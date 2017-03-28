@@ -1,4 +1,3 @@
-# /home/burak/Documents/Dropbox/Public/data/chessb-right.avi
 import cv2
 import sys; sys.path.append('../../tser/tser_kf')
 from kalman_3d import *
