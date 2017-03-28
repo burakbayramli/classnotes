@@ -50,8 +50,8 @@ int main(int argc, char **argv)
   ofstream out_smoothed_trajectory("smoothed_trajectory.txt");
   ofstream out_new_transform("new_prev_to_cur_transformation.txt");
 
-  //VideoCapture cap(argv[1]);
-  VideoCapture cap("/home/burak/Documents/Dropbox/Public/data/bwalk1.mp4"); 
+  VideoCapture cap(argv[1]);
+  //VideoCapture cap("/home/burak/Documents/Dropbox/Public/data/bwalk1.mp4"); 
   assert(cap.isOpened());
 
   Mat cur, cur_grey;
