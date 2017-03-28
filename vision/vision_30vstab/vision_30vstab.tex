@@ -93,11 +93,12 @@ $$
 
 Dönüþ $R$, taþýnma $t$, ölçekleme $s$. Bu transformasyona ölçeklemeye
 (scaling) izin veren bir katý (rigid) transformasyon deniyor. ``Katý''
-demek $s=1$ ile noktalar arasý mesafeler deðiþmeyecek demek, $s$ ile tabii
-ölçekleme olabilir, mesafeler artabilir, ama mesafe oranlarý yine ayný
-kalýr, ayrýca döndürme de -rotation- yapýlabilir. Bu transformasyona
-yansýtsal (projective) ismi de verilir. Yansýtal transformasyonun ýlgýn
-transformasyondan daha esnek / kuvvetli olduðu bilinir.
+demek $s=1$, yani noktalar arasý mesafeler deðiþmeyecek demek, daha büyük
+$s$ ile tabii ölçekleme olabilir, mesafeler artabilir, ama mesafe oranlarý
+yine ayný kalýr, ayrýca döndürme de -rotation- yapýlabilir. Bu
+transformasyona yansýtsal (projective) ismi de verilir. Yansýtal
+transformasyonun ilgin transformasyondan daha esnek / kuvvetli olduðu
+bilinir.
 
 Not: Mesela ilgin transformasyon literatürde $x' = R x + t$, yani rotasyon
 artý yer deðiþimi gibi bir formda da görülebilir, biz homojen sisteme
@@ -108,7 +109,7 @@ Homografi hesabýnýn kullaným alanlarý geniþ; mesela elde olan iki imaj
 arasýnda birbirine uyan noktalarý biliyorsak, $H$'yi hesaplayarak tüm imaj
 üzerinde bir deðiþim matrisi hesaplamýþ oluruz. 
 
-Yansýtsal $H$ hesabý için direk lýneer transform (direct linear transform
+Yansýtsal $H$ hesabý için direk lineer transform (direct linear transform
 -DLT-) tekniði var. Eldeki tüm eþleþmeler için alttaki sistemi yaratýrýz,
 
 $$ 
@@ -193,8 +194,7 @@ yakýn!
 
 Üstteki tekniðin ilginç uygulamalarýndan biri; diyelim ki bir imajýn belli
 bir bölgesindeki görüntüyü eþit kenarlý olacak þekilde çekip çýkarmak
-istiyorum, mesela alttaki Sudoku oyun karesini alýp sadece o olacak þekilde
-görmek istiyorum. 
+istiyorum, mesela alttaki Sudoku oyun karesini,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy import ndimage
@@ -217,8 +217,8 @@ Kenarlarý kýrmýzý noktalarla ben seçtim, þimdi o bölgenin alýnýp eþit
 kenarlý halde gösterilmesini istiyorum. Bu ne demektir? Bu seçilen her köþe
 noktasýnýn eþit kenarlý bir karenin köþelerine transform edilmesi
 demektir. Daha önce yaptýðým gibi $H$ hesaplarým, sonra o bölgedeki tüm
-piksellerin alýp hespaladýðým transformasyonu onlara uygularým,
-\verb!scipy.ndimage.geometric_transform! bu iþi yapar.
+piksellerin alýp hespaladýðým transformasyonu onlara uygularým (
+\verb!scipy.ndimage.geometric_transform! bu iþi yapar),
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy import ndimage
@@ -245,27 +245,27 @@ Video Stabilizasyonu
 Elde tutulan kamera ile kaydedilen görüntülerde titreme çok
 olabilir. Mesela þurada [1] bizim cep telefonu ile kaydettiðimiz bir örnek
 var. Bu görüntüyü yazýlým ile stabilize etmek mümkün mü? Cevap evet - ve
-çözüm þaþýrtýcý derecede basit. 
-
-[4]'ün çözümü þöyle özetlenebilir: bir video'yu baþtan itibaren kare kare
-iþlerken, her karede ilginç köþe noktalarý (Harris tekniði ile) buluruz, ve
-bu noktalarýn bir sonraki resimdeki eþlerini elde ederiz. Tüm eþlemeleri
-kullanarak bir homografi / transformasyon hesaplarýz, bu transformasyon
-matrisi içinde $x,y$ deðiþimi, yani taþýnma, ve $a$ açýsý ki döndürme
-bilgisi vardýr. Bu bilgileri $dx,dy,da$ olarak biriktiririz. 
+çözüm þaþýrtýcý derecede basit.  [4]'ün tekniði þöyle özetlenebilir: bir
+video'yu baþtan itibaren kare kare iþlerken, her karede ilginç köþe
+noktalarý (Harris tekniði ile) buluruz, ve bu noktalarýn bir sonraki
+resimdeki eþlerini elde ederiz, bu artýk görüntü iþlemede demirbaþ haline
+gelmiþ bir iþlem. Sonra tüm eþlemeleri kullanarak her kare için bir
+homografi / transformasyon hesaplarýz, bu transformasyon matrisi içinde
+$x,y$ deðiþimi, yani taþýnma, ve $a$ açýsý ki döndürme bilgisi vardýr. Bu
+bilgileri $dx,dy,da$ olarak biriktiririz.
 
 Tüm kareler iþlenince baþa dönüp tüm bu deðiþimlerin kümülatif toplamýný
 alarak $x,y,a$ zaman serilerini oluþtururuz. Bu zaman serileri üzerinde bir
 yürüyen ortalama (moving average) hesabý yaparýz, bu bize
 pürüzüþleþtirilmiþ zaman serileri verir. Þimdi kümülatif serinin pürüzsüz
 seriden olan farklarýný buluruz, ve her kare için bu farký alýp, bir önceki
-kare üzerinde yamultma yaparak onu ``düzeltiriz''.
+kare üzerinde yamultma yaparak onu ``düzeltiriz''. Bu kadar.
 
-Özetlemek gerekirse üstte gösterdiðimiz türde video'larda "beklenen" bir
-nokta eþleþmesi vardýr, düz yürüyoruz, kamera ileri dönük, ortadaki
-pikseller dýþa doðru eþleþmeli, saðdakiler daha saða doðru, vs.  Bu
-beklentiyi hareketli ortalama ile hesaplamak mümkün, ve ondan olan
-sapmalarý kameranýn istenmeyen titremesi olarak algýlýyoruz, ve
+Bu teknik niye iþliyor? Ýþliyor çünkü üstte gösterdiðimiz türde video'larda
+"beklenen" bir nokta eþleþmesi, bir ``akýþ'' var, düz yürüyoruz, kamera
+ileri dönük, ortadaki pikseller dýþa doðru eþleþmeli, saðdakiler daha saða
+doðru, vs.  Bu beklentiyi hareketli ortalama ile hesaplamak mümkün, ve
+ondan olan sapmalarý kameranýn istenmeyen titremesi olarak algýlýyoruz, ve
 düzeltiyoruz.
 
 \inputminted[fontsize=\footnotesize]{python}{vidstab.py}
