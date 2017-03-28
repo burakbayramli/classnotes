@@ -1,0 +1,190 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Çok Boyutlu Regresyon ile Tavsiye
+
+Tavsiye sistemlerinde eðer tercih edilen nesnelerin sayýsý çok fazla
+deðilse ilginç bir metot çok boyutlu çýktý regresyonu (multioutput
+regression -MR-) kullanmak. Tavsiye sistemleri bilindiði gibi çoðunlukla
+birçok mümkün seçeneði sýralayarak en iyi seçimleri en üste koymaya
+uðraþýr, ve yine, çoðunlukla bu sistemleri eðitirken her seçenek için tek
+bir etiket (beðenildi / beðenilmedi) ile o etiketin baðlý olduðu ``kaynak''
+verisi arasýnda iliþki kurulmaya uðraþýlýr, ve her seçenek için ayrý bir
+obje eðitilir (SVD kýsmen bir istisna, bu metot ta ayný anda tüm
+kullanýcýlarýn çýktýsý -etiketleri- arasýndaki iliþkiyi gözönüne alabilir).
+
+MR kullanarak çok boyutlu kaynak verisiyle yine çok boyutlu çýktý arasýnda
+{\em ayný anda} bir iliþki kurabiliriz, ve daha önemlisi bu iliþkiyi esnek
+(soft) bir þekilde yapabiliriz. Ayrýca MR girdi ve çýktý arasýnda iliþki
+kurduðu gibi, çýktýlar arasýnda da baðlantýlarý bulabilir, eðer her seçenek
+için ayrý ayrý tavsiye objeleri kullansaydýk bu iliþkiyi
+öðrenemezdik. Mesela 40 yaþ üstü Arizona'dan gelen kiþiler aksiyon filmi
+seviyor, ve ayný kiþiler yine komedi filmi seviyor. MR aksiyon ile komedi
+çýktýlarý arasýndaki iliþkiyi öðrenebilir.
+
+Ýþler bir MR metotunun örneðini [2] yazýsýnda bulabiliriz, bu yazýda karar
+aðacý (decision tree) kullanýlýyor, \verb!scikit-learn! paketi karar
+aðaçlarýnýn çýktýnýn çok olabilmesini destekliyor. [2]'deki örneðin amacý
+bir çemberi öðrenmek mesela; çember þöyle oluþturulmuþ, kaynak tek bir
+boyut - sýralý sayýlar, çýktý ise iki boyutlu, $\cos(x)$ diðeri $\sin(x)$. Bu
+doðal olarak bir çember ortaya çýkartacaktýr. [2]'de görüldüðü gibi MR bu
+çemberi öðreniyor.
+
+Ayný tekniði mesela Movielens 1M verisinde genre öðrenmek için
+kullanabiliriz. Kaynak müþterinin kiþisel bilgileri, hedef ise çok boyutlu
+0/1 olarak kodlanmýþ {\em tüm genre'ler} olacak. Eðer bir kiþi hem komedi
+hem aksiyon sevmiþ ise matrisin o kiþiye tekabül eden satýrýnda aksiyon ve
+komedi kolonu 1 olacak mesela. Bu þekilde tüm müþteriler kodlanacak, ve
+kaynak olarak kiþisel veri alýnacak. 
+
+Bu veri {\em Pivotlama} yazýsýnýn dizininde bulunabilir, zip dosyasýný
+açmak yeterli.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+cols = ['user_id', 'movie_id', 'rating', 'timestamp']
+ratings =  pd.read_csv('../stat_pandas_ratings/ratings.dat', sep='::',
+           header=None,names=cols)
+cols = ['movie_id', 'title', 'genres']
+movies =  pd.read_csv('../stat_pandas_ratings/movies.dat',sep='::',
+          header=None,names=cols)
+cols = ['user_id', 'gender', 'age', 'occupation', 'zip']
+users = pd.read_csv('../stat_pandas_ratings/users.dat', sep='::', 
+        header=None,names=cols)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+genre_iter = (set(x.split('|')) for x in movies.genres)
+genres = sorted(set.union(*genre_iter))
+dummies = pd.DataFrame(np.zeros((len(movies), len(genres))), columns=genres)
+for i, gen in enumerate(movies.genres):
+   dummies.ix[i, gen.split('|')] = 1
+movies_windic = movies.join(dummies.add_prefix('Genre_'))
+movies_windic = movies_windic.drop(['title','genres'],axis=1)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+joined = ratings.merge(movies_windic, left_on='movie_id',right_on='movie_id')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y = joined.groupby('user_id').sum()
+y = y.drop(['movie_id','rating','timestamp'],axis=1)
+y[y > 0.0] = 1.0
+\end{minted}
+
+Çýktýyý kodlarken Movielens verisinde bir kiþi bir filme herhangi bir not
+vermiþ ise o filmin genre'sini ``tercih edilir'' olarak 1 ile
+iþaretledik. Tabii ki o film için not düþük olabilir (ve bu durumu bir
+filtre koþulu olarak kullanabilirdik), ama bu, o kiþinin o belirli filmi
+beðenmediðini gösterir, o filmi seçtiyse müþteri büyük bir ihtimalle o
+genre'yi seviyordur. Bu hipotezi test edebilirsiniz, \verb!y[y > 0.0]!
+yerine \verb!y[y > 3]!  seçilirse baþarý oraný düþüyor. Yani bize faydalý
+olacak deðerli verileri ikinci filtre ile kaybediyoruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.feature_extraction import DictVectorizer
+def one_hot_dataframe(data, cols):
+    vec = DictVectorizer()
+    mkdict = lambda row: dict((col, row[col]) for col in cols)
+    tmp = vec.fit_transform(data[cols].to_dict(outtype='records')).toarray()
+    vecData = pd.DataFrame(tmp)
+    vecData.columns = vec.get_feature_names()
+    vecData.index = data.index
+    data = data.drop(cols, axis=1)
+    data = data.join(vecData)
+    return data
+
+X = users.copy()
+X['occupation2'] = users['occupation'].map(lambda x: str(x))
+X['zip2'] = users['zip'].map(lambda x: str(x)[0])
+X['zip3'] = users['zip'].map(lambda x: str(x)[:2])
+X = one_hot_dataframe(X,['occupation2','gender','zip2','zip3'])
+X = X.drop(['occupation','zip'],axis=1)
+X = X.set_index('user_id')
+X = X.ix[y.index]
+X = X.reindex(y.index)
+print X.shape, y.shape
+\end{minted}
+
+\begin{verbatim}
+(6040, 134) (6040, 18)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_auc_score
+from sklearn.cross_validation import train_test_split
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Lasso, Ridge, LinearRegression
+
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=1000)
+clf = RandomForestRegressor(max_depth=3,n_estimators=5)
+
+clf.fit(x_train,y_train)
+y_pred = clf.predict(x_test)
+
+fpr, tpr, thresholds = roc_curve(np.ravel(y_test), np.ravel(y_pred))
+roc_auc = auc(fpr, tpr)
+print 'Tree AUC', roc_auc
+
+imps = pd.Series(list(clf.feature_importances_),index=X.columns)
+imps = imps.order(ascending=False).head(20)
+print 'important features'
+print np.array(imps.index)
+\end{minted}
+
+\begin{verbatim}
+Tree AUC 0.844777794213
+important features
+['gender=F' 'age' 'gender=M' 'occupation2=10' 'zip3=46' 'zip2=3' 'zip3=37'
+ 'zip3=65' 'zip3=31' 'zip3=33' 'zip3=41' 'zip3=39' 'zip3=67' 'zip3=01'
+ 'zip3=20' 'zip3=24' 'zip3=95' 'zip3=08' 'zip3=09' 'zip3=03']
+\end{verbatim}
+
+Test etmek için AUC olcusunu kullandýk. Bir pürüz vardý, AUC hem tahmin hem
+de test etiketlerini tek boyutlarda alýr, bizim çýktýmýz çok boyutlu
+idi. Ne yapmalý?  Biz de her iki matrisi (test etiketleri, tahminler)
+``düzleþtirdik'', tek boyut haline getirdik. Nasýl olsa her iki matris ayný
+þekilde düzleþtirildiði ve boyutlarý zaten ayný olduðu için sonuç iki
+vektör de ayný boyutta oldu. Ve bu iki vektör üzerinde AUC hesabý
+yaptýk. Sonuç üstte görüldüðü gibi \%84.
+
+Ayrýca \verb!RandomForestRegressor! objesi regresyonun önemli bulduðu
+kaynak öðelerini önem sýrasýna göre gösterebilir. Üstte cinsiyet (gender),
+yaþ (age) genre seçiminde önemli görünüyor. Bu akla yatkýn. Ayrýca
+meslekler (öccupation) arasýnda 10 kodlu olan önemliymiþ, bu kodun
+ilköðretim öðrencisine tekabül ettiðini gördük. Ýlginç.
+
+Karþýlaþtýrmak için basit bir alternatif kodladýk, tüm beðenilerin
+ortalamasýný aldýk, ve bu senaryoada tahmin olarak herkes için sürekli ayný
+tahmini yaptýk. Buradan gelen sonuç \%83. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y_naive = np.array(y_train).mean(axis=0)
+y_naive = pd.DataFrame([y_naive], index=range(y_test.shape[0]), 
+                       columns=list(y.columns))
+fpr, tpr, thresholds = roc_curve(np.ravel(y_test), np.ravel(y_naive))
+roc_auc = auc(fpr, tpr)
+print 'Naive AUC', roc_auc
+\end{minted}
+
+\begin{verbatim}
+Naive AUC 0.833752370725
+\end{verbatim}
+
+Evet, bu çok basit bir tahmin için yüksek gelebilir, fakat bir Netflix Veri 
+Bilimcisi'nin söylediði gibi ``popüleriteyi yenmek zordur''. Neyse ki
+üstteki  MR metotu popüleriteyi yendi. Ayrýca bir þey daha yaptý, 
+eðer tavsiye sistemi için popülerite kullansaydýk herkes için sürekli 
+ayný tavsiyeyi vermemiz gerekecekti. MR bazlý ``kisielleþtirilmiþ'' 
+metot herkes için ayrý tavsiyeler verebilecektir.
+
+Kaynaklar
+
+[1] Wikipedia, {\em Zip Code Zones}, \url{http://upload.wikimedia.org/wikipedia/commons/2/24/ZIP_Code_zones.svg}
+
+[2] Scikit-Learn, {\em Multi-output Decision Tree Regression}, \url{http://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html}
+
+
+\end{document}

@@ -1,0 +1,320 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+
+[1, sf. 390]'i baz alarak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('phillips.raw',sep='\s*',index_col=0)
+df['dinf'] = df.inf.diff()
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('dinf ~ unem', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                   dinf   R-squared:                       0.104
+Model:                            OLS   Adj. R-squared:                  0.087
+Method:                 Least Squares   F-statistic:                     6.132
+Date:                Tue, 05 Jul 2016   Prob (F-statistic):             0.0165
+Time:                        13:37:56   Log-Likelihood:                -123.00
+No. Observations:                  55   AIC:                             250.0
+Df Residuals:                      53   BIC:                             254.0
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept      2.8282      1.225      2.309      0.025         0.371     5.285
+unem          -0.5176      0.209     -2.476      0.017        -0.937    -0.098
+==============================================================================
+Omnibus:                       25.286   Durbin-Watson:                   1.771
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               71.207
+Skew:                          -1.193   Prob(JB):                     3.45e-16
+Kurtosis:                       8.038   Cond. No.                         23.7
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 'dogal issizlik', results.params.Intercept / -results.params.unem
+\end{minted}
+
+\begin{verbatim}
+dogal issizlik 5.46355434805
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('data.csv')
+df.columns = ['country','year','unemploy','inf','tbal']
+uk = df[df['country'] == 'United Kingdom']
+uk = uk.sort('year')
+uk = uk.set_index('year')
+dfa = pd.read_csv('data-add.csv')
+dfa = dfa.set_index('year')
+dfa = dfa[dfa['country'] == 'United Kingdom']
+uk.loc[dfa.index,'unemploy'] = dfa.unemploy
+uk.to_csv('uk.csv')
+uk['dinf'] = uk.inf.diff()
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('dinf ~ unemploy', data=uk[(uk.index>=1974) & (uk.index <=1980)]).fit()
+print results.params.Intercept / -results.params.unemploy
+results = smf.ols('dinf ~ unemploy', data=uk[(uk.index>=1981) & (uk.index <=1987)]).fit()
+print results.params.Intercept / -results.params.unemploy
+results = smf.ols('dinf ~ unemploy', data=uk[(uk.index>=1988) & (uk.index <=1990)]).fit()
+print results.params.Intercept / -results.params.unemploy
+\end{minted}
+
+\begin{verbatim}
+6.35449629013
+10.2971219195
+26.4862783933
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 5.23 * 1.51
+\end{minted}
+
+\begin{verbatim}
+7.8973
+\end{verbatim}
+Demand side
+
+Money demand
+
+%
+$$ m - p = y_d $$
+%{{_preview/f-76319454.png}}
+
+Goods demand
+
+%
+$$ y_d = \sigma_1x - \sigma_2 r + \sigma_3 c  $$
+%{{_preview/f-12778034.png}}
+
+Competitiveness
+
+%
+$$ c = e + p^* - p $$
+%{{_preview/f--1071252110.png}}
+
+Uncovered interest parity
+
+%
+$$ i = i^* + \Delta e^e $$
+%{{_preview/f--1233035684.png}}
+
+Expected depreciation
+
+%
+$$ \Delta e^e = \Delta p^e - \Delta p^{*e} - \delta (c - \bar{c}) $$
+%{{_preview/f-1932232954.png}}
+
+
+$m$ real money stock, $p$ price level (GDP deflator), $y_d$ real demand / real
+GDP, $x$ exogenous real demand factors including fiscal stance, world econ
+activity, $r$ domestic real interest rate $c$ competitiveness, $e$ exchange rate
+as measured the domestic curreny value of one unit of foreign currency, $p^*$
+world price of output in foreign currency $i$ domestic nominal interest rate,
+$i^*$ foreign nominal interest rate, $\Delta p^e$ expected domestic inflation,
+$\Delta p^{*e}$  expected foreign inflation, $\bar{c}$ expected long-run
+equilibrium competitiveness.
+
+Sonuc
+
+%
+$$ y_d = m - p $$
+%{{_preview/f--926985034.png}}
+
+%
+$$ c = c_1 (m-p) - c_2 x + c_3 r^* + c_4 \bar{c} $$
+%{{_preview/f--1430910965.png}}
+
+$r^* = i^* - \Delta p^{*e}$ foreign interest rate, $c_1 = 1/\Omega$, $c_2 =
+\sigma_1 / \Omega$, $c_3 = \sigma_2 / \Omega$, $c_4 = \sigma_2 \delta / \Omega$,
+$\Omega = \sigma_2 \delta + \sigma_3 $. 
+
+Supply side
+
+Production funtion
+
+%
+$$ y_d - \bar{y} = -u \mlabel{1} $$
+%{{_preview/f-1129444691.png}}
+
+Price setting
+
+%
+$$ p - w = \beta_0 + \beta_1 [y_d - \bar{y} ] + \beta_{12}c - \beta_2 \Delta^2 p $$
+%{{_preview/f--1539898271.png}}
+
+Wage bargaining
+
+%
+$$ w - p = \gamma_0 - \gamma_1 u + \gamma_{12}c - \gamma_2 \Delta^2 p + z_w $$
+%{{_preview/f--1379571147.png}}
+
+Trade deficit
+
+%
+$$ c = \delta_0 + \delta_1 [y_d - \bar{y} ] - \delta_2 td - z_c
+\mlabel{2}
+$$
+%{{_preview/f--694842754.png}}
+
+$y$ potention output, $w$ wage, $\Delta^2 p$ the rate of change of inflation,
+$u$ unemployment rate, $z_w$ exogenous factors raising wages, $td$ trade deficit
+as proportion of potential output, $z_c$ exogenous factors tending to imrpove
+trade deficit. 
+
+(1)'den
+
+%
+$$ u = - [y_d - \bar{y}]  $$
+%{{_preview/f--839050880.png}}
+Diger
+
+%
+$$ td = \frac{1}{\delta_2} [ \delta_0 + \delta_1 [y_d - \bar{y} ]  - c ] - z_c $$
+%{{_preview/f--1896032686.png}}
+
+(2)'yi baz alarak,
+
+%
+$$
+\Delta^2 p = \frac{1}{\alpha_2} [\alpha_0 + \alpha_1 [y_d - \bar{y} ] +
+\alpha_{12}c + z_w ] 
+$$
+%{{_preview/f--1385538750.png}}
+
+$\alpha_0 = \beta_0 + \gamma_0$, $\alpha_1 = \beta_1 + \gamma_1$, $\alpha_{12} =
+\beta_{12} + \gamma_{12}$, $\alpha_2 = \beta_2 + \gamma_2$.
+
+%
+$$ [ \alpha_1 + \delta_1 \alpha_{12}]u + \alpha_2 \Delta^2 p +
+\alpha_{12} \delta_2 td = \alpha_0 + z_w - \alpha_{12}z_c
+\mlabel{3}
+$$
+%{{_preview/f-915344346.png}}
+
+Equilibrium level
+
+%
+$$ [ \alpha_1 + \delta_1 \alpha_{12} ] \hat{u} = \alpha_0 + z_w - \alpha_{12}z_c  $$
+%{{_preview/f-1604576065.png}}
+
+$\hat{u}$ is natural rate of unemployment. We reinterpret (3) as
+
+
+%
+$$ [ \alpha_1 + \delta_1 \alpha_{12}]u + \alpha_2 \Delta^2 p +
+\alpha_{12} \delta_2 td = [\alpha_1 + \delta_1 \alpha_{12} ] \hat{u}
+$$
+%{{_preview/f-1341265048.png}}
+
+
+%
+$$
+0.091 \log u + 0.05 u + 1.07 \Delta^2 p + 1.25 td  =
+0.091 \log \hat{u} + 0.054 \hat{u} - 1.27 \Delta u
+$$
+%{{_preview/f-1370262018.png}}
+
+
+
+
+
+
+
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+uk = df[df['country'] == 'United Kingdom']
+uk = uk.sort('year')
+uk = uk.set_index('year')
+dfa = pd.read_csv('data-add.csv')
+dfa = dfa.set_index('year')
+dfa = dfa[dfa['country'] == 'United Kingdom']
+uk.loc[dfa.index,'unemploy'] = dfa.unemploy
+fig, axes = plt.subplots(nrows=3, ncols=1)
+uk['tbal'].plot(ax=axes[0],title='Trade Balance')
+uk['unemploy'].plot(ax=axes[1],title='Unemployment')
+uk['inf'].plot(ax=axes[2],title='Inflation')
+plt.subplots_adjust(hspace=1.0)
+plt.savefig('uk2.png')
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('data.csv')
+df.columns = ['country','year','unemploy','inf','tbal']
+tr = df[df['country'] == 'Turkey']
+tr = tr.sort('year')
+tr = tr.set_index('year')
+tr = tr.interpolate(method='spline',order=1)
+fig, axes = plt.subplots(nrows=3, ncols=1)
+tr['tbal'].plot(ax=axes[0],title='Trade Balance')
+tr['unemploy'].plot(ax=axes[1],title='Unemployment')
+tr['inf'].plot(ax=axes[2],title='Inflation')
+plt.subplots_adjust(hspace=1.0)
+plt.savefig('tr2.png')
+\end{minted}
+
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('data.csv')
+df.columns = ['country','year','unemploy','inf','tbal']
+us = df[df['country'] == 'United States']
+us = us.sort('year')
+us = us.set_index('year')
+us = us.interpolate(method='spline',order=1)
+fig, axes = plt.subplots(nrows=3, ncols=1)
+us['tbal'].plot(ax=axes[0],title='Trade Balance')
+us['unemploy'].plot(ax=axes[1],title='Unemployment')
+us['inf'].plot(ax=axes[2],title='Inflation')
+plt.subplots_adjust(hspace=1.0)
+plt.savefig('us2.png')
+\end{minted}
+
+
+
+
+
+
+
+
+
+
+
+Kaynaklar
+
+[1] Wooldridge, {\em Introductory Econometrics}
+
+
+
+
+
+
+
+
+
+
+\end{document}

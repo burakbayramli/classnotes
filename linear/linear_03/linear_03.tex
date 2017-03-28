@@ -1,0 +1,530 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 3
+
+Önceki derslerde matris çarpýmý yaptýk, bu derste bu iþlemin kurallarýný
+göreceðiz. Bu iþi pek çok þekilde yapmanýn yolu var ve hepsi önemli, ve
+ayný sonucu veriyor.
+
+Sonra matris tersi (inverse) konusuna gireceðiz, orada bir sürü kavram var,
+ve çok önemli. 
+
+Ýki matrisi çarpma tekniðiyle baþlayalým. 
+
+\includegraphics[height=3cm]{3_01.png}
+
+Bu çarpýmý elle yaparken bazen soldaki matrisin üzerinde sol iþaret
+parmaðý, saðdakinde sað iþaret parmaðý konulur, ve sol el soldan-saða, sað
+el yukarýdan-aþaðý hareket ettirilir, ve parmaklarýn üzerinde olan hücreler
+birbiri ile çarpýlýr, sonra bu çarpýmlar toplanýr. Üstte soldaki matrisin
+3. satýrý, saðdaki matrisin 4. kolonu baz alýnmýþ, bu çarpým ve toplama
+sonucu $C$'nin 3. satýr ve 4. kolonundaki deðeri elde ederiz. Bu deðere
+$c_{34}$ diyelim,
+
+$$ 
+\left[\begin{array}{rrrr}
+\\
+\\
+a_{31} & a_{32} & \dots \\
+\\
+\\
+\end{array}\right]
+\left[\begin{array}{rrrrr}
+& & b_{14} & & \\
+& & b_{24} & & \\
+& &  & & \\
+& &  & & \\
+& &  & & 
+\end{array}\right] 
+=
+\left[\begin{array}{rrrrr}
+& &  & & \\
+& &  & & \\
+& & c_{34} & & \\
+& &  & & \\
+& &  & & 
+\end{array}\right]
+$$ 
+
+$$ c_{34} = \textrm{ 3. satýr } \times \textrm{ 4. kolon } $$
+
+diyebiliriz, ve cebirsel olarak
+
+$$ = a_{31}b_{14} + a_{32}b_{24} + ... $$
+
+Eðer toplama operatörü kullanarak daha temiz yazmak gerekirse,
+
+$$ c_{34} = \sum_{k=1}^{n} a_{3k}b_{k4} $$ 
+
+ki $n$ satýr sayýsý $n$'dir. 
+
+Bu çarpýmý tabii her zaman gerçekleþtiremeyiz. Çarpýmýn olmasý için matris
+boyutlarýnýn uyumlu olmasý gerekir (illa kare matris olmasý da gerekmez,
+ama uyumluluk gerekir). Üstteki çarpýmýn nasýl gerçekleþtiðine bakarsak bu
+uyumu görmeye baþlarýz herhalde, soldaki matrisin satýrý saðdakinin kolonu
+çarpýlýyorsa bu satýr ve kolon büyüklüklerinin eþit olmasý gerekir. Diyelim
+ki $m$ satýr $n$ kolon içeren $A$ matrisi $m \times n$ boyutlarýnda ise, o
+zaman bu matris sadece $n \times p$ boyutlarýndaki bir $B$ matrisi ile
+çarpýlabilir, ve sonuç $m \times p$ boyutlarýnda yeni bir matris
+olur. Yeni matrisin boyutlarý $A$'nin satýr sayýsý $B$'nin kolon sayýsýna
+eþittir. 
+
+Matris çarpýmýna kolon bazlý bakabilir miyiz? Evet. Daha önce öðrendiðimiz
+kolonla matris çarpýmý fikrini kullanmak yeterli, mesela alttaki durumda
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+\dots & \dots   \\
+\dots & \dots   \\
+\dots & \dots 
+\end{array}\right]
+}_{A m \times n}
+\underbrace{
+\left[\begin{array}{rr}
+\uparrow &  \dots\\
+&  \dots\\
+\downarrow & \dots 
+\end{array}\right] 
+}_{B, n \times p}
+=
+\underbrace{
+\left[\begin{array}{rr}
+\uparrow &  \dots \\
+&  \dots \\
+\downarrow & \dots
+\end{array}\right] 
+}_{C, m \times p}
+$$
+
+$A$'nin {\em tamamýnýn} $B$'nin en sol kolonu ile çarpýlmasý bize $C$'nin
+en sol kolonunu verecektir. Dikkat, bu iþlemde $B$'nin diðer kolonlarý
+hiçbir þekilde iþleme dahil olmazlar. Yine eðer yine $A$'nin {\em tamamý}
+ile bu sefer ikinci kolonu çarparsak $C$'nin ikinci kolonunu elde ederiz,
+vs.
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+\dots & \dots   \\
+\dots & \dots   \\
+\dots & \dots 
+\end{array}\right]
+}_{A m \times n}
+\underbrace{
+\left[\begin{array}{rr}
+\dots & \uparrow \\
+& \\
+\dots & \downarrow
+\end{array}\right] 
+}_{B, n \times p}
+=
+\underbrace{
+\left[\begin{array}{rr}
+\dots & \uparrow \\
+& \\
+\dots & \downarrow
+\end{array}\right] 
+}_{C, m \times p}
+$$
+
+O zaman þu ifadeyi kullanabiliriz: ``$C$'nin kolonlarý $A$'nin kolonlarýnýn
+bir kombinasyonudur''. Bu ifade daha önceki kolon bakýþýmýz ile
+uyumlu. Daha önce kolonlarýn kombine edilerek yeni bir kolon elde
+edildiðini gördük, bu fikri sadece $B$ üzerinde, tekrar tekrar, her $B$
+kolonu ile ayrý ayrý uyguluyoruz, ve sonuç olarak $C$'nin ayrý ayrý
+kolonlarýný elde ediyoruz.
+
+Satýr Bakýþý
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+\leftarrow  & \rightarrow  \\
+\dots & \dots \\
+\dots & \dots 
+\end{array}\right]
+}_{A m \times n}
+\underbrace{
+\left[\begin{array}{rr}
+\dots & \dots \\
+\dots & \dots \\
+\dots & \dots
+\end{array}\right] 
+}_{B, n \times p}
+=
+\underbrace{
+\left[\begin{array}{rr}
+\leftarrow  & \rightarrow  \\
+\dots & \dots  \\
+\dots & \dots 
+\end{array}\right] 
+}_{C, m \times p}
+$$
+
+Ayný çarpýmý satýrsal olarak düþünelim, tekrar daha önce öðrendiðimiz satýr
+bakýþýný ayrý ayrý satýrlar olarak kullanýyoruz. $A$'nin tek bir satýrý
+$B$'nin tamamýný, tüm satýrlarýný kombine ediyor ve bu þekilde $C$'nin
+tekabül eden satýrýný elde ediyoruz. 
+
+Peki 4. yol nedir? Þimdiye kadar gördüklerimiz satýr ve kolon noktasal
+çarpýmý (her $C$ hücresi için), $A$ kolon kombinasyonu, $B$ satýr
+kombinasyonu. Ya peki $A$'nin kolonunu alýp $B$'nin satýrýyla çarpsak ne
+olur? Boyut olarak bu neye benzerdi? $A$'dan tek kolon alýnca boyut $m
+\times 1$. $B$'den satýr alýnca boyut $1 \times p$. Çarpýnca sonuç bir
+matris olmaz mý? Evet, boyutu $m \times p$ boyutunda bir matris ortaya
+çýkar. Bunu iki vektörün çarpýmýndan elde ettik! Ufak bir örnekte görelim, 
+
+$$ 
+\left[\begin{array}{r}
+2 \\ 3 \\ 4
+\end{array}\right]
+\left[\begin{array}{rr}
+1 & 6
+\end{array}\right]
+=
+\left[\begin{array}{rr}
+2 & 12 \\
+3 & 18 \\
+4 & 24
+\end{array}\right]
+ $$
+
+Saðdaki matris çok özel bir matristir; öncelikle $C$'nin kolonlarý mesela
+$A$'nin (þu anda bir vektör) katlarýdýr aslýnda. Peki satýrlar?  $C$'nin
+satýrlarý ayný zamanda $B$ nin satýrlarýnýn da katlarýdýr! O zaman þunu
+söyleyebiliriz. 4. yol $k=1,..,n$ için $A$'nin $k$'inci kolonu ile
+$k$'inci satýrýnýn çarpýmýnýn toplamýdýr. Yani alttaki gibi örnekte
+göstermek gerekirse, 
+
+$$ 
+\left[\begin{array}{rr}
+2 & 7 \\
+3 & 8 \\
+4 & 9
+\end{array}\right]
+\left[\begin{array}{rr}
+1 & 6 \\
+0 & 0
+\end{array}\right]
+=
+\left[\begin{array}{r}
+2 \\ 3\\ 4
+\end{array}\right]
+\left[\begin{array}{rr}
+1 & 6
+\end{array}\right] 
++
+\left[\begin{array}{r}
+7 \\ 8\\ 9
+\end{array}\right]
+\left[\begin{array}{rr}
+0 & 0
+\end{array}\right] 
+ $$
+
+Eþitliðin saðýnda her toplamda ayrý birer matris var. Yani her çarpýmdan
+bir matris elde ediyoruz, sonra bu matrisleri üst üste koyarak
+topluyoruz. Bu yaklaþým ayrý ayrý kolonlarý hesaplayýp onlarý yanyana
+istiflemekten farklý, 4. yolda $m \times p$ boyutlu bir matrisi sürekli
+elde ediyoruz, sonra bu matrisleri topluyoruz. 
+
+Eðer iki üstteki örnekteki $C$'nin satýrlarýný vektör olarak çizseydim,
+onlarýn hepsinin ayný yöne iþaret ettiðini görürdüm; üst üste binmiþ farklý
+boyutlarýnda vektörler olarak gözüküyörlerdi yani. Kolonlarý çizsem, yine
+ayný þekilde olurlardý. Þimdi bir ifade kullanacaðým, ki anlamý dersin
+ilerisinde daha açýk hale gelecek, ``$C$'nin satýr uzayý da, kolon uzayý da
+tek bir çizgidir (ayrý çizgiler tabii)''.
+
+Blok Teknigi
+
+Aslinda matrisleri parcalara bolup carpimi o parcalar uzerinde yapmak ta
+mumkundur. 
+
+Mesela $A$'yi ve $B$'yi dört parçaya bölebilirim, ki $A$ mesela $10 \times
+10$ boyutlarýnda olabilir, o zaman çarpým sonucunun sol üst köþesi ne olur?
+Alttaki gibi olur,
+
+\includegraphics[height=4cm]{3_02.png}
+
+Yani bloklarý sanki ayrý bir hücreymiþ gibi görüp bildiðimiz çarpým
+numarasýný uygulayabiliyoruz.
+
+Evet bugünlük matris çarpýmý konusunu bitirdik. Artýk matris tersi alma
+konusuna gelebiliriz. 
+
+Matris Tersi (Inverses)
+
+Matris tersi $A^{-1}$ mesela bir $A$ matrisi için, eðer var ise, öyle bir
+matristir ki $A$ ile çarpýlýnca birim matrisi verir. Yani
+
+$$ A^{-1} A = I $$
+
+Tabii bu durum biraz daha detaylandýrýlabilir; mesela üstteki matris tersi
+soldan ters (left inverse) olarak bilinir, ama kare matrisler için soldan,
+saðdan hepsi aynýdýr, yani kare durum için 
+
+$$ AA^{-1} = I $$
+
+ifadesi de doðrudur. Bunu ispat etmek pek kolay deðildir bu arada. Neyse,
+karesel deðil dikdörtgensel matris olsaydý o zaman sol ters sað terse eþit
+olmazdý; zaten boyut açýdan bu eþitlik imkansýz olurdu. Karesel açýdan
+boyutlar da uyumlu. 
+
+Önemli sorular ``matris tersi ne zaman mevcuttur?'', ve ``mevcut ise nasýl
+bulunur?''.
+
+Tersi alýnabilen matrisler ayný zamanda eþsiz olmayan (non-singular)
+matrislerdir. Þimdi eþsiz olan ve tersi olmayan duruma bakalým. Ufak örnek, 
+
+$$ 
+A = 
+\left[\begin{array}{rr}
+1 & 3 \\ 2 & 6
+\end{array}\right]
+ $$
+
+Bu matrisin niye tersi yoktur? Bu soruya deðiþik þekillerde cevap
+verilebilir. Eðer determinantlarý görmüþ olsaydýk derdik ki ``determinantý
+hesaplayýnca sýfýr sonuç gelir''. Baþka bir sebep? 
+
+Diyelim ki $A$ bir baþka matrisle çarpýlýnca birim matris sonucunu
+verdi. Bu baþka matris nedir? Eðer ters yoksa, bu mümkün olamaz. Niye?
+Þimdi kolon bakýþýný düþünelim, eðer $A$'yi bir baþka matris ile
+çarpýyorsam ters olmayan durumda kolonlar birbirinin katýdýr. Peki
+birbirinin katý olan kolonlarýn kombinasyonu ile birim matris elde edebilir
+miyim? Mümkün deðil. Çünkü birim matrisin kolonlarýnda 1 ve 0 deðerleri
+var, ve üstteki durumda katlarý ekleyerek çýkartarak, vs bu deðerlere
+ulaþamam. 
+
+Bir diðer bakýþ açýsý: $Ax = 0$ denklemini tatmin edecek bir $x$ vektörü
+bulabilir miyim? Matris formunda yazarsam, 
+
+$$ 
+\left[\begin{array}{rr}
+1 & 3 \\ 2 & 6
+\end{array}\right]
+\left[\begin{array}{r}
+\dots \\ \dots
+\end{array}\right]
+=
+\left[\begin{array}{r}
+0 \\ 0
+\end{array}\right]
+ $$
+
+Noktalý yerlere ne gelmeli? Ne gelebilir? 
+
+$$ 
+\left[\begin{array}{rr}
+1 & 3 \\ 2 & 6
+\end{array}\right]
+\left[\begin{array}{r}
+3 \\ -1
+\end{array}\right]
+=
+\left[\begin{array}{r}
+0 \\ 0
+\end{array}\right]
+ $$
+ 
+Þimdi bir zihin egzersizi: Eðer $A$'nin tersi olsaydý, her iki tarafý
+matris tersiyle çarpardým,
+
+$$A^{-1}Ax = A^{-1} 0$$
+
+$$x = 0$$
+
+sonucunu elde ederdim. Yani $x=0$ olmasý gerekirdi. Fakat $x \ne 0$, biraz
+önce üstte bunu bulduk. Burada bir çakýþma var (contradiction), demek ki
+baþlangýç hipotezi yanlýþtýr; $A$'nin tersi yoktur. 
+
+Tersi olan bir matris alalým. Boþluða ne gelmeli?
+
+$$ 
+\underbrace{
+\left[\begin{array}{rrr}
+1 & 3 \\
+2 & 7
+\end{array}\right]
+}_{A}
+\underbrace{
+\left[\begin{array}{rrr}
+ &  \\
+ & 
+\end{array}\right]
+}_{A^{-1}}
+=
+\underbrace{
+\left[\begin{array}{rrr}
+1 & 0 \\
+0 & 1
+\end{array}\right]
+}_{I}
+ $$
+
+Kolonsal olarak düþünelim, 
+
+
+$$ 
+\underbrace{
+\left[\begin{array}{rrr}
+1 & 3 \\
+2 & 7
+\end{array}\right]
+}_{A}
+\underbrace{
+\left[\begin{array}{rrr}
+a &  \\
+b & 
+\end{array}\right]
+}_{A^{-1}}
+=
+\underbrace{
+\left[\begin{array}{rrr}
+1 &  \\
+0 & 
+\end{array}\right]
+}_{I}
+ $$
+
+Yani tersin ilk kolonuna öyle $a,b$ deðerleri bulalým ki bu kolon $A$'yi
+çarpýnca (kolonlarýný kombine edince) sonuç $\left[\begin{array}{rr}1 &
+ 0\end{array}\right]^T$ olsun. 
+
+Ayný þekilde ikinci kolon için ama bu sefer sonuç $\left[\begin{array}{rr}0 &
+ 1\end{array}\right]^T$ olsun. 
+
+
+$$ 
+\underbrace{
+\left[\begin{array}{rrr}
+1 & 3 \\
+2 & 7
+\end{array}\right]
+}_{A}
+\underbrace{
+\left[\begin{array}{rrr}
+a & c \\
+b & d
+\end{array}\right]
+}_{A^{-1}}
+=
+\underbrace{
+\left[\begin{array}{rrr}
+1 & 0 \\
+0 & 1
+\end{array}\right]
+}_{I}
+ $$
+
+Belki de þöyle söylemek lazým; burada ayný anda iki denklem sistemi
+çözüyor gibiyiz. Bu baðlamda Gauss-Jordan'ýn fikri þudur; her iki denklemi
+ayný anda çöz. Denklemler þunlardýr
+
+$$ 
+\left[\begin{array}{rrr}
+1 & 3 \\
+2 & 7
+\end{array}\right]
+\left[\begin{array}{r}
+a  \\
+b 
+\end{array}\right]
+=
+\left[\begin{array}{rrr}
+1  \\
+0
+\end{array}\right]
+ $$
+
+$$ 
+\left[\begin{array}{rrr}
+1 & 3 \\
+2 & 7
+\end{array}\right]
+\left[\begin{array}{r}
+c  \\
+d 
+\end{array}\right]
+=
+\left[\begin{array}{rrr}
+0  \\
+1
+\end{array}\right]
+ $$
+
+Gauss ile Jordan bu konu hakkýnda konuþuyorlarmýþ, Jordan Gauss'a
+``bunlarýn ikisini niye ayný anda çözmüyorsun?'' demiþ. Hikaye böyle! Bunun
+için Jordan'ýn fikri eklemlemeyi geniþletmektir. Daha önce gördüðümüz gibi,
+denklem çözmek demek, eklemlenmiþ (augmented) matrisi çözmek demektir,
+1. denklem için 
+
+$$ 
+\left[\begin{array}{rr|r}
+1 & 3 & 1\\
+2 & 7 & 0
+\end{array}\right]
+$$
+
+çözülürdü mesela. Ýki denklem için fikir 2. sonucu da eklemlenmiþ kýsma
+koymak, yani 
+        
+$$ 
+\left[\begin{array}{rr|rr}
+1 & 3 & 1 & 0\\
+2 & 7 & 0 & 1
+\end{array}\right]
+ $$
+
+sistemini çözmek. Üstteki sistem çözülünce sonuç matris tersi olacaktýr!
+Çünkü eklemlenmiþ kýsýma dikkat edersek, o kýsým aslýnda bir birim
+matrisidir. Þimdi eliminasyona baþlarýz, mesela 1. satýrý 2 ile çarpýp
+2. satýrdan çýkartmak yani,
+
+        
+$$ 
+\left[\begin{array}{rr|rr}
+1 & 3 & 1 & 0\\
+0 & 1 & -2 & 1
+\end{array}\right]
+ $$
+
+elde ederiz. Üstteki sol matris üst üçgensel. Bu noktada Gauss ``iþ
+tamamdýr'' diyor, fakat Jordan devam et diyor. Þimdi en üst satýrdaki 3
+sayýsýný elimine et. O zaman alttaki satýrý 3 ile çarpýp 1. satýrdan
+çýkartýrýz,
+
+$$ 
+\left[\begin{array}{rr|rr}
+1 & 0 & 7 & -3\\
+0 & 1 & -2 & 1
+\end{array}\right]
+ $$
+
+Böylece sol kýsýmda birim matris edildi. Ve taným itibariyle sað kýsýmda
+ise $A^{-1}$ elde etmiþ oldum. Peki bu nasýl oldu? Elimizde bir
+$\left[\begin{array}{r|r}A & I\end{array}\right]$ var, ve onda 
+eliminasyon yapýyorum, yani onu bir sürü $E$ ile ardarda 
+çarpýyorum, ya da tek nihai bir $E$ ile çarpýyorum. 
+
+$$ E \left[\begin{array}{rr}A & I\end{array}\right] = 
+\left[\begin{array}{rr}I & ?\end{array}\right]
+$$
+
+Eðer $EA = I$ elde edebiliyorsam, $E$ öyle bir þeydir ki $A$ ile çarpýnca
+bana $I$ vermektedir. Bu ``þey'' o zaman matris tersinden baþka bir þey
+olamaz, yani $E = A^{-1}$. Devam edersek,
+
+$$ E \left[\begin{array}{rr}A & I\end{array}\right] = 
+\left[\begin{array}{rr}EA & EI\end{array}\right] =
+\left[\begin{array}{rr}I & EI\end{array}\right] =
+\left[\begin{array}{rr}I & E\end{array}\right] =
+\left[\begin{array}{rr}I & A^{-1}\end{array}\right]
+$$
+
+$E$ birim matrisi ile çarpýldý. Demek ki sonuç matrisinin sað kýsmýnda
+görülen matris $E$'dir, yani matris tersidir.
+
+
+\end{document}

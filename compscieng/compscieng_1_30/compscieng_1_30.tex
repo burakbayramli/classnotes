@@ -1,0 +1,181 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+DFT
+
+Ayrýksal (discrete) olarak Fourier modellemesi yapmak istiyorsak, elimizde
+devamlý (continuous) f(x) fonksiyonu olmayacak, bir f(x) fonksiyonun belli
+noktalarýndaki deðerleri (olduðunu farzettiðimiz) verileri içeren bir {\em
+  vektör} olacak. Bu vektörün N elemaný var diyelim. Fonksiyon periyodik
+olduðuna göre, x için $2\pi$'i N eþit parçaya böleriz (tahtadan alýnan
+resim altta). Bunu söylemekle fonksiyonun periyotunun $N$ olduðunu farz
+etmiþ oluyoruz, bir anlamda diyoruz ki eðer elimizde $N$ tane daha nokta
+olsaydý, onlar elimizde olan deðerlerle týpatýp ayný olacaktý. Örneðimizde
+N=4 olsun.
+
+\includegraphics[height=3cm]{compscieng_1_30_01.png}
+
+Ayrýca $F(x)$ formülü biraz deðiþecek. Elimizde sonsuz tane nokta olmadýðýna göre
+
+$$ F(x) = \sum_{n=0}^{N} c_ne^{inx} $$
+
+olmasý lazým. Þimdi, eðer bütün $c_k$ deðerlerini biliyor olsaydýk, bu
+fonksiyon, x=0 noktasýnda hangi deðere sahip olurdu?
+
+$$ f(0) = c_0 + c_1 + c_2 + c_3 + c_4 = Y_0 $$
+
+Sonraki $x$ deðerleri $2\pi/N, 4\pi/N, ..$ için (çünkü her parça $2\pi/N$,
+bir sonraki parça $2\pi/N + 2\pi/N$, bir kere topluyoruz, yani parçayý $2$
+ile çarpýyoruz, sonra $3$ ile, vs) aþaðýdaki gibi devam edeceðiz, ama ondan
+önce bir $w$ deðiþkeni tanýmlayalým, bu deðiþkeni $w=e^{2\pi i/N}$ olarak
+alalým. Böylece $w^2$ dediðimizde üstel iþlemlerde çarpým iþlemi toplama
+iþlemine dönüþeceði için $e^{4i\pi/N}$ deðeri elde edilebilir, $w^3$ ile
+$e^{6i\pi/N}$ elde edilir, vs. Bu deðerler bize lazým olacak deðerler, $w$
+sayesinde formüller daha temiz olacak. $F(2\pi/N)$ içindeki 3. terim
+($n=2$) nedir?  $c_ne^{inx} = c_2e^{2i2\pi/N} = c_2e^{4i\pi/N} = c_2w^2$. O
+zaman
+
+$$ f(2\pi/N) = c_o + wc_1 + w^2c_2 + w^3c_3 = Y_1 $$
+
+Devam edelim:
+
+$$ f(4\pi/N) = c_o + w^2c_1 + w^4c_2 + w^6c_3 = Y_2  $$
+
+$$ f(6\pi/N) = c_o + w^3c_1 + w^6c_2 + w^9c_3 = Y_3  $$
+
+Elimizdeki dört toplam iþlemine bakýnca, bu toplamlar ve çarpýmlarýn aslýnda
+lineer cebir üzerinden matrisler ile gösterilebildiðini farkedebiliriz. 
+
+$$  
+\left[ \begin{array}{c}
+    Y_0 \\
+    Y_1 \\
+    Y_2 \\
+    Y_3
+\end{array} \right]
+=
+\left[ \begin{array}{cccc}
+    1 & 1 & 1 & 1 \\
+    1 & w & w^2 & w^3  \\
+    1 & w^2 & w^4 & w^6  \\
+    1 & w^3 & w^6 & w^9  
+\end{array} \right]
+\left[ \begin{array}{c}
+    c_0 \\
+    c_1 \\
+    c_2 \\
+    c_3
+\end{array} \right] \\
+$$
+
+Her matris için bir deðiþken kullanýrsak
+
+$$ Y = WC $$
+
+F(x)'ten (yani Y'den) C'ye gitmek istersek, elimizde $Y_n$ deðerleri var, $w$
+deðerleri zaten sabittir, W bu sabit deðere göre oluþturulur, o zaman, $c_n$
+sayýlarýný nasýl buluruz?
+
+$$ Y = WC  $$
+
+$$ W^{-1}Y = W^{-1}WC  $$
+
+$$ W^{-1}Y = C $$
+
+Yani $W$ matrisinin tersini (inverse) alýp, onu $Y$ ile çarpýnca elimize $C$
+deðerleri geçecek.
+
+Güneþ Benekleri
+
+Güneþte periyodik olarak olan benekler, aþaðý yukarý 11 senede bir ortaya
+çýkarlar. Bu benekler uzun süredir gözlenmekte ve ölçülmektedir,
+þiddetlerine göre, \verb!sunspots.dat! adlý dosyada bulabiliriz. Benek
+verisindeki periyodik oluþ, Fourier transformu ile analiz etmek için
+uygun. Alttaki Python kodu $w$, $W$ gibi kavramlarý kullanarak, üstteki
+çarpýmlarla $C$ vektörünü bulacak. Bu vektör içindeki sayýlar Fourier
+analizindeki belli frekanslara, harmoniklere tekabül ediyor olacaklar.
+
+Bu $C$ deðerlerinden bazýlarý diðerlerinden daha güçlü bir etkidir, mesela 11
+senelik periyot, C içinde daha güçlü olarak çýkacaktýr, çýkmalýdýr. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy
+
+tempdata = np.loadtxt("sunspots.dat")
+
+year=tempdata[:,0]
+
+Y=tempdata[:,1]
+
+print len(Y), 'tane veri noktasi var'
+
+N = len(Y)
+
+w = np.exp((2*np.pi*1j)/N)
+
+W = np.zeros((N,N), complex)
+for i in range(N):
+    for k in range(N):
+        W[i,k] = w**(i*k)
+        
+C = np.dot(np.linalg.inv(W), Y) 
+\end{minted}
+
+\begin{verbatim}
+305 tane veri noktasi var
+\end{verbatim}
+
+En yüksek periyotu görmek istersek, alttaki kodu kullanabiliriz [6].
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n=len(Y); print 'n=',n
+power = np.abs(C[0:int(n/2)])**2
+nyquist = 1./2
+freq = np.array(map(float, np.array(arange(0,int(n/2))))) / (n/2)*nyquist
+print 'len(freq)=',len(freq)
+period=1./freq;
+plt.plot(period,power)
+plt.xlim(0,30)
+plt.savefig('compscieng_1_30_02.png')
+\end{minted}
+
+\begin{verbatim}
+n= 305
+len(freq)= 152
+\end{verbatim}
+
+\includegraphics[height=6cm]{compscieng_1_30_02.png}
+
+Sonucun 11 sene civarýnda olduðunu görebiliyoruz. 
+
+FFT
+
+Bitirmeden önce FFT konusundan bahsedelim. $\textbf{D}$FT algoritmasý kodda
+görüldüðü gibi bir W matrisi ortaya çýkarýr ve önce tersini alma, sonra bu ters
+ile bir çarpým iþlemi yaparak C sonucunu üretir. $O$ notasyonunu kullanýrsak
+DFT'nin karmaþýklýðý $O(N^2)$'dir. Bu iyi bir hýzdýr.
+
+FFT algoritmasý üstteki çarpýmýn bazý özelliklerini kullanarak DFT'yi
+daha da hýzlandýrýr ve $O(\frac{1}{2}Nlog_2N)$ hýzýna getirir. FFT'den
+bu makalede bahsetmeyeceðiz, aklýmýzda olsun, Scipy üzerinde fft
+çaðrýsý bu algoritmayý kullanýr.
+
+Eðer scipy kullanýlmak istenirse, bu kütüphanenin \verb!fft! çaðrýsý çok
+basit:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+C = scipy.fft(Y)
+print C[:3]
+\end{minted}
+
+\begin{verbatim}
+[ 15318.00000000   +0.j           1153.09522938 +866.74784921j
+    -72.35158374+1347.22954505j]
+\end{verbatim}
+
+Kaynaklar
+
+[1] Strang, G., {\em Computational Science and Engineering, sf. 340-370}
+
+
+\end{document}
+

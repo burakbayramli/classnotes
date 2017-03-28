@@ -1,0 +1,419 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 29
+
+Nihayet en son ayrýþtýrma (decomposition) konusuna geldik, bu teknik Eþsiz Deðer
+Ayrýþtýrma (Singular Value Decomposition -SVD-) tekniðidir. Ayrýþtýrma þu halde
+olacak
+
+$$ A = U \Sigma V^T $$
+
+Sað tarafta ayrýþma sonrasý bir dikgen (orthogonal) matris, bir köþegen
+(diagonal) matris, ve tekrar bir dikgen matris olacak. Yani bildiðimiz,
+sevdiðimiz matris formlarý ayrýþma sonrasý parçalar olarak elimize
+geçecekler. Ýlginç olan iki tane dikgen matris elde etmemiz. Ayrýca $A$
+her türden, her boyuttan bir matris olabilir (illa karesel olmasý gerekmez
+mesela).
+
+SVD bu dersin pek çok kavramýný da bir araya getirir. Mesela simetrik
+pozitif kesin matrisler. Hatýrlarsak bu matrisler simetrik olduðu için
+özvektörleri dikgen idi. Yani normalde þu haldeki bir ayrýþma
+
+$$ A = S \Lambda S ^{-1}   $$
+
+Su halde gorulebiliyordu
+
+$$ A = Q \Lambda Q ^{T}   $$
+
+Yani $S$, dikgen vektörlü $Q$ oluyordu, pozitif kesinlik sayesinde de
+normal bir $\Lambda$, içinde sadece pozitif deðerler taþýyan bir  $\Lambda$
+oluyordu. 
+
+Özetle, eðer $A$ simetrik pozitif kesin ise onun SVD'si $Q \Lambda Q ^{T}$
+olacaktýr. Bu durumda tek $Q$ matrisi yeterli, diðer durumlarda $U,V$ gibi
+iki farklý matris lazým. Ayrýca þunu da vurgulayalým: SVD için dikgenlik
+aradýðýmýz önemli bir þart, ``dikgen çarpý köþegen çarpý dikgen''
+þeklinde bir form istiyorum özellikle. 
+
+\includegraphics[height=4cm]{29_1.png}
+
+SVD'den beklediðimiz iþlemi yukarýdaki resim üzerinden anlamaya
+çalýþalým. Soldaki düzlem satýr uzayý (row space), saðdaki kolon uzayý
+(column space). Bir matrisi temsil eden satýrlar ve kolonlar bu uzaylarýn
+içinde. Þimdi eðer $U \Sigma V^T$ formunu düþünürsek, öyle bir köþegen
+matris arýyorum ki satýr uzayýndaki dikgen bazý (basis) uzayýndaki bir
+dikgen baza transform etmeli. Bu hakikaten özel bir matris olmalý.
+
+Soru: satýr uzayýnýn dikgen bazý var mýdýr? Tabii ki vardýr,
+Gram-Schmidt tekniðinde gördük, herhangi bir bazýn dikgen bazýný
+alabiliriz. Dikgen baz hesabý özgün deðildir, ayný bazdan pek çok
+dikgen baz çýkartýlabilir, ve satýr uzayýndaki ``herhangi'' bir
+dikgen bazý alýp kolon uzayýna transform edersem onun illa dikgen
+kalacaðý garanti deðildir. Yani transform edildikten sonra da dikgen
+kalacak özel bir dikgen baz arýyorum. Yapmaya çalýþtýðým çarpým her
+vektörü gösterecek þekilde nasýldýr?
+
+$$ 
+A \left[\begin{array}{rrrr}
+&&& \\
+v_1 & v_2& ... & v_r \\
+&&& 
+\end{array}\right] = 
+\left[\begin{array}{rrrr}
+&&& \\
+u_1 & u_2& ... & u_r \\
+&&& 
+\end{array}\right] 
+\left[\begin{array}{rrrr}
+\sigma_1 &&& \\
+ & \sigma_2&  & \\
+&& \ddots & \\
+&&& \sigma_r
+\end{array}\right] 
+ $$
+
+Yani $Av_1$ çarpýmý bana $u_1 \sigma_1$'i vermeli. Matris olarak yukarýdaki 
+
+$$ AV = U\Sigma $$
+
+Hatta dikgenlikten daha ileride birimdikliði (orthonormal) hesaplamak daha
+da iyi.
+
+Ornek 
+
+$$ 
+A = 
+\left[\begin{array}{rr}
+4 & 4 \\ -3 & 3
+\end{array}\right]
+ $$
+
+$A$ tersine çevirilebilir (ýnvertible) o zaman kertesi (rank)
+2. Aradýklarým 
+
+$$ v_1,v_2 \  \mathbb{R}^2 \textit{ satýr uzayýnda }  $$
+
+$$ u_1,u_2 \  \mathbb{R}^2 \textit{ kolon uzayýnda }  $$
+
+$$ \sigma_1 > 0, \sigma_2 > 0 $$
+
+Sýfýr uzayý (nullspace) burada problem deðil. Zorluklar neler? Matris
+simetrik olmayabilir, o zaman özvektörleri kullanamam, çünkü onlar
+dikgen deðildir.
+
+$$ A = U \Sigma V^{-1} $$
+
+$V^{-1}$'yi baþka nasýl yazabilirim? $V$ kare, dikgen olacaðýna göre,
+$V^{-1} = V^{T}$. O zaman 
+
+$$ A = U \Sigma V^{T} $$
+
+Þimdi hesabý düþünmeye baþlayalým. Ýki tane ayrý dikgen matris bulmam
+lazým, ama bunlarýn ikisini de ayný anda bulmak istemiyorum. Bir fikir:
+öyle bir numara yapayým ki $U$ yokolsun her þey $V$ üzerinden temsil
+edilsin. 
+
+Alttaki ifade ne zaman elimizde genel dikdörtgensel (kare olmayan) bir
+matris varsa karþýmýza çýkan bir ifade, $A^TA$. Bu matris kare, pozitif
+kesin, yani güzel özellikleri var. O zaman üstteki formülü $A^T$ ile soldan
+çarpacaðýz,
+
+$$ A^T = V \Sigma^T U^{T}  $$
+
+olduðuna göre,
+
+$$ A^TA = V \Sigma^T U^{T}  U \Sigma V^{T}  $$
+
+$U^TU = I$ olduðuna göre
+
+$$ A^TA = V \Sigma^T \Sigma V^{T}  $$
+
+Kolaylaþtýrmalar bitmedi. $\Sigma$ köþegen olduðuna göre, $\Sigma^T\Sigma$
+köþegendeki deðerlerin karesinden ibarettir. 
+
+$$ = V 
+\left[\begin{array}{rrrr}
+\sigma_1^2 &&& \\
+ & \sigma_2^2 &  & \\
+&& \ddots & \\
+&&& \sigma_r^2 
+\end{array}\right] 
+V^T
+  $$
+
+Ýþte, $U$'lar yokoldu. Bu son ulaþtýðýmýz formda $V$'ler nedir?
+Özvektörlerdir! Problem mükemmel bir özdeðer / özvektör problemine
+dönüþtü, yani $Q\Lambda Q$ haline geldi. Bu kolaylýða, sonuca $A$ yerine $A^TA$'yi
+kullanmak sayesinde eriþtik.
+
+Pekala bu þekilde $V$'leri elde ediyoruz, ama $U$'yu nasýl elde edeceðiz?
+Onu geçici bir süre için yokettik, ama $U$ hala hesaplamamýz gereken bir
+büyüklük, vektörler. Onun da çaresi var, $A^T$ ile soldan çarpmak yerine ana
+formülü $A^T$ ile saðdan çarparsak, bu sefer $V$'ler yokolur, ve yine
+benzer özdeðer / özvektör hesabýna geliriz, ama bu sefer $U$ hesaplarýz.
+
+$$ AA^T = U\Sigma V^TV\Sigma^TU^T $$
+
+$$  = U\Sigma \Sigma^TU^T $$
+
+Örnek için tüm bu hesaplarý yapalým. 
+
+$$ A^TA = 
+\left[\begin{array}{rr}
+4 & -3 \\ 4 & 3
+\end{array}\right]
+\left[\begin{array}{rr}
+4 & 4 \\ -3 & 3
+\end{array}\right] = 
+\left[\begin{array}{cc}
+25 & 7 \\ 7 & 25
+\end{array}\right]
+ $$
+
+Özvektörler
+
+$$ 
+\left[\begin{array}{r}
+1 \\ 1
+\end{array}\right],
+\left[\begin{array}{r}
+-1 \\ 1
+\end{array}\right]
+ $$
+
+Özdeðerler
+
+$\lambda_1=32, \lambda_2=18$. 
+
+Özvektörleri normalize etmeli
+
+$$ 
+\left[\begin{array}{r}
+1 / \sqrt{ 2} \\ 1/ \sqrt{ 2}
+\end{array}\right],
+\left[\begin{array}{r}
+-1/ \sqrt{ 2} \\ 1/ \sqrt{ 2}
+\end{array}\right]
+ $$
+
+o zaman 
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+4 & 4 \\ -3 & 3
+\end{array}\right] 
+}_{A}
+=
+\underbrace{
+\left[\begin{array}{rr}
+ &  \\  & 
+\end{array}\right]
+}_{U}
+\underbrace{
+\left[\begin{array}{rr}
+\sqrt{ 32} &  \\  & \sqrt{ 18}
+\end{array}\right]
+}_{\Sigma}
+\underbrace{
+\left[\begin{array}{rr}
+1/\sqrt{ 2} & 1/\sqrt{ 2} \\ -1/\sqrt{ 2} & 1/\sqrt{ 2}
+\end{array}\right]
+}_{V^T}
+ $$
+
+Þimdi $U$'nun sýrasý geldi. Onun için $AA^T$ lazým. 
+
+$$ A^TA = 
+\left[\begin{array}{rr}
+4 & 4 \\ -3 & 3
+\end{array}\right] 
+\left[\begin{array}{rr}
+4 & -3 \\ 4 & 3
+\end{array}\right] =
+\left[\begin{array}{rr}
+32 & 0 \\ 0 & 18
+\end{array}\right]
+ $$
+
+Raslantý oldu yukarýdaki çarpým köþegen çýktý, iyi oldu tabii, çünkü bu tür
+matrislerin özvektörlerini, özdeðerlerini hesaplamak çok
+kolaydýr. Özvektörler, 
+
+$$ 
+\left[\begin{array}{r}
+1 \\ 0
+\end{array}\right],
+\left[\begin{array}{r}
+0 \\ 1
+\end{array}\right]
+ $$
+
+Özdeðerler $\lambda_1 = 32, \lambda_2 = 18$
+
+Ýlginci ki yine ayný özdeðerleri elde ettim, ama þaþýrmamak lazým, çünkü
+mesela bir $AB$ çarpýmýnýn özdeðerleri $BA$ ile aynýdýr. 
+
+Neyse $U$'yu bulduk, yerine koyalým, 
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+4 & 4 \\ -3 & 3
+\end{array}\right] 
+}_{A}
+=
+\underbrace{
+\left[\begin{array}{rr}
+1 & 0 \\ 0 & 1 
+\end{array}\right]
+}_{U}
+\underbrace{
+\left[\begin{array}{rr}
+\sqrt{ 32} & 0 \\ 0 & \sqrt{ 18}
+\end{array}\right]
+}_{\Sigma}
+\underbrace{
+\left[\begin{array}{rr}
+1/\sqrt{ 2} & 1/\sqrt{ 2} \\ -1/\sqrt{ 2} & 1/\sqrt{ 2}
+\end{array}\right]
+}_{V^T}
+ $$
+
+Örnek 
+
+Bu sefer $A$ eþsiz (singular) olsun, yani kertesi 1. 
+
+$$ A = \left[\begin{array}{rr}
+4 & 3 \\ 8 & 6
+\end{array}\right] $$
+
+Þimdi, eðer SVD iþlemi satýr uzayý ve kolon uzayý için birimdik bir baz
+bulmak demek ise, $A$'nin satýr uzayýnda özvektör bulmak kolay (çünkü
+eþsiz satýr uzayý
+
+$$ 
+\left[\begin{array}{r}
+4 \\ 3
+\end{array}\right]
+ $$
+
+Özvektör bu uzayda olmalý, bu uzayda tek eleman vardýr, o zaman hesap
+kolay. Tek yapmamýz gereken üstteki vektörü normalize etmek, 
+
+$$ 
+v_1 = \left[\begin{array}{r}
+.8 \\ .6
+\end{array}\right]
+ $$
+
+Peki $v_2$? $v_1$'e dikgen olmalý. 
+
+$$ 
+v_2 = \left[\begin{array}{r}
+.8 \\ -.6
+\end{array}\right]
+ $$
+
+Ayný iþlem $U$ için,
+
+$$ 
+\left[\begin{array}{r}
+4 \\ 8
+\end{array}\right]
+ $$
+
+Birinci kolonu direk aldýk (bu kolon ile ikinci kolon arasýnda kat
+farký olduðu direk görülmüyor ama kesirli olarak var),
+
+$$ 
+u_1 = \left[\begin{array}{r}
+1/\sqrt{ 5} \\ 2/\sqrt{ 5}
+\end{array}\right]
+ $$
+
+Yani
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+4 & 3 \\ 8 & 6
+\end{array}\right] 
+}_{A}
+=
+\underbrace{
+\left[\begin{array}{rr}
+1/\sqrt{ 5} &  \\ 2/\sqrt{ 5} & 
+\end{array}\right]
+}_{U}
+\underbrace{
+\left[\begin{array}{rr}
+ & 0 \\ 0 & 0
+\end{array}\right]
+}_{\Sigma}
+\underbrace{
+\left[\begin{array}{rr}
+ & \\
+ & 
+\end{array}\right]
+}_{V^T}
+ $$
+
+$\Sigma$ içinde üç sýfýr var, çünkü $A$ eþsiz. Eksik deðer nedir? Þu
+çarpýmýn özdeðerlerini bulalým
+
+$$ A^TA = 
+\left[\begin{array}{rr}
+4 & 8 \\ 3 & 6
+\end{array}\right] 
+\left[\begin{array}{rr}
+4 & 3 \\ 8 & 6
+\end{array}\right] =
+\left[\begin{array}{rr}
+80 & 60 \\ 60 & 45
+\end{array}\right] 
+ $$
+
+Sonuç yine eþsiz, özdeðerlerin biri sýfýr. Tüm özdeðerlerin toplamý matris izine
+(trace) eþit, özdeðerlerden biri sýfýr, o zaman diðeri köþegenin toplamýnýn
+ta kendisi, yani 125. 
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+4 & 3 \\ 8 & 6
+\end{array}\right] 
+}_{A}
+=
+\underbrace{
+\left[\begin{array}{rr}
+1/\sqrt{ 5} & 2/\sqrt{5} \\ 2/\sqrt{ 5} & -1/\sqrt{5}
+\end{array}\right]
+}_{U}
+\underbrace{
+\left[\begin{array}{rr}
+\sqrt{ 125} & 0 \\ 0 & 0
+\end{array}\right]
+}_{\Sigma}
+\underbrace{
+\left[\begin{array}{rr}
+.8 & -.6 \\
+.8 & .6 
+\end{array}\right]
+}_{V^T}
+ $$
+
+Örneklerimiz bunlar. Þimdi ne yaptýðýmýzý biraz düþünelim. $v_1,..,v_r$
+satýr uzayý için birimdik bir bazdýr. $u_1,..,u_r$ kolon uzayý için
+birimdik bir bazdýr. Fakat eþsizlik var, o zaman $v_{r+1},.,v_n$ sýfýr
+uzayý için birimdik bir bazdýr, ve $u_{r+1},..,u_n$ $A^T$'un sýfýr
+uzayý için birimdik bir bazdýr. 
+
+SVD üzerinden öyle bazlar seçiyoruz ki 
+
+$$ Av_i = \sigma_i u_i $$ 
+
+doðru oluyor. 
+
+\end{document}
+

@@ -1,0 +1,822 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Lineer Cebir ile Minimizasyon
+
+Diyelim ki $Ax$ deðerinin mümkün olduðu kadar 0'a yakýn olmasýný istiyoruz,
+yani öyle $x$ deðerleri arýyoruz ki $Ax$ olabildiðince sýfýra yakýn olsun, bir
+þartla, $||x||=1$ olmalý. Bu bir minimizasyon problemidir [8].
+
+%
+$$ \min_{x} ||Ax||^2 \textrm{ öyle ki } ||x||^2 = 1$$
+%{{x.png}}
+
+Her iki ifadeyi açarsak,
+
+%
+$$ ||Ax||^2  = (Ax)^T(Ax) = x^TA^TAx $$
+%{{x.png}}
+
+%
+$$ ||x||^2 = x^Tx = 1$$
+%{{x.png}}
+
+Optimizasyon için alttaki bedel fonksiyonunu yazabiliriz,
+
+%
+$$ L(x) = x^TA^TAx - \lambda (x^Tx-1) $$
+%{{x.png}}
+
+Bu bedele Lagrangian bedeli denir ve $\lambda$ Lagrange çarpanýdýr. Lagrangian
+terimi kýsýtlama þartýný bedelin içine gömülmesini saðlar, böylece iki ayrý
+ifade yerine tek ifade yeterli oluyor. Artýk minimizasyonu þöyle yazabiliriz,
+
+%
+$$ \min_x \big\{ L(x) = x^TA^TAx - \lambda (x^Tx-1) \big\} $$
+%{{x.png}}
+
+$x$'e göre türev alýrsak,
+
+%
+$$ A^TAx - \lambda x = 0 $$
+%{{x.png}}
+
+%
+$$ A^TAx = \lambda x $$
+%{{x.png}}
+
+Bu ifade bir özvektör problemidir, $A^TA$'nin özvektörleri vardýr, þimdi
+$\lambda$'yi özdeðer gibi görebiliriz, ve her farklý özdeðere tekabül eden
+özvektör üstteki problemi çözer. Bu farklý $x$'lere $x_\lambda$ diyelim. Ama
+hangi $x_\lambda$'yi istiyoruz? Bedeli þu þekilde tekrar yazalým,
+
+%
+$$ L(x_\lambda) = x_\lambda^T A^T A x_\lambda - \lambda (x_\lambda^Tx_\lambda-1) $$
+%{{x.png}}
+
+Özvektör tanýmýndan $A^TA  x_\lambda = \lambda x_\lambda$ olduðuna göre üstte
+yerine koyarsak ve saðdaki terim iptali yaparsak,
+
+%
+$$  = \lambda x_\lambda^T  x_\lambda - \cancel{\lambda (x_\lambda^Tx_\lambda-1)} $$
+%{{x.png}}
+
+$x_\lambda^T  x_\lambda = 1$ olduðu için,
+
+%
+$$ L(x_\lambda) = \lambda x_\lambda^T  x_\lambda  = \lambda$$
+%{{x.png}}
+
+Yani bedel fonksiyonu her $x_\lambda$ için o özvektörün baðlantýlý olduðu
+$\lambda$ deðerini verir. Böylece minimizasyon için hangi $x_\lambda$'yi
+seçmeliyiz sorusunun cevabýný vermiþ oluyoruz: en küçük $\lambda$'nin
+$x_\lambda$'sý!
+
+Örnek
+
+Sýfýr uzayý kavramýný gördük, eðer $A$ tam kertede deðil ise sýfýr uzayý boþ
+deðildir. Bir örnek uyduruyorum, mesela
+
+%
+$$
+\left[\begin{array}{rrr} 1 & 2 \\ 3 & 6 \end{array}\right] x = 0
+$$
+%{{x.png}}
+
+Bu örnek için $x$'in ne olduðunu biliyorum, kolonlar baðýmsýz deðil, 2. kolon
+1.'nin iki katý, yani $\left[\begin{array}{cc} -2 & 1 \end{array}\right]$ bu
+problemi çözer, ya da bir öðesi diðerinin negatif iki katý olan herhangi bir
+diðer $x$. Peki ya problem þöyle olsaydý?
+
+%
+$$
+\left[\begin{array}{cc} 1 & 2 \\ 3 & 5.5 \end{array}\right] x = 0
+$$
+%{{x.png}}
+
+Þimdi direk $\left[\begin{array}{cc} -2 & 1 \end{array}\right]$ diyemeyiz, ama
+biliyoruz ki sýfýra olabildiðince yaklaþabilmek mümkün, bu problemi minimizasyon
+olarak çözmek lazým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+A = np.array([[1,2],[3,5.5]])
+eval,evec = lin.eig(np.dot(A.T,A))
+print eval
+print evec
+\end{minted}
+
+\begin{verbatim}
+[[-0.8798189  -0.47530906]
+ [ 0.47530906 -0.8798189 ]]
+[  5.65043904e-03   4.42443496e+01]
+\end{verbatim}
+
+En küçük özdeðer birincisi,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print evec[:,0]
+\end{minted}
+
+\begin{verbatim}
+[-0.8798189   0.47530906]
+\end{verbatim}
+
+Yani $Ax$'i sýfýra en yaklaþtýran çozum $x = \left[\begin{array}{cc} -0.88 &
+ 0.47 \end{array}\right]$. Görüldüðü gibi 1. öðe ikincisinin negatif iki
+``katýmsý''. 
+
+Birazdan Temel Bileþen Analizi (Principal Component Analysis -PCA-) adlý bir
+tekniði göreceðiz, bu tekniðin bahsettiðimiz minimizasyon ile yakýn alakalarý
+var. Eðer $A$ matrisi kolonlarýný belli ölçümler, yaþ, aðýrlýk, vs gibi
+düþünürsek, bu ölçümler üzerinden kovaryansýn ne olduðunu biliyoruz:
+$A^TA$. Deðil mi? Peki þimdi þu sorunun cevabýný nasýl veririz? Öyle yönler bul
+ki $A^TA$ o yönlerde kovaryans yansýmasý minimal ya da maksimal olsun.
+
+Yön demek bir birim vektördür, $x$ diyelim, yani gene $A^TAx$'yi minimize /
+maksimize etmeye geldik (ya da $x^TA^TAx$, ayný þey)! Þart $||x||^2 = 1$ aynen
+olduðu gibi geçerli çünkü sadece bir yön arýyoruz. Kovaryansýn minimal, maksimal
+olduðu yerler öyle yönler olacak ki o yönlerde deðiþkenlerin beraber deðiþimi en
+az, ya da en fazla olacak, altta örnek PCA örnek grafiðinde görülüyor,
+noktalarýn sað üste doðru ``beraber'' uzandýðý yer en fazla baðlantý, ona dik
+olan diðer yönde en az baðlantý var. Bunlar temel bileþenler.
+
+Rayleigh Bölümü (Quotient)
+
+Baþlangýçtaki minimizasyon formatýna dönersek, daha genel bir ifade ile, eðer
+$M$ simetrik ise (daha önceki örnekte $A^TA$ kullandýk, ama bu ifade de her
+zaman simetriktir, çünkü matrisin devriði çarpý kendisi her zaman simetrik bir
+matris doðurur),
+
+%
+$$ R(M,x) = \frac{x^TMx}{x^Tx} \mlabel{1} $$
+%{{x.png}}
+
+ifadesi de doðru olmalý. $R$'ye Rayleigh bölümü adý veriliyor, ve eþitliðin saðý
+biraz önce gördüðümüz gibi minimal noktasýna en küçük özdeðer/vektör ikilisiyle
+gelir. Üstte bir oran görülüyor, fakat bu karýþýklýk yaratmasýn, daha önce $x^Tx
+= 1$ þartýný ayrý bir þekilde yazmýþtýk, ve $x^T M x$ minizasyonu
+yapmýþtýk. Diyelim ki $x$ deðil $v$ kullandýk ve $v$ herhangi bir vektör
+olabilir, fakat herhangi bir vektörü birim vektör haline getirmeyi biliyoruz, $x
+= v/||v||$, ve $x^T M x$ içinde yerine koyarsak (1)'i elde ederiz [9].
+
+Böylece ileride göreceðimiz Rayleigh-Ritz Teorisi'nin ispatýnýn bir kýsmýna da
+farklý bir çözüm getirmiþ olduk.
+
+Optimizasyonu bölüm olarak belirtmenin bazý faydalý var, sýnýr þartýnýn illa 1'e
+eþit olma zorunluðu bazý uygulamalar için çok kýsýtlayýcý olabilir.
+
+Örnek
+
+Karesel denklemler de matris formunda gösterilebilir, mesela
+
+%
+$$ q(x,y) = 3x^2 + 2xy + 3y^2 $$
+%{{x.png}}
+
+ile
+
+%
+$$
+\left[\begin{array}{cc} x & y \end{array}\right]
+\left[\begin{array}{rrr}3 & 1 \\ 1 & 3 \end{array}\right]
+\left[\begin{array}{c} x \\ y \end{array}\right]
+$$
+%{{x.png}}
+
+ayný þey. Problem $q$'yu $x^2+y^2 = 1$ olacak þekilde optimize etmek. Fakat
+artýk þu þekilde de tanýmlayabiliriz,
+
+%
+$$
+r(x,y) = \frac{ 3x^2 + 2xy + 3y^2}{x^2+y^2 }
+$$
+%{{x.png}}
+
+Çözüm $\lambda_1=4$ ve $\lambda_2 = 2$.
+
+%
+$$
+q(-1/\sqrt{2},1/\sqrt{2}) =
+2 \le q(x,y) \le 4 =
+q(1/\sqrt{2},1/\sqrt{2})
+$$
+%{{x.png}}
+
+Þimdi PCA, Rayleigh-Ritz konularýna tekrar bakalým.
+
+PCA
+
+PCA yöntemi boyut azaltan yöntemlerden biri, takip edilmeden (unsupervised)
+iþleyebilir. Ana fikir veri noktalarýnýn izdüþümünün yapýlacaðý yönler bulmaktýr
+ki bu yönler baðlamýnda (izdüþüm sonrasý) noktalarýn arasýndaki sayýsal varyans
+(empirical variance) en fazla olsun, yani noktalar grafik baðlamýnda düþünürsek
+en "yayýlmýþ" þekilde bulunsunlar. Böylece birbirinden daha uzaklaþan noktalarýn
+mesela daha rahat kümelenebileceðini umabiliriz.  Bir diðer amaç, hangi
+deðiþkenlerin varyansýnýn daha fazla olduðunun görülmesi üzerine, o
+deðiþkenlerin daha önemli olabileceðinin anlaþýlmasý. Örnek olarak alttaki
+grafiðe bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from pandas import *
+data = read_csv("testSet.txt",sep="\t",header=None)
+print data[:10]
+\end{minted}
+
+\begin{verbatim}
+           0          1
+0  10.235186  11.321997
+1  10.122339  11.810993
+2   9.190236   8.904943
+3   9.306371   9.847394
+4   8.330131   8.340352
+5  10.152785  10.123532
+6  10.408540  10.821986
+7   9.003615  10.039206
+8   9.534872  10.096991
+9   9.498181  10.825446
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.scatter(data.ix[:,0],data.ix[:,1])
+plt.plot(data.ix[1,0],data.ix[1,1],'rd')
+plt.plot(data.ix[4,0],data.ix[4,1],'rd')
+plt.savefig('pca_1.png')
+\end{minted}
+
+\includegraphics[height=4cm]{pca_1.png}
+
+PCA ile yapmaya çalýþtýðýmýz öyle bir yön bulmak ki, $x$ veri
+noktalarýnýn tamamýnýn o yöne izdüþümü yapýlýnca sonuç olacak,
+"izdüþümü yapýlmýþ" $z$'nin varyansý en büyük olsun. Bu bir
+maksimizasyon problemidir. Fakat ondan önce $x$ nedir, $z$ nedir
+bunlara yakýndan bakalým.
+
+Veri $x$ ile tüm veri noktalarý kastedilir, fakat PCA probleminde
+genellikle bir "vektörün diðeri üzerine" yapýlan izdüþümü, "daha
+optimal bir $w$ yönü bulma", ve "o yöne doðru izdüþüm yapmak"
+kelimeleri kullanýlýr. Demek ki veri noktalarýný bir vektör olarak
+görmeliyiz. Eðer üstte kýrmýzý ile iþaretlenen iki noktayý alýrsak (bu
+noktalar verideki 1. ve 4. sýradaki noktalar),
+
+\includegraphics[height=4cm]{proj1.png}
+
+gibi bir görüntüden bahsediyoruz. Hayali bir $w$ kullandýk, ve noktalardan
+biri veri noktasý, $w$ üzerine izdüþüm yapýlarak yeni bir vektörü / noktayý
+ortaya çýkartýlýyor. Genel olarak ifade edersek, bir nokta için
+
+$$ z_i =  x_i^Tw = x_i \cdot w$$
+
+Yapmaya çalýþtýðýmýz sayýsal varyansý maksimize etmek demiþtik. Bu arada verinin
+hangi daðýlýmdan geldiðini söylemedik, ``her veri noktasý birbirinden ayrý,
+baðýmsýz ama ayný bir daðýlýmdandýr'' bile demedik, $x$ bir rasgele deðiþkendir
+beyaný yapmadýk ($x$ veri noktalarýný tutan bir þey sadece). Sadece sayýsal
+varyans ile iþ yapacaðýz.  Sayýsal varyans,
+
+$$ \frac{1}{n}\sum_i  (x_i \cdot w)^2 $$
+
+Toplama iþlemi yerine þöyle düþünelim, tüm $x_i$ noktalarýný istifleyip bir
+$x$ matrisi haline getirelim, o zaman $xw$ ile bir yansýtma yapabiliriz, bu
+yansýtma sonucu bir vektördür. Bu tek vektörün karesini almak demek onun
+devriðini alýp kendisi ile çarpmak demektir, yani
+
+$$ = \frac{1}{n}(xw)^T(xw) = \frac{1}{n} w^Tx^Txw$$
+
+$$ =  w^T\frac{x^Tx}{n}w$$
+
+$x^Tx / n$ sayýsal kovaryanstýr (empirical covariance). Ona $\Sigma$
+diyelim. 
+
+$$ =  w^T\Sigma w$$
+
+Üstteki sonuçlarýn boyutlarý $1 \times N \cdot N \times N \cdot N \times 1
+= 1 \times 1$. Tek boyutlu skalar degerler elde ettik.  Yani $w$ yönündeki
+izdüþüm bize tek boyutlu bir çizgi verecektir. Bu sonuç aslýnda çok
+þaþýrtýcý olmasa gerek, tüm veri noktalarýný alýp, baþlangýcý baþnokta 0,0
+(origin) noktasýnda olan vektörlere çevirip ayný yöne iþaret edecek þekilde
+düzenliyoruz, bu vektörleri tekrar nokta olarak düþünürsek, tabii ki ayný
+yönü gösteriyorlar, bilahere ayný çizgi üzerindeki noktalara
+dönüþüyorlar. Ayný çizgi üzerinde olmak ne demek? Tek boyuta inmiþ olmak
+demek.
+
+Ufak bir sorun $w^T\Sigma w$'i sürekli daha büyük $w$'lerle sonsuz
+kadar büyütebilirsiniz. Bize ek bir kýsýtlama þartý daha lazým, bu þart
+$||w|| = 1$ olabilir, yani $w$'nin norm'ü 1'den daha büyük olmasýn. Böylece
+optimizasyon $w$'yi sürekli büyüte büyüte maksimizasyon yapmayacak, sadece
+yön bulmak ile ilgilenecek, iyi, zaten biz $w$'nin yönü ile
+ilgileniyoruz. Aradýðýmýz ifadeyi yazalým, ve ek sýnýrý Lagrange ifadesi
+olarak ekleyelim, ve yeni bir $L$ ortaya çýkartalým,
+
+$$ L(w,\lambda) =  w^T \Sigma w  - \lambda(w^T w - 1) $$
+
+Niye eksiden sonraki terim o þekilde eklendi? O terim öyle þekilde seçildi
+ki, $\partial L / \partial \lambda = 0$ alýnýnca $w^Tw = 1$ geri gelsin /
+ortaya çýksýn [2, sf 340]. Bu Lagrange'in dahice buluþu. Bu kontrol
+edilebilir, $\lambda$ 'ya göre türev alýrken $w_1$ sabit olarak yokolur,
+parantez içindeki ifadeler kalýr ve sýfýra eþitlenince orijinal kýsýtlama
+ifadesi geri gelir. Þimdi
+
+$$ \max\limits_{w} L(w,\lambda) $$
+
+için türevi $w$'e göre alýrsak, ve sýfýra eþitlersek,
+
+$$ \frac{\partial L}{\partial w} = 2w \Sigma - 2 \lambda w = 0 $$
+
+$$ 2w \Sigma = 2 \lambda w $$
+
+$$ \Sigma w  = \lambda w $$
+
+Üstteki ifade özdeðer, özvektör ana formülüne benzemiyor mu?
+Evet. Eðer $w$, $\Sigma$'nin özvektörü ise ve eþitliðin saðýndaki
+$\lambda$ ona tekabül eden özdeðer ise, bu eþitlik doðru olacaktýr.
+
+Peki hangi özdeðer / özvektör maksimal deðeri verir? Unutmayalým,
+maksimize etmeye çalýþtýðýmýz þey $w^T \Sigma w$ idi
+
+Eger $\Sigma w  = \lambda w$ yerine koyarsak
+
+$$ w^T \lambda w =  \lambda w^T  w = \lambda $$
+
+Çünkü $w_1^T w$'nin 1 olacaðý þartýný koymuþtuk. Neyse, maksimize etmeye
+çalýþtýðýmýz deðer $\lambda$ çýktý, o zaman en büyük $\lambda$ kullanýrsak,
+en maksimal varyansý elde ederiz, bu da en büyük özdeðerin ta
+kendisidir. Demek ki izdüþüm yapýlacak "yön" kovaryans $\Sigma$'nin en
+büyük özdeðerine tekabül eden özvektör olarak seçilirse, temel
+bileþenlerden en önemlisini hemen bulmuþ olacaðýz. Ýkinci, üçüncü en büyük
+özdeðerin özvektörleri ise diðer daha az önemli yönleri bulacaklar. 
+
+$\Sigma$ matrisi $n \times n$ boyutunda bir matris, bu sebeple $n$ tane
+özvektörü olacak. Her kovaryans matrisi simetriktir, o zaman lineer cebir
+bize der ki özvektörler birbirine dikgen (orthogonal) olmalý. Yýne $\Sigma$
+bir kovaryans matrisi olduðu için pozitif bir matris olmalý, yani herhangi
+bir $x$ için $x \Sigma x \ge 0$. Bu bize tüm özvektörlerin $\ge 0$ olmasý
+gerektiðini söylüyor.
+
+Kovaryansýn özvektörleri verinin temel bileþenleridir (principal
+components), ki metotun ismi burada geliyor.
+
+Örnek
+
+Þimdi tüm bunlarý bir örnek üzerinde görelim. Ýki boyutlu örnek veriyi
+üstte yüklemiþtik. Þimdi veriyi "sýfýrda ortalayacaðýz" yani her kolon için
+o kolonun ortalama deðerini tüm kolondan çýkartacaðýz. PCA ile iþlem
+yaparken tüm deðerlerin sýfýr merkezli olmasý gerekiyor, çünkü bu sayýsal
+kovaryans için gerekli. Daha sonra özdeðer / vektör hesabý için kovaryansý
+bulacaðýz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+from pandas import *
+data = read_csv("testSet.txt",sep="\t",header=None)
+print data.shape
+print data[:10]
+
+means = data.mean()
+meanless_data = data - means
+cov_mat = np.cov(meanless_data, rowvar=0)
+print cov_mat.shape
+eigs,eigv = lin.eig(cov_mat)
+eig_ind = np.argsort(eigs)
+print eig_ind
+\end{minted}
+
+\begin{verbatim}
+(1000, 2)
+           0          1
+0  10.235186  11.321997
+1  10.122339  11.810993
+2   9.190236   8.904943
+3   9.306371   9.847394
+4   8.330131   8.340352
+5  10.152785  10.123532
+6  10.408540  10.821986
+7   9.003615  10.039206
+8   9.534872  10.096991
+9   9.498181  10.825446
+(2, 2)
+[0 1]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print eigs[1],eigv[:,1].T
+print eigs[0],eigv[:,0].T
+\end{minted}
+
+\begin{verbatim}
+2.89713495618 [-0.52045195 -0.85389096]
+0.366513708669 [-0.85389096  0.52045195]
+\end{verbatim}
+
+En büyük olan yönü quiver komutunu kullanarak orijinal veri seti
+üzerinde gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.scatter(data.ix[:,0],data.ix[:,1]) 
+# merkez 9,9, tahminen secildi
+plt.quiver(9,9,eigv[1,1],eigv[0,1],scale=10,color='r') 
+plt.savefig('pca_2.png')
+\end{minted}
+
+\includegraphics[height=4cm]{pca_2.png}
+
+Görüldüðü gibi bu yön hakikaten daðýlýmýn, veri noktalarýnýn en çok
+yayýlmýþ olduðu yön. Demek ki PCA yöntemi doðru sonucu buldu. Her iki
+yönü de çizersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.scatter(data.ix[:,0],data.ix[:,1]) 
+plt.quiver(9,9,eigv[1,0],eigv[0,0],scale=10,color='r') 
+plt.quiver(9,9,eigv[1,1],eigv[0,1],scale=10,color='r')
+plt.savefig('pca_3.png')
+\end{minted}
+
+\includegraphics[height=4cm]{pca_3.png}
+
+Bu ikinci yön birinciye dik olmalýydý, ve o da bulundu. Aslýnda iki
+boyut olunca baþka seçenek kalmýyor, 1. yön sonrasý ikincisi baþka bir
+þey olamazdý, fakat çok daha yüksek boyutlarda en çok yayýlýmýn olduðu
+ikinci yön de doðru þekilde geri getirilecekti.
+
+SVD ile PCA Hesaplamak
+
+PCA bölümünde anlatýlan yöntem temel bileþenlerin hesabýnda özdeðerler
+ve özvektörler kullandý. Alternatif bir yöntem Eþsiz Deðer Ayrýþtýrma
+(Singular Value Decomposition -SVD-) üzerinden bu hesabý
+yapmaktýr. SVD için Lineer Cebir Ders 29'a bakabilirsiniz. Peki
+ne zaman klasik PCA ne zaman SVD üzerinden PCA kullanmalý? Bir cevap
+belki mevcut kütüphanelerde SVD kodlamasýnýn daha iyi olmasý,
+ayrýþtýrmanýn özvektör / deðer hesabýndan daha hýzlý iþleyebilmesi [6].
+
+Ayrýca birazdan göreceðimiz gibi SVD, kovaryans matrisi üzerinde
+deðil, $A$'nin kendisi üzerinde iþletilir, bu hem kovaryans hesaplama
+aþamasýný atlamamýzý, hem de kovaryans hesabý sýrasýnda ortaya
+çýkabilecek sayýsal (numeric) pürüzlerden korunmamýzý saðlar (çok ufak
+deðerlerin kovaryans hesabýný bozabileceði literatürde
+bahsedilmektedir).
+
+PCA ve SVD baðlantýsýna gelelim:
+
+Biliyoruz ki SVD bir matrisi þu þekilde ayrýþtýrýr
+
+$$A = USV^T$$
+
+$U$ matrisi $n \times n$ dikgen (orthogonal), $V$ ise $m \times m$
+dikgen. $S$'in sadece köþegeni üzerinde deðerler var ve bu  $\sigma_j$
+deðerleri $A$'nin eþsiz deðerleri (singular values) olarak biliniyor.
+
+Þimdi $A$ yerine $AA^T$ koyalým, ve bu matrisin SVD ayrýþtýrmasýný yapalým,
+acaba elimize ne geçecek?
+
+$$ AA^T = (USV^T)(USV^T)^T $$
+
+$$ = (USV^T)(V S^T U^T) $$
+
+$$ = U S S^T U^T $$
+
+$S$ bir köþegen matrisi, o zaman $SS^T$ matrisi de köþegen, tek farkla
+köþegen üzerinde artýk $\sigma_j^2$ deðerleri var. Bu normal.
+
+$SS^T$ yerine $\Lambda$ sembolünü kullanalým, ve denklemi iki taraftan
+(ve saðdan) $U$ ile çarparsak (unutmayalým $U$ ortanormal bir matris
+ve $U^T U = I$),
+
+$$ AA^TU = U \Lambda U^TU $$
+
+$$ AA^TU = U \Lambda   $$
+
+Son ifadeye yakýndan bakalým, $U$'nun tek bir kolonuna, $u_k$ diyelim,
+odaklanacak olursak, üstteki ifadeden bu sadece kolona yönelik nasýl
+bir eþitlik çýkartabilirdik? Þöyle çýkartabilirdik,
+
+$$ (AA^T)u_k = \sigma^2 u_k   $$
+
+Bu ifade tanýdýk geliyor mu? Özdeðer / özvektör klasik yapýsýna
+eriþtik. Üstteki  eþitlik sadece ve sadece eðer $u_k$, $AA^T$'nin
+özvektörü ve $\sigma^2$ onun özdeðeri ise geçerlidir. Bu eþitliði tüm
+$U$ kolonlarý için uygulayabileceðimize göre demek ki $U$'nun
+kolonlarýnda $AA^T$'nin özvektörleri vardýr, ve $AA^T$'nin özdeðerleri
+$A$'nin eþsiz deðerlerinin karesidir.
+
+Bu müthiþ bir buluþ. Demek ki $AA^T$'nin özektörlerini hesaplamak için $A$
+üzerinde SVD uygulayarak $U$'yu bulmak ise yarar, kovaryans matrisini
+hesaplamak gerekli deðil. $AA^T$ özdeðerleri üzerinde büyüklük
+karþýlaþtýrmasý için ise $A$'nin eþsiz deðerlerine bakmak yeterli! 
+
+Dikkat, daha önce kovaryansý $A^TA$ olarak tanýmlamýþtýk, þimdi $AA^T$
+ifadesi görüyoruz, bir devrik uyuþmazlýðý var, bu sebeple, aslýnda
+$A^T$'nin SVD'si alýnmalý (altta görüyoruz).
+
+Örnek
+
+Ýlk bölümdeki örneðe dönelim, ve özvektörleri SVD üzerinden
+hesaplatalým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+U,s,Vt = svd(meanless_data.T,full_matrices=False)
+print U
+\end{minted}
+
+\begin{verbatim}
+[[-0.52045195 -0.85389096]
+ [-0.85389096  0.52045195]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.dot(U.T,U)
+\end{minted}
+
+\begin{verbatim}
+[[  1.00000000e+00   3.70255042e-17]
+ [  3.70255042e-17   1.00000000e+00]]
+\end{verbatim}
+
+Görüldüðü gibi ayný özvektörleri bulduk.
+
+New York Times Yazýlarý Analizi
+
+Þimdi daha ilginç bir örneðe bakalým. Bir araþtýrmacý belli yýllar
+arasýndaki NY Times makalelerinde her yazýda hangi kelimenin kaç kere
+çýktýðýnýn verisini toplamýþ [1,2,3], bu veri 4000 küsur kelime, her satýr
+(yazý) için bir boyut (kolon) olarak kaydedilmiþ. Bu veri
+\verb!nytimes.csv! üzerinde ek bir normalize iþleminden sonra, onun
+üzerinde boyut indirgeme yapabiliriz.
+
+Veri setinde her yazý ayrýca ek olarak sanat (arts) ve müzik (music)
+olarak etiketlenmiþ, ama biz PCA kullanarak bu etiketlere hiç
+bakmadan, verinin boyutlarýný azaltarak acaba verinin "ayrýlabilir"
+hale indirgenip indirgenemediðine bakacaðýz. Sonra etiketleri veri
+üstüne koyup sonucun doðruluðunu kontrol edeceðiz.
+
+Bakmak derken veriyi (en önemli) iki boyuta indirgeyip sonucu
+grafikleyeceðiz. Ýlla 2 olmasý gerekmez tabii, 10 boyuta indirgeyip
+(ki 4000 küsur boyuttan sonra bu hala müthiþ bir kazaným) geri
+kalanlar üzerinde mesela bir kümeleme algoritmasý kullanabilirdik.
+
+Ana veriyi yükleyip birkaç satýrýný ve kolonlarýný gösterelim.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from pandas import *
+import numpy.linalg as lin
+nyt = read_csv ("nytimes.csv")
+labels = nyt['class.labels']
+print nyt.ix[:8,102:107]
+\end{minted}
+
+\begin{verbatim}
+   after  afternoon  afterward  again  against
+0      1          0          0      0        0
+1      1          1          0      0        0
+2      1          0          0      1        2
+3      3          0          0      0        0
+4      0          1          0      0        0
+5      0          0          0      1        2
+6      7          0          0      0        1
+7      0          0          0      0        0
+8      0          0          0      0        0
+\end{verbatim}
+
+Yüklemeyi yapýp sadece etiketleri aldýk ve onlarý bir kenara
+koyduk. Þimdi önemli bir normalizasyon iþlemi gerekiyor - ki bu iþleme
+ters doküman-frekans aðýrlýklandýrmasý (inverse document-frequency
+weighting -IDF-) ismi veriliyor - her dokümanda aþýrý fazla ortaya
+çýkan kelimelerin önemi özellikle azaltýlýyor, ki diðer kelimelerin
+etkisi artabilsin.
+
+IDF kodlamasý alttaki gibidir. Önce \verb!class.labels! kolonunu
+atarýz. Sonra "herhangi bir deðer içeren" her hücrenin 1 diðerlerinin
+0 olmasý için kullanýlan DataFrame üzerinde \verb!astype(bools)! iþletme
+numarasýný kullanýrýz, böylece aþýrý büyük deðerler bile sadece 1
+olacaktýr. Bazý diðer iþlemler sonrasý her satýrý kendi içinde tekrar
+normalize etmek için o satýrdaki tüm deðerlerin karesinin toplamýnýn
+karekökünü alýrýz ve satýrdaki tüm deðerler bu karekök ile
+bölünür. Buna Öklitsel (Euclidian) normalizasyon denebilir.
+
+Not: Öklitsel norm alýrken toplamýn hemen ardýndan çok ufak bir 1e-16
+deðeri eklememize dikkat çekelim, bunu toplamýn sýfýr olma durumu için
+yapýyoruz, ki sonra sýfýrla bölerken NaN sonucundan kaçýnalým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+nyt2 = nyt.drop('class.labels',axis=1)
+freq = nyt2.astype(bool).sum(axis=0)
+freq = freq.replace(0,1)
+w = np.log(float(nyt2.shape[0])/freq)
+nyt2 = nyt2.apply(lambda x: x*w,axis=1)
+nyt2 = nyt2.apply(lambda x: x / np.sqrt(np.sum(np.square(x))+1e-16), axis=1)
+nyt2=nyt2.ix[:,1:] # ilk kolonu atladik
+print nyt2.ix[:8,102:107]
+\end{minted}
+
+\begin{verbatim}
+   afterward     again   against       age  agent
+0          0  0.000000  0.000000  0.051085      0
+1          0  0.000000  0.000000  0.000000      0
+2          0  0.021393  0.045869  0.000000      0
+3          0  0.000000  0.000000  0.000000      0
+4          0  0.000000  0.000000  0.000000      0
+5          0  0.024476  0.052480  0.000000      0
+6          0  0.000000  0.008536  0.000000      0
+7          0  0.000000  0.000000  0.000000      0
+8          0  0.000000  0.000000  0.000000      0
+\end{verbatim}
+
+Not: Bir diger normalize metotu
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+df = pd.DataFrame([[1.,1.,np.nan],
+                   [1.,2.,0.],
+                   [1.,3.,np.nan]])
+print df
+print df.div(df.sum(axis=0), axis=1)
+\end{minted}
+
+\begin{verbatim}
+   0  1   2
+0  1  1 NaN
+1  1  2   0
+2  1  3 NaN
+          0         1   2
+0  0.333333  0.166667 NaN
+1  0.333333  0.333333 NaN
+2  0.333333  0.500000 NaN
+\end{verbatim}
+
+SVD yapalým
+
+\begin{minted}[fontsize=\footnotesize]{python}
+nyt3 = nyt2 - nyt2.mean(0)
+u,s,v = lin.svd(nyt3.T,full_matrices=False)
+print s[:10]
+\end{minted}
+
+\begin{verbatim}
+[ 1.41676764  1.37161893  1.31840061  1.24567955  1.20596873  1.18624932
+  1.15118771  1.13820504  1.1138296   1.10424634]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print u.shape
+\end{minted}
+
+\begin{verbatim}
+(4430, 102)
+\end{verbatim}
+
+SVD'nin verdiði $u$ içinden iki özvektörü seçiyoruz (en baþtakiler,
+çünkü Numpy SVD kodu bu özvektörleri zaten sýralanmýþ halde döndürür),
+ve veriyi bu yeni kordinata izdüþümlüyoruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+proj = np.dot(nyt, u[:,:2])
+proj.shape
+plt.plot(proj[:,0],proj[:,1],'.')
+plt.savefig('pca_4.png')
+\end{minted}
+
+\includegraphics[height=6cm]{pca_4.png}
+
+Þimdi ayný veriyi bir de etiket bilgisini devreye sokarak
+çizdirelim. Sanat kýrmýzý müzik mavi olacak.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+arts =proj[labels == 'art']
+music =proj[labels == 'music']
+plt.plot(arts[:,0],arts[:,1],'r.')
+plt.plot(music[:,0],music[:,1],'b.')
+plt.savefig('pca_5.png')
+\end{minted}
+
+\includegraphics[height=6cm]{pca_5.png}
+
+Görüldüðü gibi veride ortaya çýkan / özvektörlerin keþfettiði doðal
+ayýrým, hakikaten doðruymuþ.
+
+Metotun ne yaptýðýna dikkat, bir sürü boyutu bir kenara atmamýza
+raðmen geri kalan en önemli 2 boyut üzerinden net bir ayýrým ortaya
+çýkartabiliyoruz. Bu PCA yönteminin iyi bir iþ becerdiðini gösteriyor,
+ve kelime sayýlarýnýn makalelerin içeriði hakkýnda ipucu içerdiðini
+ispatlýyor.
+
+Rayleigh-Ritz Teoremi
+
+Sentetik görüntü algoritmasýný gösterdiðimizde, Rayleigh-Ritz kuramýna atýf
+yapmýþtýk. Bu yazýda bütün kuramýn ispatýný veriyoruz. Ýspatta kullanýlan
+küme sanal sayýlar kümesidir. Bizim örneðimiz için gerçek sayýlar kümesi
+kullanýlýyor, fakat ayný ispat hala geçerli olacak.
+
+Problem
+
+Bir kare matrisin özdeðerlerini büyüklük sýrasýna dizersek, bu deðerlerin
+kýsýtlý bir minimizasyon / maksimizasyon probleminin çözümü olduðun
+görüyoruz. Kýsýtlý derken, $x*x$ (x vektör devriði çarpý $x$, yani x'in
+uzunluðu) çarpýmýný 1'e kýsýtlý tutmaktan bahsediyorum. Böylece
+maksimizasyon problemimizin sonsuzluða gitmesini engellemiþ
+oluyoruz. $\lambda$ sembolu genelde özdeðerler için kullanýlýr. Yýldýz
+iþareti * ise sanal sayýlar uzayýnda, devrik yapmak demektir. Gerçek
+sayýlar uzayýnda olsaydýk, o zaman T iþaretini kullanabilirdik. (T
+transpose kelimesinden gelir).
+
+$$ \forall \ x \ \in \ C^n  $$
+
+$$ \lambda_1x^*x \le x^*Ax \le \lambda_nx^*x  $$
+
+$$ \lambda_{ust} = \lambda_n = \max\limits_{x^*x=1} (\frac{x^*Ax}{x^*x}) =
+\max\limits_{x^*x=1}(x^*Ax)
+ $$
+
+$$ \lambda_{alt} = \lambda_n = \max\limits_{x^*x=1} (\frac{x^*Ax}{x^*x}) =
+\max\limits_{x^*x=1}(x^*Ax)
+ $$
+
+Problemi üstte tanýmladýktan sonra, ispatýna gelelim. 
+
+A matrisi, Hermit matrisi olduðu için, elimizde bu A matrisine tekabül eden
+birincil (unitary) bir matris var demektir. Bu birincil matrisi U ile
+temsil edersek, þu sonuca da varýrýz.
+
+$$ A = U \Lambda U^* $$
+
+$$ \Lambda = diag(\lambda_1\lambda_2...,\lambda_n) $$
+
+Bu demektir ki, 
+
+$$ \forall \ x \ \in \ C^n  $$
+
+$$ x^*Ax = x^*U\Lambda U^*x = (U^*x)^*\Lambda(U^*x) $$
+
+$$ \sum_{i=1}^n \lambda_i |(U^*x)_i|^2 $$
+
+Ufak iki not olarak düþmek gerekiyor. Yukarýdaki 3. eþitliðe gelmemizin
+sebebi aþaðýdakinin doðru olmasýdýr.
+
+$$ x^*U = (U^*x)^* $$
+
+Doðrusal cebirde bilinen çevirimlerden biridir bu. En son not olarak,
+toplamlý eþitliðe gelebilmemizin sebebi (4. terim) þundandýr. $U^*x$ yerine
+$W$ koyarsak, $W^*W$ çarpýmýnýn her zaman $W$'nin uzunluðunu verir. Yani
+bir vektörün uzunluðunu bulmak için vektörün devriðini kendisi ile çarpmak
+gerekir, bu çarpým uzunluðun karesidir.
+
+Devam ediyoruz. Her $|(U^*x)_i|^2$ ifadesi artý deðerli olmaya mecbur
+olduðu için,
+
+$$ \lambda_{alt}\sum_{i=1}^n |(U^*x)_i|^2 \le x^*Ax = 
+\sum_{i=1}\lambda_i |(U^*x)|^2 \le
+\lambda_{ust}\sum_{i=1}^n |(U^*x)_i|^2 \le x^*Ax 
+ $$
+
+Üstteki eþitsizliðin doðru olmasýnýn bir sebebi var. Elimizde 3 tane
+deðiþik 1..n arasý yapýlan toplam var. Dikkatle bakarsanýz, ortadaki
+toplam içinde i ile kontrol edilen, bütün özdeðerlerin toplandýðýný
+göreceksiniz. Buna kýyasla mesela en soldaki, toplam içinde sürekli ayný
+'alt özdeðer' toplandýðýný farketmemiz lazým. Buna bakarak anlýyoruz ki,
+tabii ki bütün özdeðerlerin toplamý, tekrar eden ayný özdeðer deðerinin
+toplamýndan fazla olacaktýr! Çünkü iki tarafta da özdeðerler haricindeki
+bütün terimler birbirine eþit. Daha da basitleþtirmek için U'yu yokedelim.
+
+U'da birincil bir matris olduðu için, 
+
+$$ \sum_{i=1}^n |(U^*x)_i|^2 \sum_{i=1} |x_i|^2 = X^*x  $$
+
+cunku
+
+$$ |U^*x| = |x|$$
+
+Ýspat
+
+$$ |U^*x| = (U^*x)^*(U^*x) = x^*UU^*x = x^*x = |x| $$
+
+Böylece göstermiþ oluyoruz ki, 
+
+$$ \lambda_1x^*x \le \lambda_{alt}x^*x \le x^*Ax \le \lambda_{ust}x^*x $$ 
+
+Not: Lineer Cebir notlarýmýzda SVD türetilmesine bakýnca özdeðer/vektör
+mantýðýna atýf yapýldýðýný görebiliriz ve akla þu gelebilir; "özdeðer / vektör
+rutini iþletmekten kurtulalým dedik, SVD yapýyoruz, ama onun içinde de
+özdeðer/vektör hesabý var".  Fakat þunu belirtmek gerekir ki SVD sayýsal
+hesabýný yapmanýn tek yöntemi özdeðer/vektör yöntemi deðildir. Mesela Numpy
+Linalg kütüphanesi içindeki SVD, LAPACK \verb!dgesdd!  rutinini kullanýr ve bu
+rutin iç kodlamasýnda QR, ve bir tür böl / istila et (divide and conquer)
+algoritmasý iþletmektedir.
+
+Kaynaklar
+
+[1] Alpaydýn, E., {\em Introduction to Machine Learning, 2nd Edition}
+
+[2] Strang, G., {\em Linear Algebra and Its Applications, 4th Edition}
+
+[3] Wood, {\em Principal Component Analysis}, Lecture,\url{http://www.robots.ox.ac.uk/~fwood/teaching/index.html}
+
+[4] Cosma Shalizi, {\em Advanced Data Analysis from an Elementary Point of View}
+
+[5] {\em The New York Times Annotated Corpus}, \url{http://www.ldc.upenn.edu/Catalog/CatalogEntry.jsp?catalogId=LDC2008T19}
+
+[6] Shalizi, {\em Statistics 36-350: Data Mining Lecture},\url{http://www.stat.cmu.edu/~cshalizi/350/}
+
+[7] Goodman, {\em Risk and Portfolio Management with Econometrics}, \url{http://www.math.nyu.edu/faculty/goodman/teaching/RPME/notes/Section3.pdf}
+
+[8] Collins, {\em Introduction to Computer Vision}, \url{http://www.cse.psu.edu/~rtc12/CSE486/}
+
+[9] Olver, {\em Applied Linear Algebra}
+
+\end{document}

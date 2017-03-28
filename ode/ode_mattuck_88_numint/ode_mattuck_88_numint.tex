@@ -1,0 +1,234 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Sayýsal Fonksiyonlarý Sayýsal Entegre Etmek
+
+Bir ODE ya da ODE sisteminin sonucunu almak için Euler yöntemini gördük, bu
+yöntem aslýnda bir entegrasyondur, daha doðrusu analitik fonksiyonun
+sayýsal entegrasyonudur. Fakat ya ortada analitik fonksiyon olmasaydý,
+elimizde sadece belli noktalarda toplanmýþ ``veri noktalarý'' olsaydý? O
+zaman sayýsal fonksiyonlarýn sayýsal entegrasyonunu görmemiz lazým.
+
+Newton-Cotes Entegrasyonu
+
+NC yöntemine göre sadece sayýsal deðerleri olan $f(x)$'i entegre etmek için
+ona iyi uyan bir yaklaþýk ama analitik baþka bir fonksiyon bulunur ve bu
+metot analitik ya da sayýsal olarak entegre edilir. Mesela $f(x)$ yerine
+$f_n(x)$ kullanarak,
+
+$$ \int_a^b f(x) \ud x \approx \int _{a}^{b} f_n(x) \ud x $$
+
+$$ f_n(x) = a_0 + a_1x + ... + a_nx^n $$
+
+Yani polinom uydurmus olduk. Veriye polinom uydurmak için bilinen yöntemler
+var, bunlardan biri kullanýlýr, polinom $f_n$ elde edilir, ve o entegre
+edilir. Polinomlarýn entegrasyonu kolay, $a_0 + a_1x + ..$'in entegrali
+mesela $a_0x + a_1x^2/2 + ...$.
+
+Ýkizkenar Yamuk (Trapezoid) Kuralý
+
+Entegral hesabý bir alan hesabý olduðuna göre $a,b$ noktalarý arasýndaki
+alaný bir ikizkenar yamuk ile yaklaþýk olarak temsil edersek, bir ikizkenar
+yamuðun alaný nasýl hesaplanýr biliyoruz [1], bu hesabý uygularýz,
+
+\includegraphics[width=20em]{ode_mattuck_88_numint_02.png}
+
+Üstteki yamuðun alaný $A = \frac{a+b}{2} h$. Bu formülü alttaki
+parametrelere uygularsak,
+
+\includegraphics[width=20em]{ode_mattuck_88_numint_01.png}
+
+Þu formülü
+
+$$ Alan = (b-a) \frac{f(b)-f(a)}{2}$$
+
+elde ederiz. O zaman entegrasyon yapmak istediðimiz herhangi iki nokta
+arasýnda $n$ parça tanýmlarýz (parçalarýn eþit aralýklý olmasý mecbur
+deðildir), 
+
+$$ a = x_0 \le x_1 \le x_2 \le ... \le x_n = b$$
+
+Entegral
+
+$$ 
+\int _{a}^{b} f(x) \ud x \approx \sum _{i=0}^{n-1} 
+\frac{1}{2} \big( x_{i+1}-x_i \big) \big( f(x_{i+1})-f(x_i) \big)
+$$
+
+Örnek
+
+$$ \int _{0}^{\pi} \sin(x) \ud x $$
+
+Baþlangýçta sayýsal fonksiyon dedik ama üstteki fonksiyon analitik, neyse
+örnek amaçlý onun sayýsal halini kullanalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+X = np.linspace(0,np.pi,100)
+Y = np.sin(X)
+Z = np.trapz(Y,X)
+print Z
+\end{minted}
+
+\begin{verbatim}
+1.99983216389
+\end{verbatim}
+
+Analitik olarak kontrol etmek gerekirse, $\int \sin = -\cos(x) + C$,
+analitik entegral $-\cos(\pi) + \cos(0) $
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print -np.cos(np.pi) + np.cos(0)
+\end{minted}
+
+\begin{verbatim}
+2.0
+\end{verbatim}
+
+Örnek
+
+Þimdi pür sayýsal fonksiyon görelim. Alttaki deðerler bir cismin belli
+noktalardaki hýzýný temsil ediyor. Bu cismin zaman 0 ve 3 arasýndaki
+katettiði mesafeyi bulun. 
+
+$$ 
+\begin{tabular}{c|c}
+Zaman (saniye) & Hýz (metre) \\ \hline
+0.0 & 0.0 \\ 1.0 & 10.0 \\ 2.0 & 12 \\ 3.0 & 14
+\end{tabular}
+$$
+
+Mesafenin hýzýn entegrali olduðunu biliyoruz, bkz. {\em Temel Fizik, Ývme,
+  Hýz, Yerçekimi} notlarý,
+
+$$ Mesafe = \int _{0}^{3} V(t) \ud t$$
+
+Ýkiz yamuk yöntemi ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = [0,1,2,3]
+y = [0, 10, 12, 14]
+print np.trapz(y,x), 'metre'
+\end{minted}
+
+\begin{verbatim}
+29.0
+\end{verbatim}
+
+Eðer elle hesaplasaydýk,
+
+$$ h = x_{i+1} - x_i = 1$$
+
+$$ T = h 
+\bigg[ 
+\sum _{i=1}^{n-1} f(x_i) + \frac{1}{2} \big( f(x_0) + f(x_n) \big)
+\bigg]
+$$
+
+$$ = 1 \bigg[ (10+12) + \frac{1}{2}(0+14) \bigg] = 29 $$
+
+Ývmeden Mesafe Hesabý
+
+Eðer elimizde ivme var ise, mesafe nasýl hesaplarýz? Bu durumda iki kere
+entegral almak lazým, ilk entegralle ivmeden hýz, ikincisi hýzdan
+mesafe. Fakat kullanýlan paket program baðlamýnda bir sorun
+\verb!numpy.trapz!'nin entegral bir vektörü alýp geriye tek bir sayý deðeri
+döndürmesi... Bu entegral sonucu, normalde bu beklenen sonuç, fakat hýz
+bize bir zaman serisi olarak gelmeli ki onun da entegralini alarak mesafeyi
+elde edelim.
+
+Acaba $t_0,t_N$ arasýnda $t_0,t_1$, sonra $t_0,t_2$, .. olacak þekilde
+\verb!trapz! hesabý yapsak ve bu deðerleri hatýrlayarak bir hýz vektörü
+oluþtursak? Bu olur, fakat kodlamasý külfetli, otomatik olarak tam da
+bu iþi yapan \verb!scipy.integrate.cumtrapz! adlý bir çaðrý var, yani
+kümülatif hesabý kendiliðinden yapýyor. Bu çaðrýya N büyüklüðündeki vektör
+verince N büyüklüðünde vektör elde ediyoruz. Sonra devam ederek
+\verb!trapz! çaðrýsý yapýyoruz.
+
+Örnek veri: Elimizde cep telefonu kullanarak alýnmýþ ivme ölçümleri var,
+seyahat alttaki güzargah üzerinde, telefon dikey, ekran içe dönük þekilde
+toplandý [2]. Veri noktalarý yaklaþýk saniye bazýnda (ki verinin ilk kolonu
+milisaniye formatindaki zaman), ivme ölçümlerinin birimi $m/s^2$.
+
+\includegraphics[width=20em]{ode_mattuck_88_numint_03.png} 
+
+Ekran içe doðru olduðunda önümüzdeki yola doðru giden z ekseni pozitif, o
+zaman ölçümlerin negatifini almak lazým. Ayrýca telefonda dururken bile
+deðerlerin -0.2 etrafýnda olduðunu gördük, bir hata durumu var gibi
+duruyordu, o yüzden tüm veri noktalarýna 0.2 ekleyerek bu hatayý düzeltmeye
+çalýþtýk.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('lacc.txt',header=None,sep='\s')
+df = df[23:60]
+t = df[0] / 1000.
+acc = df[3]+0.2
+import scipy.integrate as int
+vel = int.cumtrapz(acc, t)
+print np.trapz(vel), 'metre'
+\end{minted}
+
+\begin{verbatim}
+65.9321216755 metre
+\end{verbatim}
+
+Sonuç fena deðil; Google Maps 72 metre diyor, biz 65 metre bulduk. Belki
+düzeltme faktörü daha iyi olabilirdi, ya da baþlangýç noktasýný haritadan
+daha iyi seçebilirdik (kesin nokta için GPS kullanýlabilir, fakat Android
+GPS'inin de 10 metrelik hata payý var), ya da telefonun ivme ölçümündeki
+hata payý sonuca yansýmýþ olabilir.
+
+X-Y Kordinat Sisteminde
+
+Eðer iki boyutlu harita üzerinde nerede olduðumuzu, nasýl hareket
+ettiðimizi grafiklemek istersek, kameranýn $z$ yönünde ne kadar
+ilerlediðimizi ve hangi yönde ilerlendigi (açý bilgisi olarak) ile bu
+hesabý yapabiliriz. Cep telefonunu içi kendimize dönük, üst tarafý solumuza
+gelecek þekilde yere tam dikey tutuyoruz, yani tüm hareketimiz $z$ yönünde
+olarak algýlanýyor. Cep telefon yön bilgisini de kaydettik, yön açýsý $x$
+eksenine göre ama saat yönü tersinde, yani açý 0 derece ise tam doðuya
+gidiyoruz demektir, 90 derece ise güneye gidiyoruz demektir. Gidiþatýn
+grafiði için z yönündeki her zaman diliminde atýlan adýmýn y ve x
+bileþenlerini buluruz, bunlar sýrasýyla adýmýn gidilen yöne göre kosinüs ve
+sinüsü olacaktýr (sadece sinüs hesabýný -1 ile çarpýyoruz, biraz önceki
+sebepten dolayý). Dikkat edelim altta kümülatif entegrali iki kez alýyoruz,
+böylece hem hýz hem de mesafe için bir zaman serisi elde etmiþ oluyoruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.integrate as int
+import pandas as pd
+
+dfacc = pd.read_csv('lacc.txt',header=None,sep='\s')
+dfori = pd.read_csv('orientations.txt',header=None,sep='\s')
+
+dfacc = dfacc[14:]
+dfori = dfori[14:]
+
+t = dfacc[0] / 1000.
+acc2 = dfacc[3] + 0.2
+vel2 = int.cumtrapz(acc2, t)
+distz = int.cumtrapz(vel2, t[1:]) 
+
+df = pd.DataFrame([distz, dfori[1]]).T
+df.columns = ['distz','o']
+
+df['x'] = df.distz.diff() * np.cos(np.deg2rad(df.o))
+df['y'] = -df.distz.diff() * np.sin(np.deg2rad(df.o))
+df['x1'] = df.x.cumsum()
+df['y1'] = df.y.cumsum()
+plt.plot(df.x1, df.y1, '.')
+plt.savefig('ode_mattuck_88_numint_04.png')
+\end{minted}
+
+\includegraphics[height=6cm]{ode_mattuck_88_numint_04.png}
+
+Görüldüðü gibi gidilen yön Google haritasýnýn gösterdiðine oldukca
+yakýn. Sonlara doðru donuslu bazi hareketler var, bunlar da hakikaten ilk
+haritadaki gidistan sonra sola donup yapilan donusler.
+
+Kaynaklar
+
+[1] Sertel, {\em Numerical Integration}, \url{http://web.itu.edu.tr/~sertele/dersler/matlab/ders09.pdf}
+
+[2] Bayramli, {\em Algýlayýcý Ölçümleri, Video, Android}, \url{http://sayilarvekuramlar.blogspot.co.uk/2017/02/algilayici-olcumleri-video-android.html}
+
+\end{document}

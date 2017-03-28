@@ -1,0 +1,429 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Algýlayýcý Birleþtirimi, Füzyonu (Sensor Fusion)
+
+Tek boyutlu ortamda bir büyüklüðü mesela bir lokasyon bilgisi $x$'i, iki
+kere ölçüyoruz, ve bu ölçümü iki deðiþik algýlayýcýya yaptýrýyoruz, ve yine
+diyelim ki iki deðiþik alet bir cismin olduðu uzaklýðýný / yerini bize geri
+döndürüyor. Devam edelim, bu bilgilerde belli ölçüde gürültü var; bu
+aletlerin hatalý ölçümü yüzünden olabilir, çevre þartlarý sebebiyle
+olabilir, örnek olarak iki $z_1,z_2$ ölçümü için iki deðiþik belirsizlik
+(uncertainty) olduðunu farzedelim, bunlar $\sigma_1,\sigma_2$. Soru þu: bu
+iki ölçümü kullanarak daha iyi bir $x$ tahmini yapabilir miyiz?
+
+Bunun için iki ölçümü bir þekilde birleþtirmemiz gerekiyor. Her ölçümü
+Gaussian / Normal daðýlým olarak modelleyebiliriz, o zaman iki Gaussian
+daðýlýmý bir þekilde birleþtirmemiz (fusion) lazým. 
+
+Ölçümleri temsil etmek için Gaussian biçilmiþ kaftan. Ölçümdeki
+belirsizliði standart sapma (standart deviation) üzerinden rahatlýkla
+temsil edebiliriz. Peki birleþtirimi nasýl yapalým?
+
+Bu tür problemlerde maksimum olurluk (maximum likelihood) kullanýlmasý
+gerektiðini aþaðý yukarý tahmin edebiliriz, çünkü maksimum olurluk verinin
+olurluðunu (olasýlýðýný yani) maksimize ederek bilinmeyen parametreleri
+tahmin etmeye uðraþýr. Çoðunlukla bu tekniði hep {\em tek} bir daðýlým
+baðlamýnda görürüz, bazý bilinmeyen parametreleri olan tek bir daðýlýma
+deðiþik veri noktalarý verilerek olasýlýk sonuçlarý çarpýlýr, ve elde
+edilen formül maksimize edilmeye uðraþýlýrken ayný anda bilinmeyen
+parametrelerin optimal deðerleri saptanmaya uðraþýlýr. Bizim bu
+problemimizde iki deðiþik daðýlým olacak, maksimum olurluk illa tek bir
+daðýlýmla kullanýlabilir diye bir kural yok.
+
+Problemimizde iki ölçümü, iki Gaussian ile temsil edebiliriz, ve bu iki
+Gaussian'a verilen iki ölçüm noktasýný olurluðunu bu Gaussian'larýn
+sonuçlarýný çarparak hesaplayabiliriz. Peki bilinmeyen parametre nedir? Onu
+da {\em her iki Gaussian için de ayný olduðunu farzettiðimiz orta nokta}
+(mean) olarak alabiliriz, ve $x$ olarak belirtiriz. Yani
+
+$$ L(x) = p(z_1|x,\sigma_1) p(z_2|x,\sigma_2) $$
+
+$$ L(x) \sim \exp{\frac{-(z_1-x)^2}{2\sigma_1^2} } 
+\times \exp \frac{-(z_2-x)^2}{2\sigma_2^2} $$
+
+1D Gaussian formülünü hatýrlarsak, 
+
+$$ p(z;x,\sigma) = \frac{1}{\sigma\sqrt{2\pi}} 
+\exp \bigg\{ - \frac{(z-x)^2}{2\sigma^2}  \bigg\}
+ $$
+
+Ders notlarý [1]'de iki üstteki formülün nasýl maksimize edilerek bir
+$x_{MLE}$ formülüne eriþildiðini görebiliriz. 
+
+Formül baþýndaki sabit kýsmýnýn $L(x)$'de kullanýlmadýðýný görüyoruz, çünkü
+maksimizasyon açýsýndan düþünürsek o kýsým tekrar tekrar çarpýlacak ve
+hesaplamaya çalýþtýðýmýz deðiþkenler açýsýndan bu sürekli tekrar bir
+fark yaratmaz.
+
+Bu metot iþler. Fakat biz alternatif olarak daha temiz olacak deðiþik bir
+yoldan gideceðiz. Elimizdeki her iki ölçümü iki farklý tek boyutlu Gaussian
+yerine {\em 2 boyutlu} tek bir Gaussian içine koyacaðýz, iki ölçümü tek
+bir 2 boyutlu vektör içinde belirteceðiz yani, ve tek bir olasýlýk hesabýný
+$p(z;x,\Sigma)$'i baz alacaðýz.  Belirsizlikler ne olacak? Ölçüm
+belirsizliklerini bu 2D Gaussian'ýn kovaryansýnda çapraza (diagonal)
+koyabiliriz, çapraz diþindaki matris öðeleri sýfýr yapýlýrsa iki ölçümün
+birbirinden baðýmsýzlýðýný temsil etmiþ oluruz. Maksimizasyon? Tek bir
+ölçümün olurluðunu maksimize edeceðiz, bu tek bir ölçümün olasýlýðýný
+hesaplamaktan ibarettir, ve bu hesap sýrasýnda bilinmeyen deðiþkenleri
+içeren yeni bir formül ortaya çýkacaktýr. Maksimize etmeye uðraþacaðýmýz bu
+formül olur.
+
+Çok boyutlu Gaussian'ý hatýrlayalým (artýk $z,x$ birer vektör),
+
+$$ p(z;x,\Sigma) = 
+\frac{ 1}{(2\pi)^{k/2} \det(\Sigma)^{1/2}} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z-x)^T\Sigma^{-1}(z-x)
+\bigg\} $$
+
+Kýsaca,
+
+$$ =  \frac{ 1}{C} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z-x)^T\Sigma^{-1}(z-x)
+\bigg\} $$
+
+Bir numara, $\exp$ ve parantez içi negatif ibareden kurtulmak için
+$-\ln p$ alalým,
+
+$$ L = -\ln p(z) = 
+\frac{ 1}{2}(z-x)^T\Sigma^{-1}(z-x)
+$$
+
+Þimdi iki ölçümü, belirsizliði vektör / matris öðeleri olarak gösterelim, 
+
+$$ = \frac{1}{2}  
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]^T
+\left[\begin{array}{cc}
+\sigma_1^2 & 0 \\
+0 & \sigma_2^2 
+\end{array}\right]^{-1}
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]
+$$
+
+Çapraz matrisin tersini almak için çaprazdaki öðelerin tersini almak
+yeterlidir,
+
+$$ = \frac{1}{2}  
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]^T
+\left[\begin{array}{cc}
+\sigma_1^{-2} & 0 \\
+0 & \sigma_2^{-2} 
+\end{array}\right]
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]
+$$
+
+$$ = \frac{1}{2}  
+\left[\begin{array}{cc}
+\sigma_1^{-2}(z_1-x) & \sigma_2^{-2} (z_2-x)
+\end{array}\right]
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]
+$$
+
+$$ = 
+\frac{1}{2}\sigma_1^{-2}(z_1-x)^2 + \frac{1}{2}\sigma_2^{-2} (z_2-x)^2
+$$
+
+Maksimize etmek için, formül karesel olduðuna göre, bilinmeyen $x$
+deðiþkenine göre türev alýp sýfýra eþitleyebiliriz,
+
+$$ 
+\frac{dL}{dx} = \sigma_1^{-2}z_1-\sigma_1^{-2}x + \sigma_2^{-2}z_2-\sigma_2^{-2}x = 0
+$$
+
+$x$ üzerinden gruplarsak,
+
+$$ 
+-x(\sigma_1^{-2}+\sigma_2^{-2}) + \sigma_1^{-2}z_1+ \sigma_2^{-2}z_2 = 0
+$$
+
+Gruplanan kýsmý eþitliðin saðýna alalým,
+
+$$ 
+\sigma_1^{-2}z_1+ \sigma_2^{-2}z_2 = x(\sigma_1^{-2}+\sigma_2^{-2}) 
+$$
+
+$$ 
+\frac{\sigma_1^{-2}z_1+ \sigma_2^{-2}z_2 }{\sigma_1^{-2}+\sigma_2^{-2}}= x_{MLE}
+$$
+
+Gayet temiz bir þekilde sonuca eriþtik. 
+
+Örnek
+
+Elimizde belirsizlikleri $\sigma_1=10,\sigma_2=20$ olan iki algýlayýcý
+var. Bu algýlayýcýlar ayný obje hakkýnda $z_1=130,z_2=170$ olarak iki ölçüm
+gönderiyorlar. Bu ölçümleri birleþtirelim. Hatýrlarsak $10^{-2}$ ile
+çarpmak $10^{2}$ ile bölmek ayný þey.
+
+$$ x_{MLE} =
+\frac{130/10^2 + 170/20^2}{1/10^2 + 1/20^2} = 138.0
+$$
+
+Sonuç belirsizliði daha az olan ölçüme daha yakýn çýktý, bu akla yatkýn
+bir sonuç.
+
+Çok Boyutlu Gaussian Füzyon
+
+Peki ya elimizdeki ölçümlerin kendisi çok boyutlu ise? Yani $z_1,z_2$ birer
+vektör ise?
+
+Yine maksimum olurluk üzerinden bir formül türetebiliriz. Bu durumda tek
+olasýlýk hesabý yetmez, iki ayrý daðýlým olmalý,
+
+$$ p(z_1;x,\Sigma_1) =  \frac{ 1}{C_1} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z_1-x)^T\Sigma_1^{-1}(z_1-x)
+\bigg\} $$
+
+$$ p(z_2;x,\Sigma_2) =  \frac{ 1}{C_2} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z_2-x)^T\Sigma_2^{-1}(z_2-x)
+\bigg\} $$
+
+Orta nokta $x$ her iki formülde ayný çünkü deðiþmeyen olan o; ayný orta
+nokta için tahmin üretmeye uðraþýyoruz. Bu durum bildik maksimum olurluk
+hesaplarýna benziyor, fakat ilk baþta belirttiðimiz gibi farklý türden
+olasýlýk fonksiyonlarýnýn (bu sefer çok boyutlu) farklý veri noktalarý
+üzerinden çarpýlmasý.
+
+Devam edelim. Daha önce $\ln$ alarak $\exp$'yi yoketmiþtik. Bunun bir diðer
+faydasý $\ln$ alýnýnca çarpýmlarýn toplama dönüþmesidir, 
+
+$$ L = p(z_1;x,\Sigma_1) p(z_2;x,\Sigma_2) 
+$$
+
+$$ -\ln L = -\ln p(z_1;x,\Sigma_1) -\ln p(z_2;x,\Sigma_2) 
+$$
+
+$$ 
+\mathcal{L} = 
+-\ln L = 
+\frac{ 1}{2}(z_1-x)^T\Sigma_1^{-1}(z_1-x) + 
+\frac{ 1}{2}(z_2-x)^T\Sigma_2^{-1}(z_2-x)
+$$
+
+Þimdi eþitliðin sað tarafýnýn $x$'e göre türevini alalým, vektör ve matris
+baðlamýnda türev nasýl alýnýr? Herhangi bir $M$'in simetrik olduðu
+durumlarda (ki kovaryans matrisleri her zaman simetriktir, çünkü mesela iki
+deðiþkenli durumda $x_1,x_2$ kovaryansý -iliþkisi- $x_2,x_1$ kovaryansýndan
+farklý olamaz),
+
+$$ \frac{\partial}{\partial x}[x^TMx] = 2Mx $$
+
+olduðunu biliyoruz [2]. O zaman türev sonucu þöyle olur, 
+
+$$ 
+\frac{d\mathcal{L}}{dx} = 
+(z_1-x)^T\Sigma_1^{-1} +  (z_2-x)^T\Sigma_2^{-1}
+$$
+
+Sýfýra eþitleyip çözelim, 
+
+$$ 
+(z_1-x)\Sigma_1^{-1} +  (z_2-x)\Sigma_2^{-1} = 0
+$$
+
+$$ 
+z_1\Sigma_1^{-1} - x\Sigma_1^{-1} + z_2\Sigma_2^{-1} - x\Sigma_2^{-1} = 0
+$$
+
+Yine $x$ altýnda gruplayalým,
+
+$$ 
+-x(\Sigma_1^{-1} + \Sigma_2^{-1}) + z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}  = 0
+$$
+
+$$ 
+z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}  = x(\Sigma_1^{-1} + \Sigma_2^{-1}) 
+$$
+
+Eðer iki belirsizliðin toplamýný $\Sigma_x^{-1}$ olarak özetlersek, yani 
+
+$$ 
+\Sigma_x^{-1} = \Sigma_1^{-1} + \Sigma_2^{-1}
+$$
+
+Not: Aslýnda $\Sigma_x$ te diyebilirdik, fakat tersi alýnmýþ matrislerin
+toplamý olduðunu temsil etmesi için ``tersi alýnmýþ bir sembol''
+kullandýk. Tabii diðer yandan tersin tersini alýnca ele geçecek
+$\Sigma_x$'in de bir anlamý olduðu iddia edilebilir, bu $\Sigma_x$ en olasý
+$x$ tahmininin yeni belirsizliðidir de bir bakýma. 
+
+Simdi ana formule donelim,
+
+$$ 
+z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}  = x\Sigma_x^{-1}
+$$
+
+
+$$ 
+\Sigma_x (z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}) = x_{MLE}
+$$
+
+Örnek
+
+Elimizde iki tane iki boyutlu ölçüm var, 
+
+$$ z_1 = \left[\begin{array}{c}
+1 \\ 1
+\end{array}\right], 
+z_2 = \left[\begin{array}{r}
+2 \\ -1
+\end{array}\right] 
+$$
+
+Ölçümler iki deðiþik algýlayýcýdan geliyor, belirsizlikleri
+
+$$ 
+\Sigma_1 = 
+\left[\begin{array}{cc}
+1 & 0 \\ 0 & 4
+\end{array}\right], 
+\Sigma_2 = 
+\left[\begin{array}{cc}
+4 & 0 \\ 0 & 1
+\end{array}\right]
+ $$
+
+Nihai ölçüm nedir? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+import matplotlib.mlab as mlab
+
+x = np.arange(-10.0, 10.0, 0.1)
+y = np.arange(-10.0, 10.0, 0.1)
+
+X, Y = np.meshgrid(x, y)
+Z1 = mlab.bivariate_normal(X, Y, sigmax=1.0, sigmay=4.0,mux=1., \
+     muy=1.,sigmaxy=0.0)
+Z2 = mlab.bivariate_normal(X, Y, sigmax=4.0, sigmay=1.0,mux=2., \
+     muy=-1.,sigmaxy=0.0)
+
+# iki yuzeyi ayni grafikte birlestirmek icin herhangi iki nokta arasinda
+# daha fazla (maksimum) olani al, cunku nihai yuzey olarak onu gormek 
+# istiyoruz zaten
+Z = np.maximum(Z1,Z2)
+
+fig = plt.figure()
+
+ax = Axes3D(fig)
+ax.view_init(elev=50., azim=80)
+
+ax.plot_surface(X,Y,Z,cmap=cm.jet)
+plt.savefig('fusion_1.png')
+\end{minted}
+
+
+\includegraphics[height=6cm]{fusion_1.png}
+
+Ýki ölçümü Gaussian olarak ekrana bastýk, bu Gaussian'larýn orta noktasý
+$z_1,z_2$, bu durumu maksimum olurluk için ayný olduðunu farz ettiðimiz $x$
+ile karýþtýrmayalým; o $x$ modelleme sýrasýnda olduðunu farzettiðimiz ideal
+bir Gaussian idi. Üstte sadece veri noktalarýný ekrana basýyoruz. 
+
+Üstten bakýþla kontur (contour) olarak gösterirsek 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+CS = plt.contour(X, Y, Z1,rotation=70)
+CS = plt.contour(X, Y, Z2,rotation=70)
+plt.savefig('fusion_3.png')
+\end{minted}
+
+\includegraphics[height=6cm]{fusion_3.png}
+
+Resimde önce ilk ölçüm, sonra onunla yanyana olacak ikinci ölçüm koyulmuþ. 
+
+$$ \Sigma_x^{-1} = \Sigma_1^{-1} + \Sigma_2^{-1}  =
+\left[\begin{array}{cc}
+1 & 0 \\ 0 & 0.25
+\end{array}\right] + 
+\left[\begin{array}{cc}
+0.25 & 0 \\ 0 & 1
+\end{array}\right] =
+\left[\begin{array}{cc}
+1.25 & 0 \\ 0 & 1.25
+\end{array}\right] 
+$$
+
+Tersini alalým 
+
+$$ \Sigma_x =
+\left[\begin{array}{cc}
+0.8 & 0 \\ 0 & 0.8
+\end{array}\right] 
+$$
+
+$$ x_{MLE} =  \Sigma_x (z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}) $$
+
+$$ 
+x_{MLE} =
+\left[\begin{array}{cc}
+0.8 & 0 \\ 0 & 0.8
+\end{array}\right] 
+\bigg(
+\left[\begin{array}{cc}
+1 & 0 \\ 0 & 0.25
+\end{array}\right] 
+\left[\begin{array}{c}
+1 \\ 1
+\end{array}\right]  + 
+\left[\begin{array}{cc}
+0.25 & 0 \\ 0 & 1
+\end{array}\right] 
+\left[\begin{array}{r}
+2 \\ -1
+\end{array}\right]  
+\bigg) = 
+\left[\begin{array}{r}
+1.2 \\ -0.6
+\end{array}\right]  
+$$
+
+Sonuç grafiklenirse suna benzer (ki yeni belirsizlik $\Sigma_x$'i de
+grafikte kullanalým),
+
+\begin{minted}[fontsize=\footnotesize]{python}
+Z3 = mlab.bivariate_normal(X, Y, sigmax=0.8, sigmay=0.8,mux=1.2, \
+     muy=-0.6,sigmaxy=0.0)
+
+fig = plt.figure()
+
+ax = Axes3D(fig)
+ax.view_init(elev=40.,azim=80)
+
+ax.plot_surface(X,Y,Z3,cmap=cm.jet)
+plt.savefig('fusion_2.png')
+\end{minted}
+
+
+\includegraphics[height=6cm]{fusion_2.png}
+
+Yeni tahminimiz böyle çýktý. Çok daha emin olduðumuz bir noktada en olasý ölçümü
+ortaya çýkardýk. Kontur olarak grafiklersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+CS = plt.contour(X, Y, Z3)
+plt.savefig('fusion_4.png')
+\end{minted}
+
+\includegraphics[height=6cm]{fusion_4.png}
+
+
+[1] Zisserman, {\em Lectures 3 \& 4: Estimators}, \url{www.robots.ox.ac.uk/~az/lectures/est/lect34.pdf}
+
+[2] Hart, Duda, {\em Pattern Classification}
+
+\end{document}

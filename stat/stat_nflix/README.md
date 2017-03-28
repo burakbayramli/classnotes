@@ -1,0 +1,7 @@
+
+Halko, N., Randomized methods for computing low-rank approximations of matrices
+
+Gleich, D., Benson, Demmel, Direct QR factorizations for tall-and-skinny matrices in MapReduce architectures
+
+Bayramli, B., SVD Factorization for Tall-and-fat Matrices on Map/Reduce Architectures
+

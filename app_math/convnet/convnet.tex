@@ -1,0 +1,135 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Evriþimsel Aðlar, Derin Öðrenim (Convolutional Nets -Convnet-, Deep Learning)
+
+Convnet'ler YSA'lara yeni bazý özellikler ekledi. Öncelikle gizli katman
+artýk ikiden daha fazla derinliðe gidebiliyor. Diðer bir ek, mesela veriye
+ilk dokunan katmaný sadece evriþim operasyonu için kullanmak. Bu ek'in
+convnet'in alt katmanlarýndaki hata düzeltme iþlemini daha rahatlaþtýrdýðý
+keþfedildi. Bir diðer katman özel bir ReLu (doðrultan lineer ünite
+-rectified linear unit-) katmaný eklemek, bir diðeri ``aþaðý örnekleme
+(downsampling)'' yapmak, mesela 2x2 içindeki bir pencere içine düþen
+öðelerin maksimumunu almak, vs. Bir diðer katman ``veri atma (dropout)''
+katmaný, veri içinde bir kýsým rasgele þekilde eðitim verisinden atýlýyor,
+böylece modelde aþýrý uygunluk (overfitting) problemlerinden kaçýnýlmýþ
+olunuyor, potansiyel olarak daha saðlam (robust) bir modelin ortaya çýkmasý
+saðlanýyor.
+
+\includegraphics[height=6cm]{convnet_06.png}
+
+Böyle gide gide bir derin að yapýsý ortaya çýkartmýþ oluyoruz. Altta örnek
+kod görüyoruz. Veri [5]'ten indirilebilir.
+
+\inputminted[fontsize=\footnotesize]{python}{convnet2.py}
+
+\begin{verbatim}
+Loading training data...
+KNN
+0.82
+    Epoch      |    Train err  |   Test error  
+              0|           0.92|           0.93
+              1|           0.89|            0.9
+              2|          0.798|           0.82
+              3|          0.767|           0.74
+              4|          0.727|           0.67
+              5|          0.678|           0.71
+              6|          0.627|           0.65
+              7|          0.563|           0.56
+              8|          0.503|           0.53
+              9|          0.445|           0.49
+             10|          0.418|           0.45
+             11|          0.357|           0.41
+             12|           0.34|           0.39
+             13|          0.322|           0.36
+             14|          0.287|           0.32
+             15|          0.258|           0.29
+             16|          0.261|           0.33
+             17|          0.232|           0.27
+             18|          0.216|           0.25
+             19|          0.206|           0.25
+             20|          0.188|           0.22
+             21|          0.171|           0.23
+             22|          0.164|           0.23
+             23|          0.175|           0.25
+             24|          0.121|           0.21
+             25|          0.152|           0.19
+             26|          0.169|           0.21
+             27|          0.145|           0.18
+             28|          0.119|           0.22
+             29|          0.099|           0.18
+             30|          0.073|           0.16
+             31|          0.083|            0.2
+             32|          0.066|           0.17
+             33|           0.06|           0.18
+             34|          0.052|           0.18
+             35|          0.042|           0.18
+             36|          0.034|           0.16
+             37|          0.034|           0.18
+             38|          0.027|           0.17
+             39|          0.023|           0.15
+             40|          0.026|           0.18
+             41|          0.017|           0.16
+             42|          0.012|           0.16
+             43|          0.011|           0.14
+             44|          0.011|           0.12
+             45|          0.008|           0.14
+             46|          0.009|           0.13
+             47|          0.007|           0.15
+             48|          0.006|           0.12
+             49|          0.005|           0.15
+\end{verbatim}
+
+Convnet'lerin son zamanlarda baþarýlý olmaya baþlamasýnda bazý etkenler
+þunlar: en önemlisi araþtýrmacýlarýn dýþbükey olmayan kayýp
+fonksiyonlarýndan (non-convex loss functions) korkmadan (!) onlarýn
+minimumunu rasgele gradyan iniþi üzerinden bulabilmeye
+baþlamalarý. Convnet, HMM, Gaussian karýþýmlar gibi pek çok alanda dýþbükey
+olmayan bir durum vardýr, hatta bir bakýma ciddi her yapay öðrenim alanýnda
+bu durum ortaya çýkar. Bu optimizasyon problemi rasgele gradyan iniþi ile
+çözmeye baþlandý. Gerçi rasgele gradyan iniþi çok basit bir yöntemdir,
+fakat araþtýrmacýlar yýllarca bu yöntemi dýþbükey olmayan yerlerde
+kullanmadýlar çünkü yakýnsama (convergence) garantileri teorik olarak
+mümkün deðildi. Kýyasla bir dýþbükey fonksiyonun minimumuna varmak doðru
+yöntemler ile garantidir. Fakat son araþtýrmalara göre rasgele gradyan
+iniþi ile optimizasyon eðitim verisi üzerinden yakýnsama garantisi olmasa
+bile test verisi üzerinde bazý garantilerin olduðu ortaya çýktý, ki test
+skoru eðitim skorundan daha önemli.
+
+Bir diðer geliþme að yapýsýnda gizli katmandaki nöron sayýsýný
+geniþletince, minimum noktasýnýn pek çok yerde ortaya çýkabilmesi, ve bu
+noktalarýn birbiriyle aþaðý yukarý ayný olmasý. Yani gradyan iniþi bu
+noktalardan birini bulduðunda iþ bitmiþ sayýlabiliyor. Ayrýca çok boyut
+olunca yerel minima'da takýlýp kalmadan bir yan boyuta atlayýp önümüzdeki
+tepenin etrafýndan dolaþabilme þansý ortaya çýkýyor [4].
+
+Ek bir geliþme herhangi bir yazýlým fonksiyonun türevinin alýnabilmesini
+saðlayan otomatik türev alma (automatic differentiation) tekniðinin
+yaygýnlaþmasý, ki bu teknik çetrefil nöron fonksiyonlarý içerebilen
+convnet'ler için faydalý oldu. Not: dikkat otomatik türev ile {\em her
+  türlü} fonksiyon hatta \verb!if, while! komutlarý içeren bir kod
+parçasýnýn bile türevini alýnabiliyor (bkz {\em Otomatik Türev}
+yazýsý). Türevler önemli çünkü gradyan iniþi minimuma gidebilmek için türev
+kullanmalý.
+
+Bazý negatifler: Convnet'lerin eðitimi hýzlý deðildir, ciddi kullanýmlar
+için GPU, ya da paralel CPU kullanmak þart. Ayrýca convnet'lerin bir fark
+yaratmasý için oldukca çok veriye ihtiyaçlarý var, normal ölçek veri
+ortamýnda diðer yaklaþýmlar da convnet'ten çok daha kötü deðiller. Bir
+diðeri bir YSA'nýn, yapý olarak, istatistiki bir anlamýnýn olmamasý: Bir að
+yapýsý var, fakat bu aðýn tamamýnýn olasýlýksal olarak irdelenmesi mümkün
+deðil. Kýyasla bir GMM bir olasýlýðý temsil eder, bu sebeple yaptýðý
+hesaplarýn mesela güven aralýðýný hesaplamak mümkündür; Mesela týbbi bir
+uygulama baðlamýnda YSA bir tahmin yapýnca bundan ``ne kadar emin olduðu''
+sorusunun direk cevabý alýnamýyor. Bu alanda araþtýrmalar var tabii, ilginç
+bazý buluþlar bunu mümkün kýlabilir.
+
+Kaynaklar
+
+[3] {\em Machine learning algorithms}, https://github.com/rushter/MLAlgorithms
+
+[4] LeCun, {\em Who is Afraid of Non-Convex Loss Functions?}, \url{http://videolectures.net/eml07_lecun_wia}
+
+[5] LeCun, {\em MNIST Verisi}, \url{http://yann.lecun.com/exdb/mnist}
+
+
+\end{document}

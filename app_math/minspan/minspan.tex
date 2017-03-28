@@ -1,0 +1,282 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Minimum Kapsamlý Aðaç (Minimum Spanning Tree -MST-)
+
+MST algoritmasý kenar aðýrlýklarýna (weights) sahip olan bir çizit (graph)
+yapýsý içinde minimal ve kapsayan aðacý (MST) bulan algoritmaya verilen
+isimdir. Mesela alttaki çizit içinde
+
+\includegraphics[height=4cm]{minspan_0.png}
+
+MST öyle bir baðlantý yapýsýdýr ki baþtan sona, herhangi bir noktadan
+(node) bir diðerine geçiþ yapýlabilsin, ve bu tüm yollarýn toplamý en
+minimal olsun. Dikkat, herhangi bir noktadan diðerine giden yol en az olsun
+demiyoruz, bu durumda problem en kýsa yol (shortest path) problemi
+olurdu, ki bu problemi {\em Dinamik Programlama} yazýsýnda gördük. Burada
+göreceðimiz kapsayan aðacýn {\em toplamýnýn} minimal olmasýdýr. 
+
+Kapsayan aðaç (spanning tree) kavramýný tanýmlamak gerekirse, bir çizitin
+kapsayan aðacý orijinal çizitin tüm noktalarýna sahip olmalýdýr, aðaç
+içinde hiçbir döngü (cycle) olmamalýdýr. Döngü derken bir noktadan diðerine
+atlaya atlaya giderken bizi dönüp tekrar ayný yere getirebilecek türden
+``kapalý devre'' tur bir döngüden bahsediyoruz - bu mümkün
+olmamalýdýr. Ayrýca çizit baðlantýlý olmalýdýr, yani bir kýsmý diðer
+kýsmýndan kopuk bir çizit üzerinde MST bulunamaz. 
+
+Minimum kapsayýcý aðaç ise bu tür pek çok alternatif aðaçlarýn içinde en az
+aðýrlýklý olanýdýr. Not, bir çizitin MST çözümü özgün (unique) olmayabilir, ayný
+aðýrlýkta birden fazla deðiþik aðaç mümkündür. Mesela üstteki çizit için mümkün
+MST'ler altta görülüyor,
+
+\includegraphics[height=4cm]{minspan_1.png}
+
+Kontrol edilebilir, üstteki her aðacýn kenar toplamý 8'dýr. Bu aðaçlarýn
+her biri bir MST olarak kabul edilebilir.
+
+Uygulama baðlamýnda MST bulma algoritmasýnýn ne kadar kullanýþlý olacaðý
+görülüyor herhalde; mesela elektrik hatlarý, telefon iletiþim hatlarý
+tasarlarken MST kullanýlabilir, toplam baðlantýsý en az olan bir að yapýsý
+her iki durumda da kullanýþlý olur. Biyolojik, kimyasal aðlarýn analizinde
+bile MST kullanýlmaktadýr.
+
+Aðaçlarýn Özellikleri (Properties of Trees)
+
+Baþlamadan önce bir aðacý aðaç yapan iki önemli özelliði belirtelim
+
+1) Taným itibariyle aðaç olan bir þeye, arasýnda baðlantý olmayan iki
+noktayý birleþtiren bir kenar koyarsak bu aðaçta bir döngü yaratmýþ
+oluruz.
+
+2) Elde olan bir aðacýn herhangi bir kenarýný çýkartýrsak bu aðacý
+``kopartmýþ'' oluruz, birbiriyle baðlantýsýz iki alt-aðaç ortaya çýkar.
+
+\includegraphics[height=8cm]{graph_prop.png}
+
+Resimde her iki durumu görüyoruz. Bu iki özellik çok önemli, çünkü onlarý
+MST'lerin çok temel özelliklerini ispatlamak için kullanacaðýz. Ondan önce
+bazý tanýmlar,
+
+Taným
+
+Kesik (cut): Bir çizit üzerindeki yapýlan kesik, o çiziti birbiriyle
+alakasýz, baðlantýsýz iki parçaya / kümeye böler. {\em Not}: Bir kesik
+birden fazla kenarýn üzerinden geçebilir / kapsayabilir, çünkü bir çiziti
+tamamen ikiye ayýrmaktan bahsediyoruz. Bir aðaçtan bahsediyor olsaydýk,
+yukarýda belirttiðimiz gibi, tek bir kenarý kesmek yeterli olurdu.
+
+Birleþtiren kenar (crossing edge): birbirinden baðlantýsýz iki kümedeki
+herhangi bir noktayý diðer kümedeki herhangi bir diðer noktayla birleþtiren
+bir kenardýr.
+
+Önerme (Proposition)
+
+Herhangi bir çiziti alalým, ve bu çizitteki bir kesik içindeki (yani
+kopardýðý tüm kenarlar) içindeki minimum birleþtiren kenara bakalým. Bu
+kenar o çizitin MST'sinde {\em kesinlikle} olmalýdýr.
+
+Ýspat
+
+Bu ispat tersini yanlýþlama (proof by contradiction) yöntemini
+kullanacak. Diyelim ki bir kesik var, ve o kesikteki $e$ minimum
+birleþtiren kenar. Bu çizitin MST'si $T$ olsun. Þimdi $e$'nin $T$'nin
+içinde olmadýðý durumu düþünelim (yani önermenin dediðinin tersi), ve
+diyelim ki þimdi $e$'yi alýp $T$'ye ekliyoruz. Yeni bir çizit ortaya
+çýkardý, fakat daha önce dediðimiz gibi, $T$'ye bir kenar eklemek ona ayný
+zamanda bir döngü eklemek demektir, ki bu döngünün içinde en az bir diðer
+kenar $f$ olacaktýr (çünkü $e$ MST'de olmadýðýna göre orada baþka bir þey
+var), ki bu $f$, $e$'den büyüktür. Fakat o zaman $f$'yi kesip onun yerine
+daha az aðýrlýkta olan $e$'yi ekleyince MST'yi, hem de daha az aðýrlýkla
+elde etmiþ olmaz mýydýk? Evet. Demek ki $e$'nin MST içinde olmamasý
+imkansýzdýr çünkü MST taným itibariyle en minimal aðýrlýða sahip olmalýdýr.
+
+Alttaki resimde gri ve beyaz ile gösterilen ayrý kümelerdeki noktalarý bir
+kesik ile ayrýlmýþlar ve bu kümelerin arasýndaki birleþtiren kenarlar
+kýrmýzý ile gösteriliyor. Burada $e$ ile gösterilen kenar MST içinde
+olmalýdýr. 
+
+\includegraphics[height=5cm]{cross_edge.png}
+
+Üstteki kavramlar Kruskal'ýn MST bulan algoritmasýnýn temelini
+oluþturmaktadýr (bu algoritmaya kýsaca Kruskal diyeceðiz). Kruskal (ilk
+baþta) birbirinden baðýmsýz aðaçlarý yavaþ yavaþ yaratýr, onlarý
+büyütür. Ayný anda sürekli o aðaçlarý minimal bir kenar ile birleþtirip
+onlarý daha büyük bir aðaç yapma fýrsatýna bakar. 
+
+Ufak ufak aðaçlar üstteki durumda gri ve beyaz noktalarý kapsayan aðaçlar
+gibi görülebilir, bunlar çizitin farklý bölgelerinde ayrý ayrý
+büyürler. Eðer bu ayrý ayrý bölgelerde, onlara ait MST'ler
+oluþturabilmiþsek, Onlarý minimal þekilde birleþtirmek (üstte $e$ ile) bize
+daha büyük bir MST saðlar. 
+
+Kruskal kenarlarý teker teker iþler, önce onlarý aðýrlýklarýna göre
+sýralar, ve en küçük kenarlarý önce alýr. Bu yüzden aðaçlarý baðlanayan
+``birleþtiren kenarýn'' minimal kalmasý, ve önce alýnmasý da saðlanýr.
+
+Birleþim-Buluþ (Union-Find)
+
+Kruskal'ýn kodlama baðlamýnda önemli bir püf noktasý, sýrayla bakýlan bir
+kenarýn mevcut alt-aðaçlardan birine eklenme durumunda döngü oluþturup
+oluþturmadýðýný hýzlý bir þekilde anlayabilmesidir. Bunun için þu diðer
+soruyu cevaplamak yeterlidir: bir kenara baktýðýmýzda, bu kenarýn iki
+ucundaki iki noktayý alýrýz, ve bu iki noktanýn herhangi bir alt-aðaç
+içinde, yani ayný alt-aðaç içinde, olup olmadýðýna bakarýz (hatýrlarsak pek
+çok alt-aðaç olabiliyor). Eðer bu iki nokta herhangi bir alt-aðaç içinde
+bulunursa, bu kenarý çöpe atabiliriz, çünkü bu noktalar baþka bir þekilde
+bir alt-MST oluþturmuþtur, ve bu alt-MST optimaldir (bkz üstteki ispat).
+
+``Ýki noktanýn ayný alt aðaç içinde olup olmadýðýný anlamak'' ise þu
+alt-aðaçlarýn sürekli bir ``temsili noktaya'' iþaret etmesiyle
+halledilebilir (bu iþaret, kenarlardan farklý). Eðer iki nokta, ayný,
+temsili noktaya iþaret ediyorsa, onlar ayný aðaç içindedir, vep dolaylý
+olarak bu demektir ki bu noktalar bir þekilde ``baðlanmýþtýrlar'' çünkü her
+alt-aðaç ayný zamanda ufak bir MST'dir. Bu durumda yeni kenarý eklemek
+taným itibariyle bir döngü oluþturur, ve gereksizdir. Eðer noktalar farklý
+aðaçlarda iseler, bu aðaçlarý birleþtirmek iki temsili noktadan birinin bir
+diðerine iþaret etmesiyle halolabilir. Evet birleþtirme sonrasý bazý üyeler
+yeni temsili noktaya iþaret etmiyor olabilirler, bu durum, noktadan noktaya
+atlanýp temsili noktaya eriþmek ile halolur. Bu arada, arama sýrasýnda,
+yeni temsili noktaya olan iþaretler deðiþtirilir, ki bu ``düzeltme'' iþlemi
+yol sýkýþtýrma (path compression) olarak anýlýyor.
+
+Alttaki kod tüm bu numaralarý kullanýyor. Örnek olarak yazýnýn baþýnda
+verilen çiziti kodladýk ve MST'sini bulduk. Çizit formatý iki yönlü
+kenar bilgisi gerektirmez, iki nokta arasýndaki geçiþi bir kere belirtmek
+yeterlidir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+G1 = {
+  'a': {'b':1, 'f':2, 'g': 6},
+  'b': {'c':1},
+  'c': set(),
+  'd': {'f':1, 'e':2},
+  'e': {'g':1},
+  'f': set(),
+  'g': set()
+}
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def find(C, u):
+    if C[u] != u:
+        C[u] = find(C, C[u])                    # Path compression
+    return C[u]
+
+def union(C, R, u, v):
+    u, v = find(C, u), find(C, v)
+    if R[u] > R[v]:                             # Union by rank
+        C[v] = u
+    else:
+        C[u] = v
+    if R[u] == R[v]:                            # A tie: Move v up a level
+        R[v] += 1
+
+def kruskal(G):
+    E = [(G[u][v],u,v) for u in G for v in G[u]]
+    T = set()
+    C, R = {u:u for u in G}, {u:0 for u in G}   # Comp. reps and ranks
+    print list(sorted(E))
+    for _, u, v in sorted(E):
+        if find(C, u) != find(C, v):
+            T.add((u, v))
+            print (u, v)
+            union(C, R, u, v)
+    return T
+
+mst = list(kruskal(G1))
+print 'MST', mst
+\end{minted}
+
+\begin{verbatim}
+[(1, 'a', 'b'), (1, 'b', 'c'), (1, 'd', 'f'), (1, 'e', 'g'), (2, 'a', 'f'),
+ (2, 'd', 'e'), (6, 'a', 'g')]
+('a', 'b')
+('b', 'c')
+('d', 'f')
+('e', 'g')
+('a', 'f')
+('d', 'e')
+MST [('d', 'e'), ('e', 'g'), ('d', 'f'), ('b', 'c'), ('a', 'f'), ('a', 'b')]
+\end{verbatim}
+
+Bu iþleyiþ (yine baþta gösterdiðimiz) alternatif MST'lerden birincisini
+buldu (\verb!a-f! baðlý, \verb!e-f! baðlý deðil). Güzel! Kruskal'ýn iþleyiþ
+hýzý $O(E \log E)$ seviyesindedir, $E$ kenar sayýsýdýr. Bu çok iyi bir
+performanstýr, bu performansýn mesela $O(N^2)$'den farkýný göstermek için
+alttaki hesaba bakalým, eðer 100,000 tane kenar olsaydý,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+e = 100 * 1000
+print 'n^2', e**2
+print 'log', np.log(e)
+print 'kruskal', e*np.log(e)
+\end{minted}
+
+\begin{verbatim}
+n^2 10000000000
+log 11.512925465
+kruskal 1151292.5465
+\end{verbatim}
+
+Kruskal 1 milyon kusur operasyona orantýlý bir sonuç verirdi, kýyasla
+$O(N^2)$ 10 milyar operasyon ortaya çýkartýyor! 
+
+Bir diðer örnek: Altta MST'nin adým adým oluþturulmasýný da
+göreceðiz. Kýrmýzý ile iþaretlenen kenar o adýmda seçilen kenarý
+gösteriyor, siyah olanlar mevcut MST(lerde) olan kenarlarý.
+
+\includegraphics[width=8cm]{sedge_krus_1.png}
+
+\includegraphics[width=8cm]{sedge_krus_2.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+G2 = {
+  0: {7: 0.16, 4: 0.38, 2: 0.26, 6: 0.58},
+  1: {5: 0.32, 2: 0.36, 3: 0.29, 7: 0.19},
+  2: {3: 0.17, 6: 0.40, 7: 0.34},
+  3: {6: 0.52},
+  4: {5: 0.35, 7: 0.37, 6: 0.93},
+  5: {7: 0.28},
+  6: set(),
+  7: set()
+} 
+
+mst = list(kruskal(G2))
+print 'MST', mst
+\end{minted}
+
+\begin{verbatim}
+[(0.16, 0, 7), (0.17, 2, 3), (0.19, 1, 7), (0.26, 0, 2), (0.28, 5, 7), (0.29, 1, 3), (0.32, 1, 5), (0.34, 2, 7), (0.35, 4, 5), (0.36, 1, 2), (0.37, 4, 7), (0.38, 0, 4), (0.4, 2, 6), (0.52, 3, 6), (0.58, 0, 6), (0.93, 4, 6)]
+(0, 7)
+(2, 3)
+(1, 7)
+(0, 2)
+(5, 7)
+(4, 5)
+(2, 6)
+MST [(2, 6), (4, 5), (5, 7), (0, 7), (2, 3), (1, 7), (0, 2)]
+\end{verbatim}
+
+Þekilde \verb!5-7!'yi birbirine baðlayan 6. adým sonrasý \verb!1-3!'un
+çözüme dahil edilmediðine dikkat edelim. Bu noktada 1 ve 3 düðümleri artýk
+ayný aðaç içindedirler, ve bu kenarý eklemek bir döngü oluþturacaktýr. 
+
+Kruskal algoritmasý, ve ona benzer Prim, ya da ``bir sonraki adýmda hep en
+yakýný iþleyen'' algoritmalar açgözlü (greedy) algoritmalar olarak
+bilinirler. Mesela {\em Dinamik Programlama} yazýsýnda gördüðümüz üzere,
+açgözlü yöntem en kýsa yolu vermeyebiliyordu. MST durumunda açgözlülük
+faydalýdýr, açgözlülüðün faydalý olduðu mutlu örneklerden biridir diyelim! 
+
+Not: Bazýlarýna tanýdýk gelebilecek bilgisayar bilimin demirbaþ
+problemlerinden Seyahat Eden Satýþ Görevlisi (Traveling Salesman Problemi
+-TSP-) NP-Tam olarak bilinir. MST, ki çok hýzlý iþleyen bir algoritma,
+yaklaþýksal olarak TSP'yi çözmekte kullanýlabilmektedir. 
+
+Kaynaklar
+
+[1] Sedgewick, R. {\em Algorithms}, sf. 409
+
+[2] Sedgewick, R. {\em Algorithms, 4rd Edition}, sf. 624
+
+[3] Heatland, {\em Python Algorithms}
+
+\end{document}

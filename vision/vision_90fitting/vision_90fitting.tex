@@ -1,0 +1,263 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Imajda Elips Bulmak
+
+Diyelim ki elimizde bir imaj var, ve bu imajdaki belli renkteki bir elipsin
+yerini ``bulmak'' istiyoruz.
+
+\includegraphics[height=4cm]{ellipsedented.png}
+
+İmaj gri tonlu, siyah değerler için 0, görülen elips piksel değerleri 155
+değerinde. Basitlik amaçlı veriyi böyle seçtik, fakat renkli, RGB temelli de
+bulma yapabilirdik.
+
+Elips bulmak demek ne anlama gelir? Matematiksel olarak bunu düşünelim; bilinen
+elips formülünü veriye uydurmayı deneyebiliriz. Tabii uydurmak derken bunu da
+tanımlamamız gerekiyor. İstediğim şu, öyle bir elips formülü bulayım ki içinde
+aradığım $\mu$ rengine en yakın olan pikseller olsun. Yani resimdeki $\mu$'umsu
+pikselleri en fazla kapsayan elipsi bulmak istiyorum.
+
+Bu bir minimizasyon problemi olarak formülize edilebilir mi? Gradyan inişi
+için bkz {\em İstatistik, Gradyan İnişi ve Model Uydurmak}. Bedel
+fonksiyonu nedir? Elips formülünün ne olduğunu ve nasıl davrandığını
+biliyorum (ki zaten bu sebeple bu örneği elipsel şekilde uydurduk, fakat
+gerçek dünya uygulamasında da elips seçebilirdik çünkü yukarı, yana
+yassılaşıp pek çok farklı alanı kapsayabilen bir şekildir, ve formülünün
+türevini almak kolaydır, bir özelliği daha var birazdan göreceğiz), mesela
+eğimsiz bir elips,
+
+%
+$$ \frac{(x-h)^2}{r_x^2} + \frac{(y-k)^2}{r_y^2} = 1 \mlabel{1}$$
+%{{x.png}}
+
+$h,k$ elips merkezi, $r_x,r_y$ genişlik ve yükseklik (çapları), $\theta$ eğimi
+(bu formülde yok).  Bu fonksiyon elips dışındaki noktalar için $>1$, içindekiler
+için $<1$ verir. Bunu kullanabilirim. 
+
+Eğimli formülü de verelim, referans amaçlı olarak
+
+$$
+\dfrac {((x-h)\cos(\theta)+(y-k)\sin(\theta))^2}{(r_x^2)} +
+\dfrac{((x-h) \sin(\theta)-(y-k)\cos(\theta))^2}{(r_y^2)}=1
+$$
+
+İç nokta, dış nokta durumunu gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def ellipse(x,y,h,k,rx,ry):
+    return ((x-h)**2 / rx**2) + ((y-k)**2 / ry**2)
+print ellipse(20,6,mean[0],mean[1],width,height)
+print ellipse(22,7,mean[0],mean[1],width,height)
+\end{minted}
+
+\begin{verbatim}
+0.827297691192
+3.5828975713
+\end{verbatim}
+
+Bazı grafikleme rutinleri,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from matplotlib.patches import Ellipse
+mean = [ 19.92977907 ,  5.07380955]
+width = 30
+height = 1.01828848
+angle = -54
+ell = Ellipse(xy=mean, width=width, height=height, angle = 180+angle)
+fig, ax = plt.subplots()
+
+ax.add_patch(ell)
+ax.set_aspect('equal')
+ax.autoscale()
+plt.hold(True)
+plt.plot(20,6,'rd')
+plt.hold(True)
+plt.plot(22,7,'rd')
+plt.savefig('vision_90fitting_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{vision_90fitting_01.png}
+
+\inputminted[fontsize=\footnotesize]{python}{elli.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import elli
+pts = elli.get_ellipse_coords(a=1.0, b=1.0, x=2, y=3,k=1./8)
+ax = plt.plot(pts[:,0], pts[:,1])
+# Set the aspect ratio so it looks like a circle; add a grid as well
+ax[0].get_axes().set_aspect(1)
+
+# Ellipse, with major axis length = 4, minor axis = 1, centered at (0,0)
+pts = elli.get_ellipse_coords(a=4.0, b=1.0)
+ax = plt.plot(pts[:,0], pts[:,1])
+
+# Rotate the above ellipse by 30 degrees and use only 11 points!
+pts = elli.get_ellipse_coords(a=4.0, b=1.0, angle=30,k=1./36)
+ax = plt.plot(pts[:,0], pts[:,1])
+
+# Use all the options and 721 points:
+pts = elli.get_ellipse_coords(a=2.0, b=0.25, x=-4, y=-2, angle=250,k=2)
+ax = plt.plot(pts[:,0], pts[:,1])
+plt.savefig('vision_90fitting_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{vision_90fitting_02.png}
+
+Modelimize başlayalım. Hem bir piksel değeri hem de bir elips arıyorum, o zaman
+$\mu$'ye yakın piksellerin bir elips içinde olduğu durumun minimal olacağı bir
+durum yaratabilir miyim? Mesela $I(x,y)$ bir imajın $x,y$'deki piksel
+değerlerini versin, o zaman $C(x,y) = -\log (|I(x,y)-\mu| / W)$ tanımlayayım,
+$W$ bir sabit, mesela $W=50$, eğer 150 arıyorsam $(|155-150|)/50$, bana 1'den
+düşük bir değer verir. Diğer pikseller için, mesela 0, $(|150-0|)/50$, 1'den
+büyük. Log alırsam 1'den küçük değerler negatif olur, -1 ile çarpınca işaretler
+tersine döner. Böylece ``aradığım'' piksellere pozitif diğerlerine negatif değer
+vermiş oldum.
+
+Şimdi (1) formülüne $R(x,y,h,k,r_x,r_y)$ diyelim, ve şöyle bir bedel
+hesaplayalım,
+
+%
+$$ E = \sum_{i=1}^n \log R(x_i,y_i,h,k,r_x,r_y) C(x_i,y_i) $$
+%{{x.png}}
+
+$R$'nin log'unu aldık çünkü bu sefer elips içinde negatif dışında pozitiflik
+yaratıyoruz. Böylece renksel olarak negatif yersel olarak pozitif ile, renksel
+olarak pozitif yersel olarak negatif ile çarpılmış oluyor, yani sonuç hep
+negatif.
+
+\includegraphics[width=7cm]{negpos.png}
+
+Tüm bu negatifleri çarpın sonuçlarını toplayınca istediğimiz optimallik
+noktasında, sadece negatiflik var, yani $E$'yi minimize edince tam istediğimiz
+yeri bulmuş olacağız.
+
+Başlayalım, kısaltma amaçlı olarak $C_i \equiv C(x_i,y_i)$ olsun. Türevler,
+
+%
+$$
+\frac{\partial (R_iC_i)}{\partial h} \bigg( \sum_{i=1}^n 
+\frac{C_ix_i^2}{r_x^2} - \frac{2C_i x_i h}{r_x^2} + \frac{C_ih^2}{r_x^2} + ...
+\bigg) =
+\sum_{i=1}^n \frac{- 2C_i (x_i - h)}{r_x^2} 
+$$
+%{{_preview/f--513963488.png}}
+
+%
+$$
+\frac{\partial (R_iC_i)}{\partial k}  = \sum_{i=1}^n \frac{- 2C_i (y_i - k)}{r_y^2} 
+$$
+%{{_preview/f--740998177.png}}
+
+%
+$$
+\frac{\partial (R_iC_i)}{\partial r_x}  = 
+\sum_{i=1}^n \frac{-2C_i x_i^2 + 4C_i x_i h - 2C_i h^2}{r_x^3}  =
+\sum_{i=1}^n \frac{-2C_i(x_i^2 - 2x_i h + h^2)}{r_x^3} =
+\sum_{i=1}^n \frac{-2C_i(x_i-h)^2}{r_x^3}
+$$
+%{{x.png}}
+
+%
+$$
+\frac{\partial (R_iC_i)}{\partial r_y}  = \sum_{i=1}^n \frac{-2C_i(y_i-k)^2}{r_y^3}
+$$
+%{{x.png}}
+
+$\log u$'nun türevinin $u'/u$ olmasından hareketle üstteki formüller
+tamamlanabilir. Nihai kod,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+from matplotlib.patches import Ellipse
+from PIL import Image
+
+img = Image.open('ellipsedented.png').convert('L')
+A = np.array(img)
+
+x = []; y=[]; I=[]
+for i in  range(A.shape[1]): 
+     for j in range(A.shape[0]):
+         x.append(float(i)) 
+         y.append(A.shape[0]-float(j)) # imalarin (0,0) noktasi ust solda
+         I.append(A[j,i])
+x = np.array(x); y=np.array(y); I=np.array(I)
+
+h = 20; k = 20; rx = 30; ry = 30; mu=150; eta = 0.01
+M = 50; iter = 1000
+
+C =  -1*np.log((np.abs(I-mu) / M) + 0.001)
+
+def R(xx,yy,hh,kk,rxx,ryy):
+    return ((xx-hh)**2 / rxx**2) + ((yy-kk)**2 / ryy**2)  
+
+def plot_ellipse_image(h,k,rx,ry,i):
+     ell = Ellipse(xy=[h,A.shape[0]-k], width=rx, height=ry, alpha=0.2)
+     fig, ax = plt.subplots()
+     ax.add_patch(ell)
+     plt.hold(True)
+     plt.imshow(img)
+     plt.savefig('ellipse_fitting_%d.png' % i) 
+
+for i in range(iter):
+     old = np.array([h,k,rx,ry])
+     r = R(x,y,h,k,rx,ry)
+     tmp = (-2*C*(x-h) / rx**2) / r
+     h_step = pd.Series(tmp).fillna(0).sum() * eta 
+     tmp = (-2*C*(y-k) / ry**2) / r
+     k_step = pd.Series(tmp).fillna(0).sum() * eta 
+     tmp = (-2*C*(x-h)**2 / np.power(rx,3)) / r
+     rx_step = pd.Series(tmp).fillna(0).sum() * eta / delay
+     tmp = (-2*C*(y-k)**2 / np.power(ry,3)) / r
+     ry_step = pd.Series(tmp).fillna(0).sum() * eta / delay
+     h = h - h_step
+     k = k - k_step
+     rx = rx - rx_step
+     ry = ry - ry_step     
+     new = np.array([h,k,rx,ry])
+     if i % 100 == 0:
+         plot_ellipse_image(h,k,rx,ry,i)
+         print h,k,rx,ry,np.abs((new-old).sum()), i
+     if np.abs((new-old).sum()) < 0.40: break
+\end{minted}
+
+\begin{verbatim}
+20.2912285341 20.1022673012 31.2624892385 30.2303017337 1.88628680749 0
+58.5321032327 55.4484215065 87.4262267983 56.9770929591 1.78919549708 100
+142.756122484 92.0176869537 115.249606357 81.1246340264 0.775276466036 200
+\end{verbatim}
+
+\includegraphics[height=6cm]{ellipse_fitting_0.png}
+\includegraphics[height=6cm]{ellipse_fitting_100.png}
+\includegraphics[height=6cm]{ellipse_fitting_200.png}
+\includegraphics[height=6cm]{ellipse_fitting_300.png}
+
+Kodda görülebileceği gibi döngünün her adımında tüm parametrelerdeki değişimin
+mutlak değerini topluyoruz, ve eğer bu değişim belli bir değer altına düşmüş ise
+bunu ``global minimuma geldiğimiz an''  olarak kabul ediyoruz, ve duruyoruz. 
+
+Ödev
+
+1) Yeni bir imaj \verb!ellipsedented2.png!'e bakalım. Aynı kodu bu imaj üzerinde
+kullanınca, $\mu=198$ ile, ne oldu? Elips genişlemesi çok önce oldu ve bu
+sebeple yer değişimiyle elipsi bulunca optimal noktayı kaçırdık. Bu tür
+durumlarda bazı parametrelerin değişimini ``yavaşlatmayı'' seçebiliriz, mesela
+genişleme parametrelerinin \verb!eta!'sını 10 ile bölebiliriz. Ayrıca durma
+eşiğini \verb!0.001! yaptık, bu şekilde optimal elips yine bulundu.
+
+2) Acaba farklı bedel fonksiyonları denenebilir mi? $R$ yerine $(R-1)^2$ olsa ne
+olurdu?
+
+3) 2 boyutta elips uydurduk, aynı tekniği kullanarak 3 boyutta elipsoid
+uydurabilir miyiz? 2 boyutlu bir imajı alalım, imajdaki en belirgin K tane rengi
+seçelim, ve bu her renk için ona yakın olan elispoid'lerin yansımasına en yakın
+objeyi bulalım. Kamera matrisinin bilindiğini farzedelim.
+
+Kaynaklar
+
+[1] Nedrich, {\em An Introduction to Gradient Descent and Linear Regression},
+\url{https://spin.atomicobject.com/2014/06/24/gradient-descent-linear-regression}
+
+[2] Bullinara, {\em Introduction to Neural Networks}, \url{http://www.cs.bham.ac.uk/~jxb/NN/l5.pdf}
+
+
+\end{document}

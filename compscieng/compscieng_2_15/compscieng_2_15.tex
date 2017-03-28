@@ -1,0 +1,256 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 15
+
+Konumuz çok, çok büyük ve seyrek matrisler üzerinden $Ax = b$ çözümü. Çok
+büyük boyutlarda $A$'nin tersini almak pahalý bir iþlem olacaktýr. Standart
+teknik Gauss Eliminiasyon tekniði de yüksek boyutlarda pahalý bir iþlem
+olur. Pahalý olmayan iþlem nedir? $A$'yi bir vektör ile çarpmaktýr
+mesela. Bu iþlemin nasýl devreye gireceðini göreceðiz.
+
+Genel ismiyle daha hýzlý olacak genel kategori özyineli (iterative)
+metotlardýr. Bu yöntemlerde en iyi cevaba eriþmeyiz, ama yeterince
+yaklaþýrýz, ve daha önemlisi bu iþi çok hýzlý bir þekilde
+yapabiliriz. Bu metotlarda iyi bir önkoþullandýrýcý (preconditioner)
+matris $P$'yi seçmek önemlidir. $P$, $A$'yi temel alan ve bazý iþlemleri
+kolaylaþtýran bir yapý olacaktýr. 
+
+Özyineli tekniklerden en iyi bilinenlerden biri eþlenik gradyan
+tekniðidir. Bu yöntem için $A$'nin simetrik, pozitif kesin olmasý gerekir.
+
+Özyineli metotlarda bir baþlangýç $x_0$ deðeri vardýr, ve oradan $x_{k+1}$
+elde edilir. Lineer metotlar için baþlangýcýn nerede olduðu önemli
+deðildir, sýfýrda bile baþlanabilir. Gayrýlineer (nonlinear), ``Newton''
+metotlarýnda sonuca yakýn bir yerde olmak önemlidir, bunun için uðraþýlýr.
+
+Çözmek istediðimiz 
+
+$$ Ax = b $$
+
+Bunu þöyle de yazabilirim 
+
+$$ x = x - Ax + b $$
+
+$$ x = (I - A)x + b $$
+
+Þimdi bu denklemi alýp sað tarafý ``eski'' sol tarafý ``yeni'' olarak
+temsil edersek,
+
+$$ x_{k+1} = (I - A)x_k + b $$
+
+elde ederiz. Bu önkoþulsuz, basit bir özyinelemedir. Önkoþul $P$ istersek,
+
+$$ Ax = b $$
+
+$$ 0 = -Ax + b $$
+
+$$ Px = Px - Ax + b $$
+
+$$ Px = (P -A)x + b $$
+
+$$ Px_{k+1} =  (P - A)x_k + b $$
+
+Eðer $P = A$ olsaydý, o zaman direk eski denklemi çözüyor olurduk.  
+Biz $P\approx A$ dedik, ``yakýn ama ayný olmayan bir $P$'' istiyoruz,
+özellikle. Bu $P$'nin iþlerimizi kolaylaþtýracaðýný umuyoruz çünkü.
+
+Bazý $P$ örnekleri þunlardýr: Jacobi $A$'nin sadece çaprazýndaki deðerleri
+alýp $P$'ye koyar. Gauss-Seidel yaklaþýmý [1], hem çaprazý, hem alt üçgensel
+(lower triangular) kýsmý alýp $P$'ye koyar.
+
+Not: Ýlginç bir tarihi anektod, Gauss Eliminasyon yöntemini keþfeden bizzat
+Gauss'un kendisi bile bu yöntemi kullanmak istememiþti, büyük matrislerde
+eliminasyon iþinin özellikle hesabýn elle yapýldýðý eski yýlllarda çok
+külfet getiriyordu. Özyineli ilk metotlardan Gauss-Seidel tekniði Gauss'u
+çok memnun etti, ve kendi hesaplarýnda bu tekniði kullandý.
+
+Diðer yaklaþýmlar fazla rahatlatma (overrelaxation), ve tamamlanmamýþ
+(incomplete) LU gibi yaklaþýmlar. Ben üstlisans yaparken bu son iki yöntem
+Jacobi, Gauss-Seidel'den bir adým ileri gitme yönündeki denemelerin
+baþlangýcýydý. 
+
+Peki $x$'lerin doðru cevaba eriþip eriþmediðini nereden anlarýz? Hata
+hesabý için bir formüle ihtiyacým var. Alttaki formüllerde 2. formülü
+1. formülden çýkartýrsam, ve $e_k = x - x_k$ ise
+
+$$ x_{k+1} = (I - A)x_k + b $$
+
+$$ x_k = (I - A)x + b $$
+
+Þunu elde ederim,
+
+$$ Pe_{k+1} = (P-A)e_k $$
+
+Ýki tarafý $P^{-1}$ ile çarparsam,
+
+$$ e_{k+1} = (I-P^{-1}A)e_k = Me_k$$
+
+O zaman hata hesabý için her özyineleme adýmýnda üstteki hesabý
+yaparým. Parantez içindeki büyük ifadeye $M$ ismi verdim, buna özyineleme
+matrisi de diyebiliriz. 
+
+Deðerlere yakýnda bakarsak, $P$'nin $A$'ya yakýn olmasýný istiyoruz
+demiþtik, o zaman $P^{-1}A$, $I$'ya yakýn olacaktýr, ve bu $I$'ya yakýn
+olan þey $I$'dan çýkartýlýnca sonuç sýfýra yakýn olacaktýr. Hatanýn ufak
+olmasýný istediðimize göre bu mantýklý. 
+
+Her adýmda $M$ ile çarptýðýmýza göre, 
+
+$$ e_k = M^k e_0 $$
+
+Üstteki sýfýra gider mi? Giderse ne kadar hýzlý gider? Bunun olmasý için
+$M$'nin hangi öðesine bakmak gerekir? En büyük özdeðerine bakmak
+gerekir. Genel olarak þunu söyleyebiliriz, her $|\lambda(M)| < 1$ olmasý
+gerekir. Notasyonel olarak en büyük özdeðer $\rho(M)$'dir, $|\rho(M)|$ ise
+spektral yarýçapý (spectral radius) olarak adlandýrýlýr.
+
+Bazý örnekler
+
+$$ K = A = 
+\left[\begin{array}{rrrr}
+2 & -1 && \\
+& 2 & -1 & \\
+&&& \\
+&& -1 & 2 \\
+\end{array}\right]
+ $$
+
+Özdeðerler $\lambda_j(A) = 2 - 2 \cos\theta_j$
+
+$P_{Jacobi} = 2I$
+
+$$ M = I-P^{-1}A  $$
+
+Sonuç
+
+$$ 
+\left[\begin{array}{rrrr}
+0 & \frac{ 1}{2} & & \\
+\frac{ 1}{2} & 0 & \frac{ 1}{2}& \\
+ & \frac{ 1}{2} & \ddots & \ddots \\
+ && \ddots & 0
+\end{array}\right]
+ $$
+
+Boþ olan yerlerde sýfýr deðerleri var. 
+
+Yani $P^{-1} = 1/2$
+
+$$ M = I-\frac{ 1}{2}A  $$
+
+$$ \lambda_j(M) = 1 - \frac{ 1}{2}\lambda_j(A) = \cos \frac{ j\pi}{N+1}$$
+
+O zaman yaklaþýksallama olacak. En büyük özdeðer
+
+$$ \rho = \cos \frac{ \pi}{N+1} $$
+
+Eðer her döngüde bir þeyleri grafiklemek istesem, neyi seçerdim? Her
+döngüdeki hatayý, ``artýðý (residual)'' grafikleyebilirdim. Tam denklem
+
+$$ Ax = b $$
+
+$Ax_k$ gerçeðe ``yakýn'', o zaman artýk deðer $r$ bu ikisi arasýndaki fark
+olabilir, 
+
+$$ r = Ax - Ax_k $$
+
+$$ r = Ae_k $$
+
+[hata grafikleme atlandý]
+
+Örnek Jacobi kodlarý
+
+Kod \#1
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+A = np.array([[6.,1.,1.],
+              [1.,7.,1.],
+              [1.,1.,8.]])
+b = [1.,1.,1.]
+
+xreal = lin.solve(A, b); print "solution", xreal
+
+P = np.diag(np.diag(A)); print "P",P
+x = np.zeros(A.shape[0]); print x
+T = P - A
+for i in range(10):
+    x =  lin.solve(P, b+np.dot(T,x))
+    print x
+\end{minted}
+
+\begin{verbatim}
+solution [ 0.13249211  0.11041009  0.09463722]
+P [[ 6.  0.  0.]
+ [ 0.  7.  0.]
+ [ 0.  0.  8.]]
+[ 0.  0.  0.]
+[ 0.16666667  0.14285714  0.125     ]
+[ 0.12202381  0.10119048  0.08630952]
+[ 0.13541667  0.11309524  0.09709821]
+[ 0.13163442  0.10964073  0.09393601]
+[ 0.13273721  0.11063279  0.09484061]
+[ 0.1324211   0.11034603  0.09457875]
+[ 0.13251254  0.11042859  0.09465411]
+[ 0.13248622  0.11040476  0.09463236]
+[ 0.13249381  0.11041163  0.09463863]
+[ 0.13249162  0.11040965  0.09463682]
+\end{verbatim}
+
+Kod \#2
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.array([[6.,1.,1.],
+              [1.,7.,1.],
+              [1.,1.,8.]])
+
+b = [1.,1.,1.]
+
+xreal = lin.solve(A, b); print "solution", xreal
+
+P = np.diag(np.diag(A)); print "P",P
+x = np.zeros(A.shape[0]); print x
+J = lin.solve(P,P-A)
+c = lin.solve(P,b)
+for i in range(10):
+    x = np.dot(J,x) + c
+    print x
+\end{minted}
+
+\begin{verbatim}
+solution [ 0.13249211  0.11041009  0.09463722]
+P [[ 6.  0.  0.]
+ [ 0.  7.  0.]
+ [ 0.  0.  8.]]
+[ 0.  0.  0.]
+[ 0.16666667  0.14285714  0.125     ]
+[ 0.12202381  0.10119048  0.08630952]
+[ 0.13541667  0.11309524  0.09709821]
+[ 0.13163442  0.10964073  0.09393601]
+[ 0.13273721  0.11063279  0.09484061]
+[ 0.1324211   0.11034603  0.09457875]
+[ 0.13251254  0.11042859  0.09465411]
+[ 0.13248622  0.11040476  0.09463236]
+[ 0.13249381  0.11041163  0.09463863]
+[ 0.13249162  0.11040965  0.09463682]
+\end{verbatim}
+
+Bu kodlarýn ikisi de özyineli Jacobi hesabý yapýyor. Birincisi her döngüde 
+\verb!solve! iþlemi yapýyor. Fakat daha önce belirttiðimiz gibi, her
+döngüde çarpým iþlemi yapmak çok daha optimal olur. Ýkinci kod [1]
+
+$$ Px_{k+1} =  (P - A)x_k + b $$ 
+
+iþlemini iki parçaya ayýrmýþ, $P,P-A$ ve $P,b$ sistemlerini ayrý ayrý
+çözerek, döngü içinde $Jx + c$ ile sadece çarpma ve toplama kullanmayý
+baþarmýþ. Bu parçalamanýn yapýlabilmesinin sebebi tabii ki bir lineer
+sistemle çalýþýyor olmamýz. Çok akýllýca bir teknik. 
+
+Kaynaklar
+
+[1] Olver, {\em A Basic Introduction to Matlab}, \url{http://www.math.umn.edu/~olver/matlab.html}
+
+
+
+\end{document}

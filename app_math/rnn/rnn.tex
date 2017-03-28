@@ -1,0 +1,263 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Kendini Tekrarlayan Yapay Sinir Aðlarý (Recurrent Neural Network -RNN-)
+
+RNN'ler zaman serilerini, sýralý olan verileri modellemek için
+kullanýlýr. Mesela 2 3 1 2 3 1 2 3 1 2 3 gibi bir girdi olabilir, girdi
+arka arkaya gelen her 3 karakter, hedef ise 4. karakter. Bu veri üzerinde
+RNN eðitilebilir, ve mesela verili 2 3 1'den sonra hangi 4. sayý geldiði
+tahmin edilmeye uðraþýlabilir. Ayrýksal olarak girdi bir harf dizisi de
+olabilir. 
+
+\includegraphics[width=30em]{rnn_01.png}
+
+Daha önce iþlediðimiz Öne Doðru Beslemeli (Feed-Forward) YSA'lar en temel,
+klasik yapýlardýr. Eðer bir $N$ boyutlu girdi alýyorlarsa bu verinin tüm
+boyutlarýný ayný anda iþlerler. RNN için yapý þöyle deðiþiyor, bir saklý
+katman $h$ var ve belli bir zaman aný için $h_t$ bu saklý konum
+
+$$ h_t = \phi(Wx_t + U h_{t-1})$$
+
+ile deðiþime uðrayabiliyor. Ýlginç olan geçiþindeki $W,U$ aðýrlýk
+matrisleri, parametrelerinin her zaman aný, her veri noktasý için ayný
+olmasý. Yani farklý zaman dilimleri için farklý aðýrlýklar atanmýyor. $t$
+anýndaki gizli (hidden) konum $h_t$, bu bir nevi ``hafýza''. Bu fonksiyon
+$x_t$ girdisinin $W$ ile çarpýlmasý, artý bir önceki gizli konumun bir
+baþka $U$ ile çarpýlmasý sonucundan elde ediliyor. $W,U$ matrisleri geçmiþe
+ne kadar önem verileceðini tanýmlýyorlar. Ardýndan tüm hesap bir $\phi$ ile
+``eziliyor'' yani belli aralýklara düþmesi zorlanýyor, bunun için tipik
+olarak sigmoid, ya da $tanh$ kullanýlýr.
+
+Bu kavramlar, konumlararasý geçiþ, $t$ anýndaki girdilerin ondan önceki
+girdileri nasýl baðlý olduðunun aðýrlýklar üzerinden ayarlanmasý, yani
+filtrelenmesi, aslýnda Markov zincirlerine benziyor. Bu hesaplar sonucu
+elde edilen tahmin ve hata geriye yayma (backpropagation) ile aðýrlýk
+matrislerini deðiþtirmek için kullanýlacak.
+
+RNN ismindeki ``tekrarlanma'' $W,U$'nun her zaman için ayný olmasýndan
+geliyor. Að bir bakýma tek bir seviye için, bir kez tanýmlanýyor, ve geriye
+ne kadar gidileceði üzerinden o yöne doðru kopyalanýyor, ya da ``açýlýyor
+(unfolding)''. Alttaki diagramda $h$ yerine $s$ kullanýlmýþ.
+
+\includegraphics[width=30em]{rnn_02.png}
+
+Bu açýlma iþlemini her zaman adýmý için gösterebiliriz. Alttaki
+diagramlarda $\phi$ için $f$ kullanýlmýþ.
+
+\includegraphics[width=20em]{rnndiag-0.jpg}
+\includegraphics[width=20em]{rnndiag-1.jpg}
+
+\includegraphics[width=20em]{rnndiag-2.jpg}
+\includegraphics[width=20em]{rnndiag-3.jpg}
+
+\includegraphics[width=20em]{rnndiag-4.jpg}
+\includegraphics[width=20em]{rnndiag-5.jpg}
+
+\includegraphics[width=20em]{rnndiag-6.jpg}
+\includegraphics[width=20em]{rnndiag-7.jpg}
+
+\includegraphics[width=20em]{rnndiag-8.jpg}
+
+Zaman Ýçinde Geriye Doðru Yayýlma (Backpropagation Through Time -BPTT-)
+
+YSA'lar kendini tekrarlayan olsun ya da olmasýn aslýnda $f(g(h(x)))$
+þeklinde basit içiçe fonksiyondurlar. Klasik YSA'da en sondaki hata
+backprop ile aðýrlýklardaki deðiþim girdiler yönünde geriye doðru yayýlýr,
+bunu yapmak için $-\frac{\partial E}{\partial w}$ hesaplanýr, böylece tüm
+aðýrlýklar hataya yaptýklarý katký (!) baðlamýnda deðiþikliðe uðrarlar,
+``düzeltilirler'', yani düzeltme Zincir Kanunu ile dýþ fonksiyonlardan içe
+doðru aktarýlmýþ olur.
+
+RNN'de içiçe olma durumu zaman faktöründen kaynaklanýyor, fonksiyonlar
+önceki zaman dilimleri baðlamýnda içiçe geçmiþ durumdadýrlar, çünkü bir $t$
+anýndaki tahmin önceki dilimlerdeki fonksiyonlarýn sonucudur, bir
+geribesleme durumu vardýr, her gizli konum $h_t$ sadece bir önceki
+$h_{t-1}$ deðil ondan önceki tüm gizli konumlardan da etkilenir. O zaman
+eðitimin bunu gözönüne almasý gerekir.
+
+Alttaki kodda bir metin okunarak o metindeki harf sýrasý tahmin edilmeye
+uðraþýlýyor. Metin tekrar sýfýrdan üretilmeye çabalanýyor. Otomatik türev
+(automatic differentiation -AD-) alma ile içiçe geçmiþ fonksiyonlarýn
+zincirleme türevinin alýnmasý saðlanýyor, \verb!rnn_predict! hesabý 40
+geriye gider, AD tüm bu zinciri takip eder. 
+
+\inputminted[fontsize=\footnotesize]{python}{rnn.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import autograd.numpy as np
+import autograd.numpy.random as npr
+from autograd import grad
+from autograd.optimizers import adam
+import rnn
+
+def build_dataset(filename, sequence_length, alphabet_size, max_lines=-1):
+    with open(filename) as f:
+        content = f.readlines()
+    content = content[:max_lines]
+    content = [line for line in content if len(line) > 2]   
+    seqs = np.zeros((sequence_length, len(content), alphabet_size))
+    for ix, line in enumerate(content):
+        padded_line = (line + " " * sequence_length)[:sequence_length]
+        seqs[:, ix, :] = string_to_one_hot(padded_line, alphabet_size)
+    return seqs
+
+num_chars = 128
+text_filename = 'rnn.py'
+train_inputs = build_dataset(text_filename, sequence_length=30,
+                                 alphabet_size=num_chars, max_lines=60)
+
+init_params = rnn.create_rnn_params(input_size=128, output_size=128,
+                                    state_size=40, param_scale=0.01)
+                                    
+def print_training_prediction(weights):
+    print("Training text                         Predicted text")
+    logprobs = np.asarray(rnn_predict(weights, train_inputs))
+    for t in range(logprobs.shape[1]):
+        training_text  = one_hot_to_string(train_inputs[:,t,:])
+        predicted_text = rnn.one_hot_to_string(logprobs[:,t,:])
+        print(training_text.replace('\n', ' ') + "|" +
+              predicted_text.replace('\n', ' '))
+
+def callback(weights, iter, gradient):
+    if iter % 10 == 0:
+        print("Iteration", iter, "Train loss:", training_loss(weights, 0))
+        #print_training_prediction(weights)
+
+# Build gradient of loss function using autograd.
+training_loss_grad = grad(training_loss)
+
+print("Training RNN...")
+trained_params = adam(training_loss_grad, init_params, step_size=0.1,
+                      num_iters=280, callback=callback)
+\end{minted}
+
+\begin{verbatim}
+Training RNN...
+('Iteration', 0, 'Train loss:', 4.854500980126768)
+('Iteration', 10, 'Train loss:', 3.069896973468059)
+('Iteration', 20, 'Train loss:', 2.9564946588218)
+('Iteration', 30, 'Train loss:', 2.590610887049078)
+('Iteration', 40, 'Train loss:', 2.3255385285729027)
+('Iteration', 50, 'Train loss:', 2.1211122619024696)
+('Iteration', 60, 'Train loss:', 1.9691676257416404)
+('Iteration', 70, 'Train loss:', 1.8868756780002685)
+('Iteration', 80, 'Train loss:', 1.7455098359656291)
+('Iteration', 90, 'Train loss:', 1.7750342336507772)
+('Iteration', 100, 'Train loss:', 1.6059292555729703)
+('Iteration', 110, 'Train loss:', 1.5077116694554635)
+('Iteration', 120, 'Train loss:', 1.437485110908115)
+('Iteration', 130, 'Train loss:', 1.4504849515039933)
+('Iteration', 140, 'Train loss:', 1.3480379515887519)
+('Iteration', 150, 'Train loss:', 1.4083643059429929)
+('Iteration', 160, 'Train loss:', 1.2655987546227996)
+('Iteration', 170, 'Train loss:', 1.2051278365327054)
+('Iteration', 180, 'Train loss:', 1.1561998913079512)
+('Iteration', 190, 'Train loss:', 1.1814640952544757)
+('Iteration', 200, 'Train loss:', 1.3673188298901471)
+('Iteration', 210, 'Train loss:', 1.1591863193874781)
+('Iteration', 220, 'Train loss:', 1.056688128805028)
+('Iteration', 230, 'Train loss:', 1.0465201536978259)
+('Iteration', 240, 'Train loss:', 1.0373081053464259)
+('Iteration', 250, 'Train loss:', 1.3591698106017474)
+('Iteration', 260, 'Train loss:', 1.1556108786809474)
+('Iteration', 270, 'Train loss:', 1.0323757883394502)
+\end{verbatim}
+
+Üretmek / eðitim için \verb!rnn.py! kodunun kendisi kullanýldý.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+num_letters = 30
+for t in range(20):
+    text = ""
+    for i in range(num_letters):
+        seqs = rnn.string_to_one_hot(text, num_chars)[:, np.newaxis, :]
+        logprobs = rnn.rnn_predict(trained_params, seqs)[-1].ravel()
+        text += chr(npr.choice(len(logprobs), p=np.exp(logprobs)))
+    print(text)
+\end{minted}
+
+\begin{verbatim}
+    rs.lepugnunpdit - cenedili
+def p.rnns, logs'ininpum, hid_
+    ngan rrad_ti, feturn ns.sc
+def catorrtar t  aut_re_strad.
+            hiddens_numumut in
+def hiddes = rhiddensdord.rato
+    return ncan((ponddens_tram
+ders minpperen(scnt_strt onut_
+    returnts, utete, jIoutdati
+    return oute_sthorn(pund_om
+dershgline nigms, conteme_sco_
+    return 0.5*(natorad.mincde
+    contse, hiddens_mihrra opu
+    [cran_put inhgto_tut= retu
+  # Ite, wItre =        retat 
+    ashis_lik[enutnoncam(nthen
+      oonname, jItogput_pre_sp
+    cet(fiddens = lot led_ome_
+def rinnam_idt(parddens_nnd(on
+    rs.leteqslind_tat  = [hipp
+\end{verbatim}
+
+Fena deðil; \verb!def! ile baþlanan satýr ardýndan sonraki satýr tab ile
+boþluk býraktý, bunlar kolay þeyler deðil.  Altta karþýlaþtýrma amaçlý
+olarak sadece frekans sayarak üretim yapan bir kod görüyoruz. O da fena
+deðil, bu konu hakkýnda daha fazla detay için [2].
+
+\begin{minted}[fontsize=\footnotesize]{python}
+f = "../../stat/stat_naive/data/a1.txt"
+print open(f).read()[:300]
+\end{minted}
+
+\begin{verbatim}
+A well-known scientist (some say it was Bertrand Russell) once gave a
+public lecture on astronomy. He described how the earth orbits around
+the sun and how the sun, in turn, orbits around the center of a vast
+collection of stars called our galaxy. At the end of the lecture, a
+little old lady at the 
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import lm
+lmm = lm.train_char_lm(f, order=4)
+res = lm.generate_text(lmm, 4)
+print res[:400]
+\end{minted}
+
+\begin{verbatim}
+A well-know
+better? What the moon were caused by Ptolemy in more the picture only late the Greeks even had
+been elongstanding that the sky what eclipses rather ridiculous, but why do we know about to someone looking the sun and the earth Star
+lies one looking the North orbiting questimate thought spheres the superior smile before think we go back of the really a flat plater see then? What disk, th
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print lmm.keys()[:10]
+print lmm.get('pla')
+\end{minted}
+
+\begin{verbatim}
+['t w', 'Fir', 'all', 't t', 'sci', 'rom', 'ron', 'roo', 'thi', 'oss']
+[('t', 0.5), ('n', 0.5)]
+\end{verbatim}
+
+LSTM
+
+RNN'lerin biraz daha farklý bir çeþidi LSTM. RNN'lerde içiçe geçen
+fonksiyonlar sebebiyle hatalar ya çok büyüyüp ya da çok
+küçülebiliyor. Gerçi bu normal derin YSA'lerde de problem olabilirdi, fakat
+RNN'lerde bu durum daha belirgin, çünkü N adým geriye gitmek demek N kadar
+içiçe geçen fonksiyon demektir, ve sýralý veriyi tahmin için N'in büyük
+olmasý gerekebilir. LSTM hatayý sabit bir seviyede tutarak yeni bir
+yaklaþým getirmiþ. Pür RNN'lerde de bazý çözümler getirildi tabii.
+
+Kaynaklar
+
+[1] {\em A Beginner's Guide to Recurrent Networks and LSTMs}, \url{https://deeplearning4j.org/lstm#a-beginners-guide-to-recurrent-networks-and-lstms}
+
+[2] Bayramli, {\em Derin Öðrenim ile Text Üretmek, RNN, LSTM}, \url{http://sayilarvekuramlar.blogspot.co.uk/2017/01/derin-ogrenim-ile-text-uretmek-rnn-lstm.html}
+
+[3] Britz, {\em Recurrent Neural Networks Tutorial, Part 1}, \url{http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/}
+
+\end{document}

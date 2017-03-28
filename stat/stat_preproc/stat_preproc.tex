@@ -1,0 +1,256 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Özet İstatistikleri, Grafikleri
+
+Medyan ve Yüzdelikler (Percentile)
+
+Üstteki hesapların çoğu sayıları toplayıp, bölmek üzerinden yapıldı. Medyan
+ve diğer yüzdeliklerin hesabı (ki medyan 50. yüzdeliğe tekabül eder) için
+eldeki tüm değerleri "sıraya dizmemiz" ve sonra 50. yüzdelik için
+ortadakine bakmamız gerekiyor. Mesela eğer ilk 5. yüzdeliği arıyorsak ve
+elimizde 80 tane değer var ise, baştan 4. sayıya / vektör hücresine / öğeye
+bakmamız gerekiyor. Eğer 100 eleman var ise, 5. sayıya bakmamız gerekiyor,
+vs.
+
+Bu sıraya dizme işlemi kritik. Kıyasla ortalama hesabı hangi sırada olursa
+olsun, sayıları birbirine topluyor ve sonra bölüyor. Zaten ortalama ve
+sapmanın istatistikte daha çok kullanılmasının tarihi sebebi de aslında bu;
+bilgisayar öncesi çağda sayıları sıralamak (sorting) zor bir işti. Bu
+sebeple hangi sırada olursa olsun, toplayıp, bölerek hesaplanabilecek
+özetler daha makbuldü. Fakat artık sıralama işlemi kolay, ve veri setleri
+her zaman tek tepeli, simetrik olmayabiliyor. Örnek veri seti olarak ünlü
+\verb!dellstore2! tabanındaki satış miktarları kullanırsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.mean(data)
+\end{minted}
+
+\begin{verbatim}
+213.948899167
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.median(data)
+\end{minted}
+
+\begin{verbatim}
+214.06
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.std(data)
+\end{minted}
+
+\begin{verbatim}
+125.118481954
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.mean(data)+2*np.std(data)
+\end{minted}
+
+\begin{verbatim}
+464.185863074
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.percentile(data, 95)
+\end{minted}
+
+\begin{verbatim}
+410.4115
+\end{verbatim}
+
+Görüldüğü gibi üç nokta hesabı için ortalamadan iki sapma ötesini
+kullanırsak, 464.18, fakat 95. yüzdeliği kullanırsak 410.41 elde
+ediyoruz. Niye? Sebep ortalamanın kendisi hesaplanırken çok üç
+değerlerin toplama dahil edilmiş olması ve bu durum, ortalamanın
+kendisini daha büyük seviyeye doğru itiyor. Yüzdelik hesabı ise sadece
+sayıları sıralayıp belli bazı elemanları otomatik olarak üç nokta
+olarak addediyor.
+
+Box Whisker Grafikleri
+
+Tek boyutlu bir verinin dağılımını görmek için Box ve Whisker grafikleri
+faydalı araçlardır; medyan (median), dağılımın genişliğini ve sıradışı
+noktaları (outliers) açık şekilde gösterirler. İsim nereden geliyor? Box
+yani kutu, dağılımın ağırlığının nerede olduğunu gösterir, medyanın
+sağındada ve solunda olmak üzere iki çeyreğin arasındaki kısımdır, kutu
+olarak resmedilir. Whiskers kedilerin bıyıklarına verilen isimdir, zaten
+grafikte birazcık bıyık gibi duruyorlar. Bu uzantılar medyan noktasından
+her iki yana kutunun iki katı kadar uzatılır sonra verideki "ondan az olan
+en büyük" noktaya kadar geri çekilir. Tüm bunların dışında kalan veri ise
+teker teker nokta olarak grafikte basılır. Bunlar sıradışı (outlier)
+oldukları için daha az olacakları tahmin edilir.
+
+BW grafikleri iki veriyi dağılımsal olarak karşılaştırmak için
+birebirdir. Mesela Larsen and Marx adlı araştırmacılar çok az veri
+içeren Quintus Curtius Snodgrass veri setinin değişik olduğunu
+ispatlamak için bir sürü hesap yapmışlardır, bir sürü matematiksel
+işleme girmişlerdir, fakat basit bir BW grafiği iki setin farklılığını
+hemen gösterir.
+
+BW grafikleri iki veriyi dağılımsal olarak karşılaştırmak için
+birebirdir. Mesela Larsen and Marx adlı araştırmacılar çok az veri
+içeren Quintus Curtius Snodgrass veri setinin değişik olduğunu
+ispatlamak için bir sürü hesap yapmışlardır, bir sürü matematiksel
+işleme girmişlerdir, fakat basit bir BW grafiği iki setin farklılığını
+hemen gösterir.
+
+Python üzerinde basit bir BW grafiği 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+spread= rand(50) * 100
+center = ones(25) * 50
+flier_high = rand(10) * 100 + 100
+flier_low = rand(10) * -100
+data =concatenate((spread, center, flier_high, flier_low), 0)
+plt.boxplot(data)
+plt.savefig('05_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_preproc_04.png}
+
+Bir diğer örnek Glass veri seti üzerinde
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = loadtxt("glass.data",delimiter=",")
+head = data[data[:,10]==7]
+tableware = data[data[:,10]==6]
+containers = data[data[:,10]==5]
+
+print head[:,1]
+
+data =(containers[:,1], tableware[:,1], head[:,1])
+
+plt.yticks([1, 2, 3], ['containers', 'tableware', 'head'])
+
+plt.boxplot(data,0,'rs',0,0.75)
+plt.savefig('05_04.png')
+\end{minted}
+
+\begin{verbatim}
+[ 1.51131  1.51838  1.52315  1.52247  1.52365  1.51613  1.51602  1.51623
+  1.51719  1.51683  1.51545  1.51556  1.51727  1.51531  1.51609  1.51508
+  1.51653  1.51514  1.51658  1.51617  1.51732  1.51645  1.51831  1.5164
+  1.51623  1.51685  1.52065  1.51651  1.51711]
+\end{verbatim}
+
+\includegraphics[height=6cm]{stat_preproc_03.png}
+
+Zaman Kolonlarını Zenginleştirmek
+
+Veri madenciliğinde "veriden veri yaratma" tekniği çok kullanılıyor; mesela
+bir sipariş veri satırında o siparişin hangi zamanda (timestamp) olduğunu
+belirten bir kolon varsa (ki çoğu zaman vardır), bu kolonu "parçalayarak"
+ek, daha genel, özetsel bilgi kolonları yaratılabilir. Zaman kolonları çoğu
+zaman saniyeye kadar kaydedilir, bu bilgiyi alıp mesela ay, mevsim,
+haftanın günü, saat, iş saati mi (9-5 arası), akşam mı, sabah mı, öğlen mi,
+vs. gibi ek bilgiler çıkartılabilir. Tüm kolonlar veri madenciliği
+algoritmasına verilir, ve algoritma belki öğlen saati ile sipariş verilmiş
+olması arasında genel bir bağlantı bulacaktır.
+
+Python + Pandaş ile bir zaman kolonu şöyle parçalanabilir, örnek veri
+üzerinde görelim, sadece iki kolon var, müşteri no, ve sipariş zamanı,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+from StringIO import StringIO
+s = """customer_id;order_date
+299;2012-07-20 19:44:55.661000+01:00
+421;2012-02-17 21:54:15.013000+01:00
+437;2012-02-20 22:18:12.021000+01:00
+463;2012-02-20 23:46:21.587000+01:00
+482;2012-05-21 09:50:02.739000+01:00
+607;2012-02-21 11:57:12.462000+01:00
+641;2012-02-21 13:40:28.088000+01:00
+674;2012-08-21 14:53:15.851000+01:00
+780;2012-02-23 10:31:05.571000+01:00
+"""
+df = pd.read_csv(StringIO(s),sep=';', parse_dates=True)
+
+def f(x):
+   tmp = pd.to_datetime(x['order_date'])
+   tpl = tmp.timetuple(); yymm = int(tmp.strftime('%m%d'))
+   spring = int(yymm >= 321 and yymm < 621)
+   summer = int(yymm >= 621 and yymm < 921)
+   fall = int(yymm >= 921 and yymm < 1221)
+   winter = int( spring==0 and summer==0 and fall==0 )
+   warm_season = float(tpl.tm_mon >= 4 and tpl.tm_mon <= 9)
+   work_hours = float(tpl.tm_hour > 9 and tpl.tm_hour < 17)
+   morning = float(tpl.tm_hour >= 7 and tpl.tm_hour <= 11)
+   noon = float(tpl.tm_hour >= 12 and tpl.tm_hour <= 14)
+   afternoon = float(tpl.tm_hour >= 15 and tpl.tm_hour <= 19)
+   night = int (morning==0 and noon==0 and afternoon==0)
+
+   return pd.Series([tpl.tm_hour, tpl.tm_mon,
+                     tpl.tm_wday, warm_season,
+                     work_hours, morning, noon, afternoon, night,
+                     spring, summer, fall, winter])
+cols = ['ts_hour','ts_mon','ts_wday','ts_warm_season',
+        'ts_work_hours','ts_morning','ts_noon','ts_afternoon',
+        'ts_night', 'ts_spring', 'ts_summer', 'ts_fall', 'ts_winter']
+df[cols] = df.apply(f, axis=1)
+print df[cols]
+\end{minted}
+
+\begin{verbatim}
+   ts_hour  ts_mon  ts_wday  ts_warm_season  ts_work_hours  ts_morning  \
+0       18       7        4               1              0           0   
+1       20       2        4               0              0           0   
+2       21       2        0               0              0           0   
+3       22       2        0               0              0           0   
+4        8       5        0               1              0           1   
+5       10       2        1               0              1           1   
+6       12       2        1               0              1           0   
+7       13       8        1               1              1           0   
+8        9       2        3               0              0           1   
+
+   ts_noon  ts_afternoon  ts_night  ts_spring  ts_summer  ts_fall  ts_winter  
+0        0             1         0          0          1        0          0  
+1        0             0         1          0          0        0          1  
+2        0             0         1          0          0        0          1  
+3        0             0         1          0          0        0          1  
+4        0             0         0          1          0        0          0  
+5        0             0         0          0          0        0          1  
+6        1             0         0          0          0        0          1  
+7        1             0         0          0          1        0          0  
+8        0             0         0          0          0        0          1  
+\end{verbatim}
+
+Sıcak mevsim (warm season) Mart-Eylül aylarını kapsar, bu ikisel bir
+değişken hale getirildi. Belki siparişin, ya da diğer başka bir verinin
+bununla bir alakası vardır. Genel 4 sezon tek başına yeterli değil midir?
+Olabilir, fakat bazı kalıplar / örüntüler (patterns) belki sıcak / soğuk
+mevsim bilgisiyle daha çok bağlantılıdır. Veri madenciliğinde elde ne varsa
+vereceksiniz. Yoksa daha fazla yaratacaksınız, veriden veri
+çıkartacaksınız.
+
+Aynı şekilde saat 1-24 arasında bir sayı olarak var, fakat "iş saatini"
+ayrı bir ikisel değişken olarak kodlamak yine bir "kalıp yakalama"
+şansımızı arttırabilir. Bu kolonun ayrı bir şekilde kodlanmış olması veri
+tasarımı açısından ona önem verildiğini gösterir, ve madencilik
+algoritmaları bu kolonu, eğer ona bağlı bir kalıp var ise,
+yakalayabilirler.
+
+Not: Burada ufak bir pürüz sabah, öğlen, akşamüstü gibi zamanları kodlarken
+çıktı. Gece 19'dan sonra ve 7'den önce bir sayı olacaktı, fakat bu durumda
+$x>19$ ve $x<7$ hiçbir sonuç getirmeyecekti. Burada saatlerin 24 sonrası başa
+dönmesi durumu problem çıkartıyordu, tabii ki karşılaştırma ifadelerini
+çetrefilleştirerek bu iş çözülebilir, ama o zaman kod temiz olmaz (mesela
+($x>19$ ve $x<24$) ya da ($x>0$ ve $x<7$) yapabilirdik). Temiz kod için gece
+haricinde diğer tüm seçenekleri kontrol ediyoruz, ve gece "sabah, öğlen,
+akşamüstü olmayan şey" haline geliyor. Aynı durum mevsimler için de
+geçerli. Onun için 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+night = int (morning==0 and noon==0 and afternoon==0)
+\end{minted}
+
+kullanıldı.
+
+Kaynaklar 
+
+[1] Teetor, {\em R Cookbook}
+
+\end{document}
