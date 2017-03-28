@@ -3,8 +3,7 @@ import cv2, sys
 import numpy as np
 import pandas as pd
 
-#fin = '/home/burak/Documents/Dropbox/Public/data/bwalk1.mp4'
-if len(sys.argv) &lt; 2:
+if len(sys.argv) < 2:
     print "Usage: vs.py [input file]"
     exit()
 fin = sys.argv[1]
@@ -21,8 +20,15 @@ prev_to_cur_transform = []
 for k in range(N-1):
     status, cur = cap.read()
     cur_gray = cv2.cvtColor(cur, cv2.COLOR_BGR2GRAY)
-    prev_corner = cv2.goodFeaturesToTrack(prev_gray, maxCorners = 200, qualityLevel = 0.01, minDistance = 30.0, blockSize = 3)
-    cur_corner, status, err = cv2.calcOpticalFlowPyrLK(prev_gray, cur_gray, prev_corner,None)
+    prev_corner = cv2.goodFeaturesToTrack(prev_gray,
+                                          maxCorners = 200,
+                                          qualityLevel = 0.01,
+                                          minDistance = 30.0,
+                                          blockSize = 3)
+    cur_corner, status, err = cv2.calcOpticalFlowPyrLK(prev_gray,
+                                                       cur_gray,
+                                                       prev_corner,
+                                                       None)
     prev_corner2 = []
     cur_corner2 = []
     for i,st in enumerate(status):
@@ -47,12 +53,14 @@ trajectory = np.cumsum(prev_to_cur_transform, axis=0)
 trajectory = pd.DataFrame(trajectory)
 smoothed_trajectory = pd.rolling_mean(trajectory,window=30)
 smoothed_trajectory = smoothed_trajectory.fillna(method='bfill')
-new_prev_to_cur_transform = prev_to_cur_transform + (smoothed_trajectory - trajectory)
+new_prev_to_cur_transform = prev_to_cur_transform + \
+                            (smoothed_trajectory - trajectory)
 new_prev_to_cur_transform = np.array(new_prev_to_cur_transform)
 
 T = np.zeros((2,3))
 cap = cv2.VideoCapture(fin)
-out = cv2.VideoWriter('out.avi', cv2.VideoWriter_fourcc('P','I','M','1'), fps, (w, h), True)
+out = cv2.VideoWriter('out.avi', cv2.VideoWriter_fourcc('P','I','M','1'),
+                      fps, (w, h), True)
 
 for k in range(N-1):
     status, cur = cap.read()

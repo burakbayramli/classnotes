@@ -232,7 +232,36 @@ scipy.misc.imsave('vision_30vstab_05.png', im_g)
 
 \includegraphics[height=6cm]{vision_30vstab_05.png}
 
+Video Stabilizasyonu
 
+Elde tutulan kamera ile kaydedilen görüntülerde titreme çok
+olabilir. Mesela þurada [1] bizim cep telefonu ile kaydettiðimiz bir örnek
+var. Bu görüntüyü yazýlým ile stabilize etmek mümkün mü? Cevap evet - ve
+çözüm þaþýrtýcý derecede basit. [4]'teki çözüm þöyle özetlenebilir: bir
+video'yu baþtan itibaren kare kare iþlerken, her karede ilginç köþe
+noktalarý (Harris tekniði ile) buluruz, ve bu noktalarýn bir sonraki
+resimdeki eþlerini elde ederiz. Tüm eþlemeleri kullanarak bir
+transformasyon hesaplarýz, bu transformasyon matrisý içinde $x,y$ deðiþimi,
+yani taþýmma, ve $a$ acýsý ki döndürme bilgisi vardýr. Bu bilgileri
+$dx,dy,da$ olarak biriktiririz. Tüm kareler iþlenince deðiþimlerin
+kumulatif toplamýný alarak $x,y,a$ zaman serilerini oluþtururuz. Bu zaman
+serileri üzerinde bir yürüyen ortalama (moving average) hesabý yaparýz, bu
+bize pürüzüþleþtirilmiþ zaman serileri verir. Þimdi kumulatif serinin
+pürüzsüz þeriden olan farklarýný buluruz, ve her zaman anýnda bu farký alýp
+bir önceki kare üzerinde yamultma yaparak onu ``düzeltiriz''. 
+
+Kabaca tarif etmek gerekirse üstte gösterdiðimiz türde video'larda
+"beklenen" bir nokta eþleþmesi var, düz yürüyoruz, kamera ileri dönük,
+ortadaki pikseller dýþa doðru eþleþmeli, saðdakiler daha saða doðru, vs.,
+bu beklenti hareketli ortalama ile hesaplanýyor, ve ondan olan sapmalarda
+kameranýn istenmeyen titremesi olarak algýlanýyor.
+
+\inputminted[fontsize=\footnotesize]{python}{vidstab.py}
+
+Üstteki kodu [1] üzerinde uygularsak stabilizasyon yapýldýðýný
+göreceðiz. Sonuç [2]'de. 
+
+C++ kodu \verb!vidstab.cpp!'de bulunabilir.
 
 Kaynaklar
 
