@@ -1,65 +1,126 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
+Ýki Boyut Nokta Eþleþmesi, Homografi, Video Stabilizasyonu
 
+Oldukça çok ortaya çýkan bir imaj iþleme problemi þudur: elimizde iki nokta
+grubu var, bu noktalarýn arasýndaki eþleþmeyi biliyoruz. Öyle bir $H$
+iliþkisi bulmak istiyoruz ki verili $x$ noktasýnýnýn (homojen) kordinatýný
+$x'$ noktasýna taþýsýn, yani eldeki her veri noktasýnýn ima ettiði eþleþmeyi
+bulsun. 
 
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd, zipfile
-import numpy as np
-import cv2
-
-def draw_flow(img, flow, step=16):
-    h, w = img.shape[:2]
-    y, x = np.mgrid[step/2:h:step, step/2:w:step].reshape(2,-1).astype(int)
-    fx, fy = flow[y,x].T
-    lines = np.vstack([x, y, x+fx, y+fy]).T.reshape(-1, 2, 2)
-    lines = np.int32(lines + 0.5)
-    vis = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-    cv2.polylines(vis, lines, 0, (0, 255, 0))
-    for (x1, y1), (x2, y2) in lines:
-        cv2.circle(vis, (x1, y1), 1, (0, 255, 0), -1)
-    return vis
-
-prevgray = cv2.imread('106.jpg', cv2.IMREAD_GRAYSCALE)
-gray = cv2.imread('107.jpg', cv2.IMREAD_GRAYSCALE)
-flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-cv2.imwrite('vision_30vstab_01.png', draw_flow(gray, flow))
-\end{minted}
-
-\includegraphics[width=20em]{vision_30vstab_01.png}
+Ornek
 
 \begin{minted}[fontsize=\footnotesize]{python}
-x1 = [[25.8064516129,25.0],
-      [23.8709677419,45.625],
-      [20.0,69.375],
-      [28.3870967742,92.5],
-      [38.7096774194,116.875],
-      [64.5161290323,115.0],
-      [64.5161290323,89.375],
-      [65.1612903226,66.875],
-      [57.4193548387,45.0],
-      [45.8064516129,23.75]]
-x2 = [[93.5483870968,66.25],
-      [114.838709677,110.0],
-      [138.709677419,153.125],
-      [182.580645161,179.375],
-      [241.935483871,204.375],
-      [276.774193548,163.75],
-      [254.193548387,123.125],
-      [212.903225806,73.125],
-      [158.064516129,54.375],
-      [120.64516129,40.625]]
+x1 = [[25.8064516129,25.0],[23.87096,45.625],
+      [20.0,69.375],[28.387,92.5],
+      [38.709,116.875],[64.5161290323,115.0],
+      [64.516,89.375],[65.16,66.875],
+      [57.4193,45.0],[45.80645,23.75]]
+x2 = [[93.548,66.25],[114.838,110.0],
+      [138.709,153.125],[182.580,179.375],
+      [241.935,204.375],[276.77,163.75],
+      [254.193,123.125],[212.903,73.125],
+      [158.064,54.375],[120.6451,40.625]]
 
 x1 = np.array(x1)
 x2 = np.array(x2)
-plt.plot(x1[:,0], x1[:,1], 'r.')
-plt.plot(x2[:,0], x2[:,1], 'b.')
+plt.plot(x1[:,0], x1[:,1], 'rd')
+plt.plot(x2[:,0], x2[:,1], 'bd')
 plt.xlim(0,320)
 plt.ylim(0,240)
 plt.savefig('vision_30vstab_02.png')
 \end{minted}
 
-\includegraphics[height=6cm]{vision_30vstab_02.png}
+\includegraphics[width=20em]{vision_30vstab_02.png}
+
+Yani kýrmýzý noktalarý mavi noktalara çeviren iliþkiyi arýyoruz. Bu
+transformasyon kabaca bakýnca bir yer deðiþtirme (translation) ve ölçekleme
+(scaling) içeriyor. Üstteki türden 2D-2D iliþkilerine homografi adý
+veriliyor. Aradýðýmýz alttaki türden bir formül,
+
+$$ x' = H x$$
+
+ki orijinal her $x$ noktasý $H$ ile $x'$ haline gelecek. $H$ matrisi
+homojen kordinatlarý baz alýr,
+
+$$ 
+\left[\begin{array}{r} x' \\ y' \\ w' \end{array}\right]
+\left[\begin{array}{rrr}
+h_1 & h_2 & h_3 \\ h_3 & h_4 & h_5 \\ h_6 & h_7 & h_8 
+\end{array}\right]
+\left[\begin{array}{r} x \\ y \\ w \end{array}\right]
+$$
+
+$H$ matrisinin bazý þekilleri vardýr, mesela 
+
+$$ 
+\left[\begin{array}{r} x' \\ y' \\ 1 \end{array}\right]
+\left[\begin{array}{rrr}
+a_1 & a_2 & t_x \\ a_3 & a_4 & t_y \\ 0 & 0 & 1
+\end{array}\right]
+\left[\begin{array}{r} x \\ y \\ w \end{array}\right]
+$$
+
+Ya da matris içindeki bölgeleri vektör / matrisler ile özetlersek,
+
+$$ 
+x' = \left[\begin{array}{rr} A & t \\ 0 & 1 \end{array}\right] x
+$$
+
+Üstteki transformasyona ilgin transformasyonu (affine transformation)
+deniyor, yamultma (warping) denen iþlem budur. Bu transformasyon $w=1$
+þartýný korur.
+
+Eðer $H$ þu türden olursa,
+
+$$ 
+\left[\begin{array}{r} x' \\ y' \\ 1 \end{array}\right]
+\left[\begin{array}{rrr}
+s\cos(\theta) & -s\sin(\theta) & t_x \\ 
+s\sin(\theta) & s\cos(\theta) & t_y \\ 
+0 & 0 & 1
+\end{array}\right]
+\left[\begin{array}{r} x \\ y \\ 1 \end{array}\right]
+$$
+
+Bu ölçeklemeye (scaling) izin veren bir katý (rigid) transformasyon
+deniyor. ``Katý'' demek $s=1$ ile noktalar arasý mesafeler deðiþmeyecek
+demek, $s$ ile tabii ölçekleme olabilir, mesafeler artabilir, ama mesafe
+oranlarý yine ayný kalýr, ayrýca döndürme de -rotation- yapýlabilir. Bu
+transformasyona yansýtsal (projective) ismi de verilir. Yansýtal
+transformasyonun ilgin transformasyondan daha esnek / kuvvetli olduðu
+bilinir. 
+
+Not: Mesela ilgin transformasyon literatürde $x' = R x + t$, yani rotasyon
+artý yer deðiþimi gibi bir formda da görülebilir, biz homojen sisteme
+geçerek her ikisini ayný matris $H$ içinde ve tek çarpým operasyonu ile
+gösterebilmiþ oluyoruz. 
+
+Homografi hesabýnýn kullaným alanlarý geniþ; mesela elde olan iki imaj
+arasýnda birbirine uyan noktalarý biliyorsak, $H$'yi hesaplayarak tüm imaj
+üzerinde bir deðiþim matrisi hesaplamýþ oluruz. 
+
+Yansistal $H$ hesabý için direk lineer transform (direct linear transform
+-DLT-) tekniði var. Eldeki tum eslesmeler icin alttaki sistemi yaratiriz, 
+
+$$ 
+\left[\begin{array}{rrrrrrrrr}
+-x_1 & -y_1 & -1 & 0 & 0 & 0 & x_1x_1' & y_1x_1' & x_1' \\
+0 & 0 & 0 & -x_1 & -y_1 & -1 & x_1y_1' & y_1y_1' & y_1' \\
+-x_2 & -y_2 & -1 & 0 & 0 & 0 & x_2x_2' & y_2x_2' & x_2' \\
+0 & 0 & 0 & -x_2 & -y_2 & -1 & x_2y_2' & y_2y_2' & y_2' \\
+ &  \vdots &  &  \vdots &  & \vdots &  &  \vdots & 
+\end{array}\right]
+\left[\begin{array}{r}
+h_1 \\ h_2 \\ h_3 \\ h_4 \\ h_5 \\ h_6 \\ h_7 \\ h_8 \\ h_9 
+\end{array}\right]
+$$
+
+Bu sistem $x' - Hx = 0$ sistemini temsil etmiþ oluyor, ne kadar fazla nokta
+olursa üstteki matris o kadar aþaðý doðru geniþleyecektir (öðe ayarlamasý
+öne göre yapýlacak tabii). Mükemmel $H$ bulunamayabilir, ama sýfýra
+olabildiðince yaklaþmak için üstteki problemi bir minimizasyon problemi
+olarak görürüz, SVD bu çözümü bize saðlar. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy.linalg as lin
@@ -106,15 +167,26 @@ A = H_from_points(x1h.T,x2h.T)
 res = np.dot(A, x1h.T).T
 res = res.T / res[:,2]
 
-plt.plot(x2[:,0], x2[:,1], 'b.')
-plt.plot(res.T[:,0], res.T[:,1], 'rx')
+plt.plot(x1[:,0], x1[:,1], 'rd')
+plt.plot(x2[:,0], x2[:,1], 'bd')
+plt.plot(res.T[:,0], res.T[:,1], 'bx')
 plt.xlim(0,320)
 plt.ylim(0,240)
 plt.savefig('vision_30vstab_03.png')
 \end{minted}
 
-\includegraphics[height=6cm]{vision_30vstab_03.png}
+\includegraphics[width=30em]{vision_30vstab_03.png}
 
+Çarpý ile iþaretli noktalar kestirme hesabý yapýlan $H$ ile kýrmýzý
+noktalarýn transform edilmesiyle elde edildi. Gerçek noktalara oldukca
+yakýn! 
+
+Ýmaj Bölgesi Çekip Çýkarmak
+
+Üstteki tekniðin ilginç uygulamalarýndan biri; diyelim ki bir imajýn belli
+bir bölgesindeki görüntüyü eþit kenarlý olacak þekilde çekip çýkarmak
+istiyorum, mesela alttaki Sudoku oyun karesini alýp sadece o olacak þekilde
+görmek istiyorum. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy import ndimage
@@ -126,13 +198,19 @@ corners = [[257.4166, 14.9375],
            [59.30208, 269.65625], 
            [325.598958, 469.05729]]
 corners = np.array(corners)
-plt.plot(corners[3,0], corners[3,1], 'bd')
-#plt.plot(corners[:,0], corners[:,1], 'bd')
+plt.plot(corners[:,0], corners[:,1], 'rd')
 plt.imshow(im, cmap=plt.cm.Greys_r)
 plt.savefig('vision_30vstab_04.png')
 \end{minted}
 
-\includegraphics[height=6cm]{vision_30vstab_04.png}
+\includegraphics[width=30em]{vision_30vstab_04.png}
+
+Kenarlarý kýrmýzý noktalarla ben seçtim, þimdi o bölgenin alýnýp eþit
+kenarlý halde gösterilmesini istiyorum. Bu ne demektir? Bu seçilen her köþe
+noktasýnýn eþit kenarlý bir karenin köþelerine transform edilmesi
+demektir. Daha önce yaptýðým gibi $H$ hesaplarým, sonra o bölgedeki tüm
+piksellerin alýp hespaladýðým transformasyonu onlara uygularým,
+\verb!scipy.ndimage.geometric_transform! bu iþi yapar.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy import ndimage
@@ -156,8 +234,6 @@ scipy.misc.imsave('vision_30vstab_05.png', im_g)
 
 
 
-
-
 Kaynaklar
 
 [1] Bayramli, Veri 1, \url{https://www.dropbox.com/s/dlcd1ooxyvvp4cv/bwalk1.mp4?dl=1}
@@ -168,5 +244,7 @@ Kaynaklar
 
 [4] Nghia Ho, {\em Simple Video Stabilization using OpenCV},
     \url{http://nghiaho.com/?p=2093}
+
+[5] Bayramli, {\em OpenCV 3.0}, \url{http://sayilarvekuramlar.blogspot.com/2017/03/opencv-30.html}
 
 \end{document}
