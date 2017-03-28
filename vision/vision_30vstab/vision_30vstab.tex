@@ -113,28 +113,46 @@ plt.ylim(0,240)
 plt.savefig('vision_30vstab_03.png')
 \end{minted}
 
+\includegraphics[height=6cm]{vision_30vstab_03.png}
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy import ndimage
+from PIL import Image
 
+im = np.array(Image.open('sudoku81.JPG').convert('L'))
+corners = [[257.4166, 14.9375], 
+           [510.8489, 197.6145], 
+           [59.30208, 269.65625], 
+           [325.598958, 469.05729]]
+corners = np.array(corners)
+plt.plot(corners[3,0], corners[3,1], 'bd')
+#plt.plot(corners[:,0], corners[:,1], 'bd')
+plt.imshow(im, cmap=plt.cm.Greys_r)
+plt.savefig('vision_30vstab_04.png')
+\end{minted}
 
+\includegraphics[height=6cm]{vision_30vstab_04.png}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy import ndimage
+import scipy
 
+fp = [ [p[1],p[0],1] for p in corners]
+fp = np.array(fp).T
+tp = np.array([[0,0,1],[0,300,1],[300,0,1],[300,300,1]]).T
+H = H_from_points(tp,fp)
 
+def warpfcn(x):
+    x = np.array([x[0],x[1],1])
+    xt = np.dot(H,x)
+    xt = xt/xt[2]
+    return xt[0],xt[1]
+im_g = ndimage.geometric_transform(im,warpfcn,(300,300))
+scipy.misc.imsave('vision_30vstab_05.png', im_g)
+\end{minted}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\includegraphics[height=6cm]{vision_30vstab_05.png}
 
 
 
