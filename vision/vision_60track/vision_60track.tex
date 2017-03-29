@@ -2,14 +2,14 @@
 \begin{document}
 Obje Takibi
 
-Video'lardaki görüntüleri objeleri takip etmek için filtreleme kullanmak
-mümkün, bu teknik ile iki boyutlu yansýmadan üç boyutlu konum bilgisini
-takip edebiliriz. Kalman Filtreleri (KF) ile görüntüde ilgilendiðimiz
-objeyi her seferinde iki boyutta ``bulmalýyýz'', yani bu objenin
-örüntüsünün ne olduðunu önceden biliyor olmamýz gerekir, ve onu sonraki
-resimlerde takip etmemiz gerekir. Bulduðumuz, iki boyutlu kordinat
-deðerleridir, yani ölçümsel büyüklüklerdir, ardýndan KF'in en son konumuna
-göre ürettiði tahmin ile aradaki fark KF'i düzeltmek için kullanýlýr.
+Video görüntülerinde obje takibi için filtreleme kullanmak mümkün, bu
+teknik ile iki boyutlu yansýmadan üç boyutlu konum bilgisini takip
+edebiliriz. Kalman Filtreleri (KF) ile görüntüde ilgilendiðimiz objeyi her
+seferinde iki boyutta ``bulmalýyýz'', yani bu objenin örüntüsünün ne
+olduðunu önceden biliyor olmamýz gerekir, ve onu sonraki resimlerde takip
+etmemiz gerekir. Bulduðumuz, iki boyutlu kordinat deðerleridir, yani
+ölçümsel büyüklüklerdir, ardýndan KF'in en son konumuna göre ürettiði
+tahmin ile aradaki fark KF'i düzeltmek için kullanýlýr.
 
 Parçacýk filtreleri (PF) ile yine konum ve ölçüm fonksiyonu ikilisi var,
 fakat ölçüm ile konumdan üretilen tahmin arasýndaki uyumu bir olasýlýk,
@@ -68,23 +68,23 @@ görüyoruz. Benim tahminimde ``gürültü'' yani ``hata payý'' var, ölçümde
 gürültü var, tüm bunlar üst üste konsa bile filtre yine de gizli konumu
 bulacak.
 
-Ölçümsel dönüþümü temsil eden H'e ben onun temeli olan yansýma (projection)
-kelimesinden gelen P matrisinden bahsedelim. Yansýma matrisi görüntü
-(vision) literatüründe iðne delik kamerasý (pinhole camera) modelinden ileri
-gelen bir matristir ve bu matrisi hesaplamak ayarlama / kalibrasyon
-(calibration) denen apayrý bir iþlemin parçasýdýr. OpenCV içinde
-kalibrasyon için fonksiyonlar var, biz de bunlarý denedik, kalibrasyon için
-kullandýðýmýz resimlerle alakalý olmalý, elde edilen sonuçlardan memnun
-kalmadýk. Alternatif olarak þunu yaptýk; resimde görülen yeþil yüzey bizim
-programýn oluþturduðu hayali bir yüzey. Filtrenin o anki tahminini P
-üzerinden görüntüye yansýtarak bu yüzeyi oluþturduk, böylece deneme /
-yanýlma yöntemiyle pek çok P deðerini deneyerek, yüzeyin resimde görülen
-masanýn sonunda çýkacak þekilde olmasýný saðladýk. Projeksiyon için
-kullanýlan $K$ matrisi ve baþlangýç imajý altta:
+Ölçümsel dönüþümü temsil eden H'e ben onun temeli olan yansýtma
+(projection) kelimesinden gelen P matrisinden bahsedelim. Yansýma matrisi
+görüntü (vision) literatüründe iðne delik kamerasý (pinhole camera)
+modelinden ileri gelen bir matristir ve bu matrisi hesaplamak ayarlama /
+kalibrasyon (calibration) denen apayrý bir iþlemin parçasýdýr. OpenCV
+içinde kalibrasyon için fonksiyonlar var, biz de bunlarý denedik,
+kalibrasyon için kullandýðýmýz resimlerle alakalý olmalý, elde edilen
+sonuçlardan memnun kalmadýk. Alternatif olarak þunu yaptýk; resimde görülen
+yeþil yüzey bizim programýn oluþturduðu hayali bir yüzey. Filtrenin o anki
+tahminini P üzerinden görüntüye yansýtarak bu yüzeyi oluþturduk, böylece
+deneme / yanýlma yöntemiyle pek çok P deðerini deneyerek, yüzeyin resimde
+görülen masanýn sonunda çýkacak þekilde olmasýný saðladýk. Yansýtma için
+kullanýlan $K$ matrisi, yansýtma metotu ve baþlangýç imajý altta:
 
 \includegraphics[height=6cm]{tser_kf_02.png}
 
-\inputminted[fontsize=\footnotesize]{python}{K.py}
+\inputminted[fontsize=\footnotesize]{python}{util.py}
 
 O noktaya gelince istediðimiz P deðerini bulmuþ oluyorduk. Yansýtma
 matrisleri 3x3 olur, KF buna bir dördüncü [0 0 0] satýrý ekleyerek onu 4x3
@@ -97,23 +97,7 @@ kararsýzlýk deðeri kullandýk. Sebep baþlangýç deðeri olan masa ortasýný
 seçtik, ve takip edeceðimiz satranç tahtasýnýn nerede olduðunu bilmiyoruz,
 ``emin deðiliz''.  Bu kararsýzlýðý sayýsal olarak programa bildirmiþ olduk.
 
-Alttaki resimlerde filtrenin tahminini temsil eden yeþil yüzeyi baþarýyla
-takip ettiðini görüyoruz.
-
 \inputminted[fontsize=\footnotesize]{python}{track-chess-kf.py}
-
-\includegraphics[height=4cm]{./kf/cb-kf-1.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-2.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-3.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-4.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-4.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-5.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-6.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-7.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-8.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-9.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-10.jpg}
-\includegraphics[height=4cm]{./kf/cb-kf-11.jpg}
 
 Kalman filtreleri (KF), eðer kararsýzlýk Gaussian olarak gösterilebiliyorsa çok
 faydalý, ve hýzlý bir yöntem. Bir KF bellekte çok az yer tutar, 3 boyutlu bir
@@ -125,8 +109,8 @@ edebilirler. Diyelim ki tek boyutlu bir daðýlýmý 100 öðe içeren bir dizin ile
 temsil edebiliriz, o zaman daðýlýmýn deðerlerini 100 tane noktada taþýmamýz
 gerekir.  Bunun faydalarý her türlü daðýlým þeklini temsil edebilmemiz. Gaussian
 ile sadece tek bir tepe noktasý olabilir, fakat ayrýksal temsil ile 2, 3,
-istediðimiz kadar tepe noktasý olan bir daðýlýmý temsil edebiliriz. Bu saeyede
-borden fazla gayrý lineer hipotezi ayný anda iþletebiliriz. KF ile tepe noktasý
+istediðimiz kadar tepe noktasý olan bir daðýlýmý temsil edebiliriz. Bu sayede
+birden fazla gayrý lineer hipotezi ayný anda iþletebiliriz. KF ile tepe noktasý
 en iyi tahminimizdir (mesela.. satranç kartonu masa ortasýnda), PF ile birkaç
 tahmini ayný anda hesaplatmak mümkün olabilir.
 
@@ -162,20 +146,6 @@ istiyoruz. Dikkat: tekrar örnekleme süreci yeni parçacýk deðerleri yaratmýyor,
 sadece mevcut olanlarý tekrarlýyor ya da onlarý atlýyor.
 
 \inputminted[fontsize=\footnotesize]{python}{track-chess-pf.py}
-
-\includegraphics[height=4cm]{./pf/cb-pf-1.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-2.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-3.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-4.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-4.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-5.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-6.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-7.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-8.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-9.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-10.jpg}
-\includegraphics[height=4cm]{./pf/cb-pf-11.jpg}
-
 
 Kaynaklar
 

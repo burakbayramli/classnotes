@@ -221,10 +221,11 @@ plt.savefig('vision_30vstab_04.png')
 
 Kenarlarý kýrmýzý noktalarla ben seçtim, þimdi o bölgenin alýnýp eþit
 kenarlý halde gösterilmesini istiyorum. Bu ne demektir? Bu seçilen her köþe
-noktasýnýn eþit kenarlý bir karenin köþelerine transform edilmesi
-demektir. Daha önce yaptýðým gibi $H$ hesaplarým, sonra o bölgedeki tüm
-pikselleri alýp hesapladýðým transformasyonu onlara uygularým (
-\verb!scipy.ndimage.geometric_transform! bu iþi yapar),
+noktasýnýn eþit kenarlý bir karenin köþelerine transform edilmesi demektir,
+mesela bu köþeler $(1,300),(300,300),..$ gibi olabilir (imajýn en uç
+noktalarý). Sonra daha önce yaptýðým gibi $H$ hesaplarým, ve o bölgedeki
+tüm pikselleri alýp hesapladýðým transformasyonu onlara uygularým,
+\verb!scipy.ndimage.geometric_transform! bu iþi yapar.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy import ndimage
@@ -255,7 +256,7 @@ var. Bu görüntüyü yazýlým ile stabilize etmek mümkün mü? Cevap evet - ve
 video'yu baþtan itibaren kare kare iþlerken, her karede ilginç köþe
 noktalarý (Harris tekniði ile) buluruz, ve bu noktalarýn bir sonraki
 resimdeki eþlerini elde ederiz, bu artýk görüntü iþlemede demirbaþ haline
-gelmiþ bir iþlem. Sonra tüm eþlemeleri kullanarak her kare için bir
+gelmiþ bir iþlem. Sonra tüm eþlemeleri kullanarak her video karesi için bir
 homografi / transformasyon hesaplarýz, bu transformasyon matrisi içinde
 $x,y$ deðiþimi, yani taþýnma, ve $a$ açýsý ki döndürme bilgisi vardýr. Bu
 bilgileri $dx,dy,da$ olarak biriktiririz.
@@ -264,11 +265,12 @@ Tüm kareler iþlenince baþa dönüp tüm bu deðiþimlerin kümülatif toplamýný
 alarak $x,y,a$ zaman serilerini oluþtururuz. Bu zaman serileri üzerinde bir
 yürüyen ortalama (moving average) hesabý yaparýz, bu bize
 pürüzüþleþtirilmiþ zaman serileri verir. Þimdi kümülatif serinin pürüzsüz
-seriden olan farklarýný buluruz, ve her kare için bu farký alýp, bir önceki
-kare üzerinde yamultma yaparak onu ``düzeltiriz''. Bu kadar.
+seriden olan farklarýný buluruz, ve her kare için bu farký alýp, onunla bir
+$H$ oluþtururuz ve bu $H$ ile bir önceki kare üzerinde yamultma yaparak onu
+``düzeltiriz''. Bu kadar.
 
 Bu teknik niye iþliyor? Ýþliyor çünkü üstte gösterdiðimiz türde video'larda
-"beklenen" bir nokta eþleþmesi, bir ``akýþ'' var, düz yürüyoruz, kamera
+"beklenen" bir ``akýþ'', bir nokta eþleþmesi var. Düz yürüyoruz, kamera
 ileri dönük, ortadaki pikseller dýþa doðru eþleþmeli, saðdakiler daha saða
 doðru, vs.  Bu beklentiyi hareketli ortalama ile hesaplamak mümkün, ve
 ondan olan sapmalarý kameranýn istenmeyen titremesi olarak algýlýyoruz, ve
