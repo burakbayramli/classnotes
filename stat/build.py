@@ -11,6 +11,7 @@ if len(sys.argv) == 1 :
     "./stat_ci/stat_ci.pdf " + \
     "./stat_tests/stat_tests.pdf " + \
     "./stat_tests2/stat_tests2.pdf " + \
+    "./stat_multigauss/stat_multigauss.pdf " + \
     "./stat_kl/stat_kl.pdf " + \
     "./stat_linreg/stat_linreg.pdf " + \
     "./stat_fxu/stat_fxu.pdf " + \
