@@ -2,6 +2,8 @@
 \begin{document}
 Iki Imaj Kullanarak 3 Boyutta Tekrar Olusturmak (3D Reconstruction from Two Images)
 
+Temel Matris ve 8-Nokta Algoritmasi 
+
 \begin{minted}[fontsize=\footnotesize]{python}
 from mpl_toolkits.mplot3d import axes3d
 import scipy.linalg as lin
@@ -56,34 +58,40 @@ cv2.imwrite('vision_20recons_01.jpg',tmp)
 for pt in pts2: cv2.circle(img2,tuple(pt),5,(0,0,255),-1)
 tmp = cv2.resize(img2, (int(w/4),int(h/4)))
 cv2.imwrite('vision_20recons_02.jpg',tmp)
+
+pts1 = np.array(pts1)
+pts2 = np.array(pts2)
+
+h,w,dum = img1.shape
+pts1[:,1] = h-pts1[:,1]
+pts2[:,1] = h-pts2[:,1]
 \end{minted}
 
 \begin{verbatim}
-matches 1277
-Out[1]: 
-True
+matches 1290
 \end{verbatim}
 
 \includegraphics[width=30em]{vision_20recons_01.jpg}
 
 \includegraphics[width=30em]{vision_20recons_02.jpg}
 
-
 \begin{minted}[fontsize=\footnotesize]{python}
 # kamera matrisi biliniyor
 K = np.array([[2394,0,932],[0,2398,628],[0,0,1]])
 
-h,w,dum = img1.shape
-pts1[:,1] = h-pts1[:,1]
-pts2[:,1] = h-pts2[:,1]
-
 F, mask = cv2.findFundamentalMat(pts1,pts2)
 
 E = K.T.dot(F).dot(K)
+print F
 
 R1,R2,t = cv2.decomposeEssentialMat(E)
 \end{minted}
 
+\begin{verbatim}
+[[ -5.44722052e-08   9.22019433e-07   1.17985628e-03]
+ [ -1.26508496e-06   7.74814744e-07   1.15134028e-02]
+ [ -1.29297913e-03  -1.31947419e-02   1.00000000e+00]]
+\end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def triangulate_point(u1, u2, P1, P2):
@@ -104,7 +112,6 @@ def triangulate_point(u1, u2, P1, P2):
 def triangulate(x1, x2, P1, P2):
   X = [triangulate_point(x1[i, :], x2[i, :], P1, P2) for i in range(len(x1))]
   return np.array(X).T
-
 
 P1 = np.eye(4)
 P2 = np.array([[ 0.878, -0.01 ,  0.479, -1.995],
@@ -136,13 +143,10 @@ x [ 0.09099773  0.36408896  1.        ]
 x2 [ 0.4200205   0.38890029  1.        ]
 \end{verbatim}
 
-
 \begin{minted}[fontsize=\footnotesize]{python}
 for i,P in enumerate(((R1,t),(R1,-t),(R2,t),(R2,-t))):
 
     P1 = K.dot(np.hstack(P))       # Projection matrix of second cam is ready
-    print 'P', P1
-
     P00 = np.float64([ [1,0,0,0],
                        [0,1,0,0],
                        [0,0,1,0]   ]) # Projection matrix of first cam at origin
@@ -154,9 +158,13 @@ for i,P in enumerate(((R1,t),(R1,-t),(R2,t),(R2,-t))):
     ax = fig.gca(projection='3d')    
     ax.plot(X[0], X[2], X[1], 'r.')
     ax.view_init(elev=23., azim=-67)
-    plt.savefig('thd_03_%d.png' % i)
+    plt.savefig('vision_20recons_03_%d.png' % i)
 \end{minted}
 
+\includegraphics[width=20em]{vision_20recons_03_0.png}
+\includegraphics[width=20em]{vision_20recons_03_1.png}
+\includegraphics[width=20em]{vision_20recons_03_2.png}
+\includegraphics[width=20em]{vision_20recons_03_3.png}
 
 
 
