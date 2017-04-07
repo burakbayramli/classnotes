@@ -2,15 +2,15 @@
 \begin{document}
 Ýki Ýmaj Kullanarak 3 Boyutta Tekrar Oluþturmak (3D Reconstruction from Two Images)
 
-Temel Matris 
+Temel Matris (Fundamental Matrix)
 
 Daha önce vazgeçilmez matris (essential matris) konusunu görmüþtük. Þimdi
-bu konuya ve yani bölümde iþlenen eskutupsal kýsýtlamayý (epipolar
-contraint) bir daha anlatalým, bu sefer temel matris (fundamental matrix)
-denen bir kavramý merkez alarak. Aslýnda vazgeçilmez ve temel matrisler
-birbirine çok yakýnlar, temel matris vazgeçilmezin içinden kalibre edilmiþ
-matris faraziyesinin çýkartýlmýþ hali. [1, sf. 257] diyor ki vazgeçilmez
-matriste her þey vazgeçilmez deðilmiþ demek ki (!).
+bu konuya ve yani bölümde iþlenen eþkutupsal kýsýtlamayý (epipolar
+contraint) bir daha anlatalým, bu sefer temel matris denen bir kavramý
+merkez alarak. Aslýnda vazgeçilmez ve temel matrisler birbirine çok
+yakýnlar, temel matris vazgeçilmezin içinden kalibre edilmiþ matris
+faraziyesinin çýkartýlmýþ hali. [1, sf. 257] diyor ki vazgeçilmez matriste
+her þey vazgeçilmez deðilmiþ demek ki (!).
 
 Kalibrasyon, yani $K$ faraziyesi þöyle çýkartýlýr: diyelim ki bir kamera
 matrisi $P = K[R | t]$ olarak tanýmlý ve $x = PX$ görüntüdeki bir piksel
@@ -105,7 +105,7 @@ matches = matcher.knnMatch(des1, des2, k = 2)
 matches = [m[0] for m in matches \
            if len(m) == 2 and m[0].distance < m[1].distance * 0.75]
 
-print 'matches', len(matches)
+print 'uyan noktalar', len(matches)
 
 pts1 = []; pts2 = []
 
@@ -137,32 +137,48 @@ pts2[:,1] = h-pts2[:,1]
 \end{minted}
 
 \begin{verbatim}
-matches 1290
+uyan noktalar 1298
 \end{verbatim}
 
 \includegraphics[width=30em]{vision_20recons_01.jpg}
 
 \includegraphics[width=30em]{vision_20recons_02.jpg}
 
-Birinci resimde saptanan ORB noktalarýnýn ayný resimdeki noktalara nasýl
-eþleþtiðini gösterdik, ikinci resimde ayný bu noktalar görülüyor. Eslenen
-noktalarin kaymasi kameraninin hareketi hakkinda bir ipucu verdigi ciplak
-gozle bile goruluyor. Temel matrisi hesaplayarak daha net bir sonuc
-alabiliriz. 
+Birinci resimde saptanan ORB noktalarýnýn ikinci resimdeki noktalara nasýl
+nasýl eþleþtiðini (yine birinci resimde) gösterdik, ikinci resimde
+eþleþilen noktalar görülüyor. Bu noktalardaki kayma kameranýnýn hareketi
+hakkýnda bir ipucu veriyor bize, kayýþý çýplak gözle bile
+görebiliyoruz. Temel matrisi hesaplayýnca daha net bir sonuç alacaðýz
+tabii.
 
-8-Nokta Algoritmasi
+8-Nokta Algoritmasý
 
+Aslýnda $F$ hesabý için 8 nokta yeterli, fakat daha fazlasýna da izin veren
+bir çözüm yöntemi SVD ile mümkün. Çözülecek sistem eþkutupsal kýsýtlamadan
+formülünden baþlar, her $i=1,2,..$ için $x_1^i,x_2^i$ eþleþmeleri olsun, o
+zaman her $x_1^i F x_2^i = 0$'i içinde barýndýran bir $Af = 0$ sistemi
+yaratabiliriz, $x_1^i = (x_1^i,y_1^i,w_1^i)$ ve $x_2^i=(x_2^i,y_2^i,w_2^i)$
+olacak þekilde,
 
+$$ 
+\left[\begin{array}{ccccc}
+x_2^1x_1^1 & x_2^1y_1^1 & x_2^1w_1^1 & \hdots & w_2^1w_1^1 \\
+x_2^2x_1^2 & x_2^2y_1^2 & x_2^2w_1^2 & \hdots & w_2^2w_1^2 \\
+\vdots & \vdots & \vdots & \vdots & \vdots  \\
+x_2^nx_1^n & x_2^ny_1^n & x_2^nw_1^n & \hdots & w_2^nw_1^n
+\end{array}\right]
+\left[\begin{array}{c}
+F_{11} \\ F_{11} \\ F_{11} \\ \vdots \\ F_{11} 
+\end{array}\right] = 0
+$$
+
+$f$ içinde $F$'nin öðeleri var. Üstteki çarpým yapýlýnca teker teker her
+satýrda eskutupsal kýsýtlamayý elde edebileceðimizi görebiliriz. $Af = 0$
+sistemi yaklaþýk olarak SVD ile çözülebilir.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def compute_fundamental(x1, x2):
-  '''Computes the fundamental matrix from corresponding points x1, x2 using
-  the 8 point algorithm.'''
   n = x1.shape[1]
-  if x2.shape[1] != n:
-    raise ValueError('Number of points do not match.')
-
-  # Normalization is done in compute_fundamental_normalized().
   A = np.zeros((n, 9))
   for i in range(n):
     A[i] = [x1[0, i] * x2[0, i],  x1[0, i] * x2[1, i],  x1[0, i] * x2[2, i],
@@ -170,44 +186,79 @@ def compute_fundamental(x1, x2):
             x1[2, i] * x2[0, i],  x1[2, i] * x2[1, i],  x1[2, i] * x2[2, i],
            ]
 
-  # Solve A*f = 0 using least squares.
   U, S, V = np.linalg.svd(A)
   F = V[-1].reshape(3, 3)
 
-  # Constrain F to rank 2 by zeroing out last singular value.
   U, S, V = np.linalg.svd(F)
   S[2] = 0
   F = np.dot(U, np.dot(np.diag(S), V))
   return F / F[2, 2]
+\end{minted}
 
+Eðer biraz önce bulunan noktalar üzerinde uygularsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
 def make_homog(points):
   return np.vstack((points, np.ones((1, points.shape[1]))))
-
 print compute_fundamental(make_homog(pts1.T),make_homog(pts2.T))
 \end{minted}
 
 \begin{verbatim}
-[[  8.29708245e-08   5.53218101e-07  -1.17004785e-03]
- [  1.08768393e-07   8.91858158e-07  -3.47847848e-03]
- [  3.12214921e-04   1.61877427e-03   1.00000000e+00]]
+[[  1.30375335e-07   1.65553204e-07  -9.29038216e-04]
+ [  5.01128878e-07   8.40553282e-07  -3.40774405e-03]
+ [  3.28488982e-05   1.58554327e-03   1.00000000e+00]]
 \end{verbatim}
+
+Üstteki hesap fena deðildir, fakat $F$ gibi kritik bir hesap için daha
+saðlam bir yaklaþým tercih ediliyor. RANSAC adý verilen yaklaþýmla verilen
+tüm eþleþme noktalarýndan ufak örneklemler toplanýr, her örneklem üzerinde
+üstteki hesap uygulanýr, ve elde edilen sonuçlara bakýlarak gerçek $F$'e
+yaklaþýp yaklaþýlmadýðý kararlarlaþtýrýlmaya çalýþýlýr. Detaylar için [1,
+sf. 291]. 
+
+OpenCV \verb!cv2.findFundamentalMat! çaðrýsýyla $F$'yi RANSAC ile
+hesaplayabilir. Ardindan $E$'yi hesaplarýz, ve $E$'yi $R,t$ parçalarýna
+ayýrýrýz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 # kamera matrisi biliniyor
 K = np.array([[2394,0,932],[0,2398,628],[0,0,1]])
 
-F, mask = cv2.findFundamentalMat(pts1,pts2)
-print F
+F, mask = cv2.findFundamentalMat(pts1,pts2,method=cv2.RANSAC, param1=3., param2=0.99)
+print 'F', F
 E = K.T.dot(F).dot(K)
-
+print 'E', E
 R1,R2,t = cv2.decomposeEssentialMat(E)
+print 'R1',R1
+print 'R2',R2
+print 't',t
 \end{minted}
 
 \begin{verbatim}
-[[ -5.44722052e-08   9.22019433e-07   1.17985628e-03]
- [ -1.26508496e-06   7.74814744e-07   1.15134028e-02]
- [ -1.29297913e-03  -1.31947419e-02   1.00000000e+00]]
+F [[  5.96322112e-08   5.60043096e-06  -2.04058699e-03]
+ [ -5.99484026e-06   1.84659966e-07   1.51380328e-02]
+ [  1.78053340e-03  -1.63463214e-02   1.00000000e+00]]
+E [[  0.34176628  32.15102128   3.66775373]
+ [-34.41525089   1.0618694   23.18100597]
+ [ -4.61718585 -26.40378644  -0.10739647]]
+R1 [[-0.29336175 -0.1052158   0.95019394]
+ [-0.13001529 -0.98029957 -0.14869019]
+ [ 0.94711927 -0.16715975  0.27390274]]
+R2 [[ 0.9950157  -0.02174197  0.09731924]
+ [ 0.02293629  0.99967452 -0.01117018]
+ [-0.09704471  0.01334665  0.99519053]]
+t [[ 0.63358512]
+ [-0.09669105]
+ [ 0.76760715]]
 \end{verbatim}
+
+Ucgenleme (Triangulation) 
+
+Simdi uc boyutta gercek nokta $X$'leri hesaplayalim. 
+
+[1, sf. 312]
+
+devam edecek
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def triangulate_point(u1, u2, P1, P2):
@@ -294,23 +345,4 @@ Kaynaklar
 
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
