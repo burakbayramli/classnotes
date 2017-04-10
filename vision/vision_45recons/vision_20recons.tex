@@ -260,14 +260,14 @@ t [[ 0.63358512]
 Üçgenleme (Triangulation) 
 
 Yer deðiþtirme, rotasyon matrislerini biliyoruz, oradan her kamera için
-yansýtma matrisleri $P,P'$'yi oluþturabiliriz. Þimdi bu matrisleri
-kullanarak üç boyutta gerçek nokta $X$'leri nasýl hesaplarýz, onu görelim
-çünkü halen elimizde sadece iki boyutlu imaj noktalarý var, 3D dünya
-noktalarý yok. $X$'leri hesaplamak için daha önce gördüðümüz direk lineer
-transform metotunun benzerini uygularýz. Bu gerekli çünkü her iki
-kameradaki yansýmadan oluþan hatalar, vs. sonucu pür analitik bir denklem
-ile uygulanacak bir üçgenleme yöntemini kesin çözmek mümkün
-olmayabilir. Alttaki durum ortaya çýkar, 
+yansýtma matrisleri $P,P'$'yi oluþturabiliriz. Peki bu matrisleri
+kullanarak üç boyutta gerçek nokta $X$'leri nasýl hesaplarýz?  Halen
+elimizde sadece iki boyutlu imaj noktalarý var, 3D dünya noktalarý
+yok. $X$'leri hesaplamak için daha önce gördüðümüz direk lineer transform
+metotunun benzerini uygularýz. Bu gerekli çünkü her iki kameradaki
+yansýmadan oluþan hatalar, vs. sonucu pür analitik bir denklem ile
+uygulanacak bir üçgenleme yöntemini kesin çözmek mümkün
+olmayabilir. Alttaki durum ortaya çýkar,
 
 \includegraphics[width=20em]{vision_20recons_07.png}
 
@@ -276,10 +276,10 @@ hatayý olabildiðince minimize etmeye uðraþmalýyýz.
 
 Birbirinin eþi olan iki piksel noktasý için elimizde $x = PX, x' = P'X$
 denklemleri var, bu denklemde $X$ ayný dikkat edersek, çünkü ayný 3D
-noktasýnýn iki kameradaki deðiþik yansýmalarý var. Bu denklemler
-birleþtirilerek bir $AX=0$ sistemi ortaya çýkartýlabilir [1, sf. 312], ve
-bu denklem minimizasyon olarak çözülebilir. Çapraz çarpým ile homojen ölçek
-faktörünü çýkartýrsak, mesela ilk imaj için
+noktasýnýn iki kameradaki deðiþik yansýmalarý var. Bu denklemleri
+birleþtirerek bir $AX=0$ sistemi ortaya çýkartabiliriz [1, sf. 312], ve bu
+sistem minimize edilebilir. Çapraz çarpým ile homojen ölçek faktörünü
+çýkartýrsak, mesela ilk imaj için
 
 $$ x \times (PX) = 0$$
 
@@ -292,7 +292,7 @@ $$ y(p^{3T}X) - (p^{2T}X) = 0 $$
 $$ x(p^{2T}X) - (p^{1T}X) = 0 $$
 
 ki $p^{iT}$ $P$ matrisinin satýrlarýdýr. Bu denklemler $X$'in öðelerine göre
-lineerdir. Bu sistemden hareketle $AX=0$'daki $A$ þöyle olur, 
+lineerdir. Bu sistemden hareketle $AX=0$'daki $A$ þöyle, 
 
 $$ A = \left[\begin{array}{c}
 xp^{3T} - p^{1T} \\ 
@@ -301,9 +301,9 @@ x'p'^{3T} - p'^{1T} \\
 y'p'^{3T} - p'^{2T} 
 \end{array}\right]$$
 
-Her iki imajdan iki denklem alýndý, toplam 4 denklem oldu. Bu denklem yine
-SVD ile ya da $AX=b$ þeklinde tekrar düzenlenip 2. derste gördüðümü sözde
-ters (pseudoinverse) ile çözülebilir. Altta bu yöntem takip edildi,
+Her iki imajdan iki denklem alýndý, toplam 4 denklem oldu. Bu denklem SVD
+ile, ya da $AX=b$ þeklinde tekrar düzenlenip 2. derste gördüðümüz sözde ters
+(pseudoinverse) ile çözülebilir. Altta bu yöntem takip edildi,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.linalg as lin
@@ -328,9 +328,10 @@ def triangulate(x1, x2, P1, P2):
   return np.array(X).T
 \end{minted}
 
-Test amaçlý olarak bilinen \verb!P1,P2! ile üçgenleme yapalým, sonra elde
-edilen üç boyutlu noktalarý kameralara yansýtalým ve baþladýðýmýz imaj
-noktalarýna uyuyor mu ona bakalým. 
+Test amaçlý olarak bilinen \verb!P1,P2! ve bilinen iki boyutlu eþliði
+bilinen noktalarý ile üçgenleme yapalým, sonra elde edilen üç boyutlu
+noktalarý kameralara yansýtalým ve baþladýðýmýz imaj noktalarýna uyuyor mu
+kontrol edelim.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 P1 = np.eye(4)
@@ -345,7 +346,7 @@ x1real = np.array([[ 0.091,  0.167,  0.231,  0.083,  0.154],
 x2real = np.array([[ 0.42 ,  0.537,  0.645,  0.431,  0.538],
                    [ 0.389,  0.375,  0.362,  0.357,  0.345],
                    [ 1.   ,  1.   ,  1.   ,  1.   ,  1.   ]])
-X = triangulate_point( x1real.T[0], x2real.T[0], P1, P2 )
+X = triangulate( x1real.T, x2real.T, P1, P2 )
 X /= X[3]
 x1 = np.dot(P1[:3],X)
 x2 = np.dot(P2[:3],X)
@@ -358,9 +359,16 @@ print 'x2', x2
 \end{minted}
 
 \begin{verbatim}
-X [  1.00277411   4.01217675  11.01977032   1.        ]
-x [ 0.09099773  0.36408896  1.        ]
-x2 [ 0.4200205   0.38890029  1.        ]
+X [[  1.00277411   2.00859585   3.01259205   1.00350223   2.01053989]
+ [  4.01217675   4.01023497   4.01743619   4.02955748   4.01893278]
+ [ 11.01977032  12.02833872  13.04162674  12.0914948   13.05493008]
+ [  1.           1.           1.           1.           1.        ]]
+x [[ 0.09099773  0.16698863  0.23099818  0.0829924   0.15400618]
+ [ 0.36408896  0.33339891  0.30804717  0.33325553  0.3078479 ]
+ [ 1.          1.          1.          1.          1.        ]]
+x2 [[ 0.4200205   0.53709008  0.64501081  0.43105574  0.5379661 ]
+ [ 0.38890029  0.37453124  0.36194221  0.35671322  0.34517828]
+ [ 1.          1.          1.          1.          1.        ]]
 \end{verbatim}
 
 Ana problemimize dönelim; þimdi ikinci kamera için ayrýþtýrmadan elde
