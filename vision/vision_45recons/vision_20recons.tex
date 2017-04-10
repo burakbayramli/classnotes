@@ -257,13 +257,53 @@ t [[ 0.63358512]
  [ 0.76760715]]
 \end{verbatim}
 
-Ucgenleme (Triangulation) 
+Üçgenleme (Triangulation) 
 
-Simdi uc boyutta gercek nokta $X$'leri hesaplayalim. 
+Yer deðiþtirme, rotasyon matrislerini biliyoruz, oradan her kamera için
+yansýtma matrisleri $P,P'$'yi oluþturabiliriz. Þimdi bu matrisleri
+kullanarak üç boyutta gerçek nokta $X$'leri nasýl hesaplarýz, onu görelim
+çünkü halen elimizde sadece iki boyutlu imaj noktalarý var, 3D dünya
+noktalarý yok. $X$'leri hesaplamak için daha önce gördüðümüz direk lineer
+transform metotunun benzerini uygularýz. Bu gerekli çünkü her iki
+kameradaki yansýmadan oluþan hatalar, vs. sonucu pür analitik bir denklem
+ile uygulanacak bir üçgenleme yöntemini kesin çözmek mümkün
+olmayabilir. Alttaki durum ortaya çýkar, 
 
-[1, sf. 312]
+\includegraphics[width=20em]{vision_20recons_07.png}
 
-devam edecek
+O zaman yaklaþýksal bir çözüm gerekli, üstteki hata ortaya çýksa da, bu
+hatayý olabildiðince minimize etmeye uðraþmalýyýz. 
+
+Birbirinin eþi olan iki piksel noktasý için elimizde $x = PX, x' = P'X$
+denklemleri var, bu denklemde $X$ ayný dikkat edersek, çünkü ayný 3D
+noktasýnýn iki kameradaki deðiþik yansýmalarý var. Bu denklemler
+birleþtirilerek bir $AX=0$ sistemi ortaya çýkartýlabilir [1, sf. 312], ve
+bu denklem minimizasyon olarak çözülebilir. Çapraz çarpým ile homojen ölçek
+faktörünü çýkartýrsak, mesela ilk imaj için
+
+$$ x \times (PX) = 0$$
+
+Bu bize üç denklem verir, 
+
+$$ x(p^{3T}X) - (p^{1T}X) = 0 $$
+
+$$ y(p^{3T}X) - (p^{2T}X) = 0 $$
+
+$$ x(p^{2T}X) - (p^{1T}X) = 0 $$
+
+ki $p^{iT}$ $P$ matrisinin satýrlarýdýr. Bu denklemler $X$'in öðelerine göre
+lineerdir. Bu sistemden hareketle $AX=0$'daki $A$ þöyle olur, 
+
+$$ A = \left[\begin{array}{c}
+xp^{3T} - p^{1T} \\ 
+yp^{3T} - p^{2T} \\
+x'p'^{3T} - p'^{1T} \\
+y'p'^{3T} - p'^{2T} 
+\end{array}\right]$$
+
+Her iki imajdan iki denklem alýndý, toplam 4 denklem oldu. Bu denklem yine
+SVD ile ya da $AX=b$ þeklinde tekrar düzenlenip 2. derste gördüðümü sözde
+ters (pseudoinverse) ile çözülebilir. Altta bu yöntem takip edildi,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.linalg as lin
@@ -286,20 +326,26 @@ def triangulate_point(u1, u2, P1, P2):
 def triangulate(x1, x2, P1, P2):
   X = [triangulate_point(x1[i, :], x2[i, :], P1, P2) for i in range(len(x1))]
   return np.array(X).T
+\end{minted}
 
+Test amaçlý olarak bilinen \verb!P1,P2! ile üçgenleme yapalým, sonra elde
+edilen üç boyutlu noktalarý kameralara yansýtalým ve baþladýðýmýz imaj
+noktalarýna uyuyor mu ona bakalým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
 P1 = np.eye(4)
 P2 = np.array([[ 0.878, -0.01 ,  0.479, -1.995],
               [ 0.01 ,  1.   ,  0.002, -0.226],
               [-0.479,  0.002,  0.878,  0.615],
               [ 0.   ,  0.   ,  0.   ,  1.   ]])
 # Homogeneous arrays
-a3xN = np.array([[ 0.091,  0.167,  0.231,  0.083,  0.154],
-                 [ 0.364,  0.333,  0.308,  0.333,  0.308],
-                 [ 1.   ,  1.   ,  1.   ,  1.   ,  1.   ]])
-b3xN = np.array([[ 0.42 ,  0.537,  0.645,  0.431,  0.538],
-                 [ 0.389,  0.375,  0.362,  0.357,  0.345],
-                 [ 1.   ,  1.   ,  1.   ,  1.   ,  1.   ]])
-X = triangulate_point( a3xN.T[0], b3xN.T[0], P1, P2 )
+x1real = np.array([[ 0.091,  0.167,  0.231,  0.083,  0.154],
+                   [ 0.364,  0.333,  0.308,  0.333,  0.308],
+                   [ 1.   ,  1.   ,  1.   ,  1.   ,  1.   ]])
+x2real = np.array([[ 0.42 ,  0.537,  0.645,  0.431,  0.538],
+                   [ 0.389,  0.375,  0.362,  0.357,  0.345],
+                   [ 1.   ,  1.   ,  1.   ,  1.   ,  1.   ]])
+X = triangulate_point( x1real.T[0], x2real.T[0], P1, P2 )
 X /= X[3]
 x1 = np.dot(P1[:3],X)
 x2 = np.dot(P2[:3],X)
@@ -316,6 +362,15 @@ X [  1.00277411   4.01217675  11.01977032   1.        ]
 x [ 0.09099773  0.36408896  1.        ]
 x2 [ 0.4200205   0.38890029  1.        ]
 \end{verbatim}
+
+Ana problemimize dönelim; þimdi ikinci kamera için ayrýþtýrmadan elde
+edilen $R,t$ sonuçlarýný kamera matrisi $K$ ile çarparak $P_2$ oluþturulmak
+lazým ($P_1$ birim matrisi, o biliniyor), ve böylece her imaj nokta eþleri
+için üçgenleme yapacaðýz. Fakat 8. derste bahsedildiði gibi $E$'nin
+ayrýþtýrmasýndan dört türlü farklý $R,t$ olasýlýðý ortaya çýkýyor, bu
+sonuçlarýn her biri denenmeli. Biz altta tüm bu seçenekleri deneyeceðiz,
+yani her biri için bir üç boyutta tekrar oluþturma yapacaðýz, ve sonuçlarý
+farklý grafiklerde göstereceðiz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 for i,P in enumerate(((R1,t),(R1,-t),(R2,t),(R2,-t))):
@@ -340,7 +395,9 @@ for i,P in enumerate(((R1,t),(R1,-t),(R2,t),(R2,-t))):
 \includegraphics[width=20em]{vision_20recons_03_2.png}
 \includegraphics[width=20em]{vision_20recons_03_3.png}
 
-
+Galiba alt saðdaki resim Alkatraz'a daha çok benziyor. Gerçek dünya
+uygulamalarýnda ``kamera önüne düþen en çok nokta hangisinde'' gibi ek
+kodlar geliþtirip gerçek 3D sonucu bu þekilde elenebiliyor. 
 
 Kaynaklar
 
