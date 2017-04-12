@@ -128,6 +128,7 @@ komut satırından işletilir.
 Kurulması gereken bazı Python paketleri (eğer Anaconda tarafından kurulmadıysa)
 
 ```
+matplotlib==2.0
 pandas
 numpy
 scipy
