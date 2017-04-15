@@ -12,8 +12,8 @@ Baþlýkta söylemi tam notasyonla vermek gerekirse;
 $$ F_X(X) \sim U(0,1) $$
 
 Yani, daðýlýmý her ne olursa olsun, bu daðýlýmdan gelen bir rasgele
-deðiþkenin deðerlerini o daðýlýmýn kumulatif daðýlým fonksiyonuna (cdf)
-geçersek, elde edilen deðerler (yeni bir rasgele deðiþken) $U(0,1)$ olarak,
+deðiþkenin deðerlerini o daðýlýmýn kümülatif daðýlým fonksiyonuna (cdf)
+geçersek, elde edilen deðerler yeni bir rasgele deðiþken $U(0,1)$ olarak,
 yani birörnek (uniform) olarak daðýlacaktýr!  Müthiþ bir sonuç. Bu metot
 simülasyonda Ters Transform Metotu (Inverse Transform Method) olarak
 geçiyor.
@@ -67,7 +67,7 @@ formu mevcut deðildir. Ya da çok daha çetrefil, çok boyutlu daðýlýmlar
 durumunda da bu mümkün olmayabilir. Bu tür durumlar için baþka yöntemler
 var, Markov Zinciri Monte Carlo (MCMC) yöntemleri mesela, ya da daha basit
 Kabul-Reddet (Accept-Rejection) yöntemi... Daðýlýmlarý simüle etme
-konusunun arkasýnda derin bir literatur var, baþlangýç olarak [2].
+konusunun arkasýnda derin bir literatür var [2].
 
 Peki $U$ Nereden Geliyor? 
 
@@ -110,7 +110,7 @@ sayý ürettik. Genel olarak tam periyot iyi bir þeydir. Eðer
 
 $$ Z_i = (5 Z_{i-1} + 1) \bmod 7$$
 
-seçseydik, $Z_0=1$ ile $1,6,3,2,4,6$ yani kut diye 6'ya döndük. Bu olmadý, tam
+seçseydik, $Z_0=1$ ile $1,6,3,2,4,6$ yani küt diye 6'ya döndük. Bu olmadý, tam
 periyot deðil. Eðer $Z_0=5$ seçseydik sonuç daha da kötü olurdu, bir sonraki
 sayý baþlangýcýn kendisi, yani 5! Bu durumda tek bir tane bile sözde rasgele
 sayý bile üretememiþ olurduk.
@@ -120,14 +120,36 @@ sayý bile üretememiþ olurduk.
 $$ Z_i = 16807 Z_{i-1} \bmod (2^{31}-1)$$
 
 Bu çok hýzlý iþleyen, tekrar edene kadar 2 milyar (dikkat: {\em milyar})
-sayýdan daha fazla sayý üretebilen bir üreteçtir. Kodu altta bulunabilir,
+sayýdan daha fazla sayý üretebilen bir üreteçtir. Kodu altta
+bulunabilir, $2^{31}-1=2147483647$ olduðunu biliyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def do_unif(ix): 
+    u = (16807*ix) % 2147483647
+    return u
+
+u = do_unif(1e7)
+print u
+u = do_unif(u)
+print u
+u = do_unif(u)
+print u
+\end{minted}
+
+\begin{verbatim}
+566275534.0
+1892860081.0
+476634709.0
+\end{verbatim}
+
+Biraz daha farklý bir yaklaþým [1], [5, sf. 215],
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def do_unif(ix): 
     k1 = int(ix/127773)
     ix = 16807*(ix - k1*127773) - k1*2836
     if ix < 0: ix = ix + 2147483647
-    u = ix*4.656612875e-10
+    u = ix*4.656612875e-10 # 1'den kucuk olmasi icin
     return ix, u
 
 ix, u = do_unif(1e7)
@@ -390,5 +412,7 @@ Kaynaklar
 [3] Shalizi, {\em Advanced Data Analysis from an Elementary Point of View}
 
 [4] {\em Thomas' Calculus, 11th Ed}
+
+[5] Schrage, {\em A Guide to Simulation}
 
 \end{document}
