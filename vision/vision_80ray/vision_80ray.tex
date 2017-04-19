@@ -1,14 +1,15 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Geriye Yansýtma (Backprojection) ile 3D Iþýn (Ray), ve Düzlem Hesabý
+Geri-Yansýtmayla 3D Iþýn Hesabý (Back-projecting a 3D Ray), ve Düzlem Mesafesi
 
 Üç boyutlu bir noktanýn iki boyuta yansýmasýnda derinlik bilgisinin
-kaybolduðunu gördük. Pek çok üç boyutlu nokta ayný piksele tekabül
-edebiliyor. Bu durumda piksel bazlý olarak mesafe ölçümünü tek bir görüntü
-üzerinden nasýl yapabiliriz? Eðer derinlik bilgisini kaybettiysek, o zaman
-resimde bilinen diðer bazý faktörleri yanyana koyarak bir uzaklýk
-hesaplayabiliriz belki. Mesela alttaki resimdeki kýrmýzý piksellerin
-mesafesini bulmak istiyorum.
+kaybolduðunu gördük, birden fazla üç boyutlu nokta ayný piksele tekabül
+edebiliyor. Bu durumda sadece piksel kullanarak obje mesafe ölçümünü tek
+bir görüntü üzerinden nasýl yapabiliriz? 
+
+Eðer derinlik bilgisini kaybettiysek o zaman resimde bilinen diðer bazý
+faktörleri yanyana koyarak bir uzaklýk hesaplayabiliriz belki. Mesela
+alttaki resimdeki kýrmýzý piksellerin mesafesini bulmak istiyorum.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from PIL import Image
@@ -35,10 +36,11 @@ plt.savefig('vision_80ray_02.png')
 
 Problem öyle ki bu piksellerin yolu temsil eden pikseller olduðunu
 biliyorum. Bu bilgiyi nasýl elde ettim? Renksel bazlý, ya da iki boyutta
-imajý parçalara bölmeyi çok iyi yapan bir algoritmam var belki, vs. Eðer bu
-bilgi elde varsa, bu bana bir þey kazandýrdý: üç boyutta bu piksellerin
-hangi düzlemden geldiðini biliyorum artýk. Bu düzlem $xy$ düzlemi, ki
-düzlem üzerinde $z=0$.
+imajý parçalara bölmeyi çok iyi yapan bir algoritmam var belki, vs. ve bu
+sayede o piksellerin caddeye ait oldugunu biliyorum. O zaman, bu bilgi elde
+varsa, bu bana bir þey kazandýrdý: üç boyutta bu piksellerin {\em hangi
+  düzlemden} geldiðini biliyorum artýk. Bu düzlem $xy$ düzlemidir, orada
+$z=0$.
 
 Bir numara daha: bir piksele bakarak onun kesin üç boyutlu yerini
 hesaplayamayabilirim. Ama bir piksele tekabül eden, onu oluþturan kamera
@@ -50,8 +52,9 @@ hesaplayabilirim.
 Mesela örnek kýrmýzý piksellerden biri $p_1$ noktasý olabilir, kamera
 merkezi $C$'den bir ýþýn fýrlatýyoruz, bu ýþýn $p_1$'i oluþturuyor ve dýþ
 dünyadaki bir $X$ noktasýna doðru gidiyor.  Þimdi bu iki fikri biraraya
-koyarsak, elde bir düzlem, bir ýþýn var; eh ikisinin kesiþtiði yer yol
-noktasýnýn üç boyutlu kordinatýdýr.
+koyarsak, elde bir düzlem, bir ýþýn var; üç boyutlu yer nasýl bulunur?
+Ikisinin kesiþtiði yer ile! Bu nokta yol noktasýnýn üç boyutlu
+kordinatýdýr.
 
 Kamera Merkezi
 
@@ -76,20 +79,10 @@ R_c & C \\
 $$
 
 $$ 
-= \left[
-\left[
-\begin{array}{c|c}
-I & C \\
-\hline
-\boldsymbol{0} & 1 \\
-\end{array}
+= \left[ 
+\left[ \begin{array}{c|c} I & C \\ \hline \boldsymbol{0} & 1 \\ \end{array}
 \right]
-\left[
-\begin{array}{c|c}
-R_c & 0 \\
-\hline
-\boldsymbol{0} & 1 \\
-\end{array}
+\left[ \begin{array}{c|c} R_c & 0 \\ \hline \boldsymbol{0} & 1 \\ \end{array}
 \right]
 \right]^{-1}
 $$
@@ -98,45 +91,21 @@ $$
 $$ 
 = 
 \left[
-\begin{array}{c|c}
-R_c & 0 \\
-\hline
-\boldsymbol{0} & 1 \\
-\end{array}
+\begin{array}{c|c} R_c & 0 \\ \hline \boldsymbol{0} & 1 \\ \end{array} 
 \right]^{-1} 
-\left[
-\begin{array}{c|c}
-I & C \\
-\hline
-\boldsymbol{0} & 1 \\
-\end{array}
+\left[ \begin{array}{c|c} I & C \\ \hline \boldsymbol{0} & 1 \\ \end{array}
 \right]^{-1}
 $$
 
 $$ = 
-\left[
-\begin{array}{c|c}
-R_c^T & 0 \\
-\hline
-\boldsymbol{0} & 1 \\
-\end{array}
+\left[\begin{array}{c|c} R_c^T & 0 \\ \hline \boldsymbol{0} & 1 \\ \end{array}
 \right]
-\left[
-\begin{array}{c|c}
-I & -C \\
-\hline
-\boldsymbol{0} & 1 \\
-\end{array}
+\left[ \begin{array}{c|c} I & -C \\ \hline \boldsymbol{0} & 1 \\ \end{array}
 \right]
 $$
 
 $$ = 
-\left[
-\begin{array}{c|c}
-R_c^T & -R_c^TC \\
-\hline
-\boldsymbol{0} & 1 \\
-\end{array}
+\left[\begin{array}{c|c} R_c^T & -R_c^TC \\ \hline \boldsymbol{0} & 1 \\ \end{array}
 \right]
 $$
 
