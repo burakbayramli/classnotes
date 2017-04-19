@@ -1,12 +1,147 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Geriye Yansitma (Backprojection) ile 3D Isin (Ray), ve Duzlem Hesabi
+Geriye Yansýtma (Backprojection) ile 3D Iþýn (Ray), ve Düzlem Hesabý
+
+Üç boyutlu bir noktanýn iki boyuta yansýmasýnda derinlik bilgisinin
+kaybolduðunu gördük. Pek çok üç boyutlu nokta ayný piksele tekabül
+edebiliyor. Bu durumda piksel bazlý olarak mesafe ölçümünü tek bir görüntü
+üzerinden nasýl yapabiliriz? Eðer derinlik bilgisini kaybettiysek, o zaman
+resimde bilinen diðer bazý faktörleri yanyana koyarak bir uzaklýk
+hesaplayabiliriz belki. 
+
+Mesela alttaki resimdeki kýrmýzý piksellerin mesafesini bulmak
+istiyorum. Problem öyle ki bu piksellerin yolu temsil eden pikseller
+olduðunu biliyorum. Bu bilgiyi nasýl elde ettim? Renksel bazlý, ya da iki
+boyutta imajý parçalara bölmeyi çok iyi yapan bir algoritmam var, vs. Þimdi
+bu bilgi bana bir þey kazandýrdý: üç boyutta bu piksellerin hangi düzlemden
+geldiðini biliyorum artýk. Bu düzlem $x-y$ düzlemi, düzlem üzerinde $z=0$. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from PIL import Image, ImageDraw
+import cv2, util
+
+im = np.array(Image.open('mitte.png'))
+plt.xlim(0,320)
+plt.ylim(240,0)
+plt.imshow(im)
+h = np.array(im).shape[0]
+
+np.random.seed(1)
+quad = np.array([[140,0],[164,90.],[212,90],[234,0]])
+util.plot_quad(quad, h, 'y')
+N = 1000 
+random_points = np.random.uniform(0, 320, (N, 2)).astype(np.int)
+random_points = random_points[random_points[:,1] < 240]
+mask = np.array([util.inside_quad(quad, p)[0] for p in random_points])
+plt.plot(random_points[mask][:,0], h-random_points[mask][:,1], 'r.')
+plt.savefig('vision_80ray_02.png')
+\end{minted}
+
+\includegraphics[width=20em]{vision_80ray_02.png}
+
+Þimdi bir numara daha: bir piksele bakarak onun kesin üç boyutlu yerini
+hesaplayamayabilirim. Ama bir piksele tekabül eden, onu oluþturan kamera
+merkezinden dünyaya doðru fýrlayan bir ýþýnýn (ray) kesin formülünü
+hesaplayabilirim. 
+
+\includegraphics[width=20em]{vision_80ray_01.png}
+
+Mesela örnek kýrmýzý piksellerden biri $p_1$ noktasý olabilir, kamera
+merkezi $C$'den bir ýþýn fýrlatýyoruz, bu ýþýn $p_1$'i oluþturuyor ve dýþ
+dünyadaki bir $X_1$ noktasýna doðru gidiyor. 
+
+Þimdi bu iki fikri biraraya koyarsak, elde bir düzlem, bir iþin var; eh
+ikisinin kesiþtiði yer yol noktasýnýn üç boyutlu kordinatýdýr.
 
 Kamera Merkezi
 
-Dis
+Dissal (exintrinsic) matrisin 
 
-\includegraphics[width=20em]{vision_80ray_01.png}
+$$ 
+\left[
+\begin{array}{c|c}
+R & \boldsymbol{t} \\
+\hline 
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]
+ = 
+\left[
+\begin{array}{c|c}
+R_c & C \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]^{-1} 
+$$
+
+$$ 
+= \left[
+\left[
+\begin{array}{c|c}
+I & C \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]
+\left[
+\begin{array}{c|c}
+R_c & 0 \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]
+\right]^{-1}
+$$
+
+
+$$ 
+= 
+\left[
+\begin{array}{c|c}
+R_c & 0 \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]^{-1} 
+\left[
+\begin{array}{c|c}
+I & C \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]^{-1}
+$$
+
+$$ = 
+\left[
+\begin{array}{c|c}
+R_c^T & 0 \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]
+\left[
+\begin{array}{c|c}
+I & -C \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]
+$$
+
+$$ = 
+\left[
+\begin{array}{c|c}
+R_c^T & -R_c^TC \\
+\hline
+\boldsymbol{0} & 1 \\
+\end{array}
+\right]
+$$
+
+
+
 
 
 
