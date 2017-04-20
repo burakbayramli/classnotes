@@ -29,8 +29,8 @@ random_points = np.random.uniform(0, 320, (N, 2)).astype(np.int)
 random_points = random_points[random_points[:,1] < 240]
 mask = np.array([util.inside_quad(quad, p)[0] for p in random_points])
 plt.plot(random_points[mask][:,0], h-random_points[mask][:,1], 'r.')
-p1idx = 44
-plt.plot(random_points[mask][p1idx,0], h-random_points[mask][p1idx,1], 'c.')
+p1 = np.array([215, 180])
+plt.plot(p1[0], p1[1], 'c.')
 plt.savefig('vision_80ray_02.png')
 \end{minted}
 
@@ -169,9 +169,8 @@ C = np.array([0., 0., 1.])
 
 p1 = [random_points[mask][p1idx,0], h-random_points[mask][p1idx,1], 1]
 p1 = np.array(p1)
-print p1
 
-X = np.dot(lin.pinv(P),np.array(p1))
+X = np.dot(lin.pinv(P),p1)
 X = X / X[3]
 XX  = np.copy(X)
 XX[1] = X[2]; XX[2] = X[1]; XX[2] = -XX[2]
@@ -194,10 +193,6 @@ ax.view_init(elev=5, azim=50)
 plt.savefig('vision_80ray_05.png')
 \end{minted}
 
-\begin{verbatim}
-[215 180   1]
-\end{verbatim}
-
 \includegraphics[width=15em]{vision_80ray_04.png}
 \includegraphics[width=15em]{vision_80ray_05.png}
 
@@ -209,8 +204,11 @@ sonsuza giden çizgi ile bir düzlem (bir nokta, bir normal ile tanýmlý)
 arasýnda kesiþmeyi hesaplayan çaðrýdýr, bkz {\em Çok Boyutlu Calculus, Ders
   5}. Üstteki gördüðümüz kýrmýzý renkli pikselleri alýp teker teker onlarýn
 ýþýnýný bulacaðýz, sonra bu çizginin $xy$ düzlemi ile kesiþmesini
-bulacaðýz. Kamera matrisi $K$'yi biliyoruz, çünkü kamerayý biz kalibre
-ettik, detaylar için [2].
+bulacaðýz. $xy$ düzlemini tanýmlamak için bir nokta, bir de normal vektör
+lazým; en basit nokta orijin, yani $(0,0,0)$, normal ise dik yukarý giden
+birim vektör $\left[\begin{array}{ccc} 0&0&1 \end{array}\right]^T$.  Kamera
+matrisi $K$'yi biliyoruz, çünkü kamerayý biz kalibre ettik, detaylar için
+[2].
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def intersect(n,V0,P0,P1):
