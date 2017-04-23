@@ -27,7 +27,6 @@ if len(sys.argv) == 1:
     ./mesquita/mesquita.pdf \
     ./rsa/rsa.pdf \
     ./street/street.pdf \
-    ./geo/geo.pdf \
     ./phd/phd.pdf \
     ./zapp/zapp.pdf \
     output ../../Dropbox/Public/skfiles/app-math-tr.pdf"
