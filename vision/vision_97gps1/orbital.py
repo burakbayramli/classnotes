@@ -102,7 +102,7 @@ def get_observer_look(sat_lon, sat_lat, sat_alt, utc_time, lon, lat, alt):
     top_e = -sin_theta * rx + cos_theta * ry
     top_z = cos_lat * cos_theta * rx + \
         cos_lat * sin_theta * ry + sin_lat * rz
-
+    r = np.sqrt(top_s**2+top_e**2+top_z**2)
     az_ = np.arctan(-top_e / top_s)
 
     az_ = np.where(top_s > 0, az_ + np.pi, az_)
@@ -111,4 +111,4 @@ def get_observer_look(sat_lon, sat_lat, sat_alt, utc_time, lon, lat, alt):
     rg_ = np.sqrt(rx * rx + ry * ry + rz * rz)
     el_ = np.arcsin(top_z / rg_)
 
-    return np.rad2deg(az_), np.rad2deg(el_)
+    return np.rad2deg(az_), np.rad2deg(el_), r
