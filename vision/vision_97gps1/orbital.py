@@ -1,47 +1,25 @@
 import datetime
 import numpy as np
 
-F = 1 / 298.257223563 # Earth flattening WGS-84
-A = 6378.137 # WGS84 Equatorial radius
+F = 1 / 298.257223563 # Dunya duzlestirme WGS-84
 MFACTOR = 7.292115E-5 
-ECC_EPS = 1.0e-6  # Too low for computing further drops.
-ECC_LIMIT_LOW = -1.0e-3
-ECC_LIMIT_HIGH = 1.0 - ECC_EPS  # Too close to 1
-ECC_ALL = 1.0e-4
 EPS_COS = 1.5e-12
-NR_EPS = 1.0e-12
-CK2 = 5.413080e-4
-CK4 = 0.62098875e-6
-E6A = 1.0e-6
-QOMS2T = 1.88027916e-9
-S = 1.01222928
-S0 = 78.0
-XJ3 = -0.253881e-5
-XKE = 0.743669161e-1
-XKMPER = 6378.135
-XMNPDA = 1440.0
-AE = 1.0
-SECDAY = 8.6400E4
-F = 1 / 298.257223563  # Earth flattening WGS-84
-A = 6378.137  # WGS84 Equatorial radius
-SGDP4_ZERO_ECC = 0
-SGDP4_DEEP_NORM = 1
-SGDP4_NEAR_SIMP = 2
-SGDP4_NEAR_NORM = 3
+F = 1 / 298.257223563  # Dunya duzlestirme WGS-84
+A = 6378.137  # WGS84 ekvotarsal cap
 
 def jdays2000(utc_time):
-    """Get the days since year 2000.
+    """2000'den itibaren gecen gunler
     """
     return _days(utc_time - datetime(2000, 1, 1, 12, 0))
     
 
 def jdays(utc_time):
-    """Get the julian day of *utc_time*.
+    """UTC zamaninini julyen zamanina degistir
     """
     return jdays2000(utc_time) + 2451545
 
 def _fdays(dt):
-    """Get the days (floating point) from *d_t*.
+    """d_t'den reel sayi bazinda gunleri al
     """
     return (dt.days +
             (dt.seconds +
@@ -58,8 +36,7 @@ def _days(dt):
         return _vdays(dt)
 
 def gmst(utc_time):
-    """Greenwich mean sidereal utc_time, in radians.
-    
+    """Greenwich mean sidereal utc_time, in radians.    
     As defined in the AIAA 2006 implementation:
     http://www.celestrak.com/publications/AIAA/2006-6753/
     """
@@ -71,7 +48,6 @@ def gmst(utc_time):
 
 def observer_position(time, lon, lat, alt):
     """Calculate observer ECI position.
-
     http://celestrak.com/columns/v02n03/
     """
     
