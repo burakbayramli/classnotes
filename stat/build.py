@@ -18,7 +18,6 @@ if len(sys.argv) == 1 :
     "./stat_powerlaw/stat_powerlaw.pdf " + \
     "./stat_predint/stat_predint.pdf " + \
     "./stat_logit/stat_logit.pdf " + \
-    "./stat_gradreg/stat_gradreg.pdf " + \
     "./stat_count/stat_count.pdf " + \
     "./stat_multlev/stat_multlev.pdf " + \
     "./stat_gauss_fusion/stat_gauss_fusion.pdf " + \
