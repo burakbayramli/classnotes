@@ -18,16 +18,16 @@ mesafeleri 20,000 kilometre (evet, yirmi bin).
 
 \includegraphics[width=15em]{sat1.jpg}
 
-Bu yazýda mesafeleri kullanýp nerede olduðumüz konusuna girmeden, ondan
-önce eðer nerede olduðumüz biliniyor olsa uyduya olan yatay açý / azimut
-(azimuth) açý ve yüksekliði (elevation) nasýl buluruz konusunu iþleyeceðiz.
+Bu yazýda mesafeleri kullanýp nerede olduðumuz konusuna girmeden eðer
+nerede olduðumuz biliniyor olsa uyduya olan yatay açý / azimut (azimuth) ve
+yüksekliði (elevation) nasýl buluruz konusunu iþleyeceðiz.
 
-Azimut ve yatay açý nedir? Yeryüzünde duruyoruz, yüzümüzü kuzeye dönelim,
-bu referans duruþu. Eðer mesela azimut 324 derece ise, doðuya doðru o kadar
-döneriz (ya da batýya 360-324 kadar dönebiliriz, farketmez), ve baþýmýzý
-yukarý doðru yükseklik açýsý kadar kaldýrýrýz, mesela 67 ise 67 derece
-yukarý doðru, ki 90 derece tam dik yukarý bakýyoruz demektir. Aþaðý yukarý
-alttaki resimdeki gibi bir durum olur, 
+Azimut nedir? Yeryüzünde duruyoruz, yüzümüzü kuzeye dönelim, bu referans
+duruþu. Eðer mesela azimut 324 derece ise, doðuya doðru o kadar döneriz (ya
+da batýya 360-324 kadar dönebiliriz, farketmez), ve baþýmýzý yukarý doðru
+yükseklik açýsý kadar kaldýrýrýz, mesela 67 ise 67 derece yukarý doðru, ki
+90 derece tam dik yukarý bakýyoruz demektir. Aþaðý yukarý alttaki resimdeki
+gibi bir durum olur,
 
 \includegraphics[width=30em]{azelzen.png}
 
@@ -38,10 +38,11 @@ alttaki resimdeki gibi bir durum olur,
 \inputminted[fontsize=\footnotesize]{python}{orbital.py}
 
 \begin{minted}[fontsize=\footnotesize]{python}
+import orbital
 from datetime import datetime
 millis = 1493036068479
 dt = datetime.fromtimestamp(millis/1000.0)
-dtj = jdays(datetime.fromtimestamp(millis/1000.0))
+dtj = orbital.jdays(datetime.fromtimestamp(millis/1000.0))
 print dtj
 \end{minted}
 
@@ -54,26 +55,14 @@ lon = 13.442383333333332
 lat = 52.483086666666665
 alt = 0
 sat_alt = 20*1000*1000
-sat_lon = -164.259351
-sat_lat = 30.518234
-az,el,r = get_observer_look(sat_lon, sat_lat, sat_alt, dt, lon, lat, alt)
-print '11', az, el, r
-sat_lon = -57.092297
-sat_lat = 1.027207
-az,el,r = get_observer_look(sat_lon, sat_lat, sat_alt, dt, lon, lat, alt)
-print '18', az, el, r 
-sat_lon = -122.123140
-sat_lat = -55.533692
-az,el,r = get_observer_look(sat_lon, sat_lat, sat_alt, dt, lon, lat, alt)
-print '16', az, el, r 
-sat_lon = 17.625305
-sat_lat = 45.299193
-az,el,r = get_observer_look(sat_lon, sat_lat, sat_alt, dt, lon, lat, alt)
-print '24', az, el, r 
-sat_lon = -102.581100
-sat_lat = 13.344068
-az,el,r = get_observer_look(sat_lon, sat_lat, sat_alt, dt, lon, lat, alt)
-print '31', az, el, r 
+
+sats = [[11,-164.259351,30.518234],[18,-57.092297,1.027207],
+        [16,-122.123140,-55.533692],[24,17.625305,45.299193],
+        [31,-102.581100,13.344068]]
+
+for (prn,sat_lon,sat_lat) in sats:
+    az,el,r = orbital.get_observer_look(sat_lon, sat_lat, sat_alt, dt, lon, lat, alt)
+    print prn, az, el, r   
 \end{minted}
 
 \begin{verbatim}
