@@ -1,12 +1,20 @@
 from datetime import datetime
 #import datetime
-import numpy as np
+import numpy as np, math
 
 F = 1 / 298.257223563 # Dunya duzlestirme WGS-84
 MFACTOR = 7.292115E-5 
 EPS_COS = 1.5e-12
 F = 1 / 298.257223563  # Dunya duzlestirme WGS-84
 A = 6378.137  # WGS84 ekvotarsal cap
+
+a = 6378137.0
+#Semiminor axis length (m)
+b = 6356752.3142
+#Ellipsoid flatness (unitless)
+f = (a - b) / a
+#Eccentricity (unitless)
+e = np.sqrt(f * (2 - f))
 
 def jdays2000(utc_time):
     return _days(utc_time - datetime(2000, 1, 1, 12, 0))
@@ -84,3 +92,30 @@ def get_observer_look(sat_lon, sat_lat, sat_alt, utc_time, lon, lat, alt):
     el_ = np.arcsin(top_z / rg_)
 
     return np.rad2deg(az_), np.rad2deg(el_), r
+
+def ecef2lla(ecef, tolerance=1e-9):
+    """Convert Earth-centered, Earth-fixed coordinates to lat, lon, alt.
+    Input: ecef - (x, y, z) in (m, m, m)
+    Output: lla - (lat, lon, alt) in (decimal degrees, decimal degrees, m)
+    """
+    #Decompose the input
+    x = ecef[0]
+    y = ecef[1]
+    z = ecef[2]
+    #Calculate lon
+    lon = math.atan2(y, x)
+    #Initialize the variables to calculate lat and alt
+    alt = 0
+    N = a
+    p = np.sqrt(x**2 + y**2)
+    lat = 0
+    previousLat = 90
+    #Iterate until tolerance is reached
+    while abs(lat - previousLat) >= tolerance:
+        previousLat = lat
+        sinLat = z / (N * (1 - e**2) + alt)
+        lat = math.atan((z + e**2 * N * sinLat) / p)
+        N = a / np.sqrt(1 - (e * sinLat)**2)
+        alt = p / math.cos(lat) - N
+    #Return the lla coordinates
+    return (np.rad2deg(lat), np.rad2deg(lon), alt)
