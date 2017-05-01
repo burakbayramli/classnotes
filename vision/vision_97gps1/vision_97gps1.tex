@@ -1,6 +1,6 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-GPS, GPS Uydularýna Olan Açýyý Bulmak
+GPS, Kullanýcý Yerini Uzaklýk ile Bulmak, GPS Uydularýna Olan Açý
 
 Küresel Konumlama Sistemi (Global Positioning System -GPS-) ile dünyada
 nerede olduðumuzu kolay bir þekilde bulabiliyoruz. GPS'in temelinde eldeki
@@ -30,9 +30,9 @@ yükseklik açýsý kadar kaldýrýrýz, mesela 67 ise 67 derece yukarý doðru, ki
 90 derece tam dik yukarý bakýyoruz demektir. Aþaðý yukarý alttaki resimdeki
 gibi bir durum olur,
 
-\includegraphics[width=30em]{azelzen.png}
+\includegraphics[width=20em]{azelzen.png}
 
-\includegraphics[width=20em]{gpstest.png}
+\includegraphics[width=15em]{gpstest.png}
 
 \includegraphics[width=40em]{waas_sats.png}
 
@@ -95,9 +95,14 @@ P(x,y,z,\tau) = P(x_0,y_0,z_0,\tau_0) +
 (\tau-\tau_0)\frac{\partial P}{\partial \tau} 
 $$
 
+$$ 
+= P_{hesap} + \frac{\partial P}{\partial x} \Delta x + 
+\frac{\partial P}{\partial y} \Delta y + 
+\frac{\partial P}{\partial z} \Delta z + 
+\frac{\partial P}{\partial \tau} \Delta \tau 
+$$
+
 \begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import scipy.linalg as lin
 
@@ -114,9 +119,8 @@ xxyyzz = [[16577402.072, 5640460.750, 20151933.185],
 
 xxyyzz = np.array(xxyyzz)
 
-pseudorange = np.array([20432524.0, 21434024.4, 24556171.0, 21315100.2, 21255217.0, 24441547.2, 23768678.3])
-
-l = pseudorange
+pseudorange = np.array([20432524.0, 21434024.4, 24556171.0, 
+                        21315100.2, 21255217.0, 24441547.2, 23768678.3])
 
 xx = xxyyzz[:,0]
 yy = xxyyzz[:,1]
@@ -124,31 +128,23 @@ zz = xxyyzz[:,2]
 x = [0, 0, 0, 0]
 A = np.ones((len(xxyyzz),4))
 for iter in range(20):
-    range = np.sqrt((x[0]-xx)**2+(x[1]-yy)**2+(x[2]-zz)**2);
-    prange = range + x[3]
-    F = prange
-    irange = 1/range;
-    dF = irange * (x[0]-xx)
-    A[:,0] = dF
-    dF = irange*(x[1]-yy);
-    A[:,1] = dF
-    dF = irange*(x[2]-zz);
-    A[:,2] = dF
-    k = l-F
-    N = A.T;
-    c = np.dot(N,k)
-    N = np.dot(N,A)
+    rng = np.sqrt((x[0]-xx)**2+(x[1]-yy)**2+(x[2]-zz)**2);
+    F = rng + x[3]
+    irange = 1/rng;
+    A[:,0] = irange*(x[0]-xx)
+    A[:,1] = irange*(x[1]-yy);
+    A[:,2] = irange*(x[2]-zz);
+    c = np.dot(A.T,pseudorange-F)
+    N = np.dot(A.T,A)
     deltahat = lin.solve(N,c)
     x = x+deltahat
     if np.max(np.abs(deltahat))<0.001: break
 
-print iter
-print x
+print 'iter', iter, x
 \end{minted}
 
 \begin{verbatim}
-4
-[ 3507889.12958827   780490.02116445  5251783.75537277    25511.14592576]
+iter 4 [ 3507889.12958827   780490.02116445  5251783.75537277    25511.14592576]
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}

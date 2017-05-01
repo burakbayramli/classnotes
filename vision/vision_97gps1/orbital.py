@@ -7,13 +7,12 @@ MFACTOR = 7.292115E-5
 EPS_COS = 1.5e-12
 F = 1 / 298.257223563  # Dunya duzlestirme WGS-84
 A = 6378.137  # WGS84 ekvotarsal cap
-
-a = 6378137.0
-#Semiminor axis length (m)
+a = 6378137.0 # tekrar
+# yari minor eksen uzunlugu (m)
 b = 6356752.3142
-#Ellipsoid flatness (unitless)
+# elipsoid duzluk (birimsiz)
 f = (a - b) / a
-#Eccentricity (unitless)
+# eksentriklik (birimsiz)
 e = np.sqrt(f * (2 - f))
 
 def jdays2000(utc_time):
@@ -23,17 +22,13 @@ def jdays(utc_time):
     return jdays2000(utc_time) + 2451545
 
 def _fdays(dt):
-    return (dt.days +
-            (dt.seconds +
-             dt.microseconds / (1000000.0)) / (24 * 3600.0))
+    return (dt.days + (dt.seconds + \
+            dt.microseconds / (1000000.0)) / (24 * 3600.0))
 
 _vdays = np.vectorize(_fdays)
 
 def _days(dt):
-    try:
-        return _fdays(dt)
-    except AttributeError:
-        return _vdays(dt)
+    return _fdays(dt)
 
 def gmst(utc_time):
     ut1 = jdays2000(utc_time) / 36525.0
@@ -94,28 +89,19 @@ def get_observer_look(sat_lon, sat_lat, sat_alt, utc_time, lon, lat, alt):
     return np.rad2deg(az_), np.rad2deg(el_), r
 
 def ecef2lla(ecef, tolerance=1e-9):
-    """Convert Earth-centered, Earth-fixed coordinates to lat, lon, alt.
-    Input: ecef - (x, y, z) in (m, m, m)
-    Output: lla - (lat, lon, alt) in (decimal degrees, decimal degrees, m)
-    """
-    #Decompose the input
     x = ecef[0]
     y = ecef[1]
     z = ecef[2]
-    #Calculate lon
     lon = math.atan2(y, x)
-    #Initialize the variables to calculate lat and alt
     alt = 0
     N = a
     p = np.sqrt(x**2 + y**2)
     lat = 0
     previousLat = 90
-    #Iterate until tolerance is reached
     while abs(lat - previousLat) >= tolerance:
         previousLat = lat
         sinLat = z / (N * (1 - e**2) + alt)
         lat = math.atan((z + e**2 * N * sinLat) / p)
         N = a / np.sqrt(1 - (e * sinLat)**2)
         alt = p / math.cos(lat) - N
-    #Return the lla coordinates
     return (np.rad2deg(lat), np.rad2deg(lon), alt)
