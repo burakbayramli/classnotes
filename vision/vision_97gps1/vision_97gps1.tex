@@ -36,6 +36,8 @@ gibi bir durum olur,
 
 \includegraphics[width=40em]{waas_sats.png}
 
+\includegraphics[width=25em]{ecef_topo.png}
+
 \inputminted[fontsize=\footnotesize]{python}{orbital.py}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -77,6 +79,10 @@ for (prn,sat_lon,sat_lat) in sats:
 
 Uzaklýktan Kullanýcý Pozisyonunu Bulmak
 
+Ayni zamanda bir GPS alicisi olan akilli cep telefonlari o an goruntude
+olan GPS uydularina olan mesafeyi hesaplayabilir. Bunu bir uydudan
+gonderilen sinyallerin erisim mesafesini hesaplayarak yaparlar; 
+
 \includegraphics[width=25em]{trilat1.png}
 
 \includegraphics[width=25em]{trilat2.png}
@@ -87,12 +93,19 @@ $$
 P^i = \sqrt{ \big( (x^i-x)^2 + (y^i-y)^2 + (z^i-z)^2  \big) } + c\tau
 $$
 
+
+$$ P_{\textrm{gözlem}} = p_{model} + \textrm{gürültü} $$
+
+$$ 
+= P(x,y,z,\tau) + v
+$$
+
 $$ 
 P(x,y,z,\tau) = P(x_0,y_0,z_0,\tau_0) + 
 (x-x_0)\frac{\partial P}{\partial x} + 
 (y-y_0)\frac{\partial P}{\partial y} + 
 (z-z_0)\frac{\partial P}{\partial z} + 
-(\tau-\tau_0)\frac{\partial P}{\partial \tau} 
+(\tau-\tau_0)\frac{\partial P}{\partial \tau}  + ...
 $$
 
 $$ 
@@ -101,6 +114,28 @@ $$
 \frac{\partial P}{\partial z} \Delta z + 
 \frac{\partial P}{\partial \tau} \Delta \tau 
 $$
+
+$$ \Delta P \equiv P_{\textrm{gözlem}} - P_{hesap} $$
+
+$$ = \frac{\partial P}{\partial x} \Delta x + 
+\frac{\partial P}{\partial y} \Delta y + 
+\frac{\partial P}{\partial z} \Delta z + 
+\frac{\partial P}{\partial \tau} \Delta \tau 
++ v
+$$
+Matris formunda yazarsak, 
+
+$$ \Delta P = \left[\begin{array}{cccc}
+\frac{\partial P}{\partial x} \Delta x & 
+\frac{\partial P}{\partial y} \Delta y & 
+\frac{\partial P}{\partial z} \Delta z & 
+\frac{\partial P}{\partial \tau} \Delta \tau
+\end{array}\right]
+\left[\begin{array}{c}
+\Delta x \\ \Delta y \\ \Delta z \\ \Delta \tau 
+\end{array}\right] + v
+$$
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import matplotlib.pyplot as plt
@@ -165,6 +200,8 @@ Kaynaklar
 [3] \url{http://celestrak.com/columns/v02n02/}
 
 [4] \url{https://github.com/pytroll/pyorbital}
+
+[5] Blewitt, {\em Basics of the GPS Technique: Observation Equations},  \url{http://www.nbmg.unr.edu/staff/pdfs/Blewitt%20Basics%20of%20gps.pdf}
 
 \end{document}
 
