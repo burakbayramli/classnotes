@@ -39,13 +39,15 @@ sayýlýyor, (0,0,0) noktasý) sistemindedir.
 
 \includegraphics[width=20em]{eci.jpg}
 
-Bu sisteme ECÝ sistemi, ya da ECEF kordinatlarý deniyor. Tabii mesela
+Bu sisteme ECI sistemi, ya da ECEF kordinatlarý deniyor. Tabii mesela
 kilometre baðlamýnda mesela (1,1,1) noktasý anlamsýz olabilir, dünyanýn
 ``içinde'', yerkabuðunun altýnda bir nokta olacaktýr, fakat dünya yüzeyi,
 ve yüzeyden daha üstteki mesela uydular için anlamlý ve kullanýþlý bir
 sistem. Daha önemlisi bu sistem bize Kartezyen geometrisi kullanmamýza izin
 verecek, ve daha ileride göreceðimiz gibi uzaklýk hesaplarýnda faydalý
-olacak.
+olacak. ECI ve alýcý bazlý kordinat sýstemlerini ayný resimde görelim,
+
+\includegraphics[width=25em]{ecef_topo.png}
 
 Hesabýn detaylarý [3]'te bulunabilir. Dünyanýn duruþunun hesabý için yýldýz
 günü (sidereal day) kavramý gerekli. Bilinen gün hesabý güneþin ayný
@@ -54,10 +56,10 @@ güneþin tekrar ayný noktada olduðu zaman bir gün geçmiþ demektir. Fakat
 astronomi hesaplarý için etrafýnda döndüðümüz güneþ deðil, daha uzaktaki
 bir noktayý merkez almak gerekebiliyor, bu daha uzaktaki noktanýn ayný
 boylamýn üzerinden iki geçiþi arasýndaki zaman bir yýldýz günüdür. Normal
-günü ile yýldýz günü arasýnda 4 dakikalýk bir fark olabilir. Yildiz gunu
-icin Julyen Tarihi kullanilir, iki an arasindaki zaman farki Julyen tarih
-farklari olarak hesaplanir. Bizim bazi olcumler aldigimiz zamani milisaniye
-olarak kaydettik, onun Julyen cevrimi de hesaplandi,
+günü ile yýldýz günü arasýnda 4 dakikalýk bir fark olabilir. Yýldýz günü
+için Jülyen Tarihi kullanýlýr, iki an arasýndaki zaman farký Jülyen tarih
+farklarý olarak hesaplanýr. Bizim bazý ölçümler aldýðýmýz zamaný milisaniye
+olarak kaydettik, onun Jülyen çevrimi de hesaplandý,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import orbital
@@ -72,7 +74,10 @@ print dtj
 2457868.09339
 \end{verbatim}
 
-Azimut, yukseklik hesaplari icin 
+Azimut, yükseklik hesaplarý için [1]'den ölçüm aldýðýmýz anda uydularýn
+nerede olduðunu bir dosyaya kaydettik. GPS uydularý PRN kodlarý ile takip
+edilir, PRN 11,18,16,24,31 için uydu enlem / boylam pozisyonlarý altta
+bulunabilir,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -93,6 +98,10 @@ PRN
 31   13.344068 -102.581100
 \end{verbatim}
 
+Ölçüm alýnan yerin kordinatlarý Berlin'de altta \verb!lat,lon!
+içinde. Þimdi bu noktadan bakýlacak olsa uydularýn hangi azimut,
+yükseklikte olacaðýnýn hesabýný yapalým,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 lon = 13.442383333333332
 lat = 52.483086666666665
@@ -111,20 +120,39 @@ PRN
 31    (298.723320912, -4.42938085218, 20006877.4437)
 dtype: object
 \end{verbatim}
-\includegraphics[width=15em]{gpstest.png}
+
+[2]'den tüm uydularýn o anda dünya üzerinde nerede olduðuna baktýk,
 
 \includegraphics[width=40em]{waas_sats.png}
 
-\includegraphics[width=25em]{ecef_topo.png}
+Peki bu hesaplarý mesela cep telefonunun aldýðý azimut, yükseklik ile
+karþýlaþtýrsak ne görürüz? 
+
+\includegraphics[width=15em]{gpstest.png}
+
+Telefonun raporladýðý rakamlar uydu ve alýcý pozisyonuna göre deðil, antene
+ve sinyale göre hesaplanýyor, GPS kitlemesi yapýlmadan da bu deðerleri bir
+GPS programýnda [7] görebiliyoruz. 11,31 fena durmuyor, fakat 18 tam ters
+yönde çýkmýþ. Telefondaki ölçümlere tam güvenilir diyemeyiz. Peki acaba
+elde yeteri kadar azimut, yükseklik ölçümü olsa ve uydu pozisyonu ile
+birleþtirince üstteki hesapta geriye doðru giderek bir alýcý pozisyonu elde
+edilebilir mi? Ýstatistiki bir yaklaþým belki bunu yapabilir. Ödev olsun!
+
+Tum kodlar
 
 \inputminted[fontsize=\footnotesize]{python}{orbital.py}
 
-
 Uzaklýktan Kullanýcý Pozisyonunu Bulmak
 
-Ayni zamanda bir GPS alicisi olan akilli cep telefonlari o an goruntude
-olan GPS uydularina olan mesafeyi hesaplayabilir. Bunu bir uydudan
-gonderilen sinyallerin erisim mesafesini hesaplayarak yaparlar; 
+Ayni zamanda bir GPS alicisi olan akilli cep telefonlari GPS uydularina
+olan mesafeyi hesaplayabilir. Bunu uydudan gonderilen sinyallerin erisim
+suresini hesaplayarak yaparlar. 
+
+\includegraphics[width=25em]{foghorn1.png}
+
+\includegraphics[width=25em]{foghorn2.png}
+
+
 
 \includegraphics[width=25em]{trilat1.png}
 
@@ -306,7 +334,8 @@ print orbital.ecef2lla(x)
 (55.796250049381591, 12.543735075055356, 73.165498103015125)
 \end{verbatim}
 
-\includegraphics[width=25em]{denmark.jpg}
+\includegraphics[width=20em]{denmark.jpg}
+
 
 Kaynaklar 
 
