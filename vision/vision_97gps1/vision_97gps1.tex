@@ -88,7 +88,6 @@ gonderilen sinyallerin erisim mesafesini hesaplayarak yaparlar;
 \includegraphics[width=25em]{trilat2.png}
 
 
-
 $$ 
 P^i = \sqrt{ \big( (x^i-x)^2 + (y^i-y)^2 + (z^i-z)^2  \big) } + c\tau
 $$
@@ -126,16 +125,62 @@ $$
 Matris formunda yazarsak, 
 
 $$ \Delta P = \left[\begin{array}{cccc}
-\frac{\partial P}{\partial x} \Delta x & 
-\frac{\partial P}{\partial y} \Delta y & 
-\frac{\partial P}{\partial z} \Delta z & 
-\frac{\partial P}{\partial \tau} \Delta \tau
+\dfrac{\partial P}{\partial x} \Delta x & 
+\dfrac{\partial P}{\partial y} \Delta y & 
+\dfrac{\partial P}{\partial z} \Delta z & 
+\dfrac{\partial P}{\partial \tau} \Delta \tau
 \end{array}\right]
 \left[\begin{array}{c}
 \Delta x \\ \Delta y \\ \Delta z \\ \Delta \tau 
 \end{array}\right] + v
 $$
 
+
+$$ 
+\begin{bmatrix}
+\Delta P^1 \\[1ex]
+\Delta P^2 \\[1ex] 
+\Delta P^3 \\[1ex] 
+\vdots \\[1ex]
+\Delta P^m 
+\end{bmatrix}
+= 
+\begin{bmatrix}
+\dfrac{\partial P^1}{\partial x} & 
+\dfrac{\partial P^1}{\partial y} & 
+\dfrac{\partial P^1}{\partial z} & 
+\dfrac{\partial P^1}{\partial \tau}
+\\[2ex]
+\dfrac{\partial P^2}{\partial x} & 
+\dfrac{\partial P^2}{\partial y} & 
+\dfrac{\partial P^2}{\partial z} & 
+\dfrac{\partial P^2}{\partial \tau}
+\\[2ex]
+\dfrac{\partial P^3}{\partial x} & 
+\dfrac{\partial P^3}{\partial y} & 
+\dfrac{\partial P^3}{\partial z} & 
+\dfrac{\partial P^3}{\partial \tau} 
+\\[2ex]
+\vdots & \vdots & \vdots & \vdots \\[2ex]
+\dfrac{\partial P^m}{\partial x} & 
+\dfrac{\partial P^m}{\partial y} & 
+\dfrac{\partial P^m}{\partial z} & 
+\dfrac{\partial P^m}{\partial \tau} 
+\end{bmatrix} 
+\begin{bmatrix}
+\Delta x \\[1ex]
+\Delta y \\[1ex] 
+\Delta z \\[1ex] 
+\Delta \tau
+\end{bmatrix} + 
+\begin{bmatrix}
+v_1 \\[1ex]
+v_2 \\[1ex] 
+v_2 \\[1ex] 
+\vdots \\[1ex] 
+v_m
+\end{bmatrix}
+$$
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import matplotlib.pyplot as plt
@@ -175,33 +220,44 @@ for iter in range(20):
     x = x+deltahat
     if np.max(np.abs(deltahat))<0.001: break
 
-print 'iter', iter, x
+print 'iter', iter
+print np.reshape(x, (4,1))
 \end{minted}
 
 \begin{verbatim}
-iter 4 [ 3507889.12958827   780490.02116445  5251783.75537277    25511.14592576]
+iter 4
+[[ 3507889.12958827]
+ [  780490.02116445]
+ [ 5251783.75537277]
+ [   25511.14592576]]
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import orbital
-print orbital.ecef2lla([3507884.948, 780492.718, 5251780.403])
+print orbital.ecef2lla(x)
 \end{minted}
 
 \begin{verbatim}
-(55.796260992402772, 12.543791525445892, 68.738843318074942)
+(55.796250049381591, 12.543735075055356, 73.165498103015125)
 \end{verbatim}
+
+\includegraphics[width=25em]{denmark.png}
 
 Kaynaklar 
 
-[1] \url{http://www.nstb.tc.faa.gov/incoming/Waas_Sv_Status.txt}
+[1] Federal Aviation Administration, {\em Uydu Pozisyonlarý}, \url{http://www.nstb.tc.faa.gov/incoming/Waas_Sv_Status.txt}
 
-[2] \url{http://www.nstb.tc.faa.gov/RT_WaasSatelliteStatus.htm}
+[2] Federal Aviation Administration, {\em WAAS Satellite Status}, \url{http://www.nstb.tc.faa.gov/RT_WaasSatelliteStatus.htm}
 
-[3] \url{http://celestrak.com/columns/v02n02/}
+[3] Kelso, {\em Orbital Coordinate Systems, Part II}, \url{http://celestrak.com/columns/v02n02/}
 
-[4] \url{https://github.com/pytroll/pyorbital}
+[4] Raspaud, {\em PyOrbital}, \url{https://github.com/pytroll/pyorbital}
 
 [5] Blewitt, {\em Basics of the GPS Technique: Observation Equations},  \url{http://www.nbmg.unr.edu/staff/pdfs/Blewitt%20Basics%20of%20gps.pdf}
+
+[6], Nielsen, {\em Least Squares Adjustment: Linear and Nonlinear Weighted Regression Analysis}, \url{http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/2804/pdf/imm2804.pdf}
+
+[7], Chartcross Limited, {\em GPS Test}, \url{https://play.google.com/store/apps/details?id=com.chartcross.gpstest}
 
 \end{document}
 
