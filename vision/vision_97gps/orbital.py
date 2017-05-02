@@ -1,5 +1,4 @@
 from datetime import datetime
-#import datetime
 import numpy as np, math
 
 F = 1 / 298.257223563 # Dunya duzlestirme WGS-84
