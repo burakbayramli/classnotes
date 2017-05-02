@@ -32,28 +32,32 @@ gibi bir durum olur,
 
 \includegraphics[width=20em]{azelzen.png}
 
-Fakat ustteki turden bir gosterim aslinda kullanici merkezli bir hesaptir,
-akat GPS uydulari, hatta kullanicinin yeri dunyayi merkez alan, daha net
-sekilde belirtmek gerekirse dunyanin merkezini merkez alan (orasi orijin
-sayiliyor, (0,0,0) noktasi) sistemindedir. 
+Fakat üstteki türden bir gösterim aslýnda kullanýcý merkezli bir hesaptýr,
+akat GPS uydularý, hatta kullanýcýnýn yeri dünyayý merkez alan, daha net
+þekilde belirtmek gerekirse dünyanýn merkezini merkez alan (orasý orijin
+sayýlýyor, (0,0,0) noktasý) sistemindedir. 
 
 \includegraphics[width=20em]{eci.jpg}
 
-Bu sisteme ECI sistemi, ya da ECEF kordinatlari deniyor. Tabii mesela
-kilometre baglaminda mesela (1,1,1) noktasi anlamsiz olabilir, dunyanin
-``icinde'', yerkabugunun altinda bir nokta olacaktir, fakat dunya yuzeyi,
-ve yuzeyden daha ustteki mesela uydular icin anlamli ve kullanisli bir
-sistem. Daha onemlisi bu sistem bize Kartezyen geometrisi kullanmamiza izin
-verecek, ve daha ileride gorecegimiz gibi uzaklik hesaplarinda faydali
+Bu sisteme ECÝ sistemi, ya da ECEF kordinatlarý deniyor. Tabii mesela
+kilometre baðlamýnda mesela (1,1,1) noktasý anlamsýz olabilir, dünyanýn
+``içinde'', yerkabuðunun altýnda bir nokta olacaktýr, fakat dünya yüzeyi,
+ve yüzeyden daha üstteki mesela uydular için anlamlý ve kullanýþlý bir
+sistem. Daha önemlisi bu sistem bize Kartezyen geometrisi kullanmamýza izin
+verecek, ve daha ileride göreceðimiz gibi uzaklýk hesaplarýnda faydalý
 olacak.
 
-\includegraphics[width=15em]{gpstest.png}
-
-\includegraphics[width=40em]{waas_sats.png}
-
-\includegraphics[width=25em]{ecef_topo.png}
-
-\inputminted[fontsize=\footnotesize]{python}{orbital.py}
+Hesabýn detaylarý [3]'te bulunabilir. Dünyanýn duruþunun hesabý için yýldýz
+günü (sidereal day) kavramý gerekli. Bilinen gün hesabý güneþin ayný
+boylamdan iki geçiþi arasýndaki zamandýr. Öðlen 12'de güneþ yukarýdadýr,
+güneþin tekrar ayný noktada olduðu zaman bir gün geçmiþ demektir. Fakat
+astronomi hesaplarý için etrafýnda döndüðümüz güneþ deðil, daha uzaktaki
+bir noktayý merkez almak gerekebiliyor, bu daha uzaktaki noktanýn ayný
+boylamýn üzerinden iki geçiþi arasýndaki zaman bir yýldýz günüdür. Normal
+günü ile yýldýz günü arasýnda 4 dakikalýk bir fark olabilir. Yildiz gunu
+icin Julyen Tarihi kullanilir, iki an arasindaki zaman farki Julyen tarih
+farklari olarak hesaplanir. Bizim bazi olcumler aldigimiz zamani milisaniye
+olarak kaydettik, onun Julyen cevrimi de hesaplandi,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import orbital
@@ -67,6 +71,55 @@ print dtj
 \begin{verbatim}
 2457868.09339
 \end{verbatim}
+
+Azimut, yukseklik hesaplari icin 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+df = pd.read_csv('Waas_Sv_Status.txt',sep='\s*',index_col=0)
+sats = [11,18,16,24,31]
+df = df.ix[sats]
+print df[['Lat','Long']]
+\end{minted}
+
+\begin{verbatim}
+           Lat        Long
+PRN                       
+11   30.518234 -164.259351
+18    1.027207  -57.092297
+16  -55.533692 -122.123140
+24   45.299193   17.625305
+31   13.344068 -102.581100
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+lon = 13.442383333333332
+lat = 52.483086666666665
+alt = 0
+sat_alt = 20*1000*1000
+print df.apply(lambda x: orbital.get_observer_look(x.Long, \
+               x.Lat, sat_alt, dt, lon, lat, alt),axis=1)
+\end{minted}
+
+\begin{verbatim}
+PRN
+11     (358.005492414, -6.99245765159, 20007166.964)
+18        (254.95693367, 12.52250143, 20004991.9173)
+16    (245.378821316, -64.1703023622, 20012088.4789)
+24     (157.451172143, 82.3085240779, 20000057.3405)
+31    (298.723320912, -4.42938085218, 20006877.4437)
+dtype: object
+\end{verbatim}
+\includegraphics[width=15em]{gpstest.png}
+
+\includegraphics[width=40em]{waas_sats.png}
+
+\includegraphics[width=25em]{ecef_topo.png}
+
+\inputminted[fontsize=\footnotesize]{python}{orbital.py}
+
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
 lon = 13.442383333333332
