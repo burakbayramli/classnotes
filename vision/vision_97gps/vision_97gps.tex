@@ -232,10 +232,13 @@ Kareler, onlarýn toplamý ve karekök iþlemi var. Üstteki denklemi, ve bu
 denklemi kullanacaðýmýz denklem sistemini bir þekilde lineerleþtirmemiz
 lazým. 
 
+Her sözde uzaklýk ölçümünü üstteki model artýk gürültü olarak gösterelim,
 
 $$ P_{\textrm{gözlem}} = p_{model} + \textrm{gürültü} $$
 
 $$ = P(x,y,z,\tau) + v $$
+
+Simdi model uzerinde cok boyutlu Taylor acilimi uygulayalim, 
 
 $$ 
 P(x,y,z,\tau) = P(x_0,y_0,z_0,\tau_0) + 
@@ -245,6 +248,12 @@ P(x,y,z,\tau) = P(x_0,y_0,z_0,\tau_0) +
 (\tau-\tau_0)\frac{\partial P}{\partial \tau}  + ...
 $$
 
+Bu açýlýmda noktalý yerlerde daha yüksek üstelli terimler var, onlarý
+atalým, geri kalanlar lineer terimler. Taylor açýlýmýni
+$x_0,y_0,z_0,\tau_0$ noktasý ``etrafýnda'' yaptýk, þimdi
+$ P(x_0,y_0,z_0,\tau_0)$'e $P_{hesap}$ diyelim, bunun sebebini birazdan
+göreceðiz, ve tüm denklem þu hale gelir,
+
 $$ 
 = P_{hesap} + \frac{\partial P}{\partial x} \Delta x + 
 \frac{\partial P}{\partial y} \Delta y + 
@@ -252,17 +261,24 @@ $$
 \frac{\partial P}{\partial \tau} \Delta \tau 
 $$
 
+Simdi
+
 $$ \Delta P \equiv P_{\textrm{gözlem}} - P_{hesap} $$
 
-$$ = \frac{\partial P}{\partial x} \Delta x + 
+diyelim, ve
+
+$$ 
+= \frac{\partial P}{\partial x} \Delta x + 
 \frac{\partial P}{\partial y} \Delta y + 
 \frac{\partial P}{\partial z} \Delta z + 
 \frac{\partial P}{\partial \tau} \Delta \tau 
 + v
 $$
+
 Matris formunda yazarsak, 
 
-$$ \Delta P = \left[\begin{array}{cccc}
+$$ 
+\Delta P = \left[\begin{array}{cccc}
 \dfrac{\partial P}{\partial x} \Delta x & 
 \dfrac{\partial P}{\partial y} \Delta y & 
 \dfrac{\partial P}{\partial z} \Delta z & 
@@ -273,6 +289,8 @@ $$ \Delta P = \left[\begin{array}{cccc}
 \end{array}\right] + v
 $$
 
+Üstteki tek bir ölçüm için. Her uydudan gelen ölçüm matriste yeni bir satýr
+oluþturur, $m$ tane ölçüm için,
 
 $$ 
 \begin{bmatrix}
@@ -320,16 +338,16 @@ v_m
 \end{bmatrix}
 $$
 
-Bu sistemi bir $b = Ax + v$ lineer sistemi olarak gorebiliriz, ki en az
-kareler yontemi sistemi cozer. $A$ matrisinin icerigi icin kismi turevlerin
-alinmasi lazim, bu turevler, mesela $P^1$ ve $x$ icin 
+Bu sistemi bir $b = Ax + v$ lineer sistemi olarak görebiliriz, ki en az
+kareler yöntemi sistemi çözer. $A$ matrisinin içeriði için kýsmi türevlerin
+alýnmasý lazým, bu türevler, mesela $P^1$ ve $x$ için 
 
 $$ 
 \frac{\partial P^1}{\partial x} = 
 \frac{x^1-x}{\sqrt{ \big( (x^i-x)^2 + (y^i-y)^2 + (z^i-z)^2  \big) }} = \frac{x^1-x}{\rho}
 $$
 
-Tum olcumler ve degiskenler icin yapalim,
+Tüm ölçümler ve deðiþkenler için yapalým,
 
 $$ 
 A = \left[\begin{array}{cccc}
@@ -341,12 +359,25 @@ A = \left[\begin{array}{cccc}
 \end{array}\right]
 $$
 
+Böylece bir $b = Ax + v$ sistemi elde ettik, $\Delta$ deðiþkenleri $x$
+oldu, $A$'yi üstte kurduk, standart en az kareler çözümünü bu sistem
+üzerinde uygulayabiliriz. 
+
+Þimdi çözülenin ne olduðuna dikkat, çözümler $\Delta$ deðiþkenleri, yani
+$x_0,y_0,z_0,\tau_0$ noktasý ile olan {\em fark}. Þimdi, bir de Taylor
+açýlýmlarýnýn püf noktasýný hatýrlayalým, bu açýlýmlar açýlým noktasý
+etrafýnda, yakýnýnda geçerlidir. O zaman nihai çözüme bir döngü içinde
+eriþmek gerekecek, yavaþ yavaþ, bir önceki çözüme ekleye ekleye. Herhangi
+bir baþlangýç noktasý mesela dünyanýn merkezi ve sýfýr yanlýlýk
+$x_0,y_0,z_0,\tau_0 = (0,0,0,0)$ ile baþlarýz, $\Delta$'larý hesaplarýz, ve
+baþlangýca ekleriz, bunlar yeni ``baþlangýç'' noktasý olur, hesabý
+tekrarlarýz, ve farklar çok ufak oluncaya kadar (çözüme yaklaþtýk) bunu
+tekrar ederiz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import matplotlib.pyplot as plt
 import scipy.linalg as lin
 
-clight = 299792458
 xtrue = [3507884.948, 780492.718, 5251780.403, 0]
 
 xxyyzz = [[16577402.072, 5640460.750, 20151933.185],
@@ -362,6 +393,14 @@ xxyyzz = np.array(xxyyzz)
 pseudorange = np.array([20432524.0, 21434024.4, 24556171.0, 
                         21315100.2, 21255217.0, 24441547.2, 23768678.3])
 
+\end{minted}
+
+Üstte örnek ölçümler görüyoruz. [6]'daki araþtýrmacý Danimarka'da bir ölçüm
+merkezinde GPS aletinden 7 tane GPS uydusuna olan sözde uzaklýðý ve bu
+uydularýn o anki yerlerini kaydetmiþ, bu kiþi acaba nerededir? Tarif edilen
+yaklaþým ile hesaplayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
 xx = xxyyzz[:,0]
 yy = xxyyzz[:,1]
 zz = xxyyzz[:,2]
@@ -392,6 +431,9 @@ iter 4
  [   25511.14592576]]
 \end{verbatim}
 
+Döngü beþ kez tekrarladý ama dünya merkezinden baþlamýþ olmamýza raðmen
+sonuca çabukça eriþti. ECEF sisteminden enlem / boylam çevirimini yapalým,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 import orbital
 print orbital.ecef2lla(x)
@@ -400,6 +442,10 @@ print orbital.ecef2lla(x)
 \begin{verbatim}
 (55.796250049381591, 12.543735075055356, 73.165498103015125)
 \end{verbatim}
+
+Bu kordinatlarý bir harita uygulamasýndan kontrol ettik; yazar Danimarka'da
+teknik üniversite yakýnlarýnda imiþ. Zaten [6] gerçek yerini de paylaþmýþ,
+üstteki çözüme çok yakýn. Sistem iþliyor demektir.
 
 \includegraphics[width=20em]{denmark.jpg}
 
