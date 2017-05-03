@@ -56,10 +56,13 @@ güneþin tekrar ayný noktada olduðu zaman bir gün geçmiþ demektir. Fakat
 astronomi hesaplarý için etrafýnda döndüðümüz güneþ deðil, daha uzaktaki
 bir noktayý merkez almak gerekebiliyor, bu daha uzaktaki noktanýn ayný
 boylamýn üzerinden iki geçiþi arasýndaki zaman bir yýldýz günüdür. Normal
-günü ile yýldýz günü arasýnda 4 dakikalýk bir fark olabilir. Yýldýz günü
-için Jülyen Tarihi kullanýlýr, iki an arasýndaki zaman farký Jülyen tarih
-farklarý olarak hesaplanýr. Bizim bazý ölçümler aldýðýmýz zamaný milisaniye
-olarak kaydettik, onun Jülyen çevrimi de hesaplandý,
+gün ile yýldýz günü arasýnda 4 dakikalýk bir fark var. Yýldýz günü hesabýný
+ve ayrýca tek reel sayý bazlý tarih kullanabilmek için için Jülyen Tarihi
+kullanýlýr, bu tarih bir baþlangýç anýndan mevcut ana olan gün
+sayýsýdýr. 
+
+Biz altta bazý ölçümler aldýðýmýz zamaný milisaniye olarak kaydettik, onun
+Jülyen çevrimi alttaki gibi hesaplanýyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import orbital
@@ -74,10 +77,9 @@ print dtj
 2457868.09339
 \end{verbatim}
 
-Azimut, yükseklik hesaplarý için [1]'den ölçüm aldýðýmýz anda uydularýn
-nerede olduðunu bir dosyaya kaydettik. GPS uydularý PRN kodlarý ile takip
-edilir, PRN 11,18,16,24,31 için uydu enlem / boylam pozisyonlarý altta
-bulunabilir,
+Azimut, yükseklik hesaplarý ölçüm aldýðýmýz anda için [1]'den uydularýn
+nerede olduðunu bir dosyaya kaydettik. GPS uydularýnýn PRN kodlarý vardýr,
+mesela PRN 11,18,16,24,31 için uydu enlem / boylam pozisyonlarý altta,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -98,9 +100,9 @@ PRN
 31   13.344068 -102.581100
 \end{verbatim}
 
-Ölçüm alýnan yerin kordinatlarý Berlin'de altta \verb!lat,lon!
-içinde. Þimdi bu noktadan bakýlacak olsa uydularýn hangi azimut,
-yükseklikte olacaðýnýn hesabýný yapalým,
+Ölçüm alýnan yerin kordinatlarý altta \verb!lat,lon!  içinde. Þimdi bu
+noktadan bakýlacak olsa (Berlin'deyiz) uydularýn hangi azimut, yükseklikte
+olacaðýnýn hesabýný yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 lon = 13.442383333333332
@@ -133,42 +135,107 @@ karþýlaþtýrsak ne görürüz?
 Telefonun raporladýðý rakamlar uydu ve alýcý pozisyonuna göre deðil, antene
 ve sinyale göre hesaplanýyor, GPS kitlemesi yapýlmadan da bu deðerleri bir
 GPS programýnda [7] görebiliyoruz. 11,31,24 fena durmuyor, fakat 18 tam
-ters yönde çýkmýþ. Telefondaki ölçümlere tam güvenilir diyemeyiz. Peki
-acaba elde yeteri kadar azimut, yükseklik ölçümü olsa ve uydu pozisyonu ile
-birleþtirince üstteki hesapta geriye doðru giderek bir alýcý pozisyonu elde
-edilebilir mi? Ýstatistiki bir yaklaþým belki bunu yapabilir. Ödev olsun!
+ters yönde çýkmýþ. Telefondaki ölçümlere tam güvenilir diyemeyiz. Zihin
+egzersizi: acaba elde yeteri kadar azimut, yükseklik ölçümü olsa ve uydu
+pozisyonu ile birleþtirince üstteki hesapta geriye doðru giderek bir alýcý
+pozisyonu elde edilebilir mi? Ýstatistiki bir yaklaþým belki bunu
+yapabilir. Ödev olsun!
 
-Tum kodlar
+Tüm kodlar
 
 \inputminted[fontsize=\footnotesize]{python}{orbital.py}
 
 Uzaklýktan Kullanýcý Pozisyonunu Bulmak
 
-Ayni zamanda bir GPS alicisi olan akilli cep telefonlari GPS uydularina
-olan mesafeyi hesaplayabilir. Bunu uydudan gonderilen sinyallerin erisim
-suresini hesaplayarak yaparlar. 
-
-\includegraphics[width=25em]{foghorn1.png}
-
-\includegraphics[width=25em]{foghorn2.png}
-
-
+Ayný zamanda bir GPS alýcýsý olan akýllý cep telefonlarý GPS uydularýna
+olan mesafeyi hesaplayabilir. Bunu uydudan gönderilen sinyallerin eriþim
+süresini hesaplayarak yaparlar. Uydulardan gelen her sinyal içinde o
+sinyalin gönderilme ani vardýr, alýcý bu zamana bakar, ve kendi elindeki
+saate bakar ve aradaki farký sinyalin hýzý ile çarparak mesafeyi
+bulur. Birden fazla yeri bilinen uyduya olan mesafelerin kesiþme noktasý
+alýcýnýn olduðu yerdir. 
 
 \includegraphics[width=25em]{trilat1.png}
 
+Yanlýz bu hesap yapýlýrken iki potansiyel problem ortaya çýkar. 
+
+Birinci problem alýcýdaki saat yanlýlýk problemi (clock bias). Denizcilikte
+sis sireni denen bir þey var, sisli durumlarda gemicileri yakýnda tehlikeli
+kayalar hakkýnda uyarmak için kullanýlýr. Örnek amaçlý olarak diyelim ki sis
+sirenini yerimizi bulmak için kullanacaðýz. Yine basitleþtirme amaçlý
+olarak tek boyutlu bir dünya düþünelim, bir çizgi üzerindeyiz, bu çizgide
+ya sola ya da saða gidebiliyoruz, sis sireni çizginin sýfýr noktasýnda. 
+
+\includegraphics[width=25em]{foghorn1.png}
+
+Sis sireninin her gün öðlen 12:00'de çalýndýðýnýn biliyoruz. Diyelim ki
+saat 12:00:10 (yani 10 saniye sonra) sireni duyduk. Üstteki çizgide
+neredeyiz? Ses hýzý 330 metre / saniye, o zaman 10 saniye sonra 3.3
+kilometre uzaktayýz. Fakat bu hesap eðer saatimiz mükemmel bir þekilde
+siren saati ile senkronize ise geçerli. Uzaktan bu senkronizasyon var mý
+yok mu bilemiyoruz, çünkü sireni duyduðumuzda saate baktýk acaba önceden 5
+saniye gerimiydik de 15 saniye sonra gelen sireni acaba 12:00:10'da gördük?
+Ya da senkronizasyon haricinde belki saatimiz daha yavaþ, ya da daha hýzlý
+iþliyor, ses havada seyahat ederken bu hýzlanma / yavaþlama ölçüme etki
+etti? 
+
+\includegraphics[width=25em]{foghorn2.png}
+
+Bu problemden kurtulmak için elimizdeki saatin yanlýlýðýný denklemlerde
+direk kullanarak onu da hesaplamak bir çözüm olabilir. Yanlýlýðý
+modelleyebiliyoruz çünkü sis sirenleri birbirleri ile mükemmel þekilde
+senkronize, ve bizim saatimizde yanlýlýk varsa bu yanlýlýk her iki siren
+için ayný. Yani yanlýþlýk olmasý önemli deðil, yanlýþlýk tutarlý ise ondan
+kurtulabiliriz! 
+
+Yanlýlýk ikinci bir bilinmeyen tabii, o zaman ikinci bir ölçüm
+lazým. Diyelim ki birinci sirenden 990 m. saðda olan ikinci bir sirenden
+saat 12:00:09'da bir sinyal aldýk. Þimdi nerede olduðumuzu bulabilir miyiz?
+Uzaklýk, daha doðrusu içinde yanlýlýk ta olduðu için, ``sözde uzaklýk
+(pseudorange)'' þöyle modellenir,
+
+$$ R_1' = v_{ses} (\Delta t_1 + \tau ) = x + v_{ses}\tau = 3300 $$
+
+$$ R_2' = v_{ses} (\Delta t_2 + \tau ) = 990 - x + \tau = 2970$$
+
+ki $\Delta t_1, \Delta t_2$ geçen zaman, $\tau$ yanlýlýk, $v_{ses}$ ses
+hýzý. Tekrar düzenlersek, 
+
+$$ x + v_{ses} \tau = 3300$$
+
+$$ x - v_{ses} \tau = -1980  $$
+
+Çözersek, 
+
+$$ \tau = 8 \textrm{ saniye} \quad x = 660 \textrm{ metre}$$
+
+Ýkinci problem kesiþme hesabý sýrasýnda ortaya çýkýyor. Yanlýlýk doðru
+modellense bile diðer pek çok sebepten dolayý uzaklýk hesabýnda eksikler
+olabilir. O zaman mükemmel kesiþme yerine alttaki durum ortaya çýkar, 
+
 \includegraphics[width=25em]{trilat2.png}
 
+1. uydu uzaklýðý normalden kýsa, 2. ve 3. uzun gelmiþ. Acaba bu
+uzaklýklarýn gürültülü bir ortamda olsak bile kesiþtiði yeri yaklaþýk bir
+þekilde bulamaz mýyýz? Hatta sistemi öyle kuralým ki ne kadar çok uydu
+ölçümü eklersek ölçüm o kadar ilerlesin, yani bir tür istatistiksel en az
+kareler (least squares) çözümü arýyoruz. 
+
+Tek problem var, alýcý ve uydu arasýndaki sözde mesafe, $P^i$ diyelim,
+gayrý-lineer bir hesap.
 
 $$ 
-P^i = \sqrt{ \big( (x^i-x)^2 + (y^i-y)^2 + (z^i-z)^2  \big) } + c\tau
+P^i = \sqrt{ \big( (x^i-x)^2 + (y^i-y)^2 + (z^i-z)^2  \big) } + \tau
 $$
+
+Kareler, onlarýn toplamý ve karekök iþlemi var. Üstteki denklemi, ve bu
+denklemi kullanacaðýmýz denklem sistemini bir þekilde lineerleþtirmemiz
+lazým. 
 
 
 $$ P_{\textrm{gözlem}} = p_{model} + \textrm{gürültü} $$
 
-$$ 
-= P(x,y,z,\tau) + v
-$$
+$$ = P(x,y,z,\tau) + v $$
 
 $$ 
 P(x,y,z,\tau) = P(x_0,y_0,z_0,\tau_0) + 
@@ -266,11 +333,11 @@ Tum olcumler ve degiskenler icin yapalim,
 
 $$ 
 A = \left[\begin{array}{cccc}
-\dfrac{x - x^1}{\rho} & \dfrac{y - y^1}{\rho} & \dfrac{z - z^1}{\rho} & c \\
-\dfrac{x - x^2}{\rho} & \dfrac{y - y^2}{\rho} & \dfrac{z - z^2}{\rho} & c \\
-\dfrac{x - x^3}{\rho} & \dfrac{y - y^3}{\rho} & \dfrac{z - z^3}{\rho} & c \\
+\dfrac{x - x^1}{\rho} & \dfrac{y - y^1}{\rho} & \dfrac{z - z^1}{\rho} & 1 \\
+\dfrac{x - x^2}{\rho} & \dfrac{y - y^2}{\rho} & \dfrac{z - z^2}{\rho} & 1 \\
+\dfrac{x - x^3}{\rho} & \dfrac{y - y^3}{\rho} & \dfrac{z - z^3}{\rho} & 1 \\
 \vdots & \vdots & \vdots & \vdots \\
-\dfrac{x - x^m}{\rho} & \dfrac{y - y^m}{\rho} & \dfrac{z - z^m}{\rho} & c 
+\dfrac{x - x^m}{\rho} & \dfrac{y - y^m}{\rho} & \dfrac{z - z^m}{\rho} & 1 
 \end{array}\right]
 $$
 
