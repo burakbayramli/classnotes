@@ -136,7 +136,8 @@ $$ K = P_{xz}P_z^{-1} $$
 Üstteki matris tersi iþlemi bir nevi oran hesabý gibi görebiliriz, o zaman
 Kalman kazancý
 
-$$ K \approx \frac{P_{xz}}{P_z^{-1}} \approx 
+$$ 
+K \approx \frac{P_{xz}}{P_z^{-1}} \approx 
 \frac{\textrm{mevcut konuma inanç}}{\textrm{ölçüme olan inanç}}
 $$
 
@@ -202,161 +203,10 @@ kullanacaðýz.
 
 Kodlar altta,
 
+\inputminted[fontsize=\footnotesize]{python}{filter.py}
+
 \begin{minted}[fontsize=\footnotesize]{python}
-def dot3(A,B,C):
-    return dot(A, dot(B,C))
-
-def logpdf(x, mean, cov):
-    flat_mean = np.asarray(mean).flatten()
-    flat_x = np.asarray(x).flatten()
-    return multivariate_normal.logpdf(flat_x, flat_mean, cov, True)
-
-def unscented_transform(sigmas, Wm, Wc, noise_cov=None,
-                        mean_fn=None, residual_fn=None):
-    kmax, n = sigmas.shape
-
-    if mean_fn is None:
-        x = np.dot(Wm, sigmas)    # dot = \Sigma^n_1 (W[k]*Xi[k])
-    else:
-        x = mean_fn(sigmas, Wm)
-
-    if residual_fn is None:
-        y = sigmas - x[np.newaxis,:]
-        P = y.T.dot(np.diag(Wc)).dot(y)
-    else:
-        P = np.zeros((n, n))
-        for k in range(kmax):
-            y = residual_fn(sigmas[k], x)
-            P += Wc[k] * np.outer(y, y)
-
-    if noise_cov is not None:
-        P += noise_cov
-
-    return (x, P)
-
-def Q_discrete_white_noise(dim, dt=1., var=1.):
-    assert dim == 2 or dim == 3
-    if dim == 2:
-        Q = np.array([[.25*dt**4, .5*dt**3],
-                      [ .5*dt**3,    dt**2]], dtype=float)
-    else:
-        Q = np.array([[.25*dt**4, .5*dt**3, .5*dt**2],
-                      [ .5*dt**3,    dt**2,       dt],
-                      [ .5*dt**2,       dt,        1]], dtype=float)
-
-    return Q * var
-
-
-class UKF(object):
-    def __init__(self, dim_x, dim_z, dt, hx, fx, points,
-                 sqrt_fn=None, x_mean_fn=None, z_mean_fn=None,
-                 residual_x=None,
-                 residual_z=None):
-
-        self.Q = eye(dim_x)
-        self.R = eye(dim_z)
-        self.x = zeros(dim_x)
-        self.P = eye(dim_x)
-        self._dim_x = dim_x
-        self._dim_z = dim_z
-        self.points_fn = points
-        self._dt = dt
-        self._num_sigmas = points.num_sigmas()
-        self.hx = hx
-        self.fx = fx
-        self.x_mean = x_mean_fn
-        self.z_mean = z_mean_fn
-        self.log_likelihood = 0.0
-
-        if sqrt_fn is None:
-            self.msqrt = cholesky
-        else:
-            self.msqrt = sqrt_fn
-
-        self.Wm, self.Wc = self.points_fn.weights()
-
-        if residual_x is None:
-            self.residual_x = np.subtract
-        else:
-            self.residual_x = residual_x
-
-        if residual_z is None:
-            self.residual_z = np.subtract
-        else:
-            self.residual_z = residual_z
-
-        self.sigmas_f = zeros((self._num_sigmas, self._dim_x))
-        self.sigmas_h = zeros((self._num_sigmas, self._dim_z))
-
-
-    def predict(self, dt=None,  UT=None, fx_args=()):
-
-        if dt is None:
-            dt = self._dt
-
-        if not isinstance(fx_args, tuple):
-            fx_args = (fx_args,)
-
-        if UT is None:
-            UT = unscented_transform
-
-        sigmas = self.points_fn.sigma_points(self.x, self.P)
-
-        for i in range(self._num_sigmas):
-            self.sigmas_f[i] = self.fx(sigmas[i], dt, *fx_args)
-
-        self.x, self.P = UT(self.sigmas_f, self.Wm, self.Wc, self.Q,
-                            self.x_mean, self.residual_x)
-
-
-    def update(self, z, R=None, UT=None, hx_args=()):
-        if z is None:
-            return
-
-        if not isinstance(hx_args, tuple):
-            hx_args = (hx_args,)
-
-        if UT is None:
-            UT = unscented_transform
-
-        if R is None:
-            R = self.R
-        elif isscalar(R):
-            R = eye(self._dim_z) * R
-
-        for i in range(self._num_sigmas):
-            self.sigmas_h[i] = self.hx(self.sigmas_f[i], *hx_args)
-
-        zp, Pz = UT(self.sigmas_h, self.Wm, self.Wc, R, self.z_mean, self.residual_z)
-
-        Pxz = zeros((self._dim_x, self._dim_z))
-        for i in range(self._num_sigmas):
-            dx = self.residual_x(self.sigmas_f[i], self.x)
-            dz =  self.residual_z(self.sigmas_h[i], zp)
-            Pxz += self.Wc[i] * outer(dx, dz)
-
-
-        self.K = dot(Pxz, inv(Pz)) 
-        self.y = self.residual_z(z, zp) 
-
-        self.x = self.x + dot(self.K, self.y)
-        self.P = self.P - dot3(self.K, Pz, self.K.T)
-
-        self.log_likelihood = logpdf(self.y, np.zeros(len(self.y)), Pz)
-
-
-    def cross_variance(self, x, z, sigmas_f, sigmas_h):
-        Pxz = zeros((sigmas_f.shape[1], sigmas_h.shape[1]))
-        N = sigmas_f.shape[0]
-        for i in range(N):
-            dx = self.residual_x(sigmas_f[i], x)
-            dz =  self.residual_z(sigmas_h[i], z)
-            Pxz += self.Wc[i] * outer(dx, dz)
-
-
-    @property
-    def likelihood(self):
-        return math.exp(self.log_likelihood)
+import filter
 
 def f_cv(x, dt):
     F = np.array([[1, dt, 0, 0],
@@ -374,12 +224,12 @@ dt = 1.0
 std_x, std_y = .3, .3
 zs = [np.array([i + randn()*std_x,i + randn()*std_y]) for i in range(100)]
 
-sigmas = util.MerweScaledSigmaPoints(4, alpha=.1, beta=2., kappa=1.)
-ukf = UKF(dim_x=4, dim_z=2, fx=f_cv,hx=h_cv, dt=dt, points=sigmas)
+sigmas = filter.MerweScaledSigmaPoints(4, alpha=.1, beta=2., kappa=1.)
+ukf = filter.UKF(dim_x=4, dim_z=2, fx=f_cv,hx=h_cv, dt=dt, points=sigmas)
 ukf.x = np.array([0., 0., 0., 0.])
 ukf.R = np.diag([0.09, 0.09])
-ukf.Q[0:2, 0:2] = Q_discrete_white_noise(2, dt=1, var=0.02)
-ukf.Q[2:4, 2:4] = Q_discrete_white_noise(2, dt=1, var=0.02)
+ukf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=1, var=0.02)
+ukf.Q[2:4, 2:4] = filter.Q_discrete_white_noise(2, dt=1, var=0.02)
 uxs = []
 for z in zs:
     ukf.predict()
@@ -505,9 +355,9 @@ ac_pos = (0., 1000.)
 ac_vel = (100., 0.)
 radar_pos = (0., 0.)
 h_radar.radar_pos = radar_pos
-points = util.MerweScaledSigmaPoints(n=3, alpha=.1, beta=2., kappa=0.)
-kf = UKF(3, 2, dt, fx=f_radar, hx=h_radar, points=points)
-kf.Q[0:2, 0:2] = Q_discrete_white_noise(2, dt=dt, var=0.1)
+points = filter.MerweScaledSigmaPoints(n=3, alpha=.1, beta=2., kappa=0.)
+kf = filter.UKF(3, 2, dt, fx=f_radar, hx=h_radar, points=points)
+kf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
 kf.Q[2,2] = 0.1
 kf.R = np.diag([range_std**2, bearing_std**2])
 kf.x = np.array([0., 90., 1100.])
@@ -593,10 +443,10 @@ def f_cv_radar(x, dt):
     [0, 0, 0, 1]], dtype=float)
     return np.dot(F, x)
 def cv_UKF(fx, hx, R_std):
-    points = util.MerweScaledSigmaPoints(n=4, alpha=.1, beta=2., kappa=-1.)
-    kf = UKF(4, len(R_std), dt, fx=fx, hx=hx, points=points)
-    kf.Q[0:2, 0:2] = Q_discrete_white_noise(2, dt=dt, var=0.1)
-    kf.Q[2:4, 2:4] = Q_discrete_white_noise(2, dt=dt, var=0.1)
+    points = filter.MerweScaledSigmaPoints(n=4, alpha=.1, beta=2., kappa=-1.)
+    kf = filter.UKF(4, len(R_std), dt, fx=fx, hx=hx, points=points)
+    kf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
+    kf.Q[2:4, 2:4] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
     kf.R = np.diag(R_std)
     kf.R = np.dot(kf.R, kf.R) # square to get rariance
     kf.x = np.array([0., 90., 1100., 0.])
