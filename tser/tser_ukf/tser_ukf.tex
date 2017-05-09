@@ -129,9 +129,13 @@ Ortalamalardaki fark x=-0.054, y=42.877
 
 \includegraphics[height=8cm]{tser_ukf_13.png}
 
-Görülüyor ki eðer Geniþletilmiþ Kalman Filtrelerinde (Extended Kalman
-Filter) olduðu gibi bir lineerizasyon yapýlsa ortaya çok büyük bir hata
-çýkacak. Fakat sigma bazlý transform kullanýrsak,
+Görülüyor ki eðer EKF ile olduðu gibi bir lineerizasyon yapýlsa ortaya çok
+büyük bir hata çýkacak. Tekrar vurgulamak gerekirse figürde görülen
+``lineerize edilmiþ ortalama'' Gaussian $\mu$'sunun gayrý lineer fonksiyona
+geçilmiþ hali, ki EKF bu þekilde iþlem yapar, diðeri Gaussian'dan alýnan
+noktalarýn gayrý-lineer fonksiyona geçildikten sonra alýnan ortalama. 
+
+Fakat sigma bazlý transform kullanýrsak,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy.random import multivariate_normal
@@ -174,8 +178,9 @@ Ortalamalardaki fark x=-0.097, y=0.549
 \includegraphics[height=8cm]{tser_ukf_12.png}
 
 Bu sonuç bana müthiþ geliyor; sadece 5 nokta kullanarak ortalamaya çok
-yakýn olarak hesaplayabildik. Eðer sigma noktalarýný üreten koda bakarsak
-göreceðiz ki bu kod gayrý-lineer fonksiyondan baðýmsýz.
+yakýn bir sonucu hesaplayabildik, ayrýca bunu gayrý lineerliðin ne
+olduðundan tamamen baðýmsýz olarak yaptýk; eðer sigma noktalarýný üreten
+koda bakarsak göreceðiz ki bu kod gayrý-lineer fonksiyondan habersiz.
 
 Filtre
 
@@ -235,6 +240,9 @@ $$ x = \bar{x} + Ky $$
 yeni kovaryans
 
 $$ P = \bar{P} - KP_zK^T $$
+
+Filtrenin iç kodlamasý hakkýnda diðer matematiksel detaylar için [1,
+sf. 382].
 
 Örnek
 
@@ -589,12 +597,12 @@ noktasýnda uçaðýn olduðu yeri bulabilirdiniz.
 Ama tek bir kerelik kesiþme bulmak, elle bu hesaplarý yapmak çok hataya
 açýk bir yaklaþým. Kalman filtrelemesi ile, ardý ardýna, özyineli olarak
 çok daha iyi hesap yapabiliriz. Problemi tarif edelim, elde iki tane
-algýlayýcý var, ve bilinen A, B istasyonlarýna olan acýyý elde ediyoruz,
+algýlayýcý var, ve bilinen A, B istasyonlarýna olan açýyý elde ediyoruz,
 
 \includegraphics[width=25em]{tser_ukf_09.png}
 
-Çemberler katlý çizildi, eðer algýlayýcýda gürültü varsa çember daha
-geniþ oluyor. Ýstasyon ile algýlayýcý arasýndaki acý (bearing) þöyle
+Çemberler katlý çizildi, eðer algýlayýcýda gürültü varsa çember çizgisi
+daha kalýn oluyor. Ýstasyon ile algýlayýcý arasýndaki açý (bearing) þöyle
 hesaplanýyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -690,9 +698,11 @@ plt.savefig('tser_ukf_11.png')
 
 \includegraphics[width=25em]{tser_ukf_11.png}
 
-Not: Filtrenin ismindeki ``unscented'' kelimesi nereden geliyor? Bu kelime
-ilk kez ``unscented transform'' baðlamýnda bu kavramý icat eden kiþi
-tarafýndan kullanýlmýþ, fakat yazar o makalede niye kelimeyi kullandýðýný
+Not: 
+
+Filtrenin ismindeki ``unscented'' kelimesi nereden geliyor? Bu kelime ilk
+kez ``unscented transform'' baðlamýnda bu kavramý icat eden kiþi tarafýndan
+kullanýlmýþ, fakat yazar o makalede niye kelimeyi kullandýðýný
 anlatmamýþ. Anlamsal olarak terimin çok uyduðu söylenemez, belki ``scent''
 kullanýmý Ýngilizce ``iz takibi'', ``iz sürme'' çaðrýþýmý yaptýðý için, bu
 filtre, örneklem bazlý parçacýk filtreleri gibi, bir hipotez peþinden
@@ -704,5 +714,7 @@ Kaynaklar
 [1] Labbe, {\em Kalman and Bayesian Filters in Python}, \url{https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python}
 
 [2] Van der Merwe, {\em Sigma-Point Kalman Filters for Probabilistic Inference in Dynamic State-Space Models, dissertation (2004)},\url{http://www.cslu.ogi.edu/publications/ps/merwe04.pdf}  
+
+[3] Julier, {\em The Scaled Unscented Transformation}, \url{https://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF}
 
 \end{document}
