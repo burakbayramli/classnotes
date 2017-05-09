@@ -73,12 +73,14 @@ class MerweScaledSigmaPoints(object):
         return 2*self.n + 1
 
     def sigma_points(self, x, P):
-        assert self.n == np.size(x), \
-            "expected size {}, but size is {}".format(self.n, np.size(x))
+        assert self.n == np.size(x), "expected size {}, but size is {}".format(
+            self.n, np.size(x))
 
         n = self.n
+
         if np.isscalar(x):
             x = np.asarray([x])
+
         if  np.isscalar(P):
             P = np.eye(n)*P
         else:
@@ -99,6 +101,7 @@ class MerweScaledSigmaPoints(object):
     def weights(self):
         n = self.n
         lambda_ = self.alpha**2 * (n +self.kappa) - n
+
         c = .5 / (n + lambda_)
         Wc = np.full(2*n + 1, c)
         Wm = np.full(2*n + 1, c)
@@ -151,29 +154,46 @@ class UKF(object):
 
     def predict(self, dt=None,  UT=None, fx_args=()):
 
-        if dt is None: dt = self._dt
-        if not isinstance(fx_args, tuple): fx_args = (fx_args,)
+        if dt is None:
+            dt = self._dt
+
+        if not isinstance(fx_args, tuple):
+            fx_args = (fx_args,)
+
+        if UT is None:
+            UT = unscented_transform
+
         sigmas = self.points_fn.sigma_points(self.x, self.P)
+
         for i in range(self._num_sigmas):
             self.sigmas_f[i] = self.fx(sigmas[i], dt, *fx_args)
 
-        self.x, self.P = UT(self.sigmas_f, self.Wm, self.Wc, self.Q,
-                            self.x_mean, self.residual_x)
+        self.x, self.P = unscented_transform(self.sigmas_f,
+                                             self.Wm,
+                                             self.Wc,
+                                             self.Q,
+                                             self.x_mean,
+                                             self.residual_x)
 
 
     def update(self, z, R=None, UT=None, hx_args=()):
-        if z is None: return
-        if not isinstance(hx_args, tuple): hx_args = (hx_args,)
-        if R is None: R = self.R
-        elif isscalar(R): R = eye(self._dim_z) * R
+        if z is None:
+            return
+
+        if not isinstance(hx_args, tuple):
+            hx_args = (hx_args,)
+
+        if R is None:
+            R = self.R
+        elif isscalar(R):
+            R = eye(self._dim_z) * R
 
         for i in range(self._num_sigmas):
             self.sigmas_h[i] = self.hx(self.sigmas_f[i], *hx_args)
 
         zp, Pz = unscented_transform(self.sigmas_h,
                                      self.Wm,
-                                     self.Wc,
-                                     R,
+                                     self.Wc, R,
                                      self.z_mean,
                                      self.residual_z)
 
@@ -186,8 +206,10 @@ class UKF(object):
 
         self.K = dot(Pxz, inv(Pz)) 
         self.y = self.residual_z(z, zp) 
+
         self.x = self.x + dot(self.K, self.y)
         self.P = self.P - dot3(self.K, Pz, self.K.T)
+
         self.log_likelihood = logpdf(self.y, np.zeros(len(self.y)), Pz)
 
 
