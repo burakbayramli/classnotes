@@ -156,17 +156,10 @@ class UKF(object):
 
 
     def update(self, z, R=None, UT=None, hx_args=()):
-        if z is None:
-            return
-
-        if not isinstance(hx_args, tuple):
-            hx_args = (hx_args,)
-
-        if R is None:
-            R = self.R
-        elif isscalar(R):
-            R = eye(self._dim_z) * R
-
+        if z is None: return
+        if not isinstance(hx_args, tuple): hx_args = (hx_args,)
+        if R is None: R = self.R
+        elif isscalar(R): R = eye(self._dim_z) * R
         for i in range(self._num_sigmas):
             self.sigmas_h[i] = self.hx(self.sigmas_f[i], *hx_args)
 
