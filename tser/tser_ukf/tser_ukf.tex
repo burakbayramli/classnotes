@@ -576,26 +576,26 @@ takip baþarýlý.
 
 Birden Fazla Pozisyon Verisini Birleþtirmek 
 
-GPS'ten icat edilmeden önce gemiler ve uçaklar uzaklýk ve açý üzerinden
-konum bulma sistemleri kullanýrlardý, VOR sistemi bunlardan biriydi. Mesela
-bir uçakta iki tane VOR alýcýsý olabilirdi, pilot bu alýcýlardan her birini
-farklý bir istasyona (radyoda doðru frekans ile kanal bulmak gibi herhalde)
-ayarlardý, ve her VOR alýcýsý ``radyal (radial)'' denen bir bilgiyi
+GPS icat edilmeden önce gemiler ve uçaklar uzaklýk ve açý üzerinden konum
+bulma sistemleri kullanýrlardý, VOR sistemi bunlardan biriydi. Mesela bir
+uçakta iki tane VOR alýcýsý olabilirdi, pilot bu alýcýlardan her birini
+farklý bir istasyona ayarlardý (radyoda doðru frekans ile kanal bulmak gibi
+herhalde), ve her VOR alýcýsý ``radyal (radial)'' denen bir bilgiyi
 verirdi, bu bilgi VOR istasyonunun alýcýya olan açýsýydý. Bu iki radyalý,
 istasyon sinyal uzaklýk kapasitesini kullanýp onun etrafýnda bir çember
 çizerek, istasyonlarýn bilinen yerlerini kullanarak, ve çemberlerin kesiþme
-noktasýnda uçaðýn olduðu yeri bulabilirdiniz. Ama tek bir kerelik kesiþme
-bulmak, elle bu hesaplarý yapmak çok hataya açýk bir yaklaþým. Kalman
-filtrelemesi ile çok daha iyi hesap yapabiliriz.
+noktasýnda uçaðýn olduðu yeri bulabilirdiniz. 
 
-Problemi tarif edelim, elde iki tane algýlayýcý var, ve bilinen A, B
-istasyonlarýna olan açýyý elde ediyoruz,
+Ama tek bir kerelik kesiþme bulmak, elle bu hesaplarý yapmak çok hataya
+açýk bir yaklaþým. Kalman filtrelemesi ile, ardý ardýna, özyineli olarak
+çok daha iyi hesap yapabiliriz. Problemi tarif edelim, elde iki tane
+algýlayýcý var, ve bilinen A, B istasyonlarýna olan acýyý elde ediyoruz,
 
 \includegraphics[width=25em]{tser_ukf_09.png}
 
-Cemberler iki katli, eger algilayicida gurultu varsa cemberin daha genis
-oluyor. Istasyon ile algilayici arasindaki aci (bearing) soyle
-hesaplaniyor,
+Çemberler katlý çizildi, eðer algýlayýcýda gürültü varsa çember daha
+geniþ oluyor. Ýstasyon ile algýlayýcý arasýndaki acý (bearing) þöyle
+hesaplanýyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def bearing(sensor, target_pos):
@@ -604,8 +604,8 @@ def bearing(sensor, target_pos):
 
 \end{minted}
 
-Filtre her guncelleme icin bir vektor icinde farkli iki algilayicidan gelen
-iki tane olcum aliyor,
+Filtre her güncelleme için bir vektör içinde farklý iki algýlayýcýdan gelen
+iki tane ölçüm alýyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def measurement(A_pos, B_pos, pos):
@@ -614,7 +614,7 @@ def measurement(A_pos, B_pos, pos):
     return [angle_a, angle_b]
 \end{minted}
 
-Simdi filtrelemeyi yapalim,
+Þimdi filtrelemeyi yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy.random import randn
@@ -679,9 +679,9 @@ gerçeðe oldukca yakýn hesabý elde etmeye baþlýyoruz. Þimdi, problemin
 gayrý-lineerliðini iyi gözlemlemek için hedefi iki istasyon arasýna, ayný
 y-ekseninde olacak þekilde koyacaðým, bu sigma ortalamalarýndaki
 gayrý-lineerliði daha çok ortaya çýkartacak, çünkü açý sýfýr derece
-etrafýnda olacak. Acý sýfýr altýna inmeye baþlayýnca birdenbire çok büyük
-bir açý hesaplanýyor olacak tabii, çünkü orada $2\pi$ açýsý var. Bu tabii
-ki filtrenin iþleyiþini oldukca bozacak, 
+etrafýnda olacak, ama açý sýfýr altýna inmeye baþlayýnca birdenbire çok
+büyük bir açý hesaplanýyor olacak tabii, çünkü orada $2\pi$ açýsý var. Bu
+tabii ki filtrenin iþleyiþini oldukca bozuyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 run_vor_filter(target_pos = [100, 0])
