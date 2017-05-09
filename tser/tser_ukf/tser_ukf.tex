@@ -91,6 +91,92 @@ uygulama için tasarýmcý buna karar verir, altta bazý örnekler görülüyor,
 Fakat endüstri sigmayý ve aðýrlýklarýný seçmek için 2005'ten itibaren
 [2]'deki yöntemi kabul etmiþ görünüyor.
 
+Trasform Örneði
+
+Alttaki gibi bir gayrý-lineer fonksiyon
+
+$$ 
+\left\{ \begin{array}{ll}
+x = x + y \\
+y = 0.1 x^2 + y^2
+\end{array} \right.
+$$
+
+olsun, bu fonksiyona  alttaki çok boyutlu Gaussian'dan örneklenmiþ
+noktalarý geçeceðiz, 
+
+$$ 
+\mu = \left[\begin{array}{r} 0 \\ 0 \end{array}\right],
+\quad 
+\Sigma = \left[\begin{array}{rr} 32 & 15 \\ 15 & 40 \end{array}\right]
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+mean = (0, 0)
+p = np.array([[32, 15], [15., 40.]])
+# Compute linearized mean
+mean_fx = f_nonlinear_xy(*mean)
+
+#generate random points
+xs, ys = multivariate_normal(mean=mean, cov=p, size=10000).T
+util.plot_monte_carlo_mean(xs, ys, f_nonlinear_xy, mean_fx, 'Lineerize Edilmis Ortalama');
+plt.savefig('tser_ukf_13.png')
+\end{minted}
+
+\begin{verbatim}
+Ortalamalardaki fark x=-0.054, y=42.877
+\end{verbatim}
+
+\includegraphics[height=8cm]{tser_ukf_13.png}
+
+Görülüyor ki eðer Geniþletilmiþ Kalman Filtrelerinde (Extended Kalman
+Filter) olduðu gibi bir lineerizasyon yapýlsa ortaya çok büyük bir hata
+çýkacak. Fakat sigma bazlý transform kullanýrsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from numpy.random import multivariate_normal
+import util
+
+def f_nonlinear_xy(x, y):
+    return np.array([x + y, .1*x**2 + y*y])
+
+#initial mean and covariance
+mean = (0, 0)
+p = np.array([[32., 15], [15., 40.]])
+
+# create sigma points - we will learn about this later
+points = filter.MerweScaledSigmaPoints(n=2, alpha=.3, beta=2., kappa=.1)
+Wm, Wc = points.weights()
+sigmas = points.sigma_points(mean, p)
+
+### gayri-lineer fonksiyondan gecir
+sigmas_f = np.empty((5, 2))
+for i in range(5):
+    sigmas_f[i] = f_nonlinear_xy(sigmas[i, 0], sigmas[i ,1])
+
+### sigma bazli transform ile yeni ortalama ve kovaryansi hesapla
+ukf_mean, ukf_cov = filter.unscented_transform(sigmas_f, Wm, Wc)
+
+# rasgele noktalar uret
+np.random.seed(100)
+xs, ys = multivariate_normal(mean=mean, cov=p, size=5000).T
+util.plot_monte_carlo_mean(xs, ys, f_nonlinear_xy, ukf_mean, 'Sigma Bazli Ortalama')
+plt.xlim(-30, 30); plt.ylim(0, 90)
+plt.subplot(121)
+plt.scatter(sigmas[:,0], sigmas[:,1], c='r', s=30);
+plt.savefig('tser_ukf_12.png')
+\end{minted}
+
+\begin{verbatim}
+Ortalamalardaki fark x=-0.097, y=0.549
+\end{verbatim}
+
+\includegraphics[height=8cm]{tser_ukf_12.png}
+
+Bu sonuç bana müthiþ geliyor; sadece 5 nokta kullanarak ortalamaya çok
+yakýn olarak hesaplayabildik. Eðer sigma noktalarýný üreten koda bakarsak
+göreceðiz ki bu kod gayrý-lineer fonksiyondan baðýmsýz.
+
 Filtre
 
 UKF formüllerine bakalým. Geçiþ ve gözlemin $f,h$ olduðunu

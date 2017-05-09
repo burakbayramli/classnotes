@@ -1,8 +1,10 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 import math
+import scipy.stats
 import numpy as np
 from numpy import eye, zeros, dot, isscalar, outer
 from scipy.linalg import inv, cholesky
@@ -71,3 +73,49 @@ def plot_covariance_ellipse(mean, cov=None, variance = 1.0, std=None,
 def arrow(x1,y1,x2,y2, width=0.2):
     return Arrow(x1,y1, x2-x1, y2-y1, lw=1, width=width, ec='k', color='k')
 
+def plot_bivariate_colormap(xs, ys):
+    xs = np.asarray(xs)
+    ys = np.asarray(ys)
+    xmin = xs.min()
+    xmax = xs.max()
+    ymin = ys.min()
+    ymax = ys.max()
+    values = np.vstack([xs, ys])
+    kernel = scipy.stats.gaussian_kde(values)
+    X, Y = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
+    positions = np.vstack([X.ravel(), Y.ravel()])
+
+    Z = np.reshape(kernel.evaluate(positions).T, X.shape)
+    plt.gca().imshow(np.rot90(Z), cmap=plt.cm.Greys,
+                     extent=[xmin, xmax, ymin, ymax])
+
+
+def plot_monte_carlo_mean(xs, ys, f, mean_fx, label, plot_colormap=True):
+    fxs, fys = f(xs, ys)
+
+    computed_mean_x = np.average(fxs)
+    computed_mean_y = np.average(fys)
+    plt.subplot(121)
+    plt.gca().grid(b=False)
+
+    plot_bivariate_colormap(xs, ys)
+
+    plt.scatter(xs, ys, marker='.', alpha=0.02, color='k')
+    plt.xlim(-20, 20)
+    plt.ylim(-20, 20)
+
+    plt.subplot(122)
+    plt.gca().grid(b=False)
+
+    plt.scatter(fxs, fys, marker='.', alpha=0.02, color='k')
+    plt.scatter(mean_fx[0], mean_fx[1],
+                marker='v', s=300, c='r', label=label)
+    plt.scatter(computed_mean_x, computed_mean_y,
+                marker='*',s=120, c='b', label='Hesaplanan Ortalama')
+
+    plot_bivariate_colormap(fxs, fys)
+    plt.ylim([-10, 200])
+    plt.xlim([-100, 100])
+    plt.legend(loc='best', scatterpoints=1)
+    print ('Ortalamalardaki fark x={:.3f}, y={:.3f}'.format(
+           computed_mean_x-mean_fx[0], computed_mean_y-mean_fx[1]))
