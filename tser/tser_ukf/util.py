@@ -9,9 +9,7 @@ from scipy.linalg import inv, cholesky
 from numpy.random import randn
 from scipy.stats import norm, multivariate_normal
 import scipy.linalg as linalg
-from matplotlib.patches import Ellipse,Arrow
-
-
+from matplotlib.patches import Ellipse, Arrow
 
 def covariance_ellipse(P, deviations=1):
     U,s,v = linalg.svd(P)

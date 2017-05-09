@@ -218,8 +218,6 @@ def f_cv(x, dt):
 def h_cv(x):
     return np.array([x[0], x[2]])
 
-def f_nonlinear_xy(x, y):
-    return np.array([x + y, .1*x**2 + y*y])
 dt = 1.0
 std_x, std_y = .3, .3
 zs = [np.array([i + randn()*std_x,i + randn()*std_y]) for i in range(100)]
@@ -489,6 +487,122 @@ UKF ile hesaplanan irtifa: 2432.9
 
 Görüldüðü gibi irtifa tahmini daha zor hale geldi, bolca gürültü var, fakat
 takip baþarýlý. 
+
+Birden Fazla Pozisyon Verisini Birleþtirmek 
+
+GPS'ten icat edilmeden önce gemiler ve uçaklar uzaklýk ve açý üzerinden
+konum bulma sistemleri kullanýrlardý, VOR sistemi bunlardan biriydi. Mesela
+bir uçakta iki tane VOR alýcýsý olabilirdi, pilot bu alýcýlardan her birini
+farklý bir istasyona (radyoda doðru frekans ile kanal bulmak gibi herhalde)
+ayarlardý, ve her VOR alýcýsý ``radyal (radial)'' denen bir bilgiyi
+verirdi, bu bilgi VOR istasyonunun alýcýya olan açýsýydý. Bu iki radyalý,
+istasyon sinyal uzaklýk kapasitesini kullanýp onun etrafýnda bir çember
+çizerek, istasyonlarýn bilinen yerlerini kullanarak, ve çemberlerin kesiþme
+noktasýnda uçaðýn olduðu yeri bulabilirdiniz. Ama tek bir kerelik kesiþme
+bulmak, elle bu hesaplarý yapmak çok hataya açýk bir yaklaþým. Kalman
+filtrelemesi ile çok daha iyi hesap yapabiliriz.
+
+Problemi tarif edelim, elde iki tane algýlayýcý var, ve bilinen A, B
+istasyonlarýna olan açýyý elde ediyoruz,
+
+\includegraphics[width=25em]{tser_ukf_09.png}
+
+Cemberler iki katli, eger algilayicida gurultu varsa cemberin daha genis
+oluyor. Istasyon ile algilayici arasindaki aci (bearing) soyle
+hesaplaniyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bearing(sensor, target_pos):
+    return math.atan2(target_pos[1] - sensor[1], 
+                      target_pos[0] - sensor[0])
+
+\end{minted}
+
+Filtre her guncelleme icin bir vektor icinde farkli iki algilayicidan gelen
+iki tane olcum aliyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def measurement(A_pos, B_pos, pos):
+    angle_a = bearing(A_pos, pos)
+    angle_b = bearing(B_pos, pos)
+    return [angle_a, angle_b]
+\end{minted}
+
+Simdi filtrelemeyi yapalim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from numpy.random import randn
+import math, filter
+
+def fx_VOR(x, dt):
+    x[0] += x[1] * dt
+    x[2] += x[3] * dt
+    return x
+
+sa_pos = [-400, 0]
+sb_pos = [400, 0]
+
+def hx_VOR(x):
+    # measurement to A
+    pos = (x[0], x[2])
+    return measurement(sa_pos, sb_pos, pos)
+
+def run_vor_filter(target_pos):
+    np.random.seed(123)
+    std_noise = math.radians(0.5)
+    Q = 1.0
+    dt=0.1
+    kappa=0.0
+    points = filter.MerweScaledSigmaPoints(n=4, alpha=.1, beta=2., kappa=kappa)
+    f = filter.UKF(dim_x=4, dim_z=2, dt=dt, hx=hx_VOR, fx=fx_VOR, points=points)
+    f.x = np.array([target_pos[0], 1., target_pos[1], 1.])
+
+    q = filter.Q_discrete_white_noise(2, dt, Q)
+    f.Q[0:2, 0:2] = q
+    f.Q[2:4, 2:4] = q
+    f.R *= std_noise**2
+    f.P *= 1000    
+
+    xs, txs = [], []
+    for i in range(300):
+        target_pos[0] += 1 + randn()*0.0001
+        target_pos[1] += 1 + randn()*0.0001
+        txs.append((target_pos[0], target_pos[1]))
+
+        z = measurement(sa_pos, sb_pos, target_pos)
+        z[0] += randn() * std_noise
+        z[1] += randn() * std_noise
+
+        f.predict()
+        f.update(z)
+        xs.append(f.x)
+
+    xs = np.asarray(xs)
+    txs = np.asarray(txs)
+    plt.plot(xs[:, 0], xs[:, 2])
+    plt.plot(txs[:, 0], txs[:, 1])
+
+run_vor_filter(target_pos = [100, 200])
+plt.savefig('tser_ukf_10.png')
+\end{minted}
+
+\includegraphics[width=25em]{tser_ukf_10.png}
+
+Sonuç oldukca iyi. Baþlangýçta biraz hata var ama hata hemen düzeliyor, ve
+gerçeðe oldukca yakýn hesabý elde etmeye baþlýyoruz. Þimdi, problemin
+gayrý-lineerliðini iyi gözlemlemek için hedefi iki istasyon arasýna, ayný
+y-ekseninde olacak þekilde koyacaðým, bu sigma ortalamalarýndaki
+gayrý-lineerliði daha çok ortaya çýkartacak, çünkü açý sýfýr derece
+etrafýnda olacak. Acý sýfýr altýna inmeye baþlayýnca birdenbire çok büyük
+bir açý hesaplanýyor olacak tabii, çünkü orada $2\pi$ açýsý var. Bu tabii
+ki filtrenin iþleyiþini oldukca bozacak, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+run_vor_filter(target_pos = [100, 0])
+plt.savefig('tser_ukf_11.png')
+\end{minted}
+
+\includegraphics[width=25em]{tser_ukf_11.png}
 
 Not: Filtrenin ismindeki ``unscented'' kelimesi nereden geliyor? Bu kelime
 ilk kez ``unscented transform'' baðlamýnda bu kavramý icat eden kiþi
