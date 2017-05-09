@@ -73,13 +73,9 @@ class MerweScaledSigmaPoints(object):
 
         n = self.n
 
-        if np.isscalar(x):
-            x = np.asarray([x])
-
-        if  np.isscalar(P):
-            P = np.eye(n)*P
-        else:
-            P = np.asarray(P)
+        if np.isscalar(x): x = np.asarray([x])
+        if  np.isscalar(P): P = np.eye(n)*P
+        else: P = np.asarray(P)
 
         lambda_ = self.alpha**2 * (n + self.kappa) - n
         U = cholesky((lambda_ + n)*P)
@@ -102,7 +98,6 @@ class MerweScaledSigmaPoints(object):
         Wm = np.full(2*n + 1, c)
         Wc[0] = lambda_ / (n + lambda_) + (1 - self.alpha**2 + self.beta)
         Wm[0] = lambda_ / (n + lambda_)
-
         return Wm, Wc
 
 class UKF(object):
@@ -143,14 +138,9 @@ class UKF(object):
 
     def predict(self, dt=None,  UT=None, fx_args=()):
 
-        if dt is None:
-            dt = self._dt
+        if dt is None: dt = self._dt
 
-        if not isinstance(fx_args, tuple):
-            fx_args = (fx_args,)
-
-        if UT is None:
-            UT = unscented_transform
+        if not isinstance(fx_args, tuple): fx_args = (fx_args,)
 
         sigmas = self.points_fn.sigma_points(self.x, self.P)
 
