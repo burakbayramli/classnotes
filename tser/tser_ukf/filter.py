@@ -59,11 +59,6 @@ class MerweScaledSigmaPoints(object):
         self.alpha = alpha
         self.beta = beta
         self.kappa = kappa
-        if sqrt_method is None:
-            self.sqrt = cholesky
-        else:
-            self.sqrt = sqrt_method
-
         if subtract is None:
             self.subtract= np.subtract
         else:
@@ -87,7 +82,7 @@ class MerweScaledSigmaPoints(object):
             P = np.asarray(P)
 
         lambda_ = self.alpha**2 * (n + self.kappa) - n
-        U = self.sqrt((lambda_ + n)*P)
+        U = cholesky((lambda_ + n)*P)
 
         sigmas = np.zeros((2*n+1, n))
         sigmas[0] = x
@@ -112,7 +107,7 @@ class MerweScaledSigmaPoints(object):
 
 class UKF(object):
     def __init__(self, dim_x, dim_z, dt, hx, fx, points,
-                 sqrt_fn=None, x_mean_fn=None, z_mean_fn=None,
+                 x_mean_fn=None, z_mean_fn=None,
                  residual_x=None,
                  residual_z=None):
 
@@ -130,12 +125,6 @@ class UKF(object):
         self.x_mean = x_mean_fn
         self.z_mean = z_mean_fn
         self.log_likelihood = 0.0
-
-        if sqrt_fn is None:
-            self.msqrt = cholesky
-        else:
-            self.msqrt = sqrt_fn
-
         self.Wm, self.Wc = self.points_fn.weights()
 
         if residual_x is None:
