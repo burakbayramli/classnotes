@@ -135,17 +135,12 @@ class UKF(object):
         self.sigmas_h = zeros((self._num_sigmas, self._dim_z))
 
 
-    def predict(self, dt=None,  UT=None, fx_args=()):
-
-        if dt is None: dt = self._dt
-
-        if not isinstance(fx_args, tuple): fx_args = (fx_args,)
-
+    def predict(self):
         sigmas = self.points_fn.sigma_points(self.x, self.P)
-
+        
         for i in range(self._num_sigmas):
-            self.sigmas_f[i] = self.fx(sigmas[i], dt, *fx_args)
-
+            self.sigmas_f[i] = self.fx(sigmas[i], self._dt)
+            
         self.x, self.P = unscented_transform(self.sigmas_f,
                                              self.Wm,
                                              self.Wc,
@@ -154,17 +149,13 @@ class UKF(object):
                                              self.residual_x)
 
 
-    def update(self, z, R=None, UT=None, hx_args=()):
-        if z is None: return
-        if not isinstance(hx_args, tuple): hx_args = (hx_args,)
-        if R is None: R = self.R
-        elif isscalar(R): R = eye(self._dim_z) * R
+    def update(self, z):
         for i in range(self._num_sigmas):
-            self.sigmas_h[i] = self.hx(self.sigmas_f[i], *hx_args)
-
+            self.sigmas_h[i] = self.hx(self.sigmas_f[i])
         zp, Pz = unscented_transform(self.sigmas_h,
                                      self.Wm,
-                                     self.Wc, R,
+                                     self.Wc,
+                                     self.R,
                                      self.z_mean,
                                      self.residual_z)
 
