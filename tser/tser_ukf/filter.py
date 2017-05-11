@@ -137,6 +137,8 @@ class UKF(object):
     def predict(self, dt):
         sigmas = self.points_fn.sigma_points(self.x, self.P)        
         for i in range(self._num_sigmas):
+            # parametre verilen dt oldugu gibi fx'e geciliyor,
+            # yani UKF matematiginde direk kullanilmiyor
             self.sigmas_f[i] = self.fx(sigmas[i], dt)
             
         self.x, self.P = unscented_transform(self.sigmas_f,
