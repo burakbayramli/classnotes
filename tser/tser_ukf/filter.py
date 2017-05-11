@@ -139,8 +139,7 @@ class UKF(object):
         for i in range(self._num_sigmas):
             # parametre verilen dt oldugu gibi fx'e geciliyor,
             # yani UKF matematiginde direk kullanilmiyor
-            self.sigmas_f[i] = self.fx(sigmas[i], dt)
-            
+            self.sigmas_f[i] = self.fx(sigmas[i], dt)            
         self.x, self.P = unscented_transform(self.sigmas_f,
                                              self.Wm,
                                              self.Wc,
@@ -148,6 +147,19 @@ class UKF(object):
                                              self.x_mean,
                                              self.residual_x)
 
+    def predict(self, dt, u):
+        sigmas = self.points_fn.sigma_points(self.x, self.P)        
+        for i in range(self._num_sigmas):
+            # parametre verilen dt oldugu gibi fx'e geciliyor,
+            # yani UKF matematiginde direk kullanilmiyor
+            self.sigmas_f[i] = self.fx(sigmas[i], dt, u)
+        self.x, self.P = unscented_transform(self.sigmas_f,
+                                             self.Wm,
+                                             self.Wc,
+                                             self.Q,
+                                             self.x_mean,
+                                             self.residual_x)
+        
 
     def update(self, z):
         for i in range(self._num_sigmas):
