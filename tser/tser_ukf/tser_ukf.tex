@@ -38,7 +38,7 @@ vermek istenebilir, diðerleri dýþ noktalarý tercih edebilir.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import math, util, scipy.linalg as linalg
+import math, util, scipy.linalg as linalg, filter
 from numpy import eye, zeros, dot, isscalar, outer
 from scipy.linalg import inv, cholesky
 from numpy.random import randn
@@ -50,7 +50,7 @@ x = np.array([0, 5])
 P = np.array([[4, -2.2], [-2.2, 3]])
 
 util.plot_covariance_ellipse(x, P, facecolor='b', alpha=0.6, variance=9,plt=plt)
-sigmas = util.MerweScaledSigmaPoints(2, alpha=.5, beta=2., kappa=0.)
+sigmas = filter.MerweScaledSigmaPoints(2, alpha=.5, beta=2., kappa=0.)
 
 S = sigmas.sigma_points(x=x, P=P)
 plt.scatter(S[:,0], S[:,1], c='k', s=80)
@@ -112,19 +112,22 @@ $$
 $$
 
 \begin{minted}[fontsize=\footnotesize]{python}
+def f_nonlinear_xy(x, y):
+    return np.array([x + y, .1*x**2 + y*y])
+
 mean = (0, 0)
 p = np.array([[32, 15], [15., 40.]])
 # Compute linearized mean
 mean_fx = f_nonlinear_xy(*mean)
 
 #generate random points
-xs, ys = multivariate_normal(mean=mean, cov=p, size=10000).T
+xs, ys = multivariate_normal.rvs(mean=mean, cov=p, size=2000).T
 util.plot_monte_carlo_mean(xs, ys, f_nonlinear_xy, mean_fx, 'Lineerize Edilmis Ortalama');
 plt.savefig('tser_ukf_13.png')
 \end{minted}
 
 \begin{verbatim}
-Ortalamalardaki fark x=-0.054, y=42.877
+Ortalamalardaki fark x=-0.471, y=43.237
 \end{verbatim}
 
 \includegraphics[height=8cm]{tser_ukf_13.png}
@@ -140,9 +143,6 @@ Fakat sigma bazlý transform kullanýrsak,
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy.random import multivariate_normal
 import util
-
-def f_nonlinear_xy(x, y):
-    return np.array([x + y, .1*x**2 + y*y])
 
 #initial mean and covariance
 mean = (0, 0)
