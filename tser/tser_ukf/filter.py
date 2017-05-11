@@ -100,7 +100,7 @@ class MerweScaledSigmaPoints(object):
         return Wm, Wc
 
 class UKF(object):
-    def __init__(self, dim_x, dim_z, dt, hx, fx, points,
+    def __init__(self, dim_x, dim_z, hx, fx, points,
                  x_mean_fn=None, z_mean_fn=None,
                  residual_x=None,
                  residual_z=None):
@@ -112,7 +112,6 @@ class UKF(object):
         self._dim_x = dim_x
         self._dim_z = dim_z
         self.points_fn = points
-        self._dt = dt
         self._num_sigmas = points.num_sigmas()
         self.hx = hx
         self.fx = fx
@@ -135,11 +134,10 @@ class UKF(object):
         self.sigmas_h = zeros((self._num_sigmas, self._dim_z))
 
 
-    def predict(self):
-        sigmas = self.points_fn.sigma_points(self.x, self.P)
-        
+    def predict(self, dt):
+        sigmas = self.points_fn.sigma_points(self.x, self.P)        
         for i in range(self._num_sigmas):
-            self.sigmas_f[i] = self.fx(sigmas[i], self._dt)
+            self.sigmas_f[i] = self.fx(sigmas[i], dt)
             
         self.x, self.P = unscented_transform(self.sigmas_f,
                                              self.Wm,

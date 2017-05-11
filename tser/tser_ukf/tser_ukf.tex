@@ -331,14 +331,14 @@ std_x, std_y = .3, .3
 zs = [np.array([i + randn()*std_x,i + randn()*std_y]) for i in range(100)]
 
 sigmas = filter.MerweScaledSigmaPoints(4, alpha=.1, beta=2., kappa=1.)
-ukf = filter.UKF(dim_x=4, dim_z=2, fx=f_cv,hx=h_cv, dt=dt, points=sigmas)
+ukf = filter.UKF(dim_x=4, dim_z=2, fx=f_cv,hx=h_cv, points=sigmas)
 ukf.x = np.array([0., 0., 0., 0.])
 ukf.R = np.diag([0.09, 0.09])
 ukf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=1, var=0.02)
 ukf.Q[2:4, 2:4] = filter.Q_discrete_white_noise(2, dt=1, var=0.02)
 uxs = []
 for z in zs:
-    ukf.predict()
+    ukf.predict(dt=dt)
     ukf.update(z)
     uxs.append(ukf.x.copy())
 uxs = np.array(uxs)
@@ -462,7 +462,7 @@ ac_vel = (100., 0.)
 radar_pos = (0., 0.)
 h_radar.radar_pos = radar_pos
 points = filter.MerweScaledSigmaPoints(n=3, alpha=.1, beta=2., kappa=0.)
-kf = filter.UKF(3, 2, dt, fx=f_radar, hx=h_radar, points=points)
+kf = filter.UKF(3, 2, fx=f_radar, hx=h_radar, points=points)
 kf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
 kf.Q[2,2] = 0.1
 kf.R = np.diag([range_std**2, bearing_std**2])
@@ -477,7 +477,7 @@ xs = []
 for _ in time:
     ac.update(dt)
     r = radar.noisy_reading(ac.pos)
-    kf.predict()
+    kf.predict(dt=dt)
     kf.update([r[0], r[1]])
     xs.append(kf.x)
 
@@ -550,7 +550,7 @@ def f_cv_radar(x, dt):
     return np.dot(F, x)
 def cv_UKF(fx, hx, R_std):
     points = filter.MerweScaledSigmaPoints(n=4, alpha=.1, beta=2., kappa=-1.)
-    kf = filter.UKF(4, len(R_std), dt, fx=fx, hx=hx, points=points)
+    kf = filter.UKF(4, len(R_std), fx=fx, hx=hx, points=points)
     kf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
     kf.Q[2:4, 2:4] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
     kf.R = np.diag(R_std)
@@ -569,7 +569,7 @@ for t in time:
         ac.vel[1] = 300/60 # 300 meters/minute climb
     ac.update(dt)
     r = radar.noisy_reading(ac.pos)
-    kf.predict()
+    kf.predict(dt=dt)
     kf.update([r[0], r[1]])
     xs.append(kf.x)
 
@@ -662,9 +662,8 @@ def run_vor_filter(target_pos):
     dt=0.1
     kappa=0.0
     points = filter.MerweScaledSigmaPoints(n=4, alpha=.1, beta=2., kappa=kappa)
-    f = filter.UKF(dim_x=4, dim_z=2, dt=dt, hx=hx_VOR, fx=fx_VOR, points=points)
+    f = filter.UKF(dim_x=4, dim_z=2, hx=hx_VOR, fx=fx_VOR, points=points)
     f.x = np.array([target_pos[0], 1., target_pos[1], 1.])
-
     q = filter.Q_discrete_white_noise(2, dt, Q)
     f.Q[0:2, 0:2] = q
     f.Q[2:4, 2:4] = q
@@ -681,7 +680,7 @@ def run_vor_filter(target_pos):
         z[0] += randn() * std_noise
         z[1] += randn() * std_noise
 
-        f.predict()
+        f.predict(dt=dt)
         f.update(z)
         xs.append(f.x)
 
