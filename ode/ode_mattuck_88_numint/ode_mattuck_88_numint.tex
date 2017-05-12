@@ -169,12 +169,12 @@ R = 6378.1 #Radius of the Earth
 scales = {18: (1.8e5, -2.5e5), 17: (1.0e5, -1.52e5), 15: (23000., -40000.) }
 
 def travel(lat, lon, bearing, distance):
-    # yon (bearing) alttaki kodun orijinal halinde y-ekseninden
-    # saat yonune dogru olan aci olarak aliniyordu. Biz bunu
-    # ustteki argumanda x-eksenden saat yonu tersi olacak sekilde
-    # kabul ediyoruz, ki tanidik matematik formulleri kullanilabilsin.
-    brng = 3*np.pi/4 -  bearing
-    #brng = bearing
+    # yon (bearing) bu kodun orijinalinde y-ekseninden saat yonune 
+    # dogru olan aci olarak alinmis. Biz aciyi  (ustteki argumanda) 
+    # x-eksenden saat yonu tersi olacak sekilde kabul ediyoruz, sonra 
+    # alttaki koda gore cevrim yapiyoruz, ki tanidik matematik formulleri 
+    # kullanilabilsin.
+    brng = (450-bearing) % 360
     # mesafe kilometre
     lat1 = math.radians(lat) #Current lat point converted to radians
     lon1 = math.radians(lon) #Current long point converted to radians
@@ -201,25 +201,25 @@ def plot_line_gm(mapfile, pts, outfile):
     nim.save(outfile)
 \end{minted}
 
-Bilinen bir baþlangýç noktasýndan 30 derece doðuya 30 metre gitmek, 
+Bilinen bir baþlangýç noktasýndan 20 derece doðuya 30 metre gitmek, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 mf = 'berlin_52_5009766667_13_312235.png'
 ref = [52.502035, 13.312638]
-plot_line_gm(mf, [ref, travel(ref[0], ref[1], np.deg2rad(30), 0.030)], 'ku1.png')
+plot_line_gm(mf, [ref, travel(ref[0], ref[1], np.deg2rad(20), 0.030)], 'ku1.png')
 \end{minted}
 
 \includegraphics[width=25em]{ku1.png}
 
-Þimdi toplanan veriye gelelim. Bu veride üstteki baþlangýç noktasýndan önce
-doðuya yaklaþýk 30 metre sonra güneye doðru 100 metre kadar yürüdük,
+Toplanan yürüyüþ verisine gelelim. Bu veride üstteki baþlangýç noktasýndan
+önce doðuya yaklaþýk 30 metre, sonra güneye doðru 100 metre kadar yürüdük,
 ortadaki ana yol boyunca, onun solunda. [2]'de bahsedilen araç telefonun
 rotasyon matrisini (rotation matrix) ve ham ivme verilerini kaydetti. Ývme
 verileri telefonun kordinat sýstemine göre, ve her eksen için ayrý ayrý,
 rotasyonda telefonun dünya kordinatýna göre nasýl durduðu
 gösterilir. Ývmeyi dünya kordinatlarýna çevirmek için (kuzeye ne kadar,
 doðuya ne kadar ivmem var?) üç boyutlu ivme vektörü rotasyon matrisý ile
-çarpýlýr. 
+çarpýlýr.
 
 Altta bu iþlem yapýlýyor, ve her eksen için (daha doðrusu $x,y$ için, $z$
 ile ilgilenmiyoruz) sayýsal entegrasyon yapýlýyor. 
