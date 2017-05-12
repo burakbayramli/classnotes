@@ -137,98 +137,144 @@ elde edelim.
 
 Acaba $t_0,t_N$ arasýnda $t_0,t_1$, sonra $t_0,t_2$, .. olacak þekilde
 \verb!trapz! hesabý yapsak ve bu deðerleri hatýrlayarak bir hýz vektörü
-oluþtursak? Bu olur, fakat kodlamasý külfetli, otomatik olarak tam da
-bu iþi yapan \verb!scipy.integrate.cumtrapz! adlý bir çaðrý var, yani
-kümülatif hesabý kendiliðinden yapýyor. Bu çaðrýya N büyüklüðündeki vektör
-verince N büyüklüðünde vektör elde ediyoruz. Sonra devam ederek
-\verb!trapz! çaðrýsý yapýyoruz.
+oluþtursak? 
 
-Örnek veri: Elimizde cep telefonu kullanarak alýnmýþ ivme ölçümleri var,
-seyahat alttaki güzargah üzerinde, telefon dikey, ekran içe dönük þekilde
-toplandý [2]. Veri noktalarý yaklaþýk saniye bazýnda (ki verinin ilk kolonu
-milisaniye formatýndaki zaman), ivme ölçümlerinin birimi $m/s^2$.
+Örnek veri: Elimizde cep telefonu kullanarak alýnmýþ ivme ölçümleri var. Bu
+ölçümleri [2] ile topladýk, ve [3]'te görüldüðü gibi bir sayýsal
+entegrasyon yapacaðýz. 
 
-\includegraphics[width=20em]{ode_mattuck_88_numint_03.png} 
+\includegraphics[width=25em]{ode_mattuck_88_numint_03.png}
 
-Ekran içe doðru olduðunda önümüzdeki yola doðru giden z ekseni pozitif, o
-zaman ölçümlerin negatifini almak lazým. Ayrýca telefonda dururken bile
-deðerlerin -0.2 etrafýnda olduðunu gördük, bir hata durumu var gibi
-duruyordu, o yüzden tüm veri noktalarýna 0.2 ekleyerek bu hatayý düzeltmeye
-çalýþtýk.
+Hýz için gereken entegrasyon ivme $a$ üzerinde alýnýr,
 
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-df = pd.read_csv('lacc.txt',header=None,sep='\s')
-df = df[23:60]
-t = df[0] / 1000.
-acc = df[3]+0.2
-import scipy.integrate as int
-vel = int.cumtrapz(acc, t)
-print np.trapz(vel), 'metre'
-\end{minted}
+$$ 
+v(t_2)-v(t_1) = \int _{t_1}^{t_2} a(t) \ud t \approx 
+\sum _{t_1}^{t_2} \frac{1}{2} (a_i + a_{i+1}) \Delta t
+$$
 
-\begin{verbatim}
-65.9321216755 metre
-\end{verbatim}
-
-Sonuç fena deðil; Google Maps 72 metre diyor, biz 65 metre bulduk. Belki
-düzeltme faktörü daha iyi olabilirdi, ya da baþlangýç noktasýný haritadan
-daha iyi seçebilirdik (kesin nokta için GPS kullanýlabilir, fakat Android
-GPS'inin de 10 metrelik hata payý var), ya da telefonun ivme ölçümündeki
-hata payý sonuca yansýmýþ olabilir.
-
-X-Y Kordinat Sisteminde
-
-Eðer iki boyutlu harita üzerinde nerede olduðumuzu, nasýl hareket
-ettiðimizi grafiklemek istersek, kameranýn $z$ yönünde ne kadar
-ilerlediðimizi ve hangi yönde ilerlendigi (açý bilgisi olarak) ile bu
-hesabý yapabiliriz. Cep telefonunu içi kendimize dönük, üst tarafý solumuza
-gelecek þekilde yere tam dikey tutuyoruz, yani tüm hareketimiz $z$ yönünde
-olarak algýlanýyor. Cep telefon yön bilgisini de kaydettik, yön açýsý $x$
-eksenine göre ama saat yönü tersinde, yani açý 0 derece ise tam doðuya
-gidiyoruz demektir, 90 derece ise güneye gidiyoruz demektir. Gidiþatýn
-grafiði için z yönündeki her zaman diliminde atýlan adýmýn y ve x
-bileþenlerini buluruz, bunlar sýrasýyla adýmýn gidilen yöne göre kosinüs ve
-sinüsü olacaktýr (sadece sinüs hesabýný -1 ile çarpýyoruz, biraz önceki
-sebepten dolayý). Dikkat edelim altta kümülatif entegrali iki kez alýyoruz,
-böylece hem hýz hem de mesafe için bir zaman serisi elde etmiþ oluyoruz.
+Sonra hýzý da entegre ederek mesafeyi elde ederiz. Altta harita üzerinde
+alýnan direk mesafeyi grafiklemek için bazý rutinler var. Baþlangýç enlem /
+boylamdan açý, katedilen yol verilince yeni enlem boylam
+hesaplanýyor, verili harita üzerinde grafikleme yapýlabiliyor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import scipy.integrate as int
-import pandas as pd
+from PIL import Image, ImageDraw, ImageFont
+import pandas as pd, io, math, re
+from io import BytesIO
+from PIL import Image
 
-dfacc = pd.read_csv('lacc.txt',header=None,sep='\s')
-dfori = pd.read_csv('orientations.txt',header=None,sep='\s')
+R = 6378.1 #Radius of the Earth
 
-dfacc = dfacc[14:]
-dfori = dfori[14:]
+# pixel <-> lat/lon conversion, found by trial and error
+scales = {18: (1.8e5, -2.5e5), 17: (1.0e5, -1.52e5), 15: (23000., -40000.) }
 
-t = dfacc[0] / 1000.
-acc2 = dfacc[3] + 0.2
-vel2 = int.cumtrapz(acc2, t)
-distz = int.cumtrapz(vel2, t[1:]) 
+def travel(lat, lon, bearing, distance):
+    # yon (bearing) alttaki kodun orijinal halinde y-ekseninden
+    # saat yonune dogru olan aci olarak aliniyordu. Biz bunu
+    # ustteki argumanda x-eksenden saat yonu tersi olacak sekilde
+    # kabul ediyoruz, ki tanidik matematik formulleri kullanilabilsin.
+    brng = 3*np.pi/4 -  bearing
+    #brng = bearing
+    # mesafe kilometre
+    lat1 = math.radians(lat) #Current lat point converted to radians
+    lon1 = math.radians(lon) #Current long point converted to radians
+    lat2 = math.asin( math.sin(lat1)*math.cos(distance/R) +
+                      math.cos(lat1)*math.sin(distance/R)*math.cos(brng))
+    lon2 = lon1 + math.atan2(math.sin(brng)*math.sin(distance/R)*math.cos(lat1),
+                             math.cos(distance/R)-math.sin(lat1)*math.sin(lat2))
+    return (math.degrees(lat2), math.degrees(lon2))
 
-df = pd.DataFrame([distz, dfori[1]]).T
-df.columns = ['distz','o']
-
-df['x'] = df.distz.diff() * np.cos(np.deg2rad(df.o))
-df['y'] = -df.distz.diff() * np.sin(np.deg2rad(df.o))
-df['x1'] = df.x.cumsum()
-df['y1'] = df.y.cumsum()
-plt.plot(df.x1, df.y1, '.')
-plt.savefig('ode_mattuck_88_numint_04.png')
+def plot_line_gm(mapfile, pts, outfile):
+    SCALEX,SCALEY = scales[17]
+    tmp = re.findall("(-*\d+)_(\d+)_(-*\d+)_(\d+)",mapfile,re.DOTALL)[0]
+    nim = Image.open(mapfile)
+    w,h = np.array(nim).shape
+    c = (w/2,h/2)
+    center_lat = float(tmp[0] + "." + tmp[1])
+    center_lon = float(tmp[2] + "." + tmp[3])
+    line = []
+    for i,pt in enumerate(pts):
+    	dx,dy=((pt[1]-center_lon)*SCALEX,(pt[0]-center_lat)*SCALEY)
+    	line.append((c[0]+dx,c[1]+dy))
+    d = ImageDraw.Draw(nim)
+    d.line(line)
+    nim.save(outfile)
 \end{minted}
 
-\includegraphics[height=6cm]{ode_mattuck_88_numint_04.png}
+Bilinen bir baþlangýç noktasýndan 30 derece doðuya 30 metre gitmek, 
 
-Görüldüðü gibi gidilen yön Google haritasýnýn gösterdiðine oldukca
-yakýn. Sonlara doðru dönüþlü bazý hareketler var, bunlar da hakikaten ilk
-haritadaki gidiþten sonra sola dönüp yapýlan dönüþler.
+\begin{minted}[fontsize=\footnotesize]{python}
+mf = 'berlin_52_5009766667_13_312235.png'
+ref = [52.502035, 13.312638]
+plot_line_gm(mf, [ref, travel(ref[0], ref[1], np.deg2rad(30), 0.030)], 'ku1.png')
+\end{minted}
+
+\includegraphics[width=25em]{ku1.png}
+
+Þimdi toplanan veriye gelelim. Bu veride üstteki baþlangýç noktasýndan önce
+doðuya yaklaþýk 30 metre sonra güneye doðru 100 metre kadar yürüdük,
+ortadaki ana yol boyunca, onun solunda. [2]'de bahsedilen araç telefonun
+rotasyon matrisini (rotation matrix) ve ham ivme verilerini kaydetti. Ývme
+verileri telefonun kordinat sýstemine göre, ve her eksen için ayrý ayrý,
+rotasyonda telefonun dünya kordinatýna göre nasýl durduðu
+gösterilir. Ývmeyi dünya kordinatlarýna çevirmek için (kuzeye ne kadar,
+doðuya ne kadar ivmem var?) üç boyutlu ivme vektörü rotasyon matrisý ile
+çarpýlýr. 
+
+Altta bu iþlem yapýlýyor, ve her eksen için (daha doðrusu $x,y$ için, $z$
+ile ilgilenmiyoruz) sayýsal entegrasyon yapýlýyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+idx = 80
+dfacc = np.array(pd.read_csv('acc.txt',header=None,sep='\s+'))
+dfrot = pd.read_csv('rotations.txt',header=None,sep='\s+')
+dt = np.array(dfrot.diff().fillna(0))[:,0] # zaman
+dfrot = np.array(dfrot)
+
+v = np.zeros((len(dt), 2))
+s = np.zeros((len(dt), 2))
+a = np.zeros((len(dt), 2))
+
+for i in range(idx,len(dfacc)):
+    tmp = np.dot(dfrot[i,1:].reshape((3,3)), dfacc[i, 1:])
+    a[i,0] = tmp[0]; a[i,1] = tmp[1]
+   
+for i in range(idx,len(a)):
+    v[i]=v[i-1]+(0.5*(a[i-1]+a[i])*dt[i]);
+    s[i]=s[i-1]+(0.5*(v[i-1]+v[i])*dt[i]);
+
+# uzaklik hesabinda iyi sonuc veren elle secilmis bir sabit
+C = 150. 
+coords = []
+for i in range(idx,len(a)):
+    xx = s[i]
+    bearing = np.arctan2(xx[1], xx[0])
+    dist = np.sqrt(xx[0]**2+xx[1]**2) / C
+    lat,lon = travel(ref[0], ref[1], bearing, dist)
+    coords.append([lat,lon])
+coords = np.array(coords)
+plot_line_gm(mf, coords, 'ku2.png')
+\end{minted}
+
+\includegraphics[width=20em]{ku2.png}
+
+Gidiþ yaklaþýk olarak hesaplandý. Ývme algýlýyýcýlarý tabii ki tüm diðer
+algýlayýcýlar gibi oldukca gürültü içeriyorlar. Bu ölçümü GPS (ki þehir
+içinde o da çok gürültülü sonuçlar içerir) birleþtirerek, iþin içine
+bilinen harita dahil ederek, ve diðer ek taklalarla sonucu git gide
+düzeltmek mümkündür.
+
+Ayrýca üstteki iþlemleri otomatik yapan \verb!scipy.integrate.cumtrapz!
+çaðrýsý var, yani kümülatif hesabý kendiliðinden yapýyor. Bu çaðrýya N
+büyüklüðündeki vektör verince N büyüklüðünde vektör elde ediyoruz. Sonra
+devam ederek \verb!trapz! çaðrýsý yapýyoruz.
 
 Kaynaklar
 
 [1] Sertel, {\em Numerical Integration}, \url{http://web.itu.edu.tr/~sertele/dersler/matlab/ders09.pdf}
 
 [2] Bayramlý, {\em Algýlayýcý Ölçümleri, Video, Android}, \url{http://sayilarvekuramlar.blogspot.co.uk/2017/02/algilayici-olcumleri-video-android.html}
+
+[3] Latcha, {\em EGR 280 - Introduction to Mechanics, Lab}, \url{www.secs.oakland.edu/~latcha/EGR280/AccelerationLab.doc}
 
 \end{document}
