@@ -129,15 +129,7 @@ $$ = 1 \bigg[ (10+12) + \frac{1}{2}(0+14) \bigg] = 29 $$
 
 Eðer elimizde ivme var ise, mesafe nasýl hesaplarýz? Bu durumda iki kere
 entegral almak lazým, ilk entegralle ivmeden hýz, ikincisi hýzdan
-mesafe. Fakat kullanýlan paket program baðlamýnda bir sorun
-\verb!numpy.trapz!'nin entegral bir vektörü alýp geriye tek bir sayý deðeri
-döndürmesi... Bu entegral sonucu, normalde bu beklenen sonuç, fakat hýz
-bize bir zaman serisi olarak gelmeli ki onun da entegralini alarak mesafeyi
-elde edelim.
-
-Acaba $t_0,t_N$ arasýnda $t_0,t_1$, sonra $t_0,t_2$, .. olacak þekilde
-\verb!trapz! hesabý yapsak ve bu deðerleri hatýrlayarak bir hýz vektörü
-oluþtursak? 
+mesafe. 
 
 Örnek veri: Elimizde cep telefonu kullanarak alýnmýþ ivme ölçümleri var. Bu
 ölçümleri [2] ile topladýk, ve [3]'te görüldüðü gibi bir sayýsal
@@ -211,58 +203,45 @@ plot_line_gm(mf, [ref, travel(ref[0], ref[1], np.deg2rad(20), 0.030)], 'ku1.png'
 
 \includegraphics[width=25em]{ku1.png}
 
-Toplanan yürüyüþ verisine gelelim. Bu veride üstteki baþlangýç noktasýndan
-önce doðuya yaklaþýk 30 metre, sonra güneye doðru 100 metre kadar yürüdük,
-ortadaki ana yol boyunca, onun solunda. [2]'de bahsedilen araç telefonun
-rotasyon matrisini (rotation matrix) ve ham ivme verilerini kaydetti. Ývme
-verileri telefonun kordinat sýstemine göre, ve her eksen için ayrý ayrý,
-rotasyonda telefonun dünya kordinatýna göre nasýl durduðu
-gösterilir. Ývmeyi dünya kordinatlarýna çevirmek için (kuzeye ne kadar,
-doðuya ne kadar ivmem var?) üç boyutlu ivme vektörü rotasyon matrisý ile
-çarpýlýr.
-
-Altta bu iþlem yapýlýyor, ve her eksen için (daha doðrusu $x,y$ için, $z$
-ile ilgilenmiyoruz) sayýsal entegrasyon yapýlýyor. 
-
 \begin{minted}[fontsize=\footnotesize]{python}
-idx = 80
-dfacc = np.array(pd.read_csv('acc.txt',header=None,sep='\s+'))
-dfrot = pd.read_csv('rotations.txt',header=None,sep='\s+')
-dt = np.array(dfrot.diff().fillna(0))[:,0] # zaman
-dfrot = np.array(dfrot)
+dt = [1.0 for i in range(100)] 
 
 v = np.zeros((len(dt), 2))
 s = np.zeros((len(dt), 2))
 a = np.zeros((len(dt), 2))
 
-for i in range(idx,len(dfacc)):
-    tmp = np.dot(dfrot[i,1:].reshape((3,3)), dfacc[i, 1:])
-    a[i,0] = tmp[0]; a[i,1] = tmp[1]
+a[0:10,0] = 0.26
+a[11:20,0] = -0.14
+a[11:20,1] = -0.4
    
-for i in range(idx,len(a)):
+for i in range(len(dt)):
     v[i]=v[i-1]+(0.5*(a[i-1]+a[i])*dt[i]);
     s[i]=s[i-1]+(0.5*(v[i-1]+v[i])*dt[i]);
 
-# uzaklik hesabinda iyi sonuc veren elle secilmis bir sabit
-C = 150. 
 coords = []
-for i in range(idx,len(a)):
+for i in range(len(dt)):
     xx = s[i]
     bearing = np.arctan2(xx[1], xx[0])
-    dist = np.sqrt(xx[0]**2+xx[1]**2) / C
-    lat,lon = travel(ref[0], ref[1], bearing, dist)
+    dist = np.sqrt(xx[0]**2+xx[1]**2) 
+    lat,lon = travel(ref[0], ref[1], bearing, dist / 1000.)
     coords.append([lat,lon])
 coords = np.array(coords)
 plot_line_gm(mf, coords, 'ku2.png')
 \end{minted}
 
+
 \includegraphics[width=20em]{ku2.png}
 
-Gidiþ yaklaþýk olarak hesaplandý. Ývme algýlýyýcýlarý tabii ki tüm diðer
-algýlayýcýlar gibi oldukca gürültü içeriyorlar. Bu ölçümü GPS (ki þehir
-içinde o da çok gürültülü sonuçlar içerir) birleþtirerek, iþin içine
-bilinen harita dahil ederek, ve diðer ek taklalarla sonucu git gide
-düzeltmek mümkündür.
+
+Fakat kullanýlan paket program baðlamýnda bir sorun
+\verb!numpy.trapz!'nin entegral bir vektörü alýp geriye tek bir sayý deðeri
+döndürmesi... Bu entegral sonucu, normalde bu beklenen sonuç, fakat hýz
+bize bir zaman serisi olarak gelmeli ki onun da entegralini alarak mesafeyi
+elde edelim.
+
+Acaba $t_0,t_N$ arasýnda $t_0,t_1$, sonra $t_0,t_2$, .. olacak þekilde
+\verb!trapz! hesabý yapsak ve bu deðerleri hatýrlayarak bir hýz vektörü
+oluþtursak? 
 
 Ayrýca üstteki iþlemleri otomatik yapan \verb!scipy.integrate.cumtrapz!
 çaðrýsý var, yani kümülatif hesabý kendiliðinden yapýyor. Bu çaðrýya N
