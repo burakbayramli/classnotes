@@ -131,10 +131,6 @@ Eðer elimizde ivme var ise, mesafe nasýl hesaplarýz? Bu durumda iki kere
 entegral almak lazým, ilk entegralle ivmeden hýz, ikincisi hýzdan
 mesafe. 
 
-Örnek veri: Elimizde cep telefonu kullanarak alýnmýþ ivme ölçümleri var. Bu
-ölçümleri [2] ile topladýk, ve [3]'te görüldüðü gibi bir sayýsal
-entegrasyon yapacaðýz. 
-
 \includegraphics[width=25em]{ode_mattuck_88_numint_03.png}
 
 Hýz için gereken entegrasyon ivme $a$ üzerinde alýnýr,
@@ -144,10 +140,14 @@ v(t_2)-v(t_1) = \int _{t_1}^{t_2} a(t) \ud t \approx
 \sum _{t_1}^{t_2} \frac{1}{2} (a_i + a_{i+1}) \Delta t
 $$
 
-Sonra hýzý da entegre ederek mesafeyi elde ederiz. Altta harita üzerinde
-alýnan direk mesafeyi grafiklemek için bazý rutinler var. Baþlangýç enlem /
-boylamdan açý, katedilen yol verilince yeni enlem boylam
-hesaplanýyor, verili harita üzerinde grafikleme yapýlabiliyor.
+Sonra hýzý da entegre ederek mesafeyi elde ederiz. Alttaki örnek için bazý
+ývme verilerini biz elle yarattýk, önce saða, sonra aþaðý iniþ þeklinde,
+ivme verileri iki boyutlu, yani çapraz üst saða gidiþ için $x,y$ ayný
+ivmeye sahip olmalý.
+
+Altta harita üzerinde alýnan direk mesafeyi grafiklemek için bazý rutinler
+var. Baþlangýç enlem / boylamdan açý, katedilen yol verilince yeni enlem
+boylam hesaplanýyor, verili harita üzerinde grafikleme yapýlabiliyor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from PIL import Image, ImageDraw, ImageFont
@@ -203,6 +203,8 @@ plot_line_gm(mf, [ref, travel(ref[0], ref[1], np.deg2rad(20), 0.030)], 'ku1.png'
 
 \includegraphics[width=25em]{ku1.png}
 
+Þimdi ivme verisine ve entegrasyona gelelim,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 dt = [1.0 for i in range(100)] 
 
@@ -229,24 +231,17 @@ coords = np.array(coords)
 plot_line_gm(mf, coords, 'ku2.png')
 \end{minted}
 
-
 \includegraphics[width=20em]{ku2.png}
-
-
-Fakat kullanýlan paket program baðlamýnda bir sorun
-\verb!numpy.trapz!'nin entegral bir vektörü alýp geriye tek bir sayý deðeri
-döndürmesi... Bu entegral sonucu, normalde bu beklenen sonuç, fakat hýz
-bize bir zaman serisi olarak gelmeli ki onun da entegralini alarak mesafeyi
-elde edelim.
-
-Acaba $t_0,t_N$ arasýnda $t_0,t_1$, sonra $t_0,t_2$, .. olacak þekilde
-\verb!trapz! hesabý yapsak ve bu deðerleri hatýrlayarak bir hýz vektörü
-oluþtursak? 
 
 Ayrýca üstteki iþlemleri otomatik yapan \verb!scipy.integrate.cumtrapz!
 çaðrýsý var, yani kümülatif hesabý kendiliðinden yapýyor. Bu çaðrýya N
 büyüklüðündeki vektör verince N büyüklüðünde vektör elde ediyoruz. Sonra
 devam ederek \verb!trapz! çaðrýsý yapýyoruz.
+
+Not: Ývmeden hýz, sonra mesafe hesabý entegrasyon ile ``hata birikmesine''
+açýktir, çünkü mesela 0.1'lýk bir hata bile entegrasyon sonrasý büyüyerek
+$t^2$'ye oranlý bir hata büyümesine sebep olur. Bu sebeple üstteki metotun
+kýsa mesafelerde kullanýlmasý tavsiye edilir. 
 
 Kaynaklar
 
