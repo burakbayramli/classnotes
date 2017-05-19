@@ -2,31 +2,32 @@
 \begin{document}
 Frekans Analizi, Periyodik Sinyaller
 
-Bir periyodik sinyali nasil analiz ederiz? Kendimiz bir sinyal olusturmak
-istesek, bunu nasil yapacagimizi dusunelim; $\sin$ ya da $\cos$
-matematiksel fonksiyonlarinin bir periyotu vardir, $0,2\pi$ arasindaki
-degerleri $2\pi,4\pi$ arasinda tekrar eder, boyle devam eder. Tabii
-periyodik sinyallerin ek ozellikleri olabilir, mesela $\cos$ sifir
-noktasinda 1 degerine sahiptir, fakat elimizdeki zaman serisi saga ya da
-sola ``kaymis'' olabilir, yani sifir noktasinda deger 1 degildir. Ayrica
--1,+1 arasinda gidip gelmek yerine mesela -10,+10 arasinda gidip
-gelinebilir. Bir diger ozellik $0,2\pi$ arasinda tek bir periyot yerine
-birden fazla periyot olabilmesi (frekans). 
+Bir periyodik sinyali nasýl analiz ederiz? Kendimiz bir sinyal oluþturmak
+istesek, bunu nasýl yapacaðýmýzý düþünelim; $\sin$ ya da $\cos$
+fonksiyonlarýnýn bir periyotu vardýr, $0,2\pi$ arasýndaki deðerler
+$2\pi,4\pi$ arasýnda tekrar eder, vs.. Bazý ek özellikler, mesela $\cos$
+sýfýr noktasýnda 1 deðerine sahip, fakat elimizdeki zaman serisi saða ya da
+sola ``kaymýþ'' olabilir, buna faz kaymasý (phase shift) deniyor, yani
+sýfýr noktasýnda deðer 1 olmayabilir. Ayrýca -1,+1 arasýnda gidip gelmek
+yerine mesela -10,+10 arasýnda gidip gelinebilir, buna genlik deniyor
+(amplitude). Bir diðer özellik $0,2\pi$ arasýnda tek bir periyot yerine
+birden fazla periyot olabilmesi (frekans).
 
-Frekans ile baslayalim, 
+Frekans ile baþlayalým, once normal bir kosinüs sinyali,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-x = np.linspace(0,10,100)
-plt.plot(x, np.cos(x))
+t = np.linspace(0,10,100)
+plt.plot(t, np.cos(t))
 plt.xlim(0,10)
 plt.savefig('tser_freq_01.png')
 \end{minted}
 
-\includegraphics[height=6cm]{tser_freq_01.png}
+\includegraphics[height=5cm]{tser_freq_01.png}
+
+Her $\pi$ noktasýný gösterelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-x = np.linspace(0,10,100)
-plt.plot(x, np.cos(x))
+plt.plot(t, np.cos(t))
 plt.axvline(0,lw='1',ls='dashed',color='r')
 plt.axvline(np.pi,lw='1',ls='dashed',color='r')
 plt.axvline(2*np.pi,lw='1',ls='dashed',color='r')
@@ -35,10 +36,16 @@ plt.xlim(0,10)
 plt.savefig('tser_freq_02.png')
 \end{minted}
 
-\includegraphics[height=6cm]{tser_freq_02.png}
+\includegraphics[height=5cm]{tser_freq_02.png}
+
+Bu sinyalde $\cos$'a verilen $t$ deðerlerini iki ile çarpsam ne olur? Bu
+durumda mesela $0,2\pi$ arasýnda bir periyot için daha önceki $t$'lerin
+yarýsý ile bu iþ yapýlabilir, demek ki önceki tek periyot içinde þimdi
+sinyal iki kez tur atacaktýr. O zaman $\cos$ içinde bir sabit ile çarpým
+yapmak ile frekansý o kadar arttýrmýþ oldum,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-plt.plot(x, np.cos(2*x))
+plt.plot(t, np.cos(2*t))
 plt.axvline(0,lw='1',ls='dashed',color='r')
 plt.axvline(np.pi,lw='1',ls='dashed',color='r')
 plt.axvline(2*np.pi,lw='1',ls='dashed',color='r')
@@ -47,9 +54,81 @@ plt.xlim(0,10)
 plt.savefig('tser_freq_03.png')
 \end{minted}
 
-\includegraphics[height=6cm]{tser_freq_03.png}
+\includegraphics[height=5cm]{tser_freq_03.png}
 
-\includegraphics[height=4cm]{tser_freq_03.png}
+-1/+1 arasýnda gidip gelmeyi arttýrmak en kolayý, $\cos$ hesabýndan elde
+edilen deðeri mesela 10 ile çarparsam genlik o kadar artar. Faz kaydýrma
+$\cos$ içinde bir toplam olabilir. Tüm resmi göstermek gerekirse, $A$
+genlik, $f_0$ frekans, faz kaymasý $\phi$ olacak þekilde,
+
+$$ 
+x(t) = A \cos (2\pi f_0 t - \phi)
+$$
+
+Bu formülün grafiði,
+
+\includegraphics[height=4cm]{tser_freq_04.png}
+
+Direk formüle bakarak $A$ hemen anlaþýlabiliyor. Frekans $t$'yi çarpan
+deðerle orantýlý, yanlýz dikkat, bu deðer her zaman $2\pi$'ye oranlý bir
+þey, yani formül $\cos(10 t)$ gibi bir ifade içeriyorsa, $10 / 2\pi$ ile
+$f_0$'yi çýkartmamýz gerekir. Eðer $t$ saniye birimine sahipse, bir periyot
+$T_0 = 1/f_0 = 0.5$ saniyedir, ve frekans 2 Hertz olacaktýr. Eger frekans
+$w_0 = 2\pi f_o$ formunda gösterilirse, o zaman birim radyan / saniye olur.
+
+Faz kaymasý $\phi$ sebebiyle tepe noktanýn nerede olduðu da direk formülden
+anlaþýlamiyor, biraz ek hesap lazým, üstteki örnekte 3/16, bunu bulmak
+için ``kosinüse geçilen deðerin sýfýr olduðu yer'' gerekli,
+
+$$ 0 = 2\pi \cdot 2 \cdot t  - 3\pi/4 
+\implies t = 3\pi / (4 \cdot 4\pi)  
+\implies t = 3/16
+$$
+
+Fakat hala faz kaymasý $3\pi/4$ diyebiliriz. 
+
+Örneklemek (Sampling)
+
+Sayýsal, yani bilgisayar ortamýnda bilgiler ayrýksaldýr, kimse bize üstteki
+sürekli formül formatýyla sinyal parametrelerini vermez. Diyelim ki bir
+sinyalin saniyede 10 tane örneklemini alýyoruz. O zaman 3 saniye sonra
+elimizde 30 veri noktasý olacak. Fakat her örneklem frekansý gerçek sinyali
+incelemek için yeterli deðildir. Nyquist teorisine göre örneklem gerçek
+frekansýn en az iki katý olmalýdýr 
+
+
+Tabii sadece ayriksal frekansa bakarak sinyalin frekansýnýn ne olduðunu
+anlamak ta mumkun degil. Eðer bir þekilde gercek sinyalin kaç örneklemde
+bir tekrar ettiðini bulursak, o zaman yaklaþýk bir frekans bulabiliriz;
+mesela bir sinüssel sinyalin 20 ölçümde bir tekrar ettiðini bulduk, ve
+örneklem periyotu 0.05 milisaniye / örneklem ise (her iki örneklem arasý
+geçen zaman), o zaman
+
+$$ 
+\textrm{sinüs dalgasý periyotu} =  
+\frac{20 \textrm{ örneklem}}{periyot}
+\frac{0.05 \textrm{ milisaniye}}{\textrm{örneklem}} = 1 milisaniye
+$$
+
+Demek ki periyot 1 / 1 milisaniye = 1 Khz. Ya örneklem periyotu 2
+milisaniye olsaydý? O zaman sinüs dalga periyotu 40 milisaniye olurdu, ve
+gerçek frekans 25 Hz olurdu. Söylemek istediðimiz ayrýksal durumda
+Hz. bazýnda gerçek frekansýn hesabý her zaman örneklem frekansýna $f_s$'e
+baðlýdýr,
+
+$$ f_s = 1 / t_s$$
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
