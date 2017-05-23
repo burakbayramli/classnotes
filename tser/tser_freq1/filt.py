@@ -30,7 +30,7 @@ def sinc_filter_low(order, fc1, fs):
             B[i] = np.sin(tmp1) / tmp2
         B[i] = B[i] * window[i]
     return B / np.sum(B)
-
+ 
 def sinc_filter_high(order, fc1, fs):
     Fc1 = fc1 / np.float(fs) 
     M  = order
@@ -49,8 +49,14 @@ def sinc_filter_high(order, fc1, fs):
     B[(M/2)] = B[(M/2)] + 1
     return B
     
-
-
+def sinc_filter_band(order, fc1, fc2, fs):
+    M = order
+    A = sinc_filter_low(order, fc1, fs).T[0]
+    B = sinc_filter_high(order, fc2, fs).T[0]
+    output = A+B
+    output = -output
+    output[(M/2)] = output[(M/2)] + 1.
+    return output
 
 
 

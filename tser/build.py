@@ -26,6 +26,8 @@ if len(sys.argv) == 1:
     ./tser_bubble/tser_bubble.pdf \
     ./tser_peak/tser_peak.pdf \
     ./tser_conv/tser_conv.pdf \
+    ./tser_freq1/tser_freq1.pdf \
+    ./tser_freq2/tser_freq2.pdf \
     ./tser_sinreg/tser_sinreg.pdf \
     ./tser_sound/tser_sound.pdf \
     ./tser_z001/tser_z001.pdf \
