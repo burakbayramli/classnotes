@@ -150,20 +150,65 @@ f_bw=200000
 Fs=1140000
 n_taps=64
 lpf= signal.remez(n_taps, [0, f_bw, f_bw +(Fs/2-f_bw)/4,Fs/2], [1,0], Hz=Fs)
+plt.xscale('log')
+plt.title('Filter Frequency Response')
+plt.xlabel('Frequency')
+plt.ylabel('Amplitude')
+plt.margins(0,1)
+plt.grid(which='both',axis='both')
+plt.plot(w, 20*np.log10(abs(h)))
+plt.savefig('compscieng_app60wave_11.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app60wave_11.png}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
 w,h = signal.freqz(lpf)
 x3 = signal.lfilter(lpf, 1.0, x2)
+plt.psd(x2, NFFT=1024, Fs=1140000, color="blue")  # original
+plt.psd(x3, NFFT=1024, Fs=1140000, color="green")  # filtered
+plt.title("PSD of output signal from LPF Vs Original Signal")
+plt.savefig('compscieng_app60wave_12.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app60wave_12.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
 dec_rate = int(Fs/f_bw)
 x4 = signal.decimate(x3, dec_rate)
 Fs_x4 = Fs/dec_rate
-y = x4[1:] * np.conj(x4[:-1])
+plt.psd(x4, NFFT=1024, Fs=Fs_x4, color="blue")
+plt.title("PSD of deimated signal")
+plt.savefig('compscieng_app60wave_13.png')
+\end{minted}
 
+\includegraphics[width=20em]{compscieng_app60wave_13.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y = x4[1:] * np.conj(x4[:-1])
 x5 = np.angle(y)
+plt.psd(x5, NFFT=1024, Fs=Fs_x4, color="blue")
+plt.title("PSD of Post Frequency Discrimination")
+plt.savefig('compscieng_app60wave_14.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app60wave_14.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
 d = Fs_x4 * 75e-6   # Calculate the # of samples to hit the -3dB point
 r = np.exp(-1/d)   # Calculate the decay between each sample
 b = [1-r]          # Create the filter coefficients
 a = [1,-r]
 x6 = signal.lfilter(b,a,x5)
+plt.psd(x6, NFFT=1024, Fs=Fs_x4, color="blue")
+plt.title("PSD of signal Post DeEmphasis")
+plt.savefig('compscieng_app60wave_15.png')
+\end{minted}
 
+\includegraphics[width=20em]{compscieng_app60wave_15.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
 d = Fs_x4 * 75e-6   # Calculate the # of samples to hit the -3dB point
 r = np.exp(-1/d)   # Calculate the decay between each sample
 b = [1-r]          # Create the filter coefficients
