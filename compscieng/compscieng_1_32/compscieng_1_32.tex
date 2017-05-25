@@ -1,6 +1,72 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Filtrelemek
+Frekans Filtrelemek
+
+Bir sinyalin içinden belli frekanslarý ayýklama iþlemine filtreleme adý
+veriliyor; çeþitleri alçak-geçiren (low-pass), yüksek-geçiren (high-pass),
+ve bant geçiren filtreler (band-pass filter). Alçak-geçiren filtrelerle,
+mesela 2 kHz üstündeki tüm frekanlarý sinyalden çýkartmak istiyorsak eþik
+deðeri 2 kHz'lük olan bir alçak-geçiren filtre kullanabiliriz,
+yüksek-geçiren bunun tersini yapar. Bant-geçiren ise sadece belli bir
+aralýktaki frekanlara izin vermek için kullanýlýr, mesela sinyalde 4 ve 5
+kHz arasý frekanslar kalsýn istiyorsak bir bant geçiren filtre kullanýrýz.
+
+Bu yazýda sonlu dürtü yanýtlý (finite impülse response -FIR-) adý verilen
+sayýsal filtreleri kullanacaðýz, bu filtreler tipik olarak sonlu sayýda
+katsayý olarak hesaplanýrlar, sonra bur katsayýlar bir evriþim
+(convolution) operasyonu ile sinyale uygulanýr.
+
+FIR filtre tasarýmýnda elimizdeki en önemli silah evriþim, ayrýksal fourier
+transformu arasýndaki bir iliþki. Eldeki $x$ verisine evriþim ile bir $h$
+filtresi uygulayacaðýmýzý düþünelim, ve bu bize $y = x * h$ sonucunu
+verecek. Ýliþki þudur ki, eðer $x$ ve $h$'nin Fourier transformunu alýrsak
+$x * h$ iþlemi çarpýma dönüþür, yani frekans yöresindeki çarpým iþlemi
+zaman yöresindeki evriþim iþlemine eþittir [1, sf. 161]. Yani,
+
+$$ x(n) * h(n) \leftrightarrow X(\theta)H(\theta)$$
+
+ki $X$ ve $H$, $x,h$'nin Fourier transformudur.
+
+Ýspat
+
+Ayrýksal evriþim formülünü hatýrlarsak,
+
+$$ y(n) = x(n) * h(n) = \sum _{m=-\infty}^{\infty} x(m) h(n-m) $$
+
+Eþitliðin iki tarafýnýn Fourier transformunu alalým, $y(n)$'nin transformu
+$Y(\theta)$ olsun,
+
+$$  
+Y(\theta) =
+\sum _{n=-\infty}^{\infty} \bigg[
+\sum _{m=-\infty}^{\infty} x(m) h(n-m)
+\bigg] e^{-j\theta n}
+$$
+
+Toplamlarýn yer deðiþtirebilme özelliðini kullanýrsak, 
+
+$$ 
+= \sum _{m=-\infty}^{\infty} x(m)  \sum _{n=-\infty}^{\infty} h(n-m)  e^{-j\theta n}
+$$
+
+Þimdi $k = n-m$ tanýmlayalým, 
+
+$$  
+= \sum _{m=-\infty}^{\infty} x(m)  \sum _{k=-\infty}^{\infty} h(k)  e^{-j\theta (k+m)}
+$$
+
+$$ 
+Y(\theta) =
+\sum _{m=-\infty}^{\infty} x(m)  e^{-j\theta m}
+\sum _{k=-\infty}^{\infty} h(k)  e^{-j\theta k}
+$$
+
+Son ifadede $x$ ve $h$ nin ayrý ayrý Fourier transformlarýný elde etmiþ
+olduk, ve bu transformlar birbiriyle çarpým halindeler. Ýspat tamamlandý,
+gerçekten de evriþtirilen iki öðenin arasýndaki iliþki ayrý ayrý Fourier
+transformu üzerinden çarpým haline geliyor.
+
+[devam edecek]
 
 \inputminted[fontsize=\footnotesize]{python}{filt.py}
 
@@ -117,26 +183,6 @@ plt.savefig('compscieng_1_32_13.png')
 
 Kaynaklar
 
+[1] ElAli, {\em Discrete Systems and Digital Signal Processing with Matlab, 2nd Edition}
+
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
