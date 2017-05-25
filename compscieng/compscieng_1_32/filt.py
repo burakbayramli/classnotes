@@ -1,3 +1,4 @@
+import scipy, matplotlib.pyplot as plt
 import numpy as np
 
 def hamming(window_size):
@@ -56,6 +57,13 @@ def sinc_filter_band(order, fc1, fc2, fs):
     output[(M/2)] = output[(M/2)] + 1.
     return output
 
-
-
-
+def plotSpectrum(y,Fs):
+    n = len(y) # length of the signal
+    k = np.arange(n)
+    T = n/Fs
+    frq = k/T # two sides frequency range
+    frq = frq[range(n/2)] # one side frequency range
+    Y = scipy.fft(y)/n # fft computing and normalization
+    Y = Y[range(n/2)] 
+    plt.plot(frq,np.abs(Y),'r') # plotting the spectrum
+    
