@@ -7,13 +7,13 @@ Frekans Analizi, Periyodik Sinyaller
 Bir periyodik sinyali nasýl analiz ederiz? Kendimiz bir sinyal oluþturmak
 istesek, bunu nasýl yapacaðýmýzý düþünelim; $\sin$ ya da $\cos$
 fonksiyonlarýnýn bir periyotu vardýr, $0,2\pi$ arasýndaki deðerler
-$2\pi,4\pi$ arasýnda tekrar eder, vs.. Bazý ek özellikler, mesela $\cos$
+$2\pi,4\pi$ arasýnda tekrar eder, vs.. Bazý ek özellikler; mesela $\cos$
 sýfýr noktasýnda 1 deðerine sahip, fakat elimizdeki zaman serisi saða ya da
 sola ``kaymýþ'' olabilir, buna faz kaymasý (phase shift) deniyor, yani
 sýfýr noktasýnda deðer 1 olmayabilir. Ayrýca -1,+1 arasýnda gidip gelmek
 yerine mesela -10,+10 arasýnda gidip gelinebilir, buna genlik deniyor
 (amplitude). Bir diðer özellik $0,2\pi$ arasýnda tek bir periyot yerine
-birden fazla periyot olabilmesi (frekans).
+birden fazla periyot olabilmesi (frekans deðiþimi).
 
 Frekans ile baþlayalým, once normal bir kosinüs sinyali,
 
@@ -98,7 +98,7 @@ elimizde 30 veri noktasý olacak. Fakat her örneklem frekansý gerçek sinyali
 incelemek için yeterli deðildir. Nyquist teorisine göre örneklem gerçek
 frekansýn en az iki katý olmalýdýr 
 
-Tabii sadece ayriksal frekansa bakarak sinyalin frekansýnýn ne olduðunu
+Tabii sadece ayrýksal frekansa bakarak sinyalin frekansýnýn ne olduðunu
 anlamak ta mumkun degil. Eðer bir þekilde gercek sinyalin kaç örneklemde
 bir tekrar ettiðini bulursak, o zaman yaklaþýk bir frekans bulabiliriz;
 mesela bir sinüssel sinyalin 20 ölçümde bir tekrar ettiðini bulduk, ve
@@ -119,8 +119,10 @@ baðlýdýr,
 
 $$ f_s = 1 / t_s$$
 
-Fourier analizine gelelim: {\em Diferansiyel Denklemler Ders 15}'te surekli
-Fourier Transformunu gorduk,
+Ayrýksal Fourier Transformu
+
+{\em Diferansiyel Denklemler Ders 15}'te sürekli Fourier Transformunu
+gördük,
 
 $$ X(f) = \int _{-\infty}^{\infty} x(t) e^{j2\pi ft} \ud t $$
 
@@ -131,9 +133,9 @@ $$ X(m) = \sum _{n=0}^{N-1} x(n) e^{-j2\pi nm / N} $$
 
 $x(n)$ her $n$ anýnda, bir $n$ indisiyle eriþilen, bir anlamda $x(t)$'den
 ``örneklenmiþ'' sinyal verisi olacaktýr, $e$ tabii ki doðal logaritma bazý,
-$j$ ise hayali sayý $j = \sqrt{-1}$.  Euler iliþkisi
-$e^{-j\phi} = \cos(\phi) - j\sin(\phi)$'den hareketle üstteki ayrýksal
-denklem alttakine eþittir,
+$j$ ise hayali sayý $j = \sqrt{-1}$.  Euler iliþkisi $e^{-j\phi} =
+\cos(\phi) - j\sin(\phi)$'den 
+hareketle üstteki ayrýksal denklem alttakine eþittir,
 
 $$ X(m) = \sum _{n=0}^{N-1} x(n) [ \cos(2\pi nm / N) - j \sin(2\pi nm / N)] 
 \mlabel{1}
@@ -180,34 +182,111 @@ for n in range(8): print np.round(x(n),4),
 0.3536 0.3536 0.6464 1.0607 0.3536 -1.0607 -1.3536 -0.3536
 \end{verbatim}
 
-Þimdi $x(n)$ girdisine DFT uygulayacaðýz. $X(1)$ için (1) formülü suna
-benzer,
+Þimdi $x(n)$ girdisine DFT uygulayacaðýz. Eðer 1 kHz'un Fourier
+katsayýlarýný merak ediyorsak, $X(1)$ hesaplarýz, yani (1) formülü
+kullanýlacak, ki formül suna benzer,
 
 $$ X(1) = \sum _{n=0}^{7}  x(n)\cos(2\pi n / 8) - jx(n)\sin(2\pi n / 8) $$
+
+Genel kodla gösterelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def X(m):
     real = 0.0; imag = 0.0
     for n in range(8): 
         real += x(n)*np.cos(2*np.pi*m*n/8.)
-        imag += x(n)*np.sin(2*np.pi*m*n/8.)
+        imag -= x(n)*np.sin(2*np.pi*m*n/8.)
     return np.round(real,4), imag
 
 print X(1)
+\end{minted}
+
+\begin{verbatim}
+(-0.0, -4.0)
+\end{verbatim}
+
+2 kHz için ne olur?
+
+\begin{minted}[fontsize=\footnotesize]{python}
 print X(2)
 \end{minted}
 
 \begin{verbatim}
-(-0.0, 4.0)
-(1.4141999999999999, -1.4142135623730947)
+(1.4141999999999999, 1.4142135623730947)
 \end{verbatim}
 
+Bu sonuçlarda 1. sayý hayali sayýnýn reel kýsmý, 2. sayý pür kompleks
+kýsmý. Çoðunlukla bu elde edilen $X(m)$ sayýsýnýn büyüklüðü (magnitude) ile
+ilgileniriz, bu hesap
 
-[devam edecek]
+$$ X_{\textrm{büyüklük}} = |X(m)| = \sqrt{X_{reel}(m)^2 + X_{kompleks}(m)^2}$$
 
-Ekler
+olarak yapýlýyor. \verb!numpy.abs! çaðrýsý bu hesabý hayali sayýlar
+üzerinde otomatik olarak yapar.
 
-[Alttakiler Strang hocanýn dersinden notlardýr]:
+\begin{minted}[fontsize=\footnotesize]{python}
+r,i = X(2)
+print res, u'büyüklük', np.abs(complex(r,i))
+\end{minted}
+
+\begin{verbatim}
+-5.55111512313e-17j büyüklük 1.99999040998
+\end{verbatim}
+
+Büyüklüðe bakýlýrsa 2 Khz frekansýnýn katsayýsý ufak deðil, demek ki bu
+frekans sinyal içinde var / önemli. 3 Khz'e bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+r,i = X(3)
+print res, u'büyüklük', np.abs(complex(r,i))
+\end{minted}
+
+\begin{verbatim}
+-5.55111512313e-17j büyüklük 5.55111512313e-17
+\end{verbatim}
+
+Çok ufak, demek ki bu frekans sinyal içinde mevcut deðil.
+
+Not: Örnekte sürekli bir formülden baþlayarak $x(n)$ hesabý yapýlmýþ olmasý
+ayrýksallýðýn nerede baþlayýp bittiði hakkýnda kafa karýþýklýðý
+yaratmasýn; analitik formül iki yöre arasýnda gidiþ / geliþ nasýl oluyor
+bunu göstermek için yapýldý. Çoðunlukla elimizde sadece bir tek boyutlu bir
+dizi içinde bir seri veri olur, bu verinin hangi analitik formülden
+geldiðini bilmeyiz (Fourier analizinin onun için yapýyoruz zaten!), veri
+hakkýnda tek (gerekli) bilgi onun örneklem frekansý olacaktýr, $x(n)$ bize
+þeriden $n$'inci veriyi döndürmekten baþka bir þey yapmaz.
+
+Bir ornek uzerinde daha gorelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy
+
+N = 64; n = np.arange(N) - 1; T = 0.05;
+t = n*T; xbn = np.sin(w1*t)+ 0.5*np.sin(w2*t);
+plt.stem(t,xbn)
+plt.savefig('compscieng_1_30_08.png')
+k = np.arange(N) - 1
+Xb = scipy.fft(xbn);
+plt.figure()
+plt.stem(k,abs(Xb))
+plt.savefig('compscieng_1_30_09.png')
+\end{minted}
+
+\includegraphics[width=17em]{compscieng_1_30_08.png}
+\includegraphics[width=17em]{compscieng_1_30_09.png}
+
+$k=2,5$'te büyüklük var, bu deðerler $k\omega_0 = 2\pi k / NT$ ile $\pi$
+bazina cevirilebilir, $k=2$ icin $2\pi k / 3.2 = 1.25 \pi$, $k=5$ icin
+$3.125 \pi$ elde ederiz.
+
+Ders 15
+
+[Strang hocanýn notlarýndan. Üstteki DFT hesabý, toplamlar, döngüler
+içinde, belli indiþler için yapýldý. Altta Strang hocanýn anlattýðý ilginç
+bir yaklaþým var, sinyalin frekanslarýnýn katsayýlarla aðýrlýklanmýþ
+toplamý olduðu temel Fourier formülü ile baþlarýz, fakat diðer yöne gitmek
+için pür lineer cebir kullanýrýz, böylece katsayý hesabý bir matris tersi
+alma iþlemi haline gelir. Altta bu yaklaþým anlatýlýyor].
 
 Ayrýksal (discrete) olarak Fourier modellemesi yapmak istiyorsak, elimizde
 devamlý (continuous) f(x) fonksiyonu olmayacak, bir f(x) fonksiyonun belli

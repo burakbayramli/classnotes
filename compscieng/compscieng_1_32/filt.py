@@ -1,6 +1,6 @@
 import numpy as np
 
-def hamm(window_size):
+def hamming(window_size):
     N = window_size;
     output = np.zeros((N, 1));
     if np.mod(N, 2) == 0 :
@@ -18,7 +18,7 @@ def sinc_filter_low(order, fc1, fs):
     Fc1 = fc1 / np.float(fs) 
     M  = order
     B = np.zeros((M+1, 1))
-    window = hamm(M+1)
+    window = hamming(M+1)
     for i in range(M+1):
         if 2 * i == M:
             B[i] = 2*np.pi*Fc1
@@ -33,7 +33,7 @@ def sinc_filter_high(order, fc1, fs):
     Fc1 = fc1 / np.float(fs) 
     M  = order
     B = np.zeros((M+1, 1))
-    window = hamm(M+1)
+    window = hamming(M+1)
     for i in range(M+1):
         if 2 * i == M:
             B[i] = 2*np.pi*Fc1
