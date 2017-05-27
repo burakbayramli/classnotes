@@ -3,29 +3,30 @@
 Frekans Filtrelemek
 
 Bir sinyalin içinden belli frekanslarý ayýklama iþlemine filtreleme adý
-veriliyor; çeþitleri alçak-geçiren (low-pass), yüksek-geçiren (high-pass),
-ve bant geçiren filtreler (band-pass filter). Alçak-geçiren filtrelerle,
-mesela 2 kHz üstündeki tüm frekanlarý sinyalden çýkartmak istiyorsak eþik
-deðeri 2 kHz'lük olan bir alçak-geçiren filtre kullanabiliriz,
-yüksek-geçiren bunun tersini yapar. Bant-geçiren ise sadece belli bir
-aralýktaki frekanlara izin vermek için kullanýlýr, mesela sinyalde 4 ve 5
-kHz arasý frekanslar kalsýn istiyorsak bir bant geçiren filtre kullanýrýz.
+veriliyor; çeþitleri alçak geçiren (low-pass), yüksek geçiren (high-pass),
+ve bant geçiren (band-pass) filtreleri. Alçak geçiren filtrelerle mesela 2
+kHz üstündeki tüm frekanlarý sinyalden çýkartmak istiyorsak eþik deðeri 2
+kHz'lük olan bir filtre kullanabiliriz, yüksek geçiren bunun tersini
+yapabilir. Bant geçiren ise sadece belli bir aralýktaki frekanslara izin
+vermek için kullanýlýr, mesela sinyalde 4 ve 5 kHz arasý frekanslar kalsýn
+istiyorsak bir bant geçiren filtre kullanýrýz.
 
-Bu yazýda sonlu dürtü yanýtlý (finite impülse response -FIR-) adý verilen
+Bu yazýda sonlu dürtü yanýtlý (finite impulse response -FIR-) adý verilen
 sayýsal filtreleri kullanacaðýz, bu filtreler tipik olarak sonlu sayýda
-katsayý olarak hesaplanýrlar, sonra bur katsayýlar bir evriþim
+katsayý olarak hesaplanýrlar, sonra bu katsayýlar bir evriþim
 (convolution) operasyonu ile sinyale uygulanýr.
 
-FIR filtre tasarýmýnda elimizdeki en önemli silah evriþim, ayrýksal fourier
-transformu arasýndaki bir iliþki. Eldeki $x$ verisine evriþim ile bir $h$
-filtresi uygulayacaðýmýzý düþünelim, ve bu bize $y = x * h$ sonucunu
-verecek. Ýliþki þudur ki, eðer $x$ ve $h$'nin Fourier transformunu alýrsak
-$x * h$ iþlemi çarpýma dönüþür, yani frekans yöresindeki çarpým iþlemi
-zaman yöresindeki evriþim iþlemine eþittir [1, sf. 161]. Yani,
+FIR filtre tasarýmýný kolaylaþtýran en önemli numara evriþim ile ayrýksal
+Fourier transformu arasýndaki bir iliþkiye dayanýyor. Bir $x$'e evriþimle
+bir $h$ filtresi uygulayacaðýmýzý düþünelim, ve bu bize $y = x * h$
+sonucunu verecek. Ýliþki þudur ki eðer $x$ ve $h$'nin Fourier transformunu
+alýrsak $x * h$ iþlemi ``frekans yöresinde' $X \cdot H$ çarpýmýna dönüþür,
+yani frekans yöresindeki çarpým iþlemi zaman yöresindeki evriþim iþlemine
+eþittir [1, sf. 161].
 
 $$ x(n) * h(n) \leftrightarrow X(\theta)H(\theta)$$
 
-ki $X$ ve $H$, $x,h$'nin Fourier transformudur.
+ki $X$ ve $H$, $x,h$'nin Fourier transformu.
 
 Ýspat
 
@@ -65,6 +66,28 @@ Son ifadede $x$ ve $h$ nin ayrý ayrý Fourier transformlarýný elde etmiþ
 olduk, ve bu transformlar birbiriyle çarpým halindeler. Ýspat tamamlandý,
 gerçekten de evriþtirilen iki öðenin arasýndaki iliþki ayrý ayrý Fourier
 transformu üzerinden çarpým haline geliyor.
+
+Bu özellik filtre tasarýmýnda son derece faydalý: çünkü eðer belli
+frekanslarý elemek istiyorsak bunu yapmanýn en rahat yolu frekans yöresinde
+öyle bir $H$ tanýmlamak ki $X$'in bazý bölgelerini olduðu gibi býraksýn
+diðerlerini sýfýrlasýn. Bu fonksiyon istenen yerlerde 1 deðerine diðer
+yerlerde 0 deðerine sahip olan bir fonksiyondan ibarettir. Fonksiyon bir
+dikdörtgene benzer, ki bu sebeple ona ``tuðla duvarý (brickwall)'' deniyor,
+duvar sanki istenmeyen frekanslarýn üzerine düþerek onlarý eziyor (!). Bu
+tuðla duvarýnýn önemli bir avantajý zaman yöresine geçiþ yapýldýðýnda yine
+basit bir fonksiyon olmasý, bu ünlü $\sinc$ fonksiyonu,
+
+$$ \sinc (x) = \frac{\sin(x)}{x}$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x=np.linspace(-10.0,10.0,100)
+y=np.sinc(x)
+plt.plot(x,y); 
+plt.savefig('compscieng_1_32_14.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_32_14.png}
+
 
 [devam edecek]
 
@@ -121,6 +144,7 @@ plt.title(u'Yüksek Geçiren Filtre Sonrasý Sinyal')
 plt.savefig('compscieng_1_32_10.png')
 f=plt.figure()
 filt.plotSpectrum(y2, fs)
+plt.title(u'Yüksek Geçiren Filtre Sonrasý Frekanslar')
 plt.savefig('compscieng_1_32_09.png')
 \end{minted}
 
@@ -147,7 +171,6 @@ plt.savefig('compscieng_1_32_11.png')
 \includegraphics[width=20em]{compscieng_1_32_11.png}
 
 \includegraphics[width=20em]{compscieng_1_32_12.png}
-
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.signal import butter, lfilter
