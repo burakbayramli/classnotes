@@ -58,12 +58,12 @@ def sinc_filter_band(order, fc1, fc2, fs):
     return output
 
 def plotSpectrum(y,Fs):
-    n = len(y) # length of the signal
+    n = len(y) # sinyal uzunlugu
     k = np.arange(n)
     T = n/Fs
-    frq = k/T # two sides frequency range
-    frq = frq[range(n/2)] # one side frequency range
-    Y = scipy.fft(y)/n # fft computing and normalization
+    frq = k/T # frekansin her iki kismi
+    frq = frq[range(n/2)] # frekansin tek tarafi
+    Y = scipy.fft(y)/n # fft hesaplamak ve normalizasyon
     Y = Y[range(n/2)] 
-    plt.plot(frq,np.abs(Y),'r') # plotting the spectrum
+    plt.plot(frq,np.abs(Y),'r') # spektrumu grafiklemek
     
