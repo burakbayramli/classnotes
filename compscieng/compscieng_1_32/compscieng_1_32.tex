@@ -72,11 +72,10 @@ frekanslarý elemek istiyorsak bunu yapmanýn en rahat yolu frekans yöresinde
 öyle bir $H$ tanýmlamak ki $X$'in bazý bölgelerini olduðu gibi býraksýn
 diðerlerini sýfýrlasýn. Bu fonksiyon istenen yerlerde 1 deðerine diðer
 yerlerde 0 deðerine sahip olan bir fonksiyondan ibarettir. Fonksiyon bir
-dikdörtgene benzer, ki bu sebeple ona ``tuðla duvarý (brickwall)'' deniyor,
-duvar sanki istenmeyen frekanslarýn üzerine düþerek onlarý eziyor (!). Bu
-tuðla duvarýnýn önemli bir avantajý (ters Fourier transformu ile) zaman
-yöresine geçiþ yapýldýðýnda yine basit bir fonksiyon olmasý, bu ünlü
-$\sinc$ fonksiyonudur,
+dikdörtgene benzer, ki bu sebeple ona ``tuðla duvarý (brickwall)''
+deniyor. Bu tuðla duvarýnýn önemli bir avantajý (ters Fourier transformu
+ile) zaman yöresine geçiþ yapýldýðýnda yine basit bir fonksiyon olmasý, bu
+ünlü $\sinc$ fonksiyonudur,
 
 $$ \sinc (x) = \frac{\sin(x)}{x}$$
 
@@ -131,14 +130,44 @@ alçak geçiren (low-pass) filtreyi elde ediyoruz [2, sf. 285].
 
 Tek problem $\sinc$ fonksiyonunun sýfýr genliðe eriþmeden eksi ve artý
 sonsuzluða sürekli devam etmesi. Bu sonsuz uzantý sayýsal ortamda
-kullanýþlý deðil. Bunun için fonksiyonu bize sýfýrda ortalanmýþ $M$ tane
-katsayý deðeri býrakacak þekilde kýrpacaðýz ($M$ çift sayý olmalý, her iki
-yönde eþit katsayý olmasý için), ve geri kalan tüm $\sinc$ deðerleri sýfýr
-kabul edilecek. 
+kullanýþlý deðil. Bunun için fonksiyonu bize sýfýrda ortalanmýþ $M+1$ tane
+katsayý deðeri býrakacak þekilde kýrpacaðýz ($M$ çift sayý olmalý, sifirda
+ortalaninca geri kalan katsayilardan her iki yönde eþit sayýda olmasý
+için), ve geri kalan tüm $\sinc$ deðerleri sýfýr kabul edilecek. 
 
-[devam edecek]
+Bir diðer problem sýfýrda ortalama demek negatif indiþler kullanmak demek,
+bu bilgisayarlar için problemli; o sebeple her þeyi $M/2$ saða
+kaydýrýyoruz. 
+
+Fakat kýrpmanýn bir yan etkisi þudur; kýrpma çok keskin bir þekilde
+yapýldýðý için bu fonksiyonda ani bitiþ (abrupt end) yaratýyor ve bu
+frekans yöresinde pürüzlere yol açýyor. 
+
+\includegraphics[width=30em]{compscieng_1_32_15.png}
+
+Bu problemin bir çözümü pencereleme fonksiyonu kullanmak, ve filtreleme
+yapacak çekirdeði bu pencereyle çarpýp ani geçiþi yumuþatmaya
+uðraþmak. Hamming penceresi bir seçenek,
+
+$$ w[i] = 0.54 - 0.46 \cos (2\pi 2 / M)  $$
+
+Nihai filtre
+
+$$ 
+h[i] = K \frac{\sin(2\pi f_c (i-M/2))}{i-M/2} \bigg[
+0.54 - 0.46 \cos (2\pi 2 / M)
+\bigg]
+$$
+
+\includegraphics[width=30em]{compscieng_1_32_16.png}
+
+Kodlarý altta görüyoruz, 
 
 \inputminted[fontsize=\footnotesize]{python}{filt.py}
+
+Alçak Geçiren (Low-Pass) Filtre
+
+Bir alçak geçiren filtre örneði $f_c$ eþik deðeri için altta görülüyor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import filt
@@ -181,6 +210,13 @@ plt.savefig('compscieng_1_32_07.png')
 
 \includegraphics[width=20em]{compscieng_1_32_08.png}
 
+Yüksek Geçiren (High-Pass) Filtre
+
+Yüksek geçiren filtre elde etmek için herhangi bir $f_c$ için tanýmlý bir
+alçak geçiren filtreyi alýp, katsayýlarýný negatife çevirmek yeterli (bir
+de ortada sýfýr noktasýnda bir pozitif deðer ekleniyor). Bu deðiþim o
+filtreyi $f_c$ için yüksek geçiren hale getirir.
+
 \begin{minted}[fontsize=\footnotesize]{python}
 fc1 = 4
 f2 = filt.sinc_filter_high(order, fc1, fs).T[0];
@@ -199,6 +235,14 @@ plt.savefig('compscieng_1_32_09.png')
 
 \includegraphics[width=20em]{compscieng_1_32_10.png}
 
+Bant Geciren (Band-Pass) Filtre
+
+Sadece $f_{c1}$ ve $f_{c2}$ frekanslarý arasý haricindeki tüm diðer
+frekanslar elensin istiyorsak $f_{c1}$ için alçak geçiren $f_{c2}$ için
+yüksek geçiren filtre tanýmlayýp bu iki filtreyi toplarýz. Bu toplam bize
+bir bant reddi (bant-reject) filtresi verir. Ama biz bunun tersini
+istiyoruz, o zaman eldeki katsayýlarý üstteki bahsedilen yöntemle tersini
+alýrsak, bir bant geçiren filtre elde ederiz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 fc1 = 4.0
@@ -218,6 +262,9 @@ plt.savefig('compscieng_1_32_11.png')
 \includegraphics[width=20em]{compscieng_1_32_11.png}
 
 \includegraphics[width=20em]{compscieng_1_32_12.png}
+
+Karþýlaþtýrma amaçlý olarak \verb!scipy.signal.butter! kütüphane çaðrýsý
+ile bir Butterworth bant geçiren filtreyi de ayný veri üzerinde iþlettik.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.signal import butter, lfilter
@@ -241,15 +288,6 @@ plt.savefig('compscieng_1_32_13.png')
 \end{minted}
 
 \includegraphics[width=20em]{compscieng_1_32_13.png}
-
-
-
-
-
-
-
-
-[devam edecek]
 
 Kaynaklar
 
