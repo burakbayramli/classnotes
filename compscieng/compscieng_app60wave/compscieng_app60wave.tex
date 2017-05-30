@@ -1,8 +1,19 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Frekanslar, Uygulamalar
+Frekans Verisi Bazlý Uygulamalar
 
 Adým Ölçmek, Pedometre
+
+Cep telefonlarýnýn çoðunda artýk ivmeölçer (acceloremeter) algýlayýcýlar
+var; bu algýlayýcýlar telefonun $x,y,z$ eksenlerini baz alarak bu
+eksenlerde ne kadar ivme etkisi olduðunu ölçüyorlar. 
+
+Bu etkilerden en büyüklerinden biri tabii ki yerçekimi, telefonda hiçbir
+hareket olmasa bile telefonu tutuþa göre 9.8 metre / $s^2$'lik bir ivme tek
+ya da tüm eksenlere daðýlmýþ olarak ölçülecektir. Yürürken, adým atarken
+meydana çýkan yukarý ve aþaðý yönde kuvvet uygulamasý da ivmeölçerlerle
+yakalanabilmeli. Bu ölçümleri kullanarak acaba atýlan adým sayýsýný bulamaz
+mýyýz? [8]'deki uygulamayý kullanarak alýnan ölçümlere bakalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -21,12 +32,27 @@ print dfacc.head()
 
 \begin{minted}[fontsize=\footnotesize]{python}
 steps1 = np.sqrt(np.sum(dfacc[[1,2,3]]**2, axis=1))
-steps2 = steps1 - 10.0
+steps2 = steps1 - 9.8
 steps2[:200].plot()
 plt.savefig('compscieng_app60wave_01.png')
 \end{minted}
 
 \includegraphics[height=6cm]{compscieng_app60wave_01.png}
+
+Üç eksendeki ivme ölçümünün normalize ettik (karelerinin toplamýnýn
+kareköku) - daha önce belirtildiðimiz gibi telefonun duruþu deðiþik
+þekillerde olabilir, ve yerçekiminde olduðu gibi bu ölçümler üç eksene
+daðýlmýþ olacaktýr. Bu üç ölçümü birleþtirerek esas bizi ilgilendiren
+hesaba daha yaklaþmýþ olmayý umduk. Sonuçlar fena deðil, baþtaki sýfýra
+yakýn bölgede hiç hareket etmiyorduk mesela, ve ivme hesabý burada ufak
+bir deðer gösteriyor.
+
+Yapýlan bir ek iþlemden daha bahsedelim, 9.8'lik yerçekimi ivmesini
+karekökten çýkarttýk çünkü yerçekimini ölçmekle de ilgilenmiyoruz (hep ayný
+zaten), bu deðeri çýkartarak yine bizi ilgilendiren veriyi daha net þekilde
+görebileceðimizi umduk. Altta bu çýkartma öncesi ve sonrasýnda yapýlan
+Fourier analizine göre yerçekimi çýkartýlmýþ verinin bizim ilgilendiðimiz
+frekanslarý daha net gösterdiði belli oluyor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sys; sys.path.append('../compscieng_1_32')
@@ -42,17 +68,29 @@ plt.savefig('compscieng_app60wave_06.png')
 \includegraphics[height=6cm]{compscieng_app60wave_02.png}
 \includegraphics[height=6cm]{compscieng_app60wave_06.png}
 
+1 Hz. ve 2 Hz. seviyesindeki frekanslar ilginç, bunlar saniyede bir ve iki
+adýma tekabül ediyor olmalýlar. 
+
+Adým saymak için zaman serilerinde doruk / üç nokta bulabilen kodlar
+kullanacaðýz, \verb!peakutils! altýnda bu kodlarý görüyoruz; bu kodlarla
+belli eþik, minimum mesafe deðerlerini belirleyerek bir zaman serisindeki
+uç noktalarý bulabiliyoruz.
+
 \begin{minted}[fontsize=\footnotesize]{python}
-idx = peakutils.indexes(bpSteps, thres=0.1, min_dist=3)
-print len(idx)
-plt.plot(bpSteps)
-plt.plot(idx,bpSteps[idx],'rd')
+import peakutils
+idx = peakutils.indexes(steps2, thres=0.1, min_dist=3)
+print len(idx), u'doruk noktasý var'
+plt.plot(steps2)
+plt.plot(idx,steps2[idx],'rd')
 plt.savefig('compscieng_app60wave_03.png')
 \end{minted}
 
 \begin{verbatim}
-89
+89 doruk noktasý var
 \end{verbatim}
+
+Bu noktalarýn alt bölümü de var tabii, bu nihai sayý için üstteki sonucu
+iki ile çarpabiliriz. Hesap fena deðil, bu deney için 170 adým atmýþtýk.
 
 \includegraphics[height=6cm]{compscieng_app60wave_03.png}
 
@@ -64,8 +102,6 @@ print len(idx2)
 \begin{verbatim}
 89
 \end{verbatim}
-
-85*2 = 160 adim olmali
 
 Radyo Dalgalari
 
@@ -225,7 +261,7 @@ Kaynaklar
 
 [7] Fund, {\em Lab 1: Working with IQ data in Python}, \url{http://witestlab.poly.edu/~ffund/el9043/labs/lab1.html}
 
-[8] Barton, {\em Nest Interview}, \url{https://github.com/sbarton272/Pedometer}
+[8] Bayramlý, {\em Algýlayýcý Ölçümleri, Video, Android}, \url{http://sayilarvekuramlar.blogspot.de/2017/02/algilayici-olcumleri-video-android.html}
 
 \end{document}
 
