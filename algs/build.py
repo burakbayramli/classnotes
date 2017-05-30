@@ -29,7 +29,7 @@ if len(sys.argv) == 1:
     ./street/street.pdf \
     ./phd/phd.pdf \
     ./zapp/zapp.pdf \
-    output ../../Dropbox/Public/skfiles/app-math-tr.pdf"
+    output ../../Dropbox/Public/skfiles/algs.pdf"
     os.system(cmd)
     print cmd
     exit()
