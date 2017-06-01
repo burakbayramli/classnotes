@@ -1,3 +1,7 @@
+#
+# https://github.com/atjacobs/PeakUtils adresinden alinmistir,
+# bu kod Matlab dunyasinda iyi bilinen peakutils'in Python cevrimi
+#
 import numpy as np
 from scipy import optimize
 from scipy.integrate import simps
