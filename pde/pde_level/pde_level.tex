@@ -280,26 +280,16 @@ bir kýsmý matematiksel formüllerle (belki kalem kaðýtla) yapýlýyor.
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.signal as signal
 import scipy.ndimage as image
-from scipy import ndimage
-
-def bwdist(a):
-    """ 
-    this is an intermediary function, 'a' has only True, False vals, 
-    so we convert them into 0, 1 values -- in reverse. True is 0, 
-    False is 1, distance_transform_edt wants it that way.
-    """
-    b = np.ones(a.shape)
-    b[a==True] = 0.
-    return ndimage.distance_transform_edt(b)
+import time
 
 def gauss_kern():
     """ Returns a normalized 2D gauss kernel array for convolutions """
-    h1 = 15
-    h2 = 15
+    h1 = 8
+    h2 = 8
     x, y = np.mgrid[0:h2, 0:h1]
     x = x-h2/2
     y = y-h1/2
-    sigma = 1.5
+    sigma = 10.0
     g = np.exp( -( x**2 + y**2 ) / (2*sigma**2) );
     return g / g.sum()
 
@@ -327,7 +317,7 @@ g = 1 / (1+absGradI**2)
 gy,gx = np.gradient(g)
 
 # gradient descent step size
-dt=1.
+dt=1
 
 # number of iterations after which we reinitialize the surface
 num_reinit=10
@@ -337,7 +327,7 @@ phiOld=np.zeros((rows,cols))
 # number of iterations after which we reinitialize the surface
 iter=0
 
-while iter < 70:
+while iter<150:
     # gradient of phi
     gradPhiY, gradPhiX = np.gradient(phi)    
     # magnitude of gradient of phi
@@ -360,29 +350,20 @@ while iter < 70:
     # level set evolution equation    
     phi = phi + ( dt * dPhiBydT )
     iter=iter+1
-    if np.mod(iter,num_reinit)==0:
-        # reinitialize the embedding function 
-        # after num_reinit iterations
-        phi=np.sign(phi)
-        phi = (phi > 0) * (bwdist(phi < 0)) - \
-            (phi < 0) * (bwdist(phi > 0))
-        
-    if np.mod(iter,10)==0:
+    if np.mod(iter,20)==0:
+        f=plt.figure()
         plt.imshow(Img, cmap='gray')
-        plt.hold(True)
-        plt.contour(phi,0, colors='r')
+        CS = plt.contour(phi,0, colors='r') 
         plt.savefig('level_2_' + str(iter) + '.png')
-        plt.hold(False)
 \end{minted}
 
-\includegraphics[height=4cm]{level_2_10.png}
 \includegraphics[height=4cm]{level_2_20.png}
-\includegraphics[height=4cm]{level_2_30.png}
 \includegraphics[height=4cm]{level_2_40.png}
-\includegraphics[height=4cm]{level_2_50.png}
 \includegraphics[height=4cm]{level_2_60.png}
-\includegraphics[height=4cm]{level_2_70.png}
-
+\includegraphics[height=4cm]{level_2_80.png}
+\includegraphics[height=4cm]{level_2_100.png}
+\includegraphics[height=4cm]{level_2_120.png}
+\includegraphics[height=4cm]{level_2_140.png}
 
 
 \end{document}
