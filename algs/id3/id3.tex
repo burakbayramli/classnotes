@@ -41,9 +41,8 @@ Diðer bir örnek, lokantalarda çok yemek yiyen birisinin kullandýðý karar
 aðacý olabilir. Bu kimse her türlü deðiþik þart altýnda deðiþik lokantalara
 gitmiþ, ve her seferindeki memnuniyet/piþmanlýk durumunu kayýt ederek bir
 karar aðacý oluþturmuþ ise, artýk yeni bir lokantada karar kýlmasý için
-kapýsýndan þöyle içeri bakýp menüye göz gezdirmesi yeterli olacaktýr.
-
-Mesela bu zat'týn lokanta deneyimleri aþaðýdaki gibi kayýtlý olsun.
+kapýsýndan þöyle içeri bakýp menüye göz gezdirmesi yeterli olacaktýr. Bu
+kiþinin lokanta deneyimleri mesela aþaðýdaki gibi kayýtlý olsun.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 labels = ['BASKA','BAR','HAFTASONU','ACMIYIZ','MUSTERILER',\
@@ -196,18 +195,19 @@ problemlerden hatýrlayabileceðimiz bir sonuç bu. Ya da, 'iki tane bit en
 fazla kaç onluk sayýyý gösterir' sorusunun tersten sorulmuþ þeklidir
 denebilir.
 
-Þimdi, bu ters soruyu, karar aðacýnýn böldüðü her parçaya soralým. Tabii
-birkaç deðiþiklik yapmamýz gerekecek. Mesela elimizde yemektürü=tayland
-sonucunda tek bir parça üzerine 2 yanlýþ ve 2 doðru deðer var ise, bu
-düðümün bilgi deðerini kesirler ile hesaplamamýz gerekecek. Kesirler ile
-uðraþýrken, log iþlevi eksi deðerler getireceði için, cevabý önce kesirin
-kendisi, sonra da eksi ile çarpmamýz lazým (log, 0 ve 1 arasý için eksi
-deðer getirir). Yani, genel olarak iki cevaplý bir uzayda, tek parçanýn
-bilgi deðeri þöyle gösterilebilir. Parca Bilgi Degeri suna esit:
+Þimdi bu ters soruyu karar aðacýnýn böldüðü her parçaya soralým. Tabii
+birkaç deðiþiklik yapmamýz gerekecek. Mesela elimizde
+\verb!yemekturu=tayland! sonucunda tek bir parça üzerine 2 yanlýþ ve 2
+doðru deðer var ise, bu düðümün bilgi deðerini kesirler ile hesaplamamýz
+gerekecek. Kesirler ile uðraþýrken log iþlevi eksi deðerler getireceði için
+cevabý önce kesirin kendisi, sonra da eksi ile çarpmamýz lazým ($\log$, 0
+ve 1 arasý için eksi deðer getirir). Yani, genel olarak iki cevaplý bir
+uzayda, tek parçanýn bilgi deðeri þöyle gösterilebilir. Parça Bilgi Deðeri
+suna eþit:
 
 $$ B(O(v_1),...,O(V_n)) = \sum_{i=1}^{n} -O(v_i)\log_2O(v_i) $$
 
-$O$, olasiligi temsil ediyor. 
+$O$, olasýlýðý temsil ediyor. 
 
 Genel olarak göstermek gerekirse, n cevaplý bir uzayda parçanýn bilgi
 deðeri þudur. 
@@ -322,7 +322,7 @@ import operator
 def calcShannonEnt(dataSet):
     numEntries = len(dataSet)
     labelCounts = {}
-    #the the number of unique elements and their occurance
+    # kac ozgun deger var ve bu degerler kac kere ortaya cikiyorlar
     for featVec in dataSet: 
         currentLabel = featVec[-1]
         if currentLabel not in labelCounts.keys(): labelCounts[currentLabel] = 0
@@ -337,45 +337,38 @@ def splitDataSet(dataSet, axis, value):
     retDataSet = []
     for featVec in dataSet:
         if featVec[axis] == value:
-            #chop out axis used for splitting
             reducedFeatVec = featVec[:axis]     
             reducedFeatVec.extend(featVec[axis+1:])
             retDataSet.append(reducedFeatVec)
     return retDataSet
     
 def chooseBestFeatureToSplit(dataSet):
-    #the last column is used for the labels
     numFeatures = len(dataSet[0]) - 1      
     baseEntropy = calcShannonEnt(dataSet)
     bestInfoGain = 0.0; bestFeature = -1
-    #iterate over all the features
+    # tum ozellikleri ziyaret et
     for i in range(numFeatures):        
-        #create a list of all the examples of this feature
         featList = [example[i] for example in dataSet]
-        #get a set of unique values
         uniqueVals = set(featList)       
         newEntropy = 0.0
         for value in uniqueVals:
             subDataSet = splitDataSet(dataSet, i, value)
             prob = len(subDataSet)/float(len(dataSet))
             newEntropy += prob * calcShannonEnt(subDataSet)     
-        #calculate the info gain; ie reduction in entropy
+        # enformasyon kazancini hesapla, yani entropideki azalisi
         infoGain = baseEntropy - newEntropy     
-        #compare this to the best gain so far
+        # bu hesabi simdiye kadarki en iyi kazancla karsilastir
         if (infoGain > bestInfoGain):       
-            #if better than current best, set to best
             bestInfoGain = infoGain         
             bestFeature = i
-    #returns an integer
     return bestFeature                      
 
 
 def createTree(dataSet,labels):
     classList = [example[-1] for example in dataSet]
     if classList.count(classList[0]) == len(classList): 
-        #stop splitting when all of the classes are equal
+        # tum siniflar esitse bolmeyi durdur
         return classList[0]
-    #stop splitting when there are no more features in dataSet
     if len(dataSet[0]) == 1: 
         return majorityCnt(classList)
     bestFeat = chooseBestFeatureToSplit(dataSet)
@@ -396,7 +389,6 @@ def getNumLeafs(myTree):
     firstStr = myTree.keys()[0]
     secondDict = myTree[firstStr]
     for key in secondDict.keys():
-        #test to see if the nodes are dictonaires, if not they are leaf nodes
         if type(secondDict[key]).__name__=='dict':
             numLeafs += getNumLeafs(secondDict[key])
         else:   numLeafs +=1
@@ -407,7 +399,6 @@ def getTreeDepth(myTree):
     firstStr = myTree.keys()[0]
     secondDict = myTree[firstStr]
     for key in secondDict.keys():
-        #test to see if the nodes are dictonaires, if not they are leaf nodes
         if type(secondDict[key]).__name__=='dict':
             thisDepth = 1 + getTreeDepth(secondDict[key])
         else:   thisDepth = 1
@@ -426,11 +417,8 @@ def plotMidText(cntrPt, parentPt, txtString):
                         va="center", ha="center", rotation=30)
 
 def plotTree(myTree, parentPt, nodeTxt):
-    #if the first key tells you what feat was split on
-    #this determines the x width of this tree
     numLeafs = getNumLeafs(myTree)  
     depth = getTreeDepth(myTree)
-    #the text label for this node should be this
     firstStr = myTree.keys()[0]     
     cntrPt = (plotTree.xOff + (1.0 + float(numLeafs))/2.0/plotTree.totalW,\
               plotTree.yOff)
@@ -439,24 +427,19 @@ def plotTree(myTree, parentPt, nodeTxt):
     secondDict = myTree[firstStr]
     plotTree.yOff = plotTree.yOff - 1.0/plotTree.totalD
     for key in secondDict.keys():
-        #test to see if the nodes are dictonaires, if not they are leaf nodes   
         if type(secondDict[key]).__name__=='dict':
-            #recursion
             plotTree(secondDict[key],cntrPt,str(key))        
-        else:   #it's a leaf node print the leaf node
+        else:  
             plotTree.xOff = plotTree.xOff + 1.0/plotTree.totalW
             plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), \
             cntrPt, leafNode)
             plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))
     plotTree.yOff = plotTree.yOff + 1.0/plotTree.totalD
-    #if you do get a dictonary you know it's a tree, and the first
-    #element will be another dict
 
 def createPlot(inTree):
     fig = plt.figure(1, facecolor='white')
     fig.clf()
     axprops = dict(xticks=[], yticks=[])
-    #no ticks
     createPlot.ax1 = plt.subplot(111, frameon=False, **axprops)    
     plotTree.totalW = float(getNumLeafs(inTree))
     plotTree.totalD = float(getTreeDepth(inTree))
