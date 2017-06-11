@@ -33,7 +33,6 @@ if len(sys.argv) == 1 :
     "./stat_worldcup/stat_worldcup.pdf " + \
     "./stat_hadoop_patent/stat_hadoop_patent.pdf " + \
     "./stat_hadoop_logreg/stat_hadoop_logreg.pdf " + \
-    "./stat_multiout/stat_multout_reg.pdf " + \
     "./stat_naive/stat_naive.pdf " + \
     "./stat_pcd/stat_pcd.pdf " + \
     "./stat_boltzmann/stat_boltzmann.pdf " + \
