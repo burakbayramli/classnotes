@@ -1,4 +1,15 @@
 
+benim filmer
+
+6,Heat,4
+11,American President, The,5
+10,GoldenEye (1995),5
+111::Taxi Driver (1976),3
+150::Apollo 13 (1995),4
+380::True Lies (1994),5
+485::Last Action Hero (1993),3
+2701::Wild Wild West (1999),1
+
 ```python
 import networkx as net
 import networkx.generators.small
