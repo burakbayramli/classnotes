@@ -1,51 +1,5 @@
 
 
-
-```python
-import pandas as pd
-df = pd.read_csv('../stat_logit/nes.dat',sep=r'\s+')
-df = df[['presvote','year','gender','income','race','occup1']]
-df = df.dropna()
-df.to_csv('nes2.csv',index=None)
-```
-
-
-
-
-
-```python
-from sklearn.feature_extraction.text import HashingVectorizer
-import numpy as np
-vect = HashingVectorizer(n_features=20)
-a = ['aa','bb','cc']
-res = vect.transform(a)
-print res
-```
-
-```text
-  (0, 5)	1.0
-  (1, 19)	1.0
-  (2, 18)	-1.0
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-https://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/
-
-
 ```python
 from sklearn.feature_extraction.text import HashingVectorizer
 import numpy as np
@@ -56,7 +10,7 @@ HASH = 30
 vect = HashingVectorizer(decode_error='ignore',n_features=HASH)
 
 def get_row(cols):
-    with open("tmp.csv", 'r') as csvfile:
+    with open("nes2.csv", 'r') as csvfile:
         rd = csv.reader(csvfile)
         headers = {k: v for v, k in enumerate(next(rd))}
         for row in rd:

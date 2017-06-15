@@ -150,7 +150,7 @@ vs. gibi ek bilgiler çýkartýlabilir. Tüm kolonlar veri madenciliði
 algoritmasýna verilir, ve algoritma belki öðlen saati ile sipariþ verilmiþ
 olmasý arasýnda genel bir baðlantý bulacaktýr.
 
-Python + Pandaþ ile bir zaman kolonu þöyle parçalanabilir, örnek veri
+Python + Pandas ile bir zaman kolonu þöyle parçalanabilir, örnek veri
 üzerinde görelim, sadece iki kolon var, müþteri no, ve sipariþ zamaný,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -247,7 +247,7 @@ night = int (morning==0 and noon==0 and afternoon==0)
 
 kullanýldý.
 
-Anahtarlama Numarasý (Hashing Trick)
+Kategörleri Ýkileþtirme, Anahtarlama Numarasý (Öne-Hot Encoding, Hashing Trick)
 
 Üstteki kodda bir problem var, dokümaný temsil eden ve içinde 1 ya da
 0 hücreli özellik vektörünü (feature vector) oluþturmak için tüm
@@ -347,25 +347,24 @@ print hash_col(data,'state',4)
 4  2.9  2002        0        0        0        1
 \end{verbatim}
 
-Azar Azar Ýþlemek (Incremental, Mýnýbatch Processing)
+Azar Azar Ýþlemek (Incremental, Minibatch Processing)
 
-Üstteki yöntemler eðer tüm veri hafýzada (Pandas üzerindeyse) iyi. Fakat
-çoðu zaman onlarca kategori, birkaç milyonluk satýr içeren bir veriye
-bakmamýz gerekiyor; biliyoruz ki bu kadar veri için Büyük Veri
-teknolojilerine (mesela Spark, Hadoop gibi) geçmek gereðinden fazla külfet
-getirecek, elimizdeki dizüstü, masaüstü bilgisayarý bu iþlemler için
-yeterli, fakat çoðu kütüphane tek makina / azar azar iþlem için
-yazýlmamýþ. 
+Üstteki yöntemler eðer tüm veri hafýzada ise iyi. Fakat çoðu zaman onlarca
+kategori, birkaç milyonluk satýr içeren bir veriye bakmamýz gerekiyor;
+biliyoruz ki bu kadar veri için Büyük Veri teknolojilerine (mesela Spark,
+Hadoop gibi) geçmek gereðinden fazla külfet getirecek, elimizdeki dizüstü,
+masaüstü bilgisayarý bu iþlemler için yeterli olmalý, fakat çoðu kütüphane
+tek makinada azar azar iþlem yapmak için yazýlmamýþ.
 
 Bu durumda kendimiz çok basit Python kavramlarýný, iyi bir anahtarlama
-kodunu, ve seyreklik (sparsity) kullanarak ufak veri parçalarý iþleyen bir
-ortamý yaratabiliriz. 
+kodunu, ve lineer cebir hesaplarýnda seyreklik (sparsýty) tekniklerini
+kullanarak ufak veri parçalarý iþleyen bir ortamý yaratabiliriz.
 
-Örnek veri olarak {\em Lineer Regresyon} yazýsýnda görülen oy veriþ
-kalýplarý verisiný biraz deðiþtirerek yeni bir analiz için
-kullanalým. Analiz oy verenlerin ýrk, cinsiyet, meslek, hangi partiye oy
-verdiði gibi kategorik deðerlerin bu kiþinin kazancýyla baðlantýlý olup
-olmadýðý. 
+Örnek veri olarak {\em Lineer Regresyon} yazýsýnda görülen oy kalýplarý
+verisini biraz deðiþtirerek yeni bir analiz için kullanalým. Veri oy
+verenlerin ýrk, cinsiyet, meslek, hangi partiye oy verdikleri ve
+kazançlarýný kaydetmiþ, biz analizimizde bahsedilen kategorilerin bu
+kiþilerin kazancýyla baðlantýlý olup olmadýðýna bakacaðýz. Veriyi oluþturalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -375,29 +374,141 @@ df = df.dropna()
 df.to_csv('nes2.csv',index=None)
 \end{minted}
 
-Analize baþlayalým. Önce kategorilerden ne kadar var, sayalým. Basit toplam
-yapalým yani,
+Önce kategorilerden ne kadar var, sayalým. Basit toplam yani,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
 df = pd.read_csv('nes2.csv')
 print u'tüm veri', len(df)
-print np.array(df['gender'].value_counts())
-print np.array(df['race'].value_counts())
-print np.array(df['presvote'].value_counts())
+print 'cinsiyet', np.array(df['gender'].value_counts())
+print u'ýrk', np.array(df['race'].value_counts())
+print 'parti', np.array(df['presvote'].value_counts())
 \end{minted}
 
 \begin{verbatim}
 tüm veri 13804
-[7461 6343]
-[12075  1148   299   180    85    17]
-[6998 6535  271]
+cinsiyet [7461 6343]
+ýrk [12075  1148   299   180    85    17]
+parti [6998 6535  271]
 \end{verbatim}
 
-Son sonuçtaki her hücre belli bir partiye verilen oylarýn sayýsý; veriye
-göre üç farklý kategori varmýþ demek ki, veri ABD için olduðuna göre bunlar
-bilinen iki büyük parti, üçüncü hücre de herhalde baðýmsýz adaylar. 
+Mesela son sonuçtaki her hücre belli bir partiye verilen oylarýn sayýsý;
+veriye göre üç farklý kategori varmýþ demek ki, veri ABD için olduðuna göre
+bunlardan ilk ikisi bilinen iki büyük parti, üçüncü hücre de herhalde
+baðýmsýz adaylar.
 
+Kategorik verileri ikileþtirmeye gelelim. Burada üç nokta önemli, azar azar
+iþleyeceðiz, sonucu seyrek matris almak istiyoruz, ve hangi kategorik
+deðerin hangi kolona eþleneceðini elle tanýmlamak istemiyoruz (eþleme
+otomatik olmalý). Seyreklik önemli çünkü eðer 1000 farklý kategorik deðere
+sahip olan 10 tane kolon varsa, bu 10000 tane yeni kolon yaratýlmasý
+demektir - her farklý kategori için o deðere tekabül eden kolon 1 olacak
+gerisi 0 olacak. Bu rakamlar orta ölçekte bile rahatlýkla milyonlara
+ulaþabilir. Eðer ikileþtirme için seyrek matris kullanýrsak çoðu sýfýr olan
+deðerler hafýzada bile tutulmaz. Eþleme otomatik olmalý, zaten onun için
+anahtarlama yapacaðýz. 
+
+Anahtarlama icin \verb!sklearn.feature_extraction.text.HashingVectorizer!
+var,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.feature_extraction.text import HashingVectorizer
+import numpy as np
+vect = HashingVectorizer(n_features=20)
+a = ['aa','bb','cc']
+res = vect.transform(a)
+print res
+\end{minted}
+
+\begin{verbatim}
+  (0, 5)	1.0
+  (1, 19)	1.0
+  (2, 18)	-1.0
+\end{verbatim}
+
+Sonuçlar seyrek matris olarak, ve üç deðer için üç ayrý satýr olarak
+geldi. Bunu tek satýr olacak þekilde kendimiz tekrar düzenleyebiliriz. O
+zaman Python \verb!yield! kavramýný [3] kullanarak (azar azar satýr okumak
+için), ve anahtarlama, seyrek matrisler ile þu þekilde bir kod olabilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.feature_extraction.text import HashingVectorizer
+import numpy as np
+import pandas as pd, csv
+import scipy.sparse as sps
+
+HASH = 30
+vect = HashingVectorizer(decode_error='ignore',n_features=HASH)
+
+def get_row(cols):
+    with open("nes2.csv", 'r') as csvfile:
+        rd = csv.reader(csvfile)
+        headers = {k: v for v, k in enumerate(next(rd))}
+        for row in rd:
+            label = float(row[headers['income']])
+            rrow = [x + str(row[headers[x]]) for x in headers if x in cols]
+            X_train = vect.transform(rrow)
+            yield X_train.tocoo(), label            
+
+def get_minibatch(row_getter,size=10):
+    X_train = sps.lil_matrix((size,HASH))
+    y_train = []
+    for i in range(size):
+        cx,y = row_getter.next()
+        for dummy,j,val in zip(cx.row, cx.col, cx.data): X_train[i,j] = val
+        y_train.append(y)
+    return X_train, y_train
+    
+cols = ['gender','income','race','occup1']
+row_getter = get_row(cols)
+X,y = get_minibatch(row_getter,size=1)
+print y, X.todense()
+\end{minted}
+
+\begin{verbatim}
+[4.0] [[ 0.  0.  0. -1.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.
+   0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  1.  0.]]
+\end{verbatim}
+
+Ýlgilendiðimiz kolon listesini \verb!get_row!'a verip bir gezici fonksiyon
+yarattýk. Bu geziciyi \verb!get_minibatch!'e verdik, kaç tane satýr
+istediðimizi ona söylüyoruz, o bize istenen kadar satýrý seyrek matris
+olarak veriyor. 10 tane daha isteyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+X,y = get_minibatch(row_getter,size=10)
+print len(y), X.shape, type(X)
+\end{minted}
+
+\begin{verbatim}
+10 (10, 30) <class 'scipy.sparse.lil.lil_matrix'>
+\end{verbatim}
+
+Þimdi baþtan itibaren parçalar halinde alýnan verileri lineer regresyon
+yapmak için kullanalým. Regresyonun hedef verisi kazanç, kaynak verisi geri
+kalan kategoriler. Her parça 1000 satýr, 10 parça alacaðýz, 10,000 satýr
+modeli eðitmek için kullanýlacak. Geri kalanlar test verisi
+olacak. \verb!sklearn.linear_model.SGDRegressor! ufak seyrek matris
+parçalarý ile eðitilebiliyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.linear_model import SGDRegressor
+clf = SGDRegressor(random_state=1, n_iter=1)
+row_getter = get_row(cols)
+for i in range(10):
+    X_train, y_train = get_minibatch(row_getter,1000)
+    clf.partial_fit(X_train, y_train)
+X_test,y_test = get_minibatch(row_getter,100)
+print 'Skor', clf.score(X_test, y_test)    
+\end{minted}
+
+\begin{verbatim}
+Skor 0.439458612416
+\end{verbatim}
+
+Tahmin yüzdesi \%43 civarý. Demek ki veri içinde bazý kalýplar var. Hangi
+kolonlarýn daha önemli olduðunu bulmak için her kolonu teker teker atýp
+skorun yukarý mý aþaðý mý indiðine bakabiliriz. 
 
 Kaynaklar 
 
