@@ -27,7 +27,7 @@ if len(sys.argv) == 1 :
     "./stat_gmm/stat_gmm.pdf " + \
     "./stat_lmm/stat_lmm.pdf " + \
     "./stat_regular/stat_regular.pdf " + \
-    "./stat_preproc/stat_preproc.pdf " + \
+    "./stat_feat/stat_feat.pdf " + \
     "./stat_ratings/stat_ratings.pdf " + \
     "./stat_assoc/stat_assoc.pdf " + \
     "./stat_worldcup/stat_worldcup.pdf " + \

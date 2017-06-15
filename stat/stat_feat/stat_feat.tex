@@ -1,5 +1,7 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
+Özellikleri Ýþlemek, Veriyi Ýncelemek
+
 Özet Ýstatistikleri, Grafikleri
 
 Medyan ve Yüzdelikler (Percentile)
@@ -249,8 +251,112 @@ night = int (morning==0 and noon==0 and afternoon==0)
 
 kullanýldý.
 
+Anahtarlama Numarasý (Hashing Trick)
+
+Üstteki kodda bir problem var, dokümaný temsil eden ve içinde 1 ya da
+0 hücreli özellik vektörünü (feature vector) oluþturmak için tüm
+kelimelerin ne olduðunu bilmeliyiz. Yani veriyi bir kere baþtan sonra
+tarayarak bir sözlük oluþturmalýyýz (ki öyle yapmaya mecbur kaldýk) ve
+ancak ondan sonra her doküman için hangi kelimenin olup olmadýðýný
+saptamaya ve onu kodlamaya baþlayabiliriz. Halbuki belgelere bakar
+bakmaz, teker teker giderken bile hemen bir özellik vektörü
+oluþturabilseydik daha iyi olmaz mýydý?
+
+Bunu baþarmak için anahtarlama numarasýný kullanmamýz lazým. Bilindiði
+gibi temel yazýlým bilime göre bir kelimeyi temsil eden bir anahtar
+(hash) üretebiliriz, ki bu hash deðeri bir sayýdýr. Elimizde bir
+"sayý" olmasý bize faydalý olur yarar, bu sayýnýn en fazla kaç
+olabileceðinden hareketle (hatta bu sayýya bir limit koyarak) özellik
+vektörümüzün boyutunu önceden saptamýþ oluruz.  Sonra kelimeye
+bakarýz, hash üretiriz, sonuç mesela 230 geldi, o zaman özellik
+vektöründeki 230'uncu kolonun deðerini 1 yaparýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+d_input = dict()
+
+def add_word(word):
+    hashed_token = hash(word) % 127
+    d_input[hashed_token] = d_input.setdefault(hashed_token, 0) + 1
+
+add_word("obama")
+print d_input
+\end{minted}
+
+\begin{verbatim}
+{48: 1}
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+add_word("politics")
+print d_input
+\end{minted}
+
+\begin{verbatim}
+{48: 1, 91: 1}
+\end{verbatim}
+
+Üstteki kodda bunun örneðini görüyoruz. Hash sonrasý mod uyguladýk
+(yüzde iþareti ile) ve hash sonucunu en fazla 127 olacak þekilde
+sýnýrladýk. Sözlük (dictionary) yavaþ yavaþ büyüyebiliyor.
+Potansiyel problemler ne olabilir? Hashing mükemmel deðildir, çarpýþma
+(collision) olmasý mümkündür yani nadiren farklý kelimelerin ayný
+numaraya eþlenebilmesi durumu. Bu problemleri iyi bir anahtarlama
+algoritmasý kullanarak, mod edilen sayýyý büyük tutarak çözmek
+mümkündür, ya da bu tür nadir çarpýþmalar "kabul edilir hata" olarak
+addedilebilir.
+
+Pandas kullanarak bir Dataframe'i otomatik olarak anahtarlamak istersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
+
+data = pd.DataFrame(data)
+print data
+\end{minted}
+
+\begin{verbatim}
+   pop   state  year
+0  1.5    Ohio  2000
+1  1.7    Ohio  2001
+2  3.6    Ohio  2002
+3  2.4  Nevada  2001
+4  2.9  Nevada  2002
+\end{verbatim}
+
+Þimdi bu veri üzerinde sadece eyalet (state) için bir anahtarlama numarasý
+yapalým
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def hash_col(df,col,N):
+    for i in range(N): df[col + '_' + str(i)] = 0.0
+    df[col + '_hash'] = df.apply(lambda x: hash(x[col]) % N,axis=1)    
+    for i in range(N):
+        idx = df[df[col + '_hash'] == i].index
+        df.ix[idx,'%s_%d' % (col,i)] = 1.0
+    df = df.drop([col, col + '_hash'], axis=1)
+    return df
+
+print hash_col(data,'state',4)
+\end{minted}
+
+\begin{verbatim}
+   pop  year  state_0  state_1  state_2  state_3
+0  1.5  2000        0        1        0        0
+1  1.7  2001        0        1        0        0
+2  3.6  2002        0        1        0        0
+3  2.4  2001        0        0        0        1
+4  2.9  2002        0        0        0        1
+\end{verbatim}
+
+
 Kaynaklar 
 
 [1] Teetor, {\em R Cookbook}
+
+[2] Scikit-Learn Documentation, {\em 4.2. Feature extraction}, \url{http://scikit-learn.org/dev/modules/feature_extraction.html}
+
 
 \end{document}
