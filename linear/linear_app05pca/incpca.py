@@ -1,3 +1,8 @@
+# Alttaki kod sklearn kodlarini baz aliyor, fakat sklearn IncrementalPCA
+# 6/2017 itibariyle ufak parcalari seyrek (sparse) matris olarak isleyemiyordu.
+# Biz kodda basitlestirme yaparak bu eki yaptik. 
+# http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.IncrementalPCA.html
+
 import numpy as np
 from scipy import linalg
 import scipy.sparse.linalg as linalg2
@@ -45,7 +50,7 @@ def _incremental_mean_and_var(X, last_mean=.0, last_variance=None,
     return updated_mean, updated_variance, updated_sample_count
 
 
-class MyIncrementalPCA:
+class IncPCA:
 
     def __init__(self, n_components):
         self.n_components = n_components
@@ -124,46 +129,4 @@ class MyIncrementalPCA:
         else:
             self.noise_variance_ = 0.
         return self
-
-import pandas as pd
-
-df = pd.read_csv('/home/burak/Documents/classnotes/stat/stat_preproc/iris.csv')
-df = np.array(df)[:,:4].astype(float)
-print df
-pca = MyIncrementalPCA(n_components=2)
-S  = 10
-df2 = df.copy()
-for i in range(15):
-    pca.partial_fit(df2[i*S:(i+1)*S, :])
-print 'exp var', pca.explained_variance_
-print 'var rat',pca.explained_variance_ratio_
-print 'pca s', pca.singular_values_
-print 'pca c', pca.components_.T
-
-u,s,vt = linalg.svd(df)
-print 'full c',vt
-print 'full s',s
-
-from sklearn.decomposition import IncrementalPCA
-pca = IncrementalPCA(n_components=2)
-S  = 10
-df2 = df.copy()
-for i in range(15):
-    pca.partial_fit(df2[i*S:(i+1)*S, :])
-print
-print 'exp var', pca.explained_variance_
-print 'var rat',pca.explained_variance_ratio_
-print 'pca2 s', pca.singular_values_
-print 'pca2 c', pca.components_.T
-
-
-
-
-
-
-
-
-
-
-
 
