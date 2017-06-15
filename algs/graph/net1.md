@@ -1,14 +1,5 @@
 
-benim filmer
 
-6,Heat,4
-11,American President, The,5
-10,GoldenEye (1995),5
-111::Taxi Driver (1976),3
-150::Apollo 13 (1995),4
-380::True Lies (1994),5
-485::Last Action Hero (1993),3
-2701::Wild Wild West (1999),1
 
 ```python
 import networkx as net
@@ -81,23 +72,56 @@ plt.savefig('net2.png')
 
 
 
+
+
+benim filmer
+
+
+
 ```python
-import pandas as pd, zipfile
-import sys; sys.path.append('../../stat/stat_ratings')
-rnames = ['user_id', 'movie_id', 'rating', 'timestamp']
-mnames = ['movie_id', 'title', 'genres']
+import zipfile, csv
+import networkx as net
+mg=net.Graph()
+
 with zipfile.ZipFile('../../stat/stat_ratings/data.zip', 'r') as z:
-    ratings = pd.read_table(z.open('ratings.dat'), sep='::', header=None,names=rnames)
-    movies = pd.read_table(z.open('movies.dat'), sep='::', header=None,names=mnames)
+    with z.open('ratings.dat') as csvfile:
+    	 spamreader = csv.reader(csvfile)
+    	 for row in spamreader:
+	     tokens = row[0].split("::")
+	     mg.add_edge(tokens[0],tokens[1],weight=tokens[2])
 ```
 
 ```python
-print len(np.unique(ratings.user_id))
+my_ratings = [[6,"Heat",4],\
+	      [11,"American President, The",5],\
+	      [10,"GoldenEye",5],\
+	      [111,"Taxi Driver (1976)",3],\
+	      [150,"Apollo 13",4],\
+	      [380,"True Lies",5],\
+	      [485,"Last Action Hero",3],\
+	      [2701,"Wild Wild West",1]]
+
+dummy_user_id = 10000
+for r in my_ratings: mg.add_edge(dummy_user_id,r[0],weight=r[2])
+
 ```
 
-```text
-6040
+```python
+ego = net.ego_graph(mg, dummy_user_id, 3)
+pos = net.spring_layout(ego)
+plt.figure(figsize=(12,12))
+plt.axis('off')
+net.draw_networkx_nodes(ego, pos,node_size=200)
+net.draw_networkx_edges(ego,pos,edgelist=ego.edges(data=True, nbunch=[dummy_user_id,]))
+plt.savefig('net3.png')
 ```
+
+
+
+
+
+
+
 
 
 
