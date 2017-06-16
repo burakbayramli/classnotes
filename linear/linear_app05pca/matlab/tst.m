@@ -19,7 +19,8 @@ V
 %vectors=eigvect(:,1:q);
 
 values=ones(q, 1) / q;
-vectors=normrnd(0, 0.2, D, q);
+%vectors=normrnd(0, 0.2, D, q);
+vectors=ones(D, q) / (D*q)
 %values=diag(S1)
 %vectors=V1
 
@@ -29,7 +30,6 @@ vectors=normrnd(0, 0.2, D, q);
 for i = 1:150
   [values, vectors] = CCIPCA2(values, vectors, A(i,:),i-1,2);
 end
-
 
 values
 vectors
