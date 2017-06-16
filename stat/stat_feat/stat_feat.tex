@@ -247,7 +247,7 @@ night = int (morning==0 and noon==0 and afternoon==0)
 
 kullanýldý.
 
-Kategörleri Ýkileþtirme, Anahtarlama Numarasý (Öne-Hot Encoding, Hashing Trick)
+Kategörleri Ýkileþtirme, Anahtarlama Numarasý (One-Hot Encoding, Hashing Trick)
 
 Üstteki kodda bir problem var, dokümaný temsil eden ve içinde 1 ya da
 0 hücreli özellik vektörünü (feature vector) oluþturmak için tüm
@@ -258,14 +258,13 @@ saptamaya ve onu kodlamaya baþlayabiliriz. Halbuki belgelere bakar
 bakmaz, teker teker giderken bile hemen bir özellik vektörü
 oluþturabilseydik daha iyi olmaz mýydý?
 
-Bunu baþarmak için anahtarlama numarasýný kullanmamýz lazým. Bilindiði
-gibi temel yazýlým bilime göre bir kelimeyi temsil eden bir anahtar
-(hash) üretebiliriz, ki bu hash deðeri bir sayýdýr. Elimizde bir
-"sayý" olmasý bize faydalý olur yarar, bu sayýnýn en fazla kaç
+Bunu baþarmak için anahtarlama numarasýný kullanmamýz lazým. Bilindiði gibi
+temel yazýlým bilime göre bir kelimeyi temsil eden bir anahtar (hash)
+üretebiliriz, ki bu hash deðeri bir sayýdýr. Bu sayýnýn en fazla kaç
 olabileceðinden hareketle (hatta bu sayýya bir limit koyarak) özellik
-vektörümüzün boyutunu önceden saptamýþ oluruz.  Sonra kelimeye
-bakarýz, hash üretiriz, sonuç mesela 230 geldi, o zaman özellik
-vektöründeki 230'uncu kolonun deðerini 1 yaparýz. 
+vektörümüzün boyutunu önceden saptamýþ oluruz.  Sonra kelimeye bakarýz,
+hash üretiriz, sonuç mesela 230 geldi, o zaman özellik vektöründeki
+230'uncu kolonun deðerini 1 yaparýz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 d_input = dict()
@@ -291,15 +290,13 @@ print d_input
 {48: 1, 91: 1}
 \end{verbatim}
 
-Üstteki kodda bunun örneðini görüyoruz. Hash sonrasý mod uyguladýk
-(yüzde iþareti ile) ve hash sonucunu en fazla 127 olacak þekilde
-sýnýrladýk. Sözlük (dictionary) yavaþ yavaþ büyüyebiliyor.
+Üstteki kodda bunun örneðini görüyoruz. Hash sonrasý mod uyguladýk (yüzde
+iþareti ile) ve hash sonucunu en fazla 127 olacak þekilde sýnýrladýk.
 Potansiyel problemler ne olabilir? Hashing mükemmel deðildir, çarpýþma
-(collision) olmasý mümkündür yani nadiren farklý kelimelerin ayný
-numaraya eþlenebilmesi durumu. Bu problemleri iyi bir anahtarlama
-algoritmasý kullanarak, mod edilen sayýyý büyük tutarak çözmek
-mümkündür, ya da bu tür nadir çarpýþmalar "kabul edilir hata" olarak
-addedilebilir.
+(collision) olmasý mümkündür yani nadiren farklý kelimelerin ayný numaraya
+eþlenebilmesi durumu. Bu problemleri iyi bir anahtarlama algoritmasý
+kullanarak, mod edilen sayýyý büyük tutarak çözmek mümkündür, ya da bu tür
+nadir çarpýþmalar "kabul edilir hata" olarak addedilebilir.
 
 Pandas kullanarak bir Dataframe'i otomatik olarak anahtarlamak istersek,
 
@@ -349,15 +346,16 @@ print hash_col(data,'state',4)
 
 Azar Azar Ýþlemek (Incremental, Minibatch Processing)
 
-Üstteki yöntemler eðer tüm veri hafýzada ise iyi. Fakat çoðu zaman onlarca
-kategori, birkaç milyonluk satýr içeren bir veriye bakmamýz gerekiyor;
-biliyoruz ki bu kadar veri için Büyük Veri teknolojilerine (mesela Spark,
-Hadoop gibi) geçmek gereðinden fazla külfet getirecek, elimizdeki dizüstü,
-masaüstü bilgisayarý bu iþlemler için yeterli olmalý, fakat çoðu kütüphane
-tek makinada azar azar iþlem yapmak için yazýlmamýþ.
+Çoðu zaman onlarca kategori, birkaç milyonluk satýr içeren bir veriye
+bakmamýz gerekiyor; biliyoruz ki bu kadar veri için Büyük Veri
+teknolojilerine (mesela Spark, Hadoop gibi) geçmek gereðinden fazla külfet
+getirecek, elimizdeki dizüstü, masaüstü bilgisayarý bu iþlemler için
+yeterli olmalý, fakat çoðu kütüphane tek makinada azar azar iþlem yapmak
+için yazýlmamýþ. Mesela üstte görülen anahtarlama yöntemi anahtarlama
+baþlamadan önce tüm verinin hafýzaya alýnmasýný gerektiriyor.
 
 Bu durumda kendimiz çok basit Python kavramlarýný, iyi bir anahtarlama
-kodunu, ve lineer cebir hesaplarýnda seyreklik (sparsýty) tekniklerini
+kodunu, ve lineer cebir hesaplarýnda seyreklik (sparsity) tekniklerini
 kullanarak ufak veri parçalarý iþleyen bir ortamý yaratabiliriz.
 
 Örnek veri olarak {\em Lineer Regresyon} yazýsýnda görülen oy kalýplarý
@@ -427,12 +425,12 @@ print res
 \end{verbatim}
 
 Sonuçlar seyrek matris olarak, ve üç deðer için üç ayrý satýr olarak
-geldi. Anahtarlama niye-1 ya da +1 veriyor? Aslýnda bu bizim için çok faydalý,
-çünkü birazdan PCA iþleteceðiz mesela ve bu yöntem her veri kolonunun
-sýfýrda ortalanmýþ olmasýný ister. Üstteki teknikte bizim tahminimiz -1,+1
-arasýnda rasgele seçim yapýlýyor böylece üretilen anahtar kolonlarýnda
--1 / +1 doðal olarak dengelenmiþ olacaktýr, o zaman otomatik olarak
-ortalamalarý sýfýra iner. Akýllýca bir teknik.
+geldi. Anahtarlama niye-1 ya da +1 veriyor? Aslýnda bu bizim için çok
+faydalý, çünkü birazdan PCA iþleteceðiz mesela ve bu yöntem her veri
+kolonunun sýfýrda ortalanmýþ olmasýný ister. Üstteki teknikte -1,+1
+arasýnda rasgele seçim yapýlýyor, böylece üretilen anahtar kolonlarýnda -1
+/ +1 deðerleri doðal olarak dengelenmiþ olacaktýr, o zaman otomatik olarak
+ortalamalarý sýfýra iner. Akýllýca bir teknik. 
 
 Devam edelim, sonucu tek satýr olacak þekilde kendimiz tekrar
 düzenleyebiliriz. O zaman Python \verb!yield! kavramýný [3] kullanarak
@@ -466,7 +464,8 @@ def get_minibatch(row_getter,size=10):
         for dummy,j,val in zip(cx.row, cx.col, cx.data): X_train[i,j] = val
         y_train.append(y)
     return X_train, y_train
-    
+
+# tek bir satir goster    
 cols = ['gender','income','race','occup1']
 row_getter = get_row(cols)
 X,y = get_minibatch(row_getter,size=1)
@@ -558,9 +557,9 @@ ortalama tahmin hatasi 0.0105872845541
 maksimum deger 5.0
 \end{verbatim}
 
-1 ile 5 arasinda gidip gelen degerlerin tahmininde 0.01 civari ortalama
-hata var. Fena degil. Peki verinin kendisini oldugu gibi alip regresyonda
-kullansaydik? Regresyonun hedef verisi kazanç, kaynak verisi geri kalan
+1 ile 5 arasýnda gidip gelen deðerlerin tahmininde 0.01 civarý ortalama
+hata var. Fena deðil. Peki verinin kendisini olduðu gibi alýp regresyonda
+kullansaydýk? Regresyonun hedef verisi kazanç, kaynak verisi geri kalan
 kategoriler. Her parça 1000 satýr, 10 parça alacaðýz, 10,000 satýr modeli
 eðitmek için kullanýlacak. Geri kalanlar test verisi
 olacak. \verb!sklearn.linear_model.SGDRegressor! ufak seyrek matris

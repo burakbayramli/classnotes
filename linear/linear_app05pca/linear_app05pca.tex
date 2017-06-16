@@ -232,6 +232,43 @@ boyut olunca baþka seçenek kalmýyor, 1. yön sonrasý ikincisi baþka bir
 þey olamazdý, fakat çok daha yüksek boyutlarda en çok yayýlýmýn olduðu
 ikinci yön de doðru þekilde geri getirilecekti.
 
+Azar Azar PCA (Incremental PCA)
+
+Toptan iþlem yapmak yerine ufak parçalar üzerinde PCA iþletebilmek için
+[9]'deki fikir kullanýlabilir. Böylece elimize yeni bir veri geçince tüm
+önceki veriler + yeni veriyi birarada iþlememize gerek kalmýyor. Eldeki son
+PCA durumunu yeni veriyi kullanarak güncelliyoruz. Bu sekilde isleyen bir
+PCA teknigi CCIPCA. 
+
+\inputminted[fontsize=\footnotesize]{python}{ccipca.py}
+
+Örnek için Ýris veri setinde görelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, ccipca
+
+df = pd.read_csv('../../stat/stat_feat/iris.csv')
+df = np.array(df)[:,:4].astype(float)
+pca = ccipca.CCIPCA(n_components=2,n_features=4)
+S  = 10
+print df[0, :]
+for i in range(150): pca.partial_fit(df[i, :])
+pca.post_process()
+print 'varyans orani',pca.explained_variance_ratio_
+print 'sonuc', pca.components_.T
+\end{minted}
+
+\begin{verbatim}
+[ 5.1  3.5  1.4  0.2]
+varyans orani [ 0.99758595  0.00241405]
+sonuc [[ 0.80321426  0.21317031]
+ [ 0.38265982  0.38577571]
+ [ 0.44985225 -0.8021981 ]
+ [ 0.07778993 -0.40275764]]
+\end{verbatim}
+
+Paylaþýlan CCIPCA kodu satýrlarý seyrek matris formatýnda da iþleyebiliiyor.
+
 SVD ile PCA Hesaplamak
 
 PCA bölümünde anlatýlan yöntem temel bileþenlerin hesabýnda özdeðerler
@@ -501,41 +538,6 @@ hesabýný yapmanýn tek yöntemi özdeðer/vektör yöntemi deðildir. Mesela Numpy
 Linalg kütüphanesi içindeki SVD, LAPACK \verb!dgesdd!  rutinini kullanýr ve bu
 rutin iç kodlamasýnda QR, ve bir tür böl / istila et (divide and conquer)
 algoritmasý iþletmektedir.
-
-Azar Azar PCA (Incremental PCA)
-
-Toptan iþlem yapmak yerine ufak parçalar üzerinde PCA iþletebilmek için
-[9]'deki fikir kullanýlabilir. Böylece elimize yeni bir veri geçince tüm
-önceki veriler + yeni veriyi birarada iþlememize gerek kalmýyor. Eldeki son
-PCA durumunu yeni veriyi kullanarak güncelliyoruz. Bu sekilde isleyen bir
-PCA teknigi CCIPCA. 
-
-\inputminted[fontsize=\footnotesize]{python}{ccipca.py}
-
-Örnek için Ýris veri setinde görelim,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd, ccipca
-
-df = pd.read_csv('../../stat/stat_feat/iris.csv')
-df = np.array(df)[:,:4].astype(float)
-pca = ccipca.CCIPCA(n_components=2,n_features=4)
-S  = 10
-print df[0, :]
-for i in range(150): pca.partial_fit(df[i, :])
-pca.post_process()
-print 'varyans orani',pca.explained_variance_ratio_
-print 'sonuc', pca.components_.T
-\end{minted}
-
-\begin{verbatim}
-[ 5.1  3.5  1.4  0.2]
-varyans orani [ 0.99758595  0.00241405]
-sonuc [[ 0.80321426  0.21317031]
- [ 0.38265982  0.38577571]
- [ 0.44985225 -0.8021981 ]
- [ 0.07778993 -0.40275764]]
-\end{verbatim}
 
 Kaynaklar
 

@@ -45,10 +45,7 @@ class CCIPCA:
                 V[j,:] = w1*V[j,:] + w2*np.dot(u,V[j,:])*u / la.norm(V[j,:])
                 normedV = V[j,:] / la.norm(V[j,:])
                 normedV = normedV.reshape((self.n_features, 1))
-                tmp1 = np.dot(u,normedV)
-                tmp2 = np.dot(tmp1,normedV.T)
-                u = u - tmp2
-                u = u
+                u = u - np.dot(np.dot(u,normedV),normedV.T)
                 
         self.iteration += 1
         self.components_ = V / la.norm(V)
@@ -62,5 +59,6 @@ class CCIPCA:
         self.components_ = self.components_[idx,:]
         self.explained_variance_ratio_ = (self.explained_variance_ratio_ / self.explained_variance_ratio_.sum())
         for r in range(0,self.components_.shape[0]):
-            self.components_[r,:] /= np.sqrt(np.dot(self.components_[r,:],self.components_[r,:]))
+            d = np.sqrt(np.dot(self.components_[r,:],self.components_[r,:]))
+            self.components_[r,:] /= d
 
