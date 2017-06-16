@@ -13,7 +13,8 @@ class CCIPCA:
         self.iteration = 0
         self.mean_ = None
         self.components_ = None
-
+        self.mean_ = np.zeros([self.n_features], np.float)
+        self.components_ = np.ones((self.n_components,self.n_features)) / (self.n_features*self.n_components)
       
     def partial_fit(self, u):
         n = float(self.iteration)
@@ -77,20 +78,12 @@ X = iris.data
 y = iris.target
 
 ccipca = CCIPCA(n_components=2,n_features=X.shape[1])
-ccipca.mean_ = np.zeros([ccipca.n_features], np.float)
 #ccipca.components_ = np.zeros([ccipca.n_components,ccipca.n_features], np.float)
-ccipca.components_ = np.ones((ccipca.n_components,ccipca.n_features)) / (ccipca.n_features*ccipca.n_components)
                     
-#X = sps.lil_matrix(X)
-#for i in range(X.shape[0]): ccipca.partial_fit(X[i,:])
+X = sps.lil_matrix(X)
 for i in range(X.shape[0]): ccipca.partial_fit(X[i,:])
+#for i in range(X.shape[0]): ccipca.partial_fit(X[i,:])
 ccipca.post_process()
 
 print ccipca.components_
 
-'''
-[[ 0.36158968 -0.08226889  0.85657211  0.35884393]
- [ 0.65653988  0.72971237 -0.1757674  -0.07470647]]
-[[ 0.81484887  0.52092446  0.25321053  0.02331202]
- [ 0.09304124 -0.38124227  0.86734622  0.30611795]]
-'''

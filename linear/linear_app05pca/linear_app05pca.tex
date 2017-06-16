@@ -493,8 +493,6 @@ raðmen geri kalan en önemli 2 boyut üzerinden net bir ayýrým ortaya
 ve kelime sayýlarýnýn makalelerin içeriði hakkýnda ipucu içerdiðini
 ispatlýyor.
 
-
-
 Not: Lineer Cebir notlarýmýzda SVD türetilmesine bakýnca özdeðer/vektör
 mantýðýna atýf yapýldýðýný görebiliriz ve akla þu gelebilir; "özdeðer / vektör
 rutini iþletmekten kurtulalým dedik, SVD yapýyoruz, ama onun içinde de
@@ -509,67 +507,30 @@ Azar Azar PCA (Incremental PCA)
 Toptan iþlem yapmak yerine ufak parçalar üzerinde PCA iþletebilmek için
 [9]'deki fikir kullanýlabilir. Böylece elimize yeni bir veri geçince tüm
 önceki veriler + yeni veriyi birarada iþlememize gerek kalmýyor. Eldeki son
-PCA durumunu yeni veriyi kullanarak güncelliyoruz. Örnek için Ýris veri
-setinde görelim, 
+PCA durumunu yeni veriyi kullanarak güncelliyoruz. Bu sekilde isleyen bir
+PCA teknigi CCIPCA. Örnek için Ýris veri setinde görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd, ccipca
 
-df = pd.read_csv('../../stat/stat_preproc/iris.csv')
+df = pd.read_csv('../../stat/stat_feat/iris.csv')
 df = np.array(df)[:,:4].astype(float)
-pca = incpca.CCIPCA(n_components=2)
+pca = ccipca.CCIPCA(n_components=2,n_features=4)
 S  = 10
-df2 = df.copy()
-for i in range(15):
-    fr = i*S; to = (i+1)*S
-    print 'Ufak parca', fr,to,'isleniyor'
-    pca.partial_fit(df2[fr:to, :])
-print 'aciklanabilen varyans', pca.explained_variance_
-print 'varyans orani',pca.explained_variance_ratio_
-print 'essiz degerler', pca.singular_values_
-print 'sonuc', pca.components_.T
-
-from sklearn.decomposition import PCA
-pca = PCA(n_components=2)
-S  = 10
-df2 = df.copy()
-pca.fit(df2)
-print
-print 'aciklanabilen varyans', pca.explained_variance_
+print df[0, :]
+for i in range(150): pca.partial_fit(df[i, :])
+pca.post_process()
 print 'varyans orani',pca.explained_variance_ratio_
 print 'sonuc', pca.components_.T
 \end{minted}
 
 \begin{verbatim}
-Ufak parca 0 10 isleniyor
-Ufak parca 10 20 isleniyor
-Ufak parca 20 30 isleniyor
-Ufak parca 30 40 isleniyor
-Ufak parca 40 50 isleniyor
-Ufak parca 50 60 isleniyor
-Ufak parca 60 70 isleniyor
-Ufak parca 70 80 isleniyor
-Ufak parca 80 90 isleniyor
-Ufak parca 90 100 isleniyor
-Ufak parca 100 110 isleniyor
-Ufak parca 110 120 isleniyor
-Ufak parca 120 130 isleniyor
-Ufak parca 130 140 isleniyor
-Ufak parca 140 150 isleniyor
-aciklanabilen varyans [ 0.23764206  4.04160534]
-varyans orani [ 0.4381091   7.45097096]
-essiz degerler [  5.97045296  24.6219577 ]
-sonuc [[ 0.64411706  0.36431173]
- [ 0.74129597 -0.08044427]
- [-0.17490763  0.85571279]
- [-0.07071643  0.35855446]]
-
-aciklanabilen varyans [ 4.19667516  0.24062861]
-varyans orani [ 0.92461621  0.05301557]
-sonuc [[ 0.36158968  0.65653988]
- [-0.08226889  0.72971237]
- [ 0.85657211 -0.1757674 ]
- [ 0.35884393 -0.07470647]]
+[ 5.1  3.5  1.4  0.2]
+varyans orani [ 0.99758595  0.00241405]
+sonuc [[ 0.80321426  0.21317031]
+ [ 0.38265982  0.38577571]
+ [ 0.44985225 -0.8021981 ]
+ [ 0.07778993 -0.40275764]]
 \end{verbatim}
 
 Kaynaklar
@@ -590,7 +551,7 @@ Kaynaklar
 
 [8] Collins, {\em Introduction to Computer Vision}, \url{http://www.cse.psu.edu/~rtc12/CSE486/}
 
-[9] Ross, {\em Incremental Learning for Robust Visual Tracking}, \url{http://www.cs.toronto.edu/~dross/ivt/RossLimLinYang_ijcv.pdf}
+[9] Weng, {\em Candid Covariance-free Incremental Principal Component Analysis}, \url{https://pdfs.semanticscholar.org/4e22/d6b9650a4ff9ccc8c9b860442d162d559025.pdf}
 
 
 \end{document}

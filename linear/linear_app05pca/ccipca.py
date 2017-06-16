@@ -5,16 +5,16 @@ import scipy.sparse as sps
 from sklearn import datasets
 
 class CCIPCA:    
-    def __init__(self, n_components=2, amnesic=2.0, copy=True):
-        self.n_components = n_components            
+    def __init__(self, n_components, n_features, amnesic=2.0, copy=True):
+        self.n_components = n_components
+        self.n_features = n_features
         self.copy = copy
         self.amnesic = amnesic
         self.iteration = 0
-        self.n_samples=0
-        self.n_features = 0
         self.mean_ = None
         self.components_ = None
-
+        self.mean_ = np.zeros([self.n_features], np.float)
+        self.components_ = np.ones((self.n_components,self.n_features)) / (self.n_features*self.n_components)
       
     def partial_fit(self, u):
         n = float(self.iteration)
@@ -49,26 +49,17 @@ class CCIPCA:
                 u = u - tmp2
                 u = u
                 
-
         self.iteration += 1
         self.components_ = V / la.norm(V)
             
         return
 
-    def post_process(self):
-        
+    def post_process(self):        
         self.explained_variance_ratio_ = np.sqrt(np.sum(self.components_**2,axis=1))
-
-        # sort by explained_variance_ratio_
         idx = np.argsort(-self.explained_variance_ratio_)
         self.explained_variance_ratio_ = self.explained_variance_ratio_[idx]
         self.components_ = self.components_[idx,:]
-
-        # re-normalize
         self.explained_variance_ratio_ = (self.explained_variance_ratio_ / self.explained_variance_ratio_.sum())
-
         for r in range(0,self.components_.shape[0]):
             self.components_[r,:] /= np.sqrt(np.dot(self.components_[r,:],self.components_[r,:]))
 
-    
-    
