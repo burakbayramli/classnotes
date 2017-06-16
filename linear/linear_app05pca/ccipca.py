@@ -1,3 +1,4 @@
+# https://github.com/kevinhughes27/pyIPCA baz alinmistir
 import scipy.sparse as sp
 import numpy as np
 from scipy import linalg as la
