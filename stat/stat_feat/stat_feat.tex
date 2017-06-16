@@ -484,10 +484,77 @@ print len(y), X.shape, type(X)
 10 (10, 30) <class 'scipy.sparse.lil.lil_matrix'>
 \end{verbatim}
 
-Þimdi baþtan itibaren parçalar halinde alýnan verileri lineer regresyon
-yapmak için kullanalým. Regresyonun hedef verisi kazanç, kaynak verisi geri
-kalan kategoriler. Her parça 1000 satýr, 10 parça alacaðýz, 10,000 satýr
-modeli eðitmek için kullanýlacak. Geri kalanlar test verisi
+PCA
+
+Lineer Cebir'in temel bileþen analizi (PCA) tekniðini kullanarak boyut
+azaltmasý yapabiliriz. Bu yazýda veriyi satýr satýr iþleyerek PCA hesabý
+yapan bir kod var, ayrýca bu kod satýrlarý seyrek formatta alabiliyor. Bu
+iyi haber, çünkü bu ufak örnekte onlarca kolon var fakat milyonlarca kolon
+olsa bu kod yine iþleyecektir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../../linear/linear_app05pca')
+import ccipca
+cols = ['gender','income','race','occup1']
+row_getter = get_row(cols)
+pca = ccipca.CCIPCA(n_components=10,n_features=30)
+for i in range(10000): 
+    X,y = get_minibatch(row_getter,size=1)
+    pca.partial_fit(X)
+pca.post_process()
+
+print 'varyans orani'
+print pca.explained_variance_ratio_
+\end{minted}
+
+\begin{verbatim}
+varyans orani
+[ 0.36086926  0.16186391  0.13377998  0.09440711  0.0702763   0.05113956
+  0.04768294  0.0343724   0.02336052  0.02224802]
+\end{verbatim}
+
+Her bileþenin verideki varyansýn ne kadarýný açýkladýðý görülüyor. 30
+kolonu 10 kolona indirdik, acaba veri temsilinde ilerleme elde ettik mi?
+Veriyi PCA'nýn bulduðu uzaya yansýtýp bu boyutu azaltýlmýþ veriyi
+regresyonda kullansak ne olur acaba? Yansýtma ve regresyon,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.linear_model import SGDRegressor
+clf = SGDRegressor(random_state=1, n_iter=1)
+row_getter = get_row(cols)
+P = pca.components_.T
+for i in range(10000):
+    X_train, y_train = get_minibatch(row_getter,1)
+    Xp = np.dot((X_train-pca.mean_),P)
+    clf.partial_fit(Xp, y_train)
+\end{minted}
+
+Þimdi sonraki 1000 satýrý test için kullanalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y_predict = []
+y_real = []
+for i in range(1000):
+    X_test,y_test = get_minibatch(row_getter,1)
+    Xp = np.dot((X_test-pca.mean_),P)
+    y_predict.append(clf.predict(Xp)[0])
+    y_real.append(y_test[0])
+y_predict = np.array(y_predict)
+y_real = np.array(y_real)
+print 'ortalama tahmin hatasi', np.sqrt(((y_predict-y_real)**2).sum()) / len(y_predict)
+print 'maksimum deger', np.max(y_real)
+\end{minted}
+
+\begin{verbatim}
+ortalama tahmin hatasi 0.0105872845541
+maksimum deger 5.0
+\end{verbatim}
+
+1 ile 5 arasinda gidip gelen degerlerin tahmininde 0.01 civari ortalama
+hata var. Fena degil. Peki verinin kendisini oldugu gibi alip regresyonda
+kullansaydik? Regresyonun hedef verisi kazanç, kaynak verisi geri kalan
+kategoriler. Her parça 1000 satýr, 10 parça alacaðýz, 10,000 satýr modeli
+eðitmek için kullanýlacak. Geri kalanlar test verisi
 olacak. \verb!sklearn.linear_model.SGDRegressor! ufak seyrek matris
 parçalarý ile eðitilebiliyor,
 
@@ -495,20 +562,31 @@ parçalarý ile eðitilebiliyor,
 from sklearn.linear_model import SGDRegressor
 clf = SGDRegressor(random_state=1, n_iter=1)
 row_getter = get_row(cols)
+
+y_predict = []; y_real = []
+
 for i in range(10):
     X_train, y_train = get_minibatch(row_getter,1000)
     clf.partial_fit(X_train, y_train)
-X_test,y_test = get_minibatch(row_getter,100)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+X_test,y_test = get_minibatch(row_getter,1000)
 print 'Skor', clf.score(X_test, y_test)    
+y_predict = clf.predict(X_test) 
+print 'ortalama tahmin hatasi', np.sqrt(((y_predict-y_test)**2).sum()) / len(y_predict)
 \end{minted}
 
 \begin{verbatim}
-Skor 0.439458612416
+Skor 0.609560912327
+ortalama tahmin hatasi 0.0208096951078
 \end{verbatim}
 
-Tahmin yüzdesi \%43 civarý. Demek ki veri içinde bazý kalýplar var. Hangi
-kolonlarýn daha önemli olduðunu bulmak için her kolonu teker teker atýp
-skorun yukarý mý aþaðý mý indiðine bakabiliriz. 
+
+Bu sonuç ta hiç fena deðil.  Sonuç olarak veri içinde bazý kalýplar
+olduðunu gördük, tahmin yapabiliyoruz. Hangi kolonlarýn daha önemli
+olduðunu bulmak için her kolonu teker teker atýp skorun yukarý mý aþaðý mý
+indiðine bakabilirdik.
 
 Kaynaklar 
 
