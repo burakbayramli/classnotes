@@ -4,14 +4,6 @@ Determines the triadic census of a graph
 import networkx as nx
 __author__ = "\n".join(['Max Tsvetovat (maksim@tsvetovat.org)', 'revised from code by Alex Levenson (alex@isnontinvain.com) and Diederik van Liere (diederik.vanliere@rotman.utoronto.ca)'])
 
-#    (C) Maksim Tsvetovat, 2011
-
-#    Revised from triadic.py by
-#    (C) Reya Group: http://www.reyagroup.com
-#    Alex Levenson (alex@isnotinvain.com)
-#    Diederik van Liere (diederik.vanliere@rotman.utoronto.ca)
-#    BSD license.
-
 __all__ = ["triadic_census"]
 
 triad_names = ("003", "012", "102", "021D","021U", "021C", "111D", "111U",

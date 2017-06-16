@@ -22,7 +22,7 @@ her zaman tek tepeli, simetrik olmayabiliyor. Örnek veri seti olarak ünlü
 \verb!dellstore2! tabanındaki satış miktarları kullanırsak,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print np.mean(data)
+  print np.mean(data)
 \end{minted}
 
 \begin{verbatim}
@@ -30,7 +30,7 @@ print np.mean(data)
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print np.median(data)
+  print np.median(data)
 \end{minted}
 
 \begin{verbatim}
@@ -38,7 +38,7 @@ print np.median(data)
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print np.std(data)
+  print np.std(data)
 \end{minted}
 
 \begin{verbatim}
@@ -46,7 +46,7 @@ print np.std(data)
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print np.mean(data)+2*np.std(data)
+  print np.mean(data)+2*np.std(data)
 \end{minted}
 
 \begin{verbatim}
@@ -54,7 +54,7 @@ print np.mean(data)+2*np.std(data)
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print np.percentile(data, 95)
+  print np.percentile(data, 95)
 \end{minted}
 
 \begin{verbatim}
@@ -100,13 +100,13 @@ hemen gösterir.
 Python üzerinde basit bir BW grafiği 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-spread= rand(50) * 100
-center = ones(25) * 50
-flier_high = rand(10) * 100 + 100
-flier_low = rand(10) * -100
-data =concatenate((spread, center, flier_high, flier_low), 0)
-plt.boxplot(data)
-plt.savefig('stat_feat_01.png')
+  spread= rand(50) * 100
+  center = ones(25) * 50
+  flier_high = rand(10) * 100 + 100
+  flier_low = rand(10) * -100
+  data =concatenate((spread, center, flier_high, flier_low), 0)
+  plt.boxplot(data)
+  plt.savefig('stat_feat_01.png')
 \end{minted}
 
 \includegraphics[height=6cm]{stat_feat_01.png}
@@ -114,19 +114,19 @@ plt.savefig('stat_feat_01.png')
 Bir diğer örnek Glass veri seti üzerinde
 
 \begin{minted}[fontsize=\footnotesize]{python}
-data = loadtxt("glass.data",delimiter=",")
-head = data[data[:,10]==7]
-tableware = data[data[:,10]==6]
-containers = data[data[:,10]==5]
+  data = loadtxt("glass.data",delimiter=",")
+  head = data[data[:,10]==7]
+  tableware = data[data[:,10]==6]
+  containers = data[data[:,10]==5]
 
-print head[:,1]
+  print head[:,1]
 
-data =(containers[:,1], tableware[:,1], head[:,1])
+  data =(containers[:,1], tableware[:,1], head[:,1])
 
-plt.yticks([1, 2, 3], ['containers', 'tableware', 'head'])
+  plt.yticks([1, 2, 3], ['containers', 'tableware', 'head'])
 
-plt.boxplot(data,0,'rs',0,0.75)
-plt.savefig('stat_feat_02.png')
+  plt.boxplot(data,0,'rs',0,0.75)
+  plt.savefig('stat_feat_02.png')
 \end{minted}
 
 \begin{verbatim}
@@ -154,44 +154,44 @@ Python + Pandas ile bir zaman kolonu şöyle parçalanabilir, örnek veri
 üzerinde görelim, sadece iki kolon var, müşteri no, ve sipariş zamanı,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-from StringIO import StringIO
-s = """customer_id;order_date
-299;2012-07-20 19:44:55.661000+01:00
-421;2012-02-17 21:54:15.013000+01:00
-437;2012-02-20 22:18:12.021000+01:00
-463;2012-02-20 23:46:21.587000+01:00
-482;2012-05-21 09:50:02.739000+01:00
-607;2012-02-21 11:57:12.462000+01:00
-641;2012-02-21 13:40:28.088000+01:00
-674;2012-08-21 14:53:15.851000+01:00
-780;2012-02-23 10:31:05.571000+01:00
-"""
-df = pd.read_csv(StringIO(s),sep=';', parse_dates=True)
+  import pandas as pd
+  from StringIO import StringIO
+  s = """customer_id;order_date
+  299;2012-07-20 19:44:55.661000+01:00
+  421;2012-02-17 21:54:15.013000+01:00
+  437;2012-02-20 22:18:12.021000+01:00
+  463;2012-02-20 23:46:21.587000+01:00
+  482;2012-05-21 09:50:02.739000+01:00
+  607;2012-02-21 11:57:12.462000+01:00
+  641;2012-02-21 13:40:28.088000+01:00
+  674;2012-08-21 14:53:15.851000+01:00
+  780;2012-02-23 10:31:05.571000+01:00
+  """
+  df = pd.read_csv(StringIO(s),sep=';', parse_dates=True)
 
-def f(x):
-   tmp = pd.to_datetime(x['order_date'])
-   tpl = tmp.timetuple(); yymm = int(tmp.strftime('%m%d'))
-   spring = int(yymm >= 321 and yymm < 621)
-   summer = int(yymm >= 621 and yymm < 921)
-   fall = int(yymm >= 921 and yymm < 1221)
-   winter = int( spring==0 and summer==0 and fall==0 )
-   warm_season = float(tpl.tm_mon >= 4 and tpl.tm_mon <= 9)
-   work_hours = float(tpl.tm_hour > 9 and tpl.tm_hour < 17)
-   morning = float(tpl.tm_hour >= 7 and tpl.tm_hour <= 11)
-   noon = float(tpl.tm_hour >= 12 and tpl.tm_hour <= 14)
-   afternoon = float(tpl.tm_hour >= 15 and tpl.tm_hour <= 19)
-   night = int (morning==0 and noon==0 and afternoon==0)
+  def f(x):
+  tmp = pd.to_datetime(x['order_date'])
+  tpl = tmp.timetuple(); yymm = int(tmp.strftime('%m%d'))
+  spring = int(yymm >= 321 and yymm < 621)
+  summer = int(yymm >= 621 and yymm < 921)
+  fall = int(yymm >= 921 and yymm < 1221)
+  winter = int( spring==0 and summer==0 and fall==0 )
+  warm_season = float(tpl.tm_mon >= 4 and tpl.tm_mon <= 9)
+  work_hours = float(tpl.tm_hour > 9 and tpl.tm_hour < 17)
+  morning = float(tpl.tm_hour >= 7 and tpl.tm_hour <= 11)
+  noon = float(tpl.tm_hour >= 12 and tpl.tm_hour <= 14)
+  afternoon = float(tpl.tm_hour >= 15 and tpl.tm_hour <= 19)
+  night = int (morning==0 and noon==0 and afternoon==0)
 
-   return pd.Series([tpl.tm_hour, tpl.tm_mon,
-                     tpl.tm_wday, warm_season,
-                     work_hours, morning, noon, afternoon, night,
-                     spring, summer, fall, winter])
-cols = ['ts_hour','ts_mon','ts_wday','ts_warm_season',
-        'ts_work_hours','ts_morning','ts_noon','ts_afternoon',
-        'ts_night', 'ts_spring', 'ts_summer', 'ts_fall', 'ts_winter']
-df[cols] = df.apply(f, axis=1)
-print df[cols]
+  return pd.Series([tpl.tm_hour, tpl.tm_mon,
+  tpl.tm_wday, warm_season,
+  work_hours, morning, noon, afternoon, night,
+  spring, summer, fall, winter])
+  cols = ['ts_hour','ts_mon','ts_wday','ts_warm_season',
+  'ts_work_hours','ts_morning','ts_noon','ts_afternoon',
+  'ts_night', 'ts_spring', 'ts_summer', 'ts_fall', 'ts_winter']
+  df[cols] = df.apply(f, axis=1)
+  print df[cols]
 \end{minted}
 
 \begin{verbatim}
@@ -242,7 +242,7 @@ akşamüstü olmayan şey" haline geliyor. Aynı durum mevsimler için de
 geçerli. Onun için 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-night = int (morning==0 and noon==0 and afternoon==0)
+  night = int (morning==0 and noon==0 and afternoon==0)
 \end{minted}
 
 kullanıldı.
@@ -267,14 +267,14 @@ hash üretiriz, sonuç mesela 230 geldi, o zaman özellik vektöründeki
 230'uncu kolonun değerini 1 yaparız.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-d_input = dict()
+  d_input = dict()
 
-def add_word(word):
-    hashed_token = hash(word) % 127
-    d_input[hashed_token] = d_input.setdefault(hashed_token, 0) + 1
+  def add_word(word):
+  hashed_token = hash(word) % 127
+  d_input[hashed_token] = d_input.setdefault(hashed_token, 0) + 1
 
-add_word("obama")
-print d_input
+  add_word("obama")
+  print d_input
 \end{minted}
 
 \begin{verbatim}
@@ -282,8 +282,8 @@ print d_input
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-add_word("politics")
-print d_input
+  add_word("politics")
+  print d_input
 \end{minted}
 
 \begin{verbatim}
@@ -301,13 +301,13 @@ nadir çarpışmalar "kabul edilir hata" olarak addedilebilir.
 Pandas kullanarak bir Dataframe'i otomatik olarak anahtarlamak istersek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
-        'year': [2000, 2001, 2002, 2001, 2002],
-        'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
+  import pandas as pd
+  data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+    'year': [2000, 2001, 2002, 2001, 2002],
+    'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
 
-data = pd.DataFrame(data)
-print data
+  data = pd.DataFrame(data)
+  print data
 \end{minted}
 
 \begin{verbatim}
@@ -323,16 +323,16 @@ print data
 yapalım
 
 \begin{minted}[fontsize=\footnotesize]{python}
-def hash_col(df,col,N):
-    for i in range(N): df[col + '_' + str(i)] = 0.0
-    df[col + '_hash'] = df.apply(lambda x: hash(x[col]) % N,axis=1)    
-    for i in range(N):
-        idx = df[df[col + '_hash'] == i].index
-        df.ix[idx,'%s_%d' % (col,i)] = 1.0
-    df = df.drop([col, col + '_hash'], axis=1)
-    return df
+  def hash_col(df,col,N):
+  for i in range(N): df[col + '_' + str(i)] = 0.0
+  df[col + '_hash'] = df.apply(lambda x: hash(x[col]) % N,axis=1)    
+  for i in range(N):
+  idx = df[df[col + '_hash'] == i].index
+  df.ix[idx,'%s_%d' % (col,i)] = 1.0
+  df = df.drop([col, col + '_hash'], axis=1)
+  return df
 
-print hash_col(data,'state',4)
+  print hash_col(data,'state',4)
 \end{minted}
 
 \begin{verbatim}
@@ -381,6 +381,7 @@ print u'tüm veri', len(df)
 print 'cinsiyet', np.array(df['gender'].value_counts())
 print u'ırk', np.array(df['race'].value_counts())
 print 'parti', np.array(df['presvote'].value_counts())
+print u'kazanç', df['income'].mean()
 \end{minted}
 
 \begin{verbatim}
@@ -388,23 +389,30 @@ tüm veri 13804
 cinsiyet [7461 6343]
 ırk [12075  1148   299   180    85    17]
 parti [6998 6535  271]
+kazanç 3.07649956534
 \end{verbatim}
 
 Mesela son sonuçtaki her hücre belli bir partiye verilen oyların sayısı;
 veriye göre üç farklı kategori varmış demek ki, veri ABD için olduğuna göre
 bunlardan ilk ikisi bilinen iki büyük parti, üçüncü hücre de herhalde
-bağımsız adaylar.
+bağımsız adaylar. 
 
-Kategorik verileri ikileştirmeye gelelim. Burada üç nokta önemli, azar azar
-işleyeceğiz, sonucu seyrek matris almak istiyoruz, ve hangi kategorik
-değerin hangi kolona eşleneceğini elle tanımlamak istemiyoruz (eşleme
-otomatik olmalı). Seyreklik önemli çünkü eğer 1000 farklı kategorik değere
-sahip olan 10 tane kolon varsa, bu 10000 tane yeni kolon yaratılması
-demektir - her farklı kategori için o değere tekabül eden kolon 1 olacak
-gerisi 0 olacak. Bu rakamlar orta ölçekte bile rahatlıkla milyonlara
-ulaşabilir. Eğer ikileştirme için seyrek matris kullanırsak çoğu sıfır olan
-değerler hafızada bile tutulmaz. Eşleme otomatik olmalı, zaten onun için
-anahtarlama yapacağız. 
+Kazanç 1 ile 5 arasında tam sayılar (1 az, 5 çok) bu sayıları kategorik
+olarak kabul edip aslında çok çıktılı bir sınıflayıcı eğitmeyi de
+seçebilirdik, fakat bu örnek için bu sayıları reel hedef olarak aldık: test
+verisinde tahminleri bakılırsa 2.5'lük kazanç tahminleri görülebilir, bu
+yüzden.
+
+Kategorik verileri ikileştirmeye gelelim. Burada üç nokta önemli, veriyi
+azar azar işleyeceğiz demiştik, ve veriyi seyrek matris olarak almak
+istiyoruz, ve hangi kategorik değerin hangi kolona eşleneceğini elle
+tanımlamak istemiyoruz (eşleme otomatik olmalı). Seyreklik önemli çünkü
+eğer 1000 farklı kategorik değere sahip olan 10 tane kolon varsa, bu 10000
+tane yeni kolon yaratılması demektir - her farklı kategori için o değere
+tekabül eden kolon 1 olacak gerisi 0 olacak. Bu rakamlar orta ölçekte bile
+rahatlıkla milyonlara ulaşabilir. Eğer ikileştirme için seyrek matris
+kullanırsak çoğu sıfır olan değerler hafızada bile tutulmaz. Eşleme
+otomatik olmalı, zaten onun için anahtarlama yapacağız.
 
 Anahtarlama icin \verb!sklearn.feature_extraction.text.HashingVectorizer!
 var,
@@ -425,16 +433,17 @@ print res
 \end{verbatim}
 
 Sonuçlar seyrek matris olarak, ve üç değer için üç ayrı satır olarak
-geldi. Anahtarlama niye-1 ya da +1 veriyor? Aslında bu bizim için çok
-faydalı, çünkü birazdan PCA işleteceğiz mesela ve bu yöntem her veri
-kolonunun sıfırda ortalanmış olmasını ister. Üstteki teknikte -1,+1
-arasında rasgele seçim yapılıyor, böylece üretilen anahtar kolonlarında -1
-/ +1 değerleri doğal olarak dengelenmiş olacaktır, o zaman otomatik olarak
-ortalamaları sıfıra iner. Akıllıca bir teknik. 
+geldi. Anahtarlama niye bazen -1 bazen +1 veriyor? Aslında bu bizim için
+çok faydalı, çünkü birazdan PCA işleteceğiz mesela ve bu yöntem her veri
+kolonunun sıfırda ortalanmış olmasını ister. Üstteki teknikte anahtar
+üreten fonksiyon -1,+1 arasında rasgele seçim yapıyor demek ki, bize göre
+bu sayede üretilen anahtar kolonlarında -1,+1 değerleri doğal olarak
+dengelenmiş olacak, böylece otomatik olarak ortalamaları sıfıra
+inecektir. Akıllıca bir teknik.
 
 Devam edelim, sonucu tek satır olacak şekilde kendimiz tekrar
 düzenleyebiliriz. O zaman Python \verb!yield! kavramını [3] kullanarak
-(azar azar satır okumak için), ve anahtarlama, seyrek matrisler ile şu
+(azar azar satır okumak için), anahtarlama, ve seyrek matrisler ile şu
 şekilde bir kod olabilir,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -479,8 +488,8 @@ print y, X.todense()
 
 İlgilendiğimiz kolon listesini \verb!get_row!'a verip bir gezici fonksiyon
 yarattık. Bu geziciyi \verb!get_minibatch!'e verdik, kaç tane satır
-istediğimizi ona söylüyoruz, o bize istenen kadar satırı seyrek matris
-olarak veriyor. 10 tane daha isteyelim,
+istediğimizi ona söylüyoruz, o bize istenen kadar satırı arka planda
+geziciye sorarak seyrek matris olarak veriyor. 10 tane daha isteyelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 X,y = get_minibatch(row_getter,size=10)
@@ -494,10 +503,9 @@ print len(y), X.shape, type(X)
 PCA
 
 Lineer Cebir'in temel bileşen analizi (PCA) tekniğini kullanarak boyut
-azaltması yapabiliriz. Bu yazıda veriyi satır satır işleyerek PCA hesabı
-yapan bir kod var, ayrıca bu kod satırları seyrek formatta alabiliyor. Bu
-iyi haber, çünkü bu ufak örnekte onlarca kolon var fakat milyonlarca kolon
-olsa bu kod yine işleyecektir. 
+azaltması yapabiliriz. Veriyi yine satır satır işleyerek PCA hesabı yapan
+teknikler var, kod veriyi seyrek formatta da alabiliyor. Bu kod lineer
+cebir PCA yazısında işlendi. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sys; sys.path.append('../../linear/linear_app05pca')
@@ -520,10 +528,12 @@ varyans orani
   0.04768294  0.0343724   0.02336052  0.02224802]
 \end{verbatim}
 
-Her bileşenin verideki varyansın ne kadarını açıkladığı görülüyor. 30
-kolonu 10 kolona indirdik, acaba veri temsilinde ilerleme elde ettik mi?
-Veriyi PCA'nın bulduğu uzaya yansıtıp bu boyutu azaltılmış veriyi
-regresyonda kullansak ne olur acaba? Yansıtma ve regresyon,
+Her bileşenin verideki varyansın ne kadarını açıkladığı görülüyor. 
+
+Peki 30 kolonu 10 kolona indirdik, acaba veri temsilinde, tahmin etmek
+amacında ilerleme elde ettik mi?  Veriyi PCA'nın bulduğu uzaya yansıtıp bu
+boyutu azaltılmış veriyi regresyonda kullansak ne olur acaba? Yansıtma ve
+regresyon,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sklearn.linear_model import SGDRegressor
@@ -548,7 +558,9 @@ for i in range(1000):
     y_real.append(y_test[0])
 y_predict = np.array(y_predict)
 y_real = np.array(y_real)
-print 'ortalama tahmin hatasi', np.sqrt(((y_predict-y_real)**2).sum()) / len(y_predict)
+
+err = np.sqrt(((y_predict-y_real)**2).sum()) / len(y_predict)
+print 'ortalama tahmin hatasi', err
 print 'maksimum deger', np.max(y_real)
 \end{minted}
 
@@ -559,11 +571,13 @@ maksimum deger 5.0
 
 1 ile 5 arasında gidip gelen değerlerin tahmininde 0.01 civarı ortalama
 hata var. Fena değil. Peki verinin kendisini olduğu gibi alıp regresyonda
-kullansaydık? Regresyonun hedef verisi kazanç, kaynak verisi geri kalan
-kategoriler. Her parça 1000 satır, 10 parça alacağız, 10,000 satır modeli
-eğitmek için kullanılacak. Geri kalanlar test verisi
-olacak. \verb!sklearn.linear_model.SGDRegressor! ufak seyrek matris
-parçaları ile eğitilebiliyor,
+kullansaydık? Hedef verisi kazanç, kaynak kolonları geri kalan
+kategoriler. Üstte olduğu gibi veri parçaları 1000'er satır, 10 parça
+olarak alacağız, yani 10,000 satır modeli eğitmek için kullanılacak. Geri
+kalanlar test verisi olacak. 
+
+\verb!sklearn.linear_model.SGDRegressor! ufak seyrek matris parçaları ile
+eğitilebiliyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sklearn.linear_model import SGDRegressor
@@ -579,20 +593,20 @@ for i in range(10):
 
 \begin{minted}[fontsize=\footnotesize]{python}
 X_test,y_test = get_minibatch(row_getter,1000)
-print 'Skor', clf.score(X_test, y_test)    
 y_predict = clf.predict(X_test) 
-print 'ortalama tahmin hatasi', np.sqrt(((y_predict-y_test)**2).sum()) / len(y_predict)
+
+err = np.sqrt(((y_predict-y_test)**2).sum()) / len(y_predict)
+print 'ortalama tahmin hatasi', 
 \end{minted}
 
 \begin{verbatim}
-Skor 0.609560912327
 ortalama tahmin hatasi 0.0208096951078
 \end{verbatim}
 
 
 Bu sonuç ta hiç fena değil.  Sonuç olarak veri içinde bazı kalıplar
 olduğunu gördük, tahmin yapabiliyoruz. Hangi kolonların daha önemli
-olduğunu bulmak için her kolonu teker teker atıp skorun yukarı mı aşağı mı
+olduğunu bulmak için her kolonu teker teker atıp hatanın yukarı mı aşağı mı
 indiğine bakabilirdik.
 
 Kaynaklar 

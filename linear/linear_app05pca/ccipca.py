@@ -1,4 +1,6 @@
 # https://github.com/kevinhughes27/pyIPCA baz alinmistir
+# online PCA using CCIPCA method which can process sparse
+# rows (minibatches of 1). 
 import scipy.sparse as sp
 import numpy as np
 from scipy import linalg as la
