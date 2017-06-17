@@ -3,7 +3,7 @@ class node:
         self.name = nameValue
         self.count = numOccur
         self.nodeLink = None
-        self.parent = parent  #needs to be updated
+        self.parent = parent
         self.children = {} 
     
     def inc(self, numOccur):
@@ -16,23 +16,22 @@ class node:
 
 def create_tree(dataSet, minSup=1): 
     header_table = {}
-    #go over dataSet twice
-    for trans in dataSet:#first pass counts frequency of occurance
+    # veri uzerinden iki kez gec
+    for trans in dataSet: # ilk gecis veri ogelerinin ne kadar oldugunu / frekansini sayiyor
         for item in trans:
             header_table[item] = header_table.get(item, 0) + dataSet[trans]
     for k in header_table.keys():  #remove items not meeting minSup
         if header_table[k] < minSup: 
             del(header_table[k])
     freqItemSet = set(header_table.keys())
-    #if no items meet min support -->get out    
+    # alt min destektek uzerinde hic oge yoksa disari cik
     if len(freqItemSet) == 0: return None, None  
     for k in header_table:
-        #reformat header_table to use Node link 
         header_table[k] = [header_table[k], None] 
-    retTree = node('Null Set', 1, None) #create tree
-    for tranSet, count in dataSet.items():  #go through dataset 2nd time
+    retTree = node('Null Set', 1, None) # agaci olustur
+    for tranSet, count in dataSet.items():  # veri uzerinden 2. kez gecis
         localD = {}
-        for item in tranSet:  #put transaction items in order
+        for item in tranSet:  # islem kalemlerini siraya diz
             if item in freqItemSet:
                 localD[item] = header_table[item][0]
         if len(localD) > 0:
@@ -123,6 +122,5 @@ if __name__ == "__main__":
         ]
 
     items = fpgrowth(data, minsup=3)
-    for x in items:
-        if len(x) > 1: print x
+    for x in items: if len(x) > 1: print x
 
