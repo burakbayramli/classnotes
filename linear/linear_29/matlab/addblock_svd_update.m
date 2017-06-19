@@ -27,6 +27,7 @@ function [Up,Sp,Vp] = addblock_svd_update( U, S, V, A, force_orth )
 % singular value decomposition".
 %
 % D. Wingate 8/17/2007
+% http://pcc.byu.edu/resources.html
 %
 
   current_rank = size( U, 2 );
