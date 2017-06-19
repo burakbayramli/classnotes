@@ -226,9 +226,22 @@ $$
 && j \bigg( \frac{1}{j(j-1)} T_{1,j-1} - \frac{1}{j} x_j \bigg) 
 \end{eqnarray*}
 
+$$ 
+= \sum _{k=1}^{j-1} \bigg( x_k - \frac{1}{j-1} T_{1,j-1} \bigg)^2 + 
+\bigg( x_j - \frac{1}{j-1} T_{1,j-1} \bigg)^2 \bigg( 1-\frac{2}{j} \bigg) + 
+j \bigg( \frac{1}{j(j-1)} T_{1,j-1} - \frac{1}{j}x_j \bigg)^2
+$$
 
+çünkü $\sum _{k=1}^{j-1} (x_k-\frac{1}{j-1} T_{1,j-1} )=0$
 
+$$ 
+= S_{1,j-1}  + \bigg( x_j - \frac{1}{j-1} (T_{1j}-x_j) \bigg) ^2
+\bigg( 1-\frac{2}{j}+\frac{1}{j}\bigg)
+$$
 
+$$ = S_{1,j-1} + \frac{1}{(j-1)^2} (jx_j - T_{1j})^2 \frac{j-1}{j} $$
+
+Bu algoritma (5) algoritmasından daha stabil. Kod üzerinde görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def incremental_mean_and_var(x, last_sum, last_var, j):
@@ -236,20 +249,20 @@ def incremental_mean_and_var(x, last_sum, last_var, j):
     new_var = last_var + (1./(j*(j-1))) * (j*x - new_sum)**2 
     return new_sum, new_var
 
-arr = np.array(range(10))
+N = 10
+arr = np.array(range(N)) # basit veri, 0..N-1 arasi sayilar
 print arr
-last_sum = arr[0]
-last_var = 0.
-for j in range(2,11):
+last_sum = arr[0]; last_var = 0.
+for j in range(2,N+1):
     last_sum,last_var = incremental_mean_and_var(arr[j-1], last_sum, last_var, j)
 
-print last_var / 10, arr.var()
+print 'YC =', last_var / N, 'Standart = ', arr.var()
 print last_sum, arr.sum()
 \end{minted}
 
 \begin{verbatim}
 [0 1 2 3 4 5 6 7 8 9]
-8.25 8.25
+YC = 8.25 Standart =  8.25
 45 45
 \end{verbatim}
 
