@@ -137,7 +137,7 @@ alakalýyýz. O yüzden her sapmanýn karesini alýrýz, bunlarý toplayýp nokta
 sayýsýna böleriz. 
 
 Ýlginç bir cebirsel iþlem þudur ve bize verinin üzerinden tek bir kez
-geçerek (öne pass) hem sayýsal ortalamayý hem de sayýsal varyansý
+geçerek (one pass) hem sayýsal ortalamayý hem de sayýsal varyansý
 hesaplamamýzý saðlar. Eðer $\bar{y}$ tanýmýný üstteki formüle sokarsak,
 
 $$ = \frac{ 1}{n} \sum_i y_i^2 + \frac{ 1}{n} \sum_i m^2 - \frac{ 2}{n} \sum_i y_i\bar{y}  $$
@@ -148,6 +148,12 @@ $$ = \frac{ 1}{n} \sum_i y_i^2 +  \bar{y}^2 - 2\bar{y}^2 $$
 
 $$ = \frac{ 1}{n} \sum_i y_i^2 - \bar{y}^2 $$
 
+ya da 
+
+$$ = \sum _{i=1}^{n} y_i^2 - \frac{1}{n} \bigg( \sum _{i=1}^{n} y_i \bigg)^2  
+\mlabel{5}
+$$
+
 Bu arada standard sapma varyansýn kareköküdür, ve biz karekök olan versiyon
 ile çalýþmayý tercih ediyoruz. Niye? Çünkü o zaman veri noktalarýnýn ve
 yayýlma ölçüsünün birimleri birbiri ile ayný olacak. Eðer veri setimiz bir
@@ -155,7 +161,52 @@ alýþveriþ sepetindeki malzemelerin lira cinsinden deðerleri olsaydý,
 varyans bize sonucu "kare lira" olarak verecekti ve bunun pek anlamý
 olmayacaktý.
 
-[yeni ekler buraya]
+Artýmsal (Incremental) Varyans Hesabý
+
+(5) formülünü $x$ kullanarak bir daha yazalým,
+
+$$ 
+S = \sum _{i=1}^{n} x_i^2 - \frac{1}{n} \bigg( \sum _{i=1}^{n} x_i \bigg)^2  
+$$
+
+Bu formülü her yeni veri geldikçe eldeki mevcut varyansý ``güncelleme''
+amaçlý olarak tekrar düzenleyebilirdik, böylece veri üzerinden bir kez
+geçmekle kalmayýp en son bakýlan veriye göre en son varyansý
+hesaplayabilmiþ olurduk. Ortalama için mesela her yeni veri bir toplama
+eklenebilir, ayrýca kaç veri noktasý görüldüðü hatýrlanýr, ve o andaki en
+son ortalama en son toplam bolu bu en son sayýdýr. 
+
+Fakat varyans için (5)'in bir problemi var, $\sum x_i^2$ ve $(\sum x_i)^2$
+sayýlarý uygulamalarda aþýrý büyüyorlar, ve yuvarlama hatalarý (rounding
+errors) hatalarý ortaya çýkmaya baþlýyor. Eðer varyans küçük ise bu aþýrý
+büyük sayýlardaki tüm basamaklar birbirini iptal eder, geriye hiçbir þey
+kalmaz. Bu hatalardan uzak durmak için varyansý farklý bir artýmsal
+yöntemle hesaplamak istiyoruz.
+
+Youngs ve Cramer'in yöntemine göre [3, sf. 69] bu hesap þöyle
+yapýlabilir. $T_{ij}$, $M_{ij}$ ve $S_{ij}$,  veri noktalarý $x_i$ $x_j$
+arasýndaki verileri kapsayacak þekilde sýrasýyla toplam, ortalama ve
+verinin karesinin toplamý olsun, 
+
+$$ 
+T_{ij} = \sum _{k=i}^{j} x_k , \quad  
+M_{ij} = \frac{1}{(j-1+1)}, \quad
+S_{ij} = \sum _{k=i}^{j} (x_k - M_{ij})^2
+$$
+
+Güncelleme formülleri þunlardýr, 
+
+$$ T_{1,j} = T_{i,j-1} + x_j$$
+
+$$ S_{1,j} = S_{i,j-1} + \frac{1}{j(j-1)} (jx_j - T_{1,j})^2  $$
+
+ki $T_{1,1} = x_1$ ve $S_{1,1}=0$ olacak þekilde.
+
+Ýspat
+
+
+
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def incremental_mean_and_var(x, last_sum, last_var, j):
@@ -795,5 +846,7 @@ Kaynaklar
 [1] Ross, {\em Introduction to Probability and Statistics for Engineers, 3rd Edition}
 
 [2] Wasserman, {\em All of Statistics}
+
+[3] Weihs, {\em Foundations of Statistical Algorithms With References to R Packages}
 
 \end{document}
