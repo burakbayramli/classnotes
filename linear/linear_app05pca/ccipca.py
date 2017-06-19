@@ -17,7 +17,8 @@ class CCIPCA:
         self.mean_ = None
         self.components_ = None
         self.mean_ = np.zeros([self.n_features], np.float)
-        self.components_ = np.ones((self.n_components,self.n_features)) / (self.n_features*self.n_components)
+        self.components_ = np.ones((self.n_components,self.n_features)) / \
+                           (self.n_features*self.n_components)
       
     def partial_fit(self, u):
         n = float(self.iteration)
@@ -59,7 +60,8 @@ class CCIPCA:
         idx = np.argsort(-self.explained_variance_ratio_)
         self.explained_variance_ratio_ = self.explained_variance_ratio_[idx]
         self.components_ = self.components_[idx,:]
-        self.explained_variance_ratio_ = (self.explained_variance_ratio_ / self.explained_variance_ratio_.sum())
+        self.explained_variance_ratio_ = (self.explained_variance_ratio_ / \
+                                          self.explained_variance_ratio_.sum())
         for r in range(0,self.components_.shape[0]):
             d = np.sqrt(np.dot(self.components_[r,:],self.components_[r,:]))
             self.components_[r,:] /= d
