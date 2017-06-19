@@ -1,4 +1,4 @@
-function [Up,Sp,Vp] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth )
+function [Up1,Sp,Vp1] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth )
 
   U = Varg;
   V = Uarg;
@@ -30,5 +30,10 @@ function [Up,Sp,Vp] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth )
     Vp = VQ * tVp;
     Sp = tSp;
   end;
+
+  Up1 = Vp;
+  Vp1 = Up;
+  
+
   
 return;
