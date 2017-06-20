@@ -318,7 +318,70 @@ yansýmayý çözmek. O zaman $A$'yi alttaki yerine koyunca, çözüm ortaya
 
 $$ \hat{x} = (A^TA)^{-1}A^Tb $$
 
+Ekler
 
+Matris tersi kullanmadan vektörün düzlem üzerine yansýtmasýný daha direk
+bir þekilde þöyle anlatabilirdik [1]: hatýrlarsak, bir $u$ vektörünün diðer
+bir $v$ vektörünün üzerine yansýtmasý (operasyonu $\proj$ üzerinden)
+
+$$ \proj_v(u) = \frac{u \cdot v}{||v||^2} $$
+
+idi. O zaman $u$'nun bir düzlem üzerine yansýtmasýný $u$'nin içinde o
+düzleme dik olan bileþenlerini çýkartarak bulabiliriz. Düzlemi yatay olarak
+düþünürsek $u$ içinden düzleme dikey olan bileþenleri çýkartýnca geriye
+$u$'nun yatay bileþenleri kalýr, bu da $u$'nun düzleme yansýtýlmýþ hali
+demektir. Peki düzleme dikey olan vektörü nasýl buluyoruz? Bu vektör zaten
+biliniyor, bu vektör düzlemin normal vektöründen baþka bir þey
+deðil. Normal vektor $n$ icin formul,
+
+$$ \proj_{\textrm{düzlem}}(u) = u - \proj_{n}(u) = u - \frac{u \cdot n}{||n||^2} n $$
+
+Bir örnek üzerinde görelim, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../../vision/vision_02')
+from mpl_toolkits.mplot3d import Axes3D
+import plot3d
+o = np.array([5,5,5])
+u = np.array([3,3,3])
+n = np.array([-1/3.,2/3.,2/3.])
+
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_plane(ax, o, n, size=5)
+plot3d.plot_vector(fig, o, u)
+plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
+plt.savefig('15_8.png')
+\end{minted}
+
+\includegraphics[width=20em]{15_8.png}
+
+Mavi vektörü düzleme yansýtmak istiyoruz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p = u - (np.dot(u,n) / np.dot(n,n)) * n
+print p
+\end{minted}
+
+\begin{verbatim}
+[ 4.  1.  1.]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_plane(ax, o, n, size=5)
+plot3d.plot_vector(fig, o, u)
+plot3d.plot_vector(fig, o, p, 'cyan')
+plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
+plt.savefig('15_9.png')
+\end{minted}
+
+\includegraphics[width=20em]{15_9.png}
+
+Kaynaklar
+
+[1] Maplesoft, {\em Projection of a Vector onto a Plane}, \url{http://www.maplesoft.com/support/help/Maple/view.aspx?path=MathApps/ProjectionOfVectorOntoPlane}
 
 
 \end{document}
