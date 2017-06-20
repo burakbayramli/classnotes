@@ -6,16 +6,20 @@ import scipy.linalg as lin
 def  addblock_svd_update( Uarg, Sarg, Varg, Aarg, force_orth ):
   U = Varg
   V = Uarg
-  S = Sarg
+  S = np.eye(len(Sarg),len(Sarg))*Sarg
   A = Aarg.T
-    
+  
   current_rank = U.shape[1]
   m = np.dot(U.T,A)
   print m
   p = A - np.dot(U,m)
+  p = np.array([[-8.8818e-16],[-2.2204e-16],[-1.1102e-15]])  
   P = lin.orth(p)
-  print P
-
+  Ra = np.dot(P.T,p)
+  z = np.zeros(m.shape)
+  tmp1 = np.hstack((S,m))
+  print tmp1
+  
   return None,None,None
 
 

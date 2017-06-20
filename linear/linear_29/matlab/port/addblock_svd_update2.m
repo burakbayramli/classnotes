@@ -13,6 +13,8 @@ function [Up1,Sp,Vp1] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth
   Ra = P' * p;
   z = zeros( size(m) );
   K = [ S m ; z' Ra ];
+  K
+  quit;
   [tUp,tSp,tVp] = svds( K, current_rank );
   Sp = tSp;
   Up = [ U P ] * tUp;                           
