@@ -12,7 +12,6 @@ def crossings_nonzero_pos2neg(data):
 def butter_lowpass_filter(data, sample_rate, cutoff=10, order=4):
     nyquist = 0.5 * sample_rate
     normal_cutoff = cutoff / nyquist
-    print 'nc', normal_cutoff
     b, a = butter(order, normal_cutoff, btype='low', analog=False)
     y = lfilter(b, a, data)
     return y

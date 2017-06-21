@@ -1,4 +1,30 @@
 
+Re: heel strikes (from Yang, et al., 2012): "The heel contacts are
+detected by peaks preceding the sign change of AP acceleration [3]. In
+order to automatically detect a heel contact event, firstly, the AP
+acceleration is low pass filtered by the 4th order zero lag
+Butterworth filter whose cut frequency is set to 5 Hz.  After that,
+transitional positions where AP acceleration changes from positive to
+negative can be identified. Finally the peaks of AP acceleration
+preceding the transitional positions, and greater than the product of
+a threshold and the maximum value of the AP acceleration are denoted
+as heel contact events...  This threshold is defined as the ratio to
+the maximum value of the AP acceleration, for example 0.5 indicates
+the threshold is set at 50% of the maximum AP acceleration. Its
+default value is set to 0.4 as determined experimentally in this
+paper, where this value allowed correct detection of all gait events
+in control subjects. However, when a more irregular pattern is
+analysed, the threshold should be less than 0.4. The user can test
+different threshold values and find the best one according to the gait
+event detection results."
+
+This program derives the local walk direction vector from the end of
+the primary leg's stride, when it is decelerating in its swing.  While
+the WalkCompass relies on clear heel strike signals across the
+accelerometer axes, this program just uses the most prominent strikes,
+and estimates period from the real part of the FFT of the data.
+
+
 
 ```python
 import pandas as pd
@@ -30,7 +56,7 @@ data = np.abs(ax) + np.abs(ay) + np.abs(az)
 plot_test2 = False
 
 
-# Demean data (not in iGAIT):
+# Demean data
 data -= np.mean(data)
 
 # Low-pass filter the AP accelerometer data by the 4th order zero lag
@@ -47,14 +73,12 @@ plt.plot(transitions,filtered[transitions],'rd')
 plt.savefig('out1.png')
 ```
 
-```text
-nc 0.4
-```
+
+# Find the peaks of AP acceleration preceding the transitional
+# positions, and greater than the product of a threshold and the
+# maximum value of the AP acceleration:
 
 ```python
-# Find the peaks of AP acceleration preceding the transitional positions,
-# and greater than the product of a threshold and the maximum value of
-# the AP acceleration:
 strike_indices_smooth = []
 filter_threshold = np.abs(threshold * np.max(filtered))
 for i in range(1, np.size(transitions)):
@@ -63,9 +87,15 @@ for i in range(1, np.size(transitions)):
     if filtered[segment[imax]] > filter_threshold:
         strike_indices_smooth.append(segment[imax])
 
+f=plt.figure()
+plt.plot(data)
+plt.plot(strike_indices_smooth,data[strike_indices_smooth],'rd')
+plt.savefig('out3.png')
+
 # Compute number of samples between peaks using the real part of the FFT:
 interpeak = health.compute_interpeak(data, sample_rate)
 decel = np.int(interpeak / 2)
+print 'decel', decel
 
 # Find maximum peaks close to maximum peaks of smoothed data:
 strike_indices = []
@@ -85,22 +115,20 @@ plt.savefig('out2.png')
 ```
 
 ```text
-nc 0.4
+decel 37
 ```
 
 ```python
 # Compute number of samples between peaks using the real part of the FFT:
 decel = np.int(np.round(stride_fraction * interpeak))
+print 'decel', decel
 
 # Find maximum peaks close to maximum peaks of smoothed data:
 ipeaks = []
 for ipeak_smooth in strike_indices:
-    #print decel, ipeak_smooth-decel, ipeak_smooth + decel
-    #print data[ipeak_smooth - decel:ipeak_smooth + decel]
     ipeak = np.argmax(data[ipeak_smooth - decel:ipeak_smooth + decel])
     ipeak += ipeak_smooth - decel
     ipeaks.append(ipeak)
-
 
 # Compute the average vector for each deceleration phase:
 vectors = []
@@ -119,6 +147,7 @@ print direction
 ```
 
 ```text
+decel 9
 [ 0.24212494 -0.25265038  0.93677281]
 ```
 

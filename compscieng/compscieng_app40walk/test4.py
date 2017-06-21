@@ -82,8 +82,6 @@ decel = np.int(np.round(stride_fraction * interpeak))
 # Find maximum peaks close to maximum peaks of smoothed data:
 ipeaks = []
 for ipeak_smooth in strike_indices:
-    #print decel, ipeak_smooth-decel, ipeak_smooth + decel
-    #print data[ipeak_smooth - decel:ipeak_smooth + decel]
     ipeak = np.argmax(data[ipeak_smooth - decel:ipeak_smooth + decel])
     ipeak += ipeak_smooth - decel
     ipeaks.append(ipeak)
