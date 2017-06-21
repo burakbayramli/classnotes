@@ -15,12 +15,10 @@ function [Up1,Sp,Vp1] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth
   K = [ S m ; z' Ra ];
   [tUp,tSp,tVp] = svds( K, current_rank );
   Sp = tSp;
-  Up = [ U P ] * tUp;                           
-  if ( ~isempty(V) )
-    Vp = V * tVp( 1:current_rank, : );
-  else
-    Vp = [];
-  end;
+  Up = [ U P ] * tUp;
+  Vp = V * tVp( 1:current_rank, : );
+  Vp
+  quit;
   Vp = [ Vp ; tVp( current_rank+1:size(tVp,1), : ) ];
   if ( force_orth )
     [UQ,UR] = qr( Up, 0 );

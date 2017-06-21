@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.linalg as lin
+import scipy.sparse as sps
+import scipy.sparse.linalg as slin
 
 def  addblock_svd_update( Uarg, Sarg, Varg, Aarg, force_orth ):
   U = Varg
@@ -11,14 +13,23 @@ def  addblock_svd_update( Uarg, Sarg, Varg, Aarg, force_orth ):
   
   current_rank = U.shape[1]
   m = np.dot(U.T,A)
-  print m
   p = A - np.dot(U,m)
   p = np.array([[-8.8818e-16],[-2.2204e-16],[-1.1102e-15]])  
   P = lin.orth(p)
   Ra = np.dot(P.T,p)
   z = np.zeros(m.shape)
   tmp1 = np.hstack((S,m))
-  print tmp1
+  tmp2 = np.hstack((z.T,Ra))  
+  K = np.vstack((tmp1,tmp2))
+  tUp,tSp,tVp = lin.svd(K);
+  tUp = tUp[:,:current_rank]
+  tSp = np.diag(tSp[:current_rank])
+  tVp = tVp[:,:current_rank]
+  Sp = tSp
+  Up = np.dot(np.hstack((U,P)),tUp)
+  Vp = np.dot(V,tVp[:current_rank,:])
+  print Vp
+
   
   return None,None,None
 
@@ -34,7 +45,7 @@ A = np.array([[1, 1, 1]])
 X2 = np.vstack((X,A))
 
 U,S,V = np.linalg.svd(X, full_matrices=False)
-U = [[   0.77045  -0.62822  -0.10593],
+U = [[0.77045,  -0.62822,  -0.10593],
      [0.56969,   0.62909,   0.46671],
      [-0.23689,  -0.43623,   0.86792],
      [-0.16047,  -0.13890,  -0.13296]]
@@ -44,14 +55,9 @@ V = [[   0.144322,  -0.967520,  -0.207550],
      [0.091448,   0.221889,  -0.970774 ]]
 
 U = np.array(U)
-V = np.array(V)  
+V = np.array(V)
 
 Up,Sp,Vp = addblock_svd_update(U, S, V, A, True)
 
  
-
-
-
-
-
 
