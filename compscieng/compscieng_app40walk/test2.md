@@ -78,11 +78,9 @@ strikes = np.asarray(strike_indices)
 strikes -= strikes[0]
 strikes = strikes / sample_rate
 
-ipeaks_smooth = strike_indices
-
 f=plt.figure()
 plt.plot(data)
-plt.plot(ipeaks_smooth,data[ipeaks_smooth],'rd')
+plt.plot(strike_indices,data[strike_indices],'rd')
 plt.savefig('out2.png')
 ```
 
@@ -92,14 +90,11 @@ nc 0.4
 
 ```python
 # Compute number of samples between peaks using the real part of the FFT:
-interpeak = health.compute_interpeak(data, sample_rate)
-#print interpeak
-#print 'sf', stride_fraction, stride_fraction*interpeak
 decel = np.int(np.round(stride_fraction * interpeak))
 
 # Find maximum peaks close to maximum peaks of smoothed data:
 ipeaks = []
-for ipeak_smooth in ipeaks_smooth:
+for ipeak_smooth in strike_indices:
     #print decel, ipeak_smooth-decel, ipeak_smooth + decel
     #print data[ipeak_smooth - decel:ipeak_smooth + decel]
     ipeak = np.argmax(data[ipeak_smooth - decel:ipeak_smooth + decel])
@@ -126,6 +121,7 @@ print direction
 ```text
 [ 0.24212494 -0.25265038  0.93677281]
 ```
+
 
 
 
