@@ -139,7 +139,153 @@ olarak saptanacaktýr. Yatay yönde ama bu sefer reel deðer bazlý bir eþik
 deðeri \verb!min_dist! ile verilir, bu durumda tepe noktalarý arasýnda en
 az bu kadar mesafe olmasý gerekir.
 
+Yürüyüþ Yönünü Bulmak
+
+Cep telefonuyla hangi yöne yürüdüðümüzü nasýl buluruz? Bilim kurgu filmleri
+izleyici olan bizleri biraz sükseli uygulamalara alýþtýrdý -zamanda
+seyahat, istediði yere inen uzay gemileri, ýþýktan hýzlý seyahat gibi-
+fakat cep telefonu ile yürüyüþ yönünü hesaplamak 2014 civarýna kadar hala
+tam, genel bir þekilde çözülmüþ deðildi. GPS ise yaramýyor mu? GPS kesin
+çözüm olabilirdi, dünya üzerinde global kordinatlarý direk alýyoruz, fakat
+GPS þehir ortamýnda binalardan sinyal yansýmasý (multipath) problemi
+sebebiyle herhangi bir yönde birkaç yüz metre hatalý olabiliyor, ve kapalý
+alanlarda GPS sinyali alamýyoruz.
+
+Yürüyüþ yönü çözümü için daha önce adým sayýsýnda olduðu gibi ivmeölçer
+kullanýmý akla gelecektir, ivmeölçer önemli, fakat bu algýlayýcýlarýn
+kaydettikleri yürüyüþ sýrasýnda pek çok diðer hareket ile karýþmýþ
+halde. Sallanma, aþaðý yukarý gidiþ geliþ gibi. Ayrýca ivmeölçerin
+kaydettiði telefon bazlý bir eksen sistemine göre, bu sistem
+
+\includegraphics[width=10em]{compscieng_app40walk_08.png}
+
+Eðer telefonu ekraný bana tam yere dik þekilde tutup yürürsem ivmeölçer y
+kordinatýnda daha yüksek deðerler kaydediyor mesela. Bu bilgiyi alýp
+telefonun bir diðer algýlayýcýsý elektronik pusula / manyetometre
+(magnetometer) üzerinden bir global yön bilgisine belki çevirebilirim,
+fakat pusula da tam güvenli deðil, bu birleþtirmeyi dikkatli yapmak lazým.
+
+Bu birleþtirme için çoðunlukla Android ortamýnda rotasyon matrisi [3]
+kavramý tavsiye edenler var; bu kavrama göre ivmeölçer ve pusula
+birleþtirilip kamera kordinat sistemini dünya kordinate sistemine tercüme
+edecek bir matris hesaplanýyor. Fakat bu hesap hareketli ortamda tam
+güvenilir deðil, ayrýca hesaplanan çok boyutlu, çok çetrefil bir þey. Bu
+tür girift ara ürünler nihai çözümdeki hata ihtimalini daha arttýrýr, bize
+gereken tek bir yön sadece, {\em tüm} üç boyutlu eksenin bir diðer üç
+boyutlu eksene direk eþlemesi biraz fazla. Bir diðer problem bu hesabýn
+nasýl kullanýlacaðýnda. Mesela ivme hesaplarýný rotasyon matrisý ile dünya
+kordinat sýstemine çevirdik, þimdi kuzey-güney doðu-batý baðlamýnda
+ivlenmeyi biliyoruz. Bu ivmelenmeyi bir kere sayýsal entegrasyon ile hýza
+çevirip oradan yön elde edebilir miyiz?  Ne yazýk ki bu yöntemin de hassas
+olduðunu biliyoruz. Eðer olmayan yerde birkaç saniye fazla ivme ölçümü bile
+hýzda, yönde aþýrý farklýlýklar yaratabiliyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import pandas as pd, health
+import scipy.linalg as lin
+
+dir = './data/pots1/'
+dfacc = pd.read_csv(dir + 'lacc.txt',header=None,sep='\s+')
+fr=100; to=250
+dfacc = np.array(dfacc)[fr:to]
+t = dfacc[:,0] / 1e9
+ax = dfacc[:,1]
+ay = dfacc[:,2]
+az = dfacc[:,3]
+data = np.abs(ax) + np.abs(ay) + np.abs(az)
+
+sample_rate = 25.0
+cutoff = 5.0
+threshold = 0.1
+order=4
+stride_fraction = 1.0/8.0
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# Sum of absolute values across accelerometer axes:
+data = np.abs(ax) + np.abs(ay) + np.abs(az)
+
+# Find maximum peaks of smoothed data:
+plot_test2 = False
+
+# Demean data
+data -= np.mean(data)
+
+# Low-pass filter the AP accelerometer data by the 4th order zero lag
+# Butterworth filter whose cut frequency is set to 5 Hz:
+filtered = health.butter_lowpass_filter(data, sample_rate, cutoff, order)
+
+# Find transitional positions where AP accelerometer changes from
+# positive to negative.
+transitions = health.crossings_nonzero_pos2neg(filtered)
+
+f=plt.figure()
+plt.plot(filtered)
+plt.plot(transitions,filtered[transitions],'rd')
+plt.savefig('compscieng_app40walk_09.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app40walk_09.png}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+strike_indices_smooth = []
+filter_threshold = np.abs(threshold * np.max(filtered))
+for i in range(1, np.size(transitions)):
+    segment = range(transitions[i-1], transitions[i])
+    imax = np.argmax(filtered[segment])
+    if filtered[segment[imax]] > filter_threshold:
+        strike_indices_smooth.append(segment[imax])
+
+f=plt.figure()
+plt.plot(filtered)
+plt.plot(strike_indices_smooth,filtered[strike_indices_smooth],'rd')
+plt.plot(transitions,filtered[transitions],'gx')
+plt.savefig('compscieng_app40walk_10.png')
+
+# Compute number of samples between peaks using the real part of the FFT:
+interpeak = health.compute_interpeak(data, sample_rate)
+decel = np.int(interpeak / 2)
+print 'decel', decel
+
+# Find maximum peaks close to maximum peaks of smoothed data:
+strike_indices = []
+for ismooth in strike_indices_smooth:
+    istrike = np.argmax(data[ismooth - decel:ismooth + decel])
+    istrike = istrike + ismooth - decel
+    strike_indices.append(istrike)
+
+strikes = np.asarray(strike_indices)
+strikes -= strikes[0]
+strikes = strikes / sample_rate
+
+print np.unique(strike_indices)
+
+f=plt.figure()
+plt.plot(data)
+plt.plot(strike_indices,data[strike_indices],'rd')
+plt.savefig('compscieng_app40walk_11.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app40walk_10.png}
+
+\includegraphics[width=20em]{compscieng_app40walk_11.png}
+
+
+\begin{verbatim}
+decel 37
+[ 64  93 107 121]
+\end{verbatim}
+
 Kaynaklar
+
+[1] Roy, {\em WalkCompass: Finding Walking Direction Leveraging Smartphone's Inertial Sensors}, \url{http://scholarcommons.sc.edu/etd/2352/}
+
+[2] Roy, {\em I am a Smartphone and I can Tell my User's Walking Direction}, \url{http://synrg.csl.illinois.edu/papers/walkcompass.pdf} 
+
+[3] Google, {\em Position Sensors} \url{https://developer.android.com/guide/topics/sensors/sensors_position.html}
 
 [4] Daskalov, {\em A Pedometer in the Real World}, \url{http://www.aosabook.org/en/500L/a-pedometer-in-the-real-world.htm}
 
