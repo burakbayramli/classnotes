@@ -88,8 +88,9 @@ for i in range(1, np.size(transitions)):
         strike_indices_smooth.append(segment[imax])
 
 f=plt.figure()
-plt.plot(data)
-plt.plot(strike_indices_smooth,data[strike_indices_smooth],'rd')
+plt.plot(filtered)
+plt.plot(strike_indices_smooth,filtered[strike_indices_smooth],'rd')
+plt.plot(transitions,filtered[transitions],'gx')
 plt.savefig('out3.png')
 
 # Compute number of samples between peaks using the real part of the FFT:
