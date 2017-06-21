@@ -1,4 +1,3 @@
-# https://github.com/Sage-Bionetworks/mhealthx baz alinmistir
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -33,7 +32,8 @@ def compute_interpeak(data, sample_rate):
 
     return interpeak
 
-def heel_strikes(data, sample_rate, threshold=0.2, order=4, cutoff=5,t=None):
+def heel_strikes(data, sample_rate, threshold=0.2, order=4, cutoff=5,
+                 plot_test=False, t=None):
 
     # Demean data (not in iGAIT):
     data -= np.mean(data)
@@ -77,16 +77,16 @@ def heel_strikes(data, sample_rate, threshold=0.2, order=4, cutoff=5,t=None):
 
 def walk_direction_preheel(ax, ay, az, t, sample_rate, 
                            stride_fraction=1.0/8.0, threshold=0.5,
-                           order=4, cutoff=5):
+                           order=4, cutoff=5, plot_test=False):
 
 
     # Sum of absolute values across accelerometer axes:
     data = np.abs(ax) + np.abs(ay) + np.abs(az)
 
     # Find maximum peaks of smoothed data:
-    dummy, ipeaks_smooth = heel_strikes(data, sample_rate,
-                                        threshold,
-                                        order, cutoff, t)
+    plot_test2 = False
+    dummy, ipeaks_smooth = heel_strikes(data, sample_rate, threshold,
+                                        order, cutoff, plot_test2, t)
 
     # Compute number of samples between peaks using the real part of the FFT:
     interpeak = compute_interpeak(data, sample_rate)
