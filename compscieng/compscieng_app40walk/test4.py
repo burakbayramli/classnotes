@@ -20,11 +20,6 @@ threshold = 0.1
 order=4
 stride_fraction = 1.0/8.0
 
-#wdir = health.walk_direction_preheel(ax, ay, az, t, sample_rate=sample_rate,
-#                                     stride_fraction=stride_fraction,
-#                                     threshold=threshold,
-#                                     order=4, cutoff=cutoff)
-
 # Sum of absolute values across accelerometer axes:
 data = np.abs(ax) + np.abs(ay) + np.abs(az)
 
@@ -46,7 +41,7 @@ transitions = health.crossings_nonzero_pos2neg(filtered)
 f=plt.figure()
 plt.plot(filtered)
 plt.plot(transitions,filtered[transitions],'rd')
-plt.savefig('out2.png')
+plt.savefig('out1.png')
 
 # Find the peaks of AP acceleration preceding the transitional positions,
 # and greater than the product of a threshold and the maximum value of
@@ -74,27 +69,19 @@ strikes = np.asarray(strike_indices)
 strikes -= strikes[0]
 strikes = strikes / sample_rate
 
-
-ipeaks_smooth = strike_indices
-
-dummy, ipeaks_smooth = health.heel_strikes(data, sample_rate, threshold,
-                                           order, cutoff, plot_test2, t)
-
+#ipeaks_smooth = strike_indices
 
 f=plt.figure()
 plt.plot(data)
-plt.plot(ipeaks_smooth,data[ipeaks_smooth],'rd')
-plt.savefig('out1.png')
+plt.plot(strike_indices,data[strike_indices],'rd')
+plt.savefig('out2.png')
 
 # Compute number of samples between peaks using the real part of the FFT:
-interpeak = health.compute_interpeak(data, sample_rate)
-#print interpeak
-#print 'sf', stride_fraction, stride_fraction*interpeak
 decel = np.int(np.round(stride_fraction * interpeak))
 
 # Find maximum peaks close to maximum peaks of smoothed data:
 ipeaks = []
-for ipeak_smooth in ipeaks_smooth:
+for ipeak_smooth in strike_indices:
     #print decel, ipeak_smooth-decel, ipeak_smooth + decel
     #print data[ipeak_smooth - decel:ipeak_smooth + decel]
     ipeak = np.argmax(data[ipeak_smooth - decel:ipeak_smooth + decel])
