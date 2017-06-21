@@ -124,16 +124,9 @@ decel 37
 decel = np.int(np.round(stride_fraction * interpeak))
 print 'decel', decel
 
-# Find maximum peaks close to maximum peaks of smoothed data:
-ipeaks = []
-for ipeak_smooth in strike_indices:
-    ipeak = np.argmax(data[ipeak_smooth - decel:ipeak_smooth + decel])
-    ipeak += ipeak_smooth - decel
-    ipeaks.append(ipeak)
-
 # Compute the average vector for each deceleration phase:
 vectors = []
-for ipeak in ipeaks:
+for ipeak in strike_indices:
     decel_vectors = np.asarray([[ax[i], ay[i], az[i]]
                                 for i in range(ipeak - decel, ipeak)])
     vectors.append(np.mean(decel_vectors, axis=0))

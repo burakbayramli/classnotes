@@ -69,8 +69,6 @@ strikes = np.asarray(strike_indices)
 strikes -= strikes[0]
 strikes = strikes / sample_rate
 
-#ipeaks_smooth = strike_indices
-
 f=plt.figure()
 plt.plot(data)
 plt.plot(strike_indices,data[strike_indices],'rd')
@@ -79,17 +77,9 @@ plt.savefig('out2.png')
 # Compute number of samples between peaks using the real part of the FFT:
 decel = np.int(np.round(stride_fraction * interpeak))
 
-# Find maximum peaks close to maximum peaks of smoothed data:
-ipeaks = []
-for ipeak_smooth in strike_indices:
-    ipeak = np.argmax(data[ipeak_smooth - decel:ipeak_smooth + decel])
-    ipeak += ipeak_smooth - decel
-    ipeaks.append(ipeak)
-
-
 # Compute the average vector for each deceleration phase:
 vectors = []
-for ipeak in ipeaks:
+for ipeak in strike_indices:
     decel_vectors = np.asarray([[ax[i], ay[i], az[i]]
                                 for i in range(ipeak - decel, ipeak)])
     vectors.append(np.mean(decel_vectors, axis=0))
