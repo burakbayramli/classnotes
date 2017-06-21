@@ -142,20 +142,20 @@ az bu kadar mesafe olmasý gerekir.
 Yürüyüþ Yönünü Bulmak
 
 Cep telefonuyla hangi yöne yürüdüðümüzü nasýl buluruz? Bilim kurgu filmleri
-izleyici olan bizleri biraz sükseli uygulamalara alýþtýrdý -zamanda
-seyahat, istediði yere inen uzay gemileri, ýþýktan hýzlý seyahat gibi-
-fakat cep telefonu ile yürüyüþ yönünü hesaplamak 2014 civarýna kadar hala
-tam, genel bir þekilde çözülmüþ deðildi. GPS ise yaramýyor mu? GPS kesin
-çözüm olabilirdi, dünya üzerinde global kordinatlarý direk alýyoruz, fakat
-GPS þehir ortamýnda binalardan sinyal yansýmasý (multipath) problemi
-sebebiyle herhangi bir yönde birkaç yüz metre hatalý olabiliyor, ve kapalý
-alanlarda GPS sinyali alamýyoruz.
+biz izleyicileri biraz þýmarttý aslýnda -zamanda seyahat, istediði yere
+inen uzay gemileri, ýþýktan hýzlý seyahat- fakat cep telefonu ile yürüyüþ
+yönünü hesaplamak 2014 civarýna kadar hala tam, genel bir þekilde çözülmüþ
+deðildi. GPS ise yaramýyor mu? GPS kesin çözüm olabilirdi çünkü dünya
+üzerinde global kordinatlarý direk cihaza alýyoruz, fakat GPS þehir
+ortamýnda binalardan sinyal yansýmasý (multipath) problemi sebebiyle
+herhangi bir yönde birkaç yüz metre hatalý olabiliyor, ve kapalý alanlarda
+zaten hiç GPS sinyali alamýyoruz. Baþka bir yöntemi kullanmamýz gerekiyor.
 
-Yürüyüþ yönü çözümü için daha önce adým sayýsýnda olduðu gibi ivmeölçer
-kullanýmý akla gelecektir, ivmeölçer önemli, fakat bu algýlayýcýlarýn
-kaydettikleri yürüyüþ sýrasýnda pek çok diðer hareket ile karýþmýþ
-halde. Sallanma, aþaðý yukarý gidiþ geliþ gibi. Ayrýca ivmeölçerin
-kaydettiði telefon bazlý bir eksen sistemine göre, bu sistem
+Daha önce adým sayýsýnda olduðu gibi ivmeölçer kullanýmý akla gelecektir,
+ivmeölçer önemli, fakat bu algýlayýcýlarýn kaydettikleri veri yürüyüþ
+sýrasýnda pek çok diðer hareket ile karýþmýþ halde. Sallanma, aþaðý yukarý
+gidiþ geliþ gibi. Ayrýca ivmeölçerin kaydettiði telefon bazlý bir eksen
+sistemine göre, bu sistem
 
 \includegraphics[width=10em]{compscieng_app40walk_08.png}
 
@@ -165,31 +165,35 @@ telefonun bir diðer algýlayýcýsý elektronik pusula / manyetometre
 (magnetometer) üzerinden bir global yön bilgisine belki çevirebilirim,
 fakat pusula da tam güvenli deðil, bu birleþtirmeyi dikkatli yapmak lazým.
 
-Bu birleþtirme için çoðunlukla Android ortamýnda rotasyon matrisi [3]
-kavramý tavsiye edenler var; bu kavrama göre ivmeölçer ve pusula
-birleþtirilip kamera kordinat sistemini dünya kordinate sistemine tercüme
+Bu birleþtirme için Android ortamýnda rotasyon matrisi [3] bazlý bir
+yöntemi tavsiye edenler var; bu yönteme göre ivmeölçer ve pusula
+birleþtirilip kamera kordinat sistemini dünya kordinat sistemine tercüme
 edecek bir matris hesaplanýyor. Fakat bu hesap hareketli ortamda tam
-güvenilir deðil, ayrýca hesaplanan çok boyutlu, çok çetrefil bir þey. Bu
-tür girift ara ürünler nihai çözümdeki hata ihtimalini daha arttýrýr, bize
-gereken tek bir yön sadece, {\em tüm} üç boyutlu eksenin bir diðer üç
-boyutlu eksene direk eþlemesi biraz fazla. Bir diðer problem bu hesabýn
-nasýl kullanýlacaðýnda. Mesela ivme hesaplarýný rotasyon matrisý ile dünya
-kordinat sýstemine çevirdik, þimdi kuzey-güney doðu-batý baðlamýnda
-ivlenmeyi biliyoruz. Bu ivmelenmeyi bir kere sayýsal entegrasyon ile hýza
-çevirip oradan yön elde edebilir miyiz?  Ne yazýk ki bu yöntemin de hassas
-olduðunu biliyoruz. Eðer olmayan yerde birkaç saniye fazla ivme ölçümü bile
-hýzda, yönde aþýrý farklýlýklar yaratabiliyor.
+güvenilir deðil, ayrýca hesaplanan çok boyutlu bir ürün. Bu tür girift ara
+ürünler nihai çözümdeki hata ihtimalini daha arttýrýr, bize gereken tek bir
+yön sadece, {\em tüm} üç boyutlu eksenin bir diðer üç boyutlu eksene direk
+eþlemesi deðil. Bir diðer problem bu hesabýn nasýl kullanýlacaðý... Mesela
+ivme hesaplarýný rotasyon matrisi ile dünya kordinat sistemine çevirdik,
+þimdi kuzey-güney doðu-batý baðlamýnda ivlenmeyi ``biliyoruz''. Bu
+ivmelenmeyi bir kere sayýsal entegrasyon ile hýza çevirip oradan yön elde
+edebilir miyiz?  Ne yazýk ki entegrasyon hassas bir hesaptýr. Eðer olmayan
+yerde birkaç saniye bile fazla ivme ölçümü almýþsak, hýzda, yönde aþýrý
+farklýlýklar ortaya çýkabiliyor.
 
-Çözüm için yürüyüþün ivmeölçere nasýl yansýdýðýný yakýndan incelemek
-gerekiyor, ki [1, 2]'deki araþtýrma aynen bunu yapmýþ. Bugünlerde moda olan
-veri bilimi denen bir meslek var, burada bazý mühendislerin ilk refleksi
-elde olan bir sürü veriyi bir yapay öðrenim algoritmasýna vermek
-olabiliyor, ve yapay öðrenim algoritmasý bir þeyler ``öðreniyor'', ve
-birdenbire bize yeni veriler / ortamlar için doðru sonuçlar vermeye
-baþlýyor. Bu yaklaþým her zaman iþlemez, problem alanýný yakýndan gözlemek
-her zaman faydalýdýr, onu elden geldiði kadar matematiksel olarak
-modellemeye uðraþmamýz lazým. Aradýðýmýz çok hassas olmayan, genel, geniþ
-tekrar eden bir kalýp, bir sinyal, amacýmýz bu kalýbý yakalamaya uðraþmak.
+Daha saðlam çözüm için yürüyüþün ivmeölçere nasýl yansýdýðýný yakýndan
+incelemek gerekiyor, ki [1, 2]'deki araþtýrma aynen bunu yapmýþ. 
+
+Not: Bugünlerde moda olan veri bilimi denen bir meslek var, buradaki bazý
+arkadaþlarýn ilk refleksi elde olan bir sürü veriyi bir yapay öðrenim
+algoritmasýna týkmak olabiliyor, yapay öðrenim algoritmasý bir þeyler
+``öðreniyor'', ve birdenbire bize yeni veriler / ortamlar için doðru
+sonuçlar vermeye baþlýyor. Çoðunlukla denetimli iþleyen bu ortamlar için
+gereken veri hazýrlýðýnýn külfeti bir tarafa, bu yaklaþým her zaman
+iþlemez, iþlese bile ortaya kýrýlgan bir sistem çýkabilir, problem alanýný
+yakýndan gözlemek her zaman daha faydalýdýr. Problemi elden geldiði kadar
+matematiksel olarak modellemeye uðraþmamýz lazým. Aradýðýmýz çok hassas
+olmayan, genel, geniþ, tekrar eden bir kalýp, sinyali yakalamak. Bunu da
+ancak olan biteni yakýndan gözlemleyerek bulabiliriz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -290,6 +294,9 @@ decel 37
 [ 64  93 107 121]
 \end{verbatim}
 
+
+\inputminted[fontsize=\footnotesize]{python}{health.py}
+
 Kaynaklar
 
 [1] Roy, {\em WalkCompass: Finding Walking Direction Leveraging Smartphone's Inertial Sensors}, \url{http://scholarcommons.sc.edu/etd/2352/}
@@ -303,21 +310,3 @@ Kaynaklar
 [5] Bayramlý, {\em Algýlayýcý Ölçümleri, Video, Android}, \url{http://sayilarvekuramlar.blogspot.de/2017/02/algilayici-olcumleri-video-android.html}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
