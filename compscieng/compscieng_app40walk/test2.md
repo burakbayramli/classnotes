@@ -109,6 +109,8 @@ strikes = np.asarray(strike_indices)
 strikes -= strikes[0]
 strikes = strikes / sample_rate
 
+print np.unique(strike_indices)
+
 f=plt.figure()
 plt.plot(data)
 plt.plot(strike_indices,data[strike_indices],'rd')
@@ -117,6 +119,7 @@ plt.savefig('out2.png')
 
 ```text
 decel 37
+[ 64  93 107 121]
 ```
 
 ```python
@@ -145,7 +148,15 @@ decel 9
 [ 0.24212494 -0.25265038  0.93677281]
 ```
 
+```python
+from scipy.fftpack import rfft, fftfreq
+print fftfreq(20)
+```
 
+```text
+[ 0.    0.05  0.1   0.15  0.2   0.25  0.3   0.35  0.4   0.45 -0.5  -0.45
+ -0.4  -0.35 -0.3  -0.25 -0.2  -0.15 -0.1  -0.05]
+```
 
 
 
