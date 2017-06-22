@@ -219,6 +219,10 @@ telefonun tüm eksenlerindeki ivme ölçüsü, ve sonuç üç boyutlu bir
 vektör. Vektörün iþaretini tersine çevirirsek (yavaþlama yönünün tersi) bu
 bize yürüyüþ yönünü verecektir. 
 
+Alttaki kodda bizim [5]'teki bir uygulama {\em Steps}'i kullanarak
+kaydettiðimiz veriler üzerinden telefon eksenleri üzerindeki yürüyüþ yönü
+vektörünü hesaplýyoruz.
+
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
 import pandas as pd, health
@@ -281,12 +285,13 @@ plt.plot(strike_indices_smooth,filtered[strike_indices_smooth],'rd')
 plt.plot(transitions,filtered[transitions],'gx')
 plt.savefig('compscieng_app40walk_10.png')
 
-# Compute number of samples between peaks using the real part of the FFT:
+# Tepe noktalari arasinda kac veri noktasi oldugunu FFT'nin reel kismini 
+# kullanarak hesapla
 interpeak = health.compute_interpeak(data, sample_rate)
 decel = np.int(interpeak / 2)
-print 'decel', decel
 
-# Find maximum peaks close to maximum peaks of smoothed data:
+# Puruzlestirilmis verinin maksimum noktalarina yakin olan maksimum
+# noktalarini bul
 strike_indices = []
 for ismooth in strike_indices_smooth:
     istrike = np.argmax(data[ismooth - decel:ismooth + decel])
@@ -297,55 +302,45 @@ strikes = np.asarray(strike_indices)
 strikes -= strikes[0]
 strikes = strikes / sample_rate
 
-print np.unique(strike_indices)
-
 f=plt.figure()
 plt.plot(data)
 plt.plot(strike_indices,data[strike_indices],'rd')
 plt.savefig('compscieng_app40walk_11.png')
 \end{minted}
 
-\begin{verbatim}
-decel 37
-[ 64  93 107 121]
-\end{verbatim}
-
 \includegraphics[width=20em]{compscieng_app40walk_10.png}
 
 \includegraphics[width=20em]{compscieng_app40walk_11.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-# Compute number of samples between peaks using the real part of the FFT:
 decel = np.int(np.round(stride_fraction * interpeak))
-print 'decel', decel
 
-# Compute the average vector for each deceleration phase:
+# ters ivmenin oldugu bolgede ortalama al, sonuc uc boyutlu vektor
 vectors = []
 for ipeak in strike_indices:
     decel_vectors = np.asarray([[ax[i], ay[i], az[i]]
                                 for i in range(ipeak - decel, ipeak)])
     vectors.append(np.mean(decel_vectors, axis=0))
 
-# Compute the average deceleration vector and take the opposite direction:
+# ve isareti tersine cevir
 direction = -1 * np.mean(vectors, axis=0)
 
-# Return the unit vector in this direction:
+# Birim vektor haline getir / normalize et
 direction /= np.sqrt(direction.dot(direction))
 
-print direction
+print u'yürüyüþ yönü', direction
 \end{minted}
 
 \begin{verbatim}
-decel 9
-[ 0.24212494 -0.25265038  0.93677281]
+yürüyüþ yönü [ 0.24212494 -0.25265038  0.93677281]
 \end{verbatim}
-
-
-\inputminted[fontsize=\footnotesize]{python}{health.py}
 
 
 \includegraphics[width=20em]{compscieng_app40walk_12.png}
 
+Üstteki kodun kullandýðý yardýmcý kodlar alttadýr,
+
+\inputminted[fontsize=\footnotesize]{python}{health.py}
 
 Kaynaklar
 

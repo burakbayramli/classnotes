@@ -17,16 +17,11 @@ def butter_lowpass_filter(data, sample_rate, cutoff=10, order=4):
     return y
 
 def compute_interpeak(data, sample_rate):
-
-    # Real part of FFT:
     freqs = fftfreq(data.size, d=1.0/sample_rate)
     f_signal = rfft(data)
-
-    # Maximum non-zero frequency:
     imax_freq = np.argsort(f_signal)[-2]
     freq = np.abs(freqs[imax_freq])
-
-    # Inter-peak samples:
+    # tepe noktalari arasindaki veri nokta sayisi
     interpeak = np.int(np.round(sample_rate / freq))
 
     return interpeak
