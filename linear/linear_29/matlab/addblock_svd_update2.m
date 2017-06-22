@@ -1,3 +1,4 @@
+% kolon ekini satir ekine cevir
 function [Up1,Sp,Vp1] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth )
 
   U = Varg;
