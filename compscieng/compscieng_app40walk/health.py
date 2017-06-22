@@ -5,6 +5,7 @@ from scipy.fftpack import rfft, fftfreq
 from scipy.signal import butter, lfilter
 
 def crossings_nonzero_pos2neg(data):
+    # sifir gecislerini burada hesapla
     pos = data > 0
     crossings = (pos[:-1] & ~pos[1:]).nonzero()[0]
     return crossings
