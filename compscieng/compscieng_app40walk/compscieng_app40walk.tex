@@ -269,7 +269,6 @@ plt.savefig('compscieng_app40walk_09.png')
 
 \includegraphics[width=20em]{compscieng_app40walk_09.png}
 
-
 \begin{minted}[fontsize=\footnotesize]{python}
 strike_indices_smooth = []
 filter_threshold = np.abs(threshold * np.max(filtered))
@@ -335,12 +334,94 @@ print u'yürüyüþ yönü', direction
 yürüyüþ yönü [ 0.24212494 -0.25265038  0.93677281]
 \end{verbatim}
 
+Yürüyüþ yönünü telefon eksenleri üzerinde saptadýk, peki bu yönün dünya
+üzerinde hangi yön olduðunu nasýl anlayacaðýz? Burada pusulayý
+kullabiliriz, cep telefonlarý pusula algýlayýcýsý ile kuzey manyetik
+etkisinin telefon eksenlerine ne kadar etki ettiðini kaydedebiliyor, yani
+bu üç eksenden alýnan üç veri noktasý bir vektör olarak telefon kordinate
+sisteminde kuzeyin neresi olduðuna iþaret edecektir. Son durum þöyle
+olabilir, bir telefonun standart elde tutuluþ tarzýný baz alalým, 
 
+\includegraphics[width=15em]{compscieng_app40walk_14.png}
+
+Güzel, þimdi bu vektörleri kullanarak gidiþ yönünü nasýl buluruz? Üstteki
+vektörlerin üç boyutlu olduðuna dikkat, bize aslýnda gereken sadece kuzeye
+göre nasýl hareket ettiðimizi verecek tek bir açý. 
+
+Burada iþimizi kolaylaþtýracak bir yeni kavramý daha kullanabiliriz:
+yerçekim vektörü. Yerçekim ivmeolcerler tarafýndan sürekli kaydedilir,
+yerçekimi müthiþ bir kuvvet, 9.8 $m/s^2$ ile sürekli üzerimizde etkisi olan
+bir þey. Bunun iyi tarafý telefonlar bu kuvveti, ve onun yönünü bir vektör
+olarak güvenilir bir þekilde hesaplayabilirler. Hatta Android'in bu vektörü
+ivme verisinden çýkartan bir ``türevsel algýlayýcýsý'' bile var. Yerçekim
+vektör algýlayýcýsý (gravity vector sensor) hýzlý bir þekilde bu hesabý
+veriyor. Telefon hangi konumda olursa olsun yerçekimin, yine telefon
+kordinatlarýna göre, hangi yönde olduðunu bulabiliyoruz. 
+
+Yerçekim vektörünün faydasý þurada: bu vektörün normal olduðu düzlem
+üzerinde durduðumuz yeryüzeyi olacaktýr. Eðer pusula ve yürüyüþ yönü
+vektörlerini bu düzlem üzerinde yansýtýrsak, artýk bu iki vektör arasýndaki
+açýyý bulmak çok basittir.
+
+\includegraphics[width=15em]{compscieng_app40walk_15.png}
 \includegraphics[width=20em]{compscieng_app40walk_12.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def proj(u, n):
+    return u - (np.dot(u,n) / np.dot(n,n)) * n
+
+dfmag = pd.read_csv(dir + 'mags.txt',header=None,sep='\s+')
+dfmag = np.array(dfmag)
+dfmag = dfmag[fr:to,1:].mean(axis=0)
+print u'kuzey yönü', dfmag
+
+dfg = pd.read_csv(dir + 'grav.txt',header=None,sep='\s+')
+dfg = np.array(dfg)
+dfg = dfg[fr:to,1:].mean(axis=0)
+print u'yerçekim vektörü', dfg
+
+pmag = proj(dfmag, dfg)
+print u'kuzey vektörü yeryüzeyinde yansýtma sonrasý'
+print pmag
+
+pwdir = proj(direction, dfg)
+pwdir = pwdir / lin.norm(pwdir)
+print u'yürüyüþ yönü yansýtma sonrasý'
+print pwdir
+
+a = np.arccos(np.dot(pwdir, pmag) / (lin.norm(pwdir)*lin.norm(pmag)))
+print u'\nAçý', np.rad2deg(a)
+\end{minted}
+
+\begin{verbatim}
+kuzey yönü [-41.02575884  16.51051212  -2.29159006]
+yerçekim vektörü [ 0.70329063  3.60535991  9.0586454 ]
+kuzey vektörü yeryüzeyinde yansýtma sonrasý
+[-41.098733    16.13641625  -3.23152448]
+yürüyüþ yönü yansýtma sonrasý
+[ 0.30343773 -0.89316924  0.33192509]
+
+Açý 129.15898241
+\end{verbatim}
+
+Bu yön hakikaten doðru, ölçüm alýrken aþaðý yukarý o yönde yürüyorduk.
 
 Üstteki kodun kullandýðý yardýmcý kodlar alttadýr,
 
 \inputminted[fontsize=\footnotesize]{python}{health.py}
+
+Görüldüðü gibi bu hesap çok hassas ölçümlere dayanarak yapýlmadý. Yürüyüþ
+yönü için [1] araþtýrmasý veride yürüyüþün en çok iz býraktýðý bölgeye
+odaklanýyor, ve gürültüyü eleyip belli kesitler çýkartarak bir ortalama
+alýyor. Bu saðlam bir hesap. Pusula ölçümleri için de yaklaþým öyle,
+telefondan telefona, markadan markaya göre bir eksendeki ölçüm 20
+mikrotesla yerine 40 mikrotesla gelebilir, fakat bu tür bir fark hesapta
+savrulma yaratacaksa yaklaþýmýmýz saðlam deðil demektir. Fakat hesaplar
+vektörsel olarak ise, ama ölçümdeki deðiþiklik, hata her ne ise, {\em
+  tutarlý} ise vektörün tüm öðelerinde mevcut olacaktýr, ve vektörün
+yönünde deðiþiklik olmayacaktýr. Vektörler, düzlemler, tek açýlar ile iþ
+yaparak, tek bir amaca odaklý algýlayýcýlarýn verisine güvenerek ve onlarý
+bir araya getirerek iþimizi kolaylaþtýrmýþ olduk.
 
 Kaynaklar
 
