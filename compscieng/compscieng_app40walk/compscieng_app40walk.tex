@@ -185,7 +185,7 @@ incelemek gerekiyor, ki [1, 2]'deki araþtýrma aynen bunu yapmýþ.
 
 Not: Bugünlerde moda olan veri bilimi denen bir meslek var, buradaki bazý
 arkadaþlarýn ilk refleksi elde olan bir sürü veriyi bir yapay öðrenim
-algoritmasýna týkmak olabiliyor, yapay öðrenim algoritmasý bir þeyler
+algoritmasina týkmak olabiliyor, yapay öðrenim algoritmasi bir þeyler
 ``öðreniyor'', ve birdenbire bize yeni veriler / ortamlar için doðru
 sonuçlar vermeye baþlýyor. Çoðunlukla denetimli iþleyen bu ortamlar için
 gereken veri hazýrlýðýnýn külfeti bir tarafa, bu yaklaþým her zaman
@@ -193,9 +193,31 @@ iþlemez, iþlese bile ortaya kýrýlgan bir sistem çýkabilir, problem alanýný
 yakýndan gözlemek her zaman daha faydalýdýr. Problemi elden geldiði kadar
 matematiksel olarak modellemeye uðraþmamýz lazým. Aradýðýmýz çok hassas
 olmayan, genel, geniþ, tekrar eden bir kalýp, sinyali yakalamak. Bunu da
-ancak olan biteni yakýndan gözlemleyerek bulabiliriz. 
+ancak olan biteni yakýndan gözlemleyerek bulabiliriz. [1]'deki Walkcompass
+araþtýrmasýnýn yaptýðý tam da budur. 
 
-\includegraphics[width=20em]{compscieng_app40walk_12.png}
+\includegraphics[width=30em]{compscieng_app40walk_13.png}
+
+[1]'e göre insan yürüyüþünün bölgelere ayrýlabilir ve her bölgenin
+ivmeölçerde farklý bir yansýmasý var. Ýki büyük bölge duruþ ve sallanýþ
+denebilecek konumlar; duruþta (aslýnda tam duruþ deðil, fakat senkronize
+hareket) bacak ve üst gövde ayný anda öne doðru gitmekte, sallanýþ ise bir
+bacaðýn arkadan öne doðru itilmesiyle üst gövdeden öne geçme aný. Sallanýþ
+bölgesinin ilk kýsmýnda ivme pozitif, ikinci kýsmýnda ise negatif. Ayrýca,
+diyelim ki sallanýþ $t_1,..,t_9$ zaman kesitlerini kapsýyor, ivme $t_3$'te
+maksimum, $t_5$'te sýfýr, ve geriye doðru ters ivme (deceleration) $t_7$'de
+en üst noktasýnda. 
+
+Araþtýrmanýn en önemli bulgusu þudur: güvenli bir þekilde ivmeölçere
+yansýyan ve yürüyüþ yönü bilgisini taþýyan en iyi bölge topuk vuruþuna
+giden maksimum yavaþlamanýn olduðu bir bölge, bunun için [1] önce ivme
+sinyalinde aþýrý yüksek frekanslý sinyalleri eler, ardýndan sýfýr geçiþ
+anlarýný bulur - bu noktalar sinyalin artýdan eksiye doðru geçiþ yaptýðý
+anlardýr. Ardýndan sýfýr geçiþ ve tepe noktalarý arasýndaki bölgeye
+odaklanýlýr, ve bu kesit çýkartýlarak ortalamasý alýnýr. Bu ortalama
+telefonun tüm eksenlerindeki ivme ölçüsü, ve sonuç üç boyutlu bir
+vektör. Vektörün iþaretini tersine çevirirsek (yavaþlama yönünün tersi) bu
+bize yürüyüþ yönünü verecektir. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -221,21 +243,18 @@ stride_fraction = 1.0/8.0
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-# Sum of absolute values across accelerometer axes:
+# Tum eksenlerdeki degerleri pozitifle ve topla
 data = np.abs(ax) + np.abs(ay) + np.abs(az)
 
-# Find maximum peaks of smoothed data:
-plot_test2 = False
-
-# Demean data
+# ortalamayi cikar
 data -= np.mean(data)
 
-# Low-pass filter the AP accelerometer data by the 4th order zero lag
-# Butterworth filter whose cut frequency is set to 5 Hz:
+# Veri uzerinde alcak geciren (low-pass) Butterworth filter filtre islet,
+# esik noktasi  5 Hz. Bu cok alcak bir deger degil, Huseyin Bolt bile 
+# saniyede 5 adimdan fazla atmiyordur herhalde
 filtered = health.butter_lowpass_filter(data, sample_rate, cutoff, order)
 
-# Find transitional positions where AP accelerometer changes from
-# positive to negative.
+# Pozitiften negatife gecis noktalarini bul
 transitions = health.crossings_nonzero_pos2neg(filtered)
 
 f=plt.figure()
@@ -286,18 +305,47 @@ plt.plot(strike_indices,data[strike_indices],'rd')
 plt.savefig('compscieng_app40walk_11.png')
 \end{minted}
 
-\includegraphics[width=20em]{compscieng_app40walk_10.png}
-
-\includegraphics[width=20em]{compscieng_app40walk_11.png}
-
-
 \begin{verbatim}
 decel 37
 [ 64  93 107 121]
 \end{verbatim}
 
+\includegraphics[width=20em]{compscieng_app40walk_10.png}
+
+\includegraphics[width=20em]{compscieng_app40walk_11.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# Compute number of samples between peaks using the real part of the FFT:
+decel = np.int(np.round(stride_fraction * interpeak))
+print 'decel', decel
+
+# Compute the average vector for each deceleration phase:
+vectors = []
+for ipeak in strike_indices:
+    decel_vectors = np.asarray([[ax[i], ay[i], az[i]]
+                                for i in range(ipeak - decel, ipeak)])
+    vectors.append(np.mean(decel_vectors, axis=0))
+
+# Compute the average deceleration vector and take the opposite direction:
+direction = -1 * np.mean(vectors, axis=0)
+
+# Return the unit vector in this direction:
+direction /= np.sqrt(direction.dot(direction))
+
+print direction
+\end{minted}
+
+\begin{verbatim}
+decel 9
+[ 0.24212494 -0.25265038  0.93677281]
+\end{verbatim}
+
 
 \inputminted[fontsize=\footnotesize]{python}{health.py}
+
+
+\includegraphics[width=20em]{compscieng_app40walk_12.png}
+
 
 Kaynaklar
 
