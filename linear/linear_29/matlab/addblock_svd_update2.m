@@ -18,8 +18,6 @@ function [Up1,Sp,Vp1] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth
   Sp = tSp;
   Up = [ U P ] * tUp;
   Vp = V * tVp( 1:current_rank, : );
-  Vp
-  quit;
   Vp = [ Vp ; tVp( current_rank+1:size(tVp,1), : ) ];
   if ( force_orth )
     [UQ,UR] = qr( Up, 0 );
@@ -32,7 +30,5 @@ function [Up1,Sp,Vp1] = addblock_svd_update2( Uarg, Sarg, Varg, Aarg, force_orth
 
   Up1 = Vp;
   Vp1 = Up;
-  
-
-  
+    
 return;
