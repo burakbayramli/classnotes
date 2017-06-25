@@ -147,10 +147,11 @@ izleyicileri biraz þýmarttý aslýnda -zamanda seyahat, istediði yere inen
 uzay gemileri, ýþýktan hýzlý seyahat- fakat cep telefonu ile yürüyüþ yönünü
 hesaplamak 2014 civarýna kadar hala tam, genel bir þekilde çözülmüþ
 deðildi. GPS iþe yaramýyor mu? GPS kesin çözüm olabilirdi çünkü dünya
-üzerinde global kordinatlarý direk cihaza alýyoruz, fakat GPS þehir
-ortamýnda binalardan sinyal yansýmasý (multipath) problemi sebebiyle
-herhangi bir yönde birkaç yüz metre hatalý olabiliyor, ve kapalý alanlarda
-zaten hiç GPS sinyali alamýyoruz. Baþka bir yöntemi kullanmamýz gerekiyor.
+üzerinde global kordinatlarý direk cihaza alýyoruz ve ardý ardýna alýnan
+ölçümler bir gidiþ yönünü gösteriyor olurdu, fakat GPS þehir ortamýnda
+binalardan sinyal yansýmasý (multipath) problemi sebebiyle herhangi bir
+yönde birkaç yüz metre hatalý olabiliyor, ve kapalý alanlarda zaten hiç GPS
+sinyali alamýyoruz. Baþka bir yöntemi kullanmamýz gerekiyor.
 
 Daha önce adým sayýsýnda olduðu gibi ivmeölçer kullanýmý akla gelecektir,
 ivmeölçer önemli, fakat bu algýlayýcýlarýn kaydettikleri veri yürüyüþ
@@ -210,7 +211,7 @@ negatif. Ayrýca, diyelim ki sallanýþ $t_1,..,t_9$ zaman kesitlerini
 kapsýyor, ivme $t_3$'te maksimum, $t_5$'te sýfýr, ve geriye doðru ters ivme
 (deceleration) $t_7$'de en üst noktasýnda.
 
-Araþtýrmanýn en önemli bulgusu þudur: güvenli bir þekilde ivmeolcere
+Araþtýrmanýn en önemli bulgusu þudur: güvenli bir þekilde ivmeölçere
 yansýyan ve yürüyüþ yönü bilgisini taþýyan en iyi veri bölgesi topuk
 vuruþuna giden maksimum yavaþlamanýn olduðu bir bölgedir, bunun için [1]
 önce ivme sinyalinde aþýrý yüksek frekanslý sinyalleri eler, ardýndan sýfýr
@@ -220,12 +221,12 @@ vuruþuna en yakýn bölgeye odaklanýlýr, ve bu kesit çýkartýlarak bütün üç
 eksenler üzerinden o bölgedeki ortalama alýnýr. Bu ortalama telefonun tüm
 eksenlerindeki ivme ölçüsü olacaktýr, sonuç üç boyutlu bir vektör. Vektörün
 iþaretini tersine çevirirsek (yavaþlama yönünün tersi) bu bize yürüyüþ
-yönünü verecektir. Not: negatiflik, pozitiflik, sýfýr geçiþ irdelemeleri
-birleþtirilmiþ ivme verisinde, aranan bölge bulununca o bölgedeki ortalama
-üç eksendeki ivme verisi üzerinden hesaplanýr.
+yönünü verecektir. Tekrar vurgulayalým, negatiflik, pozitiflik, sýfýr geçiþ
+irdelemeleri birleþtirilmiþ ivme verisinde, aranan bölge bulununca o
+bölgedeki ortalama üç eksendeki ivme verisinde hesaplanýr.
 
 Alttaki kodda bizim [5]'teki uygulama {\em Steps}'i kullanarak
-kaydettiðimiz verilerle yürüyüþ yönü vektörü hesabýný görüyoruz.
+kaydettiðimiz verilerle yürüyüþ yönü hesabýný görüyoruz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd, health
@@ -339,6 +340,8 @@ print u'yürüyüþ yönü', direction
 yürüyüþ yönü [ 0.24212494 -0.25265038  0.93677281]
 \end{verbatim}
 
+Pusula
+
 Yürüyüþ yönünü telefon eksenleri bazlý saptadýk, peki bu yön dünyada nereyi
 gösteriyor? Pusulayý kullabiliriz, cep telefonlarý pusula algýlayýcýsý ile
 kuzey manyetik etkisinin telefon eksenlerine ne kadar etki ettiðini
@@ -352,24 +355,24 @@ alalým,
 \includegraphics[width=15em]{compscieng_app40walk_14.png}
 
 Güzel, þimdi bu vektörleri kullanarak gidiþ yönünü bulalým. Üstteki
-vektörlerin üç boyutlu olduðuna dikkat, eðer bu iki vektör arasýnda direk
-açý hesaplamaya uðraþsak, diyelim biri çok yukarýda diðeri çok aþaðýda ama
-yeryüzü bazýnda doðu-batý temelli çok az farklý olan iki vektör arasýnda
-çok büyük açý ortaya çýkardý. Bize aslýnda gereken sadece kuzeye göre nasýl
-hareket ettiðimizi verecek ``yataysal'' bir açý. Þimdi iþimizi
-kolaylaþtýracak bir yeni kavramý daha kullanabiliriz: yerçekim
-vektörü. Yerçekim ivmeölçerler tarafýndan sürekli kaydedilir, yerçekimi
-müthiþ bir kuvvettir, 9.8 $m/s^2$ ile sürekli üzerimizde etkisi var. Bunun
-iyi tarafý telefonlar bu kuvveti, ve onun yönünü bir vektör olarak
-güvenilir bir þekilde hesaplayabilirler. Hatta Android'in bu vektörü ivme
-verisinden çýkartan bir ``türevsel algýlayýcýsý'' bile var. Yerçekim vektör
-algýlayýcýsý (gravity vector sensor) hýzlý bir þekilde bu hesabý
+vektörlerin üç boyutlu olduðuna dikkat, eðer yürüyüþ yönü ve kuzey vektörü
+arasýnda direk açý hesaplamaya uðraþsak, diyelim biri çok yukarýda diðeri
+çok aþaðýda ama yeryüzü bazýnda doðu-batý temelli çok az farklý olan iki
+vektör arasýnda çok büyük açý ortaya çýkabilirdi. Bize aslýnda gereken
+sadece kuzeye göre nasýl hareket ettiðimizi verecek ``yataysal'' bir
+açý. Þimdi iþimizi kolaylaþtýracak bir yeni kavramý daha kullanabiliriz:
+yerçekim vektörü. Yerçekim ivmeölçerler tarafýndan sürekli kaydedilir,
+yerçekimi müthiþ bir kuvvettir, 9.8 $m/s^2$ ile sürekli üzerimizde etkisi
+var. Bunun iyi tarafý telefonlar bu kuvveti, ve onun yönünü bir vektör
+olarak güvenilir bir þekilde hesaplayabilirler. Hatta Android'in bu vektörü
+ivme verisinden çýkartan bir ``türevsel algýlayýcýsý'' bile var. Yerçekim
+vektör algýlayýcýsý (gravity vector sensor) hýzlý bir þekilde bu hesabý
 veriyor. Telefon hangi konumda olursa olsun yerçekimin, yine telefon
 kordinatlarýna göre, hangi yönde olduðunu gösteriyor.
 
 Yerçekim vektörünün faydasý þurada: bu vektörün normal olduðu düzlemi hayal
 edersek, bu üzerinde durduðumuz yeryüzeyi olacaktýr! Ve, eðer pusula ve
-yürüyüþ yönü vektörlerini bu düzlem üzerinde yansýtýrsak, artýk bu iki
+yürüyüþ yönü vektörlerini bu düzlem üzerine yansýtýrsak, artýk bu iki
 vektör arasýndaki açýyý bulmak çok basittir. Yansýtma için bkz {\em Lineer
   Cebir, Ders 15}. Açý hesabý için iki vektor arasýndaki þu iliþkiyi
 hatýrlayalým,
