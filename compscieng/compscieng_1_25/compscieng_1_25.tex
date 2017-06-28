@@ -255,15 +255,17 @@ kullanabilirdik, bu durumda $y$'yi üretmek için $y$'nin kendisini kullanmýþ
 olurduk, bu sebeple bu tür filtrelere özyineli (recursive) filtreler ismi
 de veriliyor. Yani
 
-\begin{eqnarray}
+\begin{eqnarray*}
 y[n] = a_0 x[n] &+& a_1 x[n-1] + a_2 x[n-2] +  a_3 x[n-3] + ...  \\
  &+& b_1 y[n-1] + b_2 y[n-2] + b_3 y[n-3] + ..
-\end{eqnarray}
+\end{eqnarray*}
 
 Peki FIR yöntemi ile filtre tasarlamayý biliyoruz, niye üstteki gibi bir
 yaklaþým kullanalým ki? Cevap özyineli filtrelerin FIR'e göre çok hýzlý
 iþlemeleri. IIR yönteminin de bazý negatif taraflarý var, fakat bunlardan
-uzak durabilirsek optimal hýzda iþleyen bir filtre elde etmek mümkündür.
+uzak durabilirsek optimal hýzda iþleyen bir filtre elde etmek
+mümkündür. Ayrýca elektronik devrelerden, analog temelli pek çok özyineli
+filtre biliniyor, bu filtreleri sayýsal ortamda kullanabilmek iyi olur.
 
 IIR'nin genel verimliliði hakkýnda bir örnek verelim: diyelim ki 7 vuruþlu
 bir ortalama filtremiz var, ve $n=50$'de $y[50]$ þu deðere sahip,
@@ -287,13 +289,60 @@ kullanmak. IIR filtreleri iþte bu sebeple daha verimli iþlerler, eðer
 tasarýmlarýnda dikkatli olunursa daha az miktarda katsayý ile çok daha
 hýzlý hesaplar yapabiliriz [2, sf. 283].
 
+Simdi daha onceki genel formu hatirlayalim 
+
+$$ y(n) + \sum_{k=1}^N a_k y(n-k) = \sum_{l=0}^M b_l x(n-l) $$
+
+Bu formül bir farklýlýk denklemi. Literatürde daha önce (5) formülü aslýnda
+transfer fonksiyonu $H(z)$ olarak geçiyor,
+
+$$ 
+H(z)  = \frac{\sum_{l=0}^M b_l z^{-l}X(z) }{ 1 + \sum_{k=1}^Na_kz^{-k}} 
+$$
+
+Açýlmýþ þekilde  
+
+$$ 
+= \frac
+{b_0 + b_1 z^{-1} + .. + b_m z^{-1}}
+{1 + a_1 z^{-1} + .. + a_n z^{-1}}
+$$
+
+Bu formun güzel tarafý eðer transfer fonksiyonuna bir þekilde eriþebilirsek
+oradan direk farklýlýk denklemine geçebiliriz, katsayýlar $a_0,..,a_n$ ve
+$b_0,..,b_m$ farklýlýk denkleminde aynen kullanýlacak haldeler. Bu kavram
+IIR filtresi tasarlarken faydalý olacak. 
+
+IIR Tasarýmý
+
+IIR filtre tasarýmý için pek çok yöntem var. Bizim iþleyeceðimiz yöntem
+dürtü deðiþmezliði (impülse ýnvariance) yöntemi. Bu yöntem ile bilinen bir
+analog filtrenin analog transfer fonksiyonu $H(s)$'i alýr, sonra ters
+Laplace transformu ile dürtü cevap fonksiyonu $h(t)$'yi elde eder. Sayýsala
+geçmek için bu fonksiyon belli aralýklarla örneklenir, yani $h(t)$, $h(nT)$
+haline getirilir. Sonra bu fonksiyonun z-transformu alýnarak $H(z)$'ye
+geçiþ yapýlýr, bu geçiþ bize özyineli fonksiyonumuzda kullanabileceðimiz
+direk katsayýlarý verecektir. 
+
+Analog deyip geçmeyelim, alçak geçiren, yüksek geçiren, vs. filtreleme
+konusunda burada derin bir literatur var. Sayýsal yöntemler ortaya
+çýktýðýndan beri haklý olarak çok ilgi gördüler, fakat unutmamak lazým,
+sayýsal yöntemlerden önce analog elektronik devreler filtreleme yapýyordu
+(hale de yapýyor), mesela alttaki devre çok basit bir alçak geçiren
+filtredir. 
+
 \includegraphics[width=15em]{compscieng_1_25_01.png}
+
+Bu devreye verilen $v_s$ sinyali (yani içinde pek çok frekans içeren
+elektrik akýmý) seçilen $R,C$'ye göre $v_o$'da alçak geçiren þekilde
+filtrelenmiþ olarak çýkacaktýr. Bu klasik bir filtre devresi ve bir tranfer
+fonksiyonu var. 
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-fs = 10.0 # sample rate
-T = 10.0         # seconds
-n = int(T * fs) # total number of samples
+fs = 10.0 # orneklem orani
+T = 10.0 # saniyelik sinyal
+n = int(T * fs) 
 t = np.linspace(0, T, n, endpoint=False)
 data = np.sin(0.40*2*np.pi*t) + 1.5*np.cos(9*2*np.pi*t) + 0.5*np.sin(12.0*2*np.pi*t)
 plt.plot(t,data)
