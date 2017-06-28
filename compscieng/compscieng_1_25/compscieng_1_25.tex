@@ -4,43 +4,6 @@ Ders 25
 
 [ders notlarý atlandý]
 
-IIR Filtreleri
-
-Önceki dersteki FIR filtreleri sinyal üzerinde bir evriþimle tanýmlandý,
-eldeki belli katsayýlarý geriye dönük ham sinyal üzerinde uygulayarak
-filtrelenmiþ sinyali üretiyoruz,
-
-$$ y[n] = a_0 x[n] + a_1 x[n-1] + a_2 x[n-2] +  a_3 x[n-3] + ... $$
-
-Aslýnda filtreleme için ham sinyalin kendisi elimizdeki tek seçenek deðil,
-sadece sinyal $x$ ile beraber geriye dönük þekilde $y$'nin kendisini de
-kullanabilirdik, bu durumda $y$'yi üretmek için $y$'nin kendisini kullanmýþ
-olurduk, bu sebeple bu tür filtrelere özyineli (recursive) filtreler ismi
-de veriliyor. Yani
-
-\begin{eqnarray}
-y[n] = a_0 x[n] &+& a_1 x[n-1] + a_2 x[n-2] +  a_3 x[n-3] + ...  \\
- &+& b_1 y[n-1] + b_2 y[n-2] + b_3 y[n-3] + ..
-\end{eqnarray}
-
-Peki FIR yontemi ile filtre tasarlamayi biliyoruz, niye ustteki gibi bir
-yaklasim kullanalim ki? Cevap ozyineli filtrelerin FIR'e gore cok hizli
-islemeleri. IIR yonteminin de bazi negatif taraflari var, fakat bu
-taraflardan uzak durabilirsek, optimal hizda isleyen filtreler elde etmek
-mumkundur. 
-
-
-
-
-
-
-
-
-
-
-
-
-
 z Transform 
 
 z Transform, Laplace Transformunun ayrýksal dünyadaki karþýlýðýdýr,
@@ -278,20 +241,85 @@ print np.array(k)
 
 Not: Üstteki hesaplar [1] için kullanýldý.
 
+IIR Filtreleri
+
+Önceki dersteki FIR filtreleri sinyal üzerinde bir evriþimle kodlandý,
+eldeki belli katsayýlarý geriye dönük ham sinyal üzerinde uygulayarak
+filtrelenmiþ sinyali üretiyorduk,
+
+$$ y[n] = a_0 x[n] + a_1 x[n-1] + a_2 x[n-2] +  a_3 x[n-3] + ... $$
+
+Aslýnda filtreleme için ham sinyalin kendisi elimizdeki tek girdi seçeneði
+deðil, sinyal $x$ ile beraber geriye dönük þekilde $y$'nin kendisini de
+kullanabilirdik, bu durumda $y$'yi üretmek için $y$'nin kendisini kullanmýþ
+olurduk, bu sebeple bu tür filtrelere özyineli (recursive) filtreler ismi
+de veriliyor. Yani
+
+\begin{eqnarray}
+y[n] = a_0 x[n] &+& a_1 x[n-1] + a_2 x[n-2] +  a_3 x[n-3] + ...  \\
+ &+& b_1 y[n-1] + b_2 y[n-2] + b_3 y[n-3] + ..
+\end{eqnarray}
+
+Peki FIR yöntemi ile filtre tasarlamayý biliyoruz, niye üstteki gibi bir
+yaklaþým kullanalým ki? Cevap özyineli filtrelerin FIR'e göre çok hýzlý
+iþlemeleri. IIR yönteminin de bazý negatif taraflarý var, fakat bunlardan
+uzak durabilirsek optimal hýzda iþleyen bir filtre elde etmek mümkündür.
+
+IIR'nin genel verimliliði hakkýnda bir örnek verelim: diyelim ki 7 vuruþlu
+bir ortalama filtremiz var, ve $n=50$'de $y[50]$ þu deðere sahip,
+
+$$ y[50] = x[47] + x[48] + x[49] + x[50] + x[51] + x[52] + x[53] $$
+
+Sinyalde $n$ ortalanarak 3 geri ve 3 ileri gidilerek toplam alýnýyor,
+filtrelenmiþ sinyal bu. Þimdi ayný filtrenin bir sonraki zaman kesitinde,
+$y[51]$'deki deðerine bakalým,
+
+$$ y[51] = x[48] + x[49] + x[50] + x[51] + x[52] + x[53] + x[54] $$
+
+Bu toplam aþaðý yukarý iki üstteki ile ayný deðil mi? $x[48]$ ve $x[53]$
+arasý deðerler ayný þekilde toplanýyor, o zaman eðer elimizde $y[50]$
+deðeri var ise, $y[51]$'i hesaplamak için en optimal yöntem
+
+$$ y[51] = y[50] + x[54] - x[47]$$
+
+hesabý olacaktýr, yani $y$'nin bir önceki zaman kesitindeki deðerini
+kullanmak. IIR filtreleri iþte bu sebeple daha verimli iþlerler, eðer
+tasarýmlarýnda dikkatli olunursa daha az miktarda katsayý ile çok daha
+hýzlý hesaplar yapabiliriz [2, sf. 283].
+
+\includegraphics[width=15em]{compscieng_1_25_01.png}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fs = 10.0 # sample rate
+T = 10.0         # seconds
+n = int(T * fs) # total number of samples
+t = np.linspace(0, T, n, endpoint=False)
+data = np.sin(0.40*2*np.pi*t) + 1.5*np.cos(9*2*np.pi*t) + 0.5*np.sin(12.0*2*np.pi*t)
+plt.plot(t,data)
+plt.savefig('compscieng_1_25_02.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_25_02.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 3 * 1/(2*np.pi) # rad/s
+\end{minted}
+
+\begin{verbatim}
+0.477464829276
+\end{verbatim}
+
+1 rad/s -> 1/2*pi Hertz. 
+
+
+
 Kaynaklar
 
 [1] Bayramlý, M., {\em Patent Strategies and R\&D in Complex Product Industries},
     \url{http://amsdottorato.unibo.it/5151/1/bayramli_meltem_tesi.pdf}
 
-
-
-
-
-
-
-
-
-
+[2] Smith, {\em The Scientist and Engineer's Guide to Digital Signal Processing, 2nd Ed.}
 
 
 \end{document}
