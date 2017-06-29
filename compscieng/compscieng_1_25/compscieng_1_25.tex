@@ -244,13 +244,13 @@ Not: Üstteki hesaplar [1] için kullanýldý.
 IIR Filtreleri
 
 Önceki dersteki FIR filtreleri sinyal üzerinde bir evriþimle kodlandý,
-eldeki belli katsayýlarý geriye dönük ham sinyal üzerinde uygulayarak
-filtrelenmiþ sinyali üretiyorduk,
+filtre katsayýlarýný geriye dönük ham sinyal üzerinde uygulayarak
+filtrelenmiþ sonucu üretiyorduk,
 
 $$ y[n] = a_0 x[n] + a_1 x[n-1] + a_2 x[n-2] +  a_3 x[n-3] + ... $$
 
-Aslýnda filtreleme için ham sinyalin kendisi elimizdeki tek girdi seçeneði
-deðil, sinyal $x$ ile beraber geriye dönük þekilde $y$'nin kendisini de
+Fakat filtre için ham sinyalin kendisi elimizdeki tek girdi seçeneði deðil,
+sinyal $x$ ile beraber geriye dönük þekilde $y$'nin kendisini de
 kullanabilirdik, bu durumda $y$'yi üretmek için $y$'nin kendisini kullanmýþ
 olurduk, bu sebeple bu tür filtrelere özyineli (recursive) filtreler ismi
 de veriliyor. Yani
@@ -268,13 +268,13 @@ mümkündür. Ayrýca elektronik devrelerden, analog temelli pek çok özyineli
 filtre biliniyor, bu filtreleri sayýsal ortamda kullanabilmek iyi olur.
 
 IIR'nin genel verimliliði hakkýnda bir örnek verelim: diyelim ki 7 vuruþlu
-bir ortalama filtremiz var, ve $n=50$'de $y[50]$ þu deðere sahip,
+bir ortalama filtremiz var, ve $n=50$ anýnda $y[50]$ þu deðere sahip,
 
 $$ y[50] = x[47] + x[48] + x[49] + x[50] + x[51] + x[52] + x[53] $$
 
-Sinyalde $n$ ortalanarak 3 geri ve 3 ileri gidilerek toplam alýnýyor,
-filtrelenmiþ sinyal bu. Þimdi ayný filtrenin bir sonraki zaman kesitinde,
-$y[51]$'deki deðerine bakalým,
+Sinyalde $n$ merkezli olacak þekilde 3 geri ve 3 ileri gidilerek toplam
+alýnýyor, filtrelenmiþ sinyal bu. Þimdi ayný filtrenin bir sonraki zaman
+kesitinde, $y[51]$'deki deðerine bakalým,
 
 $$ y[51] = x[48] + x[49] + x[50] + x[51] + x[52] + x[53] + x[54] $$
 
@@ -289,12 +289,12 @@ kullanmak. IIR filtreleri iþte bu sebeple daha verimli iþlerler, eðer
 tasarýmlarýnda dikkatli olunursa daha az miktarda katsayý ile çok daha
 hýzlý hesaplar yapabiliriz [2, sf. 283].
 
-Simdi daha onceki genel formu hatirlayalim 
+Þimdi daha önceki genel formu hatýrlayalým 
 
 $$ y(n) + \sum_{k=1}^N a_k y(n-k) = \sum_{l=0}^M b_l x(n-l) $$
 
-Bu formül bir farklýlýk denklemi. Literatürde daha önce (5) formülü aslýnda
-transfer fonksiyonu $H(z)$ olarak geçiyor,
+Bu formül bir farklýlýk denklemi. Bu denklemin transfer fonksiyonu
+altta, ki (5)'in literatürde daha çok görülen hali $H$ kullanýr,
 
 $$ 
 H(z)  = \frac{\sum_{l=0}^M b_l z^{-l}X(z) }{ 1 + \sum_{k=1}^Na_kz^{-k}} 
@@ -304,31 +304,32 @@ Açýlmýþ þekilde
 
 $$ 
 = \frac
-{b_0 + b_1 z^{-1} + .. + b_m z^{-1}}
-{1 + a_1 z^{-1} + .. + a_n z^{-1}}
+{b_0 + b_1 z^{-1} + .. + b_m z^{-l}}
+{1 + a_1 z^{-1} + .. + a_n z^{-k}}
 $$
 
-Bu formun güzel tarafý eðer transfer fonksiyonuna bir þekilde eriþebilirsek
-oradan direk farklýlýk denklemine geçebiliriz, katsayýlar $a_0,..,a_n$ ve
+Bu formun güzel tarafý farklýlýk denklemleri ile üstteki formun arasýndaki
+direk baðlantý. Eðer transfer fonksiyonuna bir þekilde eriþebilirsek oradan
+direk farklýlýk denklemine geçilebiliyor, katsayýlar $a_0,..,a_n$ ve
 $b_0,..,b_m$ farklýlýk denkleminde aynen kullanýlacak haldeler. Bu kavram
-IIR filtresi tasarlarken faydalý olacak. 
+IIR filtresi tasarlarken faydalý olacak.
 
 IIR Tasarýmý
 
 IIR filtre tasarýmý için pek çok yöntem var. Bizim iþleyeceðimiz yöntem
-dürtü deðiþmezliði (impülse ýnvariance) yöntemi. Bu yöntem ile bilinen bir
-analog filtrenin analog transfer fonksiyonu $H(s)$'i alýr, sonra ters
-Laplace transformu ile dürtü cevap fonksiyonu $h(t)$'yi elde eder. Sayýsala
-geçmek için bu fonksiyon belli aralýklarla örneklenir, yani $h(t)$, $h(nT)$
-haline getirilir. Sonra bu fonksiyonun z-transformu alýnarak $H(z)$'ye
-geçiþ yapýlýr, bu geçiþ bize özyineli fonksiyonumuzda kullanabileceðimiz
-direk katsayýlarý verecektir. 
+dürtü deðiþmezliði (impulse invariance) yöntemi. DD ile bilinen bir analog
+filtrenin analog transfer fonksiyonu $H(s)$'yi alýrýz, sonra ters Laplace
+transformu ile dürtü cevap fonksiyonu $h(t)$'yi elde ederiz. Sayýsala
+geçmek için bu fonksiyonu belli aralýklarla örnekleriz, yani $h(t)$'yi
+$h(nT)$ haline getiririz. Sonra bu örneklenmiþ fonksiyonun z-transformunu
+alarak $H(z)$'ye geçiþ yaparýz, bu geçiþ bize özyineli fonksiyonumuzda
+kullanabileceðimiz direk katsayýlarý verecektir.
 
 Analog deyip geçmeyelim, alçak geçiren, yüksek geçiren, vs. filtreleme
 konusunda burada derin bir literatur var. Sayýsal yöntemler ortaya
 çýktýðýndan beri haklý olarak çok ilgi gördüler, fakat unutmamak lazým,
 sayýsal yöntemlerden önce analog elektronik devreler filtreleme yapýyordu
-(hale de yapýyor), mesela alttaki devre çok basit bir alçak geçiren
+(halen de yapýyor), mesela alttaki devre çok basit bir alçak geçiren
 filtredir. 
 
 \includegraphics[width=15em]{compscieng_1_25_01.png}
@@ -341,10 +342,11 @@ fonksiyonu var.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 fs = 10.0 # orneklem orani
-T = 10.0 # saniyelik sinyal
-n = int(T * fs) 
-t = np.linspace(0, T, n, endpoint=False)
-data = np.sin(0.40*2*np.pi*t) + 1.5*np.cos(9*2*np.pi*t) + 0.5*np.sin(12.0*2*np.pi*t)
+T = 1/fs
+L = 5.0 # saniyelik sinyal
+n = int(L * fs) 
+t = np.linspace(0, L, n, endpoint=False)
+data = np.sin(2.0*2*np.pi*t) + np.cos(7*2*np.pi*t) 
 plt.plot(t,data)
 plt.savefig('compscieng_1_25_02.png')
 \end{minted}
@@ -352,16 +354,73 @@ plt.savefig('compscieng_1_25_02.png')
 \includegraphics[width=20em]{compscieng_1_25_02.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print 3 * 1/(2*np.pi) # rad/s
+print T
+print 20*T
+cutoff = 20 * 1/(2*np.pi) # rad/s
+print cutoff
+print np.exp(-20*T)
 \end{minted}
 
 \begin{verbatim}
-0.477464829276
+0.1
+2.0
+3.18309886184
+0.135335283237
 \end{verbatim}
 
-1 rad/s -> 1/2*pi Hertz. 
+1 rad/s is $1/2\pi$ Hertz.
+
+$$ H(z) = \frac{20}{1 - e^{-20 \times 0.05} z^{-1}}$$
+
+$$ H(z) = \frac{20}{1 - 0.36787 z^{-1}}$$
+
+$$ y[n] = 0.36787 y[n-1] + 20 x[n]$$
 
 
+lfilter
+
+a[0]*y[n] = b[0]*x[n] + b[1]*x[n-1] + ... + b[M]*x[n-M]
+                      - a[1]*y[n-1] - ... - a[N]*y[n-N]
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = data # formul ile ayni olsun
+a = [1.0, -np.exp(-20*T)]
+b = [1.0, 20*T]
+y = np.zeros(len(x))
+for n in range(1,len(data)):    
+   y[n] = b[0]*x[n] + b[1]*x[n-1] - a[1]*y[n-1]
+plt.plot(t,y)
+plt.savefig('compscieng_1_25_03.png')
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a = [1.0, -np.exp(-20*T)]
+b = [1.0, 20*T]
+print b,a
+y = lfilter(b, a, x)
+plt.plot(t,y)
+plt.savefig('compscieng_1_25_04.png')
+\end{minted}
+
+\begin{verbatim}
+[1.0, 2.0] [1.0, -0.1353352832366127]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.signal import butter, lfilter
+nyq = 0.5 * fs
+low = 2.0 / nyq
+b, a = butter(1, low, btype='lowpass')
+print b,a
+y = lfilter(b, a, x)
+plt.plot(t,y)
+plt.savefig('compscieng_1_25_05.png')
+\end{minted}
+
+\begin{verbatim}
+[ 0.42080778  0.42080778] [ 1.         -0.15838444]
+\end{verbatim}
 
 Kaynaklar
 
