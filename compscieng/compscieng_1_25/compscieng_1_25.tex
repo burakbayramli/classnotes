@@ -241,7 +241,7 @@ print np.array(k)
 
 Not: Üstteki hesaplar [1] için kullanýldý.
 
-IIR Filtreleri
+Frekans Filtreme, IIR Filtreleri
 
 Önceki dersteki FIR filtreleri sinyal üzerinde bir evriþimle kodlandý,
 filtre katsayýlarýný geriye dönük ham sinyal üzerinde uygulayarak
@@ -317,7 +317,8 @@ IIR filtresi tasarlarken faydalý olacak.
 IIR Tasarýmý
 
 IIR filtre tasarýmý için pek çok yöntem var. Bizim iþleyeceðimiz yöntem
-dürtü deðiþmezliði (impulse invariance) yöntemi. DD ile bilinen bir analog
+dürtü deðiþmezliði (impulse invariance) yöntemi, bir diðeri mesela
+çiftlineer (bilinear) transform yöntemi. DD ile bilinen bir analog
 filtrenin analog transfer fonksiyonu $H(s)$'yi alýrýz, sonra ters Laplace
 transformu ile dürtü cevap fonksiyonu $h(t)$'yi elde ederiz. Sayýsala
 geçmek için bu fonksiyonu belli aralýklarla örnekleriz, yani $h(t)$'yi
@@ -326,7 +327,7 @@ alarak $H(z)$'ye geçiþ yaparýz, bu geçiþ bize özyineli fonksiyonumuzda
 kullanabileceðimiz direk katsayýlarý verecektir.
 
 Analog deyip geçmeyelim, alçak geçiren, yüksek geçiren, vs. filtreleme
-konusunda burada derin bir literatur var. Sayýsal yöntemler ortaya
+konusunda burada derin bir literatür var. Sayýsal yöntemler ortaya
 çýktýðýndan beri haklý olarak çok ilgi gördüler, fakat unutmamak lazým,
 sayýsal yöntemlerden önce analog elektronik devreler filtreleme yapýyordu
 (halen de yapýyor), mesela alttaki devre çok basit bir alçak geçiren
@@ -337,8 +338,64 @@ filtredir.
 Bu devreye verilen $v_s$ sinyali (yani içinde pek çok frekans içeren
 elektrik akýmý) seçilen $R,C$'ye göre $v_o$'da alçak geçiren þekilde
 filtrelenmiþ olarak çýkacaktýr. Bu klasik bir filtre devresi ve bir tranfer
-fonksiyonu var. 
+fonksiyonu var. Aslýnda çok basit, 
 
+$$ H(s) = \frac{1}{s + 1}$$
+
+Bir frekans eþik deðeri (cutoff frequency) $\Omega_c$ için [3, sf. 527]
+$H(\frac{s}{\Omega_c})$ kullanýlýyor. Diyelim ki $\Omega_c = 20$ rad/s,
+
+$$ 
+H \bigg( \frac{s}{\Omega_c} \bigg) = H\bigg( \frac{s}{20} \bigg) 
+= \frac{1}{(s/20) + 1} = \frac{20}{s + 20}
+$$
+
+Simdi ters Laplace ile $h(t)$ bulunur, 
+
+$$ 
+h(t) = \mathcal{L}^{-1} \bigg\{ H\bigg( \frac{s}{20} \bigg)  \bigg\} 
+= \mathcal{L}^{-1} \bigg\{ \frac{20}{s + 20}  \bigg\}  
+= 20 e^{-20 t}
+$$
+
+Sonra $Th(nT)$ ayrýksal fonksiyonunun z-transformunu alýrýz, 
+
+$$
+H(z) = 20 T \sum _{n=1}^{\infty} e^{-20 nT}z^{-1} 
+= 20 T \sum _{n=0}^{\infty} \big( e^{20 T}z^{-1} \big)^n
+= \frac{20T}{1 - e^{-20 T}z^{-1}} \mlabel{4}
+$$
+
+Son eþitlik nasýl mümkün oldu? Geometrik serilerinin açýlýmý sayesinde,
+hatýrlarsak, 
+
+$$ \sum _{n=0}^{\infty} x^n = \frac{1}{1-x} $$
+
+Bu kadar. (4) formülündeki son durum bize $a,b$ katsayýlarýný da
+veriyor. $a_0 = 1.0$, $a_1=-e^{-20T}$, $b_0 = 1.0$, $b_1 = 20T$. Bu þekilde
+seçtik çünkü \verb!scipy.signal.lfilter! ile uyumlu olmasýný istedik, bu
+kütüphane,
+
+\begin{eqnarray*}
+a[0]y[n] = b[0]x[n] + b[1]x[n-1] + ... + b[M]x[n-M] \\
+                    - a[1]y[n-1] - ... - a[N]y[n-N]
+\end{eqnarray*}
+
+formülünü kodluyor. 
+
+Þimdi örnek üretelim, 1 rad/s $1/2\pi$ Hertz olduðuna göre, eþik deðeri
+$\Omega_c$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cutoff = 20 * 1/(2*np.pi) 
+print cutoff, 'Hz'
+\end{minted}
+
+\begin{verbatim}
+3.18309886184 Hz
+\end{verbatim}
+
+O zaman
 
 \begin{minted}[fontsize=\footnotesize]{python}
 fs = 10.0 # orneklem orani
@@ -353,37 +410,11 @@ plt.savefig('compscieng_1_25_02.png')
 
 \includegraphics[width=20em]{compscieng_1_25_02.png}
 
-\begin{minted}[fontsize=\footnotesize]{python}
-print T
-print 20*T
-cutoff = 20 * 1/(2*np.pi) # rad/s
-print cutoff
-print np.exp(-20*T)
-\end{minted}
-
-\begin{verbatim}
-0.1
-2.0
-3.18309886184
-0.135335283237
-\end{verbatim}
-
-1 rad/s is $1/2\pi$ Hertz.
-
-$$ H(z) = \frac{20}{1 - e^{-20 \times 0.05} z^{-1}}$$
-
-$$ H(z) = \frac{20}{1 - 0.36787 z^{-1}}$$
-
-$$ y[n] = 0.36787 y[n-1] + 20 x[n]$$
-
-
-lfilter
-
-a[0]*y[n] = b[0]*x[n] + b[1]*x[n-1] + ... + b[M]*x[n-M]
-                      - a[1]*y[n-1] - ... - a[N]*y[n-N]
+Böylece biri 2 diðeri 7 Hz ile üretilmiþ iki sinyali üst üste
+koyduk. Filtreleme ile bunu ayrýþtýrmaya uðraþalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-x = data # formul ile ayni olsun
+x = data # formul ile ayni olsun diye
 a = [1.0, -np.exp(-20*T)]
 b = [1.0, 20*T]
 y = np.zeros(len(x))
@@ -393,19 +424,11 @@ plt.plot(t,y)
 plt.savefig('compscieng_1_25_03.png')
 \end{minted}
 
+\includegraphics[width=20em]{compscieng_1_25_03.png}
 
-\begin{minted}[fontsize=\footnotesize]{python}
-a = [1.0, -np.exp(-20*T)]
-b = [1.0, 20*T]
-print b,a
-y = lfilter(b, a, x)
-plt.plot(t,y)
-plt.savefig('compscieng_1_25_04.png')
-\end{minted}
-
-\begin{verbatim}
-[1.0, 2.0] [1.0, -0.1353352832366127]
-\end{verbatim}
+Fena deðil. Eðer \verb!scipy.signal.butter! ile katsayýlarý üretsek ve
+\verb!lfilter! ile uygulasak (ki üstteki kod \verb!lfilter! ile ayný
+çarpýmý yapýyor),
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.signal import butter, lfilter
@@ -415,12 +438,46 @@ b, a = butter(1, low, btype='lowpass')
 print b,a
 y = lfilter(b, a, x)
 plt.plot(t,y)
-plt.savefig('compscieng_1_25_05.png')
+plt.savefig('compscieng_1_25_04.png')
 \end{minted}
 
 \begin{verbatim}
 [ 0.42080778  0.42080778] [ 1.         -0.15838444]
 \end{verbatim}
+
+\includegraphics[width=20em]{compscieng_1_25_04.png}
+
+Bu biraz daha pürüzsüz oldu, kütüphane çaðrýlarý farklý katsayýlar
+gösteriyor bu arada, çünkü farklý bir sayýsala geçiþ yöntemi kullanýyorlar
+(çiftlineer transform olmalý). Eðer vuruþ sayýsýný arttýrýrsak, yani daha
+fazla katsayý ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+b, a = butter(2, low, btype='lowpass')
+print b
+print a
+y = lfilter(b, a, x)
+plt.plot(t,y)
+plt.savefig('compscieng_1_25_05.png')
+\end{minted}
+
+\begin{verbatim}
+[ 0.20657208  0.41314417  0.20657208]
+[ 1.         -0.36952738  0.19581571]
+\end{verbatim}
+
+\includegraphics[width=20em]{compscieng_1_25_05.png}
+
+Bu daha da iyi oldu. 
+
+Bir mühendislik notu olarak þunu ekleyelim, diyelim ki mobil ortamda
+filtreleme yapmak istiyoruz, ve IIR yaklaþýmý kullanacaðýz. Bu durumda
+üstteki sayýsal kütüphanelere mobil ortamýnda ihtiyacýmýz yok. Bize tek
+gereken $a,b$ katsayýlarý, geliþtirme sýrasýnda dizüstü bilgisayarýmýzda
+vuruþ sayýsýný verip filteyi ``tasarlýyoruz'' ve katsayýlarý elde edip
+mobile sadece bunlarý taþýyoruz. Artýk bu katsayýlarý alýp sinyal üzerinde
+uygulamak basit bir çarpma / toplama iþlemi haline gelecektir. Bütün sihir
+katsayýlarda!
 
 Kaynaklar
 
@@ -429,5 +486,8 @@ Kaynaklar
 
 [2] Smith, {\em The Scientist and Engineer's Guide to Digital Signal Processing, 2nd Ed.}
 
+[3] Pularikas, {\em Signals and Systems Primer with Matlab}
+
+[4] Irwin, {\em Basic Engineering Circuit Analysis, 10th Edition}
 
 \end{document}
