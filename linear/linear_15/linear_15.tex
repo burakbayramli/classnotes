@@ -379,26 +379,70 @@ plt.savefig('15_9.png')
 
 \includegraphics[width=20em]{15_9.png}
 
+Bir Düzlem Üzerindeki Ýki Vektör Arasýndaki Açýyý Bulmak
+
+Þu resme bakalým,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 n = np.array([-1/3.,2/3.,2/3.])
 o = np.array([5,5,5])
 u1 = np.array([3,3,3])
-u2 = np.array([-1,-2,0])
+u2 = np.array([-3,0,3])
 
 fig = plt.figure()
 ax = Axes3D(fig)
 plot3d.plot_plane(ax, o, n, size=5)
 p1 = u1 - (np.dot(u1,n) / np.dot(n,n)) * n
 p2 = u2 - (np.dot(u2,n) / np.dot(n,n)) * n
+plot3d.plot_vector(fig, o, 3*n,'red')
 plot3d.plot_vector(fig, o, u1)
-plot3d.plot_vector(fig, o, p1,'cyan')
 plot3d.plot_vector(fig, o, u2)
-plot3d.plot_vector(fig, o, p2,'cyan')
+plot3d.plot_vector(fig, o, p1,'cyan')
+plot3d.plot_vector(fig, o, p2,'skyblue')
+plot3d.plot_vector(fig, o, 0.5*np.cross(p1,p2),'yellow')
+ax.view_init(elev=30, azim=30)
 plt.savefig('15_10.png')
 \end{minted}
 
 \includegraphics[width=20em]{15_10.png}
 
+Koyu mavi iki vektörün düzlem üzerinde yansýtýlmasýný görüyoruz (açýk ve
+biraz daha açýk mavi iki vektör). Bu vektörler arasýndaki açý nedir? Tabii
+açý derken {\em hangi yöne doðru açý} demek istiyoruz, bu da önemli. Çoðu
+zaman bir referans vektörüne olan ikinci bir vektörün saat yönü ya da onun
+tersi yöndeki açýsýný isteriz. Eger açýyý bilinen
+
+$$ \theta = \arccos \frac{u \cdot v}{||u||||v|||}$$
+
+temelli hesaplarsak, bu hesap bize her zaman iki vektör arasý en ``yakýn''
+acýyý verir (yani 180'den daha az olan açýyý). Fakat biz mesela sürekli
+saat yönü tersindeki açýyý istiyorsak, o zaman potansiyel olarak 180'den
+fazla açýlar da elde edebilmemiz gerekir. 
+
+Burada çapraz çarpým kullanabiliriz, $n \cdot (a \times b)$ hesabýna
+bakarýz, bu hesap artý ise üstteki $\theta$'yi olduðu gibi alýrýz, deðil
+ise $360-\theta$'yi kullanýrýz. Bunun sebebi $a \times b$ bize sað el
+kuralýna göre (bkz. {\em Yapay Görüþ ve Robotik, Ders 2}) $a$ referanslý
+bir üçüncü vektör veriyor. Sað el kuralýný hatýrlayalým, eðer $a$'dan
+baþlayýp $b$'ye saat yönü tersine giderken 180 dereceden az bir gidiþ
+yeterli ise, üçüncü vektör yukarý doðru iþaret ediyor, yoksa aþaðý
+doðru. Mesela üstteki örnekte vektör düzlem normaline ters, yani aþaðý. Bu
+bize ilgilendiðimiz gidiþ yönündeki açýnýn 180'den fazla olduðuna dair bir
+iþaret, o zaman $360 - \theta$ kullanmamýz gerekir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+deg = np.rad2deg(np.arccos(np.dot(p1,p2) / (lin.norm(p1)*lin.norm(p2))))
+s = np.dot(n, np.cross(p1,p2))
+print 'deg', deg
+if s < 0: print '360 - deg =', 360-deg
+else: print 'deg', deg
+\end{minted}
+
+\begin{verbatim}
+deg 135.0
+360 - deg = 225.0
+\end{verbatim}
 
 Kaynaklar
 
