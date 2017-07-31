@@ -22,7 +22,7 @@ if len(sys.argv) == 1:
     ./kmeans/kmeans.pdf \
     ./kmeans_mr/kmeans_mr.pdf \
     ./meanshift/meanshift.pdf \
-    ./biasvar/biasvar.pdf \
+    ./modeval/modeval.pdf \
     ./crf/crf.pdf \
     ./mesquita/mesquita.pdf \
     ./rsa/rsa.pdf \
