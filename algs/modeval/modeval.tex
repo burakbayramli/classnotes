@@ -1,18 +1,93 @@
-\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+ \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
 Model Baþarasýný Ölçmek
 
-AUC
+Kafa Karisikligi Matrisi (Confusion Matrix) 
+
+Ýki ya da daha fazla etiketli tahmin problemlerinin sonuçlarýný irdelemek
+için kafa karýþýklýðý matrisi (KKM) kullanýlabilir. Bu matrisin dikey
+eksenini test verisinde gerçekten olan etiket, yatay eksenini tahmin edilen
+etiket olarak düþünürsek, kordinate kesiþimleri her özgün etiket deðeri
+için tahmin etme baþarýsýný gösterecektir. Mesela herhangi bir yapay
+öðrenim algoritmasýndan \verb!y_tahmin! üretilmiþ olsun,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.metrics import confusion_matrix
+y_gercek = ["kedi", "sinek", "kedi", "kedi", "sinek", "balik"]
+y_tahmin = ["sinek", "sinek", "kedi", "kedi", "sinek", "kedi"]
+print confusion_matrix(y_gercek, y_tahmin, labels=["sinek", "balik", "kedi"])
+\end{minted}
+
+\begin{verbatim}
+[[2 0 0]
+ [0 0 1]
+ [1 0 2]]
+\end{verbatim}
+
+Bakýyoruz gerçekten sinek olduðu zaman 2 kere sinek tahmin edilmiþ
+(matriste sol üst köþe), kedi ayný þekilde iki, ama bir defa kedi için
+sinek denmiþ, bu matrisin sol alt köþesinde. KKM matrisi tüm bu doðrularý,
+hatalarý tek bir yerde gösterebilen faydalý bir raporlama aracýdýr. 
+
+Eger sadece iki etiket varsa, matris alttaki gibi olur,
+
+\includegraphics[width=20em]{modeval_06.png}
+
+Ýki etiket durumunda matristeki sayýlarýn özel isimleri var. Her eksende
+ilk hücre 1 tahmini, diðeri 0 tahmini olursa, üst sol köþedeki tahmin
+gerçekten 1 olduðu ve 1 tahmin edildiði durum, buna doðru pozitif (true
+positive) ismi veriliyor. 0 tahmin yapýlmýþ ama aslýnda etiket 1 ise buna
+yanlýþ negatif (false negative), 1 tahmini yapýlmýþ ama 0 ise buna yanlýþ
+pozitif (false positive), 0 tahmini yapýlmýþ ve gerçekten 0 ise buna doðru
+negatif (true negative) ismi veriliyor. Kýsaltýlmýþ olarak sýrasýyla TP,
+FN, FP, TN [1, sf. 190].
+
+Doðruluk (Accuracy)
+
+Üstteki deðerler ile bazý özet hesaplar var, bunlardan biri
+doðruluk. Formülü
+
+$$ 
+ACC = \frac{FP + FN}{FP + FN + TP + TN}
+$$
 
 Kesinlik (Precision)
 
-Hatirlama (Recall)
+Diyelim ki bir fotografta 12 kedi, birkac tane fare var. Bir program 8 tane
+kedi var diyor, ama kedi denen objelerden sadece 5 tanesi gercekten kedi. O
+zaman programin kesinligi 5/8. 
+
+$$ 
+PRE = \frac{TP}{TP + FP}
+$$
+
+Hatýrlama (Recall)
+
+Üstteki örnekte hatýrlama 5/12
+
+$$ 
+REC = \frac{TP}{FN + TP}
+$$
 
 F1 Skoru
 
+Cogu zaman kesinlik ve hatirlamayi birlestirmek iyi bir fikirdir, bu bize
+F1-Skoru verir, 
+
+$$ 
+F1 = 2 \frac{PRE \cdot REC}{PRE + REC}
+$$
+
+
+
+
+AUC
+
+
+
 Yanlýlýk-Varyans Dengesi  (Bias-Variance Trade-off)
 
-\includegraphics[width=30em]{biasvar_01.png}
+\includegraphics[width=30em]{modeval_01.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sklearn.svm import SVC
@@ -30,34 +105,32 @@ title = "Naive Bayes"
 cv = ShuffleSplit(n_splits=100, test_size=0.2, random_state=0)
 estimator = GaussianNB()
 lcurve.plot(estimator, title, X, y, cv=cv, n_jobs=2)
-plt.savefig('biasvar_02.png')
+plt.savefig('modeval_02.png')
 
 title = u'SVM, RBF çekirdek (kernel), $\gamma=0.001$'
 cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
 estimator = SVC(gamma=0.001)
 lcurve.plot(estimator, title, X, y, cv=cv, n_jobs=2)
-plt.savefig('biasvar_03.png')
+plt.savefig('modeval_03.png')
 
 title = "Lojistik Regresyon"
 cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
 estimator = linear_model.LogisticRegression()
 lcurve.plot(estimator, title, X, y, ylim=(-0.1,0.1), cv=cv, n_jobs=2)
-plt.savefig('biasvar_04.png')
+plt.savefig('modeval_04.png')
 
 title = "RandomForestClassifier"
 cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
 estimator = ensemble.RandomForestClassifier()
 lcurve.plot(estimator, title, X, y, ylim=(-0.1,0.1), cv=cv, n_jobs=2)
-plt.savefig('biasvar_05.png')
+plt.savefig('modeval_05.png')
 \end{minted}
 
-\includegraphics[width=30em]{biasvar_02.png}
+\includegraphics[width=30em]{modeval_02.png}
 
-\includegraphics[width=30em]{biasvar_03.png}
+\includegraphics[width=30em]{modeval_03.png}
 
-\includegraphics[width=30em]{biasvar_04.png}
-
-
+\includegraphics[width=30em]{modeval_04.png}
 
 
 
@@ -66,5 +139,9 @@ plt.savefig('biasvar_05.png')
 
 
 
+
+Kaynaklar
+
+[1] Raschka, {\em Python Machine Learning}
 
 \end{document}
