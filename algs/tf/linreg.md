@@ -2,11 +2,20 @@
 ```python
 import tensorflow as tf
 from sklearn.datasets import fetch_california_housing
+from sklearn.preprocessing import StandardScaler
 
-housing = fetch_california_housing()
+housing = fetch_california_housing(data_home="/home/burak/Downloads/scikit-data")
+scaler = StandardScaler()
 m, n = housing.data.shape
 housing_data_plus_bias = np.c_[np.ones((m, 1)), housing.data]
+scaled_housing_data_plus_bias = scaler.fit_transform(housing_data_plus_bias.astype(np.float64))
+```
 
+```text
+downloading Cal. housing from http://www.dcc.fc.up.pt/~ltorgo/Regression/cal_housing.tgz to /home/burak/Downloads
+```
+
+```python
 n_epochs = 1000
 learning_rate = 0.01
 
@@ -32,6 +41,27 @@ with tf.Session() as sess:
 print best_theta
 ```
 
+```text
+('Epoch', 0, 'MSE =', 6.0430689)
+('Epoch', 100, 'MSE =', 6.0430689)
+('Epoch', 200, 'MSE =', 6.0430689)
+('Epoch', 300, 'MSE =', 6.0430689)
+('Epoch', 400, 'MSE =', 6.0430689)
+('Epoch', 500, 'MSE =', 6.0430689)
+('Epoch', 600, 'MSE =', 6.0430689)
+('Epoch', 700, 'MSE =', 6.0430689)
+('Epoch', 800, 'MSE =', 6.0430689)
+('Epoch', 900, 'MSE =', 6.0430689)
+[[ 0.52967787]
+ [ 0.56210446]
+ [-0.05574155]
+ [-0.46587348]
+ [ 0.98646569]
+ [-0.44030929]
+ [-0.35371423]
+ [-0.23383665]
+ [ 0.33086038]]
+```
 
 
 
