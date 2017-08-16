@@ -71,6 +71,8 @@ init = tf.global_variables_initializer()
 n_iterations = 1500
 batch_size = 50
 
+saver = tf.train.Saver()
+mfile = "/home/burak/Downloads/scikit-data/my_time_series_model"
 with tf.Session() as sess:
     init.run()
     for iteration in range(n_iterations):
@@ -79,6 +81,8 @@ with tf.Session() as sess:
         if iteration % 100 == 0:
             mse = loss.eval(feed_dict={X: X_batch, y: y_batch})
             print(iteration, "\tMSE:", mse)
+
+    saver.save(sess, mfile) # not shown in the book
 ```
 
 ```text
@@ -99,8 +103,62 @@ with tf.Session() as sess:
 (1400, '\tMSE:', 0.042768508)
 ```
 
+```python
+with tf.Session() as sess:
+    saver.restore(sess, mfile)
+    X_new = time_series(np.array(t_instance[:-1].reshape(-1, n_steps, n_inputs)))
+    y_pred = sess.run(outputs, feed_dict={X: X_new})
+
+plt.title("Testing the model", fontsize=14)
+plt.plot(t_instance[:-1], time_series(t_instance[:-1]), "bo", markersize=10, label="instance")
+plt.plot(t_instance[1:], time_series(t_instance[1:]), "w*", markersize=10, label="target")
+plt.plot(t_instance[1:], y_pred[0,:,0], "r.", markersize=10, label="prediction")
+plt.legend(loc="upper left")
+plt.xlabel("Time")
+plt.savefig('time_02.png')
+```
 
 
+
+
+
+
+
+
+
+
+
+
+```python
+np.random.seed(1)
+batch_size = 3
+n_steps = 2
+res = next_batch(batch_size, n_steps)
+for b in res:
+    print '--------'
+    print b
+```
+
+```text
+--------
+[[[-1.85606804]
+  [-0.55195234]]
+
+ [[ 4.57292999]
+  [ 4.66524142]]
+
+ [[ 0.03408592]
+  [ 0.99217973]]]
+--------
+[[[-0.55195234]
+  [ 0.85560291]]
+
+ [[ 4.66524142]
+  [ 4.30608622]]
+
+ [[ 0.99217973]
+  [ 1.71480895]]]
+```
 
 
 
