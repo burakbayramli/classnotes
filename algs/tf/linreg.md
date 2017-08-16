@@ -4,6 +4,11 @@ import tensorflow as tf
 from sklearn.datasets import fetch_california_housing
 from sklearn.preprocessing import StandardScaler
 
+def reset_graph(seed=42):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
 housing = fetch_california_housing(data_home="/home/burak/Downloads/scikit-data")
 scaler = StandardScaler()
 m, n = housing.data.shape
@@ -28,15 +33,10 @@ print(scaled_housing_data_plus_bias.shape)
 ```
 
 ```python
+reset_graph()
+
 n_epochs = 1000
 learning_rate = 0.01
-
-def reset_graph(seed=42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
-    np.random.seed(seed)
-
-reset_graph()
 
 X = tf.constant(scaled_housing_data_plus_bias, dtype=tf.float32, name="X")
 y = tf.constant(housing.target.reshape(-1, 1), dtype=tf.float32, name="y")
@@ -44,22 +44,20 @@ theta = tf.Variable(tf.random_uniform([n + 1, 1], -1.0, 1.0, seed=42), name="the
 y_pred = tf.matmul(X, theta, name="predictions")
 error = y_pred - y
 mse = tf.reduce_mean(tf.square(error), name="mse")
-gradients = 2/m * tf.matmul(tf.transpose(X), error)
-training_op = tf.assign(theta, theta - learning_rate * gradients)
 
-
-optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,
-                                       momentum=0.9)
-training_op = optimizer.minimize(mse)
+# this block for manual gradient
+#
+#gradients = 2/np.float(m) * tf.matmul(tf.transpose(X), error)
+gradients = tf.gradients(mse, [theta])[0]
+training_op = tf.assign(theta, theta-(learning_rate*gradients))
 
 init = tf.global_variables_initializer()
 
 with tf.Session() as sess:
     sess.run(init)
     for epoch in range(n_epochs):
-        if epoch % 100 == 0:
-            print("Epoch", epoch, "MSE =", mse.eval())
-        sess.run(training_op)
+        if epoch % 100 == 0: print("Epoch", epoch, "MSE =", mse.eval())
+	sess.run(training_op)
     
     best_theta = theta.eval()
     
@@ -68,26 +66,25 @@ print best_theta
 
 ```text
 ('Epoch', 0, 'MSE =', 9.1615429)
-('Epoch', 100, 'MSE =', 0.53056407)
-('Epoch', 200, 'MSE =', 0.52501106)
-('Epoch', 300, 'MSE =', 0.52441096)
-('Epoch', 400, 'MSE =', 0.52433294)
-('Epoch', 500, 'MSE =', 0.52432221)
-('Epoch', 600, 'MSE =', 0.5243206)
-('Epoch', 700, 'MSE =', 0.52432084)
-('Epoch', 800, 'MSE =', 0.52432084)
-('Epoch', 900, 'MSE =', 0.52432072)
-[[ 2.06855798]
- [ 0.82962859]
- [ 0.11875337]
- [-0.26554456]
- [ 0.30571091]
- [-0.00450251]
- [-0.03932662]
- [-0.89986444]
- [-0.87052065]]
+('Epoch', 100, 'MSE =', 0.71450061)
+('Epoch', 200, 'MSE =', 0.56670463)
+('Epoch', 300, 'MSE =', 0.55557162)
+('Epoch', 400, 'MSE =', 0.54881167)
+('Epoch', 500, 'MSE =', 0.5436362)
+('Epoch', 600, 'MSE =', 0.53962916)
+('Epoch', 700, 'MSE =', 0.53650916)
+('Epoch', 800, 'MSE =', 0.53406781)
+('Epoch', 900, 'MSE =', 0.53214717)
+[[ 2.06855249]
+ [ 0.88740271]
+ [ 0.14401658]
+ [-0.34770882]
+ [ 0.36178368]
+ [ 0.00393811]
+ [-0.04269556]
+ [-0.66145277]
+ [-0.6375277 ]]
 ```
-
 
 
 
