@@ -1,15 +1,17 @@
 
 ```python
+np.random.seed(1)
+
 t_min, t_max = 0, 30
 resolution = 0.1
 
-def time_series(t):
+def f(t):
     return t * np.sin(t) / 3 + 2 * np.sin(t*5)
 
 def next_batch(batch_size, n_steps):
     t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution)
     Ts = t0 + np.arange(0., n_steps + 1) * resolution
-    ys = time_series(Ts)
+    ys = f(Ts)
     return ys[:, :-1].reshape(-1, n_steps, 1), ys[:, 1:].reshape(-1, n_steps, 1)
 
 t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
@@ -20,8 +22,8 @@ t_instance = np.linspace(12.2, 12.2 + resolution * (n_steps + 1), n_steps + 1)
 plt.figure(figsize=(11,4))
 plt.subplot(121)
 plt.title("A time series (generated)", fontsize=14)
-plt.plot(t, time_series(t), label=r"$t . \sin(t) / 3 + 2 . \sin(5t)$")
-plt.plot(t_instance[:-1], time_series(t_instance[:-1]), "b-", linewidth=3, label="A training instance")
+plt.plot(t, f(t), label=r"$t . \sin(t) / 3 + 2 . \sin(5t)$")
+plt.plot(t_instance[:-1], f(t_instance[:-1]), "b-", linewidth=3, label="A training instance")
 plt.legend(loc="lower left", fontsize=14)
 plt.axis([0, 30, -17, 13])
 plt.xlabel("Time")
@@ -29,8 +31,8 @@ plt.ylabel("Value")
 
 plt.subplot(122)
 plt.title("A training instance", fontsize=14)
-plt.plot(t_instance[:-1], time_series(t_instance[:-1]), "bo", markersize=10, label="instance")
-plt.plot(t_instance[1:], time_series(t_instance[1:]), "w*", markersize=10, label="target")
+plt.plot(t_instance[:-1], f(t_instance[:-1]), "bo", markersize=10, label="instance")
+plt.plot(t_instance[1:], f(t_instance[1:]), "w*", markersize=10, label="target")
 plt.legend(loc="upper left")
 plt.xlabel("Time")
 plt.savefig('time_01.png')
@@ -68,7 +70,7 @@ training_op = optimizer.minimize(loss)
 
 init = tf.global_variables_initializer()
 
-n_iterations = 1500
+n_iterations = 400
 batch_size = 50
 
 saver = tf.train.Saver()
@@ -90,28 +92,17 @@ with tf.Session() as sess:
 (100, '\tMSE:', 0.57806575)
 (200, '\tMSE:', 0.17610031)
 (300, '\tMSE:', 0.086107321)
-(400, '\tMSE:', 0.065761395)
-(500, '\tMSE:', 0.066474326)
-(600, '\tMSE:', 0.055397537)
-(700, '\tMSE:', 0.049701054)
-(800, '\tMSE:', 0.0511938)
-(900, '\tMSE:', 0.048483677)
-(1000, '\tMSE:', 0.048555028)
-(1100, '\tMSE:', 0.049441505)
-(1200, '\tMSE:', 0.041582063)
-(1300, '\tMSE:', 0.048374038)
-(1400, '\tMSE:', 0.042768508)
 ```
 
 ```python
 with tf.Session() as sess:
     saver.restore(sess, mfile)
-    X_new = time_series(np.array(t_instance[:-1].reshape(-1, n_steps, n_inputs)))
+    X_new = f(np.array(t_instance[:-1].reshape(-1, n_steps, n_inputs)))
     y_pred = sess.run(outputs, feed_dict={X: X_new})
 
 plt.title("Testing the model", fontsize=14)
-plt.plot(t_instance[:-1], time_series(t_instance[:-1]), "bo", markersize=10, label="instance")
-plt.plot(t_instance[1:], time_series(t_instance[1:]), "w*", markersize=10, label="target")
+plt.plot(t_instance[:-1], f(t_instance[:-1]), "bo", markersize=10, label="instance")
+plt.plot(t_instance[1:], f(t_instance[1:]), "w*", markersize=10, label="target")
 plt.plot(t_instance[1:], y_pred[0,:,0], "r.", markersize=10, label="prediction")
 plt.legend(loc="upper left")
 plt.xlabel("Time")
