@@ -77,14 +77,16 @@ accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
 # Initializing the variables
 init = tf.global_variables_initializer()
-
+saver = tf.train.Saver()
+mfile = "/home/burak/Downloads/scikit-data/time_series_classif"
 with tf.Session() as sess:
     sess.run(init)
     step = 1
     # Keep training until reach max iterations
     b_it = minibatches(batch_size)
-    while step * batch_size < training_iters:
-          batch_x, batch_y = next(b_it) 
+    while step < int(1000 / batch_size):
+          batch_x, batch_y = next(b_it)
+          print batch_x.shape
           # Run optimization op (backprop)
           sess.run(optimizer, feed_dict={x: batch_x, y: batch_y})
           if step % display_step == 0:
@@ -92,12 +94,13 @@ with tf.Session() as sess:
                 acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
                 # Calculate batch loss
                 loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
-                print("Iter " + str(step*batch_size) + ", Minibatch Loss= " + \
+                print("Iter " + str(step) + ", Minibatch Loss= " + \
                       "{:.6f}".format(loss) + ", Training Accuracy= " + \
                       "{:.5f}".format(acc))
           step += 1
       
     print("Optimization Finished!")
+    saver.save(sess, mfile) # not shown in the book
 
 
 
