@@ -4,10 +4,14 @@ import matplotlib.pyplot as plt
 import pandas as pd, zipfile
 
 with zipfile.ZipFile('wafer.zip', 'r') as z:
-      df =  pd.read_csv(z.open('Wafer/wafer_TRAIN.txt'),header=None)
-df = np.array(df)
+      df_train =  pd.read_csv(z.open('Wafer/wafer_TRAIN.txt'),header=None)
+      df_test =  pd.read_csv(z.open('Wafer/wafer_TEST.txt'),header=None)
 
-def minibatches(batch_size):
+def minibatches(batch_size,input="train"):
+      df = None
+      if input=="train": df=df_train
+      if input=="test": df=df_test
+      df = np.array(df)
       for i in range(len(df)):
             batch_x = []; batch_y = []
             for j in range(batch_size):
@@ -23,6 +27,9 @@ def minibatches(batch_size):
 
 import tensorflow as tf
 from tensorflow.contrib import rnn
+
+mfile = "/home/burak/Downloads/scikit-data/time_series_classif"
+
 # Parameters
 learning_rate = 0.001
 training_iters = 100000
@@ -66,44 +73,55 @@ def RNN(x, weights, biases):
 
 pred = RNN(x, weights, biases)
 
-print 'cost'
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
-print 'optimizer'
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-
 # Evaluate model
 correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
-# Initializing the variables
-init = tf.global_variables_initializer()
-saver = tf.train.Saver()
-mfile = "/home/burak/Downloads/scikit-data/time_series_classif"
-with tf.Session() as sess:
-    sess.run(init)
-    step = 1
-    # Keep training until reach max iterations
-    b_it = minibatches(batch_size)
-    while step < int(1000 / batch_size):
-          batch_x, batch_y = next(b_it)
-          print batch_x.shape
-          # Run optimization op (backprop)
-          sess.run(optimizer, feed_dict={x: batch_x, y: batch_y})
-          if step % display_step == 0:
-                # Calculate batch accuracy
-                acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
-                # Calculate batch loss
-                loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
-                print("Iter " + str(step) + ", Minibatch Loss= " + \
-                      "{:.6f}".format(loss) + ", Training Accuracy= " + \
-                      "{:.5f}".format(acc))
-          step += 1
+def train():
+
+      print 'cost'
+      cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
+      print 'optimizer'
+      optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
       
-    print("Optimization Finished!")
-    saver.save(sess, mfile) # not shown in the book
+      # Initializing the variables
+      init = tf.global_variables_initializer()
+      saver = tf.train.Saver()
+      with tf.Session() as sess:
+          sess.run(init)
+          step = 1
+          # Keep training until reach max iterations
+          b_it = minibatches(batch_size)
+          while step < int(1000 / batch_size):
+                batch_x, batch_y = next(b_it)
+                print batch_x.shape
+                # Run optimization op (backprop)
+                sess.run(optimizer, feed_dict={x: batch_x, y: batch_y})
+                if step % display_step == 0:
+                      # Calculate batch accuracy
+                      acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
+                      # Calculate batch loss
+                      loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
+                      print("Iter " + str(step) + ", Minibatch Loss= " + \
+                            "{:.6f}".format(loss) + ", Training Accuracy= " + \
+                            "{:.5f}".format(acc))
+                step += 1
 
+          print("Optimization Finished!")
+          saver.save(sess, mfile) # not shown in the book
 
+def test():          
+      saver = tf.train.Saver()
+      res = []
+      with tf.Session() as sess:
+          saver.restore(sess, mfile)
+          for batch_x, batch_y in minibatches(500,input="test"):
+              print batch_x.shape
+              print sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
+          print res
 
+#train()
+test()
 
 
 
