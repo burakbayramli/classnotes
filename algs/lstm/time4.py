@@ -37,10 +37,10 @@ batch_size = 25
 display_step = 10
 
 # Network Parameters
-n_input = 1 # MNIST data input (img shape: 28*28)
+n_input = 1 
 n_steps = 152 # timesteps
 n_hidden = 128 # hidden layer num of features
-n_classes = 2 # MNIST total classes (0-9 digits)
+n_classes = 2
 
 # tf Graph input
 x = tf.placeholder("float", [None, n_steps, n_input])
