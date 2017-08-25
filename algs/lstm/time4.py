@@ -1,24 +1,37 @@
-
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd, zipfile
+
 with zipfile.ZipFile('wafer.zip', 'r') as z:
       df =  pd.read_csv(z.open('Wafer/wafer_TRAIN.txt'),header=None)
-df0 = df[df[0]==-1]
-df1 = df[df[0]==1]
-print df0.shape
-print df1.shape
+df = np.array(df)
 
+def minibatches(batch_size):
+      for i in range(len(df)):
+            batch_x = []; batch_y = []
+            for j in range(batch_size):
+                  batch_x.append(list(df[i,1:]))
+                  batch_y.append([int(df[i,0]==-1), int(df[i,0]==1) ])
+            batch_x = np.array(batch_x).reshape(batch_size,152,1)
+            batch_y = np.array(batch_y).reshape(batch_size,2)
+            yield batch_x, batch_y
+                  
+#for batch_x, batch_y in minibatches(10):
+#      print batch_x.shape, batch_y.shape
+#exit()
 
 import tensorflow as tf
 from tensorflow.contrib import rnn
 # Parameters
 learning_rate = 0.001
 training_iters = 100000
-batch_size = 128
+batch_size = 25
 display_step = 10
 
 # Network Parameters
 n_input = 1 # MNIST data input (img shape: 28*28)
-n_steps = 153 # timesteps
+n_steps = 152 # timesteps
 n_hidden = 128 # hidden layer num of features
 n_classes = 2 # MNIST total classes (0-9 digits)
 
@@ -35,7 +48,6 @@ biases = {
 }
 
 def RNN(x, weights, biases):
-
     # Prepare data shape to match `rnn` function requirements
     # Current data input shape: (batch_size, n_steps, n_input)
     # Required shape: 'n_steps' tensors list of shape (batch_size, n_input)
@@ -70,10 +82,22 @@ with tf.Session() as sess:
     sess.run(init)
     step = 1
     # Keep training until reach max iterations
+    b_it = minibatches(batch_size)
     while step * batch_size < training_iters:
-        batch_x, batch_y = mnist.train.next_batch(batch_size)
-
-
+          batch_x, batch_y = next(b_it) 
+          # Run optimization op (backprop)
+          sess.run(optimizer, feed_dict={x: batch_x, y: batch_y})
+          if step % display_step == 0:
+                # Calculate batch accuracy
+                acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
+                # Calculate batch loss
+                loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
+                print("Iter " + str(step*batch_size) + ", Minibatch Loss= " + \
+                      "{:.6f}".format(loss) + ", Training Accuracy= " + \
+                      "{:.5f}".format(acc))
+          step += 1
+      
+    print("Optimization Finished!")
 
 
 
