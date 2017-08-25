@@ -76,6 +76,7 @@ pred = RNN(x, weights, biases)
 # Evaluate model
 correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+new_pred = tf.argmax(y,1)
 
 def train():
 
@@ -115,10 +116,8 @@ def test():
       res = []
       with tf.Session() as sess:
           saver.restore(sess, mfile)
-          for batch_x, batch_y in minibatches(500,input="test"):
-              print batch_x.shape
-              print sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
-          print res
+          for batch_x, batch_y in minibatches(1,input="test"):
+              print batch_y, sess.run(new_pred, feed_dict={x: batch_x, y: batch_y})
 
 #train()
 test()
