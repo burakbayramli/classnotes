@@ -299,10 +299,29 @@ durumu var, ne ülke ne de ürün karmaþýklýðýný baþta biliyoruz. Bu problemi
 nasýl çözeriz? Özdeðer ve özvektörler bu tür problemleri çözmek için
 sürekli kullanýlýr.
 
-Eðer bir ülke $i$ ürün $j$'yi üretiyor ise $m_{ij}=1$ olsun, üretmiyor ise
-$m_{ij}=0$ olsun. Birazdan ortalama hesabý için gerekecek aðýrlýklarý
-hesaplayalým [5] $v_{ij} = m_{ij} / d_i$, $w_{ij}=m_{ij}/u_j$. Burada $d$
-kelimesi çeþitlilikten (diversification) geliyor, $u$ ise ürünün yaygýnlýðý
+Ýlk akla gelen modelleme yöntemi olarak eðer bir ülke $i$ ürün $j$'yi
+üretmiþ ve ihraç etmiþ ise $m_{ij}=1$ olsun, üretmiyor ise $m_{ij}=0$ olsun
+diyebilirdik. Fakat bir ülkenin herhangi bir ürünü azýcýk bile üretmiþ
+olmasý dikkate deðer olmayabilir. Bize gereken, [4]'te bahsedilen, ülkenin
+bir ürünü ``hakkýna düþenden'' daha fazlasýnýn ihraç ettiði
+durumlar. Mesela 2008 yýlýnda soya fasulyesi 42 milyar dolarlýk hacim ile
+dünya ticaretinin yüzde 0.35\%'ini temsil ediyordu. Bu toplam içinde
+Brezilya yaklaþýk 11 milyar dolarlýk ihraç yaptý, ve o sene Brezilya'nýn
+toplam ihracatý 140 milyar dolar olduðu için soya fasulyesi Brezilya'nýn
+ihracatýnýn yüzde 7.8'ini oluþturdu. Bu miktar Brezilya'nýn ``hakkýna
+düþen'' ihracatýn 21 katýydý (yüzde 7.8 bölü yüzde 0.35). Yani burada
+önemli bir ihracat var, ve bu verimizde 1 olarak iþaretlenmeli. O zaman
+kullanacaðýmýz öniþlem büyüklüðüne RCA dersek,
+
+$$
+RCA_{ij} = \frac{X_{ij}}{\sum_i X_{ij}} / \frac{\sum_j X_{ij}}{\sum_{i,j} X_{i,j}}
+$$
+
+$RCA_{ij} > 1.0$'den büyük ise $m_{ij}=1$ deriz, yoksa 0. 
+
+Birazdan ortalama hesabý için gerekecek aðýrlýklarý hesaplayalým [5]
+$v_{ij} = m_{ij} / d_i$, $w_{ij}=m_{ij}/u_j$. Burada $d$ kelimesi
+çeþitlilikten (diversification) geliyor, $u$ ise ürünün yaygýnlýðý
 (ubiquity). Ülke $i$ ve ürün $j$ için bunlar $d_i = \sum_j m_{ij}$ ve
 $u_j = \sum_i m_{ij}$.
 
@@ -377,14 +396,16 @@ print len(np.unique(df.hs92)), 'urun'
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-cp2 = np.array(cp)
-cp2[cp2 > 0.] = 1.0
+denom = cp.sum(axis=1) / cp.sum().sum()
+denom = cp.sum(axis=1) / cp.sum().sum()
+cp2 = cp.div(cp.sum(axis=0).T)
+cp2 = cp2.div(denom,axis=0)
+cp2 = cp2.fillna(0)
+cp2[cp2 > 1.0] = 1.0
 cp2[cp2 != 1.0] = 0.0
-cp3 = pd.DataFrame(cp2)
-cp4 = cp3.apply(lambda x: x/cp3.sum(axis=1), axis=0)
-cp4 = cp4.fillna(0)
-cp5 = cp3.apply(lambda x: x/cp3.sum(axis=0), axis=1)
-cp5 = cp5.fillna(0)
+cp3 = cp2
+cp4 = cp3.div(cp3.sum(axis=1),axis=0)
+cp5 = cp3.div(cp3.sum(axis=0),axis=1)
 print cp4.shape, cp5.shape
 \end{minted}
 
@@ -404,7 +425,7 @@ print vc.shape
 eci = np.array(vc)[:,1]
 print len(eci)
 print np.argmax(eci)
-top_countries = cp.index[np.argsort(eci)[-10:]]
+top_countries = cp.index[np.argsort(eci)[:10]]
 print top_countries
 \end{minted}
 
@@ -412,9 +433,9 @@ print top_countries
 (220, 4858)
 (220, 220)
 220
-38
-Index([u'nld', u'jpn', u'blx', u'gbr', u'ita', u'esp', u'deu', u'fra', u'usa',
-       u'chn'],
+181
+Index([u'jpn', u'che', u'deu', u'kor', u'swe', u'xxb', u'usa', u'sgp', u'cze',
+       u'fin'],
       dtype='object', name=u'origin')
 \end{verbatim}
 
@@ -429,25 +450,15 @@ scp4 = sps.lil_matrix(cp4)
 scp5 = sps.lil_matrix(cp5)
 
 A = scp4.T.dot(scp5)
-print A.shape
 up,vp = lin.eigs(A,k=2)
-print vp.shape
 pci = np.array(vp)[:,1]
-print len(pci)
-print np.argmax(pci)
-print np.argsort(pci)[-10:]
 top_prods = cp.columns[np.argsort(pci)[-10:]]
 print top_prods
 \end{minted}
 
 \begin{verbatim}
-(4858, 4858)
-(4858, 2)
-4858
-3206
-[1441 2163 3119 3192 3172 1109  971 1083 3391 3206]
-Int64Index([350290, 521129, 721141, 722692, 722012, 291430, 284160, 290960,
-            750522, 722920],
+Int64Index([851410, 390940, 847990, 847790, 840999, 852610, 841221, 848390,
+            870810, 848590],
            dtype='int64', name=u'hs92')
 \end{verbatim}
 
@@ -456,31 +467,30 @@ Bu ürünler hangileri?
 \begin{minted}[fontsize=\footnotesize]{python}
 pd.set_option('expand_frame_repr', False)
 top_prods2 = [str(x) for x in list(top_prods)]
+print len(top_prods2)
 print hs2.ix[top_prods2][['Product Description_y','Product Description_x']]
 \end{minted}
 
 \begin{verbatim}
+10
                                            Product Description_y                              Product Description_x
 ProductCode_x                                                                                                      
-350290         Albumins (including concentrates of two or mor...                                            - Other
-521129         Woven fabrics of cotton, containing less than ...                          (-2006)  -- Other fabrics
-721141         Flat-rolled products of iron or non-alloy stee...  (-1995) Containing by weight less than 0,25 % ...
-722692         Flat-rolled products of other alloy steel, of ...  -- Not further worked than cold-rolled (cold-r...
-722012         Flat-rolled products of stainless steel, of a ...             -- Of a thickness of less than 4.75 mm
-291430         Ketones and quinones, whether or not with othe...  (-1995) Aromatic ketones without other oxygen ...
-284160             Salts of oxometallic or peroxometallic acids.   (-1995) Manganites, manganates and permanganates
-290960         Ethers, ether-alcohols, ether-phenols, ether-a...  - Alcohol peroxides, ether peroxides, ketone p...
-750522                     Nickel bars, rods, profiles and wire.                                -- Of nickel alloys
-722920                                Wire of other alloy steel.                        - Of silico-manganese steel
+851410         Industrial or laboratory electric furnaces and...             - Resistance heated furnaces and ovens
+390940         Amino-resins, phenolic resins and polyurethane...                                  - Phenolic resins
+847990         Machines and mechanical appliances having indi...                                            - Parts
+847790         Machinery for working rubber or plastics or fo...                                            - Parts
+840999         Parts suitable for use solely or principally w...                                           -- Other
+852610         Radar apparatus, radio navigational aid appara...                                  - Radar apparatus
+841221                                 Other engines and motors.                       -- Linear acting (cylinders)
+848390         Transmission shafts (including cam shafts and ...  -Toothed wheels, chain sprockets and other tra...
+870810         Parts and accessories of the motor vehicles of...                        - Bumpers and parts thereof
+848590         (-2006) Machinery parts not specified or inclu...                                    (-2006) - Other
 \end{verbatim}
 
-Kimya, metalurji ürünleri aðýrlýkta ilginç bir þekilde. Bu sonuç
-Hidalgo'nun 2008 bazlý analizinden biraz farklý, veri öniþlemdeki bazý
-farklýlýklar da rol oynamýþ olabilir. Fakat üstteki ürünlerin teknik olarak
-çetrefil olduklarýný görebiliyoruz. 
-
-Acaba ECI'yi 2014 yýlýnda ülkelerin kiþi baþýna gayrýsafi yurtiçi
-hasýlasýný tahmin etmek için kullanabilir miyiz?
+Ýþ makinalarý, radar ürünleri, araba þanzýmaný, kimya, metalurji ürünleri
+aðýrlýkta. Üstteki ürünlerin teknik olarak çetrefil olduklarýný
+görebiliyoruz. Acaba ECI'yi 2014 yýlýnda ülkelerin kiþi baþýna gayrýsafi
+yurtiçi hasýlasýný tahmin etmek için kullanabilir miyiz?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 cindex = [x.upper() for x in cp.index]
@@ -491,56 +501,35 @@ ecigdp.columns = ['eci', u'gdp2014', u'gdp2016']
 ecigdp['prods'] = np.array(cp3.sum(axis=1))
 ecigdp = ecigdp.dropna()
 print ecigdp.tail()
-
 import statsmodels.formula.api as smf
-results = smf.ols('np.log(gdp2014) ~ eci', data=ecigdp).fit()
-print results.rsquared_adj
 results = smf.ols('np.log(gdp2014) ~ prods', data=ecigdp).fit()
 print results.rsquared_adj
-results = smf.ols('np.log(gdp2014) ~ prods + eci', data=ecigdp).fit()
-print results.summary()
+results = smf.ols('np.log(gdp2014) ~ eci', data=ecigdp).fit()
+print results.rsquared_adj
 \end{minted}
 
 \begin{verbatim}
 (220, 3)
-          eci      gdp2014      gdp2016   prods
-WSM -0.088245  3761.912686  3524.649880   374.0
-YEM -0.056550   679.667360  1101.117444   995.0
-ZAF  0.030545  7504.295250  7627.851926  4409.0
-ZMB -0.029490  1622.409958  1620.823290  1856.0
-ZWE -0.040179   908.829980   932.548383  1571.0
-0.302005430646
-0.370724391062
-                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:        np.log(gdp2014)   R-squared:                       0.427
-Model:                            OLS   Adj. R-squared:                  0.420
-Method:                 Least Squares   F-statistic:                     62.51
-Date:                Thu, 24 Aug 2017   Prob (F-statistic):           5.09e-21
-Time:                        15:29:21   Log-Likelihood:                -259.05
-No. Observations:                 171   AIC:                             524.1
-Df Residuals:                     168   BIC:                             533.5
-Df Model:                           2                                         
-Covariance Type:            nonrobust                                         
-==============================================================================
-                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
-------------------------------------------------------------------------------
-Intercept      3.9544      0.864      4.575      0.000         2.248     5.661
-prods          0.0016      0.000      5.943      0.000         0.001     0.002
-eci          -33.9159      8.670     -3.912      0.000       -51.031   -16.800
-==============================================================================
-Omnibus:                        1.237   Durbin-Watson:                   1.823
-Prob(Omnibus):                  0.539   Jarque-Bera (JB):                1.310
-Skew:                           0.196   Prob(JB):                        0.519
-Kurtosis:                       2.825   Cond. No.                     2.78e+05
-==============================================================================
-
+          eci      gdp2014      gdp2016  prods
+WSM  0.025062  3761.912686  3524.649880  209.0
+YEM  0.075479   679.667360  1101.117444  147.0
+ZAF  0.008537  7504.295250  7627.851926  742.0
+ZMB  0.048409  1622.409958  1620.823290  182.0
+ZWE  0.063000   908.829980   932.548383  275.0
+0.230701679034
+0.55503440264
 \end{verbatim}
 
-Sonuç fena deðil. Dikkat edersek düz ürün sayýsýný kullanarak yapýlan
-regresyon en son sonuç kadar baþarýlý deðil, ECI ve ürün sayýsýný beraber
-kullanan regresyon en baþarýlýsý.  Demek ki ECI hakikaten bir niceliði
-yakalayabilmiþ.
+Sonuç yuzde 55 varyansi acikliyor, fena deðil. Dikkat edersek düz ürün
+sayýsýný kullanarak yapýlan regresyon o kadar basarili degil, demek ki ECI
+hakikaten bir niceliði yakalayabilmiþ.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(ecigdp.eci,np.log(ecigdp.gdp2014),'.')
+plt.savefig('linear_app03eigen_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{linear_app03eigen_01.png}
 
 Bu alanda daha fazla okuma yapmak isteyenler için [4] güzel bir
 kaynak. Üretime uygulanabilen bilgiden bahsedilirken mesela geliþmiþ
