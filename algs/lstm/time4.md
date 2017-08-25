@@ -3,48 +3,70 @@
 import pandas as pd, zipfile
 with zipfile.ZipFile('wafer.zip', 'r') as z:
       df =  pd.read_csv(z.open('Wafer/wafer_TRAIN.txt'),header=None)
-print df[df[0]==-1].tail(3)
-print df[df[0]==1].tail(3)
+df0 = df[df[0]==-1]
+df1 = df[df[0]==1]
+print df0.shape
+print df1.shape
 ```
 
 ```text
-     0        1        2        3        4        5        6        7    \
-988   -1  0.74324  0.87211  0.82400  0.85109  0.83413  0.84502  0.83786   
-989   -1  0.67333  0.81559  0.80422  0.83231  0.80003  0.84280  0.78251   
-997   -1 -0.83289 -0.97729 -0.92342 -0.95368 -0.93672 -0.94615 -0.94389   
-
-         8        9     ...         143      144      145      146      147  \
-988  0.84278  0.83295   ...     0.84077  0.84108  0.83985  0.84239  0.83812   
-989  0.87130  0.73182   ...     0.71725  0.71752  0.71647  0.71864  0.71500   
-997 -0.93863 -0.95212   ...    -0.94217 -0.94252 -0.94114 -0.94399 -0.93921   
-
-         148      149      150      151      152  
-988  0.84487  0.83423  0.85104  0.82404  0.87211  
-989  0.72076  0.71168  0.72602  0.70298  0.74399  
-997 -0.94677 -0.93484 -0.95368 -0.92342 -0.97729  
-
-[3 rows x 153 columns]
-     0        1        2        3        4        5        6        7    \
-996    1  0.81352  0.81352  0.81352  0.81352  0.81352  0.81352  0.81352   
-998    1  0.93039  0.93039  0.93039  0.93039  0.93039  0.93039  0.93039   
-999    1 -1.14820 -1.15030 -1.14820 -1.14820 -1.14820 -1.14820 -1.14820   
-
-         8        9     ...         143      144      145      146      147  \
-996  0.81352  0.81352   ...     0.75819  0.75819  0.75819  0.75819  0.75819   
-998  0.93039  0.86531   ...     0.93039  0.93039  0.93039  0.93039  0.93039   
-999 -1.14820 -1.14820   ...    -1.16540 -1.16760 -1.16970 -1.17190 -1.17400   
-
-         148      149      150      151      152  
-996  0.75819  0.75819  0.75819  0.75819  0.75819  
-998  0.93039  0.93039  0.93039  0.93039  0.93039  
-999 -1.17620 -1.17830 -1.18050 -1.18260 -1.18480  
-
-[3 rows x 153 columns]
+(97, 153)
+(903, 153)
 ```
 
+```python
 
+import tensorflow as tf
+from tensorflow.contrib import rnn
+# Parameters
+learning_rate = 0.001
+training_iters = 100000
+batch_size = 128
+display_step = 10
 
+# Network Parameters
+n_input = 1 # MNIST data input (img shape: 28*28)
+n_steps = 153 # timesteps
+n_hidden = 128 # hidden layer num of features
+n_classes = 2 # MNIST total classes (0-9 digits)
 
+# tf Graph input
+x = tf.placeholder("float", [None, n_steps, n_input])
+y = tf.placeholder("float", [None, n_classes])
+
+# Define weights
+weights = {
+    'out': tf.Variable(tf.random_normal([n_hidden, n_classes]))
+}
+biases = {
+    'out': tf.Variable(tf.random_normal([n_classes]))
+}
+
+def RNN(x, weights, biases):
+
+    # Prepare data shape to match `rnn` function requirements
+    # Current data input shape: (batch_size, n_steps, n_input)
+    # Required shape: 'n_steps' tensors list of shape (batch_size, n_input)
+
+    # Unstack to get a list of 'n_steps' tensors of shape (batch_size, n_input)
+    x = tf.unstack(x, n_steps, 1)
+
+    # Define a lstm cell with tensorflow
+    lstm_cell = rnn.BasicLSTMCell(n_hidden)
+
+    # Get lstm cell output
+    outputs, states = rnn.static_rnn(lstm_cell, x, dtype=tf.float32)
+
+    # Linear activation, using rnn inner loop last output
+    return tf.matmul(outputs[-1], weights['out']) + biases['out']
+
+pred = RNN(x, weights, biases)
+```
+
+```python
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+```
 
 
 
