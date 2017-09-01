@@ -60,25 +60,23 @@ Bu yapý bir listedir, fakat özel bir tür listedir. Ona eklenen öðe en
 tepeye / sona eklenir, yani ``yýðýlmýþ'' olur, bir saman yýðýný gibi,
 eklenen her þey en tepeye eklenir. Öðe alýnmasý gerektiðinde de en son
 eklenen öðe alýnýr, yani en tepedeki / sondaki öðe. Bu yaklaþýma
-ilk-giren-son-çýkar (first-in-last-out, FILO) ismi de veriliyor.
+ilk-giren-son-çýkar (first-in-last-out, FILO) ismi de veriliyor. Python ile
+düz listeler direk yýðýt olarak kullanýlabiliyor, ve üzerinde ekleme icin
+\verb!extend!, çýkarma için \verb!pop! çaðrýlarý yapýlabiliyor. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-class Stack(list):
-    push = list.append
-
-a = Stack([3,4,5,4])
+a  = []
+a.extend(["ddd"])
+a.extend(["eddd"])
 print a
 print a.pop()
-print a
-a.push(1)
 print a
 \end{minted}
 
 \begin{verbatim}
-[3, 4, 5, 4]
-4
-[3, 4, 5]
-[3, 4, 5, 1]
+['ddd', 'eddd']
+eddd
+['ddd']
 \end{verbatim}
 
 Kuyruk (Queue)
@@ -262,6 +260,85 @@ gibi iþlemler biraz göstergeç cambazlýðý ile çok hýzlý bir þekilde kodlanabilir.
 mümkün. 
 
 \includegraphics[width=9cm]{basic_05.png}
+
+Önce Geniþliðine (Breadth-First) ve Önce Derinliðine (Depth-First) Arama
+
+Elimizde alttaki gibi bir çizit olsun, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+graph = {'A': set(['B', 'C']),
+         'B': set(['A', 'D', 'E']),
+         'C': set(['A', 'F']),
+         'D': set(['B']),
+         'E': set(['B', 'F']),
+         'F': set(['C', 'E'])}
+\end{minted}
+
+\includegraphics[width=10em]{graph.png}
+
+Arama için bir baþlangýç düðümünü alýyoruz, onun komþularýný, komþularýn
+komþularýný ziyaret ede ede tüm çiziti ziyaret etmiþ oluyoruz. Ama bu
+ziyaret hangi sýrada olmalý?
+
+Bu sýrayý belirlemek için bir yýðýt kullanabiliriz. Yýðýt kullanýnca
+aslýnda önce derinliðe türden bir arama kodlamýþ oluyoruz. Her ziyaret
+öncesi bir düðümün komþularýný alýp, onlarý yýðýta koyuyoruz, sonra yýðýtýn
+en üstündeki düðümü alýp onu ziyaret ediyoruz. Bu iþlem ayný seviyedeki tüm
+komþularý ziyaret etmeden sürekli komþunun komþusu, vs. aldýðý için bu bir
+derinliðe iniþ kodlar. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def dfs(graph, start):
+    visited, stack = [], [start]
+    while stack: # yigit bos ise bu ifade false olur
+        vertex = stack.pop()
+        if vertex not in visited:
+            visited.append(vertex)
+            stack.extend(graph[vertex])
+    return visited
+print dfs(graph, 'A')
+\end{minted}
+
+\begin{verbatim}
+['A', 'B', 'D', 'E', 'F', 'C']
+\end{verbatim}
+
+Özyineli formda da yazabiliriz, eðer her komþu için teker teker
+\verb!dfs!'in kendisini çaðýrýrsak derinleme dalýþ yapmýþ oluruz. Tabii bu
+durumda gidilen yolu hatirlamak icin onu bir liste olarak surekli bir
+sonraki ozyineli cagriya geceriz ve her cagridan geri donduruz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import collections
+def dfs(graph,curr,path = collections.OrderedDict()):
+    path[curr] = ''
+    for edge in graph[curr]:
+        if edge not in path: # bu kontrol hizli olsun diye OrderedDict kullandik
+            path = dfs(graph,edge,path)
+    return path
+
+print dfs(graph,'A')
+\end{minted}
+
+\begin{verbatim}
+OrderedDict([('A', ''), ('C', ''), ('F', ''), ('E', ''), ('B', ''), ('D', '')])
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bfs(graph, start):
+    visited, queue = [], Queue([start])
+    while queue:
+        vertex = queue.pull()
+        if vertex not in visited:
+            visited.append(vertex)
+            for x in graph[vertex]: queue.push(x)
+    return visited
+print bfs(graph, 'A')
+\end{minted}
+
+\begin{verbatim}
+['A', 'C', 'B', 'F', 'E', 'D']
+\end{verbatim}
 
 Ýkisel Arama Aðaçlarý (Binary Search Trees -BST-)
 
