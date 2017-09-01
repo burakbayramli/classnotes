@@ -288,19 +288,22 @@ komþularý ziyaret etmeden sürekli komþunun komþusu, vs. aldýðý için bu bir
 derinliðe iniþ kodlar. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
+import collections
+
 def dfs(graph, start):
-    visited, stack = [], [start]
+    visited, stack = collections.OrderedDict(), [start]
     while stack: # yigit bos ise bu ifade false olur
         vertex = stack.pop()
+        # bu kontrol hizli olsun diye OrderedDict kullandik
         if vertex not in visited:
-            visited.append(vertex)
+            visited[vertex] = ''
             stack.extend(graph[vertex])
     return visited
 print dfs(graph, 'A')
 \end{minted}
 
 \begin{verbatim}
-['A', 'B', 'D', 'E', 'F', 'C']
+OrderedDict([('A', ''), ('B', ''), ('D', ''), ('E', ''), ('F', ''), ('C', '')])
 \end{verbatim}
 
 Özyineli formda da yazabiliriz, eðer her komþu için teker teker
@@ -313,7 +316,7 @@ import collections
 def dfs(graph,curr,path = collections.OrderedDict()):
     path[curr] = ''
     for edge in graph[curr]:
-        if edge not in path: # bu kontrol hizli olsun diye OrderedDict kullandik
+        if edge not in path:
             path = dfs(graph,edge,path)
     return path
 
