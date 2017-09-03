@@ -295,6 +295,8 @@ def dfs(graph, start):
     while stack: # yigit bos ise bu ifade false olur
         vertex = stack.pop()
         # bu kontrol hizli olsun diye OrderedDict kullandik
+        # boylece hem ziyaret sirasi hatirlanacak, hem de
+        # dugum ziyaret edilip edilmedigi sorusu cok hizli cevaplanacak
         if vertex not in visited:
             visited[vertex] = ''
             stack.extend(graph[vertex])
@@ -307,9 +309,12 @@ OrderedDict([('A', ''), ('B', ''), ('D', ''), ('E', ''), ('F', ''), ('C', '')])
 \end{verbatim}
 
 Özyineli formda da yazabiliriz, eðer her komþu için teker teker
-\verb!dfs!'in kendisini çaðýrýrsak derinleme dalýþ yapmýþ oluruz. Tabii bu
-durumda gidilen yolu hatirlamak icin onu bir liste olarak surekli bir
-sonraki ozyineli cagriya geceriz ve her cagridan geri donduruz. 
+\verb!dfs!'in kendisini çaðýrýrsak derinleme dalýþ yapmýþ oluruz, çünkü
+komþu listesinde ilk elemanda özyineli çaðrý yapýnca o geri gelene kadar o
+çaðrý içindeyiz, o çaðrý da bir komþu listesi alýp öðelerde özyineli çaðrý
+yapacak, böyle derinleme devam edecek... Tabii bu durumda gidilen yolu
+hatýrlamak için onu bir liste olarak sürekli bir sonraki özyineli çaðrýya
+geçeriz ve her çaðrýdan da geriye döndürürüz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import collections
@@ -327,11 +332,12 @@ print dfs(graph,'A')
 OrderedDict([('A', ''), ('C', ''), ('F', ''), ('E', ''), ('B', ''), ('D', '')])
 \end{verbatim}
 
-Önce geniþliðine arama yapmak için yiðit veri yapýsý yerine kuyruk
-kullanmak yeterli. Bu durumda komþularý kuyruða koyduðumuz zaman o
-komþularýn iþlenmesi bitmeden sonraki düðümlere geçilmeyecektir (çünkü
-kuyruða ilk konan ilk önce iþlenir) bu ziyareti seviye seviye iþlem yapmaya
-zorlar. 
+Þimdi diðer arama þekline, önce geniþliðine aramaya gelelim. Bunu yapmak
+için yýðýt veri yapýsý yerine kuyruk kullanmak yeterli. Bu durumda
+komþularý kuyruða koyduðumuz zaman o komþularýn iþlenmesi bitmeden sonraki
+düðümlere geçilmeyecektir, çünkü kuyruða ilk konan ilk önce iþlenir, yani
+komþularýn kendisinin iþlenmesi bitmeden onlarýn alt çocuklarýna sýra
+gelmeyecektir. Bu, ziyareti seviye seviye iþlem yapmaya zorlar.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def bfs(graph, start):
