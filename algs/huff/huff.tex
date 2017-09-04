@@ -2,60 +2,53 @@
 \begin{document}
 Huffman Kodlamasi ile Veri Sýkýþtýrma (Compression)
 
+[1, sf. 159]
+
 \begin{minted}[fontsize=\footnotesize]{python}
-from heapq import heappush, heappop, heapify
-from collections import defaultdict
- 
-def encode(symb2freq):
-    """Huffman encode the given dict mapping symbols to weights"""
-    heap = [[wt, [sym, ""]] for sym, wt in symb2freq.items()]
-    heapify(heap)
-    while len(heap) > 1:
-        lo = heappop(heap)
-        hi = heappop(heap)
-        for pair in lo[1:]:
-            pair[1] = '0' + pair[1]
-        for pair in hi[1:]:
-            pair[1] = '1' + pair[1]
-        heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
-    return sorted(heappop(heap)[1:], key=lambda p: (len(p[-1]), p))
- 
-txt = "this is an example for huffman encoding"
-symb2freq = defaultdict(int)
-for ch in txt: symb2freq[ch] += 1
-huff = encode(symb2freq)
-print "Symbol\tWeight\tHuffman Code"
-for p in huff:
-    print "%s\t%s\t%s" % (p[0], symb2freq[p[0]], p[1])
+from heapq import heapify, heappush, heappop
+from itertools import count
+def huffman(seq, frq):
+    num = count()
+    trees = list(zip(frq, num, seq))
+    heapify(trees)
+    while len(trees) > 1:
+       fa, _, a = heappop(trees)
+       fb, _, b = heappop(trees)
+       n = next(num)
+       heappush(trees, (fa+fb, n, [a, b]))
+    return trees[0][-1]
+
+seq = "abcdefghi"
+frq = [4, 5, 6, 9, 11, 12, 15, 16, 20]
+tree = huffman(seq, frq)
+print tree
 \end{minted}
 
 \begin{verbatim}
-Symbol	Weight	Huffman Code
- 	6	101
-n	4	010
-a	3	1001
-e	3	1100
-f	3	1101
-h	2	0001
-i	3	1110
-m	2	0010
-o	2	0011
-s	2	0111
-g	1	00000
-l	1	00001
-p	1	01100
-r	1	01101
-t	1	10000
-u	1	10001
-x	1	11110
-c	1	111110
-d	1	111111
+[['i', [['a', 'b'], 'e']], [['f', 'g'], [['c', 'd'], 'h']]]
 \end{verbatim}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+def codes(tree, prefix=""):
+    if len(tree) == 1:
+        yield (tree, prefix)                    # A leaf with its code
+        return
+    for bit, child in zip("01", tree):          # Left (0) and right (1)
+        for pair in codes(child, prefix + bit): # Get codes recursively
+            yield pair
+	    
+print list(codes(tree))
+\end{minted}
 
-
+\begin{verbatim}
+[('i', '00'), ('a', '0100'), ('b', '0101'), ('e', '011'), ('f', '100'), ('g', '101'), ('c', '1100'), ('d', '1101'), ('h', '111')]
+\end{verbatim}
 
 [devam edecek]
 
+
+Kaynaklar
+
+[1] Heatland, {\em Python Algorithms}
 
 \end{document}
