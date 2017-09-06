@@ -2,6 +2,23 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd, zipfile
+import tensorflow as tf
+from tensorflow.contrib import rnn
+
+mfile = "/home/burak/Downloads/scikit-data/time_series_classif"
+
+# Parameters
+learning_rate = 0.001
+training_iters = 100000
+batch_size = 25
+display_step = 10
+
+# Network Parameters
+n_input = 1 
+n_steps = 152 # timesteps
+#n_hidden = 128 # hidden layer num of features
+n_hidden = 40 # hidden layer num of features
+n_classes = 2
 
 with zipfile.ZipFile('wafer.zip', 'r') as z:
       df_train =  pd.read_csv(z.open('Wafer/wafer_TRAIN.txt'),header=None)
@@ -17,31 +34,10 @@ def minibatches(batch_size,input="train"):
             for j in range(batch_size):
                   batch_x.append(list(df[i,1:]))
                   batch_y.append([int(df[i,0]==-1), int(df[i,0]==1) ])
-            batch_x = np.array(batch_x).reshape(batch_size,152,1)
+            batch_x = np.array(batch_x).reshape(batch_size,n_steps,1)
             batch_y = np.array(batch_y).reshape(batch_size,2)
             yield batch_x, batch_y
                   
-#for batch_x, batch_y in minibatches(10):
-#      print batch_x.shape, batch_y.shape
-#exit()
-
-import tensorflow as tf
-from tensorflow.contrib import rnn
-
-mfile = "/home/burak/Downloads/scikit-data/time_series_classif"
-
-# Parameters
-learning_rate = 0.001
-training_iters = 100000
-batch_size = 25
-display_step = 10
-
-# Network Parameters
-n_input = 1 
-n_steps = 152 # timesteps
-n_hidden = 128 # hidden layer num of features
-n_classes = 2
-
 # tf Graph input
 x = tf.placeholder("float", [None, n_steps, n_input])
 y = tf.placeholder("float", [None, n_classes])
@@ -56,9 +52,6 @@ biases = {
 
 def RNN(x, weights, biases):
     # Prepare data shape to match `rnn` function requirements
-    # Current data input shape: (batch_size, n_steps, n_input)
-    # Required shape: 'n_steps' tensors list of shape (batch_size, n_input)
-
     # Unstack to get a list of 'n_steps' tensors of shape (batch_size, n_input)
     x = tf.unstack(x, n_steps, 1)
 
@@ -111,21 +104,19 @@ def train():
           print("Optimization Finished!")
           saver.save(sess, mfile) # not shown in the book
 
-def test():          
+def test():      
       saver = tf.train.Saver()
-      res = []
+      from sklearn import metrics
+      real = []
+      pred = []
       with tf.Session() as sess:
           saver.restore(sess, mfile)
           for batch_x, batch_y in minibatches(1,input="test"):
-              print batch_y, sess.run(new_pred, feed_dict={x: batch_x, y: batch_y})
-
-#train()
+            res = sess.run(new_pred, feed_dict={x: batch_x, y: batch_y})
+            pred.append(res[0])
+            real.append(np.argmax(batch_y[0]))
+          fpr, tpr, thresholds = metrics.roc_curve(np.array(real), np.array(pred))
+          print metrics.auc(fpr, tpr)
+      
+train()
 test()
-
-
-
-
-
-
-
-
