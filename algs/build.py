@@ -18,6 +18,7 @@ if len(sys.argv) == 1:
     ./convnet/convnet.pdf \
     ./autodiff/autodiff.pdf \
     ./rnn/rnn.pdf \
+    ./lstm/lstm.pdf \
     ./enc/enc.pdf \
     ./kmeans/kmeans.pdf \
     ./kmeans_mr/kmeans_mr.pdf \
