@@ -146,6 +146,7 @@ scikit-image
 lmfit==0.8.3
 autograd==1.1.7
 sounddevice
+tensorflow==
 ```
 
 Python paket kurulumu Ubuntu Linux üzerinde `conda install [paket ismi]` 
