@@ -26,13 +26,13 @@ iþletebiliriz, mesela üstteki $f$ için $f(3,4)$ hesabý,
 
 \includegraphics[width=20em]{tf_02.png}
 
-þeklinde iki parçaya bölünebilir. 3 verilen soldaki parça kendi baþýna
-hesabýný yaparken ayný anda 4 verilen diðer parça iþlemine devam
-eder mesela. Ayrýca Google TPU adý verilen tensor iþlemci üniteleri
-üzerinden artýk CPU, GPU yerine direk TF için optimize edilmiþ yeni
-iþlemciler üzerinden paralelizasyon yoluna gidiyor. 
+þeklinde iki parçaya bölünebilir. 3 girilen soldaki parça kendi baþýna
+hesabýný yaparken ayný anda 4 girilen diðer parça iþlemine devam
+edebilir. Ayrýca Google TPU adý verilen tensor iþlemci üniteleri üzerinden
+artýk CPU, GPU yerine direk TF için optimize edilmiþ yeni iþlemciler
+üzerinden paralelizasyon yapýlabiliyor.
 
-TF ile ilk hesap çizitimizi yaratalým. Üstteki örnek için 
+TF kodlamasý nasýl olur? Üstteki örnek için
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -44,10 +44,11 @@ f = x*x*y + y + 2
 
 Ýçinde $x,y,f$ düðümleri (node) olan bir çizit yaratýldý. Bu kadar! Fakat
 anlamamýz gereken önemli bir nokta var, üstteki kodu iþletince halen bir
-hesap yapmýþ olmuyoruz, sadece hesabý yaratacak çizit yapýsýný yaratmýþ
-oluyoruz. Hesabýn kendisi için bir TF oturumu (session) açmak lazým, bu
-oturum üzerinden deðiþkenleri baþlangýç deðerlerlerine eþitlenir, ve sonra
-$f$ hesabý tetiklenir. Esas hesap bu þekilde ortaya çýkar.
+hesap yapmýþ olmuyoruz, sadece üzerinden hesabýn yapýlabileceði çizit
+yapýsýný yaratmýþ oluyoruz. Hesabýn kendisi için bir TF oturumu (session)
+açmak lazým, bu oturum üzerinden deðiþkenler baþlangýç deðerlerlerine
+eþitlenir, ve sonra $f$ hesabý tetiklenir. Esas hesap bu þekilde ortaya
+çýkar.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 sess = tf.Session()
@@ -82,14 +83,12 @@ print result
 42
 \end{verbatim}
 
-Bu \verb!with! kullanýmý ile blok dýþýna çýkýlýnca kapatma iþlemi otomatik
-olarak yapýlýyor. 
-
-Nihai hesap için \verb!eval! çaðrýsý yapýldýðýný gördük, bu çaðrý aslýnda
-herhangi bir düðümün hesaplanmasýný tetikleyebilir. Bu tetikleme sonrasýnda
-TF bir düðümün hangi diðer düðümlere baðlý olduðuna bakarak çizitte önce o
-düðümlerin hesabýný yapacaktýr, ve o çýktýlarý çizite göre birleþtirerek
-nihai sonucu bulacaktýr. Mesela
+\verb!with! kullanýmý ile blok dýþýna çýkýlýnca kapatma iþlemi otomatik
+olarak yapýlýyor. Nihai hesap için \verb!eval! çaðrýsý yapýldýðýný gördük,
+bu çaðrý aslýnda herhangi bir düðümün hesaplanmasýný tetikleyebilir. Bu
+tetikleme sonrasýnda TF bir düðümün hangi diðer düðümlere baðlý olduðuna
+bakarak çizitte önce o düðümlerin hesabýný yapacaktýr, ve o çýktýlarý
+çizite göre birleþtirerek nihai sonucu bulacaktýr. Mesela
 
 \begin{minted}[fontsize=\footnotesize]{python}
 w = tf.constant(3)
@@ -108,16 +107,15 @@ z = 15
 \end{verbatim} 
 
 TF otomatik olarak $y$'nin $w$'ye, onun da $x$'e baðlý olduðunu gördü, önce
-$w$'yi iþletti, sonra $y$'yi, ve onu da $z$ hesabý için kullandý.
-
-Dikkat, TF onbellekleme yapmaz, yani üstteki kod $w,x$ hesabýný iki kere
+$w$'yi iþletti, sonra $y$'yi, ve onu da $z$ hesabý için kullandý. Dikkat,
+TF önbellekleme yapmaz, yani üstteki kod $w,x$ hesabýný iki kere
 yapar. Hesap çaðrýsý sonrasý deðiþken deðerleri muhafaza edilir (çünkü
 onlar çizitin parçasý) fakat düðüm deðerleri yokolur.
 
-TF'i bir anlamda numpy kütüphanesinin çizitli, çok iþlemcili versiyonu
-olarak görebiliriz. Bir numpy matrisi üzerinde yapýlan pek çok iþlem TF ile
-de yapýlabilir. Mesela bir matrisin tümü, herhangi bir ekseni bazýndaki
-toplamlarý alttaki gibi alýnabiliyor,
+TF bir anlamda numpy kütüphanesinin çizitli, çok iþlemcili versiyonu olarak
+görülebilir. Bir numpy matrisi üzerinde yapýlan pek çok iþlem TF ile de
+yapýlabilir. Mesela bir matrisin tümü, herhangi bir ekseni bazýndaki toplam
+alttaki gibi alýnabiliyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 x = tf.constant([[1., 1., 1.], [1., 1.,1.]])
@@ -137,17 +135,16 @@ print tf.Session().run(c2)
 
 Lineer Regresyon
 
-Þimdi toptan þekilde yapýlacak basit lineer regresyon hesabýný TF ile
-yapalým. Regresyonu California emlak veri seti üzerinde iþleteceðiz, bu
-veride bölge bazlý olarak ev sahiplerinin ortalama yaþý, geliri, gibi
-deðiþkenler ile hedef deðiþkeni olan ev fiyatý kayýtlý. Hedef ve kaynak
-deðiþkenler arasýndaki lineer iliþkiyi lineer regresyon ile
-hesaplayabiliriz, tanýdýk toptan formül,
+Þimdi bir toptan basit lineer regresyon hesabýný TF ile yapalým. Regresyonu
+California emlak veri seti üzerinde iþleteceðiz, bu veride bölge bazlý
+olarak ev sahiplerinin ortalama yaþý, geliri, gibi deðiþkenler ile hedef
+deðiþkeni olan ev fiyatý kayýtlý. Hedef ve kaynak deðiþkenler arasýndaki
+lineer iliþkiyi lineer regresyon ile hesaplanabilir, tanýdýk formül,
 
 $\hat{\theta} = (X^TX )^{-1} X^T y $
 
-TF ile veriye bir yanlýlýk (sadece 1 deðeri içeren yeni bir kolon) ekleyip
-üstteki hesabý yapalým.
+Veriye bir yanlýlýk (sadece 1 deðeri içeren yeni bir kolon) ekleyip üstteki
+hesabý yapalým.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -193,21 +190,20 @@ theta
 \end{verbatim}
 
 TF'in matris çarpýmý için \verb!matmul!, tersini alma için
-\verb!matrix_inverse! çaðrýlarýný görüyoruz. Üstteki kod numpy'a kýyasla
-avantajý onun direk pek çok iþlemci üzerinde direk paralelize edilebiliyor
-olmasý.
+\verb!matrix_inverse! çaðrýlarýný görüyoruz. Üstteki kodu olduðu gibi alýp
+pek çok iþlemci üzerinde direk paralel þekilde iþletebiliriz, ayný iþi pür
+numpy bazlý kodla yapmak daha külfetli olurdu.
 
 Gradyan Ýniþi
 
-Klasik lineer cebir, toptan usül ile hesabý gördük. Peki gradyan iniþi ile
-lineer regresyon nasýl yaparýz? Burada iki yaklaþýmý göstereceðiz, biri
-daha zor, diðeri daha kolay. Zor olan matematiksel olarak elle kendimiz
-türev alarak hesapladýðýmýz gradyan formülünü kodlamak, daha kolay olaný
-türevi TF içindeki otomatik türev alma mekanizmasýný kullanarak bu iþi de
-TF'e yaptýrmak.
+Klasik toptan usül ile hesabý gördük. Peki gradyan iniþi ile lineer
+regresyon nasýl yaparýz? Burada iki yaklaþýmý göstereceðiz, biri daha zor,
+diðeri daha kolay. Zor olan matematiksel olarak elle kendimizin gradyan
+türevini almasý, daha kolay olaný türevi TF içindeki otomatik türev alma
+mekanizmasýný kullanarak o iþi de TF'e yaptýrmak.
 
 Çiziti oluþturalým; baþlangýç $\theta$ deðeri rasgele atansýn, $X,y$
-deðerleri verinin kendisi, tahmin ve hata için fonksiyonlar olsun. 
+deðerleri verinin kendisi olacak, tahmin ve hata için fonksiyonlar olsun.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 scaler = StandardScaler()
@@ -286,8 +282,8 @@ theta
 
 Otomatik Türev ile Gradyan
 
-Sembolik türev yerine TF içindeki autodiff paketine türevi aldýralým ve
-gradyan iniþini böyle yapalým,
+Sembolik türev yerine TF içindeki \verb!autodiff! paketine türevi aldýralým
+ve gradyan iniþini böyle yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 gradients = tf.gradients(mse, [theta])[0] # otomatik turev
@@ -329,11 +325,12 @@ print best_theta
  [-0.6375277 ]]
 \end{verbatim}
 
-Ayný sonuca eriþtik. Daha da basitleþtirebilirdik, üstteki kodda
-\verb!assign! ile gradyan iniþi için gereken çýkartma iþlemi elle
-yapýldý. TF paketi içinde bu çýkartmayý yapacak optimizasyon rutinleri de
-var, mesela \verb!GradientDescentOptimizer! çaðrýsý. Bir diðeri
-\verb!MomentumOptimizer!.
+Ayný sonuca eriþtik. 
+
+Daha da basitleþtirebiliriz, üstteki kodda \verb!assign! ile gradyan iniþi
+için gereken çýkartma iþlemi elle yapýldý. TF paketi içinde bu çýkartmayý
+yapacak optimizasyon rutinleri de var, mesela
+\verb!GradientDescentOptimizer!.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
@@ -375,24 +372,11 @@ theta
  [-0.6375277 ]]
 \end{verbatim}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Görüldüðü gibi matris iþlemi içeren her türlü hesap TF ile kodlanabilir, bu
+yapýldýðýnda kodlar rahat bir þekilde paralelize edilebilir. Yapay
+öðrenimde ne kadar çok lýneer cebir kullanýmý olduðunu biliyoruz, ayrýca
+türev almak otomatikleþtirildiði için akla gelebilecek her türlü lineer
+cebir, optimizasyon iþlemi TF üzerinden kodlanabilir.
 
 
 Kaynaklar 
