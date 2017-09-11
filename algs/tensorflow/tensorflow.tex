@@ -379,36 +379,24 @@ yapýldýðýnda kodlar rahat bir þekilde paralelize edilebilir. Yapay
 türev almak otomatikleþtirildiði için akla gelebilecek her türlü lineer
 cebir, optimizasyon iþlemi TF üzerinden kodlanabilir.
 
+TensorFlow ile Cok Katmanli Yapay Sinir Aglari (Neural Network -NN-)
 
+Þimdi çok katmanlý NN ile regresyon yapma örneði görelim. Bir NN bildiðimiz
+gibi evrensel yaklaþýklayýcý, yeterli veri var ise her türlü fonksiyonu
+yaklaþýk olarak temsil edebilir, öðrenebilir. Düz lineer regeresyon ile
+yaptýðýmýz da bir bakýma budur, bilinmeyen bir fonksiyonu veriden öðrenmeye
+uðraþýrýz, fakat nihai fonksiyon lineer olmalý. NN ile lineer, gayrý-lineer
+her türlü fonksiyon temsil edilebilir.
 
+Her katmanda girdi aðýrlýklar ile çarpýlacak, bir yanlýlýk (bias)
+eklenecek, ve sonuç bir aktivasyon fonksiyonuna verilecek (altta kullanýlan
+ReLu), buradan çýkan sonuç bir sonraki katmana aktarýlacak. Lineer
+regresyon tek katmanlý ve aktivasyonu olmayan bir NN gibi de görülebilir.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-TensorFlow ile Cok Katmanli Yapay Sinir Aglari 
+Örnek için kullanýlan veri seti Low Birth Weight [2] verisi, bu veride
+yeni doðan çocuklarýn annenin týbbi verileri ile çocuðun doðduðundaki
+aðýrlýðý kaydedilmiþ, ve bu hedef deðiþkeni ile diðerleri arasýndaki
+iliþkiyi öðrenmek istiyoruz. Veriyi okuyup normalize edelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from tensorflow.python.framework import ops
@@ -423,8 +411,6 @@ y_vals = np.array(df['BWT'])
 ops.reset_default_graph()
 tf.set_random_seed(3)
 np.random.seed(3)
-
-batch_size = 10
 
 sess = tf.Session()
 
@@ -446,6 +432,11 @@ def normalize_cols(m):
 x_vals_train = np.nan_to_num(normalize_cols(x_vals_train))
 x_vals_test = np.nan_to_num(normalize_cols(x_vals_test))
 \end{minted}
+
+NN katmanlarýný hazýrlayalým [3], üç katman olacak, katmanlarda sýrasýyla 25,
+10 ve 3 tane nöron olacak. Kayýp (loss) fonksiyonu L1 (mutlak deðer)
+üzerinden hesaplanýyor. Optimize edici olarak TF'te \verb!AdamOptimizer!
+adlý optimize ediciyi kullanacaðýz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def init_weight(shape, st_dev):
@@ -481,15 +472,23 @@ final_output = fully_connected(layer_3, weight_4, bias_4)
 
 loss = tf.reduce_mean(tf.abs(y_target - final_output))
 
-my_opt = tf.train.AdamOptimizer(0.05)
+my_opt = tf.train.AdamOptimizer(0.02)
 train_step = my_opt.minimize(loss)
 
 init = tf.initialize_all_variables()
 sess.run(init)
 \end{minted}
 
+Þimdi veriyi 80/20 oranýnda eðitim / doðrulama olarak ayýrýrýz, ve eðitim
+veri seti üzerinde eðitim yaparýz. Nasýl? Eðitim verisinden
+\verb!batch_size! büyüklüðünde mini toptan parçalar (minibatch)
+örnekleyeceðiz, ve her eðitim döngüsünde optimize ediciye bu parçalarý
+vereceðiz. 
+
 \begin{minted}[fontsize=\footnotesize]{python}
 loss_vec = []; test_loss = []
+
+batch_size = 200
 
 for i in range(200):
     rand_index = np.random.choice(len(x_vals_train), size=batch_size)
@@ -505,7 +504,6 @@ for i in range(200):
     if (i+1)%25==0:
         print('Epoch: ' + str(i+1) + '. Kayip = ' + str(temp_loss))
 
-
 # Plot loss over time
 plt.plot(loss_vec, 'k-', label=u'Egitim Kaybý')
 plt.plot(test_loss, 'r--', label=u'Test Kaybý')
@@ -517,40 +515,31 @@ plt.savefig('tf_03.png')
 \end{minted}
 
 \begin{verbatim}
-Epoch: 25. Kayip = 6739.92
-Epoch: 50. Kayip = 2719.33
-Epoch: 75. Kayip = 1346.03
-Epoch: 100. Kayip = 1823.08
-Epoch: 125. Kayip = 951.273
-Epoch: 150. Kayip = 1440.24
-Epoch: 175. Kayip = 2061.46
-Epoch: 200. Kayip = 1526.82
+Epoch: 25. Kayip = 16744.3
+Epoch: 50. Kayip = 8367.32
+Epoch: 75. Kayip = 4687.56
+Epoch: 100. Kayip = 1767.07
+Epoch: 125. Kayip = 1297.27
+Epoch: 150. Kayip = 852.689
+Epoch: 175. Kayip = 705.81
+Epoch: 200. Kayip = 728.779
 \end{verbatim}
 
 \includegraphics[width=30em]{tf_03.png}
 
+Görüldüðü gibi eðitim ve test kayýbý birbirine yakýn ki bu iyiye iþaret,
+model iyi öðreniyor, eksik uyum, aþýrý uyum durumlarý yok demektir, ve
+nihai kayýp her iki tarafta da 0.7 kg civarý. 
 
+Çift Kategori Sýnýflamasý
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Peki istatistikte lojistik regresyon ile yaptýðýmýzý çok katmanlý NN ile
+nasýl yaparýz? Mesela bebeðin 2.5 kg altýnda doðup doðmamasý diyelim, bu
+bir riskli durum, ve direk bu hedef deðiþkeni için 0/1 tarzýnda bir eðitim
+yapmak istiyoruz. Bir önceki NN'i alýp her yeni veri noktasý için kg
+bazýnda tahmin üretip, bu tahmini eþik deðeri 2.5 üstünde mi altýnda mý
+hesabýný yapabilirdik, bu hesap yüzde 55 civarý baþarý veriyor. Daha iyisi
+baþka bir NN'i direk 0/1 hedefi için eðitmek. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from tensorflow.python.framework import ops
@@ -562,10 +551,9 @@ df = pd.read_csv('lowbwt.dat',sep='\s*',engine='python')
 x_vals = np.array(df[cols_of_interest])
 y_vals = np.array(df['LOW'])
 
-seed = 1
 ops.reset_default_graph()
-tf.set_random_seed(seed)
-np.random.seed(seed)
+tf.set_random_seed(1)
+np.random.seed(1)
 sess = tf.Session()
 
 tmp = np.random.choice(range(len(x_vals)), size=len(x_vals), replace=False)
@@ -586,7 +574,7 @@ def normalize_cols(m):
 x_vals_train = np.nan_to_num(normalize_cols(x_vals_train))
 x_vals_test = np.nan_to_num(normalize_cols(x_vals_test))
 
-batch_size = 130
+batch_size = 50
 
 x_data = tf.placeholder(shape=[None, 8], dtype=tf.float32)
 y_target = tf.placeholder(shape=[None, 1], dtype=tf.float32)
@@ -664,16 +652,16 @@ plt.savefig('tf_05.png')
 \end{minted}
 
 \begin{verbatim}
-Loss = 0.627154
-Loss = 0.545542
-Loss = 0.608412
-Loss = 0.618306
-Loss = 0.578082
-Loss = 0.498052
-Loss = 0.583924
-Loss = 0.509966
-Loss = 0.545845
-Loss = 0.582545
+Loss = 0.615425
+Loss = 0.593725
+Loss = 0.575125
+Loss = 0.664008
+Loss = 0.667132
+Loss = 0.617393
+Loss = 0.504238
+Loss = 0.447125
+Loss = 0.530287
+Loss = 0.528585
 \end{verbatim}
 
 \includegraphics[width=30em]{tf_04.png}
@@ -686,5 +674,9 @@ Loss = 0.582545
 Kaynaklar 
 
 [1] Géron, {\em Hands-On Machine Learning with Scikit-Learn and TensorFlow}
+
+[2] Heidelberg U., {\em Risk Factors Associated with Low Infant Birth Weight}, \url{http://www.statlab.uni-heidelberg.de/data/linmod/birthweight.html}
+
+[3] McClure, {\em TensorFlow Machine Learning Cookbook}
 
 \end{document}
