@@ -12,9 +12,9 @@ x_vals = np.array(df[cols_of_interest])
 y_vals = np.array(df['LOW'])
 
 seed = 1
+ops.reset_default_graph()
 tf.set_random_seed(seed)
 np.random.seed(seed)
-
 sess = tf.Session()
 
 tmp = np.random.choice(range(len(x_vals)), size=len(x_vals), replace=False)
