@@ -76,7 +76,6 @@ train_step = my_opt.minimize(loss)
 init = tf.initialize_all_variables()
 sess.run(init)
 
-# Training loop
 loss_vec = []; test_loss = []
 
 for i in range(200):
