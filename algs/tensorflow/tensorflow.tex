@@ -133,6 +133,35 @@ print tf.Session().run(c2)
 [ 3.  3.]
 \end{verbatim}
 
+Disaridan Okunan Veriyi Cizite Vermek
+
+Bunu yapmanýn en basit yolu yer tutucu düðüm (placeholder node)
+kullanmak. Bu düðümler özel düðümler, hiç bir iþ yapmýyorlar, içlerinde
+veri yok, sadece onlara dýþarýdan verdiðimiz veriyi dýþarý veriyorlar, yani
+çizitin akýþýna dahil ediyorlar. Eðer onlara dýþarýdan veri verilmezse bir
+hata mesajý görüyoruz.
+
+Yer tutucularý tanýmlarken onlarýn önceden tipini tanýmlayabiliriz, þart
+olmasa da bir büyüklük te tanýmlanabilir, fakat \verb!Nöne! ile burayý boþ
+býrakmak ta mümkün. Þimdi yer tutucu \verb!A! tanýmlayalým, \verb!B! ona
+baðlý olsun, sonra \verb!B! deðerini hesaplamak için \verb!eval! çaðrýrken
+yer tutucunun içini o anda dolduralým, ve sonuca bakalým, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = tf.placeholder(tf.float32, shape=(None, 3))
+B = A + 5
+with tf.Session() as sess:
+    print  B.eval(feed_dict={A: [[1, 2, 3]]})
+\end{minted}
+
+\begin{verbatim}
+[[ 6.  7.  8.]]
+\end{verbatim}
+
+Yer tutucular tipik olarak gradyan iniþi ile optimizasyon sýrasýnda eðitim
+verisini ufak toptan parçalar olarak $X,y$ baðlamýnda çizite vermek için
+kullanýlýr.
+
 Lineer Regresyon
 
 Þimdi bir toptan basit lineer regresyon hesabýný TF ile yapalým. Regresyonu
@@ -433,10 +462,10 @@ x_vals_train = np.nan_to_num(normalize_cols(x_vals_train))
 x_vals_test = np.nan_to_num(normalize_cols(x_vals_test))
 \end{minted}
 
-NN katmanlarýný hazýrlayalým [3], üç katman olacak, katmanlarda sýrasýyla 25,
-10 ve 3 tane nöron olacak. Kayýp (loss) fonksiyonu L1 (mutlak deðer)
-üzerinden hesaplanýyor. Optimize edici olarak TF'te \verb!AdamOptimizer!
-adlý optimize ediciyi kullanacaðýz. 
+NN katmanlarýný hazýrlayalým [3], üç katman olacak, katmanlarda sýrasýyla
+25, 10 ve 3 tane nöron olacak. Kayýp (loss) fonksiyonu L1 (mutlak deðer)
+üzerinden hesaplanýyor. Optimize edici olarak TF'in
+\verb!AdamOptimizer!'ini kullanacaðýz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def init_weight(shape, st_dev):
@@ -479,6 +508,24 @@ init = tf.initialize_all_variables()
 sess.run(init)
 \end{minted}
 
+NN að çizit yapýsý kuruldu, hatta aðýrlýklarýn deðerleri bile var. Tabii
+baþta bu deðerler rasgele olarak seçildi, fakat bu aða bir veri versek,
+bize bir hesap yapacaktýr,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = np.array([20.,181.,1.,1.,0.,0.,1.,0.]) # uyduruk veri
+x = np.reshape(x, (1,8))
+print sess.run(final_output,feed_dict={x_data: x})
+\end{minted}
+
+\begin{verbatim}
+[[ 8723006.]]
+\end{verbatim}
+
+Bu sayý çok büyük, fakat NN'i eðitim verisiyle eðitirken aðýrlýklar gerçek
+hallerine yaklaþacaklar, o zaman üstteki gibi bir veri noktasý için daha
+iyi bir sonuç 
+
 Þimdi veriyi 80/20 oranýnda eðitim / doðrulama olarak ayýrýrýz, ve eðitim
 veri seti üzerinde eðitim yaparýz. Nasýl? Eðitim verisinden
 \verb!batch_size! büyüklüðünde mini toptan parçalar (minibatch)
@@ -498,14 +545,15 @@ for i in range(200):
 
     temp_loss = sess.run(loss, feed_dict={x_data: rand_x, y_target: rand_y})
     loss_vec.append(temp_loss)
-    
-    test_temp_loss = sess.run(loss, feed_dict={x_data: x_vals_test, y_target: np.transpose([y_vals_test])})
+
+    d = {x_data: x_vals_test, y_target: np.transpose([y_vals_test])}
+    test_temp_loss = sess.run(loss, feed_dict=d)
     test_loss.append(test_temp_loss)
     if (i+1)%25==0:
         print('Epoch: ' + str(i+1) + '. Kayip = ' + str(temp_loss))
 
 # Plot loss over time
-plt.plot(loss_vec, 'k-', label=u'Egitim Kaybý')
+plt.plot(loss_vec, 'k-', label=u'Eðitim Kaybý')
 plt.plot(test_loss, 'r--', label=u'Test Kaybý')
 plt.title(u'Her Epoch Ýçinde Kayýp')
 plt.xlabel('Epoch')
@@ -527,19 +575,22 @@ Epoch: 200. Kayip = 728.779
 
 \includegraphics[width=30em]{tf_03.png}
 
-Görüldüðü gibi eðitim ve test kayýbý birbirine yakýn ki bu iyiye iþaret,
+Görüldüðü gibi eðitim ve test kaybý birbirine yakýn ki bu iyiye iþaret,
 model iyi öðreniyor, eksik uyum, aþýrý uyum durumlarý yok demektir, ve
-nihai kayýp her iki tarafta da 0.7 kg civarý. 
+nihai kayýp her iki tarafta da 0.7 kg civarý.
 
-Çift Kategori Sýnýflamasý
+Ýki Kategori Sýnýflamasý
 
-Peki istatistikte lojistik regresyon ile yaptýðýmýzý çok katmanlý NN ile
-nasýl yaparýz? Mesela bebeðin 2.5 kg altýnda doðup doðmamasý diyelim, bu
-bir riskli durum, ve direk bu hedef deðiþkeni için 0/1 tarzýnda bir eðitim
-yapmak istiyoruz. Bir önceki NN'i alýp her yeni veri noktasý için kg
-bazýnda tahmin üretip, bu tahmini eþik deðeri 2.5 üstünde mi altýnda mý
-hesabýný yapabilirdik, bu hesap yüzde 55 civarý baþarý veriyor. Daha iyisi
-baþka bir NN'i direk 0/1 hedefi için eðitmek. 
+Peki istatistikte lojistik regresyon ile yaptýðýmýz iki kategori arasýnda
+sýnýflamayý çok katmanlý NN ile nasýl yaparýz? Mesela bebeðin 2.5 kg
+altýnda doðup doðmamasý diyelim, bu bir riskli durum, ve iki farklý sýnýf
+olarak görülebilecek bu hedef deðiþkeni için 0/1 tarzýnda bir eðitim yapmak
+istiyoruz. Ýlk akla gelebilecek en kolay çözüm bir önceki NN'i alýp oradan
+gelecek tahminleri eþik deðeri 2.5 üstünde mi altýnda mý diye ek bir
+filtrelemden geçirmek, yani regresyon sonucunu 0/1 tahminine çevirmek.  Bu
+yaklaþým yüzde 55 civarý baþarý veriyor. 
+
+Daha iyisi farklý bir NN'i özellikle 0/1 hedefi için eðitmek.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from tensorflow.python.framework import ops
@@ -603,7 +654,8 @@ A3 = init_variable(shape=[10,1])
 b3 = init_variable(shape=[1])
 final_output = logistic(logistic_layer2, A3, b3, activation=False)
 
-loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=final_output, labels=y_target))
+tmp = tf.nn.sigmoid_cross_entropy_with_logits(logits=final_output, labels=y_target)
+loss = tf.reduce_mean(tmp)
      
 my_opt = tf.train.AdamOptimizer(learning_rate = 0.002)
 train_step = my_opt.minimize(loss)
