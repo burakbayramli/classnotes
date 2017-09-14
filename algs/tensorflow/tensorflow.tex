@@ -133,19 +133,19 @@ print tf.Session().run(c2)
 [ 3.  3.]
 \end{verbatim}
 
-Disaridan Okunan Veriyi Cizite Vermek
+Dýþarýdan Okunan Veriyi Çizite Vermek
 
 Bunu yapmanýn en basit yolu yer tutucu düðüm (placeholder node)
 kullanmak. Bu düðümler özel düðümler, hiç bir iþ yapmýyorlar, içlerinde
-veri yok, sadece onlara dýþarýdan verdiðimiz veriyi dýþarý veriyorlar, yani
-çizitin akýþýna dahil ediyorlar. Eðer onlara dýþarýdan veri verilmezse bir
-hata mesajý görüyoruz.
+veri yok, sadece onlara dýþarýdan verdiðimiz veriyi çizit içine taþýyorlar,
+yani çizitin akýþýna dahil ediyorlar. Eðer iþleyiþ anýnda onlara dýþarýdan
+veri verilmezse TF bir hata mesajý verecektir.
 
 Yer tutucularý tanýmlarken onlarýn önceden tipini tanýmlayabiliriz, þart
-olmasa da bir büyüklük te tanýmlanabilir, fakat \verb!Nöne! ile burayý boþ
+degil ama bir büyüklük te tanýmlanabilir, \verb!None! ile burayý boþ
 býrakmak ta mümkün. Þimdi yer tutucu \verb!A! tanýmlayalým, \verb!B! ona
 baðlý olsun, sonra \verb!B! deðerini hesaplamak için \verb!eval! çaðrýrken
-yer tutucunun içini o anda dolduralým, ve sonuca bakalým, 
+yer tutucunun içini o anda dolduralým, ve sonuca bakalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 A = tf.placeholder(tf.float32, shape=(None, 3))
@@ -159,8 +159,8 @@ with tf.Session() as sess:
 \end{verbatim}
 
 Yer tutucular tipik olarak gradyan iniþi ile optimizasyon sýrasýnda eðitim
-verisini ufak toptan parçalar olarak $X,y$ baðlamýnda çizite vermek için
-kullanýlýr.
+verisini ufak toptan parçalar olarak mesela $X,y$ uzerinden çizite vermek
+için kullanýlýr.
 
 Lineer Regresyon
 
@@ -599,12 +599,12 @@ Peki istatistikte lojistik regresyon ile yaptýðýmýz iki kategori arasýnda
 sýnýflamayý çok katmanlý NN ile nasýl yaparýz? Mesela bebeðin 2.5 kg
 altýnda doðup doðmamasý diyelim, bu bir riskli durum, ve iki farklý sýnýf
 olarak görülebilecek bu hedef deðiþkeni için 0/1 tarzýnda bir eðitim yapmak
-istiyoruz. Ýlk akla gelebilecek en kolay çözüm bir önceki NN'i alýp oradan
-gelecek tahminleri eþik deðeri 2.5 üstünde mi altýnda mý diye ek bir
-filtrelemden geçirmek, yani regresyon sonucunu 0/1 tahminine çevirmek.  Bu
-yaklaþým yüzde 55 civarý baþarý veriyor. 
+istiyoruz. Ýlk akla gelebilecek çözüm bir önceki NN'i alýp oradan gelecek
+tahminleri eþik deðeri 2.5 üstünde mi altýnda mý diye ek bir filtrelemeden
+geçirmek, yani regresyon sonucunu 0/1 tahminine çevirmek.  Bu yaklaþým
+yüzde 55 civarý baþarý veriyor.
 
-Daha iyisi farklý bir NN'i özellikle 0/1 hedefi için eðitmek.
+Daha iyisi, daha farklý bir NN'i özellikle 0/1 hedefi için eðitmek.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from tensorflow.python.framework import ops
@@ -655,6 +655,10 @@ def logistic(input_layer, multiplication_weight, bias_weight, activation = True)
         return(linear_layer)
 \end{minted}
 
+Üstteki \verb!logistic! çaðrýsý aðýrlýklarla çarpým sonucunu bir sigmoid
+fonksiyonundan geçiriyor. Yeni NN'imiz 20, 20, 10 nöron içeren bu yeni
+stili kullanacak.
+
 \begin{minted}[fontsize=\footnotesize]{python}
 A1 = init_variable(shape=[8,20])
 b1 = init_variable(shape=[20])
@@ -689,15 +693,19 @@ for i in range(1500):
     rand_index = np.random.choice(len(x_vals_train), size=batch_size)
     rand_x = x_vals_train[rand_index]
     rand_y = np.transpose([y_vals_train[rand_index]])
+
     sess.run(train_step, feed_dict={x_data: rand_x, y_target: rand_y})
     temp_loss = sess.run(loss, feed_dict={x_data: rand_x, y_target: rand_y})
     loss_vec.append(temp_loss)
-    temp_acc_train = sess.run(accuracy, feed_dict={x_data: x_vals_train, y_target: np.transpose([y_vals_train])})
+
+    d1 = {x_data: x_vals_train, y_target: np.transpose([y_vals_train])}
+    temp_acc_train = sess.run(accuracy, feed_dict=d1)
     train_acc.append(temp_acc_train)
-    temp_acc_test = sess.run(accuracy, feed_dict={x_data: x_vals_test, y_target: np.transpose([y_vals_test])})
+
+    d2 = {x_data: x_vals_test, y_target: np.transpose([y_vals_test])}
+    temp_acc_test = sess.run(accuracy, feed_dict=d2)
     test_acc.append(temp_acc_test)
-    if (i+1)%150==0:
-        print('Loss = ' + str(temp_loss))
+    if (i+1)%150==0: print('Loss = ' + str(temp_loss))
 
 plt.plot(loss_vec, 'k-')
 plt.title(u"Her Epoch Ýçin Çapraz Entropi Kaybý")
