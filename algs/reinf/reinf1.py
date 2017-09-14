@@ -12,7 +12,7 @@ n_actions = 3             # number of available actions
 learning_rate = 1e-3
 gamma = .99               # discount factor for reward
 decay = 0.99              # decay rate for RMSProp gradients
-save_path='/home/burak/Downloads/scikit-data/models/pong.ckpt'
+save_path='/home/burak/Downloads/scikit-data/models/pong/pong.ckpt'
 
 # gamespace 
 env = gym.make("Pong-v0") # environment info

@@ -76,6 +76,6 @@ n_max_steps = 1000
 n_iterations = 250
 save_iterations = 10
 discount_rate = 0.95
-ffile = "/tmp/my_policy_net_pg.ckpt"
+ffile = "/home/burak/Downloads/scikit-data/models/cartpole.ckpt"
 
-frames = render_policy_net("/tmp/my_policy_net_pg.ckpt", action, X, n_max_steps=500)
+frames = render_policy_net(ffile, action, X, n_max_steps=500)
