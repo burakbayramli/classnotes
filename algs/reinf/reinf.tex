@@ -1,6 +1,6 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Takviyeli Öðrenme (Reinforcement Learning)
+Derin Takviyeli Öðrenme, Ilke Gradyanlari (Deep Reinforcement Learning, Policy Gradients )
 
 Bilgisayar otomatik olarak oyun oynamayý öðrenebilir mi? Diyelim herhangi
 bir bilgisayar oyunu, dama, satranç, ya da eðlence oyunlarýndan Pong.
@@ -8,42 +8,41 @@ Takviyeli öðrenme teknikleri ile bu sorunun cevabý evet.
 
 Daha önce {\em Yapay Zeka ve Müsabaka} yazýsýnda farklý bir yaklaþým
 gördük, bir deðer fonksiyonu vardý, bu fonksiyonlara tahtanýn durumunu
-veriyorduk, deðer fonksiyonu da bize o pozisyonun taraflar için ne kadar
-avantajlý olduðunu bir sayý ile raporluyordu. Bu fonksiyon bir kez, ve
+veriyorduk, deðer fonksiyonu bize pozisyonun taraflar için ne kadar
+avantajlý olduðunu raporluyordu (tek bir sayý). Bu fonksiyon bir kez, ve
 önceden kodlanmaktaydý, ve oyun oynayan yapay zeka altüst (minimax)
-algoritmasi ile kendisi için en avantajlý karþý taraf için en avantajsýz
-pozisyonlarý bu fonksiyon ile deðerlendirerek bir arama algoritmasý
-üzerinden buluyordu.
+algoritmasý ile kendisi için en avantajlý karþý taraf için en avantajsýz
+pozisyonlarý deðerlendirerek arama yaparak buluyordu. Fakat deðer
+fonksiyonu yaklaþýmýnýn bazý dezavantajlarý var, birincisi fonksiyon
+deterministik olmasý. Oyun sýrasýnda deðiþmiyor, önceden kodlanmýþ. 
 
-Fakat deðer fonksiyonu yaklaþýmýnýn bazý dezavantajlarý var, birincisi
-fonksiyon deterministik olmasý. Oyun sýrasýnda deðiþmiyor, ve önceden
-kodlanmýþ. Daha iyi bir yaklaþým olasýlýksal bir ilke (policy)
-$\pi_\theta(a,s)$ kodlamak, ve bu ilkeyi her oyun sonunda
+Daha iyi bir yaklaþým olasýlýksal bir ilke $\pi_\theta(a,s)$ kodlamak,
+atýlan adýmlarý örnekleme ile atmak, ve ilkeyi her oyun sonunda
 güncellemek. Böylece oyun sýrasýnda hem oyuncu yeni þeyler denemeye (açýk
 fikirli!) hazýr oluyor, takýlýp kalmýyor, oyun durumundan tam emin
-olunamadigi durumlar icin bile hazir oluyor, ve kazandýran ilkeler daha
+olunamadýðý durumlar icin bile hazýr oluyor, ve kazandýran ilkeler daha
 yoðun olasýlýklara tekabül ettiði için yine iyi bir oyun oynama becerisine
 kavuþuyor, ve kendini sürekli güncelliyor.
 
-Ýlke $\pi_\theta(a,s)$'de oyun konumu (state) $s$ ile, yapýlacak hareket
-ise $a$ ile belirtilir. Pong örneðinde konum bir görüntü olarak bize
-bildiriliyor olabilir, hareket ise raketin yukarý mý aþaðý mý gideceði;
-verili konum $s$ için $\pi_\theta(a|s)$ bize, kazanmak için optimallik
-baðlamýnda, mümkün tüm davranýþlarýn daðýlýmýný verecek.
+Ýlke $\pi_\theta(a,s)$, oyun konumu (state) $s$ ile, yapýlacak hareket ise
+$a$ ile belirtilir. Pong örneðinde konum tüm oyunun o andaki piksel
+görüntüsü olarak bize bildiriliyor olabilir, hareket ise raketin yukarý mý
+aþaðý mý gideceði; verili konum $s$ için $\pi_\theta(a|s)$ (kazanmak için
+optimallik baðlamýnda) mümkün tüm davranýþlarýn daðýlýmýný verecek.
 
 Peki ilke fonksiyonunu nasýl güncelleriz? Ýlke gradyaný (policy gradient)
-kavramý burada devreye giriyor. Ýlke bir fonksiyondur, bir softmax
-fonksiyonu ile ya da yapay sinir aðý ile temsil edilebilir. YSA'lar her
-türlü fonksiyonu temsil edebildikleri için sofistike beceri için daha
-tercih ediliyorlar (daha önemlisi gradyanlarý otomatik alýnabiliyor, bunun
-niye faydalý olduðunu birazdan göreceðiz). Güncelleme nasýl olacak? Burada
-skor fonksiyonunu da dahil etmek lazým, optimize etmek istediðimiz bir skor
+kavramý ile. Ýlke bir fonksiyondur, bir softmax fonksiyonu ile ya da yapay
+sinir aðý ile temsil edilebilir. YSA'lar her türlü fonksiyonu temsil
+edebildikleri için sofistike kabiliyetleri için daha tercih ediliyorlar
+(daha önemlisi gradyanlarý otomatik alýnabiliyor, bunun niye faydalý
+olduðunu birazdan göreceðiz). Güncelleme nasýl olacak? Burada skor
+fonksiyonunu kavramý gerekli, optimize etmek istediðimiz bir skor
 fonksiyonunun beklentisinin optimize edilmesi, skor fonksiyonu tabii ki
 ilke fonksiyonuna baðlýdýr, yani skor beklentisi en iyi olacak ilkeyi
-arýyoruz. Skor $Q$ olsun. Bu beklentinin gradyanýný istiyoruz, çünkü ilkeyi
-tanýmlayan $\theta$'yi skor baðlamýnda öyle güncelleyeceðiz ki eðer ayný
-konumu tekrar gelmiþ olsak, daha iyi hareketlerle daha iyi skora
-eriþelim. Aradýðýmýz gradyan ($s,a$ yerine kýsaca $x$ kullanalým) [2],
+arýyoruz. Bu beklentinin gradyanýný istiyoruz, çünkü ilkeyi tanýmlayan
+$\theta$'yi skor baðlamýnda öyle güncelleyeceðiz ki eðer ayný konumu tekrar
+gelmiþ olsak, daha iyi hareketlerle daha iyi skora eriþelim. Aradýðýmýz
+gradyan ($s,a$ yerine kýsaca $x$ kullanalým), skor $Q$ olsun [2],
 
 $$ 
 \nabla_\theta E_{x \sim \pi_\theta(x)} [Q(x)] 
@@ -87,14 +86,17 @@ $$
 = E_{s,a} \big[ \nabla_\theta \log \pi_\theta(s,a) Q(s,a) \big]
 $$
 
-Eþitliðin sað tarafý bize güzel bir kabiliyet sunmuþ oldu, bir beklenti
-tanýmý görüyoruz, bu hesabý analitik olarak yapmak çok zor olabilir, fakat
+Eþitliðin sað tarafý bize güzel bir kabiliyet sunmuþ oldu, orada bir
+beklenti var, bu hesabý analitik olarak yapmak çok zor olabilir, fakat
 beklentilerin örneklem alarak nasýl hesaplanacaðýný biliyoruz! Detaylar
-için {\em Ýstatistik, Monte Carlo, Entegraller, MCMC} yazýsý. $Q(s,a)$'dan
-örneklem $v_t \sim Q(s,a)$ alýrýz, yani oyunu baþtan sonra kadar oynarýz ve
-skora bakarýz, ve $\theta$ güncellemesi için [5],
+için {\em Ýstatistik, Monte Carlo, Entegraller, MCMC} yazýsý. O zaman
+$v_t \sim Q(s,a)$ örneklemi alýrýz, yani oyunu baþtan sonra kadar oynarýz
+ve skora bakarýz, ve $\theta$ güncellemesi için [5],
 
 $$ \Delta \theta_t = \alpha \nabla_\theta \log \pi_\theta (s_t,a_t) v_t$$
+
+Oyun oynamak ile örneklemin alakasý ne? Oynanan bir oyun mümkün tüm oyunlar
+içinden alýnan bir örneklem deðil midir? Evet. 
 
 Tabii mesela Pong oyunu bir sürü adým $a_1,..,a_n$ sonrasý bitiyor, bu
 durumda en sondaki kazanç (ya da kaybý) o oyundaki tüm adýmlara geriye
@@ -103,15 +105,15 @@ bir oyun daha oynayarak ayný þeyi tekrarlýyoruz.
 
 $\pi_\theta (s,a)$'nin ilke fonksiyonu olduðunu söyledik, bu fonksiyon
 sonlu sayýda seçenek üzerinden ayrýksal olasýlýklarý depolayan softmax
-olabilir (detaylar en altta), hatta bir derin yapay sinir aðý
-olabilir. Üstteki formüle göre $\log \pi_\theta (s,a)$'un gradyanýnýn
-gerektiðini görüyoruz, otomatik türev uzerinden bu gradyan DYSA paketinden
-rahatça alýnabilir.
+olabilir (bu durum için gradyan türetmesi altta), hatta bir derin yapay
+sinir aðý olabilir. DYSA durumunda, üstteki formüle göre
+$\log \pi_\theta (s,a)$'un gradyanýnýn gerektiðini görüyoruz, otomatik
+türev uzerinden bu gradyan DYSA paketinden rahatça alýnabilir.
 
-Pong oynamadan önce çubuk dengeleme problemine bakalým [1], kuruluþ, oyun
-açýklamasý için [3]. Bu oyunda konum dört tane sayý üzerinden bildirilir,
-ödül her adýmda anýnda alýnýr (çubuk düþmediyse, ekrandan çýkmadýysa
-baþarý). Komut satýrýndan iþletiriz,
+Pong oyunu kodunu göreceðiz, ama ondan önce daha basit çubuk dengeleme
+problemine bakalým [1], kuruluþ, oyun açýklamasý için [3]. Bu oyunda konum
+dört tane sayý üzerinden bildirilir, ödül her adýmda anýnda alýnýr (çubuk
+düþmediyse, ekrandan çýkmadýysa o anda baþarý). Komut satýrýndan iþletiriz,
 
 \inputminted[fontsize=\footnotesize]{python}{cartpole_train.py}
 
@@ -130,13 +132,14 @@ $$
 \pi_\theta(s,a) = \frac{e^{h(s,a,\theta)}}{\sum_b e^{h(s,b,\theta)} }
 $$
 
-ki $h(s,a,\theta) = \phi(s,a)^T\theta$. Softmax'in kodlamasý ayrýksal
-olarak (bir matriste mesela) her $s,a$ kombinasyonu için gerekli
-aðýrlýklarý tutmak. Bir $\phi$ çaðrýsý sonrai $\theta$ ile bu katsayýlar
-çarpýlýr ve $\theta$ ilkenin ne olduðunu tanýmlar. Softmax durumunda
-otomatik türeve gerek olmadan direk türevi kendimiz hesaplayabiliriz [4].
+ki $h(s,a,\theta) = \phi(s,a)^T\theta$. Softmax'in kodlamasý için bir çözüm
+ayrýksal olarak (bir matriste mesela) her $s,a$ kombinasyonu için gerekli
+aðýrlýklarý tutmak. O zaman spesifik bir $\phi$ çaðrýsý sonrasý $\theta$
+ile bu katsayýlar çarpýlýr ve sonuç alýnir. $\theta$ ilkenin ne olduðunu,
+onun özünü tanýmlar. DYSA durumundan bir fark softmax durumunda otomatik
+türeve gerek olmadan direk türevi kendimiz hesaplayabiliriz [4].
 
-Ýki üsttekinin log'unun gradyaný
+Üstteki formülün log gradyaný
 
 $$ 
 \nabla_\theta \log \pi_\theta = 
@@ -168,14 +171,14 @@ $$
 $$
 
 Ýlginç ve ilk bakýþta anlaþýlabilen / akla yatacak (intuitive) bir sonuca
-ulaþtýk. Log gradyaný içinde bulunduðumu konum ve attýðýmýz adým için
+ulaþtýk. Log gradyaný içinde bulunduðumuz konum ve attýðýmýz adým için
 hesaplanan $\phi$'den mevcut atýlabilecek tüm adýmlar üzerinden hesaplanan
-bir $\phi$ ortalamasý çýkartýlmýþ hali. Yani ``bu spesifik $\phi$ normalden
-ne kadar fazla?'' sorusu sormuþ oluyorum, ve gradyanýn gideceði, iyileþtirme
-yönünü bu sayý belirliyor. Yani bir $\phi$ eðer normalden fazla ortaya
-çýkýyorsa ve iyi sonuç alýyorsa (skorla çarpým yaptýðýmýzý unutmayalým),
-ilkeyi o yönde daha fazla güncelliyoruz ki bu baþarýlý sonuçlarý daha fazla
-alabilelim. 
+bir $\phi$ ortalamasýnýn çýkartýlmýþ hali. Yani ``bu spesifik $\phi$
+normalden ne kadar fazla?'' sorusunu sormuþ oluyorum, ve gradyanýn gideceði,
+iyileþtirme yönünü bu sayý belirliyor. Yani bir $\phi$ eðer normalden fazla
+ortaya çýkýyorsa ve iyi sonuç alýyorsa (skorla çarpým yaptýðýmýzý
+unutmayalým), ilkeyi o yönde daha fazla güncelliyoruz ki bu baþarýlý
+sonuçlarý daha fazla alabilelim.
 
 Kaynaklar
 
