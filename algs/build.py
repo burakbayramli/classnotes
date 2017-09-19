@@ -20,6 +20,7 @@ if len(sys.argv) == 1:
     ./tensorflow/tensorflow.pdf \
     ./rnn/rnn.pdf \
     ./lstm/lstm.pdf \
+    ./reinf/reinf.pdf \
     ./enc/enc.pdf \
     ./kmeans/kmeans.pdf \
     ./kmeans_mr/kmeans_mr.pdf \

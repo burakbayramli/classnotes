@@ -20,9 +20,10 @@ fonksiyon deterministik olmasý. Oyun sýrasýnda deðiþmiyor, ve önceden
 kodlanmýþ. Daha iyi bir yaklaþým olasýlýksal bir ilke (policy)
 $\pi_\theta(a,s)$ kodlamak, ve bu ilkeyi her oyun sonunda
 güncellemek. Böylece oyun sýrasýnda hem oyuncu yeni þeyler denemeye (açýk
-fikirli!) hazýr oluyor, takýlýp kalmýyor, kazandýran ilkeler daha yoðun
-olasýlýklara tekabül ettiði için yine iyi bir oyun oynama becerisine
-kavuþuyor, ayrýca kendini sürekli güncelliyor.
+fikirli!) hazýr oluyor, takýlýp kalmýyor, oyun durumundan tam emin
+olunamadigi durumlar icin bile hazir oluyor, ve kazandýran ilkeler daha
+yoðun olasýlýklara tekabül ettiði için yine iyi bir oyun oynama becerisine
+kavuþuyor, ve kendini sürekli güncelliyor.
 
 Ýlke $\pi_\theta(a,s)$'de oyun konumu (state) $s$ ile, yapýlacak hareket
 ise $a$ ile belirtilir. Pong örneðinde konum bir görüntü olarak bize
@@ -30,10 +31,100 @@ bildiriliyor olabilir, hareket ise raketin yukarý mý aþaðý mý gideceði;
 verili konum $s$ için $\pi_\theta(a|s)$ bize, kazanmak için optimallik
 baðlamýnda, mümkün tüm davranýþlarýn daðýlýmýný verecek.
 
+Peki ilke fonksiyonunu nasýl güncelleriz? Ýlke gradyaný (policy gradient)
+kavramý burada devreye giriyor. Ýlke bir fonksiyondur, bir softmax
+fonksiyonu ile ya da yapay sýnýr aðý ile temsil edilebilir. YSA'lar her
+türlü fonksiyonu temsil edebildikleri için sofistike beceri için daha
+tercih ediliyorlar. Güncelleme nasýl olacak? Burada skor fonksiyonunu da
+dahil etmek lazým, optimize etmek istediðimiz bir skor fonksiyonunun
+beklentisinin optimize edilmesi, skor fonksiyonu tabii ki ilke fonksiyonuna
+baðlýdýr, yani skor beklentisi en iyi olacak ilkeyi arýyoruz. Skor $Q$
+olsun. Bu beklentinin gradyanýný istiyoruz, çünkü ilkeyi tanýmlayan
+$\theta$'yi skor baðlamýnda öyle güncelleyeceðiz ki eðer ayný konumu
+tekrar gelmiþ olsak, daha iyi hareketlerle daha iyi skora
+eriþelim. Aradýðýmýz gradyan ($s,a$ yerine kýsaca $x$ kullanalým)
+
 $$ 
-\nabla_\theta E_{x \sim \pi_\theta(x)} [f(x)] = 
-\nabla_\theta \sum_x \pi f(x)
+\nabla_\theta E_{x \sim \pi_\theta(x)} [Q(x)] 
 $$
+
+Üstteki ifadeyi açalým, beklentinin tanýmý üzerinden,
+
+$$ \nabla_\theta E_{x \sim \pi_\theta(s)} [Q(x)] = 
+\nabla_\theta \sum_x \pi(x) Q(x)
+$$
+
+Gradyan içeri nüfuz edebilir,
+
+$$ 
+= \sum_x \nabla_\theta \pi_\theta(x) Q(x)
+$$
+
+$\pi(x)$ ile çarpýp bölersek hiç bir þey deðiþmemiþ olur,
+
+$$ 
+= \sum_x \pi(x) \frac{\nabla_\theta \pi(x)}{\pi(x)} Q(x)
+$$
+
+Cebirsel olarak biliyoruz ki $\nabla_\theta \log(z) =
+\frac{1}{z}\nabla_\theta$, o zaman,
+
+$$ 
+= \sum_x \pi(x) \nabla_\theta \log \pi(x)Q(x)
+$$
+
+Yine beklenti tanýmýndan hareketle
+
+$$ 
+= E_x \big[ \nabla_\theta \log \pi(x) Q(x) \big]
+$$
+
+$x = (s,a)$ demistik, o zaman nihai denklem
+
+$$ 
+\nabla_\theta E_{x \sim \pi_\theta(s,a)} [Q(s,a)] 
+= E_{s,a} \big[ \nabla_\theta \log \pi_\theta(s,a) Q(s,a) \big]
+$$
+
+Eþitliðin sað tarafý bize güzel bir kabiliyet sunmuþ oldu, bir beklenti
+tanýmý görüyoruz, beklentilerin örneklem alarak nasýl hesaplanacaðýný
+biliyoruz! Detaylar için {\em Ýstatistik, Monte Carlo, Entegraller, MCMC}
+yazýsý. $Q(s,a)$'dan örneklem $v_t \sim Q(s,a)$ alýrýz, yani oyunu baþtan
+sonra kadar oynarýz ve skora bakarýz), ve $\theta$ güncellemesi için
+
+$$ \Delta \theta_t = \alpha \nabla_\theta \log \pi_\theta (s_t,a_t)v_t$$
+
+Tabii oyun bir sürü adým $a_1,..,a_n$ sonrasý bitiyor, bu durumda, yani çok
+adýmlý oyunlar için, sondaki ayný kazanç (ya da kaybý) o oyundaki tüm
+adýmlara geriye giderek uyguluyoruz. Güncelleme sonrasý ilke fonksiyonumuz
+deðiþiyor, ve bir oyun daha oynayarak ayný þeyi tekrarlýyoruz. 
+
+
+\inputminted[fontsize=\footnotesize]{python}{cartpole_train.py}
+
+\inputminted[fontsize=\footnotesize]{python}{cartpole_play.py}
+
+\inputminted[fontsize=\footnotesize]{python}{pong.py}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 $h(s,a,\theta) = \phi(s,a)^T\theta$
@@ -80,7 +171,9 @@ Kaynaklar
 
 [1] Géron, {\em Hands-On Machine Learning with Scikit-Learn and TensorFlow}
 
-[2] Bayramli, {\em OpenAI Gym, Pong, Derin Takviyeli Ogrenme},
+[2] Karpathy, {\em Deep Reinforcement Learning: Pong from Pixels}, \url{http://karpathy.github.io/2016/05/31/rl/}
+
+[3] Bayramli, {\em OpenAI Gym, Pong, Derin Takviyeli Ogrenme},
 \url{http://sayilarvekuramlar.blogspot.de/2017/09/openai-gym-pong-derin-takviyeli-ogrenme.html}
 
 \end{document}
