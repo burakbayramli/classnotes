@@ -1,3 +1,4 @@
+# cartpole_play.py - oyunu oyna
 import tensorflow as tf
 import matplotlib.animation as animation
 import gym

@@ -1,3 +1,4 @@
+# pong.py
 import numpy as np
 import gym
 import tensorflow as tf
@@ -75,6 +76,7 @@ tf.initialize_all_variables().run()
 saver = tf.train.Saver(tf.all_variables())
 load_was_success = True 
 try:
+    # mevcut TF ciziti varsa yuklemeye ugras, kaldigi yerden devam icin
     save_dir = '/'.join(save_path.split('/')[:-1])
     ckpt = tf.train.get_checkpoint_state(save_dir)
     load_path = ckpt.model_checkpoint_path
@@ -88,6 +90,9 @@ else:
     episode_number = int(load_path.split('-')[-1])
 
 while True:
+    # oyunu seyretmek icin bir sure egitildikten sonra
+    # alttaki satiri aktif hale getirebiliriz
+    #env.render() 
     cur_x = prepro(observation)
     x = cur_x - prev_x if prev_x is not None else np.zeros(n_obs)
     prev_x = cur_x

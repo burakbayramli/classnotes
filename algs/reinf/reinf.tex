@@ -33,16 +33,17 @@ baðlamýnda, mümkün tüm davranýþlarýn daðýlýmýný verecek.
 
 Peki ilke fonksiyonunu nasýl güncelleriz? Ýlke gradyaný (policy gradient)
 kavramý burada devreye giriyor. Ýlke bir fonksiyondur, bir softmax
-fonksiyonu ile ya da yapay sýnýr aðý ile temsil edilebilir. YSA'lar her
+fonksiyonu ile ya da yapay sinir aðý ile temsil edilebilir. YSA'lar her
 türlü fonksiyonu temsil edebildikleri için sofistike beceri için daha
-tercih ediliyorlar. Güncelleme nasýl olacak? Burada skor fonksiyonunu da
-dahil etmek lazým, optimize etmek istediðimiz bir skor fonksiyonunun
-beklentisinin optimize edilmesi, skor fonksiyonu tabii ki ilke fonksiyonuna
-baðlýdýr, yani skor beklentisi en iyi olacak ilkeyi arýyoruz. Skor $Q$
-olsun. Bu beklentinin gradyanýný istiyoruz, çünkü ilkeyi tanýmlayan
-$\theta$'yi skor baðlamýnda öyle güncelleyeceðiz ki eðer ayný konumu
-tekrar gelmiþ olsak, daha iyi hareketlerle daha iyi skora
-eriþelim. Aradýðýmýz gradyan ($s,a$ yerine kýsaca $x$ kullanalým)
+tercih ediliyorlar (daha önemlisi gradyanlarý otomatik alýnabiliyor, bunun
+niye faydalý olduðunu birazdan göreceðiz). Güncelleme nasýl olacak? Burada
+skor fonksiyonunu da dahil etmek lazým, optimize etmek istediðimiz bir skor
+fonksiyonunun beklentisinin optimize edilmesi, skor fonksiyonu tabii ki
+ilke fonksiyonuna baðlýdýr, yani skor beklentisi en iyi olacak ilkeyi
+arýyoruz. Skor $Q$ olsun. Bu beklentinin gradyanýný istiyoruz, çünkü ilkeyi
+tanýmlayan $\theta$'yi skor baðlamýnda öyle güncelleyeceðiz ki eðer ayný
+konumu tekrar gelmiþ olsak, daha iyi hareketlerle daha iyi skora
+eriþelim. Aradýðýmýz gradyan ($s,a$ yerine kýsaca $x$ kullanalým) [2],
 
 $$ 
 \nabla_\theta E_{x \sim \pi_\theta(x)} [Q(x)] 
@@ -87,54 +88,55 @@ $$
 $$
 
 Eþitliðin sað tarafý bize güzel bir kabiliyet sunmuþ oldu, bir beklenti
-tanýmý görüyoruz, beklentilerin örneklem alarak nasýl hesaplanacaðýný
-biliyoruz! Detaylar için {\em Ýstatistik, Monte Carlo, Entegraller, MCMC}
-yazýsý. $Q(s,a)$'dan örneklem $v_t \sim Q(s,a)$ alýrýz, yani oyunu baþtan
-sonra kadar oynarýz ve skora bakarýz), ve $\theta$ güncellemesi için
+tanýmý görüyoruz, bu hesabý analitik olarak yapmak çok zor olabilir, fakat
+beklentilerin örneklem alarak nasýl hesaplanacaðýný biliyoruz! Detaylar
+için {\em Ýstatistik, Monte Carlo, Entegraller, MCMC} yazýsý. $Q(s,a)$'dan
+örneklem $v_t \sim Q(s,a)$ alýrýz, yani oyunu baþtan sonra kadar oynarýz ve
+skora bakarýz, ve $\theta$ güncellemesi için [5],
 
-$$ \Delta \theta_t = \alpha \nabla_\theta \log \pi_\theta (s_t,a_t)v_t$$
+$$ \Delta \theta_t = \alpha \nabla_\theta \log \pi_\theta (s_t,a_t) v_t$$
 
-Tabii oyun bir sürü adým $a_1,..,a_n$ sonrasý bitiyor, bu durumda, yani çok
-adýmlý oyunlar için, sondaki ayný kazanç (ya da kaybý) o oyundaki tüm
-adýmlara geriye giderek uyguluyoruz. Güncelleme sonrasý ilke fonksiyonumuz
-deðiþiyor, ve bir oyun daha oynayarak ayný þeyi tekrarlýyoruz. 
+Tabii mesela Pong oyunu bir sürü adým $a_1,..,a_n$ sonrasý bitiyor, bu
+durumda en sondaki kazanç (ya da kaybý) o oyundaki tüm adýmlara geriye
+giderek uyguluyoruz. Güncelleme sonrasý ilke fonksiyonumuz deðiþiyor, ve
+bir oyun daha oynayarak ayný þeyi tekrarlýyoruz.
 
+$\pi_\theta (s,a)$'nin ilke fonksiyonu olduðunu söyledik, bu fonksiyon
+sonlu sayýda seçenek üzerinden ayrýksal olasýlýklarý depolayan softmax
+olabilir (detaylar en altta), hatta bir derin yapay sinir aðý
+olabilir. Üstteki formüle göre $\log \pi_\theta (s,a)$'un gradyanýnýn
+gerektiðini görüyoruz, otomatik türev uzerinden bu gradyan DYSA paketinden
+rahatça alýnabilir.
+
+Pong oynamadan önce çubuk dengeleme problemine bakalým [1], kuruluþ, oyun
+açýklamasý için [3]. Bu oyunda konum dört tane sayý üzerinden bildirilir,
+ödül her adýmda anýnda alýnýr (çubuk düþmediyse, ekrandan çýkmadýysa
+baþarý). Komut satýrýndan iþletiriz,
 
 \inputminted[fontsize=\footnotesize]{python}{cartpole_train.py}
 
+Eðitim fazla sürmüyor. Bittikten sonra alttaki kodla sonucu
+görebiliriz. Çubuðun dengeli bir þekilde tutulabildiðini göreceðiz. 
+
 \inputminted[fontsize=\footnotesize]{python}{cartpole_play.py}
+
+Pong oyunu kodu alttadýr. 
 
 \inputminted[fontsize=\footnotesize]{python}{pong.py}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-$h(s,a,\theta) = \phi(s,a)^T\theta$
+Softmax
 
 $$ 
 \pi_\theta(s,a) = \frac{e^{h(s,a,\theta)}}{\sum_b e^{h(s,b,\theta)} }
 $$
 
-Usttekinin log'unun gradyani
+ki $h(s,a,\theta) = \phi(s,a)^T\theta$. Softmax'in kodlamasý ayrýksal
+olarak (bir matriste mesela) her $s,a$ kombinasyonu için gerekli
+aðýrlýklarý tutmak. Bir $\phi$ çaðrýsý sonrai $\theta$ ile bu katsayýlar
+çarpýlýr ve $\theta$ ilkenin ne olduðunu tanýmlar. Softmax durumunda
+otomatik türeve gerek olmadan direk türevi kendimiz hesaplayabiliriz [4].
 
+Ýki üsttekinin log'unun gradyaný
 
 $$ 
 \nabla_\theta \log \pi_\theta = 
@@ -143,14 +145,15 @@ $$
 
 $$ = \nabla_\theta \big[ \log e^{h(s,a,\theta)} - \log \sum_b e^{h(s,b,\theta)}\big]$$
 
-cunku 
+çünkü 
 
 $$ \log(\frac{x}{y}) = \log x - \log y $$
 
 Devam edelim
 
 $$ = \nabla_\theta \big[ h(s,a,\theta) - \log \sum_b e^{h(s,b,\theta)} \big]$$
-Gradyan her iki terime de uygulanir,
+
+Gradyan her iki terime de uygulanýr,
 
 $$ 
 = \phi(s,a) - \sum_b h(s,b,\theta)\frac{e^{h(s,b,\theta)}}{\sum_b e^{h(s,b,\theta)}} 
@@ -160,12 +163,19 @@ $$
 = \phi(s,a) - \sum_b h(s,b,\theta) \pi_\theta(b,s)
 $$
 
+$$ 
+= \phi(s,a) - E_{\pi_\theta} \big[ \phi(s,\cdot) \big]
+$$
 
-
-
-
-
-
+Ýlginç ve ilk bakýþta anlaþýlabilen / akla yatacak (intuitive) bir sonuca
+ulaþtýk. Log gradyaný içinde bulunduðumu konum ve attýðýmýz adým için
+hesaplanan $\phi$'den mevcut atýlabilecek tüm adýmlar üzerinden hesaplanan
+bir $\phi$ ortalamasý çýkartýlmýþ hali. Yani ``bu spesifik $\phi$ normalden
+ne kadar fazla?'' sorusu sormuþ oluyorum, ve gradyanýn gideceði, iyileþtirme
+yönünü bu sayý belirliyor. Yani bir $\phi$ eðer normalden fazla ortaya
+çýkýyorsa ve iyi sonuç alýyorsa (skorla çarpým yaptýðýmýzý unutmayalým),
+ilkeyi o yönde daha fazla güncelliyoruz ki bu baþarýlý sonuçlarý daha fazla
+alabilelim. 
 
 Kaynaklar
 
@@ -175,5 +185,10 @@ Kaynaklar
 
 [3] Bayramli, {\em OpenAI Gym, Pong, Derin Takviyeli Ogrenme},
 \url{http://sayilarvekuramlar.blogspot.de/2017/09/openai-gym-pong-derin-takviyeli-ogrenme.html}
+
+[4] Silver, {\em Monte-Carlo Simulation Balancing},
+\url{http://www.machinelearning.org/archive/icml2009/papers/500.pdf}
+
+[5] Silver, {\em Reinforcement Learning}, \url{http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html}
 
 \end{document}
