@@ -274,14 +274,80 @@ Eðer zaman serisi tahmin etmek istiyorsak $x_1,x_2,..$ serisini alýp bir
 kaydýrarak ona karþýlýk olan ``etiketleri'' kendimiz yaratabiliriz. Bu
 durumda $y_1,y_2,..$ yerine $x_2,x_3,..$ serisi olacaktýr. 
 
-%En Basit RNN
-%Simdi TensorFlow ile en basit RNN'yi kendimiz yaratalim, 
+Bir RNN'in tekrar eden kýsým bir nöron yerine bir katman da olabilir, yani
+bu katman içinde birden fazla nöron olur, ve bu katman zamanda geriye doðru
+kopyalanýr. 
+
+\includegraphics[width=24em]{rnn_06.png}
+
+Þimdi TensorFlow ile en basit RNN'yi kendimiz yaratalým. Tekrar eden bir
+katman olacak, içinde 5 tane nöron,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+def reset_graph(seed=42):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+reset_graph()
+
+n_inputs = 3
+n_neurons = 5
+
+X0 = tf.placeholder(tf.float32, [None, n_inputs])
+X1 = tf.placeholder(tf.float32, [None, n_inputs])
+
+Wx = tf.Variable(tf.random_normal(shape=[n_inputs, n_neurons],dtype=tf.float32))
+Wy = tf.Variable(tf.random_normal(shape=[n_neurons,n_neurons],dtype=tf.float32))
+b = tf.Variable(tf.zeros([1, n_neurons], dtype=tf.float32))
+
+Y0 = tf.tanh(tf.matmul(X0, Wx) + b)
+Y1 = tf.tanh(tf.matmul(Y0, Wy) + tf.matmul(X1, Wx) + b)
+
+init = tf.global_variables_initializer()
+\end{minted}
+
+Þimdi iki veri noktasý verip iki veri noktasý çýktýsýna bakalým. Bu 2-2
+verisinden pek çok olacak, ki bu veriler ufak toptan eðitim (minibatch)
+verimiz. Alttaki ufak toptan eðitim verisinde 4 tane bu tür 2-2 veriler
+var. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+
+# ufak toptan egitim seti
+X0_batch = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 0, 1]]) # t = 0
+X1_batch = np.array([[9, 8, 7], [0, 0, 0], [6, 5, 4], [3, 2, 1]]) # t = 1
+
+with tf.Session() as sess:
+    init.run()
+    Y0_val, Y1_val = sess.run([Y0, Y1], feed_dict={X0: X0_batch, X1: X1_batch})
+
+print 't=0'
+print(Y0_val)
+print 't=1'
+print(Y1_val)
+\end{minted}
 
 
+\begin{verbatim}
+t=0
+[[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
+ [ 0.9977755  -0.71978885 -0.99657625  0.9673925  -0.99989718]
+ [ 0.99999774 -0.99898815 -0.99999893  0.99677622 -0.99999988]
+ [ 1.         -1.         -1.         -0.99818915  0.99950868]]
+t=1
+[[ 1.         -1.         -1.          0.40200216 -1.        ]
+ [-0.12210433  0.62805319  0.96718419 -0.99371207 -0.25839335]
+ [ 0.99999827 -0.9999994  -0.9999975  -0.85943311 -0.9999879 ]
+ [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]
+\end{verbatim}
 
 Zaman Serisi Tahmini
 
-Tensorflow ile zaman serisi tahmini yapalim.
+Tensorflow ile zaman serisi tahmini yapalým.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 np.random.seed(1)
@@ -315,13 +381,6 @@ plt.savefig('rnn_03.png')
 \includegraphics[width=20em]{rnn_03.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import tensorflow as tf
-
-def reset_graph(seed=42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
-    np.random.seed(seed)
-
 reset_graph()
 
 n_steps = 20
