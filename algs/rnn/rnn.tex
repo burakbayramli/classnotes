@@ -84,6 +84,12 @@ geribesleme durumu vardýr, her gizli konum $h_t$ sadece bir önceki
 $h_{t-1}$ deðil ondan önceki tüm gizli konumlardan da etkilenir. O zaman
 eðitimin bunu gözönüne almasý gerekir.
 
+Dikkat: RNN'lerde içiçe geçen fonksiyonlar sebebiyle hatalar ya çok büyüyüp
+ya da çok küçülebiliyor, normal derin YSA'lerde de problem olabilir bu,
+fakat RNN'lerde bu durum daha belirgin çünkü N adým geriye gitmek demek N
+kadar içiçe geçen fonksiyon demek, ve sýralý veriyi tahmin için N'in büyük
+olmasý gerekebilir.
+
 Alttaki kodda bir metin okunarak o metindeki harf sýrasý tahmin edilmeye
 uðraþýlýyor. Metin tekrar sýfýrdan üretilmeye çabalanýyor. Otomatik türev
 (automatic differentiation -AD-) alma ile içiçe geçmiþ fonksiyonlarýn
@@ -251,22 +257,16 @@ print lmm.get('pla')
 [('t', 0.5), ('n', 0.5)]
 \end{verbatim}
 
-Dikkat: RNN'lerde içiçe geçen fonksiyonlar sebebiyle hatalar ya çok büyüyüp
-ya da çok küçülebiliyor, normal derin YSA'lerde de problem olabilir bu,
-fakat RNN'lerde bu durum daha belirgin çünkü N adým geriye gitmek demek N
-kadar içiçe geçen fonksiyon demek, ve sýralý veriyi tahmin için N'in büyük
-olmasý gerekebilir.
-
 RNN Çesitleri, Numaralarý
 
 Ýlla her nöronun çýktýsýný kullanmak gerekmez. Her nöron çýktýsý bir
 sonrakine girdi kabul edildiði için bu çýktýlar RNN'nin bütününü
 etkilerler, fakat illa etiket / düzeltme baðlamýnda direk kullanýlmalarý
 þart deðildir. Mesela bir RNN'e bir veri dizisi verip, çýktýlarýnýn en
-sonuncusu hariç geri kalanlarýný yok sayabiliriz, bu bir dizi-vektör RNN'i
-olur. Mesela RNN'e bir film hakkýndaki tüm yorumlarý kelime kelime veri
-dizisi olarak verebiliriz, RNN çýktýsý -1/+1 þeklinde beðendi / beðenmedi
-skoru olabilir. Altta diyagramý görüyoruz, 
+sonuncusu hariç geri kalanlarýný yok sayabiliriz, o zaman bir dizi-vektör
+RNN'i elde ederiz. Mesela RNN'e bir film hakkýndaki tüm yorumlarý kelime
+kelime veri dizisi olarak verebiliriz, RNN'in tek çýktýsý -1/+1 þeklinde
+beðendi / beðenmedi skoru olabilir. Altta diyagramý görüyoruz,
 
 \includegraphics[width=15em]{rnn_05.png}
 
@@ -310,8 +310,8 @@ init = tf.global_variables_initializer()
 \end{minted}
 
 Þimdi iki veri noktasý verip iki veri noktasý çýktýsýna bakalým. Bu 2-2
-verisinden pek çok olacak, ki bu veriler ufak toptan set (minibatch)
-verimiz. Alttaki ufak veride 4 tane bu tür 2-2 veriler var.
+verisinden pek çok olacak, ki bu veriler ufak toptan setimizi (minibatch)
+oluþturacak. Alttaki ufak veride 4 tane bu tür 2-2 veriler var.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy as np
@@ -344,14 +344,15 @@ t=1
  [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]
 \end{verbatim}
 
-Tabii bu bir eðitim deðil, RNN'e ileri yönde hesap yaptýrdýk, dört kez
+Dikkat, eðitim yapmakdýk, RNN'e ileri yönde hesap yaptýrdýk, dört kez
 $x_0,x_1$ verdik o da bize dört tane $y_0,y_1$ verdi. RNN'i eðitiyor
 olsaydýk üretilen dört $y_0,y_1$ için ``gerçek'' veri, etiketler saðlamamýz
-gerekecekti.
+gerekecekti, onun üzerinden düzeltme yapacaktýk, vs.
 
 Üstteki kod kolaydý, fakat RNN iki yerine 100 zaman adýmý geriye gitsin
-isteseydik, bu çizit çok daha büyük olurdu. Büyük RNN durumlarý için TF'in
-özel çaðrýlarý var, mesela \verb!static_rnn!. 
+isteseydik, bu çizit çok daha büyük olurdu. O tür kodlarý kolaylaþtýrmak
+için TF'in özel çaðrýlarý var, mesela \verb!static_rnn! bunlardan
+biri. Üstteki aðý bu þekilde yaratabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 reset_graph()
