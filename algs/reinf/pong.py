@@ -92,7 +92,7 @@ else:
 while True:
     # oyunu seyretmek icin bir sure egitildikten sonra
     # alttaki satiri aktif hale getirebiliriz
-    #env.render() 
+    # env.render() 
     cur_x = prepro(observation)
     x = cur_x - prev_x if prev_x is not None else np.zeros(n_obs)
     prev_x = cur_x
