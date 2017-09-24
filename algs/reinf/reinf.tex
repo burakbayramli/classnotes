@@ -27,11 +27,12 @@ olunamadýðý durumlar icin bile hazýr oluyor, ve kazandýran ilkeler daha
 yoðun olasýlýklara tekabül ettiði için yine iyi bir oyun oynama becerisine
 kavuþuyor, ve kendini sürekli güncelliyor.
 
-Ýlke $\pi_\theta(a,s)$, oyun konumu (state) $s$ ile, yapýlacak hareket ise
-$a$ ile belirtilir. Pong örneðinde konum tüm oyunun o andaki piksel
-görüntüsü olarak bize bildiriliyor olabilir, hareket ise raketin yukarý mý
-aþaðý mý gideceði; verili konum $s$ için $\pi_\theta(a|s)$ (kazanmak için
-optimallik baðlamýnda) mümkün tüm davranýþlarýn daðýlýmýný verecek.
+Ýlke $\pi_\theta(a,s)$, oyun konumu (state) $s$ ile, yapýlacak hareket
+(action) ise $a$ ile belirtilir. Pong örneðinde konum tüm oyunun o andaki
+piksel görüntüsü olarak bize bildiriliyor olabilir, hareket ise raketin
+yukarý mý aþaðý mý gideceði; verili konum $s$ için $\pi_\theta(a|s)$
+(kazanmak için optimallik baðlamýnda) mümkün tüm davranýþlarýn daðýlýmýný
+verecek.
 
 Peki ilke fonksiyonunu nasýl güncelleriz? Ýlke gradyaný (policy gradient)
 kavramý ile. Ýlke bir fonksiyondur, bir softmax fonksiyonu ile ya da yapay
@@ -48,8 +49,8 @@ skor fonksiyonu tabii ki ilke fonksiyonuna baðlýdýr, yani skor beklentisi
 en iyi olacak ilkeyi arýyoruz. Bu beklentinin gradyanýný istiyoruz, çünkü
 ilkeyi tanýmlayan $\theta$'yi skor baðlamýnda öyle güncelleyeceðiz ki eðer
 ayný konumu tekrar gelmiþ olsak, daha iyi hareketlerle daha iyi skora
-eriþelim. Aradýðýmýz gradyan ($s,a$ yerine kýsaca $x$ kullanalým), skor $Q$
-olsun [2],
+eriþelim. Aradýðýmýz gradyan ($s,a$ yerine kýsaca $x$ kullanalým, skor $Q$
+olsun [2]),
 
 $$ 
 \nabla_\theta E_{x \sim \pi_\theta(x)} [Q(x)] 
@@ -113,18 +114,18 @@ durumda en sondaki kazanç (ya da kaybý) o oyundaki tüm adýmlara geriye
 giderek uyguluyoruz. Güncelleme sonrasý ilke fonksiyonumuz deðiþiyor, ve
 bir oyun daha oynayarak ayný þeyi tekrarlýyoruz.
 
-$\pi_\theta (s,a)$'nin ilke fonksiyonu olduðunu söyledik, bu fonksiyon
-sonlu sayýda seçenek üzerinden ayrýksal olasýlýklarý depolayan softmax
-olabilir (bu durum için gradyan türetmesi altta), hatta bir derin yapay
-sinir aðý olabilir. DYSA durumunda, üstteki formüle göre
-$\log \pi_\theta (s,a)$'un gradyanýnýn gerektiðini görüyoruz, otomatik
-türev uzerinden bu gradyan DYSA paketinden rahatça alýnabilir.
+$\pi_\theta (s,a)$'nin ilke fonksiyonu olduðunu söyledik, bu fonksiyon DYSA
+olabilir, ya da daha basit, sonlu sayýda seçenek üzerinden ayrýksal
+olasýlýklarý depolayan softmax olabilir (bu durum için gradyan türetmesi
+altta). DYSA durumunda üstteki formüle göre $\log \pi_\theta (s,a)$'un
+gradyanýnýn gerektiðini görüyoruz, otomatik türev uzerinden bu gradyan DYSA
+paketinden rahatça alýnabilir.
 
 Pong oyunu kodunu göreceðiz, ama ondan önce daha basit çubuk dengeleme
 problemine bakalým [1], kuruluþ, oyun açýklamasý için [3]. Bir simülasyon
 ortamýndayýz, ve bu ortamda bize bir çubuk veriliyor, ve çubuðun konumu
 dört tane sayý üzerinden bildirilir, ödül her adýmda anýnda alýnýr (çubuk
-düþmediyse, ekrandan çýkmadýysa o anda baþarý). Komut satýrýndan iþletiriz,
+düþmediyse, ekrandan çýkmadýysa o anda baþarý).
 
 \inputminted[fontsize=\footnotesize]{python}{cartpole_train.py}
 
@@ -150,11 +151,12 @@ $$
 \pi_\theta(s,a) = \frac{e^{h(s,a,\theta)}}{\sum_b e^{h(s,b,\theta)} }
 $$
 
-ki $h(s,a,\theta) = \phi(s,a)^T\theta$. Softmax'in kodlamasý için bir çözüm
-ayrýksal olarak (bir matriste mesela) her $s,a$ kombinasyonu için gerekli
+ki $h(s,a,\theta) = \phi(s,a)^T\theta$. Þimdi ilke gradyanýný softmax ile
+nasýl iþletiriz onu görelim. Softmax'in kodlamasý için bir çözüm ayrýksal
+olarak (bir matriste mesela) her $s,a$ kombinasyonu için gerekli
 aðýrlýklarý tutmak. O zaman spesifik bir $\phi$ çaðrýsý sonrasý $\theta$
 ile bu katsayýlar çarpýlýr ve sonuç alýnýr. $\theta$ ilkenin ne olduðunu,
-onun özünü tanýmlar. DYSA durumundan bir fark softmax durumunda otomatik
+onun özünü tanýmlar. DYSA durumundan bir fark softmax için otomatik
 türeve gerek olmadan direk türevi kendimiz hesaplayabiliriz [4]. Üstteki
 formülün log gradyaný
 

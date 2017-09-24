@@ -48,7 +48,9 @@ initializer = tf.contrib.layers.variance_scaling_initializer()
 
 X = tf.placeholder(tf.float32, shape=[None, n_inputs])
 
-hidden = tf.layers.dense(X, n_hidden, activation=tf.nn.elu, kernel_initializer=initializer)
+hidden = tf.layers.dense(X, n_hidden,
+                         activation=tf.nn.elu,
+                         kernel_initializer=initializer)
 logits = tf.layers.dense(hidden, n_outputs)
 outputs = tf.nn.sigmoid(logits)  # probability of action 0 (left)
 p_left_and_right = tf.concat(axis=1, values=[outputs, 1 - outputs])

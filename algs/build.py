@@ -14,13 +14,6 @@ if len(sys.argv) == 1:
     ./huff/huff.pdf \
     ./id3/id3.pdf \
     ./knn/knn.pdf \
-    ./mlp/mlp.pdf \
-    ./convnet/convnet.pdf \
-    ./autodiff/autodiff.pdf \
-    ./tensorflow/tensorflow.pdf \
-    ./rnn/rnn.pdf \
-    ./lstm/lstm.pdf \
-    ./reinf/reinf.pdf \
     ./enc/enc.pdf \
     ./kmeans/kmeans.pdf \
     ./kmeans_mr/kmeans_mr.pdf \
@@ -30,7 +23,13 @@ if len(sys.argv) == 1:
     ./mesquita/mesquita.pdf \
     ./rsa/rsa.pdf \
     ./street/street.pdf \
-    ./phd/phd.pdf \
+    ./mlp/mlp.pdf \
+    ./convnet/convnet.pdf \
+    ./autodiff/autodiff.pdf \
+    ./tensorflow/tensorflow.pdf \
+    ./rnn/rnn.pdf \
+    ./lstm/lstm.pdf \
+    ./reinf/reinf.pdf \
     ./zapp/zapp.pdf \
     output ../../Dropbox/Public/skfiles/algs.pdf"
     os.system(cmd)
