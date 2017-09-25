@@ -1,12 +1,15 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Derin Ogrenme ile Dogal Dil Islemek (Natural Language Processing)
+Derin Öðrenme ile Doðal Dil Ýþlemek (Natural Language Processing)
 
 \begin{minted}[fontsize=\footnotesize]{python}
+from tensorflow.contrib import learn
 import numpy as np
 import data_helpers
 
-x_text, y = data_helpers.load_data_and_labels("./data/rt-polaritydata/rt-polarity.pos", "./data/rt-polaritydata/rt-polarity.neg")
+nfin = "./data/rt-polarity.pos"
+pfin = "./data/rt-polarity.neg"
+x_text, y = data_helpers.load_data_and_labels(nfin, pfin)
 
 max_document_length = max([len(x.split(" ")) for x in x_text])
 print max_document_length
@@ -51,14 +54,13 @@ Train/Dev split: 2133/8529
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
-from tensorflow.contrib import learn
 from tensorflow.python.framework import ops
 
 ops.reset_default_graph()
 sess = tf.Session()
 
-print('Creating Model')
-embeddings = tf.Variable(tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0))
+ru = tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0)
+embeddings = tf.Variable(ru)
 
 A = tf.Variable(tf.random_normal(shape=[embedding_size,1]))
 b = tf.Variable(tf.random_normal(shape=[1,1]))
@@ -70,7 +72,9 @@ embed = tf.nn.embedding_lookup(embeddings, x_data)
 embed_avg = tf.reduce_mean(embed, 1)
 model_output = tf.add(tf.matmul(embed_avg, A), b)
 
-loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=model_output, labels=y_target))
+s = tf.nn.sigmoid_cross_entropy_with_logits(logits=model_output,\
+                                            labels=y_target)
+loss = tf.reduce_mean(s)
 prediction = tf.round(tf.sigmoid(model_output))
 predictions_correct = tf.cast(tf.equal(prediction, y_target), tf.float32)
 accuracy = tf.reduce_mean(predictions_correct)
@@ -81,22 +85,57 @@ train_step = my_opt.minimize(loss)
 init = tf.initialize_all_variables()
 sess.run(init)
 
-for i in range(2):
-    d = feed_dict={x_data: x_train[i].reshape(1,56), y_target: y_train[i]}
-    print y_train[i]
-    #train_loss_temp = sess.run(loss, d)
+bsize = 10
+epochs = 1
+batches = data_helpers.batch_iter(list(zip(x_train, y_train)), bsize, epochs)
+for i,batch in enumerate(batches):
+    x_batch, y_batch = zip(*batch)
+    x_batch = np.array(x_batch).reshape(len(x_batch),max_document_length)
+    y_batch = np.array(y_batch).reshape(len(y_batch),2)
+    y_batch = (y_batch[:,0]==1.0).astype(np.float).reshape(len(y_batch),1)
+    y_dev = (y_dev[:,0]==1.0).astype(np.float).reshape(len(y_dev),1)
+    d = feed_dict={x_data: x_batch, y_target: y_batch}
+    train_loss_temp = sess.run(loss, d)
+    if (i % 10) == 0: 
+        train_loss = sess.run(loss, feed_dict={x_data: x_batch, y_target: y_batch})
+        dev_loss = sess.run(loss, feed_dict={x_data: x_dev, y_target: y_dev})
+        print i, train_loss, dev_loss
 \end{minted}
 
 \begin{verbatim}
-Creating Model
-[1 0]
-[1 0]
+0 2.28847 1.88862
+10 3.12275 1.88862
+20 3.10507 1.88862
+30 1.33238 1.88862
+40 2.73603 1.88862
+50 1.76815 1.88862
+60 1.83537 1.88862
+70 1.31739 1.88862
+80 2.61372 1.88862
+90 2.77177 1.88862
+100 1.24895 1.88862
+110 1.79147 1.88862
+120 2.00614 1.88862
+130 2.78075 1.88862
+140 1.9286 1.88862
+150 2.35567 1.88862
+160 1.95311 1.88862
+170 0.973448 1.88862
+180 1.18998 1.88862
+190 1.85658 1.88862
+200 1.68493 1.88862
+210 1.56208 1.88862
 \end{verbatim}
 
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+print x_dev.shape
+\end{minted}
 
-
+\begin{verbatim}
+(8529, 56)
+\end{verbatim}
 
 
 
