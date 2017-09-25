@@ -1,3 +1,5 @@
+# sudo pip install keras==2.0.8
+# sudo pip install theano
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf

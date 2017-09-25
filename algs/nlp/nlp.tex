@@ -2,6 +2,35 @@
 \begin{document}
 Derin Ogrenme ile Dogal Dil Islemek (Natural Language Processing)
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+import numpy as np
+import data_helpers
+from tensorflow.contrib import learn
+from tensorflow.python.framework import ops
+
+ops.reset_default_graph()
+sess = tf.Session()
+
+x_text, y = data_helpers.load_data_and_labels("./data/rt-polaritydata/rt-polarity.pos", "./data/rt-polaritydata/rt-polarity.neg")
+
+max_document_length = max([len(x.split(" ")) for x in x_text])
+print max_document_length
+print x_text[:4]
+vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
+x = np.array(list(vocab_processor.fit_transform(x_text)))
+
+np.random.seed(10)
+shuffle_indices = np.random.permutation(np.arange(len(y)))
+x_shuffled = x[shuffle_indices]
+y_shuffled = y[shuffle_indices]
+
+dev_sample_index = -1 * int(0.80 * float(len(y)))
+x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
+print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+\end{minted}
 
 
 
