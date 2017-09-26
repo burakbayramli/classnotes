@@ -72,10 +72,8 @@ sess = tf.InteractiveSession()
 init = tf.global_variables_initializer()
 sess.run(init)
 
-print correct_prediction.eval({x: test_x, y: test_y})
-
 # Train for a number of epochs
-training_epochs = 3000
+training_epochs = 5000
 for epoch in range(training_epochs):
     sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
 
