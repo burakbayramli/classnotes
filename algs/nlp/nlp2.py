@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 import tensorflow as tf
 import numpy as np
 import data_helpers
@@ -15,19 +14,15 @@ print("")
 print("Loading data...")
 x_text, y = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
 
-# Build vocabulary
 max_document_length = max([len(x.split(" ")) for x in x_text])
 vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 x = np.array(list(vocab_processor.fit_transform(x_text)))
 
-# Randomly shuffle data
 np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
 x_shuffled = x[shuffle_indices]
 y_shuffled = y[shuffle_indices]
 
-# Split train/test set
-# TODO: This is very crude, should use cross-validation
 dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
 x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
@@ -49,8 +44,8 @@ dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 l2_loss = tf.constant(0.0)
 
 W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_),
-                                   FLAGS.embedding_dim], -1.0, 1.0),
-                name="W")
+                                   FLAGS.embedding_dim], -1.0, 1.0))
+
 embedded_chars = tf.nn.embedding_lookup(W, input_x)
 embedded_chars_expanded = tf.expand_dims(embedded_chars, -1)
 
@@ -68,8 +63,7 @@ for i, filter_size in enumerate(filter_sizes):
     h = tf.nn.relu(tf.nn.bias_add(conv, b))
 
     pooled = tf.nn.max_pool(
-        h,
-        ksize=[1, sequence_length - filter_size + 1, 1, 1],
+        h, ksize=[1, sequence_length - filter_size + 1, 1, 1],
         strides=[1, 1, 1, 1],
         padding='VALID',
         name="pool")
