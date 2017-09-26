@@ -124,12 +124,16 @@ for i,batch in enumerate(batches):
         input_y: y_batch,
         dropout_keep_prob: FLAGS.dropout_keep_prob
     }
+    sess.run(train_op, feed_dict)
     if (i % 10) == 0:
+        feed_dict2 = {
+            input_x: x_dev,
+            input_y: y_dev,
+            dropout_keep_prob: FLAGS.dropout_keep_prob
+        }
         train_acc = sess.run(accuracy, feed_dict)
-        test_acc = sess.run(accuracy, feed_dict)
+        test_acc = sess.run(accuracy, feed_dict2)
         print train_acc, test_acc
-    else:
-        sess.run(train_op, feed_dict)
 
 
 
