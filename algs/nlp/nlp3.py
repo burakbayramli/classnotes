@@ -58,26 +58,20 @@ with tf.Graph().as_default():
         dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
         l2_loss = tf.constant(0.0)
-        with tf.device('/cpu:0'), tf.name_scope("embedding"):
-            W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_), FLAGS.embedding_dim], -1.0, 1.0),
-                            name="W")
-            embedded_chars = tf.nn.embedding_lookup(W, input_x)
-            embedded_chars_expanded = tf.expand_dims(embedded_chars, -1)
+        W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_), FLAGS.embedding_dim], -1.0, 1.0))
+        embedded_chars = tf.nn.embedding_lookup(W, input_x)
+        embedded_chars_expanded = tf.expand_dims(embedded_chars, -1)
 
 
 
         #####################################################3
 
-
-
             
-        # Initialize all variables
         sess.run(tf.global_variables_initializer())
 
-        # Generate batches
         batches = data_helpers.batch_iter(
             list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
-        # Training loop. For each batch...
+
         for batch in batches:
             x_batch, y_batch = zip(*batch)
             feed_dict = {
