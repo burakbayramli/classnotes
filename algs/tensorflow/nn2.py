@@ -6,8 +6,9 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 
 np.random.seed(0)
+tf.set_random_seed(0)
 data = pd.read_csv("iris.data", sep=",",names=["sepal_length", "sepal_width", "petal_length", "petal_width", "iris_class"])
-data = data.sample(frac=1).reset_index(drop=True)
+data = data.sample(frac=1,random_state=0).reset_index(drop=True)
 all_x = data[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
 min_max_scaler = preprocessing.MinMaxScaler()
 all_x = min_max_scaler.fit_transform(all_x)
@@ -54,7 +55,7 @@ init = tf.global_variables_initializer()
 sess.run(init)
 
 # Train for a number of epochs
-training_epochs = 3000
+training_epochs = 2000
 for epoch in range(training_epochs):
     sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
 
