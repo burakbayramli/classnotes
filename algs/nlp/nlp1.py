@@ -1,4 +1,4 @@
-# nlp1.py
+# nlp2.py
 import tensorflow as tf
 import numpy as np
 import data_helpers
@@ -35,25 +35,59 @@ tf.reset_default_graph()
 num_classes=y_train.shape[1]
 sequence_length=x_train.shape[1]
 num_filters=FLAGS.num_filters
-filter_sizes=list(map(int, FLAGS.filter_sizes.split(",")))
-l2_reg_lambda=0.0
 
 input_x = tf.placeholder(tf.int32, [None, sequence_length])
 input_y = tf.placeholder(tf.float32, [None, num_classes])
 
 W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_),
                                    FLAGS.embedding_dim], -1.0, 1.0))
+ec = tf.nn.embedding_lookup(W, input_x)
+embed = tf.contrib.layers.flatten(ec)
 
-embedded_chars = tf.nn.embedding_lookup(W, input_x)
-embedded_chars_expanded = tf.expand_dims(embedded_chars, -1)
-
-prediction = tf.contrib.layers.fully_connected(inputs=embedded_chars_expanded,
+scores = tf.contrib.layers.fully_connected(inputs=embed,
                                                num_outputs=2, 
                                                activation_fn=tf.nn.softmax)
 
-cost = tf.losses.softmax_cross_entropy(onehot_labels=y,logits=prediction)
+predictions = tf.argmax(scores, 1)
 
-optimizer = tf.train.AdagradOptimizer(0.01).minimize(cost)
+losses = tf.nn.softmax_cross_entropy_with_logits(logits=scores, labels=input_y)
 
+loss = tf.reduce_mean(losses) 
 
-        
+correct_predictions = tf.equal(predictions, tf.argmax(input_y, 1))
+
+accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"))
+
+global_step = tf.Variable(0, trainable=False)
+
+optimizer = tf.train.AdamOptimizer(1e-3)
+
+grads_and_vars = optimizer.compute_gradients(loss)
+
+train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
+
+sess = tf.Session()
+
+sess.run(tf.global_variables_initializer())
+
+batches = data_helpers.batch_iter(
+    list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
+
+saver = tf.train.Saver(tf.global_variables())
+
+for i,batch in enumerate(batches):
+    x_batch, y_batch = zip(*batch)
+    feed_dict = {
+        input_x: x_batch,
+        input_y: y_batch
+    }
+    sess.run(train_op, feed_dict)
+    if (i % 30) == 0:
+        feed_dict2 = {
+            input_x: x_dev,
+            input_y: y_dev
+        }
+        train_acc = sess.run(accuracy, feed_dict)
+        test_acc = sess.run(accuracy, feed_dict2)
+        print train_acc, test_acc
+
