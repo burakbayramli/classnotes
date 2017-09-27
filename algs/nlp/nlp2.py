@@ -38,9 +38,9 @@ num_filters=FLAGS.num_filters
 filter_sizes=list(map(int, FLAGS.filter_sizes.split(",")))
 l2_reg_lambda=0.0
 
-input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
-input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
-dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
+input_x = tf.placeholder(tf.int32, [None, sequence_length])
+input_y = tf.placeholder(tf.float32, [None, num_classes])
+dropout_keep_prob = tf.placeholder(tf.float32)
 
 l2_loss = tf.constant(0.0)
 
@@ -112,6 +112,8 @@ sess.run(tf.global_variables_initializer())
 batches = data_helpers.batch_iter(
     list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
 
+saver = tf.train.Saver(tf.global_variables())
+
 for i,batch in enumerate(batches):
     x_batch, y_batch = zip(*batch)
     feed_dict = {
@@ -120,7 +122,7 @@ for i,batch in enumerate(batches):
         dropout_keep_prob: FLAGS.dropout_keep_prob
     }
     sess.run(train_op, feed_dict)
-    if (i % 10) == 0:
+    if (i % 20) == 0:
         feed_dict2 = {
             input_x: x_dev,
             input_y: y_dev,
@@ -129,6 +131,7 @@ for i,batch in enumerate(batches):
         train_acc = sess.run(accuracy, feed_dict)
         test_acc = sess.run(accuracy, feed_dict2)
         print train_acc, test_acc
+        path = saver.save(sess, "/home/burak/Downloads/scikit-data/models/nlpembed")
 
 
 

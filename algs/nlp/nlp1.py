@@ -38,8 +38,8 @@ num_filters=FLAGS.num_filters
 filter_sizes=list(map(int, FLAGS.filter_sizes.split(",")))
 l2_reg_lambda=0.0
 
-input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
-input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
+input_x = tf.placeholder(tf.int32, [None, sequence_length])
+input_y = tf.placeholder(tf.float32, [None, num_classes])
 
 W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_),
                                    FLAGS.embedding_dim], -1.0, 1.0))
@@ -47,7 +47,13 @@ W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_),
 embedded_chars = tf.nn.embedding_lookup(W, input_x)
 embedded_chars_expanded = tf.expand_dims(embedded_chars, -1)
 
+prediction = tf.contrib.layers.fully_connected(inputs=embedded_chars_expanded,
+                                               num_outputs=2, 
+                                               activation_fn=tf.nn.softmax)
 
+cost = tf.losses.softmax_cross_entropy(onehot_labels=y,logits=prediction)
+
+optimizer = tf.train.AdagradOptimizer(0.01).minimize(cost)
 
 
         

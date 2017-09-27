@@ -744,12 +744,13 @@ Loss = 0.528585
 
 Çoklu Kategori Hedefi
 
-Çiçeklerin ölçümleri ve çiçek çeþitlerini içeren ünlü ÝRÝS veri setinde 4
+Çiçeklerin ölçümleri ve çiçek çeþitlerini içeren ünlü IRIS veri setinde 4
 boyutlu sayýsal veri ile 3 çiçek çeþidi arasýnda softmax ile seçim yapacak
 bir kodu görelim. Bu kodda tamamen tamamen baðlanmýþ katman
 (fully-connected layer) hesabýný elle deðil, TF çaðrýsý
-\verb!tf.contrib.layers.fully_connected! ile yapýyoruz. Ýlk önce bir tane
-tamamen baðlanmýþ kaman içeren bir kod görelim,
+\verb!tf.contrib.layers.fully_connected! ile yapýyoruz. 
+
+Ýlk önce sadece tek tamamen baðlanmýþ katman içeren bir kod görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -811,12 +812,11 @@ print("Dogruluk:", accuracy.eval({x: test_x, y: test_y}))
 (120, 3)
 (30, 4)
 (30, 3)
-(Dogruluk:', 0.76666665)
+('Dogruluk:', 0.76666665)
 \end{verbatim}
 
-Simdi sirasiyla 10,20,10 olacak sekilde 3 katmanli bir YSA ile 3 kategori
-arasinda siniflama yapalim,
-
+Þimdi sýrasýyla 10,20,10 olacak þekilde üç katmanlý bir YSA ile sýnýflama
+yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 tf.reset_default_graph()
@@ -826,24 +826,23 @@ learning_rate = 0.01
 x = tf.placeholder(tf.float32, [None, np.shape(train_x)[1]], name="x")
 y = tf.placeholder(tf.float32, [None, np.shape(train_y)[1]], name="y")
 
-h1 = 10
-h2 = 20
-h3 = 10
+h1 = 10 # 1. gizli (hidden) katman
+h2 = 20 # 2. gizli katman
+h3 = 10 # 3. gizli katman
 
-fully_connected1 = tf.contrib.layers.fully_connected(inputs=x,
-                                                     num_outputs=h1, 
-                                                     activation_fn=tf.nn.relu)
+k1 = tf.contrib.layers.fully_connected(inputs=x,
+                                       num_outputs=h1, 
+                                       activation_fn=tf.nn.relu)
 
-fully_connected2 = tf.contrib.layers.fully_connected(inputs=fully_connected1,
-                                                     num_outputs=h2, 
-                                                     activation_fn=tf.nn.relu)
+k2 = tf.contrib.layers.fully_connected(inputs=k1,
+                                       num_outputs=h2, 
+                                       activation_fn=tf.nn.relu)
 
-fully_connected3 = tf.contrib.layers.fully_connected(inputs=fully_connected2,
-                                                     num_outputs=h3, 
-                                                     activation_fn=tf.nn.relu)
+k3 = tf.contrib.layers.fully_connected(inputs=k2,
+                                       num_outputs=h3, 
+                                       activation_fn=tf.nn.relu)
 
-
-prediction = tf.contrib.layers.fully_connected(inputs=fully_connected3,
+prediction = tf.contrib.layers.fully_connected(inputs=k3,
                                                num_outputs=np.shape(train_y)[1], 
                                                activation_fn=tf.nn.softmax)
 
@@ -869,7 +868,7 @@ print("Dogruluk:", accuracy.eval({x: test_x, y: test_y}))
 \end{minted}
 
 \begin{verbatim}
-(Dogruluk:', 0.96666664)
+('Dogruluk:', 0.96666664)
 \end{verbatim}
 
 Kaynaklar 
