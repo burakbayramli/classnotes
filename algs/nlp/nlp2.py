@@ -78,8 +78,7 @@ h_drop = tf.nn.dropout(h_pool_flat, dropout_keep_prob)
 
 l2_loss = tf.constant(0.0)
 
-W = tf.get_variable("W",shape=[num_filters_total, num_classes],
-                    initializer=tf.contrib.layers.xavier_initializer())
+W = tf.Variable(tf.random_normal(shape=[num_filters_total, num_classes]))
 
 b = tf.Variable(tf.constant(0.1, shape=[num_classes]))
 
@@ -107,6 +106,7 @@ grads_and_vars = optimizer.compute_gradients(loss)
 train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
 
 sess = tf.Session()
+
 sess.run(tf.global_variables_initializer())
 
 batches = data_helpers.batch_iter(
@@ -122,7 +122,7 @@ for i,batch in enumerate(batches):
         dropout_keep_prob: FLAGS.dropout_keep_prob
     }
     sess.run(train_op, feed_dict)
-    if (i % 20) == 0:
+    if (i % 10) == 0:
         feed_dict2 = {
             input_x: x_dev,
             input_y: y_dev,
