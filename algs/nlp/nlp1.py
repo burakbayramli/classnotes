@@ -3,17 +3,15 @@ import tensorflow as tf
 import numpy as np
 import data_helpers
 from tensorflow.contrib import learn
-import constants
 
-FLAGS = tf.flags.FLAGS
-FLAGS._parse_flags()
-print("\nParameters:")
-for attr, value in sorted(FLAGS.__flags.items()):
-    print("{}={}".format(attr.upper(), value))
-print("")
+dev_sample_percentage = .1
+positive_data_file = "./data/rt-polarity.pos"
+negative_data_file = "./data/rt-polarity.neg"
+embedding_dim = 120
+batch_size = 40
+num_epochs = 200
 
-print("Loading data...")
-x_text, y = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
+x_text, y = data_helpers.load_data_and_labels(positive_data_file, negative_data_file)
 
 max_document_length = max([len(x.split(" ")) for x in x_text])
 vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
@@ -24,7 +22,7 @@ shuffle_indices = np.random.permutation(np.arange(len(y)))
 x_shuffled = x[shuffle_indices]
 y_shuffled = y[shuffle_indices]
 
-dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
+dev_sample_index = -1 * int(dev_sample_percentage * float(len(y)))
 x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
 print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
@@ -34,19 +32,20 @@ tf.reset_default_graph()
 
 num_classes=y_train.shape[1]
 sequence_length=x_train.shape[1]
-num_filters=FLAGS.num_filters
 
 input_x = tf.placeholder(tf.int32, [None, sequence_length])
 input_y = tf.placeholder(tf.float32, [None, num_classes])
 
 W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_),
-                                   FLAGS.embedding_dim], -1.0, 1.0))
+                                   embedding_dim], -1.0, 1.0))
+
 ec = tf.nn.embedding_lookup(W, input_x)
+
 embed = tf.contrib.layers.flatten(ec)
 
 scores = tf.contrib.layers.fully_connected(inputs=embed,
-                                               num_outputs=2, 
-                                               activation_fn=tf.nn.softmax)
+                                           num_outputs=2, 
+                                           activation_fn=tf.nn.softmax)
 
 predictions = tf.argmax(scores, 1)
 
@@ -70,8 +69,9 @@ sess = tf.Session()
 
 sess.run(tf.global_variables_initializer())
 
-batches = data_helpers.batch_iter(
-    list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
+batches = data_helpers.batch_iter(list(zip(x_train, y_train)),\
+                                  batch_size,\
+                                  num_epochs)
 
 saver = tf.train.Saver(tf.global_variables())
 
