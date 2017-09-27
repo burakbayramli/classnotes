@@ -19,7 +19,7 @@ $$ f(z) = \frac{1}{1 + \exp(-z)}$$
 
 ki $w$ aðýrlýk deðerlerinin taþýyan bir vektördür. Sigmoid seçiminin bir
 diðer sebebi türevinin rahat alýnabilmesi. Alternatif fonksiyonlar $\tanh$
-olabilirdi, ya da düzeltilmiþ lineer ünite (rectified linear ünit -ReLu-)
+olabilirdi, ya da düzeltilmiþ lineer ünite (rectified linear unit -ReLu-)
 fonksiyonlarý. ReLu'lar YSA'larýn uzantýsý Derin Öðrenim'de oldukca popüler
 oldu, tanýmý
 
@@ -37,31 +37,34 @@ gelir, mesela 2. katman aktivasyonu $f_2$ olsun, 1. gizli katman çýktýsý
 
 $$ f_2 (W_1x + b) $$
 
-Girdi $4 \times 1$, aðýrlýk $W_1$ boyutu  $3 \times 4$, o zaman çarpým $3
-\times 1$ olacak, $f_2$ uygulanýnca boyut deðiþmez (her öge üzerinde ayný
-fonksiyon iþletiliyor) sonuç $3 \times 1$, bu da zaten 2. katmana giren
-(sonra oradan sonraki katmana çýkan) hesap. Üstteki diyagramda yanlýlýk
-(bias) ayrý bir nöron olarak eklenmiþ, ama bazen bu yapýlmayabiliyor.
+Girdi $4 \times 1$, aðýrlýk $W_1$ boyutu $3 \times 4$, o zaman çarpým
+$3 \times 1$ olacak, $f_2$ uygulanýnca boyut deðiþmez (her öge üzerinde
+ayný fonksiyon iþletiliyor) sonuç $3 \times 1$, bu da zaten 2. katmana
+giren (sonra oradan sonraki katmana çýkan) hesap. Üstteki diyagramda
+yanlýlýk (bias) ayrý bir nöron olarak eklenmiþ (bazen bu yapýlmayabiliyor).
 
-Iki gizli seviyesi (hidden layer) olan bir YSA,
+Ýki gizli seviyesi (hidden layer) olan bir YSA,
 
 \includegraphics[height=6cm]{mlp_05.png}
 
 Görüldüðü gibi çok seviyeli durumda bir seviyenin çýktýsý bir diðer
 seviyenin girdisi haline geliyor. YSA'lar denetimli (supervised) þekilde
-eðitilirler. Elde $x_i,y_i$ veri noktalarý vardýr, ve her (potansiyel) çok
-boyutlu $x_i$ yine (potansiyel) çok boyutlu $y_i$ ile eþlidir. Aynen
+eðitilirler. Elde $x_i,y_i$ veri noktalarý vardýr, ve her bir ya da çok
+boyutlu $x_i$ yine bir ya da çok boyutlu $y_i$ ile eþlidir. Aynen
 regresyonda olduðu gibi bu veri çiftlerini alýrýz ve onlarý en iyi temsil
-eden YSA'yý eðitmek için kullanýrýz. Eðitim tamamlandýðýnda $w_i$
-aðýrlýklarý belli deðerlere sahip olurlar, ve eldeki ``model'' bu
-aðýrlýklardýr. Yeni bir veri noktasý verildiðinde o veri noktasý aðýrlýklar
-$w_i$'lar ile çarpýlýp, toplanýp üstte görülen fonksiyonlara geçilip tüm
-sonuçlar biraraya getirilir, ve çýktý deðeri böyle hesaplanýr.
+eden YSA'yý eðitmek için kullanýrýz. Eðitim tamamlandýðýnda $i$
+katmanýndaki $W_i$ aðýrlýklarý belli deðerlere sahip olurlar, ve eldeki
+``model'' bu aðýrlýklardýr. Yeni bir veri noktasý verildiðinde o veri
+noktasý aðýrlýklar her katmanýn $W_i$'sý ile çarpýlýp, toplanýp, aktivasyon
+fonksiyonlarýna geçilip, tüm katmanlardan bu þekilde geçirildikten sonra en
+sondaki çýktý deðerine eriþilir.
 
 Yanlýlýk taþýmayan þekilde að yapýsý görelim ve matris çarpýmý ile tüm
 girdileri /  çýktýlarý gösterelim,
 
 \includegraphics[width=30em]{nn_nobias.PNG}
+
+$$ Girdi = x_0$$
 
 $$ x_1 = f_1(W_1x_0)$$
 
@@ -71,11 +74,12 @@ $$ Çýktý = f_3(W_3x_2) $$
 
 Aktivasyon için $f_1,f_2,f_3$ ReLu ya da sigmoid seçilebilir.
 
-Ýki gizli seviyeli YSA'larýn evrensel yaklaþýklayýcý (universal
-approximator) olduðu iddia edilir, yani üstteki gibi yeterince çetrefil bir
-YSA her türlü fonksiyonu yaklaþýk olarak temsil edebilir. Ýþin tarihine
-gidersek, ilk baþta tek seviyeli YSA vardý, fakat XOR fonksiyonunu baþarýlý
-þekilde temsil edemedi. Gizli (tek) seviyeli olan bunu baþardý.
+Ýki gizli seviyesi olan (ve yeterince sayýda nöron içeren) YSA'nýn evrensel
+yaklaþýklayýcý (universal approximator) olduðu iddia edilir, yani üstteki
+gibi yeterince çetrefil bir YSA her türlü fonksiyonu yaklaþýk olarak temsil
+edebilir. Ýþin tarihine gidersek, ilk baþta tek seviyeli YSA vardý, fakat
+XOR fonksiyonunu baþarýlý þekilde temsil edemedi. Gizli (tek) seviyeli olan
+bunu baþardý.
 
 YSA'lar imaj tanýma alanýnda bolca kullanýlmýþtýr. Bir imajda, mesela sayý
 tanýma uygulamasýnda, alttaki gibi pek çok resimler olabilir,
@@ -86,17 +90,16 @@ tanýma uygulamasýnda, alttaki gibi pek çok resimler olabilir,
 Bir imaj nihayetinde o resmi temsil eden gri deðerlerin olduðu bir
 matristen ibarettir. YSA'ya girdi olmasý için matris genelde düzleþtirilir,
 ve tek bir vektör olarak verilir, 8x8 matris 64x1 vektörü olur, girdi 64
-boyutlu bir $x_i$ çýktý ise tek boyutlu 0,1,2,..,9 gibi etiketler.. Bazen
-çýktýlar ikisel olarak modellenmek istenebilir, o zaman 0,..,9 yerine
-onlarýn ikisel bazdaki halleri kullanýlýrdý, 4 bit yeterli, 9 sayýsý ikisel
-olarak 1001'dir, o zaman çýktý $y_i$ dört boyutlu modellenir.
+boyutlu bir $x_i$ çýktý ise tek boyutlu 0,1,2,..,9 gibi
+etiketler.. Çoðunlukla bu tür kategorik çýktýlar ikisel olarak modellenir,
+0,..,9 yerine 10 öðeli bir ikisel vektör alýnýr, 9. öðesi 1 diðerleri 0 yapýlýr.
 
 YSA'lar nasýl eðitilir? Eldeki $x_i,y_i$ çiftleri YSA'ya verilir, her $x_i$
 önce tahmin için kullanýlýr, ve bir YSA'nýn tahmin ettiðine, bir de gerçek
 veriye bakýlýr. Bu fark, hata, YSA'nýn düzeltilmesi / iyileþtirilmesi için
 kullanýlýr, burada geriye yayýlým (backpropagation -backprop-) adlý bir
-teknik var. YSA içinde, üstte gördüðümüz gibi, en üst seviyeden baþlayarak
-dibe gidecek þekilde, fonksiyonlar, fonksiyonlarýn fonksiyonlarý þeklinde
+teknik var. YSA içinde, üstte gördüðümüz gibi, sol seviyeden baþlayarak
+saða gidecek þekilde, fonksiyonlar, fonksiyonlarýn fonksiyonlarý þeklinde
 çetrefil bir yapý var. Backprop elde hatayý alýp YSA'daki tüm nöronlarýn
 aðýrlýklarýný bu hataya göre düzeltilmesini, düzelmenin ``yayýlmasýný''
 saðlar [1,2]. Bu iþlem ardý ardýna, farklý her döngüde tekrarlanýr, bir
@@ -107,7 +110,7 @@ Formüller ve Kod
 
 \includegraphics[width=35em]{mlp_07.png}
 
-Backprop'un genel bir resmi üstte: a) Eðitim verisi ileri yönde (solda
+Backprop'un genel bir resmi üstte: a) Eðitim verisi ileri yönde (soldan
 saða) YSA'ya veriliyor, ve bu veri her nokta için, o anda sahip olunan
 aðýrlýklara göre bir tahmin üretiyor. b) Eðitim verisindeki beklenen ve
 tahmin edilen deðerler arasýndaki hata hesaplanýyor c) Hata YSA'ya ``geri
