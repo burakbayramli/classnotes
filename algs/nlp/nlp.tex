@@ -1,20 +1,20 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Derin Öðrenme ile Doðal Dil Ýþlemek (Natural Language Processing)
+Derin Öðrenme ile Doðal Dil Ýþlemek (Natural Language Processing -NLP-)
 
 Doküman sýnýflamak, bir film için yazýlmýþ yorumu beðendi / beðenmedi
 þeklinde irdelemek; tüm bu iþlemler doðal dil iþlemek kategorisine girer,
-ve derin yapay sinir aðlarý (DYSA) ile halledilebilirler. 
+ve derin yapay sinir aðlarý (DYSA) bu alanda kullanýlabilir.
 
 Doküman nasýl temsil edilir? 
 
-Doküman kelimelerden oluþur, fakat bir kelime temel olarak sayýsal deðil
-kategoriktir, DYSA kullanmak için kelimelerin sayýsallaþtýrýlmasý
-lazým. Bir çözüm öne-hot kodlamasý, tüm dokümanlardaki tüm kelimeler ön bin
-kelimelik bir ``sözlükten'' geliyorsa, her kelime için ön bin boyutunda bir
-vektör yaratýrýz, bu vektörde kelimelerin yerleri önceden bellidir, ``cat
-(kedi)'' kelimesi mesela 300. indis, o zaman ``cat'' kelimesini temsil için
-10,000 büyüklüðündeki bir vektörün 300. öðesi 1 diðer 9999 ögesi 0 olur.
+Doküman kelimelerden oluþur, fakat kelimeler sayýsal deðil kategorik
+þeyler, DYSA kullanmak için kelimelerin sayýsallaþtýrýlmasý lazým. Bir
+çözüm one-hot kodlamasý, tüm dokümanlardaki tüm kelimeler on bin kelimelik
+bir ``sözlükten'' geliyorsa, her kelime için on bin boyutunda bir vektör
+yaratýrýz, bu vektörde kelimelerin yerleri önceden bellidir, ``cat (kedi)''
+kelimesi mesela 300. indis, o zaman ``cat'' kelimesini temsil için 10,000
+büyüklüðündeki bir vektörün 300. öðesi 1 diðer 9999 ögesi 0 olur.
 
 Bu temsil þekli biraz israflý degil mi? Ayrýca kelimeler arasýnda benzerlik
 için bize hiçbir fayda getirmiyor.
@@ -34,19 +34,24 @@ sat:  (-0.35609, ..., -0.35413, 0.38511, -0.070976)
 \end{verbatim}
 
 DYSA ile ayný sonuç kelime gömme (word embedding) mekanizmasý ile elde
-ediliyor. Fikir aslýnda gayet basit ve dahiyane. Tüm dokümanlar üzerinden
-sözlüðü oluþtururuz, ama kelimeleri one-hot vektörü deðil, tek bir indis
-haline getiririz, üstteki ``cat' sadece 300 sayýsýna dönüþür. Bunlardan
-sadece sýnýrlý sayýda kelimeyi alýrýz, mesela ilk 5'i, her dokümanýn ilk 50
-kelimesi tutulur, gerisi atýlýr, eðer eksik varsa dolgulama (padding) ile
-sýfýrlar eklenip 5'e getirilir.
+ediliyor. Fikir aslýnda gayet basit ve dahiyane. Kelime yerine onlarý
+temsil eden sýnýrlý sayýdaki bir vektör YSA'nýn bir tabakasýna ``gömülür''
+ve aynen YSA'nýn diðer katmanlarý gibi eðitilir. Baþlangýçta tüm
+kelimelerin gömme vektörleri rasgele sayýlardýr, eðitim ilerledikçe bu
+deðerler anlamlý hale gelirler.
 
-Tabii bu indis deðerleri YSA için direk kullanýlamaz, bir sonraki aþama,
-YSA'ya bir gömme tabakasý eklemek, YSA'nýn eðitimde kullanacaðý esas
-deðerler bunlar. Her kelimenin gömme boyutu $n$ önceden kararlaþtýrýlýr,
-mesela $n=4$ diyelim, eðer sözlük büyüklüðü $|V|$ ise, $n \times |V|$
-boyutunda bir büyük gömme referans matrisi elde edilir. YSA icinde bulunan
-gömme girdi katmaný ise 5 x 4 = 20 olacaktýr.
+Kodlama kabaca þöyle: tüm dokümanlar üzerinden sözlüðü oluþtururuz.
+Kelimeler one-hot vektörü deðil, tek bir indis haline getirilir, üstteki
+``cat'' sadece 300 sayýsýna dönüþür. Gömme tabakasý için sadece sýnýrlý
+sayýda kelimeyi alýrýz, mesela ilk 5'i, yani her dokümanýn ilk 5 kelimesi
+tutulur, gerisi atýlýr, eðer eksik varsa dolgulama (padding) ile sýfýrlar
+eklenip 5'e getirilir. Tabii bu indis deðerleri YSA için direk
+kullanýlamaz, bir sonraki aþama, YSA'ya bir gömme tabakasý eklemek, YSA'nýn
+eðitimde kullanacaðý esas deðerler bunlar. Her kelimenin gömme boyutu $n$
+önceden kararlaþtýrýlýr, mesela $n=4$ diyelim, eðer sözlük büyüklüðü $|V|$
+ise, $n \times |V|$ boyutunda bir büyük gömme referans matrisi elde edilir,
+matrisin baþlangýç deðerleri rasgeledir. YSA icinde bulunan gömme girdi
+katmanýnýn tamamý 5 x 4 = 20 olacaktýr.
 
 \includegraphics[width=20em]{nlp_02.png}
 
@@ -56,42 +61,40 @@ görüyoruz,
 \hspace{1.2cm}
 \includegraphics[width=15em]{nlp_03.png}
 
-Aslýnda girdi katmaný 5 x 4 boyutundaki bir ``tensor'' da olabilirdi
-(modern YSA araçlarý çok boyutlu tensorlar ile rahatça çalýþýrlar), biz
-basitleþtirme amaçýyla vektörün düzleþtirildiðini düþünelim,
+Girdi katmaný 5 x 4 boyutundaki bir ``tensor'' da olabilirdi (modern YSA
+araçlarý çok boyutlu tensorlar ile rahatça çalýþýrlar), biz basitleþtirme
+amaçýyla vektörün düzleþtirildiðini düþünelim,
 
 \includegraphics[width=25em]{nlp_04.png}
 
-Ama burada ilginç bir durum var, bu durum alýþýlagelen YSA kodlamasýndan
-farklý; $x$ vektörüne bir ``girdi'' dendi, fakat $x$'i bir tamamen
-baðlanmýþ aðýrlýk tabakasý olarak görmek daha doðru. Fakat bu aðýrlýk
-tabakasý diðer aðýrlýk tabakalarý gibi deðil; Her eðitim veri noktasý için
-indis bazlý esas girdilere göre, {\em referans gömme matrisindeki} uygun
-satýrlar çekilip bir $x$ haline getiriliyor. Ardýndan geriye yayýlma ile
-hata düzeltme yapýlacaðý zaman gömme referans matrisindeki vektörler
-güncelleniyor. 
+Burada ilginç bir durum var, alýþýlagelen YSA kodlamasýndan farklý olarak
+$x$ vektörüne ``girdi'' dedik, fakat $x$'i bir tamamen baðlanmýþ aðýrlýk
+tabakasý olarak görmek daha doðru. Fakat bu aðýrlýk tabakasý diðer aðýrlýk
+tabakalarý gibi deðil; Her eðitim veri noktasý için indis bazlý esas
+girdilere göre, {\em referans gömme matrisindeki} uygun satýrlar çekilip o
+anda bir $x$ haline getiriliyor. Ardýndan geriye yayýlma ile YSA hata
+düzeltme yapacaðý zaman gömme referans matrisindeki uygun vektörler
+güncelleniyor.
 
-Peki eðitim hedef deðeri nedir? Burada farklý yaklaþýmlar var, üstteki
-Lineer Cebir yazýsýnda komþu kelimeler tahmin edilmeye uðraþýlýr dedik. Bir
-baþka ufak numara bir cümleyi alýp içindeki tek bir kelimeyi ``bozmak'',
-yani oraya anlamsýz bir kelime getirmek, ve bu yeni cümleyi yanlýþ
-bozulmamýþ olanýný doðru etiketi ile eðitim verisine koymak. Cümleler nasýl
-olsa hazýr var, onlarý bozmak kolay, bu þekilde iki kategorili bir
-sýnýflama problemi elde ediyoruz. 
-
-0/1 hedefli ufak YSA'miz þöyle olabilir,
+Eðitim hedef deðeri nedir? Burada farklý yaklaþýmlar var, üstteki {\em
+  Lineer Cebir} yazýsýnda komþu kelimeler tahmin edilmeye
+uðraþýlýyordu. Bir baþka numara bir cümleyi alýp içindeki tek bir kelimeyi
+``bozmak'', oraya anlamsýz bir kelime getirmek, ve bu yeni cümleyi 0,
+bozulmamýþ olanýný 1 etiketi eðitmek. Cümleler nasýl olsa hazýr var, onlarý
+bozmak kolay, bu þekilde iki kategorili bir sýnýflama problemi elde
+ediyoruz. Bu yaklaþim için örnek boyutlarla, 
 
 $x \in \mathbb{R}^{20 \times 1}, 
 W \in \mathbb{R}^{8 \times 20}, 
 U \in \mathbb{R}^{8 \times 1}$ 
 
-Örnek girdi,
+örnek girdi,
 
 $$ x = \left[\begin{array}{rrrrr}
 x_{cat} & x_{chills} & x_{on} & x_{a} & x_{mat}
 \end{array}\right]$$
 
-Katmanlar,
+olacak þekilde, 
 
 $$ s = U^T a$$
 
@@ -99,9 +102,13 @@ $$ a = f(z)$$
 
 $$ z = Wx + b$$
 
+Katmanlarý tasarlanabilir.
 
 \includegraphics[width=15em]{nlp_05.png}
 
+TensorFlow gömme tabakasý ile referans matrisi arasýndaki iliþkiyi
+\verb!embedding_lookup! çaðrýsý ile yapýyor. Bu çaðrý aslýnda bir matriste
+indis eriþimi sadece, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -118,12 +125,14 @@ with tf.Session() as sess:
 [10 20 30 40]
 \end{verbatim}
 
+Fakat YSA içine konduðu zaman bu çaðrý ve onun oluþturduðu katman geriye
+yayýlma sýrasýnda nasýl davranacaðýný biliyor. 
 
-
-\includegraphics[width=35em]{nlp_01.png}
-
-
-
+Örnek olarak [2] verisi üzerinde üstte tarif edilen basit að yapýsýný
+oluþturalým. Veri {\em Rotten Tomatoes} adlý film yorum sitesinden alýnan
+kullanýcý yorumlarý (yazdýðý kelimeler yani) ve kullanýcýnýn filmi beðendi
+/ beðenmedi þeklindeki hissiyatýný içeriyor. Bu bir doðal dil iþleme 0/1
+sýnýflama problemi. Veriye bakalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -139,7 +148,6 @@ batch_size = 40
 num_epochs = 200
 
 x_text, y = data_helpers.load_data_and_labels(positive_data_file, negative_data_file)
-
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -153,6 +161,16 @@ print y[10000], x_text[10000]
 [0 1] emerges as something rare , an issue movie that 's so honest and keenly observed that it does n't feel like one
 [1 0] like mike is a slight and uninventive movie like the exalted michael jordan referred to in the title , many can aspire but none can equal
 \end{verbatim}
+
+Örnek seçtiðimiz bir kaç yoruma bakýyoruz (üstte), birincisi, ikincisi
+pozitif, üçüncü negatif. Yorumlarda kullanýlan kelimelerde mesela ilkinde
+``a good place to start (iyi bir baþlangýç noktasý)'' yorumu pozitifsel bir
+hava taþýyor, üçüncüde ``uninventive (bir yenilik yok)'' kelimesi
+kullanýlmýþ, negatif. YSA eðitildikten sonra bu kelimelerin doðru temsilsel
+(gömme) aðýrlýklarýný ve onlarýn 0/1 hedefine olan baðlantýsýný öðrenmeyi
+umuyoruz. 
+
+Ýndis matrisini yaratalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 max_document_length = max([len(x.split(" ")) for x in x_text])
@@ -171,37 +189,61 @@ print x
  [11512     3   147 ...,     0     0     0]]
 \end{verbatim}
 
+Ýndisler \verb!x! kullanýmý kafa karýþtýrmasýn, [1] kodlamasý o þekilde
+seçmiþ. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Ardýndan gömme yapýlýr, ve bu aðýrlýklar \verb!fully_connected! ile tam
+baðlamýþ YSA tabakasýna verilir, oradan çýkan sonuç ise iki kategorili
+softmax'e verilir. Tüm kod,
 
 \inputminted[fontsize=\footnotesize]{python}{nlp1.py}
 
+Bu kodun baþarýsý yüzde 67 civarý. 
+
+Evriþim Tabakasý
+
+Fakat daha yapýlacaklar var. NLP alanýnda DYSA moda olmadan önce mesela
+lojistik regresyon ile eðitim yapýldýðýnda bir n-gram yaklaþýmý vardý. Bir
+doküman sayýsal hale getirilirken kelimeleri tek tek alabiliriz, ya da,
+yanyana gelen her iki (2-gram), üç (3-gram) kelime demetlerini sanki baþlý
+baþýna kelimelermiþ gibi sayýsala çevirebiliriz. Eðer mesela ``küçük ev''
+ve ``sarý kedi'' 2-gramlarý sürekli dökümanlarda beraber görülüyorsa, bu
+kelime çiftinin bir sýnýflayýcý kuvveti olabilir, ve n-gram yaklaþýmý bunu
+kullanmaya uðraþýr.
+
+n-gram iþlemi bu eski yaklaþýmlarda çoðunlukla bir öniþlem (preprocessing)
+aþamasýnda veriden yeni veri çýkartarak yapýlýrdý, DYSA ile elimizde daha
+kullanýþlý bir silah var. Evriþim.
+
+Altta görülen örnekte gömme tabakasý $9 \times 6$ boyutunda, bu tabaka
+üzerinde farklý boyutlarda evriþim operasyonlarý uygulanýyor, mesela 2 x 6
+boyutlu bir evriþim var (kýrmýzý renkli), üstten baþlanýp birer birer aþaðý
+kaydýrýlarak ikinci tabakadaki sonuç elde ediliyor, ayný þekilde 3 x 6 bir
+diðeri (sarý renkli). Böylece ikinci seviyedeki vektörler elde ediliyor, bu
+vektörler üzerine max-pool iþlemi uygulanýyor, ve oradan gelen sonuçlar
+softmax'e veriliyor. 
+
+\includegraphics[width=35em]{nlp_01.png}
+
+Bu þekilde deðiþtirilmiþ kod altta. 
+
 \inputminted[fontsize=\footnotesize]{python}{nlp2.py}
 
+Bu kod eðitim sonrasý yüzde 74 baþarýya eriþti, kodun orijinal yazarý [1]
+yüzde 76'yi görmüþ, zaten bu veri seti üzerinde bilinen en iyi baþarý bu
+civarda.
 
+Ödev
 
-
-
+1. kodu iþletin, ve gömme referans matris aðýrlýklarýna bakýn. Örnek bir
+kelime seçip o kelimenin gömme matrisindeki diðerlerine olan mesafesini
+Öklitsel uzaklýk hesabýyla bulun, en yakýn on kelimeyi gösterin.
 
 
 Kaynaklar
 
 [1] Britz, {\em Implementing a CNN for Text Classification in TensorFlow}, \url{http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/}
+
+[2] Cornell U., {\em Movie Review Data}, \url{http://www.cs.cornell.edu/people/pabo/movie-review-data}
 
 \end{document}

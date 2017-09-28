@@ -135,6 +135,3 @@ for i,batch in enumerate(batches):
         path = saver.save(sess, "/tmp/nlpembed2")
 
 
-
-
-        

@@ -36,11 +36,13 @@ sequence_length=x_train.shape[1]
 input_x = tf.placeholder(tf.int32, [None, sequence_length])
 input_y = tf.placeholder(tf.float32, [None, num_classes])
 
+# rasgele agirliklar
 W = tf.Variable(tf.random_uniform([len(vocab_processor.vocabulary_),
                                    embedding_dim], -1.0, 1.0))
 
 ec = tf.nn.embedding_lookup(W, input_x)
 
+# duzlestir
 embed = tf.contrib.layers.flatten(ec)
 
 scores = tf.contrib.layers.fully_connected(inputs=embed, num_outputs=2, 
