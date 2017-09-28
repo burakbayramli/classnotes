@@ -3,18 +3,18 @@
 Derin Öðrenme ile Doðal Dil Ýþlemek (Natural Language Processing)
 
 Doküman sýnýflamak, bir film için yazýlmýþ yorumu beðendi / beðenmedi
-þeklinde irdelemek; tüm bu doðal dil iþlemek kategorisine girer, ve bu
-iþlemler derin yapay sinir aðlarý (DYSA) ile yapýlabilir.
+þeklinde irdelemek; tüm bu iþlemler doðal dil iþlemek kategorisine girer,
+ve derin yapay sinir aðlarý (DYSA) ile halledilebilirler. 
 
 Doküman nasýl temsil edilir? 
 
-Doküman kelimelerden oluþur, fakat kelimeler temel olarak sayýsal deðil
+Doküman kelimelerden oluþur, fakat bir kelime temel olarak sayýsal deðil
 kategoriktir, DYSA kullanmak için kelimelerin sayýsallaþtýrýlmasý
-lazým. Bir çözüm one-hot kodlamasý, tüm dokümanlardaki tüm kelimeler on bin
-kelimelik bir ``sözlükten'' geliyorsa, her kelime için 10000 boyutunda bir
-vektör yaratýrýz, bu vektörde kelimelerin yerleri önceden bellidir,
-``portakal'' kelimesi mesela 300. indis, o zaman portakal kelimesini temsil
-için bir vektörün 300. öðesi 1 diðerleri 0 olur.
+lazým. Bir çözüm öne-hot kodlamasý, tüm dokümanlardaki tüm kelimeler ön bin
+kelimelik bir ``sözlükten'' geliyorsa, her kelime için ön bin boyutunda bir
+vektör yaratýrýz, bu vektörde kelimelerin yerleri önceden bellidir, ``cat
+(kedi)'' kelimesi mesela 300. indis, o zaman ``cat'' kelimesini temsil için
+10,000 büyüklüðündeki bir vektörün 300. öðesi 1 diðer 9999 ögesi 0 olur.
 
 Bu temsil þekli biraz israflý degil mi? Ayrýca kelimeler arasýnda benzerlik
 için bize hiçbir fayda getirmiyor.
@@ -23,20 +23,85 @@ Daha önce {\em Lineer Cebir, SVD ile Kümeleme, Benzerlik} yazýsýnda boyut
 azaltma iþleminden bahsettik. Bir kelimeyi, ya da dökümaný her ikisinin
 iliþkisini içeren bir matris üzerinde SVD iþlettikten sonra daha ufak bir
 boyutta temsil edebiliyorduk. Bu azaltýlmýþ boyutta kelimeler pür sayýsal
-hale gelir ve kelimelere tekabül eden sayýlarýn, anlamsal baðlamda, birbirine
-yakýnlýk ya da uzaklýklarý bu sayýlar üzerinden ölçülebilir. 
-
-DYSA ile bu iþlem kelime gömme (word embedding) ile yapýlýyor. 
+hale geliyordu ve kelimelere tekabül eden vektörlerin, anlamsal baðlamda,
+birbirine yakýnlýk ya da uzaklýklarý bu sayýlar üzerinden ölçülebiliyordu.
 
 \begin{verbatim}
-sarý:  (0.01359, 0.00075997, 0.24608, ..., -0.2524, 1.0048, 0.06259)
-kýrmýzý:  (0.01396, 0.11887, -0.48963, ..., 0.033483, -0.10007, 0.1158)
-portakal:  (-0.24776, -0.12359, 0.20986, ..., 0.079717, 0.23865, -0.014213)
-yeþil:  (-0.35609, 0.21854, 0.080944, ..., -0.35413, 0.38511, -0.070976)
+cat:  (0.01359, ..., -0.2524, 1.0048, 0.06259)
+mat:  (0.01396, ..., 0.033483, -0.10007, 0.1158)
+chills: (-0.24776, ..., 0.079717, 0.23865, -0.014213)
+sat:  (-0.35609, ..., -0.35413, 0.38511, -0.070976)
 \end{verbatim}
 
+DYSA ile ayný sonuç kelime gömme (word embedding) mekanizmasý ile elde
+ediliyor. Fikir aslýnda gayet basit ve dahiyane. Tüm dokümanlar üzerinden
+sözlüðü oluþtururuz, ama kelimeleri one-hot vektörü deðil, tek bir indis
+haline getiririz, üstteki ``cat' sadece 300 sayýsýna dönüþür. Bunlardan
+sadece sýnýrlý sayýda kelimeyi alýrýz, mesela ilk 5'i, her dokümanýn ilk 50
+kelimesi tutulur, gerisi atýlýr, eðer eksik varsa dolgulama (padding) ile
+sýfýrlar eklenip 5'e getirilir.
 
-\includegraphics[width=35em]{nlp_01.png}
+Tabii bu indis deðerleri YSA için direk kullanýlamaz, bir sonraki aþama,
+YSA'ya bir gömme tabakasý eklemek, YSA'nýn eðitimde kullanacaðý esas
+deðerler bunlar. Her kelimenin gömme boyutu $n$ önceden kararlaþtýrýlýr,
+mesela $n=4$ diyelim, eðer sözlük büyüklüðü $|V|$ ise, $n \times |V|$
+boyutunda bir büyük gömme referans matrisi elde edilir. YSA icinde bulunan
+gömme girdi katmaný ise 5 x 4 = 20 olacaktýr.
+
+\includegraphics[width=20em]{nlp_02.png}
+
+Altta ``cat chills on a mat (kedi paspas üzerinde takýlýyor)'' cümlesini
+görüyoruz,
+
+\hspace{1.2cm}
+\includegraphics[width=15em]{nlp_03.png}
+
+Aslýnda girdi katmaný 5 x 4 boyutundaki bir ``tensor'' da olabilirdi
+(modern YSA araçlarý çok boyutlu tensorlar ile rahatça çalýþýrlar), biz
+basitleþtirme amaçýyla vektörün düzleþtirildiðini düþünelim,
+
+\includegraphics[width=25em]{nlp_04.png}
+
+Ama burada ilginç bir durum var, bu durum alýþýlagelen YSA kodlamasýndan
+farklý; $x$ vektörüne bir ``girdi'' dendi, fakat $x$'i bir tamamen
+baðlanmýþ aðýrlýk tabakasý olarak görmek daha doðru. Fakat bu aðýrlýk
+tabakasý diðer aðýrlýk tabakalarý gibi deðil; Her eðitim veri noktasý için
+indis bazlý esas girdilere göre, {\em referans gömme matrisindeki} uygun
+satýrlar çekilip bir $x$ haline getiriliyor. Ardýndan geriye yayýlma ile
+hata düzeltme yapýlacaðý zaman gömme referans matrisindeki vektörler
+güncelleniyor. 
+
+Peki eðitim hedef deðeri nedir? Burada farklý yaklaþýmlar var, üstteki
+Lineer Cebir yazýsýnda komþu kelimeler tahmin edilmeye uðraþýlýr dedik. Bir
+baþka ufak numara bir cümleyi alýp içindeki tek bir kelimeyi ``bozmak'',
+yani oraya anlamsýz bir kelime getirmek, ve bu yeni cümleyi yanlýþ
+bozulmamýþ olanýný doðru etiketi ile eðitim verisine koymak. Cümleler nasýl
+olsa hazýr var, onlarý bozmak kolay, bu þekilde iki kategorili bir
+sýnýflama problemi elde ediyoruz. 
+
+0/1 hedefli ufak YSA'miz þöyle olabilir,
+
+$x \in \mathbb{R}^{20 \times 1}, 
+W \in \mathbb{R}^{8 \times 20}, 
+U \in \mathbb{R}^{8 \times 1}$ 
+
+Örnek girdi,
+
+$$ x = \left[\begin{array}{rrrrr}
+x_{cat} & x_{chills} & x_{on} & x_{a} & x_{mat}
+\end{array}\right]$$
+
+Katmanlar,
+
+$$ s = U^T a$$
+
+$$ a = f(z)$$
+
+$$ z = Wx + b$$
+
+
+\includegraphics[width=15em]{nlp_05.png}
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -52,6 +117,11 @@ with tf.Session() as sess:
 \begin{verbatim}
 [10 20 30 40]
 \end{verbatim}
+
+
+
+\includegraphics[width=35em]{nlp_01.png}
+
 
 
 

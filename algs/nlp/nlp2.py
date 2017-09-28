@@ -119,16 +119,14 @@ saver = tf.train.Saver(tf.global_variables())
 for i,batch in enumerate(batches):
     x_batch, y_batch = zip(*batch)
     feed_dict = {
-        input_x: x_batch,
-        input_y: y_batch,
-        dropout_keep_prob: dropout_keep_prob
+        input_x: x_batch,input_y: y_batch, dropout_keep_prob: dropout_kp
     }
     sess.run(train_op, feed_dict)
     if (i % 30) == 0:
         feed_dict2 = {
             input_x: x_dev,
             input_y: y_dev,
-            dropout_keep_prob: dropout_keep_prob
+            dropout_keep_prob: dropout_kp
         }
         train_acc = sess.run(accuracy, feed_dict)
         test_acc = sess.run(accuracy, feed_dict2)
