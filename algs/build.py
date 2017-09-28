@@ -30,6 +30,7 @@ if len(sys.argv) == 1:
     ./rnn/rnn.pdf \
     ./lstm/lstm.pdf \
     ./reinf/reinf.pdf \
+    ./nlp/nlp.pdf \
     ./zapp/zapp.pdf \
     output ../../Dropbox/Public/skfiles/algs.pdf"
     os.system(cmd)
