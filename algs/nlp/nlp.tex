@@ -2,8 +2,96 @@
 \begin{document}
 Derin Öðrenme ile Doðal Dil Ýþlemek (Natural Language Processing)
 
-\inputminted[fontsize=\footnotesize]{python}{nlp1.py}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+tf.reset_default_graph()
+
+params = tf.constant([10,20,30,40])
+ids = tf.constant([0,1,2,3])
+
+with tf.Session() as sess:
+     print tf.nn.embedding_lookup(params,ids).eval()
+\end{minted}
+
+\begin{verbatim}
+[10 20 30 40]
+\end{verbatim}
+
+\begin{verbatim}
+sarý:  (0.01359, 0.00075997, 0.24608, ..., -0.2524, 1.0048, 0.06259)
+kýrmýzý:  (0.01396, 0.11887, -0.48963, ..., 0.033483, -0.10007, 0.1158)
+portakal:  (-0.24776, -0.12359, 0.20986, ..., 0.079717, 0.23865, -0.014213)
+yeþil:  (-0.35609, 0.21854, 0.080944, ..., -0.35413, 0.38511, -0.070976)
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+import numpy as np
+import data_helpers
+from tensorflow.contrib import learn
+
+dev_sample_percentage = .1
+positive_data_file = "./data/rt-polarity.pos"
+negative_data_file = "./data/rt-polarity.neg"
+embedding_dim = 120
+batch_size = 40
+num_epochs = 200
+
+x_text, y = data_helpers.load_data_and_labels(positive_data_file, negative_data_file)
+
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print y[3], x_text[3]
+print y[4], x_text[4]
+print y[10000], x_text[10000]
+\end{minted}
+
+\begin{verbatim}
+[0 1] if you sometimes like to go to the movies to have fun , wasabi is a good place to start
+[0 1] emerges as something rare , an issue movie that 's so honest and keenly observed that it does n't feel like one
+[1 0] like mike is a slight and uninventive movie like the exalted michael jordan referred to in the title , many can aspire but none can equal
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+max_document_length = max([len(x.split(" ")) for x in x_text])
+vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
+x = np.array(list(vocab_processor.fit_transform(x_text)))
+print x
+\end{minted}
+
+\begin{verbatim}
+[[    1     2     3 ...,     0     0     0]
+ [    1    31    32 ...,     0     0     0]
+ [   57    58    59 ...,     0     0     0]
+ ..., 
+ [   75    84  1949 ...,     0     0     0]
+ [    1  2191  2690 ...,     0     0     0]
+ [11512     3   147 ...,     0     0     0]]
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\inputminted[fontsize=\footnotesize]{python}{nlp1.py}
 
 \inputminted[fontsize=\footnotesize]{python}{nlp2.py}
 

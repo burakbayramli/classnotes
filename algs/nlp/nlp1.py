@@ -1,4 +1,4 @@
-# nlp2.py
+# nlp1.py
 import tensorflow as tf
 import numpy as np
 import data_helpers
@@ -43,8 +43,7 @@ ec = tf.nn.embedding_lookup(W, input_x)
 
 embed = tf.contrib.layers.flatten(ec)
 
-scores = tf.contrib.layers.fully_connected(inputs=embed,
-                                           num_outputs=2, 
+scores = tf.contrib.layers.fully_connected(inputs=embed, num_outputs=2, 
                                            activation_fn=tf.nn.softmax)
 
 predictions = tf.argmax(scores, 1)
@@ -69,25 +68,20 @@ sess = tf.Session()
 
 sess.run(tf.global_variables_initializer())
 
-batches = data_helpers.batch_iter(list(zip(x_train, y_train)),\
-                                  batch_size,\
-                                  num_epochs)
+batches = data_helpers.batch_iter(list(zip(x_train, y_train)),batch_size,num_epochs)
 
 saver = tf.train.Saver(tf.global_variables())
 
 for i,batch in enumerate(batches):
-    x_batch, y_batch = zip(*batch)
-    feed_dict = {
-        input_x: x_batch,
-        input_y: y_batch
-    }
+    
+    x_batch, y_batch = zip(*batch)    
+    feed_dict = { input_x: x_batch, input_y: y_batch }    
     sess.run(train_op, feed_dict)
+    
     if (i % 30) == 0:
-        feed_dict2 = {
-            input_x: x_dev,
-            input_y: y_dev
-        }
+        feed_dict2 = { input_x: x_dev, input_y: y_dev }
         train_acc = sess.run(accuracy, feed_dict)
         test_acc = sess.run(accuracy, feed_dict2)
         print train_acc, test_acc
-
+    if (i % 200) == 0:
+        path = saver.save(sess, "/tmp/nlpembed1")
