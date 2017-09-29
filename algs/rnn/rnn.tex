@@ -331,7 +331,6 @@ print 't=1'
 print(Y1_val)
 \end{minted}
 
-
 \begin{verbatim}
 t=0
 [[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
@@ -447,31 +446,27 @@ init = tf.global_variables_initializer()
 n_iterations = 400
 batch_size = 50
 
-saver = tf.train.Saver()
-mfile = "/tmp/my_time_series_model"
-with tf.Session() as sess:
-    init.run()
-    for iteration in range(n_iterations):
-        X_batch, y_batch = next_batch(batch_size, n_steps)
-        sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
-        if iteration % 100 == 0:
-            mse = loss.eval(feed_dict={X: X_batch, y: y_batch})
-            print(iteration, "\tMSE:", mse)
+sess = tf.Session()
 
-    saver.save(sess, mfile) # not shown in the book
+sess.run(tf.global_variables_initializer())
 
+for iteration in range(n_iterations):
+    X_batch, y_batch = next_batch(batch_size, n_steps)
+    sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
+    if iteration % 100 == 0:
+        mse = loss.eval(feed_dict={X: X_batch, y: y_batch}, session=sess)
+        print(iteration, "\tMSE:", mse)
 
 t_start = 29.
 y_pred = np.array([f(t_start+i*resolution) for i in range(20)]).reshape(1,20,1)
 res = []
 n_more = 30
-with tf.Session() as sess:
-    saver.restore(sess, mfile)
-    for i in range(n_more):
-    	y_pred_new = sess.run(outputs, feed_dict={X: y_pred})
-	y_pred[0,0:n_steps-1,0] = y_pred[0,1:n_steps,0]
-	y_pred[0,-1,0] = y_pred_new[0,-1,0]
-    	res.append(y_pred_new[0,-1,0])
+
+for i in range(n_more):
+    y_pred_new = sess.run(outputs, feed_dict={X: y_pred})
+    y_pred[0,0:n_steps-1,0] = y_pred[0,1:n_steps,0]
+    y_pred[0,-1,0] = y_pred_new[0,-1,0]
+    res.append(y_pred_new[0,-1,0])
 
 t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
 y = f(t)
