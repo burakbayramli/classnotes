@@ -78,7 +78,7 @@ n_max_steps = 1000
 n_iterations = 250
 save_iterations = 10
 discount_rate = 0.95
-ffile = "/home/burak/Downloads/scikit-data/models/cartpole.ckpt"
+ffile = "/tmp/cartpole.ckpt"
 
 sess = tf.Session()
 sess.run(init)
