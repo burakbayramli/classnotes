@@ -11,20 +11,18 @@ olabilir.
 
 \includegraphics[width=30em]{rnn_01.png}
 
-\includegraphics[width=30em]{rnn_07.jpg}
-
 Daha önce iþlediðimiz Öne Doðru Beslemeli (Feed-Forward) YSA'lar en temel,
 klasik yapýlardýr. Eðer bir $N$ boyutlu girdi alýyorlarsa bu verinin tüm
 boyutlarýný ayný anda iþlerler. RNN için [3] yapý þöyle deðiþiyor (tek bir
 nöron için),
 
-$x_t$ $t$ anindaki girdi. 
+$x_t$: $t$ anýndaki girdi. 
 
-$s_t$ $t$ anindaki gizli konum. 
+$s_t$: $t$ anýndaki gizli konum. 
 
 $$ s_t = f(U x_t +  W s_{t-1})$$
 
-$o_t$ $t$ anindaki cikti, $o_t = g(V s_t)$
+$o_t$: $t$ anýndaki çýktý, $o_t = g(V s_t)$
 
 Ýlginç olan $U,V,W$ aðýrlýk matrislerinin, parametrelerinin her zaman aný,
 her veri noktasý için ayný olmasý. Yani farklý zaman dilimleri için farklý
@@ -34,6 +32,8 @@ aðýrlýklar atanmýyor. $t$ anýndaki gizli (hidden) konum $s_t$, bu bir nevi
 matrisi geçmiþe ne kadar önem verileceðini tanýmlýyorlar. Ardýndan tüm
 hesap bir $\phi$ ile ``eziliyor'' yani belli aralýklara düþmesi zorlanýyor,
 bunun için tipik olarak sigmoid, ya da $tanh$ kullanýlýr.
+
+\includegraphics[width=30em]{rnn_07.jpg}
 
 Bu kavramlar, konumlararasý geçiþ, $t$ anýndaki girdilerin ondan önceki
 girdileri nasýl baðlý olduðunun aðýrlýklar üzerinden ayarlanmasý, yani
@@ -45,9 +45,113 @@ RNN ismindeki ``tekrarlanma'' $U,V,W$'nin her zaman adýmý için ayný
 olmasýndan geliyor. Að bir bakýma tek bir seviye için, bir kez
 tanýmlanýyor, ve geriye ne kadar gidileceði üzerinden o yöne doðru
 kopyalanýyor, ya da ``açýlýyor (unfolding)''.  Bu açýlma iþlemini her zaman
-adýmý için gösterebiliriz. 
-f
-Zaman Ýçinde Geriye Doðru Yayýlma (Backpropagation Through Time -BPTT-)
+adýmý için gösterebiliriz.  f Zaman Ýçinde Geriye Doðru Yayýlma
+(Backpropagation Through Time -BPTT-)
+
+Þimdi TensorFlow ile en basit RNN'yi kendimiz yaratalým. Tekrar eden bir
+katman olacak, içinde 5 tane nöron,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+def reset_graph(seed=42):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+reset_graph()
+
+n_inputs = 3
+n_neurons = 5
+
+X0 = tf.placeholder(tf.float32, [None, n_inputs])
+X1 = tf.placeholder(tf.float32, [None, n_inputs])
+
+W = tf.Variable(tf.random_normal(shape=[n_inputs, n_neurons],dtype=tf.float32))
+U = tf.Variable(tf.random_normal(shape=[n_neurons,n_neurons],dtype=tf.float32))
+b = tf.Variable(tf.zeros([1, n_neurons], dtype=tf.float32))
+
+Y0 = tf.tanh(tf.matmul(X0, W) + b)
+Y1 = tf.tanh(tf.matmul(Y0, U) + tf.matmul(X1, W) + b)
+
+init = tf.global_variables_initializer()
+\end{minted}
+
+Þimdi iki veri noktasý verip iki veri noktasý çýktýsýna bakalým. Bu 2-2
+verisinden pek çok olacak, ki bu veriler ufak toptan setimizi (minibatch)
+oluþturacak. Alttaki ufak veride 4 tane o þekilde veri noktasý var.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+
+# ufak toptan veri
+X0_batch = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 0, 1]]) # t = 0
+X1_batch = np.array([[9, 8, 7], [0, 0, 0], [6, 5, 4], [3, 2, 1]]) # t = 1
+
+with tf.Session() as sess:
+    init.run()
+    Y0_val, Y1_val = sess.run([Y0, Y1], feed_dict={X0: X0_batch, X1: X1_batch})
+
+print 't=0'
+print(Y0_val)
+print 't=1'
+print(Y1_val)
+\end{minted}
+
+\begin{verbatim}
+t=0
+[[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
+ [ 0.9977755  -0.71978885 -0.99657625  0.9673925  -0.99989718]
+ [ 0.99999774 -0.99898815 -0.99999893  0.99677622 -0.99999988]
+ [ 1.         -1.         -1.         -0.99818915  0.99950868]]
+t=1
+[[ 1.         -1.         -1.          0.40200216 -1.        ]
+ [-0.12210433  0.62805319  0.96718419 -0.99371207 -0.25839335]
+ [ 0.99999827 -0.9999994  -0.9999975  -0.85943311 -0.9999879 ]
+ [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]
+\end{verbatim}
+
+Dikkat, eðitim yapmadýk, ayrýca çýktý da üretmedik, sadece her basamak için
+gizli katmaný hesapladýk, ve RNN'e ileri yönde hesap yaptýrdýk, dört kez
+$x_0,x_1$ verdik o da bize dört tane $y_0,y_1$ verdi. RNN'i eðitiyor
+olsaydýk üretilen dört $y_0,y_1$ için $V$ ile çarpým, onu ``gerçek''
+veriyle / etiketlerle karþýlaþtýrmamýz gerekecekti, onun üzerinden düzeltme
+yapacaktýk, vs.
+
+Üstteki kod kolaydý, fakat RNN iki yerine 100 zaman adýmý geriye gitsin
+isteseydik, bu çizit çok daha büyük olurdu. O tür kodlarý kolaylaþtýrmak
+için TF'in özel çaðrýlarý var, mesela \verb!static_rnn! bunlardan
+biri. Üstteki aðý bu þekilde yaratabiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+reset_graph()
+
+X0 = tf.placeholder(tf.float32, [None, n_inputs])
+X1 = tf.placeholder(tf.float32, [None, n_inputs])
+
+basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons)
+output_seqs, states = tf.contrib.rnn.static_rnn(basic_cell, [X0, X1],
+                                                dtype=tf.float32)
+Y0, Y1 = output_seqs
+
+print 't=0'
+print(Y0_val)
+print 't=1'
+print(Y1_val)
+\end{minted}
+
+\begin{verbatim}
+t=0
+[[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
+ [ 0.9977755  -0.71978885 -0.99657625  0.9673925  -0.99989718]
+ [ 0.99999774 -0.99898815 -0.99999893  0.99677622 -0.99999988]
+ [ 1.         -1.         -1.         -0.99818915  0.99950868]]
+t=1
+[[ 1.         -1.         -1.          0.40200216 -1.        ]
+ [-0.12210433  0.62805319  0.96718419 -0.99371207 -0.25839335]
+ [ 0.99999827 -0.9999994  -0.9999975  -0.85943311 -0.9999879 ]
+ [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]
+\end{verbatim}
 
 YSA'lar kendini tekrarlayan olsun ya da olmasýn aslýnda $f(g(h(x)))$
 þeklinde basit içiçe fonksiyondurlar. Klasik YSA'da en sondaki hata
@@ -69,6 +173,30 @@ ya da çok küçülebiliyor, normal derin YSA'lerde de problem olabilir bu,
 fakat RNN'lerde bu durum daha belirgin çünkü N adým geriye gitmek demek N
 kadar içiçe geçen fonksiyon demek, ve sýralý veriyi tahmin için N'in büyük
 olmasý gerekebilir.
+
+RNN Çesitleri, Numaralarý
+
+Ýlla her nöronun çýktýsýný kullanmak gerekmez. Her nöron çýktýsý bir
+sonrakine girdi kabul edildiði için bu çýktýlar RNN'nin bütününü
+etkilerler, fakat muhakkak etiket / düzeltme baðlamýnda direk
+kullanýlmalarý þart deðildir. Mesela bir RNN'e bir veri dizisi verip,
+çýktýlarýnýn en sonuncusu hariç geri kalanlarýný yok sayabiliriz, o zaman
+bir dizi-vektör RNN'i elde ederiz. Mesela RNN'e bir film hakkýndaki tüm
+yorumlarý kelime kelime veri dizisi olarak verebiliriz, RNN'in tek çýktýsý
+-1/+1 þeklinde beðendi / beðenmedi skoru olabilir. Altta diyagramý
+görüyoruz,
+
+\includegraphics[width=15em]{rnn_05.png}
+
+Eðer zaman serisi tahmin etmek istiyorsak $x_1,x_2,..$ serisini alýp bir
+kaydýrarak ona karþýlýk olan ``etiketleri'' kendimiz yaratabiliriz. Bu
+durumda $y_1,y_2,..$ serisi $x_2,x_3,..$ serisi haline gelir.
+
+Bir RNN'in tekrar eden kýsým bir nöron yerine bir katman da olabilir, yani
+bu katman içinde birden fazla nöron olur, ve bu katman zamanda geriye doðru
+kopyalanýr. 
+
+\includegraphics[width=24em]{rnn_06.png}
 
 Alttaki kodda bir metin okunarak o metindeki harf sýrasý tahmin edilmeye
 uðraþýlýyor. Metin tekrar sýfýrdan üretilmeye çabalanýyor. Otomatik türev
@@ -237,132 +365,6 @@ print lmm.get('pla')
 [('t', 0.5), ('n', 0.5)]
 \end{verbatim}
 
-RNN Çesitleri, Numaralarý
-
-Ýlla her nöronun çýktýsýný kullanmak gerekmez. Her nöron çýktýsý bir
-sonrakine girdi kabul edildiði için bu çýktýlar RNN'nin bütününü
-etkilerler, fakat muhakkak etiket / düzeltme baðlamýnda direk
-kullanýlmalarý þart deðildir. Mesela bir RNN'e bir veri dizisi verip,
-çýktýlarýnýn en sonuncusu hariç geri kalanlarýný yok sayabiliriz, o zaman
-bir dizi-vektör RNN'i elde ederiz. Mesela RNN'e bir film hakkýndaki tüm
-yorumlarý kelime kelime veri dizisi olarak verebiliriz, RNN'in tek çýktýsý
--1/+1 þeklinde beðendi / beðenmedi skoru olabilir. Altta diyagramý
-görüyoruz,
-
-\includegraphics[width=15em]{rnn_05.png}
-
-Eðer zaman serisi tahmin etmek istiyorsak $x_1,x_2,..$ serisini alýp bir
-kaydýrarak ona karþýlýk olan ``etiketleri'' kendimiz yaratabiliriz. Bu
-durumda $y_1,y_2,..$ serisi $x_2,x_3,..$ serisi haline gelir.
-
-Bir RNN'in tekrar eden kýsým bir nöron yerine bir katman da olabilir, yani
-bu katman içinde birden fazla nöron olur, ve bu katman zamanda geriye doðru
-kopyalanýr. 
-
-\includegraphics[width=24em]{rnn_06.png}
-
-Þimdi TensorFlow ile en basit RNN'yi kendimiz yaratalým. Tekrar eden bir
-katman olacak, içinde 5 tane nöron,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import tensorflow as tf
-
-def reset_graph(seed=42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
-    np.random.seed(seed)
-
-reset_graph()
-
-n_inputs = 3
-n_neurons = 5
-
-X0 = tf.placeholder(tf.float32, [None, n_inputs])
-X1 = tf.placeholder(tf.float32, [None, n_inputs])
-
-Wx = tf.Variable(tf.random_normal(shape=[n_inputs, n_neurons],dtype=tf.float32))
-Wy = tf.Variable(tf.random_normal(shape=[n_neurons,n_neurons],dtype=tf.float32))
-b = tf.Variable(tf.zeros([1, n_neurons], dtype=tf.float32))
-
-Y0 = tf.tanh(tf.matmul(X0, Wx) + b)
-Y1 = tf.tanh(tf.matmul(Y0, Wy) + tf.matmul(X1, Wx) + b)
-
-init = tf.global_variables_initializer()
-\end{minted}
-
-Þimdi iki veri noktasý verip iki veri noktasý çýktýsýna bakalým. Bu 2-2
-verisinden pek çok olacak, ki bu veriler ufak toptan setimizi (minibatch)
-oluþturacak. Alttaki ufak veride 4 tane o þekilde veri noktasý var.
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import numpy as np
-
-# ufak toptan veri
-X0_batch = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 0, 1]]) # t = 0
-X1_batch = np.array([[9, 8, 7], [0, 0, 0], [6, 5, 4], [3, 2, 1]]) # t = 1
-
-with tf.Session() as sess:
-    init.run()
-    Y0_val, Y1_val = sess.run([Y0, Y1], feed_dict={X0: X0_batch, X1: X1_batch})
-
-print 't=0'
-print(Y0_val)
-print 't=1'
-print(Y1_val)
-\end{minted}
-
-\begin{verbatim}
-t=0
-[[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
- [ 0.9977755  -0.71978885 -0.99657625  0.9673925  -0.99989718]
- [ 0.99999774 -0.99898815 -0.99999893  0.99677622 -0.99999988]
- [ 1.         -1.         -1.         -0.99818915  0.99950868]]
-t=1
-[[ 1.         -1.         -1.          0.40200216 -1.        ]
- [-0.12210433  0.62805319  0.96718419 -0.99371207 -0.25839335]
- [ 0.99999827 -0.9999994  -0.9999975  -0.85943311 -0.9999879 ]
- [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]
-\end{verbatim}
-
-Dikkat, eðitim yapmadýk, RNN'e ileri yönde hesap yaptýrdýk, dört kez
-$x_0,x_1$ verdik o da bize dört tane $y_0,y_1$ verdi. RNN'i eðitiyor
-olsaydýk üretilen dört $y_0,y_1$ için ``gerçek'' veri, etiketler saðlamamýz
-gerekecekti, onun üzerinden düzeltme yapacaktýk, vs.
-
-Üstteki kod kolaydý, fakat RNN iki yerine 100 zaman adýmý geriye gitsin
-isteseydik, bu çizit çok daha büyük olurdu. O tür kodlarý kolaylaþtýrmak
-için TF'in özel çaðrýlarý var, mesela \verb!static_rnn! bunlardan
-biri. Üstteki aðý bu þekilde yaratabiliriz,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-reset_graph()
-
-X0 = tf.placeholder(tf.float32, [None, n_inputs])
-X1 = tf.placeholder(tf.float32, [None, n_inputs])
-
-basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons)
-output_seqs, states = tf.contrib.rnn.static_rnn(basic_cell, [X0, X1],
-                                                dtype=tf.float32)
-Y0, Y1 = output_seqs
-
-print 't=0'
-print(Y0_val)
-print 't=1'
-print(Y1_val)
-\end{minted}
-
-\begin{verbatim}
-t=0
-[[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
- [ 0.9977755  -0.71978885 -0.99657625  0.9673925  -0.99989718]
- [ 0.99999774 -0.99898815 -0.99999893  0.99677622 -0.99999988]
- [ 1.         -1.         -1.         -0.99818915  0.99950868]]
-t=1
-[[ 1.         -1.         -1.          0.40200216 -1.        ]
- [-0.12210433  0.62805319  0.96718419 -0.99371207 -0.25839335]
- [ 0.99999827 -0.9999994  -0.9999975  -0.85943311 -0.9999879 ]
- [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]
-\end{verbatim}
 Zaman Serisi Tahmini
 
 Tensorflow ile zaman serisi tahmini yapalým. Eðitim verisinin formülünü
