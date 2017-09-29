@@ -13,20 +13,33 @@ olabilir.
 
 Daha önce iþlediðimiz Öne Doðru Beslemeli (Feed-Forward) YSA'lar en temel,
 klasik yapýlardýr. Eðer bir $N$ boyutlu girdi alýyorlarsa bu verinin tüm
-boyutlarýný ayný anda iþlerler. RNN için yapý þöyle deðiþiyor, bir saklý
-katman $h$ var ve belli bir zaman aný için $h_t$ bu saklý konum
+boyutlarýný ayný anda iþlerler. RNN için yapý þöyle deðiþiyor (tek bir
+nöron için),
 
-$$ h_t = \phi(Wx_t + U h_{t-1})$$
+$$ y_t = \phi(x_t^T \cdot w_x + y_{t-1}^Tw_y + b)  $$
 
-ile deðiþime uðrayabiliyor. Ýlginç olan geçiþindeki $W,U$ aðýrlýk
-matrisleri, parametrelerinin her zaman aný, her veri noktasý için ayný
-olmasý. Yani farklý zaman dilimleri için farklý aðýrlýklar atanmýyor. $t$
-anýndaki gizli (hidden) konum $h_t$, bu bir nevi ``hafýza''. Bu fonksiyon
-$x_t$ girdisinin $W$ ile çarpýlmasý, artý bir önceki gizli konumun bir
-baþka $U$ ile çarpýlmasý sonucundan elde ediliyor. $W,U$ matrisleri geçmiþe
-ne kadar önem verileceðini tanýmlýyorlar. Ardýndan tüm hesap bir $\phi$ ile
-``eziliyor'' yani belli aralýklara düþmesi zorlanýyor, bunun için tipik
-olarak sigmoid, ya da $tanh$ kullanýlýr.
+Ýlginç olan geçiþindeki $w_y,w_x$ aðýrlýk matrisleri, parametrelerinin her
+zaman aný, her veri noktasý için ayný olmasý. Yani farklý zaman dilimleri
+için farklý aðýrlýklar atanmýyor. $t$ anýndaki gizli (hidden) konum $h_t$,
+bu bir nevi ``hafýza''. Bu fonksiyon $x_t$ girdisinin $W$ ile çarpýlmasý,
+artý bir önceki konumun bir baþka $w_x$ ile çarpýlmasý sonucundan elde
+ediliyor. $w_x,w_y$ matrisleri geçmiþe ne kadar önem verileceðini
+tanýmlýyorlar. Ardýndan tüm hesap bir $\phi$ ile ``eziliyor'' yani belli
+aralýklara düþmesi zorlanýyor, bunun için tipik olarak sigmoid, ya da
+$tanh$ kullanýlýr.
+
+Aynen normal YSA'da olduðu gibi bir ufak toptan veri parçasý (minibatch)
+için tüm hesaplarý tek bir vektorize iþlemle yapabiliriz,
+
+$$ Y_t = \phi(X_t^T \cdot W_x + Y_{t-1}^TW_y + b)  $$
+
+$$  = \phi( 
+\left[
+  \begin{array}{cc} X_t & Y_{t-1} \end{array}
+\right]
+) \cdot W + b )   
+\quad \textrm{ ki } \quad  W = \left[\begin{array}{c} W_x\\W_y \end{array}\right]
+$$
 
 Bu kavramlar, konumlararasý geçiþ, $t$ anýndaki girdilerin ondan önceki
 girdileri nasýl baðlý olduðunun aðýrlýklar üzerinden ayarlanmasý, yani
@@ -401,18 +414,30 @@ def next_batch(batch_size, n_steps):
     Ts = t0 + np.arange(0., n_steps + 1) * resolution
     ys = f(Ts)
     return ys[:, :-1].reshape(-1, n_steps, 1), ys[:, 1:].reshape(-1, n_steps, 1)
+\end{minted}
 
-t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
-y = f(t)
-plt.plot(t,y)
 
+\begin{minted}[fontsize=\footnotesize]{python}
 batch_size = 4
 n_steps = 3
 t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution)
 Ts = t0 + np.arange(0., n_steps + 1) * resolution
 ys = f(Ts)
-plt.plot(Ts,ys,'r.')
+print ys
+\end{minted}
 
+\begin{verbatim}
+[[ 2.22963782  2.68394768  2.64810416  2.18202481]
+ [-0.55129553 -1.52984254 -2.17899898 -2.36687898]
+ [-8.34178463 -9.30522476 -9.80876245 -9.75169688]
+ [-1.90158319 -2.33323898 -2.27949901 -1.78163634]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
+y = f(t)
+plt.plot(t,y)
+plt.plot(Ts,ys,'r.')
 plt.savefig('rnn_03.png')
 \end{minted}
 
@@ -457,10 +482,10 @@ for iteration in range(n_iterations):
         mse = loss.eval(feed_dict={X: X_batch, y: y_batch}, session=sess)
         print(iteration, "\tMSE:", mse)
 
-t_start = 29.
+t_start = 29. # tahmine burada basla
+n_more = 30 # bu kadar daha uret
 y_pred = np.array([f(t_start+i*resolution) for i in range(20)]).reshape(1,20,1)
 res = []
-n_more = 30
 
 for i in range(n_more):
     y_pred_new = sess.run(outputs, feed_dict={X: y_pred})
