@@ -11,35 +11,29 @@ olabilir.
 
 \includegraphics[width=30em]{rnn_01.png}
 
+\includegraphics[width=30em]{rnn_07.jpg}
+
 Daha önce iþlediðimiz Öne Doðru Beslemeli (Feed-Forward) YSA'lar en temel,
 klasik yapýlardýr. Eðer bir $N$ boyutlu girdi alýyorlarsa bu verinin tüm
-boyutlarýný ayný anda iþlerler. RNN için yapý þöyle deðiþiyor (tek bir
+boyutlarýný ayný anda iþlerler. RNN için [3] yapý þöyle deðiþiyor (tek bir
 nöron için),
 
-$$ y_t = \phi(x_t^T \cdot w_x + y_{t-1}^Tw_y + b)  $$
+$x_t$ $t$ anindaki girdi. 
 
-Ýlginç olan geçiþindeki $w_y,w_x$ aðýrlýk matrisleri, parametrelerinin her
-zaman aný, her veri noktasý için ayný olmasý. Yani farklý zaman dilimleri
-için farklý aðýrlýklar atanmýyor. $t$ anýndaki gizli (hidden) konum $h_t$,
-bu bir nevi ``hafýza''. Bu fonksiyon $x_t$ girdisinin $W$ ile çarpýlmasý,
-artý bir önceki konumun bir baþka $w_x$ ile çarpýlmasý sonucundan elde
-ediliyor. $w_x,w_y$ matrisleri geçmiþe ne kadar önem verileceðini
-tanýmlýyorlar. Ardýndan tüm hesap bir $\phi$ ile ``eziliyor'' yani belli
-aralýklara düþmesi zorlanýyor, bunun için tipik olarak sigmoid, ya da
-$tanh$ kullanýlýr.
+$s_t$ $t$ anindaki gizli konum. 
 
-Aynen normal YSA'da olduðu gibi bir ufak toptan veri parçasý (minibatch)
-için tüm hesaplarý tek bir vektorize iþlemle yapabiliriz,
+$$ s_t = f(U x_t +  W s_{t-1})$$
 
-$$ Y_t = \phi(X_t^T \cdot W_x + Y_{t-1}^TW_y + b)  $$
+$o_t$ $t$ anindaki cikti, $o_t = g(V s_t)$
 
-$$  = \phi( 
-\left[
-  \begin{array}{cc} X_t & Y_{t-1} \end{array}
-\right]
-) \cdot W + b )   
-\quad \textrm{ ki } \quad  W = \left[\begin{array}{c} W_x\\W_y \end{array}\right]
-$$
+Ýlginç olan $U,V,W$ aðýrlýk matrislerinin, parametrelerinin her zaman aný,
+her veri noktasý için ayný olmasý. Yani farklý zaman dilimleri için farklý
+aðýrlýklar atanmýyor. $t$ anýndaki gizli (hidden) konum $s_t$, bu bir nevi
+``hafýza''. Bu fonksiyon $x_t$ girdisinin $W$ ile çarpýlmasý, artý bir
+önceki konumun bir baþka $W$ ile çarpýlmasý sonucundan elde ediliyor. $W$
+matrisi geçmiþe ne kadar önem verileceðini tanýmlýyorlar. Ardýndan tüm
+hesap bir $\phi$ ile ``eziliyor'' yani belli aralýklara düþmesi zorlanýyor,
+bunun için tipik olarak sigmoid, ya da $tanh$ kullanýlýr.
 
 Bu kavramlar, konumlararasý geçiþ, $t$ anýndaki girdilerin ondan önceki
 girdileri nasýl baðlý olduðunun aðýrlýklar üzerinden ayarlanmasý, yani
@@ -47,41 +41,12 @@ filtrelenmesi, aslýnda Markov zincirlerine benziyor. Bu hesaplar sonucu
 elde edilen tahmin ve hata geriye yayma (backpropagation) ile aðýrlýk
 matrislerini deðiþtirmek için kullanýlacak.
 
-RNN ismindeki ``tekrarlanma'' $W_x,W_y$'nin her zaman adýmý için ayný
+RNN ismindeki ``tekrarlanma'' $U,V,W$'nin her zaman adýmý için ayný
 olmasýndan geliyor. Að bir bakýma tek bir seviye için, bir kez
 tanýmlanýyor, ve geriye ne kadar gidileceði üzerinden o yöne doðru
 kopyalanýyor, ya da ``açýlýyor (unfolding)''.  Bu açýlma iþlemini her zaman
-adýmý için gösterebiliriz. Alttaki diagramlarda $\phi$ için $f$, $W_y$
-yerine $W_h$ kullanýlmýþ. 0,1,.. indisleri ve apostrofi zaman dilimlerini
-temsil için.
-
-\includegraphics[width=8em]{rnndiag-0.jpg}
-\hspace{3cm}
-\includegraphics[width=19.5em]{rnndiag-1.jpg}
-
-\includegraphics[width=19.5em]{rnndiag-2.jpg}
-\includegraphics[width=19.5em]{rnndiag-3.jpg}
-
-\hspace{1cm}
-\includegraphics[width=25em]{rnndiag-4.jpg}
-
-\hspace{1cm}
-\includegraphics[width=25em]{rnndiag-5.jpg}
-
-\hspace{1cm}
-\includegraphics[width=25em]{rnndiag-6.jpg}
-
-Bir diagram daha, daha önce gördüðümüz $h$ kafa karýþtýrmasýn, bir önceki
-nöronun çýktýsý bir sonrakine girdi olmaktadýr, bir yandan ham veri girdisi
-var tabii, bu þekilde o nöronun çýktýsý meydana gelir. Standart yapýda her
-nöronun çýktýsý hesabý ve o çýktý için etiket olacaktýr, ve tahmin ile
-çýktý arasýndaki uyuþmazlýk eðitim ile düzeltilmeye çalýþýlacaktýr,
-vs. Gerçi bir önceki nörondan gelen veri ayrý aðýrlýklarla çarpýlýr, bu
-sebeple direk veri gibi sonraki katmana girmez, bu açýdan o farklýlýðý
-belirtmek için ``gizli'' þekilde tanýmlanabilir belki.
-
-\includegraphics[width=25em]{rnn_02.png}
-
+adýmý için gösterebiliriz. 
+f
 Zaman Ýçinde Geriye Doðru Yayýlma (Backpropagation Through Time -BPTT-)
 
 YSA'lar kendini tekrarlayan olsun ya da olmasýn aslýnda $f(g(h(x)))$
