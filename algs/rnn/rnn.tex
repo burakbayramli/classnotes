@@ -47,11 +47,13 @@ filtrelenmesi, aslýnda Markov zincirlerine benziyor. Bu hesaplar sonucu
 elde edilen tahmin ve hata geriye yayma (backpropagation) ile aðýrlýk
 matrislerini deðiþtirmek için kullanýlacak.
 
-RNN ismindeki ``tekrarlanma'' $W,U$'nun her zaman için ayný olmasýndan
-geliyor. Að bir bakýma tek bir seviye için, bir kez tanýmlanýyor, ve geriye
-ne kadar gidileceði üzerinden o yöne doðru kopyalanýyor, ya da ``açýlýyor
-(unfolding)''.  Bu açýlma iþlemini her zaman adýmý için
-gösterebiliriz. Alttaki diagramlarda $\phi$ için $f$ kullanýlmýþ.
+RNN ismindeki ``tekrarlanma'' $W_x,W_y$'nin her zaman adýmý için ayný
+olmasýndan geliyor. Að bir bakýma tek bir seviye için, bir kez
+tanýmlanýyor, ve geriye ne kadar gidileceði üzerinden o yöne doðru
+kopyalanýyor, ya da ``açýlýyor (unfolding)''.  Bu açýlma iþlemini her zaman
+adýmý için gösterebiliriz. Alttaki diagramlarda $\phi$ için $f$, $W_y$
+yerine $W_h$ kullanýlmýþ. 0,1,.. indisleri ve apostrofi zaman dilimlerini
+temsil için.
 
 \includegraphics[width=8em]{rnndiag-0.jpg}
 \hspace{3cm}
@@ -398,7 +400,10 @@ t=1
 \end{verbatim}
 Zaman Serisi Tahmini
 
-Tensorflow ile zaman serisi tahmini yapalým.
+Tensorflow ile zaman serisi tahmini yapalým. Eðitim verisinin formülünü
+bildiðimiz bir sinüs eðrisinden alacaðýz, sanki eðriyi bilmiyormuþ gibi
+yapalým, bu eðriyi sadece üretilen veriye bakarak ``öðreneceðiz''. Eðrinin
+rasgele kýsýmlarýndan toptan veri parçalarý üretmek için bir çaðrý yazalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 np.random.seed(1)
@@ -416,22 +421,30 @@ def next_batch(batch_size, n_steps):
     return ys[:, :-1].reshape(-1, n_steps, 1), ys[:, 1:].reshape(-1, n_steps, 1)
 \end{minted}
 
+Eðitim verisi zaman serisinin ufak bir parçasý, ve hedef verisi onun bir
+ileri kaydýrýlmýþ hali. 
+
+Zaman serisinin rasgele þekilde nasýl örneklendiðini göstermek için üstteki
+çaðrý içindeki örnekleme kodunun benzerini altta tekrarlayalým ve grafikleyelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-batch_size = 4
+batch_size = 5
 n_steps = 3
 t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution)
-Ts = t0 + np.arange(0., n_steps + 1) * resolution
+Ts = t0 + np.arange(0., n_steps+1) * resolution
 ys = f(Ts)
 print ys
 \end{minted}
 
 \begin{verbatim}
-[[ 2.22963782  2.68394768  2.64810416  2.18202481]
- [-0.55129553 -1.52984254 -2.17899898 -2.36687898]
- [-8.34178463 -9.30522476 -9.80876245 -9.75169688]
- [-1.90158319 -2.33323898 -2.27949901 -1.78163634]]
+[[ 2.17743208  2.27357975  1.87228856  1.05163803]
+ [-0.10520593 -0.90911746 -1.75240355 -2.39598168]
+ [-0.80861926 -0.7867238  -1.23048937 -2.082059  ]
+ [-1.37642148 -1.96414822 -2.65249624 -3.20183786]
+ [-3.54107518 -3.90422668 -3.80257653 -3.37818064]]
 \end{verbatim}
+
+Grafiklersek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
@@ -442,6 +455,8 @@ plt.savefig('rnn_03.png')
 \end{minted}
 
 \includegraphics[width=20em]{rnn_03.png}
+
+Öðrenme amaçýyla daha büyük adým, iç nöron sayýsý tanýmlayalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 reset_graph()
@@ -482,6 +497,25 @@ for iteration in range(n_iterations):
         mse = loss.eval(feed_dict={X: X_batch, y: y_batch}, session=sess)
         print(iteration, "\tMSE:", mse)
 
+\end{minted}
+
+\begin{verbatim}
+(0, '\tMSE:', 13.8245)
+(100, '\tMSE:', 0.57806575)
+(200, '\tMSE:', 0.17610031)
+(300, '\tMSE:', 0.086107321)
+\end{verbatim}
+
+Öðrenme tamamlandý ve MSE hata raporu fena deðil. Þimdi bu RNN'i hiç
+görmediðimiz geleceði tahmin için kullanalým, \verb!n_more! adým ilerisini
+tahmin edeceðiz, yanlýz \verb!n_steps! zaman serisi kaydýrýlmýþ
+\verb!n_steps! ilerisini tahmin için kullanýlýyordu. Biz tahminleri
+üretirken tahmin bloðunun sadece en sondaki öðesini alacaðýz. Sonra bu
+ögeyi kaynak veriye dahil edip bir gelecek bloðu daha üreteceðiz (onun da
+son öðesini alacaðýz, vs), ve böyle gide gide \verb!n_more! kadar geleceði
+bitiþtirmiþ olacaðýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
 t_start = 29. # tahmine burada basla
 n_more = 30 # bu kadar daha uret
 y_pred = np.array([f(t_start+i*resolution) for i in range(20)]).reshape(1,20,1)
@@ -503,14 +537,10 @@ plt.plot(t2,y2,'g.')
 plt.savefig('rnn_04.png')
 \end{minted}
 
-\begin{verbatim}
-(0, '\tMSE:', 13.8245)
-(100, '\tMSE:', 0.57806575)
-(200, '\tMSE:', 0.17610031)
-(300, '\tMSE:', 0.086107321)
-\end{verbatim}
-
 \includegraphics[width=20em]{rnn_04.png}
+
+Kýrmýzý renkli tahmin, yeþil renkli ne olduðugü. Tahminin alttan üste
+çýkýþý biraz erken olmuþ ama genel gidiþatý tahmin edebilmiþ gözüküyor.
 
 Kaynaklar
 
