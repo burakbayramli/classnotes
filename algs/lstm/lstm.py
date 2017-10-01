@@ -43,6 +43,7 @@ def concat_and_multiply(weights, *args):
 def init_lstm_params(input_size, state_size, output_size,
                      param_scale=0.01, rs=npr.RandomState(0)):
 
+    print 'state size', state_size
     print 'input size', input_size
     
     def rp(*shape):
@@ -77,7 +78,6 @@ def lstm_predict(params, inputs):
 
     output = [hiddens_to_output_probs(hiddens)]
     for input in inputs:  # Iterate over time steps.
-        print 'input in pred', input.shape
         hiddens, cells = update_lstm(input, hiddens, cells)
         output.append(hiddens_to_output_probs(hiddens))
     return output

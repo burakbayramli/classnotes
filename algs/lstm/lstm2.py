@@ -12,26 +12,6 @@ from autograd.scipy.misc import logsumexp
 
 from autograd.optimizers import adam
 
-def string_to_one_hot(string, maxchar):
-    """Converts an ASCII string to a one-of-k encoding."""
-    ascii = np.array([ord(c) for c in string]).T
-    return np.array(ascii[:,None] == np.arange(maxchar)[None, :], dtype=int)
-
-def one_hot_to_string(one_hot_matrix):
-    return "".join([chr(np.argmax(c)) for c in one_hot_matrix])
-
-def build_dataset(filename, sequence_length, alphabet_size, max_lines=-1):
-    """Loads a text file, and turns each line into an encoded sequence."""
-    with open(filename) as f:
-        content = f.readlines()
-    content = content[:max_lines]
-    content = [line for line in content if len(line) > 2]   # Remove blank lines
-    seqs = np.zeros((sequence_length, len(content), alphabet_size))
-    for ix, line in enumerate(content):
-        padded_line = (line + " " * sequence_length)[:sequence_length]
-        seqs[:, ix, :] = string_to_one_hot(padded_line, alphabet_size)
-    return seqs
-
 def sigmoid(x):
     return 0.5*(np.tanh(x) + 1.0)   # Output ranges from 0 to 1.
 
@@ -84,7 +64,6 @@ def lstm_log_likelihood(params, inputs, targets):
         loglik += np.sum(logprobs[t] * targets[t])
     return loglik / (num_time_steps * num_examples)
 
-
 np.random.seed(1)
 
 def f(t):
@@ -93,15 +72,33 @@ def f(t):
 def next_batch(batch_size, n_steps):
     t_min, t_max = 0, 30
     resolution = 0.1
-    t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution)
+    t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution) # 
     Ts = t0 + np.arange(0., n_steps + 1) * resolution
     ys = f(Ts)
     return ys[:, :-1].reshape(-1, n_steps, 1), ys[:, 1:].reshape(-1, n_steps, 1)
 
 if __name__ == '__main__':
 
-    X,y = next_batch(4,3)
-    print len(X)
-    print X[0], y[0]
+    X,y = next_batch(10,100)
+    #X = X.reshape((dims,1))
+    X = np.array(X)
+    y = np.array(y)
+    print X.shape, y.shape
     
+    init_params = init_lstm_params(input_size=1, output_size=1,
+                                   state_size=5, param_scale=0.1)
+
+    def training_loss(params, iter): return -lstm_log_likelihood(params, X, y)
+
+    def callback(weights, iter, gradient):
+        if iter % 20 == 0:
+            print("Iteration", iter, "Train loss:", training_loss(weights, 0))    
+    
+    training_loss_grad = grad(training_loss)
+    
+    trained_params = adam(training_loss_grad, init_params,
+                          step_size=0.01, num_iters=1000,
+                          callback=callback)
+
+
     
