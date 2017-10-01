@@ -33,16 +33,12 @@ def build_dataset(filename, sequence_length, alphabet_size, max_lines=-1):
         seqs[:, ix, :] = string_to_one_hot(padded_line, alphabet_size)
     return seqs
 
-
-
 def sigmoid(x):
     return 0.5*(np.tanh(x) + 1.0)   # Output ranges from 0 to 1.
 
 def concat_and_multiply(weights, *args):
     cat_state = np.hstack(args + (np.ones((args[0].shape[0], 1)),))
     return np.dot(cat_state, weights)
-
-
 
 def init_lstm_params(input_size, state_size, output_size,
                      param_scale=0.01, rs=npr.RandomState(0)):
@@ -98,6 +94,10 @@ if __name__ == '__main__':
     train_inputs = build_dataset(text_filename, sequence_length=30,
                                  alphabet_size=num_chars, max_lines=60)
 
+    print (num_chars)
+    print (train_inputs.shape)
+    exit()
+    
     init_params = init_lstm_params(input_size=128, output_size=128,
                                    state_size=40, param_scale=0.01)
 
@@ -114,7 +114,7 @@ if __name__ == '__main__':
         return -lstm_log_likelihood(params, train_inputs, train_inputs)
 
     def callback(weights, iter, gradient):
-        if iter % 10 == 0:
+        if iter % 100 == 0:
             print("Iteration", iter, "Train loss:", training_loss(weights, 0))
             print_training_prediction(weights)
 

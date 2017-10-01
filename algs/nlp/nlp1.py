@@ -85,5 +85,5 @@ for i,batch in enumerate(batches):
         train_acc = sess.run(accuracy, feed_dict)
         test_acc = sess.run(accuracy, feed_dict2)
         print train_acc, test_acc
-    if (i % 200) == 0:
+    if (i % 200) == 0: # arada sirada modeli kaydet
         path = saver.save(sess, "/tmp/nlpembed1")
