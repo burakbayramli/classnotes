@@ -3,7 +3,6 @@ This version vectorizes over multiple examples, but each string
 has a fixed length."""
 
 from __future__ import absolute_import
-from __future__ import print_function
 from builtins import range
 from os.path import dirname, join
 import autograd.numpy as np
@@ -27,6 +26,7 @@ def build_dataset(filename, sequence_length, alphabet_size, max_lines=-1):
         content = f.readlines()
     content = content[:max_lines]
     content = [line for line in content if len(line) > 2]   # Remove blank lines
+    print 'file lines', len(content)
     seqs = np.zeros((sequence_length, len(content), alphabet_size))
     for ix, line in enumerate(content):
         padded_line = (line + " " * sequence_length)[:sequence_length]
@@ -42,6 +42,9 @@ def concat_and_multiply(weights, *args):
 
 def init_lstm_params(input_size, state_size, output_size,
                      param_scale=0.01, rs=npr.RandomState(0)):
+
+    print 'input size', input_size
+    
     def rp(*shape):
         return rs.randn(*shape) * param_scale
 
@@ -68,6 +71,7 @@ def lstm_predict(params, inputs):
         return output - logsumexp(output, axis=1, keepdims=True) # Normalize log-probs.
 
     num_sequences = inputs.shape[1]
+    print 'num_sequences', num_sequences
     hiddens = np.repeat(params['init hiddens'], num_sequences, axis=0)
     cells   = np.repeat(params['init cells'],   num_sequences, axis=0)
 
@@ -94,9 +98,9 @@ if __name__ == '__main__':
     train_inputs = build_dataset(text_filename, sequence_length=30,
                                  alphabet_size=num_chars, max_lines=60)
 
-    print (num_chars)
-    print (train_inputs.shape)
-    exit()
+    print 'alphabet', num_chars
+    print 'seq', train_inputs.shape[0]
+    print 'input', train_inputs.shape
     
     init_params = init_lstm_params(input_size=128, output_size=128,
                                    state_size=40, param_scale=0.01)
@@ -109,6 +113,7 @@ if __name__ == '__main__':
             predicted_text = one_hot_to_string(logprobs[:,t,:])
             print(training_text.replace('\n', ' ') + "|" +
                   predicted_text.replace('\n', ' '))
+            exit()
 
     def training_loss(params, iter):
         return -lstm_log_likelihood(params, train_inputs, train_inputs)
