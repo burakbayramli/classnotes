@@ -43,8 +43,11 @@ def lstm_predict(params, inputs):
         return hiddens, cells
 
     def hiddens_to_output_probs(hiddens):
-        output = concat_and_multiply(params['predict'], hiddens)
-        return output - logsumexp(output, axis=1, keepdims=True) # Normalize log-probs.
+        output1 = concat_and_multiply(params['predict'], hiddens).T
+        output2 = logsumexp(output1, axis=1, keepdims=True).T # Normalize log-probs.
+        #print output1 - output2
+        #print '-----------'
+        return output1 - output2
 
     num_sequences = inputs.shape[1]
     hiddens = np.repeat(params['init hiddens'], num_sequences, axis=0)
