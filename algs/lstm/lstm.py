@@ -77,6 +77,7 @@ def lstm_predict(params, inputs):
 
     output = [hiddens_to_output_probs(hiddens)]
     for input in inputs:  # Iterate over time steps.
+        print 'input in pred', input.shape
         hiddens, cells = update_lstm(input, hiddens, cells)
         output.append(hiddens_to_output_probs(hiddens))
     return output
@@ -85,6 +86,7 @@ def lstm_log_likelihood(params, inputs, targets):
     logprobs = lstm_predict(params, inputs)
     loglik = 0.0
     num_time_steps, num_examples, _ = inputs.shape
+    print 'time steps', num_time_steps
     for t in range(num_time_steps):
         loglik += np.sum(logprobs[t] * targets[t])
     return loglik / (num_time_steps * num_examples)
