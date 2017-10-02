@@ -44,7 +44,9 @@ def lstm_predict(params, inputs):
 
     def hiddens_to_output_probs(hiddens):
         output1 = concat_and_multiply(params['predict'], hiddens).T
-        output2 = logsumexp(output1, axis=1, keepdims=True).T 
+        output2 = logsumexp(output1, axis=1, keepdims=True).T # Normalize log-probs.
+        #print output1 - output2
+        #print '-----------'
         return output1 - output2
 
     num_sequences = inputs.shape[1]
@@ -76,12 +78,12 @@ def next_batch(batch_size, n_steps):
     t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution) # 
     Ts = t0 + np.arange(0., n_steps + 1) * resolution
     ys = f(Ts)
-    Xa = ys[:, :-1].reshape(-1, n_steps, 1)
-    ya = ys[:, 1:].reshape(-1, n_steps, 1)
-    return np.array(Xa),np.array(ya)
+    return ys[:, :-1].reshape(-1, n_steps, 1), ys[:, 1:].reshape(-1, n_steps, 1)
 
 if __name__ == '__main__':
 
+    np.random.seed(1)
+    
     X,y = next_batch(20,30)
     print X.shape, y.shape
     
@@ -92,7 +94,7 @@ if __name__ == '__main__':
 
     def callback(weights, iter, gradient):
         if iter % 10 == 0:
-        print("Iteration", iter, "Train loss:", training_loss(weights, 0))    
+            print("Iteration", iter, "Train loss:", training_loss(weights, 0))    
     
     training_loss_grad = grad(training_loss)
     
@@ -100,5 +102,8 @@ if __name__ == '__main__':
                           step_size=0.01, num_iters=54,
                           callback=callback)
 
-
     
+    np.random.seed(20)
+    X_test,y_test = next_batch(1,30)
+    res = lstm_predict(init_params, X_test)
+    print res

@@ -69,11 +69,8 @@ def lstm_predict(params, inputs):
 
     def hiddens_to_output_probs(hiddens):
         output1 = concat_and_multiply(params['predict'], hiddens)
-        #output = concat_and_multiply(params['predict'], hiddens)
         output2 = logsumexp(output1, axis=1, keepdims=True) # Normalize log-probs.
         print 'output1.shape output2.shape', output1.shape, output2.shape
-        #return output - logsumexp(output, axis=1, keepdims=True) # Normalize log-probs.
-        #print output1 - output2
         return output1 - output2
 
     num_sequences = inputs.shape[1]
