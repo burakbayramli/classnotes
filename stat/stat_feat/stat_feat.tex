@@ -16,13 +16,13 @@ probleminde kullandýk, ve diyelim yüzde 70 baþarý elde ettik. Þimdi çok
 basit bir yeni özellik yaratalým, görüntüyü dikey ikiye bölelim, ve üstteki
 ve alttaki siyah noktalarý toplayarak iki yeni kolon olarak görüntü
 matrisine ekleyelim. Bu yeni özellikleri kullanýnca basit sýnýflayýcýnýn
-yüzde 20 kadar tanýma baþarýndan ilerleme olduðunu göreceðiz! 
+yüzde 20 kadar tanýma baþarýsýnda ilerleme kaydettiðini göreceðiz!
 
 Not: Derin yapay sýnýr aðlarý teknikleri ile özellik iþlemeye artýk gerek
 olmadýðý söylenir, bu büyük ölçüde doðru. Bir DYSA farklý seviyelerdeki pek
-çok farklý nöronlar üzerinden aslýnda üstte tarif edilen türden yeni
-özellikleri otomatik olarak yaratýr. Fakat yine de bu teknikleri bilmek
-iyidir. 
+çok farklý nöronlarý üzerinden aslýnda üstte tarif edilen türden yeni
+özellikleri otomatik olarak yaratýr, ögrenir. Fakat yine de yeni
+özellikleri elle yaratma tekniklerini bilmek iyi.
 
 Þimdi farklý yöntemlere bakalým.
 
@@ -135,7 +135,7 @@ kullanýldý.
 
 Kategorileri Ýkileþtirme
 
-Yapay öðrenim algoritmalarýnýn çoðu zaman hem kategorik hem numerik
+Yapay öðrenim algoritmalarýnýn çoðu zaman hem kategorik hem sayýsal
 deðerleri ayný anda bulunduran verilerle iþ yapmasý gerekebiliyor. Ayrýca
 literatüre bakýlýnca görülür ki çoðunlukla bir algoritma ya biri, ya diðeri
 ile çalýþýr, ikisi ile ayný anda çalýþmaz (çalýþanlar var tabii, mesela
@@ -143,11 +143,11 @@ karar aðaçlarý -decision tree-). Bu gibi durumlarda iki seçenek var, ya
 numerik veri kategoriselleþtirilir (ayrýksallaþtýrýlýr), ya da kategorik
 veri numerik hale getirilir.
 
-Bu durumda, kategorik bir kolon eyalet icin, eyaletin Ohio olup olmamasi
-basli basina ayri bir kolon olarak gosteriliyor. Ayni sekilde Nevada. Bu
-kodlamaya literaturde One-Hot Kodlamasi adi veriliyor. KMeans, lojistik
-regresyon gibi metotlara girdi vermek icin bu transformasyon
-kullanilabilir.
+Bu durumda, kategorik bir kolon eyalet için, eyaletin Ohio olup olmamasý
+baþlý baþýna ayrý bir kolon olarak gösteriliyor. Ayný þekilde Nevada. Bu
+kodlamaya literatürde 1-hot kodlamasý adý veriliyor. KMeans, lojistik
+regresyon gibi metotlara girdi vermek için bu transformasyon
+kullanýlabilir.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy as np
@@ -187,22 +187,20 @@ print df2
 
 Unutmayalým, kategorik deðerler bazen binleri bulabilir (hatta sayfa
 týklama tahmini durumunda mesela milyonlar, hatta milyarlar), bu da
-binlerce yeni kolon demektir
+binlerce yeni kolon demektir. Yani 1/0 kodlamasý, yani 1-hot iþleminden ele
+geçen yeni blok içinde aslýnda oldukca çok sayýda sýfýr deðeri olacak
+(sonuçta her satýrda binlerce 'þey' içinde sadece bir tanesi 1 oluyor),
+yani bu bloðun bir seyrek matris olmasý iyi olurdu. O zaman matrisin
+tamamýný \verb!sps.csr_matrix! ya da \verb!sps.lil_matrix! ile gerçekten
+seyrek formata çevirebiliriz, ve mesela scikit-learn paketi, numpy, scipy
+iþlemleri seyrek matrisler ile hesap yapabilme yeteneðine
+sahip. Seyrekselleþtirince ne elde ediyoruz?  Sýfýrlarý depolamadýðýmýz
+için sadece sýfýr olmayan deðerler ile iþlem yapýyoruz, o ölçüde kod
+hýzlanýyor, daha az yer tutuyor.
 
-Fakat 1/0 kodlamasý, yani öne-hot iþleminden ele geçen yeni blok içinde
-aslýnda oldukca çok sayýda sýfýr deðeri vardýr (sonuçta her satýrda
-binlerce 'þey' içinde sadece bir tanesi 1 oluyor), yani bu blok bir seyrek
-matris olacaktýr. O zaman matrisýn tamamýný \verb!sps.csr_matrix! ya da
-\verb!sps.lil_matrix! ile gerçekten seyrek formata çevirebiliriz, ve mesela
-Scikit Learn adlý yapay öðrenim paketi, sýfýrdan YO kodlamak istersek
-Numpy, Scipy iþlemleri seyrek matrisler ile hesap yapabilme yeteneðine
-sahip. Seyrekselleþtirince ne elde ediyoruz? Sýfýrlarý depolamadýðýmýz için
-sadece sýfýr olmayan deðerler ile iþlem yapýyoruz, o ölçüde kod hýzlanýyor,
-daha az yer tutuyor.
-
-Dikkat etmek gerekir ki yeni kolonlari uretince degerlerin yerleri
-sabitlenmis olur. Her satir bazinda bazen state=Ohio, state=Nevada, bazen
-sadece state=Ohio uretiyor olamayiz. Ustteki ornekte her zaman 4 tane kolon
+Dikkat etmek gerekir ki yeni kolonlarý üretince deðerlerin yerleri
+sabitlenmiþ olur. Her satýr bazýnda bazen state=Ohio, state=Nevada, bazen
+sadece state=Ohio üretiyor olamayýz. Üstteki örnekte her zaman 4 tane kolon
 elde edilmelidir.
 
 Not: 1-hot yerine bir diðer seçenek kategoriyi bir indise çevirmek (tüm
@@ -211,9 +209,9 @@ ikisel sistemde belirtmek, eðer 'a' sayýsý 30 indisine tekabül ediyorsa, 30
 ikisel sistemde 11110, bu deðer kullanýlýr (aslýnda bu son tarif edilen
 sistemin 1-hot sistemden daha iyi iþlediði rapor ediliyor).
 
-Anahtarlama Numarasý (One-Hot Encoding, Hashing Trick)
+Anahtarlama Numarasý (1-Hot Encoding, Hashing Trick)
 
-Üstteki kodda bir problem var, dokümaný temsil eden ve içinde 1 ya da
+Fakat bir problem var, dokümaný temsil eden ve içinde 1 ya da
 0 hücreli özellik vektörünü (feature vector) oluþturmak için tüm
 kelimelerin ne olduðunu bilmeliyiz. Yani veriyi bir kere baþtan sonra
 tarayarak bir sözlük oluþturmalýyýz (ki öyle yapmaya mecbur kaldýk) ve
