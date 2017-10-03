@@ -407,11 +407,11 @@ print ys
 \end{minted}
 
 \begin{verbatim}
-[[ 2.17743208  2.27357975  1.87228856  1.05163803]
- [-0.10520593 -0.90911746 -1.75240355 -2.39598168]
- [-0.80861926 -0.7867238  -1.23048937 -2.082059  ]
- [-1.37642148 -1.96414822 -2.65249624 -3.20183786]
- [-3.54107518 -3.90422668 -3.80257653 -3.37818064]]
+[[-2.3141651  -1.12233854  0.27200624  1.6253068 ]
+ [ 4.31878159  4.63599743  4.61528818  4.112844  ]
+ [ 0.03397153  0.99207952  1.71474727  2.02731967]
+ [ 2.87376693  3.00044595  2.62695206  1.77847377]
+ [-0.96970753 -2.03368272 -2.93926439 -3.47887785]]
 \end{verbatim}
 
 Grafiklersek,
@@ -429,6 +429,13 @@ plt.savefig('rnn_03.png')
 Öðrenme amacýyla daha büyük adým, iç nöron sayýsý tanýmlayalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+def reset_graph(seed=42):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
 reset_graph()
 
 n_steps = 20
@@ -486,32 +493,28 @@ son öðesini alacaðýz, vs), ve böyle gide gide \verb!n_more! kadar geleceði
 bitiþtirmiþ olacaðýz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-t_start = 29. # tahmine burada basla
-n_more = 30 # bu kadar daha uret
-y_pred = np.array([f(t_start+i*resolution) for i in range(20)]).reshape(1,20,1)
-res = []
-
-for i in range(n_more):
-    y_pred_new = sess.run(outputs, feed_dict={X: y_pred})
-    y_pred[0,0:n_steps-1,0] = y_pred[0,1:n_steps,0]
-    y_pred[0,-1,0] = y_pred_new[0,-1,0]
-    res.append(y_pred_new[0,-1,0])
+n_more = 40
 
 t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
 y = f(t)
+
+newx = list(t[-n_steps:])
+newy = list(y[-n_steps:])
+for i in range(n_more): # bu kadar daha uret
+   tst_input = np.array(newy[-n_steps:]).reshape(1,n_steps,1) 
+   res = sess.run(outputs, feed_dict={X: tst_input})
+   newy.append(res[0][0][0])
+   newx.append(t_max + (i*resolution))
+
 plt.plot(t,y)
-t2 = [t_start+i*resolution for i in range(n_more)]
-plt.plot(t2,res,'r.')
-y2 = np.array([f(tt) for tt in t2])
-plt.plot(t2,y2,'g.')
+plt.plot(newx[n_steps-1:],newy[n_steps-1:],'g')
+
 plt.savefig('rnn_04.png')
 \end{minted}
 
 \includegraphics[width=20em]{rnn_04.png}
 
-Kýrmýzý renkli tahmin, yeþil renkli gerçek zaman serisi. Tahminin alttan
-üste çýkýþý biraz erken olmuþ ama genel gidiþatý tahmin edebilmiþ
-gözüküyor.
+Yeþil renkli tahmin bölümü. 
 
 Kaynaklar
 
