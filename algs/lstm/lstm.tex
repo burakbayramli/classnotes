@@ -2,11 +2,12 @@
 \begin{document}
 Uzun Kýsa-Vade Hafýza Aðlarý (Long Short-Term Memory Networks, LSTM)
 
-Kendini tekrarlayan YSA (RNN) yapýlarýnýn içindeki gizli konum $s_t$ bir
-zaman diliminden bir diðerine aktarýlabiliyordu, ve bu sýrada bir matris
-çarpýmý üzerinden deðiþime uðrayabiliyordu. Böylece her zaman diliminde
-yeni görülen verinin ``hafýza'' olarak ta görülebilecek $s_t$'ye etkisi
-olabiliyordu. RNN dýþ dünya hakkýndaki iç modelini böyle güncelliyordu.
+Kendini tekrarlayan YSA (RNN) yapýlarýnýn içindeki gizli konum $h_t$ (o
+yazýda $s_t$ adý verilmiþti) olarak bir zaman diliminden bir diðerine
+aktarýlabiliyordu, ve bu sýrada bir matris çarpýmý üzerinden deðiþime
+uðrayabiliyordu. Böylece her zaman diliminde yeni görülen verinin
+``hafýza'' olarak ta görülebilecek $h_t$'ye etkisi olabiliyordu. RNN dýþ
+dünya hakkýndaki iç modelini böyle güncelliyordu.
 
 Fakat RNN ile tarif edilen bu güncellemeye hiç bir sýnýr getirmedik. Biraz
 düþünürsek bu güncellemenin biraz kaotik bir hal alabileceðini görebiliriz
@@ -14,11 +15,11 @@ düþünürsek bu güncellemenin biraz kaotik bir hal alabileceðini görebiliriz
 etmeye uðraþan bir RNN düþünelim. Bir karede bir karakterin ABD'de olduðunu
 düþünebilir, ama sonraki karede karakterin suþi yediðini görüyor ve
 Japonya'da olduðuna karar verebilir, sonra Panda ayýsý görüyor ve karakteri
-kuzey kutbunda zannediyor olabilir.
+kuzey kutbunda zannediyor.
 
 Bu tarif edilen kaos enformasyonun çok hýzlý etki ettiðini ve ayný hýzda
 yokolduðuna iþaret. Bu tür bir yapýda modelin uzun vadeli hafýza tutmasý
-oldukca zor. Bize gereken modelin sadece güncelleme yapmasý deðil,
+oldukça zor. Bize gereken modelin sadece güncelleme yapmasý deðil,
 güncelleme yapmayý da öðrenmesi. Ali adlý bir karakter film karesinde yoksa
 o kareler Ali hakkýndaki bilgiyi güncellemek için kullanýlmamalý, ayný
 þekilde Ayþe'nin içinde olmadýðý kareler onun hakkýndaki bilgiyi
@@ -28,12 +29,12 @@ güncellemek için kullanýlmamalý.
 
 1) Bir ``unutma'' mekanizmasý ekle. Film seyrediyoruz, bir sahne bitiyor, o
 sahnenin hangi gün, saat kaçta, nerede olduðunu unutuyoruz. Fakat bir
-karakter o sahnede olmuþse, bunu hatýrlýyoruz. Modelin ne zaman
+karakter o sahnede ölmüþse, bunu hatýrlýyoruz. Modelin ne zaman
 hatýrlayacaðýný, ne zaman unutacaðýný öðrenmesini istiyoruz (dikkat sadece
 belli bir þekilde unutmasý, hatýrlamasý deðil, tüm bunlarý ne zaman
 yapacaðýný öðrenmesi).
 
-2) Bir belleðe yazma (zulaya atma?) mekanizmasý. Model yeni bir kare
+2) Bir belleðe yazma (zulaya atma?) mekanizmasý. Modelin yeni bir kare
 gördüðünde o karedeki bilginin kaydetmeye deðer olup olmadýðýna karar
 vermesi lazým, ve bu öðrenilse iyi olur.
 
@@ -54,7 +55,7 @@ güncellenmesinin gerekli olduðunu, ve hangisinin daha fazla odaklanýlmaya
 ihtiyaç duyduðunu belirler.
 
 Matematiksel olarak $t$ anýnda bir $x_t$ girdisi alýyoruz, uzun-vadeli ve
-iþlem hafýzasý $c_{t-1}$ ve $h_{t-1}$ bir önceki zaman diliminden bir
+iþlem hafýzasý $C_{t-1}$ ve $h_{t-1}$ bir önceki zaman diliminden bir
 önceki bu zamana aktarýlýyor ve onlarý bir þekilde güncellemek
 istiyoruz. Bize gereken bir tür hatýrlama geçidi (remember gate), bu
 elektronik devrelerdeki gibi bir geçit, 0 ile 1 arasýnda olacak $n$ tane
@@ -70,72 +71,100 @@ kullandýk çünkü 0 ile 1 arasýnda çýktýya ihtiyacýmýz var. Þimdi girdiden
 öðreneceðimiz bilgiyi hesaplamamýz lazým, bu bilgi uzun-vadeli hafýzamýz
 için bir aday olacak. 
 
-$$ c_t' = \phi(W_l x_t + U_l h_{t-1})$$
+$$ C_t' = \phi(W_l x_t + U_l h_{t-1})$$
 
 $\phi$ bir aktivasyon fonksiyonu, çoðunlukla $\tanh$ olarak seçilir. 
 
 Fakat bir adayý hafýzamýza eklemeden önce hangi bölümlerinin kullanýma,
 kaydetmeye deðer olduðunu öðrenmemiz gerekir. Web'de bir þey okurken kendi
-zihnimizde neler olduðunu düþünelim. Bir haber makalesi okuduðumuzu
-düþünelim, Trabzonspor'un hep kötüyü gittiðini, yanlýþ tranferler yaptýðýný
-anlatan bir haber okuyoruz, bu haberi fenerbahçe.org sitesinde okuyorsak o
-habere daha az önem verebiliriz.
+zihnimizde neler olduðunu düþünelim. Bir haber makalesi okuyoruz mesela,
+Trabzonspor'un hep kötüyü gittiðini, hep yanlýþ tranferler yaptýðýný
+anlatan bir haber okuyoruz, ama bu haberi fenerbahçe.org sitesinde
+okuyorsak o habere daha az önem verebiliriz.
 
-$$ i_t = \sigma (W_s x_t + U_s h_{t-1} $$
+$$ i_t = \sigma (W_s x_t + U_s h_{t-1}) $$
 
-Þimdi tüm bu basamaklarý birleþtirelim. Ýhtiyaçýmiz olmayan hafýzalarý
+Þimdi tüm bu basamaklarý birleþtirelim. Ýhtiyacýmýz olmayan hafýzalarý
 unuttuktan ve bilgilerin faydalý olabilecek kýsýmlarýný sakladýktan sonra,
 elimizde bir güncellenmiþ uzun-vadeli bellek geçer, 
 
-$$ c_t = f_t \circ c_{t-1} \circ i_t \circ c_t' $$
+$$ C_t = f_t \circ c_{t-1} \circ i_t \circ \tilde{C}_t $$
 
-ki $\circ$ operasyonu her iki taraftaki deðiþkenlerin içindeki her ögenin
-birer birer çarpýlmasý (element-wise multiplication)  demek. 
+ki $\circ$ operasyonu her iki taraftaki deðiþkenin içindeki her ögenin
+birer birer çarpýlmasý (element-wise multiplication) demek.
 
 Sonra iþlem hafýzasýný güncellememiz lazým, uzun-vade belleðimizi anlýk
 iþlem için faydalý olabilecek þekilde nasýl odaklarýz, onu öðrenmek
 istiyoruz. O zaman bir odaklanma vektörü öðreniriz,
 
-$$ o_t = \sigma (W_f x_t + U_f h_{t-1} $$
+$$ o_t = \sigma (W_f x_t + U_f h_{t-1}) $$
 
 O zaman iþlem hafýzamýz
 
-$$ h_t = o_t \circ \phi (c_t)$$
+$$ h_t = o_t \circ \phi (C_t)$$
 
 Yani odak deðeri 1 olan öðelere tam dikkatimizi veriyoruz, 0 olanlara hiç
 dikkat etmiyoruz. 
 
-Kuþbakýþý ile bakarsak kendini tekrar eden LSTM yapýsý suna benzer,
+Kuþbakýþý ile tüm resmi görelim, kendini tekrar eden LSTM yapýsý þuna
+benzer,
 
 \includegraphics[width=30em]{lstm_02.png}
 
 Sol ve saðdaki hücreler ortadakinin kopyasý. 
 
-Kýyasla RNN'nin iç yapýsý çok daha basittir, 
+Kýyasla bir RNN'nin iç yapýsý çok daha basittir, 
 
 \includegraphics[width=30em]{lstm_03.png}
 
 LSTM resmindeki her birimin formülleriyle beraber teker teker tekrar
-üzerinden geçmek gerekirse [2]:
-
-Ýlk adým hücre bilgisinden neleri atacaðýmýza karar vermek. Bu karar unutma
-karar tabakasý adý verilen bir sigmoid tabakasý tarafýndan
-kararlaþtýrýlýyor, bu tabaka $h_{t-1}$ ve $x_t$'ye bakýyor ve $c_{t-1}$
-hücre konumundaki her deðer için 0 ile 1 arasýnda bir sayý üretiyor. 1 bu
-deðeri tamamen tut, 0 bu deðeri tamamen unut anlamýna geliyor.
+üzerinden geçmek gerekirse [2] - ilk adým hücre bilgisinden neleri
+atacaðýmýza karar vermek. Bu karar unutma karar tabakasý adý verilen bir
+sigmoid tabakasý tarafýndan kararlaþtýrýlýyor, bu tabaka $h_{t-1}$ ve
+$x_t$'ye bakýyor ve $C_{t-1}$ hücre konumundaki her deðer için 0 ile 1
+arasýnda bir sayý üretiyor. 1 bu deðeri tamamen tut, 0 bu deðeri tamamen
+unut anlamýna geliyor (tüm $b$ deðerleri yanlýlýk -bias- için).
 
 \includegraphics[width=30em]{lstm_04.png}
 
 Bir sonraki adým hücrede hangi yeni bilgiyi depolayacaðýmýza karar
 vermek. Bu kararýn iki parçasý var, önce girdi geçit tabakasý (input gate
-layer) adý verilen hangi deðerleri güncelleyeceðimize karar
-veriyor. Ardýndan bir $\tanh$ tabakasý bir ``aday vektörü'' $c_t'$
-üretiyor, bu vektör, adý üzerinde, hücre konumuna eklenmeye aday
-bilgiler. Ardýndan bu iki vektör birleþtirilip konumu güncellemek için yeni
-bir vektör yaratýlýyor. 
+layer) hangi deðerleri güncelleyeceðimize karar veriyor. Ardýndan bir
+$\tanh$ tabakasý bir ``aday vektörü'' $\tilde{C}_t$ üretiyor, bu vektör,
+adý üzerinde, hücre konumuna eklenmeye aday bilgiler. Ardýndan bu iki
+vektör birleþtirilip konumu güncellemek için yeni bir vektör yaratýlýyor.
 
 \includegraphics[width=30em]{lstm_05.png}
 
+Sýra güncelleme iþ bantýna (update conveyor) geldi. Herhalde bu isim
+verilmiþ çünkü hücrenin en üstünde direk soldan saða giden bu ok bir tür
+fabrika iþ bantý gibi, bir ana akým hattý. Bir kaç bilgi akýmý bu ana kola
+giriyor. Bu iþ bantýnýn görevi hücrenin eski konum bilgisini güncellemek,
+$C_{t-1}$'i $C_t$ haline getirmek. Önceki adýmlar ne yapýlmasý gerektiðine
+karar vermiþti, þimdi bu kararlarý eyleme geçirme zamaný. Eski konum
+bilgisini $f_t$ ile çarpýyoruz, böylece unutmak istediklerimizi
+unutuyoruz. Sonra $i_t * C_t'$'yi ekliyoruz, bunlar yeni konumu ne kadar
+güncellemek istediðimizi belirleyen aðýrlýklarla ölçeklenmiþ yeni aday
+deðerler.
+
+\includegraphics[width=30em]{lstm_06.png}
+
+En son adým tahmin adýmý, bu adýmda artýk çýktýnýn ne olacaðýna karar
+veriyoruz. Çýktý mevcut hücre konumunu baz alacak, ama onun filtrelenmiþ
+bir hali olacak. Ýlk önce bir sigmoid iþleterek konumun hangi kýsmýnýn
+çýktýya verileceðini kararlaþtýrýyoruz. Ardýndan mevcut konum bilgisini bir
+$\tanh$'e veriyoruz, ki bu deðerlerin $-1,+1$ arasýnda gelmesini
+saðlýyoruz, ve bu sonucu sigmoid'den gelen deðer ile çarpýyoruz, ki sadece
+istediðimiz kýsmýn dýþarý verilmesini saðlayalým. 
+
+\includegraphics[width=30em]{lstm_07.png}
+
+Þimdi üstteki formülleri kullanarak TensorFlow ile sýfýrdan bir LSTM
+kodlayalým. Amacýmýz daha RNN için gördüðümüz zaman serisini öðrenmek, 
+bu seriyi 5'er 5'er okuyacaðýz, yani yanyana 5 seri öðesini okuyacaðýz, ve
+6. seri deðeri hedef deðeri olacak, seri içinden bu þekilde örneklem
+yaparak bir ufak toptan eðitim seti yaratacaðýz. Sonra serinin hiç
+görmediðimiz ``geleceðini'' tahmin etmeye uðraþacaðýz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -181,13 +210,18 @@ train_output = reference_output_data[:NUM_EXAMPLES]
 print train_input[1]
 print train_output[1]
 
-data = tf.placeholder(tf.float32, [None, sequence_length, instruction_count], name='data')
+data = tf.placeholder(tf.float32, 
+                      [None, sequence_length, instruction_count], 
+                      name='data')
+
 target = tf.transpose(tf.placeholder(tf.float32, [None], name='target'))
 
 FEATURE_SIZE = 1 
 
 def default_weights_and_bias():
-    Weights = tf.Variable(tf.truncated_normal([LSTM_SIZE, LSTM_SIZE + FEATURE_SIZE], -0.2, 0.1))
+    Weights = tf.Variable(tf.truncated_normal([LSTM_SIZE, 
+                                               LSTM_SIZE + FEATURE_SIZE], 
+                                               -0.2, 0.1))
     bias = tf.Variable(tf.constant(0.0, shape = [LSTM_SIZE, 1]))
     
     return Weights, bias
@@ -208,6 +242,7 @@ def i_t(ht_minus_1_and_xt):
 
 W_C, b_c = default_weights_and_bias()
 
+# is banti icin adaylar
 def candidate_C_t(ht_minus_1_and_xt):
     return tf.tanh(tf.matmul(W_C, ht_minus_1_and_xt) + b_c)
 
@@ -216,6 +251,7 @@ def C_t(ht_minus_1_and_xt, Conveyor, CandidateConveyor):
 
 W_o, b_o = default_weights_and_bias()
 
+# guncellenmis is banti
 def h_t(ht_minus_1_and_xt, FinalConveyor):
     o_t = tf.sigmoid(tf.matmul(W_o, ht_minus_1_and_xt) + b_o)    
     return o_t * tf.tanh(FinalConveyor)
@@ -301,33 +337,38 @@ for i in range(epoch):
  [ 4.67751103]
  [ 4.39857443]]
 3.60413751202
-Epoch   20 | mean squ error  4373.3
-Epoch   40 | mean squ error  2624.0
-Epoch   60 | mean squ error  2007.1
-Epoch   80 | mean squ error  1474.9
-Epoch  100 | mean squ error  989.3
-Epoch  120 | mean squ error  657.5
-Epoch  140 | mean squ error  476.4
-Epoch  160 | mean squ error  367.4
-Epoch  180 | mean squ error  296.0
-Epoch  200 | mean squ error  244.6
-Epoch  220 | mean squ error  205.1
-Epoch  240 | mean squ error  174.6
-Epoch  260 | mean squ error  151.6
-Epoch  280 | mean squ error  134.1
-Epoch  300 | mean squ error  120.5
-Epoch  320 | mean squ error  109.5
-Epoch  340 | mean squ error  100.3
-Epoch  360 | mean squ error  92.3
-Epoch  380 | mean squ error  85.1
-Epoch  400 | mean squ error  78.6
-Epoch  420 | mean squ error  72.7
-Epoch  440 | mean squ error  67.2
-Epoch  460 | mean squ error  62.2
-Epoch  480 | mean squ error  57.7
-Epoch  500 | mean squ error  53.5
+Epoch   20 | mean squ error  3604.8
+Epoch   40 | mean squ error  2134.7
+Epoch   60 | mean squ error  1349.9
+Epoch   80 | mean squ error  928.2
+Epoch  100 | mean squ error  681.5
+Epoch  120 | mean squ error  570.9
+Epoch  140 | mean squ error  486.0
+Epoch  160 | mean squ error  419.0
+Epoch  180 | mean squ error  363.4
+Epoch  200 | mean squ error  316.0
+Epoch  220 | mean squ error  275.1
+Epoch  240 | mean squ error  240.7
+Epoch  260 | mean squ error  212.3
+Epoch  280 | mean squ error  189.4
+Epoch  300 | mean squ error  171.2
+Epoch  320 | mean squ error  156.5
+Epoch  340 | mean squ error  143.9
+Epoch  360 | mean squ error  132.4
+Epoch  380 | mean squ error  121.4
+Epoch  400 | mean squ error  111.1
+Epoch  420 | mean squ error  101.6
+Epoch  440 | mean squ error  93.0
+Epoch  460 | mean squ error  85.5
+Epoch  480 | mean squ error  78.9
+Epoch  500 | mean squ error  73.2
 \end{verbatim}
 
+Tahminleri üretirken test verisinin en sonundaki 5 öðeyi alýp sonraki 1
+deðeri üretiyoruz, bu deðer tahmin için kullanýlan verinin sonuna
+ekliyoruz, bu veriden son 5'ý aliyoruz (biraz önceki tahminle beraber) yani
+tahmin üretiyoruz, böyle gidiyor, ve bu þekilde serinin hiç görmediðimiz
+kýsmini tahmin ediyoruz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def f(t):
@@ -350,15 +391,17 @@ plt.plot(newx,newy,'g')
 plt.savefig('lstm_01.png')
 \end{minted}
 
-
 \includegraphics[width=20em]{lstm_01.png}
 
-
-[devam edecek]
-
-
+Yeþil renkli kýsým tahmin. Fena deðil.
 
 Zaman Serisi Sýnýflandýrmak
+
+Þimdi TF'in kendi LSTM çaðrýsýný kullanarak zaman serisi sýnýflandýrmasý
+yapalým. Ýki farklý sýnýfa ait olan zaman serisi verimiz var [3],
+mýkroelektronik yarý-iletken üretiminden gelen bir veri, fabrikasyon
+sýrasýnda algýlayýcýlar bu iki turlu seriyi kaydediyor, onlarý ayýrtetmek
+bizim görevimiz. Okuma yöntemi kodlayalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd, zipfile
@@ -395,6 +438,7 @@ def minibatches(batch_size,input="train"):
 
 \end{minted}
 
+TF hesap çizitini kodlayalým ve eðitelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def reset_graph(seed=42):
@@ -486,20 +530,17 @@ with tf.Session() as sess:
 AUC 1.0
 \end{verbatim}
 
-
-
-
-
-
-
-
-
+Sonuç yüzde 100. 
 
 Kaynaklar
 
 [1] Chen, {\em Exploring LSTMs: Understanding Basics (Part One)}, \url{https://www.topbots.com/exploring-lstm-tutorial-part-1-recurrent-neural-network-deep-learning/}
 
 [2] Shell, {\em Do It Yourself LSTM with TensorFlow}, \url{https://chrisschell.de/2017/07/10/do_it_yourself_lstm_with_tensorflow.html}
+
+[3] Olszewski, {\em Wafer Dataset}, \url{http://timeseriesclassification.com/description.php?Dataset=Wafer}
+
+[4] Olah, {\em Understanding LSTM Networks}, \url{https://colah.github.io/posts/2015-08-Understanding-LSTMs}
 
 \end{document}
 
