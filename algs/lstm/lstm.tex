@@ -120,11 +120,10 @@ def next_batch(batch_size, n_steps):
 
 reference_input_data,reference_output_data = next_batch(400, sequence_length)
    
-NUM_EXAMPLES = len(reference_input_data) / 4 # we use 1/4 of the data for the training
+NUM_EXAMPLES = len(reference_input_data) / 4 
 
 test_input = reference_input_data[NUM_EXAMPLES:]
-test_output = reference_output_data[NUM_EXAMPLES:] # everything beyond NUM_EXAMPLES
-
+test_output = reference_output_data[NUM_EXAMPLES:] 
 train_input = reference_input_data[:NUM_EXAMPLES]
 train_output = reference_output_data[:NUM_EXAMPLES]
 
@@ -146,64 +145,28 @@ W_f, _ = default_weights_and_bias()
 
 b_f = tf.Variable(tf.constant(1.0, shape = [LSTM_SIZE, 1]))
 
-# The forget layer
-#
-# Shapes:
-#   - W_f: 24x27
-#   - ht_minus_1_and_xt: 27x?
-#   - b_f: 24x1
-#   - f_t: 24x?
+# Unutma tabakasi
 def f_t(ht_minus_1_and_xt):
     return tf.sigmoid(tf.matmul(W_f, ht_minus_1_and_xt) + b_f)
 
 W_i, b_i = default_weights_and_bias()
 
-# Input Gate Layer
-#
-# Shapes:
-#   - W_i: 24x27
-#   - ht_minus_1_and_xt: 27x?
-#   - b_i: 24x1
-#   - i_t: 24x?
+# Girdi gecidi tabakasi
 def i_t(ht_minus_1_and_xt):
     return tf.sigmoid(tf.matmul(W_i, ht_minus_1_and_xt) + b_i)
 
 W_C, b_c = default_weights_and_bias()
 
-# New Candidates for the Conveyor
-#
-# Shapes:
-#   - W_C: 24x27
-#   - ht_minus_1_and_xt: 27x?
-#   - b_c: 24x1
-#   - candidate_C_t: 24x?
 def candidate_C_t(ht_minus_1_and_xt):
     return tf.tanh(tf.matmul(W_C, ht_minus_1_and_xt) + b_c)
 
-# Updated Conveyor
-#
-# Shapes:
-#   - f_t: 24x?
-#   - Conveyor: 24x?
-#   - i_t: 24x?
-#   - CandidateConveyor: 24x?
 def C_t(ht_minus_1_and_xt, Conveyor, CandidateConveyor):
     return f_t(ht_minus_1_and_xt) * Conveyor + i_t(ht_minus_1_and_xt) * CandidateConveyor
 
 W_o, b_o = default_weights_and_bias()
 
-# Updated Conveyor
-#
-# Shapes:
-#   - W_o: 24x27
-#   - b_o: 24x1
-#   - ht_minus_1_and_xt: 27x?
-#   - FinalConveyor: 24x?
-#   - o_t: 24x?
-#   - h_t: 24x?
 def h_t(ht_minus_1_and_xt, FinalConveyor):
-    o_t = tf.sigmoid(tf.matmul(W_o, ht_minus_1_and_xt) + b_o)
-    
+    o_t = tf.sigmoid(tf.matmul(W_o, ht_minus_1_and_xt) + b_o)    
     return o_t * tf.tanh(FinalConveyor)
 
 def lstm_cell(ht_minus_1_and_Conveyor, xt):
@@ -234,9 +197,9 @@ timesteps = sequence_length
 
 for_each_time_step = lambda a, b, step: tf.less(step, timesteps)
 
+arg = (initial_prediction, initial_Conveyor, 0)
 lstm_prediction, lstm_state, _ = tf.while_loop(for_each_time_step,
-                                               lstm_loop,
-                                               (initial_prediction, initial_Conveyor, 0),
+                                               lstm_loop, arg,
                                                parallel_iterations=32)
 
 weight = tf.Variable(tf.truncated_normal([LSTM_SIZE, 1]))
