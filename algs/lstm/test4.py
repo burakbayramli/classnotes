@@ -2,12 +2,18 @@ import tensorflow as tf
 import numpy as np
 from pprint import pprint
 import datetime
-import data_generator
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 np.random.seed(1)
 
+LSTM_SIZE = 50
 t_min, t_max = 0, 30
 resolution = 0.1
+sequence_length = 6
+instruction_count = 1
+epoch = 1000
 
 def f(t):
     return t * np.sin(t) / 3 + 2 * np.sin(t*5)
@@ -23,15 +29,7 @@ def next_batch(batch_size, n_steps):
     print y.shape    
     return list(X),y
 
-X,y = next_batch(300, 6)
-print X[0]
-print y[0]
-#exit()
-
-sequence_length = 6
-instruction_count = 1
-
-reference_input_data,reference_output_data = next_batch(300, 6)
+reference_input_data,reference_output_data = next_batch(400, sequence_length)
    
 NUM_EXAMPLES = len(reference_input_data) / 4 # we use 1/4 of the data for the training
 
@@ -49,7 +47,6 @@ print train_output[1]
 data = tf.placeholder(tf.float32, [None, sequence_length, instruction_count], name='data')
 target = tf.transpose(tf.placeholder(tf.float32, [None], name='target'))
 
-LSTM_SIZE = 40
 #FEATURE_SIZE = 3 # Ace of Hearts, Ace of Clubs, King of Spades
 FEATURE_SIZE = 1 # Ace of Hearts, Ace of Clubs, King of Spades
 
@@ -187,8 +184,6 @@ saver = tf.train.Saver()
 
 sess.run(init_op)
 
-epoch = 700
-
 for i in range(epoch):
     if (i + 1) % 20 == 0:
         summary, mean_squ_err = sess.run([merged, mean_square_error], {data: test_input, target: test_output})        
@@ -200,3 +195,46 @@ saver.save(sess, "/tmp/lstm-time-")
     
 sess.close()
 
+# saver = tf.train.Saver() 
+
+# sess = tf.InteractiveSession()
+
+# tst_input = [[-3.22914761],
+#              [-2.55665759],
+#              [-1.44953796],
+#              [-0.0840293 ],
+#              [ 1.30288372],
+#              [ 2.47053056]]
+
+# tst_input = [ np.array(tst_input) ]
+# print tst_input    
+# with tf.Session() as sess:
+#     saver.restore(sess, "/tmp/lstm-time-")
+#     print sess.run(prediction, { data: tst_input  } )
+
+t_start = 30. # tahmine burada basla
+n_more = 40 # bu kadar daha uret
+newx = []
+newy = []
+with tf.Session() as sess:
+    saver.restore(sess, "/tmp/lstm-time-")
+    t_curr = t_start
+    for i in range(n_more):
+        newp = np.array([  t_curr + (j*resolution) for j in range(sequence_length)  ] )
+        newp = f(newp)
+        t_curr += resolution
+        newp = [ newp.reshape(sequence_length,1) ]
+        newp = f(newp)
+        outp = sess.run(prediction, { data: newp  } )[0][0]
+        newx.append(t_curr)
+        newy.append(outp)
+
+newx = np.array(newx)
+newy = np.array(newy)
+print newx, newy
+
+t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
+y = f(t)
+plt.plot(t,y)
+plt.plot(newx,newy,'g')
+plt.savefig('lstm_01.png')
