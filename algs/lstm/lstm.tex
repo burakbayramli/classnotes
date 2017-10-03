@@ -72,18 +72,69 @@ için bir aday olacak.
 
 $$ c_t' = \phi(W_l x_t + U_l h_{t-1})$$
 
+$\phi$ bir aktivasyon fonksiyonu, çoðunlukla $\tanh$ olarak seçilir. 
 
+Fakat bir adayý hafýzamýza eklemeden önce hangi bölümlerinin kullanýma,
+kaydetmeye deðer olduðunu öðrenmemiz gerekir. Web'de bir þey okurken kendi
+zihnimizde neler olduðunu düþünelim. Bir haber makalesi okuduðumuzu
+düþünelim, Trabzonspor'un hep kötüyü gittiðini, yanlýþ tranferler yaptýðýný
+anlatan bir haber okuyoruz, bu haberi fenerbahçe.org sitesinde okuyorsak o
+habere daha az önem verebiliriz.
 
+$$ i_t = \sigma (W_s x_t + U_s h_{t-1} $$
 
+Þimdi tüm bu basamaklarý birleþtirelim. Ýhtiyaçýmiz olmayan hafýzalarý
+unuttuktan ve bilgilerin faydalý olabilecek kýsýmlarýný sakladýktan sonra,
+elimizde bir güncellenmiþ uzun-vadeli bellek geçer, 
 
+$$ c_t = f_t \circ c_{t-1} \circ i_t \circ c_t' $$
 
+ki $\circ$ operasyonu her iki taraftaki deðiþkenlerin içindeki her ögenin
+birer birer çarpýlmasý (element-wise multiplication)  demek. 
 
+Sonra iþlem hafýzasýný güncellememiz lazým, uzun-vade belleðimizi anlýk
+iþlem için faydalý olabilecek þekilde nasýl odaklarýz, onu öðrenmek
+istiyoruz. O zaman bir odaklanma vektörü öðreniriz,
 
+$$ o_t = \sigma (W_f x_t + U_f h_{t-1} $$
 
+O zaman iþlem hafýzamýz
 
+$$ h_t = o_t \circ \phi (c_t)$$
 
+Yani odak deðeri 1 olan öðelere tam dikkatimizi veriyoruz, 0 olanlara hiç
+dikkat etmiyoruz. 
 
+Kuþbakýþý ile bakarsak kendini tekrar eden LSTM yapýsý suna benzer,
 
+\includegraphics[width=30em]{lstm_02.png}
+
+Sol ve saðdaki hücreler ortadakinin kopyasý. 
+
+Kýyasla RNN'nin iç yapýsý çok daha basittir, 
+
+\includegraphics[width=30em]{lstm_03.png}
+
+LSTM resmindeki her birimin formülleriyle beraber teker teker tekrar
+üzerinden geçmek gerekirse [2]:
+
+Ýlk adým hücre bilgisinden neleri atacaðýmýza karar vermek. Bu karar unutma
+karar tabakasý adý verilen bir sigmoid tabakasý tarafýndan
+kararlaþtýrýlýyor, bu tabaka $h_{t-1}$ ve $x_t$'ye bakýyor ve $c_{t-1}$
+hücre konumundaki her deðer için 0 ile 1 arasýnda bir sayý üretiyor. 1 bu
+deðeri tamamen tut, 0 bu deðeri tamamen unut anlamýna geliyor.
+
+\includegraphics[width=30em]{lstm_04.png}
+
+Bir sonraki adým hücrede hangi yeni bilgiyi depolayacaðýmýza karar
+vermek. Bu kararýn iki parçasý var, önce girdi geçit tabakasý (input gate
+layer) adý verilen hangi deðerleri güncelleyeceðimize karar
+veriyor. Ardýndan bir $\tanh$ tabakasý bir ``aday vektörü'' $c_t'$
+üretiyor, bu vektör, adý üzerinde, hücre konumuna eklenmeye aday
+bilgiler. Ardýndan bu iki vektör birleþtirilip konumu güncellemek için yeni
+bir vektör yaratýlýyor. 
+
+\includegraphics[width=30em]{lstm_05.png}
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -447,6 +498,8 @@ AUC 1.0
 Kaynaklar
 
 [1] Chen, {\em Exploring LSTMs: Understanding Basics (Part One)}, \url{https://www.topbots.com/exploring-lstm-tutorial-part-1-recurrent-neural-network-deep-learning/}
+
+[2] Shell, {\em Do It Yourself LSTM with TensorFlow}, \url{https://chrisschell.de/2017/07/10/do_it_yourself_lstm_with_tensorflow.html}
 
 \end{document}
 
