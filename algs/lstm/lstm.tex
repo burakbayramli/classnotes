@@ -80,145 +80,6 @@ $$ c_t' = \phi(W_l x_t + U_l h_{t-1})$$
 
 
 
-[devam edecek]
-
-
-
-Zaman Serisi Sýnýflandýrmak
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd, zipfile
-import tensorflow as tf
-from tensorflow.contrib import rnn
-
-learning_rate = 0.001
-training_iters = 100000
-batch_size = 25
-display_step = 10
-
-n_input = 1 
-n_steps = 152 
-n_hidden = 128 
-n_classes = 2
-
-with zipfile.ZipFile('wafer.zip', 'r') as z:
-      df_train =  pd.read_csv(z.open('Wafer/wafer_TRAIN.txt'),header=None)
-      df_test =  pd.read_csv(z.open('Wafer/wafer_TEST.txt'),header=None)
-
-def minibatches(batch_size,input="train"):
-      df = None
-      if input=="train": df=df_train
-      if input=="test": df=df_test
-      df = np.array(df)
-      for i in range(len(df)):
-            batch_x = []; batch_y = []
-            for j in range(batch_size):
-                  batch_x.append(list(df[i,1:]))
-                  batch_y.append([int(df[i,0]==-1), int(df[i,0]==1) ])
-            batch_x = np.array(batch_x).reshape(batch_size,n_steps,1)
-            batch_y = np.array(batch_y).reshape(batch_size,2)
-            yield batch_x, batch_y                  
-
-\end{minted}
-
-
-\begin{minted}[fontsize=\footnotesize]{python}
-def reset_graph(seed=42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
-    np.random.seed(seed)
-
-reset_graph()
-
-x = tf.placeholder("float", [None, n_steps, n_input])
-y = tf.placeholder("float", [None, n_classes])
-
-weights = {
-    'out': tf.Variable(tf.random_normal([n_hidden, n_classes]))
-}
-biases = {
-    'out': tf.Variable(tf.random_normal([n_classes]))
-}
-
-def LSTM(x, weights, biases):
-    x = tf.unstack(x, n_steps, 1)
-    lstm_cell = rnn.BasicLSTMCell(n_hidden)
-    outputs, states = rnn.static_rnn(lstm_cell, x, dtype=tf.float32)
-    return tf.matmul(outputs[-1], weights['out']) + biases['out']
-
-pred = LSTM(x, weights, biases)
-
-correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
-accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-new_pred = tf.argmax(y,1)
-
-print 'cost'
-scf = tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y)
-cost = tf.reduce_mean(scf)
-print 'optimizer'
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-
-mfile = "/tmp/time_series_classif"
-
-init = tf.global_variables_initializer()
-saver = tf.train.Saver()
-with tf.Session() as sess:
-    sess.run(init)
-    step = 1
-    # Keep training until reach max iterations
-    b_it = minibatches(batch_size)
-    while step < int(1000 / batch_size):
-          batch_x, batch_y = next(b_it)
-          sess.run(optimizer, feed_dict={x: batch_x, y: batch_y})
-          if step % display_step == 0:
-                # Calculate batch accuracy
-                acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
-                # Calculate batch loss
-                loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
-                print("Iter " + str(step) + ", Minibatch Loss= " + \
-                      "{:.6f}".format(loss) + ", Training Accuracy= " + \
-                      "{:.5f}".format(acc))
-          step += 1
-
-    print("Optimization Finished!")
-    saver.save(sess, mfile) # not shown in the book
-\end{minted}
-
-\begin{verbatim}
-cost
-optimizer
-Iter 10, Minibatch Loss= 1.847300, Training Accuracy= 0.00000
-Iter 20, Minibatch Loss= 0.049264, Training Accuracy= 1.00000
-Iter 30, Minibatch Loss= 0.176535, Training Accuracy= 1.00000
-Optimization Finished!
-\end{verbatim}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-saver = tf.train.Saver()
-from sklearn import metrics
-real = []
-pred = []
-with tf.Session() as sess:
-    saver.restore(sess, mfile)
-    for batch_x, batch_y in minibatches(1,input="test"):
-      res = sess.run(new_pred, feed_dict={x: batch_x, y: batch_y})
-      pred.append(res[0])
-      real.append(np.argmax(batch_y[0]))
-    fpr, tpr, thresholds = metrics.roc_curve(np.array(real), np.array(pred))
-    print 'AUC', metrics.auc(fpr, tpr)      
-\end{minted}                    
-
-\begin{verbatim}
-AUC 1.0
-\end{verbatim}
-
-
-
-
-
-
-
-
 
 
 
@@ -413,7 +274,6 @@ for i in range(epoch):
     
     sess.run(minimize,{data: train_input, target: train_output})
 
-saver.save(sess, "/tmp/lstm-time-")
 \end{minted}
 
 \begin{verbatim}
@@ -475,8 +335,6 @@ Epoch  940 | mean squ error  14.2
 Epoch  960 | mean squ error  14.0
 Epoch  980 | mean squ error  13.8
 Epoch 1000 | mean squ error  13.7
-Out[1]: 
-'/tmp/lstm-time-'
 \end{verbatim}
 
 
@@ -522,14 +380,147 @@ plt.savefig('lstm_01.png')
 \end{minted}
 
 
-
-
-
-
-
-
-
 \includegraphics[width=20em]{lstm_01.png}
+
+
+[devam edecek]
+
+
+
+Zaman Serisi Sýnýflandýrmak
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, zipfile
+import tensorflow as tf
+from tensorflow.contrib import rnn
+
+learning_rate = 0.001
+training_iters = 100000
+batch_size = 25
+display_step = 10
+
+n_input = 1 
+n_steps = 152 
+n_hidden = 128 
+n_classes = 2
+
+with zipfile.ZipFile('wafer.zip', 'r') as z:
+      df_train =  pd.read_csv(z.open('Wafer/wafer_TRAIN.txt'),header=None)
+      df_test =  pd.read_csv(z.open('Wafer/wafer_TEST.txt'),header=None)
+
+def minibatches(batch_size,input="train"):
+      df = None
+      if input=="train": df=df_train
+      if input=="test": df=df_test
+      df = np.array(df)
+      for i in range(len(df)):
+            batch_x = []; batch_y = []
+            for j in range(batch_size):
+                  batch_x.append(list(df[i,1:]))
+                  batch_y.append([int(df[i,0]==-1), int(df[i,0]==1) ])
+            batch_x = np.array(batch_x).reshape(batch_size,n_steps,1)
+            batch_y = np.array(batch_y).reshape(batch_size,2)
+            yield batch_x, batch_y                  
+
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def reset_graph(seed=42):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+reset_graph()
+
+x = tf.placeholder("float", [None, n_steps, n_input])
+y = tf.placeholder("float", [None, n_classes])
+
+weights = {
+    'out': tf.Variable(tf.random_normal([n_hidden, n_classes]))
+}
+biases = {
+    'out': tf.Variable(tf.random_normal([n_classes]))
+}
+
+def LSTM(x, weights, biases):
+    x = tf.unstack(x, n_steps, 1)
+    lstm_cell = rnn.BasicLSTMCell(n_hidden)
+    outputs, states = rnn.static_rnn(lstm_cell, x, dtype=tf.float32)
+    return tf.matmul(outputs[-1], weights['out']) + biases['out']
+
+pred = LSTM(x, weights, biases)
+
+correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
+accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+new_pred = tf.argmax(y,1)
+
+print 'cost'
+scf = tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y)
+cost = tf.reduce_mean(scf)
+print 'optimizer'
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+
+mfile = "/tmp/time_series_classif"
+
+init = tf.global_variables_initializer()
+saver = tf.train.Saver()
+with tf.Session() as sess:
+    sess.run(init)
+    step = 1
+    # Keep training until reach max iterations
+    b_it = minibatches(batch_size)
+    while step < int(1000 / batch_size):
+          batch_x, batch_y = next(b_it)
+          sess.run(optimizer, feed_dict={x: batch_x, y: batch_y})
+          if step % display_step == 0:
+                # Calculate batch accuracy
+                acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
+                # Calculate batch loss
+                loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
+                print("Iter " + str(step) + ", Minibatch Loss= " + \
+                      "{:.6f}".format(loss) + ", Training Accuracy= " + \
+                      "{:.5f}".format(acc))
+          step += 1
+
+    print("Optimization Finished!")
+    saver.save(sess, mfile) # not shown in the book
+\end{minted}
+
+\begin{verbatim}
+cost
+optimizer
+Iter 10, Minibatch Loss= 1.847300, Training Accuracy= 0.00000
+Iter 20, Minibatch Loss= 0.049264, Training Accuracy= 1.00000
+Iter 30, Minibatch Loss= 0.176535, Training Accuracy= 1.00000
+Optimization Finished!
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+saver = tf.train.Saver()
+from sklearn import metrics
+real = []
+pred = []
+with tf.Session() as sess:
+    saver.restore(sess, mfile)
+    for batch_x, batch_y in minibatches(1,input="test"):
+      res = sess.run(new_pred, feed_dict={x: batch_x, y: batch_y})
+      pred.append(res[0])
+      real.append(np.argmax(batch_y[0]))
+    fpr, tpr, thresholds = metrics.roc_curve(np.array(real), np.array(pred))
+    print 'AUC', metrics.auc(fpr, tpr)      
+\end{minted}                    
+
+\begin{verbatim}
+AUC 1.0
+\end{verbatim}
+
+
+
+
+
+
+
 
 
 
