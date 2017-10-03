@@ -1,6 +1,6 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Ozellik Islemek (Feature Engineering)
+Özellik Ýþlemek (Feature Engineering)
 
 Veri madenciliðinde "veriden veri yaratma" tekniði çok kullanýlýyor; mesela
 bir sipariþ veri satýrýnda o sipariþin hangi zamanda (timestamp) olduðunu
@@ -8,13 +8,23 @@ belirten bir kolon varsa (ki çoðu zaman vardýr), bu kolonu "parçalayarak"
 ek, daha genel, özetsel bilgi kolonlarý yaratýlabilir. Ya da kategoriksel
 verileri pek çok farklý þekilde sayýsal hale çevirebiliriz, mesela 1-hot
 kodlama ile N kategori N kolon haline gelir, eldeki kategoriye tekabül eden
-öðe 1 diðerleri sýfýr yapýlýr. Bir diðer seçenek kategoriyi bir indise
-çevirmek (tüm kategorileri sýralayýp kaçýnci olduðuna bakarak mesela) sonra
-bu sayýyý ikisel sistemde belirtmek, eðer 'a' sayýsý 30 indisine tekabül
-ediyorsa, 30 ikisel sistemde 11110, bu deðer kullanýlýr (aslýnda bu son
-tarif edilen sistemin 1-hot sistemden daha iyi iþlediði rapor ediliyor). 
+öðe 1 diðerleri sýfýr yapýlýr. 
 
-Farkli yontemlere bakalim.
+Özellik iþlemenin önemi yapay öðrenme açýsýndan önemi var, mesela bir SVM
+sýnýflayýcýsýný en basit haliyle siyah/beyaz görüntüden sayý tanýma
+probleminde kullandýk, ve diyelim yüzde 70 baþarý elde ettik. Þimdi çok
+basit bir yeni özellik yaratalým, görüntüyü dikey ikiye bölelim, ve üstteki
+ve alttaki siyah noktalarý toplayarak iki yeni kolon olarak görüntü
+matrisine ekleyelim. Bu yeni özellikleri kullanýnca basit sýnýflayýcýnýn
+yüzde 20 kadar tanýma baþarýndan ilerleme olduðunu göreceðiz! 
+
+Not: Derin yapay sýnýr aðlarý teknikleri ile özellik iþlemeye artýk gerek
+olmadýðý söylenir, bu büyük ölçüde doðru. Bir DYSA farklý seviyelerdeki pek
+çok farklý nöronlar üzerinden aslýnda üstte tarif edilen türden yeni
+özellikleri otomatik olarak yaratýr. Fakat yine de bu teknikleri bilmek
+iyidir. 
+
+Þimdi farklý yöntemlere bakalým.
 
 Zaman Kolonlarýný Zenginleþtirmek
 
@@ -123,7 +133,85 @@ night = int (morning==0 and noon==0 and afternoon==0)
 
 kullanýldý.
 
-Kategorileri Ýkileþtirme, Anahtarlama Numarasý (One-Hot Encoding, Hashing Trick)
+Kategorileri Ýkileþtirme
+
+Yapay öðrenim algoritmalarýnýn çoðu zaman hem kategorik hem numerik
+deðerleri ayný anda bulunduran verilerle iþ yapmasý gerekebiliyor. Ayrýca
+literatüre bakýlýnca görülür ki çoðunlukla bir algoritma ya biri, ya diðeri
+ile çalýþýr, ikisi ile ayný anda çalýþmaz (çalýþanlar var tabii, mesela
+karar aðaçlarý -decision tree-). Bu gibi durumlarda iki seçenek var, ya
+numerik veri kategoriselleþtirilir (ayrýksallaþtýrýlýr), ya da kategorik
+veri numerik hale getirilir.
+
+Bu durumda, kategorik bir kolon eyalet icin, eyaletin Ohio olup olmamasi
+basli basina ayri bir kolon olarak gosteriliyor. Ayni sekilde Nevada. Bu
+kodlamaya literaturde One-Hot Kodlamasi adi veriliyor. KMeans, lojistik
+regresyon gibi metotlara girdi vermek icin bu transformasyon
+kullanilabilir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+import pandas as pd, os
+import scipy.sparse as sps
+from sklearn.feature_extraction import DictVectorizer
+
+def one_hot_dataframe(data, cols, replace=False):
+    vec = DictVectorizer()
+    mkdict = lambda row: dict((col, row[col]) for col in cols)
+    vecData = pd.DataFrame(vec.fit_transform(data[cols].apply(mkdict, axis=1)).toarray())
+    vecData.columns = vec.get_feature_names()
+    vecData.index = data.index
+    if replace is True:
+        data = data.drop(cols, axis=1)
+        data = data.join(vecData)
+    return (data, vecData, vec)
+
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
+
+df = pd.DataFrame(data)
+
+df2, _, _ = one_hot_dataframe(df, ['state'], replace=True)
+print df2
+\end{minted}
+
+\begin{verbatim}
+   pop  year  state=Nevada  state=Ohio
+0  1.5  2000           0.0         1.0
+1  1.7  2001           0.0         1.0
+2  3.6  2002           0.0         1.0
+3  2.4  2001           1.0         0.0
+4  2.9  2002           1.0         0.0
+\end{verbatim}
+
+Unutmayalým, kategorik deðerler bazen binleri bulabilir (hatta sayfa
+týklama tahmini durumunda mesela milyonlar, hatta milyarlar), bu da
+binlerce yeni kolon demektir
+
+Fakat 1/0 kodlamasý, yani öne-hot iþleminden ele geçen yeni blok içinde
+aslýnda oldukca çok sayýda sýfýr deðeri vardýr (sonuçta her satýrda
+binlerce 'þey' içinde sadece bir tanesi 1 oluyor), yani bu blok bir seyrek
+matris olacaktýr. O zaman matrisýn tamamýný \verb!sps.csr_matrix! ya da
+\verb!sps.lil_matrix! ile gerçekten seyrek formata çevirebiliriz, ve mesela
+Scikit Learn adlý yapay öðrenim paketi, sýfýrdan YO kodlamak istersek
+Numpy, Scipy iþlemleri seyrek matrisler ile hesap yapabilme yeteneðine
+sahip. Seyrekselleþtirince ne elde ediyoruz? Sýfýrlarý depolamadýðýmýz için
+sadece sýfýr olmayan deðerler ile iþlem yapýyoruz, o ölçüde kod hýzlanýyor,
+daha az yer tutuyor.
+
+Dikkat etmek gerekir ki yeni kolonlari uretince degerlerin yerleri
+sabitlenmis olur. Her satir bazinda bazen state=Ohio, state=Nevada, bazen
+sadece state=Ohio uretiyor olamayiz. Ustteki ornekte her zaman 4 tane kolon
+elde edilmelidir.
+
+Not: 1-hot yerine bir diðer seçenek kategoriyi bir indise çevirmek (tüm
+kategorileri sýralayýp kaçýncý olduðuna bakarak mesela) sonra bu sayýyý
+ikisel sistemde belirtmek, eðer 'a' sayýsý 30 indisine tekabül ediyorsa, 30
+ikisel sistemde 11110, bu deðer kullanýlýr (aslýnda bu son tarif edilen
+sistemin 1-hot sistemden daha iyi iþlediði rapor ediliyor).
+
+Anahtarlama Numarasý (One-Hot Encoding, Hashing Trick)
 
 Üstteki kodda bir problem var, dokümaný temsil eden ve içinde 1 ya da
 0 hücreli özellik vektörünü (feature vector) oluþturmak için tüm
@@ -143,14 +231,14 @@ hash üretiriz, sonuç mesela 230 geldi, o zaman özellik vektöründeki
 230'uncu kolonun deðerini 1 yaparýz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-  d_input = dict()
+d_input = dict()
 
-  def add_word(word):
+def add_word(word):
   hashed_token = hash(word) % 127
   d_input[hashed_token] = d_input.setdefault(hashed_token, 0) + 1
 
-  add_word("obama")
-  print d_input
+add_word("obama")
+print d_input
 \end{minted}
 
 \begin{verbatim}
@@ -158,8 +246,8 @@ hash üretiriz, sonuç mesela 230 geldi, o zaman özellik vektöründeki
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-  add_word("politics")
-  print d_input
+add_word("politics")
+print d_input
 \end{minted}
 
 \begin{verbatim}
@@ -219,6 +307,88 @@ print hash_col(data,'state',4)
 3  2.4  2001      0.0      0.0      0.0      1.0
 4  2.9  2002      0.0      0.0      0.0      1.0
 \end{verbatim}
+
+Baþtan Seyrek Matris ile Çalýþmak
+
+Büyük Veri ortamýnda, eðer kategorik deðerler milyonlarý buluyorsa, o zaman
+üstteki gibi normal Numpy matrisinden seyreðe geçiþ yapmak bile külfetli
+olabilir. Bu durumlarda daha en baþtan seyrek matris üretiyor
+olmalýyýz. Mevcut tüm deðerleri önceden bildiðimizi farz edersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+import pandas as pd, os
+import scipy.sparse as sps
+import itertools
+
+def one_hot_column(df, cols, vocabs):
+    mats = []; df2 = df.drop(cols,axis=1)
+    mats.append(sps.lil_matrix(np.array(df2)))
+    for i,col in enumerate(cols):
+        mat = sps.lil_matrix((len(df), len(vocabs[i])))
+        for j,val in enumerate(np.array(df[col])):
+            mat[j,vocabs[i][val]] = 1.
+        mats.append(mat)
+
+    res = sps.hstack(mats)    
+    return res
+            
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+        'year': ['2000', '2001', '2002', '2001', '2002'],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
+
+df = pd.DataFrame(data)
+print df
+
+vocabs = []
+vals = ['Ohio','Nevada']
+vocabs.append(dict(itertools.izip(vals,range(len(vals)))))
+vals = ['2000','2001','2002']
+vocabs.append(dict(itertools.izip(vals,range(len(vals)))))
+
+print vocabs
+
+print one_hot_column(df, ['state','year'], vocabs).todense()
+\end{minted}
+
+\begin{verbatim}
+   pop   state  year
+0  1.5    Ohio  2000
+1  1.7    Ohio  2001
+2  3.6    Ohio  2002
+3  2.4  Nevada  2001
+4  2.9  Nevada  2002
+[{'Ohio': 0, 'Nevada': 1}, {'2002': 2, '2000': 0, '2001': 1}]
+[[ 1.5  1.   0.   1.   0.   0. ]
+ [ 1.7  1.   0.   0.   1.   0. ]
+ [ 3.6  1.   0.   0.   0.   1. ]
+ [ 2.4  0.   1.   0.   1.   0. ]
+ [ 2.9  0.   1.   0.   0.   1. ]]
+\end{verbatim}
+
+\verb!one_hot_column! çaðrýsýna bir "sözlükler listesi" verdik, sözlük her
+kolon için o kolonlardaki mümkün tüm deðerleri bir sýra sayýsý ile
+eþliyor. Sözlük listesinin sýrasý kolon sýrasýna uyuyor olmalý.
+
+Niye sözlük verdik? Bunun sebebi eðer azar azar (incremental) ortamda iþ
+yapýyorsak, ki Büyük Veri (Big Data) ortamýnda her zaman azar azar yapay
+öðrenim yapmaya mecburuz, o zaman bir kategorik kolonun mevcut tüm
+deðerlerine azar azar ulaþamazdýk (verinin baþýnda isek, en sonundaki bir
+kategorik deðeri nasýl görelim ki?). Fakat önceden bu listeyi baþka
+yollarla elde etmiþsek, o zaman her öne-hot iþlemine onu parametre olarak
+geçiyoruz.
+
+Sözlük niye \verb!one_hot_dataframe! çaðrýsý dýþýnda yaratýldý? Bu çaðrý
+düz bir liste alýp oradaki deðerleri sýrayla bir sayýyla eþleyerek her
+seferinde bir sözlük yaratabilirdi. Bunu yapmadýk, çünkü sözlük yaratýmýnýn
+sadece bir kere, \verb!one_hot_dataframe! dýþýnda olmasýný istiyoruz. Yine
+Büyük Veri ortamýný düþünenelim, eþleme (map) için mesela bir script
+yazdýk, bu script içinde (basýnda) hemen sözlükler yaratýlýrdý. Daha sonra
+verinin tamamý için, azar azar sürekli \verb!one_hot_dataframe! çaðrýsý
+yapýlacaktýr. O zaman arka arkaya sürekli ayný veriyi (sözlükleri) sýfýrdan
+tekrar yaratmamýz gerekirdi. Bu gereksiz performans kaybý demek
+olacaktý. Unutmayalým, Büyük Veri ortamýnda tek bir kategorik kolonun
+milyonlarca deðiþik deðeri olabilir!
 
 Azar Azar Ýþlemek (Incremental, Minibatch Processing)
 
