@@ -39,15 +39,12 @@ test_output = reference_output_data[NUM_EXAMPLES:] # everything beyond NUM_EXAMP
 train_input = reference_input_data[:NUM_EXAMPLES]
 train_output = reference_output_data[:NUM_EXAMPLES]
 
-print '--------'
 print train_input[1]
 print train_output[1]
-#exit()
 
 data = tf.placeholder(tf.float32, [None, sequence_length, instruction_count], name='data')
 target = tf.transpose(tf.placeholder(tf.float32, [None], name='target'))
 
-#FEATURE_SIZE = 3 # Ace of Hearts, Ace of Clubs, King of Spades
 FEATURE_SIZE = 1 # Ace of Hearts, Ace of Clubs, King of Spades
 
 def default_weights_and_bias():
