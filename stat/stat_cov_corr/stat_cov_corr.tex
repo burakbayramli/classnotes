@@ -2,6 +2,144 @@
 \begin{document}
 Beklenti, Varyans, Kovaryans ve Korelasyon
 
+Özellik Ýþleme, Seçme, Veri Ýncelemesi
+
+Medyan ve Yüzdelikler (Percentile)
+
+Üstteki hesaplarýn çoðu sayýlarý toplayýp, bölmek üzerinden yapýldý. Medyan
+ve diðer yüzdeliklerin hesabý (ki medyan 50. yüzdeliðe tekabül eder) için
+eldeki tüm deðerleri "sýraya dizmemiz" ve sonra 50. yüzdelik için
+ortadakine bakmamýz gerekiyor. Mesela eðer ilk 5. yüzdeliði arýyorsak ve
+elimizde 80 tane deðer var ise, baþtan 4. sayýya / vektör hücresine / öðeye
+bakmamýz gerekiyor. Eðer 100 eleman var ise, 5. sayýya bakmamýz gerekiyor,
+vs.
+
+Bu sýraya dizme iþlemi kritik. Kýyasla ortalama hesabý hangi sýrada olursa
+olsun, sayýlarý birbirine topluyor ve sonra bölüyor. Zaten ortalama ve
+sapmanýn istatistikte daha çok kullanýlmasýnýn tarihi sebebi de aslýnda bu;
+bilgisayar öncesi çaðda sayýlarý sýralamak (sorting) zor bir iþti. Bu
+sebeple hangi sýrada olursa olsun, toplayýp, bölerek hesaplanabilecek
+özetler daha makbuldü. Fakat artýk sýralama iþlemi kolay, ve veri setleri
+her zaman tek tepeli, simetrik olmayabiliyor. Örnek veri seti olarak ünlü
+\verb!dellstore2! tabanýndaki satýþ miktarlarý kullanýrsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.mean(data)
+\end{minted}
+
+\begin{verbatim}
+213.948899167
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.median(data)
+\end{minted}
+
+\begin{verbatim}
+214.06
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.std(data)
+\end{minted}
+
+\begin{verbatim}
+125.118481954
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+  print np.mean(data)+2*np.std(data)
+\end{minted}
+
+\begin{verbatim}
+464.185863074
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.percentile(data, 95)
+\end{minted}
+
+\begin{verbatim}
+410.4115
+\end{verbatim}
+
+Görüldüðü gibi üç nokta hesabý için ortalamadan iki sapma ötesini
+kullanýrsak, 464.18, fakat 95. yüzdeliði kullanýrsak 410.41 elde
+ediyoruz. Niye? Sebep ortalamanýn kendisi hesaplanýrken çok üç
+deðerlerin toplama dahil edilmiþ olmasý ve bu durum, ortalamanýn
+kendisini daha büyük seviyeye doðru itiyor. Yüzdelik hesabý ise sadece
+sayýlarý sýralayýp belli bazý elemanlarý otomatik olarak üç nokta
+olarak addediyor.
+
+Box Whisker Grafikleri
+
+Tek boyutlu bir verinin daðýlýmýný görmek için Box ve Whisker grafikleri
+faydalý araçlardýr; medyan (median), daðýlýmýn geniþliðini ve sýradýþý
+noktalarý (outliers) açýk þekilde gösterirler. Ýsim nereden geliyor? Box
+yani kutu, daðýlýmýn aðýrlýðýnýn nerede olduðunu gösterir, medyanýn
+saðýndada ve solunda olmak üzere iki çeyreðin arasýndaki kýsýmdýr, kutu
+olarak resmedilir. Whiskers kedilerin býyýklarýna verilen isimdir, zaten
+grafikte birazcýk býyýk gibi duruyorlar. Bu uzantýlar medyan noktasýndan
+her iki yana kutunun iki katý kadar uzatýlýr sonra verideki "ondan az olan
+en büyük" noktaya kadar geri çekilir. Tüm bunlarýn dýþýnda kalan veri ise
+teker teker nokta olarak grafikte basýlýr. Bunlar sýradýþý (outlier)
+olduklarý için daha az olacaklarý tahmin edilir.
+
+BW grafikleri iki veriyi daðýlýmsal olarak karþýlaþtýrmak için
+birebirdir. Mesela Larsen and Marx adlý araþtýrmacýlar çok az veri
+içeren Quintus Curtius Snodgrass veri setinin deðiþik olduðunu
+ispatlamak için bir sürü hesap yapmýþlardýr, bir sürü matematiksel
+iþleme girmiþlerdir, fakat basit bir BW grafiði iki setin farklýlýðýný
+hemen gösterir.
+
+BW grafikleri iki veriyi daðýlýmsal olarak karþýlaþtýrmak için
+birebirdir. Mesela Larsen and Marx adlý araþtýrmacýlar çok az veri
+içeren Quintus Curtius Snodgrass veri setinin deðiþik olduðunu
+ispatlamak için bir sürü hesap yapmýþlardýr, bir sürü matematiksel
+iþleme girmiþlerdir, fakat basit bir BW grafiði iki setin farklýlýðýný
+hemen gösterir.
+
+Python üzerinde basit bir BW grafiði 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+spread= rand(50) * 100
+center = ones(25) * 50
+flier_high = rand(10) * 100 + 100
+flier_low = rand(10) * -100
+data =concatenate((spread, center, flier_high, flier_low), 0)
+plt.boxplot(data)
+plt.savefig('stat_feat_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_feat_01.png}
+
+Bir diðer örnek Glass veri seti üzerinde
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = loadtxt("glass.data",delimiter=",")
+head = data[data[:,10]==7]
+tableware = data[data[:,10]==6]
+containers = data[data[:,10]==5]
+
+print head[:,1]
+
+data =(containers[:,1], tableware[:,1], head[:,1])
+
+plt.yticks([1, 2, 3], ['containers', 'tableware', 'head'])
+
+plt.boxplot(data,0,'rs',0,0.75)
+plt.savefig('stat_feat_02.png')
+\end{minted}
+
+\begin{verbatim}
+[ 1.51131  1.51838  1.52315  1.52247  1.52365  1.51613  1.51602  1.51623
+  1.51719  1.51683  1.51545  1.51556  1.51727  1.51531  1.51609  1.51508
+  1.51653  1.51514  1.51658  1.51617  1.51732  1.51645  1.51831  1.5164
+  1.51623  1.51685  1.52065  1.51651  1.51711]
+\end{verbatim}
+
+\includegraphics[height=6cm]{stat_feat_02.png}
+
 Beklenti ve varyans
 
 Beklenti (Expectation) 
