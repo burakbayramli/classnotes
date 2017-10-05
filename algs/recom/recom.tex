@@ -4,7 +4,7 @@ Derin Öðrenme ile Tavsiye Sistemleri (Deep Recommendation Systems)
 
 Kullanýcý $i$ için film $j$ tavsiye problemine farklý çözümler gördük. Bir
 yaklaþýma göre eðitim verisine bazý filmlere verilen beðeni notlarý
-(ratings) bir $i,j$ matrisind tutulup, SVD ile bu matris üzerinde
+(ratings) bir $i,j$ matrisinde tutulup, SVD ile bu matris üzerinde
 ayrýþtýrma yapýlarak hem kullanýcý hem film boyutlarýnda azaltýlmýþ temsili
 boyutlar elde ediliyordu, ardýndan bu boyutlar mesela kullanýcý $i$ ile tüm
 filmlerin temsili satýrlarýyla çarpýlarak o filmlere (çoðunlukla daha
@@ -18,38 +18,39 @@ alýnarak minimizasyon noktasý aranabilir.
 Fakat bu iþi pür derin YSA bakýþýyla çözmek belki daha iyi. Doðal dil
 iþlemede (NLP) görülen kelime gömme (word embedding) kavramýný bu problemde
 de kullanabiliriz. NLP problemlerinde elde bir doküman vardýr, bir
-sözlükten gelen kelimelerin bir kýsmi bu belgelerde yer alýrlar. Kullanýcý
-/ film, ya da müþteri / ürün baðlamýnda da sanki bir doküman vardýr, ama bu
-dokümanda sadece tek bir beðeni için olan müþteri / ürün ikilisi
-vardýr. NLP'de bir belge `` kedi paspasta oturuyor'', kimlik verisi
-üzerinden [200, 201, 565] olabiliyordu, kullanýcý / film için sadece [100,
-4500], kullanýcý 100 film 4500'i beðenmiþ. Beðeni notunun nereye gittiðinin
-birazdan göreceðiz.
+sözlükten gelen kelimeler bu belgelerde görülebilir. Kullanýcý / film, ya
+da müþteri / ürün baðlamýnda da sanki bir doküman vardýr, ama bu dokümanda
+sadece tek bir beðeni için olan müþteri / ürün ikilisi vardýr. NLP'de bir
+belge `` kedi paspasta oturuyor'', kimlik verisi üzerinden [200, 201, 565]
+olabiliyordu, kullanýcý / film için sadece [100, 4500]; kullanýcý 100 film
+4500'i beðenmiþ. Beðeni notunun nereye gittiðinin birazdan göreceðiz.
 
 O zaman alttaki gibi bir að yapýsý düþünülebilir; kullanýcý / film ikilisi
 kimlik verilerine gömme transformasyonu uygulanýr, ve sonuç gömme
-vektörleri bu tabakada yanyana yer alýrlar. Ardýndan bomme tabakasýndaki
+vektörleri bu tabakada yanyana yer alýrlar. Ardýndan gömme tabakasýndaki
 tüm bilgi tam baðlanmýþ (fully connected) iki ayrý tabaka üzerinden tahmin
 üretmek için kullanýlýr, bu tahmin ise beðeni notunun ta kendisidir. Eldeki
 eðitim verisinde gerçek verilen not olacaktýr, ve bir kayýp fonksiyonu
-üzerinden optimizasyon, vs.
+üzerinden optimizasyon yapýlýr.
 
 \includegraphics[width=25em]{recom_01.png}
 
-Meta
+Meta Veri
 
 Bu mimariye bazý ekler yapabiliriz. Mesela eðer müþteri, ürün hakkýnda
-``meta'' bilgiler var ise, diyelim kullanýcýlarýn yasý, mesleði gibi, bu
+``meta'' bilgiler var ise, diyelim kullanýcýlarýn yaþý, mesleði gibi, bu
 bilgiler verilen beðeni notundan bir diðerine deðiþmezler, o sebeple meta
-bilgidirler. Ürünler için ürünün hangi tarihte üretildiði, fiyatý, vs. gibi
+bilgidirler, ürünler için ürünün hangi tarihte üretildiði, fiyatý, vs. gibi
 detaylar meta olabilir. Bu bilgileri nasýl DYSA'ya dahil ederiz?
 
 Bu bilgileri direk gömme tabakasýnda öteki gömme temsili kolonlarýn hemen
-yanýna koyabiliriz, yani mesela ürünün yapýlýþ tarihi bir sayýsal kolon olarak bu
-tabakada yer alabilir, diðerleri ayný þekilde, müþteri $i$ ve ürün $j$ için
-meta veri $m_i,n_j$ olsun, 
+yanýna koyabiliriz, yani mesela ürünün yapýlýþ tarihi bir sayýsal kolon
+olarak bu tabakada yer alabilir, diðerleri ayný þekilde. Mimari olarak,
+müþteri $i$ ve ürün $j$ için meta veri $m_i,n_j$ olsun,
 
 \includegraphics[width=25em]{recom_02.png}
+
+þeklinde olur. 
 
 Kodlamaya baþlayabiliriz. Önce verileri okuyalým, eðitim test verisi
 yaratalým (DYSA paketi olarak TensorFlow üzerinde yazýlmýþ onu biraz daha
@@ -119,7 +120,6 @@ item_vecs = Flatten()(item_embedding)
 
 Þimdi bir meta kolonu ekleyelim, bunu sadece filmin üretim tarihi için
 yapacaðýz, fakat diðerleri için de yapýlacak ek aynen bu þekilde olurdu,
-gayet basit.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 
@@ -140,10 +140,12 @@ input_vecs = merge([user_vecs, item_vecs, meta_input], mode='concat')
 \end{minted}
 
 Þimdi tam baðlanmýþ tabakalarý ekleyelim, arada bir de veri atma (dropout)
-tabakasý olsun, bu tabaka içinden geçen verileri rasgele bir þekilde
-yoksayýyor (eðitim döngüsünün o aþamasý yapýlmýyor yani), bu tekniðin aþýrý
-uygunluk (överfitting) problemleri için faydalý olduðu keþfedildi, biz de
-kullandýk. Tabakalar hazýrlanýnca eðitime baþlayabiliriz,
+tabakasý olsun, bu tabaka içinden geçen verilerin bazýlarýný / rasgele bir
+þekilde yoksayýyor (eðitim döngüsünün o aþamasý yapýlmýyor yani), bu
+tekniðin aþýrý uygunluk (overfitting) problemleri için faydalý olduðu
+keþfedildi. 
+
+Tabakalar hazýrlanýnca eðitime baþlayabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 x = Dense(64, activation='relu')(input_vecs)
@@ -209,8 +211,8 @@ Tavsiye Üretmek
 
 Eðitilmiþ model sayesinde artýk kullanýcýnýn hiç seyretmediði filmler için
 beðeni notu üretmek mümkün, herhangi bir kullanýcý / film kimliðini DYSA'ya
-solda veriyoruz, en sondan tahmin notu çýkýyor, DYSA'nýn her kullanýcý ve
-her film için elinde gömme temsili vektörleri var. O zaman tavsiye üretme
+soldan veriyoruz, saðdan tahmin notu çýkýyor, DYSA'nýn her kullanýcý ve her
+film için elinde gömme temsili vektörleri var. O zaman tavsiye üretme
 amacýyla herhangi bir kullanýcý için tüm filmlerin tahmini notlarýný
 hesaplarsak, ve sonuç beðeni notlarý içinde en üst 10 filmi seçersek bu
 filmler bu kullanýcýnýn görüp beðenebileceði filmler olacaktýr. Kullanýcý
