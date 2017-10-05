@@ -20,13 +20,40 @@ iþlemede (NLP) görülen kelime gömme (word embedding) kavramýný bu problemde
 de kullanabiliriz. NLP problemlerinde elde bir doküman vardýr, bir
 sözlükten gelen kelimelerin bir kýsmi bu belgelerde yer alýrlar. Kullanýcý
 / film, ya da müþteri / ürün baðlamýnda da sanki bir doküman vardýr, ama bu
-dokümanda sadece bir beðeni verisi için olan müþteri / ürün ikilisi
-vardýr. NLP için bir belge `` kedi paspasta oturuyor'' ya da kimlik verisi
-üzerinden mesela [100, 201, 565] olacaktýr, kullanýcý / film için mesela
-[102, 4500], kullanýcý 102 film 4500'i beðenmiþ. Beðeni notunun nereye
-gittiðinin birazdan göreceðiz. 
+dokümanda sadece tek bir beðeni için olan müþteri / ürün ikilisi
+vardýr. NLP'de bir belge `` kedi paspasta oturuyor'', kimlik verisi
+üzerinden [200, 201, 565] olabiliyordu, kullanýcý / film için sadece [100,
+4500], kullanýcý 100 film 4500'i beðenmiþ. Beðeni notunun nereye gittiðinin
+birazdan göreceðiz.
+
+O zaman alttaki gibi bir að yapýsý düþünülebilir; kullanýcý / film ikilisi
+kimlik verilerine gömme transformasyonu uygulanýr, ve sonuç gömme
+vektörleri bu tabakada yanyana yer alýrlar. Ardýndan bomme tabakasýndaki
+tüm bilgi tam baðlanmýþ iki ayrý tabaka üzerinden tahmin üretmek için
+kullanýlýr, bu tahmin ise beðeni notunun ta kendisidir. Eldeki eðitim
+verisinde gerçek verilen not olacaktýr, ve bir kayýp fonksiyonu üzerinden
+optimizasyon, vs.
 
 \includegraphics[width=25em]{recom_01.png}
+
+Meta
+
+Bu mimariye bazý ekler yapabiliriz. Mesela eðer müþteri, ürün hakkýnda
+``meta'' bilgiler var ise, diyelim kullanýcýlarýn yasý, mesleði gibi, bu
+bilgiler verilen beðeni notundan bir diðerine deðiþmezler, o sebeple meta
+bilgidirler. Ürünler için ürünün hangi tarihte üretildiði, fiyatý, vs. gibi
+detaylar meta olabilir. Bu bilgileri nasýl DYSA'ya dahil ederiz?
+
+Bu bilgileri direk gömme tabakasýnda öteki gömme temsili kolonlarýn hemen
+yanýna koyabiliriz, yani mesela ürünün yapýlýþ tarihi bir sayýsal kolon olarak bu
+tabakada yer alabilir, diðerleri ayný þekilde, müþteri $i$ ve ürün $j$ için
+meta veri $m_i,n_j$ olsun, 
+
+\includegraphics[width=25em]{recom_02.png}
+
+Verileri okuyalým, eðitim test verisi yaratalým (DYSA paketi olarak
+TensorFlow üzerinde yazýlmýþ onu biraz daha kolaylaþtýran Keras paketini
+kullanýldý [1])
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import matplotlib.pyplot as plt
@@ -60,6 +87,8 @@ print ratings_train.shape
 (80000, 4)
 \end{verbatim}
 
+Þimdi gömme tabakasý kurulur, kullanýcý, film için bu 32'þer boyutlu olsun,
+yaný yanyana 64 öðeli bir vektör. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 user_id_input = Input(shape=[1])
@@ -88,7 +117,9 @@ user_vecs = Flatten()(user_embedding)
 item_vecs = Flatten()(item_embedding)
 \end{minted}
 
-
+Þimdi bir meta kolonu ekleyelim, bunu sadece filmin üretim tarihi için
+yapacaðýz, fakat diðerleri için de yapýlacak ek aynen bu þekilde, gayet
+basit. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 
@@ -107,6 +138,8 @@ item_meta_test = items["scaled_date"][item_id_test]
 
 input_vecs = merge([user_vecs, item_vecs, meta_input], mode='concat')
 \end{minted}
+
+Tabakalar hazýr. Eðitime baþlayabiliriz, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 x = Dense(64, activation='relu')(input_vecs)
@@ -164,16 +197,26 @@ Final test Loss: 0.968
 Final test Loss: 0.719
 \end{verbatim}
 
+Test verisi üzerinde hata karelerinin ortalamasý (mean squared error) ve
+hata mutlak deðer ortalamasý (mean absolute erör) görülüyor. Notlarýn 1 ile
+5 arasýnda olduðunu düþünürsek sonuçlar fena deðil diyebiliriz.
+
+Tavsiye Uretmek
+
+Eðitilmiþ model sayesinde artýk kullanýcýnýn hiç seyretmediði filmler için
+beðeni notu üretmek mümkün, herhangi bir kullanýcý / film kimliði için
+tahmin üretebiliyoruz, çünkü DYSA'nýn her kullanýcý ve her film için elinde
+gömme temsili vektörleri var. O zaman herhangi bir kullanýcý için tüm
+filmlerin tahmini notlarýný hesaplarsak, bu tahmini beðeni notlarý içinde
+en üst 10 film bu kullanýcýnýn görüp beðenebileceði filmler olacaktýr. O
+zaman kullanýcý 100 için bu tahminleri üretelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def recommend(user_id, top_n=10):
     item_ids = range(1, max_item_id)
     seen_movies = list(all_ratings[all_ratings["user_id"]==user_id]["item_id"])
     item_ids = list(filter(lambda x: x not in seen_movies, item_ids))
-    
-    print("user "+str(user_id) +" has seen "+str(len(seen_movies)) + " movies. "+
-          "Computing ratings for "+str(len(item_ids))+ " other movies")
-    
+        
     item_ids = np.array(item_ids)
     user = np.zeros_like(item_ids)
     user[:]=user_id
@@ -190,7 +233,6 @@ for x in recommend(100):
 \end{minted}
 
 \begin{verbatim}
-user 100 has seen 59 movies. Computing ratings for 1622 other movies
 (u'Nemesis 2: Nebula (1995)', 4.7475376)
 (u'Vie est belle, La (Life is Rosey) (1987)', 4.6862297)
 (u'Above the Rim (1994)', 4.6599483)
@@ -203,12 +245,12 @@ user 100 has seen 59 movies. Computing ratings for 1622 other movies
 (u'Mondo (1996)', 4.3473449)
 \end{verbatim}
 
+Bu arkadaþ üstteki filmleri sevebilirmiþ. 
 
+Yakinlik
 
-
-
-
-
+Gomme tabakasinda her kullanici, film daha az boyutta, sayisal degerlerle
+temsil edilir dedik, mesela {\em Toy Story} filmi icin 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 weights = model.get_weights()
@@ -234,9 +276,9 @@ Embedding vector for the first item:
 ('shape:', (32,))
 \end{verbatim}
 
-
-
-
+Bu sayýlarýn yakýnlýk baðlamýnda anlamý olduðundan bahsettik. O zaman bir
+filmin diðerlerine olan yakýnlýðýný Öklitsel uzaklýk ile hesaplayabiliriz,
+mesela {\em Groundhog Day} filmine yakýn diðerleri hangileridir?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 EPSILON = 1e-07
@@ -305,26 +347,12 @@ Groundhog Day filmine yakin filmler:
 (u'Time to Kill, A (1996)', 0.39465994)
 \end{verbatim}
 
+Pek anlamsýz deðil. Tabii girdi verisi ne kadar fazla olursa sonuçlar o
+kadar iyi olur, kullandýðýmýz veri Movielens 100K verisi, 100,000 tane not
+var. MovieLens 1M ile daha iyi sonuçlar alýnabilir. Bu da ödev olsun.
 
+Kaynaklar
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+[1] Grisel, {\em Deep Learning, course @ Télécom ParisTech}, \url{https://github.com/petermartigny/Deep-Learning}
 
 \end{document}
