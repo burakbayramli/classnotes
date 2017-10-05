@@ -22,6 +22,14 @@ from sklearn.model_selection import train_test_split
 ratings_train, ratings_test = train_test_split(
     all_ratings, test_size=0.2, random_state=0)
 
+
+
+# For each sample we input the integer identifiers
+# of a single user and a single item
+user_id_input = Input(shape=[1])
+item_id_input = Input(shape=[1])
+meta_input = Input(shape=[1])
+
 user_id_train = ratings_train['user_id']
 item_id_train = ratings_train['item_id']
 rating_train = ratings_train['rating']
@@ -33,7 +41,20 @@ rating_test = ratings_test['rating']
 max_user_id = all_ratings['user_id'].max()
 max_item_id = all_ratings['item_id'].max()
 
-# transform the date (string) into an int representing the release year
+embedding_size = 32
+user_embedding = Embedding(output_dim=embedding_size, input_dim=max_user_id + 1,
+                           input_length=1)(user_id_input)
+item_embedding = Embedding(output_dim=embedding_size, input_dim=max_item_id + 1,
+                           input_length=1)(item_id_input)
+
+user_vecs = Flatten()(user_embedding)
+
+item_vecs = Flatten()(item_embedding)
+
+
+
+
+
 parsed_dates = [int(film_date[-4:])
                 for film_date in items["date"].tolist()]
 
@@ -47,24 +68,18 @@ items['scaled_date'] = scale(items['parsed_date'].astype('float64'))
 item_meta_train = items["scaled_date"][item_id_train]
 item_meta_test = items["scaled_date"][item_id_test]
 
-# For each sample we input the integer identifiers
-# of a single user and a single item
-user_id_input = Input(shape=[1])
-item_id_input = Input(shape=[1])
-meta_input = Input(shape=[1])
-
-embedding_size = 32
-user_embedding = Embedding(output_dim=embedding_size, input_dim=max_user_id + 1,
-                           input_length=1)(user_id_input)
-item_embedding = Embedding(output_dim=embedding_size, input_dim=max_item_id + 1,
-                           input_length=1)(item_id_input)
-
-
-user_vecs = Flatten()(user_embedding)
-
-item_vecs = Flatten()(item_embedding)
-
 input_vecs = merge([user_vecs, item_vecs, meta_input], mode='concat')
+
+
+
+
+
+
+
+
+
+
+
 
 x = Dense(64, activation='relu')(input_vecs)
 x = Dropout(0.5)(x)

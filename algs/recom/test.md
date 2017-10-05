@@ -33,11 +33,6 @@ print ratings_train.shape
 (80000, 4)
 ```
 
-```python
-input_x = tf.placeholder(tf.int32, [None, 2])
-input_y = tf.placeholder(tf.float32, [None, 1])
-
-```
 
 
 
