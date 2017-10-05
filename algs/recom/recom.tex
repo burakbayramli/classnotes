@@ -142,7 +142,7 @@ input_vecs = merge([user_vecs, item_vecs, meta_input], mode='concat')
 Þimdi tam baðlanmýþ tabakalarý ekleyelim, arada bir de veri atma (dropout)
 tabakasý olsun, bu tabaka içinden geçen verileri rasgele bir þekilde
 yoksayýyor (eðitim döngüsünün o aþamasý yapýlmýyor yani), bu tekniðin aþýrý
-uygunluk (överfitting) problemleri için faydalý olduðu kes]fedildi, biz de
+uygunluk (överfitting) problemleri için faydalý olduðu keþfedildi, biz de
 kullandýk. Tabakalar hazýrlanýnca eðitime baþlayabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -202,18 +202,19 @@ Final test Loss: 0.719
 \end{verbatim}
 
 Test verisi üzerinde hata karelerinin ortalamasý (mean squared error) ve
-hata mutlak deðer ortalamasý (mean absolute erör) görülüyor. Notlarýn 1 ile
-5 arasýnda olduðunu düþünürsek sonuçlar fena deðil diyebiliriz.
+hata mutlak deðer ortalamasý (mean absolute error) görülüyor. Notlarýn 1
+ile 5 arasýnda olduðunu düþünürsek sonuçlar fena deðil diyebiliriz.
 
-Tavsiye Uretmek
+Tavsiye Üretmek
 
 Eðitilmiþ model sayesinde artýk kullanýcýnýn hiç seyretmediði filmler için
-beðeni notu üretmek mümkün, herhangi bir kullanýcý / film kimliði için
-tahmin üretebiliyoruz, çünkü DYSA'nýn her kullanýcý ve her film için elinde
-gömme temsili vektörleri var. O zaman herhangi bir kullanýcý için tüm
-filmlerin tahmini notlarýný hesaplarsak, bu tahmini beðeni notlarý içinde
-en üst 10 film bu kullanýcýnýn görüp beðenebileceði filmler olacaktýr. O
-zaman kullanýcý 100 için bu tahminleri üretelim,
+beðeni notu üretmek mümkün, herhangi bir kullanýcý / film kimliðini DYSA'ya
+solda veriyoruz, en sondan tahmin notu çýkýyor, DYSA'nýn her kullanýcý ve
+her film için elinde gömme temsili vektörleri var. O zaman tavsiye üretme
+amacýyla herhangi bir kullanýcý için tüm filmlerin tahmini notlarýný
+hesaplarsak, ve sonuç beðeni notlarý içinde en üst 10 filmi seçersek bu
+filmler bu kullanýcýnýn görüp beðenebileceði filmler olacaktýr. Kullanýcý
+100 için bu tahminleri üretelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def recommend(user_id, top_n=10):
@@ -251,10 +252,10 @@ for x in recommend(100):
 
 Bu arkadaþ üstteki filmleri sevebilirmiþ. 
 
-Yakinlik
+Yakýnlýk
 
-Gomme tabakasinda her kullanici, film daha az boyutta, sayisal degerlerle
-temsil edilir dedik, mesela {\em Toy Story} filmi icin 
+Gömme tabakasýnda her kullanýcý, film daha az boyutta, sayýsal deðerlerle
+temsil edilir dedik, mesela {\em Toy Story} filmi için 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 weights = model.get_weights()
@@ -282,59 +283,32 @@ Embedding vector for the first item:
 
 Bu sayýlarýn yakýnlýk baðlamýnda anlamý olduðundan bahsettik. O zaman bir
 filmin diðerlerine olan yakýnlýðýný Öklitsel uzaklýk ile hesaplayabiliriz,
-mesela {\em Groundhog Day} filmine yakýn diðerleri hangileridir?
+mesela {\em Groundhog Day} filmine yakýn filmler hangileridir?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 EPSILON = 1e-07
 
-def cosine(x, y):
-    dot_pdt = np.dot(x, y.T)
-    norms = np.linalg.norm(x) * np.linalg.norm(y)
-    return dot_pdt / (norms + EPSILON)
-
-# Computes cosine similarities between x and all item embeddings
-def cosine_similarities(x):
-    dot_pdts = np.dot(item_embedding, x)
-    norms = np.linalg.norm(x) * np.linalg.norm(item_embeddings, axis=1)
-    return dot_pdts / (norms + EPSILON)
-
-# Computes euclidean distances between x and all item embeddings
 def euclidean_distances(x):
     return np.linalg.norm(item_embeddings - x, axis=1)
 
-# Computes top_n most similar items to an idx, 
 def most_similar(idx, top_n=10, mode='euclidean'):
     sorted_indexes=0
-    if mode=='euclidean':
-        dists = euclidean_distances(item_embeddings[idx])
-        sorted_indexes = np.argsort(dists)
-        idxs = sorted_indexes[0:top_n]
-        return list(zip(items["name"][idxs], dists[idxs]))
-    else:
-        sims = cosine_similarities(item_embeddings[idx])
-        # [::-1] makes it possible to reverse the order of a numpy
-        # array, this is required because most similar items have
-        # a larger cosine similarity value
-        sorted_indexes = np.argsort(sims)[::-1]
-        idxs = sorted_indexes[0:top_n]
-        return list(zip(items["name"][idxs], sims[idxs]))
+    dists = euclidean_distances(item_embeddings[idx])
+    sorted_indexes = np.argsort(dists)
+    idxs = sorted_indexes[0:top_n]
+    return list(zip(items["name"][idxs], dists[idxs]))
 
-# sanity checks:
-print("cosine of item 1 and item 1: "
-      + str(cosine(item_embeddings[1], item_embeddings[1])))
 euc_dists = euclidean_distances(item_embeddings[1])
 print(euc_dists.shape)
 print(euc_dists[1:5])
 print()
 
-# Test on movie 181: Return of the Jedi
 print("Groundhog Day filmine yakin filmler:")
 for title, dist in most_similar(202, mode="euclidean"):
     print(title, dist)
 \end{minted}
 
 \begin{verbatim}
-cosine of item 1 and item 1: 0.999999743723
 (1683,)
 [ 0.          0.96932679  1.29504049  0.57039422]
 ()
@@ -353,7 +327,8 @@ Groundhog Day filmine yakin filmler:
 
 Pek anlamsýz deðil. Tabii girdi verisi ne kadar fazla olursa sonuçlar o
 kadar iyi olur, kullandýðýmýz veri Movielens 100K verisi, 100,000 tane not
-var. MovieLens 1M ile daha iyi sonuçlar alýnabilir. Bu da ödev olsun.
+var. MovieLens 1M (1 milyon not) ile daha iyi sonuçlar alýnabilir (bu veri
+{\em Ýstatistik, Pivotlama} yazýsýnýn dizininde). Okur için ödev olsun.
 
 Kaynaklar
 
