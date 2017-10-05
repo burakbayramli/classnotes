@@ -6,7 +6,7 @@ Kendini tekrarlayan YSA (RNN) yapýlarýnýn içindeki gizli konum $h_t$
 (önceki yazýda $s_t$) olarak bir zaman diliminden bir diðerine
 aktarýlabiliyordu, ve bu sýrada bir matris çarpýmý üzerinden deðiþime
 uðrayabiliyordu. Böylece her zaman diliminde yeni görülen verinin
-``hafýza'' olarak ta görülebilecek $h_t$'ye etkisi olabiliyordu. RNN dýþ
+``hafýza'' olarak ta tanýmlanabilen $h_t$'ye etkisi olabiliyordu. RNN dýþ
 dünya hakkýndaki iç modelini böyle güncelliyordu.
 
 Fakat RNN ile tarif edilen bu güncellemeye hiç bir sýnýr getirmedik. Biraz
@@ -31,7 +31,7 @@ güncellemek için kullanýlmamalý.
 sahnenin hangi gün, saat kaçta, nerede olduðunu unutuyoruz. Fakat bir
 karakter o sahnede ölmüþse, bunu hatýrlýyoruz. Modelin ne zaman
 hatýrlayacaðýný, ne zaman unutacaðýný öðrenmesini istiyoruz (dikkat sadece
-belli bir þekilde unutmasý, hatýrlamasý deðil, tüm bunlarý ne zaman
+belli bir þekilde unutmasý, hatýrlamasý deðil, tüm bunlarý nasýl, ne zaman
 yapacaðýný öðrenmesi).
 
 2) Bir belleðe yazma (zulaya atma?) mekanizmasý. Modelin yeni bir kare
@@ -79,7 +79,7 @@ Fakat bir adayý hafýzamýza eklemeden önce hangi bölümlerinin kullanýma,
 kaydetmeye deðer olduðunu öðrenmemiz gerekir. Web'de bir þey okurken kendi
 zihnimizde neler olduðunu düþünelim. Bir haber makalesi okuyoruz mesela,
 Trabzonspor'un hep kötüye gittiðini, hep yanlýþ tranferler yaptýðýný
-anlatan bir haber okuyoruz, ama bu haberi fenerbahçe.org sitesinde
+anlatan bir haber okuyoruz, ama bu haberi fenerbahce.org sitesinde
 okuyorsak o habere daha az önem verebiliriz.
 
 $$ i_t = \sigma (W_s x_t + U_s h_{t-1}) $$
@@ -159,7 +159,7 @@ istediðimiz kýsmýn dýþarý verilmesini saðlayalým.
 \includegraphics[width=35em]{lstm_07.png}
 
 Þimdi üstteki formülleri kullanarak TensorFlow ile sýfýrdan bir LSTM
-kodlayalým. Amacýmýz daha RNN için gördüðümüz zaman serisini öðrenmek, 
+kodlayalým. Amacýmýz daha önce RNN için gördüðümüz zaman serisini öðrenmek,
 bu seriyi 5'er 5'er okuyacaðýz, yani yanyana 5 seri öðesini okuyacaðýz, ve
 6. seri deðeri hedef deðeri olacak, seri içinden bu þekilde örneklem
 yaparak bir ufak toptan eðitim seti yaratacaðýz. Sonra serinin hiç
@@ -174,12 +174,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+tf.reset_default_graph()
 np.random.seed(1)
+tf.set_random_seed(1)
 
 LSTM_SIZE = 30
 t_min, t_max = 0, 30
 resolution = 0.1
-sequence_length = 5
+sequence_length = 4
 instruction_count = 1
 epoch = 500
 
@@ -199,8 +201,8 @@ def next_batch(batch_size, n_steps):
 
 reference_input_data,reference_output_data = next_batch(400, sequence_length)
    
+# verinin 1/4'u egitim gerisi test
 NUM_EXAMPLES = len(reference_input_data) / 4 
-
 test_input = reference_input_data[NUM_EXAMPLES:]
 test_output = reference_output_data[NUM_EXAMPLES:] 
 train_input = reference_input_data[:NUM_EXAMPLES]
@@ -245,8 +247,8 @@ W_C, b_c = default_weights_and_bias()
 def candidate_C_t(ht_minus_1_and_xt):
     return tf.tanh(tf.matmul(W_C, ht_minus_1_and_xt) + b_c)
 
-def C_t(ht_minus_1_and_xt, Conveyor, CandidateConveyor):
-    return f_t(ht_minus_1_and_xt) * Conveyor + i_t(ht_minus_1_and_xt) * CandidateConveyor
+def C_t(ht_minus_1_and_xt, Conveyor, CandConv):
+    return f_t(ht_minus_1_and_xt) * Conveyor + i_t(ht_minus_1_and_xt) * CandConv
 
 W_o, b_o = default_weights_and_bias()
 
@@ -303,13 +305,9 @@ optimizer = tf.train.AdamOptimizer()
 
 minimize = optimizer.minimize(mean_square_error)
 
-with tf.name_scope('error'):
-    with tf.name_scope('mistakes'):
-        mistakes = tf.not_equal(target, tf.round(tf.unstack(prediction, axis = 1)))
+mistakes = tf.not_equal(target, tf.round(tf.unstack(prediction, axis = 1)))
 
 sess = tf.InteractiveSession()
-
-merged = tf.summary.merge_all()
 
 date = str(datetime.datetime.now())
 
@@ -321,53 +319,51 @@ sess.run(init_op)
 
 for i in range(epoch):
     if (i + 1) % 20 == 0:
-        summary, mean_squ_err = sess.run([merged, mean_square_error], {data: test_input, target: test_output})        
+        mean_squ_err = sess.run(mean_square_error, {data: test_input, target: test_output})
         print('Epoch {:4d} | mean squ error {: 3.1f}'.format(i + 1, mean_squ_err))
     
     sess.run(minimize,{data: train_input, target: train_output})
-
 \end{minted}
 
 \begin{verbatim}
 (400,)
-[[ 3.71134228]
- [ 4.12646883]
- [ 4.52614447]
- [ 4.67751103]
- [ 4.39857443]]
-3.60413751202
-Epoch   20 | mean squ error  3604.8
-Epoch   40 | mean squ error  2134.7
-Epoch   60 | mean squ error  1349.9
-Epoch   80 | mean squ error  928.2
-Epoch  100 | mean squ error  681.5
-Epoch  120 | mean squ error  570.9
-Epoch  140 | mean squ error  486.0
-Epoch  160 | mean squ error  419.0
-Epoch  180 | mean squ error  363.4
-Epoch  200 | mean squ error  316.0
-Epoch  220 | mean squ error  275.1
-Epoch  240 | mean squ error  240.7
-Epoch  260 | mean squ error  212.3
-Epoch  280 | mean squ error  189.4
-Epoch  300 | mean squ error  171.2
-Epoch  320 | mean squ error  156.5
-Epoch  340 | mean squ error  143.9
-Epoch  360 | mean squ error  132.4
-Epoch  380 | mean squ error  121.4
-Epoch  400 | mean squ error  111.1
-Epoch  420 | mean squ error  101.6
-Epoch  440 | mean squ error  93.0
-Epoch  460 | mean squ error  85.5
-Epoch  480 | mean squ error  78.9
-Epoch  500 | mean squ error  73.2
+[[ 4.00159218]
+ [ 4.4298434 ]
+ [ 4.67217731]
+ [ 4.52697138]]
+3.87853505042
+Epoch   20 | mean squ error  3181.8
+Epoch   40 | mean squ error  1860.6
+Epoch   60 | mean squ error  1307.7
+Epoch   80 | mean squ error  903.1
+Epoch  100 | mean squ error  628.8
+Epoch  120 | mean squ error  477.8
+Epoch  140 | mean squ error  390.5
+Epoch  160 | mean squ error  323.5
+Epoch  180 | mean squ error  271.9
+Epoch  200 | mean squ error  233.8
+Epoch  220 | mean squ error  204.4
+Epoch  240 | mean squ error  180.8
+Epoch  260 | mean squ error  161.2
+Epoch  280 | mean squ error  144.9
+Epoch  300 | mean squ error  131.7
+Epoch  320 | mean squ error  121.4
+Epoch  340 | mean squ error  113.0
+Epoch  360 | mean squ error  105.7
+Epoch  380 | mean squ error  99.0
+Epoch  400 | mean squ error  92.6
+Epoch  420 | mean squ error  86.6
+Epoch  440 | mean squ error  80.9
+Epoch  460 | mean squ error  75.4
+Epoch  480 | mean squ error  70.1
+Epoch  500 | mean squ error  64.9
 \end{verbatim}
 
-Tahminleri üretirken test verisinin en sonundaki 5 öðeyi alýp sonraki 1
-deðeri üretiyoruz, bu deðeri tahmin için kullanýlan önceki verinin sonuna
-ekliyoruz, eklenmiþ veriden tekrar bir 5 öðe alýyoruz (biraz önceki
-tahminle beraber), yeni tahmin üretiyoruz, böyle gidiyor, ve bu þekilde
-serinin hiç görmediðimiz kýsmýný tahmin ediyoruz.
+Tahminleri üretirken eðitim verisinin en sonundaki 5 öðeyi alýp sonraki 1
+deðeri üretiyoruz, bu deðeri alýp tahmin için kullanýlan biraz önceki 5
+deðerin sonuna ekleyip yine en son 5 deðer üzerinden bir tahmin daha
+üretiyoruz, böyle gidiyor, ve bu þekilde serinin hiç görmediðimiz kýsmýný
+tahmin ediyoruz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def f(t):
