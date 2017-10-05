@@ -29,10 +29,10 @@ birazdan göreceðiz.
 O zaman alttaki gibi bir að yapýsý düþünülebilir; kullanýcý / film ikilisi
 kimlik verilerine gömme transformasyonu uygulanýr, ve sonuç gömme
 vektörleri bu tabakada yanyana yer alýrlar. Ardýndan bomme tabakasýndaki
-tüm bilgi tam baðlanmýþ iki ayrý tabaka üzerinden tahmin üretmek için
-kullanýlýr, bu tahmin ise beðeni notunun ta kendisidir. Eldeki eðitim
-verisinde gerçek verilen not olacaktýr, ve bir kayýp fonksiyonu üzerinden
-optimizasyon, vs.
+tüm bilgi tam baðlanmýþ (fully connected) iki ayrý tabaka üzerinden tahmin
+üretmek için kullanýlýr, bu tahmin ise beðeni notunun ta kendisidir. Eldeki
+eðitim verisinde gerçek verilen not olacaktýr, ve bir kayýp fonksiyonu
+üzerinden optimizasyon, vs.
 
 \includegraphics[width=25em]{recom_01.png}
 
@@ -51,9 +51,9 @@ meta veri $m_i,n_j$ olsun,
 
 \includegraphics[width=25em]{recom_02.png}
 
-Verileri okuyalým, eðitim test verisi yaratalým (DYSA paketi olarak
-TensorFlow üzerinde yazýlmýþ onu biraz daha kolaylaþtýran Keras paketini
-kullanýldý [1])
+Kodlamaya baþlayabiliriz. Önce verileri okuyalým, eðitim test verisi
+yaratalým (DYSA paketi olarak TensorFlow üzerinde yazýlmýþ onu biraz daha
+kolaylaþtýran Keras paketi kullanýldý [1])
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import matplotlib.pyplot as plt
@@ -88,7 +88,7 @@ print ratings_train.shape
 \end{verbatim}
 
 Þimdi gömme tabakasý kurulur, kullanýcý, film için bu 32'þer boyutlu olsun,
-yaný yanyana 64 öðeli bir vektör. 
+yani yanyana 64 öðeli bir vektör. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 user_id_input = Input(shape=[1])
@@ -118,8 +118,8 @@ item_vecs = Flatten()(item_embedding)
 \end{minted}
 
 Þimdi bir meta kolonu ekleyelim, bunu sadece filmin üretim tarihi için
-yapacaðýz, fakat diðerleri için de yapýlacak ek aynen bu þekilde, gayet
-basit. 
+yapacaðýz, fakat diðerleri için de yapýlacak ek aynen bu þekilde olurdu,
+gayet basit.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 
@@ -139,7 +139,11 @@ item_meta_test = items["scaled_date"][item_id_test]
 input_vecs = merge([user_vecs, item_vecs, meta_input], mode='concat')
 \end{minted}
 
-Tabakalar hazýr. Eðitime baþlayabiliriz, 
+Þimdi tam baðlanmýþ tabakalarý ekleyelim, arada bir de veri atma (dropout)
+tabakasý olsun, bu tabaka içinden geçen verileri rasgele bir þekilde
+yoksayýyor (eðitim döngüsünün o aþamasý yapýlmýyor yani), bu tekniðin aþýrý
+uygunluk (överfitting) problemleri için faydalý olduðu kes]fedildi, biz de
+kullandýk. Tabakalar hazýrlanýnca eðitime baþlayabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 x = Dense(64, activation='relu')(input_vecs)

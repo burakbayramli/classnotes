@@ -147,6 +147,7 @@ lmfit==0.8.3
 autograd==1.1.7
 sounddevice
 tensorflow==1.2
+keras==2.0.8
 ```
 
 Python paket kurulumu Ubuntu Linux üzerinde `conda install [paket ismi]` 
