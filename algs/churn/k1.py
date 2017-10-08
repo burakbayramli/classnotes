@@ -3,21 +3,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import theano as T
 from keras import backend as K
-
 from keras.models import Sequential
 from keras.layers import Dense
-
 from keras.layers import LSTM,GRU
 from keras.layers import Lambda
 from keras.layers.wrappers import TimeDistributed
 
 from keras.optimizers import RMSprop,adam
 from keras.callbacks import History, TensorBoard
-
-print('tensorflow version '+tf.__version__) 
-print('theano     version '+T.__version__) 
 
 def _keras_unstack_hack(ab):
     ndim = len(K.int_shape(ab))
