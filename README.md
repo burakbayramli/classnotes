@@ -207,12 +207,11 @@ Here are lecture notes on ODE, Multivariate Calculus, Linear Algebra,
 Computational Science, Computer Science, Statistics, Functional
 Analysis written in Latex, in Turkish. All necessary Python code and
 data is either in the document itself or included in the same
-directory as the article / classnote.
+directory as the article, residing in this GH repository.
 
 Anaconda is the suggested Python installation, and for the necessary
-side packages. If Anaconda is not used, the packages below need to be
-installed one by one, and we suggest `conda install` to do this, or
-`pip install` on the list above.
+side packages. Use `conda install` to do this, or `pip install` on the
+list above.
 
 R
 
