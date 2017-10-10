@@ -204,11 +204,10 @@ komut satırından `cd [dizin ismi]` ile gidebilirsiniz.
 ## English
 
 Here are lecture notes on ODE, Multivariate Calculus, Linear Algebra,
-Computational Science, Statistics, Functional Analysis written
-in Latex, in Turkish. There is also a small handbook of collected math,
-applied math articles. All necessary Python code and data is either in 
-the document itself or included in the same directory as the 
-article / classnote.
+Computational Science, Computer Science, Statistics, Functional
+Analysis written in Latex, in Turkish. All necessary Python code and
+data is either in the document itself or included in the same
+directory as the article / classnote.
 
 Anaconda is the suggested Python installation, and for the necessary
 side packages. If Anaconda is not used, the packages below need to be
