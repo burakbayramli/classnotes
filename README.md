@@ -14,8 +14,7 @@ Bu notlarda yazılanları takip etmek için önkoşul bilgiler şunlar:
 * Cebir
 
 Yani üniversite sınavına hazırlık için gereken konular (gerçi artık
-Calculus gerekiyor mu bilmiyorum, bir süre önce gerekmediğini
-duyduğumu hatırlıyorum, benim zamanımda gerekiyordu).
+Calculus gerekiyor mu bilmiyorum, benim zamanımda gerekiyordu).
 
 ### Kodlar, TeX
 
