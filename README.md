@@ -3,10 +3,8 @@
 ODE, Çok Değişkenli Calculus, Lineer Cebir, Hesapsal Bilim,
 İstatistik, Fonksiyonel Analiz video derslerinden, ya da ders
 kitaplarından alınan notların Latex ile yazılmış ve PDF olarak
-üretilmiş dosyaları burada bulunabilir. Matematik ve Uygulamalı
-Matematik hakkında yazılmış yazılarımız da var. Örnek Python kodları
-gerektiği yerde yazı içinde ya da onunla beraber aynı dizinde
-olacaktır.
+üretilmiş dosyaları burada bulunabilir. Örnek Python kodları gerektiği
+yerde yazı içinde ya da onunla beraber aynı dizinde olacaktır.
 
 Bu notlarda yazılanları takip etmek için önkoşul bilgiler şunlar:
 
@@ -216,7 +214,7 @@ list above.
 R
 
 The R installation command for Ubuntu, as well as the R package
-installation command is shown above.
+installation command is shown above in the TR section.
 
 Blog
 
