@@ -7,3 +7,5 @@ data_utils.prepare_data('/home/burak/Downloads/',
                         '/home/burak/Downloads/tur-eng/dev-tur.txt',
                         10000,
                         10000)
+
+
