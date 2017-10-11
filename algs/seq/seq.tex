@@ -9,16 +9,44 @@ with zipfile.ZipFile('/home/burak/Downloads/deu-eng.zip', 'r') as z:
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import data_utils
+_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
+import tensorflow as tf, sys, data_utils
 
-data_utils.prepare_data('/home/burak/Downloads/', 
-                        '/home/burak/Downloads/tur-eng/tatoeba-eng.txt', 
-                        '/home/burak/Downloads/tur-eng/tatoeba-tur.txt', 
-                        '/home/burak/Downloads/tur-eng/dev-end.txt',
-                        '/home/burak/Downloads/tur-eng/dev-tur.txt',10000,10000) 
+def read_data(source_path, target_path, max_size=None):
+  data_set = [[] for _ in _buckets]
+  with tf.gfile.GFile(source_path, mode="r") as source_file:
+    with tf.gfile.GFile(target_path, mode="r") as target_file:
+      source, target = source_file.readline(), target_file.readline()
+      counter = 0
+      while source and target and (not max_size or counter < max_size):
+        counter += 1
+        if counter % 100000 == 0:
+          print("  reading data line %d" % counter)
+          sys.stdout.flush()
+        source_ids = [int(x) for x in source.split()]
+        target_ids = [int(x) for x in target.split()]
+        target_ids.append(data_utils.EOS_ID)
+        for bucket_id, (source_size, target_size) in enumerate(_buckets):
+          if len(source_ids) < source_size and len(target_ids) < target_size:
+            data_set[bucket_id].append([source_ids, target_ids])
+            break
+        source, target = source_file.readline(), target_file.readline()
+  return data_set
+
+
+train_set = read_data('/home/burak/Downloads/tur-eng/tatoeba-eng.txt.ids10000',\
+                      '/home/burak/Downloads/tur-eng/tatoeba-tur.txt.ids10000')
+
+print len(train_set)
 \end{minted}
 
-
+\begin{verbatim}
+  reading data line 100000
+  reading data line 200000
+  reading data line 300000
+  reading data line 400000
+4
+\end{verbatim}
 
 
 
