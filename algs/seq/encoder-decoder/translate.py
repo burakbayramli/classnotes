@@ -20,8 +20,9 @@ class parameters(object):
         Holds all the parameters for NMT.
         """
 
-        self.max_en_vocab_size = 5000
-        self.max_sp_vocab_size = 5000
+        self.ckpt_dir = 'checkpoints/'
+        self.max_en_vocab_size = 10000
+        self.max_sp_vocab_size = 10000
 
         self.num_epochs = 100
         self.batch_size = 4
@@ -47,11 +48,9 @@ def train(FLAGS):
 
     # Load the data
     en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict = \
-        process_data('data/en.p', max_vocab_size=5000, target_lang=False)
-    print en_token_ids
-    exit()
+        process_data('data/en.p', max_vocab_size=10000, target_lang=False)
     sp_token_ids, sp_seq_lens, sp_vocab_dict, sp_rev_vocab_dict = \
-        process_data('data/sp.p', max_vocab_size=5000, target_lang=True)
+        process_data('data/sp.p', max_vocab_size=10000, target_lang=True)
 
     # Split into train and validation sets
     train_encoder_inputs, train_decoder_inputs, train_targets, \
@@ -97,6 +96,14 @@ def train(FLAGS):
                 batch_loss.append(loss)
 
             losses.append(np.mean(batch_loss))
+
+        if not os.path.isdir(FLAGS.ckpt_dir):
+            os.makedirs(FLAGS.ckpt_dir)
+        checkpoint_path = os.path.join(FLAGS.ckpt_dir, "model.ckpt")
+        print "Saving the model."
+        model.saver.save(sess, checkpoint_path,
+                         global_step=model.global_step)
+            
 
         plt.plot(losses, label='loss')
         plt.legend()

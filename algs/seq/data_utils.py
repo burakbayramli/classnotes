@@ -132,6 +132,10 @@ def create_vocabulary(vocabulary_path, data_path, max_vocabulary_size,
   if not gfile.Exists(vocabulary_path):
     print("Creating vocabulary %s from data %s" % (vocabulary_path, data_path))
     vocab = {}
+    vocab["_PAD"] = 0
+    vocab["_GO"] = 1
+    vocab["_EOS"] = 2
+    vocab["_UNK"] = 3
     with gfile.GFile(data_path, mode="rb") as f:
       counter = 0
       for line in f:

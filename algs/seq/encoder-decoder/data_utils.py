@@ -108,6 +108,10 @@ def process_data(datafile, max_vocab_size, target_lang):
     # Get vocab information
     vocab_list, vocab_dict, rev_vocab_dict = get_vocab(tokenized,
         max_vocab_size)
+    #print vocab_list
+    #print vocab_dict
+    #print rev_vocab_dict
+    #exit()
 
     # Convert data to token ids
     data_as_tokens, seq_lens = data_to_token_ids(tokenized, vocab_dict,

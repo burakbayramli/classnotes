@@ -24,8 +24,11 @@ def make_sentences(datafile):
 
 def prepare_data():
 
-    english_data = 'data/my_en.txt'
-    spanish_data = 'data/my_sp.txt'
+    #english_data = 'data/my_en.txt'
+    #spanish_data = 'data/my_sp.txt'
+    english_data = '/home/burak/Downloads/tur-eng/tatoeba-eng.txt'
+    spanish_data = '/home/burak/Downloads/tur-eng/tatoeba-tur.txt'
+    
 
     # Break into sentences
     english_sentences = make_sentences(english_data)
