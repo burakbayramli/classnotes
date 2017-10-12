@@ -14,7 +14,7 @@ from model import model
 class parameters(object):
 
     def __init__(self):
-        self.ckpt_dir = 'checkpoints/'
+        self.ckpt_dir = '/tmp/checkpoints/'
         self.max_en_vocab_size = 10000
         self.max_sp_vocab_size = 10000
         self.num_epochs = 100
