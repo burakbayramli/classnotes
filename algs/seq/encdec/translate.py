@@ -32,7 +32,11 @@ def create_model(sess, FLAGS):
     tf_model = model(FLAGS)
     print "Created a new model"
     sess.run(tf.initialize_all_variables())
+    return tf_model
 
+def restore_model(sess, FLAGS):
+    tf_model = model(FLAGS)
+    tf_model.saver.restore(sess, "/tmp/checkpoints/model.ckpt") 
     return tf_model
 
 def train(FLAGS):
@@ -55,6 +59,10 @@ def train(FLAGS):
     FLAGS.en_vocab_size = len(en_vocab_dict)
     FLAGS.sp_vocab_size = len(sp_vocab_dict)
 
+    print 'len(en_vocab_dict)', len(en_vocab_dict)
+    print 'len(sp_vocab_dict)', len(sp_vocab_dict)
+    #exit()
+    
     # Start session
     with tf.Session() as sess:
 

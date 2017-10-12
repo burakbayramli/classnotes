@@ -43,7 +43,6 @@ class parameters(object):
 
 def create_model(sess, FLAGS, forward_only):
 
-
     tf_model = model(FLAGS, forward_only)
 
     ckpt = tf.train.get_checkpoint_state(FLAGS.ckpt_dir)

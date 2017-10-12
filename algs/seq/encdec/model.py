@@ -136,19 +136,6 @@ class model(object):
 
         self.saver = tf.train.Saver(tf.all_variables())
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     def step(self, sess, FLAGS, batch_encoder_inputs, batch_decoder_inputs,
         batch_targets, batch_en_seq_lens, batch_sp_seq_lens, dropout):
 
