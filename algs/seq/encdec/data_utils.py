@@ -73,8 +73,7 @@ def sentence_to_token_ids(sentence, vocab_dict, target_lang,
     return tokens
 
 
-def data_to_token_ids(tokenized, vocab_dict, target_lang,
-    normalize_digits=True):
+def data_to_token_ids(tokenized, vocab_dict, target_lang, normalize_digits=True):
     """
     Convert tokens into ids used vocab_dict and normalize all digits
     to 0.

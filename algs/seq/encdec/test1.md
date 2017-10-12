@@ -5,6 +5,11 @@ import data_utils
 en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict = data_utils.process_data('data/en.p', max_vocab_size=10000, target_lang=False)
 sp_token_ids, sp_seq_lens, sp_vocab_dict, sp_rev_vocab_dict = data_utils.process_data('data/sp.p', max_vocab_size=10000, target_lang=True)
 
+print 'vocab en'
+print en_vocab_dict
+print 'vocab sp'
+print sp_vocab_dict
+
 train_encoder_inputs,\
 train_decoder_inputs,\
 train_targets, \
@@ -14,126 +19,54 @@ valid_encoder_inputs,\
 valid_decoder_inputs,\
 valid_targets, \
 valid_en_seq_lens,\
-valid_sp_seq_len = \
-    data_utils.split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens,
-        train_ratio=0.8)
+valid_sp_seq_len = data_utils.split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens,train_ratio=0.8)
 ```
 
 ```text
-16 training samples and 4 validations samples
+vocab en
+{'all': 63, 'focus': 115, 'four': 116, 'causes': 117, 'seemed': 118, 'synthetic': 64, 'uphold': 119, 'tremors': 120, 'concerned': 65, 'father': 66, 'young': 121, 'languages': 67, 'to': 7, 'present': 123, 'ashore': 373, 'sent': 124, 'sound': 40, 'very': 68, 'rise': 126, 'translations': 127, 'Richter': 128, 'try': 46, 'limitations': 393, '_GO': 1, 'says': 130, 'download': 131, 'even': 132, 'what': 133, 'weren': 134, 'melt': 135, 'spokesman': 136, 'scientists': 137, 'falling': 138, 'body': 139, 'never': 140, 'desired': 141, 'others': 114, 'cirrhosis': 233, 'Lang-8': 144, 'change': 145, 'healthy': 146, 'economics': 147, 'amount': 148, 'makes': 149, 'Constitution': 150, 'manage': 151, 'visible': 152, 'Tom': 31, 'from': 32, 'takes': 153, 'working': 154, '0': 122, 'E-cigarettes': 155, 'few': 156, 'live': 157, 'recommend': 158, 'until': 160, 'today': 161, 'more': 69, 'diamond': 162, 'Erick': 163, 'corrected': 164, 'chocolate': 70, 'Roger': 165, 'must': 166, 'this': 167, 'car': 168, 'values': 169, 'can': 33, 'learn': 170, 'growing': 71, 'example': 171, 'heart': 172, 'violence': 395, 'activities': 173, 'high': 73, 'something': 175, 'want': 74, 'phrase': 176, 'Injury': 177, 'native': 26, 'huge': 178, 'end': 179, 'get': 286, 'damage': 181, 'how': 182, 'Poverty': 183, 'instead': 184, 'economy': 75, 'A': 47, 'tension': 185, 'may': 76, 'after': 186, 'retirement': 367, 'wrong': 187, 'produce': 188, 'blood': 189, 'fits': 190, 'a': 10, 'unimportant': 288, 'cigarettes': 192, 'so': 77, 'pulled': 193, 'longest': 194, 'breaking': 180, 'over': 34, 'soon': 195, 'ended': 196, 'looks': 197, 'still': 198, 'its': 78, 'll': 199, ',': 5, 'him': 91, 'window': 79, 'permanent': 201, 'Using': 202, 'main': 332, 'then': 204, 'them': 80, 'good': 48, 'diseases': 205, 'practice': 81, 'impossible': 243, 'effects': 208, 'they': 35, 'front': 209, 'hearing': 210, 'realize': 211, 'bigger': 212, 'easily': 213, 'settings': 215, 'rocks': 216, 'magnitude': 217, 'found': 218, 'everyone': 219, 'doing': 220, 'reduce': 221, 'year': 222, 'our': 36, 'wages': 223, 'really': 113, 'large': 225, "'": 12, 'dialects': 226, 'since': 82, 'health': 83, 'dioxide': 227, 'got': 228, 'cause': 229, 'announced': 230, 'colorless': 231, 'tempo': 232, '_UNK': 3, 'quite': 143, 'offhandedly': 234, 'put': 49, 'org': 235, 'language': 37, 'computers': 236, 'times': 237, 'place': 238, 'first': 239, 'spoken': 240, 'Oklahoma': 241, 'There': 242, 'yourself': 84, 'ironing': 72, 'ring': 244, 'top': 245, 'system': 85, 'their': 86, 'too': 246, 'wrapped': 247, 'countries': 294, 'Association': 248, 'that': 11, 'shelf': 249, 'cops': 250, 'than': 87, 'kind': 251, 'require': 252, 'matter': 253, 'speaking': 254, 'iron': 38, 'result': 255, 'and': 8, '_EOS': 2, 'have': 88, 'sentences': 50, 'need': 256, 'seem': 257, 'saw': 258, 'speakers': 259, 'Diseases': 260, 'After': 261, 'which': 89, 'online': 262, 'banjo': 263, 'play': 264, 'excess': 321, 'though': 265, 'who': 266, 'The': 39, '\xe2\x80\x94': 439, 'class': 267, 'don': 268, 'clear': 269, 'Some': 270, 'face': 271, 'Tatoeba': 272, 'laws': 273, 'saying': 274, 'businesses': 276, 'one': 51, 'We': 52, 'proposed': 358, 'Top-down': 277, 'justice': 278, 'sentence': 279, 'folded': 280, 'should': 281, 'surroundings': 282, 'only': 283, 'meant': 284, 'his': 20, 'hit': 285, 'means': 159, 'pocket': 287, 'feels': 191, 'fastest': 289, 'words': 290, 'fabrics': 200, 'Swimming': 292, 'tobacco': 293, 'hiring': 207, 'she': 295, 'where': 92, 'iPad': 93, 'computer': 296, 'are': 15, 'ability': 297, 'knees': 298, 'said': 299, 'closet': 300, 'That': 301, 'away': 302, 'difficulties': 303, 'various': 94, 'correctly': 304, 'probably': 305, 'email': 306, 'we': 53, 'jobs': 307, 'creating': 95, 'attention': 308, 'succeed': 96, 'news': 310, 'climate': 311, 'restaurant': 312, 'many': 97, 'barely': 313, 'against': 314, 'players': 315, 's': 19, 'became': 98, 'long-term': 316, 'com': 317, 'comment': 318, 'cancer': 319, 'had': 107, 'English': 142, 'Though': 413, 'alcohol-related': 322, 'learning': 323, 'carbon': 54, 'swimmer': 341, 'discrimination': 325, 'quickly': 326, 'willing': 309, 'expected': 328, 'threw': 329, 'photos': 55, 'liver': 330, 'those': 331, 'And': 125, 'criminal': 203, 'these': 333, 'vanilla': 99, 'choices': 334, 'will': 335, 'pace': 336, 'while': 337, 'warning': 427, 'ceilings': 339, 'country': 100, 'promoted': 340, 'mistake': 101, 'is': 16, 'it': 14, 'middle': 102, 'someone': 342, 'in': 9, 'You': 343, 'greater': 396, 'fibers': 345, 'make': 103, 'same': 41, 'speaker': 27, 'underestimate': 346, 'largest': 347, 'gets': 348, 'week': 349, 'I': 350, 'moment': 351, 'footprint': 104, 'off': 352, 'database': 353, 'Miller': 354, 'well': 105, 'aftershock': 355, 'contact': 356, 'In': 214, 'the': 4, 'If': 56, 'just': 90, 'less': 106, 'being': 359, 'not': 360, 'shape': 361, 'rooms': 362, 'alternative': 363, 'Nicholas': 364, 'yet': 365, 'adding': 366, 'death': 174, 'mother': 357, 'seems': 320, 'interested': 429, 'board': 369, 'Five': 411, 'has': 371, 'swim': 372, 'around': 344, 'Project': 374, 'know': 108, 'background': 375, 'world': 376, 'like': 21, 'offices': 377, 't': 28, 'night': 378, 'translated': 379, 'security': 380, 'works': 381, 'cooled': 382, 'because': 383, 'old': 384, 'often': 57, 'people': 58, 'some': 385, 'back': 109, 'ideals': 386, 'strongest': 387, 'home': 388, '5': 430, 'Mary': 42, 'Channel': 389, 'scale': 390, 'However': 391, '_PAD': 0, 'does': 392, 'cord': 129, 'be': 29, 'shaken': 394, 'on': 22, 'about': 43, 'of': 13, 'incomes': 324, 'practical': 397, 'Japan': 398, 'shiny': 399, 'or': 400, 'block': 401, 'pollution': 402, 'own': 403, 'Cindy': 434, 'No': 404, 'into': 405, 'down': 406, 'tatoeba': 407, 'rising': 206, 'primarily': 409, '1990s': 410, '.': 6, 'your': 30, 'fabric': 412, 'her': 110, 'area': 275, 'housing': 414, 'noticed': 415, 'overestimate': 416, 'start': 417, 'much': 327, 'way': 418, 'was': 59, 'Obama': 419, 'but': 23, 'heat': 420, 'uncle': 421, 'highest': 422, 'with': 44, 'he': 24, 'made': 60, 'up': 111, 'convince': 61, 'accustomed': 423, 'site': 424, 'called': 425, 'doesn': 112, 'an': 426, 'as': 62, 'too-hot': 338, 'at': 17, 'education': 428, 'again': 45, 'when': 25, 'other': 368, 'electrical': 370, 'sick': 431, 'you': 18, 'out': 224, 'users': 432, 'important': 433, 'accounts': 408, 'authorities': 435, 'died': 436, 'Dover': 437, 'building': 438, 'applause': 291, 'exhausting': 440, 'At': 441, 'time': 442, 'Wages': 443, 'accidents': 444, 'starting': 445, 'having': 446}
+vocab sp
+{'kullan\xc4\xb1c\xc4\xb1lar': 75, 'g\xc3\xb6nderebilir': 76, 'masas\xc4\xb1n\xc4\xb1': 77, 'Gen\xc3\xa7lerin': 78, 'hata': 37, '\xc3\xa7e\xc5\x9fitli': 79, 'durumda': 80, '0': 81, '\xc3\xa7\xc3\xbcnk\xc3\xbc': 82, '\xc3\xa7evrimi\xc3\xa7i': 83, 'g\xc3\xb6r\xc3\xbcnsede': 84, '\xc3\xbcretti\xc4\x9fimiz': 85, 'onun': 10, 'sonunda': 86, 'konusunda': 87, 'sentetik': 88, 'ideallerimiz': 89, '\xc3\x9clke': 90, 'Richter': 91, 'insanlar': 92, 'yasalar\xc4\xb1': 93, 'dil': 94, 'alma': 95, 'olan': 96, 'haber': 97, 'kablosunu': 98, '\xc3\xb6nemsiz': 374, '\xc4\xb0nsanlar\xc4\xb1': 99, 'Araba': 100, 'imkans\xc4\xb1zd\xc4\xb1r': 101, 'odaklanman\xc4\xb1n': 102, '_GO': 1, 'di\xc4\x9ferleri': 104, 'leh\xc3\xa7eler': 105, 'konu\xc5\x9fmak': 106, 'olacakt\xc4\xb1r': 107, 'teklif': 434, 'emeklilik': 108, '\xc3\xa7ekmek': 421, 'temas': 110, 'hasara': 111, '\xc4\xb1s\xc4\xb1': 112, 'i\xc5\x9fler': 296, 'pratik': 24, 'tabaka': 113, ';': 114, 'kanser': 115, '\xc5\x9fu': 116, 'daha': 16, '\xc3\xa7\xc3\xb6kt\xc3\xbc': 117, 'd\xc3\xbcnya': 422, 'Lang-8': 119, 'Y\xc3\xbcksek': 121, 'konu\xc5\x9fulursa': 122, 'i\xc5\x9fletmelerimiz': 123, 'se\xc3\xa7imler': 124, 'olabilir': 125, 'yerli': 12, 's\xc3\xb6zc\xc3\xbc': 126, 'Tom': 17, 'sonu\xc3\xa7land\xc4\xb1': 357, 'e\xc4\x9fitim': 127, 'kal\xc4\xb1c\xc4\xb1': 128, 'a\xc5\x9fa\xc4\x9f\xc4\xb1ya': 129, 'b\xc3\xbcy\xc3\xbcyor': 195, 'g\xc3\xb6r\xc3\xbcnm\xc3\xbcyor': 130, 'Ekonomimizin': 131, 'kald\xc4\xb1rd\xc4\xb1': 302, 'kazalar\xc4\xb1ndan': 133, '\xc3\xbct\xc3\xbclerken': 134, 'kuma\xc5\x9fla': 120, 'bilgisayardan': 136, 'sistemini': 138, 'Roger': 139, '\xc3\xbclkede': 140, 'olu\xc5\x9fturma': 141, 'babas\xc4\xb1': 40, '1990': 143, 'ettiren': 144, 'ancak': 145, 'alk\xc4\xb1\xc5\x9flarken': 146, 'nedenle': 147, 'yapt\xc4\xb1klar\xc4\xb1': 41, 'etti\xc4\x9fi': 42, 'bunun': 43, 's\xc4\xb1n\xc4\xb1rlar\xc4\xb1n\xc4\xb1': 148, '\xc3\xa7ekiyor': 149, 'etti': 150, 'sonucu': 151, 'g\xc3\xbc\xc3\xa7l\xc3\xbc': 152, 'daki': 153, 'endi\xc5\x9feli': 154, 'beklenen': 155, 'budur': 156, '\xc3\xa7alabilinceye': 157, 'de\xc4\x9fi\xc5\x9fikli\xc4\x9finden': 158, 'renksiz': 159, 'kendinize': 160, 'E\xc4\x9fer': 161, 'dikkat': 162, 'kadar': 13, 'uyar\xc4\xb1yorlar': 163, 'nedeni': 164, 'konu\xc5\x9fmac\xc4\xb1': 25, '\xc5\x9fiddetten': 165, 'hafta': 166, '\xc4\xb0ngilizcesi': 167, 'Sentetik': 168, '\xc5\x9fey': 169, 'ya\xc5\x9famaya': 224, 'art\xc4\xb1yor': 171, 'fark': 44, '\xc3\xb6l\xc3\xbcm\xc3\xbcn': 172, 'konut': 428, 'sistemi': 174, '\xc3\xb6rnek': 175, 'bir\xc3\xa7ok': 45, 'konu\xc5\x9fanlar\xc4\xb1': 176, 'bina': 177, 'ediliyor': 178, 'ayakizi': 179, 'hasta': 272, 'zorlukla': 181, 'te\xc5\x9fvik': 282, 'hastal\xc4\xb1klar': 183, 'y\xc3\xbczmenin': 184, 'koyamazs\xc4\xb1n\xc4\xb1z': 185, 'siteyi': 186, 'g\xc3\xb6re': 187, 'otoriteleri': 188, 'bulunabilen': 189, 'Yoksulluk': 190, 'eritecek': 191, 'vanilya': 46, '\xc3\xbczerine': 192, 'le': 193, '\xc3\xbct\xc3\xbcy\xc3\xbc': 194, ',': 5, 'senin': 26, 'Projesi': 196, '\xc3\xbct\xc3\xbc': 197, 'lardan': 198, 'yorum': 199, 'ya': 200, 'Derne\xc4\x9finden': 201, 'ye': 202, 'hala': 203, 'karbon': 65, 'gerektirdi\xc4\x9fi': 205, 'muhtemelen': 206, 'fiyatlar\xc4\xb1': 207, 'alternatif': 208, 'olduk\xc3\xa7a': 209, 'al\xc4\xb1p': 210, 'etmeyi': 211, 'istekli': 212, 'kar\xc5\x9f\xc4\xb1': 48, 'y\xc3\xbcz\xc3\xbcndeki': 213, '\xc3\xa7\xc4\xb1kard\xc4\xb1': 214, 'etmeye': 215, 'ikna': 27, 'en': 18, 'fazla': 49, 'sard\xc4\xb1': 216, 'ev': 217, "'": 8, 'odalar\xc4\xb1': 219, '\xc3\xa7evrilmi\xc5\x9f': 220, '\xc3\xb6l\xc3\xa7e\xc4\x9fine': 221, 'desteklemeliyiz': 222, '\xc3\xb6nemli': 223, 'hemen': 170, 'yarat\xc4\xb1yorlar': 225, 'c\xc3\xbcmlelerden': 226, '_UNK': 3, 'olmak': 227, 'yapt\xc4\xb1\xc4\x9f\xc4\xb1nda': 228, 'org': 229, 'olmaz': 230, '\xc3\x96ncelikle': 231, 'En': 232, 'sonra': 50, 'i\xc3\xa7in': 28, '\xc3\xb6\xc4\x9frenmeye': 233, 'yeteneklerini': 234, 'vadeli': 235, '\xc3\xa7\xc4\xb1karmak': 236, 's\xc3\xb6ylemeyi': 237, 'ta\xc5\x9flar': 238, 'g\xc3\xbcvenlik': 239, 'do\xc4\x9fru': 240, 'ceza': 241, 'bloklar\xc4\xb1ndan': 242, 'Oklahoma': 243, 'konu\xc5\x9fman': 103, 'edinme': 244, 'onlara': 245, 'yine': 51, 'onu': 29, 'ayarlar\xc4\xb1': 246, 'arad\xc4\xb1': 247, 'oldu': 248, 'g\xc3\xb6r\xc3\xbcn\xc3\xbcr': 249, '\xc3\xb6n\xc3\xbcnde': 250, 'g\xc3\xb6r\xc3\xbcn\xc3\xbcyordu': 251, 'zorunday\xc4\xb1z': 252, 'baz\xc4\xb1': 253, 'd\xc3\xbc\xc5\x9f\xc3\xbcyor': 254, 'gerekir': 255, 'd\xc3\xbc\xc5\x9f\xc3\xbcncesizce': 256, '\xc3\xb6yle': 257, 'g\xc3\xb6r\xc3\xbclebilir': 258, 'sa\xc4\x9fl\xc4\xb1kl\xc4\xb1': 259, 'alan': 52, 'ayn\xc4\xb1': 30, 'b\xc3\xbcy\xc3\xbckl\xc3\xbc\xc4\x9f\xc3\xbc': 260, '\xc4\xb1n': 261, 'iklim': 262, 'oldu\xc4\x9fu': 31, 'duyurdu': 263, 'y\xc3\xbcz\xc3\xbck': 322, 'sa\xc4\x9flar': 266, 'sigaralar': 267, 'uyum': 268, 'konu\xc5\x9ftu\xc4\x9funu': 269, '\xc3\xa7evresi': 270, 'ana': 271, 'olarak': 53, 'yukar\xc4\xb1dan': 180, 'yaralanma': 273, 'deneyimini': 274, 'anlam\xc4\xb1na': 275, 'dolaba': 276, 'sadece': 54, 'yapt\xc4\xb1\xc4\x9f\xc4\xb1': 277, 'kan': 278, 'ofis': 279, 'dilindeki': 55, 'ba\xc5\x9flang\xc4\xb1\xc3\xa7ta': 280, 'vurmad\xc4\xb1\xc4\x9f\xc4\xb1': 281, 'katlad\xc4\xb1': 182, 'h\xc4\xb1zl\xc4\xb1': 283, 'yerde': 284, 'ki': 56, '\xc3\xa7abucak': 285, 'att\xc4\xb1': 286, 'Tatoeba': 57, 'annesi': 287, 'Alkolle': 288, 'karaci\xc4\x9fer': 289, 'Y\xc3\xbcz\xc3\xbcc\xc3\xbc': 290, 'restoranda': 291, 'kendi': 292, '\xc3\xbccretler': 293, 'ge\xc3\xa7mi\xc5\x9f': 294, 'ayakizlerini': 295, 'biri': 38, 'Birden': 297, 'e-postayla': 298, 'c\xc3\xbcmlelerinin': 299, 'Y\xc3\xbczme': 300, 'cam\xc4\xb1n\xc4\xb1': 301, 'Biz': 132, 'Bir': 58, 'evlenme': 303, 'de': 19, 'beden': 304, 'da': 20, 'a\xc5\x9fan': 305, 'kuma\xc5\x9flar\xc4\xb1': 59, '\xc3\x9ct\xc3\xbc': 306, '\xc3\xa7ikolata': 307, '\xc3\xa7al\xc4\xb1\xc5\x9f': 390, 'elmas': 391, '\xc3\xbczerinde': 309, 'istiyorsan': 60, 'dizlerinin': 310, 'ortas\xc4\xb1nda': 311, 'ban\xc3\xa7o': 312, 'olmad\xc4\xb1\xc4\x9f\xc4\xb1n\xc4\xb1': 313, 'iPad': 61, 'hesaplar\xc4\xb1': 314, 'ses': 315, 'foto\xc4\x9fraf': 316, 'd\xc3\xb6rt': 364, 'kullanmak': 317, 'sa\xc4\x9fl\xc4\xb1k': 318, 'ya\xc5\x9f\xc4\xb1ndayken': 319, '\xc3\xa7ikolatan\xc4\xb1n': 320, 'kolayl\xc4\xb1kla': 321, 'tavanl\xc4\xb1': 264, 'faaliyetlerimizin': 323, 'yerine': 367, 'ekonominin': 324, 'gecenin': 325, 'istenilen': 326, 'g\xc3\xb6zlerinde': 327, 'de\xc4\x9fi\xc5\x9fik': 328, 'tempoda': 62, 'ile': 329, 'd\xc3\xbczey': 330, 'yapmaya': 331, 't\xc3\xbcr\xc3\xbc': 332, 'com': 333, 'orta': 334, 'so\xc4\x9fuduktan': 335, 'Bununla': 336, '_EOS': 2, 'adalet': 337, 's\xc4\xb1cak': 338, 'kirlenmesinin': 339, 'elektrik': 340, '.': 4, 'etkilerine': 452, 'Senin': 342, 'sebep': 343, 'vard\xc4\xb1': 344, 'birlikte': 345, 'Yani': 346, 'gelirler': 347, 'olanlar': 348, 'ba\xc5\x9flamalar\xc4\xb1': 349, '\xc3\xa7evirileri': 350, 'iyi': 14, 'denemen': 351, '\xc3\xb6nemlidir': 352, '\xc3\xbcst': 353, 'par\xc3\xa7ay\xc4\xb1': 354, 'oldu\xc4\x9funu': 355, '\xc3\xa7o\xc4\x9funlukla': 356, 've': 6, 'koydu': 358, 'cebinden': 359, 'oldu\xc4\x9funa': 33, 'olmal\xc4\xb1s\xc4\xb1n': 360, 'biliyor': 361, 'uzun': 63, '\xc3\xa7al\xc4\xb1\xc5\x9f\xc4\xb1yor': 401, 'Ayr\xc4\xb1mc\xc4\xb1l\xc4\xb1\xc4\x9fa': 362, 'rafa': 431, 'gerilimi': 204, 'al\xc4\xb1\xc5\x9fk\xc4\xb1nd\xc4\xb1r': 365, 'birden': 366, 'nin': 47, 'defalarca': 368, 'yerini': 369, 'Elektronik': 370, 'd\xc3\xbczeltilmesini': 371, 'herkes': 372, 'Baz\xc4\xb1': 373, 'yapmak': 265, 'konu\xc5\x9fan\xc4\xb1': 375, 'Daver': 376, 'k\xc4\xb1rarak': 377, 'Ve': 378, 'sarst\xc4\xb1': 404, 'ard\xc4\xb1ndan': 379, 'Miller': 380, 'c\xc3\xbcmleleri': 381, '\xc3\xbct\xc3\xbcye': 456, 'ilgili': 383, 'hatal\xc4\xb1': 384, '\xc3\xb6neririz': 385, 'genellikle': 386, '\xc3\xbct\xc3\xbcn\xc3\xbcn': 387, '\xc4\xb1': 388, 'hakk\xc4\xb1nda': 66, 'zaman': 21, 'parlak': 389, 'kalp': 308, 'tekrar': 32, 'polisi': 392, 'yorucu': 393, 'yer': 142, 'indirebilirsiniz': 395, 'azaltmaya': 396, 'hen\xc3\xbcz': 397, 'konu\xc5\x9fmad\xc4\xb1\xc4\x9f\xc4\xb1n\xc4\xb1': 398, 'b\xc3\xbcy\xc3\xbct\xc3\xbcrek': 459, 'ba\xc5\x9far\xc4\xb1l\xc4\xb1': 67, 'vard\xc4\xb1r': 460, 'b\xc3\xbcy\xc3\xbcd\xc3\xbc\xc4\x9f\xc3\xbc': 68, 'ama': 64, 'sars\xc4\xb1nt\xc4\xb1': 402, 'birilerini': 403, 'i\xc5\x9fe': 69, 'karbondioksit': 363, 'ba\xc5\x9fka': 405, '\xc3\xbcstte': 406, 'bir': 7, '\xc3\xa7\xc4\xb1kt\xc4\xb1': 407, '\xc3\xb6ld\xc3\xbc': 408, 'g\xc3\xb6rd\xc3\xbcm': 409, 'dikkatini': 410, '\xc5\x9fekilde': 411, 'g\xc3\xb6nderildi': 412, 'amcas\xc4\xb1': 413, 'foto\xc4\x9fraflar\xc4\xb1': 414, 'oluruz': 415, 'Mary': 22, 'penceresine': 416, 'miktar\xc4\xb1d\xc4\xb1r': 417, '_PAD': 0, 'Anayasa': 418, 'gelir': 419, 't\xc3\xbct\xc3\xbcne': 420, 'art\xc3\xa7\xc4\xb1n\xc4\xb1n': 109, 'ger\xc3\xa7ekten': 70, 'bilmeyen': 118, 'bu': 15, 'bilim': 423, 'hissetti\xc4\x9finde': 424, 'y\xc3\xbckselmeye': 425, 'dilin': 426, 'o': 11, 'Maa\xc5\x9flar': 427, '\xc3\xbclke': 71, '\xc3\xa7al\xc4\xb1\xc5\x9f\xc4\xb1yorlar': 173, 'be\xc5\x9f': 429, '\xc3\xa7ok': 23, 's\xc3\xb6yledi': 430, 'anda': 39, 'eklemeni': 432, 'bilgisayarlardan': 433, 'kendini': 137, 'ba\xc5\x9fl\xc4\xb1yor': 435, 'zorluklar\xc4\xb1n\xc4\xb1': 436, '\xc3\xa7al\xc4\xb1\xc5\x9f\xc4\xb1rsan': 437, 'becerebilsen': 438, 'Obama': 439, 'yaramad\xc4\xb1\xc4\x9f\xc4\xb1n\xc4\xb1': 440, 'y\xc3\xbcksek': 441, 'gibi': 9, 'Hen\xc3\xbcz': 442, 'adamlar\xc4\xb1': 443, 'beri': 444, 's\xc4\xb1k': 445, 'yeniden': 446, 'ortaya': 447, 'ekonomi': 448, 'istedi\xc4\x9fimiz': 449, 'bizim': 34, 'un': 450, 'fakat': 35, 'dili': 451, 'dile': 341, 'yapt\xc4\xb1': 453, 'olu\xc5\x9fan': 454, 'k\xc4\xb1y\xc4\xb1ya': 455, 'az': 72, 'Erick': 135, 'hafife': 382, '\xc3\xbczerindeki': 457, 'ne': 73, 'etmek': 458, '5': 399, 'herkesin': 400, 'duymaya': 461, 'Nicholas': 394, '\xc3\xa7alanlar\xc4\xb1n': 462, 'veritaban\xc4\xb1': 463, 'sirozu': 464, 'Cindy': 465, 's\xc3\xb6ylerse': 466, 'e': 74, 'foto\xc4\x9fraflar\xc4\xb1n\xc4\xb1z\xc4\xb1': 218, 'Kanal': 467, 'asla': 468, 'b\xc3\xbcy\xc3\xbck': 36, 'Japonya': 469}
+28 training samples and 8 validations samples
 ```
 
 ```python
 print len(train_encoder_inputs)
+print 'encoder---------------'
 print train_encoder_inputs
-print '---------------'
+print 'decoder---------------'
 print train_decoder_inputs
-print '---------------'
+print 'target-------------'
 print train_targets
-print '---------------'
+
 ```
 
 ```text
-16
-[[123   9   5  17   6 202  53 183  20   8   5 172  39 179 135  67   4   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  5  24 210   6  65  13  16 117  25  11 174  19  16  89 153   4   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [ 38  61 107 158  28  32   7  32 115 130   4   0   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [114  10   6 187  45  76   8  10 175 110 137   4   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  5  71  48   7 193  14 113   7 120  11 129 211  22  36  15 191  94  22
-   15 149   7 188 133  56 111   6  45 138  19 212   4   0]
- [  5  24  88 213 146   9 105   9  90 204   4   0   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [ 38 125 112  28  14  62 190  60   9 206 169   9  80 197   8 163 141   4
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  5  17 171 142  97  79  23  49  44  13 150 173  16  66  44  13 161   4
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  5  47   6  43  82 200  10  13 182  29   8 178  10 166 192  22   5  17
-   18 189   7  35 102  72  87  26 167  10 181  29   4   0]
- [ 96  10 103  93 164 126  13   6 134 160   4   0   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  5  69 170  10 108 177  34   6  43  30   6 136 195   4   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [ 95  25  46 156   8   6 144 203  46  50 151   4   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  5  31   7  12 101 159  70   9 199   8  20  55  13  14  83  21  77   5
-   41  12   6  75  84 198  42  99   8 168   4   0   0   0]
- [ 21 127   5  33   7  12 119  92  11 145   4   0   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [ 21 140  86   9   5  41  12 106 186   8 205 180  20   4   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [176  14  63   9   5  68  52 122  11 201  42  12  74  11 116   4   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0]]
----------------
-[[  1 106   6 135  51   5 103   8 129   9 150   8 166   5 118 123   4   2
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1  16 176  11  56   8 167  21  57  12 214   5  20  64 156   4   2   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1  37 147 146   5  44  27 165   5 205   5  40  22  40   4   2   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 120  14  11  94  38 109   9  29  65 132  25  28   4   2   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 153   6  24  23   7 151   5 216  12   7 178  19  10 171 181 183  10
-   63  45  22  61  98  48   8  17 113  71   5 173   4   2   0]
- [  1  16 164  32  55 128   6 212   6  42   5 136   4   2   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1  37 157 139  27   7 197 170  53 196   6   7 161 175   6  78 203   9
-  158 140   4   2   0   0   0   0   0   0   0   0   0   0   0]
- [  1 221  95   5 188  76  18 168 163   8 145  81  10  20 208 152   8 185
-    4   2   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 169  11  59  72  10  29   8   7  77  41   9  14 124  67  10  39 105
-  102  22 186  66  34 131  14 218 108  41   4   2   0   0   0]
- [  1  79  14 200 142  69  58 148   8   7  54   5  11 121   4   2   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 100  10 182  92 210  43  19  11  99   5  75 179   4   2   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 190  15  21 126   9  11 207 137 116  88   4   2   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 107  32  13  87   5 130   5  82   6 112   9 155   5  35   8   7  47
-   30  15  90 111  13  17 199  97 219  33 172   9  84   4   2]
- [  1  30   7 149 201   5  13 204 159  12 110   4   2   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 215   7 104   6  26 125 184   6  13 174   9 189  25  17  35   4   2
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [  1 160  36  60   5 134   6  93 187 191  12  68  33  13  85  12 117   4
-    2   0   0   0   0   0   0   0   0   0   0   0   0   0   0]]
----------------
-[[106   6 135  51   5 103   8 129   9 150   8 166   5 118 123   4   2   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [ 16 176  11  56   8 167  21  57  12 214   5  20  64 156   4   2   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [ 37 147 146   5  44  27 165   5 205   5  40  22  40   4   2   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [120  14  11  94  38 109   9  29  65 132  25  28   4   2   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [153   6  24  23   7 151   5 216  12   7 178  19  10 171 181 183  10  63
-   45  22  61  98  48   8  17 113  71   5 173   4   2   0   0]
- [ 16 164  32  55 128   6 212   6  42   5 136   4   2   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [ 37 157 139  27   7 197 170  53 196   6   7 161 175   6  78 203   9 158
-  140   4   2   0   0   0   0   0   0   0   0   0   0   0   0]
- [221  95   5 188  76  18 168 163   8 145  81  10  20 208 152   8 185   4
-    2   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [169  11  59  72  10  29   8   7  77  41   9  14 124  67  10  39 105 102
-   22 186  66  34 131  14 218 108  41   4   2   0   0   0   0]
- [ 79  14 200 142  69  58 148   8   7  54   5  11 121   4   2   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [100  10 182  92 210  43  19  11  99   5  75 179   4   2   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [190  15  21 126   9  11 207 137 116  88   4   2   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [107  32  13  87   5 130   5  82   6 112   9 155   5  35   8   7  47  30
-   15  90 111  13  17 199  97 219  33 172   9  84   4   2   0]
- [ 30   7 149 201   5  13 204 159  12 110   4   2   0   0   0   0   0   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [215   7 104   6  26 125 184   6  13 174   9 189  25  17  35   4   2   0
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
- [160  36  60   5 134   6  93 187 191  12  68  33  13  85  12 117   4   2
-    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]]
----------------
+28
+encoder---------------
+[[165 354  12 ...,   0   0   0]
+ [ 39 272 374 ...,   0   0   0]
+ [ 31 228 406 ...,   0   0   0]
+ ..., 
+ [ 39 100 392 ...,   0   0   0]
+ [ 52  96  25 ...,   0   0   0]
+ [ 47  54 104 ...,   0   0   0]]
+decoder---------------
+[[  1 442   7 ...,   0   0   0]
+ [  1  57   4 ...,   0   0   0]
+ [  1  17 291 ...,   0   0   0]
+ ..., 
+ [  1  58  65 ...,   0   0   0]
+ [  1 373  92 ...,   0   0   0]
+ [  1 232 152 ...,   0   0   0]]
+target-------------
+[[442   7 319 ...,   0   0   0]
+ [ 57   4 229 ...,   0   0   0]
+ [ 17 291 400 ...,   0   0   0]
+ ..., 
+ [ 58  65 179 ...,   0   0   0]
+ [373  92 262 ...,   0   0   0]
+ [232 152  55 ...,   0   0   0]]
 ```
 
 
