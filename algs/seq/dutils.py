@@ -1,19 +1,3 @@
-# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-"""Utilities for downloading data from WMT, tokenizing, vocabularies."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -22,6 +6,8 @@ import gzip
 import os
 import re
 import tarfile
+import tensorflow as tf, sys
+_buckets = [(5, 10), (10, 15), (20, 25), (40, 50)]
 
 from six.moves import urllib
 
@@ -320,3 +306,25 @@ def prepare_data(data_dir, from_train_path, to_train_path, from_dev_path, to_dev
   return (from_train_ids_path, to_train_ids_path,
           from_dev_ids_path, to_dev_ids_path,
           from_vocab_path, to_vocab_path)
+
+def read_data(source_path, target_path, max_size=None):
+  data_set = [[] for _ in _buckets]
+  with tf.gfile.GFile(source_path, mode="r") as source_file:
+    with tf.gfile.GFile(target_path, mode="r") as target_file:
+      source, target = source_file.readline(), target_file.readline()
+      counter = 0
+      while source and target and (not max_size or counter < max_size):
+        counter += 1
+        if counter % 100000 == 0:
+          print("  reading data line %d" % counter)
+          sys.stdout.flush()
+        source_ids = [int(x) for x in source.split()]
+        target_ids = [int(x) for x in target.split()]
+        target_ids.append(EOS_ID)
+        for bucket_id, (source_size, target_size) in enumerate(_buckets):
+          if len(source_ids) < source_size and len(target_ids) < target_size:
+            data_set[bucket_id].append([source_ids, target_ids])
+            break
+        source, target = source_file.readline(), target_file.readline()
+  return data_set
+

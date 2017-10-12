@@ -1,5 +1,5 @@
 import tensorflow as tf
-import numpy as np
+import numpy as np, os
 import matplotlib.pyplot as plt
 
 from data_utils import (
@@ -17,10 +17,8 @@ class parameters(object):
         self.ckpt_dir = 'checkpoints/'
         self.max_en_vocab_size = 10000
         self.max_sp_vocab_size = 10000
-
         self.num_epochs = 100
         self.batch_size = 4
-
         self.rnn_unit = 'lstm'
         self.num_hidden_units = 300
         self.num_layers = 1
@@ -94,10 +92,7 @@ def train(FLAGS):
             os.makedirs(FLAGS.ckpt_dir)
         checkpoint_path = os.path.join(FLAGS.ckpt_dir, "model.ckpt")
         print "Saving the model."
-        model.saver.save(sess, checkpoint_path,
-                         global_step=model.global_step)
-            
-
+        model.saver.save(sess, checkpoint_path)            
         plt.plot(losses, label='loss')
         plt.legend()
         plt.show()

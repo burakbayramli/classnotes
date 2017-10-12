@@ -82,23 +82,6 @@ class model(object):
                 sequence_length=self.en_seq_lens, time_major=False,
                 dtype=tf.float32)
 
-        '''
-        # Convert to list of tensors
-        self.encoder_outputs = tf.unpack(self.all_outputs, axis=0) # annotations
-        self.encoder_state = tf.unpack(self.state, axis=0)
-
-        # First calculate a concatenation of encoder outputs to put attention on.
-        self.top_states = [tf.reshape(e, [-1, 1,
-            self.stacked_cell.output_size]) for e in self.encoder_outputs]
-        self.attention_states = tf.concat(1, self.top_states)
-        '''
-
-        '''
-        # Decoder (use last relevant state from encoder as initial state)
-        self.initial_decoder_state = self.encoder_state[0]
-
-        '''
-
         with tf.variable_scope('decoder') as scope:
 
             # Initial state is last relevant state from encoder
@@ -151,6 +134,7 @@ class model(object):
         self.train_optimizer = optimizer.apply_gradients(
             zip(grads, trainable_vars))
 
+        self.saver = tf.train.Saver(tf.all_variables())
 
 
 
