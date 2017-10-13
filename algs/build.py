@@ -32,6 +32,7 @@ if len(sys.argv) == 1:
     ./reinf/reinf.pdf \
     ./nlp/nlp.pdf \
     ./recom/recom.pdf \
+    ./seq/seq.pdf \
     ./speech/speech.pdf \
     ./zapp/zapp.pdf \
     output ../../Dropbox/Public/skfiles/algs.pdf"
