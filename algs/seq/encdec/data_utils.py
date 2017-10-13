@@ -173,17 +173,15 @@ def generate_batch(encoder_inputs, decoder_inputs, targets,
             en_seq_lens[start_index:end_index], \
             sp_seq_lens[start_index:end_index]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+def split():
+    dir = "/home/burak/Downloads/tur-eng/"
+    fin = open(dir + "tur.txt")
+    fout1 = open(dir + "tatoeba-eng.txt","w")
+    fout2 = open(dir + "tatoeba-tur.txt","w")
+    for line in fin.readlines():
+        tmp = line.split('\t')
+        fout1.write(tmp[0] + "\n")
+        fout2.write(tmp[1])    
+    fout1.close()
+    fout2.close()
 
