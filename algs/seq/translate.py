@@ -1,13 +1,10 @@
+# translate.py
+import pickle
 import tensorflow as tf
 import numpy as np, os
 import matplotlib.pyplot as plt
-import pickle
-
 from data_utils import (
-    process_data,
-    split_data,
-    generate_epoch,
-    generate_batch,
+    process_data,split_data,generate_epoch,generate_batch,
 )
 
 def rnn_cell(FLAGS, dropout, scope):
@@ -161,7 +158,6 @@ class parameters(object):
         self.max_gradient_norm = 5.0
 
 def create_model(sess, FLAGS):
-
     tf_model = model(FLAGS)
     print "Created a new model"
     sess.run(tf.initialize_all_variables())
