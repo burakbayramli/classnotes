@@ -148,7 +148,6 @@ class model(object):
 class parameters(object):
 
     def __init__(self):
-        self.ckpt_dir = '/tmp/checkpoints/'
         self.max_en_vocab_size = 5000
         self.max_sp_vocab_size = 5000
         self.num_epochs = 100
@@ -169,7 +168,7 @@ def create_model(sess, FLAGS):
 
 def restore_model(sess, FLAGS):
     tf_model = model(FLAGS)
-    tf_model.saver.restore(sess, "/home/burak/Downloads/model.ckpt") 
+    tf_model.saver.restore(sess, "/tmp/model.ckpt") 
     return tf_model
 
 def train(FLAGS):
@@ -235,9 +234,7 @@ def train(FLAGS):
 
             losses.append(np.mean(batch_loss))
 
-        if not os.path.isdir(FLAGS.ckpt_dir):
-            os.makedirs(FLAGS.ckpt_dir)
-        checkpoint_path = os.path.join(FLAGS.ckpt_dir, "model.ckpt")
+        checkpoint_path = "/tmp/model.ckpt"
         print "Saving the model."
         model.saver.save(sess, checkpoint_path)            
         plt.plot(losses, label='loss')
