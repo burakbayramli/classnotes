@@ -12,15 +12,7 @@ from data_utils import (
 def rnn_cell(FLAGS, dropout, scope):
 
     with tf.variable_scope(scope):
-        # Get the cell type
-        if FLAGS.rnn_unit == 'rnn':
-            rnn_cell_type = tf.nn.rnn_cell.BasicRNNCell
-        elif FLAGS.rnn_unit == 'gru':
-            rnn_cell_type = tf.nn.rnn_cell.GRUCell
-        elif FLAGS.rnn_unit == 'lstm':
-            rnn_cell_type = tf.nn.rnn_cell.BasicLSTMCell
-        else:
-            raise Exception("Choose a valid RNN unit type.")
+        rnn_cell_type = tf.nn.rnn_cell.BasicLSTMCell
 
         # Single cell
         single_cell = rnn_cell_type(FLAGS.num_hidden_units)
@@ -167,7 +159,6 @@ class parameters(object):
         self.max_sp_vocab_size = 10000
         self.num_epochs = 100
         self.batch_size = 4
-        self.rnn_unit = 'lstm'
         self.num_hidden_units = 300
         self.num_layers = 1
         self.dropout = 0.5
