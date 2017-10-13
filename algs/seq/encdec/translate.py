@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np, os
 import matplotlib.pyplot as plt
+import pickle
 
 from data_utils import (
     process_data,
@@ -13,15 +14,9 @@ def rnn_cell(FLAGS, dropout, scope):
 
     with tf.variable_scope(scope):
         rnn_cell_type = tf.nn.rnn_cell.BasicLSTMCell
-
-        # Single cell
         single_cell = rnn_cell_type(FLAGS.num_hidden_units)
-
-        # Dropout
         single_cell = tf.nn.rnn_cell.DropoutWrapper(single_cell,
             output_keep_prob=1-dropout)
-
-        # Each state as one cell
         stacked_cell = tf.nn.rnn_cell.MultiRNNCell(
             [single_cell] * FLAGS.num_layers)
 
@@ -50,7 +45,6 @@ class model(object):
 
     def __init__(self, FLAGS):
 
-        # Placeholders
         self.encoder_inputs = tf.placeholder(tf.int32, shape=[None, None],
             name='encoder_inputs')
         self.decoder_inputs = tf.placeholder(tf.int32, shape=[None, None],
@@ -155,8 +149,8 @@ class parameters(object):
 
     def __init__(self):
         self.ckpt_dir = '/tmp/checkpoints/'
-        self.max_en_vocab_size = 10000
-        self.max_sp_vocab_size = 10000
+        self.max_en_vocab_size = 5000
+        self.max_sp_vocab_size = 5000
         self.num_epochs = 100
         self.batch_size = 4
         self.num_hidden_units = 300
@@ -175,7 +169,7 @@ def create_model(sess, FLAGS):
 
 def restore_model(sess, FLAGS):
     tf_model = model(FLAGS)
-    tf_model.saver.restore(sess, "/tmp/checkpoints/model.ckpt") 
+    tf_model.saver.restore(sess, "/home/burak/Downloads/model.ckpt") 
     return tf_model
 
 def train(FLAGS):
@@ -193,6 +187,13 @@ def train(FLAGS):
         valid_en_seq_lens, valid_sp_seq_len = \
         split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens,
             train_ratio=0.8)
+    
+    output = open('data/vocab_en.pkl', 'wb')
+    pickle.dump(en_vocab_dict, output)
+    output.close()
+    output = open('data/vocab_sp.pkl', 'wb')
+    pickle.dump(sp_vocab_dict, output)
+    output.close()
 
     # Update parameters
     FLAGS.en_vocab_size = len(en_vocab_dict)
@@ -200,7 +201,6 @@ def train(FLAGS):
 
     print 'len(en_vocab_dict)', len(en_vocab_dict)
     print 'len(sp_vocab_dict)', len(sp_vocab_dict)
-    #exit()
     
     # Start session
     with tf.Session() as sess:
@@ -242,7 +242,7 @@ def train(FLAGS):
         model.saver.save(sess, checkpoint_path)            
         plt.plot(losses, label='loss')
         plt.legend()
-        plt.show()
+        plt.savefig('seq_01.png')
 
 if __name__ == '__main__':
     FLAGS = parameters()

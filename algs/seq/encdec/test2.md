@@ -6,29 +6,54 @@ print tf.__version__
 ```
 
 ```text
-<module 'tensorflow' from '/home/burak/.local/lib/python2.7/site-packages/tensorflow/__init__.pyc'>
-1.2.1
+<module 'tensorflow' from '/usr/local/lib/python2.7/dist-packages/tensorflow/__init__.pyc'>
+1.3.0
+```
+
+```python
+import pickle
+pkl1 = open('data/vocab_en.pkl', 'rb')
+en_vocab_dict = pickle.load(pkl1)
+pkl1.close()
+pkl2 = open('data/vocab_sp.pkl', 'rb')
+sp_vocab_dict = pickle.load(pkl2)
+pkl2.close()
 ```
 
 
 
 ```python
-import model, translate
+import translate
 import tensorflow as tf
 FLAGS = translate.parameters()
-FLAGS.en_vocab_size = 215
-FLAGS.sp_vocab_size = 222
+FLAGS.en_vocab_size = 395
+FLAGS.sp_vocab_size = 408
 tf.reset_default_graph()
 with tf.Session() as sess:
      tf_model = translate.restore_model(sess, FLAGS)
 ```
 
-```text
-WARNING:tensorflow:From model.py:137: all_variables (from tensorflow.python.ops.variables) is deprecated and will be removed after 2017-03-02.
-Instructions for updating:
-Please use tf.global_variables instead.
-INFO:tensorflow:Restoring parameters from /tmp/checkpoints/model.ckpt
+```python
+test_s = "I can easily start learning the economy"
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
