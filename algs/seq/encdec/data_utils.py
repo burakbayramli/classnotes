@@ -96,22 +96,15 @@ def process_data(datafile, max_vocab_size, target_lang):
     """
     Read the sentences from our datafiles.
     """
-    with open(datafile, 'rb') as f:
-        sentences = cPickle.load(f)
-
-    # Split into tokens
     tokenized = []
-    for i in xrange(len(sentences)):
-        tokenized.append(basic_tokenizer(sentences[i]))
-
+    fin = open(datafile)
+    for line in fin.readlines():
+        tokenized.append(basic_tokenizer(line))
+        
     # Get vocab information
     vocab_list, vocab_dict, rev_vocab_dict = get_vocab(tokenized,
         max_vocab_size)
-    #print vocab_list
-    #print vocab_dict
-    #print rev_vocab_dict
-    #exit()
-
+    
     # Convert data to token ids
     data_as_tokens, seq_lens = data_to_token_ids(tokenized, vocab_dict,
         target_lang, normalize_digits=True)
