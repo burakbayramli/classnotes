@@ -1,5 +1,18 @@
 
 ```python
+import tensorflow as tf
+print tf
+print tf.__version__
+```
+
+```text
+<module 'tensorflow' from '/home/burak/.local/lib/python2.7/site-packages/tensorflow/__init__.pyc'>
+1.2.1
+```
+
+
+
+```python
 import model, translate
 import tensorflow as tf
 FLAGS = translate.parameters()
