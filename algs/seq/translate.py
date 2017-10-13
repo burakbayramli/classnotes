@@ -68,7 +68,6 @@ class model(object):
                 [FLAGS.en_vocab_size, FLAGS.num_hidden_units])
             self.embedded_encoder_inputs = rnn_inputs(FLAGS,
                 self.encoder_inputs, FLAGS.en_vocab_size, scope=scope)
-            #initial_state = encoder_stacked_cell.zero_state(FLAGS.batch_size, tf.float32)
 
             # Outputs from encoder RNN
             self.all_encoder_outputs, self.encoder_state = tf.nn.dynamic_rnn(
@@ -112,7 +111,9 @@ class model(object):
 
             # Loss with masking
             targets_flat = tf.reshape(self.targets, [-1])
-            losses_flat = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits_flat, labels=targets_flat)
+            losses_flat = tf.nn.sparse_softmax_cross_entropy_with_logits(
+                logits=self.logits_flat, labels=targets_flat
+            )
             mask = tf.sign(tf.to_float(targets_flat))
             masked_losses = mask * losses_flat
             masked_losses = tf.reshape(masked_losses,  tf.shape(self.targets))
