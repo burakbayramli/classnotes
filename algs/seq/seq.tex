@@ -4,7 +4,7 @@ Otomatik Tercüme, Dizin-Dizin Ýliþkisini Öðrenmek (Machine Translation, Sequence
 
 Dillerarasý otomatik tercüme yazýlýmý Google Translate ile popüler hale
 geldi. Google bu servisi ilk kodladýðýnda parça parça, istatistiki bir
-yaklaþým kullanarak kodlamýþ, fakat 2017 yýlýnda bu servisi tamamen derin
+yaklaþým kullanarak kodlamýþ, fakat 2017 yýlýnda bu servis tamamen derin
 öðrenme üzerinden iþleyecek þekilde deðiþtirildi, kod satýr sayýsý
 500,000'den 500'e indi!
 
@@ -23,35 +23,37 @@ Kaynak, sonuç tercüme cümleleri farklý boylarda olabilir, hem ayný eðitim
 noktasý içinde birbirlerinden, hem de deðiþik eðitim noktalarýnda
 kendilerinden bile farklý boyutlarda olabilirler, bu sebeple RNN öðe
 sayýlarý dinamik þekilde, her eðitim verisine göre farklý olacak. Fakat bu
-farklý boyutlarýn karýþýklýk yaratmýyor, çünkü tercüme için önemli olan þey
+farklý boyutlar karýþýklýk yaratmýyor, çünkü tercüme için önemli olan þey
 kodlayýcý bloktan kod çözücü bloða geçen gizli konum.
 
-Bu konuma daha önceki yazýlarda $h$ adý vermiþtik. Tüm süreç þöyle, eðitim
-için tüm cümleler + tüm kelimeler üzerinden bir sözlük oluþtururuz, bu
-sözlüðe göre her kelimeye bir tam sayý indis deðeri atarýz, sonra
-kelimeleri tam sayýlara çevirip gömme tabakasýna veririz, bu tabaka reel
-sayý içeren vektörlere dönüþür, ve eðitim ilerledikçe referans gömme
-matrisinde kelimelerin temsil deðerleri iyileþir. Bunlar otomatik oluyor
-tabii, biz soldan saða YSA'ya her eðitim veri noktasýndaki kelimeleri teker
-teker geçiyoruz, bir eðitim noktasý için önce birinci kelimeyi ilk RNN
-öðesine, oradan çýkan $h$'yi ve ikinci kelimeyi ikinci RNN öðesine, böyle
-devam ediyor.  
+Bu konuma daha önceki yazýlarda $h$ adý vermiþtik. Eðitim süreci þöyle, tüm
+cümleler + tüm kelimeler üzerinden bir sözlük oluþtururuz, bu sözlüðe göre
+her kelimeye bir tam sayý indis deðeri atarýz, sonra kelimeleri tam
+sayýlara çevirip gömme tabakasýna veririz, bu tabaka reel sayý içeren
+vektörlere dönüþür, ve eðitim ilerledikçe referans gömme matrisinde
+kelimelerin temsil deðerleri iyileþir. Bunlar otomatik oluyor tabii, biz
+soldan saða YSA'ya her eðitim veri noktasýndaki kelimeleri teker teker
+geçiyoruz, bir eðitim noktasý için önce birinci kelimeyi ilk RNN öðesine,
+oradan çýkan $h$'yi ve ikinci kelimeyi ikinci RNN öðesine, böyle devam
+ediyor.
 
 Kodlayýcýdan çýkýþ olduðu anda (dikkat hala tek bir eðitim noktasýný
 iþliyoruz) elimizde olan $h$'nin özel bir anlamý var. Üstteki mimariye göre
 bu gizli katman tüm kaynak cümleyi temsil eden bir $h$'dir. Baþta pek
-deðildir ama zaman geçtikçe öyle olacaktýr. Boyutu önceden planlanan
-þekildedir, yani cümleye göre küçülüp büyüyen bir þey deðildir. Neyse tabii
-ileri besleme orada durmuyor, kod çözücüye devam ediliyor, burada kelimeler
-sonuç tercümeden geliyor, þimdi onun kelimelerini almaya baþlýyoruz ve
-etikette bahsettiðimiz þekilde kaydýrýlan kelimelere tekabül edecek þekilde
-eðitime devam ediyoruz, ve saða en sona gelince bir eðitim noktasý ile
-iþimiz bitiyor.
+deðildir ama zaman geçtikçe öyle olacaktýr. $h$ boyutu önceden planlanan
+þekilde, yani cümleye göre küçülüp büyüyen bir þey deðil. Neyse tabii ileri
+besleme orada durmuyor, kod çözücüye devam ediliyor, burada kelimeler sonuç
+tercümeden geliyor, þimdi onun kelimelerini almaya baþlýyoruz ve etikette
+bahsettiðimiz þekilde kaydýrýlan kelimelere tekabül edecek þekilde eðitime
+devam ediyoruz, ve saða en sona gelince bir eðitim noktasý ile iþimiz
+bitiyor.
 
 Hedef kelimeleri softmax olarak planlanmýþ, yani kod çözücüdeki RNN öðeleri
 mümkün tüm kelimeler üzerinden bir olasýlýk vektörü üretiyor. Gerçek dünya
-uygulamalarýnda bu yaklaþým külfetli olabilir, burada performansý
-iyileþtirebilecek bazý yaklaþýmlar var.
+uygulamalarýnda bu yaklaþým külfetli olabilir, çünkü sözlük çok büyük ise
+softmax boyutu tek bir kelime çýktýsý için olasýlýklarý temsil etmek için
+çok fazla boyutlu olmalýdýr, burada performansý iyileþtirebilecek bazý
+yaklaþýmlar var.
 
 Eðitim bittikten sonra hiç görülmemiþ yeni test verisi için tercüme nasýl
 yaparýz? Biraz önce gördüðümüz gibi kaynak cümlenin kelimeleri soldan saða
@@ -60,13 +62,13 @@ verilecektir, ve bu sembol sonuç tercümede ilk kelimeyi üretir. Tercümenin
 ilk kelimesini bu þekilde elde etmiþ oluruz. Eðer eðitim iyi yapýlmýþsa
 derin YSA ilk kelimeyi güzel bir þekilde üretecektir (daha doðrusu softmax
 tüm kelimelerin olasýlýklarýný hesaplar, biz bu olasýlýklara göre en olasý
-kelimeyi örnekleme yaparak alacaðýz). Sonra bu üretilen kelimeyi alýp
-alttan YSA'ya artýk kod çözücüde tabii beslemeye devam edeceðiz, mesela Go
-sonucu ``içeri'' kelimesi verilmiþ, biz ``içeri'' kelimesini alttan ikinci
-RNN öðesine vereceðiz, bu bize üstten ``girmesine'' kelimesini
-üretebilecek, böyle devam edecek. 
+kelimeyi örnekleme yaparak alýrýz). Sonra bu üretilen kelimeyi alýp alttan
+YSA'ya (artýk kod çözücüde tabii) beslemeye devam ederiz, mesela Go sonucu
+``içeri'' kelimesi verilmiþ, biz ``içeri'' kelimesini alttan ikinci RNN
+öðesine veririz, bu bize üstten ``girmesine'' kelimesini üretebilir, böyle
+devam ederiz.
 
-Örnek kod alttadýr,
+Örnek kod [1] alttadýr,
 
 \inputminted[fontsize=\footnotesize]{python}{translate.py}
 
@@ -76,8 +78,8 @@ Dikkat Etme Vektörü
 
 Bazý yaklaþýmlara göre kodlayýcý bloktan çýkan $h$ bir cümleyi temsil etmek
 için yeterli görülmüyor, kod çözücü bloðundaki RNN öðeleri kaynak cümledeki
-tüm kelimelere bir dikkat etme vektörü üzerinden baðlantýlý. Detaylar
-[2]'de bulunabilir.
+tüm kelimelere bir dikkat etme vektörü üzerinden baðlantý
+koyuluyor. Detaylar [2]'de bulunabilir.
 
 \includegraphics[width=30em]{attention.jpg}
 
@@ -92,25 +94,4 @@ Kaynaklar
 [2] TensorFlow, {\em TensorFlow Neural Machine Translation Tutorial}, \url{https://github.com/tensorflow/nmt}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

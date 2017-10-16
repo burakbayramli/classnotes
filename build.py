@@ -74,6 +74,7 @@ if __name__ == "__main__":
             fout.write("<html>\n")
             for subdir in os.listdir(dir):
                 print 'subdir',subdir
+                if "cover" in subdir or "00" in subdir: continue
                 print dir + "/" + subdir
                 # read tex file, get header
                 fin = open(dir + "/" + subdir + "/" + subdir + ".tex")
@@ -106,8 +107,8 @@ if __name__ == "__main__":
                     fout1.write(line)
                     if i == 15:  fout1.write(ad)
                 fout1.close()                
-                break
+                #break
             fout.write("</html>\n")
             fout.close()
-            break
+            #break
                       
