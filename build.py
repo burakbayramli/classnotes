@@ -6,28 +6,6 @@ cfg = """
 \\begin{document}
 \\EndPreamble
 """
-def getstatusoutput(cmd):
-    """Return (status, output) of executing cmd in a shell."""
-    mswindows = (sys.platform == "win32")
-    if not mswindows:
-        return commands.getstatusoutput(cmd)
-    pipe = os.popen(cmd + ' 2>&1', 'r')
-    text = pipe.read()
-    sts = pipe.close()
-    if sts is None: sts = 0
-    if text[-1:] == '\n': text = text[:-1]
-    return sts, text
-
-def deleteDir(path):
-    """deletes the path entirely"""
-    mswindows = (sys.platform == "win32")
-    if mswindows: 
-        cmd = "RMDIR "+ path +" /s /q"
-    else:
-        cmd = "rm -rf "+path
-    result = getstatusoutput(cmd)
-    if(result[0]!=0):
-        raise RuntimeError(result[1])
 
 if __name__ == "__main__": 
  
@@ -51,11 +29,10 @@ if __name__ == "__main__":
                 os.chdir("..")
 
     if sys.argv[1] == 'html':
-        # htlatex dosya.tex "dosya" "" "" -shell-escape
-        tgt = "%s/classnotes" % os.environ['TEMP']
-        #print tgt
-        #deleteDir(tgt)
-        #shutil.copytree(".",  tgt, ignore=shutil.ignore_patterns(".git"))
+        tgt = "/home/burak/Downloads/classnotes_html"
+        #cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s' --delete" % (os.getcwd(), tgt)
+        #print cmd
+        #os.system(cmd)                
         files = []
         for root, directories, filenames in os.walk(tgt):
             for filename in filenames: 
@@ -68,7 +45,7 @@ if __name__ == "__main__":
                     out = open(base + ".cfg", "w")
                     out.write(cfg)
                     out.close()
-                    cmd = 'htlatex %s.tex "%s" "" "" -shell-escape' % (base,base)                    
+                    cmd = 'htlatex %s.tex "%s" "" "" -shell-escape' % (base,base)     
                     print cmd
                     os.system(cmd)
                     exit()
