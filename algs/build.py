@@ -21,6 +21,7 @@ if len(sys.argv) == 1:
     ./modeval/modeval.pdf \
     ./crf/crf.pdf \
     ./mesquita/mesquita.pdf \
+    ./graph/graph.pdf \
     ./rsa/rsa.pdf \
     ./street/street.pdf \
     ./mlp/mlp.pdf \
