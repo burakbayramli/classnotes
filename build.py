@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, re, codecs
+import os, sys, re, codecs, shutil
 
 cfg = """
 \\Preamble{xhtml}
@@ -49,6 +49,7 @@ if __name__ == "__main__":
             dir = tgt + "/" + topdir
             print 'dir',dir
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
+            fout.write("<html>\n")
             for subdir in os.listdir(dir):
                 print 'subdir',subdir
                 print dir + "/" + subdir
@@ -68,7 +69,16 @@ if __name__ == "__main__":
                 fout.write(line)
                 fout.write("\n")
                 fin.close()
+
+                os.chdir(dir + "/" + subdir)                
+                ocfg = open(subdir + ".cfg", "w")
+                ocfg.write(cfg)
+                ocfg.close()
+                cmd = 'htlatex %s.tex "%s" "" "" -shell-escape' % (subdir,subdir)     
+                os.system(cmd)
+                
                 break
+            fout.write("</html>\n")
             fout.close()
             break
 
