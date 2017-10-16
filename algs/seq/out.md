@@ -1,1 +1,0 @@
-Ve için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için için 
