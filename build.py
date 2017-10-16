@@ -32,20 +32,38 @@ if __name__ == "__main__":
         tgt = "/home/burak/Downloads/classnotes_html"
         #cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s' --delete" % (os.getcwd(), tgt)
         #print cmd
-        #os.system(cmd)                
-        files = []
-        for root, directories, filenames in os.walk(tgt):
-            for filename in filenames: 
-                path = os.path.join(root,filename)
-                if ".tex" in path:
-                    dir = os.path.dirname(os.path.abspath(path))
-                    base = os.path.basename(path).replace(".tex","")
-                    print dir, base
-                    os.chdir(dir)
-                    out = open(base + ".cfg", "w")
-                    out.write(cfg)
-                    out.close()
-                    cmd = 'htlatex %s.tex "%s" "" "" -shell-escape' % (base,base)     
-                    print cmd
-                    os.system(cmd)
-                    exit()
+        #os.system(cmd)
+        for topdir in ['algs','calc_multi','chaos','compscieng',
+                       'func_analysis','linear','ode','pde','stat',
+                       'tser','vision']:
+            print 'main',topdir
+            dir = tgt + "/" + topdir
+            print 'dir',dir
+            for subdir in os.listdir(dir):
+                print 'subdir',subdir
+                print dir + "/" + subdir
+                # read tex file, get header
+                                
+            break
+
+
+        # for root, directories, filenames in os.walk(tgt):
+        #     print root, directories, filenames
+        #     for filename in filenames:
+        #         print filename
+        #         path = os.path.join(root,filename)
+        #         if ".tex" in path:
+        #             dir = os.path.dirname(os.path.abspath(path))
+        #             if "00" in dir: continue
+        #             base = os.path.basename(path).replace(".tex","")
+        #             print dir, base
+        #             os.chdir(dir)
+        #             out = open(base + ".cfg", "w")
+        #             out.write(cfg)
+        #             out.close()
+        #             cmd = 'htlatex %s.tex "%s" "" "" -shell-escape' % (base,base)     
+        #             print cmd
+        #             os.system(cmd)
+        #             break
+        #         break
+            
