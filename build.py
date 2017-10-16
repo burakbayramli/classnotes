@@ -73,6 +73,7 @@ if __name__ == "__main__":
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
             fout.write("<html>\n")
             for subdir in os.listdir(dir):
+                if not os.path.isdir(dir + "/" + subdir): continue
                 print 'subdir',subdir
                 if "cover" in subdir or "00" in subdir: continue
                 print dir + "/" + subdir
