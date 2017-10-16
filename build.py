@@ -1,4 +1,5 @@
-import os, sys, shutil
+# -*- coding: utf-8 -*-
+import os, sys, re, codecs
 
 cfg = """
 \\Preamble{xhtml}
@@ -6,6 +7,14 @@ cfg = """
 \\begin{document}
 \\EndPreamble
 """
+
+def translit_low(c):
+    res = c.lower()
+    res = res.replace(u'ğ','g')
+    res = res.replace(u'ş','s')
+    res = res.replace(u'ı','i')
+    res = res.replace(u'ç','c')
+    return res
 
 if __name__ == "__main__": 
  
@@ -39,11 +48,28 @@ if __name__ == "__main__":
             print 'main',topdir
             dir = tgt + "/" + topdir
             print 'dir',dir
+            fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
             for subdir in os.listdir(dir):
                 print 'subdir',subdir
                 print dir + "/" + subdir
                 # read tex file, get header
-                                
+                fin = open(dir + "/" + subdir + "/" + subdir + ".tex")
+                content = fin.read()
+                #print content
+                title = re.findall(u"begin.*?document.*?\n(.*?)\n",content.decode('latin5'),re.DOTALL)[0]
+                url = translit_low(title)
+                url = url.replace(" ","_")
+                url = url.replace("(","_")
+                url = url.replace(")","_")
+                url = url.replace("-","")
+                url = url.replace(",","")
+                url = url + ".html"
+                line = "<a href='%s'>%s</a>" % (url, title)
+                fout.write(line)
+                fout.write("\n")
+                fin.close()
+                break
+            fout.close()
             break
 
 
