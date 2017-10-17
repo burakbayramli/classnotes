@@ -85,6 +85,7 @@ if __name__ == "__main__":
                 url = url.replace(" ","_")
                 url = url.replace("(","_")
                 url = url.replace(")","_")
+                url = url.replace("/","_")
                 url = url.replace("-","")
                 url = url.replace(",","")
                 url = url + ".html"
