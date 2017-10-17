@@ -89,7 +89,7 @@ if __name__ == "__main__":
                 url = url.replace("-","")
                 url = url.replace(",","")
                 url = url + ".html"
-                line = "<a href='%s'>%s</a>" % (url, title)
+                line = "<a href='%s'>%s</a><br/><br/>" % (url, title)
                 fout.write(line)
                 fout.write("\n")
                 fin.close()
