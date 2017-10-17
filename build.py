@@ -95,6 +95,14 @@ if __name__ == "__main__":
 
                 print 'chdir', dir + "/" + subdir
                 os.chdir(dir + "/" + subdir)
+
+                if os.path.isfile(subdir + ".html"): 
+                    textime = os.path.getmtime(subdir + ".tex")
+                    htmltime = os.path.getmtime(subdir + ".html")
+                    if htmltime > textime:
+                        print "HTML exists.. skipping"
+                        continue
+                
                 ocfg = open(subdir + ".cfg", "w")
                 ocfg.write(cfg)
                 ocfg.close()
