@@ -11,6 +11,6 @@ framework, it may have different conventions for serving static files.
 Refer to the [top-level README](../README.md) for instructions on
 running and deploying.
 
-https://tensor-rnn-162508.appspot.com
+https://tensor-rnn-162508.appspot.com/static/classes.html
 
 gcloud app deploy
