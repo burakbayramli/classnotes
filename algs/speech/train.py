@@ -41,8 +41,6 @@ def run_ctc():
 
         # Defining the cell
         # Can be:
-        #   tf.nn.rnn_cell.RNNCell
-        #   tf.nn.rnn_cell.GRUCell
         cell = tf.contrib.rnn.LSTMCell(num_hidden, state_is_tuple=True)
 
         # Stacking rnn cells
