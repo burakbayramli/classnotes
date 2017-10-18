@@ -88,8 +88,9 @@ if __name__ == "__main__":
                 url = url.replace("/","_")
                 url = url.replace("-","")
                 url = url.replace(",","")
-                url = subdir + "/" + url + ".html"
-                line = "<a href='%s'>%s</a><br/><br/>" % (url, title)
+                url = url + ".html"
+                print 'the url is', subdir + "/" + url
+                line = "<a href='%s'>%s</a><br/><br/>" % (subdir + "/" + url, title)
                 fout.write(line)
                 fout.write("\n")
                 fin.close()
@@ -103,11 +104,11 @@ if __name__ == "__main__":
                     if htmltime > textime:
                         print "HTML exists.. skipping"
                         continue
-                
+
                 ocfg = open(subdir + ".cfg", "w")
                 ocfg.write(cfg)
                 ocfg.close()
-                cmd = 'htlatex %s.tex "%s" "" "" -shell-escape' % (subdir,subdir)     
+                cmd = 'make4ht -u %s.tex -s ' % subdir
                 os.system(cmd)
 
                 # read 16 lines, insert ad, then continue
@@ -116,7 +117,7 @@ if __name__ == "__main__":
                 for i,line in enumerate(fin1.readlines()):
                     fout1.write(line)
                     if i == 15:  fout1.write(ad)
-                fout1.close()                
+                fout1.close()                                
                 #break
             fout.write("</html>\n")
             fout.close()
