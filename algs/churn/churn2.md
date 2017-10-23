@@ -1,30 +1,5 @@
 
 ```python
-import pandas as pd, zipfile
-#df = pd.read_csv('online_retail.csv')
-with zipfile.ZipFile('/home/burak/Documents/Dropbox/Public/data/retail.zip', 'r') as z:
-    df =  pd.read_csv(z.open('online_retail.csv'))    
-```
-
-```python
-print df[df.CustomerID == 15065][['Description','InvoiceDate']].tail(10)
-```
-
-```text
-                            Description   InvoiceDate
-433515  PAPER CHAIN KIT 50'S CHRISTMAS   11/2/11 9:45
-433516         ROLL WRAP 50'S CHRISTMAS  11/2/11 9:45
-433517        IVORY WICKER HEART MEDIUM  11/2/11 9:45
-433518  VINTAGE DOILY TRAVEL SEWING KIT  11/2/11 9:45
-433519         JUMBO BAG VINTAGE DOILY   11/2/11 9:45
-433520        HAND WARMER RED RETROSPOT  11/2/11 9:45
-433521          HAND WARMER BIRD DESIGN  11/2/11 9:45
-433522    PRETTY HANGING QUILTED HEARTS  11/2/11 9:45
-433523          BUBBLEGUM RING ASSORTED  11/2/11 9:45
-433524           6 RIBBONS RUSTIC CHARM  11/2/11 9:45
-```
-
-```python
 import tensorflow as tf
 from keras import backend as K
 from keras.models import Sequential

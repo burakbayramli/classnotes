@@ -4,6 +4,7 @@ import pandas as pd, zipfile
 dateparse = lambda x: pd.datetime.strptime(x, '%m/%d/%y %H:%M').date()
 with zipfile.ZipFile('/home/burak/Documents/Dropbox/Public/data/retail.zip', 'r') as z:
     df =  pd.read_csv(z.open('online_retail.csv'),parse_dates=['InvoiceDate'],date_parser=dateparse)
+    dfc =  pd.read_csv(z.open('online_retail_side_data_extended.csv'))
 print df[df.CustomerID == 15065][['Description','InvoiceDate']].tail(10)
 ```
 
