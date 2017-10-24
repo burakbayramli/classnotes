@@ -112,6 +112,23 @@ df4['gender'] = (df4['gender']=='Male').astype(float)
 df4.to_csv('out-%d.csv' % cid)
 ```
 
+```python
+import pickle
+file = open("recs.pkl",'r')
+recs = pickle.load(file)
+file.close()
+```
+
+```python
+idx = 400
+print len(recs[idx])
+#print recs[idx]
+# tte,censor,age,gender
+```
+
+```text
+235
+```
 
 
 
