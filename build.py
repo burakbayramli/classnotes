@@ -8,7 +8,18 @@ cfg = """
 \\EndPreamble
 """
 
-ad = '''<p>Your ad code goes here</p>
+ad = '''<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- sayilarvekuramlar_header_AdSense1_1x1_as -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8892285732370920"
+     data-ad-host="ca-host-pub-1556223355139109"
+     data-ad-host-channel="L0002"
+     data-ad-slot="3877741589"
+     data-ad-format="auto"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
 '''
 
 def translit_low(c):
@@ -44,14 +55,8 @@ if __name__ == "__main__":
 
     if sys.argv[1] == 'html':
         
-        fr = os.getcwd() + "/static_files"
-        tgt = "/home/burak/Downloads/classnotes_html/scripts"
-        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, tgt)
-        print cmd
-        os.system(cmd)
-
         fr = os.getcwd()
-        tgt = tgt + "/static/classnotes"
+        tgt = "/home/burak/Documents/dersblog"
         cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, tgt)
         print cmd
         os.system(cmd)
