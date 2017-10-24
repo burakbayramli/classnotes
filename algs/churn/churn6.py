@@ -48,8 +48,10 @@ for cid in dfc.index:
         df4['age'] = dfc.ix[cid]['Age']
         df4['gender'] = dfc.ix[cid]['Gender']
         df4['gender'] = (df4['gender']=='Male').astype(float)
+        df4['change'] = (df4['dc']==0).astype(float)
         #df4.to_csv('/tmp/out-%d.csv' % cid)
-        recs.append(np.array(df4))
+        if not np.any(pd.isnull(df4)):
+            recs.append(np.array(df4))
         #if len(recs)>200: break
         #if len(recs)>500: break
     except:
