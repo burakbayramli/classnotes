@@ -1,3 +1,9 @@
+# Generating static html files
+
+Run build.py html in the parent directory. 
+
+
+
 f# Python / Flask static files sample for Google App Engine Flexible
   Environment
 

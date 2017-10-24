@@ -8,15 +8,7 @@ cfg = """
 \\EndPreamble
 """
 
-ad = '''<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- htlatex -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:90px"
-     data-ad-client="ca-pub-1121997141902625"
-     data-ad-slot="1808738179"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+ad = '''<p>Your ad code goes here</p>
 '''
 
 def translit_low(c):
@@ -53,7 +45,7 @@ if __name__ == "__main__":
     if sys.argv[1] == 'html':
         
         fr = os.getcwd() + "/static_files"
-        tgt = "/home/burak/Downloads/classnotes_html/static_files"
+        tgt = "/home/burak/Downloads/classnotes_html/scripts"
         cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, tgt)
         print cmd
         os.system(cmd)
