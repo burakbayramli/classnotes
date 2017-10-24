@@ -103,10 +103,10 @@ print dfc.ix[cid]
 ```
 
 ```text
-Gender             Female
-Age                    39
+Gender               Male
+Age                    33
 Country    United Kingdom
-Name: 13808, dtype: object
+Name: 15065, dtype: object
 ```
 
 ```python
