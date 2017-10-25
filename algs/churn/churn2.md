@@ -31,7 +31,7 @@ model.add( GRU(1, input_shape=(n_timesteps, n_features), activation='tanh', retu
 model.add( Dense(2) )
 model.add( Lambda(util.output_lambda, arguments={"init_alpha":init_alpha,  "max_beta_value":4.0}) )
 model.compile(loss=util.weibull_loss_discrete, optimizer=adam(lr=.01))
-model.load_weights("/home/burak/Downloads/wtte-simple-weights.h5")
+model.load_weights("wtte-simple-weights.h5")
 ```
 
 ```text

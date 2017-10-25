@@ -3,25 +3,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from keras import backend as K
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM,GRU
-from keras.layers import Lambda
-from keras.layers.wrappers import TimeDistributed
-
-from keras.optimizers import RMSprop,adam
-from keras.callbacks import History, TensorBoard
-
-def _keras_unstack_hack(ab):
-    ndim = len(K.int_shape(ab))
-    if ndim == 0:
-        print('can not unstack with ndim=0')
-    else:
-        a = ab[..., 0]
-        b = ab[..., 1]
-    return a, b
-
 
 def get_data(n_timesteps, every_nth, n_repeats, noise_level, n_features, n_sequences, use_censored = True):
     

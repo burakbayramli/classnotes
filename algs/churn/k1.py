@@ -9,7 +9,6 @@ from keras.layers import Dense
 from keras.layers import LSTM,GRU
 from keras.layers import Lambda
 from keras.layers.wrappers import TimeDistributed
-
 from keras.optimizers import RMSprop,adam
 from keras.callbacks import History, TensorBoard
 
@@ -122,6 +121,8 @@ print 'init_alpha: ',init_alpha
 np.random.seed(1)
 
 history = History()
+
+print 'x_train', x_train.shape, 'y_train', y_train.shape
 
 model = Sequential()
 model.add(GRU(1, input_shape=(n_timesteps, n_features),activation='tanh',return_sequences=True))
