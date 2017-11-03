@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+
+#
+# __TODO__: for html, put article title inside <title></title>
+#
 import os, sys, re, codecs, shutil
 
 cfg = """
