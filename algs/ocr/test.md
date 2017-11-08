@@ -1,19 +1,19 @@
 
 ```python
-import fakestrings
-print fakestrings.randomstring()
+import util
+print util.randomstring()
 ```
 
 ```text
-('+420-207962763', 'phone_num')
+('333848355', 'invoice_id')
 ```
 
 ```python
 from PIL import Image
 import ockre
-(s,t) = fakestrings.randomstring()
+(s,t) = util.randomstring()
 print s, t
-res = ockre.paint_text(s,520,64,rotate=True,ud=True,multi_fonts=True)
+res = util.paint_text(s,520,64,rotate=True,ud=True,multi_fonts=True)
 res = res.reshape(64,520)
 print res.shape
 #im = Image.fromarray(res)
@@ -23,9 +23,10 @@ plt.savefig('out1.png')
 ```
 
 ```text
-CZ916500000033206770205 iban
+75047471 sender_ic
 (64, 520)
 ```
+
 
 
 
