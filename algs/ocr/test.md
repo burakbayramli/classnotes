@@ -1,41 +1,31 @@
 
 ```python
-import numpy as np
-import string
-from PIL import Image, ImageFont, ImageDraw
- 
-def MakeImg(t, f, fn, s = (300, 50), o = (20, 20)):
-    '''
-    Generate an image of text
-    t:      The text to display in the image
-    f:      The font to use
-    fn:     The file name
-    s:      The image size
-    o:      The offest of the text in the image
-    '''
-    img = Image.new('RGB', s, "Gray")
-    draw = ImageDraw.Draw(img)
-    draw.text(o, t, (0, 0, 0), font = f)
-    img.save(fn)
-
-S = "Hello alkjsfl klajsdlkj"
-font = ImageFont.truetype("LiberationMono-Regular.ttf", 16)
-MakeImg(S, font,'out.png')
+import fakestrings
+print fakestrings.randomstring()
 ```
 
 ```text
-(0, 0)
+('+420-207962763', 'phone_num')
 ```
 
+```python
+from PIL import Image
+import ockre
+(s,t) = fakestrings.randomstring()
+print s, t
+res = ockre.paint_text(s,520,64,rotate=True,ud=True,multi_fonts=True)
+res = res.reshape(64,520)
+print res.shape
+#im = Image.fromarray(res)
+#plt.imshow(res)
+plt.imshow(res,cmap='gray',interpolation="none")
+plt.savefig('out1.png')
+```
 
-
-
-
-
-
-
-
-
+```text
+CZ916500000033206770205 iban
+(64, 520)
+```
 
 
 
