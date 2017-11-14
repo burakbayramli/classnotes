@@ -64,10 +64,111 @@ olarak daha saðlam (robust) bir modelin ortaya çýkmasý saðlanýyor.
 
 \includegraphics[height=6cm]{convnet_06.png}
 
-Böyle gide gide bir derin að yapýsý ortaya çýkartmýþ oluyoruz. Altta MNIST
-verisinin iþleyebilen mimarinin kodunu görüyoruz. Bu yapý ünlü YSA
-araþtýrmacýsý Yann LeCun'un LeNet adý verilen mimarisi. Veri [5]'ten
-indirilebilir.
+Böyle gide gide bir derin að yapýsý ortaya çýkartmýþ oluyoruz. 
+
+Not: Çoðunlukla evriþim tabakasýndan sonra ReLu aktviyasyonuna baðlantý
+yapýlýr, çünkü eðer aktivasyon olmasa, evriþim sonuçta aðýrlýklarla çarpým
+ve toplam iþlemidir, ve bu bir lineer iþlemdir, o zaman tüm NN'in iþlemi
+ardý ardýna matrislerin çarpýmý olarak ta görülebilirdi, ve bu bir lineer
+iþlem olurdu, o zaman NN gayri-lineerligi modelleyemezdi.
+
+TensorFlow ile Evriþim
+
+Þimdi TF kullanarak evriþim yapalým, iki resim üzerinde örneði görelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+import tensorflow as tf
+from sklearn.datasets import load_sample_images
+
+# Load sample images
+dataset = np.array(load_sample_images().images, dtype=np.float32)
+batch_size, height, width, channels = dataset.shape
+print 'veri tensor boyutu', dataset.shape
+plt.imshow(dataset[0,:,:,:] / 255.) 
+plt.savefig('conv-9.png')
+plt.imshow(dataset[1,:,:,:] / 255.) 
+plt.savefig('conv-10.png')
+\end{minted}
+
+\begin{verbatim}
+veri tensor boyutu (2, 427, 640, 3)
+\end{verbatim}
+
+\includegraphics[width=20em]{conv-9.png}
+\includegraphics[width=20em]{conv-10.png}
+
+Bu iki resmi bir ``tensor'' yani çok boyutlu matris içine koyduk, resmin
+boyutlarý 640 x 427, eðer tek bir resme bakýyor olsaydýk (640,427) boyutlu
+tek bir matris ile iþ yapabilirdik, fakat TF ardý ardýna gelen verileri de
+bir tensorun ayrý boyutlarý olarak kabul edebiliyor. Ayrýca tensorun son
+boyutu renk kanallarý, üç tane var, RGB renk sistemý için kýrmýzý (red),
+yeþil (green) ve mavi (blue) için. Böylece üstteki tensor boyutlarýný elde
+ettik.
+
+Evriþim için 4 tane filtre tanýmlayacaðýz. Bu filtrelerin içeriðinin elle
+burada tanýmlayacaðýz, yapay öðrenme baðlamýnda bu içerik eðitim sýrasýnda
+otomatik olarak öðrenilir, þimdi örnek amaçlý olarak filtre deðerlerini biz
+atýyoruz. Ayrýca istediðimiz kadar filtre tanýmlayabilirdik, yapay
+öðrenmede istenen o'dur ki bu filtreler doðru deðerlere doðru evrilir, her
+filtre görüntünün deðiþik yerlerine, biçimlerine odaklanmaya
+baþlayabilirler. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+in_channels = channels
+out_channels = 4
+W = np.zeros(shape=(7, 7, in_channels, out_channels), dtype=np.float32)
+W[:, 3, :, 0] = 1  # yatay cizgi
+W[3, :, :, 1] = 1  # dikey cizgi
+W[5, :, :, 2] = 1  
+W[2, :, :, 3] = 1  
+
+X = tf.placeholder(tf.float32, shape=(None, height, width, channels))
+convolution = tf.nn.conv2d(X, W, strides=[1,2,2,1], padding="SAME")
+with tf.Session() as sess:
+    output = sess.run(convolution, feed_dict={X: dataset})
+    print u'evriþimden gelen tensor', output.shape
+\end{minted}
+
+\begin{verbatim}
+evriþimden gelen tensor (2, 214, 320, 4)
+\end{verbatim}
+
+Filtrelerin ilkinde mesela sadece yatay bir çizgi var, bu filtre yatay
+piksellerin bir ortalamasýný alýyor olacak, vs. Parametrelerden kaydýrma
+yatay 2 dikey olarak tanýmlý, o zaman her imaj kabaca yarýsýna inecek,
+dolgu (padding) için \verb!SAME! diyerek dolgu yap demiþiz, yani kaydýrma
+olmasaydý giren çýkan tensor ayný olurdu. Peki 3 tane ayrý kanal bilgisine
+ne oldu? Görüntü boyutlar azalarak (320,214) oldu, 4 tane filtre çýkýþý
+var, 2 tane imaj. Kanallar üzerinden bir toplam alýndý, yani ayrý kanal
+bilgisi artýk yok. Bu aslýnda istenen bir þey çünkü bir görüntünün R,G,B
+kanallarý üzerinde ayrý ayrý irdeleme yapmak istemeyiz, sýnýflama, karar
+mekanizmasýný tüm imaj üzerinden iþletmek isteriz.
+
+Sonuçlar altta, iki tane filtre sonucu örnek olarak seçildi.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def plot_image(image):
+    plt.imshow(image, cmap="gray", interpolation="nearest")
+    plt.axis("off")
+    
+image_index = 0; feature_map_index = 2
+plot_image(output[image_index, :, :, feature_map_index])
+plt.savefig('conv-out-%d-%d.png' % (image_index,feature_map_index))
+
+image_index = 1; feature_map_index = 1
+plot_image(output[image_index, :, :, feature_map_index])
+plt.savefig('conv-out-%d-%d.png' % (image_index,feature_map_index))
+\end{minted}
+
+\includegraphics[width=20em]{conv-out-0-2.png}
+\includegraphics[width=20em]{conv-out-1-1.png}
+
+MNIST
+
+Altta MNIST verisini iþleyebilen mimarýnýn TF olmadan pür Python kullanan
+kodunu görüyoruz. Bu yapý ünlü YSA araþtýrmacýsý Yann LeCun'un LeNet adý
+verilen mimarisi. Veri [5]'ten indirilebilir.
 
 \inputminted[fontsize=\footnotesize]{python}{convnet2.py}
 
