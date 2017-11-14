@@ -1,6 +1,11 @@
 
 ```python
 import util
+
+import random
+np.random.seed(0)
+random.seed(0)
+
 print util.randomstring()
 import util, ockre
 from PIL import Image
@@ -16,8 +21,8 @@ print dataset.shape
 ```
 
 ```text
-('21. 3. 2019', 'date_due')
-CZ90696352 sender_dic
+('CZ74254731', 'sender_dic')
+29.8.2000 date_issue
 (1, 64, 512)
 (1, 512, 64, 1)
 ```
@@ -51,16 +56,22 @@ b_conv1 = bias_variable([16])
 h_conv1 = tf.nn.relu(conv2d(inputs, W_conv1) + b_conv1)
 h_pool1 = max_pool_1x1(h_conv1)
 
+W_conv2 = weight_variable([3, 3, 16, 16])
+b_conv2 = bias_variable([16])
+h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+h_pool2 = max_pool_1x1(h_conv2)
+
+
 print inputs.shape
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
-     output = sess.run(h_pool1, feed_dict={inputs: dataset})
-     print output.shape
+     output = sess.run(h_pool2, feed_dict={inputs: dataset})
+     print 'output',output.shape
 ```
 
 ```text
 (?, 512, 64, 1)
-(1, 512, 64, 16)
+output (1, 512, 64, 16)
 ```
 
 
