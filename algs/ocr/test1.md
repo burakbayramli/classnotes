@@ -5,12 +5,12 @@ print util.randomstring()
 ```
 
 ```text
-('333848355', 'invoice_id')
+('CZ13909878', 'sender_dic')
 ```
 
 ```python
-import util, ockre
 from PIL import Image
+import util
 
 (s,t) = util.randomstring()
 print s, t
@@ -24,7 +24,7 @@ plt.savefig('out1.png')
 ```
 
 ```text
-EQBKCZPP bic
+0,00 amount_rounding
 (64, 520)
 ```
 

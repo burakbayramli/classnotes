@@ -36,8 +36,6 @@ w = 128; h = 64
 np.random.seed(0)
 random.seed(0)
 
-print util.randomstring()
-
 (s,t) = util.randomstring()
 print s, t
 dataset = util.paint_text(s,w,h,rotate=True,ud=True,multi_fonts=True)
@@ -49,8 +47,7 @@ print dataset.shape
 ```
 
 ```text
-('CZ74254731', 'sender_dic')
-29.8.2000 date_issue
+CZ74254731 sender_dic
 (1, 64, 128)
 (1, 128, 64, 1)
 ```
@@ -62,7 +59,7 @@ w = 128; h = 64
 
 pool_size = 1
 num_filters = 16
-hidden_layer_size = 10
+hidden_layer_size = 512
 
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
@@ -110,7 +107,7 @@ with tf.Session() as sess:
 ```
 
 ```text
-outputs.shape (?, 32, 10)
+outputs.shape (?, 32, 512)
 (?, 128, 64, 1)
 output (1, 32, 32)
 ```
