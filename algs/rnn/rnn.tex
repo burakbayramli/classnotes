@@ -50,6 +50,43 @@ kopyalanýyor, ya da ``açýlýyor (unfolding)''.  Bu açýlma iþlemini her zaman
 adýmý için gösterebiliriz.  f Zaman Ýçinde Geriye Doðru Yayýlma
 (Backpropagation Through Time -BPTT-)
 
+RNN Çesitleri, Numaralarý
+
+Ýlla her biriminin çýktýsýný kullanmak gerekmez. Her RNN biriminin $h$
+formundaki gizli katman çýktýsý bir sonraki birime girdi kabul edildiði
+için bu çýktýlar RNN'nin bütününü etkilerler, fakat etiket / düzeltme
+baðlamýnda direk kullanýlmalarý þart deðildir. Mesela bir RNN'e bir veri
+dizisi verip, çýktýlarýnýn en sonuncusu hariç geri kalanlarýný yok
+sayabiliriz, o zaman bir dizi-vektör RNN'i elde ederiz. Ya da RNN'e bir
+film hakkýndaki tüm yorumlarý kelime kelime veri dizisi olarak verebiliriz,
+RNN'in tek çýktýsý -1/+1 þeklinde beðendi / beðenmedi skoru olabilir, bu
+ünlü hissiyat analizi (sentiment analyis) örneðidir. Altta diyagramý
+görüyoruz,
+
+\includegraphics[width=15em]{rnn_05.png}
+
+Eðer zaman serisi tahmin etmek istiyorsak $x_1,x_2,..$ serisini alýp bir
+kaydýrarak ona karþýlýk olan ``etiketleri'' kendimiz yaratabiliriz. Bu
+durumda $y_1,y_2,..$ serisi $x_2,x_3,..$ serisi haline gelir.
+
+Bir RNN'in tekrar eden kýsým bir nöron yerine bir katman da olabilir, yani
+bu katman içinde birden fazla nöron olur, ve bu katman zamanda geriye doðru
+kopyalanýr. 
+
+\includegraphics[width=24em]{rnn_06.png}
+
+Eðer tüm çeþitleri göstermek gerekirse
+
+\includegraphics[width=35em]{rnn_08.png}
+
+Bire bir (one to one) çok basit, diðerleri bire çok (one to many), çoka bir
+(many to one), ve iki çeþit çoka çok (many to many). RNN yapýsýndaki tek
+sýnýr herhalde tekrarlanan hücrelerden daha fazla girdi hücresi olamayacak
+olmasý, fakat onun haricinde neredeyse her tür olasýlýk mümkün. Mesela
+soldan 4. örnekte üç boyutlu bir girdi sadece ilk üç tekrarlanan hücreye
+veriliyor, geri kalanlara bir þey verilmiyor, çýktý ise son üç hücreden
+alýnýyor.
+
 Þimdi TensorFlow ile en basit RNN'yi kendimiz yaratalým. Tekrar eden bir
 katman olacak, içinde 5 tane nöron,
 
@@ -176,36 +213,13 @@ fakat RNN'lerde bu durum daha belirgin çünkü N adým geriye gitmek demek N
 kadar içiçe geçen fonksiyon demek, ve sýralý veriyi tahmin için N'in büyük
 olmasý gerekebilir.
 
-RNN Çesitleri, Numaralarý
-
-Ýlla her biriminin çýktýsýný kullanmak gerekmez. Her RNN biriminin $h$
-formundaki gizli katman çýktýsý bir sonraki birime girdi kabul edildiði
-için bu çýktýlar RNN'nin bütününü etkilerler, fakat etiket / düzeltme
-baðlamýnda direk kullanýlmalarý þart deðildir. Mesela bir RNN'e bir veri
-dizisi verip, çýktýlarýnýn en sonuncusu hariç geri kalanlarýný yok
-sayabiliriz, o zaman bir dizi-vektör RNN'i elde ederiz. Ya da RNN'e bir
-film hakkýndaki tüm yorumlarý kelime kelime veri dizisi olarak verebiliriz,
-RNN'in tek çýktýsý -1/+1 þeklinde beðendi / beðenmedi skoru olabilir, bu
-ünlü hissiyat analizi (sentiment analyis) örneðidir. Altta diyagramý
-görüyoruz,
-
-\includegraphics[width=15em]{rnn_05.png}
-
-Eðer zaman serisi tahmin etmek istiyorsak $x_1,x_2,..$ serisini alýp bir
-kaydýrarak ona karþýlýk olan ``etiketleri'' kendimiz yaratabiliriz. Bu
-durumda $y_1,y_2,..$ serisi $x_2,x_3,..$ serisi haline gelir.
-
-Bir RNN'in tekrar eden kýsým bir nöron yerine bir katman da olabilir, yani
-bu katman içinde birden fazla nöron olur, ve bu katman zamanda geriye doðru
-kopyalanýr. 
-
-\includegraphics[width=24em]{rnn_06.png}
+Örnek
 
 Alttaki kodda bir metin okunarak o metindeki harf sýrasý tahmin edilmeye
 uðraþýlýyor. Metin tekrar sýfýrdan üretilmeye çabalanýyor. Otomatik türev
 (automatic differentiation -AD-) alma ile içiçe geçmiþ fonksiyonlarýn
 zincirleme türevinin alýnmasý saðlanýyor, \verb!rnn_predict! hesabý 40
-geriye gider, AD tüm bu zinciri takip eder. 
+geriye gider, AD tüm bu zinciri takip eder.
 
 \inputminted[fontsize=\footnotesize]{python}{rnn.py}
 

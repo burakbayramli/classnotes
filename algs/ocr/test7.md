@@ -1,4 +1,3 @@
-python -u image_ocr.py 
 Using TensorFlow backend.
 (?, 128, 64, 1)
 (3, 3)
@@ -24,17 +23,20 @@ Tensor("gru2_b/transpose_1:0", shape=(?, ?, 512), dtype=float32)
 
 
 ```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+import random
+from PIL import Image
 import util
 
 w = 128; h = 64
 
-import random
 np.random.seed(0)
 random.seed(0)
 
 print util.randomstring()
-import util, ockre
-from PIL import Image
 
 (s,t) = util.randomstring()
 print s, t
@@ -58,10 +60,9 @@ w = 128; h = 64
 # junk image, only one
 #dataset = np.zeros((1,w,h,1))
 
-import tensorflow as tf
-
 pool_size = 1
 num_filters = 16
+hidden_layer_size = 10
 
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
@@ -77,6 +78,8 @@ def conv2d(x, W):
 def max_pool_2x2(x):
   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
+
+tf.reset_default_graph()
 
 inputs = tf.placeholder(tf.float32, [None, w, h, 1])
 
@@ -94,6 +97,10 @@ h_pool2_flat = tf.reshape(h_pool2, [-1, 32, 256])
 
 W_fc1 = tf.contrib.layers.fully_connected(h_pool2_flat, 32)
 
+cell = tf.contrib.rnn.GRUCell(hidden_layer_size)
+outputs, states = tf.nn.dynamic_rnn(cell, h_pool2_flat, dtype=tf.float32)
+print 'outputs.shape', outputs.shape
+
 print inputs.shape
 
 with tf.Session() as sess:
@@ -103,6 +110,7 @@ with tf.Session() as sess:
 ```
 
 ```text
+outputs.shape (?, 32, 10)
 (?, 128, 64, 1)
 output (1, 32, 32)
 ```
