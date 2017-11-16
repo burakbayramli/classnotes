@@ -23,37 +23,30 @@ Tensor("gru2_b/transpose_1:0", shape=(?, ?, 512), dtype=float32)
 
 
 ```python
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import tensorflow as tf
-import random
 from PIL import Image
 import util
 
-w = 128; h = 64
-
-np.random.seed(0)
-random.seed(0)
-
 (s,t) = util.randomstring()
 print s, t
-dataset = util.paint_text(s,w,h,rotate=True,ud=True,multi_fonts=True)
-plt.imshow(dataset.reshape(h,w),cmap='gray',interpolation="none")
+res = util.paint_text(s,520,64,rotate=True,ud=True,multi_fonts=True)
+res = res.reshape(64,520)
+print res.shape
+#im = Image.fromarray(res)
+#plt.imshow(res)
+plt.imshow(res,cmap='gray',interpolation="none")
 plt.savefig('out1.png')
-print dataset.shape
 dataset = dataset.reshape(1,w,h,1)
 print dataset.shape
 ```
 
 ```text
-CZ74254731 sender_dic
-(1, 64, 128)
-(1, 128, 64, 1)
+211 customer_id
+(64, 520)
+(1, 512, 64, 1)
 ```
 
 ```python
-w = 128; h = 64
+w = 512; h = 64
 # junk image, only one
 #dataset = np.zeros((1,w,h,1))
 
@@ -72,6 +65,9 @@ def bias_variable(shape):
 def conv2d(x, W):
   return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
+def max_pool_1x1(x):
+  return tf.nn.max_pool(x, ksize=[1, 1, 1, 1],
+                        strides=[1, 1, 1, 1], padding='SAME')
 def max_pool_2x2(x):
   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
@@ -79,37 +75,40 @@ def max_pool_2x2(x):
 tf.reset_default_graph()
 
 inputs = tf.placeholder(tf.float32, [None, w, h, 1])
+print 'inputs', inputs.shape
 
 W_conv1 = weight_variable([3, 3, 1, num_filters])
 b_conv1 = bias_variable([num_filters])
 h_conv1 = tf.nn.relu(conv2d(inputs, W_conv1) + b_conv1)
-h_pool1 = max_pool_2x2(h_conv1)
+h_pool1 = max_pool_1x1(h_conv1)
 
 W_conv2 = weight_variable([3, 3, num_filters, num_filters])
 b_conv2 = bias_variable([num_filters])
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-h_pool2 = max_pool_2x2(h_conv2)
+h_pool2 = max_pool_1x1(h_conv2)
+print 'h_pool2',h_pool2
 
 h_pool2_flat = tf.reshape(h_pool2, [-1, 32, 256])
+print 'h_pool2_flat',h_pool2_flat
 
 W_fc1 = tf.contrib.layers.fully_connected(h_pool2_flat, 32)
+print 'W_fc1',W_fc1
 
 cell = tf.contrib.rnn.GRUCell(hidden_layer_size)
-outputs, states = tf.nn.dynamic_rnn(cell, h_pool2_flat, dtype=tf.float32)
-print 'outputs.shape', outputs.shape
-
-print inputs.shape
+rnnout, states = tf.nn.dynamic_rnn(cell, h_pool2_flat, dtype=tf.float32)
+print 'rnnshape', rnnout.shape
 
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
-     output = sess.run(W_fc1, feed_dict={inputs: dataset})
-     print 'output',output.shape
+     output = sess.run(rnnout, feed_dict={inputs: dataset})
 ```
 
 ```text
-outputs.shape (?, 32, 512)
-(?, 128, 64, 1)
-output (1, 32, 32)
+inputs (?, 512, 64, 1)
+h_pool2 Tensor("MaxPool_1:0", shape=(?, 512, 64, 16), dtype=float32)
+h_pool2_flat Tensor("Reshape:0", shape=(?, 32, 256), dtype=float32)
+W_fc1 Tensor("fully_connected/Relu:0", shape=(?, 32, 32), dtype=float32)
+rnnshape (?, 32, 512)
 ```
 
 
