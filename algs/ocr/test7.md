@@ -1,4 +1,3 @@
-Using TensorFlow backend.
 (?, 128, 64, 1)
 (3, 3)
 Tensor("conv1/Relu:0", shape=(?, 128, 64, 16), dtype=float32)
@@ -26,27 +25,30 @@ Tensor("gru2_b/transpose_1:0", shape=(?, ?, 512), dtype=float32)
 from PIL import Image
 import util
 
+w = 512; h = 64
+num_classes = 68
+
 (s,t) = util.randomstring()
 print s, t
-res = util.paint_text(s,520,64,rotate=True,ud=True,multi_fonts=True)
-res = res.reshape(64,520)
+res = util.paint_text(s,512,64,rotate=True,ud=True,multi_fonts=True)
+res = res.reshape(64,512)
 print res.shape
 #im = Image.fromarray(res)
 #plt.imshow(res)
 plt.imshow(res,cmap='gray',interpolation="none")
 plt.savefig('out1.png')
-dataset = dataset.reshape(1,w,h,1)
+dataset = res.reshape(1,w,h,1)
 print dataset.shape
 ```
 
 ```text
-211 customer_id
-(64, 520)
+192 const_sym
+(64, 512)
 (1, 512, 64, 1)
 ```
 
 ```python
-w = 512; h = 64
+import tensorflow as tf
 # junk image, only one
 #dataset = np.zeros((1,w,h,1))
 
@@ -71,6 +73,12 @@ def max_pool_1x1(x):
 def max_pool_2x2(x):
   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
+
+def ctc_loss_layer(rnn_logits, sequence_labels, sequence_length):
+    loss = tf.nn.ctc_loss( sequence_labels, rnn_logits, sequence_length,
+                           time_major=True )
+    total_loss = tf.reduce_mean(loss)
+    return total_loss
 
 tf.reset_default_graph()
 
@@ -98,6 +106,16 @@ cell = tf.contrib.rnn.GRUCell(hidden_layer_size)
 rnnout, states = tf.nn.dynamic_rnn(cell, h_pool2_flat, dtype=tf.float32)
 print 'rnnshape', rnnout.shape
 
+rnn_logits = tf.layers.dense( rnnout, num_classes+1, 
+                              activation=tf.nn.relu,
+                              kernel_initializer=tf.contrib.layers.variance_scaling_initializer(),
+                              bias_initializer=tf.constant_initializer(value=0.0),
+                              name='logits')
+
+print rnn_logits.shape
+
+#loss = ctc_loss_layer(rnn_logits,label,sequence_length) 
+
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
      output = sess.run(rnnout, feed_dict={inputs: dataset})
@@ -109,6 +127,7 @@ h_pool2 Tensor("MaxPool_1:0", shape=(?, 512, 64, 16), dtype=float32)
 h_pool2_flat Tensor("Reshape:0", shape=(?, 32, 256), dtype=float32)
 W_fc1 Tensor("fully_connected/Relu:0", shape=(?, 32, 32), dtype=float32)
 rnnshape (?, 32, 512)
+(?, 32, 69)
 ```
 
 
