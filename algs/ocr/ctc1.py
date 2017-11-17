@@ -50,6 +50,7 @@ class CTCLossTest(test.TestCase):
          [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
          [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107]],
         dtype=np.float32)
+
     input_log_prob_matrix_0 = np.log(input_prob_matrix_0)
 
     # seq_len_1 == 5

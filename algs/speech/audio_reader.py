@@ -5,7 +5,7 @@ from time import time
 
 import dill
 import librosa
-import progressbar
+#import progressbar
 
 TMP_DIR = '/tmp/tensorflow-ctc-speech-recognition/'
 if not os.path.exists(TMP_DIR):
@@ -95,9 +95,9 @@ class AudioReader(object):
                 TMP_DIR))
         self.metadata = dill.load(open(os.path.join(TMP_DIR, 'metadata.pkl'), 'rb'))
 
-        bar = progressbar.ProgressBar()
+        #bar = progressbar.ProgressBar()
         pickle_files = find_files(TMP_DIR, pattern='*.pkl')
-        for pkl_file in bar(pickle_files):
+        for pkl_file in pickle_files:
             if 'metadata' not in pkl_file:
                 with open(pkl_file, 'rb') as f:
                     obj = dill.load(f)
