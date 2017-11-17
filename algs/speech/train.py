@@ -11,6 +11,7 @@ from utils import FIRST_INDEX
 num_features = 13
 # Accounting the 0th index +  space + blank label = 28 characters
 num_classes = ord('z') - ord('a') + 1 + 1 + 1
+print ('num_classes %d' % num_classes)
 
 # Hyper-parameters
 num_epochs = 10000
