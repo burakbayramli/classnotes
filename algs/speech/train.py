@@ -76,6 +76,10 @@ def run_ctc():
         logits = tf.transpose(logits, (1, 0, 2))
 
         loss = tf.nn.ctc_loss(targets, logits, seq_len)
+        print (targets)
+        print (logits)
+        print (seq_len)
+        exit()
         cost = tf.reduce_mean(loss)
 
         optimizer = tf.train.MomentumOptimizer(learning_rate=0.005,

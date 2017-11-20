@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 import numpy as np
-
+import tensorflow as tf
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import errors_impl
@@ -31,68 +31,62 @@ def SimpleSparseTensorFrom(x):
   return sparse_tensor.SparseTensor(x_ix, x_val, x_shape)
 
 
-class CTCLossTest(test.TestCase):
+# Input and ground truth from Alex Graves' implementation.
 
-  def testBasic(self):
-    # Input and ground truth from Alex Graves' implementation.
+# max_time_steps == 7
+depth = 6
 
-    # max_time_steps == 7
-    depth = 6
+# seq_len_0 == 5
+targets_0 = [0, 1, 2, 1, 0]
+loss_log_prob_0 = -3.34211
+# dimensions are time x depth
+input_prob_matrix_0 = np.asarray(
+    [[0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
+     [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
+     [0.0357786, 0.633813, 0.321418, 0.00249248, 0.00272882, 0.0037688],
+     [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
+     [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107]],
+    dtype=np.float32)
 
-    # seq_len_0 == 5
-    targets_0 = [0, 1, 2, 1, 0]
-    loss_log_prob_0 = -3.34211
-    # dimensions are time x depth
-    input_prob_matrix_0 = np.asarray(
-        [[0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
-         [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
-         [0.0357786, 0.633813, 0.321418, 0.00249248, 0.00272882, 0.0037688],
-         [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
-         [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107]],
-        dtype=np.float32)
+input_log_prob_matrix_0 = np.log(input_prob_matrix_0)
 
-    input_log_prob_matrix_0 = np.log(input_prob_matrix_0)
+# seq_len_1 == 5
+targets_1 = [0, 1, 1, 0]
+loss_log_prob_1 = -5.42262
+# dimensions are time x depth
 
-    # seq_len_1 == 5
-    targets_1 = [0, 1, 1, 0]
-    loss_log_prob_1 = -5.42262
-    # dimensions are time x depth
+input_prob_matrix_1 = np.asarray(
+    [[0.30176, 0.28562, 0.0831517, 0.0862751, 0.0816851, 0.161508],
+     [0.24082, 0.397533, 0.0557226, 0.0546814, 0.0557528, 0.19549],
+     [0.230246, 0.450868, 0.0389607, 0.038309, 0.0391602, 0.202456],
+     [0.280884, 0.429522, 0.0326593, 0.0339046, 0.0326856, 0.190345],
+     [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
+    dtype=np.float32)
+input_log_prob_matrix_1 = np.log(input_prob_matrix_1)
 
-    input_prob_matrix_1 = np.asarray(
-        [[0.30176, 0.28562, 0.0831517, 0.0862751, 0.0816851, 0.161508],
-         [0.24082, 0.397533, 0.0557226, 0.0546814, 0.0557528, 0.19549],
-         [0.230246, 0.450868, 0.0389607, 0.038309, 0.0391602, 0.202456],
-         [0.280884, 0.429522, 0.0326593, 0.0339046, 0.0326856, 0.190345],
-         [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
-        dtype=np.float32)
-    input_log_prob_matrix_1 = np.log(input_prob_matrix_1)
+# len max_time_steps array of 2 x depth matrices
+inputs = [
+    np.vstack(
+        [input_log_prob_matrix_0[t, :], input_log_prob_matrix_1[t, :]])
+    for t in range(5)
+] + 2 * [np.nan * np.ones((2, depth), np.float32)]
 
-    # len max_time_steps array of 2 x depth matrices
-    inputs = [
-        np.vstack(
-            [input_log_prob_matrix_0[t, :], input_log_prob_matrix_1[t, :]])
-        for t in range(5)
-    ] + 2 * [np.nan * np.ones((2, depth), np.float32)]
-    
-    # convert inputs into [max_time x batch_size x depth tensor] Tensor
-    inputs = np.asarray(inputs, dtype=np.float32)
-    print inputs.shape
-    
-    # len batch_size array of label vectors
-    print targets_0
-    labels = SimpleSparseTensorFrom([targets_0, targets_1])
+# convert inputs into [max_time x batch_size x depth tensor] Tensor
+inputs = np.asarray(inputs, dtype=np.float32)
+print inputs.shape
 
-    # batch_size length vector of sequence_lengths
-    seq_lens = np.array([5, 5], dtype=np.int32)
+# len batch_size array of label vectors
+print targets_0
+labels = SimpleSparseTensorFrom([targets_0, targets_1])
 
-    #self._testCTCLoss(inputs, seq_lens, labels)
-    inputs_t = constant_op.constant(inputs)
+# batch_size length vector of sequence_lengths
+seq_lens = np.array([5, 5], dtype=np.int32)
 
-    with self.test_session(use_gpu=False) as sess:
-      loss = ctc_ops.ctc_loss(
-          inputs=inputs_t, labels=labels, sequence_length=seq_lens)
-      print (loss.eval())
+#self._testCTCLoss(inputs, seq_lens, labels)
+inputs_t = constant_op.constant(inputs)
 
+with tf.Session() as sess:
+  loss = ctc_ops.ctc_loss(
+      inputs=inputs_t, labels=labels, sequence_length=seq_lens)
+  print (loss.eval())
 
-if __name__ == "__main__":
-  test.main()
