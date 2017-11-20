@@ -28,7 +28,9 @@ def SimpleSparseTensorFrom(x):
   x_ix = constant_op.constant(x_ix, dtypes.int64)
   x_val = constant_op.constant(x_val, dtypes.int32)
   x_shape = constant_op.constant(x_shape, dtypes.int64)
-  return sparse_tensor.SparseTensor(x_ix, x_val, x_shape)
+  res = sparse_tensor.SparseTensor(x_ix, x_val, x_shape)
+  print 'res', res
+  return res
 
 
 # Input and ground truth from Alex Graves' implementation.
@@ -64,6 +66,8 @@ input_prob_matrix_1 = np.asarray(
     dtype=np.float32)
 input_log_prob_matrix_1 = np.log(input_prob_matrix_1)
 
+print input_prob_matrix_1[0,:]
+
 # len max_time_steps array of 2 x depth matrices
 inputs = [
     np.vstack(
@@ -86,8 +90,9 @@ seq_lens = np.array([5, 5], dtype=np.int32)
 inputs_t = constant_op.constant(inputs)
 
 with tf.Session() as sess:
-  loss = ctc_ops.ctc_loss(inputs=inputs_t, labels=labels, sequence_length=seq_lens)
+  #loss = ctc_ops.ctc_loss(inputs=inputs_t, labels=labels, sequence_length=seq_lens)
   loss2 = tf.nn.ctc_loss( labels=labels, inputs=inputs_t, sequence_length=seq_lens, time_major=True )
+  print 'labels', labels.eval()
   print (loss2.eval())
   
 
