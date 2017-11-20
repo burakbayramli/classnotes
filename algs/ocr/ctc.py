@@ -86,7 +86,8 @@ seq_lens = np.array([5, 5], dtype=np.int32)
 inputs_t = constant_op.constant(inputs)
 
 with tf.Session() as sess:
-  loss = ctc_ops.ctc_loss(
-      inputs=inputs_t, labels=labels, sequence_length=seq_lens)
-  print (loss.eval())
+  loss = ctc_ops.ctc_loss(inputs=inputs_t, labels=labels, sequence_length=seq_lens)
+  loss2 = tf.nn.ctc_loss( labels=labels, inputs=inputs_t, sequence_length=seq_lens, time_major=True )
+  print (loss2.eval())
+  
 
