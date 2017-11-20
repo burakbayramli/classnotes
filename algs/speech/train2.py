@@ -53,7 +53,8 @@ def next_testing_batch():
     return train_inputs, train_targets, train_seq_len, original, random_shift
 
 
-def run_ctc():
+if __name__ == "__main__": 
+ 
     graph = tf.Graph()
     with graph.as_default():
         # e.g: log filter bank or MFCC features
@@ -131,7 +132,14 @@ def run_ctc():
                 feed = {inputs: train_inputs,
                         targets: train_targets,
                         seq_len: train_seq_len}
-
+                
+                res = session.run(logits, feed)
+                #print ('targets ' + str(train_targets))
+                #print ('inputs ' + str(train_inputs.shape))
+                #print ('logits ' + str(res.shape))
+                #print ('logits ' + str(res))
+                #exit()
+                
                 batch_cost, _ = session.run([cost, optimizer], feed)
                 train_cost += batch_cost * batch_size
                 train_ler += session.run(ler, feed_dict=feed) * batch_size
@@ -175,6 +183,3 @@ def run_ctc():
             print(log.format(curr_epoch + 1, num_epochs, train_cost, train_ler,
                              val_cost, val_ler, time.time() - start))
 
-
-if __name__ == '__main__':
-    run_ctc()

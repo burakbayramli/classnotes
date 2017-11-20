@@ -15,11 +15,15 @@ SENTENCE_ID = 'sentence_id'
 SPEAKER_ID = 'speaker_id'
 FILENAME = 'filename'
 
-
-def find_files(directory, pattern='**/*.wav'):
+def find_files(directory, pattern='.wav'):
     """Recursively finds all files matching the pattern."""
-    return sorted(glob(os.path.join(directory, pattern), recursive=True))
-
+    files = []
+    for root, directories, filenames in os.walk(directory):
+        for filename in filenames: 
+            path = os.path.join(root,filename)
+            if pattern in path: files.append(path)    
+    res = sorted(files)
+    return res
 
 # TODO: test also with import scipy.io.wavfile as wav; fs, audio = wav.read(audio_filename)
 def read_audio_from_filename(filename, sample_rate):
@@ -53,7 +57,7 @@ class AudioReader(object):
         self.cache = dict()  # big cache <filename, data:audio librosa, text.>
 
         st = time()
-        if len(find_files(TMP_DIR, pattern='*.pkl')) == 0:  # generate all the pickle files.
+        if len(find_files(TMP_DIR, pattern='.pkl')) == 0:  # generate all the pickle files.
             print('Nothing found at {}. Generating all the caches now.'.format(TMP_DIR))
             files = find_files(audio_dir)
             assert len(files) != 0, 'Generate your cache please.'
@@ -96,7 +100,7 @@ class AudioReader(object):
         self.metadata = dill.load(open(os.path.join(TMP_DIR, 'metadata.pkl'), 'rb'))
 
         #bar = progressbar.ProgressBar()
-        pickle_files = find_files(TMP_DIR, pattern='*.pkl')
+        pickle_files = find_files(TMP_DIR, pattern='.pkl')
         for pkl_file in pickle_files:
             if 'metadata' not in pkl_file:
                 with open(pkl_file, 'rb') as f:
