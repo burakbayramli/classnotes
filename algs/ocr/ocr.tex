@@ -50,45 +50,48 @@ boyutlardaki iki vektörün birbirine uymasý ne demektir? Tüm bunlar tabii ki
 üstteki softmax vektörlerini nasýl dekode edip bir kelime üretiriz sorusu
 ile yakýn alakalý. 
 
-Uyum konusu önemli çünkü el yazýsý, ya da font seçimi dolaþýyla bazý
+Uyum konusu önemli çünkü el yazýsý, ya da font seçimi dolasýyla bazý
 karakterler diðerlerinden daha fazla yer tutuyor olabilir. Ayný þey ses
 tanýma için de geçerli, ``merhaba'' derken kimisi ``meeeerhaba'' demiþ
 olabilir, burada 'e' harfinden daha fazla ses verisi alýnacaktýr, ama o
 noktada üzerinde olunan harf deðiþmemiþtir.
 
 Dekode için ilk yaklaþým her vektör için en yüksek olasýlýktaki hücreye
-tekabül eden karakteri seçmek (fýnd the most probable symbol), sonra bir ek
+tekabül eden karakteri seçmek (find the most probable symbol), sonra bir ek
 iþlem tabakasýna giderek bazý elemeler, düzeltmeler yaparak bir kelimeye
 eriþmeye uðraþmak. Mesela en olasýlý karakter seçimi sonrasý arka arka
 gelen tekrar eden harfleri çýkartýrýz, sonra boþ karakteri çýkartýrýz,
 
 \includegraphics[width=37em]{ocr_04.png}
 
+Tüm bunlar oldukca basit görünüyor. Fakat tüm bu iþlemleri bir kayýp
+fonksiyonu olarak kullanmak istersek iþler karýþýyor. Çünkü pek çok farklý
+gidiþ yolu var, tüm kombinasyonlarý iþlemek zor,
 
+\includegraphics[width=37em]{ocr_05.png}
 
+ayrýca üstteki kýsaltma algoritmasý en iyi sonucu her zaman
+vermeyebilir. Kombinasyon derken üstteki örnek için bile $6^8 = 1,679,616$
+tane seçenekten bahediyoruz. Daha büyük bir sözlük, ve daha fazla LSTM
+adýmý için bu sayý astronomik boyutlara varabilir.
 
+Çözüm nedir? Seçenekler arasýndan uygun yolu bulup hesaplayan, ya da verili
+bir etiket için olurluk (likelihood) hesabý yapan bir yaklaþým var, buna
+baðlantýsal zamansal bedel (connectionist temporal cost) adý veriliyor,
+detaylar için [1,2,3]. CTC dinamik programlama kullanýr, ayrýca yolu
+hesaplarken Gizli Markod Modellerine benzer $\alpha,\beta$ fonksiyonlarý
+yaratýr, ve YSA öðrenimi baðlamýnda bu fonksiyonlar üzerinden gradyan
+hesabý mümkün oluyor, ve farklý boyuttaki girdi / çýktý arasýndaki uyuþma,
+eðitim iþte bu þekilde yapýlýyor.
 
+TensorFlow ile CTC
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-Birbirinden farklý boyutlarda olan iki dizini birbirine uydurmak için
-baðlantýsal zamansal bedel (connectionist temporal cost) fonksiyonu
-kullanýlýyor. 
+TF ile CTC hesabini gorelim. Alttaki ciktinin daha once semasini verdigimiz
+YSA'ya benzer bir yapinin son adimindan cikan softmax olasiliklari oldugunu
+dusunelim. Verinin satirlari her LSTM adimi, her kolon alfabedeki farkli
+bir karakter. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import tensorflow as tf
-
 train_inputs_0 = np.asarray(
     [[0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
      [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
@@ -96,23 +99,13 @@ train_inputs_0 = np.asarray(
      [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
      [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107]],
     dtype=np.float32)
+\end{minted}
 
-train_inputs_1 = np.asarray(
-    [[0.30176, 0.28562, 0.0831517, 0.0862751, 0.0816851, 0.161508],
-     [0.24082, 0.397533, 0.0557226, 0.0546814, 0.0557528, 0.19549],
-     [0.230246, 0.450868, 0.0389607, 0.038309, 0.0391602, 0.202456],
-     [0.280884, 0.429522, 0.0326593, 0.0339046, 0.0326856, 0.190345],
-     [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
-    dtype=np.float32)
+Bu yapý için mesela \verb![0, 1, 2, 1, 0]! çýktý dizisinin kaybý / hatasý
+nedir? 
 
-train_inputs_2 = np.asarray(
-    [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]],
-    dtype=np.float32)
-
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
 
 def sparse_tuple_from(sequences, dtype=np.int32):
     indices = []
@@ -124,10 +117,7 @@ def sparse_tuple_from(sequences, dtype=np.int32):
     values = np.asarray(values, dtype=dtype)
     shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
     return indices, values, shape
-\end{minted}
 
-
-\begin{minted}[fontsize=\footnotesize]{python}
 train_seq_len = [5]
 num_features = 6
 
@@ -140,36 +130,66 @@ logits3 = tf.transpose(logits2, (1, 0, 2))
 seq_len = tf.placeholder(tf.int32, [None])
 loss = tf.nn.ctc_loss(targets, logits3, seq_len)
 decoded, log_prob = tf.nn.ctc_greedy_decoder(logits3, seq_len)
-          
+
 with tf.Session() as sess:
 
      sess.run(tf.global_variables_initializer())
 
-     # Veri 0
      train_targets = sparse_tuple_from([[0, 1, 2, 1, 0]])     
      feed_t = { logits1: train_inputs_0, 
                 targets: train_targets, 
                 seq_len: train_seq_len }
      res = sess.run(loss, feed_t)     
      print u'kayýp', res
-     
-     feed_dec = { logits1: train_inputs_0, seq_len: train_seq_len }
-     decoded_res = sess.run(decoded, feed_dec)     
-     print 'dekode', decoded_res
+\end{minted}
 
-     # Veri 1
+\begin{verbatim}
+kayýp [ 7.27719784]
+\end{verbatim}
+
+Farklý veri, farklý çýktý,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+train_inputs_1 = np.asarray(
+    [[0.30176, 0.28562, 0.0831517, 0.0862751, 0.0816851, 0.161508],
+     [0.24082, 0.397533, 0.0557226, 0.0546814, 0.0557528, 0.19549],
+     [0.230246, 0.450868, 0.0389607, 0.038309, 0.0391602, 0.202456],
+     [0.280884, 0.429522, 0.0326593, 0.0339046, 0.0326856, 0.190345],
+     [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
+    dtype=np.float32)
+
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
      train_targets = sparse_tuple_from([[0, 1, 1, 0]])     
      feed_t = { logits1: train_inputs_1, 
                 targets: train_targets, 
                 seq_len: train_seq_len }
      res = sess.run(loss, feed_t)     
      print u'kayýp', res
-     
-     feed_dec = { logits1: train_inputs_1, seq_len: train_seq_len }
-     decoded_res = sess.run(decoded, feed_dec)     
-     print 'dekode', decoded_res
+\end{minted}
 
-     # Veri 2
+\begin{verbatim}
+kayýp [ 8.08572388]
+\end{verbatim}
+
+Þimdi ilginç bir veri, burada veri direk 2. karakter olsun diyor. O zaman
+buna uyan çýktýlar yüksek, uymayanlar alçak sonuç vermeli,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+train_inputs_2 = np.asarray(
+    [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]],
+    dtype=np.float32)
+
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
      train_targets = sparse_tuple_from([[2, 2, 2]]) 
      feed_t = { logits1: train_inputs_2, 
                 targets: train_targets, 
@@ -183,6 +203,29 @@ with tf.Session() as sess:
                 seq_len: train_seq_len }
      res = sess.run(loss, feed_t)     
      print u'kayýp', res
+\end{minted}
+
+\begin{verbatim}
+kayýp [ 7.21795845]
+kayýp [ 10.21795845]
+\end{verbatim}
+
+Dekode
+
+TF CTC ile dekode iþlemi de yapýlabilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}        
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     feed_dec = { logits1: train_inputs_0, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
+     
+     feed_dec = { logits1: train_inputs_1, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
      
      feed_dec = { logits1: train_inputs_2, seq_len: train_seq_len }
      decoded_res = sess.run(decoded, feed_dec)     
@@ -190,23 +233,21 @@ with tf.Session() as sess:
 \end{minted}
 
 \begin{verbatim}
-kayýp [ 7.27719784]
 dekode [SparseTensorValue(indices=array([[0, 0],
        [0, 1],
        [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
-kayýp [ 8.08572388]
 dekode [SparseTensorValue(indices=array([[0, 0],
        [0, 1],
        [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
-kayýp [ 7.21795845]
-kayýp [ 10.21795845]
 dekode [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]
 \end{verbatim}
 
+En son örnekte \verb!values=array([2])! sonucu geldi, yani dekode iþlemi
+doðru bir þekilde tek bir seçim yaptý. Bu seçim arka arkaya tekrarlanmýþ
+olacaktý tabii ki bu sebeple bir kez gösteriliyor, appleeee yerine apple
+demek gibi.
 
-
-
-
+[devam edecek]
 
 
 
