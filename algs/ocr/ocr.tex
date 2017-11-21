@@ -1,12 +1,66 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Optik Karakter Tanima, Yazi Tanima (Optical Character Recognition -OCR-)
+Optik Karakter Tanýma, Yazý Tanýma (Optical Character Recognition -OCR-)
 
-Ses tanýma problemi iki dizini birbiriyle uyuþturma problemi olarak
-görülebilir. Birbirinden farklý boyutlarda olan iki dizini birbirine
-uydurmak için baðlantýsal zamansal bedel (connectionist temporal cost)
-fonksiyonu kullanýlýyor. Detaylar [3]'de, [2] kodunu kullanarak alttaki
-örnek yazýldý, veri için [1].
+OCR problemi iki dizini birbiriyle uyuþturma problemi olarak
+görülebilir. Çoðunlukla tanýmak istediðimiz görüntü bir kelime, bir sayý
+dizisidir, ve girdi boyutlarý önceden tanýmlanýr, dýþarýda kalan görüntüler
+iþlenmez, eðer daha büyük kelimeler dizisi var ise görüntü iþleme yapýlarak
+parça parça kelimeler alýnmaya uðraþýlabilir. Neyse, bu anlatýmda farz
+ettiðimiz bir görüntü içinde bir kelime olacak. 
+
+Ýlk önce kelime görüntüsü ya da onu temsil eden (bir evriþim tabakasý
+üzerinden mesela) iþlenmiþ veriler parça parça, kesitler olarak
+alýnabilir. Ardýndan veri parçalarýnýn zamansal ilintilerini yakalayabilmek
+için veriler bir LSTM katmanýna verilebilir, ve her zaman adýmýndaki alfabe
+boyutundaki çýktýlar, bir vektör olarak, her hücrede belli bir harfin olma
+olasýlýðý olarak ayarlanabilir, ve eðitim verisi üzerinden tüm bu yapý
+eðitilir. 
+
+\includegraphics[width=30em]{ocr_01.png}
+
+Üstteki figürde Ýngilizce apple (elma) kelimesini görüyoruz. Görüntü
+geniþliði 128, yüksekliði 64 ve üç kanal var, bu kanallar her renk için
+R,G,B olabilir, ya da baþka bir format. Ýlk önce evriþimsel sýnýr aðý
+özellik çýkartma  (CNN feature extraction) katmaný ile özellik bulmaya
+uðraþýlýyor, buradan (4,8,4) boyutunda bir tensor elde ediliyor. Bu tensor
+(16,8) boyutuna getiriliyor, bu yeni tensor'daki her kolon (biri yeþille
+iþaretli) önceki tensorda bir parçaya tekabül eder, yani kelime
+görüntüsünün bir parçasýna. 
+
+Ardýndan þekillendirme (reshape) sonrasý alýnan yeni tensoru parça parça
+LSTM tabakasýna veriyoruz, ilk LSTM hücresi mesela alttaki gibi,
+
+\includegraphics[width=30em]{ocr_02.png}
+
+LSTM sonrasý tamamen baðlanmýþ (fully-connected) tabaka ve softmax ile
+alfabe tahmini üretiliyor. Bu örnekte alfabede 6 karakter var, bu sebeple
+vektör (6,1) boyutlu, karakterler 'a','e','l','p','z','-'. En son '-'
+karakteri ``boþ karakter'' demek, boþ karakterin niye lazým olduðunu
+göreceðiz. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Birbirinden farklý boyutlarda olan iki dizini birbirine uydurmak için
+baðlantýsal zamansal bedel (connectionist temporal cost) fonksiyonu
+kullanýlýyor. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
