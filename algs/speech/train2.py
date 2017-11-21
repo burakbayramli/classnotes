@@ -82,6 +82,7 @@ if __name__ == "__main__":
 
         shape = tf.shape(inputs)
         batch_s, max_time_steps = shape[0], shape[1]
+        print 'batch_s', batch_s
 
         # Reshaping to apply the same weights over the timesteps
         outputs = tf.reshape(outputs, [-1, num_hidden])
@@ -96,15 +97,15 @@ if __name__ == "__main__":
         b = tf.Variable(tf.constant(0., shape=[num_classes]))
 
         # Doing the affine projection
-        logits = tf.matmul(outputs, W) + b
+        logits1 = tf.matmul(outputs, W) + b
 
         # Reshaping back to the original shape
-        logits = tf.reshape(logits, [batch_s, -1, num_classes])
+        logits2 = tf.reshape(logits1, [batch_s, -1, num_classes])
 
         # Time major
-        logits = tf.transpose(logits, (1, 0, 2))
+        logits3 = tf.transpose(logits2, (1, 0, 2))
 
-        loss = tf.nn.ctc_loss(targets, logits, seq_len)
+        loss = tf.nn.ctc_loss(targets, logits3, seq_len)
         cost = tf.reduce_mean(loss)
 
         optimizer = tf.train.MomentumOptimizer(learning_rate=0.005,
@@ -112,7 +113,7 @@ if __name__ == "__main__":
 
         # Option 2: tf.contrib.ctc.ctc_beam_search_decoder
         # (it's slower but you'll get better results)
-        decoded, log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len)
+        decoded, log_prob = tf.nn.ctc_greedy_decoder(logits3, seq_len)
 
         # Inaccuracy: label error rate
         ler = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32),
@@ -133,12 +134,23 @@ if __name__ == "__main__":
                         targets: train_targets,
                         seq_len: train_seq_len}
                 
-                res = session.run(logits, feed)
-                #print ('targets ' + str(train_targets))
-                #print ('inputs ' + str(train_inputs.shape))
-                #print ('logits ' + str(res.shape))
-                #print ('logits ' + str(res))
-                #exit()
+                res1 = session.run(logits1, feed)
+                res2 = session.run(logits2, feed)
+                res3 = session.run(logits3, feed)
+                batch_s_res = session.run(batch_s, feed)
+                lossres = session.run(loss, feed)
+                print 'seqlen', train_seq_len
+                print 'loss', lossres
+                print ('targets ' + str(train_targets))
+                print 'batch_s ', batch_s_res
+                print ('inputs ' + str(train_inputs.shape))
+                print ('logits1 ' + str(res1.shape))
+                print ('logits2 ' + str(res2.shape))
+                print ('logits3 ' + str(res3.shape))
+                print ('logits1 ' + str(res1))
+                print ('logits2 ' + str(res2))
+                print ('logits3 ' + str(res3))
+                exit()
                 
                 batch_cost, _ = session.run([cost, optimizer], feed)
                 train_cost += batch_cost * batch_size
