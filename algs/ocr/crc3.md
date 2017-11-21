@@ -40,6 +40,16 @@ train_inputs_1 = np.asarray(
      [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
     dtype=np.float32)
 
+train_targets_2 = [0, 1, 1, 0]
+
+train_inputs_2 = np.asarray(
+    [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]],
+    dtype=np.float32)
+
 ```
 
 ```python
@@ -56,20 +66,27 @@ logits2 = tf.reshape(logits1, [1, -1, num_features])
 logits3 = tf.transpose(logits2, (1, 0, 2))
 seq_len = tf.placeholder(tf.int32, [None])
 loss = tf.nn.ctc_loss(targets, logits3, seq_len)
+decoded, log_prob = tf.nn.ctc_greedy_decoder(logits3, seq_len)
           
 with tf.Session() as sess:
 
      sess.run(tf.global_variables_initializer())
 
-     train_targets = sparse_tuple_from([train_targets_1])
-     feed = { logits1: train_inputs_1, targets: train_targets, seq_len: train_seq_len }
-     res3 = sess.run(loss, feed)
+     train_targets = sparse_tuple_from([train_targets_2])
+     
+     feed = { logits1: train_inputs_2, targets: train_targets, seq_len: train_seq_len }
+     res3 = sess.run(loss, feed)     
      print res3
+     
+     feed_dec = { logits1: train_inputs_2, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print decoded_res
 
 ```
 
 ```text
-[ 8.08572388]
+[ 10.21795845]
+[SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]
 ```
 
 

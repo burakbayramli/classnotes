@@ -2,6 +2,120 @@
 \begin{document}
 Optik Karakter Tanima, Yazi Tanima (Optical Character Recognition -OCR-)
 
+Ses tanýma problemi iki dizini birbiriyle uyuþturma problemi olarak
+görülebilir. Birbirinden farklý boyutlarda olan iki dizini birbirine
+uydurmak için baðlantýsal zamansal bedel (connectionist temporal cost)
+fonksiyonu kullanýlýyor. Detaylar [3]'de, [2] kodunu kullanarak alttaki
+örnek yazýldý, veri için [1].
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+train_inputs_0 = np.asarray(
+    [[0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
+     [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
+     [0.0357786, 0.633813, 0.321418, 0.00249248, 0.00272882, 0.0037688],
+     [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
+     [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107]],
+    dtype=np.float32)
+
+train_inputs_1 = np.asarray(
+    [[0.30176, 0.28562, 0.0831517, 0.0862751, 0.0816851, 0.161508],
+     [0.24082, 0.397533, 0.0557226, 0.0546814, 0.0557528, 0.19549],
+     [0.230246, 0.450868, 0.0389607, 0.038309, 0.0391602, 0.202456],
+     [0.280884, 0.429522, 0.0326593, 0.0339046, 0.0326856, 0.190345],
+     [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
+    dtype=np.float32)
+
+train_inputs_2 = np.asarray(
+    [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]],
+    dtype=np.float32)
+
+
+def sparse_tuple_from(sequences, dtype=np.int32):
+    indices = []
+    values = []
+    for n, seq in enumerate(sequences):
+        indices.extend(zip([n] * len(seq), range(len(seq))))
+        values.extend(seq)
+    indices = np.asarray(indices, dtype=np.int64)
+    values = np.asarray(values, dtype=dtype)
+    shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
+    return indices, values, shape
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+train_seq_len = [5]
+num_features = 6
+
+tf.reset_default_graph()
+
+targets = tf.sparse_placeholder(tf.int32)
+logits1 = tf.placeholder(tf.float32, [None, num_features] )
+logits2 = tf.reshape(logits1, [1, -1, num_features])
+logits3 = tf.transpose(logits2, (1, 0, 2))
+seq_len = tf.placeholder(tf.int32, [None])
+loss = tf.nn.ctc_loss(targets, logits3, seq_len)
+decoded, log_prob = tf.nn.ctc_greedy_decoder(logits3, seq_len)
+          
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     # Veri 0
+     train_targets = sparse_tuple_from([[0, 1, 2, 1, 0]])     
+     feed_t = { logits1: train_inputs_0, targets: train_targets, seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+     
+     feed_dec = { logits1: train_inputs_0, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
+
+     # Veri 1
+     train_targets = sparse_tuple_from([[0, 1, 1, 0]])     
+     feed_t = { logits1: train_inputs_1, targets: train_targets, seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+     
+     feed_dec = { logits1: train_inputs_1, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
+
+     # Veri 2
+     train_targets = sparse_tuple_from([[2, 2, 2]]) 
+     feed_t = { logits1: train_inputs_2, targets: train_targets, seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+
+     train_targets = sparse_tuple_from([[0, 1, 1, 0]]) 
+     feed_t = { logits1: train_inputs_2, targets: train_targets, seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+     
+     feed_dec = { logits1: train_inputs_2, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
+\end{minted}
+
+\begin{verbatim}
+kayýp [ 7.27719784]
+dekode [SparseTensorValue(indices=array([[0, 0],
+       [0, 1],
+       [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
+kayýp [ 8.08572388]
+dekode [SparseTensorValue(indices=array([[0, 0],
+       [0, 1],
+       [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
+kayýp [ 7.21795845]
+kayýp [ 10.21795845]
+dekode [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]
+\end{verbatim}
 
 
 
@@ -13,12 +127,11 @@ Optik Karakter Tanima, Yazi Tanima (Optical Character Recognition -OCR-)
 
 
 
+[1] Graves, {\em Supervised Sequence Labelling with Recurrent Neural Networks}, \url{https://www.cs.toronto.edu/~graves/preprint.pdf}
 
+[2] Graves, {\em How to build a recognition system (Part 2): CTC Loss}, \url{https://docs.google.com/presentation/d/12gYcPft9_4cxk2AD6Z6ZlJNa3wvZCW1ms31nhq51vMk}
 
-
-
-
-
+[3] Graves, {\em How to build a recognition system (Part 1): CTC Loss}, \url{https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI}
 
 
 \end{document}
