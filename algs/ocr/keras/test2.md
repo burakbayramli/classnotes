@@ -11,6 +11,7 @@ from keras.optimizers import SGD
 from keras.utils.data_utils import get_file
 from keras.preprocessing import image
 import keras.callbacks
+import util
 
 def ctc_lambda_func(args):
     y_pred, labels, input_length, label_length = args
@@ -114,24 +115,24 @@ m = train()
 ```text
 (?, 128, 64, 1)
 (3, 3)
-Tensor("conv1_6/Relu:0", shape=(?, 128, 64, 16), dtype=float32)
+Tensor("conv1_1/Relu:0", shape=(?, 128, 64, 16), dtype=float32)
 2
-Tensor("max1_6/MaxPool:0", shape=(?, 64, 32, 16), dtype=float32)
+Tensor("max1_1/MaxPool:0", shape=(?, 64, 32, 16), dtype=float32)
 (3, 3)
 relu
-Tensor("conv2_6/Relu:0", shape=(?, 64, 32, 16), dtype=float32)
-Tensor("max2_6/MaxPool:0", shape=(?, 32, 16, 16), dtype=float32)
-Tensor("reshape_6/Reshape:0", shape=(?, 32, 256), dtype=float32)
+Tensor("conv2_1/Relu:0", shape=(?, 64, 32, 16), dtype=float32)
+Tensor("max2_1/MaxPool:0", shape=(?, 32, 16, 16), dtype=float32)
+Tensor("reshape_1/Reshape:0", shape=(?, 32, 256), dtype=float32)
 32
-Tensor("reshape_6/Reshape:0", shape=(?, 32, 256), dtype=float32)
-Tensor("dense1_6/Relu:0", shape=(?, 32, 32), dtype=float32)
+Tensor("reshape_1/Reshape:0", shape=(?, 32, 256), dtype=float32)
+Tensor("dense1_1/Relu:0", shape=(?, 32, 32), dtype=float32)
 rnn_size 512
-Tensor("gru1_6/transpose_1:0", shape=(?, ?, 512), dtype=float32)
-Tensor("gru1_b_6/transpose_1:0", shape=(?, ?, 512), dtype=float32)
-Tensor("add_7/add:0", shape=(?, ?, 512), dtype=float32)
-Tensor("gru2_6/transpose_1:0", shape=(?, ?, 512), dtype=float32)
-Tensor("gru2_b_6/transpose_1:0", shape=(?, ?, 512), dtype=float32)
-Tensor("dense2_5/add:0", shape=(?, 32, 63), dtype=float32)
+Tensor("gru1_1/transpose_1:0", shape=(?, ?, 512), dtype=float32)
+Tensor("gru1_b_1/transpose_1:0", shape=(?, ?, 512), dtype=float32)
+Tensor("add_2/add:0", shape=(?, ?, 512), dtype=float32)
+Tensor("gru2_1/transpose_1:0", shape=(?, ?, 512), dtype=float32)
+Tensor("gru2_b_1/transpose_1:0", shape=(?, ?, 512), dtype=float32)
+Tensor("dense2/add:0", shape=(?, 32, 63), dtype=float32)
 ____________________________________________________________________________________________________
 Layer (type)                     Output Shape          Param #     Connected to                     
 ====================================================================================================
@@ -153,17 +154,17 @@ gru1 (GRU)                       (None, 32, 512)       837120      dense1[0][0]
 ____________________________________________________________________________________________________
 gru1_b (GRU)                     (None, 32, 512)       837120      dense1[0][0]                     
 ____________________________________________________________________________________________________
-add_7 (Add)                      (None, 32, 512)       0           gru1[0][0]                       
+add_2 (Add)                      (None, 32, 512)       0           gru1[0][0]                       
                                                                    gru1_b[0][0]                     
 ____________________________________________________________________________________________________
-gru2 (GRU)                       (None, 32, 512)       1574400     add_7[0][0]                      
+gru2 (GRU)                       (None, 32, 512)       1574400     add_2[0][0]                      
 ____________________________________________________________________________________________________
-gru2_b (GRU)                     (None, 32, 512)       1574400     add_7[0][0]                      
+gru2_b (GRU)                     (None, 32, 512)       1574400     add_2[0][0]                      
 ____________________________________________________________________________________________________
-concatenate_6 (Concatenate)      (None, 32, 1024)      0           gru2[0][0]                       
+concatenate_1 (Concatenate)      (None, 32, 1024)      0           gru2[0][0]                       
                                                                    gru2_b[0][0]                     
 ____________________________________________________________________________________________________
-dense2 (Dense)                   (None, 32, 63)        64575       concatenate_6[0][0]              
+dense2 (Dense)                   (None, 32, 63)        64575       concatenate_1[0][0]              
 ____________________________________________________________________________________________________
 softmax (Activation)             (None, 32, 63)        0           dense2[0][0]                     
 ====================================================================================================
@@ -171,9 +172,9 @@ Total params: 4,898,319
 Trainable params: 4,898,319
 Non-trainable params: 0
 ____________________________________________________________________________________________________
-labels Tensor("the_labels_4:0", shape=(?, 15), dtype=float32)
-Tensor("input_length_4:0", shape=(?, 1), dtype=int64)
-label_length Tensor("label_length_4:0", shape=(?, 1), dtype=int64)
+labels Tensor("the_labels:0", shape=(?, 15), dtype=float32)
+Tensor("input_length:0", shape=(?, 1), dtype=int64)
+label_length Tensor("label_length:0", shape=(?, 1), dtype=int64)
 ```
 
     
