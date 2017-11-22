@@ -9,6 +9,16 @@ from keras.optimizers import SGD
 from keras.utils.data_utils import get_file
 from keras.preprocessing import image
 import keras.callbacks
+import pandas as pd
+import numpy as np
+import util
+
+def ctc_lambda_func(args):
+    y_pred, labels, input_length, label_length = args
+    # the 2 is critical here since the first couple outputs of the RNN
+    # tend to be garbage:
+    y_pred = y_pred[:, 2:, :]
+    return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
 def train():
     # Input Parameters
@@ -73,5 +83,47 @@ def train():
     gru_2b = GRU(rnn_size, return_sequences=True, go_backwards=True, kernel_initializer='he_normal', name='gru2_b')(gru1_merged)
     print gru_2b
 
-train()
-    
+    inner = Dense(len(util.all_chars)+1, kernel_initializer='he_normal',
+                  name='dense2')(concatenate([gru_2, gru_2b]))
+    print inner
+    y_pred = Activation('softmax', name='softmax')(inner)
+    Model(inputs=input_data, outputs=y_pred).summary()    
+
+    labels = Input(name='the_labels', shape=[util.absolute_max_string_len], dtype='float32')
+    print 'labels', labels
+    input_length = Input(name='input_length', shape=[1], dtype='int64')
+    print input_length
+    label_length = Input(name='label_length', shape=[1], dtype='int64')
+    print 'label_length', label_length
+
+    loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')([y_pred, labels, input_length, label_length])
+
+    # clipnorm seems to speeds up convergence
+    sgd = SGD(lr=0.02, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
+
+    model = Model(inputs=[input_data, labels, input_length, label_length], outputs=loss_out)
+
+    # the loss calc occurs elsewhere, so use a dummy lambda func for the loss
+    model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
+    return model    
+
+m = train()
+
+batch_size = 2
+outputs = {'ctc': np.ones((batch_size,1)) * batch_size }
+print outputs
+import util
+data = util.get_minibatch(batch_size)
+m.fit(x=data[0], y=outputs, batch_size=batch_size, epochs=1)
+
+
+
+
+
+
+
+
+
+
+
+

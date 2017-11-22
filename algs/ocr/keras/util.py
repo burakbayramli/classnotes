@@ -25,17 +25,23 @@ def get_minibatch(batch_size=1):
     res = {}
     source_str = []
     the_labels = np.ones((batch_size,absolute_max_string_len))
-    vals = np.array(np.zeros((batch_size,w,h,1)))
+    the_input = np.zeros((batch_size,w,h,1))
+    label_length = np.zeros((batch_size,1))
+    input_length = np.zeros((batch_size,1))
     for i in range(batch_size):
     	(idxs,str) = randomstring()
     	tmp = paint_text(str,w,h,rotate=True,ud=True,multi_fonts=True)
-    	vals[i, :] = tmp.reshape((w,h,1))
+    	the_input[i, :] = tmp.reshape((w,h,1))
+        label_length[i, 0] = len(str)
+        input_length[i, 0] = 30.
         for j in range(len(idxs)): the_labels[i, j] = idxs[j]
         source_str.append(str)
 
-    res['the_input'] = vals
+    res['the_input'] = the_input
     res['the_labels'] = the_labels
     res['source_str'] = source_str
+    res['label_length'] = label_length
+    res['input_length'] = input_length
     return (res,)
 
 
@@ -53,7 +59,8 @@ def speckle(img):
     return img_speck
 
 
-# Redundant instance of paint_text only kept for generation of empty samples within the module.
+# Redundant instance of paint_text only kept for generation of empty
+# samples within the module.
 
 def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
@@ -82,6 +89,8 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
             top_left_y = np.random.randint(0, int(max_shift_y))
         else:
             top_left_y = h // 2
+        #print top_left_x
+        #print top_left_y
         context.move_to(top_left_x - int(box[0]), top_left_y - int(box[1]))
         context.set_source_rgb(0, 0, 0)
         context.show_text(text)

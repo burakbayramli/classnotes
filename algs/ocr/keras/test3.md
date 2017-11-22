@@ -42,10 +42,10 @@ import util
 
 res = util.get_minibatch()
 print 'source str',res[0]['source_str']
-#print 'label_length',res[0]['label_length']
+print 'label_length',res[0]['label_length']
 print 'the_labels',res[0]['the_labels']
 print 'the_labels',res[0]['the_labels'].shape
-#print 'input_length',res[0]['input_length']
+print 'input_length',res[0]['input_length']
 print 'the_input',res[0]['the_input'].shape
 
 img = res[0]['the_input']
@@ -55,10 +55,12 @@ plt.savefig('out1.png')
 ```
 
 ```text
-source str [u'pemetmutnnwsi']
-the_labels [[ 15.   4.  12.   4.  19.  12.  20.  19.  13.  13.  22.  18.   8.   1.
+source str [u'qyaqtaqorbs']
+label_length [[ 11.]]
+the_labels [[ 16.  24.   0.  16.  19.   0.  16.  14.  17.   1.  18.   1.   1.   1.
     1.   1.]]
 the_labels (1, 16)
+input_length [[ 30.]]
 the_input (1, 128, 64, 1)
 ```
 
