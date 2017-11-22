@@ -31,7 +31,7 @@ import util
 w = 512; h = 64
 num_classes = 68
 
-(s,t) = util.randomstring()
+(t,s) = util.randomstring()
 print s, t
 res = util.paint_text(s,512,64,rotate=True,ud=True,multi_fonts=True)
 res = res.reshape(64,512)
@@ -45,7 +45,7 @@ print dataset.shape
 ```
 
 ```text
-5.5.1998 date_due
+pIm6idNRDQwTn [15, 34, 12, 58, 8, 3, 39, 43, 29, 42, 22, 45, 13]
 (64, 512)
 (1, 512, 64, 1)
 ```

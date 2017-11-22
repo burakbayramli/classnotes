@@ -6,8 +6,6 @@ import editdistance
 import keras.callbacks
 import numpy as np
 import unicodedata
-from synthset import size_plainpad
-from synthset import CropImageIterator
 import random, string
 all_chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
 all_chars_idx = range(len(all_chars))
