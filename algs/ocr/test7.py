@@ -4,6 +4,7 @@ import numpy as np
 import util
 import matplotlib.pyplot as plt
 
+num_epochs = 1
 w = 512; h = 64
 num_filters = 16
 hidden_layer_size = 512
@@ -90,11 +91,20 @@ targets = tf.sparse_placeholder(tf.int32)
 seq_len = tf.placeholder(tf.int32, [None])
 loss = tf.nn.ctc_loss(targets, rnn_logits, seq_len)
 
-exit()
+cost = tf.reduce_mean(loss)
 
-#with tf.Session() as sess:
-#     sess.run(tf.global_variables_initializer())
-#     output = sess.run(rnnout, feed_dict={inputs: train_data, train_targets} )
+optimizer = tf.train.MomentumOptimizer(learning_rate=0.005,
+                                       momentum=0.9).minimize(cost)
+
+train_seq_len = [batch_size]
+
+with tf.Session() as sess:
+     sess.run(tf.global_variables_initializer())
+
+     for curr_epoch in range(num_epochs):
+       train_data, train_targets = get_minibatch(batch_size=10)
+       feed_dict={inputs: train_data, targets: train_targets}
+       batch_cost, batch_opt = sess.run([cost, optimizer], feed_dict)
 
 
 
