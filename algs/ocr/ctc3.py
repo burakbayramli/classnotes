@@ -49,6 +49,10 @@ with tf.Session() as sess:
      train_targets = sparse_tuple_from([train_targets])
      print train_targets
      feed = { logits1: train_inputs, targets: train_targets, seq_len: train_seq_len }
+     res1 = sess.run(logits1, feed)
+     print res1.shape
+     res2 = sess.run(logits2, feed)
+     print res2.shape
      res3 = sess.run(loss, feed)
      print res3
 

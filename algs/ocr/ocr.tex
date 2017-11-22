@@ -2,31 +2,32 @@
 \begin{document}
 Optik Karakter Tanýma, Yazý Tanýma (Optical Character Recognition -OCR-)
 
-OCR problemi iki dizini birbiriyle uyuþturma problemi olarak
-görülebilir. Çoðunlukla tanýmak istediðimiz görüntü bir kelime, bir sayý
-dizisidir, ve girdi boyutlarý önceden tanýmlanýr, dýþarýda kalan görüntüler
-iþlenmez, eðer daha büyük kelimeler dizisi var ise görüntü iþleme yapýlarak
-parça parça kelimeler alýnmaya uðraþýlabilir. Neyse, bu anlatýmda farz
-ettiðimiz bir görüntü içinde bir kelime olacak. 
+OCR, iki dizini birbiriyle uyuþturma problemi olarak görülebilir. Dizi
+derken neden bahsetmek istediðimi anlatmaya uðrasayým. Çoðunlukla tanýmak
+istediðimiz görüntü bir kelime, bir sayý dizisidir, ve bu dizi ufak ya da
+büyük bir kelime olabilir. Girdi ise boyutlarý önceden tanýmlanan görüntüyü
+temsil eden veri parçalarý olacaktýr, bu görüntü bir kelimeye
+odaklanabilir, görüntü aktarýlmadan önce o kelime bir kare içine alýnmaya
+çalýþýr.
 
-Ýlk önce kelime görüntüsü ya da onu temsil eden (bir evriþim tabakasý
-üzerinden mesela) iþlenmiþ veriler parça parça, kesitler olarak
-alýnabilir. Ardýndan veri parçalarýnýn zamansal ilintilerini yakalayabilmek
-için veriler bir LSTM katmanýna verilebilir, ve her zaman adýmýndaki alfabe
-boyutundaki çýktýlar, bir vektör olarak, her hücrede belli bir harfin olma
-olasýlýðý olarak ayarlanabilir, ve eðitim verisi üzerinden tüm bu yapý
-eðitilir. 
+Kelime görüntüsünü bir evriþim tabakasý üzerinden mesela iþlenmiþ veriler
+olarak parça parça, kesitler olarak alabiliriz. Ardýndan veri parçalarýnýn
+zamansal ilintilerini yakalayabilmek için onlarý bir LSTM katmanýna
+verebiliriz, ve her zaman adýmýndaki alfabe boyutundaki çýktýlar, bir
+vektör olarak, her hücrede belli bir harfin olma olasýlýðý olarak
+ayarlanabilir. Eðer en son katmandan sonra uygun bir hata fonksiyonu
+tanýmlayabilirsek bilinen etiketli kelimeler, onlarýn görüntüsünü içeren
+eðitim verisi üzerinden tüm bu yapýyý eðitebiliriz.
 
 \includegraphics[width=30em]{ocr_01.png}
 
 Üstteki figürde Ýngilizce apple (elma) kelimesini görüyoruz. Girdi görüntü
 (input image) geniþliði 128, yüksekliði 64 ve üç kanal var, bu kanallar her
-renk için R,G,B olabilir, ya da baþka bir format. Ýlk önce evriþimsel sinir
-aðý özellik çýkartma (CNN feature extraction) katmaný ile özellik bulmaya
-uðraþýlýyor, buradan (4,8,4) boyutunda bir tensor elde ediliyor. Bu tensor
-(16,8) boyutuna getiriliyor, bu yeni tensor'daki her kolon (biri yeþille
-iþaretli) önceki tensorda bir parçaya tekabül eder, yani kelime
-görüntüsünün bir parçasýna.
+renk için R,G,B olabilir. Ýlk önce evriþimsel sinir aðý özellik çýkartma
+(CNN feature extraction) katmaný ile özellik bulmaya uðraþýlýyor, buradan
+(4,8,4) boyutunda bir tensor elde ediliyor. Bu tensor (16,8) boyutuna
+getiriliyor, bu yeni tensor'daki her kolon (biri yeþille iþaretli) önceki
+tensorda bir parçaya tekabül eder, yani kelime görüntüsünün bir parçasýna.
 
 Ardýndan þekillendirme (reshape) sonrasý alýnan yeni tensoru parça parça
 LSTM tabakasýna veriyoruz, ilk LSTM hücresi mesela alttaki gibi,
@@ -37,18 +38,20 @@ LSTM sonrasý tamamen baðlanmýþ (fully-connected) tabaka ve softmax ile
 alfabe tahmini üretiliyor. Bu örnekte alfabede 6 karakter var, bu sebeple
 vektör (6,1) boyutlu, karakterler 'a','e','l','p','z','-'. En son '-'
 karakteri ``boþ karakter'' demek, boþ karakterin niye lazým olduðunu
-göreceðiz. Vektördeki ilk hücre $y_a^1$ 'a' o noktada karakterinin olma
-olasýlýðý. Diðerleri o birinci hücre için aþaðý doðru $y_e^1$, $y_l^1$,
-vs. diye devam edecek. Þimdi tüm LSTM hücreleri sonrasý olan resme bakalým,
+göreceðiz. Vektördeki ilk hücre $y_a^1$ yani 'a', o noktada 'a'
+karakterinin olma olasýlýðý. Diðerleri o birinci hücre için aþaðý doðru
+$y_e^1$, $y_l^1$, vs. diye devam edecek. Þimdi tüm LSTM hücrelerini iceren
+resme bakalým,
 
 \includegraphics[width=35em]{ocr_03.png}
 
-Þimdi elimizde 8 tane 6 boyutlu softmax vektörü var. Þimdi iki soru var:
-ilki YSA eðitimi baðlamýnda nasýl bir kayýp fonksiyonu bulalým ki uyan
-kelimeler için az, kötü uyanlar için yüksek rakam üretsin, ikincisi farklý
-boyutlardaki iki vektörün birbirine uymasý ne demektir? Tüm bunlar tabii ki
-üstteki softmax vektörlerini nasýl dekode edip bir kelime üretiriz sorusu
-ile yakýn alakalý. 
+Þimdi elimizde 8 tane 6 boyutlu softmax vektörü var. 
+
+Bu noktada iki sorumuz var: ilki YSA eðitimi baðlamýnda nasýl bir kayýp
+fonksiyonu bulalým ki uyan kelimeler için az, kötü uyanlar için yüksek
+rakam üretsin, ikincisi farklý boyutlardaki iki vektörün birbirine uymasý
+ne demektir? Tüm bunlar tabii ki üstteki softmax vektörlerini nasýl dekode
+edip bir kelime üretiriz sorusu ile yakýn alakalý.
 
 Uyum konusu önemli çünkü el yazýsý, ya da font seçimi dolasýyla bazý
 karakterler diðerlerinden daha fazla yer tutuyor olabilir. Ayný þey ses
@@ -56,21 +59,23 @@ tanýma için de geçerli, ``merhaba'' derken kimisi ``meeeerhaba'' demiþ
 olabilir, burada 'e' harfinden daha fazla ses verisi alýnacaktýr, ama o
 noktada üzerinde olunan harf deðiþmemiþtir.
 
-Dekode için ilk yaklaþým her vektör için en yüksek olasýlýktaki hücreye
-tekabül eden karakteri seçmek (find the most probable symbol), sonra bir ek
-iþlem tabakasýna giderek bazý elemeler, düzeltmeler yaparak bir kelimeye
-eriþmeye uðraþmak. Mesela en olasýlý karakter seçimi sonrasý arka arka
-gelen tekrar eden harfleri çýkartýrýz, sonra boþ karakteri çýkartýrýz,
+Dekode için akla gelebilecek ilk yaklaþým her vektör için en yüksek
+olasýlýktaki hücreye tekabül eden karakteri seçmek (find the most probable
+symbol), sonra bir ek iþlem tabakasýna giderek bazý elemeler, düzeltmeler
+yaparak bir kelimeye eriþmeye uðraþmak. Mesela en olasýlý karakter seçimi
+sonrasý arka arka gelen tekrar eden harfleri çýkartýrýz, sonra boþ
+karakteri çýkartýrýz,
 
 \includegraphics[width=37em]{ocr_04.png}
 
 Tüm bunlar oldukca basit görünüyor. Fakat tüm bu iþlemleri bir kayýp
-fonksiyonu olarak kullanmak istersek iþler karýþýyor. Çünkü pek çok farklý
-gidiþ yolu var, tüm kombinasyonlarý iþlemek zor,
+fonksiyonu olarak kullanmak istersek iþler karýþýyor. Çünkü kelime bulmaya
+uðraþýrken softmax'lerde baþlangýçtan sona pek çok farklý gidiþ yolu var,
+tüm kombinasyonlarý iþlemek zor.
 
 \includegraphics[width=37em]{ocr_05.png}
 
-ayrýca üstteki kýsaltma algoritmasý en iyi sonucu her zaman
+Ayrýca üstteki kýsaltma algoritmasý en iyi sonucu da her zaman
 vermeyebilir. Kombinasyon derken üstteki örnek için bile $6^8 = 1,679,616$
 tane seçenekten bahediyoruz. Daha büyük bir sözlük, ve daha fazla LSTM
 adýmý için bu sayý astronomik boyutlara varabilir.
@@ -86,9 +91,9 @@ eðitim iþte bu þekilde yapýlýyor.
 
 TensorFlow ile CTC
 
-TF ile CTC hesabini gorelim. Alttaki ciktinin daha once semasini verdigimiz
-YSA'ya benzer bir yapinin son adimindan cikan softmax olasiliklari oldugunu
-dusunelim. Verinin satirlari her LSTM adimi, her kolon alfabedeki farkli
+TF ile CTC hesabýný görelim. Alttaki çýktýnýn daha önce þemasýný verdiðimiz
+YSA'ya benzer bir yapýnýn son adýmýndan çýkan softmax olasýlýklarý olduðunu
+düþünelim. Verinin satýrlarý her LSTM adýmý, her kolon alfabedeki farklý
 bir karakter. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -101,8 +106,8 @@ train_inputs_0 = np.asarray(
     dtype=np.float32)
 \end{minted}
 
-Bu yapý için mesela \verb![0, 1, 2, 1, 0]! çýktý dizisinin kaybý / hatasý
-nedir? 
+Bu yapý üzerinde için mesela \verb![0, 1, 2, 1, 0]! dizisini kontrol
+etmemiz istense dizinin kaybý / hatasý nedir?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -243,9 +248,9 @@ dekode [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shap
 \end{verbatim}
 
 En son örnekte \verb!values=array([2])! sonucu geldi, yani dekode iþlemi
-doðru bir þekilde tek bir seçim yaptý. Bu seçim arka arkaya tekrarlanmýþ
-olacaktý tabii ki bu sebeple bir kez gösteriliyor, appleeee yerine apple
-demek gibi.
+doðru bir þekilde tüm adýmlar için tek bir seçim olan 2 seçimini yaptý. Bu
+seçim arka arkaya tekrarlanmýþ olacaktý tabii ki bu sebeple bir kez
+gösteriliyor, appleeee yerine apple demek gibi.
 
 [devam edecek]
 

@@ -45,7 +45,7 @@ print dataset.shape
 ```
 
 ```text
-CZ554674000055722483732 iban
+5.5.1998 date_due
 (64, 512)
 (1, 512, 64, 1)
 ```
@@ -114,12 +114,16 @@ rnn_logits = tf.layers.dense( rnnout, num_classes+1,
                               bias_initializer=tf.constant_initializer(value=0.0),
                               name='logits')
 
-print rnn_logits.shape
+print 'logits', rnn_logits.shape
 
-#loss = ctc_loss_layer(rnn_logits,label,sequence_length) 
+#loss = ctc_loss_layer(rnn_logits,label,sequence_length)
+targets = tf.sparse_placeholder(tf.int32)
+seq_len = tf.placeholder(tf.int32, [None])
+loss = tf.nn.ctc_loss(targets, rnn_logits, seq_len)
 
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
+     #train_targets = sparse_tuple_from([train_targets_2])
      output = sess.run(rnnout, feed_dict={inputs: dataset})
 ```
 
@@ -129,7 +133,7 @@ h_pool2 Tensor("MaxPool_1:0", shape=(?, 512, 64, 16), dtype=float32)
 h_pool2_flat Tensor("Reshape:0", shape=(?, 32, 256), dtype=float32)
 W_fc1 Tensor("fully_connected/Relu:0", shape=(?, 32, 32), dtype=float32)
 rnnshape (?, 32, 512)
-(?, 32, 69)
+logits (?, 32, 69)
 ```
 
 

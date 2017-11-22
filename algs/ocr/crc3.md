@@ -75,8 +75,14 @@ with tf.Session() as sess:
      train_targets = sparse_tuple_from([train_targets_2])
      
      feed = { logits1: train_inputs_2, targets: train_targets, seq_len: train_seq_len }
+     res1 = sess.run(logits1, feed)     
+     #print res1
+     print logits1.shape
+     res2 = sess.run(logits2, feed)     
+     #print res2
+     print logits2.shape
      res3 = sess.run(loss, feed)     
-     print res3
+     #print res3
      
      feed_dec = { logits1: train_inputs_2, seq_len: train_seq_len }
      decoded_res = sess.run(decoded, feed_dec)     
@@ -85,6 +91,18 @@ with tf.Session() as sess:
 ```
 
 ```text
+[[ 0.  0.  1.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.]]
+(?, 6)
+[[[ 0.  0.  1.  0.  0.  0.]
+  [ 0.  0.  1.  0.  0.  0.]
+  [ 0.  0.  1.  0.  0.  0.]
+  [ 0.  0.  1.  0.  0.  0.]
+  [ 0.  0.  1.  0.  0.  0.]]]
+(1, ?, 6)
 [ 10.21795845]
 [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]
 ```
