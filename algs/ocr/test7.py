@@ -22,13 +22,14 @@ def sparse_tuple_from(sequences, dtype=np.int32):
     return indices, values, shape
 
 def get_minibatch(batch_size=1):
-    vals = []; labels = []
+    vals = []; labels = []; seq_lens = []
     for i in range(batch_size):
     	(idxs,str) = util.randomstring()
     	res = util.paint_text(str,w,h,rotate=True,ud=True,multi_fonts=True)
     	vals.append(res)    
     	labels.append(idxs)
-    return np.reshape(vals, (batch_size,w,h,1)), sparse_tuple_from(labels)
+        seq_lens.append(len(str))
+    return np.reshape(vals, (batch_size,w,h,1)), sparse_tuple_from(labels), seq_lens
 
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
@@ -79,31 +80,36 @@ cell = tf.contrib.rnn.GRUCell(hidden_layer_size)
 rnnout, states = tf.nn.dynamic_rnn(cell, h_pool2_flat, dtype=tf.float32)
 print 'rnnshape', rnnout.shape
 
-rnn_logits = tf.layers.dense( rnnout, num_classes+1, 
+rnn_logits = tf.layers.dense( rnnout,
+                              num_classes+1, 
                               activation=tf.nn.relu,
                               kernel_initializer=tf.contrib.layers.variance_scaling_initializer(),
                               bias_initializer=tf.constant_initializer(value=0.0),
                               name='logits')
 
-print 'logits', rnn_logits.shape
+print 'rnn logits', rnn_logits.shape
+
+rnn_logits2 = tf.reshape(rnn_logits, [1, -1, 63])
+
+print 'rnn logits 2', rnn_logits2.shape
 
 targets = tf.sparse_placeholder(tf.int32)
 seq_len = tf.placeholder(tf.int32, [None])
-loss = tf.nn.ctc_loss(targets, rnn_logits, seq_len)
-
+loss = tf.nn.ctc_loss(targets, rnn_logits2, seq_len)
 cost = tf.reduce_mean(loss)
 
 optimizer = tf.train.MomentumOptimizer(learning_rate=0.005,
                                        momentum=0.9).minimize(cost)
 
-train_seq_len = [batch_size]
+train_seq_len = [32]
 
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
 
      for curr_epoch in range(num_epochs):
-       train_data, train_targets = get_minibatch(batch_size=10)
-       feed_dict={inputs: train_data, targets: train_targets}
+       train_data, train_targets, train_seq_lens = get_minibatch(batch_size=1)
+       print train_data.shape
+       feed_dict={inputs: train_data, targets: train_targets, seq_len: train_seq_len}
        batch_cost, batch_opt = sess.run([cost, optimizer], feed_dict)
 
 

@@ -150,7 +150,7 @@ if __name__ == "__main__":
                 print ('logits1 ' + str(res1))
                 print ('logits2 ' + str(res2))
                 print ('logits3 ' + str(res3))
-                exit()
+                #exit()
                 
                 batch_cost, _ = session.run([cost, optimizer], feed)
                 train_cost += batch_cost * batch_size
@@ -172,6 +172,7 @@ if __name__ == "__main__":
 
             out = next_testing_batch()
             val_inputs, val_targets, val_seq_len, val_original, random_shift = out
+            print 'val_seq_len',val_seq_len
             val_feed = {inputs: val_inputs,
                         targets: val_targets,
                         seq_len: val_seq_len}

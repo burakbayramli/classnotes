@@ -72,10 +72,10 @@ with tf.Session() as sess:
      feed = { logits1: train_inputs_2, targets: train_targets, seq_len: train_seq_len }
      res1 = sess.run(logits1, feed)     
      #print res1
-     print logits1.shape
+     print 'logits1.shape', logits1.shape
      res2 = sess.run(logits2, feed)     
      #print res2
-     print logits2.shape
+     print 'logits2.shape', logits2.shape
      res3 = sess.run(loss, feed)     
      #print res3
      
@@ -86,8 +86,8 @@ with tf.Session() as sess:
 ```
 
 ```text
-(?, 6)
-(1, ?, 6)
+logits1.shape (?, 6)
+logits2.shape (1, ?, 6)
 [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]
 ```
 
