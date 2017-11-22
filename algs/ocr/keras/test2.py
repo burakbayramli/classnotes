@@ -20,7 +20,7 @@ def ctc_lambda_func(args):
     y_pred = y_pred[:, 2:, :]
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
-def train():
+def get_model():
     # Input Parameters
     img_w = 128
     img_h = 64
@@ -107,7 +107,7 @@ def train():
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
     return model    
 
-m = train()
+m = get_model()
 
 batch_size = 2
 outputs = {'ctc': np.ones((batch_size,1)) * batch_size }
