@@ -7,9 +7,38 @@ import keras.callbacks
 import numpy as np
 import unicodedata
 import random, string
-all_chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
+#all_chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
+all_chars = u'abcdefghijklmnopqrstuvwxyz '
 all_chars_idx = range(len(all_chars))
-absolute_max_string_len = 15
+absolute_max_string_len = 16
+w = 128
+h = 64
+
+def randomstring():
+    rlen = random.choice(range(3,absolute_max_string_len))
+    ridx = [random.choice(all_chars_idx) for i in range(rlen)]
+    rchars = [all_chars[i] for i in ridx]
+    str = "".join(rchars)
+    return ridx, str
+
+def get_minibatch(batch_size=1):
+    res = {}
+    source_str = []
+    the_labels = np.ones((batch_size,absolute_max_string_len))
+    vals = np.array(np.zeros((batch_size,w,h,1)))
+    for i in range(batch_size):
+    	(idxs,str) = randomstring()
+    	tmp = paint_text(str,w,h,rotate=True,ud=True,multi_fonts=True)
+    	vals[i, :] = tmp.reshape((w,h,1))
+        for j in range(len(idxs)): the_labels[i, j] = idxs[j]
+        source_str.append(str)
+
+    res['the_input'] = vals
+    res['the_labels'] = the_labels
+    res['source_str'] = source_str
+    return (res,)
+
+
 
 # this creates larger "blotches" of noise which look
 # more realistic than just adding gaussian noise
@@ -38,7 +67,7 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
                                      np.random.choice([cairo.FONT_WEIGHT_BOLD, cairo.FONT_WEIGHT_NORMAL]))
         else:
             context.select_font_face('Courier', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        context.set_font_size(15)
+        context.set_font_size(13)
         box = context.text_extents(text)
         border_w_h = (4, 4)
         if box[2] > (w - 2 * border_w_h[1]) or box[3] > (h - 2 * border_w_h[0]):
@@ -69,10 +98,4 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
 
     return a
 
-def randomstring():
-    rlen = random.choice(range(3,absolute_max_string_len))
-    ridx = [random.choice(all_chars_idx) for i in range(rlen)]
-    rchars = [all_chars[i] for i in ridx]
-    str = "".join(rchars)
-    return ridx, str
 
