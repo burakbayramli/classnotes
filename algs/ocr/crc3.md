@@ -3,10 +3,6 @@
 import tensorflow as tf
 import pandas as pd
 import numpy as np
-from tensorflow.python.framework import constant_op
-from tensorflow.python.framework import dtypes
-from tensorflow.python.framework import errors_impl
-from tensorflow.python.framework import sparse_tensor
 
 def sparse_tuple_from(sequences, dtype=np.int32):
     indices = []
@@ -49,7 +45,6 @@ train_inputs_2 = np.asarray(
      [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
      [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]],
     dtype=np.float32)
-
 ```
 
 ```python
@@ -91,19 +86,8 @@ with tf.Session() as sess:
 ```
 
 ```text
-[[ 0.  0.  1.  0.  0.  0.]
- [ 0.  0.  1.  0.  0.  0.]
- [ 0.  0.  1.  0.  0.  0.]
- [ 0.  0.  1.  0.  0.  0.]
- [ 0.  0.  1.  0.  0.  0.]]
 (?, 6)
-[[[ 0.  0.  1.  0.  0.  0.]
-  [ 0.  0.  1.  0.  0.  0.]
-  [ 0.  0.  1.  0.  0.  0.]
-  [ 0.  0.  1.  0.  0.  0.]
-  [ 0.  0.  1.  0.  0.  0.]]]
 (1, ?, 6)
-[ 10.21795845]
 [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]
 ```
 

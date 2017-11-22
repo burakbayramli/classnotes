@@ -22,8 +22,6 @@ Tensor("gru2/transpose_1:0", shape=(?, ?, 512), dtype=float32)
 Tensor("gru2_b/transpose_1:0", shape=(?, ?, 512), dtype=float32)
 
 
-
-
 ```python
 from PIL import Image
 import util
