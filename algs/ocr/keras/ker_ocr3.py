@@ -41,7 +41,7 @@ def train():
                                       img_w=img_w,
                                       img_h=img_h,
                                       downsample_factor=(pool_size ** 2),
-                                      val_split=words_per_epoch - val_words
+                                      absolute_max_string_len=4
     )
         
     act = 'relu'

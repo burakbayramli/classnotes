@@ -5,14 +5,6 @@ import editdistance
 import numpy as np
 from scipy import ndimage
 from keras import backend as K
-from keras.layers.convolutional import Conv2D, MaxPooling2D
-from keras.layers import Input, Dense, Activation
-from keras.layers import Reshape, Lambda
-from keras.layers.merge import add, concatenate
-from keras.models import Model
-from keras.layers.recurrent import GRU
-from keras.optimizers import SGD
-from keras.utils.data_utils import get_file
 from keras.preprocessing import image
 import keras.callbacks
 
@@ -21,8 +13,8 @@ regex = r'^[a-z ]+$'
 alphabet = u'abcdefghijklmnopqrstuvwxyz '
 all_chars_idx = range(len(alphabet))
 
-def randomstring():
-    rlen = random.choice(range(2,4))
+def randomstring(max_string_len):
+    rlen = random.choice(range(2,max_string_len))
     ridx = [random.choice(all_chars_idx) for i in range(rlen)]
     rchars = [alphabet[i] for i in ridx]
     str = "".join(rchars)
@@ -103,14 +95,13 @@ def is_valid_str(in_str):
 class TextImageGenerator(keras.callbacks.Callback):
 
     def __init__(self, minibatch_size,
-                 img_w, img_h, downsample_factor, val_split,
-                 absolute_max_string_len=16):
+                 img_w, img_h, downsample_factor, 
+                 absolute_max_string_len):
 
         self.minibatch_size = minibatch_size
         self.img_w = img_w
         self.img_h = img_h
         self.downsample_factor = downsample_factor
-        self.val_split = val_split
         self.blank_label = self.get_output_size() - 1
         self.absolute_max_string_len = absolute_max_string_len
         self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
@@ -129,7 +120,7 @@ class TextImageGenerator(keras.callbacks.Callback):
         label_length = np.zeros([size, 1])
         source_str = []
         for i in range(size):
-            word = randomstring()
+            word = randomstring(self.absolute_max_string_len)
             if random.choice(range(5)) == 0: 
                 X_data[i, 0:self.img_w, :, 0] = self.paint_func('',)[0, :, :].T
                 labels[i, 0] = self.blank_label
