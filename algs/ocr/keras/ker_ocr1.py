@@ -494,6 +494,11 @@ def train(run_name, start_epoch, stop_epoch, img_w):
     viz_cb = VizCallback(run_name, test_func, img_gen.next_val())
 
     #exit()
+
+    print '--', (words_per_epoch - val_words) // minibatch_size
+    print 'stop_epoch', stop_epoch
+    print '--', val_words // minibatch_size
+    print 's', start_epoch
     
     model.fit_generator(generator=img_gen.next_train(),
                         steps_per_epoch=(words_per_epoch - val_words) // minibatch_size,

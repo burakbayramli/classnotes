@@ -81,8 +81,8 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     a = a[:, :, 0]  # grab single channel
     a = a.astype(np.float32) / 255
     a = np.expand_dims(a, 0)
-    if rotate:
-        a = image.random_rotation(a, 3 * (w - top_left_x) / w + 1)
+#    if rotate:
+#        a = image.random_rotation(a, 3 * (w - top_left_x) / w + 1)
     a = speckle(a)
 
     return a
@@ -167,20 +167,14 @@ class TextImageGenerator():
     def get_batch(self, index, size, train):
         # width and height are backwards from typical Keras convention
         # because width is the time dimension when it gets fed into the RNN
-        if K.image_data_format() == 'channels_first':
-            X_data = np.ones([size, 1, self.img_w, self.img_h])
-        else:
-            X_data = np.ones([size, self.img_w, self.img_h, 1])
+        X_data = np.ones([size, self.img_w, self.img_h, 1])
 
         labels = np.ones([size, self.absolute_max_string_len])
         input_length = np.zeros([size, 1])
         label_length = np.zeros([size, 1])
         source_str = []
         for i in range(size):
-	    if K.image_data_format() == 'channels_first':
-               X_data[i, 0, 0:self.img_w, :] = self.paint_func(self.X_text[index + i])[0, :, :].T
-            else:
-                X_data[i, 0:self.img_w, :, 0] = self.paint_func(self.X_text[index + i])[0, :, :].T
+            X_data[i, 0:self.img_w, :, 0] = self.paint_func(self.X_text[index + i])[0, :, :].T
             labels[i, :] = self.Y_data[index + i]
             input_length[i] = self.img_w // self.downsample_factor - 2
             label_length[i] = self.Y_len[index + i]
@@ -259,116 +253,17 @@ res = img_gen.next_train()
 for i,x in enumerate(res):
     print x[0]['source_str'],
     #print x[0]['the_input'].shape
-    img = x[0]['the_input'].reshape(64,128)
+    img = x[0]['the_input'].reshape(128,64)
     plt.imshow(img,cmap='gray',interpolation="none")
     plt.savefig('out1.png')    
     #print x
-    if i==100: break
+    #if i==100: break
+    break
 ```
 
 ```text
 size 1
-[u'bohr'] size 1
-[u'news'] size 1
-[u'sufi'] size 1
-[u'out'] size 1
-[u'afdc'] size 1
-[u'use'] size 1
-[u'prez'] size 1
-[u'any'] size 1
-[u'lsl'] size 1
-[u'see'] size 1
-[u'usfs'] size 1
-[u'only'] size 1
-[u'kuta'] size 1
-[u'so'] size 1
-[u'srg'] size 1
-[u'his'] size 1
-[u'uvm'] size 1
-[u'when'] size 1
-[u'hcp'] size 1
-[u'here'] size 1
-[u'flak'] size 1
-[u'web'] size 1
-[u'ual'] size 1
-[u'also'] size 1
-[u'divo'] size 1
-[u'now'] size 1
-[u'kolb'] size 1
-[u'help'] size 1
-[u'pil'] size 1
-[u'get'] size 1
-[u'tht'] size 1
-[u'pm'] size 1
-[u'mde'] size 1
-[u'view'] size 1
-[u'etna'] size 1
-[u'c'] size 1
-[u'ews'] size 1
-[u'e'] size 1
-[u'jrs'] size 1
-[u'am'] size 1
-[u'quod'] size 1
-[u'been'] size 1
-[u'fett'] size 1
-[u'were'] size 1
-[u'pco'] size 1
-[u'me'] size 1
-[u'ably'] size 1
-[u's'] size 1
-[u'liao'] size 1
-[u'some'] size 1
-[u'brun'] size 1
-[u'its'] size 1
-[u'vma'] size 1
-[u'like'] size 1
-[u'uwb'] size 1
-[u'x'] size 1
-[u'movi'] size 1
-[u'than'] size 1
-[u'fib'] size 1
-[u'find'] size 1
-[u'ofdm'] size 1
-[u'date'] size 1
-[u'ail'] size 1
-[u'back'] size 1
-[u'ncep'] size 1
-[u'top'] size 1
-[u'redd'] size 1
-[u'had'] size 1
-[u'rtty'] size 1
-[u'list'] size 1
-[u'fmla'] size 1
-[u'name'] size 1
-[u'aran'] size 1
-[u'just'] size 1
-[u'cfi'] size 1
-[u'over'] size 1
-[u'lard'] size 1
-[u'year'] size 1
-[u'omia'] size 1
-[u'day'] size 1
-[u'nerc'] size 1
-[u'into'] size 1
-[u'teo'] size 1
-[u'two'] size 1
-[u'hypo'] size 1
-[u'n'] size 1
-[u'mwc'] size 1
-[u're'] size 1
-[u'vcu'] size 1
-[u'next'] size 1
-[u'mils'] size 1
-[u'used'] size 1
-[u'soit'] size 1
-[u'go'] size 1
-[u'jrc'] size 1
-[u'b'] size 1
-[u'gir'] size 1
-[u'work'] size 1
-[u'jq'] size 1
-[u'last'] size 1
-[u'rdc']
+[u'pdo']
 ```
 
 
