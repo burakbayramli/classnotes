@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-import os, random, re
-import itertools
-import codecs
-import datetime
+import os, random, re, itertools
+import codecs, datetime
 import cairocffi as cairo
 import editdistance
 import numpy as np
 from scipy import ndimage
-import pylab
 from keras import backend as K
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers import Input, Dense, Activation
@@ -130,15 +127,13 @@ def is_valid_str(in_str):
 
 class TextImageGenerator(keras.callbacks.Callback):
 
-    def __init__(self, monogram_file, bigram_file, minibatch_size,
+    def __init__(self, minibatch_size,
                  img_w, img_h, downsample_factor, val_split,
                  absolute_max_string_len=16):
 
         self.minibatch_size = minibatch_size
         self.img_w = img_w
         self.img_h = img_h
-        self.monogram_file = monogram_file
-        self.bigram_file = bigram_file
         self.downsample_factor = downsample_factor
         self.val_split = val_split
         self.blank_label = self.get_output_size() - 1
@@ -230,21 +225,6 @@ def ctc_lambda_func(args):
     y_pred = y_pred[:, 2:, :]
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
-
-# For a real OCR application, this should be beam search with a dictionary
-# and language model.  For this example, best path is sufficient.
-
-def decode_batch(test_func, word_batch):
-    out = test_func([word_batch])[0]
-    ret = []
-    for j in range(out.shape[0]):
-        out_best = list(np.argmax(out[j, 2:], 1))
-        out_best = [k for k, g in itertools.groupby(out_best)]
-        outstr = labels_to_text(out_best)
-        ret.append(outstr)
-    return ret
-
-
 def train(run_name, start_epoch, stop_epoch, img_w):
     # Input Parameters
     img_h = 64
@@ -271,9 +251,7 @@ def train(run_name, start_epoch, stop_epoch, img_w):
     print 'fdir', fdir
     print 'K.image_data_format()', K.image_data_format()
     
-    img_gen = TextImageGenerator(monogram_file=os.path.join(fdir, 'wordlist_mono_clean.txt'),
-                                 bigram_file=os.path.join(fdir, 'wordlist_bi_clean.txt'),
-                                 minibatch_size=minibatch_size,
+    img_gen = TextImageGenerator(minibatch_size=minibatch_size,
                                  img_w=img_w,
                                  img_h=img_h,
                                  downsample_factor=(pool_size ** 2),
