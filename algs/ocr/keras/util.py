@@ -108,7 +108,6 @@ class TextImageGenerator(keras.callbacks.Callback):
                                                   rotate=True, ud=True, multi_fonts=True)
 
         self.max_string_len = 4
-        self.num_words = 16000
         
     def get_output_size(self):
         return len(alphabet) + 1
@@ -121,18 +120,17 @@ class TextImageGenerator(keras.callbacks.Callback):
         source_str = []
         for i in range(size):
             word = randomstring(self.absolute_max_string_len)
+            input_length[i] = self.img_w // self.downsample_factor - 2
             if random.choice(range(5)) == 0: 
                 X_data[i, 0:self.img_w, :, 0] = self.paint_func('',)[0, :, :].T
                 labels[i, 0] = self.blank_label
-                input_length[i] = self.img_w // self.downsample_factor - 2
                 label_length[i] = 1
                 source_str.append('')
             else:
                 X_data[i, 0:self.img_w, :, 0] = self.paint_func(word)[0, :, :].T
-                Y_data2 = np.ones([1, self.absolute_max_string_len]) * -1
-                Y_data2[0, 0:len(word)] = text_to_labels(word)
-                labels[i, :] = Y_data2
-                input_length[i] = self.img_w // self.downsample_factor - 2
+                Y_data = np.ones([1, self.absolute_max_string_len]) * -1
+                Y_data[0, 0:len(word)] = text_to_labels(word)
+                labels[i, :] = Y_data
                 label_length[i] = len(word)
                 source_str.append(word)
 
