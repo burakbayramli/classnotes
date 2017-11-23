@@ -119,26 +119,11 @@ class TextImageGenerator(keras.callbacks.Callback):
         self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
                                                   rotate=True, ud=True, multi_fonts=True)
 
-        self.build_word_list(16000, 4, 1)
+        self.max_string_len = 4
+        self.num_words = 16000
         
     def get_output_size(self):
         return len(alphabet) + 1
-
-    def build_word_list(self, num_words, max_string_len=None, mono_fraction=0.5):
-        self.num_words = num_words
-        self.string_list = [''] * self.num_words
-        tmp_string_list = []
-        self.max_string_len = max_string_len
-        self.Y_data = np.ones([self.num_words, self.absolute_max_string_len]) * -1
-        self.X_text = []
-        self.Y_len = [0] * self.num_words
-
-        self.string_list = [randomstring() for i in range(num_words)]
-        for i, word in enumerate(self.string_list):
-            self.Y_len[i] = len(word)
-            self.Y_data[i, 0:len(word)] = text_to_labels(word)
-            self.X_text.append(word)
-        self.Y_len = np.expand_dims(np.array(self.Y_len), 1)
 
     def get_batch(self, size, train):
         X_data = np.ones([size, self.img_w, self.img_h, 1])
