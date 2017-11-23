@@ -96,7 +96,7 @@ def get_model(img_w,img_h):
     loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')([y_pred, labels, input_length, label_length])
 
     # clipnorm seems to speeds up convergence
-    sgd = SGD(lr=0.02, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
+    sgd = SGD(lr=0.02, decay=1e-3, momentum=0.9, nesterov=True, clipnorm=5)
 
     model = Model(inputs=[input_data, labels, input_length, label_length], outputs=loss_out)
 
@@ -110,13 +110,10 @@ m = get_model(img_w,img_h)
 np.random.seed(0)
 random.seed(0)
 
-batch_size = 30
+batch_size = 5
 outputs = {'ctc': np.ones((batch_size,1)) * batch_size }
 #print outputs
 import util
 for i in range(1000):
-    if i % 20 == 0:
-        print 'Epoch', i
-        m.save('/tmp/ocr_1.h5')
     data = util.get_minibatch(img_w,img_h,batch_size)
     m.fit(x=data[0], y=outputs, batch_size=batch_size, epochs=1)

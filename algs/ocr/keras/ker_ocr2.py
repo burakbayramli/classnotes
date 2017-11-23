@@ -202,7 +202,6 @@ class TextImageGenerator(keras.callbacks.Callback):
         # interlace to mix up the easy and hard words
         self.string_list[::2] = tmp_string_list[:self.num_words // 2]
         self.string_list[1::2] = tmp_string_list[self.num_words // 2:]
-
         for i, word in enumerate(self.string_list):
             self.Y_len[i] = len(word)
             self.Y_data[i, 0:len(word)] = text_to_labels(word)
@@ -264,14 +263,6 @@ class TextImageGenerator(keras.callbacks.Callback):
             #pickle.dump(ret, output)
             #output.close()
             #exit()
-            yield ret
-
-    def next_val(self):
-        while 1:
-            ret = self.get_batch(self.cur_val_index, self.minibatch_size, train=False)
-            self.cur_val_index += self.minibatch_size
-            if self.cur_val_index >= self.num_words:
-                self.cur_val_index = self.val_split + self.cur_val_index % 32
             yield ret
 
     def on_train_begin(self, logs={}):
@@ -441,7 +432,6 @@ def train(run_name, start_epoch, stop_epoch, img_w):
     model.fit_generator(generator=img_gen.next_train(),
                         steps_per_epoch=(words_per_epoch - val_words) // minibatch_size,
                         epochs=stop_epoch,
-                        validation_data=img_gen.next_val(),
                         validation_steps=val_words // minibatch_size,
                         callbacks=[img_gen],
                         initial_epoch=start_epoch)
