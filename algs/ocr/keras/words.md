@@ -1,4 +1,28 @@
 
+```python
+Y_len = [0] * 4
+Y_len = np.expand_dims(np.array(Y_len), 1)
+print Y_len
+```
+
+```text
+[[0]
+ [0]
+ [0]
+ [0]]
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```python
 import os

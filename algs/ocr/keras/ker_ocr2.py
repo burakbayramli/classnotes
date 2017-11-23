@@ -150,6 +150,7 @@ class TextImageGenerator(keras.callbacks.Callback):
         label_length = np.zeros([size, 1])
         source_str = []
         for i in range(size):
+            word = randomstring()
             if random.choice(range(5)) == 0: 
                 X_data[i, 0:self.img_w, :, 0] = self.paint_func('',)[0, :, :].T
                 labels[i, 0] = self.blank_label
@@ -157,11 +158,19 @@ class TextImageGenerator(keras.callbacks.Callback):
                 label_length[i] = 1
                 source_str.append('')
             else:
-                X_data[i, 0:self.img_w, :, 0] = self.paint_func(self.X_text[index + i])[0, :, :].T
-                labels[i, :] = self.Y_data[index + i]
+                #X_data[i, 0:self.img_w, :, 0] = self.paint_func(self.X_text[index + i])[0, :, :].T
+                #labels[i, :] = self.Y_data[index + i]
+                #input_length[i] = self.img_w // self.downsample_factor - 2
+                #label_length[i] = self.Y_len[index + i]                
+                #source_str.append(self.X_text[index + i])
+
+                X_data[i, 0:self.img_w, :, 0] = self.paint_func(word)[0, :, :].T
+                Y_data2 = np.ones([1, self.absolute_max_string_len]) * -1
+                Y_data2[0, 0:len(word)] = text_to_labels(word)
+                labels[i, :] = Y_data2
                 input_length[i] = self.img_w // self.downsample_factor - 2
-                label_length[i] = self.Y_len[index + i]
-                source_str.append(self.X_text[index + i])
+                label_length[i] = len(word)
+                source_str.append(word)
 
         inputs = {'the_input': X_data,
                   'the_labels': labels,
