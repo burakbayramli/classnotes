@@ -33,10 +33,6 @@ def randomstring():
 
 np.random.seed(55)
 
-# this creates larger "blotches" of noise which look
-# more realistic than just adding gaussian noise
-# assumes greyscale with pixels ranging from 0 to 1
-
 def speckle(img):
     severity = np.random.uniform(0, 0.6)
     blur = ndimage.gaussian_filter(np.random.randn(*img.shape) * severity, 1)
@@ -44,11 +40,6 @@ def speckle(img):
     img_speck[img_speck > 1] = 1
     img_speck[img_speck <= 0] = 0
     return img_speck
-
-
-# paints the string in a random location the bounding box
-# also uses a random font, a slight random rotation,
-# and a random amount of speckle noise
 
 def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
@@ -93,16 +84,12 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
 
     return a
 
-
-# Translation of characters to unique integer values
 def text_to_labels(text):
     ret = []
     for char in text:
         ret.append(alphabet.find(char))
     return ret
 
-
-# Reverse translation of numerical classes back to characters
 def labels_to_text(labels):
     ret = []
     for c in labels:
@@ -112,18 +99,9 @@ def labels_to_text(labels):
             ret.append(alphabet[c])
     return "".join(ret)
 
-
-# only a-z and space..probably not to difficult
-# to expand to uppercase and symbols
-
 def is_valid_str(in_str):
     search = re.compile(regex, re.UNICODE).search
     return bool(search(in_str))
-
-
-# Uses generator functions to supply train/test with
-# data. Image renderings are text are created on the fly
-# each time with random perturbations
 
 class TextImageGenerator(keras.callbacks.Callback):
 
@@ -146,14 +124,7 @@ class TextImageGenerator(keras.callbacks.Callback):
     def get_output_size(self):
         return len(alphabet) + 1
 
-    # num_words can be independent of the epoch size due to the use of generators
-    # as max_string_len grows, num_words can grow
     def build_word_list(self, num_words, max_string_len=None, mono_fraction=0.5):
-        print 'num_words', num_words
-        print 'max_string_len', max_string_len
-        assert max_string_len <= self.absolute_max_string_len
-        assert num_words % self.minibatch_size == 0
-        assert (self.val_split * num_words) % self.minibatch_size == 0
         self.num_words = num_words
         self.string_list = [''] * self.num_words
         tmp_string_list = []
@@ -172,20 +143,13 @@ class TextImageGenerator(keras.callbacks.Callback):
         self.cur_val_index = self.val_split
         self.cur_train_index = 0
 
-    # each time an image is requested from train/val/test, a new random
-    # painting of the text is performed
     def get_batch(self, index, size, train):
-        # width and height are backwards from typical Keras convention
-        # because width is the time dimension when it gets fed into the RNN
         X_data = np.ones([size, self.img_w, self.img_h, 1])
-
         labels = np.ones([size, self.absolute_max_string_len])
         input_length = np.zeros([size, 1])
         label_length = np.zeros([size, 1])
         source_str = []
         for i in range(size):
-            # Mix in some blank inputs.  This seems to be important for
-            # achieving translational invariance
             if random.choice(range(5)) == 0: 
                 X_data[i, 0:self.img_w, :, 0] = self.paint_func('',)[0, :, :].T
                 labels[i, 0] = self.blank_label
@@ -198,7 +162,7 @@ class TextImageGenerator(keras.callbacks.Callback):
                 input_length[i] = self.img_w // self.downsample_factor - 2
                 label_length[i] = self.Y_len[index + i]
                 source_str.append(self.X_text[index + i])
-            
+
         inputs = {'the_input': X_data,
                   'the_labels': labels,
                   'input_length': input_length,
@@ -304,11 +268,6 @@ def train(run_name, start_epoch, stop_epoch, img_w):
 
     # the loss calc occurs elsewhere, so use a dummy lambda func for the loss
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
-    if start_epoch > 0:
-        weight_file = os.path.join(OUTPUT_DIR, os.path.join(run_name, 'weights%02d.h5' % (start_epoch - 1)))
-        model.load_weights(weight_file)
-    # captures output of softmax so we can decode the output during visualization
-    test_func = K.function([input_data], [y_pred])
 
     model.fit_generator(generator=img_gen.next_train(),
                         steps_per_epoch=(words_per_epoch - val_words) // minibatch_size,
@@ -319,10 +278,6 @@ def train(run_name, start_epoch, stop_epoch, img_w):
 
 
 if __name__ == '__main__':
-    run_name = datetime.datetime.now().strftime('%Y:%m:%d:%H:%M:%S')
-    
+    run_name = datetime.datetime.now().strftime('run1')    
     train(run_name, 0, 1, 128)
     
-    #train(run_name, 0, 20, 128)
-    # increase to wider images and start at epoch 20. The learned weights are reloaded
-    #train(run_name, 20, 25, 512)
