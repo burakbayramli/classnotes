@@ -1,3 +1,4 @@
+
 from keras import backend as K
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers import Input, Dense, Activation
@@ -11,7 +12,7 @@ from keras.preprocessing import image
 import keras.callbacks
 import pandas as pd
 import numpy as np
-import util
+import util, random
 
 def ctc_lambda_func(args):
     y_pred, labels, input_length, label_length = args
@@ -20,13 +21,9 @@ def ctc_lambda_func(args):
     y_pred = y_pred[:, 2:, :]
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
-def get_model():
+def get_model(img_w,img_h):
     # Input Parameters
-    img_w = 128
-    img_h = 64
-    words_per_epoch = 16000
     val_split = 0.2
-    val_words = int(words_per_epoch * (val_split))
 
     # Network parameters
     conv_filters = 16
@@ -43,58 +40,58 @@ def get_model():
     
     act = 'relu'
     input_data = Input(name='the_input', shape=input_shape, dtype='float32')
-    print input_data.shape
+    #print input_data.shape
     inner = Conv2D(conv_filters, kernel_size, padding='same',
                    activation=act, kernel_initializer='he_normal',
                    name='conv1')(input_data)
-    print kernel_size
-    print inner
+    #print kernel_size
+    #print inner
     inner = MaxPooling2D(pool_size=(pool_size, pool_size), name='max1')(inner)
-    print pool_size
-    print inner
+    #print pool_size
+    #print inner
     inner = Conv2D(conv_filters, kernel_size, padding='same',
                    activation=act, kernel_initializer='he_normal',
                    name='conv2')(inner)
     print kernel_size
-    print act
-    print inner
+    #print act
+    #print inner
     inner = MaxPooling2D(pool_size=(pool_size, pool_size), name='max2')(inner)
-    print inner
+    #print inner
     conv_to_rnn_dims = (img_w // (pool_size ** 2), (img_h // (pool_size ** 2)) * conv_filters)
     inner = Reshape(target_shape=conv_to_rnn_dims, name='reshape')(inner)
-    print inner
+    #print inner
     # cuts down input size going into RNN:
-    print time_dense_size
-    print inner
+    #print time_dense_size
+    #print inner
     inner = Dense(time_dense_size, activation=act, name='dense1')(inner)
-    print inner
+    #print inner
 
     # Two layers of bidirectional GRUs
     # GRU seems to work as well, if not better than LSTM:
-    print 'rnn_size', rnn_size
+    #print 'rnn_size', rnn_size
     gru_1 = GRU(rnn_size, return_sequences=True, kernel_initializer='he_normal', name='gru1')(inner)
-    print gru_1
+    #print gru_1
     gru_1b = GRU(rnn_size, return_sequences=True, go_backwards=True, kernel_initializer='he_normal', name='gru1_b')(inner)
-    print gru_1b
+    #print gru_1b
     gru1_merged = add([gru_1, gru_1b])
-    print gru1_merged
+    #print gru1_merged
     gru_2 = GRU(rnn_size, return_sequences=True, kernel_initializer='he_normal', name='gru2')(gru1_merged)
-    print gru_2
+    #print gru_2
     gru_2b = GRU(rnn_size, return_sequences=True, go_backwards=True, kernel_initializer='he_normal', name='gru2_b')(gru1_merged)
-    print gru_2b
+    #print gru_2b
 
     inner = Dense(len(util.all_chars)+1, kernel_initializer='he_normal',
                   name='dense2')(concatenate([gru_2, gru_2b]))
-    print inner
+    #print inner
     y_pred = Activation('softmax', name='softmax')(inner)
     Model(inputs=input_data, outputs=y_pred).summary()    
 
     labels = Input(name='the_labels', shape=[util.absolute_max_string_len], dtype='float32')
-    print 'labels', labels
+    #print 'labels', labels
     input_length = Input(name='input_length', shape=[1], dtype='int64')
-    print input_length
+    #print input_length
     label_length = Input(name='label_length', shape=[1], dtype='int64')
-    print 'label_length', label_length
+    #print 'label_length', label_length
 
     loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')([y_pred, labels, input_length, label_length])
 
@@ -107,23 +104,19 @@ def get_model():
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
     return model    
 
-m = get_model()
+img_w = 128
+img_h = 64
+m = get_model(img_w,img_h)
+np.random.seed(0)
+random.seed(0)
 
-batch_size = 2
+batch_size = 30
 outputs = {'ctc': np.ones((batch_size,1)) * batch_size }
-print outputs
+#print outputs
 import util
-data = util.get_minibatch(batch_size)
-m.fit(x=data[0], y=outputs, batch_size=batch_size, epochs=1)
-
-
-
-
-
-
-
-
-
-
-
-
+for i in range(1000):
+    if i % 20 == 0:
+        print 'Epoch', i
+        m.save('/tmp/ocr_1.h5')
+    data = util.get_minibatch(img_w,img_h,batch_size)
+    m.fit(x=data[0], y=outputs, batch_size=batch_size, epochs=1)

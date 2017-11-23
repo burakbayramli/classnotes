@@ -10,9 +10,7 @@ import random, string
 #all_chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
 all_chars = u'abcdefghijklmnopqrstuvwxyz '
 all_chars_idx = range(len(all_chars))
-absolute_max_string_len = 16
-w = 128
-h = 64
+absolute_max_string_len = 10
 
 def randomstring():
     rlen = random.choice(range(3,absolute_max_string_len))
@@ -21,7 +19,7 @@ def randomstring():
     str = "".join(rchars)
     return ridx, str
 
-def get_minibatch(batch_size=1):
+def get_minibatch(w,h,batch_size=1):
     res = {}
     source_str = []
     the_labels = np.ones((batch_size,absolute_max_string_len))
@@ -30,6 +28,7 @@ def get_minibatch(batch_size=1):
     input_length = np.zeros((batch_size,1))
     for i in range(batch_size):
     	(idxs,str) = randomstring()
+        #print str
     	tmp = paint_text(str,w,h,rotate=True,ud=True,multi_fonts=True)
     	the_input[i, :] = tmp.reshape((w,h,1))
         label_length[i, 0] = len(str)
@@ -67,14 +66,14 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     with cairo.Context(surface) as context:
         context.set_source_rgb(1, 1, 1)  # White
         context.paint()
-        # this font list works in Centos 7
+        # this font list works in CentOS 7
         if multi_fonts:
             fonts = ['Century Schoolbook', 'Courier', 'STIX', 'URW Chancery L', 'FreeMono']
             context.select_font_face(np.random.choice(fonts), cairo.FONT_SLANT_NORMAL,
                                      np.random.choice([cairo.FONT_WEIGHT_BOLD, cairo.FONT_WEIGHT_NORMAL]))
         else:
             context.select_font_face('Courier', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        context.set_font_size(13)
+        context.set_font_size(20)
         box = context.text_extents(text)
         border_w_h = (4, 4)
         if box[2] > (w - 2 * border_w_h[1]) or box[3] > (h - 2 * border_w_h[0]):
@@ -89,8 +88,6 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
             top_left_y = np.random.randint(0, int(max_shift_y))
         else:
             top_left_y = h // 2
-        #print top_left_x
-        #print top_left_y
         context.move_to(top_left_x - int(box[0]), top_left_y - int(box[1]))
         context.set_source_rgb(0, 0, 0)
         context.show_text(text)
@@ -104,7 +101,6 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     if rotate:
         a = image.random_rotation(a, 3 * (w - top_left_x) / w + 1)
     a = speckle(a)
-
     return a
 
 

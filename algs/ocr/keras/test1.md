@@ -5,7 +5,7 @@ from PIL import Image
 import util
 
 w = 128; h = 64
-num_classes = 68
+#w = 256; h = 64
 
 (t,s) = util.randomstring()
 print s, t
@@ -21,7 +21,7 @@ print dataset.shape
 ```
 
 ```text
-zibkU [25, 8, 1, 10, 46]
+bqpogmhgco [1, 16, 15, 14, 6, 12, 7, 6, 2, 14]
 (64, 128)
 (1, 128, 64, 1)
 ```
@@ -30,6 +30,7 @@ zibkU [25, 8, 1, 10, 46]
 import tensorflow as tf
 # junk image, only one
 #dataset = np.zeros((1,w,h,1))
+num_classes = 68
 
 pool_size = 1
 num_filters = 16
