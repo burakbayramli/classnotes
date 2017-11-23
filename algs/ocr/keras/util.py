@@ -8,13 +8,11 @@ from keras import backend as K
 from keras.preprocessing import image
 import keras.callbacks
 
-# character classes and matching regex filter
-regex = r'^[a-z ]+$'
 alphabet = u',.0123456789abcdefghijklmnopqrstuvwxyz '
 all_chars_idx = range(len(alphabet))
 
 def randomstring(max_string_len):
-    rlen = random.choice(range(2,max_string_len))
+    rlen = random.choice(range(4,max_string_len))
     ridx = [random.choice(all_chars_idx) for i in range(rlen)]
     rchars = [alphabet[i] for i in ridx]
     str = "".join(rchars)
@@ -87,10 +85,6 @@ def labels_to_text(labels):
         else:
             ret.append(alphabet[c])
     return "".join(ret)
-
-def is_valid_str(in_str):
-    search = re.compile(regex, re.UNICODE).search
-    return bool(search(in_str))
 
 class TextImageGenerator(keras.callbacks.Callback):
 

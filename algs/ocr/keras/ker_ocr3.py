@@ -22,7 +22,7 @@ def ctc_lambda_func(args):
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
 def train():
-    img_w = 128
+    img_w = 256
     img_h = 64
     words_per_epoch = 16000
     val_split = 0.2
@@ -41,7 +41,7 @@ def train():
                                       img_w=img_w,
                                       img_h=img_h,
                                       downsample_factor=(pool_size ** 2),
-                                      absolute_max_string_len=4
+                                      absolute_max_string_len=12
     )
         
     act = 'relu'
@@ -116,6 +116,8 @@ def train():
                         callbacks=[img_gen],
                         initial_epoch=0)
 
+    model.save('/tmp/ocr3.h5')
+    
 
 if __name__ == '__main__':
     train()
