@@ -1,53 +1,34 @@
-from scipy import ndimage
-from keras.preprocessing import image
-import random
+import os, random, re, itertools
+import codecs, datetime
 import cairocffi as cairo
 import editdistance
-import keras.callbacks
 import numpy as np
-import unicodedata
-import random, string
-#all_chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
-all_chars = u'abcdefghijklmnopqrstuvwxyz '
-all_chars_idx = range(len(all_chars))
-absolute_max_string_len = 10
+from scipy import ndimage
+from keras import backend as K
+from keras.layers.convolutional import Conv2D, MaxPooling2D
+from keras.layers import Input, Dense, Activation
+from keras.layers import Reshape, Lambda
+from keras.layers.merge import add, concatenate
+from keras.models import Model
+from keras.layers.recurrent import GRU
+from keras.optimizers import SGD
+from keras.utils.data_utils import get_file
+from keras.preprocessing import image
+import keras.callbacks
+
+# character classes and matching regex filter
+regex = r'^[a-z ]+$'
+alphabet = u'abcdefghijklmnopqrstuvwxyz '
+all_chars_idx = range(len(alphabet))
 
 def randomstring():
-    rlen = random.choice(range(3,absolute_max_string_len))
+    rlen = random.choice(range(2,4))
     ridx = [random.choice(all_chars_idx) for i in range(rlen)]
-    rchars = [all_chars[i] for i in ridx]
+    rchars = [alphabet[i] for i in ridx]
     str = "".join(rchars)
-    return ridx, str
+    return str
 
-def get_minibatch(w,h,batch_size=1):
-    res = {}
-    source_str = []
-    the_labels = np.ones((batch_size,absolute_max_string_len))
-    the_input = np.zeros((batch_size,w,h,1))
-    label_length = np.zeros((batch_size,1))
-    input_length = np.zeros((batch_size,1))
-    for i in range(batch_size):
-    	(idxs,str) = randomstring()
-        #print str
-    	tmp = paint_text(str,w,h,rotate=True,ud=True,multi_fonts=True)
-    	the_input[i, :] = tmp.reshape((w,h,1))
-        label_length[i, 0] = len(str)
-        input_length[i, 0] = 30.
-        for j in range(len(idxs)): the_labels[i, j] = idxs[j]
-        source_str.append(str)
-
-    res['the_input'] = the_input
-    res['the_labels'] = the_labels
-    res['source_str'] = source_str
-    res['label_length'] = label_length
-    res['input_length'] = input_length
-    return (res,)
-
-
-
-# this creates larger "blotches" of noise which look
-# more realistic than just adding gaussian noise
-# assumes greyscale with pixels ranging from 0 to 1
+np.random.seed(55)
 
 def speckle(img):
     severity = np.random.uniform(0, 0.6)
@@ -56,10 +37,6 @@ def speckle(img):
     img_speck[img_speck > 1] = 1
     img_speck[img_speck <= 0] = 0
     return img_speck
-
-
-# Redundant instance of paint_text only kept for generation of empty
-# samples within the module.
 
 def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
@@ -73,7 +50,7 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
                                      np.random.choice([cairo.FONT_WEIGHT_BOLD, cairo.FONT_WEIGHT_NORMAL]))
         else:
             context.select_font_face('Courier', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        context.set_font_size(20)
+        context.set_font_size(25)
         box = context.text_extents(text)
         border_w_h = (4, 4)
         if box[2] > (w - 2 * border_w_h[1]) or box[3] > (h - 2 * border_w_h[0]):
@@ -101,6 +78,84 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     if rotate:
         a = image.random_rotation(a, 3 * (w - top_left_x) / w + 1)
     a = speckle(a)
+
     return a
 
+def text_to_labels(text):
+    ret = []
+    for char in text:
+        ret.append(alphabet.find(char))
+    return ret
+
+def labels_to_text(labels):
+    ret = []
+    for c in labels:
+        if c == len(alphabet):  # CTC Blank
+            ret.append("")
+        else:
+            ret.append(alphabet[c])
+    return "".join(ret)
+
+def is_valid_str(in_str):
+    search = re.compile(regex, re.UNICODE).search
+    return bool(search(in_str))
+
+class TextImageGenerator(keras.callbacks.Callback):
+
+    def __init__(self, minibatch_size,
+                 img_w, img_h, downsample_factor, val_split,
+                 absolute_max_string_len=16):
+
+        self.minibatch_size = minibatch_size
+        self.img_w = img_w
+        self.img_h = img_h
+        self.downsample_factor = downsample_factor
+        self.val_split = val_split
+        self.blank_label = self.get_output_size() - 1
+        self.absolute_max_string_len = absolute_max_string_len
+        self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
+                                                  rotate=True, ud=True, multi_fonts=True)
+
+        self.max_string_len = 4
+        self.num_words = 16000
+        
+    def get_output_size(self):
+        return len(alphabet) + 1
+
+    def get_batch(self, size, train):
+        X_data = np.ones([size, self.img_w, self.img_h, 1])
+        labels = np.ones([size, self.absolute_max_string_len])
+        input_length = np.zeros([size, 1])
+        label_length = np.zeros([size, 1])
+        source_str = []
+        for i in range(size):
+            word = randomstring()
+            if random.choice(range(5)) == 0: 
+                X_data[i, 0:self.img_w, :, 0] = self.paint_func('',)[0, :, :].T
+                labels[i, 0] = self.blank_label
+                input_length[i] = self.img_w // self.downsample_factor - 2
+                label_length[i] = 1
+                source_str.append('')
+            else:
+                X_data[i, 0:self.img_w, :, 0] = self.paint_func(word)[0, :, :].T
+                Y_data2 = np.ones([1, self.absolute_max_string_len]) * -1
+                Y_data2[0, 0:len(word)] = text_to_labels(word)
+                labels[i, :] = Y_data2
+                input_length[i] = self.img_w // self.downsample_factor - 2
+                label_length[i] = len(word)
+                source_str.append(word)
+
+        inputs = {'the_input': X_data,
+                  'the_labels': labels,
+                  'input_length': input_length,
+                  'label_length': label_length,
+                  'source_str': source_str  # used for visualization only
+                  }
+        outputs = {'ctc': np.zeros([size])}  # dummy data for dummy loss function
+        return (inputs, outputs)
+
+    def next_train(self):
+        while 1:
+            ret = self.get_batch(self.minibatch_size, train=True)
+            yield ret
 
