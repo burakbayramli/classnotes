@@ -262,61 +262,36 @@ def train(run_name, start_epoch, stop_epoch, img_w):
     
     act = 'relu'
     input_data = Input(name='the_input', shape=input_shape, dtype='float32')
-    print input_data.shape
     inner = Conv2D(conv_filters, kernel_size, padding='same',
                    activation=act, kernel_initializer='he_normal',
                    name='conv1')(input_data)
-    print kernel_size
-    print inner
     inner = MaxPooling2D(pool_size=(pool_size, pool_size), name='max1')(inner)
-    print pool_size
-    print inner
     inner = Conv2D(conv_filters, kernel_size, padding='same',
                    activation=act, kernel_initializer='he_normal',
                    name='conv2')(inner)
-    print kernel_size
-    print act
-    print inner
     inner = MaxPooling2D(pool_size=(pool_size, pool_size), name='max2')(inner)
-    print inner
     conv_to_rnn_dims = (img_w // (pool_size ** 2), (img_h // (pool_size ** 2)) * conv_filters)
     inner = Reshape(target_shape=conv_to_rnn_dims, name='reshape')(inner)
-    print inner
     # cuts down input size going into RNN:
-    print time_dense_size
-    print inner
     inner = Dense(time_dense_size, activation=act, name='dense1')(inner)
-    print inner
 
     # Two layers of bidirectional GRUs
     # GRU seems to work as well, if not better than LSTM:
-    print 'rnn_size', rnn_size
     gru_1 = GRU(rnn_size, return_sequences=True, kernel_initializer='he_normal', name='gru1')(inner)
-    print gru_1
     gru_1b = GRU(rnn_size, return_sequences=True, go_backwards=True, kernel_initializer='he_normal', name='gru1_b')(inner)
-    print gru_1b
     gru1_merged = add([gru_1, gru_1b])
-    print gru1_merged
     gru_2 = GRU(rnn_size, return_sequences=True, kernel_initializer='he_normal', name='gru2')(gru1_merged)
-    print gru_2
     gru_2b = GRU(rnn_size, return_sequences=True, go_backwards=True, kernel_initializer='he_normal', name='gru2_b')(gru1_merged)
-    print gru_2b
 
-    print 'img_gen.get_output_size()', img_gen.get_output_size()
-    
     # transforms RNN output to character activations:
     inner = Dense(img_gen.get_output_size(), kernel_initializer='he_normal',
                   name='dense2')(concatenate([gru_2, gru_2b]))
-    print inner
     y_pred = Activation('softmax', name='softmax')(inner)
     Model(inputs=input_data, outputs=y_pred).summary()
 
     labels = Input(name='the_labels', shape=[img_gen.absolute_max_string_len], dtype='float32')
-    print 'labels', labels
     input_length = Input(name='input_length', shape=[1], dtype='int64')
-    print input_length
     label_length = Input(name='label_length', shape=[1], dtype='int64')
-    print 'label_length', label_length
 
     # Keras doesn't currently support loss funcs with extra parameters
     # so CTC loss is implemented in a lambda layer
@@ -335,13 +310,6 @@ def train(run_name, start_epoch, stop_epoch, img_w):
     # captures output of softmax so we can decode the output during visualization
     test_func = K.function([input_data], [y_pred])
 
-    #exit()
-
-    print '--', (words_per_epoch - val_words) // minibatch_size
-    print 'stop_epoch', stop_epoch
-    print '--', val_words // minibatch_size
-    print 's', start_epoch
-    
     model.fit_generator(generator=img_gen.next_train(),
                         steps_per_epoch=(words_per_epoch - val_words) // minibatch_size,
                         epochs=stop_epoch,
