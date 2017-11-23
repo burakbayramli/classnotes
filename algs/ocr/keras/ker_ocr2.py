@@ -20,15 +20,21 @@ from keras.utils.data_utils import get_file
 from keras.preprocessing import image
 import keras.callbacks
 
-
 OUTPUT_DIR = 'image_ocr'
 
 # character classes and matching regex filter
 regex = r'^[a-z ]+$'
 alphabet = u'abcdefghijklmnopqrstuvwxyz '
+all_chars_idx = range(len(alphabet))
+
+def randomstring():
+    rlen = random.choice(range(2,4))
+    ridx = [random.choice(all_chars_idx) for i in range(rlen)]
+    rchars = [alphabet[i] for i in ridx]
+    str = "".join(rchars)
+    return str
 
 np.random.seed(55)
-
 
 # this creates larger "blotches" of noise which look
 # more realistic than just adding gaussian noise
@@ -148,6 +154,8 @@ class TextImageGenerator(keras.callbacks.Callback):
     # num_words can be independent of the epoch size due to the use of generators
     # as max_string_len grows, num_words can grow
     def build_word_list(self, num_words, max_string_len=None, mono_fraction=0.5):
+        print 'num_words', num_words
+        print 'max_string_len', max_string_len
         assert max_string_len <= self.absolute_max_string_len
         assert num_words % self.minibatch_size == 0
         assert (self.val_split * num_words) % self.minibatch_size == 0
@@ -159,31 +167,7 @@ class TextImageGenerator(keras.callbacks.Callback):
         self.X_text = []
         self.Y_len = [0] * self.num_words
 
-        # monogram file is sorted by frequency in english speech
-        with codecs.open(self.monogram_file, mode='rt', encoding='utf-8') as f:
-            for line in f:
-                if len(tmp_string_list) == int(self.num_words * mono_fraction):
-                    break
-                word = line.rstrip()
-                if max_string_len == -1 or max_string_len is None or len(word) <= max_string_len:
-                    tmp_string_list.append(word)
-
-        # bigram file contains common word pairings in english speech
-        with codecs.open(self.bigram_file, mode='rt', encoding='utf-8') as f:
-            lines = f.readlines()
-            for line in lines:
-                if len(tmp_string_list) == self.num_words:
-                    break
-                columns = line.lower().split()
-                word = columns[0] + ' ' + columns[1]
-                if is_valid_str(word) and \
-                        (max_string_len == -1 or max_string_len is None or len(word) <= max_string_len):
-                    tmp_string_list.append(word)
-        if len(tmp_string_list) != self.num_words:
-            raise IOError('Could not pull enough words from supplied monogram and bigram files. ')
-        # interlace to mix up the easy and hard words
-        self.string_list[::2] = tmp_string_list[:self.num_words // 2]
-        self.string_list[1::2] = tmp_string_list[self.num_words // 2:]
+        self.string_list = [randomstring() for i in range(num_words)]
         for i, word in enumerate(self.string_list):
             self.Y_len[i] = len(word)
             self.Y_data[i, 0:len(word)] = text_to_labels(word)
@@ -219,6 +203,7 @@ class TextImageGenerator(keras.callbacks.Callback):
                 input_length[i] = self.img_w // self.downsample_factor - 2
                 label_length[i] = self.Y_len[index + i]
                 source_str.append(self.X_text[index + i])
+            
         inputs = {'the_input': X_data,
                   'the_labels': labels,
                   'input_length': input_length,
