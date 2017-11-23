@@ -91,28 +91,6 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
     return a
 
 
-def shuffle_mats_or_lists(matrix_list, stop_ind=None):
-    ret = []
-    assert all([len(i) == len(matrix_list[0]) for i in matrix_list])
-    len_val = len(matrix_list[0])
-    if stop_ind is None:
-        stop_ind = len_val
-    assert stop_ind <= len_val
-
-    a = list(range(stop_ind))
-    np.random.shuffle(a)
-    a += list(range(stop_ind, len_val))
-    for mat in matrix_list:
-        if isinstance(mat, np.ndarray):
-            ret.append(mat[a])
-        elif isinstance(mat, list):
-            ret.append([mat[i] for i in a])
-        else:
-            raise TypeError('`shuffle_mats_or_lists` only supports '
-                            'numpy.array and list objects.')
-    return ret
-
-
 # Translation of characters to unique integer values
 def text_to_labels(text):
     ret = []
@@ -159,7 +137,11 @@ class TextImageGenerator(keras.callbacks.Callback):
         self.val_split = val_split
         self.blank_label = self.get_output_size() - 1
         self.absolute_max_string_len = absolute_max_string_len
+        self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
+                                                  rotate=True, ud=True, multi_fonts=True)
 
+        self.build_word_list(16000, 4, 1)
+        
     def get_output_size(self):
         return len(alphabet) + 1
 
@@ -216,10 +198,7 @@ class TextImageGenerator(keras.callbacks.Callback):
     def get_batch(self, index, size, train):
         # width and height are backwards from typical Keras convention
         # because width is the time dimension when it gets fed into the RNN
-        if K.image_data_format() == 'channels_first':
-            X_data = np.ones([size, 1, self.img_w, self.img_h])
-        else:
-            X_data = np.ones([size, self.img_w, self.img_h, 1])
+        X_data = np.ones([size, self.img_w, self.img_h, 1])
 
         labels = np.ones([size, self.absolute_max_string_len])
         input_length = np.zeros([size, 1])
@@ -253,36 +232,7 @@ class TextImageGenerator(keras.callbacks.Callback):
         while 1:
             ret = self.get_batch(self.cur_train_index, self.minibatch_size, train=True)
             self.cur_train_index += self.minibatch_size
-            if self.cur_train_index >= self.val_split:
-                self.cur_train_index = self.cur_train_index % 32
-                (self.X_text, self.Y_data, self.Y_len) = shuffle_mats_or_lists(
-                    [self.X_text, self.Y_data, self.Y_len], self.val_split)
-            #print 'ret', ret
-            #import pickle
-            #output = open('dict.pkl', 'wb')
-            #pickle.dump(ret, output)
-            #output.close()
-            #exit()
             yield ret
-
-    def on_train_begin(self, logs={}):
-        self.build_word_list(16000, 4, 1)
-        self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
-                                                  rotate=False, ud=False, multi_fonts=False)
-
-    def on_epoch_begin(self, epoch, logs={}):
-        # rebind the paint function to implement curriculum learning
-        if 3 <= epoch < 6:
-            self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
-                                                      rotate=False, ud=True, multi_fonts=False)
-        elif 6 <= epoch < 9:
-            self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
-                                                      rotate=False, ud=True, multi_fonts=True)
-        elif epoch >= 9:
-            self.paint_func = lambda text: paint_text(text, self.img_w, self.img_h,
-                                                      rotate=True, ud=True, multi_fonts=True)
-        if epoch >= 21 and self.max_string_len < 12:
-            self.build_word_list(32000, 12, 0.5)
 
 
 # the actual loss calc occurs here despite it not being
