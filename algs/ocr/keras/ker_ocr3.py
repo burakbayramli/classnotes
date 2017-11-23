@@ -24,10 +24,6 @@ def ctc_lambda_func(args):
 def train():
     img_w = 256
     img_h = 64
-    words_per_epoch = 16000
-    val_split = 0.2
-    val_words = int(words_per_epoch * (val_split))
-
     conv_filters = 16
     kernel_size = (3, 3)
     pool_size = 2
@@ -68,6 +64,7 @@ def train():
     
     gru_1 = GRU(rnn_size, return_sequences=True,
                 kernel_initializer='he_normal', name='gru1')(inner)
+    
     gru_1b = GRU(rnn_size, return_sequences=True,
                  go_backwards=True, kernel_initializer='he_normal',
                  name='gru1_b')(inner)
@@ -89,7 +86,9 @@ def train():
     
     Model(inputs=input_data, outputs=y_pred).summary()
 
-    labels = Input(name='the_labels', shape=[img_gen.absolute_max_string_len], dtype='float32')
+    labels = Input(name='the_labels',
+                   shape=[img_gen.absolute_max_string_len],
+                   dtype='float32')
 
     input_length = Input(name='input_length', shape=[1], dtype='int64')
 

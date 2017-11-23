@@ -35,16 +35,23 @@ def paint_text(text, w, h, rotate=False, ud=False, multi_fonts=False):
         context.paint()
         # this font list works in CentOS 7
         if multi_fonts:
-            fonts = ['Century Schoolbook', 'Courier', 'STIX', 'URW Chancery L', 'FreeMono']
-            context.select_font_face(np.random.choice(fonts), cairo.FONT_SLANT_NORMAL,
-                                     np.random.choice([cairo.FONT_WEIGHT_BOLD, cairo.FONT_WEIGHT_NORMAL]))
+            fonts = ['Century Schoolbook',
+                     'Courier', 'STIX',
+                     'URW Chancery L',
+                     'FreeMono']
+            context.select_font_face(np.random.choice(fonts),
+                                     cairo.FONT_SLANT_NORMAL,
+                                     np.random.choice([cairo.FONT_WEIGHT_BOLD,
+                                                       cairo.FONT_WEIGHT_NORMAL]))
         else:
-            context.select_font_face('Courier', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+            context.select_font_face('Courier',
+                                     cairo.FONT_SLANT_NORMAL,
+                                     cairo.FONT_WEIGHT_BOLD)
         context.set_font_size(25)
         box = context.text_extents(text)
         border_w_h = (4, 4)
         if box[2] > (w - 2 * border_w_h[1]) or box[3] > (h - 2 * border_w_h[0]):
-            raise IOError('Could not fit string into image. Max char count is too large for given image width.')
+            raise IOError('Could not fit string into image.')
 
         # teach the RNN translational invariance by
         # fitting text box randomly on canvas, with some room to rotate
@@ -77,15 +84,6 @@ def text_to_labels(text):
         ret.append(alphabet.find(char))
     return ret
 
-def labels_to_text(labels):
-    ret = []
-    for c in labels:
-        if c == len(alphabet):  # CTC Blank
-            ret.append("")
-        else:
-            ret.append(alphabet[c])
-    return "".join(ret)
-
 class TextImageGenerator(keras.callbacks.Callback):
 
     def __init__(self, minibatch_size,
@@ -106,7 +104,7 @@ class TextImageGenerator(keras.callbacks.Callback):
     def get_output_size(self):
         return len(alphabet) + 1
 
-    def get_batch(self, size, train):
+    def get_batch(self, size):
         X_data = np.ones([size, self.img_w, self.img_h, 1])
         labels = np.ones([size, self.absolute_max_string_len])
         input_length = np.zeros([size, 1])
@@ -139,6 +137,6 @@ class TextImageGenerator(keras.callbacks.Callback):
 
     def next_train(self):
         while 1:
-            ret = self.get_batch(self.minibatch_size, train=True)
+            ret = self.get_batch(self.minibatch_size)
             yield ret
 
