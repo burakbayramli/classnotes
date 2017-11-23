@@ -6,7 +6,7 @@ img_gen = util.TextImageGenerator(minibatch_size=1,
                                   img_w=128,
                                   img_h=64,
                                   downsample_factor=4,
-                                  val_split=0)
+				  absolute_max_string_len=4)
 
 ```
 
@@ -20,6 +20,6 @@ for x in img_gen.next_train():
 ```
 
 ```text
-[u'jti']
+[u'rt.']
 ```
 

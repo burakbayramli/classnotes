@@ -10,7 +10,7 @@ import keras.callbacks
 
 # character classes and matching regex filter
 regex = r'^[a-z ]+$'
-alphabet = u'abcdefghijklmnopqrstuvwxyz '
+alphabet = u',.0123456789abcdefghijklmnopqrstuvwxyz '
 all_chars_idx = range(len(alphabet))
 
 def randomstring(max_string_len):
