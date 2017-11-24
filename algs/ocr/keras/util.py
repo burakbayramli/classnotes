@@ -18,7 +18,7 @@ def randomstring(max_string_len):
     str = "".join(rchars)
     return str
 
-np.random.seed(55)
+#np.random.seed(55)
 
 def speckle(img):
     severity = np.random.uniform(0, 0.6)

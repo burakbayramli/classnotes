@@ -24,10 +24,10 @@ def ctc_lambda_func(args):
 def train():
     img_w = 256
     img_h = 64
-    conv_filters = 16
+    conv_filters = 32
     kernel_size = (3, 3)
-    pool_size = 2
-    time_dense_size = 32
+    pool_size = 1
+    time_dense_size = 64
     rnn_size = 512
     minibatch_size = 2
 
@@ -99,7 +99,7 @@ def train():
                                                                        input_length,
                                                                        label_length])
 
-    sgd = SGD(lr=0.02, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
+    sgd = SGD(lr=0.02, decay=1e-4, momentum=0.95, nesterov=True, clipnorm=5)
 
     model = Model(inputs=[input_data,
                           labels,
@@ -109,7 +109,7 @@ def train():
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
 
     model.fit_generator(generator=img_gen.next_train(),
-                        steps_per_epoch=5000,
+                        steps_per_epoch=1000,
                         epochs=1,
                         validation_steps=0,
                         callbacks=[img_gen],

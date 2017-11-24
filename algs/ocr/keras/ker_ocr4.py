@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, util
+import os, util4
 import datetime
 import numpy as np
 from keras import backend as K
@@ -24,16 +24,16 @@ def ctc_lambda_func(args):
 def train():
     img_w = 256
     img_h = 64
-    conv_filters = 16
-    kernel_size = (3, 3)
-    pool_size = 2
+    conv_filters = 20
+    kernel_size = (2, 2)
+    pool_size = 3
     time_dense_size = 32
-    rnn_size = 512
-    minibatch_size = 2
+    rnn_size = 256
+    minibatch_size = 10
 
     input_shape = (img_w, img_h, 1)
     
-    img_gen = util.TextImageGenerator(minibatch_size=minibatch_size,
+    img_gen = util4.TextImageGenerator(minibatch_size=minibatch_size,
                                       img_w=img_w,
                                       img_h=img_h,
                                       downsample_factor=(pool_size ** 2),
@@ -107,15 +107,17 @@ def train():
                           label_length], outputs=loss_out)
 
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
+    mfile = "/tmp/ocr4.h5"
+    if os.path.isfile(mfile): model.load_weights(mfile)
 
     model.fit_generator(generator=img_gen.next_train(),
-                        steps_per_epoch=5000,
+                        steps_per_epoch=1000,
                         epochs=1,
                         validation_steps=0,
                         callbacks=[img_gen],
                         initial_epoch=0)
 
-    model.save('/tmp/ocr3.h5')
+    model.save(mfile)
     
 
 if __name__ == '__main__':
