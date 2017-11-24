@@ -109,7 +109,7 @@ def train():
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
 
     model.fit_generator(generator=img_gen.next_train(),
-                        steps_per_epoch=300,
+                        steps_per_epoch=5000,
                         epochs=1,
                         validation_steps=0,
                         callbacks=[img_gen],
