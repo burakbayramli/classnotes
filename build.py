@@ -24,6 +24,11 @@ ad = '''<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
+<br/>
+<a href='..'>Yukarı</a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='../..'>Ana Menü</a>
+<br/>
 '''
 
 def translit_low(c):
@@ -91,7 +96,9 @@ if __name__ == "__main__":
                 url = url.replace(",","")
                 url = url + ".html"
                 print 'the url is', subdir + "/" + url
+                
                 line = "<a href='%s'>%s</a><br/><br/>" % (subdir + "/" + url, title)
+                print line
                 fout.write(line)
                 fout.write("\n")
                 fin.close()
@@ -117,7 +124,9 @@ if __name__ == "__main__":
                 fout1 = codecs.open(url, "w")
                 for i,line in enumerate(fin1.readlines()):
                     fout1.write(line)
-                    if i == 15:  fout1.write(ad)
+                    if i == 15:
+                        fout1.write(ad)
+
                 fout1.close()                                
                 #break
             fout.write("</html>\n")
