@@ -1,8 +1,6 @@
 import os
 import sys
 
-#sys.path.append(os.path.abspath('..'))
-
 from audio_reader import AudioReader
 from constants import c
 

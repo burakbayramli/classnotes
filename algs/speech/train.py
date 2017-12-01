@@ -1,4 +1,3 @@
-# train.py - python 3 gerekli
 import time
 import numpy as np
 import tensorflow as tf
