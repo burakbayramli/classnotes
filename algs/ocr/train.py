@@ -120,7 +120,7 @@ if __name__ == '__main__':
                                       downsample_factor=(pool_size ** 2),
                                       absolute_max_string_len=12
     )
-    model = get_model(img_w,img_h,minibatch_size,pool_size)
+    model, dummy = get_model(img_w,img_h,minibatch_size,pool_size)
     mfile = "/tmp/ocr4.h5"
     if os.path.isfile(mfile):
         print 'Loaded', mfile
