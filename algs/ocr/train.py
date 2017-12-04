@@ -121,7 +121,7 @@ if __name__ == '__main__':
                                       absolute_max_string_len=12
     )
     model, dummy = get_model(img_w,img_h,minibatch_size,pool_size)
-    mfile = "/tmp/ocr4.h5"
+    mfile = "/tmp/ocr.h5"
     if os.path.isfile(mfile):
         print 'Loaded', mfile
         model.load_weights(mfile)

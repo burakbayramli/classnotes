@@ -180,7 +180,7 @@ kayýp [ 8.08572388]
 \end{verbatim}
 
 Þimdi ilginç bir veri, burada veri direk 2. karakter olsun diyor. O zaman
-buna uyan çýktýlar yüksek, uymayanlar alçak sonuç vermeli,
+buna uyan çýktýlar alçak (kayýp az), uymayanlar yüksek sonuç vermeli,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 train_inputs_2 = np.asarray(
@@ -254,26 +254,30 @@ gösteriliyor, appleeee yerine apple demek gibi.
 
 Að Yapýsý ve Kod
 
-Altta kurulacak að yapýsý [4] tezi ve bu tezin de esinlendiði [5]
-kütüphanesini baz alýyor. Bizim nihai kodda boyutlarda deðiþiklik yapýldý
-okur bu deðiþimi akýlda tutarak iþlemleri takip edebilir. Yapýda ilk
-evriþim tabakasýnda arka arkaya evriþim ve max pool operasyonlarý
-gerçekleþtiriliyor, sonuç bir boyut deðiþtirme sonrasý tamamen baðlanmýþ
-(fully connected) bir tabakaya geçiliyor, buradan çýkan sonuç iki yönlü
-(bi-directional) GRU tabakasýna veriliyor. GRU, kendini tekrarlayan LSTM
-yapýsýnýn biraz daha basitleþtirilmiþ hali. Buradan çýkan sonuçlar bir
-baþka yoðun tabakaya oradan da softmax aktivasyonuna veriliyor, kayýp
-fonksiyonu CTC. 
+Þimdi örnek veriyi, alfabeyi geniþletelim ve að yapýsýný daha
+derinleþtirelim. Altta gösterilen að yapýsý [4] tezi ve onun esinlendiði
+[5] kütüphanesini baz alýyor. Nihai kodda teze göre bazý boyut
+deðiþiklikleri var, okur bunu akýlda tutarak diyagramlarý, iþlemleri takip
+edebilir. Mimaride ilk evriþim tabakasýnda arka arkaya iki evriþim ve max
+pool operasyonlarý var, sonra bir boyut deðiþtirme sonrasý tamamen
+baðlanmýþ (fully connected) bir tabakaya sonuç geçiliyor, oradan çýkan
+sonuç iki yönlü (bi-directional) GRU tabakasýna veriliyor. Bu zamansal YSA
+ilk baþta görülen tek LSTM seviyesinden daha çetrefil yani. GRU hücreleri,
+LSTM hücre yapýsýnýn biraz daha basitleþtirilmiþ halidir. Devam edelim,
+buradan çýkan sonuçlar bir baþka yoðun tabakaya oradan da softmax
+aktivasyonuna veriliyor, kayýp fonksiyonu CTC.
 
 \includegraphics[width=35em]{ocr_07.png}
 
 \inputminted[fontsize=\footnotesize]{python}{train.py}
 
-Eðitmek için ilginç bir teknik kullanacaðýz, bir kelimeyi alýp onun imajýný
-üretebilen yazýlýmlar var, bunlardan birini kullanýp, hatta üretilen imajý
-deforme bile ederen tanýma algoritmasýnýn iþini bilerek zorlaþtýrabiliriz,
-ve eðitime bu verileri sokarak, hiç ek eðitim verisi diskte tutmadan eðitim
-operasyonunu gerçekleþtireceðiz. Bir örnek kelime imajý üretelim mesela,
+Eðitim verisi ne olacak? Burada ilginç bir teknik kullanacaðýz, bir
+kelimenin imajýný üretebilen yazýlýmlar var, yani masaüstünde Paint ya da
+Gimp ile bir imaj içine yazý yazmak gibi, bu kodlardan birini kullanýp,
+hatta üretilen imajý deforme bile ederek tanýma algoritmasýnýn iþini
+bilerek zorlaþtýrabiliriz, ve eðitime bu verileri sokarak, hiç ek eðitim
+verisi diskte tutmadan eðitim operasyonunu istediðimiz þekilde
+gerçekleþtiririz. Bir örnek kelime imajý üretelim mesela,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import util
@@ -298,25 +302,35 @@ plt.savefig('ocr_06.png')
 [u'daxco7mu1']
 \end{verbatim}
 
-Eðitim verisini üretec (generatör) tekniði [6] üzerinden yaratýyoruz. 
-
 Ýmaj neye benziyor?
 
 \includegraphics[width=20em]{ocr_06.png}
+
+Eðitim verisini üreteç (generator) tekniði [6] üzerinden yaratýyoruz dikkat
+edildiyse, üreteç eðitim verisini bir gezici arayüzü üzerinden eðitim
+rutinine vermemizi saðlýyor. Üreteç, döngüsünde her dönüldüðünde ve çaðýran
+veri istendiðinde rasgele bir kelime üretir, bu kelimeyi imaja çevirip
+etiketi ile birlikte çaðrýyý yapana veriyor. Üreteç yapýsýný kullanmanýn
+güzel tarafý çaðýran tarafýn döngü sözdizimini kullanabilmesi. Üstte tek
+bir kere dönüp çýktýk (tek imaj istiyorduk), eðitim mekanizmasý istediði
+kadar dönerek istediði kadar eðtim verisi alabilir.
 
 Görüldüðü gibi imaj biraz aþaðý doðru eðimli çýktý, bu iyi, çünkü gerçek
 dünyada olan þartlarý tekrarlamak istiyoruz, belki bir cep telefonunun
 çektiði resimdeki kelimeleri tanýyacaðýz ve telefonu mükemmel þekilde
 tutmak mümkün deðil, farklý açýlardan kelimeleri tanýyabilmek çok iyi
-olur. Ayrýca kullandýðýmýz rutin karlandýrma bile yapabiliyor, hatta
-kelimenin imajýn çok farklý yerlerinden baþlamasý bile mümkün. Neyse,
-eðitimi yapýp raporlanan kaybý belli bir seviyeye indirdikten sonra (5,6
-civarý mesela, fakat uzun süre sonra 2 seviyesi de mümkün), YSA hazýr
-demektir. Bizim önceden eðittiðimiz YSA'yý yükleyelim,
+olur. Ayrýca kullandýðýmýz rutin suni ``gürültü'' bile ekliyor, karlandýrma
+yapýyor mesela, hatta kelimenin imajýn çok farklý yerlerinden
+baþlatabiliyor. 
+
+Neyse, iþte bu þekilde üretilen veri üzerinden eðitimi yapýp raporlanan
+kaybý belli bir seviyeye indirdikten sonra (5,6 civarý mesela, fakat uzun
+süre sonra 2 seviyesi de mümkün), YSA hazýr demektir. Bizim önceden
+eðittiðimiz YSA'yý yükleyelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import train
-mfile = '/tmp/ocr4.h5'
+mfile = '/tmp/ocr.h5'
 
 pool_size = 3
 img_w = 256
