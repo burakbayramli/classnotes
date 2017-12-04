@@ -21,11 +21,15 @@ def ctc_lambda_func(args):
     y_pred = y_pred[:, 2:, :]
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
-def get_model(img_w,img_h,minibatch_size,pool_size):
+def train():
+    img_w = 256
+    img_h = 64
     conv_filters = 20
     kernel_size = (2, 2)
+    pool_size = 3
     time_dense_size = 32
     rnn_size = 256
+    minibatch_size = 10
 
     input_shape = (img_w, img_h, 1)
     
@@ -103,22 +107,7 @@ def get_model(img_w,img_h,minibatch_size,pool_size):
                           label_length], outputs=loss_out)
 
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
-    return model
-    
-
-def train():
-    pool_size = 3
-    img_w = 256
-    img_h = 64
-    minibatch_size = 10
-    img_gen = util4.TextImageGenerator(minibatch_size=minibatch_size,
-                                      img_w=img_w,
-                                      img_h=img_h,
-                                      downsample_factor=(pool_size ** 2),
-                                      absolute_max_string_len=12
-    )
-    model = get_model(img_w,img_h,minibatch_size,pool_size)
-    mfile = "/tmp/ocr4.h5"
+    mfile = "ocr4.h5"
     if os.path.isfile(mfile): model.load_weights(mfile)
 
     model.fit_generator(generator=img_gen.next_train(),
