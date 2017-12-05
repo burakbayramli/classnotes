@@ -34,6 +34,7 @@ if len(sys.argv) == 1:
     ./nlp/nlp.pdf \
     ./recom/recom.pdf \
     ./seq/seq.pdf \
+    ./ocr/ocr.pdf \
     ./speech/speech.pdf \
     ./zapp/zapp.pdf \
     output ../../Dropbox/Public/skfiles/algs.pdf"

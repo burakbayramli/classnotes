@@ -1,3 +1,5 @@
+import random
+from utils import convert_inputs_to_ctc_format
 import time
 import numpy as np
 import tensorflow as tf
@@ -23,6 +25,32 @@ num_batches_per_epoch = int(num_examples / batch_size)
 
 audio = AudioReader(audio_dir=c.AUDIO.VCTK_CORPUS_PATH,
                     sample_rate=c.AUDIO.SAMPLE_RATE)
+
+def next_training_batch():
+    random_index = random.choice(list(audio.cache.keys())[0:5])
+    training_element = audio.cache[random_index]
+    target_text = training_element['target']
+    out = convert_inputs_to_ctc_format(
+        training_element['audio'],c.AUDIO.SAMPLE_RATE,target_text
+    )
+    train_inputs, train_targets, train_seq_len, original = out
+    return train_inputs, train_targets, train_seq_len, original
+
+def next_testing_batch():
+    import random
+    from utils import convert_inputs_to_ctc_format
+    random_index = random.choice(list(audio.cache.keys())[0:5])
+    training_element = audio.cache[random_index]
+    target_text = training_element['target']
+    random_shift = np.random.randint(low=1, high=1000)
+    print('random_shift =', random_shift)
+    truncated_audio = training_element['audio'][random_shift:]
+    out = convert_inputs_to_ctc_format(truncated_audio,
+                                       c.AUDIO.SAMPLE_RATE,
+                                       target_text)
+    train_inputs, train_targets, train_seq_len, original = out
+    return train_inputs, train_targets, train_seq_len, original, random_shift
+
 
 def run_ctc():
     graph = tf.Graph()
@@ -88,32 +116,6 @@ def run_ctc():
         ler = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32),
                                               targets))
 
-    def next_training_batch():
-        import random
-        from utils import convert_inputs_to_ctc_format
-        random_index = random.choice(list(audio.cache.keys())[0:5])
-        training_element = audio.cache[random_index]
-        target_text = training_element['target']
-        out = convert_inputs_to_ctc_format(
-            training_element['audio'],c.AUDIO.SAMPLE_RATE,target_text
-        )
-        train_inputs, train_targets, train_seq_len, original = out
-        return train_inputs, train_targets, train_seq_len, original
-
-    def next_testing_batch():
-        import random
-        from utils import convert_inputs_to_ctc_format
-        random_index = random.choice(list(audio.cache.keys())[0:5])
-        training_element = audio.cache[random_index]
-        target_text = training_element['target']
-        random_shift = np.random.randint(low=1, high=1000)
-        print('random_shift =', random_shift)
-        truncated_audio = training_element['audio'][random_shift:]
-        out = convert_inputs_to_ctc_format(truncated_audio,
-                                           c.AUDIO.SAMPLE_RATE,
-                                           target_text)
-        train_inputs, train_targets, train_seq_len, original = out
-        return train_inputs, train_targets, train_seq_len, original, random_shift
 
     with tf.Session(graph=graph) as session:
 
