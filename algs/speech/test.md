@@ -1,5 +1,16 @@
 
 ```python
+s = "r aɪ t"
+print len(s)
+```
+
+```text
+7
+```
+
+
+
+```python
 from audio_reader import AudioReader
 from utils import convert_inputs_to_ctc_format
 from constants import c
