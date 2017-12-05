@@ -1,12 +1,11 @@
-import random
-from utils import convert_inputs_to_ctc_format
 import time
 import numpy as np
 import tensorflow as tf
-
+import random
 from audio_reader import AudioReader
 from constants import c
 from utils import FIRST_INDEX
+from utils import convert_inputs_to_ctc_format
 
 # Some configs
 num_features = 13
@@ -37,8 +36,6 @@ def next_training_batch():
     return train_inputs, train_targets, train_seq_len, original
 
 def next_testing_batch():
-    import random
-    from utils import convert_inputs_to_ctc_format
     random_index = random.choice(list(audio.cache.keys())[0:5])
     training_element = audio.cache[random_index]
     target_text = training_element['target']
