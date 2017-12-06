@@ -1,17 +1,17 @@
 from python_speech_features import mfcc
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 from glob import glob
 import time, re, os, random
 import numpy as np
 import librosa
 
 num_epochs = 1000
-num_hidden = 100
+num_hidden = 200
 num_layers = 1
 batch_size = 10
 num_batches_per_epoch = 10
-sample_rate = 16000
+sample_rate=16000
 num_features = 13
 # Accounting the 0th index +  space + blank label = 28 characters
 num_classes = ord('z') - ord('a') + 1 + 1 + 1
@@ -24,7 +24,7 @@ FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
 
 def convert_inputs_to_ctc_format(audio, fs, target_text):
     #print('convert_inputs_to_ctc_format target_text:' + target_text)
-    inputs = mfcc(audio, samplerate=fs)
+    inputs = mfcc(audio, samplerate=fs, numcep=num_features)
     # Transform in 3D array
     train_inputs = np.asarray(inputs[np.newaxis, :])
     train_inputs = (train_inputs - np.mean(train_inputs)) / np.std(train_inputs)
@@ -163,7 +163,7 @@ def run_ctc():
                 batch_cost, _ = session.run([cost, optimizer], feed)
                 train_ler += session.run(ler, feed_dict=feed)
                 
-            print 'batch_cost', batch_cost, 'train_ler', train_ler
+                print 'batch_cost', batch_cost, 'train_ler', train_ler
 
             # Decoding
             d = session.run(decoded[0], feed_dict=feed)
