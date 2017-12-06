@@ -1,3 +1,10 @@
+define the label error rate (LER) of a temporal classifier h as the
+mean normalised edit distance between its classifications and the
+targets on S where ED(p, q) is the edit distance between two sequences
+p and q — i.e. the minimum number of insertions, substitutions and
+deletions required to change p into q.  This is a natural measure for
+tasks (such as speech or handwriting recognition) where the aim is to
+minimise the rate of transcription mistakes
 
 
 down - d aʊ n
@@ -10,8 +17,6 @@ up - ʌ p
 yes - j e s 
 left - l e f t
 right - r aɪ t
-
-
 
 
 ```python

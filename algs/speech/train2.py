@@ -1,11 +1,9 @@
 from glob import glob
+import librosa
 import time, re, os, random
 import numpy as np
 import tensorflow as tf
-from constants import c
-from utils import FIRST_INDEX
 from utils import convert_inputs_to_ctc_format
-import audio_reader
 
 # Some configs
 num_features = 13
@@ -19,6 +17,15 @@ num_hidden = 100
 num_layers = 1
 batch_size = 10
 num_batches_per_epoch = 10
+
+# TODO: test also with import scipy.io.wavfile as wav; fs, audio = wav.read(audio_filename)
+def read_audio_from_filename(filename, sample_rate):
+    # import scipy.io.wavfile as wav
+    # fs, audio = wav.read(filename)
+    audio, _ = librosa.load(filename, sr=sample_rate, mono=True)
+    audio = audio.reshape(-1, 1)
+    return audio
+
 
 def find_files(directory, pattern='.wav'):
     """Recursively finds all files matching the pattern."""
@@ -105,11 +112,13 @@ def run_ctc():
             for batch in range(num_batches_per_epoch):
                 filename = random.choice(files)
                 txt = re.findall(".*/(.*?)/.*?.wav",filename)[0]
-                audio = audio_reader.read_audio_from_filename(filename, 8000)
-                out = convert_inputs_to_ctc_format(audio,8000,txt)
+                audio = read_audio_from_filename(filename, 16000)
+                out = convert_inputs_to_ctc_format(audio,16000,txt)
                 train_inputs, train_targets, train_seq_len, original = out
 
-                feed = {inputs: train_inputs, targets: train_targets, seq_len: train_seq_len}
+                feed = {inputs: train_inputs,
+                        targets: train_targets,
+                        seq_len: train_seq_len}
 
                 batch_cost, _ = session.run([cost, optimizer], feed)
                 train_cost += batch_cost * batch_size
