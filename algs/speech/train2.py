@@ -1,31 +1,70 @@
-from glob import glob
-import librosa
-import time, re, os, random
+from python_speech_features import mfcc
 import numpy as np
 import tensorflow as tf
-from utils import convert_inputs_to_ctc_format
+from glob import glob
+import time, re, os, random
+import numpy as np
+import librosa
 
-# Some configs
-num_features = 13
-# Accounting the 0th index +  space + blank label = 28 characters
-num_classes = ord('z') - ord('a') + 1 + 1 + 1
-print ('num_classes %d' % num_classes)
-
-# Hyper-parameters
 num_epochs = 100
 num_hidden = 100
 num_layers = 1
 batch_size = 10
 num_batches_per_epoch = 10
+num_features = 13
+# Accounting the 0th index +  space + blank label = 28 characters
+num_classes = ord('z') - ord('a') + 1 + 1 + 1
+print ('num_classes %d' % num_classes)
 
-# TODO: test also with import scipy.io.wavfile as wav; fs, audio = wav.read(audio_filename)
+SPACE_TOKEN = '<space>'
+SPACE_INDEX = 0
+FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
+
+
+def convert_inputs_to_ctc_format(audio, fs, target_text):
+    #print('convert_inputs_to_ctc_format target_text:' + target_text)
+    inputs = mfcc(audio, samplerate=fs)
+    # Transform in 3D array
+    train_inputs = np.asarray(inputs[np.newaxis, :])
+    train_inputs = (train_inputs - np.mean(train_inputs)) / np.std(train_inputs)
+    train_seq_len = [train_inputs.shape[1]]
+
+    # Get only the words between [a-z] and replace period for none
+    original = ' '.join(target_text.strip().lower().split(' ')).replace('.', '').replace('?', '').replace(',', '').replace("'", '').replace('!', '').replace('-', '')
+    #print('original:' + original)
+    targets = original.replace(' ', '  ')
+    targets = targets.split(' ')
+
+    # Adding blank label
+    targets = np.hstack([SPACE_TOKEN if x == '' else list(x) for x in targets])
+
+    # Transform char into index
+    targets = np.asarray([SPACE_INDEX if x == SPACE_TOKEN else ord(x) - FIRST_INDEX
+                          for x in targets])
+
+    # Creating sparse representation to feed the placeholder
+    train_targets = sparse_tuple_from([targets])
+
+    return train_inputs, train_targets, train_seq_len, original
+
+
+def sparse_tuple_from(sequences, dtype=np.int32):
+    indices = []
+    values = []
+    for n, seq in enumerate(sequences):
+        indices.extend(zip([n] * len(seq), range(len(seq))))
+        values.extend(seq)
+
+    indices = np.asarray(indices, dtype=np.int64)
+    values = np.asarray(values, dtype=dtype)
+    shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
+
+    return indices, values, shape
+
 def read_audio_from_filename(filename, sample_rate):
-    # import scipy.io.wavfile as wav
-    # fs, audio = wav.read(filename)
     audio, _ = librosa.load(filename, sr=sample_rate, mono=True)
     audio = audio.reshape(-1, 1)
     return audio
-
 
 def find_files(directory, pattern='.wav'):
     """Recursively finds all files matching the pattern."""
