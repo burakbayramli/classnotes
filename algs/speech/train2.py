@@ -1,16 +1,17 @@
 from python_speech_features import mfcc
-import numpy as np
 import tensorflow as tf
+import numpy as np
 from glob import glob
 import time, re, os, random
 import numpy as np
 import librosa
 
-num_epochs = 100
+num_epochs = 1000
 num_hidden = 100
 num_layers = 1
 batch_size = 10
 num_batches_per_epoch = 10
+sample_rate = 16000
 num_features = 13
 # Accounting the 0th index +  space + blank label = 28 characters
 num_classes = ord('z') - ord('a') + 1 + 1 + 1
@@ -140,7 +141,7 @@ def run_ctc():
         ler = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32),
                                               targets))
 
-    files = find_files("/home/burak/Downloads/train/audio")
+    files = find_files("/home/burak/Downloads/goog_tf_speech")
         
     with tf.Session(graph=graph) as session:
 
@@ -151,8 +152,8 @@ def run_ctc():
             for batch in range(num_batches_per_epoch):
                 filename = random.choice(files)
                 txt = re.findall(".*/(.*?)/.*?.wav",filename)[0]
-                audio = read_audio_from_filename(filename, 16000)
-                out = convert_inputs_to_ctc_format(audio,16000,txt)
+                audio = read_audio_from_filename(filename, sample_rate)
+                out = convert_inputs_to_ctc_format(audio,sample_rate,txt)
                 train_inputs, train_targets, train_seq_len, original = out
 
                 feed = {inputs: train_inputs,
@@ -160,13 +161,21 @@ def run_ctc():
                         seq_len: train_seq_len}
 
                 batch_cost, _ = session.run([cost, optimizer], feed)
-                train_cost += batch_cost * batch_size
-                train_ler += session.run(ler, feed_dict=feed) * batch_size
+                train_ler += session.run(ler, feed_dict=feed)
                 
-                #print 'train_ler in for', train_ler
+            print 'batch_cost', batch_cost, 'train_ler', train_ler
+
+            # Decoding
+            d = session.run(decoded[0], feed_dict=feed)
+            str_decoded = ''.join([chr(x) for x in np.asarray(d[1]) + FIRST_INDEX])
+            # Replacing blank label to none
+            str_decoded = str_decoded.replace(chr(ord('z') + 1), '')
+            # Replacing space label to space
+            str_decoded = str_decoded.replace(chr(ord('a') - 1), ' ')
+
+            print('Original: %s' % original)
+            print('Decoded: %s' % str_decoded)
                 
-            print 'train_cost', train_cost, 'train_ler', train_ler / num_batches_per_epoch
-            
 
 
 if __name__ == '__main__':
