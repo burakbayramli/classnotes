@@ -39,6 +39,7 @@ def next_testing_batch():
     training_element = audio.cache[random_index]
     target_text = training_element['target']
     random_shift = np.random.randint(low=1, high=1000)
+    print 'random_shift', random_shift
     #print('random_shift =', random_shift)
     truncated_audio = training_element['audio'][random_shift:]
     out = convert_inputs_to_ctc_format(truncated_audio,
@@ -152,7 +153,66 @@ its great because it takes a lot of pressure off the players
 ```
 
 
+```python
+import librosa
 
+def read_audio_from_filename(filename, sample_rate):
+    # import scipy.io.wavfile as wav
+    # fs, audio = wav.read(filename)
+    audio, _ = librosa.load(filename, sr=sample_rate, mono=True)
+    audio = audio.reshape(-1, 1)
+    return audio
+
+filename = '/home/burak/Downloads/vctk-p225-small/wav48/p225/p225_001.wav'
+audio = read_audio_from_filename(filename, 8000)
+print audio.shape
+txt = 'Please call Stella.'
+out = convert_inputs_to_ctc_format(audio,8000,txt)
+train_inputs, train_targets, train_seq_len, original = out
+print original
+print train_inputs
+print train_targets
+print train_seq_len```
+
+```text
+(16413, 1)
+convert_inputs_to_ctc_format target_text:Please call Stella.
+original:please call stella
+please call stella
+[[[-0.67487496  0.16195085  0.22103811 ...,  0.30688176  0.46616323
+    0.30333008]
+  [-0.78461139  0.45824027  1.10632913 ...,  1.15581928 -0.21745038
+    0.09131419]
+  [-0.78385004  0.07659654  1.35290426 ...,  0.6201917  -0.36027755
+    0.91094108]
+  ..., 
+  [-0.74619432 -0.30510182  0.60356367 ...,  1.16440837  0.73415372
+   -0.3586614 ]
+  [-0.75728365 -0.28775713  0.47213882 ...,  0.34081892 -0.27396868
+   -0.2989732 ]
+  [-0.68014333 -0.30977439  0.2680564  ...,  0.42448062  0.04323652
+    0.12273666]]]
+(array([[ 0,  0],
+       [ 0,  1],
+       [ 0,  2],
+       [ 0,  3],
+       [ 0,  4],
+       [ 0,  5],
+       [ 0,  6],
+       [ 0,  7],
+       [ 0,  8],
+       [ 0,  9],
+       [ 0, 10],
+       [ 0, 11],
+       [ 0, 12],
+       [ 0, 13],
+       [ 0, 14],
+       [ 0, 15],
+       [ 0, 16],
+       [ 0, 17]]), array([16, 12,  5,  1, 19,  5,  0,  3,  1, 12, 12,  0, 19, 20,  5, 12, 12,
+        1], dtype=int32), array([ 1, 18]))
+[204]
+```
 
 
 
