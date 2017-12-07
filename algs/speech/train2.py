@@ -7,12 +7,11 @@ import numpy as np
 import librosa
 
 num_epochs = 1000
-num_hidden = 200
+num_hidden = 400
 num_layers = 1
-batch_size = 10
-num_batches_per_epoch = 10
+num_batches_per_epoch = 20
 sample_rate=16000
-num_features = 20
+num_features = 13
 # Accounting the 0th index +  space + blank label = 28 characters
 num_classes = ord('z') - ord('a') + 1 + 1 + 1
 print ('num_classes %d' % num_classes)
@@ -131,8 +130,8 @@ def run_ctc():
 
         # Option 2: tf.contrib.ctc.ctc_beam_search_decoder
         # (it's slower but you'll get better results)
-        decoded, log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len)
-        #decoded, log_prob = tf.nn.ctc_beam_search_decoder(logits, seq_len)
+        #decoded, log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len)
+        decoded, log_prob = tf.nn.ctc_beam_search_decoder(logits, seq_len)
 
         # Inaccuracy: label error rate
         ler = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32),
