@@ -12,7 +12,7 @@ num_layers = 1
 batch_size = 10
 num_batches_per_epoch = 10
 sample_rate=16000
-num_features = 13
+num_features = 20
 # Accounting the 0th index +  space + blank label = 28 characters
 num_classes = ord('z') - ord('a') + 1 + 1 + 1
 print ('num_classes %d' % num_classes)
@@ -20,7 +20,7 @@ print ('num_classes %d' % num_classes)
 SPACE_TOKEN = '<space>'
 SPACE_INDEX = 0
 FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
-
+mfile = "/tmp/speech.ckpt"
 
 def convert_inputs_to_ctc_format(audio, fs, target_text):
     #print('convert_inputs_to_ctc_format target_text:' + target_text)
@@ -94,14 +94,12 @@ def run_ctc():
 
         # Defining the cell
         # Can be:
-        cell = tf.contrib.rnn.LSTMCell(num_hidden, state_is_tuple=True)
-
-        # Stacking rnn cells
-        stack = tf.contrib.rnn.MultiRNNCell([cell] * num_layers,
-                                            state_is_tuple=True)
+        #cell = tf.contrib.rnn.BasicRNNCell(num_hidden)
+        cell = tf.contrib.rnn.LSTMCell(num_hidden)
+        #cell = tf.contrib.rnn.GRUCell(num_hidden)
 
         # The second output is the last state and we will no use that
-        outputs, _ = tf.nn.dynamic_rnn(stack, inputs, seq_len, dtype=tf.float32)
+        outputs, _ = tf.nn.dynamic_rnn(cell, inputs, seq_len, dtype=tf.float32)
 
         shape = tf.shape(inputs)
         batch_s, max_time_steps = shape[0], shape[1]
@@ -111,9 +109,7 @@ def run_ctc():
 
         # Truncated normal with mean 0 and stdev=0.1
         # Tip: Try another initialization
-        W = tf.Variable(tf.truncated_normal([num_hidden,
-                                             num_classes],
-                                            stddev=0.1))
+        W = tf.Variable(tf.truncated_normal([num_hidden, num_classes], stddev=0.1))
         # Zero initialization
         # Tip: Is tf.zeros_initializer the same?
         b = tf.Variable(tf.constant(0., shape=[num_classes]))
@@ -136,6 +132,7 @@ def run_ctc():
         # Option 2: tf.contrib.ctc.ctc_beam_search_decoder
         # (it's slower but you'll get better results)
         decoded, log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len)
+        #decoded, log_prob = tf.nn.ctc_beam_search_decoder(logits, seq_len)
 
         # Inaccuracy: label error rate
         ler = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32),
@@ -147,11 +144,16 @@ def run_ctc():
 
         tf.global_variables_initializer().run()
 
+        saver = tf.train.Saver()
+        #saver.restore(session, mfile)
+
         for curr_epoch in range(num_epochs):
             train_cost = train_ler = 0
             for batch in range(num_batches_per_epoch):
                 filename = random.choice(files)
                 txt = re.findall(".*/(.*?)/.*?.wav",filename)[0]
+                #txt=txt.replace("right","rayt")
+                #txt=txt.replace("down","daun")
                 audio = read_audio_from_filename(filename, sample_rate)
                 out = convert_inputs_to_ctc_format(audio,sample_rate,txt)
                 train_inputs, train_targets, train_seq_len, original = out
@@ -176,7 +178,8 @@ def run_ctc():
             print('Original: %s' % original)
             print('Decoded: %s' % str_decoded)
                 
-
+            if curr_epoch % 10 == 0: saver.save(session, mfile)
+            
 
 if __name__ == '__main__':
     run_ctc()
