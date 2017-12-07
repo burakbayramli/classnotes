@@ -8,7 +8,7 @@ import numpy as np
 import librosa
 
 num_epochs = 1000
-num_hidden = 50
+num_hidden = 100
 num_layers = 4
 num_batches_per_epoch = 10
 sample_rate=16000
@@ -152,10 +152,6 @@ def sparse_tuple_from(sequences, dtype=np.int32):
 
     return indices, values, shape
 
-def read_audio_from_filename(filename, sample_rate):
-    audio, _ = librosa.load(filename, sr=sample_rate, mono=True)
-    audio = audio.reshape(-1, 1)
-    return audio
 
 def find_files(directory, pattern='.wav'):
     """Recursively finds all files matching the pattern."""
@@ -182,7 +178,7 @@ def run_ctc():
         # 1d array of size [batch_size]
         seq_len = tf.placeholder(tf.int32, [None])
 
-        network = tf.contrib.rnn.MultiRNNCell([tf.contrib.rnn.BasicRNNCell(num_hidden)
+        network = tf.contrib.rnn.MultiRNNCell([tf.contrib.rnn.GRUCell(num_hidden)
                                                for _ in range(num_layers)], state_is_tuple=True)
 
         
