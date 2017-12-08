@@ -141,34 +141,38 @@ res = audiofile_to_input_vector(f, num_features, steps_before_after)
 res = res.astype('float32')
 print res.shape
 
+labels = ['down','go','left','no','off','on','right','stop','up','yes']
+
 random.seed(0)
 def get_minibatch(batch_size):
     res = []
+    y = []
     for i in range(batch_size):
     	f = random.choice(audio_files)
 	a = audiofile_to_input_vector(f, num_features, steps_before_after)
 	a = a.astype('float32')
     	res.append(a)
-	
+	label = re.findall(".*/(.*?)/.*?.wav",f)[0]
+	y.append(labels.index(label))
     res = np.array(res)
-    return res
+    y = np.array(y)
+    return res, y
 
-data = get_minibatch(2)
-print data.shape
-
+data,y = get_minibatch(2)
+print data.shape, y.shape
 ```
 
 ```text
 (50, 494)
 (50, 494)
-(2, 50, 494)
+(2, 50, 494) (2,)
 ```
 
 
 ```python
 num_units = 200
 num_layers = 3
-     
+
 graph = tf.Graph()
 with graph.as_default():
 
@@ -177,7 +181,8 @@ with graph.as_default():
     # e.g: log filter bank or MFCC features
     # Has size [batch_size, max_step_size, num_features], but the
     # batch_size and max_step_size can vary along each step
-    inputs = tf.placeholder(tf.float32, [None, None, 494])
+    X = tf.placeholder(tf.float32, [None, None, 494])
+    y = tf.placeholder(tf.int32, [None])    
 
     cells = []
     for _ in range(num_layers):
@@ -186,9 +191,33 @@ with graph.as_default():
     	cells.append(cell)
     cell = tf.contrib.rnn.MultiRNNCell(cells)
 
-    data = tf.placeholder(tf.float32, [None, None, 28])
-    output, state = tf.nn.dynamic_rnn(cell, data, dtype=tf.float32)
+    output, states = tf.nn.dynamic_rnn(cell, X, dtype=tf.float32)
+
+    logit = tf.contrib.layers.fully_connected(states, len(labels), activation_fn=None)
+    prediction = tf.nn.softmax(logit)
+    #loss = tf.losses.softmax_cross_entropy(target, logit)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
