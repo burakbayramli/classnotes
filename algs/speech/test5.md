@@ -15,7 +15,7 @@ num_layers = 4
 num_batches_per_epoch = 10
 sample_rate=16000
 num_features = 26
-
+steps_before_after = 9
 SPACE_TOKEN = '<space>'
 SPACE_INDEX = 0
 FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
@@ -109,23 +109,59 @@ def audiofile_to_input_vector(audio_filename, numcep, numcontext):
     # This can be done more efficiently in the TensorFlow graph
     train_inputs = (train_inputs - np.mean(train_inputs)) / np.std(train_inputs)
     return train_inputs
+    
+fdir = "/home/burak/Downloads/train/audio"
+
+def find_files(directory, pattern='.wav'):
+    """Recursively finds all files matching the pattern."""
+    files = []
+    for root, directories, filenames in os.walk(directory):
+        for filename in filenames: 
+            path = os.path.join(root,filename)
+            if pattern in path: files.append(path)    
+    res = sorted(files)
+    return res
+
+audio_files = find_files("/home/burak/Downloads/goog_tf_speech/audio")
+print len(audio_files)
+```
+
+```text
+23682
 ```
 
 ```python
 f = '/home/burak/Downloads/goog_tf_speech/audio/down/00176480_nohash_0.wav'
-res = audiofile_to_input_vector(f, 26, 9)
+res = audiofile_to_input_vector(f, num_features, steps_before_after)
 res = res.astype('float32')
 print res.shape
 
 f = '/home/burak/Downloads/goog_tf_speech/audio/down/00176480_nohash_0.wav'
-res = audiofile_to_input_vector(f, 26, 9)
+res = audiofile_to_input_vector(f, num_features, steps_before_after)
 res = res.astype('float32')
 print res.shape
+
+random.seed(0)
+def get_minibatch(batch_size):
+    res = []
+    for i in range(batch_size):
+    	f = random.choice(audio_files)
+	a = audiofile_to_input_vector(f, num_features, steps_before_after)
+	a = a.astype('float32')
+    	res.append(a)
+	
+    res = np.array(res)
+    return res
+
+data = get_minibatch(2)
+print data.shape
+
 ```
 
 ```text
 (50, 494)
 (50, 494)
+(2, 50, 494)
 ```
 
 
