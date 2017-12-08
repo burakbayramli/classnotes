@@ -1,4 +1,4 @@
-
+import tensorflow as tf
 from python_speech_features import mfcc
 import numpy as np
 import tensorflow as tf
@@ -7,9 +7,10 @@ from glob import glob
 import time, re, os, random
 import numpy as np
 
+num_units = 200
+num_layers = 3
+batch_size = 5
 num_epochs = 1000
-num_hidden = 100
-num_layers = 4
 num_batches_per_epoch = 10
 sample_rate=16000
 num_features = 26
@@ -153,13 +154,6 @@ def get_minibatch(batch_size):
 data,y = get_minibatch(1)
 print data.shape, y.shape
 print y[0]
-#print y[1]
-
-import tensorflow as tf
-
-num_units = 200
-num_layers = 3
-batch_size = 10
 
 tf.reset_default_graph()
 
@@ -167,10 +161,9 @@ tf.reset_default_graph()
 # Has size [batch_size, max_step_size, num_features], but the
 # batch_size and max_step_size can vary along each step
 X = tf.placeholder(tf.float32, [batch_size, 50, 494])
-#y = tf.placeholder(tf.int32, [None])
 y = tf.placeholder(tf.float32, shape=[batch_size, len(labels)])
 
-basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=num_units)
+basic_cell = tf.contrib.rnn.GRUCell(num_units=num_units)
 multi_layer_cell = tf.contrib.rnn.MultiRNNCell([basic_cell] * num_units)
 cells = []
 for _ in range(num_layers):
@@ -179,21 +172,16 @@ for _ in range(num_layers):
 cell = tf.contrib.rnn.MultiRNNCell(cells)
 output, states = tf.nn.dynamic_rnn(cell, X, dtype=tf.float32)
 last = states[-1][0]
-print last
-print 'len(labels)',len(labels)
-#logits = tf.contrib.layers.fully_connected(inputs=last,
-#                                           num_outputs=len(labels),
-#					   activation_fn=tf.nn.relu)
-W = tf.Variable(tf.truncated_normal([200,10],mean=0,stddev=.01))
-b = tf.Variable(tf.truncated_normal([10], mean=0,stddev=.01))
-logits = tf.matmul(last, W) + b
+logits = tf.contrib.layers.fully_connected(inputs=last,
+                                           num_outputs=len(labels),
+					   activation_fn=None)
 
 print logits
-#xentropy = tf.losses.softmax_cross_entropy(y, logits)
+
 softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y)                         
 
 cross_entropy = tf.reduce_mean(softmax)
-train_step = tf.train.RMSPropOptimizer(0.001, 0.9).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(logits,1))
 accuracy = (tf.reduce_mean(tf.cast(correct_prediction, tf.float32)))*100
@@ -211,6 +199,4 @@ with tf.Session() as sess:
         except:
             #print 'error'
             continue
-
-        
-        
+               
