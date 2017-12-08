@@ -176,13 +176,13 @@ num_layers = 3
 graph = tf.Graph()
 with graph.as_default():
 
-    dropout = tf.placeholder(tf.float32)
-
     # e.g: log filter bank or MFCC features
     # Has size [batch_size, max_step_size, num_features], but the
     # batch_size and max_step_size can vary along each step
     X = tf.placeholder(tf.float32, [None, None, 494])
     y = tf.placeholder(tf.int32, [None])    
+
+    dropout = tf.placeholder(tf.float32)
 
     cells = []
     for _ in range(num_layers):
@@ -193,11 +193,41 @@ with graph.as_default():
 
     output, states = tf.nn.dynamic_rnn(cell, X, dtype=tf.float32)
 
-    logit = tf.contrib.layers.fully_connected(states, len(labels), activation_fn=None)
-    prediction = tf.nn.softmax(logit)
-    #loss = tf.losses.softmax_cross_entropy(target, logit)
+#    print output
+#    print states
+
+    hidden_layer_size = num_units
+    num_classes = len(labels)
+    W = tf.Variable(tf.truncated_normal([hidden_layer_size,num_classes],mean=0,stddev=.01))
+    b = tf.Variable(tf.truncated_normal([num_classes],mean=0,stddev=.01))
+
+    print states[num_layers-1][1]
+    print W
+
+    final_output = tf.matmul(states[num_layers-1][1],W) + b
+
+#    print states
+#    print len(labels)
+#    logits = tf.contrib.layers.fully_connected(states, len(labels), activation_fn=None)
+#    print logits    
+#    xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y, logits=logits)
+#    loss = tf.reduce_mean(xentropy)
+#    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+#    training_op = optimizer.minimize(loss)
+#    correct = tf.nn.in_top_k(logits, y, 1)
+#    accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
+
+#    logit = tf.contrib.layers.fully_connected(states, len(labels), activation_fn=None)
+#    prediction = tf.nn.softmax(logit)
+#    loss = tf.losses.softmax_cross_entropy(y, logit) 
+
+
 ```
 
+```text
+Tensor("strided_slice:0", shape=(200,), dtype=float32)
+<tf.Variable 'Variable:0' shape=(200, 10) dtype=float32_ref>
+```
 
 
 
