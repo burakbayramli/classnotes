@@ -16,9 +16,6 @@ num_epochs = 2000
 sample_rate=16000
 num_features = 26
 steps_before_after = 9
-SPACE_TOKEN = '<space>'
-SPACE_INDEX = 0
-FIRST_INDEX = ord('a') - 1  # 0 is reserved to space
 mfile = "/tmp/speech.ckpt"
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
