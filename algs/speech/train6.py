@@ -9,10 +9,10 @@ import numpy as np
 
 random.seed(0)
 np.random.seed(0)
-num_units = 50
-num_layers = 3
-batch_size = 10
-num_epochs = 1000
+num_units = 20
+num_layers = 2
+batch_size = 20
+num_epochs = 2000
 sample_rate=16000
 num_features = 26
 steps_before_after = 9
@@ -135,11 +135,17 @@ if __name__ == "__main__":
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
+
+        saver = tf.train.Saver()
+
+        if os.path.isfile(mfile + ".index"):
+            print 'restoring'
+            saver.restore(sess, mfile)
+        
         for i in range(num_epochs):
-            print i
             x_batch, y_batch = get_minibatch(batch_size)
             sess.run(train_step,feed_dict={X:x_batch, y:y_batch})
-            if i % 10 == 0: 
+            if i % 20 == 0: 
                 acc = sess.run(accuracy,feed_dict={X:x_batch, y:y_batch})
-                print 'accuracy', acc
-
+                print i, 'accuracy', acc
+                saver.save(sess, mfile)

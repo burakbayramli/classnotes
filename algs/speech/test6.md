@@ -1,5 +1,24 @@
 
 ```python
+import time, re, os, random
+
+mfile = "/tmp/speech.ckpt"
+
+print os.path.isfile(mfile + ".index")
+```
+
+```text
+True
+```
+
+
+
+
+
+
+
+
+```python
 from python_speech_features import mfcc
 import numpy as np
 import tensorflow as tf
