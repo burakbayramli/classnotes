@@ -8,9 +8,10 @@ import time, re, os, random
 import numpy as np
 
 random.seed(0)
-num_units = 200
+np.random.seed(0)
+num_units = 50
 num_layers = 3
-batch_size = 2
+batch_size = 10
 num_epochs = 1000
 sample_rate=16000
 num_features = 26
@@ -99,7 +100,7 @@ def get_minibatch(batch_size):
         if a.shape[0] != 50: continue
     	res[i, :, :] = a
 	label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-        print label
+        #print label
 	y[i, labels.index(label)] = 1.0
         i += 1
         if i==batch_size: break
