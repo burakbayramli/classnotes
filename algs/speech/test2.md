@@ -1,3 +1,32 @@
+
+
+```python
+zip = '/home/burak/Downloads/goog_voice_train.zip'
+import zipfile, pandas as pd, random
+with zipfile.ZipFile(zip, 'r') as z:
+     training_files = z.namelist()
+```
+
+
+```python
+def get_minibatch(batch_size):
+    res = np.zeros((batch_size, 16000))
+    with zipfile.ZipFile(zip, 'r') as z:
+        for i in range(batch_size):
+            f = random.choice(training_files)
+     	    wav = io.BytesIO(z.open(f).read())
+     	    v = scipy.io.wavfile.read(wav)
+	    res[i, 0:len(v[1])] = v[1]
+    return res
+    
+tmp = get_minibatch(20)
+print tmp.shape
+```
+
+```text
+(20, 16000)
+```
+
 ```python
 import scipy.io.wavfile, zipfile
 import io, time
