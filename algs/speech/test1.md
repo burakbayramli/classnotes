@@ -77,16 +77,21 @@ print v[1].shape
 ```
 
 ```python
-
+data = v[1].reshape((1,16000))
+chunk = 2000
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
-     res = sess.run(mfccs,feed_dict={pcm: v[1].reshape((1,16000)) })
+     #res = sess.run(mfccs,feed_dict={pcm: data) })
+     res = sess.run(mfccs,feed_dict={pcm: data[0,0:chunk].reshape(1,chunk) })
+     print res.shape
+     res = sess.run(mfccs,feed_dict={pcm: data[0,chunk:2*chunk].reshape(1,chunk) })
      print res.shape
 
 ```
 
 ```text
-(1, 59, 80)
+(1, 4, 80)
+(1, 4, 80)
 ```
 
 
