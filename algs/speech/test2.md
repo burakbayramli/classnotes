@@ -3,9 +3,57 @@
 ```python
 zip = '/home/burak/Downloads/goog_voice_train.zip'
 import zipfile, pandas as pd, random
+import scipy.io.wavfile, io
 with zipfile.ZipFile(zip, 'r') as z:
      training_files = z.namelist()
 ```
+
+```python
+import re
+
+labels = ['down','go','left','no','off','on','right','stop','up','yes']
+
+def get_minibatch(batch_size):
+    res = np.zeros((batch_size, 16000))
+    y = np.zeros((batch_size,len(labels)+2 ))
+    with zipfile.ZipFile(zip, 'r') as z:
+        for i in range(batch_size):
+            f = random.choice(training_files)
+	    label = re.findall(".*/(.*?)/.*?.wav",f)[0]
+	    if label in labels:
+	       y[i, labels.index(label)] = 1.0
+	    else:
+	       y[i, len(labels)+1] = 1.0 # unknown
+     	    wav = io.BytesIO(z.open(f).read())
+     	    v = scipy.io.wavfile.read(wav)
+	    res[i, 0:len(v[1])] = v[1]
+    return res,y
+    
+X,y = get_minibatch(1)
+print X.shape
+print y.shape
+```
+
+```text
+(1, 16000)
+(1, 12)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```python
@@ -84,7 +132,16 @@ with tf.Session() as sess:
 (1, 30, 80)
 ```
 
+```python
+with tf.Session() as sess:
+     sess.run(tf.global_variables_initializer())
+     res = sess.run(mfccs2,feed_dict={pcm: tmp })
+     print res.shape
+```
 
+```text
+(20, 30, 80)
+```
 
 
 
