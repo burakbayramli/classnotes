@@ -86,15 +86,20 @@ accuracy = (tf.reduce_mean(tf.cast(correct_prediction, tf.float32)))*100.
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    
+
+    saver = tf.train.Saver()
+
+    if os.path.isfile(mfile + ".index"):
+         print 'restoring'
+         saver.restore(sess, mfile)
+            
     for i in range(num_epochs):
         x_batch, y_batch = get_minibatch(batch_size)
         sess.run(train_step,feed_dict={pcm:x_batch, y:y_batch})
-        if i % 20 == 0: 
+        if i % 5 == 0: 
             acc = sess.run(accuracy,feed_dict={pcm:x_batch, y:y_batch})
             print i, 'accuracy', acc
-
-
+            saver.save(sess, mfile)
 
 
 
