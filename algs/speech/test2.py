@@ -15,15 +15,16 @@ num_epochs = 2000
 sample_rate=16000
 mfile = "/tmp/speech.ckpt"
 
-white_noise = np.array(((acoustics.generator.noise(16000, color='white'))/3) * 32767).astype(np.int16)
-pink_noise = np.array(((acoustics.generator.noise(16000, color='pink'))/3) * 32767).astype(np.int16)
-
 zip = '/home/burak/Downloads/goog_voice_train.zip'
 import zipfile, pandas as pd, random
 import scipy.io.wavfile, io
 with zipfile.ZipFile(zip, 'r') as z:
-     training_files = z.namelist()
+     files = z.namelist()
 
+files = [x for x in files if  '.wav' in x]     
+training_files = [x for x in files if not '_background_noise_' in x]
+noise_files = [x for x in files if '_background_noise_' in x]
+     
 def get_minibatch(batch_size):
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
@@ -39,10 +40,19 @@ def get_minibatch(batch_size):
                     y[i, len(labels)] = 1.0 # unknown
                wav = io.BytesIO(z.open(f).read())
                v = scipy.io.wavfile.read(wav)
-               print f, v[1].shape
+               #print f, v[1].shape
                res[i, 0:len(v[1])] = v[1]
-          else: # silence, use generated data          
-	       res[i, :] = random.choice([pink_noise, white_noise])
+          else: # silence, use generated data
+               f = random.choice(noise_files)
+               print 'noise', f
+               wav = io.BytesIO(z.open(f).read())
+               v = scipy.io.wavfile.read(wav)
+               chunks = int(len(v[1]) / sample_rate) - 1
+               chosen_chunk = random.choice(range(chunks))
+               fr = int(chosen_chunk * sample_rate)
+               to = int((chosen_chunk+1)*sample_rate)
+               chunk_byte = v[1][fr:to]
+	       res[i, :] = chunk_byte
 	       y[i, len(labels)+1] = 1.0 # silence
                                   
     return res,y
