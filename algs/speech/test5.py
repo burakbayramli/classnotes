@@ -53,7 +53,6 @@ def get_minibatch(batch_size, training=True):
                #print f, v[1].shape
                res[i, 0:len(v[1])] = v[1]
           else: # silence, use generated data
-               f = random.choice(noise_files)
                #print 'noise', f
                wav = io.BytesIO(z.open(f).read())
                v = scipy.io.wavfile.read(wav)
