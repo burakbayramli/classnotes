@@ -1,10 +1,12 @@
 import tensorflow as tf, re
 import zipfile, pandas as pd, random
 import pandas as pd, scipy.io.wavfile
-import numpy as np, io, os
+import numpy as np, io, os, acoustics
 import matplotlib.pyplot as plt
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
+
+random.seed(0)
 
 num_units = 20
 num_layers = 2
@@ -12,6 +14,9 @@ batch_size = 20
 num_epochs = 2000
 sample_rate=16000
 mfile = "/tmp/speech.ckpt"
+
+white_noise = np.array(((acoustics.generator.noise(16000, color='white'))/3) * 32767).astype(np.int16)
+pink_noise = np.array(((acoustics.generator.noise(16000, color='pink'))/3) * 32767).astype(np.int16)
 
 zip = '/home/burak/Downloads/goog_voice_train.zip'
 import zipfile, pandas as pd, random
@@ -24,15 +29,22 @@ def get_minibatch(batch_size):
     y = np.zeros((batch_size,len(labels)+2 ))
     with zipfile.ZipFile(zip, 'r') as z:
         for i in range(batch_size):
-            f = random.choice(training_files)
-	    label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-	    if label in labels:
-	       y[i, labels.index(label)] = 1.0
-	    else:
-	       y[i, len(labels)+1] = 1.0 # unknown
-     	    wav = io.BytesIO(z.open(f).read())
-     	    v = scipy.io.wavfile.read(wav)
-	    res[i, 0:len(v[1])] = v[1]
+          action = random.choice(range(10))
+          if action != 0: # non-silence voice file
+               f = random.choice(training_files)
+               label = re.findall(".*/(.*?)/.*?.wav",f)[0]
+               if label in labels:
+                    y[i, labels.index(label)] = 1.0
+               else:
+                    y[i, len(labels)] = 1.0 # unknown
+               wav = io.BytesIO(z.open(f).read())
+               v = scipy.io.wavfile.read(wav)
+               print f, v[1].shape
+               res[i, 0:len(v[1])] = v[1]
+          else: # silence, use generated data          
+	       res[i, :] = random.choice([pink_noise, white_noise])
+	       y[i, len(labels)+1] = 1.0 # silence
+                                  
     return res,y
     
 sample_rate = 16000.0

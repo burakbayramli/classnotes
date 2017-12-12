@@ -1,5 +1,22 @@
 
 ```python
+import scipy.io.wavfile, zipfile, acoustics
+
+scipy.io.wavfile.write('/tmp/white_noise.wav', 16000,
+np.array(((acoustics.generator.noise(16000*60, color='white'))/3) *
+32767).astype(np.int16))
+
+scipy.io.wavfile.write('/tmp/pink_noise.wav', 16000,
+np.array(((acoustics.generator.noise(16000*60, color='pink'))/3) *
+32767).astype(np.int16))
+```
+
+
+
+
+
+
+```python
 #zip = '/media/burak/New Volume/archive/data/google_voice/test.zip'
 zip = '/home/burak/Downloads/goog_voice_train.zip'
 import zipfile, pandas as pd, random
