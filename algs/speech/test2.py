@@ -5,8 +5,6 @@ import numpy as np, io, os
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
-random.seed(0)
-
 num_units = 20
 num_layers = 2
 batch_size = 100
