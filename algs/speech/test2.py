@@ -26,7 +26,7 @@ training_files = [x for x in files if not '_background_noise_' in x]
 noise_files = [x for x in files if '_background_noise_' in x]
      
 def get_minibatch(batch_size):
-    res = np.zeros((batch_size, 16000))
+    res = np.zeros((batch_size, sample_rate))
     y = np.zeros((batch_size,len(labels)+2 ))
     with zipfile.ZipFile(zip, 'r') as z:
         for i in range(batch_size):
@@ -57,13 +57,11 @@ def get_minibatch(batch_size):
                                   
     return res,y
     
-sample_rate = 16000.0
-
 pcm = tf.placeholder(tf.float32, [None, None])
 
-pcm2 = pcm[:,0:16000]
+pcm2 = pcm[:,0:sample_rate]
 
-pcm3 = tf.reshape(pcm2, (-1,10,1600))
+pcm3 = tf.reshape(pcm2, (-1,10,sample_rate))
 
 stfts = tf.contrib.signal.stft(pcm3, frame_length=1024, frame_step=256, fft_length=1024)
 
