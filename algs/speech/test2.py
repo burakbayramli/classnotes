@@ -10,7 +10,7 @@ random.seed(0)
 
 num_units = 20
 num_layers = 2
-batch_size = 20
+batch_size = 100
 num_epochs = 2000
 sample_rate=16000
 mfile = "/tmp/speech.ckpt"
@@ -26,7 +26,7 @@ training_files = [x for x in files if not '_background_noise_' in x]
 noise_files = [x for x in files if '_background_noise_' in x]
      
 def get_minibatch(batch_size):
-    res = np.zeros((batch_size, sample_rate))
+    res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     with zipfile.ZipFile(zip, 'r') as z:
         for i in range(batch_size):
@@ -57,11 +57,13 @@ def get_minibatch(batch_size):
                                   
     return res,y
     
+sample_rate = 16000.0
+
 pcm = tf.placeholder(tf.float32, [None, None])
 
-pcm2 = pcm[:,0:sample_rate]
+pcm2 = pcm[:,0:16000]
 
-pcm3 = tf.reshape(pcm2, (-1,10,sample_rate))
+pcm3 = tf.reshape(pcm2, (-1,10,1600))
 
 stfts = tf.contrib.signal.stft(pcm3, frame_length=1024, frame_step=256, fft_length=1024)
 
@@ -120,11 +122,5 @@ with tf.Session() as sess:
             acc = sess.run(accuracy,feed_dict={pcm:x_batch, y:y_batch})
             print i, 'accuracy', acc
             saver.save(sess, mfile)
-
-
-
-
-
-
 
 
