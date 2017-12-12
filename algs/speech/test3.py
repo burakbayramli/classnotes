@@ -9,14 +9,14 @@
 import sounddevice as sd
 import scipy.io.wavfile, zipfile
 import io, time
-#zip = '/media/burak/New Volume/archive/data/google_voice/test.zip'
-zip = '/home/burak/Downloads/goog_voice_train.zip'
+zip = '/home/burak/Downloads/goog_voice_test.zip'
+#zip = '/home/burak/Downloads/goog_voice_train.zip'
 with zipfile.ZipFile(zip, 'r') as z:
-     wav = io.BytesIO(z.open('train/audio/_background_noise_/pink_noise.wav').read())
+     wav = io.BytesIO(z.open('test/audio/clip_d6705db50.wav').read())
      v = scipy.io.wavfile.read(wav)
      fs = 16000
-     #scipy.io.wavfile.write('/tmp/tmp1.wav', fs, v[1])
-     sd.play(v[1], fs)
-     time.sleep(10)
+     scipy.io.wavfile.write('/tmp/tmp1.wav', fs, v[1])
+     #sd.play(v[1], fs)
+     #time.sleep(10)
      print v[1]
 
