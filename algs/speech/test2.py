@@ -1,8 +1,7 @@
 import tensorflow as tf, re
 import zipfile, pandas as pd, random
 import pandas as pd, scipy.io.wavfile
-import numpy as np, io, os, acoustics
-import matplotlib.pyplot as plt
+import numpy as np, io, os
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
