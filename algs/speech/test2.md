@@ -1,4 +1,38 @@
 
+```python
+import tensorflow as tf
+
+tf.reset_default_graph()
+init_op = tf.global_variables_initializer()
+
+data = tf.placeholder(tf.float32, [1, 20, 5, 10])
+
+basic_cell = tf.contrib.rnn.GRUCell(num_units=30)
+outputs, states = tf.nn.dynamic_rnn(basic_cell, data, dtype=tf.float32)
+print 'gru', outputs.shape
+print 'gru', states.shape
+
+s = np.random.rand(1,20,5,10)
+with tf.Session() as sess:
+     sess.run(tf.global_variables_initializer())
+     res = sess.run(states, feed_dict={data: s })  
+print res.shape
+
+```
+
+```text
+gru (1, 20, 30)
+gru (1, 30)
+(1, 30)
+```
+
+
+
+
+
+
+
+
 
 ```python
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
