@@ -4,6 +4,8 @@
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 import tensorflow as tf
 
+tf.reset_default_graph()
+
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
   return tf.Variable(initial)
@@ -23,6 +25,7 @@ def max_pool_3x3(x):
 init_op = tf.global_variables_initializer()
 
 data = tf.placeholder(tf.float32, [None, None])
+y = tf.placeholder(tf.float32, shape=[None, 12])
 
 stfts = tf.contrib.signal.stft(data,
 			       frame_length=110,
@@ -59,11 +62,31 @@ print 'conv 4', h_conv4.shape
 h_pool4 = max_pool_3x3(h_conv4)
 print 'pool 4', h_pool4.shape
 
+X = tf.reshape(h_pool4, (-1, 53, 32*8))
+
+basic_cell = tf.contrib.rnn.GRUCell(num_units=30)
+
+outputs, states = tf.nn.dynamic_rnn(basic_cell, X, dtype=tf.float32)
+print 'gru', states.shape
+
+logits = tf.contrib.layers.fully_connected(inputs=states,num_outputs=12,activation_fn=None)
+
+softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y) 
+
+cross_entropy = tf.reduce_mean(softmax)
+
+train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
+
+correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(logits,1))
+
+accuracy = (tf.reduce_mean(tf.cast(correct_prediction, tf.float32)))*100.
+
+
 from tensorflow.python.ops import random_ops
 s = np.random.rand(2,16000)
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
-     res = sess.run(h_pool4, feed_dict={data: s })  
+     res = sess.run(logits, feed_dict={data: s })  
 print res.shape
 ```
 
@@ -76,7 +99,8 @@ conv 3 (?, 32, 210, 32)
 pool 3 (?, 16, 105, 32)
 conv 4 (?, 16, 105, 32)
 pool 4 (?, 8, 53, 32)
-(2, 8, 53, 32)
+gru (?, 30)
+(2, 12)
 ```
 
 
