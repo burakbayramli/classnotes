@@ -1,3 +1,11 @@
+conv 1 (?, 128, 840, 16)
+pool 1 (?, 64, 420, 16)
+conv 2 (?, 64, 420, 32)
+pool 2 (?, 32, 210, 32)
+conv 3 (?, 32, 210, 32)
+pool 3 (?, 16, 105, 32)
+conv 4 (?, 16, 105, 32)
+pool 4 (?, 8, 53, 32)
 
 ```python
 import tensorflow as tf
@@ -5,24 +13,34 @@ import tensorflow as tf
 tf.reset_default_graph()
 init_op = tf.global_variables_initializer()
 
-data = tf.placeholder(tf.float32, [1, 20, 5, 10])
-
+data = tf.placeholder(tf.float32, [1, 5, 3, 2])
+X = tf.transpose(data, [0,2,1,3])
+X = tf.reshape(X, (-1, 3, 10))
 basic_cell = tf.contrib.rnn.GRUCell(num_units=30)
-outputs, states = tf.nn.dynamic_rnn(basic_cell, data, dtype=tf.float32)
+outputs, states = tf.nn.dynamic_rnn(basic_cell, X, dtype=tf.float32)
 print 'gru', outputs.shape
 print 'gru', states.shape
 
-s = np.random.rand(1,20,5,10)
+s = np.random.rand(1,5,3,2)
 with tf.Session() as sess:
-     sess.run(tf.global_variables_initializer())
-     res = sess.run(states, feed_dict={data: s })  
+     sess.run(tf.global_variables_initializer())     
+     res = sess.run(states, feed_dict={data: s })
+     print s[0,:,0,:]
+     print sess.run(X, feed_dict={data: s })[0,0]
 print res.shape
 
 ```
 
 ```text
-gru (1, 20, 30)
+gru (1, 3, 30)
 gru (1, 30)
+[[ 0.28997342  0.11505928]
+ [ 0.07538374  0.19706126]
+ [ 0.9662463   0.5150687 ]
+ [ 0.96518386  0.41174758]
+ [ 0.72776183  0.95941608]]
+[ 0.28997341  0.11505928  0.07538374  0.19706126  0.96624631  0.51506871
+  0.96518385  0.41174757  0.72776181  0.95941609]
 (1, 30)
 ```
 

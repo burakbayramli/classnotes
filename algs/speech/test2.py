@@ -5,8 +5,9 @@ import numpy as np, io, os
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
+num_units = 30
 batch_size = 10
-num_epochs = 2000
+num_epochs = 5000
 sample_rate = 16000
 mfile = "/tmp/speech.ckpt"
 
@@ -115,9 +116,10 @@ print 'conv 4', h_conv4.shape
 h_pool4 = max_pool_3x3(h_conv4)
 print 'pool 4', h_pool4.shape
 
-X = tf.reshape(h_pool4, (-1, 53, 32*8))
+X = tf.transpose(h_pool4, [0,2,1,3])
+X = tf.reshape(X, (-1, 53, 32*8))
 
-basic_cell = tf.contrib.rnn.GRUCell(num_units=30)
+basic_cell = tf.contrib.rnn.GRUCell(num_units=num_units)
 
 outputs, states = tf.nn.dynamic_rnn(basic_cell, X, dtype=tf.float32)
 print 'gru', states.shape
