@@ -103,6 +103,16 @@ train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(logits,1))
 accuracy = (tf.reduce_mean(tf.cast(correct_prediction, tf.float32)))*100.
 
+total_parameters = 0
+for variable in tf.trainable_variables():
+    shape = variable.get_shape()
+    variable_parameters = 1
+    for dim in shape:
+        variable_parameters *= dim.value
+    total_parameters += variable_parameters
+print(total_parameters)
+exit()
+
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 

@@ -14,7 +14,6 @@ stfts = tf.contrib.signal.stft(data,
 			       fft_length=1678)
 spectrograms = tf.abs(stfts)
 
-
 from tensorflow.python.ops import random_ops
 s = np.random.rand(2,16000)
 with tf.Session() as sess:
