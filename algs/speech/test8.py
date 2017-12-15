@@ -90,12 +90,12 @@ gru_bw_cell	=	tf.contrib.rnn.GRUCell(100)
 gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
 
 
-outputs,	states	=	tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
-								cell_bw=gru_bw_cell,
-								inputs=mfcc,dtype=tf.float32)
+outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
+						   cell_bw=gru_bw_cell,
+						   inputs=mfcc,dtype=tf.float32)
 print outputs
 
-states	=	tf.concat(values=states,	axis=1)
+states = tf.concat(values=states, axis=1)
 
 print states
 
