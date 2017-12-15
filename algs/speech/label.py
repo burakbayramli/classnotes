@@ -5,7 +5,7 @@ zip = '/home/burak/Downloads/goog_voice_test.zip'
 import zipfile
 with zipfile.ZipFile(zip, 'r') as z:
     files = z.namelist()
-    fout = open ("/tmp/label.txt", "a")     
+    fout = open ("label.txt", "a")     
     while (True):
         f = random.choice(files)
         print f
