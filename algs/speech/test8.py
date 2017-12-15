@@ -73,13 +73,15 @@ pcm = tf.placeholder(tf.float32, [None, 16000], name = 'inputs')
 
 y = tf.placeholder(tf.float32, shape=[None, 12])
 
-stfts = tf.contrib.signal.stft(pcm, frame_length=40, frame_step=40, fft_length=512)
+stfts = tf.contrib.signal.stft(pcm, frame_length=400, frame_step=50, fft_length=512)
 
 spec = tf.abs(stfts)
 
 print spec
 
 mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
+
+print mfcc
 
 gru_fw_cell	=	tf.contrib.rnn.GRUCell(100)
 gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
