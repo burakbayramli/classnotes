@@ -1,5 +1,27 @@
 
 ```python
+zip = '/home/burak/Downloads/goog_voice_train.zip'
+import zipfile
+with zipfile.ZipFile(zip, 'r') as z:
+     res = z.namelist()
+for x in res:
+    if 'background' in x: print x
+```
+
+```text
+train/audio/_background_noise_/
+train/audio/_background_noise_/README.md
+train/audio/_background_noise_/doing_the_dishes.wav
+train/audio/_background_noise_/dude_miaowing.wav
+train/audio/_background_noise_/exercise_bike.wav
+train/audio/_background_noise_/pink_noise.wav
+train/audio/_background_noise_/running_tap.wav
+train/audio/_background_noise_/white_noise.wav
+```
+
+
+
+```python
 print 1000 / 25
 print 16000 / 40
 ```
