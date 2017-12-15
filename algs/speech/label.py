@@ -1,3 +1,4 @@
+# yes, no, up, down, left, right, on, off, stop, go
 import random, scipy.io.wavfile, io
 import sounddevice as sd, time
 
