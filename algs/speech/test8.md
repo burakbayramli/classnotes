@@ -1,5 +1,49 @@
 
 ```python
+d = '/tmp/bla/bla'
+ds = ''
+for x in d.split('/'):
+    if x=='': continue
+    ds += '/' + x
+    if os.path.isdir(ds) == False: os.mkdir(ds)
+```
+
+```text
+/tmp
+/tmp/bla
+/tmp/bla/bla
+```
+
+
+
+
+
+
+
+
+
+
+```python
+import shutil, os
+
+#print help(shutil.rmtree)
+print help(os.mkdir)
+#os.mkdir("/tmp/asdf/")
+```
+
+```text
+Help on built-in function mkdir in module posix:
+
+mkdir(...)
+    mkdir(path [, mode=0777])
+    
+    Create a directory.
+
+None
+```
+
+
+```python
 zip = '/home/burak/Downloads/goog_voice_train.zip'
 import zipfile
 with zipfile.ZipFile(zip, 'r') as z:
