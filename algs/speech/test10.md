@@ -1,15 +1,10 @@
 
 ```python
+import zipfile
 zip = '/home/burak/Downloads/goog_voice_train.zip'
 z = zipfile.ZipFile(zip, 'r')
 z.close()
 ```
-
-
-
-
-
-
 
 ```python
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
@@ -20,39 +15,74 @@ import numpy as np, io, os
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
-zip = '/home/burak/Downloads/goog_voice_train.zip'
+
 import zipfile, pandas as pd, random
 import scipy.io.wavfile, io
-with zipfile.ZipFile(zip, 'r') as z: files = z.namelist()
 
-noise_files = [x for x in files if 'noise.wav' in x]
+trainzip = '/home/burak/Downloads/goog_voice_train.zip'
+with zipfile.ZipFile(trainzip, 'r') as z: tfiles = z.namelist()
+noise_files = [x for x in tfiles if 'noise.wav' in x]
+tfiles =  [x for x in tfiles if '_background' not in x]
+tfiles = np.array([x for x in tfiles if  '.wav' in x] )
 
-files =  [x for x in files if '_background' not in x]
+valzip = '/home/burak/Downloads/test.zip'
+with zipfile.ZipFile(valzip, 'r') as z: vfiles = z.namelist()
+vfiles = np.array([x for x in vfiles if  '.wav' in x] )
 
-files = np.array([x for x in files if  '.wav' in x] )
+print tfiles[:10]
+print vfiles[:10]
 
-z = zipfile.ZipFile(zip, 'r')
+zt = zipfile.ZipFile(trainzip, 'r')
+zv = zipfile.ZipFile(valzip, 'r')
 ```
+
+```text
+['train/audio/bed/00176480_nohash_0.wav'
+ 'train/audio/bed/004ae714_nohash_0.wav'
+ 'train/audio/bed/004ae714_nohash_1.wav'
+ 'train/audio/bed/00f0204f_nohash_0.wav'
+ 'train/audio/bed/00f0204f_nohash_1.wav'
+ 'train/audio/bed/012c8314_nohash_0.wav'
+ 'train/audio/bed/012c8314_nohash_1.wav'
+ 'train/audio/bed/0132a06d_nohash_0.wav'
+ 'train/audio/bed/0135f3f2_nohash_0.wav'
+ 'train/audio/bed/0137b3f4_nohash_0.wav']
+['test/audio/down/clip_1fc8b54ac.wav' 'test/audio/down/clip_3fd4d5983.wav'
+ 'test/audio/down/clip_4240be2d8.wav' 'test/audio/down/clip_4fc880247.wav'
+ 'test/audio/down/clip_6853c3d86.wav' 'test/audio/down/clip_7b9a54b3f.wav'
+ 'test/audio/down/clip_7f8470799.wav' 'test/audio/down/clip_caf7bee3b.wav'
+ 'test/audio/down/clip_cf7b57412.wav' 'test/audio/down/clip_cfda138a6.wav']
+```
+
+
+
+
 
 ```python
 sample_rate = 16000
 
-def get_minibatch(batch_size, training=True):
+def get_minibatch(batch_size, validation=False):
+
+    zf = zt
+    filez = tfiles
+    if validation:
+       zf = zv
+       filez = vfiles
+    
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
-      f = random.choice(files)          
+      f = random.choice(filez)          
       if random.choice(range(10)) != 0:
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
            if label in labels:
                 y[i, labels.index(label)] = 1.0
            else:
                 y[i, len(labels)] = 1.0 # unknown
-           wav = io.BytesIO(z.open(f).read())
+           wav = io.BytesIO(zf.open(f).read())
            v = scipy.io.wavfile.read(wav)
-           #print f, v[1].shape
            res[i, 0:len(v[1])] = v[1]
-      else: 
+      elif validation==False: 
            nf = random.choice(noise_files)
            wav = io.BytesIO(z.open(nf).read())
            v = scipy.io.wavfile.read(wav)
@@ -67,7 +97,6 @@ def get_minibatch(batch_size, training=True):
     return res,y
 
 x,y = get_minibatch(10)
-
 ```
 
 ```python
@@ -88,7 +117,23 @@ print y
 ```
 
 
+```python
+x,y = get_minibatch(10,validation=True)
+print y
+```
 
+```text
+[[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]]
+```
 
 
 
