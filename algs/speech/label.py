@@ -38,8 +38,10 @@ def zipup():
     with zipfile.ZipFile(zip, 'r') as z:
         for row in df.iterrows():
             f = str(row[1]['name'])
-            print f
-            d = "/tmp/" + re.sub(r'clip.*wav$','',str(row[1]['name']))
+            label = str(row[1]['desc'])
+            f = f.replace("/clip", "/" +label+"/clip")
+            print f, label
+            d = "/tmp/" + re.sub(r'clip.*wav$','',f)
             ds = ''
             for x in d.split('/'):
                 if x=='': continue
@@ -47,7 +49,7 @@ def zipup():
                 if os.path.isdir(ds) == False: os.mkdir(ds)
      	    wav = io.BytesIO(z.open(str(row[1]['name'])).read())
      	    v = scipy.io.wavfile.read(wav)
-            scipy.io.wavfile.write('/tmp/%s' % str(row[1]['name']), 16000, v[1])
+            scipy.io.wavfile.write('/tmp/%s' % f, 16000, v[1])
 
 zipup()
 
