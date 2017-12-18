@@ -2,7 +2,7 @@ from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 import tensorflow as tf, re
 import zipfile, pandas as pd, random
 import pandas as pd, scipy.io.wavfile
-import numpy as np, io, os
+import numpy as np, io, os, numpy.linalg as lin
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
@@ -25,8 +25,8 @@ zv = zipfile.ZipFile(valzip, 'r')
 sample_rate = 16000
 batch_size = 100
 num_epochs = 5000
-mfile = "/tmp/speech.ckpt"
-
+mfile = "/tmp/speech1.ckpt"
+   
 def get_minibatch(batch_size, validation=False):
 
     zf = zt
@@ -34,7 +34,18 @@ def get_minibatch(batch_size, validation=False):
     if validation:
        zf = zv
        filez = vfiles
-    
+
+    def noise_snippet():
+       nf = random.choice(noise_files)
+       wav = io.BytesIO(zf.open(nf).read())
+       v = scipy.io.wavfile.read(wav)
+       chunks = int(len(v[1]) / sample_rate) - 1
+       chosen_chunk = random.choice(range(chunks))
+       fr = int(chosen_chunk * sample_rate)
+       to = int((chosen_chunk+1)*sample_rate)
+       chunk_byte = v[1][fr:to]
+       return chunk_byte
+       
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
@@ -48,17 +59,13 @@ def get_minibatch(batch_size, validation=False):
                 y[i, len(labels)] = 1.0 # unknown
            wav = io.BytesIO(zf.open(f).read())
            v = scipy.io.wavfile.read(wav)
-           res[i, 0:len(v[1])] = v[1]          
+           data = lin.norm(v[1])
+           if random.choice(range(3))==0 and validation==False:
+               res[i, 0:len(v[1])] = data + lin.norm(noise_snippet())
+           else:
+               res[i, 0:len(v[1])] = data
       else: 
-           nf = random.choice(noise_files)
-           wav = io.BytesIO(zf.open(nf).read())
-           v = scipy.io.wavfile.read(wav)
-           chunks = int(len(v[1]) / sample_rate) - 1
-           chosen_chunk = random.choice(range(chunks))
-           fr = int(chosen_chunk * sample_rate)
-           to = int((chosen_chunk+1)*sample_rate)
-           chunk_byte = v[1][fr:to]
-           res[i, :] = chunk_byte
+           res[i, :] = noise_snippet()
            y[i, len(labels)+1] = 1.0 # silence
                                   
     return res,y
