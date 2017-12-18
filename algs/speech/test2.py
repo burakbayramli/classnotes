@@ -11,24 +11,13 @@ import scipy.io.wavfile, io
 
 trainzip = '/home/burak/Downloads/goog_voice_train.zip'
 with zipfile.ZipFile(trainzip, 'r') as z: tfiles = z.namelist()
-noise_files = [x for x in tfiles if 'noise.wav' in x]
+noise_files = [x for x in tfiles if '_background' in x and '.wav' in x]
 tfiles =  [x for x in tfiles if '_background' not in x]
 tfiles = np.array([x for x in tfiles if  '.wav' in x] )
 
 valzip = '/home/burak/Downloads/test.zip'
 with zipfile.ZipFile(valzip, 'r') as z: vfiles = z.namelist()
 vfiles = np.array([x for x in vfiles if  '.wav' in x] )
-
-random.seed(0)
-np.random.seed(0)
-
-rnd_idx = np.random.choice(range(len(tfiles)), len(tfiles), replace=False)
-tfiles = tfiles[rnd_idx]
-rnd_idx = np.random.choice(range(len(vfiles)), len(vfiles), replace=False)
-vfiles = vfiles[rnd_idx]
-
-random.seed()
-np.random.seed()
 
 zt = zipfile.ZipFile(trainzip, 'r')
 zv = zipfile.ZipFile(valzip, 'r')
