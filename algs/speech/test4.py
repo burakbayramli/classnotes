@@ -38,8 +38,8 @@ def get_minibatch(batch_size, validation=False):
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
-      f = random.choice(filez)          
-      if random.choice(range(10)) != 0:
+      f = random.choice(filez)
+      if random.choice(range(10)) != 0 or validation==True: 
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
            labels2 = labels + ['unknown','silence']
            if label in labels2:
@@ -48,8 +48,8 @@ def get_minibatch(batch_size, validation=False):
                 y[i, len(labels)] = 1.0 # unknown
            wav = io.BytesIO(zf.open(f).read())
            v = scipy.io.wavfile.read(wav)
-           res[i, 0:len(v[1])] = v[1]
-      elif validation==False: 
+           res[i, 0:len(v[1])] = v[1]          
+      else: 
            nf = random.choice(noise_files)
            wav = io.BytesIO(zf.open(nf).read())
            v = scipy.io.wavfile.read(wav)
@@ -60,9 +60,9 @@ def get_minibatch(batch_size, validation=False):
            chunk_byte = v[1][fr:to]
            res[i, :] = chunk_byte
            y[i, len(labels)+1] = 1.0 # silence
+
                                   
     return res,y
-
 
 tf.reset_default_graph()
 
@@ -77,8 +77,8 @@ stfts = tf.contrib.signal.stft(pcm,
 spec = tf.abs(stfts)
 
 cells = []
-for _ in range(4):
-    cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.LSTMCell(100))
+for _ in range(6):
+    cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.LSTMCell(200))
     cells.append(cell)
 cell = tf.contrib.rnn.MultiRNNCell(cells)
 output, states = tf.nn.dynamic_rnn(cell, spec, dtype=tf.float32)
