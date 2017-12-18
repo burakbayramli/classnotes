@@ -104,18 +104,18 @@ mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
 print mfcc
 
 fc1 = tf.contrib.layers.fully_connected(inputs=mfcc,
-                                        num_outputs=100,
+                                        num_outputs=512,
                                         activation_fn=tf.nn.crelu)
 print fc1
 
 fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
-                                        num_outputs=100,
+                                        num_outputs=256,
                                         activation_fn=tf.nn.crelu)
 
 print fc2
 
 fc3 = tf.contrib.layers.fully_connected(inputs=fc2,
-                                        num_outputs=100,
+                                        num_outputs=128,
                                         activation_fn=tf.nn.crelu)
 
 
