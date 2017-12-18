@@ -19,8 +19,16 @@ valzip = '/home/burak/Downloads/test.zip'
 with zipfile.ZipFile(valzip, 'r') as z: vfiles = z.namelist()
 vfiles = np.array([x for x in vfiles if  '.wav' in x] )
 
-print tfiles[:10]
-print vfiles[:10]
+random.seed(0)
+np.random.seed(0)
+
+rnd_idx = np.random.choice(range(len(tfiles)), len(tfiles), replace=False)
+tfiles = tfiles[rnd_idx]
+rnd_idx = np.random.choice(range(len(vfiles)), len(vfiles), replace=False)
+vfiles = vfiles[rnd_idx]
+
+random.seed()
+np.random.seed()
 
 zt = zipfile.ZipFile(trainzip, 'r')
 zv = zipfile.ZipFile(valzip, 'r')
