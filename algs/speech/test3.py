@@ -24,7 +24,7 @@ zt = zipfile.ZipFile(trainzip, 'r')
 zv = zipfile.ZipFile(valzip, 'r')
 
 sample_rate = 16000
-batch_size = 100
+batch_size = 200
 num_epochs = 5000
 num_cell = 200
 mfile = "/tmp/speech3.ckpt"
@@ -44,11 +44,12 @@ def get_minibatch_val(batch_size):
         wav = io.BytesIO(zv.open(f).read())
         v = scipy.io.wavfile.read(wav)
         data = normalize(v[1])
+        res[i, 0:len(data)] = data
         y[i, labels2.index(label)] = 1.0
-
+               
     return res,y
 
-def get_minibatch(batch_size, validation=False):
+def get_minibatch(batch_size):
 
     def noise_snippet():
        nf = random.choice(noise_files)
@@ -100,6 +101,10 @@ spec = tf.abs(stfts)
 print spec
 
 fc1 = tf.contrib.layers.fully_connected(inputs=spec,
+                                        num_outputs=200,
+                                        activation_fn=tf.nn.relu)
+
+fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
                                         num_outputs=100,
                                         activation_fn=tf.nn.relu)
 
@@ -114,7 +119,7 @@ gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
 
 outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
 						   cell_bw=gru_bw_cell,
-						   inputs=fc1,dtype=tf.float32)
+						   inputs=fc2,dtype=tf.float32)
 print outputs
 
 states = tf.concat(values=states, axis=1)

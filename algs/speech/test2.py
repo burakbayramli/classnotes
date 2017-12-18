@@ -25,7 +25,7 @@ zv = zipfile.ZipFile(valzip, 'r')
 
 sample_rate = 16000
 batch_size = 100
-num_epochs = 5000
+num_epochs = 2000
 num_cell = 220
 mfile = "/tmp/speech2.ckpt"
 
@@ -44,11 +44,12 @@ def get_minibatch_val(batch_size):
         wav = io.BytesIO(zv.open(f).read())
         v = scipy.io.wavfile.read(wav)
         data = normalize(v[1])
+        res[i, 0:len(data)] = data
         y[i, labels2.index(label)] = 1.0
-
+               
     return res,y
 
-def get_minibatch(batch_size, validation=False):
+def get_minibatch(batch_size):
 
     def noise_snippet():
        nf = random.choice(noise_files)
