@@ -26,8 +26,8 @@ zv = zipfile.ZipFile(valzip, 'r')
 sample_rate = 16000
 batch_size = 100
 num_epochs = 5000
-num_cell = 20
-mfile = "/tmp/speech2.ckpt"
+num_cell = 200
+mfile = "/tmp/speech3.ckpt"
 
 def normalize(v):
     norm=np.linalg.norm(v, ord=1)
@@ -104,18 +104,18 @@ mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
 print mfcc
 
 fc1 = tf.contrib.layers.fully_connected(inputs=mfcc,
-                                        num_outputs=500,
+                                        num_outputs=100,
                                         activation_fn=tf.nn.crelu)
 print fc1
 
 fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
-                                        num_outputs=300,
+                                        num_outputs=100,
                                         activation_fn=tf.nn.crelu)
 
 print fc2
 
 fc3 = tf.contrib.layers.fully_connected(inputs=fc2,
-                                        num_outputs=200,
+                                        num_outputs=100,
                                         activation_fn=tf.nn.crelu)
 
 
