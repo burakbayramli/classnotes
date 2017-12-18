@@ -26,8 +26,7 @@ zv = zipfile.ZipFile(valzip, 'r')
 sample_rate = 16000
 batch_size = 100
 num_epochs = 5000
-num_cell = 200
-num_layer = 6
+num_cell = 20
 mfile = "/tmp/speech3.ckpt"
 
 def normalize(v):
@@ -39,6 +38,7 @@ def get_minibatch_val(batch_size):
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
+        f = random.choice(vfiles)
         label = re.findall(".*/(.*?)/.*?.wav",f)[0]
         labels2 = labels + ['unknown','silence']
         wav = io.BytesIO(zv.open(f).read())
@@ -46,6 +46,7 @@ def get_minibatch_val(batch_size):
         data = normalize(v[1])
         y[i, labels2.index(label)] = 1.0
 
+    return res,y
 
 def get_minibatch(batch_size, validation=False):
 
@@ -101,8 +102,8 @@ print spec
 mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
 
 cells = []
-for _ in range(num_layer):
-    cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.LSTMCell(num_cell))
+for _ in range(6):
+    cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.LSTMCell(200))
     cells.append(cell)
 cell = tf.contrib.rnn.MultiRNNCell(cells)
 output, states = tf.nn.dynamic_rnn(cell, spec, dtype=tf.float32)
@@ -111,6 +112,7 @@ last = states[-1][0]
 logits = tf.contrib.layers.fully_connected(inputs=last,
                                            num_outputs=12,
                                            activation_fn=None)
+
 
 softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y) 
 
@@ -140,6 +142,6 @@ for i in range(num_epochs):
         print i, 'accuracy', acc
         saver.save(sess, mfile)
     if i % 30 == 0: 
-        x_batch, y_batch = get_minibatch(batch_size, validation=True)
+        x_batch, y_batch = get_minibatch_val(batch_size)
         acc = sess.run(accuracy,feed_dict={pcm:x_batch, y:y_batch})
         print i, 'validation accuracy', acc

@@ -38,6 +38,7 @@ def get_minibatch_val(batch_size):
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
+        f = random.choice(vfiles)
         label = re.findall(".*/(.*?)/.*?.wav",f)[0]
         labels2 = labels + ['unknown','silence']
         wav = io.BytesIO(zv.open(f).read())
@@ -45,6 +46,7 @@ def get_minibatch_val(batch_size):
         data = normalize(v[1])
         y[i, labels2.index(label)] = 1.0
 
+    return res,y
 
 def get_minibatch(batch_size, validation=False):
 
@@ -149,6 +151,6 @@ for i in range(num_epochs):
         print i, 'accuracy', acc
         saver.save(sess, mfile)
     if i % 30 == 0: 
-        x_batch, y_batch = get_minibatch(batch_size, validation=True)
+        x_batch, y_batch = get_minibatch_val(batch_size)
         acc = sess.run(accuracy,feed_dict={pcm:x_batch, y:y_batch})
         print i, 'validation accuracy', acc
