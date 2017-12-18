@@ -1,3 +1,4 @@
+# best so far - >80 on validation
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 import tensorflow as tf, re
 import zipfile, pandas as pd, random
