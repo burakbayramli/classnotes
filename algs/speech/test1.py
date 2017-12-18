@@ -66,11 +66,11 @@ def get_minibatch(batch_size, validation=False):
            v = scipy.io.wavfile.read(wav)
            data = normalize(v[1])
            if random.choice(range(3))==0 and validation==False:
-               res[i, 0:len(v[1])] = data + normalize(noise_snippet())[0:len(data)]
+               res[i, 0:len(data)] = data + normalize(noise_snippet())[0:len(data)]
            else:
-               res[i, 0:len(v[1])] = data
+               res[i, 0:len(data)] = data
       else: 
-           res[i, :] = noise_snippet()
+           res[i, :] = normalize(noise_snippet())
            y[i, len(labels)+1] = 1.0 # silence
                                   
     return res,y
