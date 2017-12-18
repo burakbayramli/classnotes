@@ -60,7 +60,6 @@ def get_minibatch(batch_size, validation=False):
            chunk_byte = v[1][fr:to]
            res[i, :] = chunk_byte
            y[i, len(labels)+1] = 1.0 # silence
-
                                   
     return res,y
 
@@ -83,19 +82,33 @@ print mfcc
 flat = tf.reshape(mfcc, (-1, 400*26))
 
 fc1 = tf.contrib.layers.fully_connected(inputs=flat,
-                                        num_outputs=200,
-                                        activation_fn=tf.nn.relu)
+                                        num_outputs=500,
+                                        activation_fn=tf.nn.crelu)
 
 fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
-                                        num_outputs=100,
-                                        activation_fn=tf.nn.relu)
+                                        num_outputs=300,
+                                        activation_fn=tf.nn.crelu)
 
 fc3 = tf.contrib.layers.fully_connected(inputs=fc2,
-                                        num_outputs=50,
-                                        activation_fn=tf.nn.relu)
+                                        num_outputs=200,
+                                        activation_fn=tf.nn.crelu)
 
 
-logits = tf.contrib.layers.fully_connected(inputs=fc3,
+gru_fw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
+
+gru_bw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
+
+
+outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
+						   cell_bw=gru_bw_cell,
+						   inputs=fc3,
+                                                   dtype=tf.float32)
+
+states = tf.concat(values=states, axis=1)
+
+logits = tf.contrib.layers.fully_connected(inputs=states,
                                            num_outputs=12,
                                            activation_fn=None)
 

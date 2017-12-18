@@ -11,7 +11,7 @@ import scipy.io.wavfile, io
 
 trainzip = '/home/burak/Downloads/goog_voice_train.zip'
 with zipfile.ZipFile(trainzip, 'r') as z: tfiles = z.namelist()
-noise_files = [x for x in tfiles if 'noise.wav' in x]
+noise_files = [x for x in tfiles if '_background' in x and '.wav' in x]
 tfiles =  [x for x in tfiles if '_background' not in x]
 tfiles = np.array([x for x in tfiles if  '.wav' in x] )
 
@@ -19,23 +19,12 @@ valzip = '/home/burak/Downloads/test.zip'
 with zipfile.ZipFile(valzip, 'r') as z: vfiles = z.namelist()
 vfiles = np.array([x for x in vfiles if  '.wav' in x] )
 
-random.seed(0)
-np.random.seed(0)
-
-rnd_idx = np.random.choice(range(len(tfiles)), len(tfiles), replace=False)
-tfiles = tfiles[rnd_idx]
-rnd_idx = np.random.choice(range(len(vfiles)), len(vfiles), replace=False)
-vfiles = vfiles[rnd_idx]
-
-random.seed()
-np.random.seed()
-
 zt = zipfile.ZipFile(trainzip, 'r')
 zv = zipfile.ZipFile(valzip, 'r')
 
 sample_rate = 16000
 batch_size = 100
-num_epochs = 3000
+num_epochs = 5000
 mfile = "/tmp/speech.ckpt"
 
 def get_minibatch(batch_size, validation=False):
@@ -49,17 +38,18 @@ def get_minibatch(batch_size, validation=False):
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
-      f = random.choice(filez)          
-      if random.choice(range(10)) != 0:
+      f = random.choice(filez)
+      if random.choice(range(10)) != 0 or validation==True: 
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-           if label in labels:
-                y[i, labels.index(label)] = 1.0
+           labels2 = labels + ['unknown','silence']
+           if label in labels2:
+                y[i, labels2.index(label)] = 1.0
            else:
                 y[i, len(labels)] = 1.0 # unknown
            wav = io.BytesIO(zf.open(f).read())
            v = scipy.io.wavfile.read(wav)
-           res[i, 0:len(v[1])] = v[1]
-      elif validation==False: 
+           res[i, 0:len(v[1])] = v[1]          
+      else: 
            nf = random.choice(noise_files)
            wav = io.BytesIO(zf.open(nf).read())
            v = scipy.io.wavfile.read(wav)
@@ -72,7 +62,6 @@ def get_minibatch(batch_size, validation=False):
            y[i, len(labels)+1] = 1.0 # silence
                                   
     return res,y
-
 
 tf.reset_default_graph()
 
@@ -90,10 +79,10 @@ mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
 
 print mfcc
 
-gru_fw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_fw_cell	=	tf.contrib.rnn.GRUCell(200)
 gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
 
-gru_bw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_bw_cell	=	tf.contrib.rnn.GRUCell(200)
 gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
 
 
