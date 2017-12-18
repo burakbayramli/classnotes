@@ -102,8 +102,8 @@ print spec
 mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
 
 cells = []
-for _ in range(6):
-    cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.LSTMCell(200))
+for _ in range(4):
+    cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.LSTMCell(100))
     cells.append(cell)
 cell = tf.contrib.rnn.MultiRNNCell(cells)
 output, states = tf.nn.dynamic_rnn(cell, spec, dtype=tf.float32)
