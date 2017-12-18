@@ -19,17 +19,6 @@ valzip = '/home/burak/Downloads/test.zip'
 with zipfile.ZipFile(valzip, 'r') as z: vfiles = z.namelist()
 vfiles = np.array([x for x in vfiles if  '.wav' in x] )
 
-random.seed(0)
-np.random.seed(0)
-
-rnd_idx = np.random.choice(range(len(tfiles)), len(tfiles), replace=False)
-tfiles = tfiles[rnd_idx]
-rnd_idx = np.random.choice(range(len(vfiles)), len(vfiles), replace=False)
-vfiles = vfiles[rnd_idx]
-
-random.seed()
-np.random.seed()
-
 zt = zipfile.ZipFile(trainzip, 'r')
 zv = zipfile.ZipFile(valzip, 'r')
 
@@ -52,8 +41,9 @@ def get_minibatch(batch_size, validation=False):
       f = random.choice(filez)          
       if random.choice(range(10)) != 0:
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-           if label in labels:
-                y[i, labels.index(label)] = 1.0
+           labels2 = labels + ['unknown','silence']
+           if label in labels2:
+                y[i, labels2.index(label)] = 1.0
            else:
                 y[i, len(labels)] = 1.0 # unknown
            wav = io.BytesIO(zf.open(f).read())
@@ -83,23 +73,19 @@ y = tf.placeholder(tf.float32, shape=[None, 12])
 stfts = tf.contrib.signal.stft(pcm,
 			       frame_length=110,
 			       frame_step=125,
-			       fft_length=1678)
-spectrograms = tf.abs(stfts)
+			       fft_length=512)
+spec = tf.abs(stfts)
 
-spectrograms2 = tf.reshape(spectrograms,(-1,128,840))
-
-print spectrograms2
-
-gru_fw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_fw_cell	=	tf.contrib.rnn.GRUCell(50)
 gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
 
-gru_bw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_bw_cell	=	tf.contrib.rnn.GRUCell(50)
 gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
 
 
 outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
 						   cell_bw=gru_bw_cell,
-						   inputs=spectrograms2,
+						   inputs=spec,
                                                    dtype=tf.float32)
 print outputs
 
