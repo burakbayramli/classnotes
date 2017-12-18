@@ -27,7 +27,7 @@ sample_rate = 16000
 batch_size = 100
 num_epochs = 5000
 num_cell = 20
-mfile = "/tmp/speech3.ckpt"
+mfile = "/tmp/speech2.ckpt"
 
 def normalize(v):
     norm=np.linalg.norm(v, ord=1)
@@ -101,18 +101,45 @@ print spec
 
 mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
 
-cells = []
-for _ in range(4):
-    cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.LSTMCell(100))
-    cells.append(cell)
-cell = tf.contrib.rnn.MultiRNNCell(cells)
-output, states = tf.nn.dynamic_rnn(cell, spec, dtype=tf.float32)
-last = states[-1][0]
+print mfcc
 
-logits = tf.contrib.layers.fully_connected(inputs=last,
+fc1 = tf.contrib.layers.fully_connected(inputs=mfcc,
+                                        num_outputs=500,
+                                        activation_fn=tf.nn.crelu)
+print fc1
+
+fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
+                                        num_outputs=300,
+                                        activation_fn=tf.nn.crelu)
+
+print fc2
+
+fc3 = tf.contrib.layers.fully_connected(inputs=fc2,
+                                        num_outputs=200,
+                                        activation_fn=tf.nn.crelu)
+
+
+print fc3
+
+gru_fw_cell	=	tf.contrib.rnn.GRUCell(num_cell)
+gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
+
+gru_bw_cell	=	tf.contrib.rnn.GRUCell(num_cell)
+gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
+
+
+outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
+						   cell_bw=gru_bw_cell,
+						   inputs=fc3,dtype=tf.float32)
+print outputs
+
+states = tf.concat(values=states, axis=1)
+
+print states
+
+logits = tf.contrib.layers.fully_connected(inputs=states,
                                            num_outputs=12,
                                            activation_fn=None)
-
 
 softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y) 
 
