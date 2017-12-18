@@ -26,7 +26,12 @@ sample_rate = 16000
 batch_size = 100
 num_epochs = 5000
 mfile = "/tmp/speech1.ckpt"
-   
+
+def normalize(v):
+    norm=np.linalg.norm(v, ord=1)
+    if norm==0: return v
+    return v/norm
+
 def get_minibatch(batch_size, validation=False):
 
     zf = zt
@@ -59,9 +64,9 @@ def get_minibatch(batch_size, validation=False):
                 y[i, len(labels)] = 1.0 # unknown
            wav = io.BytesIO(zf.open(f).read())
            v = scipy.io.wavfile.read(wav)
-           data = lin.norm(v[1])
+           data = normalize(v[1])
            if random.choice(range(3))==0 and validation==False:
-               res[i, 0:len(v[1])] = data + lin.norm(noise_snippet())
+               res[i, 0:len(v[1])] = data + normalize(noise_snippet())[0:len(data)]
            else:
                res[i, 0:len(v[1])] = data
       else: 

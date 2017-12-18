@@ -1,5 +1,40 @@
 
 ```python
+import scipy.io.wavfile, zipfile
+import io, numpy.linalg as lin
+zip = '/home/burak/Downloads/goog_voice_train.zip'
+with zipfile.ZipFile(zip, 'r') as z:
+     wav = io.BytesIO(z.open('train/audio/tree/15f04ff8_nohash_0.wav').read())
+     v = scipy.io.wavfile.read(wav)
+     print v[1]
+```
+
+```text
+[  2 -10 -21 ..., -14  19  13]
+```
+
+
+```python
+def normalize(v):
+    norm=np.linalg.norm(v, ord=1)
+    if norm==0: norm=np.finfo(v.dtype).eps
+    return v/norm
+
+print normalize(v[1])
+```
+
+```text
+[  4.44844112e-07  -2.22422056e-06  -4.67086318e-06 ...,  -3.11390879e-06
+   4.22601907e-06   2.89148673e-06]
+```
+
+
+
+
+
+
+
+```python
 import zipfile
 zip = '/home/burak/Downloads/goog_voice_train.zip'
 z = zipfile.ZipFile(zip, 'r')
