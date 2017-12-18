@@ -99,27 +99,11 @@ spec = tf.abs(stfts)
 
 print spec
 
-mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
+fc1 = tf.contrib.layers.fully_connected(inputs=spec,
+                                        num_outputs=100,
+                                        activation_fn=tf.nn.relu)
 
-print mfcc
-
-fc1 = tf.contrib.layers.fully_connected(inputs=mfcc,
-                                        num_outputs=512,
-                                        activation_fn=tf.nn.crelu)
 print fc1
-
-fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
-                                        num_outputs=256,
-                                        activation_fn=tf.nn.crelu)
-
-print fc2
-
-fc3 = tf.contrib.layers.fully_connected(inputs=fc2,
-                                        num_outputs=128,
-                                        activation_fn=tf.nn.crelu)
-
-
-print fc3
 
 gru_fw_cell	=	tf.contrib.rnn.GRUCell(num_cell)
 gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
@@ -130,7 +114,7 @@ gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
 
 outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
 						   cell_bw=gru_bw_cell,
-						   inputs=fc3,dtype=tf.float32)
+						   inputs=fc1,dtype=tf.float32)
 print outputs
 
 states = tf.concat(values=states, axis=1)
