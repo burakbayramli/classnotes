@@ -49,17 +49,18 @@ def get_minibatch(batch_size, validation=False):
     res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
-      f = random.choice(filez)          
-      if random.choice(range(10)) != 0:
+      f = random.choice(filez)
+      if random.choice(range(10)) != 0 or validation==True: 
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-           if label in labels:
-                y[i, labels.index(label)] = 1.0
+           labels2 = labels + ['unknown','silence']
+           if label in labels2:
+                y[i, labels2.index(label)] = 1.0
            else:
                 y[i, len(labels)] = 1.0 # unknown
            wav = io.BytesIO(zf.open(f).read())
            v = scipy.io.wavfile.read(wav)
-           res[i, 0:len(v[1])] = v[1]
-      elif validation==False: 
+           res[i, 0:len(v[1])] = v[1]          
+      else: 
            nf = random.choice(noise_files)
            wav = io.BytesIO(zf.open(nf).read())
            v = scipy.io.wavfile.read(wav)
@@ -105,10 +106,10 @@ conv4 = tf.layers.conv1d(inputs=max_pool_3, filters=144, kernel_size=2, strides=
 #conv4 = tf.layers.batch_normalization(conv4)
 max_pool_4 = tf.layers.max_pooling1d(inputs=conv4, pool_size=2, strides=2, padding='same')
 
-gru_fw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_fw_cell	=	tf.contrib.rnn.GRUCell(200)
 gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
 
-gru_bw_cell	=	tf.contrib.rnn.GRUCell(100)
+gru_bw_cell	=	tf.contrib.rnn.GRUCell(200)
 gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
 
 
