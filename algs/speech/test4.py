@@ -81,14 +81,15 @@ def get_minibatch(batch_size):
           v = scipy.io.wavfile.read(wav)
           data = normalize(v[1])
 
-          shift = np.random.randint(0,200)
-          pad = data[shift]
-          data[shift:-1] = data[0:len(data)-shift-1] 
-          data[0:shift] = pad
+          if random.choice(range(3))==0:
+              shift = np.random.randint(0,200)
+              pad = data[0]
+              data[shift:-1] = data[0:len(data)-shift-1] 
+              data[0:shift] = pad
           
           # sometimes add noise to training
           if random.choice(range(3))==0:
-              res[i, 0:len(data)] = data + normalize(noise_snippet())[0:len(data)]
+              res[i, 0:len(data)] = normalize(data + normalize(noise_snippet())[0:len(data)])
           else:
               res[i, 0:len(data)] = data
                                   

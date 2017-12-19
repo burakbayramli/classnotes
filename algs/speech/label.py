@@ -51,7 +51,8 @@ def zipup():
      	    v = scipy.io.wavfile.read(wav)
             scipy.io.wavfile.write('/tmp/%s' % f, 16000, v[1])
 
-zipup()
+rec()
+#zipup()
 
                 
 
