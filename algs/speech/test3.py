@@ -26,7 +26,7 @@ zv = zipfile.ZipFile(valzip, 'r')
 sample_rate = 16000
 batch_size = 200
 num_epochs = 5000
-num_cell = 200
+num_cell = 256
 mfile = "/tmp/speech3.ckpt"
 
 def normalize(v):
@@ -100,15 +100,29 @@ spec = tf.abs(stfts)
 
 print spec
 
-fc1 = tf.contrib.layers.fully_connected(inputs=spec,
-                                        num_outputs=200,
-                                        activation_fn=tf.nn.relu)
+mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
+print mfcc
 
-fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
-                                        num_outputs=100,
-                                        activation_fn=tf.nn.relu)
+mfcc = tf.reshape(mfcc, (-1, 313, 26, 1))
+print mfcc
 
-print fc1
+layer1 = tf.layers.conv2d(inputs=mfcc, filters=16, kernel_size=(2,2), padding='same')
+layer1 = tf.layers.max_pooling2d(inputs=layer1, pool_size=(3,3), strides=1, padding='same')
+print layer1
+
+layer2 = tf.layers.conv2d(inputs=layer1, filters=16, kernel_size=(2,2), padding='same')
+layer2 = tf.layers.max_pooling2d(inputs=layer2, pool_size=(3,3), strides=1, padding='same')
+print layer2
+
+input_dense = tf.reshape(layer2, (-1, 313, 26*16))
+
+print input_dense
+
+fc = tf.contrib.layers.fully_connected(inputs=input_dense,
+                                       num_outputs=26*16,
+                                       activation_fn=tf.nn.relu)
+
+print fc
 
 gru_fw_cell	=	tf.contrib.rnn.GRUCell(num_cell)
 gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell)
@@ -119,7 +133,7 @@ gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell)
 
 outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
 						   cell_bw=gru_bw_cell,
-						   inputs=fc2,dtype=tf.float32)
+						   inputs=fc,dtype=tf.float32)
 print outputs
 
 states = tf.concat(values=states, axis=1)
