@@ -80,6 +80,12 @@ def get_minibatch(batch_size):
           wav = io.BytesIO(zt.open(f).read())
           v = scipy.io.wavfile.read(wav)
           data = normalize(v[1])
+
+          shift = np.random.randint(0,200)
+          pad = data[shift]
+          data[shift:-1] = data[0:len(data)-shift-1] 
+          data[0:shift] = pad
+                    
           # sometimes add noise to training
           if random.choice(range(3))==0:
               res[i, 0:len(data)] = data + normalize(noise_snippet())[0:len(data)]
@@ -108,10 +114,12 @@ print mfcc
 
 layer1 = tf.layers.conv2d(inputs=mfcc, filters=16, kernel_size=(2,2), padding='same')
 layer1 = tf.layers.max_pooling2d(inputs=layer1, pool_size=(3,3), strides=1, padding='same')
+layer1 = tf.layers.dropout(inputs=layer1,rate=0.2)
 print layer1
 
 layer2 = tf.layers.conv2d(inputs=layer1, filters=16, kernel_size=(2,2), padding='same')
 layer2 = tf.layers.max_pooling2d(inputs=layer2, pool_size=(3,3), strides=1, padding='same')
+layer2 = tf.layers.dropout(inputs=layer2,rate=0.2)
 print layer2
 
 input_dense = tf.reshape(layer2, (-1, 313, 26*16))
