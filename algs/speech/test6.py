@@ -82,7 +82,7 @@ def get_minibatch(batch_size):
           data = normalize(v[1])
           # sometimes add noise to training
           if random.choice(range(3))==0:
-              res[i, 0:len(data)] = data + normalize(noise_snippet())[0:len(data)]
+              res[i, 0:len(data)] = normalize(data + normalize(noise_snippet())[0:len(data)])
           else:
               res[i, 0:len(data)] = data
                                   
@@ -105,8 +105,14 @@ mfcc = tf.reshape(mfcc, (-1, 313, 26, 1))
 
 print mfcc
 
-layer1 = tf.layers.conv2d(inputs=mfcc, filters=186, kernel_size=(8,8), padding='same', strides = (4,1))
-layer1 = tf.layers.dropout(inputs=layer1,rate=0.5)
+layer1 = tf.layers.conv2d(inputs=mfcc,
+                          filters=186,
+                          kernel_size=(8,8),
+                          padding='same',
+                          strides = (4,1),
+                          activation=tf.nn.relu)
+
+layer1 = tf.layers.dropout(inputs=layer1,rate=0.2)
 
 print layer1
 
@@ -114,7 +120,7 @@ fc1 = tf.contrib.layers.fully_connected(inputs=layer1,
                                         num_outputs=128,
                                         activation_fn=None)
 
-fc1 = tf.layers.dropout(inputs=fc1,rate=0.5)
+fc1 = tf.layers.dropout(inputs=fc1,rate=0.2)
 print fc1
 
 fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
