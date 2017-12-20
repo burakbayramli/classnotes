@@ -35,9 +35,8 @@ time_dim = 50
 feature_dim = 494
 
 def normalize(v):
-    norm=np.linalg.norm(v, ord=1)
-    if norm==0: return v
-    return v/norm
+    if np.std(v)==0: return v
+    return (v-np.mean(v)) / np.std(v)
 
 def audiofile_to_input_vector(audio, fs, numcep, numcontext):
 
@@ -96,7 +95,7 @@ def get_minibatch_val(batch_size):
         labels2 = labels + ['unknown','silence']
         wav = io.BytesIO(zv.open(f).read())
         v = scipy.io.wavfile.read(wav)
-        data = v[1]
+        data = normalize(v[1])
         res[i, :] = audiofile_to_input_vector(data, fs, numcep, numcontext)
         y[i, labels2.index(label)] = 1.0
                
@@ -114,7 +113,7 @@ def get_minibatch(batch_size):
        fr = int(chosen_chunk * sample_rate)
        to = int((chosen_chunk+1)*sample_rate)
        chunk_byte = v[1][fr:to]
-       return chunk_byte
+       return normalize(chunk_byte)
        
     res = np.zeros((batch_size, time_dim, feature_dim))
     y = np.zeros((batch_size,len(labels)+2 ))
@@ -133,7 +132,7 @@ def get_minibatch(batch_size):
               y[i, len(labels)] = 1.0 # unknown
           wav = io.BytesIO(zt.open(f).read())
           v = scipy.io.wavfile.read(wav)
-          data = v[1]
+          data = normalize(v[1])
           # sometimes add noise to training
           if random.choice(range(3))==0:
               data[0:len(data)] = data + noise_snippet()[0:len(data)]
@@ -210,10 +209,10 @@ if os.path.isfile(mfile + ".index"):
         
 for i in range(num_epochs):
     x_batch, y_batch = get_minibatch(batch_size)
-    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch })
     if i % 5 == 0:
         acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch })
         print i, 'accuracy', acc
+    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch })
     if i % 30 == 0: 
         saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)
