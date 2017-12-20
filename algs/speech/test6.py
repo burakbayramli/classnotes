@@ -107,14 +107,16 @@ print mfcc
 
 layer1 = tf.layers.conv2d(inputs=mfcc,
                           filters=186,
-                          kernel_size=(8,8),
-                          padding='same',
+                          kernel_size=(8,26),
+                          padding='valid',
                           strides = (4,1),
                           activation=tf.nn.relu)
 
 layer1 = tf.layers.dropout(inputs=layer1,rate=0.2)
 
 print layer1
+
+layer1 = tf.reshape(layer1, (-1, 77*186))
 
 fc1 = tf.contrib.layers.fully_connected(inputs=layer1,
                                         num_outputs=128,
@@ -129,9 +131,6 @@ fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
 
 fc2 = tf.layers.dropout(inputs=fc2,rate=0.5)
 
-print fc2
-fc2 = tf.reshape(fc2, (-1, 79*26*128))
-
 logits = tf.contrib.layers.fully_connected(inputs=fc2,
                                            num_outputs=12,
                                            activation_fn=None)
@@ -140,7 +139,7 @@ softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y)
 
 cross_entropy = tf.reduce_mean(softmax)
 
-train_step = tf.train.GradientDescentOptimizer(0.001).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(logits,1))
 
