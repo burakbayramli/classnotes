@@ -154,16 +154,16 @@ print mfcc
 
 layer1 = tf.layers.conv2d(inputs=fingerprint,
                           filters=186,
-                          kernel_size=(20,20),
+                          kernel_size=(8,20),
                           padding='valid',
-                          strides = (8,1),
+                          strides = (1,4),
                           activation=tf.nn.relu)
 
 layer1d = tf.layers.dropout(inputs=layer1,rate=0.2)
 
 print layer1d
 
-layer1r = tf.reshape(layer1d, (-1, 4*475*186))
+layer1r = tf.reshape(layer1d, (-1, 43*119*186))
 
 print layer1r
 
