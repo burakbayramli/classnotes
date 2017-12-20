@@ -157,14 +157,14 @@ layer1 = tf.layers.conv2d(inputs=fingerprint,
                           filters=186,
                           kernel_size=(20,20),
                           padding='valid',
-                          strides = (1,1),
+                          strides = (8,1),
                           activation=tf.nn.relu)
 
 layer1d = tf.layers.dropout(inputs=layer1,rate=0.2)
 
 print layer1d
 
-layer1r = tf.reshape(layer1d, (-1, 31*475*186))
+layer1r = tf.reshape(layer1d, (-1, 4*475*186))
 
 print layer1r
 
@@ -214,8 +214,8 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch })
         print i, 'accuracy', acc
-        saver.save(sess, mfile)
     if i % 30 == 0: 
+        saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)
         acc = sess.run(accuracy,feed_dict={fingerprint:x_batch, y:y_batch})
         print i, 'validation accuracy', acc
