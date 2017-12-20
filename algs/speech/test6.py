@@ -87,6 +87,22 @@ def audiofile_to_input_vector(audio, fs, numcep, numcontext):
     res[0:train_inputs.shape[0], 0:train_inputs.shape[1]] = train_inputs
     return res
 
+def get_minibatch_val(batch_size):
+    res = np.zeros((batch_size, time_dim, feature_dim))
+    y = np.zeros((batch_size,len(labels)+2 ))
+    for i in range(batch_size):
+        f = random.choice(vfiles)
+        label = re.findall(".*/(.*?)/.*?.wav",f)[0]
+        labels2 = labels + ['unknown','silence']
+        wav = io.BytesIO(zv.open(f).read())
+        v = scipy.io.wavfile.read(wav)
+        data = v[1]
+        res[i, :] = audiofile_to_input_vector(data, fs, numcep, numcontext)
+        y[i, labels2.index(label)] = 1.0
+               
+    return res.reshape((batch_size,time_dim,feature_dim,1)),y
+
+
 def get_minibatch(batch_size):
 
     def noise_snippet():
@@ -127,7 +143,7 @@ def get_minibatch(batch_size):
           res[i, :] = mfcc
           
     res = np.reshape(res, (batch_size, time_dim, feature_dim, 1))
-    return res,y
+    return res.reshape((batch_size,time_dim,feature_dim,1)),y
 
 tf.reset_default_graph()
 
@@ -144,28 +160,33 @@ layer1 = tf.layers.conv2d(inputs=fingerprint,
                           strides = (1,4),
                           activation=tf.nn.relu)
 
-layer1 = tf.layers.dropout(inputs=layer1,rate=0.2)
+layer1d = tf.layers.dropout(inputs=layer1,rate=0.2)
 
-print layer1
+print layer1d
 
-layer1 = tf.reshape(layer1, (-1, 77*186))
+layer1r = tf.reshape(layer1d, (-1, 43*118*186))
 
-fc1 = tf.contrib.layers.fully_connected(inputs=layer1,
+print layer1r
+
+fc1 = tf.contrib.layers.fully_connected(inputs=layer1r,
                                         num_outputs=128,
                                         activation_fn=None)
 
-fc1 = tf.layers.dropout(inputs=fc1,rate=0.2)
-print fc1
+fc1d = tf.layers.dropout(inputs=fc1,rate=0.2)
+print fc1d
 
-fc2 = tf.contrib.layers.fully_connected(inputs=fc1,
+fc2 = tf.contrib.layers.fully_connected(inputs=fc1d,
                                         num_outputs=128,
                                         activation_fn=None)
 
-fc2 = tf.layers.dropout(inputs=fc2,rate=0.5)
+fc2d = tf.layers.dropout(inputs=fc2,rate=0.5)
+print fc2d
 
-logits = tf.contrib.layers.fully_connected(inputs=fc2,
+logits = tf.contrib.layers.fully_connected(inputs=fc2d,
                                            num_outputs=12,
                                            activation_fn=None)
+
+#exit()
 
 softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y) 
 
@@ -193,3 +214,7 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch })
         print i, 'accuracy', acc
+    if i % 30 == 0: 
+        x_batch, y_batch = get_minibatch_val(batch_size)
+        acc = sess.run(accuracy,feed_dict={fingerprint:x_batch, y:y_batch})
+        print i, 'validation accuracy', acc
