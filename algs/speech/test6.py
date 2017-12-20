@@ -4,6 +4,7 @@ import tensorflow as tf, re
 import zipfile, pandas as pd, random
 import pandas as pd, scipy.io.wavfile
 import numpy as np, io, os, numpy.linalg as lin
+from python_speech_features import mfcc
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
@@ -26,28 +27,65 @@ zv = zipfile.ZipFile(valzip, 'r')
 sample_rate = 16000
 batch_size = 100
 num_epochs = 2000
-num_cell = 220
+fs=16000
+numcep = 26
+numcontext = 9
 mfile = "/tmp/speech6.ckpt"
+time_dim = 50
+feature_dim = 494
 
 def normalize(v):
     norm=np.linalg.norm(v, ord=1)
     if norm==0: return v
     return v/norm
 
-def get_minibatch_val(batch_size):
-    res = np.zeros((batch_size, 16000))
-    y = np.zeros((batch_size,len(labels)+2 ))
-    for i in range(batch_size):
-        f = random.choice(vfiles)
-        label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-        labels2 = labels + ['unknown','silence']
-        wav = io.BytesIO(zv.open(f).read())
-        v = scipy.io.wavfile.read(wav)
-        data = normalize(v[1])
-        res[i, 0:len(data)] = data
-        y[i, labels2.index(label)] = 1.0
-               
-    return res,y
+def audiofile_to_input_vector(audio, fs, numcep, numcontext):
+
+    # Get mfcc coefficients
+    orig_inputs = mfcc(audio, samplerate=fs, numcep=numcep)
+
+    orig_inputs = orig_inputs[::2]
+    train_inputs = np.array([], np.float32)
+    train_inputs.resize((orig_inputs.shape[0], numcep + 2 * numcep * numcontext))
+    empty_mfcc = np.array([])
+    empty_mfcc.resize((numcep))
+    time_slices = range(train_inputs.shape[0])
+    context_past_min = time_slices[0] + numcontext
+    context_future_max = time_slices[-1] - numcontext
+    for time_slice in time_slices:
+        need_empty_past = max(0, (context_past_min - time_slice))
+        empty_source_past = list(empty_mfcc for empty_slots in range(need_empty_past))
+        data_source_past = orig_inputs[max(0, time_slice - numcontext):time_slice]
+        assert(len(empty_source_past) + len(data_source_past) == numcontext)
+
+        # Pick up to numcontext time slices in the future, and complete with empty
+        # mfcc features
+        need_empty_future = max(0, (time_slice - context_future_max))
+        empty_source_future = list(empty_mfcc for empty_slots in range(need_empty_future))
+        data_source_future = orig_inputs[time_slice + 1:time_slice + numcontext + 1]
+        assert(len(empty_source_future) + len(data_source_future) == numcontext)
+
+        if need_empty_past:
+            past = np.concatenate((empty_source_past, data_source_past))
+        else:
+            past = data_source_past
+
+        if need_empty_future:
+            future = np.concatenate((data_source_future, empty_source_future))
+        else:
+            future = data_source_future
+
+        past = np.reshape(past, numcontext * numcep)
+        now = orig_inputs[time_slice]
+        future = np.reshape(future, numcontext * numcep)
+
+        train_inputs[time_slice] = np.concatenate((past, now, future))
+        assert(len(train_inputs[time_slice]) == numcep + 2 * numcep * numcontext)
+        
+    train_inputs = (train_inputs - np.mean(train_inputs)) / np.std(train_inputs)
+    res = np.zeros((time_dim, feature_dim))
+    res[0:train_inputs.shape[0], 0:train_inputs.shape[1]] = train_inputs
+    return res
 
 def get_minibatch(batch_size):
 
@@ -62,13 +100,13 @@ def get_minibatch(batch_size):
        chunk_byte = v[1][fr:to]
        return chunk_byte
        
-    res = np.zeros((batch_size, 16000))
+    res = np.zeros((batch_size, time_dim, feature_dim))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
       f = random.choice(tfiles)
       # pick silence (noise) randomly as training
       if random.choice(range(10)) == 0: 
-           res[i, :] = normalize(noise_snippet())
+           res[i, :] = audiofile_to_input_vector(noise_snippet(), fs, numcep, numcontext)
            y[i, len(labels)+1] = 1.0 # silence
       else: # otherwise regular file is used
           label = re.findall(".*/(.*?)/.*?.wav",f)[0]
@@ -79,37 +117,31 @@ def get_minibatch(batch_size):
               y[i, len(labels)] = 1.0 # unknown
           wav = io.BytesIO(zt.open(f).read())
           v = scipy.io.wavfile.read(wav)
-          data = normalize(v[1])
+          data = v[1]
           # sometimes add noise to training
           if random.choice(range(3))==0:
-              res[i, 0:len(data)] = normalize(data + normalize(noise_snippet())[0:len(data)])
-          else:
-              res[i, 0:len(data)] = data
-                                  
+              data[0:len(data)] = data + noise_snippet()[0:len(data)]
+              
+          mfcc = audiofile_to_input_vector(data, fs, numcep, numcontext)
+          #print mfcc.shape
+          res[i, :] = mfcc
+          
+    res = np.reshape(res, (batch_size, time_dim, feature_dim, 1))
     return res,y
 
 tf.reset_default_graph()
 
-pcm = tf.placeholder(tf.float32, [None, 16000], name = 'inputs')
+fingerprint = tf.placeholder(tf.float32, [None, time_dim, feature_dim, 1])
 
 y = tf.placeholder(tf.float32, shape=[None, 12])
 
-stfts = tf.contrib.signal.stft(pcm, frame_length=400, frame_step=50, fft_length=512)
-
-spec = tf.abs(stfts)
-
-print spec
-
-mfcc = contrib_audio.mfcc(spec,16000,dct_coefficient_count=26)
-mfcc = tf.reshape(mfcc, (-1, 313, 26, 1))
-
 print mfcc
 
-layer1 = tf.layers.conv2d(inputs=mfcc,
+layer1 = tf.layers.conv2d(inputs=fingerprint,
                           filters=186,
                           kernel_size=(8,26),
                           padding='valid',
-                          strides = (4,1),
+                          strides = (1,4),
                           activation=tf.nn.relu)
 
 layer1 = tf.layers.dropout(inputs=layer1,rate=0.2)
@@ -157,12 +189,7 @@ if os.path.isfile(mfile + ".index"):
         
 for i in range(num_epochs):
     x_batch, y_batch = get_minibatch(batch_size)
-    sess.run(train_step,feed_dict={pcm:x_batch, y:y_batch})
-    if i % 5 == 0: 
-        acc = sess.run(accuracy,feed_dict={pcm:x_batch, y:y_batch})
+    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch })
+    if i % 5 == 0:
+        acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch })
         print i, 'accuracy', acc
-        saver.save(sess, mfile)
-    if i % 30 == 0: 
-        x_batch, y_batch = get_minibatch_val(batch_size)
-        acc = sess.run(accuracy,feed_dict={pcm:x_batch, y:y_batch})
-        print i, 'validation accuracy', acc
