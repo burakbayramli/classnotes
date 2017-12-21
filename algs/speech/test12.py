@@ -137,14 +137,12 @@ input_time_size = 49
 input_frequency_size = 26
 fingerprint_4d = tf.reshape(mfcc_, [-1, input_time_size, input_frequency_size, 1])
 
-first_conv = tf.layers.conv2d(inputs=fingerprint_4d, filters=64, kernel_size=(20,8), padding='same')
-first_relu = tf.nn.relu(first_conv)
-first_dropout = tf.nn.dropout(first_relu, dropout_prob)
+first_conv = tf.layers.conv2d(inputs=fingerprint_4d, filters=64, kernel_size=(20,8), activation=tf.nn.relu, padding='same')
+first_dropout = tf.layers.dropout(inputs=first_conv, rate=dropout_prob)
 print first_conv
 
-second_conv = tf.layers.conv2d(inputs=first_dropout, filters=64, kernel_size=(10,4), padding='same')
-second_relu = tf.nn.relu(second_conv)
-second_dropout = tf.nn.dropout(second_relu, dropout_prob)
+second_conv = tf.layers.conv2d(inputs=first_dropout, filters=64, kernel_size=(10,4), activation=tf.nn.relu, padding='same')
+second_dropout = tf.layers.dropout(inputs=second_conv, rate=dropout_prob)
 
 print second_dropout
 
@@ -183,9 +181,7 @@ if os.path.isfile(mfile + ".index"):
 for i in range(num_epochs):
     x_batch, y_batch = get_minibatch(batch_size)
     if i % 5 == 0:
-        acc = sess.run(accuracy, feed_dict={pcm: x_batch,
-                                            y: y_batch,
-                                            dropout_prob: 0.2 })
+        acc = sess.run(accuracy, feed_dict={pcm: x_batch, y: y_batch, dropout_prob: 0.0 })
         print i, 'accuracy', acc
     sess.run(train_step,feed_dict={pcm:x_batch, y:y_batch, dropout_prob: 0.2})
     if i % 30 == 0: 

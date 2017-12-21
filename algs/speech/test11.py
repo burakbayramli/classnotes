@@ -161,12 +161,12 @@ y = tf.placeholder(tf.float32, shape=[None, 12])
 
 print fingerprint
 
-layer1 = tf.layers.conv2d(inputs=fingerprint, filters=16, kernel_size=(2,2), padding='same')
+layer1 = tf.layers.conv2d(inputs=fingerprint, filters=16, kernel_size=(2,2), activation=tf.nn.relu, padding='same')
 layer1 = tf.layers.max_pooling2d(inputs=layer1, pool_size=(3,3), strides=1, padding='same')
 layer1 = tf.layers.dropout(inputs=layer1,rate=dropout_prob)
 print layer1
 
-layer2 = tf.layers.conv2d(inputs=layer1, filters=16, kernel_size=(2,2), padding='same')
+layer2 = tf.layers.conv2d(inputs=layer1, filters=16, kernel_size=(2,2), activation=tf.nn.relu, padding='same')
 layer2 = tf.layers.max_pooling2d(inputs=layer2, pool_size=(3,3), strides=1, padding='same')
 layer2 = tf.layers.dropout(inputs=layer2, rate=dropout_prob)
 print layer2
@@ -227,9 +227,9 @@ if os.path.isfile(mfile + ".index"):
 for i in range(num_epochs):
     x_batch, y_batch = get_minibatch(batch_size)
     if i % 5 == 0:
-        acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.2 })
+        acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.0 })
         print i, 'accuracy', acc
-    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch })
+    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.2 })
     if i % 30 == 0: 
         saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)
