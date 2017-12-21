@@ -10,8 +10,9 @@ np.random.seed(0)
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes'] + ['unknown','silence']
 
-mfile = "/home/burak/Downloads/speech2.ckpt"
-zip = '/home/burak/Downloads/goog_voice_test.zip'    
+mfile = "/home/burak/Downloads/speech11.ckpt"
+#zip = '/home/burak/Downloads/goog_voice_test.zip'    
+zip = '/home/burak/Downloads/test.zip'    
 
 sample_rate = 16000
 batch_size = 100
@@ -134,19 +135,40 @@ with tf.Session() as sess:
 
     saver.restore(sess, mfile)
 
-    fout = open(outfile,"w")
-    fout.write("fname,label\n")
+    last = None
+    if os.path.isfile(outfile):
+        fin = open(outfile)
+        for line in fin.readlines(): pass
+        last = line.split(",")[0]
+    print 'last', last
+    
+    fout = open(outfile,"aw")
+    #fout.write("fname,label\n")    
     with zipfile.ZipFile(zip, 'r') as z:
-         files = z.namelist()
-         for f in files:
-              if '.wav' not in f: continue
-              wav = io.BytesIO(z.open(f).read())
-              v = scipy.io.wavfile.read(wav)
-              v = v[1].reshape((1,16000))
-              data = normalize(v)
-              m = audiofile_to_input_vector(data, fs, numcep, numcontext)
-              m = m.reshape((1, 50, 494, 1))
-              res = sess.run(logits, feed_dict={ fingerprint : m, dropout_prob: 0.0 })
-              fout.write("%s,%s\n" % (f.replace("test/audio/",""), labels[np.argmax(res)]) )
-              fout.flush()
+         lenFiles = len(list(z.namelist()))
+         filesIt = iter(z.namelist())
+         count = 0
+         if last:
+             f2 = None
+             while (last!=f2):
+                 f = filesIt.next()
+                 if ".wav" not in f: continue
+                 f2 = re.findall(".*/.*?/(.*?.wav)",f)[0]
+                 print f
+                 count += 1
+             last = None
+         for i in range(count, lenFiles):
+             f = filesIt.next()
+             if '.wav' not in f: continue                  
+             print f
+             f2 = re.findall(".*/.*?/(.*?.wav)",f)[0]
+             wav = io.BytesIO(z.open(f).read())
+             v = scipy.io.wavfile.read(wav)
+             v = v[1].reshape((1,16000))
+             data = normalize(v)
+             m = audiofile_to_input_vector(data, fs, numcep, numcontext)
+             m = m.reshape((1, 50, 494, 1))
+             res = sess.run(logits, feed_dict={ fingerprint : m, dropout_prob: 0.0 })
+             fout.write("%s,%s\n" % (f2, labels[np.argmax(res)]) )
+             fout.flush()
      #fout.close()
