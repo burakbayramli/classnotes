@@ -134,6 +134,13 @@ def get_minibatch(batch_size):
           wav = io.BytesIO(zt.open(f).read())
           v = scipy.io.wavfile.read(wav)
           data = normalize(v[1])
+
+          if random.choice(range(3))==0:
+              shift = np.random.randint(0,200)
+              pad = data[0]
+              data[shift:-1] = data[0:len(data)-shift-1] 
+              data[0:shift] = pad
+          
           # sometimes add noise to training
           if random.choice(range(3))==0:
               data[0:len(data)] = normalize(data + noise_snippet()[0:len(data)])
