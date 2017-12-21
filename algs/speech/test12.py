@@ -25,7 +25,7 @@ zv = zipfile.ZipFile(valzip, 'r')
 
 sample_rate = 16000
 batch_size = 100
-num_epochs = 5000
+num_epochs = 10000
 mfile = "/tmp/speech12.ckpt"
 
 def normalize(v):
