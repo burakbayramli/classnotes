@@ -26,7 +26,7 @@ zv = zipfile.ZipFile(valzip, 'r')
 
 sample_rate = 16000
 batch_size = 100
-num_epochs = 2000
+num_epochs = 5000
 fs=16000
 numcep = 26
 numcontext = 9
@@ -100,7 +100,7 @@ def get_minibatch_val(batch_size):
         res[i, :] = audiofile_to_input_vector(data, fs, numcep, numcontext)
         y[i, labels2.index(label)] = 1.0
                
-    return res, y
+    return res.reshape((batch_size,time_dim,feature_dim,1)),y
 
 
 def get_minibatch(batch_size):
@@ -133,7 +133,15 @@ def get_minibatch(batch_size):
               y[i, len(labels)] = 1.0 # unknown
           wav = io.BytesIO(zt.open(f).read())
           v = scipy.io.wavfile.read(wav)
+
           data = normalize(v[1])
+
+          if random.choice(range(3))==0:
+              shift = np.random.randint(0,200)
+              pad = data[0]
+              data[shift:-1] = data[0:len(data)-shift-1] 
+              data[0:shift] = pad
+                    
           # sometimes add noise to training
           if random.choice(range(3))==0:
               data[0:len(data)] = normalize(data + noise_snippet()[0:len(data)])
@@ -142,35 +150,46 @@ def get_minibatch(batch_size):
           #print mfcc.shape
           res[i, :] = mfcc
           
-    return res, y
+    return res.reshape((batch_size,time_dim,feature_dim,1)),y
 
 tf.reset_default_graph()
 
 dropout_prob = tf.placeholder(tf.float32)
 
-fingerprint = tf.placeholder(tf.float32, [None, time_dim, feature_dim])
+fingerprint = tf.placeholder(tf.float32, [None, time_dim, feature_dim, 1])
 
 y = tf.placeholder(tf.float32, shape=[None, 12])
 
-print fingerprint
+layer1 = tf.layers.conv2d(inputs=fingerprint,
+                          filters=186,
+                          kernel_size=(8,20),
+                          padding='valid',
+                          strides = (4,4),
+                          activation=tf.nn.relu)
 
-gru_fw_cell	=	tf.contrib.rnn.GRUCell(num_cell)
-gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell, output_keep_prob=1-dropout_prob)
+layer1d = tf.layers.dropout(inputs=layer1,rate=dropout_prob)
 
-gru_bw_cell	=	tf.contrib.rnn.GRUCell(num_cell)
-gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell, output_keep_prob=1-dropout_prob)
+print layer1d
 
+layer1r = tf.reshape(layer1d, (-1, 11*119*186))
 
-outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
-						   cell_bw=gru_bw_cell,
-						   inputs=fingerprint,dtype=tf.float32)
-print outputs
+print layer1r
 
-states = tf.concat(values=states, axis=1)
+fc1 = tf.contrib.layers.fully_connected(inputs=layer1r,
+                                        num_outputs=128,
+                                        activation_fn=None)
 
-print states
+fc1d = tf.layers.dropout(inputs=fc1,rate=dropout_prob)
+print fc1d
 
-logits = tf.contrib.layers.fully_connected(inputs=states,
+fc2 = tf.contrib.layers.fully_connected(inputs=fc1d,
+                                        num_outputs=128,
+                                        activation_fn=None)
+
+fc2d = tf.layers.dropout(inputs=fc2,rate=dropout_prob)
+print fc2d
+
+logits = tf.contrib.layers.fully_connected(inputs=fc2d,
                                            num_outputs=12,
                                            activation_fn=None)
 
