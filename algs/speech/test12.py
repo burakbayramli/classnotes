@@ -174,7 +174,11 @@ logits = tf.contrib.layers.fully_connected(inputs=states,
                                            num_outputs=12,
                                            activation_fn=None)
 
-softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y) 
+pos_weight = tf.constant([0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.505])
+
+softmax = tf.nn.weighted_cross_entropy_with_logits(logits=logits,
+                                                   targets=y,
+                                                   pos_weight=pos_weight) 
 
 cross_entropy = tf.reduce_mean(softmax)
 
