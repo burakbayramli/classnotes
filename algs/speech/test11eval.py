@@ -3,6 +3,7 @@ import tensorflow as tf, re
 import zipfile, pandas as pd, random
 import pandas as pd, scipy.io.wavfile
 import numpy as np, io, os
+import scipy.io.wavfile, io
 
 random.seed(0)
 np.random.seed(0)
@@ -10,8 +11,7 @@ np.random.seed(0)
 labels = ['down','go','left','no','off','on','right','stop','up','yes'] + ['unknown','silence']
 
 mfile = "/home/burak/Downloads/speech2.ckpt"
-
-tf.reset_default_graph()
+zip = '/home/burak/Downloads/goog_voice_test.zip'    
 
 sample_rate = 16000
 batch_size = 100
@@ -23,7 +23,7 @@ mfile = "/home/burak/Downloads/speech11.ckpt"
 time_dim = 50
 feature_dim = 494
 num_cell = 256
-
+outfile = "/tmp/test11out.txt"
 
 def audiofile_to_input_vector(audio, fs, numcep, numcontext):
 
@@ -134,10 +134,7 @@ with tf.Session() as sess:
 
     saver.restore(sess, mfile)
 
-    zip = '/home/burak/Downloads/goog_voice_test.zip'
-    import zipfile, pandas as pd, random
-    import scipy.io.wavfile, io
-    fout = open("/tmp/test11out.txt","w")
+    fout = open(outfile,"w")
     fout.write("fname,label\n")
     with zipfile.ZipFile(zip, 'r') as z:
          files = z.namelist()
