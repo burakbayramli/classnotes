@@ -1,23 +1,5 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-"""Model definitions for simple speech recognition.
-
-"""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
 import hashlib
 import math
@@ -25,7 +7,6 @@ import os.path
 import random
 import re
 import sys
-import tarfile
 
 import numpy as np
 from six.moves import urllib
@@ -162,46 +143,6 @@ class AudioProcessor(object):
     self.prepare_background_data()
     self.prepare_processing_graph(model_settings)
 
-  def maybe_download_and_extract_dataset(self, data_url, dest_directory):
-    """Download and extract data set tar file.
-
-    If the data set we're using doesn't already exist, this function
-    downloads it from the TensorFlow.org website and unpacks it into a
-    directory.
-    If the data_url is none, don't download anything and expect the data
-    directory to contain the correct files already.
-
-    Args:
-      data_url: Web location of the tar file containing the data set.
-      dest_directory: File path to extract data to.
-    """
-    if not data_url:
-      return
-    if not os.path.exists(dest_directory):
-      os.makedirs(dest_directory)
-    filename = data_url.split('/')[-1]
-    filepath = os.path.join(dest_directory, filename)
-    if not os.path.exists(filepath):
-
-      def _progress(count, block_size, total_size):
-        sys.stdout.write(
-            '\r>> Downloading %s %.1f%%' %
-            (filename, float(count * block_size) / float(total_size) * 100.0))
-        sys.stdout.flush()
-
-      try:
-        filepath, _ = urllib.request.urlretrieve(data_url, filepath, _progress)
-      except:
-        tf.logging.error('Failed to download URL: %s to folder: %s', data_url,
-                         filepath)
-        tf.logging.error('Please make sure you have enough free space and'
-                         ' an internet connection')
-        raise
-      print()
-      statinfo = os.stat(filepath)
-      tf.logging.info('Successfully downloaded %s (%d bytes)', filename,
-                      statinfo.st_size)
-    tarfile.open(filepath, 'r:gz').extractall(dest_directory)
 
   def prepare_data_index(self, silence_percentage, unknown_percentage,
                          wanted_words, validation_percentage,
@@ -373,11 +314,15 @@ class AudioProcessor(object):
     background_add = tf.add(background_mul, sliced_foreground)
     background_clamp = tf.clip_by_value(background_add, -1.0, 1.0)
     # Run the spectrogram and MFCC ops to get a 2D 'fingerprint' of the audio.
+    print 'window_size_samples', model_settings['window_size_samples']
+    print 'window_stride_samples', model_settings['window_stride_samples']
     spectrogram = contrib_audio.audio_spectrogram(
         background_clamp,
         window_size=model_settings['window_size_samples'],
         stride=model_settings['window_stride_samples'],
         magnitude_squared=True)
+    print 'dct_coefficient_count', model_settings['dct_coefficient_count']
+    print 'wav_decoder.sample_rate', wav_decoder.sample_rate
     self.mfcc_ = contrib_audio.mfcc(
         spectrogram,
         wav_decoder.sample_rate,
