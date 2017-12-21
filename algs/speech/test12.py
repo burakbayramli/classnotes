@@ -4,7 +4,6 @@ import tensorflow as tf, re
 import zipfile, pandas as pd, random
 import pandas as pd, scipy.io.wavfile
 import numpy as np, io, os, numpy.linalg as lin
-from python_speech_features import mfcc
 
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 
@@ -39,53 +38,6 @@ def normalize(v):
     if np.std(v)==0: return v
     return (v-np.mean(v)) / np.std(v)
 
-def audiofile_to_input_vector(audio, fs, numcep, numcontext):
-
-    # Get mfcc coefficients
-    orig_inputs = mfcc(audio, samplerate=fs, numcep=numcep)
-
-    orig_inputs = orig_inputs[::2]
-    train_inputs = np.array([], np.float32)
-    train_inputs.resize((orig_inputs.shape[0], numcep + 2 * numcep * numcontext))
-    empty_mfcc = np.array([])
-    empty_mfcc.resize((numcep))
-    time_slices = range(train_inputs.shape[0])
-    context_past_min = time_slices[0] + numcontext
-    context_future_max = time_slices[-1] - numcontext
-    for time_slice in time_slices:
-        need_empty_past = max(0, (context_past_min - time_slice))
-        empty_source_past = list(empty_mfcc for empty_slots in range(need_empty_past))
-        data_source_past = orig_inputs[max(0, time_slice - numcontext):time_slice]
-        assert(len(empty_source_past) + len(data_source_past) == numcontext)
-
-        # Pick up to numcontext time slices in the future, and complete with empty
-        # mfcc features
-        need_empty_future = max(0, (time_slice - context_future_max))
-        empty_source_future = list(empty_mfcc for empty_slots in range(need_empty_future))
-        data_source_future = orig_inputs[time_slice + 1:time_slice + numcontext + 1]
-        assert(len(empty_source_future) + len(data_source_future) == numcontext)
-
-        if need_empty_past:
-            past = np.concatenate((empty_source_past, data_source_past))
-        else:
-            past = data_source_past
-
-        if need_empty_future:
-            future = np.concatenate((data_source_future, empty_source_future))
-        else:
-            future = data_source_future
-
-        past = np.reshape(past, numcontext * numcep)
-        now = orig_inputs[time_slice]
-        future = np.reshape(future, numcontext * numcep)
-
-        train_inputs[time_slice] = np.concatenate((past, now, future))
-        assert(len(train_inputs[time_slice]) == numcep + 2 * numcep * numcontext)
-        
-    train_inputs = (train_inputs - np.mean(train_inputs)) / np.std(train_inputs)
-    res = np.zeros((time_dim, feature_dim))
-    res[0:train_inputs.shape[0], 0:train_inputs.shape[1]] = train_inputs
-    return res
 
 def get_minibatch_val(batch_size):
     res = np.zeros((batch_size, time_dim, feature_dim))
@@ -97,7 +49,7 @@ def get_minibatch_val(batch_size):
         wav = io.BytesIO(zv.open(f).read())
         v = scipy.io.wavfile.read(wav)
         data = normalize(v[1])
-        res[i, :] = audiofile_to_input_vector(data, fs, numcep, numcontext)
+        res[i, :] = data
         y[i, labels2.index(label)] = 1.0
                
     return res.reshape((batch_size,time_dim,feature_dim,1)),y
@@ -122,7 +74,7 @@ def get_minibatch(batch_size):
       f = random.choice(tfiles)
       # pick silence (noise) randomly as training
       if random.choice(range(10)) == 0: 
-           res[i, :] = audiofile_to_input_vector(noise_snippet(), fs, numcep, numcontext)
+           res[i, :] = audiofile_to_input_vector(noise_snippet(), sample_rate, numcep, numcontext)
            y[i, len(labels)+1] = 1.0 # silence
       else: # otherwise regular file is used
           label = re.findall(".*/(.*?)/.*?.wav",f)[0]
@@ -146,9 +98,7 @@ def get_minibatch(batch_size):
           if random.choice(range(3))==0:
               data[0:len(data)] = normalize(data + noise_snippet()[0:len(data)])
               
-          mfcc = audiofile_to_input_vector(data, fs, numcep, numcontext)
-          #print mfcc.shape
-          res[i, :] = mfcc
+          res[i, :] = data
           
     return res.reshape((batch_size,time_dim,feature_dim,1)),y
 
@@ -156,42 +106,24 @@ tf.reset_default_graph()
 
 dropout_prob = tf.placeholder(tf.float32)
 
-fingerprint = tf.placeholder(tf.float32, [None, time_dim, feature_dim, 1])
-
 y = tf.placeholder(tf.float32, shape=[None, 12])
 
-layer1 = tf.layers.conv2d(inputs=fingerprint,
-                          filters=186,
-                          kernel_size=(8,20),
-                          padding='valid',
-                          strides = (4,4),
-                          activation=tf.nn.relu)
+pcm = tf.placeholder(tf.float32, [16000, None], name = 'inputs')
 
-layer1d = tf.layers.dropout(inputs=layer1,rate=dropout_prob)
+spectrogram = contrib_audio.audio_spectrogram(
+    pcm,
+    window_size=480,
+    stride=160,
+    magnitude_squared=True)
 
-print layer1d
 
-layer1r = tf.reshape(layer1d, (-1, 11*119*186))
+print spectrogram
 
-print layer1r
+mfcc_ = contrib_audio.mfcc(spectrogram, sample_rate, 40)
 
-fc1 = tf.contrib.layers.fully_connected(inputs=layer1r,
-                                        num_outputs=128,
-                                        activation_fn=None)
+print mfcc_
 
-fc1d = tf.layers.dropout(inputs=fc1,rate=dropout_prob)
-print fc1d
-
-fc2 = tf.contrib.layers.fully_connected(inputs=fc1d,
-                                        num_outputs=128,
-                                        activation_fn=None)
-
-fc2d = tf.layers.dropout(inputs=fc2,rate=dropout_prob)
-print fc2d
-
-logits = tf.contrib.layers.fully_connected(inputs=fc2d,
-                                           num_outputs=12,
-                                           activation_fn=None)
+exit()
 
 pos_weight = tf.constant([0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.505])
 

@@ -316,17 +316,20 @@ class AudioProcessor(object):
     # Run the spectrogram and MFCC ops to get a 2D 'fingerprint' of the audio.
     print 'window_size_samples', model_settings['window_size_samples']
     print 'window_stride_samples', model_settings['window_stride_samples']
+    print 'background_clamp', background_clamp
     spectrogram = contrib_audio.audio_spectrogram(
         background_clamp,
         window_size=model_settings['window_size_samples'],
         stride=model_settings['window_stride_samples'],
         magnitude_squared=True)
+    print 'spectrogram', spectrogram
     print 'dct_coefficient_count', model_settings['dct_coefficient_count']
     print 'wav_decoder.sample_rate', wav_decoder.sample_rate
     self.mfcc_ = contrib_audio.mfcc(
         spectrogram,
         wav_decoder.sample_rate,
         dct_coefficient_count=model_settings['dct_coefficient_count'])
+    print 'self.mfcc_', self.mfcc_
 
   def set_size(self, mode):
     """Calculates the number of samples in the dataset partition.
