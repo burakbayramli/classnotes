@@ -17,7 +17,6 @@
 """
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
 import math
 
@@ -95,6 +94,8 @@ def create_model(fingerprint_input, model_settings, model_architecture,
   Raises:
     Exception: If the architecture type isn't recognized.
   """
+
+  print 'model_architecture', model_architecture
   if model_architecture == 'single_fc':
     return create_single_fc_model(fingerprint_input, model_settings,
                                   is_training)
@@ -226,6 +227,7 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   first_bias = tf.Variable(tf.zeros([first_filter_count]))
   first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 1, 1, 1],
                             'SAME') + first_bias
+  print first_conv
   first_relu = tf.nn.relu(first_conv)
   if is_training:
     first_dropout = tf.nn.dropout(first_relu, dropout_prob)
@@ -245,6 +247,7 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   second_bias = tf.Variable(tf.zeros([second_filter_count]))
   second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
                              'SAME') + second_bias
+  print second_conv
   second_relu = tf.nn.relu(second_conv)
   if is_training:
     second_dropout = tf.nn.dropout(second_relu, dropout_prob)
@@ -259,11 +262,13 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   flattened_second_conv = tf.reshape(second_dropout,
                                      [-1, second_conv_element_count])
   label_count = model_settings['label_count']
+  print flattened_second_conv
   final_fc_weights = tf.Variable(
       tf.truncated_normal(
           [second_conv_element_count, label_count], stddev=0.01))
   final_fc_bias = tf.Variable(tf.zeros([label_count]))
   final_fc = tf.matmul(flattened_second_conv, final_fc_weights) + final_fc_bias
+  print final_fc
   if is_training:
     return final_fc, dropout_prob
   else:
