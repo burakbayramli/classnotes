@@ -104,7 +104,9 @@ y = tf.placeholder(tf.float32, shape=[None, 12])
 
 pcm = tf.placeholder(tf.float32, [None, sample_rate])
 
-stfts = tf.contrib.signal.stft(pcm, frame_length=480, frame_step=160, fft_length=1024)
+stfts = tf.contrib.signal.stft(pcm, frame_length=600, frame_step=320, fft_length=1024)
+
+print stfts
 
 spectrograms = tf.abs(stfts)
 
@@ -127,8 +129,12 @@ mfcc_ = tf.contrib.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrograms)
 
 print mfcc_
 
-input_time_size = 98
-input_frequency_size = 80
+mfcc_ = mfcc_[:, :, :26]
+
+print mfcc_
+
+input_time_size = 49
+input_frequency_size = 26
 fingerprint_4d = tf.reshape(mfcc_, [-1, input_time_size, input_frequency_size, 1])
 
 first_conv = tf.layers.conv2d(inputs=fingerprint_4d, filters=64, kernel_size=(20,8), padding='same')
@@ -142,7 +148,7 @@ second_dropout = tf.nn.dropout(second_relu, dropout_prob)
 
 print second_dropout
 
-flattened_second_conv = tf.reshape(second_dropout, [-1, 98*80*64])
+flattened_second_conv = tf.reshape(second_dropout, [-1, 49*26*64])
 print flattened_second_conv
 
 logits = tf.contrib.layers.fully_connected(inputs=flattened_second_conv,
