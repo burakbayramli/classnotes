@@ -135,8 +135,8 @@ def get_minibatch(batch_size):
           v = scipy.io.wavfile.read(wav)
           data = normalize(v[1])
 
-          if random.choice(range(3))==0:
-              shift = np.random.randint(0,200)
+          if random.choice(range(4))==0:
+              shift = np.random.randint(0,1000)
               data[shift:-1] = data[0:len(data)-shift-1] 
               data[0:shift] = 0
           
@@ -160,17 +160,17 @@ y = tf.placeholder(tf.float32, shape=[None, 12])
 
 print fingerprint
 
-layer1 = tf.layers.conv2d(inputs=fingerprint, filters=16, kernel_size=(2,2), activation=tf.nn.relu, padding='same')
-layer1 = tf.layers.max_pooling2d(inputs=layer1, pool_size=(3,3), strides=1, padding='same')
-layer1 = tf.layers.dropout(inputs=layer1,rate=dropout_prob)
-print layer1
+layer1a = tf.layers.conv2d(inputs=fingerprint, filters=16, kernel_size=(2,2), activation=tf.nn.relu, padding='same')
+layer1b = tf.layers.max_pooling2d(inputs=layer1a, pool_size=(3,3), strides=1, padding='same')
+layer1c = tf.layers.dropout(inputs=layer1b,rate=dropout_prob)
+print layer1c
 
-layer2 = tf.layers.conv2d(inputs=layer1, filters=16, kernel_size=(2,2), activation=tf.nn.relu, padding='same')
-layer2 = tf.layers.max_pooling2d(inputs=layer2, pool_size=(3,3), strides=1, padding='same')
-layer2 = tf.layers.dropout(inputs=layer2, rate=dropout_prob)
-print layer2
+layer2a = tf.layers.conv2d(inputs=layer1c, filters=16, kernel_size=(2,2), activation=tf.nn.relu, padding='same')
+layer2b = tf.layers.max_pooling2d(inputs=layer2a, pool_size=(3,3), strides=1, padding='same')
+layer2c = tf.layers.dropout(inputs=layer2b, rate=dropout_prob)
+print layer2c
 
-input_dense = tf.reshape(layer2, (-1, 50, 494*16))
+input_dense = tf.reshape(layer2c, (-1, 50, 494*16))
 
 print input_dense
 
@@ -228,7 +228,7 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.0 })
         print i, 'accuracy', acc
-    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.2 })
+    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.5 })
     if i % 30 == 0: 
         saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)

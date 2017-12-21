@@ -29,9 +29,8 @@ num_epochs = 10000
 mfile = "/tmp/speech12.ckpt"
 
 def normalize(v):
-    norm=np.linalg.norm(v, ord=1)
-    if norm==0: return v
-    return v/norm
+    if np.std(v)==0: return v
+    return (v-np.mean(v)) / np.std(v)
 
 def noise_snippet():
     nf = random.choice(noise_files)
@@ -81,8 +80,8 @@ def get_minibatch(batch_size):
           v = scipy.io.wavfile.read(wav)
           data = normalize(v[1])
 
-          if random.choice(range(3))==0:
-              shift = np.random.randint(0,200)
+          if random.choice(range(4))==0:
+              shift = np.random.randint(0,1000)
               data[shift:-1] = data[0:len(data)-shift-1] 
               data[0:shift] = 0
           
@@ -182,7 +181,7 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy, feed_dict={pcm: x_batch, y: y_batch, dropout_prob: 0.0 })
         print i, 'accuracy', acc
-    sess.run(train_step,feed_dict={pcm:x_batch, y:y_batch, dropout_prob: 0.2})
+    sess.run(train_step, feed_dict={pcm:x_batch, y:y_batch, dropout_prob: 0.5})
     if i % 30 == 0: 
         saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)
