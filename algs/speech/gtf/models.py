@@ -44,39 +44,6 @@ def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
 
 def create_model(fingerprint_input, model_settings, model_architecture,
                  is_training, runtime_settings=None):
-  """Builds a model of the requested architecture compatible with the settings.
-
-  There are many possible ways of deriving predictions from a spectrogram
-  input, so this function provides an abstract interface for creating different
-  kinds of models in a black-box way. You need to pass in a TensorFlow node as
-  the 'fingerprint' input, and this should output a batch of 1D features that
-  describe the audio. Typically this will be derived from a spectrogram that's
-  been run through an MFCC, but in theory it can be any feature vector of the
-  size specified in model_settings['fingerprint_size'].
-
-  The function will build the graph it needs in the current TensorFlow graph,
-  and return the tensorflow output that will contain the 'logits' input to the
-  softmax prediction process. If training flag is on, it will also return a
-  placeholder node that can be used to control the dropout amount.
-
-  See the implementations below for the possible model architectures that can be
-  requested.
-
-  Args:
-    fingerprint_input: TensorFlow node that will output audio feature vectors.
-    model_settings: Dictionary of information about the model.
-    model_architecture: String specifying which kind of model to create.
-    is_training: Whether the model is going to be used for training.
-    runtime_settings: Dictionary of information about the runtime.
-
-  Returns:
-    TensorFlow node outputting logits results, and optionally a dropout
-    placeholder.
-
-  Raises:
-    Exception: If the architecture type isn't recognized.
-  """
-
   return create_conv_model(fingerprint_input, model_settings, is_training)
 
 def load_variables_from_checkpoint(sess, start_checkpoint):

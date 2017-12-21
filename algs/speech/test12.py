@@ -25,22 +25,28 @@ zv = zipfile.ZipFile(valzip, 'r')
 
 sample_rate = 16000
 batch_size = 100
-num_epochs = 10000
-fs=16000
-numcep = 26
-numcontext = 9
+num_epochs = 5000
 mfile = "/tmp/speech12.ckpt"
-time_dim = 50
-feature_dim = 494
-num_cell = 256
 
 def normalize(v):
-    if np.std(v)==0: return v
-    return (v-np.mean(v)) / np.std(v)
+    norm=np.linalg.norm(v, ord=1)
+    if norm==0: return v
+    return v/norm
 
+def noise_snippet():
+    nf = random.choice(noise_files)
+    wav = io.BytesIO(zt.open(nf).read())
+    v = scipy.io.wavfile.read(wav)
+    chunks = int(len(v[1]) / sample_rate) - 1
+    chosen_chunk = random.choice(range(chunks))
+    fr = int(chosen_chunk * sample_rate)
+    to = int((chosen_chunk+1)*sample_rate)
+    chunk_byte = v[1][fr:to]
+    return chunk_byte
 
+ 
 def get_minibatch_val(batch_size):
-    res = np.zeros((batch_size, time_dim, feature_dim))
+    res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
         f = random.choice(vfiles)
@@ -49,32 +55,20 @@ def get_minibatch_val(batch_size):
         wav = io.BytesIO(zv.open(f).read())
         v = scipy.io.wavfile.read(wav)
         data = normalize(v[1])
-        res[i, :] = data
+        res[i, 0:len(data)] = data
         y[i, labels2.index(label)] = 1.0
                
-    return res.reshape((batch_size,time_dim,feature_dim,1)),y
-
+    return res,y
 
 def get_minibatch(batch_size):
-
-    def noise_snippet():
-       nf = random.choice(noise_files)
-       wav = io.BytesIO(zt.open(nf).read())
-       v = scipy.io.wavfile.read(wav)
-       chunks = int(len(v[1]) / sample_rate) - 1
-       chosen_chunk = random.choice(range(chunks))
-       fr = int(chosen_chunk * sample_rate)
-       to = int((chosen_chunk+1)*sample_rate)
-       chunk_byte = v[1][fr:to]
-       return normalize(chunk_byte)
        
-    res = np.zeros((batch_size, time_dim, feature_dim))
+    res = np.zeros((batch_size, 16000))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
       f = random.choice(tfiles)
       # pick silence (noise) randomly as training
       if random.choice(range(10)) == 0: 
-           res[i, :] = audiofile_to_input_vector(noise_snippet(), sample_rate, numcep, numcontext)
+           res[i, :] = normalize(noise_snippet())
            y[i, len(labels)+1] = 1.0 # silence
       else: # otherwise regular file is used
           label = re.findall(".*/(.*?)/.*?.wav",f)[0]
@@ -85,7 +79,6 @@ def get_minibatch(batch_size):
               y[i, len(labels)] = 1.0 # unknown
           wav = io.BytesIO(zt.open(f).read())
           v = scipy.io.wavfile.read(wav)
-
           data = normalize(v[1])
 
           if random.choice(range(3))==0:
@@ -93,14 +86,15 @@ def get_minibatch(batch_size):
               pad = data[0]
               data[shift:-1] = data[0:len(data)-shift-1] 
               data[0:shift] = pad
-                    
+          
           # sometimes add noise to training
           if random.choice(range(3))==0:
-              data[0:len(data)] = normalize(data + noise_snippet()[0:len(data)])
-              
-          res[i, :] = data
-          
-    return res.reshape((batch_size,time_dim,feature_dim,1)),y
+              res[i, 0:len(data)] = normalize(data + normalize(noise_snippet())[0:len(data)])
+          else:
+              res[i, 0:len(data)] = data
+                                  
+    return res,y
+
 
 tf.reset_default_graph()
 
@@ -108,22 +102,53 @@ dropout_prob = tf.placeholder(tf.float32)
 
 y = tf.placeholder(tf.float32, shape=[None, 12])
 
-pcm = tf.placeholder(tf.float32, [16000, None], name = 'inputs')
+pcm = tf.placeholder(tf.float32, [None, sample_rate])
 
-spectrogram = contrib_audio.audio_spectrogram(
-    pcm,
-    window_size=480,
-    stride=160,
-    magnitude_squared=True)
+stfts = tf.contrib.signal.stft(pcm, frame_length=480, frame_step=160, fft_length=1024)
 
+spectrograms = tf.abs(stfts)
 
-print spectrogram
+num_spectrogram_bins = stfts.shape[-1].value
 
-mfcc_ = contrib_audio.mfcc(spectrogram, sample_rate, 40)
+lower_edge_hertz, upper_edge_hertz, num_mel_bins = 80.0, 7600.0, 80
+
+linear_to_mel_weight_matrix = tf.contrib.signal.linear_to_mel_weight_matrix(
+  num_mel_bins, num_spectrogram_bins, sample_rate, lower_edge_hertz,
+  upper_edge_hertz)
+  
+mel_spectrograms = tf.tensordot(spectrograms, linear_to_mel_weight_matrix, 1)
+  
+mel_spectrograms.set_shape(spectrograms.shape[:-1].concatenate(
+  linear_to_mel_weight_matrix.shape[-1:]))
+
+log_mel_spectrograms = tf.log(mel_spectrograms + 1e-6)
+
+mfcc_ = tf.contrib.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrograms)
 
 print mfcc_
 
-exit()
+input_time_size = 98
+input_frequency_size = 80
+fingerprint_4d = tf.reshape(mfcc_, [-1, input_time_size, input_frequency_size, 1])
+
+first_conv = tf.layers.conv2d(inputs=fingerprint_4d, filters=64, kernel_size=(20,8), padding='same')
+first_relu = tf.nn.relu(first_conv)
+first_dropout = tf.nn.dropout(first_relu, dropout_prob)
+print first_conv
+
+second_conv = tf.layers.conv2d(inputs=first_dropout, filters=64, kernel_size=(10,4), padding='same')
+second_relu = tf.nn.relu(second_conv)
+second_dropout = tf.nn.dropout(second_relu, dropout_prob)
+
+print second_dropout
+
+flattened_second_conv = tf.reshape(second_dropout, [-1, 98*80*64])
+print flattened_second_conv
+
+logits = tf.contrib.layers.fully_connected(inputs=flattened_second_conv,
+                                           num_outputs=12,
+                                           activation_fn=None)
+
 
 pos_weight = tf.constant([0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.045, 0.505])
 
@@ -152,11 +177,13 @@ if os.path.isfile(mfile + ".index"):
 for i in range(num_epochs):
     x_batch, y_batch = get_minibatch(batch_size)
     if i % 5 == 0:
-        acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.2 })
+        acc = sess.run(accuracy, feed_dict={pcm: x_batch,
+                                            y: y_batch,
+                                            dropout_prob: 0.2 })
         print i, 'accuracy', acc
-    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch })
+    sess.run(train_step,feed_dict={pcm:x_batch, y:y_batch, dropout_prob: 0.2})
     if i % 30 == 0: 
         saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)
-        acc = sess.run(accuracy,feed_dict={fingerprint:x_batch, y:y_batch, dropout_prob: 0.0})
+        acc = sess.run(accuracy,feed_dict={pcm: x_batch, y: y_batch, dropout_prob: 0.0})
         print i, 'validation accuracy', acc

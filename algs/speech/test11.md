@@ -1,5 +1,38 @@
 
 ```python
+import tensorflow as tf
+from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
+
+import tensorflow as tf
+
+tf.reset_default_graph()
+
+sample_rate = 16000.0
+
+pcm = tf.placeholder(tf.float32, [16000, 2])
+
+#res = contrib_audio.audio_spectrogram(pcm,window_size=480,stride=160,magnitude_squared=True)
+res = contrib_audio.audio_spectrogram(pcm,window_size=480,stride=160,magnitude_squared=True)
+
+with tf.Session() as sess:
+     data = np.random.randn(16000, 2)
+     res = sess.run(res,feed_dict={pcm: data})
+     print res.shape
+```
+
+```text
+(1, 98, 257)
+```
+
+
+
+
+
+
+
+
+
+```python
 from python_speech_features import mfcc
 def audiofile_to_input_vector(audio, fs, numcep, numcontext):
 
