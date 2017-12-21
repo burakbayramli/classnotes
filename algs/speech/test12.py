@@ -26,7 +26,7 @@ zv = zipfile.ZipFile(valzip, 'r')
 
 sample_rate = 16000
 batch_size = 100
-num_epochs = 5000
+num_epochs = 10000
 fs=16000
 numcep = 26
 numcontext = 9
