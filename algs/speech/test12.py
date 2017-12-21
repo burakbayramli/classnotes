@@ -83,9 +83,8 @@ def get_minibatch(batch_size):
 
           if random.choice(range(3))==0:
               shift = np.random.randint(0,200)
-              pad = data[0]
               data[shift:-1] = data[0:len(data)-shift-1] 
-              data[0:shift] = pad
+              data[0:shift] = 0
           
           # sometimes add noise to training
           if random.choice(range(3))==0:
