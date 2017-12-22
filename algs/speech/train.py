@@ -1,23 +1,18 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import tensorflow as tf
+from tensorflow.python.platform import gfile
+from six.moves import xrange  # pylint: disable=redefined-builtin
+import numpy as np, sys
+import tensorflow as tf
+import input_data
 import argparse
 import os.path
-import sys
-
-import numpy as np
-from six.moves import xrange  # pylint: disable=redefined-builtin
-import tensorflow as tf
-
-import input_data
-from tensorflow.python.platform import gfile
+import math
 
 FLAGS = None
 wanted_words = ['up','down']
-
-
-import math
-import tensorflow as tf
 
 
 def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
@@ -152,13 +147,6 @@ def main(_):
   fingerprint_size = model_settings['fingerprint_size']
   label_count = model_settings['label_count']
   time_shift_samples = int((FLAGS.time_shift_ms * FLAGS.sample_rate) / 1000)
-  # Figure out the learning rates for each training phase. Since it's often
-  # effective to have high learning rates at the start of training, followed by
-  # lower levels towards the end, the number of steps and learning rates can be
-  # specified as comma-separated lists to define the rate at each stage. For
-  # example --how_many_training_steps=10000,3000 --learning_rate=0.001,0.0001
-  # will run 13,000 training loops in total, with a rate of 0.001 for the first
-  # 10,000, and 0.0001 for the final 3,000.
   training_steps_list = list(map(int, FLAGS.how_many_training_steps.split(',')))
   learning_rates_list = list(map(float, FLAGS.learning_rate.split(',')))
   if len(training_steps_list) != len(learning_rates_list):
