@@ -1,5 +1,72 @@
 
 ```python
+zip = '/home/burak/Downloads/goog_voice_train.zip'
+import zipfile, pandas as pd, random
+with zipfile.ZipFile(zip, 'r') as z:
+     res = z.namelist()
+```
+
+```python
+print random.choice(res)
+```
+
+```text
+train/audio/sheila/019fa366_nohash_0.wav
+```
+
+
+```python
+import scipy.io.wavfile, zipfile
+import io, time
+zip = '/home/burak/Downloads/goog_voice_train.zip'
+f = 'train/audio/sheila/019fa366_nohash_0.wav'
+with zipfile.ZipFile(zip, 'r') as z:
+     wav = io.BytesIO(z.open(f).read())
+     v = scipy.io.wavfile.read(wav)     
+```
+
+```python
+print v[1]
+```
+
+```text
+[0 3 5 ..., 4 4 3]
+```
+
+```python
+plt.plot(v[1])
+plt.savefig('out.png')
+```
+
+```python
+def normalize(x):
+    print x.max()-x.min()
+    print x.std()
+    x2 = x / x.std()
+    return x2
+
+s = normalize(v[1])
+print s
+plt.plot(s)
+plt.savefig('out2.png')
+```
+
+```text
+14587
+1525.28662483
+[ 0.          0.00196684  0.00327807 ...,  0.00262246  0.00262246
+  0.00196684]
+```
+
+```python
+fs = 16000
+#scipy.io.wavfile.write('/tmp/tmp.wav', fs, s)
+scipy.io.wavfile.write('/tmp/tmp.wav', fs, v[1])
+```
+
+
+
+```python
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
 
