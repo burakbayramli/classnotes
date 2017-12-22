@@ -28,13 +28,8 @@ batch_size = 100
 num_epochs = 10000
 mfile = "/tmp/speech12.ckpt"
 
-#def normalize(v):
-#    if np.std(v)==0: return v
-#    return (v-np.mean(v)) / np.std(v)
-
 def normalize(v):
-    if np.std(v)==0: return v
-    return (v-np.mean(v)) / np.std(v)
+    return v
 
 def noise_snippet():
     nf = random.choice(noise_files)

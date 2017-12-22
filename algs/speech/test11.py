@@ -36,8 +36,7 @@ feature_dim = 494
 num_cell = 256
 
 def normalize(v):
-    if np.std(v)==0: return v
-    return (v-np.mean(v)) / np.std(v)
+    return v
 
 def audiofile_to_input_vector(audio, fs, numcep, numcontext):
 
