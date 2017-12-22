@@ -14,7 +14,6 @@ import math
 FLAGS = None
 wanted_words = ['up','down']
 
-
 def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
                            window_size_ms, window_stride_ms,
                            dct_coefficient_count):
@@ -37,11 +36,6 @@ def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
       'label_count': label_count,
       'sample_rate': sample_rate,
   }
-
-
-def create_model(fingerprint_input, model_settings, model_architecture,
-                 is_training, runtime_settings=None):
-  return create_conv_model(fingerprint_input, model_settings, is_training)
 
 def load_variables_from_checkpoint(sess, start_checkpoint):
   """Utility function to centralize checkpoint restoration.
@@ -160,11 +154,8 @@ def main(_):
 
   print 'fingerprint_input',fingerprint_input
 
-  logits, dropout_prob = create_model(
-      fingerprint_input,
-      model_settings,
-      FLAGS.model_architecture,
-      is_training=True)
+  logits, dropout_prob = create_conv_model(fingerprint_input, model_settings, is_training=True)
+  
 
   # Define loss and optimizer
   ground_truth_input = tf.placeholder(
