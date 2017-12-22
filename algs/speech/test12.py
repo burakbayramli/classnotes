@@ -79,10 +79,10 @@ def get_minibatch(batch_size):
           v = scipy.io.wavfile.read(wav)
           data = normalize(v[1])
 
-          if random.choice(range(4))==0:
-              shift = np.random.randint(0,1000)
-              data[shift:-1] = data[0:len(data)-shift-1] 
-              data[0:shift] = 0
+#          if random.choice(range(4))==0:
+#              shift = np.random.randint(0,1000)
+#              data[shift:-1] = data[0:len(data)-shift-1] 
+#              data[0:shift] = 0
           
           # sometimes add noise to training
           if random.choice(range(3))==0:
@@ -159,7 +159,8 @@ softmax = tf.nn.weighted_cross_entropy_with_logits(logits=logits,
 
 cross_entropy = tf.reduce_mean(softmax)
 
-train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
+#train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
+train_step = tf.train.GradientDescentOptimizer(0.001).minimize(cross_entropy)
 
 correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(logits,1))
 
@@ -180,7 +181,7 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy, feed_dict={pcm: x_batch, y: y_batch, dropout_prob: 0.0 })
         print i, 'accuracy', acc
-    sess.run(train_step, feed_dict={pcm:x_batch, y:y_batch, dropout_prob: 0.5})
+    sess.run(train_step, feed_dict={pcm:x_batch, y:y_batch, dropout_prob: 0.2})
     if i % 30 == 0: 
         saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)

@@ -134,10 +134,10 @@ def get_minibatch(batch_size):
           v = scipy.io.wavfile.read(wav)
           data = normalize(v[1])
 
-          if random.choice(range(4))==0:
-              shift = np.random.randint(0,1000)
-              data[shift:-1] = data[0:len(data)-shift-1] 
-              data[0:shift] = 0
+#          if random.choice(range(4))==0:
+#              shift = np.random.randint(0,1000)
+#              data[shift:-1] = data[0:len(data)-shift-1] 
+#              data[0:shift] = 0
           
           # sometimes add noise to training
           if random.choice(range(3))==0:
@@ -227,7 +227,7 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.0 })
         print i, 'accuracy', acc
-    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.5 })
+    sess.run(train_step,feed_dict={ fingerprint:x_batch, y:y_batch, dropout_prob: 0.2 })
     if i % 30 == 0: 
         saver.save(sess, mfile)
         x_batch, y_batch = get_minibatch_val(batch_size)
