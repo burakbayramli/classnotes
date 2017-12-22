@@ -12,7 +12,7 @@ import os.path
 import math
 
 FLAGS = None
-wanted_words = ['up','down']
+wanted_words = ['down','go','left','no','off','on','right','stop','up','yes']
 
 def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
                            window_size_ms, window_stride_ms,
@@ -134,7 +134,7 @@ def main(_):
       FLAGS.sample_rate, FLAGS.clip_duration_ms, FLAGS.window_size_ms,
       FLAGS.window_stride_ms, FLAGS.dct_coefficient_count)
   audio_processor = input_data.AudioProcessor(
-      "/home/burak/Downloads/test/audio", 10.0, 10.0,
+      "/home/burak/Downloads/train/audio", 10.0, 10.0,
       wanted_words,
       FLAGS.validation_percentage,
       FLAGS.testing_percentage, model_settings)
@@ -169,23 +169,24 @@ def main(_):
     control_dependencies = [checks]
 
   # Create the back propagation and training evaluation machinery in the graph.
-  with tf.name_scope('cross_entropy'):
-    cross_entropy_mean = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits(
-            labels=ground_truth_input, logits=logits))
+  cross_entropy_mean = tf.reduce_mean(
+    tf.nn.softmax_cross_entropy_with_logits(
+      labels=ground_truth_input, logits=logits))
+  
   tf.summary.scalar('cross_entropy', cross_entropy_mean)
+  
   with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
     learning_rate_input = tf.placeholder(
         tf.float32, [], name='learning_rate_input')
     train_step = tf.train.GradientDescentOptimizer(
         learning_rate_input).minimize(cross_entropy_mean)
+    
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
   correct_prediction = tf.equal(predicted_indices, expected_indices)
   confusion_matrix = tf.confusion_matrix(expected_indices, predicted_indices)
   evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   tf.summary.scalar('accuracy', evaluation_step)
-
   global_step = tf.contrib.framework.get_or_create_global_step()
   increment_global_step = tf.assign(global_step, global_step + 1)
 
