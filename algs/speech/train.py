@@ -14,9 +14,12 @@ import models
 from tensorflow.python.platform import gfile
 
 FLAGS = None
-
+wanted_words = ['up','down']
 
 def main(_):
+
+  batch_size = 100
+  
   # We want to see all the logging messages for this tutorial.
   tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -27,13 +30,12 @@ def main(_):
   # training data of your own, use `--data_url= ` on the command line to avoid
   # downloading.
   model_settings = models.prepare_model_settings(
-      len(input_data.prepare_words_list(FLAGS.wanted_words.split(','))),
+      len(input_data.prepare_words_list(wanted_words)),
       FLAGS.sample_rate, FLAGS.clip_duration_ms, FLAGS.window_size_ms,
       FLAGS.window_stride_ms, FLAGS.dct_coefficient_count)
   audio_processor = input_data.AudioProcessor(
-      FLAGS.data_dir, FLAGS.silence_percentage,
-      FLAGS.unknown_percentage,
-      FLAGS.wanted_words.split(','),
+      "/home/burak/Downloads/test/audio", 10.0, 10.0,
+      wanted_words,
       FLAGS.validation_percentage,
       FLAGS.testing_percentage, model_settings)
   fingerprint_size = model_settings['fingerprint_size']
@@ -137,7 +139,7 @@ def main(_):
         break
     # Pull the audio samples we'll use for training.
     train_fingerprints, train_ground_truth = audio_processor.get_data(
-        FLAGS.batch_size, 0, model_settings, FLAGS.background_frequency,
+        batch_size, 0, model_settings, FLAGS.background_frequency,
         FLAGS.background_volume, time_shift_samples, 'training', sess)
     # Run the graph with this batch of training data.
     train_summary, train_accuracy, cross_entropy_value, _, _ = sess.run(
@@ -160,9 +162,9 @@ def main(_):
       set_size = audio_processor.set_size('validation')
       total_accuracy = 0
       total_conf_matrix = None
-      for i in xrange(0, set_size, FLAGS.batch_size):
+      for i in xrange(0, set_size, batch_size):
         validation_fingerprints, validation_ground_truth = (
-            audio_processor.get_data(FLAGS.batch_size, i, model_settings, 0.0,
+            audio_processor.get_data(batch_size, i, model_settings, 0.0,
                                      0.0, 0, 'validation', sess))
         # Run a validation step and capture training summaries for TensorBoard
         # with the `merged` op.
@@ -196,7 +198,7 @@ def main(_):
   tf.logging.info('set_size=%d', set_size)
   total_accuracy = 0
   total_conf_matrix = None
-  for i in xrange(0, set_size, FLAGS.batch_size):
+  for i in xrange(0, set_size, batch_size):
     test_fingerprints, test_ground_truth = audio_processor.get_data(
         FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
     test_accuracy, conf_matrix = sess.run(
@@ -239,20 +241,6 @@ if __name__ == '__main__':
       default=0.8,
       help="""\
       How many of the training samples have background noise mixed in.
-      """)
-  parser.add_argument(
-      '--silence_percentage',
-      type=float,
-      default=10.0,
-      help="""\
-      How much of the training data should be silence.
-      """)
-  parser.add_argument(
-      '--unknown_percentage',
-      type=float,
-      default=10.0,
-      help="""\
-      How much of the training data should be unknown words.
       """)
   parser.add_argument(
       '--time_shift_ms',
@@ -321,11 +309,6 @@ if __name__ == '__main__':
       type=str,
       default='/tmp/retrain_logs',
       help='Where to save summary logs for TensorBoard.')
-  parser.add_argument(
-      '--wanted_words',
-      type=str,
-      default='yes,no,up,down,left,right,on,off,stop,go',
-      help='Words to use (others will be added to an unknown label)',)
   parser.add_argument(
       '--train_dir',
       type=str,
