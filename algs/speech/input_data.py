@@ -42,14 +42,13 @@ def which_set(filename, validation_percentage, testing_percentage):
 class AudioProcessor(object):
 
   def __init__(self, data_dir, silence_percentage, unknown_percentage,
-               wanted_words, validation_percentage, testing_percentage,
-               model_settings):
+               wanted_words, validation_percentage, testing_percentage):
     self.data_dir = data_dir
     self.prepare_data_index(silence_percentage, unknown_percentage,
                             wanted_words, validation_percentage,
                             testing_percentage)
     self.prepare_background_data()
-    self.prepare_processing_graph(model_settings)
+    self.prepare_processing_graph()
 
 
   def prepare_data_index(self, silence_percentage, unknown_percentage,
@@ -133,7 +132,7 @@ class AudioProcessor(object):
       if not self.background_data:
         raise Exception('No background wav files were found in ' + search_path)
 
-  def prepare_processing_graph(self, model_settings):
+  def prepare_processing_graph(self):
     desired_samples = model_settings['desired_samples']
     self.wav_filename_placeholder_ = tf.placeholder(tf.string, [])
     wav_loader = io_ops.read_file(self.wav_filename_placeholder_)
@@ -162,21 +161,21 @@ class AudioProcessor(object):
     background_add = tf.add(background_mul, sliced_foreground)
     background_clamp = tf.clip_by_value(background_add, -1.0, 1.0)
     # Run the spectrogram and MFCC ops to get a 2D 'fingerprint' of the audio.
-    print 'window_size_samples', model_settings['window_size_samples']
-    print 'window_stride_samples', model_settings['window_stride_samples']
+    print 'window_size_samples', window_size_samples
+    print 'window_stride_samples', window_stride_samples
     print 'background_clamp', background_clamp
     spectrogram = contrib_audio.audio_spectrogram(
         background_clamp,
-        window_size=model_settings['window_size_samples'],
-        stride=model_settings['window_stride_samples'],
+        window_size=window_size_samples,
+        stride=window_stride_samples,
         magnitude_squared=True)
     print 'spectrogram', spectrogram
-    print 'dct_coefficient_count', model_settings['dct_coefficient_count']
+    print 'dct_coefficient_count', dct_coefficient_count
     print 'wav_decoder.sample_rate', wav_decoder.sample_rate
     self.mfcc_ = contrib_audio.mfcc(
         spectrogram,
         wav_decoder.sample_rate,
-        dct_coefficient_count=model_settings['dct_coefficient_count'])
+        dct_coefficient_count=dct_coefficient_count)
     print 'self.mfcc_', self.mfcc_
 
   def set_size(self, mode):
@@ -190,7 +189,7 @@ class AudioProcessor(object):
     """
     return len(self.data_index[mode])
 
-  def get_data(self, how_many, offset, model_settings, background_frequency,
+  def get_data(self, how_many, offset, background_frequency,
                background_volume_range, time_shift, mode, sess):
     # Pick one of the partitions to choose samples from.
     candidates = self.data_index[mode]
@@ -199,9 +198,9 @@ class AudioProcessor(object):
     else:
       sample_count = max(0, min(how_many, len(candidates) - offset))
     # Data and labels will be populated and returned.
-    data = np.zeros((sample_count, model_settings['fingerprint_size']))
-    labels = np.zeros((sample_count, model_settings['label_count']))
-    desired_samples = model_settings['desired_samples']
+    data = np.zeros((sample_count, fingerprint_size))
+    labels = np.zeros((sample_count, label_count))
+    desired_samples = desired_samples
     use_background = self.background_data and (mode == 'training')
     pick_deterministically = (mode != 'training')
     # Use the processing graph we created earlier to repeatedly to generate the
@@ -234,7 +233,7 @@ class AudioProcessor(object):
         background_index = np.random.randint(len(self.background_data))
         background_samples = self.background_data[background_index]
         background_offset = np.random.randint(
-            0, len(background_samples) - model_settings['desired_samples'])
+            0, len(background_samples) - desired_samples)
         background_clipped = background_samples[background_offset:(
             background_offset + desired_samples)]
         background_reshaped = background_clipped.reshape([desired_samples, 1])
