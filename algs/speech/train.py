@@ -12,6 +12,7 @@ import os.path
 import math
 
 FLAGS = None
+#wanted_words = ['down','up']
 wanted_words = ['down','go','left','no','off','on','right','stop','up','yes']
 
 def prepare_model_settings(label_count, sample_rate, clip_duration_ms,
@@ -135,6 +136,7 @@ def main(_):
       FLAGS.window_stride_ms, FLAGS.dct_coefficient_count)
   audio_processor = input_data.AudioProcessor(
       "/home/burak/Downloads/train/audio", 10.0, 10.0,
+      #"/home/burak/Downloads/test/audio", 10.0, 10.0,
       wanted_words,
       FLAGS.validation_percentage,
       FLAGS.testing_percentage, model_settings)
