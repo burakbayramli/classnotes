@@ -447,7 +447,7 @@ def main(_):
   start_step = 1
 
   if FLAGS.start_checkpoint:
-    print 'restoring'
+    print 'restoring',
     load_variables_from_checkpoint(sess, FLAGS.start_checkpoint)
     start_step = global_step.eval(session=sess)
 
