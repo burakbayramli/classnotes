@@ -363,16 +363,15 @@ def main(_):
 
   # Start a new TensorFlow session.
   sess = tf.InteractiveSession()
-  
-  print fingerprint_size, dct_coefficient_count, sample_rate, window_size_samples,\
-    spectrogram_length, window_stride_samples, desired_samples, label_count
-  
+    
   audio_processor = AudioProcessor(
-      #"/home/burak/Downloads/train/audio", 10.0, 10.0,
-      "/home/burak/Downloads/test/audio", 10.0, 10.0,
-      wanted_words,
-      validation_percentage,
-      testing_percentage)
+    #"/home/burak/Downloads/train/audio", 
+    "/home/burak/Downloads/test/audio",
+    10.0,
+    10.0,
+    wanted_words,
+    validation_percentage,
+    testing_percentage)
 
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
