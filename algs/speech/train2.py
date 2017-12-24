@@ -27,6 +27,8 @@ RANDOM_SEED = 59185
 def prepare_words_list(wanted_words):
   return [SILENCE_LABEL, UNKNOWN_WORD_LABEL] + wanted_words
 
+silence_percentage = 10.0
+unknown_percentage = 50.0
 check_nans = False
 train_dir = '/tmp/speech_commands_train'
 save_step_interval = 100
@@ -77,19 +79,14 @@ def which_set(filename, validation_percentage, testing_percentage):
 
 class AudioProcessor(object):
 
-  def __init__(self, data_dir, silence_percentage, unknown_percentage,
-               wanted_words, validation_percentage, testing_percentage):
+  def __init__(self, data_dir):
     self.data_dir = data_dir
-    self.prepare_data_index(silence_percentage, unknown_percentage,
-                            wanted_words, validation_percentage,
-                            testing_percentage)
+    self.prepare_data_index()
     self.prepare_background_data()
     self.prepare_processing_graph()
 
 
-  def prepare_data_index(self, silence_percentage, unknown_percentage,
-                         wanted_words, validation_percentage,
-                         testing_percentage):
+  def prepare_data_index(self):
     # Make sure the shuffling and picking of unknowns is deterministic.
     random.seed(RANDOM_SEED)
     wanted_words_index = {}
@@ -366,12 +363,8 @@ def main(_):
     
   audio_processor = AudioProcessor(
     #"/home/burak/Downloads/train/audio", 
-    "/home/burak/Downloads/test/audio",
-    10.0,
-    10.0,
-    wanted_words,
-    validation_percentage,
-    testing_percentage)
+    "/home/burak/Downloads/test/audio"
+    )
 
   fingerprint_input = tf.placeholder(
       tf.float32, [None, fingerprint_size], name='fingerprint_input')
