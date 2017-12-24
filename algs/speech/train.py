@@ -16,6 +16,7 @@ RANDOM_SEED = 59185
 def prepare_words_list(wanted_words):
   return [SILENCE_LABEL, UNKNOWN_WORD_LABEL] + wanted_words
 
+summaries_dir = '/tmp/retrain_logs'
 time_shift_ms = 100.0
 background_volume = 0.1
 background_frequency = 0.8
@@ -438,9 +439,8 @@ def main(_):
 
   # Merge all the summaries and write them out to /tmp/retrain_logs (by default)
   merged_summaries = tf.summary.merge_all()
-  train_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train',
-                                       sess.graph)
-  validation_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/validation')
+  train_writer = tf.summary.FileWriter(summaries_dir + '/train',sess.graph)
+  validation_writer = tf.summary.FileWriter(summaries_dir + '/validation')
 
   tf.global_variables_initializer().run()
 
@@ -529,16 +529,6 @@ if __name__ == '__main__':
       help="""\
       Where to download the speech training data to.
       """)
-  parser.add_argument(
-      '--eval_step_interval',
-      type=int,
-      default=400,
-      help='How often to evaluate the training results.')
-  parser.add_argument(
-      '--summaries_dir',
-      type=str,
-      default='/tmp/retrain_logs',
-      help='Where to save summary logs for TensorBoard.')
   parser.add_argument(
       '--train_dir',
       type=str,
