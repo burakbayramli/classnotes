@@ -16,6 +16,7 @@ RANDOM_SEED = 59185
 def prepare_words_list(wanted_words):
   return [SILENCE_LABEL, UNKNOWN_WORD_LABEL] + wanted_words
 
+save_step_interval = 100
 summaries_dir = '/tmp/retrain_logs'
 time_shift_ms = 100.0
 background_volume = 0.1
@@ -299,12 +300,6 @@ import os.path
 import math
 
 def load_variables_from_checkpoint(sess, start_checkpoint):
-  """Utility function to centralize checkpoint restoration.
-
-  Args:
-    sess: TensorFlow session.
-    start_checkpoint: Path to saved checkpoint on disk.
-  """
   saver = tf.train.Saver(tf.global_variables())
   saver.restore(sess, start_checkpoint)
 
@@ -447,10 +442,10 @@ def main(_):
 
   start_step = 1
 
-  if FLAGS.start_checkpoint:
-    print 'restoring',
-    load_variables_from_checkpoint(sess, FLAGS.start_checkpoint)
-    start_step = global_step.eval(session=sess)
+#  if FLAGS.start_checkpoint:
+#    print 'restoring',
+#    load_variables_from_checkpoint(sess, FLAGS.start_checkpoint)
+#    start_step = global_step.eval(session=sess)
 
   tf.logging.info('Training from step: %d ', start_step)
 
@@ -493,7 +488,7 @@ def main(_):
                      cross_entropy_value))
 
     # Save the model checkpoint periodically.
-    if (training_step % FLAGS.save_step_interval == 0 or
+    if (training_step % save_step_interval == 0 or
         training_step == training_steps_max):
       checkpoint_path = os.path.join(FLAGS.train_dir, 'conv.ckpt')
       tf.logging.info('Saving to "%s-%d"', checkpoint_path, training_step)
@@ -526,16 +521,6 @@ if __name__ == '__main__':
       type=str,
       default='/tmp/speech_commands_train',
       help='Directory to write event logs and checkpoint.')
-  parser.add_argument(
-      '--save_step_interval',
-      type=int,
-      default=100,
-      help='Save model checkpoint every save_steps.')
-  parser.add_argument(
-      '--start_checkpoint',
-      type=str,
-      default='',
-      help='If specified, restore this pretrained model before any training.')
   parser.add_argument(
       '--check_nans',
       type=bool,
