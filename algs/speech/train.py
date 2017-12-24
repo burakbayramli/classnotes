@@ -523,13 +523,6 @@ def main(_):
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument(
-      '--data_dir',
-      type=str,
-      default='/tmp/speech_dataset/',
-      help="""\
-      Where to download the speech training data to.
-      """)
-  parser.add_argument(
       '--train_dir',
       type=str,
       default='/tmp/speech_commands_train',
