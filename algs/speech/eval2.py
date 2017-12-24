@@ -57,11 +57,8 @@ fingerprint_size = dct_coefficient_count * spectrogram_length
 label_count = len(prepare_words_list(wanted_words))  
 how_many_training_steps = "15000,3000"
 learning_rate = "0.001,0.0001"
-time_shift_samples = int((time_shift_ms * sample_rate) / 1000)
 training_steps_list = list(map(int, how_many_training_steps.split(',') ))
 learning_rates_list = list(map(float, learning_rate.split(',')))
-
-
 
 def which_set(filename, validation_percentage, testing_percentage):
   base_name = os.path.basename(filename)
@@ -100,34 +97,8 @@ class AudioProcessor(object):
     wav_loader = io_ops.read_file(self.wav_filename_placeholder_)
     wav_decoder = contrib_audio.decode_wav(
         wav_loader, desired_channels=1, desired_samples=desired_samples)
-    # Allow the audio sample's volume to be adjusted.
-    self.foreground_volume_placeholder_ = tf.placeholder(tf.float32, [])
-    scaled_foreground = tf.multiply(wav_decoder.audio,
-                                    self.foreground_volume_placeholder_)
-    # Shift the sample's start position, and pad any gaps with zeros.
-    self.time_shift_padding_placeholder_ = tf.placeholder(tf.int32, [2, 2])
-    self.time_shift_offset_placeholder_ = tf.placeholder(tf.int32, [2])
-    padded_foreground = tf.pad(
-        scaled_foreground,
-        self.time_shift_padding_placeholder_,
-        mode='CONSTANT')
-    sliced_foreground = tf.slice(padded_foreground,
-                                 self.time_shift_offset_placeholder_,
-                                 [desired_samples, -1])
-    # Mix in background noise.
-    self.background_data_placeholder_ = tf.placeholder(tf.float32,
-                                                       [desired_samples, 1])
-    self.background_volume_placeholder_ = tf.placeholder(tf.float32, [])
-    background_mul = tf.multiply(self.background_data_placeholder_,
-                                 self.background_volume_placeholder_)
-    background_add = tf.add(background_mul, sliced_foreground)
-    background_clamp = tf.clip_by_value(background_add, -1.0, 1.0)
-    # Run the spectrogram and MFCC ops to get a 2D 'fingerprint' of the audio.
-    print 'window_size_samples', window_size_samples
-    print 'window_stride_samples', window_stride_samples
-    print 'background_clamp', background_clamp
     spectrogram = contrib_audio.audio_spectrogram(
-        background_clamp,
+        wav_decoder.audio,
         window_size=window_size_samples,
         stride=window_stride_samples,
         magnitude_squared=True)
@@ -143,39 +114,25 @@ class AudioProcessor(object):
   def set_size(self, mode):
     return len(self.data_index[mode])
 
-  def get_data(self, sess):
-    time_shift = time_shift_samples
+  def get_data(self, sess, sample_i):
     # Pick one of the partitions to choose samples from.
     candidates = self.files
-    sample_count = len(candidates) 
     # Data and labels will be populated and returned.
-    data = np.zeros((sample_count, fingerprint_size))
-    labels = np.zeros((sample_count, label_count))
+    data = np.zeros((1, fingerprint_size))
+    labels = np.zeros((1, label_count))
     # Use the processing graph we created earlier to repeatedly to generate the
     # final output sample data we'll use in training.
-    for i in xrange(1,sample_count):
-      sample = candidates[i]
-      print sample
-      label = re.findall(".*/(.*?)/.*?.wav",sample)[0]
-      time_shift_amount = 0
-      time_shift_padding = [[0, -time_shift_amount], [0, 0]]
-      time_shift_offset = [-time_shift_amount, 0]
-      input_dict = {
-          self.wav_filename_placeholder_: sample,
-          self.time_shift_padding_placeholder_: time_shift_padding,
-          self.time_shift_offset_placeholder_: time_shift_offset,
-      }
-      background_reshaped = np.zeros([desired_samples, 1])
-      background_volume = 0
-      input_dict[self.background_data_placeholder_] = background_reshaped
-      input_dict[self.background_volume_placeholder_] = background_volume
-      input_dict[self.foreground_volume_placeholder_] = 1
-      # Run the graph to produce the output audio.
-      data[i, :] = sess.run(self.mfcc_, feed_dict=input_dict).flatten()
-      if label not in wanted_words:
-        labels[i, 1] = 1
-      else:
-        labels[i, prepare_words_list(wanted_words).index(label)] = 1
+    sample = candidates[sample_i]
+    print sample
+    label = re.findall(".*/(.*?)/.*?.wav",sample)[0]
+    input_dict = {
+        self.wav_filename_placeholder_: sample
+    }
+    data[0, :] = sess.run(self.mfcc_, feed_dict=input_dict).flatten()
+    if label not in wanted_words:
+      labels[0, 1] = 1
+    else:
+      labels[0, prepare_words_list(wanted_words).index(label)] = 1
     return data, labels
 
 def load_variables_from_checkpoint(sess, start_checkpoint):
@@ -262,8 +219,9 @@ def main(_):
     "/home/burak/Downloads/test/audio"
     )
 
-  x, y = audio_processor.get_data(sess)
-  print x.shape, y.shape
+  for i in range(10):
+    x, y = audio_processor.get_data(sess, i)
+    print x.shape, y.shape
   exit()
   
   fingerprint_input = tf.placeholder(
@@ -271,9 +229,8 @@ def main(_):
 
   print 'fingerprint_input',fingerprint_input
 
-  logits, dropout_prob = create_conv_model(fingerprint_input, is_training=True)
+  logits, dropout_prob = create_conv_model(fingerprint_input, is_training=False)
   
-
   # Define loss and optimizer
   ground_truth_input = tf.placeholder(
       tf.float32, [None, label_count], name='groundtruth_input')
