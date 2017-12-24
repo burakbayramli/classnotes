@@ -429,7 +429,6 @@ def main(_):
   predicted_indices = tf.argmax(logits, 1)
   expected_indices = tf.argmax(ground_truth_input, 1)
   correct_prediction = tf.equal(predicted_indices, expected_indices)
-  confusion_matrix = tf.confusion_matrix(expected_indices, predicted_indices)
   evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   tf.summary.scalar('accuracy', evaluation_step)
   global_step = tf.contrib.framework.get_or_create_global_step()
@@ -439,7 +438,9 @@ def main(_):
 
   # Merge all the summaries and write them out to /tmp/retrain_logs (by default)
   merged_summaries = tf.summary.merge_all()
+  
   train_writer = tf.summary.FileWriter(summaries_dir + '/train',sess.graph)
+  
   validation_writer = tf.summary.FileWriter(summaries_dir + '/validation')
 
   tf.global_variables_initializer().run()
@@ -454,12 +455,11 @@ def main(_):
   tf.logging.info('Training from step: %d ', start_step)
 
   # Save graph.pbtxt.
-  tf.train.write_graph(sess.graph_def, FLAGS.train_dir,
-                       FLAGS.model_architecture + '.pbtxt')
+  tf.train.write_graph(sess.graph_def, FLAGS.train_dir, 'conv.pbtxt')
 
   # Save list of words.
   with gfile.GFile(
-      os.path.join(FLAGS.train_dir, FLAGS.model_architecture + '_labels.txt'),
+      os.path.join(FLAGS.train_dir, 'conv_labels.txt'),
       'w') as f:
     f.write('\n'.join(audio_processor.words_list))
 
@@ -495,8 +495,7 @@ def main(_):
     # Save the model checkpoint periodically.
     if (training_step % FLAGS.save_step_interval == 0 or
         training_step == training_steps_max):
-      checkpoint_path = os.path.join(FLAGS.train_dir,
-                                     FLAGS.model_architecture + '.ckpt')
+      checkpoint_path = os.path.join(FLAGS.train_dir, 'conv.ckpt')
       tf.logging.info('Saving to "%s-%d"', checkpoint_path, training_step)
       saver.save(sess, checkpoint_path, global_step=training_step)
 
@@ -507,7 +506,7 @@ def main(_):
     test_fingerprints, test_ground_truth = audio_processor.get_data(
         FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
     test_accuracy, conf_matrix = sess.run(
-        [evaluation_step, confusion_matrix],
+        [evaluation_step],
         feed_dict={
             fingerprint_input: test_fingerprints,
             ground_truth_input: test_ground_truth,
@@ -537,11 +536,6 @@ if __name__ == '__main__':
       type=str,
       default='',
       help='If specified, restore this pretrained model before any training.')
-  parser.add_argument(
-      '--model_architecture',
-      type=str,
-      default='conv',
-      help='What model architecture to use')
   parser.add_argument(
       '--check_nans',
       type=bool,
