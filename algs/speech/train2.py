@@ -27,6 +27,7 @@ RANDOM_SEED = 59185
 def prepare_words_list(wanted_words):
   return [SILENCE_LABEL, UNKNOWN_WORD_LABEL] + wanted_words
 
+num_cell = 256
 silence_percentage = 10.0
 unknown_percentage = 50.0
 check_nans = False
@@ -34,7 +35,7 @@ train_dir = '/tmp/speech_commands_train'
 save_step_interval = 100
 summaries_dir = '/tmp/retrain_logs'
 time_shift_ms = 100.0
-background_volume = 0.1
+background_volume_range = 0.1
 background_frequency = 0.8
 batch_size = 100
 sample_rate = 16000
