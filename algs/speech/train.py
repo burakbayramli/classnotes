@@ -1,5 +1,16 @@
+from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
+from tensorflow.python.ops import io_ops
+from tensorflow.python.platform import gfile
+from tensorflow.python.util import compat
+import tensorflow as tf
+import hashlib, math, os.path, random, re, sys
+import numpy as np
+from six.moves import urllib
+from six.moves import xrange
 from __future__ import absolute_import
 from __future__ import division
+import tensorflow as tf
+from six.moves import xrange
 
 FLAGS = None
 wanted_words = ['down','up']
@@ -16,6 +27,8 @@ RANDOM_SEED = 59185
 def prepare_words_list(wanted_words):
   return [SILENCE_LABEL, UNKNOWN_WORD_LABEL] + wanted_words
 
+check_nans = False
+train_dir = '/tmp/speech_commands_train'
 save_step_interval = 100
 summaries_dir = '/tmp/retrain_logs'
 time_shift_ms = 100.0
@@ -45,17 +58,6 @@ time_shift_samples = int((time_shift_ms * sample_rate) / 1000)
 training_steps_list = list(map(int, how_many_training_steps.split(',') ))
 learning_rates_list = list(map(float, learning_rate.split(',')))
 
-
-from tensorflow.contrib.framework.python.ops import audio_ops as contrib_audio
-from tensorflow.python.ops import io_ops
-from tensorflow.python.platform import gfile
-from tensorflow.python.util import compat
-import tensorflow as tf
-
-import hashlib, math, os.path, random, re, sys
-import numpy as np
-from six.moves import urllib
-from six.moves import xrange  # pylint: disable=redefined-builtin
 
 
 def which_set(filename, validation_percentage, testing_percentage):
@@ -212,14 +214,6 @@ class AudioProcessor(object):
     print 'self.mfcc_', self.mfcc_
 
   def set_size(self, mode):
-    """Calculates the number of samples in the dataset partition.
-
-    Args:
-      mode: Which partition, must be 'training', 'validation', or 'testing'.
-
-    Returns:
-      Number of samples in the partition.
-    """
     return len(self.data_index[mode])
 
   def get_data(self, offset, mode, sess):
@@ -289,15 +283,6 @@ class AudioProcessor(object):
       label_index = self.word_to_index[sample['label']]
       labels[i - offset, label_index] = 1
     return data, labels
-
-import tensorflow as tf
-from tensorflow.python.platform import gfile
-from six.moves import xrange  # pylint: disable=redefined-builtin
-import numpy as np, sys
-import tensorflow as tf
-import argparse
-import os.path
-import math
 
 def load_variables_from_checkpoint(sess, start_checkpoint):
   saver = tf.train.Saver(tf.global_variables())
@@ -404,7 +389,7 @@ def main(_):
   # Optionally we can add runtime checks to spot when NaNs or other symptoms of
   # numerical errors start occurring during training.
   control_dependencies = []
-  if FLAGS.check_nans:
+  if check_nans:
     checks = tf.add_check_numerics_ops()
     control_dependencies = [checks]
 
@@ -450,11 +435,11 @@ def main(_):
   tf.logging.info('Training from step: %d ', start_step)
 
   # Save graph.pbtxt.
-  tf.train.write_graph(sess.graph_def, FLAGS.train_dir, 'conv.pbtxt')
+  tf.train.write_graph(sess.graph_def, train_dir, 'conv.pbtxt')
 
   # Save list of words.
   with gfile.GFile(
-      os.path.join(FLAGS.train_dir, 'conv_labels.txt'),
+      os.path.join(train_dir, 'conv_labels.txt'),
       'w') as f:
     f.write('\n'.join(audio_processor.words_list))
 
@@ -490,42 +475,10 @@ def main(_):
     # Save the model checkpoint periodically.
     if (training_step % save_step_interval == 0 or
         training_step == training_steps_max):
-      checkpoint_path = os.path.join(FLAGS.train_dir, 'conv.ckpt')
+      checkpoint_path = os.path.join(train_dir, 'conv.ckpt')
       tf.logging.info('Saving to "%s-%d"', checkpoint_path, training_step)
       saver.save(sess, checkpoint_path, global_step=training_step)
 
-  set_size = audio_processor.set_size('testing')
-  tf.logging.info('set_size=%d', set_size)
-  total_accuracy = 0
-  for i in xrange(0, set_size, batch_size):
-    test_fingerprints, test_ground_truth = audio_processor.get_data(
-        FLAGS.batch_size, i, model_settings, 0.0, 0.0, 0, 'testing', sess)
-    test_accuracy, conf_matrix = sess.run(
-        [evaluation_step],
-        feed_dict={
-            fingerprint_input: test_fingerprints,
-            ground_truth_input: test_ground_truth,
-            dropout_prob: 1.0
-        })
-    batch_size = min(FLAGS.batch_size, set_size - i)
-    total_accuracy += (test_accuracy * batch_size) / set_size
-
-  tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (total_accuracy * 100,
-                                                           set_size))
-
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
-  parser.add_argument(
-      '--train_dir',
-      type=str,
-      default='/tmp/speech_commands_train',
-      help='Directory to write event logs and checkpoint.')
-  parser.add_argument(
-      '--check_nans',
-      type=bool,
-      default=False,
-      help='Whether to check for invalid numbers during processing')
-
-  FLAGS, unparsed = parser.parse_known_args()
-  tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+  tf.app.run(main=main, argv=[sys.argv[0]])
