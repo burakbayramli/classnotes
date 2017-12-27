@@ -371,13 +371,20 @@ def create_conv_model(fingerprint_input, model_settings, is_training):
   final_fc_bias = tf.Variable(tf.zeros([label_count]))
   final_fc = tf.matmul(flattened_second_conv, final_fc_weights) + final_fc_bias
   print 'final_fc',final_fc
-  #exit()
+  exit()
   if is_training:
     return final_fc, dropout_prob
   else:
     return final_fc
 
+#fingerprint_input Tensor("fingerprint_input:0", shape=(?, 3920), dtype=float32)
+#fingerprint_4d Tensor("Reshape:0", shape=(?, 98, 40, 1), dtype=float32)
+#first_conv Tensor("add:0", shape=(?, 98, 40, 64), dtype=float32)
+#second_conv Tensor("add_1:0", shape=(?, 49, 20, 64), dtype=float32)
+#flattened_second_conv Tensor("Reshape_1:0", shape=(?, 62720), dtype=float32)
+#final_fc Tensor("add_2:0", shape=(?, 4), dtype=float32)
 
+  
 def main(_):
 
   batch_size = 100
