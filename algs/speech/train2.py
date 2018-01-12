@@ -13,8 +13,8 @@ import tensorflow as tf
 from six.moves import xrange
 
 FLAGS = None
-wanted_words = ['down','up']
-#wanted_words = ['down','go','left','no','off','on','right','stop','up','yes']
+#wanted_words = ['down','up']
+wanted_words = ['down','go','left','no','off','on','right','stop','up','yes']
 
 MAX_NUM_WAVS_PER_CLASS = 2**27 - 1  # ~134M
 SILENCE_LABEL = '_silence_'

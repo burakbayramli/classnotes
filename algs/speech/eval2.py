@@ -11,10 +11,11 @@ from six.moves import urllib
 from six.moves import xrange
 import tensorflow as tf
 from six.moves import xrange
+import train2
 
 FLAGS = None
-wanted_words = ['down','up']
-#wanted_words = ['down','go','left','no','off','on','right','stop','up','yes']
+#wanted_words = ['down','up']
+wanted_words = ['down','go','left','no','off','on','right','stop','up','yes']
 
 MAX_NUM_WAVS_PER_CLASS = 2**27 - 1  # ~134M
 SILENCE_LABEL = '_silence_'
@@ -82,8 +83,6 @@ class AudioProcessor(object):
     self.prepare_data_index()
     self.prepare_processing_graph()
 
-
-
   def prepare_data_index(self):
     search_path = os.path.join(self.data_dir, '*', '*.wav')
     self.files = []
@@ -140,71 +139,6 @@ def load_variables_from_checkpoint(sess, start_checkpoint):
   saver.restore(sess, start_checkpoint)
 
 
-def create_conv_model(fingerprint_input, is_training):
-  if is_training:
-    dropout_prob = tf.placeholder(tf.float32, name='dropout_prob')
-  input_frequency_size = dct_coefficient_count
-  input_time_size = spectrogram_length
-  fingerprint_4d = tf.reshape(fingerprint_input,
-                              [-1, input_time_size, input_frequency_size, 1])
-
-  print 'fingerprint_4d', fingerprint_4d
-  first_filter_width = 8
-  first_filter_height = 20
-  first_filter_count = 64
-  first_weights = tf.Variable(
-      tf.truncated_normal(
-          [first_filter_height, first_filter_width, 1, first_filter_count],
-          stddev=0.01))
-  first_bias = tf.Variable(tf.zeros([first_filter_count]))
-  first_conv = tf.nn.conv2d(fingerprint_4d, first_weights, [1, 1, 1, 1],
-                            'SAME') + first_bias
-  print 'first_conv',first_conv
-  first_relu = tf.nn.relu(first_conv)
-  if is_training:
-    first_dropout = tf.nn.dropout(first_relu, dropout_prob)
-  else:
-    first_dropout = first_relu
-  max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
-  second_filter_width = 4
-  second_filter_height = 10
-  second_filter_count = 64
-  second_weights = tf.Variable(
-      tf.truncated_normal(
-          [
-              second_filter_height, second_filter_width, first_filter_count,
-              second_filter_count
-          ],
-          stddev=0.01))
-  second_bias = tf.Variable(tf.zeros([second_filter_count]))
-  second_conv = tf.nn.conv2d(max_pool, second_weights, [1, 1, 1, 1],
-                             'SAME') + second_bias
-  print 'second_conv', second_conv
-  second_relu = tf.nn.relu(second_conv)
-  if is_training:
-    second_dropout = tf.nn.dropout(second_relu, dropout_prob)
-  else:
-    second_dropout = second_relu
-  second_conv_shape = second_dropout.get_shape()
-  second_conv_output_width = second_conv_shape[2]
-  second_conv_output_height = second_conv_shape[1]
-  second_conv_element_count = int(
-      second_conv_output_width * second_conv_output_height *
-      second_filter_count)
-  flattened_second_conv = tf.reshape(second_dropout,
-                                     [-1, second_conv_element_count])
-  print 'flattened_second_conv', flattened_second_conv
-  final_fc_weights = tf.Variable(
-      tf.truncated_normal(
-          [second_conv_element_count, label_count], stddev=0.01))
-  final_fc_bias = tf.Variable(tf.zeros([label_count]))
-  final_fc = tf.matmul(flattened_second_conv, final_fc_weights) + final_fc_bias
-  print 'final_fc',final_fc
-  if is_training:
-    return final_fc, dropout_prob
-  else:
-    return final_fc
-
 
 def main(_):
   
@@ -218,50 +152,14 @@ def main(_):
     #"/home/burak/Downloads/train/audio", 
     "/home/burak/Downloads/test/audio"
     )
-
-  for i in range(10):
-    x, y = audio_processor.get_data(sess, i)
-    print x.shape, y.shape
-  exit()
   
-  fingerprint_input = tf.placeholder(
-      tf.float32, [None, fingerprint_size], name='fingerprint_input')
+  fingerprint_input = tf.placeholder(tf.float32,[None, fingerprint_size])
 
   print 'fingerprint_input',fingerprint_input
 
-  logits, dropout_prob = create_conv_model(fingerprint_input, is_training=False)
-  
-  # Define loss and optimizer
-  ground_truth_input = tf.placeholder(
-      tf.float32, [None, label_count], name='groundtruth_input')
-
-  # Optionally we can add runtime checks to spot when NaNs or other symptoms of
-  # numerical errors start occurring during training.
-  control_dependencies = []
-  if check_nans:
-    checks = tf.add_check_numerics_ops()
-    control_dependencies = [checks]
-
-  # Create the back propagation and training evaluation machinery in the graph.
-  cross_entropy_mean = tf.reduce_mean(
-    tf.nn.softmax_cross_entropy_with_logits(
-      labels=ground_truth_input, logits=logits))
-  
-  tf.summary.scalar('cross_entropy', cross_entropy_mean)
-  
-  with tf.name_scope('train'), tf.control_dependencies(control_dependencies):
-    learning_rate_input = tf.placeholder(
-        tf.float32, [], name='learning_rate_input')
-    train_step = tf.train.GradientDescentOptimizer(
-        learning_rate_input).minimize(cross_entropy_mean)
-    
+  logits = train2.create_conv_model(fingerprint_input, is_training=False)
+       
   predicted_indices = tf.argmax(logits, 1)
-  expected_indices = tf.argmax(ground_truth_input, 1)
-  correct_prediction = tf.equal(predicted_indices, expected_indices)
-  evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-  tf.summary.scalar('accuracy', evaluation_step)
-  global_step = tf.contrib.framework.get_or_create_global_step()
-  increment_global_step = tf.assign(global_step, global_step + 1)
 
   saver = tf.train.Saver(tf.global_variables())
 
@@ -269,11 +167,15 @@ def main(_):
   merged_summaries = tf.summary.merge_all()
     
   tf.global_variables_initializer().run()
-
+  
   print 'restoring'
   load_variables_from_checkpoint(sess, "/home/burak/Downloads/train2/conv.ckpt-100")
-  
-  exit()
+
+  for i in range(200):
+    x, y = audio_processor.get_data(sess, i)
+    print x.shape, y.shape
+    corr = sess.run([predicted_indices], feed_dict={fingerprint_input: x})
+    print corr, y, np.argmax(y[0])
   
 
 
