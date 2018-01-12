@@ -362,8 +362,8 @@ def main(_):
   sess = tf.InteractiveSession()
     
   audio_processor = AudioProcessor(
-    #"/home/burak/Downloads/train/audio", 
-    "/home/burak/Downloads/test/audio"
+    "/home/burak/Downloads/train/audio", 
+    #"/home/burak/Downloads/test/audio"
     )
 
   fingerprint_input = tf.placeholder(
