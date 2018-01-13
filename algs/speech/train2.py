@@ -312,6 +312,7 @@ def create_conv_model(fingerprint_input, is_training):
   else:
     first_dropout = first_relu
   max_pool = tf.nn.max_pool(first_dropout, [1, 2, 2, 1], [1, 2, 2, 1], 'SAME')
+  print max_pool
   second_filter_width = 4
   second_filter_height = 10
   second_filter_count = 64
@@ -346,7 +347,7 @@ def create_conv_model(fingerprint_input, is_training):
   final_fc_bias = tf.Variable(tf.zeros([label_count]))
   final_fc = tf.matmul(flattened_second_conv, final_fc_weights) + final_fc_bias
   print 'final_fc',final_fc
-  #exit()
+  
   if is_training:
     return final_fc, dropout_prob
   else:
