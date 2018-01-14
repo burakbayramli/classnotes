@@ -4,7 +4,7 @@ import sounddevice as sd, time, zipfile
 import pandas as pd, os, re
 import numpy as np
 
-zip = '/home/burak/Downloads/goog_voice_test.zip'
+zip = '/media/burak/New Volume/archive/data/google_voice/test.zip'
 fname = 'label.txt'
 
 def rec():
@@ -13,7 +13,7 @@ def rec():
         fout = open (fname, "a")     
         while (True):
             f = random.choice(files)
-            print f
+            #print f
             def play():
                 wav = io.BytesIO(z.open(f).read())
                 v = scipy.io.wavfile.read(wav)

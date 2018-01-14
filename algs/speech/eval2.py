@@ -115,6 +115,7 @@ class AudioProcessor(object):
 
   def get_data(self, sess, sample_i):
     # Pick one of the partitions to choose samples from.
+    #print len(self.files)
     candidates = self.files
     # Data and labels will be populated and returned.
     data = np.zeros((1, fingerprint_size))
@@ -122,7 +123,7 @@ class AudioProcessor(object):
     # Use the processing graph we created earlier to repeatedly to generate the
     # final output sample data we'll use in training.
     sample = candidates[sample_i]
-    print sample
+    #print sample
     label = re.findall(".*/(.*?)/.*?.wav",sample)[0]
     input_dict = {
         self.wav_filename_placeholder_: sample
@@ -169,14 +170,18 @@ def main(_):
   tf.global_variables_initializer().run()
   
   print 'restoring'
-  load_variables_from_checkpoint(sess, "/home/burak/Downloads/train2/conv.ckpt-100")
+  load_variables_from_checkpoint(sess, "/home/burak/Downloads/model_2/conv.ckpt-18000")
 
-  for i in range(200):
+  accuracy = 0
+  N = 660
+  for i in range(N):
     x, y = audio_processor.get_data(sess, i)
-    print x.shape, y.shape
-    corr = sess.run([predicted_indices], feed_dict={fingerprint_input: x})
-    print corr, y, np.argmax(y[0])
-  
+    #print x.shape, y.shape
+    pred = sess.run([predicted_indices], feed_dict={fingerprint_input: x})[0]
+    #print y, np.argmax(y[0]), pred
+    if pred[0] == np.argmax(y[0]): accuracy+=1.0
+
+  print accuracy, accuracy / N
 
 
 if __name__ == '__main__':
