@@ -1,10 +1,44 @@
 
-```python
-import os, random, re
 
+```python
+import scipy.io.wavfile, zipfile
+import io, time, os, random, re
+fs = 16000
 train_dir = '/home/burak/Downloads/train/audio'
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 all_labels = labels + ['unknown','silence']
+```
+
+```python
+f = train_dir + '/sheila/019fa366_nohash_0.wav'
+wav = io.BytesIO(open(f).read())
+v = scipy.io.wavfile.read(wav)
+print v[1]
+vol_multiplier = np.max(np.abs(v[1])) / 1000.
+print vol_multiplier
+vnew = v[1].astype(float) / vol_multiplier
+vnew = vnew.astype(np.int16)
+scipy.io.wavfile.write('/tmp/tmp.wav', fs, vnew)
+```
+
+```text
+[0 3 5 ..., 4 4 3]
+7.294
+```
+
+```python
+plt.plot(vnew)
+plt.savefig('test1_1.png')
+```
+
+
+
+
+
+
+
+
+```python
 
 all_train_files = []
 for d, r, f in os.walk(train_dir):
