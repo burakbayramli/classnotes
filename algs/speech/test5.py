@@ -12,7 +12,7 @@ def adj_volume(vec):
 
 fs = 16000
 batch_size = 100
-num_epochs = 2000
+num_epochs = 10000
 num_cell = 256
 num_layers = 4
 mfile = "/tmp/speech5.ckpt"

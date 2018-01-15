@@ -149,7 +149,7 @@ def audiofile_to_input_vector(audio, fs, numcep, numcontext):
     
 fs=16000
 numcep = 13
-numcontext = 3
+numcontext = 9
 
 data = np.random.randn(1,16000)
 res = audiofile_to_input_vector(data, fs, numcep, numcontext)
@@ -157,7 +157,7 @@ print res.shape
 ```
 
 ```text
-(50, 91)
+(50, 247)
 ```
 
 
