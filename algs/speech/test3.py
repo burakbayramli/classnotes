@@ -133,7 +133,8 @@ y = tf.placeholder(tf.float32, shape=[None, 12])
 
 cells = []
 for _ in range(num_layers):
-    cell = tf.contrib.rnn.LSTMCell(num_cell) 
+    cell = tf.contrib.rnn.LSTMCell(num_cell)
+    cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=1-dropout_prob)
     cells.append(cell)
 cell = tf.contrib.rnn.MultiRNNCell(cells)
 output, states = tf.nn.dynamic_rnn(cell, X, dtype=tf.float32)
