@@ -14,7 +14,7 @@ def adj_volume(vec):
 numcep = 13
 numcontext = 9
 fs = 16000
-batch_size = 100
+batch_size = 200
 num_epochs = 10000
 num_cell = 256
 num_layers = 4
@@ -162,7 +162,7 @@ softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y)
 
 cross_entropy = tf.reduce_mean(softmax)
 
-train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
+train_step = tf.train.GradientDescentOptimizer(0.001).minimize(cross_entropy)
 
 predicted_indices = tf.argmax(logits, 1)
 
@@ -185,7 +185,7 @@ if os.path.isfile(mfile + ".index"):
 for i in range(num_epochs):
     x_batch, y_batch = get_minibatch(batch_size)
     if i % 5 == 0:
-        acc, _ = sess.run([evaluation_step, train_step], feed_dict={ data: x_batch, y:y_batch, dropout_prob: 0.2})
+        acc, _ = sess.run([evaluation_step, train_step], feed_dict={ data: x_batch, y:y_batch, dropout_prob: 0.5})
         print i, 'accuracy', acc
     if i % 30 == 0: 
         saver.save(sess, mfile)
