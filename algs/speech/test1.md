@@ -5,6 +5,7 @@ import scipy.io.wavfile, zipfile
 import io, time, os, random, re
 fs = 16000
 train_dir = '/home/burak/Downloads/train/audio'
+val_dir = '/home/burak/Downloads/test/audio'
 labels = ['down','go','left','no','off','on','right','stop','up','yes']
 all_labels = labels + ['unknown','silence']
 ```
@@ -40,9 +41,11 @@ all_train_files = []
 for d, r, f in os.walk(train_dir):
     for filename in f:
     	all_train_files.append(os.path.join(d,filename))
+	
 noise_files = [x for x in all_train_files if "_background_noise_" in x and ".wav" in x]
 train_files = []
 unknown_files = []
+
 for x in all_train_files:
     if ".wav" in x: 
        label = re.findall(".*/(.*?)/.*?.wav",x)[0]
@@ -169,7 +172,29 @@ Tensor("Placeholder:0", shape=(?, 16000), dtype=float32)
 (1, 247, 129)
 ```
 
+```python
+all_val_files = []
+for d, r, f in os.walk(val_dir):
+	for filename in f:
+	    if ".wav" in filename: all_val_files.append(os.path.join(d,filename))
 
+print all_val_files[:3]
+val_x = np.zeros((len(all_val_files), fs))
+val_y = np.zeros((len(all_val_files),len(labels)+2 ))
+for i in range(len(all_val_files)):
+    f = all_val_files[i]
+    wav = io.BytesIO(open(f).read())
+    v = scipy.io.wavfile.read(wav)
+    label = re.findall(".*/(.*?)/.*?.wav",f)[0]
+    val_x[i, 0:len(v[1])] = adj_volume(v[1])
+    val_y[i, all_labels.index(label)] = 1.0 
+print val_x.shape
+```
+
+```text
+['/home/burak/Downloads/test/audio/on/clip_79b6f3c31.wav', '/home/burak/Downloads/test/audio/on/clip_dbf4740cf.wav', '/home/burak/Downloads/test/audio/on/clip_30758be6d.wav']
+(863, 16000)
+```
 
 
 
