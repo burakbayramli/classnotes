@@ -147,9 +147,9 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy,feed_dict={ data:x_batch, y:y_batch, dropout_prob: 0.0})
         print i, 'accuracy', acc        
-    sess.run(train_step,feed_dict={ data:x_batch, y:y_batch, dropout_prob: 0.5 })
+    sess.run(train_step,feed_dict={ data:x_batch, y:y_batch, dropout_prob: 0.2 })
     
-    if i % 50 == 0: 
+    if i % 30 == 0: 
         saver.save(sess, mfile)
         acc = sess.run(accuracy,feed_dict={data:val_x, y:val_y, dropout_prob: 0.0 })
         print i, 'validation accuracy', acc
