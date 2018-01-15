@@ -112,7 +112,10 @@ def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.10, silenc
 	   f = random.choice(train_files)
 	   wav = io.BytesIO(open(f).read())
 	   v = scipy.io.wavfile.read(wav)
-           mfcca = audiofile_to_input_vector(adj_volume(v[1]), fs, numcep, numcontext)
+           vv = v[1]
+           if random.choice(range(int(1./silence_added_percent))) == 0:
+               vv = vv + random.choice(noise_chunks)[:len(vv)]
+           mfcca = audiofile_to_input_vector(adj_volume(vv), fs, numcep, numcontext)
 	   res[i, 0:mfcca.shape[0], 0:mfcca.shape[1]] = mfcca
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
 	   y[i, labels.index(label)] = 1.0
@@ -162,7 +165,7 @@ softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y)
 
 cross_entropy = tf.reduce_mean(softmax)
 
-train_step = tf.train.GradientDescentOptimizer(0.001).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 predicted_indices = tf.argmax(logits, 1)
 
