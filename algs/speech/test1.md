@@ -189,11 +189,22 @@ for i in range(len(all_val_files)):
     val_x[i, 0:len(v[1])] = adj_volume(v[1])
     val_y[i, all_labels.index(label)] = 1.0 
 print val_x.shape
+print val_y[100:110]
 ```
 
 ```text
 ['/home/burak/Downloads/test/audio/on/clip_79b6f3c31.wav', '/home/burak/Downloads/test/audio/on/clip_dbf4740cf.wav', '/home/burak/Downloads/test/audio/on/clip_30758be6d.wav']
 (863, 16000)
+[[ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]]
 ```
 
 
