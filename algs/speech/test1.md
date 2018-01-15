@@ -32,12 +32,6 @@ plt.savefig('test1_1.png')
 ```
 
 
-
-
-
-
-
-
 ```python
 
 all_train_files = []
@@ -70,11 +64,10 @@ print unknown_files[:10]
 ```python
 
 def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.15):
-    res = np.zeros((batch_size, fs))    
+    res = np.zeros((batch_size, fs))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
-        if random.choice(range(int(1/silence_percent))) == 0:
-	   # silence
+        if random.choice(range(int(1/silence_percent))) == 0:	   
            f = random.choice(noise_files)
 	   wav = io.BytesIO(open(f).read())
 	   v = scipy.io.wavfile.read(wav)
@@ -84,18 +77,18 @@ def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.15):
            to = int((chosen_chunk+1)*fs)
            chunk_byte = v[1][fr:to]
 	   res[i, :] = chunk_byte
-	   y[i, 11] = 1.0
-        elif random.choice(range(int(1/unknown_percent))) == 0:
-	   # unknown
+	   y[i, 11] = 1.0 # silence
+        elif random.choice(range(int(1/unknown_percent))) == 0:	   
            f = random.choice(unknown_files)
 	   wav = io.BytesIO(open(f).read())
 	   v = scipy.io.wavfile.read(wav)
 	   res[i, 0:len(v[1])] = v[1]
-	   y[i, 10] = 1.0
+	   y[i, 10] = 1.0 # unknown
 	else:
 	   f = random.choice(train_files)
 	   wav = io.BytesIO(open(f).read())
 	   v = scipy.io.wavfile.read(wav)
+	   if i==0: scipy.io.wavfile.write('/tmp/tmp1.wav', fs, v[1])	   
 	   res[i, 0:len(v[1])] = v[1]
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
 	   y[i, labels.index(label)] = 1.0
@@ -103,26 +96,37 @@ def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.15):
     return res, y
     
 x,y = get_minibatch(20)
-print x
+print y
 ```
 
 ```text
-[[  0.00000000e+00   3.00000000e+00   5.00000000e+00 ...,   9.00000000e+00
-    9.00000000e+00   6.00000000e+00]
- [ -4.00000000e+01  -1.10000000e+01   1.00000000e+01 ...,   0.00000000e+00
-    0.00000000e+00   0.00000000e+00]
- [  1.25000000e+02   1.05600000e+03  -4.60000000e+01 ...,  -4.37000000e+02
-   -1.40000000e+02  -1.21500000e+03]
- ..., 
- [ -6.06000000e+02  -9.90400000e+03  -1.92500000e+03 ...,   4.08000000e+02
-    3.37000000e+02   1.14000000e+03]
- [  8.50000000e+01   1.35000000e+02   3.48000000e+02 ...,   3.04000000e+02
-    2.13000000e+02   3.76000000e+02]
- [  4.63000000e+02   5.41000000e+02   5.61000000e+02 ...,   4.37000000e+02
-    4.08000000e+02   4.46000000e+02]]
+[[ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.]
+ [ 0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.]
+ [ 1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.]
+ [ 0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.]]
 ```
 
 
+```python
+vv = x[4,:].astype(np.int16)
+scipy.io.wavfile.write('/tmp/tmp2.wav', fs, vv)
+```
 
 
 
