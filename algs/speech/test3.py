@@ -11,9 +11,9 @@ def adj_volume(vec):
     return vnew
 
 fs = 16000
-batch_size = 100
+batch_size = 200
 num_epochs = 20000
-num_cell = 128
+num_cell = 256
 num_layers = 4
 mfile = "/tmp/speech3.ckpt"
 train_dir = '/home/burak/Downloads/train/audio'
@@ -47,7 +47,7 @@ for f in noise_files:
     	chunk_byte = v[1][fr:to]
 	noise_chunks.append(adj_volume(chunk_byte))
     
-def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.15, silence_added_percent = 0.5):
+def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.10, silence_added_percent = 0.5):
     res = np.zeros((batch_size, fs))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
@@ -169,7 +169,7 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc = sess.run(accuracy,feed_dict={ data:x_batch, y:y_batch, dropout_prob: 0.0})
         print i, 'accuracy', acc        
-    sess.run(train_step,feed_dict={ data:x_batch, y:y_batch, dropout_prob: 0.2 })
+    sess.run(train_step,feed_dict={ data:x_batch, y:y_batch, dropout_prob: 0.5 })
     
     if i % 30 == 0: 
         saver.save(sess, mfile)
