@@ -10,20 +10,18 @@ all_labels = labels + ['unknown','silence']
 ```
 
 ```python
-f = train_dir + '/sheila/019fa366_nohash_0.wav'
+f = train_dir + '/down/030ec18b_nohash_1.wav'
 wav = io.BytesIO(open(f).read())
 v = scipy.io.wavfile.read(wav)
 print v[1]
-vol_multiplier = np.mean(np.abs(v[1])) / 500.
-print vol_multiplier
-vnew = v[1].astype(float) / vol_multiplier
+scipy.io.wavfile.write('/tmp/tmp3.wav', fs, v[1])    
+vnew = adj_volume(v[1])
 vnew = vnew.astype(np.int16)
-scipy.io.wavfile.write('/tmp/tmp.wav', fs, vnew)    
+scipy.io.wavfile.write('/tmp/tmp1.wav', fs, vnew)    
 ```
 
 ```text
-[0 3 5 ..., 4 4 3]
-1.786834
+[ -68 -118 -182 ...,  425  402  330]
 ```
 
 ```python
@@ -33,6 +31,11 @@ plt.savefig('test1_1.png')
 
 
 ```python
+def adj_volume(vec):
+    vol_multiplier = np.mean(np.abs(vec)) / 500.
+    vnew = vec.astype(float) / vol_multiplier
+    return vnew
+    
 all_train_files = []
 for d, r, f in os.walk(train_dir):
     for filename in f:
@@ -55,7 +58,7 @@ for f in noise_files:
     	fr = int(i * fs)
     	to = int((i+1)*fs)
     	chunk_byte = v[1][fr:to]
-	noise_chunks.append(chunk_byte)
+	noise_chunks.append(adj_volume(chunk_byte))
     
 ```
 
@@ -73,10 +76,6 @@ print unknown_files[:10]
 
 
 ```python
-def adj_volume(vec):
-    vol_multiplier = np.mean(np.abs(vec)) / 500.
-    vnew = vec.astype(float) / vol_multiplier
-    return vnew
 
 def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.15):
     res = np.zeros((batch_size, fs))
@@ -90,14 +89,13 @@ def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.15):
            f = random.choice(unknown_files)
 	   wav = io.BytesIO(open(f).read())
 	   v = scipy.io.wavfile.read(wav)
-	   res[i, 0:len(v[1])] = v[1]
+	   res[i, 0:len(v[1])] = adj_volume(v[1])
 	   y[i, all_labels.index('unknown')] = 1.0 # unknown
 	else:
 	   f = random.choice(train_files)
 	   wav = io.BytesIO(open(f).read())
 	   v = scipy.io.wavfile.read(wav)
-	   if i==0: scipy.io.wavfile.write('/tmp/tmp1.wav', fs, v[1])	   
-	   res[i, 0:len(v[1])] = v[1]
+	   res[i, 0:len(v[1])] = adj_volume(v[1])
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
 	   y[i, labels.index(label)] = 1.0
 	   
@@ -108,34 +106,32 @@ print y
 ```
 
 ```text
-[[ 0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.]
- [ 1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+[[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
  [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
- [ 0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
- [ 0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.]
  [ 0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
  [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
  [ 0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.]
+ [ 1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
  [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]
  [ 0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.]
- [ 0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.]
- [ 0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  0.]]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.]
+ [ 0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.]]
 ```
 
 
 ```python
-vv = x[5,:].astype(np.int16)
+vv = x[18,:].astype(np.int16)
 scipy.io.wavfile.write('/tmp/tmp2.wav', fs, vv)
-vv = x[8,:].astype(np.int16)
-scipy.io.wavfile.write('/tmp/tmp3.wav', fs, vv)
 i = 8
 plt.specgram(x[i,:], Fs=fs, NFFT=1024)
 print y[i]
@@ -143,7 +139,7 @@ plt.savefig('test1_2.png')
 ```
 
 ```text
-[ 0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.]
+[ 0.  1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
 ```
 
 
