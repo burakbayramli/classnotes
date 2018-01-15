@@ -14,16 +14,16 @@ f = train_dir + '/sheila/019fa366_nohash_0.wav'
 wav = io.BytesIO(open(f).read())
 v = scipy.io.wavfile.read(wav)
 print v[1]
-vol_multiplier = np.max(np.abs(v[1])) / 1000.
+vol_multiplier = np.mean(np.abs(v[1])) / 500.
 print vol_multiplier
 vnew = v[1].astype(float) / vol_multiplier
 vnew = vnew.astype(np.int16)
-scipy.io.wavfile.write('/tmp/tmp.wav', fs, vnew)
+scipy.io.wavfile.write('/tmp/tmp.wav', fs, vnew)    
 ```
 
 ```text
 [0 3 5 ..., 4 4 3]
-7.294
+1.786834
 ```
 
 ```python
@@ -68,47 +68,58 @@ print unknown_files[:10]
 
 
 ```python
+
 def get_minibatch(batch_size, silence_percent=0.10, unknown_percent=0.15):
+    res = np.zeros((batch_size, fs))    
+    y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
         if random.choice(range(int(1/silence_percent))) == 0:
 	   # silence
            f = random.choice(noise_files)
-	   print f, 'noise'
+	   wav = io.BytesIO(open(f).read())
+	   v = scipy.io.wavfile.read(wav)
+           chunks = int(len(v[1]) / fs) - 1
+           chosen_chunk = random.choice(range(chunks))
+           fr = int(chosen_chunk * fs)
+           to = int((chosen_chunk+1)*fs)
+           chunk_byte = v[1][fr:to]
+	   res[i, :] = chunk_byte
+	   y[i, 11] = 1.0
         elif random.choice(range(int(1/unknown_percent))) == 0:
 	   # unknown
            f = random.choice(unknown_files)
-	   print f, 'unknown'  
+	   wav = io.BytesIO(open(f).read())
+	   v = scipy.io.wavfile.read(wav)
+	   res[i, 0:len(v[1])] = v[1]
+	   y[i, 10] = 1.0
 	else:
-           f = random.choice(train_files)
+	   f = random.choice(train_files)
+	   wav = io.BytesIO(open(f).read())
+	   v = scipy.io.wavfile.read(wav)
+	   res[i, 0:len(v[1])] = v[1]
            label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-	   print f, label
-	
-
-print get_minibatch(20)
+	   y[i, labels.index(label)] = 1.0
+	   
+    return res, y
+    
+x,y = get_minibatch(20)
+print x
 ```
 
 ```text
-/home/burak/Downloads/train/audio/right/743edf9d_nohash_0.wav right
-/home/burak/Downloads/train/audio/down/f3cee168_nohash_1.wav down
-/home/burak/Downloads/train/audio/three/18a8f03f_nohash_0.wav unknown
-/home/burak/Downloads/train/audio/stop/0ff728b5_nohash_3.wav stop
-/home/burak/Downloads/train/audio/house/626e323f_nohash_1.wav unknown
-/home/burak/Downloads/train/audio/right/b3327675_nohash_0.wav right
-/home/burak/Downloads/train/audio/yes/39a6b995_nohash_0.wav yes
-/home/burak/Downloads/train/audio/left/6166ae21_nohash_1.wav left
-/home/burak/Downloads/train/audio/four/6823565f_nohash_1.wav unknown
-/home/burak/Downloads/train/audio/left/3777c08e_nohash_1.wav left
-/home/burak/Downloads/train/audio/right/9aa21fa9_nohash_1.wav right
-/home/burak/Downloads/train/audio/_background_noise_/pink_noise.wav noise
-/home/burak/Downloads/train/audio/no/c120e80e_nohash_2.wav no
-/home/burak/Downloads/train/audio/_background_noise_/dude_miaowing.wav noise
-/home/burak/Downloads/train/audio/six/37e8db82_nohash_0.wav unknown
-/home/burak/Downloads/train/audio/happy/62641b88_nohash_0.wav unknown
-/home/burak/Downloads/train/audio/on/7eee5973_nohash_1.wav on
-/home/burak/Downloads/train/audio/down/00b01445_nohash_1.wav down
-/home/burak/Downloads/train/audio/up/c661be6e_nohash_0.wav up
-/home/burak/Downloads/train/audio/off/ab76ac76_nohash_0.wav off
-None
+[[  0.00000000e+00   3.00000000e+00   5.00000000e+00 ...,   9.00000000e+00
+    9.00000000e+00   6.00000000e+00]
+ [ -4.00000000e+01  -1.10000000e+01   1.00000000e+01 ...,   0.00000000e+00
+    0.00000000e+00   0.00000000e+00]
+ [  1.25000000e+02   1.05600000e+03  -4.60000000e+01 ...,  -4.37000000e+02
+   -1.40000000e+02  -1.21500000e+03]
+ ..., 
+ [ -6.06000000e+02  -9.90400000e+03  -1.92500000e+03 ...,   4.08000000e+02
+    3.37000000e+02   1.14000000e+03]
+ [  8.50000000e+01   1.35000000e+02   3.48000000e+02 ...,   3.04000000e+02
+    2.13000000e+02   3.76000000e+02]
+ [  4.63000000e+02   5.41000000e+02   5.61000000e+02 ...,   4.37000000e+02
+    4.08000000e+02   4.46000000e+02]]
 ```
 
 
