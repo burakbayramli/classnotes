@@ -1,5 +1,5 @@
 from python_speech_features import mfcc
-import pandas as pd
+import pandas as pd, util
 import numpy as np
 import tensorflow as tf
 import scipy.io.wavfile, zipfile
@@ -18,7 +18,7 @@ numcontext = 9
 fs = 16000
 batch_size = 300
 num_epochs = 10000
-num_cell = 128
+num_cell = 256
 num_layers = 3
 mfile = "/tmp/speech10.ckpt"
 train_dir = '/home/burak/Downloads/train/audio'
@@ -45,12 +45,13 @@ noise_chunks = []
 for f in noise_files:
     wav = io.BytesIO(open(f).read())
     v = scipy.io.wavfile.read(wav)
-    chunks = int(len(v[1]) / fs) - 1
-    for i in range(chunks):
-    	fr = int(i * fs)
-    	to = int((i+1)*fs)
-    	chunk_byte = v[1][fr:to]
-	noise_chunks.append(adj_volume(chunk_byte))
+    noise_chunks.append(v[1])
+#    chunks = int(len(v[1]) / fs) - 1
+#    for i in range(chunks):
+#    	fr = int(i * fs)
+#    	to = int((i+1)*fs)
+#    	chunk_byte = v[1][fr:to]
+#	noise_chunks.append(adj_volume(chunk_byte))
 
 def audiofile_to_input_vector(audio, fs, numcep, numcontext):
     orig_inputs = mfcc(audio, samplerate=fs, numcep=numcep)
@@ -95,18 +96,25 @@ def audiofile_to_input_vector(audio, fs, numcep, numcontext):
     train_inputs = (train_inputs - np.mean(train_inputs)) / np.std(train_inputs)
     return train_inputs
         
-def get_minibatch(batch_size, silence_percent=0.15, unknown_percent=0.15, silence_added_percent = 0.2, pad_percent = 0.3):
+def get_minibatch(batch_size, silence_percent=0.20, unknown_percent=0.20):
     res = np.zeros((batch_size, w, h))
     y = np.zeros((batch_size,len(labels)+2 ))
     for i in range(batch_size):
         if random.choice(range(int(1/silence_percent))) == 0:	   
-           chunk_byte = random.choice(noise_chunks)
+           chunk_byte = util.get_noise(noise_chunks)
 	   res[i, :] = audiofile_to_input_vector(chunk_byte, fs, numcep, numcontext)
 	   y[i, all_labels.index('silence')] = 1.0 # silence
         elif random.choice(range(int(1/unknown_percent))) == 0:	   
            f = random.choice(unknown_files)
 	   wav = io.BytesIO(open(f).read())
 	   v = scipy.io.wavfile.read(wav)
+           vv = v[1]
+
+           vv = util.tf_random_add_noise_transform(vv, noise_chunks)
+           vv = util.tf_random_time_shift_transform(vv)
+           vv = util.tf_random_pad_transform(vv)
+           vv = util.tf_fix_pad_transform(vv)           
+           
            mfcca = audiofile_to_input_vector(adj_volume(v[1]), fs, numcep, numcontext)
 	   res[i, 0:mfcca.shape[0], 0:mfcca.shape[1]] = mfcca           
 	   y[i, all_labels.index('unknown')] = 1.0 # unknown
@@ -116,14 +124,10 @@ def get_minibatch(batch_size, silence_percent=0.15, unknown_percent=0.15, silenc
 	   v = scipy.io.wavfile.read(wav)
            vv = v[1]
 
-           if random.choice(range(int(1./pad_percent))) == 0:
-              shift = np.random.randint(100,1000)
-              pad = vv[0]
-              vv[shift:-1] = vv[0:len(vv)-shift-1] 
-              vv[0:shift] = pad
-              
-           if random.choice(range(int(1./silence_added_percent))) == 0:
-               vv = vv + random.choice(noise_chunks)[:len(vv)]
+           vv = util.tf_random_add_noise_transform(vv, noise_chunks)
+           vv = util.tf_random_time_shift_transform(vv)
+           vv = util.tf_random_pad_transform(vv)
+           vv = util.tf_fix_pad_transform(vv)           
                
            mfcca = audiofile_to_input_vector(adj_volume(vv), fs, numcep, numcontext)
 	   res[i, 0:mfcca.shape[0], 0:mfcca.shape[1]] = mfcca
