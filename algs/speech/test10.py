@@ -11,6 +11,7 @@ def adj_volume(vec):
     vnew = vec.astype(float) / vol_multiplier
     return vnew
 
+lrate = 0.001
 w = 50
 h = 494
 numcep = 26
@@ -19,7 +20,7 @@ fs = 16000
 batch_size = 300
 num_epochs = 10000
 num_cell = 256
-num_layers = 3
+num_layers = 4
 mfile = "/tmp/speech10.ckpt"
 train_dir = '/home/burak/Downloads/train/audio'
 val_dir = '/home/burak/Downloads/test/audio'
@@ -46,12 +47,6 @@ for f in noise_files:
     wav = io.BytesIO(open(f).read())
     v = scipy.io.wavfile.read(wav)
     noise_chunks.append(v[1])
-#    chunks = int(len(v[1]) / fs) - 1
-#    for i in range(chunks):
-#    	fr = int(i * fs)
-#    	to = int((i+1)*fs)
-#    	chunk_byte = v[1][fr:to]
-#	noise_chunks.append(adj_volume(chunk_byte))
 
 def audiofile_to_input_vector(audio, fs, numcep, numcontext):
     orig_inputs = mfcc(audio, samplerate=fs, numcep=numcep)
@@ -167,12 +162,12 @@ gru_fw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_fw_cell, output_keep_prob=1-drop
 gru_bw_cell	=	tf.contrib.rnn.GRUCell(num_cell)
 gru_bw_cell	=	tf.contrib.rnn.DropoutWrapper(gru_bw_cell, output_keep_prob=1-dropout_prob)
 
-
 outputs, states	=  tf.nn.bidirectional_dynamic_rnn(cell_fw=gru_fw_cell,
 						   cell_bw=gru_bw_cell,
 						   inputs=data,
                                                    dtype=tf.float32)
 print outputs
+print states
 
 states = tf.concat(values=states, axis=1)
 
@@ -187,7 +182,7 @@ softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y)
 
 cross_entropy = tf.reduce_mean(softmax)
 
-train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(0.0001).minimize(cross_entropy)
 
 predicted_indices = tf.argmax(logits, 1)
 
@@ -212,6 +207,7 @@ for i in range(num_epochs):
     if i % 5 == 0:
         acc, _ = sess.run([evaluation_step, train_step], feed_dict={ data: x_batch, y:y_batch, dropout_prob: 0.5})
         print i, 'accuracy', acc
+        if lrate==0.001 and acc > 0.70: lrate = 0.0001
     if i % 30 == 0: 
         saver.save(sess, mfile)
         acc = sess.run(evaluation_step,feed_dict={ data:val_x, y:val_y, dropout_prob: 0.0})
