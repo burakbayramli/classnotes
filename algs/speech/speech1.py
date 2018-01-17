@@ -1,4 +1,4 @@
-
+import util
 import pandas as pd
 import numpy as np
 import tensorflow as tf
@@ -10,53 +10,10 @@ batch_size = 40
 num_epochs = 100
 num_cell = 100
 num_layers = 3
-mfile = "/tmp/speech.ckpt"
+mfile = "/tmp/speech1.ckpt"
 train_dir = '/home/burak/Downloads/voice_cmd_small'
 labels = ['up','down','yes','no']
 
-all_train_files = []
-all_train_files2 = []
-
-for d, r, f in os.walk(train_dir):
-    for filename in f:
-    	all_train_files.append(os.path.join(d,filename))
-
-for x in all_train_files:
-    if ".wav" in x: 
-       label = re.findall(".*/(.*?)/.*?.wav",x)[0]
-       if label in labels: all_train_files2.append(x)
-
-all_train_files2 = np.array(all_train_files2)
-
-idx = np.random.permutation(np.arange(len(all_train_files2)))
-N = float(len(idx))
-tidx = idx[0:int(N*0.9)]
-vidx = idx[int(N*0.9):]
-train_files = all_train_files2[tidx]
-val_files = all_train_files2[vidx]
-
-def adj_volume(vec):
-    vol_multiplier = np.mean(np.abs(vec)) / 500.
-    if vol_multiplier == 0: return vec
-    vnew = vec.astype(float) / vol_multiplier
-    return vnew
-
-def get_minibatch(batch_size, validation=False):
-    files = train_files
-    if validation:
-        files = val_files
-        batch_size = len(val_files)
-    res = np.zeros((batch_size, fs))
-    y = np.zeros((batch_size,len(labels) ))
-    for i in range(batch_size):
-    	f = random.choice(files)
-	wav = io.BytesIO(open(f).read())
-	v = scipy.io.wavfile.read(wav)
-	res[i, 0:len(v[1])] = adj_volume(v[1])
-        label = re.findall(".*/(.*?)/.*?.wav",f)[0]
-	y[i, labels.index(label)] = 1.0
-
-    return res, y
 
 import tensorflow as tf
 
@@ -110,13 +67,13 @@ if os.path.isfile(mfile + ".index"):
      saver.restore(sess, mfile)
 
 for i in range(num_epochs):
-    x_batch, y_batch = get_minibatch(batch_size)
+    x_batch, y_batch = util.get_minibatch(batch_size)
     acc, _ = sess.run([evaluation_step, train_step], feed_dict={ data:x_batch,
                                                                  y:y_batch,
                                                                  dropout_prob:0.0})
     print i, 'accuracy', acc 
     if i % 5 == 0:
-	val_x, val_y = get_minibatch(batch_size,validation=True)
+	val_x, val_y = util.get_minibatch(batch_size,validation=True)
         acc = sess.run(evaluation_step, feed_dict={ data:val_x,
                                                     y:val_y,
                                                     dropout_prob:0})
