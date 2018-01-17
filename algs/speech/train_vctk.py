@@ -31,7 +31,13 @@ def convert_inputs_to_ctc_format(audio, fs, target_text):
     train_seq_len = [train_inputs.shape[1]]
 
     # Get only the words between [a-z] and replace period for none
-    original = ' '.join(target_text.strip().lower().split(' ')).replace('.', '').replace('?', '').replace(',', '').replace("'", '').replace('!', '').replace('-', '')
+    original = ' '.join(target_text.strip().lower().split(' ')).\
+               replace('.', '').\
+               replace('?', '').\
+               replace(',', '').\
+               replace("'", '').\
+               replace('!', '').\
+               replace('-', '')
     #print('original:' + original)
     targets = original.replace(' ', '  ')
     targets = targets.split(' ')
@@ -58,7 +64,9 @@ def sparse_tuple_from(sequences, dtype=np.int32):
 
     indices = np.asarray(indices, dtype=np.int64)
     values = np.asarray(values, dtype=dtype)
-    shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
+    shape = np.asarray([len(sequences),
+                        np.asarray(indices).max(0)[1] + 1],
+                       dtype=np.int64)
 
     return indices, values, shape
 
