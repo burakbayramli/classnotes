@@ -5,15 +5,11 @@ import tensorflow as tf
 import scipy.io.wavfile, zipfile
 import io, time, os, random, re
 
-fs = 16000
 batch_size = 40
 num_epochs = 100
 num_cell = 100
 num_layers = 3
 mfile = "/tmp/speech1.ckpt"
-train_dir = '/home/burak/Downloads/voice_cmd_small'
-labels = ['up','down','yes','no']
-
 
 import tensorflow as tf
 
@@ -21,7 +17,7 @@ tf.reset_default_graph()
 
 dropout_prob = tf.placeholder(tf.float32)
 
-data = tf.placeholder(tf.float32, [None, fs])
+data = tf.placeholder(tf.float32, [None, util.fs])
 
 stfts = tf.contrib.signal.stft(data, frame_length=256, frame_step=128, fft_length=256)
 
@@ -29,7 +25,7 @@ fingerprint = tf.abs(stfts)
 
 print fingerprint
 
-y = tf.placeholder(tf.float32, shape=[None, len(labels)])
+y = tf.placeholder(tf.float32, shape=[None, len(util.labels)])
 
 cells = []
 for _ in range(num_layers):
@@ -43,7 +39,7 @@ last = states[-1][0]
 print last
 
 logits = tf.contrib.layers.fully_connected(inputs=last,
-                                           num_outputs=len(labels),
+                                           num_outputs=len(util.labels),
                                            activation_fn=None)
 
 softmax = tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=y) 
