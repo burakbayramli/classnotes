@@ -7,8 +7,9 @@ import model1 # farkli modeller burada import edilir
 
 # bu dosya her model icin farkli isimde secilebilir
 
-random.seed(0)
-np.random.seed(0)
+seed = 0
+random.seed(seed)
+np.random.seed(seed)
 
 cmd = 'm = ' + sys.argv[1] + '.Model()'
 print cmd, 'isletiliyor'
@@ -17,6 +18,8 @@ exec cmd
 sess = tf.Session()
 
 sess.run(tf.global_variables_initializer())
+
+tf.set_random_seed(seed)
 
 saver = tf.train.Saver()
 

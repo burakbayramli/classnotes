@@ -3,14 +3,14 @@ import tensorflow as tf, util, os
 
 class Model:
     def __init__(self):
-
-        self.mfile = "/tmp/speech1.ckpt"
+                
+        self.mfile = "/tmp/" + os.path.basename(__file__) + ".ckpt"
 
         self.batch_size = 40
         
         self.num_epochs = 200
 
-        self.dop_param = 0.0 # dropout olasiligi
+        self.dop_param = 0.2 # dropout olasiligi
 
         self.num_layers = 3
         
