@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd, sys
 import numpy as np, util
 import tensorflow as tf
 import scipy.io.wavfile, zipfile
@@ -8,11 +8,12 @@ import model1 # farkli modeller burada import edilir
 # bu dosya her model icin farkli isimde secilebilir
 
 batch_size = 40
-num_epochs = 100
+num_epochs = 200
 random.seed(0)
 np.random.seed(0)
 
-m = model1.Model()
+print cmd, 'isletiliyor'
+exec cmd
 
 sess = tf.Session()
 
@@ -26,7 +27,7 @@ if os.path.isfile(m.mfile + ".index"):
 
 for i in range(num_epochs):
     train_x, train_y = util.get_minibatch(batch_size)
-    d = { m.data:train_x, m.y:train_y, m.dop:0.5}
+    d = { m.data:train_x, m.y:train_y, m.dop:0.2}
     acc, _ = sess.run([m.evaluation_step, m.train_step], feed_dict=d)
     print i, 'accuracy', acc 
     if i % 5 == 0:
