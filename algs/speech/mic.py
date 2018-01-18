@@ -39,9 +39,10 @@ if os.path.isfile(m.mfile + ".index"):
 while 1:
     snd_data = array('h', stream.read(CHUNK_SIZE))
     arr = np.array(snd_data).reshape(1,16000)
+    arr = util.adj_volume(arr)
     print arr.shape    
     d = { m.data:arr, m.dop:0}
     l = sess.run(m.logits, feed_dict=d)
-    if np.any(np.abs(l)>2.0):
+    if np.any(np.abs(l)>3.0):
          print util.labels[np.argmax(l)], l
 
