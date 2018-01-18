@@ -4,7 +4,9 @@ import tensorflow as tf, util, os
 class Model:
     def __init__(self):
                 
-        self.mfile = "/tmp/" + os.path.basename(__file__) + ".ckpt".replace("pyc","py")
+        self.file = os.path.basename(__file__).replace(".pyc","").replace(".py","")
+        
+        self.mfile = "/tmp/" + self.file + ".ckpt"
 
         self.batch_size = 100
         
