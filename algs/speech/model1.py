@@ -1,33 +1,48 @@
+# model1.py
 import tensorflow as tf, util, os
-
-num_layers = 3
-num_cell = 100
 
 class Model:
     def __init__(self):
 
         self.mfile = "/tmp/speech1.ckpt"
 
+        self.batch_size = 40
+        
+        self.num_epochs = 200
+
+        self.dop_param = 0.0 # dropout olasiligi
+
+        self.num_layers = 3
+        
+        self.num_cell = 100
+
         tf.reset_default_graph()
 
         self.dop = tf.placeholder(tf.float32) # dropout olasiligi (probability)
         
         self.data = tf.placeholder(tf.float32, [None, util.fs])
+
+        print self.data 
         
         self.stfts = tf.contrib.signal.stft(self.data, frame_length=256,
                                             frame_step=128, fft_length=256)
+
+        print self.stfts
+        
         self.fingerprint = tf.abs(self.stfts)
         
         print self.fingerprint
 
         self.y = tf.placeholder(tf.float32, shape=[None, len(util.labels)])
         cells = []
-        for _ in range(num_layers):
-            cell = tf.contrib.rnn.LSTMCell(num_cell)
+        for _ in range(self.num_layers):
+            cell = tf.contrib.rnn.LSTMCell(self.num_cell)
             cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=1-self.dop)
             cells.append(cell)
         cell = tf.contrib.rnn.MultiRNNCell(cells)
         output, states = tf.nn.dynamic_rnn(cell, self.fingerprint, dtype=tf.float32)
+        print output
+        for x in states: print x
         self.last = states[-1][0]
 
         print self.last
@@ -36,6 +51,8 @@ class Model:
                                                         num_outputs=len(util.labels),
                                                         activation_fn=None)
 
+        print self.logits
+        
         self.softmax = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits,
                                                                labels=self.y) 
 

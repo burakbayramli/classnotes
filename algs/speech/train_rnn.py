@@ -7,11 +7,10 @@ import model1 # farkli modeller burada import edilir
 
 # bu dosya her model icin farkli isimde secilebilir
 
-batch_size = 40
-num_epochs = 200
 random.seed(0)
 np.random.seed(0)
 
+cmd = 'm = ' + sys.argv[1] + '.Model()'
 print cmd, 'isletiliyor'
 exec cmd
 
@@ -25,15 +24,15 @@ if os.path.isfile(m.mfile + ".index"):
      print 'restoring'
      saver.restore(sess, m.mfile)
 
-for i in range(num_epochs):
-    train_x, train_y = util.get_minibatch(batch_size)
-    d = { m.data:train_x, m.y:train_y, m.dop:0.2}
+for i in range(m.num_epochs):
+    train_x, train_y = util.get_minibatch(m.batch_size)
+    d = { m.data:train_x, m.y:train_y, m.dop:m.dop_param}
     acc, _ = sess.run([m.evaluation_step, m.train_step], feed_dict=d)
     print i, 'accuracy', acc 
     if i % 5 == 0:
-         d = { m.data:train_x, m.y:train_y, m.dop:0.0 }
+         d = { m.data:train_x, m.y:train_y, m.dop:m.dop_param }
          tacc = sess.run(m.evaluation_step, feed_dict=d)
-	 val_x, val_y = util.get_minibatch(batch_size,validation=True)
+	 val_x, val_y = util.get_minibatch(m.batch_size,validation=True)
          d = { m.data:val_x, m.y:val_y, m.dop:0}
          vacc = sess.run(m.evaluation_step, feed_dict=d)
          print i, 'training', tacc, 'validation', vacc
