@@ -5,24 +5,20 @@ import scipy.io.wavfile, zipfile
 import io, time, os, random, re
 import model1 # farkli modeller burada import edilir
 
-# bu dosya her model icin farkli isimde secilebilir
-
-seed = 0
-random.seed(seed)
-np.random.seed(seed)
-
+cmd = 'import ' + sys.argv[1] 
+exec cmd
 cmd = 'm = ' + sys.argv[1] + '.Model()'
-print cmd, 'isletiliyor'
+print 'model', sys.argv[1]
 exec cmd
 
 sess = tf.Session()
 
 sess.run(tf.global_variables_initializer())
 
-tf.set_random_seed(seed)
-
 saver = tf.train.Saver()
 
+print m.mfile
+print 'model file exists', os.path.isfile(m.mfile + ".index")
 if os.path.isfile(m.mfile + ".index"):
      print 'restoring'
      saver.restore(sess, m.mfile)

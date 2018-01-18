@@ -5,6 +5,7 @@ import scipy.io.wavfile, zipfile
 import io, time, os, random, re
 
 train_dir = '/home/burak/Downloads/voice_cmd_small'
+#train_dir = '/home/burak/Downloads/train'
 labels = ['up','down','yes','no']
 
 fs = 16000
@@ -22,8 +23,8 @@ for x in all_train_files:
 all_train_files2 = np.array(all_train_files2)
 idx = np.random.permutation(np.arange(len(all_train_files2)))
 N = float(len(idx))
-tidx = idx[0:int(N*0.9)]
-vidx = idx[int(N*0.9):]
+tidx = idx[0:int(N*0.8)]
+vidx = idx[int(N*0.8):]
 train_files = all_train_files2[tidx]
 val_files = all_train_files2[vidx]
 

@@ -4,17 +4,17 @@ import tensorflow as tf, util, os
 class Model:
     def __init__(self):
                 
-        self.mfile = "/tmp/" + os.path.basename(__file__) + ".ckpt"
+        self.mfile = "/tmp/" + os.path.basename(__file__) + ".ckpt".replace("pyc","py")
 
-        self.batch_size = 40
+        self.batch_size = 100
         
         self.num_epochs = 200
 
         self.dop_param = 0.0 # dropout olasiligi
 
-        self.num_layers = 3
+        self.num_layers = 4
         
-        self.num_cell = 100
+        self.num_cell = 200
 
         tf.reset_default_graph()
 
@@ -70,3 +70,4 @@ class Model:
         self.saver = tf.train.Saver()
                 
         
+# training 0.81 validation 0.851949
