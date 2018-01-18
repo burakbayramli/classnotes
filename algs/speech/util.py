@@ -4,7 +4,8 @@ import tensorflow as tf
 import scipy.io.wavfile, zipfile
 import io, time, os, random, re
 
-train_dir = '/home/burak/Downloads/voice_cmd_medium'
+#train_dir = '/home/burak/Downloads/voice_cmd_medium'
+train_dir = '/home/burak/Downloads/train'
 labels = ['up','down','yes','no']
 
 fs = 16000
