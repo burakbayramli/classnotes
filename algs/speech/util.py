@@ -49,3 +49,5 @@ def get_minibatch(batch_size, validation=False):
 	y[i, labels.index(label)] = 1.0
 
     return res, y
+
+    
