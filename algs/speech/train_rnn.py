@@ -10,8 +10,11 @@ mfile = "/tmp/speech1.ckpt"
 
 batch_size = 40
 num_epochs = 100
+random.seed(0)
+np.random.seed(0)
 
-evaluation_step, train_step, data, y, dropout_prob = model1.init_model()
+#evaluation_step, train_step, data, y, dropout_prob = model1.init_model()
+m = model1.Model()
 
 sess = tf.Session()
 
@@ -25,13 +28,15 @@ if os.path.isfile(mfile + ".index"):
 
 for i in range(num_epochs):
     x_batch, y_batch = util.get_minibatch(batch_size)
-    d = { data:x_batch, y:y_batch, dropout_prob:0.0}
-    acc, _ = sess.run([evaluation_step, train_step], feed_dict=d)
+    d = { m.data:x_batch, m.y:y_batch, m.dropout_prob:0.5}
+    acc, _ = sess.run([m.evaluation_step, m.train_step], feed_dict=d)
     print i, 'accuracy', acc 
     if i % 5 == 0:
-	val_x, val_y = util.get_minibatch(batch_size,validation=True)
-        d = { data:val_x, y:val_y, dropout_prob:0}
-        acc = sess.run(evaluation_step, feed_dict=d)
-        print i, 'validation accuracy', acc        
+         d = { m.data:x_batch, m.y:y_batch, m.dropout_prob:0.0 }
+         tacc = sess.run(m.evaluation_step, feed_dict=d)
+	 val_x, val_y = util.get_minibatch(batch_size,validation=True)
+         d = { m.data:val_x, m.y:val_y, m.dropout_prob:0}
+         vacc = sess.run(m.evaluation_step, feed_dict=d)
+         print i, 'training', tacc, 'validation', vacc
     
 saver.save(sess, mfile)
