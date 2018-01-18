@@ -10,7 +10,7 @@ class Model:
         
         self.num_epochs = 200
 
-        self.dop_param = 0.2 # dropout olasiligi
+        self.dop_param = 0.0 # dropout olasiligi
 
         self.num_layers = 3
         
