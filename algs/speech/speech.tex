@@ -1,12 +1,14 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Konusma Tanima (Speech Recognition)
+Konuþma Tanýma (Speech Recognition)
 
-CTC
+Frekans Üzerinden Özellik Çýkartýmý, RNN, LSTM, GRU
 
-\inputminted[fontsize=\footnotesize]{python}{train_ctc.py}
-
-Frekans Uzerinden Ozellik Cikartimi, RNN, LSTM, GRU
+1 saniyelik ses dosyalarýmýz olsun, bu dosyalardaki ses kayýtlarý dört
+farklý komutu olabilsin, Ýngilizce up, down, yes, no (yukarý, aþaðý, evet,
+hayýr) komutlarý. Ses kayýtlarý aslýnda zaman serileridir, tek boyutlu bir
+veri, mesela 1 saniyelik 16,000 sayý içeren bir vektör. Örnek bir 'down'
+kaydýnýn neye benzediðini görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import util
@@ -17,7 +19,6 @@ f = util.train_dir + '/down/004ae714_nohash_0.wav'
 wav = io.BytesIO(open(f).read())
 v = scipy.io.wavfile.read(wav)
 print v[1]
-#scipy.io.wavfile.write('/tmp/tmp1.wav', util.fs, vnew)    
 plt.plot(v[1])
 plt.savefig('speech_01.png')
 \end{minted}
@@ -28,12 +29,29 @@ plt.savefig('speech_01.png')
 
 \includegraphics[width=20em]{speech_01.png}
 
+Yapay öðrenme baðlamýnda zaman serileri için daha önce {\em Uzun Kýsa-Vade
+  Hafýza Aðlarý} yazýsýnda LSTM yapýsýný görmüþtük. Örnek olarak zaman
+serilerini sýnýflamýþtýk, zaman serisindeki tüm verileri LSTM'e
+vermiþtik. Yani bir þeride 150 kusur veri noktasý varsa, o kadar LSTM
+hücresi yaratýlacaktý. Fakat içinde binlerce öðe olan seriler için bu iyi
+olmayabilir. Çözüm seriyi bir þekilde özetleyerek bu daha az olan veriyi
+LSTM'e vermek.
+
+Ses verilerini frekans üzerinden özetlemek iyi bilinen bir teknik, ses
+verisi ufak pencerelere bölünür, bu pencereler üzerinde Fourier transformu
+iþletilir, ve oradaki frekans bilgileri, hangi frekansýn ne kadar önemli
+olduðu elde edilir. Spektogram bu bilgiyi renkli olarak göstermenin bir
+yolu, üstteki ses için,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 plt.specgram(v[1], Fs=util.fs, NFFT=1024)
 plt.savefig('speech_02.png')
 \end{minted}
 
 \includegraphics[width=20em]{speech_02.png}
+
+Spektogramýn örüntü tanýma için kullanýlabileceðini anlamak için bir tane
+daha farklý 'down' sesi, bir de 'no' sesinin spektogramýna bakalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 f1 = util.train_dir + '/down/0f3f64d5_nohash_2.wav'
@@ -52,6 +70,14 @@ plt.savefig('speech_04.png')
 \includegraphics[width=20em]{speech_03.png}
 \includegraphics[width=20em]{speech_04.png}
 
+Görüyoruz ki 'down' seslerinin spektogramlarý birbirine benziyor. Demek ki
+öðrenme için bu yapýyý kullanabiliriz.
+
+Kademeli LSTM
+
+[..]
+
+\includegraphics[width=20em]{stacked-rnn.png}
 
 \inputminted[fontsize=\footnotesize]{python}{model1.py}
 
@@ -78,11 +104,22 @@ Tensor("fully_connected/BiasAdd:0", shape=(?, 4), dtype=float32)
 \inputminted[fontsize=\footnotesize]{python}{train_rnn.py}
 
 Ýþletmek için mesela \verb!python train_rnn.py model1! iþletince
-\verb!model1.py! içindeki model yüklenecek ve eðitilmeye baþlanacak. 
+\verb!model1.py! içindeki model yüklenecek ve eðitilmeye baþlanacak. Eðitim
+sonrasý modelin baþarýsý eðitim verisi üzerinde yüzde 91, doðrulama
+verisinde yüzde 92. 
+
+[..]
+
+Mikrofondan 1 saniyelik ses parçalarýný alýp parçayý model üzerinde iþletip
+dört komuttan birini seçen örnek kod \verb!mic.py!'da bulunabilir.
+
+
+CTC
+
+\inputminted[fontsize=\footnotesize]{python}{train_ctc.py}
+
 
 [devam edecek]
-
-
 
 Kaynaklar
 
@@ -96,6 +133,6 @@ Kaynaklar
 
 [5] Graves, {\em How to build a recognition system (Part 1): CTC Loss}, \url{https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI}
 
-[6] Bayramli, {\em Small Voice Files}, \url{https://www.dropbox.com/s/8754ytatft2ttge/voice_cmd_small.zip?dl=1}
+[6] Bayramli, {\em Voice Files}, \url{https://www.dropbox.com/s/qznhytp3iqaq6gk/voice_cmd_medium.zip?dl=1}
 
 \end{document}

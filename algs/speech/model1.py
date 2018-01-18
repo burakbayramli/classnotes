@@ -72,4 +72,4 @@ class Model:
         self.saver = tf.train.Saver()
                 
         
-# training 0.81 validation 0.851949
+# training 0.91 validation 0.926238

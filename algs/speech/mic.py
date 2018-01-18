@@ -3,12 +3,10 @@ import numpy as np, util
 import tensorflow as tf
 import scipy.io.wavfile, zipfile
 import io, time, os, random, re
-import model1 # farkli modeller burada import edilir
-
-import numpy as np
 from array import array
 import pyaudio
 import wave
+import model1 
 
 THRESHOLD = 500
 CHUNK_SIZE = 16000
@@ -22,8 +20,6 @@ stream = p.open(format=FORMAT, channels=1, rate=RATE,
 
 num_silent = 0
 snd_started = False
-
-r = array('h')
 
 import model1
 m = model1.Model()
@@ -41,11 +37,9 @@ if os.path.isfile(m.mfile + ".index"):
      saver.restore(sess, m.mfile)
      
 while 1:
-    # little endian, signed short
     snd_data = array('h', stream.read(CHUNK_SIZE))
     arr = np.array(snd_data).reshape(1,16000)
-    print arr.shape
-    
+    print arr.shape    
     d = { m.data:arr, m.dop:0}
     l = sess.run(m.logits, feed_dict=d)
     if np.any(np.abs(l)>2.0):
