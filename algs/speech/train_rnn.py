@@ -1,13 +1,15 @@
-import util, model1
 import pandas as pd
-import numpy as np
+import numpy as np, util
 import tensorflow as tf
 import scipy.io.wavfile, zipfile
 import io, time, os, random, re
+import model1 # farkli modeller burada import edilir
+
+# bu dosya her model icin farkli isimde secilebilir
+mfile = "/tmp/speech1.ckpt"
 
 batch_size = 40
 num_epochs = 100
-mfile = "/tmp/speech1.ckpt"
 
 evaluation_step, train_step, data, y, dropout_prob = model1.init_model()
 
