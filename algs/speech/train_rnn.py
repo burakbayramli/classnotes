@@ -4,9 +4,9 @@ import tensorflow as tf
 import scipy.io.wavfile, zipfile
 import io, time, os, random, re
 
-import model1
+import model_lstm
 
-m = m.Model()
+m = model_lstm.Model()
 
 sess = tf.Session()
 
