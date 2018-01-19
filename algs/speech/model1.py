@@ -45,7 +45,7 @@ class Model:
         output, states = tf.nn.dynamic_rnn(cell, self.fingerprint, dtype=tf.float32)
         print output
         for x in states: print x
-        self.last = states[-1][0]
+        self.last = states[-1][0] # en ust sagdaki son hucre
 
         print self.last
 
