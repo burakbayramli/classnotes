@@ -4,11 +4,12 @@ import tensorflow as tf
 import scipy.io.wavfile, zipfile
 import io, time, os, random, re
 
-#train_dir = '/home/burak/Downloads/voice_cmd_medium'
-train_dir = '/home/burak/Downloads/train'
+train_dir = '/home/burak/Downloads/voice_cmd_medium'
+#train_dir = '/home/burak/Downloads/train'
 labels = ['up','down','yes','no']
 
 fs = 16000
+
 all_train_files = []
 all_train_files2 = []
 
@@ -32,7 +33,7 @@ val_files = all_train_files2[vidx]
 
 np.random.seed()
 
-print 'train', len(train_files), 'val', len(val_files)
+#print 'train', len(train_files), 'val', len(val_files)
 
 def adj_volume(vec):
     vol_multiplier = np.mean(np.abs(vec)) / 500.
@@ -58,4 +59,14 @@ def get_minibatch(batch_size, validation=False):
 
     return res, y
 
+    
+def network_parameters():
+    total_parameters = 0
+    for variable in tf.trainable_variables():
+        shape = variable.get_shape()
+        variable_parameters = 1
+        for dim in shape:
+            variable_parameters *= dim.value
+        total_parameters += variable_parameters
+    return(total_parameters)
     
