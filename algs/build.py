@@ -33,7 +33,7 @@ if len(sys.argv) == 1:
     ./reinf/reinf.pdf \
     ./nlp/nlp.pdf \
     ./recom/recom.pdf \
-    ./seq/seq.pdf \
+    ./nmt/nmt.pdf \
     ./ocr/ocr.pdf \
     ./speech/speech.pdf \
     ./zapp/zapp.pdf \
