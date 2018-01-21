@@ -171,10 +171,15 @@ def restore_model(sess, FLAGS):
 def train(FLAGS):
 
     # Load the data
+#    en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict = \
+#        process_data('data/my_en.txt', max_vocab_size=5000, target_lang=False)
+#    sp_token_ids, sp_seq_lens, sp_vocab_dict, sp_rev_vocab_dict = \
+#        process_data('data/my_sp.txt', max_vocab_size=5000, target_lang=True)
     en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict = \
-        process_data('data/my_en.txt', max_vocab_size=5000, target_lang=False)
+        process_data('/home/burak/Downloads/tur-eng/train.en', max_vocab_size=25000, target_lang=False)
     sp_token_ids, sp_seq_lens, sp_vocab_dict, sp_rev_vocab_dict = \
-        process_data('data/my_sp.txt', max_vocab_size=5000, target_lang=True)
+        process_data('/home/burak/Downloads/tur-eng/train.tr', max_vocab_size=25000, target_lang=True)
+
 
     # Split into train and validation sets
     train_encoder_inputs, train_decoder_inputs, train_targets, \
@@ -184,10 +189,10 @@ def train(FLAGS):
         split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens,
             train_ratio=0.8)
     
-    output = open('data/vocab_en.pkl', 'wb')
+    output = open('/tmp/vocab_en.pkl', 'wb')
     pickle.dump(en_vocab_dict, output)
     output.close()
-    output = open('data/vocab_sp.pkl', 'wb')
+    output = open('/tmp/vocab_sp.pkl', 'wb')
     pickle.dump(sp_vocab_dict, output)
     output.close()
 
