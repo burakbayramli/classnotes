@@ -231,7 +231,9 @@ def train(FLAGS):
                     batch_encoder_inputs, batch_decoder_inputs, batch_targets,
                     batch_en_seq_lens, batch_sp_seq_lens,
                     FLAGS.dropout)
-
+                
+                print 'loss', loss
+                
                 batch_loss.append(loss)
 
             losses.append(np.mean(batch_loss))
