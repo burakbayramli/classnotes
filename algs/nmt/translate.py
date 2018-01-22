@@ -143,11 +143,11 @@ class model(object):
 class parameters(object):
 
     def __init__(self):
-        self.max_en_vocab_size = 5000
-        self.max_sp_vocab_size = 5000
+        self.max_en_vocab_size = 25000
+        self.max_sp_vocab_size = 25000
         self.num_epochs = 100
-        self.batch_size = 4
-        self.num_hidden_units = 300
+        self.batch_size = 10
+        self.num_hidden_units = 100
         self.num_layers = 1
         self.dropout = 0.5
         self.learning_rate = 1e-3
@@ -216,19 +216,14 @@ def train(FLAGS):
                     batch_encoder_inputs, batch_decoder_inputs, batch_targets,
                     batch_en_seq_lens, batch_sp_seq_lens,
                     FLAGS.dropout)
-                
-                print 'loss', loss
-                
+                                
                 batch_loss.append(loss)
-
+            print 'loss', np.mean(batch_loss)
             losses.append(np.mean(batch_loss))
 
         checkpoint_path = "/tmp/model.ckpt"
         print "Saving the model."
         model.saver.save(sess, checkpoint_path)            
-        plt.plot(losses, label='loss')
-        plt.legend()
-        plt.savefig('seq_01.png')
 
 if __name__ == '__main__':
     FLAGS = parameters()
