@@ -2,10 +2,7 @@
 import pickle
 import tensorflow as tf
 import numpy as np, os
-import matplotlib.pyplot as plt
-from data_utils import (
-    process_data,split_data,generate_epoch,generate_batch,
-)
+import utils
 
 def rnn_cell(FLAGS, dropout, scope):
 
@@ -171,30 +168,18 @@ def restore_model(sess, FLAGS):
 def train(FLAGS):
 
     # Load the data
-#    en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict = \
-#        process_data('data/my_en.txt', max_vocab_size=5000, target_lang=False)
-#    sp_token_ids, sp_seq_lens, sp_vocab_dict, sp_rev_vocab_dict = \
-#        process_data('data/my_sp.txt', max_vocab_size=5000, target_lang=True)
-    en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict = \
-        process_data('/home/burak/Downloads/tur-eng/train.en', max_vocab_size=25000, target_lang=False)
-    sp_token_ids, sp_seq_lens, sp_vocab_dict, sp_rev_vocab_dict = \
-        process_data('/home/burak/Downloads/tur-eng/train.tr', max_vocab_size=25000, target_lang=True)
+    print 'loading...'
+    [en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict] = pickle.load(open('/tmp/vocab_en.pkl','rb'))
+    [sp_token_ids, sp_seq_lens, sp_vocab_dict, sp_rev_vocab_dict] = pickle.load(open('/tmp/vocab_sp.pkl','rb'))
 
-
+    print 'train / valid split...'
     # Split into train and validation sets
     train_encoder_inputs, train_decoder_inputs, train_targets, \
         train_en_seq_lens, train_sp_seq_len, \
         valid_encoder_inputs, valid_decoder_inputs, valid_targets, \
         valid_en_seq_lens, valid_sp_seq_len = \
-        split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens,
+        utils.split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens,
             train_ratio=0.8)
-    
-    output = open('/tmp/vocab_en.pkl', 'wb')
-    pickle.dump(en_vocab_dict, output)
-    output.close()
-    output = open('/tmp/vocab_sp.pkl', 'wb')
-    pickle.dump(sp_vocab_dict, output)
-    output.close()
 
     # Update parameters
     FLAGS.en_vocab_size = len(en_vocab_dict)
@@ -211,7 +196,7 @@ def train(FLAGS):
 
         # Training begins
         losses = []
-        for epoch_num, epoch in enumerate(generate_epoch(train_encoder_inputs,
+        for epoch_num, epoch in enumerate(utils.generate_epoch(train_encoder_inputs,
             train_decoder_inputs, train_targets,
             train_en_seq_lens, train_sp_seq_len,
             FLAGS.num_epochs, FLAGS.batch_size)):
