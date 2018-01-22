@@ -163,7 +163,7 @@ def get_minibatch(encoder_inputs, decoder_inputs, targets, en_seq_lens, sp_seq_l
         targets_b[i,:] = targets[idx]
         en_seq_lens_b[i] = en_seq_lens[idx]
         sp_seq_lens_b[i] = sp_seq_lens[idx]
-        return encoder_inputs_b, decoder_inputs_b, targets_b, en_seq_lens_b, sp_seq_lens_b
+    return encoder_inputs_b.astype(np.int64), decoder_inputs_b.astype(np.int64), targets_b.astype(np.int64), en_seq_lens_b, sp_seq_lens_b
 
 if __name__ == "__main__": 
 

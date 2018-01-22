@@ -117,12 +117,11 @@ class model(object):
                 tf.reduce_sum(masked_losses, reduction_indices=1))
 
         # Optimization
-        self.lr = tf.Variable(0.0, trainable=False)
         trainable_vars = tf.trainable_variables()
         # clip the gradient to avoid vanishing or blowing up gradients
         grads, _ = tf.clip_by_global_norm(
             tf.gradients(self.loss, trainable_vars), FLAGS.max_gradient_norm)
-        optimizer = tf.train.AdamOptimizer(self.lr)
+        optimizer = tf.train.AdamOptimizer(0.001)
         self.train_optimizer = optimizer.apply_gradients(
             zip(grads, trainable_vars))
 
@@ -147,13 +146,11 @@ class parameters(object):
     def __init__(self):
         self.max_en_vocab_size = 25000
         self.max_sp_vocab_size = 25000
-        self.num_epochs = 10000
+        self.num_epochs = 1000
         self.batch_size = 100
-        self.num_hidden_units = 100
-        self.num_layers = 1
+        self.num_hidden_units = 300
+        self.num_layers = 2
         self.dropout = 0.5
-        self.learning_rate = 1e-3
-        self.learning_rate_decay_factor = 0.99
         self.max_gradient_norm = 5.0
 
 def create_model(sess, FLAGS):
@@ -188,6 +185,7 @@ def train(FLAGS):
         valid_sp_seq_len = \
         utils.split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens, train_ratio=0.8)
 
+    
     # Update parameters
     FLAGS.en_vocab_size = len(en_vocab_dict)
     FLAGS.sp_vocab_size = len(sp_vocab_dict)
@@ -203,7 +201,8 @@ def train(FLAGS):
         for i in range(FLAGS.num_epochs):
             res = utils.get_minibatch(train_encoder_inputs,
                                       train_decoder_inputs, train_targets,
-                                      train_en_seq_lens, train_sp_seq_len, FLAGS.batch_size)
+                                      train_en_seq_lens, train_sp_seq_len,
+                                      FLAGS.batch_size)
 
             (batch_encoder_inputs, batch_decoder_inputs,
              batch_targets, batch_en_seq_lens,
@@ -215,7 +214,7 @@ def train(FLAGS):
                 FLAGS.dropout)
             print 'loss', loss
 
-            if i % 10 == 0: 
+            if i % 10 == 0:
                 print "Saving the model."
                 model.saver.save(sess, checkpoint_path)
 
