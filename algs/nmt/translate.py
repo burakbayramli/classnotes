@@ -4,6 +4,8 @@ import tensorflow as tf
 import numpy as np, os
 import utils
 
+checkpoint_path = "/tmp/model.ckpt"
+
 def rnn_cell(FLAGS, dropout, scope):
 
     with tf.variable_scope(scope):
@@ -145,8 +147,8 @@ class parameters(object):
     def __init__(self):
         self.max_en_vocab_size = 25000
         self.max_sp_vocab_size = 25000
-        self.num_epochs = 100
-        self.batch_size = 10
+        self.num_epochs = 10000
+        self.batch_size = 100
         self.num_hidden_units = 100
         self.num_layers = 1
         self.dropout = 0.5
@@ -174,12 +176,17 @@ def train(FLAGS):
 
     print 'train / valid split...'
     # Split into train and validation sets
-    train_encoder_inputs, train_decoder_inputs, train_targets, \
-        train_en_seq_lens, train_sp_seq_len, \
-        valid_encoder_inputs, valid_decoder_inputs, valid_targets, \
-        valid_en_seq_lens, valid_sp_seq_len = \
-        utils.split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens,
-            train_ratio=0.8)
+    train_encoder_inputs, \
+        train_decoder_inputs, \
+        train_targets, \
+        train_en_seq_lens, \
+        train_sp_seq_len, \
+        valid_encoder_inputs, \
+        valid_decoder_inputs, \
+        valid_targets, \
+        valid_en_seq_lens, \
+        valid_sp_seq_len = \
+        utils.split_data(en_token_ids, sp_token_ids, en_seq_lens, sp_seq_lens, train_ratio=0.8)
 
     # Update parameters
     FLAGS.en_vocab_size = len(en_vocab_dict)
@@ -193,37 +200,24 @@ def train(FLAGS):
 
         # Create new model or load old one
         model = create_model(sess, FLAGS)
+        for i in range(FLAGS.num_epochs):
+            res = utils.get_minibatch(train_encoder_inputs,
+                                      train_decoder_inputs, train_targets,
+                                      train_en_seq_lens, train_sp_seq_len, FLAGS.batch_size)
 
-        # Training begins
-        losses = []
-        for epoch_num, epoch in enumerate(utils.generate_epoch(train_encoder_inputs,
-            train_decoder_inputs, train_targets,
-            train_en_seq_lens, train_sp_seq_len,
-            FLAGS.num_epochs, FLAGS.batch_size)):
+            (batch_encoder_inputs, batch_decoder_inputs,
+             batch_targets, batch_en_seq_lens,
+             batch_sp_seq_lens) = res
+            
+            loss, _ = model.step(sess, FLAGS,
+                batch_encoder_inputs, batch_decoder_inputs, batch_targets,
+                batch_en_seq_lens, batch_sp_seq_lens,
+                FLAGS.dropout)
+            print 'loss', loss
 
-            print "EPOCH: %i" % (epoch_num)
-            # Decay learning rate
-            sess.run(tf.assign(model.lr, FLAGS.learning_rate * \
-                (FLAGS.learning_rate_decay_factor ** epoch_num)))
-
-            batch_loss = []
-
-            for batch_num, (batch_encoder_inputs, batch_decoder_inputs,
-                batch_targets, batch_en_seq_lens,
-                batch_sp_seq_lens) in enumerate(epoch):
-
-                loss, _ = model.step(sess, FLAGS,
-                    batch_encoder_inputs, batch_decoder_inputs, batch_targets,
-                    batch_en_seq_lens, batch_sp_seq_lens,
-                    FLAGS.dropout)
-                                
-                batch_loss.append(loss)
-            print 'loss', np.mean(batch_loss)
-            losses.append(np.mean(batch_loss))
-
-        checkpoint_path = "/tmp/model.ckpt"
-        print "Saving the model."
-        model.saver.save(sess, checkpoint_path)            
+            if i % 10 == 0: 
+                print "Saving the model."
+                model.saver.save(sess, checkpoint_path)
 
 if __name__ == '__main__':
     FLAGS = parameters()

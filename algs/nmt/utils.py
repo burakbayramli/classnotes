@@ -1,7 +1,7 @@
 # encoding=utf8
 
 import sys, pickle, re
-import cPickle
+import cPickle, random
 import numpy as np
 
 # For special characters
@@ -149,28 +149,21 @@ def split_data(en_token_ids, sp_token_ids,
         valid_encoder_inputs, valid_decoder_inputs, valid_targets, \
         valid_en_seq_lens, valid_sp_seq_len
 
-def generate_epoch(encoder_inputs, decoder_inputs, targets, en_seq_lens, sp_seq_lens,
-    num_epochs, batch_size):
-
-    for epoch_num in range(num_epochs):
-        yield generate_batch(encoder_inputs, decoder_inputs, targets,
-            en_seq_lens, sp_seq_lens, batch_size)
-
-def generate_batch(encoder_inputs, decoder_inputs, targets,
-    en_seq_lens, sp_seq_lens, batch_size):
-
+def get_minibatch(encoder_inputs, decoder_inputs, targets, en_seq_lens, sp_seq_lens, batch_size):
     data_size = len(encoder_inputs)
-
-    num_batches = (data_size // batch_size)
-    for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-
-        yield encoder_inputs[start_index:end_index], \
-            decoder_inputs[start_index:end_index], \
-            targets[start_index:end_index], \
-            en_seq_lens[start_index:end_index], \
-            sp_seq_lens[start_index:end_index]
+    encoder_inputs_b = np.zeros((batch_size, len(encoder_inputs[0])))
+    decoder_inputs_b = np.zeros((batch_size, len(decoder_inputs[0])))
+    targets_b = np.zeros((batch_size, len(targets[0])))
+    en_seq_lens_b = np.zeros(batch_size)
+    sp_seq_lens_b = np.zeros(batch_size)
+    for i in range(batch_size):
+        idx = random.choice(range(data_size))    
+        encoder_inputs_b[i,:] = encoder_inputs[idx]
+        decoder_inputs_b[i,:] = decoder_inputs[idx]
+        targets_b[i,:] = targets[idx]
+        en_seq_lens_b[i] = en_seq_lens[idx]
+        sp_seq_lens_b[i] = sp_seq_lens[idx]
+        return encoder_inputs_b, decoder_inputs_b, targets_b, en_seq_lens_b, sp_seq_lens_b
 
 if __name__ == "__main__": 
 
