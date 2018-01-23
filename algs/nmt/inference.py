@@ -4,7 +4,6 @@ from __future__ import print_function
 import codecs
 import time
 import tensorflow as tf
-import attention_model
 import model as nmt_model
 import utils
 

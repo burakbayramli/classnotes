@@ -18,7 +18,7 @@ class BaseModel(object):
                reverse_target_vocab_table=None,
                scope=None,
                extra_args=None):
-
+    
     assert isinstance(iterator, utils.BatchedInput)
     self.iterator = iterator
     self.mode = mode
