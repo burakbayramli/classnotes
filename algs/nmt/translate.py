@@ -148,21 +148,10 @@ class parameters(object):
         self.max_sp_vocab_size = 25000
         self.num_epochs = 1000
         self.batch_size = 100
-        self.num_hidden_units = 300
-        self.num_layers = 2
-        self.dropout = 0.5
+        self.num_hidden_units = 200
+        self.num_layers = 5
+        self.dropout = 0.0
         self.max_gradient_norm = 5.0
-
-def create_model(sess, FLAGS):
-    tf_model = model(FLAGS)
-    print "Created a new model"
-    sess.run(tf.initialize_all_variables())
-    return tf_model
-
-def restore_model(sess, FLAGS):
-    tf_model = model(FLAGS)
-    tf_model.saver.restore(sess, "/tmp/model.ckpt") 
-    return tf_model
 
 def train(FLAGS):
 
@@ -197,7 +186,18 @@ def train(FLAGS):
     with tf.Session() as sess:
 
         # Create new model or load old one
-        model = create_model(sess, FLAGS)
+        m = None
+        if os.path.isfile(checkpoint_path + ".index"):
+            print 'restoring model'
+            m = model(FLAGS)
+            m.saver.restore(sess, checkpoint_path)             
+        else:
+            'new model'
+            #model = create_model(sess, FLAGS)
+            print "Created a new model"
+            m = model(FLAGS)
+            sess.run(tf.initialize_all_variables())
+                    
         for i in range(FLAGS.num_epochs):
             res = utils.get_minibatch(train_encoder_inputs,
                                       train_decoder_inputs, train_targets,
