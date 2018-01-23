@@ -148,9 +148,9 @@ class parameters(object):
         self.max_sp_vocab_size = 25000
         self.num_epochs = 1000
         self.batch_size = 100
-        self.num_hidden_units = 220
-        self.num_layers = 7
-        self.dropout = 0.0
+        self.num_hidden_units = 300
+        self.num_layers = 10
+        self.dropout = 0.5
         self.max_gradient_norm = 5.0
 
 def train(FLAGS):
@@ -214,7 +214,7 @@ def train(FLAGS):
                 FLAGS.dropout)
             print 'loss', loss
 
-            if i % 10 == 0:
+            if i % 20 == 0:
                 print "Saving the model."
                 m.saver.save(sess, checkpoint_path)
 
