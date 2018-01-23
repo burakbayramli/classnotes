@@ -148,8 +148,8 @@ class parameters(object):
         self.max_sp_vocab_size = 25000
         self.num_epochs = 1000
         self.batch_size = 100
-        self.num_hidden_units = 200
-        self.num_layers = 5
+        self.num_hidden_units = 220
+        self.num_layers = 7
         self.dropout = 0.0
         self.max_gradient_norm = 5.0
 
@@ -208,7 +208,7 @@ def train(FLAGS):
              batch_targets, batch_en_seq_lens,
              batch_sp_seq_lens) = res
             
-            loss, _ = model.step(sess, FLAGS,
+            loss, _ = m.step(sess, FLAGS,
                 batch_encoder_inputs, batch_decoder_inputs, batch_targets,
                 batch_en_seq_lens, batch_sp_seq_lens,
                 FLAGS.dropout)
@@ -216,7 +216,7 @@ def train(FLAGS):
 
             if i % 10 == 0:
                 print "Saving the model."
-                model.saver.save(sess, checkpoint_path)
+                m.saver.save(sess, checkpoint_path)
 
 if __name__ == '__main__':
     FLAGS = parameters()
