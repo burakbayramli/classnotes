@@ -1207,8 +1207,10 @@ def create_or_load_model(model, model_dir, session, name):
   """Create translation model and initialize or load parameters in session."""
   latest_ckpt = tf.train.latest_checkpoint(model_dir)
   if latest_ckpt:
+    print ('latest ckpt')
     model = load_model(model, latest_ckpt, session, name)
   else:
+    print ('not latest ckpt')
     start_time = time.time()
     session.run(tf.global_variables_initializer())
     session.run(tf.tables_initializer())

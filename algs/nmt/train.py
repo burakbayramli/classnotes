@@ -452,8 +452,7 @@ def _format_results(name, ppl, scores, metrics):
 def _get_best_results(hparams):
   """Summary of the current best results."""
   tokens = []
-  for metric in hparams['metrics']:
-    tokens.append("%s %.2f" % (metric, getattr(hparams, "best_" + metric)))
+  tokens.append("%s %.2f" % ("bleu", hparams['best_bleu']))
   return ", ".join(tokens)
 
 
