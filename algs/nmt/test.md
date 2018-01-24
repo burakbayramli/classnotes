@@ -1,5 +1,29 @@
 
 ```python
+import utils
+loaded_infer_model, global_step = utils.create_or_load_model(\
+    infer_model.model, model_dir, infer_sess, "infer")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```python
 import utils, pickle
 print 'loading...'
 [en_token_ids, en_seq_lens, en_vocab_dict, en_rev_vocab_dict] = pickle.load(open('/tmp/vocab_en.pkl','rb'))

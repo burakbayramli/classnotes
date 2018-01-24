@@ -708,16 +708,16 @@ def create_train_model(
     model_creator, hparams, scope=None, num_workers=1, jobid=0,
     extra_args=None):
   """Create train graph, model, and iterator."""
-  src_file = "%s.%s" % (hparams.train_prefix, hparams.src)
-  tgt_file = "%s.%s" % (hparams.train_prefix, hparams.tgt)
-  src_vocab_file = hparams.src_vocab_file
-  tgt_vocab_file = hparams.tgt_vocab_file
+  src_file = "%s.%s" % (hparams['train_prefix'], hparams['src'])
+  tgt_file = "%s.%s" % (hparams['train_prefix'], hparams['tgt'])
+  src_vocab_file = hparams['src_vocab_file']
+  tgt_vocab_file = hparams['tgt_vocab_file']
 
   graph = tf.Graph()
 
   with graph.as_default(), tf.container(scope or "train"):
     src_vocab_table, tgt_vocab_table = utils.create_vocab_tables(
-        src_vocab_file, tgt_vocab_file, hparams.share_vocab)
+        src_vocab_file, tgt_vocab_file, hparams['share_vocab'])
 
     src_dataset = tf.data.TextLineDataset(src_file)
     tgt_dataset = tf.data.TextLineDataset(tgt_file)
@@ -730,13 +730,13 @@ def create_train_model(
         tgt_dataset,
         src_vocab_table,
         tgt_vocab_table,
-        batch_size=hparams.batch_size,
-        sos=hparams.sos,
-        eos=hparams.eos,
-        random_seed=hparams.random_seed,
-        num_buckets=hparams.num_buckets,
-        src_max_len=hparams.src_max_len,
-        tgt_max_len=hparams.tgt_max_len,
+        batch_size=hparams['batch_size'],
+        sos=hparams['sos'],
+        eos=hparams['eos'],
+        random_seed=hparams['random_seed'],
+        num_buckets=hparams['num_buckets'],
+        src_max_len=hparams['src_max_len'],
+        tgt_max_len=hparams['tgt_max_len'],
         skip_count=skip_count_placeholder,
         num_shards=num_workers,
         shard_index=jobid)
@@ -771,13 +771,13 @@ class EvalModel(
 
 def create_eval_model(model_creator, hparams, scope=None, extra_args=None):
   """Create train graph, model, src/tgt file holders, and iterator."""
-  src_vocab_file = hparams.src_vocab_file
-  tgt_vocab_file = hparams.tgt_vocab_file
+  src_vocab_file = hparams['src_vocab_file']
+  tgt_vocab_file = hparams['tgt_vocab_file']
   graph = tf.Graph()
 
   with graph.as_default(), tf.container(scope or "eval"):
     src_vocab_table, tgt_vocab_table = utils.create_vocab_tables(
-        src_vocab_file, tgt_vocab_file, hparams.share_vocab)
+        src_vocab_file, tgt_vocab_file, hparams['share_vocab'])
     src_file_placeholder = tf.placeholder(shape=(), dtype=tf.string)
     tgt_file_placeholder = tf.placeholder(shape=(), dtype=tf.string)
     src_dataset = tf.data.TextLineDataset(src_file_placeholder)
@@ -787,13 +787,13 @@ def create_eval_model(model_creator, hparams, scope=None, extra_args=None):
         tgt_dataset,
         src_vocab_table,
         tgt_vocab_table,
-        hparams.batch_size,
-        sos=hparams.sos,
-        eos=hparams.eos,
-        random_seed=hparams.random_seed,
-        num_buckets=hparams.num_buckets,
-        src_max_len=hparams.src_max_len_infer,
-        tgt_max_len=hparams.tgt_max_len_infer)
+        hparams['batch_size'],
+        sos=hparams['sos'],
+        eos=hparams['eos'],
+        random_seed=hparams['random_seed'],
+        num_buckets=hparams['num_buckets'],
+        src_max_len=hparams['src_max_len_infer'],
+        tgt_max_len=hparams['tgt_max_len_infer'])
     model = model_creator(
         hparams,
         iterator=iterator,
@@ -820,12 +820,12 @@ class InferModel(
 def create_infer_model(model_creator, hparams, scope=None, extra_args=None):
   """Create inference model."""
   graph = tf.Graph()
-  src_vocab_file = hparams.src_vocab_file
-  tgt_vocab_file = hparams.tgt_vocab_file
+  src_vocab_file = hparams['src_vocab_file']
+  tgt_vocab_file = hparams['tgt_vocab_file']
 
   with graph.as_default(), tf.container(scope or "infer"):
     src_vocab_table, tgt_vocab_table = utils.create_vocab_tables(
-        src_vocab_file, tgt_vocab_file, hparams.share_vocab)
+        src_vocab_file, tgt_vocab_file, hparams['share_vocab'])
     reverse_tgt_vocab_table = lookup_ops.index_to_string_table_from_file(
         tgt_vocab_file, default_value=utils.UNK)
 
@@ -838,8 +838,8 @@ def create_infer_model(model_creator, hparams, scope=None, extra_args=None):
         src_dataset,
         src_vocab_table,
         batch_size=batch_size_placeholder,
-        eos=hparams.eos,
-        src_max_len=hparams.src_max_len_infer)
+        eos=hparams['eos'],
+        src_max_len=hparams['src_max_len_infer'])
     model = model_creator(
         hparams,
         iterator=iterator,

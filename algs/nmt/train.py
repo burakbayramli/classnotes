@@ -33,8 +33,8 @@ def run_internal_eval(
     loaded_eval_model, global_step = utils.create_or_load_model(
         eval_model.model, model_dir, eval_sess, "eval")
 
-  dev_src_file = "%s.%s" % (hparams.dev_prefix, hparams.src)
-  dev_tgt_file = "%s.%s" % (hparams.dev_prefix, hparams.tgt)
+  dev_src_file = "%s.%s" % (hparams['dev_prefix'], hparams['src'])
+  dev_tgt_file = "%s.%s" % (hparams['dev_prefix'], hparams['tgt'])
   dev_eval_iterator_feed_dict = {
       eval_model.src_file_placeholder: dev_src_file,
       eval_model.tgt_file_placeholder: dev_tgt_file
@@ -44,9 +44,9 @@ def run_internal_eval(
                            eval_model.iterator, dev_eval_iterator_feed_dict,
                            summary_writer, "dev")
   test_ppl = None
-  if use_test_set and hparams.test_prefix:
-    test_src_file = "%s.%s" % (hparams.test_prefix, hparams.src)
-    test_tgt_file = "%s.%s" % (hparams.test_prefix, hparams.tgt)
+  if use_test_set and hparams['test_prefix']:
+    test_src_file = "%s.%s" % (hparams['test_prefix'], hparams['src'])
+    test_tgt_file = "%s.%s" % (hparams['test_prefix'], hparams['tgt'])
     test_eval_iterator_feed_dict = {
         eval_model.src_file_placeholder: test_src_file,
         eval_model.tgt_file_placeholder: test_tgt_file
@@ -65,11 +65,11 @@ def run_external_eval(infer_model, infer_sess, model_dir, hparams,
     loaded_infer_model, global_step = utils.create_or_load_model(
         infer_model.model, model_dir, infer_sess, "infer")
 
-  dev_src_file = "%s.%s" % (hparams.dev_prefix, hparams.src)
-  dev_tgt_file = "%s.%s" % (hparams.dev_prefix, hparams.tgt)
+  dev_src_file = "%s.%s" % (hparams['dev_prefix'], hparams['src'])
+  dev_tgt_file = "%s.%s" % (hparams['dev_prefix'], hparams['tgt'])
   dev_infer_iterator_feed_dict = {
       infer_model.src_placeholder: inference.load_data(dev_src_file),
-      infer_model.batch_size_placeholder: hparams.infer_batch_size,
+      infer_model.batch_size_placeholder: hparams['infer_batch_size'],
   }
   dev_scores = _external_eval(
       loaded_infer_model,
@@ -242,19 +242,20 @@ def before_train(loaded_train_model, train_model, train_sess, global_step,
 
 
 def train(hparams, scope=None, target_session=""):
+
   """Train a translation model."""
-  log_device_placement = hparams.log_device_placement
-  out_dir = hparams.out_dir
-  num_train_steps = hparams.num_train_steps
-  steps_per_stats = hparams.steps_per_stats
-  steps_per_external_eval = hparams.steps_per_external_eval
+  log_device_placement = hparams['log_device_placement']
+  out_dir = hparams['out_dir']
+  num_train_steps = hparams['num_train_steps']
+  steps_per_stats = hparams['steps_per_stats']
+  steps_per_external_eval = hparams['steps_per_external_eval']
   steps_per_eval = 10 * steps_per_stats
-  avg_ckpts = hparams.avg_ckpts
+  avg_ckpts = hparams['avg_ckpts']
 
   if not steps_per_external_eval:
     steps_per_external_eval = 5 * steps_per_eval
 
-  if not hparams.attention:
+  if not hparams['attention']:
     model_creator = nmt_model.Model
   else:  # Attention
     if (hparams.encoder_type == "gnmt" or
@@ -271,15 +272,15 @@ def train(hparams, scope=None, target_session=""):
   infer_model = utils.create_infer_model(model_creator, hparams, scope)
 
   # Preload data for sample decoding.
-  dev_src_file = "%s.%s" % (hparams.dev_prefix, hparams.src)
-  dev_tgt_file = "%s.%s" % (hparams.dev_prefix, hparams.tgt)
+  dev_src_file = "%s.%s" % (hparams['dev_prefix'], hparams['src'])
+  dev_tgt_file = "%s.%s" % (hparams['dev_prefix'], hparams['tgt'])
   print (dev_src_file)
   print (dev_tgt_file)
   sample_src_data = inference.load_data(dev_src_file)
   sample_tgt_data = inference.load_data(dev_tgt_file)
 
   summary_name = "train_log"
-  model_dir = hparams.out_dir
+  model_dir = hparams['out_dir']
 
   # Log and output files
   log_file = os.path.join(out_dir, "log_%d" % time.time())
@@ -289,8 +290,8 @@ def train(hparams, scope=None, target_session=""):
   # TensorFlow model
   config_proto = utils.get_config_proto(
       log_device_placement=log_device_placement,
-      num_intra_threads=hparams.num_intra_threads,
-      num_inter_threads=hparams.num_inter_threads)
+      num_intra_threads=hparams['num_intra_threads'],
+      num_inter_threads=hparams['num_inter_threads'])
   train_sess = tf.Session(
       target=target_session, config=config_proto, graph=train_model.graph)
   eval_sess = tf.Session(
@@ -326,10 +327,10 @@ def train(hparams, scope=None, target_session=""):
     start_time = time.time()
     try:
       step_result = loaded_train_model.train(train_sess)
-      hparams.epoch_step += 1
+      hparams['epoch_step'] += 1
     except tf.errors.OutOfRangeError:
       # Finished going through the training dataset.  Go to next epoch.
-      hparams.epoch_step = 0
+      hparams['epoch_step'] = 0
       utils.print_out(
           "# Finished an epoch, step %d. Perform external evaluation" %
           global_step)
@@ -490,15 +491,15 @@ def _sample_decode(model, global_step, sess, hparams, iterator, src_data,
 
   nmt_outputs, attention_summary = model.decode(sess)
 
-  if hparams.beam_width > 0:
+  if hparams['beam_width'] > 0:
     # get the top translation.
     nmt_outputs = nmt_outputs[0]
 
   translation = utils.get_translation(
       nmt_outputs,
       sent_id=0,
-      tgt_eos=hparams.eos,
-      subword_option=hparams.subword_option)
+      tgt_eos=hparams['eos'],
+      subword_option=hparams['subword_option'])
   utils.print_out("    src: %s" % src_data[decode_id])
   utils.print_out("    ref: %s" % tgt_data[decode_id])
   utils.print_out(b"    nmt: " + translation)
@@ -512,7 +513,7 @@ def _external_eval(model, global_step, sess, hparams, iterator,
                    iterator_feed_dict, tgt_file, label, summary_writer,
                    save_on_best, avg_ckpts=False):
   """External evaluation such as BLEU and ROUGE scores."""
-  out_dir = hparams.out_dir
+  out_dir = hparams['out_dir']
   decode = global_step > 0
 
   if avg_ckpts:
@@ -530,14 +531,14 @@ def _external_eval(model, global_step, sess, hparams, iterator,
       sess,
       output,
       ref_file=tgt_file,
-      metrics=hparams.metrics,
-      subword_option=hparams.subword_option,
-      beam_width=hparams.beam_width,
-      tgt_eos=hparams.eos,
+      metrics=hparams['metrics'],
+      subword_option=hparams['subword_option'],
+      beam_width=hparams['beam_width'],
+      tgt_eos=hparams['eos'],
       decode=decode)
   # Save on best metrics
   if decode:
-    for metric in hparams.metrics:
+    for metric in hparams['metrics']:
       if avg_ckpts:
         best_metric_label = "avg_best_" + metric
       else:
@@ -555,3 +556,15 @@ def _external_eval(model, global_step, sess, hparams, iterator,
             global_step=model.global_step)
     utils.save_hparams(out_dir, hparams)
   return scores
+
+if __name__ == "__main__": 
+
+  params = [(u'attention', u''), (u'attention_architecture', u'standard'), (u'avg_ckpts', False), (u'batch_size', 128), (u'beam_width', 0), (u'best_bleu', 0), (u'best_bleu_dir', u'/tmp/nmt_model/best_bleu'), (u'check_special_token', True), (u'colocate_gradients_with_ops', True), (u'decay_scheme', u''), (u'dev_prefix', u'/home/burak/Downloads/tur-eng/tst2012'), (u'dropout', 0.2), (u'embed_prefix', None), (u'encoder_type', u'uni'), (u'eos', u'</s>'), (u'epoch_step', 0), (u'forget_bias', 1.0), (u'infer_batch_size', 32), (u'init_op', u'uniform'), (u'init_weight', 0.1), (u'learning_rate', 1.0), (u'length_penalty_weight', 0.0), (u'log_device_placement', False), (u'max_gradient_norm', 5.0), (u'max_train', 0), (u'metrics', [u'bleu']), (u'num_buckets', 5), (u'num_decoder_layers', 2), (u'num_decoder_residual_layers', 0), (u'num_embeddings_partitions', 0), (u'num_encoder_layers', 2), (u'num_encoder_residual_layers', 0), (u'num_gpus', 1), (u'num_inter_threads', 0), (u'num_intra_threads', 0), (u'num_keep_ckpts', 5), (u'num_layers', 2), (u'num_train_steps', 12000), (u'num_translations_per_input', 1), (u'num_units', 128), (u'optimizer', u'sgd'), (u'out_dir', u'/tmp/nmt_model'), (u'output_attention', True), (u'override_loaded_hparams', False), (u'pass_hidden_state', True), (u'random_seed', None), (u'residual', False), (u'sampling_temperature', 0.0), (u'share_vocab', False), (u'sos', u'<s>'), (u'src', u'en'), (u'src_embed_file', u''), (u'src_max_len', 50), (u'src_max_len_infer', None), (u'src_vocab_file', u'/tmp/nmt_model/vocab.en'), (u'src_vocab_size', 24646), (u'steps_per_external_eval', None), (u'steps_per_stats', 100), (u'subword_option', u''), (u'test_prefix', u'/home/burak/Downloads/tur-eng/tst2013'), (u'tgt', u'tr'), (u'tgt_embed_file', u''), (u'tgt_max_len', 50), (u'tgt_max_len_infer', None), (u'tgt_vocab_file', u'/tmp/nmt_model/vocab.tr'), (u'tgt_vocab_size', 106604), (u'time_major', True), (u'train_prefix', u'/home/burak/Downloads/tur-eng/train'), (u'unit_type', u'lstm'), (u'vocab_prefix', u'/home/burak/Downloads/tur-eng/vocab'), (u'warmup_scheme', u't2t'), (u'warmup_steps', 0)] 
+  hparams = dict((k,v) for (k,v) in params)
+  train(hparams)
+
+
+
+
+
+  

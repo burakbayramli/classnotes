@@ -25,30 +25,30 @@ class BaseModel(object):
     self.src_vocab_table = source_vocab_table
     self.tgt_vocab_table = target_vocab_table
 
-    self.src_vocab_size = hparams.src_vocab_size
-    self.tgt_vocab_size = hparams.tgt_vocab_size
-    self.num_gpus = hparams.num_gpus
-    self.time_major = hparams.time_major
+    self.src_vocab_size = hparams['src_vocab_size']
+    self.tgt_vocab_size = hparams['tgt_vocab_size']
+    self.num_gpus = hparams['num_gpus']
+    self.time_major = hparams['time_major']
 
     self.single_cell_fn = None
     if extra_args:
       self.single_cell_fn = extra_args.single_cell_fn
 
-    self.num_encoder_layers = hparams.num_encoder_layers
-    self.num_decoder_layers = hparams.num_decoder_layers
+    self.num_encoder_layers = hparams['num_encoder_layers']
+    self.num_decoder_layers = hparams['num_decoder_layers']
     assert self.num_encoder_layers
     assert self.num_decoder_layers
 
     if hasattr(hparams, "num_residual_layers"):  # compatible common_test_utils
-      self.num_encoder_residual_layers = hparams.num_residual_layers
-      self.num_decoder_residual_layers = hparams.num_residual_layers
+      self.num_encoder_residual_layers = hparams['num_residual_layers']
+      self.num_decoder_residual_layers = hparams['num_residual_layers']
     else:
-      self.num_encoder_residual_layers = hparams.num_encoder_residual_layers
-      self.num_decoder_residual_layers = hparams.num_decoder_residual_layers
+      self.num_encoder_residual_layers = hparams['num_encoder_residual_layers']
+      self.num_decoder_residual_layers = hparams['num_decoder_residual_layers']
 
     # Initializer
     initializer = utils.get_initializer(
-        hparams.init_op, hparams.random_seed, hparams.init_weight)
+        hparams['init_op'], hparams['random_seed'], hparams['init_weight'])
     tf.get_variable_scope().set_initializer(initializer)
 
     # Embeddings
@@ -59,7 +59,7 @@ class BaseModel(object):
     with tf.variable_scope(scope or "build_network"):
       with tf.variable_scope("decoder/output_projection"):
         self.output_layer = layers_core.Dense(
-            hparams.tgt_vocab_size, use_bias=False, name="output_projection")
+            hparams['tgt_vocab_size'], use_bias=False, name="output_projection")
 
     ## Train graph
     res = self.build_graph(hparams, scope=scope)
@@ -87,27 +87,27 @@ class BaseModel(object):
     # Gradients and SGD update operation for training the model.
     # Arrage for the embedding vars to appear at the beginning.
     if self.mode == tf.contrib.learn.ModeKeys.TRAIN:
-      self.learning_rate = tf.constant(hparams.learning_rate)
+      self.learning_rate = tf.constant(hparams['learning_rate'])
       # warm-up
       self.learning_rate = self._get_learning_rate_warmup(hparams)
       # decay
       self.learning_rate = self._get_learning_rate_decay(hparams)
 
       # Optimizer
-      if hparams.optimizer == "sgd":
+      if hparams['optimizer'] == "sgd":
         opt = tf.train.GradientDescentOptimizer(self.learning_rate)
         tf.summary.scalar("lr", self.learning_rate)
-      elif hparams.optimizer == "adam":
+      elif hparams['optimizer'] == "adam":
         opt = tf.train.AdamOptimizer(self.learning_rate)
 
       # Gradients
       gradients = tf.gradients(
           self.train_loss,
           params,
-          colocate_gradients_with_ops=hparams.colocate_gradients_with_ops)
+          colocate_gradients_with_ops=hparams['colocate_gradients_with_ops'])
 
       clipped_grads, grad_norm_summary, grad_norm = utils.gradient_clip(
-          gradients, max_gradient_norm=hparams.max_gradient_norm)
+          gradients, max_gradient_norm=hparams['max_gradient_norm'])
       self.grad_norm = grad_norm
 
       self.update = opt.apply_gradients(
@@ -124,7 +124,7 @@ class BaseModel(object):
 
     # Saver
     self.saver = tf.train.Saver(
-        tf.global_variables(), max_to_keep=hparams.num_keep_ckpts)
+        tf.global_variables(), max_to_keep=hparams['num_keep_ckpts'])
 
     # Print trainable variables
     utils.print_out("# Trainable variables")
@@ -133,10 +133,10 @@ class BaseModel(object):
                                         param.op.device))
 
   def _get_learning_rate_warmup(self, hparams):
-    warmup_steps = hparams.warmup_steps
-    warmup_scheme = hparams.warmup_scheme
+    warmup_steps = hparams['warmup_steps']
+    warmup_scheme = hparams['warmup_scheme']
     utils.print_out("  learning_rate=%g, warmup_steps=%d, warmup_scheme=%s" %
-                    (hparams.learning_rate, warmup_steps, warmup_scheme))
+                    (hparams['learning_rate'], warmup_steps, warmup_scheme))
 
     if warmup_scheme == "t2t":
       warmup_factor = tf.exp(tf.log(0.01) / warmup_steps)
@@ -146,33 +146,33 @@ class BaseModel(object):
       raise ValueError("Unknown warmup scheme %s" % warmup_scheme)
 
     return tf.cond(
-        self.global_step < hparams.warmup_steps,
+        self.global_step < hparams['warmup_steps'],
         lambda: inv_decay * self.learning_rate,
         lambda: self.learning_rate,
         name="learning_rate_warump_cond")
 
   def _get_learning_rate_decay(self, hparams):
-    if hparams.decay_scheme in ["luong5", "luong10", "luong234"]:
+    if hparams['decay_scheme'] in ["luong5", "luong10", "luong234"]:
       decay_factor = 0.5
-      if hparams.decay_scheme == "luong5":
-        start_decay_step = int(hparams.num_train_steps / 2)
+      if hparams['decay_scheme'] == "luong5":
+        start_decay_step = int(hparams['num_train_steps'] / 2)
         decay_times = 5
-      elif hparams.decay_scheme == "luong10":
-        start_decay_step = int(hparams.num_train_steps / 2)
+      elif hparams['decay_scheme'] == "luong10":
+        start_decay_step = int(hparams['num_train_steps'] / 2)
         decay_times = 10
-      elif hparams.decay_scheme == "luong234":
-        start_decay_step = int(hparams.num_train_steps * 2 / 3)
+      elif hparams['decay_scheme'] == "luong234":
+        start_decay_step = int(hparams['num_train_steps'] * 2 / 3)
         decay_times = 4
-      remain_steps = hparams.num_train_steps - start_decay_step
+      remain_steps = hparams['num_train_steps'] - start_decay_step
       decay_steps = int(remain_steps / decay_times)
-    elif not hparams.decay_scheme:  # no decay
-      start_decay_step = hparams.num_train_steps
+    elif not hparams['decay_scheme']:  # no decay
+      start_decay_step = hparams['num_train_steps']
       decay_steps = 0
       decay_factor = 1.0
-    elif hparams.decay_scheme:
-      raise ValueError("Unknown decay scheme %s" % hparams.decay_scheme)
+    elif hparams['decay_scheme']:
+      raise ValueError("Unknown decay scheme %s" % hparams['decay_scheme'])
     utils.print_out("  decay_scheme=%s, start_decay_step=%d, decay_steps %d, "
-                    "decay_factor %g" % (hparams.decay_scheme,
+                    "decay_factor %g" % (hparams['decay_scheme'],
                                          start_decay_step,
                                          decay_steps,
                                          decay_factor))
@@ -190,16 +190,16 @@ class BaseModel(object):
     """Init embeddings."""
     self.embedding_encoder, self.embedding_decoder = (
         utils.create_emb_for_encoder_and_decoder(
-            share_vocab=hparams.share_vocab,
+            share_vocab=hparams['share_vocab'],
             src_vocab_size=self.src_vocab_size,
             tgt_vocab_size=self.tgt_vocab_size,
-            src_embed_size=hparams.num_units,
-            tgt_embed_size=hparams.num_units,
-            num_partitions=hparams.num_embeddings_partitions,
-            src_vocab_file=hparams.src_vocab_file,
-            tgt_vocab_file=hparams.tgt_vocab_file,
-            src_embed_file=hparams.src_embed_file,
-            tgt_embed_file=hparams.tgt_embed_file,
+            src_embed_size=hparams['num_units'],
+            tgt_embed_size=hparams['num_units'],
+            num_partitions=hparams['num_embeddings_partitions'],
+            src_vocab_file=hparams['src_vocab_file'],
+            tgt_vocab_file=hparams['tgt_vocab_file'],
+            src_embed_file=hparams['src_embed_file'],
+            tgt_embed_file=hparams['tgt_embed_file'],
             scope=scope,))
 
   def train(self, sess):
@@ -249,21 +249,21 @@ class BaseModel(object):
   def _build_encoder_cell(self, hparams, num_layers, num_residual_layers,
                           base_gpu=0):
     return utils.create_rnn_cell(
-        unit_type=hparams.unit_type,
-        num_units=hparams.num_units,
+        unit_type=hparams['unit_type'],
+        num_units=hparams['num_units'],
         num_layers=num_layers,
         num_residual_layers=num_residual_layers,
-        forget_bias=hparams.forget_bias,
-        dropout=hparams.dropout,
-        num_gpus=hparams.num_gpus,
+        forget_bias=hparams['forget_bias'],
+        dropout=hparams['dropout'],
+        num_gpus=hparams['num_gpus'],
         mode=self.mode,
         base_gpu=base_gpu,
         single_cell_fn=self.single_cell_fn)
 
   def _get_infer_maximum_iterations(self, hparams, source_sequence_length):
 
-    if hparams.tgt_max_len_infer:
-      maximum_iterations = hparams.tgt_max_len_infer
+    if hparams['tgt_max_len_infer']:
+      maximum_iterations = hparams['tgt_max_len_infer']
       utils.print_out("  decoding maximum_iterations %d" % maximum_iterations)
     else:
       # TODO(thangluong): add decoding_length_factor flag
@@ -275,9 +275,9 @@ class BaseModel(object):
 
   def _build_decoder(self, encoder_outputs, encoder_state, hparams):
 
-    tgt_sos_id = tf.cast(self.tgt_vocab_table.lookup(tf.constant(hparams.sos)),
+    tgt_sos_id = tf.cast(self.tgt_vocab_table.lookup(tf.constant(hparams['sos'])),
                          tf.int32)
-    tgt_eos_id = tf.cast(self.tgt_vocab_table.lookup(tf.constant(hparams.eos)),
+    tgt_eos_id = tf.cast(self.tgt_vocab_table.lookup(tf.constant(hparams['eos'])),
                          tf.int32)
     iterator = self.iterator
 
@@ -324,8 +324,8 @@ class BaseModel(object):
 
       ## Inference
       else:
-        beam_width = hparams.beam_width
-        length_penalty_weight = hparams.length_penalty_weight
+        beam_width = hparams['beam_width']
+        length_penalty_weight = hparams['length_penalty_weight']
         start_tokens = tf.fill([self.batch_size], tgt_sos_id)
         end_token = tgt_eos_id
 
@@ -341,12 +341,12 @@ class BaseModel(object):
               length_penalty_weight=length_penalty_weight)
         else:
           # Helper
-          sampling_temperature = hparams.sampling_temperature
+          sampling_temperature = hparams['sampling_temperature']
           if sampling_temperature > 0.0:
             helper = tf.contrib.seq2seq.SampleEmbeddingHelper(
                 self.embedding_decoder, start_tokens, end_token,
                 softmax_temperature=sampling_temperature,
-                seed=hparams.random_seed)
+                seed=hparams['random_seed'])
           else:
             helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(
                 self.embedding_decoder, start_tokens, end_token)
@@ -442,7 +442,7 @@ class Model(BaseModel):
           self.embedding_encoder, source)
 
       # Encoder_outputs: [max_time, batch_size, num_units]
-      if hparams.encoder_type == "uni":
+      if hparams['encoder_type'] == "uni":
         utils.print_out("  num_layers = %d, num_residual_layers=%d" %
                         (num_layers, num_residual_layers))
         cell = self._build_encoder_cell(
@@ -455,7 +455,7 @@ class Model(BaseModel):
             sequence_length=iterator.source_sequence_length,
             time_major=self.time_major,
             swap_memory=True)
-      elif hparams.encoder_type == "bi":
+      elif hparams['encoder_type'] == "bi":
         num_bi_layers = int(num_layers / 2)
         num_bi_residual_layers = int(num_residual_layers / 2)
         utils.print_out("  num_bi_layers = %d, num_bi_residual_layers=%d" %
@@ -480,7 +480,7 @@ class Model(BaseModel):
             encoder_state.append(bi_encoder_state[1][layer_id])  # backward
           encoder_state = tuple(encoder_state)
       else:
-        raise ValueError("Unknown encoder_type %s" % hparams.encoder_type)
+        raise ValueError("Unknown encoder_type %s" % hparams['encoder_type'])
     return encoder_outputs, encoder_state
 
   def _build_bidirectional_rnn(self, inputs, sequence_length,
@@ -513,23 +513,23 @@ class Model(BaseModel):
                           source_sequence_length):
 
     # We only make use of encoder_outputs in attention-based models
-    if hparams.attention:
+    if hparams['attention']:
       raise ValueError("BasicModel doesn't support attention.")
 
     cell = utils.create_rnn_cell(
-        unit_type=hparams.unit_type,
-        num_units=hparams.num_units,
+        unit_type=hparams['unit_type'],
+        num_units=hparams['num_units'],
         num_layers=self.num_decoder_layers,
         num_residual_layers=self.num_decoder_residual_layers,
-        forget_bias=hparams.forget_bias,
-        dropout=hparams.dropout,
+        forget_bias=hparams['forget_bias'],
+        dropout=hparams['dropout'],
         num_gpus=self.num_gpus,
         mode=self.mode,
         single_cell_fn=self.single_cell_fn)
 
-    if self.mode == tf.contrib.learn.ModeKeys.INFER and hparams.beam_width > 0:
+    if self.mode == tf.contrib.learn.ModeKeys.INFER and hparams['beam_width'] > 0:
       decoder_initial_state = tf.contrib.seq2seq.tile_batch(
-          encoder_state, multiplier=hparams.beam_width)
+          encoder_state, multiplier=hparams['beam_width'])
     else:
       decoder_initial_state = encoder_state
 
