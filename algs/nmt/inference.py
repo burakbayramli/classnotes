@@ -49,7 +49,7 @@ def load_data(inference_input_file, hparams=None):
       tf.gfile.GFile(inference_input_file, mode="rb")) as f:
     inference_data = f.read().splitlines()
 
-  if hparams and hparams.inference_indices:
+  if hparams and hparams['inference_indices']:
     inference_data = [inference_data[i] for i in hparams.inference_indices]
 
   return inference_data
@@ -103,7 +103,7 @@ def single_worker_inference(infer_model,
         infer_model.iterator.initializer,
         feed_dict={
             infer_model.src_placeholder: infer_data,
-            infer_model.batch_size_placeholder: hparams.infer_batch_size
+            infer_model.batch_size_placeholder: hparams['infer_batch_size']
         })
     # Decode
     utils.print_out("# Start decoding")
@@ -161,7 +161,7 @@ def multi_worker_inference(infer_model,
     sess.run(infer_model.iterator.initializer,
              {
                  infer_model.src_placeholder: infer_data,
-                 infer_model.batch_size_placeholder: hparams.infer_batch_size
+                 infer_model.batch_size_placeholder: hparams['infer_batch_size']
              })
     # Decode
     utils.print_out("# Start decoding")

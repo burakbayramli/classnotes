@@ -85,12 +85,12 @@ def run_external_eval(infer_model, infer_sess, model_dir, hparams,
       avg_ckpts=avg_ckpts)
 
   test_scores = None
-  if use_test_set and hparams.test_prefix:
-    test_src_file = "%s.%s" % (hparams.test_prefix, hparams.src)
-    test_tgt_file = "%s.%s" % (hparams.test_prefix, hparams.tgt)
+  if use_test_set and hparams['test_prefix']:
+    test_src_file = "%s.%s" % (hparams['test_prefix'], hparams['src'])
+    test_tgt_file = "%s.%s" % (hparams['test_prefix'], hparams['tgt'])
     test_infer_iterator_feed_dict = {
         infer_model.src_placeholder: inference.load_data(test_src_file),
-        infer_model.batch_size_placeholder: hparams.infer_batch_size,
+        infer_model.batch_size_placeholder: hparams['infer_batch_size'],
     }
     test_scores = _external_eval(
         loaded_infer_model,
@@ -111,11 +111,11 @@ def run_avg_external_eval(infer_model, infer_sess, model_dir, hparams,
                           summary_writer, global_step):
   """Creates an averaged checkpoint and run external eval with it."""
   avg_dev_scores, avg_test_scores = None, None
-  if hparams.avg_ckpts:
+  if hparams['avg_ckpts']:
     # Convert VariableName:0 to VariableName.
     global_step_name = infer_model.model.global_step.name.split(":")[0]
     avg_model_dir = utils.avg_checkpoints(
-        model_dir, hparams.num_keep_ckpts, global_step, global_step_name)
+        model_dir, hparams['num_keep_ckpts'], global_step, global_step_name)
 
     if avg_model_dir:
       avg_dev_scores, avg_test_scores, _ = run_external_eval(
@@ -155,16 +155,16 @@ def run_full_eval(model_dir, infer_model, infer_sess, eval_model, eval_sess,
     metrics["avg_dev_scores"] = avg_dev_scores
     metrics["avg_test_scores"] = avg_test_scores
 
-  result_summary = _format_results("dev", dev_ppl, dev_scores, hparams.metrics)
+  result_summary = _format_results("dev", dev_ppl, dev_scores, hparams['metrics'])
   if avg_dev_scores:
     result_summary += ", " + _format_results("avg_dev", None, avg_dev_scores,
-                                             hparams.metrics)
-  if hparams.test_prefix:
+                                             hparams['metrics'])
+  if hparams['test_prefix']:
     result_summary += ", " + _format_results("test", test_ppl, test_scores,
-                                             hparams.metrics)
+                                             hparams['metrics'])
     if avg_test_scores:
       result_summary += ", " + _format_results("avg_test", None,
-                                               avg_test_scores, hparams.metrics)
+                                               avg_test_scores, hparams['metrics'])
 
   return result_summary, global_step, metrics
 
@@ -232,7 +232,7 @@ def before_train(loaded_train_model, train_model, train_sess, global_step,
                   (global_step, info["learning_rate"], time.ctime()), log_f)
 
   # Initialize all of the iterators
-  skip_count = hparams.batch_size * hparams.epoch_step
+  skip_count = hparams['batch_size'] * hparams['epoch_step']
   utils.print_out("# Init train iterator, skipping %d elements" % skip_count)
   train_sess.run(
       train_model.iterator.initializer,
@@ -410,7 +410,7 @@ def train(hparams, scope=None, target_session=""):
   summary_writer.close()
 
   utils.print_out("# Start evaluating saved best models.")
-  for metric in hparams.metrics:
+  for metric in hparams['metrics']:
     best_model_dir = getattr(hparams, "best_" + metric + "_dir")
     summary_writer = tf.summary.FileWriter(
         os.path.join(best_model_dir, summary_name), infer_model.graph)
@@ -452,7 +452,7 @@ def _format_results(name, ppl, scores, metrics):
 def _get_best_results(hparams):
   """Summary of the current best results."""
   tokens = []
-  for metric in hparams.metrics:
+  for metric in hparams['metrics']:
     tokens.append("%s %.2f" % (metric, getattr(hparams, "best_" + metric)))
   return ", ".join(tokens)
 
