@@ -181,11 +181,11 @@ def update_stats(stats, start_time, step_result):
    step_word_count, batch_size, grad_norm, learning_rate) = step_result
 
   # Update statistics
-  stats["step_time"] += (time.time() - start_time)
-  stats["loss"] += (step_loss * batch_size)
-  stats["predict_count"] += step_predict_count
-  stats["total_count"] += float(step_word_count)
-  stats["grad_norm"] += grad_norm
+  stats["step_time"] = stats["step_time"] + (time.time() - start_time)
+  stats["loss"] = stats["loss"] + (step_loss * batch_size)
+  stats["predict_count"] = stats["predict_count"] + step_predict_count
+  stats["total_count"] = stats["total_count"] + float(step_word_count)
+  stats["grad_norm"] = stats["grad_norm"] + grad_norm
 
   return global_step, learning_rate, step_summary
 
@@ -317,7 +317,7 @@ def train(hparams, scope=None, target_session=""):
     start_time = time.time()
     try:
       step_result = loaded_train_model.train(train_sess)
-      hparams['epoch_step'] += 1
+      hparams['epoch_step'] = hparams['epoch_step'] + 1
     except tf.errors.OutOfRangeError:
       # Finished going through the training dataset.  Go to next epoch.
       hparams['epoch_step'] = 0
@@ -572,12 +572,12 @@ if __name__ == "__main__":
             (u'residual', False), (u'sampling_temperature', 0.0), \
             (u'share_vocab', False), (u'sos', u'<s>'), (u'src', u'en'), \
             (u'src_embed_file', u''), (u'src_max_len', 50), \
-            (u'src_max_len_infer', None), (u'src_vocab_file', u'/tmp/nmt_model/vocab.en'), \
+            (u'src_max_len_infer', None), (u'src_vocab_file', u'/home/burak/Downloads/tur-eng/vocab.en'), \
             (u'src_vocab_size', 24646), (u'steps_per_external_eval', None), \
             (u'steps_per_stats', 100), (u'subword_option', u''), \
             (u'test_prefix', u'/home/burak/Downloads/tur-eng/tst2013'), \
             (u'tgt', u'tr'), (u'tgt_embed_file', u''), (u'tgt_max_len', 50), \
-            (u'tgt_max_len_infer', None), (u'tgt_vocab_file', u'/tmp/nmt_model/vocab.tr'), \
+            (u'tgt_max_len_infer', None), (u'tgt_vocab_file', u'/home/burak/Downloads/tur-eng/vocab.tr'), \
             (u'tgt_vocab_size', 106604), (u'time_major', True), \
             (u'train_prefix', u'/home/burak/Downloads/tur-eng/train'), \
             (u'unit_type', u'lstm'), (u'vocab_prefix', u'/home/burak/Downloads/tur-eng/vocab'), \

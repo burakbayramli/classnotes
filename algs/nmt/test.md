@@ -34,7 +34,8 @@ params = [(u'attention', u''), (u'attention_architecture', u'standard'), \
           (u'tgt_vocab_size', 106604), (u'time_major', True), \
           (u'train_prefix', u'/home/burak/Downloads/tur-eng/train'), \
           (u'unit_type', u'lstm'), (u'vocab_prefix', u'/home/burak/Downloads/tur-eng/vocab'), \
-          (u'warmup_scheme', u't2t'), (u'warmup_steps', 0)] 
+          (u'warmup_scheme', u't2t'), (u'warmup_steps', 0)]
+	  
 hparams = dict((k,v) for (k,v) in params)
   
 model_creator = model.Model
