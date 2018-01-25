@@ -535,14 +535,6 @@ def _external_eval(model, global_step, sess, hparams, iterator,
 
       utils.add_summary(summary_writer, global_step, "%s_%s" % (label, metric),
                         scores[metric])
-      # metric: larger is better
-      if save_on_best and scores[metric] > hparams['best_bleu']:
-        hparams['best_bleu'] = scores[metric]
-        model.saver.save(
-            sess,
-            os.path.join(
-                getattr(hparams, best_metric_label + "_dir"), "translate.ckpt"),
-            global_step=model.global_step)
     utils.save_hparams(out_dir, hparams)
   return scores
 

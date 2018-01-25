@@ -267,10 +267,7 @@ def maybe_parse_standard_hparams(hparams, hparams_path):
 
 def save_hparams(out_dir, hparams):
   """Save hparams."""
-  hparams_file = os.path.join(out_dir, "hparams")
-  print_out("  saving hparams to %s" % hparams_file)
-  with codecs.getwriter("utf-8")(tf.gfile.GFile(hparams_file, "wb")) as f:
-    f.write(hparams.to_json())
+  pass
 
 
 def debug_tensor(s, msg=None, summarize=10):
