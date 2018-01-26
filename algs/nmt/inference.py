@@ -4,7 +4,9 @@ from __future__ import print_function
 import codecs
 import time
 import tensorflow as tf
+import attention_model
 import model as nmt_model
+import model_helper
 import utils
 
 def _decode_inference_indices(model, sess, output_infer,
@@ -49,7 +51,7 @@ def load_data(inference_input_file, hparams=None):
       tf.gfile.GFile(inference_input_file, mode="rb")) as f:
     inference_data = f.read().splitlines()
 
-  if hparams and hparams['inference_indices']:
+  if hparams and hparams.inference_indices:
     inference_data = [inference_data[i] for i in hparams.inference_indices]
 
   return inference_data
@@ -63,8 +65,15 @@ def inference(ckpt,
               jobid=0,
               scope=None):
   """Perform translation."""
-  model_creator = attention_model.AttentionModel
-  infer_model = utils.create_infer_model(model_creator, hparams, scope)
+  if hparams.inference_indices:
+    assert num_workers == 1
+  if not hparams.attention:
+    model_creator = nmt_model.Model
+  elif hparams.attention_architecture == "standard":
+    model_creator = attention_model.AttentionModel
+  else:
+    raise ValueError("Unknown model architecture")
+  infer_model = model_helper.create_infer_model(model_creator, hparams, scope)
 
   if num_workers == 1:
     single_worker_inference(
@@ -97,13 +106,13 @@ def single_worker_inference(infer_model,
 
   with tf.Session(
       graph=infer_model.graph, config=utils.get_config_proto()) as sess:
-    loaded_infer_model = utils.load_model(
+    loaded_infer_model = model_helper.load_model(
         infer_model.model, ckpt, sess, "infer")
     sess.run(
         infer_model.iterator.initializer,
         feed_dict={
             infer_model.src_placeholder: infer_data,
-            infer_model.batch_size_placeholder: hparams['infer_batch_size']
+            infer_model.batch_size_placeholder: hparams.infer_batch_size
         })
     # Decode
     utils.print_out("# Start decoding")
@@ -156,12 +165,12 @@ def multi_worker_inference(infer_model,
 
   with tf.Session(
       graph=infer_model.graph, config=utils.get_config_proto()) as sess:
-    loaded_infer_model = utils.load_model(
+    loaded_infer_model = model_helper.load_model(
         infer_model.model, ckpt, sess, "infer")
     sess.run(infer_model.iterator.initializer,
              {
                  infer_model.src_placeholder: infer_data,
-                 infer_model.batch_size_placeholder: hparams['infer_batch_size']
+                 infer_model.batch_size_placeholder: hparams.infer_batch_size
              })
     # Decode
     utils.print_out("# Start decoding")

@@ -525,6 +525,9 @@ def create_or_load_hparams(
 
 def run_main(flags, default_hparams, train_fn, inference_fn, target_session=""):
   """Run main."""
+
+  print (default_hparams)
+
   # Job
   jobid = flags.jobid
   num_workers = flags.num_workers
@@ -579,6 +582,7 @@ def main(unused_argv):
   default_hparams = create_hparams(FLAGS)
   train_fn = train.train
   inference_fn = inference.inference
+  print (FLAGS)
   run_main(FLAGS, default_hparams, train_fn, inference_fn)
 
 
