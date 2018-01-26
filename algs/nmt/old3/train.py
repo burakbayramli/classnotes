@@ -605,7 +605,7 @@ if __name__ == "__main__":
     num_embeddings_partitions=0,
     num_encoder_layers=2,
     num_encoder_residual_layers=0,
-    num_gpus=1,
+    num_gpus=0,
     num_inter_threads=0,
     num_intra_threads=0,
     num_keep_ckpts=5,
