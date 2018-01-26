@@ -53,7 +53,8 @@ print (dev_src_file)
 print (dev_tgt_file)
 sample_src_data = inference.load_data(dev_src_file)
 sample_tgt_data = inference.load_data(dev_tgt_file)
-
+print 'sample_src_data', sample_src_data[:3]
+print 'sample_tgt_data', sample_tgt_data[:3]
 summary_name = "train_log"
 model_dir = hparams.out_dir
 
@@ -73,8 +74,17 @@ infer_sess = tf.Session(target='', config=config_proto, graph=infer_model.graph)
 ```text
 /home/burak/Downloads/tur-eng/tst2012.en
 /home/burak/Downloads/tur-eng/tst2012.tr
-# log_file=/tmp/nmt_model/log_1516967447
+sample_src_data [u'"Would you like to go with me ?" "You bet !"', u'A baseball came flying through the window .', u'A belt keeps your pants from falling down .']
+sample_tgt_data [u'"Benimle gitmek ister misin ?" "Kesinlikle !"', u'Bir beyzbol topu pencereden u\xe7arak geldi .', u'Kemer pantolonunun d\xfc\u015fmesini \xf6nler .']
+# log_file=/tmp/nmt_model/log_1516968063
 ```
+
+```python
+my_src = ['I was walking with my friend outside']
+my_tgt = ['Disarida arkadasimla yuruyordum']
+```
+
+
 
 ```python
 import train, inference
@@ -90,7 +100,8 @@ sample_tgt_data = inference.load_data(dev_tgt_file)
 summary_writer = tf.summary.FileWriter("/tmp/out", infer_model.graph)
 
 train._sample_decode(loaded_infer_model, global_step, infer_sess, hparams,
-                     infer_model.iterator, sample_src_data, sample_tgt_data,
+#                     infer_model.iterator, sample_src_data, sample_tgt_data,
+                     infer_model.iterator, my_src, my_tgt,
                      infer_model.src_placeholder,
                      infer_model.batch_size_placeholder, summary_writer)	
 ```
