@@ -76,7 +76,7 @@ infer_sess = tf.Session(target='', config=config_proto, graph=infer_model.graph)
 /home/burak/Downloads/tur-eng/tst2012.tr
 sample_src_data [u'"Would you like to go with me ?" "You bet !"', u'A baseball came flying through the window .', u'A belt keeps your pants from falling down .']
 sample_tgt_data [u'"Benimle gitmek ister misin ?" "Kesinlikle !"', u'Bir beyzbol topu pencereden u\xe7arak geldi .', u'Kemer pantolonunun d\xfc\u015fmesini \xf6nler .']
-# log_file=/tmp/nmt_model/log_1516968063
+# log_file=/tmp/nmt_model/log_1517060367
 ```
 
 ```python
@@ -89,7 +89,7 @@ my_tgt = ['Disarida arkadasimla yuruyordum']
 ```python
 import train, inference
 
-model_dir = "/tmp/nmt_model/translate.ckpt-4000"
+model_dir = "/tmp/nmt_model/translate.ckpt-11000"
 with infer_model.graph.as_default():
     loaded_infer_model, global_step = model_helper.create_or_load_model(
         infer_model.model, model_dir, infer_sess, "infer")

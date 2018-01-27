@@ -1,15 +1,13 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import tensorflow as tf
-import inference, os, time
-import model, model_helper
-import utils
 
+import utils
 hparams = utils.load_hparams('/tmp/nmt_model')
 
+import model, model_helper
 model_creator = model.Model
 infer_model = model_helper.create_infer_model(model_creator, hparams)
+
+import tensorflow as tf
+import inference, os, time
 
 log_device_placement = hparams.log_device_placement
 out_dir = hparams.out_dir
@@ -46,7 +44,7 @@ my_tgt = ['Disarida arkadasimla yuruyordum']
 
 import train, inference
 
-model_dir = "/tmp/nmt_model/translate.ckpt-4000"
+model_dir = "/tmp/nmt_model/translate.ckpt-12000"
 with infer_model.graph.as_default():
     loaded_infer_model, global_step = model_helper.create_or_load_model(
         infer_model.model, model_dir, infer_sess, "infer")
@@ -61,12 +59,3 @@ train._sample_decode(loaded_infer_model, global_step, infer_sess, hparams,
                      infer_model.iterator, my_src, my_tgt,
                      infer_model.src_placeholder,
                      infer_model.batch_size_placeholder, summary_writer)	
-
-
-
-
-
-
-
-
-
