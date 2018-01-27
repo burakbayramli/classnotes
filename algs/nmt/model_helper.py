@@ -469,6 +469,7 @@ def gradient_clip(gradients, max_gradient_norm):
 
 
 def load_model(model, ckpt, session, name):
+  print ('model helper load model...')
   start_time = time.time()
   model.saver.restore(session, ckpt)
   session.run(tf.tables_initializer())
