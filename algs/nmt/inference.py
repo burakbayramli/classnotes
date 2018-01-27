@@ -126,6 +126,7 @@ def single_worker_inference(infer_model,
           tgt_eos=hparams.eos,
           subword_option=hparams.subword_option)
     else:
+      print ('no inf ind, decode')
       utils.decode_and_evaluate(
           "infer",
           loaded_infer_model,
