@@ -56,8 +56,3 @@ elif sys.argv[1] == 'tex':
     file = glob.glob('*.tex')
     os.system("pdflatex -shell-escape %s" % file[0])
         
-elif sys.argv[1] == 'dict':
-    os.system("pdflatex -shell-escape dict1.tex")
-    os.system("pdflatex -shell-escape dict2.tex")
-    os.system("pdflatex -shell-escape dict3.tex")
-    os.system("pdflatex -shell-escape dict4.tex")
