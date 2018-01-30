@@ -50,17 +50,17 @@ $n$: Tüm oyunlar (tüm makinelerde kaç kere oynandýðý)
 Ve stratejimiz her adýmda üst sýnýrý en yüksek olan makinayý
 oynamaktýr. Bunu yaptýkça o makinanýn gözlenen ortalamasý kazanca / kayýba
 göre kayacak, ve güven aralýðý ufalacak (elimizde daha fazla veri var
-çünkü, daha fazla veri daha fazla kesinlik demek), ve diðer makýnlarýn
+çünkü, daha fazla veri daha fazla kesinlik demek), ve diðer makinalarýn
 aralýðý geniþleyecek. Bir noktada baþka bir makinanýn üst sýnýrý o anda
-oynadýðýmýzý geçecek, o zaman biz bu öteki makinaya geçeceðiz. Bu
-strateji optimal olarak islemektedir. 
+oynadýðýmýzý geçecek, o zaman biz bu öteki makinaya geçeceðiz. Uzun vadede
+bu strateji optimal olarak sonuç vermektedir.
 
 Türetmek için notasyonu biraz deðiþtirelim [3], $a$ bir aksiyon (ya da
 makina seçimi), $Q(a) = E(r|a)$, bir aksiyon için ortalama getiri, $U_t(a)$
 adým $t$'de bir aksiyonun üst sýnýrý, $\hat{Q}, \hat{U}$ kestirme deðerler,
 $N(a)$ bir aksiyonun kaç kez seçildiði. Hem $\hat{U}$ kestirme deðerini
 sürekli hesaplayacaðýz, hem de güven aralýðýný maksimize eden aksiyonu
-seçeceðiz.
+seçeceðiz, yani.
 
 $$ a_t = \argmax_{a \in A} \hat{Q}_t(a) + \hat{U}_t(a) $$
 
@@ -75,13 +75,65 @@ olsunlar, ve $\overline{X}_t = \frac{1}{\tau} \sum_{\tau=1}^{t} X_\tau$
 
 $$ P(E(X) > \overline{X}_t + u ) \le e^{-2 t u^2}$$
 
-olduðunu biliyoruz. Bunu soyguncu problemindeki getiri rasgele deðiþkenleri
-için uyarlarsak, 
+olduðunu biliyoruz, soyguncu problemindeki getiri rasgele deðiþkenleri için
+uyarlarsak,
 
-$$ P \big( Q(a) > \hat{Q}_t(a) + U_t(a)  \big)$$
+$$ 
+P \big( Q(a) > \hat{Q}_t(a) + U_t(a)  \big) \le 
+e^{-2 N_t(a)U_t(a)^2 }
+$$
 
+Ýstediðimiz þartlarýn oluþmasý için üstteki formülün doðruluðu yeterli,
+þimdi bu formülü baz alarak bir $U_t(a)$ hesaplayabiliriz, formülü $U_t(a)$
+tek baþýna kalacak þekilde tekrar düzenleyebiliriz. Eþitliðin sol tarafýna
+$p$ diyelim, burada sanki istenilen bir güven aralýk büyüklüðünü baz almýþ
+oluyoruz, 95\% (yani 0.95) gibi, ama burada sembolik bir deðer kulladýk,
+ilk amacýmýz $u$ deðerine eriþmek,
 
+$$ e^{-2 N_t(a)U_t(a)^2 } = p $$ 
 
+$$ \ln p = -2 N_t(a)U_t(a)^2 $$
+
+$$ \frac{-\ln p}{2 N_t(a)} = U_t(a)^2 $$
+
+$$ U_t(a) = \sqrt{\frac{-\ln p}{2 N_t(a)}} $$
+
+$t$ büyüdükçe $p$ azalsýn istiyoruz, o zaman $p = t^{-4}$ seçebiliriz, bu
+spesifik deðer formülü de basitleþtirmek için seçildi bir yandan,
+
+$$ U_t(a) = \sqrt{\frac{\log t}{N_t(a)}} $$
+
+Böylece UCB1 algoritmasýna eriþmiþ olduk, 
+
+$$ 
+a_t = \argmax_{a \in A} Q(a) + \sqrt{\frac{\log t}{N_t(a)}}
+$$
+
+UCT ve Tic-Tac-Toe
+
+\inputminted[fontsize=\footnotesize]{python}{tictac_uct.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tictac_uct
+board_state = ((1, 0, 0),
+               (0, -1, 0),
+               (1, -1, -1))
+
+print(tictac_uct.monte_carlo_tree_search_uct(board_state, 1, 10000))
+
+b = np.array(board_state)
+b[1,0] = 1.0
+print b
+\end{minted}
+
+\begin{verbatim}
+(1.0, (1, 0))
+[[ 1  0  0]
+ [ 1 -1  0]
+ [ 1 -1 -1]]
+\end{verbatim}
+
+[devam edecek]
 
 Kaynaklar
 
@@ -91,5 +143,6 @@ Kaynaklar
 
 [3] Silver, {\em Reinforcement Learning}, \url{http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html}
 
+[4] Zocca, {\em Python Deep Learning}
 
 \end{document}
