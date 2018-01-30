@@ -11,34 +11,85 @@ kötü bizim için en iyi olacak þekilde bir arama ile optimal oyun
 hamlelerini buluyordu. 
 
 Fakat minimaksýn bir problemi þudur: birkaç hamle sonrasýna bakmak için tüm
-mümkün hamlelere göre kurulan aðaç müthiþ büyük olabilir. Özellikle Gö
+mümkün hamlelere göre kurulan aðaç müthiþ büyük olabilir. Özellikle Go
 oyunu [1] gibi dallanma faktörü çok büyük olan oyunlarda minimaks zorluk
 yaþayabiliyor. Bu gibi durumlarda MCTS yaklaþýmýnýn daha baþarýlý olduðu
-bulunmuþtur. Þimdi MCTS'i anlatalým, özelde UCT adý verilen üst güven
-aralýðýnýn aðaçlara uygulanmasý (upper-confidence applied to trees) adlý
-çeþidini gösterelim.
+bulunmuþtur. 
+
+Þimdi MCTS'i anlatalým, özelde UCT adý verilen üst güven aralýðýnýn
+aðaçlara uygulanmasý (upper-confidence applied to trees) adlý çeþidini
+gösterelim. Bunun için tabii önce UCT'yi ve onun baz çeþidi UCB1'i anlamak
+lazým.
 
 Kumarhanelerdeki o kollu oyun makinalarýný düþünelim, oyuncunun önünde
-bunlardan birkaç tane var, ve bu makinalardan her birinin farklý bir getiri
-daðýlýmý var. Tek kollu makinalara ``tek kollu soyguncu (öne-armed
-bandit)'' denilir, bilgisayarcýlar üstteki üstteki probleme ``çok kollu
-soyguncu (multi-armed bandit)'' ismi veriyorlar. Biraz esprili bir þekilde
-bu makinalarý çok kollu bir ahtapotun hayal ediliyor bazen, ki ahtapot
-akýllý, yani oyunu optimal oynayacak bilgisayar programý.
+bunlardan birkaç tane olsun, ve bu makinalardan her birinin farklý ve
+bilinmeyen bir getiri daðýlýmý var. Tek kollu makinalara argoda ``tek kollu
+soyguncu (one-armed bandit)'' de denilir, bilgisayarcýlar üstteki üstteki
+probleme ``çok kollu soyguncu (multi-armed bandit)'' ismi veriyorlar. Biraz
+esprili bir þekilde bu makinalarý çok kollu bir ahtapotun hayal ediliyor
+bazen, ki ahtapot akýllý, yani oyunu optimal oynayacak bilgisayar programý.
 
 \includegraphics[width=13em]{mcts_01.png}
 
+Aklýmýzdaki soru þu; Getirisi en iyi olacak makina acaba hangisi? Bilsek
+hemen onu oynardýk. Bunu baþta bilmiyoruz, oturup baþkasýný seyredecek
+durumda deðiliz, o zaman hem seçenekleri bir þekilde deneyecek ama bu
+sýrada çok getiri kaybý yaþamayacak ayný zamanda uzun vadede kazançta
+kalacak þekilde bu oyunu oynamak istiyoruz. UCB1 adlý bir strateji bunu
+yapabiliyor, bu stratejiye göre her makina $i$ için bir istatistiki güven
+aralýðý yaratýlýr, 
 
+$$ \overline{x}_i \pm \sqrt{\frac{2 \ln n}{n_i}} $$
 
+$\overline{x}_i$: Makine $i$'nin ortalama getirisi
 
+$n_i$: Makine $i$'nin kaç kere oynandýðý
 
+$n$: Tüm oyunlar (tüm makinelerde kaç kere oynandýðý)
 
+Ve stratejimiz her adýmda üst sýnýrý en yüksek olan makinayý
+oynamaktýr. Bunu yaptýkça o makinanýn gözlenen ortalamasý kazanca / kayýba
+göre kayacak, ve güven aralýðý ufalacak (elimizde daha fazla veri var
+çünkü, daha fazla veri daha fazla kesinlik demek), ve diðer makýnlarýn
+aralýðý geniþleyecek. Bir noktada baþka bir makinanýn üst sýnýrý o anda
+oynadýðýmýzý geçecek, o zaman biz bu öteki makinaya geçeceðiz. Bu
+strateji optimal olarak islemektedir. 
+
+Türetmek için notasyonu biraz deðiþtirelim [3], $a$ bir aksiyon (ya da
+makina seçimi), $Q(a) = E(r|a)$, bir aksiyon için ortalama getiri, $U_t(a)$
+adým $t$'de bir aksiyonun üst sýnýrý, $\hat{Q}, \hat{U}$ kestirme deðerler,
+$N(a)$ bir aksiyonun kaç kez seçildiði. Hem $\hat{U}$ kestirme deðerini
+sürekli hesaplayacaðýz, hem de güven aralýðýný maksimize eden aksiyonu
+seçeceðiz.
+
+$$ a_t = \argmax_{a \in A} \hat{Q}_t(a) + \hat{U}_t(a) $$
+
+Bu seçimi yaparken yüksek olasýlýkla (with high probability)
+$Q(a) \le \hat{Q}_t(a) + \hat{U}_t(a)$ olmasýný saðlayacaðýz. Bu þart için
+Hoeffding eþitsizliðinden baþlayabiliriz (bkz {\em Ýstatistik,
+  Ekler}). 
+
+$X_1,...X_n$ $[0,1]$ aralýðýnda deðerlere sahip rasgele deðiþkenler
+olsunlar, ve $\overline{X}_t = \frac{1}{\tau} \sum_{\tau=1}^{t} X_\tau$
+örneklem ortalamasý olsun. O zaman 
+
+$$ P(E(X) > \overline{X}_t + u ) \le e^{-2 t u^2}$$
+
+olduðunu biliyoruz. Bunu soyguncu problemindeki getiri rasgele deðiþkenleri
+için uyarlarsak, 
+
+$$ P \big( Q(a) > \hat{Q}_t(a) + U_t(a)  \big)$$
 
 
 
 
 Kaynaklar
 
-[1] {\em Go Oyun Kurallari}, \url{https://www.dropbox.com/s/xfcimo9ojhq3l2l/go.pdf?dl=1}
+[1] {\em Go Oyun Kurallarý}, \url{https://www.dropbox.com/s/xfcimo9ojhq3l2l/go.pdf?dl=1}
+
+[2] Bradberry, {\em Introduction to Monte Carlo Tree Search}, \url{https://jeffbradberry.com/posts/2015/09/intro-to-monte-carlo-tree-search}
+
+[3] Silver, {\em Reinforcement Learning}, \url{http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html}
+
 
 \end{document}
