@@ -23,8 +23,11 @@ from gtp_wrapper import MCTSPlayer
 SIMULTANEOUS_LEAVES = 8
 
 class DummyNet:
-    def run(self, whatever):
-        return random.random(), random.random()
+#    def run(self, whatever):
+#        return random.random(), random.random()
+    def run_many(self, positions):
+        return np.random.rand(19*19), np.random.rand(19*19)
+        
 
 def play(network, readouts, resign_threshold, verbosity=0):
     ''' Plays out a self-play match, returning
@@ -32,10 +35,7 @@ def play(network, readouts, resign_threshold, verbosity=0):
     - the n x 362 tensor of floats representing the mcts search probabilities
     - the n-ary tensor of floats representing the original value-net estimate
     where n is the number of moves in the game'''
-    player = MCTSPlayer(network,
-                        resign_threshold=resign_threshold,
-                        verbosity=verbosity,
-                        num_parallel=SIMULTANEOUS_LEAVES)
+    player = MCTSPlayer(network)
     global_n = 0
 
     # Disable resign in 5% of games
@@ -48,6 +48,7 @@ def play(network, readouts, resign_threshold, verbosity=0):
     # affects the first move of the game.
     first_node = player.root.select_leaf()
     prob, val = network.run(first_node.position)
+    print first_node
     first_node.incorporate_results(prob, val, first_node)
 
     while True:
@@ -66,6 +67,7 @@ def play(network, readouts, resign_threshold, verbosity=0):
         if player.should_resign(): # TODO: make this less side-effecty.
             break
         move = player.pick_move()
+        print 'move', move
         player.play_move(move)
         if player.is_done():
             # TODO: actually handle the result instead of ferrying it around as a property.
@@ -88,4 +90,4 @@ def play(network, readouts, resign_threshold, verbosity=0):
 if __name__ == "__main__": 
 
     net = DummyNet()
-    play(net, 10, 0.95)
+    play(net, 10, 0.95, verbosity=1)
