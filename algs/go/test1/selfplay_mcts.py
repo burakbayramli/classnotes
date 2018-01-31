@@ -23,10 +23,10 @@ from gtp_wrapper import MCTSPlayer
 SIMULTANEOUS_LEAVES = 8
 
 class DummyNet:
-#    def run(self, whatever):
-#        return random.random(), random.random()
+    def run(self, whatever):
+        return random.random(), random.random()
     def run_many(self, positions):
-        return np.random.rand(19*19), np.random.rand(19*19)
+        return np.random.rand(9*9), np.random.rand(9*9)
         
 
 def play(network, readouts, resign_threshold, verbosity=0):

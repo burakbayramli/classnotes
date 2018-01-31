@@ -137,6 +137,7 @@ class MCTSPlayerMixin:
         self.qs.append(self.root.Q) # Save our resulting Q.
         self.root = self.root.maybe_add_child(coords.flatten_coords(c))
         self.position = self.root.position # for showboard
+        print self.position
         del self.root.parent.children
         return True # GTP requires positive result.
 
