@@ -26,7 +26,8 @@ from mcts import MCTSNode
 
 import go
 
-MAX_GAME_DEPTH = int(go.N * go.N * 1.25)
+#MAX_GAME_DEPTH = int(go.N * go.N * 1.25)
+MAX_GAME_DEPTH = 300
 # When to do deterministic move selection.  ~30 moves on a 19x19, ~8 on 9x9
 TEMPERATURE_CUTOFF = int((go.N * go.N) / 12)
 

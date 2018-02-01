@@ -65,6 +65,7 @@ def play(network, readouts, resign_threshold, verbosity=0):
 
         # Sets is_done to be True if player.should resign.
         if player.should_resign(): # TODO: make this less side-effecty.
+            print 'done2'
             break
         move = player.pick_move()
         print 'move', move
@@ -72,6 +73,7 @@ def play(network, readouts, resign_threshold, verbosity=0):
         if player.is_done():
             # TODO: actually handle the result instead of ferrying it around as a property.
             player.result = player.position.result()
+            print 'done1'
             break
 
         if (verbosity >= 2) or (verbosity >= 1 and player.root.position.n % 10 == 9):
@@ -81,7 +83,7 @@ def play(network, readouts, resign_threshold, verbosity=0):
         if verbosity >= 3:
             print("Played >>",
                   coords.to_human_coord(coords.unflatten_coords(player.root.fmove)))
-
+        
 
         # TODO: break when i >= 2 * go.N * go.N (where is this being done now??...)
 
@@ -90,4 +92,4 @@ def play(network, readouts, resign_threshold, verbosity=0):
 if __name__ == "__main__": 
 
     net = DummyNet()
-    play(net, 10, 0.95, verbosity=1)
+    play(net, 10, 0.95, verbosity=2)
