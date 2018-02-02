@@ -3,11 +3,10 @@ import json, re, util
 import numpy as np
 from shutil import copy
 from ai import MCTSPlayer
-from policy_value import PolicyValue
+from mock_self_play import MockPolicyValue
 from util import flatten_idx, pprint_board
 
-
-def self_play_and_save(player, opp_player, boardsize, mock_state=[]):    
+def self_play_and_save(player, opp_player, boardsize): 
     '''Run num_games games to completion, keeping track of each position
     and move of the new_player.  And save the game data
 
@@ -19,9 +18,6 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
     board_size = boardsize
     state = go.GameState(size=board_size, komi=0)
 
-    # Allowing injection of a mock state object for testing purposes
-    if mock_state:
-        state = mock_state
 
     player_color = go.BLACK
     current = player
@@ -67,12 +63,12 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
 def run_self_play(cmd_line_args=None):
     while True:
         # Set initial conditions
-        policy = PolicyValue()
+        policy = MockPolicyValue()
 
         boardsize = 9
         # different opponents come from simply changing the weights of 'opponent.policy.model'. That
         # is, only 'opp_policy' needs to be changed, and 'opponent' will change.
-        opp_policy = PolicyValue()
+        opp_policy = MockPolicyValue()
 
         for i in range(10):
             print(str(i) + "th self playing game")
