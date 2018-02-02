@@ -16,9 +16,6 @@ class MockPolicyValue:
     and value of the current state.
     """
 
-    def batch_eval_value_state(self, states):
-        return np.array([random.random() for x in states])        
-
     def eval_policy_state(self, state, moves=None):
         return [(action, random.random()) for action in state.get_legal_moves()]
 

@@ -13,10 +13,7 @@ class PolicyValue:
 
     def __init__(self, model):
         self.model = model
-
-    def batch_eval_value_state(self, states):
-        return np.array([random.random() for x in states])        
-
+        
     def eval_policy_state(self, state, moves=None):
         return [(action, random.random()) for action in state.get_legal_moves()]
 
@@ -64,8 +61,8 @@ class PolicyValue:
             bias_regularizer=R.l2(.0001))(model_input)
 
         convolution_path = L.BatchNormalization(
-                beta_regularizer=R.l2(.0001),
-                gamma_regularizer=R.l2(.0001))(convolution_path)
+            beta_regularizer=R.l2(.0001),
+            gamma_regularizer=R.l2(.0001))(convolution_path)
 
         convolution_path = L.Activation('relu')(convolution_path)
 
