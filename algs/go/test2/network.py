@@ -4,7 +4,7 @@ from tensorflow.contrib.keras import regularizers as R
 from util import flatten_idx, random_transform, idx_transformations
 from tensorflow.contrib.keras import backend as K
 from tensorflow.contrib.keras import models as M
-import numpy as np, util
+import numpy as np, util, random
 
 class PolicyValue:
     """uses a convolutional neural network to evaluate the state of the game
