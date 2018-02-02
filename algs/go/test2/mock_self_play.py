@@ -10,74 +10,11 @@ from tensorflow.contrib.keras import models as M
 import numpy as np
 import random
 
-
-class NeuralNetBase(object):
-    """Base class for neural network classes handling feature processing, construction
-    of a 'forward' function, etc.
-    """
-
-    # keep track of subclasses to make generic saving/loading cleaner.
-    # subclasses can be 'registered' with the @neuralnet decorator
-    subclasses = {}
-
-    def __init__(self):
-        pass
-
-def neuralnet(cls):
-    """Class decorator for registering subclasses of NeuralNetBase
-    """
-    NeuralNetBase.subclasses[cls.__name__] = cls
-    return cls
-
-
-@neuralnet
-class MockPolicyValue(NeuralNetBase):
+class MockPolicyValue:
     """uses a convolutional neural network to evaluate the state of the game
     and compute a probability distribution over the next action
     and value of the current state.
     """
-
-    def _select_moves_and_normalize(self, nn_output, moves, size, transform="noop"):
-        """helper function to normalize a distribution over the given list of moves
-        and return a list of (move, prob) tuples
-        """
-        if len(moves) == 0:
-            return []
-        move_indices = [flatten_idx(idx_transformations(m, size, transform), size) for m in moves]
-        # get network activations at legal move locations
-        distribution = nn_output[move_indices]
-        distribution = distribution / distribution.sum()
-        return zip(moves, distribution)
-
-    def batch_eval_policy_state(self, states, moves_lists=None):
-        """Given a list of states, evaluates them all at once to make best use of GPU
-        batching capabilities.
-
-        Analogous to [eval_policy_state(s) for s in states]
-
-        Returns: a parallel list of move distributions as in eval_policy_state
-        """
-
-        #print 'batch_eval_policy_state', states
-        exit()
-        n_states = len(states)
-        if n_states == 0:
-            return []
-        state_size = states[0].size
-        if not all([st.size == state_size for st in states]):
-            raise ValueError("all states must have the same size")
-        # concatenate together all one-hot encoded states along the 'batch' dimension
-        nn_input = np.concatenate([self.preprocessor.state_to_tensor(s) for s in states], axis=0)
-        # pass all input through the network at once (backend makes use of
-        # batches if len(states) is large)
-        network_policy, network_value = self.forward(nn_input)
-        # default move lists to all legal moves
-        moves_lists = moves_lists or [st.get_legal_moves() for st in states]
-        results = [None] * n_states
-        for i in range(n_states):
-            results[i] = self._select_moves_and_normalize(network_policy[i], moves_lists[i],
-                                                          state_size)
-        return results
 
     def batch_eval_value_state(self, states):
         return np.array([random.random() for x in states])        

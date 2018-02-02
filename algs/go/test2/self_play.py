@@ -5,6 +5,7 @@ from shutil import copy
 from ai import MCTSPlayer
 from mock_self_play import MockPolicyValue
 from util import flatten_idx, pprint_board
+import network
 
 def self_play_and_save(player, opp_player, boardsize): 
     '''Run num_games games to completion, keeping track of each position
@@ -63,12 +64,14 @@ def self_play_and_save(player, opp_player, boardsize):
 def run_self_play(cmd_line_args=None):
     while True:
         # Set initial conditions
-        policy = MockPolicyValue()
+        #policy = MockPolicyValue()
+        policy = network.PolicyValue(network.PolicyValue.create_network())
 
         boardsize = 9
         # different opponents come from simply changing the weights of 'opponent.policy.model'. That
         # is, only 'opp_policy' needs to be changed, and 'opponent' will change.
-        opp_policy = MockPolicyValue()
+        #opp_policy = MockPolicyValue()
+        opp_policy = network.PolicyValue(network.PolicyValue.create_network())
 
         for i in range(10):
             print(str(i) + "th self playing game")

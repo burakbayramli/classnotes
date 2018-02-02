@@ -4,7 +4,7 @@ from tensorflow.contrib.keras import regularizers as R
 from util import flatten_idx, random_transform, idx_transformations
 from tensorflow.contrib.keras import backend as K
 from tensorflow.contrib.keras import models as M
-import numpy as np
+import numpy as np, util
 
 class PolicyValue:
     """uses a convolutional neural network to evaluate the state of the game
@@ -12,132 +12,17 @@ class PolicyValue:
     and value of the current state.
     """
 
-    def __init__(self, feature_list, **kwargs):
-        """create a neural net object that preprocesses according to feature_list and uses
-        a neural network specified by keyword arguments (using subclass' create_network())
-
-        optional argument: init_network (boolean). If set to False, skips initializing
-        self.model and self.forward and the calling function should set them.
-        """
-        self.preprocessor = Preprocess(feature_list)
-        kwargs["input_dim"] = self.preprocessor.output_dim
-
-        if kwargs.get('init_network', True):
-            # self.__class__ refers to the subclass so that subclasses only
-            # need to override create_network()
-            self.model = self.__class__.create_network(**kwargs)
-            # self.forward is a lambda function wrapping a Keras function
-            self.forward = self._model_forward()
-
-    def _model_forward(self):
-        """Construct a function using the current keras backend that, when given a batch
-        of inputs, simply processes them forward and returns the output
-
-        This is as opposed to model.compile(), which takes a loss function
-        and training method.
-
-        c.f. https://github.com/fchollet/keras/issues/1426
-        """
-        # The uses_learning_phase property is True if the model contains layers that behave
-        # differently during training and testing, e.g. Dropout or BatchNormalization.
-        # In these cases, K.learning_phase() is a reference to a backend variable that should
-        # be set to 0 when using the network in prediction mode and is automatically set to 1
-        # during training.
-        if self.model.uses_learning_phase:
-            forward_function = K.function(self.model.inputs + [K.learning_phase()], self.model.outputs)
-
-            # the forward_function returns a list of tensors
-            # the first [0] gets the front tensor.
-            return lambda inpt: forward_function([inpt, 0])
-        else:
-            # identical but without a second input argument for the learning phase
-            forward_function = K.function(self.model.inputs, self.model.outputs)
-            return lambda inpt: forward_function([inpt])
-    
-
-    def _select_moves_and_normalize(self, nn_output, moves, size, transform="noop"):
-        """helper function to normalize a distribution over the given list of moves
-        and return a list of (move, prob) tuples
-        """
-        if len(moves) == 0:
-            return []
-        move_indices = [flatten_idx(idx_transformations(m, size, transform), size) for m in moves]
-        # get network activations at legal move locations
-        distribution = nn_output[move_indices]
-        distribution = distribution / distribution.sum()
-        return zip(moves, distribution)
-
-    def batch_eval_policy_state(self, states, moves_lists=None):
-        """Given a list of states, evaluates them all at once to make best use of GPU
-        batching capabilities.
-
-        Analogous to [eval_policy_state(s) for s in states]
-
-        Returns: a parallel list of move distributions as in eval_policy_state
-        """
-        n_states = len(states)
-        if n_states == 0:
-            return []
-        state_size = states[0].size
-        if not all([st.size == state_size for st in states]):
-            raise ValueError("all states must have the same size")
-        # concatenate together all one-hot encoded states along the 'batch' dimension
-        nn_input = np.concatenate([self.preprocessor.state_to_tensor(s) for s in states], axis=0)
-        # pass all input through the network at once (backend makes use of
-        # batches if len(states) is large)
-        network_policy, network_value = self.forward(nn_input)
-        # default move lists to all legal moves
-        moves_lists = moves_lists or [st.get_legal_moves() for st in states]
-        results = [None] * n_states
-        for i in range(n_states):
-            results[i] = self._select_moves_and_normalize(network_policy[i], moves_lists[i],
-                                                          state_size)
-        return results
+    def __init__(self, model):
+        self.model = model
 
     def batch_eval_value_state(self, states):
-        """Given a list of states, evaluates them all at once to make best use of GPU
-        batching capabilities.
-
-        Analogous to [eval_value_state(s) for s in states]
-
-        Returns: a parallel list of values as in eval_value_state
-        """
-        n_states = len(states)
-        if n_states == 0:
-            return []
-        state_size = states[0].size
-        if not all([st.size == state_size for st in states]):
-            raise ValueError("all states must have the same size")
-        # concatenate together all one-hot encoded states along the 'batch' dimension
-        nn_input = np.concatenate([self.preprocessor.state_to_tensor(s) for s in states], axis=0)
-        # pass all input through the network at once (backend makes use of
-        # batches if len(states) is large)
-        network_policy, network_value = self.forward(nn_input)
-        return network_value
-
+        return np.array([random.random() for x in states])        
 
     def eval_policy_state(self, state, moves=None):
-        """Given a GameState object, returns a list of (action, probability) pairs
-        according to the network outputs
-
-        If a list of moves is specified, only those moves are kept in the distribution
-        """
-        transform = random_transform()
-        tensor = self.preprocessor.state_to_tensor(state, transform)
-        # run the tensor through the network
-        network_policy, network_value = self.forward(tensor)
-        moves = moves or state.get_legal_moves()
-        return self._select_moves_and_normalize(network_policy[0], moves, state.size, transform)
+        return [(action, random.random()) for action in state.get_legal_moves()]
 
     def eval_value_state(self, state):
-        """Given a GameState object, returns value
-        according to the network outputs
-        """
-        transform = random_transform()
-        tensor = self.preprocessor.state_to_tensor(state, transform)
-        # run the tensor through the network
-        network_policy, network_value = self.forward(tensor)
-        return network_value[0]
+        return random.random()
 
     @staticmethod
     def create_network(**kwargs):
