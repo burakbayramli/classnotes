@@ -1,10 +1,8 @@
-import os, glob, pickle
-import json
-import re
+import os, glob, pickle, go
+import json, re, util
 import numpy as np
 from shutil import copy
 from ai import MCTSPlayer
-import go
 from policy_value import PolicyValue
 from util import flatten_idx, pprint_board
 
@@ -50,7 +48,8 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
         pi = zip(actions, distribution)
         #print(zip(actions, _n_visits))
         state_list.append(state.copy())
-        print(state)
+        #print(state)
+        pprint_board(state.board)
         pi_list.append(pi)
 
         current.mcts.update_with_move(move)
