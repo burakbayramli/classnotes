@@ -4,6 +4,7 @@ from tensorflow.contrib.keras import regularizers as R
 from util import flatten_idx, random_transform, idx_transformations
 from nn_util import NeuralNetBase, neuralnet
 import numpy as np
+import random
 
 
 @neuralnet
@@ -34,7 +35,7 @@ class PolicyValue(NeuralNetBase):
         Returns: a parallel list of move distributions as in eval_policy_state
         """
 
-        print (states)
+        #print 'batch_eval_policy_state', states
         exit()
         n_states = len(states)
         if n_states == 0:
@@ -56,16 +57,17 @@ class PolicyValue(NeuralNetBase):
         return results
 
     def batch_eval_value_state(self, states):
-        """Given a list of states, evaluates them all at once to make best use of GPU
-        batching capabilities.
+        """Given a list of states, evaluates them all at once to make best use
+        of GPU batching capabilities.
 
         Analogous to [eval_value_state(s) for s in states]
 
         Returns: a parallel list of values as in eval_value_state
+
         """
 
-        print states
-        exit()
+        #print 'batch_eval_value_state', states
+        return np.array([random.random() for x in states])
         
         n_states = len(states)
         if n_states == 0:
@@ -82,8 +84,9 @@ class PolicyValue(NeuralNetBase):
 
 
     def eval_policy_state(self, state, moves=None):
-        print state
-        exit()
+        #print 'eval_policy_state', state
+        return [(action, random.random()) for action in state.get_legal_moves()]
+        #exit()
         """Given a GameState object, returns a list of (action, probability) pairs
         according to the network outputs
 
@@ -100,11 +103,12 @@ class PolicyValue(NeuralNetBase):
         """Given a GameState object, returns value
         according to the network outputs
         """
-        transform = random_transform()
-        tensor = self.preprocessor.state_to_tensor(state, transform)
+        #transform = random_transform()
+        #tensor = self.preprocessor.state_to_tensor(state, transform)
         # run the tensor through the network
-        network_policy, network_value = self.forward(tensor)
-        return network_value[0]
+        #network_policy, network_value = self.forward(tensor)
+        #return network_value[0]
+        return random.random()
 
     @staticmethod
     def create_network(**kwargs):

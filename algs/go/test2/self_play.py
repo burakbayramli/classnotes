@@ -83,13 +83,13 @@ def run_self_play(cmd_line_args=None):
             player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player, boardsize)
-            data_to_save["state"] = state_list
-            data_to_save["pi"] = pi_list
-            data_to_save["reward"] = reward_list
+            #data_to_save["state"] = state_list
+            #data_to_save["pi"] = pi_list
+            #data_to_save["reward"] = reward_list
             del player
             del opp_player
-        metadata["self_play_model"] += [best_weight_path]
-        save_metadata()
+        #metadata["self_play_model"] += [best_weight_path]
+        #save_metadata()
         del policy
         del opp_policy
 
