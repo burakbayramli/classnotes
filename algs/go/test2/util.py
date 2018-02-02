@@ -86,3 +86,19 @@ def pprint_board(board):
     print(out0)
 
 
+def get_board(state):
+    """A feature encoding WHITE BLACK and EMPTY on separate planes, but plane 0
+    always refers to the current player and plane 1 to the opponent
+    """
+    planes = np.zeros((17, state.size, state.size))
+    board_history = state.board_history
+    for i in range(8):
+        planes[2*i,:,:] = board_history[7-i] == state.current_player
+        planes[2*i+1,:,:] = board_history[7-i] == -state.current_player
+    if state.current_player == go.BLACK:
+        planes[16,:,:] = 1
+    else:
+        planes[16,:,:] = 0
+    planes = np.array([BOARD_TRANSFORMATIONS["noop"](plane) for plane in planes])
+    return planes
+    
