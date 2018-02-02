@@ -12,25 +12,26 @@ print util.pprint_board(state.board)
 
 ```text
    A B C D E F G H I 
- 9 . . O . . . . . X 9
- 8 X O X . . X . . . 8
- 7 X . . . . . . . . 7
- 6 O . . . . . . . . 6
- 5 . X . O . . . . . 5
- 4 . . O . . . . X . 4
- 3 . . . . . . . . . 3
- 2 O O . . . X . . X 2
- 1 . . O . O . . . O 1
+ 9 . . . X . . O . . 9
+ 8 . . . . . . . . . 8
+ 7 X . X . . O . . . 7
+ 6 O . X . . . . . . 6
+ 5 O . . X . . . . . 5
+ 4 . . X X . . X . . 4
+ 3 O O O . O . . . . 3
+ 2 X . . . . O . O . 2
+ 1 . . X . . . . . . 1
    A B C D E F G H I 
 None
 ```
 
 ```python
 res = net.eval_value_state(state)
+print res
 ```
 
 ```text
-(1, 17, 9, 9)
+-0.00221886
 ```
 
 ```python
@@ -43,6 +44,13 @@ print res[1].shape
 (1, 1)
 ```
 
+```python
+res = net.eval_policy_state(state)
+print res
+```
 
+```text
+[(None, -0.28896204)]
+```
 
 

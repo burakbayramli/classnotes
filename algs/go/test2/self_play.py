@@ -19,7 +19,6 @@ def self_play_and_save(player, opp_player, boardsize):
     board_size = boardsize
     state = go.GameState(size=board_size, komi=0)
 
-
     player_color = go.BLACK
     current = player
     other = opp_player

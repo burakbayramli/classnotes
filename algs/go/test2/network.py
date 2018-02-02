@@ -14,14 +14,15 @@ class PolicyValue:
     def __init__(self, model):
         self.model = model
         
-    def eval_policy_state(self, state, moves=None):
+    def eval_policy_state(self, state):
+        #s = util.get_board(state).reshape(1, 17, 9, 9)
         return [(action, random.random()) for action in state.get_legal_moves()]
+        #return [(action, self.model.predict(s)[0]) for action in state.get_legal_moves()]
 
     def eval_value_state(self, state):
-        x = util.get_board(state)
-        x1 = x.reshape(1, 17, 9, 9)
-        return self.model.predict(x1)
-
+        x = util.get_board(state).reshape(1, 17, 9, 9)
+        return self.model.predict(x)[1][0][0]
+            
     @staticmethod
     def create_network(**kwargs):
         """construct a convolutional neural network with Residual blocks.
