@@ -27,8 +27,7 @@ class DummyNet:
         return random.random(), random.random()
     def run_many(self, positions):
         return np.random.rand(9*9), np.random.rand(9*9)
-        
-
+    
 def play(network, readouts, resign_threshold, verbosity=0):
     ''' Plays out a self-play match, returning
     - the final position
@@ -68,6 +67,7 @@ def play(network, readouts, resign_threshold, verbosity=0):
             print 'done2'
             break
         move = player.pick_move()
+        print 'player', player
         print 'move', move
         player.play_move(move)
         if player.is_done():
@@ -92,4 +92,5 @@ def play(network, readouts, resign_threshold, verbosity=0):
 if __name__ == "__main__": 
 
     net = DummyNet()
+    play(net, 10, 0.95, verbosity=2)
     play(net, 10, 0.95, verbosity=2)

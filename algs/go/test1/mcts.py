@@ -58,8 +58,7 @@ class MCTSNode(object):
     """
 
     def __init__(self, position, fmove=None, parent=None):
-        if parent is None:
-            parent = DummyNode()
+        if parent is None: parent = DummyNode()
         self.parent = parent
         self.fmove = fmove # move that led to this position, as flattened coords
         self.position = position
