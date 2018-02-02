@@ -71,7 +71,7 @@ def run_self_play(cmd_line_args=None):
         # different opponents come from simply changing the weights of 'opponent.policy.model'. That
         # is, only 'opp_policy' needs to be changed, and 'opponent' will change.
         #opp_policy = MockPolicyValue()
-        opp_policy = network.PolicyValue(network.PolicyValue.create_network())
+        opp_policy = policy
 
         for i in range(10):
             print(str(i) + "th self playing game")
