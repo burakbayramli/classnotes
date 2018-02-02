@@ -1,9 +1,8 @@
+from tensorflow.contrib.keras import regularizers as R
 from tensorflow.contrib.keras import models as M
 from tensorflow.contrib.keras import layers as L
-from tensorflow.contrib.keras import regularizers as R
-from util import flatten_idx, random_transform, idx_transformations
 from tensorflow.contrib.keras import backend as K
-from tensorflow.contrib.keras import models as M
+from util import flatten_idx, random_transform, idx_transformations
 import numpy as np, util, random
 
 class PolicyValue:
@@ -22,7 +21,10 @@ class PolicyValue:
         return [(action, random.random()) for action in state.get_legal_moves()]
 
     def eval_value_state(self, state):
-        return random.random()
+        x = util.get_board(state)
+        x1 = x.reshape(1, 17, 9, 9)
+        print x1.shape
+        return self.model.predict(x1)
 
     @staticmethod
     def create_network(**kwargs):

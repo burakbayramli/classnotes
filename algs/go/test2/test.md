@@ -2,7 +2,7 @@
 ```python
 import network, pickle, util
 
-x = network.PolicyValue(network.PolicyValue.create_network())
+net = network.PolicyValue(network.PolicyValue.create_network())
 ```
 
 ```python
@@ -25,9 +25,23 @@ print util.pprint_board(state.board)
 None
 ```
 
+```python
+res = net.eval_value_state(state)
+```
 
+```text
+(1, 17, 9, 9)
+```
 
+```python
+print res[0].shape
+print res[1].shape
+```
 
+```text
+(1, 82)
+(1, 1)
+```
 
 
 
