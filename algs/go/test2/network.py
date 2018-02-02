@@ -23,7 +23,6 @@ class PolicyValue:
     def eval_value_state(self, state):
         x = util.get_board(state)
         x1 = x.reshape(1, 17, 9, 9)
-        print x1.shape
         return self.model.predict(x1)
 
     @staticmethod
