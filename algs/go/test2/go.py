@@ -7,7 +7,10 @@ EMPTY = 0
 PASS_MOVE = None
 
 WHITE, EMPTY, BLACK, FILL, KO, UNKNOWN = range(-1, 5)
-N = 9
+
+def place_stones(board, color, stones):
+    for s in stones:
+        board[s] = color
 
 class GameState(object):
     """State of a game of Go and some basic functions to interact with it
@@ -664,17 +667,17 @@ class GameState(object):
         if self.ko is not None:
             place_stones(board, KO, [self.ko])
         raw_board_contents = []
-        for i in range(N):
+        for i in range(self.size):
             row = []
-            for j in range(N):
+            for j in range(self.size):
                 appended = '<' if (self.recent and (i, j) == self.recent[-1].move) else ' '
                 row.append(pretty_print_map[board[i,j]] + appended)
                 row.append('\x1b[0m')
             raw_board_contents.append(''.join(row))
 
-        row_labels = ['%2d ' % i for i in range(N, 0, -1)]
+        row_labels = ['%2d ' % i for i in range(self.size, 0, -1)]
         annotated_board_contents = [''.join(r) for r in zip(row_labels, raw_board_contents, row_labels)]
-        header_footer_rows = ['   ' + ' '.join('ABCDEFGHJKLMNOPQRST'[:N]) + '   ']
+        header_footer_rows = ['   ' + ' '.join('ABCDEFGHJKLMNOPQRST'[:self.size]) + '   ']
         annotated_board = '\n'.join(itertools.chain(header_footer_rows, annotated_board_contents, header_footer_rows))
         details = "\nMove: {}. Captures X: {} O: {}\n".format(len(self.board_history), *captures)
         return annotated_board + details

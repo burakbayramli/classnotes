@@ -1,8 +1,10 @@
-"""Monte Carlo Tree Search, as described in Silver et al 2017.
+"""
+Monte Carlo Tree Search, as described in Silver et al 2017.
 
-This is a "pure" implementation of the AlphaGo MCTS algorithm in that it is not specific to the
-game of Go; everything in this file is implemented generically with respect to some state, actions,
-policy function, and value function.
+This is a "pure" implementation of the AlphaGo MCTS algorithm in that
+it is not specific to the game of Go; everything in this file is
+implemented generically with respect to some state, actions, policy
+function, and value function.
 """
 import numpy as np
 from operator import itemgetter
@@ -10,8 +12,8 @@ from operator import itemgetter
 #sys.setrecursionlimit(1500)
 
 class TreeNode(object):
-    """A node in the MCTS tree. Each node keeps track of its own value Q, prior probability P, and
-    its visit-count-adjusted prior score u.
+    """A node in the MCTS tree. Each node keeps track of its own value Q,
+    prior probability P, and its visit-count-adjusted prior score u.
     """
 
     def __init__(self, parent, prior_p):
