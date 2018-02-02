@@ -1,3 +1,4 @@
+import itertools
 import numpy as np
 
 WHITE = -1
@@ -5,6 +6,8 @@ BLACK = +1
 EMPTY = 0
 PASS_MOVE = None
 
+WHITE, EMPTY, BLACK, FILL, KO, UNKNOWN = range(-1, 5)
+N = 9
 
 class GameState(object):
     """State of a game of Go and some basic functions to interact with it
@@ -65,6 +68,9 @@ class GameState(object):
             BLACK: rng.randint(np.iinfo(np.uint64).max, size=(size, size), dtype='uint64')}
         self.current_hash = np.uint64(0)
         self.previous_hashes = set()
+        
+        self.caps = (0,0)
+        self.recent = tuple()
 
     def get_group(self, position):
         """Get the group of connected same-color stones to the given position
@@ -645,6 +651,35 @@ class GameState(object):
                 pass
         return self.is_end_of_game
 
+    def __str__(self):
+        pretty_print_map = {
+            WHITE: '\x1b[0;31;47mO',
+            EMPTY: '\x1b[0;31;43m.',
+            BLACK: '\x1b[0;31;40mX',
+            FILL: '#',
+            KO: '*',
+        }
+        board = np.copy(self.board)
+        captures = self.caps
+        if self.ko is not None:
+            place_stones(board, KO, [self.ko])
+        raw_board_contents = []
+        for i in range(N):
+            row = []
+            for j in range(N):
+                appended = '<' if (self.recent and (i, j) == self.recent[-1].move) else ' '
+                row.append(pretty_print_map[board[i,j]] + appended)
+                row.append('\x1b[0m')
+            raw_board_contents.append(''.join(row))
+
+        row_labels = ['%2d ' % i for i in range(N, 0, -1)]
+        annotated_board_contents = [''.join(r) for r in zip(row_labels, raw_board_contents, row_labels)]
+        header_footer_rows = ['   ' + ' '.join('ABCDEFGHJKLMNOPQRST'[:N]) + '   ']
+        annotated_board = '\n'.join(itertools.chain(header_footer_rows, annotated_board_contents, header_footer_rows))
+        details = "\nMove: {}. Captures X: {} O: {}\n".format(len(self.board_history), *captures)
+        return annotated_board + details
+
+    
 
 class IllegalMove(Exception):
     pass

@@ -33,7 +33,7 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
     while not state.is_end_of_game:
         move = current.get_move(state, self_play=True)
 
-        #print(move)
+        print(move)
         childrens = current.mcts._root._children.items()
         #print(childrens)
         actions, next_states = map(list, zip(*childrens))
@@ -49,7 +49,8 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
             distribution = np.zeros(np.shape(_n_visits))
         pi = zip(actions, distribution)
         #print(zip(actions, _n_visits))
-        state_list.append(state)
+        state_list.append(state.copy())
+        print(state)
         pi_list.append(pi)
 
         current.mcts.update_with_move(move)
@@ -58,10 +59,8 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
         current, other = other, current
         step += 1
 
-        #pprint_board(state.board)
-
     winner = state.get_winner()
-    #print(winner)
+    print 'winner', winner
     if winner == go.BLACK:
         reward_list = [(-1.)**j for j in range(len(state_list))]
     else : # winner == go.WHITE:
@@ -83,6 +82,13 @@ def run_self_play(cmd_line_args=None):
             player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player, boardsize)
+            print type(state_list)
+            print len(state_list)
+            #print state_list[0]
+            print state_list[0]
+            print state_list[-1]
+            print type(pi_list)
+            exit()
             #data_to_save["state"] = state_list
             #data_to_save["pi"] = pi_list
             #data_to_save["reward"] = reward_list
