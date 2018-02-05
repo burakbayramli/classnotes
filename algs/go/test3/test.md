@@ -1,8 +1,8 @@
 
 
 ```python
-import network, pickle, util
-net = network.PolicyValue(network.PolicyValue.create_network())
+import resnet, pickle, util
+net = resnet.PolicyValue(network.PolicyValue.create_network())
 ```
 
 ```text

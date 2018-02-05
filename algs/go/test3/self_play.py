@@ -5,7 +5,7 @@ from shutil import copy
 from ai import MCTSPlayer
 from mock_self_play import MockPolicyValue
 from util import flatten_idx, pprint_board
-import network
+import resnet
 
 def self_play_and_save(player, opp_player, boardsize): 
     '''Run num_games games to completion, keeping track of each position
@@ -64,7 +64,7 @@ def run_self_play(cmd_line_args=None):
     while True:
         # Set initial conditions
         #policy = MockPolicyValue()
-        policy = network.PolicyValue(network.PolicyValue.create_network())
+        policy = resnet.PolicyValue(resnet.PolicyValue.create_network())
 
         boardsize = 9
         # different opponents come from simply changing the weights of 'opponent.policy.model'. That
