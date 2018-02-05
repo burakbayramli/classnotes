@@ -7,11 +7,8 @@ from mock_self_play import MockPolicyValue
 from util import flatten_idx, pprint_board
 import resnet
 
-def self_play_and_save(player, opp_player, boardsize): 
-    '''Run num_games games to completion, keeping track of each position
-    and move of the new_player.  And save the game data
-
-    '''
+def self_play_and_save(player, opp_player, boardsize):
+    
     state_list = []
     pi_list = []
     player_list = []
@@ -26,9 +23,9 @@ def self_play_and_save(player, opp_player, boardsize):
     step = 0
     while not state.is_end_of_game:
         move = current.get_move(state, self_play=True)
-        #print(move)
+
         childrens = current.mcts._root._children.items()
-        #print(childrens)
+
         actions, next_states = map(list, zip(*childrens))
         _n_visits = [next_state._n_visits for next_state in next_states]
         if not move == go.PASS_MOVE:
@@ -41,9 +38,9 @@ def self_play_and_save(player, opp_player, boardsize):
         else: # to prevent the model from overfitting to PASS_MOVE
             distribution = np.zeros(np.shape(_n_visits))
         pi = zip(actions, distribution)
-        #print(zip(actions, _n_visits))
+
         state_list.append(state.copy())
-        #pprint_board(state.board)
+
         pi_list.append(pi)
 
         current.mcts.update_with_move(move)
@@ -78,7 +75,9 @@ def run_self_play(cmd_line_args=None):
             opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player, boardsize)
             print len(state_list)
-            #print state_list[0]
+            print state_list[0]
+            print 'pilist', len(pi_list)
+            #print pi_list            
 
             b = util.get_board(state_list[20])
             print type(b)

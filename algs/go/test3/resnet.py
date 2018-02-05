@@ -17,8 +17,10 @@ class PolicyValue:
     def eval_policy_state(self, state):
         #return [(action, random.random()) for action in state.get_legal_moves()]
         x = util.get_board(state).reshape(1, 17, 9, 9)
-        probs = self.model.predict(x)[0][0][1:].reshape(9,9)
-        res_probs = [probs[action] for action in state.get_legal_moves() if action]
+        probs1 = self.model.predict(x)[0][0]
+        probs2 = probs1[1:].reshape(9,9)
+        res_probs = [(action,probs2[action]) for action in state.get_legal_moves() if action]
+        res_probs.append((None, probs1[0]))
         return res_probs
 
     def eval_value_state(self, state):
