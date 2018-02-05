@@ -1,4 +1,16 @@
 
+```python
+print [(-1.)**j for j in range(10)]
+print [(-1.)**(j+1) for j in range(10)]
+```
+
+```text
+[1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0]
+[-1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0]
+```
+
+
+
 
 ```python
 import resnet, pickle, util

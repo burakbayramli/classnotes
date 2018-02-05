@@ -51,6 +51,10 @@ def self_play_and_save(player, opp_player, boardsize):
 
     winner = state.get_winner()
     print 'winner', winner
+    # oyun bitti kimin kazandigini biliyioruz, mesela siyah kazandiysa
+    # odulleri hamle bazinda +1,-1,+1,.. olacak sekilde ata, beyaz
+    # kazandiysa -1,+1,-1 seklinde. Siyah olunca +1 cunku oyuna hep siyah
+    # basliyor.
     if winner == go.BLACK:
         reward_list = [(-1.)**j for j in range(len(state_list))]
     else : # winner == go.WHITE:
@@ -77,7 +81,8 @@ def run_self_play(cmd_line_args=None):
             print len(state_list)
             print state_list[0]
             print 'pilist', len(pi_list)
-            #print pi_list            
+            #print pi_list
+            print reward_list
 
             b = util.get_board(state_list[20])
             print type(b)
