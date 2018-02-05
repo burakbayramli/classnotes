@@ -15,11 +15,11 @@ class PolicyValue:
         self.model = model
         
     def eval_policy_state(self, state):
-        #s = util.get_board(state).reshape(1, 17, 9, 9)
         #return [(action, random.random()) for action in state.get_legal_moves()]
         x = util.get_board(state).reshape(1, 17, 9, 9)
-        probs = self.model.predict(x)
-        #for action in state.get_legal_moves(): print action
+        probs = self.model.predict(x)[0][0][1:].reshape(9,9)
+        res_probs = [probs[action] for action in state.get_legal_moves() if action]
+        return res_probs
 
     def eval_value_state(self, state):
         x = util.get_board(state).reshape(1, 17, 9, 9)
@@ -43,9 +43,10 @@ class PolicyValue:
             "input_dim": 17,
             "board": 9,
             "filters_per_layer": 16,
-            "layers": 4,
+            "layers": 9,
             "filter_width": 3
         }
+
         # copy defaults, but override with anything in kwargs
         params = defaults
         params.update(kwargs)
@@ -130,6 +131,7 @@ class PolicyValue:
                 kernel_regularizer=R.l2(.0001),
                 bias_regularizer=R.l2(.0001))(policy_path)
         policy_output = L.Activation('softmax')(policy_path)
+        print 'policy_output', policy_output
 
         # value head
         value_path = L.Convolution2D(
