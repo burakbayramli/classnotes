@@ -1,15 +1,4 @@
 
-```python
-print [(-1.)**j for j in range(10)]
-print [(-1.)**(j+1) for j in range(10)]
-```
-
-```text
-[1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0]
-[-1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0]
-```
-
-
 
 
 ```python
@@ -18,7 +7,85 @@ net = resnet.PolicyValue(resnet.PolicyValue.create_network())
 ```
 
 ```text
-policy_output Tensor("activation_21/Softmax:0", shape=(?, 82), dtype=float32)
+Tensor("input_3:0", shape=(?, 17, 9, 9), dtype=float32)
+Tensor("conv2d_43/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_43/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_44/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_44/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_50/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_45/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_45/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_19/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_51/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_46/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_46/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_52/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_47/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_47/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_20/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_53/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_48/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_48/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_54/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_49/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_49/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_21/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_55/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_50/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_50/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_56/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_51/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_51/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_22/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_57/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_52/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_52/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_58/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_53/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_53/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_23/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_59/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_54/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_54/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_60/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_55/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_55/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_24/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_61/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_56/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_56/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_62/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_57/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_57/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_25/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_63/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_58/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_58/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_64/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_59/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_59/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_26/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_65/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_60/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_60/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_66/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_61/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_61/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("add_27/add:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("activation_67/Relu:0", shape=(?, 17, 9, 16), dtype=float32)
+------------- policy -------------------
+Tensor("conv2d_62/BiasAdd:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("activation_68/Relu:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("flatten_5/Reshape:0", shape=(?, 306), dtype=float32)
+policy_output Tensor("activation_69/Softmax:0", shape=(?, 82), dtype=float32)
+------------- policy -------------------
+Tensor("conv2d_63/BiasAdd:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("activation_70/Relu:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("flatten_6/Reshape:0", shape=(?, 153), dtype=float32)
+Tensor("dense_8/BiasAdd:0", shape=(?, 256), dtype=float32)
+Tensor("activation_71/Relu:0", shape=(?, 256), dtype=float32)
+Tensor("dense_9/BiasAdd:0", shape=(?, 1), dtype=float32)
+Tensor("dense_9/BiasAdd:0", shape=(?, 1), dtype=float32)
 ```
 
 ```python
