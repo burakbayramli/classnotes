@@ -56,11 +56,11 @@ class PolicyValue:
         # create the network using Keras' functional API,
         model_input = L.Input(shape=(params["input_dim"], params["board"], params["board"]))
         print model_input
-        # create first layer
+        
         convolution_path = L.Convolution2D(
             input_shape=(),
-            filters=params["filters_per_layer"],
-            kernel_size=params["filter_width"],
+            filters=16,
+            kernel_size=3,
             activation='linear',
             padding='same',
             kernel_regularizer=R.l2(.0001),
@@ -71,44 +71,22 @@ class PolicyValue:
             gamma_regularizer=R.l2(.0001))(convolution_path)
         print convolution_path
         convolution_path = L.Activation('relu')(convolution_path)
-        def add_resnet_unit(path, **params):
-            block_input = path
-            # add Conv2D
-            path = L.Convolution2D(
-                filters=params["filters_per_layer"],
-                kernel_size=params["filter_width"],
-                activation='linear',
-                padding='same',
-                kernel_regularizer=R.l2(.0001),
-                bias_regularizer=R.l2(.0001))(path)
-            print path
-            path = L.BatchNormalization(
-                    beta_regularizer=R.l2(.0001),
-                    gamma_regularizer=R.l2(.0001))(path)
-            print path
-            path = L.Activation('relu')(path)
-            print path
-            path = L.Convolution2D(
-                filters=params["filters_per_layer"],
-                kernel_size=params["filter_width"],
-                activation='linear',
-                padding='same',
-                kernel_regularizer=R.l2(.0001),
-                bias_regularizer=R.l2(.0001))(path)
-            print path
-            path = L.BatchNormalization(
-                    beta_regularizer=R.l2(.0001),
-                    gamma_regularizer=R.l2(.0001))(path)
-            print path
-            path = L.Add()([block_input, path])
-            print path
-            path = L.Activation('relu')(path)
-            print path
-            return path
 
-        # create all other layers
-        for _ in range(params['layers']):
-            convolution_path = add_resnet_unit(convolution_path, **params)
+        convolution_path = L.Convolution2D(
+            input_shape=(),
+            filters=32,
+            kernel_size=3,
+            activation='linear',
+            padding='same',
+            kernel_regularizer=R.l2(.0001),
+            bias_regularizer=R.l2(.0001))(convolution_path)
+        print convolution_path
+        convolution_path = L.BatchNormalization(
+            beta_regularizer=R.l2(.0001),
+            gamma_regularizer=R.l2(.0001))(convolution_path)
+        print convolution_path
+        convolution_path = L.Activation('relu')(convolution_path)
+
 
         print '------------- policy -------------------'            
         # policy head
