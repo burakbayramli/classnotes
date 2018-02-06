@@ -5,7 +5,8 @@ from shutil import copy
 from ai import MCTSPlayer
 from mock_self_play import MockPolicyValue
 from util import flatten_idx, pprint_board
-import resnet
+#import resnet
+import simplenet
 
 def self_play_and_save(player, opp_player, boardsize):
     
@@ -31,17 +32,21 @@ def self_play_and_save(player, opp_player, boardsize):
         if not move == go.PASS_MOVE:
             if step < 25: # temperature is considered to be 1
                 distribution = np.divide(_n_visits, np.sum(_n_visits))
+                print 'dist'
             else:
+                print 'else1'
                 max_visit_idx = np.argmax(_n_visits)
                 distribution = np.zeros(np.shape(_n_visits))
                 distribution[max_visit_idx] = 1.0
         else: # to prevent the model from overfitting to PASS_MOVE
             distribution = np.zeros(np.shape(_n_visits))
+            print 'else2'
+            
         pi = zip(actions, distribution)
+        pi_list.append(pi)
+        #print pi
 
         state_list.append(state.copy())
-
-        pi_list.append(pi)
 
         current.mcts.update_with_move(move)
         state.do_move(move)
@@ -65,7 +70,7 @@ def run_self_play(cmd_line_args=None):
     while True:
         # Set initial conditions
         #policy = MockPolicyValue()
-        policy = resnet.PolicyValue(resnet.PolicyValue.create_network())
+        policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
 
         boardsize = 9
         # different opponents come from simply changing the weights of 'opponent.policy.model'. That
@@ -81,7 +86,6 @@ def run_self_play(cmd_line_args=None):
             print len(state_list)
             print state_list[0]
             print 'pilist', len(pi_list)
-            #print pi_list
             print reward_list
 
             b = util.get_board(state_list[20])

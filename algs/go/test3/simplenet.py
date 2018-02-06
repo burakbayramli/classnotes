@@ -6,16 +6,10 @@ from util import flatten_idx, random_transform, idx_transformations
 import numpy as np, util, random
 
 class PolicyValue:
-    """uses a convolutional neural network to evaluate the state of the game
-    and compute a probability distribution over the next action
-    and value of the current state.
-    """
-
     def __init__(self, model):
         self.model = model
         
     def eval_policy_state(self, state):
-        #return [(action, random.random()) for action in state.get_legal_moves()]
         x = util.get_board(state).reshape(1, 17, 9, 9)
         probs1 = self.model.predict(x)[0][0]
         probs2 = probs1[1:].reshape(9,9)
@@ -29,32 +23,7 @@ class PolicyValue:
             
     @staticmethod
     def create_network(**kwargs):
-        """construct a convolutional neural network with Residual blocks.
-        Arguments are the same as with the default CNNPolicy network, except the default
-        number of layers is 20 plus a new n_skip parameter
-
-        Keword Arguments:
-        - input_dim:             depth of features to be processed by first layer (default 17)
-        - board:                 width of the go board to be processed (default 19)
-        - filters_per_layer:     number of filters used on every layer (default 256)
-        - layers:                number of residual blocks (default 19)
-        - filter_width:          width of filter
-                                 Must be odd.
-        """
-        defaults = {
-            "input_dim": 17,
-            "board": 9,
-            "filters_per_layer": 16,
-            "layers": 9,
-            "filter_width": 3
-        }
-
-        # copy defaults, but override with anything in kwargs
-        params = defaults
-        params.update(kwargs)
-
-        # create the network using Keras' functional API,
-        model_input = L.Input(shape=(params["input_dim"], params["board"], params["board"]))
+        model_input = L.Input(shape=(17, 9, 9))
         print model_input
         
         convolution_path = L.Convolution2D(
@@ -88,7 +57,7 @@ class PolicyValue:
         convolution_path = L.Activation('relu')(convolution_path)
 
 
-        print '------------- policy -------------------'            
+        print '------------- value -------------------'            
         # policy head
         policy_path = L.Convolution2D(
             input_shape=(),
@@ -107,7 +76,7 @@ class PolicyValue:
         policy_path = L.Flatten()(policy_path)
         print policy_path
         policy_path = L.Dense(
-                params["board"]*params["board"]+1,
+                (9*9)+1,
                 kernel_regularizer=R.l2(.0001),
                 bias_regularizer=R.l2(.0001))(policy_path)
         policy_output = L.Activation('softmax')(policy_path)
