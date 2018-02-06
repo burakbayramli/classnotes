@@ -27,8 +27,8 @@ if len(sys.argv) == 1:
     ./street/street.pdf \
     ./mlp/mlp.pdf \
     ./autodiff/autodiff.pdf \
-    ./convnet/convnet.pdf \
     ./tensorflow/tensorflow.pdf \
+    ./convnet/convnet.pdf \
     ./rnn/rnn.pdf \
     ./lstm/lstm.pdf \
     ./reinf/reinf.pdf \

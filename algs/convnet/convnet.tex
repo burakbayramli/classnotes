@@ -166,6 +166,36 @@ plt.savefig('conv-out-%d-%d.png' % (image_index,feature_map_index))
 \includegraphics[width=20em]{conv-out-0-2.png}
 \includegraphics[width=20em]{conv-out-1-1.png}
 
+Cok kanallý durum için açýk olmadýysa bir daha vurgulayalým, evriþim
+katmaný evriþim operatörünü imaj ya da baþka bir tensor üzerinde
+gezdirirken üzerinde olduðu tüm girdi tabakalarýný, tüm kanallarý
+kapsayacak þekilde, çarpýp sonucu tek bir öðeye götürür. Bu çarpým için
+herhalde kanallar bir þekilde düzleþtirilip aðýrlýklara eþleniyor. Neyse,
+filtreyi kaydýrdýkça çarpým sonucu çýktýda farklý öðeler elde edilir, ve bu
+bize tek boyutlu bir sonuç kesiti verir. Eðer birden fazla evriþim filtresi
+uygularsak onlarýn sonuçlarý farklý sonuç tabakalarý olarak diðer
+tabakalarýn üzerinde istiflenir.
+
+\includegraphics[width=20em]{conv-11.png}
+
+Mesela altta 20x30 boyutlu ve 3 kanallý bir tensor girdimiz olsun, bu
+tensorlardan kaç tane olduðunu þimdilik tanýmlamadýk (mini girdi yýðýnýnda
+yani). Þimdi girdi üzerinde 16 tane filtre gezdiriyoruz, ve 20x30x16
+boyutlu çýktý elde ediyoruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+tf.reset_default_graph()
+input = tf.placeholder(tf.float32, [None, 20, 30, 3])
+conv_layer = tf.layers.conv2d(inputs=input, filters=16, 
+                              kernel_size=(2,2), padding='same')
+print conv_layer
+\end{minted}
+
+\begin{verbatim}
+Tensor("conv2d/BiasAdd:0", shape=(?, 20, 30, 16), dtype=float32)
+\end{verbatim}
+
 MNIST
 
 Altta MNIST verisini iþleyebilen mimarýnýn TF olmadan pür Python kullanan
