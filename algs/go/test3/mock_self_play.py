@@ -89,14 +89,9 @@ def run_self_play(cmd_line_args=None):
             #print state_list[0]
 
             b = util.get_board(state_list[20])
-            pickle.dump(state_list[20], open('board1.pkl', 'wb'), 0)
-            print type(b)
-            print b.shape
+            pickle.dump([state_list[20], pi_list[20], reward_list[20]], open('testdata.pkl', 'wb'), 0)
             
             exit()
-            #data_to_save["state"] = state_list
-            #data_to_save["pi"] = pi_list
-            #data_to_save["reward"] = reward_list
             del player
             del opp_player
         #metadata["self_play_model"] += [best_weight_path]
