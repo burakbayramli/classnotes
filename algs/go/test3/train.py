@@ -77,9 +77,10 @@ def self_play_and_train(cmd_line_args=None):
             opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player)            
             idxs = [np.random.choice(range(len(state_list)),replace=False) for i in range(batch_size)]
-            state_list2.append(state_list[idx])
-            pi_list2.append(pi_list[idx])
-            reward_list2.append(reward_list[idx])
+            for idx in idx:
+                state_list2.append(state_list[idx])
+                pi_list2.append(pi_list[idx])
+                reward_list2.append(reward_list[idx])
             if len(state_list2) >= batch_size: break
             
 
