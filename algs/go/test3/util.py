@@ -102,3 +102,13 @@ def get_board(state):
     planes = np.array([BOARD_TRANSFORMATIONS["noop"](plane) for plane in planes])
     return planes
     
+def to_pi_mat(pi):    
+    pi_mat = np.zeros((9,9))
+    none_val = False
+    for idx,val in pi:
+        if idx: pi_mat[idx[0],idx[1]] = val
+    	elif val > 0: none_val = True
+    pi_mat2 = np.zeros(9*9+1)
+    if none_val: pi_mat2[0] = 1.0
+    pi_mat2[1:] = pi_mat.reshape(9*9)
+    return pi_mat2
