@@ -32,15 +32,12 @@ def self_play_and_save(player, opp_player, boardsize):
         if not move == go.PASS_MOVE:
             if step < 25: # temperature is considered to be 1
                 distribution = np.divide(_n_visits, np.sum(_n_visits))
-                print 'dist'
             else:
-                print 'else1'
                 max_visit_idx = np.argmax(_n_visits)
                 distribution = np.zeros(np.shape(_n_visits))
                 distribution[max_visit_idx] = 1.0
         else: # to prevent the model from overfitting to PASS_MOVE
             distribution = np.zeros(np.shape(_n_visits))
-            print 'else2'
             
         pi = zip(actions, distribution)
         pi_list.append(pi)

@@ -32,15 +32,12 @@ def self_play_and_save(player, opp_player, boardsize):
         if not move == go.PASS_MOVE:
             if step < 25: # temperature is considered to be 1
                 distribution = np.divide(_n_visits, np.sum(_n_visits))
-                print 'dist'
             else:
-                print 'else1'
                 max_visit_idx = np.argmax(_n_visits)
                 distribution = np.zeros(np.shape(_n_visits))
                 distribution[max_visit_idx] = 1.0
         else: # to prevent the model from overfitting to PASS_MOVE
             distribution = np.zeros(np.shape(_n_visits))
-            print 'else2'
             
         pi = zip(actions, distribution)
         pi_list.append(pi)
@@ -67,39 +64,31 @@ def self_play_and_save(player, opp_player, boardsize):
     return state_list, pi_list, reward_list
 
 def self_play_and_train(cmd_line_args=None):
+    boardsize = 9
+    batch_size = 2
+    n_play = 10
     while True:
-        # Set initial conditions
-        #policy = MockPolicyValue()
         policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
-
-        boardsize = 9
-        # different opponents come from simply changing the weights of 'opponent.policy.model'. That
-        # is, only 'opp_policy' needs to be changed, and 'opponent' will change.
-        #opp_policy = MockPolicyValue()
         opp_policy = policy
 
-        for i in range(10):
+        idxs = [np.random.choice(range(n_play),replace=False) for i in range(batch_size)]
+        pout = np.zeros((batch_size, 9*9+1))
+        vout = np.zeros((batch_size, 1))
+        Y = [pout, vout]
+        X = np.zeros((batch_size, 17, 9, 9))
+        
+        for i in range(n_play):
             print(str(i) + "th self playing game")
             player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
-            state_list, pi_list, reward_list = self_play_and_save(opp_player, player, boardsize)
-            print len(state_list)
-            print state_list[0]
-            print 'pilist', len(pi_list)
-            print reward_list
+            state_list, pi_list, reward_list = self_play_and_save(opp_player, player, boardsize)            
 
-            b = util.get_board(state_list[20])
-            print type(b)
-            print b.shape
-            
-            exit()
-
-            del player
-            del opp_player
-        #metadata["self_play_model"] += [best_weight_path]
-        #save_metadata()
-        del policy
-        del opp_policy
+        for i in range(batch_size): 
+            pout[0,i] = util.to_pi_mat(pi_list[idxs[i]])
+            vout[0,i] = reward_list[idxs[i]]
+            X[0, i] = util.get_board(state_list[idxs[i]])
+                        
+        policy.model.fit(X, Y)
 
 if __name__ == '__main__':
     self_play_and_train()
