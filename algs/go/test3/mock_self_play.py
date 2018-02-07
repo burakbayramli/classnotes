@@ -60,6 +60,7 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
         else: # to prevent the model from overfitting to PASS_MOVE
             distribution = np.zeros(np.shape(_n_visits))
         pi = zip(actions, distribution)
+        #print np.array([x[1] for x in pi]).sum()
         #print(zip(actions, _n_visits))
         state_list.append(state.copy())
         #pprint_board(state.board)

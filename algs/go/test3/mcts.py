@@ -22,8 +22,9 @@ class TreeNode(object):
         self._n_visits = 0
         self._W = 0 # This was not in the original code.
         self._Q = 0
-        # This value for u will be overwritten in the first call to update(), but is useful for
-        # choosing the first action from this node.
+        # This value for u will be overwritten in the first call to
+        # update(), but is useful for choosing the first action from
+        # this node.
         self._u = prior_p
         self._P = prior_p
 
@@ -71,16 +72,18 @@ class TreeNode(object):
         self._W += leaf_value
         # Update Q, a running average of values for all visits.
         self._Q = self._W / self._n_visits
-        # Update u, the prior weighted by an exploration hyperparameter c_puct and the number of
-        # visits. Note that u is not normalized to be a distribution.
+        # Update u, the prior weighted by an exploration
+        # hyperparameter c_puct and the number of visits. Note that u
+        # is not normalized to be a distribution.
         if not self.is_root():
             self._u = c_puct * self._P * np.sqrt(self._parent._n_visits) / (1 + self._n_visits)
 
     def update_recursive(self, leaf_value, c_puct):
         """Like a call to update(), but applied recursively for all ancestors.
 
-        Note: it is important that this happens from the root downward so that 'parent' visit
-        counts are correct.
+        Note: it is important that this happens from the root downward
+        so that 'parent' visit counts are correct.
+
         """
         # If it is not root, this node's parent should be updated first.
         if self._parent:
@@ -88,8 +91,10 @@ class TreeNode(object):
         self.update(leaf_value, c_puct)
 
     def get_value(self):
-        """Calculate and return the value for this node: a combination of leaf evaluations, Q, and
-        this node's prior adjusted for its visit count, u
+        """Calculate and return the value for this node: a combination of leaf
+        evaluations, Q, and this node's prior adjusted for its visit
+        count, u
+
         """
         return self._Q + self._u
 
@@ -105,13 +110,17 @@ class TreeNode(object):
 class MCTS(object):
     """A simple (and slow) single-threaded implementation of Monte Carlo Tree Search.
 
-    Search works by exploring moves randomly according to the given policy up to a certain
-    depth, which is relatively small given the search space. "Leaves" at this depth are assigned a
-    value by the value function evaluated at that leaf.The probability of revisiting a node changes
-    over the course of the many playouts according to its estimated value.
-    Ultimately the node which is chosen based on the number of visits is returned as the next action.
+    Search works by exploring moves randomly according to the given
+    policy up to a certain depth, which is relatively small given the
+    search space. "Leaves" at this depth are assigned a value by the
+    value function evaluated at that leaf.The probability of
+    revisiting a node changes over the course of the many playouts
+    according to its estimated value.  Ultimately the node which is
+    chosen based on the number of visits is returned as the next
+    action.
 
     The term "playout" refers to a single search from the root.
+
     """
 
     def __init__(self, value_fn, policy_fn, c_puct=5, n_playout=1600):
@@ -131,8 +140,9 @@ class MCTS(object):
         self._n_playout = n_playout
 
     def _playout(self, state, self_play):
-        """Run a single playout from the root to the given depth, getting a value at the leaf and
-        propagating it back through its parents. State is modified in-place, so a copy must be
+        """Run a single playout from the root to the given depth, getting a
+        value at the leaf and propagating it back through its
+        parents. State is modified in-place, so a copy must be
         provided.
 
         Arguments:
@@ -141,24 +151,19 @@ class MCTS(object):
 
         Returns:
         None
+
         """
         node = self._root
         if not node.is_leaf() and self_play:
             etas = np.random.dirichlet([0.03 for _ in range(len(node._children.items()))],1)[0]
             j = 0
-            #a, c = map(list, zip(*node._children.items()))
-            #print("first")
-            #print(zip(a, [_c._P for _c in c]))
             for action, child_node in node._children.iteritems():
                 child_node._P = 0.75*child_node._P + 0.25*etas[j]
                 j += 1
-            #a, c = map(list, zip(*node._children.items()))
-            #print("second")
-            #print(zip(a, [_c._P for _c in c]))
 
         while True:
-            # Only expand node if it has not already been done. Existing nodes already know their
-            # prior.
+            # Only expand node if it has not already been
+            # done. Existing nodes already know their prior.
             if node.is_leaf():
                 action_probs = self._policy(state)
                 # Check for end of game.
@@ -179,7 +184,8 @@ class MCTS(object):
             action, node = node.select()
             state.do_move(action)
 
-        # Evaluate the leaf using value function which is the subnetwork of policy_value network
+        # Evaluate the leaf using value function which is the
+        # subnetwork of policy_value network
         leaf_value = self._value(state)
 
         # Update value and visit count of nodes in this traversal.
@@ -187,13 +193,15 @@ class MCTS(object):
 
 
     def get_move(self, state, temperature, self_play):
-        """Runs all playouts sequentially and returns the action based on exponentiated visit count.
+        """Runs all playouts sequentially and returns the action based on
+           exponentiated visit count.
 
         Arguments:
         state -- the current state, including both game state and the current player.
 
         Returns:
         the selected action
+
         """
         for n in range(self._n_playout):
             state_copy = state.copy()
@@ -212,8 +220,10 @@ class MCTS(object):
             return max(self._root._children.iteritems(), key=lambda act_node: act_node[1]._n_visits)[0]
 
     def update_with_move(self, last_move):
-        """Step forward in the tree, keeping everything we already know about the subtree, assuming
-        that get_move() has been called already. Siblings of the new root will be garbage-collected.
+        """Step forward in the tree, keeping everything we already know about
+        the subtree, assuming that get_move() has been called
+        already. Siblings of the new root will be garbage-collected.
+
         """
         if last_move in self._root._children:
             self._root = self._root._children[last_move]
