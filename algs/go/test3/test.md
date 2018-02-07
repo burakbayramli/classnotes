@@ -1,4 +1,33 @@
 
+##########################################
+x = Dense(64, activation='relu')(input_vecs)
+x = Dropout(0.5)(x)
+x = Dense(32, activation='relu')(x)
+y = Dense(1)(x)
+
+model = Model(input=[user_id_input, item_id_input, meta_input], output=y)
+model.compile(optimizer='adam', loss='mae')
+
+initial_train_preds = model.predict([user_id_train, item_id_train, item_meta_train])
+
+history = model.fit([user_id_train, item_id_train, item_meta_train], rating_train,
+                    batch_size=64, nb_epoch=15, validation_split=0.1,
+                    shuffle=True)
+
+################################################3
+
+from tensorflow.contrib.keras import callbacks as C
+from tensorflow.contrib.keras import backend as K
+change_lr = C.LearningRateScheduler(lr_scheduler)
+sgd = O.SGD(lr=.01, momentum=0.9)
+model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=sgd)
+
+################################################3
+
+
+
+
+
 ```python
 import pickle, util
 state, pi, reward = pickle.load(open("testdata.pkl"))

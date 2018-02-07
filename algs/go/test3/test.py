@@ -19,12 +19,14 @@ class BasicTest(unittest.TestCase):
         
         res = net.eval_value_state(state)
 
-        self.assertTrue(np.abs(res) > 0.0)
+        self.assertTrue(np.abs(res) > 0.0 and np.abs(res) < 1.0)
 
         net = resnet.PolicyValue(resnet.PolicyValue.create_network())
 
-        self.assertTrue(np.abs(res) > 0.0)
-        
+        self.assertTrue(np.abs(res) > 0.0 and np.abs(res) < 1.0)
+
+        b = util.get_board(state)
+        self.assertTrue(b.shape == (17, 9, 9))
         
 if __name__ == "__main__": 
 
