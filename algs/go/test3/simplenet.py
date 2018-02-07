@@ -8,6 +8,9 @@ import numpy as np, util, random
 class PolicyValue:
     def __init__(self, model):
         self.model = model
+
+    def save(self):
+        self.model.save_weights("/tmp/alphago-zero")        
         
     def eval_policy_state(self, state):
         x = util.get_board(state).reshape(1, 17, 9, 9)

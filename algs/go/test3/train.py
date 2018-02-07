@@ -3,8 +3,10 @@ import json, re, util
 import numpy as np
 from shutil import copy
 from ai import MCTSPlayer
-from mock_self_play import MockPolicyValue
 from util import flatten_idx, pprint_board
+from tensorflow.contrib.keras import optimizers as O
+from tensorflow.contrib.keras import callbacks as C
+from tensorflow.contrib.keras import backend as K
 #import resnet
 import simplenet
 
@@ -62,12 +64,25 @@ def self_play_and_save(player, opp_player):
     return state_list, pi_list, reward_list
 
 def self_play_and_train(cmd_line_args=None):
-    batch_size = 4
-    n_pick = 2
-    while True:
-        policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
-        opp_policy = policy
-        
+    batch_size = 20
+    n_pick = 4
+    
+    policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
+    opp_policy = policy
+
+    def lr_scheduler(epoch):
+        if epoch == 400000:
+            K.set_value(model.optimizer.lr, .001)
+        elif epoch == 600000:
+            K.set_value(model.optimizer.lr, .0001)
+        return K.get_value(model.optimizer.lr)
+
+    change_lr = C.LearningRateScheduler(lr_scheduler)
+    sgd = O.SGD(lr=.01, momentum=0.9)
+    policy.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=sgd)        
+            
+    for i in range(1000):
+
         state_list2 = []
         pi_list2 = []
         reward_list2 = []        
@@ -76,8 +91,9 @@ def self_play_and_train(cmd_line_args=None):
             player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player)            
-            idxs = [np.random.choice(range(len(state_list)),replace=False) for i in range(batch_size)]
-            for idx in idx:
+            idxs = [np.random.choice(range(10,len(state_list)),replace=False) for i in range(n_pick)]
+            print 'picked results', idxs
+            for idx in idxs:
                 state_list2.append(state_list[idx])
                 pi_list2.append(pi_list[idx])
                 reward_list2.append(reward_list[idx])
@@ -90,12 +106,13 @@ def self_play_and_train(cmd_line_args=None):
         X = np.zeros((batch_size, 17, 9, 9))
 
         for i in range(len(state_list2)):
-            pout[0,i] = util.to_pi_mat(pi_list2[i])
-            vout[0,i] = reward_list2[i]
-            X[0, i] = util.get_board(state_list[i])
-        
-                                        
+            vout[i,:] = reward_list2[i]
+            X[i, :] = util.get_board(state_list2[i])
+            pout[i,:] = util.to_pi_mat(pi_list2[i])
+                                                
         policy.model.fit(X, Y)
+
+        policy.save()
 
 if __name__ == '__main__':
     self_play_and_train()

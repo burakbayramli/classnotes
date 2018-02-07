@@ -20,24 +20,24 @@ net = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
  1 . O . . . . . X . 1
    A B C D E F G H I 
 None
-Tensor("input_2:0", shape=(?, 17, 9, 9), dtype=float32)
-Tensor("conv2d_5/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
-Tensor("batch_normalization_5/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
-Tensor("conv2d_6/BiasAdd:0", shape=(?, 17, 9, 32), dtype=float32)
-Tensor("batch_normalization_6/batchnorm/add_1:0", shape=(?, 17, 9, 32), dtype=float32)
+Tensor("input_3:0", shape=(?, 17, 9, 9), dtype=float32)
+Tensor("conv2d_9/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("batch_normalization_9/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
+Tensor("conv2d_10/BiasAdd:0", shape=(?, 17, 9, 32), dtype=float32)
+Tensor("batch_normalization_10/batchnorm/add_1:0", shape=(?, 17, 9, 32), dtype=float32)
 ------------- value -------------------
-Tensor("conv2d_7/BiasAdd:0", shape=(?, 17, 9, 2), dtype=float32)
-Tensor("activation_10/Relu:0", shape=(?, 17, 9, 2), dtype=float32)
-Tensor("flatten_3/Reshape:0", shape=(?, 306), dtype=float32)
-policy_output Tensor("activation_11/Softmax:0", shape=(?, 82), dtype=float32)
+Tensor("conv2d_11/BiasAdd:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("activation_17/Relu:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("flatten_5/Reshape:0", shape=(?, 306), dtype=float32)
+policy_output Tensor("activation_18/Softmax:0", shape=(?, 82), dtype=float32)
 ------------- policy -------------------
-Tensor("conv2d_8/BiasAdd:0", shape=(?, 17, 9, 1), dtype=float32)
-Tensor("activation_12/Relu:0", shape=(?, 17, 9, 1), dtype=float32)
-Tensor("flatten_4/Reshape:0", shape=(?, 153), dtype=float32)
-Tensor("dense_5/BiasAdd:0", shape=(?, 256), dtype=float32)
-Tensor("activation_13/Relu:0", shape=(?, 256), dtype=float32)
-Tensor("dense_6/BiasAdd:0", shape=(?, 1), dtype=float32)
-Tensor("dense_6/BiasAdd:0", shape=(?, 1), dtype=float32)
+Tensor("conv2d_12/BiasAdd:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("activation_19/Relu:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("flatten_6/Reshape:0", shape=(?, 153), dtype=float32)
+Tensor("dense_8/BiasAdd:0", shape=(?, 256), dtype=float32)
+Tensor("activation_20/Relu:0", shape=(?, 256), dtype=float32)
+Tensor("dense_9/BiasAdd:0", shape=(?, 1), dtype=float32)
+Tensor("dense_9/BiasAdd:0", shape=(?, 1), dtype=float32)
 ```
 
 ##########################################
@@ -101,8 +101,8 @@ net.model.fit(X, Y)
 
 ```text
 Epoch 1/1
-1/1 [==============================] - 1s - loss: 6.7361 - activation_11_loss: 5.7097 - activation_14_loss: 0.9850
-Out[1]: <tensorflow.python.keras._impl.keras.callbacks.History at 0x7fe8e7449890>
+1/1 [==============================] - 1s - loss: 8.2936 - activation_18_loss: 4.6405 - activation_21_loss: 3.6121
+Out[1]: <tensorflow.python.keras._impl.keras.callbacks.History at 0x7fe8e62908d0>
 ```
 
 
