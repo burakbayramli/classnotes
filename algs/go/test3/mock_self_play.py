@@ -11,10 +11,6 @@ import numpy as np
 import random
 
 class MockPolicyValue:
-    """uses a convolutional neural network to evaluate the state of the game
-    and compute a probability distribution over the next action
-    and value of the current state.
-    """
 
     def eval_policy_state(self, state, moves=None):
         return [(action, random.random()) for action in state.get_legal_moves()]
@@ -27,10 +23,7 @@ class MockPolicyValue:
         pass
 
 def self_play_and_save(player, opp_player, boardsize, mock_state=[]):    
-    '''Run num_games games to completion, keeping track of each position
-    and move of the new_player.  And save the game data
 
-    '''
     state_list = []
     pi_list = []
     player_list = []
@@ -84,11 +77,8 @@ def run_self_play(cmd_line_args=None):
     while True:
         # Set initial conditions
         policy = MockPolicyValue()
-
-        boardsize = 9
-        # different opponents come from simply changing the weights of 'opponent.policy.model'. That
-        # is, only 'opp_policy' needs to be changed, and 'opponent' will change.
         opp_policy = MockPolicyValue()
+        boardsize = 9
 
         for i in range(10):
             print(str(i) + "th self playing game")
