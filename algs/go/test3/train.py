@@ -8,14 +8,13 @@ from util import flatten_idx, pprint_board
 #import resnet
 import simplenet
 
-def self_play_and_save(player, opp_player, boardsize):
+def self_play_and_save(player, opp_player):
     
     state_list = []
     pi_list = []
     player_list = []
 
-    board_size = boardsize
-    state = go.GameState(size=board_size, komi=0)
+    state = go.GameState(size=9, komi=0)
 
     player_color = go.BLACK
     current = player
@@ -41,7 +40,6 @@ def self_play_and_save(player, opp_player, boardsize):
             
         pi = zip(actions, distribution)
         pi_list.append(pi)
-        #print pi
 
         state_list.append(state.copy())
 
@@ -64,30 +62,38 @@ def self_play_and_save(player, opp_player, boardsize):
     return state_list, pi_list, reward_list
 
 def self_play_and_train(cmd_line_args=None):
-    boardsize = 9
-    batch_size = 2
-    n_play = 10
+    batch_size = 4
+    n_pick = 2
     while True:
         policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
         opp_policy = policy
+        
+        state_list2 = []
+        pi_list2 = []
+        reward_list2 = []        
+        
+        while True:            
+            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
+            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
+            state_list, pi_list, reward_list = self_play_and_save(opp_player, player)            
+            idxs = [np.random.choice(range(len(state_list)),replace=False) for i in range(batch_size)]
+            state_list2.append(state_list[idx])
+            pi_list2.append(pi_list[idx])
+            reward_list2.append(reward_list[idx])
+            if len(state_list2) >= batch_size: break
+            
 
-        idxs = [np.random.choice(range(n_play),replace=False) for i in range(batch_size)]
         pout = np.zeros((batch_size, 9*9+1))
         vout = np.zeros((batch_size, 1))
         Y = [pout, vout]
         X = np.zeros((batch_size, 17, 9, 9))
-        
-        for i in range(n_play):
-            print(str(i) + "th self playing game")
-            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
-            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
-            state_list, pi_list, reward_list = self_play_and_save(opp_player, player, boardsize)            
 
-        for i in range(batch_size): 
-            pout[0,i] = util.to_pi_mat(pi_list[idxs[i]])
-            vout[0,i] = reward_list[idxs[i]]
-            X[0, i] = util.get_board(state_list[idxs[i]])
-                        
+        for i in range(len(state_list2)):
+            pout[0,i] = util.to_pi_mat(pi_list2[i])
+            vout[0,i] = reward_list2[i]
+            X[0, i] = util.get_board(state_list[i])
+        
+                                        
         policy.model.fit(X, Y)
 
 if __name__ == '__main__':
