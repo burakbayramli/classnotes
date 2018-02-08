@@ -7,29 +7,26 @@ from util import flatten_idx, pprint_board
 from util import flatten_idx, random_transform, idx_transformations
 from tensorflow.contrib.keras import backend as K
 from tensorflow.contrib.keras import models as M
-import numpy as np
+import numpy as np, gtp
 import random, simplenet
 
 # Dis dunyadan bir Go programiyla oynamak icin arayuz
-class GnuGo(object):
+class Human(object):
     def __init__(self,board_size):
         self.is_human = True
         self.board_size = board_size
+        self.gnugo = gtp.GTPFacade("white", ["gnugo", "--mode", "gtp", "--level", "10"])
+        self.gnugo.boardsize(9)
+        self.gnugo.komi(5.5)
+        self.gnugo.clear_board()
 
+    def set_others_move(self, coord):
+        self.gnugo.play(gtp.BLACK, coord)
+        
     def get_move(self, state):
-        while True:
-            query = raw_input("Your move: ")
-            if len(query)==0:
-                return go.PASS_MOVE
-            else:
-                try:
-                    alphabet, number = re.match(r"([a-z]+)([0-9]+)", query, re.I).groups()
-                    y = ord(alphabet.upper()) - ord('A')
-                    x = self.board_size - int(number)
-                    return ((x,y))
-                except:
-                    print("The input should have the form like 'a1' or 'A1'.")
-                    continue
+        (x,y) = self.gnugo.genmove(gtp.WHITE)
+        if (x,y)==(0,0): return go.PASS_MOVE
+        return (x-1,y-1)
 
 def run_a_game(alphago_player, human_player, boardsize):
     '''Run num_games games to completion, keeping track of each position and move of the new_player.
@@ -41,15 +38,9 @@ def run_a_game(alphago_player, human_player, boardsize):
     state = go.GameState(size=board_size, komi=0)
 
     # Start all odd games with moves by 'old_player'. Even games will have 'new_player' black.
-    human_color = np.random.choice([go.BLACK, go.WHITE])
-    if human_color == go.BLACK:
-        current = human_player
-        other = alphago_player
-        print("Your color is black.")
-    else:
-        current = alphago_player
-        other = human_player
-        print("Your color is white.")
+    human_color = go.WHITE
+    current = human_player
+    other = alphago_player
 
     pprint_board(state.board)
     while not state.is_end_of_game:
@@ -61,6 +52,9 @@ def run_a_game(alphago_player, human_player, boardsize):
             continue
         if other == alphago_player:
             other.mcts.update_with_move(move)
+            print 'my move', move
+            current.set_others_move(move)
+                
         current, other = other, current
 
         pprint_board(state.board)

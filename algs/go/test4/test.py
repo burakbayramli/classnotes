@@ -11,7 +11,7 @@ class BasicTest(unittest.TestCase):
 
         for i in range(10):
             res = gnugo.genmove(gtp.WHITE)
-            print res
+            print 'res', res
             gnugo.showboard()        
     
     def testBasic(self):
