@@ -5,6 +5,8 @@ from tensorflow.contrib.keras import backend as K
 from util import flatten_idx, random_transform, idx_transformations
 import numpy as np, util, random
 
+mfile = "/tmp/alphago-zero.h5"
+
 class PolicyValue:
     """uses a convolutional neural network to evaluate the state of the game
     and compute a probability distribution over the next action
@@ -13,6 +15,12 @@ class PolicyValue:
 
     def __init__(self, model):
         self.model = model
+
+    def save(self):
+        self.model.save_weights(mfile)
+        
+    def load(self):
+        self.model.load_weights(mfile)
         
     def eval_policy_state(self, state):
         #return [(action, random.random()) for action in state.get_legal_moves()]

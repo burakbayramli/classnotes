@@ -64,8 +64,8 @@ def self_play_and_save(player, opp_player):
     return state_list, pi_list, reward_list
 
 def self_play_and_train(cmd_line_args=None):
-    policy = resnet.PolicyValue(resnet.PolicyValue.create_network())
-    opp_policy = resnet.PolicyValue(resnet.PolicyValue.create_network())
+    policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
+    opp_policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
 
     def lr_scheduler(epoch):
         if epoch == 400000:
