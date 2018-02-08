@@ -11,14 +11,13 @@ import random, simplenet
 
 # Dis dunyadan bir Go programiyla oynamak icin arayuz
 class GnuGo(object):
-    def __init__(self,board_size):
+    def __init__(self,board_size, level):
         self.is_human = True
         self.board_size = board_size
-        self.gnugo = gtp.GTPFacade("white", ["gnugo", "--mode", "gtp", "--level", "10"])
+        self.gnugo = gtp.GTPFacade("white", ["gnugo", "--mode", "gtp", "--level", str(level)])
         self.gnugo.boardsize(9)
         self.gnugo.komi(5.5)
         self.gnugo.clear_board()
-
 
     def set_others_move(self, coord):
         if coord:
@@ -30,6 +29,9 @@ class GnuGo(object):
         (x,y) = self.gnugo.genmove(gtp.WHITE)
         if (x,y)==(0,0): return go.PASS_MOVE
         return (x-1,y-1)
+
+    def showboard(self):
+        self.gnugo.showboard()        
 
 def run_a_game(alphago_player, gnugo_player, boardsize):
     '''Run num_games games to completion, keeping track of each position and move of the new_player.
@@ -46,14 +48,16 @@ def run_a_game(alphago_player, gnugo_player, boardsize):
             move = alphago_player.get_move(state)            
             state.do_move(move)
             alphago_player.mcts.update_with_move(move)            
-            print 'gnugo move', move
+            print 'alphago move', move
             gnugo_player.set_others_move(move)
-            pprint_board(state.board)
+            #pprint_board(state.board)
+            gnugo_player.showboard()
 
             move = gnugo_player.get_move()
-            print move
+            print 'gnugo move', move
             state.do_move(move)
-            pprint_board(state.board)
+            #pprint_board(state.board)
+            gnugo_player.showboard()
             
         except Exception as e:
             print(e)
@@ -62,9 +66,10 @@ def run_a_game(alphago_player, gnugo_player, boardsize):
     winner = state.get_winner()
     print 'winner', winner
 if __name__ == '__main__':
-    # Set initial conditions
+    # Arguments
+    # gnugo_play.py [num of recursive calls] [gnugo difficulty (between 1-10)]
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
-    best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=int(sys.argv[1]), evaluating=True)
-    human_player = GnuGo(9)
-    run_a_game(best_player, human_player, 9)
+    alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=int(sys.argv[1]), evaluating=True)
+    gnugo_player = GnuGo(9, sys.argv[2])
+    run_a_game(alphago_player, gnugo_player, 9)
