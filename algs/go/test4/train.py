@@ -78,27 +78,30 @@ def self_play_and_train(cmd_line_args=None):
     sgd = O.SGD(lr=.01, momentum=0.9)
     policy.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=sgd)        
 
-    batch_size = 100
+    batch_size = 50
     n_pick = 10
         
-    for epoch in range(10000):
+    for epoch in range(1000):
 
         state_list2 = []
         pi_list2 = []
         reward_list2 = []        
         
-        while True:            
-            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=40, evaluating=False, self_play=True)
-            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=40, evaluating=False, self_play=True)
-            state_list, pi_list, reward_list = self_play_and_save(opp_player, player)            
-            idxs = [np.random.choice(range(10,len(state_list)),replace=False) for i in range(n_pick)]
-            print 'picked results', idxs
-            for idx in idxs:
-                state_list2.append(state_list[idx])
-                pi_list2.append(pi_list[idx])
-                reward_list2.append(reward_list[idx])
-            if len(state_list2) >= batch_size: break
-            
+        while True:
+            try:
+                player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=50, evaluating=False, self_play=True)
+                opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=50, evaluating=False, self_play=True)
+                state_list, pi_list, reward_list = self_play_and_save(opp_player, player)
+                idxs = [np.random.choice(range(10,len(state_list)),replace=False) for i in range(n_pick)]
+                print 'picked results', idxs
+                for idx in idxs:
+                    state_list2.append(state_list[idx])
+                    pi_list2.append(pi_list[idx])
+                    reward_list2.append(reward_list[idx])
+                if len(state_list2) >= batch_size: break
+            except:
+                print 'exception'
+                continue
 
         pout = np.zeros((batch_size, 9*9+1))
         vout = np.zeros((batch_size, 1))
@@ -116,7 +119,7 @@ def self_play_and_train(cmd_line_args=None):
             print 'saving'
             policy.save()
 
-        if epoch % 100 == 0:
+        if epoch % 50 == 0:
             print 'restoring opp policy to last saved policy'
             opp_policy.load()
 
