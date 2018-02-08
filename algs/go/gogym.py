@@ -15,15 +15,19 @@ def main():
     env.reset()
     while True:
         s = env._state
+        print 's', s
         env._render()
 
         colorstr = pachi_py.color_to_str(s.color)
         if args.raw_actions:
             a = int(raw_input('{} (raw)> '.format(colorstr)))
+            print 'a 1', a
+            print 'coordstr 1', coordstr
         else:
             coordstr = raw_input('{}> '.format(colorstr))
+            print 'coordstr 2', coordstr
             a = go.str_to_action(s.board, coordstr)
-
+            print 'a 2', a
         _, r, done, _ = env.step(a)
         if done:
             break

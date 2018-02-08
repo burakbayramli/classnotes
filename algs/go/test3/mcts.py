@@ -6,10 +6,12 @@ it is not specific to the game of Go; everything in this file is
 implemented generically with respect to some state, actions, policy
 function, and value function.
 """
-import numpy as np
+import numpy as np, resource, sys
 from operator import itemgetter
-#import sys
-#sys.setrecursionlimit(1500)
+
+sys.setrecursionlimit(1500)
+resource.setrlimit(resource.RLIMIT_STACK, [0x10000000, resource.RLIM_INFINITY])
+sys.setrecursionlimit(0x100000)
 
 class TreeNode(object):
     """A node in the MCTS tree. Each node keeps track of its own value Q,

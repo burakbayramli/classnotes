@@ -64,9 +64,6 @@ def self_play_and_save(player, opp_player):
     return state_list, pi_list, reward_list
 
 def self_play_and_train(cmd_line_args=None):
-    batch_size = 20
-    n_pick = 4
-    
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     opp_policy = policy
 
@@ -80,7 +77,10 @@ def self_play_and_train(cmd_line_args=None):
     change_lr = C.LearningRateScheduler(lr_scheduler)
     sgd = O.SGD(lr=.01, momentum=0.9)
     policy.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=sgd)        
-            
+
+    batch_size = 20
+    n_pick = 4
+        
     for i in range(1000):
 
         state_list2 = []
@@ -88,8 +88,8 @@ def self_play_and_train(cmd_line_args=None):
         reward_list2 = []        
         
         while True:            
-            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
-            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=10, evaluating=False, self_play=True)
+            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=1600, evaluating=False, self_play=True)
+            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=1600, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player)            
             idxs = [np.random.choice(range(10,len(state_list)),replace=False) for i in range(n_pick)]
             print 'picked results', idxs
