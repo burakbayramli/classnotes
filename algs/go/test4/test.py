@@ -1,8 +1,20 @@
 import unittest, pickle, util, simplenet, resnet
-import numpy as np
+import numpy as np, gtp 
 
 class BasicTest(unittest.TestCase):
-    def testBla(self):
+
+    def testGnuGo(self):
+        gnugo = gtp.GTPFacade("white", ["gnugo", "--mode", "gtp", "--level", "10"])
+        gnugo.boardsize(9)
+        gnugo.komi(5.5)
+        gnugo.clear_board()
+
+        for i in range(10):
+            res = gnugo.genmove(gtp.WHITE)
+            print res
+            gnugo.showboard()        
+    
+    def testBasic(self):
         state, pi, reward = pickle.load(open("testdata.pkl"))
         state._create_neighbors_cache()
 
