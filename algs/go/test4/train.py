@@ -7,7 +7,7 @@ from util import flatten_idx, pprint_board
 from tensorflow.contrib.keras import optimizers as O
 from tensorflow.contrib.keras import callbacks as C
 from tensorflow.contrib.keras import backend as K
-#import resnet
+import resnet
 import simplenet
 
 def self_play_and_save(player, opp_player):
@@ -64,8 +64,8 @@ def self_play_and_save(player, opp_player):
     return state_list, pi_list, reward_list
 
 def self_play_and_train(cmd_line_args=None):
-    policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
-    opp_policy = policy
+    policy = resnet.PolicyValue(resnet.PolicyValue.create_network())
+    opp_policy = resnet.PolicyValue(resnet.PolicyValue.create_network())
 
     def lr_scheduler(epoch):
         if epoch == 400000:
@@ -78,18 +78,18 @@ def self_play_and_train(cmd_line_args=None):
     sgd = O.SGD(lr=.01, momentum=0.9)
     policy.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=sgd)        
 
-    batch_size = 20
-    n_pick = 4
+    batch_size = 100
+    n_pick = 10
         
-    for i in range(1000):
+    for i in range(10000):
 
         state_list2 = []
         pi_list2 = []
         reward_list2 = []        
         
         while True:            
-            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=1600, evaluating=False, self_play=True)
-            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=1600, evaluating=False, self_play=True)
+            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=100, evaluating=False, self_play=True)
+            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=100, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player)            
             idxs = [np.random.choice(range(10,len(state_list)),replace=False) for i in range(n_pick)]
             print 'picked results', idxs
@@ -112,7 +112,13 @@ def self_play_and_train(cmd_line_args=None):
                                                 
         policy.model.fit(X, Y)
 
-        policy.save()
+        if i % 5 == 0:
+            print 'saving'
+            policy.save()
+
+        if i % 100 == 0:
+            print 'restoring opp policy to last saved policy'
+            opp_policy.load()
 
 if __name__ == '__main__':
     self_play_and_train()

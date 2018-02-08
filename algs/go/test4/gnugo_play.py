@@ -16,7 +16,7 @@ class GnuGo(object):
         self.board_size = board_size
         self.gnugo = gtp.GTPFacade("white", ["gnugo", "--mode", "gtp", "--level", str(level)])
         self.gnugo.boardsize(9)
-        self.gnugo.komi(5.5)
+        self.gnugo.komi(0.0)
         self.gnugo.clear_board()
 
     def set_others_move(self, coord):
