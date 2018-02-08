@@ -68,9 +68,9 @@ def self_play_and_train(cmd_line_args=None):
     opp_policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
 
     def lr_scheduler(epoch):
-        if epoch == 400000:
+        if epoch == 5000:
             K.set_value(model.optimizer.lr, .001)
-        elif epoch == 600000:
+        elif epoch == 7000:
             K.set_value(model.optimizer.lr, .0001)
         return K.get_value(model.optimizer.lr)
 
@@ -81,15 +81,15 @@ def self_play_and_train(cmd_line_args=None):
     batch_size = 100
     n_pick = 10
         
-    for i in range(10000):
+    for epoch in range(10000):
 
         state_list2 = []
         pi_list2 = []
         reward_list2 = []        
         
         while True:            
-            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=100, evaluating=False, self_play=True)
-            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=100, evaluating=False, self_play=True)
+            player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=40, evaluating=False, self_play=True)
+            opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=40, evaluating=False, self_play=True)
             state_list, pi_list, reward_list = self_play_and_save(opp_player, player)            
             idxs = [np.random.choice(range(10,len(state_list)),replace=False) for i in range(n_pick)]
             print 'picked results', idxs
@@ -112,11 +112,11 @@ def self_play_and_train(cmd_line_args=None):
                                                 
         policy.model.fit(X, Y)
 
-        if i % 5 == 0:
+        if epoch % 5 == 0:
             print 'saving'
             policy.save()
 
-        if i % 100 == 0:
+        if epoch % 100 == 0:
             print 'restoring opp policy to last saved policy'
             opp_policy.load()
 
