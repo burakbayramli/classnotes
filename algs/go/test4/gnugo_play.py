@@ -71,10 +71,8 @@ def run_play(cmd_line_args=None):
     # Set initial conditions
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
-
-    boardsize = policy.model.input_shape[-1]
     best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=True)
-    human_player = GnuGo(boardsize)
+    human_player = GnuGo(9)
     run_a_game(best_player, human_player, boardsize)
 
 if __name__ == '__main__':
