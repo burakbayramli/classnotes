@@ -44,7 +44,7 @@ class PolicyValue:
         defaults = {
             "input_dim": 17,
             "board": 9,
-            "filters_per_layer": 16,
+            "filters_per_layer": 64,
             "layers": 9,
             "filter_width": 3
         }
@@ -135,7 +135,7 @@ class PolicyValue:
         policy_output = L.Activation('softmax')(policy_path)
         print 'policy_output', policy_output
 
-        print '------------- policy -------------------'
+        print '-------------value -------------------'
         
         # value head
         value_path = L.Convolution2D(
