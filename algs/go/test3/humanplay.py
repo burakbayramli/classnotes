@@ -76,9 +76,9 @@ def run_play(cmd_line_args=None):
     # Set initial conditions
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
-    exit()
+
     boardsize = policy.model.input_shape[-1]
-    best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=args.n_playout, evaluating=True)
+    best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=True)
     human_player = Human(boardsize)
     run_a_game(best_player, human_player, boardsize)
 
