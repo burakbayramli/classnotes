@@ -11,7 +11,7 @@ import numpy as np, gtp
 import random, simplenet
 
 # Dis dunyadan bir Go programiyla oynamak icin arayuz
-class Human(object):
+class GnuGo(object):
     def __init__(self,board_size):
         self.is_human = True
         self.board_size = board_size
@@ -74,7 +74,7 @@ def run_play(cmd_line_args=None):
 
     boardsize = policy.model.input_shape[-1]
     best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=10, evaluating=True)
-    human_player = Human(boardsize)
+    human_player = GnuGo(boardsize)
     run_a_game(best_player, human_player, boardsize)
 
 if __name__ == '__main__':
