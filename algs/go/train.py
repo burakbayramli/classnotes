@@ -107,7 +107,11 @@ def self_play_and_train(cmd_line_args=None):
                 state_list, pi_list, reward_list = self_play_and_save(
                     opp_player, player
                 )
-                
+
+                # oyunda atilan tum adimlar, sonuclar state_list,
+                # pi_list, reward_list listesi icinde. Simdi rasgele
+                # n_pick tane veri noktasi her oyun kaydindan cekip
+                # cikartilir.
                 idxs = [np.random.choice(range(10,len(state_list)),replace=False) \
                         for i in range(n_pick)]
                 
