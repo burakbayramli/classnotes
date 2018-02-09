@@ -12,11 +12,13 @@ def agz_to_gnu(action):
 
 print gnu_to_agz((4,3))
 print agz_to_gnu((6,3))
+print agz_to_gnu((5,7))
 ```
 
 ```text
 (6, 3)
 (4, 3)
+(8, 4)
 ```
 
 ```python

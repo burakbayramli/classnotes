@@ -64,6 +64,7 @@ def run_a_game(alphago_player, gnugo_player):
             move = gnugo_player.get_move()
             print 'gnugo move', move
             state.do_move(move, go.WHITE)
+            alphago_player.mcts.update_with_move(move)
             pprint_board(state.board)
             gnugo_player.showboard()
             print '==================================================='
