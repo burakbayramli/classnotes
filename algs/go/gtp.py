@@ -7,25 +7,19 @@ def pre_engine(s):
     s = s.replace("\t", " ")
     return s
 
-
 def pre_controller(s):
     s = re.sub("[^\t\n -~]", "", s)
     s = s.replace("\t", " ")
     return s
 
-
 def gtp_boolean(b):
     return "true" if b else "false"
-
 
 def gtp_list(l):
     return "\n".join(l)
 
-
 def gtp_color(color):
-    # an arbitrary choice amongst a number of possibilities
     return {BLACK: "B", WHITE: "W"}[color]
-
 
 def gtp_vertex(vertex):
     if vertex == PASS:
@@ -39,7 +33,6 @@ def gtp_vertex(vertex):
 
 def gtp_move(color, vertex):
     return " ".join([gtp_color(color), gtp_vertex(vertex)])
-
 
 def parse_message(message):
     message = pre_engine(message).strip()
@@ -64,7 +57,6 @@ EMPTY = 0
 PASS = (0, 0)
 RESIGN = "resign"
 
-
 def parse_color(color):
     if color.lower() in ["b", "black"]:
         return BLACK
@@ -72,7 +64,6 @@ def parse_color(color):
         return WHITE
     else:
         return False
-
 
 def parse_vertex(vertex_string):
     if vertex_string is None:
@@ -91,7 +82,6 @@ def parse_vertex(vertex_string):
         return False
     return (x, y)
 
-
 def parse_move(move_string):
     color_string, vertex_string = (move_string.split(" ") + [None])[:2]
     color = parse_color(color_string)
@@ -106,7 +96,6 @@ def parse_move(move_string):
 
 MIN_BOARD_SIZE = 7
 MAX_BOARD_SIZE = 19
-
 
 def format_success(message_id, response=None):
     if response is None:
@@ -126,7 +115,6 @@ def format_error(message_id, response):
         return "?{}{}\n\n".format(message_id, response)
     else:
         return "?{}\n\n".format(response)
-
 
 class Engine(object):
 

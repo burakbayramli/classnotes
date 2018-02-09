@@ -2,7 +2,7 @@ import os, glob, pickle, go
 import json, re, util, gtp
 import numpy as np, sys
 from shutil import copy
-from ai import MCTSPlayer
+from mcts import MCTSPlayer
 from util import flatten_idx, pprint_board
 from util import flatten_idx, random_transform, idx_transformations
 from tensorflow.contrib.keras import backend as K
@@ -33,14 +33,14 @@ class GnuGo(object):
     def showboard(self):
         self.gnugo.showboard()        
 
-def run_a_game(alphago_player, gnugo_player, boardsize):
+def run_a_game(alphago_player, gnugo_player):
     '''Run num_games games to completion, keeping track of each position and move of the new_player.
     And return the win ratio
 
     '''
 
     board_size = boardsize
-    state = go.GameState(size=board_size, komi=0)
+    state = go.GameState(size=9, komi=0)
 
     pprint_board(state.board)
     while not state.is_end_of_game:
@@ -71,5 +71,5 @@ if __name__ == '__main__':
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
     alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=40, evaluating=True)
-    gnugo_player = GnuGo(9, 10)
-    run_a_game(alphago_player, gnugo_player, 9)
+    gnugo_player = GnuGo(10)
+    run_a_game(alphago_player, gnugo_player)
