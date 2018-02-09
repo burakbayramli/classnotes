@@ -1,3 +1,7 @@
+#
+# GnuGo ile iletisim kurar, gnugo programinin ayri kurulmus olmasi lazim
+# Ubuntu'da sudo apt-get install gnugo
+#
 import os, glob, pickle, go
 import json, re, util, gtp
 import numpy as np, sys
@@ -82,6 +86,6 @@ if __name__ == '__main__':
     # gnugo_play.py [num of recursive calls] [gnugo difficulty (between 1-10)]
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
-    alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=100, evaluating=True)
+    alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=50, evaluating=True)
     gnugo_player = GnuGo(board_size=9,level=5)
     run_a_game(alphago_player, gnugo_player)

@@ -90,6 +90,12 @@ verisi toplanýr ve bu veri YZ'yi iyileþtirmek için aða uygulanýr, ve iþlem
 baþa dönerek devam edilir. Bu sayede en kötü performanstan en iyisine doðru
 ilerlemek mümkündür.
 
+Eðitim verisinde hedefin ne olduðunu daha iyi vurgulamak gerekirse, deðer
+kafasý için bu tek bir deðer, ilke kafasý için tüm 9x9 tahta
+pozisyonlarýnda hangi hamlenin yapýlmýþ olduðu, o hücre 1 diðerleri 0
+deðerinde olacak. Bu þekilde eðitilen YSA, ilke tahmini üreteceði zaman tüm
+hücrelerde olasýlýk deðerleri üretecektir.
+
 Alttaki kod [4]'u baz almýþtýr. Eðitmek için \verb!train.py! kullanýlýr,
 eðitim sýrasýnda en son YSA belli aralýklarla sürekli kaydedilecektir,
 eðitim sonunda ya da yeterince eðitilince iþlem durulabilir, ve
@@ -103,37 +109,48 @@ simplenet.PolicyValue.create_network()
 \end{minted}
 
 \begin{verbatim}
-Tensor("input_4:0", shape=(?, 17, 9, 9), dtype=float32)
-Tensor("conv2d_47/BiasAdd:0", shape=(?, 17, 9, 16), dtype=float32)
-Tensor("batch_normalization_47/batchnorm/add_1:0", shape=(?, 17, 9, 16), dtype=float32)
-Tensor("conv2d_48/BiasAdd:0", shape=(?, 17, 9, 32), dtype=float32)
-Tensor("batch_normalization_48/batchnorm/add_1:0", shape=(?, 17, 9, 32), dtype=float32)
+Tensor("input_1:0", shape=(?, 17, 9, 9), dtype=float32)
+Tensor("conv2d/BiasAdd:0", shape=(?, 17, 9, 64), dtype=float32)
+Tensor("batch_normalization/batchnorm/add_1:0", shape=(?, 17, 9, 64), dtype=float32)
+Tensor("conv2d_2/BiasAdd:0", shape=(?, 17, 9, 128), dtype=float32)
+Tensor("batch_normalization_2/batchnorm/add_1:0", shape=(?, 17, 9, 128), dtype=float32)
 ------------- value -------------------
-Tensor("conv2d_49/BiasAdd:0", shape=(?, 17, 9, 2), dtype=float32)
-Tensor("activation_58/Relu:0", shape=(?, 17, 9, 2), dtype=float32)
-Tensor("flatten_7/Reshape:0", shape=(?, 306), dtype=float32)
-policy_output Tensor("activation_59/Softmax:0", shape=(?, 82), dtype=float32)
+Tensor("conv2d_3/BiasAdd:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("activation_3/Relu:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("flatten/Reshape:0", shape=(?, 306), dtype=float32)
+policy_output Tensor("activation_4/Softmax:0", shape=(?, 82), dtype=float32)
 ------------- policy -------------------
-Tensor("conv2d_50/BiasAdd:0", shape=(?, 17, 9, 1), dtype=float32)
-Tensor("activation_60/Relu:0", shape=(?, 17, 9, 1), dtype=float32)
-Tensor("flatten_8/Reshape:0", shape=(?, 153), dtype=float32)
-Tensor("dense_11/BiasAdd:0", shape=(?, 256), dtype=float32)
-Tensor("activation_61/Relu:0", shape=(?, 256), dtype=float32)
-Tensor("dense_12/BiasAdd:0", shape=(?, 1), dtype=float32)
-Tensor("dense_12/BiasAdd:0", shape=(?, 1), dtype=float32)
-Out[1]: <tensorflow.python.keras._impl.keras.engine.training.Model at 0x7f95d7088c10>
+Tensor("conv2d_4/BiasAdd:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("activation_5/Relu:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("flatten_2/Reshape:0", shape=(?, 153), dtype=float32)
+Tensor("dense_2/BiasAdd:0", shape=(?, 256), dtype=float32)
+Tensor("activation_6/Relu:0", shape=(?, 256), dtype=float32)
+Tensor("dense_3/BiasAdd:0", shape=(?, 1), dtype=float32)
+Tensor("dense_3/BiasAdd:0", shape=(?, 1), dtype=float32)
+Out[1]: <tensorflow.python.keras._impl.keras.engine.training.Model at 0x7fa2dd30de50>
 \end{verbatim}
-
-Bu mimari birkaç saat eðitim sonrasý GnuGo baþlangýç seviyelerini
-yeniyor. Okuyucuya ödev, grafik kartlý güçlü bir mimaride \verb!resnet.py!
-ile ve \verb!n_play!'i arttýrýp daha fazla simülasyon yaparak sonuçlara
-bakmak olabilir.
 
 \inputminted[fontsize=\footnotesize]{python}{mcts.py}
 
 \inputminted[fontsize=\footnotesize]{python}{train.py}
 
 \inputminted[fontsize=\footnotesize]{python}{simplenet.py}
+
+Ýki YSA kendisine karþý oynarken ayný aðýrlýklara sahip iki farklý YSA ile
+baþlýyoruz, ve oyun sonuçlarýný kullanarak sadece birini
+güncelliyoruz. Eðer her toptan demeti (minibatch) ile her iki YSA'yý
+günceleseydik birbirlerinden farklýlaþmalarý zorlaþabilirdi. Ama döngünün
+daha ileri bir noktasýnda esitleme yapariz yine de, ilk YSA'yý
+güncellenenin aðýrlýklarýný diskten okuyarak güncelliyoruz, ve böyle devam
+ediyor. AGZ tasarýmcýlarý ``en iyi'' olan aðýrlýklara geçmeden yeni YSA'nýn
+diðerini yüzde 55'ten fazla yenmesi þartýný koymuþlar, tam donanýmla
+testleri yapanlar bunu takip ederse iyi olur.
+
+Üstteki mimari birkaç saat eðitim sonrasý GnuGo baþlangýç, orta
+seviyelerini yenebiliyor. Okuyucular, grafik kartlý güçlü bir mimaride, ya
+üstteki YSA'yý derinleþtirerek (daha fazla evriþim filtresi ekleyerek), ya
+da \verb!resnet.py! ile, ve \verb!n_play!'i arttýrarak daha fazla
+simülasyonla sonuçlarý daha da iyileþtirmeye uðraþabilirler.
 
 Kaynaklar
 
