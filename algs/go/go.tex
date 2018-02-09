@@ -2,12 +2,41 @@
 \begin{document}
 Derin Öðrenme ile Go Oyununu Oynamak, DeepMind AlphaGo Zero
 
+Yapay Zeka alanýndaki heyecan verici ilerlemelerden biri Google DeepMind
+þirketinin AlphaGo programýnýn 17 kez Gö þampiyonu olmuþ Lee Sedol'u
+yenmesiydi. Fakat DeepMind orada durmadý, mimariyi geliþtirerek AlphaGo'yu
+100-0 yenecek AlphaGo Zero'yu geliþtirdi. Yeni mimarýnýn ilginç tarafý
+YZ'nin hiç dýþ veriye ihtiyaç duymadan eðitilmiþ olmasý. AÐZ sýfýr
+kabiliyet ile baþlýyor, ve kendisiyle oynaya oynaya Gö þampiyonlarýný
+yenecek hale geliyor.
 
+Mimari
 
+Genel olarak AG ve AGZ'nin benzer bazý özellikleri var. Bunlardan ilki
+Monte Carlo Agac Aramasýnýn Derin YSA ile geniþletilerek kabiliyetinin
+ilerletilmiþ olmasý. MCTS konusunu iþledik, herhangi bir tahta
+pozisyonundan baþlayarak simülasyon yapýlýr, ve kazanç / kayýp verisi
+yukarý alýnarak karar mekanizmasý için kullanýlýr. Fakat simülasyon
+yapýlýrken ve her tahta pozisyonundan hamle seçenekleri üretilirken ne
+kadar derine inilecek? Oyun bitene kadar inilirse bu çok derin bir aðaç
+ortaya çýkartabilir.
 
+Çözüm belli bir tahtaya bakarak o oyunun kazanýlýp kazanýlmayacaðý hakkýnda
+``sezgisel'' bir karar verebilmek. Bu iþi örüntü tanýma üzerinden YSA çok
+güzel yapabilir. Önceden (kendisiyle oynarken) elde edilen oyun verisine
+bakarak, tahta pozisyonlarý ve o oyunun kazanýlýp kazanýlmadýðý verisiyle
+eðitilen ``deðer YSA'sý'' artýk yeni bir tahtayý görünce o durumun kazanç
+þansýnýn olup olmadýðýný -1,+1 arasýnda bir deðer ile hesaplayabilir. Bu
+durumda MCTS'in herhangi bir dalda oyunu sonuna kadar simüle etmesine gerek
+yoktur, belli bir seviye sonra durup YSA'ya kazanç þansýný sorar, bu deðeri
+kullanýr.
 
+Ikinci ozellik bir ilke / siyaset / strateji YSA'si kullanmak, ilke YSA'si
+bir tahtayi girdi olarak alip, yapilabilecek tum hamleler bir kazanc
+olasiligi uretebilir, yani ilke YSA'sin ciktisi potansiyel olarak tum tahta
+hucreleri olabilir [1,3]. 
 
-
+\includegraphics[width=20em]{go_02.jpg}
 
 
 
@@ -15,8 +44,11 @@ Derin Öðrenme ile Go Oyununu Oynamak, DeepMind AlphaGo Zero
 \includegraphics[width=30em]{go_01.png}
 
 
-\inputminted[fontsize=\footnotesize]{python}{mcts.py}
+Alttaki kod [4]'u baz almistir. Egitmek icin \verb!train.py! kullanilir,
+en son YSA surekli kaydedilir, egitim sonunda ya da yeterince egitilince
+durulur, ve \verb!gnugo_play.py! bu modeli kullanarak 
 
+\inputminted[fontsize=\footnotesize]{python}{mcts.py}
 
 \inputminted[fontsize=\footnotesize]{python}{train.py}
 

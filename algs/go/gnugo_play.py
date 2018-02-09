@@ -70,6 +70,6 @@ if __name__ == '__main__':
     # gnugo_play.py [num of recursive calls] [gnugo difficulty (between 1-10)]
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
-    alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=int(sys.argv[1]), evaluating=True)
-    gnugo_player = GnuGo(9, sys.argv[2])
+    alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=40, evaluating=True)
+    gnugo_player = GnuGo(9, 10)
     run_a_game(alphago_player, gnugo_player, 9)
