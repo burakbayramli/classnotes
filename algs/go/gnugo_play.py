@@ -39,7 +39,6 @@ def run_a_game(alphago_player, gnugo_player):
 
     '''
 
-    board_size = boardsize
     state = go.GameState(size=9, komi=0)
 
     pprint_board(state.board)
@@ -71,5 +70,5 @@ if __name__ == '__main__':
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
     alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=40, evaluating=True)
-    gnugo_player = GnuGo(10)
+    gnugo_player = GnuGo(board_size=9,level=10)
     run_a_game(alphago_player, gnugo_player)
