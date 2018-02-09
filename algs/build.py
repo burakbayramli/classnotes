@@ -12,6 +12,7 @@ if len(sys.argv) == 1:
     ./mstseg/mstseg.pdf \
     ./probsolve/probsolve.pdf \
     ./mcts/mcts.pdf \
+    ./go/go.pdf \
     ./huff/huff.pdf \
     ./id3/id3.pdf \
     ./knn/knn.pdf \
