@@ -53,7 +53,7 @@ def self_play_and_save(player, opp_player):
 
     winner = state.get_winner()
     print 'winner', winner
-    # oyun bitti kimin kazandigini biliyioruz, mesela siyah kazandiysa
+    # oyun bitti kimin kazandigini biliyoruz, mesela siyah kazandiysa
     # odulleri hamle bazinda +1,-1,+1,.. olacak sekilde ata, beyaz
     # kazandiysa -1,+1,-1 seklinde. Siyah olunca +1 cunku oyuna hep siyah
     # basliyor.
@@ -64,6 +64,10 @@ def self_play_and_save(player, opp_player):
     return state_list, pi_list, reward_list
 
 def self_play_and_train(cmd_line_args=None):
+
+    # iki farkli ag yarat, egitim bunlardan ilkini gunceller.
+    # belli bir sure sonra oteki YSA ilkinin kaydettigi veriden guncellenir,
+    # ve ikisi tekrar esit hale gelir, bu boyle devam eder.
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     opp_policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
 
@@ -136,7 +140,7 @@ def self_play_and_train(cmd_line_args=None):
             policy.save()
 
         if epoch % 50 == 0:
-            print 'restoring opp policy to last saved policy'
+            print 'birincinin en son kayitli agirliklarindan bu agi guncelle'
             opp_policy.load()
 
 if __name__ == '__main__':
