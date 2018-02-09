@@ -48,16 +48,16 @@ def run_a_game(alphago_player, gnugo_player):
 
             move = alphago_player.get_move(state)            
             print 'alphago move', move
-            state.do_move(move)
+            state.do_move(move, go.BLACK)
             alphago_player.mcts.update_with_move(move)            
             gnugo_player.set_others_move(move)
-            #pprint_board(state.board)
+            pprint_board(state.board)
             gnugo_player.showboard()
 
             move = gnugo_player.get_move()
             print 'gnugo move', move
-            state.do_move(move)
-            #pprint_board(state.board)
+            state.do_move(move, go.WHITE)
+            pprint_board(state.board)
             gnugo_player.showboard()
             print '==================================================='
 
@@ -76,5 +76,5 @@ if __name__ == '__main__':
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
     alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=100, evaluating=True)
-    gnugo_player = GnuGo(board_size=9,level=5)
+    gnugo_player = GnuGo(board_size=9,level=1)
     run_a_game(alphago_player, gnugo_player)
