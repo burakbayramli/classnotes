@@ -2,7 +2,7 @@ import os, glob, pickle, go
 import json, re, util
 import numpy as np
 from shutil import copy
-from ai import MCTSPlayer
+from mcts import MCTSPlayer
 from util import flatten_idx, pprint_board
 from util import flatten_idx, random_transform, idx_transformations
 from tensorflow.contrib.keras import backend as K

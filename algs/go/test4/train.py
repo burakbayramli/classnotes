@@ -2,7 +2,7 @@ import os, glob, pickle, go
 import json, re, util
 import numpy as np
 from shutil import copy
-from ai import MCTSPlayer
+from mcts import MCTSPlayer
 from util import flatten_idx, pprint_board
 from tensorflow.contrib.keras import optimizers as O
 from tensorflow.contrib.keras import callbacks as C
@@ -79,7 +79,7 @@ def self_play_and_train(cmd_line_args=None):
     policy.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=sgd)        
 
     batch_size = 50
-    n_pick = 10
+    n_pick = 10 # her oyundan kac veri noktasi alalim
         
     for epoch in range(1000):
 
@@ -87,7 +87,7 @@ def self_play_and_train(cmd_line_args=None):
         pi_list2 = []
         reward_list2 = []        
         
-        while True:
+        while True: # batch_size kadar veri toplayincaya kadar oyna
             try:
                 player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=50, evaluating=False, self_play=True)
                 opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=50, evaluating=False, self_play=True)
