@@ -78,9 +78,9 @@ def pprint_board(board):
             if pt == go.EMPTY:
                 out += '. '
             elif pt == go.BLACK:
-                out += 'O '
-            else:
                 out += 'X '
+            else:
+                out += 'O '
         out += str(board_size-j)
         print(out)
     print(out0)

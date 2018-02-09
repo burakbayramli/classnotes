@@ -18,7 +18,7 @@ class GameState(object):
         self.board = np.zeros((size, size))
         self.board.fill(EMPTY)
         self.size = size
-        self.current_player = WHITE
+        self.current_player = BLACK
         self.ko = None
         self.komi = komi  # Komi is number of extra points WHITE gets for going 2nd
         self.handicaps = []
@@ -580,10 +580,12 @@ class GameState(object):
         """
         return self.current_player
 
-    def do_move(self, action, color=None):
-        """Play stone at action=(x,y). If color is not specified, current_player is used
-        If it is a legal move, current_player switches to the opposite color
-        If not, an IllegalMove exception is raised
+    def do_move(self, action, color=None):        
+        """Play stone at action=(x,y). If color is not specified,
+        current_player is used If it is a legal move, current_player
+        switches to the opposite color If not, an IllegalMove
+        exception is raised
+
         """
         color = color or self.current_player
         reset_player = self.current_player

@@ -21,14 +21,14 @@ class GnuGo(object):
 
     def set_others_move(self, coord):
         if coord:
-            self.gnugo.play(gtp.BLACK, (coord[1]+1,coord[0]+1))
+            self.gnugo.play(gtp.BLACK, (coord[0],coord[1]))
         else:
             self.gnugo.play(gtp.BLACK, (0,0))
         
     def get_move(self):
         (x,y) = self.gnugo.genmove(gtp.WHITE)
         if (x,y)==(0,0): return go.PASS_MOVE
-        return (9-y-1,x-1)
+        return (x,y)
 
     def showboard(self):
         self.gnugo.showboard()        
@@ -61,7 +61,7 @@ def run_a_game(alphago_player, gnugo_player):
             gnugo_player.showboard()
             print '==================================================='
 
-            #exit()
+            exit()
         except Exception as e:
             print('exception')
             print (e)
