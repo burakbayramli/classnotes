@@ -37,7 +37,7 @@ class PolicyValue:
         
         convolution_path = L.Convolution2D(
             input_shape=(),
-            filters=16,
+            filters=64,
             kernel_size=3,
             activation='linear',
             padding='same',
@@ -52,7 +52,7 @@ class PolicyValue:
 
         convolution_path = L.Convolution2D(
             input_shape=(),
-            filters=32,
+            filters=128,
             kernel_size=3,
             activation='linear',
             padding='same',

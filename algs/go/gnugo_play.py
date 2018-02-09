@@ -21,14 +21,14 @@ class GnuGo(object):
 
     def set_others_move(self, coord):
         if coord:
-            self.gnugo.play(gtp.BLACK, (coord[0]+1,coord[1]+1))
+            self.gnugo.play(gtp.BLACK, (coord[1]+1,coord[0]+1))
         else:
             self.gnugo.play(gtp.BLACK, (0,0))
         
     def get_move(self):
         (x,y) = self.gnugo.genmove(gtp.WHITE)
         if (x,y)==(0,0): return go.PASS_MOVE
-        return (x-1,y-1)
+        return (9-y-1,x-1)
 
     def showboard(self):
         self.gnugo.showboard()        
@@ -44,10 +44,12 @@ def run_a_game(alphago_player, gnugo_player):
     pprint_board(state.board)
     while not state.is_end_of_game:
         try:
+            print '==================================================='
+
             move = alphago_player.get_move(state)            
+            print 'alphago move', move
             state.do_move(move)
             alphago_player.mcts.update_with_move(move)            
-            print 'alphago move', move
             gnugo_player.set_others_move(move)
             #pprint_board(state.board)
             gnugo_player.showboard()
@@ -57,10 +59,14 @@ def run_a_game(alphago_player, gnugo_player):
             state.do_move(move)
             #pprint_board(state.board)
             gnugo_player.showboard()
-            
+            print '==================================================='
+
+            #exit()
         except Exception as e:
-            print(e)
-            exit()
+            print('exception')
+            print (e)
+            #exit()
+            continue
             
     winner = state.get_winner()
     print 'winner', winner
@@ -69,6 +75,6 @@ if __name__ == '__main__':
     # gnugo_play.py [num of recursive calls] [gnugo difficulty (between 1-10)]
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
-    alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=40, evaluating=True)
-    gnugo_player = GnuGo(board_size=9,level=10)
+    alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=100, evaluating=True)
+    gnugo_player = GnuGo(board_size=9,level=5)
     run_a_game(alphago_player, gnugo_player)

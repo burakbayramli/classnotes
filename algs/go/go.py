@@ -18,7 +18,7 @@ class GameState(object):
         self.board = np.zeros((size, size))
         self.board.fill(EMPTY)
         self.size = size
-        self.current_player = BLACK
+        self.current_player = WHITE
         self.ko = None
         self.komi = komi  # Komi is number of extra points WHITE gets for going 2nd
         self.handicaps = []
