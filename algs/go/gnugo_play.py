@@ -9,6 +9,16 @@ from tensorflow.contrib.keras import backend as K
 from tensorflow.contrib.keras import models as M
 import random, simplenet
 
+def gnu_to_agz(action):
+    if action==(0,0): return None
+    (x,y) = action
+    return (9-y,(x-1))
+
+def agz_to_gnu(action):
+    if not action: return (0,0)
+    (x,y) = action
+    return (y+1,9-x)
+
 # Dis dunyadan bir Go programiyla oynamak icin arayuz
 class GnuGo(object):
     def __init__(self,board_size, level):
@@ -20,15 +30,12 @@ class GnuGo(object):
         self.gnugo.clear_board()
 
     def set_others_move(self, coord):
-        if coord:
-            self.gnugo.play(gtp.BLACK, (coord[0],coord[1]))
-        else:
-            self.gnugo.play(gtp.BLACK, (0,0))
+        self.gnugo.play(gtp.BLACK, (agz_to_gnu(coord)))
         
     def get_move(self):
         (x,y) = self.gnugo.genmove(gtp.WHITE)
         if (x,y)==(0,0): return go.PASS_MOVE
-        return (x,y)
+        return gnu_to_agz((x,y))
 
     def showboard(self):
         self.gnugo.showboard()        
@@ -61,12 +68,11 @@ def run_a_game(alphago_player, gnugo_player):
             gnugo_player.showboard()
             print '==================================================='
 
-            exit()
+            #exit()
         except Exception as e:
             print('exception')
             print (e)
-            #exit()
-            continue
+            exit()
             
     winner = state.get_winner()
     print 'winner', winner
@@ -76,5 +82,5 @@ if __name__ == '__main__':
     policy = simplenet.PolicyValue(simplenet.PolicyValue.create_network())
     policy.load()
     alphago_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=100, evaluating=True)
-    gnugo_player = GnuGo(board_size=9,level=1)
+    gnugo_player = GnuGo(board_size=9,level=5)
     run_a_game(alphago_player, gnugo_player)

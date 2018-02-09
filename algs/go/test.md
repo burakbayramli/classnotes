@@ -1,63 +1,50 @@
-
 ```python
-import pickle, go, util
+def gnu_to_agz(action):
+    if action==(0,0): return None
+    (x,y) = action
+    return (9-y,(x-1))
 
-state, pi, reward = pickle.load(open("testdata.pkl"))
-state._create_neighbors_cache()
+def agz_to_gnu(action):
+    if not action: return (0,0)
+    (x,y) = action
+    return (y+1,9-x)
 
-print state.get_legal_moves()
 
-print util.pprint_board(state.board)
-state.do_move((5,3), go.WHITE)
-print util.pprint_board(state.board)
-
-#state.do_move((2,5), go.WHITE)
-#print util.pprint_board(state.board)
-
+print gnu_to_agz((4,3))
+print agz_to_gnu((6,3))
 ```
 
 ```text
-[None, (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (1, 0), (1, 1), (1, 2), (1, 4), (1, 5), (1, 7), (1, 8), (2, 0), (2, 1), (2, 5), (2, 6), (2, 7), (2, 8), (3, 0), (3, 4), (3, 7), (3, 8), (4, 0), (4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 7), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (5, 6), (5, 7), (6, 0), (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (6, 7), (7, 0), (7, 1), (7, 2), (7, 4), (7, 5), (7, 8), (8, 0), (8, 1), (8, 3), (8, 4), (8, 5), (8, 6), (8, 7)]
-   A B C D E F G H I 
- 9 . . . . . . . . . 9
- 8 . . . O . . O . . 8
- 7 . . X O X . . . . 7
- 6 . O X O . O X . . 6
- 5 . . . . . . X . O 5
- 4 O . . . . . . . O 4
- 3 . . . . . . . . X 3
- 2 . . . X . . X X . 2
- 1 . . O . . . . . X 1
-   A B C D E F G H I 
-None
-   A B C D E F G H I 
- 9 . . . . . . . . . 9
- 8 . . . O . . O . . 8
- 7 . . X O X . . . . 7
- 6 . O X O . O X . . 6
- 5 . . . . . . X . O 5
- 4 O . . O . . . . O 4
- 3 . . . . . . . . X 3
- 2 . . . X . . X X . 2
- 1 . . O . . . . . X 1
-   A B C D E F G H I 
-None
+(6, 3)
+(4, 3)
 ```
 
+```python
 
+import pickle, go, util
 
+#state, pi, reward = pickle.load(open("testdata.pkl"))
+state = go.GameState()
+state._create_neighbors_cache()
 
+util.pprint_board(state.board)
+#state.do_move((3,3), go.WHITE)
+#state.do_move(gnu_to_agz((4,3)), go.WHITE)
+```
 
-
-
-
-
-
-
-
-
-
-
+```text
+   A B C D E F G H I 
+ 9 . . . . . . . . . 9
+ 8 . . . . . . . . . 8
+ 7 . . . . . . . . . 7
+ 6 . . . . . . . . . 6
+ 5 . . . . . . . . . 5
+ 4 . . . . . . . . . 4
+ 3 . . . . . . . . . 3
+ 2 . . . . . . . . . 2
+ 1 . . . . . . . . . 1
+   A B C D E F G H I 
+```
 
 
 
