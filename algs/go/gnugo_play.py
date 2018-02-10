@@ -55,8 +55,6 @@ def run_a_game(alphago_player, gnugo_player):
     pprint_board(state.board)
     while not state.is_end_of_game:
         try:
-            print '==================================================='
-
             move = alphago_player.get_move(state)            
             print 'alphago move', move
             state.do_move(move, go.BLACK)
@@ -71,7 +69,6 @@ def run_a_game(alphago_player, gnugo_player):
             #alphago_player.mcts.update_with_move(move)
             #pprint_board(state.board)
             gnugo_player.showboard()
-            print '==================================================='
 
             #exit()
         except Exception as e:
