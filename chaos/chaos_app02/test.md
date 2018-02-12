@@ -1,21 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```python
 import scipy as sp
 from scipy.integrate.odepack import odeint
@@ -41,11 +24,6 @@ print v
 [ 0.         -0.02499818 -0.04998555 ..., -0.06484723 -0.03987144
  -0.01487837]
 ```
-
-
-
-
-
 
 
 
