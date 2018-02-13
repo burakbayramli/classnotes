@@ -26,7 +26,7 @@ small=0.00001;   % <- definition of a small number
 
 % approximation
 %options = odeset('RelTol',small,'AbsTol',small);
-options = odeset('RelTol',small,'AbsTol',small)
+options = odeset('RelTol',small,'AbsTol',small, 'InitialStep',10.0,'MaxStep',10.0)
 
 [t,x] = ode45(@(tspan,x) minsky_I_dx(tspan,x,alpha,beta,c,d,gamma,nu), tspan, x0, options);
 
@@ -44,20 +44,23 @@ I=P;
 employment_rate=100*L./N; % <- in % points
 wage_share=100*(w.*L)./Y; % <- in % points
 
+size(Y)
+Y(end-10:end,:)
+
 % here choose your favourite chart
 chart=2;
 
-if chart==1
-    % output (cyclical)
-    plot(t,Y)
-    xlabel('TIME (IN YEARS)')
-    ylabel('OUTPUT');
-    grid on;
-elseif chart==2
-    % employment cycles
-    plot(employment_rate,wage_share)
-    xlabel('EMPLOYMENT RATE')
-    ylabel('WAGES TO OUTPUT')
-    axis([90 105 60 120])
-    grid on;
-end
+%if chart==1
+%    % output (cyclical)
+%    plot(t,Y)
+%    xlabel('TIME (IN YEARS)')
+%    ylabel('OUTPUT');
+%    grid on;
+%elseif chart==2
+%    % employment cycles
+%    plot(employment_rate,wage_share)
+%    xlabel('EMPLOYMENT RATE')
+%    ylabel('WAGES TO OUTPUT')
+%    axis([90 105 60 120])
+%    grid on;
+%end
