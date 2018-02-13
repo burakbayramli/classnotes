@@ -123,19 +123,19 @@ def rhs(u,t,alpha,beta,c,d,gamma,nu):
     return res
     
 
-alpha=0.02;      # <- per annum
-beta=0.01;       # <- per annum
+alpha=0.02;      # <- yillik
+beta=0.01;       # <- yillik
 c=4.8;
 d=5.0;
-gamma=0.01;      # <- per annum
+gamma=0.01;      # <- yillik
 nu=3.0;
 
-T=100;           # <- terminal time
+T=100;           # <- bitis zamani
 
-L0=300.0;          # <- initial labour force
-w0=0.95;         # <- initial wages
-a0=1.0;            # <- initial technology
-N0=300;          # <- initial population
+L0=300.0;          # <- baslangic is gucu, milyon kisi olara
+w0=0.95;         # <- baslangic isci ucreti
+a0=1.0;            # <- baslangic teknoloji seviyesi (uretkenlik)
+N0=300;          # <- baslangic nufusu
 
 t=np.linspace(0.0,T,10000.0)
 res=odeint(rhs,[L0,w0,a0,N0],t,args=(alpha,beta,c,d,gamma,nu))
@@ -143,14 +143,29 @@ L1,w1,a1,N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3]
 
 print a1.shape, L1.shape
 Y = a1 * L1
-print Y
+plt.plot(Y,t)
+plt.xlabel('Zaman (Sene Olarak)')
+plt.ylabel(u'Üretim')
+plt.savefig('chaos_app02_01.png')
 \end{minted}
 
 \begin{verbatim}
 (10000,) (10000,)
-[  300.           300.01914917   300.03659728 ...,  6045.65944989
-  6047.99654567  6050.30004811]
 \end{verbatim}
+
+\includegraphics[height=6cm]{chaos_app02_01.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+employment_rate=100*L1/N1
+wage_share=100*(w1*L1)/Y
+plt.plot(employment_rate, wage_share)
+plt.xlabel(u'İstihdam Oranı')
+plt.ylabel(u'Üretimdeki İşçi Ücret Oranı')
+plt.savefig('chaos_app02_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{chaos_app02_02.png}
+
 
 [devam edecek]
 
