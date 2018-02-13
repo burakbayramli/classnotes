@@ -220,6 +220,68 @@ büyümede düþüþ, o da yükselen iþsizlik, o da iþçi ücretlerinde azalmaya o
 da artýk kârda tekrar yükseliþe sebep oluyor, ve bu dönme-dolap ardý ardýna
 kendini tekrar ediyor.
 
+2. Minsky Modeli 
+
+Þimdi finans ve borç mekanizmalarýný modelimize dahil edelim.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy as sp
+from scipy.integrate.odepack import odeint
+
+def rhs(u,t,alpha,beta,gamma,nu,r,x_p,y_p,s_p,m_p,x_l,y_l,s_l,m_l):
+    Y, w, D, a, N = u
+    L=Y/a;                                       #  labour
+    P=Y-w*L - r*D;                               #  profit
+    p=P/(nu*Y);                                  #  profit to capital
+    I=(y_p-m_p)*np.exp(s_p*(p-x_p)/(y_p-m_p))+m_p;  #  investment as a function of profit
+    l=Y/(a*N);                                   #  employment rate
+    H=(y_l-m_l)*np.exp(s_l*(l-x_l)/(y_l-m_l))+m_l;  # growth rate of wages as a fctn. of employment rate
+
+    res = [Y*(I/nu - gamma ),\
+           H*w, \
+           I*Y-P, \
+           alpha*a, \
+           beta*N]
+
+    return res
+    
+
+alpha=0.02;      # <- per annum
+beta=0.01;       # <- per annum
+gamma=0.01;      # <- per annum
+nu=3;
+r=0.05;          # <- interest rate, exogeneous
+
+# parameters of a non-linear function, capturing the dependence 
+# of investment on ratio of profit to capital
+x_p=0.05;
+y_p=0.05;
+s_p=1.75;
+m_p=0.0;
+
+# parameters of a non-linear function, capturing the dependence
+# of wage growth rate on employment (aka Phillips curve)
+x_l=0.95; 
+y_l=0.0;
+s_l=0.5;
+m_l=-0.01;
+T = 120.0
+t=np.linspace(0.0,T,10000.0)
+Y0=300;          # initial output
+w0=0.95;         # initial wages
+D0=0;            # initial debt
+a0=1;            # initial technology
+N0=300;          # initial population
+
+
+arg0 = (alpha,beta,gamma,nu,r,x_p,y_p,s_p,m_p,x_l,y_l,s_l,m_l)
+
+res=odeint(rhs,[Y0,w0,D0,a0,N0],t,args=arg0)
+Y1,w1,D1,a1,N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3],res[:, 4]
+\end{minted}
+
+[devam edecek]
+
 Kaynaklar
 
 [1] Lorenz, {\em Nonlinear Dynamical Economics and Chaotic Motion}

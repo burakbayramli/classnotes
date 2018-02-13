@@ -66,6 +66,12 @@ D=x(:,3);
 a=x(:,4); 
 N=x(:,5);
 
+Y(end-5:end)
+w(end-5:end)
+D(end-5:end)
+a(end-5:end)
+N(end-5:end)
+
 K=Y/nu;
 L=Y./a;
 P=Y-w.*L-r*D;
