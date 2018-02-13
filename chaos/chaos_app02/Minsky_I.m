@@ -1,3 +1,11 @@
+%function dx = minsky_I_dx(tspan,x,alpha,beta,c,d,gamma,nu)
+%    dx=zeros(4,1);
+%    dx(1)=( (1/nu)*(1-x(2)/x(3))- gamma - alpha)*x(1);
+%    dx(2)=(d*(x(1)/x(4))-c)*x(2);
+%    dx(3)=alpha*x(3);
+%    dx(4)=beta*x(4);
+%end
+
 clear; clc;
 
 pkg load odepkg;
@@ -45,7 +53,11 @@ employment_rate=100*L./N; % <- in % points
 wage_share=100*(w.*L)./Y; % <- in % points
 
 size(Y)
-Y(end-10:end,:)
+L(end-10:end)
+w(end-10:end)
+a(end-10:end)
+N(end-10:end)
+Y(end-10:end)
 
 % here choose your favourite chart
 chart=2;

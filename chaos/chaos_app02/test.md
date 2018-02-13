@@ -3,21 +3,61 @@
 import scipy as sp
 from scipy.integrate.odepack import odeint
 
-def f(y,t):
-    alpha = -5.0
-    r = sp.array([0,0],float)
-    r[0] = y[1]
-    r[1] = alpha*sp.sin(y[0])
-    return r
+def rhs(u,t,alpha,beta,c,d,gamma,nu):
+    L,w,a,N = u
+    res = [( (1/nu)*(1-w/a)- gamma - alpha )*L,\
+    	   (d*(L/N)-c)*w,\
+	   alpha*a,\
+	   beta*N]
+    return res
+    
 
-T = 10; n = 1000
-theta0 = sp.pi/6; v0 = 0
-tspan = sp.linspace(0,T,n+1)
-initc = sp.array([theta0,v0])
-y = odeint(f,initc,tspan)
-theta = y[:,0]
-v = y[:,1]
-print v
+alpha=0.02;      # <- per annum
+beta=0.01;       # <- per annum
+c=4.8;
+d=5.0;
+gamma=0.01;      # <- per annum
+nu=3.0;
+
+T=100;           # <- terminal time
+
+L0=300.0;          # <- initial labour force
+w0=0.95;         # <- initial wages
+a0=1.0;            # <- initial technology
+N0=300;          # <- initial population
+
+t=np.linspace(0.0,T,10000.0)
+res=odeint(rhs,[L0,w0,a0,N0],t,args=(alpha,beta,c,d,gamma,nu))
+L1,w1,a1,N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3]
+
+print a1.shape, L1.shape
+Y = a1 * L1
+print Y[-10:]
+#print L1[-10:]
+#print w1[-10:]
+#print a1[-10:]
+#print N1[-10:]
+```
+
+```text
+(10000,) (10000,)
+[ 6028.37511357  6030.94198418  6033.47663714  6035.97886281  6038.4484558
+  6040.88521503  6043.2889438   6045.65944989  6047.99654567  6050.30004811]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```python
+
 ```
 
 ```text

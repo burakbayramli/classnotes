@@ -110,6 +110,47 @@ $$ \dot{a} = \alpha a$$
 
 $$ \dot{N} = \beta N$$
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy as sp
+from scipy.integrate.odepack import odeint
+
+def rhs(u,t,alpha,beta,c,d,gamma,nu):
+    L,w,a,N = u
+    res = [( (1/nu)*(1-w/a)- gamma - alpha )*L,\
+    	   (d*(L/N)-c)*w,\
+	   alpha*a,\
+	   beta*N]
+    return res
+    
+
+alpha=0.02;      # <- per annum
+beta=0.01;       # <- per annum
+c=4.8;
+d=5.0;
+gamma=0.01;      # <- per annum
+nu=3.0;
+
+T=100;           # <- terminal time
+
+L0=300.0;          # <- initial labour force
+w0=0.95;         # <- initial wages
+a0=1.0;            # <- initial technology
+N0=300;          # <- initial population
+
+t=np.linspace(0.0,T,10000.0)
+res=odeint(rhs,[L0,w0,a0,N0],t,args=(alpha,beta,c,d,gamma,nu))
+L1,w1,a1,N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3]
+
+print a1.shape, L1.shape
+Y = a1 * L1
+print Y
+\end{minted}
+
+\begin{verbatim}
+(10000,) (10000,)
+[  300.           300.01914917   300.03659728 ...,  6045.65944989
+  6047.99654567  6050.30004811]
+\end{verbatim}
 
 [devam edecek]
 
@@ -122,19 +163,4 @@ Kaynaklar
 [3] Wikipedia, {\em Logarithmic differentiation}, \url{https://en.wikipedia.org/wiki/Logarithmic_derivative}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
