@@ -89,7 +89,19 @@ http://sayilarvekuramlar.blogspot.com/2015/12/coklu-baks-ac-geometrisi-multiple-
 
 İçeriğe ek yapmak isteyenler gerekli .tex dosyasını değiştirip,
 ekleyip içinde oldukları dizinde `python ../build.py tex` komutunu
-işletebilirler, gerekli PDF dosyası otomatik olarak üretilecektir. 
+işletebilirler, gerekli PDF dosyası otomatik olarak üretilecektir.
+
+LaTeX dosyalarının tamamını HTML'e çevirmek için `python build.py
+html` komutu kullanılır, sonuç içerik`TARGET_DİR` altına
+yazılır. Buradan biz alııp Github'a bir Web projesine gönderiyoruz,
+
+https://burakbayramli.github.io/dersblog
+
+Github Web arayüzü üzerinden içerik değişimleri için o an bakılan
+dosya üzerinde Edit tıklamak yeterli, değişim yapılır, ve değişim
+isteği bana "yama sorusu (patch request)" olarak gelecek, ben
+değişikliği dahil ederim, ve bir HTML gönderimi yapılınca bu değişik
+sayfalara, PDF dosyalarına gider.
 
 Dokümanların içinde görülen kod Jupyter not defteri ortamı içinden
 işletilebilir. ipython kurmak için

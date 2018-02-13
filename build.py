@@ -31,6 +31,8 @@ ad = '''<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle
 <br/>
 '''
 
+TARGET_DIR = "/home/burak/Documents/dersblog"
+
 def translit_low(c):
     res = c.lower()
     res = res.replace(u'ğ','g')
@@ -65,8 +67,7 @@ if __name__ == "__main__":
     if sys.argv[1] == 'html':
         
         fr = os.getcwd()
-        tgt = "/home/burak/Documents/dersblog"
-        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, tgt)
+        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, TARGET_DIR)
         print cmd
         os.system(cmd)
         
@@ -74,7 +75,7 @@ if __name__ == "__main__":
                        'func_analysis','linear','ode','pde','stat',
                        'tser','vision']:
             print 'main',topdir
-            dir = tgt + "/" + topdir
+            dir = TARGET_DIR + "/" + topdir
             print 'dir',dir
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
             fout.write("<html>\n")
