@@ -78,6 +78,11 @@ if __name__ == "__main__":
             print 'dir',dir
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
             fout.write("<html>\n")
+            fout.write(u"""
+            <p>
+            <a href='..'>Ana Menü</a>
+            </p>
+            """)
             for subdir in sorted(os.listdir(dir)):
                 if not os.path.isdir(dir + "/" + subdir): continue
                 print 'subdir',subdir
