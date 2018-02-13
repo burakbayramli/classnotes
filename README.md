@@ -97,9 +97,9 @@ sonucu biz buradan alıp Github'a bir Web projesine gönderiyoruz,
 
 https://burakbayramli.github.io/dersblog
 
-Github Web arayüzü üzerinden içerik değişimleri için o an bakılan
-dosya üzerinde Edit tıklamak yeterli, değişim yapılır, ve değişim
-isteği bana "yama sorusu (patch request)" olarak gelecek, ben
+İçerik ekleri için Github Web arayüzünden o an bakılan dosya üzerinde
+Edit tıklamak yeterli, değişim arayüzden yapılır, kaydedilir, değişim
+isteği bana "yama sorusu (patch request)" olarak gelir, ben
 değişikliği dahil ederim, ve bir HTML gönderimi yapılınca bu değişik
 sayfalara, PDF dosyalarına gider. Github usta kullanıcıları tabii depo
 klonlaması, vs. ile aynı şeyleri yapabilirler.
