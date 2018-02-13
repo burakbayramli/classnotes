@@ -56,7 +56,7 @@ tspan=[0 T];     % <- time span (from t=0 up to t=T)
 small=0.000001;   % <- definition of a small number
 
 % approximation
-options = odeset('RelTol',small,'AbsTol',small);
+options = odeset('RelTol',small,'AbsTol',small,'InitialStep',12.0, 'MaxStep',12.0);
 [t,x] = ode45(@(tspan,x) minsky_II_dx(tspan,x,params), tspan, x0,options);
 
 % mapping solutions of ode to economy
@@ -72,7 +72,7 @@ P=Y-w.*L-r*D;
 I=P;
 
 % here choose your favourite chart
-chart=4;
+chart=1;
 
 if chart==1
     % PHillips curve
