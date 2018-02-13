@@ -33,6 +33,8 @@ ad = '''<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle
 
 TARGET_DIR = "/home/burak/Documents/dersblog"
 
+# get rsync.py from my "kod" repo 
+
 def translit_low(c):
     res = c.lower()
     res = res.replace(u'ğ','g')
