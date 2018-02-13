@@ -2,11 +2,48 @@
 \begin{document}
 Makro Ekonomi, Minsky, Keen Ekonomik Modeli, Ýþsizlik, Enflasyon, Kaos
 
+2007 yýlda baþlayan kriz ekonomistlerin sevinçle kutlamakta olduklarý Büyük
+Ilýmlý Evreye (The Great Moderation) son verdi. 80'li yýllarda baþladýðý
+kabul edilen bu evrede ekonomilerdeki dalgalanmalarýn artýk ufaldýðý,
+krizlerin daha az sýk ve daha ufak ölçekte olduklarý ve böyle olacaklarý
+düþünülüyordu. Pek çok ana akým ekonomist bu sebeple ortaya çýkan kriz
+karþýsýnda hazýrlýksýz yakalandý, fakat krizi tahmin etme kabiliyeti olan
+modellerden biri Hyman Minsky'nin Finans Gayri-Stabillik Hipotezi
+(Financial Instability Hypothesis) idi. Steve Keen adlý ekonomist bu
+hipotezi nicesel olarak ortaya çýkarýp hesaplarýný yaptý [2], ve 15 sene
+öncesi ve sonrasýndaki gerçek makroekonomi ve gelir daðýlýmý rakamlarýnda
+görülenleri modelinden birebir çýkartýlabileceðini anladý. Modele göre
+ýlýmlý bir evreyi sert dalgalanma takip ediyordu, bu sýrada
+gayrý-stabillik, ve ciddi ekonomik krizler meydana geliyordu.
+
+Minsky'nin modelini geliþtirmesindeki sebep anaakým neoklasik
+ekonomistlerin soyut modellerinin gayri-stabillik
+üretememesi. Üretemedikleri için kriz tahmini yapamýyorlar, Minsky'nin
+amaçlarýndan biri 1929-1941 yýllarý arasýnda meydana gelen Büyük Depresyonu
+anlayabilmekti, ve aradýðý özelliklerden biri modelin sonuçlarýndan birinin
+bu kriz olmasýydý, fakat Minsky etrafta revaçta olan modellerin kriz
+çýktýsý veremediðini farketti.  Neoklasikçilere göre, mesela ABD Merkez
+Bankasý eski baþkaný Ben Bernanke, ``ellerindeki modeller kriz olmadýðý
+zamanlarda kullanýlmalý'' (Bernanke ilginç bir þekilde ünlü Büyük Depresyon
+uzmanlarýndan sayýlýyor). Belki de bu ekonomistlerin kurduðu modelleri
+hiçbir zaman kasýrga, fýrtýna sonucu vermeyecek meteorolojik modellere
+benzetebiliriz.
+
+Gayri-lineerlik için aþýrý çetrefil matematiðe gerek yok, daha önce
+gördüðümüz gibi deterministik bir ODE sistemi gayrý-lineerlik üretebilir ve,
+daha önemlisi, ana ekonomik parametreleri yakalayabilir. 
+
+Ýlk model, ona Keen'in temel aldýðý araþtýrmacý Goodwin sebebiyle Goodwin
+Modeli diyelim, istihdam oraný ve üretimdeki iþçi ücret payý sonucunu temel
+alacak. Bazý tanýmlar,
+
 $\frac{\ud a}{\ud t} = \alpha a$: Üretkenliðin büyüme oraný.
 
 $\frac{\ud N}{\ud t} = \beta N$: Nüfusun büyüme oraný.
 
-$L = Y/a$: Ne kadar üretim olduðunu üretkenliðe bölersek istihdam elde ederiz.
+$L = Y/a$: Ne kadar üretim olduðunu üretkenliðe bölersek istihdam elde
+ederiz. Ya da tersten bakarsak istihdam seviyesi üretkenlik üzerinden
+üretimi belirler.
 
 Sermaye $K$ bir sabit, hýzlandýrýcý sabit $v$ üzerinden üretim $Y$'ye
 $K = v \cdot Y$ ile baðlýdýr.
@@ -22,7 +59,8 @@ eðrisi kullanýlýr, $w(\lambda) = (-c + d \cdot \lambda)$.
 
 $\Pi$ kâr, üretimden tüm maaþlar çýkartýlýnca elde edilir $\Pi = Y - W$.
 
-Sermayenin deðiþim oraný yatýrým eksi amortisman $\frac{\ud K}{\ud t} = I-\gamma \cdot K$. 
+Sermayenin deðiþim oraný yatýrým eksi amortisman (depreciation)
+$\frac{\ud K}{\ud t} = I-\gamma \cdot K$.
 
 Tüm kâr $\Pi$ þirkete yatýrým $I$ olarak geri verilir $I = \Pi$.
 
@@ -98,7 +136,7 @@ $$
 \gamma - \alpha
 $$
 
-Artik ODE denklem sistemini yazabiliriz,
+Artýk ODE denklem sistemini yazabiliriz,
 
 $$ 
 \dot{L} = L \cdot \bigg( \frac{1-\frac{w}{a}}{v} - \gamma - \alpha \bigg)
@@ -109,6 +147,8 @@ $$ \dot{w} = (d \cdot \frac{L}{N} - c) \cdot w $$
 $$ \dot{a} = \alpha a$$
 
 $$ \dot{N} = \beta N$$
+
+Python \verb!scipy! ile bu ODE sistemini sayýsal olarak çözelim [4]. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy as sp
@@ -123,19 +163,19 @@ def rhs(u,t,alpha,beta,c,d,gamma,nu):
     return res
     
 
-alpha=0.02;      # <- yillik
-beta=0.01;       # <- yillik
+alpha=0.02;      # yillik
+beta=0.01;       # yillik
 c=4.8;
 d=5.0;
-gamma=0.01;      # <- yillik
+gamma=0.01;      # yillik
 nu=3.0;
 
-T=100;           # <- bitis zamani
+T=100;           # bitis zamani
 
-L0=300.0;          # <- baslangic is gucu, milyon kisi olara
-w0=0.95;         # <- baslangic isci ucreti
-a0=1.0;            # <- baslangic teknoloji seviyesi (uretkenlik)
-N0=300;          # <- baslangic nufusu
+L0=300.0;        # baslangic is gucu, milyon kisi olara
+w0=0.95;         # baslangic isci ucreti
+a0=1.0;          # baslangic teknoloji seviyesi (uretkenlik)
+N0=300;          # baslangic nufusu
 
 t=np.linspace(0.0,T,10000.0)
 res=odeint(rhs,[L0,w0,a0,N0],t,args=(alpha,beta,c,d,gamma,nu))
@@ -166,8 +206,18 @@ plt.savefig('chaos_app02_02.png')
 
 \includegraphics[height=6cm]{chaos_app02_02.png}
 
-
-[devam edecek]
+Bir çevrim ortaya çýktýðýný görüyoruz. Bu çevrim, suni bir þekilde modelde
+zorlanan bir gayrý-lineerlikten deðil, sistemin yapýsal olarak ortaya
+çýkardýðý bir gayrý-lineerlik. Modelde ücret oraný ve istihdam seviyesi
+birbiriyle çarpýlmakta, ve büyüme oraný deðiþimi ve gelir daðýlýmý deðiþimi
+arasýndaki iliþki (çünkü istihdam seviyeleri deðiþtikçe iþçilerin
+maaþlarýný pazarlýk edebilme kabiliyetleri artýp azalýyor) bir çevrim
+ortaya çýkartýyor. Yüksek seviyede yatýrým yüksek büyüme ortaya çýkartýyor,
+ve iþsizlik azalýyor, bu iþçi ücretlerinde artýþa ve artýk kârda (profit
+share) azalmaya, artýk kârda azalma yatýrýmda azalmaya, o da ekonomik
+büyümede düþüþ, o da yükselen iþsizlik, o da iþçi ücretlerinde azalmaya o
+da artýk kârda tekrar yükseliþe sebep oluyor, ve bu dönme-dolap ardý ardýna
+kendini tekrar ediyor.
 
 Kaynaklar
 
@@ -176,6 +226,8 @@ Kaynaklar
 [2] Keen, {\em A monetary Minsky model of the Great Moderation and the Great Recession}, \url{https://warwick.ac.uk/fac/soc/economics/current/modules/rm/notes1/keen2013a.pdf}
 
 [3] Wikipedia, {\em Logarithmic differentiation}, \url{https://en.wikipedia.org/wiki/Logarithmic_derivative}
+
+[4] Jelonek, {\em Numerical techniques in MATLAB: differential equations and non-linear dynamics} \url{https://warwick.ac.uk/fac/soc/economics/current/modules/rm/notes1/research_methods_matlab_3.pdf}
 
 \end{document}
 
