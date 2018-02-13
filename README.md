@@ -92,7 +92,7 @@ ekleyip içinde oldukları dizinde `python ../build.py tex` komutunu
 işletebilirler, gerekli PDF dosyası otomatik olarak üretilecektir.
 
 LaTeX dosyalarının tamamını HTML'e çevirmek için `python build.py
-html` komutu kullanılır, sonuç içerik`TARGET_DİR` altına
+html` komutu kullanılır, sonuç içerik`TARGET_DIR` altına
 yazılır. Buradan biz alııp Github'a bir Web projesine gönderiyoruz,
 
 https://burakbayramli.github.io/dersblog
