@@ -175,11 +175,12 @@ altında `pyconometrics.py` adlı bir dosyayı görüyoruz. Gerekli kod burada.
 
 ### Emacs Bağlantısı
 
-Daha çetrefil bir kullanım, Emacs'te LaTeX doküman *içinde* iken
-Python kodlarını [emacs-ipython](https://github.com/burakbayramli/emacs-ipython)
-adlı bir teknoloji üzerinden direk belge içinde işletmektir (arka planda
-ipython'a bağlanıyor, yani aynı temel yapı kullanılıyor). Bu durumda,
-emacs-ipython gereken tüm ipython ayarlarını kendisi yapıyor.
+Github projelerimizden biriyle Emacs'te LaTeX doküman *içinde* iken
+Python kodlarını
+[emacs-ipython](https://github.com/burakbayramli/emacs-ipython) adlı
+bir teknoloji üzerinden direk belge içinde işletmek mümkün (arka
+planda ipython'a bağlanıyor, yani aynı temel yapı kullanılıyor). Bu
+durumda, emacs-ipython gereken tüm ipython ayarlarını kendisi yapıyor.
 
 ### R
 
