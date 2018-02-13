@@ -87,9 +87,9 @@ http://sayilarvekuramlar.blogspot.com/2015/12/coklu-baks-ac-geometrisi-multiple-
 
 ### İçerik
 
-Icerige ek yapmak isteyenler gerekli .tex dosyasini degistirip,
-ekleyip icinde olduklari dizinde `python ../build.py tex` komutunu
-isletebilirler, gerekli PDF dosyasi otomatik olarak uretilecektir. 
+İçeriğe ek yapmak isteyenler gerekli .tex dosyasını değiştirip,
+ekleyip içinde oldukları dizinde `python ../build.py tex` komutunu
+işletebilirler, gerekli PDF dosyası otomatik olarak üretilecektir. 
 
 Dokümanların içinde görülen kod Jupyter not defteri ortamı içinden
 işletilebilir. ipython kurmak için
