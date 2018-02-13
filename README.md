@@ -1,4 +1,3 @@
-## Türkçe
 
 ODE, Çok Değişkenli Calculus, Lineer Cebir, Hesapsal Bilim,
 İstatistik, Fonksiyonel Analiz video derslerinden, ya da ders
@@ -86,9 +85,13 @@ http://sayilarvekuramlar.blogspot.com/2015/12/gayr-lineer-dinamik-ve-kaos-chaos-
 
 http://sayilarvekuramlar.blogspot.com/2015/12/coklu-baks-ac-geometrisi-multiple-view.html
 
-### Python
+### İçerik
 
-Dokümanların içinde görülen kod python/ipython ortamı içinden
+Icerige ek yapmak isteyenler gerekli .tex dosyasini degistirip,
+ekleyip icinde olduklari dizinde `python ../build.py tex` komutunu
+isletebilirler, gerekli PDF dosyasi otomatik olarak uretilecektir. 
+
+Dokümanların içinde görülen kod Jupyter not defteri ortamı içinden
 işletilebilir. ipython kurmak için
 
 ```
@@ -101,10 +104,17 @@ Kurulum olarak en acısız kurulum Anaconda üzerinden
 http://continuum.io/downloads
 ```
 
+Ubuntu'da
+
+```
+sudo apt-get install ipython ipython-notebook
+sudo pip install jupyter
+```
+
 Komut satırından [1] ipython başlatmak için
 
 ```
-ipython notebook
+jupyter notebook
 ```
 
 kullanılabilir. Belgelerde görülen her bölümdeki kodlar kendi başına
