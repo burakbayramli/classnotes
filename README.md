@@ -100,9 +100,10 @@ https://burakbayramli.github.io/dersblog
 İçerik ekleri için Github Web arayüzünden o an bakılan dosya üzerinde
 Edit tıklamak yeterli, değişim arayüzden yapılır, kaydedilir, değişim
 isteği bana "yama sorusu (patch request)" olarak gelir, ben
-değişikliği dahil ederim, ve bir HTML gönderimi yapılınca bu değişik
-sayfalara, PDF dosyalarına gider. Github usta kullanıcıları tabii depo
-klonlaması, vs. ile aynı şeyleri yapabilirler.
+değişikliği dahil ederim, ve üstteki adrese gönderimi yapılınca
+değişiklik sayfalara, PDF dosyalarına yansır. Github usta
+kullanıcıları tabii depo klonlaması, vs. ile aynı şeyleri
+yapabilirler.
 
 Dokümanların içinde görülen kod Jupyter not defteri ortamı içinden
 işletilebilir. ipython kurmak için
