@@ -105,6 +105,10 @@ değişiklik sayfalara, PDF dosyalarına yansır. Github usta
 kullanıcıları tabii depo klonlaması, vs. ile aynı şeyleri
 yapabilirler.
 
+US klavyede Türkçe yazmak isteyenler (ve Emacs kullananlar için)
+
+http://sayilarvekuramlar.blogspot.com/2017/12/emacs.html
+
 Dokümanların içinde görülen kod Jupyter not defteri ortamı içinden
 işletilebilir. ipython kurmak için
 
