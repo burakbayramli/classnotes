@@ -78,7 +78,7 @@ P=Y-w.*L-r*D;
 I=P;
 
 % here choose your favourite chart
-chart=1;
+chart=4;
 
 if chart==1
     % PHillips curve

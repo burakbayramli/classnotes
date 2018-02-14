@@ -33,6 +33,8 @@ Gayri-lineerlik için aþýrý çetrefil matematiðe gerek yok, daha önce
 gördüðümüz gibi deterministik bir ODE sistemi gayrý-lineerlik üretebilir ve,
 daha önemlisi, ana ekonomik parametreleri yakalayabilir. 
 
+1. Minsky Modeli
+
 Ýlk model, ona Keen'in temel aldýðý araþtýrmacý Goodwin sebebiyle Goodwin
 Modeli diyelim, istihdam oraný ve üretimdeki iþçi ücret payý sonucunu temel
 alacak. Ýlk baþta kriz þartlarýndan bahsetmeyeceðiz, sadece ana iliþkileri
@@ -222,7 +224,61 @@ kendini tekrar ediyor.
 
 2. Minsky Modeli 
 
-Þimdi finans ve borç mekanizmalarýný modelimize dahil edelim.
+Þimdi finans ve borç mekanizmalarýný modelimize dahil edelim, lineer
+yatýrým fonksiyonunu yerine daha gerçekçi ve borç temelli bir fonksiyon
+kullanalým, yani yatýrým isteði elde tutulan kazancý aþýnca aradaki fark
+borç ile finans edilecek. Yatýrým isteði için bir üstel fonksiyon
+kullanýyoruz, çünkü bu tür bir fonksiyon ekonomist Keynes'in belirsizlik
+olduðu durumlarda insanlarýn nasýl davrandýðýný daha iyi
+modelliyor. Keynes'e göre insanlar ``mevcut durumun ileride devam edeceðini
+inanmaya meyilli oluyor her ne kadar geçmiþ bunun böyle olduðunu
+göstermesine raðmen''. 
+
+Yani ekonomideki aktörler içinde olduklarý þartý geleceðe doðru aynen
+uzatmaya meyilli, ``gerçi bu elde baþka bir seçenek olmadýðýnda kýsmen
+meþru olabilir''. Bu sebeple yüksek kâr artýþ trendi olduðu zaman iþ
+sahipleri kârlarýndan daha fazla yatýrým yapýyorlar, ama kâr azalmasý
+olduðu zaman yatýrým kârýn altýnda kalýyor çünkü iþverenler ayný durumun
+gelecekte devam edeceðini düþünüyorlar.
+
+Alttaki modele yapacaðýmýz bir diðer gayrý-lineer ek Philips eðrisini
+lineerlikten çýkarmak, böylece yüksek istihdam durumunda iþçi ücretleri
+hýzla artsýn, az istihdam durumunda yavaþ azalsýn. 
+
+Bir genel üstel fonksiyon tanýmlarýz, 
+
+$$ GenExp(v;x,y,s,m) = (y-m) \cdot \exp (s \cdot (v-x)/(y-m)) + m$$
+
+$W,I$ deðiþkenlerini bu fonksiyon üzerinden belirleriz, 
+
+$$ W_f(v) = GenExp (v;x_w,y_w,s_w,m_w)$$
+
+$$ I_f(v) = GenExp (v;x_i,y_i,s_i,m_i)$$
+
+O zaman istenen yatýrým seviyesi ile mümkün olan arasýndaki farký banka
+sektörü finanse edecek, bu durumu modele basit bir iliþki üzerinden dahil
+edebiliriz, istenen yatýrým seviyesi ve eldeki kâr arasýndaki fark borç
+miktarý $D$'de artýþa sebep olur,
+
+$$ \frac{\ud D}{\ud t} = I - \Pi$$
+
+Kâr tanýmýnda da bir deðiþiklik yapmamýz lazým, kâr üretim eksi tüm iþçi
+ücretleri artý (mevcut borç için ödenmesi gereken) faiz.
+
+$$ \Pi = Y - w \cdot L - r \cdot D$$
+
+Bu eklerden sonra denklem sistemi þu hale gelir (türetilmesini okuyucuya býrakýyoruz)
+
+$$ \dot{Y} = \bigg( \frac{1}{v} I_f \big( \frac{\Pi}{v \cdot Y} \big) - \gamma \bigg) \cdot Y$$
+
+$$ \dot{w} = P_f (\lambda) \cdot w $$
+
+$$ \dot{D} = I_f \bigg( \frac{\Pi}{v \cdot Y} \bigg) \cdot Y - \Pi   $$
+
+$$ \dot{a} = \alpha a$$
+
+$$ \dot{N} = \beta N$$
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy as sp
@@ -230,12 +286,15 @@ from scipy.integrate.odepack import odeint
 
 def rhs(u,t,alpha,beta,gamma,nu,r,x_p,y_p,s_p,m_p,x_l,y_l,s_l,m_l):
     Y, w, D, a, N = u
-    L=Y/a;                                       #  labour
-    P=Y-w*L - r*D;                               #  profit
-    p=P/(nu*Y);                                  #  profit to capital
-    I=(y_p-m_p)*np.exp(s_p*(p-x_p)/(y_p-m_p))+m_p;  #  investment as a function of profit
-    l=Y/(a*N);                                   #  employment rate
-    H=(y_l-m_l)*np.exp(s_l*(l-x_l)/(y_l-m_l))+m_l;  # growth rate of wages as a fctn. of employment rate
+    L=Y/a;                                       #  isgucu
+    P=Y-w*L - r*D;                               #  kar
+    p=P/(nu*Y);                                  
+    #  investment as a function of profit
+    I=(y_p-m_p)*np.exp(s_p*(p-x_p)/(y_p-m_p))+m_p;  
+    #  istihdam orani
+    l=Y/(a*N);                                   
+    # isci ucretlerinin istihdam orani fonksiyonu olarak buyume orani 
+    H=(y_l-m_l)*np.exp(s_l*(l-x_l)/(y_l-m_l))+m_l;  
 
     res = [Y*(I/nu - gamma ),\
            H*w, \
@@ -246,21 +305,17 @@ def rhs(u,t,alpha,beta,gamma,nu,r,x_p,y_p,s_p,m_p,x_l,y_l,s_l,m_l):
     return res
     
 
-alpha=0.02;      # <- per annum
-beta=0.01;       # <- per annum
-gamma=0.01;      # <- per annum
+alpha=0.02;      
+beta=0.01;       
+gamma=0.01;      
 nu=3;
-r=0.05;          # <- interest rate, exogeneous
+r=0.05;          # banka faiz orani
 
-# parameters of a non-linear function, capturing the dependence 
-# of investment on ratio of profit to capital
 x_p=0.05;
 y_p=0.05;
 s_p=1.75;
 m_p=0.0;
 
-# parameters of a non-linear function, capturing the dependence
-# of wage growth rate on employment (aka Phillips curve)
 x_l=0.95; 
 y_l=0.0;
 s_l=0.5;
@@ -278,9 +333,73 @@ arg0 = (alpha,beta,gamma,nu,r,x_p,y_p,s_p,m_p,x_l,y_l,s_l,m_l)
 
 res=odeint(rhs,[Y0,w0,D0,a0,N0],t,args=arg0)
 Y1,w1,D1,a1,N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3],res[:, 4]
+
+K=Y1/nu;
+L=Y1/a1;
+P=Y1-w1*L-r*D1;
+I=P;
 \end{minted}
 
-[devam edecek]
+Kaotik davranýþý en iyi gösteren figür alt saðdaki herhalde. Bazý baþlangýç
+þartlarý için denge durumu var fakat diðerleri için periyodik þekilde
+kaosta kalma görülüyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+wage_share=(w1*L)/Y1; 
+employment_rate=L/N1;
+debt_ratio=D1/Y1;
+x1=wage_share; x2=employment_rate; x3=debt_ratio; 
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.plot(x1,x2,x3,'.', zs=0,zdir='z', label='zs=0, zdir=z')
+ax.set_xlabel(u'Üretimde Ýþçi Ücret Payý')
+ax.set_ylabel(u'Ýstihdam Oraný')
+ax.set_zlabel(u'Borç Oraný')
+plt.savefig('chaos_app02_06.png')
+\end{minted}
+
+\includegraphics[height=6cm]{chaos_app02_05.png}
+\includegraphics[height=6cm]{chaos_app02_06.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+l=np.linspace(0.9,1.01,1101);
+H=(y_l-m_l)*np.exp(s_l*(l-x_l)/(y_l-m_l))+m_l;
+plt.plot(100*l,100*H);
+plt.xlabel(u'Ýstihdam Oraný %')
+plt.ylabel(u'Gerçek Ücretlerde Yýllýk Deðiþim %')
+plt.savefig('chaos_app02_03.png')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p=np.linspace(-0.05,0.11,1601);
+I=(y_p-m_p)*np.exp(s_p*(p-x_p)/(y_p-m_p))+m_p; 
+plt.plot(100*nu*p,100*I);
+plt.xlabel(u'Kâr %')
+plt.ylabel(u'Üretimdeki Yatýrým Payý %')
+plt.savefig('chaos_app02_04.png')
+\end{minted}
+
+\includegraphics[height=6cm]{chaos_app02_03.png}
+\includegraphics[height=6cm]{chaos_app02_04.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(t,Y1);
+plt.xlabel(u'Sene')
+plt.ylabel(u'Üretim')
+plt.savefig('chaos_app02_05.png')
+\end{minted}
+
+3. Minsky modelinin kodlamasý da ödev olsun. 
+
+Üstteki sonuçlar Minsky'nin hipotezini doðruluyor. Ýkinci modelde kaos var,
+ve burada yapýlan yegane ek borçlanmayý modellemek, yani bir ekonomide
+krizlere dalgalanmalara sebep olan borçlanmadýr. Keen bu sebeple bir
+ekonominin saðlýðýný hýzlý bir þekilde irdelemek için ilk önce bu
+parametreye bakýyor, özel sektör ve bireysel borç toplamýnýn GSMH'ya oraný
+nedir? Eðer bu oranda uzun süreli bir artýþ varsa alarm zilleri
+çalmalýdýr. 
 
 Kaynaklar
 
@@ -293,4 +412,3 @@ Kaynaklar
 [4] Jelonek, {\em Numerical techniques in MATLAB: differential equations and non-linear dynamics} \url{https://warwick.ac.uk/fac/soc/economics/current/modules/rm/notes1/research_methods_matlab_3.pdf}
 
 \end{document}
-
