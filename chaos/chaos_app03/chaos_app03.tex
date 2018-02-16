@@ -20,7 +20,7 @@ $\frac{\ud w}{\ud t} = \Phi(\lambda) \cdot w$: Ýþçi kazanç oranýndaki deðiþim is
 gayrý-lineer bir fonksiyonu, çoðunlukla burada Philips eðrisi kullanýlýr, 
 mesela $\Phi(\lambda) = \frac{\phi_1}{(1-\lambda)^2}-\phi_0$
 
-$\omega$ ekonomideki iþçi ücretleri oraný, $$\omega=\frac{w\cdot L}{a \cdot L} = \frac{w}{a}$$
+$\omega$ ekonomideki iþçi ücretleri oraný, $\omega=\frac{w\cdot L}{a \cdot L} = \frac{w}{a}$
 
 Özel sektör, özel kiþi borcunun GSMH'ye oraný: Borç $D$ bölü GSYH $Y$, $d=D/Y$.
 
@@ -154,19 +154,105 @@ import numpy as np
 import scipy as sp
 from scipy.integrate.odepack import odeint
 
-def rhs(u,t,alpha,beta,gamma,delta,r,k0,k1,k2):
-    omega, lam, d = u
-    res = [
+def kappa(x,k0,k1,k2): return k0+k1*np.exp(k2*x)
 
+def philips(lam,phi0,phi1): return ( (phi1 / (1.0-lam)**2) - phi0)
+
+def rhs(u,t,alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1):
+    omega, lam, d, a, N = u
+    tmp = kappa(1.0-omega-r*d,k0,k1,k2) / v
+    res = [omega*(philips(lam,phi0,phi1)-alpha), \
+           lam*(tmp - alpha - beta - delta), \
+           d * ( r - tmp + alpha ) + tmp*v - (1.0-omega), \
+           alpha*a, \
+           beta*N]
+    return res
+           
+alpha = 0.025
+beta = 0.02
+delta = 0.01
+v = 3.0
+phi0 = 0.04 / (1.0-0.04**2.0)
+phi1 = 0.04**3.0 / (1.0-0.04**2.0)
+r = 0.03
+k0 = -0.0065
+k1 = np.exp(-5.0)
+k2 = 20.0
 \end{minted}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+omega0 = 0.75
+lam0 = 0.75
+d0 = 0.1
+a0 = 1.0;
+N0 = 300.
 
+t=np.linspace(0.0,300.0,10000.0)
+args = (alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1)
+res=odeint(rhs,[omega0, lam0, d0, a0, N0],t,args=args)
+omega1, lam1, d1, a1, N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3],res[:, 4]
 
+Y = lam1*N1
 
+plt.figure()
+plt.plot(t,omega1)
+plt.ylabel('Omega')
+plt.savefig('chaos_app03_01.png')
+plt.figure()
+plt.plot(t,lam1)
+plt.ylabel('Lambda')
+plt.savefig('chaos_app03_02.png')
+plt.figure()
+plt.plot(t,d1)
+plt.ylabel('d')
+plt.savefig('chaos_app03_03.png')
+plt.figure()
+plt.plot(t,Y)
+plt.ylabel('Y')
+plt.savefig('chaos_app03_04.png')
+\end{minted}
 
+\includegraphics[height=6cm]{chaos_app03_01.png}
+\includegraphics[height=6cm]{chaos_app03_02.png}
+\includegraphics[height=6cm]{chaos_app03_03.png}
+\includegraphics[height=6cm]{chaos_app03_04.png}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+omega0 = 0.75
+lam0 = 0.70
+d0 = 0.1
+a0 = 1.0;
+N0 = 300.
 
+t=np.linspace(0.0,300.0,1000.0)
+args = (alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1)
+res=odeint(rhs,[omega0, lam0, d0, a0, N0],t,args=args)
+omega2, lam2, d2, a2, N2=res[:, 0],res[:, 1],res[:, 2],res[:, 3],res[:, 4]
 
+Y = lam2*N2
+
+plt.figure()
+plt.plot(t,omega2)
+plt.ylabel('Omega')
+plt.savefig('chaos_app03_05.png')
+plt.figure()
+plt.plot(t,lam2)
+plt.ylabel('Lambda')
+plt.savefig('chaos_app03_06.png')
+plt.figure()
+plt.plot(t,d2)
+plt.ylabel('d')
+plt.savefig('chaos_app03_07.png')
+plt.figure()
+plt.plot(t,Y)
+plt.ylabel('Y')
+plt.savefig('chaos_app03_08.png')
+\end{minted}
+
+\includegraphics[height=6cm]{chaos_app03_05.png}
+\includegraphics[height=6cm]{chaos_app03_06.png}
+\includegraphics[height=6cm]{chaos_app03_07.png}
+\includegraphics[height=6cm]{chaos_app03_08.png}
 
 
 [devam edecek]
