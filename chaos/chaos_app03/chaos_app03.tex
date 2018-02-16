@@ -133,38 +133,137 @@ $$
 
 Sonuç olarak þu ODE denklem sistemine eriþiyoruz, 
 
-$$ \dot{\omega} = w [ \Phi(\lambda)-\alpha ] $$ 
+$$ \dot{\omega} = \omega [ \Phi(\lambda)-\alpha ] \mlabel{2}$$ 
 
 $$ 
 \dot{\lambda}=  \lambda \bigg[ 
 \frac{\kappa(1-\omega-rd)}{v} - \alpha - \beta - \delta
 \bigg]
+\mlabel{3}
 $$
 
 $$ 
 \dot{d} = d \bigg[
 r - \frac{\kappa(1-\omega-rd)}{v} + \alpha 
 \bigg] + \kappa(1-\omega-rd) - (1-\omega)
+\mlabel{3}
 $$
+
+Stabil Noktalar
+
+ODE sistemindeki tüm türevlerin sýfýr olmasý için $(0,0,0)$ seçilebilir,
+fakat bu aþýrý basit (trivial) çözümdür, ekonomik olarak anlamý
+yoktur. Daha anlamlý bir sabit nokta için (2)'deki türevin sýfýr olmasý
+için $\Phi(\lambda)=\alpha $ olmalýdýr, ya da $\lambda=\Phi^{-1}(\alpha)$. Yani bir $\Phi$'nin tersini 
+arýyoruz, öyle ki $\Phi^{-1}(\Phi(\lambda)) = \lambda$ olsun.
+
+$$ \Phi(\lambda) = \alpha = \frac{\phi_1}{(1-\lambda)^2}-\phi_0$$
+
+Fonksiyonun tersini bulmak icin bir karesel denklem seklinde duzenleyelim,
+
+$$ \alpha + \phi_0 = \frac{\phi_1}{(1-\lambda)^2}$$
+
+$$   (1-\lambda)^2 = \frac{\phi_1}{ \alpha + \phi_0} $$
+
+$$  \lambda^2 - 2\lambda + \lambda^2 - \frac{\phi_1}{ \alpha + \phi_0} =0$$
+
+Bu standart bir karesel denklem, köklerini bulalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+alpha = 0.025
+phi0 = 0.04 / (1.0-(0.04**2))
+phi1 = 0.04**3.0 / (1.0-(0.04**2))
+print np.roots([1, -2, 1-(phi1/(alpha+phi0))   ])
+\end{minted}
+
+\begin{verbatim}
+[ 1.03138824  0.96861176]
+\end{verbatim}
+
+$\lambda < 1.0$ olmasý gerektiði için göre aradýðýmýz ikinci sonuç, yani
+[2]'de bahsedilen $\overline{\lambda}_1 = 0.9686$ deðeri.
+
+
+$\overline{\omega}_1$ icin (4) denkleminde turevi sifira esitleriz, 
+
+$$ r - \frac{\kappa(\overline{\pi}_1)}{v} + \delta + \kappa(\overline{\pi}_1) + 1 = \omega$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+pi1 = 0.16184
+v = 3.0
+k0 = -0.0065
+k1 = np.exp(-5.0)
+k2 = 20.0
+r = 0.03
+omega1 = 1-r+(kappa(pi1,k0,k1,k2)/v)-delta-kappa(pi1,k0,k1,k2)
+print omega1
+\end{minted}
+
+\begin{verbatim}
+0.850003199874
+\end{verbatim}
+
+$\overline{d}_1$ için (3) denkleminde türevi sýfýra eþitleriz ve basit
+olmayan çözüm için
+
+$$ \kappa(1-\omega-rd)= v (\alpha + \beta + \delta) $$
+
+ile baslariz. Yine ters alma operasyonu uygularsak,
+
+$$ \overline{\pi}_1 = 1-\omega-rd= \kappa^{-1}(v (\alpha - \beta - \delta)) $$
+
+$\overline{\pi}_1$ tanýmýný yaptýk takibi rahat olsun diye. 
+
+Once $\overline{\pi}_1$ hesabi. $\kappa$'nin tersi lazim,
+
+$$ \kappa^{-1} = \frac{1}{\kappa_2} \log \bigg( \frac{\kappa(x) - \kappa_0 }{\kappa_1}\bigg)$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+alpha = 0.025
+beta = 0.02
+delta = 0.01
+v = 3.0
+k0 = -0.0065
+k1 = np.exp(-5.0)
+k2 = 20.0
+tmp = v*(alpha+beta+delta) - k0
+pi1 = 1.0/k2 * np.log(np.abs(tmp/k1))
+print 'pi1', pi1
+\end{minted}
+
+\begin{verbatim}
+pi1 0.161841399381
+\end{verbatim}
+
+O zaman $d$ icin
+
+$$ \overline{\pi}_1 = 1-\omega-rd $$
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-import numpy as np
+print -r
+print (pi1 - 1.0 + omega1) / -r
+\end{minted}
+
+\begin{verbatim}
+-0.03
+-0.394819975158
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
 import scipy as sp
 from scipy.integrate.odepack import odeint
 
-def kappa(x,k0,k1,k2): return k0+k1*np.exp(k2*x)
+def kappa(x,k0,k1,k2): return k0 + (k1*np.exp(k2*x))
 
 def philips(lam,phi0,phi1): return ( (phi1 / (1.0-lam)**2) - phi0)
 
 def rhs(u,t,alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1):
     omega, lam, d, a, N = u
-    w = omega*a    
-    tmp = kappa(1.0-omega-r*d,k0,k1,k2) / v
-    res = [w*(philips(lam,phi0,phi1)-alpha), \
-           lam*(tmp - alpha - beta - delta), \
-           d * ( r - tmp + alpha ) + tmp*v - (1.0-omega), \
+    tmp = kappa(1.0-omega-r*d,k0,k1,k2) 
+    res = [omega*(philips(lam,phi0,phi1)-alpha), \
+           lam*(tmp/v - alpha - beta - delta), \
+           d * ( r - tmp/v + alpha ) + tmp - (1.0-omega), \
            alpha*a, \
            beta*N]
     return res
@@ -173,8 +272,8 @@ alpha = 0.025
 beta = 0.02
 delta = 0.01
 v = 3.0
-phi0 = 0.04 / (1.0-0.04**2.0)
-phi1 = 0.04**3.0 / (1.0-0.04**2.0)
+phi0 = 0.04 / (1.0-(0.04**2))
+phi1 = 0.04**3.0 / (1.0-(0.04**2))
 r = 0.03
 k0 = -0.0065
 k1 = np.exp(-5.0)
@@ -182,10 +281,10 @@ k2 = 20.0
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-omega0 = 0.75
-lam0 = 0.75
+omega0 = 0.80
+lam0 = 0.80
 d0 = 0.1
-a0 = 0.2;
+a0 = 0.5
 N0 = 300.
 
 t=np.linspace(0.0,300.0,10000.0)
@@ -221,6 +320,9 @@ plt.savefig('chaos_app03_04.png')
 \begin{minted}[fontsize=\footnotesize]{python}
 omega0 = 0.70
 lam0 = 0.70
+d0 = 0.1
+a0 = 0.5
+N0 = 300.
 
 t=np.linspace(0.0,300.0,1000.0)
 args = (alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1)
