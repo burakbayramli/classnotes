@@ -151,11 +151,30 @@ $$
 
 Stabil Noktalar
 
+\begin{minted}[fontsize=\footnotesize]{python}
+alpha = 0.025
+beta = 0.02
+delta = 0.01
+v = 3.0
+k0 = -0.0065
+k1 = np.exp(-5.0)
+k2 = 20.0
+r = 0.03
+phi0 = 0.04 / (1.0-(0.04**2))
+phi1 = 0.04**3.0 / (1.0-(0.04**2))
+
+def kappa(x,k0,k1,k2): return k0 + (k1*np.exp(k2*x))
+
+def philips(lam,phi0,phi1): return ( (phi1 / (1.0-lam)**2) - phi0)
+\end{minted}
+
+
 ODE sistemindeki tüm türevlerin sýfýr olmasý için $(0,0,0)$ seçilebilir,
 fakat bu aþýrý basit (trivial) çözümdür, ekonomik olarak anlamý
 yoktur. Daha anlamlý bir sabit nokta için (2)'deki türevin sýfýr olmasý
-için $\Phi(\lambda)=\alpha $ olmalýdýr, ya da $\lambda=\Phi^{-1}(\alpha)$. Yani bir $\Phi$'nin tersini 
-arýyoruz, öyle ki $\Phi^{-1}(\Phi(\lambda)) = \lambda$ olsun.
+için $\Phi(\lambda)=\alpha $ olmalýdýr, ya da
+$\lambda=\Phi^{-1}(\alpha)$. Yani bir $\Phi$'nin tersini arýyoruz, öyle ki
+$\Phi^{-1}(\Phi(\lambda)) = \lambda$ olsun. $\Phi$ neydi?
 
 $$ \Phi(\lambda) = \alpha = \frac{\phi_1}{(1-\lambda)^2}-\phi_0$$
 
@@ -165,14 +184,11 @@ $$ \alpha + \phi_0 = \frac{\phi_1}{(1-\lambda)^2}$$
 
 $$   (1-\lambda)^2 = \frac{\phi_1}{ \alpha + \phi_0} $$
 
-$$  \lambda^2 - 2\lambda + \lambda^2 - \frac{\phi_1}{ \alpha + \phi_0} =0$$
+$$  \lambda^2 - 2\lambda + 1 - \frac{\phi_1}{ \alpha + \phi_0} =0$$
 
 Bu standart bir karesel denklem, köklerini bulalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-alpha = 0.025
-phi0 = 0.04 / (1.0-(0.04**2))
-phi1 = 0.04**3.0 / (1.0-(0.04**2))
 print np.roots([1, -2, 1-(phi1/(alpha+phi0))   ])
 \end{minted}
 
@@ -180,31 +196,10 @@ print np.roots([1, -2, 1-(phi1/(alpha+phi0))   ])
 [ 1.03138824  0.96861176]
 \end{verbatim}
 
-$\lambda < 1.0$ olmasý gerektiði için göre aradýðýmýz ikinci sonuç, yani
-[2]'de bahsedilen $\overline{\lambda}_1 = 0.9686$ deðeri.
+$\lambda < 1.0$ olmasý gerektiði için aradýðýmýz ikinci sonuç, yani [2]'de
+bahsedilen $\overline{\lambda}_1 = 0.9686$ deðeri.
 
-
-$\overline{\omega}_1$ icin (4) denkleminde turevi sifira esitleriz, 
-
-$$ r - \frac{\kappa(\overline{\pi}_1)}{v} + \delta + \kappa(\overline{\pi}_1) + 1 = \omega$$
-
-\begin{minted}[fontsize=\footnotesize]{python}
-pi1 = 0.16184
-v = 3.0
-k0 = -0.0065
-k1 = np.exp(-5.0)
-k2 = 20.0
-r = 0.03
-omega1 = 1-r+(kappa(pi1,k0,k1,k2)/v)-delta-kappa(pi1,k0,k1,k2)
-print omega1
-\end{minted}
-
-\begin{verbatim}
-0.850003199874
-\end{verbatim}
-
-$\overline{d}_1$ için (3) denkleminde türevi sýfýra eþitleriz ve basit
-olmayan çözüm için
+(3) denkleminde türevi sýfýra eþitleriz ve basit olmayan çözüm için
 
 $$ \kappa(1-\omega-rd)= v (\alpha + \beta + \delta) $$
 
@@ -219,13 +214,6 @@ Once $\overline{\pi}_1$ hesabi. $\kappa$'nin tersi lazim,
 $$ \kappa^{-1} = \frac{1}{\kappa_2} \log \bigg( \frac{\kappa(x) - \kappa_0 }{\kappa_1}\bigg)$$
 
 \begin{minted}[fontsize=\footnotesize]{python}
-alpha = 0.025
-beta = 0.02
-delta = 0.01
-v = 3.0
-k0 = -0.0065
-k1 = np.exp(-5.0)
-k2 = 20.0
 tmp = v*(alpha+beta+delta) - k0
 pi1 = 1.0/k2 * np.log(np.abs(tmp/k1))
 print 'pi1', pi1
@@ -235,28 +223,39 @@ print 'pi1', pi1
 pi1 0.161841399381
 \end{verbatim}
 
-O zaman $d$ icin
+$\overline{\omega}_1$ için
 
-$$ \overline{\pi}_1 = 1-\omega-rd $$
+[denklem]
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print -r
-print (pi1 - 1.0 + omega1) / -r
+omega1 = r-(kappa(pi1,k0,k1,k2)/v)+delta+kappa(pi1,k0,k1,k2)+1.0
+omega1 = d*(r-alpha-beta) + philips(alpha+beta+delta,phi0,phi1) - 1
+print omega1
 \end{minted}
 
 \begin{verbatim}
--0.03
--0.394819975158
+1.15
+\end{verbatim}
+
+$d$ için $\overline{\pi}_1 $ formülünden baþlarýz, ve artýk bildiðimiz
+deðerleri yerine koyarýz
+
+$$ \overline{\pi}_1 = 1-\omega-rd => 
+d = (1-\overline{\omega}_1 -\overline{\pi}_1) / r $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+#omega1 = 0.836
+print (1-omega1-pi1) / r
+\end{minted}
+
+\begin{verbatim}
+0.605286687294
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy as sp
 from scipy.integrate.odepack import odeint
-
-def kappa(x,k0,k1,k2): return k0 + (k1*np.exp(k2*x))
-
-def philips(lam,phi0,phi1): return ( (phi1 / (1.0-lam)**2) - phi0)
 
 def rhs(u,t,alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1):
     omega, lam, d, a, N = u
