@@ -189,7 +189,9 @@ $$  \lambda^2 - 2\lambda + 1 - \frac{\phi_1}{ \alpha + \phi_0} =0$$
 Bu standart bir karesel denklem, köklerini bulalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-print np.roots([1, -2, 1-(phi1/(alpha+phi0))   ])
+res = np.roots([1, -2, 1-(phi1/(alpha+phi0))   ])
+lambda1 = res[1]
+print res
 \end{minted}
 
 \begin{verbatim}
@@ -201,15 +203,15 @@ bahsedilen $\overline{\lambda}_1 = 0.9686$ deðeri.
 
 (3) denkleminde türevi sýfýra eþitleriz ve basit olmayan çözüm için
 
-$$ \kappa(1-\omega-rd)= v (\alpha + \beta + \delta) $$
+$$ \kappa(1-\omega-rd)= v (\alpha + \beta + \delta) \mlabel{5}$$
 
-ile baslariz. Yine ters alma operasyonu uygularsak,
+ile baþlarýz. Yine ters alma operasyonu uygularsak,
 
 $$ \overline{\pi}_1 = 1-\omega-rd= \kappa^{-1}(v (\alpha - \beta - \delta)) $$
 
 $\overline{\pi}_1$ tanýmýný yaptýk takibi rahat olsun diye. 
 
-Once $\overline{\pi}_1$ hesabi. $\kappa$'nin tersi lazim,
+Önce $\overline{\pi}_1$ hesabý. $\kappa$'nin tersi lazým,
 
 $$ \kappa^{-1} = \frac{1}{\kappa_2} \log \bigg( \frac{\kappa(x) - \kappa_0 }{\kappa_1}\bigg)$$
 
@@ -223,21 +225,55 @@ print 'pi1', pi1
 pi1 0.161841399381
 \end{verbatim}
 
-$\overline{\omega}_1$ için
+$\overline{\omega}_1$ için (5)'i tekrar düzenleyelim,
 
-[denklem]
+$$ d = \frac{1-\overline{\pi}_1-\omega}{r} $$
 
+Þimdi bu $d$'yi (4) içine sokalim,
 
-$$ \omega = 1-\pi_1-r \frac{v(\alpha+\beta+\delta) - \pi_1}{\alpha+\beta}$$
+$$ 
+0 =  \frac{1-\overline{\pi}_1-\omega}{r} \bigg[
+r - \frac{v (\alpha + \beta + \delta)}{v} + \delta
+\bigg] + v (\alpha + \beta + \delta)- 1+\omega
+$$
+
+$$ 
+-\omega =  \bigg(\frac{1}{r}-\frac{\overline{\pi}_1}{r}-\frac{\omega}{r}\bigg) \bigg(
+r - \alpha - \beta 
+\bigg) + v (\alpha + \beta + \delta)- 1
+$$
+
+$$ 
+-\omega =
+\bigg(\frac{1}{r}-\frac{\overline{\pi}_1}{r}-\frac{\omega}{r}\bigg)c_1 +
+c_2 - 1
+$$
+
+$$ 
+-\omega = \frac{c_1}{r}-\frac{c_1\overline{\pi}_1}{r}-\frac{c_1 \omega}{r}  +c_2 - 1
+$$
+
+$$ 
+\omega(\frac{c_1 }{r} -1) = \frac{c_1}{r}-\frac{c_1 \overline{\pi}_1}{r} +c_2 - 1
+$$
+
+$$ 
+\omega(\frac{c_1-r }{r}) = \frac{c_1 - c_1 \overline{\pi}_1 + rc_2 - r}{r}
+$$
+
+$$ 
+\overline{\omega}_1 = \frac{c_1 - c_1\overline{\pi}_1 + rc_2 - r}{c_1 - r}
+$$
 
 \begin{minted}[fontsize=\footnotesize]{python}
-omega1 = r-(kappa(pi1,k0,k1,k2)/v)+delta+kappa(pi1,k0,k1,k2)+1.0
-omega1 = d*(r-alpha-beta) + philips(alpha+beta+delta,phi0,phi1) - 1
+c1 = r-alpha-beta
+c2 = v*(alpha+beta+delta)
+omega1 = (c1 - c1*pi1+r*c2-r) / (c1-r)
 print omega1
 \end{minted}
 
 \begin{verbatim}
-1.15
+0.836052866873
 \end{verbatim}
 
 $d$ için $\overline{\pi}_1 $ formülünden baþlarýz, ve artýk bildiðimiz
@@ -247,13 +283,28 @@ $$ \overline{\pi}_1 = 1-\omega-rd =>
 d = (1-\overline{\omega}_1 -\overline{\pi}_1) / r $$
 
 \begin{minted}[fontsize=\footnotesize]{python}
-#omega1 = 0.836
-print (1-omega1-pi1) / r
+d1 =  (1-omega1-pi1) / r
+print d1
 \end{minted}
 
 \begin{verbatim}
-0.605286687294
+0.0701911248667
 \end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fp1 = (lambda1,omega1,d1)
+print 'sabit nokta', np.round(fp1,4)
+\end{minted}
+
+\begin{verbatim}
+sabit nokta [ 0.9686  0.8361  0.0702]
+\end{verbatim}
+
+Bu deðerler istihdam, iþçi ücretin GSYH içindeki payý, ve özel borç
+oranýnýn sabit noktadaki deðerlerini gösteriyor.
+
+Simdi ODE sistemini cozelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy as sp
@@ -280,6 +331,9 @@ k0 = -0.0065
 k1 = np.exp(-5.0)
 k2 = 20.0
 \end{minted}
+
+Ýki senaryoyu deneyelim, biri üstte bulduðumuz sabit noktaya yakýn bir
+yerden, diðeri uzak bir yerden baþlamak. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 omega0 = 0.80
