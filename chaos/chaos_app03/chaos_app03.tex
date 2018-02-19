@@ -2,8 +2,14 @@
 \begin{document}
 Steve Keen Özel Sektör Modeli, Ýkinci Form
 
-Bu yazýda borç temell modeli sýfýrdan türetmeye uðraþacaðýz. Tanýmlarý
-tekrarlamak gerekirse,
+Bu yazýda bir önceki yazýda baktýðýmýz borç temell modeli sýfýrdan
+türetmeye uðraþacaðýz. Sonuç olarak gayrý-lineer sonuçlar verebilecek bir
+ODE sistemi elde edeceðiz, bu sistemin, bu ders notlarýnda pek çok kez
+gördüðümüz gibi sabit noktalarý olacaktýr, bu noktalardan ekonomik olarak
+anlamý olan bir tanesine bakacaðýz. Ardýndan sayýsal olarak sistemý çözüp
+iki farklý baþlangýç noktasýna göre gidiþatýn neye benzediðini göreceðiz.
+
+Tanýmlarý tekrarlamak gerekirse,
 
 $\alpha$: üretkenliðin büyüme oraný, $\frac{\ud a}{\ud t} = \alpha a$
 
@@ -301,7 +307,10 @@ sabit nokta [ 0.9686  0.8361  0.0702]
 \end{verbatim}
 
 Bu deðerler istihdam, iþçi ücretlerinin GSYH içindeki payý, ve özel borç
-oranýnýn sabit noktadaki deðerlerini gösteriyor.
+oranýnýn sabit noktadaki deðerlerini gösteriyor. Bu deðerleri verilen
+parametreler ýþýðýnda ekonomik olarak ``optimal'' olarak
+görebiliriz. [2]'de bu deðerlerin stabilite ne kadar yakýnýnda kalýnmasý
+gerektiði gösterilmiþ. 
 
 Þimdi ODE sistemini sayýsal olarak çözelim,
 
@@ -397,8 +406,47 @@ plt.savefig('chaos_app03_08.png')
 \includegraphics[height=6cm]{chaos_app03_07.png}
 \includegraphics[height=6cm]{chaos_app03_08.png}
 
+Goruldugu gibi ilk senaro bizi stabiliteye tasiyor, digeri ekonomik
+cokuse. Cokus noktasinda issizlik, uretim sifir, ozel borc sonsuz
+seviyede. Bu cokuse gidisin ne kadar kolay oldugunu gorduk, sabit noktadan
+cok fazla uzaklamadik, ama sistem batisa gitti. Eger modelin ana temeline
+inaniyorsak soylediklerine de inanmak gerekir, serbest piyasa kuruldugu
+sekliyle temel olarak krizlere acikti. Bunu zaten gercek dunyada da
+goruyoruz, her 10 senede bir ekonomide kriz oluyor. 
 
-[devam edecek]
+Sabit noktanýn ne anlama geldiðini sözel olarak belirtmek gerekirse,
+[0.9686 0.8361 0.0702] demek istihdam oraný 96\%, gelir daðýlýmýndaki
+maaþlarýn (yaný orta sýnýfýn kazandýðý, çünkü onlar gelirlerini maaþtan elde
+ediyorlar) payý 83\%, borç oranýnýn 7\% olmasý demektir ($v$ sabitini
+arttýrýnca borçluluk oraný daha fazla olabiliyor, fakat diðerlerinde pek
+deðiþim yok). O zaman krizleri azaltmak demek istihdam teþviki, ve
+kazançlarýn artmasý, borçluðun azalmasý demektir. Þu anda Amerika'da
+seviyeler alttadýr,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('gdp.csv',parse_dates=True)
+df.columns = ['date','W','GDP','house_debt','corp_debt','N','emp']
+df = df.dropna()
+df = df.set_index('date')
+df.loc[:,'N'] = df['N'] / 1000000.
+df.loc[:,'W'] = df['W'] / 1000.
+df.loc[:,'GDP'] = df['GDP'] / 1000.
+df.loc[:,'corp_debt'] = df['corp_debt'] / 1000000.
+df.loc[:,'house_debt'] = df['house_debt'] / 1000.
+df['wage_share'] = df.W / df.GDP
+df['debt_share'] = (df.corp_debt + df.house_debt) / df.GDP
+print df[['emp','wage_share','debt_share']].tail(1)
+\end{minted}
+
+\begin{verbatim}
+             emp  wage_share  debt_share
+date                                    
+2016-01-01  81.2    0.441951    1.089282
+\end{verbatim}
+
+Gelir seviyesi olmasý gerekenin yarýsýnda, borçluluk çok yüksek, istihdam
+düþük. 
 
 Kaynaklar
 
