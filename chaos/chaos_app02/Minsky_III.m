@@ -78,7 +78,7 @@ Y=100*(1+[0; cumsum(0.5*(t(2:end)-t(1:end-1)).*(g(2:end)+g(1:end-1)))]);
 n=size(t,1)       % <- number of points in time (optimized by solver)
 
 %%%%%%%%%%%%%%% CHARTS %%%%%%%%%%%%%%%%%
-chart=1; % <- here choose your chart
+chart=4; % <- here choose your chart
 
 if chart==1
     plot(t,100*lambda)
