@@ -146,6 +146,7 @@ print 1-np.exp(-1)
 Ýþte $\tau$ deðeri ulaþýlmaya çalýþan deðerin kabaca yüzde 63'üne gelmek
 için geçmesi gereken gündür tanýmý buradan geliyor.
 
+Nihai denklemler,
 
 $$ 
 \frac{\dot{\lambda}}{\lambda} =
@@ -172,9 +173,60 @@ $$
 $$ g = \frac{I_{fn}(\pi_r)}{v} - \delta_{Kr} $$
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy as sp
+from scipy.integrate.odepack import odeint
 
+def rhs(u,t,alpha, beta, delta, nu, r_b, s, tau_p, tau_i, x_i, y_i, s_i, m_i, x_w, y_w, s_w, m_w):
+    lam, omega, d, i = u
+    r=r_b;
+    if i>0: r=r+i; 
+    p=1.0-omega-r*d;
+    f=-(1.0/tau_p)*(1.0-omega/(1.0-s));
+    I=(y_i-m_i)*np.exp(s_i*((p/nu)-x_i)/(y_i-m_i))+m_i;
+    W=(y_w-m_w)*np.exp(s_w*(lam-x_w)/(y_w-m_w))+m_w;
+    return [( ((1.0/nu)*I-delta) -(alpha + beta) )*lam, \
+            ( W - (alpha+f) )*omega, \
+            ( I-p ) -( (1/nu)*I - delta + f )*d,\
+            -(1.0/tau_i)*(i-f)]
+    
 
+alpha=0.025;     
+beta=0.015;      
+delta=0.07;      
+nu=3.0;
+r_b=0.04;        
+s=0.3;
+tau_p=1.0;
+tau_i=0.5;
+x_i=0.03;
+y_i=0.03;
+s_i=2.25;
+m_i=0;
+x_w=0.6;
+y_w=0.0;
+s_w=1.0;
+m_w=-0.04;
 
+lambda0=0.65;
+omega0=0.82;
+d0=0.5; 
+i0=0.1;
+
+arg0 = (alpha, beta, delta, nu, r_b, s, tau_p, tau_i, x_i, y_i, s_i, m_i, x_w, y_w, s_w, m_w)
+
+T=80.0
+t=np.linspace(0.0,T,1000.0)
+
+res=odeint(rhs,[lambda0, omega0, d0, i0],t,args=arg0)
+lambda1,omega1,d1,i1=res[:, 0],res[:, 1],res[:, 2],res[:, 3]
+plt.plot(t, 100.0*i1)
+plt.xlabel(u'Zaman (Sene)')
+plt.ylabel(u'Yýllýk Enflasyon')
+plt.savefig('chaos_app04_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{chaos_app04_01.png}
 
 
 
@@ -184,7 +236,7 @@ Kaynaklar
 
 [1] Keen, {\em A monetary Minsky model of the Great Moderation and the Great Recession}
 
-[2] {\em Greenwich-Kingston PhD students lecture: the logic  maths of modelling Minsky (2)} \url{youtu.be/0Do05hV_Iqo}
+[2] {\em Greenwich-Kingston PhD students lecture: the logic  maths of modelling Minsky (2)} \url{http://youtu.be/0Do05hV_Iqo}
 
 [3] Jelonek, {\em Numerical techniques in MATLAB: differential equations and non-linear dynamics} \url{https://warwick.ac.uk/fac/soc/economics/current/modules/rm/notes1/research_methods_matlab_3.pdf}
 

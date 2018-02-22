@@ -125,7 +125,7 @@ elseif chart==8
     axis([0 T 0 400])
     grid on
 elseif chart==9
-    last=902; % <- only first 60 years
+    last=800; % <- only first 60 years
     plot(100*lambda(1:last,:),100*i(1:last,:))
     xlabel('EMPLOYMENT (IN %)')
     ylabel('INFLATION (IN % PER YEAR)')
