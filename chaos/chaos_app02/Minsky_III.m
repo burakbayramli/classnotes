@@ -78,7 +78,7 @@ Y=100*(1+[0; cumsum(0.5*(t(2:end)-t(1:end-1)).*(g(2:end)+g(1:end-1)))]);
 n=size(t,1)       % <- number of points in time (optimized by solver)
 
 %%%%%%%%%%%%%%% CHARTS %%%%%%%%%%%%%%%%%
-chart=4; % <- here choose your chart
+chart=10; % <- here choose your chart
 
 if chart==1
     plot(t,100*lambda)
@@ -131,7 +131,7 @@ elseif chart==9
     ylabel('INFLATION (IN % PER YEAR)')
     grid on
 elseif chart==10
-    last=902; % <- only first 60 years
+    last=200; % <- only first 60 years
     x1=100*(1-lambda(1:last));
     x2=100*i(1:last);
     x3=100*d(1:last);
