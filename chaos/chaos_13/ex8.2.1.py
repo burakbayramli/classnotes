@@ -35,7 +35,7 @@ start = [[0.3,0],[1.4,-.35]]
 strm = ax0.streamplot( X,Y,U, V,linewidth=.2)
 strmS = ax0.streamplot(x1,y1, U, V, start_points=start, color="crimson", linewidth=.5)
 fig.suptitle('Hopf Bifurcation /n Strogatz 8.2.1, p.256', size=16)
-ax0.set_title( 'a) Stable Spiral', size=12)
+ax0.set_title( 'a) Stabil Sarmal', size=12)
 ax0.text(xmin+.25,ymax-.25, r'$\mu = {0}$'.format(mu),size=14)
 ax0.plot(y1/(mu+y1**2),x1, 'k-.',lw=lw, label=r'x-nullcline: $x = \frac{y}{(\mu+y^2)}$')
 ax0.plot(-mu*y1+y1**3,x1, 'k:', lw=lw, label=r'y-nullcline: $x =  -\mu y + y^3}$')
@@ -56,7 +56,7 @@ start = [[0.3,0],[.6,.5]]
 strm = ax1.streamplot( X,Y,U, V,linewidth=.2)
 strmS = ax1.streamplot(x1,y1, U, V, start_points=start, color="crimson", linewidth=.5)
 
-ax1.set_title( 'b) Critical Point', size=12)
+ax1.set_title( 'b) Kritik Nokta', size=12)
 ax1.text(xmin+.25,ymax-.25, r'$\mu = {0}$'.format(mu),size=14)
 ax1.plot(y1/(mu+y1**2),x1, 'k-.',lw=lw, label=r'x-nullcline: $x = \frac{y}{(\mu+y^2)}$')
 ax1.plot(-mu*y1+y1**3,x1, 'k:', lw=lw, label=r'y-nullcline: $x =  -\mu y + y^3}$')
@@ -76,7 +76,7 @@ start = [[0.3,0],[.6,.5]]
 strm = ax2.streamplot( X,Y,U, V,linewidth=.2)
 strmS = ax2.streamplot(x1,y1, U, V, start_points=start, color="crimson", linewidth=.5)
 
-ax2.set_title( 'c) Unstable Spiral', size=12)
+ax2.set_title( 'c) Gayri Stabil Sarmal', size=12)
 ax2.text(xmin+.25,ymax-.25, r'$\mu = {0}$'.format(mu),size=14)
 ax2.plot(y1/(mu+y1**2),x1, 'k-.',lw=lw, label=r'x-nullcline: $x = \frac{y}{(\mu+y^2)}$')
 ax2.plot(-mu*y1+y1**3,x1, 'k:', lw=lw, label=r'y-nullcline: $x =  -\mu y + y^3}$')
@@ -96,7 +96,7 @@ start = [[0.3,0],[.6,.5]]
 strm = ax3.streamplot( X,Y,U, V,linewidth=.2)
 strmS = ax3.streamplot(x1,y1, U, V, start_points=start, color="crimson", linewidth=.5)
 
-ax3.set_title( 'd) Unstable Spiral', size=12)
+ax3.set_title( 'd) Gayri Stabil Sarmal', size=12)
 ax3.text(xmin+.25,ymax-.25, r'$\mu = {0}$'.format(mu),size=14)
 ax3.plot(y1/(mu+y1**2),x1, 'k-.',lw=lw, label=r'x-nullcline: $x = \frac{y}{(\mu+y^2)}$')
 ax3.plot(-mu*y1+y1**3,x1, 'k:', lw=lw, label=r'y-nullcline: $x =  -\mu y + y^3}$')
