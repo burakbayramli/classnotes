@@ -98,6 +98,7 @@ if __name__ == "__main__":
                 url = translit_low(title)
                 url = url.replace(" ","_")
                 url = url.replace("(","_")
+                url = url.replace("'","_")
                 url = url.replace(")","_")
                 url = url.replace("/","_")
                 url = url.replace("-","")

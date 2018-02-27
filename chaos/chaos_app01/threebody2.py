@@ -1,13 +1,13 @@
 """3BodyProb.py
  
-This program solves the differeintial equation of the three-body problem with the use of odeint from scipy.integrate.
-The plots show the solutions of different initial conditions. 
-The Hamiltonian used for the cyclotron (none relativisic) is
---> H=1/2(p_x^2+p_y^2)-V_mu(x)+y*p_x-x*P_y (with mu=0.2 as default)
- 
+This program solves the differeintial equation of the three-body
+problem with the use of odeint from scipy.integrate.  The plots show
+the solutions of different initial conditions.  The Hamiltonian used
+for the cyclotron (none relativisic) is -->
+H=1/2(p_x^2+p_y^2)-V_mu(x)+y*p_x-x*P_y (with mu=0.2 as default)
+
 """
- 
-__author__ = "Marion Baumgartner (marion.baumgartner@uzh.ch)"
+
 __date__ = "$Date: 4/01/2012 $"
  
 from numpy import exp,array, arange, sqrt, linspace, sin, pi, cos, arctan2
