@@ -2,9 +2,6 @@
 \begin{document}
 Ay'a Gidelim, Kýsýtlanmýþ 3-Cisim Problemi (Restricted 3-Body Problem)
 
-spacedyn 704
-numcru 133
-
 Newton'un 2. Hareket Kanununu hatýrlarsak vektörsel anlýk $\vec{F}$
 kuvvetin $m$ kütlesi üzerinde etkisinin yol açtýðý anlýk yönsel ivme
 $\vec{a}$. 
@@ -28,26 +25,93 @@ F = |\vec{F}| \cdot \frac{\vec{r}}{|r|}
 = G \frac{m_1 m_2}{r^3}\cdot \vec{r}
 $$
 
+..
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+import numpy as np
+
+m1 = 1
+m2 = 1
+
+def twobody(state, t):
+    x1 = np.array([state[0], state[1], state[2]])
+    v1 = np.array([state[3], state[4], state[5]])
+    x2 = np.array([state[6], state[7], state[8]])
+    v2 = np.array([state[9], state[10], state[11]])
+
+    r = x2-x1
+    r = np.sqrt(np.sum(r*r))
+
+    x1d = v1
+    v1d = m2*(x2-x1)/(r*r*r)
+    x2d = v2
+    v2d = m1*(x1-x2)/(r*r*r)
+
+    return [x1d[0],x1d[1],x1d[2],v1d[0],v1d[1],v1d[2],x2d[0],x2d[1],x2d[2],v2d[0],v2d[1],v2d[2]]
+
+state0 = [0.0, 0.0, 0.0, 0.0,0.0,0.0, 1,0,0, 0.0,1.0,0.0]
+
+t = np.arange(0.0,100.0, 0.01)
+state = odeint(twobody, state0, t)
+
+from mpl_toolkits.mplot3d import Axes3D
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot(state[:,6]-state[:,0], state[:,7]-state[:,1], state[:,8]-state[:,2])
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z')
+plt.savefig('chaos_app01_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{chaos_app01_01.png}
+
+Kýsýtlanmýþ 3-Cisim Denklemi
+
+Kýsýtlama 3. cismin kütlesini yok sayar. O cismin ilk iki cismin (ay,
+dünya) oluþturduðu düzlemde olduðunu varsayar. Ayrýca iki cisim hareket
+ettikçe onlar kordinat sistemini deðiþtirmiþ olurlar, bir basitleþtirme de
+budur. Uzaklýklar birimsiz hale getirilmiþtir, $\mu_1,\mu_2$ böyle [2].
+
+$$ 
+y_1'' = y_1 + 2y_2' - \mu_2 \frac{y_1+\mu_1}{D_1} - \mu_1 \frac{y_1-\mu_2}{D_2}
+$$
+
+$$ 
+y_2'' = y_2 - 2y_1' - \mu_2 \frac{y_2}{D_1} -\mu_1 \frac{y_2}{D_2}
+$$
+
+$$\mu_1 = \frac{m_1}{m_1+m_2}$$
+
+$$\mu_2 = 1-\mu_1$$
+
+$$ D_1 = ((y_1+\mu_1)^2 + y_2^2 )^{3/2}$$
+
+$$ D_1 = ((y_1-\mu_2)^2 + y_2^2 )^{3/2}$$
+
+Alttaki baþlangýç deðerleri bir periyodik yörünge ortaya çýkartýyor,
+
+$y_1(0) = 0.994$, $y_1'(0)=0$, $y_2'(0) = -2.0015851063790825224053786222$
+
+Bu deðerler nasýl bulunmuþ? Periyodiklikten hareketle mesela $x(t)$'in
+periyot sonunda $x(T)$'de yine ayný deðere gelmesi bir sýnýr deðeri olarak
+kabul edilebilir. Böylece iki noktalý sýnýr deðer (two-point boundary value
+problem) çözülür (Taylor yöntemi ile), ve baþlangýç deðerleri
+bulunur. Baþlangýç deðerleri ile ODE entegre edilir ve tüm gidiþat bulunur.
 
 
+spacedyn 704
+numcru 133
 
-
-
-
-
-
-two body, space dyn - 374, 524, 553
-
-szebehely pg 418
-
-analyti-schaub 509
-
-
-
+[devam edecek]
 
 Kaynaklar
 
 [1] Stack Exchange, {\em Restricted Three-Body Problem}, \url{http://math.stackexchange.com/questions/54735/restricted-three-body-problem}
+
+[2] Szebehely, {\em Theory of Orbits}
 
 
 \end{document}
