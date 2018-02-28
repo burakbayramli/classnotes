@@ -1,3 +1,5 @@
+% Gander, {\em Scientific Computing An Introduction using Maple and MATLAB}
+% pg 618
 function yp=Arenstorf(t,y);
 a=0.012277471; b=1-a;
 D1=((y(1)+a)^2+y(2)^2)^(3/2);
