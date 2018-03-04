@@ -62,14 +62,125 @@ $$ x = \frac{-b - \sqrt{b^2-4ac}}{2a} $$
 
 olacak.
 
+Örnek
+
+$a=3,b=3,c=5$, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a=1.0;b=3.0;c=1.0
+tmp=np.sqrt((b**2)-(4.0*a*c))
+print (-b-tmp) / (2.0 * a)
+print (-b+tmp) / (2.0 * a)
+\end{minted}
+
+\begin{verbatim}
+-2.61803398875
+-0.38196601125
+\end{verbatim}
+
+Kütüphane çaðrýsý ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.roots([a, b, c])
+\end{minted}
+
+\begin{verbatim}
+[-2.61803399 -0.38196601]
+\end{verbatim}
+
 Sayýsal Yöntemler
 
 Eðer analitik bir þekilde $f(x)=0$'da kök bulmak mümkün deðilse, sayýsal
 yöntemler kullanýlabilir. Newton'un yöntemi (Newton's method) bunlardan
 biri. Diyelim ki $f(x)$'in köklerinden birini $x_0$ olarak tahmin
-ediyoruz. Bu tahmin etrafýnda fonksiyonun Taylor açýlýmý
+ediyoruz. Bu tahmin etrafýnda fonksiyonun Taylor açýlýmý [1, sf. 175],
 
 $$ f(x) = f(x_0) + f'(x_0)(x-x_0) + ...$$
+
+Kök aradýðýmýz için $f(x)=0$ yaparýz, ve $x$'i bir tarafa alacak þekilde
+tekrar düzenleriz, 
+
+$$ 0 = \frac{f(x_0)}{f'(x_0)} + x-x_0$$
+
+
+$$ x = x_0 - \frac{f(x_0)}{f'(x_0)} $$
+
+Bu denklemi $x_0$'i baz alarak bir sonraki $x$'i hesaplayacak bir formül
+gibi görebiliriz, 
+
+$$ x_1 = x_0 - \frac{f(x_0)}{f'(x_0)} $$
+
+Genel olarak
+
+$$ x_{i+1} = x_i - \frac{f(x_i)}{f'(x_i)} $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def newton(f, x, dfdx=None, eps=1e-6):
+    if dfdx is None: 
+        delta = eps**0.5
+    while True:
+        fx = f(x)
+        # turev bilinmiyorsa onu da sayisal hesapla
+        if dfdx is None:
+            dx = delta*x
+            if abs(dx) < delta: dx = delta
+            df = (f(x+dx) - fx)/dx
+        else:
+            df = dfdx(x)
+        dx = -fx/df
+        x += dx
+        if abs(dx) < eps: return x
+
+a=1.0;b=3.0;c=1.0
+
+def f1(x): return a*(x**2.0) + b*x + c
+print newton(f1,0.0) # baslangic 0'da
+print newton(f1,-3.0) # farkli noktadan baslatalim
+
+# bilinen turev 
+def df1(x): return 2*a*x + b
+print '\n',newton(f1,0.0,df1)
+print newton(f1,-3.0,df1) 
+
+\end{minted}
+
+\begin{verbatim}
+-0.381966010827
+-2.61803398875
+
+-0.38196601125
+-2.61803398875
+\end{verbatim}
+
+Ýkiye Bölme Yöntemi (Bisection Method)
+
+Bu yöntemle kök aramasý belli $x$ aralýklarý içinde yapýlýr, her aralýðýn
+orta noktasýnýn $f(x)=0$'a ne kadar yaklaþtýðý kontrol edilir, eðer
+yaklaþma yoksa aralýk ikiye bölünerek sýfýra daha yaklaþtýracak parça
+içinde devam edilir. Parçalar $\log$ hýzýnda küçülecekleri için bu arama
+oldukca hýzlýdýr. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bisect(f, a, b, eps=1e-6):
+     if f(a) > 0: # swap a and b
+          (a, b) = (b, a)
+     xmid = None
+     while np.abs(a - b) > eps:
+         xmid = (a+b)/2.0
+         if f(xmid) < 0:
+             a = xmid
+         else:
+             b = xmid
+     return xmid
+
+print bisect(f1,-5.0,0.0) 
+print bisect(f1,-2.0,0.0) 
+\end{minted}
+
+\begin{verbatim}
+-2.618034482
+-0.381966590881
+\end{verbatim}
 
 Kaynaklar 
 
