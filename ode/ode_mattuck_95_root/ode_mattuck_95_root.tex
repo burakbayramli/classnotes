@@ -4,10 +4,13 @@ Kök Bulmak, Karesel Formül (Root Finding, Quadratic Formula)
 
 $$ ax^2 + bx + c = 0$$
 
-Yukarýdaki gibi bir formülü çözmek için, sýnavlardan hatýrlayacaðýnýz
+Yukarýdaki gibi bir formülü çözmek için, sýnavlardan hatýrlayabileceðimiz
 aþaðýdaki formül kullanýlýr.
 
 $$ x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} $$
+
+Böylece denklemin kökleri bulunur, karesel durumda $(x-r_1)(x-r_2)=0$,
+$r_1,r_2$ iki tane köktür.
 
 Çözümü türetmek için kullanacaðýmýz yöntem, "kareyi tamamlama (completing
 the square)" yöntemi. Bu yönteme göre, c deðerini denklemin solundan,
@@ -102,7 +105,6 @@ tekrar düzenleriz,
 
 $$ 0 = \frac{f(x_0)}{f'(x_0)} + x-x_0$$
 
-
 $$ x = x_0 - \frac{f(x_0)}{f'(x_0)} $$
 
 Bu denklemi $x_0$'i baz alarak bir sonraki $x$'i hesaplayacak bir formül
@@ -113,6 +115,14 @@ $$ x_1 = x_0 - \frac{f(x_0)}{f'(x_0)} $$
 Genel olarak
 
 $$ x_{i+1} = x_i - \frac{f(x_i)}{f'(x_i)} $$
+
+Yani bir $x_0$ tahmini ile baþlýyoruz, oradan $x_1$ elde ediyoruz, onu geri
+verip $x_2$ elde ediyoruz, böyle devam ediyor.
+
+Not: yöntemin iþlemesi için $f(x)$'in türevi $f'(x)$ gerekiyor, fakat çoðu
+zaman türev elde olmaz, o zaman türevi de yaklaþýk olarak hesaplayabiliriz, 
+
+$$ f'(x) \approx \frac{f(x + \ud x) - f(x)}{\ud x}$$
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def newton(f, x, dfdx=None, eps=1e-6):
@@ -152,6 +162,39 @@ print newton(f1,-3.0,df1)
 -2.61803398875
 \end{verbatim}
 
+Çok Boyutlu Newton'un Yöntemi
+
+Çok boyutta Taylor açýlýmý,
+
+$$ 
+0 = f(x_i + \Delta x_i) = f(x_i) + J(x_i) \cdot \Delta x_i + ... 
+$$
+
+ki $x_i$ $N$ boyutlu bir vektör, ve $J$ Jacobian matrisi
+
+$$ 
+J = \left[\begin{array}{rrr}
+\frac{\partial f_1}{\partial x_1}  & \hdots & \frac{\partial f_1}{\partial x_n} \\
+ \vdots & \ddots & \vdots \\
+\frac{\partial f_N}{\partial x_1}  & \hdots & \frac{\partial f_n}{\partial x_N} 
+\end{array}\right]
+$$
+
+$\Delta x_i$ adýmlarýný hesaplamak için,
+
+$$  -f(x_i) =  J(x_i) \cdot \Delta x_i  $$
+
+$$  -f(x_i)J(x_i)^{-1} = \Delta x_i  $$
+
+Üstte ters alma iþlemi yapýldý fakat çoðunlukla Gaussian eliminasyon
+kullanýlarak bu pahalý ters alma iþleminden kaçýnýlmaya uðraþýlýr.
+
+O zaman güncellemeyi
+
+$$ x_{i+1} = x_i + \Delta x_i $$
+
+olarak özyineli bir þekilde yapabiliriz.
+
 Ýkiye Bölme Yöntemi (Bisection Method)
 
 Bu yöntemle kök aramasý belli $x$ aralýklarý içinde yapýlýr, her aralýðýn
@@ -182,8 +225,13 @@ print bisect(f1,-2.0,0.0)
 -0.381966590881
 \end{verbatim}
 
+Dikkat, hem Newton hem de ikiye bölme yönteminde bazý patalojik durumlar
+ortaya çýkabiliyor, bunlara karþý tetikte olunmalý, detaylar için [2, sf. 71]
+
 Kaynaklar 
 
-[10] Crighton, {\em Numerical Methods}
+[1] Crighton, {\em Numerical Methods}
+
+[2] Kincaid, {\em Numerical Analysis}
 
 \end{document}
