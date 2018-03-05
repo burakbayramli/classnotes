@@ -7,4 +7,3 @@ N = 100; tol = 1e-8; kmax = 10;
 xo = 1./(4 - t.*t); err = norm(x(:,1) - xo)/(N + 1)
 plot(t,x(:,1),'g', t,xo,'--r')
 print -djpg /tmp/out1.jpg
-
