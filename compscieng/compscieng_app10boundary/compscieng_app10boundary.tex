@@ -10,31 +10,33 @@ $$
 
 $$x(t_0) = x_0, \quad x(t_f) = x_f$$ 
 
-Ýkinci satýr sýnýrý þartlarýný belirtiyor, zaman $t_0,t_1,...t_f$ indisleri
-kullanýr, yani sistemin konumunu $x(t)$'in baþlangýçta $x_0$ bitiþte $x_f$
-noktasýnda olmasý isteniyor (bunlar gerçek tek sayý deðerleri
+Ýkinci satýr sýnýr þartlarýný belirtiyor, zaman için $t_0,t_1,...t_f$
+indisleri kullanýlýr, yani sistemin konumu $x(t)$'in baþlangýçta $x_0$
+bitiþte $x_f$ noktasýnda olmasý isteniyor (bunlar gerçek tek sayý deðerleri
 olacak). Bilinmeyen bir baþlangýç þartý var, bu $x'(0)$ þartý, diyelim
 $x'(0) = z$. Bilinmeyen $z$'yi nasýl bulacaðýz? Bu tür sistemlerin tipik
-örneði gülle ateþ atme problemidir, güllenin nereden atýldýðý bilinir,
-düþmesi istenen bir yer vardýr, ama hangi açýyla (burada $x'(0))$ o vuruþ
-için güllenin yukarý doðru tutulacaðý bilinmez.
+örneði top atýþý (silah anlamýnda) problemidir, güllenin nereden atýldýðý
+bilinir, düþmesi istenen bir yer vardýr, ama hangi açýyla (burada $x'(0))$
+yukarý doðru tutulacaðý bilinmez.
 
-Bilinmeyen baþlangýç þartýný bulmak için bir yöntem, bilinen tüm baþlangýç
-þartlarýný kullanýp bilinmeyen için bir tahmin üretme, ev bu sistemi
-entegre ederek sonuca gelmek. Sonuca gelindiðinde $x_f$'e ne kadar yakýn
-olunduðuna göre bir hata gradyaný oluþturup bu gradyaný $x'(0)$'te düzeltme
-yapmak için kullanmak, ve süreci tekrarlamak. Bu iþlem ardý ardýna yapýlýr
-ve istenen bitiþ deðerine gelince durulur.
+\includegraphics[width=20em]{compscieng_app10boundary_02.png}
 
-Gradyaný hesaplamak ve uygulamak için Sekant Yöntemini kullanabiliriz (bkz
-{\em Diferansiyel Denklemler, Kök Bulmak} yazýsý). Hata fonksiyonu $z$'nin
-fonksiyonudur,
+Bilinmeyen baþlangýç þartlarýndan birinin bulmak için bir yöntem, tüm
+bilinenleri kullanýp, bilinmeyen için bir tahmin yerine koymak, ve bu
+sistemi entegre ederek sonuca gelmek. Sonuca gelindiðinde $x_f$'e ne kadar
+yakýn olunduðuna göre bir hata gradyaný oluþturup bu gradyaný $x'(0)$'te
+düzeltme yapmak için kullanmak, ve süreci tekrarlamak. Bu iþlem ardý ardýna
+yapýlýr ve istenen bitiþ deðerine gelince durulur. Bu yönteme ilham aldýðý
+temel örnekten hareketle atýþ metotu (the shooting method) adý veriliyor.
+
+Gradyaný hesaplamak ve düzeltmede kullanmak için Sekant Yöntemini
+kullanabiliriz (bkz {\em Diferansiyel Denklemler, Kök Bulmak} yazýsý). Hata
+fonksiyonu $z$'nin fonksiyonudur,
 
 $$ e(z) = x(t_f) - x_f $$
 
 Ýstediðimiz $e(z)$'nin minimal olmasý, yani sýfýra eþit olmasý, $e(z) =
 0$. Bu durumda bir kök bulma problemi ortaya çýkýyor,
-
 
 $$ z_{n+1} = z_n - \frac{ \quad e(z_n) \quad }{\frac{\ud e(z_n) }{\ud z_n} }$$
 
@@ -46,8 +48,19 @@ $$
 
 Örnek 
 
+$$ x''(t) = 2x^2(t) + 4t x(t) x'(t)$$
+
+$$ x(0) = \frac{1}{4}, \quad x(1) = \frac{1}{3}$$
+
+Bu problemin analitik çözümü aslýnda biliniyor, 
+
+$$x(t) = \frac{1}{4 - t^2}, \quad x'(t) = \frac{2t}{(4-t^2)^2} = 2t x^2(t)$$
+
+Ama bilmeseydik nasýl çözerdik? Alttaki gibi,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy as sp
+import numpy.linalg as lin
 from scipy.integrate.odepack import odeint
 
 def rhs(u,t):
@@ -56,52 +69,36 @@ def rhs(u,t):
 
 def bvp_shoot(t0,tf,x0,xf,N,tol,kmax):
     dx0 = np.zeros(kmax)
+    e = np.zeros(kmax)
     dx0[0]= (xf-x0)/(tf-t0);
     t=np.linspace(t0,tf,100.0)
     for k in range(1,kmax-1):
-        res=odeint(rhs,[x0, dx0[k]], t)
-        x1r,x2r=res[:, 0],res[:, 1]
-        print x2r
-        break
-    return 
+        x=odeint(rhs,[x0, dx0[k]], t)        
+        e[k]=x[-1,0]-xf
+        ddx= dx0[k]-dx0[k-1]
+        if np.abs(e[k])<tol or np.abs(ddx)<tol: break
+        deddx= (e[k]-e[k-1])/ddx;
+        dx0[k+1] = dx0[k]-e[k]/deddx;
+    return t, x
 
 t0 = 0.; tf = 1.; x0 = 1/4.; xf = 1/3.;
 N = 100.; tol = 1e-8; kmax = 10;
 
-bvp_shoot(t0,tf,x0,xf,N,tol,kmax)
+t,x = bvp_shoot(t0,tf,x0,xf,N,tol,kmax)
+xo = 1.0 /(4.0 - t**2); err = lin.norm(x[:,0] - xo)/(N + 1.0)
 
-
+plt.plot(t,x[:,0],'g') # bizim hesap
+plt.plot(t,xo,'--r') # analitik bilinen
+plt.savefig('compscieng_app10boundary_01.png')
 \end{minted}
 
-\begin{verbatim}
-[ 0.          0.0012627   0.00252578  0.00378961  0.00505462  0.00632118
-  0.00758968  0.00886051  0.01013406  0.01141073  0.01269092  0.01397502
-  0.01526343  0.01655657  0.01785485  0.01915867  0.02046846  0.02178464
-  0.02310764  0.02443789  0.02577583  0.0271219   0.02847656  0.02984028
-  0.0312135   0.03259671  0.03399039  0.03539502  0.03681112  0.03823919
-  0.03967974  0.0411333   0.04260042  0.04408164  0.04557754  0.0470887
-  0.04861569  0.05015912  0.05171962  0.05329781  0.05489434  0.05650989
-  0.05814513  0.05980076  0.0614775   0.0631761   0.06489732  0.06664193
-  0.06841074  0.07020457  0.07202429  0.07387076  0.0757449   0.07764763
-  0.07957992  0.08154276  0.08353716  0.0855642   0.08762496  0.08972057
-  0.09185219  0.09402104  0.09622836  0.09847544  0.10076361  0.10309426
-  0.10546883  0.10788881  0.11035572  0.11287118  0.11543684  0.11805443
-  0.12072573  0.12345259  0.12623695  0.12908082  0.13198628  0.1349555
-  0.13799074  0.14109435  0.14426879  0.1475166   0.15084046  0.15424313
-  0.1577275   0.1612966   0.16495359  0.16870176  0.17254457  0.1764856
-  0.18052863  0.1846776   0.18893664  0.19331006  0.1978024   0.20241841
-  0.20716307  0.2120416   0.21705949  0.22222251]
-\end{verbatim}
+\includegraphics[width=20em]{compscieng_app10boundary_01.png}
 
-
-
-
-
-
-[devam edecek]
+Grafikte görüldüðü gibi iki çözüm birbirinin týpký aynýsý. 
 
 Kaynaklar
 
 [1] Yang, {\em Applied Numerical Methods using Matlab}
 
 \end{document}
+
