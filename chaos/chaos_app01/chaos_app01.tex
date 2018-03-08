@@ -3,30 +3,44 @@
 Ay'a Gidelim, Düzlemlsel, Dairesel Kýsýtlanmýþ 3-Cisim Problemi (Planar
 Restricted Circular 3-Body Problem)
 
-Newton'un 2. Hareket Kanununu hatýrlarsak vektörsel anlýk $F$ kuvvetin $m$
-kütlesi üzerinde etkisinin yol açtýðý anlýk yönsel ivme $a$.
+Iki Cisim Problemi
 
-$$ F = m a $$
+Uzayda iki cisim olduðunu düþünelim, bunlar iki gezegen olabilir,birisi
+$m_1$ kütlesine sahip ve $\vec{x}_1$'de, diðer $m_2$ kütlesine sahip ve
+$\vec{x}_2$'de.
 
-$F,a$ vektor. Bir diðer Newton kanunu iki kütle arasýndaki karþýlýklý çekim
-kuvveti,
+\includegraphics[width=20em]{chaos_app01_03.png}
 
-$$ 
-|F| = G \frac{m_1 m_2}{r^2}
-$$
-
-$r$ iki kütle $m_1,m_2$ arasýndaki mesafe, basitlik açýsýndan tüm
-kütlelerinin orta noktalarýna odaklý olduðu farzedilir. Simdi $r \equiv \vec{r}$
-diyelim, bu kuvvetin yönsel hali yani, o yonde birim vektörü $\vec{r}/|r|$
-ve bu birim vektörü üstteki kuvvet ile çarparýz,
+Böyle bir sistemde 2. kütlenin 1. üzerindeki çekim kuvvetinin
 
 $$ 
-F = |F| \cdot \frac{r}{|r|}  
-= G \frac{m_1 m_2}{r^2}\cdot \frac{r}{|r|} 
-= G \frac{m_1 m_2}{r^3}\cdot r
+\vec{F}_1 = 
+\frac{G m_1 m_2 (\vec{x}_2-\vec{x}_1)  }{ | \vec{x}_2 - \vec{x}_1|^3  }
 $$
 
-..
+olduðunu Newton Kanunu'nundan biliyoruz. Ters yönden bakarsak 1. kütlenin
+2. üzerindeki etkisi
+
+$$ 
+\vec{F}_2 = 
+\frac{G m_1 m_2 (\vec{x}_1-\vec{x}_2)  }{ | \vec{x}_1 - \vec{x}_2|^3  }
+$$
+
+ki $G$ yerçekim sabiti. Newton'un ikinci kanunu $F=ma$'yi kullanýrsak, daha
+doðrusu onun formunu, $\vec{F} = m \vec{a}$ kullanarak üstteki iki formülü
+tekrar yazabiliriz. $\vec{x}_1$ ve $\vec{x}_2$'in ivmesi (formüldeki
+$\vec{a}$)) $\ddot{\vec{x}}_1$, $\ddot{\vec{x}}_2$ olacaktýr, mesela
+1. cisim için 
+
+$$ \vec{F}_1=  m_1 \ddot{\vec{x}}_1 $$
+
+$\vec{F}_1$  için üstteki formülü yerine geçirip $m_1$ iptali yapýnca
+
+$$ \ddot{\vec{x}}_1  = \frac{G m_2 (\vec{x}_2-\vec{x}_1)  }{ | \vec{x}_2 - \vec{x}_1|^3  }$$
+
+Ayný þekilde 2. cisim için
+
+$$ \ddot{\vec{x}}_2  = \frac{G m_1 (\vec{x}_1-\vec{x}_2)  }{ | \vec{x}_1 - \vec{x}_2|^3  }$$
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.integrate import odeint
@@ -50,7 +64,8 @@ def twobody(state, t):
     x2d = v2
     v2d = m1*(x1-x2)/(r*r*r)
 
-    return [x1d[0],x1d[1],x1d[2],v1d[0],v1d[1],v1d[2],x2d[0],x2d[1],x2d[2],v2d[0],v2d[1],v2d[2]]
+    return [x1d[0],x1d[1],x1d[2],v1d[0],v1d[1],v1d[2],\
+            x2d[0],x2d[1],x2d[2],v2d[0],v2d[1],v2d[2]]
 
 state0 = [0.0, 0.0, 0.0, 0.0,0.0,0.0, 1,0,0, 0.0,1.0,0.0]
 
@@ -69,12 +84,26 @@ plt.savefig('chaos_app01_01.png')
 
 \includegraphics[height=6cm]{chaos_app01_01.png}
 
-Kýsýtlanmýþ 3-Cisim Denklemi
+Kýsýtlanmýþ 3-Cisim Problemi
 
-Kýsýtlama 3. cismin kütlesini yok sayar. O cismin ilk iki cismin (ay,
-dünya) oluþturduðu düzlemde olduðunu varsayar. Ayrýca iki cisim hareket
-ettikçe onlar kordinat sistemini deðiþtirmiþ olurlar, bir basitleþtirme de
-budur. Uzaklýklar birimsiz hale getirilmiþtir, $\mu_1,\mu_2$ böyle [2].
+Kýsýtlanmýþ formda mesela bir dünya, ay, uzay gemisi sisteminde 3. cisim
+olan uzay gemisinin diðer iki cisim üzerinde etkisinin yok sayýlabileceði
+varsayýlýr. O zaman sadece 3. cisim için 
+
+$$ \ddot{\vec{x}}_3 =  
+\frac{G m_1 (\vec{x}_1-\vec{x}_3)  }{ | \vec{x}_1 - \vec{x}_3|^3  } + 
+\frac{G m_2 (\vec{x}_2-\vec{x}_3)  }{ | \vec{x}_2 - \vec{x}_3|^3  } 
+$$
+
+Bir diðer basitleþtirme yörüngenin elips deðil dairesel olmasý. O zaman
+Kepler'in Teorisi üzerinden bu iki cismin sabit hýzda döndüðü
+farzedilebilir. 
+
+[devam edecek]
+
+\newpage
+
+\includegraphics[width=30em]{chaos_app01_04.png}
 
 $$ 
 y_1'' = y_1 + 2y_2' - \mu_2 \frac{y_1+\mu_1}{D_1} - \mu_1 \frac{y_1-\mu_2}{D_2}
