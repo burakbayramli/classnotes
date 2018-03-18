@@ -4,7 +4,7 @@ Ay'a Gidelim, Düzlemsel, Dairesel Kýsýtlanmýþ 3-Cisim Problemi (Planar
 Restricted Circular 3-Body Problem)
 
 Ay'a gidebilmek için kütlelerin uzayda birbirini nasýl etkilediðini,
-birbirleri olan çekimlerini incelemek gerekiyor. ABD Nasa'nýn Apollo
+birbirleriyle olan çekimlerini incelemek gerekiyor. ABD Nasa'nýn Apollo
 programý aya gidebilmek için bu tür hesaplarý yapmak zorundaydý. Önce basit
 formdan baþlayalým, iki cisim problemi.
  
@@ -47,6 +47,10 @@ Ayný þekilde 2. cisim için
 
 $$ \ddot{\vec{x}}_2  = \frac{G m_1 (\vec{x}_1-\vec{x}_2)  }{ | \vec{x}_1 - \vec{x}_2|^3  }$$
 
+Sayýsal çözüm için $\dot{\vec{x}}_1 = v_1$, $\dot{\vec{x}}_2 = v_2$,
+tanýmlarý yapýlabilir, böylece $\dot{v}_1 = \ddot{\vec{x}}_1$ olur, vs.
+detaylar için [6].
+
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
@@ -72,7 +76,10 @@ def twobody(state, t):
     return [x1d[0],x1d[1],x1d[2],v1d[0],v1d[1],v1d[2],\
             x2d[0],x2d[1],x2d[2],v2d[0],v2d[1],v2d[2]]
 
-state0 = [0.0, 0.0, 0.0, 0.0,0.0,0.0, 1,0,0, 0.0,1.0,0.0]
+state0 = [0.0, 0.0, 0.0,\
+          0.0, 0.0, 0.0,\
+          1.0, 0.0, 0.0,\
+          0.0, 1.0, 0.0]
 
 t = np.arange(0.0,100.0, 0.01)
 state = odeint(twobody, state0, t)
@@ -89,8 +96,9 @@ plt.savefig('chaos_app01_01.png')
 
 \includegraphics[height=6cm]{chaos_app01_01.png}
 
-Not: Üstte iki cisim problemini hesapsal olarak çözdük fakat bu problemin
+Not: Üstte iki cisim problemini hesapsal olarak çözdük [6]. Bu problemin
 analitik çözümü de vardýr, detaylar için [5].
+
 
 Kýsýtlanmýþ 3-Cisim Problemi
 
@@ -106,7 +114,7 @@ hareket eden 3. cismin gidiþ hesabý kolaylaþýr. Tabii bu sistemin de
 analitik çözümü yoktur, hesapsal tekniklere baþvurmak gerekir.
 
 Baþtan baþlayalým, 1. ve 2. cisim üzerindeki kuvvet önemli deðil, büyük iki
-cismin üçüncü cisim üzerindeki çekimi onamlý, O zaman sadece 3. cisim için
+cismin üçüncü cisim üzerindeki çekimi önemli, O zaman sadece 3. cisim için
 
 $$ 
 \ddot{\vec{x}}_3 =  
@@ -129,14 +137,21 @@ $$
 \end{array}\right]
 $$
 
+$$ 
+\vec{x}_2 = \left[\begin{array}{r}
+\frac{m_1}{m_2} r_2 \cos ( \frac{2\pi t}{\tau} )\\
+\frac{m_1}{m_2} r_2 \sin ( \frac{2\pi t}{\tau} )
+\end{array}\right]
+$$
+
 ki $r_1,r_2$ sýrasýyla $m_1,m_2$'nin orijinden olan uzaklýðý ve $\tau$ bir
 dönüþün ne kadar zaman aldýðý (periyot büyüklüðü). Ýki kütlenin aðýrlýk
 merkezini orijin olarak atamak istiyoruz, ki $r_2 = \frac{m_1}{m_2}r_1$
 olsun. Ayrýca basitlik amaçýyla $r=r_1$ diyelim. Þimdi iki cismin dönüþüne
 oranla kordinat sistemini döndürürsek bu cisimlerin sürekli $y=0$'da
 kalmasýný garanti edebiliriz, böylece sadece üçüncü cismin hareketine
-odaklanabiliriz, bu kordinate döndürmesi $-\frac{2\pi t}{\tau}$ açýsýyla
-olacak, bu rotasyon matrisine $R$ diyelim,
+odaklanabiliriz, kordinatý döndürmesi $-\frac{2\pi t}{\tau}$ açýsýyla
+olacak, bu döndürme / rotasyon matrisine $R$ diyelim,
 
 $$ 
 R(t) = \left[\begin{array}{rr}
@@ -145,7 +160,17 @@ R(t) = \left[\begin{array}{rr}
 \end{array}\right]
 $$
 
-Bu yeni sistemde $\vec{x}_1,\vec{x}_2$'i hesaplarsak,
+Genel olarak iki boyutta $\theta$ kadar döndürme yapmak için alttaki gibi
+bir bir matris kullanabileceðimizi biliyoruz,
+
+$$ R_\theta = \left[\begin{array}{rr}
+\cos \theta & -\sin \theta \\
+\sin \theta & \cos \theta
+\end{array}\right] $$
+
+Not: üstte eksi açýyla döndürülme yapýldýðý için $\sin$ iþaretleri deðiþmiþ
+
+Devam edelim, bu yeni sistemde $\vec{x}_1,\vec{x}_2$'i hesaplarsak,
 
 $$ \vec{x}_{1r} = R \vec{x}_1 = \left[\begin{array}{c}-r \\ 0\end{array}\right]$$
 
@@ -286,4 +311,7 @@ Kaynaklar
 
 [5] Mitchell, {\em The Restricted 3-Body Problem: A Mission to L4}, \url{https://www.math.ksu.edu/reu/sumar/rebeccaspaper.pdf}
 
+[6] Pilant, {\em Welcome to Math 614  Dynamical Systems and Chaos}, \url{http://www.math.tamu.edu/~mpilant/math614/twobody.pdf}
+
 \end{document}
+
