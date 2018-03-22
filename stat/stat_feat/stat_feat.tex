@@ -659,24 +659,54 @@ kullanýma da gidebilirdik. Bu yazýda göstermeye çalýþtýðýmýz çok fazla
 veri, çok fazla kolon / kategori olduðunda ve tek makina ortamýnda takip
 edilebilecek çözümler.
 
-Zaman Karsilastirmak
+Zaman Karþýlaþtýrmak
+
+Eðer 23:50 ile sabah 00:10 zamanýný karþýlaþtýrmak istersek ne yaparýz?
+Eðer saat ve dakika farkýný direk hesaplasak bu iki zamanýn çok uzak
+olduðunu düþünebilirdik. Fakat aslýnda aralarýnda 20 dakika var, zaman
+dönüp baþa gelen bir kavram. 
 
 \includegraphics[width=20em]{stat_feat_01.png}
 
+Bu hesabý yapmak için bir yöntem çember, açýlar kullanmak. Gün içindeki
+zamaný 0 ile 1 arasýnda kodlarýz, sonra bu büyüklüðü $2\pi$ ile çarpariz,
+bu bize cember uzerindeki bir noktayi verir, yani zamani aciya cevirmis
+oluruz. Sonra acinin $\sin$, $\cos$ deðerini hesaplayýp iki rakam elde
+ederiz, bu iki sayý bize gün içindeki zamaný temsil eden bir büyüklük
+verir. 
+
+Bu büyüklükleri birbirleri ile karþýlaþtýrmak daha kolay, üstteki þekilde
+$\theta_2$ ve $\theta_3$ birbirine yakýn, karþýlaþtýrma yaparken $\sin$
+bize dikey eksendeki izdüþümü, $\cos$ yatay eksendeki izdüþümünü verir,
+$\theta_2,\theta_3$ için y eksenindeki yansýma birbirine çok yakýn. Eksen x
+üzerindeki yansýma farklý biri eksi biri artý yönde fakat yine de mutlak
+deðer baðlamýnda birbirlerine çok yakýnlar. Ýstediðimiz de bu zaten. 
+
 \begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
 t1 = 0.12 * 2*np.pi
 t2 = 0.97 * 2*np.pi
 t3 = 0.03 * 2*np.pi
 
-print ("%f %f" % (np.cos(t1), np.sin(t1)))
-print ("%f %f" % (np.cos(t2), np.sin(t2)))
-print ("%f %f" % (np.cos(t3), np.sin(t3)))
+d1 = (np.cos(t1), np.sin(t1))
+d2 = (np.cos(t2), np.sin(t2))
+d3 = (np.cos(t3), np.sin(t3))
+
+print ("%f %f" % d1)
+print ("%f %f" % d2)
+print ("%f %f" % d3)
+
+print u'uzaklýk 1-2 =', lin.norm(np.array(d1)-np.array(d2))
+print u'uzaklýk 2-3 =', lin.norm(np.array(d2)-np.array(d3))
 \end{minted}
 
 \begin{verbatim}
 0.728969 0.684547
 0.982287 -0.187381
 0.982287 0.187381
+uzaklýk 1-2 = 0.907980999479
+uzaklýk 2-3 = 0.374762629171
 \end{verbatim}
 
 Kaynaklar 
