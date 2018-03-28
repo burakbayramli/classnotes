@@ -38,6 +38,7 @@ if len(sys.argv) == 1:
     ./nmt/nmt.pdf \
     ./ocr/ocr.pdf \
     ./speech/speech.pdf \
+    ./graphconv/graphconv.pdf \
     ./zapp/zapp.pdf \
     output ../../Dropbox/Public/skfiles/algs.pdf"
     os.system(cmd)
