@@ -32,10 +32,15 @@ adj, features = util.load_data(dataset_str)
 
 # Store original adjacency matrix (without diagonal entries) for later
 adj_orig = adj
-adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape)
+adj_orig = adj_orig - sp.dia_matrix(
+    ( adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape
+)
 adj_orig.eliminate_zeros()
 
-adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = util.mask_test_edges(adj)
+adj_train, train_edges, val_edges,\
+val_edges_false, test_edges,\
+test_edges_false = util.mask_test_edges(adj)
+
 adj = adj_train
 
 if FLAGS.features == 0:
@@ -65,12 +70,9 @@ pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
 norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
 
 # Optimizer
-with tf.name_scope('optimizer'):
-    opt = util.OptimizerAE(preds=model.reconstructions,
-                           labels=tf.reshape(tf.sparse_tensor_to_dense(placeholders['adj_orig'],
-                                                                       validate_indices=False), [-1]),
-                           pos_weight=pos_weight,
-                           norm=norm)
+tmp = tf.reshape(tf.sparse_tensor_to_dense(placeholders['adj_orig'],validate_indices=False), [-1])
+opt = util.OptimizerAE(preds=model.reconstructions,labels=tmp,
+                       pos_weight=pos_weight,norm=norm)
 
 # Initialize session
 sess = tf.Session()

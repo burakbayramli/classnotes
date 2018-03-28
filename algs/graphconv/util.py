@@ -21,14 +21,15 @@ class OptimizerAE(object):
         preds_sub = preds
         labels_sub = labels
 
-        self.cost = norm * tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=pos_weight))
+        tmp = tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=pos_weight)
+        self.cost = norm * tf.reduce_mean(tmp)
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)  # Adam Optimizer
 
         self.opt_op = self.optimizer.minimize(self.cost)
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
-        self.correct_prediction = tf.equal(tf.cast(tf.greater_equal(tf.sigmoid(preds_sub), 0.5), tf.int32),
-                                           tf.cast(labels_sub, tf.int32))
+        tmp = tf.cast(tf.greater_equal(tf.sigmoid(preds_sub), 0.5), tf.int32)
+        self.correct_prediction = tf.equal(tmp, tf.cast(labels_sub, tf.int32))
         self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
 
 def parse_index_file(filename):
@@ -109,10 +110,15 @@ class Layer(object):
 
 
 class GraphConvolution(Layer):
-    def __init__(self, input_dim, output_dim, adj, dropout=0., act=tf.nn.relu, **kwargs):
+    def __init__(self, input_dim,
+                 output_dim, adj,
+                 dropout=0.,
+                 act=tf.nn.relu, **kwargs):
         super(GraphConvolution, self).__init__(**kwargs)
         with tf.variable_scope(self.name + '_vars'):
-            self.vars['weights'] = weight_variable_glorot(input_dim, output_dim, name="weights")
+            self.vars['weights'] = weight_variable_glorot(input_dim,
+                                                          output_dim,
+                                                          name="weights")
         self.dropout = dropout
         self.adj = adj
         self.act = act
@@ -127,10 +133,15 @@ class GraphConvolution(Layer):
 
 
 class GraphConvolutionSparse(Layer):
-    def __init__(self, input_dim, output_dim, adj, features_nonzero, dropout=0., act=tf.nn.relu, **kwargs):
+    def __init__(self, input_dim,
+                 output_dim, adj,
+                 features_nonzero,
+                 dropout=0., act=tf.nn.relu, **kwargs):
         super(GraphConvolutionSparse, self).__init__(**kwargs)
         with tf.variable_scope(self.name + '_vars'):
-            self.vars['weights'] = weight_variable_glorot(input_dim, output_dim, name="weights")
+            self.vars['weights'] = weight_variable_glorot(input_dim,
+                                                          output_dim,
+                                                          name="weights")
         self.dropout = dropout
         self.adj = adj
         self.act = act
@@ -244,7 +255,9 @@ def preprocess_graph(adj):
     adj_ = adj + sp.eye(adj.shape[0])
     rowsum = np.array(adj_.sum(1))
     degree_mat_inv_sqrt = sp.diags(np.power(rowsum, -0.5).flatten())
-    adj_normalized = adj_.dot(degree_mat_inv_sqrt).transpose().dot(degree_mat_inv_sqrt).tocoo()
+    adj_normalized = adj_.dot(degree_mat_inv_sqrt).\
+                     transpose().\
+                     dot(degree_mat_inv_sqrt).tocoo()
     return sparse_to_tuple(adj_normalized)
 
 
@@ -326,8 +339,12 @@ def mask_test_edges(adj):
 
     data = np.ones(train_edges.shape[0])
 
-    adj_train = sp.csr_matrix((data, (train_edges[:, 0], train_edges[:, 1])), shape=adj.shape)
+    adj_train = sp.csr_matrix((data, (train_edges[:, 0],
+                                      train_edges[:, 1])),
+                              shape=adj.shape)
     adj_train = adj_train + adj_train.T
 
-    return adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false
-
+    return \
+        adj_train, train_edges, val_edges, \
+        val_edges_false, test_edges, \
+        test_edges_false
