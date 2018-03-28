@@ -9,7 +9,6 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
 
-# Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
@@ -26,11 +25,9 @@ flags.DEFINE_integer('features', 1, 'Whether to use features (1) or not (0).')
 
 model_str = FLAGS.model
 dataset_str = FLAGS.dataset
-1
-# Load data
+
 adj, features = util.load_data(dataset_str)
 
-# Store original adjacency matrix (without diagonal entries) for later
 adj_orig = adj
 adj_orig = adj_orig - sp.dia_matrix(
     ( adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape
@@ -46,10 +43,8 @@ adj = adj_train
 if FLAGS.features == 0:
     features = sp.identity(features.shape[0])  # featureless
 
-# Some preprocessing
 adj_norm = util.preprocess_graph(adj)
 
-# Define placeholders
 placeholders = {
     'features': tf.sparse_placeholder(tf.float32),
     'adj': tf.sparse_placeholder(tf.float32),
@@ -63,18 +58,15 @@ features = util.sparse_to_tuple(features.tocoo())
 num_features = features[2][1]
 features_nonzero = features[1].shape[0]
 
-# Create model
 model = util.GCNModelAE(placeholders, num_features, features_nonzero)
 
 pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
 norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
 
-# Optimizer
 tmp = tf.reshape(tf.sparse_tensor_to_dense(placeholders['adj_orig'],validate_indices=False), [-1])
 opt = util.OptimizerAE(preds=model.reconstructions,labels=tmp,
                        pos_weight=pos_weight,norm=norm)
 
-# Initialize session
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
@@ -118,17 +110,15 @@ val_roc_score = []
 adj_label = adj_train + sp.eye(adj_train.shape[0])
 adj_label = util.sparse_to_tuple(adj_label)
 
-# Train model
 for epoch in range(FLAGS.epochs):
 
     t = time.time()
-    # Construct feed dictionary
+
     feed_dict = util.construct_feed_dict(adj_norm, adj_label, features, placeholders)
     feed_dict.update({placeholders['dropout']: FLAGS.dropout})
-    # Run single weight update
+
     outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
 
-    # Compute average loss
     avg_cost = outs[1]
     avg_accuracy = outs[2]
 
