@@ -39,7 +39,6 @@ def parse_index_file(filename):
 
 
 def load_data(dataset):
-    # load the data: x, tx, allx, graph
     names = ['x', 'tx', 'allx', 'graph']
     objects = []
     for i in range(len(names)):
@@ -48,8 +47,6 @@ def load_data(dataset):
     test_idx_reorder = parse_index_file("data/ind.{}.test.index".format(dataset))
     test_idx_range = np.sort(test_idx_reorder)
 
-    # Fix citeseer dataset (there are some isolated nodes in the graph)
-    # Find isolated nodes, add them as zero-vecs into the right position
     test_idx_range_full = range(min(test_idx_reorder), max(test_idx_reorder)+1)
     tx_extended = sp.lil_matrix((len(test_idx_range_full), x.shape[1]))
     tx_extended[test_idx_range-min(test_idx_range), :] = tx
@@ -62,9 +59,6 @@ def load_data(dataset):
     return adj, features
 
 def weight_variable_glorot(input_dim, output_dim, name=""):
-    """Create a weight variable with Glorot & Bengio (AISTATS 2010)
-    initialization.
-    """
     init_range = np.sqrt(6.0 / (input_dim + output_dim))
     initial = tf.random_uniform([input_dim, output_dim], minval=-init_range,
                                 maxval=init_range, dtype=tf.float32)
@@ -73,8 +67,6 @@ def weight_variable_glorot(input_dim, output_dim, name=""):
 _LAYER_UIDS = {}
 
 def get_layer_uid(layer_name=''):
-    """Helper function, assigns unique layer IDs
-    """
     if layer_name not in _LAYER_UIDS:
         _LAYER_UIDS[layer_name] = 1
         return 1
@@ -84,8 +76,6 @@ def get_layer_uid(layer_name=''):
 
 
 def dropout_sparse(x, keep_prob, num_nonzero_elems):
-    """Dropout for sparse tensors. Currently fails for very large sparse tensors (>1M elements)
-    """
     noise_shape = [num_nonzero_elems]
     random_tensor = keep_prob
     random_tensor += tf.random_uniform(noise_shape)
@@ -95,16 +85,6 @@ def dropout_sparse(x, keep_prob, num_nonzero_elems):
 
 
 class Layer(object):
-    """Base layer class. Defines basic API for all layer objects.
-
-    # Properties
-        name: String, defines the variable scope of the layer.
-
-    # Methods
-        _call(inputs): Defines computation graph of layer
-            (i.e. takes input, returns output)
-        __call__(inputs): Wrapper for _call()
-    """
     def __init__(self, **kwargs):
         allowed_kwargs = {'name', 'logging'}
         for kwarg in kwargs.keys():
@@ -129,7 +109,6 @@ class Layer(object):
 
 
 class GraphConvolution(Layer):
-    """Basic graph convolution layer for undirected graph without edge labels."""
     def __init__(self, input_dim, output_dim, adj, dropout=0., act=tf.nn.relu, **kwargs):
         super(GraphConvolution, self).__init__(**kwargs)
         with tf.variable_scope(self.name + '_vars'):
@@ -148,7 +127,6 @@ class GraphConvolution(Layer):
 
 
 class GraphConvolutionSparse(Layer):
-    """Graph convolution layer for sparse inputs."""
     def __init__(self, input_dim, output_dim, adj, features_nonzero, dropout=0., act=tf.nn.relu, **kwargs):
         super(GraphConvolutionSparse, self).__init__(**kwargs)
         with tf.variable_scope(self.name + '_vars'):
@@ -169,7 +147,6 @@ class GraphConvolutionSparse(Layer):
 
 
 class InnerProductDecoder(Layer):
-    """Decoder model layer for link prediction."""
     def __init__(self, input_dim, dropout=0., act=tf.nn.sigmoid, **kwargs):
         super(InnerProductDecoder, self).__init__(**kwargs)
         self.dropout = dropout
@@ -281,14 +258,8 @@ def construct_feed_dict(adj_normalized, adj, features, placeholders):
 
 
 def mask_test_edges(adj):
-    # Function to build test set with 10% positive links
-    # NOTE: Splits are randomized and results might slightly deviate from reported numbers in the paper.
-    # TODO: Clean up.
-
-    # Remove diagonal elements
     adj = adj - sp.dia_matrix((adj.diagonal()[np.newaxis, :], [0]), shape=adj.shape)
     adj.eliminate_zeros()
-    # Check that diag is zero:
     assert np.diag(adj.todense()).sum() == 0
 
     adj_triu = sp.triu(adj)
@@ -355,10 +326,8 @@ def mask_test_edges(adj):
 
     data = np.ones(train_edges.shape[0])
 
-    # Re-build adj matrix
     adj_train = sp.csr_matrix((data, (train_edges[:, 0], train_edges[:, 1])), shape=adj.shape)
     adj_train = adj_train + adj_train.T
 
-    # NOTE: these edge lists only contain single direction of edge!
     return adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false
 
