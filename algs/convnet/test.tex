@@ -1,0 +1,41 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+
+
+Hangi Filtre Hangi Ise Odaklaniyor
+
+YSA'larýn her katmanýnýn, bu katmanlardaki nöronlarýn farklý iþlemlere
+odaklanabildiði, YSA'larýn kuvvetli özelliklerinden birinin bu olduðu
+söylenir. Convnet'ler baðlamýnda elimizde farklý evriþim filtreleri var. Bu
+filtreler acaba görüntü iþlerken hangi görüntü tiplerine odaklanýyorlar? 
+
+Bu sorunun cevabýný bulmak için ilginç bir teknik þu: öyle bir fonksiyon
+yazarýz ki bu fonksiyon herhangi bir evriþim tabakasýndaki filtrenin
+deðerlerini (evriþimi) maksimize eder, ve gradyan iniþi uyguladýðýmýzda
+gradyaný rasgele / boþ bir imajýn deðerlerini deðiþtirmek için kullanýrýz,
+yani gradyan iniþi maksimizasyon yaparken belli bir filtre için imajý
+deðiþtirir. Maksimum noktada bu filtrenin odaklandýðý görüntü tipine
+eriþmiþ oluruz! Teknik ilginç çünkü genelde graydnan iniþinde maksimize
+edilen aðýrlýk deðerleri olur. Burada deðiþtirilen bizzat görüntü.
+
+Tekniði kullanmak için tabii ki önceden eðitilmiþ bir YSA'ya ihtiyaç var,
+çünkü filtre deðerleri bilinen bir YSA'dan baþlayarak bu iþi
+yapacaðýz. Örnek olarak ünlü ÝmageNet verisi üzerinde eðitilmiþ VGG16 aðýný
+kullanabiliriz. Bu aðýn aðýrlýklarý Keras kütüphanesi içinde hazýr halde
+mevcut. Önce kayýp (loss) fonksiyonunu hazýrlayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from keras.applications import VGG16
+from keras import backend as K
+model = VGG16(weights='imagenet',
+              include_top=False)
+layer_name = 'block3_conv1'
+filter_index = 0
+layer_output = model.get_layer(layer_name).output
+loss = K.mean(layer_output[:, :, :, filter_index])
+\end{minted}
+
+Gradyan inisi kodlamak icin bu kayibin gradyani lazim, 
+
+
+\end{document}
