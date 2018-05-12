@@ -34,17 +34,13 @@ import pandas as pd
 df = pd.read_csv('data.csv',parse_dates=True)
 df = df.dropna(axis=0)
 df = df.set_index('DATE')
-print (df.tail(5))
-
-df['govexp'] = df['gov1exp'] + df['gov2exp']
-#df['lhs'] = (df.consump + df.invest + df.netexp).diff()
-#df['lhs'] = (df.consump + df.invest).diff()
-df['lhs'] = (df.consump + df.invest).pct_change()
-df['dcrt'] = (df.nonfinloan - df.constructloan).diff()
-#df['dgdpt'] = df.gdp.diff()
-#df['dgt'] = df.govexp.diff()
+df['gdp'] = df.gdp / 1000.0
+df['govexp'] = (df['gov1exp'] + df['gov2exp']) / 1000.0
+df['lhs'] = (df.consump + df.invest + df.netexp).pct_change() 
+df['dgt'] = df.govexp.pct_change() 
+df['dcrt'] = (df.nonfinloan - df.constructloan).diff() / 1000.0
 df['dgdpt'] = df.gdp.pct_change()
-df['dgt'] = df.govexp.pct_change()
+df['dgdpt1'] = df.dgdpt.shift(1)
 df = df.dropna(axis=0)
 print (df.tail(5))
 \end{minted}
@@ -52,80 +48,64 @@ print (df.tail(5))
 \begin{verbatim}
             consump   gov1exp   gov2exp    invest   netexp        gdp  \
 DATE                                                                    
-2016-01-01  109.981  4176.842  2650.478  2849.839 -526.236  18325.187   
-2016-04-01  110.550  4164.494  2673.472  2830.237 -501.567  18538.039   
-2016-07-01  111.029  4232.902  2691.437  2847.246 -492.834  18729.130   
-2016-10-01  111.577  4266.220  2712.709  2905.720 -564.320  18905.545   
-2017-01-01  112.192  4320.538  2737.536  2896.996 -582.844  19057.705   
+2016-01-01  109.981  4176.842  2650.478  2849.839 -526.236  18.325187   
+2016-04-01  110.550  4164.494  2673.472  2830.237 -501.567  18.538039   
+2016-07-01  111.029  4232.902  2691.437  2847.246 -492.834  18.729130   
+2016-10-01  111.577  4266.220  2712.709  2905.720 -564.320  18.905545   
+2017-01-01  112.192  4320.538  2737.536  2896.996 -582.844  19.057705   
 
-            nonfinloan  constructloan  
-DATE                                   
-2016-01-01   27236.607      3889.7280  
-2016-04-01   27550.841      3959.9659  
-2016-07-01   27895.222      4031.5850  
-2016-10-01   28108.440      4098.3063  
-2017-01-01   28421.574      4132.2395  
-            consump   gov1exp   gov2exp    invest   netexp        gdp  \
-DATE                                                                    
-2016-01-01  109.981  4176.842  2650.478  2849.839 -526.236  18325.187   
-2016-04-01  110.550  4164.494  2673.472  2830.237 -501.567  18538.039   
-2016-07-01  111.029  4232.902  2691.437  2847.246 -492.834  18729.130   
-2016-10-01  111.577  4266.220  2712.709  2905.720 -564.320  18905.545   
-2017-01-01  112.192  4320.538  2737.536  2896.996 -582.844  19057.705   
-
-            nonfinloan  constructloan    govexp       lhs      dcrt     dgdpt  \
+            nonfinloan  constructloan    govexp       lhs       dgt      dcrt  \
 DATE                                                                            
-2016-01-01   27236.607      3889.7280  6827.320 -0.009761  204.1615  0.002076   
-2016-04-01   27550.841      3959.9659  6837.966 -0.006430  243.9961  0.011615   
-2016-07-01   27895.222      4031.5850  6924.339  0.005947  272.7619  0.010308   
-2016-10-01   28108.440      4098.3063  6978.929  0.019951  146.4967  0.009419   
-2017-01-01   28421.574      4132.2395  7058.074 -0.002688  279.2008  0.008048   
+2016-01-01   27236.607      3889.7280  6.827320 -0.014302  0.010270  0.204162   
+2016-04-01   27550.841      3959.9659  6.837966  0.002316  0.001559  0.243996   
+2016-07-01   27895.222      4031.5850  6.924339  0.010750  0.012631  0.272762   
+2016-10-01   28108.440      4098.3063  6.978929 -0.005055  0.007884  0.146497   
+2017-01-01   28421.574      4132.2395  7.058074 -0.010857  0.011341  0.279201   
 
-                 dgt  
-DATE                  
-2016-01-01  0.010270  
-2016-04-01  0.001559  
-2016-07-01  0.012631  
-2016-10-01  0.007884  
-2017-01-01  0.011341  
+               dgdpt    dgdpt1  
+DATE                            
+2016-01-01  0.002076  0.003266  
+2016-04-01  0.011615  0.002076  
+2016-07-01  0.010308  0.011615  
+2016-10-01  0.009419  0.010308  
+2017-01-01  0.008048  0.009419  
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import statsmodels.formula.api as smf
-results = smf.ols('lhs ~  dgt + dgdpt + dcrt  ', data=df).fit()
+results = smf.ols('lhs ~  dgt + dgdpt + dgdpt1 + dcrt ', data=df).fit()
 print results.summary()
 \end{minted}
 
 \begin{verbatim}
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:                    lhs   R-squared:                       0.559
-Model:                            OLS   Adj. R-squared:                  0.552
-Method:                 Least Squares   F-statistic:                     77.69
-Date:                Sat, 12 May 2018   Prob (F-statistic):           1.64e-32
-Time:                        23:07:36   Log-Likelihood:                 427.05
-No. Observations:                 188   AIC:                            -846.1
-Df Residuals:                     184   BIC:                            -833.2
-Df Model:                           3                                         
+Dep. Variable:                    lhs   R-squared:                       0.608
+Model:                            OLS   Adj. R-squared:                  0.600
+Method:                 Least Squares   F-statistic:                     86.68
+Date:                Sat, 12 May 2018   Prob (F-statistic):           2.23e-44
+Time:                        23:36:14   Log-Likelihood:                 533.63
+No. Observations:                 229   AIC:                            -1057.
+Df Residuals:                     224   BIC:                            -1040.
+Df Model:                           4                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [95.0% Conf. Int.]
 ------------------------------------------------------------------------------
-Intercept     -0.0211      0.004     -4.956      0.000        -0.029    -0.013
-dgt           -0.9556      0.134     -7.150      0.000        -1.219    -0.692
-dgdpt          2.8731      0.194     14.815      0.000         2.491     3.256
-dcrt        9.157e-06   1.43e-05      0.641      0.522      -1.9e-05  3.73e-05
+Intercept     -0.0112      0.004     -2.818      0.005        -0.019    -0.003
+dgt           -0.9923      0.118     -8.443      0.000        -1.224    -0.761
+dgdpt          3.3273      0.188     17.731      0.000         2.958     3.697
+dgdpt1        -0.8473      0.184     -4.603      0.000        -1.210    -0.485
+dcrt          -0.0218      0.013     -1.718      0.087        -0.047     0.003
 ==============================================================================
-Omnibus:                       19.919   Durbin-Watson:                   1.874
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               28.336
-Skew:                          -0.637   Prob(JB):                     7.03e-07
-Kurtosis:                       4.411   Cond. No.                     1.96e+04
+Omnibus:                        4.972   Durbin-Watson:                   2.101
+Prob(Omnibus):                  0.083   Jarque-Bera (JB):                4.650
+Skew:                          -0.295   Prob(JB):                       0.0978
+Kurtosis:                       3.372   Cond. No.                         143.
 ==============================================================================
 
 Warnings:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
-[2] The condition number is large, 1.96e+04. This might indicate that there are
-strong multicollinearity or other numerical problems.
 \end{verbatim}
 
 

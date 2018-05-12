@@ -1,6 +1,6 @@
 import pandas as pd, datetime
 from pandas_datareader import data
-start=datetime.datetime(1970, 1, 1)
+start=datetime.datetime(1950, 1, 1)
 end=datetime.datetime(2017, 1, 1)
 # Personal Consumption Expenditures - DPCERD3Q086SBEA
 # Federal government total expenditures - W019RCQ027SBEA
