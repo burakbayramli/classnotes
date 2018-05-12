@@ -37,13 +37,14 @@ df = df.set_index('DATE')
 print (df.tail(5))
 
 df['govexp'] = df['gov1exp'] + df['gov2exp']
-df['lhs'] = (df.consump + df.invest + df.netexp).diff()
-#df['dcrt'] = (df.nonfinloan - df.constructloan).diff()
-df['dcrt'] = (df.nonfinloan).diff()
-df['dcrt3'] = df.dcrt.shift(3)
-df['dgdpt'] = df.gdp.diff()
-df['dgdpt1'] = df.dgdpt.shift(1)
-df['dgt'] = df.govexp.diff()
+#df['lhs'] = (df.consump + df.invest + df.netexp).diff()
+#df['lhs'] = (df.consump + df.invest).diff()
+df['lhs'] = (df.consump + df.invest).pct_change()
+df['dcrt'] = (df.nonfinloan - df.constructloan).diff()
+#df['dgdpt'] = df.gdp.diff()
+#df['dgt'] = df.govexp.diff()
+df['dgdpt'] = df.gdp.pct_change()
+df['dgt'] = df.govexp.pct_change()
 df = df.dropna(axis=0)
 print (df.tail(5))
 \end{minted}
@@ -72,57 +73,59 @@ DATE
 2016-10-01  111.577  4266.220  2712.709  2905.720 -564.320  18905.545   
 2017-01-01  112.192  4320.538  2737.536  2896.996 -582.844  19057.705   
 
-            nonfinloan  constructloan    govexp     lhs     dcrt    dcrt3  \
-DATE                                                                        
-2016-01-01   27236.607      3889.7280  6827.320 -35.310  281.064  402.936   
-2016-04-01   27550.841      3959.9659  6837.966   5.636  314.234  229.182   
-2016-07-01   27895.222      4031.5850  6924.339  26.221  344.381  222.344   
-2016-10-01   28108.440      4098.3063  6978.929 -12.464  213.218  281.064   
-2017-01-01   28421.574      4132.2395  7058.074 -26.633  313.134  314.234   
+            nonfinloan  constructloan    govexp       lhs      dcrt     dgdpt  \
+DATE                                                                            
+2016-01-01   27236.607      3889.7280  6827.320 -0.009761  204.1615  0.002076   
+2016-04-01   27550.841      3959.9659  6837.966 -0.006430  243.9961  0.011615   
+2016-07-01   27895.222      4031.5850  6924.339  0.005947  272.7619  0.010308   
+2016-10-01   28108.440      4098.3063  6978.929  0.019951  146.4967  0.009419   
+2017-01-01   28421.574      4132.2395  7058.074 -0.002688  279.2008  0.008048   
 
-              dgdpt   dgdpt1     dgt  
-DATE                                  
-2016-01-01   37.961   59.537  69.401  
-2016-04-01  212.852   37.961  10.646  
-2016-07-01  191.091  212.852  86.373  
-2016-10-01  176.415  191.091  54.590  
-2017-01-01  152.160  176.415  79.145  
+                 dgt  
+DATE                  
+2016-01-01  0.010270  
+2016-04-01  0.001559  
+2016-07-01  0.012631  
+2016-10-01  0.007884  
+2017-01-01  0.011341  
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import statsmodels.formula.api as smf
-results = smf.ols('lhs ~  dgt + dgdpt1 + dcrt - dcrt3', data=df).fit()
+results = smf.ols('lhs ~  dgt + dgdpt + dcrt  ', data=df).fit()
 print results.summary()
 \end{minted}
 
 \begin{verbatim}
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:                    lhs   R-squared:                       0.041
-Model:                            OLS   Adj. R-squared:                  0.025
-Method:                 Least Squares   F-statistic:                     2.597
-Date:                Sat, 12 May 2018   Prob (F-statistic):             0.0539
-Time:                        21:19:52   Log-Likelihood:                -979.30
-No. Observations:                 185   AIC:                             1967.
-Df Residuals:                     181   BIC:                             1979.
+Dep. Variable:                    lhs   R-squared:                       0.559
+Model:                            OLS   Adj. R-squared:                  0.552
+Method:                 Least Squares   F-statistic:                     77.69
+Date:                Sat, 12 May 2018   Prob (F-statistic):           1.64e-32
+Time:                        23:07:36   Log-Likelihood:                 427.05
+No. Observations:                 188   AIC:                            -846.1
+Df Residuals:                     184   BIC:                            -833.2
 Df Model:                           3                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [95.0% Conf. Int.]
 ------------------------------------------------------------------------------
-Intercept     10.6682      6.612      1.614      0.108        -2.378    23.714
-dgt           -0.1541      0.071     -2.163      0.032        -0.295    -0.014
-dgdpt1         0.0777      0.061      1.268      0.206        -0.043     0.198
-dcrt          -0.0180      0.030     -0.601      0.548        -0.077     0.041
+Intercept     -0.0211      0.004     -4.956      0.000        -0.029    -0.013
+dgt           -0.9556      0.134     -7.150      0.000        -1.219    -0.692
+dgdpt          2.8731      0.194     14.815      0.000         2.491     3.256
+dcrt        9.157e-06   1.43e-05      0.641      0.522      -1.9e-05  3.73e-05
 ==============================================================================
-Omnibus:                        3.891   Durbin-Watson:                   2.136
-Prob(Omnibus):                  0.143   Jarque-Bera (JB):                3.565
-Skew:                          -0.251   Prob(JB):                        0.168
-Kurtosis:                       3.459   Cond. No.                         437.
+Omnibus:                       19.919   Durbin-Watson:                   1.874
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               28.336
+Skew:                          -0.637   Prob(JB):                     7.03e-07
+Kurtosis:                       4.411   Cond. No.                     1.96e+04
 ==============================================================================
 
 Warnings:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 1.96e+04. This might indicate that there are
+strong multicollinearity or other numerical problems.
 \end{verbatim}
 
 
