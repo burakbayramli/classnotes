@@ -1,0 +1,158 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Makroekonomi
+
+$$ \Delta (P_RY) = V_R\Delta C_R$$
+
+$$ \Delta p_R + \Delta y = \Delta c_R$$
+
+
+
+
+$c$ nominal consumption 
+
+$i$ nominal government expenditure
+
+$i$ nominal investment 
+
+$nx$ nominal net exports
+
+$$ \Delta GDP_t = 
+\alpha + \beta_1 \Delta GDP_{t-1} + 
+\gamma_0 \Delta C_{Rt} + \gamma_3 \Delta C_{Rt-3} + \epsilon_t 
+$$
+
+$$ 
+\Delta (c_t + i_t + nx_t) = 
+\alpha + \beta_1 \Delta GDP_{t-1} + 
+\gamma_0 \Delta C_{Rt} + \gamma_3 \Delta C_{Rt-3} + \epsilon_t 
+$$
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('data.csv')
+df = df.dropna(axis=0)
+df = df.set_index('DATE')
+print (df.tail(5))
+\end{minted}
+
+\begin{verbatim}
+            consump    govexp    invest   netexp        gdp        crt
+DATE                                                                  
+2016-01-01  12536.6  4176.842  2849.839 -526.236  16571.573  27236.607
+2016-04-01  12699.8  4164.494  2830.237 -501.567  16663.516  27550.841
+2016-07-01  12849.4  4232.902  2847.246 -492.834  16778.148  27895.222
+2016-10-01  13006.2  4266.220  2905.720 -564.320  16851.420  28108.440
+2017-01-01  13160.0  4320.538  2896.996 -582.844  16903.240  28421.574
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df['lhs'] = (df.consump + df.invest + df.netexp ).diff()
+df['crt3'] = df.crt.shift(3)
+df['gdpt1'] = df.gdp.shift(1)
+df['dgt'] = df.govexp.diff()
+print (df.tail(5))
+\end{minted}
+
+\begin{verbatim}
+            consump    govexp    invest   netexp        gdp        crt  \
+DATE                                                                     
+2016-01-01  12536.6  4176.842  2849.839 -526.236  16571.573  27236.607   
+2016-04-01  12699.8  4164.494  2830.237 -501.567  16663.516  27550.841   
+2016-07-01  12849.4  4232.902  2847.246 -492.834  16778.148  27895.222   
+2016-10-01  13006.2  4266.220  2905.720 -564.320  16851.420  28108.440   
+2017-01-01  13160.0  4320.538  2896.996 -582.844  16903.240  28421.574   
+
+                lhs       crt3      gdpt1     dgt  
+DATE                                               
+2016-01-01   47.013  26504.017  16547.619  50.152  
+2016-04-01  168.267  26733.199  16571.573 -12.348  
+2016-07-01  175.342  26955.543  16663.516  68.408  
+2016-10-01  143.788  27236.607  16778.148  33.318  
+2017-01-01  126.552  27550.841  16851.420  54.318  
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('lhs ~ dgt + gdpt1 + crt + crt3', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    lhs   R-squared:                       0.212
+Model:                            OLS   Adj. R-squared:                  0.195
+Method:                 Least Squares   F-statistic:                     12.17
+Date:                Sat, 12 May 2018   Prob (F-statistic):           8.76e-09
+Time:                        19:26:56   Log-Likelihood:                -1039.6
+No. Observations:                 186   AIC:                             2089.
+Df Residuals:                     181   BIC:                             2105.
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept    -84.7563     42.743     -1.983      0.049      -169.095    -0.418
+dgt           -0.2278      0.104     -2.183      0.030        -0.434    -0.022
+gdpt1          0.0232      0.008      2.978      0.003         0.008     0.039
+crt            0.0087      0.016      0.559      0.577        -0.022     0.039
+crt3          -0.0157      0.014     -1.113      0.267        -0.044     0.012
+==============================================================================
+Omnibus:                       33.760   Durbin-Watson:                   1.493
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               88.230
+Skew:                          -0.753   Prob(JB):                     6.94e-20
+Kurtosis:                       6.020   Cond. No.                     2.00e+05
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large,  2e+05. This might indicate that there are
+strong multicollinearity or other numerical problems.
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
