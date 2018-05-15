@@ -1019,9 +1019,10 @@ Phi Korelasyon Katsayýsý
 
 Phi katsayýsý iki tane ikisel deðiþkenin birbiriyle ne kadar alakalý,
 baðlantýlý olduðunu hesaplayan bir ölçüttür. Mesela $x,y$ deðiþkenleri için
-elde olan  $(x_1,y_1),(x_2,y_2),..$ verilerini kullanarak hem $x=j1$ hem
-$y=1$ olan verileri sayýp toplamý $n_{11}$'e yazarýz, ayný þekilde diðer
-kombinasyonlara bakarak alttaki tabloyu oluþtururuz [5], 
+elde olan $(x_1,y_1),(x_2,y_2),..$ verilerini kullanarak hem $x=1$ hem
+$y=1$ olan verileri sayýp toplamý $n_{11}$'e yazarýz, $y=1,x=0$ icin
+$n_{10}$, ayný þekilde diðer kombinasyonlara bakarak alttaki tabloyu
+oluþtururuz [5],
 
 \includegraphics[width=12em]{phitable.png}
 
@@ -1032,7 +1033,8 @@ $$
 {\sqrt{n_{0\bullet} n_{1\bullet} n_{\bullet 0} n_{\bullet 1}}} \mlabel{6}
 $$
 
-ile hesaplanýr. Bu ifadeyi türetmek için korelasyon formülü ile baþlýyoruz, 
+ile hesaplanýr. Bu ifadeyi türetmek için iki rasgele deðiþken arasýndaki
+korelasyonu hesaplayan formül ile baþlýyoruz,
 
 $$ Corr(X,Y) = \frac{E (x-E(X)) (y-E(Y)) }{\sqrt{Var(X) \cdot Var(Y) } } $$
 
@@ -1040,8 +1042,8 @@ $$
 = \frac{E(XY) - E(X)E(Y)}{ \sqrt{Var(X) \cdot Var(Y)} }
 $$
 
-Sadece 1,0 deðerlerine sahip olan $X,Y$ Bernoulli daðýlýmýna sahip
-deðiþkenler düþünelim, o zaman 
+$X,Y$ deðiþkenlerinin Bernoulli daðýlýmýna sahip olduðunu düþünelim, çünkü
+0/1 deðerlerine sahip olabilen ikisel deðiþkenler bunlar, o zaman
 
 $$
 E[X]= \frac{n_{1\bullet}}{n}, \quad
@@ -1051,25 +1053,26 @@ Var[Y]= \frac{n_{\bullet 0}n_{\bullet 1}}{n^2}, \quad
 E[XY]= \frac{n_{11}}{n^2}
 $$
 
-$E(XY)$ nasýl hesaplandý? Ayrýksal daðýlýmlar için beklenti formülünün iki
-deðiþken için þöyle ifade edildiðini görebiliriz,
+olacaktýr. $E(XY)$ nasýl hesaplandý? Ayrýksal daðýlýmlar için beklenti
+formülünün iki deðiþken için þöyle ifade edildiðini biliyoruz,
 
 $$  E[XY] = \sum_i\sum_j x_i\cdot y_j \cdot P\{X = x_i, Y = y_j\} $$
 
 Bu ifadeyi tabloya uyarlarsak, iki üstteki sonucu elde edebileceðimizi
-görürüz, çünkü $x_i y_i$ sadece her iki deðer ayný anda 1 olduðunda
-geçerlidir. Bu degerleri yerine gecirince (6) elde edilir.
+görürüz, çünkü tek geçerli toplam $x_i y_i$ her iki deðiþken de ayný anda 1
+olduðunda geçerlidir. Bu deðerleri yerine geçirince (6) elde edilir.
 
-Phi katsayýsýnýn bir diðer ismi Matthews korelasyon katsayýsý. Bu katsayý
-hesabýný mesela bir 0/1 tahmini üreten sýnýflayýcýnýn baþarýsýný ölçmek
-için kullanabiliriz, gerçek, test 0/1 verileri bir dizinde, üretilen
-tahminler bir diðerinde olur, ve Phi katsayýsý ile aradaki uyumu
-raporlarýz. Sonuç 0,1 arasýnda (ya da -1,+1) olacaðý için sonuca bakarak
-irdeleme yapmak kolaydýr. 
+Phi katsayýsýnýn bir diðer ismi Matthews korelasyon katsayýsý. Bu hesabý
+mesela bir 0/1 tahmini üreten sýnýflayýcýnýn baþarýsýný ölçmek için
+kullanabiliriz, gerçek, test 0/1 verileri bir dizinde, üretilen tahminler
+bir diðerinde olur, ve Phi katsayýsý ile aradaki uyumu raporlarýz. Sonuç
+0,1 arasýnda (ya da -1,+1) olacaðý için sonuca bakarak irdeleme yapmak
+kolaydýr, bu bir baþarý raporu olarak algýlanabilir. Ayrýca Phi hesabýnýn,
+AUC hesabý gibi, dengesiz veri setleri üzerinde (mesela 0'a kýyasla çok
+daha fazla 1 olan veriler, ya da tam tersi) üzerinde bile hala optimal
+olarak çalýþtýðý [4] bulunmuþtur. 
 
-Phi hesabýnýn, AUC hesabý gibi, dengesiz veri setleri üzerinde (mesela 0'a
-kýyasla çok daha fazla 1 olan veriler, ya da tam tersi) hala optimal olarak
-þekilde çalýþtýðý [4] bulunmuþtur. Bazý örnekler,
+Bazý örnekler,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sklearn.metrics import matthews_corrcoef
@@ -1085,8 +1088,7 @@ print (matthews_corrcoef(y_true, y_pred)  )
 Ya da
 
 \begin{minted}[fontsize=\footnotesize]{python}
-a = [\
-[0,  0],[0,  0],[0,  0],[0,  0],[0,  0],[1,  0],\
+a = [[0,  0],[0,  0],[0,  0],[0,  0],[0,  0],[1,  0],\
 [1,  0],[1,  0],[0,  1],[0,  1],[1,  1],[1,  1],\
 [1,  1],[1,  1],[1,  1],[1,  1],[1,  1],[1,  1],\
 [1,  1], [1,  1],[1,  1],[1,  1],[1,  1],[1,  1],\
@@ -1108,7 +1110,7 @@ Kaynaklar
 
 [3] Weihs, {\em Foundations of Statistical Algorithms With References to R Packages}
 
-[4] Boughorbel, {\em Optimal classifier for imbalanced data using Matthews Correlation Coefficient metric} \url{http://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0177678&type=printable}
+[4] Boughorbel, {\em Optimal classifier for imbalanced data using Matthews Correlation Coefficient metric}, \url{http://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0177678&type=printable}
 
 [5] Cross Validated, {\em Relation between the phi, Matthews and Pearson correlation coefficients?}, \url{https://stats.stackexchange.com/questions/59343/relation-between-the-phi-matthews-and-pearson-correlation-coefficients}
 
