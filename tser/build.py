@@ -23,6 +23,7 @@ if len(sys.argv) == 1:
     ./tser_pf/tser_pf.pdf \
     ./tser_ukf/tser_ukf.pdf \
     ./tser_int/tser_int.pdf \
+    ./tser_macro/tser_macro.pdf \
     ./tser_bubble/tser_bubble.pdf \
     ./tser_peak/tser_peak.pdf \
     ./tser_sinreg/tser_sinreg.pdf \
