@@ -43,7 +43,16 @@ likelihood ratio test: chi2=17.1609 , p=0.0002  , df=2
 parameter F test:         F=9.2853  , p=0.0005  , df_denom=40, df_num=2
 ```
 
+```python
+import scipy.stats as stats
+df['gdpinc1'] = df.gdpinc.shift(1)
+df2 = df.dropna(axis=0)
+print stats.pearsonr(df2.shortrate, df2.gdpinc1)
+```
 
+```text
+(0.75710287451587455, 1.1393168782627738e-09)
+```
 
 
 
