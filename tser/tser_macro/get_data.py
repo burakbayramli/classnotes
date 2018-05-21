@@ -2,10 +2,19 @@ import pandas as pd, datetime
 from pandas_datareader import data
 start=datetime.datetime(1970, 1, 1)
 end=datetime.datetime(2017, 1, 1)
+df = data.DataReader(['GDP','IR3TIB01USM156N'], 'fred', start, end)
+df.columns = ['gdp','shortrate']
+df.to_csv('rates.csv')
+
+exit()
+
+import pandas as pd, datetime
+from pandas_datareader import data
+start=datetime.datetime(1970, 1, 1)
+end=datetime.datetime(2017, 1, 1)
 df = data.DataReader(['M2SL','GDP','CRDQUSAPABIS','REALLN'], 'fred', start, end)
-#df = data.DataReader(['M2SL','GDP','BUSLOANS'], 'fred', start, end)
 df.columns = ['m2cd','gdp','nonfincred','realest']
-df.to_csv('data2.csv')
+df.to_csv('money.csv')
 
 import pandas as pd, datetime
 from pandas_datareader import data
