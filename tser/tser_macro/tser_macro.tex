@@ -232,7 +232,112 @@ Bu hýzýn daha stabil olduðunu görüyoruz. Verileri farklý þekilde toplamak
 mümkün, bizim ABD için seçtiðimiz yöntem [3] yaklaþýmýndan biraz daha
 farklý, [3, sf. 204] Japonya için de daha da stabil bir eðri bulmuþ. 
 
-Merkez Bankasi Faizleri Buyumeyi Etkiler mi?
+Merkez Bankasý Faizleri Büyümeyi Etkiler mi?
+
+Neoklasik ekonomiye göre düþürülen faizler büyümeyi teþvik eder,
+yükseltilen faizler durgunluða sebep olur. Fakat veriye bakýnca bunun doðru
+olmadýðýný görüyoruz [7]. Test etmek için merkez bankasý faizleri ve büyüme
+rakamlarýný indiriyoruz, ve üzerinde Granger sebep olma (causality) testi
+uyguluyoruz. Bu test iki zaman serisini alýr ve ikincisinin birincisine
+sebep olup olmadýðýný ölçer. Sýfýr hipotez olmadýðýdýr, o zaman hipotez
+reddedilirse bunu sebep olma yönünde güçlü kanýt olarak alabiliriz. Altta
+ilk önce faizlerin büyüme üzerinde etkisi, sonra büyümenin faizler üzerinde
+etkisine bakýyoruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.tsa.stattools as t
+import pandas as pd
+
+df = pd.read_csv('rates.csv',parse_dates=['DATE'])
+df = df.set_index('DATE')
+df = df.resample('AS').last()
+df['gdpinc'] = df.gdp.pct_change()*100.0
+df = df.dropna(axis=0)
+res = t.grangercausalitytests(df[['gdpinc','shortrate']],maxlag=2)
+res = t.grangercausalitytests(df[['shortrate','gdpinc']],maxlag=2)
+\end{minted}
+
+\begin{verbatim}
+
+Granger Causality
+('number of lags (no zero)', 1)
+ssr based F test:         F=0.0062  , p=0.9378  , df_denom=43, df_num=1
+ssr based chi2 test:   chi2=0.0066  , p=0.9353  , df=1
+likelihood ratio test: chi2=0.0066  , p=0.9353  , df=1
+parameter F test:         F=0.0062  , p=0.9378  , df_denom=43, df_num=1
+
+Granger Causality
+('number of lags (no zero)', 2)
+ssr based F test:         F=0.2645  , p=0.7689  , df_denom=40, df_num=2
+ssr based chi2 test:   chi2=0.5952  , p=0.7426  , df=2
+likelihood ratio test: chi2=0.5913  , p=0.7440  , df=2
+parameter F test:         F=0.2645  , p=0.7689  , df_denom=40, df_num=2
+
+Granger Causality
+('number of lags (no zero)', 1)
+ssr based F test:         F=14.0199 , p=0.0005  , df_denom=43, df_num=1
+ssr based chi2 test:   chi2=14.9980 , p=0.0001  , df=1
+likelihood ratio test: chi2=12.9812 , p=0.0003  , df=1
+parameter F test:         F=14.0199 , p=0.0005  , df_denom=43, df_num=1
+
+Granger Causality
+('number of lags (no zero)', 2)
+ssr based F test:         F=9.2853  , p=0.0005  , df_denom=40, df_num=2
+ssr based chi2 test:   chi2=20.8919 , p=0.0000  , df=2
+likelihood ratio test: chi2=17.1609 , p=0.0002  , df=2
+parameter F test:         F=9.2853  , p=0.0005  , df_denom=40, df_num=2
+\end{verbatim}
+
+Sonuca göre büyüme faizleri etkiliyor, ters yönde bir etki söz konusu
+deðil. Altta etkinin korelasyonuna bakýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.stats as stats
+df['gdpinc1'] = df.gdpinc.shift(1)
+df2 = df.dropna(axis=0)
+print stats.pearsonr(df2.shortrate, df2.gdpinc1)
+\end{minted}
+
+\begin{verbatim}
+(0.75710287451587455, 1.1393168782627738e-09)
+\end{verbatim}
+
+Etkinin korelasyonu pozitif, yani büyüme faiz arttýrýmýna, küçülme faiz
+düþürülmesine sebep oluyor.
+
+Madem durum böyle niye ekonomistler sürekli faizlerden bahsediyorlar? [3]'e
+göre sebep politik. Merkez ve ticari bankalar esas manivelanýn kredi
+yönlendirmesi olduðunu halktan saklamak istiyorlar, çünkü bu çok güçlü bir
+araç, bu aracý politikacýlardan uzak tutmak istiyorlar ve kendi
+ajandalarýný takip ediyorlar. Mesela Japonya'nýn 90'li yýlllarda baþlayan
+ve bitmek bilmeyen krizi aslýnda kredi daralmasý ile Japon merkez
+bankasýnýn yarattýðý bir krizdir, ve bu sýrada sürekli ``yapýsal reform''
+sözleri söylenmiþtir, amaç Japonya'nýn daha ABD'ye benzeyen bir ekonomi
+olmasýný saðlamaktýr. AB'de çevre ülkelerde meydana gelen kriz aslýnda suni
+bir krizdir, Avrupa Merkez Bankasý bu ülkelere krediyi aþýrý arttýrmýþtýr,
+büyümeyi çok çok aþan bu para doðal olarak enflasyona, emlak piyasasýna
+akmýþtýr. Amaç kriz ortamýnda finansal baðlantýlarý merkezi haline
+getirmek, AB projesini ilerletmektir.
+
+Teorik olarak neoklasik ekonominin faizleri sevmesinin sebebi olmayan yerde
+sürekli denge arayan teorileridir. Bu teorilere göre arz/talep vardýr, ve
+paraya olan arz ve talep ``paranýn fiyatý'' olan faizi ortaya
+çýkarýr. Fakat ticari bankalar parayý hiç yoktan yaratýrlar, ve bu paraya
+pratikte sonsuz talep vardýr (pek çok kiþi kredi almak ister), eðer piyasa
+þartlarý devreye girseydi faizlerin müthiþ fazla olmasý gerekirdi. Bu
+olamayýnca, kredi piyasasýnda arz/talebin iþlemeyeceði
+görülecektir. Arz/talep iþlemeyince çok olan bir þey (para) ile az
+alýnabilecek þey (kredi) iliþkisinde, yani az miktar ile çok miktar
+arasýnda her zaman çok olan kurallarý koyar, ya da arzýn bir nevi ``karneye
+baðlandýðý (rationed)'' da söylenebilir, yani kredi saðlayan isteðidiði
+fiyatý, kendisine uygun ölçüde, belli sayýdaki müþteriye ama çok aþýrý
+olmayacak þekilde belirler.
+
+Karneye baðlama kavramýndan bahsedilemeye baþlanýnca bazý sosyal
+tercihlerin yapýlmasý gerektiði, yapýlacaðý bir durum ortaya çýkar, devlet
+ya da diðer iç odaklar devreye girebilir, kredi hangi yöne saðlanacak,
+hangi amaçlar için yaratýlacaktýr? Bu noktada halkýn geleceði
+gözetilecektir, en azýndan böyle olacaðý umulur.
 
 Kriz zamanýnda devletin harcamalarý arttýrmasý büyümeye yardým eder mi? 
 
@@ -243,7 +348,18 @@ para arzýnda deðiþim olmaz. [3]'e göre para = kredi, eðer spekülasyon
 olmayan ``GSYH üreten'' aktivitelere para arzý (kredi) artmamýþsa büyüme
 olmaz.
 
-[devam edecek]
+Formül üzerinde görmek için ana denklem ile baþlayalým, ama onun gerçek
+sektörü etkileyen kýsmý ile ilgilenelim,
+
+$$ P_R Y = V_R C_R$$
+
+ki $C_R$ reel sektöre giden kredi (para arzý). Farklýlýklara bakarsak, 
+
+$$ \Delta (P_r Y) = V_R \Delta C_R \mlabel{2}$$
+
+$P_rY$ reel GSYH. Farklýlýk operatörünü $V_R$ üzerinde uygulamadýk çünkü
+hýzý sabit kabul ettik. Þimdi $P_rY$'yi ayýrmak için alttaki deðiþkenleri
+tanýmlayalým,
 
 $c$ reel tüketim (nominal consumption)
 
@@ -253,47 +369,69 @@ $i$ reel yatýrým (nominal ýnvestment)
 
 $nx$ reel net ihracat (nominal net exports)
 
-$$ \Delta p_R + \Delta y = \Delta c_R$$
+Ve
 
-$$ \Delta (P_RY) = V_R\Delta C_R$$
+$$ \Delta (P_RY) = \Delta c + \Delta i + \Delta g + \Delta nx \mlabel{3}$$ 
 
-$$ \Delta (P_RY) = \Delta c + \Delta i + \Delta g + \Delta nx $$
-
-$$ \Delta c + \Delta i + \Delta g + \Delta nx = V_R\Delta C_R$$
+olarak ayýrýyoruz. (2)'yi üstteki denkleme sokunca, 
 
 $$ \Delta (c +  i +  nx) = V_R\Delta C_R - \Delta g$$
 
+Bu eþitliðin sol tarafý talepteki artýþý temsil ediyor. Üstteki denklem
+ilginç bir þey söylüyor aslýnda, banka sisteminin ürettiði kredinin sabit
+olduðu þartta devlet harcamalarý $g$'deki her büyüme eþit ölçüde talep
+azalmasýna sebep olmalý; çünkü $\Delta g$'nin katsayýsý -1.``Ayný olduðu
+þartý'' faraziyesini test edebiliriz, çünkü bir regresyon uyguladýðýmýzda
+rapor edilen katsayýlar aynen bu faraziyeye göre hesaplanýrlar. 
+
+Þimdi sayýsal test için gerekli denklemi kuralým. Farklýlýkta hýz
+kavramýna gerek yok, ayrýca yüzdesel artým, azalým ile konuþmak
+istiyoruz. Log'larýn farklýlýklarýnýn kabaca yüzde artýþý olduðunu
+biliyoruz, log'u alýnmýþ deðiþkenleri küçük harfi ile temsil edersek, 
+
+$$ \Delta p_R + \Delta y = \Delta c_R$$
+
+Þimdi üstteki denklemdeki zaman indislerini göz önüne alalým. Bir periyotta
+yaratýlan kredi bir sonraki periyottaki büyümeyi etkiler, o zaman üstteki
+denklem,
+
+$$ \Delta p_{Rt} + \Delta y_{t} = \Delta c_{Rt-1}$$
+
+haline gelir. Ya da 
+
 $$ \Delta GDP_t = \Delta C_{Rt-1}$$
 
+Her iki tarafa $\Delta GDP_{t-1}$ ekleyelim,
+
 $$ \Delta GDP_t + \Delta GDP_{t-1} = \Delta C_{Rt-1} + \Delta GDP_{t-1} $$
+
+Ýki üsttekini yerine koyalým,
 
 $$ \Delta GDP_t + \Delta GDP_{t-1} = \Delta C_{Rt-1} + \Delta C_{Rt-2}  $$
 
 $$ \Delta GDP_t = - \Delta GDP_{t-1} + \Delta C_{Rt-1} + \Delta C_{Rt-2}  $$
 
+Þimdi üstteki formülü test etmek için regresyon katsayýlarý verelim,
+
 $$ \Delta GDP_t = 
 \alpha + \beta_1 \Delta GDP_{t-1} + 
-\gamma_0 \Delta C_{Rt} + \gamma_3 \Delta C_{Rt-3} + \epsilon_t 
+\gamma_0 \Delta C_{Rt-1} + \gamma_3 \Delta C_{Rt-2} + \epsilon_t 
 $$
 
+Sol kýsmý (3)'e bakarak açýyoruz ve $\Delta g$'yi sað tarafa geçiriyoruz,
 $$ 
 \Delta (c_t + i_t + nx_t) = 
 \alpha + \beta_0 \Delta g_t + \beta_1 \Delta GDP_{t-1} + 
-\gamma_0 \Delta C_{Rt} + \gamma_3 \Delta C_{Rt-3} + \epsilon_t 
+\gamma_0 \Delta C_{Rt-1} + \gamma_3 \Delta C_{Rt-2} + \epsilon_t 
 $$
 
-$$ 
-\Delta (c_t + i_t + nx_t) =  
-\alpha + \beta_0 \Delta g_t + 
-\beta_1 \Delta GDP_{t-1} +  
-\gamma_0 \Delta C_{Rt} + 
- \gamma_0 \Delta C_{Rt-1} + ...  + \epsilon_t 
-$$
-
+O zaman biraz önce bahsedilen yerinden etme teorisi doðruysa devlet
+harcamalarýndaki deðiþimin katsayýsýnýn eksi bir olduðunu veriden katsayý
+hesapladýðýmýzda görmemiz lazým. Regresyonu kuralým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
-df = pd.read_csv('data.csv',parse_dates=True)
+df = pd.read_csv('crowd.csv',parse_dates=True)
 df = df.dropna(axis=0)
 df = df.set_index('DATE')
 df['gdp'] = df.gdp / 1000.0
@@ -346,17 +484,23 @@ Warnings:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 \end{verbatim}
 
+$\Delta g$ katsayýsý -0.56 çýktý. Veri toplamadaki deðiþimle alakalý
+olabilir, fakat [3]'te Japonya verisi için Werner tam -1 buldu. Katsayý
+istatistiki olarak önemli, ve genel model uyumu $R^2$ 10 civarýnda. Fena
+sayýlmaz. Yani devletin harcadýðý her dolar aþaðý yukarý ayný miktarda
+dolarý (ya da lirayý) yerinden ediyor. Büyümeye yardým etmiyor.
 
-
-
-
-
-
-
-
-
-
-
+Böylece ana kavramlarý görmüþ olduk. Sorulabilir ki büyüme için teknolojiye
+yatýrým, eðitim, vs. sözleri söylenir. Bunlar neyi arttýrýr? Bu
+bahsedilenler aslýnda ekonomik kapasiteyi arttýrýrlar (hatta kapasite
+arttýrýmý için iyi bir yöntem {\em Lineer Cebir, Ülkelerin Ekonomik
+  Kapasiteleri} yazýsýnda bulunabilir). Ýyi seçimler yapýlýrsa kapasite
+diyelim yüzde 2'den yüzde 5'e artsýn. Geri kalan bu kapasiteyi gerekli
+krediyi saðlamak, ``faiz indirmek'' deðil. Politikaçýlar onlarý kukla gibi
+oynatan bankaçýlara karþý hazýrlýklý olmalý. Bu arada eðer kredi büyüme
+kapasitesini karþýlayacak kadar saðlanmazsa deflasyon ortaya çýkar, Japonya
+gerçek ürünlerde bunu da yaþadý. Eðer para arzý büyümeyi aþarsa enflasyon
+ortaya çýkar. Spekülasyon, tüketime giden kredi enflasyona gider.
 
 Kaynaklar
 
@@ -376,7 +520,5 @@ Kaynaklar
     \url{https://www.sciencedirect.com/science/article/pii/S0921800916307510}
 
 \end{document}
-
-
 
 
