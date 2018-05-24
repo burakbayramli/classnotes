@@ -32,6 +32,7 @@ if len(sys.argv) == 1:
     ./convnet/convnet.pdf \
     ./rnn/rnn.pdf \
     ./lstm/lstm.pdf \
+    ./autoenc/autoenc.pdf \
     ./reinf/reinf.pdf \
     ./nlp/nlp.pdf \
     ./recom/recom.pdf \
