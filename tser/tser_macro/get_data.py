@@ -2,6 +2,14 @@ import pandas as pd, datetime, os
 from pandas_datareader import data
 
 #####
+start=datetime.datetime(2000, 1, 1)
+end=datetime.datetime(2018, 1, 1)
+df = data.DataReader(['DEXCAUS','IR3TIB01CAM156N','IR3TIB01USM156N','XTEXVA01CAM667S','XTIMVA01CAQ667S'], 'fred', start, end)
+df.columns = ['cadus','cadrate','usrate','export(usd)','import(usd)']
+df.to_csv('cad.csv')
+exit()
+
+#####
 start=datetime.datetime(1970, 1, 1)
 end=datetime.datetime(2017, 1, 1)
 df = data.DataReader(['GDP','IR3TIB01USM156N'], 'fred', start, end)
@@ -67,4 +75,4 @@ if os.path.isdir("cad"):
 
     df2 = pd.concat(res)
     print df2
-    df2.to_csv('cad.csv',index=None)
+    df2.to_csv('cadpos.csv',index=None)
