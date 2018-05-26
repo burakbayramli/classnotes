@@ -4,9 +4,9 @@ from pandas_datareader import data
 #####
 start=datetime.datetime(2000, 1, 1)
 end=datetime.datetime(2018, 1, 1)
-df = data.DataReader(['DEXCAUS','IR3TIB01CAM156N','IR3TIB01USM156N','XTEXVA01CAM667S','XTIMVA01CAQ667S'], 'fred', start, end)
+df = data.DataReader(['EXJPUS','IR3TIB01JPM156N','IR3TIB01USM156N','EXPJP','IMPJP'], 'fred', start, end)
 df.columns = ['cadus','cadrate','usrate','export(usd)','import(usd)']
-df.to_csv('cad.csv')
+df.to_csv('jpy.csv')
 exit()
 
 #####
@@ -61,18 +61,18 @@ df.to_csv('curr.csv')
 # speculative traders, noncommercial open position
 # wget http://www.cftc.gov/files/dea/history/deacot2002.zip
 # use year 2012, 2015, etc in the file name
-# put them under cad directory
+# put them under jpy directory
 
-if os.path.isdir("cad"):
+if os.path.isdir("jpy"):
     res = []    
     for y in range(2002,2018):    
         print y
         with zipfile.ZipFile('cad/deacot%d.zip' % y, 'r') as z:
             df = pd.read_csv(z.open('annual.txt'))     
-            df = df[df["Market and Exchange Names"].str.contains("CANADIAN DOLLAR")]
+            df = df[df["Market and Exchange Names"].str.contains("JAPANESE YEN")]
             df = df[["As of Date in Form YYYY-MM-DD","Noncommercial Positions-Long (All)","Noncommercial Positions-Short (All)","Commercial Positions-Long (All)","Commercial Positions-Short (All)"]]
             res.append(df.copy())
 
     df2 = pd.concat(res)
     print df2
-    df2.to_csv('cadpos.csv',index=None)
+    df2.to_csv('jpypos.csv',index=None)
