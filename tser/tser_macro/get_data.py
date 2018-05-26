@@ -47,3 +47,26 @@ df.to_csv('curr.csv')
 
 # http://wwe.economagic.com/em-cgi/data.exe/bjap/hms11
 # get this by copy and paste, into bojliq.csv
+
+
+#####
+# speculative traders, noncommercial open position
+# wget http://www.cftc.gov/files/dea/history/deacot2002.zip
+# use year 2012, 2015, etc in the file name
+
+exit()
+
+import pandas as pd, zipfile
+
+res = []    
+for y in range(2002,2018):
+    print y
+    with zipfile.ZipFile('cad/deacot%d.zip' % y, 'r') as z:
+        df = pd.read_csv(z.open('annual.txt'))     
+        df = df[df["Market and Exchange Names"].str.contains("CANADIAN DOLLAR")]
+        df = df[["As of Date in Form YYYY-MM-DD","Noncommercial Positions-Long (All)","Noncommercial Positions-Short (All)","Commercial Positions-Long (All)","Commercial Positions-Short (All)"]]
+        res.append(df.copy())
+
+df2 = pd.concat(res)
+print df2
+df2.to_csv('cad.csv',index=None)
