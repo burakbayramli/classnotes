@@ -510,52 +510,6 @@ Kurlarý Tahmin Etmek
 
 [devam edecek]
 
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-df2 = pd.read_csv('bojliq.csv',sep='\s*')
-df2['DATE'] = df2.apply(lambda x: pd.to_datetime("%d-%02d-01" % (x.year,x.mon)), axis=1)
-df2 = df2.set_index('DATE')
-
-import pandas as pd
-df = pd.read_csv('curr.csv',parse_dates=['DATE'])
-df = df.dropna(axis=0)
-df = df.set_index('DATE')
-df['jp'] = (df.DDDI06JPA156NWDB * df.JPNNGDP)/100.0
-df['jp'] = (df['jp'] - df['jp'].mean()) / df['jp'].std()
-df['us'] = (df['us'] - df['us'].mean()) / df['us'].std()
-df['curr'] = (df['curr'] - df['curr'].mean()) / df['curr'].std()
-df['jpliq'] = df2.liq
-df = df.dropna(axis=0)
-df['jpliq'] = (df['jpliq'] - df['jpliq'].mean()) / df['jpliq'].std()
-#df['jpus'] = df.jp - df.us
-df['jpus'] = df.jpliq - df.us
-df[['jpus','curr']].plot()
-plt.savefig('tser_macro_06.png')
-\end{minted}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import statsmodels.tsa.stattools as t
-res = t.grangercausalitytests(df[['jpus','curr']],maxlag=1)
-res = t.grangercausalitytests(df[['curr','jpus']],maxlag=1)
-\end{minted}
-
-\begin{verbatim}
-
-Granger Causality
-('number of lags (no zero)', 1)
-ssr based F test:         F=0.7643  , p=0.4742  , df_denom=2, df_num=1
-ssr based chi2 test:   chi2=1.9107  , p=0.1669  , df=1
-likelihood ratio test: chi2=1.6182  , p=0.2033  , df=1
-parameter F test:         F=0.7643  , p=0.4742  , df_denom=2, df_num=1
-
-Granger Causality
-('number of lags (no zero)', 1)
-ssr based F test:         F=2.7863  , p=0.2370  , df_denom=2, df_num=1
-ssr based chi2 test:   chi2=6.9658  , p=0.0083  , df=1
-likelihood ratio test: chi2=4.3631  , p=0.0367  , df=1
-parameter F test:         F=2.7863  , p=0.2370  , df_denom=2, df_num=1
-\end{verbatim}
-
 
 
 Kaynaklar

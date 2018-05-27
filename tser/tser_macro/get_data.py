@@ -5,7 +5,7 @@ from pandas_datareader import data
 start=datetime.datetime(2000, 1, 1)
 end=datetime.datetime(2018, 1, 1)
 df = data.DataReader(['EXJPUS','IR3TIB01JPM156N','IR3TIB01USM156N','EXPJP','IMPJP'], 'fred', start, end)
-df.columns = ['cadus','cadrate','usrate','export(usd)','import(usd)']
+df.columns = ['jpyus','jpyrate','usrate','export(usd)','import(usd)']
 df.to_csv('jpy.csv')
 exit()
 
@@ -50,7 +50,7 @@ df.to_csv('crowd.csv')
 start=datetime.datetime(1970, 1, 1)
 end=datetime.datetime(2017, 1, 1)
 df = data.DataReader(['BORROW','DDDI06JPA156NWDB','JPNNGDP','EXJPUS'], 'fred', start, end)
-df.columns = ['us','DDDI06JPA156NWDB','JPNNGDP','curr']
+df.columns = ['liqus','DDDI06JPA156NWDB','JPNNGDP','exjpus']
 df.to_csv('curr.csv')
 
 #####
