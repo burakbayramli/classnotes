@@ -200,40 +200,89 @@ df3 = df3.set_index('DATE')
 
 import pandas as pd
 df4 = pd.read_csv('curr.csv',parse_dates=['DATE'])
-df4 = df4.dropna(axis=0)
+df4 = df4.interpolate(method='linear')
 df4 = df4.set_index('DATE')
-df4['jp'] = (df4.DDDI06JPA156NWDB * df4.JPNNGDP)/100.0
-df4['jp'] = (df4['jp'] - df4['jp'].mean()) / df4['jp'].std()
+df4 = df4.join(df3)
 df4['liqus'] = (df4['liqus'] - df4['liqus'].mean()) / df4['liqus'].std()
-df4['exjpus'] = (df4['exjpus'] - df4['exjpus'].mean()) / df4['exjpus'].std()
-df4['jpliq'] = df3.liq
-df4 = df4.dropna(axis=0)
-df4['jpliq'] = (df4['jpliq'] - df4['jpliq'].mean()) / df4['jpliq'].std()
-df4['liqjpus'] = df4.jpliq - df4.liqus
+df4['liqjp'] = (df4['liqjp'] - df4['liqjp'].mean()) / df4['liqjp'].std()
+#df4['exjpus'] = (df4['exjpus'] - df4['exjpus'].mean()) / df4['exjpus'].std()
+#df4['exjpus'] = df4['exjpus'].pct_change()
 
+df4['liqjpus'] = (df4.liqjp - df4.liqus)
+
+df4 = df4.dropna(axis=0)
+
+df4.to_csv('/tmp/out.csv')
+
+import statsmodels.formula.api as smf
+results = smf.ols('exjpus ~ liqjpus', data=df4).fit()
+print results.summary()
+```
+
+```text
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                 exjpus   R-squared:                       0.249
+Model:                            OLS   Adj. R-squared:                  0.246
+Method:                 Least Squares   F-statistic:                     75.96
+Date:                Sun, 27 May 2018   Prob (F-statistic):           5.94e-16
+Time:                        19:19:03   Log-Likelihood:                -1213.9
+No. Observations:                 231   AIC:                             2432.
+Df Residuals:                     229   BIC:                             2439.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept    165.9374      3.122     53.148      0.000       159.786   172.089
+liqjpus      -26.6226      3.055     -8.715      0.000       -32.641   -20.604
+==============================================================================
+Omnibus:                      172.690   Durbin-Watson:                   0.231
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               21.421
+Skew:                           0.398   Prob(JB):                     2.23e-05
+Kurtosis:                       1.739   Cond. No.                         1.22
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+```
+
+```python
 import statsmodels.tsa.stattools as t
-res = t.grangercausalitytests(df4[['liqjpus','exjpus']],maxlag=1)
-res = t.grangercausalitytests(df4[['exjpus','liqjpus']],maxlag=1)
+res = t.grangercausalitytests(df4[['liqjpus','exjpus']],maxlag=2)
+res = t.grangercausalitytests(df4[['exjpus','liqjpus']],maxlag=2)
 ```
 
 ```text
 
 Granger Causality
 ('number of lags (no zero)', 1)
-ssr based F test:         F=0.7643  , p=0.4742  , df_denom=2, df_num=1
-ssr based chi2 test:   chi2=1.9107  , p=0.1669  , df=1
-likelihood ratio test: chi2=1.6182  , p=0.2033  , df=1
-parameter F test:         F=0.7643  , p=0.4742  , df_denom=2, df_num=1
+ssr based F test:         F=0.1627  , p=0.6871  , df_denom=227, df_num=1
+ssr based chi2 test:   chi2=0.1648  , p=0.6847  , df=1
+likelihood ratio test: chi2=0.1648  , p=0.6848  , df=1
+parameter F test:         F=0.1627  , p=0.6871  , df_denom=227, df_num=1
+
+Granger Causality
+('number of lags (no zero)', 2)
+ssr based F test:         F=3.6223  , p=0.0283  , df_denom=224, df_num=2
+ssr based chi2 test:   chi2=7.4062  , p=0.0246  , df=2
+likelihood ratio test: chi2=7.2890  , p=0.0261  , df=2
+parameter F test:         F=3.6223  , p=0.0283  , df_denom=224, df_num=2
 
 Granger Causality
 ('number of lags (no zero)', 1)
-ssr based F test:         F=2.7863  , p=0.2370  , df_denom=2, df_num=1
-ssr based chi2 test:   chi2=6.9658  , p=0.0083  , df=1
-likelihood ratio test: chi2=4.3631  , p=0.0367  , df=1
-parameter F test:         F=2.7863  , p=0.2370  , df_denom=2, df_num=1
+ssr based F test:         F=1.9262  , p=0.1665  , df_denom=227, df_num=1
+ssr based chi2 test:   chi2=1.9517  , p=0.1624  , df=1
+likelihood ratio test: chi2=1.9435  , p=0.1633  , df=1
+parameter F test:         F=1.9262  , p=0.1665  , df_denom=227, df_num=1
+
+Granger Causality
+('number of lags (no zero)', 2)
+ssr based F test:         F=1.2886  , p=0.2777  , df_denom=224, df_num=2
+ssr based chi2 test:   chi2=2.6347  , p=0.2678  , df=2
+likelihood ratio test: chi2=2.6196  , p=0.2699  , df=2
+parameter F test:         F=1.2886  , p=0.2777  , df_denom=224, df_num=2
 ```
-
-
 
 
 

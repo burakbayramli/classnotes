@@ -2,12 +2,12 @@ import pandas as pd, datetime, os
 from pandas_datareader import data
 
 #####
-start=datetime.datetime(2000, 1, 1)
-end=datetime.datetime(2018, 1, 1)
-df = data.DataReader(['EXJPUS','IR3TIB01JPM156N','IR3TIB01USM156N','EXPJP','IMPJP'], 'fred', start, end)
-df.columns = ['jpyus','jpyrate','usrate','export(usd)','import(usd)']
-df.to_csv('jpy.csv')
-exit()
+start=datetime.datetime(1970, 1, 1)
+end=datetime.datetime(2017, 1, 1)
+df = data.DataReader(['BORROW','EXJPUS'], 'fred', start, end)
+df.columns = ['liqus','exjpus']
+df.to_csv('curr.csv')
+
 
 #####
 start=datetime.datetime(1970, 1, 1)
