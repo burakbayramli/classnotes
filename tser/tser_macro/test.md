@@ -60,7 +60,7 @@ Dep. Variable:                      e   R-squared:                       0.064
 Model:                            OLS   Adj. R-squared:                 -0.053
 Method:                 Least Squares   F-statistic:                    0.5448
 Date:                Sun, 27 May 2018   Prob (F-statistic):              0.656
-Time:                        17:04:13   Log-Likelihood:                 32.017
+Time:                        17:27:14   Log-Likelihood:                 32.017
 No. Observations:                  28   AIC:                            -56.03
 Df Residuals:                      24   BIC:                            -50.71
 Df Model:                           3                                         
@@ -96,7 +96,7 @@ Dep. Variable:                      S   R-squared:                       0.241
 Model:                            OLS   Adj. R-squared:                  0.180
 Method:                 Least Squares   F-statistic:                     3.964
 Date:                Sun, 27 May 2018   Prob (F-statistic):             0.0320
-Time:                        17:04:16   Log-Likelihood:                -67.122
+Time:                        17:27:21   Log-Likelihood:                -67.122
 No. Observations:                  28   AIC:                             140.2
 Df Residuals:                      25   BIC:                             144.2
 Df Model:                           2                                         
@@ -132,7 +132,7 @@ Dep. Variable:                      N   R-squared:                       0.207
 Model:                            OLS   Adj. R-squared:                  0.144
 Method:                 Least Squares   F-statistic:                     3.265
 Date:                Sun, 27 May 2018   Prob (F-statistic):             0.0550
-Time:                        17:04:21   Log-Likelihood:                -57.218
+Time:                        17:27:26   Log-Likelihood:                -57.218
 No. Observations:                  28   AIC:                             120.4
 Df Residuals:                      25   BIC:                             124.4
 Df Model:                           2                                         
@@ -165,31 +165,31 @@ res = t.grangercausalitytests(df[['e','i']],maxlag=2)
 
 Granger Causality
 ('number of lags (no zero)', 1)
-ssr based F test:         F=5.6027  , p=0.0267  , df_denom=23, df_num=1
-ssr based chi2 test:   chi2=6.3335  , p=0.0118  , df=1
-likelihood ratio test: chi2=5.6682  , p=0.0173  , df=1
-parameter F test:         F=5.6027  , p=0.0267  , df_denom=23, df_num=1
+ssr based F test:         F=0.6386  , p=0.4320  , df_denom=24, df_num=1
+ssr based chi2 test:   chi2=0.7185  , p=0.3966  , df=1
+likelihood ratio test: chi2=0.7091  , p=0.3998  , df=1
+parameter F test:         F=0.6386  , p=0.4320  , df_denom=24, df_num=1
 
 Granger Causality
 ('number of lags (no zero)', 2)
-ssr based F test:         F=4.3630  , p=0.0268  , df_denom=20, df_num=2
-ssr based chi2 test:   chi2=10.9075 , p=0.0043  , df=2
-likelihood ratio test: chi2=9.0518  , p=0.0108  , df=2
-parameter F test:         F=4.3630  , p=0.0268  , df_denom=20, df_num=2
+ssr based F test:         F=1.6810  , p=0.2103  , df_denom=21, df_num=2
+ssr based chi2 test:   chi2=4.1626  , p=0.1248  , df=2
+likelihood ratio test: chi2=3.8611  , p=0.1451  , df=2
+parameter F test:         F=1.6810  , p=0.2103  , df_denom=21, df_num=2
 
 Granger Causality
 ('number of lags (no zero)', 1)
-ssr based F test:         F=0.4742  , p=0.4980  , df_denom=23, df_num=1
-ssr based chi2 test:   chi2=0.5360  , p=0.4641  , df=1
-likelihood ratio test: chi2=0.5306  , p=0.4664  , df=1
-parameter F test:         F=0.4742  , p=0.4980  , df_denom=23, df_num=1
+ssr based F test:         F=0.6621  , p=0.4238  , df_denom=24, df_num=1
+ssr based chi2 test:   chi2=0.7449  , p=0.3881  , df=1
+likelihood ratio test: chi2=0.7348  , p=0.3913  , df=1
+parameter F test:         F=0.6621  , p=0.4238  , df_denom=24, df_num=1
 
 Granger Causality
 ('number of lags (no zero)', 2)
-ssr based F test:         F=2.2711  , p=0.1292  , df_denom=20, df_num=2
-ssr based chi2 test:   chi2=5.6777  , p=0.0585  , df=2
-likelihood ratio test: chi2=5.1165  , p=0.0774  , df=2
-parameter F test:         F=2.2711  , p=0.1292  , df_denom=20, df_num=2
+ssr based F test:         F=0.2946  , p=0.7478  , df_denom=21, df_num=2
+ssr based chi2 test:   chi2=0.7296  , p=0.6943  , df=2
+likelihood ratio test: chi2=0.7195  , p=0.6978  , df=2
+parameter F test:         F=0.2946  , p=0.7478  , df_denom=21, df_num=2
 ```
 
 ```python
@@ -199,21 +199,21 @@ df3['DATE'] = df3.apply(lambda x: pd.to_datetime("%d-%02d-01" % (x.year,x.mon)),
 df3 = df3.set_index('DATE')
 
 import pandas as pd
-df = pd.read_csv('curr.csv',parse_dates=['DATE'])
-df = df.dropna(axis=0)
-df = df.set_index('DATE')
-df['jp'] = (df.DDDI06JPA156NWDB * df.JPNNGDP)/100.0
-df['jp'] = (df['jp'] - df['jp'].mean()) / df['jp'].std()
-df['liqus'] = (df['liqus'] - df['liqus'].mean()) / df['liqus'].std()
-df['exjpus'] = (df['exjpus'] - df['exjpus'].mean()) / df['exjpus'].std()
-df['jpliq'] = df2.liq
-df = df.dropna(axis=0)
-df['jpliq'] = (df['jpliq'] - df['jpliq'].mean()) / df['jpliq'].std()
-df['liqjpus'] = df.jpliq - df.liqus
+df4 = pd.read_csv('curr.csv',parse_dates=['DATE'])
+df4 = df4.dropna(axis=0)
+df4 = df4.set_index('DATE')
+df4['jp'] = (df4.DDDI06JPA156NWDB * df4.JPNNGDP)/100.0
+df4['jp'] = (df4['jp'] - df4['jp'].mean()) / df4['jp'].std()
+df4['liqus'] = (df4['liqus'] - df4['liqus'].mean()) / df4['liqus'].std()
+df4['exjpus'] = (df4['exjpus'] - df4['exjpus'].mean()) / df4['exjpus'].std()
+df4['jpliq'] = df3.liq
+df4 = df4.dropna(axis=0)
+df4['jpliq'] = (df4['jpliq'] - df4['jpliq'].mean()) / df4['jpliq'].std()
+df4['liqjpus'] = df4.jpliq - df4.liqus
 
 import statsmodels.tsa.stattools as t
-res = t.grangercausalitytests(df[['liqjpus','exjpus']],maxlag=1)
-res = t.grangercausalitytests(df[['exjpus','liqjpus']],maxlag=1)
+res = t.grangercausalitytests(df4[['liqjpus','exjpus']],maxlag=1)
+res = t.grangercausalitytests(df4[['exjpus','liqjpus']],maxlag=1)
 ```
 
 ```text
