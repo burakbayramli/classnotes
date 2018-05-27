@@ -15,7 +15,7 @@ df['T'] = df['exp'] + df['imp']
 df['S'] = df.S.pct_change() 
 df['N'] = df.N.pct_change()
 df['T'] = df['T'].pct_change()
-df['e'] = df.jpyus.pct_change()
+df['e'] = df.jpyus
 df['i'] = df.usrate - df.jpyrate
 df = df.dropna(axis=0)
 print df.tail(5)
@@ -40,11 +40,11 @@ DATE
 
                    e      i  
 DATE                         
-2015-12-01  0.012380  0.371  
-2016-03-01 -0.071553  0.452  
-2016-11-01 -0.039747  0.654  
-2017-08-01  0.012762  1.194  
-2017-08-01  0.000000  1.194  
+2015-12-01  121.6350  0.371  
+2016-03-01  112.9317  0.452  
+2016-11-01  108.4430  0.654  
+2017-08-01  109.8270  1.194  
+2017-08-01  109.8270  1.194  
 ```
 
 ```python
@@ -56,27 +56,27 @@ print results.summary()
 ```text
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:                      e   R-squared:                       0.064
-Model:                            OLS   Adj. R-squared:                 -0.053
-Method:                 Least Squares   F-statistic:                    0.5448
-Date:                Sun, 27 May 2018   Prob (F-statistic):              0.656
-Time:                        17:27:14   Log-Likelihood:                 32.017
-No. Observations:                  28   AIC:                            -56.03
-Df Residuals:                      24   BIC:                            -50.71
+Dep. Variable:                      e   R-squared:                       0.087
+Model:                            OLS   Adj. R-squared:                 -0.027
+Method:                 Least Squares   F-statistic:                    0.7606
+Date:                Sun, 27 May 2018   Prob (F-statistic):              0.527
+Time:                        17:39:37   Log-Likelihood:                -111.17
+No. Observations:                  28   AIC:                             230.3
+Df Residuals:                      24   BIC:                             235.7
 Df Model:                           3                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [95.0% Conf. Int.]
 ------------------------------------------------------------------------------
-Intercept     -0.0019      0.017     -0.117      0.908        -0.036     0.032
-N             -0.0005      0.011     -0.047      0.963        -0.022     0.021
-T             -0.1804      0.188     -0.960      0.347        -0.568     0.208
-S              0.0034      0.007      0.463      0.648        -0.012     0.019
+Intercept    103.9373      2.747     37.842      0.000        98.269   109.606
+N              0.7320      1.769      0.414      0.683        -2.918     4.382
+T            -12.5409     31.268     -0.401      0.692       -77.076    51.994
+S              0.8006      1.236      0.648      0.523        -1.751     3.352
 ==============================================================================
-Omnibus:                        6.159   Durbin-Watson:                   1.842
-Prob(Omnibus):                  0.046   Jarque-Bera (JB):                5.391
-Skew:                           0.496   Prob(JB):                       0.0675
-Kurtosis:                       4.907   Cond. No.                         42.9
+Omnibus:                        2.464   Durbin-Watson:                   0.414
+Prob(Omnibus):                  0.292   Jarque-Bera (JB):                2.095
+Skew:                          -0.564   Prob(JB):                        0.351
+Kurtosis:                       2.276   Cond. No.                         42.9
 ==============================================================================
 
 Warnings:
@@ -92,26 +92,26 @@ print results.summary()
 ```text
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:                      S   R-squared:                       0.241
-Model:                            OLS   Adj. R-squared:                  0.180
-Method:                 Least Squares   F-statistic:                     3.964
-Date:                Sun, 27 May 2018   Prob (F-statistic):             0.0320
-Time:                        17:27:21   Log-Likelihood:                -67.122
-No. Observations:                  28   AIC:                             140.2
-Df Residuals:                      25   BIC:                             144.2
+Dep. Variable:                      S   R-squared:                       0.222
+Model:                            OLS   Adj. R-squared:                  0.160
+Method:                 Least Squares   F-statistic:                     3.573
+Date:                Sun, 27 May 2018   Prob (F-statistic):             0.0432
+Time:                        17:39:44   Log-Likelihood:                -67.459
+No. Observations:                  28   AIC:                             140.9
+Df Residuals:                      25   BIC:                             144.9
 Df Model:                           2                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [95.0% Conf. Int.]
 ------------------------------------------------------------------------------
-Intercept     -0.3475      0.687     -0.506      0.617        -1.763     1.068
-e              5.2186      6.683      0.781      0.442        -8.545    18.982
-i              0.8265      0.310      2.663      0.013         0.187     1.466
+Intercept     -0.5554      4.879     -0.114      0.910       -10.604     9.493
+e              0.0019      0.049      0.038      0.970        -0.099     0.103
+i              0.8301      0.383      2.166      0.040         0.041     1.619
 ==============================================================================
-Omnibus:                       40.823   Durbin-Watson:                   2.685
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              176.125
-Skew:                           2.708   Prob(JB):                     5.69e-39
-Kurtosis:                      14.028   Cond. No.                         29.1
+Omnibus:                       41.315   Durbin-Watson:                   2.763
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              181.475
+Skew:                           2.743   Prob(JB):                     3.92e-40
+Kurtosis:                      14.201   Cond. No.                         959.
 ==============================================================================
 
 Warnings:
@@ -128,26 +128,26 @@ print results.summary()
 ```text
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:                      N   R-squared:                       0.207
-Model:                            OLS   Adj. R-squared:                  0.144
-Method:                 Least Squares   F-statistic:                     3.265
-Date:                Sun, 27 May 2018   Prob (F-statistic):             0.0550
-Time:                        17:27:26   Log-Likelihood:                -57.218
-No. Observations:                  28   AIC:                             120.4
-Df Residuals:                      25   BIC:                             124.4
+Dep. Variable:                      N   R-squared:                       0.205
+Model:                            OLS   Adj. R-squared:                  0.141
+Method:                 Least Squares   F-statistic:                     3.224
+Date:                Sun, 27 May 2018   Prob (F-statistic):             0.0568
+Time:                        17:39:50   Log-Likelihood:                -57.254
+No. Observations:                  28   AIC:                             120.5
+Df Residuals:                      25   BIC:                             124.5
 Df Model:                           2                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
                  coef    std err          t      P>|t|      [95.0% Conf. Int.]
 ------------------------------------------------------------------------------
-Intercept     -0.2429      0.482     -0.503      0.619        -1.236     0.751
-e              1.3706      4.692      0.292      0.773        -8.292    11.033
-i              0.5492      0.218      2.521      0.018         0.101     0.998
+Intercept      0.2298      3.389      0.068      0.946        -6.750     7.209
+e             -0.0049      0.034     -0.143      0.888        -0.075     0.065
+i              0.5742      0.266      2.157      0.041         0.026     1.122
 ==============================================================================
-Omnibus:                       30.023   Durbin-Watson:                   2.934
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               81.957
-Skew:                           2.035   Prob(JB):                     1.60e-18
-Kurtosis:                      10.327   Cond. No.                         29.1
+Omnibus:                       29.083   Durbin-Watson:                   2.955
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               75.370
+Skew:                           1.988   Prob(JB):                     4.30e-17
+Kurtosis:                       9.985   Cond. No.                         959.
 ==============================================================================
 
 Warnings:
@@ -165,31 +165,31 @@ res = t.grangercausalitytests(df[['e','i']],maxlag=2)
 
 Granger Causality
 ('number of lags (no zero)', 1)
-ssr based F test:         F=0.6386  , p=0.4320  , df_denom=24, df_num=1
-ssr based chi2 test:   chi2=0.7185  , p=0.3966  , df=1
-likelihood ratio test: chi2=0.7091  , p=0.3998  , df=1
-parameter F test:         F=0.6386  , p=0.4320  , df_denom=24, df_num=1
+ssr based F test:         F=0.0890  , p=0.7680  , df_denom=24, df_num=1
+ssr based chi2 test:   chi2=0.1001  , p=0.7517  , df=1
+likelihood ratio test: chi2=0.0999  , p=0.7519  , df=1
+parameter F test:         F=0.0890  , p=0.7680  , df_denom=24, df_num=1
 
 Granger Causality
 ('number of lags (no zero)', 2)
-ssr based F test:         F=1.6810  , p=0.2103  , df_denom=21, df_num=2
-ssr based chi2 test:   chi2=4.1626  , p=0.1248  , df=2
-likelihood ratio test: chi2=3.8611  , p=0.1451  , df=2
-parameter F test:         F=1.6810  , p=0.2103  , df_denom=21, df_num=2
+ssr based F test:         F=1.6867  , p=0.2093  , df_denom=21, df_num=2
+ssr based chi2 test:   chi2=4.1766  , p=0.1239  , df=2
+likelihood ratio test: chi2=3.8733  , p=0.1442  , df=2
+parameter F test:         F=1.6867  , p=0.2093  , df_denom=21, df_num=2
 
 Granger Causality
 ('number of lags (no zero)', 1)
-ssr based F test:         F=0.6621  , p=0.4238  , df_denom=24, df_num=1
-ssr based chi2 test:   chi2=0.7449  , p=0.3881  , df=1
-likelihood ratio test: chi2=0.7348  , p=0.3913  , df=1
-parameter F test:         F=0.6621  , p=0.4238  , df_denom=24, df_num=1
+ssr based F test:         F=0.0301  , p=0.8638  , df_denom=24, df_num=1
+ssr based chi2 test:   chi2=0.0338  , p=0.8541  , df=1
+likelihood ratio test: chi2=0.0338  , p=0.8542  , df=1
+parameter F test:         F=0.0301  , p=0.8638  , df_denom=24, df_num=1
 
 Granger Causality
 ('number of lags (no zero)', 2)
-ssr based F test:         F=0.2946  , p=0.7478  , df_denom=21, df_num=2
-ssr based chi2 test:   chi2=0.7296  , p=0.6943  , df=2
-likelihood ratio test: chi2=0.7195  , p=0.6978  , df=2
-parameter F test:         F=0.2946  , p=0.7478  , df_denom=21, df_num=2
+ssr based F test:         F=0.0372  , p=0.9636  , df_denom=21, df_num=2
+ssr based chi2 test:   chi2=0.0921  , p=0.9550  , df=2
+likelihood ratio test: chi2=0.0919  , p=0.9551  , df=2
+parameter F test:         F=0.0372  , p=0.9636  , df_denom=21, df_num=2
 ```
 
 ```python
