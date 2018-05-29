@@ -16,7 +16,6 @@ df['e'] = df.jpyus
 df['i'] = df.jpyrate - df.usrate
 df = df.dropna(axis=0)
 print df.tail(5)
-df.to_csv('/tmp/out.csv')
 ```
 
 ```text

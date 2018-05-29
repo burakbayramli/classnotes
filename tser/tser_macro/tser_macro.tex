@@ -508,6 +508,96 @@ tüketime giden kredi enflasyona gider.
 
 Kurlarý Tahmin Etmek
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+df = pd.read_csv('exch.csv',parse_dates=['DATE'])
+df = df.set_index('DATE')
+df = df.interpolate(method='linear')
+#df.to_csv('out.csv')
+df = df.dropna(axis=0)
+df['m'] = (df.nonfinloanus-df.constructloanus)*df.xjpus / df.nonfinloanjp 
+#df['m'] = df.m2us*df.xjpus / df.m2jp
+df['y'] = df.realgdpjp / df.realgdpus
+df['m'] = df.m.pct_change()
+df['y'] = df.y.pct_change()
+df['ms'] = df.m.shift(1)
+df['ys'] = df.y.shift(1)
+df['p'] = df.m + df.y
+df = df.dropna(axis=0)
+
+import statsmodels.formula.api as smf
+results = smf.ols('xjpus ~ ms + ys', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  xjpus   R-squared:                       0.091
+Model:                            OLS   Adj. R-squared:                  0.085
+Method:                 Least Squares   F-statistic:                     14.38
+Date:                Tue, 29 May 2018   Prob (F-statistic):           1.11e-06
+Time:                        22:32:08   Log-Likelihood:                -1163.8
+No. Observations:                 291   AIC:                             2334.
+Df Residuals:                     288   BIC:                             2345.
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept    106.0084      0.849    124.855      0.000       104.337   107.680
+ms           132.8209     29.448      4.510      0.000        74.861   190.781
+ys          -784.8944    243.760     -3.220      0.001     -1264.671  -305.117
+==============================================================================
+Omnibus:                       12.858   Durbin-Watson:                   0.156
+Prob(Omnibus):                  0.002   Jarque-Bera (JB):               13.864
+Skew:                          -0.530   Prob(JB):                     0.000976
+Kurtosis:                       2.861   Cond. No.                         313.
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.tsa.stattools as t
+res = t.grangercausalitytests(df[['xjpus','p']],maxlag=2)
+res = t.grangercausalitytests(df[['p','xjpus']],maxlag=2)
+\end{minted}
+
+\begin{verbatim}
+
+Granger Causality
+('number of lags (no zero)', 1)
+ssr based F test:         F=28.5870 , p=0.0000  , df_denom=287, df_num=1
+ssr based chi2 test:   chi2=28.8858 , p=0.0000  , df=1
+likelihood ratio test: chi2=27.5361 , p=0.0000  , df=1
+parameter F test:         F=28.5870 , p=0.0000  , df_denom=287, df_num=1
+
+Granger Causality
+('number of lags (no zero)', 2)
+ssr based F test:         F=0.4631  , p=0.6298  , df_denom=284, df_num=2
+ssr based chi2 test:   chi2=0.9424  , p=0.6242  , df=2
+likelihood ratio test: chi2=0.9409  , p=0.6247  , df=2
+parameter F test:         F=0.4631  , p=0.6298  , df_denom=284, df_num=2
+
+Granger Causality
+('number of lags (no zero)', 1)
+ssr based F test:         F=2.7007  , p=0.1014  , df_denom=287, df_num=1
+ssr based chi2 test:   chi2=2.7289  , p=0.0985  , df=1
+likelihood ratio test: chi2=2.7162  , p=0.0993  , df=1
+parameter F test:         F=2.7007  , p=0.1014  , df_denom=287, df_num=1
+
+Granger Causality
+('number of lags (no zero)', 2)
+ssr based F test:         F=3.1971  , p=0.0424  , df_denom=284, df_num=2
+ssr based chi2 test:   chi2=6.5067  , p=0.0386  , df=2
+likelihood ratio test: chi2=6.4345  , p=0.0401  , df=2
+parameter F test:         F=3.1971  , p=0.0424  , df_denom=284, df_num=2
+\end{verbatim}
+
+
 [devam edecek]
 
 

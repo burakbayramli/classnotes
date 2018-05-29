@@ -3,12 +3,11 @@ from pandas_datareader import data
 
 #####
 start=datetime.datetime(1970, 1, 1)
-end=datetime.datetime(2017, 1, 1)
-df = data.DataReader(['BORROW','EXJPUS'], 'fred', start, end)
-df.columns = ['liqus','exjpus']
-df.to_csv('curr.csv')
-
-
+end=datetime.datetime(2018, 5, 1)
+df = data.DataReader(['CRDQUSAPABIS','REALLN','CRDQJPAPABIS','JPNRGDPEXP','GDPC1','EXJPUS','MYAGM2USM052S','MYAGM2USM052S'], 'fred', start, end)
+df.columns = ['nonfinloanus','constructloanus','nonfinloanjp','realgdpjp','realgdpus','xjpus','m2us','m2jp']
+df.to_csv('exch.csv')
+    
 #####
 start=datetime.datetime(1970, 1, 1)
 end=datetime.datetime(2017, 1, 1)
@@ -39,25 +38,6 @@ df.columns = ['consump','gov1exp','gov2exp', 'invest','netexp','gdp','nonfinloan
 df.to_csv('crowd.csv')
 
 #####
-#Total Borrowings of Depository Institutions from the Federal Reserve
-#BORROW
-#Central Bank Assets to GDP for Japan
-#DDDI06JPA156NWDB
-#Gross Domestic Product for Japan
-#JPNNGDP
-
-#####
-start=datetime.datetime(1970, 1, 1)
-end=datetime.datetime(2017, 1, 1)
-df = data.DataReader(['BORROW','DDDI06JPA156NWDB','JPNNGDP','EXJPUS'], 'fred', start, end)
-df.columns = ['liqus','DDDI06JPA156NWDB','JPNNGDP','exjpus']
-df.to_csv('curr.csv')
-
-#####
-# http://wwe.economagic.com/em-cgi/data.exe/bjap/hms11
-# get this by copy and paste, into bojliq.csv
-
-#####
 # speculative traders, noncommercial open position
 # wget http://www.cftc.gov/files/dea/history/deacot2002.zip
 # use year 2012, 2015, etc in the file name
@@ -76,3 +56,5 @@ if os.path.isdir("jpy"):
     df2 = pd.concat(res)
     print df2
     df2.to_csv('jpypos.csv',index=None)
+
+    
