@@ -16,10 +16,10 @@ df.columns = ['gdp','shortrate']
 df.to_csv('rates.csv')
 
 #####
-start=datetime.datetime(1970, 1, 1)
+start=datetime.datetime(1950, 1, 1)
 end=datetime.datetime(2017, 1, 1)
-df = data.DataReader(['M2SL','GDP','CRDQUSAPABIS','REALLN'], 'fred', start, end)
-df.columns = ['m2cd','gdp','nonfincred','realest']
+df = data.DataReader(['M2SL','GDP','CRDQUSAPABIS','REALLN','CPIAUCSL'], 'fred', start, end)
+df.columns = ['m2cd','gdp','nonfincred','realest','inflation']
 df.to_csv('money.csv')
 
 #####
