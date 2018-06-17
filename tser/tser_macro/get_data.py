@@ -18,8 +18,8 @@ df.to_csv('rates.csv')
 #####
 start=datetime.datetime(1950, 1, 1)
 end=datetime.datetime(2017, 1, 1)
-df = data.DataReader(['M2SL','GDP','CRDQUSAPABIS','REALLN','CPIAUCSL'], 'fred', start, end)
-df.columns = ['m2cd','gdp','nonfincred','realest','inflation']
+df = data.DataReader(['M2SL','GDP','CRDQUSAPABIS','REALLN','FPCPITOTLZGUSA','FEDFUNDS'], 'fred', start, end)
+df.columns = ['m2cd','gdp','nonfincred','realest','inflation','irate']
 df.to_csv('money.csv')
 
 #####
