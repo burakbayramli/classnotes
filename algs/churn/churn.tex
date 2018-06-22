@@ -2,17 +2,43 @@
 \begin{document}
 Müþteri Sadakatini Tahmin Etmek (Churn Prediction)
 
-\inputminted[fontsize=\footnotesize]{python}{wtte_rnn.py}
-
+\inputminted[fontsize=\footnotesize]{python}{model.py}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import wtte_rnn
-m = wtte_rnn.get_model()
+import model
+
+train_x = np.load("./data/train_x.npy")
+train_y = np.load("./data/train_y.npy")
+test_x = np.load("./data/test_x.npy")
+test_y = np.load("./data/test_y.npy")
+
+m = model.get_model()
 m.load_weights('wtte.h5')
 \end{minted}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+# Make some predictions and put them alongside the real TTE and event
+# indicator values
+test_predict = m.predict(test_x)
+test_predict = np.resize(test_predict, (100, 2))
+test_result = np.concatenate((test_y, test_predict), axis=1)
 
+# TTE, Event Indicator, Alpha, Beta
+print(test_result[:10])
+\end{minted}
 
+\begin{verbatim}
+[[ 112.            1.          199.97093201    3.82868171]
+ [  98.            1.          180.49946594    3.690907  ]
+ [  69.            1.           81.04798889    1.45907807]
+ [  82.            1.           82.94621277    1.49614   ]
+ [  91.            1.           86.75234985    1.57983696]
+ [  93.            1.           82.14154816    1.49072194]
+ [  91.            1.           81.48047638    1.47451472]
+ [  95.            1.           82.19529724    1.49306989]
+ [ 111.            1.          175.48095703    3.63983274]
+ [  96.            1.           82.51445007    1.48723483]]
+\end{verbatim}
 
 [devam edecek]
 
@@ -61,5 +87,7 @@ Kaynaklar
 [3] Bayramli, Parakende Veri Dosyasi, \url{https://www.dropbox.com/s/anlijprxktjqx3x/retail.zip?dl=1}
 
 [4] GraphLab, {\em Churn Prediction}, \url{https://turi.com/learn/userguide/churn_prediction/quick-start.html}
+
+[5] \url{https://github.com/daynebatten/keras-wtte-rnn}
 
 \end{document}
