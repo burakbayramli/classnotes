@@ -1,59 +1,59 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Uretici Hasimsal Aglar (Generative Adverserial Networks -GAN-)
+Üretici Haþimsal Aðlar (Generative Adverserial Networks -GAN-)
 
-Derin Ogrenme ustalarindan Yann Lecun GAN'leri ``son 10 senede yapay ogrenmede
-gorulen en buyuk ilerleme'' olarak tarif ediyor. Burada haksiz degil. YSA'lar
-ilk basta (geri gelisinden sonraki ilk evresinde de) bir resimde kedi, kopek ya
-da ucak olup olmadigini siniflayabiliyordu. Yeni evrisimsel (convolutional) yapi
-ile cetrefil goruntu iliskilerini ogrenip bunlari siniflama ozelligi kazandi,
-fakat bunlar basit bir etikete bagli olarak denetimli (supervised) olarak
-yapiyordu.
+Derin Öðrenme ustalarýndan Yann LeCun GAN'leri ``son 10 senede yapay öðrenmede
+görülen en büyük ilerleme'' olarak tarif ediyor. Burada haksýz deðil. YSA'lar
+ilk baþta (geri geliþinden sonraki ilk evresinde de) bir resimde kedi, köpek ya
+da uçak olup olmadýðýný sýnýflayabiliyordu. Yeni evriþimsel (convolutional) yapý
+ile çetrefil görüntü iliþkilerini öðrenip bunlarý sýnýflama özelliði kazandý,
+fakat bunlar basit bir etikete baðlý olarak denetimli (süpervised) olarak
+yapýyordu.
 
-GAN'ler denetimsiz olarak egitilebiliyor, ve daha ilginci ``uretimsel
-(generative)'' olarak kullanilabiliyor. Mesela pek cok goruntuye bakip yeni
-goruntuler ureten bir GAN olabilir, ya da, sozel tarif verilince o tarifteki
-soylenen goruntuyu ureten bir GAN olabilir! Oyle ya sonucta verilen girdi bir
-takim reel sayilar iceren cok boyutlu vektorlerdir, bu sayilarin kelimeleri,
-baska goruntuleri temsil etmesi mimari acisindan cok fark yaratmaz.
+GAN'ler denetimsiz olarak eðitilebiliyor, ve daha ilginci ``üretimsel
+(generative)'' olarak kullanýlabiliyor. Mesela pek çok görüntüye bakýp yeni
+görüntüler üreten bir GAN olabilir, ya da, sözel tarif verilince o tarifteki
+söylenen görüntüyü üreten bir GAN olabilir! Öyle ya sonuçta verilen girdi bir
+takým reel sayýlar içeren çok boyutlu vektörlerdir, bu sayýlarýn kelimeleri,
+baþka görüntüleri temsil etmesi mimarý açýsýndan çok fark yaratmaz.
 
 \includegraphics[width=20em]{gan_02.png}
 
-Resimden resime tercume edebilmek, ``uretim yapmak'' elle cizilmis taslaklari
-gercege cok yakin resimlere donusturmek, ya da tam tersi yonde gitmek mesela
-bir uydunun cektigi sehir resmini haritasal yollar, evler semasina tercume
+Resimden resime tercüme edebilmek, ``üretim yapmak'' elle çizilmiþ taslaklarý
+gerçeðe çok yakýn resimlere dönüþtürmek, ya da tam tersi yönde gitmek mesela
+bir uydunun çektiði þehir resmini haritasal yollar, evler þemasýna tercüme
 etmek, vs.
 
 \includegraphics[width=20em]{gan_04.png}
 
 Mimari
 
-Simdi GAN'lerin nasil kurulduguna gelelim. Bir GAN yapisi kabaca bir kalpazan
-(uretimsel) ve polis (ayýrtaç -discriminator-) arasindaki iliskiyi
-benzetilebilir. Ilk basta kalpazan polise bir sahte para gosterir, polis buna
-sahte der. Bu noktada polis kalpazana onemli bir bilgi / geri besleme vermis
+Þimdi GAN'lerin nasýl kurulduðuna gelelim. Bir GAN yapýsý kabaca bir kalpazan
+(üretimsel) ve polis (ayýrtaç -discriminatör-) arasýndaki iliþkiyi
+benzetilebilir. Ýlk baþta kalpazan polise bir sahte para gösterir, polis buna
+sahte der. Bu noktada polis kalpazana önemli bir bilgi / geri besleme vermiþ
 olur, kalpazan bu bilgiyi kullanarak bir sonraki sefere daha iyi sahte para
-basmaya ugrasabilir. Bu dongu uzun sure devam ettirilir ta ki kalpazan isleri
+basmaya uðraþabilir. Bu döngü uzun süre devam ettirilir ta ki kalpazan iþleri
 iyice ilerletip polisi tamamen aldatabilinceye kadar. 
 
-Imajlar baglaminda dusunelim simdi; sahte imajlar uretmek ve onlari
-ayirdedebilmek. Ustteki anlatimdan bize iki tane ag gerektiginin
-anlayabiliriz. Birincisi ayirtac, bu aga imaj verilir, o da cevap olarak 0/1
-olarak sahte / degil, dogru / yanlis seklinde bir cevap hesaplar. 
+Ýmajlar baðlamýnda düþünelim þimdi; sahte imajlar üretmek ve onlarý
+ayýrdedebilmek. Üstteki anlatýmdan bize iki tane að gerektiðinin
+anlayabiliriz. Birincisi ayýrtaç, bu aða imaj verilir, o da cevap olarak 0/1
+olarak sahte / deðil, doðru / yanlýþ þeklinde bir cevap hesaplar. 
 
 \includegraphics[width=20em]{gan_05.png}
 
-Ikinci ag yapisi sahte imaj uretmeye ugrasiyor, ve bu uretimi cok iyi yapmaya
-ugrasiyor. Peki girdi nedir? Gurultu! Ikinci aga 100 boyutlu gurultu verecegiz
-(baska boyutlar da olabilir), ve bu gurultuyu isleyerek 28x28 boyutlarinda bir
-imaj uretmesini bekleyecegiz. Bu dahiyane bir yontem. Agin hayal gormesini,
-uretmesini istiyoruz, bu tur bir aga gurultu, ya da hiclikten daha iyi bir girdi
-verilemezdi herhalde. Bu arada egitildikten sonra YSA'nin deterministik bir
-yapida oldugunu unutmayalim, yani egitim bitince ayni gurultu iki kere verilince
-ayni imaj uretilir. Degisik imajlar icin degisik gurultuler vermek lazim!
-Degisik gurultu nasil olur? Gaussian bazli N(0,1) gurultu urettigimizi
-dusunelim, bazen 0'in solundan bazen sagindan deger uretiyor olabiliriz. Muthis
-olan YSA'nin egitim sirasinda bu tur gurultu farklarina hassas hale gelmesidir!
+Ýkinci að yapýsý sahte imaj üretmeye uðraþýyor, ve bu üretimi çok iyi yapmaya
+uðraþýyor. Peki girdi nedir? Gürültü! Ýkinci aða 100 boyutlu gürültü vereceðiz
+(baþka boyutlar da olabilir), ve bu gürültüyü iþleyerek 28x28 boyutlarýnda bir
+imaj üretmesini bekleyeceðiz. Bu dahiyane bir yöntem. Aðýn hayal görmesini,
+üretmesini istiyoruz, bu tür bir aða gürültü, ya da hiçlikten daha iyi bir girdi
+verilemezdi herhalde. Bu arada eðitildikten sonra YSA'nýn deterministik bir
+yapýda olduðunu unutmayalým, yani eðitim bitince ayný gürültü iki kere verilince
+ayný imaj üretilir. Deðiþik imajlar için deðiþik gürültüler vermek lazým!
+Deðiþik gürültü nasýl olur? Gaussian bazlý N(0,1) gürültü ürettiðimizi
+düþünelim, bazen 0'in solundan bazen saðýndan deðer üretiyor olabiliriz. Müthiþ
+olan YSA'nýn eðitim sýrasýnda bu tür gürültü farklarýna hassas hale gelmesidir!
 
 Ikinci ag
 
@@ -73,7 +73,7 @@ birbirinden ayiredemesin.
 
 \inputminted[fontsize=\footnotesize]{python}{mnist_dcgan.py}
 
-Egittikten sonra bir gurultu verip uretim yapalim,
+Eðittikten sonra bir gürültü verip üretim yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import mnist_dcgan
@@ -88,7 +88,7 @@ plt.savefig('gan_01.png')
 
 \includegraphics[width=20em]{gan_01.png}
 
-Bir kez daha gurultu uretelim,
+Bir kez daha gürültü üretelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 noise = np.random.randn(1,200)
@@ -100,9 +100,7 @@ plt.savefig('gan_03.png')
 
 \includegraphics[width=20em]{gan_03.png}
 
-Bu ciktilarin goruntusu ilginc degil mi? 
-
-
+Bu çýktýlarýn görüntüsü ilginç deðil mi? 
 
 Kaynaklar
 
