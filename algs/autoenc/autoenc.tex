@@ -70,6 +70,43 @@ Standard özkodlayýcýlarýn bir problemi kodlama yaptýklarý daralmýþ
 alandaki vektörlerin sürekli olmayabileceði, ve buradaki deðerlerin
 kolay bir þekilde interpolasyon yapýlmasýndaki bazý zorluklar.
 
+
+[5]'ten 
+Given a random variable z with one distribution, we can create another random
+variable X = g(z) with a completely different distribution.  Left: samples from
+a gaussian distribution. Right: those same samples mapped through the function
+g(z) = z/10 + z/||z|| to form a ring. This is the strategy that VAEs use to
+create arbitrary distributions: the deterministic function g is learned from
+data .
+
+Biliyoruz ki herhangi bir dagilima sahip rasgele degisken $z$'yi bir $g$
+fonksiyonu kullanarak $X=g(z)$ ile baska bir dagilima cevirebiliyoruz. Altta
+ornegi goruluyor, soldaki resim Gaussian dagilimdan, sagdaki resim soldaki
+verilerin $g(z) = z/10 + z/||z||$ ile baska bir dagilima eslenmis hali ve bu
+yeni dagilim bir cember seklini olusturmus. VAE'nin rasgele dagilimlar
+yaratabilmesinin arkasinda yatan gizem bu iste. Egitim ile VAE $g$'yi ogrenmis
+oluyor, ki bu bir determinstik fonksiyon. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import random, numpy.linalg as lin, pandas as pd
+x = np.random.randn(1000,2)
+x = pd.DataFrame(x)
+x['n'] = np.sqrt(x[0]*x[0] + x[1]*x[1])
+x['g0'] = (x[0]/10.0) + x[0]/x['n']
+x['g1'] = (x[1]/10.0) + x[1]/x['n']
+plt.figure()
+ax = plt.subplot(1, 2, 1)
+plt.plot(x[0],x[1],'.')
+ax = plt.subplot(1, 2, 2)
+plt.plot(x['g0'],x['g1'],'.')
+plt.xlim(-4,4)
+plt.ylim(-4,4)
+plt.savefig('autoenc_10.png')
+\end{minted}
+
+\includegraphics[width=40em]{autoenc_10.png}
+
+
 \includegraphics[width=40em]{autoenc_06.png}
 
 \includegraphics[width=20em]{autoenc_07.png}
@@ -91,7 +128,7 @@ enc.load_weights('mnist_lstm_enc.h5')
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import random
-idx = 400
+idx = 400 # herhangi bir imaji sec
 print (tmp.shape)
 x_test_tmp = x_test[idx]
 res = vae.predict(x_test_tmp.reshape((1, 28, 28)))
@@ -110,9 +147,27 @@ plt.savefig('autoenc_04.png')
 
 \includegraphics[width=20em]{autoenc_04.png}
 
-\inputminted[fontsize=\footnotesize]{python}{aae_normal.py}
+Hasimsal Ozkodlayici (Adverserial Autoencoder -AA-)
 
-\inputminted[fontsize=\footnotesize]{python}{aae_lstm.py}
+Uretici Hasimsal Aglar (Generative Adverserial Networks -GAN-) kavraminin
+ozkodlayicilara uygulanmis hali AA olur. 
+
+\includegraphics[width=20em]{autoenc_09.png}
+
+Burada bir kodlayici / kodçözücü yapisi var (ust blok) bu yapidan kodlanmis ara
+tabaka $z \sim q(z)$ ``kotu'' ornekler cekilip $p(z)$'den gelen ``iyi'' ornekler
+ile birlestiriliyor ve ayirdedici yine bu iki grup arasinda ayirim yapmayi
+ogreniyor. Bu durumda ust bloktaki kodcozucu GAN'deki uretici gibi olur, ona
+donusur bir bakima, cunku oyle iyi uretim yapmaya calisacaktir ki $p(z)$
+gurultusu ile onun aldigi kodlanmis tabaka verisi ayiredilemez hale gelmelidir.
+Tabii ki ust soldaki kodlayici bu ara tabakaya o sekilde temsili veri uretmeye
+calisacaktir, bu arada kodlayici / kodcozucu yapisi da egitilmis olur. Yani $z$
+bir anlamda alt soldaki gercek gurultuye yaklasir, bu gurultuden sayi uretebilir
+hale geliriz, bu klasik GAN, ayrica bu ``kodlanmis'' gurultuyu ureten kodlayici
+/ kodcozucu tabaka da ayri bir sekilde kendini optimize eder ve kodlama isini
+yapar hale gelir.
+
+\inputminted[fontsize=\footnotesize]{python}{aae_normal.py}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import aae_normal
@@ -125,7 +180,7 @@ generator.load_weights('aae-norm-generator.h5')
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-idx = 100
+idx = 100 # herhangi bir imaji sec
 print (x_test[idx, :].shape)
 res = encoder.predict(x_test[idx, :].reshape(1,28,28))
 print (res.shape)
@@ -137,6 +192,31 @@ plt.savefig('autoenc_05.png')
 \end{minted}
 
 \includegraphics[width=20em]{autoenc_05.png}
+
+\inputminted[fontsize=\footnotesize]{python}{aae_lstm.py}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import aae_lstm
+latent_dim = 200
+input_shape = (28, 28)
+encoder = aae_lstm.model_encoder(latent_dim, input_shape)
+encoder.load_weights('aae-lstm-encoder.h5')
+generator = aae_lstm.model_generator(latent_dim, input_shape)
+generator.load_weights('aae-lstm-generator.h5')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+idx = 1030 # herhangi bir imaji sec
+res = encoder.predict(x_test[idx, :].reshape(1, 28,28))
+pixels = generator.predict(res)
+pixels = pixels.reshape((28, 28))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig('autoenc_08.png')
+\end{minted}
+
+\includegraphics[width=20em]{autoenc_08.png}
 
 
 

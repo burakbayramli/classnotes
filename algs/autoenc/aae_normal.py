@@ -25,19 +25,29 @@ def mnist_data():
     return mnist_process(xtrain), mnist_process(xtest)
 
 
-def model_generator(latent_dim, input_shape, hidden_dim=512, reg=lambda: l1l2(1e-7, 0)):
+def model_generator(latent_dim, input_shape,
+                    hidden_dim=512,
+                    reg=lambda: l1l2(1e-7, 0)):
     return Sequential([
-        Dense(hidden_dim, name="generator_h1", input_dim=latent_dim, W_regularizer=reg()),
+        Dense(hidden_dim, name="generator_h1",
+              input_dim=latent_dim,
+              W_regularizer=reg()),
         LeakyReLU(0.2),
-        Dense(hidden_dim, name="generator_h2", W_regularizer=reg()),
+        Dense(hidden_dim,
+              name="generator_h2",
+              W_regularizer=reg()),
         LeakyReLU(0.2),
-        Dense(np.prod(input_shape), name="generator_x_flat", W_regularizer=reg()),
+        Dense(np.prod(input_shape),
+              name="generator_x_flat",
+              W_regularizer=reg()),
         Activation('sigmoid'),
         Reshape(input_shape, name="generator_x")],
         name="generator")
 
 
-def model_encoder(latent_dim, input_shape, hidden_dim=512, reg=lambda: l1l2(1e-7, 0)):
+def model_encoder(latent_dim, input_shape,
+                  hidden_dim=512,
+                  reg=lambda: l1l2(1e-7, 0)):
     x = Input(input_shape, name="x")
     h = Flatten()(x)
     h = Dense(hidden_dim, name="encoder_h1", W_regularizer=reg())(h)

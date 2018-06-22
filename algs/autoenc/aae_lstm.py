@@ -24,9 +24,13 @@ def mnist_data():
 
 activation='relu'
 
-def model_generator(latent_dim, input_shape, hidden_dim=100, reg=lambda: l1l2(1e-7, 0)):
+def model_generator(latent_dim, input_shape,
+                    hidden_dim=100,
+                    reg=lambda: l1l2(1e-7, 0)):
     return Sequential([
-        Dense(np.prod(input_shape), activation=activation,name="generator_h1", input_dim=latent_dim, W_regularizer=reg()),
+        Dense(np.prod(input_shape), activation=activation,
+              name="generator_h1", input_dim=latent_dim,
+              W_regularizer=reg()),
         Reshape(input_shape, name="generator_x"),
         GRU(latent_dim,return_sequences=True),
         GRU(28,return_sequences=True),
@@ -34,16 +38,25 @@ def model_generator(latent_dim, input_shape, hidden_dim=100, reg=lambda: l1l2(1e
         name="generator")
 
 
-def model_encoder(latent_dim, input_shape, hidden_dim=100, reg=lambda: l1l2(1e-7, 0)):
+def model_encoder(latent_dim, input_shape,
+                  hidden_dim=100,
+                  reg=lambda: l1l2(1e-7, 0)):
     x = Input(input_shape, name="x")
     h = GRU(hidden_dim, return_sequences=True)(x)
     h = GRU(hidden_dim)(h)
-    h = Dense(hidden_dim, activation=activation,name="encoder_h3", W_regularizer=reg())(h)    
+    h = Dense(hidden_dim, activation=activation,
+              name="encoder_h3",
+              W_regularizer=reg())(h)    
     
     mu = Dense(latent_dim, name="encoder_mu", W_regularizer=reg())(h)
-    log_sigma_sq = Dense(latent_dim, name="encoder_log_sigma_sq", W_regularizer=reg())(h)
-    z = merge([mu, log_sigma_sq], mode=lambda p: p[0] + K.random_normal(K.shape(p[0])) * K.exp(p[1] / 2),
+    
+    log_sigma_sq = Dense(latent_dim, name="encoder_log_sigma_sq",
+                         W_regularizer=reg())(h)
+    
+    z = merge([mu, log_sigma_sq],
+              mode=lambda p: p[0] + K.random_normal(K.shape(p[0])) * K.exp(p[1] / 2),
               output_shape=lambda p: p[0])
+    
     return Model(x, z, name="encoder")
 
 
