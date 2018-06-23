@@ -16,7 +16,7 @@ YSA'yý veriyi özetlemeye doðru yöneltecektir, ve bu tekrar oluþturma
 için ileri besleme sýrasýnda veriyi dar bir noktadan geçmeye zorlarsak
 (üstteki resimde görülüyor, 7 nöronluk girdi 5 nöronluk "daha dar" bir
 katmandan geçmeye zorlanýyor), bu YSA'yý "sýkýþtýrma" yapmaya daha da
-meyýllendirecektir.
+meyillendirecektir.
 
 \inputminted[fontsize=\footnotesize]{python}{mnist_autoenc.py}
 
@@ -24,15 +24,20 @@ meyýllendirecektir.
 from keras.datasets import mnist
 import mnist_autoenc
 
-(x_train, _), (x_test, _) = mnist.load_data()
+(x_train, _), (x_test, y_test) = mnist.load_data()
 x_test = x_test.astype('float32') / 255.
 autoencoder, encoder, decoder = mnist_autoenc.get_model()
 encoder.load_weights("mod-enc-1.h5")
 decoder.load_weights("mod-dec-1.h5")
 \end{minted}
 
+Üstteki kodla modeli eðittikten sonra herhangi bir sayý resmini alýyoruz,
+kodluyoruz, kodçözme yapýyoruz ve tekrar oluþturulmuþ hali ekrana basýyoruz,
+
 \begin{minted}[fontsize=\footnotesize]{python}
-tmp = x_test[1090, :, :].reshape(1,28*28)
+idx = 1090  # herhangi bir sayi resmini al
+print y_test[idx]
+tmp = x_test[idx, :, :].reshape(1,28*28)
 encoded = encoder.predict(tmp)
 print (encoded.shape)
 decoded = decoder.predict(encoded).reshape(28,28)
@@ -42,7 +47,28 @@ plt.gray()
 plt.savefig('autoenc_01.png')
 \end{minted}
 
+\begin{verbatim}
+9
+(1, 32)
+(28, 28)
+\end{verbatim}
+
 \includegraphics[width=20em]{autoenc_01.png}
+
+9 resmini elde ettik. 
+
+Zaman Serisi Özkodlamasý, RNN 
+
+Eðer zamana baðlý bir veri yapýsýný özkodlamak istesek nasýl bir model
+kullanýrdýk? Mesela birkaç boyutlu bir finans verisini (bir andaki hisse
+fiyatý, satým miktarý çok boyutlu bir vektörde olabilirdi) modelliyor
+olabilidiik. MNIST verisini bu þekilde kullanabiliriz aslýnda, 28 x 28
+boyutlu veride sanki 28 tane 28 boyutlu veriyi zamana baðlý alýyormuþuz
+gibi görebilirdik, sanki resimde soldan saða doðru dikey þeritler alýp
+teker teker bunlarý iþlediðimizi düþünebiliriz. MNIST sayý görüntülerine bu
+þekilde bakmak aslýnda çok anlamsýz deðil, mesela bir altý görüntüsünü
+düþünürsek soldan saða giderken kavisli yukarý doðru bir gidiþ vardýr, bu
+gidiþi zamana baðlý bir NN yakalayabilir.
 
 \inputminted[fontsize=\footnotesize]{python}{mnist_autoenc_rnn_simple.py}
 
@@ -64,19 +90,36 @@ plt.savefig('autoenc_03.png')
 
 \includegraphics[width=20em]{autoenc_03.png}
 
-Varyasyonel Özkodlayýcýlar
+Varyasyonel Özkodlayýcýlar (Variational Autoencoder -VAE-)
 
 Standard özkodlayýcýlarýn bir problemi kodlama yaptýklarý daralmýþ
 alandaki vektörlerin sürekli olmayabileceði, ve buradaki deðerlerin
 kolay bir þekilde interpolasyon yapýlmasýndaki bazý zorluklar.
 
-Biliyoruz ki herhangi bir daðýlýma sahip rasgele deðiþken $z$'yi bir $g$
-fonksiyonu kullanarak $X=g(z)$ ile baþka bir daðýlýma çevirebiliyoruz. Altta
-örneði görülüyor, soldaki resim Gaussian daðýlýmdan, saðdaki resim soldaki
-verilerin $g(z) = z/10 + z/||z||$ ile baþka bir daðýlýma eþlenmiþ hali ve bu
-yeni daðýlým bir çember þeklini oluþturmuþ. VAE'nin rasgele daðýlýmlar
-yaratabilmesinin arkasýnda yatan gizem bu iþte. Eðitim ile VAE $g$'yi öðrenmiþ
-oluyor, ki bu bir determinstik fonksiyon. 
+VAE özkodlayýcýlar ile kodlayýcýyý tabaka bir tamamen baðlanmýþ / yoðun
+(dense) bir katmandan geçiyor ama bir deðiþiklik var; yoðun katman
+$\mu,\sigma$ rasgele {\em deðiþkenleri} haline geliyor ve ondan bir sonraki
+katman bu deðiþkenlerden örneklem alýyor! Bu dahiyene bir düþünce. Fakat
+akla gelebilir - YSA yapýsý deterministik bir yapýdýr, örneklem, yani zar
+atma rasgele (stochastic) bir hesap. Bu kavramý YSA mekanizmasýna nasýl
+dahil ediyoruz?
+
+\includegraphics[width=40em]{autoenc_06.png}
+
+Çözüm örneklem operasyonunu (gürültü $N(0,1)$ + $\mu$) çarpý $\sigma$
+olarak modellemek, bu þekilde eðitilen çarpma, toplama üzerinden
+$\mu,\sigma$ deðiþkenleri, ve halen YSA mekanizmasý devrede. Gürültü, eh
+Gaussian sýfýr merkezli bir stardart sapmalý gürültü. Bir gürültü
+diðerinden farklýdýr demiyoruz, model için hepsi ayný gürültü.
+
+Bunlari yapabilmemizin temelinde su bilgi de var: Biliyoruz ki herhangi bir
+daðýlýma sahip rasgele deðiþken $z$'yi bir $g$ fonksiyonu kullanarak
+$X=g(z)$ ile baþka bir daðýlýma çevirebiliyoruz. Altta örneði görülüyor,
+soldaki resim Gaussian daðýlýmdan, saðdaki resim soldaki verilerin
+$g(z) = z/10 + z/||z||$ ile baþka bir daðýlýma eþlenmiþ hali ve bu yeni
+daðýlým bir çember þeklini oluþturmuþ. VAE'nin rasgele daðýlýmlar
+yaratabilmesinin arkasýnda yatan gizem bu iþte. Eðitim ile VAE $g$'yi
+öðrenmiþ oluyor, ki bu bir determinstik fonksiyon.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import random, numpy.linalg as lin, pandas as pd
@@ -96,9 +139,6 @@ plt.savefig('autoenc_10.png')
 \end{minted}
 
 \includegraphics[width=40em]{autoenc_10.png}
-
-
-\includegraphics[width=40em]{autoenc_06.png}
 
 \includegraphics[width=20em]{autoenc_07.png}
 
@@ -138,12 +178,15 @@ plt.savefig('autoenc_04.png')
 
 \includegraphics[width=20em]{autoenc_04.png}
 
+Gördüðümüz gibi zamansal iþlem yaptýk ama VAE çok iyi sonuç verdi. Hatta
+test imajýný daha netleþtirdi!
+
 Hasýmsal Özkodlayýcý (Adverserial Autoencoder -AA-)
 
-Üretici Hasýmsal Aðlar (Generative Adverþerial Networks -GAN-) kavramýnýn
+Üretici Hasýmsal Aðlar (Generative Adverserial Networks -GAN-) kavramýnýn
 özkodlayýcýlara uygulanmýþ hali AA olur. 
 
-\includegraphics[width=20em]{autoenc_09.png}
+\includegraphics[width=30em]{autoenc_09.png}
 
 Burada bir kodlayýcý / kodçözücü yapýsý var (üst blok) bu yapýdan kodlanmýþ ara
 tabaka $z \sim q(z)$ ``kötü'' örnekler çekilip $p(z)$'den gelen ``iyi'' örnekler

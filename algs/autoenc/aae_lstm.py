@@ -85,8 +85,6 @@ def example_aae(adversarial_optimizer):
     # autoencoder (x -> x')
     print (encoder.inputs)
     e = encoder(encoder.inputs)
-    print ('-------')
-    print (e)
     g = generator(e)
     autoencoder = Model(encoder.inputs, g)
     # discriminator (z -> y)
