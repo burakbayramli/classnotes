@@ -179,11 +179,13 @@ sabit seviyede olmalýydý. Fakat alttaki grafikte hýzýn
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
 df = pd.read_csv('money.csv',parse_dates=['DATE'])
-df2 = df[['m2cd','gdp','DATE']]
-df2 = df2.dropna(axis=0)
-df2 = df2.set_index('DATE')
-df2['vel1'] = df2.gdp / df2.m2cd
-df2.vel1.plot(ylim=[1.0,3.0])
+df = df.set_index('DATE')
+df = df[['m2cd','gdp']]
+df = df.ix[df.index > '1960-01-01']
+df = df.ix[df.index < '2010-01-01']
+df = df.dropna(axis=0)
+df['vel1'] = df.gdp / df.m2cd
+df.vel1.plot(ylim=[0.0,3.0])
 plt.savefig('tser_macro_04.png')
 \end{minted}
 
@@ -218,11 +220,14 @@ kredileri alýp, ondan emlak kredilerini çýkartýrsak, ve bu ``iyi'' $M$
 üzerinden hýzý grafiklersek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-df3 = df[['gdp','nonfincred','DATE','realest']]
-df3 = df3.dropna(axis=0)
+df3 = pd.read_csv('money.csv',parse_dates=['DATE'])
 df3 = df3.set_index('DATE')
+df3 = df3.ix[df3.index > '1960-01-01']
+df3 = df3.ix[df3.index < '2010-01-01']
+df3 = df3[['m2cd','gdp','nonfincred','realest']]
+df3 = df3.resample("A", how='sum') 
 df3['vel2'] = df3.gdp / (df3.nonfincred-df3.realest)
-df3.vel2.plot(ylim=[0.0,2.0])
+df3.vel2.plot(ylim=[0.0,3.0])
 plt.savefig('tser_macro_05.png')
 \end{minted}
 
@@ -844,3 +849,5 @@ Kaynaklar
 [10] Mankiw, {\em Principles of Macroeconomics, 5th Edition, 2008} 
 
 \end{document}
+
+
