@@ -73,7 +73,7 @@ if __name__ == "__main__":
         print cmd
         os.system(cmd)
         
-        for topdir in ['algs','calc_multi','chaos','compscieng',
+        for topdir in ['algs','calc_multi','chaos','compscieng','elecmag',
                        'func_analysis','linear','ode','pde','stat',
                        'tser','vision']:
             print 'main',topdir
