@@ -98,24 +98,114 @@ o ezilme, yayýlma, vs. iþlemi sýrasýnda ayrýlmasýnýn yol açtýðý enformasyon
 kaybýnýn kaosla ilintilendirilen o tahmin edilmezliðin temeli olduðunu ima
 ediyoruz. 
 
-Þimdi size bir kitaptan [1] bazý resimler göstereceðim. Kitap 80'lý yýllarýn
-baþýnda çýkmýþtý zannediyorum, ben hatýrlýyorum, o zamanlar için yeni olan kaos,
-garip çekiciler, vs. konusunda bir kitap bulmaya uðraþýyordum, bu zor bir iþti o
-zaman, baþlangýç seviyesindeki birisi için rahat okunabilecek fazla kaynak
-yoktu. Ama bu kitap [1] tam da onu yapmaya uðraþan bir kitaptý, hatta yazarlar
-hiç matematiksel formül kullanmadan konuyu anlatmaya karar vermiþler bunu sýký
-bri þekilde takip etmiþler, kitapta hiç formül yok, herþeyi görsel olarak
-anlatmaya uðraþmýþlar. Görsel meyýllý olanlarýnýz þimdiye kadar gördüklerimize
-farklý bir bakýþ açýsý saðlamasý açýsýndan bu kitabý ilginç bulabilir. Ben pür
-görselci deðilim tabii, formüllere inanýrým, onlarý severim. Þimdi kitabýn
-resimlerini görmeden önce kapaktaki resim hakkýnda bazý formüller göstermek
-istiyorum.
+Þimdi size bir kitaptan [1] bazý resimler göstereceðim. Kitap 80'lý
+yýllarýn baþýnda çýkmýþtý zannediyorum, ben hatýrlýyorum, o zamanlar için
+yeni olan kaos, garip çekiciler, vs. konusunda bir kitap bulmaya
+uðraþýyordum, bu zor bir iþti o zaman, baþlangýç seviyesindeki birisi için
+rahat okunabilecek fazla kaynak yoktu. Ama bu kitap [1] tam da onu yapmaya
+uðraþan bir kitaptý, hatta yazarlar hiç matematiksel formül kullanmadan
+konuyu anlatmaya karar vermiþler bunu sýký bri þekilde takip etmiþler,
+kitapta hiç formül yok, herþeyi görsel olarak anlatmaya uðraþmýþlar. Görsel
+meyilli olanlarýnýz þimdiye kadar gördüklerimize farklý bir bakýþ açýsý
+saðlamasý açýsýndan bu kitabý ilginç bulabilir. Ben pür görselci deðilim
+tabii, formüllere inanýrým, onlarý severim. Þimdi kitabýn resimlerini
+görmeden önce kapaktaki resim hakkýnda bazý formüller göstermek istiyorum.
 
 Resim Rossler çekicisi denen bir çekici. Onu bulan Otto Rossler bir
-biyokimyacýydý. 
+biyokimyacýydý, 70'lý yýllarýn ortasýnda zannediyorum, bizim þu anda
+sorduðumuz sorulara benzer sorular soruyordu, kaosun geometrisini nasýl
+irdeleriz? Garip çekicilerin o þekli almalarýnýn sebebi nedir? Temel
+denklemlerini sývý dinamiðini baz alarak yazan temebilim odaklý olan
+Lorenz'in aksine, Rossler panayýra gittiði zamanki bir hikayesini
+anlatýyor, orada pamuk helvasý yapan bir makina görüyor, makinanýn kollarý
+var, önce sekizimsi, sonra saðdan solda deðiþik þekillerde hareket
+ediyorlar tabii bu sýrada helvayý karýþtýrmýþ, katlamýþ,
+vs. oluyorlar. Herneyse Rossler bu makinayý seyrederken gördüklerinin
+kaosun geometrisi ile bir alakasýnýn olabileceðini düþünmeye baþlýyor. O
+gördüðü geometriyi canladýracaðýný düþündüðü baþta biraz uydurükümsü bir
+denklem sistemi yazýyor ve bir garip çekiciyi ortaya çýkartýp
+çýkartamayacaðýný görmek istiyor. Þu denklemi yazdý ve bu denklem en basit
+garip çekiciyi içerir, hatta Lorenz sisteminden bile basittir. Ýçinde
+sadece bir (karesel, $xz$ terimi) gayrý-lineerlik vardýr (Lorenz'de iki
+vardý),
 
+$$ \dot{x} = -y -z$$
 
+$$ \dot{y} = x + a y$$
 
+$$ \dot{z} = b + z(x-c)$$
+
+Bu denklemin doðabilimsel bir anlamý yok, uyduruk, $a,b$ dýþ parametreler.
+Rossler bir sürü parametre deðerin denedi ve buldu, benim þimdi
+göstereceðim $a=b=0.2$, $c=5.7$. Bu deðerler [1]'in kapaðýndaki þekli
+ortaya çýkartacak. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from numpy import *
+from matplotlib import *
+from scipy import *
+from pylab import figure, show, setp
+from mpl_toolkits.mplot3d import Axes3D
+
+def num_rossler(x_n,y_n,z_n,h,a,b,c):
+    x_n1=x_n+h*(-y_n-z_n)
+    y_n1=y_n+h*(x_n+a*y_n)
+    z_n1=z_n+h*(b+z_n*(x_n-c))   
+    return x_n1,y_n1,z_n1
+
+a=0.2
+b=0.2
+c=5.7
+
+t_ini=0
+t_fin=32*pi
+h=0.0001
+numsteps=int((t_fin-t_ini)/h)
+
+t=linspace(t_ini,t_fin,numsteps)
+x=zeros(numsteps)
+y=zeros(numsteps)
+z=zeros(numsteps)
+x[0]=0
+y[0]=0
+z[0]=0
+
+for k in range(x.size-1):
+    [x[k+1],y[k+1],z[k+1]]=num_rossler(x[k],y[k],z[k],t[k+1]-t[k],a,b,c)
+   
+fig = figure()
+ax1 = fig.add_axes([0.1, 0.7, 0.4, 0.2])
+ax2 = fig.add_axes([0.1, 0.4, 0.4, 0.2])
+ax3 = fig.add_axes([0.1, 0.1, 0.4, 0.2])
+ax4 = fig.add_axes([0.55, 0.25, 0.35, 0.5],projection='3d')
+
+ax1.plot(t, x,color='red',lw=1,label='x(t)')
+ax1.set_xlabel('t')
+ax1.set_ylabel('x(t)')
+ax1.legend()
+ax1.axis((t_ini,t_fin,min(x),max(x)))
+
+ax2.plot(t, y,color='green',lw=1,label='y(t)')
+ax2.set_xlabel('t')
+ax2.set_ylabel('y(t)')
+ax2.legend()
+ax2.axis((t_ini,t_fin,min(y),max(y)))
+
+ax3.plot(t, z,color='blue',lw=1,label='z(t)')
+ax3.set_xlabel('t')
+ax3.set_ylabel('z(t)')
+ax3.legend()
+ax3.axis((t_ini,t_fin,min(z),max(z)))
+
+ax4.plot(x, y,z,color='black',lw=1,label='Evolution(t)')
+ax4.set_xlabel('x(t)')
+ax4.set_ylabel('y(t)')
+ax4.set_zlabel('z(t)')
+ax4.set_title('Evolution')
+plt.savefig('23_04.png')
+\end{minted}
+
+\includegraphics[width=30em]{23_04.png}
 
 
 
