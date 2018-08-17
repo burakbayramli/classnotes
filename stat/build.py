@@ -31,7 +31,6 @@ if len(sys.argv) == 1 :
     "./stat_ratings/stat_ratings.pdf " + \
     "./stat_assoc/stat_assoc.pdf " + \
     "./stat_worldcup/stat_worldcup.pdf " + \
-    "./stat_hadoop_patent/stat_hadoop_patent.pdf " + \
     "./stat_hadoop_logreg/stat_hadoop_logreg.pdf " + \
     "./stat_naive/stat_naive.pdf " + \
     "./stat_pcd/stat_pcd.pdf " + \
