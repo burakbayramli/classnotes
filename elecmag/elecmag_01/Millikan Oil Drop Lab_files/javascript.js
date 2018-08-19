@@ -142,10 +142,10 @@ function drawingpart(){
 				document.getElementById("ViewMainButton").style.visibility = "hidden";	
 			}
 			if (Viewed == "No"){
-				WriteText(450,50,"The drops will acquire a negative charge when leaving the nozzle of the bottle",22,"#990000",0.5);
-				WriteText(450,100,"Notice how some drops move up to the top plate and some accelerate downward",22,"#990000",0.5);
-				WriteText(450,150,"If no drop remains suspended between the plates, spray the oil again.",22,"#990000",0.5);
-				WriteText(450,200,"If a drop does remain suspended, click on the scope to see the size of the drop.",22,"#990000",0.5);
+				WriteText(450,50,"Püskürtücüden çıkarken damlalar eksi yük kazanacaklar",22,"#990000",0.5);
+				WriteText(450,100,"Bazı damlaların yukarı diğerlerinin aşağı gittiğine dikkat",22,"#990000",0.5);
+				WriteText(450,150,"Eğer askıda kalan damla hiç yoksa  tekrar püskürtme yapın.",22,"#990000",0.5);
+				WriteText(450,200,"Askıda kalan damla varsa, mikroskop merceğine tıklayın ve onu büyütülmüş halde görün.",22,"#990000",0.5);
 			}
 			else{
 				WriteText(450,50,"If you have calculated the charge on this drop,",22,"#990000",0.5);
@@ -157,7 +157,7 @@ function drawingpart(){
 			ctx.strokeStyle = "#000000";
 			ctx.lineWidth = 2;
 			ctx.strokeRect(600, 250, 300, 300);
-			WriteText(750,300,"Forces @ Equilibrium",22,"#990000",0.5);
+			WriteText(750,300,"Dengedeki Kuvvetler",22,"#990000",0.5);
 			DrawDrop(750,425,50*100);
 			DrawArrow(750,325, 75, 25, "#990000", 0);
 			WriteText(825,350,"Fe = qE",22,"#990000",0.5);
@@ -166,7 +166,7 @@ function drawingpart(){
 			WriteText(825,500,"Fg = mg",22,"#000099",0.5);
 		}
 		else{
-			WriteText(450,50,"Click on the Spritzer of the oil bottle to spray drops into the chamber",22,"#990000",0.5);
+			WriteText(450,50,"Fışkırtıcının yuvarlak püskürtücüsünü sıkın (tıklayarak)",22,"#990000",0.5);
 		}
 	}
 	else{
