@@ -148,10 +148,10 @@ function drawingpart(){
 				WriteText(450,200,"Askıda kalan damla varsa, mikroskop merceğine tıklayın ve onu büyütülmüş halde görün.",22,"#990000",0.5);
 			}
 			else{
-				WriteText(450,50,"If you have calculated the charge on this drop,",22,"#990000",0.5);
-				WriteText(450,100,"spray more oil and repeat the calculation for a new drop.",22,"#990000",0.5);
-				WriteText(450,150,"Collect data on at least 10 drops.",22,"#990000",0.5);
-				WriteText(450,200,"Look for a pattern in your data or share data with class and look for pattern in all the data.",22,"#990000",0.5);
+				WriteText(450,50,"Eğer bu damla üzerindeki yükü hesapladıysanız,",22,"#990000",0.5);
+				WriteText(450,100,"daha fazla yağ püskürtün ve aynı hesapları yeni bir damla üzerinde tekrarlayın.",22,"#990000",0.5);
+				WriteText(450,150,"Bu şekilde en az 10 damla üzerinde veri toplayın.",22,"#990000",0.5);
+				WriteText(450,200,"Sonra verinizde bir kalıp var mı ona bakın.",22,"#990000",0.5);
 			}
 			
 			ctx.strokeStyle = "#000000";
@@ -238,17 +238,17 @@ function drawingpart(){
 		
 		WriteText(startx + 20,starty + 230,"scale in nm",20,"#000000",0);
 		
-		WriteText(700,50,"You are viewing the drop that is in Equilibrium",16,"#FFFFFF",0.5);
-		WriteText(710,100,"Measure the radius of the drop",16,"#FFFFFF",0.5);
-		WriteText(720,150,"The oil density is " + DensityOfDrop.toFixed(0) + " kg/m^3",16,"#FFFFFF",0.5);
-		WriteText(730,200,"Calculate the Volume and Mass of the drop",16,"#FFFFFF",0.5);
-		WriteText(740,250,"Calculate the Fg on the drop",16,"#FFFFFF",0.5);
-		WriteText(750,300,"Set Fe = Fg",16,"#FFFFFF",0.5);
-		WriteText(740,350,"The capacitor plates are " + PlateSeparationmm.toFixed(1) + " mm apart",16,"#FFFFFF",0.5);
-		WriteText(730,400,"The ∆V between plates is " + Voltage.toFixed(1) + " V",16,"#FFFFFF",0.5);
-		WriteText(720,450,"Calculate the Electric Field between the plates.",16,"#FFFFFF",0.5);
-		WriteText(710,500,"Find the charge on the oil drop.",16,"#FFFFFF",0.5);
-		WriteText(700,550,"Return to Main",24,"#FFFFFF",0.5);
+		WriteText(700,50,"Şu anda dengede duran damlaya bakıyorsunuz",16,"#FFFFFF",0.5);
+		WriteText(710,100,"Damlanın çapını ölçün",16,"#FFFFFF",0.5);
+		WriteText(720,150,"Yağın yoğunluğu " + DensityOfDrop.toFixed(0) + " kg/m^3",16,"#FFFFFF",0.5);
+		WriteText(730,200,"Damlanın hacmini ve kütlesini hesapla",16,"#FFFFFF",0.5);
+		WriteText(740,250,"Damla üzerinde Fg hesapla",16,"#FFFFFF",0.5);
+		WriteText(750,300,"Fe = Fg yap",16,"#FFFFFF",0.5);
+		WriteText(740,350,"Kapasitör plakaları arası " + PlateSeparationmm.toFixed(1) + " mm ",16,"#FFFFFF",0.5);
+		WriteText(730,400,"Plakalar arasındaki ∆V  " + Voltage.toFixed(1) + " V",16,"#FFFFFF",0.5);
+		WriteText(720,450,"Plakalar arasındaki elektrik alanını hesapla.",16,"#FFFFFF",0.5);
+		WriteText(710,500,"Yağ damlasının yükünü hesapla.",16,"#FFFFFF",0.5);
+		WriteText(700,550,"Başa dön",24,"#FFFFFF",0.5);
 	}
 }
 
