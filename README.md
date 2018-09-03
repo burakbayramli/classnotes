@@ -93,37 +93,19 @@ http://sayilarvekuramlar.blogspot.com/2015/12/coklu-baks-ac-geometrisi-multiple-
 
 İçeriğe ek yapmak isteyenler [için](CONTRIBUTING.md).
 
-Dokümanların içinde görülen kod Jupyter not defteri ortamı içinden
-işletilebilir. ipython kurmak için
+Dokümanların içinde görülen kod Jupyter not defteri ya da ipythn
+ortamı içinden işletilebilir, kurmak icin `pip install jupyter` ve
+`pip install ipython`.
 
-```
-http://ipython.org/install.html
-```
+Diger temel kurulus bilgileri
 
-Kurulum olarak en acısız kurulum Anaconda üzerinden
+http://sayilarvekuramlar.blogspot.com/2016/01/python-dil-ogrenimi.html
 
-```
-http://continuum.io/downloads
-```
-
-Ubuntu'da
-
-```
-sudo apt-get install ipython ipython-notebook
-sudo pip install jupyter
-```
-
-Komut satırından [1] ipython başlatmak için
-
-```
-jupyter notebook
-```
-
-kullanılabilir. Belgelerde görülen her bölümdeki kodlar kendi başına
-(bölümün dizini içinden) işleyebilecek şekilde ayarlanmıştır. Bu
-kodlar notların Github tex dosyalarından kopyalayarak alınabilir, ya
-da ayrı ayrı elle girilir. Eğer kodlar not defteri dışında, dosya
-bazlı, pür Python olarak işletilmek istenirse,
+Belgelerde görülen her bölümdeki kodlar kendi başına (bölümün dizini
+içinden) işleyebilecek şekilde ayarlanmıştır. Bu kodlar notların
+Github tex dosyalarından kopyalayarak alınabilir, ya da ayrı ayrı elle
+girilir. Eğer kodlar not defteri dışında, dosya bazlı, pür Python
+olarak işletilmek istenirse,
 
 ```
 import numpy as np
@@ -141,6 +123,7 @@ matplotlib==2.0
 pandas
 numpy
 scipy
+ipython
 statsmodels
 arch
 rpy2
