@@ -116,8 +116,6 @@ ibarelerini her script'in başına eklemek lazım. Bu durumda kodlar
 `dosya.py` gibi bir dosya içinde kaydedilir, ve `python dosya.py` ile
 komut satırından işletilir.
 
-Kurulması gereken bazı Python paketleri (eğer Anaconda tarafından kurulmadıysa)
-
 ```
 matplotlib==2.0
 pandas
@@ -144,8 +142,8 @@ librosa
 python_speech_features
 ```
 
-Python paket kurulumu Ubuntu Linux üzerinde `conda install [paket ismi]` 
-ya da`pip install [paket ismi]` ile yapılabiliyor.
+Python paket kurulumu Ubuntu Linux üzerinde `pip install [paket ismi]`
+ile yapılabiliyor.
 
 Eğer kod içinde `import` edilen bir paket / modül ustteki listeden
 değil ise, ve bu dahil (import) edilen kod parçası doküman içinde
@@ -187,14 +185,7 @@ Bir servis / makina listesi gösteren menü çıkacak, bu menüden bir
 lme4
 tseries
 urca
-```
-
-[1] Komut satırı nedir? Windows üzerindeyseniz `Start | All Programs |
-Accessories | Command Prompt` ile başlatılır. Terminal usulü metin
-bazlı bir iletişim aracıdır - `dir`, `ls` gibi komutları
-vardır. Ubuntu üzerinde `Applications | Accessories | Terminal` ile
-başlatılabilir. Kodları ve dökümanları nereye açtıysanız, o dizine
-komut satırından `cd [dizin ismi]` ile gidebilirsiniz.
+``
 
 ## English
 
