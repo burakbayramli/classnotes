@@ -93,7 +93,7 @@ http://sayilarvekuramlar.blogspot.com/2015/12/coklu-baks-ac-geometrisi-multiple-
 
 İçeriğe ek yapmak isteyenler [için](CONTRIBUTING.md).
 
-Dokümanların içinde görülen kod Jupyter not defteri ya da ipythn
+Dokümanların içinde görülen kod Jupyter not defteri ya da ipython
 ortamı içinden işletilebilir, kurmak icin `pip install jupyter` ve
 `pip install ipython`.
 
