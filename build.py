@@ -89,7 +89,7 @@ if __name__ == "__main__":
             for subdir in sorted(os.listdir(dir)):
                 if not os.path.isdir(dir + "/" + subdir): continue
                 print 'subdir',subdir
-                if "cover" in subdir or "00" in subdir: continue
+                if "cover" in subdir or "00" in subdir : continue
                 print dir + "/" + subdir
                 # read tex file, get header
                 fin = open(dir + "/" + subdir + "/" + subdir + ".tex")
