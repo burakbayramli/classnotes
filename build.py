@@ -62,7 +62,7 @@ if __name__ == "__main__":
             if ".git" in x: continue
             if os.path.isdir(x):
                 os.chdir(x)
-                print "building", x
+                print ("building", x)
                 os.system("python build.py")
                 os.chdir("..")
 
@@ -70,15 +70,15 @@ if __name__ == "__main__":
         
         fr = os.getcwd()
         cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, TARGET_DIR)
-        print cmd
+        print (cmd)
         os.system(cmd)
         
         for topdir in ['algs','calc_multi','chaos','compscieng','elecmag',
                        'func_analysis','linear','ode','pde','stat',
                        'tser','vision']:
-            print 'main',topdir
+            print ('main',topdir)
             dir = TARGET_DIR + "/" + topdir
-            print 'dir',dir
+            print ('dir',dir)
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
             fout.write("<html>\n")
             fout.write(u"""
@@ -88,13 +88,15 @@ if __name__ == "__main__":
             """)
             for subdir in sorted(os.listdir(dir)):
                 if not os.path.isdir(dir + "/" + subdir): continue
-                print 'subdir',subdir
+                print ('subdir',subdir)
                 if "cover" in subdir or "00" in subdir : continue
-                print dir + "/" + subdir
+                print (dir + "/" + subdir)
                 # read tex file, get header
-                fin = open(dir + "/" + subdir + "/" + subdir + ".tex")
+                #fin = open(dir + "/" + subdir + "/" + subdir + ".tex")
+                ff = dir + "/" + subdir + "/" + subdir + ".tex"
+                fin = codecs.open(ff, encoding='iso-8859-9')
                 content = fin.read()
-                title = re.findall(u"begin.*?document.*?\n(.*?)\n",content.decode('latin5'),re.DOTALL)[0]
+                title = re.findall(u"begin.*?document.*?\n(.*?)\n",content,re.DOTALL)[0]
                 url = translit_low(title)
                 url = url.replace(" ","_")
                 url = url.replace("(","_")
@@ -105,22 +107,22 @@ if __name__ == "__main__":
                 url = url.replace(",","")
                 url = url.replace("?","")
                 url = url + ".html"
-                print 'the url is', subdir + "/" + url
+                print ('the url is', subdir + "/" + url)
                 
                 line = "<a href='%s'>%s</a><br/><br/>" % (subdir + "/" + url, title)
-                print line
+                print (line)
                 fout.write(line)
                 fout.write("\n")
                 fin.close()
 
-                print 'chdir', dir + "/" + subdir
+                print ('chdir', dir + "/" + subdir)
                 os.chdir(dir + "/" + subdir)
 
                 if os.path.isfile(subdir + ".html"): 
                     textime = os.path.getmtime(subdir + ".tex")
                     htmltime = os.path.getmtime(subdir + ".html")
                     if htmltime > textime:
-                        print "HTML exists.. skipping"
+                        print ("HTML exists.. skipping")
                         continue
 
                 ocfg = open(subdir + ".cfg", "w")
