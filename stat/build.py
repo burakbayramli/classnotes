@@ -39,7 +39,7 @@ if len(sys.argv) == 1 :
     "./stat_appendix/stat_appendix.pdf " + \
     "output ../../Dropbox/Public/skfiles/stat.pdf"
     
-    print cmd
+    print (cmd)
     os.system(cmd)
     exit()
     
