@@ -122,28 +122,33 @@ aic 1907.7277269856995
 Þimdi bir ARIMA paketi ile aynýsýný yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-%load_ext rpy2.ipython
-\end{minted}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-lynx = df.x
-%R -i lynx
-%R model10<-arima(lynx,order=c(1,0,0))
-%R -o res res = model10
-print res
+from statsmodels.tsa.arima_model import ARIMA
+model10 = ARIMA(df.x, order=(1,0,0))
+model_fit = model10.fit(disp=0)
+print(model_fit.summary())
 \end{minted}
 
 \begin{verbatim}
-
-Call:
-arima(x = lynx, order = c(1, 0, 0))
-
-Coefficients:
-         ar1  intercept
-      0,7173  1550,5708
-s.e.  0,0649   356,6935
-
-sigma^2 estimated as 1210542:  log likelihood = -960,5,  aic = 1926,99
+                              ARMA Model Results                              
+==============================================================================
+Dep. Variable:                      x   No. Observations:                  114
+Model:                     ARMA(1, 0)   Log Likelihood                -960.495
+Method:                       css-mle   S.D. of innovations           1100.247
+Date:                Tue, 13 Nov 2018   AIC                           1926.991
+Time:                        11:45:20   BIC                           1935.199
+Sample:                             0   HQIC                          1930.322
+                                                                              
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const       1550.1773    356.690      4.346      0.000     851.078    2249.276
+ar.L1.x        0.7173      0.065     11.042      0.000       0.590       0.845
+                                    Roots                                    
+=============================================================================
+                  Real          Imaginary           Modulus         Frequency
+-----------------------------------------------------------------------------
+AR.1            1.3941           +0.0000j            1.3941            0.0000
+-----------------------------------------------------------------------------
 \end{verbatim}
 
 Sonuçlar oldukça yakýn (gerçi kesi farklý -niye?-, ama katsayý daha önemli).
@@ -153,28 +158,26 @@ En Ýyi Model?
 AR, ARIMA, MA, onlarýn dereceleri arasýnda bir seçim yapmak gerekiyor. Önce
 sýrf AR deneyelim,
 
+
+
 \begin{minted}[fontsize=\footnotesize]{python}
-lynx = df.x
-%R -i lynx
-%R model10<-arima(lynx,order=c(1,0,0))
-%R model20<-arima(lynx,order=c(2,0,0))
-%R model30<-arima(lynx,order=c(3,0,0))
-%R model40<-arima(lynx,order=c(4,0,0))
-%R model50<-arima(lynx,order=c(5,0,0))
-%R model60<-arima(lynx,order=c(6,0,0))
-%R -o res res<-AIC(model10,model20,model30,model40,model50,model60)
-print res
+res = []
+res.append(ARIMA(df.x, order=(1,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(2,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(3,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(4,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(5,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(6,0,0)).fit(disp=0))
+for x in res: print (x.df_model+1, x.aic)
 \end{minted}
 
 \begin{verbatim}
-        df      AIC
-model10  3 1926,991
-model20  4 1878,032
-model30  5 1879,957
-model40  6 1874,222
-model50  7 1875,276
-model60  8 1876,858
-
+3 1926.9906490207566
+4 1878.031850120836
+5 1879.9567487161364
+6 1874.221797648189
+7 1875.2758635012437
+8 1876.858328122954
 \end{verbatim}
 
 En iyi model AR(4) olarak gözüküyor. Þimdi sadece MA olarak bakalým,
