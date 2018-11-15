@@ -45,10 +45,10 @@ if len(sys.argv) == 1:
     ./zapp/zapp.pdf \
     output ../../Dropbox/Public/skfiles/algs.pdf"
     os.system(cmd)
-    print cmd
+    print (cmd)
     exit()
 elif sys.argv[1] == 'all':
-    print os.listdir(".")
+    print (os.listdir("."))
     for a in os.listdir("."):
         if os.path.isdir(a):
             os.chdir(a)
