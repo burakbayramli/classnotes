@@ -14,21 +14,286 @@ Niye ikinci türev? Çünkü KM tarihi veriye bakarak bulmuþtur ki enflasyon ve
 büyümenin deðiþim hýzý senetlerin, tahvillerin getirisi ile çok yakýnan
 baðlantýlýdýr. 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+df1 = pd.read_csv('quandl-gdp.csv',index_col=0,parse_dates=True)
+df2 = pd.read_csv('quandl-inf.csv',index_col=0,parse_dates=True)
+
+df1['gdpyoy'] = (df1.Value - df1.Value.shift(4)) / df1.Value.shift(4) * 100.0
+def f(x):
+    if x.name.month == 4: return "%d%s" % (x.name.year,"Q1")
+    elif x.name.month == 7: return "%d%s" % (x.name.year, "Q2")
+    elif x.name.month == 10: return "%d%s" % (x.name.year, "Q3")
+    elif x.name.month == 1: return "%d%s" % (x.name.year-1, "Q4")
+
+df1['Q'] = df1.apply(f, axis=1)
+print (df1[['gdpyoy','Q']].tail(3))
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+df1 = pd.read_csv('quandl-gdp.csv',index_col=0,parse_dates=True)
+df2 = pd.read_csv('quandl-inf.csv',index_col=0,parse_dates=True)
+
+df1['gdpyoy'] = (df1.Value - df1.Value.shift(4)) / df1.Value.shift(4) * 100.0
+def f(x):
+    if x.name.month == 4: return "%d%s" % (x.name.year,"Q1")
+    elif x.name.month == 7: return "%d%s" % (x.name.year, "Q2")
+    elif x.name.month == 10: return "%d%s" % (x.name.year, "Q3")
+    elif x.name.month == 1: return "%d%s" % (x.name.year-1, "Q4")
+
+df1['Q'] = df1.apply(f, axis=1)
+print (df1[['gdpyoy','Q']].tail(3))
+\end{minted}
+
+\begin{verbatim}
+              gdpyoy       Q
+Date                        
+2018-01-01  2.580414  2017Q4
+2018-04-01  2.869807  2018Q1
+2018-07-01  3.039632  2018Q2
+\end{verbatim}
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df2['cpi'] = df2.resample('Q')[['Value']].mean()
+df2c = df2.dropna()
+
+def f(x):
+    if x.name.month == 3: return "%d%s" % (x.name.year,"Q1")
+    elif x.name.month == 6: return "%d%s" % (x.name.year, "Q2")
+    elif x.name.month == 9: return "%d%s" % (x.name.year, "Q3")
+    elif x.name.month == 12: return "%d%s" % (x.name.year, "Q4")
+
+df2c['Q'] = df2c.apply(f, axis=1)
+print (df2c[['cpi','Q']].tail(3))
+print (df2c.tail(3))
+\end{minted}
+
+\begin{verbatim}
+                 cpi       Q
+Date                        
+2018-03-31  2.214333  2018Q1
+2018-06-30  2.712000  2018Q2
+2018-09-30  2.642000  2018Q3
+            Value   ...         Q
+Date                ...          
+2018-03-31  2.360   ...    2018Q1
+2018-06-30  2.872   ...    2018Q2
+2018-09-30  2.277   ...    2018Q3
+
+[3 rows x 3 columns]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = df1[['gdpyoy','Q']].merge(df2c[['cpi','Q']], on='Q')
+df['gdpyoy'] = df.gdpyoy.shift(1)
+df['gdpdiff'] = df.gdpyoy.diff()
+df['cpidiff'] = df.cpi.diff()
+df = df.dropna()
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df3 = df.copy()
+roll=4;delay=-1
+df3['gdpyoydiff'] = df3['gdpyoy'].diff()
+df3['x']= df3['gdpyoy'].diff().rolling(roll).mean() * 100.0
+df3['y'] = (df3.gdpyoy.diff() *100.0).shift(delay)
+df4 = df3.head(250)
+plt.xlim(-300,300)
+plt.ylim(-300,300)
+plt.plot(df4.x,df4.y,'.')
+plt.savefig('tser_macromkt_01.png')
+
+import statsmodels.formula.api as smf
+results = smf.ols('y ~ x', data=df4).fit()
+
+df5 = df3.tail(30)
+df5['ypred'] = df5.x*results.params['x'] + results.params['Intercept']
+#df5['ypred'] = df5.x*(-0.9095) + 3.3631
+#df5['ypred'] = df5.x*(0.73596) - 0.11808703
+df5['sign_acc'] = ((df5.ypred * df5.y) > 0)
+print (df5.sign_acc.sum() / len(df5))
+print (results.aic)
+print (results.params)
+print (results.rsquared)
+tmp = np.array(df5[['gdpyoy','y','ypred','sign_acc']])
+#print (tmp)
+\end{minted}
+
+\begin{verbatim}
+0.6666666666666666
+3155.5173735898506
+Intercept    1.420050
+x           -0.067526
+dtype: float64
+0.001947943182620926
+\end{verbatim}
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df6 = df5.copy()
+df6.loc[:,'gdpyoypred'] = (df6['gdpyoy'] + df6['ypred']/5.0)
+df6.loc[:,'gdpyoy2'] = df6['gdpyoy'].shift(1)
+df6[['gdpyoy2','gdpyoypred']].plot()
+plt.savefig('tser_macromkt_02.png')
+print (df6[['gdpyoy','ypred']].tail(3))
+\end{minted}
+
+\begin{verbatim}
+       gdpyoy     ypred
+284  2.471707  0.419066
+285  2.580414  0.336008
+286  2.869807  0.145337
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import random
+plt.xlim(-1.0,1.0)
+plt.ylim(-1.0,1.0)
+plt.grid()
+res = df[['Q','cpidiff','gdpdiff']].tail(14)
+for (q,x,y) in np.array(res):
+    plt.plot(x,y,'rd')
+    xa = random.choice(np.linspace(0,0.05,3))
+    plt.text(x+xa,y+xa,q)
+plt.savefig('tser_macromkt_03.png')    
+\end{minted}
+
+\includegraphics[width=20em]{tser_macromkt_01.png}
+
+\includegraphics[width=20em]{tser_macromkt_02.png}
+
+\includegraphics[width=20em]{tser_macromkt_03.png}
+
+Oynaklik 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import norm
+import datetime, numpy as np
+
+def find_vol(target_value, call_put, S, K, T, r):
+    MAX_ITERATIONS = 100
+    PRECISION = 1.0e-5
+
+    sigma = 0.5
+    for i in range(0, MAX_ITERATIONS):
+        price = bs_price(call_put, S, K, T, r, sigma)
+        vega = bs_vega(call_put, S, K, T, r, sigma)
+        price = price
+        diff = target_value - price  # our root
+
+        print (i, sigma, diff)
+
+        if (abs(diff) < PRECISION): return sigma
+        sigma = sigma + diff/vega # f(x) / f'(x)
+
+    return sigma
+
+
+n = norm.pdf
+N = norm.cdf
+
+def bs_price(cp_flag,S,K,T,r,v,q=0.0):
+    d1 = (np.log(S/K)+(r+v*v/2.)*T)/(v*np.sqrt(T))
+    d2 = d1-v*np.sqrt(T)
+    if cp_flag == 'c':
+        price = S*np.exp(-q*T)*N(d1)-K*np.exp(-r*T)*N(d2)
+    else:
+        price = K*np.exp(-r*T)*N(-d2)-S*np.exp(-q*T)*N(-d1)
+    return price
+
+def bs_vega(cp_flag,S,K,T,r,v,q=0.0):
+    d1 = (np.log(S/K)+(r+v*v/2.)*T)/(v*np.sqrt(T))
+    return S * np.sqrt(T)*n(d1)
+
+def test1():
+    
+    V_market = 17.5
+    K = 585
+    T = (datetime.date(2014,10,18) - datetime.date(2014,9,8)).days / 365.
+    S = 586.08
+    r = 0.0002
+    cp = 'c' # call option
+    
+    implied_vol = find_vol(V_market, cp, S, K, T, r)
+    
+    print ('Implied vol: %.2f%%' % (implied_vol * 100))
+    
+    print ('Market price = %.2f' % V_market)
+    print ('Model price = %.2f' % bs_price(cp, S, K, T, r, implied_vol))
+
+test1()
+\end{minted}
+
+\begin{verbatim}
+0 0.5 -21.669539271534063
+1 0.21879739316064523 0.03217154881230044
+2 0.21921383628613422 1.9891615465894574e-08
+Implied vol: 21.92%
+Market price = 17.50
+Model price = 17.50
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import numpy as np
+from datetime import datetime
+from datetime import date
+import pandas_datareader.data as web
+
+pd.set_option('display.notebook_repr_html', False)
+pd.set_option('display.max_columns', 7)
+pd.set_option('display.max_rows', 10) 
+pd.set_option('display.width', 82) 
+pd.set_option('precision', 3)
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+aapl_options = web.Options('AAPL', 'yahoo')
+aapl_options = aapl_options.get_all_data().reset_index()
+aapl_options.to_csv('tmp-opout.csv')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+aapl_options = pd.read_csv('aapl_options.csv',  parse_dates=['Expiry'])
+aapl_options['IV'].tail(4)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+aos = aapl_options.sort_values(['Expiry', 'Strike'])[['Expiry', 'Strike', 'Type', 'IV', 'Bid', 'Ask', 'Underlying_Price']] 
+aos['IV'] = aos['IV'].apply(lambda x: float(x.strip('%')))
+aos[:5]
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+aos['Expiry'].unique()
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+aos.loc[158]
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+calls1 = aos[(aos.Expiry=='2015-02-27') & (aos.Type=='call')]
+calls1[:5]
+\end{minted}
 
 
 
 
 
+Kaynaklar
 
-
+[1] \url{http://www.codeandfinance.com/finding-implied-vol.html}
 
 
 \end{document}
-
-
-
-
-
-
-
 
