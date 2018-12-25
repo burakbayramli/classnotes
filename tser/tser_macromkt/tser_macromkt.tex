@@ -1,6 +1,6 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Makro Bilgisi ve Piyasalarin Gidisatinin Baglantisi
+Makro Bilgisi ve Piyasalarýn Gidiþatýnýn Baðlantýsý
 
 Hedgeye kuruluþunun CEO'su Keith Mccollough (KM) baþlangýç olarak iki deðiþkene
 bakarak nereye yatýrým yapýlmasý gerektiðine karar verebilmekte. Bu iki deðiþken
@@ -12,7 +12,18 @@ hýzýna. Fizikle alakalandýrmak gerekirse enflasyonun ``ivmesinden'' ya da
 
 Niye ikinci türev? Çünkü KM tarihi veriye bakarak bulmuþtur ki enflasyon ve
 büyümenin deðiþim hýzý senetlerin, tahvillerin getirisi ile çok yakýnan
-baðlantýlýdýr. 
+baðlantýlýdýr.
+
+Deðiþimin deðiþimi þu þekilde hesaplanýr: ilk deðiþim yýl-üzeri-yýl
+(year-over-year, YoY) üzerinden, yani mesela, bir çeyrek için büyüme yüzdesi
+hesaplanacaksa bu ayný senedeki bir önceki çeyreðe deðil, 1 sene önceki ayný
+çeyreg bakýlarak yapýlýr. Böylece her zaman elmalarý elmalar ile karþýlaþtýrmýþ
+oluruz ve mevsimsel farklýlýklar hakkýnda endiselenmek gerekmez. Mesela 2010
+senesindeki 4. çeyrek 3. çeyrekten büyük ise, belki bu büyüklük kýþ zamanýnda
+bazý þeylerin hep daha fazla yapýlmasýndan ileri geliyordur, ama 2010 çeyrek 4'u
+2009 çeyrek 4 ile karþýlaþtýrýrsak bu mevsimsel farklýlýklardan kurtulmuþ
+oluruz. Bu zaman serisi hesaplandýktan sonra ikinci fark hesabý klasik þekilde
+yapýlabilir. Enflasyon ayný þekilde, YoY usulü. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -29,36 +40,7 @@ def f(x):
 
 df1['Q'] = df1.apply(f, axis=1)
 print (df1[['gdpyoy','Q']].tail(3))
-\end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-
-df1 = pd.read_csv('quandl-gdp.csv',index_col=0,parse_dates=True)
-df2 = pd.read_csv('quandl-inf.csv',index_col=0,parse_dates=True)
-
-df1['gdpyoy'] = (df1.Value - df1.Value.shift(4)) / df1.Value.shift(4) * 100.0
-def f(x):
-    if x.name.month == 4: return "%d%s" % (x.name.year,"Q1")
-    elif x.name.month == 7: return "%d%s" % (x.name.year, "Q2")
-    elif x.name.month == 10: return "%d%s" % (x.name.year, "Q3")
-    elif x.name.month == 1: return "%d%s" % (x.name.year-1, "Q4")
-
-df1['Q'] = df1.apply(f, axis=1)
-print (df1[['gdpyoy','Q']].tail(3))
-\end{minted}
-
-\begin{verbatim}
-              gdpyoy       Q
-Date                        
-2018-01-01  2.580414  2017Q4
-2018-04-01  2.869807  2018Q1
-2018-07-01  3.039632  2018Q2
-\end{verbatim}
-
-
-
-\begin{minted}[fontsize=\footnotesize]{python}
 df2['cpi'] = df2.resample('Q')[['Value']].mean()
 df2c = df2.dropna()
 
@@ -74,6 +56,11 @@ print (df2c.tail(3))
 \end{minted}
 
 \begin{verbatim}
+              gdpyoy       Q
+Date                        
+2018-01-01  2.580414  2017Q4
+2018-04-01  2.869807  2018Q1
+2018-07-01  3.039632  2018Q2
                  cpi       Q
 Date                        
 2018-03-31  2.214333  2018Q1
@@ -96,6 +83,20 @@ df['cpidiff'] = df.cpi.diff()
 df = df.dropna()
 \end{minted}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import random
+plt.xlim(-1.0,1.0)
+plt.ylim(-1.0,1.0)
+plt.grid()
+res = df[['Q','cpidiff','gdpdiff']].tail(14)
+for (q,x,y) in np.array(res):
+    plt.plot(x,y,'rd')
+    xa = random.choice(np.linspace(0,0.05,3))
+    plt.text(x+xa,y+xa,q)
+plt.savefig('tser_macromkt_03.png')    
+\end{minted}
+
+\includegraphics[width=20em]{tser_macromkt_03.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 df3 = df.copy()
@@ -134,8 +135,6 @@ dtype: float64
 0.001947943182620926
 \end{verbatim}
 
-
-
 \begin{minted}[fontsize=\footnotesize]{python}
 df6 = df5.copy()
 df6.loc[:,'gdpyoypred'] = (df6['gdpyoy'] + df6['ypred']/5.0)
@@ -152,24 +151,9 @@ print (df6[['gdpyoy','ypred']].tail(3))
 286  2.869807  0.145337
 \end{verbatim}
 
-\begin{minted}[fontsize=\footnotesize]{python}
-import random
-plt.xlim(-1.0,1.0)
-plt.ylim(-1.0,1.0)
-plt.grid()
-res = df[['Q','cpidiff','gdpdiff']].tail(14)
-for (q,x,y) in np.array(res):
-    plt.plot(x,y,'rd')
-    xa = random.choice(np.linspace(0,0.05,3))
-    plt.text(x+xa,y+xa,q)
-plt.savefig('tser_macromkt_03.png')    
-\end{minted}
-
 \includegraphics[width=20em]{tser_macromkt_01.png}
 
 \includegraphics[width=20em]{tser_macromkt_02.png}
-
-\includegraphics[width=20em]{tser_macromkt_03.png}
 
 Oynaklik 
 
@@ -255,44 +239,37 @@ pd.set_option('display.width', 82)
 pd.set_option('precision', 3)
 \end{minted}
 
-
-\begin{minted}[fontsize=\footnotesize]{python}
-aapl_options = web.Options('AAPL', 'yahoo')
-aapl_options = aapl_options.get_all_data().reset_index()
-aapl_options.to_csv('tmp-opout.csv')
-\end{minted}
-
 \begin{minted}[fontsize=\footnotesize]{python}
 aapl_options = pd.read_csv('aapl_options.csv',  parse_dates=['Expiry'])
 aapl_options['IV'].tail(4)
-\end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{python}
 aos = aapl_options.sort_values(['Expiry', 'Strike'])[['Expiry', 'Strike', 'Type', 'IV', 'Bid', 'Ask', 'Underlying_Price']] 
 aos['IV'] = aos['IV'].apply(lambda x: float(x.strip('%')))
 aos[:5]
-\end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{python}
 aos['Expiry'].unique()
-\end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{python}
 aos.loc[158]
-\end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{python}
 calls1 = aos[(aos.Expiry=='2015-02-27') & (aos.Type=='call')]
 calls1[:5]
 \end{minted}
 
-
-
-
+\begin{verbatim}
+Out[1]: 
+        Expiry  Strike  Type      IV    Bid    Ask  Underlying_Price
+158 2015-02-27    75.0  call  271.88  53.60  53.85            128.79
+190 2015-02-27    80.0  call  225.78  48.65  48.80            128.79
+226 2015-02-27    85.0  call  199.22  43.65  43.80            128.79
+265 2015-02-27    90.0  call  175.00  38.65  38.80            128.79
+303 2015-02-27    93.0  call  160.16  35.65  35.80            128.79
+\end{verbatim}
 
 Kaynaklar
 
 [1] \url{http://www.codeandfinance.com/finding-implied-vol.html}
+
+[2] Heydt, {\em Mastering Pandas for Finance}
 
 
 \end{document}

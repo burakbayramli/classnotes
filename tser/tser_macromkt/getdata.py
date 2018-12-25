@@ -10,3 +10,7 @@ df1 = quandl.get("FRED/GDPC1-Real-Gross-Domestic-Product", returns="pandas",auth
 df2 = quandl.get("RATEINF/INFLATION_USA-Inflation-YOY-USA", returns="pandas",authtoken=auth)
 df1.to_csv('quandl-gdp.csv')
 df2.to_csv('quandl-inf.csv')
+
+# deprecated
+#aapl_options = web.Options('AAPL', 'yahoo')
+#aapl_options = aapl_options.get_all_data().reset_index()
