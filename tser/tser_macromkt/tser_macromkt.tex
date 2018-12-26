@@ -148,65 +148,9 @@ edebilen makro geleceði tahmin eder, ve Hedgeye þirketi bu ise müthiþ
 odaklýdýr. Aslýnda kabaca düþününce bu tahminin imkansýz olmayacaðý anlaþýlýr,
 eðer sinüs eðrisinin neresinde olacaðýmýzý tahmin etmeye uðraþýyorsak, bunu
 nerede olduðumuza, nereden geldiðimize bakarak yapabilmemiz gerekir. HE
-hakikaten YoY verisinden geriye bakarak, hareket eden bir ortalamayý bir sonraki
-çeyreðin verisiyle regresyona sokarak tahmin edebiliyor [10]. 
-
-\begin{minted}[fontsize=\footnotesize]{python}
-df3 = df.copy()
-roll=4;delay=-1
-df3['gdpyoydiff'] = df3['gdpyoy'].diff()
-df3['x']= df3['gdpyoy'].diff().rolling(roll).mean() * 100.0
-df3['y'] = (df3.gdpyoy.diff() *100.0).shift(delay)
-df4 = df3.head(250)
-plt.xlim(-300,300)
-plt.ylim(-300,300)
-plt.plot(df4.x,df4.y,'.')
-plt.savefig('tser_macromkt_01.png')
-
-import statsmodels.formula.api as smf
-results = smf.ols('y ~ x', data=df4).fit()
-
-df5 = df3.tail(30)
-df5['ypred'] = df5.x*results.params['x'] + results.params['Intercept']
-#df5['ypred'] = df5.x*(-0.9095) + 3.3631
-#df5['ypred'] = df5.x*(0.73596) - 0.11808703
-df5['sign_acc'] = ((df5.ypred * df5.y) > 0)
-print (df5.sign_acc.sum() / len(df5))
-print (results.aic)
-print (results.params)
-print (results.rsquared)
-tmp = np.array(df5[['gdpyoy','y','ypred','sign_acc']])
-#print (tmp)
-\end{minted}
-
-\begin{verbatim}
-0.6666666666666666
-3155.5173735898506
-Intercept    1.420050
-x           -0.067526
-dtype: float64
-0.001947943182620926
-\end{verbatim}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-df6 = df5.copy()
-df6.loc[:,'gdpyoypred'] = (df6['gdpyoy'] + df6['ypred']/5.0)
-df6.loc[:,'gdpyoy2'] = df6['gdpyoy'].shift(1)
-df6[['gdpyoy2','gdpyoypred']].plot()
-plt.savefig('tser_macromkt_02.png')
-print (df6[['gdpyoy','ypred']].tail(3))
-\end{minted}
-
-\begin{verbatim}
-       gdpyoy     ypred
-284  2.471707  0.419066
-285  2.580414  0.336008
-286  2.869807  0.145337
-\end{verbatim}
-
-\includegraphics[width=20em]{tser_macromkt_01.png}
-
-\includegraphics[width=20em]{tser_macromkt_02.png}
+hakikaten YoY verisinden geriye bakarak ortalamaya donus zamanini tahmin
+edebiliyor. Tam degisim hizi tahmini icin 30 tane faktoru kullanarak bir diger
+regresyon yapiyorlar [10]. 
 
 Oynaklik 
 
@@ -317,6 +261,21 @@ Out[1]:
 265 2015-02-27    90.0  call  175.00  38.65  38.80            128.79
 303 2015-02-27    93.0  call  160.16  35.65  35.80            128.79
 \end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('GOOG.csv')
+cl = df['Close']
+print (np.std(cl.pct_change()))
+print (np.std(cl))
+#print (df['Close'])
+\end{minted}
+
+\begin{verbatim}
+0.012951898037880208
+28.431701168145946
+\end{verbatim}
+
 
 1-4 main, 5-8 vol
 
