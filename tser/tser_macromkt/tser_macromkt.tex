@@ -179,9 +179,9 @@ haricindeki tüm parametreler biliniyor.
 Bir örnek üzerinde görelim, piyasada mevcut opsiyonlara baktýðýmýzda GOOG
 (Google) için 18 Ekim 2014'te biten bir opsiyon görüyoruz, kullaným fiyatý
 \$585, teklif fiyati \$17.50. Yani $V,K,T$ elimizde. Bugünkü (opsiyon bitiþinden
-bir ay önce, 18 Eylül) senet fiyatlarýna bakýyoruz, GOOG \$586.08 seviyesinde,
-bu da $S$. Risksiz faiz için 4 haftalýk tahvil faizlerine bakabiliriz, ki o da
-þu anda \%0.02 seviyesinde. Bu verilerle
+kabaca bir ay önce, 9 Eylül) senet fiyatlarýna bakýyoruz, GOOG \$586.08
+seviyesinde, bu da $S$. Risksiz faiz için 4 haftalýk tahvil faizlerine
+bakabiliriz, ki o da þu anda \%0.02 seviyesinde. Bu verilerle
 
 $$ V = BS(S,K,r,T,\sigma) $$
 
@@ -190,16 +190,37 @@ $$ 17.50 = BS(586.08, 585.00, 0.0002, 0.10958.., \sigma)$$
 Þimdi elimizde tek bilinmeyen $\sigma$. Fiyatlandýrmayý yapan kuruluþlar tabii
 ki oraya bir deðer girerek 17.50 fiyatýný bulmuþlar, biz verilirk fiyat $\sigma$
 harici bilinen tüm parametrelerle tek bilinmeyen $\sigma$'yi bulmaya
-uðraþacaðýz.
+uðraþacaðýz [8].
 
-Ne yazýk ki B-S denklemini cebirsel olarak tekrar düzenleyip $\sigma$'yi
+Ne yazýk ki B-S denklemini cebirsel olarak tekrar düzenleyip $\sigma$'yý
 eþitliðin bir tarafýnda tek baþýna býrakmak analitik olarak mümkün deðil. Ama
 sayýsal kök bulma yöntemlerini kullanabiliriz. Bu yöntemlerden Newton'un
-yöntemini {\em Diferansiyel Denklemler, Kök Bulmak, Karesel Formül} yazýsýndan
-gördük. 
+yöntemini {\em Diferansiyel Denklemler, Kök Bulmak, Karesel Formül} yazýsýnda
+gördük.
+
+Bir $f(x)$ için $f(x)=0$ sonucunu verecek $x$ deðerlerini bulmak kök
+bulmaktýr. Tabii üstteki problemde fonksiyonu sýfýr olmayan belli bir sabite
+olan eþitliðe göre ayarlamak lazým, $f(x) = a$ gibi, ama bu problemi yine kök
+bulmaya çevirebiliriz, $g(x) = a-f(x) = 0$ ile mesela. Ardýndan Newton yöntemini
+yine olduðu gibi, $g$ üzerinde kullanýrýz,
+
+$$
+x_{n+1} = x_n - \frac{g(x_n)}{g'(x_n)}
+$$
+
+ya da 
+
+$$
+x_{n+1} = x_n - \frac{a-f(x_n)}{f'(x_n)}
+$$
+
+Peki türev $g'(x)$ nereden geliyor? B-S türetimini bilenler oynaklýða göre
+$g(x)$'nin türevinin ``vega fonksiyonu'' olduðunu bilirler. Bu fonksiyon B-S
+matematiði içinde bilinen, standart bir fonksiyon.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from scipy.stats import norm import datetime, numpy as np
+from scipy.stats import norm
+import datetime, numpy as np
 
 def find_vol(target_value, call_put, S, K, T, r):
     MAX_ITERATIONS = 100
@@ -209,7 +230,6 @@ def find_vol(target_value, call_put, S, K, T, r):
     for i in range(0, MAX_ITERATIONS):
         price = bs_price(call_put, S, K, T, r, sigma)
         vega = bs_vega(call_put, S, K, T, r, sigma)
-        price = price
         diff = target_value - price  # our root
 
         print (i, sigma, diff)
@@ -247,10 +267,10 @@ def test1():
     
     implied_vol = find_vol(V_market, cp, S, K, T, r)
     
-    print ('Implied vol: %.2f%%' % (implied_vol * 100))
+    print ('Ima edilen oynaklik (implied vol): %.2f%%' % (implied_vol * 100))
     
-    print ('Market price = %.2f' % V_market)
-    print ('Model price = %.2f' % bs_price(cp, S, K, T, r, implied_vol))
+    print ('Piyasa fiyat (market price) = %.2f' % V_market)
+    print ('Model fiyati (model price) = %.2f' % bs_price(cp, S, K, T, r, implied_vol))
 
 test1()
 \end{minted}
@@ -259,11 +279,31 @@ test1()
 0 0.5 -21.669539271534063
 1 0.21879739316064523 0.03217154881230044
 2 0.21921383628613422 1.9891615465894574e-08
-Implied vol: 21.92%
-Market price = 17.50
-Model price = 17.50
+Ima edilen oynaklik (implied vol): 21.92%
+Piyasa fiyat (market price) = 17.50
+Model fiyati (model price) = 17.50
 \end{verbatim}
 
+Simdi opsiyona baktigimizdaki oynaklik ile bir ay sonrasindaki gercek oynakligi
+karsilastiralim. Acaba ima edilen oynakligin tahmin edici kuvveti var mi? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('GOOG.csv')
+print (len(df))
+print ('8 eyluldeki gercek oynaklik', np.std(df['Close'].head(252).pct_change()) * np.sqrt(252))
+print ('18 ekimdeki gercek oynaklik', np.std(df['Close'].tail(252).pct_change()) * np.sqrt(252))
+\end{minted}
+
+\begin{verbatim}
+281
+8 eyluldeki gercek oynaklik 0.24023589641421986
+18 ekimdeki gercek oynaklik 0.20560500728697875
+\end{verbatim}
+
+Görüldüðü gibi üstteki hesaptan yüzde 22 elde ettik, yani 8 Eylül'deki yüzde
+24'ten bir iniþ tahmin edildi. Bu iniþ gerçekten ortaya çýktý, yüzde 20'ye doðru
+bir iniþ oldu, ve bu iniþ üzerinden iþlem yapmýþ olsak para kazanmýþ olurduk.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -278,6 +318,12 @@ pd.set_option('display.max_rows', 10)
 pd.set_option('display.width', 82) 
 pd.set_option('precision', 3)
 \end{minted}
+
+Altta daha önce Yahoo finans servisinen indirilmiþ opsiyon verisi üzerinde bazý
+iþlemleri görüyoruz. Bunlarý referans amaçlý burada tutuyoruz. Dikkat edersek
+veride `ÝV` adýnda bir kolon var, bu kolon ima edilen oynaklýk olarak
+gösterilir. Ne kadar gerçeði yansýtýyor bilmiyoruz, ama aklýmýzda olsun, bu
+kolonu da belki olduðu gibi kullanmak mümkündür. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 aapl_options = pd.read_csv('aapl_options.csv',  parse_dates=['Expiry'])
@@ -303,21 +349,6 @@ Out[1]:
 226 2015-02-27    85.0  call  199.22  43.65  43.80            128.79
 265 2015-02-27    90.0  call  175.00  38.65  38.80            128.79
 303 2015-02-27    93.0  call  160.16  35.65  35.80            128.79
-\end{verbatim}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-df = pd.read_csv('GOOG.csv')
-print (len(df))
-print (np.std(df['Close'].head(254).pct_change()) * np.sqrt(252))
-print (np.std(df['Close'].tail(254).pct_change()) * np.sqrt(252))
-#print (df['Close'])
-\end{minted}
-
-\begin{verbatim}
-274
-0.23989196101316274
-0.24679150720580836
 \end{verbatim}
 
 Kaynaklar
