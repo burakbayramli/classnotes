@@ -2,7 +2,7 @@ import os, sys, glob, shutil
 
 if len(sys.argv) == 1:
     cmd = """
-    pdftk \
+    pdfunite \
     ./tser_00/tser_00.pdf \
     ./tser_intro/tser_intro.pdf \
     ./tser_back/tser_back.pdf \
@@ -18,6 +18,7 @@ if len(sys.argv) == 1:
     ./tser_port/tser_port.pdf \
     ./tser_kelly/tser_kelly.pdf \
     ./tser_voltar/tser_voltar.pdf \
+    ./tser_macromkt/tser_macromkt.pdf \
     ./tser_hmm/tser_hmm.pdf \
     ./tser_kf/tser_kf.pdf \
     ./tser_pf/tser_pf.pdf \
@@ -29,7 +30,7 @@ if len(sys.argv) == 1:
     ./tser_sinreg/tser_sinreg.pdf \
     ./tser_sound/tser_sound.pdf \
     ./tser_zapp/tser_zapp.pdf \
-    output ../../Dropbox/Public/skfiles/tser.pdf
+    /data/data/com.termux/files/home/Downloads/tser.pdf
     """
     os.system(cmd)
     exit()
