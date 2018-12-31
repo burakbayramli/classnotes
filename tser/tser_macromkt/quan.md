@@ -115,47 +115,9 @@ def f(x):
 
 df2c['Q'] = df2c.apply(f, axis=1)
 print (df2c[['cpi','Q']].tail(10))
-print (df2c.tail(20))
+#print (df2c.tail(20))
 ```
 
-```text
-                 cpi       Q
-Date                        
-2016-06-30  1.051000  2016Q2
-2016-09-30  1.120667  2016Q3
-2016-12-31  1.801333  2016Q4
-2017-03-31  2.539667  2017Q1
-2017-06-30  1.899000  2017Q2
-2017-09-30  1.964000  2017Q3
-2017-12-31  2.117667  2017Q4
-2018-03-31  2.214333  2018Q1
-2018-06-30  2.712000  2018Q2
-2018-09-30  2.642000  2018Q3
-            Value   ...         Q
-Date                ...          
-2013-12-31  1.502   ...    2013Q4
-2014-03-31  1.512   ...    2014Q1
-2014-06-30  2.072   ...    2014Q2
-2014-09-30  1.658   ...    2014Q3
-2014-12-31  0.756   ...    2014Q4
-2015-03-31 -0.074   ...    2015Q1
-2015-06-30  0.124   ...    2015Q2
-2015-09-30 -0.036   ...    2015Q3
-2015-12-31  0.730   ...    2015Q4
-2016-03-31  0.853   ...    2016Q1
-2016-06-30  1.006   ...    2016Q2
-2016-09-30  1.464   ...    2016Q3
-2016-12-31  2.075   ...    2016Q4
-2017-03-31  2.381   ...    2017Q1
-2017-06-30  1.625   ...    2017Q2
-2017-09-30  2.233   ...    2017Q3
-2017-12-31  2.109   ...    2017Q4
-2018-03-31  2.360   ...    2018Q1
-2018-06-30  2.872   ...    2018Q2
-2018-09-30  2.277   ...    2018Q3
-
-[20 rows x 3 columns]
-```
 
 
 ```python
@@ -166,21 +128,6 @@ df['cpidiff'] = df.cpi.diff()
 df = df.dropna()
 ```
 
-```text
-       gdpyoy    ...          cpi
-277  1.295951    ...     1.081333
-278  1.536247    ...     1.051000
-279  1.878757    ...     1.120667
-280  1.938263    ...     1.801333
-281  2.114707    ...     2.539667
-282  2.338877    ...     1.899000
-283  2.471707    ...     1.964000
-284  2.580414    ...     2.117667
-285  2.869807    ...     2.214333
-286  3.039632    ...     2.712000
-
-[10 rows x 3 columns]
-```
 
 ```python
 import random
@@ -195,10 +142,32 @@ for (q,x,y) in np.array(res):
 plt.savefig('quads.png')    
 ```
 
+Scraping options
+
+https://www.nasdaq.com/symbol/aapl/option-chain
+
+
+
 When irates go up and u r in Quad2, bonds go down. When irates go down
 and u r in Quad4 bonds go up.
 
+if an asset’s price and volume is rising while its volatility is
+falling that’s bullish. It means investors are buying with
+conviction. Conversely, if an asset’s price is falling while volume
+and volatility are rising that’s bearish. It means investors are
+selling with conviction
 
+https://accounts.hedgeye.com/products/daily-trading-ranges/61
 
+How tp trade bill bear trends, vol
+https://m.youtube.com/watch?v=n3u8fMYKmwA
+
+Get that soros comment on vol
+
+More vol
+https://m.youtube.com/watch?v=CBCenp7_j_M
+
+Narrow risk range
+https://m.youtube.com/watch?v=NBVin93Y4M4
 
 
