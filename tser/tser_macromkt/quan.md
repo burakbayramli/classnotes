@@ -54,6 +54,55 @@ going up. The rest of the world has to use world's reserve currency to
 fund a deleveraging of their invested position. That's why in Quad4
 the $ has the highest expected value.
 
+Volatility
+
+youtube.com/watch?v=FwpckOfUyRk
+
+youtube.com/watch?v=-WJtepxbQbE
+
+youtube.com/watch?v=USrojq9tgzs
+
+Volume, volatility, price relation
+https://m.youtube.com/watch?v=n3u8fMYKmwA
+
+
+When irates go up and u r in Quad2, bonds go down. When irates go down
+and u r in Quad4 bonds go up.
+
+if an asset’s price and volume is rising while its volatility is
+falling that’s bullish. It means investors are buying with
+conviction. Conversely, if an asset’s price is falling while volume
+and volatility are rising that’s bearish. It means investors are
+selling with conviction
+
+https://accounts.hedgeye.com/products/daily-trading-ranges/61
+
+How to trade on bear trends, vol
+https://m.youtube.com/watch?v=n3u8fMYKmwA
+
+Get that soros comment on vol
+
+More vol
+https://m.youtube.com/watch?v=CBCenp7_j_M
+
+Narrow risk range
+https://m.youtube.com/watch?v=NBVin93Y4M4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```python
@@ -86,21 +135,6 @@ def f(x):
 
 df1['Q'] = df1.apply(f, axis=1)
 print (df1[['gdpyoy','Q']].tail(10))
-```
-
-```text
-              gdpyoy       Q
-Date                        
-2016-04-01  1.295951  2016Q1
-2016-07-01  1.536247  2016Q2
-2016-10-01  1.878757  2016Q3
-2017-01-01  1.938263  2016Q4
-2017-04-01  2.114707  2017Q1
-2017-07-01  2.338877  2017Q2
-2017-10-01  2.471707  2017Q3
-2018-01-01  2.580414  2017Q4
-2018-04-01  2.869807  2018Q1
-2018-07-01  3.039632  2018Q2
 ```
 
 ```python
@@ -146,28 +180,5 @@ Scraping options
 
 https://www.nasdaq.com/symbol/aapl/option-chain
 
-
-
-When irates go up and u r in Quad2, bonds go down. When irates go down
-and u r in Quad4 bonds go up.
-
-if an asset’s price and volume is rising while its volatility is
-falling that’s bullish. It means investors are buying with
-conviction. Conversely, if an asset’s price is falling while volume
-and volatility are rising that’s bearish. It means investors are
-selling with conviction
-
-https://accounts.hedgeye.com/products/daily-trading-ranges/61
-
-How tp trade bill bear trends, vol
-https://m.youtube.com/watch?v=n3u8fMYKmwA
-
-Get that soros comment on vol
-
-More vol
-https://m.youtube.com/watch?v=CBCenp7_j_M
-
-Narrow risk range
-https://m.youtube.com/watch?v=NBVin93Y4M4
 
 
