@@ -1,0 +1,12 @@
+# Genel Yazılım Teknikleri
+
+
+Genel Yazılım Teknikleri
+
+
+
+ Programcılık işinde temel bazı teknikler, her türlü yazılım türü için geçerlidir. Başka bir yazımızda, genel yazılım tiplerinden bahsettik. Fakat bu çesitler içinde ortak "bazı" şeyler vardır. Mesela tekrar tekrar kullanılan kod parçaları, kendi başına bir ünite içine konursa, o halde kullanılması daha rahat olur.              Ortak teknikleri aşağıdaki gurupta toplayabiliriz.              * Ortak kodu ayırma    * Doğru veri şeklini bulma   * Veri gizleme             Ortak kodu ayırma yukarıda bahsedildi. Bir sonraki konu, doğru veri şeklini bulmak; yani, her algoritma için, doğru veri tarifini kullanmaktır.               Sorunun temeline inersek daha iyi anlayacaksınız. Bu meslekte yaptığımız işe "kodlama" denmesi raslantı değildir. Her dil bir kodlamadır. Bazı şeylere verilen bazı isimler, onların anlamını hafızamızda çağrıştırır. Dil bir koddan ibarettir. Devam edelim, bir programın içinde, "veri şekli" bir bakıma kodlamadır. Mesela ZIP dosyaları içinde veri belli şekilde sıralanmıştır. XF harfleri BURAK kelimesine tekabül edebilir; veri o sekilde kodlanmıştır. Bazı veri şekilleri düz yazıda gösterilmeyecek şekilde karmaşıktır, agaç metodu (dal-budak) ayrı bir veri saklama metodudur.               Her türlü problem için, aynı veri şeklini kullanmayın. Bazı problemlerin çözümü için dal-budak şekli etkili olacaktır; bazı problemler anahtarlı-dizi (hash array) ile daha rahat çözülür. Eğer dogru veri şeklini bulmuşsanız, programlarınız birden bire daha çok rahatlayacaktir. Bunu hemen farkedeceksiniz. Yanlış veri şekli programınızı daha zorlaştırır, ve sürekli boğuşmak zorunda kalırsınız.              Bir diğer yazılım tekniği, 'veri gizlemektir'. Bunu şöyle özetleyelim. Mesela programınız içinde her değişkenin herkez tarafından görüldüğünü, ve değiştirilir olduğunu düşünün. Eğer bu program 400,000 satır kadar büyüseydi, ve her değişken herkez tarafından gözükseydi, o zaman programın hangi kısmı hangi değişkeni "değiştirmiş" katiyen anlaşılmazdı.              Böyle bir programda hataları bulmak imkansıza yakındır. Bu işin çözümü veri gizlemekten geçer. Yani, eğer veri bir program kısmına gerekli degilse, veri bu kısımdan gizlenir. Bu sayede programcı rahat bir kafayla, hataları bulurken daha az yere baksa da olur. Sonuçta değişken bölüm ABC tarafında yapılmamıştır: Yapılamaz, çünkü derleyici erişmeye kalkan bölümler hakkında hata ekranı verecektir.        
+
+
+
+

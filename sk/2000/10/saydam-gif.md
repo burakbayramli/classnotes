@@ -1,0 +1,12 @@
+# Saydam GIF'ler
+
+
+Saydam GIF'ler
+
+
+
+ Internet üzerinde gezinirken, resimlerin arka plan ve arka renkler ile uyum içinde oldugunu, resmin kare olmasina ragmen arka planin resmin bosluklarindan görünebildigine sahit olursunuz. Eger web sayfanizda bir resim kullaniyor ve resmin bos taraflarindan arkaplanin görünmemesinden ve resmin sayfa üzerinde yama gibi görünmesinden yakiniyorsaniz bu bölümü dikkatle okuyun.                Bu bölümde resmi transparan hale getirirken en çok kullanilan shareware grafik editörlerinden biri olan Paint Shop Pro'nun 3.12 sürümünü kullanacagiz. PSP 4.0 sahipleri de yaptiklarimizi aynen kendi programlarinda uygulayabilirler. Öncelikle Paint Shop'u açin ve transparan yapmak istediginiz GIF dosyasini yükleyin, unutmayin transparan dosyalar sadece GIF formatinda ve 256 renkte olabilirler.                "Select" araç kutusundan asagidaki resimde de seçili olan "Color Picker"i seçin ve resim üzerinde transparan yapmak istediginiz, yani yaprak ve dünyanin disinda kalan alanin üzerine götürün. Fareyi bu bölgeden ayirmadan durum çubugunun sag bölmesinde I: degerinin yanindaki degeri aklinizin bir kenarina kaydedin.                "File" menüsünden "Save As..." komutunu çalistirin ve format olarak GIF89a - Interlaced'i seçin. Diyalog kutusunun sag tarafinda bulunan Options butonuna bastiginizda GIF Transparency Options Diyalog kutusu karsiniza gelecektir. Bu kutucukta "Set Transparency Value to:" seçenegini isaretleyip karsisindaki metin kutusuna "I:"nin karsisinda okudugunuz degeri (yani yalniz bu resim için 215'i) yazarsaniz GIF dosyasinin renk seçici ile seçtiginiz rengi transparan olacak böylece arkaplanlar bu bölgeden görülebilecektir. Resimler her zaman basarili olarak transparan yapilamazlar, bunun sebebi bazen resmin istemediginiz alanlarinda transparan yaptiginiz renge ait parçaciklarin kalmasidir. Bunu önlemek için resmi yüksek renge getirdikten sonra resim ile alakasi olmayan bir renk seçip transparan yapmak istediginiz alani bu renk ile boyamali ve resmi tekrar 256 renge getirerek bu rengin indeksini okuyup transparan hale getirmelisiniz. Bir transparan GIF'in hikayesi kisaca böyle, "Benim isim gücüm var, bu kadar isle ugrasamam" diyorsaniz, Internet üzerinde yüzlerce GIF dönüstürme seti bulabilirsiniz, hizli olmalarina ragmen insan elinin yerini tutmaz ama olsun.                Yazarin izni ile http://draskin.150m.com sitesinden alinmistir
+
+
+
+

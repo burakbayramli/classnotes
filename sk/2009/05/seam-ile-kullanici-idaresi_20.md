@@ -1,0 +1,12 @@
+# Seam ile Kullanici Idaresi
+
+
+Seam ile Kullanici Idaresi
+
+
+
+Seam pages.xml dosyasinda kullanicinin login durumu ile alakali komutlar kullanabilmemizi saglar. Bunlardan bir tanesi login-required ibaresidir; eger bir sayfa taniminda login-required tanimlamissak, kullanicinin login durumuna gore onu bir login sayfasina yonlendirmemiz mumkun olmaktadir. Kullanim soyle:<page view-id="/sayfa.xhtml" login-required="false">..</page>Peki Seam, eger kullanici login etmemisse hangi sayfaya yonlendirme yapilacagini nereden bilecek? O da pages.xml'in en tepesinde tanimli:<pages login-view-id="/login.xhtml">..</pages>Login edilmedigi durumunda ve sayfa.xhtml'e gitmek istedigimizde Seam, login.xhtml sayfasina gonderecek. Simdi; Seam'in "login edilip edilmedigini nasil anlayacagi" mekanizmasina gelelim. Bunun icin oncelikle bir Seam Action yazip bu Java kodunun gerekli sifre, vs. bilgisini form'dan alip veri tabanina baglanip tabanda bilgileri kontrol ettikten sonra, kullanici/degil kararini vermesini saglamamiz gerekli. Bu kod neye benzer? Bizim kodlarda soyle:@Stateful@Scope(SESSION)@Name("userHandler")public class UserHandlerBean implements UserHandler {@In Identity identity;@Out(required=false)Person user;public boolean authenticate(){// database'den User objesini alif (user == null) {  return false;} else {  identity.login();  return true;}}Identity uzerinde login() cagirilmis olmasi onemli. Simdi Seam'e bu yontemi tanitmak icin WEB-INF/components.xml dosyasinda<security:identity authenticate-method="#{userHandler.authenticate}"/>Person objesinin Action icinde de-enjekte edildigini dikkat edelim. Eger ek olarak Person objesi kendi Java dosyasinda @Scope(SESSION) ile, bir oturum (session) nesnesi olarak tanimlanmissa, artik uygulamadaki herhangi bir anda herhangi bir sayfada #{user} nesnesini null olup olmama testine tabi tutarak ona bagli olarak degisik islemler yapabiliriz. Mesela bir baglanti, Web sitesinde login olup/olmamaya gore gozuksun/gozukmesin demek istersek;<s:link view="/sayfa.xhtml" rendered="#{user == null}">Bir Baglanti</s:link>Ayni karar mekanizmasini pages.xml dosyasinda navigasyon amacli olarak bile kullanabiliriz. Mesela<page view-id="/sayfa.xhtml" ... ><navigation from-action="#{someAction.filan}"><rule if="#{user == null}">  <redirect view-id="/suraya.xhtml"/></rule><rule if="#{user != null}">  <redirect view-id="/buraya.xhtml"/></rule></navigation></page>Not: Kullanici statusunun uygulama ortasinda degistigi durumlarda, Identity uzerinde once logout() sonra login() arka arkaya isletmek gerekli olabilir.
+
+
+
+

@@ -1,0 +1,12 @@
+# XML ne işe yarar
+
+
+XML ne işe yarar
+
+
+
+ Bu yazımızın konusu XML olacak. İnternet programcılığında XML en son  büyük gelişmelerden biri oldu. Ama nedir? Ne işe yarar?              Önce XML'in tarihine bir bakalım. Aslında XML bir dosya format'ından başka bir sey değildir. Format = Kayıt Şekli. HTML kayıt tipi ile XML birbirine çok benzer. Her ikisinde de başlangıç ve bitiş komutları (etiketleri) vardır, arasında kalanlar ise o etiketin altına girerler.                HTML ile XML arasındaki fark, XML şeklinin "açık" oluşudur. HTML ile sadece belli komutları kullanabilirsiniz. Mesela H1 komutu, takibinde gelen yazıları daha koyu renkli göstermenizi sağlar. Bu kurallar, İnternet kurulları tarafından böyle kabul edilmiştir ve sizin tarayıcı programınız yazıları H1 için koyu gösterir.               Fakat XML dünyasında istediğiniz baslangıç/bitiş komutlarını kullanabilirsiniz. Bu yüzden XML programcılarin düşlediği veri transfer şekli haline gelmiştir.               Bu arada hemen belirtelim: Kimisi derki, "ah ne güzel, XML ile istediğimi tanımlarım, ve yollarım, karşı tarafta onları okur.               Bu tabii ki yanlis bir görüştür. Karşiı tarafın da aynı veriyi almaya "hazırlıklı" olması gerekir. Eğer beklenmeyen veriyi gönderirseniz karşı tarafı, o verileri ekrana yazmaktan başka bir sey yapamaz. Ama hazırlıklı ise onlar üzerinde belli işlemler yapılabilir. XML'in avantajı esasında bir çok 'genel-işlemci' program sağlamış olmasıdır, 'özel-işlemciler' genel işlemciler kullanılarak programcılar tarafından yazılır.               Bir soru daha soralım kendimize: "Eğer istediğim seyi tanımlamak istersem, düz dosya kullanarak ta yollarım. XML'e niye ihtiyacım var?".              Bunun cevabı şöyle: XML, aynen HTML gibi başlangıç/bitiş komutları arasında 'ağaca benzer', yani hiyerarşik, yani dal-budak şeklinde bir ilişki kurulması için biçilmiş kaftandır. Mesela eğer bir kitap yazmak için XML kullanmak istiyorsanız, tepeden başlayarak               <kitap><paragraf>    Ä°Å�te bu bir paragraf yazÄ±sÄ±..</paragraf><paragraf>    Ä°kinci paragraf yazÄ±sÄ±..</paragraf></kitap>              .. gibi bir ilişki kurabilirsiniz. Bu kayıtta gayet açıkça görülüyor ki, kitap ve paragraflar arasında bir ilişki var. Bu dal-budak ilişkisini istediğiniz kadar aşağı indirebilirsiniz.              Düz dosya ile böyle iliskileri göstermek çok zordur.               O yüzden, "İnternet yayıncılığı" için, XML biçilmis kaftandır.              Programlar arasında veri alışverişi için de XML cok yararlıdır.
+
+
+
+
