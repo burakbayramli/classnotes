@@ -27,6 +27,10 @@ dengeler bozuluyor; bu sebeple en iyisi tekrar yüklenen sayfayı bir
 alt frame içinde tutmak, yükleme, frame içindeki bilgileri okuyup
 sesli okuma işini dış sayfa içinde yapmak.
 
+Not: Frame kavramı için HTML kaynaklarına danışılabilir; frame ile bir
+dış HTML bir diğeri içine dahil edilir, neredeyse o iç frame'de ayrı
+bir tarayıcı işliyormuş gibi olur.
+
 Dış sayfa
 
 
