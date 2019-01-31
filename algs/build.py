@@ -1,7 +1,7 @@
 import os, sys, glob, shutil
 
 if len(sys.argv) == 1:
-    cmd = "pdftk ./cover/cover.pdf \
+    cmd = "pdfunite ./cover/cover.pdf \
     ./mlintro/mlintro.pdf \
     ./complexity/complexity.pdf \
     ./basic/basic.pdf \
@@ -43,7 +43,7 @@ if len(sys.argv) == 1:
     ./gan/gan.pdf \
     ./wavenet/wavenet.pdf \
     ./zapp/zapp.pdf \
-    output ../../Dropbox/Public/skfiles/algs.pdf"
+    /data/data/com.termux/files/home/Downloads/algs.pdf"
     os.system(cmd)
     print (cmd)
     exit()
