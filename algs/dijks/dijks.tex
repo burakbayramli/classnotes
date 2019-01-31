@@ -39,7 +39,7 @@ düðümün kuyruktaki yeri de deðiþebilecekir, belki bir baþka düðümün önüne
 geçer.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from priodict import priorityDictionary # onemsel kuyruk
+from pqdict import pqdict
 
 def dijkstra(G,basla,bitis):
     # nihai uzakliklarin sozlugu
@@ -47,18 +47,18 @@ def dijkstra(G,basla,bitis):
     # ebeveyn dugumlerin sozlugu
     P = {}  
     # dugumlerin baslangica olan tahmini uzakliginin kuyrugu
-    Q = priorityDictionary() 
+    Q = pqdict() 
 
     Q[basla] = 0
 
-    for v in Q:
-       D[v] = Q[v]
-       if v == bitis: break
+    while len(Q)>0:
+       (v,vv) = Q.popitem()
+       D[v] = vv
        for w in G[v]:
           vwLength = D[v] + G[v][w]
           if w in D:
               if vwLength < D[w]:
-                  raise ValueError, "sonuca giden daha iyi yol bulundu"
+                  raise ValueError("sonuca giden daha iyi yol bulundu")
           elif w not in Q or vwLength < Q[w]:
               Q[w] = vwLength
               P[w] = v
@@ -73,7 +73,7 @@ def dijkstra(G,basla,bitis):
 G = {'s':{'t':10, 'y':5}, 't':{'x':1, 'z':2}, 'x':{'z':4}, \
      'y':{'t':3, 'x':9, 'z':2}, 'z':{'s':7, 'x':6}}
 path = dijkstra(G, 's', 'x')
-print path
+print (path)
 \end{minted}
 
 \begin{verbatim}
@@ -179,7 +179,7 @@ bakýlabilir, biz alttaki kodda 8 hücreyi temel aldýk,
 \includegraphics[width=15em]{dijks_04.jpg}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from priodict import priorityDictionary
+from pqdict import pqdict
 import numpy as np
 
 def get_neighbor_idx(x,y,dims):
@@ -194,15 +194,14 @@ def get_neighbor_idx(x,y,dims):
 def dijkstra(C,s,e):    
     D = {}
     P = {}
-    Q = priorityDictionary() 
+    Q = pqdict() 
     Q[s] = 0
-
-    while True:
-        if len(Q)==0: break
+    
+    #for v in Q:
+    while len(Q)>0:
         (v,vv) = Q.popitem()
         D[v] = vv
         neighs = get_neighbor_idx(v[0],v[1],C.shape)
-        #print (neighs)
         for w in neighs:
             vwLength = D[v] + np.abs(C[v[0],v[1]] - C[w[0],w[1]])
             if w in D:
@@ -218,7 +217,7 @@ def dijkstra(C,s,e):
        if e == s: break
        e = P[e]
     path.reverse()
-    return path
+    return path   
 
 m = np.array([[999.9, 999.9, 999.9,   0. ],
               [999.9, 999.9, 999.9,   0. ],
@@ -227,7 +226,7 @@ m = np.array([[999.9, 999.9, 999.9,   0. ],
 
 res = dijkstra(m,(3,0),(0,3))
 
-print (res)    
+print (res)
 \end{minted}
 
 \begin{verbatim}
