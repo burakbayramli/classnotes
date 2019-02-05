@@ -30,21 +30,32 @@ yr = yyy[idx]
 zr = zzz[idx]
 print (xr.shape)
 
-gamma = 43.0
+#gamma = 50.0
+gamma = 1/90.0
+
 xxx = np.subtract.outer(xr,xr).T
 yyy = np.subtract.outer(yr,yr).T
-#aaa = np.exp(-gamma * np.sqrt(xxx**2 + yyy**2))
-aaa = np.exp(-gamma * (xxx**2 + yyy**2))
+aaa = np.exp(-gamma * np.sqrt(xxx**2 + yyy**2))
+#aaa = np.exp(-gamma * (xxx**2 + yyy**2))
 print (aaa.shape)
 import scipy.linalg as lin
 w = lin.solve(aaa, zr)
 print (w[:5])
 
+rmse = 0
+for i in range(len(xr)):
+    tmp = np.exp(-gamma * np.sqrt( (xr[i]-xr)**2 + (yr[i]-yr)**2 ) )
+    #tmp = np.exp(-gamma * (xr[i]-xr)**2 + (yr[i]-yr)**2)
+    rmse += (np.dot(w,tmp)-zr[i])**2
+rmse = np.sqrt(np.mean(rmse) / len(xr))
+print ('rmse',rmse)
+#exit()
+
 xnew = [36.4,32.4]
-#tmp = np.exp(-gamma * np.sqrt((xnew[0]-xr)**2 + (xnew[1]-yr)**2))
-tmp = np.exp(-gamma * ((xnew[0]-xr)**2 + (xnew[1]-yr)**2))
+tmp = np.exp(-gamma * np.sqrt( (xnew[0]-xr)**2 + xnew[1]-yr)**2 )
+#tmp = np.exp(-gamma * ((xnew[0]-xr)**2 + (xnew[1]-yr)**2))
 res = np.dot(w,tmp)
-print (res)
+print ('res',res)
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
