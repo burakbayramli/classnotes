@@ -17,7 +17,7 @@ def func(x, y):
     g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)
     return g1 + g2
 
-D = 100
+D = 200
 x = np.linspace(36,37,D)
 y = np.linspace(32,33,D)
 
@@ -27,20 +27,64 @@ zz = func(xx,yy)
 xxx = xx.reshape(D*D)
 yyy = yy.reshape(D*D)
 zzz = zz.reshape(D*D)
-idx = np.random.choice(range(D*D),300)
+idx = np.random.choice(range(D*D),500)
 
 xr = xxx[idx]
 yr = yyy[idx]
 zr = zzz[idx]
-\end{minted}
-
-\begin{minted}[fontsize=\footnotesize]{python}
 print (xr.shape)
 \end{minted}
 
 \begin{verbatim}
-(300,)
+(500,)
 \end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+fig.colorbar(surf, shrink=0.5, aspect=5)
+plt.savefig('/data/data/com.termux/files/home/Downloads/out1.png')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+gamma = 0.2
+xxx = np.subtract.outer(xr,xr).T
+yyy = np.subtract.outer(yr,yr).T
+aaa = np.exp(-gamma * np.sqrt(xxx**2 + yyy**2))
+print (aaa.shape)
+import scipy.linalg as lin
+w = lin.solve(aaa, zr)
+print (w[:5])
+
+xm = [36.4,32.4]
+tmp = np.exp(-gamma * np.sqrt((xm[0]-xr)**2 + (xm[1]-yr)**2))
+res = np.dot(w,tmp)
+print (res)
+\end{minted}
+
+\begin{verbatim}
+(500, 500)
+[-0.19300543 -0.62116301  0.00370977  0.09326682  0.05787695]
+0.37171564421857206
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+rmse = 0
+for i in range(len(xr)):
+    tmp = np.exp(-gamma * np.sqrt((xr[i]-xr)**2 + (yr[i]-yr)**2))
+    rmse += ((np.dot(w,tmp)-zr[i])**2)
+rmse = np.sqrt(np.mean(rmse))
+print (rmse)
+\end{minted}
+
+\begin{verbatim}
+3.123703758799e-13
+\end{verbatim}
+
+
+
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -50,7 +94,7 @@ ax = np.subtract.outer(aa[:,0],aa[:,0]).T
 bx = np.subtract.outer(aa[:,1],aa[:,1]).T
 print (ax.T)
 print (bx.T)
-cc = np.exp(-gamma * np.sqrt(ax**2 + bx**2))
+cc = np.exp(gamma * (ax**2 + bx**2))
 print (cc)
 \end{minted}
 
@@ -61,9 +105,9 @@ print (cc)
 [[ 0 -2 -4]
  [ 2  0 -2]
  [ 4  2  0]]
-[[1.         0.79962949 0.63940732]
- [0.79962949 1.         0.79962949]
- [0.63940732 0.79962949 1.        ]]
+[[1.         1.64872127 7.3890561 ]
+ [1.64872127 1.         1.64872127]
+ [7.3890561  1.64872127 1.        ]]
 \end{verbatim}
 
 
