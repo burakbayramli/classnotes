@@ -12,7 +12,7 @@ def func(x, y):
     g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)
     return g1 + g2
 
-D = 100
+D = 50
 x = np.linspace(36,37,D)
 y = np.linspace(32,33,D)
 

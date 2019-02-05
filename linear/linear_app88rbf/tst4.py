@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
 import matplotlib.pyplot as plt
+import numpy.linalg as lin
+from scipy.spatial.distance import cdist
+from scipy.spatial.distance import pdist
+
 
 def func(x, y):
     s1 = 0.2; x1 = 36.5; y1 = 32.5
@@ -12,9 +16,9 @@ def func(x, y):
     g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)    
     return g1 + g2 
 
-D = 200
-S = 400
-gamma = 400.0
+D = 50
+S = 100
+gamma = 2.0
 
 x = np.linspace(36,37,D)
 y = np.linspace(32,33,D)
@@ -30,22 +34,33 @@ idx = np.random.choice(range(D*D),S)
 xr = xxx[idx].reshape(S,1)
 yr = yyy[idx].reshape(S,1)
 zr = zzz[idx].reshape(S,1)
-X = np.vstack((xr,yr)).T
+X = np.hstack((xr,yr))
 print (X.shape)
-
-import numpy.linalg as lin
-from scipy.spatial.distance import cdist
-
-Phi = np.exp(-gamma*cdist(xr,yr,'euclid'))
+Phi = np.exp(-gamma*cdist(X,X,metric='euclid'))
 
 print (Phi.shape)
 
 w = np.dot(lin.pinv(Phi),zr)
+print (w)
 
-rmse = 0
-for i in range(len(xr)):
-    tmp = np.exp(-gamma * np.sqrt( (xr[i]-xr)**2 + (yr[i]-yr)**2 ) )
-    rmse += (np.dot(w.T,tmp)-zr[i])**2
-rmse = np.sqrt(np.mean(rmse) / len(xr))
-print ('rmse',rmse)
 
+znew = np.zeros(D*D)
+for i in range(len(xxx)):
+    tmp = 0
+    if i % 100 == 0: print (i)
+    for m in range(S):
+        a = np.array([[xr[m,0],yr[m,0]]])
+        b = np.array([[xxx[i],yyy[i]]])
+        #print (a,b)
+        #print (np.exp(cdist(a,b,'euclid')[0][0]))
+        #print (np.exp(-gamma*cdist(a,b,'euclid')[0][0]))
+        #print (w[m])
+        tmp += (w[m] * np.exp(-gamma*cdist(a,b,'euclid')[0][0]))
+    #print (tmp)
+    znew[i] = tmp*100.0
+    
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx, yy, znew.reshape(D,D), cmap=cm.coolwarm,linewidth=0, antialiased=False)
+fig.colorbar(surf, shrink=0.5, aspect=5)
+plt.savefig('/data/data/com.termux/files/home/Downloads/out2.png')

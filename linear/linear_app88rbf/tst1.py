@@ -13,10 +13,9 @@ def func(x, y):
     g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)
     return g1 + g2
 
-points = np.random.rand(1000, 2)
-
-x = np.linspace(36,37,100)
-y = np.linspace(32,33,100)
+D = 50
+x = np.linspace(36,37,D)
+y = np.linspace(32,33,D)
 
 xx,yy = np.meshgrid(x,y)
 zz = func(xx,yy)
