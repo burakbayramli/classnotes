@@ -1,11 +1,5 @@
 # Numpy
 
-
-Numpy
-
-
-
-
 Matris islemleri icin kullanilan Numpy teknikleri altta. Yaziya ekler olacak
 
 Filtreli Erisim
