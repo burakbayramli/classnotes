@@ -1,15 +1,55 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Dairesel Baz Fonksiyonlari (Radial Basis Functions)
+Dairesel Baz Fonksiyonlari (Radial Basis Functions -RBF-), Yukseklik Verisi, Daglar
+
+Ara deðerlemek (interpolation), yani elde olan veriyi kullanýp olmayan hakkýnda
+tahmin yapmaya uðraþmak için çok boyutlu ortamda RBF iyi iþleyen bir
+yaklaþýmdýr. Belki de zihinde en rahat canlandýrýlabilecek örnek yeryüzünde
+ovalara, daðlara ovalara tekabül eden yükseklik (elevation) verilerini alarak
+onlara sürekli tepe fonksiyonlarý ``uydurmak'' böylece daðlarýn nerede olduðunu
+saptamak. çözünürlükte yükseklik verisi ise yaramayabilir, eðer bir nokta daðýn
+bir eteðinde diðeri öte yanindaki eteðinden alýnmýþsa bu dað yok anlamýna
+gelecektir. 
+
+Peki yükseklik verisinýn geldiði yerden daha yüksek çözünürlüklü veri almýyoruz?
+Bu hem eriþim hem de tutacaðý yer baðlamýnda pahalý olabilir. 1 derecelik enlem
+/ boylam içinde, mesela 36-37 ve 32-33 arasý diyelim, 100 metrelik çözünürlük
+demek 0.001 derece deðiþimine tekabül eder, ve bu durumda 1 milyon veri noktasý
+alýnmasý gerekecektir. Halbuki yükseklik verisinden yüzde 3 miktarýnda bile bir
+rasgele örneklem alýrsak, bu noktalara RBF ile tepe fonksiyonlarý uydurarak
+matematiksel, sürekli olan bir genel fonksiyon elde ederiz, ve uydurma iyi
+iþlerse artýk istediðimiz çözünürlükte yükseklik verisi elde edebiliriz. 
+
+ 
+
+$$
+\left[\begin{array}{rrr}
+\exp(-\gamma \|x_1-x_1\|^2) & \cdots & \exp(-\gamma \|x_1-x_N\|^2)\\
+\exp(-\gamma \|x_2-x_1\|^2) & \cdots & \exp(-\gamma \|x_2-x_N\|^2)\\
+\vdots & \ddots & \vdots \\
+\exp(-\gamma \|x_N-x_1\|^2) & \cdots & \exp(-\gamma  \|x_N-x_N\|^2)
+\end{array}\right]
+\left[\begin{array}{r}
+ w_1  \\
+ w_2  \\
+ \vdots \\
+ w_N
+\end{array}\right] =
+\left[\begin{array}{rrr}
+ y_1  \\
+ y_2  \\
+ \vdots \\
+ y_N
+\end{array}\right]
+$$
+
+
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from matplotlib import cm
-import numpy as np
-import matplotlib.pyplot as plt
-import numpy.linalg as lin
-from scipy.spatial.distance import cdist
+from mpl_toolkits.mplot3d import Axes3D import matplotlib.pyplot as plt from
+matplotlib import cm import numpy as np import matplotlib.pyplot as plt import
+numpy.linalg as lin from scipy.spatial.distance import cdist
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
