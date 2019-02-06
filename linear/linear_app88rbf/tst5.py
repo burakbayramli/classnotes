@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy.linalg as lin
 from scipy.spatial.distance import cdist
 from scipy.spatial.distance import pdist
+
 np.random.seed(0)
 
 def func(x, y):
@@ -29,6 +30,7 @@ zz = func(xx,yy)
 xxx = xx.reshape(D*D)
 yyy = yy.reshape(D*D)
 zzz = zz.reshape(D*D)
+
 idx = np.random.choice(range(D*D),S)
 
 xr = xxx[idx].reshape(S,1)
