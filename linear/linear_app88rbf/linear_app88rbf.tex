@@ -17,17 +17,50 @@ Bu hem eriþim hem de tutacaðý yer baðlamýnda pahalý olabilir. 1 derecelik enlem
 demek 0.001 derece deðiþimine tekabül eder, ve bu durumda 1 milyon veri noktasý
 alýnmasý gerekecektir. Halbuki yükseklik verisinden yüzde 3 miktarýnda bile bir
 rasgele örneklem alýrsak, bu noktalara RBF ile tepe fonksiyonlarý uydurarak
-matematiksel, sürekli olan bir genel fonksiyon elde ederiz, ve uydurma iyi
-iþlerse artýk istediðimiz çözünürlükte yükseklik verisi elde edebiliriz. 
+ matematiksel, sürekli olan bir genel fonksiyon elde ederiz, ve uydurma iyi
+iþlerse artýk istediðimiz çözünürlükte yükseklik verisi elde edebiliriz çünkü
+elimizdeki sürekli fonksiyona istediðimiz her nokta için yükseliðin ne olduðunu
+artýk hesaplattýrabiliriz.
 
- 
+Bu örneði 3 boyutta herhangi bir baþka veri için de düþünmek mümkün; ama
+yükseklik verisinde daha rahat, her örneklem noktasýna koyulan sürekli foknsiyon
+olan tepeler ve onlarýn birleþimi bize pürüzsüz, sürekli bir engebe þekli
+verir. RBF baz fonksiyonlarý $\Phi(x) = f(||x-c||)$ þeklindedir, $f$ tepe, ya da
+farklý bir fonksiyon olabilir, $||\cdot||$ norm fonksiyonudur, Öklitsel norm
+olabilir mesela.
+
+Burada $c$ üstüne baz fonksiyon konulan nokta, her örneklem veri noktasý
+yani. RBF eðitimi / uydurma metadolijisine göre herhangi bir veri noktasý
+dýþýndaki tüm diðer örneklem verileri o veri noktasýnýn oluþumunu etkiler. Bu
+anormal bir faraziye deðil, bir daðýn baþýnda, ortasýnda, tepesinden alýnmýþ
+örneklemler varsa, mesela en alt ve en tepedeki veri ortadakini etkiler, yani o
+baðlantýyý, iliþkiyi farzetmek normaldir. Orta nokta zirveyi tanýmlayan
+fonksiyona belli bir aðýrlýkla baðlý, en alttakine baþka bir þekilde baðlý,
+vs. Bu aðýrlýklarýn ne olacaðýný genel çözüm belirleyecektir. Eðer $f$ için
+Gaussianýmsý bir tepe fonksiyonu seçersek, yeni gözlemin baz fonksiyonlarý ile
+arasýndaki iliþki,
 
 $$
-\left[\begin{array}{rrr}
-\exp(-\gamma \|x_1-x_1\|^2) & \cdots & \exp(-\gamma \|x_1-x_N\|^2)\\
-\exp(-\gamma \|x_2-x_1\|^2) & \cdots & \exp(-\gamma \|x_2-x_N\|^2)\\
-\vdots & \ddots & \vdots \\
-\exp(-\gamma \|x_N-x_1\|^2) & \cdots & \exp(-\gamma  \|x_N-x_N\|^2)
+h(x) = \sum_{n=1}^N w_n \times exp(-\gamma \|x-x_n\|^2)
+$$
+
+olarak gösterilebilir. Formüldeki $x-c$ kullanýmýna dikkat, bu aslýnda ``diðer
+noktalarý'' temsil etmenin akýllýca bir yolu, $c$ üzerinde $x-c$ sýfýr
+deðerdedir, bu o noktayý temsil için diðer noktalar üzerindeki bazlarýn devreye
+girmesi gerektiðini modelde zorlamýþ olur.
+
+Her bazýn etkisi $w_n$ aðýrlýðý üzerinden modele yansýtýlýr. Bu aðýrlýklarýn ne
+olduðunu bulmak, nihai genel fonksiyonu bulmuþ olmak anlamýna gelir.
+
+$$
+y_n = \sum_{n=1}^N w_m \times exp(-\gamma \|x_n-x_m\|^2)
+$$
+
+
+$$ \left[\begin{array}{rrr} \exp(-\gamma \|x_1-x_1\|^2) & \cdots & \exp(-\gamma
+    \|x_1-x_N\|^2)\\ \exp(-\gamma \|x_2-x_1\|^2) & \cdots & \exp(-\gamma
+    \|x_2-x_N\|^2)\\ \vdots & \ddots & \vdots \\ \exp(-\gamma \|x_N-x_1\|^2) &
+    \cdots & \exp(-\gamma \|x_N-x_N\|^2)
 \end{array}\right]
 \left[\begin{array}{r}
  w_1  \\
