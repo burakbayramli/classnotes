@@ -926,6 +926,85 @@ plt.savefig('5_10.png')
 
 \includegraphics[width=20em]{5_10.png}
 
+Çizgi Parçasýna Noktanýn En Yakýn Mesafesi
+
+Elimizde verili iki nokta arasýnda tanýmlý çizgi parçasý var. Herhangi bir
+noktanýn bu parçaya en yakýn mesafesi nedir? Ayrýca o noktadan parçaya bir düz
+çizgi çekilse kesiþimin olduðu nokta nerededir?
+
+Þu metota bakalým [5]. Çizgiyi $\vec{z} = \vec{a} + t \vec{b}$ olarak
+tanýmlayabiliriz. O zaman bu çizgi ile bir diðer nokta $\vec{x}$ arasýndaki
+mesafe $\vec{x}-\vec{z}$ vektörünün uzunluðudur, yani
+
+$$
+|| \vec{x} - (\vec{a} + t' \vec{b}) ||
+$$
+
+olarak tanýmlanabilir, ki burada $t'$ özel bir $t$ deðeri oluyor. Bu deðer öyle
+bir $t$ deðeri ki o noktaya kadar gelen $\vec{z}$'nin bolumu $\vec{x}$'e dik. Bu
+noktayý ve ardýndan çizgiye olan (dik) mesafeyi nasýl buluruz?
+
+Þimdi üstteki çizgi formülünde kesiþim anýna kadar olan bölümdeki, $t'$'ye
+tekabül eden kýsma $\vec{r}$ diyelim, ve onu
+
+$$
+\vec{r} = \vec{a} + t' \vec{b}
+$$
+
+olarak gösterelim. Ýstediðimiz $||\vec{r}-\vec{x}||$ uzunluðunu bulmak. $t'$
+deðerinde aradaki vektör $\vec{b}$'ye dik olduðuna göre
+
+$$
+(\vec{x} - \vec{r}) \cdot \vec{b} = 0
+$$
+
+$\vec{r}$ formülünü açalým,
+
+$$
+= (\vec{x} - \vec{a} - t' \vec{b}) \cdot \vec{b} = 0
+$$
+
+$$
+= \vec{x}\cdot\vec{b} - \vec{a}\cdot\vec{b} - t'||b||^2 = 0
+$$
+
+$$
+t' = \frac{\vec{x}\cdot\vec{b} - \vec{a}\cdot\vec{b}}{||b||^2}
+$$
+
+Örnek
+
+$<2,2>$ ve $<5,5>$ noktalarý noktalarýndan geçen çizgiye $<4,1>$ noktasýnýn
+uzaklýðý nedir? Kesiþim nerede olur?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def dist(x1,y1,x2,y2,px,py):
+    a = np.array([[x1,y1]]).T
+    b = np.array([[x2,y2]]).T
+    x = np.array([[px,py]]).T
+    tp = (np.dot(x.T, b) - np.dot(a.T, b)) / np.dot(b.T, b)
+    tp = tp[0][0]
+    tmp = x - (a + tp*b)
+    d = np.sqrt(np.dot(tmp.T,tmp)[0][0])
+    return d, a+tp*b
+
+x1,y1=2.,2.
+x2,y2=5.,5.
+px,py=4.,1.
+
+d, inters = dist(x1,y1, x2,y2, px,py)
+print (d)
+print (inters)
+\end{minted}
+
+\begin{verbatim}
+2.1213203435596424
+[[2.5]
+ [2.5]]
+\end{verbatim}
+
+Not: Üstteki metot 2, 3 üzeri boyutlar için de iþleyecektir. 
+
 Kaynak
 
 [1] Sunday, {\em Intersection of Lines and Planes}, \url{http://geomalgorithms.com/a05-_intersect-1.html}
@@ -936,6 +1015,12 @@ Kaynak
 [3] Thomas, {\em Thomas' Calculus}
 
 [4] Khaled, {\em Straight Line and Plane Intersection Matlab Code}, \url{https://uk.mathworks.com/matlabcentral/fileexchange/17751-straight-line-and-plane-intersection}
+
+[5] {\em Distance between Point and Line}, \url{https://brilliant.org/wiki/distance-between-point-and-line/}
+
+
+
+
 
 \end{document}
 
