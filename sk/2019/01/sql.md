@@ -11,7 +11,7 @@ basit tek bir dosyada tüm bilgiyi tutar, Postgres gibi daha çetrefil
 tabanlarda olduğu gibi ayrı servis yapıları yoktur. İlk ihtiyaçlarımız
 için bu yeterli olur.
 
-İlk önce tabloyu yaratalım. Araba (çar) adlı tabloda her satır araba
+İlk önce tabloyu yaratalım. Araba (car) adlı tabloda her satır araba
 kayıtları olacak. Şimdilik bu tabloda bir kimlik ve tanım için bir
 isim olacak.
 
