@@ -19,7 +19,9 @@ end=datetime.datetime(2015, 9, 30)
 s = web.DataReader("MSFT", 'yahoo', start, end)
 ```
 
-Kaynak icin `google` gecilirse veri oradan gelecek. 
+Kaynak icin `google` gecilirse veri oradan gelecek.
+
+Ayni sekilde 'fred' ABD merkez bankasi tabanindan veri indirebiliyor.
 
 Opsiyon
 
