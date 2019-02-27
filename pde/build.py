@@ -1,7 +1,7 @@
 import os, sys, glob
 
 if len(sys.argv) == 1 :
-    os.system("pdftk \
+    os.system("pdfunite \
     pde_00/pde_00.pdf \
     pde_01/pde_01.pdf \
     pde_02/pde_02.pdf \
@@ -14,7 +14,7 @@ if len(sys.argv) == 1 :
     pde_curvature/pde_curvature.pdf \
     pde_wave_deriv/pde_wave_deriv.pdf \
     pde_varcalc/pde_varcalc.pdf \
-    output ../../Dropbox/Public/skfiles/pde.pdf" \
+    /data/data/com.termux/files/home/Downloads/pde.pdf" \
     )
     exit()
     
