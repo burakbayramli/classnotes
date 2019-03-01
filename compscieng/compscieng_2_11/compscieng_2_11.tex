@@ -10,14 +10,13 @@ Elimizde bir eðri var diyelim (altta resimde $t=0$ anýndaki)
 
 \includegraphics[width=20em]{2_11_01.jpg}
 
-ve bu ``arayüz (interface)'' ya da duvar gibi diyelim, bu eðri hareket
-ediyor. Ýlerliyor. Bu ilerlemenin kendi normalý (yani eðrinin her noktasýndaki
-teðetine dik) yönünde olduðunu düþünelim. Bu ilerleme þeklini biz empoze
-ediyoruz, sonra formüllerin buna göre nasýl þekillendiðini göreceðiz. Bu
-ilerleme sonunda mesela $t=0$'da görülen þekilden $t=1$'deki þekle gelinmiþ
-olacak. En ideal þartlarda hýzýn hiçbir noktada deðiþmediðini düþünebiliriz,
-yani hýz sabit. O zaman birim zamanda sabit hýzda (diyelim o da 1), mesafe 1
-katedilmiþ olur.
+ve bu ``arayüz (interface)'' ya da duvar, bu eðri hareket ediyor. Ýlerliyor. Bu
+ilerlemenin kendi normali (yani eðrinin her noktasýndaki teðetine dik) yönünde
+olduðunu düþünelim. Bu ilerleme þeklini biz empoze ediyoruz, sonra formüllerin
+buna göre nasýl þekillendiðini göreceðiz. Bu ilerleme sonunda mesela $t=0$'da
+görülen þekilden $t=1$'deki þekle gelinmiþ olacak. En ideal þartlarda hýzýn
+hiçbir noktada deðiþmediðini düþünebiliriz, yani hýz sabit. O zaman birim
+zamanda sabit hýzda (diyelim o da 1), mesafe 1 katedilmiþ olur.
 
 Eðrinin nasýl tarif edildiði anahtar. Eðriyi, o eðri üzerindeki belli yerlerde
 noktalar üzerinden mi temsil etsem? Ki o her nokta bir bilinmeyen / deðiþkenle
@@ -38,26 +37,28 @@ seviyesi nedir? Kesit seviyesi bir ana fonksiyona göre tarif edilir, mesela
 $\Phi(x,y)$'nin kesit seviyesi. Bu seviye $\Phi(x,y) = 0$ olabilir, yani
 $\Phi(x,y)$'nin sýfýrdaki kesit seviyesine bakabiliriz.
 
-BB: bu kesitleri üç boyutlu bir yüzeyde alýnmýþ yatay kesitler olarak
-düþünebiliriz. Yüzeyin, yani üç boyutlu fonksiyonun o kesit düzlemi üzerindeki
-hali, yansýmasý iþte bu kesittir. Pek çok kesiti konturlar ile gösterebilirdik,
-hatta mesela yeryüzeyi $x,y$ kordinatlarýndaki yükseklik (daðlar) verisini
-konturlar olarak göstermek klasik bir topografi tekniðidir. 
+Kesitleri üç boyutlu yüzey üzerinde yapýlan yatay kesitler olarak
+düþünebiliriz. Üç boyutlu fonksiyonun o yatay düzlem üzerindeki hali, yansýmasý
+bu kesittir. Birden fazla kesiti farklý kontur renkleri ile gösterebilirdik.
+Mesela yeryüzeyi $x,y$ kordinatlarýndaki yükseklik (daðlar) verisini konturlar
+olarak göstermek klasik bir topografi tekniðidir. Yapay bir veri üzerinde
+görelim, $x,y$ ve yükseklik deyince üç boyutlu bir fonksiyondan bahsediyoruz,
+onun ayrýksal halini mesela 10x10 boyutunda bir matris ile gösterebiliriz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-def func(x, y):
-    s1 = 2.0; x1 = 5; y1 = 5
+def Phi(x, y):
+    s1 = 1.5; x1 = 5.0; y1 = 5.0
     g1 = np.exp( -2 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
     return g1
   
-D = 12
+D = 10
 x = np.linspace(0,10,D)
 y = np.linspace(0,10,D)
 xx,yy = np.meshgrid(x,y)
-zz = func(xx,yy)
+zz = Phi(xx,yy)
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
@@ -65,7 +66,8 @@ surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=Fal
 plt.savefig('2_11_02.png')
 
 plt.figure()
-cs=plt.contour(xx,yy,zz,10)
+contours = [0.1, 0.2, 0.3]
+cs=plt.contour(xx,yy,zz,contours)
 plt.clabel(cs,inline=1,fontsize=9)
 plt.savefig('2_11_03.png')
 \end{minted}
@@ -73,7 +75,10 @@ plt.savefig('2_11_03.png')
 \includegraphics[width=20em]{2_11_02.png}
 \includegraphics[width=20em]{2_11_03.png}
 
-
+Tam ortasýna bir tepe koyduk, bu tepeyi bir analitik fonksiyon ile yaptýk ama
+bunu rahatlýk amaçýyla yaptýk, elle bazi degerleri gerekli yerlere koyunca ayni
+sonuc elde edilebilirdi. Ustteki matrisin degerlerini mesela matristen okursak
+þuna benzer,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 np.set_printoptions(precision=3,suppress=True)
@@ -81,21 +86,28 @@ print (zz)
 \end{minted}
 
 \begin{verbatim}
-[[0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]
- [0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]
- [0.    0.    0.    0.    0.    0.001 0.001 0.    0.    0.    0.    0.   ]
- [0.    0.    0.    0.001 0.008 0.024 0.024 0.008 0.001 0.    0.    0.   ]
- [0.    0.    0.    0.008 0.076 0.239 0.239 0.076 0.008 0.    0.    0.   ]
- [0.    0.    0.001 0.024 0.239 0.751 0.751 0.239 0.024 0.001 0.    0.   ]
- [0.    0.    0.001 0.024 0.239 0.751 0.751 0.239 0.024 0.001 0.    0.   ]
- [0.    0.    0.    0.008 0.076 0.239 0.239 0.076 0.008 0.    0.    0.   ]
- [0.    0.    0.    0.001 0.008 0.024 0.024 0.008 0.001 0.    0.    0.   ]
- [0.    0.    0.    0.    0.    0.001 0.001 0.    0.    0.    0.    0.   ]
- [0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]
- [0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]]
+[[0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]
+ [0.    0.    0.    0.002 0.005 0.005 0.002 0.    0.    0.   ]
+ [0.    0.    0.005 0.026 0.062 0.062 0.026 0.005 0.    0.   ]
+ [0.    0.002 0.026 0.146 0.343 0.343 0.146 0.026 0.002 0.   ]
+ [0.    0.005 0.062 0.343 0.807 0.807 0.343 0.062 0.005 0.   ]
+ [0.    0.005 0.062 0.343 0.807 0.807 0.343 0.062 0.005 0.   ]
+ [0.    0.002 0.026 0.146 0.343 0.343 0.146 0.026 0.002 0.   ]
+ [0.    0.    0.005 0.026 0.062 0.062 0.026 0.005 0.    0.   ]
+ [0.    0.    0.    0.002 0.005 0.005 0.002 0.    0.    0.   ]
+ [0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]]
 \end{verbatim}
 
+Kötür grafiðinde üç tane konturu gösterdik, \verb!contours! deðiþkeni
+listesinden tanýmlý. Derse dönelim.
 
+Yani kesit seviyeleri bir eðriyi dolaylý (implicitely) tanýmlamýþ oluyor. Ýki
+boyutlu bir eðriyi bir sürü nokta üzerinden tanýmlamak yerine, üç boyutlu bir
+yüzeyin bir kesit üzerindeki yansýmasý üzerinden tanýmlýyoruz, yani $\Phi(x,y) =
+0$ gibi. Yani bir egri $\Phi(x,y) = 0$ denklemini {\em cozen} $x,y$  deðerleri
+oluyor. 3
+
+Basit bir ornek uzerinde gorursek, 
 
 
 
