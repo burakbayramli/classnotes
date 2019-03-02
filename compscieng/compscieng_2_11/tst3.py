@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy import *
 from scipy import ndimage
 
 def imageplot(f, str='', sbpt=[]):
@@ -103,11 +102,11 @@ def exo3(x0,W):
     Compute the distance map to these starting point using the FM algorithm.
     """
     n = W.shape[0]
-    pstart = transpose(array([x0]))
-    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, inf,'fm', 'sym',n*6)
+    pstart = np.transpose(np.array([x0]))
+    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, np.inf, 'fm', 'sym',n*6)
     # display
     k = 8
-    displ = lambda D: cos(2*pi*k*D/ max(D.flatten()))
+    displ = lambda D: np.cos(2*np.pi*k*D / np.max(D.flatten()))
     plt.figure()
     imageplot(displ(D))
     plt.set_cmap('jet')
@@ -116,10 +115,10 @@ def exo3(x0,W):
 
 
 n = 100
-x = linspace(-1, 1, n)
-[Y, X] = meshgrid(x, x)
+x = np.linspace(-1, 1, n)
+[Y, X] = np.meshgrid(x, x)
 sigma = .2
-W = 1 + 8 * exp(-(X**2 + Y**2)/ (2*sigma**2))
+W = 1 + 8 * np.exp(-(X**2 + Y**2)/ (2*sigma**2))
 imageplot(W)
 plt.savefig('out-520.png')
 

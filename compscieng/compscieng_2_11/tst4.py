@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy import *
 from scipy import ndimage
 
 def bilinear_interpolate(im, x, y):
@@ -211,11 +210,11 @@ def exo3(x0,W):
     Compute the distance map to these starting point using the FM algorithm.
     """
     n = W.shape[0]
-    pstart = transpose(array([x0]))
-    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, inf,'fm', 'sym',n*6)
+    pstart = np.transpose(np.array([x0]))
+    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, np.inf,'fm', 'sym',n*6)
     # display
     k = 8
-    displ = lambda D: cos(2*pi*k*D/ max(D.flatten()))
+    displ = lambda D: np.cos(2*np.pi*k*D/ max(D.flatten()))
     plt.figure()
     imageplot(displ(D))
     plt.set_cmap('jet')
@@ -231,12 +230,12 @@ def exo4(tau,x0,x1,G):
     point. You must stop the iteration when the path is close to $x_0$.
     """
     n = G.shape[0]
-    Geval = lambda G,x: bilinear_interpolate(G[:,:,0], imag(x), real(x) ) + 1j * bilinear_interpolate(G[:,:,1],imag(x), real(x))
+    Geval = lambda G,x: bilinear_interpolate(G[:,:,0], np.imag(x), np.real(x) ) + 1j * bilinear_interpolate(G[:,:,1],np.imag(x), np.real(x))
     niter = 1.5*n/tau;
     # init gamma
     gamma = [x1]
     xtgt = x0[0] + 1j*x0[1]
-    for i in arange(0,niter):
+    for i in np.arange(0,niter):
         g = Geval(G, gamma[-1] )
         gamma.append( gamma[-1] - tau*g )
         if abs(gamma[-1]-xtgt)<1:
@@ -246,16 +245,16 @@ def exo4(tau,x0,x1,G):
 
 
 n = 100
-x = linspace(-1, 1, n)
-[Y, X] = meshgrid(x, x)
+x = np.linspace(-1, 1, n)
+[Y, X] = np.meshgrid(x, x)
 sigma = .2
-W = 1 + 8 * exp(-(X**2 + Y**2)/ (2*sigma**2))
+W = 1 + 8 * np.exp(-(X**2 + Y**2)/ (2*sigma**2))
 x0 = [round(.1*n), round(.1*n)]
 D = exo3(x0,W)
 
 G0 = grad(D)
-d = sqrt(sum(G0**2, axis=2))
-U = zeros((n,n,2))
+d = np.sqrt(np.sum(G0**2, axis=2))
+U = np.zeros((n,n,2))
 U[:,:,0] = d
 U[:,:,1] = d
 G = G0 / U
@@ -263,15 +262,15 @@ tau = .8
 x1 = round(.9*n) + 1j*round(.88*n)
 gamma = [x1]
 
-Geval = lambda G,x: bilinear_interpolate(G[:,:,0], imag(x), real(x) ) + 1j * bilinear_interpolate(G[:,:,1],imag(x), real(x))
+Geval = lambda G,x: bilinear_interpolate(G[:,:,0], np.imag(x), np.real(x) ) + 1j * bilinear_interpolate(G[:,:,1],np.imag(x), np.real(x))
 g = Geval(G, gamma[-1] )
 gamma.append( gamma[-1] - tau*g )
 gamma = exo4(tau,x0,x1,G)
 
 imageplot(W) 
 plt.set_cmap('gray')
-h = plt.plot(imag(gamma), real(gamma), '.b', linewidth=2)
+h = plt.plot(np.imag(gamma), np.real(gamma), '.b', linewidth=2)
 h = plt.plot(x0[1], x0[0], '.r', markersize=20)
-h = plt.plot(imag(x1), real(x1), '.g', markersize=20)
+h = plt.plot(np.imag(x1), np.real(x1), '.g', markersize=20)
 plt.savefig('out-760.png')
 

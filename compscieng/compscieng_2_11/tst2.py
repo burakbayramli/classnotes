@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy import *
 from scipy import ndimage
 
 def imageplot(f, str='', sbpt=[]):
@@ -114,26 +113,26 @@ def exo1(x0,W):
 
 def exo2(x0,W):
     n = W.shape[0]
-    pstart = transpose(array([x0]))
-    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, inf,'fm', 'sym',n*6)
+    pstart = np.transpose(np.array([x0]))
+    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, np.inf,'fm', 'sym',n*6)
     plt.figure();
-    for i in arange(0,4):
+    for i in np.arange(0,4):
         plt.subplot(2, 2, i+1)
         d = Dsvg[:,:,i]
-        d[d==inf] = 0
+        d[d==np.inf] = 0
         imageplot(d)
         plt.set_cmap('jet')        
     plt.savefig('out-450.png')
     return D
 
 n = 40
-W = ones( (n,n) )
+W = np.ones( (n,n) )
 x0 = [int(n/2), int(n/2)]
 
 D = exo2(x0,W)
 
 plt.figure()
-displ = lambda D: cos(2*pi*5*D/max(D.flatten()) )
+displ = lambda D: np.cos(2*np.pi*5*D/np.max(D.flatten()) )
 imageplot(displ(D))
 plt.savefig('out-480.png')
 
