@@ -3,7 +3,7 @@ import os, sys, glob, shutil
 pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
 
 if len(sys.argv) == 1:
-    os.system("pdftk %s output ../../Dropbox/Public/skfiles/compscieng.pdf" % pdfs)
+    os.system("pdfunite %s  /data/data/com.termux/files/home/Downloads/compscieng.pdf" % pdfs)
     exit()    
 
 elif sys.argv[1] == 'all':
