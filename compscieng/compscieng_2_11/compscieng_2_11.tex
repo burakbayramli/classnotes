@@ -327,15 +327,73 @@ res = exo3(x0,W)
 
 \includegraphics[width=20em]{out-560.png}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+def exo4(tau,x0,x1,G):
+    n = G.shape[0]
+    Geval = lambda G,x: util.bilinear_interpolate(G[:,:,0], np.imag(x), np.real(x) ) + 1j * util.bilinear_interpolate(G[:,:,1],np.imag(x), np.real(x))
+    niter = 1.5*n/tau;
+    # init gamma
+    gamma = [x1]
+    xtgt = x0[0] + 1j*x0[1]
+    for i in np.arange(0,niter):
+        g = Geval(G, gamma[-1] )
+        gamma.append( gamma[-1] - tau*g )
+        if abs(gamma[-1]-xtgt)<1:
+            break
+    gamma.append( xtgt )
+    return gamma
+  
+n = 100
+x = np.linspace(-1, 1, n)
+[Y, X] = np.meshgrid(x, x)
+sigma = .2
+W = 1 + 8 * np.exp(-(X**2 + Y**2)/ (2*sigma**2))
+x0 = [round(.1*n), round(.1*n)]
+D = exo3(x0,W)
 
+G0 = util.grad(D)
+d = np.sqrt(np.sum(G0**2, axis=2))
+U = np.zeros((n,n,2))
+U[:,:,0] = d
+U[:,:,1] = d
+G = G0 / U
+tau = .8
+x1 = round(.9*n) + 1j*round(.88*n)
+gamma = [x1]
 
+Geval = lambda G,x: util.bilinear_interpolate(G[:,:,0], np.imag(x), np.real(x) ) + 1j * util.bilinear_interpolate(G[:,:,1],np.imag(x), np.real(x))
+g = Geval(G, gamma[-1] )
+gamma.append( gamma[-1] - tau*g )
+gamma = exo4(tau,x0,x1,G)
 
+util.imageplot(W) 
+plt.set_cmap('gray')
+h = plt.plot(np.imag(gamma), np.real(gamma), '.b', linewidth=2)
+h = plt.plot(x0[1], x0[0], '.r', markersize=20)
+h = plt.plot(np.imag(x1), np.real(x1), '.g', markersize=20)
+plt.savefig('out-760.png')
+\end{minted}
 
+\begin{verbatim}
+1.0
+2.0
+3.0
+4.0
+5.0
+6.0
+7.0
+8.0
+9.0
+10.0
+11.0
+12.0
+13.0
+14.0
+15.0
+16.0
+\end{verbatim}
 
-
-
-
-
+\includegraphics[width=20em]{out-760.png}
 
 
 
