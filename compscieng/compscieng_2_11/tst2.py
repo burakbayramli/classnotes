@@ -13,7 +13,7 @@ def imageplot(f, str='', sbpt=[]):
     imgplot.set_cmap('gray')
     plt.axis('off')
 
-def perform_dijstra_fm(W, pstart, niter=np.inf, method='dijstr', bound='sym', svg_rate=10):
+def perform_dijstra_fm(W, pstart, niter=np.inf, bound='sym', svg_rate=10):
     n = W.shape[0]
     neigh = np.array([[1, -1, 0, 0], [0, 0,  1, -1]])
 
@@ -79,14 +79,11 @@ def perform_dijstra_fm(W, pstart, niter=np.inf, method='dijstr', bound='sym', sv
             dy = min(DNeigh(D,2), DNeigh(D,3))
             u = ind2sub1(j)
             w = extract1d(W,j);
-            if method=='dijstr':
-                D[u[0],u[1]] = min(dx + w, dy + w)
+            Delta = 2*w - (dx-dy)**2
+            if (Delta>=0):
+                D[u[0],u[1]] = (dx + dy + np.sqrt(Delta))/ 2
             else:
-                Delta = 2*w - (dx-dy)**2
-                if (Delta>=0):
-                    D[u[0],u[1]] = (dx + dy + np.sqrt(Delta))/ 2
-                else:
-                    D[u[0],u[1]] = min(dx + w, dy + w)
+                D[u[0],u[1]] = min(dx + w, dy + w)
         t = iter/svg_rate
         if (np.mod(iter,svg_rate)==0) & (t<q):
             print (t)
@@ -114,7 +111,7 @@ def exo1(x0,W):
 def exo2(x0,W):
     n = W.shape[0]
     pstart = np.transpose(np.array([x0]))
-    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, np.inf,'fm', 'sym',n*6)
+    [D,Dsvg,Ssvg] = perform_dijstra_fm(W, pstart, np.inf, 'sym',n*6)
     plt.figure();
     for i in np.arange(0,4):
         plt.subplot(2, 2, i+1)
