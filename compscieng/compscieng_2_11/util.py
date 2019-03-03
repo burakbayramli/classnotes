@@ -4,9 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def imageplot(f, str='', sbpt=[]):
-    """
-        Use nearest neighbor interpolation for the display.
-    """
     if sbpt != []:
         plt.subplot(sbpt[0], sbpt[1], sbpt[2])
     imgplot = plt.imshow(f, interpolation='nearest')
@@ -40,30 +37,9 @@ def bilinear_interpolate(im, x, y):
     return wa*Ia + wb*Ib + wc*Ic + wd*Id
 
 def grad(M, bound="sym", order=1):
-    """
-        grad - gradient, forward differences
-        
-          [gx,gy] = grad(M, options);
-        or
-          g = grad(M, options);
-        
-          options.bound = 'per' or 'sym'
-          options.order = 1 (backward differences)
-                        = 2 (centered differences)
-        
-          Works also for 3D array.
-          Assme that the function is evenly sampled with sampling step 1.
-        
-          See also: div.
-        
-          Copyright (c) Gabriel Peyre
-    """    
-
-
     # retrieve number of dimensions
     nbdims = np.ndim(M)
-    
-    
+        
     if bound == "sym":  
         nx = np.shape(M)[0]
         if order == 1:
