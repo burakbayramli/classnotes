@@ -2,7 +2,7 @@ import os, sys, glob
 d = os.environ['HOME']
 
 if len(sys.argv) == 1 :
-    cmd = "pdftk " + \
+    cmd = "pdfunite " + \
     "./stat_00/stat_00.pdf " + \
     "./stat_intro/stat_intro.pdf " + \
     "./stat_cov_corr/stat_cov_corr.pdf " + \
@@ -38,7 +38,7 @@ if len(sys.argv) == 1 :
     "./stat_boltzmann/stat_boltzmann.pdf " + \
     "./stat_rbm/stat_rbm.pdf " + \
     "./stat_appendix/stat_appendix.pdf " + \
-    "output " + d + "/Downloads/stat.pdf"
+    d + "/Downloads/stat.pdf"
     
     print (cmd)
     os.system(cmd)

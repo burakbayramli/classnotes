@@ -30,9 +30,9 @@ if len(sys.argv) == 1:
     ./tser_peak/tser_peak.pdf \
     ./tser_sinreg/tser_sinreg.pdf \
     ./tser_sound/tser_sound.pdf \
-    ./tser_zapp/tser_zapp.pdf \
-    " + d + "/Downloads/tser.pdf
-    """
+    ./tser_zapp/tser_zapp.pdf """ 
+    cmd = cmd + d + "/Downloads/tser.pdf"
+    print (cmd)
     os.system(cmd)
     exit()
     
