@@ -1,9 +1,9 @@
 import os, sys, glob
 
 pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
-
+d = os.environ['HOME']
 if len(sys.argv) == 1:
-    os.system("pdfunite %s /data/data/com.termux/files/home/Downloads/multivar_calculus.pdf" % pdfs)
+    os.system("pdfunite %s " + d + "/Downloads/multivar_calculus.pdf" % pdfs)
     exit()    
 elif sys.argv[1] == 'all':
     for a in sorted(glob.glob("calc*")):

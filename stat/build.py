@@ -38,7 +38,7 @@ if len(sys.argv) == 1 :
     "./stat_boltzmann/stat_boltzmann.pdf " + \
     "./stat_rbm/stat_rbm.pdf " + \
     "./stat_appendix/stat_appendix.pdf " + \
-    "output " + d + "/stat.pdf"
+    "output " + d + "/Downloads/stat.pdf"
     
     print (cmd)
     os.system(cmd)

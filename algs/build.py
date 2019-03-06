@@ -1,5 +1,5 @@
 import os, sys, glob, shutil
-
+d = os.environ['HOME']
 if len(sys.argv) == 1:
     cmd = "pdfunite ./cover/cover.pdf \
     ./mlintro/mlintro.pdf \
@@ -43,7 +43,7 @@ if len(sys.argv) == 1:
     ./gan/gan.pdf \
     ./wavenet/wavenet.pdf \
     ./zapp/zapp.pdf \
-    /data/data/com.termux/files/home/Downloads/algs.pdf"
+    " + d + "/Downloads/algs.pdf"
     os.system(cmd)
     print (cmd)
     exit()
