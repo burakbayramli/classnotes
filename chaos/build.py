@@ -1,9 +1,10 @@
 import os, sys, glob
 
 pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
+d = os.environ['HOME']
 
 if len(sys.argv) == 1 :
-    os.system("pdftk %s output ../../Dropbox/Public/skfiles/chaos.pdf" % pdfs)
+    os.system("pdftk %s output " + d + "/chaos.pdf" % pdfs)
     exit()    
 elif sys.argv[1] == 'all':
     for a in sorted(glob.glob("chaos_*")):

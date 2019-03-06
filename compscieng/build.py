@@ -1,9 +1,10 @@
 import os, sys, glob, shutil
 
 pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
-
+d = os.environ['HOME']
 if len(sys.argv) == 1:
-    os.system("pdfunite %s  /data/data/com.termux/files/home/Downloads/compscieng.pdf" % pdfs)
+    cmd = "pdfunite %s " + d + "/Downloads/compscieng.pdf"
+    os.system(cmd % pdfs)
     exit()    
 
 elif sys.argv[1] == 'all':

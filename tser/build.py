@@ -1,5 +1,6 @@
 import os, sys, glob, shutil
 
+d = os.environ['HOME']
 if len(sys.argv) == 1:
     cmd = """
     pdfunite \
@@ -30,7 +31,7 @@ if len(sys.argv) == 1:
     ./tser_sinreg/tser_sinreg.pdf \
     ./tser_sound/tser_sound.pdf \
     ./tser_zapp/tser_zapp.pdf \
-    /data/data/com.termux/files/home/Downloads/tser.pdf
+    " + d + "/Downloads/tser.pdf
     """
     os.system(cmd)
     exit()

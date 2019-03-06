@@ -1,4 +1,5 @@
 import os, sys, glob
+d = os.environ['HOME']
 
 if len(sys.argv) == 1 :
     cmd = "pdftk " + \
@@ -37,7 +38,7 @@ if len(sys.argv) == 1 :
     "./stat_boltzmann/stat_boltzmann.pdf " + \
     "./stat_rbm/stat_rbm.pdf " + \
     "./stat_appendix/stat_appendix.pdf " + \
-    "output ../../Dropbox/Public/skfiles/stat.pdf"
+    "output " + d + "/stat.pdf"
     
     print (cmd)
     os.system(cmd)

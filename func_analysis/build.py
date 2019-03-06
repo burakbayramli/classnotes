@@ -1,9 +1,9 @@
 import os, sys, glob
 
 pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
-
+d = os.environ['HOME']
 if len(sys.argv) == 1 :
-    os.system("pdftk %s output ../../Dropbox/Public/skfiles/functional_analysis.pdf" % pdfs)
+    os.system("pdftk %s output " + d + "/functional_analysis.pdf" % pdfs)
     exit()
     
 elif sys.argv[1] == 'all':

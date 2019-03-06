@@ -1,5 +1,5 @@
 import os, sys, glob
-
+d = os.environ['HOME']
 if len(sys.argv) == 1 :
     os.system("pdfunite \
     pde_00/pde_00.pdf \
@@ -14,7 +14,7 @@ if len(sys.argv) == 1 :
     pde_curvature/pde_curvature.pdf \
     pde_wave_deriv/pde_wave_deriv.pdf \
     pde_varcalc/pde_varcalc.pdf \
-    /data/data/com.termux/files/home/Downloads/pde.pdf" \
+    " + d + "/Downloads/pde.pdf" \
     )
     exit()
     
