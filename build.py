@@ -75,7 +75,7 @@ if __name__ == "__main__":
         
         for topdir in ['algs','calc_multi','chaos','compscieng','elecmag',
                        'func_analysis','linear','ode','pde','stat',
-                       'tser','vision']:
+                       'tser','vision','phy']:
             print ('main',topdir)
             dir = TARGET_DIR + "/" + topdir
             print ('dir',dir)
@@ -92,7 +92,6 @@ if __name__ == "__main__":
                 if "cover" in subdir or "00" in subdir : continue
                 print (dir + "/" + subdir)
                 # read tex file, get header
-                #fin = open(dir + "/" + subdir + "/" + subdir + ".tex")
                 ff = dir + "/" + subdir + "/" + subdir + ".tex"
                 fin = codecs.open(ff, encoding='iso-8859-9')
                 content = fin.read()
