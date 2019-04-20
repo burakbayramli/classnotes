@@ -1,10 +1,12 @@
 import os, sys, glob
 
-pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
 d = os.environ['HOME']
-if len(sys.argv) == 1:
-    cmd = "pdftk %s output " + d + "/Downloads/phy.pdf"
-    os.system(cmd % pdfs)
+if len(sys.argv) == 1 :
+    os.system("pdfunite \
+    phy_lagrange/phy_lagrange.pdf \
+    phy_varcalc/phy_varcalc.pdf \
+    " + d + "/Downloads/phy.pdf" \
+    )
     exit()
     
 elif sys.argv[1] == 'all':

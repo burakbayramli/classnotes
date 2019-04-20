@@ -13,7 +13,6 @@ if len(sys.argv) == 1 :
     pde_lk/pde_lk.pdf \
     pde_curvature/pde_curvature.pdf \
     pde_wave_deriv/pde_wave_deriv.pdf \
-    pde_varcalc/pde_varcalc.pdf \
     " + d + "/Downloads/pde.pdf" \
     )
     exit()
