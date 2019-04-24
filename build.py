@@ -105,6 +105,7 @@ if __name__ == "__main__":
                 url = url.replace("-","")
                 url = url.replace(",","")
                 url = url.replace("?","")
+                url = url.replace("̇","")
                 url = url + ".html"
                 print ('the url is', subdir + "/" + url)
                 
