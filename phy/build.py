@@ -5,7 +5,7 @@ if len(sys.argv) == 1 :
     os.system("pdfunite \
     phy_basics/phy_basics.pdf \
     phy_lagrange/phy_lagrange.pdf \
-    phy_hamiltonian_1/phy_hamiltonian_1.pdf \
+    phy_hamiltonian/phy_hamiltonian.pdf \
     phy_varcalc/phy_varcalc.pdf \
     " + d + "/Downloads/phy.pdf" \
     )
