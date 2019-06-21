@@ -3,7 +3,7 @@ import os, sys, glob
 pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
 d = os.environ['HOME']
 if len(sys.argv) == 1:
-    cmd = "pdftk %s " + d + "/Downloads/ode_mattuck.pdf"
+    cmd = "pdfunite %s " + d + "/Downloads/ode_mattuck.pdf"
     os.system(cmd % pdfs)
     exit()
     
