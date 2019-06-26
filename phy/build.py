@@ -6,7 +6,7 @@ if len(sys.argv) == 1 :
     phy_basics/phy_basics.pdf \
     phy_lagrange/phy_lagrange.pdf \
     phy_hamiltonian/phy_hamiltonian.pdf \
-    phy_control/phy_control.pdf \
+    phy_control_3/phy_control_3.pdf \
     phy_varcalc/phy_varcalc.pdf \
     " + d + "/Downloads/phy.pdf" \
     )
