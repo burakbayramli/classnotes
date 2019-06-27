@@ -82,25 +82,170 @@ $$
 Bu dersin aþaðý yukarý tamamýnda üstteki türden gayri lineer bir denklemle
 temsil edilen ikinci derece sistemlere bakacaðýz. Hatta bizim
 ilgilendiðimiz çoðu robot daha da basit bir formda olabiliyor, hareket
-denklemleri $u$ bazýnda lineer olabiliyor. Robotuma dönme kuvveti ekleyince
+denklemleri $u$ bazýnda lineer olabiliyor, robota dönme kuvveti ekleyince
 bu etki sistemin ivmesine lineer bir etki uyguluyor yani.
 
 $$
-\ddot{q} = f_1 (q, \dot{q}, t) =  f_2 (q, \dot{q}, t) u
+\ddot{q} = f_1 (q, \dot{q}, t) + f_2 (q, \dot{q}, t) u \mlabel{1}
 $$
 
-Bu arada tamamen kumandali ne demek olurdu? 
+Pek yeni bir þey söylemiþim olmadým aslýnda, $f_1$ ile bir takým gayrý
+lineer iliþkilerle görülen deðiþkenler sisteme etki ediyor, sonra $f_2$ ile
+yine bir takým gayrý lineer iliþkilerle bir iliþki daha var, tek deðiþik
+söylediðim $u$'nun lineer olarak etki ettiði. 
 
-28:33
+Devam edelim, tamamen kumandalý ne demek? Üstteki denkleme bakalým, $q$ bir
+2x1 vektör, tabii ki $\ddot{q}$ da öyle, yani (1)'de gördüðümüz bir vektör
+denklemi. $f_1$ ayný þekilde. $u$ da öyle, 2x1 vektör. Bu durumda
+boyutlarýn uymasý için $f_2$'nin 2x2 matris olmasý gerekir. Hayatý
+kavramsal, düþünüþ olarak en kolaylaþtýran, ve çoðu robot tasarýmcýsýnýn
+yaptýðý $f_2$ matrisinin tam kerte olduðunu düþünmektir. O zaman deriz ki
+eðer $f_2$ tam kerte ise bir robot tamamen kumandalýdýr. Matematiksel olarak,
 
-sf. 110
+$$
+\rank [f_2(q,\dot{q},t)] = \ddim [q]
+$$
+
+Bu demektir ki eðer $f_1,f_2$'yi biliyorsam $u$ ile istediðim $\ddot{q}$'yu
+elde edebilirim. Deðil mi? Tam kerte bu demek, eðer $f_2$ tam kerte olmasa,
+tüm uzayý kapsayazdým, çünkü içinde tekrar eden kolonlar olurdu ve bu
+tekrar yeni bilgi eklemezdi, bu sebeple belli bir $u$ ile her $\ddot{q}$'ya
+erisemezdim.
+
+Daha az kumandalý nedir? Eðer 
+
+$$\rank [f_2(q,\dot{q},t)] < \ddim [q] \mlabel{2}$$ 
+
+ise. 
+
+[geri besleme lineerlestirme atlandi]
+
+Tarif edersek, bir sistemin kontrol girdisi sistemi her yönde
+ivmelendiremezse o sistem daha az kumandalýdýr. 
+
+Bu arada (2) formülüne dikkatle bakarsak, $f_2$, $q,\dot{q}$'a baðlý, o
+zaman daha az, tam kumandalý olma olmamama irdelemesi o anki konuma
+baðlý. Sistem dinamiði sýrasýnda bazen tam kumandalý olabilirim, bazen
+olmayabilirim. Bu nasýl olur? Bir engel vardýr belki, dinamiði belli
+þekillerde deðiþtirir, ve bazý þeyler mümkün olur, bazýlarý olmaz... 
+
+Asimo örneðine dönersek çok dikkatli, muhafazakar bir þekilde hareket
+ediyor deðil mi? Ýþte bu þekilde dikkatli olarak tam kumandalý konumlarda
+kalmaya uðraþýyor, yaptýðý bu. 
+
+Umarým bu tarif ettiðim ayrýmýn ne kadar derin olduðunu
+anlatabilmiþimdir. Robotik alanýnda bu fark her yerde; son 30 senedir çoðu
+araþtýrmacý robot kontrol tasarlarken $f_2$'nin tam kerte olduðunu
+farzetmiþtir. Mesela uyarlanýr (adaptýve) kontrol, hesaplanan dönme kuvveti
+metotlarý, tüm bunlar dolaylý olarak bu tam kerte faraziyesini yapar, ki
+böylece kafanýza esen þekilde kontrol uygulayarak kafanýza esen þekilde
+ivme yaratabilesiniz.  Ýþte bu sebeple uyarlanýr kontrolde mesela tüm bu
+matematiksel ispatlar vardýr, ki sistemi lineerize edebilesiniz, onun
+hakkýnda kolay þekilde düþünebilesiniz.
+
+Ýþte bu sebeple tam ile daha az kumandalý sistemler, tasarýmcýlar arasýnda
+bu kadar ayrýlýk var, çünkü eðer gayrý lineer sistemi alýp lineer hale
+getirme þansýmýz yoksa, o zaman gayrý lineer dinamiði anlamaya uðraþmaktan,
+onun uzun vadeli davranýþý hakkýnda düþünmekten baþka bir þansýnýz
+yoktur. Analitik yaklaþýmlar neredeyse ise baþlar baþlamaz ise yaramaz hale
+gelir, bilgisayarlar burada yardým edebilir.
+
+Fabrikadaki montaj bantýnda çalýþan robot kollarýn çoðu tam kumandalýdýr,
+yürüyen robotlarýn çoðu deðildir. 
+
+Örnek üzerinde bu fikirleri yakýndan görelim; Soyut $f$'ten bahsettik,
+artýk ilk baþta gördüðümüz iki baðlantýlý robot kol için hareket
+formüllerini yazalým. 
+
+Belki Lagrange mekanýðýný görmüþ olanlarýnýz vardýr, dersimiz için bu bilgi
+þart deðil, ders notlarýnda var, ama bu konuyu bilmek iyidir onu belirtmek
+istiyorum. Bu örnekte Lagrange yöntemini bir kere göstereceðim, özellikle
+bilmenizi istediðim eðer bir sistemin hareket formüllerini bulmak
+istiyorsanýz, Lagrange sistemi oldukca metodik bir þekilde en çetrefil
+sistemler için bile istediðinizi verecektir. 
+
+Birinci kütlenin $x_1$'de ikinci kütlenin $x_2$'de olduðunu düþünelim,
+
+$$
+x_1 = 
+\left[\begin{array}{r}
+l_1 \sin\theta_1 \\
+-l_1 \cos\theta_1
+\end{array}\right] =
+\left[\begin{array}{r}
+l_1 s_1 \\
+-l_1 c_1
+\end{array}\right]
+$$
+
+$$
+x_2 = x_1 + 
+\left[\begin{array}{r}
+l_2 \sin(\theta_1 + \theta_2) \\
+-l_2 \cos(\theta_1 + \theta_2)
+\end{array}\right] = 
+\left[\begin{array}{r}
+l_2 s_{1+2} \\
+-l_2 c_{1+2}
+\end{array}\right]
+$$
+
+Türevleri bulalým, mesela $\dot{x_1}$, bu hýz bir birleþik hýzdýr deðil mi,
+2. kütle de harekete dahil çünkü. 
+
+$$
+\dot{x}_1 = \left[\begin{array}{r}
+l_1 \cos\theta_1 \dot{\theta}_1 \\
+l_1 \sin\theta_1 \dot{\theta}_1 
+\end{array}\right]
+$$
+
+$$
+\dot{x}_2 = \dot{x}_1 + \left[\begin{array}{rrr}
+l_2 c_{1+2} (\dot{\theta}_1+ \dot{\theta})\\
+l_2 s_{1+2} (\dot{\theta}_1+ \dot{\theta})
+\end{array}\right]
+$$
+
+Kinematiði böylece çözmüþ olduk. Dinamiði ortaya çýkartmak için, Lagrangian
+metotunu kullanýyoruz. Sistemin enerjisini düþünüyoruz, toplam kinetik
+enerji $T$'yi düþünelim. Bu basit, zaten onun için noktasal kütleleri
+seçtim, $\frac{1}{2} m V^2$ genel formülünden hareketle, vektör formunda
+
+$$
+T = \frac{1}{2} \dot{x}_1^T m_1 \dot{x}_1 + \frac{1}{2} \dot{x}_2^T m_2 \dot{x}_2 
+$$
+
+Toplam potansiyel enerji $U$ için, 
+
+$$
+U = - m g l_1 c_1 - m_2 g (l_1c_1 + l_2 c_{1+2})
+$$
+
+Lagrangian $L = T - U$. $I_1 = m_1 l_1$ ve $I_2 = m_2 l_2$ olacak þekilde,
+
+$$
+(I_1 + I_2 + m_2 l_1^2 + 2m_2 l_1 l_{c2} c_2) \ddot{q}_1 + (I_2 + m_2
+l_1 l_{c2} c_2)\ddot{q}_2 - 2m_2 l_1 l_{c2} s_2 \dot{q}_1 \dot{q}_2
+$$
+
+$$
+-m_2 l_1 l_{c2} s_2 \dot{q}_2^2 + m_1 g l_{c1}s_1 + m_2 g
+        (l_1 s_1 + l_{c2} s_{1+2}) = 0
+$$
+
+$$
+(I_2 + m_2 l_1 l_{c2} c_2) \ddot{q}_1 + I_2 \ddot{q}_2 + m_2 l_1
+        l_{c2} s_2 \dot{q}_1^2 + m_2 g l_{c2} s_{1+2} = \tau
+$$
 
 
+$$
+\frac{\ud }{\ud t} \frac{\partial L}{\partial \dot{q}} + \frac{\partial L}{\partial q} =
+Q
+$$
 
-
-
-
-
+$Q$'ya genelleþtirilmiþ kuvvet deniyor. 
 
 
 
@@ -118,17 +263,3 @@ Kaynaklar
 [1] Tedrake, {\em MIT, 6.832 Underactuated Robotics}, \url{https://youtu.be/Z8oMbOj9IWM}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
