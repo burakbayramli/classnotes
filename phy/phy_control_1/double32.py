@@ -103,7 +103,7 @@ def make_plot(i):
     ax.set_ylim(-L1-L2-r, L1+L2+r)
     ax.set_aspect('equal', adjustable='box')
     plt.axis('off')
-    plt.savefig('frames/_img{:04d}.png'.format(i//di), dpi=72)
+    plt.savefig('/home/burak/Downloads/frames/_img{:04d}.png'.format(i//di), dpi=72)
     plt.cla()
 
     
