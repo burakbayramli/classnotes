@@ -113,8 +113,9 @@ fig = plt.figure(figsize=(8.3333, 6.25), dpi=72)
 ax = fig.add_subplot(111)
 tmax, dt = 30, 0.01
 t = np.arange(0, tmax+dt, dt)
-for i in range(0, t.size-10, di):
+for i in range(0, t.size, di):
     #print(i // di, '/', t.size // di)
+    if i==1000: break
     if i % 20 == 0:
         print (i)
         make_plot(i)
