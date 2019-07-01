@@ -3,14 +3,7 @@ import numpy as np
 from matplotlib.patches import Circle
 import matplotlib.pyplot as plt
 
-
 g = 9.8 # standard freefall (m/s^2)
-
-#l = input('pendulum length (meters) - > ')
-#theta10 = input('initial angle 1 (radians) - > ')
-#theta20 = input('initial angle 2 (radians) - > ')
-#dt = input('time step (seconds) - > ')
-#tmax = input('time to end of simulation (seconds) - > '    )
 
 l = 1
 L1 = 1
