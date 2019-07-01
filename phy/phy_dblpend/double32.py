@@ -18,7 +18,7 @@ L2 = 1
 theta10 = 3*np.pi/7
 theta20 = 3*np.pi/4
 dt = 0.01
-tmax = 30
+tmax = 10
 
 nsteps = int(tmax/dt)
 t = [0.0]*nsteps
@@ -66,7 +66,7 @@ for i in range(nsteps - 1):
 # Plotted bob circle radius
 r = 0.05
 # Plot a trail of the m2 bob's position for the last trail_secs seconds.
-trail_secs = 1
+trail_secs = 0
 # This corresponds to max_trail time points.
 max_trail = int(trail_secs / dt)
 
@@ -103,7 +103,7 @@ def make_plot(i):
     ax.set_ylim(-L1-L2-r, L1+L2+r)
     ax.set_aspect('equal', adjustable='box')
     plt.axis('off')
-    plt.savefig('/home/burak/Downloads/frames/_img{:04d}.png'.format(i//di), dpi=72)
+    plt.savefig('/home/burak/Downloads/frames/img{:04d}.png'.format(i), dpi=72)
     plt.cla()
 
     
@@ -113,32 +113,10 @@ fig = plt.figure(figsize=(8.3333, 6.25), dpi=72)
 ax = fig.add_subplot(111)
 tmax, dt = 30, 0.01
 t = np.arange(0, tmax+dt, dt)
-for i in range(0, t.size, di):
-    print(i // di, '/', t.size // di)
-    make_plot(i)
+for i in range(0, t.size-10, di):
+    #print(i // di, '/', t.size // di)
+    if i % 20 == 0:
+        print (i)
+        make_plot(i)
     
 
-pylab.figure()
-pylab.title('double pendulum')
-pylab.plot(t, q2, label='theta2')
-pylab.plot(t, q1, label='theta1')
-pylab.xlabel('t (s)')
-pylab.ylabel('angle (rad)')
-pylab.legend(loc=9)
-pylab.grid()
-pylab.figure(figsize=(6, 6))
-pylab.title('Lissajou curves for the double pendulum')
-pylab.plot(q1, q2)
-pylab.xlabel('theta1 (rad)')
-pylab.ylabel('theta2 (rad)')
-minmax = max(abs(min(q1+q2)), abs(max(q1+q2)))
-pylab.axis([ - minmax, minmax, - minmax, minmax], aspect='equal')
-pylab.grid()
-pylab.figure(figsize=(6, 6))
-pylab.title('double pendulum trace')
-pylab.plot(x2, y2)
-pylab.xlabel('x (m)')
-pylab.ylabel('y (m)')
-pylab.axis([ -2.1, 2.1, -2.1, 2.1], aspect='equal')
-pylab.grid()
-pylab.show()
