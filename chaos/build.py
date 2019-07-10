@@ -4,9 +4,9 @@ pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
 d = os.environ['HOME']
 
 if len(sys.argv) == 1 :
-    cmd = "pdfunite %s " + d + "/Downloads/chaos.pdf"
+    cmd = "pdfunite " + pdfs + " " + d + "/Downloads/chaos.pdf"
     print (cmd)
-    os.system(cmd % pdfs)
+    os.system(cmd)
     exit()    
 elif sys.argv[1] == 'all':
     for a in sorted(glob.glob("chaos_*")):
