@@ -140,7 +140,9 @@ tensorflow==1.4.1
 keras==2.0.8
 librosa
 python_speech_features
-gym
+gym==0.9.4
+slycot
+control
 ```
 
 Python paket kurulumu Ubuntu Linux üzerinde `pip install [paket ismi]`

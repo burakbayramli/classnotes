@@ -149,7 +149,7 @@ M+m & m l \cos\theta \\ \cos\theta & l
 \right)
 $$
 
-1. derece ODE sistemi elde etmek icin konum vektorunu tanimlayalim, 
+1. derece ODE sistemi elde etmek için konum vektörünü tanýmlayalým, 
 
 $$
 \bar{x} = \left[\begin{array}{r}
@@ -159,26 +159,6 @@ x_1 \\ x_2 \\ x_3 \\ x_4
 x \\ \theta \\ \dot{x} \\ \dot{\theta}
 \end{array}\right]
 $$
-
-
-
-
-
-Bu cebirsel olarak oldukca cetrefil bir islem. \verb!sympy! ile bu
-islemleri yapariz,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import sympy
-
-x1, x2, x3, x4 = sympy.symbols('x1 x2 x3 x4')
-M, m, l, mu, g, F = sympy.symbols('m M l mu g F',constant = True)
-
-a = sympy.Matrix([[M+m, m*l*sympy.cos(x2)],[sympy.cos(x2), l]])
-
-b = sympy.Matrix([m * l * x4**2 * sympy.sin(x2) - mu*x3 + F , g * sympy.sin(x2)])
-
-c = a.inv() * b
-\end{minted}
 
 Simdi 
 
@@ -197,20 +177,36 @@ M+m & m l \cos x_2 \\ \cos x_2 & l
 \right)
 $$
 
-Üstteki elde edilen matrisin 1. ve 2. satýrý, ona $t_1$, $t_2$ diyelim,
-sýrasýyla alttaki noktalý yerlere gelecek,
+Bu cebirsel olarak oldukca cetrefil bir islem. \verb!sympy! ile bu
+islemleri yapariz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sympy
+
+x1, x2, x3, x4 = sympy.symbols('x1 x2 x3 x4')
+M, m, l, mu, g, F = sympy.symbols('m M l mu g F',constant = True)
+
+a = sympy.Matrix([[M+m, m*l*sympy.cos(x2)],[sympy.cos(x2), l]])
+
+b = sympy.Matrix([m * l * x4**2 * sympy.sin(x2) - mu*x3 + F , g * sympy.sin(x2)])
+
+c = a.inv() * b
+\end{minted}
+
+Üstteki elde edilen matrisin 1. ve 2. satýrý sýrasýyla alttaki noktalý
+yerlere gelecek,
 
 $$
 \frac{\ud}{\ud t} \left[\begin{array}{rrr}
 x_1 \\ x_2 \\ x_3 \\ x_4
 \end{array}\right] = 
-\left[\begin{array}{rrr}
-x_3 \\ x_4 \\ t_1 \\ t_2
+\left[\begin{array}{c}
+x_3 \\ x_4 \\ \textrm{.. 1. satýr ...} \\ \textrm{.. 2. satýr ...}
 \end{array}\right]
 $$
 
 Artýk eþitliðin saðýndaki matrisin Jacobian'ini alýp $0,0,0,0$ noktasýndaki
-deðerini bulabiliriz. Tüm bu iþlemleri \verb!sympy! ile yapabiliriz,
+deðerini bulabiliriz. Tüm bu iþlemler \verb!sympy! ile yapilabilir,
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -244,6 +240,42 @@ $$
 \frac{g \left(M + m\right)}{l m} ,
 \frac{\mu}{l m}
 $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import control
+
+mu = 0.1
+m = 0.5;     
+M = 1.0;   
+l = 0.7;    
+g = 9.81;   
+d1 = 1;     
+Q = np.array([[100., 0., 0., 0.],[0, 1, 0, 0],[0, 0, 1000, 0],[0, 0, 0, 1]] )
+R = 0.0001
+
+A = np.array([[0, 0, 1, 0],
+    [0, 0, 0, 1],
+    [0, -(m/M)*g, -mu/M, 0],
+    [0, (m+M)*g/M*l, mu/M*l, 0]])
+    
+B = np.array([[0], [0], [1/M],[-1/M*l]])
+
+K,X,e = control.lqr(A,B,Q,R);
+print (K)
+\end{minted}
+
+\begin{verbatim}
+[[ -1000.00000075 -26562.41502589  -3925.95979882 -10134.95641789]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.array([[0, 1, 0, 0],
+    [0, -d1/m1,  m2*g/m1, 0],
+    [0, 0, 0, 1],
+    [0, -d1/(m1*l), (m1+m2)*g/(m1*l), 0]])
+    
+B = np.array([[0], [1/m1],[0], [1/(m1*l)]])
+\end{minted}
 
 
 
