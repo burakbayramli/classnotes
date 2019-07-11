@@ -49,12 +49,12 @@ $$
 
 $$
 \frac{\ud}{\ud t} \frac{\partial L}{\partial \dot{x}} -
-\frac{\partial L}{\partial \dot{x}}  = F
+\frac{\partial L}{\partial x}  = F
 $$
 
 $$
 \frac{\ud}{\ud t} \frac{\partial L}{\partial \dot{\theta}} -
-\frac{\partial L}{\partial \dot{\theta}}  = 0
+\frac{\partial L}{\partial \theta}  = 0
 $$
 
 Ýki üstteki denklemde eþitliðin sað tarafýnda $F$ var, niye sýfýr deðil?
@@ -75,6 +75,78 @@ $$
 $$
 
 
+{\em Gayri-Lineer Dinamik ve Kaos, Ders 6}'da Jacobian matrisi ile denge
+noktalarý yakýnýnda bir sistemi nasýl lineerize edebileceðimizi gördük. Ýki
+boyutta $x^*,y^*$ denge noktasý yakýnýnda, $\dot{u} = \dot{x} = f(x,y)$ ve
+$\dot{v} = \dot{y} = g(x,y)$ ODE sistem için mesela, ya da,
+
+$$
+\left[\begin{array}{r}
+\dot{u} \\ \dot{v}
+\end{array}\right] = 
+\left[\begin{array}{r}
+f(x,y) \\ g(x,y)
+\end{array}\right] 
+$$
+
+için, lineerizasyon sonrasý þöyle bir görüntü var,
+
+$$
+\left[\begin{array}{r}
+\dot{u} \\ \dot{v}
+\end{array}\right]
+=
+\left[\begin{array}{rr}
+\frac{\partial f}{\partial x} & \frac{\partial f}{\partial y} \\
+\frac{\partial g}{\partial x} & \frac{\partial g}{\partial y} 
+\end{array}\right]_{x^*,y^*}
+\left[\begin{array}{r} u \\ v \end{array}\right]
++ ...
+$$
+
+Noktalý kýsýmlarý atarsak 1. dereceden bir yaklaþýksallama ve lineerizasyon
+elde ediyoruz ve görülen $x^*,y^*$ noktasýndaki deðerleri kullanýlan 2x2
+matrisi Jacobian matrisidir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sympy import *
+
+init_printing(use_unicode=False)
+
+x1, x2, x3, x4 = symbols('x1 x2 x3 x4')
+M, m, l, mu, g, u = symbols('m M l mu g u',constant = True)
+
+a = Matrix([[M+m, m*l*cos(x2)],[cos(x2), l]])
+#pprint (a)
+
+b = Matrix([m * l * x4**2 * sin(x2) - mu*x3 + u , g * sin(x2)])
+#pprint (b)
+
+c = a.inv() * b
+#pprint (c)
+
+tmp = diff(c[0], x2).subs({x1:0,x2:0,x3:0,x4:0}).simplify()
+print(latex(tmp), ',')
+tmp = diff(c[0], x3).subs({x1:0,x2:0,x3:0,x4:0}).simplify()
+print(latex(tmp), ',')
+tmp = diff(c[1], x2).subs({x1:0,x2:0,x3:0,x4:0}).simplify()
+print(latex(tmp), ',')
+tmp = diff(c[1], x3).subs({x1:0,x2:0,x3:0,x4:0}).simplify()
+\end{minted}
+
+\begin{verbatim}
+- \frac{M g}{m} ,
+- \frac{\mu}{m} ,
+\frac{g \left(M + m\right)}{l m} ,
+\end{verbatim}
+
+$$
+- \frac{M g}{m} ,
+- \frac{\mu}{m} ,
+\frac{g \left(M + m\right)}{l m} ,
+$$
+
+
 
 
 2.160 pdf sf 75 algebr ricc
@@ -88,20 +160,3 @@ Kaynaklar
 [2] Wikipedia, {\em Optimal control}, \url{wikipedia.com/Optimal_control}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
