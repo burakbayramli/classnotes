@@ -31,7 +31,6 @@ K,X,e = control.lqr(A,B,Q,R);
 
 print (K)
 
-
 def f(y, t):
     x1,x2,x3,x4 = y
     xs = np.array([1,0,0,0])
