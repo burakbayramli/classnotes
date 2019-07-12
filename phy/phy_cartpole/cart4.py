@@ -7,9 +7,11 @@ env = gym.make('CartPole-v0').env
 
 x = env.reset()
 
-#for i in range(5): env.step(0)
-for i in range(5): env.step(1)
-
+curr_theta = 0
+for i in range(10):
+    observation, reward, done, info = env.step(1)
+    curr_theta = observation[2]
+    
 g = env.gravity
 m = env.masspole
 M = env.masscart
@@ -42,6 +44,7 @@ def f(y, t):
 
 N = 10. / tau
 t = np.linspace(0, 10, N)
-x0 = [0.0, 0.0, -np.pi, 2.0]
+x0 = [0.0, 0.0, curr_theta, 2.0]
 sol = odeint(f, x0, t)
 print (sol)
+
