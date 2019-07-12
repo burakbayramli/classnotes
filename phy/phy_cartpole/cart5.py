@@ -1,4 +1,5 @@
 # https://c4science.ch/diffusion/3852/browse/master/test.py
+# convert -loop 0 -delay 100 frames1/*.png frames1/cart.gif
 from scipy.integrate import odeint
 import control, gym, time
 import numpy as np
@@ -17,16 +18,17 @@ g = 9.8
 m = 0.3
 M = 1.0
 l = 1.0
-
 mu = 0.1 # friction
 Q = np.array([[100., 0., 0., 0.],[0, 1, 0, 0],[0, 0, 1000, 0],[0, 0, 0, 1]] )
 R = 0.0001
-
+#init_theta = -5.0
+init_theta = 0.5
+x0 = [0.0, 0.0, init_theta, 2.0]
 
 def flatten(a):
     return np.array(a).flatten()
 
-def show_cart(xt, theta):
+def show_cart(fout, xt, theta):
     cart_w = 1.0
     cart_h = 0.5
     radius = 0.1
@@ -55,16 +57,16 @@ def show_cart(xt, theta):
     wx = np.copy(ox) + float(bx[0, -1])
     wy = np.copy(oy) + float(by[0, -1])
 
+    plt.figure()
     plt.plot(flatten(cx), flatten(cy), "-b")
     plt.plot(flatten(bx), flatten(by), "-k")
     plt.plot(flatten(rwx), flatten(rwy), "-k")
     plt.plot(flatten(lwx), flatten(lwy), "-k")
     plt.plot(flatten(wx), flatten(wy), "-k")
-    plt.title("x:" + str(round(xt, 2)) + ",theta:" +
-              str(round(math.degrees(theta), 2)))
 
-    plt.axis("equal")
-    plt.show()
+    #plt.axis("equal")
+    plt.xlim(-3, 3)
+    plt.savefig(fout)
         
 A = np.array([[0, 0, 1, 0],
     [0, 0, 0, 1],
@@ -87,13 +89,13 @@ def f(y, t):
     return [x3, x4, tmp1, tmp2 ]
 
 
-t = np.linspace(0, 10, 200)
-init_theta = 0.3
-x0 = [0.0, 0.0, init_theta, 2.0]
+t = np.linspace(0, 5, 100)
 sol = odeint(f, x0, t)
-print (sol[:,0])
-print (sol[:,1])
+#print (sol[:,0])
+#print (sol[:,1])
 
-    
-show_cart(0.4, 0.5)
-show_cart(-3.4, -0.5)
+for i,row in enumerate(sol):
+    if i % 5 == 0:
+        print (row[0], row[1])
+        show_cart('frames1/cart-%04d' % i, row[0], row[1])
+        #show_cart(-3.4, -0.5)
