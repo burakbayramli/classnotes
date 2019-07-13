@@ -7,8 +7,8 @@ if len(sys.argv) == 1 :
     phy_lagrange/phy_lagrange.pdf \
     phy_hamiltonian/phy_hamiltonian.pdf \
     phy_dblpend/phy_dblpend.pdf \
-    phy_control_1/phy_control_1.pdf \
-    phy_control_3/phy_control_3.pdf \
+    phy_cartpole/phy_cartpole.pdf \
+    phy_under/phy_under.pdf \
     phy_varcalc/phy_varcalc.pdf \
     " + d + "/Downloads/phy.pdf" \
     )
