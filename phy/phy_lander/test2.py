@@ -16,7 +16,7 @@ for i in range(100):
     buffer = pyglet.image.get_buffer_manager().get_color_buffer()            
     image_data = buffer.get_image_data()
     if i % 10 == 0:
-        image_data.save(filename='frames/out-%04d.png' % i)
+        image_data.save(filename='frames/lunar-%04d.png' % i)
     
     print (observation)
     if done: break

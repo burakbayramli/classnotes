@@ -27,7 +27,7 @@ if __name__ == "__main__":
             buffer = pyglet.image.get_buffer_manager().get_color_buffer()            
             image_data = buffer.get_image_data()
             if i % 10 == 0:
-                image_data.save(filename='frames/out-%04d.png' % i)
+                image_data.save(filename='frames/rocket-%04d.png' % i)
             i += 1
             
             env.draw_marker(env.landing_coordinates[0], env.landing_coordinates[1])
