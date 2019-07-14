@@ -1,10 +1,3 @@
-"""Author: Reuben Ferrante
-Date:   16/08/2017
-
-Description: This is the main running point of the simulation. Set
-settings, algorithm, episodes,...
-
-"""
 from rocketlander import RocketLander
 from constants import LEFT_GROUND_CONTACT, RIGHT_GROUND_CONTACT
 import numpy as np
