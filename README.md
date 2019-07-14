@@ -143,6 +143,7 @@ python_speech_features
 gym==0.9.4
 slycot
 control
+pyglet
 ```
 
 Python paket kurulumu Ubuntu Linux üzerinde `pip install [paket ismi]`
