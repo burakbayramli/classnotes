@@ -15,8 +15,8 @@ if __name__ == "__main__":
     s = env.reset()
     
     left_or_right_barge_movement = np.random.randint(0, 2)
-    epsilon = 0.05
-    for i in range(30):
+
+    for i in range(50):
 
             a = [10.0, 1.0, 1.0]                        
             s, r, done, info = env.step(a)
@@ -35,8 +35,7 @@ if __name__ == "__main__":
 
             # When should the barge move? Water movement, dynamics etc can be simulated here.
             if s[LEFT_GROUND_CONTACT] == 0 and s[RIGHT_GROUND_CONTACT] == 0:
-                env.move_barge_randomly
-                (epsilon, left_or_right_barge_movement)
+                env.move_barge_randomly(0.05, left_or_right_barge_movement)
                 
                 # Random Force on rocket to simulate wind.
                 env.apply_random_x_disturbance \
