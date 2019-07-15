@@ -74,42 +74,7 @@ $$
 \ell \ddot{\theta} - g \sin\theta + \ddot{x} \cos\theta = 0
 $$
 
-
-{\em Gayri-Lineer Dinamik ve Kaos, Ders 6}'da Jacobian matrisi ile denge
-noktalarý yakýnýnda bir sistemi nasýl lineerize edebileceðimizi gördük. Ýki
-boyutta $x^*,y^*$ denge noktasý yakýnýnda, $\dot{u} = \dot{x} = f(x,y)$ ve
-$\dot{v} = \dot{y} = g(x,y)$ ODE sistem için mesela, ya da,
-
-$$
-\left[\begin{array}{r}
-\dot{u} \\ \dot{v}
-\end{array}\right] = 
-\left[\begin{array}{r}
-f(x,y) \\ g(x,y)
-\end{array}\right] 
-$$
-
-için, lineerizasyon sonrasý þöyle bir görüntü var,
-
-$$
-\left[\begin{array}{r}
-\dot{u} \\ \dot{v}
-\end{array}\right]
-=
-\left[\begin{array}{rr}
-\frac{\partial f}{\partial x} & \frac{\partial f}{\partial y} \\
-\frac{\partial g}{\partial x} & \frac{\partial g}{\partial y} 
-\end{array}\right]_{x^*,y^*}
-\left[\begin{array}{r} u \\ v \end{array}\right]
-+ ...
-$$
-
-Noktalý kýsýmlarý atarsak 1. dereceden bir yaklaþýksallama ve lineerizasyon
-elde ediyoruz ve görülen $x^*,y^*$ noktasýndaki deðerleri kullanýlan 2x2
-matrisi Jacobian matrisidir. 
-
-Sarkac denklemlerine donersek, bu denklemleri su sekilde tekrar
-duzenleyebiliriz, 
+Ya da
 
 $$
 \left[\begin{array}{rr}
@@ -125,7 +90,7 @@ g \sin\theta
 \end{array}\right] + 
 \left[\begin{array}{r}
 1 \\ 0
-\end{array}\right] F
+\end{array}\right] F 
 $$
 
 $$
@@ -145,7 +110,12 @@ M+m & m l \cos\theta \\ \cos\theta & l
   1 \\ 0
   \end{array}\right] F
 \right)
+\mlabel{1}
 $$
+
+Örneðe dönelim; Noktalý kýsýmlarý atarsak 1. dereceden bir yaklaþýksallama
+ve lineerizasyon elde ediyoruz ve görülen $x^*,y^*$ noktasýndaki deðerleri
+kullanýlan 2x2 matrisi Jacobian matrisidir.
 
 1. derece ODE sistemi elde etmek için konum vektörünü tanýmlayalým, 
 
@@ -159,10 +129,22 @@ x \\ \theta \\ \dot{x} \\ \dot{\theta}
 \end{array}\right]
 $$
 
-$x_1,x_2$'nin ne olduðu basit. $x_3,x_4$ için iki üstteki denklem
-gerekiyor, daha doðrusu görülen matris iþlemlerini yapýp 1. ve
-2. satýrlarýný $x_3,x_4$ için kullanabiliriz. Önce gerekli $x_i$ deðiþken
-deðiþimlerini yaparýz,
+(1)'den elde edilen matrisin 1. ve 2. satýrý sýrasýyla alttaki noktalý
+yerlere gelecek,
+
+$$
+\frac{\ud}{\ud t} \left[\begin{array}{rrr}
+x_1 \\ x_2 \\ x_3 \\ x_4
+\end{array}\right] = 
+\left[\begin{array}{c}
+x_3 \\ x_4 \\ \textrm{.. 1. satýr ...} \\ \textrm{.. 2. satýr ...}
+\end{array}\right]
+$$
+
+Görüldüðü gibi $x_1,x_2$'nin ne olduðu basit. $x_3,x_4$ için (1)
+denklemindeki matris iþlemlerini yapýp 1. ve 2. satýrlarýný $x_3,x_4$ için
+kullanabiliriz. Önce (1) formülündeki gerekli $x_i$ deðiþken deðiþimlerini
+yaparýz,
 
 $$
 \left[\begin{array}{rr}
@@ -193,23 +175,84 @@ a = sympy.Matrix([[M+m, m*l*sympy.cos(x2)],[sympy.cos(x2), l]])
 b = sympy.Matrix([m * l * x4**2 * sympy.sin(x2) - mu*x3 + F , g * sympy.sin(x2)])
 
 c = a.inv() * b
+
+sympy.pprint(sympy.latex(sympy.simplify(c)))
 \end{minted}
 
-Üstteki elde edilen matrisin 1. ve 2. satýrý sýrasýyla alttaki noktalý
-yerlere gelecek,
+\begin{verbatim}
+\left[\begin{matrix}\frac{F - \frac{M g \sin{\left(2 x_{2} \right)}}{2} + M l 
+x_{4}^{2} \sin{\left(x_{2} \right)} - \mu x_{3}}{M \sin^{2}{\left(x_{2} \right
+)} + m}\\\frac{g \left(M + m\right) \sin{\left(x_{2} \right)} - \left(F + M l 
+x_{4}^{2} \sin{\left(x_{2} \right)} - \mu x_{3}\right) \cos{\left(x_{2} \right
+)}}{l \left(M \sin^{2}{\left(x_{2} \right)} + m\right)}\end{matrix}\right]
+\end{verbatim}
+
+Ýki matris satýrý elde ettik, bunlarý yerine koyalým,
 
 $$
 \frac{\ud}{\ud t} \left[\begin{array}{rrr}
 x_1 \\ x_2 \\ x_3 \\ x_4
 \end{array}\right] = 
 \left[\begin{array}{c}
-x_3 \\ x_4 \\ \textrm{.. 1. satýr ...} \\ \textrm{.. 2. satýr ...}
+x_3 \\ x_4 \\ 
+\frac{F - \frac{M g \sin{\left(2 x_{2} \right)}}{2} + M l 
+x_{4}^{2} \sin{\left(x_{2} \right)} - \mu x_{3}}{M \sin^{2}{\left(x_{2} \right
+)} + m} \\
+\frac{g \left(M + m\right) \sin{\left(x_{2} \right)} - \left(F + M l 
+x_{4}^{2} \sin{\left(x_{2} \right)} - \mu x_{3}\right) \cos{\left(x_{2} \right
+)}}{l \left(M \sin^{2}{\left(x_{2} \right)} + m\right)}
 \end{array}\right]
 $$
 
-ODE eþitliðinin saðýndaki matrisi elde ettik. Bu matrisin Jacobian'inin
-kritik nokta $(0,0,0,0)$'daki deðerini bulabiliriz. Tüm bu iþlemler de
-\verb!sympy! ile yapýlabilir. Önce $x$ üzerinden Jacobian,
+Bir gayrý-lineer ODE elde etmiþ olduk. Þimdi yapmak istediðimiz bu sistemi 
+
+$$
+\dot{x} = Ax(t) + B F(t)
+$$
+
+$$
+y(t) = C x(t) + D F(t)
+$$
+
+haline sokmak, yani lineer bir þekilde temsil edebilme, örnekte birinci
+denklem $\dot{x} = Ax(t) + Bu(t)$ yeterli.
+
+Sistemimizi lineerize etmemiz lazým. Bunu kritik nokta yakýnýnda
+yapabiliriz, o zaman LQR adlý bir teknik sistemin o noktada kalmasý için
+gerekli kontrol $F$ etkisini hesaplayabiliyor.
+
+{\em Gayri-Lineer Dinamik ve Kaos, Ders 6}'da Jacobian matrisi ile denge
+noktalarý yakýnýnda bir sistemi nasýl lineerize edebileceðimizi gördük. Ýki
+boyutta $x^*,y^*$ denge noktasý yakýnýnda, $\dot{u} = \dot{x} = f(x,y)$ ve
+$\dot{v} = \dot{y} = g(x,y)$ ODE sistem için mesela, ya da,
+
+$$
+\left[\begin{array}{r}
+\dot{u} \\ \dot{v}
+\end{array}\right] = 
+\left[\begin{array}{r}
+f(x,y) \\ g(x,y)
+\end{array}\right] 
+$$
+
+için, lineerizasyon sonrasý þöyle bir görüntü var,
+
+$$
+\left[\begin{array}{r}
+\dot{u} \\ \dot{v}
+\end{array}\right]
+=
+\left[\begin{array}{rr}
+\frac{\partial f}{\partial x} & \frac{\partial f}{\partial y} \\
+\frac{\partial g}{\partial x} & \frac{\partial g}{\partial y} 
+\end{array}\right]_{x^*,y^*}
+\left[\begin{array}{r} u \\ v \end{array}\right]
++ ...
+$$
+
+Örneðe dönelim; matrisimizin Jacobian'inin kritik nokta $(0,0,0,0)$'daki
+deðerini bulabiliriz. Tüm bu iþlemler de \verb!sympy! ile yapýlabilir. Önce
+$x$ üzerinden Jacobian,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 tmp = sympy.diff(c[0], x2).subs({x1:0,x2:0,x3:0,x4:0}).simplify()
