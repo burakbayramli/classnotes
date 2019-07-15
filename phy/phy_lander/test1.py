@@ -26,9 +26,8 @@ if __name__ == "__main__":
             # Draw the target
             buffer = pyglet.image.get_buffer_manager().get_color_buffer()            
             image_data = buffer.get_image_data()
-            if i % 10 == 0:
+            if i % 5 == 0:
                 image_data.save(filename='frames/rocket-%04d.png' % i)
-            i += 1
             
             env.draw_marker(env.landing_coordinates[0], env.landing_coordinates[1])
             # Refresh render
@@ -36,9 +35,13 @@ if __name__ == "__main__":
 
             # When should the barge move? Water movement, dynamics etc can be simulated here.
             if s[LEFT_GROUND_CONTACT] == 0 and s[RIGHT_GROUND_CONTACT] == 0:
-                env.move_barge_randomly(epsilon, left_or_right_barge_movement)
+                env.move_barge_randomly
+                (epsilon, left_or_right_barge_movement)
+                
                 # Random Force on rocket to simulate wind.
-                env.apply_random_x_disturbance(epsilon=0.005, left_or_right=left_or_right_barge_movement)
+                env.apply_random_x_disturbance \
+                (epsilon=0.005, \
+                 left_or_right=left_or_right_barge_movement)
                 env.apply_random_y_disturbance(epsilon=0.005)
 
             # Touch down or pass abs(THETA_LIMIT)

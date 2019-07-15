@@ -1,12 +1,3 @@
-"""Author: Reuben Ferrante
-Date:   10/05/2017
-
-Description: This is the rocket lander simulation built on top of the
-             gym lunar lander. It's made to be a continuous action
-             problem (as opposed to discretized).
-
-"""
-
 from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape, revoluteJointDef, contactListener)
 import numpy as np
 import Box2D
@@ -18,7 +9,6 @@ import logging
 import pyglet
 from itertools import chain
 from constants import *
-
 
 # This contact detector is equivalent the one implemented in Lunar Lander
 class ContactDetector(contactListener):

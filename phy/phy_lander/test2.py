@@ -22,12 +22,7 @@
 
 # Left-right: -1.0..-0.5 fire left engine, +0.5..+1.0 fire right
 # engine, -0.5..0.5 off
-
-
-import gym, six
-import pyglet
-import pandas as pd
-import numpy as np
+import gym, six, pyglet, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 
 env = gym.make('LunarLander-v2')
