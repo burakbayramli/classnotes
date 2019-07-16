@@ -3,6 +3,7 @@ import os, sys, glob, shutil
 d = os.environ['HOME']
 if len(sys.argv) == 1 :
     os.system("pdfunite \
+    phy_cover/phy_cover.pdf \
     phy_basics/phy_basics.pdf \
     phy_lagrange/phy_lagrange.pdf \
     phy_hamiltonian/phy_hamiltonian.pdf \
