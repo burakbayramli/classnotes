@@ -208,22 +208,23 @@ $$
 Bir gayrý-lineer ODE elde etmiþ olduk. Þimdi yapmak istediðimiz bu sistemi 
 
 $$
-\dot{x} = Ax(t) + B F(t)
+\dot{x} = Ax(t) + B u(t)
 $$
 
 $$
-y(t) = C x(t) + D F(t)
+y(t) = C x(t) + D u(t)
 $$
 
 haline sokmak, yani lineer bir þekilde temsil edebilme, örnekte birinci
-denklem $\dot{x} = Ax(t) + Bu(t)$ yeterli. Lineerizasyonu kritik nokta
-yakýnýnda yapacagiz, o zaman LQR adlý bir teknik sistemin o noktada kalmasý
-için gerekli kontrol $F$ etkisini hesaplayabiliyor.
+denklem $\dot{x} = Ax(t) + B u(t)$ yeterli. Lineerizasyonu kritik nokta
+yakýnýnda yapacaðýz, o zaman LQR adlý bir teknik sistemin o noktada kalmasý
+için gerekli kontrol $u$ degerini hesaplayabiliyor.
 
-{\em Gayri-Lineer Dinamik ve Kaos, Ders 6}'da Jacobian matrisi ile denge
+{\em Gayri-Lineer Dinamik ve Kaos, Ders 6}'da Jacobian matrisý ile denge
 noktalarý yakýnýnda bir sistemi nasýl lineerize edebileceðimizi gördük. Ýki
 boyutta $x^*,y^*$ denge noktasý yakýnýnda, $\dot{u} = \dot{x} = f(x,y)$ ve
-$\dot{v} = \dot{y} = g(x,y)$ ODE sistem için mesela, ya da,
+$\dot{v} = \dot{y} = g(x,y)$ ODE sistem için mesela (buradaki $u$ üstteki
+$u$ ile karýþtýrýlmasýn), ya da,
 
 $$
 \left[\begin{array}{r}
@@ -257,8 +258,8 @@ $$
 J_x = \left[\begin{array}{cccc}
 0 & 0 & 1 & 0 \\
 0 & 0 & 0 & 1 \\
-&& ..\textrm{..3. satýr..} & \\ 
-&& ..\textrm{..4. satýr..} &
+& \textrm{..... 3. satýr ...} &  &  \\ 
+& \textrm{..... 4. satýr ...} &  & 
 \end{array}\right]
 $$
 
@@ -318,6 +319,54 @@ B = J_F = \left[\begin{array}{c}
 \end{array}\right]
 $$
 
+Böylece $(0,0,0,0)$ kritik noktasý etrafýnda lineerize edilmiþ sistemimiz
+için bir $\dot{x} = A x + B u$ denklemi elde etmiþ olduk, 
+
+Lineer Karesel Düzenleyici (Linear Quadratic Regulators -LQR-)
+
+Sistemi belirtilen kritik nokta etrafýnda lineerize etmemizin bir sebebi
+vardý; çünkü bir lineer sistem varsa, o sistem herhangi bir denge noktasý
+etrafýnda LQR ile tutulabilir. $(0,0,0,0)$ noktasý çubuðun tam dik olduðu
+(acý orada sýfýr) yerdir, amacýmýz çubuk dengelemek, o zaman dengelemeyi
+burada yapabiliriz. Eðer sistem bu duruma yakýnsa (çubuðun tam aþaðý düþmüþ
+olduðu durumlarda bu yaklaþým ise yaramaz), LQR kullanýlabilir. Tam taným;
+baþlangýcý $x_0$ olarak bilinen bir
+
+$$
+\dot{x} = A x + B u
+$$
+
+sistemi için amaç
+
+$$
+J = \frac{1}{2} \int _{0}^{\infty} [ x^T(t) Q x(t) + u^T(t) R u(t) ] \ud t
+$$
+
+$$
+x(t_0) = x_0
+$$
+
+bedel fonksiyonunu minimize etmektir, yani bu minimizasyonu yapacak kontrol
+$u$ deðerini bulmaktý. Çözüm $u(t) = -K(t) x (t)$, ve $K$ cebirsel
+Riccati denklemi üzerinden bulunur [2]. Hesapsal pek çok kütüphanede bu
+çözümü yapacak \verb!lqr! çaðrýlarý vardýr. $Q,R$ ile $x,u$ içindeki hangi
+deðiþkenlere daha önem, aðýrlýk vereceðimizi tanýmlayabiliriz, mesela iki
+boyutlu durumda köþegen matriste 
+
+$$
+Q = \left[\begin{array}{rrr}
+2 & 0 \\ 0 & 1
+\end{array}\right]
+$$
+
+tanýmlamak $x_1$'e $x_2$'ye göre iki kat daha önem verildiðini gösterir. 
+
+O zaman gerekli $u(t)$'yu bulduktan sonra bu aksiyonu sisteme
+uygulayabiliriz, yani $\dot{x} = A x + B u$ sistemini bulunan $u$ ile
+entegre ederiz, ve bu sistem dengeye giden bir çubuk olacaktýr. Altta bu
+çözümü, baþlangýç acýsý $\theta = 0.5$ ve $-5$ için görüyoruz. Sonuçlar
+animasyon olarak [5,6]'da.
+
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.integrate import odeint
 import control, gym, time
@@ -339,8 +388,8 @@ l = 1.0
 mu = 0.1 # friction
 Q = np.array([[100., 0., 0., 0.],[0, 1, 0, 0],[0, 0, 1000, 0],[0, 0, 0, 1]] )
 R = 0.0001
-#init_theta = -5.0
-init_theta = 0.5
+init_theta = -5.0
+#init_theta = 0.5
 x0 = [0.0, 0.0, init_theta, 2.0]
 
 def flatten(a):
@@ -399,10 +448,10 @@ def rhs(x, t):
     xs = np.array([1,0,0,0])
     F = np.float(np.dot(K,(xs - np.array([x1,x2,x3,x4]))))
 
-    tmp1 = (F - M*g*sin(2*x2)/2 + M*l*x4**2*sin(x2) - mu*x3) \ 
-           /(M*sin(x2)**2 + m)
+    tmp1 = (F - M*g*sin(2*x2)/2 + M*l*x4**2*sin(x2) - mu*x3) \
+           / (M*sin(x2)**2 + m)
 
-    tmp2 = (g*(M + m)*sin(x2) - (F + M*l*x4**2*sin(x2) - mu*x3)*cos(x2)) \ 
+    tmp2 = (g*(M + m)*sin(x2) - (F + M*l*x4**2*sin(x2) - mu*x3)*cos(x2)) \
            /(l*(M*sin(x2)**2 + m))
 
     return [x3, x4, tmp1, tmp2 ]
@@ -413,7 +462,7 @@ sol = odeint(rhs, x0, t)
 
 for i,row in enumerate(sol):
     if i % 5 == 0:
-        show_cart('frames1/cart-%04d' % i, row[0], row[1])
+        show_cart('frames2/cart-%04d' % i, row[0], row[1])
 \end{minted}
 
 $\theta = 0.5$
@@ -432,22 +481,29 @@ $\theta = -5.0$
 \includegraphics[width=17em]{frames2/cart-0020.png}
 \includegraphics[width=17em]{frames2/cart-0030.png}
 
+Kodlar genel hatlarýyla [4]'u baz almýþtýr. 
 
-
-
-2.160 pdf sf 75 algebr ricc
-
-[devam edecek]
+Özyineli bir þekilde LQR yapan bir diðer kod [7]'de, \verb!ilqr.py! dosyasýnda
+bulunabilir.
 
 Kaynaklar
 
-[1] Wikipedia, {\em Inverted Pendulum}, \url{wikipedia.com/Inverted_pendulum}
+[1] Wikipedia, {\em Inverted Pendulum}, \url{http://www.wikipedia.com/wiki/Inverted_pendulum}
 
-[2] Wikipedia, {\em Optimal control}, \url{wikipedia.com/Optimal_control}
+[2] Wikipedia, {\em Optimal control}, \url{http://wikipedia.com/wiki/Optimal_control}
 
 [3] Gutman, {\em Technion, Linear Systems Lecture}, \url{http://leo.technion.ac.il/Courses/LS/}
 
 [4] Suhm, {\em LQR Control Tutorial For An Inverted Pendulum With Octave /
   Matlab}, \url{https://www.youtube.com/watch?v=KqdP0DVZ-lQ}
 
+[5] Bayramli, {\em Animasyon}, \url{https://github.com/burakbayramli/classnotes/blob/master/phy/phy_cartpole/frames1/cart.gif}
+
+[6] Bayramli, {\em Animasyon}, \url{https://github.com/burakbayramli/classnotes/blob/master/phy/phy_cartpole/frames2/cart.gif}
+
+[7] Eiting, {\em ilqr}, \url{https://gist.github.com/jeiting/c381e195d6153eaf657c21f691c2e456}
+
 \end{document}
+
+
+
