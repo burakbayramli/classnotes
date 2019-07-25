@@ -6,7 +6,6 @@ if len(sys.argv) == 1 :
     phy_cover/phy_cover.pdf \
     phy_basics/phy_basics.pdf \
     phy_lagrange/phy_lagrange.pdf \
-    phy_hamiltonian/phy_hamiltonian.pdf \
     phy_dblpend/phy_dblpend.pdf \
     phy_cartpole/phy_cartpole.pdf \
     phy_under/phy_under.pdf \
