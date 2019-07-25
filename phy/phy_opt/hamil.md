@@ -37,6 +37,12 @@ $$
 J_a(u(t)) = \int _{t_0}^{t_f} \mathcal{L}( x(t), \dot{x}(t), u(t), \lambda(t), t)
 $$
 
+Eğer Hamiltonian biçimine geçmek istiyorsak, 
+
+$$
+\mathcal{H}(x(t), u(t), \lambda(t), t) = 
+V( x(t), u(t), t) + \lambda^T f(x(t), u(t), t)
+$$
 
 
 
