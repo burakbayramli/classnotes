@@ -121,12 +121,12 @@ y = np.linspace(32,33,D)
 
 xx,yy = np.meshgrid(x,y)
 
-xr = np.array([[36.06122449],
+xm = np.array([[36.06122449],
                [36.71428571]])
-yr = np.array([[32.67346939],
+ym = np.array([[32.67346939],
                [32.32653061]])
 	       
-X = np.hstack((xr,yr))
+X = np.hstack((xm,ym))
 
 Phi = np.exp(-gamma*cdist(X,X,metric='euclid'))
 
@@ -150,7 +150,38 @@ plt.savefig('linear_app88rbf_04.png')
 \includegraphics[width=20em]{linear_app88rbf_04.png}
 
 Bu kod üzerinde oynayarak farklý $\gamma$, aðýrlýklar $w$ deðerlerinin
-grafikte deðiþime yol açtýðý görülebilir.
+grafikte deðiþime yol açtýðý görülebilir. 
+
+Burada RBF ile aslýnda analýk bir fonksiyon yaratmýþ olduk. Bir kez
+aðýrlýklarýný aldýktan sonra (RBF merkezlerini zaten biliyoruz) herhangi
+bir $x,y$ deðeri için o noktadaki birleþik RBF sonucunu hesaplatabiliriz,
+mesela üstteki örnek için
+
+$$
+x_{m1} = [36.06, 32.67],
+x_{m2} = [36.71, 32.32], 
+x_{test} = [36.16, 32.77]
+$$
+
+
+$$
+y = 0.5 \exp (-\gamma || x_{test} - x_{m1} ||^2) + 0.5 \exp (-\gamma || x_{test} - x_{m2} ||^2 )
+$$
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x_test = 36.16; y_test = 32.77
+w1 = 0.5; w2 = 0.5
+
+d1 = (x_test-xm[0])**2 + (y_test-ym[0])**2
+d2 = (x_test-xm[1])**2 + (y_test-ym[1])**2
+y_new = w1*np.exp(-gamma * d1) + w2*np.exp(-gamma * d2) 
+print (y_new)
+\end{minted}
+
+\begin{verbatim}
+[0.6637959]
+\end{verbatim}
 
 Gerçek dünya þartlarýna yaklaþýrsak; bu tür durumlarda çok daha fazla baz
 fonksiyon, örneklem kullanýlýr, altta \verb!func! fonksiyonu örneklem
