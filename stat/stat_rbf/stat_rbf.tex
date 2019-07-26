@@ -152,10 +152,10 @@ plt.savefig('linear_app88rbf_04.png')
 Bu kod üzerinde oynayarak farklý $\gamma$, aðýrlýklar $w$ deðerlerinin
 grafikte deðiþime yol açtýðý görülebilir. 
 
-Burada RBF ile aslýnda analýk bir fonksiyon yaratmýþ olduk. Bir kez
+Burada RBF ile aslýnda analitik bir fonksiyon yaratmýþ olduk. Bir kez
 aðýrlýklarýný aldýktan sonra (RBF merkezlerini zaten biliyoruz) herhangi
 bir $x,y$ deðeri için o noktadaki birleþik RBF sonucunu hesaplatabiliriz,
-mesela üstteki örnek için
+mesela üstteki fonksiyon için
 
 $$
 x_{m1} = [36.06, 32.67],
@@ -287,7 +287,8 @@ Yeryüzü modellemesinde çokça kullanýlan bir fonksiyon çoklu ikinci derece yüzey
 fonksiyonudur. Bu fonksiyon
 
 $$
-\phi(r) = \sqrt{r^2 + \gamma^2}
+\phi(r) = \sqrt{(r/\epsilon)^2 + 1} =
+\sqrt{ \left( \frac{\|x_n-x_m\|}{\epsilon} \right)^2 + 1} 
 $$
 
 ile gösterilir, ki $\gamma$ pürüzsüzlüðü kontrol eden bir sabittir. 
@@ -311,7 +312,7 @@ yy = yy.reshape(D*D)
 znew = znew.reshape(D*D)
 
 from scipy.interpolate import Rbf
-rbfi = Rbf(xx,yy,znew)
+rbfi = Rbf(xx,yy,znew,function='multiquadric')
 
 xx = xx.reshape(D,D)
 yy = yy.reshape(D,D)
@@ -332,6 +333,38 @@ Not: \verb!scipy! ile bize döndürülen ve ara deðerleme için direk çaðýrýlabilen
 objeyi gerekli her türlü bilgiyi içinde taþýyor. Yani modeli çýkartýp veriyi
 atýp, sadece bu objeyi (mesela \verb!pickle! ile) diskte saklayabiliriz, bu tek
 baþýna yeterlidir. 
+
+Yazý baþýndaki Gaussian tekniðini \verb!scipy! üzerinden kullanalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+np.random.seed(0)
+
+S = 200
+
+x = np.linspace(36,37,D)
+y = np.linspace(32,33,D)
+
+xx,yy = np.meshgrid(x,y)
+znew = func(xx,yy)
+xx = xx.reshape(D*D)
+yy = yy.reshape(D*D)
+znew = znew.reshape(D*D)
+
+from scipy.interpolate import Rbf
+rbfi = Rbf(xx,yy,znew,function='gaussian')
+
+xx = xx.reshape(D,D)
+yy = yy.reshape(D,D)
+znew = znew.reshape(D,D)
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+fig.colorbar(surf, shrink=0.5, aspect=5)
+plt.savefig('linear_app88rbf_05.png')
+\end{minted}
+
+\includegraphics[width=20em]{linear_app88rbf_05.png}
 
 Kaynaklar
 
