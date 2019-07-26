@@ -22,9 +22,8 @@ xr = np.array([[36.06122449],
                [36.71428571]])
 yr = np.array([[32.67346939],
                [32.32653061]])
+	       
 X = np.hstack((xr,yr))
-print (xr)
-print (yr)
 
 Phi = np.exp(-gamma*cdist(X,X,metric='euclid'))
 
@@ -42,7 +41,6 @@ znew = dd.reshape(D,D)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.savefig('rbf1.png')
 ```
 

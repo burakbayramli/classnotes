@@ -37,6 +37,8 @@ if len(sys.argv) == 1 :
     "./stat_pcd/stat_pcd.pdf " + \
     "./stat_boltzmann/stat_boltzmann.pdf " + \
     "./stat_rbm/stat_rbm.pdf " + \
+    "./stat_pca/stat_pca.pdf " + \
+    "./stat_rbf/stat_rbf.pdf " + \
     "./stat_appendix/stat_appendix.pdf " + \
     d + "/Downloads/stat.pdf"
     
