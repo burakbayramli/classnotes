@@ -41,7 +41,6 @@ if len(sys.argv) == 1:
     ./speech/speech.pdf \
     ./graphconv/graphconv.pdf \
     ./gan/gan.pdf \
-    ./wavenet/wavenet.pdf \
     ./zapp/zapp.pdf \
     " + d + "/Downloads/algs.pdf"
     os.system(cmd)
