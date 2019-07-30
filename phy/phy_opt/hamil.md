@@ -1,4 +1,5 @@
 #+LaTeX_HEADER: \newcommand{\ud}{\,\mathrm{d}}
+#+LaTeX_HEADER: \newcommand{\mlabel}[1]{\quad \text{(#1)}\quad}
 #+LaTeX_HEADER: \usepackage{palatino,eulervm}
 
 Hamiltonian Biçimi 
@@ -54,16 +55,66 @@ o zaman Lagrangian $\mathcal{H}$ formunda su hale gelir,
 $$
 \mathcal{L}( x, \dot{x}, u, \lambda, t) = 
 \mathcal{H}(x, u, \lambda, t) - \lambda^T \dot{x}
+\mlabel{5}
 $$
 
 Bu aslında (4)'ün açılmış hali, ve o ilk bölümün $\mathcal{H}$ olarak tanımlanması,
 
+$$ 
+\mathcal{L} = \underbrace{V( x, u, t) + \lambda^T f( x, u, t))}_{\mathcal{H}} - 
+\lambda^T \dot{x}(t) 
+$$ 
+
+Şimdi Euler-Lagrange işlemini hatırlayalım, eldeki değişkenler
+$x,\lambda,u$ üzerinden bu denklemler
+
 $$
-\mathcal{L} = \underbrace{V( x, u, t) +  \lambda^T f( x, u, t ))}_{\mathcal{H}} - \lambda^T \dot{x}(t)
+\left( \frac{\partial \mathcal{L}}{\partial x} \right) -
+\frac{\ud}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{x}} \right) 
+= 0 
+\quad
+\textrm{konum (state) denklemi}
 $$
 
+$$
+\left( \frac{\partial \mathcal{L}}{\partial \lambda} \right) -
+\frac{\ud}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{\lambda}} \right) 
+= 0
+\quad
+\textrm{eskonum (costate) denklemi}
+$$
 
+$$
+\left( \frac{\partial \mathcal{L}}{\partial u} \right) -
+\frac{\ud}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{u}} \right) 
+= 0
+\quad
+\textrm{kontrol (control) denklemi}
+$$
 
+Üstte belirtildiği gibi bu denklemlere konum, eşkonum, control
+denklemleri ismi veriliyor. Şimdi biz bu türetmeyi içinde
+$\mathcal{H}$ olan $\mathcal{L}$ için yapacağız, çünkü bu şekilde
+belli daha uygun formlar elde etmek istiyoruz, yani (4) denklemini baz
+alarak, üstteki üç formülü uygulayınca,
+
+$$
+\frac{\partial \mathcal{L}}{\partial x} = 
+\frac{\partial \mathcal{H}}{\partial x} - 
+\frac{\ud}{\ud t} \left( -\lambda \right)   = 0
+$$
+
+$$
+\frac{\partial \mathcal{L}}{\partial \lambda} = 
+\frac{\partial \mathcal{H}}{\partial \lambda} - \dot{x} -
+\frac{\ud}{\ud t} \left( 0 \right)   = 0
+$$
+
+$$
+\frac{\partial \mathcal{L}}{\partial u} = 
+\frac{\partial \mathcal{H}}{\partial u} - 
+\frac{\ud}{\ud t} \left( 0 \right)   = 0
+$$
 
 
 
