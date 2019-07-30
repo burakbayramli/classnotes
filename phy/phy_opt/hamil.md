@@ -92,7 +92,7 @@ $$
 \textrm{kontrol (control) denklemi}
 $$
 
-Üstte belirtildiği gibi bu denklemlere konum, eşkonum, control
+Üstte belirtildiği gibi bu denklemlere konum, eşkonum, kontrol
 denklemleri ismi veriliyor. Şimdi biz bu türetmeyi içinde
 $\mathcal{H}$ olan $\mathcal{L}$ için yapacağız, çünkü bu şekilde
 belli daha uygun formlar elde etmek istiyoruz, yani (4) denklemini baz
@@ -116,8 +116,30 @@ $$
 \frac{\ud}{\ud t} \left( 0 \right)   = 0
 $$
 
+Ve bu turetme uzerinden konum, eşkonum, kontrol denklemlerinin yeniden
+duzenlenmis hali soyle olur,
+
+$$
+\dot{x} = + \left( \frac{\partial \mathcal{H}}{\partial \lambda} \right)
+$$
+
+$$
+\dot{\lambda} = - \left( \frac{\partial \mathcal{H}}{\partial x} \right)
+$$
+
+$$
+0 = + \left( \frac{\partial \mathcal{H}}{\partial u} \right)
+$$
 
 
+Üstteki son denklem Hamiltonian $\mathcal{H}$'nin kontrol $u$'ya göre
+nasıl optimize edileceğini gösteriyor. Yani $J$ fonksiyonelin sistem
+denklemine göre optimize edilmesi problemi şimdi Hamiltonian
+fonksiyonunun $u$ bazında optimize edilmesi problemine
+dönüştü. Böylece orijinal fonksiyonel optimizasyonunu normal bir
+fonksiyon optimizasyon problemine indirgemiş olduk [1, sf. 92].
+
+Ornek [1, sf. 70]
 
 
 
