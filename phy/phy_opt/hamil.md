@@ -30,8 +30,8 @@ $$
 \underbar{x}(2) = \left[\begin{array}{cc} 1 & 0 \end{array}\right]^T 
 $$
 
-Yazının geri kalanında $\underbar{x},\underbar{\lambda}$, vs.
-kullanılmayacak, çerçeveden boyut tahmin edilebilir. 
+Yazının geri kalanında $\underbar{x}$, vs. kullanılmayacak, çerçeveden
+boyut tahmin edilebilir.
 
 Çözüm
 
@@ -85,11 +85,97 @@ $$
 = \lambda_1^* x_2^* - \frac{1}{2} {\lambda_2^*}^2  
 $$
 
+Devam edersek, $\dot{x} = \left( \frac{\partial \mathcal{H}}{\partial
+\lambda} \right)$  denkleminden hareketle,
+
+$$
+\dot{x}^*_1 = \left( \frac{\partial \mathcal{H}}{\partial \lambda_1} \right) =
+x_2^*
+$$
+
+$$
+\dot{x}^*_2 = \left( \frac{\partial \mathcal{H}}{\partial \lambda_2} \right) =
+\lambda_2^*
+$$
+
+Ve $\dot{\lambda} = - \left( \frac{\partial \mathcal{H}}{\partial x}
+\right)$ denkleminden hareketle,
+
+$$
+\dot{\lambda}_1^* = - \left( \frac{\partial \mathcal{H}}{\partial x_1} \right) = 0
+$$
+
+$$
+\dot{\lambda}_2^* = - \left( \frac{\partial \mathcal{H}}{\partial x_2} \right) = 
+- \lambda_1^*
+$$
+
+```python
+from sympy import symbols, Eq, Function, dsolve, latex, simplify
+
+t = symbols('t') 
+x1,x2,lam1,lam2 = symbols('x1 x2 lam1 lam2',cls=Function)
+
+system = [Eq(x1(t).diff(t), x2(t)), \
+          Eq(x2(t).diff(t), -lam2(t)), \
+          Eq(lam1(t).diff(t), 0), \
+          Eq(lam2(t).diff(t), -lam1(t)),  \
+          ]
+
+sol = dsolve(system, [x1(t),x2(t),lam1(t),lam2(t)])
+print (latex(simplify(sol[0])))
+print (latex(simplify(sol[1])))
+print (latex(sol[2]))
+print (latex(sol[3]))
+```
+
+```text
+x_{1}{\left(t \right)} = C_{1} + C_{2} t + C_{2} + \frac{C_{3} t^{2}}{2} + C_{3} t + C_{3} + \frac{C_{4} t^{3}}{6} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+x_{2}{\left(t \right)} = C_{2} + C_{3} t + C_{3} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+lam_{1}{\left(t \right)} = C_{4}
+lam_{2}{\left(t \right)} = - C_{3} - C_{4} t - C_{4}
+```
+
+$$
+x_{1}{\left(t \right)} = C_{1} + C_{2} t + C_{2} + \frac{C_{3} t^{2}}{2} + C_{3} t + C_{3} + \frac{C_{4} t^{3}}{6} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+$$
+
+$$
+x_{2}{\left(t \right)} = C_{2} + C_{3} t + C_{3} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+$$
+
+$$
+lam_{1}{\left(t \right)} = C_{4}
+$$
+
+$$
+lam_{2}{\left(t \right)} = - C_{3} - C_{4} t - C_{4}
+$$
 
 
+Sınır şartlarını tanımlayarak çözersek, ve sadece $\lambda_2$'ye
+bakarsak (çünkü $u(t)$ sonucunu $u(t) = -\lambda_2^*(t)$ olarak bulmuştuk),
 
 
+```python
+ics = { x1(0):1, x2(0):2, x1(2):1, x2(2):0 } 
+sol = dsolve(system, [x1(t),x2(t),lam1(t),lam2(t)], ics=ics)
+print (latex(sol[3]))
+```
 
+```text
+lam_{2}{\left(t \right) = 4 - 3 t
+```
+
+$$
+\lambda_{2}{\left(t \right)} = 4 - 3 t
+$$
+
+O zaman, ve 
+
+$$
+u = -\lambda_2 = 3t - 4
+$$
 
 
 
