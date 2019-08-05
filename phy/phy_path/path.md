@@ -60,3 +60,4 @@ $$
 
 
 
+[1] Bryson, Ho, {\em Applied Optimal Control}
