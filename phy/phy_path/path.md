@@ -27,11 +27,11 @@ $$
 \dot{y} = V \sin\theta + v(x,y)
 $$
 
-ki $\theta$ geminin burnunu hangi yöne doğru tuttuğumuzu kontrol
-ediyor, yani geminin hızı $V$ o yönde uygulanmış oluyor. $\theta$
-sabitlenmiş kordinate eksenlerine göredir, ve $x,y$ bu eksende geminin
-yönünü gösterir.  Dikkat: $u$ çoğunlukla kontrol girdisi olarak
-gösterilir, burada böyle değil.
+$\theta$ geminin burnunu hangi yöne doğru tuttuğumuzu kontrol ediyor,
+yani geminin hızı $V$ o yönde uygulanmış oluyor. $\theta$ sabitlenmiş
+kordinat eksenlerine göredir, ve $x,y$ bu eksende geminin yönünü
+gösterir.  Dikkat: $u$ çoğunlukla kontrol girdisi olarak gösterilir,
+burada böyle değil.
 
 $$
 \mathcal{H}(x, u, \lambda, t) = \mathcal{L}( x, u, t) + \lambda^T f(x, u, t) 
@@ -80,9 +80,9 @@ V (-\lambda_x \sin \theta + \lambda_y \cos \theta ) \to
 \tan\theta = \frac{\lambda_y}{\lambda_x}
 $$
 
-Hamiltonian $\mathcal{H}$, zaman $t$'ye direk / belirgin sekilde bagli
-olmadigi durumlarda $\mathcal{H} = \textrm{sabit}$ sistemin
-entegrallerinden biridir. Ispatlayalim, 
+Hamiltonian $\mathcal{H}$ zaman $t$'ye direk / belirgin şekilde bağlı
+olmadığı durumlarda $\mathcal{H} = \textrm{sabit}$ sistemin
+entegrallerinden biridir. İspatlayalım,
 
 $$
 \frac{\ud \mathcal{H}(x, u, \lambda, t)}{\ud t} = 
@@ -137,11 +137,11 @@ edersek $\mathcal{H}_u = 0$ sıfır şartı optimal gidiş yolu üzerinde
 geçerlidir. 
 
 Varabileceğimiz bir diğer sonuç $\mathcal{H}$'nin sabit olmak ötesinde
-sıfıra eşit olması mecburiyetidir. Bu nereden geliyor? 
-
-[ispat]
-
-(1)'den başlayalım, 
+sıfıra eşit olması mecburiyetidir. Bu nereden geliyor? Eğer zaman
+üzerinden optimize ediyorsak ve $\mathcal{H}$ zamana bağlı değilse ve
+sabitse, zamanın herhangi bir yerde olabilmesi için sadece sıfır
+sabiti bu işi yapabilir.
+Çözüme gelelim. (1)'den başlayalım, 
 
 $$
 0 = \lambda_x (V \cos\theta + u) + \lambda_y (W \sin\theta + v) + 1
@@ -188,4 +188,5 @@ Kaynaklar
 
 [2] Radhakant Padhi, {\em OPTIMAL CONTROL, GUIDANCE AND ESTIMATION}, 
     \url{https://nptel.ac.in/courses/101108057/downloads/Lecture-34.pdf}
+
 
