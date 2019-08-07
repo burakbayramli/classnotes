@@ -31,15 +31,22 @@ sabitlenmiþ kordinate eksenlerine göredir, ve $x,y$ bu eksende geminin
 yönünü gösterir.  Dikkat: $u$ çoðunlukla kontrol girdisi olarak
 gösterilir, burada böyle deðil.
 
-Hamiltonian genel olarak þu formdadýr (notasyon karýþmasýn diye $V$
-yerine $W$ kullandýk),
-
 $$
-\mathcal{H}(x, u, \lambda, t) = W( x, u, t) + \lambda^T f(x, u, t)
+\mathcal{H}(x, u, \lambda, t) = \mathcal{L}( x, u, t) + \lambda^T f(x, u, t) 
 $$
 
-Optimize edilecek bedel $W(x,y,\theta,t) = 1$. Diðer deðiþken $\lambda
-= \left[\begin{array}{cc} \lambda_x & \lambda_y \end{array}\right]^T$
+Zaman optimizasyonu icin $\mathcal{L} = 1$. Niye? Mesela
+
+$$
+J = \int _{t_0}^{t_f} \mathcal{L}( x, \dot{x}, u, \lambda, t)
+$$
+
+performans ölçütünü düþünelim, $\mathcal{L} = 1$ seçmek entegral
+çözümünden hareketle $J = t_f - t_0$ anlamýna gelir, yani geçen
+zamanýn hesabý.
+
+Diðer deðiþken $\lambda =
+\left[\begin{array}{cc} \lambda_x & \lambda_y \end{array}\right]^T$
 diyelim, sistem denklemi $f$ biraz önce verildi zaten.
 
 Bu sistemin Hamiltonian'ý 
@@ -48,18 +55,8 @@ $$
 \mathcal{H} = 
 \lambda_x (V \cos \theta + u ) + 
 \lambda_y (V \sin \theta + v ) + 1
+\mlabel{1}
 $$
-
-$W(x,y,\theta,t) = 1$ seçtik çünkü minimum zaman problemlerinde bu
-yapýlýr, mesela 
-
-$$
-J = \int _{0}^{t_f} \mathcal{L}( x, \dot{x}, u, \lambda, t)
-$$
-
-performans ölçütünü düþünelim, $\mathcal{L} = 1$ seçmek entegral
-çözümünden hareketle $J = t_f - t_0$ anlamýna gelir, yani geçen
-zamanýn hesabý.
 
 Devam edersek, Euler-Lagrange denklemleri
 
@@ -93,13 +90,13 @@ $$
 \frac{\partial \mathcal{H}}{\partial \lambda}\frac{\partial \lambda}{\partial t} 
 $$
 
-Ýptalleme mümkün çünkü $\mathcal{H}$ zamandan baðýmsýz. Devam edelim,
+Ýptalleme mümkün çünkü $\mathcal{H}$ zamandan baðýmsýz. Devam edelim [1, sf 49],
 
 $$
-\dot{H} = \mathcal{H}_t + \mathcal{H}_x \dot{x} + H_u \dot{u} + \dot{\lambda}^T f
+\dot{H} = \mathcal{H}_x \dot{x} + H_u \dot{u} + \dot{\lambda}^T f
 $$
 
-$f$ nereden geldi, Euler-Lagrange denklemlerini hatirlarsak,
+$f$ nereden geldi, Euler-Lagrange denklemlerini hatýrlarsak,
 
 $$
 \dot{x} = + \left( \frac{\partial \mathcal{H}}{\partial \lambda} \right)
@@ -111,7 +108,69 @@ $$
 
 Soldan birinci denklem ile $\dot{x}$ yerine $\frac{\partial
 \mathcal{H}}{\partial \lambda}$ kullanabiliyoruz, ayrica $\dot{x} = f$
-olduðuna göre bu yerine geçirme mümkün oluyor.
+olduðuna göre bu yerine geçirme mümkün oluyor. 
+
+Ayný þekilde $\dot{x}$ yerine $f$ ve gruplama sonrasý,
+
+$$
+\dot{H} = \mathcal{H}_u \dot{u} + (\mathcal{H}_x + \dot{\lambda}^T) f
+$$
+
+E-L soldan ikinci denklem ile parantez içi sýfýr olur, geri
+kalanlardan, E-L soldan üçüncü denklem ile,
+
+$$
+= \cancelto{0}{\mathcal{H}_u \dot{u}}
+$$
+
+Ve sonuç,
+
+$$
+\dot{H} = 0
+$$
+
+Eðer üstteki doðruysa o zaman optimal gidiþ yolu üzerinde $t$
+üzerinden entegral $\mathcal{H}$'in sabit olmasý gerekir. Dikkat
+edersek $\mathcal{H}_u = 0$ sýfýr þartý optimal gidiþ yolu üzerinde
+geçerlidir. 
+
+Varabileceðimiz bir diðer sonuç $\mathcal{H}$'nin sabit olmak ötesinde
+sýfýra eþit olmasý mecburiyetidir. Bu nereden geliyor? 
+
+[ispat]
+
+(1)'den baþlayalým, 
+
+$$
+0 = \lambda_x (V \cos\theta + u) + \lambda_y (W \sin\theta + v) + 1
+$$
+
+$$
+-\frac{1}{\lambda_x} = \cancel{\frac{\lambda_x}{\lambda_x}}
+(V  \cos\theta + u) + \frac{\sin\theta}{\cos\theta} (V \sin\theta + v)
+$$
+
+$$
+\frac{-\cos\theta}{\lambda_x} = 
+V \cos^2\theta + u\cos\theta + V \sin^2\theta + V \cos\theta
+$$
+
+$$
+= V (\cancelto{1}{\cos^2\theta + \sin^2\theta}) + u + v
+$$
+
+$$
+\lambda_x = \frac{-\cos\theta}{V + u\cos\theta + v\sin\theta}
+$$
+
+Benzer iþlemler sonrasý 
+
+$$
+\lambda_y = \frac{-\sin\theta}{V + u\cos\theta + v\sin\theta}
+$$
+
+elde edilebilir.
+
 
 
 
@@ -127,6 +186,5 @@ Kaynaklar
 
 [2] Radhakant Padhi, {\em OPTIMAL CONTROL, GUIDANCE AND ESTIMATION}, 
     \url{https://nptel.ac.in/courses/101108057/downloads/Lecture-34.pdf}
-
 
 \end{document}
