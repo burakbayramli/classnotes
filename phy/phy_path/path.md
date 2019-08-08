@@ -2,176 +2,174 @@
 #+LaTeX_HEADER: \newcommand{\mlabel}[1]{\quad \text{(#1)}\quad}
 #+LaTeX_HEADER: \usepackage{palatino,eulervm}
 #+LaTeX_HEADER: \usepackage{cancel}
-Optimal Yol Hesabı
 
-Bir geminin çok kuvvetli dalgaların olduğu bir bölgeden geçmesi
-gerekiyor. Bu dalgaların büyüklüğü ve yönü her nokta için o noktaya
-etki eden bir vektör olarak gösterilebilir [1, sf. 77]. Bu vektörün
-iki öğesi, 
+```python
+from scipy.integrate import odeint
 
-$$
-u = u(x,y), \quad v = v(x,y)
-$$
+b = 0.25
+c = 5.0
 
-Geminin hızı $V$'nin suya göre sabit olduğunu düşünelim. Bu gemiyi
-nasıl yönlendirirdik ki $A$ noktasından $B$ noktasına minimal zamanda
-gidebilelim?
+def pend(y, t):
+    theta, omega = y
+    return [omega, -b*omega - c*np.sin(theta)]
 
-Problemi çözmek için hareket denklemlerini yazalım, 
+t = np.linspace(0, 10, 101)
 
-$$
-\dot{x} = V \cos\theta + u(x,y)
-$$
+y0 = [np.pi - 0.1, 0.0]
 
-$$
-\dot{y} = V \sin\theta + v(x,y)
-$$
+sol = odeint(pend, y0, t)
+```
 
-$\theta$ geminin burnunu hangi yöne doğru tuttuğumuzu kontrol ediyor,
-yani geminin hızı $V$ o yönde uygulanmış oluyor. $\theta$ sabitlenmiş
-kordinat eksenlerine göredir, ve $x,y$ bu eksende geminin yönünü
-gösterir.  Dikkat: $u$ çoğunlukla kontrol girdisi olarak gösterilir,
-burada böyle değil.
+$u = -V(y/h), v=0$
 
-$$
-\mathcal{H}(x, u, \lambda, t) = \mathcal{L}( x, u, t) + \lambda^T f(x, u, t) 
-$$
+```python
+V = 1.0
+h = 1.0
+def wave(z, t):
+    x,y,theta = z
+    tmp1 = V*np.cos(theta) + -V*(y/h)
+    tmp2 = V*np.sin(theta) 
+    tmp3 = -np.cos(theta)**2*(-V/h)
+    return [tmp1, tmp2, tmp3]
 
-Zaman optimizasyonu icin $\mathcal{L} = 1$. Niye? Mesela
+t = np.linspace(0, 10, 50)
 
-$$
-J = \int _{t_0}^{t_f} \mathcal{L}( x, \dot{x}, u, \lambda, t)
-$$
+z0 = [3.66,-1.86,np.deg2rad(0)]
+sol = odeint(wave, z0, t)
+print (sol[40,:])
+print (sol)
+thetas = sol[:,2]
+print (thetas)
 
-performans ölçütünü düşünelim, $\mathcal{L} = 1$ seçmek entegral
-çözümünden hareketle $J = t_f - t_0$ anlamına gelir, yani geçen
-zamanın hesabı.
+z0 = [3.66,-1.86,np.deg2rad(105)]
+sol = odeint(wave, z0, t)
+print (sol[31,:])
+print (sol)
+print (thetas)
+```
 
-Diğer değişken $\lambda =
-\left[\begin{array}{cc} \lambda_x & \lambda_y \end{array}\right]^T$
-diyelim, sistem denklemi $f$ biraz önce verildi zaten.
-
-Bu sistemin Hamiltonian'ı 
-
-$$
-\mathcal{H} = 
-\lambda_x (V \cos \theta + u ) + 
-\lambda_y (V \sin \theta + v ) + 1
-\mlabel{1}
-$$
-
-Devam edersek, Euler-Lagrange denklemleri
-
-$$
-\dot{\lambda}_x = -\frac{\partial H}{\partial x }  = 
--\lambda_x \frac{\partial u}{\partial x} - 
- \lambda_y \frac{\partial v}{\partial x}
-$$
-
-$$
-\dot{\lambda}_y = -\frac{\partial H}{\partial y}  = 
--\lambda_x \frac{\partial y}{\partial y} - 
- \lambda_y \frac{\partial u}{\partial y}
-$$
-
-$$
-0 = \frac{\partial H}{\partial \theta}  = 
-V (-\lambda_x \sin \theta + \lambda_y \cos \theta ) \to
-\tan\theta = \frac{\lambda_y}{\lambda_x}
-$$
-
-Hamiltonian $\mathcal{H}$ zaman $t$'ye direk / belirgin şekilde bağlı
-olmadığı durumlarda $\mathcal{H} = \textrm{sabit}$ sistemin
-entegrallerinden biridir. İspatlayalım,
-
-$$
-\frac{\ud \mathcal{H}(x, u, \lambda, t)}{\ud t} = 
-\cancel{\frac{\partial \mathcal{H}}{\partial t}} + 
-\frac{\partial \mathcal{H}}{\partial x}\frac{\partial x}{\partial t} + 
-\frac{\partial \mathcal{H}}{\partial u}\frac{\partial u}{\partial t} + 
-\frac{\partial \mathcal{H}}{\partial \lambda}\frac{\partial \lambda}{\partial t} 
-$$
-
-İptalleme mümkün çünkü $\mathcal{H}$ zamandan bağımsız. Devam edelim [1, sf 49],
-
-$$
-\dot{H} = \mathcal{H}_x \dot{x} + H_u \dot{u} + \dot{\lambda}^T f
-$$
-
-$f$ nereden geldi, Euler-Lagrange denklemlerini hatırlarsak,
-
-$$
-\dot{x} = + \left( \frac{\partial \mathcal{H}}{\partial \lambda} \right)
-\quad
-\dot{\lambda} = - \left( \frac{\partial \mathcal{H}}{\partial x} \right)
-\quad
-0 = + \left( \frac{\partial \mathcal{H}}{\partial u} \right)
-$$
-
-Soldan birinci denklem ile $\dot{x}$ yerine $\frac{\partial
-\mathcal{H}}{\partial \lambda}$ kullanabiliyoruz, ayrica $\dot{x} = f$
-olduğuna göre bu yerine geçirme mümkün oluyor. 
-
-Aynı şekilde $\dot{x}$ yerine $f$ ve gruplama sonrası,
-
-$$
-\dot{H} = \mathcal{H}_u \dot{u} + (\mathcal{H}_x + \dot{\lambda}^T) f
-$$
-
-E-L soldan ikinci denklem ile parantez içi sıfır olur, geri
-kalanlardan, E-L soldan üçüncü denklem ile,
-
-$$
-= \cancelto{0}{\mathcal{H}_u \dot{u}}
-$$
-
-Ve sonuç,
-
-$$
-\dot{H} = 0
-$$
-
-Eğer üstteki doğruysa o zaman optimal gidiş yolu üzerinde $t$
-üzerinden entegral $\mathcal{H}$'in sabit olması gerekir. Dikkat
-edersek $\mathcal{H}_u = 0$ sıfır şartı optimal gidiş yolu üzerinde
-geçerlidir. 
-
-Varabileceğimiz bir diğer sonuç $\mathcal{H}$'nin sabit olmak ötesinde
-sıfıra eşit olması mecburiyetidir. Bu nereden geliyor? Eğer zaman
-üzerinden optimize ediyorsak ve $\mathcal{H}$ zamana bağlı değilse ve
-sabitse, zamanın herhangi bir yerde olabilmesi için sadece sıfır
-sabiti bu işi yapabilir.
-Çözüme gelelim. (1)'den başlayalım, 
-
-$$
-0 = \lambda_x (V \cos\theta + u) + \lambda_y (W \sin\theta + v) + 1
-$$
-
-$$
--\frac{1}{\lambda_x} = \cancel{\frac{\lambda_x}{\lambda_x}}
-(V  \cos\theta + u) + \frac{\sin\theta}{\cos\theta} (V \sin\theta + v)
-$$
-
-$$
-\frac{-\cos\theta}{\lambda_x} = 
-V \cos^2\theta + u\cos\theta + V \sin^2\theta + V \cos\theta
-$$
-
-$$
-= V (\cancelto{1}{\cos^2\theta + \sin^2\theta}) + u + v
-$$
-
-$$
-\lambda_x = \frac{-\cos\theta}{V + u\cos\theta + v\sin\theta}
-$$
-
-Benzer işlemler sonrası 
-
-$$
-\lambda_y = \frac{-\sin\theta}{V + u\cos\theta + v\sin\theta}
-$$
-
-elde edilebilir.
+```text
+[-5.16331933  5.36428722  1.44890361]
+[[  3.66        -1.86         0.        ]
+ [  4.24087479  -1.83938777   0.20131708]
+ [  4.80572212  -1.77990869   0.38752377]
+ [  5.3417286   -1.68746267   0.54937447]
+ [  5.84048446  -1.5691131    0.68461714]
+ [  6.29729547  -1.43128282   0.7954988 ]
+ [  6.70989619  -1.27905876   0.88597506]
+ [  7.07738608  -1.11620637   0.96007035]
+ [  7.39955994  -0.94543585   1.0212363 ]
+ [  7.67653813  -0.76868601   1.07222842]
+ [  7.90857637  -0.58735152   1.11518068]
+ [  8.09597225  -0.40244701   1.15172883]
+ [  8.23902159  -0.21472102   1.18312675]
+ [  8.33799964  -0.02473393   1.21034074]
+ [  8.39315443   0.16708856   1.23412151]
+ [  8.40470588   0.36041849   1.25505773]
+ [  8.37284749   0.55499984   1.2736155 ]
+ [  8.29774895   0.75063031   1.29016748]
+ [  8.17955904   0.94714817   1.30501442]
+ [  8.01840833   1.14442278   1.31840123]
+ [  7.81441172   1.34234756   1.33052905]
+ [  7.56767054   1.54083479   1.34156438]
+ [  7.27827447   1.73981166   1.35164614]
+ [  6.94630312   1.93921727   1.36089098]
+ [  6.57182741   2.13900031   1.36939757]
+ [  6.15491072   2.33911727   1.37724985]
+ [  5.69560987   2.53953103   1.38451964]
+ [  5.19397596   2.74020972   1.39126876]
+ [  4.6500551    2.94112585   1.39755065]
+ [  4.06388899   3.14225557   1.40341175]
+ [  3.43551547   3.34357811   1.40889262]
+ [  2.76496899   3.54507529   1.41402879]
+ [  2.05228095   3.74673113   1.41885154]
+ [  1.29748005   3.94853153   1.4233885 ]
+ [  0.50059263   4.150464     1.42766418]
+ [ -0.33835715   4.35251746   1.43170037]
+ [ -1.21934703   4.55468201   1.43551652]
+ [ -2.14235647   4.7569488    1.43913005]
+ [ -3.1073665    4.95930991   1.44255658]
+ [ -4.11435956   5.1617582    1.4458102 ]
+ [ -5.16331933   5.36428722   1.44890361]
+ [ -6.25423066   5.56689116   1.45184829]
+ [ -7.38707945   5.76956474   1.45465468]
+ [ -8.56185256   5.97230316   1.45733226]
+ [ -9.7785377    6.17510207   1.45988965]
+ [-11.03712339   6.37795747   1.46233475]
+ [-12.33759889   6.58086573   1.46467475]
+ [-13.67995411   6.7838235    1.46691628]
+ [-15.06417958   6.98682774   1.46906539]
+ [-16.49026641   7.18987561   1.47112767]]
+[0.         0.20131708 0.38752377 0.54937447 0.68461714 0.7954988
+ 0.88597506 0.96007035 1.0212363  1.07222842 1.11518068 1.15172883
+ 1.18312675 1.21034074 1.23412151 1.25505773 1.2736155  1.29016748
+ 1.30501442 1.31840123 1.33052905 1.34156438 1.35164614 1.36089098
+ 1.36939757 1.37724985 1.38451964 1.39126876 1.39755065 1.40341175
+ 1.40889262 1.41402879 1.41885154 1.4233885  1.42766418 1.43170037
+ 1.43551652 1.43913005 1.44255658 1.4458102  1.44890361 1.45184829
+ 1.45465468 1.45733226 1.45988965 1.46233475 1.46467475 1.46691628
+ 1.46906539 1.47112767]
+[-0.05438215 -0.77682439  4.34450253]
+[[ 3.66       -1.86        1.83259571]
+ [ 3.96528883 -1.66325273  1.8470006 ]
+ [ 4.2275255  -1.46735252  1.86303511]
+ [ 4.44656676 -1.27245131  1.88098251]
+ [ 4.62224918 -1.07873864  1.90119291]
+ [ 4.75438641 -0.88645346  1.92410295]
+ [ 4.84276635 -0.69590085  1.95026263]
+ [ 4.88714908 -0.50747525  1.98037137]
+ [ 4.88726685 -0.32169378  2.0153271 ]
+ [ 4.8428285  -0.13924419  2.05629252]
+ [ 4.75353392  0.03894505  2.10478274]
+ [ 4.61910865  0.21160268  2.16277586]
+ [ 4.43937943  0.37696641  2.23283746]
+ [ 4.2144301   0.53257455  2.31821901]
+ [ 3.9449087   0.67499519  2.42281526]
+ [ 3.63259782  0.79954001  2.55071628]
+ [ 3.28136413  0.90014006  2.70490193]
+ [ 2.8984305   0.96978203  2.88473245]
+ [ 2.4953645   1.00198806  3.08307899]
+ [ 2.0875329   0.9931725   3.28607986]
+ [ 1.69134401  0.94435907  3.47789556]
+ [ 1.32076135  0.86066071  3.64724463]
+ [ 0.98544781  0.74903953  3.79003261]
+ [ 0.69103634  0.61621829  3.9075356 ]
+ [ 0.44036361  0.46768673  4.0034417 ]
+ [ 0.23463697  0.30756717  4.08185558]
+ [ 0.07421273  0.1388421   4.14642084]
+ [-0.04096147 -0.0363544   4.20008988]
+ [-0.11111516 -0.21649088  4.24516304]
+ [-0.13653995 -0.40045717  4.28340638]
+ [-0.11753488 -0.58743768  4.31617269]
+ [-0.05438215 -0.77682439  4.34450253]
+ [ 0.05266213 -0.96815731  4.36920229]
+ [ 0.20337007 -1.16108348  4.39090258]
+ [ 0.39754083 -1.35532839  4.41010131]
+ [ 0.63499819 -1.55067584  4.42719546]
+ [ 0.91558765 -1.74695356  4.44250457]
+ [ 1.23917367 -1.94402279  4.45628821]
+ [ 1.6056371  -2.14177065  4.46875901]
+ [ 2.01487292 -2.34010447  4.48009264]
+ [ 2.46678828 -2.53894749  4.49043529]
+ [ 2.96130082 -2.73823566  4.49990955]
+ [ 3.49833725 -2.93791513  4.50861887]
+ [ 4.07783215 -3.1379403   4.51665113]
+ [ 4.6997269  -3.33827233  4.52408141]
+ [ 5.36396884 -3.53887796  4.53097418]
+ [ 6.07051049 -3.73972852  4.53738514]
+ [ 6.81930895 -3.94079918  4.54336265]
+ [ 7.6103253  -4.14206834  4.54894882]
+ [ 8.44352418 -4.34351711  4.55418056]]
+[0.         0.20131708 0.38752377 0.54937447 0.68461714 0.7954988
+ 0.88597506 0.96007035 1.0212363  1.07222842 1.11518068 1.15172883
+ 1.18312675 1.21034074 1.23412151 1.25505773 1.2736155  1.29016748
+ 1.30501442 1.31840123 1.33052905 1.34156438 1.35164614 1.36089098
+ 1.36939757 1.37724985 1.38451964 1.39126876 1.39755065 1.40341175
+ 1.40889262 1.41402879 1.41885154 1.4233885  1.42766418 1.43170037
+ 1.43551652 1.43913005 1.44255658 1.4458102  1.44890361 1.45184829
+ 1.45465468 1.45733226 1.45988965 1.46233475 1.46467475 1.46691628
+ 1.46906539 1.47112767]
+```
 
 
 
@@ -180,13 +178,6 @@ elde edilebilir.
 
 
 
-[devam edecek]
 
-Kaynaklar
-
-[1] Bryson, Ho, {\em Applied Optimal Control}
-
-[2] Radhakant Padhi, {\em OPTIMAL CONTROL, GUIDANCE AND ESTIMATION}, 
-    \url{https://nptel.ac.in/courses/101108057/downloads/Lecture-34.pdf}
 
 
