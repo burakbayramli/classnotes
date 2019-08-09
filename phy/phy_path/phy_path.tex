@@ -143,6 +143,7 @@ sýfýra eþit olmasý mecburiyetidir. Bu nereden geliyor? Eðer zaman
 üzerinden optimize ediyorsak ve $\mathcal{H}$ zamana baðlý deðilse ve
 sabitse, zamanýn herhangi bir yerde olabilmesi için sadece sýfýr
 sabiti bu iþi yapabilir.
+
 Çözüme gelelim. (1)'den baþlayalým, 
 
 $$
@@ -196,6 +197,154 @@ dalga, eksende uzaða gittikçe büyüyor. Baþlangýç noktasý $x_0 = 3.66, y_0/h
 = -1.86$ olsun. 
 
 \includegraphics[width=25em]{phy_path_01.png}
+
+
+Fakat hala iþimiz bitmedi, $A$ noktasýndan baþlayýp $B$ noktasýna giden
+yolu, kontrol zincirini hesaplamak için doðru $\theta_A$'yi seçmemiz
+gerekiyor, ya da $\theta_0$'yi. Eðer elimizdekiler $u=u(y)$ ve $v=v(y)$
+olsaydý o zaman (2) denklemi þu hale gelirdi,
+
+$$
+\dot{\lambda}_x = 0 \to \lambda_x = \textrm{sabit}
+$$
+
+Ve (7) denklemi þu hale dönüþür,
+
+$$
+\frac{\cos\theta}{V + u(y)\cos\theta + v(y)\sin\theta} = \textrm{sabit}
+$$
+
+$u = -V(y/h), v=0$ üzerinden
+
+$$
+\frac{\cos\theta}{V - V(y/h)\cos\theta} = \frac{\cos\theta_f}{V} = \textrm{sabit}
+$$
+
+$$
+\cos\theta = \frac{\cos\theta_f}{1 + (y/h)\cos\theta_f} 
+$$
+
+Baðýmsýz deðiþken için $t$ yerine $\theta$ kullanmak daha
+rahat. Elimizde bir $y(\theta)$ var, 
+
+$$
+\frac{y}{h} = \sec\theta - \sec\theta_f \mlabel{8}
+$$
+
+(6) þu hale gelir, 
+
+$$
+\frac{\ud t}{\ud \theta} = \frac{h}{V} \sec^2\theta \to
+\frac{V(t_f-t)}{h} = \tan\theta - \tan\theta_f \mlabel{9}
+$$
+
+Bu nasýl oldu? (6)'nin son terimi haricinde tüm diðer 
+terimleri $u = -V(y/h), v=0$ yerine koyunca yokolur, kalanlardan
+
+$$
+-\cos^2 \theta \frac{\partial u}{\partial y} = 
+\cos^2 \theta \frac{V}{h}=\frac{\ud \theta}{\ud t}
+$$
+
+Ve
+
+$$
+\frac{1}{\frac{\ud \theta}{\ud t}} = \frac{\ud \theta}{\ud t}
+$$
+
+üzerinden görülen sonuç varýlýr. 
+
+Ve son olarak (4) denklemi, (8) ve (9) ile þu hale gelir,
+
+$$
+\frac{\ud x}{\ud \theta} = 
+\frac{V \cos\theta + V (\sec\theta_f - \sec\theta}{-(V/h)\cos^2\theta} =
+-h (\sec\theta + \sec\theta_f \sec^2\theta - \sec^3\theta)
+$$
+
+Bu denklemi entegre edince
+
+$$
+\frac{x}{h} = \frac{1}{2} \left[
+\sec\theta_f (\tan\theta_f - \tan\theta) - \tan\theta (\sec\theta_f - \sec\theta)
++ \log \frac{\tan\theta_f + \sec\theta_f}{\tan\theta + \sec\theta}
+\right] 
+$$
+
+
+Þimdi üstteki ve (8) denklemini beraber çözünce $\theta_0,\theta_f$
+deðerlerini elde edebiliriz, ki bunlar sýrasýyla baþlangýçtaki
+$\theta$ deðerleridir. 
+
+
+Baþlangýç noktalarý $x_0 = 3.66, y_0/h = -1.86$ deðerlerini kullanarak 
+
+$$
+-1.86 = \sec\theta_0 - \sec\theta_f 
+$$
+
+$$
+3.66 = \frac{1}{2} [ \sec\theta_f (\tan\theta_f - \tan\theta_0 ) - 
+\tan\theta_0 (\sec\theta_f - \sec\theta_0) + 
+$$
+
+$$
+\sin h^{-1} (\tan\theta_f) - \sin h^{-1} (\tan\theta_0) ]
+$$
+
+Bu denklemleri çözünce 
+
+$$
+\theta_0 = 105^0, \quad \theta_f = 240^0
+$$
+
+elde ediyoruz. 
+
+Aslýnda bu problem bir nevi iki sýnýr koþullu problemi (two-boint boundary
+value problem), yani baþlangýcý ve bitiþi tanýmlanarak çözülen bir
+ODE. Fakat biz þimdi kontrol amaçlý olarak eldeki baþlangýç deðerleri ile
+sistemi entegre ederek nereye varýyoruz ona bakalým, bu çözüm diðer yandan
+bize tüm $x(t),y(t),\theta(t)$ çözümünü de verecek, yani tüm gidiþ yolunu. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+
+V = 1.0
+h = 1.0
+def wave(z, t):
+    x,y,theta = z
+    tmp1 = V*np.cos(theta) + -V*(y/h)
+    tmp2 = V*np.sin(theta) 
+    tmp3 = -np.cos(theta)**2*(-V/h)
+    return [tmp1, tmp2, tmp3]
+
+t = np.linspace(0, 10, 50)
+
+z0 = [3.66,-1.86,np.deg2rad(105)]
+sol = odeint(wave, z0, t)
+idx = 27
+thetas = sol[0:idx,2]
+print (sol[idx,:])
+print (np.rad2deg(sol[idx,2]))
+print (t[idx])
+print (np.rad2deg(thetas))
+\end{minted}
+
+\begin{verbatim}
+[-0.04096147 -0.0363544   4.20008988]
+240.64742384230138
+5.510204081632653
+[105.         105.82533902 106.74404915 107.77235927 108.93033001
+ 110.24297839 111.74181792 113.46692122 115.46973744 117.81688271
+ 120.59516753 123.91792862 127.932163   132.82416518 138.81708905
+ 146.14527764 154.97946458 165.28299453 176.64741416 188.27850714
+ 199.26873739 208.97172389 217.15287301 223.88529836 229.3803128
+ 233.87309753 237.57241404]
+\end{verbatim}
+
+Görüldüðü gibi $x,y$'nin sýfýra en yakýn olduðu noktada zaman ve bitiþ
+açýsýna bakýyoruz, üstte bulunan deðerle ayný. 
+
 
 
 [devam edecek]
