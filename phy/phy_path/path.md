@@ -3,6 +3,7 @@
 #+LaTeX_HEADER: \usepackage{palatino,eulervm}
 #+LaTeX_HEADER: \usepackage{cancel}
 
+
 Vektör Formu
 
 Benzer bir problemi vektörel formda çözelim. Bir uçağın rüzgarlı bir
@@ -24,7 +25,7 @@ $$
 \dot{r} = V \hat{u} + w
 $$
 
-ki $\hat{u}$ ucagin yonunu gosteren birim vektor, $\hat{u} \cdot
+ki $\hat{u}$ uçağın yönünü gösteren birim vektör, $\hat{u} \cdot
 \hat{u} = 1$. 
 
 \includegraphics[width=15em]{phy_path_03.png}
@@ -48,6 +49,32 @@ $$
 $$
 0 = \frac{\partial H}{\partial \hat{u}} = V \lambda - 2\mu\hat{u}
 $$
+
+Son denkleme bakarak, ve $\hat{u}$'nun birim vektör olduğunu hatırlayarak,
+$\hat{u},\lambda$ haricindekileri bir $C$ altında $C =V/2\mu$ gruplayıp,
+$\hat{u} = C \lambda$ ve, ardından $\hat{u}$ birim vektör olduğu için
+$C = 1/|\lambda|$ diyebilirdik, fakat bu son ifade yanlış olurdu; ya
+$V/2\mu$ negatif ise? $C = 1/|\lambda|$ ile $C$'nin negatif olabilme şansı
+kalmaz. Şöyle yazmak lazım,
+
+$$
+\hat{u} = \pm |C| \lambda = \pm \frac{\lambda}{||\lambda||}
+$$
+
+Minimum zaman problemi için $H=0$ olmalı. Bu durumda Hamiltonian
+formülünde ikinci terim sıfır, üçüncü terim pozitif, ve genel resme
+bakınca $\lambda \cdot (V \hat{u}  + w) = \lambda \cdot \dot{r}$
+hesabının aşağı yukarı aynı yöne işaret eden vektörler olması
+sebebiyle pozitif olması gerektiği için, o terimde negatifliği
+zorlamak için $\hat{\lambda} = -\hat{u}$ seçmemiz gerekir, ki
+$\hat{\lambda} = \lambda / |\lambda|$. Yani hiz vektoru yer etki
+vektoru $\lambda$'nin tam tersi yonunu gostermelidir. 
+
+
+
+
+
+
 
 
 
