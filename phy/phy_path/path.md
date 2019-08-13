@@ -3,7 +3,6 @@
 #+LaTeX_HEADER: \usepackage{palatino,eulervm}
 #+LaTeX_HEADER: \usepackage{cancel}
 
-
 Vektör Formu
 
 Benzer bir problemi vektörel formda çözelim. Bir uçağın rüzgarlı bir
@@ -71,8 +70,12 @@ $\hat{\lambda} = \lambda / |\lambda|$. Yani hiz vektoru yer etki
 vektoru $\lambda$'nin tam tersi yonunu gostermelidir. 
 
 
-
-
+$$
+\nabla (\lambda \cdot w) = 
+(\lambda \cdot \nabla) w + (w \cdot \nabla) \lambda + 
+\lambda \times (\nabla \times w) + 
+w \times (\nabla \times \lambda)
+$$
 
 
 
