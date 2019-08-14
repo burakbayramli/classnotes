@@ -13,6 +13,8 @@ $$
 f = \left[\begin{array}{r} f_1(x,y,z) \\ f_2(x,y,z) \\ f_3(x,y,z) \end{array}\right]
 $$
 
+Yonsel Turev (Directional Derivative)
+
 Formel olarak $f \cdot \nabla$ bir operator tanimlar [2, sf. 74],
 
 $$
@@ -44,7 +46,9 @@ f_3 \frac{\partial g}{\partial z}
 $$
 
 
-Uzaklaşım (divergence) $\bdiv f$, ya da $\nabla \cdot f$ ile gosterilir, 
+Uzaklaşım (divergence)
+
+Bu hesap $\bdiv f$, ya da $\nabla \cdot f$ ile gosterilir,
 
 $$
 \bdiv f = \left(
@@ -54,9 +58,8 @@ $$
 \right)
 $$
 
-$\nabla \cdot f$ notasyonu aslında şuradan geliyor, üstteki hesabı
-$f$'nin gradyanı ve $f$'nin kendisi arasında bir noktasal çarpım
-olarak görebiliriz. 
+$\nabla \cdot f$ notasyonu üstteki hesabı $f$'nin gradyanı ve $f$'nin
+kendisi arasında bir noktasal çarpım olarak görmek.
 
 $$
 \nabla \cdot f = \left(
