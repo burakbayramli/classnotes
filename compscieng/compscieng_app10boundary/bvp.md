@@ -7,6 +7,8 @@
 
 Bratu Problemi
 
+Paket cozumleri de kullanilabilir. Mesela \verb!scipy!.
+
 Bu problem 
 
 $$
@@ -38,10 +40,9 @@ def bc(ya, yb):
 x = np.linspace(0, 1, 5)
 ```
 
-Bu problemin iki farklı çözümü var. Her iki çözümü de elde etmek için
-$y$ için farklı başlangıç noktaları deneyeceğiz, bu seçenekleri $a$ ve
-$b$ olarak işaretleyelim,
-
+Bu problemin iki farkli cozumu var. Her iki cozumu de elde etmek icin
+$y$ icin farkli baslangic noktalari deneyecegiz, bu secenekleri $a$ ve
+$b$ olarak isaretleyelim,
 
 ```python
 y_a = np.zeros((2, x.size))

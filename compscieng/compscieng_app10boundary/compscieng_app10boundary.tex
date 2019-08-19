@@ -122,6 +122,70 @@ plt.savefig('compscieng_app10boundary_01.png')
 
 Grafikte görüldüðü gibi iki çözüm birbirinin týpký aynýsý. 
 
+Bu problem 
+
+$$
+y'' + k + \exp(y) = 0
+$$
+
+$$
+y(0) = y(1) = 0
+$$
+
+olarak bilinir. Bu sistemi 1. derece bir sistem olarak deðiþtirelim,
+
+$$
+y_1' = y_2
+$$
+
+$$
+y_2' = -\exp(y_1)
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def fun(x, y):
+    # k=1 farz edildi
+    return np.vstack((y[1], -np.exp(y[0])))
+
+def bc(ya, yb):
+    return np.array([ya[0], yb[0]])
+
+x = np.linspace(0, 1, 5)
+\end{minted}
+
+
+Bu problemin iki farklý çözümü var. Her iki çözümü de elde etmek için
+$y$ için farklý baþlangýç noktalarý deneyeceðiz, bu seçenekleri $a$ ve
+$b$ olarak iþaretleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y_a = np.zeros((2, x.size))
+y_b = np.zeros((2, x.size))
+y_b[0] = 3
+
+from scipy.integrate import solve_bvp
+res_a = solve_bvp(fun, bc, x, y_a)
+res_b = solve_bvp(fun, bc, x, y_b)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x_plot = np.linspace(0, 1, 100)
+y_plot_a = res_a.sol(x_plot)[0]
+y_plot_b = res_b.sol(x_plot)[0]
+import matplotlib.pyplot as plt
+plt.plot(x_plot, y_plot_a, label='y_a')
+
+plt.plot(x_plot, y_plot_b, label='y_b')
+plt.legend()
+plt.xlabel("x")
+plt.ylabel("y")
+plt.savefig('compscieng_app10boundary_03.png')
+\end{minted}
+
+
+\includegraphics[width=20em]{compscieng_app10boundary_03.png}
+
+
 Kaynaklar
 
 [1] Yang, {\em Applied Numerical Methods using Matlab}
