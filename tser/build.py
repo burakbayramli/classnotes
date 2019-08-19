@@ -21,7 +21,6 @@ if len(sys.argv) == 1:
     ./tser_voltar/tser_voltar.pdf \
     ./tser_macromkt/tser_macromkt.pdf \
     ./tser_hmm/tser_hmm.pdf \
-    ./tser_kf/tser_kf.pdf \
     ./tser_pf/tser_pf.pdf \
     ./tser_ukf/tser_ukf.pdf \
     ./tser_int/tser_int.pdf \
