@@ -26,6 +26,7 @@ fout.write('''
 ''')
 
 for line in fin.readlines():
+   line = line.replace("\\ud", "\\mathrm{d}")
    if '\includegraphics' in line:
        gf = re.findall("\includegraphics\[.*?\]\{(.*?)\}",line,re.DOTALL)[0]
        fout.write('![](' + gf + ')\n')
@@ -41,7 +42,6 @@ for line in fin.readlines():
    elif '\\url' in line:
       u = re.findall('url\{(.*?)\}',line,re.DOTALL)[0]
       b = re.findall('\[(.*?)url',line,re.DOTALL)[0]
-      print (u)
       fout.write("[" + b[:-1] + "<a href='" + u + "'>" + u + "</a>\n")
    else:
        fout.write(line)
