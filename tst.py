@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import markdown, sys, os, codecs, re
-fin = codecs.open("/home/burak/Documents/classnotes/calc_multi/calc_multi_01/calc_multi_01.tex", encoding='iso-8859-9')
+f = "/home/burak/Documents/classnotes/phy/phy_dblpend/phy_dblpend.tex"
+fin = codecs.open(f, encoding='iso-8859-9')
 fout = codecs.open("/tmp/out.md",mode="w",encoding="utf-8")
 
 fin.readline()
@@ -26,7 +27,7 @@ fout.write('''
 
 for line in fin.readlines():
    if '\includegraphics' in line:
-       gf = re.findall(u"\includegraphics\[height.*?\]\{(.*?)\}",line,re.DOTALL)[0]
+       gf = re.findall("\includegraphics\[.*?\]\{(.*?)\}",line,re.DOTALL)[0]
        fout.write('![](' + gf + ')\n')
    elif '\\begin{minted}' in line:
        fout.write('```python\n')
@@ -37,6 +38,11 @@ for line in fin.readlines():
    elif '\\mlabel' in line:
       label = re.findall(u"\mlabel\{(.*?)\}",line,re.DOTALL)[0]
       fout.write("\\qquad (" + label + ")")
+   elif '\\url' in line:
+      u = re.findall('url\{(.*?)\}',line,re.DOTALL)[0]
+      b = re.findall('\[(.*?)url',line,re.DOTALL)[0]
+      print (u)
+      fout.write("[" + b[:-1] + "<a href='" + u + "'>" + u + "</a>\n")
    else:
        fout.write(line)
    fout.flush()
