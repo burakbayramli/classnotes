@@ -71,6 +71,12 @@ def tex_mathjax_html(texfile, htmlfile):
           fout.write('```\n')          
       elif '\end{document}' in line:
           fout.write("\n")
+      elif '\\inputminted' in line:
+         pf = re.findall("inputminted.*?python\}\{(.*?\.py)\}",line,re.DOTALL)[0]
+         pfcontent = codecs.open(pf).read()
+         fout.write("```python\n")
+         fout.write(pfcontent)
+         fout.write("```\n")  
       elif '\\mlabel' in line:
          label = re.findall(u"\mlabel\{(.*?)\}",line,re.DOTALL)[0]
          fout.write("\\qquad (" + label + ")")

@@ -41,6 +41,12 @@ def tex_mathjax_html(texfile, htmlfile):
           fout.write('![](' + gf + ')\n')
       elif '\\begin{minted}' in line:
           fout.write('```python\n')
+      elif '\\inputminted' in line:
+         pf = re.findall("inputminted.*?python\}\{(.*?\.py)\}",line,re.DOTALL)[0]
+         pfcontent = codecs.open(pf).read()
+         fout.write("```python")
+         fout.write(pfcontent)
+         fout.write("```") 
       elif '\end{minted}' in line:
           fout.write('```\n')
       elif '\\begin{verbatim}' in line:
@@ -69,5 +75,5 @@ def tex_mathjax_html(texfile, htmlfile):
    fout.write(res)
    fout.close()
 
-texfile = "/home/burak/Documents/classnotes/algs/dynp/dynp.tex"
+texfile = "/home/burak/Documents/classnotes/algs/convnet/convnet.tex"
 tex_mathjax_html(texfile, "/tmp/out.html")   
