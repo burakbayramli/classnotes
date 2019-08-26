@@ -65,6 +65,10 @@ def tex_mathjax_html(texfile, htmlfile):
           fout.write('```python\n')
       elif '\end{minted}' in line:
           fout.write('```\n')
+      elif '\\begin{verbatim}' in line:
+          fout.write('```\n')
+      elif '\\end{verbatim}' in line:
+          fout.write('```\n')          
       elif '\end{document}' in line:
           fout.write("\n")
       elif '\\mlabel' in line:
