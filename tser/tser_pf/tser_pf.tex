@@ -80,9 +80,7 @@ veriliyor, kýsmi çünkü $x_{1:t-1}$ entegre edilip dýþarý çýkartýlmýþ. Bir diðer
 ilgilenen yan ürün $\phi$ üzerinden $p(x_{0:t} | y_{1:t})$'nin beklentisi, ona
 $I$ diyelim,
 
-%
 $$ I(f_t) = \int \phi_t(x_{0:t}) p(x_{0:t} | y_{1:t}) \ud x_{0:t} $$
-%{{x.png}}
 
 En basit durumda eðer $\phi_t(x_{0:t}) =x_{0:t}$ alýrsak, o zaman þartsal
 ortalama (conditional mean) elde ederiz. Farklý fonksiyonlar da mümkündür [1].
@@ -95,18 +93,14 @@ y_{1:t}$'den örnekleyemiyoruz. Bu durumda yine ayný yazýda görmüþtük ki
 önemsel örnekleme (importance sampling) adý veriliyordu. Mesela mesela herhangi
 bir yoðunluk $h(x_{0:t})$ üzerinden,
 
-%
 $$ I = \int
 \phi(x_{0:t})
 \frac{ p(x_{0:t}|y_{1:t}) }{ h(x_{0:t}) } h_{0:t} \ud x_{0:t}
 $$
-%{{x.png}}
 
 yaklaþýksal olarak
 
-%
 $$ \hat{I} = \frac{1}{N} \sum _{i=1}^{N} \phi (x^i_{0:t}) w^i_t  $$
-%{{x.png}}
 
 ki
 
@@ -123,86 +117,70 @@ mý?
 
 Bu mümkün. Mesela önemsel daðýlým $h$ için,
 
-%
 $$ h(x_{0:t}) = h(x_t | x_{0:t-1}) h(x_{{0:t-1}}) \mlabel{2}$$
-%{{x.png}}
 
 Üstteki ifade koþulsal olasýlýðýn doðal bir sonucu. Peki aðýrlýklar özyineli
 olarak hesaplanabilir mi? Bayes Teorisini kullanarak (1)'in bölünen kýsmýný
 açabiliriz,
 
-%
 $$
 w_t =
 \frac{p(x_{0:t}|y_{1:t})}{h(x_{0:t})} =
 \frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_{0:t})p(y_{1:t}) }
 \mlabel{3}
 $$
-%{{x.png}}
 
 çünkü hatýrlarsak $P(A|B) = P(B|A)P(A) / P(B)$, teknik iþliyor çünkü
 $P(B,A)=P(A,B)$.  
 
 Þimdi $h(x_{0:t})$ için (2)'de gördüðümüz açýlýmý yerine koyalým,
 
-%
 $$ w_t =
 \frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_t | x_{0:t-1}) h(x_{{0:t-1}}) p(y_{1:t}) }
 $$
-%{{x.png}}
 
 Ayrýca gözlem daðýlýmý $g$'yi $p(y_{1:t}|x_{0:t})$'yi, ve gizli geçiþ daðýlýmý
 $f$'i $p(x_{0:t})$ açmak için kullanýrsak,
 
-%
 $$ = \frac
 {g(y_t|x_t) p(y_{1:t-1}|x_{0:t-1}) f(x_t|x_{t-1})p(x_{0:t-1}) }
 {h(x_t|x_{0:t-1}) h(x_{{0:t-1}}) p(y_{1:t})}
 $$
-%{{x.png}}
 
 Bu formülde yeþil renkli kýsma bakalým, bu aslýnda (3)'e göre $w_{t-1}$'in
 tanýmý deðil mi?
 
-%
 $$ = \frac
 {g(y_t|x_t) \textcolor{green}{p(y_{1:t-1}|x_{0:t-1})} f(x_t|x_{t-1})\textcolor{green}{p(x_{0:t-1})} }
 {h(x_t|x_{0:t-1}) \textcolor{green}{h(x_{{0:t-1}})} p(y_{1:t})}
 $$
-%{{x.png}}
 
 
 Neredeyse; arada tek bir fark var, bir $p(y_{1:t-1})$ lazým, o üstteki formülde
 yok, ama onu bölünene ekleyebiliriz, o zaman
 
-%
 $$ =
 w_{t-1} \frac{g(y_t|x_t) f(x_t|x_{t-1})p(y_{1:t-1}) }
 {h(x_t|x_{0:t-1}) p(y_{1:t})}
 $$
-%{{x.png}}
 
 Hem $p(y_{1:t})$ hem de $p(y_{1:t})$ birer sabittir, o zaman o deðiþkenleri
 atarak üstteki eþitliðin oransal doðru olduðunu söyleyebiliriz. Ayrýca bu
 aðýrlýklarý artýk normalize edilmiþ parçacýklar bazýnda düþünürsek,
 $\tilde{w}^i_t = \frac{w_t^i}{\sum_j w_t^j}$, o zaman 
 
-%
 $$
 \tilde{w}^i_{t} \propto
 \tilde{w}^i_{t-1} \frac{g(y_t|x_t) f(x_t|x_{t-1}) } {h(x_t|x_{0:t-1}) }
 $$
-%{{x.png}}
 
 Eðer baþlangýç daðýlýmý $x_0^{(1)}, ..., x_0^{(N)} \sim \pi(x_0)$'dan geliyor
 ise, ve biz $h(x_0) = \pi(x_0)$ dersek, ayrýca önem daðýlýmý $h$ için
 $h(x_t|x_{0:t-1}) = f(x_t|x_{t-1})$ kullanýrsak, geriye 
 
-%
 $$
 \tilde{w}^i_{t} \propto \tilde{w}^i_{t-1} g(y_t|x_t)
 $$
-%{{x.png}}
 
 kalacaktýr.
 
