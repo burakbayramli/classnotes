@@ -129,6 +129,9 @@ if __name__ == "__main__":
         cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, TARGET_DIR)
         print (cmd)
         os.system(cmd)
+
+        os.chdir(TARGET_DIR)
+        os.system("find . -name '*.pdf' | xargs rm -rf ")
         
         for topdir in ['algs','calc_multi','chaos','compscieng','elecmag',
                        'func_analysis','linear','ode','pde','stat',
@@ -172,7 +175,7 @@ if __name__ == "__main__":
                 fout.write("\n")
                 fin.close()
 
-                print ('chdir', dir + "/" + subdir)
+                print ('chdir', dir + "/" + subdir)                
                 os.chdir(dir + "/" + subdir)
 
                 if os.path.isfile(subdir + ".html"): 
@@ -185,9 +188,7 @@ if __name__ == "__main__":
                 texfile = subdir + '.tex'
                 htmlfile = subdir + '.html'
                 tex_mathjax_html(texfile, htmlfile)
-
-                #fout1.close()                                
-                #break
+                
             fout.write("</html>\n")
             fout.close()
             #break
