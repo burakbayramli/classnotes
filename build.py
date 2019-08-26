@@ -60,9 +60,15 @@ def tex_mathjax_html(texfile, htmlfile):
 
    for line in fin.readlines():
       line = line.replace("\\ud", "\\mathrm{d}")
+      line = line.replace("\\curl", "\\mathrm{curl}")
+      line = line.replace("\\bdiv", "\\mathrm{div}")
+      line = line.replace("\\tr", "\\mathrm{trace}")
+      line = line.replace("\\grad", "\\mathrm{grad}")
+      line = line.replace("\\rank", "\\mathrm{rank}")
+      line = line.replace("\\ddim", "\\mathrm{dim}")
       line = line.replace('``','"')
       line = line.replace("''",'"')
-      line = line.replace(" \\\\ "," \\\\\\\\ ")
+      line = line.replace("\\\\","\\\\\\\\")
       line = line.replace("\\left\{","\\left\\\\{")
       line = line.replace("\\right\}","\\right\\\\}")
       line = re.sub(r'{\\em (.*?)}', r'*\1*', line)
