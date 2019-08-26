@@ -20,7 +20,7 @@ ad = '''
 <br/>
 '''
 
-TARGET_DIR = "/home/burak/Documents/dersblog2"
+TARGET_DIR = "/home/burak/Documents/dersblog"
 
 html_head = '''
 <!DOCTYPE html>
@@ -73,7 +73,7 @@ def tex_mathjax_html(texfile, htmlfile):
       elif '\end{document}' in line:
           fout.write("\n")
       elif '\\inputminted' in line:
-         pf = re.findall("inputminted.*?python\}\{(.*?\.py)\}",line,re.DOTALL)[0]
+         pf = re.findall("inputminted.*?python\}\{(.*?)\}",line,re.DOTALL)[0]
          pfcontent = codecs.open(pf).read()
          fout.write("```python\n")
          fout.write(pfcontent)
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 fout.write(line)
                 fout.write("\n")
                 fin.close()
-
+                
                 print ('chdir', dir + "/" + subdir)                
                 os.chdir(dir + "/" + subdir)
 
@@ -189,6 +189,13 @@ if __name__ == "__main__":
                 texfile = subdir + '.tex'
                 htmlfile = subdir + '.html'
                 tex_mathjax_html(texfile, htmlfile)
+                shutil.copy(htmlfile, url)
+                
+                #ocfg = open(subdir + ".cfg", "w")
+                #ocfg.write(cfg)
+                #ocfg.close()
+                #cmd = 'make4ht -u %s.tex -s ' % subdir
+                #os.system(cmd)                
                 
             fout.write("</html>\n")
             fout.close()
