@@ -3,7 +3,7 @@
 #
 # __TODO__: for html, put article title inside <title></title>
 #
-import os, sys, re, codecs, shutil
+import os, sys, re, codecs, shutil, markdown
 
 cfg = """
 \\Preamble{xhtml}
