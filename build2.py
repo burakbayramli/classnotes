@@ -52,7 +52,8 @@ def tex_mathjax_html(texfile, htmlfile):
 
    for line in fin.readlines():
       line = line.replace("\\ud", "\\mathrm{d}")
-
+      line = line.replace('``','"')
+      line = line.replace("''",'"')
       s = re.sub(r'verb!(.*?)!', r'`\1`', line)
       s = s.replace('\`','`')
       line = s
@@ -71,9 +72,10 @@ def tex_mathjax_html(texfile, htmlfile):
          fout.write("\\qquad (" + label + ")")
       elif '\\url' in line:
          u = re.findall('url\{(.*?)\}',line,re.DOTALL)[0]
-         u = re.sub('url\{.*?\}', url, line)
-         u = u.replace("\\http","http")
-         fout.write()
+         s = "<a href='" + u + "'>" + u + "</a>"
+         line = re.sub('url\{.*?\}', s, line)
+         line = line.replace("\\http","http")
+         fout.write(u + "\n")
       else:
           fout.write(line)
       fout.flush()
