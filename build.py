@@ -141,6 +141,7 @@ if __name__ == "__main__":
         cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, TARGET_DIR)
         print (cmd)
         os.system(cmd)
+        shutil.copy(".gitignore", TARGET_DIR)
         
         for topdir in ['algs','calc_multi','chaos','compscieng','elecmag',
                        'func_analysis','linear','ode','pde','stat',

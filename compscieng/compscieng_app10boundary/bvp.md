@@ -7,7 +7,7 @@
 
 Bratu Problemi
 
-Paket cozumleri de kullanilabilir [2, sf. 396]. Mesela \verb!scipy!.
+Paket çözümleri de kullanılabilir [2, sf. 396]. Mesela \verb!scipy!.
 
 Bu problem 
 
