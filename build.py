@@ -86,12 +86,12 @@ def tex_mathjax_html(texfile, htmlfile):
          fout.write("```python\n")
          fout.write(pfcontent)
          fout.write("```\n")  
-      elif '\\mlabel' in line:
-         label = re.findall(u"\mlabel\{(.*?)\}",line,re.DOTALL)[0]
-         fout.write("\\qquad (" + label + ")")
       elif '\\url' in line:
          line = re.sub(r'\\url{(.*?)}', r'<a href="\1">\1</a>', line)
          fout.write(line + "\n")
+      elif '\\mlabel' in line:
+         line = re.sub(r'\\mlabel{(.*?)}', r'\qquad (\1)', line)
+         fout.write(line)
       else:
           fout.write(line)
       fout.flush()
