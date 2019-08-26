@@ -54,6 +54,7 @@ def tex_mathjax_html(texfile, htmlfile):
       line = line.replace("\\ud", "\\mathrm{d}")
       line = line.replace('``','"')
       line = line.replace("''",'"')
+      line = re.sub(r'{\\em (.*?)}', r'*\1*', line)
       s = re.sub(r'verb!(.*?)!', r'`\1`', line)
       s = s.replace('\`','`')
       line = s
@@ -81,11 +82,8 @@ def tex_mathjax_html(texfile, htmlfile):
          label = re.findall(u"\mlabel\{(.*?)\}",line,re.DOTALL)[0]
          fout.write("\\qquad (" + label + ")")
       elif '\\url' in line:
-         u = re.findall('url\{(.*?)\}',line,re.DOTALL)[0]
-         s = "<a href='" + u + "'>" + u + "</a>"
-         line = re.sub('url\{.*?\}', s, line)
-         line = line.replace("\\http","http")
-         fout.write(u + "\n")
+         line = re.sub(r'\\url{(.*?)}', r'<a href="\1">\1</a>', line)
+         fout.write(line + "\n")
       else:
           fout.write(line)
       fout.flush()
@@ -135,9 +133,6 @@ if __name__ == "__main__":
         cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, TARGET_DIR)
         print (cmd)
         os.system(cmd)
-
-        os.chdir(TARGET_DIR)
-        os.system("find . -name '*.pdf' | xargs rm -rf ")
         
         for topdir in ['algs','calc_multi','chaos','compscieng','elecmag',
                        'func_analysis','linear','ode','pde','stat',
