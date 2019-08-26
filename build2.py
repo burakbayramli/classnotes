@@ -52,6 +52,11 @@ def tex_mathjax_html(texfile, htmlfile):
 
    for line in fin.readlines():
       line = line.replace("\\ud", "\\mathrm{d}")
+
+      s = re.sub(r'verb!(.*?)!', r'`\1`', line)
+      s = s.replace('\`','`')
+      line = s
+      
       if '\includegraphics' in line:
           gf = re.findall("\includegraphics\[.*?\]\{(.*?)\}",line,re.DOTALL)[0]
           fout.write('![](' + gf + ')\n')
