@@ -74,6 +74,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\\\","\\\\\\\\")
       line = line.replace("\\left\{","\\left\\\\{")
       line = line.replace("\\right\}","\\right\\\\}")
+      line = line.replace("\\bigg\{","\\bigg\\\\{")
+      line = line.replace("\\bigg\}","\\bigg\\\\}")
       line = re.sub(r'{\\em (.*?)}', r'*\1*', line)
       s = re.sub(r'verb!(.*?)!', r'`\1`', line)
       s = s.replace('\`','`')
