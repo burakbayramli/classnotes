@@ -18,7 +18,7 @@ if len(sys.argv) == 1 :
     exit()
     
 elif sys.argv[1] == 'all':
-    for a in sorted(glob.glob("pny*")):
+    for a in sorted(glob.glob("phy*")):
         os.chdir(a)
         os.system("pdflatex -shell-escape %s" % glob.glob("phy_*.tex")[0] )
         os.chdir("..")

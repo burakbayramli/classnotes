@@ -5,6 +5,12 @@
 #
 import os, sys, re, codecs, shutil, markdown
 
+topdirs = ['algs','calc_multi','chaos','compscieng','elecmag',
+           'func_analysis','linear','ode','pde','stat',
+           'tser','vision','phy']
+
+topdirs = ['phy']
+
 cfg = """
 \\Preamble{xhtml}
 \\Configure{HColor}{DarkGray}{\\#1A1A1A}
@@ -69,6 +75,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\grad", "\\mathrm{grad}")
       line = line.replace("\\rank", "\\mathrm{rank}")
       line = line.replace("\\ddim", "\\mathrm{dim}")
+      line = line.replace("\\begin{tabular}","\\begin{array}")
+      line = line.replace("\\end{tabular}","\\end{array}")
       line = line.replace('``','"')
       line = line.replace("''",'"')
       line = line.replace("\\\\","\\\\\\\\")
@@ -135,19 +143,22 @@ if __name__ == "__main__":
     if sys.argv[1] == 'clean':
         os.system("find . -name _region_* | xargs rm -rf ")
         os.system("find . -name '*.log' | xargs rm -rf ")
+        os.system("find . -name '*.pdf' | xargs rm -rf ")
         os.system("find . -name '*.aux' | xargs rm -rf ")
         os.system("find . -name '*.out' | xargs rm -rf ")
         os.system("find . -name '_minted-*' | xargs rm -rf ")
         os.system("find . -name '_preview*' | xargs rm -rf ")
 
     if sys.argv[1] == 'all':
-        for x in os.listdir("."):
+        for x in topdirs:
             if ".git" in x: continue
             if os.path.isdir(x):
                 os.chdir(x)
                 print ("building", x)
+                os.system("python build.py all")
                 os.system("python build.py")
                 os.chdir("..")
+                exit()
 
     if sys.argv[1] == 'html':
         
@@ -157,9 +168,7 @@ if __name__ == "__main__":
         os.system(cmd)
         shutil.copy(".gitignore", TARGET_DIR)
         
-        for topdir in ['algs','calc_multi','chaos','compscieng','elecmag',
-                       'func_analysis','linear','ode','pde','stat',
-                       'tser','vision','phy']:
+        for topdir in topdirs:
             print ('main',topdir)
             dir = TARGET_DIR + "/" + topdir
             print ('dir',dir)

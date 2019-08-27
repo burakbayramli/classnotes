@@ -3,7 +3,8 @@ import os, sys, glob, shutil
 pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
 d = os.environ['HOME']
 if len(sys.argv) == 1:
-    os.system("pdfunite %s " + d + "/Downloads/elecmag.pdf" % pdfs)
+    cmd = "pdfunite %s " + d + "/Downloads/elecmag.pdf"
+    os.system(cmd % pdfs)
     exit()    
 elif sys.argv[1] == 'all':
     for a in sorted(glob.glob("elecmag*")):
