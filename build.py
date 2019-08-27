@@ -26,6 +26,7 @@ html_head = '''
 <!DOCTYPE html>
 <html>
   <head>
+    <title>[title]</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <script type="text/x-mathjax-config">
       MathJax.Hub.Config({
@@ -46,7 +47,7 @@ html_head = '''
 </head>
 '''   
 
-def tex_mathjax_html(texfile, htmlfile):
+def tex_mathjax_html(texfile, htmlfile, title):
 
    fin = codecs.open(texfile, encoding='iso-8859-9')
    fout = codecs.open("/tmp/out.md",mode="w",encoding="utf-8")
@@ -56,7 +57,8 @@ def tex_mathjax_html(texfile, htmlfile):
    title = "# " + fin.readline()
    fout.write(title)
 
-   fout.write(html_head)
+   head = html_head.replace("[title]",title.replace('# ',''))
+   fout.write(head)
 
    for line in fin.readlines():
       line = line.replace("\\ud", "\\mathrm{d}")
@@ -206,7 +208,7 @@ if __name__ == "__main__":
 
                 texfile = subdir + '.tex'
                 htmlfile = subdir + '.html'
-                tex_mathjax_html(texfile, htmlfile)
+                tex_mathjax_html(texfile, htmlfile, title)
                 shutil.copy(htmlfile, url)
                 
                 #ocfg = open(subdir + ".cfg", "w")
