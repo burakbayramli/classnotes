@@ -63,6 +63,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
    for line in fin.readlines():
       line = line.replace("\\ud", "\\mathrm{d}")
       line = line.replace("\\curl", "\\mathrm{curl}")
+      line = line.replace("\\sinc", "\\mathrm{sinc}")
       line = line.replace("\\bdiv", "\\mathrm{div}")
       line = line.replace("\\tr", "\\mathrm{trace}")
       line = line.replace("\\grad", "\\mathrm{grad}")
