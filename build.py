@@ -9,8 +9,6 @@ topdirs = ['algs','calc_multi','chaos','compscieng','elecmag',
            'func_analysis','linear','ode','pde','stat',
            'tser','vision','phy']
 
-topdirs = ['ode']
-
 cfg = """
 \\Preamble{xhtml}
 \\Configure{HColor}{DarkGray}{\\#1A1A1A}
@@ -158,7 +156,6 @@ if __name__ == "__main__":
                 os.system("python build.py all")
                 os.system("python build.py")
                 os.chdir("..")
-                exit()
 
     if sys.argv[1] == 'html':
         
