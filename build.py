@@ -160,7 +160,7 @@ if __name__ == "__main__":
     if sys.argv[1] == 'html':
         
         fr = os.getcwd()
-        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'" % (fr, TARGET_DIR)
+        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s' --ignore-list=.md,.git,.zip" % (fr, TARGET_DIR)
         print (cmd)
         os.system(cmd)
         shutil.copy(".gitignore", TARGET_DIR)
