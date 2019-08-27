@@ -9,7 +9,7 @@ topdirs = ['algs','calc_multi','chaos','compscieng','elecmag',
            'func_analysis','linear','ode','pde','stat',
            'tser','vision','phy']
 
-topdirs = ['phy']
+topdirs = ['ode']
 
 cfg = """
 \\Preamble{xhtml}
