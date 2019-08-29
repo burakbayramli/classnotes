@@ -73,12 +73,12 @@ x = np.linspace(0, 1, 5)
 
 Çaðrý \verb!bc! içinde sýnýr þartlarýnýn artýðý, hatasý donduruluyor. Daha
 doðrusu \verb!bc!'ye verilen iki parametre içinde baþta ve sonda olmak
-üzere $y = [y_1,y_2]$ vektöründeki artýk deðerleri var. Bu artýklardan
+üzere $y = [y_1,y_2]$ formatýnda artýk deðerler var. Bu artýklardan
 hangisinin belirlediðimiz sýnýr þartýna ait olaný biz seçiyoruz. Mesela
 \verb!ya[0]! ve \verb!yb[0]! ile içinde $y_1$'in baþta ve sondaki deðerini
-seçmiþ oluyoruz, ki zaten sýnýr þartý onlar üzerinden tanýmlanmýþtý. Eðer
-$y_1'$, yani $y_2$ üzerinde bir þart olsaydý o zaman 1. indisteki deðeri
-döndürürdük.
+seçmiþ oluyoruz, ki zaten problemin sýnýr þartlarý onlar üzerinden
+tanýmlanmýþtý. Eðer $y_1'$, yani $y_2$ üzerinde bir son þart olsaydý o
+zaman \verb!yb! 1. indisteki deðeri döndürürdük.
 
 Bu problemin iki farklý çözümü var. Her iki çözümü de elde etmek için
 $y$ için farklý baþlangýç noktalarý deneyeceðiz, bu seçenekleri $1$ ve
@@ -98,9 +98,8 @@ res_2 = solve_bvp(fun, bc, x, y_2)
 x_plot = np.linspace(0, 1, 100)
 y_plot_1 = res_1.sol(x_plot)[0]
 y_plot_2 = res_2.sol(x_plot)[0]
-import matplotlib.pyplot as plt
-plt.plot(x_plot, y_plot_1, label='y_a')
 
+plt.plot(x_plot, y_plot_1, label='y_a')
 plt.plot(x_plot, y_plot_2, label='y_b')
 plt.legend()
 plt.xlabel("x")
@@ -220,6 +219,82 @@ plt.savefig('compscieng_app10boundary_01.png')
 \includegraphics[width=20em]{compscieng_app10boundary_01.png}
 
 Grafikte görüldüðü gibi iki çözüm birbirinin týpký aynýsý. 
+
+Sturm-Liouville
+
+Yine paket ile devam edelim. Sturm-Liouville adlý bir problemi çözelim, 
+
+$$
+y'' + k^y = 0
+$$
+
+$$
+y(0) = y(1) = 0
+$$
+
+Bu problemin $n$ bir tam sayý olmak üzere $k = n \pi$ için bariz / önemsiz
+olmayan bir çözümünün $y=A\sin(kx)$ olduðu biliniyor. $A=1$ ile normalizasyon
+saðlamak için bir sýnýr þart daha ekliyoruz,
+
+$$
+y'(0) = k
+$$
+
+Çünkü $y=A\sin(kx) \to y' = A k \cos(kx)$, ve $y'(0)$ dersek
+$y'(0) = A k \cos(0)) = A k$ olacaktýr, o zaman $y'(0) = k$ þartýný
+koyarsak $A=1$'i zorlamýþ oluruz. 
+
+1. derece sisteme çevirirsek,
+
+$$
+y_1' = y_2
+$$
+
+$$
+y_2' = -k^2 y_1
+$$
+
+Ayrýca $k\pi$ için bir çözüm aradýðýmýz için $y$ deðerlerinin aþaðý yukarý
+$\sin(2\pi x)$'yi takip etmesini saðlýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import solve_bvp
+
+def fun(x, y, p):
+    k = p[0]
+    return np.vstack((y[1], -k**2 * y[0]))
+
+def bc(ya, yb, p):
+    k = p[0]
+    return np.array([ya[0], yb[0], ya[1] - k])
+
+x = np.linspace(0, 1, 5)
+y = np.zeros((2, x.size))
+y[0, 1] = 1
+y[0, 3] = -1
+
+sol = solve_bvp(fun, bc, x, y, p=[6])
+print (sol.p)
+\end{minted}
+
+\begin{verbatim}
+[6.2832946]
+\end{verbatim}
+
+$k$'nin asagi yukari dogru degerde oldugunu goruyoruz. Tum cozumu
+grafikleyince beklenen sinus egrisini de gorecegiz, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x_plot = np.linspace(0, 1, 100)
+y_plot = sol.sol(x_plot)[0]
+plt.plot(x_plot, y_plot)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.savefig('compscieng_app10boundary_04.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app10boundary_04.png}
+
 
 
 Kaynaklar
