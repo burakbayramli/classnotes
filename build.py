@@ -105,7 +105,10 @@ def tex_mathjax_html(texfile, htmlfile, title):
          pfcontent = codecs.open(pf).read()
          fout.write("```python\n")
          fout.write(pfcontent)
-         fout.write("```\n")  
+         fout.write("```\n")
+      elif '_' in line:
+         line = line.replace("_","@@UUEEE@@") # special code
+         fout.write(line)
       elif '\\url' in line:
          line = re.sub(r'\\url{(.*?)}', r'<a href="\1">\1</a>', line)
          fout.write(line + "\n")
@@ -120,6 +123,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
    fout = codecs.open(htmlfile, mode="w",encoding="utf-8")
    content=fin.read()
    res = markdown.markdown(content, extensions=['fenced_code'])
+   res = res.replace("@@UUEEE@@","_")
    fout.write(res)
    fout.close()
 
