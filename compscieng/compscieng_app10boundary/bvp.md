@@ -40,7 +40,7 @@ $$
 \kappa' = F \cos (\phi)
 $$
 
-Bilinmeyen sabit $F$. Sinir degerleri,
+Bilinmeyen sabit $F$. Sınır değerleri,
 
 $$
 x(0) = 0
@@ -65,7 +65,7 @@ $$
 Görülen beş tane sınır değişkeniyle aslında problemi tamamen tanımlanmış
 oluyor. Entegrasyondan ortaya çıkan dört tane sabit olacak, üstte beş tane
 değer var. Hatta $F$'yi de bir sınır değeri olarak dahil edince hala çözüm
-için yeterli öğe elimizde oluyor. Yeni sinir değeri
+için yeterli öğe elimizde oluyor. Yeni sınır değeri
 
 $$
 F' = 0
@@ -75,22 +75,50 @@ Dikkat, yani $F$'nin türevi her yerde sıfır olmalı (çünkü sabit).
 
 [devam edecek]
 
-\begin{minted}[fontsize=\footnotesize]{python}
+```python
 # x,y,\phi,\kappa, F
 from scipy.integrate import solve_bvp
 
-def fun(x, y):    
-    return np.vstack((   np.cos(y[2]), np.sin(y[2]), y[3], y[4]*np.cos(y[2]) ))
+def fun(x, y):
+    return np.vstack(( np.cos(y[2]),
+                       np.sin(y[2]),
+                       y[3],
+                       y[4]*np.cos(y[2]),
+                       np.zeros(x.shape[0]) ))
 
 def bc(ya, yb):
-    return np.array([   ya[0], ya[1], ya[3], yb[1], yb[2] ])
+    return np.array([ ya[0],
+                      ya[1],
+                      ya[3],
+                      yb[1],
+                      yb[2]+(np.pi/2) ])
 
-x = np.linspace(0, 0.5, 1000)
-y = np.zeros((2, x.size))
-
+x = np.linspace(0, 0.5, 400)
+y = np.zeros((5, x.size))
 sol = solve_bvp(fun, bc, x, y)
-print (sol.p)
-\end{minted}
+print (sol.y[4,0])
+```
+
+```text
+-21.54910449259776
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
