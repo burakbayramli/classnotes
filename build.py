@@ -66,6 +66,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
 
    for line in fin.readlines():
       line = line.replace("\\ud", "\\mathrm{d}")
+      line = line.replace("^*", "@@RR@@@")
       line = line.replace("\\curl", "\\mathrm{curl}")
       line = line.replace("\\sinc", "\\mathrm{sinc}")
       line = line.replace("\\bdiv", "\\mathrm{div}")
@@ -82,6 +83,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\right\}","\\right\\\\}")
       line = line.replace("\\bigg\{","\\bigg\\\\{")
       line = line.replace("\\bigg\}","\\bigg\\\\}")
+      line = line.replace("\\big\{","\\big\\\\{")
+      line = line.replace("\\big\}","\\big\\\\}")
       line = re.sub(r'{\\em (.*?)}', r'*\1*', line)
       s = re.sub(r'verb!(.*?)!', r'`\1`', line)
       s = s.replace('\`','`')
@@ -124,6 +127,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
    content=fin.read()
    res = markdown.markdown(content, extensions=['fenced_code'])
    res = res.replace("@@UUEEE@@","_")
+   res = res.replace("@@RR@@@","^*")
    fout.write(res)
    fout.close()
 
