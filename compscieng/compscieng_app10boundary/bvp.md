@@ -5,113 +5,67 @@
 #+LaTeX_HEADER: \usepackage{palatino,eulervm}
 #+LaTeX_HEADER: \usepackage{cancel}
 
-Bilinmeyen Sabit Durumları
+Sinir Sistemi Tepkisi (Nerve Impulse)
 
-Her TPBVP problemi üstte görülen yazılımlara direk, olduğu gibi aktarılacak
-durumda olmayabilir. Ama bu problemleri de bazı numaralar kullanarak
-çözüm yazılımının beklediği hale çevirebiliriz. 
-
-Mesela çoğu sınır değeri problemi bilinmeyen sabitler içerirler, ki çözüm
-içi bu sabitlerin bilinmesi gereklidir. Bu tür problemler üstteki
-yöntemlerle direk çözülemez. Ama bilinmeyen sabitleri de birer değişken
-olarak kabul edersek, bu engelin etrafından dolaşabiliriz. Bu
-``değişkenin'' ilk türevi tabii ki sıfır olacaktır, ve bu türevin sıfıra
-eşit olma hali üzerinden sabiti diferansiyel denklem sistemimize dahil
-edebiliriz. 
-
-{\em Elastiklik} (elastica) problemi mekanik alanında standart bir problem
-[3, sf. 221]. Bir ucu yere bağlı bir esnek çubuğa diğer uçtan uygulanan
-kuvvet ile nasıl büküldüğünü gösteriyor. Sabiti dahil etmeden ana sistem
-şöyle,
+Tekrar eden sınır şart durumunu bilinmeyen entegral limiti durumu ile
+birleştiren bir problemi göreceğiz şimdi [8, sf. 27, 3, sf. 225, 6, 5,
+sf. 173]. Bilinmeyen sinir sarti icin bir numara yapabiliriz; Yeni bir
+değişken $\tau$ tanımlıyoruz, ve bu değişken sadece $[0,1]$ aralığına
+kısıtlanıyor. Bağımsız değişken $x$.  Şimdi $\tau = x/b$, ki $b$
+bilinmeyen entegral sınırı,
 
 $$
-x' = \cos (\phi) 
+\frac{\ud y}{\ud x} = f(x,y)
+$$
+
+yerine 
+
+$$
+\frac{\ud y}{\ud \tau} = b f(x,y)
 $$
 
 $$
-y' = \sin (\phi) 
+\frac{\ud b}{\ud \tau} = 0
+$$
+
+Problem sorusuna gelelim. Diyelim ki hücre zar potansiyeli $y_1$,
+geçirgenlik $y_2$, ve
+
+$$
+y_1' = 3 (y_1 + y_2 - 1/3 y_1^3 - 1.3)
 $$
 
 $$
-\phi' = \kappa
+y_2' = -(y_1 - 0.7 + 0.8 y_2) / 3
+$$
+
+Bu problem $[0,T]$ zaman diliminde tanımlanmıştır. Fakat bir problem
+şu, $T$'nin ne olduğunu bilmiiyoruz, ve aynı $T$ bilinmeyeni sinir
+şartlarının tanımlanmasında kullanılmış. 
+
+$$
+y_1(0) = y_1(T), \quad y_2(0) = y_2(T)
+$$
+
+O zaman biraz önceki numarayı kullanabiliriz. 
+
+$$
+y_1' = 3 T (y_1 + y_2 - 1/3 y_1^3 - 1.3)
 $$
 
 $$
-\kappa' = F \cos (\phi)
+y_2' = -T (y_1 - 0.7 + 0.8 y_2) / 3
+$$
+ 
+$$
+T' = 0
 $$
 
-Bilinmeyen sabit $F$. Sınır değerleri,
+Böylece problem $[0,1]$ arasında tanımlanmış oldu, ve sinir şartları 
 
 $$
-x(0) = 0
+y_1(0) = y_1(1), \quad y_2(0) = y_2(1)
 $$
-
-$$
-y(0) = 0
-$$
-
-$$
-\kappa(0) = 0
-$$
-
-$$
-y(0.5) = 0
-$$
-
-$$
-\phi(0.5) = -\pi/2
-$$
-
-Görülen beş tane sınır değişkeniyle aslında problemi tamamen tanımlanmış
-oluyor. Entegrasyondan ortaya çıkan dört tane sabit olacak, üstte beş tane
-değer var. Hatta $F$'yi de bir sınır değeri olarak dahil edince hala çözüm
-için yeterli öğe elimizde oluyor. Yeni sınır değeri
-
-$$
-F' = 0
-$$
-
-Dikkat, yani $F$'nin türevi her yerde sıfır olmalı (çünkü sabit).
-
-[devam edecek]
-
-```python
-# x,y,\phi,\kappa, F
-from scipy.integrate import solve_bvp
-
-def fun(x, y):
-    return np.vstack(( np.cos(y[2]),
-                       np.sin(y[2]),
-                       y[3],
-                       y[4]*np.cos(y[2]),
-                       np.zeros(x.shape[0]) ))
-
-def bc(ya, yb):
-    return np.array([ ya[0],
-                      ya[1],
-                      ya[3],
-                      yb[1],
-                      yb[2]+(np.pi/2) ])
-
-x = np.linspace(0, 0.5, 400)
-y = np.zeros((5, x.size))
-sol = solve_bvp(fun, bc, x, y)
-print (sol.y[4,0])
-```
-
-```text
--21.54910449259776
-```
-
-
-
-
-
-
-
-
-
-
 
 
 
