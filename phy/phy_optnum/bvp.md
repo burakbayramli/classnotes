@@ -46,4 +46,5 @@ ki $u(t) = f(t)/m$ olacak.
 
 
 
+
 [devam edecek]
