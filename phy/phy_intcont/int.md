@@ -5,8 +5,9 @@
 Çift Entegre Edici ve Hamiltonian Çözüm
 
 Cift-entegre edici (double-integrator) problemine farkli bir sekilde
-bakalim [1]. Bu problemde amac tek eksen üzerinde $y$ diyelim, bir
-objeyi bir konumdan diğerine hareket ettirmekti.
+bakalim [3, sf. 519], [2, sf. 308], [4, sf. 250]. Bu problemde amac
+tek eksen üzerinde $y$ diyelim, bir objeyi bir konumdan diğerine
+hareket ettirmekti.
 
 Ana fizik formülleri $F = ma$'dan hareketle,
 
@@ -133,25 +134,16 @@ $u^*(t)$'nun bağlı olduğu $u^*(t) u^*(t) $\lambda_2^*(t)$ ortaya
 ya artıdan eksiye, ya da ekside, artıda kalacağı için (başka seçenek
 yok), optimal kontrol seçenekleri [-1], [+1], [+1,-1], [-1,+1] olabilir.
 
+Çözümde daha da ilerleyince [3, sf. 519] sonuç olarak $x_1,x_2$ grafiğinde paraboller ortaya çıkar. 
 
+\includegraphics[width=20em]{phy_control_07.png}
 
+Bu grafikte -1 aşağı giden gidiş yollarını +1 yukarı giden gidiş
+yollarını temsil eder. Eğer bir başlangıç noktası, mesela $d$'den
+orijine gitmek istiyorsak, önce -1 ile aşağı ineriz, sonra +1 ile
+$a$'dan geçen yukarı yolla kesiştiğimiz yerde o gidiş yoluna değişim
+yaparız ve orijine ulaşırız.
 
-
-
-
-
-
-
-
-[devam edecek]
-
-[3, sf. 519]
-
-[2, sf. 308]
-
-[4, sf. 250]
-
-[devam edecek]
 
 
 
