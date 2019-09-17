@@ -118,8 +118,29 @@ $$
 \lambda_1^*(t) = \lambda_1^*(0)
 $$
 
-Değil mi? Sıfırı entegre edince bir sabit elde edilir, yani
-$\lambda_1^*(t)$'nin başlangıç değeri $\lambda_1^*(0)$. 
+Değil mi? Sıfırı entegre edince bir sabit elde edilir, bu sabit
+$\lambda_1^*(t)$'nin başlangıç değeri $\lambda_1^*(0)$. İkinci
+entegrasyon $\dot{\lambda}_2 ^*(t) $ için, bu değişken
+$-\lambda_1^*(t)$'a eşit, biraz önce bu değeri bulduk, onu yerine
+koyup entegre edince,
+
+$$
+\lambda_2^*(t) = \lambda_2^*(0) - \lambda_1(0) t
+$$
+
+$u^*(t)$'nun bağlı olduğu $u^*(t) u^*(t) $\lambda_2^*(t)$ ortaya
+çıktı, bu bir düz çizgiyi gösteriyor. Bir düz çizgi ya eksiden artıya,
+ya artıdan eksiye, ya da ekside, artıda kalacağı için (başka seçenek
+yok), optimal kontrol seçenekleri [-1], [+1], [+1,-1], [-1,+1] olabilir.
+
+
+
+
+
+
+
+
+
 
 
 [devam edecek]
