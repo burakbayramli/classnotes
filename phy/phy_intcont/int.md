@@ -45,13 +45,12 @@ Kontrol $|u(t)| < 1, \forall t \in [t_0,t_f]$ olmalı. Bu objeyi
 herhangi bir $[x_1(0),x_2(0)]$ başlangıcından orijine minimal zamanda
 götürmek için kullanılacak optimal kontrol nasıl hesaplanır?
 
-Zaman optimize edildiği için, $V = 1$
+Zaman optimize edildiği için, $V = 1$ kabul ederiz çünkü onun
+üzerinden alınan entegral zamanı optimize etmeye çalışacaktır,
 
 $$
 J = \int_{t_0}^{t_f} V \ud t  = \int_{t_0}^{t_f} 1 \ud t = t_f - t_0
 $$
-
-tanımını kullanmak bize optimal zaman hesabını verecektir. 
 
 Hamiltonian şöyle oluşturulur,
 
@@ -99,19 +98,45 @@ $$
 
 ile özetleyebiliriz, ki $sgn$ fonksiyonu işaret (sign) fonksiyonu, bir
 sayının sadece işaretini verir, yani -, + anlaminda, ya da -1, +1.
-Mesela 3,4 gibi değerler için +1 döndürür, -3,-6,-4 gibi değerler için
--1 döndürür.
+Mesela 3,4 gibi değerler için +1 döndürür, -3,-4 gibi değerler için -1
+döndürür.
 
+Kontrolün $\lambda_2^*$'ya bağlı olduğu görülüyor, o zaman
+$\lambda_2^*$'yi bulmak için, eskonum denklemlerini kullanarız,
 
+$$
+\dot{\lambda}_1 ^*(t) = \frac{\partial \mathcal{H}}{\partial x_1^*} = 0
+$$
 
+$$
+\dot{\lambda}_2 ^*(t) = \frac{\partial \mathcal{H}}{\partial x_2^*} = -\lambda_1^*(t)
+$$
 
+Üstteki denklemleri entegre edersek, mesela $\dot{\lambda}_1 ^*(t)=0$ ile başlayalım,
 
+$$
+\lambda_1^*(t) = \lambda_1^*(0)
+$$
 
-
-
-
-
-
+Değil mi? Sıfırı entegre edince bir sabit elde edilir, yani
+$\lambda_1^*(t)$'nin başlangıç değeri $\lambda_1^*(0)$. 
 
 
 [devam edecek]
+
+[3, sf. 519]
+
+[2, sf. 308]
+
+[4, sf. 250]
+
+[devam edecek]
+
+
+
+
+
+
+
+
+
