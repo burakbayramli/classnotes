@@ -99,15 +99,25 @@ $$
 \end{array}\right]
 $$
 
-
-Optimal kontrol girdisi icin $u(t)$'yi icin bir cozum bulmayi gerektiriyor,
+Optimal kontrol girdisi için $u(t)$'yi için bir çözüm bulmayı gerektiriyor,
 
 ```python
-
+u, x1, x2, lam1, lam2 = sympy.symbols('u x1 x2 lam1 lam2')
+HH = lam1*x2 + u**2 + x1**2 - lam2*(x1 - 4*u + x2*(x2**2/10 - 2))
+print (sympy.solve(HH.diff(u),u),u)
 ```
 
+```text
+[-2*lam2] u
+```
 
+Yani
 
+$$
+u^*(t) = -2 \lambda_2(t)
+$$
+
+sonucuna eriştik. 
 
 
 
