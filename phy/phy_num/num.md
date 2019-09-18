@@ -51,13 +51,25 @@ f = sympy.Matrix([[x[1]],[  -x[0]+(2.0 - 0.1*x[1]**2)*x[1] + 4*u ]])
 V = x[0]**2 + u**2
 H = V + lam.T.dot(f)
 print (H)
+print (sympy.latex(H))
 ```
 
 ```text
 lam1*x2 + lam2*(4*u - x1 + x2*(2.0 - 0.1*x2**2)) + u**2 + x1**2
+lam_{1} x_{2} + lam_{2} \left(4 u - x_{1} + x_{2} \left(2.0 - 0.1 x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}
 ```
 
+$$
+\mathcal{H} = \lambda_{1} x_{2} + \lambda_{2} \left(4 u - x_{1} + x_{2} \left(2.0 - 0.1
+x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}
+$$
 
+Eger bu formulu biraz masajlarsak, [2]'deki sonucu elde ederiz,
+
+$$
+= x_1^2 + u^2 + \lambda_1 x_2 - \lambda_2
+\left( x_1 - 4u + x_2 \left( \frac{x_2^2}{10} - 2 \right)  \right)
+$$
 
 
 
