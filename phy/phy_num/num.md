@@ -86,3 +86,6 @@ Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])
 
 [devam edecek]
 
+
+
+
