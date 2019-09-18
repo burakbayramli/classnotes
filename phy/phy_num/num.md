@@ -24,9 +24,38 @@ $$
 
 Acaba $x_1(t=0)=-5$ ve $x_2(t=0)=-5$ başlangıç şartları için,
 $t_f=2.5$ anına kadar kontrolü ve salınımı az seviyede tutmaya
-çalışsak nasıl bir kontrol uygulamamız gerekir? 
+çalışsak nasıl bir kontrol uygulamamız gerekir?
+
+Hamiltonian'i tanimlarken
+
+$$
+\mathcal{H} = V + \lambda^T f
+$$
+
+formülü verilmişti. Üstteki tanımda ODE denklem sistemi $f$,
+
+$$
+V = x_1^2 + u^2
+$$
+
+Şimdi $\mathcal{H}$'yi sembolik olarak bulalım,
 
 
+```python
+import sympy
+
+u, x1, x2, lam1, lam2 = sympy.symbols('u x1 x2 lam1 lam2')
+x = sympy.Matrix([[x1],[x2]])
+lam = sympy.Matrix([[lam1],[lam2]])
+f = sympy.Matrix([[x[1]],[  -x[0]+(2.0 - 0.1*x[1]**2)*x[1] + 4*u ]])
+V = x[0]**2 + u**2
+H = V + lam.T.dot(f)
+print (H)
+```
+
+```text
+lam1*x2 + lam2*(4*u - x1 + x2*(2.0 - 0.1*x2**2)) + u**2 + x1**2
+```
 
 
 
