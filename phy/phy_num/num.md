@@ -71,7 +71,14 @@ $$
 \left( x_1 - 4u + x_2 \left( \frac{x_2^2}{10} - 2 \right)  \right)
 $$
 
+```python
+lam_dot = -sympy.diff(H, x).T
+print (lam_dot)
+```
 
+```text
+Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])
+```
 
 
 
