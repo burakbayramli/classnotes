@@ -64,12 +64,14 @@ $$
 x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}
 $$
 
-Eger bu formulu biraz masajlarsak, [2]'deki sonucu elde ederiz,
+Eğer bu formülü biraz masajlarsak, [2]'deki sonucu elde ederiz,
 
 $$
 = x_1^2 + u^2 + \lambda_1 x_2 - \lambda_2
 \left( x_1 - 4u + x_2 \left( \frac{x_2^2}{10} - 2 \right)  \right)
 $$
+
+$\dot{\lambda} = -(\partial \mathcal{H} / \partial x)^T$ ve  $\lambda(t_f) = \partial \phi / \partial x)^T$ üzerinden ,
 
 ```python
 lam_dot = -sympy.diff(H, x).T
@@ -79,6 +81,33 @@ print (lam_dot)
 ```text
 Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])
 ```
+
+$$
+\left[\begin{array}{c}
+\dot{\lambda_1} \\ \dot{\lambda_2} 
+\end{array}\right] =
+\left[\begin{array}{c}
+\lambda_2 - 2 x_1 \\
+\lambda_1 \left( \frac{3 x_2^2}{10} - 2  \right) - \lambda_1
+\end{array}\right],
+\quad
+\left[\begin{array}{c}
+\lambda_1(t_f) \\ \lambda_2(t_f) 
+\end{array}\right] =
+\left[\begin{array}{c}
+0 \\ 0
+\end{array}\right]
+$$
+
+
+Optimal kontrol girdisi icin $u(t)$'yi icin bir cozum bulmayi gerektiriyor,
+
+```python
+
+```
+
+
+
 
 
 
