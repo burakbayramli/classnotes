@@ -181,9 +181,51 @@ x_1(0) \\ x_2(0) \\ \lambda_1(t_f) \\ \lambda_2(t_f)
 $$
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import solve_bvp
+
+def fun(x, y):
+    return np.vstack((
+        y[1],
+        -8*y[3] - y[0] - y[1]*(y[1]**2/10.0),
+        y[3]-2*y[0],
+        y[3]*(3/10*y[1]**2-2) - y[2]
+        )
+    )
+
+def bc(ya, yb):
+    return np.array( [ ya[0]+5, ya[1]+5, yb[2], yb[3] ]   )
+                     
+t = np.linspace(0, 2.5, 10)
+y = np.ones((4, t.size))
+sol = solve_bvp(fun, bc, t, y)
+print (y.shape)
+print (sol.y[0].shape)
+\end{minted}
+
+\begin{verbatim}
+(4, 10)
+(35,)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.DataFrame()
+df['x1'] = sol.y[0]
+df['x2'] = sol.y[1]
+df.plot()
+plt.savefig('phy_num_01.png')
+\end{minted}
 
 
+\includegraphics[height=6cm]{phy_num_01.png}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.DataFrame()
+df['$\lambda_1$'] = sol.y[2]
+df['$\lambda_2$'] = sol.y[3]
+df.plot()
+plt.savefig('phy_num_02.png')
+\end{minted}
 
 
 
