@@ -41,6 +41,16 @@ $$
 V = x_1^2 + u^2
 $$
 
+Yani minimize etmek istedigimiz, 
+
+$$
+J(u) = \int_{0}^{2.5} V  \ud t = \int_{0}^{2.5} (x_1^2 + u^2)  \ud t
+$$
+
+Not: Üstteki formül tam formül $J(u) = \phi(x(t_f) + \int_{0}^{2.5} V  \ud
+t$ formulunden biraz farkli, $\phi$ yok, yani varýlan son konum için bir
+bedel tanýmlanmadý. Bunun sonucu $\lambda(t_f)$'in olmasýdýr.
+
 Þimdi $\mathcal{H}$'yi sembolik olarak bulalým,
 
 
@@ -109,11 +119,12 @@ Optimal kontrol girdisi için $u(t)$'yi için bir çözüm bulmayý gerektiriyor,
 \begin{minted}[fontsize=\footnotesize]{python}
 u, x1, x2, lam1, lam2 = sympy.symbols('u x1 x2 lam1 lam2')
 HH = lam1*x2 + u**2 + x1**2 - lam2*(x1 - 4*u + x2*(x2**2/10 - 2))
-print (sympy.solve(HH.diff(u),u),u)
+uopt = sympy.solve(HH.diff(u),u)[0]
+print ( uopt )
 \end{minted}
 
 \begin{verbatim}
-[-2*lam2] u
+-2*lam2
 \end{verbatim}
 
 Yani
@@ -122,7 +133,57 @@ $$
 u^*(t) = -2 \lambda_2(t)
 $$
 
-sonucuna eriþtik. 
+sonucuna eriþtik. Bulduðumuz optimal $u^*$ deðerini $f$ denklemindeki
+$u$'lar yerine koyarsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x_dot = f.subs({u: uopt})
+print (x_dot)
+\end{minted}
+
+\begin{verbatim}
+Matrix([[x2], [-8*lam2 - x1 + x2*(2.0 - 0.1*x2**2)]])
+\end{verbatim}
+
+Daha önceden bulduðumuz $\dot{\lambda}$ formülünü hatýrlayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (lam_dot)
+\end{minted}
+
+\begin{verbatim}
+Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])
+\end{verbatim}
+
+Artýk elimizde bir iki noktalý sýnýr problemi var, bu problemi sayýsal
+olarak çözebiliriz. 
+
+$$
+\left[\begin{array}{c}
+\dot{x}_1 \\ 
+\dot{x}_2 \\ 
+\dot{\lambda}_1 \\ 
+\dot{\lambda}_2 
+\end{array}\right] = 
+\left[\begin{array}{c}
+x_2 \\ 
+-x_1 + (2 - 0.1 x_2^2 ) x_2 - 8 \lambda_2 \\
+\lambda_2 \\
+\lambda_1 \left( \frac{3x_2^2}{10} - 2  \right) - \lambda_1
+\end{array}\right], 
+\quad
+\left[\begin{array}{c}
+x_1(0) \\ x_2(0) \\ \lambda_1(t_f) \\ \lambda_2(t_f)
+\end{array}\right] = 
+\left[\begin{array}{c}
+-5 \\ -5 \\ 0 \\ 0
+\end{array}\right]
+$$
+
+
+
+
+
 
 
 
