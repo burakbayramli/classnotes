@@ -29,7 +29,7 @@ Acaba $x_1(t=0)=-5$ ve $x_2(t=0)=-5$ baþlangýç þartlarý için,
 $t_f=2.5$ anýna kadar kontrolü ve salýnýmý az seviyede tutmaya
 çalýþsak nasýl bir kontrol uygulamamýz gerekir?
 
-Hamiltonian'i tanimlarken
+Hamiltonian'ý tanýmlarken
 
 $$
 \mathcal{H} = V + \lambda^T f
@@ -54,16 +54,75 @@ f = sympy.Matrix([[x[1]],[  -x[0]+(2.0 - 0.1*x[1]**2)*x[1] + 4*u ]])
 V = x[0]**2 + u**2
 H = V + lam.T.dot(f)
 print (H)
+print (sympy.latex(H))
 \end{minted}
 
 \begin{verbatim}
 lam1*x2 + lam2*(4*u - x1 + x2*(2.0 - 0.1*x2**2)) + u**2 + x1**2
+lam_{1} x_{2} + lam_{2} \left(4 u - x_{1} + x_{2} \left(2.0 - 0.1 x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}
 \end{verbatim}
 
 
+$$
+\mathcal{H} = \lambda_{1} x_{2} + \lambda_{2} \left(4 u - x_{1} + x_{2} \left(2.0 - 0.1
+x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}
+$$
+
+Eðer bu formülü biraz masajlarsak, [2]'deki sonucu elde ederiz,
+
+$$
+= x_1^2 + u^2 + \lambda_1 x_2 - \lambda_2
+\left( x_1 - 4u + x_2 \left( \frac{x_2^2}{10} - 2 \right)  \right)
+$$
+
+$\dot{\lambda} = -(\partial \mathcal{H} / \partial x)^T$ ve  $\lambda(t_f) = (\partial \phi / \partial x)^T$ üzerinden ,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+lam_dot = -sympy.diff(H, x).T
+print (lam_dot)
+\end{minted}
+
+\begin{verbatim}
+Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])
+\end{verbatim}
 
 
+$$
+\left[\begin{array}{c}
+\dot{\lambda_1} \\ \dot{\lambda_2} 
+\end{array}\right] =
+\left[\begin{array}{c}
+\lambda_2 - 2 x_1 \\
+\lambda_1 \left( \frac{3 x_2^2}{10} - 2  \right) - \lambda_1
+\end{array}\right],
+\quad
+\left[\begin{array}{c}
+\lambda_1(t_f) \\ \lambda_2(t_f) 
+\end{array}\right] =
+\left[\begin{array}{c}
+0 \\ 0
+\end{array}\right]
+$$
 
+Optimal kontrol girdisi için $u(t)$'yi için bir çözüm bulmayý gerektiriyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+u, x1, x2, lam1, lam2 = sympy.symbols('u x1 x2 lam1 lam2')
+HH = lam1*x2 + u**2 + x1**2 - lam2*(x1 - 4*u + x2*(x2**2/10 - 2))
+print (sympy.solve(HH.diff(u),u),u)
+\end{minted}
+
+\begin{verbatim}
+[-2*lam2] u
+\end{verbatim}
+
+Yani
+
+$$
+u^*(t) = -2 \lambda_2(t)
+$$
+
+sonucuna eriþtik. 
 
 
 
