@@ -9,36 +9,25 @@ $$
 
 
 ```python
-t = np.linspace(0,1.0)
+t = np.linspace(0,1.0,100)
 
-a1=0.4
-b1=2.9
+a1,a2,a3 = 0.5, 1.0, 1.0
+b1,b2,b3 = 2.5, -4.0, -1.0
 
-sx,sy=(1,1)
-ex,ey=(4,4)
+sx,sy=(1.0,1.0)
+ex,ey=(4.0,4.0)
 
-a2 = ex - sx - a1
-b2 = ey - sy - b1
+a4 = ex - sx - (a1+a2+a3)
+b4 = ey - sy - (b1+b2+b3)
 
-print (a1+a2)
-print (b1+b2)
-
-x = 1.0 + a1*t + a2*t**2
-y = 1.0 + b1*t + b2*t**2
+x = 1.0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4
+y = 1.0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
 
 plt.xlim(0,5.0)
 plt.ylim(0,5.0)
 plt.plot(x,y)
-plt.savefig('out5.png')
+plt.savefig('out6.png')
 ```
-
-```text
-3.0
-3.0
-```
-
-
-
 
 
 
