@@ -1,5 +1,3 @@
-\documentclass[12pt,fleqn]{article}\usepackage{../../common}
-\begin{document}
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -37,7 +35,7 @@ fig = plt.figure()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig('out1.png')
+plt.savefig('out2.png')
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -85,7 +83,7 @@ fig = plt.figure()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig('out2.png')
+plt.savefig('out3.png')
 \end{minted}
 
 

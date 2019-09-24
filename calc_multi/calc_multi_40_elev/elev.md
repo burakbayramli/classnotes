@@ -7,6 +7,83 @@ $$
 f(x,y) = 0.5 \exp (-\gamma || x - m_1 ||^2) + 0.5 \exp (-\gamma || x - m_2 ||^2 )
 $$
 
+
+```python
+t = np.linspace(0,1.0)
+
+a1=0.4
+b1=2.9
+
+sx,sy=(1,1)
+ex,ey=(4,4)
+
+a2 = ex - sx - a1
+b2 = ey - sy - b1
+
+print (a1+a2)
+print (b1+b2)
+
+x = 1.0 + a1*t + a2*t**2
+y = 1.0 + b1*t + b2*t**2
+
+plt.xlim(0,5.0)
+plt.ylim(0,5.0)
+plt.plot(x,y)
+plt.savefig('out5.png')
+```
+
+```text
+3.0
+3.0
+```
+
+
+
+
+
+
+
+
+
+```python
+import sympy
+
+t, a1, a2, a3, b1, b2, b3, gamma, x, m1, m2 = sympy.symbols('t a1 a2 a3 b1 b2 b3 gamma x m1 m2')
+
+f = sympy.Eq(0.5 * sympy.exp(-gamma * sympy.sqrt((x-m1)**2)) + 0.5 * sympy.exp(-gamma * sympy.sqrt((x-m2)**2) ))
+
+xdef = a1*t + a2*t**2 + a3
+ydef = b1*t + b2*t**2 + b3
+
+dxdt = sympy.diff(xdef,t)
+print (dxdt)
+dydt = sympy.diff(ydef,t)
+print (dydt)
+```
+
+```text
+a1 + 2*a2*t
+b1 + 2*b2*t
+```
+
+```python
+f2 = f.subs({x: xdef})
+print (f2)
+```
+
+```text
+Eq(0.5*exp(-gamma*sqrt((a1*t + a2*t**2 + a3 - m2)**2)) + 0.5*exp(-gamma*sqrt((a1*t + a2*t**2 + a3 - m1)**2)), 0)
+```
+
+
+
+
+
+
+
+
+
+
 ```python
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.distance import cdist
@@ -60,5 +137,24 @@ plt.savefig('out1.png')
  [36.71428571 32.32653061]]
 0.3597470320869875
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
