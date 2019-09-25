@@ -60,13 +60,13 @@ from matplotlib import cm
 D = 50
 gamma = 2.0
 
-x = np.linspace(36,37,D)
-y = np.linspace(32,33,D)
+x = np.linspace(0,5,D)
+y = np.linspace(0,5,D)
 
 xx,yy = np.meshgrid(x,y)
 
-m1 = np.array([[36.06122449,32.67346939]])
-m2 = np.array([[36.71428571,32.32653061]])	       
+m1 = np.array([[2,2]])
+m2 = np.array([[3,3]])	       
 X = np.vstack((m1,m2))
 print (X)
 
@@ -91,7 +91,7 @@ def f(x_test):
     y_new = w1*np.exp(-gamma * d1) + w2*np.exp(-gamma * d2)
     return y_new
 
-x_test = [36.2, 32.2]
+x_test = [3, 3]
 print (f(x_test))
 ax.plot3D([x_test[0]], [x_test[1]], f(x_test),'rd')
 
@@ -99,9 +99,9 @@ plt.savefig('out1.png')
 ```
 
 ```text
-[[36.06122449 32.67346939]
- [36.71428571 32.32653061]]
-0.3597470320869875
+[[2 2]
+ [3 3]]
+0.5295528732809781
 ```
 
 
