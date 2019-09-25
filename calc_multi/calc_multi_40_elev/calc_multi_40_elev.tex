@@ -18,8 +18,6 @@ x = np.linspace(0,5,D)
 y = np.linspace(0,5,D)
 
 xx,yy = np.meshgrid(x,y)
-print (xx.shape)
-print (yy.shape)
 zz = gfunc(xx,yy)
 
 fig = plt.figure()
@@ -30,8 +28,8 @@ surf = ax.plot_wireframe(xx, yy, zz,rstride=10, cstride=10)
 
 t = np.linspace(0,1.0,100)
 
-a1,a2,a3 = 1.5, 10.1, 4.0
-b1,b2,b3 = 0.3, 0.4, 30.3
+a1,a2,a3 = 1.5, 8.1, 4.0
+b1,b2,b3 = 0.3, 0.4, 23.3
 
 a0,b0=(1.0,1.0)
 ex,ey=(0.3,4.0)
@@ -49,71 +47,18 @@ plt.savefig('calc_multi_40_elev_01.png')
 
 \includegraphics[width=20em]{calc_multi_40_elev_01.png}
 
-
 \begin{minted}[fontsize=\footnotesize]{python}
-print (gfunc(np.array([30,10,400]),np.array([10,20,200])))
+plt.xlim(0,5.0)
+plt.ylim(0,5.0)
+plt.plot(x,y)
+plt.savefig('calc_multi_40_elev_02.png')
 \end{minted}
 
-\begin{verbatim}
-[1.07205709e-211 2.96055607e-097 0.00000000e+000]
-\end{verbatim}
 
 
 $$
 \int_{t=0}^{t=1} f(x(t),y(t)) \sqrt{(\ud x/\ud t)^2 + (\ud y/\ud t)^2} \ud t
 $$
-
-
-\begin{minted}[fontsize=\footnotesize]{python}
-def intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
-   sq = np.sqrt(b1 + 2*b2*t + 3*b3*t**2 - 112.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 65.2*t**3)**2)
-   x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
-   y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
-   x = np.array(x)
-   y = np.array(y)   
-   z = gfunc(x,y)   
-   res = z * sq
-   T = np.trapz(res, x=t)
-   return T
-
-t = np.linspace(0,1,100)
-a0,a1,a2,a3 = 1.0, 1.5, 10.1, 4.0
-b0,b1,b2,b3 = 1.0, 0.3, 0.4, 30.3
-
-sx,sy=(a0,b0)
-ex,ey=(0.3,4.0)
-
-a4 = ex - sx - (a1+a2+a3)
-b4 = ey - sy - (b1+b2+b3)
-
-T = intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-print (T)
-\end{minted}
-
-\begin{verbatim}
-1.7109299071584967
-\end{verbatim}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sympy
@@ -137,6 +82,51 @@ a1 + 2*a2*t + 3*a3*t**2 - 65.2*t**3
 b1 + 2*b2*t + 3*b3*t**2 - 112.0*t**3
 sqrt(b1 + 2*b2*t + 3*b3*t**2 - 112.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 65.2*t**3)**2)
 \end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
+   sq = np.sqrt(b1 + 2*b2*t + 3*b3*t**2 - 112.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 65.2*t**3)**2)
+   x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
+   y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
+   x = np.array(x)
+   y = np.array(y)   
+   z = gfunc(x,y)   
+   res = z * sq
+   T = np.trapz(res, x=t)
+   return T
+
+t = np.linspace(0,1,100)
+a0,a1,a2,a3 = 1.0, 1.5, 10.1, 4.0
+b0,b1,b2,b3 = 1.0, 0.3, 0.4, 30.3
+
+sx,sy=(a0,b0)
+ex,ey=(0.3,4.0)
+
+a4 = ex - sx - (a1+a2+a3)
+b4 = ey - sy - (b1+b2+b3)
+f
+T = intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+print (T)
+\end{minted}
+
+\begin{verbatim}
+1.7109299071584967
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 [devam edecek]
