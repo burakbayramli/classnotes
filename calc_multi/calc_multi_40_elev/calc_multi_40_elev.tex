@@ -12,35 +12,35 @@ def gfunc(x, y):
     g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
     return g1 
 
-D = 50
+def plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
 
-x = np.linspace(0,5,D)
-y = np.linspace(0,5,D)
+    D = 50
+    x = np.linspace(0,5,D)
+    y = np.linspace(0,5,D)
+    xx,yy = np.meshgrid(x,y)
+    zz = gfunc(xx,yy)
 
-xx,yy = np.meshgrid(x,y)
-zz = gfunc(xx,yy)
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.set_xlim(0,5)
+    ax.set_ylim(0,5)
+    surf = ax.plot_wireframe(xx, yy, zz,rstride=10, cstride=10)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.set_xlim(0,5)
-ax.set_ylim(0,5)
-surf = ax.plot_wireframe(xx, yy, zz,rstride=10, cstride=10)
+    t = np.linspace(0,1.0,100)
 
-t = np.linspace(0,1.0,100)
+    x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
+    y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
 
+    ax.plot3D(x, y, gfunc(x,y),'r.')
+    
 a1,a2,a3 = 1.5, 8.1, 4.0
 b1,b2,b3 = 0.3, 0.4, 23.3
-
 a0,b0=(1.0,1.0)
 ex,ey=(0.3,4.0)
-
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
-
-x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
-y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
-
-ax.plot3D(x, y, gfunc(x,y),'r.')
+test_coefs1 = (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 
 plt.savefig('calc_multi_40_elev_01.png')
 \end{minted}
@@ -48,6 +48,9 @@ plt.savefig('calc_multi_40_elev_01.png')
 \includegraphics[width=20em]{calc_multi_40_elev_01.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
+t = np.linspace(0,1.0,100)
+x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
+y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
 plt.xlim(0,5.0)
 plt.ylim(0,5.0)
 plt.plot(x,y)
@@ -56,6 +59,24 @@ plt.savefig('calc_multi_40_elev_02.png')
 
 \includegraphics[width=20em]{calc_multi_40_elev_02.png}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+a1,a2,a3 = 1.5, 3.0, 1.0
+b1,b2,b3 = 0.0, 1.0, 1.0
+a0,b0=(1.0,1.0)
+ex,ey=(0.3,4.0)
+a4 = ex - a0 - (a1+a2+a3)
+b4 = ey - b0 - (b1+b2+b3)
+test_coefs2 = (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+print (test_coefs2)
+plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plt.savefig('calc_multi_40_elev_03.png')
+\end{minted}
+
+\begin{verbatim}
+(1.0, 1.5, 3.0, 1.0, -6.2, 1.0, 0.0, 1.0, 1.0, 1.0)
+\end{verbatim}
+
+\includegraphics[width=20em]{calc_multi_40_elev_03.png}
 
 $$
 \int_{t=0}^{t=1} f(x(t),y(t)) \sqrt{(\ud x/\ud t)^2 + (\ud y/\ud t)^2} \ud t
@@ -87,7 +108,8 @@ sqrt(b1 + 2*b2*t + 3*b3*t**2 - 84.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 57.2*t**3)
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def trapz(y, dx):
-    tmp = np.sum(y[1:-1]*2.0)
+    vals = np.nan_to_num(y[1:-1],0)
+    tmp = np.sum(vals*2.0)    
     return (y[0]+tmp+y[-1])*(dx/2.0)
 
 def intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
@@ -102,24 +124,19 @@ def intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
    return T
 
 t = np.linspace(0,1,100)
-a0,a1,a2,a3 = 1.0, 1.5, 10.1, 4.0
-b0,b1,b2,b3 = 1.0, 0.3, 0.4, 30.3
 
-sx,sy=(a0,b0)
-ex,ey=(0.3,4.0)
-
-a4 = ex - sx - (a1+a2+a3)
-b4 = ey - sy - (b1+b2+b3)
-
+a0,a1,a2,a3,a4,b0,b1,b2,b3,b4 = test_coefs1
+T = intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+print (T)
+a0,a1,a2,a3,a4,b0,b1,b2,b3,b4 = test_coefs2
 T = intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 print (T)
 \end{minted}
 
 \begin{verbatim}
-1.6938206080869116
+1.624956808796678
+5.534245013919315
 \end{verbatim}
-
-
 
 
 
