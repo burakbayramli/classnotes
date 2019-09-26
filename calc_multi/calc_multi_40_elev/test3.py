@@ -16,9 +16,6 @@ def trapz(y, dx):
     vals = vals[vals>0.0]
     return (y[0]+sum(vals*2.0)+y[-1])*(dx/2.0)
 
-#def trapz(y, dx):
-#    return 10.0
-
 def gfunc(x, y):
     s1 = 2.2; x1 = 2.0; y1 = 2.0
     tmp = -4.0 *log(2.0) * ((x-x1)**2.0+(y-y1)**2.0) / s1**2.0
