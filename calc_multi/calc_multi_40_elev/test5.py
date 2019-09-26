@@ -11,8 +11,8 @@ from scipy import optimize
 import autograd
 import numpy as np
 
-#ex,ey=(0.3,4.0)
-ex,ey=4.0,4.0
+ex,ey=(0.3,4.0)
+#ex,ey=4.0,4.0
 a0,b0=1.0,1.0
 
 def trapz(y, dx):
@@ -50,46 +50,38 @@ def pintval(p):
 
 #a1,a2,a3 = 1.0,1.0,1.0
 #b1,b2,b3 = 1.0,1.0,1.0
-a1,a2,a3 = 2.0,1.0,1.0
-b1,b2,b3 = 2.0,1.0,1.0
+a1,a2,a3 = 0.3,0.3,0.3
+b1,b2,b3 = 0.3,0.3,0.3
 x0 = a1,a2,a3,b1,b2,b3
 
 pintval_grad = autograd.grad(pintval)
 
 print (pintval_grad(x0))
 
-cons=({'type': 'ineq','fun': lambda x: x[0]**x[0]-400},
-      {'type': 'ineq','fun': lambda x: x[1]**x[1]-400},
-      {'type': 'ineq','fun': lambda x: x[2]**x[2]-400},
-      {'type': 'ineq','fun': lambda x: x[3]**x[3]-400},
-      {'type': 'ineq','fun': lambda x: x[4]**x[4]-400},
-      {'type': 'ineq','fun': lambda x: x[5]**x[5]-400},
-      {'type': 'ineq','fun': lambda x: x[6]**x[6]-400},
-      {'type': 'ineq','fun': lambda x: -x[0]},
-      {'type': 'ineq','fun': lambda x: -x[1]},
-      {'type': 'ineq','fun': lambda x: -x[2]},
-      {'type': 'ineq','fun': lambda x: -x[3]},
-      {'type': 'ineq','fun': lambda x: -x[4]},
-      {'type': 'ineq','fun': lambda x: -x[5]},
-      {'type': 'ineq','fun': lambda x: -x[6]}      
+cons=({'type': 'ineq','fun': lambda x: 20.0-x[0]},
+      {'type': 'ineq','fun': lambda x: 20.0-x[1]},
+      {'type': 'ineq','fun': lambda x: 20.0-x[2]},
+      {'type': 'ineq','fun': lambda x: 20.0-x[3]},
+      {'type': 'ineq','fun': lambda x: 20.0-x[4]},
+      {'type': 'ineq','fun': lambda x: 20.0-x[5]},
+      {'type': 'ineq','fun': lambda x: x[0]},
+      {'type': 'ineq','fun': lambda x: x[1]},
+      {'type': 'ineq','fun': lambda x: x[2]},
+      {'type': 'ineq','fun': lambda x: x[3]},
+      {'type': 'ineq','fun': lambda x: x[4]},
+      {'type': 'ineq','fun': lambda x: x[5]},
       )
 
 
 sol = optimize.minimize(pintval,
                         x0,
                         jac = pintval_grad,
-                        method = 'BFGS',
+                        method = 'SLSQP',
                         #method = 'Newton-CG',
                         callback=print,
-                        tol=0.05,
+                        tol=0.1,
                         constraints=cons)
 
 print (sol)
 
-#cons=({'type': 'ineq',
-#       'fun': lambda x: x[0]**3 - x[1]**2 - 1},
-#      {'type': 'ineq',
-#       'fun': lambda x: x[0]},
-#      {'type': 'ineq',
-#       'fun': lambda x: x[2]})
 # https://stackoverflow.com/questions/35432478/scipy-minimize-constrained-function
