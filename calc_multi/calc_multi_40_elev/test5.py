@@ -14,6 +14,7 @@ import numpy as np
 ex,ey=(0.3,4.0)
 #ex,ey=4.0,4.0
 a0,b0=1.0,1.0
+OFFSET = 0.1
 
 def trapz(y, dx):
     vals = y[1:-1]
@@ -22,12 +23,10 @@ def trapz(y, dx):
 
 def gfunc(x, y):
     s1 = 2.2; x1 = 2.0; y1 = 2.0
-    s2 = 0.5; x2 = 3.0; y2 = 3.0
+    #s2 = 0.5; x2 = 3.0; y2 = 3.0
     tmp = -4.0 *log(2.0) * ((x-x1)**2.0+(y-y1)**2.0) / s1**2.0
     g1 = np.array([power(e,_) if _ != nan else 0.0 for _ in tmp])
-    tmp = -4.0 *log(2.0) * ((x-x2)**2.0+(y-y2)**2.0) / s2**2.0
-    g2 = np.array([power(e,_) if _ != nan else 0.0 for _ in tmp])
-    return g1+g2
+    return g1+OFFSET
 
 def pintval(p):
    a1,a2,a3,b1,b2,b3 = p
