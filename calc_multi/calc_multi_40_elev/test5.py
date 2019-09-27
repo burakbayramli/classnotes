@@ -14,9 +14,9 @@ import numpy as np
 #ex,ey=(0.3,4.0)
 ex,ey=4.0,4.0
 a0,b0=1.0,1.0
-OFFSET = 0.5
+OFFSET = 1.0
 
-a1,a2,a3 = 0.1,0.2,0.3
+a1,a2,a3 = 0.1,0.2,0.4
 b1,b2,b3 = 0.2,0.4,0.6
 x0 = a1,a2,a3,b1,b2,b3
 
@@ -72,10 +72,11 @@ cons=({'type': 'ineq','fun': lambda x: 30.0-x[0]},
 sol = optimize.minimize(pintval,
                         x0,
                         jac = pintval_grad,
-                        method = 'SLSQP',
+                        #method = 'SLSQP',
+                        method = 'COBYLA',
                         #method = 'Newton-CG',
                         callback=print,
-                        tol=0.01,
+                        tol=0.05,
                         constraints=cons)
 
 print (sol)
