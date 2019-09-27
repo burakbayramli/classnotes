@@ -1,12 +1,5 @@
+from autograd.numpy import sqrt, exp, nan, e, log, power, sum
 from autograd import numpy as np
-from autograd.numpy import sqrt
-from autograd.numpy import exp
-from autograd.numpy import nan
-from autograd.numpy import abs
-from autograd.numpy import e
-from autograd.numpy import log
-from autograd.numpy import power
-from autograd.numpy import sum
 from scipy import optimize
 import autograd
 
@@ -32,7 +25,7 @@ def pfunc(x, y):
     g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
     return g1 
 
-def plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
+def plot_surf_path(azim,elev,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
 
     D = 50
     x = np.linspace(0,5,D)
@@ -44,6 +37,7 @@ def plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
     ax = fig.gca(projection='3d')
     ax.set_xlim(0,5)
     ax.set_ylim(0,5)
+    ax.view_init(elev=elev, azim=azim)
     surf = ax.plot_wireframe(xx, yy, zz,rstride=10, cstride=10)
 
     t = np.linspace(0,1.0,100)
@@ -114,8 +108,9 @@ a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plt.savefig('/tmp/out1.png')
+plot_surf_path(-130,23,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+#plt.savefig('/tmp/out1.png')
+plt.show()
 
 ex,ey=4.0,4.0
 res = find_path(ex,ey,a0,b0,OFFSET)
@@ -123,7 +118,8 @@ a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plt.savefig('/tmp/out2.png')
+plot_surf_path(-90,36,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+#plt.savefig('/tmp/out2.png')
+plt.show()
 
 
