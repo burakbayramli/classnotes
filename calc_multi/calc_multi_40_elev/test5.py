@@ -14,7 +14,7 @@ import numpy as np
 ex,ey=(0.3,4.0)
 #ex,ey=4.0,4.0
 a0,b0=1.0,1.0
-OFFSET = 0.5
+OFFSET = 0.1
 
 a1,a2,a3 = 0.1,0.2,0.3
 b1,b2,b3 = 0.2,0.4,0.6
