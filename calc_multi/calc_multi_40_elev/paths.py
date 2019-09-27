@@ -8,7 +8,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.distance import cdist
 from matplotlib import cm
 
-
 def trapz(y, dx):
     vals = y[1:-1]
     vals = vals[vals>0.0]
@@ -108,7 +107,7 @@ a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(-130,23,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plot_surf_path(173,40,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 plt.savefig('calc_multi_40_elev_04.png')
 #plt.show()
 
@@ -118,7 +117,7 @@ a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(-90,36,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plot_surf_path(173,40,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 plt.savefig('calc_multi_40_elev_05.png')
 #plt.show()
 
