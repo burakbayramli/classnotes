@@ -2,6 +2,20 @@
 \begin{document}
 Daðlar Arasýnda En Optimal Yürüyüþ Yolu Bulmak
 
+Elimizde bir alan içindeki yükseklikleri veren bir fonksiyon $f(x,y)$
+olduðunu düþünelim. Acaba verili bir baþlangýç ve bitiþ noktasý arasýndaki
+en ``rahat'' gidiþ yolunu nasýl buluruz? 
+
+Bu problemi bir çizgi entegral hesabýna çevirebiliriz. Bir skalar alan
+üzerinden giden herhangi bir parametrize eðrinin altýndaki alaný
+hesaplamayý biliyoruz [2]. Ayrýca istediðimiz derecede polinom parametrize
+eðrileri nasýl yaratacaðýmýzý biliyoruz. Bu fikirleri bir araya koyarsak,
+geriye kalan bir optimizasyon problemidir. Çünkü en rahat yol, ``toplam
+yüksekliði en az olan yol'' olarak görülebilir, ve burada çizgi entegrali
+faydalý olur.
+
+Önce yükseklikleri ve eðrileri iki örnek üzerinde görelim,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.distance import cdist
@@ -48,6 +62,8 @@ plt.savefig('calc_multi_40_elev_01.png')
 
 \includegraphics[width=20em]{calc_multi_40_elev_01.png}
 
+Eðer üstteki gidiþ yoluna kuþbakýþý, iki boyutlu ortamda bakmak istersek,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 t = np.linspace(0,1.0,100)
 x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
@@ -59,6 +75,8 @@ plt.savefig('calc_multi_40_elev_02.png')
 \end{minted}
 
 \includegraphics[width=20em]{calc_multi_40_elev_02.png}
+
+Þimdi ikinci bir gidiþ yoluna bakalým, baþlangýç noktasý ayný ama bitiþ farklý,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 # 2. gidis yolunun tanimi, dik cikip iniyor
@@ -75,9 +93,18 @@ plt.savefig('calc_multi_40_elev_03.png')
 
 \includegraphics[width=20em]{calc_multi_40_elev_03.png}
 
+Bu yollarý tabii ki rasgele parametreler üzerinden yarattýk, bunlar optimal
+yollar deðiller.
+
+Optimallik için gereken çizgi entegralinin hesabýna gelelim. Bu hesap için
+gereken formül,
+
 $$
 \int_{t=0}^{t=1} f(x(t),y(t)) \sqrt{(\ud x/\ud t)^2 + (\ud y/\ud t)^2} \ud t
 $$
+
+Formülde görülen $\ud x/\ud t$ ve $\ud y/\ud t$ ve bunlarýn karesi,
+toplamarýn kareköku, vs. hesaplarýný sembolik olarak altta yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sympy
@@ -102,6 +129,18 @@ b1 + 2*b2*t + 3*b3*t**2 - 84.0*t**3
 sqrt(b1 + 2*b2*t + 3*b3*t**2 - 84.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 57.2*t**3)**2)
 \end{verbatim}
 
+
+Þimdi entegralin kendisine gelelim. Bu noktada üstteki sembolik programý
+daha da ilerletip sembolik entegrali almayý deneyebilirdik. Fakat bu iþlem
+oldukca uzun zaman alýyor. Zaten daha ileride daha çetrefil yükseklik
+fonksiyonlarý ile çalýþmak istersek, o durumda da kullanabilecek bir metota
+ihtiyacýmýz var. Burada sayýsal entegral almak [1] bir seçenektir. Ama o
+zaman optimizasyon için gereken gradyan hesabý nasýl olacak diye merak
+edenler olabilir.. Cevap basit. Otomatik türev yöntemi ile! 
+
+Otomatik türev ile herhangi bir fonksiyonun türevini alabileceðimizi
+biliyoruz, eh sayýsal entegrasyon da herhangi bir metot olduðuna göre onun
+türevini alabiliriz. Altta bu hesabý üstteki örnek yollar için görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def trapz(y, dx):
@@ -135,14 +174,15 @@ print (T)
 5.534245013919315
 \end{verbatim}
 
+Daha dik yolun entegrali daha yüksek çýktý, bu normal.
 
+Þimdi optimal yolu bulalým,
 
+\inputminted[fontsize=\footnotesize]{python}{paths.py}
 
+\includegraphics[width=20em]{calc_multi_40_elev_04.png}
 
-
-
-
-
+\includegraphics[width=20em]{calc_multi_40_elev_05.png}
 
 
 [devam edecek]
@@ -153,6 +193,6 @@ Kaynaklar
 
 [2] Bayramlý, Cok Boyutlu Calculus, {\em Ders 19, Skalar Alanlar Uzerinden Cizgi Entegral}
 
-[2] Bayramlý, Cok Boyutlu Calculus, {\em Ders 5, Ýki Nokta Arasýnda Parametrize Edilmiþ Eðri}
+[3] Bayramlý, Cok Boyutlu Calculus, {\em Ders 5, Ýki Nokta Arasýnda Parametrize Edilmiþ Eðri}
 
 \end{document}
