@@ -49,13 +49,13 @@ def plot_surf_path(azim,elev,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
 
 def find_path(ex,ey,a0,b0,offset):
     
-    cons=({'type': 'ineq','fun': lambda x: 30.0-x[0]},
+    cons=({'type': 'ineq','fun': lambda x: 30.0-x[0]}, # y<30
           {'type': 'ineq','fun': lambda x: 30.0-x[1]},
           {'type': 'ineq','fun': lambda x: 30.0-x[2]},
           {'type': 'ineq','fun': lambda x: 30.0-x[3]},
           {'type': 'ineq','fun': lambda x: 30.0-x[4]},
           {'type': 'ineq','fun': lambda x: 30.0-x[5]},
-          {'type': 'ineq','fun': lambda x: x[0]},
+          {'type': 'ineq','fun': lambda x: x[0]}, # y>0
           {'type': 'ineq','fun': lambda x: x[1]},
           {'type': 'ineq','fun': lambda x: x[2]},
           {'type': 'ineq','fun': lambda x: x[3]},
