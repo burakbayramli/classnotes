@@ -115,7 +115,7 @@ a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plt.show()
+plt.savefig('/tmp/out1.png')
 
 ex,ey=4.0,4.0
 res = find_path(ex,ey,a0,b0,OFFSET)
@@ -124,5 +124,6 @@ a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 plot_surf_path(a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plt.show()
+plt.savefig('/tmp/out2.png')
+
 
