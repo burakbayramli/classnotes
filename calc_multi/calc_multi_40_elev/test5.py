@@ -16,6 +16,11 @@ ex,ey=(0.3,4.0)
 a0,b0=1.0,1.0
 OFFSET = 0.5
 
+a1,a2,a3 = 0.1,0.2,0.3
+b1,b2,b3 = 0.2,0.4,0.6
+x0 = a1,a2,a3,b1,b2,b3
+
+
 def trapz(y, dx):
     vals = y[1:-1]
     vals = vals[vals>0.0]
@@ -45,20 +50,17 @@ def pintval(p):
    print ('T',T)
    return T
 
-a1,a2,a3 = 0.3,0.3,0.3
-b1,b2,b3 = 0.3,0.3,0.3
-x0 = a1,a2,a3,b1,b2,b3
 
 pintval_grad = autograd.grad(pintval)
 
 print (pintval_grad(x0))
 
-cons=({'type': 'ineq','fun': lambda x: 15.0-x[0]},
-      {'type': 'ineq','fun': lambda x: 15.0-x[1]},
-      {'type': 'ineq','fun': lambda x: 15.0-x[2]},
-      {'type': 'ineq','fun': lambda x: 15.0-x[3]},
-      {'type': 'ineq','fun': lambda x: 15.0-x[4]},
-      {'type': 'ineq','fun': lambda x: 15.0-x[5]},
+cons=({'type': 'ineq','fun': lambda x: 10.0-x[0]},
+      {'type': 'ineq','fun': lambda x: 10.0-x[1]},
+      {'type': 'ineq','fun': lambda x: 10.0-x[2]},
+      {'type': 'ineq','fun': lambda x: 10.0-x[3]},
+      {'type': 'ineq','fun': lambda x: 10.0-x[4]},
+      {'type': 'ineq','fun': lambda x: 10.0-x[5]},
       {'type': 'ineq','fun': lambda x: x[0]},
       {'type': 'ineq','fun': lambda x: x[1]},
       {'type': 'ineq','fun': lambda x: x[2]},
