@@ -11,10 +11,10 @@ from scipy import optimize
 import autograd
 import numpy as np
 
-ex,ey=(0.3,4.0)
-#ex,ey=4.0,4.0
+#ex,ey=(0.3,4.0)
+ex,ey=4.0,4.0
 a0,b0=1.0,1.0
-OFFSET = 0.1
+OFFSET = 0.5
 
 a1,a2,a3 = 0.1,0.2,0.3
 b1,b2,b3 = 0.2,0.4,0.6
@@ -28,7 +28,6 @@ def trapz(y, dx):
 
 def gfunc(x, y):
     s1 = 2.2; x1 = 2.0; y1 = 2.0
-    #s2 = 0.5; x2 = 3.0; y2 = 3.0
     tmp = -4.0 *log(2.0) * ((x-x1)**2.0+(y-y1)**2.0) / s1**2.0
     g1 = np.array([power(e,_) if _ != nan else 0.0 for _ in tmp])
     return g1+OFFSET
@@ -55,12 +54,12 @@ pintval_grad = autograd.grad(pintval)
 
 print (pintval_grad(x0))
 
-cons=({'type': 'ineq','fun': lambda x: 10.0-x[0]},
-      {'type': 'ineq','fun': lambda x: 10.0-x[1]},
-      {'type': 'ineq','fun': lambda x: 10.0-x[2]},
-      {'type': 'ineq','fun': lambda x: 10.0-x[3]},
-      {'type': 'ineq','fun': lambda x: 10.0-x[4]},
-      {'type': 'ineq','fun': lambda x: 10.0-x[5]},
+cons=({'type': 'ineq','fun': lambda x: 30.0-x[0]},
+      {'type': 'ineq','fun': lambda x: 30.0-x[1]},
+      {'type': 'ineq','fun': lambda x: 30.0-x[2]},
+      {'type': 'ineq','fun': lambda x: 30.0-x[3]},
+      {'type': 'ineq','fun': lambda x: 30.0-x[4]},
+      {'type': 'ineq','fun': lambda x: 30.0-x[5]},
       {'type': 'ineq','fun': lambda x: x[0]},
       {'type': 'ineq','fun': lambda x: x[1]},
       {'type': 'ineq','fun': lambda x: x[2]},
@@ -76,7 +75,7 @@ sol = optimize.minimize(pintval,
                         method = 'SLSQP',
                         #method = 'Newton-CG',
                         callback=print,
-                        tol=0.1,
+                        tol=0.01,
                         constraints=cons)
 
 print (sol)
