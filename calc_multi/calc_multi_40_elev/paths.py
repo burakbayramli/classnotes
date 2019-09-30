@@ -1,4 +1,5 @@
-from autograd.numpy import sqrt, exp, nan, e, log, power, sum
+import autograd.numpy as anp
+#import sqrt, nan, e, log, power, sum
 from autograd import numpy as np
 from scipy import optimize
 import autograd
@@ -11,12 +12,12 @@ from matplotlib import cm
 def trapz(y, dx):
     vals = y[1:-1]
     vals = vals[vals>0.0]
-    return (y[0]+sum(vals*2.0)+y[-1])*(dx/2.0)
+    return (y[0]+anp.sum(vals*2.0)+y[-1])*(dx/2.0)
 
 def gfunc(x, y, offset=0.0):
     s1 = 2.2; x1 = 2.0; y1 = 2.0
-    tmp = -4.0 *log(2.0) * ((x-x1)**2.0+(y-y1)**2.0) / s1**2.0
-    g1 = np.array([power(e,_) if _ != nan else 0.0 for _ in tmp])
+    tmp = -4.0 *anp.log(2.0) * ((x-x1)**2.0+(y-y1)**2.0) / s1**2.0
+    g1 = np.array([anp.power(anp.e,_) if _ != anp.nan else 0.0 for _ in tmp])
     return g1+offset
 
 def pfunc(x, y):
@@ -74,7 +75,7 @@ def find_path(ex,ey,a0,b0,offset):
         b4 = ey - b0 - (b1+b2+b3)   
         t = np.linspace(0,1,100)
         tmp = b1 + 2.0*b2*t + 3.0*b3*t**2.0 - 112.0*t**3.0 + (a1 + 2.0*a2*t + 3.0*a3*t**2.0 - 65.2*t**3.0)**2.0
-        sq = [sqrt(_) if _ != nan else 0.0 for _ in tmp]
+        sq = [anp.sqrt(_) if _ != anp.nan else 0.0 for _ in tmp]
         x = a0 + a1*t + a2*t**2.0 + a3*t**3.0 + a4*t**4.0
         y = b0 + b1*t + b2*t**2.0 + b3*t**3.0 + b4*t**4.0
         x = np.array(x)
@@ -107,7 +108,7 @@ a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(173,40,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plot_surf_path(-124,58,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 plt.savefig('calc_multi_40_elev_04.png')
 #plt.show()
 
@@ -117,7 +118,7 @@ a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
 print (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(173,40,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plot_surf_path(-124,58,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
 plt.savefig('calc_multi_40_elev_05.png')
 #plt.show()
 
