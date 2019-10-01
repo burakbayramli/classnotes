@@ -221,15 +221,66 @@ print (sol)
        x: array([-7.44668151e-09,  2.73897702e-24, -7.44668129e-09])
 \end{verbatim}
 
-Autograd
+Bazen her þeyi kendimiz yaparak tüm adýmlarýn ne yaptýðýndan emin olmak
+isteyebiliriz. Mesela kýsýtlama þartlarýný kendimiz bir Lagrange çarpaný
+$f(x) f(x) - \lambda g(x)$ ifadesi üzerinden tanýmlayýp, türevi alýp sýfýra
+eþitleyip, $f_x(x)=f_y(x)=f_z(x)=g(x)=0$ ile, elde edilen kýsýtsýz
+optimizasyonu çözmeyi tercih edebiliriz. Türevin alýnmasýný direk
+\verb!autograd!'a yaptýrýrýz.
 
-Güzel haber \verb!autoðrad! ile bulunan gradyanýn çaðrýsýna verilebilmesi,
-yani \verb!scipy! ile \verb!autoðrad! rahatça entegre olabiliyor.
+\begin{minted}[fontsize=\footnotesize]{python}
+import autograd.numpy as np
+from autograd import grad
 
+def F(L):
+    x, y, z, _lambda = L
+    return objective([x, y, z]) - _lambda * eq([x, y, z])
 
+dfdL = grad(F, 0)
 
+# Find L that returns all zeros in this function.
+def obj(L):
+    x, y, z, _lambda = L
+    dFdx, dFdy, dFdz, dFdlam = dfdL(L)
+    return [dFdx, dFdy, dFdz, eq([x, y, z])]
 
-[devam edecek]
+from scipy.optimize import fsolve
+x, y, z, _lam = fsolve(obj, [0.0, 0.0, 0.0, 1.0])
+print (x,y,z)
+\end{minted}
+
+\begin{verbatim}
+1.0 -0.5 0.5
+\end{verbatim}
+
+Ayný sonuç bulundu. Þimdi merak ediyoruz, bu sonuç gerçekten minimum mu?
+Üstteki noktada Hessian'ýn pozitif kesin olup olmadýðýný kontrol
+edebiliriz. Hessian'ý da \verb!autoðrad! hesaplar!
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from autograd import hessian
+h = hessian(objective, 0)
+res = h(np.array([x, y, z]))
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[[2. 0. 0.]
+ [0. 2. 0.]
+ [0. 0. 2.]]
+\end{verbatim}
+
+Bu matris pozitif kesin, ama çýplak gözle bariz deðilse, tüm özdeðerleri
+pozitif olup olmadýðýna bakabiliriz, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (np.linalg.eig(h(np.array([x, y, z])))[0])
+\end{minted}
+
+\begin{verbatim}
+[2. 2. 2.]
+\end{verbatim}
+
 
 Kaynaklar 
 
@@ -238,8 +289,6 @@ Kaynaklar
 [2] Schrimpf, \url{http://faculty.arts.ubc.ca/pschrimpf/526/526.html}
 
 [3] \url{https://nikstoyanov.me/post/2019-04-14-numerical-optimizations}
-
-[4] \url{https://rlhick.people.wm.edu/posts/mle-autograd.html}
 
 [5] \url{http://kitchingroup.cheme.cmu.edu/blog/2018/11/03/Constrained-optimization-with-Lagrange-multipliers-and-autograd/}
 
