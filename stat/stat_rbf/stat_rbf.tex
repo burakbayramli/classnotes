@@ -210,7 +210,6 @@ zz = func(xx,yy)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.savefig('linear_app88rbf_01.png')
 \end{minted}
 
@@ -248,7 +247,6 @@ znew = dd.reshape(D,D)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.savefig('linear_app88rbf_02.png')
 \end{minted}
 
@@ -280,61 +278,7 @@ sadece bu deðerleri taþýyacak.
 Bizim bu konuya girmemizin sebebi Google Elevation API ile aldýðýmýz yükseklik
 verilerini verimli þekilde kullanma ihtiyacý idi.
 
-Çoklu Ýkinci Derece Yüzey (Multiquadric)
-
-Yeryüzü modellemesinde çokça kullanýlan bir fonksiyon çoklu ikinci derece yüzey
-fonksiyonudur. Bu fonksiyon
-
-$$
-\phi(r) = \sqrt{(r/\epsilon)^2 + 1} =
-\sqrt{ \left( \frac{\|x_n-x_m\|}{\epsilon} \right)^2 + 1} 
-$$
-
-ile gösterilir, ki $\gamma$ pürüzsüzlüðü kontrol eden bir sabittir. 
-
-Bu fonksiyonun örneði için \verb!scipy.interpolate! kullanacaðýz, biraz önceki
-örneði de ayný þekilde yapabilirdik ama onu temeli göstermek için sýfýrdan
-yazdýk, normal þartlarda kütüphane fonksiyonu kullanýlabilir.
-
-\begin{minted}[fontsize=\footnotesize]{python}
-np.random.seed(0)
-
-S = 200
-
-x = np.linspace(36,37,D)
-y = np.linspace(32,33,D)
-
-xx,yy = np.meshgrid(x,y)
-znew = func(xx,yy)
-xx = xx.reshape(D*D)
-yy = yy.reshape(D*D)
-znew = znew.reshape(D*D)
-
-from scipy.interpolate import Rbf
-rbfi = Rbf(xx,yy,znew,function='multiquadric')
-znew = rbfi(xx,yy)
-
-xx = xx.reshape(D,D)
-yy = yy.reshape(D,D)
-znew = znew.reshape(D,D)
-
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig('linear_app88rbf_03.png')
-\end{minted}
-
-\includegraphics[width=20em]{linear_app88rbf_03.png}
-
-Ve yine orijinal fonksiyona benziyor.
-
-Not: \verb!scipy! ile bize döndürülen ve ara deðerleme için direk çaðýrýlabilen
-objeyi gerekli her türlü bilgiyi içinde taþýyor. Yani modeli çýkartýp veriyi
-atýp, sadece bu objeyi (mesela \verb!pickle! ile) diskte saklayabiliriz, bu tek
-baþýna yeterlidir. 
-
-Yazý baþýndaki Gaussian tekniðini \verb!scipy! üzerinden kullanalým.
+Simdi \verb!scipy! ile ayni isleri yapalim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 np.random.seed(0)
@@ -361,11 +305,158 @@ znew = znew.reshape(D,D)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.savefig('linear_app88rbf_05.png')
 \end{minted}
 
 \includegraphics[width=20em]{linear_app88rbf_05.png}
+
+
+Not: \verb!scipy! ile bize döndürülen ve ara deðerleme için direk
+çaðýrýlabilen objeyi gerekli her türlü bilgiyi içinde taþýyor. Yani modeli
+çýkartýp veriyi atýp, sadece bu objeyi (mesela \verb!pickle! ile) diskte
+saklayabiliriz, bu tek baþýna yeterlidir.
+
+Modelleme \verb!scipy! Ýle, Tekrar Yaratmak Elle Yazýlan Fonksiyon Ýle
+
+Bir diðer yaklaþým veriyi örneklemek, \verb!scipy! ile RBF'leri yaratmak,
+ama \verb!sciy! parametrelerini kullanarak modeli kendimizin tekrar
+yaratmasý. Bunun deðiþik sebepleri olabilir, belki veriyi modelleyen bir
+yükseklik fonksiyonu üzerinde otomatik türev almak istiyoruz, ama
+\verb!scipy! içindeki versiyon ile bunu yapamýyoruz. Ya da motor kapaðý
+altýnda nelerin olup bittiðini daha iyi anlamak istiyoruz. 
+
+Her neyse, yine iki tepeli ortamý yaratýyoruz, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+from matplotlib import cm
+
+np.random.seed(0)
+
+def func(x, y):
+    s1 = 0.2; x1 = 36.5; y1 = 32.5
+    s2 = 0.4; x2 = 36.1; y2 = 32.8
+    g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
+    g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)    
+    return g1 + g2 
+
+D = 10
+gamma = 2.0
+
+x = np.linspace(36,37,D)
+y = np.linspace(32,33,D)
+
+xx,yy = np.meshgrid(x,y)
+zz = func(xx,yy)
+\end{minted}
+
+Ve grafiklemeyi yapýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.interpolate import Rbf
+rbfi = Rbf(xx,yy,zz,function='gaussian')
+znew = rbfi(xx,yy)
+
+xx = xx.reshape(D,D)
+yy = yy.reshape(D,D)
+znew = znew.reshape(D,D)
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.view_init(elev=29, azim=29)
+surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+plt.savefig('linear_app88rbf_03.png')
+\end{minted}
+
+\includegraphics[width=20em]{linear_app88rbf_03.png}
+
+Modelleme Gaussian RBF'ler üzerinden yapýldý, bu formül neye benziyor?
+Dokümantasyona bakýnca 
+
+\verb!'gaussian': exp(-(r/self.epsilon)**2)!
+
+ifadesini görüyoruz, burada \verb!r! yeni nokta ile bir RBF baz fonksiyonu
+arasýndaki mesafe. Bir test noktasý ile üstteki RBF'leri (D*D tane)
+arasýndaki mesafe þöyle hesaplanabilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import autograd.numpy as anp
+def dist_matrix(X, Y):
+    sx = anp.sum(X**2, 1)
+    sy = anp.sum(Y**2, 1)
+    D2 =  sx[:, np.newaxis] - 2.0*X.dot(Y.T) + sy[np.newaxis, :] 
+    D2[D2 < 0] = 0
+    D = anp.sqrt(D2)
+    return D
+    
+test_1 = anp.array([[36.0,32.0]])
+test_1_dist = dist_matrix(test_1, rbfi.xi.T)
+print (test_1_dist.shape)
+print (test_1_dist[0][:10])
+\end{minted}
+
+\begin{verbatim}
+(1, 100)
+[0.         0.11111111 0.22222222 0.33333333 0.44444444 0.55555556
+ 0.66666667 0.77777778 0.88888889 1.        ]
+\end{verbatim}
+
+O mesafeyi alýp eksi karesini hesaplayýp \verb!exp!'ye vermek lazým. Tüm
+RBF'leri de bir þekilde dahil etmek lazým tabii, o da hesaplanan aðýrlýklar
+ile üstteki sonucu çarpýp hepsini toplamakla olur. Gerekli parametreler
+\verb!rbfi! içinde,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (rbfi.epsilon)
+print (rbfi.smooth)
+print (rbfi.xi.shape)
+print (rbfi.nodes.shape)
+\end{minted}
+
+\begin{verbatim}
+0.1
+0.0
+(2, 100)
+(100,)
+\end{verbatim}
+
+Aðýrlýklar \verb!nodes!, RBF merkezleri \verb!xi!, \verb!epsilon! genel bir
+pürüz parametresi. Ýki test noktasý üzerinde görelim, dikkat burada {\em
+  tüm} RBF'ler gözönüne alýnacak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+nodes = rbfi.nodes.reshape(1,len(rbfi.nodes))
+def gaussian(r,eps): return anp.exp(-(r/eps)**2)
+
+def f_interp(newp, rbfi):
+    nodes = rbfi.nodes.reshape(1,len(rbfi.nodes))
+    newp_dist = dist_matrix(newp, rbfi.xi.T)
+    return anp.dot(gaussian(newp_dist, rbfi.epsilon), nodes.T)
+
+test_2 = anp.array([[36.0,32.0],[36.1,31.9]])
+print (f_interp(test_2,rbfi))
+\end{minted}
+
+\begin{verbatim}
+[[0.00358205]
+ [0.00067651]]
+\end{verbatim}
+
+Þimdi iki tepeli fonksiyonu RBF'ler üzerinde yaratalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+test_3 = np.column_stack((xx.ravel(), yy.ravel()))
+znewnew = f_interp(test_3,rbfi).reshape(xx.shape)
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.view_init(elev=29, azim=29)
+surf = ax.plot_surface(xx, yy, znewnew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+plt.savefig('linear_app88rbf_06.png')
+\end{minted}
+
+\includegraphics[width=20em]{linear_app88rbf_06.png}
 
 Kaynaklar
 
