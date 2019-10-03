@@ -40,7 +40,7 @@ def plot_surf_path(azim,elev,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
     ax.view_init(elev=elev, azim=azim)
     surf = ax.plot_wireframe(xx, yy, zz,rstride=10, cstride=10)
 
-    t = np.linspace(0,1.0,100)
+    t = np.linspace(0,1.0,300)
 
     x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
     y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
@@ -65,15 +65,15 @@ def find_path(ex,ey,a0,b0,offset):
 
 
     # rasgele secilmis baslangic degerleri
-    a1,a2,a3 = 0.1,0.2,0.4
-    b1,b2,b3 = 0.2,0.4,0.6
+    a1,a2,a3 = 0,0,0
+    b1,b2,b3 = 0,0,0
     x0 = a1,a2,a3,b1,b2,b3
 
     def pintval(p):
         a1,a2,a3,b1,b2,b3 = p
         a4 = ex - a0 - (a1+a2+a3)
         b4 = ey - b0 - (b1+b2+b3)   
-        t = np.linspace(0,1,100)
+        t = np.linspace(0,1,300)
         tmp = b1 + 2.0*b2*t + 3.0*b3*t**2.0 - 112.0*t**3.0 + \
               (a1 + 2.0*a2*t + 3.0*a3*t**2.0 - 65.2*t**3.0)**2.0
         sq = [anp.sqrt(_) if _ != anp.nan else 0.0 for _ in tmp]
@@ -84,7 +84,6 @@ def find_path(ex,ey,a0,b0,offset):
         z = gfunc(x,y,offset)
         res = z * sq
         T = trapz(res, 1.0/len(t))
-        print ('T',T)
         return T
     
     pintval_grad = autograd.grad(pintval)
@@ -94,17 +93,15 @@ def find_path(ex,ey,a0,b0,offset):
                             jac = pintval_grad,
                             method = 'COBYLA',
                             callback=print,
-                            tol=0.05,
+                            tol=0.001,
                             constraints=cons)
 
     print (sol.x)
     return sol.x
     
 a0,b0=1.0,1.0
-OFFSET = 1.0
-
 ex,ey=0.3,4.0
-res = find_path(ex,ey,a0,b0,OFFSET)
+res = find_path(ex,ey,a0,b0,offset=0.8)
 a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
@@ -114,7 +111,7 @@ plt.savefig('calc_multi_40_elev_04.png')
 #plt.show()
 
 ex,ey=4.0,4.0
-res = find_path(ex,ey,a0,b0,OFFSET)
+res = find_path(ex,ey,a0,b0,offset=2.0)
 a1,a2,a3,b1,b2,b3 = res
 a4 = ex - a0 - (a1+a2+a3)
 b4 = ey - b0 - (b1+b2+b3)
