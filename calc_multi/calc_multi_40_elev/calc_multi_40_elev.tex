@@ -186,14 +186,6 @@ Daha dik yolun entegrali daha yüksek çýktý, bu normal.
 
 \includegraphics[width=20em]{calc_multi_40_elev_05.png}
 
-Dikkat edersek son kod içinde bazý fonksiyonlarý tekrar yazmamýz
-gerekti. Bunun sebebi otomatik türev kütüphanesi \verb!autograd!'ýn kendi
-içinde olan \verb!numpy! kodlarýný kullanmamýz gerekmesi. Yani dýþarýdan
-\verb!numpy! deðil \verb!autograd! içindeki \verb!numpy!'i kullanmak lazým;
-sebep o \verb!numpy!'in ``türevi alýnabilir'' bir hale getirilmiþ
-olmasý. OT bir sihirli deðnek deðil, pek çok iyi yapýyor, daha önceden
-hazýrlanmýþ öðeleri kullanmak þartýyla. 
-
 Ayrýca bir \verb!offset! parametresiyle yükseklik fonksiyonunun döndürdüðü
 her yükseklik hesabýna bir \verb!offset! kadar yüksekliði suni olarak
 eklediðimize dikkat. Bunun sebebi yer seviyesinin 0 yükseklikte olmasý
@@ -219,18 +211,16 @@ enlem/boylam (36,32) kordinatlarý bir blok (Alanya çevresi), (36,33) bir
 baþka blok. Her tam sayýlý alan yaklaþýk 9,300 $km^2$'ye tekabül eder. Bu
 yeterince büyük bir alan, oradaki tepeleri modellemek ise yarar. Her neyse,
 diyelim ki bir hesap için (36,32), ve (36,33) RBF'lerini bir sözlük içine
-alýyoruz, ve bu iki RBF bloðu üzerinden entegralin otomatik türevini
-alacaðýz. Olur mu? Autograd ile oluyor.
+alýyoruz, ve bu iki RBF bloðu üzerinden optimizasyonun olmasýný
+saðlayalým. 
 
 Test amaçlý bir blok içinde iki tepe yaratalým, sonra ayný tepeleri bir
 baþka blok içinde yaratacaðýz, ve ikisini yanyana koyacaðýz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from autograd import numpy as anp
 from scipy import optimize
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-import autograd
 
 np.random.seed(0)
 S = 50
@@ -362,29 +352,24 @@ def find_path(ex,ey,a0,b0):
 
     def pintval(p):
         a1,a2,a3,b1,b2,b3 = p
+        t = np.linspace(0,1,100)
         a4 = ex - a0 - (a1+a2+a3)
         b4 = ey - b0 - (b1+b2+b3)   
-        t = anp.linspace(0,1,100)
-        tmp = b1 + 2.0*b2*t + 3.0*b3*t**2.0 - 112.0*t**3.0 + \
-              (a1 + 2.0*a2*t + 3.0*a3*t**2.0 - 65.2*t**3.0)**2.0
-        sq = [anp.sqrt(_) if _ != anp.nan else 0.0 for _ in tmp]
-        x = a0 + a1*t + a2*t**2.0 + a3*t**3.0 + a4*t**4.0
-        y = b0 + b1*t + b2*t**2.0 + b3*t**3.0 + b4*t**4.0
+        sq = np.sqrt(b1 + 2*b2*t + 3*b3*t**2 - 112.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 65.2*t**3)**2)
+        x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
+        y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
         x = np.array(x)
-        y = np.array(y)
+        y = np.array(y)   
         z = np.array([rbfi_combo(xxx,yyy,offset=2.0) for xxx,yyy in zip(x,y)])
         res = z * sq
         T = trapz(res, 1.0/len(t))
         return T
-
-    pintval_grad = autograd.grad(pintval)
     
     sol = optimize.minimize(pintval,
 			    x0,
-			    jac = pintval_grad,
 			    method = 'COBYLA',
 			    callback=print,
-			    tol=0.05,
+			    tol=0.001,
 			    constraints=cons)
 
     return sol.x
@@ -396,7 +381,7 @@ print (res)
 \end{minted}
 
 \begin{verbatim}
-[2.0599569  1.1969097  2.07756688 0.76797734 1.78467521 3.01687383]
+[1.93797385 1.18995129 2.05061276 0.73444983 1.79205523 2.9747821 ]
 \end{verbatim}
 
 Bir yol bulundu. Grafikleyelim,
@@ -440,6 +425,9 @@ Kaynaklar
 [6] Bayramlý, Ýstatistik ve Veri Analizi, {\em Dairesel Baz Fonksiyonlarý (Radial Basis Functions -RBF-)}
 
 \end{document}
+
+
+
 
 
 
