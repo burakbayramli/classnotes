@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -71,6 +70,7 @@ def intval(a1,a2,a3,b1,b2,b3):
    z = [f_interp(anp.array([[xx,yy]]))[0][0] for xx,yy in zip(x,y)]
    res = z * sq
    T = trapz(res, 1.0/len(t))
+   if ('ArrayBox' not in str(type(T))): return float(T)
    return T._value
 
 
@@ -92,8 +92,8 @@ for i in range(3):
     oldx = newx
     a1,a2,a3,b1,b2,b3 = newx
 
-    print (a1,a2,a3)
-    
+    T = intval(a1,a2,a3,b1,b2,b3)
+        
     a4 = ex - a0 - (a1+a2+a3)
     b4 = ey - b0 - (b1+b2+b3)
 
@@ -111,7 +111,7 @@ for i in range(3):
     y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
     z = [f_interp(anp.array([[xx,yy]]))[0][0] for xx,yy in zip(x,y)]
     ax.plot3D(x, y, z,'r.')
-    plt.title(", ".join([str(np.round(xcurr,2)) for xcurr in newx]))
+    plt.title('T=%0.2f, katsayilar=' % T +', '.join([str(np.round(xcurr,2)) for xcurr in newx]))
     plt.savefig('linear_app88rbf_08-%d.png' % i)
 
     grad_1 = [intval_grad_a1(a1,a2,a3,b1,b2,b3),\
