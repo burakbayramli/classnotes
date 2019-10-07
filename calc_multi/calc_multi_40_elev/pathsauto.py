@@ -71,8 +71,6 @@ def intval(a1,a2,a3,b1,b2,b3):
    z = [f_interp(anp.array([[xx,yy]]))[0][0] for xx,yy in zip(x,y)]
    res = z * sq
    T = trapz(res, 1.0/len(t))
-   P = anp.power(a1,a1) + anp.power(a2,a2)  + anp.power(a3,a3) + anp.power(b1,b1) + anp.power(b2,b2)  + anp.power(b3,b3)
-   T = T + P
    return T._value
 
 
