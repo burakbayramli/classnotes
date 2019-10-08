@@ -11,6 +11,7 @@ if len(sys.argv) == 1 :
     phy_intcont/phy_intcont.pdf \
     phy_varcalc/phy_varcalc.pdf \
     phy_opt/phy_opt.pdf \
+    phy_num/phy_num.pdf \
     phy_path/phy_path.pdf \
     phy_kf/phy_kf.pdf \
     " + d + "/Downloads/phy.pdf" \
