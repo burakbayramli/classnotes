@@ -158,7 +158,7 @@ plt.show()
 Türevi \verb!autograd! ile aldýk, bu örnekte sembolik türev kolaydý, elle
 $f'(x)=2x$ diyebilirdik ama gösterim amaçlý direk yazýlýmla türevi aldýk.
 
-Kisitlanmis Optimizasyon
+Kýsýtlanmýþ Optimizasyon
 
 Mühendislik problemlerinde kýsýtlanmýþ optimizasyon çok ortaya
 çýkar. Prototipik örnek bir düzlem üzerindeki orijine en yakýn noktayý
@@ -283,6 +283,64 @@ print (np.linalg.eig(h(np.array([x, y, z])))[0])
 [2. 2. 2.]
 \end{verbatim}
 
+Birden Fazla Gradyan Deðiþkeni
+
+Diyelim ki elimizde 
+
+$$
+g(w_1,w_2) = \tanh (w_1w_2)
+$$
+
+fonksiyonu var, bu üç boyutlu bir fonksiyon, ve optimizasyon amaçlý gradyan
+gerekiyor, gradyanýn iki deðiþken üzerinden alýnmasý gerekli. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import autograd
+from autograd import numpy as anp
+
+def g(w_1,w_2):
+    return anp.tanh(w_1*w_2)
+
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+x = np.linspace(-4,4,20)
+y = np.linspace(-4,4,20)
+xx,yy = np.meshgrid(x,y)
+zz = g(xx,yy)
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm)
+plt.savefig('func_40_autograd_03.png')
+\end{minted}
+
+\includegraphics[width=20em]{func_40_autograd_03.png}
+
+$g$'nin her iki kýsmi türevini ve gradyanýný, 
+
+$$
+\nabla g(w_1,w_2) = \left[\begin{array}{r}
+\frac{\partial }{\partial w_1} g(w_1,w_2) \\
+\frac{\partial }{\partial w_2} g(w_1,w_2) 
+\end{array}\right]
+$$
+
+\verb!autograd! ile hesaplamak için 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+dgdw1 = autograd.grad(g,0)
+dgdw2 = autograd.grad(g,1)
+\end{minted}
+
+Þimdi mesela (1,2) noktasýndaki gradyaný hesaplayabiliriz, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+gradg = [dgdw1(1.0,2.0), dgdw2(1.0,2.0)]
+print (gradg)
+\end{minted}
+
+\begin{verbatim}
+[0.14130164970632894, 0.07065082485316447]
+\end{verbatim}
 
 Kaynaklar 
 
@@ -290,11 +348,14 @@ Kaynaklar
 
 [2] Schrimpf, \url{http://faculty.arts.ubc.ca/pschrimpf/526/526.html}
 
-[3] \url{https://nikstoyanov.me/post/2019-04-14-numerical-optimizations}
+[3] Stoyanov, \url{https://nikstoyanov.me/post/2019-04-14-numerical-optimizations}
 
-[5] \url{http://kitchingroup.cheme.cmu.edu/blog/2018/11/03/Constrained-optimization-with-Lagrange-multipliers-and-autograd/}
+[5] Kitchin, \url{http://kitchingroup.cheme.cmu.edu/blog/2018/11/03/Constrained-optimization-with-Lagrange-multipliers-and-autograd/}
 
 [6] Bayramli, Cok Boyutlu Calculus, {\em Vektör Calculus, Kurallar, Matris Türevleri}
+
+[7] Watt, {\em Automatic Differentiation}, 
+    \url{https://jermwatt.github.io/machine_learning_refined/notes/3_First_order_methods/3_5_Automatic.html}
 
 
 \end{document}
