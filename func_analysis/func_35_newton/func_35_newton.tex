@@ -2,18 +2,19 @@
 \begin{document}
 Newton'un Metodu (Newton's Method)
 
-([2] dersinden aldýðýmýz notlar). Newton birazdan bahsedeceðimiz yöntemi
-tek boyutlu problemler için kullandý. Rhapson adlý bilimci yöntemi çok
-boyutlu problemler için geniþletti. Biz bu yönteme optimizasyon
-çerçevesinde bakacaðýz.  Konunun tarihinden biraz bahsetmek istiyorum, bu
-dersi öðretmeye baþladýðýmda 1986 senesiydi, Newton'un metodunu nasýl
-gördüðümüz o zamandan beri deðiþime uðradý. NM o zamanlar son baþvurulan
-metot diye öðretiliyordu, çünkü metodu kullanmak için ``büyük'' bir denklem
-sistemi çözmek gerekiyordu, 500 x 500 bir sistem mesela. Bugüne gelelim
-artýk NM ilk baþvurulan metot haline geldi, 50,000 x 50,000 boyutlarýnda
-bir sistem çözmek ``yetiyor'' ve böyle bir sistem artýk idare edilebilen
-bir boyut haline geldi. Yani hesapsal kapasite NM'in optimizasyon alanýnda
-oynadýðý rolü tamamen deðiþtirdi.
+Bu notlar [2] dersinden alýndý.
+
+Newton birazdan bahsedeceðimiz yöntemi tek boyutlu problemler için
+kullandý. Rhapson adlý bilimci yöntemi çok boyutlu problemler için
+geniþletti. Biz bu yönteme optimizasyon çerçevesinde bakacaðýz.  Konunun
+tarihinden biraz bahsetmek istiyorum, bu dersi öðretmeye baþladýðýmda 1986
+senesiydi, Newton'un metodunu nasýl gördüðümüz o zamandan beri deðiþime
+uðradý. NM o zamanlar son baþvurulan metot diye öðretiliyordu, çünkü metodu
+kullanmak için ``büyük'' bir denklem sistemi çözmek gerekiyordu, 500 x 500
+bir sistem mesela. Bugüne gelelim artýk NM ilk baþvurulan metot haline
+geldi, 50,000 x 50,000 boyutlarýnda bir sistem çözmek ``yetiyor'' ve böyle
+bir sistem artýk idare edilebilen bir boyut haline geldi. Yani hesapsal
+kapasite NM'in optimizasyon alanýnda oynadýðý rolü tamamen deðiþtirdi.
 
 Diðer bir faktör ileride öðreneceðimiz iç nokta (interior-point)
 metotlarýnýn Newton'un metodunu kullanýyor olmalarý. Ýç nokta metotlarý
@@ -38,28 +39,59 @@ $$
 ki $H$ Hessian matrisi. Üstteki formüle $h(x)$ diyelim. Böylece bir karesel
 model ortaya çýkartmýþ oldum, formülün sað tarafýndaki çarpým onu karesel
 yapýyor, ve þimdi onu kesin olarak çözmek istiyorum. Bunu nasýl yaparým?
-Formülün gradyanýný sýfýra eþitleyebilirim. Üstteki fonksiyonun $x$'tei
+Formülün gradyanýný sýfýra eþitleyebilirim. Üstteki fonksiyonun $x$'teki
 gradyaný nedir? 
 
 Gradyaný $x$'e göre aldýðýmýzý unutmayalým, $h(x)$'in ikinci terimi
 $\nabla f(\bar{x})^T$ bir sabit sayý, ikinci gradyan alýnýrken sýfýrlanýr,
 ve tüm ikinci terim sýfýrlanýr. Üçüncü terimin gradyanýný almak bir nevi
-$\frac{\partial (x^TAx)}{\partial x} $ almak gibi [1], $A$ simetrik olunca
-gradyan $2Ax$ sonucunu veriyordu, o zaman üçüncü terimde $H$ kalýr, 2 ve
-$1/2$ birbirini iptal eder, sonuç
+$\frac{\partial (x^TAx)}{\partial x} $ almak gibi [1], $H$ belli bir
+noktadaki ikinci türev matrisi olduðu için $A$ gibi bir sabit matris kabul
+edilebilir, $A$ simetrik olunca gradyan $2Ax$ sonucunu veriyordu, $H$
+simetrik, o zaman üçüncü terimde $H$ kalýr, 2 ve $1/2$ birbirini iptal
+eder, sonuç
 
 $$
-\nabla h() = \nabla f(\bar{x}) + H(\bar{x})(x-\bar{x})
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + H(\bar{x})(x-\bar{x}) 
 $$
 
 Ýki üstteki karesel yaklaþýksal ifadenin gradyaný bu iþte. Onu sýfýra
-eþitleriz ve çözeriz, 
+eþitleriz ve çözeriz. $H$ tersi alinabilir bir matristir, o zaman 
+
+$$
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + H(\bar{x})(x-\bar{x}) = 0
+$$
 
 
+$$
+(x-\bar{x}) = -H^{-1} \nabla f(\bar{x})
+$$
+ 
+Üstteki ifadeye $d$ diyebilirim, ve bu $d$ benim Newton yönüm olarak
+görülebilir, yön derken optimizasyon baðlamýnda minimuma giden yön. 
 
+Bu bizi gayet basit 4 adýmlýk bir algoritmaya taþýyor,
 
+0) $x^0$ verildi, bu baþlangýç noktasý, $k = 0$ yap.
 
+1) $d^k = -H(x^k)^{-1} \nabla f(x^k)$. Eðer $d^k=0$ ise dur.
 
+2) $\alpha^k = 1$ adým boyu seç
+
+3) $x^{k+1} = x^k + \alpha^k d^k$, $k = k + 1$. 1. adýma geri dön.
+
+Bu metodun önemli bir özelliðinin sadece bir lineer sistemi çözmek olduðunu
+görüyoruz. Bir lineer sistemi çözmek kolay midir? Sisteme göre deðiþir, 100
+x 100 sistem, problem yok. 10,000 x 10,000 yoðun bir sistem var ise (seyrek
+matrisle temsil edilen lineer sisteme nazaran) iþimiz daha zor
+olacaktýr. Bu tür sistemlerde Gaussian eliminasyon iþlemeyebilir, bir tür
+özyineli metot gerekli. Demek istediðim Newton yönteminin darboðazý bir
+lineer denklem sistemini her seferinde sýfýrdan baþlayarak çözmek, ve bunu
+her döngüde yapmak. 
+
+Fakat bu çözümün bize pek çok þey kazandýrdýðýný da görmek lazým;
+bahsedilen sistemi çözmek bize pek çok bilgi kazandýrýyor çünkü çözülen
+problem içinde 1. ve 2. türev bilgisi var. 
 
 
 
@@ -75,7 +107,7 @@ eþitleriz ve çözeriz,
 
 Kaynaklar 
 
-[1] Bayramli, Cok Boyutlu Calculus, {\em Vektör Calculus, Kurallar, Matris Türevleri}
+[1] Bayramlý, Çok Boyutlu Calculus, {\em Vektör Calculus, Kurallar, Matris Türevleri}
 
 [2] Freund, {\em MIT OCW Nonlinear Programming Lecture},
     \url{https://ocw.mit.edu/courses/sloan-school-of-management/15-084j-nonlinear-programming-spring-2004/}
