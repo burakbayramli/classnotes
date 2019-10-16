@@ -206,6 +206,136 @@ $$
 $v^TAv > 0$ pozitif kesinlik formülü farklý bir $v$ için hala geçerlidir, o
 zaman ortadaki $A$, bu durumda $H(x)$ pozitif kesin olmalýdýr. 
 
+Örnek 1
+
+$f(x) = 7x - \ln(x)$ olsun. O zaman $\nabla f(x) = 7 - \frac{1}{x}$ ve
+$H(x) = f''(x) = \frac{1}{x^2}$. Bu fonksiyonun özgün global minimumunun
+$x^* = 1/7 = 1.428..$ olduðunu kontrol etmek zor deðil. $x$ noktasýndaki
+Newton yönü
+
+$$
+d = -H(x)^{-1} \nabla f(x) = -\frac{f'(x)}{f''(x)} = 
+-x^2 \left( 7 - \frac{1}{x}  \right)=
+x - 7x^2
+$$
+
+Newton yöntemi $\{ x^k \}$ serisini üretecek, öyle ki
+
+$$
+x^{k+1} = x^k + ( x^k - 7(x^k)^2  ) = 2x^k - 7(x^k)^2
+$$
+
+Altta farklý baþlangýç noktalarýna göre üretilen serileri
+görüyoruz. Yakýnsamanýn hangi deðere doðru olduðu bariz, ve global minimum
+da o deðer zaten. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+pd.set_option('display.notebook_repr_html', False)
+pd.set_option('display.max_columns', 20)
+pd.set_option('display.max_rows', 30) 
+pd.set_option('display.width', 82) 
+pd.set_option('precision', 6)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.DataFrame(index=np.arange(11))
+
+def calculate_newton_ex1(x):
+    arr = []
+    for i in range(11):
+        arr.append(x)
+        x = 2*x - 7*x**2
+        if (x > 1e100):  x = np.inf
+        if (x < -1e100):  x = -np.inf
+    return arr
+
+df['1'] = calculate_newton_ex1(1.0)
+df['2'] = calculate_newton_ex1(0.0)
+df['3'] = calculate_newton_ex1(0.1)
+df['4'] = calculate_newton_ex1(0.01)
+
+print (df)    
+\end{minted}
+
+\begin{verbatim}
+               1    2         3         4
+0   1.000000e+00  0.0  0.100000  0.010000
+1  -5.000000e+00  0.0  0.130000  0.019300
+2  -1.850000e+02  0.0  0.141700  0.035993
+3  -2.399450e+05  0.0  0.142848  0.062917
+4  -4.030157e+11  0.0  0.142857  0.098124
+5  -1.136952e+24  0.0  0.142857  0.128850
+6  -9.048612e+48  0.0  0.142857  0.141484
+7  -5.731417e+98  0.0  0.142857  0.142844
+8           -inf  0.0  0.142857  0.142857
+9           -inf  0.0  0.142857  0.142857
+10          -inf  0.0  0.142857  0.142857
+\end{verbatim}
+
+Örnek 2
+
+Bu örnekte iki deðiþkenli bir fonksiyon görelim. Global minimum
+$(1/3,1/3)$. Bakalým bu deðeri bulabilecek miyiz?
+
+$f(x) = -\ln( 1 - x_1 - x_2) - \ln x_1 - \ln x_2$
+
+$$
+\nabla f(x) = 
+\left[\begin{array}{r}
+\frac{1}{1-x_1-x_2} - \frac{1}{x_1} \\
+\frac{1}{1-x_1-x_2} - \frac{1}{x_2} 
+\end{array}\right]
+$$
+
+$$
+H(x) = 
+\left[\begin{array}{rr}
+(\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_1})^2 & (\frac{1}{1-x_1-x_2} )^2 \\
+(\frac{1}{1-x_1-x_2} )^2 & (\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_2})^2
+\end{array}\right]
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+df = pd.DataFrame(index=np.arange(11))
+
+def calculate_newton_ex2(x):    
+    arr = []
+    for i in range(8):
+        arr.append(x)
+        x1,x2 = x[0],x[1]    
+        H = [[(1.0/(1.0-x1-x2))**2 + (1.0/x1)**2.0, (1.0/(1.0-x1-x2))**2.0],
+             [(1.0/(1.0-x1-x2))**2, (1.0/(1.0-x1-x2))**2.0 + (1.0/x2)**2.0]]
+        H = np.array(H)
+
+        Df = [[1.0/(1.0-x1-x2) - (1.0/x1)], [1.0/(1.0-x1-x2)-(1.0/x2)]]
+        Df = np.array(Df)
+
+        d = np.dot(-lin.inv(H),Df)
+        x = x + d.flatten()
+
+    return np.array(arr)
+
+res = calculate_newton_ex2([0.85,0.05])
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[[0.85  0.05 ]
+ [0.717 0.097]
+ [0.513 0.176]
+ [0.352 0.273]
+ [0.338 0.326]
+ [0.333 0.333]
+ [0.333 0.333]
+ [0.333 0.333]]
+\end{verbatim}
+
+
+
+
+
 
 
 [devam edecek]
