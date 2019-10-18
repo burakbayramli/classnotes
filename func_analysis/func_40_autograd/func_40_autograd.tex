@@ -345,6 +345,124 @@ print (gradg)
 [0.14130164970632894, 0.07065082485316447]
 \end{verbatim}
 
+
+Esitsizlik Sýnýrlamalarý 
+
+Optimizasyon problemimizde 
+
+$$
+\min_x f(x), 
+\quad 
+\textrm{oyle ki}, 
+\quad 
+c_i(x) \ge 0, 
+\quad i=1,2,..,m
+$$
+
+$c_i$ ile gösterilen eþitsizlik içeren (üstte büyüklük türünden)
+kýsýtlamalar olduðunu düþünelim. Bu problemi nasýl çözeriz?
+
+Bir fikir, problemin eþitizliklerini bir gösterge (indicator)
+fonksiyonu üzerinden, Lagrange yönteminde olduðu gibi, ana hedef
+fonksiyonuna dahil etmek, ve elde edilen yeni hedefi kýsýtlanmamýþ bir
+problem gibi çözmek. Yani üstteki yerine, alttaki problemi çözmek,
+
+$$
+\min_x f(x) + \sum_{i=1}^{m} I(c_i(x))
+$$
+
+ki $I$ pozitif reel fonksiyonlar için göstergeç fonksiyonu,
+
+$$
+I(u) = 
+\left\{ \begin{array}{ll}
+0 & u \le 0 \\
+\infty & u > 0
+\end{array} \right.
+$$
+
+Bu yaklaþýmýn nasýl iþleyeceðini kabaca tahmin edebiliriz. $I$
+fonksiyonu 0'dan büyük deðerler için müthiþ büyük deðerler veriyor, bu
+sebeple optimizasyon sýrasýnda o deðerlerden tabii ki kaçýnýlacak, ve
+arayýþ istediðimiz noktalara doðru kayacak. Tabii $x_1 > 3$ gibi bir
+þart varsa onu $x_1 - 3 > 0$ þartýna deðiþtiriyoruz ki üstteki
+göstergeci kullanabilelim. Bu yaklaþýma "bariyer metotu" ismi
+veriliyor çünkü $I$ ile bir bariyer yaratýlmýþ oluyor.
+
+Fakat bir problem var, göstergeç fonksiyonunu türevini almak, ve
+pürüzsüz rahat kullanýlabilen bir yeni fonksiyon elde etmek kolay
+deðil. Acaba $I$ yerine onu yaklaþýk temsil edebilen bir baþka sürekli
+fonksiyon kullanamaz mýyýz?
+
+Log fonksiyonunu kullanabiliriz. Altta farklý $\mu$ deðerleri için
+$-\mu \log(u)$ fonksiyonun deðerlerini görüyoruz. Fonksiyon görüldüðü
+gibi $I$'ya oldukca yakýn.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def I(u): 
+   if u<0: return 0.
+   else: return 10.0
+
+u = np.linspace(-3,1,100)
+Is = np.array([I(x) for x in u])
+
+import pandas as pd
+df = pd.DataFrame(index=u)
+
+df['I'] = Is
+df['$\mu$=0.5'] = -0.5*np.log(-u)
+df['$\mu$=1.0'] = -1.0*np.log(-u)
+df['$\mu$=2.0'] = -2.0*np.log(-u)
+
+df.plot()
+plt.savefig('func_40_autograd_04.png')
+\end{minted}
+
+\includegraphics[width=25em]{func_40_autograd_04.png}
+
+O zaman yeni birleþik fonksiyon,
+
+$$
+P(x;\mu) = f(x) + \mu \sum_{i=1}^{m} \log c_i(x) 
+$$
+
+Böylece elde edilen yaklaþým log-bariyer yaklaþýmý olacaktýr. 
+
+Algoritma olarak optimizasyon þu þekilde gider;
+
+1) Bir $x$ ve $\mu$ deðerinden baþla.
+
+2) Newton metotu ile birkaç adým at (durma kriteri yaklaþýma göre deðisebilir)
+
+3) $\mu$'yu küçült
+
+4) Ana durma kriterine bak, tamamsa dur. Yoksa baþa dön
+
+Bu yaklaþýmýn diþbukey (convex) problemler için global minimuma
+gittiði ispatlanmýþtýr [8, sf. 504].
+
+Örnek
+
+$\min (x_1 + 0.5)^2 + (x_2 - 0.5)^2$ problemini çöz, $x_1 \in [0,1]$ ve $x_2 \in
+[0,1]$ kriterine göre.
+
+Üstteki için log-bariyer,
+
+$$
+P(x;\mu) = (x_1 + 0.5)^2 + (x_2-0.5)^2 -
+\mu 
+\big[
+\log x_1 + \log (1-x_1) + \log x_2 + \log (1-x_2)
+\big]
+$$
+
+Bu formülasyonun nasýl olduðu bariz herhalde, $x_1 \ge 0$ ve $x_1 \le
+1$ var mesela,
+ikinci ifadeyi büyüktür iþaretine çevirmek için eksi ile
+çarparýz, $-x_1 \ge 1$, ya da  $1-x_1 \ge 0$ böylece $\log(1-x_1)$  olur. 
+
+[devam edecek]
+
 Kaynaklar 
 
 [1] Bayramlý, Ders Notlarý, {\em Otomatik Türev Almak (Automatic Differentiation -AD-)}
@@ -360,5 +478,6 @@ Kaynaklar
 [7] Watt, {\em Automatic Differentiation}, 
     \url{https://jermwatt.github.io/machine_learning_refined/notes/3_First_order_methods/3_5_Automatic.html}
 
+[8] Nocedal, {\em Numerical Optimization}
 
 \end{document}

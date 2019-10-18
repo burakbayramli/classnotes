@@ -43,7 +43,8 @@ fonksiyonu 0'dan büyük değerler için müthiş büyük değerler veriyor, bu
 sebeple optimizasyon sırasında o değerlerden tabii ki kaçınılacak, ve
 arayış istediğimiz noktalara doğru kayacak. Tabii $x_1 > 3$ gibi bir
 şart varsa onu $x_1 - 3 > 0$ şartına değiştiriyoruz ki üstteki
-göstergeci kullanabilelim.
+göstergeci kullanabilelim. Bu yaklaşıma "bariyer metotu" ismi
+veriliyor çünkü $I$ ile bir bariyer yaratılmış oluyor.
 
 Fakat bir problem var, göstergeç fonksiyonunu türevini almak, ve
 pürüzsüz rahat kullanılabilen bir yeni fonksiyon elde etmek kolay
@@ -74,6 +75,84 @@ df.plot()
 plt.savefig('func_40_autograd_04.png')
 ```
 
+\includegraphics[width=25em]{func_40_autograd_04.png}
+
+O zaman yeni birleşik fonksiyon,
+
+$$
+P(x;\mu) = f(x) + \mu \sum_{i=1}^{m} \log c_i(x) 
+$$
+
+Böylece elde edilen yaklaşım log-bariyer yaklaşımı olacaktır. 
+
+Algoritma olarak optimizasyon şu şekilde gider;
+
+1) Bir $x$ ve $\mu$ değerinden başla.
+
+2) Newton metotu ile birkaç adım at (durma kriteri yaklaşıma göre değisebilir)
+
+3) $\mu$'yu küçült
+
+4) Ana durma kriterine bak, tamamsa dur. Yoksa başa dön
+
+Bu yaklaşımın dişbukey (convex) problemler için global minimuma
+gittiği ispatlanmıştır [8, sf. 504].
+
+Örnek
+
+$\min (x_1 + 0.5)^2 + (x_2 - 0.5)^2$ problemini çöz, $x_1 \in [0,1]$ ve $x_2 \in
+[0,1]$ kriterine göre.
+
+Üstteki için log-bariyer,
+
+$$
+P(x;\mu) = (x_1 + 0.5)^2 + (x_2-0.5)^2 -
+\mu 
+\big[
+\log x_1 + \log (1-x_1) + \log x_2 + \log (1-x_2)
+\big]
+$$
+
+Bu formülasyonun nasıl olduğu bariz herhalde, $x_1 \ge 0$ ve $x_1 \le
+1$ var mesela,
+ikinci ifadeyi büyüktür işaretine çevirmek için eksi ile
+çarparız, $-x_1 \ge 1$, ya da  $1-x_1 \ge 0$ böylece $\log(1-x_1)$  olur. 
+
+
+```python
+from autograd import numpy as anp, grad, hessian
+
+for i in range(1):
+    mu = 2.0
+    def P(x1,x2):
+        return (x1+0.5)**2 + (x2-0.5)**2 - mu * \
+               (anp.log(x1) + anp.log(1-x1) + anp.log(x2)+anp.log(1-x2))
+
+    dx1 = grad(P,0)
+    dx2 = grad(P,1)
+
+    h = hessian(grad(P,0),0)
+    print (h(0.8,0.9))
+    h = hessian(grad(P,0),1)
+    print (h(0.8,0.9))
+    h = hessian(grad(P,1),0)
+    print (h(0.8,0.9))
+    h = hessian(grad(P,1),1)
+    print (h(0.8,0.9))
+
+    #print (P(0.8,0.8))
+
+    
+
+
+```
+
+```text
+492.18750000000045
+0.0
+0.0
+3994.5130315500724
+```
 
 
 
@@ -88,15 +167,7 @@ plt.savefig('func_40_autograd_04.png')
 
 
 
-
-
-
-
-
-
-Kaynaklar 
-
-[1] Nocedal, {\em Numerical Optimization}
+[devam edecek]
 
 
 
