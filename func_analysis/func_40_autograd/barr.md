@@ -19,10 +19,10 @@ $$
 $c_i$ ile gösterilen eşitsizlik içeren (üstte büyüklük türünden)
 kısıtlamalar olduğunu düşünelim. Bu problemi nasıl çözeriz?
 
-Bir fikir problemin eşitizliklerin bir gösterge (indicator) fonksiyonu
-üzerinden, Lagrange yönteminde olduğu gibi, ana hedef fonksiyonuna
-dahil etmektir, ve elde edilen yeni hedefi kısıtlanmamış bir problem
-gibi çözmektir. Yani üstteki yerine alttaki problemi çözmek,
+Bir fikir, problemin eşitizliklerini bir gösterge (indicator)
+fonksiyonu üzerinden, Lagrange yönteminde olduğu gibi, ana hedef
+fonksiyonuna dahil etmek, ve elde edilen yeni hedefi kısıtlanmamış bir
+problem gibi çözmek. Yani üstteki yerine, alttaki problemi çözmek,
 
 $$
 \min_x f(x) + \sum_{i=1}^{m} I(c_i(x))
@@ -38,20 +38,21 @@ I(u) =
 \end{array} \right.
 $$
 
-
-Bu yaklaşımın nasıl işleyeceğini kabaca kendimiz de tahmin
-edebilirdik. $I$ fonksiyonu 0'dan büyük değerler için müthiş büyük
-değerler veriyor, bu sebeple optimizasyon sırasında o değerlerden
-tabii ki kaçınilacak, ve arayış istediğimiz noktalara doğru
-kayacak. Tabii $x_1 > 3$ gibi bir şart varsa onu $x_1 - 3 > 0$ şartına
-değiştiriyoruz ki üstteki göstergeci kullanabilelim. 
+Bu yaklaşımın nasıl işleyeceğini kabaca tahmin edebiliriz. $I$
+fonksiyonu 0'dan büyük değerler için müthiş büyük değerler veriyor, bu
+sebeple optimizasyon sırasında o değerlerden tabii ki kaçınılacak, ve
+arayış istediğimiz noktalara doğru kayacak. Tabii $x_1 > 3$ gibi bir
+şart varsa onu $x_1 - 3 > 0$ şartına değiştiriyoruz ki üstteki
+göstergeci kullanabilelim.
 
 Fakat bir problem var, göstergeç fonksiyonunu türevini almak, ve
 pürüzsüz rahat kullanılabilen bir yeni fonksiyon elde etmek kolay
-değil. Acaba $I$ yerine ona yaklaşık bir başka sürekli fonksiyon
-kullanamaz mıyız?  
+değil. Acaba $I$ yerine onu yaklaşık temsil edebilen bir başka sürekli
+fonksiyon kullanamaz mıyız?
 
-Log fonksiyonunu kullanabiliriz. 
+Log fonksiyonunu kullanabiliriz. Altta farklı $\mu$ değerleri için
+$-\mu \log(u)$ fonksiyonun değerlerini görüyoruz. Fonksiyon görüldüğü
+gibi $I$'ya oldukca yakın.
 
 ```python
 def I(u): 
@@ -81,9 +82,44 @@ plt.savefig('func_40_autograd_04.png')
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 Kaynaklar 
 
 [1] Nocedal, {\em Numerical Optimization}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
