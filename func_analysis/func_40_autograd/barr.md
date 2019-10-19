@@ -46,7 +46,7 @@ arayış istediğimiz noktalara doğru kayacak. Tabii $x_1 > 3$ gibi bir
 göstergeci kullanabilelim. Bu yaklaşıma "bariyer metotu" ismi
 veriliyor çünkü $I$ ile bir bariyer yaratılmış oluyor.
 
-Fakat bir problem var, göstergeç fonksiyonunu türevini almak, ve
+Fakat bir problem var, göstergeç fonksiyonunun türevini almak, ve
 pürüzsüz rahat kullanılabilen bir yeni fonksiyon elde etmek kolay
 değil. Acaba $I$ yerine onu yaklaşık temsil edebilen bir başka sürekli
 fonksiyon kullanamaz mıyız?
