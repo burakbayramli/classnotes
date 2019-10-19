@@ -52,7 +52,7 @@ değil. Acaba $I$ yerine onu yaklaşık temsil edebilen bir başka sürekli
 fonksiyon kullanamaz mıyız?
 
 Log fonksiyonunu kullanabiliriz. Altta farklı $\mu$ değerleri için
-$-\mu \log(u)$ fonksiyonun değerlerini görüyoruz. Fonksiyon görüldüğü
+$-\mu \log(-u)$ fonksiyonun değerlerini görüyoruz. Fonksiyon görüldüğü
 gibi $I$'ya oldukca yakın.
 
 ```python
@@ -77,13 +77,19 @@ plt.savefig('func_40_autograd_04.png')
 
 \includegraphics[width=25em]{func_40_autograd_04.png}
 
-O zaman yeni birleşik fonksiyon,
+O zaman eldeki tüm $c_i(x) \ge 0$ kısıtlamalarını
 
 $$
-P(x;\mu) = f(x) + \mu \sum_{i=1}^{m} \log c_i(x) 
+- \sum_{i=1}^{m} \log c_i(x)
 $$
 
-Böylece elde edilen yaklaşım log-bariyer yaklaşımı olacaktır. 
+ile hedef fonksiyonuna dahil edebiliriz, yeni birleşik fonksiyon,
+
+$$
+P(x;\mu) = f(x) - \mu \sum_{i=1}^{m} \log c_i(x) 
+$$
+
+olur. Böylece elde edilen yaklaşım log-bariyer yaklaşımı olacaktır. 
 
 Algoritma olarak optimizasyon şu şekilde gider;
 
