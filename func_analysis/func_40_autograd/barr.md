@@ -101,7 +101,7 @@ Algoritma olarak optimizasyon şu şekilde gider;
 
 4) Ana durma kriterine bak, tamamsa dur. Yoksa başa dön
 
-Bu yaklaşımın dişbukey (convex) problemler için global minimuma
+Bu yaklaşımın dışbükey (convex) problemler için global minimuma
 gittiği ispatlanmıştır [8, sf. 504].
 
 Örnek
@@ -109,7 +109,7 @@ gittiği ispatlanmıştır [8, sf. 504].
 $\min (x_1 + 0.5)^2 + (x_2 - 0.5)^2$ problemini çöz, $x_1 \in [0,1]$ ve $x_2 \in
 [0,1]$ kriterine göre.
 
-Üstteki için log-bariyer,
+Üstteki fonksiyon için log-bariyer,
 
 $$
 P(x;\mu) = (x_1 + 0.5)^2 + (x_2-0.5)^2 -
@@ -119,10 +119,10 @@ P(x;\mu) = (x_1 + 0.5)^2 + (x_2-0.5)^2 -
 \big]
 $$
 
-Bu formülasyonun nasıl olduğu bariz herhalde, $x_1 \ge 0$ ve $x_1 \le
-1$ var mesela,
-ikinci ifadeyi büyüktür işaretine çevirmek için eksi ile
-çarparız, $-x_1 \ge 1$, ya da  $1-x_1 \ge 0$ böylece $\log(1-x_1)$  olur. 
+Bu formülasyonu nasıl elde ettiğimiz bariz herhalde, $x_1 \ge 0$ ve
+$x_1 \le 1$ kısıtlamaları var mesela, ikinci ifadeyi büyüktür
+işaretine çevirmek için eksi ile çarptık, $-x_1 \ge 1$, ya da $1-x_1
+\ge 0$ böylece $\log(1-x_1)$ oldu.
 
 
 ```python
