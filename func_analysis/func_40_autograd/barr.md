@@ -131,32 +131,20 @@ from autograd import numpy as anp, grad, hessian
 
 for i in range(1):
     mu = 2.0
-    def P(x1,x2):
-        return (x1+0.5)**2 + (x2-0.5)**2 - mu * \
-               (anp.log(x1) + anp.log(1-x1) + anp.log(x2)+anp.log(1-x2))
+    def P(x):
+    	x1,x2=x[0],x[1]
+    	return (x1+0.5)**2 + (x2-0.5)**2 - mu * (anp.log(x1) + anp.log(1-x1) + anp.log(x2)+anp.log(1-x2))
 
-    dx1 = grad(P,0)
-    dx2 = grad(P,1)
+    h = hessian(P)
+    print (h(np.array( [0.8,0.2] )))
 
-    h = hessian(grad(P,0),0)
-    print (h(0.8,0.9))
-    h = hessian(grad(P,0),1)
-    print (h(0.8,0.9))
-    h = hessian(grad(P,1),0)
-    print (h(0.8,0.9))
-    h = hessian(grad(P,1),1)
-    print (h(0.8,0.9))
 
-    #print (P(0.8,0.8))    
 ```
 
 ```text
-492.18750000000045
-0.0
-0.0
-3994.5130315500724
+[[55.125  0.   ]
+ [ 0.    55.125]]
 ```
-
 
 
 
