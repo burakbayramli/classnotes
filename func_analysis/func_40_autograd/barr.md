@@ -125,29 +125,51 @@ işaretine çevirmek için eksi ile çarptık, $-x_1 \ge 1$, ya da $1-x_1
 \ge 0$
 böylece $\log(1-x_1)$ oldu.
 
+Artık Newton yöntemini kullanarak sanki elimizde bir kısıtlanması
+olmayan fonksiyon varmış gibi kodlama yapabiliriz, $P$'yi minimize
+edebiliriz. Newton yönü $d$ için gereken Hessian ve Jacobian
+matrislerini otomatik türevle hesaplayacağız, belli bir noktadan
+başlayacağız, ve her adımda $d = -H(x)^{-1} \nabla f(x)$ yönünde adım
+atacağız.
 
 ```python
-from autograd import numpy as anp, grad, hessian
+from autograd import numpy as anp, grad, hessian, jacobian
+import numpy.linalg as lin
 
-for i in range(1):
-    mu = 2.0
+x = np.array([0.8,0.2])
+mu = 2.0
+for i in range(10):
     def P(x):
     	x1,x2=x[0],x[1]
-    	return (x1+0.5)**2 + (x2-0.5)**2 - mu * (anp.log(x1) + anp.log(1-x1) + anp.log(x2)+anp.log(1-x2))
+    	return (x1+0.5)**2 + (x2-0.5)**2 - mu * \
+	   (anp.log(x1) + anp.log(1-x1) + anp.log(x2)+anp.log(1-x2))
 
     h = hessian(P)
-    print (h(np.array( [0.8,0.2] )))
-
-
+    j = jacobian(P)
+    J = j(np.array(x))
+    H = h(np.array(x))
+    d = np.dot(-lin.inv(H), J)
+    x = x + d
+    print (i, x, np.round(mu,5))
+    mu = mu*0.1
 ```
 
 ```text
-[[55.125  0.   ]
- [ 0.    55.125]]
+0 [0.61678005 0.34693878] 2.0
+1 [-0.00858974  0.486471  ] 0.2
+2 [-0.02078755  0.49999853] 0.02
+3 [-0.18014768  0.5       ] 0.002
+4 [-0.49963245  0.5       ] 0.0002
+5 [-0.50002667  0.5       ] 2e-05
+6 [-0.50000267  0.5       ] 0.0
+7 [-0.50000027  0.5       ] 0.0
+8 [-0.50000003  0.5       ] 0.0
+9 [-0.5  0.5] 0.0
 ```
 
-
-
+Görüldüğü gibi 5. adımda optimal noktaya gelindi, o noktada $\mu$
+oldukca küçük, ve bariyerle tanımladığımız yerlerden uzak duruldu,
+optimal nokta $x_1=-0.5,x_2=0.5$ bulundu.
 
 
 
