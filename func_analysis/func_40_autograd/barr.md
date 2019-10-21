@@ -3,7 +3,7 @@
 #+LaTeX_HEADER: \usepackage{palatino,eulervm}
 #+LaTeX_HEADER: \usepackage{cancel}
 
-Esitsizlik Sınırlamaları 
+Eşitsizlik Sınırlamaları 
 
 Optimizasyon problemimizde 
 
@@ -122,7 +122,8 @@ $$
 Bu formülasyonu nasıl elde ettiğimiz bariz herhalde, $x_1 \ge 0$ ve
 $x_1 \le 1$ kısıtlamaları var mesela, ikinci ifadeyi büyüktür
 işaretine çevirmek için eksi ile çarptık, $-x_1 \ge 1$, ya da $1-x_1
-\ge 0$ böylece $\log(1-x_1)$ oldu.
+\ge 0$
+böylece $\log(1-x_1)$ oldu.
 
 
 ```python
@@ -146,11 +147,7 @@ for i in range(1):
     h = hessian(grad(P,1),1)
     print (h(0.8,0.9))
 
-    #print (P(0.8,0.8))
-
-    
-
-
+    #print (P(0.8,0.8))    
 ```
 
 ```text
@@ -200,33 +197,6 @@ for i in range(1):
 
 
 
-
-```python
-from autograd import numpy as anp, grad
-
-#r = 10.0
-r = 1.0
-
-def B(x1,x2):
-    return (x1 - 1.0)**2 + (x2 - 2.0)**2 - r*anp.log(x1 + x2 - 4.0)
-
-dx1 = grad(B,0)
-dx2 = grad(B,1)
-
-x = anp.array([2.0,3.0])
-
-alpha = 0.1
-
-for i in range(20):   
-    nabla = anp.array([dx1(x[0], x[1]), dx2(x[0], x[1])])
-    x = x - alpha*nabla
-
-print (x)
-```
-
-```text
-[1.80901699 2.80901699]
-```
 
 
 
