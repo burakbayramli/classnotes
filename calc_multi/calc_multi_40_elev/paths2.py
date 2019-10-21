@@ -59,14 +59,14 @@ def trapz(y, dx):
 
 
 DIV = 2.0
-alpha = 0.1
+alpha = 0.05
 LIM = 2.0
 mu = 2.0
 a1,a2,a3 = np.random.randn()/DIV,np.random.randn()/DIV,np.random.randn()/DIV
 b1,b2,b3 = np.random.randn()/DIV,np.random.randn()/DIV,np.random.randn()/DIV
 newx = anp.array([a1,a2,a3,b1,b2,b3])
 
-for i in range(5):
+for i in range(6):
     t = np.linspace(0,1,100)
     a0,b0=(36.0,32.0)
     ex,ey=(36.4,32.8)
@@ -87,10 +87,10 @@ for i in range(5):
                      anp.log(LIM+b1) + anp.log(LIM-b1) + \
                      anp.log(LIM+b2) + anp.log(LIM-b2) + \
                      anp.log(LIM+b3) + anp.log(LIM-b3))
-        print ('as bs',xarg)
-        print ('cons',cons)
+        #print ('as bs',xarg)
+        #print ('cons',cons)
         T = T - cons
-        print ('T',T)
+        #print ('T',T)
         if ('ArrayBox' not in str(type(T))):
             return float(T)
         return T._value
@@ -107,33 +107,22 @@ for i in range(5):
     test_3 = anp.column_stack((xx.ravel(), yy.ravel()))
     znewnew = f_interp(test_3).reshape(xx.shape)
     surf = ax.plot_wireframe(xx, yy, znewnew, rstride=10, cstride=10)
-    
+        
+    j = autograd.jacobian(obj)
+    J = j(newx)
+    d = J
+    oldx = newx[:]
+    newx = newx + alpha*d
+
+    print ('newx',newx)
+    print ('diff',np.sum(np.abs(newx-oldx)))
+
     t = np.linspace(0,1,100)
     x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
     y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
     z = [f_interp(anp.array([[xx,yy]]))[0][0] for xx,yy in zip(x,y)]
     ax.plot3D(x, y, z,'r.')
-    #plt.savefig('/tmp/out.png')
-    plt.show()
-    
-    print ('newx',newx)
-    print (obj(newx))
-    
-    # h = autograd.hessian(obj)
-    # H = h(newx)
-    # j = autograd.jacobian(obj)
-    # J = j(newx)
-    # if lin.det(H)==0.0:
-    #     H = H + np.eye(6,6)*1e-2
-    # print (H)
-    # d = np.dot(-lin.inv(H), J)
-    # mu = mu * 0.1
-    # newx = newx + d
+    plt.savefig('linear_app88rbf_08-%d.png' % i)
 
-    j = autograd.jacobian(obj)
-    J = j(newx)
-    print (J)
-    d = J
-    print (d)    
-    newx = newx + alpha*d
-
+    
+    
