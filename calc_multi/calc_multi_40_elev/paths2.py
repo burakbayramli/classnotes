@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 OFFSET = 0.0
+LIM = 2.0
 np.random.seed(0)
 
 def func(x, y):
@@ -87,10 +88,8 @@ for i in range(6):
                      anp.log(LIM+b1) + anp.log(LIM-b1) + \
                      anp.log(LIM+b2) + anp.log(LIM-b2) + \
                      anp.log(LIM+b3) + anp.log(LIM-b3))
-        #print ('as bs',xarg)
-        #print ('cons',cons)
+
         T = T - cons
-        #print ('T',T)
         if ('ArrayBox' not in str(type(T))):
             return float(T)
         return T._value
