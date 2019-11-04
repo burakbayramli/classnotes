@@ -1,24 +1,30 @@
 
 
-
 ```python
-import random
-R = 2
-
-def sample_circle(center):
-    a = random.random() * 2 * np.pi
-    r = R * np.sqrt(random.random())
-    x = center[0]+ (r * np.cos(a))
-    y = center[1] + (r * np.sin(a))
-    return x,y
-
-ps = np.array([sample_circle((0,0)) for i in range(100)])
+def random_ball(num_points, dimension, radius=1):
+    from numpy import random, linalg
+    random_directions = random.normal(size=(dimension,num_points))
+    random_directions /= linalg.norm(random_directions, axis=0)
+    random_radii = random.random(num_points) ** (1/dimension)
+    return radius * (random_directions * random_radii).T
+    
+ps = random_ball(400, 2, 1)
+center = np.array([0,1])
+ps = center + ps
 
 plt.plot(ps[:,0],ps[:,1],'.')
 plt.xlim(-3,3)
 plt.ylim(-3,3)
 plt.savefig('rb_01.png')
 ```
+
+
+
+
+
+
+
+
 
 
 
