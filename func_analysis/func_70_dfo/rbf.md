@@ -61,6 +61,9 @@ rbfi = Rbf(xr,yr,zr,function='gaussian',epsilon=0.15)
 
 
 ```python
+import autograd.numpy as anp
+import autograd
+
 def dist_matrix(X, Y):
     X = X.reshape(1, X.shape[0])
     sx = anp.sum(X**2, 1)

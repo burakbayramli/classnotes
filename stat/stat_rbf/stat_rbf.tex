@@ -661,6 +661,49 @@ Akýlda tutalým $(R,G,B)$ matrisleri köþegen ve birbirleri ile sýrabaðýmsýz
 iliþkileri var, ama $\,\Omega\,$ matrisi tam matris ve diðer matrislerle
 sýrabaðýmsýz iliþkiye giremiyor.
 
+Autograd ile Gradyan ve Hessian
+
+Otomatik türev üzerinden de üstteki hesaplarý yapabiliriz. Daha önceki
+kodlarda iki daðlý veriden örneklem alýp RBF yaratmýþtýk, bu obje
+\verb!rbfi! içinde, oradan devam edersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import autograd.numpy as anp
+import autograd
+
+def dist_matrix(X, Y):
+    X = X.reshape(1, X.shape[0])
+    sx = anp.sum(X**2, 1)
+    sy = anp.sum(Y**2, 1)
+    D2 =  sx[:, anp.newaxis] - 2.0*anp.dot(X,Y.T) + sy[anp.newaxis, :] 
+    D = anp.sqrt(D2)
+    return D
+    
+nodes = rbfi.nodes.reshape(1,len(rbfi.nodes))
+def gaussian(r,eps): return anp.exp(-(r/eps)**2)
+
+def f_interp(newp):
+    nodes = rbfi.nodes.reshape(1,len(rbfi.nodes))    
+    newp_dist = dist_matrix(newp, rbfi.xi.T)
+    return anp.dot(gaussian(newp_dist, rbfi.epsilon), nodes.T)
+
+test_1 = anp.array([36.0,32.0])
+test_1_dist = dist_matrix(test_1, rbfi.xi.T)
+print ('f',f_interp(test_1))
+
+grbf = autograd.grad(f_interp)
+hrbf = autograd.hessian(f_interp)
+print ('gradyan',grbf(test_1))
+print ('hessian',hrbf(test_1))
+\end{minted}
+
+\begin{verbatim}
+f [[-0.00387063]]
+gradyan [0.02331737 0.08191414]
+hessian [[[[0.6466522  0.74921925]
+   [0.74921925 1.92847522]]]]
+\end{verbatim}
+
 Kaynaklar
 
 [1] Neto, {\em Radial Basis Functions}, \url{http://www.di.fc.ul.pt/~jpn/r/rbf/rbf.html}
@@ -675,7 +718,3 @@ Kaynaklar
     \url{https://www.sciencedirect.com/science/article/pii/S0307904X06002009}
 
 \end{document}
-
-
-
-
