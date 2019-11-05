@@ -465,12 +465,219 @@ plt.savefig('linear_app88rbf_06.png')
 
 \includegraphics[width=20em]{linear_app88rbf_06.png}
 
+RBF Türev ve Hessian Matrisi
+
+Ana formülü hatýrlayalým, 
+
+$$
+f(x) = \sum _{i=1}^{m} \beta_i \phi(|| x-x_i||)
+$$
+
+ki $\beta_1,...,\beta_m$ oyle seciliyor ki 
+
+$$
+f(x_i) = F(x_i), \quad i=1,2,...,m
+$$
+
+eþitliði tatmin edilsin, burada $F$ modellenen ana fonksiyondur, ve $\phi$
+bizim seçtiðimiz baz fonksiyondur. RBF'in turevi nedir? Analitik olarak
+hesaplayabiliriz,
+
+$$
+\frac{\partial f(x)}{\partial x} = \beta^T \frac{\partial g}{\partial x} =
+\sum_{i=1}^{m} \beta_i \phi'(r_i) \frac{\partial r_i}{\partial x} 
+$$
+
+öyle ki $\phi'(r) = \ud \phi / \ud r$, ve 
+
+$$
+r_i(x) = ||x-x_i|| = \sqrt{(x-x_i)^T(x-x_i)} 
+\mlabel{1}
+$$
+
+Ayrýca
+
+$$
+\frac{\partial r_i}{\partial x} = \frac{1}{r_i(x)} (x-x_i)^T
+$$
+
+Hepsi bir arada [4]
+
+$$
+\frac{\partial f(x)}{\partial x} = \sum_{i=1}^{m} \frac{\beta_i\phi'(r_i)}{r_i(x)}
+(x-x_i)^T
+$$
+
+Hessian'ini alttaki gibi hesaplayabiliriz [3]. [4]'teki formul
+
+$$
+\frac{\partial^2 f(x)}{\partial x^2} = 
+\sum_{i=1}^{m} \bigg\{ 
+\phi'(r_i) I + \bigg[\phi''(r_i) - \frac{\phi'(r_i)}{r_i(x)} \bigg] 
+(x-x_i) \frac{\partial r_i}{\partial x}
+\bigg\}
+\mlabel{2}
+$$
+
+Türetmek için, radyal vektörler $\,w_k = (x - x_k)\in{\mathbb R}^n\,$
+tanýmlanýr, dikkat bunlarýn $\,dw_k = dx$ türevleri ayný. Þimdi vektörleri
+tek bir matriste birleþtir,
+
+$$
+\Omega = \big[\,w_1\;w_2\;\ldots\;w_m\big] \in {\mathbb R}^{n\times m} 
+$$
+
+$$
+d\Omega = \big[\,dx\;dx\;\ldots\;dx\big] =  dx\,{\tt\large 1}^T 
+$$
+
+Dikkat $\,r_j=\|w_j\|\,$ ogelerinin kendisi $\,r\in{\mathbb R}^m$
+vektorunun ayni zamanda ogesi.  Kartezyen baz vektorleri The cartesian base vector
+$\,e_k\in{\mathbb R}^m$ usttekini 
+
+$$w_k=\Omega\,e_k,\quad dx=d\Omega\,e_k,\quad r_j=e_j^Tr$$
+
+þeklinde yazmamýza izin veriyor. RBF'i öðesel bazda uygulayarak indisli
+toplam notasyonundan kurtulmuþ oluyoruz. Þimdi türevleri, diferansiyelleri 
+
+$$
+g=\phi(r),\quad g'=\phi'(r),\quad g''=\phi''(r)\; \in{\mathbb R}^m 
+$$
+
+$$
+dg=g'\odot dr,\quad dg'=g''\odot dr \; \in{\mathbb R}^m 
+$$
+
+ile yazabiliriz, ki $\odot$ ogesel bazli Hadamard carpimidir.
+
+Ayrica vektorler kosegen matrisler arasinda gecis yapabilmek faydalidir, ki
+bu matrisleri buyuk harfle belirtecegiz, mesela
+
+$$
+  R={\rm Diag}(r),\quad G={\rm Diag}(g),\quad G''={\rm Diag}(g'')\;\in{\mathbb R}^{m\times m} 
+$$
+
+$$
+  r = {\rm diag}(R),\quad g = {\rm diag}(G),\quad g''=\ldots 
+$$
+
+$$
+  r  = R{\tt\large 1},\quad g = G{\tt\large 1},\quad g''=\ldots 
+$$
+
+$$
+  dg = G'dr,\quad dg' = G''dr 
+$$
+
+ayrýca iþ kolaylaþtýrmasý için alttaki taným faydalý,
+
+$$
+P=R^{-1}\quad\implies PR=I,\;\;p\odot r = {\tt\large 1}
+$$
+
+Þimdi ana iliþkiyi yazalým ve türevini alalým,
+
+$$
+r\odot r = {\rm diag}(\Omega^T\Omega) 
+2r\odot dr = {\rm diag}(\Omega^Td\Omega+d\Omega^T\Omega)
+$$
+
+$$
+ \;=\; 2{\,\rm {diag}}(\Omega^Td\Omega) 
+$$
+
+$$
+R\,dr = {\rm diag}(\Omega^Tdx\,{\tt\large 1}^T) \;=\; \Omega^Tdx 
+$$
+
+$$
+dr = P\Omega^Tdx 
+$$
+
+$$
+\frac{\partial r}{\partial x} = P\Omega^T 
+$$
+
+
+$i^{th}$ bileseni kontrol edersek (1) formulunu ortaya cikartabilecegimizi
+goruyoruz, demek ki dogru yoldayiz,
+
+$$
+e_i^T\bigg(\frac{\partial r}{\partial x}\bigg) = e_i^TP\Omega^T \\
+$$
+
+$$
+\frac{\partial r_i}{\partial x} 
+ \;=\; \frac{1}{r_i}\;e_i^T\Omega^T
+$$
+
+$$
+ \;=\; \frac{w_i^T}{\|w_i\|} 
+$$
+
+Model fonksiyonu ($\beta$ $b$ kullandýk daha kýsa) 
+
+$$f = b^Tg = b:g$$
+
+Ýki nokta üst üste iz (trace) için Frobenius çarpým notasyonudur
+
+$\;A:B = {\rm Tr}(A^TB)$
+
+Þimdi Hessian
+
+$$
+dJ
+ = d\Omega\,PG'B{\tt\large 1} + \Omega PdG'B{\tt\large 1} + \Omega\,dP\,G'B{\tt\large 1} 
+\\ 
+$$
+
+$$
+ = dx\,{\tt\large 1}^TPG'B{\tt\large 1} + \Omega PB\,dg' - \Omega (P\,dR\,P)G'B{\tt\large 1}
+\\
+$$
+
+$$
+ = dx\,({\tt\large 1}^TPG'B{\tt\large 1}) +\Omega PB\,dg' -\Omega PG'PB\,dr
+\\
+$$
+
+$$
+ = (G':PB)\,dx +\Omega PBG''\,dr -\Omega PG'PB\,dr
+\\
+$$
+
+$$
+ = \Big((G':PB)I +\Omega PB(G'' - PG')P\Omega^T\Big)\,dx
+\\
+$$
+
+$$
+H = \frac{\partial J}{\partial x}
+ = (G':PB)I + \Omega PB(G''-PG')P\Omega^T \\
+$$
+
+$$
+ = \Big((p\odot b):g'\Big)\,I \;+\; \bigg(\frac{\partial r}{\partial x}\bigg)^T\Big(BG''-BPG'\Big)\bigg(\frac{\partial r}{\partial x}\bigg) \\
+$$
+
+Pek öyle durmasa da bu formül (2) formülü ile ayný.
+
+Akýlda tutalým $(R,G,B)$ matrisleri köþegen ve birbirleri ile sýrabaðýmsýz
+iliþkileri var, ama $\,\Omega\,$ matrisi tam matris ve diðer matrislerle
+sýrabaðýmsýz iliþkiye giremiyor.
+
 Kaynaklar
 
 [1] Neto, {\em Radial Basis Functions}, \url{http://www.di.fc.ul.pt/~jpn/r/rbf/rbf.html}
 
 [2] Pouderoux, {\em Adaptive Hierarchical RBF Interpolation for Creating Smooth Digital Elevation Models}
     \url{https://hal.archives-ouvertes.fr/hal-00308008/document}    
+
+[3] Math Stackexchange, {\em The Hessian of a Radial Basis Function}, 
+    \url{https://math.stackexchange.com/questions/3417706/the-hessian-of-a-radial-basis-function}
+
+[4] Mcdonald, {\em Global and local optimization using radial basis function response surface models}, 
+    \url{https://www.sciencedirect.com/science/article/pii/S0307904X06002009}
 
 \end{document}
 

@@ -1,4 +1,7 @@
-
+#+LaTeX_HEADER: \newcommand{\ud}{\,\mathrm{d}}
+#+LaTeX_HEADER: \newcommand{\mlabel}[1]{\quad \text{(#1)}\quad}
+#+LaTeX_HEADER: \usepackage{palatino,eulervm}
+#+LaTeX_HEADER: \usepackage{cancel}
 
 ```python
 def random_ball(num_points, dimension, radius=1):
@@ -17,17 +20,6 @@ plt.xlim(-3,3)
 plt.ylim(-3,3)
 plt.savefig('rb_01.png')
 ```
-
-
-
-
-
-
-
-
-
-
-
 
 ```python
 from mpl_toolkits.mplot3d import Axes3D
