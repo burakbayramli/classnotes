@@ -12,7 +12,6 @@ def random_ball(num_points, dimension, radius=1):
     random_directions /= linalg.norm(random_directions, axis=0)
     random_radii = random.random(num_points) ** (1/dimension)
     return radius * (random_directions * random_radii).T
-    
 
 def func(x, y):
     s1 = 0.2; x1 = 36.5; y1 = 32.5
@@ -28,7 +27,7 @@ def dist_matrix(X, Y):
     D2 =  sx[:, anp.newaxis] - 2.0*anp.dot(X,Y.T) + sy[anp.newaxis, :] 
     D = anp.sqrt(D2)
     return D
-    
+
 def gaussian(r,eps):
     return anp.exp(-(r/eps)**2)
 
@@ -47,10 +46,7 @@ def get_fvals_in_region(xcurr, f, radius):
     vals = [f(p) for p in pts]
     return xcurr+b, np.array(vals)
 
-xs,vs = get_fvals_in_region([1,1], rosenbrock, 0.5)
-
-print (xs)
-print (vs)
+xs,vs = get_fvals_in_region([1.5,0], rosenbrock, 0.5)
 
 x = np.linspace(-2,2,250)
 y = np.linspace(-1,3,250)
@@ -63,7 +59,8 @@ res = []
 for i in range(vs.shape[0]):
     res.append((xs[i,0],xs[i,1],vs[i]))
 res = np.array(res).reshape(vs.shape[0], 3)
-print (res)
+
 ax.plot3D(res[:,0],res[:,1],res[:,2],'r.')
 ax.plot_surface(X,Y,Z,rstride = 5, cstride = 5, cmap = 'jet', alpha = .4, edgecolor = 'none' )
-plt.show()
+ax.view_init(21, -133)
+#plt.show()

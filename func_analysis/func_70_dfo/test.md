@@ -4,6 +4,19 @@
 #+LaTeX_HEADER: \usepackage{cancel}
 
 ```python
+from scipy.interpolate import Rbf
+x, y, z, zz, d = np.random.rand(5, 50)
+rbfi = Rbf(x, y, z, zz, d)  # radial basis function interpolator instance
+xi = yi = zi = zzi = np.linspace(0, 1, 20)
+di = rbfi(xi, yi, zi, zzi)   # interpolated values
+print (di.shape)
+```
+
+```text
+(20,)
+```
+
+```python
 def random_ball(num_points, dimension, radius=1):
     from numpy import random, linalg
     random_directions = random.normal(size=(dimension,num_points))
