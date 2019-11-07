@@ -2,6 +2,7 @@ from scipy.interpolate import Rbf
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
+import numpy.linalg as lin
 import numpy as np
 import autograd.numpy as anp
 import autograd
@@ -54,7 +55,7 @@ y = np.linspace(-1,3,250)
 X, Y = np.meshgrid(x, y)
 Z = Rosenbrock(X, Y)
 
-fig = plt.figure(figsize = (8,4))
+fig = plt.figure()
 ax = fig.gca(projection='3d')
 res = []
 for i in range(vs.shape[0]):
@@ -70,14 +71,20 @@ def f_interp(newp):
 
 print (f_interp(x0))
 grbf = autograd.grad(f_interp)
-print (grbf(x0))
+hrbf = autograd.hessian(f_interp)
+print ('grbf',grbf(x0))
+print ('hrbf',hrbf(x0))
 
 b0,b1=x0[0],x0[1]
 g_dir = grbf(x0)
+d = np.dot(-lin.inv(hrbf(x0).reshape(2,2)),g_dir)
+print ('d',d)
 g_dir = g_dir / np.sum(g_dir) / 4.0
-print (g_dir)
-    
+print ('gdir',g_dir)
+
 ax.quiver(b0, b1, 0, g_dir[0], g_dir[1], 1, color='red')
+#ax.quiver(b0, b1, 0, d[0]*10, d[1]*10, 1, color='red')
+ax.plot3D([b0], [b1], [0.0], 'b.')
 
 ax.plot3D(res[:,0],res[:,1],res[:,2],'r.')
 ax.plot_surface(X,Y,Z,rstride = 5, cstride = 5, cmap = 'jet', alpha = .4, edgecolor = 'none' )
