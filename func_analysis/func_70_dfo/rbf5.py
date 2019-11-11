@@ -59,11 +59,12 @@ def eval_model(xcurr, f, radius):
 x0 = anp.array([1.5,0])
 print (eval_model(x0, rosenbrock, 1.0))
 
-initial_trust_radius=5.0
+initial_trust_radius=1.0
 trust_radius = initial_trust_radius
 gtol = 1e-4
 alpha = 0.1
 eta=0.15
+max_trust_radius=1000.0
 
 xcurr = x0
 m = eval_model
@@ -74,6 +75,18 @@ print (jac)
 print (hess)
 print ('norm',lin.norm(jac))
 while lin.norm(jac) >= gtol:
+
+    x = np.linspace(-2,2,250)
+    y = np.linspace(-1,3,250)
+    X, Y = np.meshgrid(x, y)
+    Z = Rosenbrock(X, Y)
+    fig = plt.figure()
+    ax = fig.gca()
+    ax.contour(X,Y,Z, 50, cmap = 'jet')
+    ax.plot(xcurr[0],xcurr[1], 'r.')
+    circle=plt.Circle((xcurr[0],xcurr[1]),trust_radius,fill=False)
+    ax.add_artist(circle)
+    
     val, jac, hess = eval_model(xcurr, rosenbrock, trust_radius)
     newton_dir = np.dot(-lin.inv(hess.reshape(2,2)),jac)
     p_best = xcurr + newton_dir
@@ -114,5 +127,7 @@ while lin.norm(jac) >= gtol:
         xcurr = p
 
     print ('xcurr',xcurr)
-        
+
+    plt.savefig('/tmp/out.png')
+    
     break
