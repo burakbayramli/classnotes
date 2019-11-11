@@ -62,7 +62,7 @@ print (eval_model(x0, rosenbrock, 1.0))
 initial_trust_radius=1.0
 trust_radius = initial_trust_radius
 gtol = 1e-4
-alpha = 0.1
+alpha = 0.2
 eta=0.15
 max_trust_radius=1000.0
 
@@ -90,21 +90,22 @@ while lin.norm(jac) >= gtol:
     val, jac, hess = eval_model(xcurr, rosenbrock, trust_radius)
     newton_dir = np.dot(-lin.inv(hess.reshape(2,2)),jac)
     p_best = xcurr + newton_dir
-    p_u = xcurr + alpha*jac
+    p_u = jac
+    
     print ('p_u',p_u)
-    p_u_norm = lin.norm(p_u)    
+    p_u_norm = lin.norm(p_u) 
     if lin.norm(p_best) < trust_radius:
         hits_boundary,p=False,p_best
-        print (hits_boundary,p)
+        print ('1',hits_boundary,p)       
     elif p_u_norm >= trust_radius:
         p_boundary = p_u * (trust_radius / p_u_norm)
-        hits_boundary,p=True, p_boundary
-        print (hits_boundary,p)
+        hits_boundary,p=True, xcurr-alpha*p_boundary
+        print ('2',hits_boundary,p)
     else:        
         _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
         p_boundary = p_u + tb * (p_best - p_u)
         hits_boundary,p=True,p_boundary
-        print (tb)
+        print ('3',tb)
 
     mv,dummy1,dummy2  = m(p,rosenbrock,trust_radius)
     model_prop_value = np.float(mv)
@@ -127,6 +128,9 @@ while lin.norm(jac) >= gtol:
         xcurr = p
 
     print ('xcurr',xcurr)
+    ax.plot(xcurr[0],xcurr[1], 'rx')
+    
+
 
     plt.savefig('/tmp/out.png')
     
