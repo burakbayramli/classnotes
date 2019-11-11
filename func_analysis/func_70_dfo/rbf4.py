@@ -48,7 +48,12 @@ def get_fvals_in_region(xcurr, f, radius):
     b = random_ball(N, 2, radius)
     pts = xcurr+b
     vals = [f(p) for p in pts]
-    return xcurr+b, np.array(vals)
+    return pts, np.array(vals)
+
+def get_model(xcurr, f, radius):
+    xms,yms = get_fvals_in_region(xcurr, f, radius)
+    rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
+    
 
 x0 = anp.array([1.5,0])
 xs,vs = get_fvals_in_region(x0, rosenbrock, 0.5)
