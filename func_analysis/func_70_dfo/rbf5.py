@@ -3,9 +3,13 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy.linalg as lin
+import scipy.linalg as slin
 import numpy as np, math
 import autograd.numpy as anp
 import autograd
+
+np.random.seed(0)
+N = 5
 
 def random_ball(num_points, dimension, radius=1):
     from numpy import random, linalg
@@ -24,9 +28,6 @@ def dist_matrix(X, Y):
 
 def gaussian(r,eps):
     return anp.exp(-(r/eps)**2)
-
-np.random.seed(0)
-N = 20
 
 def rosenbrock(x):
     return (1 + x[0])**2 + 100*(x[1] - x[0]**2)**2
@@ -56,39 +57,45 @@ def eval_model(xcurr, f, radius):
     hess = autograd.hessian(f_interp)
     return val, jac(xcurr), hess(xcurr)
     
-x0 = anp.array([1.5,0])
-print (eval_model(x0, rosenbrock, 1.0))
+x0 = anp.array([-2.0,2.0])
 
-initial_trust_radius=1.0
+initial_trust_radius=2.0
 trust_radius = initial_trust_radius
-gtol = 1e-4
-alpha = 0.2
+gtol = 5.0
+alpha = 0.8
 eta=0.15
 max_trust_radius=1000.0
+model_radius = 0.5
 
 xcurr = x0
 m = eval_model
 f = rosenbrock
-val, jac, hess = eval_model(xcurr, rosenbrock, trust_radius)
+val, jac, hess = eval_model(xcurr, rosenbrock, model_radius)
 print (val)
 print (jac)
 print (hess)
-print ('norm',lin.norm(jac))
 i = 0
 while lin.norm(jac) >= gtol:
-    x = np.linspace(-2,2,250)
-    y = np.linspace(-1,3,250)
+    print ('iteration', i)
+    print ('norm jac', lin.norm(jac))
+    x = np.linspace(-3,3,250)
+    y = np.linspace(-3,3,250)
     X, Y = np.meshgrid(x, y)
     Z = Rosenbrock(X, Y)
     fig = plt.figure()
     ax = fig.gca()
+    
     ax.contour(X,Y,Z, 50, cmap = 'jet')
     ax.plot(xcurr[0],xcurr[1], 'r.')
     circle=plt.Circle((xcurr[0],xcurr[1]),trust_radius,fill=False)
     ax.add_artist(circle)
     
-    val, jac, hess = eval_model(xcurr, rosenbrock, trust_radius)
+    val, jac, hess = eval_model(xcurr, rosenbrock, model_radius)
     newton_dir = np.dot(-lin.inv(hess.reshape(2,2)),jac)
+    #print ('cho',lin.det(hess[0][0]))
+    #cho_info = slin.cho_factor(hess[0][0])
+    #newton_dir = -slin.cho_solve(cho_info, jac)
+    
     p_best = xcurr + newton_dir
     p_u = jac
     
@@ -96,16 +103,16 @@ while lin.norm(jac) >= gtol:
     p_u_norm = lin.norm(p_u) 
     if lin.norm(p_best) < trust_radius:
         hits_boundary,p=False,p_best
-        print ('1',hits_boundary,p)       
+        print ('1',i,hits_boundary,p)       
     elif p_u_norm >= trust_radius:
         p_boundary = p_u * (trust_radius / p_u_norm)
         hits_boundary,p=True, xcurr-alpha*p_boundary
-        print ('2',hits_boundary,p)
+        print ('2',i,hits_boundary,p)
     else:        
         _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
         p_boundary = p_u + tb * (p_best - p_u)
         hits_boundary,p=True,p_boundary
-        print ('3',tb)
+        print ('3',i,tb)
 
     mv,dummy1,dummy2  = m(p,rosenbrock,trust_radius)
     model_prop_value = np.float(mv)
@@ -118,18 +125,21 @@ while lin.norm(jac) >= gtol:
     print (model_prop_value, model_curr_value, real_prop_value,real_curr_value)
 
     rho = (real_curr_value-real_prop_value) / (model_curr_value-model_prop_value)
-    print (rho)
+    print ('rho',rho)
     if rho < 0.25:
         trust_radius *= 0.25
     elif rho > 0.75 and hits_boundary:
+        print ('larger')
         trust_radius = min(2*trust_radius, max_trust_radius)
         
     if rho > eta:
         xcurr = p
 
     print ('xcurr',xcurr)
+    print ('\n')
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
     plt.savefig('/tmp/out-%d.png' % i)
     i += 1
+    if i==20: break
 
