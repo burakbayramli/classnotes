@@ -74,8 +74,8 @@ print (val)
 print (jac)
 print (hess)
 print ('norm',lin.norm(jac))
+i = 0
 while lin.norm(jac) >= gtol:
-
     x = np.linspace(-2,2,250)
     y = np.linspace(-1,3,250)
     X, Y = np.meshgrid(x, y)
@@ -130,8 +130,6 @@ while lin.norm(jac) >= gtol:
     print ('xcurr',xcurr)
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
+    plt.savefig('/tmp/out-%d.png' % i)
+    i += 1
 
-
-    plt.savefig('/tmp/out.png')
-    
-    break
