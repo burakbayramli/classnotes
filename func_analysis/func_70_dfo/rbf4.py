@@ -97,16 +97,22 @@ def get_boundaries_intersections(z, d, trust_radius):
     tb = -2*c / aux
     return sorted([ta, tb])
 
-xcurr = x0
 initial_trust_radius=5.0
 trust_radius = initial_trust_radius
 gtol = 1e-4
 alpha = 0.1
+eta=0.15
 grbf = autograd.grad(f_interp)
+xcurr = x0
 jac = grbf(xcurr)
 print (jac)
+m = f_interp
+f = rosenbrock
+
+print ('xcurr',xcurr)
+
 while lin.norm(jac) >= gtol:
-    hits_boundary,p_next=None,None
+    hits_boundary,p=None,None
     print (f_interp(xcurr))
     grbf = autograd.grad(f_interp)
     hrbf = autograd.hessian(f_interp)
@@ -122,16 +128,36 @@ while lin.norm(jac) >= gtol:
     print ('p_u',p_u)
     p_u_norm = lin.norm(p_u)    
     if lin.norm(p_best) < trust_radius:
-        hits_boundary,p_next=False,p_best
-        print (hits_boundary,p_next)        
+        hits_boundary,p=False,p_best
+        print (hits_boundary,p)
     elif p_u_norm >= trust_radius:
         p_boundary = p_u * (trust_radius / p_u_norm)
-        hits_boundary,p_next=True, p_boundary
-        print (hits_boundary,p_next)
+        hits_boundary,p=True, p_boundary
+        print (hits_boundary,p)
     else:        
         _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
         p_boundary = p_u + tb * (p_best - p_u)
-        hits_boundary,p_next=True,p_boundary
+        hits_boundary,p=True,p_boundary
         print (tb)
-    
+
+    model_prop_value = np.float(m(p))
+    model_curr_value = np.float(m(xcurr))
+
+    real_prop_value = f(p)
+    real_curr_value = f(xcurr)
+
+    print (model_prop_value, model_curr_value, real_prop_value,real_curr_value)
+
+    rho = (real_curr_value-real_prop_value) / (model_curr_value-model_prop_value)
+    print (rho)
+    if rho < 0.25:
+        trust_radius *= 0.25
+    elif rho > 0.75 and hits_boundary:
+        trust_radius = min(2*trust_radius, max_trust_radius)
+        
+    if rho > eta:
+        xcurr = p
+
+    print ('xcurr',xcurr)
+        
     break
