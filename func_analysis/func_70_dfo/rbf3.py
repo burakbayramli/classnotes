@@ -62,7 +62,7 @@ for i in range(vs.shape[0]):
     res.append((xs[i,0],xs[i,1],vs[i]))
 res = anp.array(res).reshape(vs.shape[0], 3)
 
-rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian',epsilon=0.15)
+rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
 
 def f_interp(newp):
     nodes = rbfi.nodes.reshape(1,len(rbfi.nodes))    
@@ -81,9 +81,9 @@ d = np.dot(-lin.inv(hrbf(x0).reshape(2,2)),g_dir)
 print ('d',d)
 g_dir = g_dir / np.sum(g_dir) / 4.0
 print ('gdir',g_dir)
-
-ax.quiver(b0, b1, 0, g_dir[0], g_dir[1], 1, color='red')
-#ax.quiver(b0, b1, 0, d[0]*10, d[1]*10, 1, color='red')
+SCALE = 10
+#ax.quiver(b0, b1, 0, g_dir[0], g_dir[1], 1, color='red')
+ax.quiver(b0, b1, 0, d[0]*SCALE, d[1]*SCALE, 1, color='red')
 ax.plot3D([b0], [b1], [0.0], 'b.')
 
 ax.plot3D(res[:,0],res[:,1],res[:,2],'r.')
