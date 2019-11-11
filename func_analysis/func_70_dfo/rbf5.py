@@ -42,9 +42,8 @@ def eval_model(xcurr, f, radius):
     pts = xcurr+b
     vals = [f(p) for p in pts]
     xs,vs = pts, np.array(vals)
-    res = []    
-    for i in range(vs.shape[0]):
-        res.append((xs[i,0],xs[i,1],vs[i]))
+    res = [(xs[i,0],xs[i,1],vs[i]) for i in range(vs.shape[0])]
+        
     res = anp.array(res).reshape(vs.shape[0], 3)
     rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
     def f_interp(xcurr):
