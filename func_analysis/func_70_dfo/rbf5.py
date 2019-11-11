@@ -9,7 +9,7 @@ import autograd.numpy as anp
 import autograd
 
 np.random.seed(0)
-N = 5
+N = 30
 
 def random_ball(num_points, dimension, radius=1):
     from numpy import random, linalg
@@ -103,16 +103,16 @@ while lin.norm(jac) >= gtol:
     p_u_norm = lin.norm(p_u) 
     if lin.norm(p_best) < trust_radius:
         hits_boundary,p=False,p_best
-        print ('1',i,hits_boundary,p)       
+        print ('method 1',hits_boundary,p)       
     elif p_u_norm >= trust_radius:
         p_boundary = p_u * (trust_radius / p_u_norm)
         hits_boundary,p=True, xcurr-alpha*p_boundary
-        print ('2',i,hits_boundary,p)
+        print ('method 2',hits_boundary,p)
     else:        
         _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
         p_boundary = p_u + tb * (p_best - p_u)
         hits_boundary,p=True,p_boundary
-        print ('3',i,tb)
+        print ('method 3',tb)
 
     mv,dummy1,dummy2  = m(p,rosenbrock,trust_radius)
     model_prop_value = np.float(mv)
@@ -122,7 +122,7 @@ while lin.norm(jac) >= gtol:
     real_prop_value = f(p)
     real_curr_value = f(xcurr)
 
-    print (model_prop_value, model_curr_value, real_prop_value,real_curr_value)
+    print ('model params',model_prop_value, model_curr_value, real_prop_value,real_curr_value)
 
     rho = (real_curr_value-real_prop_value) / (model_curr_value-model_prop_value)
     print ('rho',rho)
@@ -134,6 +134,8 @@ while lin.norm(jac) >= gtol:
         
     if rho > eta:
         xcurr = p
+    else:
+        print ('do nothing')
 
     print ('xcurr',xcurr)
     print ('\n')
