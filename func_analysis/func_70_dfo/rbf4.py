@@ -118,19 +118,20 @@ while lin.norm(jac) >= gtol:
     hess = hrbf(xcurr)
     newton_dir = np.dot(-lin.inv(hess.reshape(2,2)),jac)
     p_best = xcurr + newton_dir
-    if lin.norm(p_best) < trust_radius:
-        hits_boundary,p_next=False,p_best
-        print (hits_boundary,p_next)
-        
     p_u = xcurr + alpha*jac
     print ('p_u',p_u)
-    p_u_norm = lin.norm(p_u)
-    if p_u_norm >= trust_radius:
+    p_u_norm = lin.norm(p_u)    
+    if lin.norm(p_best) < trust_radius:
+        hits_boundary,p_next=False,p_best
+        print (hits_boundary,p_next)        
+    elif p_u_norm >= trust_radius:
         p_boundary = p_u * (trust_radius / p_u_norm)
         hits_boundary,p_next=True, p_boundary
         print (hits_boundary,p_next)
-
-    _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
-    print (tb)
+    else:        
+        _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
+        p_boundary = p_u + tb * (p_best - p_u)
+        hits_boundary,p_next=True,p_boundary
+        print (tb)
     
     break
