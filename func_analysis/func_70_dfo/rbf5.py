@@ -14,13 +14,6 @@ def random_ball(num_points, dimension, radius=1):
     random_radii = random.random(num_points) ** (1/dimension)
     return radius * (random_directions * random_radii).T
 
-def func(x, y):
-    s1 = 0.2; x1 = 36.5; y1 = 32.5
-    s2 = 0.4; x2 = 36.1; y2 = 32.8
-    g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
-    g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)    
-    return g1 + g2 
-
 def dist_matrix(X, Y):
     X = X.reshape(1, X.shape[0])
     sx = anp.sum(X**2, 1)
@@ -44,15 +37,11 @@ def Rosenbrock(x,y):
 def norm(x):
     M = sqrt(abs(x).power(2).sum(axis=a))
 
-def get_fvals_in_region(xcurr, f, radius):    
+def eval_model(xcurr, f, radius):
     b = random_ball(N, 2, radius)
     pts = xcurr+b
     vals = [f(p) for p in pts]
-    return pts, np.array(vals)
-
-
-def eval_model(xcurr, f, radius):
-    xs,vs = get_fvals_in_region(xcurr, f, radius)
+    xs,vs = pts, np.array(vals)
     res = []    
     for i in range(vs.shape[0]):
         res.append((xs[i,0],xs[i,1],vs[i]))
