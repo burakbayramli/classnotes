@@ -47,11 +47,16 @@ def rosenbrock(x):
 def Rosenbrock(x,y):
     return (1 - x)**2 + 100*(y - x**2)**2
 
+LIM=4.0
+
 def peaks(x):
     return \
-    3*(1-x[0])**2 * np.exp(-x[0]**2 - (x[1] + 1)**2) - \
-    10*(1/5. * x[0] - x[0]**3 - x[1]**5) * np.exp(-x[0]**2 - x[1]**2) - \
-    1/3. * np.exp(-(x[0]+1)**2 - x[0]**2)
+    3*(1-x[0])**2 * anp.exp(-x[0]**2 - (x[1] + 1)**2) - \
+    10*(1/5. * x[0] - x[0]**3 - x[1]**5) * anp.exp(-x[0]**2 - x[1]**2) - \
+    1/3. * np.exp(-(x[0]+1)**2 - x[0]**2) + \
+    anp.log(LIM+x[0]) + anp.log(LIM-x[0]) + \
+    anp.log(LIM+x[1]) + anp.log(LIM-x[1]) 
+
 
 def Peaks(x1,x2):
     return \
@@ -67,6 +72,7 @@ def eval_model(xcurr, f, radius):
     res = [(xs[i,0],xs[i,1],vs[i]) for i in range(vs.shape[0])]
         
     res = anp.array(res).reshape(vs.shape[0], 3)
+    res[np.isnan(res)] = 0.0
     #rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
     rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='cubic')
     def f_interp(xcurr):
