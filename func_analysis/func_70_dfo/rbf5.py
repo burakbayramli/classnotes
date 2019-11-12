@@ -71,7 +71,7 @@ def eval_model(xcurr, f, radius):
 x0 = anp.array([-2.0,2.0])
 
 np.random.seed(0)
-N = 40
+N = 50
 initial_trust_radius=1.0
 trust_radius = initial_trust_radius
 gtol = 1.0
@@ -87,10 +87,10 @@ val, jac, hess = eval_model(xcurr, rosenbrock, model_radius)
 print (val)
 print (jac)
 print (hess)
-i = 0
-while lin.norm(jac) >= gtol:
+for i in range(40):
     print ('iteration', i)
     print ('norm jac', lin.norm(jac))
+    if lin.norm(jac) < gtol: break
     x = np.linspace(-3,3,250)
     y = np.linspace(-3,3,250)
     X, Y = np.meshgrid(x, y)
@@ -155,6 +155,4 @@ while lin.norm(jac) >= gtol:
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
     plt.savefig('/tmp/rbf/out-%d.png' % i)
-    i += 1
-    if i==40 or rho<0.0: break
 
