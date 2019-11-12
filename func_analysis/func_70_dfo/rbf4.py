@@ -36,10 +36,10 @@ np.random.seed(0)
 N = 20
 
 def rosenbrock(x):
-    return (1 + x[0])**2 + 100*(x[1] - x[0]**2)**2
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
 def Rosenbrock(x,y):
-    return (1 + x)**2 + 100*(y - x**2)**2
+    return (1 - x)**2 + 100*(y - x**2)**2
 
 def norm(x):
     M = sqrt(abs(x).power(2).sum(axis=a))

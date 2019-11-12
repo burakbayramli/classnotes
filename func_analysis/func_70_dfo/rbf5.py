@@ -20,7 +20,6 @@ def get_boundaries_intersections(z, d, trust_radius):
     tb = -2*c / aux
     return sorted([ta, tb])
 
-
 def random_ball(num_points, dimension, radius=1):
     from numpy import random, linalg
     random_directions = random.normal(size=(dimension,num_points))
@@ -43,13 +42,10 @@ def cubic(r):
     return r**3
 
 def rosenbrock(x):
-    return (1 + x[0])**2 + 100*(x[1] - x[0]**2)**2
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
 def Rosenbrock(x,y):
-    return (1 + x)**2 + 100*(y - x**2)**2
-
-def norm(x):
-    M = sqrt(abs(x).power(2).sum(axis=a))
+    return (1 - x)**2 + 100*(y - x**2)**2
 
 def eval_model(xcurr, f, radius):
     b = random_ball(N, 2, radius)
@@ -75,11 +71,11 @@ def eval_model(xcurr, f, radius):
 x0 = anp.array([-2.0,2.0])
 
 np.random.seed(0)
-N = 50
+N = 40
 initial_trust_radius=1.0
 trust_radius = initial_trust_radius
 gtol = 1.0
-alpha = 0.8
+alpha = 1.0
 eta=0.15
 max_trust_radius=1000.0
 model_radius = 1.0
@@ -160,5 +156,5 @@ while lin.norm(jac) >= gtol:
     
     plt.savefig('/tmp/rbf/out-%d.png' % i)
     i += 1
-    if i==40: break
+    if i==40 or rho<0.0: break
 

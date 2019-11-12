@@ -36,10 +36,10 @@ np.random.seed(0)
 N = 20
 
 def rosenbrock(x):
-    return (1 + x[0])**2 + 100*(x[1] - x[0]**2)**2
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
 def Rosenbrock(x,y):
-    return (1 + x)**2 + 100*(y - x**2)**2
+    return (1 - x)**2 + 100*(y - x**2)**2
 
 def get_fvals_in_region(xcurr, f, radius):    
     b = random_ball(N, 2, radius)
