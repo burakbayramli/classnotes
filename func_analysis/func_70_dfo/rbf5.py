@@ -8,8 +8,18 @@ import numpy as np, math
 import autograd.numpy as anp
 import autograd
 
-np.random.seed(0)
-N = 30
+def get_boundaries_intersections(z, d, trust_radius):
+    a = np.dot(d, d)
+    b = 2 * np.dot(z, d)
+    c = np.dot(z, z) - trust_radius**2
+    print (b,a,c)
+    print (b*b - 4*a*c)
+    sqrt_discriminant = math.sqrt(b*b - 4*a*c)
+    aux = b + math.copysign(sqrt_discriminant, b)
+    ta = -aux / (2*a)
+    tb = -2*c / aux
+    return sorted([ta, tb])
+
 
 def random_ball(num_points, dimension, radius=1):
     from numpy import random, linalg
@@ -29,6 +39,9 @@ def dist_matrix(X, Y):
 def gaussian(r,eps):
     return anp.exp(-(r/eps)**2)
 
+def cubic(r):
+    return r**3
+
 def rosenbrock(x):
     return (1 + x[0])**2 + 100*(x[1] - x[0]**2)**2
 
@@ -46,11 +59,13 @@ def eval_model(xcurr, f, radius):
     res = [(xs[i,0],xs[i,1],vs[i]) for i in range(vs.shape[0])]
         
     res = anp.array(res).reshape(vs.shape[0], 3)
-    rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
+    #rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
+    rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='cubic')
     def f_interp(xcurr):
         nodes = rbfi.nodes.reshape(1,len(rbfi.nodes))    
         newp_dist = dist_matrix(xcurr, rbfi.xi.T)
-        return anp.dot(gaussian(newp_dist, rbfi.epsilon), nodes.T)
+        #return anp.dot(gaussian(newp_dist, rbfi.epsilon), nodes.T)
+        return anp.dot(cubic(newp_dist), nodes.T)
 
     val = f_interp(xcurr)
     jac = autograd.grad(f_interp)
@@ -59,13 +74,15 @@ def eval_model(xcurr, f, radius):
     
 x0 = anp.array([-2.0,2.0])
 
-initial_trust_radius=2.0
+np.random.seed(0)
+N = 50
+initial_trust_radius=1.0
 trust_radius = initial_trust_radius
-gtol = 5.0
+gtol = 1.0
 alpha = 0.8
 eta=0.15
 max_trust_radius=1000.0
-model_radius = 0.5
+model_radius = 1.0
 
 xcurr = x0
 m = eval_model
@@ -141,7 +158,7 @@ while lin.norm(jac) >= gtol:
     print ('\n')
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
-    plt.savefig('/tmp/out-%d.png' % i)
+    plt.savefig('/tmp/rbf/out-%d.png' % i)
     i += 1
-    if i==20: break
+    if i==40: break
 
