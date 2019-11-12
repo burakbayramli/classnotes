@@ -47,15 +47,15 @@ def rosenbrock(x):
 def Rosenbrock(x,y):
     return (1 - x)**2 + 100*(y - x**2)**2
 
-LIM=4.0
+LIM=8.0
 
 def peaks(x):
     return \
     3*(1-x[0])**2 * anp.exp(-x[0]**2 - (x[1] + 1)**2) - \
     10*(1/5. * x[0] - x[0]**3 - x[1]**5) * anp.exp(-x[0]**2 - x[1]**2) - \
-    1/3. * np.exp(-(x[0]+1)**2 - x[0]**2) + \
-    anp.log(LIM+x[0]) + anp.log(LIM-x[0]) + \
-    anp.log(LIM+x[1]) + anp.log(LIM-x[1]) 
+    1/3. * anp.exp(-(x[0]+1)**2 - x[0]**2)  #+ \
+#    anp.log(LIM+x[0]) + anp.log(LIM-x[0]) + \
+#    anp.log(LIM+x[1]) + anp.log(LIM-x[1]) 
 
 
 def Peaks(x1,x2):
@@ -73,31 +73,36 @@ def eval_model(xcurr, f, radius):
         
     res = anp.array(res).reshape(vs.shape[0], 3)
     res[np.isnan(res)] = 0.0
-    #rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
-    rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='cubic')
+    rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='gaussian')
+    #rbfi = Rbf(res[:,0],res[:,1],res[:,2],function='cubic')
     def f_interp(xcurr):
         nodes = rbfi.nodes.reshape(1,len(rbfi.nodes))    
         newp_dist = dist_matrix(xcurr, rbfi.xi.T)
-        #return anp.dot(gaussian(newp_dist, rbfi.epsilon), nodes.T)
-        return anp.dot(cubic(newp_dist), nodes.T)
+        return anp.dot(gaussian(newp_dist, rbfi.epsilon), nodes.T)
+        #return anp.dot(cubic(newp_dist), nodes.T)
 
     val = f_interp(xcurr)
     jac = autograd.grad(f_interp)
     hess = autograd.hessian(f_interp)
     return val, jac(xcurr), hess(xcurr)
     
-x0 = anp.array([1.0,2.5])
+#x0 = anp.array([1.0,2.5])
+x0 = anp.array([-2.0,2.5])
+#x0 = anp.array([-0.3179608,   0.94810386])
+#x0 = anp.array([0.60248924, -0.798127])
+#x0 = anp.array([0.47950079, 0.87754145])
+#x0 = anp.array([-0.39323026,  0.50883303])
 
 np.random.seed(0)
-N = 60
+N = 100
 initial_trust_radius=1.0
 trust_radius = initial_trust_radius
-#gtol = 1.0
-gtol = 0.0001
+gtol = 0.001
+#gtol = 1.5
 alpha = 1.0
 eta=0.15
 max_trust_radius=1000.0
-model_radius = 1.0
+model_radius = 0.3
 
 xcurr = x0
 m = eval_model
@@ -111,7 +116,8 @@ print (hess)
 for i in range(40):
     print ('iteration', i)
     print ('norm jac', lin.norm(jac))
-    print ('trust region',trust_radius)    
+    print ('trust region',trust_radius)
+    model_radius = trust_radius
     if lin.norm(jac) < gtol: break
     x = np.linspace(-3,3,250)
     y = np.linspace(-3,3,250)
@@ -128,10 +134,12 @@ for i in range(40):
 
     #val, jac, hess = eval_model(xcurr, rosenbrock, model_radius)
     val, jac, hess = eval_model(xcurr, peaks, model_radius)
-    newton_dir = np.dot(-lin.inv(hess.reshape(2,2)),jac)
+    newton_dir = -np.dot(lin.inv(hess.reshape(2,2)),jac)
     #print ('cho',lin.det(hess[0][0]))
-    #cho_info = slin.cho_factor(hess[0][0])
-    #newton_dir = -slin.cho_solve(cho_info, jac)
+    print ('jac',jac.reshape(2,1))
+    print ('hess',hess.reshape(2,2))
+    #cho_info = slin.cho_factor(hess.reshape(2,2))
+    #newton_dir = -slin.cho_solve(cho_info, jac.reshape(2,1)).flatten()
     
     p_best = xcurr + newton_dir
     p_u = jac
@@ -184,4 +192,5 @@ for i in range(40):
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
     plt.savefig('/tmp/rbf/out-%d.png' % i)
+    #break
 
