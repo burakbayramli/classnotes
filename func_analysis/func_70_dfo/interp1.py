@@ -79,17 +79,24 @@ ax.plot_wireframe(X,Y,Zi)
 
 coefs = coef.reshape(3,3)
 
-
 g = (2 * np.dot(coefs[:2,:2],np.array(x0).reshape(2,1)))
 
-g = g / np.sum(g)
-
-print (g)
-
+gnorm = g / np.sum(g)
 
 ax.set_zlim(0,2500)
-SCALE = 2
-ax.quiver(x0[0], x0[1], 0, -g[0], -g[1], 0, color='red')
+
+ax.quiver(x0[0], x0[1], 0, -gnorm[0], -gnorm[1], 0, color='red')
+
+hess = 2*coefs[:2,:2]
+print (hess)
+newton_dir = -np.dot(lin.inv(hess),g)
+print (newton_dir)
+
+d = newton_dir
+print (d)
+
+ax.quiver(x0[0], x0[1], 0, d[0], d[1], 0, color='green')
+
 ax.plot3D([x0[0]], [x0[1]], [0.0], 'b.')
 
 ax.view_init(21, -133)
