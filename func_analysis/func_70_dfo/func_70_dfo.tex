@@ -1,6 +1,6 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Türevsiz Optimizasyon (Derivatýve-free Optimization)
+Türevsiz Optimizasyon (Derivative-free Optimization)
 
 Karesel Yaklaþýksallama (Quadratic Approximation)
 
@@ -13,7 +13,7 @@ p(x) =
 $$
 
 bir baz olabilir, ki $x=\left[\begin{array}{cc} x_1 & x_2 \end{array}\right]^T$ 
-olmak üzere, böylece $f(x) = p(x)^T c$ çarpýmý ile bir özgün fonksiyon 
+olmak üzere, böylece $f(x) = p(x)^T a$ çarpýmý ile bir özgün fonksiyon 
 yaratabiliriz, $a = [a_0, a_1, ...]$ içinde sabitler vardýr bu sabitler 
 fonksiyonu özgün olarak belirleyen deðerlerdir. Bir anlamda
 
@@ -37,29 +37,32 @@ $$
 \vdots & & & & \vdots \\
  (x_1^n) & (x_2^n) & (x_1^n)^2 & (x_1^n)(x_2^n) & (x_2^n)^2  \\
 \end{array}\right] 
-\mathbf{x} = 
+\mathbf{a} = 
 \left[\begin{array}{c}
 y^1 \\ \vdots \\ y^n
 \end{array}\right]
 $$
 
-Bu problemi en az kareler stili ile çözebiliriz. Fakat bizim ilgilendiðimiz
-uydurulan bir karesel fonksiyon üzerinden ayrýca gradyan ve Hessian
-bilgisini de alabilmek. Bu bilginin direk alinabilecegi en kolay form 
+ortamýný yaratmak gerekir. Bu problemi en az kareler stili ile
+çözebiliriz. 
+
+Fakat bizim icin daha faydali olabilecek bilgi, bir karesel fonksiyon
+üzerinden ayrýca gradyan ve Hessian bilgisini de alabilmek. Bu bilginin
+direk alýnabileceði en kolay form
 
 $$
 f(x) = x^T A x
 $$
 
-formudur. Bu da cok boyutlu karesel fonksiyonlari temsil etmenin bir diger
+formudur. Bu da çok boyutlu karesel fonksiyonlarý temsil etmenin bir diðer
 yolu, ve gradyan $\nabla f (x) = 2 A x$ ve Hessian $\nabla^2 f(x) = 2 A$
-($A$ simetrik ise) ile hesaplanabilir. O zaman istediðimiz öyle bir en az
-kareler uygulamasi ki elde edilen katsayýlarý direk $A$ öðeleri olarak
-alabilelim, ve bu $A$ üzerinden $\nabla f(x)$ ve $\nabla^2 f(x)$ hesaplamak
-kolay olsun.
+($A$ simetrik ise) ile bu form üzerinden rahatça hesaplanabilir. O zaman
+istediðimiz öyle bir en az kareler uygulamasý ki, elde edilen katsayýlarý
+direk $A$ öðeleri olarak alabilelim, ve bu $A$ üzerinden $\nabla f(x)$ ve
+$\nabla^2 f(x)$ hesaplamak kolay olsun.
 
-Uc boyutlu durumda ne olurdu? Ustteki karesel matris formunu su sekilde
-acalim, 
+Üç boyutlu durumda ne olurdu? Üstteki karesel matris formunu þu þekilde
+açalým, 
 
 $$
 x^T A x =
@@ -77,8 +80,7 @@ x_1 \\ x_2 \\ x_3
 $$
 
 $$
-= 
-\left[\begin{array}{c}
+= \left[\begin{array}{c}
 x_1 a_{11} + x_2 a_{21} + x_3 a_{31} \\
 x_1 a_{12} + x_2 a_{22} + x_3 a_{32} \\
 x_1 a_{13} + x_2 a_{23} + x_3 a_{33} 
@@ -104,7 +106,7 @@ yanyana  koyarak bir vektör oluþturursak burada elde edilen $A$ matrisi
 içindeki öðeler beklenen yerlerde olacaktýr. 
 
 Bir pürüz daha kaldý, iki boyutlu ortamý düþünürsek $x_1^2$, $x_2^2$ var
-ama tek baþýna $x_1$ yök, ayrýca tek baþýna bir sabit deðer de gerekli, bu
+ama tek baþýna $x_1$ yok, ayrýca tek baþýna bir sabit deðer de gerekli, bu
 lineer denklemlerdeki kesi (intercept) deðeri gibi, karesel denklemi olduðu
 gibi yukarý, aþaðý kaydýrabilmemizi saðlayacak. Bunun çözümü basit, üstteki
 gibi üç boyuttaki denklemde $x_3$ yerine $1$ deðerini verirsek, 
@@ -133,7 +135,17 @@ $$
 x_1 x_2 a_{12} + x_2 x_2 a_{22} + x_2 a_{32} +  
 $$
 $$
-x_1 a_{13} + x_2 x_2 a_{23} +  a_{33} 
+x_1 a_{13} + x_2 x_3 a_{23} +  a_{33} 
+$$
+
+$$
+=  a_{11} x_1^2 + a_{21} x_1 x_2  + a_{31}x_1  +
+$$
+$$
+a_{12}x_1 x_2  + a_{22}x_2^2 +  a_{32} x_2+  
+$$
+$$
+a_{13} x_1  + a_{23} x_2 x_3 +  a_{33} 
 $$
 
 denklemini saðlar, yani iki boyutta tam bize gereken denklem. O zaman en az
@@ -141,10 +153,10 @@ kareler için üç boyutta hazýrlayacaðýmýz hesap bize iki boyut için gereken
 sonucu verir. Tek hatýrlamamýz gereken gerekli noktalarda bir '1' deðerini
 vektöre eklemektir.
 
-Þimdi optimizasyonun klasik fonksiyonlarýndan Rosenbrock fonksiyonunu
+Þimdi optimizasyonun klasik problemlerinden Rosenbrock fonksiyonunu
 görelim. Bu fonksiyonun belli noktalarýndan örneklem alacaðýz, ve bu
 noktalarý kullanarak o noktada bir karesel ara deðerleme (interpolation)
-yapacaðýz. 
+yapacaðýz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.interpolate import Rbf
@@ -202,7 +214,8 @@ plt.savefig('func_70_dfo_01.png')
 
 \includegraphics[height=6cm]{func_70_dfo_01.png}
 
-Þimdi karesel fonksiyonu bulalým,
+Þimdi üstteki örneklem noktalarýný kullanarak ona en yakýn karesel
+fonksiyonu bulalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import itertools
@@ -306,3 +319,6 @@ adýmý yönlerini hesapladýk.
 [devam edecek]
 
 \end{document}
+
+
+
