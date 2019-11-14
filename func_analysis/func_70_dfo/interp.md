@@ -19,24 +19,6 @@ def random_ball(num_points, dimension, radius=1):
     random_radii = random.random(num_points) ** (1/dimension)
     return radius * (random_directions * random_radii).T
 
-def func(x, y):
-    s1 = 0.2; x1 = 36.5; y1 = 32.5
-    s2 = 0.4; x2 = 36.1; y2 = 32.8
-    g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
-    g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)    
-    return g1 + g2 
-
-def dist_matrix(X, Y):
-    X = X.reshape(1, X.shape[0])
-    sx = anp.sum(X**2, 1)
-    sy = anp.sum(Y**2, 1)
-    D2 =  sx[:, anp.newaxis] - 2.0*anp.dot(X,Y.T) + sy[anp.newaxis, :] 
-    D = anp.sqrt(D2)
-    return D
-
-def gaussian(r,eps):
-    return anp.exp(-(r/eps)**2)
-
 np.random.seed(0)
 N = 20
 
@@ -52,7 +34,8 @@ def get_fvals_in_region(xcurr, f, radius):
     vals = [f(p) for p in pts]
     return xcurr+b, np.array(vals)
 
-xs,vs = get_fvals_in_region([1.5,0], rosenbrock, 0.5)
+x0 = [1.5,0]
+xs,vs = get_fvals_in_region(x0, rosenbrock, 0.5)
 
 res = []
 for i in range(vs.shape[0]):
@@ -71,7 +54,6 @@ def quad_interpolate(xi, yi):
     print (D)
     X_train = []
     for row in xi:
-#        print (row)
         X_train.append([row[i]*row[j] for i,j in itertools.product(range(D),range(D)) ])
     X_train = np.array(X_train)
     print (X_train.shape)
@@ -82,7 +64,6 @@ def quad_interpolate(xi, yi):
 xi = res[:,[0,1]]
 yi = res[:,[2]]
 coef = quad_interpolate(xi,yi)
-#print (fit_q)
 ```
 
 ```text
@@ -113,20 +94,42 @@ Zi = Zi.reshape(X.shape)
 ax.plot_wireframe(X,Y,Zi)
 
 ax.set_zlim(0,2500)
+SCALE = 2
+ax.quiver(x0[0], x0[1], 0, g[0]*SCALE, g[1]*SCALE, 1, color='red')
+ax.plot3D([x0[0]], [x0[1]], [0.0], 'b.')
 
 ax.view_init(21, -133)
 plt.savefig('/tmp/inter_01.png')
 ```
 
 ```python
+#print (coef.reshape(3,3))
+coefs = coef.reshape(3,3)
+#print (coefs)
+#print (coefs[:2,:2])
 
+g = - (2 * np.dot(coefs[:2,:2],np.array(x0).reshape(2,1)))
 
-print (q_interp(1,1))
+g = g / np.sum(g)
+
+print (g)
+
 ```
 
 ```text
-209.88558598211893
+[[ 1.27231897]
+ [-0.27231897]]
 ```
+
+
+
+
+
+
+
+
+
+
 
 
 
