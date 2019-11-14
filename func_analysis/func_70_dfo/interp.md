@@ -81,7 +81,7 @@ def quad_interpolate(xi, yi):
 
 xi = res[:,[0,1]]
 yi = res[:,[2]]
-fit_q = quad_interpolate(xi,yi)
+coef = quad_interpolate(xi,yi)
 #print (fit_q)
 ```
 
@@ -101,12 +101,32 @@ fig = plt.figure(figsize = (8,4))
 ax = fig.gca(projection='3d')
 ax.plot3D(res[:,0],res[:,1],res[:,2],'r.')
 ax.plot_surface(X,Y,Z,rstride = 5, cstride = 5, cmap = 'jet', alpha = .4, edgecolor = 'none' )
-ax.view_init(21, -133)
 
+def q_interp(x1,x2):
+    x = np.array([[x1,x2,1]])
+    A = coef.reshape(3,3)
+    res = np.dot(np.dot(x,A),x.T)
+    return np.float(res)
+
+Zi = np.array([q_interp(xx,yy) for xx,yy in zip(X.flatten(),Y.flatten())])
+Zi = Zi.reshape(X.shape)
+ax.plot_wireframe(X,Y,Zi)
+
+ax.set_zlim(0,2500)
+
+ax.view_init(21, -133)
 plt.savefig('/tmp/inter_01.png')
 ```
 
+```python
 
+
+print (q_interp(1,1))
+```
+
+```text
+209.88558598211893
+```
 
 
 
