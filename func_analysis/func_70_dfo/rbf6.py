@@ -47,7 +47,7 @@ def rosenbrock(x):
 def Rosenbrock(x,y):
     return (1 - x)**2 + 100*(y - x**2)**2
 
-LIM=8.0
+LIM=20.0
 
 def peaks(x):
     return \
@@ -87,15 +87,12 @@ def eval_model(xcurr, f, radius):
     return val, jac(xcurr), hess(xcurr)
     
 #x0 = anp.array([1.0,2.5])
-x0 = anp.array([-2.0,2.5])
-#x0 = anp.array([-0.3179608,   0.94810386])
-#x0 = anp.array([0.60248924, -0.798127])
-#x0 = anp.array([0.47950079, 0.87754145])
-#x0 = anp.array([-0.39323026,  0.50883303])
+#x0 = anp.array([-2.0,2.5])
+x0 = anp.array([-2.00794673, -0.79814703])
 
 np.random.seed(0)
 N = 100
-initial_trust_radius=1.0
+initial_trust_radius=2.0
 trust_radius = initial_trust_radius
 gtol = 0.001
 #gtol = 1.5
@@ -192,5 +189,5 @@ for i in range(40):
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
     plt.savefig('/tmp/rbf/out-%d.png' % i)
-    #break
+    break
 
