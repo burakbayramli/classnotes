@@ -28,8 +28,8 @@ def get_fvals_in_region(xcurr, f, radius):
     vals = [f(p) for p in pts]
     return xcurr+b, np.array(vals)
 
-#x0 = [1.5,0]
-x0 = [-1.0,0]
+x0 = [1.5,0]
+#x0 = [-1.0,0]
 xs,vs = get_fvals_in_region(x0, rosenbrock, 0.5)
 
 res = []
