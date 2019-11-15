@@ -47,15 +47,15 @@ def rosenbrock(x):
 def Rosenbrock(x,y):
     return (1 - x)**2 + 100*(y - x**2)**2
 
-LIM=20.0
+LIM=5.0
 
 def peaks(x):
     return \
     3*(1-x[0])**2 * anp.exp(-x[0]**2 - (x[1] + 1)**2) - \
     10*(1/5. * x[0] - x[0]**3 - x[1]**5) * anp.exp(-x[0]**2 - x[1]**2) - \
-    1/3. * anp.exp(-(x[0]+1)**2 - x[0]**2)  #+ \
-#    anp.log(LIM+x[0]) + anp.log(LIM-x[0]) + \
-#    anp.log(LIM+x[1]) + anp.log(LIM-x[1]) 
+    1/3. * anp.exp(-(x[0]+1)**2 - x[0]**2)  + \
+    anp.log(LIM+x[0]) + anp.log(LIM-x[0]) + \
+    anp.log(LIM+x[1]) + anp.log(LIM-x[1]) 
 
 
 def Peaks(x1,x2):
@@ -81,14 +81,14 @@ def eval_model(xcurr, f, radius):
         return anp.dot(gaussian(newp_dist, rbfi.epsilon), nodes.T)
         #return anp.dot(cubic(newp_dist), nodes.T)
 
-    val = f_interp(xcurr)
+    val = f(xcurr)
     jac = autograd.grad(f_interp)
     hess = autograd.hessian(f_interp)
     return val, jac(xcurr), hess(xcurr)
     
-#x0 = anp.array([1.0,2.5])
+x0 = anp.array([1.0,2.5])
 #x0 = anp.array([-2.0,2.5])
-x0 = anp.array([-2.00794673, -0.79814703])
+#x0 = anp.array([-2.00794673, -0.79814703])
 
 np.random.seed(0)
 N = 100
@@ -189,5 +189,5 @@ for i in range(40):
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
     plt.savefig('/tmp/rbf/out-%d.png' % i)
-    break
+    #break
 
