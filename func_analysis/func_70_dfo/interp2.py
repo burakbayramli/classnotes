@@ -17,10 +17,10 @@ np.random.seed(0)
 N = 20
 
 def rosenbrock(x):
-    return (1 + x[0])**2 + 100*(x[1] - x[0]**2)**2
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
 def Rosenbrock(x,y):
-    return (1 + x)**2 + 100*(y - x**2)**2
+    return (1 - x)**2 + 100*(y - x**2)**2
 
 def get_fvals_in_region(xcurr, f, radius):    
     b = random_ball(N, 2, radius)
@@ -82,6 +82,8 @@ coefs = coef.reshape(3,3)
 
 g = (2 * np.dot(coefs[:2,:2],np.array(x0).reshape(2,1)))
 
+print ('g',g)
+
 gnorm = g / np.sum(g)
 
 ax.set_zlim(0,2500)
@@ -89,9 +91,9 @@ ax.set_zlim(0,2500)
 ax.quiver(x0[0], x0[1], 0, -gnorm[0], -gnorm[1], 0, color='red')
 
 hess = 2*coefs[:2,:2]
-print (hess)
+print ('hess',hess)
 newton_dir = -np.dot(lin.inv(hess),g)
-print (newton_dir)
+print ('newton dir',newton_dir)
 
 d = newton_dir
 print (d)
