@@ -7,6 +7,30 @@ import scipy.linalg as slin
 import numpy as np, math
 import itertools
 
+LIM=5.0
+N = 20
+
+def rosenbrock(x):
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
+
+def Rosenbrock(x,y):
+    return (1 - x)**2 + 100*(y - x**2)**2
+
+def peaks(x):
+    return \
+    3*(1-x[0])**2 * np.exp(-x[0]**2 - (x[1] + 1)**2) - \
+    10*(1/5. * x[0] - x[0]**3 - x[1]**5) * np.exp(-x[0]**2 - x[1]**2) - \
+    1/3. * np.exp(-(x[0]+1)**2 - x[0]**2)  + \
+    np.log(LIM+x[0]) + np.log(LIM-x[0]) + \
+    np.log(LIM+x[1]) + np.log(LIM-x[1]) 
+
+def Peaks(x1,x2):
+    return \
+    3*(1-x1)**2 * np.exp(-x1**2 - (x2 + 1)**2) - \
+    10*(1/5. * x1 - x1**3 - x2**5) * np.exp(-x1**2 - x2**2) - \
+    1/3. * np.exp(-(x1+1)**2 - x1**2)
+
+
 def get_boundaries_intersections(z, d, trust_radius):
     a = np.dot(d, d)
     b = 2 * np.dot(z, d)
@@ -25,28 +49,6 @@ def random_ball(num_points, dimension, radius=1):
     random_directions /= linalg.norm(random_directions, axis=0)
     random_radii = random.random(num_points) ** (1/dimension)
     return radius * (random_directions * random_radii).T
-
-def rosenbrock(x):
-    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
-
-def Rosenbrock(x,y):
-    return (1 - x)**2 + 100*(y - x**2)**2
-
-LIM=5.0
-
-def peaks(x):
-    return \
-    3*(1-x[0])**2 * np.exp(-x[0]**2 - (x[1] + 1)**2) - \
-    10*(1/5. * x[0] - x[0]**3 - x[1]**5) * np.exp(-x[0]**2 - x[1]**2) - \
-    1/3. * np.exp(-(x[0]+1)**2 - x[0]**2)  + \
-    np.log(LIM+x[0]) + np.log(LIM-x[0]) + \
-    np.log(LIM+x[1]) + np.log(LIM-x[1]) 
-
-def Peaks(x1,x2):
-    return \
-    3*(1-x1)**2 * np.exp(-x1**2 - (x2 + 1)**2) - \
-    10*(1/5. * x1 - x1**3 - x2**5) * np.exp(-x1**2 - x2**2) - \
-    1/3. * np.exp(-(x1+1)**2 - x1**2)
 
 def get_fvals_in_region(xcurr, f, radius):    
     b = random_ball(N, 2, radius)
@@ -87,15 +89,14 @@ x0 = np.array([-2.0,-1.0])
 
 
 np.random.seed(0)
-N = 100
-initial_trust_radius=2.0
+initial_trust_radius=1.0
 trust_radius = initial_trust_radius
 gtol = 1.0
 #gtol = 1.5
 alpha = 1.0
 eta=0.15
 max_trust_radius=1000.0
-model_radius = 0.3
+model_radius = 0.5
 
 xcurr = x0
 f = rosenbrock
