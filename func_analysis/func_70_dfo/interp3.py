@@ -98,25 +98,25 @@ max_trust_radius=1000.0
 model_radius = 0.3
 
 xcurr = x0
-#f = rosenbrock
-f = peaks
-#val, jac, hess = eval_model(xcurr, rosenbrock, model_radius)
-val, jac, hess = eval_model(xcurr, peaks, model_radius)
+f = rosenbrock
+F = Rosenbrock
+#f = peaks
+#F = Peaks
+val, jac, hess = eval_model(xcurr, f, model_radius)
 print (val)
 print (jac)
 print (hess)
 
-for i in range(40):
+for i in range(10):
     print ('iteration', i)
     print ('norm jac', lin.norm(jac))
     print ('trust region',trust_radius)
     model_radius = trust_radius
-    if lin.norm(jac) < gtol: break
+    #if lin.norm(jac) < gtol: break
     x = np.linspace(-3,3,250)
     y = np.linspace(-3,3,250)
     X, Y = np.meshgrid(x, y)
-    #Z = Rosenbrock(X, Y)
-    Z = Peaks(X, Y)
+    Z = F(X, Y)
     fig = plt.figure()
     ax = fig.gca()
     
@@ -125,7 +125,7 @@ for i in range(40):
     circle=plt.Circle((xcurr[0],xcurr[1]),trust_radius,fill=False)
     ax.add_artist(circle)
 
-    val, jac, hess = eval_model(xcurr, peaks, model_radius)
+    val, jac, hess = eval_model(xcurr, f, model_radius)
     newton_dir = -np.dot(lin.inv(hess.reshape(2,2)),jac)
     newton_dir = newton_dir.flatten()
     print ('jac',jac.reshape(2,1))
@@ -137,13 +137,14 @@ for i in range(40):
     hits_boundary,p = None,None
     
     print ('p_u',p_u)
-    p_u_norm = lin.norm(p_u) 
+    p_u_norm = lin.norm(p_u)
+    
     if lin.norm(newton_dir) < trust_radius:
         hits_boundary,p=False,p_best
         print ('method 1',hits_boundary,p)       
     elif p_u_norm >= trust_radius:
         p_boundary = p_u * (trust_radius / p_u_norm)
-        hits_boundary,p=True, xcurr-alpha*p_boundary.flatten()
+        hits_boundary,p=True, xcurr-p_boundary.flatten()
         print ('method 2',hits_boundary,p)
     else:        
         _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
@@ -151,13 +152,9 @@ for i in range(40):
         hits_boundary,p=True,p_boundary
         print ('method 3',tb)
 
-    #mv,dummy1,dummy2  = m(p,rosenbrock,trust_radius)
-    print ('p',p)
-
-    mv,dummy1,dummy2  = eval_model(p,peaks,trust_radius)
+    mv,dummy1,dummy2  = eval_model(p,f,trust_radius)
     model_prop_value = np.float(mv)
-    #mv,dummy1,dummy2  =  eval_model(xcurr,rosenbrock,trust_radius)
-    mv,dummy1,dummy2  =  eval_model(xcurr,peaks,trust_radius)
+    mv,dummy1,dummy2  =  eval_model(xcurr,f,trust_radius)
     model_curr_value = np.float(mv)
 
     real_prop_value = f(p)
