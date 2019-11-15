@@ -68,8 +68,6 @@ def eval_model(xcurr, f, radius):
     for row in xi:
         X_train.append([row[i]*row[j] for i,j in itertools.product(range(D),range(D)) ])
     X_train = np.array(X_train)
-    print (X_train.shape)
-    print (yi.shape)
     coef,_,_,_ = lin.lstsq(X_train, yi)
     coefs = coef.reshape(3,3)
     jac = (2 * np.dot(coefs[:2,:2],np.array(xcurr).reshape(2,1)))
@@ -100,7 +98,6 @@ max_trust_radius=1000.0
 model_radius = 0.3
 
 xcurr = x0
-m = eval_model
 #f = rosenbrock
 f = peaks
 #val, jac, hess = eval_model(xcurr, rosenbrock, model_radius)
@@ -157,10 +154,10 @@ for i in range(40):
     #mv,dummy1,dummy2  = m(p,rosenbrock,trust_radius)
     print ('p',p)
 
-    mv,dummy1,dummy2  = m(p,peaks,trust_radius)
+    mv,dummy1,dummy2  = eval_model(p,peaks,trust_radius)
     model_prop_value = np.float(mv)
-    #mv,dummy1,dummy2  = m(xcurr,rosenbrock,trust_radius)
-    mv,dummy1,dummy2  = m(xcurr,peaks,trust_radius)
+    #mv,dummy1,dummy2  =  eval_model(xcurr,rosenbrock,trust_radius)
+    mv,dummy1,dummy2  =  eval_model(xcurr,peaks,trust_radius)
     model_curr_value = np.float(mv)
 
     real_prop_value = f(p)
