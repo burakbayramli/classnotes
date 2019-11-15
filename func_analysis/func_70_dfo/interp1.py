@@ -28,7 +28,8 @@ def get_fvals_in_region(xcurr, f, radius):
     vals = [f(p) for p in pts]
     return xcurr+b, np.array(vals)
 
-x0 = [1.5,0]
+#x0 = [1.5,0]
+x0 = [-1.0,0]
 xs,vs = get_fvals_in_region(x0, rosenbrock, 0.5)
 
 res = []
@@ -75,7 +76,7 @@ def q_interp(x1,x2):
 
 Zi = np.array([q_interp(xx,yy) for xx,yy in zip(X.flatten(),Y.flatten())])
 Zi = Zi.reshape(X.shape)
-ax.plot_wireframe(X,Y,Zi)
+ax.plot_wireframe(X,Y,Zi,rstride=10, cstride=10)
 
 coefs = coef.reshape(3,3)
 
