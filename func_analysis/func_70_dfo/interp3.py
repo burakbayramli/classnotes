@@ -83,15 +83,16 @@ def eval_model(xcurr, f, radius):
     val = q_interp(xcurr[0],xcurr[1])
     return val, jac, hess
     
-x0 = np.array([1.0,2.5])
+#x0 = np.array([1.0,2.5])
 #x0 = np.array([-2.0,2.5])
-#x0 = np.array([-2.00794673, -0.79814703])
+x0 = np.array([-2.0,-1.0])
+
 
 np.random.seed(0)
 N = 100
 initial_trust_radius=2.0
 trust_radius = initial_trust_radius
-gtol = 0.001
+gtol = 1.0
 #gtol = 1.5
 alpha = 1.0
 eta=0.15
@@ -107,6 +108,7 @@ val, jac, hess = eval_model(xcurr, peaks, model_radius)
 print (val)
 print (jac)
 print (hess)
+
 for i in range(40):
     print ('iteration', i)
     print ('norm jac', lin.norm(jac))
@@ -126,14 +128,11 @@ for i in range(40):
     circle=plt.Circle((xcurr[0],xcurr[1]),trust_radius,fill=False)
     ax.add_artist(circle)
 
-    #val, jac, hess = eval_model(xcurr, rosenbrock, model_radius)
     val, jac, hess = eval_model(xcurr, peaks, model_radius)
     newton_dir = -np.dot(lin.inv(hess.reshape(2,2)),jac)
-    #print ('cho',lin.det(hess[0][0]))
+    newton_dir = newton_dir.flatten()
     print ('jac',jac.reshape(2,1))
     print ('hess',hess.reshape(2,2))
-    #cho_info = slin.cho_factor(hess.reshape(2,2))
-    #newton_dir = -slin.cho_solve(cho_info, jac.reshape(2,1)).flatten()
     
     p_best = xcurr + newton_dir
     p_u = jac
@@ -147,7 +146,7 @@ for i in range(40):
         print ('method 1',hits_boundary,p)       
     elif p_u_norm >= trust_radius:
         p_boundary = p_u * (trust_radius / p_u_norm)
-        hits_boundary,p=True, xcurr-alpha*p_boundary
+        hits_boundary,p=True, xcurr-alpha*p_boundary.flatten()
         print ('method 2',hits_boundary,p)
     else:        
         _, tb = get_boundaries_intersections(p_u, p_best - p_u,trust_radius)
@@ -156,6 +155,8 @@ for i in range(40):
         print ('method 3',tb)
 
     #mv,dummy1,dummy2  = m(p,rosenbrock,trust_radius)
+    print ('p',p)
+
     mv,dummy1,dummy2  = m(p,peaks,trust_radius)
     model_prop_value = np.float(mv)
     #mv,dummy1,dummy2  = m(xcurr,rosenbrock,trust_radius)
@@ -185,6 +186,6 @@ for i in range(40):
     print ('\n')
     ax.plot(xcurr[0],xcurr[1], 'rx')
     
-    plt.savefig('/tmp/rbf/out-%d.png' % i)
+    plt.savefig('/tmp/quad/out-%d.png' % i)
     #break
 
