@@ -84,11 +84,11 @@ g = (2 * np.dot(coefs[:2,:2],np.array(x0).reshape(2,1)))
 
 print ('g',g)
 
-gnorm = g / np.sum(g)
+g_descent = -(g / np.sum(g))
 
 ax.set_zlim(0,2500)
 
-ax.quiver(x0[0], x0[1], 0, -gnorm[0], -gnorm[1], 0, color='red')
+ax.quiver(x0[0], x0[1], 0, g_descent[0], g_descent[1], 0, color='red')
 
 hess = 2*coefs[:2,:2]
 print ('hess',hess)
