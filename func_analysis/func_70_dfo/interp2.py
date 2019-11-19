@@ -6,7 +6,7 @@ import numpy as np
 import autograd.numpy as anp
 import autograd
 
-def random_ball(num_points, dimension, radius=1):
+def random_ball(num_points, dimension, radius=2):
     from numpy import random, linalg
     random_directions = random.normal(size=(dimension,num_points))
     random_directions /= linalg.norm(random_directions, axis=0)
@@ -14,13 +14,25 @@ def random_ball(num_points, dimension, radius=1):
     return radius * (random_directions * random_radii).T
 
 np.random.seed(0)
-N = 20
+N = 40
 
 def rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
 def Rosenbrock(x,y):
     return (1 - x)**2 + 100*(y - x**2)**2
+
+def Grad_Rosenbrock(x,y):
+    g1 = -400*x*y + 400*x**3 + 2*x -2
+    g2 = 200*y -200*x**2
+    return np.array([g1,g2])
+
+def Hessian_Rosenbrock(x,y):
+    h11 = -400*y + 1200*x**2 + 2
+    h12 = -400 * x
+    h21 = -400 * x
+    h22 = 200
+    return np.array([[h11,h12],[h21,h22]])
 
 def get_fvals_in_region(xcurr, f, radius):    
     b = random_ball(N, 2, radius)
@@ -66,7 +78,7 @@ Z = Rosenbrock(X, Y)
 fig = plt.figure(figsize = (8,4))
 ax = fig.gca(projection='3d')
 ax.plot3D(res[:,0],res[:,1],res[:,2],'r.')
-ax.plot_surface(X,Y,Z,rstride = 5, cstride = 5, cmap = 'jet', alpha = .1, edgecolor = 'none' )
+ax.plot_surface(X,Y,Z,rstride = 5, cstride = 5, cmap = 'jet', alpha = .5, edgecolor = 'none' )
 
 def q_interp(x1,x2):
     x = np.array([[x1,x2,1]])
@@ -76,13 +88,16 @@ def q_interp(x1,x2):
 
 Zi = np.array([q_interp(xx,yy) for xx,yy in zip(X.flatten(),Y.flatten())])
 Zi = Zi.reshape(X.shape)
-ax.plot_wireframe(X,Y,Zi,rstride=10, cstride=10)
+ax.plot_wireframe(X,Y,Zi,rstride=20, cstride=20)
 
 coefs = coef.reshape(3,3)
 
 g = (2 * np.dot(coefs[:2,:2],np.array(x0).reshape(2,1)))
 
+g2 = Grad_Rosenbrock(x0[0],x0[1])
+
 print ('g',g)
+print ('g2',g2)
 
 g_descent = -(g / np.sum(g))
 
@@ -92,13 +107,18 @@ ax.quiver(x0[0], x0[1], 0, g_descent[0], g_descent[1], 0, color='red')
 
 hess = 2*coefs[:2,:2]
 print ('hess',hess)
+
+hess2 = Hessian_Rosenbrock(x0[0],x0[1])
+
+print ('real hess', hess2)
+
 newton_dir = -np.dot(lin.inv(hess),g)
-print ('newton dir',newton_dir)
+print ('newton dir',newton_dir.T)
 
-d = newton_dir
-print (d)
+newton_dir2 = -np.dot(lin.inv(hess2),g2)
+print ('newton dir2',newton_dir2)
 
-ax.quiver(x0[0], x0[1], 0, d[0], d[1], 0, color='green')
+ax.quiver(x0[0], x0[1], 0, newton_dir2[0], newton_dir2[1], 0, color='green')
 
 ax.plot3D([x0[0]], [x0[1]], [0.0], 'b.')
 
