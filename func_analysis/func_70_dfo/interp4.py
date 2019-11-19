@@ -73,8 +73,8 @@ def Grad_interp(xcurr):
 
 from scipy.optimize import minimize
 x0 = [-1.0,0]
-res = minimize(fun=rosenbrock,x0=x0,method='dogleg',jac = Grad_interp, hess= Hessian_interp)
-#res = minimize(fun=rosenbrock,x0=x0,method='BFGS',jac = Grad_interp)
+#res = minimize(fun=rosenbrock,x0=x0,method='dogleg',jac = Grad_interp, hess= Hessian_interp)
+res = minimize(fun=rosenbrock,x0=x0,method='BFGS',jac = Grad_interp)
 #res = minimize(fun=rosenbrock,x0=x0,method='BFGS',jac = Grad_Rosenbrock)
 #res = minimize(fun=rosenbrock,x0=x0,method='TNC',jac = Grad_interp)
 #res = minimize(fun=rosenbrock,x0=x0,method='dogleg',jac = Grad_Rosenbrock, hess= Hessian_Rosenbrock)
