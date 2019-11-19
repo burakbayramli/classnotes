@@ -7,15 +7,15 @@ import itertools
 import numpy.linalg as lin
 import scipy.linalg as slin
 
-def random_ball(num_points, dimension, radius=1):
+np.random.seed(0)
+N = 20
+
+def random_ball(num_points, dimension, radius):
     from numpy import random, linalg
     random_directions = random.normal(size=(dimension,num_points))
     random_directions /= linalg.norm(random_directions, axis=0)
     random_radii = random.random(num_points) ** (1/dimension)
     return radius * (random_directions * random_radii).T
-
-np.random.seed(0)
-N = 20
 
 def rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
@@ -42,8 +42,9 @@ def get_fvals_in_region(xcurr, f, radius):
     return xcurr+b, np.array(vals)
 
 #x0 = [1.5,0]
-x0 = [-1.0,0]
-xs,vs = get_fvals_in_region(x0, rosenbrock, 0.5)
+#x0 = [-1.0,0]
+x0 = [-1.0,2.0]
+xs,vs = get_fvals_in_region(x0, rosenbrock, 3.0)
 
 res = []
 for i in range(vs.shape[0]):
