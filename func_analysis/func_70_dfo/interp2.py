@@ -3,10 +3,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
-import autograd.numpy as anp
-import autograd
+import itertools
+import numpy.linalg as lin
+import scipy.linalg as slin
 
-def random_ball(num_points, dimension, radius=2):
+def random_ball(num_points, dimension, radius=1):
     from numpy import random, linalg
     random_directions = random.normal(size=(dimension,num_points))
     random_directions /= linalg.norm(random_directions, axis=0)
@@ -14,7 +15,7 @@ def random_ball(num_points, dimension, radius=2):
     return radius * (random_directions * random_radii).T
 
 np.random.seed(0)
-N = 40
+N = 20
 
 def rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
@@ -49,8 +50,6 @@ for i in range(vs.shape[0]):
     res.append((xs[i,0],xs[i,1],vs[i]))
 res = np.array(res).reshape(vs.shape[0], 3)
 
-import itertools
-import numpy.linalg as lin
 
 def quad_interpolate(xi, yi):
     xi = np.hstack((xi, np.ones((1,len(xi))).T  ))
@@ -93,6 +92,7 @@ ax.plot_wireframe(X,Y,Zi,rstride=20, cstride=20)
 coefs = coef.reshape(3,3)
 
 g = (2 * np.dot(coefs[:2,:2],np.array(x0).reshape(2,1)))
+g = g.flatten() / 2.0
 
 g2 = Grad_Rosenbrock(x0[0],x0[1])
 
@@ -100,6 +100,7 @@ print ('g',g)
 print ('g2',g2)
 
 g_descent = -(g / np.sum(g))
+g_descent2 = -(g2 / np.sum(g2))
 
 ax.set_zlim(0,2500)
 
@@ -107,18 +108,23 @@ ax.quiver(x0[0], x0[1], 0, g_descent[0], g_descent[1], 0, color='red')
 
 hess = 2*coefs[:2,:2]
 print ('hess',hess)
+print ('sing hess', lin.det(hess))
 
 hess2 = Hessian_Rosenbrock(x0[0],x0[1])
 
 print ('real hess', hess2)
+print ('sing hess2', lin.det(hess2))
 
 newton_dir = -np.dot(lin.inv(hess),g)
-print ('newton dir',newton_dir.T)
+#newton_dir = -slin.cho_solve(slin.cho_factor(hess), g)
+print ('newton dir',newton_dir)
 
 newton_dir2 = -np.dot(lin.inv(hess2),g2)
+#newton_dir2 = -slin.cho_solve(slin.cho_factor(hess2), g2)
 print ('newton dir2',newton_dir2)
 
-ax.quiver(x0[0], x0[1], 0, newton_dir2[0], newton_dir2[1], 0, color='green')
+
+ax.quiver(x0[0], x0[1], 0, newton_dir[0], newton_dir[1], 0, color='green')
 
 ax.plot3D([x0[0]], [x0[1]], [0.0], 'b.')
 
