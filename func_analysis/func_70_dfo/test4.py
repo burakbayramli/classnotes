@@ -513,8 +513,9 @@ delta_grad = [grad_list[i+1]-grad_list[i]
 
 quasi_newton = SR1(init_scale=1)
 quasi_newton.initialize(len(x_list[0]), 'hess')
-#hess = deepcopy(quasi_newton)
-#hess.initialize(len(x_list[0]), 'hess')
+#quasi_newton = deepcopy(quasi_newton)
+#quasi_newton.initialize(len(x_list[0]), 'hess')
+
 # Compare the hessian and its inverse
 for i in range(len(delta_x)):
     print (hess_list[i])
