@@ -405,7 +405,9 @@ class SR1(FullHessianUpdateStrategy):
 
     def _update_implementation(self, delta_x, delta_grad):
         # Auxiliary variables w and z
+        #print ('here---------------')
         if self.approx_type == 'hess':
+            #print ('hess')
             w = delta_x
             z = delta_grad
         else:
@@ -520,6 +522,6 @@ for i in range(len(delta_x)):
     y = delta_grad[i]
     quasi_newton.update(s, y)
     B = quasi_newton.get_matrix()
-    print (np.linalg.inv(B))
+    print (B)
     print ('------------------')
     
