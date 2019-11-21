@@ -76,7 +76,5 @@ x0 = [-1.0,0]
 #res = minimize(fun=rosenbrock,x0=x0,method='dogleg',jac = Grad_Rosenbrock, hess=SR1())
 res = minimize (fun=rosenbrock, x0=x0, method = 'trust-constr', jac = "2-point", hess = SR1 (),
                options = {'verbose': 1})
-#res = minimize (fun=rosenbrock, x0=x0, method = 'trust-constr', jac = "2-point", hess = Hessian_interp,
-#               options = {'verbose': 1})
 
 print (res)
