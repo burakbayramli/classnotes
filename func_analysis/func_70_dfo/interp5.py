@@ -9,6 +9,7 @@ import scipy.linalg as slin
 
 from scipy.optimize import (SR1,
                             HessianUpdateStrategy,
+                            Bounds,
                             minimize)
 
 np.random.seed(0)
@@ -74,7 +75,14 @@ def Grad_interp(xcurr):
 
 x0 = [-1.0,0]
 #res = minimize(fun=rosenbrock,x0=x0,method='dogleg',jac = Grad_Rosenbrock, hess=SR1())
-res = minimize (fun=rosenbrock, x0=x0, method = 'trust-constr', jac = "2-point", hess = SR1 (),
-               options = {'verbose': 1})
+opts = {'maxiter': 1000, 'verbose': 2}
+res = minimize (fun=rosenbrock,
+                x0=x0,
+                method = 'trust-constr',
+                jac = "2-point",
+                #jac = Grad_Rosenbrock,
+                hess = SR1 (),
+                bounds=Bounds([0.0, 0.5], [0.0, 2.0]),
+                options=opts)
 
 print (res)
