@@ -15,14 +15,14 @@ The previously described equality constrained SQP method is used to
 solve the subproblems with increasing levels of accuracy as the
 iterate gets closer to a solution.
 
-    .. [5] Nocedal, J, and S J Wright. 2006. Numerical Optimization.
-       Springer New York.
-       
-    .. [17] Lalee, Marucha, Jorge Nocedal, and Todd Plantega. 1998. On the
-        implementation of an algorithm for large-scale equality constrained
-        optimization. SIAM Journal on Optimization 8.3: 682-706.
+[5] Nocedal, J, and S J Wright. 2006. Numerical Optimization.
+Springer New York.
 
-    .. [16] Byrd, Richard H., Mary E. Hribar, and Jorge Nocedal. 1999.
-        An interior point algorithm for large-scale nonlinear  programming.
-        SIAM Journal on Optimization 9.4: 877-900.
+[17] Lalee, Marucha, Jorge Nocedal, and Todd Plantega. 1998. On the
+implementation of an algorithm for large-scale equality constrained
+optimization. SIAM Journal on Optimization 8.3: 682-706.
+
+[16] Byrd, Richard H., Mary E. Hribar, and Jorge Nocedal. 1999.
+An interior point algorithm for large-scale nonlinear  programming.
+SIAM Journal on Optimization 9.4: 877-900.
 
