@@ -444,48 +444,6 @@ class LagrangianHessian(object):
         return LinearOperator((self.n, self.n), matvec)
 
 
-class VectorFunction(object):
-
-    def _update_v(self, v):
-        if not np.array_equal(v, self.v):
-            self.v = v
-            self.H_updated = False
-
-    def _update_x(self, x):
-        if not np.array_equal(x, self.x):
-            self._update_x_impl(x)
-
-    def _update_fun(self):
-        if not self.f_updated:
-            self._update_fun_impl()
-            self.f_updated = True
-
-    def _update_jac(self):
-        if not self.J_updated:
-            self._update_jac_impl()
-            self.J_updated = True
-
-    def _update_hess(self):
-        if not self.H_updated:
-            self._update_hess_impl()
-            self.H_updated = True
-
-    def fun(self, x):
-        self._update_x(x)
-        self._update_fun()
-        return self.f
-
-    def jac(self, x):
-        self._update_x(x)
-        self._update_jac()
-        return self.J
-
-    def hess(self, x, v):
-        # v should be updated before x.
-        self._update_v(v)
-        self._update_x(x)
-        self._update_hess()
-        return self.H
 
 
 class LinearVectorFunction(object):
