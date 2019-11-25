@@ -22,7 +22,7 @@ res = minimize (fun=rosenbrock,
                 method = 'trust-constr',
                 jac = "2-point",
                 hess = SR1 (),
-                bounds=Bounds([0.0, 0.5], [0.0, 2.0]),
+                bounds=Bounds([0.3, 0.5], [0.0, 2.0]),
                 options=opts)
 
 print (res)
