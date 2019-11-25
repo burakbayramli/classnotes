@@ -27,27 +27,8 @@ TERMINATION_MESSAGES = {
     3: "`callback` function requested termination"
 }
 
-
-class HessianUpdateStrategy(object):
-
-    def initialize(self, n, approx_type):
-        raise NotImplementedError("The method ``initialize(n, approx_type)``"
-                                  " is not implemented.")
-
-    def update(self, delta_x, delta_grad):
-        raise NotImplementedError("The method ``update(delta_x, delta_grad)``"
-                                  " is not implemented.")
-
-    def dot(self, p):
-        raise NotImplementedError("The method ``dot(p)``"
-                                  " is not implemented.")
-
-    def get_matrix(self):
-        raise NotImplementedError("The method ``get_matrix(p)``"
-                                  " is not implemented.")
-
     
-class FullHessianUpdateStrategy(HessianUpdateStrategy):
+class FullHessianUpdateStrategy(object):
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
     _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
     _symv = get_blas_funcs('symv', dtype='d')
@@ -443,9 +424,6 @@ class LagrangianHessian(object):
 
         return LinearOperator((self.n, self.n), matvec)
 
-
-
-
 class LinearVectorFunction(object):
     def __init__(self, A, x0, sparse_jacobian):
         if sparse_jacobian or sparse_jacobian is None and sps.issparse(A):
@@ -632,7 +610,7 @@ class ScalarFunction(object):
 
             update_hess()
             self.H_updated = True
-        elif isinstance(hess, HessianUpdateStrategy):
+        elif isinstance(hess, FullHessianUpdateStrategy):
             self.H = hess
             self.H.initialize(self.n, 'hess')
             self.H_updated = True
@@ -645,7 +623,7 @@ class ScalarFunction(object):
 
         self._update_hess_impl = update_hess
 
-        if isinstance(hess, HessianUpdateStrategy):
+        if isinstance(hess, FullHessianUpdateStrategy):
             def update_x(x):
                 self._update_grad()
                 self.x_prev = self.x
