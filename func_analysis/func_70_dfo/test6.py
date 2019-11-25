@@ -1066,8 +1066,7 @@ class BarrierSubproblem:
                       constr_violation < self.tolerance)
             x_cond = trust_radius < self.xtol
             return g_cond or x_cond
-
-
+        
 def inside_box_boundaries(x, lb, ub):
     return (lb <= x).all() and (x <= ub).all()
 
