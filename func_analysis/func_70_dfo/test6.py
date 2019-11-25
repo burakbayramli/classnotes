@@ -1605,29 +1605,12 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
 
     x0 = np.atleast_1d(x0).astype(float)
     n_vars = np.size(x0)
-    if hess is None:
-        if callable(hessp):
-            hess = HessianLinearOperator(hessp, n_vars)
-        else:
-            hess = BFGS()
     if disp and verbose == 0:
         verbose = 1
 
-    if bounds is not None:        
-        finite_diff_bounds = strict_bounds(bounds.lb, bounds.ub,
-                                           bounds.keep_feasible, n_vars)
-        print ('n_vars',n_vars)
-        print ('finite_diff_bounds',finite_diff_bounds)
-    else:
-        finite_diff_bounds = (-np.inf, np.inf)
+    finite_diff_bounds = strict_bounds(bounds.lb, bounds.ub,
+                                       bounds.keep_feasible, n_vars)
 
-    # Define Objective Function
-    print ('args',args)
-    print ('grad',grad)
-    print ('hess',hess)  
-    print ('finite_diff_rel_step',finite_diff_rel_step)
-    print ('finite_diff_bounds',finite_diff_bounds)
-    print ('fun',fun)
     objective = ScalarFunction(fun, x0, args, grad, hess,
                                finite_diff_rel_step, finite_diff_bounds)
 
