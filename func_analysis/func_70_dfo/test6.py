@@ -262,13 +262,6 @@ def sphere_intersections(z, d, trust_radius,
         return 0, 0, intersect
     sqrt_discriminant = np.sqrt(discriminant)
 
-    # The following calculation is mathematically
-    # equivalent to:
-    # ta = (-b - sqrt_discriminant) / (2*a)
-    # tb = (-b + sqrt_discriminant) / (2*a)
-    # but produce smaller round off errors.
-    # Look at Matrix Computation p.97
-    # for a better justification.
     aux = b + copysign(sqrt_discriminant, b)
     ta = -aux / (2*a)
     tb = -2*c / aux
@@ -1002,7 +995,6 @@ class PreparedConstraint(object):
 
 
 def strict_bounds(lb, ub, keep_feasible, n_vars):
-    """Remove bounds which are not asked to be kept feasible."""
     strict_lb = np.resize(lb, n_vars).astype(float)
     strict_ub = np.resize(ub, n_vars).astype(float)
     keep_feasible = np.resize(keep_feasible, n_vars)
@@ -1011,7 +1003,6 @@ def strict_bounds(lb, ub, keep_feasible, n_vars):
     return strict_lb, strict_ub
 
 FD_METHODS = ('2-point', '3-point', 'cs')
-
 
 class ScalarFunction(object):
 
@@ -1228,15 +1219,6 @@ class BarrierSubproblem:
         return z[:self.n_vars]
 
     def function_and_constraints(self, z):
-        """Returns barrier function and constraints at given point.
-
-        For z = [x, s], returns barrier function:
-            function(z) = fun(x) - barrier_parameter*sum(log(s))
-        and barrier constraints:
-            constraints(z) = [   constr_eq(x)     ]
-                             [ constr_ineq(x) + s ]
-
-        """
         # Get variables and slack variables
         x = self.get_variables(z)
         s = self.get_slack(z)
@@ -1277,16 +1259,6 @@ class BarrierSubproblem:
                               matvec)
 
     def gradient_and_jacobian(self, z):
-        """Returns scaled gradient.
-
-        Return scaled gradient:
-            gradient = [             grad(x)             ]
-                       [ -barrier_parameter*ones(n_ineq) ]
-        and scaled Jacobian Matrix:
-            jacobian = [  jac_eq(x)  0  ]
-                       [ jac_ineq(x) S  ]
-        Both of them scaled by the previously defined scaling factor.
-        """
         # Get variables and slack variables
         x = self.get_variables(z)
         s = self.get_slack(z)
@@ -1325,18 +1297,7 @@ class BarrierSubproblem:
                                  [J_ineq, S]])
 
     def _assemble_sparse_jacobian(self, J_eq, J_ineq, s):
-        """Assemble sparse jacobian given its components.
 
-        Given ``J_eq``, ``J_ineq`` and ``s`` returns:
-            jacobian = [ J_eq,     0     ]
-                       [ J_ineq, diag(s) ]
-
-        It is equivalent to:
-            sps.bmat([[ J_eq,   None    ],
-                      [ J_ineq, diag(s) ]], "csr")
-        but significantly more efficient for this
-        given structure.
-        """
         n_vars, n_ineq, n_eq = self.n_vars, self.n_ineq, self.n_eq
         J_aux = sps.vstack([J_eq, J_ineq], "csr")
         indptr, indices, data = J_aux.indptr, J_aux.indices, J_aux.data
@@ -1405,10 +1366,7 @@ class BarrierSubproblem:
     def stop_criteria(self, state, z, last_iteration_failed,
                       optimality, constr_violation,
                       trust_radius, penalty, cg_info):
-        """Stop criteria to the barrier problem.
-        The criteria here proposed is similar to formula (2.3)
-        from [1]_, p.879.
-        """
+
         x = self.get_variables(z)
         if self.global_stop_criteria(state, x,
                                      last_iteration_failed,
@@ -1425,22 +1383,6 @@ class BarrierSubproblem:
             return g_cond or x_cond
 
 def orthogonality(A, g):
-    """Measure orthogonality between a vector and the null space of a matrix.
-
-    Compute a measure of orthogonality between the null space
-    of the (possibly sparse) matrix ``A`` and a given vector ``g``.
-
-    The formula is a simplified (and cheaper) version of formula (3.13)
-    from [1]_.
-    ``orth =  norm(A g, ord=2)/(norm(A, ord='fro')*norm(g, ord=2))``.
-
-    References
-    ----------
-    .. [1] Gould, Nicholas IM, Mary E. Hribar, and Jorge Nocedal.
-           "On the solution of equality constrained quadratic
-            programming problems arising in optimization."
-            SIAM Journal on Scientific Computing 23.4 (2001): 1376-1395.
-    """
     # Compute vector norms
     norm_g = np.linalg.norm(g)
     # Compute Frobenius norm of the matrix A
@@ -1461,13 +1403,8 @@ def orthogonality(A, g):
 
         
 def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
-    """Return linear operators for matrix A - ``AugmentedSystem``."""
-    # Form augmented system
+
     K = csc_matrix(bmat([[eye(n), A.T], [A, None]]))
-    # LU factorization
-    # TODO: Use a symmetric indefinite factorization
-    #       to solve the system twice as fast (because
-    #       of the symmetry).
     try:
         solve = scipy.sparse.linalg.factorized(K)
     except RuntimeError:
@@ -1477,33 +1414,19 @@ def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
                                              m, n, orth_tol,
                                              max_refin, tol)
 
-    # z = x - A.T inv(A A.T) A x
-    # is computed solving the extended system:
-    # [I A.T] * [ z ] = [x]
-    # [A  O ]   [aux]   [0]
     def null_space(x):
-        # v = [x]
-        #     [0]
         v = np.hstack([x, np.zeros(m)])
-        # lu_sol = [ z ]
-        #          [aux]
         lu_sol = solve(v)
         z = lu_sol[:n]
 
-        # Iterative refinement to improve roundoff
-        # errors described in [2]_, algorithm 5.2.
         k = 0
         while orthogonality(A, z) > orth_tol:
             if k >= max_refin:
                 break
-            # new_v = [x] - [I A.T] * [ z ]
-            #         [0]   [A  O ]   [aux]
             new_v = v - K.dot(lu_sol)
-            # [I A.T] * [delta  z ] = new_v
-            # [A  O ]   [delta aux]
+
             lu_update = solve(new_v)
-            #  [ z ] += [delta  z ]
-            #  [aux]    [delta aux]
+
             lu_sol += lu_update
             z = lu_sol[:n]
             k += 1
@@ -1511,30 +1434,13 @@ def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
         # return z = x - A.T inv(A A.T) A x
         return z
 
-    # z = inv(A A.T) A x
-    # is computed solving the extended system:
-    # [I A.T] * [aux] = [x]
-    # [A  O ]   [ z ]   [0]
     def least_squares(x):
-        # v = [x]
-        #     [0]
         v = np.hstack([x, np.zeros(m)])
-        # lu_sol = [aux]
-        #          [ z ]
         lu_sol = solve(v)
-        # return z = inv(A A.T) A x
         return lu_sol[n:m+n]
 
-    # z = A.T inv(A A.T) x
-    # is computed solving the extended system:
-    # [I A.T] * [ z ] = [0]
-    # [A  O ]   [aux]   [x]
     def row_space(x):
-        # v = [0]
-        #     [x]
         v = np.hstack([np.zeros(n), x])
-        # lu_sol = [ z ]
-        #          [aux]
         lu_sol = solve(v)
         # return z = A.T inv(A A.T) x
         return lu_sol[:n]
@@ -1986,17 +1892,7 @@ def tr_interior_point(fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
                       initial_penalty,
                       initial_trust_radius,
                       factorization_method):
-    """Trust-region interior points method.
-
-    Solve problem:
-        minimize fun(x)
-        subject to: constr_ineq(x) <= 0
-                    constr_eq(x) = 0
-    using trust-region interior point method described in [1]_.
-    """
-    
-    print ('inside tr_interior_point impl')
-    
+    print ('inside tr_interior_point impl')    
     print ('constr_ineq0',constr_ineq0)
     print ('constr_eq0',constr_eq0)
     
