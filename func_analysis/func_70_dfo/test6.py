@@ -27,13 +27,14 @@ TERMINATION_MESSAGES = {
     3: "`callback` function requested termination"
 }
 
-    
-class FullHessianUpdateStrategy(object):
+class SR1:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
     _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
     _symv = get_blas_funcs('symv', dtype='d')
-
-    def __init__(self, init_scale='auto'):
+    
+    def __init__(self, min_denominator=1e-8, init_scale='auto'):
+        self.min_denominator = min_denominator
+        #super(SR1, self).__init__(init_scale)
         self.init_scale = init_scale
         self.first_iteration = None
         self.approx_type = None
@@ -64,8 +65,21 @@ class FullHessianUpdateStrategy(object):
             return ys / y_norm2
 
     def _update_implementation(self, delta_x, delta_grad):
-        raise NotImplementedError("The method ``_update_implementation``"
-                                  " is not implemented.")
+        if self.approx_type == 'hess':
+            w = delta_x
+            z = delta_grad
+        else:
+            w = delta_grad
+            z = delta_x
+        Mw = self.dot(w)
+        z_minus_Mw = z - Mw
+        denominator = np.dot(w, z_minus_Mw)
+        if np.abs(denominator) <= self.min_denominator*norm(w)*norm(z_minus_Mw):
+            return
+        if self.approx_type == 'hess':
+            self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
+        else:
+            self.H = self._syr(1/denominator, z_minus_Mw, a=self.H)
 
     def update(self, delta_x, delta_grad):
         if np.all(delta_x == 0.0):
@@ -106,28 +120,7 @@ class FullHessianUpdateStrategy(object):
         M[li] = M.T[li]
         return M
 
-class SR1(FullHessianUpdateStrategy):
-    def __init__(self, min_denominator=1e-8, init_scale='auto'):
-        self.min_denominator = min_denominator
-        super(SR1, self).__init__(init_scale)
-
-    def _update_implementation(self, delta_x, delta_grad):
-        if self.approx_type == 'hess':
-            w = delta_x
-            z = delta_grad
-        else:
-            w = delta_grad
-            z = delta_x
-        Mw = self.dot(w)
-        z_minus_Mw = z - Mw
-        denominator = np.dot(w, z_minus_Mw)
-        if np.abs(denominator) <= self.min_denominator*norm(w)*norm(z_minus_Mw):
-            return
-        if self.approx_type == 'hess':
-            self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
-        else:
-            self.H = self._syr(1/denominator, z_minus_Mw, a=self.H)
-
+            
 
 class CanonicalConstraint(object):
 
@@ -610,7 +603,7 @@ class ScalarFunction(object):
 
             update_hess()
             self.H_updated = True
-        elif isinstance(hess, FullHessianUpdateStrategy):
+        elif isinstance(hess, SR1):
             self.H = hess
             self.H.initialize(self.n, 'hess')
             self.H_updated = True
@@ -623,7 +616,7 @@ class ScalarFunction(object):
 
         self._update_hess_impl = update_hess
 
-        if isinstance(hess, FullHessianUpdateStrategy):
+        if isinstance(hess, SR1):
             def update_x(x):
                 self._update_grad()
                 self.x_prev = self.x
