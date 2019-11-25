@@ -8,13 +8,13 @@ import itertools, time
 import numpy.linalg as lin
 import scipy.linalg as slin
 import scipy.sparse as sps
+from scipy.linalg import get_blas_funcs
 import scipy.sparse.linalg
 from numpy.linalg import norm
 from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from scipy.optimize._numdiff import approx_derivative
-from scipy.optimize import (HessianUpdateStrategy, SR1,
-                            Bounds,
+from scipy.optimize import (Bounds,
                             NonlinearConstraint,
                             LinearConstraint, OptimizeResult)
 
@@ -26,6 +26,288 @@ TERMINATION_MESSAGES = {
     2: "`xtol` termination condition is satisfied.",
     3: "`callback` function requested termination"
 }
+
+
+class HessianUpdateStrategy(object):
+    """Interface for implementing Hessian update strategies.
+
+    Many optimization methods make use of Hessian (or inverse Hessian)
+    approximations, such as the quasi-Newton methods BFGS, SR1, L-BFGS.
+    Some of these  approximations, however, do not actually need to store
+    the entire matrix or can compute the internal matrix product with a
+    given vector in a very efficiently manner. This class serves as an
+    abstract interface between the optimization algorithm and the
+    quasi-Newton update strategies, giving freedom of implementation
+    to store and update the internal matrix as efficiently as possible.
+    Different choices of initialization and update procedure will result
+    in different quasi-Newton strategies.
+
+    Four methods should be implemented in derived classes: ``initialize``,
+    ``update``, ``dot`` and ``get_matrix``.
+
+    Notes
+    -----
+    Any instance of a class that implements this interface,
+    can be accepted by the method ``minimize`` and used by
+    the compatible solvers to approximate the Hessian (or
+    inverse Hessian) used by the optimization algorithms.
+    """
+
+    def initialize(self, n, approx_type):
+        """Initialize internal matrix.
+
+        Allocate internal memory for storing and updating
+        the Hessian or its inverse.
+
+        Parameters
+        ----------
+        n : int
+            Problem dimension.
+        approx_type : {'hess', 'inv_hess'}
+            Selects either the Hessian or the inverse Hessian.
+            When set to 'hess' the Hessian will be stored and updated.
+            When set to 'inv_hess' its inverse will be used instead.
+        """
+        raise NotImplementedError("The method ``initialize(n, approx_type)``"
+                                  " is not implemented.")
+
+    def update(self, delta_x, delta_grad):
+        """Update internal matrix.
+
+        Update Hessian matrix or its inverse (depending on how 'approx_type'
+        is defined) using information about the last evaluated points.
+
+        Parameters
+        ----------
+        delta_x : ndarray
+            The difference between two points the gradient
+            function have been evaluated at: ``delta_x = x2 - x1``.
+        delta_grad : ndarray
+            The difference between the gradients:
+            ``delta_grad = grad(x2) - grad(x1)``.
+        """
+        raise NotImplementedError("The method ``update(delta_x, delta_grad)``"
+                                  " is not implemented.")
+
+    def dot(self, p):
+        """Compute the product of the internal matrix with the given vector.
+
+        Parameters
+        ----------
+        p : array_like
+            1-d array representing a vector.
+
+        Returns
+        -------
+        Hp : array
+            1-d  represents the result of multiplying the approximation matrix
+            by vector p.
+        """
+        raise NotImplementedError("The method ``dot(p)``"
+                                  " is not implemented.")
+
+    def get_matrix(self):
+        """Return current internal matrix.
+
+        Returns
+        -------
+        H : ndarray, shape (n, n)
+            Dense matrix containing either the Hessian
+            or its inverse (depending on how 'approx_type'
+            is defined).
+        """
+        raise NotImplementedError("The method ``get_matrix(p)``"
+                                  " is not implemented.")
+
+
+class FullHessianUpdateStrategy(HessianUpdateStrategy):
+    """Hessian update strategy with full dimensional internal representation.
+    """
+    _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
+    _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
+    # Symmetric matrix-vector product
+    _symv = get_blas_funcs('symv', dtype='d')
+
+    def __init__(self, init_scale='auto'):
+        self.init_scale = init_scale
+        # Until initialize is called we can't really use the class,
+        # so it makes sense to set everything to None.
+        self.first_iteration = None
+        self.approx_type = None
+        self.B = None
+        self.H = None
+
+    def initialize(self, n, approx_type):
+        """Initialize internal matrix.
+
+        Allocate internal memory for storing and updating
+        the Hessian or its inverse.
+
+        Parameters
+        ----------
+        n : int
+            Problem dimension.
+        approx_type : {'hess', 'inv_hess'}
+            Selects either the Hessian or the inverse Hessian.
+            When set to 'hess' the Hessian will be stored and updated.
+            When set to 'inv_hess' its inverse will be used instead.
+        """
+        self.first_iteration = True
+        self.n = n
+        self.approx_type = approx_type
+        if approx_type not in ('hess', 'inv_hess'):
+            raise ValueError("`approx_type` must be 'hess' or 'inv_hess'.")
+        # Create matrix
+        if self.approx_type == 'hess':
+            self.B = np.eye(n, dtype=float)
+        else:
+            self.H = np.eye(n, dtype=float)
+
+    def _auto_scale(self, delta_x, delta_grad):
+        # Heuristic to scale matrix at first iteration.
+        # Described in Nocedal and Wright "Numerical Optimization"
+        # p.143 formula (6.20).
+        s_norm2 = np.dot(delta_x, delta_x)
+        y_norm2 = np.dot(delta_grad, delta_grad)
+        ys = np.abs(np.dot(delta_grad, delta_x))
+        if ys == 0.0 or y_norm2 == 0 or s_norm2 == 0:
+            return 1
+        if self.approx_type == 'hess':
+            return y_norm2 / ys
+        else:
+            return ys / y_norm2
+
+    def _update_implementation(self, delta_x, delta_grad):
+        raise NotImplementedError("The method ``_update_implementation``"
+                                  " is not implemented.")
+
+    def update(self, delta_x, delta_grad):
+        """Update internal matrix.
+
+        Update Hessian matrix or its inverse (depending on how 'approx_type'
+        is defined) using information about the last evaluated points.
+
+        Parameters
+        ----------
+        delta_x : ndarray
+            The difference between two points the gradient
+            function have been evaluated at: ``delta_x = x2 - x1``.
+        delta_grad : ndarray
+            The difference between the gradients:
+            ``delta_grad = grad(x2) - grad(x1)``.
+        """
+        if np.all(delta_x == 0.0):
+            return
+        if np.all(delta_grad == 0.0):
+            warn('delta_grad == 0.0. Check if the approximated '
+                 'function is linear. If the function is linear '
+                 'better results can be obtained by defining the '
+                 'Hessian as zero instead of using quasi-Newton '
+                 'approximations.', UserWarning)
+            return
+        if self.first_iteration:
+            # Get user specific scale
+            if self.init_scale == "auto":
+                scale = self._auto_scale(delta_x, delta_grad)
+            else:
+                scale = float(self.init_scale)
+            # Scale initial matrix with ``scale * np.eye(n)``
+            if self.approx_type == 'hess':
+                self.B *= scale
+            else:
+                self.H *= scale
+            self.first_iteration = False
+        self._update_implementation(delta_x, delta_grad)
+
+    def dot(self, p):
+        """Compute the product of the internal matrix with the given vector.
+
+        Parameters
+        ----------
+        p : array_like
+            1-d array representing a vector.
+
+        Returns
+        -------
+        Hp : array
+            1-d  represents the result of multiplying the approximation matrix
+            by vector p.
+        """
+        if self.approx_type == 'hess':
+            return self._symv(1, self.B, p)
+        else:
+            return self._symv(1, self.H, p)
+
+    def get_matrix(self):
+        """Return the current internal matrix.
+
+        Returns
+        -------
+        M : ndarray, shape (n, n)
+            Dense matrix containing either the Hessian or its inverse
+            (depending on how `approx_type` was defined).
+        """
+        if self.approx_type == 'hess':
+            M = np.copy(self.B)
+        else:
+            M = np.copy(self.H)
+        li = np.tril_indices_from(M, k=-1)
+        M[li] = M.T[li]
+        return M
+
+class SR1(FullHessianUpdateStrategy):
+    """Symmetric-rank-1 Hessian update strategy.
+
+    Parameters
+    ----------
+    min_denominator : float
+        This number, scaled by a normalization factor,
+        defines the minimum denominator magnitude allowed
+        in the update. When the condition is violated we skip
+        the update. By default uses ``1e-8``.
+    init_scale : {float, 'auto'}, optional
+        Matrix scale at first iteration. At the first
+        iteration the Hessian matrix or its inverse will be initialized
+        with ``init_scale*np.eye(n)``, where ``n`` is the problem dimension.
+        Set it to 'auto' in order to use an automatic heuristic for choosing
+        the initial scale. The heuristic is described in [1]_, p.143.
+        By default uses 'auto'.
+
+    Notes
+    -----
+    The update is based on the description in [1]_, p.144-146.
+
+    References
+    ----------
+    .. [1] Nocedal, Jorge, and Stephen J. Wright. "Numerical optimization"
+           Second Edition (2006).
+    """
+
+    def __init__(self, min_denominator=1e-8, init_scale='auto'):
+        self.min_denominator = min_denominator
+        super(SR1, self).__init__(init_scale)
+
+    def _update_implementation(self, delta_x, delta_grad):
+        # Auxiliary variables w and z
+        if self.approx_type == 'hess':
+            w = delta_x
+            z = delta_grad
+        else:
+            w = delta_grad
+            z = delta_x
+        # Do some common operations
+        Mw = self.dot(w)
+        z_minus_Mw = z - Mw
+        denominator = np.dot(w, z_minus_Mw)
+        # If the denominator is too small
+        # we just skip the update.
+        if np.abs(denominator) <= self.min_denominator*norm(w)*norm(z_minus_Mw):
+            return
+        # Update matrix
+        if self.approx_type == 'hess':
+            self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
+        else:
+            self.H = self._syr(1/denominator, z_minus_Mw, a=self.H)
 
 def inside_box_boundaries(x, lb, ub):
     """Check if lb <= x <= ub."""
