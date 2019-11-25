@@ -1933,9 +1933,8 @@ def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
         options.setdefault('xtol', tol)
         options.setdefault('gtol', tol)
         options.setdefault('barrier_tol', tol)
-
-    if constraints is not None:
-        constraints = standardize_constraints(constraints, x0, meth)
+        
+    constraints = standardize_constraints(constraints, x0, meth)
 
     return _minimize_trustregion_constr(fun, x0, args, jac, hess, hessp,
                                         bounds, constraints,
