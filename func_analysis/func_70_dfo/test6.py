@@ -27,6 +27,117 @@ TERMINATION_MESSAGES = {
     3: "`callback` function requested termination"
 }
 
+def inside_box_boundaries(x, lb, ub):
+    return (lb <= x).all() and (x <= ub).all()
+
+def box_sphere_intersections(z, d, lb, ub, trust_radius,
+                             entire_line=False,
+                             extra_info=False):
+
+    ta_b, tb_b, intersect_b = box_intersections(z, d, lb, ub,
+                                                entire_line)
+    ta_s, tb_s, intersect_s = sphere_intersections(z, d,
+                                                   trust_radius,
+                                                   entire_line)
+    ta = np.maximum(ta_b, ta_s)
+    tb = np.minimum(tb_b, tb_s)
+    if intersect_b and intersect_s and ta <= tb:
+        intersect = True
+    else:
+        intersect = False
+
+    if extra_info:
+        sphere_info = {'ta': ta_s, 'tb': tb_s, 'intersect': intersect_s}
+        box_info = {'ta': ta_b, 'tb': tb_b, 'intersect': intersect_b}
+        return ta, tb, intersect, sphere_info, box_info
+    else:
+        return ta, tb, intersect
+
+def box_intersections(z, d, lb, ub,
+                      entire_line=False):
+
+    # Make sure it is a numpy array
+    z = np.asarray(z)
+    d = np.asarray(d)
+    lb = np.asarray(lb)
+    ub = np.asarray(ub)
+    # Special case when d=0
+    if norm(d) == 0:
+        return 0, 0, False
+
+    zero_d = (d == 0)
+    if (z[zero_d] < lb[zero_d]).any() or (z[zero_d] > ub[zero_d]).any():
+        intersect = False
+        return 0, 0, intersect
+    not_zero_d = np.logical_not(zero_d)
+    z = z[not_zero_d]
+    d = d[not_zero_d]
+    lb = lb[not_zero_d]
+    ub = ub[not_zero_d]
+
+    t_lb = (lb-z) / d
+    t_ub = (ub-z) / d
+    ta = max(np.minimum(t_lb, t_ub))
+    tb = min(np.maximum(t_lb, t_ub))
+
+    if ta <= tb:
+        intersect = True
+    else:
+        intersect = False
+
+    if not entire_line:
+        if tb < 0 or ta > 1:
+            intersect = False
+            ta = 0
+            tb = 0
+        else:
+            ta = max(0, ta)
+            tb = min(1, tb)
+
+    return ta, tb, intersect
+
+def sphere_intersections(z, d, trust_radius,
+                         entire_line=False):
+
+    if norm(d) == 0:
+        return 0, 0, False
+    if np.isinf(trust_radius):
+        if entire_line:
+            ta = -np.inf
+            tb = np.inf
+        else:
+            ta = 0
+            tb = 1
+        intersect = True
+        return ta, tb, intersect
+
+    a = np.dot(d, d)
+    b = 2 * np.dot(z, d)
+    c = np.dot(z, z) - trust_radius**2
+    discriminant = b*b - 4*a*c
+    if discriminant < 0:
+        intersect = False
+        return 0, 0, intersect
+    sqrt_discriminant = np.sqrt(discriminant)
+
+    aux = b + copysign(sqrt_discriminant, b)
+    ta = -aux / (2*a)
+    tb = -2*c / aux
+    ta, tb = sorted([ta, tb])
+
+    if entire_line:
+        intersect = True
+    else:
+        if tb < 0 or ta > 1:
+            intersect = False
+            ta = 0
+            tb = 0
+        else:
+            intersect = True
+            ta = max(0, ta)
+            tb = min(1, tb)
+
+    return ta, tb, intersect
 
 class HessianUpdateStrategy(object):
 
@@ -146,120 +257,6 @@ class SR1(FullHessianUpdateStrategy):
             self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
         else:
             self.H = self._syr(1/denominator, z_minus_Mw, a=self.H)
-
-def inside_box_boundaries(x, lb, ub):
-    """Check if lb <= x <= ub."""
-    return (lb <= x).all() and (x <= ub).all()
-
-def box_sphere_intersections(z, d, lb, ub, trust_radius,
-                             entire_line=False,
-                             extra_info=False):
-
-    ta_b, tb_b, intersect_b = box_intersections(z, d, lb, ub,
-                                                entire_line)
-    ta_s, tb_s, intersect_s = sphere_intersections(z, d,
-                                                   trust_radius,
-                                                   entire_line)
-    ta = np.maximum(ta_b, ta_s)
-    tb = np.minimum(tb_b, tb_s)
-    if intersect_b and intersect_s and ta <= tb:
-        intersect = True
-    else:
-        intersect = False
-
-    if extra_info:
-        sphere_info = {'ta': ta_s, 'tb': tb_s, 'intersect': intersect_s}
-        box_info = {'ta': ta_b, 'tb': tb_b, 'intersect': intersect_b}
-        return ta, tb, intersect, sphere_info, box_info
-    else:
-        return ta, tb, intersect
-
-def box_intersections(z, d, lb, ub,
-                      entire_line=False):
-
-    # Make sure it is a numpy array
-    z = np.asarray(z)
-    d = np.asarray(d)
-    lb = np.asarray(lb)
-    ub = np.asarray(ub)
-    # Special case when d=0
-    if norm(d) == 0:
-        return 0, 0, False
-
-    zero_d = (d == 0)
-    if (z[zero_d] < lb[zero_d]).any() or (z[zero_d] > ub[zero_d]).any():
-        intersect = False
-        return 0, 0, intersect
-    not_zero_d = np.logical_not(zero_d)
-    z = z[not_zero_d]
-    d = d[not_zero_d]
-    lb = lb[not_zero_d]
-    ub = ub[not_zero_d]
-
-    t_lb = (lb-z) / d
-    t_ub = (ub-z) / d
-    ta = max(np.minimum(t_lb, t_ub))
-    tb = min(np.maximum(t_lb, t_ub))
-
-    if ta <= tb:
-        intersect = True
-    else:
-        intersect = False
-
-    if not entire_line:
-        if tb < 0 or ta > 1:
-            intersect = False
-            ta = 0
-            tb = 0
-        else:
-            ta = max(0, ta)
-            tb = min(1, tb)
-
-    return ta, tb, intersect
-
-def sphere_intersections(z, d, trust_radius,
-                         entire_line=False):
-
-    if norm(d) == 0:
-        return 0, 0, False
-    if np.isinf(trust_radius):
-        if entire_line:
-            ta = -np.inf
-            tb = np.inf
-        else:
-            ta = 0
-            tb = 1
-        intersect = True
-        return ta, tb, intersect
-
-    a = np.dot(d, d)
-    b = 2 * np.dot(z, d)
-    c = np.dot(z, z) - trust_radius**2
-    discriminant = b*b - 4*a*c
-    if discriminant < 0:
-        intersect = False
-        return 0, 0, intersect
-    sqrt_discriminant = np.sqrt(discriminant)
-
-    aux = b + copysign(sqrt_discriminant, b)
-    ta = -aux / (2*a)
-    tb = -2*c / aux
-    ta, tb = sorted([ta, tb])
-
-    if entire_line:
-        intersect = True
-    else:
-        if tb < 0 or ta > 1:
-            intersect = False
-            ta = 0
-            tb = 0
-        else:
-            intersect = True
-            ta = max(0, ta)
-            tb = min(1, tb)
-
-    return ta, tb, intersect
-
 
 
 class CanonicalConstraint(object):
