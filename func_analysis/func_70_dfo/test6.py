@@ -45,15 +45,9 @@ def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
     if constraints is not None:
         constraints = standardize_constraints(constraints, x0, meth)
 
-    if meth == '_custom':
-        return method(fun, x0, args=args, jac=jac, hess=hess, hessp=hessp,
-                      bounds=bounds, constraints=constraints,
-                      callback=callback, **options)
-    elif meth == 'trust-constr':
-        print ('inside _minimize trust-constr')
-        return _minimize_trustregion_constr(fun, x0, args, jac, hess, hessp,
-                                            bounds, constraints,
-                                            callback=callback, **options)
+    return _minimize_trustregion_constr(fun, x0, args, jac, hess, hessp,
+                                        bounds, constraints,
+                                        callback=callback, **options)
 
 def standardize_bounds(bounds, x0, meth):
     """Converts bounds to the form required by the solver."""
