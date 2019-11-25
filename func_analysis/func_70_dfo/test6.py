@@ -33,52 +33,7 @@ def inside_box_boundaries(x, lb, ub):
 def box_sphere_intersections(z, d, lb, ub, trust_radius,
                              entire_line=False,
                              extra_info=False):
-    """Find the intersection between segment (or line) and box/sphere constraints.
 
-    Find the intersection between the segment (or line) defined by the
-    parametric  equation ``x(t) = z + t*d``,  the rectangular box
-    ``lb <= x <= ub`` and the ball ``||x|| <= trust_radius``.
-
-    Parameters
-    ----------
-    z : array_like, shape (n,)
-        Initial point.
-    d : array_like, shape (n,)
-        Direction.
-    lb : array_like, shape (n,)
-        Lower bounds to each one of the components of ``x``. Used
-        to delimit the rectangular box.
-    ub : array_like, shape (n, )
-        Upper bounds to each one of the components of ``x``. Used
-        to delimit the rectangular box.
-    trust_radius : float
-        Ball radius.
-    entire_line : bool, optional
-        When ``True`` the function returns the intersection between the line
-        ``x(t) = z + t*d`` (``t`` can assume any value) and the constraints.
-        When ``False`` returns the intersection between the segment
-        ``x(t) = z + t*d``, ``0 <= t <= 1`` and the constraints.
-    extra_info : bool, optional
-        When ``True`` returns ``intersect_sphere`` and ``intersect_box``.
-
-    Returns
-    -------
-    ta, tb : float
-        The line/segment ``x(t) = z + t*d`` is inside the rectangular box and
-        inside the ball for for ``ta <= t <= tb``.
-    intersect : bool
-        When ``True`` there is a intersection between the line (or segment)
-        and both constraints. On the other hand, when ``False``, there is no
-        intersection.
-    sphere_info : dict, optional
-        Dictionary ``{ta, tb, intersect}`` containing the interval ``[ta, tb]``
-        for which the line intercept the ball. And a boolean value indicating
-        whether the sphere is intersected by the line.
-    box_info : dict, optional
-        Dictionary ``{ta, tb, intersect}`` containing the interval ``[ta, tb]``
-        for which the line intercept the box. And a boolean value indicating
-        whether the box is intersected by the line.
-    """
     ta_b, tb_b, intersect_b = box_intersections(z, d, lb, ub,
                                                 entire_line)
     ta_s, tb_s, intersect_s = sphere_intersections(z, d,
@@ -100,40 +55,7 @@ def box_sphere_intersections(z, d, lb, ub, trust_radius,
 
 def box_intersections(z, d, lb, ub,
                       entire_line=False):
-    """Find the intersection between segment (or line) and box constraints.
 
-    Find the intersection between the segment (or line) defined by the
-    parametric  equation ``x(t) = z + t*d`` and the rectangular box
-    ``lb <= x <= ub``.
-
-    Parameters
-    ----------
-    z : array_like, shape (n,)
-        Initial point.
-    d : array_like, shape (n,)
-        Direction.
-    lb : array_like, shape (n,)
-        Lower bounds to each one of the components of ``x``. Used
-        to delimit the rectangular box.
-    ub : array_like, shape (n, )
-        Upper bounds to each one of the components of ``x``. Used
-        to delimit the rectangular box.
-    entire_line : bool, optional
-        When ``True`` the function returns the intersection between the line
-        ``x(t) = z + t*d`` (``t`` can assume any value) and the rectangular
-        box. When ``False`` returns the intersection between the segment
-        ``x(t) = z + t*d``, ``0 <= t <= 1``, and the rectangular box.
-
-    Returns
-    -------
-    ta, tb : float
-        The line/segment ``x(t) = z + t*d`` is inside the box for
-        for ``ta <= t <= tb``.
-    intersect : bool
-        When ``True`` there is a intersection between the line (or segment)
-        and the rectangular box. On the other hand, when ``False``, there is no
-        intersection.
-    """
     # Make sure it is a numpy array
     z = np.asarray(z)
     d = np.asarray(d)
@@ -184,36 +106,7 @@ def box_intersections(z, d, lb, ub,
 
 def sphere_intersections(z, d, trust_radius,
                          entire_line=False):
-    """Find the intersection between segment (or line) and spherical constraints.
 
-    Find the intersection between the segment (or line) defined by the
-    parametric  equation ``x(t) = z + t*d`` and the ball
-    ``||x|| <= trust_radius``.
-
-    Parameters
-    ----------
-    z : array_like, shape (n,)
-        Initial point.
-    d : array_like, shape (n,)
-        Direction.
-    trust_radius : float
-        Ball radius.
-    entire_line : bool, optional
-        When ``True`` the function returns the intersection between the line
-        ``x(t) = z + t*d`` (``t`` can assume any value) and the ball
-        ``||x|| <= trust_radius``. When ``False`` returns the intersection
-        between the segment ``x(t) = z + t*d``, ``0 <= t <= 1``, and the ball.
-
-    Returns
-    -------
-    ta, tb : float
-        The line/segment ``x(t) = z + t*d`` is inside the ball for
-        for ``ta <= t <= tb``.
-    intersect : bool
-        When ``True`` there is a intersection between the line/segment
-        and the sphere. On the other hand, when ``False``, there is no
-        intersection.
-    """
     # Special case when d=0
     if norm(d) == 0:
         return 0, 0, False
@@ -270,42 +163,7 @@ def sphere_intersections(z, d, trust_radius,
 
 
 class CanonicalConstraint(object):
-    """Canonical constraint to use with trust-constr algorithm.
 
-    It represents the set of constraints of the form::
-
-        f_eq(x) = 0
-        f_ineq(x) <= 0
-
-    Where ``f_eq`` and ``f_ineq`` are evaluated by a single function, see
-    below.
-
-    The class is supposed to be instantiated by factory methods, which
-    should prepare the parameters listed below.
-
-    Parameters
-    ----------
-    n_eq, n_ineq : int
-        Number of equality and inequality constraints respectively.
-    fun : callable
-        Function defining the constraints. The signature is
-        ``fun(x) -> c_eq, c_ineq``, where ``c_eq`` is ndarray with `n_eq`
-        components and ``c_ineq`` is ndarray with `n_ineq` components.
-    jac : callable
-        Function to evaluate the Jacobian of the constraint. The signature
-        is ``jac(x) -> J_eq, J_ineq``, where ``J_eq`` and ``J_ineq`` are
-        either ndarray of csr_matrix of shapes (n_eq, n) and (n_ineq, n)
-        respectively.
-    hess : callable
-        Function to evaluate the Hessian of the constraints multiplied
-        by Lagrange multipliers, that is
-        ``dot(f_eq, v_eq) + dot(f_ineq, v_ineq)``. The signature is
-        ``hess(x, v_eq, v_ineq) -> H``, where ``H`` has an implied
-        shape (n, n) and provide a matrix-vector product operation
-        ``H.dot(p)``.
-    keep_feasible : ndarray, shape (n_ineq,)
-        Mask indicating which inequality constraints should be kept feasible.
-    """
     def __init__(self, n_eq, n_ineq, fun, jac, hess, keep_feasible):
         self.n_eq = n_eq
         self.n_ineq = n_ineq
@@ -678,22 +536,7 @@ def initial_constraints_as_canonical(n, prepared_constraints, sparse_jacobian):
     return c_eq, c_ineq, J_eq, J_ineq
 
 class VectorFunction(object):
-    """Vector function and its derivatives.
 
-    This class defines a vector function F: R^n->R^m and methods for
-    computing or approximating its first and second derivatives.
-
-    Notes
-    -----
-    This class implements a memoization logic. There are methods `fun`,
-    `jac`, hess` and corresponding attributes `f`, `J` and `H`. The following
-    things should be considered:
-
-        1. Use only public methods `fun`, `jac` and `hess`.
-        2. After one of the methods is called, the corresponding attribute
-           will be set. However, a subsequent call with a different argument
-           of *any* of the methods may overwrite the attribute.
-    """
     def __init__(self, fun, x0, jac, hess,
                  finite_diff_rel_step, finite_diff_jac_sparsity,
                  finite_diff_bounds, sparse_jacobian):
@@ -1007,39 +850,7 @@ class IdentityVectorFunction(LinearVectorFunction):
 
         
 class PreparedConstraint(object):
-    """Constraint prepared from a user defined constraint.
 
-    On creation it will check whether a constraint definition is valid and
-    the initial point is feasible. If created successfully, it will contain
-    the attributes listed below.
-
-    Parameters
-    ----------
-    constraint : {NonlinearConstraint, LinearConstraint`, Bounds}
-        Constraint to check and prepare.
-    x0 : array_like
-        Initial vector of independent variables.
-    sparse_jacobian : bool or None, optional
-        If bool, then the Jacobian of the constraint will be converted
-        to the corresponded format if necessary. If None (default), such
-        conversion is not made.
-    finite_diff_bounds : 2-tuple, optional
-        Lower and upper bounds on the independent variables for the finite
-        difference approximation, if applicable. Defaults to no bounds.
-
-    Attributes
-    ----------
-    fun : {VectorFunction, LinearVectorFunction, IdentityVectorFunction}
-        Function defining the constraint wrapped by one of the convenience
-        classes.
-    bounds : 2-tuple
-        Contains lower and upper bounds for the constraints --- lb and ub.
-        These are converted to ndarray and have a size equal to the number of
-        the constraints.
-    keep_feasible : ndarray
-         Array indicating which components must be kept feasible with a size
-         equal to the number of the constraints.
-    """
     def __init__(self, constraint, x0, sparse_jacobian=None,
                  finite_diff_bounds=(-np.inf, np.inf)):
         if isinstance(constraint, NonlinearConstraint):
@@ -1117,22 +928,7 @@ FD_METHODS = ('2-point', '3-point', 'cs')
 
 
 class ScalarFunction(object):
-    """Scalar function and its derivatives.
 
-    This class defines a scalar function F: R^n->R and methods for
-    computing or approximating its first and second derivatives.
-
-    Notes
-    -----
-    This class implements a memoization logic. There are methods `fun`,
-    `grad`, hess` and corresponding attributes `f`, `g` and `H`. The following
-    things should be considered:
-
-        1. Use only public methods `fun`, `grad` and `hess`.
-        2. After one of the methods is called, the corresponding attribute
-           will be set. However, a subsequent call with a different argument
-           of *any* of the methods may overwrite the attribute.
-    """
     def __init__(self, fun, x0, args, grad, hess, finite_diff_rel_step,
                  finite_diff_bounds):
         if not callable(grad) and grad not in FD_METHODS:
@@ -1309,8 +1105,6 @@ def rosenbrock(x):
 x0 = [-1.0,0]
 
 opts = {'maxiter': 1000, 'verbose': 2}
-
-
 
 class BarrierSubproblem:
     """
@@ -1676,81 +1470,8 @@ def default_scaling(x):
     n, = np.shape(x)
     return speye(n)
 
-
 def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
-    """Return three linear operators related with a given matrix A.
 
-    Parameters
-    ----------
-    A : sparse matrix (or ndarray), shape (m, n)
-        Matrix ``A`` used in the projection.
-    method : string, optional
-        Method used for compute the given linear
-        operators. Should be one of:
-
-            - 'NormalEquation': The operators
-               will be computed using the
-               so-called normal equation approach
-               explained in [1]_. In order to do
-               so the Cholesky factorization of
-               ``(A A.T)`` is computed. Exclusive
-               for sparse matrices.
-            - 'AugmentedSystem': The operators
-               will be computed using the
-               so-called augmented system approach
-               explained in [1]_. Exclusive
-               for sparse matrices.
-            - 'QRFactorization': Compute projections
-               using QR factorization. Exclusive for
-               dense matrices.
-            - 'SVDFactorization': Compute projections
-               using SVD factorization. Exclusive for
-               dense matrices.
-
-    orth_tol : float, optional
-        Tolerance for iterative refinements.
-    max_refin : int, optional
-        Maximum number of iterative refinements
-    tol : float, optional
-        Tolerance for singular values
-
-    Returns
-    -------
-    Z : LinearOperator, shape (n, n)
-        Null-space operator. For a given vector ``x``,
-        the null space operator is equivalent to apply
-        a projection matrix ``P = I - A.T inv(A A.T) A``
-        to the vector. It can be shown that this is
-        equivalent to project ``x`` into the null space
-        of A.
-    LS : LinearOperator, shape (m, n)
-        Least-Square operator. For a given vector ``x``,
-        the least-square operator is equivalent to apply a
-        pseudoinverse matrix ``pinv(A.T) = inv(A A.T) A``
-        to the vector. It can be shown that this vector
-        ``pinv(A.T) x`` is the least_square solution to
-        ``A.T y = x``.
-    Y : LinearOperator, shape (n, m)
-        Row-space operator. For a given vector ``x``,
-        the row-space operator is equivalent to apply a
-        projection matrix ``Q = A.T inv(A A.T)``
-        to the vector.  It can be shown that this
-        vector ``y = Q x``  the minimum norm solution
-        of ``A y = x``.
-
-    Notes
-    -----
-    Uses iterative refinements described in [1]
-    during the computation of ``Z`` in order to
-    cope with the possibility of large roundoff errors.
-
-    References
-    ----------
-    .. [1] Gould, Nicholas IM, Mary E. Hribar, and Jorge Nocedal.
-        "On the solution of equality constrained quadratic
-        programming problems arising in optimization."
-        SIAM Journal on Scientific Computing 23.4 (2001): 1376-1395.
-    """
     m, n = np.shape(A)
 
     # The factorization of an empty matrix
@@ -1776,18 +1497,8 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
         if method not in ("QRFactorization", "SVDFactorization"):
             raise ValueError("Method not allowed for dense array.")
 
-    if method == 'NormalEquation':
-        null_space, least_squares, row_space \
-            = normal_equation_projections(A, m, n, orth_tol, max_refin, tol)
-    elif method == 'AugmentedSystem':
-        null_space, least_squares, row_space \
-            = augmented_system_projections(A, m, n, orth_tol, max_refin, tol)
-    elif method == "QRFactorization":
-        null_space, least_squares, row_space \
-            = qr_factorization_projections(A, m, n, orth_tol, max_refin, tol)
-    elif method == "SVDFactorization":
-        null_space, least_squares, row_space \
-            = svd_factorization_projections(A, m, n, orth_tol, max_refin, tol)
+    null_space, least_squares, row_space \
+        = augmented_system_projections(A, m, n, orth_tol, max_refin, tol)
 
     Z = LinearOperator((n, n), null_space)
     LS = LinearOperator((m, n), least_squares)
