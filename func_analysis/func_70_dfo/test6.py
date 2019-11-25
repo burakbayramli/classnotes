@@ -1641,13 +1641,7 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
     canonical_all = [CanonicalConstraint.from_PreparedConstraint(c)
                      for c in prepared_constraints]
 
-    if len(canonical_all) == 0:
-        canonical = CanonicalConstraint.empty(n_vars)
-    elif len(canonical_all) == 1:
-        canonical = canonical_all[0]
-    else:
-        canonical = CanonicalConstraint.concatenate(canonical_all,
-                                                    sparse_jacobian)
+    canonical = canonical_all[0]
 
     lagrangian_hess = LagrangianHessian(n_vars, objective.hess, canonical.hess)
 
