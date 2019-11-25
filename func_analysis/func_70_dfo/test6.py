@@ -790,8 +790,6 @@ class VectorFunction(object):
 
             def update_hess():
                 self._update_jac()
-                # When v is updated before x was updated, then x_prev and
-                # J_prev are None and we need this check.
                 if self.x_prev is not None and self.J_prev is not None:
                     delta_x = self.x - self.x_prev
                     delta_g = self.J.T.dot(self.v) - self.J_prev.T.dot(self.v)
@@ -1187,35 +1185,23 @@ class BarrierSubproblem:
         return z[:self.n_vars]
 
     def function_and_constraints(self, z):
-        # Get variables and slack variables
         x = self.get_variables(z)
         s = self.get_slack(z)
-        # Compute function and constraints
         f = self.fun(x)
         c_eq, c_ineq = self.constr(x)
-        # Return objective function and constraints
         return (self._compute_function(f, c_ineq, s),
                 self._compute_constr(c_ineq, c_eq, s))
 
     def _compute_function(self, f, c_ineq, s):
-        # Use technique from Nocedal and Wright book, ref [3]_, p.576,
-        # to guarantee constraints from `enforce_feasibility`
-        # stay feasible along iterations.
         s[self.enforce_feasibility] = -c_ineq[self.enforce_feasibility]
         log_s = [np.log(s_i) if s_i > 0 else -np.inf for s_i in s]
-        # Compute barrier objective function
         return f - self.barrier_parameter*np.sum(log_s)
 
     def _compute_constr(self, c_ineq, c_eq, s):
-        # Compute barrier constraint
         return np.hstack((c_eq,
                           c_ineq + s))
 
     def scaling(self, z):
-        """Returns scaling vector.
-        Given by:
-            scaling = [ones(n_vars), s]
-        """
         s = self.get_slack(z)
         diag_elements = np.hstack((np.ones(self.n_vars), s))
 
@@ -1227,13 +1213,10 @@ class BarrierSubproblem:
                               matvec)
 
     def gradient_and_jacobian(self, z):
-        # Get variables and slack variables
         x = self.get_variables(z)
         s = self.get_slack(z)
-        # Compute first derivatives
         g = self.grad(x)
         J_eq, J_ineq = self.jac(x)
-        # Return gradient and jacobian
         return (self._compute_gradient(g),
                 self._compute_jacobian(J_eq, J_ineq, s))
 
@@ -1245,22 +1228,16 @@ class BarrierSubproblem:
             return J_eq
         else:
             if sps.issparse(J_eq) or sps.issparse(J_ineq):
-                # It is expected that J_eq and J_ineq
-                # are already `csr_matrix` because of
-                # the way ``BoxConstraint``, ``NonlinearConstraint``
-                # and ``LinearConstraint`` are defined.
                 J_eq = sps.csr_matrix(J_eq)
                 J_ineq = sps.csr_matrix(J_ineq)
                 return self._assemble_sparse_jacobian(J_eq, J_ineq, s)
             else:
                 S = np.diag(s)
                 zeros = np.zeros((self.n_eq, self.n_ineq))
-                # Convert to matrix
                 if sps.issparse(J_ineq):
                     J_ineq = J_ineq.toarray()
                 if sps.issparse(J_eq):
                     J_eq = J_eq.toarray()
-                # Concatenate matrices
                 return np.block([[J_eq, zeros],
                                  [J_ineq, S]])
 
@@ -1285,25 +1262,19 @@ class BarrierSubproblem:
         return J
 
     def lagrangian_hessian_x(self, z, v):
-        """Returns Lagrangian Hessian (in relation to `x`) -> Hx"""
         x = self.get_variables(z)
-        # Get lagrange multipliers relatated to nonlinear equality constraints
         v_eq = v[:self.n_eq]
-        # Get lagrange multipliers relatated to nonlinear ineq. constraints
         v_ineq = v[self.n_eq:self.n_eq+self.n_ineq]
         lagr_hess = self.lagr_hess
         return lagr_hess(x, v_eq, v_ineq)
 
     def lagrangian_hessian_s(self, z, v):
-        """Returns scaled Lagrangian Hessian (in relation to`s`) -> S Hs S"""
         s = self.get_slack(z)
         primal = self.barrier_parameter
         primal_dual = v[-self.n_ineq:]*s
         return np.where(v[-self.n_ineq:] > 0, primal_dual, primal)
 
     def lagrangian_hessian(self, z, v):
-        """Returns scaled Lagrangian Hessian"""
-        # Compute Hessian in relation to x and s
         Hx = self.lagrangian_hessian_x(z, v)
         if self.n_ineq > 0:
             S_Hs_S = self.lagrangian_hessian_s(z, v)
@@ -1339,20 +1310,16 @@ class BarrierSubproblem:
             return g_cond or x_cond
 
 def orthogonality(A, g):
-    # Compute vector norms
     norm_g = np.linalg.norm(g)
-    # Compute Frobenius norm of the matrix A
     if issparse(A):
         norm_A = scipy.sparse.linalg.norm(A, ord='fro')
     else:
         norm_A = np.linalg.norm(A, ord='fro')
 
-    # Check if norms are zero
     if norm_g == 0 or norm_A == 0:
         return 0
 
     norm_A_g = np.linalg.norm(A.dot(g))
-    # Orthogonality measure
     orth = norm_A_g / (norm_A*norm_g)
     return orth
 
@@ -1410,12 +1377,9 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
 
     m, n = np.shape(A)
 
-    # The factorization of an empty matrix
-    # only works for the sparse representation.
     if m*n == 0:
         A = csc_matrix(A)
 
-    # Check Argument
     if issparse(A):
         if method is None:
             method = "AugmentedSystem"
@@ -1488,20 +1452,16 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
     n, = np.shape(c)  # Number of parameters
     m, = np.shape(b)  # Number of constraints
 
-    # Initial Values
     x = Y.dot(-b)
     r = Z.dot(H.dot(x) + c)
     g = Z.dot(r)
     p = -g
 
-    # Store ``x`` value
     if return_all:
         allvecs = [x]
-    # Values for the first iteration
     H_p = H.dot(p)
     rt_g = norm(g)**2  # g.T g = r.T Z g = r.T g (ref [1]_ p.1389)
 
-    # If x > trust-region the problem does not have a solution.
     tr_distance = trust_radius - norm(x)
     if tr_distance < 0:
         raise ValueError("Trust region problem does not have a solution.")
@@ -1952,7 +1912,6 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
 
     print ('method in minimize_trustregion_constr',method)
 
-    # Construct OptimizeResult
     state = OptimizeResult(
         nit=0, nfev=0, njev=0, nhev=0,
         cg_niter=0, cg_stop_cond=0,
@@ -1968,7 +1927,6 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
 
     start_time = time.time()
     
-    # Start counting
     def stop_criteria(state, x, last_iteration_failed, tr_radius,
                       constr_penalty, cg_info, barrier_parameter,
                       barrier_tolerance):
@@ -2003,12 +1961,8 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
         initial_constr_penalty, initial_tr_radius,
         factorization_method)
 
-    # Status 3 occurs when the callback function requests termination,
-    # this is assumed to not be a success.
     result.success = True if result.status in (1, 2) else False
     result.message = TERMINATION_MESSAGES[result.status]
-
-    # Alias (for backward compatibility with 1.1.0)
     result.niter = result.nit
 
     return result
@@ -2024,15 +1978,11 @@ def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
     if not isinstance(args, tuple):
         args = (args,)
 
-    # set default tolerances
     if tol is not None:
         options = dict(options)
         options.setdefault('xtol', tol)
         options.setdefault('gtol', tol)
         options.setdefault('barrier_tol', tol)
-
-    if bounds is not None:
-        bounds = standardize_bounds(bounds, x0, meth)
 
     if constraints is not None:
         constraints = standardize_constraints(constraints, x0, meth)
@@ -2040,18 +1990,6 @@ def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
     return _minimize_trustregion_constr(fun, x0, args, jac, hess, hessp,
                                         bounds, constraints,
                                         callback=callback, **options)
-
-def standardize_bounds(bounds, x0, meth):
-    """Converts bounds to the form required by the solver."""
-    if meth == 'trust-constr':
-        if not isinstance(bounds, Bounds):
-            lb, ub = old_bound_to_new(bounds)
-            bounds = Bounds(lb, ub)
-    elif meth in ('l-bfgs-b', 'tnc', 'slsqp'):
-        if isinstance(bounds, Bounds):
-            bounds = new_bounds_to_old(bounds.lb, bounds.ub, x0.shape[0])
-    return bounds
-
 
 def standardize_constraints(constraints, x0, meth):
     """Converts constraints to the form required by the solver."""
