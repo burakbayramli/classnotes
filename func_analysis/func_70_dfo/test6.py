@@ -1869,7 +1869,6 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
         PreparedConstraint(c, x0, sparse_jacobian, finite_diff_bounds)
         for c in constraints]
 
-    # Check that all constraints are either sparse or dense.
     n_sparse = sum(c.fun.sparse_jacobian for c in prepared_constraints)
     if 0 < n_sparse < len(prepared_constraints):
         raise ValueError("All constraints must have the same kind of the "
@@ -1885,11 +1884,9 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
         prepared_constraints.append(PreparedConstraint(bounds, x0,
                                                        sparse_jacobian))
 
-    # Concatenate initial constraints to the canonical form.
     c_eq0, c_ineq0, J_eq0, J_ineq0 = initial_constraints_as_canonical(
         n_vars, prepared_constraints, sparse_jacobian)
 
-    # Prepare all canonical constraints and concatenate it into one.
     canonical_all = [CanonicalConstraint.from_PreparedConstraint(c)
                      for c in prepared_constraints]
 
@@ -1901,14 +1898,9 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
         canonical = CanonicalConstraint.concatenate(canonical_all,
                                                     sparse_jacobian)
 
-    # Generate the Hessian of the Lagrangian.
     lagrangian_hess = LagrangianHessian(n_vars, objective.hess, canonical.hess)
 
-    # Choose appropriate method
-    if canonical.n_ineq == 0:
-        method = 'equality_constrained_sqp'
-    else:
-        method = 'tr_interior_point'
+    method = 'tr_interior_point'
 
     print ('method in minimize_trustregion_constr',method)
 
@@ -1997,14 +1989,13 @@ def standardize_constraints(constraints, x0, meth):
     new_constraint_types = all_constraint_types[:-1]
     if isinstance(constraints, all_constraint_types):
         constraints = [constraints]
-    constraints = list(constraints)  # ensure it's a mutable sequence
+    constraints = list(constraints)  
 
     if meth == 'trust-constr':
         for i, con in enumerate(constraints):
             if not isinstance(con, new_constraint_types):
                 constraints[i] = old_constraint_to_new(i, con)
     else:
-        # iterate over copy, changing original
         for i, con in enumerate(list(constraints)):
             if isinstance(con, new_constraint_types):
                 old_constraints = new_constraint_to_old(con, x0)
