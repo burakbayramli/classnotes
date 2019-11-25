@@ -119,9 +119,7 @@ class SR1:
         li = np.tril_indices_from(M, k=-1)
         M[li] = M.T[li]
         return M
-
-            
-
+           
 class CanonicalConstraint(object):
 
     def __init__(self, n_eq, n_ineq, fun, jac, hess, keep_feasible):
@@ -170,58 +168,6 @@ class CanonicalConstraint(object):
 
         return cls(0, 0, fun, jac, hess, np.empty(0, dtype=np.bool))
 
-    @classmethod
-    def concatenate(cls, canonical_constraints, sparse_jacobian):
-
-        def fun(x):
-            if canonical_constraints:
-                eq_all, ineq_all = zip(
-                        *[c.fun(x) for c in canonical_constraints])
-            else:
-                eq_all, ineq_all = [], []
-
-            return np.hstack(eq_all), np.hstack(ineq_all)
-
-        if sparse_jacobian:
-            vstack = sps.vstack
-        else:
-            vstack = np.vstack
-
-        def jac(x):
-            if canonical_constraints:
-                eq_all, ineq_all = zip(
-                        *[c.jac(x) for c in canonical_constraints])
-            else:
-                eq_all, ineq_all = [], []
-
-            return vstack(eq_all), vstack(ineq_all)
-
-        def hess(x, v_eq, v_ineq):
-            hess_all = []
-            index_eq = 0
-            index_ineq = 0
-            for c in canonical_constraints:
-                vc_eq = v_eq[index_eq:index_eq + c.n_eq]
-                vc_ineq = v_ineq[index_ineq:index_ineq + c.n_ineq]
-                hess_all.append(c.hess(x, vc_eq, vc_ineq))
-                index_eq += c.n_eq
-                index_ineq += c.n_ineq
-
-            def matvec(p):
-                result = np.zeros_like(p)
-                for h in hess_all:
-                    result += h.dot(p)
-                return result
-
-            n = x.shape[0]
-            return sps.linalg.LinearOperator((n, n), matvec, dtype=float)
-
-        n_eq = sum(c.n_eq for c in canonical_constraints)
-        n_ineq = sum(c.n_ineq for c in canonical_constraints)
-        keep_feasible = np.hstack([c.keep_feasible for c in
-                                   canonical_constraints])
-
-        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
 
     @classmethod
     def _equal_to_canonical(cls, cfun, value):
