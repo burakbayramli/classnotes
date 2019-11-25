@@ -1285,6 +1285,144 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
 
     return Z, LS, Y
 
+
+def reinforce_box_boundaries(x, lb, ub):
+    """Return clipped value of x"""
+    return np.minimum(np.maximum(x, lb), ub)
+
+
+def update_state_sqp(state, x, last_iteration_failed, objective, prepared_constraints,
+                     start_time, tr_radius, constr_penalty, cg_info):
+    state.nit += 1
+    state.nfev = objective.nfev
+    state.njev = objective.ngev
+    state.nhev = objective.nhev
+    state.constr_nfev = [c.fun.nfev if isinstance(c.fun, VectorFunction) else 0
+                         for c in prepared_constraints]
+    state.constr_njev = [c.fun.njev if isinstance(c.fun, VectorFunction) else 0
+                         for c in prepared_constraints]
+    state.constr_nhev = [c.fun.nhev if isinstance(c.fun, VectorFunction) else 0
+                         for c in prepared_constraints]
+
+    if not last_iteration_failed:
+        state.x = x
+        state.fun = objective.f
+        state.grad = objective.g
+        state.v = [c.fun.v for c in prepared_constraints]
+        state.constr = [c.fun.f for c in prepared_constraints]
+        state.jac = [c.fun.J for c in prepared_constraints]
+
+        state.lagrangian_grad = np.copy(state.grad)
+        for c in prepared_constraints:
+            state.lagrangian_grad += c.fun.J.T.dot(c.fun.v)
+        state.optimality = np.linalg.norm(state.lagrangian_grad, np.inf)
+
+        state.constr_violation = 0
+        for i in range(len(prepared_constraints)):
+            lb, ub = prepared_constraints[i].bounds
+            c = state.constr[i]
+            state.constr_violation = np.max([state.constr_violation,
+                                             np.max(lb - c),
+                                             np.max(c - ub)])
+
+    state.execution_time = time.time() - start_time
+    state.tr_radius = tr_radius
+    state.constr_penalty = constr_penalty
+    state.cg_niter += cg_info["niter"]
+    state.cg_stop_cond = cg_info["stop_cond"]
+
+    return state
+
+def update_state_ip(state, x, last_iteration_failed, objective,
+                    prepared_constraints, start_time,
+                    tr_radius, constr_penalty, cg_info,
+                    barrier_parameter, barrier_tolerance):
+    state = update_state_sqp(state, x, last_iteration_failed, objective,
+                             prepared_constraints, start_time, tr_radius,
+                             constr_penalty, cg_info)
+    state.barrier_parameter = barrier_parameter
+    state.barrier_tolerance = barrier_tolerance
+    return state
+
+
+
+def standardize_constraints(constraints, x0, meth):
+    """Converts constraints to the form required by the solver."""
+    all_constraint_types = (NonlinearConstraint, LinearConstraint, dict)
+    new_constraint_types = all_constraint_types[:-1]
+    if isinstance(constraints, all_constraint_types):
+        constraints = [constraints]
+    constraints = list(constraints)  
+
+    if meth == 'trust-constr':
+        for i, con in enumerate(constraints):
+            if not isinstance(con, new_constraint_types):
+                constraints[i] = old_constraint_to_new(i, con)
+    else:
+        for i, con in enumerate(list(constraints)):
+            if isinstance(con, new_constraint_types):
+                old_constraints = new_constraint_to_old(con, x0)
+                constraints[i] = old_constraints[0]
+                constraints.extend(old_constraints[1:])  # appends 1 if present
+
+    return constraints
+
+def initial_constraints_as_canonical(n, prepared_constraints, sparse_jacobian):
+    c_eq = []
+    c_ineq = []
+    J_eq = []
+    J_ineq = []
+
+    for c in prepared_constraints:
+        f = c.fun.f
+        J = c.fun.J
+        lb, ub = c.bounds
+        if np.all(lb == ub):
+            c_eq.append(f - lb)
+            J_eq.append(J)
+        elif np.all(lb == -np.inf):
+            finite_ub = ub < np.inf
+            c_ineq.append(f[finite_ub] - ub[finite_ub])
+            J_ineq.append(J[finite_ub])
+        elif np.all(ub == np.inf):
+            finite_lb = lb > -np.inf
+            c_ineq.append(lb[finite_lb] - f[finite_lb])
+            J_ineq.append(-J[finite_lb])
+        else:
+            lb_inf = lb == -np.inf
+            ub_inf = ub == np.inf
+            equal = lb == ub
+            less = lb_inf & ~ub_inf
+            greater = ub_inf & ~lb_inf
+            interval = ~equal & ~lb_inf & ~ub_inf
+
+            c_eq.append(f[equal] - lb[equal])
+            c_ineq.append(f[less] - ub[less])
+            c_ineq.append(lb[greater] - f[greater])
+            c_ineq.append(f[interval] - ub[interval])
+            c_ineq.append(lb[interval] - f[interval])
+
+            J_eq.append(J[equal])
+            J_ineq.append(J[less])
+            J_ineq.append(-J[greater])
+            J_ineq.append(J[interval])
+            J_ineq.append(-J[interval])
+
+    c_eq = np.hstack(c_eq) if c_eq else np.empty(0)
+    c_ineq = np.hstack(c_ineq) if c_ineq else np.empty(0)
+
+    if sparse_jacobian:
+        vstack = sps.vstack
+        empty = sps.csr_matrix((0, n))
+    else:
+        vstack = np.vstack
+        empty = np.empty((0, n))
+
+    J_eq = vstack(J_eq) if J_eq else empty
+    J_ineq = vstack(J_ineq) if J_ineq else empty
+
+    return c_eq, c_ineq, J_eq, J_ineq
+
 def modified_dogleg(A, Y, b, trust_radius, lb, ub):
 
     newton_point = -Y.dot(b)
@@ -1440,9 +1578,145 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
         info['allvecs'] = allvecs
     return x, info
 
-def reinforce_box_boundaries(x, lb, ub):
-    """Return clipped value of x"""
-    return np.minimum(np.maximum(x, lb), ub)
+def _minimize_trustregion_constr(fun, x0, args, grad,
+                                 hess, hessp, bounds, constraints,
+                                 xtol=1e-8, gtol=1e-8,
+                                 barrier_tol=1e-8,
+                                 sparse_jacobian=None,
+                                 callback=None, maxiter=1000,
+                                 verbose=0, finite_diff_rel_step=None,
+                                 initial_constr_penalty=1.0, initial_tr_radius=1.0,
+                                 initial_barrier_parameter=0.1,
+                                 initial_barrier_tolerance=0.1,
+                                 factorization_method=None,
+                                 disp=False):
+
+    x0 = np.atleast_1d(x0).astype(float)
+    n_vars = np.size(x0)
+    if hess is None:
+        if callable(hessp):
+            hess = HessianLinearOperator(hessp, n_vars)
+        else:
+            hess = BFGS()
+    if disp and verbose == 0:
+        verbose = 1
+
+    if bounds is not None:        
+        finite_diff_bounds = strict_bounds(bounds.lb, bounds.ub,
+                                           bounds.keep_feasible, n_vars)
+        print ('n_vars',n_vars)
+        print ('finite_diff_bounds',finite_diff_bounds)
+    else:
+        finite_diff_bounds = (-np.inf, np.inf)
+
+    # Define Objective Function
+    print ('args',args)
+    print ('grad',grad)
+    print ('hess',hess)  
+    print ('finite_diff_rel_step',finite_diff_rel_step)
+    print ('finite_diff_bounds',finite_diff_bounds)
+    print ('fun',fun)
+    objective = ScalarFunction(fun, x0, args, grad, hess,
+                               finite_diff_rel_step, finite_diff_bounds)
+
+    # Put constraints in list format when needed
+    if isinstance(constraints, (NonlinearConstraint, LinearConstraint)):
+        constraints = [constraints]
+
+    # Prepare constraints.
+    prepared_constraints = [
+        PreparedConstraint(c, x0, sparse_jacobian, finite_diff_bounds)
+        for c in constraints]
+
+    n_sparse = sum(c.fun.sparse_jacobian for c in prepared_constraints)
+    if 0 < n_sparse < len(prepared_constraints):
+        raise ValueError("All constraints must have the same kind of the "
+                         "Jacobian --- either all sparse or all dense. "
+                         "You can set the sparsity globally by setting "
+                         "`sparse_jacobian` to either True of False.")
+    if prepared_constraints:
+        sparse_jacobian = n_sparse > 0
+
+    if bounds is not None:
+        if sparse_jacobian is None:
+            sparse_jacobian = True
+        prepared_constraints.append(PreparedConstraint(bounds, x0,
+                                                       sparse_jacobian))
+
+    c_eq0, c_ineq0, J_eq0, J_ineq0 = initial_constraints_as_canonical(
+        n_vars, prepared_constraints, sparse_jacobian)
+
+    canonical_all = [CanonicalConstraint.from_PreparedConstraint(c)
+                     for c in prepared_constraints]
+
+    if len(canonical_all) == 0:
+        canonical = CanonicalConstraint.empty(n_vars)
+    elif len(canonical_all) == 1:
+        canonical = canonical_all[0]
+    else:
+        canonical = CanonicalConstraint.concatenate(canonical_all,
+                                                    sparse_jacobian)
+
+    lagrangian_hess = LagrangianHessian(n_vars, objective.hess, canonical.hess)
+
+    method = 'tr_interior_point'
+
+    print ('method in minimize_trustregion_constr',method)
+
+    state = OptimizeResult(
+        nit=0, nfev=0, njev=0, nhev=0,
+        cg_niter=0, cg_stop_cond=0,
+        fun=objective.f, grad=objective.g,
+        lagrangian_grad=np.copy(objective.g),
+        constr=[c.fun.f for c in prepared_constraints],
+        jac=[c.fun.J for c in prepared_constraints],
+        constr_nfev=[0 for c in prepared_constraints],
+        constr_njev=[0 for c in prepared_constraints],
+        constr_nhev=[0 for c in prepared_constraints],
+        v=[c.fun.v for c in prepared_constraints],
+        method=method)
+
+    start_time = time.time()
+    
+    def stop_criteria(state, x, last_iteration_failed, tr_radius,
+                      constr_penalty, cg_info, barrier_parameter,
+                      barrier_tolerance):
+        state = update_state_ip(state, x, last_iteration_failed,
+                                objective, prepared_constraints,
+                                start_time, tr_radius, constr_penalty,
+                                cg_info, barrier_parameter, barrier_tolerance)
+        state.status = None
+        state.niter = state.nit  # Alias for callback (backward-compatibility)
+        if callback is not None and callback(np.copy(state.x), state):
+            state.status = 3
+        elif state.optimality < gtol and state.constr_violation < gtol:
+            state.status = 1
+        elif (state.tr_radius < xtol
+              and state.barrier_parameter < barrier_tol):
+            state.status = 2
+        elif state.nit > maxiter:
+            state.status = 0
+        return state.status in (0, 1, 2, 3)
+
+    print ('min TR constr elif tr_interior_point')
+    _, result = tr_interior_point(
+        objective.fun, objective.grad, lagrangian_hess,
+        n_vars, canonical.n_ineq, canonical.n_eq,
+        canonical.fun, canonical.jac,
+        x0, objective.f, objective.g,
+        c_ineq0, J_ineq0, c_eq0, J_eq0,
+        stop_criteria,
+        canonical.keep_feasible,
+        xtol, state, initial_barrier_parameter,
+        initial_barrier_tolerance,
+        initial_constr_penalty, initial_tr_radius,
+        factorization_method)
+
+    result.success = True if result.status in (1, 2) else False
+    result.message = TERMINATION_MESSAGES[result.status]
+    result.niter = result.nit
+
+    return result
 
 
 def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
@@ -1644,201 +1918,6 @@ def tr_interior_point(fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
     return x, state
 
 
-def update_state_sqp(state, x, last_iteration_failed, objective, prepared_constraints,
-                     start_time, tr_radius, constr_penalty, cg_info):
-    state.nit += 1
-    state.nfev = objective.nfev
-    state.njev = objective.ngev
-    state.nhev = objective.nhev
-    state.constr_nfev = [c.fun.nfev if isinstance(c.fun, VectorFunction) else 0
-                         for c in prepared_constraints]
-    state.constr_njev = [c.fun.njev if isinstance(c.fun, VectorFunction) else 0
-                         for c in prepared_constraints]
-    state.constr_nhev = [c.fun.nhev if isinstance(c.fun, VectorFunction) else 0
-                         for c in prepared_constraints]
-
-    if not last_iteration_failed:
-        state.x = x
-        state.fun = objective.f
-        state.grad = objective.g
-        state.v = [c.fun.v for c in prepared_constraints]
-        state.constr = [c.fun.f for c in prepared_constraints]
-        state.jac = [c.fun.J for c in prepared_constraints]
-
-        state.lagrangian_grad = np.copy(state.grad)
-        for c in prepared_constraints:
-            state.lagrangian_grad += c.fun.J.T.dot(c.fun.v)
-        state.optimality = np.linalg.norm(state.lagrangian_grad, np.inf)
-
-        state.constr_violation = 0
-        for i in range(len(prepared_constraints)):
-            lb, ub = prepared_constraints[i].bounds
-            c = state.constr[i]
-            state.constr_violation = np.max([state.constr_violation,
-                                             np.max(lb - c),
-                                             np.max(c - ub)])
-
-    state.execution_time = time.time() - start_time
-    state.tr_radius = tr_radius
-    state.constr_penalty = constr_penalty
-    state.cg_niter += cg_info["niter"]
-    state.cg_stop_cond = cg_info["stop_cond"]
-
-    return state
-
-def update_state_ip(state, x, last_iteration_failed, objective,
-                    prepared_constraints, start_time,
-                    tr_radius, constr_penalty, cg_info,
-                    barrier_parameter, barrier_tolerance):
-    state = update_state_sqp(state, x, last_iteration_failed, objective,
-                             prepared_constraints, start_time, tr_radius,
-                             constr_penalty, cg_info)
-    state.barrier_parameter = barrier_parameter
-    state.barrier_tolerance = barrier_tolerance
-    return state
-
-
-def _minimize_trustregion_constr(fun, x0, args, grad,
-                                 hess, hessp, bounds, constraints,
-                                 xtol=1e-8, gtol=1e-8,
-                                 barrier_tol=1e-8,
-                                 sparse_jacobian=None,
-                                 callback=None, maxiter=1000,
-                                 verbose=0, finite_diff_rel_step=None,
-                                 initial_constr_penalty=1.0, initial_tr_radius=1.0,
-                                 initial_barrier_parameter=0.1,
-                                 initial_barrier_tolerance=0.1,
-                                 factorization_method=None,
-                                 disp=False):
-
-    x0 = np.atleast_1d(x0).astype(float)
-    n_vars = np.size(x0)
-    if hess is None:
-        if callable(hessp):
-            hess = HessianLinearOperator(hessp, n_vars)
-        else:
-            hess = BFGS()
-    if disp and verbose == 0:
-        verbose = 1
-
-    if bounds is not None:        
-        finite_diff_bounds = strict_bounds(bounds.lb, bounds.ub,
-                                           bounds.keep_feasible, n_vars)
-        print ('n_vars',n_vars)
-        print ('finite_diff_bounds',finite_diff_bounds)
-    else:
-        finite_diff_bounds = (-np.inf, np.inf)
-
-    # Define Objective Function
-    print ('args',args)
-    print ('grad',grad)
-    print ('hess',hess)  
-    print ('finite_diff_rel_step',finite_diff_rel_step)
-    print ('finite_diff_bounds',finite_diff_bounds)
-    print ('fun',fun)
-    objective = ScalarFunction(fun, x0, args, grad, hess,
-                               finite_diff_rel_step, finite_diff_bounds)
-
-    # Put constraints in list format when needed
-    if isinstance(constraints, (NonlinearConstraint, LinearConstraint)):
-        constraints = [constraints]
-
-    # Prepare constraints.
-    prepared_constraints = [
-        PreparedConstraint(c, x0, sparse_jacobian, finite_diff_bounds)
-        for c in constraints]
-
-    n_sparse = sum(c.fun.sparse_jacobian for c in prepared_constraints)
-    if 0 < n_sparse < len(prepared_constraints):
-        raise ValueError("All constraints must have the same kind of the "
-                         "Jacobian --- either all sparse or all dense. "
-                         "You can set the sparsity globally by setting "
-                         "`sparse_jacobian` to either True of False.")
-    if prepared_constraints:
-        sparse_jacobian = n_sparse > 0
-
-    if bounds is not None:
-        if sparse_jacobian is None:
-            sparse_jacobian = True
-        prepared_constraints.append(PreparedConstraint(bounds, x0,
-                                                       sparse_jacobian))
-
-    c_eq0, c_ineq0, J_eq0, J_ineq0 = initial_constraints_as_canonical(
-        n_vars, prepared_constraints, sparse_jacobian)
-
-    canonical_all = [CanonicalConstraint.from_PreparedConstraint(c)
-                     for c in prepared_constraints]
-
-    if len(canonical_all) == 0:
-        canonical = CanonicalConstraint.empty(n_vars)
-    elif len(canonical_all) == 1:
-        canonical = canonical_all[0]
-    else:
-        canonical = CanonicalConstraint.concatenate(canonical_all,
-                                                    sparse_jacobian)
-
-    lagrangian_hess = LagrangianHessian(n_vars, objective.hess, canonical.hess)
-
-    method = 'tr_interior_point'
-
-    print ('method in minimize_trustregion_constr',method)
-
-    state = OptimizeResult(
-        nit=0, nfev=0, njev=0, nhev=0,
-        cg_niter=0, cg_stop_cond=0,
-        fun=objective.f, grad=objective.g,
-        lagrangian_grad=np.copy(objective.g),
-        constr=[c.fun.f for c in prepared_constraints],
-        jac=[c.fun.J for c in prepared_constraints],
-        constr_nfev=[0 for c in prepared_constraints],
-        constr_njev=[0 for c in prepared_constraints],
-        constr_nhev=[0 for c in prepared_constraints],
-        v=[c.fun.v for c in prepared_constraints],
-        method=method)
-
-    start_time = time.time()
-    
-    def stop_criteria(state, x, last_iteration_failed, tr_radius,
-                      constr_penalty, cg_info, barrier_parameter,
-                      barrier_tolerance):
-        state = update_state_ip(state, x, last_iteration_failed,
-                                objective, prepared_constraints,
-                                start_time, tr_radius, constr_penalty,
-                                cg_info, barrier_parameter, barrier_tolerance)
-        state.status = None
-        state.niter = state.nit  # Alias for callback (backward-compatibility)
-        if callback is not None and callback(np.copy(state.x), state):
-            state.status = 3
-        elif state.optimality < gtol and state.constr_violation < gtol:
-            state.status = 1
-        elif (state.tr_radius < xtol
-              and state.barrier_parameter < barrier_tol):
-            state.status = 2
-        elif state.nit > maxiter:
-            state.status = 0
-        return state.status in (0, 1, 2, 3)
-
-    print ('min TR constr elif tr_interior_point')
-    _, result = tr_interior_point(
-        objective.fun, objective.grad, lagrangian_hess,
-        n_vars, canonical.n_ineq, canonical.n_eq,
-        canonical.fun, canonical.jac,
-        x0, objective.f, objective.g,
-        c_ineq0, J_ineq0, c_eq0, J_eq0,
-        stop_criteria,
-        canonical.keep_feasible,
-        xtol, state, initial_barrier_parameter,
-        initial_barrier_tolerance,
-        initial_constr_penalty, initial_tr_radius,
-        factorization_method)
-
-    result.success = True if result.status in (1, 2) else False
-    result.message = TERMINATION_MESSAGES[result.status]
-    result.niter = result.nit
-
-    return result
-
-
 def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
              hessp=None, bounds=None, constraints=(), tol=None,
              callback=None, options=None):
@@ -1862,85 +1941,7 @@ def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
                                         bounds, constraints,
                                         callback=callback, **options)
 
-def standardize_constraints(constraints, x0, meth):
-    """Converts constraints to the form required by the solver."""
-    all_constraint_types = (NonlinearConstraint, LinearConstraint, dict)
-    new_constraint_types = all_constraint_types[:-1]
-    if isinstance(constraints, all_constraint_types):
-        constraints = [constraints]
-    constraints = list(constraints)  
 
-    if meth == 'trust-constr':
-        for i, con in enumerate(constraints):
-            if not isinstance(con, new_constraint_types):
-                constraints[i] = old_constraint_to_new(i, con)
-    else:
-        for i, con in enumerate(list(constraints)):
-            if isinstance(con, new_constraint_types):
-                old_constraints = new_constraint_to_old(con, x0)
-                constraints[i] = old_constraints[0]
-                constraints.extend(old_constraints[1:])  # appends 1 if present
-
-    return constraints
-
-def initial_constraints_as_canonical(n, prepared_constraints, sparse_jacobian):
-    c_eq = []
-    c_ineq = []
-    J_eq = []
-    J_ineq = []
-
-    for c in prepared_constraints:
-        f = c.fun.f
-        J = c.fun.J
-        lb, ub = c.bounds
-        if np.all(lb == ub):
-            c_eq.append(f - lb)
-            J_eq.append(J)
-        elif np.all(lb == -np.inf):
-            finite_ub = ub < np.inf
-            c_ineq.append(f[finite_ub] - ub[finite_ub])
-            J_ineq.append(J[finite_ub])
-        elif np.all(ub == np.inf):
-            finite_lb = lb > -np.inf
-            c_ineq.append(lb[finite_lb] - f[finite_lb])
-            J_ineq.append(-J[finite_lb])
-        else:
-            lb_inf = lb == -np.inf
-            ub_inf = ub == np.inf
-            equal = lb == ub
-            less = lb_inf & ~ub_inf
-            greater = ub_inf & ~lb_inf
-            interval = ~equal & ~lb_inf & ~ub_inf
-
-            c_eq.append(f[equal] - lb[equal])
-            c_ineq.append(f[less] - ub[less])
-            c_ineq.append(lb[greater] - f[greater])
-            c_ineq.append(f[interval] - ub[interval])
-            c_ineq.append(lb[interval] - f[interval])
-
-            J_eq.append(J[equal])
-            J_ineq.append(J[less])
-            J_ineq.append(-J[greater])
-            J_ineq.append(J[interval])
-            J_ineq.append(-J[interval])
-
-    c_eq = np.hstack(c_eq) if c_eq else np.empty(0)
-    c_ineq = np.hstack(c_ineq) if c_ineq else np.empty(0)
-
-    if sparse_jacobian:
-        vstack = sps.vstack
-        empty = sps.csr_matrix((0, n))
-    else:
-        vstack = np.vstack
-        empty = np.empty((0, n))
-
-    J_eq = vstack(J_eq) if J_eq else empty
-    J_ineq = vstack(J_ineq) if J_ineq else empty
-
-    return c_eq, c_ineq, J_eq, J_ineq
-
-
-        
 def rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
