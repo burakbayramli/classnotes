@@ -337,15 +337,6 @@ class PreparedConstraint(object):
         self.bounds = (lb, ub)
         self.keep_feasible = keep_feasible
 
-    def violation(self, x):
-        with suppress_warnings() as sup:
-            sup.filter(UserWarning)
-            ev = self.fun.fun(np.asarray(x))
-
-        excess_lb = np.maximum(self.bounds[0] - ev, 0)
-        excess_ub = np.maximum(ev - self.bounds[1], 0)
-
-        return excess_lb + excess_ub
 
 FD_METHODS = ('2-point', '3-point', 'cs')
 
