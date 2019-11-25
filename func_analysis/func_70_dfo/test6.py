@@ -10,6 +10,7 @@ import scipy.linalg as slin
 import scipy.sparse as sps
 import scipy.sparse.linalg
 from numpy.linalg import norm
+from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from scipy.optimize._numdiff import approx_derivative
 from scipy.optimize import (HessianUpdateStrategy, SR1,
@@ -1801,8 +1802,6 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
         dt, cg_info = projected_cg(H, c_t, Z, Y, b_t,
                                    trust_radius_t,
                                    lb_t, ub_t)
-
-        print ('here------------------')
 
         # Compute update (normal + tangential steps).
         d = dn + dt
