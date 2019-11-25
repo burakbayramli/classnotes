@@ -168,8 +168,6 @@ class CanonicalConstraint(object):
 
         return cls(0, 0, fun, jac, hess, np.empty(0, dtype=np.bool))
 
-
-
     @classmethod
     def _interval_to_canonical(cls, cfun, lb, ub, keep_feasible):
         lb_inf = lb == -np.inf
@@ -312,12 +310,7 @@ class PreparedConstraint(object):
 
     def __init__(self, constraint, x0, sparse_jacobian=None,
                  finite_diff_bounds=(-np.inf, np.inf)):
-        if isinstance(constraint, LinearConstraint):
-            fun = LinearVectorFunction(constraint.A, x0, sparse_jacobian)
-        elif isinstance(constraint, Bounds):
-            fun = IdentityVectorFunction(x0, sparse_jacobian)
-        else:
-            raise ValueError("`constraint` of an unknown type is passed.")
+        fun = IdentityVectorFunction(x0, sparse_jacobian)
 
         m = fun.m
         lb = np.asarray(constraint.lb, dtype=float)
