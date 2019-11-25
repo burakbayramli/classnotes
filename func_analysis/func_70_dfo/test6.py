@@ -29,100 +29,25 @@ TERMINATION_MESSAGES = {
 
 
 class HessianUpdateStrategy(object):
-    """Interface for implementing Hessian update strategies.
-
-    Many optimization methods make use of Hessian (or inverse Hessian)
-    approximations, such as the quasi-Newton methods BFGS, SR1, L-BFGS.
-    Some of these  approximations, however, do not actually need to store
-    the entire matrix or can compute the internal matrix product with a
-    given vector in a very efficiently manner. This class serves as an
-    abstract interface between the optimization algorithm and the
-    quasi-Newton update strategies, giving freedom of implementation
-    to store and update the internal matrix as efficiently as possible.
-    Different choices of initialization and update procedure will result
-    in different quasi-Newton strategies.
-
-    Four methods should be implemented in derived classes: ``initialize``,
-    ``update``, ``dot`` and ``get_matrix``.
-
-    Notes
-    -----
-    Any instance of a class that implements this interface,
-    can be accepted by the method ``minimize`` and used by
-    the compatible solvers to approximate the Hessian (or
-    inverse Hessian) used by the optimization algorithms.
-    """
 
     def initialize(self, n, approx_type):
-        """Initialize internal matrix.
-
-        Allocate internal memory for storing and updating
-        the Hessian or its inverse.
-
-        Parameters
-        ----------
-        n : int
-            Problem dimension.
-        approx_type : {'hess', 'inv_hess'}
-            Selects either the Hessian or the inverse Hessian.
-            When set to 'hess' the Hessian will be stored and updated.
-            When set to 'inv_hess' its inverse will be used instead.
-        """
         raise NotImplementedError("The method ``initialize(n, approx_type)``"
                                   " is not implemented.")
 
     def update(self, delta_x, delta_grad):
-        """Update internal matrix.
-
-        Update Hessian matrix or its inverse (depending on how 'approx_type'
-        is defined) using information about the last evaluated points.
-
-        Parameters
-        ----------
-        delta_x : ndarray
-            The difference between two points the gradient
-            function have been evaluated at: ``delta_x = x2 - x1``.
-        delta_grad : ndarray
-            The difference between the gradients:
-            ``delta_grad = grad(x2) - grad(x1)``.
-        """
         raise NotImplementedError("The method ``update(delta_x, delta_grad)``"
                                   " is not implemented.")
 
     def dot(self, p):
-        """Compute the product of the internal matrix with the given vector.
-
-        Parameters
-        ----------
-        p : array_like
-            1-d array representing a vector.
-
-        Returns
-        -------
-        Hp : array
-            1-d  represents the result of multiplying the approximation matrix
-            by vector p.
-        """
         raise NotImplementedError("The method ``dot(p)``"
                                   " is not implemented.")
 
     def get_matrix(self):
-        """Return current internal matrix.
-
-        Returns
-        -------
-        H : ndarray, shape (n, n)
-            Dense matrix containing either the Hessian
-            or its inverse (depending on how 'approx_type'
-            is defined).
-        """
         raise NotImplementedError("The method ``get_matrix(p)``"
                                   " is not implemented.")
 
 
 class FullHessianUpdateStrategy(HessianUpdateStrategy):
-    """Hessian update strategy with full dimensional internal representation.
-    """
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
     _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
     # Symmetric matrix-vector product
@@ -138,20 +63,6 @@ class FullHessianUpdateStrategy(HessianUpdateStrategy):
         self.H = None
 
     def initialize(self, n, approx_type):
-        """Initialize internal matrix.
-
-        Allocate internal memory for storing and updating
-        the Hessian or its inverse.
-
-        Parameters
-        ----------
-        n : int
-            Problem dimension.
-        approx_type : {'hess', 'inv_hess'}
-            Selects either the Hessian or the inverse Hessian.
-            When set to 'hess' the Hessian will be stored and updated.
-            When set to 'inv_hess' its inverse will be used instead.
-        """
         self.first_iteration = True
         self.n = n
         self.approx_type = approx_type
@@ -182,20 +93,6 @@ class FullHessianUpdateStrategy(HessianUpdateStrategy):
                                   " is not implemented.")
 
     def update(self, delta_x, delta_grad):
-        """Update internal matrix.
-
-        Update Hessian matrix or its inverse (depending on how 'approx_type'
-        is defined) using information about the last evaluated points.
-
-        Parameters
-        ----------
-        delta_x : ndarray
-            The difference between two points the gradient
-            function have been evaluated at: ``delta_x = x2 - x1``.
-        delta_grad : ndarray
-            The difference between the gradients:
-            ``delta_grad = grad(x2) - grad(x1)``.
-        """
         if np.all(delta_x == 0.0):
             return
         if np.all(delta_grad == 0.0):
@@ -220,33 +117,12 @@ class FullHessianUpdateStrategy(HessianUpdateStrategy):
         self._update_implementation(delta_x, delta_grad)
 
     def dot(self, p):
-        """Compute the product of the internal matrix with the given vector.
-
-        Parameters
-        ----------
-        p : array_like
-            1-d array representing a vector.
-
-        Returns
-        -------
-        Hp : array
-            1-d  represents the result of multiplying the approximation matrix
-            by vector p.
-        """
         if self.approx_type == 'hess':
             return self._symv(1, self.B, p)
         else:
             return self._symv(1, self.H, p)
 
     def get_matrix(self):
-        """Return the current internal matrix.
-
-        Returns
-        -------
-        M : ndarray, shape (n, n)
-            Dense matrix containing either the Hessian or its inverse
-            (depending on how `approx_type` was defined).
-        """
         if self.approx_type == 'hess':
             M = np.copy(self.B)
         else:
@@ -256,33 +132,6 @@ class FullHessianUpdateStrategy(HessianUpdateStrategy):
         return M
 
 class SR1(FullHessianUpdateStrategy):
-    """Symmetric-rank-1 Hessian update strategy.
-
-    Parameters
-    ----------
-    min_denominator : float
-        This number, scaled by a normalization factor,
-        defines the minimum denominator magnitude allowed
-        in the update. When the condition is violated we skip
-        the update. By default uses ``1e-8``.
-    init_scale : {float, 'auto'}, optional
-        Matrix scale at first iteration. At the first
-        iteration the Hessian matrix or its inverse will be initialized
-        with ``init_scale*np.eye(n)``, where ``n`` is the problem dimension.
-        Set it to 'auto' in order to use an automatic heuristic for choosing
-        the initial scale. The heuristic is described in [1]_, p.143.
-        By default uses 'auto'.
-
-    Notes
-    -----
-    The update is based on the description in [1]_, p.144-146.
-
-    References
-    ----------
-    .. [1] Nocedal, Jorge, and Stephen J. Wright. "Numerical optimization"
-           Second Edition (2006).
-    """
-
     def __init__(self, min_denominator=1e-8, init_scale='auto'):
         self.min_denominator = min_denominator
         super(SR1, self).__init__(init_scale)
@@ -478,11 +327,6 @@ class CanonicalConstraint(object):
 
     @classmethod
     def empty(cls, n):
-        """Create an "empty" instance.
-
-        This "empty" instance is required to allow working with unconstrained
-        problems as if they have some constraints.
-        """
         empty_fun = np.empty(0)
         empty_jac = np.empty((0, n))
         empty_hess = sps.csr_matrix((n, n))
@@ -500,12 +344,7 @@ class CanonicalConstraint(object):
 
     @classmethod
     def concatenate(cls, canonical_constraints, sparse_jacobian):
-        """Concatenate multiple `CanonicalConstraint` into one.
 
-        `sparse_jacobian` (bool) determines the Jacobian format of the
-        concatenated constraint. Note that items in `canonical_constraints`
-        must have their Jacobians in the same format.
-        """
         def fun(x):
             if canonical_constraints:
                 eq_all, ineq_all = zip(
@@ -736,11 +575,6 @@ class CanonicalConstraint(object):
 
 
 class LagrangianHessian(object):
-    """The Hessian of the Lagrangian as LinearOperator.
-
-    The Lagrangian is computed as the objective function plus all the
-    constraints multiplied with some numbers (Lagrange multipliers).
-    """
     def __init__(self, n, objective_hess, constraints_hess):
         self.n = n
         self.objective_hess = objective_hess
@@ -757,12 +591,6 @@ class LagrangianHessian(object):
 
 
 def initial_constraints_as_canonical(n, prepared_constraints, sparse_jacobian):
-    """Convert initial values of the constraints to the canonical format.
-
-    The purpose to avoid one additional call to the constraints at the initial
-    point. It takes saved values in `PreparedConstraint`, modify and
-    concatenate them to the the canonical constraint format.
-    """
     c_eq = []
     c_ineq = []
     J_eq = []
@@ -1065,12 +893,6 @@ class VectorFunction(object):
 
 
 class LinearVectorFunction(object):
-    """Linear vector function and its derivatives.
-
-    Defines a linear function F = A x, where x is n-dimensional vector and
-    A is m-by-n matrix. The Jacobian is constant and equals to A. The Hessian
-    is identically zero and it is returned as a csr matrix.
-    """
     def __init__(self, A, x0, sparse_jacobian):
         if sparse_jacobian or sparse_jacobian is None and sps.issparse(A):
             self.J = sps.csr_matrix(A)
@@ -1114,12 +936,6 @@ class LinearVectorFunction(object):
 
 
 class IdentityVectorFunction(LinearVectorFunction):
-    """Identity vector function and its derivatives.
-
-    The Jacobian is the identity matrix, returned as a dense array when
-    `sparse_jacobian=False` and as a csr matrix otherwise. The Hessian is
-    identically zero and it is returned as a csr matrix.
-    """
     def __init__(self, x0, sparse_jacobian):
         n = len(x0)
         if sparse_jacobian or sparse_jacobian is None:
@@ -1175,19 +991,6 @@ class PreparedConstraint(object):
         self.keep_feasible = keep_feasible
 
     def violation(self, x):
-        """How much the constraint is exceeded by.
-
-        Parameters
-        ----------
-        x : array-like
-            Vector of independent variables
-
-        Returns
-        -------
-        excess : array-like
-            How much the constraint is exceeded by, for each of the
-            constraints specified by `PreparedConstraint.fun`.
-        """
         with suppress_warnings() as sup:
             sup.filter(UserWarning)
             ev = self.fun.fun(np.asarray(x))
@@ -1379,9 +1182,6 @@ class ScalarFunction(object):
         return self.H
 
 
-#from scipy.optimize._trustregion_constr.minimize_trustregion_constr import _minimize_trustregion_constr
-
-
 def rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
@@ -1390,13 +1190,6 @@ x0 = [-1.0,0]
 opts = {'maxiter': 1000, 'verbose': 2}
 
 class BarrierSubproblem:
-    """
-    Barrier optimization problem:
-        minimize fun(x) - barrier_parameter*sum(log(s))
-        subject to: constr_eq(x)     = 0
-                  constr_ineq(x) + s = 0
-    """
-
     def __init__(self, x0, s0, fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
                  constr, jac, barrier_parameter, tolerance,
                  enforce_feasibility, global_stop_criteria,
