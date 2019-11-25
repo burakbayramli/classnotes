@@ -565,14 +565,9 @@ class ScalarFunction(object):
         self.H_updated = False
 
         finite_diff_options = {}
-        if grad in FD_METHODS:
-            finite_diff_options["method"] = grad
-            finite_diff_options["rel_step"] = finite_diff_rel_step
-            finite_diff_options["bounds"] = finite_diff_bounds
-        if hess in FD_METHODS:
-            finite_diff_options["method"] = hess
-            finite_diff_options["rel_step"] = finite_diff_rel_step
-            finite_diff_options["as_linear_operator"] = True
+        finite_diff_options["method"] = grad
+        finite_diff_options["rel_step"] = finite_diff_rel_step
+        finite_diff_options["bounds"] = finite_diff_bounds
 
         # Function evaluation
         def fun_wrapped(x):
