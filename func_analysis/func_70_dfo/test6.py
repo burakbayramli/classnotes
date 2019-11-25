@@ -1614,9 +1614,6 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
     objective = ScalarFunction(fun, x0, args, grad, hess,
                                finite_diff_rel_step, finite_diff_bounds)
 
-    # Put constraints in list format when needed
-    if isinstance(constraints, (NonlinearConstraint, LinearConstraint)):
-        constraints = [constraints]
 
     # Prepare constraints.
     prepared_constraints = [
