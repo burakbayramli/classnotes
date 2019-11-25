@@ -1412,15 +1412,11 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
     MAX_TRUST_REDUCTION = 0.5
     MIN_TRUST_REDUCTION = 0.1
     SOC_THRESHOLD = 0.1
-    TR_FACTOR = 0.8  # Zeta from formula (3.21), reference [2]_, p.885.
+    TR_FACTOR = 0.8
     BOX_FACTOR = 0.5
-
-    print ('constr0',constr0)
     
     n, = np.shape(x0)  # Number of parameters
 
-    print ('trust_lb',trust_lb)
-    print (trust_ub)
     if trust_lb is None:
         trust_lb = np.full(n, -np.inf)
     if trust_ub is None:
@@ -1539,9 +1535,6 @@ def tr_interior_point(fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
                       initial_penalty,
                       initial_trust_radius,
                       factorization_method):
-    print ('inside tr_interior_point impl')    
-    print ('constr_ineq0',constr_ineq0)
-    print ('constr_eq0',constr_eq0)
     
     BOUNDARY_PARAMETER = 0.995
     BARRIER_DECAY_RATIO = 0.2
