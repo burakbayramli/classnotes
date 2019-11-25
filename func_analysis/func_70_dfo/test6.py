@@ -554,21 +554,6 @@ class ScalarFunction(object):
 
     def __init__(self, fun, x0, args, grad, hess, finite_diff_rel_step,
                  finite_diff_bounds):
-        if not callable(grad) and grad not in FD_METHODS:
-            raise ValueError("`grad` must be either callable or one of {}."
-                             .format(FD_METHODS))
-
-        if not (callable(hess) or hess in FD_METHODS
-                or isinstance(hess, HessianUpdateStrategy)):
-            raise ValueError("`hess` must be either callable,"
-                             "HessianUpdateStrategy or one of {}."
-                             .format(FD_METHODS))
-
-        if grad in FD_METHODS and hess in FD_METHODS:
-            raise ValueError("Whenever the gradient is estimated via "
-                             "finite-differences, we require the Hessian "
-                             "to be estimated using one of the "
-                             "quasi-Newton strategies.")
 
         self.x = np.atleast_1d(x0).astype(float)
         self.n = self.x.size
@@ -889,11 +874,8 @@ def box_sphere_intersections(z, d, lb, ub, trust_radius,
                              entire_line=False,
                              extra_info=False):
 
-    ta_b, tb_b, intersect_b = box_intersections(z, d, lb, ub,
-                                                entire_line)
-    ta_s, tb_s, intersect_s = sphere_intersections(z, d,
-                                                   trust_radius,
-                                                   entire_line)
+    ta_b, tb_b, intersect_b = box_intersections(z, d, lb, ub, entire_line)
+    ta_s, tb_s, intersect_s = sphere_intersections(z, d, trust_radius, entire_line)
     ta = np.maximum(ta_b, ta_s)
     tb = np.minimum(tb_b, tb_s)
     if intersect_b and intersect_s and ta <= tb:
@@ -911,7 +893,6 @@ def box_sphere_intersections(z, d, lb, ub, trust_radius,
 def box_intersections(z, d, lb, ub,
                       entire_line=False):
 
-    # Make sure it is a numpy array
     z = np.asarray(z)
     d = np.asarray(d)
     lb = np.asarray(lb)
@@ -951,8 +932,7 @@ def box_intersections(z, d, lb, ub,
 
     return ta, tb, intersect
 
-def sphere_intersections(z, d, trust_radius,
-                         entire_line=False):
+def sphere_intersections(z, d, trust_radius, entire_line=False):
 
     if norm(d) == 0:
         return 0, 0, False
@@ -1027,9 +1007,7 @@ def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
     except RuntimeError:
         warn("Singular Jacobian matrix. Using dense SVD decomposition to "
              "perform the factorizations.")
-        return svd_factorization_projections(A.toarray(),
-                                             m, n, orth_tol,
-                                             max_refin, tol)
+        return svd_factorization_projections(A.toarray(), m, n, orth_tol, max_refin, tol)
 
     def null_space(x):
         v = np.hstack([x, np.zeros(m)])
