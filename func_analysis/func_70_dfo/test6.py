@@ -1578,146 +1578,6 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
         info['allvecs'] = allvecs
     return x, info
 
-def _minimize_trustregion_constr(fun, x0, args, grad,
-                                 hess, hessp, bounds, constraints,
-                                 xtol=1e-8, gtol=1e-8,
-                                 barrier_tol=1e-8,
-                                 sparse_jacobian=None,
-                                 callback=None, maxiter=1000,
-                                 verbose=0, finite_diff_rel_step=None,
-                                 initial_constr_penalty=1.0, initial_tr_radius=1.0,
-                                 initial_barrier_parameter=0.1,
-                                 initial_barrier_tolerance=0.1,
-                                 factorization_method=None,
-                                 disp=False):
-
-    x0 = np.atleast_1d(x0).astype(float)
-    n_vars = np.size(x0)
-    if hess is None:
-        if callable(hessp):
-            hess = HessianLinearOperator(hessp, n_vars)
-        else:
-            hess = BFGS()
-    if disp and verbose == 0:
-        verbose = 1
-
-    if bounds is not None:        
-        finite_diff_bounds = strict_bounds(bounds.lb, bounds.ub,
-                                           bounds.keep_feasible, n_vars)
-        print ('n_vars',n_vars)
-        print ('finite_diff_bounds',finite_diff_bounds)
-    else:
-        finite_diff_bounds = (-np.inf, np.inf)
-
-    # Define Objective Function
-    print ('args',args)
-    print ('grad',grad)
-    print ('hess',hess)  
-    print ('finite_diff_rel_step',finite_diff_rel_step)
-    print ('finite_diff_bounds',finite_diff_bounds)
-    print ('fun',fun)
-    objective = ScalarFunction(fun, x0, args, grad, hess,
-                               finite_diff_rel_step, finite_diff_bounds)
-
-    # Put constraints in list format when needed
-    if isinstance(constraints, (NonlinearConstraint, LinearConstraint)):
-        constraints = [constraints]
-
-    # Prepare constraints.
-    prepared_constraints = [
-        PreparedConstraint(c, x0, sparse_jacobian, finite_diff_bounds)
-        for c in constraints]
-
-    n_sparse = sum(c.fun.sparse_jacobian for c in prepared_constraints)
-    if 0 < n_sparse < len(prepared_constraints):
-        raise ValueError("All constraints must have the same kind of the "
-                         "Jacobian --- either all sparse or all dense. "
-                         "You can set the sparsity globally by setting "
-                         "`sparse_jacobian` to either True of False.")
-    if prepared_constraints:
-        sparse_jacobian = n_sparse > 0
-
-    if bounds is not None:
-        if sparse_jacobian is None:
-            sparse_jacobian = True
-        prepared_constraints.append(PreparedConstraint(bounds, x0,
-                                                       sparse_jacobian))
-
-    c_eq0, c_ineq0, J_eq0, J_ineq0 = initial_constraints_as_canonical(
-        n_vars, prepared_constraints, sparse_jacobian)
-
-    canonical_all = [CanonicalConstraint.from_PreparedConstraint(c)
-                     for c in prepared_constraints]
-
-    if len(canonical_all) == 0:
-        canonical = CanonicalConstraint.empty(n_vars)
-    elif len(canonical_all) == 1:
-        canonical = canonical_all[0]
-    else:
-        canonical = CanonicalConstraint.concatenate(canonical_all,
-                                                    sparse_jacobian)
-
-    lagrangian_hess = LagrangianHessian(n_vars, objective.hess, canonical.hess)
-
-    method = 'tr_interior_point'
-
-    print ('method in minimize_trustregion_constr',method)
-
-    state = OptimizeResult(
-        nit=0, nfev=0, njev=0, nhev=0,
-        cg_niter=0, cg_stop_cond=0,
-        fun=objective.f, grad=objective.g,
-        lagrangian_grad=np.copy(objective.g),
-        constr=[c.fun.f for c in prepared_constraints],
-        jac=[c.fun.J for c in prepared_constraints],
-        constr_nfev=[0 for c in prepared_constraints],
-        constr_njev=[0 for c in prepared_constraints],
-        constr_nhev=[0 for c in prepared_constraints],
-        v=[c.fun.v for c in prepared_constraints],
-        method=method)
-
-    start_time = time.time()
-    
-    def stop_criteria(state, x, last_iteration_failed, tr_radius,
-                      constr_penalty, cg_info, barrier_parameter,
-                      barrier_tolerance):
-        state = update_state_ip(state, x, last_iteration_failed,
-                                objective, prepared_constraints,
-                                start_time, tr_radius, constr_penalty,
-                                cg_info, barrier_parameter, barrier_tolerance)
-        state.status = None
-        state.niter = state.nit  # Alias for callback (backward-compatibility)
-        if callback is not None and callback(np.copy(state.x), state):
-            state.status = 3
-        elif state.optimality < gtol and state.constr_violation < gtol:
-            state.status = 1
-        elif (state.tr_radius < xtol
-              and state.barrier_parameter < barrier_tol):
-            state.status = 2
-        elif state.nit > maxiter:
-            state.status = 0
-        return state.status in (0, 1, 2, 3)
-
-    print ('min TR constr elif tr_interior_point')
-    _, result = tr_interior_point(
-        objective.fun, objective.grad, lagrangian_hess,
-        n_vars, canonical.n_ineq, canonical.n_eq,
-        canonical.fun, canonical.jac,
-        x0, objective.f, objective.g,
-        c_ineq0, J_ineq0, c_eq0, J_eq0,
-        stop_criteria,
-        canonical.keep_feasible,
-        xtol, state, initial_barrier_parameter,
-        initial_barrier_tolerance,
-        initial_constr_penalty, initial_tr_radius,
-        factorization_method)
-
-    result.success = True if result.status in (1, 2) else False
-    result.message = TERMINATION_MESSAGES[result.status]
-    result.niter = result.nit
-
-    return result
-
 
 def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                              x0, fun0, grad0, constr0,
@@ -1917,6 +1777,145 @@ def tr_interior_point(fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
     x = subprob.get_variables(z)
     return x, state
 
+def _minimize_trustregion_constr(fun, x0, args, grad,
+                                 hess, hessp, bounds, constraints,
+                                 xtol=1e-8, gtol=1e-8,
+                                 barrier_tol=1e-8,
+                                 sparse_jacobian=None,
+                                 callback=None, maxiter=1000,
+                                 verbose=0, finite_diff_rel_step=None,
+                                 initial_constr_penalty=1.0, initial_tr_radius=1.0,
+                                 initial_barrier_parameter=0.1,
+                                 initial_barrier_tolerance=0.1,
+                                 factorization_method=None,
+                                 disp=False):
+
+    x0 = np.atleast_1d(x0).astype(float)
+    n_vars = np.size(x0)
+    if hess is None:
+        if callable(hessp):
+            hess = HessianLinearOperator(hessp, n_vars)
+        else:
+            hess = BFGS()
+    if disp and verbose == 0:
+        verbose = 1
+
+    if bounds is not None:        
+        finite_diff_bounds = strict_bounds(bounds.lb, bounds.ub,
+                                           bounds.keep_feasible, n_vars)
+        print ('n_vars',n_vars)
+        print ('finite_diff_bounds',finite_diff_bounds)
+    else:
+        finite_diff_bounds = (-np.inf, np.inf)
+
+    # Define Objective Function
+    print ('args',args)
+    print ('grad',grad)
+    print ('hess',hess)  
+    print ('finite_diff_rel_step',finite_diff_rel_step)
+    print ('finite_diff_bounds',finite_diff_bounds)
+    print ('fun',fun)
+    objective = ScalarFunction(fun, x0, args, grad, hess,
+                               finite_diff_rel_step, finite_diff_bounds)
+
+    # Put constraints in list format when needed
+    if isinstance(constraints, (NonlinearConstraint, LinearConstraint)):
+        constraints = [constraints]
+
+    # Prepare constraints.
+    prepared_constraints = [
+        PreparedConstraint(c, x0, sparse_jacobian, finite_diff_bounds)
+        for c in constraints]
+
+    n_sparse = sum(c.fun.sparse_jacobian for c in prepared_constraints)
+    if 0 < n_sparse < len(prepared_constraints):
+        raise ValueError("All constraints must have the same kind of the "
+                         "Jacobian --- either all sparse or all dense. "
+                         "You can set the sparsity globally by setting "
+                         "`sparse_jacobian` to either True of False.")
+    if prepared_constraints:
+        sparse_jacobian = n_sparse > 0
+
+    if bounds is not None:
+        if sparse_jacobian is None:
+            sparse_jacobian = True
+        prepared_constraints.append(PreparedConstraint(bounds, x0,
+                                                       sparse_jacobian))
+
+    c_eq0, c_ineq0, J_eq0, J_ineq0 = initial_constraints_as_canonical(
+        n_vars, prepared_constraints, sparse_jacobian)
+
+    canonical_all = [CanonicalConstraint.from_PreparedConstraint(c)
+                     for c in prepared_constraints]
+
+    if len(canonical_all) == 0:
+        canonical = CanonicalConstraint.empty(n_vars)
+    elif len(canonical_all) == 1:
+        canonical = canonical_all[0]
+    else:
+        canonical = CanonicalConstraint.concatenate(canonical_all,
+                                                    sparse_jacobian)
+
+    lagrangian_hess = LagrangianHessian(n_vars, objective.hess, canonical.hess)
+
+    method = 'tr_interior_point'
+
+    print ('method in minimize_trustregion_constr',method)
+
+    state = OptimizeResult(
+        nit=0, nfev=0, njev=0, nhev=0,
+        cg_niter=0, cg_stop_cond=0,
+        fun=objective.f, grad=objective.g,
+        lagrangian_grad=np.copy(objective.g),
+        constr=[c.fun.f for c in prepared_constraints],
+        jac=[c.fun.J for c in prepared_constraints],
+        constr_nfev=[0 for c in prepared_constraints],
+        constr_njev=[0 for c in prepared_constraints],
+        constr_nhev=[0 for c in prepared_constraints],
+        v=[c.fun.v for c in prepared_constraints],
+        method=method)
+
+    start_time = time.time()
+    
+    def stop_criteria(state, x, last_iteration_failed, tr_radius,
+                      constr_penalty, cg_info, barrier_parameter,
+                      barrier_tolerance):
+        state = update_state_ip(state, x, last_iteration_failed,
+                                objective, prepared_constraints,
+                                start_time, tr_radius, constr_penalty,
+                                cg_info, barrier_parameter, barrier_tolerance)
+        state.status = None
+        state.niter = state.nit  # Alias for callback (backward-compatibility)
+        if callback is not None and callback(np.copy(state.x), state):
+            state.status = 3
+        elif state.optimality < gtol and state.constr_violation < gtol:
+            state.status = 1
+        elif (state.tr_radius < xtol
+              and state.barrier_parameter < barrier_tol):
+            state.status = 2
+        elif state.nit > maxiter:
+            state.status = 0
+        return state.status in (0, 1, 2, 3)
+
+    print ('min TR constr elif tr_interior_point')
+    _, result = tr_interior_point(
+        objective.fun, objective.grad, lagrangian_hess,
+        n_vars, canonical.n_ineq, canonical.n_eq,
+        canonical.fun, canonical.jac,
+        x0, objective.f, objective.g,
+        c_ineq0, J_ineq0, c_eq0, J_eq0,
+        stop_criteria,
+        canonical.keep_feasible,
+        xtol, state, initial_barrier_parameter,
+        initial_barrier_tolerance,
+        initial_constr_penalty, initial_tr_radius,
+        factorization_method)
+
+    result.success = True if result.status in (1, 2) else False
+    result.message = TERMINATION_MESSAGES[result.status]
+    result.niter = result.nit
+
+    return result
 
 def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
              hessp=None, bounds=None, constraints=(), tol=None,
