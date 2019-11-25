@@ -50,13 +50,10 @@ class HessianUpdateStrategy(object):
 class FullHessianUpdateStrategy(HessianUpdateStrategy):
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
     _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
-    # Symmetric matrix-vector product
     _symv = get_blas_funcs('symv', dtype='d')
 
     def __init__(self, init_scale='auto'):
         self.init_scale = init_scale
-        # Until initialize is called we can't really use the class,
-        # so it makes sense to set everything to None.
         self.first_iteration = None
         self.approx_type = None
         self.B = None
@@ -75,9 +72,6 @@ class FullHessianUpdateStrategy(HessianUpdateStrategy):
             self.H = np.eye(n, dtype=float)
 
     def _auto_scale(self, delta_x, delta_grad):
-        # Heuristic to scale matrix at first iteration.
-        # Described in Nocedal and Wright "Numerical Optimization"
-        # p.143 formula (6.20).
         s_norm2 = np.dot(delta_x, delta_x)
         y_norm2 = np.dot(delta_grad, delta_grad)
         ys = np.abs(np.dot(delta_grad, delta_x))
@@ -1313,10 +1307,7 @@ class BarrierSubproblem:
         Hx = self.lagrangian_hessian_x(z, v)
         if self.n_ineq > 0:
             S_Hs_S = self.lagrangian_hessian_s(z, v)
-
-        # The scaled Lagragian Hessian is:
-        #     [ Hx    0    ]
-        #     [ 0   S Hs S ]
+            
         def matvec(vec):
             vec_x = self.get_variables(vec)
             vec_s = self.get_slack(vec)
@@ -1395,8 +1386,6 @@ def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
             lu_sol += lu_update
             z = lu_sol[:n]
             k += 1
-
-        # return z = x - A.T inv(A A.T) A x
         return z
 
     def least_squares(x):
@@ -1455,25 +1444,16 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
 
 def modified_dogleg(A, Y, b, trust_radius, lb, ub):
 
-    # Compute minimum norm minimizer of 1/2*|| A x + b ||^2.
     newton_point = -Y.dot(b)
-    # Check for interior point
     if inside_box_boundaries(newton_point, lb, ub)  \
        and norm(newton_point) <= trust_radius:
         x = newton_point
         return x
 
-    # Compute gradient vector ``g = A.T b``
     g = A.T.dot(b)
-    # Compute cauchy point
-    # `cauchy_point = g.T g / (g.T A.T A g)``.
     A_g = A.dot(g)
     cauchy_point = -np.dot(g, g) / np.dot(A_g, A_g) * g
-    # Origin
     origin_point = np.zeros_like(cauchy_point)
-
-    # Check the segment between cauchy_point and newton_point
-    # for a possible solution.
     z = cauchy_point
     p = newton_point - cauchy_point
     _, alpha, intersect = box_sphere_intersections(z, p, lb, ub,
@@ -1481,23 +1461,18 @@ def modified_dogleg(A, Y, b, trust_radius, lb, ub):
     if intersect:
         x1 = z + alpha*p
     else:
-        # Check the segment between the origin and cauchy_point
-        # for a possible solution.
         z = origin_point
         p = cauchy_point
         _, alpha, _ = box_sphere_intersections(z, p, lb, ub,
                                                trust_radius)
         x1 = z + alpha*p
 
-    # Check the segment between origin and newton_point
-    # for a possible solution.
     z = origin_point
     p = newton_point
     _, alpha, _ = box_sphere_intersections(z, p, lb, ub,
                                            trust_radius)
     x2 = z + alpha*p
 
-    # Return the best solution among x1 and x2.
     if norm(A.dot(x1) + b) < norm(A.dot(x2) + b):
         return x1
     else:
@@ -1530,9 +1505,6 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
     tr_distance = trust_radius - norm(x)
     if tr_distance < 0:
         raise ValueError("Trust region problem does not have a solution.")
-    # If x == trust_radius, then x is the solution
-    # to the optimization problem, since x is the
-    # minimum norm solution to Ax=b.
     elif tr_distance < CLOSE_TO_ZERO:
         info = {'niter': 0, 'stop_cond': 2, 'hits_boundary': True}
         if return_all:
@@ -1540,19 +1512,15 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
             info['allvecs'] = allvecs
         return x, info
 
-    # Set default tolerance
     if tol is None:
         tol = max(min(0.01 * np.sqrt(rt_g), 0.1 * rt_g), CLOSE_TO_ZERO)
-    # Set default lower and upper bounds
     if lb is None:
         lb = np.full(n, -np.inf)
     if ub is None:
         ub = np.full(n, np.inf)
-    # Set maximum iterations
     if max_iter is None:
         max_iter = n-m
     max_iter = min(max_iter, n-m)
-    # Set maximum infeasible iterations
     if max_infeasible_iter is None:
         max_infeasible_iter = n-m
 
@@ -1562,89 +1530,66 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
     last_feasible_x = np.zeros_like(x)
     k = 0
     for i in range(max_iter):
-        # Stop criteria - Tolerance : r.T g < tol
         if rt_g < tol:
             stop_cond = 4
             break
         k += 1
-        # Compute curvature
         pt_H_p = H_p.dot(p)
-        # Stop criteria - Negative curvature
         if pt_H_p <= 0:
             if np.isinf(trust_radius):
                 raise ValueError("Negative curvature not allowed "
                                  "for unrestricted problems.")
             else:
-                # Find intersection with constraints
                 _, alpha, intersect = box_sphere_intersections(
                     x, p, lb, ub, trust_radius, entire_line=True)
-                # Update solution
                 if intersect:
                     x = x + alpha*p
-                # Reinforce variables are inside box constraints.
-                # This is only necessary because of roundoff errors.
                 x = reinforce_box_boundaries(x, lb, ub)
-                # Attribute information
                 stop_cond = 3
                 hits_boundary = True
                 break
 
-        # Get next step
         alpha = rt_g / pt_H_p
         x_next = x + alpha*p
 
-        # Stop criteria - Hits boundary
         if np.linalg.norm(x_next) >= trust_radius:
-            # Find intersection with box constraints
             _, theta, intersect = box_sphere_intersections(x, alpha*p, lb, ub,
                                                            trust_radius)
-            # Update solution
             if intersect:
                 x = x + theta*alpha*p
-            # Reinforce variables are inside box constraints.
-            # This is only necessary because of roundoff errors.
             x = reinforce_box_boundaries(x, lb, ub)
-            # Attribute information
             stop_cond = 2
             hits_boundary = True
             break
 
-        # Check if ``x`` is inside the box and start counter if it is not.
         if inside_box_boundaries(x_next, lb, ub):
             counter = 0
         else:
             counter += 1
-        # Whenever outside box constraints keep looking for intersections.
         if counter > 0:
             _, theta, intersect = box_sphere_intersections(x, alpha*p, lb, ub,
                                                            trust_radius)
             if intersect:
                 last_feasible_x = x + theta*alpha*p
-                # Reinforce variables are inside box constraints.
-                # This is only necessary because of roundoff errors.
                 last_feasible_x = reinforce_box_boundaries(last_feasible_x,
                                                            lb, ub)
                 counter = 0
-        # Stop after too many infeasible (regarding box constraints) iteration.
+
         if counter > max_infeasible_iter:
             break
-        # Store ``x_next`` value
+
         if return_all:
             allvecs.append(x_next)
 
-        # Update residual
         r_next = r + alpha*H_p
-        # Project residual g+ = Z r+
         g_next = Z.dot(r_next)
-        # Compute conjugate direction step d
-        rt_g_next = norm(g_next)**2  # g.T g = r.T g (ref [1]_ p.1389)
+        rt_g_next = norm(g_next)**2 
         beta = rt_g_next / rt_g
         p = - g_next + beta*p
-        # Prepare for next iteration
         x = x_next
         g = g_next
         r = g_next
-        rt_g = norm(g)**2  # g.T g = r.T Z g = r.T g (ref [1]_ p.1389)
+        rt_g = norm(g)**2
         H_p = H.dot(p)
 
     if not inside_box_boundaries(x, lb, ub):
@@ -1672,10 +1617,10 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                              trust_ub=None,
                              scaling=default_scaling):
 
-    PENALTY_FACTOR = 0.3  # Rho from formula (3.51), reference [2]_, p.891.
+    PENALTY_FACTOR = 0.3 
     LARGE_REDUCTION_RATIO = 0.9
     INTERMEDIARY_REDUCTION_RATIO = 0.3
-    SUFFICIENT_REDUCTION_RATIO = 1e-8  # Eta from reference [2]_, p.892.
+    SUFFICIENT_REDUCTION_RATIO = 1e-8 
     TRUST_ENLARGEMENT_FACTOR_L = 7.0
     TRUST_ENLARGEMENT_FACTOR_S = 2.0
     MAX_TRUST_REDUCTION = 0.5
@@ -1688,7 +1633,6 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
     
     n, = np.shape(x0)  # Number of parameters
 
-    # Set default lower and upper bounds.
     print ('trust_lb',trust_lb)
     print (trust_ub)
     if trust_lb is None:
@@ -1696,24 +1640,18 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
     if trust_ub is None:
         trust_ub = np.full(n, np.inf)
 
-    # Initial values
     x = np.copy(x0)
     trust_radius = initial_trust_radius
     penalty = initial_penalty
-    # Compute Values
     f = fun0
     c = grad0
     b = constr0
     A = jac0
     S = scaling(x)
-    # Get projections
     Z, LS, Y = projections(A, factorization_method)
-    # Compute least-square lagrange multipliers
     v = -LS.dot(c)
-    # Compute Hessian
     H = lagr_hess(x, v)
 
-    # Update state parameters
     optimality = norm(c + A.T.dot(v), np.inf)
     constr_violation = norm(b, np.inf) if len(b) > 0 else 0
     cg_info = {'niter': 0, 'stop_cond': 0,
@@ -1723,24 +1661,11 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
     while not stop_criteria(state, x, last_iteration_failed,
                             optimality, constr_violation,
                             trust_radius, penalty, cg_info):
-#    for i in range(5):
-        # Normal Step - `dn`
-        # minimize 1/2*||A dn + b||^2
-        # subject to:
-        # ||dn|| <= TR_FACTOR * trust_radius
-        # BOX_FACTOR * lb <= dn <= BOX_FACTOR * ub.
         dn = modified_dogleg(A, Y, b,
                              TR_FACTOR*trust_radius,
                              BOX_FACTOR*trust_lb,
                              BOX_FACTOR*trust_ub)
 
-        # Tangential Step - `dt`
-        # Solve the QP problem:
-        # minimize 1/2 dt.T H dt + dt.T (H dn + c)
-        # subject to:
-        # A dt = 0
-        # ||dt|| <= sqrt(trust_radius**2 - ||dn||**2)
-        # lb - dn <= dt <= ub - dn
         c_t = H.dot(dn) + c
         b_t = np.zeros_like(b)
         trust_radius_t = np.sqrt(trust_radius**2 - np.linalg.norm(dn)**2)
@@ -1750,54 +1675,32 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                                    trust_radius_t,
                                    lb_t, ub_t)
 
-        # Compute update (normal + tangential steps).
         d = dn + dt
-
-        # Compute second order model: 1/2 d H d + c.T d + f.
         quadratic_model = 1/2*(H.dot(d)).dot(d) + c.T.dot(d)
-        # Compute linearized constraint: l = A d + b.
         linearized_constr = A.dot(d)+b
-        # Compute new penalty parameter according to formula (3.52),
-        # reference [2]_, p.891.
         vpred = norm(b) - norm(linearized_constr)
-        # Guarantee `vpred` always positive,
-        # regardless of roundoff errors.
         vpred = max(1e-16, vpred)
         previous_penalty = penalty
         if quadratic_model > 0:
             new_penalty = quadratic_model / ((1-PENALTY_FACTOR)*vpred)
             penalty = max(penalty, new_penalty)
-        # Compute predicted reduction according to formula (3.52),
-        # reference [2]_, p.891.
         predicted_reduction = -quadratic_model + penalty*vpred
 
-        # Compute merit function at current point
         merit_function = f + penalty*norm(b)
-        # Evaluate function and constraints at trial point
         x_next = x + S.dot(d)
         f_next, b_next = fun_and_constr(x_next)
-        # Compute merit function at trial point
         merit_function_next = f_next + penalty*norm(b_next)
-        # Compute actual reduction according to formula (3.54),
-        # reference [2]_, p.892.
         actual_reduction = merit_function - merit_function_next
-        # Compute reduction ratio
         reduction_ratio = actual_reduction / predicted_reduction
 
-        # Second order correction (SOC), reference [2]_, p.892.
         if reduction_ratio < SUFFICIENT_REDUCTION_RATIO and \
            norm(dn) <= SOC_THRESHOLD * norm(dt):
-            # Compute second order correction
             y = -Y.dot(b_next)
-            # Make sure increment is inside box constraints
             _, t, intersect = box_intersections(d, y, trust_lb, trust_ub)
-            # Compute tentative point
             x_soc = x + S.dot(d + t*y)
             f_soc, b_soc = fun_and_constr(x_soc)
-            # Recompute actual reduction
             merit_function_soc = f_soc + penalty*norm(b_soc)
             actual_reduction_soc = merit_function - merit_function_soc
-            # Recompute reduction ratio
             reduction_ratio_soc = actual_reduction_soc / predicted_reduction
             if intersect and reduction_ratio_soc >= SUFFICIENT_REDUCTION_RATIO:
                 x_next = x_soc
@@ -1805,14 +1708,12 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                 b_next = b_soc
                 reduction_ratio = reduction_ratio_soc
 
-        # Readjust trust region step, formula (3.55), reference [2]_, p.892.
         if reduction_ratio >= LARGE_REDUCTION_RATIO:
             trust_radius = max(TRUST_ENLARGEMENT_FACTOR_L * norm(d),
                                trust_radius)
         elif reduction_ratio >= INTERMEDIARY_REDUCTION_RATIO:
             trust_radius = max(TRUST_ENLARGEMENT_FACTOR_S * norm(d),
                                trust_radius)
-        # Reduce trust region step, according to reference [3]_, p.696.
         elif reduction_ratio < SUFFICIENT_REDUCTION_RATIO:
             trust_reduction = ((1-SUFFICIENT_REDUCTION_RATIO) /
                                (1-reduction_ratio))
@@ -1824,21 +1725,15 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
             else:
                 trust_radius *= MIN_TRUST_REDUCTION
 
-        # Update iteration
         if reduction_ratio >= SUFFICIENT_REDUCTION_RATIO:
             x = x_next
             f, b = f_next, b_next
             c, A = grad_and_jac(x)
             S = scaling(x)
-            # Get projections
             Z, LS, Y = projections(A, factorization_method)
-            # Compute least-square lagrange multipliers
             v = -LS.dot(c)
-            # Compute Hessian
             H = lagr_hess(x, v)
-            # Set Flag
             last_iteration_failed = False
-            # Otimality values
             optimality = norm(c + A.T.dot(v), np.inf)
             constr_violation = norm(b, np.inf) if len(b) > 0 else 0
         else:
@@ -1862,43 +1757,29 @@ def tr_interior_point(fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
     print ('constr_ineq0',constr_ineq0)
     print ('constr_eq0',constr_eq0)
     
-    # BOUNDARY_PARAMETER controls the decrease on the slack
-    # variables. Represents ``tau`` from [1]_ p.885, formula (3.18).
     BOUNDARY_PARAMETER = 0.995
-    # BARRIER_DECAY_RATIO controls the decay of the barrier parameter
-    # and of the subproblem toloerance. Represents ``theta`` from [1]_ p.879.
     BARRIER_DECAY_RATIO = 0.2
-    # TRUST_ENLARGEMENT controls the enlargement on trust radius
-    # after each iteration
     TRUST_ENLARGEMENT = 5
 
-    # Default enforce_feasibility
     if enforce_feasibility is None:
         enforce_feasibility = np.zeros(n_ineq, bool)
-    # Initial Values
     barrier_parameter = initial_barrier_parameter
     tolerance = initial_tolerance
     trust_radius = initial_trust_radius
-    # Define initial value for the slack variables
     s0 = np.maximum(-1.5*constr_ineq0, np.ones(n_ineq))
-    # Define barrier subproblem
     subprob = BarrierSubproblem(
         x0, s0, fun, grad, lagr_hess, n_vars, n_ineq, n_eq, constr, jac,
         barrier_parameter, tolerance, enforce_feasibility,
         stop_criteria, xtol, fun0, grad0, constr_ineq0, jac_ineq0,
         constr_eq0, jac_eq0)
-    # Define initial parameter for the first iteration.
     z = np.hstack((x0, s0))
     fun0_subprob, constr0_subprob = subprob.fun0, subprob.constr0
     grad0_subprob, jac0_subprob = subprob.grad0, subprob.jac0
-    # Define trust region bounds
     trust_lb = np.hstack((np.full(subprob.n_vars, -np.inf),
                           np.full(subprob.n_ineq, -BOUNDARY_PARAMETER)))
     trust_ub = np.full(subprob.n_vars+subprob.n_ineq, np.inf)
 
-    # Solves a sequence of barrier problems
     while True:
-        # Solve SQP subproblem
         z, state = equality_constrained_sqp(
             subprob.function_and_constraints,
             subprob.gradient_and_jacobian,
@@ -1909,20 +1790,17 @@ def tr_interior_point(fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
             factorization_method, trust_lb, trust_ub, subprob.scaling)
         if subprob.terminate:
             break
-        # Update parameters
+
         trust_radius = max(initial_trust_radius,
                            TRUST_ENLARGEMENT*state.tr_radius)
-        # TODO: Use more advanced strategies from [2]_
-        # to update this parameters.
         barrier_parameter *= BARRIER_DECAY_RATIO
         tolerance *= BARRIER_DECAY_RATIO
-        # Update Barrier Problem
+
         subprob.update(barrier_parameter, tolerance)
-        # Compute initial values for next iteration
+
         fun0_subprob, constr0_subprob = subprob.function_and_constraints(z)
         grad0_subprob, jac0_subprob = subprob.gradient_and_jacobian(z)
 
-    # Get x and s
     x = subprob.get_variables(z)
     return x, state
 
@@ -1947,12 +1825,12 @@ def update_state_sqp(state, x, last_iteration_failed, objective, prepared_constr
         state.v = [c.fun.v for c in prepared_constraints]
         state.constr = [c.fun.f for c in prepared_constraints]
         state.jac = [c.fun.J for c in prepared_constraints]
-        # Compute Lagrangian Gradient
+
         state.lagrangian_grad = np.copy(state.grad)
         for c in prepared_constraints:
             state.lagrangian_grad += c.fun.J.T.dot(c.fun.v)
         state.optimality = np.linalg.norm(state.lagrangian_grad, np.inf)
-        # Compute maximum constraint violation
+
         state.constr_violation = 0
         for i in range(len(prepared_constraints)):
             lb, ub = prepared_constraints[i].bounds
