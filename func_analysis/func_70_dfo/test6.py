@@ -1173,12 +1173,6 @@ class ScalarFunction(object):
         return self.H
 
 
-def rosenbrock(x):
-    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
-
-x0 = [-1.0,0]
-
-opts = {'maxiter': 1000, 'verbose': 2}
 
 class BarrierSubproblem:
     def __init__(self, x0, s0, fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
@@ -2231,7 +2225,12 @@ def standardize_constraints(constraints, x0, meth):
 
     return constraints
 
+def rosenbrock(x):
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
+x0 = [-1.0,0]
+
+opts = {'maxiter': 1000, 'verbose': 2}
 
 res = minimize (fun=rosenbrock,
                 x0=x0,
