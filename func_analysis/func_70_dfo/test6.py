@@ -1651,10 +1651,6 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
 
     lagrangian_hess = LagrangianHessian(n_vars, objective.hess, canonical.hess)
 
-    method = 'tr_interior_point'
-
-    print ('method in minimize_trustregion_constr',method)
-
     state = OptimizeResult(
         nit=0, nfev=0, njev=0, nhev=0,
         cg_niter=0, cg_stop_cond=0,
@@ -1666,7 +1662,7 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
         constr_njev=[0 for c in prepared_constraints],
         constr_nhev=[0 for c in prepared_constraints],
         v=[c.fun.v for c in prepared_constraints],
-        method=method)
+        method='tr_interior_point')
 
     start_time = time.time()
     
