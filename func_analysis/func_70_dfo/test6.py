@@ -27,6 +27,1047 @@ TERMINATION_MESSAGES = {
     3: "`callback` function requested termination"
 }
 
+
+class HessianUpdateStrategy(object):
+
+    def initialize(self, n, approx_type):
+        raise NotImplementedError("The method ``initialize(n, approx_type)``"
+                                  " is not implemented.")
+
+    def update(self, delta_x, delta_grad):
+        raise NotImplementedError("The method ``update(delta_x, delta_grad)``"
+                                  " is not implemented.")
+
+    def dot(self, p):
+        raise NotImplementedError("The method ``dot(p)``"
+                                  " is not implemented.")
+
+    def get_matrix(self):
+        raise NotImplementedError("The method ``get_matrix(p)``"
+                                  " is not implemented.")
+
+    
+class FullHessianUpdateStrategy(HessianUpdateStrategy):
+    _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
+    _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
+    _symv = get_blas_funcs('symv', dtype='d')
+
+    def __init__(self, init_scale='auto'):
+        self.init_scale = init_scale
+        self.first_iteration = None
+        self.approx_type = None
+        self.B = None
+        self.H = None
+
+    def initialize(self, n, approx_type):
+        self.first_iteration = True
+        self.n = n
+        self.approx_type = approx_type
+        if approx_type not in ('hess', 'inv_hess'):
+            raise ValueError("`approx_type` must be 'hess' or 'inv_hess'.")
+        # Create matrix
+        if self.approx_type == 'hess':
+            self.B = np.eye(n, dtype=float)
+        else:
+            self.H = np.eye(n, dtype=float)
+
+    def _auto_scale(self, delta_x, delta_grad):
+        s_norm2 = np.dot(delta_x, delta_x)
+        y_norm2 = np.dot(delta_grad, delta_grad)
+        ys = np.abs(np.dot(delta_grad, delta_x))
+        if ys == 0.0 or y_norm2 == 0 or s_norm2 == 0:
+            return 1
+        if self.approx_type == 'hess':
+            return y_norm2 / ys
+        else:
+            return ys / y_norm2
+
+    def _update_implementation(self, delta_x, delta_grad):
+        raise NotImplementedError("The method ``_update_implementation``"
+                                  " is not implemented.")
+
+    def update(self, delta_x, delta_grad):
+        if np.all(delta_x == 0.0):
+            return
+        if np.all(delta_grad == 0.0):
+            warn('delta_grad == 0.0. Check if the approximated '
+                 'function is linear. If the function is linear '
+                 'better results can be obtained by defining the '
+                 'Hessian as zero instead of using quasi-Newton '
+                 'approximations.', UserWarning)
+            return
+        if self.first_iteration:
+            # Get user specific scale
+            if self.init_scale == "auto":
+                scale = self._auto_scale(delta_x, delta_grad)
+            else:
+                scale = float(self.init_scale)
+            # Scale initial matrix with ``scale * np.eye(n)``
+            if self.approx_type == 'hess':
+                self.B *= scale
+            else:
+                self.H *= scale
+            self.first_iteration = False
+        self._update_implementation(delta_x, delta_grad)
+
+    def dot(self, p):
+        if self.approx_type == 'hess':
+            return self._symv(1, self.B, p)
+        else:
+            return self._symv(1, self.H, p)
+
+    def get_matrix(self):
+        if self.approx_type == 'hess':
+            M = np.copy(self.B)
+        else:
+            M = np.copy(self.H)
+        li = np.tril_indices_from(M, k=-1)
+        M[li] = M.T[li]
+        return M
+
+class SR1(FullHessianUpdateStrategy):
+    def __init__(self, min_denominator=1e-8, init_scale='auto'):
+        self.min_denominator = min_denominator
+        super(SR1, self).__init__(init_scale)
+
+    def _update_implementation(self, delta_x, delta_grad):
+        if self.approx_type == 'hess':
+            w = delta_x
+            z = delta_grad
+        else:
+            w = delta_grad
+            z = delta_x
+        Mw = self.dot(w)
+        z_minus_Mw = z - Mw
+        denominator = np.dot(w, z_minus_Mw)
+        if np.abs(denominator) <= self.min_denominator*norm(w)*norm(z_minus_Mw):
+            return
+        if self.approx_type == 'hess':
+            self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
+        else:
+            self.H = self._syr(1/denominator, z_minus_Mw, a=self.H)
+
+
+class CanonicalConstraint(object):
+
+    def __init__(self, n_eq, n_ineq, fun, jac, hess, keep_feasible):
+        self.n_eq = n_eq
+        self.n_ineq = n_ineq
+        self.fun = fun
+        self.jac = jac
+        self.hess = hess
+        self.keep_feasible = keep_feasible
+
+    @classmethod
+    def from_PreparedConstraint(cls, constraint):
+        """Create an instance from `PreparedConstrained` object."""
+        lb, ub = constraint.bounds
+        cfun = constraint.fun
+        keep_feasible = constraint.keep_feasible
+
+        if np.all(lb == -np.inf) and np.all(ub == np.inf):
+            return cls.empty(cfun.n)
+
+        if np.all(lb == -np.inf) and np.all(ub == np.inf):
+            return cls.empty(cfun.n)
+        elif np.all(lb == ub):
+            return cls._equal_to_canonical(cfun, lb)
+        elif np.all(lb == -np.inf):
+            return cls._less_to_canonical(cfun, ub, keep_feasible)
+        elif np.all(ub == np.inf):
+            return cls._greater_to_canonical(cfun, lb, keep_feasible)
+        else:
+            return cls._interval_to_canonical(cfun, lb, ub, keep_feasible)
+
+    @classmethod
+    def empty(cls, n):
+        empty_fun = np.empty(0)
+        empty_jac = np.empty((0, n))
+        empty_hess = sps.csr_matrix((n, n))
+
+        def fun(x):
+            return empty_fun, empty_fun
+
+        def jac(x):
+            return empty_jac, empty_jac
+
+        def hess(x, v_eq, v_ineq):
+            return empty_hess
+
+        return cls(0, 0, fun, jac, hess, np.empty(0, dtype=np.bool))
+
+    @classmethod
+    def concatenate(cls, canonical_constraints, sparse_jacobian):
+
+        def fun(x):
+            if canonical_constraints:
+                eq_all, ineq_all = zip(
+                        *[c.fun(x) for c in canonical_constraints])
+            else:
+                eq_all, ineq_all = [], []
+
+            return np.hstack(eq_all), np.hstack(ineq_all)
+
+        if sparse_jacobian:
+            vstack = sps.vstack
+        else:
+            vstack = np.vstack
+
+        def jac(x):
+            if canonical_constraints:
+                eq_all, ineq_all = zip(
+                        *[c.jac(x) for c in canonical_constraints])
+            else:
+                eq_all, ineq_all = [], []
+
+            return vstack(eq_all), vstack(ineq_all)
+
+        def hess(x, v_eq, v_ineq):
+            hess_all = []
+            index_eq = 0
+            index_ineq = 0
+            for c in canonical_constraints:
+                vc_eq = v_eq[index_eq:index_eq + c.n_eq]
+                vc_ineq = v_ineq[index_ineq:index_ineq + c.n_ineq]
+                hess_all.append(c.hess(x, vc_eq, vc_ineq))
+                index_eq += c.n_eq
+                index_ineq += c.n_ineq
+
+            def matvec(p):
+                result = np.zeros_like(p)
+                for h in hess_all:
+                    result += h.dot(p)
+                return result
+
+            n = x.shape[0]
+            return sps.linalg.LinearOperator((n, n), matvec, dtype=float)
+
+        n_eq = sum(c.n_eq for c in canonical_constraints)
+        n_ineq = sum(c.n_ineq for c in canonical_constraints)
+        keep_feasible = np.hstack([c.keep_feasible for c in
+                                   canonical_constraints])
+
+        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
+
+    @classmethod
+    def _equal_to_canonical(cls, cfun, value):
+        empty_fun = np.empty(0)
+        n = cfun.n
+
+        n_eq = value.shape[0]
+        n_ineq = 0
+        keep_feasible = np.empty(0, dtype=bool)
+
+        if cfun.sparse_jacobian:
+            empty_jac = sps.csr_matrix((0, n))
+        else:
+            empty_jac = np.empty((0, n))
+
+        def fun(x):
+            return cfun.fun(x) - value, empty_fun
+
+        def jac(x):
+            return cfun.jac(x), empty_jac
+
+        def hess(x, v_eq, v_ineq):
+            return cfun.hess(x, v_eq)
+
+        empty_fun = np.empty(0)
+        n = cfun.n
+        if cfun.sparse_jacobian:
+            empty_jac = sps.csr_matrix((0, n))
+        else:
+            empty_jac = np.empty((0, n))
+
+        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
+
+    @classmethod
+    def _less_to_canonical(cls, cfun, ub, keep_feasible):
+        empty_fun = np.empty(0)
+        n = cfun.n
+        if cfun.sparse_jacobian:
+            empty_jac = sps.csr_matrix((0, n))
+        else:
+            empty_jac = np.empty((0, n))
+
+        finite_ub = ub < np.inf
+        n_eq = 0
+        n_ineq = np.sum(finite_ub)
+
+        if np.all(finite_ub):
+            def fun(x):
+                return empty_fun, cfun.fun(x) - ub
+
+            def jac(x):
+                return empty_jac, cfun.jac(x)
+
+            def hess(x, v_eq, v_ineq):
+                return cfun.hess(x, v_ineq)
+        else:
+            finite_ub = np.nonzero(finite_ub)[0]
+            keep_feasible = keep_feasible[finite_ub]
+            ub = ub[finite_ub]
+
+            def fun(x):
+                return empty_fun, cfun.fun(x)[finite_ub] - ub
+
+            def jac(x):
+                return empty_jac, cfun.jac(x)[finite_ub]
+
+            def hess(x, v_eq, v_ineq):
+                v = np.zeros(cfun.m)
+                v[finite_ub] = v_ineq
+                return cfun.hess(x, v)
+
+        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
+
+    @classmethod
+    def _greater_to_canonical(cls, cfun, lb, keep_feasible):
+        empty_fun = np.empty(0)
+        n = cfun.n
+        if cfun.sparse_jacobian:
+            empty_jac = sps.csr_matrix((0, n))
+        else:
+            empty_jac = np.empty((0, n))
+
+        finite_lb = lb > -np.inf
+        n_eq = 0
+        n_ineq = np.sum(finite_lb)
+
+        if np.all(finite_lb):
+            def fun(x):
+                return empty_fun, lb - cfun.fun(x)
+
+            def jac(x):
+                return empty_jac, -cfun.jac(x)
+
+            def hess(x, v_eq, v_ineq):
+                return cfun.hess(x, -v_ineq)
+        else:
+            finite_lb = np.nonzero(finite_lb)[0]
+            keep_feasible = keep_feasible[finite_lb]
+            lb = lb[finite_lb]
+
+            def fun(x):
+                return empty_fun, lb - cfun.fun(x)[finite_lb]
+
+            def jac(x):
+                return empty_jac, -cfun.jac(x)[finite_lb]
+
+            def hess(x, v_eq, v_ineq):
+                v = np.zeros(cfun.m)
+                v[finite_lb] = -v_ineq
+                return cfun.hess(x, v)
+
+        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
+
+    @classmethod
+    def _interval_to_canonical(cls, cfun, lb, ub, keep_feasible):
+        lb_inf = lb == -np.inf
+        ub_inf = ub == np.inf
+        equal = lb == ub
+        less = lb_inf & ~ub_inf
+        greater = ub_inf & ~lb_inf
+        interval = ~equal & ~lb_inf & ~ub_inf
+
+        equal = np.nonzero(equal)[0]
+        less = np.nonzero(less)[0]
+        greater = np.nonzero(greater)[0]
+        interval = np.nonzero(interval)[0]
+        n_less = less.shape[0]
+        n_greater = greater.shape[0]
+        n_interval = interval.shape[0]
+        n_ineq = n_less + n_greater + 2 * n_interval
+        n_eq = equal.shape[0]
+
+        keep_feasible = np.hstack((keep_feasible[less],
+                                   keep_feasible[greater],
+                                   keep_feasible[interval],
+                                   keep_feasible[interval]))
+
+        def fun(x):
+            f = cfun.fun(x)
+            eq = f[equal] - lb[equal]
+            le = f[less] - ub[less]
+            ge = lb[greater] - f[greater]
+            il = f[interval] - ub[interval]
+            ig = lb[interval] - f[interval]
+            return eq, np.hstack((le, ge, il, ig))
+
+        def jac(x):
+            J = cfun.jac(x)
+            eq = J[equal]
+            le = J[less]
+            ge = -J[greater]
+            il = J[interval]
+            ig = -il
+            if sps.issparse(J):
+                ineq = sps.vstack((le, ge, il, ig))
+            else:
+                ineq = np.vstack((le, ge, il, ig))
+            return eq, ineq
+
+        def hess(x, v_eq, v_ineq):
+            n_start = 0
+            v_l = v_ineq[n_start:n_start + n_less]
+            n_start += n_less
+            v_g = v_ineq[n_start:n_start + n_greater]
+            n_start += n_greater
+            v_il = v_ineq[n_start:n_start + n_interval]
+            n_start += n_interval
+            v_ig = v_ineq[n_start:n_start + n_interval]
+
+            v = np.zeros_like(lb)
+            v[equal] = v_eq
+            v[less] = v_l
+            v[greater] = -v_g
+            v[interval] = v_il - v_ig
+
+            return cfun.hess(x, v)
+
+        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
+
+
+class LagrangianHessian(object):
+    def __init__(self, n, objective_hess, constraints_hess):
+        self.n = n
+        self.objective_hess = objective_hess
+        self.constraints_hess = constraints_hess
+
+    def __call__(self, x, v_eq=np.empty(0), v_ineq=np.empty(0)):
+        H_objective = self.objective_hess(x)
+        H_constraints = self.constraints_hess(x, v_eq, v_ineq)
+
+        def matvec(p):
+            return H_objective.dot(p) + H_constraints.dot(p)
+
+        return LinearOperator((self.n, self.n), matvec)
+
+
+class VectorFunction(object):
+
+    def __init__(self, fun, x0, jac, hess,
+                 finite_diff_rel_step, finite_diff_jac_sparsity,
+                 finite_diff_bounds, sparse_jacobian):
+        if not callable(jac) and jac not in FD_METHODS:
+            raise ValueError("`jac` must be either callable or one of {}."
+                             .format(FD_METHODS))
+
+        if not (callable(hess) or hess in FD_METHODS
+                or isinstance(hess, HessianUpdateStrategy)):
+            raise ValueError("`hess` must be either callable,"
+                             "HessianUpdateStrategy or one of {}."
+                             .format(FD_METHODS))
+
+        if jac in FD_METHODS and hess in FD_METHODS:
+            raise ValueError("Whenever the Jacobian is estimated via "
+                             "finite-differences, we require the Hessian to "
+                             "be estimated using one of the quasi-Newton "
+                             "strategies.")
+
+        self.x = np.atleast_1d(x0).astype(float)
+        self.n = self.x.size
+        self.nfev = 0
+        self.njev = 0
+        self.nhev = 0
+        self.f_updated = False
+        self.J_updated = False
+        self.H_updated = False
+
+        finite_diff_options = {}
+        if jac in FD_METHODS:
+            finite_diff_options["method"] = jac
+            finite_diff_options["rel_step"] = finite_diff_rel_step
+            if finite_diff_jac_sparsity is not None:
+                sparsity_groups = group_columns(finite_diff_jac_sparsity)
+                finite_diff_options["sparsity"] = (finite_diff_jac_sparsity,
+                                                   sparsity_groups)
+            finite_diff_options["bounds"] = finite_diff_bounds
+            self.x_diff = np.copy(self.x)
+        if hess in FD_METHODS:
+            finite_diff_options["method"] = hess
+            finite_diff_options["rel_step"] = finite_diff_rel_step
+            finite_diff_options["as_linear_operator"] = True
+            self.x_diff = np.copy(self.x)
+        if jac in FD_METHODS and hess in FD_METHODS:
+            raise ValueError("Whenever the Jacobian is estimated via "
+                             "finite-differences, we require the Hessian to "
+                             "be estimated using one of the quasi-Newton "
+                             "strategies.")
+
+        # Function evaluation
+        def fun_wrapped(x):
+            self.nfev += 1
+            return np.atleast_1d(fun(x))
+
+        def update_fun():
+            self.f = fun_wrapped(self.x)
+
+        self._update_fun_impl = update_fun
+        update_fun()
+
+        self.v = np.zeros_like(self.f)
+        self.m = self.v.size
+
+        self._update_jac_impl = update_jac
+
+        # Define Hessian
+        if callable(hess):
+            self.H = hess(self.x, self.v)
+            self.H_updated = True
+            self.nhev += 1
+
+            if sps.issparse(self.H):
+                def hess_wrapped(x, v):
+                    self.nhev += 1
+                    return sps.csr_matrix(hess(x, v))
+                self.H = sps.csr_matrix(self.H)
+
+            elif isinstance(self.H, LinearOperator):
+                def hess_wrapped(x, v):
+                    self.nhev += 1
+                    return hess(x, v)
+
+            else:
+                def hess_wrapped(x, v):
+                    self.nhev += 1
+                    return np.atleast_2d(np.asarray(hess(x, v)))
+                self.H = np.atleast_2d(np.asarray(self.H))
+
+            def update_hess():
+                self.H = hess_wrapped(self.x, self.v)
+        elif hess in FD_METHODS:
+            def jac_dot_v(x, v):
+                return jac_wrapped(x).T.dot(v)
+
+            def update_hess():
+                self._update_jac()
+                self.H = approx_derivative(jac_dot_v, self.x,
+                                           f0=self.J.T.dot(self.v),
+                                           args=(self.v,),
+                                           **finite_diff_options)
+            update_hess()
+            self.H_updated = True
+        elif isinstance(hess, HessianUpdateStrategy):
+            self.H = hess
+            self.H.initialize(self.n, 'hess')
+            self.H_updated = True
+            self.x_prev = None
+            self.J_prev = None
+
+            def update_hess():
+                self._update_jac()
+                if self.x_prev is not None and self.J_prev is not None:
+                    delta_x = self.x - self.x_prev
+                    delta_g = self.J.T.dot(self.v) - self.J_prev.T.dot(self.v)
+                    self.H.update(delta_x, delta_g)
+
+        self._update_hess_impl = update_hess
+
+        if isinstance(hess, HessianUpdateStrategy):
+            def update_x(x):
+                self._update_jac()
+                self.x_prev = self.x
+                self.J_prev = self.J
+                self.x = np.atleast_1d(x).astype(float)
+                self.f_updated = False
+                self.J_updated = False
+                self.H_updated = False
+                self._update_hess()
+        else:
+            def update_x(x):
+                self.x = np.atleast_1d(x).astype(float)
+                self.f_updated = False
+                self.J_updated = False
+                self.H_updated = False
+
+        self._update_x_impl = update_x
+
+    def _update_v(self, v):
+        if not np.array_equal(v, self.v):
+            self.v = v
+            self.H_updated = False
+
+    def _update_x(self, x):
+        if not np.array_equal(x, self.x):
+            self._update_x_impl(x)
+
+    def _update_fun(self):
+        if not self.f_updated:
+            self._update_fun_impl()
+            self.f_updated = True
+
+    def _update_jac(self):
+        if not self.J_updated:
+            self._update_jac_impl()
+            self.J_updated = True
+
+    def _update_hess(self):
+        if not self.H_updated:
+            self._update_hess_impl()
+            self.H_updated = True
+
+    def fun(self, x):
+        self._update_x(x)
+        self._update_fun()
+        return self.f
+
+    def jac(self, x):
+        self._update_x(x)
+        self._update_jac()
+        return self.J
+
+    def hess(self, x, v):
+        # v should be updated before x.
+        self._update_v(v)
+        self._update_x(x)
+        self._update_hess()
+        return self.H
+
+
+class LinearVectorFunction(object):
+    def __init__(self, A, x0, sparse_jacobian):
+        if sparse_jacobian or sparse_jacobian is None and sps.issparse(A):
+            self.J = sps.csr_matrix(A)
+            self.sparse_jacobian = True
+        elif sps.issparse(A):
+            self.J = A.toarray()
+            self.sparse_jacobian = False
+        else:
+            self.J = np.atleast_2d(A)
+            self.sparse_jacobian = False
+
+        self.m, self.n = self.J.shape
+
+        self.x = np.atleast_1d(x0).astype(float)
+        self.f = self.J.dot(self.x)
+        self.f_updated = True
+
+        self.v = np.zeros(self.m, dtype=float)
+        self.H = sps.csr_matrix((self.n, self.n))
+
+    def _update_x(self, x):
+        if not np.array_equal(x, self.x):
+            self.x = np.atleast_1d(x).astype(float)
+            self.f_updated = False
+
+    def fun(self, x):
+        self._update_x(x)
+        if not self.f_updated:
+            self.f = self.J.dot(x)
+            self.f_updated = True
+        return self.f
+
+    def jac(self, x):
+        self._update_x(x)
+        return self.J
+
+    def hess(self, x, v):
+        self._update_x(x)
+        self.v = v
+        return self.H
+
+
+class IdentityVectorFunction(LinearVectorFunction):
+    def __init__(self, x0, sparse_jacobian):
+        n = len(x0)
+        if sparse_jacobian or sparse_jacobian is None:
+            A = sps.eye(n, format='csr')
+            sparse_jacobian = True
+        else:
+            A = np.eye(n)
+            sparse_jacobian = False
+        super(IdentityVectorFunction, self).__init__(A, x0, sparse_jacobian)
+
+
+        
+class PreparedConstraint(object):
+
+    def __init__(self, constraint, x0, sparse_jacobian=None,
+                 finite_diff_bounds=(-np.inf, np.inf)):
+        if isinstance(constraint, NonlinearConstraint):
+            fun = VectorFunction(constraint.fun, x0,
+                                 constraint.jac, constraint.hess,
+                                 constraint.finite_diff_rel_step,
+                                 constraint.finite_diff_jac_sparsity,
+                                 finite_diff_bounds, sparse_jacobian)
+        elif isinstance(constraint, LinearConstraint):
+            fun = LinearVectorFunction(constraint.A, x0, sparse_jacobian)
+        elif isinstance(constraint, Bounds):
+            fun = IdentityVectorFunction(x0, sparse_jacobian)
+        else:
+            raise ValueError("`constraint` of an unknown type is passed.")
+
+        m = fun.m
+        lb = np.asarray(constraint.lb, dtype=float)
+        ub = np.asarray(constraint.ub, dtype=float)
+        if lb.ndim == 0:
+            lb = np.resize(lb, m)
+        if ub.ndim == 0:
+            ub = np.resize(ub, m)
+
+        keep_feasible = np.asarray(constraint.keep_feasible, dtype=bool)
+        if keep_feasible.ndim == 0:
+            keep_feasible = np.resize(keep_feasible, m)
+        if keep_feasible.shape != (m,):
+            raise ValueError("`keep_feasible` has a wrong shape.")
+
+        mask = keep_feasible & (lb != ub)
+        f0 = fun.f
+        if np.any(f0[mask] < lb[mask]) or np.any(f0[mask] > ub[mask]):
+            raise ValueError("`x0` is infeasible with respect to some "
+                             "inequality constraint with `keep_feasible` "
+                             "set to True.")
+
+        self.fun = fun
+        self.bounds = (lb, ub)
+        self.keep_feasible = keep_feasible
+
+    def violation(self, x):
+        with suppress_warnings() as sup:
+            sup.filter(UserWarning)
+            ev = self.fun.fun(np.asarray(x))
+
+        excess_lb = np.maximum(self.bounds[0] - ev, 0)
+        excess_ub = np.maximum(ev - self.bounds[1], 0)
+
+        return excess_lb + excess_ub
+
+FD_METHODS = ('2-point', '3-point', 'cs')
+
+class ScalarFunction(object):
+
+    def __init__(self, fun, x0, args, grad, hess, finite_diff_rel_step,
+                 finite_diff_bounds):
+        if not callable(grad) and grad not in FD_METHODS:
+            raise ValueError("`grad` must be either callable or one of {}."
+                             .format(FD_METHODS))
+
+        if not (callable(hess) or hess in FD_METHODS
+                or isinstance(hess, HessianUpdateStrategy)):
+            raise ValueError("`hess` must be either callable,"
+                             "HessianUpdateStrategy or one of {}."
+                             .format(FD_METHODS))
+
+        if grad in FD_METHODS and hess in FD_METHODS:
+            raise ValueError("Whenever the gradient is estimated via "
+                             "finite-differences, we require the Hessian "
+                             "to be estimated using one of the "
+                             "quasi-Newton strategies.")
+
+        self.x = np.atleast_1d(x0).astype(float)
+        self.n = self.x.size
+        self.nfev = 0
+        self.ngev = 0
+        self.nhev = 0
+        self.f_updated = False
+        self.g_updated = False
+        self.H_updated = False
+
+        finite_diff_options = {}
+        if grad in FD_METHODS:
+            finite_diff_options["method"] = grad
+            finite_diff_options["rel_step"] = finite_diff_rel_step
+            finite_diff_options["bounds"] = finite_diff_bounds
+        if hess in FD_METHODS:
+            finite_diff_options["method"] = hess
+            finite_diff_options["rel_step"] = finite_diff_rel_step
+            finite_diff_options["as_linear_operator"] = True
+
+        # Function evaluation
+        def fun_wrapped(x):
+            self.nfev += 1
+            return fun(x, *args)
+
+        def update_fun():
+            self.f = fun_wrapped(self.x)
+
+        self._update_fun_impl = update_fun
+        self._update_fun()
+
+        if callable(grad):
+            def grad_wrapped(x):
+                self.ngev += 1
+                return np.atleast_1d(grad(x, *args))
+
+            def update_grad():
+                self.g = grad_wrapped(self.x)
+
+        elif grad in FD_METHODS:
+            def update_grad():
+                self._update_fun()
+                self.g = approx_derivative(fun_wrapped, self.x, f0=self.f,
+                                           **finite_diff_options)
+
+        self._update_grad_impl = update_grad
+        self._update_grad()
+
+        # Hessian Evaluation
+        if callable(hess):
+            self.H = hess(x0, *args)
+            self.H_updated = True
+            self.nhev += 1
+
+            if sps.issparse(self.H):
+                def hess_wrapped(x):
+                    self.nhev += 1
+                    return sps.csr_matrix(hess(x, *args))
+                self.H = sps.csr_matrix(self.H)
+
+            elif isinstance(self.H, LinearOperator):
+                def hess_wrapped(x):
+                    self.nhev += 1
+                    return hess(x, *args)
+
+            else:
+                def hess_wrapped(x):
+                    self.nhev += 1
+                    return np.atleast_2d(np.asarray(hess(x, *args)))
+                self.H = np.atleast_2d(np.asarray(self.H))
+
+            def update_hess():
+                self.H = hess_wrapped(self.x)
+
+        elif hess in FD_METHODS:
+            def update_hess():
+                self._update_grad()
+                self.H = approx_derivative(grad_wrapped, self.x, f0=self.g,
+                                           **finite_diff_options)
+                return self.H
+
+            update_hess()
+            self.H_updated = True
+        elif isinstance(hess, HessianUpdateStrategy):
+            self.H = hess
+            self.H.initialize(self.n, 'hess')
+            self.H_updated = True
+            self.x_prev = None
+            self.g_prev = None
+
+            def update_hess():
+                self._update_grad()
+                self.H.update(self.x - self.x_prev, self.g - self.g_prev)
+
+        self._update_hess_impl = update_hess
+
+        if isinstance(hess, HessianUpdateStrategy):
+            def update_x(x):
+                self._update_grad()
+                self.x_prev = self.x
+                self.g_prev = self.g
+
+                self.x = np.atleast_1d(x).astype(float)
+                self.f_updated = False
+                self.g_updated = False
+                self.H_updated = False
+                self._update_hess()
+        else:
+            def update_x(x):
+                self.x = np.atleast_1d(x).astype(float)
+                self.f_updated = False
+                self.g_updated = False
+                self.H_updated = False
+        self._update_x_impl = update_x
+
+    def _update_fun(self):
+        if not self.f_updated:
+            self._update_fun_impl()
+            self.f_updated = True
+
+    def _update_grad(self):
+        if not self.g_updated:
+            self._update_grad_impl()
+            self.g_updated = True
+
+    def _update_hess(self):
+        if not self.H_updated:
+            self._update_hess_impl()
+            self.H_updated = True
+
+    def fun(self, x):
+        if not np.array_equal(x, self.x):
+            self._update_x_impl(x)
+        self._update_fun()
+        return self.f
+
+    def grad(self, x):
+        if not np.array_equal(x, self.x):
+            self._update_x_impl(x)
+        self._update_grad()
+        return self.g
+
+    def hess(self, x):
+        if not np.array_equal(x, self.x):
+            self._update_x_impl(x)
+        self._update_hess()
+        return self.H
+
+
+
+class BarrierSubproblem:
+    def __init__(self, x0, s0, fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
+                 constr, jac, barrier_parameter, tolerance,
+                 enforce_feasibility, global_stop_criteria,
+                 xtol, fun0, grad0, constr_ineq0, jac_ineq0, constr_eq0,
+                 jac_eq0):
+        # Store parameters
+        self.n_vars = n_vars
+        self.x0 = x0
+        self.s0 = s0
+        self.fun = fun
+        self.grad = grad
+        self.lagr_hess = lagr_hess
+        self.constr = constr
+        self.jac = jac
+        self.barrier_parameter = barrier_parameter
+        self.tolerance = tolerance
+        self.n_eq = n_eq
+        self.n_ineq = n_ineq
+        self.enforce_feasibility = enforce_feasibility
+        self.global_stop_criteria = global_stop_criteria
+        self.xtol = xtol
+        self.fun0 = self._compute_function(fun0, constr_ineq0, s0)
+        self.grad0 = self._compute_gradient(grad0)
+        self.constr0 = self._compute_constr(constr_ineq0, constr_eq0, s0)
+        self.jac0 = self._compute_jacobian(jac_eq0, jac_ineq0, s0)
+        self.terminate = False
+
+    def update(self, barrier_parameter, tolerance):
+        self.barrier_parameter = barrier_parameter
+        self.tolerance = tolerance
+
+    def get_slack(self, z):
+        return z[self.n_vars:self.n_vars+self.n_ineq]
+
+    def get_variables(self, z):
+        return z[:self.n_vars]
+
+    def function_and_constraints(self, z):
+        x = self.get_variables(z)
+        s = self.get_slack(z)
+        f = self.fun(x)
+        c_eq, c_ineq = self.constr(x)
+        return (self._compute_function(f, c_ineq, s),
+                self._compute_constr(c_ineq, c_eq, s))
+
+    def _compute_function(self, f, c_ineq, s):
+        s[self.enforce_feasibility] = -c_ineq[self.enforce_feasibility]
+        log_s = [np.log(s_i) if s_i > 0 else -np.inf for s_i in s]
+        return f - self.barrier_parameter*np.sum(log_s)
+
+    def _compute_constr(self, c_ineq, c_eq, s):
+        return np.hstack((c_eq,
+                          c_ineq + s))
+
+    def scaling(self, z):
+        s = self.get_slack(z)
+        diag_elements = np.hstack((np.ones(self.n_vars), s))
+
+        # Diagonal Matrix
+        def matvec(vec):
+            return diag_elements*vec
+        return LinearOperator((self.n_vars+self.n_ineq,
+                               self.n_vars+self.n_ineq),
+                              matvec)
+
+    def gradient_and_jacobian(self, z):
+        x = self.get_variables(z)
+        s = self.get_slack(z)
+        g = self.grad(x)
+        J_eq, J_ineq = self.jac(x)
+        return (self._compute_gradient(g),
+                self._compute_jacobian(J_eq, J_ineq, s))
+
+    def _compute_gradient(self, g):
+        return np.hstack((g, -self.barrier_parameter*np.ones(self.n_ineq)))
+
+    def _compute_jacobian(self, J_eq, J_ineq, s):
+        if self.n_ineq == 0:
+            return J_eq
+        else:
+            if sps.issparse(J_eq) or sps.issparse(J_ineq):
+                J_eq = sps.csr_matrix(J_eq)
+                J_ineq = sps.csr_matrix(J_ineq)
+                return self._assemble_sparse_jacobian(J_eq, J_ineq, s)
+            else:
+                S = np.diag(s)
+                zeros = np.zeros((self.n_eq, self.n_ineq))
+                if sps.issparse(J_ineq):
+                    J_ineq = J_ineq.toarray()
+                if sps.issparse(J_eq):
+                    J_eq = J_eq.toarray()
+                return np.block([[J_eq, zeros],
+                                 [J_ineq, S]])
+
+    def _assemble_sparse_jacobian(self, J_eq, J_ineq, s):
+
+        n_vars, n_ineq, n_eq = self.n_vars, self.n_ineq, self.n_eq
+        J_aux = sps.vstack([J_eq, J_ineq], "csr")
+        indptr, indices, data = J_aux.indptr, J_aux.indices, J_aux.data
+        new_indptr = indptr + np.hstack((np.zeros(n_eq, dtype=int),
+                                         np.arange(n_ineq+1, dtype=int)))
+        size = indices.size+n_ineq
+        new_indices = np.empty(size)
+        new_data = np.empty(size)
+        mask = np.full(size, False, bool)
+        mask[new_indptr[-n_ineq:]-1] = True
+        new_indices[mask] = n_vars+np.arange(n_ineq)
+        new_indices[~mask] = indices
+        new_data[mask] = s
+        new_data[~mask] = data
+        J = sps.csr_matrix((new_data, new_indices, new_indptr),
+                           (n_eq + n_ineq, n_vars + n_ineq))
+        return J
+
+    def lagrangian_hessian_x(self, z, v):
+        x = self.get_variables(z)
+        v_eq = v[:self.n_eq]
+        v_ineq = v[self.n_eq:self.n_eq+self.n_ineq]
+        lagr_hess = self.lagr_hess
+        return lagr_hess(x, v_eq, v_ineq)
+
+    def lagrangian_hessian_s(self, z, v):
+        s = self.get_slack(z)
+        primal = self.barrier_parameter
+        primal_dual = v[-self.n_ineq:]*s
+        return np.where(v[-self.n_ineq:] > 0, primal_dual, primal)
+
+    def lagrangian_hessian(self, z, v):
+        Hx = self.lagrangian_hessian_x(z, v)
+        if self.n_ineq > 0:
+            S_Hs_S = self.lagrangian_hessian_s(z, v)
+            
+        def matvec(vec):
+            vec_x = self.get_variables(vec)
+            vec_s = self.get_slack(vec)
+            if self.n_ineq > 0:
+                return np.hstack((Hx.dot(vec_x), S_Hs_S*vec_s))
+            else:
+                return Hx.dot(vec_x)
+        return LinearOperator((self.n_vars+self.n_ineq,
+                               self.n_vars+self.n_ineq),
+                              matvec)
+
+    def stop_criteria(self, state, z, last_iteration_failed,
+                      optimality, constr_violation,
+                      trust_radius, penalty, cg_info):
+
+        x = self.get_variables(z)
+        if self.global_stop_criteria(state, x,
+                                     last_iteration_failed,
+                                     trust_radius, penalty,
+                                     cg_info,
+                                     self.barrier_parameter,
+                                     self.tolerance):
+            self.terminate = True
+            return True
+        else:
+            g_cond = (optimality < self.tolerance and
+                      constr_violation < self.tolerance)
+            x_cond = trust_radius < self.xtol
+            return g_cond or x_cond
+
+
 def inside_box_boundaries(x, lb, ub):
     return (lb <= x).all() and (x <= ub).all()
 
@@ -843,25 +1884,6 @@ def standardize_constraints(constraints, x0, meth):
 
     return constraints
 
-
-class HessianUpdateStrategy(object):
-
-    def initialize(self, n, approx_type):
-        raise NotImplementedError("The method ``initialize(n, approx_type)``"
-                                  " is not implemented.")
-
-    def update(self, delta_x, delta_grad):
-        raise NotImplementedError("The method ``update(delta_x, delta_grad)``"
-                                  " is not implemented.")
-
-    def dot(self, p):
-        raise NotImplementedError("The method ``dot(p)``"
-                                  " is not implemented.")
-
-    def get_matrix(self):
-        raise NotImplementedError("The method ``get_matrix(p)``"
-                                  " is not implemented.")
-
 def initial_constraints_as_canonical(n, prepared_constraints, sparse_jacobian):
     c_eq = []
     c_ineq = []
@@ -918,1091 +1940,8 @@ def initial_constraints_as_canonical(n, prepared_constraints, sparse_jacobian):
 
     return c_eq, c_ineq, J_eq, J_ineq
 
-    
-class FullHessianUpdateStrategy(HessianUpdateStrategy):
-    _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
-    _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
-    _symv = get_blas_funcs('symv', dtype='d')
-
-    def __init__(self, init_scale='auto'):
-        self.init_scale = init_scale
-        self.first_iteration = None
-        self.approx_type = None
-        self.B = None
-        self.H = None
-
-    def initialize(self, n, approx_type):
-        self.first_iteration = True
-        self.n = n
-        self.approx_type = approx_type
-        if approx_type not in ('hess', 'inv_hess'):
-            raise ValueError("`approx_type` must be 'hess' or 'inv_hess'.")
-        # Create matrix
-        if self.approx_type == 'hess':
-            self.B = np.eye(n, dtype=float)
-        else:
-            self.H = np.eye(n, dtype=float)
-
-    def _auto_scale(self, delta_x, delta_grad):
-        s_norm2 = np.dot(delta_x, delta_x)
-        y_norm2 = np.dot(delta_grad, delta_grad)
-        ys = np.abs(np.dot(delta_grad, delta_x))
-        if ys == 0.0 or y_norm2 == 0 or s_norm2 == 0:
-            return 1
-        if self.approx_type == 'hess':
-            return y_norm2 / ys
-        else:
-            return ys / y_norm2
-
-    def _update_implementation(self, delta_x, delta_grad):
-        raise NotImplementedError("The method ``_update_implementation``"
-                                  " is not implemented.")
-
-    def update(self, delta_x, delta_grad):
-        if np.all(delta_x == 0.0):
-            return
-        if np.all(delta_grad == 0.0):
-            warn('delta_grad == 0.0. Check if the approximated '
-                 'function is linear. If the function is linear '
-                 'better results can be obtained by defining the '
-                 'Hessian as zero instead of using quasi-Newton '
-                 'approximations.', UserWarning)
-            return
-        if self.first_iteration:
-            # Get user specific scale
-            if self.init_scale == "auto":
-                scale = self._auto_scale(delta_x, delta_grad)
-            else:
-                scale = float(self.init_scale)
-            # Scale initial matrix with ``scale * np.eye(n)``
-            if self.approx_type == 'hess':
-                self.B *= scale
-            else:
-                self.H *= scale
-            self.first_iteration = False
-        self._update_implementation(delta_x, delta_grad)
-
-    def dot(self, p):
-        if self.approx_type == 'hess':
-            return self._symv(1, self.B, p)
-        else:
-            return self._symv(1, self.H, p)
-
-    def get_matrix(self):
-        if self.approx_type == 'hess':
-            M = np.copy(self.B)
-        else:
-            M = np.copy(self.H)
-        li = np.tril_indices_from(M, k=-1)
-        M[li] = M.T[li]
-        return M
-
-class SR1(FullHessianUpdateStrategy):
-    def __init__(self, min_denominator=1e-8, init_scale='auto'):
-        self.min_denominator = min_denominator
-        super(SR1, self).__init__(init_scale)
-
-    def _update_implementation(self, delta_x, delta_grad):
-        if self.approx_type == 'hess':
-            w = delta_x
-            z = delta_grad
-        else:
-            w = delta_grad
-            z = delta_x
-        Mw = self.dot(w)
-        z_minus_Mw = z - Mw
-        denominator = np.dot(w, z_minus_Mw)
-        if np.abs(denominator) <= self.min_denominator*norm(w)*norm(z_minus_Mw):
-            return
-        if self.approx_type == 'hess':
-            self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
-        else:
-            self.H = self._syr(1/denominator, z_minus_Mw, a=self.H)
-
-
-class CanonicalConstraint(object):
-
-    def __init__(self, n_eq, n_ineq, fun, jac, hess, keep_feasible):
-        self.n_eq = n_eq
-        self.n_ineq = n_ineq
-        self.fun = fun
-        self.jac = jac
-        self.hess = hess
-        self.keep_feasible = keep_feasible
-
-    @classmethod
-    def from_PreparedConstraint(cls, constraint):
-        """Create an instance from `PreparedConstrained` object."""
-        lb, ub = constraint.bounds
-        cfun = constraint.fun
-        keep_feasible = constraint.keep_feasible
-
-        if np.all(lb == -np.inf) and np.all(ub == np.inf):
-            return cls.empty(cfun.n)
-
-        if np.all(lb == -np.inf) and np.all(ub == np.inf):
-            return cls.empty(cfun.n)
-        elif np.all(lb == ub):
-            return cls._equal_to_canonical(cfun, lb)
-        elif np.all(lb == -np.inf):
-            return cls._less_to_canonical(cfun, ub, keep_feasible)
-        elif np.all(ub == np.inf):
-            return cls._greater_to_canonical(cfun, lb, keep_feasible)
-        else:
-            return cls._interval_to_canonical(cfun, lb, ub, keep_feasible)
-
-    @classmethod
-    def empty(cls, n):
-        empty_fun = np.empty(0)
-        empty_jac = np.empty((0, n))
-        empty_hess = sps.csr_matrix((n, n))
-
-        def fun(x):
-            return empty_fun, empty_fun
-
-        def jac(x):
-            return empty_jac, empty_jac
-
-        def hess(x, v_eq, v_ineq):
-            return empty_hess
-
-        return cls(0, 0, fun, jac, hess, np.empty(0, dtype=np.bool))
-
-    @classmethod
-    def concatenate(cls, canonical_constraints, sparse_jacobian):
-
-        def fun(x):
-            if canonical_constraints:
-                eq_all, ineq_all = zip(
-                        *[c.fun(x) for c in canonical_constraints])
-            else:
-                eq_all, ineq_all = [], []
-
-            return np.hstack(eq_all), np.hstack(ineq_all)
-
-        if sparse_jacobian:
-            vstack = sps.vstack
-        else:
-            vstack = np.vstack
-
-        def jac(x):
-            if canonical_constraints:
-                eq_all, ineq_all = zip(
-                        *[c.jac(x) for c in canonical_constraints])
-            else:
-                eq_all, ineq_all = [], []
-
-            return vstack(eq_all), vstack(ineq_all)
-
-        def hess(x, v_eq, v_ineq):
-            hess_all = []
-            index_eq = 0
-            index_ineq = 0
-            for c in canonical_constraints:
-                vc_eq = v_eq[index_eq:index_eq + c.n_eq]
-                vc_ineq = v_ineq[index_ineq:index_ineq + c.n_ineq]
-                hess_all.append(c.hess(x, vc_eq, vc_ineq))
-                index_eq += c.n_eq
-                index_ineq += c.n_ineq
-
-            def matvec(p):
-                result = np.zeros_like(p)
-                for h in hess_all:
-                    result += h.dot(p)
-                return result
-
-            n = x.shape[0]
-            return sps.linalg.LinearOperator((n, n), matvec, dtype=float)
-
-        n_eq = sum(c.n_eq for c in canonical_constraints)
-        n_ineq = sum(c.n_ineq for c in canonical_constraints)
-        keep_feasible = np.hstack([c.keep_feasible for c in
-                                   canonical_constraints])
-
-        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
-
-    @classmethod
-    def _equal_to_canonical(cls, cfun, value):
-        empty_fun = np.empty(0)
-        n = cfun.n
-
-        n_eq = value.shape[0]
-        n_ineq = 0
-        keep_feasible = np.empty(0, dtype=bool)
-
-        if cfun.sparse_jacobian:
-            empty_jac = sps.csr_matrix((0, n))
-        else:
-            empty_jac = np.empty((0, n))
-
-        def fun(x):
-            return cfun.fun(x) - value, empty_fun
-
-        def jac(x):
-            return cfun.jac(x), empty_jac
-
-        def hess(x, v_eq, v_ineq):
-            return cfun.hess(x, v_eq)
-
-        empty_fun = np.empty(0)
-        n = cfun.n
-        if cfun.sparse_jacobian:
-            empty_jac = sps.csr_matrix((0, n))
-        else:
-            empty_jac = np.empty((0, n))
-
-        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
-
-    @classmethod
-    def _less_to_canonical(cls, cfun, ub, keep_feasible):
-        empty_fun = np.empty(0)
-        n = cfun.n
-        if cfun.sparse_jacobian:
-            empty_jac = sps.csr_matrix((0, n))
-        else:
-            empty_jac = np.empty((0, n))
-
-        finite_ub = ub < np.inf
-        n_eq = 0
-        n_ineq = np.sum(finite_ub)
-
-        if np.all(finite_ub):
-            def fun(x):
-                return empty_fun, cfun.fun(x) - ub
-
-            def jac(x):
-                return empty_jac, cfun.jac(x)
-
-            def hess(x, v_eq, v_ineq):
-                return cfun.hess(x, v_ineq)
-        else:
-            finite_ub = np.nonzero(finite_ub)[0]
-            keep_feasible = keep_feasible[finite_ub]
-            ub = ub[finite_ub]
-
-            def fun(x):
-                return empty_fun, cfun.fun(x)[finite_ub] - ub
-
-            def jac(x):
-                return empty_jac, cfun.jac(x)[finite_ub]
-
-            def hess(x, v_eq, v_ineq):
-                v = np.zeros(cfun.m)
-                v[finite_ub] = v_ineq
-                return cfun.hess(x, v)
-
-        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
-
-    @classmethod
-    def _greater_to_canonical(cls, cfun, lb, keep_feasible):
-        empty_fun = np.empty(0)
-        n = cfun.n
-        if cfun.sparse_jacobian:
-            empty_jac = sps.csr_matrix((0, n))
-        else:
-            empty_jac = np.empty((0, n))
-
-        finite_lb = lb > -np.inf
-        n_eq = 0
-        n_ineq = np.sum(finite_lb)
-
-        if np.all(finite_lb):
-            def fun(x):
-                return empty_fun, lb - cfun.fun(x)
-
-            def jac(x):
-                return empty_jac, -cfun.jac(x)
-
-            def hess(x, v_eq, v_ineq):
-                return cfun.hess(x, -v_ineq)
-        else:
-            finite_lb = np.nonzero(finite_lb)[0]
-            keep_feasible = keep_feasible[finite_lb]
-            lb = lb[finite_lb]
-
-            def fun(x):
-                return empty_fun, lb - cfun.fun(x)[finite_lb]
-
-            def jac(x):
-                return empty_jac, -cfun.jac(x)[finite_lb]
-
-            def hess(x, v_eq, v_ineq):
-                v = np.zeros(cfun.m)
-                v[finite_lb] = -v_ineq
-                return cfun.hess(x, v)
-
-        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
-
-    @classmethod
-    def _interval_to_canonical(cls, cfun, lb, ub, keep_feasible):
-        lb_inf = lb == -np.inf
-        ub_inf = ub == np.inf
-        equal = lb == ub
-        less = lb_inf & ~ub_inf
-        greater = ub_inf & ~lb_inf
-        interval = ~equal & ~lb_inf & ~ub_inf
-
-        equal = np.nonzero(equal)[0]
-        less = np.nonzero(less)[0]
-        greater = np.nonzero(greater)[0]
-        interval = np.nonzero(interval)[0]
-        n_less = less.shape[0]
-        n_greater = greater.shape[0]
-        n_interval = interval.shape[0]
-        n_ineq = n_less + n_greater + 2 * n_interval
-        n_eq = equal.shape[0]
-
-        keep_feasible = np.hstack((keep_feasible[less],
-                                   keep_feasible[greater],
-                                   keep_feasible[interval],
-                                   keep_feasible[interval]))
-
-        def fun(x):
-            f = cfun.fun(x)
-            eq = f[equal] - lb[equal]
-            le = f[less] - ub[less]
-            ge = lb[greater] - f[greater]
-            il = f[interval] - ub[interval]
-            ig = lb[interval] - f[interval]
-            return eq, np.hstack((le, ge, il, ig))
-
-        def jac(x):
-            J = cfun.jac(x)
-            eq = J[equal]
-            le = J[less]
-            ge = -J[greater]
-            il = J[interval]
-            ig = -il
-            if sps.issparse(J):
-                ineq = sps.vstack((le, ge, il, ig))
-            else:
-                ineq = np.vstack((le, ge, il, ig))
-            return eq, ineq
-
-        def hess(x, v_eq, v_ineq):
-            n_start = 0
-            v_l = v_ineq[n_start:n_start + n_less]
-            n_start += n_less
-            v_g = v_ineq[n_start:n_start + n_greater]
-            n_start += n_greater
-            v_il = v_ineq[n_start:n_start + n_interval]
-            n_start += n_interval
-            v_ig = v_ineq[n_start:n_start + n_interval]
-
-            v = np.zeros_like(lb)
-            v[equal] = v_eq
-            v[less] = v_l
-            v[greater] = -v_g
-            v[interval] = v_il - v_ig
-
-            return cfun.hess(x, v)
-
-        return cls(n_eq, n_ineq, fun, jac, hess, keep_feasible)
-
-
-class LagrangianHessian(object):
-    def __init__(self, n, objective_hess, constraints_hess):
-        self.n = n
-        self.objective_hess = objective_hess
-        self.constraints_hess = constraints_hess
-
-    def __call__(self, x, v_eq=np.empty(0), v_ineq=np.empty(0)):
-        H_objective = self.objective_hess(x)
-        H_constraints = self.constraints_hess(x, v_eq, v_ineq)
-
-        def matvec(p):
-            return H_objective.dot(p) + H_constraints.dot(p)
-
-        return LinearOperator((self.n, self.n), matvec)
-
-
-class VectorFunction(object):
-
-    def __init__(self, fun, x0, jac, hess,
-                 finite_diff_rel_step, finite_diff_jac_sparsity,
-                 finite_diff_bounds, sparse_jacobian):
-        if not callable(jac) and jac not in FD_METHODS:
-            raise ValueError("`jac` must be either callable or one of {}."
-                             .format(FD_METHODS))
-
-        if not (callable(hess) or hess in FD_METHODS
-                or isinstance(hess, HessianUpdateStrategy)):
-            raise ValueError("`hess` must be either callable,"
-                             "HessianUpdateStrategy or one of {}."
-                             .format(FD_METHODS))
-
-        if jac in FD_METHODS and hess in FD_METHODS:
-            raise ValueError("Whenever the Jacobian is estimated via "
-                             "finite-differences, we require the Hessian to "
-                             "be estimated using one of the quasi-Newton "
-                             "strategies.")
-
-        self.x = np.atleast_1d(x0).astype(float)
-        self.n = self.x.size
-        self.nfev = 0
-        self.njev = 0
-        self.nhev = 0
-        self.f_updated = False
-        self.J_updated = False
-        self.H_updated = False
-
-        finite_diff_options = {}
-        if jac in FD_METHODS:
-            finite_diff_options["method"] = jac
-            finite_diff_options["rel_step"] = finite_diff_rel_step
-            if finite_diff_jac_sparsity is not None:
-                sparsity_groups = group_columns(finite_diff_jac_sparsity)
-                finite_diff_options["sparsity"] = (finite_diff_jac_sparsity,
-                                                   sparsity_groups)
-            finite_diff_options["bounds"] = finite_diff_bounds
-            self.x_diff = np.copy(self.x)
-        if hess in FD_METHODS:
-            finite_diff_options["method"] = hess
-            finite_diff_options["rel_step"] = finite_diff_rel_step
-            finite_diff_options["as_linear_operator"] = True
-            self.x_diff = np.copy(self.x)
-        if jac in FD_METHODS and hess in FD_METHODS:
-            raise ValueError("Whenever the Jacobian is estimated via "
-                             "finite-differences, we require the Hessian to "
-                             "be estimated using one of the quasi-Newton "
-                             "strategies.")
-
-        # Function evaluation
-        def fun_wrapped(x):
-            self.nfev += 1
-            return np.atleast_1d(fun(x))
-
-        def update_fun():
-            self.f = fun_wrapped(self.x)
-
-        self._update_fun_impl = update_fun
-        update_fun()
-
-        self.v = np.zeros_like(self.f)
-        self.m = self.v.size
-
-        # Jacobian Evaluation
-        if callable(jac):
-            self.J = jac(self.x)
-            self.J_updated = True
-            self.njev += 1
-
-            if (sparse_jacobian or
-                    sparse_jacobian is None and sps.issparse(self.J)):
-                def jac_wrapped(x):
-                    self.njev += 1
-                    return sps.csr_matrix(jac(x))
-                self.J = sps.csr_matrix(self.J)
-                self.sparse_jacobian = True
-
-            elif sps.issparse(self.J):
-                def jac_wrapped(x):
-                    self.njev += 1
-                    return jac(x).toarray()
-                self.J = self.J.toarray()
-                self.sparse_jacobian = False
-
-            else:
-                def jac_wrapped(x):
-                    self.njev += 1
-                    return np.atleast_2d(jac(x))
-                self.J = np.atleast_2d(self.J)
-                self.sparse_jacobian = False
-
-            def update_jac():
-                self.J = jac_wrapped(self.x)
-
-        elif jac in FD_METHODS:
-            self.J = approx_derivative(fun_wrapped, self.x, f0=self.f,
-                                       **finite_diff_options)
-            self.J_updated = True
-
-            if (sparse_jacobian or
-                    sparse_jacobian is None and sps.issparse(self.J)):
-                def update_jac():
-                    self._update_fun()
-                    self.J = sps.csr_matrix(
-                        approx_derivative(fun_wrapped, self.x, f0=self.f,
-                                          **finite_diff_options))
-                self.J = sps.csr_matrix(self.J)
-                self.sparse_jacobian = True
-
-            elif sps.issparse(self.J):
-                def update_jac():
-                    self._update_fun()
-                    self.J = approx_derivative(fun_wrapped, self.x, f0=self.f,
-                                               **finite_diff_options).toarray()
-                self.J = self.J.toarray()
-                self.sparse_jacobian = False
-
-            else:
-                def update_jac():
-                    self._update_fun()
-                    self.J = np.atleast_2d(
-                        approx_derivative(fun_wrapped, self.x, f0=self.f,
-                                          **finite_diff_options))
-                self.J = np.atleast_2d(self.J)
-                self.sparse_jacobian = False
-
-        self._update_jac_impl = update_jac
-
-        # Define Hessian
-        if callable(hess):
-            self.H = hess(self.x, self.v)
-            self.H_updated = True
-            self.nhev += 1
-
-            if sps.issparse(self.H):
-                def hess_wrapped(x, v):
-                    self.nhev += 1
-                    return sps.csr_matrix(hess(x, v))
-                self.H = sps.csr_matrix(self.H)
-
-            elif isinstance(self.H, LinearOperator):
-                def hess_wrapped(x, v):
-                    self.nhev += 1
-                    return hess(x, v)
-
-            else:
-                def hess_wrapped(x, v):
-                    self.nhev += 1
-                    return np.atleast_2d(np.asarray(hess(x, v)))
-                self.H = np.atleast_2d(np.asarray(self.H))
-
-            def update_hess():
-                self.H = hess_wrapped(self.x, self.v)
-        elif hess in FD_METHODS:
-            def jac_dot_v(x, v):
-                return jac_wrapped(x).T.dot(v)
-
-            def update_hess():
-                self._update_jac()
-                self.H = approx_derivative(jac_dot_v, self.x,
-                                           f0=self.J.T.dot(self.v),
-                                           args=(self.v,),
-                                           **finite_diff_options)
-            update_hess()
-            self.H_updated = True
-        elif isinstance(hess, HessianUpdateStrategy):
-            self.H = hess
-            self.H.initialize(self.n, 'hess')
-            self.H_updated = True
-            self.x_prev = None
-            self.J_prev = None
-
-            def update_hess():
-                self._update_jac()
-                if self.x_prev is not None and self.J_prev is not None:
-                    delta_x = self.x - self.x_prev
-                    delta_g = self.J.T.dot(self.v) - self.J_prev.T.dot(self.v)
-                    self.H.update(delta_x, delta_g)
-
-        self._update_hess_impl = update_hess
-
-        if isinstance(hess, HessianUpdateStrategy):
-            def update_x(x):
-                self._update_jac()
-                self.x_prev = self.x
-                self.J_prev = self.J
-                self.x = np.atleast_1d(x).astype(float)
-                self.f_updated = False
-                self.J_updated = False
-                self.H_updated = False
-                self._update_hess()
-        else:
-            def update_x(x):
-                self.x = np.atleast_1d(x).astype(float)
-                self.f_updated = False
-                self.J_updated = False
-                self.H_updated = False
-
-        self._update_x_impl = update_x
-
-    def _update_v(self, v):
-        if not np.array_equal(v, self.v):
-            self.v = v
-            self.H_updated = False
-
-    def _update_x(self, x):
-        if not np.array_equal(x, self.x):
-            self._update_x_impl(x)
-
-    def _update_fun(self):
-        if not self.f_updated:
-            self._update_fun_impl()
-            self.f_updated = True
-
-    def _update_jac(self):
-        if not self.J_updated:
-            self._update_jac_impl()
-            self.J_updated = True
-
-    def _update_hess(self):
-        if not self.H_updated:
-            self._update_hess_impl()
-            self.H_updated = True
-
-    def fun(self, x):
-        self._update_x(x)
-        self._update_fun()
-        return self.f
-
-    def jac(self, x):
-        self._update_x(x)
-        self._update_jac()
-        return self.J
-
-    def hess(self, x, v):
-        # v should be updated before x.
-        self._update_v(v)
-        self._update_x(x)
-        self._update_hess()
-        return self.H
-
-
-class LinearVectorFunction(object):
-    def __init__(self, A, x0, sparse_jacobian):
-        if sparse_jacobian or sparse_jacobian is None and sps.issparse(A):
-            self.J = sps.csr_matrix(A)
-            self.sparse_jacobian = True
-        elif sps.issparse(A):
-            self.J = A.toarray()
-            self.sparse_jacobian = False
-        else:
-            self.J = np.atleast_2d(A)
-            self.sparse_jacobian = False
-
-        self.m, self.n = self.J.shape
-
-        self.x = np.atleast_1d(x0).astype(float)
-        self.f = self.J.dot(self.x)
-        self.f_updated = True
-
-        self.v = np.zeros(self.m, dtype=float)
-        self.H = sps.csr_matrix((self.n, self.n))
-
-    def _update_x(self, x):
-        if not np.array_equal(x, self.x):
-            self.x = np.atleast_1d(x).astype(float)
-            self.f_updated = False
-
-    def fun(self, x):
-        self._update_x(x)
-        if not self.f_updated:
-            self.f = self.J.dot(x)
-            self.f_updated = True
-        return self.f
-
-    def jac(self, x):
-        self._update_x(x)
-        return self.J
-
-    def hess(self, x, v):
-        self._update_x(x)
-        self.v = v
-        return self.H
-
-
-class IdentityVectorFunction(LinearVectorFunction):
-    def __init__(self, x0, sparse_jacobian):
-        n = len(x0)
-        if sparse_jacobian or sparse_jacobian is None:
-            A = sps.eye(n, format='csr')
-            sparse_jacobian = True
-        else:
-            A = np.eye(n)
-            sparse_jacobian = False
-        super(IdentityVectorFunction, self).__init__(A, x0, sparse_jacobian)
-
 
         
-class PreparedConstraint(object):
-
-    def __init__(self, constraint, x0, sparse_jacobian=None,
-                 finite_diff_bounds=(-np.inf, np.inf)):
-        if isinstance(constraint, NonlinearConstraint):
-            fun = VectorFunction(constraint.fun, x0,
-                                 constraint.jac, constraint.hess,
-                                 constraint.finite_diff_rel_step,
-                                 constraint.finite_diff_jac_sparsity,
-                                 finite_diff_bounds, sparse_jacobian)
-        elif isinstance(constraint, LinearConstraint):
-            fun = LinearVectorFunction(constraint.A, x0, sparse_jacobian)
-        elif isinstance(constraint, Bounds):
-            fun = IdentityVectorFunction(x0, sparse_jacobian)
-        else:
-            raise ValueError("`constraint` of an unknown type is passed.")
-
-        m = fun.m
-        lb = np.asarray(constraint.lb, dtype=float)
-        ub = np.asarray(constraint.ub, dtype=float)
-        if lb.ndim == 0:
-            lb = np.resize(lb, m)
-        if ub.ndim == 0:
-            ub = np.resize(ub, m)
-
-        keep_feasible = np.asarray(constraint.keep_feasible, dtype=bool)
-        if keep_feasible.ndim == 0:
-            keep_feasible = np.resize(keep_feasible, m)
-        if keep_feasible.shape != (m,):
-            raise ValueError("`keep_feasible` has a wrong shape.")
-
-        mask = keep_feasible & (lb != ub)
-        f0 = fun.f
-        if np.any(f0[mask] < lb[mask]) or np.any(f0[mask] > ub[mask]):
-            raise ValueError("`x0` is infeasible with respect to some "
-                             "inequality constraint with `keep_feasible` "
-                             "set to True.")
-
-        self.fun = fun
-        self.bounds = (lb, ub)
-        self.keep_feasible = keep_feasible
-
-    def violation(self, x):
-        with suppress_warnings() as sup:
-            sup.filter(UserWarning)
-            ev = self.fun.fun(np.asarray(x))
-
-        excess_lb = np.maximum(self.bounds[0] - ev, 0)
-        excess_ub = np.maximum(ev - self.bounds[1], 0)
-
-        return excess_lb + excess_ub
-
-FD_METHODS = ('2-point', '3-point', 'cs')
-
-class ScalarFunction(object):
-
-    def __init__(self, fun, x0, args, grad, hess, finite_diff_rel_step,
-                 finite_diff_bounds):
-        if not callable(grad) and grad not in FD_METHODS:
-            raise ValueError("`grad` must be either callable or one of {}."
-                             .format(FD_METHODS))
-
-        if not (callable(hess) or hess in FD_METHODS
-                or isinstance(hess, HessianUpdateStrategy)):
-            raise ValueError("`hess` must be either callable,"
-                             "HessianUpdateStrategy or one of {}."
-                             .format(FD_METHODS))
-
-        if grad in FD_METHODS and hess in FD_METHODS:
-            raise ValueError("Whenever the gradient is estimated via "
-                             "finite-differences, we require the Hessian "
-                             "to be estimated using one of the "
-                             "quasi-Newton strategies.")
-
-        self.x = np.atleast_1d(x0).astype(float)
-        self.n = self.x.size
-        self.nfev = 0
-        self.ngev = 0
-        self.nhev = 0
-        self.f_updated = False
-        self.g_updated = False
-        self.H_updated = False
-
-        finite_diff_options = {}
-        if grad in FD_METHODS:
-            finite_diff_options["method"] = grad
-            finite_diff_options["rel_step"] = finite_diff_rel_step
-            finite_diff_options["bounds"] = finite_diff_bounds
-        if hess in FD_METHODS:
-            finite_diff_options["method"] = hess
-            finite_diff_options["rel_step"] = finite_diff_rel_step
-            finite_diff_options["as_linear_operator"] = True
-
-        # Function evaluation
-        def fun_wrapped(x):
-            self.nfev += 1
-            return fun(x, *args)
-
-        def update_fun():
-            self.f = fun_wrapped(self.x)
-
-        self._update_fun_impl = update_fun
-        self._update_fun()
-
-        if callable(grad):
-            def grad_wrapped(x):
-                self.ngev += 1
-                return np.atleast_1d(grad(x, *args))
-
-            def update_grad():
-                self.g = grad_wrapped(self.x)
-
-        elif grad in FD_METHODS:
-            def update_grad():
-                self._update_fun()
-                self.g = approx_derivative(fun_wrapped, self.x, f0=self.f,
-                                           **finite_diff_options)
-
-        self._update_grad_impl = update_grad
-        self._update_grad()
-
-        # Hessian Evaluation
-        if callable(hess):
-            self.H = hess(x0, *args)
-            self.H_updated = True
-            self.nhev += 1
-
-            if sps.issparse(self.H):
-                def hess_wrapped(x):
-                    self.nhev += 1
-                    return sps.csr_matrix(hess(x, *args))
-                self.H = sps.csr_matrix(self.H)
-
-            elif isinstance(self.H, LinearOperator):
-                def hess_wrapped(x):
-                    self.nhev += 1
-                    return hess(x, *args)
-
-            else:
-                def hess_wrapped(x):
-                    self.nhev += 1
-                    return np.atleast_2d(np.asarray(hess(x, *args)))
-                self.H = np.atleast_2d(np.asarray(self.H))
-
-            def update_hess():
-                self.H = hess_wrapped(self.x)
-
-        elif hess in FD_METHODS:
-            def update_hess():
-                self._update_grad()
-                self.H = approx_derivative(grad_wrapped, self.x, f0=self.g,
-                                           **finite_diff_options)
-                return self.H
-
-            update_hess()
-            self.H_updated = True
-        elif isinstance(hess, HessianUpdateStrategy):
-            self.H = hess
-            self.H.initialize(self.n, 'hess')
-            self.H_updated = True
-            self.x_prev = None
-            self.g_prev = None
-
-            def update_hess():
-                self._update_grad()
-                self.H.update(self.x - self.x_prev, self.g - self.g_prev)
-
-        self._update_hess_impl = update_hess
-
-        if isinstance(hess, HessianUpdateStrategy):
-            def update_x(x):
-                self._update_grad()
-                self.x_prev = self.x
-                self.g_prev = self.g
-
-                self.x = np.atleast_1d(x).astype(float)
-                self.f_updated = False
-                self.g_updated = False
-                self.H_updated = False
-                self._update_hess()
-        else:
-            def update_x(x):
-                self.x = np.atleast_1d(x).astype(float)
-                self.f_updated = False
-                self.g_updated = False
-                self.H_updated = False
-        self._update_x_impl = update_x
-
-    def _update_fun(self):
-        if not self.f_updated:
-            self._update_fun_impl()
-            self.f_updated = True
-
-    def _update_grad(self):
-        if not self.g_updated:
-            self._update_grad_impl()
-            self.g_updated = True
-
-    def _update_hess(self):
-        if not self.H_updated:
-            self._update_hess_impl()
-            self.H_updated = True
-
-    def fun(self, x):
-        if not np.array_equal(x, self.x):
-            self._update_x_impl(x)
-        self._update_fun()
-        return self.f
-
-    def grad(self, x):
-        if not np.array_equal(x, self.x):
-            self._update_x_impl(x)
-        self._update_grad()
-        return self.g
-
-    def hess(self, x):
-        if not np.array_equal(x, self.x):
-            self._update_x_impl(x)
-        self._update_hess()
-        return self.H
-
-
-
-class BarrierSubproblem:
-    def __init__(self, x0, s0, fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
-                 constr, jac, barrier_parameter, tolerance,
-                 enforce_feasibility, global_stop_criteria,
-                 xtol, fun0, grad0, constr_ineq0, jac_ineq0, constr_eq0,
-                 jac_eq0):
-        # Store parameters
-        self.n_vars = n_vars
-        self.x0 = x0
-        self.s0 = s0
-        self.fun = fun
-        self.grad = grad
-        self.lagr_hess = lagr_hess
-        self.constr = constr
-        self.jac = jac
-        self.barrier_parameter = barrier_parameter
-        self.tolerance = tolerance
-        self.n_eq = n_eq
-        self.n_ineq = n_ineq
-        self.enforce_feasibility = enforce_feasibility
-        self.global_stop_criteria = global_stop_criteria
-        self.xtol = xtol
-        self.fun0 = self._compute_function(fun0, constr_ineq0, s0)
-        self.grad0 = self._compute_gradient(grad0)
-        self.constr0 = self._compute_constr(constr_ineq0, constr_eq0, s0)
-        self.jac0 = self._compute_jacobian(jac_eq0, jac_ineq0, s0)
-        self.terminate = False
-
-    def update(self, barrier_parameter, tolerance):
-        self.barrier_parameter = barrier_parameter
-        self.tolerance = tolerance
-
-    def get_slack(self, z):
-        return z[self.n_vars:self.n_vars+self.n_ineq]
-
-    def get_variables(self, z):
-        return z[:self.n_vars]
-
-    def function_and_constraints(self, z):
-        x = self.get_variables(z)
-        s = self.get_slack(z)
-        f = self.fun(x)
-        c_eq, c_ineq = self.constr(x)
-        return (self._compute_function(f, c_ineq, s),
-                self._compute_constr(c_ineq, c_eq, s))
-
-    def _compute_function(self, f, c_ineq, s):
-        s[self.enforce_feasibility] = -c_ineq[self.enforce_feasibility]
-        log_s = [np.log(s_i) if s_i > 0 else -np.inf for s_i in s]
-        return f - self.barrier_parameter*np.sum(log_s)
-
-    def _compute_constr(self, c_ineq, c_eq, s):
-        return np.hstack((c_eq,
-                          c_ineq + s))
-
-    def scaling(self, z):
-        s = self.get_slack(z)
-        diag_elements = np.hstack((np.ones(self.n_vars), s))
-
-        # Diagonal Matrix
-        def matvec(vec):
-            return diag_elements*vec
-        return LinearOperator((self.n_vars+self.n_ineq,
-                               self.n_vars+self.n_ineq),
-                              matvec)
-
-    def gradient_and_jacobian(self, z):
-        x = self.get_variables(z)
-        s = self.get_slack(z)
-        g = self.grad(x)
-        J_eq, J_ineq = self.jac(x)
-        return (self._compute_gradient(g),
-                self._compute_jacobian(J_eq, J_ineq, s))
-
-    def _compute_gradient(self, g):
-        return np.hstack((g, -self.barrier_parameter*np.ones(self.n_ineq)))
-
-    def _compute_jacobian(self, J_eq, J_ineq, s):
-        if self.n_ineq == 0:
-            return J_eq
-        else:
-            if sps.issparse(J_eq) or sps.issparse(J_ineq):
-                J_eq = sps.csr_matrix(J_eq)
-                J_ineq = sps.csr_matrix(J_ineq)
-                return self._assemble_sparse_jacobian(J_eq, J_ineq, s)
-            else:
-                S = np.diag(s)
-                zeros = np.zeros((self.n_eq, self.n_ineq))
-                if sps.issparse(J_ineq):
-                    J_ineq = J_ineq.toarray()
-                if sps.issparse(J_eq):
-                    J_eq = J_eq.toarray()
-                return np.block([[J_eq, zeros],
-                                 [J_ineq, S]])
-
-    def _assemble_sparse_jacobian(self, J_eq, J_ineq, s):
-
-        n_vars, n_ineq, n_eq = self.n_vars, self.n_ineq, self.n_eq
-        J_aux = sps.vstack([J_eq, J_ineq], "csr")
-        indptr, indices, data = J_aux.indptr, J_aux.indices, J_aux.data
-        new_indptr = indptr + np.hstack((np.zeros(n_eq, dtype=int),
-                                         np.arange(n_ineq+1, dtype=int)))
-        size = indices.size+n_ineq
-        new_indices = np.empty(size)
-        new_data = np.empty(size)
-        mask = np.full(size, False, bool)
-        mask[new_indptr[-n_ineq:]-1] = True
-        new_indices[mask] = n_vars+np.arange(n_ineq)
-        new_indices[~mask] = indices
-        new_data[mask] = s
-        new_data[~mask] = data
-        J = sps.csr_matrix((new_data, new_indices, new_indptr),
-                           (n_eq + n_ineq, n_vars + n_ineq))
-        return J
-
-    def lagrangian_hessian_x(self, z, v):
-        x = self.get_variables(z)
-        v_eq = v[:self.n_eq]
-        v_ineq = v[self.n_eq:self.n_eq+self.n_ineq]
-        lagr_hess = self.lagr_hess
-        return lagr_hess(x, v_eq, v_ineq)
-
-    def lagrangian_hessian_s(self, z, v):
-        s = self.get_slack(z)
-        primal = self.barrier_parameter
-        primal_dual = v[-self.n_ineq:]*s
-        return np.where(v[-self.n_ineq:] > 0, primal_dual, primal)
-
-    def lagrangian_hessian(self, z, v):
-        Hx = self.lagrangian_hessian_x(z, v)
-        if self.n_ineq > 0:
-            S_Hs_S = self.lagrangian_hessian_s(z, v)
-            
-        def matvec(vec):
-            vec_x = self.get_variables(vec)
-            vec_s = self.get_slack(vec)
-            if self.n_ineq > 0:
-                return np.hstack((Hx.dot(vec_x), S_Hs_S*vec_s))
-            else:
-                return Hx.dot(vec_x)
-        return LinearOperator((self.n_vars+self.n_ineq,
-                               self.n_vars+self.n_ineq),
-                              matvec)
-
-    def stop_criteria(self, state, z, last_iteration_failed,
-                      optimality, constr_violation,
-                      trust_radius, penalty, cg_info):
-
-        x = self.get_variables(z)
-        if self.global_stop_criteria(state, x,
-                                     last_iteration_failed,
-                                     trust_radius, penalty,
-                                     cg_info,
-                                     self.barrier_parameter,
-                                     self.tolerance):
-            self.terminate = True
-            return True
-        else:
-            g_cond = (optimality < self.tolerance and
-                      constr_violation < self.tolerance)
-            x_cond = trust_radius < self.xtol
-            return g_cond or x_cond
-
-
 def rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
