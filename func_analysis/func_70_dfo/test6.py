@@ -137,22 +137,17 @@ class SR1(FullHessianUpdateStrategy):
         super(SR1, self).__init__(init_scale)
 
     def _update_implementation(self, delta_x, delta_grad):
-        # Auxiliary variables w and z
         if self.approx_type == 'hess':
             w = delta_x
             z = delta_grad
         else:
             w = delta_grad
             z = delta_x
-        # Do some common operations
         Mw = self.dot(w)
         z_minus_Mw = z - Mw
         denominator = np.dot(w, z_minus_Mw)
-        # If the denominator is too small
-        # we just skip the update.
         if np.abs(denominator) <= self.min_denominator*norm(w)*norm(z_minus_Mw):
             return
-        # Update matrix
         if self.approx_type == 'hess':
             self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
         else:
@@ -197,40 +192,32 @@ def box_intersections(z, d, lb, ub,
     if norm(d) == 0:
         return 0, 0, False
 
-    # Get values for which d==0
     zero_d = (d == 0)
-    # If the boundaries are not satisfied for some coordinate
-    # for which "d" is zero, there is no box-line intersection.
     if (z[zero_d] < lb[zero_d]).any() or (z[zero_d] > ub[zero_d]).any():
         intersect = False
         return 0, 0, intersect
-    # Remove values for which d is zero
     not_zero_d = np.logical_not(zero_d)
     z = z[not_zero_d]
     d = d[not_zero_d]
     lb = lb[not_zero_d]
     ub = ub[not_zero_d]
 
-    # Find a series of intervals (t_lb[i], t_ub[i]).
     t_lb = (lb-z) / d
     t_ub = (ub-z) / d
-    # Get the intersection of all those intervals.
     ta = max(np.minimum(t_lb, t_ub))
     tb = min(np.maximum(t_lb, t_ub))
 
-    # Check if intersection is feasible
     if ta <= tb:
         intersect = True
     else:
         intersect = False
-    # Checks to see if intersection happens within vectors length.
+
     if not entire_line:
         if tb < 0 or ta > 1:
             intersect = False
             ta = 0
             tb = 0
         else:
-            # Restrict intersection interval between 0 and 1.
             ta = max(0, ta)
             tb = min(1, tb)
 
@@ -239,10 +226,8 @@ def box_intersections(z, d, lb, ub,
 def sphere_intersections(z, d, trust_radius,
                          entire_line=False):
 
-    # Special case when d=0
     if norm(d) == 0:
         return 0, 0, False
-    # Check for inf trust_radius
     if np.isinf(trust_radius):
         if entire_line:
             ta = -np.inf
@@ -270,16 +255,12 @@ def sphere_intersections(z, d, trust_radius,
     if entire_line:
         intersect = True
     else:
-        # Checks to see if intersection happens
-        # within vectors length.
         if tb < 0 or ta > 1:
             intersect = False
             ta = 0
             tb = 0
         else:
             intersect = True
-            # Restrict intersection interval
-            # between 0 and 1.
             ta = max(0, ta)
             tb = min(1, tb)
 
@@ -1054,7 +1035,6 @@ class ScalarFunction(object):
         self._update_fun_impl = update_fun
         self._update_fun()
 
-        # Gradient evaluation
         if callable(grad):
             def grad_wrapped(x):
                 self.ngev += 1
@@ -1323,17 +1303,8 @@ class BarrierSubproblem:
     def lagrangian_hessian_s(self, z, v):
         """Returns scaled Lagrangian Hessian (in relation to`s`) -> S Hs S"""
         s = self.get_slack(z)
-        # Using the primal formulation:
-        #     S Hs S = diag(s)*diag(barrier_parameter/s**2)*diag(s).
-        # Reference [1]_ p. 882, formula (3.1)
         primal = self.barrier_parameter
-        # Using the primal-dual formulation
-        #     S Hs S = diag(s)*diag(v/s)*diag(s)
-        # Reference [1]_ p. 883, formula (3.11)
         primal_dual = v[-self.n_ineq:]*s
-        # Uses the primal-dual formulation for
-        # positives values of v_ineq, and primal
-        # formulation for the remaining ones.
         return np.where(v[-self.n_ineq:] > 0, primal_dual, primal)
 
     def lagrangian_hessian(self, z, v):
@@ -1752,6 +1723,7 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
     while not stop_criteria(state, x, last_iteration_failed,
                             optimality, constr_violation,
                             trust_radius, penalty, cg_info):
+#    for i in range(5):
         # Normal Step - `dn`
         # minimize 1/2*||A dn + b||^2
         # subject to:
