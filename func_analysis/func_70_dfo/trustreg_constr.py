@@ -1,12 +1,6 @@
-from scipy.interpolate import Rbf
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from matplotlib import cm
 from math import copysign
 import numpy as np
 import itertools, time
-import numpy.linalg as lin
-import scipy.linalg as slin
 import scipy.sparse as sps
 from scipy.linalg import get_blas_funcs
 import scipy.sparse.linalg
