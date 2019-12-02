@@ -1,9 +1,7 @@
 from scipy.optimize import minpack2
 import warnings
-import numpy
 import numpy as np
 from scipy._lib.six import xrange
-from numpy import (atleast_1d)
 
 _status_message = {'success': 'Optimization terminated successfully.',
                    'maxfev': 'Maximum number of function evaluations has '
@@ -82,7 +80,7 @@ def _approx_fprime_helper(xk, f, epsilon, args=(), f0=None):
     return grad
 
 def vecnorm(x, ord=2):
-    return numpy.amax(numpy.abs(x))
+    return np.amax(np.abs(x))
 
 def line_search_wolfe1(f, fprime, xk, pk, gfk=None,
                        old_fval=None, old_old_fval=None,
@@ -190,7 +188,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
     warnflag = 0
     gnorm = vecnorm(gfk, ord=norm)
     while (gnorm > gtol) and (k < maxiter):
-        pk = -numpy.dot(Hk, gfk)
+        pk = -np.dot(Hk, gfk)
         try:
             alpha_k, fc, gc, old_fval, old_old_fval, gfkp1 = \
                      line_search_wolfe1(f, myfprime, xk, pk, gfk,
@@ -211,14 +209,14 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
         gnorm = vecnorm(gfk, ord=norm)
         if (gnorm <= gtol): break
 
-        if not numpy.isfinite(old_fval):           
+        if not np.isfinite(old_fval):           
             # We correctly found +-Inf as optimal value, or something went
             # wrong.
             warnflag = 2
             break
 
         try:  # this was handled in numeric, let it remaines for more safety
-            rhok = 1.0 / (numpy.dot(yk, sk))
+            rhok = 1.0 / (np.dot(yk, sk))
         except ZeroDivisionError:
             rhok = 1000.0
             if disp:
@@ -227,10 +225,9 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
             rhok = 1000.0
             if disp:
                 print("Divide-by-zero encountered: rhok assumed large")
-        A1 = I - sk[:, numpy.newaxis] * yk[numpy.newaxis, :] * rhok
-        A2 = I - yk[:, numpy.newaxis] * sk[numpy.newaxis, :] * rhok
-        Hk = numpy.dot(A1, numpy.dot(Hk, A2)) + (rhok * sk[:, numpy.newaxis] *
-                                                 sk[numpy.newaxis, :])
+        A1 = I - sk[:, np.newaxis] * yk[np.newaxis, :] * rhok
+        A2 = I - yk[:, np.newaxis] * sk[np.newaxis, :] * rhok
+        Hk = np.dot(A1, np.dot(Hk, A2)) + (rhok * sk[:, np.newaxis] * sk[np.newaxis, :])
 
     fval = old_fval
 
