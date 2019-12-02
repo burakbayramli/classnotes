@@ -254,12 +254,9 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
             break
 
         xkp1 = xk + alpha_k * pk
-        if retall:
-            allvecs.append(xkp1)
+
         sk = xkp1 - xk
         xk = xkp1
-        if gfkp1 is None:
-            gfkp1 = myfprime(xkp1)
 
         yk = gfkp1 - gfk
         gfk = gfkp1
