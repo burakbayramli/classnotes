@@ -3,9 +3,7 @@ import warnings
 import numpy
 import numpy as np
 from scipy._lib.six import xrange
-import numpy.linalg as lin
-import scipy.linalg as slin
-from numpy import (atleast_1d, mgrid, Inf, asfarray, isinf)
+from numpy import (atleast_1d, asfarray, isinf)
 
 _status_message = {'success': 'Optimization terminated successfully.',
                    'maxfev': 'Maximum number of function evaluations has '
@@ -160,7 +158,7 @@ def scalar_search_wolfe1(phi, derphi, phi0=None, old_phi0=None, derphi0=None,
     return stp, phi1, phi0
 
 def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
-                   gtol=1e-5, norm=Inf, eps=_epsilon, maxiter=None,
+                   gtol=1e-5, norm=np.Inf, eps=_epsilon, maxiter=None,
                    disp=False, return_all=False,
                    **unknown_options):
 
