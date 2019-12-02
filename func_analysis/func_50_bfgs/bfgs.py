@@ -96,9 +96,6 @@ def line_search_wolfe1(f, fprime, xk, pk, gfk=None,
                        old_fval=None, old_old_fval=None,
                        args=(), c1=1e-4, c2=0.9, amax=50, amin=1e-8,
                        xtol=1e-14):
-    if gfk is None:
-        gfk = fprime(xk)
-
     newargs = args
     gradient = True
 
