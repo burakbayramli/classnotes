@@ -133,21 +133,6 @@ def line_search_wolfe1(f, fprime, xk, pk, gfk=None,
     return stp, fc[0], gc[0], fval, old_fval, gval[0]
 
     
-def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
-                         **kwargs):
-    extra_condition = kwargs.pop('extra_condition', None)
-
-    ret = line_search_wolfe1(f, fprime, xk, pk, gfk,
-                             old_fval, old_old_fval,
-                             **kwargs)
-
-
-    if ret[0] is None:
-        raise _LineSearchError()
-
-    return ret
-
-
 def scalar_search_wolfe1(phi, derphi, phi0=None, old_phi0=None, derphi0=None,
                          c1=1e-4, c2=0.9,
                          amax=50, amin=1e-8, xtol=1e-14):
@@ -225,7 +210,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
         pk = -numpy.dot(Hk, gfk)
         try:
             alpha_k, fc, gc, old_fval, old_old_fval, gfkp1 = \
-                     _line_search_wolfe12(f, myfprime, xk, pk, gfk,
+                     line_search_wolfe1(f, myfprime, xk, pk, gfk,
                                           old_fval, old_old_fval, amin=1e-100, amax=1e100)
         except _LineSearchError:
             # Line search failed to find a better solution.
