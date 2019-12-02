@@ -5,8 +5,7 @@ import numpy as np
 from scipy._lib.six import xrange
 import numpy.linalg as lin
 import scipy.linalg as slin
-from numpy import (atleast_1d, eye, mgrid,  shape, squeeze,
-                   asarray, sqrt, Inf, asfarray, isinf)
+from numpy import (atleast_1d, eye, mgrid, sqrt, Inf, asfarray, isinf)
 
 _status_message = {'success': 'Optimization terminated successfully.',
                    'maxfev': 'Maximum number of function evaluations has '
@@ -170,7 +169,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
     epsilon = eps
     retall = return_all
 
-    x0 = asarray(x0).flatten()
+    x0 = np.asarray(x0).flatten()
 
     func_calls, f = wrap_function(f, args)
 
