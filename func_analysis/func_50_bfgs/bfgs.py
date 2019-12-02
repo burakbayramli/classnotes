@@ -5,7 +5,7 @@ import numpy as np
 from scipy._lib.six import xrange
 import numpy.linalg as lin
 import scipy.linalg as slin
-from numpy import (atleast_1d, eye, mgrid, argmin, zeros, shape, squeeze,
+from numpy import (atleast_1d, eye, mgrid,  shape, squeeze,
                    asarray, sqrt, Inf, asfarray, isinf)
 
 _status_message = {'success': 'Optimization terminated successfully.',
@@ -67,8 +67,8 @@ def approx_fprime(xk, f, epsilon, *args):
 def _approx_fprime_helper(xk, f, epsilon, args=(), f0=None):
     if f0 is None:
         f0 = f(*((xk,) + args))
-    grad = numpy.zeros((len(xk),), float)
-    ei = numpy.zeros((len(xk),), float)
+    grad = np.zeros((len(xk),), float)
+    ei = np.zeros((len(xk),), float)
     for k in range(len(xk)):
         ei[k] = 1.0
         d = epsilon * ei
