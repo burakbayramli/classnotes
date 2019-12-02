@@ -47,14 +47,6 @@ def wrap_function(function, args):
     return ncalls, function_wrapper
 
 _epsilon = np.sqrt(np.finfo(float).eps)
-
-class OptimizeWarning(UserWarning):
-    pass
-
-class _LineSearchError(RuntimeError):
-    pass
-
-#from scipy.optimize import (minimize)
         
 def approx_fprime(xk, f, epsilon, *args):
     return _approx_fprime_helper(xk, f, epsilon, args=args)
@@ -117,6 +109,7 @@ def line_search_wolfe1(f, fprime, xk, pk, gfk=None,
 def scalar_search_wolfe1(phi, derphi, phi0=None, old_phi0=None, derphi0=None,
                          c1=1e-4, c2=0.9,
                          amax=50, amin=1e-8, xtol=1e-14):
+
     if phi0 is None:
         phi0 = phi(0.)
     if derphi0 is None:
