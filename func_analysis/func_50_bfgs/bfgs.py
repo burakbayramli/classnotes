@@ -71,7 +71,7 @@ def _approx_fprime_helper(xk, f, epsilon, args=(), f0=None):
         ei[k] = 0.0
     return grad
 
-def vecnorm(x, ord=2):
+def vecnorm(x):
     return np.amax(np.abs(x))
 
 def line_search_wolfe1(f, fprime, xk, pk, gfk=None,
@@ -179,7 +179,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
     if retall:
         allvecs = [x0]
     warnflag = 0
-    gnorm = vecnorm(gfk, ord=norm)
+    gnorm = vecnorm(gfk)
     while (gnorm > gtol) and (k < maxiter):
         pk = -np.dot(Hk, gfk)
         try:
@@ -199,7 +199,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
         yk = gfkp1 - gfk
         gfk = gfkp1
         k += 1
-        gnorm = vecnorm(gfk, ord=norm)
+        gnorm = vecnorm(gfk)
         if (gnorm <= gtol): break
 
         if not np.isfinite(old_fval):           
@@ -238,13 +238,8 @@ def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
              hessp=None, bounds=None, constraints=(), tol=None,
              callback=None, options=None):
     
-    x0 = np.asarray(x0)
-    if x0.dtype.kind in np.typecodes["AllInteger"]:
-        x0 = np.asarray(x0, dtype=float)
-        
     jac = None
-
-    return _minimize_bfgs(fun, x0, args, jac, callback, **options)
+    return _minimize_bfgs(fun, np.asarray(x0), args, jac, callback, **options)
 
 def rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
