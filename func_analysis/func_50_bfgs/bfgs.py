@@ -234,7 +234,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
         result['allvecs'] = allvecs
     return result
 
-def minimize(fun, x0, args=(), method=None, jac=None, hess=None,
+def minimize(fun, x0, args=(), hess=None,
              hessp=None, bounds=None, constraints=(), tol=None,
              callback=None, options=None):
     
@@ -249,7 +249,6 @@ x0 = [-1.0,0]
 opts = {'maxiter': 1000}
 res = minimize (fun=rosenbrock,
                 x0=x0,
-                method = 'BFGS',
                 options=opts)
 
 print (res)
