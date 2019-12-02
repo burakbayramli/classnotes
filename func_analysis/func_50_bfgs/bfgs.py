@@ -169,47 +169,6 @@ def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
 def scalar_search_wolfe1(phi, derphi, phi0=None, old_phi0=None, derphi0=None,
                          c1=1e-4, c2=0.9,
                          amax=50, amin=1e-8, xtol=1e-14):
-    """
-    Scalar function search for alpha that satisfies strong Wolfe conditions
-
-    alpha > 0 is assumed to be a descent direction.
-
-    Parameters
-    ----------
-    phi : callable phi(alpha)
-        Function at point `alpha`
-    derphi : callable phi'(alpha)
-        Objective function derivative. Returns a scalar.
-    phi0 : float, optional
-        Value of phi at 0
-    old_phi0 : float, optional
-        Value of phi at previous point
-    derphi0 : float, optional
-        Value derphi at 0
-    c1 : float, optional
-        Parameter for Armijo condition rule.
-    c2 : float, optional
-        Parameter for curvature condition rule.
-    amax, amin : float, optional
-        Maximum and minimum step size
-    xtol : float, optional
-        Relative tolerance for an acceptable step.
-
-    Returns
-    -------
-    alpha : float
-        Step size, or None if no suitable step was found
-    phi : float
-        Value of `phi` at the new point `alpha`
-    phi0 : float
-        Value of `phi` at `alpha=0`
-
-    Notes
-    -----
-    Uses routine DCSRCH from MINPACK.
-
-    """
-
     if phi0 is None:
         phi0 = phi(0.)
     if derphi0 is None:
@@ -267,10 +226,8 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
 
     old_fval = f(x0)
 
-    if fprime is None:
-        grad_calls, myfprime = wrap_function(approx_fprime, (f, epsilon))
-    else:
-        grad_calls, myfprime = wrap_function(fprime, args)
+    grad_calls, myfprime = wrap_function(approx_fprime, (f, epsilon))
+
     gfk = myfprime(x0)
     k = 0
     N = len(x0)
