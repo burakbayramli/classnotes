@@ -5,7 +5,7 @@ import numpy as np
 from scipy._lib.six import xrange
 import numpy.linalg as lin
 import scipy.linalg as slin
-from numpy import (atleast_1d, eye, mgrid, sqrt, Inf, asfarray, isinf)
+from numpy import (atleast_1d, eye, mgrid, Inf, asfarray, isinf)
 
 _status_message = {'success': 'Optimization terminated successfully.',
                    'maxfev': 'Maximum number of function evaluations has '
@@ -50,7 +50,7 @@ def wrap_function(function, args):
 
     return ncalls, function_wrapper
 
-_epsilon = sqrt(numpy.finfo(float).eps)
+_epsilon = np.sqrt(np.finfo(float).eps)
 
 class OptimizeWarning(UserWarning):
     pass
