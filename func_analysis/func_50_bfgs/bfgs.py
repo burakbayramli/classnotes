@@ -304,13 +304,6 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
     else:
         msg = _status_message['success']
 
-    if disp:
-        print("%s%s" % ("Warning: " if warnflag != 0 else "", msg))
-        print("         Current function value: %f" % fval)
-        print("         Iterations: %d" % k)
-        print("         Function evaluations: %d" % func_calls[0])
-        print("         Gradient evaluations: %d" % grad_calls[0])
-
     result = OptimizeResult(fun=fval, jac=gfk, hess_inv=Hk, nfev=func_calls[0],
                             njev=grad_calls[0], status=warnflag,
                             success=(warnflag == 0), message=msg, x=xk,
@@ -339,7 +332,7 @@ def rosenbrock(x):
 
 x0 = [-1.0,0]
 
-opts = {'maxiter': 1000, 'verbose': 2}
+opts = {'maxiter': 1000}
 res = minimize (fun=rosenbrock,
                 x0=x0,
                 method = 'BFGS',
