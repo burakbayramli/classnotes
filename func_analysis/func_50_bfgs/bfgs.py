@@ -99,14 +99,8 @@ def line_search_wolfe1(f, fprime, xk, pk, gfk=None,
     if gfk is None:
         gfk = fprime(xk)
 
-    if isinstance(fprime, tuple):
-        eps = fprime[1]
-        fprime = fprime[0]
-        newargs = (f, eps) + args
-        gradient = False
-    else:
-        newargs = args
-        gradient = True
+    newargs = args
+    gradient = True
 
     gval = [gfk]
     gc = [0]
