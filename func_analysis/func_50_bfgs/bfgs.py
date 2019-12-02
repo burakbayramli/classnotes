@@ -5,7 +5,7 @@ import numpy as np
 from scipy._lib.six import xrange
 import numpy.linalg as lin
 import scipy.linalg as slin
-from numpy import (atleast_1d, eye, mgrid, Inf, asfarray, isinf)
+from numpy import (atleast_1d, mgrid, Inf, asfarray, isinf)
 
 _status_message = {'success': 'Optimization terminated successfully.',
                    'maxfev': 'Maximum number of function evaluations has '
@@ -180,7 +180,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
     gfk = myfprime(x0)
     k = 0
     N = len(x0)
-    I = numpy.eye(N, dtype=int)
+    I = np.eye(N, dtype=int)
     Hk = I
 
     # Sets the initial step guess to dx ~ 1
