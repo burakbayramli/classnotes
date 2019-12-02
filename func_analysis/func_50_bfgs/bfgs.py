@@ -218,10 +218,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
     retall = return_all
 
     x0 = asarray(x0).flatten()
-    if x0.ndim == 0:
-        x0.shape = (1,)
-    if maxiter is None:
-        maxiter = len(x0) * 200
+
     func_calls, f = wrap_function(f, args)
 
     old_fval = f(x0)
