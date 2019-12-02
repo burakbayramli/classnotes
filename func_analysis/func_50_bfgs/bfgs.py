@@ -262,10 +262,9 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
         gfk = gfkp1
         k += 1
         gnorm = vecnorm(gfk, ord=norm)
-        if (gnorm <= gtol):
-            break
+        if (gnorm <= gtol): break
 
-        if not numpy.isfinite(old_fval):
+        if not numpy.isfinite(old_fval):           
             # We correctly found +-Inf as optimal value, or something went
             # wrong.
             warnflag = 2
@@ -288,16 +287,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
 
     fval = old_fval
 
-    if warnflag == 2:
-        msg = _status_message['pr_loss']
-    elif k >= maxiter:
-        warnflag = 1
-        msg = _status_message['maxiter']
-    elif np.isnan(gnorm) or np.isnan(fval) or np.isnan(xk).any():
-        warnflag = 3
-        msg = _status_message['nan']
-    else:
-        msg = _status_message['success']
+    msg = _status_message['success']
 
     result = OptimizeResult(fun=fval, jac=gfk, hess_inv=Hk, nfev=func_calls[0],
                             njev=grad_calls[0], status=warnflag,
