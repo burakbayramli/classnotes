@@ -263,8 +263,6 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
 
         yk = gfkp1 - gfk
         gfk = gfkp1
-        if callback is not None:
-            callback(xk)
         k += 1
         gnorm = vecnorm(gfk, ord=norm)
         if (gnorm <= gtol):
