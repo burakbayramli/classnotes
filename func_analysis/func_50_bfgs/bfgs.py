@@ -3,7 +3,7 @@ import warnings
 import numpy
 import numpy as np
 from scipy._lib.six import xrange
-from numpy import (atleast_1d, asfarray, isinf)
+from numpy import (atleast_1d)
 
 _status_message = {'success': 'Optimization terminated successfully.',
                    'maxfev': 'Maximum number of function evaluations has '
@@ -223,7 +223,7 @@ def _minimize_bfgs(fun, x0, args=(), jac=None, callback=None,
             rhok = 1000.0
             if disp:
                 print("Divide-by-zero encountered: rhok assumed large")
-        if isinf(rhok):  # this is patch for numpy
+        if np.isinf(rhok):  # this is patch for numpy
             rhok = 1000.0
             if disp:
                 print("Divide-by-zero encountered: rhok assumed large")
