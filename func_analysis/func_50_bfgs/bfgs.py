@@ -141,12 +141,6 @@ def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
                              old_fval, old_old_fval,
                              **kwargs)
 
-    if ret[0] is not None and extra_condition is not None:
-        xp1 = xk + ret[0] * pk
-        if not extra_condition(ret[0], xp1, ret[3], ret[5]):
-            # Reject step if extra_condition fails
-            ret = (None,)
-
 
     if ret[0] is None:
         raise _LineSearchError()
