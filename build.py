@@ -105,6 +105,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
           fout.write('```python\n')
       elif '\end{minted}' in line:
           fout.write('```\n')
+      elif '\\newpage' in line:
+          fout.write('<hr>\n')
       elif '\\begin{verbatim}' in line:
           fout.write('```\n')
       elif '\\end{verbatim}' in line:
