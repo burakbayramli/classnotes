@@ -41,7 +41,8 @@ def BFGS(F,Fprime, Start, epsi = 10e-8, tol = 10e-6, sigma= 10**-1, beta = 10 ):
         dotsy = dot(s,y)
         if dotsy>0:
             z = dot(H,y)
-            H += outer(s,s)*(dot(s,y) + dot(y, z))/dotsy**2 - (outer(z,s)+ outer(s, z))/dotsy
+            H += outer(s,s)*(dot(s,y) + dot(y, z))/dotsy**2 - \
+                 (outer(z,s)+ outer(s, z)) / dotsy
         counter+=1
     return (x , counter)
 
