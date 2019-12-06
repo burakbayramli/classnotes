@@ -64,14 +64,11 @@ while lin.norm(grad)>1e-6:
     rho=1/np.dot(y.T,s)
     s = s.reshape(2,1)
     y = y.reshape(2,1)
-    print(rho)
-    print(y)
-    print(s)
-    print (np.eye(2)-rho*np.dot(s,y.T))
-#    H=\
-#       (np.eye(2)-np.dot(np.dot(rho,s),y.T)) * H * \
-#       (np.eye(2)-np.dot(np.dot(np.dot(rho,y),s.T))+np.dot(np.dot(rho,s),s.T)
-#    print(H)
+    tmp1 = np.eye(2)-rho*np.dot(s,y.T)
+    tmp2 = np.eye(2)-rho*np.dot(y,s.T)
+    tmp3 = rho*np.dot(s,s.T)
+    H= np.dot(np.dot(tmp1,H),tmp2) + tmp3
+    print(H)
     exit()
 
 
