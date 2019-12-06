@@ -43,6 +43,8 @@
 
 
 ```python
+eps = np.sqrt(np.finfo(float).eps)
+
 def _approx_fprime_helper(xk, f, epsilon):
     f0 = f(xk)
     grad = np.zeros((len(xk),), float)
