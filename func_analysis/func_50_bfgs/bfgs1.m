@@ -19,9 +19,9 @@ while norm(grad) > 1e-6
     
     [value,grad]=rosenbrock_withjac(x);
     p=-H*grad;
-    exit;
+
     lambda=linesearch_secant(@rosenbrock_withjac,p,x);
-    
+
     iter=iter+1;
     xt = x;
     x=x+lambda*p;
@@ -29,6 +29,9 @@ while norm(grad) > 1e-6
     s=lambda*p;
 
     dist=norm(s);
+
+    disp(dist);
+    exit;
     
     [newvalue,newgrad]=rosenbrock_withjac(x);
 

@@ -7,7 +7,8 @@ alpha=10^(-5);
 [y,grad]=feval(f,x);
 dphi_zero=grad'*d;
 dphi_curr=dphi_zero;
- 
+
+
 i=0;
 while abs(dphi_curr)>epsilon*abs(dphi_zero),
   alpha_old=alpha_curr;
