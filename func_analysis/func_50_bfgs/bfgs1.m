@@ -37,9 +37,6 @@ while norm(grad) > 1e-6
     rho=1/(y'*s);
 
     H=(eye(2)-rho*s*y')*H*(eye(2)-rho*y*s')+rho*s*s';
-    disp(H)
-    exit;
-    
     disp('lambda:')
     disp(lambda)
     
