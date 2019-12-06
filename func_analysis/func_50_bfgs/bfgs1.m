@@ -3,15 +3,12 @@ x=[-1.0;0];
 %x=[-1.2;1];
 %H=diag([2,6]);
 H=eye(2);
-disp(H);
+
 %exit;
 
 tol = 10^(-20);
 
 [y,grad]=rosenbrock_withjac(x);
-
-disp(y);
-disp(grad);
 
 dist=2*tol;
 epsilon = tol;
@@ -22,7 +19,7 @@ while norm(grad) > 1e-6
     
     [value,grad]=rosenbrock_withjac(x);
     p=-H*grad;
-    
+    exit;
     lambda=linesearch_secant(@rosenbrock_withjac,p,x);
     
     iter=iter+1;

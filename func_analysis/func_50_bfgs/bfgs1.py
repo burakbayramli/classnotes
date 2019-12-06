@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import numpy.linalg as lin
 
 def rosen(x):
     y = 100*(x[1]-x[0]**2)**2+(1-x[0])**2;
@@ -23,8 +24,11 @@ epsilon = tol
 
 iter=0;
 
-while lin.norm(grad)>1e-6
-    print (1)
+while lin.norm(grad)>1e-6:
+    value,grad=rosen(x)
+    p=np.dot(-H,grad)
+    print (p)
+    
     break;
 
 
