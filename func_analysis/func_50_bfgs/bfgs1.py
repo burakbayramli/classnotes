@@ -62,7 +62,16 @@ while lin.norm(grad)>1e-6:
     newvalue,newgrad=rosen(x)
     y = np.array(newgrad)-grad
     rho=1/np.dot(y.T,s)
+    s = s.reshape(2,1)
+    y = y.reshape(2,1)
     print(rho)
+    print(y)
+    print(s)
+    print (np.eye(2)-rho*np.dot(s,y.T))
+#    H=\
+#       (np.eye(2)-np.dot(np.dot(rho,s),y.T)) * H * \
+#       (np.eye(2)-np.dot(np.dot(np.dot(rho,y),s.T))+np.dot(np.dot(rho,s),s.T)
+#    print(H)
     exit()
 
 
