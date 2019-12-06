@@ -59,6 +59,10 @@ while lin.norm(grad)>1e-6:
     x = x + lam*p
     s = lam*p
     dist=lin.norm(s)
-    print (dist)
+    newvalue,newgrad=rosen(x)
+    y = np.array(newgrad)-grad
+    rho=1/np.dot(y.T,s)
+    print(rho)
     exit()
+
 

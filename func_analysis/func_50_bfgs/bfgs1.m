@@ -29,15 +29,15 @@ while norm(grad) > 1e-6
     s=lambda*p;
 
     dist=norm(s);
-
-    disp(dist);
-    exit;
     
     [newvalue,newgrad]=rosenbrock_withjac(x);
 
     y = newgrad-grad;
-    
+
     rho=1/(y'*s);
+
+    disp(rho);
+    exit;
     
     H=(eye(2)-rho*s*y')*H*(eye(2)-rho*y*s')+rho*s*s';
     disp(x)
