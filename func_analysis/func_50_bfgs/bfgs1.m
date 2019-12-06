@@ -1,5 +1,6 @@
 
 x=[-1.0;0];
+%x=[-1.2;1];
 H=diag([2,6]);
 
 tol = 10^(-20);
@@ -9,7 +10,7 @@ dist=2*tol;
 epsilon = tol;
 
 iter=0;
-while dist>tol | abs(xt(1)-x(1)) > epsilon | abs(xt(2)-x(2)) > epsilon
+while dist>tol || abs(xt(1)-x(1)) > epsilon || abs(xt(2)-x(2)) > epsilon
     
     [value,grad]=rosenbrock_withjac(x);
     p=-H*grad;

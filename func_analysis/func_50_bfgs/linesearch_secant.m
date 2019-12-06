@@ -17,7 +17,7 @@ while abs(dphi_curr)>epsilon*abs(dphi_zero),
   dphi_curr=grad'*d;
   alpha=(dphi_curr*alpha_old-dphi_old*alpha_curr)/(dphi_curr-dphi_old);
   i=i+1;
-  if (i >= max) & (abs(dphi_curr)>epsilon*abs(dphi_zero)),
+  if (i >= max) && (abs(dphi_curr)>epsilon*abs(dphi_zero)),
     disp('Line search terminating with number of iterations:');
     disp(i);
     disp(alpha);
