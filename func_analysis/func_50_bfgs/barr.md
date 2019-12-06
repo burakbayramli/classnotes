@@ -39,21 +39,6 @@
         f'[i] = ---------------------------------
                             epsilon[i]
 
-    The main use of `approx_fprime` is in scalar function optimizers like
-    `fmin_bfgs`, to determine numerically the Jacobian of a function.
-
-    Examples
-    --------
-    >>> from scipy import optimize
-    >>> def func(x, c0, c1):
-    ...     "Coordinate vector `x` should be an array of size two."
-    ...     return c0 * x[0]**2 + c1*x[1]**2
-
-    >>> x = np.ones(2)
-    >>> c0, c1 = (1, 200)
-    >>> eps = np.sqrt(np.finfo(float).eps)
-    >>> optimize.approx_fprime(x, func, [eps, np.sqrt(200) * eps], c0, c1)
-    array([   2.        ,  400.00004198])
 
 
 
@@ -76,18 +61,33 @@ def _approx_fprime_helper(xk, f, epsilon):
         grad[k] = df
         ei[k] = 0.0
     return grad
+```
 
-def func(x):
-    "Coordinate vector `x` should be an array of size two."
-    return 1 * x[0]**2 + 200*x[1]**2
 
-x = np.ones(2)
-eps = np.sqrt(np.finfo(float).eps)
-_approx_fprime_helper(x, func, eps)
+```python
+rosen = lambda x: (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
+
+def rosen_d(x):
+    return np.array([2*100*(x[1] - x[0]**2)*(-2*x[0]) - 2*(1.-x[0]), 2*100*(x[1]-x[0]**2)])
+
+x = [0.5, 0.5]
+res = _approx_fprime_helper(x, rosen, eps)
+print (res, rosen_d(x))
+
+x = [-0.5, 0.5]
+res = _approx_fprime_helper(x, rosen, eps)
+print (res, rosen_d(x))
 ```
 
 ```text
-Out[1]: array([  2.        , 400.00000381])
+[-50.99999928  50.00000149] [-51.  50.]
+[47.00000072 50.00000143] [47. 50.]
 ```
+
+
+
+
+
+
 
 
