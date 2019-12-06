@@ -1,16 +1,24 @@
 
 x=[-1.0;0];
 %x=[-1.2;1];
-H=diag([2,6]);
+%H=diag([2,6]);
+H=eye(2);
+disp(H);
+%exit;
 
 tol = 10^(-20);
 
 [y,grad]=rosenbrock_withjac(x);
+
+disp(y);
+disp(grad);
+
 dist=2*tol;
 epsilon = tol;
 
 iter=0;
-while dist>tol || abs(xt(1)-x(1)) > epsilon || abs(xt(2)-x(2)) > epsilon
+%while dist>tol || abs(xt(1)-x(1)) > epsilon || abs(xt(2)-x(2)) > epsilon
+while norm(grad) > 1e-6
     
     [value,grad]=rosenbrock_withjac(x);
     p=-H*grad;
