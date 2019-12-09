@@ -6,7 +6,6 @@ import numpy.linalg as lin
 eps = np.sqrt(np.finfo(float).eps)
 
 def _approx_fprime_helper(xk, f, epsilon):
-    print (xk)
     f0 = f(xk)
     grad = np.zeros((len(xk),), float)
     ei = np.zeros((len(xk),), float)
@@ -89,7 +88,7 @@ while lin.norm(grad)>1e-6:
     tmp2 = np.eye(2)-rho*np.dot(y,s.T)
     tmp3 = rho*np.dot(s,s.T)
     H= np.dot(np.dot(tmp1,H),tmp2) + tmp3
-    print ('lambda:',lam)
+    #print ('lambda:',lam)
 
 print (xt)
 print ('iter',iter)
