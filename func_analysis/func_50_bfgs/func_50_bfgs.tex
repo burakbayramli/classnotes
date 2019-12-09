@@ -22,31 +22,124 @@ adým uzunluðudur.
 
 [devam edecek]
 
-\inputminted[fontsize=\footnotesize]{python}{bfgs1.py}
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import numpy.linalg as lin
+
+eps = np.sqrt(np.finfo(float).eps)
+
+def rosen(x):
+    return 100*(x[1]-x[0]**2)**2+(1-x[0])**2
+
+def rosen_real(x):
+    gy =[-400*(x[1]-x[0]**2)*x[0]-2*(1-x[0]), 200*(x[1]-x[0]**2)]
+    return rosen(x), gy
+
+def linesearch_secant(f, d, x):
+    epsilon=10**(-5)
+    max = 500
+    alpha_curr=0
+    alpha=10**-5
+    y,grad=f(x)
+    dphi_zero=np.dot(np.array(grad).T,d)
+
+    dphi_curr=dphi_zero
+    i=0;
+    while np.abs(dphi_curr)>epsilon*np.abs(dphi_zero):
+        alpha_old=alpha_curr
+        alpha_curr=alpha
+        dphi_old=dphi_curr
+        y,grad=f(x+alpha_curr*d)
+        dphi_curr=np.dot(np.array(grad).T,d)
+        alpha=(dphi_curr*alpha_old-dphi_old*alpha_curr)/(dphi_curr-dphi_old);
+        i += 1
+        if (i >= max) and (np.abs(dphi_curr)>epsilon*np.abs(dphi_zero)):
+            print('Line search terminating with number of iterations:')
+            print(i)
+            print(alpha)
+            break
+        
+    return alpha
+
+def bfgs(x, func):
+    
+    H = np.eye(2)
+    tol = 1e-20
+    y,grad = func(x)
+    dist=2*tol
+    epsilon = tol
+    iter=0;
+
+    while lin.norm(grad)>1e-6:
+        value,grad=func(x)
+        p=np.dot(-H,grad)
+        lam = linesearch_secant(func,p,x)
+        iter += 1
+        xt = x
+        x = x + lam*p
+        s = lam*p
+        dist=lin.norm(s)
+        newvalue,newgrad=func(x)
+        y = np.array(newgrad)-grad
+        rho=1/np.dot(y.T,s)
+        s = s.reshape(2,1)
+        y = y.reshape(2,1)
+        tmp1 = np.eye(2)-rho*np.dot(s,y.T)
+        tmp2 = np.eye(2)-rho*np.dot(y,s.T)
+        tmp3 = rho*np.dot(s,s.T)
+        H= np.dot(np.dot(tmp1,H),tmp2) + tmp3
+        #print ('lambda:',lam)
+
+    print (xt)
+    print ('iter',iter)
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x=np.array([-1.0,0])
+bfgs(x,rosen_real)    
+\end{minted}
 
 \begin{verbatim}
-lambda: 0.001258546564689499
-lambda: 0.02294893971620241
-lambda: 9.504191242083053
-lambda: 3.1994859732568353
-lambda: 0.3246239081612246
-lambda: 1.3298230912381845
-lambda: 1.7553466605500365
-lambda: 0.8478429815729494
-lambda: 0.6557904021488304
-lambda: 1.2429823924492018
-lambda: 4.701024849628027
-lambda: 0.14785877754325433
-lambda: 3.0918824798760296
-lambda: 6.132618619103234
-lambda: 0.11511310306631295
-lambda: 3.574988277940419
-lambda: 1.0156882759422114
-lambda: 0.9866086362633031
-lambda: 0.9999896551845283
 [1. 1.]
 iter 19
 \end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def _approx_fprime_helper(xk, f, epsilon):
+    f0 = f(xk)
+    grad = np.zeros((len(xk),), float)
+    ei = np.zeros((len(xk),), float)
+    for k in range(len(xk)):
+        ei[k] = 1.0
+        d = epsilon * ei
+        df = (f(xk + d) - f0) / d[k]
+        if not np.isscalar(df):
+            try:
+                df = df.item()
+            except (ValueError, AttributeError):
+                raise ValueError("The user-provided "
+                                 "objective function must "
+                                 "return a scalar value.")
+        grad[k] = df
+        ei[k] = 0.0
+    return grad
+
+
+def rosen_approx(x):
+    g = _approx_fprime_helper(x, rosen, eps)
+    return rosen(x),g
+
+bfgs(x,rosen_approx)
+\end{minted}
+
+\begin{verbatim}
+[0.99999552 0.99999104]
+iter 19
+\end{verbatim}
+
 
 Kaynaklar 
 
