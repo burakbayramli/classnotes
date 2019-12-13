@@ -8,19 +8,19 @@ iniþ (descent) olacak yönü gösterir [1, sf. 151]. Dikkat, {\em yön}
 kelimesini kullandýk, o yönde ne kadar adým atýlacaðýný
 belirtmedik. Gradyanýn temel hesabý türeve dayalý olduðu için ve türev
 hesapladýðý noktaya yakýn bir yerde doðru bir yaklaþýklama olacaðý için o
-yönde atýlan adýmýn büyüklüðüne göre minimizasyon doðru ya da yanlýþ yöne
-gidiyor olabilir. Bu sebeple gradyan iniþi algoritmalarý, ki
+yönde atýlan adýmýn büyüklüðüne göre minimizasyon iyi ya da kötü sonuçlar
+verebilir. Bu sebeple gradyan iniþi algoritmalarý, ki
 
 $$
 x^{x+1} = x^k + \alpha_k \nabla f(x^k)
 $$
 
-ile kodlanýrlar, çoðunlukla pek çok ufak adým atarlar, yani $\alpha_k$
-sabitleri ufak seçilir.
-
-En Dik Ýniþ (SD) algoritmasi bu noktada bir ilerleme saðlar. Her $\alpha$,
-yani $\alpha_k$ öyle seçilir ki
-$\phi(\alpha) \equiv f(x^k - \alpha \nabla f(x^k))$ minimize edilsin. Ya da
+ile kodlanýrlar, çoðunlukla ufak ve pek çok adým atarlar, yani $\alpha_k$
+sabitleri ufak seçilir. En Dik Ýniþ (SD) algoritmasi bu noktada bir
+ilerleme. Her $\alpha$, yani $\alpha_k$ öyle seçilir ki
+$\phi(\alpha) \equiv f(x^k - \alpha \nabla f(x^k))$ kesinlikle minimize
+edilsin / belli bir yöndeki en minimum noktaya vardýracak büyüklükte adým
+atýlsýn. Ya da
 
 $$
 \alpha_k = \arg\min_{\alpha \ge 0} f(x^k - \alpha \nabla f(x^k))
@@ -28,12 +28,16 @@ $$
 
 Yani gradyanýn iþaret ettiði yönde bir tür ``arama'' yapmýþ oluyoruz, adým
 büyüklüðünü öyle seçiyoruz ki fonksiyon o yönde o kadar adým atýldýðýnda en
-fazla iniþi gerçekleþtirmiþ olsun. 
+fazla iniþi gerçekleþtirmiþ olsun. Bu sebeple bu metota çizgi aramasý (line
+search) metotu deniyor.
 
-Arama derken akla ikinci bir döngü içinde yine ufak ufak adýmlar atarak
-adým büyüklük hesabý yapmak geliyor, bu kabaca doðru, ama bize yardýmcý
-olacak bazý cebirsel numaralar var. En basiti atýlan adým $\alpha$'yi
-cebirsel olarak çözmek, altta bir örnek[3, sf. 101] var. 
+Tabii arama derken akla ikinci bir döngü içinde yine ufak ufak adýmlar
+atarak çizgi üzerinde gelinen yere bakýp büyüklük hesabýný böyle yapmak
+gelebilir, bu sonuçsal olarak, kabaca doðru, ama asýl adým hesabý bazý
+cebirsel temellerle, ya da onu çözen yaklaþýksal þekilde yapýlýyor. 
+
+En basiti atýlan adým $\alpha$'yi pür cebirsel olarak çözmek, altta bir
+örnek [3, sf. 101].
 
 Soru
 
@@ -47,7 +51,7 @@ $\frac{\partial f}{\partial x_1} = 18 x_1 + 4x_2$ ve
 $\frac{\partial  f}{\partial x_2} = 4 x_1 + 14 x_2$. Þimdi SD yöntemini
 uygulayalým, baþlangýç noktasý $x^0 = \left[\begin{array}{cc} 1 & 1 \end{array}\right]^T$
 olsun. Bu durumda $f(x^0) = 20$, ve $\nabla f(x_0) = \left[\begin{array}{cc} 22 18 \end{array}\right]^T$. 
-Adim denklemine gore, 
+Adým denklemine göre, 
 
 $$
 x^1 = x^0 - \alpha_0 \nabla f(x^0)
@@ -69,17 +73,17 @@ x_1 \\ x_2
 \end{array}\right]
 $$
 
-Simdi oyle bir $\alpha_0$ secmeliyiz ki $f(x^1)$ minimum olsun. Ustteki
-degerlerin bize verdigi $x_1$ ve $x_2$ degerleri (ki $\alpha_0$ bazli
-degerler olacaklar) ana formule yeni $x$ olarak sokarsak, $\alpha_o$  bazli
-bir denklem edecegiz, 
+Þimdi öyle bir $\alpha_0$ seçmeliyiz ki $f(x^1)$ minimum olsun. Üstteki
+deðerlerin bize verdiði $x_1$ ve $x_2$ deðerleri (ki $\alpha_0$ bazlý
+olacaklar) ana formüle yeni $x$ olarak sokarsak, $\alpha_o$ bazlý bir
+denklem edeceðiz,
 
 $$
 f(\alpha_0) = 20 - 808 \alpha_0 + 8208 (\alpha_0)^2
 $$
 
-Bu denkleme ve $\frac{\ud f(\alpha_0)}{\ud \alpha_0} = 0$ üzerinden
-$\alpha_0$'nun optimum deðeri $0.05$'týr. Yani adýmý þu þekilde atmalýyýz,
+$\frac{\ud f(\alpha_0)}{\ud \alpha_0} = 0$ üzerinden $\alpha_0$'nun optimum
+deðeri $0.05$'týr. Yani adýmý þu þekilde atmalýyýz,
 
 $$
 x^1 = 
@@ -178,14 +182,14 @@ $$
 \alpha_0 = \arg\min_{\alpha \ge 0} f(x^0 - \alpha \nabla f(x^0))
 $$
 
-lazým, tam acilmis haliyle, 
+lazým, tam açýlmýþ haliyle, 
 
 $$
 = \arg\min_{\alpha \ge 0} (0 + (2+2\alpha-3)^2 + 4(-1-1024\alpha+5)^4
 $$
 
 Ama üstteki cebirle boðuþmaya gerek yok, gradyan fonksiyonu ve gidiþ yönü
-üzerinden kok bulup bize döndürecek üstteki hesabý kullanabiliriz,
+üzerinden kök bulup bize döndürecek üstteki hesabý kullanabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 x0 = np.array([4,2,-1])
@@ -238,11 +242,12 @@ Optimal noktaya eriþmiþ olduk.
 Duruþ Þartlarý 
 
 Optimizasyonda minimum varlýðý için birinci-derecen gerekli þart
-(first-order necessary condition -FONC-) minimumda $\nabla f(x) = 0$ olmasý. Eðer
-böyle bir noktaya eriþmiþsek, diyelim $x^k$ için $\nabla f(x^k) = 0$ ölmüþ,
-bu nokta FONC'yi tatmin eder çünkü o zaman $x^{k+1} = x^k$ olur, ve
-minimumdayýz demektir. Bu teorik bilgiyi algoritmamizin ne zaman duracaðýný
-anlamasý için bir þart olarak kullanamaz mýyýz? 
+(first-order necessary condition -FONC-) minimumda $\nabla f(x) = 0$
+olmasý. Eðer böyle bir noktaya eriþmiþsek, diyelim $x^k$ için
+$\nabla f(x^k) = 0$ olmuþ, bu nokta FONC'yi tatmin eder çünkü o zaman
+$x^{k+1} = x^k$ olur, ve minimumdayýz demektir. Bu teorik bilgiyi
+algoritmamizin ne zaman duracaðýný anlamasý için bir þart olarak kullanamaz
+mýyýz?
 
 Ne yazýk ki sayýsal hesaplarda, yani pratikte $\nabla f(x^k) = 0$ hesabý
 nadiren ortaya çýkar. Bir çözüm gradyanýn normu $|| \nabla f(x) ||$ sýfýr
