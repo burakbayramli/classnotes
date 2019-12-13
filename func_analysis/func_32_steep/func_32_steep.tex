@@ -1,15 +1,15 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-En Dik Inis (Steepest Descent)
+En Dik Ýniþ (Steepest Descent)
 
 Daha önce gradyan iniþi konusunda iþlediðimiz üzere bir $f$ fonksiyonu için
 hesaplanan $-\nabla f(x)$ gradyaný $x$ noktasýnda fonksiyon için en yüksek
-iniþ (descent) olacak yönü gösterir. Dikkat, {\em yön} kelimesini
-kullandýk, o yönde ne kadar adým atýlacaðýný belirtmedik. Gradyanýn temel
-hesabý türeve dayalý olduðu için ve türev hesapladýðý noktaya yakýn bir
-yerde doðru bir yaklaþýklama olacaðý için o yönde atýlan adýmýn büyüklüðüne
-göre minimizasyon doðru ya da yanlýþ yöne gidiyor olabilir. Bu sebeple
-gradyan iniþi algoritmalarý, ki
+iniþ (descent) olacak yönü gösterir [1, sf. 151]. Dikkat, {\em yön}
+kelimesini kullandýk, o yönde ne kadar adým atýlacaðýný
+belirtmedik. Gradyanýn temel hesabý türeve dayalý olduðu için ve türev
+hesapladýðý noktaya yakýn bir yerde doðru bir yaklaþýklama olacaðý için o
+yönde atýlan adýmýn büyüklüðüne göre minimizasyon doðru ya da yanlýþ yöne
+gidiyor olabilir. Bu sebeple gradyan iniþi algoritmalarý, ki
 
 $$
 x^{x+1} = x^k + \alpha_k \nabla f(x^k)
@@ -18,9 +18,9 @@ $$
 ile kodlanýrlar, çoðunlukla pek çok ufak adým atarlar, yani $\alpha_k$
 sabitleri ufak seçilir.
 
-En Dik Ýniþ algoritmasi bu noktada bir ilerleme saðlar. Her $\alpha$, yani
-$\alpha_k$ öyle seçilir ki $\phi(\alpha) \equiv f(x^k - \alpha \nabla f(x^k))$
-minimize edilsin. Ya da 
+En Dik Ýniþ (SD) algoritmasi bu noktada bir ilerleme saðlar. Her $\alpha$,
+yani $\alpha_k$ öyle seçilir ki
+$\phi(\alpha) \equiv f(x^k - \alpha \nabla f(x^k))$ minimize edilsin. Ya da
 
 $$
 \alpha_k = \arg\min_{\alpha \ge 0} f(x^k - \alpha \nabla f(x^k))
@@ -30,16 +30,146 @@ Yani gradyanýn iþaret ettiði yönde bir tür ``arama'' yapmýþ oluyoruz, adým
 büyüklüðünü öyle seçiyoruz ki fonksiyon o yönde o kadar adým atýldýðýnda en
 fazla iniþi gerçekleþtirmiþ olsun. 
 
-Arama derken akla ikinci bir dongu icinde yine ufak ufak adimlar atarak
-adim buyukluk hesabi yapmak geliyor, bu kabaca dogru, ama bize yardimci
-olacak bazi cebirsel numaralar var. 
+Arama derken akla ikinci bir döngü içinde yine ufak ufak adýmlar atarak
+adým büyüklük hesabý yapmak geliyor, bu kabaca doðru, ama bize yardýmcý
+olacak bazý cebirsel numaralar var. En basiti atilan adim $\alpha$'yi
+cebirsel olarak cozmek, altta bir ornek[3, sf. 101] var. 
 
+Soru
 
+$f(x) = 9x_1^2 + 4x_1x_2 + 7x_2^2$ fonksiyonunun optimal noktasini bul.
 
+Çözüm
 
+Gradyanýn öðeleri
 
+$\frac{\partial f}{\partial x_1} = 18 x_1 + 4x_2$ ve 
+$\frac{\partial  f}{\partial x_2} = 4 x_1 + 14 x_2$. Þimdi SD yöntemini
+uygulayalým, baþlangýç noktasý $x^0 = \left[\begin{array}{cc} 1 & 1 \end{array}\right]^T$
+olsun. Bu durumda $f(x^0) = 20$, ve $\nabla f(x_0) = \left[\begin{array}{cc} 22 18 \end{array}\right]^T$. 
+Adim denklemine gore, 
 
+$$
+x^1 = x^0 - \alpha_0 \nabla f(x^0)
+$$
 
+ya da 
+
+$$
+\left[\begin{array}{c}
+x_1 \\ x_2
+\end{array}\right]
+= 
+\left[\begin{array}{c}
+1 \\ 1
+\end{array}\right]
+\alpha_0 
+\left[\begin{array}{c}
+22 \\ 18
+\end{array}\right]
+$$
+
+Simdi oyle bir $\alpha_0$ secmeliyiz ki $f(x^1)$ minimum olsun. Ustteki
+degerlerin bize verdigi $x_1$ ve $x_2$ degerleri (ki $\alpha_0$ bazli
+degerler olacaklar) ana formule yeni $x$ olarak sokarsak, $\alpha_o$  bazli
+bir denklem edecegiz, 
+
+$$
+f(\alpha_0) = 20 - 808 \alpha_0 + 8208 (\alpha_0)^2
+$$
+
+Bu denkleme ve $\frac{\ud f(\alpha_0)}{\ud \alpha_0} = 0$ üzerinden
+$\alpha_0$'nun optimum deðeri $0.05$'týr. Yani adýmý þu þekilde atmalýyýz,
+
+$$
+x^1 = 
+\left[\begin{array}{c}
+x_1 \\ x_2
+\end{array}\right]
+= 
+\left[\begin{array}{c}
+1 \\ 1
+\end{array}\right]
+0.05
+\left[\begin{array}{c}
+22 \\ 18
+\end{array}\right]
+$$
+
+ki bu hesap bize $f(x^1) = 0.12$ verir. Bu þekilde özyineli döngüye devam
+edersek nihai optimum noktayý buluruz.
+
+Basit cebirsel numaralar ile üstte adýmý bulduk. Daha çetrefil durumlar
+için sekant yöntemini kullanabiliriz. Bu yöntemi [2]'de iþledik. Sonuçta
+aradýðýmýz $d$ yönündeki minimum
+
+$$
+\phi_k(\alpha) = f(x^k + \alpha d^k)
+$$
+
+deðerini bulmaktýr. Üstteki formülün $\alpha$ üzerinden türevi
+
+$$
+\phi_k'(\alpha) = {d^k}^T \nabla f(x^k + \alpha d^k) 
+$$
+
+O zaman minimum $\alpha$ icin 
+
+$$
+0 = {d^k}^T \nabla f(x^k + \alpha d^k) 
+$$
+
+denklemini çözen $\alpha$ gerekli. Bu bir kök bulma problemi ve sekant
+yöntemini kullanabiliriz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def linesearch_secant(grad, d, x):
+    epsilon=10**(-8)
+    max = 500
+    alpha_curr=0
+    alpha=10**-8
+    dphi_zero=np.dot(np.array(grad(x)).T,d)
+
+    dphi_curr=dphi_zero
+    i=0;
+    while np.abs(dphi_curr)>epsilon*np.abs(dphi_zero):
+        alpha_old=alpha_curr
+        alpha_curr=alpha
+        dphi_old=dphi_curr        
+        dphi_curr=np.dot(np.array(grad(x+alpha_curr*d)).T,d)
+        alpha=(dphi_curr*alpha_old-dphi_old*alpha_curr)/(dphi_curr-dphi_old);
+        i += 1
+        if (i >= max) and (np.abs(dphi_curr)>epsilon*np.abs(dphi_zero)):
+            print('Line search terminating with number of iterations:')
+            print(i)
+            print(alpha)
+            break
+        
+    return alpha
+
+def f(x): return (x[0]-4)**2 + (x[1]-3)**2 + 4*(x[2]+5)**4
+
+def g(x): return np.array([4*(x[0]-4)**3, 2*(x[1]-3), 16*(x[2]+5)**3])
+
+x0 = np.array([4,2,-1])
+print (fg(x0))
+f0,d0 = fg(x0)
+alpha0 = linesearch_secant(g, -d0, x0)
+alpha0 = np.round(alpha0, 5)
+print ('alpha0 =',alpha0)
+x1 = x0 - alpha0*g0
+print (x1)
+\end{minted}
+
+\begin{verbatim}
+(1025, array([   0,   -2, 1024]))
+alpha0 = 0.00397
+[ 4.       2.00794 -5.06528]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+
+\end{minted}
 
 
 
@@ -55,6 +185,8 @@ Kaynaklar
 
 [1] Zak, {\em An Introduction to Optimization, 4th Edition}
 
+[2] Bayramli, {\em Diferansiyel Denklemler, Kök Bulmak, Karesel Formül (Root Finding, Quadratic Formula)}
 
+[3] Dutta, {\em Optimization in Chemical Engineering}
 
 \end{document}
