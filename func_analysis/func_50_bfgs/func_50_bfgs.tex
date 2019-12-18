@@ -1,8 +1,9 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-BFGS 
+Newton-umsu Matotlar (Quasi-Newton Methods), DFP, BFGS 
 
-Newton'un özyineli algoritmasi 
+Bir $f$ hedef fonksiyonunun minimizasyonu için Newton'un özyineli
+algoritmasi
 
 $$
 x^{k+1} = x^k - F(x^k)^{-1} g^k
@@ -10,28 +11,120 @@ $$
 
 ki $g$ gradyan, $F$ ise Hessian. 
 
-
-...
-...
-
-
-
-Newton yöntemine göre özyineli döngü þu þekilde belirtilir, 
+Ya da
 
 $$
-x_{i+1} = x_i - H_i^{-1} \nabla f (x_i)  
+x^{k+1} = x^k - (\nabla^2 f(x^k))^{-1} \nabla f(x^k)
 $$
 
-ki $f$ fonksiyonunun $H$ Hessian matrisidir. Newton-imsi (quasi-Newton)
-metotlarda ya $H_i$ matrisi bir diðer $A_i$ ile yaklaþýk olarak temsil
-edilir (ya da $H_i ^{-1}$ matrisi $B_i$ ile). O zaman ustteki denklem yerine
+Newton'umsu metotlarýn ana fikri Hessian matrisý yerine sadece gradyan
+bilgisini kullanarak yaklaþýk bir $H_k$ kullanmak. Bunu nasýl yapacaðýz? 
+
+$f(\cdot)$'un karesel olarak temsilini yazalým, özyineli gidiþat sirasinda,
+bir herhangi bir $x^{k+1}$ etrafýnda Taylor açýlýmý
 
 $$
-x_{i+1} = x_i - \lambda_i B_i \nabla f(x_i)
+m_k(x) \equiv f(x^{k+1}) + \nabla f(x^{k+1})^T (x-x^{k+1}) + 
+\frac{1}{2} (x-x^{k+1}) ^T H_{t+1}^T (x-x^{k+1}) 
 $$
 
-ki $\lambda_i$ $s_i = -\lambda_i B_i \nabla f(x_i)$ yönünde bir optimal
-adým uzunluðudur.
+Eger gradyani alirsak 
+
+$$
+\nabla m_k(x) = \nabla f(x^{k+1}) + H_{k+1}^{-1} (x-x^{k+1})
+$$
+
+Þimdi $k$ ve $k+1$ noktalarý, gradyanlarý üzerinden bir $H^{k+1}$ iliþkisi
+ortaya çýkartmak istiyoruz ki çözüp bir sonuç elde edebilelim. Ek
+denklemler elde etmek için þu akla yatkýn þartlarý öne sürebiliriz, $k$ ve
+$k+1$ için $m$ ve $f$ gradyanlarý birbirine uysun. Yaný, 
+
+$$
+\nabla m_k(x) = \nabla f(x_k)
+$$
+
+O zaman iki üstteki denklemle beraber, ve açýlýmda $x$ herhangi bir $x$
+olabileceði için onun yerine $x^k$ kullanarak,
+
+$$
+\nabla f(x^{k+1}) + H_{k+1}^{-1} (x^k-x^{k+1}) = \nabla f(x^k)
+$$
+
+$$
+H_{k+1}^{-1} (x^k-x^{k+1}) = \nabla f(x^k) - \nabla f(x^{k+1}) 
+$$
+
+$$
+H_{k+1}^{-1} (x^{k+1}-x^k) = \nabla f(x^{k+1}) - \nabla f(x^k) 
+$$
+
+Üsttekine sekant denklemi adý veriliyor, þu figürle alakalý, 
+
+\includegraphics[width=20em]{func_50_bfgs_01.png}
+
+Yani sekant denklemine göre $H_{k+1}^{-1}$ deðeri, yatay kordinattaki
+$x^{k+1}-x^k$ deðiþimini, gradyan deðiþimi $\nabla f(x^{k+1}) - \nabla
+f(x^k)$'e eþler [4]/i0p.
+
+Kýsaltma amaçlý,
+
+$$
+H_{k+1}^{-1} \underbrace{(x^{k+1}-x^k)}_{y_t} = 
+\underbrace{\nabla f(x^{k+1}) - \nabla f(x^k)}_{s_t}
+$$
+
+$$
+H_{k+1}^{-1} y_k = s_k
+$$
+
+Özyineli baðlamda bir $H_0$'dan baþlayarak ufak deðiþimlerle sonuca
+ulaþýlmaya uðraþýlýr. Deðiþimlerin ufak olmasý ve bu deðiþimlerin kerte 1
+eki [5] ile olmasý sonucu yine [4]'teki matris normu üzerinden
+görülebilir. Biz farklý bir yönden, eðer ufak deðiþim kerte 1 ve 2 ile
+yapýlsa nereye varýlacaðýna bakacaðýz [1, sf. 111]. 
+
+Kerte 1 eki ile $H_k$'yi $H_{k+1}$ yapmak demek
+
+$$
+H_{k+1} = H_k + czz^T 
+$$
+
+eþitliði demektir. Bunu iki üstteki formül içine koyarsak
+
+$$
+s_k = (H_k + czz^T) y_k = H_k y_k + cz (z^T y_k)
+$$
+
+$z^T y_k$ bir skalar olduðu için 
+
+$$
+cz = \frac{s_k - H_k y_k}{z^T y_k}
+$$
+
+Bu denklemi çözen en basit $c,z$ seçenekleri
+
+$$
+z = s_k - H_ky_k
+$$
+
+$$
+c = \frac{1}{z^Ty_k}
+$$
+
+% d -> s, g -> y
+
+Bu bize kerte 1 güncelleme formülünü verir,
+
+$$
+H_{k+1} = H_k + \frac{ (s-H_ky_k) (s-H_ky_k)^T }{(s-H_ky_k) y_k}
+$$
+
+Ne yazik ki kerte 1 guncelemesinin bazi problemleri var. Bunlardan en
+onemlisi 
+
+
+
+
 
 
 [devam edecek]
@@ -162,6 +255,11 @@ Kaynaklar
 [2] Zak, {\em An Introduction to Optimization, 4th Edition}
 
 [3] Bayramli, {\em Hesapsal Bilim, Sayýsal Entegrasyon ve Sonlu Farklýlýklar ile Sayýsal Türev}
+
+[4] Chen, {\em ELE522 - Large Scale Optimization Lecture, Princeton},
+    \url{http://www.princeton.edu/~yc5/ele522_optimization/}
+
+[5] Bayramli, {\em Lineer Cebir, Ders 8, Kerte Konusu}
 
 \end{document}
 
