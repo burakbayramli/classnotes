@@ -17,27 +17,27 @@ $$
 x^{k+1} = x^k - (\nabla^2 f(x^k))^{-1} \nabla f(x^k)
 $$
 
-Newton'umsu metotlarýn ana fikri Hessian matrisý yerine sadece gradyan
-bilgisini kullanarak yaklaþýk bir $H_k$ kullanmak. Bunu nasýl yapacaðýz? 
+Newton'umsu metotlarýn ana fikri Hessian matrisi yerine sadece gradyan
+bilgisini kullanarak yaklaþýk bir $F_k$ kullanmak. Bunu nasýl yapacaðýz? 
 
-$f(\cdot)$'un karesel olarak temsilini yazalým, özyineli gidiþat sirasinda,
+$f(\cdot)$'un karesel olarak temsilini yazalým, özyineli gidiþat sýrasýnda,
 bir herhangi bir $x^{k+1}$ etrafýnda Taylor açýlýmý
 
 $$
 m_k(x) \equiv f(x^{k+1}) + \nabla f(x^{k+1})^T (x-x^{k+1}) + 
-\frac{1}{2} (x-x^{k+1}) ^T H_{t+1}^T (x-x^{k+1}) 
+\frac{1}{2} (x-x^{k+1}) ^T F_{t+1}^T (x-x^{k+1}) 
 $$
 
 Eger gradyani alirsak 
 
 $$
-\nabla m_k(x) = \nabla f(x^{k+1}) + H_{k+1}^{-1} (x-x^{k+1})
+\nabla m_k(x) = \nabla f(x^{k+1}) + F_{k+1}^{-1} (x-x^{k+1})
 $$
 
 Þimdi $k$ ve $k+1$ noktalarý, gradyanlarý üzerinden bir $H^{k+1}$ iliþkisi
 ortaya çýkartmak istiyoruz ki çözüp bir sonuç elde edebilelim. Ek
-denklemler elde etmek için þu akla yatkýn þartlarý öne sürebiliriz, $k$ ve
-$k+1$ için $m$ ve $f$ gradyanlarý birbirine uysun. Yaný, 
+denklemler elde etmek için þu akla yatkýn þartlarý öne sürebiliriz, $m$ ve
+$f$ gradyanlarý birbirine uysun. Yani,
 
 $$
 \nabla m_k(x) = \nabla f(x_k)
@@ -48,7 +48,7 @@ beraber, ve açýlýmda $x$ herhangi bir $x$ olabileceði için onun yerine
 $x^k$ kullanarak,
 
 $$
-\nabla f(x^{k+1}) + H_{k+1}^{-1} (x^k-x^{k+1}) = \nabla f(x^k)
+\nabla f(x^{k+1}) + F_{k+1}^{-1} (x^k-x^{k+1}) = \nabla f(x^k)
 $$
 
 $$
@@ -63,35 +63,39 @@ $$
 
 \includegraphics[width=20em]{func_50_bfgs_01.png}
 
-Yani sekant denklemine göre $H_{k+1}^{-1}$ deðeri, yatay kordinattaki
+Yani sekant denklemine göre $F_{k+1}^{-1}$ deðeri, yatay kordinattaki
 $x^{k+1}-x^k$ deðiþimini, gradyan deðiþimi $\nabla f(x^{k+1}) - \nabla
-f(x^k)$'e eþler [4]/i0p.
+f(x^k)$'e taþýyor / eþliyor [4].
 
 Kýsaltma amaçlý,
 
 $$
-H_{k+1}^{-1} \underbrace{(x^{k+1}-x^k)}_{y_t} = 
+F_{k+1}^{-1} \underbrace{(x^{k+1}-x^k)}_{y_t} = 
 \underbrace{\nabla f(x^{k+1}) - \nabla f(x^k)}_{s_t}
 $$
 
 $$
-H_{k+1}^{-1} y_k = s_k
+F_{k+1}^{-1} y_k = s_k
 \mlabel{1}
 $$
 
-Özyineli baðlamda bir $H_0$'dan baþlayarak ufak deðiþimlerle sonuca
-ulaþýlmaya uðraþýlýr. Deðiþimlerin ufak olmasý ve bu deðiþimlerin kerte 1
-eki [5] ile olmasý sonucu yine [4]'teki matris normu üzerinden
-görülebilir. Biz farklý bir yönden, eðer ufak deðiþim kerte 1 ve 2 ile
-yapýlsa nereye varýlacaðýna bakacaðýz [1, sf. 111]. 
+Ve $F_{k}^{-1}$ yerine $H_k$ diyelim. 
 
-Kerte 1 eki ile $H_k$'yi $H_{k+1}$ yapmak demek
+Özyineli baðlamda bir $H_0$'dan baþlayarak ufak deðiþimlerle sonuca
+ulaþýlmaya uðraþýlýr. Deðiþimlerin ufak olmasý gerekliliði üzerinden ve bu
+deðiþimlerin kerte 1 eki ile olmasý sonucu [4]'teki matris normu ile
+beraber aslýnda birazdan türeteceðimiz güncelleme denklemi
+alýnabiliyor. Kerte 1 eki konusu için bkz [5]. Biz farklý bir yönden, eðer
+ufak deðiþim kerte 1 ve 2 ile yapýlsa nereye varýlacaðýna bakacaðýz [1,
+sf. 111].
+
+Kerte 1 eki ile $H_k$'yi $H_{k+1}$ yapmak demek aslýnda
 
 $$
 H_{k+1} = H_k + czz^T 
 $$
 
-eþitliði demektir. Bunu iki üstteki formül içine koyarsak
+demektir. Bunu iki üstteki formül içine koyarsak
 
 $$
 s_k = (H_k + czz^T) y_k = H_k y_k + cz (z^T y_k)
@@ -128,21 +132,84 @@ tehlikeye girmesi.
 Çözüm olarak $H_{k+1}$'in pozitif kesin kalmasýný garantileyecek kerte 2
 güncellemesi keþfedilmiþtir. Yani
 
-
 $$
 H_{k+1} = H_k + c_1z_1z_1^T + c_2z_2z_2^T 
 $$
 
+Pozitif kesinliðin ispatý için [2, sf. 206].
+
+Yine (1)'deki Newton-umsu metot þartýyla beraber
+
+$$
+s_k = H_k y_k + c_1 z_1 (z_1^Ty_k) + c_2z_2 (z_2^Ty_k)
+$$
+
+$z_1$ ve $z_2$ için özgün çözüm olmamasýna raðmen üstteki denklemi tatmin
+edecek seçenekler bulunabilir,
+
+$$
+z_1 = s_k, \quad 
+z_2 = H_k y_k, \quad
+c_1 = \frac{1}{z_1^Ty_k}, \quad
+c_2 = \frac{1}{z_2^Ty_k}
+$$
+
+Ve böylece kerte 2 güncellemesi þu hale gelir, 
+
+$$
+H_{k+1} = H_k + \frac{y_ky_k^T}{s_k^Ty_k} - \frac{(H_k y_k)(H_k y_k)^T}{(H_ky_k)^Ty_k}
+$$
+
+Bu formüle Davidon-Fletcher-Powell (DFP) formülü adý verilir. 
+
+BFGS
+
+DFP ile kerte 2 güncellemesi oluyor böylece $H_{k+1}$ pozitif kesin
+kalýyor, güzel. Fakat DFP'nin hala sayýsal olarak bazý problemleri
+var. Burada problem Hessian'ýn deðil Hessian'ýn tersinin yaklaþýklamasýnýn
+güncelleniyor olmasý. Daha iyi bir seçim Hessian'ýn {\em kendisinin}
+yaklaþýklamasýnýn güncellenmesi ve onun üzerinden bir terslik elde
+edilmesi olmaz mýydý? Evet.
+
+Devam etmeden önce iþimize yarayacak baþka bir konu, ikizlik konusundan
+bahsedelim. Eðer DFP formülünün tersinin alýrsak belli bir sonuç elde
+ederiz (bunun benzerini yapacaðýz). Ama biz bu noktaya (1)'deki
 
 % d -> s, g -> y
 
-Yine (1)'deki Newton-umsu metot sartiyla beraber
-
 $$
-s_k = H_k y_k + c_1z_1(z_1z_1^T) + c_2z_2(z_2z_2^T)
+H_{k+1} y_k = s_k
 $$
 
+ile geldiðimizi biliyoruz, ve üstteki formülde ufak bir takla atarsak
 
+$$
+y_k = B_{k+1} s_k
+$$
+
+ki $B_k$ $F_k$'nin yaklaþýk hali, sonucuna gelebileceðimizi de
+biliyoruz. Dikkat edersek bu yeni Newton-umsuluk kuralý form olarak bir
+öncekine çok benziyor, sadece $H_k$ yerine $B_k$ var ve $y_k,s_k$ yerleri
+deðiþti!  Bundan istifade edebiliriz, ve þimdiye kadar yapýlan tüm türetme
+iþlemlerini kullanarak ve sadece $y_k,s_k$ yerini deðiþtirerek $B_k$ için
+bir güncelleme formülü elde edebiliriz.
+
+$$
+B_{k+1} = B_k + \frac{s_ks_k^T}{y_k^Ts_k} - \frac{(B_k s_k)(B_k s_k)^T}{(B_ks_k)^Ts_k}
+$$
+
+Ýþte $B_k$'nin BFGS güncellemesi budur, isim Broyden, Fletcher, Goldfarb,
+and Shannon adlý araþtýrmacýlardan geliyor. Þimdi {\em üsttekinin tersini}
+alýrsak arka planda yapýlan ve daha stabil olan $H_k$'nin güncellenmesinden
+faydalanmýþ oluyoruz, ama hala her adýmda bizim ilgilendiðimiz matris
+tersine eriþmiþ oluyoruz. Üsttekinin tersi için [6]'daki Sherman-Morrison
+tekniðini kullanacaðýz. SM formülü neydi?
+
+$$
+(A+uv^T)^{-1} = A ^{-1} - \frac{(A^{-1} u)(v^TA^{-1})}{1 + v^T A^{-1} u}
+$$
+
+ki eðer $1+v^TA ^{-1} y \ne 0$ ise.
 
 
 
@@ -282,6 +349,11 @@ Kaynaklar
 
 [5] Bayramli, {\em Lineer Cebir, Ders 8, Kerte Konusu}
 
+[6] Bayramli, {\em Lineer Ceir, Ekler, Sherley-Morrison Formülü}
+
 \end{document}
+
+
+
 
 
