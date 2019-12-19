@@ -6,7 +6,7 @@ Bir $f$ hedef fonksiyonunun minimizasyonu için Newton'un özyineli
 algoritmasi
 
 $$
-x^{k+1} = x^k - F(x^k)^{-1} g^k
+x_{k+1} = x_k - F(x_k)^{-1} g_k
 $$
 
 ki $g$ gradyan, $F$ ise Hessian. 
@@ -14,7 +14,7 @@ ki $g$ gradyan, $F$ ise Hessian.
 Ya da
 
 $$
-x^{k+1} = x^k - (\nabla^2 f(x^k))^{-1} \nabla f(x^k)
+x_{k+1} = x_k - (\nabla^2 f(x_k))^{-1} \nabla f(x_k)
 $$
 
 Newton'umsu metotlarýn ana fikri Hessian matrisi yerine sadece gradyan
@@ -24,14 +24,14 @@ $f(\cdot)$'un karesel olarak temsilini yazalým, özyineli gidiþat sýrasýnda,
 bir herhangi bir $x^{k+1}$ etrafýnda Taylor açýlýmý
 
 $$
-m_k(x) \equiv f(x^{k+1}) + \nabla f(x^{k+1})^T (x-x^{k+1}) + 
-\frac{1}{2} (x-x^{k+1}) ^T F_{t+1}^T (x-x^{k+1}) 
+m_k(x) \equiv f(x_{k+1}) + \nabla f(x_{k+1})^T (x - x_{k+1}) + 
+\frac{1}{2} (x - x_{k+1}) ^T F_{k+1}^T (x - x_{k+1}) 
 $$
 
-Eger gradyani alirsak 
+Eðer gradyaný alýrsak 
 
 $$
-\nabla m_k(x) = \nabla f(x^{k+1}) + F_{k+1}^{-1} (x-x^{k+1})
+\nabla m_k(x) = \nabla f(x_{k+1}) + F_{k+1}^{-1} (x-x_{k+1})
 $$
 
 Þimdi $k$ ve $k+1$ noktalarý, gradyanlarý üzerinden bir $H^{k+1}$ iliþkisi
@@ -48,15 +48,15 @@ beraber, ve açýlýmda $x$ herhangi bir $x$ olabileceði için onun yerine
 $x^k$ kullanarak,
 
 $$
-\nabla f(x^{k+1}) + F_{k+1}^{-1} (x^k-x^{k+1}) = \nabla f(x^k)
+\nabla f(x_{k+1}) + F_{k+1}^{-1} (x_k-x_{k+1}) = \nabla f(x_k)
 $$
 
 $$
-H_{k+1}^{-1} (x^k-x^{k+1}) = \nabla f(x^k) - \nabla f(x^{k+1}) 
+H_{k+1}^{-1} (x_k-x_{k+1}) = \nabla f(x_k) - \nabla f(x_{k+1}) 
 $$
 
 $$
-H_{k+1}^{-1} (x^{k+1}-x^k) = \nabla f(x^{k+1}) - \nabla f(x^k) 
+H_{k+1}^{-1} (x_{k+1}-x_k) = \nabla f(x_{k+1}) - \nabla f(x_k) 
 $$
 
 Üsttekine sekant denklemi adý veriliyor, þu figürle alakalý, 
@@ -70,8 +70,8 @@ f(x^k)$'e taþýyor / eþliyor [4].
 Kýsaltma amaçlý,
 
 $$
-F_{k+1}^{-1} \underbrace{(x^{k+1}-x^k)}_{y_t} = 
-\underbrace{\nabla f(x^{k+1}) - \nabla f(x^k)}_{s_t}
+F_{k+1}^{-1} \underbrace{(x_{k+1}-x_k)}_{y_k} = 
+\underbrace{\nabla f(x_{k+1}) - \nabla f(x_k)}_{s_k}
 $$
 
 $$
@@ -161,6 +161,39 @@ H_{k+1} = H_k + \frac{y_ky_k^T}{s_k^Ty_k} - \frac{(H_k y_k)(H_k y_k)^T}{(H_ky_k)
 $$
 
 Bu formüle Davidon-Fletcher-Powell (DFP) formülü adý verilir. 
+
+Algoritma þöyle
+
+% delta x = y, g = s
+
+1. $k=0$ yap. Bir $x_0$'dan baþla, ve herhangi bir simetrik, pozitif kesin
+bir $H_0$ al
+
+2. Eðer $s_k = 0$ ise dur, yoksa $d_k = -H_k g_k$
+
+3. Þunu hesapla
+
+$$
+\alpha_k = \arg\min_{\alpha \ge 0} f(x_k + \alpha d_k)
+$$
+
+$$
+x_{k+1} = x_k + \alpha_k d_k
+$$
+
+4. Hesapla
+
+$$
+y_k = \alpha_k d_k
+$$
+
+$$
+s_k = g_{k+1} - g_k
+$$
+
+$$
+H_{k+1} = H_k + \frac{y_ky_k^T}{s_k^Ty_k} - \frac{(H_k y_k)(H_k y_k)^T}{(H_ky_k)^Ty_k}
+$$
 
 BFGS
 
@@ -291,8 +324,6 @@ $$
 
 diyerek, alttakini elde ediyoruz,
 
-% \delta x -> y, g -> s
-
 $$
 H_{k+1}^{BFGS} = H_k - \frac{H_ks_ks_k^TH_k}{s_k^Ty_k + s_k^TH_ks_k} -
 \frac
@@ -327,45 +358,49 @@ $$
 H_{k+1}^{BFGS} =  H_k - 
 \frac{H_ks_ks_k^TH_k}{s_ky_k + s_k^TH_ks_k} +
 \frac
-   {\frac{H_ks_k(s_k^Ty_k) (y_k^Ts_k)s_kH_k }{s_k^Ty_k + s_k^TH_ks_k}}
-   {(y_k^Ts_k)(s_k^Ty_k)} +
+   {\frac{H_k s_k(s_k^T y_k) (y_k^T s_k)s_k H_k }{s_k^T y_k + s_k^T H_k s_k}}
+   {(y_k^T s_k)(s_k^T y_k)} +
 \frac
-   {y_ky_k^T (s_k^Ty_k + s_k^TH_ks_k) }
-   {(y_k^Ts_k)(s_k^Ty_k)} - 
+   {y_k y_k^T (s_k^T y_k + s_k^T H_k s_k) }
+   {(y_k^T s_k)(s_k^T y_k)} - 
 $$
 $$
 \frac
-   {H_ks_k (s_ky_k) y_k^T + y_ks_k^TH_k  }
-   {(y_k^Ts_k)(s_k^Ty_k)}
+   {H_k s_k (s_k^T y_k) y_k^T + y_k s_k^T H_k  }
+   {(y_k^T s_k)(s_k^Ty_k)}
 $$
 
+3. ve 5. terimlerde daha da basitleþtirme yapýnca
 
+$$
+H_{k+1}^{BFGS} =  
+H_k - \frac{H_k s_k s_k^T H_k}{s_k^T y_k + s_k^T H_k s_k} +
+\frac{H_k s_k s_k^T H_k}{s_k y_k + s_k^T H_k s_k} +
+\frac{y_k y_k^T (s_k^T y_k + s_k^T H_k s_k)}{(y_k^T s_k)(s_k^Ty_k)} - 
+\frac{H_k s_k y_k^T + y_ks_k^T H_k}{y_k^T s_k}
+$$
 
+Dikkat edersek 2. ve 3. terimleri birbirini iptal ediyor, o zaman, ve
+4. terimi alternatif bir formda gösterirsek,
 
+$$
+H_{k+1}^{BFGS} =  H_k + 
+\frac{y_k y_k^T}{y_k^T s_k} \left( 1 + \frac{s_k^T H_k s_k}{s_k^T y_k}  \right) - 
+\frac{H_k s_k y_k^T + y_k s_k^T H_k}{y_k^T s_k}
+$$
 
+Nihai BFGS formülüne eriþmiþ olduk. Bu formülü alttaki gibi de
+gösterebiliriz [7],
 
+$$
+H_{k+1}^{BFGS} =  
+\left( I - \frac{s_k y_k^T}{s_k y_k} \right) 
+H_k
+\left( I - \frac{s_k y_k^T}{y_k^T s_k} \right) + 
+\frac{y_k y_k^T}{y_k^T s_k}
+$$
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-[devam edecek]
+Bir örnek üzerinde görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -452,6 +487,8 @@ bfgs(x,rosen_real)
 iter 19
 \end{verbatim}
 
+Eðer gradyan yerine yaklaþýksal gradyan hesap fonksiyonunu kullanýrsak,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 def _approx_fprime_helper(xk, f, epsilon):
     f0 = f(xk)
@@ -485,6 +522,7 @@ bfgs(x,rosen_approx)
 iter 19
 \end{verbatim}
 
+yine optimum noktaya eriþmiþ oluyoruz.
 
 Kaynaklar 
 
@@ -500,6 +538,8 @@ Kaynaklar
 [5] Bayramli, {\em Lineer Cebir, Ders 8, Kerte Konusu}
 
 [6] Bayramli, {\em Lineer Ceir, Ekler, Sherley-Morrison Formülü}
+
+[7] Fletcher, {\em A new approach to variable metric problems}
 
 \end{document}
 
