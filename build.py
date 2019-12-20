@@ -242,13 +242,7 @@ if __name__ == "__main__":
                 htmlfile = subdir + '.html'
                 tex_mathjax_html(texfile, htmlfile, title)
                 shutil.copy(htmlfile, url)
-                
-                #ocfg = open(subdir + ".cfg", "w")
-                #ocfg.write(cfg)
-                #ocfg.close()
-                #cmd = 'make4ht -u %s.tex -s ' % subdir
-                #os.system(cmd)                
-                
+                                
             fout.write("</body>\n")
             fout.write("</html>\n")
             fout.close()
