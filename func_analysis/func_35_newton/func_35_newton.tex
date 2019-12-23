@@ -2,10 +2,8 @@
 \begin{document}
 Newton'un Metodu (Newton's Method)
 
-Bu notlar [2] dersinden alýndý.
-
-Newton birazdan bahsedeceðimiz yöntemi tek boyutlu problemler için
-kullandý. Rhapson adlý bilimci yöntemi çok boyutlu problemler için
+Newton birazdan bahsedeceðimiz yöntemi tek boyutlu problemler için kullandý
+[2]. Rhapson adlý bilimci yöntemi çok boyutlu problemler için
 geniþletti. Biz bu yönteme optimizasyon çerçevesinde bakacaðýz.  Konunun
 tarihinden biraz bahsetmek istiyorum, bu dersi öðretmeye baþladýðýmda 1986
 senesiydi, Newton'un metodunu nasýl gördüðümüz o zamandan beri deðiþime
@@ -33,10 +31,10 @@ $$
 f(x) \approx 
 f(\bar{x}) + 
 \nabla f(\bar{x})^T (x-\bar{x}) + 
-\frac{1}{2} (x-\bar{x})^T H (x-\bar{x}) 
+\frac{1}{2} (x-\bar{x})^T F (x-\bar{x}) 
 $$
 
-ki $H$ Hessian matrisi. Üstteki formüle $h(x)$ diyelim. Böylece bir karesel
+ki $F$ Hessian matrisi. Üstteki formüle $h(x)$ diyelim. Böylece bir karesel
 model ortaya çýkartmýþ oldum, formülün sað tarafýndaki çarpým onu karesel
 yapýyor, ve þimdi onu kesin olarak çözmek istiyorum. Bunu nasýl yaparým?
 Formülün gradyanýný sýfýra eþitleyebilirim. Üstteki fonksiyonun $x$'teki
@@ -45,26 +43,26 @@ gradyaný nedir?
 Gradyaný $x$'e göre aldýðýmýzý unutmayalým, $h(x)$'in ikinci terimi
 $\nabla f(\bar{x})^T$ bir sabit sayý, ikinci gradyan alýnýrken sýfýrlanýr,
 ve tüm ikinci terim sýfýrlanýr. Üçüncü terimin gradyanýný almak bir nevi
-$\frac{\partial (x^TAx)}{\partial x} $ almak gibi [1], $H$ belli bir
+$\frac{\partial (x^TAx)}{\partial x} $ almak gibi [1], $F$ belli bir
 noktadaki ikinci türev matrisi olduðu için $A$ gibi bir sabit matris kabul
-edilebilir, $A$ simetrik olunca gradyan $2Ax$ sonucunu veriyordu, $H$
-simetrik, o zaman üçüncü terimde $H$ kalýr, 2 ve $1/2$ birbirini iptal
+edilebilir, $A$ simetrik olunca gradyan $2Ax$ sonucunu veriyordu, $F$
+simetrik, o zaman üçüncü terimde $F$ kalýr, 2 ve $1/2$ birbirini iptal
 eder, sonuç
 
 $$
-\nabla h(\bar{x}) = \nabla f(\bar{x}) + H(\bar{x})(x-\bar{x}) 
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + F(\bar{x})(x-\bar{x}) 
 $$
 
 Ýki üstteki karesel yaklaþýksal ifadenin gradyaný bu iþte. Onu sýfýra
-eþitleriz ve çözeriz. $H$ tersi alinabilir bir matristir, o zaman 
+eþitleriz ve çözeriz. $F$ tersi alinabilir bir matristir, o zaman 
 
 $$
-\nabla h(\bar{x}) = \nabla f(\bar{x}) + H(\bar{x})(x-\bar{x}) = 0
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + F(\bar{x})(x-\bar{x}) = 0
 $$
 
 
 $$
-(x-\bar{x}) = -H^{-1} \nabla f(\bar{x})
+(x-\bar{x}) = -F^{-1} \nabla f(\bar{x})
 $$
  
 Üstteki ifadeye $d$ diyebilirim, ve bu $d$ benim Newton yönüm olarak
@@ -74,7 +72,7 @@ Bu bizi gayet basit 4 adýmlýk bir algoritmaya taþýyor,
 
 0) $x^0$ verildi, bu baþlangýç noktasý, $k = 0$ yap.
 
-1) $d^k = -H(x^k)^{-1} \nabla f(x^k)$. Eðer $d^k=0$ ise dur.
+1) $d^k = -F(x^k)^{-1} \nabla f(x^k)$. Eðer $d^k=0$ ise dur.
 
 2) $\alpha^k = 1$ adým boyu seç
 
@@ -97,7 +95,7 @@ daha akýllýca adým atýlabilmesini saðlýyor.
 Metot Hessian'ýn her adýmda tersi alýnabilir olduðunu farzediyor, bu her
 zaman doðru olmayabilir. O sebeple bunun doðru olduðu türden problemler ile
 uðraþacaðýz, ya da Hessian'ýn tersi alýnabilir olmasýný saðlayan
-mekanizmalarý göreceðiz. $H$'nin özünü bozmadan deðiþtirerek tersi
+mekanizmalarý göreceðiz. $F$'nin özünü bozmadan deðiþtirerek tersi
 alýnabilir olmasýný saðlayan yöntemler var. 
 
 Ayrýca hedef her adýmda fonksiyonunu oluþturduðumda bu fonksiyonun azalma
@@ -105,7 +103,8 @@ garantisi yok. Öyle ya akýllý bir algoritmanin her adýmda hedef
 fonksiyonumu daha iyiye götürdüðümü düþünebilirdim, ama þu anda kadar
 gördüklerimiz ýþýðýnda, bunun garantisi yok. Bu konuya sonra deðineceðiz. 
 
-Bir diðer nokta 2. adýmýn çizgi arama ile geniþletilebilmesi [atlandý]
+Bir diðer nokta 2. adýmýn çizgi arama ile geniþletilebilmesi [bu konuya
+altta baska kaynaklardan deginiyoruz]
 
 NY'nin en çekici tarafý, eðer yakýnsama (convergence) mümkün ise bu
 yakýnsamanýn çok hýzlý bir þekilde olmasý, ki bu iyi. Bu konuya gelmeden
@@ -116,7 +115,7 @@ Terminoloji: bir matrise SPD denir eger matris simetrik, pozitif kesin ise
 
 Teklif (Proposition) 1: 
 
-Eðer $H(x)$ SPD ise $d \ne 0$, o zaman $d$ $\bar{x}$ noktasýnda bir iniþ
+Eðer $F(x)$ SPD ise $d \ne 0$, o zaman $d$ $\bar{x}$ noktasýnda bir iniþ
 yönüne iþaret eder. Ýniþ yönü olmasý demek, eðer makul ufak bir adým
 çerçevesinde gidilen noktada $f$'in deðerinin o an olduðumuz noktadan daha
 az olmasý demektir.
@@ -160,61 +159,61 @@ küçük $\lambda > 0$ için $f(\bar{x} + \lambda d)-f(\bar{x}) < 0$ olmalýdýr,
 yani her hangi bir yönde atýlan adým bir önceki $f$ deðerinden bizi daha
 ufak bir $f$ deðerine götürmelidir. 
 
-Ana Teklif'e dönelim. Newton adýmýnýdaki SPD $H$ için $0 < d^T \nabla f$
-olduðunu göstermemiz lazým (ki böylece iniþ yönü olduðunü ispatlayabilelim,
+Ana Teklif'e dönelim. Newton adýmýnýdaki SPD $F$ için $0 < d^T \nabla f$
+olduðunu göstermemiz lazým (ki böylece iniþ yönü olduðunu ispatlayabilelim,
 bir önceki teori),
 
 $$
-d = -H^{-1} \nabla f(\bar{x})
+d = -F^{-1} \nabla f(\bar{x})
 $$
 
 demiþtik, her iki tarafý $\nabla f(x)$ ile çarpalým,
 
 $$
-d \nabla f(x) = -\nabla f(x) H^{-1} \nabla f(x) 
+d \nabla f(x) = -\nabla f(x) F^{-1} \nabla f(x) 
 $$
 
-Eþitliðin sað tarafýndaki ifade hangi þartlarda eksi olur? Eðer $H$ matrisi
+Eþitliðin sað tarafýndaki ifade hangi þartlarda eksi olur? Eðer $F$ matrisi
 pozitif kesin ise deðil mi? Genel matrislerden hatýrlarsak, matris $A$ ve
 bir vektör için $v$ eðer $A$ pozitif kesin ise $v^TAv > 0$. Daha önce
-$H$'nin pozitif kesin olduðunu söylemiþtik, o zaman bir þekilde eðer $H$
-pozitif kesin olmasýnýn sadece ve sadece $H$'nin tersinin pozitif kesin
+$F$'nin pozitif kesin olduðunu söylemiþtik, o zaman bir þekilde eðer $F$
+pozitif kesin olmasýnýn sadece ve sadece $F$'nin tersinin pozitif kesin
 olmasýna baðlý olduðuna gösterebilirsem amacýma ulaþabilirim.
 
-Bunu yapmak aslýnda pek zor deðil. Biliyorum ki $H(x)$ SPD. Simdi herhangi
+Bunu yapmak aslýnda pek zor deðil. Biliyorum ki $F(x)$ SPD. Simdi herhangi
 bir vektor $v$ icin 
 
 $$
-0 < v^T H(x)^{-1}v
+0 < v^T F(x)^{-1}v
 $$
 
-ifadeyi þöyle geniþletelim, $H(x)H(x)^{-1}$ eklemek hiçbir þeyi deðiþtirmez
+ifadeyi þöyle geniþletelim, $F(x)F(x)^{-1}$ eklemek hiçbir þeyi deðiþtirmez
 çünkü bu çarpým birim matristir, 
 
 $$
-v^T H(x)^{-1}v = v^T H(x)^{-1} H(x)H(x)^{-1} v > 0
+v^T F(x)^{-1}v = v^T F(x)^{-1} F(x)F(x)^{-1} v > 0
 $$
 
 Geniþlemiþ ifadenin harfiyen pozitif olduðunu biliyorum, iki üstteki
 tanýmdan. Ama þimdi üstteki ifadeye farklý bir þekilde bakarsak,
 
 $$
-v^T H(x)^{-1}v = \underbrace{v^TH(x)^{-1}} H(x) \underbrace{H(x)^{-1} v} > 0
+v^T F(x)^{-1}v = \underbrace{v^TF(x)^{-1}} F(x) \underbrace{F(x)^{-1} v} > 0
 $$
 
 Ýþaretlenen bölümlerin birer vektör olduðunu görebiliriz, bu durumda
 $v^TAv > 0$ pozitif kesinlik formülü farklý bir $v$ için hala geçerlidir, o
-zaman ortadaki $A$, bu durumda $H(x)$ pozitif kesin olmalýdýr. 
+zaman ortadaki $A$, bu durumda $F(x)$ pozitif kesin olmalýdýr. 
 
 Örnek 1
 
 $f(x) = 7x - \ln(x)$ olsun. O zaman $\nabla f(x) = 7 - \frac{1}{x}$ ve
-$H(x) = f''(x) = \frac{1}{x^2}$. Bu fonksiyonun özgün global minimumunun
+$F(x) = f''(x) = \frac{1}{x^2}$. Bu fonksiyonun özgün global minimumunun
 $x^* = 1/7 = 1.428..$ olduðunu kontrol etmek zor deðil. $x$ noktasýndaki
 Newton yönü
 
 $$
-d = -H(x)^{-1} \nabla f(x) = -\frac{f'(x)}{f''(x)} = 
+d = -F(x)^{-1} \nabla f(x) = -\frac{f'(x)}{f''(x)} = 
 -x^2 \left( 7 - \frac{1}{x}  \right)=
 x - 7x^2
 $$
@@ -289,7 +288,7 @@ $$
 $$
 
 $$
-H(x) = 
+F(x) = 
 \left[\begin{array}{rr}
 (\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_1})^2 & (\frac{1}{1-x_1-x_2} )^2 \\
 (\frac{1}{1-x_1-x_2} )^2 & (\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_2})^2
@@ -305,14 +304,14 @@ def calculate_newton_ex2(x):
     for i in range(8):
         arr.append(x)
         x1,x2 = x[0],x[1]    
-        H = [[(1.0/(1.0-x1-x2))**2 + (1.0/x1)**2.0, (1.0/(1.0-x1-x2))**2.0],
+        F = [[(1.0/(1.0-x1-x2))**2 + (1.0/x1)**2.0, (1.0/(1.0-x1-x2))**2.0],
              [(1.0/(1.0-x1-x2))**2, (1.0/(1.0-x1-x2))**2.0 + (1.0/x2)**2.0]]
-        H = np.array(H)
+        F = np.array(F)
 
         Df = [[1.0/(1.0-x1-x2) - (1.0/x1)], [1.0/(1.0-x1-x2)-(1.0/x2)]]
         Df = np.array(Df)
 
-        d = np.dot(-lin.inv(H),Df)
+        d = np.dot(-lin.inv(F),Df)
         x = x + d.flatten()
 
     return np.array(arr)
@@ -368,6 +367,61 @@ kesin kalsýn.
 
 [teori 1.1 ispatý atlandý]
 
+Ekler
+
+Newton metodunun eðer baþlangýç noktasý nihai minimuma yakýnsa iyi
+yakýnsaklýk özellikleri var. Fakat eðer sonuca uzaktan bir yerden
+baþlamýþsak yakýnsaklýk garantisi yok. Geldiðimiz yeni noktada Hessian
+eþsiz olabilir. Bu sebeple metot sürekli iniþ özelliðine (descent property)
+sahip olmayacaktýr, yani $f(x_{x+1}) \ge f(x_k)$ olabilir, ve yakýnsaklýk
+garantisi bu durumda kaybolur [5, sf. 167]. Fakat bu algoritmayý biraz
+deðiþtirerek sürekli iniþ özelliðine sahip olmasýný saðlayabiliriz. 
+
+Teori
+
+$x_1,x_2,...$ ya da kýsaca $\{x_k\}$ Newton'un metodu tarafýndan üretilmiþ
+$f(x)$ hedef fonksiyonunu minimize etme amaçlý bir çözüm dizisi olsun. Eðer
+Hessian $F(x)_k$ pozitif kesin ise ve gradyan $g_k = \nabla f(x_k) \ne 0$
+ise, o zaman çözüm yönü
+
+$$
+d_k = -F(x_k)^{-1} g_k = x_{k+1} - x_k
+$$
+
+bir iniþ yönüdür, ki bu ifadeyle kastedilen bir $\bar{\alpha} > 0$
+kesinlikle vardýr öyle ki her $\alpha \in  (0,\bar{\alpha})$ için 
+
+$$
+f(x_k + \alpha d_k) < f(x_k)
+$$
+
+ifadesi doðrudur. 
+
+Ýspat
+
+$\phi(\alpha)$ diye yeni bir eþitlik yaratalým,
+
+$$
+\phi(\alpha) = f(x_k + \alpha d_k)
+$$
+
+Üstteki formülün türevini alalým. Zincirleme Kuralýný kullanarak,
+
+$$
+\phi(\alpha)' = f(x_k + \alpha d_k) d_k
+$$
+
+elde ederiz. Þimdi $\phi(0)'$ ne oluyor ona bakalým,
+
+$$
+\phi(0)' = \nabla f(x_k) d_k = -g_k^T F(x_k) ^{-1} g_k < 0
+$$
+
+$-g_k^T F(x_k) ^{-1} g_k$ ifadesinin sýfýrdan küçük olduðunu biliyoruz
+$F(x_k) ^{-1}$ pozitif kesin, ve $g_k \ne 0$. 
+
+[devam edecek]
+
 Kaynaklar 
 
 [1] Bayramlý, Çok Boyutlu Calculus, {\em Vektör Calculus, Kurallar, Matris Türevleri}
@@ -378,5 +432,7 @@ Kaynaklar
 [3] Miller, {\em Numerical Analysis for Scientists and Engineers}
 
 [4] Flannery, {\em Numerical Recipes, 3rd Edition}
+
+[5] Zak, {\em An Introduction to Optimization, 4th Edition}
 
 \end{document}
