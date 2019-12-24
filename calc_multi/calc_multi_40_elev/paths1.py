@@ -4,9 +4,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.distance import cdist
 from matplotlib import cm
 
-eps = np.sqrt(np.finfo(float).eps)
+epsilon = np.sqrt(np.finfo(float).eps)
 
-def _approx_fprime_helper(xk, f, epsilon):
+def _approx_fprime_helper(xk, f):
     f0 = f(xk)
     grad = np.zeros((len(xk),), float)
     ei = np.zeros((len(xk),), float)
@@ -46,12 +46,10 @@ def calc_int(pars):
     
 def test_fprime():
     rosen = lambda x: (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
-
     def rosen_d(x):
         return np.array([2*100*(x[1] - x[0]**2)*(-2*x[0]) - 2*(1.-x[0]), 2*100*(x[1]-x[0]**2)])
-
     x = [0.5, 0.5]
-    res = _approx_fprime_helper(x, rosen, eps)
+    res = _approx_fprime_helper(x, rosen)
     print ('analitik', res, 'sayisal', rosen_d(x))    
     
 
