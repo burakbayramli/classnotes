@@ -2,17 +2,13 @@
 \begin{document}
 Yükseklik Fonksiyonu (Tepeler) Arasýndan En Düz, Optimal Yürüyüþ Yolunu Bulmak
 
+[yapim asamasinda]
+
 Elimizde bir alan içindeki yükseklikleri veren bir fonksiyon $f(x,y)$
 olduðunu düþünelim. Acaba verili bir baþlangýç ve bitiþ noktasý arasýndaki
 en ``rahat'' gidiþ yolunu nasýl buluruz? 
 
-Bu problem bir çizgi entegral hesabýna çevirilebilir. Bir skalar alan
-üzerinden giden herhangi bir parametrize eðrinin altýndaki alaný
-hesaplamayý biliyoruz [2]. Ayrýca istediðimiz derecede polinom parametrize
-eðrileri nasýl yaratacaðýmýzý biliyoruz [3]. Bu fikirleri bir araya koyarsak,
-geriye kalan bir optimizasyon problemidir. Çünkü en rahat yol, ``toplam
-yüksekliði en az olan yol'' olarak görülebilir, ve burada çizgi entegrali
-faydalý olur.
+xxxxxxxxxxxxxxx
 
 Önce yükseklikleri ve eðrileri iki örnek üzerinde görelim. Bir rasgele
 tepe, ve bir rasgele yol çiziyoruz,
@@ -97,12 +93,10 @@ plt.savefig('calc_multi_40_elev_03.png')
 Bu yollarý tabii ki rasgele parametreler üzerinden yarattýk, bunlar optimal
 yollar deðiller.
 
-Optimallik için gereken çizgi entegralinin hesabýna gelelim. Bu hesap için
+Optimallik için gereken uzunluk hesabýna gelelim. Bu hesap için
 formül,
 
-$$
-\int_{t=0}^{t=1} f(x(t),y(t)) \sqrt{(\ud x/\ud t)^2 + (\ud y/\ud t)^2} \ud t
-$$
+xxxxxxxxxxxxxx
 
 Formülde görülen $\ud x/\ud t$ ve $\ud y/\ud t$, parametrik eðri formülünü
 tekrar yazalým, 
@@ -115,8 +109,7 @@ $$
 y(t) = b_0 + b_1 t + b_2 t^2 + b_3 t^3
 $$
 
-ve türev, bunlarýn karesi, toplamlarýn karekoku, vs. hesaplarýný sembolik
-olarak altta yapalým,
+ve türev, bunlarýn karesi hesaplarýný sembolik olarak altta yapalým,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sympy
@@ -153,55 +146,10 @@ isleyebiliyor.
 
 Altta entegral hesabýný üstteki örnek yollar için görelim,
 
-\begin{minted}[fontsize=\footnotesize]{python}
-def trapz(y, dx):
-    vals = np.nan_to_num(y[1:-1],0)
-    tmp = np.sum(vals*2.0)    
-    return (y[0]+tmp+y[-1])*(dx/2.0)
-
-def intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
-   sq = np.sqrt(b1 + 2*b2*t + 3*b3*t**2 - 112.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 65.2*t**3)**2)
-   x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
-   y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
-   x = np.array(x)
-   y = np.array(y)   
-   z = gfunc(x,y)   
-   res = z * sq
-   T = trapz(res, 1.0/len(t))
-   return T
-
-t = np.linspace(0,1,100)
-
-a0,a1,a2,a3,a4,b0,b1,b2,b3,b4 = test_coefs1
-T = intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-print (T)
-a0,a1,a2,a3,a4,b0,b1,b2,b3,b4 = test_coefs2
-T = intval(t,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-print (T)
-\end{minted}
-
-\begin{verbatim}
-1.624956808796678
-5.534245013919315
-\end{verbatim}
-
 Daha dik yolun entegrali daha yüksek çýktý, bu normal.
 
 Þimdi optimal yolu bulalým,
 
-\inputminted[fontsize=\footnotesize]{python}{paths.py}
-
-\includegraphics[width=20em]{calc_multi_40_elev_04.png}
-
-\includegraphics[width=20em]{calc_multi_40_elev_05.png}
-
-Ayrýca bir \verb!offset! parametresiyle yükseklik fonksiyonunun döndürdüðü
-her yükseklik hesabýna bir \verb!offset! kadar yüksekliði suni olarak
-eklediðimize dikkat. Bunun sebebi yer seviyesinin 0 yükseklikte olmasý
-sebebiyle sürekli tercih edilebilmesi, yani upuzun bir yol yer seviyesinden
-gidebilir, çünkü orada gitmenin hiçbir bedeli yoktur. Biz de her yüksekliði
-suni bir yükseklik ekleyerek yerdeki çok uzun yollarýn tercih edilmemesini
-saðladýk.
 
 Iki Tepe, RBF
 
@@ -226,26 +174,8 @@ saðlayalým.
 Test amaçlý bir blok içinde iki tepe yaratalým, sonra ayný tepeleri bir
 baþka blok içinde yaratacaðýz, ve ikisini yanyana koyacaðýz. 
 
-Autograd, Otomatik Türev
+xxxxxxxxxxxxxxxxx
 
-Þimdiye kadar gördüðümüz yöntem gradyan /türev bilgisinin sayýsal olarak
-hesaplayan bir yöntem kullandý, COBYLA. Fakat gradyan bilgisini otomatik
-türev olarak aldýrýp (sembolik türev ile ayný kuvvette), minimizasyon
-adýmýný kendimiz de atabilirdik. Ayrýca sýnýr þartlarýný [5]'te gördüðümüz
-gibi log-bariyer yöntemi ile kendimiz sisteme dahil edebilirdik.
-
-Ýki tepeli örnek üzerinde görelim. Tepeleri yaratýp, örneklem alýp, RBF
-modelleme yapýyoruz, o modelle çizgi entegrali hesaplýyoruz, ve belli
-baþlangýç bitiþ noktalarýna tekabül eden katsayýlar üzerinden bu entegrali
-minimize etmek istiyoruz. 
-
-Fakat bir fark var, RBF ile yükseklik hesaplayan metotun türevini otomatik
-olarak alacaðýz. Bu sebeple entegral, ve onun içinde çaðýrdýðý tüm metotlar
-``autograd-perver'' olmalý.  Ayrýca Autograd, perde arkasýnda Python kodu
-üzerinde bazý temelden deðiþimler yapar, ve bu sebeple metotlarýn autograd
-üzerinden, ve autograd dýþýndan çaðrýlmalarýnda farklýlýklar olabiliyor,
-ayrýca her türlü Python çaðrýsýný autograd-perver kodlar içinden
-yapamayabiliriz. 
 
 Þimdi çizgi entegrali hesabý ve optimizasyon için gerekli rutinleri
 yazalým, ve bir baþlangýç noktasý \verb!(36.0,32.0)!'dan
@@ -253,23 +183,7 @@ yazalým, ve bir baþlangýç noktasý \verb!(36.0,32.0)!'dan
 deðiþimi açýk olsun, \verb!import numpy as anp!  ile dahil edilen
 \verb!numpy! versiyonunu farklý isimlendirdik.
 
-\inputminted[fontsize=\footnotesize]{python}{paths2.py}
 
-\includegraphics[width=18em]{linear_app88rbf_08-0.png}
-\includegraphics[width=18em]{linear_app88rbf_08-1.png}
-
-\includegraphics[width=18em]{linear_app88rbf_08-2.png}
-\includegraphics[width=18em]{linear_app88rbf_08-3.png}
-
-\includegraphics[width=18em]{linear_app88rbf_08-4.png}
-\includegraphics[width=18em]{linear_app88rbf_08-5.png}
-
-Üstte her gradyan adýmý sonrasý hesaplanan yollarý görüyoruz. Rasgele
-katsayýlarla baþladýk (ilk grafik), ve tek bir gradyan iniþi adýmý ile
-optimal bir yola oldukca yaklaþtýk. Bir adým daha daha da iyi sonuç verdi.
-
-Ýþte görüldüðü gibi son derece çetrefil bir fonksiyon olsa da türevi rahat
-bir þekilde hesaplamýþ oluyoruz. 
 
 Kaynaklar 
 
