@@ -21,19 +21,35 @@ TERMINATION_MESSAGES = {
     3: "`callback` function requested termination"
 }
 
-class SR1:
+class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
     _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
     _symv = get_blas_funcs('symv', dtype='d')
     
-    def __init__(self, min_denominator=1e-8, init_scale='auto'):
-        self.min_denominator = min_denominator
-        #super(SR1, self).__init__(init_scale)
+    def __init__(self, exception_strategy='skip_update', min_curvature=None,
+                 init_scale='auto'):
+        if exception_strategy == 'skip_update':
+            if min_curvature is not None:
+                self.min_curvature = min_curvature
+            else:
+                self.min_curvature = 1e-8
+        elif exception_strategy == 'damp_update':
+            if min_curvature is not None:
+                self.min_curvature = min_curvature
+            else:
+                self.min_curvature = 0.2
+        else:
+            raise ValueError("`exception_strategy` must be 'skip_update' "
+                             "or 'damp_update'.")
+
         self.init_scale = init_scale
+        # Until initialize is called we can't really use the class,
+        # so it makes sense to set everything to None.
         self.first_iteration = None
         self.approx_type = None
         self.B = None
         self.H = None
+        self.exception_strategy = exception_strategy
 
     def initialize(self, n, approx_type):
         self.first_iteration = True
@@ -47,6 +63,46 @@ class SR1:
         else:
             self.H = np.eye(n, dtype=float)
 
+    def _update_inverse_hessian(self, ys, Hy, yHy, s):
+        """Update the inverse Hessian matrix.
+
+        BFGS update using the formula:
+
+            ``H <- H + ((H*y).T*y + s.T*y)/(s.T*y)^2 * (s*s.T)
+                     - 1/(s.T*y) * ((H*y)*s.T + s*(H*y).T)``
+
+        where ``s = delta_x`` and ``y = delta_grad``. This formula is
+        equivalent to (6.17) in [1]_ written in a more efficient way
+        for implementation.
+
+        References
+        ----------
+        .. [1] Nocedal, Jorge, and Stephen J. Wright. "Numerical optimization"
+               Second Edition (2006).
+        """
+        self.H = self._syr2(-1.0 / ys, s, Hy, a=self.H)
+        self.H = self._syr((ys+yHy)/ys**2, s, a=self.H)
+
+    def _update_hessian(self, ys, Bs, sBs, y):
+        """Update the Hessian matrix.
+
+        BFGS update using the formula:
+
+            ``B <- B - (B*s)*(B*s).T/s.T*(B*s) + y*y^T/s.T*y``
+
+        where ``s`` is short for ``delta_x`` and ``y`` is short
+        for ``delta_grad``. Formula (6.19) in [1]_.
+
+        References
+        ----------
+        .. [1] Nocedal, Jorge, and Stephen J. Wright. "Numerical optimization"
+               Second Edition (2006).
+        """
+        self.B = self._syr(1.0 / ys, y, a=self.B)
+        self.B = self._syr(-1.0 / sBs, Bs, a=self.B)
+
+        
+            
     def _auto_scale(self, delta_x, delta_grad):
         s_norm2 = np.dot(delta_x, delta_x)
         y_norm2 = np.dot(delta_grad, delta_grad)
@@ -59,21 +115,50 @@ class SR1:
             return ys / y_norm2
 
     def _update_implementation(self, delta_x, delta_grad):
+        # Auxiliary variables w and z
         if self.approx_type == 'hess':
             w = delta_x
             z = delta_grad
         else:
             w = delta_grad
             z = delta_x
+        # Do some common operations
+        wz = np.dot(w, z)
         Mw = self.dot(w)
-        z_minus_Mw = z - Mw
-        denominator = np.dot(w, z_minus_Mw)
-        if np.abs(denominator) <= self.min_denominator*norm(w)*norm(z_minus_Mw):
-            return
+        wMw = Mw.dot(w)
+        # Guarantee that wMw > 0 by reinitializing matrix.
+        # While this is always true in exact arithmetics,
+        # indefinite matrix may appear due to roundoff errors.
+        if wMw <= 0.0:
+            scale = self._auto_scale(delta_x, delta_grad)
+            # Reinitialize matrix
+            if self.approx_type == 'hess':
+                self.B = scale * np.eye(self.n, dtype=float)
+            else:
+                self.H = scale * np.eye(self.n, dtype=float)
+            # Do common operations for new matrix
+            Mw = self.dot(w)
+            wMw = Mw.dot(w)
+        # Check if curvature condition is violated
+        if wz <= self.min_curvature * wMw:
+            # If the option 'skip_update' is set
+            # we just skip the update when the condion
+            # is violated.
+            if self.exception_strategy == 'skip_update':
+                return
+            # If the option 'damp_update' is set we
+            # interpolate between the actual BFGS
+            # result and the unmodified matrix.
+            elif self.exception_strategy == 'damp_update':
+                update_factor = (1-self.min_curvature) / (1 - wz/wMw)
+                z = update_factor*z + (1-update_factor)*Mw
+                wz = np.dot(w, z)
+        # Update matrix
         if self.approx_type == 'hess':
-            self.B = self._syr(1/denominator, z_minus_Mw, a=self.B)
+            self._update_hessian(wz, Mw, wMw, z)
         else:
-            self.H = self._syr(1/denominator, z_minus_Mw, a=self.H)
+            self._update_inverse_hessian(wz, Mw, wMw, z)
+
 
     def update(self, delta_x, delta_grad):
         if np.all(delta_x == 0.0):
@@ -416,7 +501,7 @@ class ScalarFunction(object):
 
             update_hess()
             self.H_updated = True
-        elif isinstance(hess, SR1):
+        elif isinstance(hess, BFGS):
             self.H = hess
             self.H.initialize(self.n, 'hess')
             self.H_updated = True
@@ -429,7 +514,7 @@ class ScalarFunction(object):
 
         self._update_hess_impl = update_hess
 
-        if isinstance(hess, SR1):
+        if isinstance(hess, BFGS):
             def update_x(x):
                 self._update_grad()
                 self.x_prev = self.x
@@ -1484,7 +1569,7 @@ res = minimize (fun=rosenbrock,
                 x0=x0,
                 method = 'trust-constr',
                 jac = "2-point",
-                hess = SR1 (),
+                hess = BFGS (),
 #                bounds=Bounds([0.3, 0.5], [0.0, 2.0]),
                 bounds=Bounds([0.0, 0.0], [3.0, 3.0]),
                 options=opts)

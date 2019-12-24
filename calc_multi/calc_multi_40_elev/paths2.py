@@ -1,4 +1,4 @@
-from scipy.optimize import minimize, Bounds, SR1
+from scipy.optimize import minimize, Bounds, SR1, BFGS
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -53,6 +53,7 @@ def find_path(ex,ey,a0,b0):
                     #method='BFGS',
                     #jac = "2-point",
                     #hess = SR1 (),
+                    hess = BFGS (),
                     bounds=Bounds([-LIM, -LIM, -LIM, -LIM, -LIM, -LIM],
                                   [LIM, LIM, LIM, LIM, LIM, LIM]),
                     options=opts)
@@ -60,19 +61,7 @@ def find_path(ex,ey,a0,b0):
 
     print (res)
 
-#a1,a2,a3 = 1.5, 8.1, 4.0
-#b1,b2,b3 = 0.3, 0.4, 23.3
-#a1,a2,a3 = 1.5, 3.0, 1.0
-#b1,b2,b3 = 0.0, 1.0, 1.0
 a0,b0=(1.0,1.0)
 ex,ey=(0.3,4.0)
-
-a1,a2,a3 = 0.5, 0.1, 0.0
-b1,b2,b3 = -0.3, -1.4, 1.3
-a4 = ex - a0 - (a1+a2+a3)
-b4 = ey - b0 - (b1+b2+b3)
-test_coefs1 = (a1,a2,a3,b1,b2,b3)
-print (calc_int(test_coefs1))
-
 res = find_path(ex,ey,a0,b0)
 print  ('res',res)
