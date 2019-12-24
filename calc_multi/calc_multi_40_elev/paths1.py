@@ -6,6 +6,11 @@ from matplotlib import cm
 
 epsilon = np.sqrt(np.finfo(float).eps)
 
+def trapz(y, dx):
+    vals = y[1:-1]
+    vals = vals[vals>0.0]
+    return (y[0]+np.sum(vals*2.0)+y[-1])*(dx/2.0)
+
 def _approx_fprime_helper(xk, f):
     f0 = f(xk)
     grad = np.zeros((len(xk),), float)
@@ -25,12 +30,8 @@ def _approx_fprime_helper(xk, f):
         ei[k] = 0.0
     return grad
 
-def trapz(y, dx):
-    vals = y[1:-1]
-    vals = vals[vals>0.0]
-    return (y[0]+np.sum(vals*2.0)+y[-1])*(dx/2.0)
-
-def gfunc(t):
+def gfunc(x):
+    t = x[0]
     x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
     y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
     s1 = 2.2; x1 = 2.0; y1 = 2.0
@@ -39,10 +40,12 @@ def gfunc(t):
 
 def calc_int(pars):
     pars = a0,a1,a2,a3,a4,b0,b1,b2,b3,b4
-    t = np.linspace(0,1.0,100)
+    ts = np.linspace(0,1.0,100)
     # for z 
-    z = gfunc(t)
-    print (z)
+    dzs = np.array([_approx_fprime_helper([t],gfunc)[0] for t in ts])
+    I1 = np.sqrt(1+dzs**2)
+    I = trapz(I1, 1/100.)
+    print (I)
     
 def test_fprime():
     rosen = lambda x: (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
