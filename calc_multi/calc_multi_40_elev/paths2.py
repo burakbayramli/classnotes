@@ -60,7 +60,6 @@ def find_path(ex,ey,a0,b0):
 
     print (res)
 
-# 1. gidis yolunun tanimi, uzun yoldan dolanarak gidiyor
 #a1,a2,a3 = 1.5, 8.1, 4.0
 #b1,b2,b3 = 0.3, 0.4, 23.3
 #a1,a2,a3 = 1.5, 3.0, 1.0
