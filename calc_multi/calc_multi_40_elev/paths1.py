@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.distance import cdist
 from matplotlib import cm
-import fprime
+import util
 
 def trapz(y, dx):
     vals = y[1:-1]
@@ -22,7 +22,7 @@ def calc_int(pars):
     pars = a0,a1,a2,a3,a4,b0,b1,b2,b3,b4
     ts = np.linspace(0,1.0,100)
     # for z 
-    dzs = np.array([fprime._approx_fprime_helper([t],gfunc)[0] for t in ts])
+    dzs = np.array([util._approx_fprime_helper([t],gfunc)[0] for t in ts])
     tmp = 1 + np.sqrt(1+dzs**2)
     Iv = trapz(tmp, 1/100.)
     print (Iv)
