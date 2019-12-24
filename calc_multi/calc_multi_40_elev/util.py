@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import numpy.linalg as lin
 
 epsilon = np.sqrt(np.finfo(float).eps)
 
@@ -50,7 +51,7 @@ def linesearch_secant(f, d, x):
     return alpha
 
 def bfgs(x, func):    
-    H = np.eye(2)
+    H = np.eye(len(x))
     tol = 1e-20
     y,grad = func(x)
     dist=2*tol
@@ -59,6 +60,7 @@ def bfgs(x, func):
 
     while lin.norm(grad)>1e-6:
         value,grad=func(x)
+        print (grad)
         p=np.dot(-H,grad)
         lam = linesearch_secant(func,p,x)
         iter += 1
@@ -77,5 +79,5 @@ def bfgs(x, func):
         H= np.dot(np.dot(tmp1,H),tmp2) + tmp3
         #print ('lambda:',lam)
 
-    print (xt)
+    #print (xt)
     print ('iter',iter)
