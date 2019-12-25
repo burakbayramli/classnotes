@@ -466,42 +466,7 @@ class ScalarFunction(object):
         self._update_grad_impl = update_grad
         self._update_grad()
 
-        # Hessian Evaluation
-        if callable(hess):
-            self.H = hess(x0, *args)
-            self.H_updated = True
-            self.nhev += 1
-
-            if sps.issparse(self.H):
-                def hess_wrapped(x):
-                    self.nhev += 1
-                    return sps.csr_matrix(hess(x, *args))
-                self.H = sps.csr_matrix(self.H)
-
-            elif isinstance(self.H, LinearOperator):
-                def hess_wrapped(x):
-                    self.nhev += 1
-                    return hess(x, *args)
-
-            else:
-                def hess_wrapped(x):
-                    self.nhev += 1
-                    return np.atleast_2d(np.asarray(hess(x, *args)))
-                self.H = np.atleast_2d(np.asarray(self.H))
-
-            def update_hess():
-                self.H = hess_wrapped(self.x)
-
-        elif hess in FD_METHODS:
-            def update_hess():
-                self._update_grad()
-                self.H = approx_derivative(grad_wrapped, self.x, f0=self.g,
-                                           **finite_diff_options)
-                return self.H
-
-            update_hess()
-            self.H_updated = True
-        elif isinstance(hess, BFGS):
+        if isinstance(hess, BFGS):
             self.H = hess
             self.H.initialize(self.n, 'hess')
             self.H_updated = True
