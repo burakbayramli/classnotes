@@ -6,7 +6,6 @@ from warnings import warn
 import scipy.sparse as sps
 import scipy.sparse.linalg
 from scipy.linalg import get_blas_funcs
-from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from util import LinearOperator, approx_derivative, OptimizeResult
 
 class BFGS:
@@ -371,7 +370,7 @@ class IdentityVectorFunction(LinearVectorFunction):
     def __init__(self, x0, sparse_jacobian):
         n = len(x0)
         if sparse_jacobian or sparse_jacobian is None:
-            A = eye(n, format='csr')
+            A = sps.eye(n, format='csr')
             sparse_jacobian = True
         else:
             A = np.eye(n)
@@ -792,7 +791,7 @@ def strict_bounds(lb, ub, keep_feasible, n_vars):
 
 def orthogonality(A, g):
     norm_g = np.linalg.norm(g)
-    if issparse(A):
+    if sps.issparse(A):
         norm_A = scipy.sparse.linalg.norm(A, ord='fro')
     else:
         norm_A = np.linalg.norm(A, ord='fro')
@@ -808,7 +807,7 @@ def orthogonality(A, g):
         
 def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
 
-    K = sps.csc_matrix(bmat([[eye(n), A.T], [A, None]]))
+    K = sps.csc_matrix(sps.bmat([[sps.eye(n), A.T], [A, None]]))
     try:
         solve = scipy.sparse.linalg.factorized(K)
     except RuntimeError:
@@ -857,9 +856,9 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
     m, n = np.shape(A)
 
     if m*n == 0:
-        A = csc_matrix(A)
+        A = sps.csc_matrix(A)
 
-    if issparse(A):
+    if sps.issparse(A):
         if method is None:
             method = "AugmentedSystem"
         if method not in ("NormalEquation", "AugmentedSystem"):
