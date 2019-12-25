@@ -2,6 +2,197 @@ from math import copysign
 import numpy as np
 import operator
 
+EPS = np.finfo(np.float64).eps
+
+def _adjust_scheme_to_bounds(x0, h, num_steps, scheme, lb, ub):
+    if scheme == '1-sided':
+        use_one_sided = np.ones_like(h, dtype=bool)
+    elif scheme == '2-sided':
+        h = np.abs(h)
+        use_one_sided = np.zeros_like(h, dtype=bool)
+    else:
+        raise ValueError("`scheme` must be '1-sided' or '2-sided'.")
+
+    if np.all((lb == -np.inf) & (ub == np.inf)):
+        return h, use_one_sided
+
+    h_total = h * num_steps
+    h_adjusted = h.copy()
+
+    lower_dist = x0 - lb
+    upper_dist = ub - x0
+
+    if scheme == '1-sided':
+        x = x0 + h_total
+        violated = (x < lb) | (x > ub)
+        fitting = np.abs(h_total) <= np.maximum(lower_dist, upper_dist)
+        h_adjusted[violated & fitting] *= -1
+
+        forward = (upper_dist >= lower_dist) & ~fitting
+        h_adjusted[forward] = upper_dist[forward] / num_steps
+        backward = (upper_dist < lower_dist) & ~fitting
+        h_adjusted[backward] = -lower_dist[backward] / num_steps
+    elif scheme == '2-sided':
+        central = (lower_dist >= h_total) & (upper_dist >= h_total)
+
+        forward = (upper_dist >= lower_dist) & ~central
+        h_adjusted[forward] = np.minimum(
+            h[forward], 0.5 * upper_dist[forward] / num_steps)
+        use_one_sided[forward] = True
+
+        backward = (upper_dist < lower_dist) & ~central
+        h_adjusted[backward] = -np.minimum(
+            h[backward], 0.5 * lower_dist[backward] / num_steps)
+        use_one_sided[backward] = True
+
+        min_dist = np.minimum(upper_dist, lower_dist) / num_steps
+        adjusted_central = (~central & (np.abs(h_adjusted) <= min_dist))
+        h_adjusted[adjusted_central] = min_dist[adjusted_central]
+        use_one_sided[adjusted_central] = False
+
+    return h_adjusted, use_one_sided
+
+
+relative_step = {"2-point": EPS**0.5,
+                 "3-point": EPS**(1/3),
+                 "cs": EPS**0.5}
+
+
+def _compute_absolute_step(rel_step, x0, method):
+    if rel_step is None:
+        rel_step = relative_step[method]
+    sign_x0 = (x0 >= 0).astype(float) * 2 - 1
+    return rel_step * sign_x0 * np.maximum(1.0, np.abs(x0))
+
+
+def _dense_difference(fun, x0, f0, h, use_one_sided, method):
+    m = f0.size
+    n = x0.size
+    J_transposed = np.empty((n, m))
+    h_vecs = np.diag(h)
+
+    for i in range(h.size):
+        if method == '2-point':
+            x = x0 + h_vecs[i]
+            dx = x[i] - x0[i]  # Recompute dx as exactly representable number.
+            df = fun(x) - f0
+        elif method == '3-point' and use_one_sided[i]:
+            x1 = x0 + h_vecs[i]
+            x2 = x0 + 2 * h_vecs[i]
+            dx = x2[i] - x0[i]
+            f1 = fun(x1)
+            f2 = fun(x2)
+            df = -3.0 * f0 + 4 * f1 - f2
+        elif method == '3-point' and not use_one_sided[i]:
+            x1 = x0 - h_vecs[i]
+            x2 = x0 + h_vecs[i]
+            dx = x2[i] - x1[i]
+            f1 = fun(x1)
+            f2 = fun(x2)
+            df = f2 - f1
+        elif method == 'cs':
+            f1 = fun(x0 + h_vecs[i]*1.j)
+            df = f1.imag
+            dx = h_vecs[i, i]
+        else:
+            raise RuntimeError("Never be here.")
+
+        J_transposed[i] = df / dx
+
+    if m == 1:
+        J_transposed = np.ravel(J_transposed)
+
+    return J_transposed.T
+
+
+def _prepare_bounds(bounds, x0):
+    lb, ub = [np.asarray(b, dtype=float) for b in bounds]
+    if lb.ndim == 0:
+        lb = np.resize(lb, x0.shape)
+
+    if ub.ndim == 0:
+        ub = np.resize(ub, x0.shape)
+
+    return lb, ub
+
+
+def approx_derivative(fun, x0, method='3-point', rel_step=None, f0=None,
+                      bounds=(-np.inf, np.inf), sparsity=None,
+                      as_linear_operator=False, args=(), kwargs={}):
+    if method not in ['2-point', '3-point', 'cs']:
+        raise ValueError("Unknown method '%s'. " % method)
+
+    x0 = np.atleast_1d(x0)
+    if x0.ndim > 1:
+        raise ValueError("`x0` must have at most 1 dimension.")
+
+    lb, ub = _prepare_bounds(bounds, x0)
+
+    if lb.shape != x0.shape or ub.shape != x0.shape:
+        raise ValueError("Inconsistent shapes between bounds and `x0`.")
+
+    if as_linear_operator and not (np.all(np.isinf(lb))
+                                   and np.all(np.isinf(ub))):
+        raise ValueError("Bounds not supported when "
+                         "`as_linear_operator` is True.")
+
+    def fun_wrapped(x):
+        f = np.atleast_1d(fun(x, *args, **kwargs))
+        if f.ndim > 1:
+            raise RuntimeError("`fun` return value has "
+                               "more than 1 dimension.")
+        return f
+
+    if f0 is None:
+        f0 = fun_wrapped(x0)
+    else:
+        f0 = np.atleast_1d(f0)
+        if f0.ndim > 1:
+            raise ValueError("`f0` passed has more than 1 dimension.")
+
+    if np.any((x0 < lb) | (x0 > ub)):
+        raise ValueError("`x0` violates bound constraints.")
+
+    if as_linear_operator:
+        if rel_step is None:
+            rel_step = relative_step[method]
+
+        return _linear_operator_difference(fun_wrapped, x0,
+                                           f0, rel_step, method)
+    else:
+        h = _compute_absolute_step(rel_step, x0, method)
+
+        if method == '2-point':
+            h, use_one_sided = _adjust_scheme_to_bounds(
+                x0, h, 1, '1-sided', lb, ub)
+        elif method == '3-point':
+            h, use_one_sided = _adjust_scheme_to_bounds(
+                x0, h, 1, '2-sided', lb, ub)
+        elif method == 'cs':
+            use_one_sided = False
+
+        if sparsity is None:
+            return _dense_difference(fun_wrapped, x0, f0, h,
+                                     use_one_sided, method)
+        else:
+            if not issparse(sparsity) and len(sparsity) == 2:
+                structure, groups = sparsity
+            else:
+                structure = sparsity
+                groups = group_columns(sparsity)
+
+            if issparse(structure):
+                structure = csc_matrix(structure)
+            else:
+                structure = np.atleast_2d(structure)
+
+            groups = np.atleast_1d(groups)
+            return _sparse_difference(fun_wrapped, x0, f0, h,
+                                      use_one_sided, structure,
+                                      groups, method)
+
+
+
 def isintlike(x):
     """Is x appropriate as an index into a sparse matrix? Returns True
     if it can be cast safely to a machine int.

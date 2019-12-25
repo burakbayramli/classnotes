@@ -7,8 +7,7 @@ import scipy.sparse.linalg
 from numpy.linalg import norm
 from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
-from scipy.optimize._numdiff import approx_derivative
-from util import LinearOperator
+from util import LinearOperator, approx_derivative
 
 class OptimizeResult(dict):
     def __getattr__(self, name):
