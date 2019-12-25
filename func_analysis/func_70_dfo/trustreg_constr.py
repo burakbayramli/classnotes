@@ -449,15 +449,7 @@ class ScalarFunction(object):
         self._update_fun_impl = update_fun
         self._update_fun()
 
-        if callable(grad):
-            def grad_wrapped(x):
-                self.ngev += 1
-                return np.atleast_1d(grad(x, *args))
-
-            def update_grad():
-                self.g = grad_wrapped(self.x)
-
-        elif grad in FD_METHODS:
+        if grad in FD_METHODS:
             def update_grad():
                 self._update_fun()
                 self.g = approx_derivative(fun_wrapped, self.x, f0=self.f,
