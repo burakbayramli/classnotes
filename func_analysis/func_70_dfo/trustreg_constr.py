@@ -3,10 +3,10 @@ import numpy as np
 import itertools, time
 from numpy.linalg import norm
 from warnings import warn
-import scipy.sparse as sps
-import scipy.sparse.linalg
 from scipy.linalg import get_blas_funcs
 from util import LinearOperator, approx_derivative, OptimizeResult
+import scipy.sparse as sps
+import scipy.sparse.linalg
 
 class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
@@ -30,8 +30,6 @@ class BFGS:
                              "or 'damp_update'.")
 
         self.init_scale = init_scale
-        # Until initialize is called we can't really use the class,
-        # so it makes sense to set everything to None.
         self.first_iteration = None
         self.approx_type = None
         self.B = None
@@ -57,8 +55,6 @@ class BFGS:
     def _update_hessian(self, ys, Bs, sBs, y):
         self.B = self._syr(1.0 / ys, y, a=self.B)
         self.B = self._syr(-1.0 / sBs, Bs, a=self.B)
-
-        
             
     def _auto_scale(self, delta_x, delta_grad):
         s_norm2 = np.dot(delta_x, delta_x)
@@ -79,33 +75,20 @@ class BFGS:
         else:
             w = delta_grad
             z = delta_x
-        # Do some common operations
         wz = np.dot(w, z)
         Mw = self.dot(w)
         wMw = Mw.dot(w)
-        # Guarantee that wMw > 0 by reinitializing matrix.
-        # While this is always true in exact arithmetics,
-        # indefinite matrix may appear due to roundoff errors.
         if wMw <= 0.0:
             scale = self._auto_scale(delta_x, delta_grad)
-            # Reinitialize matrix
             if self.approx_type == 'hess':
                 self.B = scale * np.eye(self.n, dtype=float)
             else:
                 self.H = scale * np.eye(self.n, dtype=float)
-            # Do common operations for new matrix
             Mw = self.dot(w)
             wMw = Mw.dot(w)
-        # Check if curvature condition is violated
         if wz <= self.min_curvature * wMw:
-            # If the option 'skip_update' is set
-            # we just skip the update when the condion
-            # is violated.
             if self.exception_strategy == 'skip_update':
                 return
-            # If the option 'damp_update' is set we
-            # interpolate between the actual BFGS
-            # result and the unmodified matrix.
             elif self.exception_strategy == 'damp_update':
                 update_factor = (1-self.min_curvature) / (1 - wz/wMw)
                 z = update_factor*z + (1-update_factor)*Mw
@@ -121,19 +104,13 @@ class BFGS:
         if np.all(delta_x == 0.0):
             return
         if np.all(delta_grad == 0.0):
-            warn('delta_grad == 0.0. Check if the approximated '
-                 'function is linear. If the function is linear '
-                 'better results can be obtained by defining the '
-                 'Hessian as zero instead of using quasi-Newton '
-                 'approximations.', UserWarning)
+            warn('delta_grad == 0.0', UserWarning)
             return
         if self.first_iteration:
-            # Get user specific scale
             if self.init_scale == "auto":
                 scale = self._auto_scale(delta_x, delta_grad)
             else:
                 scale = float(self.init_scale)
-            # Scale initial matrix with ``scale * np.eye(n)``
             if self.approx_type == 'hess':
                 self.B *= scale
             else:
@@ -190,8 +167,6 @@ class Bounds(object):
             return "{}({!r}, {!r}, keep_feasible={!r})".format(type(self).__name__, self.lb, self.ub, self.keep_feasible)
         else:
             return "{}({!r}, {!r})".format(type(self).__name__, self.lb, self.ub)
-
-
     
 class CanonicalConstraint(object):
 
