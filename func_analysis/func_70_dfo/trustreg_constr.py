@@ -9,8 +9,7 @@ from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from scipy.optimize._numdiff import approx_derivative
 from scipy.optimize import (OptimizeResult)
-
-from scipy.sparse.linalg import LinearOperator
+from util import LinearOperator
 
 class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
