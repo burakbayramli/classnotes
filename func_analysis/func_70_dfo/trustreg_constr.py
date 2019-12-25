@@ -458,16 +458,15 @@ class ScalarFunction(object):
         self._update_grad_impl = update_grad
         self._update_grad()
 
-        if isinstance(hess, BFGS):
-            self.H = hess
-            self.H.initialize(self.n, 'hess')
-            self.H_updated = True
-            self.x_prev = None
-            self.g_prev = None
+        self.H = hess
+        self.H.initialize(self.n, 'hess')
+        self.H_updated = True
+        self.x_prev = None
+        self.g_prev = None
 
-            def update_hess():
-                self._update_grad()
-                self.H.update(self.x - self.x_prev, self.g - self.g_prev)
+        def update_hess():
+            self._update_grad()
+            self.H.update(self.x - self.x_prev, self.g - self.g_prev)
 
         self._update_hess_impl = update_hess
 
