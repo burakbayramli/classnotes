@@ -8,23 +8,9 @@ from numpy.linalg import norm
 from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from scipy.optimize._numdiff import approx_derivative
-from scipy.optimize import (NonlinearConstraint,
-                            LinearConstraint, OptimizeResult)
+from scipy.optimize import (OptimizeResult)
 
 from scipy.sparse.linalg import LinearOperator
-
-class Bounds(object):
-    def __init__(self, lb, ub, keep_feasible=False):
-        self.lb = lb
-        self.ub = ub
-        self.keep_feasible = keep_feasible
-
-    def __repr__(self):
-        if np.any(self.keep_feasible):
-            return "{}({!r}, {!r}, keep_feasible={!r})".format(type(self).__name__, self.lb, self.ub, self.keep_feasible)
-        else:
-            return "{}({!r}, {!r})".format(type(self).__name__, self.lb, self.ub)
-
 
 class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
@@ -173,7 +159,44 @@ class BFGS:
         li = np.tril_indices_from(M, k=-1)
         M[li] = M.T[li]
         return M
-           
+
+class NonlinearConstraint(object):
+    def __init__(self, fun, lb, ub, jac='2-point', hess=BFGS(),
+                 keep_feasible=False, finite_diff_rel_step=None,
+                 finite_diff_jac_sparsity=None):
+        self.fun = fun
+        self.lb = lb
+        self.ub = ub
+        self.finite_diff_rel_step = finite_diff_rel_step
+        self.finite_diff_jac_sparsity = finite_diff_jac_sparsity
+        self.jac = jac
+        self.hess = hess
+        self.keep_feasible = keep_feasible
+
+
+class LinearConstraint(object):
+    def __init__(self, A, lb, ub, keep_feasible=False):
+        self.A = A
+        self.lb = lb
+        self.ub = ub
+        self.keep_feasible = keep_feasible
+
+
+
+class Bounds(object):
+    def __init__(self, lb, ub, keep_feasible=False):
+        self.lb = lb
+        self.ub = ub
+        self.keep_feasible = keep_feasible
+
+    def __repr__(self):
+        if np.any(self.keep_feasible):
+            return "{}({!r}, {!r}, keep_feasible={!r})".format(type(self).__name__, self.lb, self.ub, self.keep_feasible)
+        else:
+            return "{}({!r}, {!r})".format(type(self).__name__, self.lb, self.ub)
+
+
+    
 class CanonicalConstraint(object):
 
     def __init__(self, n_eq, n_ineq, fun, jac, hess, keep_feasible):
