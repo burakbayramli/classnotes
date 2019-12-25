@@ -471,23 +471,17 @@ class ScalarFunction(object):
 
         self._update_hess_impl = update_hess
 
-        if isinstance(hess, BFGS):
-            def update_x(x):
-                self._update_grad()
-                self.x_prev = self.x
-                self.g_prev = self.g
+        def update_x(x):
+            self._update_grad()
+            self.x_prev = self.x
+            self.g_prev = self.g
 
-                self.x = np.atleast_1d(x).astype(float)
-                self.f_updated = False
-                self.g_updated = False
-                self.H_updated = False
-                self._update_hess()
-        else:
-            def update_x(x):
-                self.x = np.atleast_1d(x).astype(float)
-                self.f_updated = False
-                self.g_updated = False
-                self.H_updated = False
+            self.x = np.atleast_1d(x).astype(float)
+            self.f_updated = False
+            self.g_updated = False
+            self.H_updated = False
+            self._update_hess()
+
         self._update_x_impl = update_x
 
     def _update_fun(self):
