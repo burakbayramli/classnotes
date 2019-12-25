@@ -14,13 +14,6 @@ from scipy.optimize import (Bounds,
 
 from scipy.sparse.linalg import LinearOperator
 
-TERMINATION_MESSAGES = {
-    0: "The maximum number of function evaluations is exceeded.",
-    1: "`gtol` termination condition is satisfied.",
-    2: "`xtol` termination condition is satisfied.",
-    3: "`callback` function requested termination"
-}
-
 class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
     _syr2 = get_blas_funcs('syr2', dtype='d')  # Symmetric rank 2 update
@@ -64,40 +57,10 @@ class BFGS:
             self.H = np.eye(n, dtype=float)
 
     def _update_inverse_hessian(self, ys, Hy, yHy, s):
-        """Update the inverse Hessian matrix.
-
-        BFGS update using the formula:
-
-            ``H <- H + ((H*y).T*y + s.T*y)/(s.T*y)^2 * (s*s.T)
-                     - 1/(s.T*y) * ((H*y)*s.T + s*(H*y).T)``
-
-        where ``s = delta_x`` and ``y = delta_grad``. This formula is
-        equivalent to (6.17) in [1]_ written in a more efficient way
-        for implementation.
-
-        References
-        ----------
-        .. [1] Nocedal, Jorge, and Stephen J. Wright. "Numerical optimization"
-               Second Edition (2006).
-        """
         self.H = self._syr2(-1.0 / ys, s, Hy, a=self.H)
         self.H = self._syr((ys+yHy)/ys**2, s, a=self.H)
 
     def _update_hessian(self, ys, Bs, sBs, y):
-        """Update the Hessian matrix.
-
-        BFGS update using the formula:
-
-            ``B <- B - (B*s)*(B*s).T/s.T*(B*s) + y*y^T/s.T*y``
-
-        where ``s`` is short for ``delta_x`` and ``y`` is short
-        for ``delta_grad``. Formula (6.19) in [1]_.
-
-        References
-        ----------
-        .. [1] Nocedal, Jorge, and Stephen J. Wright. "Numerical optimization"
-               Second Edition (2006).
-        """
         self.B = self._syr(1.0 / ys, y, a=self.B)
         self.B = self._syr(-1.0 / sBs, Bs, a=self.B)
 
@@ -1480,7 +1443,7 @@ def _minimize_trustregion_constr(fun, x0, args, grad,
         factorization_method)
 
     result.success = True if result.status in (1, 2) else False
-    result.message = TERMINATION_MESSAGES[result.status]
+    result.message = 'done'
     result.niter = result.nit
 
     return result
