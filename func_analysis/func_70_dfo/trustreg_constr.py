@@ -1,11 +1,11 @@
 from math import copysign
 import numpy as np
 import itertools, time
-import scipy.sparse as sps
-from scipy.linalg import get_blas_funcs
-import scipy.sparse.linalg
 from numpy.linalg import norm
 from warnings import warn
+import scipy.sparse as sps
+import scipy.sparse.linalg
+from scipy.linalg import get_blas_funcs
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from util import LinearOperator, approx_derivative, OptimizeResult
 
