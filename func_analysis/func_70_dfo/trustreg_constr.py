@@ -8,8 +8,30 @@ from numpy.linalg import norm
 from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from scipy.optimize._numdiff import approx_derivative
-from scipy.optimize import (OptimizeResult)
 from util import LinearOperator
+
+class OptimizeResult(dict):
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+    def __repr__(self):
+        if self.keys():
+            m = max(map(len, list(self.keys()))) + 1
+            return '\n'.join([k.rjust(m) + ': ' + repr(v)
+                              for k, v in sorted(self.items())])
+        else:
+            return self.__class__.__name__ + "()"
+
+    def __dir__(self):
+        return list(self.keys())
+
+
 
 class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
