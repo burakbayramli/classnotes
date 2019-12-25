@@ -371,7 +371,7 @@ class IdentityVectorFunction(LinearVectorFunction):
     def __init__(self, x0, sparse_jacobian):
         n = len(x0)
         if sparse_jacobian or sparse_jacobian is None:
-            A = sps.eye(n, format='csr')
+            A = eye(n, format='csr')
             sparse_jacobian = True
         else:
             A = np.eye(n)
@@ -808,7 +808,7 @@ def orthogonality(A, g):
         
 def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
 
-    K = csc_matrix(bmat([[eye(n), A.T], [A, None]]))
+    K = sps.csc_matrix(bmat([[eye(n), A.T], [A, None]]))
     try:
         solve = scipy.sparse.linalg.factorized(K)
     except RuntimeError:
