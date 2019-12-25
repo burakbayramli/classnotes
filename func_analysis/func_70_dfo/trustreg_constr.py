@@ -8,11 +8,23 @@ from numpy.linalg import norm
 from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
 from scipy.optimize._numdiff import approx_derivative
-from scipy.optimize import (Bounds,
-                            NonlinearConstraint,
+from scipy.optimize import (NonlinearConstraint,
                             LinearConstraint, OptimizeResult)
 
 from scipy.sparse.linalg import LinearOperator
+
+class Bounds(object):
+    def __init__(self, lb, ub, keep_feasible=False):
+        self.lb = lb
+        self.ub = ub
+        self.keep_feasible = keep_feasible
+
+    def __repr__(self):
+        if np.any(self.keep_feasible):
+            return "{}({!r}, {!r}, keep_feasible={!r})".format(type(self).__name__, self.lb, self.ub, self.keep_feasible)
+        else:
+            return "{}({!r}, {!r})".format(type(self).__name__, self.lb, self.ub)
+
 
 class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
