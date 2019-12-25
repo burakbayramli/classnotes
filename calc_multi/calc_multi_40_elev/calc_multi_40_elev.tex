@@ -2,13 +2,42 @@
 \begin{document}
 Yükseklik Fonksiyonu (Tepeler) Arasýndan En Düz, Optimal Yürüyüþ Yolunu Bulmak
 
-[yapým aþamasýnda]
-
 Elimizde bir alan içindeki yükseklikleri veren bir fonksiyon $f(x,y)$
 olduðunu düþünelim. Acaba verili bir baþlangýç ve bitiþ noktasý arasýndaki
 en ``rahat'' gidiþ yolunu nasýl buluruz? 
 
-xxxxxxxxxxxxxxx
+Yükseklikler bir $E(x,y)$ fonksiyonunda olsun. Yollarý nasýl temsil ederiz?
+Bir parametrik eðri kullanabiliriz, mesela 
+
+$$
+x(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3
+$$
+
+$$
+y(t) = b_0 + b_1 t + b_2 t^2 + b_3 t^3
+$$
+
+Ýstediðimiz derecede polinom parametrize eðrileri nasýl yaratacaðýmýzý
+biliyoruz [3]. Böylece doðru, optimal bir yolu bulmak demek
+$a_0,a_1,a_2,a_3,b_0,b_1,b_2,b_3$ katsayýlarýný doðru bulmak demek
+olacaktýr. Bir optimizasyon problemi yani.
+
+Peki o zaman optimize, minimize edilecek bedel fonksiyonu ne olmalý? Burada
+farklý yaklaþýmlar olabilir. Kimisi eðri altýna düþen yüksekliklerin
+toplamýný bir çizgi entegrali ile hesaplamak isteyebilir. Fakat bu yaklaþým
+yüksekliklerden genel olarak uzak dursa da mesela çok iniþli çýkýþlý
+yollarý hala tercih eder, ama bu tür yollarýn yürüyüþ olarak yorucu
+olacaðýný biliyoruz. 1000 metrelik bir tepeye çýkýp onun üzerinde düz
+yürümek habire 1000 metreyi inmek çýkmaktan çok daha rahat.
+
+Þu þekilde bir bedel belki daha iyi; Bir eðriyi düþünelim, onun $z$
+eksenindeki yansýmasý da bir eðridir, $x,y$ düzlemindeki yansýmasý bir
+baþka eðri. Bu eðrilerin {\em uzunglunu} hesaplarsak ve dikey yöndeki
+uzunluðu yatay olan uzunluðu farklý aðýrlýklarla çarpýp toplarsak bu bir
+bedeli temsil eder. Aðýrlýk dikey/yatay uzunluklar için 5/1 oranýnda
+olabilir, o zaman yatay yöndeki bir uzunluk (katedilen yol) dikeye göre 5
+kat daha tercih edilir olur.
+
 
 Önce yükseklikleri ve eðrileri iki örnek üzerinde görelim. Bir rasgele
 tepe, ve bir rasgele yol çiziyoruz,
@@ -73,6 +102,8 @@ plt.savefig('calc_multi_40_elev_02.png')
 
 \includegraphics[width=20em]{calc_multi_40_elev_02.png}
 
+Bu biraz önce bahsettiðimiz yatay düzlemdeki yansýma.
+
 Þimdi ikinci bir gidiþ yoluna bakalým, baþlangýç noktasý ayný ama bitiþ farklý,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -94,9 +125,7 @@ Bu yollarý tabii ki rasgele parametreler üzerinden yarattýk, bunlar optimal
 yollar deðiller.
 
 Optimallik için gereken uzunluk hesabýna gelelim. Bu hesap için
-formül,
-
-xxxxxxxxxxxxxx
+formül, dikey için $I_v$ yatay için $I_h$
 
 $$
 I_v = \int_{t=0}^{t=1} \sqrt{1 + \left(\frac{\ud z}{\ud t} \right)^2 } \ud t
@@ -111,18 +140,14 @@ I_h = \int_{t=0}^{t=1} \sqrt{
 $$
 
 
-Formülde görülen $\ud x/\ud t$ ve $\ud y/\ud t$, parametrik eðri formülünü
-tekrar yazalým, 
+Formülde görülen $\ud z/\ud t$, $\ud x/\ud t$ ve $\ud y/\ud t$, parametrik
+eðri üzerinde alýnacak tabii ki. Problem çözümü açýsýndan $\ud z/\ud t$
+hesabý külfetli olabilir, üstteki örnekteki yükseklik fonksiyonu basit, ama
+daha çetrefil durumlarda da kullanabileceðimiz bir yaklaþým daha iyi
+olur. Biz bu türevi hesapsal yapacaðýz.
 
-$$
-x(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3
-$$
-
-$$
-y(t) = b_0 + b_1 t + b_2 t^2 + b_3 t^3
-$$
-
-ve türev, bunlarýn karesi hesaplarýný sembolik olarak altta yapalým,
+Ama yatay türevler, bunlarýn karesi hesaplarýný sembolik olarak
+yapabiliriz, çünkü bu formül polinom, formu þimdiden belli.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sympy
@@ -147,7 +172,47 @@ b1 + 2*b2*t + 3*b3*t**2 - 84.0*t**3
 sqrt(b1 + 2*b2*t + 3*b3*t**2 - 84.0*t**3 + (a1 + 2*a2*t + 3*a3*t**2 - 57.2*t**3)**2)
 \end{verbatim}
 
+Entegrallerin hesabýna gelelim, bu hesaplar da sayýsal yapýlacak. 
+
 \inputminted[fontsize=\footnotesize]{python}{paths2.py}
+
+\begin{verbatim}
+res  barrier_parameter: 6.400000000000003e-06
+ barrier_tolerance: 6.400000000000003e-06
+          cg_niter: 1604
+      cg_stop_cond: 2
+            constr: [array([-1.08548354, -0.36789632, -0.20897387,  0.2395503 ,  0.29868552,
+        0.00380265])]
+       constr_nfev: [0]
+       constr_nhev: [0]
+       constr_njev: [0]
+    constr_penalty: 1.0
+  constr_violation: 0.0
+    execution_time: 50.29004144668579
+               fun: 33.11613644482912
+              grad: array([-1.38273935, -0.50301313,  0.79182863,  1.80994987,  2.2042923 ,
+        2.09085321])
+               jac: [<6x6 sparse matrix of type '<class 'numpy.float64'>'
+	with 6 stored elements in Compressed Sparse Row format>]
+   lagrangian_grad: array([-1.2659412 , -0.46518832,  0.73288924,  1.67502195,  2.03938462,
+        1.93597495])
+           message: 'The maximum number of function evaluations is exceeded.'
+            method: 'tr_interior_point'
+              nfev: 2723
+              nhev: 0
+               nit: 301
+             niter: 301
+              njev: 0
+        optimality: 2.0393846199040575
+            status: 0
+           success: False
+         tr_radius: 1.8588829764195948e-08
+                 v: [array([ 0.11679815,  0.03782481, -0.05893939, -0.13492793, -0.16490768,
+       -0.15487826])]
+                 x: array([-1.08548354, -0.36789632, -0.20897387,  0.2395503 ,  0.29868552,
+        0.00380265])
+res [-1.08548354 -0.36789632 -0.20897387  0.2395503   0.29868552  0.00380265]
+\end{verbatim}
 
 Kaynaklar 
 
