@@ -7,30 +7,7 @@ import scipy.sparse.linalg
 from numpy.linalg import norm
 from warnings import warn
 from scipy.sparse import (bmat, csc_matrix, eye, issparse)
-from util import LinearOperator, approx_derivative
-
-class OptimizeResult(dict):
-    def __getattr__(self, name):
-        try:
-            return self[name]
-        except KeyError:
-            raise AttributeError(name)
-
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
-
-    def __repr__(self):
-        if self.keys():
-            m = max(map(len, list(self.keys()))) + 1
-            return '\n'.join([k.rjust(m) + ': ' + repr(v)
-                              for k, v in sorted(self.items())])
-        else:
-            return self.__class__.__name__ + "()"
-
-    def __dir__(self):
-        return list(self.keys())
-
-
+from util import LinearOperator, approx_derivative, OptimizeResult
 
 class BFGS:
     _syr = get_blas_funcs('syr', dtype='d')  # Symmetric rank 1 update
@@ -533,8 +510,6 @@ class ScalarFunction(object):
             self._update_x_impl(x)
         self._update_hess()
         return self.H
-
-
 
 class BarrierSubproblem:
     def __init__(self, x0, s0, fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
