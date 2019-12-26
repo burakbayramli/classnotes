@@ -226,15 +226,6 @@ def empty_canonical_constraint(x0, n_vars, sparse_jacobian=None):
 
 
 
-def _linear_to_canonical(linear):
-    return _nonlinear_to_canonical(linear.to_nonlinear())
-
-
-def _box_to_canonical(box):
-    return _linear_to_canonical(box.to_linear())
-
-
-
 def default_scaling(x):
     n, = np.shape(x)
     return spc.eye(n)
