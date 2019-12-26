@@ -240,50 +240,12 @@ def _linear_operator_difference(fun, x0, f0, h, method):
 
     return LinearOperator((m, n), matvec)
 
-
-
-
-def check_derivative(fun, jac, x0, bounds=(-np.inf, np.inf), args=(),
-                     kwargs={}):
-    J_to_test = jac(x0, *args, **kwargs)
-    if issparse(J_to_test):
-        J_diff = approx_derivative(fun, x0, bounds=bounds, sparsity=J_to_test,
-                                   args=args, kwargs=kwargs)
-        J_to_test = csr_matrix(J_to_test)
-        abs_err = J_to_test - J_diff
-        i, j, abs_err_data = find(abs_err)
-        J_diff_data = np.asarray(J_diff[i, j]).ravel()
-        return np.max(np.abs(abs_err_data) /
-                      np.maximum(1, np.abs(J_diff_data)))
-    else:
-        J_diff = approx_derivative(fun, x0, bounds=bounds,
-                                   args=args, kwargs=kwargs)
-        abs_err = np.abs(J_to_test - J_diff)
-        return np.max(abs_err / np.maximum(1, np.abs(J_diff)))
-
-
 TERMINATION_MESSAGES = {
     0: "The maximum number of function evaluations is exceeded.",
     1: "`gtol` termination condition is satisfied.",
     2: "`xtol` termination condition is satisfied.",
     3: "`callback` function requested termination"
 }
-
-
-class Memoize:
-    "Memoize decorator, used to avoid repeated calls to the same function."
-    def __init__(self, x0, f0):
-        self._x = x0
-        self._f = f0
-
-    def __call__(self, function):
-        def new_function(x):
-            if not np.array_equal(x, self._x):
-                self._x = x
-                self._f = function(x)
-            return self._f
-        return new_function
-
 
 class sqp_printer:
     @staticmethod
@@ -356,7 +318,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         # Need to memoize gradient wrapper in order
         # to avoid repeated calls that occur
         # when using finite differences.
-        @Memoize(x0, g0)
         def grad_wrapped(x):
             return np.atleast_1d(grad(x))
 
