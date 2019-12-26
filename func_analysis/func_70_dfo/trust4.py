@@ -7,13 +7,6 @@ from scipy.sparse.linalg import LinearOperator
 from scipy.sparse import csc_matrix
 from scipy.optimize import OptimizeResult
 
-TERMINATION_MESSAGES = {
-    0: "The maximum number of function evaluations is exceeded.",
-    1: "`gtol` termination condition is satisfied.",
-    2: "`xtol` termination condition is satisfied.",
-    3: "`callback` function requested termination"
-}
-
 class BoxConstraint:
 
     def __init__(self, kind, enforce_feasibility=False):
@@ -1486,7 +1479,7 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         xtol, state, **options)
 
     result.method = method
-    result.message = TERMINATION_MESSAGES[result.status]
+    result.message = 'done'
 
     return result
 
