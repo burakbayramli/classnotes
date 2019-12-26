@@ -7,7 +7,7 @@ from scipy.sparse.linalg import LinearOperator
 from scipy.linalg import block_diag
 from scipy.sparse import csc_matrix
 from numpy.linalg import norm
-from scipy.sparse import (bmat, csc_matrix, eye, issparse)
+from scipy.sparse import (issparse)
 from scipy.optimize import OptimizeResult
 import scipy
 import time
@@ -326,7 +326,7 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
     # The factorization of an empty matrix
     # only works for the sparse representation.
     if m*n == 0:
-        A = csc_matrix(A)
+        A = spc.csc_matrix(A)
 
     if method is None:
         method = "AugmentedSystem"
@@ -379,7 +379,7 @@ def orthogonality(A, g):
 
 
 def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
-    K = csc_matrix(bmat([[eye(n), A.T], [A, None]]))
+    K = spc.csc_matrix(spc.bmat([[spc.eye(n), A.T], [A, None]]))
     solve = scipy.sparse.linalg.factorized(K)
     def null_space(x):
         # v = [x]
