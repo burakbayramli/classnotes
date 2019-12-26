@@ -22,10 +22,6 @@ import scipy.sparse.linalg
 
 EPS = np.finfo(np.float64).eps
 
-relative_step = {"2-point": EPS**0.5,
-                 "3-point": EPS**(1/3),
-                 "cs": EPS**0.5}
-
 class Rosenbrock:
     def __init__(self, n=2, random_state=0):
         rng = np.random.RandomState(random_state)
@@ -63,13 +59,6 @@ class Rosenbrock:
     @property
     def constr(self):
         return ()
-
-def _compute_absolute_step(rel_step, x0, method):
-    if rel_step is None:
-        rel_step = relative_step[method]
-    sign_x0 = (x0 >= 0).astype(float) * 2 - 1
-    return rel_step * sign_x0 * np.maximum(1.0, np.abs(x0))
-
 
 
 def group_columns(A, order=0):
