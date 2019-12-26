@@ -245,10 +245,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         hess_wrapped = hess
 
     # Put constraints in list format when needed
-    if isinstance(constraints, (NonlinearConstraint,
-                                LinearConstraint,
-                                BoxConstraint)):
-        constraints = [constraints]
     # Copy, evaluate and initialize constraints
     copied_constraints = [deepcopy(constr) for constr in constraints]
     for constr in copied_constraints:
@@ -315,97 +311,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
 
     return result
     
-class NonlinearConstraint:
-    def __init__(self, fun, kind, jac, hess='2-point', enforce_feasibility=False):
-        self._fun = fun
-        self.kind = kind
-        self._jac = jac
-        self._hess = hess
-        self.enforce_feasibility = enforce_feasibility
-        self.isinitialized = False
-
-    def evaluate_and_initialize(self, x0, sparse_jacobian=None):
-        x0 = np.atleast_1d(x0).astype(float)
-        f0 = np.atleast_1d(self._fun(x0))
-        v0 = np.zeros_like(f0)
-        J0 = self._jac(x0)
-
-        def fun_wrapped(x):
-            return np.atleast_1d(self._fun(x))
-
-        if sparse_jacobian or (sparse_jacobian is None and spc.issparse(J0)):
-            def jac_wrapped(x):
-                return spc.csr_matrix(self._jac(x))
-            self.sparse_jacobian = True
-
-            self.J0 = spc.csr_matrix(J0)
-
-        else:
-            def jac_wrapped(x):
-                J = self._jac(x)
-                if spc.issparse(J):
-                    return J.toarray()
-                else:
-                    return np.atleast_2d(J)
-            self.sparse_jacobian = False
-
-            if spc.issparse(J0):
-                self.J0 = J0.toarray()
-            else:
-                self.J0 = np.atleast_2d(J0)
-
-        if callable(self._hess):
-            H0 = self._hess(x0, v0)
-
-            if spc.issparse(H0):
-                H0 = spc.csr_matrix(H0)
-                
-                def hess_wrapped(x, v):
-                    return spc.csr_matrix(self._hess(x, v))
-
-            elif isinstance(H0, LinearOperator):
-                def hess_wrapped(x, v):
-                    return self._hess(x, v)
-
-            else:
-                H0 = np.atleast_2d(np.asarray(H0))
-
-                def hess_wrapped(x, v):
-                    return np.atleast_2d(np.asarray(self._hess(x, v)))
-
-        elif self._hess in ('2-point', '3-point', 'cs'):
-            approx_method = self._hess
-
-            def jac_dot_v(x, v):
-                J = jac_wrapped(x)
-                return J.T.dot(v)
-
-            def hess_wrapped(x, v):
-                return approx_derivative(jac_dot_v, x, approx_method,
-                                         as_linear_operator=True,
-                                         args=(v,))
-
-        else:
-            hess_wrapped = self._hess
-
-        self.fun = fun_wrapped
-        self.jac = jac_wrapped
-        self.hess = hess_wrapped
-        self.x0 = x0
-        self.f0 = f0
-        self.n = x0.size
-        self.m = f0.size
-        self.kind = _check_kind(self.kind, self.m)
-        self.enforce_feasibility \
-            = _check_enforce_feasibility(self.enforce_feasibility, self.m)
-        if not _is_feasible(self.kind, self.enforce_feasibility, f0):
-            raise ValueError("Unfeasible initial point. "
-                             "Either set ``enforce_feasibility=False`` or "
-                             "choose a new feasible initial point ``x0``.")
-
-        self.isinitialized = True
-        return x0
-
 
 class LinearConstraint:
     def __init__(self, A, kind, enforce_feasibility=False):
