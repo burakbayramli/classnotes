@@ -6,7 +6,6 @@ import scipy.sparse as spc
 from scipy.sparse.linalg import LinearOperator
 from scipy.sparse import csc_matrix
 from scipy.optimize import OptimizeResult
-import scipy
 import time
 
 TERMINATION_MESSAGES = {
@@ -361,7 +360,7 @@ def orthogonality(A, g):
     norm_g = np.linalg.norm(g)
     # Compute Frobenius norm of the matrix A
     if spc.issparse(A):
-        norm_A = scipy.sparse.linalg.norm(A, ord='fro')
+        norm_A = spc.linalg.norm(A, ord='fro')
     else:
         norm_A = np.linalg.norm(A, ord='fro')
 
@@ -377,7 +376,7 @@ def orthogonality(A, g):
 
 def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
     K = spc.csc_matrix(spc.bmat([[spc.eye(n), A.T], [A, None]]))
-    solve = scipy.sparse.linalg.factorized(K)
+    solve = spc.linalg.factorized(K)
     def null_space(x):
         # v = [x]
         #     [0]
