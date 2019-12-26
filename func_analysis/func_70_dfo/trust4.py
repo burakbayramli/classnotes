@@ -1618,35 +1618,29 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
             method = 'tr_interior_point'
 
     # Define stop criteria
-    if method == 'tr_interior_point':
-        def stop_criteria(state):
-            barrier_tol = options.get("barrier_tol", 1e-8)
-            if verbose >= 2:
-                ip_printer.print_problem_iter(state.niter,
-                                              state.nfev,
-                                              state.cg_niter,
-                                              state.barrier_parameter,
-                                              state.trust_radius,
-                                              state.penalty,
-                                              state.optimality,
-                                              state.constr_violation)
-            state.status = None
-            if (callback is not None) and callback(state):
-                state.status = 3
-            elif state.optimality < gtol and state.constr_violation < gtol:
-                state.status = 1
-            elif (state.trust_radius < xtol
-                  and state.barrier_parameter < barrier_tol):
-                state.status = 2
-            elif state.niter > max_iter:
-                state.status = 0
-            return state.status in (0, 1, 2, 3)
+    def stop_criteria(state):
+        barrier_tol = options.get("barrier_tol", 1e-8)
+        if verbose >= 2:
+            ip_printer.print_problem_iter(state.niter,
+                                          state.nfev,
+                                          state.cg_niter,
+                                          state.barrier_parameter,
+                                          state.trust_radius,
+                                          state.penalty,
+                                          state.optimality,
+                                          state.constr_violation)
+        state.status = None
+        if (callback is not None) and callback(state):
+            state.status = 3
+        elif state.optimality < gtol and state.constr_violation < gtol:
+            state.status = 1
+        elif (state.trust_radius < xtol
+              and state.barrier_parameter < barrier_tol):
+            state.status = 2
+        elif state.niter > max_iter:
+            state.status = 0
+        return state.status in (0, 1, 2, 3)
 
-    if verbose >= 2:
-        if method == 'equality_constrained_sqp':
-            sqp_printer.print_header()
-        if method == 'tr_interior_point':
-            ip_printer.print_header()
 
     start_time = time.time()
     # Call inferior function to do the optimization
@@ -1690,19 +1684,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     result.method = method
     result.message = TERMINATION_MESSAGES[result.status]
 
-    if verbose >= 2:
-        if method == 'equality_constrained_sqp':
-            sqp_printer.print_footer()
-        if method == 'tr_interior_point':
-            ip_printer.print_footer()
-    if verbose >= 1:
-        print(result.message)
-        print("Number of iteractions: {0}, function evaluations: {1}, "
-              "CG iterations: {2}, optimality: {3:.2e}, "
-              "constraint violation: {4:.2e}, execution time: {5:4.2} s."
-              .format(result.niter, result.nfev, result.cg_niter,
-                      result.optimality, result.constr_violation,
-                      result.execution_time))
     return result
 
 class Rosenbrock:
