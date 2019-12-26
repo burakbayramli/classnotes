@@ -7,7 +7,6 @@ from scipy.sparse.linalg import LinearOperator
 from scipy.linalg import block_diag
 from scipy.sparse import csc_matrix
 from numpy.linalg import norm
-from scipy.sparse import (issparse)
 from scipy.optimize import OptimizeResult
 import scipy
 import time
@@ -363,7 +362,7 @@ def orthogonality(A, g):
     # Compute vector norms
     norm_g = np.linalg.norm(g)
     # Compute Frobenius norm of the matrix A
-    if issparse(A):
+    if spc.issparse(A):
         norm_A = scipy.sparse.linalg.norm(A, ord='fro')
     else:
         norm_A = np.linalg.norm(A, ord='fro')
