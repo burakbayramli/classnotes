@@ -6,7 +6,6 @@ import scipy.sparse as spc
 from scipy.sparse.linalg import LinearOperator
 from scipy.sparse import csc_matrix
 from scipy.optimize import OptimizeResult
-import time
 
 TERMINATION_MESSAGES = {
     0: "The maximum number of function evaluations is exceeded.",
@@ -1510,9 +1509,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         return state.status in (0, 1, 2, 3)
 
 
-    start_time = time.time()
-    # Call inferior function to do the optimization
-
     if constr.n_ineq == 0:
         warn("The problem only has equality constraints. "
              "The solver 'equality_constrained_sqp' is a "
@@ -1526,7 +1522,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         constr.enforce_feasibility,
         xtol, state, **options)
 
-    result.execution_time = time.time() - start_time
     result.method = method
     result.message = TERMINATION_MESSAGES[result.status]
 
