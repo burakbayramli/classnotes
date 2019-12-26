@@ -287,21 +287,10 @@ def _box_to_canonical(box):
     return _linear_to_canonical(box.to_linear())
 
 
-def _convert_constr(c, n_vars, n_eq, n_ineq,
-                    eq, ineq, val_eq, val_ineq,
-                    sign):
-    # Empty constraint
-    empty = np.empty((0,))
-    # Return equality and inequalit constraints
-    c_eq = c[eq] - val_eq if n_eq > 0 else empty
-    c_ineq = sign*(c[ineq] - val_ineq) if n_ineq > 0 else empty
-    return c_ineq, c_eq
-
 
 def default_scaling(x):
     n, = np.shape(x)
     return spc.eye(n)
-
 
 def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                              x0, fun0, grad0, constr0,
@@ -564,66 +553,31 @@ def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
                                              m, n, orth_tol,
                                              max_refin, tol)
 
-    # z = x - A.T inv(A A.T) A x
-    # is computed solving the extended system:
-    # [I A.T] * [ z ] = [x]
-    # [A  O ]   [aux]   [0]
     def null_space(x):
-        # v = [x]
-        #     [0]
         v = np.hstack([x, np.zeros(m)])
-        # lu_sol = [ z ]
-        #          [aux]
         lu_sol = solve(v)
         z = lu_sol[:n]
-
-        # Iterative refinement to improve roundoff
-        # errors described in [2]_, algorithm 5.2.
         k = 0
         while orthogonality(A, z) > orth_tol:
             if k >= max_refin:
                 break
-            # new_v = [x] - [I A.T] * [ z ]
-            #         [0]   [A  O ]   [aux]
             new_v = v - K.dot(lu_sol)
-            # [I A.T] * [delta  z ] = new_v
-            # [A  O ]   [delta aux]
             lu_update = solve(new_v)
-            #  [ z ] += [delta  z ]
-            #  [aux]    [delta aux]
             lu_sol += lu_update
             z = lu_sol[:n]
             k += 1
 
-        # return z = x - A.T inv(A A.T) A x
         return z
 
-    # z = inv(A A.T) A x
-    # is computed solving the extended system:
-    # [I A.T] * [aux] = [x]
-    # [A  O ]   [ z ]   [0]
     def least_squares(x):
-        # v = [x]
-        #     [0]
         v = np.hstack([x, np.zeros(m)])
-        # lu_sol = [aux]
-        #          [ z ]
         lu_sol = solve(v)
         # return z = inv(A A.T) A x
         return lu_sol[n:m+n]
 
-    # z = A.T inv(A A.T) x
-    # is computed solving the extended system:
-    # [I A.T] * [ z ] = [0]
-    # [A  O ]   [aux]   [x]
     def row_space(x):
-        # v = [0]
-        #     [x]
         v = np.hstack([np.zeros(n), x])
-        # lu_sol = [ z ]
-        #          [aux]
         lu_sol = solve(v)
-        # return z = A.T inv(A A.T) x
         return lu_sol[:n]
 
     return null_space, least_squares, row_space
@@ -639,22 +593,16 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
         A = csc_matrix(A)
 
     # Check Argument
-    if issparse(A):
-        if method is None:
-            method = "AugmentedSystem"
-        if method not in ("NormalEquation", "AugmentedSystem"):
-            raise ValueError("Method not allowed for sparse matrix.")
-        if method == "NormalEquation" and not sksparse_available:
-            warnings.warn(("Only accepts 'NormalEquation' option when"
-                           " scikit-sparse is available. Using "
-                           "'AugmentedSystem' option instead."),
-                          ImportWarning)
-            method = 'AugmentedSystem'
-    else:
-        if method is None:
-            method = "QRFactorization"
-        if method not in ("QRFactorization", "SVDFactorization"):
-            raise ValueError("Method not allowed for dense array.")
+    if method is None:
+        method = "AugmentedSystem"
+    if method not in ("NormalEquation", "AugmentedSystem"):
+        raise ValueError("Method not allowed for sparse matrix.")
+    if method == "NormalEquation" and not sksparse_available:
+        warnings.warn(("Only accepts 'NormalEquation' option when"
+                       " scikit-sparse is available. Using "
+                       "'AugmentedSystem' option instead."),
+                      ImportWarning)
+        method = 'AugmentedSystem'
 
     null_space, least_squares, row_space \
         = augmented_system_projections(A, m, n, orth_tol, max_refin, tol)
