@@ -444,21 +444,8 @@ def orthogonality(A, g):
 
 
 def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
-    """Return linear operators for matrix A - ``AugmentedSystem``."""
-    # Form augmented system
     K = csc_matrix(bmat([[eye(n), A.T], [A, None]]))
-    # LU factorization
-    # TODO: Use a symmetric indefinite factorization
-    #       to solve the system twice as fast (because
-    #       of the symmetry).
-    try:
-        solve = scipy.sparse.linalg.factorized(K)
-    except RuntimeError:
-        warn("Singular Jacobian matrix. Using dense SVD decomposition to "
-             "perform the factorizations.")
-        return svd_factorization_projections(A.toarray(),
-                                             m, n, orth_tol,
-                                             max_refin, tol)
+    solve = scipy.sparse.linalg.factorized(K)
 
     def null_space(x):
         v = np.hstack([x, np.zeros(m)])
