@@ -992,14 +992,6 @@ __all__ = ['CanonicalConstraint',
 
 
 class CanonicalConstraint:
-    """Canonical constraint
-
-    Constraint of the form:
-        c_ineq <= 0
-        c_eq = 0
-    for:
-        c_ineq, c_eq = constr(x)
-    """
     def __init__(self, n_vars, n_ineq, n_eq,
                  constr, jac, hess, sparse_jacobian,
                  enforce_feasibility,
@@ -1027,7 +1019,6 @@ class CanonicalConstraint:
 
 
 def to_canonical(constraints):
-    """Convert constraints or list of constraints to canonical format."""
     # Put ``constraints`` in list format whe needed
     if isinstance(constraints, (NonlinearConstraint,
                                 LinearConstraint,
@@ -1097,7 +1088,6 @@ def evaluated_to_canonical(constraints, list_c, list_J,
 
 
 def lagrangian_hessian(constraint, hess):
-    """Generate lagrangian hessian."""
 
     # Concatenate Hessians
     def lagr_hess(x, v_eq=np.empty(0), v_ineq=np.empty(0)):
@@ -1120,7 +1110,6 @@ def lagrangian_hessian(constraint, hess):
 
 
 def empty_canonical_constraint(x0, n_vars, sparse_jacobian=None):
-    """Return empty CanonicalConstraint."""
     n_eq = 0
     n_ineq = 0
     empty_c = np.empty(0)
@@ -1261,42 +1250,6 @@ def _convert_dense_jac(J, n_vars, n_eq, n_ineq,
 
 
 def _parse_constraint(kind):
-    """Read constraint type and return list of indices.
-
-    Parameters
-    ----------
-    kind : tuple
-        Specifies the type of contraint. Options for this
-        parameters are:
-
-            - ("interval", lb, ub): for a constraint of the type:
-                lb[i] <= f[i] <= ub[i]
-            - ("greater", lb): for a constraint of the type:
-                f[i] >= lb[i]
-            - ("less", ub): for a constraint of the type:
-                f[i] <= ub[i]
-            - ("equals", c): for a constraint of the type:
-                f[i] == c[i]
-
-        where ``lb``,  ``ub`` and ``c`` are (m,) ndarrays.
-    Returns
-    -------
-    eq : array_like
-        A vector indicating equality constraints.
-            len(eq) = number of equality constraints
-    ineq : array_like
-        A vector indicating inequality constraints.
-            len(ineq) = number of inequality constraints
-    val_eq : array_like
-        Equality constraint right hand side:
-            f[eq[i]] = val_eq[i]
-    val_ineq : array_like
-        Inequality constraint right hand side:
-            sign[i]*(f[ineq[i]] - val_ineq[i]) <= 0
-    sign : array_like
-        Sign of inequality constraints.
-    """
-
     if kind[0] == "equals":
         # Read values from input structure
         c = np.asarray(kind[1], dtype=float)
@@ -1342,8 +1295,6 @@ def _parse_constraint(kind):
 
 def _concatenate_canonical_constraints(constraints,
                                        sparse_jacobian=None):
-    """Concatenate sequence of CanonicalConstraint's."""
-    # Compute number of constraints
     n_eq = 0
     n_ineq = 0
     for constr in constraints:
@@ -1461,12 +1412,6 @@ def _concatenate_dense_jac(jac_list):
 
 
 class Rosenbrock:
-    """Rosenbrock function.
-
-    The following optimization problem:
-        minimize sum(100.0*(x[1:] - x[:-1]**2.0)**2.0 + (1 - x[:-1])**2.0)
-    """
-
     def __init__(self, n=2, random_state=0):
         rng = np.random.RandomState(random_state)
         self.x0 = rng.uniform(-1, 1, n)
@@ -1519,28 +1464,7 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                              scaling=default_scaling,
                              return_all=False,
                              factorization_method=None):
-    """Solve nonlinear equality-constrained problem using trust-region SQP.
 
-    Solve optimization problem:
-
-        minimize fun(x)
-        subject to: constr(x) = 0
-
-    using Byrd-Omojokun Trust-Region SQP method described in [1]_. Several
-    implementation details are based on [2]_ and [3]_, p. 549.
-
-    References
-    ----------
-    .. [1] Lalee, Marucha, Jorge Nocedal, and Todd Plantenga. "On the
-           implementation of an algorithm for large-scale equality
-           constrained optimization." SIAM Journal on
-           Optimization 8.3 (1998): 682-706.
-    .. [2] Byrd, Richard H., Mary E. Hribar, and Jorge Nocedal.
-           "An interior point algorithm for large-scale nonlinear
-           programming." SIAM Journal on Optimization 9.4 (1999): 877-900.
-    .. [3] Nocedal, Jorge, and Stephen J. Wright. "Numerical optimization"
-           Second Edition (2006).
-    """
     PENALTY_FACTOR = 0.3  # Rho from formula (3.51), reference [2]_, p.891.
     LARGE_REDUCTION_RATIO = 0.9
     INTERMEDIARY_REDUCTION_RATIO = 0.3
@@ -2264,40 +2188,7 @@ def sphere_intersections(z, d, trust_radius,
 
 def box_intersections(z, d, lb, ub,
                       entire_line=False):
-    """Find the intersection between segment (or line) and box constraints.
 
-    Find the intersection between the segment (or line) defined by the
-    parametric  equation ``x(t) = z + t*d`` and the rectangular box
-    ``lb <= x <= ub``.
-
-    Parameters
-    ----------
-    z : array_like, shape (n,)
-        Initial point.
-    d : array_like, shape (n,)
-        Direction.
-    lb : array_like, shape (n,)
-        Lower bounds to each one of the components of ``x``. Used
-        to delimit the rectangular box.
-    ub : array_like, shape (n, )
-        Upper bounds to each one of the components of ``x``. Used
-        to delimit the rectangular box.
-    entire_line : bool, optional
-        When ``True`` the function returns the intersection between the line
-        ``x(t) = z + t*d`` (``t`` can assume any value) and the rectangular
-        box. When ``False`` returns the intersection between the segment
-        ``x(t) = z + t*d``, ``0 <= t <= 1``, and the rectangular box.
-
-    Returns
-    -------
-    ta, tb : float
-        The line/segment ``x(t) = z + t*d`` is inside the box for
-        for ``ta <= t <= tb``.
-    intersect : bool
-        When ``True`` there is a intersection between the line (or segment)
-        and the rectangular box. On the other hand, when ``False``, there is no
-        intersection.
-    """
     # Make sure it is a numpy array
     z = np.asarray(z)
     d = np.asarray(d)
