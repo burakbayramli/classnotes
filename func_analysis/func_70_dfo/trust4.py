@@ -64,6 +64,7 @@ class BoxConstraint:
         if not self.isinitialized:
             raise RuntimeError("Trying to convert uninitialized constraint.")
         return self.to_linear().to_nonlinear()
+    
 class NonlinearConstraint:
 
     def __init__(self, fun, kind, jac, hess='2-point', enforce_feasibility=False):
