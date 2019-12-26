@@ -286,12 +286,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
             state.status = 0
         return state.status in (0, 1, 2, 3)
 
-    if verbose >= 2:
-        if method == 'equality_constrained_sqp':
-            sqp_printer.print_header()
-        if method == 'tr_interior_point':
-            ip_printer.print_header()
-
     start_time = time.time()
     # Call inferior function to do the optimization
     if method == 'equality_constrained_sqp':
