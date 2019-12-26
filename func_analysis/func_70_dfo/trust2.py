@@ -1,4 +1,7 @@
 from __future__ import division, print_function, absolute_import
+#################################################################3
+# all this came from ip-nonlinear-solver
+# for only non-constrained problems.
 from math import copysign
 import numpy as np
 from numpy.linalg import norm
@@ -22,10 +25,6 @@ EPS = np.finfo(np.float64).eps
 relative_step = {"2-point": EPS**0.5,
                  "3-point": EPS**(1/3),
                  "cs": EPS**0.5}
-
-
-
-
 
 class Rosenbrock:
     def __init__(self, n=2, random_state=0):
@@ -105,48 +104,6 @@ def group_columns(A, order=0):
     return groups
 
 
-
-
-def _linear_operator_difference(fun, x0, f0, h, method):
-    m = f0.size
-    n = x0.size
-
-    if method == '2-point':
-        def matvec(p):
-            if np.array_equal(p, np.zeros_like(p)):
-                return np.zeros(m)
-            dx = h / norm(p)
-            x = x0 + dx*p
-            df = fun(x) - f0
-            return df / dx
-
-    elif method == '3-point':
-        def matvec(p):
-            if np.array_equal(p, np.zeros_like(p)):
-                return np.zeros(m)
-            dx = 2*h / norm(p)
-            x1 = x0 - (dx/2)*p
-            x2 = x0 + (dx/2)*p
-            f1 = fun(x1)
-            f2 = fun(x2)
-            df = f2 - f1
-            return df / dx
-
-    elif method == 'cs':
-        def matvec(p):
-            if np.array_equal(p, np.zeros_like(p)):
-                return np.zeros(m)
-            dx = h / norm(p)
-            x = x0 + dx*p*1.j
-            f1 = fun(x)
-            df = f1.imag
-            return df / dx
-
-    else:
-        raise RuntimeError("Never be here.")
-
-    return LinearOperator((m, n), matvec)
-
 TERMINATION_MESSAGES = {
     0: "The maximum number of function evaluations is exceeded.",
     1: "`gtol` termination condition is satisfied.",
@@ -181,35 +138,11 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         def grad_wrapped(x):
             return np.atleast_1d(grad(x))
 
-    # Check Hessian
-    if callable(hess):
-        H0 = hess(x0)
+    H0 = hess(x0)
+    H0 = np.atleast_2d(np.asarray(H0))
+    def hess_wrapped(x):
+        return np.atleast_2d(np.asarray(hess(x)))
 
-        if spc.issparse(H0):
-            H0 = spc.csr_matrix(H0)
-
-            def hess_wrapped(x):
-                return spc.csr_matrix(hess(x))
-
-        elif isinstance(H0, LinearOperator):
-            def hess_wrapped(x):
-                return hess(x)
-
-        else:
-            H0 = np.atleast_2d(np.asarray(H0))
-
-            def hess_wrapped(x):
-                return np.atleast_2d(np.asarray(hess(x)))
-
-    elif hess in ('2-point', '3-point', 'cs'):
-        approx_method = hess
-
-        def hess_wrapped(x):
-            return approx_derivative(grad_wrapped, x, approx_method,
-                                     as_linear_operator=True)
-
-    else:
-        hess_wrapped = hess
 
     # Put constraints in list format when needed
     # Copy, evaluate and initialize constraints
