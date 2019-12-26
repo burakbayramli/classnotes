@@ -187,57 +187,6 @@ TERMINATION_MESSAGES = {
     3: "`callback` function requested termination"
 }
 
-class sqp_printer:
-    @staticmethod
-    def print_header():
-        print("|{0:^7}|{1:^7}|{2:^7}|{3:^10}|{4:^10}|{5:^10}|{6:^10}|"
-              .format("niter", "f evals", "CG iter", "tr radius", "penalty",
-                      "opt", "c viol"))
-        s = "-"*6 + ":"
-        s2 = ":" + "-"*8 + ":"
-        print("|{0:^7}|{1:^7}|{2:^7}|{3:^10}|{4:^10}|{5:^10}|{6:^10}|"
-              .format(s, s, s, s2, s2, s2, s2))
-
-    @staticmethod
-    def print_problem_iter(niter, nfev, cg_niter, tr_radius,
-                           penalty, opt, c_viol):
-        print("|{0:>7}|{1:>7}|{2:>7}| {3:^1.2e} | {4:^1.2e} |"
-              " {5:^1.2e} | {6:^1.2e} |"
-              .format(niter, nfev, cg_niter, tr_radius, penalty,
-                      opt, c_viol))
-
-    @staticmethod
-    def print_footer():
-        print("")
-        print((7*3 + 10*4 + 8)*"-")
-        print("")
-
-
-class ip_printer:
-    @staticmethod
-    def print_header():
-        print("|{0:^7}|{1:^7}|{2:^7}|{3:^13}|{4:^10}|{5:^10}|{6:^10}|{7:^10}|"
-              .format("niter", "f evals", "CG iter", "barrier param",
-                      "tr radius", "penalty", "opt", "c viol"))
-        s = "-"*6 + ":"
-        s2 = ":" + "-"*11 + ":"
-        s3 = ":" + "-"*8 + ":"
-        print("|{0:^7}|{1:^7}|{2:^7}|{3:^13}|{4:^10}|{5:^10}|{6:^10}|{7:^10}|"
-              .format(s, s, s, s2, s3, s3, s3, s3))
-
-    @staticmethod
-    def print_problem_iter(niter, nfev, cg_niter, barrier_parameter, tr_radius,
-                           penalty, opt, c_viol):
-        print("|{0:>7}|{1:>7}|{2:>7}|   {3:^1.2e}  | "
-              "{4:^1.2e} | {5:^1.2e} | {6:^1.2e} | {7:^1.2e} |"
-              .format(niter, nfev, cg_niter, barrier_parameter,
-                      tr_radius, penalty, opt, c_viol))
-
-    @staticmethod
-    def print_footer():
-        print("")
-        print((7*3 + 13 + 10*4 + 9)*"-")
-        print("")
 
 
 def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
@@ -328,14 +277,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     method = 'equality_constrained_sqp'
 
     def stop_criteria(state):
-        if verbose >= 2:
-            sqp_printer.print_problem_iter(state.niter,
-                                           state.nfev,
-                                           state.cg_niter,
-                                           state.trust_radius,
-                                           state.penalty,
-                                           state.optimality,
-                                           state.constr_violation)
         state.status = None
         if (callback is not None) and callback(state):
             state.status = 3
