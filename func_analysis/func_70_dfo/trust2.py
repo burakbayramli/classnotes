@@ -256,8 +256,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     # Concatenate constraints
     if len(copied_constraints) == 0:
         constr = empty_canonical_constraint(x0, n_vars, sparse_jacobian)
-    else:
-        constr = to_canonical(copied_constraints)
 
     # Generate Lagrangian hess function
     lagr_hess = lagrangian_hessian(constr, hess_wrapped)
@@ -607,38 +605,6 @@ class CanonicalConstraint:
         self.J_eq0 = J_eq0
 
 
-def to_canonical(constraints):
-    # Put ``constraints`` in list format whe needed
-    if isinstance(constraints, (NonlinearConstraint,
-                                LinearConstraint,
-                                BoxConstraint,
-                                CanonicalConstraint)):
-        constraints = [constraints]
-    if isinstance(constraints, (list, tuple, np.array)):
-        # Converts all constraints to canonical format
-        constraints_list = []
-        for c in constraints:
-            if isinstance(c, CanonicalConstraint):
-                constraints_list += [c]
-            elif isinstance(c, (NonlinearConstraint)):
-                constraints_list += [_nonlinear_to_canonical(c)]
-            elif isinstance(c, (LinearConstraint)):
-                constraints_list += [_linear_to_canonical(c)]
-            elif isinstance(c, (BoxConstraint)):
-                constraints_list += [_box_to_canonical(c)]
-            else:
-                raise ValueError("Unknown Constraint type.")
-        # Concatenate constraints
-        if len(constraints_list) == 0:
-            raise ValueError("Empty list.")
-        elif len(constraints_list) == 1:
-            constr = constraints_list[0]
-        else:
-            constr = _concatenate_canonical_constraints(constraints_list)
-    else:
-        raise ValueError("Unknown Constraint type.")
-
-    return constr
 
 def lagrangian_hessian(constraint, hess):
 
