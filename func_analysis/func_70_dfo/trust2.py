@@ -298,38 +298,6 @@ def _convert_constr(c, n_vars, n_eq, n_ineq,
     return c_ineq, c_eq
 
 
-def _convert_sparse_jac(J, n_vars, n_eq, n_ineq,
-                        eq, ineq, val_eq, val_ineq,
-                        sign):
-    # Empty jacobian
-    empty = spc.csr_matrix(np.empty((0, n_vars)))
-    # Compute equality and inequality Jacobian matrices
-    J_eq = J[eq, :] if n_eq > 0 else empty
-    if n_ineq > 0:
-        D = spc.lil_matrix((n_ineq, n_ineq))
-        D.setdiag(sign)
-        J_ineq = D*J[ineq, :]
-    else:
-        J_ineq = empty
-    # Return Jacobian matrices
-    return J_ineq, J_eq
-
-
-def _convert_dense_jac(J, n_vars, n_eq, n_ineq,
-                       eq, ineq, val_eq, val_ineq,
-                       sign):
-    # Empty jacobian
-    empty = np.empty((0, n_vars))
-    # Compute equality and inequality Jacobian matrices
-    J_eq = J[eq, :] if n_eq > 0 else empty
-    if n_ineq > 0:
-        J_ineq = np.multiply(J[ineq, :], sign[:, np.newaxis])
-    else:
-        J_ineq = empty
-    # Return Jacobian matrices
-    return J_ineq, J_eq
-
-
 def default_scaling(x):
     n, = np.shape(x)
     return spc.eye(n)
