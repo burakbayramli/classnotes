@@ -20,54 +20,6 @@ import scipy.sparse.linalg
 EPS = np.finfo(np.float64).eps
 
 
-def _adjust_scheme_to_bounds(x0, h, num_steps, scheme, lb, ub):
-    if scheme == '1-sided':
-        use_one_sided = np.ones_like(h, dtype=bool)
-    elif scheme == '2-sided':
-        h = np.abs(h)
-        use_one_sided = np.zeros_like(h, dtype=bool)
-    else:
-        raise ValueError("`scheme` must be '1-sided' or '2-sided'.")
-
-    if np.all((lb == -np.inf) & (ub == np.inf)):
-        return h, use_one_sided
-
-    h_total = h * num_steps
-    h_adjusted = h.copy()
-
-    lower_dist = x0 - lb
-    upper_dist = ub - x0
-
-    if scheme == '1-sided':
-        x = x0 + h_total
-        violated = (x < lb) | (x > ub)
-        fitting = np.abs(h_total) <= np.maximum(lower_dist, upper_dist)
-        h_adjusted[violated & fitting] *= -1
-
-        forward = (upper_dist >= lower_dist) & ~fitting
-        h_adjusted[forward] = upper_dist[forward] / num_steps
-        backward = (upper_dist < lower_dist) & ~fitting
-        h_adjusted[backward] = -lower_dist[backward] / num_steps
-    elif scheme == '2-sided':
-        central = (lower_dist >= h_total) & (upper_dist >= h_total)
-
-        forward = (upper_dist >= lower_dist) & ~central
-        h_adjusted[forward] = np.minimum(
-            h[forward], 0.5 * upper_dist[forward] / num_steps)
-        use_one_sided[forward] = True
-
-        backward = (upper_dist < lower_dist) & ~central
-        h_adjusted[backward] = -np.minimum(
-            h[backward], 0.5 * lower_dist[backward] / num_steps)
-        use_one_sided[backward] = True
-
-        min_dist = np.minimum(upper_dist, lower_dist) / num_steps
-        adjusted_central = (~central & (np.abs(h_adjusted) <= min_dist))
-        h_adjusted[adjusted_central] = min_dist[adjusted_central]
-        use_one_sided[adjusted_central] = False
-
-    return h_adjusted, use_one_sided
-
 
 relative_step = {"2-point": EPS**0.5,
                  "3-point": EPS**(1/3),
@@ -1091,49 +1043,6 @@ def _convert_dense_jac(J, n_vars, n_eq, n_ineq,
     # Return Jacobian matrices
     return J_ineq, J_eq
 
-
-def _parse_constraint(kind):
-    if kind[0] == "equals":
-        # Read values from input structure
-        c = np.asarray(kind[1], dtype=float)
-        # Set returns
-        eq = np.arange(len(c), dtype=int)
-        ineq = np.empty(0, dtype=int)
-        val_eq = np.asarray(c)
-        val_ineq = np.empty(0)
-        sign = np.empty(0)
-        fun_len = len(c)
-    elif kind[0] in ("greater", "less", "interval"):
-        # Constraint type
-        if kind[0] == "greater":
-            lb = np.asarray(kind[1], dtype=float)
-            ub = np.full_like(lb, np.inf, dtype=float)
-        elif kind[0] == "less":
-            ub = np.asarray(kind[1], dtype=float)
-            lb = np.full_like(ub, -np.inf, dtype=float)
-        elif kind[0] == "interval":
-            lb = np.asarray(kind[1], dtype=float)
-            ub = np.asarray(kind[2], dtype=float)
-        # Set auxiliar values
-        arange = np.arange(len(lb), dtype=int)
-        ones = np.ones(len(lb))
-        lb_isinf = np.isinf(lb)
-        ub_isinf = np.isinf(ub)
-        eq_list = (lb == ub) & ~lb_isinf & ~ub_isinf
-        # Set returns
-        eq = arange[eq_list]
-        val_eq = lb[eq_list]
-        ineq = np.hstack((arange[~eq_list & ~lb_isinf],
-                          arange[~eq_list & ~ub_isinf]))
-        val_ineq = np.hstack((lb[~eq_list & ~lb_isinf],
-                              ub[~eq_list & ~ub_isinf]))
-        sign = np.hstack((-ones[~eq_list & ~lb_isinf],
-                          ones[~eq_list & ~ub_isinf]))
-        fun_len = len(lb)
-    else:
-        raise RuntimeError("Never be here.")
-
-    return eq, ineq, val_eq, val_ineq, sign, fun_len
 
 
 class Rosenbrock:
