@@ -61,37 +61,6 @@ class Rosenbrock:
         return ()
 
 
-def group_columns(A, order=0):
-    if issparse(A):
-        A = csc_matrix(A)
-    else:
-        A = np.atleast_2d(A)
-        A = (A != 0).astype(np.int32)
-
-    if A.ndim != 2:
-        raise ValueError("`A` must be 2-dimensional.")
-
-    m, n = A.shape
-
-    if order is None or np.isscalar(order):
-        rng = np.random.RandomState(order)
-        order = rng.permutation(n)
-    else:
-        order = np.asarray(order)
-        if order.shape != (n,):
-            raise ValueError("`order` has incorrect shape.")
-
-    A = A[:, order]
-
-    if issparse(A):
-        groups = group_sparse(m, n, A.indices, A.indptr)
-    else:
-        groups = group_dense(m, n, A)
-
-    groups[order] = groups.copy()
-
-    return groups
-
 
 TERMINATION_MESSAGES = {
     0: "The maximum number of function evaluations is exceeded.",
