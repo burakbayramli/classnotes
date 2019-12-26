@@ -4,9 +4,8 @@ from math import copysign
 import numpy as np
 import scipy.sparse as spc
 from scipy.sparse.linalg import LinearOperator
-from scipy.linalg import block_diag
+from scipy.linalg import block_diag, norm
 from scipy.sparse import csc_matrix
-from numpy.linalg import norm
 from scipy.optimize import OptimizeResult
 import scipy
 import time
