@@ -4,7 +4,6 @@ from math import copysign
 import numpy as np
 import scipy.sparse as spc
 from scipy.sparse.linalg import LinearOperator
-from scipy.linalg import block_diag, norm
 from scipy.sparse import csc_matrix
 from scipy.optimize import OptimizeResult
 import scipy
@@ -636,7 +635,7 @@ def modified_dogleg(A, Y, b, trust_radius, lb, ub):
     newton_point = -Y.dot(b)
     # Check for interior point
     if inside_box_boundaries(newton_point, lb, ub)  \
-       and norm(newton_point) <= trust_radius:
+       and np.linalg.norm(newton_point) <= trust_radius:
         x = newton_point
         return x
 
@@ -667,7 +666,7 @@ def modified_dogleg(A, Y, b, trust_radius, lb, ub):
     x2 = z + alpha*p
 
     # Return the best solution among x1 and x2.
-    if norm(A.dot(x1) + b) < norm(A.dot(x2) + b):
+    if np.linalg.norm(A.dot(x1) + b) < np.linalg.norm(A.dot(x2) + b):
         return x1
     else:
         return x2
@@ -706,7 +705,7 @@ def box_intersections(z, d, lb, ub,
     lb = np.asarray(lb)
     ub = np.asarray(ub)
     # Special case when d=0
-    if norm(d) == 0:
+    if np.linalg.norm(d) == 0:
         return 0, 0, False
 
     zero_d = (d == 0)
@@ -748,7 +747,7 @@ def sphere_intersections(z, d, trust_radius,
                          entire_line=False):
 
     # Special case when d=0
-    if norm(d) == 0:
+    if np.linalg.norm(d) == 0:
         return 0, 0, False
     # Check for inf trust_radius
     if np.isinf(trust_radius):
@@ -1106,8 +1105,8 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
     v = -LS.dot(c)
 
     # Update state parameters
-    state.optimality = norm(c + A.T.dot(v), np.inf)
-    state.constr_violation = norm(b, np.inf) if len(b) > 0 else 0
+    state.optimality = np.linalg.norm(c + A.T.dot(v), np.inf)
+    state.constr_violation = np.linalg.norm(b, np.inf) if len(b) > 0 else 0
     state.niter += 1
     state.x = x
     state.v = v
@@ -1147,7 +1146,7 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
 
         quadratic_model = 1/2*(H.dot(d)).dot(d) + c.T.dot(d)
         linearized_constr = A.dot(d)+b
-        vpred = norm(b) - norm(linearized_constr)
+        vpred = np.linalg.norm(b) - np.linalg.norm(linearized_constr)
         vpred = max(1e-16, vpred)
         previous_penalty = penalty
         if quadratic_model > 0:
@@ -1155,17 +1154,17 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
             penalty = max(penalty, new_penalty)
         predicted_reduction = -quadratic_model + penalty*vpred
 
-        merit_function = f + penalty*norm(b)
+        merit_function = f + penalty*np.linalg.norm(b)
         x_next = x + S.dot(d)
         f_next, b_next = fun_and_constr(x_next)
         state.nfev += 1
         state.ncev += 1
-        merit_function_next = f_next + penalty*norm(b_next)
+        merit_function_next = f_next + penalty*np.linalg.norm(b_next)
         actual_reduction = merit_function - merit_function_next
         reduction_ratio = actual_reduction / predicted_reduction
 
         if reduction_ratio < SUFFICIENT_REDUCTION_RATIO and \
-           norm(dn) <= SOC_THRESHOLD * norm(dt):
+           np.linalg.norm(dn) <= SOC_THRESHOLD * np.linalg.norm(dt):
             y = -Y.dot(b_next)
             _, t, intersect = box_intersections(d, y, trust_lb, trust_ub)
             x_soc = x + S.dot(d + t*y)
@@ -1173,7 +1172,7 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
             # Increment funcion evaluation counter
             state.nfev += 1
             state.ncev += 1
-            merit_function_soc = f_soc + penalty*norm(b_soc)
+            merit_function_soc = f_soc + penalty*np.linalg.norm(b_soc)
             actual_reduction_soc = merit_function - merit_function_soc
             # Recompute reduction ratio
             reduction_ratio_soc = actual_reduction_soc / predicted_reduction
@@ -1184,15 +1183,15 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                 reduction_ratio = reduction_ratio_soc
 
         if reduction_ratio >= LARGE_REDUCTION_RATIO:
-            trust_radius = max(TRUST_ENLARGEMENT_FACTOR_L * norm(d),
+            trust_radius = max(TRUST_ENLARGEMENT_FACTOR_L * np.linalg.norm(d),
                                trust_radius)
         elif reduction_ratio >= INTERMEDIARY_REDUCTION_RATIO:
-            trust_radius = max(TRUST_ENLARGEMENT_FACTOR_S * norm(d),
+            trust_radius = max(TRUST_ENLARGEMENT_FACTOR_S * np.linalg.norm(d),
                                trust_radius)
         elif reduction_ratio < SUFFICIENT_REDUCTION_RATIO:
                 trust_reduction \
                     = (1-SUFFICIENT_REDUCTION_RATIO)/(1-reduction_ratio)
-                new_trust_radius = trust_reduction * norm(d)
+                new_trust_radius = trust_reduction * np.linalg.norm(d)
                 if new_trust_radius >= MAX_TRUST_REDUCTION * trust_radius:
                     trust_radius *= MAX_TRUST_REDUCTION
                 elif new_trust_radius >= MIN_TRUST_REDUCTION * trust_radius:
@@ -1223,8 +1222,8 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
             state.constr = b
             state.jac = A
             # Otimality values
-            state.optimality = norm(c + A.T.dot(v), np.inf)
-            state.constr_violation = norm(b, np.inf) if len(b) > 0 else 0
+            state.optimality = np.linalg.norm(c + A.T.dot(v), np.inf)
+            state.constr_violation = np.linalg.norm(b, np.inf) if len(b) > 0 else 0
         else:
             penalty = previous_penalty
             compute_hess = False
@@ -1259,10 +1258,10 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
         allvecs = [x]
     # Values for the first iteration
     H_p = H.dot(p)
-    rt_g = norm(g)**2  # g.T g = r.T Z g = r.T g (ref [1]_ p.1389)
+    rt_g = np.linalg.norm(g)**2  # g.T g = r.T Z g = r.T g (ref [1]_ p.1389)
 
     # If x > trust-region the problem does not have a solution.
-    tr_distance = trust_radius - norm(x)
+    tr_distance = trust_radius - np.linalg.norm(x)
     if tr_distance < 0:
         raise ValueError("Trust region problem does not have a solution.")
     # If x == trust_radius, then x is the solution
@@ -1373,14 +1372,14 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
         # Project residual g+ = Z r+
         g_next = Z.dot(r_next)
         # Compute conjugate direction step d
-        rt_g_next = norm(g_next)**2  # g.T g = r.T g (ref [1]_ p.1389)
+        rt_g_next = np.linalg.norm(g_next)**2  # g.T g = r.T g (ref [1]_ p.1389)
         beta = rt_g_next / rt_g
         p = - g_next + beta*p
         # Prepare for next iteration
         x = x_next
         g = g_next
         r = g_next
-        rt_g = norm(g)**2  # g.T g = r.T Z g = r.T g (ref [1]_ p.1389)
+        rt_g = np.linalg.norm(g)**2  # g.T g = r.T Z g = r.T g (ref [1]_ p.1389)
         H_p = H.dot(p)
 
     if not inside_box_boundaries(x, lb, ub):
