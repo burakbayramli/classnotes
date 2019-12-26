@@ -163,11 +163,7 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     if return_all:
         state.allvecs = []
         state.allmult = []
-
-    print (method)
         
-    method = 'equality_constrained_sqp'
-
     def stop_criteria(state):
         state.status = None
         if (callback is not None) and callback(state):
@@ -182,25 +178,24 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
 
     start_time = time.time()
     # Call inferior function to do the optimization
-    if method == 'equality_constrained_sqp':
-        if constr.n_ineq > 0:
-            raise ValueError("'equality_constrained_sqp' does not "
-                             "support inequality constraints.")
+    if constr.n_ineq > 0:
+        raise ValueError("'equality_constrained_sqp' does not "
+                         "support inequality constraints.")
 
-        def fun_and_constr(x):
-            f = fun(x)
-            _, c_eq = constr.constr(x)
-            return f, c_eq
+    def fun_and_constr(x):
+        f = fun(x)
+        _, c_eq = constr.constr(x)
+        return f, c_eq
 
-        def grad_and_jac(x):
-            g = grad_wrapped(x)
-            _, J_eq = constr.jac(x)
-            return g, J_eq
+    def grad_and_jac(x):
+        g = grad_wrapped(x)
+        _, J_eq = constr.jac(x)
+        return g, J_eq
 
-        result = equality_constrained_sqp(
-            fun_and_constr, grad_and_jac, lagr_hess,
-            x0, f0, g0, constr.c_eq0, constr.J_eq0,
-            stop_criteria, state, **options)
+    result = equality_constrained_sqp(
+        fun_and_constr, grad_and_jac, lagr_hess,
+        x0, f0, g0, constr.c_eq0, constr.J_eq0,
+        stop_criteria, state, **options)
 
 
     result.execution_time = time.time() - start_time
