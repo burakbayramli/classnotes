@@ -81,13 +81,8 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     f0 = fun(x0)
     g0 = np.atleast_1d(grad(x0))
 
-    if hess in ('2-point', '3-point', 'cs'):
-        def grad_wrapped(x):
-            return np.atleast_1d(grad(x))
-
-    else:
-        def grad_wrapped(x):
-            return np.atleast_1d(grad(x))
+    def grad_wrapped(x):
+        return np.atleast_1d(grad(x))
 
     H0 = hess(x0)
     H0 = np.atleast_2d(np.asarray(H0))
