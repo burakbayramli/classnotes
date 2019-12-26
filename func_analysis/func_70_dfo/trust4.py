@@ -379,25 +379,8 @@ def orthogonality(A, g):
 
 
 def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
-    # Form augmented system
     K = csc_matrix(bmat([[eye(n), A.T], [A, None]]))
-    # LU factorization
-    # TODO: Use a symmetric indefinite factorization
-    #       to solve the system twice as fast (because
-    #       of the symmetry).
-    try:
-        solve = scipy.sparse.linalg.factorized(K)
-    except RuntimeError:
-        warn("Singular Jacobian matrix. Using dense SVD decomposition to "
-             "perform the factorizations.")
-        return svd_factorization_projections(A.toarray(),
-                                             m, n, orth_tol,
-                                             max_refin, tol)
-
-    # z = x - A.T inv(A A.T) A x
-    # is computed solving the extended system:
-    # [I A.T] * [ z ] = [x]
-    # [A  O ]   [aux]   [0]
+    solve = scipy.sparse.linalg.factorized(K)
     def null_space(x):
         # v = [x]
         #     [0]
@@ -425,43 +408,20 @@ def augmented_system_projections(A, m, n, orth_tol, max_refin, tol):
             z = lu_sol[:n]
             k += 1
 
-        # return z = x - A.T inv(A A.T) A x
         return z
-
-    # z = inv(A A.T) A x
-    # is computed solving the extended system:
-    # [I A.T] * [aux] = [x]
-    # [A  O ]   [ z ]   [0]
+    
     def least_squares(x):
-        # v = [x]
-        #     [0]
         v = np.hstack([x, np.zeros(m)])
-        # lu_sol = [aux]
-        #          [ z ]
         lu_sol = solve(v)
-        # return z = inv(A A.T) A x
         return lu_sol[n:m+n]
-
-    # z = A.T inv(A A.T) x
-    # is computed solving the extended system:
-    # [I A.T] * [ z ] = [0]
-    # [A  O ]   [aux]   [x]
     def row_space(x):
-        # v = [0]
-        #     [x]
         v = np.hstack([np.zeros(n), x])
-        # lu_sol = [ z ]
-        #          [aux]
         lu_sol = solve(v)
-        # return z = A.T inv(A A.T) x
         return lu_sol[:n]
 
     return null_space, least_squares, row_space
 
-
-
 def to_canonical(constraints):
-    # Put ``constraints`` in list format whe needed
     if isinstance(constraints, (NonlinearConstraint,
                                 LinearConstraint,
                                 BoxConstraint,
@@ -503,17 +463,11 @@ class CanonicalConstraint:
         self.n_vars = n_vars
         self.n_ineq = n_ineq
         self.n_eq = n_eq
-        # Objective function and constraints
         self.constr = constr
         self.jac = jac
         self.hess = hess
-        # Use sparse jacobian flag
         self.sparse_jacobian = sparse_jacobian
-        # Enforce feasibility for CanonicalConstraint. Should
-        # be a list of booleans (and never a single boolean value,
-        # as it is allowed for Box, Linear and Nonlinear constraints).
         self.enforce_feasibility = enforce_feasibility
-        # Initial Values
         self.x0 = x0
         self.c_ineq0 = c_ineq0
         self.c_eq0 = c_eq0
@@ -528,10 +482,9 @@ def _linear_to_canonical(linear):
     return _nonlinear_to_canonical(linear.to_nonlinear())
 
 def _nonlinear_to_canonical(nonlinear):
-    # Parse constraints
     eq, ineq, val_eq, val_ineq, sign, fun_len \
         = _parse_constraint(nonlinear.kind)
-    # Get dimensions
+
     n_eq = len(eq)
     n_ineq = len(ineq)
     n_vars = nonlinear.n
@@ -591,7 +544,6 @@ def _nonlinear_to_canonical(nonlinear):
 
 def _parse_constraint(kind):
 
-
     if kind[0] == "equals":
         # Read values from input structure
         c = np.asarray(kind[1], dtype=float)
@@ -647,9 +599,9 @@ def _convert_constr(c, n_vars, n_eq, n_ineq,
 def _convert_sparse_jac(J, n_vars, n_eq, n_ineq,
                         eq, ineq, val_eq, val_ineq,
                         sign):
-    # Empty jacobian
+
     empty = spc.csr_matrix(np.empty((0, n_vars)))
-    # Compute equality and inequality Jacobian matrices
+
     J_eq = J[eq, :] if n_eq > 0 else empty
     if n_ineq > 0:
         D = spc.lil_matrix((n_ineq, n_ineq))
@@ -657,11 +609,10 @@ def _convert_sparse_jac(J, n_vars, n_eq, n_ineq,
         J_ineq = D*J[ineq, :]
     else:
         J_ineq = empty
-    # Return Jacobian matrices
+
     return J_ineq, J_eq
 
 def lagrangian_hessian(constraint, hess):
-    # Concatenate Hessians
     def lagr_hess(x, v_eq=np.empty(0), v_ineq=np.empty(0)):
         n = len(x)
         hess_list = []
@@ -691,17 +642,13 @@ def modified_dogleg(A, Y, b, trust_radius, lb, ub):
         x = newton_point
         return x
 
-    # Compute gradient vector ``g = A.T b``
     g = A.T.dot(b)
-    # Compute cauchy point
-    # `cauchy_point = g.T g / (g.T A.T A g)``.
+
     A_g = A.dot(g)
     cauchy_point = -np.dot(g, g) / np.dot(A_g, A_g) * g
-    # Origin
+
     origin_point = np.zeros_like(cauchy_point)
 
-    # Check the segment between cauchy_point and newton_point
-    # for a possible solution.
     z = cauchy_point
     p = newton_point - cauchy_point
     _, alpha, intersect = box_sphere_intersections(z, p, lb, ub,
@@ -709,16 +656,12 @@ def modified_dogleg(A, Y, b, trust_radius, lb, ub):
     if intersect:
         x1 = z + alpha*p
     else:
-        # Check the segment between the origin and cauchy_point
-        # for a possible solution.
         z = origin_point
         p = cauchy_point
         _, alpha, _ = box_sphere_intersections(z, p, lb, ub,
                                                trust_radius)
         x1 = z + alpha*p
 
-    # Check the segment between origin and newton_point
-    # for a possible solution.
     z = origin_point
     p = newton_point
     _, alpha, _ = box_sphere_intersections(z, p, lb, ub,
@@ -760,7 +703,6 @@ def box_sphere_intersections(z, d, lb, ub, trust_radius,
 def box_intersections(z, d, lb, ub,
                       entire_line=False):
 
-    # Make sure it is a numpy array
     z = np.asarray(z)
     d = np.asarray(d)
     lb = np.asarray(lb)
@@ -769,14 +711,10 @@ def box_intersections(z, d, lb, ub,
     if norm(d) == 0:
         return 0, 0, False
 
-    # Get values for which d==0
     zero_d = (d == 0)
-    # If the boundaries are not satisfied for some coordinate
-    # for which "d" is zero, there is no box-line intersection.
     if (z[zero_d] < lb[zero_d]).any() or (z[zero_d] > ub[zero_d]).any():
         intersect = False
         return 0, 0, intersect
-    # Remove values for which d is zero
     not_zero_d = np.logical_not(zero_d)
     z = z[not_zero_d]
     d = d[not_zero_d]
@@ -834,13 +772,6 @@ def sphere_intersections(z, d, trust_radius,
         return 0, 0, intersect
     sqrt_discriminant = np.sqrt(discriminant)
 
-    # The following calculation is mathematically
-    # equivalent to:
-    # ta = (-b - sqrt_discriminant) / (2*a)
-    # tb = (-b + sqrt_discriminant) / (2*a)
-    # but produce smaller round off errors.
-    # Look at Matrix Computation p.97
-    # for a better justification.
     aux = b + copysign(sqrt_discriminant, b)
     ta = -aux / (2*a)
     tb = -2*c / aux
@@ -876,17 +807,12 @@ def tr_interior_point(fun, grad, lagr_hess, n_vars, n_ineq, n_eq,
                       initial_trust_radius=1.0,
                       return_all=False,
                       factorization_method=None):
-    # BOUNDARY_PARAMETER controls the decrease on the slack
-    # variables. Represents ``tau`` from [1]_ p.885, formula (3.18).
     BOUNDARY_PARAMETER = 0.995
-    # BARRIER_DECAY_RATIO controls the decay of the barrier parameter
-    # and of the subproblem toloerance. Represents ``theta`` from [1]_ p.879.
+
     BARRIER_DECAY_RATIO = 0.2
-    # TRUST_ENLARGEMENT controls the enlargement on trust radius
-    # after each iteration
+
     TRUST_ENLARGEMENT = 5
 
-    # Default enforce_feasibility
     if enforce_feasibility is None:
         enforce_feasibility = np.zeros(n_ineq, bool)
     # Initial Values
@@ -1107,28 +1033,16 @@ class BarrierSubproblem:
 
     def lagrangian_hessian_s(self, z, v):
         s = self.get_slack(z)
-        # Using the primal formulation:
-        #     S Hs S = diag(s)*diag(barrier_parameter/s**2)*diag(s).
-        # Reference [1]_ p. 882, formula (3.1)
         primal = self.barrier_parameter
-        # Using the primal-dual formulation
-        #     S Hs S = diag(s)*diag(v/s)*diag(s)
-        # Reference [1]_ p. 883, formula (3.11)
         primal_dual = v[-self.n_ineq:]*s
-        # Uses the primal-dual formulation for
-        # positives values of v_ineq, and primal
-        # formulation for the remaining ones.
         return np.where(v[-self.n_ineq:] > 0, primal_dual, primal)
 
     def lagrangian_hessian(self, z, v):
-        # Compute Hessian in relation to x and s
+
         Hx = self.lagrangian_hessian_x(z, v)
         if self.n_ineq > 0:
             S_Hs_S = self.lagrangian_hessian_s(z, v)
 
-        # The scaled Lagragian Hessian is:
-        #     [ Hx    0    ]
-        #     [ 0   S Hs S ]
         def matvec(vec):
             vec_x = self.get_variables(vec)
             vec_s = self.get_slack(vec)
@@ -1216,23 +1130,11 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
             H = lagr_hess(x, v)
             state.nhev += 1
 
-        # Normal Step - `dn`
-        # minimize 1/2*||A dn + b||^2
-        # subject to:
-        # ||dn|| <= TR_FACTOR * trust_radius
-        # BOX_FACTOR * lb <= dn <= BOX_FACTOR * ub.
         dn = modified_dogleg(A, Y, b,
                              TR_FACTOR*trust_radius,
                              BOX_FACTOR*trust_lb,
                              BOX_FACTOR*trust_ub)
 
-        # Tangential Step - `dn`
-        # Solve the QP problem:
-        # minimize 1/2 dt.T H dt + dt.T (H dn + c)
-        # subject to:
-        # A dt = 0
-        # ||dt|| <= sqrt(trust_radius**2 - ||dn||**2)
-        # lb - dn <= dt <= ub - dn
         c_t = H.dot(dn) + c
         b_t = np.zeros_like(b)
         trust_radius_t = np.sqrt(trust_radius**2 - np.linalg.norm(dn)**2)
@@ -1245,54 +1147,34 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
         # Compute update (normal + tangential steps).
         d = dn + dt
 
-        # Compute second order model: 1/2 d H d + c.T d + f.
         quadratic_model = 1/2*(H.dot(d)).dot(d) + c.T.dot(d)
-        # Compute linearized constraint: l = A d + b.
         linearized_constr = A.dot(d)+b
-        # Compute new penalty parameter according to formula (3.52),
-        # reference [2]_, p.891.
         vpred = norm(b) - norm(linearized_constr)
-        # Guarantee `vpred` always positive,
-        # regardless of roundoff errors.
         vpred = max(1e-16, vpred)
         previous_penalty = penalty
         if quadratic_model > 0:
             new_penalty = quadratic_model / ((1-PENALTY_FACTOR)*vpred)
             penalty = max(penalty, new_penalty)
-        # Compute predicted reduction according to formula (3.52),
-        # reference [2]_, p.891.
         predicted_reduction = -quadratic_model + penalty*vpred
 
-        # Compute merit function at current point
         merit_function = f + penalty*norm(b)
-        # Evaluate function and constraints at trial point
         x_next = x + S.dot(d)
         f_next, b_next = fun_and_constr(x_next)
-        # Increment funcion evaluation counter
         state.nfev += 1
         state.ncev += 1
-        # Compute merit function at trial point
         merit_function_next = f_next + penalty*norm(b_next)
-        # Compute actual reduction according to formula (3.54),
-        # reference [2]_, p.892.
         actual_reduction = merit_function - merit_function_next
-        # Compute reduction ratio
         reduction_ratio = actual_reduction / predicted_reduction
 
-        # Second order correction (SOC), reference [2]_, p.892.
         if reduction_ratio < SUFFICIENT_REDUCTION_RATIO and \
            norm(dn) <= SOC_THRESHOLD * norm(dt):
-            # Compute second order correction
             y = -Y.dot(b_next)
-            # Make sure increment is inside box constraints
             _, t, intersect = box_intersections(d, y, trust_lb, trust_ub)
-            # Compute tentative point
             x_soc = x + S.dot(d + t*y)
             f_soc, b_soc = fun_and_constr(x_soc)
             # Increment funcion evaluation counter
             state.nfev += 1
             state.ncev += 1
-            # Recompute actual reduction
             merit_function_soc = f_soc + penalty*norm(b_soc)
             actual_reduction_soc = merit_function - merit_function_soc
             # Recompute reduction ratio
@@ -1303,14 +1185,12 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                 b_next = b_soc
                 reduction_ratio = reduction_ratio_soc
 
-        # Readjust trust region step, formula (3.55), reference [2]_, p.892.
         if reduction_ratio >= LARGE_REDUCTION_RATIO:
             trust_radius = max(TRUST_ENLARGEMENT_FACTOR_L * norm(d),
                                trust_radius)
         elif reduction_ratio >= INTERMEDIARY_REDUCTION_RATIO:
             trust_radius = max(TRUST_ENLARGEMENT_FACTOR_S * norm(d),
                                trust_radius)
-        # Reduce trust region step, according to reference [3]_, p.696.
         elif reduction_ratio < SUFFICIENT_REDUCTION_RATIO:
                 trust_reduction \
                     = (1-SUFFICIENT_REDUCTION_RATIO)/(1-reduction_ratio)
@@ -1322,7 +1202,6 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                 else:
                     trust_radius *= MIN_TRUST_REDUCTION
 
-        # Update iteration
         state.niter += 1
         if reduction_ratio >= SUFFICIENT_REDUCTION_RATIO:
             x = x_next
@@ -1637,41 +1516,19 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
 
     start_time = time.time()
     # Call inferior function to do the optimization
-    if method == 'equality_constrained_sqp':
-        if constr.n_ineq > 0:
-            raise ValueError("'equality_constrained_sqp' does not "
-                             "support inequality constraints.")
 
-        def fun_and_constr(x):
-            f = fun(x)
-            _, c_eq = constr.constr(x)
-            return f, c_eq
-
-        def grad_and_jac(x):
-            g = grad_wrapped(x)
-            _, J_eq = constr.jac(x)
-            return g, J_eq
-
-        result = equality_constrained_sqp(
-            fun_and_constr, grad_and_jac, lagr_hess,
-            x0, f0, g0, constr.c_eq0, constr.J_eq0,
-            stop_criteria, state, **options)
-
-    elif method == 'tr_interior_point':
-        if constr.n_ineq == 0:
-            warn("The problem only has equality constraints. "
-                 "The solver 'equality_constrained_sqp' is a "
-                 "better choice for those situations.")
-        result = tr_interior_point(
-            fun, grad_wrapped, lagr_hess,
-            n_vars, constr.n_ineq, constr.n_eq,
-            constr.constr, constr.jac,
-            x0, f0, g0, constr.c_ineq0, constr.J_ineq0,
-            constr.c_eq0, constr.J_eq0, stop_criteria,
-            constr.enforce_feasibility,
-            xtol, state, **options)
-    else:
-        raise ValueError("Unknown optimization ``method``.")
+    if constr.n_ineq == 0:
+        warn("The problem only has equality constraints. "
+             "The solver 'equality_constrained_sqp' is a "
+             "better choice for those situations.")
+    result = tr_interior_point(
+        fun, grad_wrapped, lagr_hess,
+        n_vars, constr.n_ineq, constr.n_eq,
+        constr.constr, constr.jac,
+        x0, f0, g0, constr.c_ineq0, constr.J_ineq0,
+        constr.c_eq0, constr.J_eq0, stop_criteria,
+        constr.enforce_feasibility,
+        xtol, state, **options)
 
     result.execution_time = time.time() - start_time
     result.method = method
