@@ -1775,84 +1775,10 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
 
     return Z, LS, Y
 
-# For comparison with the projected CG
-def eqp_kktfact(H, c, A, b):
-    """Solve equality-constrained quadratic programming (EQP) problem.
-
-    Solve ``min 1/2 x.T H x + x.t c``  subject to ``A x + b = 0``
-    using direct factorization of the KKT system.
-
-    Parameters
-    ----------
-    H : sparse matrix, shape (n, n)
-        Hessian matrix of the EQP problem.
-    c : array_like, shape (n,)
-        Gradient of the quadratic objective function.
-    A : sparse matrix
-        Jacobian matrix of the EQP problem.
-    b : array_like, shape (m,)
-        Right-hand side of the constraint equation.
-
-    Returns
-    -------
-    x : array_like, shape (n,)
-        Solution of the KKT problem.
-    lagrange_multipliers : ndarray, shape (m,)
-        Lagrange multipliers of the KKT problem.
-    """
-    n, = np.shape(c)  # Number of parameters
-    m, = np.shape(b)  # Number of constraints
-
-    # Karush-Kuhn-Tucker matrix of coefficients.
-    # Defined as in Nocedal/Wright "Numerical
-    # Optimization" p.452 in Eq. (16.4).
-    kkt_matrix = csc_matrix(bmat([[H, A.T], [A, None]]))
-    # Vector of coefficients.
-    kkt_vec = np.hstack([-c, -b])
-
-    # TODO: Use a symmetric indefinite factorization
-    #       to solve the system twice as fast (because
-    #       of the symmetry).
-    lu = linalg.splu(kkt_matrix)
-    kkt_sol = lu.solve(kkt_vec)
-    x = kkt_sol[:n]
-    lagrange_multipliers = -kkt_sol[n:n+m]
-
-    return x, lagrange_multipliers
-
 
 def sphere_intersections(z, d, trust_radius,
                          entire_line=False):
-    """Find the intersection between segment (or line) and spherical constraints.
 
-    Find the intersection between the segment (or line) defined by the
-    parametric  equation ``x(t) = z + t*d`` and the ball
-    ``||x|| <= trust_radius``.
-
-    Parameters
-    ----------
-    z : array_like, shape (n,)
-        Initial point.
-    d : array_like, shape (n,)
-        Direction.
-    trust_radius : float
-        Ball radius.
-    entire_line : bool, optional
-        When ``True`` the function returns the intersection between the line
-        ``x(t) = z + t*d`` (``t`` can assume any value) and the ball
-        ``||x|| <= trust_radius``. When ``False`` returns the intersection
-        between the segment ``x(t) = z + t*d``, ``0 <= t <= 1``, and the ball.
-
-    Returns
-    -------
-    ta, tb : float
-        The line/segment ``x(t) = z + t*d`` is inside the ball for
-        for ``ta <= t <= tb``.
-    intersect : bool
-        When ``True`` there is a intersection between the line/segment
-        and the sphere. On the other hand, when ``False``, there is no
-        intersection.
-    """
     # Special case when d=0
     if norm(d) == 0:
         return 0, 0, False
