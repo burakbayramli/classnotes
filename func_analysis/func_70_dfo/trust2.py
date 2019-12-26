@@ -1670,22 +1670,6 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
     return state
     
 def orthogonality(A, g):
-    """Measure orthogonality between a vector and the null space of a matrix.
-
-    Compute a measure of orthogonality between the null space
-    of the (possibly sparse) matrix ``A`` and a given vector ``g``.
-
-    The formula is a simplified (and cheaper) version of formula (3.13)
-    from [1]_.
-    ``orth =  norm(A g, ord=2)/(norm(A, ord='fro')*norm(g, ord=2))``.
-
-    References
-    ----------
-    .. [1] Gould, Nicholas IM, Mary E. Hribar, and Jorge Nocedal.
-           "On the solution of equality constrained quadratic
-            programming problems arising in optimization."
-            SIAM Journal on Scientific Computing 23.4 (2001): 1376-1395.
-    """
     # Compute vector norms
     norm_g = np.linalg.norm(g)
     # Compute Frobenius norm of the matrix A
@@ -1704,29 +1688,6 @@ def orthogonality(A, g):
     return orth
 
 
-def normal_equation_projections(A, m, n, orth_tol, max_refin, tol):
-    """Return linear operators for matrix A using ``NormalEquation`` approach.
-    """
-    # Cholesky factorization
-    factor = cholesky_AAt(A)
-
-    # z = x - A.T inv(A A.T) A x
-    def null_space(x):
-        v = factor(A.dot(x))
-        z = x - A.T.dot(v)
-
-        # Iterative refinement to improve roundoff
-        # errors described in [2]_, algorithm 5.1.
-        k = 0
-        while orthogonality(A, z) > orth_tol:
-            if k >= max_refin:
-                break
-            # z_next = z - A.T inv(A A.T) A z
-            v = factor(A.dot(z))
-            z = z - A.T.dot(v)
-            k += 1
-
-        return z
 
     # z = inv(A A.T) A x
     def least_squares(x):
@@ -2035,18 +1996,8 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
         if method not in ("QRFactorization", "SVDFactorization"):
             raise ValueError("Method not allowed for dense array.")
 
-    if method == 'NormalEquation':
-        null_space, least_squares, row_space \
-            = normal_equation_projections(A, m, n, orth_tol, max_refin, tol)
-    elif method == 'AugmentedSystem':
-        null_space, least_squares, row_space \
-            = augmented_system_projections(A, m, n, orth_tol, max_refin, tol)
-    elif method == "QRFactorization":
-        null_space, least_squares, row_space \
-            = qr_factorization_projections(A, m, n, orth_tol, max_refin, tol)
-    elif method == "SVDFactorization":
-        null_space, least_squares, row_space \
-            = svd_factorization_projections(A, m, n, orth_tol, max_refin, tol)
+    null_space, least_squares, row_space \
+        = augmented_system_projections(A, m, n, orth_tol, max_refin, tol)
 
     Z = LinearOperator((n, n), null_space)
     LS = LinearOperator((m, n), least_squares)
