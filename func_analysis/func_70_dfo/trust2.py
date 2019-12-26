@@ -313,19 +313,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     result.method = method
     result.message = TERMINATION_MESSAGES[result.status]
 
-    if verbose >= 2:
-        if method == 'equality_constrained_sqp':
-            sqp_printer.print_footer()
-        if method == 'tr_interior_point':
-            ip_printer.print_footer()
-    if verbose >= 1:
-        print(result.message)
-        print("Number of iteractions: {0}, function evaluations: {1}, "
-              "CG iterations: {2}, optimality: {3:.2e}, "
-              "constraint violation: {4:.2e}, execution time: {5:4.2} s."
-              .format(result.niter, result.nfev, result.cg_niter,
-                      result.optimality, result.constr_violation,
-                      result.execution_time))
     return result
     
 class NonlinearConstraint:
