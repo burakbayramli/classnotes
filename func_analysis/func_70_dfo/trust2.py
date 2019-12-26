@@ -86,6 +86,7 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
 
     H0 = hess(x0)
     H0 = np.atleast_2d(np.asarray(H0))
+    
     def hess_wrapped(x):
         return np.atleast_2d(np.asarray(hess(x)))
 
