@@ -111,15 +111,10 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     x0 = np.atleast_1d(x0).astype(float)
     n_vars = np.size(x0)
 
-    # Evaluate initial point
     f0 = fun(x0)
     g0 = np.atleast_1d(grad(x0))
 
-    # Define Gradient
     if hess in ('2-point', '3-point', 'cs'):
-        # Need to memoize gradient wrapper in order
-        # to avoid repeated calls that occur
-        # when using finite differences.
         def grad_wrapped(x):
             return np.atleast_1d(grad(x))
 
@@ -132,18 +127,12 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     def hess_wrapped(x):
         return np.atleast_2d(np.asarray(hess(x)))
 
-
-    # Put constraints in list format when needed
-    # Copy, evaluate and initialize constraints
     copied_constraints = [deepcopy(constr) for constr in constraints]
-    # Concatenate constraints
     if len(copied_constraints) == 0:
         constr = empty_canonical_constraint(x0, n_vars, sparse_jacobian)
 
-    # Generate Lagrangian hess function
     lagr_hess = lagrangian_hessian(constr, hess_wrapped)
 
-    # Construct OptimizeResult
     state = OptimizeResult(niter=0, nfev=1, ngev=1,
                            ncev=1, njev=1, nhev=0,
                            cg_niter=0, cg_info={})
@@ -350,23 +339,11 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
             H = lagr_hess(x, v)
             state.nhev += 1
 
-        # Normal Step - `dn`
-        # minimize 1/2*||A dn + b||^2
-        # subject to:
-        # ||dn|| <= TR_FACTOR * trust_radius
-        # BOX_FACTOR * lb <= dn <= BOX_FACTOR * ub.
         dn = modified_dogleg(A, Y, b,
                              TR_FACTOR*trust_radius,
                              BOX_FACTOR*trust_lb,
                              BOX_FACTOR*trust_ub)
 
-        # Tangential Step - `dn`
-        # Solve the QP problem:
-        # minimize 1/2 dt.T H dt + dt.T (H dn + c)
-        # subject to:
-        # A dt = 0
-        # ||dt|| <= sqrt(trust_radius**2 - ||dn||**2)
-        # lb - dn <= dt <= ub - dn
         c_t = H.dot(dn) + c
         b_t = np.zeros_like(b)
         trust_radius_t = np.sqrt(trust_radius**2 - np.linalg.norm(dn)**2)
@@ -376,44 +353,27 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                                    trust_radius_t,
                                    lb_t, ub_t)
 
-        # Compute update (normal + tangential steps).
         d = dn + dt
 
-        # Compute second order model: 1/2 d H d + c.T d + f.
         quadratic_model = 1/2*(H.dot(d)).dot(d) + c.T.dot(d)
-        # Compute linearized constraint: l = A d + b.
         linearized_constr = A.dot(d)+b
-        # Compute new penalty parameter according to formula (3.52),
-        # reference [2]_, p.891.
         vpred = norm(b) - norm(linearized_constr)
-        # Guarantee `vpred` always positive,
-        # regardless of roundoff errors.
         vpred = max(1e-16, vpred)
         previous_penalty = penalty
         if quadratic_model > 0:
             new_penalty = quadratic_model / ((1-PENALTY_FACTOR)*vpred)
             penalty = max(penalty, new_penalty)
-        # Compute predicted reduction according to formula (3.52),
-        # reference [2]_, p.891.
         predicted_reduction = -quadratic_model + penalty*vpred
 
-        # Compute merit function at current point
         merit_function = f + penalty*norm(b)
-        # Evaluate function and constraints at trial point
         x_next = x + S.dot(d)
         f_next, b_next = fun_and_constr(x_next)
-        # Increment funcion evaluation counter
         state.nfev += 1
         state.ncev += 1
-        # Compute merit function at trial point
         merit_function_next = f_next + penalty*norm(b_next)
-        # Compute actual reduction according to formula (3.54),
-        # reference [2]_, p.892.
         actual_reduction = merit_function - merit_function_next
-        # Compute reduction ratio
         reduction_ratio = actual_reduction / predicted_reduction
-
-        # Second order correction (SOC), reference [2]_, p.892.
+        
         if reduction_ratio < SUFFICIENT_REDUCTION_RATIO and \
            norm(dn) <= SOC_THRESHOLD * norm(dt):
             # Compute second order correction
@@ -437,14 +397,12 @@ def equality_constrained_sqp(fun_and_constr, grad_and_jac, lagr_hess,
                 b_next = b_soc
                 reduction_ratio = reduction_ratio_soc
 
-        # Readjust trust region step, formula (3.55), reference [2]_, p.892.
         if reduction_ratio >= LARGE_REDUCTION_RATIO:
             trust_radius = max(TRUST_ENLARGEMENT_FACTOR_L * norm(d),
                                trust_radius)
         elif reduction_ratio >= INTERMEDIARY_REDUCTION_RATIO:
             trust_radius = max(TRUST_ENLARGEMENT_FACTOR_S * norm(d),
                                trust_radius)
-        # Reduce trust region step, according to reference [3]_, p.696.
         elif reduction_ratio < SUFFICIENT_REDUCTION_RATIO:
                 trust_reduction \
                     = (1-SUFFICIENT_REDUCTION_RATIO)/(1-reduction_ratio)
@@ -629,13 +587,6 @@ def sphere_intersections(z, d, trust_radius,
         return 0, 0, intersect
     sqrt_discriminant = np.sqrt(discriminant)
 
-    # The following calculation is mathematically
-    # equivalent to:
-    # ta = (-b - sqrt_discriminant) / (2*a)
-    # tb = (-b + sqrt_discriminant) / (2*a)
-    # but produce smaller round off errors.
-    # Look at Matrix Computation p.97
-    # for a better justification.
     aux = b + copysign(sqrt_discriminant, b)
     ta = -aux / (2*a)
     tb = -2*c / aux
@@ -768,8 +719,6 @@ def modified_dogleg(A, Y, b, trust_radius, lb, ub):
     # Origin
     origin_point = np.zeros_like(cauchy_point)
 
-    # Check the segment between cauchy_point and newton_point
-    # for a possible solution.
     z = cauchy_point
     p = newton_point - cauchy_point
     _, alpha, intersect = box_sphere_intersections(z, p, lb, ub,
@@ -777,23 +726,18 @@ def modified_dogleg(A, Y, b, trust_radius, lb, ub):
     if intersect:
         x1 = z + alpha*p
     else:
-        # Check the segment between the origin and cauchy_point
-        # for a possible solution.
         z = origin_point
         p = cauchy_point
         _, alpha, _ = box_sphere_intersections(z, p, lb, ub,
                                                trust_radius)
         x1 = z + alpha*p
 
-    # Check the segment between origin and newton_point
-    # for a possible solution.
     z = origin_point
     p = newton_point
     _, alpha, _ = box_sphere_intersections(z, p, lb, ub,
                                            trust_radius)
     x2 = z + alpha*p
 
-    # Return the best solution among x1 and x2.
     if norm(A.dot(x1) + b) < norm(A.dot(x2) + b):
         return x1
     else:
@@ -809,26 +753,19 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
     n, = np.shape(c)  # Number of parameters
     m, = np.shape(b)  # Number of constraints
 
-    # Initial Values
     x = Y.dot(-b)
     r = Z.dot(H.dot(x) + c)
     g = Z.dot(r)
     p = -g
 
-    # Store ``x`` value
     if return_all:
         allvecs = [x]
-    # Values for the first iteration
     H_p = H.dot(p)
     rt_g = norm(g)**2  # g.T g = r.T Z g = r.T g (ref [1]_ p.1389)
 
-    # If x > trust-region the problem does not have a solution.
     tr_distance = trust_radius - norm(x)
     if tr_distance < 0:
         raise ValueError("Trust region problem does not have a solution.")
-    # If x == trust_radius, then x is the solution
-    # to the optimization problem, since x is the
-    # minimum norm solution to Ax=b.
     elif tr_distance < CLOSE_TO_ZERO:
         info = {'niter': 0, 'stop_cond': 2, 'hits_boundary': True}
         if return_all:
@@ -836,19 +773,15 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
             info['allvecs'] = allvecs
         return x, info
 
-    # Set default tolerance
     if tol is None:
         tol = max(min(0.01 * np.sqrt(rt_g), 0.1 * rt_g), CLOSE_TO_ZERO)
-    # Set default lower and upper bounds
     if lb is None:
         lb = np.full(n, -np.inf)
     if ub is None:
         ub = np.full(n, np.inf)
-    # Set maximum iterations
     if max_iter is None:
         max_iter = n-m
     max_iter = min(max_iter, n-m)
-    # Set maximum infeasible iterations
     if max_infeasible_iter is None:
         max_infeasible_iter = n-m
 
@@ -872,64 +805,45 @@ def projected_cg(H, c, Z, Y, b, trust_radius=np.inf,
                                      "allowed for unrestrited "
                                      "problems.")
             else:
-                # Find intersection with constraints
                 _, alpha, intersect = box_sphere_intersections(
                     x, p, lb, ub, trust_radius, entire_line=True)
-                # Update solution
                 if intersect:
                     x = x + alpha*p
-                # Reinforce variables are inside box constraints.
-                # This is only necessary because of roundoff errors.
                 x = reinforce_box_boundaries(x, lb, ub)
-                # Atribute information
                 stop_cond = 3
                 hits_boundary = True
                 break
 
-        # Get next step
         alpha = rt_g / pt_H_p
         x_next = x + alpha*p
 
-        # Stop criteria - Hits boundary
         if np.linalg.norm(x_next) >= trust_radius:
-            # Find intersection with box constraints
             _, theta, intersect = box_sphere_intersections(x, alpha*p, lb, ub,
                                                            trust_radius)
-            # Update solution
             if intersect:
                 x = x + theta*alpha*p
-            # Reinforce variables are inside box constraints.
-            # This is only necessary because of roundoff errors.
             x = reinforce_box_boundaries(x, lb, ub)
-            # Atribute information
             stop_cond = 2
             hits_boundary = True
             break
 
-        # Check if ``x`` is inside the box and start counter if it is not.
         if inside_box_boundaries(x_next, lb, ub):
             counter = 0
         else:
             counter += 1
-        # Whenever outside box constraints keep looking for intersections.
         if counter > 0:
             _, theta, intersect = box_sphere_intersections(x, alpha*p, lb, ub,
                                                            trust_radius)
             if intersect:
                 last_feasible_x = x + theta*alpha*p
-                # Reinforce variables are inside box constraints.
-                # This is only necessary because of roundoff errors.
                 last_feasible_x = reinforce_box_boundaries(last_feasible_x,
                                                            lb, ub)
                 counter = 0
-        # Stop after too many infeasible (regarding box constraints) iteration.
         if counter > max_infeasible_iter:
             break
-        # Store ``x_next`` value
         if return_all:
             allvecs.append(x_next)
 
-        # Update residual
         r_next = r + alpha*H_p
         # Project residual g+ = Z r+
         g_next = Z.dot(r_next)
