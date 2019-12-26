@@ -147,8 +147,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     # Put constraints in list format when needed
     # Copy, evaluate and initialize constraints
     copied_constraints = [deepcopy(constr) for constr in constraints]
-    for constr in copied_constraints:
-        x0 = constr.evaluate_and_initialize(x0, sparse_jacobian)
     # Concatenate constraints
     if len(copied_constraints) == 0:
         constr = empty_canonical_constraint(x0, n_vars, sparse_jacobian)
