@@ -486,18 +486,6 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
     if m*n == 0:
         A = csc_matrix(A)
 
-    # Check Argument
-    if method is None:
-        method = "AugmentedSystem"
-    if method not in ("NormalEquation", "AugmentedSystem"):
-        raise ValueError("Method not allowed for sparse matrix.")
-    if method == "NormalEquation" and not sksparse_available:
-        warnings.warn(("Only accepts 'NormalEquation' option when"
-                       " scikit-sparse is available. Using "
-                       "'AugmentedSystem' option instead."),
-                      ImportWarning)
-        method = 'AugmentedSystem'
-
     null_space, least_squares, row_space \
         = augmented_system_projections(A, m, n, orth_tol, max_refin, tol)
 
