@@ -19,8 +19,6 @@ import scipy.sparse.linalg
 
 EPS = np.finfo(np.float64).eps
 
-
-
 relative_step = {"2-point": EPS**0.5,
                  "3-point": EPS**(1/3),
                  "cs": EPS**0.5}
@@ -32,16 +30,6 @@ def _compute_absolute_step(rel_step, x0, method):
     sign_x0 = (x0 >= 0).astype(float) * 2 - 1
     return rel_step * sign_x0 * np.maximum(1.0, np.abs(x0))
 
-
-def _prepare_bounds(bounds, x0):
-    lb, ub = [np.asarray(b, dtype=float) for b in bounds]
-    if lb.ndim == 0:
-        lb = np.resize(lb, x0.shape)
-
-    if ub.ndim == 0:
-        ub = np.resize(ub, x0.shape)
-
-    return lb, ub
 
 
 def group_columns(A, order=0):
@@ -669,85 +657,6 @@ class BoxConstraint:
             raise RuntimeError("Trying to convert uninitialized constraint.")
         return self.to_linear().to_nonlinear()
 
-def _check_kind(kind, m):
-    if not isinstance(kind, (tuple, list, str)):
-        raise ValueError("The parameter `kind` should be a tuple, "
-                         " a list, or a string.")
-    if isinstance(kind, str):
-        kind = (kind,)
-    if len(kind) == 0:
-        raise ValueError("The parameter `kind` should not be empty.")
-
-    n_args = len(kind)
-    keyword = kind[0]
-    if keyword not in ("greater", "less", "equals", "interval"):
-        raise ValueError("Keyword `%s` not available." % keyword)
-    if n_args in (1, 2) and keyword not in ("greater", "less", "equals") \
-       or n_args == 3 and keyword not in ("interval"):
-        raise ValueError("Invalid `kind` format.")
-    if n_args == 1:
-        kind = (keyword, 0)
-
-    if keyword in ("greater", "less", "equals"):
-        c = np.asarray(kind[1], dtype=float)
-        if np.size(c) not in (1, m):
-            if keyword == "greater":
-                raise ValueError("`lb` has the wrong dimension.")
-            if keyword == "less":
-                raise ValueError("`ub` has the wrong dimension.")
-            if keyword == "equals":
-                raise ValueError("`c` has the wrong dimension.")
-        c = np.resize(c, m)
-        return (keyword, c)
-    elif keyword == "interval":
-        lb = np.asarray(kind[1], dtype=float)
-        if np.size(lb) not in (1, m):
-            raise ValueError("`lb` has the wrong dimension.")
-        lb = np.resize(lb, m)
-        ub = np.asarray(kind[2], dtype=float)
-        if np.size(ub) not in (1, m):
-            raise ValueError("`ub` has the wrong dimension.")
-        ub = np.resize(ub, m)
-        if (lb > ub).any():
-            raise ValueError("lb[i] > ub[i].")
-        return (keyword, lb, ub)
-
-
-def _check_enforce_feasibility(enforce_feasibility, m):
-    if isinstance(enforce_feasibility, bool):
-        enforce_feasibility = np.full(m,
-                                      enforce_feasibility,
-                                      dtype=bool)
-    else:
-        enforce_feasibility = np.array(enforce_feasibility,
-                                       dtype=bool)
-
-        if enforce_feasibility.size != m:
-            raise ValueError("The parameter 'enforce_feasibility' "
-                             "has the wrong number of elements.")
-    return enforce_feasibility
-
-
-def _is_feasible(kind, enforce_feasibility, f0):
-    keyword = kind[0]
-    if keyword == "equals":
-        lb = np.asarray(kind[1], dtype=float)
-        ub = np.asarray(kind[1], dtype=float)
-    elif keyword == "greater":
-        lb = np.asarray(kind[1], dtype=float)
-        ub = np.full_like(lb, np.inf, dtype=float)
-    elif keyword == "less":
-        ub = np.asarray(kind[1], dtype=float)
-        lb = np.full_like(ub, -np.inf, dtype=float)
-    elif keyword == "interval":
-        lb = np.asarray(kind[1], dtype=float)
-        ub = np.asarray(kind[2], dtype=float)
-    else:
-        raise RuntimeError("Never be here.")
-
-    return ((lb[enforce_feasibility] <= f0[enforce_feasibility]).all()
-            and (f0[enforce_feasibility] <= ub[enforce_feasibility]).all())
-
 
 def _reinforce_box_constraint(kind, enforce_feasibility, x0,
                               relative_tolerance=0.01,
@@ -778,14 +687,6 @@ def _reinforce_box_constraint(kind, enforce_feasibility, x0,
                     x0_new[i] = min(x0_new[i], upper_bound)
         return x0_new
     
-
-
-__all__ = ['CanonicalConstraint',
-           'to_canonical',
-           'lagrangian_hessian',
-           'empty_canonical_constraint']
-
-
 class CanonicalConstraint:
     def __init__(self, n_vars, n_ineq, n_eq,
                  constr, jac, hess, sparse_jacobian,
@@ -846,42 +747,6 @@ def to_canonical(constraints):
 
     return constr
 
-
-def evaluated_to_canonical(constraints, list_c, list_J,
-                           n_vars, n_eq, n_ineq, sparse_jacobian):
-    n_constr = len(constraints)
-    new_list_c = []
-    new_list_J = []
-    for i in range(n_constr):
-        constr = constraints[i]
-        c = list_c[i]
-        J = list_J[i]
-        eq, ineq, val_eq, val_ineq, sign, fun_len \
-            = _parse_constraint(constr.kind)
-
-        new_list_c += [_convert_constr(c, n_vars, n_eq, n_ineq,
-                                       eq, ineq, val_eq, val_ineq,
-                                       sign)]
-
-        if constr.sparse_jacobian:
-            new_list_J += [_convert_sparse_jac(J, n_vars, n_eq, n_ineq,
-                                               eq, ineq, val_eq, val_ineq,
-                                               sign)]
-        else:
-            new_list_J += [_convert_dense_jac(J, n_vars, n_eq, n_ineq,
-                                              eq, ineq, val_eq, val_ineq,
-                                              sign)]
-
-    if sparse_jacobian:
-        c_ineq, c_eq = _concatenate_constr(new_list_c)
-        J_ineq, J_eq = _concatenate_sparse_jac(new_list_J)
-    else:
-        c_ineq, c_eq = _concatenate_constr(new_list_c)
-        J_ineq, J_eq = _concatenate_dense_jac(new_list_J)
-
-    return c_ineq, c_eq, J_ineq, J_eq
-
-
 def lagrangian_hessian(constraint, hess):
 
     # Concatenate Hessians
@@ -926,71 +791,6 @@ def empty_canonical_constraint(x0, n_vars, sparse_jacobian=None):
                                x0, empty_c, empty_c,
                                empty_J, empty_J)
 
-
-# ************************************************************ #
-# **********           Auxiliar Functions           ********** #
-# ************************************************************ #
-def _nonlinear_to_canonical(nonlinear):
-    # Parse constraints
-    eq, ineq, val_eq, val_ineq, sign, fun_len \
-        = _parse_constraint(nonlinear.kind)
-    # Get dimensions
-    n_eq = len(eq)
-    n_ineq = len(ineq)
-    n_vars = nonlinear.n
-
-    def new_constr(x):
-        c = nonlinear.fun(x)
-        return _convert_constr(c, n_vars, n_eq, n_ineq,
-                               eq, ineq, val_eq, val_ineq,
-                               sign)
-    c_ineq0, c_eq0 = _convert_constr(nonlinear.f0, n_vars, n_eq, n_ineq,
-                                     eq, ineq, val_eq, val_ineq,
-                                     sign)
-
-    if nonlinear.sparse_jacobian:
-        def new_jac(x):
-            J = nonlinear.jac(x)
-            return _convert_sparse_jac(J, n_vars, n_eq, n_ineq,
-                                       eq, ineq, val_eq, val_ineq,
-                                       sign)
-        J_ineq0, J_eq0 = _convert_sparse_jac(nonlinear.J0, n_vars, n_eq,
-                                             n_ineq, eq, ineq, val_eq,
-                                             val_ineq, sign)
-
-    else:
-        def new_jac(x):
-            J = nonlinear.jac(x)
-            return _convert_dense_jac(J, n_vars, n_eq, n_ineq,
-                                      eq, ineq, val_eq, val_ineq,
-                                      sign)
-        J_ineq0, J_eq0 = _convert_dense_jac(nonlinear.J0, n_vars, n_eq,
-                                            n_ineq, eq, ineq, val_eq,
-                                            val_ineq, sign)
-
-    if nonlinear.hess is None:
-        new_hess = None
-    else:
-        def new_hess(x, v_eq=np.empty(0), v_ineq=np.empty(0)):
-            hess = nonlinear.hess
-            v = np.zeros(fun_len)
-            if len(v_eq) > 0:
-                v[eq] += v_eq
-            if len(v_ineq) > 0:
-                v[ineq[sign == 1]] += v_ineq[sign == 1]
-                v[ineq[sign == -1]] -= v_ineq[sign == -1]
-            return hess(x, v)
-
-    if n_ineq == 0:
-        enforce_feasibility = np.empty(0, dtype=bool)
-    else:
-        enforce_feasibility = nonlinear.enforce_feasibility[ineq]
-
-    return CanonicalConstraint(n_vars, n_ineq, n_eq,
-                               new_constr, new_jac, new_hess,
-                               nonlinear.sparse_jacobian,
-                               enforce_feasibility, nonlinear.x0,
-                               c_ineq0, c_eq0, J_ineq0, J_eq0)
 
 
 def _linear_to_canonical(linear):
