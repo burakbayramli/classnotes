@@ -1406,48 +1406,14 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     f0 = fun(x0)
     g0 = np.atleast_1d(grad(x0))
 
-    # Define Gradient
-    if hess in ('2-point', '3-point', 'cs'):
-        # Need to memoize gradient wrapper in order
-        # to avoid repeated calls that occur
-        # when using finite differences.
-        @Memoize(x0, g0)
-        def grad_wrapped(x):
-            return np.atleast_1d(grad(x))
+    def grad_wrapped(x):
+        return np.atleast_1d(grad(x))
 
-    else:
-        def grad_wrapped(x):
-            return np.atleast_1d(grad(x))
+    H0 = hess(x0)
+    H0 = np.atleast_2d(np.asarray(H0))
+    def hess_wrapped(x):
+        return np.atleast_2d(np.asarray(hess(x)))
 
-    # Check Hessian
-    if callable(hess):
-        H0 = hess(x0)
-
-        if spc.issparse(H0):
-            H0 = spc.csr_matrix(H0)
-
-            def hess_wrapped(x):
-                return spc.csr_matrix(hess(x))
-
-        elif isinstance(H0, LinearOperator):
-            def hess_wrapped(x):
-                return hess(x)
-
-        else:
-            H0 = np.atleast_2d(np.asarray(H0))
-
-            def hess_wrapped(x):
-                return np.atleast_2d(np.asarray(hess(x)))
-
-    elif hess in ('2-point', '3-point', 'cs'):
-        approx_method = hess
-
-        def hess_wrapped(x):
-            return approx_derivative(grad_wrapped, x, approx_method,
-                                     as_linear_operator=True)
-
-    else:
-        hess_wrapped = hess
 
     # Put constraints in list format when needed
     constraints = [constraints]
