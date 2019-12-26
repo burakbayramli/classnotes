@@ -1212,48 +1212,6 @@ def _concatenate_canonical_constraints(constraints,
                                c_eq0, J_ineq0, J_eq0)
 
 
-def _concatenate_constr(constr_list):
-    c_ineq = np.hstack([constr[0] for constr in constr_list])
-    c_eq = np.hstack([constr[1] for constr in constr_list])
-    return c_ineq, c_eq
-
-
-def _concatenate_sparse_jac(jac_list):
-    jac_ineq_list = []
-    jac_eq_list = []
-    for jac_tuple in jac_list:
-        J_ineq, J_eq = jac_tuple
-        jac_ineq_list += [spc.csr_matrix(J_ineq)]
-        jac_eq_list += [spc.csr_matrix(J_eq)]
-    # Concatenate all
-    J_ineq = spc.vstack(jac_ineq_list, format="csr")
-    J_eq = spc.vstack(jac_eq_list, format="csr")
-    # Return
-    return J_ineq, J_eq
-
-
-def _concatenate_dense_jac(jac_list):
-    # Read sequentially all jacobians.
-    # Convert all values to numpy arrays.
-    jac_ineq_list = []
-    jac_eq_list = []
-    for jac_tuple in jac_list:
-        J_ineq, J_eq = jac_tuple
-        if spc.issparse(J_ineq):
-            jac_ineq_list += [J_ineq.toarray()]
-        else:
-            jac_ineq_list += [np.atleast_2d(J_ineq)]
-        if spc.issparse(J_eq):
-            jac_eq_list += [J_eq.toarray()]
-        else:
-            jac_eq_list += [np.atleast_2d(J_eq)]
-    # Concatenate all
-    J_ineq = np.vstack(jac_ineq_list)
-    J_eq = np.vstack(jac_eq_list)
-    # Return
-    return J_ineq, J_eq
-
-
 class Rosenbrock:
     def __init__(self, n=2, random_state=0):
         rng = np.random.RandomState(random_state)
@@ -1529,8 +1487,6 @@ def orthogonality(A, g):
     # Orthogonality measure
     orth = norm_A_g / (norm_A*norm_g)
     return orth
-
-
 
     # z = inv(A A.T) A x
     def least_squares(x):
