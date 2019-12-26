@@ -1618,27 +1618,7 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
             method = 'tr_interior_point'
 
     # Define stop criteria
-    if method == 'equality_constrained_sqp':
-        def stop_criteria(state):
-            if verbose >= 2:
-                sqp_printer.print_problem_iter(state.niter,
-                                               state.nfev,
-                                               state.cg_niter,
-                                               state.trust_radius,
-                                               state.penalty,
-                                               state.optimality,
-                                               state.constr_violation)
-            state.status = None
-            if (callback is not None) and callback(state):
-                state.status = 3
-            elif state.optimality < gtol and state.constr_violation < gtol:
-                state.status = 1
-            elif state.trust_radius < xtol:
-                state.status = 2
-            elif state.niter > max_iter:
-                state.status = 0
-            return state.status in (0, 1, 2, 3)
-    elif method == 'tr_interior_point':
+    if method == 'tr_interior_point':
         def stop_criteria(state):
             barrier_tol = options.get("barrier_tol", 1e-8)
             if verbose >= 2:
