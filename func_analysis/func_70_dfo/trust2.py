@@ -5,7 +5,6 @@ from __future__ import division, print_function, absolute_import
 from math import copysign
 import numpy as np
 from numpy.linalg import norm
-from scipy.sparse.linalg import LinearOperator
 from scipy.sparse import eye, bmat, issparse, csc_matrix, csr_matrix, coo_matrix, find
 from scipy.optimize._group_columns import group_dense, group_sparse
 import numpy as np
@@ -13,7 +12,6 @@ import scipy.sparse as spc
 import numpy as np
 from warnings import warn
 from copy import deepcopy
-from scipy.sparse.linalg import LinearOperator
 import scipy.sparse as spc
 import time
 from scipy.optimize import OptimizeResult
@@ -489,9 +487,9 @@ def projections(A, method=None, orth_tol=1e-12, max_refin=3, tol=1e-15):
     null_space, least_squares, row_space \
         = augmented_system_projections(A, m, n, orth_tol, max_refin, tol)
 
-    Z = LinearOperator((n, n), null_space)
-    LS = LinearOperator((m, n), least_squares)
-    Y = LinearOperator((n, m), row_space)
+    Z = spc.linalg.LinearOperator((n, n), null_space)
+    LS = spc.linalg.LinearOperator((m, n), least_squares)
+    Y = spc.linalg.LinearOperator((n, m), row_space)
 
     return Z, LS, Y
 
