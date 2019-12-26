@@ -577,9 +577,9 @@ def _parse_constraint(kind):
 def _convert_constr(c, n_vars, n_eq, n_ineq,
                     eq, ineq, val_eq, val_ineq,
                     sign):
-    # Empty constraint
+
     empty = np.empty((0,))
-    # Return equality and inequalit constraints
+
     c_eq = c[eq] - val_eq if n_eq > 0 else empty
     c_ineq = sign*(c[ineq] - val_ineq) if n_ineq > 0 else empty
     return c_ineq, c_eq
@@ -695,7 +695,7 @@ def box_intersections(z, d, lb, ub,
     d = np.asarray(d)
     lb = np.asarray(lb)
     ub = np.asarray(ub)
-    # Special case when d=0
+
     if np.linalg.norm(d) == 0:
         return 0, 0, False
 
@@ -709,26 +709,24 @@ def box_intersections(z, d, lb, ub,
     lb = lb[not_zero_d]
     ub = ub[not_zero_d]
 
-    # Find a series of intervals (t_lb[i], t_ub[i]).
+
     t_lb = (lb-z) / d
     t_ub = (ub-z) / d
-    # Get the intersection of all those intervals.
+
     ta = max(np.minimum(t_lb, t_ub))
     tb = min(np.maximum(t_lb, t_ub))
 
-    # Check if intersection is feasible
     if ta <= tb:
         intersect = True
     else:
         intersect = False
-    # Checks to see if intersection happens within vectors length.
+
     if not entire_line:
         if tb < 0 or ta > 1:
             intersect = False
             ta = 0
             tb = 0
         else:
-            # Restrict intersection interval between 0 and 1.
             ta = max(0, ta)
             tb = min(1, tb)
 
@@ -737,10 +735,10 @@ def box_intersections(z, d, lb, ub,
 def sphere_intersections(z, d, trust_radius,
                          entire_line=False):
 
-    # Special case when d=0
+
     if np.linalg.norm(d) == 0:
         return 0, 0, False
-    # Check for inf trust_radius
+
     if np.isinf(trust_radius):
         if entire_line:
             ta = -np.inf
@@ -768,16 +766,12 @@ def sphere_intersections(z, d, trust_radius,
     if entire_line:
         intersect = True
     else:
-        # Checks to see if intersection happens
-        # within vectors length.
         if tb < 0 or ta > 1:
             intersect = False
             ta = 0
             tb = 0
         else:
             intersect = True
-            # Restrict intersection interval
-            # between 0 and 1.
             ta = max(0, ta)
             tb = min(1, tb)
 
@@ -1407,40 +1401,27 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
     def hess_wrapped(x):
         return np.atleast_2d(np.asarray(hess(x)))
 
-
-    # Put constraints in list format when needed
     constraints = [constraints]
-    # Copy, evaluate and initialize constraints
     copied_constraints = [deepcopy(constr) for constr in constraints]
     for constr in copied_constraints:
         x0 = constr.evaluate_and_initialize(x0, sparse_jacobian)
-    # Concatenate constraints
     if len(copied_constraints) == 0:
         constr = empty_canonical_constraint(x0, n_vars, sparse_jacobian)
     else:
         constr = to_canonical(copied_constraints)
 
-    # Generate Lagrangian hess function
     lagr_hess = lagrangian_hessian(constr, hess_wrapped)
 
-    # Construct OptimizeResult
     state = OptimizeResult(niter=0, nfev=1, ngev=1,
                            ncev=1, njev=1, nhev=0,
                            cg_niter=0, cg_info={})
-    # Store values
     return_all = options.get("return_all", False)
     if return_all:
         state.allvecs = []
         state.allmult = []
 
-    # Choose appropriate method
-    if method is None:
-        if constr.n_ineq == 0:
-            method = 'equality_constrained_sqp'
-        else:
-            method = 'tr_interior_point'
+    method = 'tr_interior_point'
 
-    # Define stop criteria
     def stop_criteria(state):
         barrier_tol = options.get("barrier_tol", 1e-8)
         if verbose >= 2:
@@ -1463,12 +1444,7 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         elif state.niter > max_iter:
             state.status = 0
         return state.status in (0, 1, 2, 3)
-
-
-    if constr.n_ineq == 0:
-        warn("The problem only has equality constraints. "
-             "The solver 'equality_constrained_sqp' is a "
-             "better choice for those situations.")
+    
     result = tr_interior_point(
         fun, grad_wrapped, lagr_hess,
         n_vars, constr.n_ineq, constr.n_eq,
