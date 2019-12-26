@@ -24,6 +24,47 @@ relative_step = {"2-point": EPS**0.5,
                  "cs": EPS**0.5}
 
 
+
+
+
+class Rosenbrock:
+    def __init__(self, n=2, random_state=0):
+        rng = np.random.RandomState(random_state)
+        self.x0 = rng.uniform(-1, 1, n)
+        self.x_opt = np.ones(n)
+
+    def fun(self, x):
+        x = np.asarray(x)
+        r = np.sum(100.0 * (x[1:] - x[:-1]**2.0)**2.0 + (1 - x[:-1])**2.0,
+                   axis=0)
+        return r
+
+    def grad(self, x):
+        x = np.asarray(x)
+        xm = x[1:-1]
+        xm_m1 = x[:-2]
+        xm_p1 = x[2:]
+        der = np.zeros_like(x)
+        der[1:-1] = (200 * (xm - xm_m1**2) -
+                     400 * (xm_p1 - xm**2) * xm - 2 * (1 - xm))
+        der[0] = -400 * x[0] * (x[1] - x[0]**2) - 2 * (1 - x[0])
+        der[-1] = 200 * (x[-1] - x[-2]**2)
+        return der
+
+    def hess(self, x):
+        x = np.atleast_1d(x)
+        H = np.diag(-400 * x[:-1], 1) - np.diag(400 * x[:-1], -1)
+        diagonal = np.zeros(len(x), dtype=x.dtype)
+        diagonal[0] = 1200 * x[0]**2 - 400 * x[1] + 2
+        diagonal[-1] = 200
+        diagonal[1:-1] = 202 + 1200 * x[1:-1]**2 - 400 * x[2:]
+        H = H + np.diag(diagonal)
+        return H
+
+    @property
+    def constr(self):
+        return ()
+
 def _compute_absolute_step(rel_step, x0, method):
     if rel_step is None:
         rel_step = relative_step[method]
@@ -64,80 +105,6 @@ def group_columns(A, order=0):
     return groups
 
 
-def approx_derivative(fun, x0, method='3-point', rel_step=None, f0=None,
-                      bounds=(-np.inf, np.inf), sparsity=None,
-                      as_linear_operator=False, args=(), kwargs={}):
-    if method not in ['2-point', '3-point', 'cs']:
-        raise ValueError("Unknown method '%s'. " % method)
-
-    x0 = np.atleast_1d(x0)
-    if x0.ndim > 1:
-        raise ValueError("`x0` must have at most 1 dimension.")
-
-    lb, ub = _prepare_bounds(bounds, x0)
-
-    if lb.shape != x0.shape or ub.shape != x0.shape:
-        raise ValueError("Inconsistent shapes between bounds and `x0`.")
-
-    if as_linear_operator and not (np.all(np.isinf(lb))
-                                   and np.all(np.isinf(ub))):
-        raise ValueError("Bounds not supported when "
-                         "`as_linear_operator` is True.")
-
-    def fun_wrapped(x):
-        f = np.atleast_1d(fun(x, *args, **kwargs))
-        if f.ndim > 1:
-            raise RuntimeError("`fun` return value has "
-                               "more than 1 dimension.")
-        return f
-
-    if f0 is None:
-        f0 = fun_wrapped(x0)
-    else:
-        f0 = np.atleast_1d(f0)
-        if f0.ndim > 1:
-            raise ValueError("`f0` passed has more than 1 dimension.")
-
-    if np.any((x0 < lb) | (x0 > ub)):
-        raise ValueError("`x0` violates bound constraints.")
-
-    if as_linear_operator:
-        if rel_step is None:
-            rel_step = relative_step[method]
-
-        return _linear_operator_difference(fun_wrapped, x0,
-                                           f0, rel_step, method)
-    else:
-        h = _compute_absolute_step(rel_step, x0, method)
-
-        if method == '2-point':
-            h, use_one_sided = _adjust_scheme_to_bounds(
-                x0, h, 1, '1-sided', lb, ub)
-        elif method == '3-point':
-            h, use_one_sided = _adjust_scheme_to_bounds(
-                x0, h, 1, '2-sided', lb, ub)
-        elif method == 'cs':
-            use_one_sided = False
-
-        if sparsity is None:
-            return _dense_difference(fun_wrapped, x0, f0, h,
-                                     use_one_sided, method)
-        else:
-            if not issparse(sparsity) and len(sparsity) == 2:
-                structure, groups = sparsity
-            else:
-                structure = sparsity
-                groups = group_columns(sparsity)
-
-            if issparse(structure):
-                structure = csc_matrix(structure)
-            else:
-                structure = np.atleast_2d(structure)
-
-            groups = np.atleast_1d(groups)
-            return _sparse_difference(fun_wrapped, x0, f0, h,
-                                      use_one_sided, structure,
-                                      groups, method)
 
 
 def _linear_operator_difference(fun, x0, f0, h, method):
@@ -436,45 +403,6 @@ def _convert_dense_jac(J, n_vars, n_eq, n_ineq,
     # Return Jacobian matrices
     return J_ineq, J_eq
 
-
-
-class Rosenbrock:
-    def __init__(self, n=2, random_state=0):
-        rng = np.random.RandomState(random_state)
-        self.x0 = rng.uniform(-1, 1, n)
-        self.x_opt = np.ones(n)
-
-    def fun(self, x):
-        x = np.asarray(x)
-        r = np.sum(100.0 * (x[1:] - x[:-1]**2.0)**2.0 + (1 - x[:-1])**2.0,
-                   axis=0)
-        return r
-
-    def grad(self, x):
-        x = np.asarray(x)
-        xm = x[1:-1]
-        xm_m1 = x[:-2]
-        xm_p1 = x[2:]
-        der = np.zeros_like(x)
-        der[1:-1] = (200 * (xm - xm_m1**2) -
-                     400 * (xm_p1 - xm**2) * xm - 2 * (1 - xm))
-        der[0] = -400 * x[0] * (x[1] - x[0]**2) - 2 * (1 - x[0])
-        der[-1] = 200 * (x[-1] - x[-2]**2)
-        return der
-
-    def hess(self, x):
-        x = np.atleast_1d(x)
-        H = np.diag(-400 * x[:-1], 1) - np.diag(400 * x[:-1], -1)
-        diagonal = np.zeros(len(x), dtype=x.dtype)
-        diagonal[0] = 1200 * x[0]**2 - 400 * x[1] + 2
-        diagonal[-1] = 200
-        diagonal[1:-1] = 202 + 1200 * x[1:-1]**2 - 400 * x[2:]
-        H = H + np.diag(diagonal)
-        return H
-
-    @property
-    def constr(self):
-        return ()
 
 def default_scaling(x):
     n, = np.shape(x)
