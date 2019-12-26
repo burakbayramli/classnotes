@@ -1450,10 +1450,7 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
         hess_wrapped = hess
 
     # Put constraints in list format when needed
-    if isinstance(constraints, (NonlinearConstraint,
-                                LinearConstraint,
-                                BoxConstraint)):
-        constraints = [constraints]
+    constraints = [constraints]
     # Copy, evaluate and initialize constraints
     copied_constraints = [deepcopy(constr) for constr in constraints]
     for constr in copied_constraints:
