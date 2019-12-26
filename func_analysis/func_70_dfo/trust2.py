@@ -316,21 +316,6 @@ def minimize_constrained(fun, x0, grad, hess='2-point', constraints=(),
             x0, f0, g0, constr.c_eq0, constr.J_eq0,
             stop_criteria, state, **options)
 
-    elif method == 'tr_interior_point':
-        if constr.n_ineq == 0:
-            warn("The problem only has equality constraints. "
-                 "The solver 'equality_constrained_sqp' is a "
-                 "better choice for those situations.")
-        result = tr_interior_point(
-            fun, grad_wrapped, lagr_hess,
-            n_vars, constr.n_ineq, constr.n_eq,
-            constr.constr, constr.jac,
-            x0, f0, g0, constr.c_ineq0, constr.J_ineq0,
-            constr.c_eq0, constr.J_eq0, stop_criteria,
-            constr.enforce_feasibility,
-            xtol, state, **options)
-    else:
-        raise ValueError("Unknown optimization ``method``.")
 
     result.execution_time = time.time() - start_time
     result.method = method
