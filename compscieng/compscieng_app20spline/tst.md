@@ -106,9 +106,48 @@ def f(t):
 tmp = np.linspace(0,5,100)
 res = np.array([f(tt) for tt in tmp])
 plt.plot(res[:,0],res[:,1],'.')
-plt.savefig('out.png')
+plt.savefig('/tmp/out.png')
 ```
 
+
+
+```python
+rho = 7.0
+def sig(x,a):
+   return (x-a)*1/(1+np.exp(-rho*(x-a)))
+
+#def sig(x,a):
+#   return np.max([0,x-a])
+
+a1,b1,c1,d1 = (1, 2.4, 1, -3.5)
+a2,b2,c2,d2 = (1, 0.4, -0.1, 0.5)
+def f(t):
+    x = a1 + \
+        b1*sig(t,1) + \
+        c1*sig(t,2) + \
+        d1*sig(t,3) 
+	   
+    y = a2 + \
+        b2*sig(t,1) + \
+        c2*sig(t,2) + \
+        d2*sig(t,3) 
+    return x,y	   
+
+print (a1+b1*(5-1)+c1*(5-2)+d1*(5-3))
+print (a2+b2*(5-1)+c2*(5-2)+d2*(5-3))
+
+tmp = np.linspace(0,5,100)
+res = np.array([f(tt) for tt in tmp])
+plt.plot(res[:,0],res[:,1],'.')
+plt.xlim(0,ex)
+plt.ylim(0,ey)
+plt.savefig('/tmp/out.png')
+```
+
+```text
+6.6
+3.3
+```
 
 
 
