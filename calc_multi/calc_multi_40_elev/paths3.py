@@ -40,18 +40,18 @@ def find_path(ex,ey,a0,b0):
             x = sigx([t])	   
             y = sigy([t])
             s1 = 2.2; x1 = 2.0; y1 = 2.0
-            g1 = 10.0 * np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
-            return g1
+            g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
+            s2 = 1.2; x2 = 4.0; y2 = 1.0
+            g2 = np.exp( -4 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)
+            return g1*10.0 + g2*10.0
+         
         ts = np.linspace(0.0,5.0,100)
         dzs = np.array([util._approx_fprime_helper([t],gfunc)[0] for t in ts])
         tmp = np.sqrt(1.0+(dzs**2.0))
         Iv = trapz(tmp, 5./100)
         dxs = np.array([util._approx_fprime_helper([t],sigx)[0] for t in ts])
         dys = np.array([util._approx_fprime_helper([t],sigy)[0] for t in ts])
-        #print (dxs)
-        #print (dys)        
         tmp = np.power(dxs,2) + np.power(dys,2)
-        #print (tmp)
         tmp = tmp[tmp>0.0]
         tmp = np.sqrt(tmp)
         #print (tmp)
@@ -66,7 +66,7 @@ def find_path(ex,ey,a0,b0):
     b1,b2,b3 = 0.1,0.1,0.1
     x0 = a1,a2,a3,b1,b2,b3
 
-    opts = {'maxiter': 300, 'verbose': 0}
+    opts = {'maxiter': 50, 'verbose': 0}
     
     def con1(x):
         aa1,aa2,aa3,bb1,bb2,bb3 = x
@@ -93,7 +93,7 @@ def find_path(ex,ey,a0,b0):
     return res
 
 a0,b0=(1.0,1.0)
-ex,ey=(4.0,1.0)
+ex,ey=(4.0,2.0)
 res = find_path(ex,ey,a0,b0)
 print  ('res',res)
 print  ('res',res['x'])
