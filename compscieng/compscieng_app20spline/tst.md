@@ -8,41 +8,41 @@ def constraint(x):
 
 cons = [{'type':'eq', 'fun': constraint}]
 
-minimize(rosen, [2500, 2500], method='trust-constr', 
-         bounds=Bounds([0,0],[5000, 5000]), constraints=cons)
+minimize(rosen, [0, 0], method='trust-constr', 
+         bounds=Bounds([-2,-2],[2, 2]), constraints=cons)
 ```
 
 ```text
 Out[1]: 
- barrier_parameter: 3.200000000000001e-05
- barrier_tolerance: 3.200000000000001e-05
-          cg_niter: 61
+ barrier_parameter: 2.560000000000001e-07
+ barrier_tolerance: 2.560000000000001e-07
+          cg_niter: 11
       cg_stop_cond: 1
-            constr: [array([0.]), array([0.61879559, 0.38120441])]
-       constr_nfev: [186, 0]
+            constr: [array([0.]), array([0.61879562, 0.38120438])]
+       constr_nfev: [36, 0]
        constr_nhev: [0, 0]
        constr_njev: [0, 0]
     constr_penalty: 1.0
   constr_violation: 0.0
-    execution_time: 0.7218673229217529
-               fun: 0.14560701802880296
-              grad: array([-0.34074346, -0.34071124])
+    execution_time: 0.15960264205932617
+               fun: 0.14560701802826012
+              grad: array([-0.34072562, -0.34072558])
                jac: [array([[1., 1.]]), array([[1., 0.],
        [0., 1.]])]
-   lagrangian_grad: array([ 1.28699234e-09, -1.28699222e-09])
+   lagrangian_grad: array([-6.68706079e-10,  6.68705970e-10])
            message: '`gtol` termination condition is satisfied.'
             method: 'tr_interior_point'
-              nfev: 186
+              nfev: 36
               nhev: 0
-               nit: 67
-             niter: 67
+               nit: 20
+             niter: 20
               njev: 0
-        optimality: 1.2869923406746671e-09
+        optimality: 6.687060790177414e-10
             status: 1
            success: True
-         tr_radius: 33490655.10320416
-                 v: [array([0.34079517]), array([-5.17103221e-05, -8.39292065e-05])]
-                 x: array([0.61879559, 0.38120441])
+         tr_radius: 1236718.7182473193
+                 v: [array([0.34072553]), array([8.80386589e-08, 5.02605228e-08])]
+                 x: array([0.61879562, 0.38120438])
 ```
 
 
