@@ -2,7 +2,6 @@ from scipy.optimize import minimize, Bounds, SR1, BFGS
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from scipy.spatial.distance import cdist
 from matplotlib import cm
 import util
 
@@ -54,7 +53,6 @@ def find_path(ex,ey,a0,b0):
         tmp = np.power(dxs,2) + np.power(dys,2)
         tmp = tmp[tmp>0.0]
         tmp = np.sqrt(tmp)
-        #print (tmp)
         Ih = trapz(tmp, 5./100)
         res = Iv*5.0 + Ih*1.0
         print (res)
@@ -62,23 +60,22 @@ def find_path(ex,ey,a0,b0):
     
     LIM = 2.0
 
-    a1,a2,a3 = 0.1,0.1,0.1
-    b1,b2,b3 = 0.1,0.1,0.1
+    a1,a2,a3,b1,b2,b3 = 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
     x0 = a1,a2,a3,b1,b2,b3
 
     opts = {'maxiter': 50, 'verbose': 0}
     
-    def con1(x):
+    def conx(x):
         aa1,aa2,aa3,bb1,bb2,bb3 = x
         a = a0+aa1*(5.0-1.0)+aa2*(5.0-2.0)+aa3*(5.0-3.0)-ex
         return a
     
-    def con2(x):
+    def cony(x):
         aa1,aa2,aa3,bb1,bb2,bb3 = x
         b = b0+bb1*(5.0-1.0)+bb2*(5.0-2.0)+bb3*(5.0-3.0)-ey
         return b
     
-    cons = [{'type':'eq', 'fun': con1}, {'type':'eq', 'fun': con2}]
+    cons = [{'type':'eq', 'fun': conx}, {'type':'eq', 'fun': cony}]
     
     res = minimize (fun=calc_int,
                     x0=x0,

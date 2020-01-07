@@ -223,6 +223,109 @@ Warnings:
 diðerlerine göre daha yüksek olduðunu görüyoruz. Grafiðe bakýlýnca bu
 mantýklý gözüküyor.
 
+
+Alternatif Ýlmik Ýfadeleri
+
+Bazen sayýsal hesaplarda üstte gördüðümüz $u_+$ ifadesinin $\max(0,x-a)$
+ile formülize edildiðini görüyoruz. Yani, 
+
+$$
+y = \beta_0 + \beta_1 x + \beta_{2}(x-a)_+ +  \beta_{3}(x-b)_+ + ...
+$$
+
+yerine
+
+$$
+y = \beta_0 + \beta_1 x + \beta_{2}\max(0,x-a) +  \beta_{3}\max(0,x-b) + ...
+$$
+
+ki $a,b$ ilmik noktalarý. Bu kullaným da ayný sonuç veriyor, düþünürsek
+$\max$ ifadesi $x$ deðeri $a$ deðerini geçinceye kadar 0, ondan sonra $x-a$
+verecek, bu da $u_+$ gibi bir kullaným ile ayný.
+
+Mesela
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a,b,c,d = (1, -1.4, 2, 2.5)
+x = np.linspace(0,5,100)
+knots = [2,3,4]
+def f(x):
+    return a + \
+           b*np.max([0,x-knots[0]]) + \
+           c*np.max([0,x-knots[1]]) + \
+           d*np.max([0,x-knots[2]])
+	   
+    
+y = np.array([f(xx) for xx in x])
+plt.plot(x,y,'.')
+plt.savefig('compscieng_app20_10.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app20_10.png}
+
+Rasgele bazý aðýrlýklarla $x=2,3,4$ noktalarýnda aktif olan ilmiklerle
+üstteki grafiði çýkarttýk. Regresyon baðlamýnda bir optimizasyon rutinine
+(illa lineer regresyon olmasý gerekmez) veriye bakarak bir hatanýn minimize
+edilmesi üzerinden en optimal $a,b,c,d$ aðýrlýklarýný buldurmak ta
+mümkündür. 
+
+Peki $\max$ yerine baska bir fonksiyon kullanabilir miydik? $\max$'in
+sonucta yaptigi belli bir esik degerinden once 0 sonrasinda baska bir deger
+vermek degil midir? Evet. Bu tur bir ``karar'' fonksiyonu sigmoid ile de
+elde edilebilir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+alpha = 5.0
+def sig(x,a):
+   return 1/(1+np.exp(-alpha*(x-a)))
+x = np.linspace(-5,5,100)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y = sig(x,0)
+plt.plot(x,y)
+plt.savefig('compscieng_app20_11.png')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y = sig(x,3)
+plt.plot(x,y)
+plt.savefig('compscieng_app20_12.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app20_11.png}
+\includegraphics[width=20em]{compscieng_app20_12.png}
+
+Normal sigmoid üst soldaki, fakat $x-a$ ile onu da istediðimiz noktaya
+kaydýrabiliyoruz. $\alpha$ parametresi 0'dan 1'e geçiþin ne kadar sert
+olduðunu kontrol ediyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+rho = 7.0
+def sig2(x,a):
+   return (x-a)*1/(1+np.exp(-rho*(x-a)))
+
+a,b,c,d = (1, -1.4, 2, 2.5)
+x = np.linspace(0,5,100)
+knots = [2,3,4]
+def f(x):
+    return a + \
+           b*sig2(x,knots[0]) + \
+           c*sig2(x,knots[1]) + \
+           d*sig2(x,knots[2])
+	       
+y = np.array([f(xx) for xx in x])
+plt.plot(x,y)
+plt.savefig('compscieng_app20_13.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app20_13.png}
+
+Daha yumuþak, pürüzsüz bir fonksiyon elde etmiþ olduk. Bu birleþik eðrinin
+türevini almak ta daha kolay olacaktýr. Gerçi otomatik türev paketleri
+artýk içinde $\max$ bile olan ifadelerin türevini alabiliyor, fakat
+üsttekinin sembolik türevi rahatça alýnabilir, bu seçeneðin elde olmasý iyidir.
+
 Küpsel Spline Eðrileri (Cubic Splines)
 
 Baz seçerken elimizde pek çok seçenek var, mesela küpsel spline eðrileri
