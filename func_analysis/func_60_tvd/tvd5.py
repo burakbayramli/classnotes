@@ -1,11 +1,11 @@
+import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.sparse import spdiags
 import numpy as np
 
-f = 'xcor.mat'
-import scipy.io as sio
-xcor = sio.loadmat(f)
-xcor = xcor['xcor']
+df = pd.read_csv('xcor.csv',header=None)
+xcor = np.reshape(np.array(df[0]), (5000,1))
+print(xcor)
 MU = 50.0
 EPSILON = 0.001
 

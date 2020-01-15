@@ -1,4 +1,22 @@
 
+```python
+import pandas as pd
+df = pd.read_csv('xcor.csv',header=None)
+xcor = np.array(df[0])
+print (xcor)
+```
+
+```text
+[0.98918588 0.95836039 1.00313331 ... 0.1637913  0.22679871 0.23063306]
+```
+
+
+
+
+
+
+
+
 
 ```python
 from scipy.sparse import spdiags
