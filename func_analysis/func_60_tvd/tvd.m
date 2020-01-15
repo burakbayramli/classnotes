@@ -16,10 +16,10 @@ newt_dec = [];
 
 for iter = 1:MAXITERS
   d = (D*x);
-  disp (d);
-  exit;
   val = (x-xcor)'*(x-xcor) + ...
 	MU*sum(sqrt(EPSILON^2+d.^2)-EPSILON*ones(n-1,1));
+  disp(val);
+  quit();
   grad = 2*(x - xcor) + ...
 	 MU*D'*(d./sqrt(EPSILON^2+d.^2));
   hess = 2*speye(n) + ...
