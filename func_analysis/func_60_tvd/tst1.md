@@ -4,61 +4,46 @@ f = 'xcor.mat'
 import scipy.io as sio
 xcor = sio.loadmat(f)
 xcor = test['xcor']
+xcor = np.reshape(xcor,(len(xcor)))
 print (xcor.shape)
 plt.plot(range(len(xcor)), xcor)
 plt.savefig('/tmp/out.png')
 ```
 
 ```text
-(5000, 1)
+(5000,)
 ```
 
 ```python
 eps = 1e-6
-print (eps)
+mu = 50.0
+
 def phi_tv(x):
    return np.sum(np.abs(np.diff(x)))
    
 def phi_atv(x):
    return np.sum(np.sqrt(eps + np.power(np.diff(x),2)) - eps)
    
-print (phi_tv(np.reshape(xcor,(len(xcor)))))
-print (phi_atv(np.reshape(xcor,(len(xcor)))))
+print (phi_tv(xcor))
+print (phi_atv(xcor))
 ```
 
 ```text
-1e-06
 155.63025715999999
 155.8936302273509
 ```
 
+```python
+def f(u):
+   return np.sum(np.power(u-xcor, 2)) + phi_atv(u)
 
+u0 = np.ones(len(xcor))
+print (f(u0))
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```text
+5585.878953812943
+```
 
 
 
