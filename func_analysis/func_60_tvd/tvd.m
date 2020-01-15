@@ -3,6 +3,8 @@
 % problem data
 approx_tv_denoising_data;
 D = spdiags([-1*ones(n,1) ones(n,1)], 0:1, n-1, n);
+size(D)
+
 % Newton method
 ALPHA = 0.01;
 BETA = 0.5;
@@ -14,6 +16,8 @@ newt_dec = [];
 
 for iter = 1:MAXITERS
   d = (D*x);
+  disp (d);
+  exit;
   val = (x-xcor)'*(x-xcor) + ...
 	MU*sum(sqrt(EPSILON^2+d.^2)-EPSILON*ones(n-1,1));
   grad = 2*(x - xcor) + ...

@@ -1,4 +1,39 @@
 
+
+```python
+from scipy.sparse import spdiags
+data = np.array([[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]])
+diags = np.array([0, -1, 2])
+spdiags(data, diags, 4, 4).toarray()
+```
+
+```text
+Out[1]: 
+array([[1, 0, 3, 0],
+       [1, 2, 0, 4],
+       [0, 2, 3, 0],
+       [0, 0, 3, 4]])
+```
+
+```python
+data = np.array([[-1, -1, -1, -1], [1, 1, 1, 1]])
+diags = np.array([0, 1])
+spdiags(data, diags, 4, 4).toarray()
+```
+
+```text
+Out[1]: 
+array([[-1,  1,  0,  0],
+       [ 0, -1,  1,  0],
+       [ 0,  0, -1,  1],
+       [ 0,  0,  0, -1]])
+```
+
+
+
+
+
+
 ```python
 f = 'xcor.mat'
 import scipy.io as sio
