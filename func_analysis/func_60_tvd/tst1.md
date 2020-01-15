@@ -1,7 +1,65 @@
 
-save ("xcor.mat", "xcor", "-v7")
+```python
+f = 'xcor.mat'
+import scipy.io as sio
+xcor = sio.loadmat(f)
+xcor = test['xcor']
+print (xcor.shape)
+plt.plot(range(len(xcor)), xcor)
+plt.savefig('/tmp/out.png')
+```
 
-https://github.com/lucasrodes/kPCA-denoising-python
+```text
+(5000, 1)
+```
+
+```python
+eps = 1e-6
+print (eps)
+def phi_tv(x):
+   return np.sum(np.abs(np.diff(x)))
+   
+def phi_atv(x):
+   return np.sum(np.sqrt(eps + np.power(np.diff(x),2)) - eps)
+   
+print (phi_tv(np.reshape(xcor,(len(xcor)))))
+print (phi_atv(np.reshape(xcor,(len(xcor)))))
+```
+
+```text
+1e-06
+155.63025715999999
+155.8936302273509
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 n=5000;
