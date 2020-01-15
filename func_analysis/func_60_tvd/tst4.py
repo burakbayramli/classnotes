@@ -1,6 +1,6 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+
+import numpy as np
 
 f = 'xcor.mat'
 import scipy.io as sio
@@ -27,15 +27,15 @@ def opt():
 
    from scipy.optimize import minimize, Bounds, SR1, BFGS
 
-   #opts = {'maxiter': 45, 'verbose': 2}
-   opts = {'maxiter': 200, 'disp': True}
+   opts = {'maxiter': 400, 'verbose': 2}
+   #opts = {'maxiter': 200, 'disp': True}
 
    res = minimize (fun=f,
                    x0=u0,
                    options=opts,
                    jac='2-point',
-                   #hess=SR1(),
-                   method='TNC'
+                   hess=BFGS(),
+                   method='trust-constr'
                    )
 
    print (res)
