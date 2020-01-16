@@ -2,6 +2,11 @@
 %
 % problem data
 approx_tv_denoising_data;
+
+xcor = xcor(1:4);
+disp(xcor)
+n = 4
+
 D = spdiags([-1*ones(n,1) ones(n,1)], 0:1, n-1, n);
 size(D)
 
@@ -18,10 +23,16 @@ for iter = 1:MAXITERS
   d = (D*x);
   val = (x-xcor)'*(x-xcor) + ...
 	MU*sum(sqrt(EPSILON^2+d.^2)-EPSILON*ones(n-1,1));
-  disp(val);
-  quit();
+
   grad = 2*(x - xcor) + ...
 	 MU*D'*(d./sqrt(EPSILON^2+d.^2));
+  grad
+
+  'dddd'
+  full(D)
+  full(D'*spdiags(EPSILON^2*(EPSILON^2+d.^2).^(-3/2),0,n-1,n-1))
+  full(D'*spdiags(EPSILON^2*(EPSILON^2+d.^2).^(-3/2),0,n-1,n-1)*D)
+  quit();
   hess = 2*speye(n) + ...
 	 MU*D'*spdiags(EPSILON^2*(EPSILON^2+d.^2).^(-3/2),0,n-1,n-1)*D;
   v = -hess\grad;
@@ -36,8 +47,8 @@ end;
 x = x+t*v;
 end;
 
-save ("/tmp/xcor.mat", "xcor", "-v7")
-save ("/tmp/x.mat", "x", "-v7")
+%save ("/tmp/xcor.mat", "xcor", "-v7")
+%save ("/tmp/x.mat", "x", "-v7")
 %x
 %xcor
 

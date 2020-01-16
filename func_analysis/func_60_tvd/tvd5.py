@@ -1,10 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.sparse import spdiags
+import scipy.sparse as sps
 import numpy as np
+import scipy.sparse.linalg as slin
 
 df = pd.read_csv('xcor.csv',header=None)
 xcor = np.reshape(np.array(df[0]), (5000,1))
+xcor = xcor[:4]
 print(xcor)
 MU = 50.0
 EPSILON = 0.001
@@ -17,7 +19,7 @@ NTTOL = 1e-10;
 n = len(xcor)
 data = np.array([-1*np.ones(n), np.ones(n)])
 diags = np.array([0, 1])
-D = spdiags(data, diags, n-1, n).toarray()
+D = sps.spdiags(data, diags, n-1, n)
 
 x = np.zeros((len(xcor),1))
 
@@ -28,5 +30,21 @@ for iter in range(MAXITERS):
    tmp22 = EPSILON*np.ones((n-1,1))
    tmp2 = np.float(tmp1 + MU*np.sum(tmp21 - tmp22))
    print (tmp2)
+   tmp1 = 2*(x-xcor)
+   tmp2 = MU*D.T.dot(d / np.sqrt(EPSILON**2 + d**2))
+   grad = tmp1 + tmp2
+   print ('grad',grad)
+   tmp1 = 2*sps.eye(n)
+   tmp2 = EPSILON**2*(EPSILON**2+d**2)**(-3/2)
+   tmp2 = tmp2.reshape((n-1))
+   tmp3 = sps.spdiags(tmp2, 0, n-1, n-1)
+
+   print ('D',D.todense())
+   hess = tmp3.dot(D).T.dot(D)
+   print ('hess',hess.todense())
+
+   
+   #v = slin.spsolve(-hess, grad)
+   #print (v)
 
    exit()

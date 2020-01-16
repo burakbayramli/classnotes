@@ -136,8 +136,9 @@ print (x.shape)
 ```
 
 ```python
-plt.plot(range(len(x)), xcor)
-plt.plot(range(len(x)), x)
+#plt.plot(range(len(x)), xcor)
+#plt.plot(range(len(x)), x)
+plt.plot(range(5000), xcor)
 plt.savefig('/tmp/out.png')
 ```
 
