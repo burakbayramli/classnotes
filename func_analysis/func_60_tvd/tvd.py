@@ -1,13 +1,9 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import scipy.sparse as sps
-import numpy as np
 import scipy.sparse.linalg as slin
 
 df = pd.read_csv('xcor.csv',header=None)
 xcor = np.reshape(np.array(df[0]), (5000,1))
-#xcor = xcor[:4]
-#print(xcor)
 MU = 50.0
 EPSILON = 0.001
 
