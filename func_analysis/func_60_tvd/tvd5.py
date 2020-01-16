@@ -40,11 +40,12 @@ for iter in range(MAXITERS):
    tmp3 = sps.spdiags(tmp2, 0, n-1, n-1)
 
    print ('D',D.todense())
-   hess = tmp3.dot(D).T.dot(D)
-   print ('hess',hess.todense())
+   hess = tmp1 + MU*tmp3.dot(D).T.dot(D)
+   v = slin.spsolve(-hess, grad)
+   lambdasqr = np.float(np.dot(-grad.T,v))
+   if lambdasqr/2 < NTTOL: break
+   t = 1;
+
 
    
-   #v = slin.spsolve(-hess, grad)
-   #print (v)
-
    exit()

@@ -26,17 +26,14 @@ for iter = 1:MAXITERS
 
   grad = 2*(x - xcor) + ...
 	 MU*D'*(d./sqrt(EPSILON^2+d.^2));
-  grad
 
-  'dddd'
-  full(D)
-  full(D'*spdiags(EPSILON^2*(EPSILON^2+d.^2).^(-3/2),0,n-1,n-1))
-  full(D'*spdiags(EPSILON^2*(EPSILON^2+d.^2).^(-3/2),0,n-1,n-1)*D)
-  quit();
   hess = 2*speye(n) + ...
 	 MU*D'*spdiags(EPSILON^2*(EPSILON^2+d.^2).^(-3/2),0,n-1,n-1)*D;
   v = -hess\grad;
-  lambdasqr = -grad'*v; newt_dec = [newt_dec sqrt(lambdasqr)];
+  lambdasqr = -grad'*v;
+  lambdasqr
+  newt_dec = [newt_dec sqrt(lambdasqr)];
+  quit()
   if (lambdasqr/2) < NTTOL, break; end;
   t = 1;
   while ((x+t*v-xcor)'*(x+t*v-xcor) + ...
