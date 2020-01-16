@@ -45,6 +45,7 @@ for iter in range(MAXITERS):
    lambdasqr = np.float(np.dot(-grad.T,v))
    if lambdasqr/2 < NTTOL: break
    t = 1;
+   #while ((x+t*v-xcor)'*(x+t*v-xcor) + ...
 
 
    
