@@ -15,10 +15,11 @@ bunun için bir tür düzenlileþtirme / regülarizasyon (regülarization)
 kullanýlmasý þarttýr [3].  
 
 Görüntüden gürültü çýkartma alanýnda iyi bilinen bir yöntem problemi iki
-hedefli bir halde konumlandýrmak, 
+hedefli bir halde konumlandýrmak [4], 
 
 $$
-|| x-x_{cor}||_2, \qquad \phi_{tv} (x) = \sum_{i=1}^{n-1} | x_{i+1} - x_i |
+|| x-x_{cor}||_2, \qquad \phi_{tv} (x) = \sum_{i=1}^{n-1} | x_{i+1} - x_i | 
+\mlabel{1}
 $$
 
 Burada $x_{cor} \in \mathbb{R}^n$ bize verilen bozulmuþ sinyal,
@@ -35,24 +36,22 @@ $$
 || x-x_{cor}||_2 + \mu \phi_{tv} 
 $$
 
-ki $\mu$ bizim sececegimiz bir parametre olabilir. Cozum icin mesela Newton
+ki $\mu$ bizim seçeceðimiz bir parametre olabilir. Çözüm için mesela Newton
 metodunu kullanabiliriz, fakat tek bir problem var, Newton ve pek çok diðer
 optimizasyon metotu için türev almak gerekli, fakat $\phi_{tv}$'deki
-L1-norm'un (tek boyutta mutlak deðer fonksiyonu) $x=0$'da türevi yoktur. Bu
-durumda
+L1-norm'unun (tek boyutta mutlak deðer fonksiyonu) $x=0$'da türevi yoktur
+(birinci terimdeki Oklit normunun karesi alýndýðý için onun iki kere türevi
+alýnabilir). Bu durumda $\phi_{tv}$'yi yaklaþýk olarak temsil edebilirsek,
+onun da türevi alýnýr hale gelmesi saðlayabiliriz. Bu yeni fonksiyona
+$\phi_{atv}$ diyelim,
 
+$$
+\phi_{atv} = \sum _{i=1}^{n-1} 
+\left( \sqrt{ \epsilon^2 + (x_{i+1})-x_i  } - \epsilon \right)
+$$
 
-Tam varyasyon (total variation)
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-df = pd.read_csv('xcor.csv',header=None)
-xcor = np.reshape(np.array(df[0]), (5000,1))
-plt.plot(range(len(xcor)), xcor)
-plt.savefig('func_60_tvd_01.png')
-\end{minted}
-
-\includegraphics[width=25em]{func_60_tvd_01.png}
+ki $\epsilon > 0$ yaklaþýklamanýn seviyesini ayarlýyor. Bu fonksiyonun iyi
+bir yaklaþýklama olduðunu görmek zor deðil, tabii deneyerek görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy as np
@@ -69,15 +68,32 @@ def phi_atv(x):
 def f(u):
    return np.sum(np.power(u-xcor, 2)) + mu*phi_atv(u)
 
-print (phi_tv(xcor[:,0]))
-print (phi_atv(xcor[:,0]))
+xcor = np.random.randn(1000)
+
+print (phi_tv(xcor))
+print (phi_atv(xcor))
 \end{minted}
 
 \begin{verbatim}
-155.63025715999999
-155.8936302273509
+1037.4372101629049
+1037.438996069622
 \end{verbatim}
 
+Buradan analitik olarak devam etmeden önce sayýsal olarak bir çözüme
+bakalým. Üstteki fonksiyonlarý olduðu gibi kodlayarak sayýsal türev
+alabilen bir kütüphane çaðrýsýyla hedefi minimize edelim, eldeki sinyal,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('xcor.csv',header=None)
+xcor = np.reshape(np.array(df[0]), (5000,1))
+plt.plot(range(len(xcor)), xcor)
+plt.savefig('func_60_tvd_01.png')
+\end{minted}
+
+\includegraphics[width=25em]{func_60_tvd_01.png}
+
+Kütüphane çaðrýsý ile
 
 \begin{minted}[fontsize=\footnotesize]{python}
 u0 = np.zeros(len(xcor))
@@ -96,18 +112,24 @@ res = minimize (fun=f,
                 )
 
 plt.plot(range(5000), res.x)
-plt.savefig('')
+plt.savefig('func_60_tvd_02.png')
 \end{minted}
 
 \includegraphics[width=25em]{func_60_tvd_02.png}
+
+Sonuç fena olmadý. Fakat üstteki yaklaþýmýn hesabý uzun sürecektir, eðer
+eldeki problem hakkýnda bazý ek þeyler biliyorsak, bu bilgileri dahil
+ederek elde edilen çözüm daha hýzlý olabilir. Mesela analitik olarak
+türevler Jacobian ve Hessian bulunabilir, ayrýca problemdeki matrislerde
+muhtemel bir seyreklikten (sparsity) faydalanýlabilir.
+
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
 import scipy.sparse as sps
 import scipy.sparse.linalg as slin
 
-df = pd.read_csv('xcor.csv',header=None)
-xcor = np.reshape(np.array(df[0]), (5000,1))
 MU = 50.0
 EPSILON = 0.001
 
@@ -151,10 +173,7 @@ for iter in range(MAXITERS):
       t = BETA*t
 
    x = x+t*v
-\end{minted}
 
-
-\begin{minted}[fontsize=\footnotesize]{python}
 plt.plot(range(n),xcor)
 plt.plot(range(n),x,'r')
 plt.savefig('func_60_tvd_03.png')
@@ -172,6 +191,9 @@ Kaynaklar
 
 [3] Afonso, {\em Fast Image Recovery Using Variable Splitting and Constrained Optimization},
     \url{http://www.lx.it.pt/~mtf/Afonso_BioucasDias_Figueiredo_twocolumn_v7.pdf}
+
+[4] Boyd, {\em Additional Exercises for Convex Optimization}
+    \url{https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf}
 
 \end{document}
 
