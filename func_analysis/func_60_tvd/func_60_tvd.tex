@@ -2,12 +2,52 @@
 \begin{document}
 Tam Varyasyon ile Gürültü Çýkartmak (Total Variation Denoising)
 
+Bir sinyalden, görüntüden gürültü çýkartmak için optimizasyon
+kullanýlabilir. Orijinal sinyal $x$'in $y = B x + n$ ile bir $n$ gürültüsü
+eklenerek bozulduðu (corrupted) farzedilebilir ($B$ bir deðiþim matrisidir,
+tutarlý, bilinen deðiþimleri temsil eder) biz eldeki $y$ ile $x$'i
+kestirmeye uðraþýrýz. 
+
+Literatürde iyi bilindiði üzere $x$'i $y$'den tahmin etmeye uðraþmak kötü
+konumlanmýþ (ill-posed) bir sorudur. Çözüm olabilecek pek çok $x$
+bulunabilir, bu sebeple arama alanýný bir þekilde daraltmak gerekir, ve
+bunun için bir tür düzenlileþtirme / regülarizasyon (regülarization)
+kullanýlmasý þarttýr [3].  
+
+Görüntüden gürültü çýkartma alanýnda iyi bilinen bir yöntem problemi iki
+hedefli bir halde konumlandýrmak, 
+
+$$
+|| x-x_{cor}||_2, \qquad \phi_{tv} (x) = \sum_{i=1}^{n-1} | x_{i+1} - x_i |
+$$
+
+Burada $x_{cor} \in \mathbb{R}^n$ bize verilen bozulmuþ sinyal,
+$x \in \mathbb{R}^n$ ise bizim bulmak istediðimiz, gürültüsü çýkartýlmýþ
+sinyal, $\phi_{tv}$ ise tam varyasyon fonksiyonu. Ustteki iki hedefi
+minimize etmek istiyoruz, boylece ayni anda hem sinyalin kendi icindeki
+varyasyonu azaltan hem de bozulmus sinyale mumkun oldugunca yakin duran bir
+gercek $x$ elde edebilelim.
+
+Her iki hedef fonksiyonunu birlestirip tek bir fonksiyon haline getirip onu
+kisitlanmamis (unconstrained) bir optimizasyon problemi olarak cozebiliriz,
+
+$$
+|| x-x_{cor}||_2 + \mu \phi_{tv} 
+$$
+
+ki $\mu$ bizim sececegimiz bir parametre olabilir. Cozum icin mesela Newton
+metodunu kullanabiliriz, fakat tek bir problem var, Newton ve pek çok diðer
+optimizasyon metotu için türev almak gerekli, fakat $\phi_{tv}$'deki
+L1-norm'un (tek boyutta mutlak deðer fonksiyonu) $x=0$'da türevi yoktur. Bu
+durumda
+
+
+Tam varyasyon (total variation)
+
 \begin{minted}[fontsize=\footnotesize]{python}
-f = 'xcor.mat'
-import scipy.io as sio
-xcor = sio.loadmat(f)
-xcor = xcor['xcor']
-xcor = np.reshape(xcor,(len(xcor)))
+import pandas as pd
+df = pd.read_csv('xcor.csv',header=None)
+xcor = np.reshape(np.array(df[0]), (5000,1))
 plt.plot(range(len(xcor)), xcor)
 plt.savefig('func_60_tvd_01.png')
 \end{minted}
@@ -29,8 +69,8 @@ def phi_atv(x):
 def f(u):
    return np.sum(np.power(u-xcor, 2)) + mu*phi_atv(u)
 
-print (phi_tv(xcor))
-print (phi_atv(xcor))
+print (phi_tv(xcor[:,0]))
+print (phi_atv(xcor[:,0]))
 \end{minted}
 
 \begin{verbatim}
@@ -129,6 +169,9 @@ Kaynaklar
 
 [2] {\em An introduction to continuous optimization for imaging}, 
     \url{https://hal.archives-ouvertes.fr/hal-01346507/document}
+
+[3] Afonso, {\em Fast Image Recovery Using Variable Splitting and Constrained Optimization},
+    \url{http://www.lx.it.pt/~mtf/Afonso_BioucasDias_Figueiredo_twocolumn_v7.pdf}
 
 \end{document}
 
