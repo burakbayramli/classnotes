@@ -3,12 +3,11 @@
 % problem data
 approx_tv_denoising_data;
 
-xcor = xcor(1:4);
-disp(xcor)
-n = 4
+%xcor = xcor(1:4);
+%disp(xcor)
+%n = 4
 
 D = spdiags([-1*ones(n,1) ones(n,1)], 0:1, n-1, n);
-size(D)
 
 % Newton method
 ALPHA = 0.01;
@@ -31,19 +30,17 @@ for iter = 1:MAXITERS
 	 MU*D'*spdiags(EPSILON^2*(EPSILON^2+d.^2).^(-3/2),0,n-1,n-1)*D;
   v = -hess\grad;
   lambdasqr = -grad'*v;
-  lambdasqr
   newt_dec = [newt_dec sqrt(lambdasqr)];
-  quit()
   if (lambdasqr/2) < NTTOL, break; end;
   t = 1;
   while ((x+t*v-xcor)'*(x+t*v-xcor) + ...
 	 MU*sum(sqrt(EPSILON^2+(D*(x+t*v)).^2)-EPSILON*ones(n-1,1)) >
 	 val - ALPHA*t*lambdasqr )
     t = BETA*t;
+  end;
+  x = x+t*v;
 end;
-x = x+t*v;
-end;
-
+sum(x)
 %save ("/tmp/xcor.mat", "xcor", "-v7")
 %save ("/tmp/x.mat", "x", "-v7")
 %x
