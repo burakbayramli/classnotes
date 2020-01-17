@@ -12,7 +12,7 @@ olabilecek pek çok $x$ bulunabilir, bu sebeple arama alanýný bir þekilde
 daraltmak gerekir, ve bunun için bir tür düzenlileþtirme / regülarizasyon
 (regularization) kullanýlmasý þarttýr [3].
 
-Bir sayisal resimden gürültü çýkartma alanýnda iyi bilinen bir yöntem,
+Bir sayýsal resimden gürültü çýkartma alanýnda iyi bilinen bir yöntem
 problemi çift hedefli bir halde konumlandýrmak [4],
 
 $$
@@ -21,11 +21,11 @@ $$
 $$
 
 Burada $x_{cor} \in \mathbb{R}^n$ bize verilen bozulmuþ sinyal,
-$x \in \mathbb{R}^n$ ise bizim bulmak istediðimiz, gürültüsü çýkartýlmýþ
-sinyal, $\phi_{tv}$ ise tam varyasyon fonksiyonu. Üstteki iki hedefi
-minimize etmek istiyoruz, böylece ayný anda hem sinyalin kendi içindeki
-varyasyonu azaltan hem de bozulmuþ sinyale mümkün olduðunca yakýn duran bir
-gerçek $x$ elde edebilelim.
+$x \in \mathbb{R}^n$ ise bulmak istediðimiz, gürültüsü çýkartýlmýþ sinyal,
+$\phi_{tv}$ ise tam varyasyon fonksiyonu. Üstteki iki hedefi minimize etmek
+istiyoruz, böylece ayný anda hem sinyalin kendi içindeki varyasyonu azaltan
+hem de bozulmuþ sinyale mümkün olduðunca yakýn duran bir gerçek $x$ elde
+edebilelim.
 
 Her iki hedef fonksiyonunu birleþtirip tek bir fonksiyon haline getirip onu
 kýsýtlanmamýþ (unconstrained) bir optimizasyon problemi olarak çözebiliriz,
@@ -49,7 +49,8 @@ $$
 $$
 
 ki $\epsilon > 0$ yaklaþýklamanýn seviyesini ayarlýyor. Bu fonksiyonun iyi
-bir yaklaþýklama olduðunu görmek zor deðil, tabii deneyerek görelim,
+bir yaklaþýklama olduðunu görmek zor deðil, toplam içindeki kýsmý deneyerek
+görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy as np
@@ -57,24 +58,21 @@ import numpy as np
 eps = 1e-6
 mu = 50.0
 
-def phi_tv(x):
+def norm_tv(x):
    return np.sum(np.abs(np.diff(x)))
    
-def phi_atv(x):
+def norm_atv(x):
    return np.sum(np.sqrt(eps + np.power(np.diff(x),2)) - eps)
    
-def f(u):
-   return np.sum(np.power(u-xcor, 2)) + mu*phi_atv(u)
-
 xcor = np.random.randn(1000)
 
-print (phi_tv(xcor))
-print (phi_atv(xcor))
+print (norm_tv(xcor))
+print (norm_atv(xcor))
 \end{minted}
 
 \begin{verbatim}
-1037.4372101629049
-1037.438996069622
+1103.2561038302395
+1103.2571969067808
 \end{verbatim}
 
 Üstteki fonksiyonun iki kez türevi alýnabilir. Þimdi analitik þekilde devam
@@ -99,6 +97,9 @@ u0 = np.zeros(len(xcor))
 print (f(u0))
 
 from scipy.optimize import minimize, Bounds, SR1, BFGS
+
+def f(u):
+   return np.sum(np.power(u-xcor, 2)) + mu*norm_atv(u)
 
 opts = {'maxiter': 400, 'verbose': 2}
 
@@ -273,6 +274,10 @@ Kaynaklar
     \url{https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf}
 
 \end{document}
+
+
+
+
 
 
 
