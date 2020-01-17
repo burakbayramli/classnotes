@@ -6,16 +6,14 @@ Bir sinyalden, görüntüden gürültü çýkartmak için optimizasyon
 kullanýlabilir. Orijinal sinyal $x$'in $y = B x + n$ ile bir $n$ gürültüsü
 eklenerek bozulduðu (corrupted) farzedilebilir ($B$ bir deðiþim matrisidir,
 tutarlý, bilinen deðiþimleri temsil eder) biz eldeki $y$ ile $x$'i
-kestirmeye uðraþýrýz. 
+kestirmeye uðraþýrýz.  Fakat literatürde iyi bilindiði üzere $x$'i $y$'den
+tahmin etmeye uðraþmak kötü konumlanmýþ (ill-posed) bir sorudur. Çözüm
+olabilecek pek çok $x$ bulunabilir, bu sebeple arama alanýný bir þekilde
+daraltmak gerekir, ve bunun için bir tür düzenlileþtirme / regülarizasyon
+(regularization) kullanýlmasý þarttýr [3].
 
-Literatürde iyi bilindiði üzere $x$'i $y$'den tahmin etmeye uðraþmak kötü
-konumlanmýþ (ill-posed) bir sorudur. Çözüm olabilecek pek çok $x$
-bulunabilir, bu sebeple arama alanýný bir þekilde daraltmak gerekir, ve
-bunun için bir tür düzenlileþtirme / regülarizasyon (regülarization)
-kullanýlmasý þarttýr [3].  
-
-Görüntüden gürültü çýkartma alanýnda iyi bilinen bir yöntem problemi iki
-hedefli bir halde konumlandýrmak [4], 
+Bir sayisal resimden gürültü çýkartma alanýnda iyi bilinen bir yöntem,
+problemi çift hedefli bir halde konumlandýrmak [4],
 
 $$
 || x-x_{cor}||_2, \qquad \phi_{tv} (x) = \sum_{i=1}^{n-1} | x_{i+1} - x_i | 
@@ -24,26 +22,26 @@ $$
 
 Burada $x_{cor} \in \mathbb{R}^n$ bize verilen bozulmuþ sinyal,
 $x \in \mathbb{R}^n$ ise bizim bulmak istediðimiz, gürültüsü çýkartýlmýþ
-sinyal, $\phi_{tv}$ ise tam varyasyon fonksiyonu. Ustteki iki hedefi
-minimize etmek istiyoruz, boylece ayni anda hem sinyalin kendi icindeki
-varyasyonu azaltan hem de bozulmus sinyale mumkun oldugunca yakin duran bir
-gercek $x$ elde edebilelim.
+sinyal, $\phi_{tv}$ ise tam varyasyon fonksiyonu. Üstteki iki hedefi
+minimize etmek istiyoruz, böylece ayný anda hem sinyalin kendi içindeki
+varyasyonu azaltan hem de bozulmuþ sinyale mümkün olduðunca yakýn duran bir
+gerçek $x$ elde edebilelim.
 
-Her iki hedef fonksiyonunu birlestirip tek bir fonksiyon haline getirip onu
-kisitlanmamis (unconstrained) bir optimizasyon problemi olarak cozebiliriz,
+Her iki hedef fonksiyonunu birleþtirip tek bir fonksiyon haline getirip onu
+kýsýtlanmamýþ (unconstrained) bir optimizasyon problemi olarak çözebiliriz,
 
 $$
-|| x-x_{cor}||_2 + \mu \phi_{tv} 
+\psi = || x-x_{cor}||_2 + \mu \phi_{tv} 
 $$
 
 ki $\mu$ bizim seçeceðimiz bir parametre olabilir. Çözüm için mesela Newton
-metodunu kullanabiliriz, fakat tek bir problem var, Newton ve pek çok diðer
-optimizasyon metotu için türev almak gerekli, fakat $\phi_{tv}$'deki
-L1-norm'unun (tek boyutta mutlak deðer fonksiyonu) $x=0$'da türevi yoktur
-(birinci terimdeki Oklit normunun karesi alýndýðý için onun iki kere türevi
-alýnabilir). Bu durumda $\phi_{tv}$'yi yaklaþýk olarak temsil edebilirsek,
-onun da türevi alýnýr hale gelmesi saðlayabiliriz. Bu yeni fonksiyona
-$\phi_{atv}$ diyelim,
+metodunu kullanabiliriz, fakat tek bir problem var, Newton ve ona benzer
+diðer optimizasyon metotlarý için türev almak gerekli, fakat
+$\phi_{tv}$'deki L1-norm'unun (tek boyutta mutlak deðer fonksiyonu)
+$x=0$'da türevi yoktur (birinci terimdeki Oklit normunun karesi alýndýðý
+için onun iki kere türevi alýnabilir). Bu durumda $\phi_{tv}$'yi yaklaþýk
+olarak temsil edebilirsek, onun da türevi alýnýr hale gelmesi
+saðlayabiliriz. Bu yeni fonksiyona $\phi_{atv}$ diyelim,
 
 $$
 \phi_{atv} = \sum _{i=1}^{n-1} 
@@ -79,9 +77,10 @@ print (phi_atv(xcor))
 1037.438996069622
 \end{verbatim}
 
-Buradan analitik olarak devam etmeden önce sayýsal olarak bir çözüme
-bakalým. Üstteki fonksiyonlarý olduðu gibi kodlayarak sayýsal türev
-alabilen bir kütüphane çaðrýsýyla hedefi minimize edelim, eldeki sinyal,
+Üstteki fonksiyonun iki kez türevi alýnabilir. Þimdi analitik þekilde devam
+etmeden önce pür sayýsal açýdan bir çözüme bakalým. Üstteki fonksiyonlarý
+direk kodlayarak ve sayýsal türev üzerinden iþleyebilen bir kütüphane
+çaðrýsýyla hedefi minimize edelim, eldeki sinyal,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -132,8 +131,35 @@ $$
 $$
 
 Zincirleme Kuralý uygulandý tabii, ve þimdi $\phi_{atv}$ üzerindeki
-türevleri bulmak gerekiyor. Sorun deðil, üstteki tüm yaklaþýklamayý bunun
-için yapmýþtýk zaten. 
+türevleri bulmak gerekiyor. Sorun deðil, daha önceki yaklaþýklamayý bunun
+için yapmýþtýk zaten. Yaklaþýk fonksiyonu genel olarak belirtirsek, 
+
+$$
+f(u) = \sqrt{\epsilon^2 + u^2} - \epsilon
+$$
+
+Bu fonksiyonun 1. ve 2. türevi
+
+$$
+f'(u) = u(\epsilon^2 + u^{-1/2} ), \qquad
+f''(u) = \epsilon^2 (\epsilon^2 + u^2)^{-3/2}
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 [devam edecek]
 
