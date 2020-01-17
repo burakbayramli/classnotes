@@ -95,6 +95,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\end{itemize}","")
       line = line.replace("\\item ","* ")
       line = re.sub(r'{\\em (.*?)}', r'*\1*', line)
+      line = re.sub(r'\\url\{(.*?)\}', r'<a href="\1">\1</a>', line)
       s = re.sub(r'verb!(.*?)!', r'`\1`', line)
       s = s.replace('\`','`')
       line = s
@@ -123,9 +124,6 @@ def tex_mathjax_html(texfile, htmlfile, title):
       elif '_' in line:
          line = line.replace("_","@@UUEEE@@") # special code
          fout.write(line)
-      elif '\\url' in line:
-         line = re.sub(r'\\url{(.*?)}', r'<a href="\1">\1</a>', line)
-         fout.write(line + "\n")
       elif '\\mlabel' in line:
          line = re.sub(r'\\mlabel{(.*?)}', r'\qquad (\1)', line)
          fout.write(line)
