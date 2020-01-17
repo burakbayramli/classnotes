@@ -221,19 +221,19 @@ x = np.zeros((len(xcor),1))
 
 for iter in range(MAXITERS):
    d = D.dot(x)
-   tmp1 = np.dot((x-xcor).T,(x-xcor))
-   tmp2a = np.sqrt(EPSILON**2 + np.power(d,2))
-   tmp2b = EPSILON*np.ones((n-1,1))
-   val = np.float(tmp1 + MU*np.sum(tmp2a - tmp2b))
-   tmp1 = 2*(x-xcor)
-   tmp2 = MU*D.T.dot(d / np.sqrt(EPSILON**2 + d**2))
-   grad = tmp1 + tmp2
-   tmp1 = 2*sps.eye(n)
-   tmp2 = EPSILON**2*(EPSILON**2+d**2)**(-3/2)
-   tmp2 = tmp2.reshape((n-1))
-   tmp3 = sps.spdiags(tmp2, 0, n-1, n-1)
+   val1 = np.dot((x-xcor).T,(x-xcor))
+   val2 = np.sqrt(EPSILON**2 + np.power(d,2))
+   val3 = EPSILON*np.ones((n-1,1))
+   val = np.float(val1 + MU*np.sum(val2 - val3))
+   grad1 = 2*(x-xcor)
+   grad2 = MU*D.T.dot(d / np.sqrt(EPSILON**2 + d**2))
+   grad = grad1 + grad2
+   hess1 = 2*sps.eye(n)
+   hess2 = EPSILON**2*(EPSILON**2+d**2)**(-3/2)
+   hess2 = hess2.reshape((n-1))
+   hess3 = sps.spdiags(hess2, 0, n-1, n-1)
 
-   hess = tmp1 + MU*tmp3.dot(D).T.dot(D)
+   hess = hess1 + MU*hess3.dot(D).T.dot(D)
    v = slin.spsolve(-hess, grad)
    v = np.reshape(v, (n,1))
    lambdasqr = np.float(np.dot(-grad.T,v))
@@ -273,6 +273,9 @@ Kaynaklar
     \url{https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf}
 
 \end{document}
+
+
+
 
 
 
