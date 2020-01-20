@@ -7,17 +7,14 @@ import scipy.sparse as sps
 
 MU = 50.0
 EPSILON = 0.001
-n = 3
+n = 300
 np.random.seed(0)
 xorig = np.random.randn(n,n)
 data = np.array([-1*np.ones(n), np.ones(n)])
 diags = np.array([0, 1])
-D = sps.spdiags(data, diags, n, n).todense()
+D = sps.spdiags(data, diags, n, n)
 #print (D)
 #print (xorig)
-
-def f(u):
-    return anp.power(EPSILON**2 + anp.power(u,2),0.5) - EPSILON
 
 def obj(xvec):
     x = xvec.reshape(n,n)
@@ -27,7 +24,7 @@ def obj(xvec):
     Uxsum = f(Ux).sum()
     Uysum = f(Uy).sum()
     phi_atv = Uxsum + Uysum
-    print (phi_atv)
+    #print (phi_atv)
 
     E = xorig-x
     diff = anp.power(anp.dot(E,(E.T)),2).sum()
@@ -38,33 +35,16 @@ def obj(xvec):
     return psi
 
     
-x0 = np.array([[1.,2.,3.],[2.,3.,4.],[4.,5.,6.]])
-print (x0)
+#x0 = np.array([[1.,2.,3.],[2.,3.,4.],[4.,5.,6.]])
+x0 = np.random.randn(n,n)
+#print (x0)
 obj(x0)
 
 grad = ad.grad(obj)
 x00 = ad.numpy.reshape(x0,n*n)
-grad(x00)
+res = grad(x00)
+#print (grad(x00))
 ```
-
-```text
-[[1. 2. 3.]
- [2. 3. 4.]
- [4. 5. 6.]]
-36.98100645417316
-Autograd ArrayBox with value 36.98100645417316
-Out[1]: 
-array([ 138.90067617,  426.86417324,  743.94097718,  370.78996771,
-        926.44601801, 1533.45533661,  901.69286291, 1883.47445845,
-       2788.11365041])
-```
-
-
-
-
-
-
-
 
 
 ```python
@@ -82,14 +62,49 @@ df_x = f.dr_wrt(x)
 print (df_x)
 ```
 
+
+
+```python
+import scipy.sparse as sps
+import chumpy as ch
+
+MU = ch.Ch(50.0)
+EPSILON = ch.Ch(0.001)
+n = 300
+np.random.seed(0)
+xorig = ch.array(np.random.randn(n,n))
+data = np.array([-1*np.ones(n), np.ones(n)])
+diags = np.array([0, 1])
+D = sps.spdiags(data, diags, n, n)
+
+#print (D.todense())
+
+
+def f(u):
+    return ch.sqrt(EPSILON**2 + ch.power(u,2)) - EPSILON
+
+xvec = ch.array(ch.zeros(n*n))
+x = xvec.reshape(n,n)
+Ux = D.dot(x)
+Uy = D.T.dot(x.T).T
+Uxsum = f(Ux).sum()
+Uysum = f(Uy).sum()
+phi_atv = Uxsum + Uysum
+print (type(phi_atv))
+E = xorig-x
+diff = ch.power(E.dot(E.T),2).sum()
+print (diff)
+print (type(diff))
+psi = diff + MU*phi_atv
+print (psi)
+res = psi.dr_wrt(x)
+```
+
 ```text
-  (0, 0)	20.0
-  (0, 1)	40.0
-  (0, 2)	60.0
-[44. 20. 30.]
-  (0, 0)	88.0
-  (0, 1)	40.0
-  (0, 2)	60.0
+<class 'chumpy.ch_ops.add'>
+[188.18395721]
+<class 'chumpy.ch_ops.sum'>
+[188.18395721]
 ```
 
 
