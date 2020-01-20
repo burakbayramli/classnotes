@@ -30,11 +30,13 @@ print (diff)
 print (type(diff))
 psi = diff + MU*phi_atv
 print (psi)
-res = psi.dr_wrt(x)
-print (res)
 
+for i in range(3):    
+    res = psi.dr_wrt(x).reshape(n,n)
+    print (res.shape)
+    print (x.shape)
+    for j in range(n):
+        for k in range(n):
+            x[j,k] = res[j,k]
 
-
-
-
-
+    
