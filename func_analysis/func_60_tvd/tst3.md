@@ -6,7 +6,7 @@ import tensorflow as tf
 MU = 50.0
 EPSILON = 0.001
 n = 4
-xorig = tf.Variable(np.ones((n,n)))
+xorig = tf.Variable(np.random.randn(n,n))
 xvec = tf.Variable(np.ones((1,n*n)))
 D = np.zeros((n,n))
 idx1, idx2 = [], []
@@ -26,22 +26,26 @@ Ux = tf.sparse_tensor_dense_matmul(D, x)
 fUx = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Ux)) - EPSILON)
 Uy = tf.transpose(tf.sparse_tensor_dense_matmul(tf.sparse_transpose(D), tf.transpose(x)))
 fUy = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Uy)) - EPSILON)
+phi_atv = Ux + Uy
+E = xorig-x
+diff = tf.reduce_sum(tf.square(E))
+psi = diff + MU*phi_atv
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     print (sess.run(xorig))
     print (sess.run(Ux))
     print (sess.run(Uy))
-    print (sess.run(fUx))
-    print (sess.run(fUy))
+    print (sess.run(phi_atv))
+    print (sess.run(psi))
 ```
 
 ```text
 [[0, 0], [1, 1], [2, 2], [3, 3], [0, 1], [1, 2], [2, 3]]
-[[1. 1. 1. 1.]
- [1. 1. 1. 1.]
- [1. 1. 1. 1.]
- [1. 1. 1. 1.]]
+[[-0.30182939  0.92248823 -0.85664373  0.84720586]
+ [ 0.0574031   1.86989003  1.71038926  1.94127856]
+ [-1.21623816 -2.00778926 -0.97432175  0.05090743]
+ [ 0.36590181  0.88501976 -0.95862726  0.53209947]]
 [[0. 0. 0. 0.]
  [0. 0. 0. 0.]
  [0. 0. 0. 0.]
@@ -50,8 +54,14 @@ with tf.Session() as sess:
  [1. 0. 0. 0.]
  [1. 0. 0. 0.]
  [1. 0. 0. 0.]]
-3.9960019999995002
-3.9960019999995002
+[[1. 0. 0. 0.]
+ [1. 0. 0. 0.]
+ [1. 0. 0. 0.]
+ [2. 1. 1. 1.]]
+[[ 81.43477909  31.43477909  31.43477909  31.43477909]
+ [ 81.43477909  31.43477909  31.43477909  31.43477909]
+ [ 81.43477909  31.43477909  31.43477909  31.43477909]
+ [131.43477909  81.43477909  81.43477909  81.43477909]]
 ```
 
 
