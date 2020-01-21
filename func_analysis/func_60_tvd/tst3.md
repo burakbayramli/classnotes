@@ -1,6 +1,8 @@
 
 https://www.tensorflow.org/api_docs/python/tf/gradients
 
+https://www.tensorflow.org/api_docs/python/tf/Variable
+
 ```python
 import tensorflow as tf
 
