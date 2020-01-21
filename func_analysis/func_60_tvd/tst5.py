@@ -55,7 +55,7 @@ xcurr = sess.run(x, {x: np.zeros((n,n)) })
 io.imsave('/tmp/lenad1.jpg', io.imread('lena-noise.jpg', as_gray=True))
 MUG = 0.0001
 
-for i in range(1000):
+for i in range(5000):
     gnew = sess.run(g, {x: xcurr - MUG*gcurr} )
     xnew = sess.run(x, {x: xcurr - MUG*gcurr} )
     chg = np.sum(np.abs(MUG*gcurr))
