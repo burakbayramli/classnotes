@@ -9,8 +9,7 @@ n = 4
 xorig = tf.Variable(np.ones((n,n)))
 xvec = tf.Variable(np.ones((1,n*n)))
 D = np.zeros((n,n))
-idx1 = []
-idx2 = []
+idx1, idx2 = [], []
 for i in range(n):
     idx1.append([i,i])
     if i<n-1: idx2.append([i,i+1])
@@ -24,13 +23,17 @@ vals = np.array(vals).astype(np.float64)
 D = tf.SparseTensor(indices=idx, values=vals, dense_shape=[n, n])
 x = tf.reshape(xvec, [n,n])
 Ux = tf.sparse_tensor_dense_matmul(D, x)
+fUx = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Ux)) - EPSILON)
 Uy = tf.transpose(tf.sparse_tensor_dense_matmul(tf.sparse_transpose(D), tf.transpose(x)))
+fUy = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Uy)) - EPSILON)
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     print (sess.run(xorig))
     print (sess.run(Ux))
     print (sess.run(Uy))
+    print (sess.run(fUx))
+    print (sess.run(fUy))
 ```
 
 ```text
@@ -47,6 +50,8 @@ with tf.Session() as sess:
  [1. 0. 0. 0.]
  [1. 0. 0. 0.]
  [1. 0. 0. 0.]]
+3.9960019999995002
+3.9960019999995002
 ```
 
 
