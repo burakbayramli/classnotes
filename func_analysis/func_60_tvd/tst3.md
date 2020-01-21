@@ -1,4 +1,57 @@
 
+```python
+import tensorflow as tf
+
+n = 4
+A = np.zeros((n,n))
+idx1 = []
+idx2 = []
+for i in range(n):
+    idx1.append([i,i])
+    if i<n-1: idx2.append([i,i+1])
+idx = idx1 + idx2
+print (idx)
+
+ones = [1.0 for i in range(n)]
+negs = [-1.0 for i in range(n-1)]
+vals = ones + negs
+vals = np.array(vals).astype(np.float64)
+A = tf.SparseTensor(indices=idx, values=vals, dense_shape=[n, n])
+x = tf.Variable(np.ones((n,n))) 
+Ax = tf.sparse_tensor_dense_matmul(A, x)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    print ('A',sess.run(A))
+    print ('x',sess.run(x))
+    print ('Ax',sess.run(Ax))
+```
+
+```text
+[[0, 0], [1, 1], [2, 2], [3, 3], [0, 1], [1, 2], [2, 3]]
+A SparseTensorValue(indices=array([[0, 0],
+       [1, 1],
+       [2, 2],
+       [3, 3],
+       [0, 1],
+       [1, 2],
+       [2, 3]]), values=array([ 1.,  1.,  1.,  1., -1., -1., -1.]), dense_shape=array([4, 4]))
+x [[1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]]
+Ax [[0. 0. 0. 0.]
+ [0. 0. 0. 0.]
+ [0. 0. 0. 0.]
+ [1. 1. 1. 1.]]
+```
+
+
+
+
+
+
+
 
 ```python
 import tensorflow as tf
