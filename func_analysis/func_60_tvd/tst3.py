@@ -1,3 +1,4 @@
+import pylab
 from skimage import io
 import pandas as pd
 import numpy as np
@@ -10,7 +11,7 @@ n = 225
 
 np.random.seed(0)
 
-xorig = tf.Variable( io.imread('lena.jpg', as_gray=True) )
+xorig = tf.Variable( io.imread('lena-noise.jpg', as_gray=True) )
 x = tf.Variable(np.ones((n,n)))
 D = np.zeros((n,n))
 idx1, idx2 = [], []
@@ -33,13 +34,16 @@ E = xorig-x
 diff = tf.reduce_sum(tf.square(E))
 psi = diff + MU*phi_atv
 g = tf.gradients(psi, x)
-gvec = tf.reshape(g, [n*n,1])
-print (g)
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    #print (sess.run(g,feed_dict={x: np.ones((n,n))} ))
-    step = sess.run(g,feed_dict={x: np.ones((n,n))})
-    print (step[0])    
-    step = sess.run(g,feed_dict={x: (x - step[0]).eval() } )
-    print (step[0])    
+    step = sess.run(g,feed_dict={x: np.zeros((n,n))})
+    print (np.sum(np.abs(step[0])))
+    for i in range(100):
+        step = sess.run(g,feed_dict={x: (x - 0.0000001*step[0]).eval() } )
+        print (np.sum(np.abs(step[0])))
+    arr = x.eval()
+    print (arr)
+    pylab.imsave('lena-denoised.jpg',arr)
+
+        
