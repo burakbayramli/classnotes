@@ -51,37 +51,41 @@ zvec = tf.matmul(tf.transpose(xvec),yvec)
 g2 = tf.gradients(zvec, xvec)
 
 #xs = tf.SparseTensor(values=[7,8],indices=[[1],[5]],dense_shape=[6])
-xs = tf.SparseTensor(indices=[[0, 0], [1, 2]], values=[1., 2.], dense_shape=[3, 3])
+xs = tf.SparseTensor(indices=[[0, 0], [0, 2]], values=[1., 2.], dense_shape=[1, 3])
 xxs = tf.sparse_tensor_dense_matmul(xs, xvec)
+
+g3 = tf.gradients(xxs, xvec)
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
+    print ('g1',sess.run(g1))
+    print ('xvec',sess.run(xvec))
+    print ('yvec',sess.run(yvec))
+    print ('zvec',sess.run(zvec))
+    print ('g2',sess.run(g2))
     print ('xs',sess.run(xs))
     print ('xxs',sess.run(xxs))
-    print (sess.run(g1))
-    print (sess.run(xvec))
-    print (sess.run(yvec))
-    print (sess.run(zvec))
-    print (sess.run(g2))
+    print ('g3',sess.run(g3))
 ```
 
 ```text
-xs SparseTensorValue(indices=array([[0, 0],
-       [1, 2]]), values=array([1., 2.], dtype=float32), dense_shape=array([3, 3]))
-xxs [[2.]
- [8.]
- [0.]]
-[3.0, 1.0]
-[[2.]
+g1 [3.0, 1.0]
+xvec [[2.]
  [3.]
  [4.]]
-[[3.]
+yvec [[3.]
  [4.]
  [5.]]
-[[38.]]
-[array([[3.],
+zvec [[38.]]
+g2 [array([[3.],
        [4.],
        [5.]], dtype=float32)]
+xs SparseTensorValue(indices=array([[0, 0],
+       [0, 2]]), values=array([1., 2.], dtype=float32), dense_shape=array([1, 3]))
+xxs [[10.]]
+g3 [array([[1.],
+       [0.],
+       [2.]], dtype=float32)]
 ```
 
 
