@@ -260,6 +260,73 @@ hýzlý.
 
 Görüntüden Gürültü Silmek
 
+Aynen tek boyutlu sinyalden gürültü silebildiðimiz gibi iki boyutlu
+görüntüden de gürültü silmek mümkün. Bu durumda tam varyasyon 
+
+$$
+\sum_{i=2}^{m} \sum_{j=2}^{n} (|U_{i,j} - U_{i-1,j}| + |U_{i,j} - U_{i,j-1}|)
+$$
+
+olabilir, yani her pikselin bir yanindaki ve bir altýndaki pikselle olan
+uzaklýðýnýn L1-norm'unu almak. Üstteki hesabý yapmak için aslýnda yine daha
+önce hesapladýðýmýz $D$ matrisini kullanabiliriz. Bir $X$ imajý üzerinde
+$DX$ hesabý, yani $D$ ile soldan çarpým dikey farklýlýklarý, saðdan çarpým
+$XD$ ise yatay farklýlýklarý verecektir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.sparse as sps
+
+X = [[1, 2, 3, 4],
+     [5, 6, 7, 8],
+     [1, 2, 3, 4],
+     [5, 6, 7, 8]]
+
+X = np.array(X)
+print (X)
+n = X.shape[0]
+data = np.array([-1*np.ones(n), np.ones(n)])
+diags = np.array([0, 1])
+D = sps.lil_matrix(sps.spdiags(data, diags, n, n))
+print (D.todense())
+print ('Dikey Farklilik')
+print (D.dot(X))
+print ('Yatay Farklilik')
+print (D.transpose().dot(X.T))
+\end{minted}
+
+\begin{verbatim}
+[[1 2 3 4]
+ [5 6 7 8]
+ [1 2 3 4]
+ [5 6 7 8]]
+[[-1.  1.  0.  0.]
+ [ 0. -1.  1.  0.]
+ [ 0.  0. -1.  1.]
+ [ 0.  0.  0. -1.]]
+Dikey Farklilik
+[[ 4.  4.  4.  4.]
+ [-4. -4. -4. -4.]
+ [ 4.  4.  4.  4.]
+ [-5. -6. -7. -8.]]
+Yatay Farklilik
+[[-1. -5. -1. -5.]
+ [-1. -1. -1. -1.]
+ [-1. -1. -1. -1.]
+ [-1. -1. -1. -1.]]
+\end{verbatim}
+
+L1 norm yaklaþýksallýðý için daha önceki yöntemi kullanabiliriz.  
+
+Gradyan almak için ise bu sefer \verb!tensörflow! paketini kullanacaðýz
+[5]. Bir vektöre göre deðil bir matrise göre türev alýyoruz, bunu sembolik
+yapmak yerine sembolik yaklaþým kadar kuvvetli olan otomatik türev ile
+gradyaný elde edebiliriz.
+
+Üstteki tüm hesaplarý TF ile bir hesap grafiði içinde kodlayýp,
+\verb!tf.gradients! ile hedef fonksiyonunun gradyanýný alacaðýz, ve
+standart gradyan iniþi optimizasyonu ile bir noktadan baþlayýp gradyan yönü
+tersinde adým atarak minimum noktaya varmaya uðraþacaðýz. 
+
 \begin{minted}[fontsize=\footnotesize]{python}
 from skimage import io
 import tensorflow as tf
@@ -328,7 +395,6 @@ for i in range(1,N):
     gcurr = tv_grad(xcurr)
     gcurr /= gcurr.max()/0.3
     chg = np.sum(np.abs(xcurr))
-    #print (tv(xcurr),chg)
     xcurr = xcurr - gcurr
  
 xcurr /= xcurr.max()/255.0
@@ -341,12 +407,9 @@ io.imsave('lenad2.jpg', np.reshape(xcurr,(n,n)))
 \includegraphics[width=10em]{lenad2.jpg}
 
 Yine total varyasyon kullanan ama farklý optimizasyon çözücüyle hesabý
-yapan [1] bir sonuç \verb!tlv_prim_dual.py! kodunda, sonuç
+yapan bir yöntem \verb!tlv_prim_dual.py! kodunda [1], sonuç
 
 \includegraphics[width=10em]{lenad3.jpg}
-
-
-[devam edecek]
 
 Kaynaklar
 
@@ -363,14 +426,7 @@ Kaynaklar
     {\em Additional Exercises for Convex Optimization}
     \url{https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf}
 
-
-
-
-
+[5] Bayramli, 
+    {\em Bilgisayar Bilim, Yapay Zeka, Tensorflow}
 
 \end{document}
-
-
-
-
-
