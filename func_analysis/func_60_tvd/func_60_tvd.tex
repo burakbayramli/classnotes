@@ -332,7 +332,6 @@ from skimage import io
 import tensorflow as tf
 
 MU = 50.0
-#MU = 0.001
 EPSILON = 0.001
 n = 225
 
@@ -350,10 +349,13 @@ for i in range(n):
     if i<n-1: idx2.append([i,i+1])
 idx = idx1 + idx2
 ones = [1.0 for i in range(n)]
+ones[n-1] = 0
 negs = [-1.0 for i in range(n-1)]
+negs[n-2] = 0
 vals = ones + negs
 vals = np.array(vals).astype(np.float32)
 D = tf.SparseTensor(indices=idx, values=vals, dense_shape=[n, n])
+
 
 diff = tf.square(tf.norm(xorig-x, ord='euclidean'))
 
@@ -386,7 +388,6 @@ def tv_grad(xvec):
     gres = sess.run(g, {x: xmat} )
     return gres
     
-MUG = 0.001
 x0 = np.zeros(n*n)
 xcurr = x0
 
