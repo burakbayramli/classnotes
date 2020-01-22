@@ -12,8 +12,11 @@ n = 225
 
 np.random.seed(0)
 
-xorig = tf.cast(tf.constant( io.imread('lena-noise.jpg', as_gray=True)),dtype=tf.float32)
-x = tf.placeholder(dtype="float",shape=[n,n],name="x")
+img = io.imread('lena-noise.jpg', as_gray=True)
+xorig = tf.cast(tf.constant(img),dtype=tf.float64)
+io.imsave('/tmp/lenad1.jpg', img)
+
+x = tf.placeholder(dtype="float64",shape=[n,n],name="x")
 
 D = np.zeros((n,n))
 idx1, idx2 = [], []
@@ -24,7 +27,7 @@ idx = idx1 + idx2
 ones = [1.0 for i in range(n)]
 negs = [-1.0 for i in range(n-1)]
 vals = ones + negs
-vals = np.array(vals).astype(np.float32)
+vals = np.array(vals).astype(np.float64)
 D = tf.SparseTensor(indices=idx, values=vals, dense_shape=[n, n])
 
 diff = tf.square(tf.norm(xorig-x, ord='euclidean'))
@@ -47,43 +50,32 @@ sess = tf.Session()
 sess.run(init)
 
 def tv(xvec):
-#    print ('tv',xvec.shape)
     xmat = xvec.reshape(n,n)
     p = sess.run(psi, {x: xmat} )
-#    print (p)
     return p
 
 def tv_grad(xvec):
-#    print ('tv grad',xvec.shape)
     xmat = xvec.reshape(n,n)
     gres = sess.run(g, {x: xmat} )
-    #gres = np.reshape(gres[0],(n*n))
-#    print (gres.shape)
     return gres
     
-#img = np.random.randn(n*n)
-#print (img.shape)
-#print (tv(img))
-#print (tv_grad(img))
-
-#exit()
 
 from scipy.optimize import minimize
 
-def callbackx(cx, state):
-    print (cx)
-    state.x /= state.x.max()/255.0    
-    return False
-
 x0 = np.zeros(n*n)
+
+def callbackx(xa):
+    print (xa)
+
 res = minimize(fun=tv,
                x0=x0,
-               #method='Newton-CG',
-               method='trust-constr',
-               #method='BFGS',
-               callback=callbackx,
+               #method='CG',
+               method='L-BFGS-B',
+               #method='CG',
                jac = tv_grad,
-               #jac = '2-point',
-               options={'disp': True})
+               callback=callbackx,
+               options={'maxiter': 2, 'disp': True})
 
-io.imsave('/tmp/lenad2.jpg', np.reshape(res.x,(n,n)))
+xnew = res.x
+xnew /= xnew.max()/255.0 
+io.imsave('/tmp/lenad2.jpg', np.reshape(xnew,(n,n)))

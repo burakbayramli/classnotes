@@ -56,11 +56,13 @@ def tv_grad(xvec):
     gres = sess.run(g, {x: xmat} )
     return gres
     
-MUG = 0.0001
+MUG = 0.001
 x0 = np.zeros(n*n)
 xnew = x0
 
-for i in range(5000):
+from scipy.optimize import SR1
+
+for i in range(500):
     gnew = tv_grad(xnew)
     chg = np.sum(np.abs(MUG*gnew))
     print (tv(xnew),chg)
@@ -68,3 +70,5 @@ for i in range(5000):
     xnew /= xnew.max()/255.0 
 
 io.imsave('/tmp/lenad2.jpg', np.reshape(xnew,(n,n)))
+
+# MUG = 0.001, iter 500
