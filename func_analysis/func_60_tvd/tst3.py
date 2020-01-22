@@ -1,69 +1,75 @@
-import pylab
-from skimage import io
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import tensorflow as tf
+import pylab, skimage
+from numpy import random
+from PIL import Image
 
-MU = 1.0
-#MU = 0.001
-EPSILON = 0.001
-n = 225
+def nabla(I):
+    h, w = I.shape
+    G = np.zeros((h, w, 2), I.dtype)
+    G[:, :-1, 0] -= I[:, :-1]
+    G[:, :-1, 0] += I[:, 1:]
+    G[:-1, :, 1] -= I[:-1]
+    G[:-1, :, 1] += I[1:]
+    return G
 
-np.random.seed(0)
+def nablaT(G):
+    h, w = G.shape[:2]
+    I = np.zeros((h, w), G.dtype)
+    # note that we just reversed left and right sides
+    # of each line to obtain the transposed operator
+    I[:, :-1] -= G[:, :-1, 0]
+    I[:, 1: ] += G[:, :-1, 0]
+    I[:-1]    -= G[:-1, :, 1]
+    I[1: ]    += G[:-1, :, 1]
+    return I
 
-xorig = tf.cast(tf.constant( io.imread('lena-noise.jpg', as_gray=True)),dtype=tf.float32)
-#x = tf.Variable(np.zeros((n,n)),name="x")
-x = tf.placeholder(dtype="float",shape=[n,n],name="x")
+def anorm(x):
+    '''Calculate L2 norm over the last array dimention'''
+    return np.sqrt((x*x).sum(-1))
 
-D = np.zeros((n,n))
-idx1, idx2 = [], []
-for i in range(n):
-    idx1.append([i,i])
-    if i<n-1: idx2.append([i,i+1])
-idx = idx1 + idx2
-ones = [1.0 for i in range(n)]
-negs = [-1.0 for i in range(n-1)]
-vals = ones + negs
-vals = np.array(vals).astype(np.float32)
-D = tf.SparseTensor(indices=idx, values=vals, dense_shape=[n, n])
+def calc_energy_ROF(X, observation, clambda):
+    Ereg = anorm(nabla(X)).sum()
+    Edata = 0.5 * clambda * ((X - observation)**2).sum()
+    return Ereg + Edata
 
-Ux = tf.sparse_tensor_dense_matmul(D, x)
-Uy = tf.sparse_tensor_dense_matmul(tf.sparse_transpose(D), tf.transpose(x))
-Uy = tf.transpose(Uy)
+def calc_energy_TVL1(X, observation, clambda):
+    Ereg = anorm(nabla(X)).sum()
+    Edata = clambda * np.abs(X - observation).sum()
+    return Ereg + Edata
 
-fUx = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Ux)) - EPSILON)
-fUy = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Uy)) - EPSILON)
-phi_atv = fUx + fUy
-E = xorig-x
-diff = tf.reduce_sum(tf.square(E))
-psi = diff + MU*phi_atv
-g = tf.gradients(psi, x)
-g = tf.reshape(g,[n,n])
+# some reasonable lambdas
+lambda_ROF = 8.0
+lambda_TVL1 = 1.0
 
-init = tf.global_variables_initializer()
+def project_nd(P, r):
+    '''perform a pixel-wise projection onto R-radius balls'''
+    nP = np.maximum(1.0, anorm(P)/r)
+    return P / nP[...,np.newaxis]
+    
+def shrink_1d(X, F, step):
+    '''pixel-wise scalar srinking'''
+    return X + np.clip(F - X, -step, step)
 
-sess = tf.Session()
+def solve_TVL1(img, clambda, iter_n=101):
+    # setting step sizes and other params
+    L2 = 8.0
+    tau = 0.02
+    sigma = 1.0 / (L2*tau)
+    theta = 1.0
 
-sess.run(init)
+    X = img.copy()
+    P = nabla(X)
+    for i in range(iter_n):
+        P = project_nd( P + sigma*nabla(X), 1.0 )
+        X1 = shrink_1d(X - tau*nablaT(P), img, clambda*tau)
+        X = X1 + theta * (X1 - X)
+    print
+    return X
 
-sess.run(tf.global_variables_initializer())
-print (type(np.zeros((n,n))))
-
-gcurr = sess.run(g, {x: np.zeros((n,n)) })
-xcurr = sess.run(x, {x: np.zeros((n,n)) })
-io.imsave('/tmp/lenad1.jpg', io.imread('lena-noise.jpg', as_gray=True))
-MUG = 0.001
-
-for i in range(1000):
-    gnew = sess.run(g, {x: xcurr - MUG*gcurr} )
-    xnew = sess.run(x, {x: xcurr - MUG*gcurr} )
-    chg = np.sum(np.abs(MUG*gcurr))
-    print (chg)
-    xcurr = xnew
-    gcurr = gnew
-    #print (xcurr)
-    #print (gcurr)
-
-io.imsave('/tmp/lenad2.jpg', xcurr)
-
+from skimage import io
+img = io.imread('lena-noise.jpg', as_gray=True)
+res = solve_TVL1(img, 1.0)
+io.imsave('/tmp/lenad3.jpg', res)
+ 
