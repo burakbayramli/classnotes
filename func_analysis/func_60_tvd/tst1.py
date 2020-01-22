@@ -5,15 +5,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-MU = 20.0
+MU = 50.0
 #MU = 0.001
 EPSILON = 0.001
 n = 225
 
-img = io.imread('lena.jpg', as_gray=True)
-io.imsave('/tmp/lenad0.jpg', img)
-xorig = tf.cast(tf.constant( io.imread('lena-noise.jpg', as_gray=True)),dtype=tf.float32)
-x = tf.placeholder(dtype="float",shape=[n,n],name="x")
+np.random.seed(0)
+
+img = io.imread('lena-noise.jpg', as_gray=True)
+xorig = tf.cast(tf.constant(img),dtype=tf.float64)
+io.imsave('/tmp/lenad1.jpg', img)
+
+x = tf.placeholder(dtype="float64",shape=[n,n],name="x")
 
 D = np.zeros((n,n))
 idx1, idx2 = [], []
@@ -24,7 +27,7 @@ idx = idx1 + idx2
 ones = [1.0 for i in range(n)]
 negs = [-1.0 for i in range(n-1)]
 vals = ones + negs
-vals = np.array(vals).astype(np.float32)
+vals = np.array(vals).astype(np.float64)
 D = tf.SparseTensor(indices=idx, values=vals, dense_shape=[n, n])
 
 diff = tf.square(tf.norm(xorig-x, ord='euclidean'))
@@ -56,19 +59,23 @@ def tv_grad(xvec):
     gres = sess.run(g, {x: xmat} )
     return gres
     
-MUG = 0.001
+
+from scipy.optimize import minimize
+
 x0 = np.zeros(n*n)
-xcurr = x0
 
-N = 130
-for i in range(1,N):
-    gcurr = tv_grad(xcurr)
-    gcurr /= gcurr.max()/0.2
-    chg = np.sum(np.abs(xcurr))
-    print (tv(xcurr),chg)
-    xcurr = xcurr - gcurr
- 
-xcurr /= xcurr.max()/255.0
-io.imsave('/tmp/lenad2.jpg', np.reshape(xcurr,(n,n)))
+def callbackx(xa):
+    print (xa)
 
-# MUG = 0.001, iter 500
+res = minimize(fun=tv,
+               x0=x0,
+               #method='CG',
+               method='L-BFGS-B',
+               #method='CG',
+               jac = tv_grad,
+               callback=callbackx,
+               options={'maxiter': 2, 'disp': True})
+
+xnew = res.x
+xnew /= xnew.max()/255.0 
+io.imsave('/tmp/lenad2.jpg', np.reshape(xnew,(n,n)))
