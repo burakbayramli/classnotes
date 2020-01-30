@@ -302,7 +302,7 @@ problem.
 
 Maksimum akýþ problemi þöyle: bir yönlü çizit verildi diyelim,
 
-\includegraphics[width=20em]{func_55_duality_01.png}
+\includegraphics[width=15em]{func_55_duality_01.png}
 
 Ýki nokta arasýnda baðlantý varsa $c_{ij}$ o iki nokta $i,j$ arasýndaki
 baðlantýnýn kapasitesini gösteriyor, eðer bir tren hattýndan bahsediyorsak
@@ -326,7 +326,7 @@ $$
 Not: $\backslash$ iþareti "hariç" demek. 
 
 Maks akýþ problemi eldeki bir mali, nakliyatý diyelim, bir baþlangýç
-noktasý $s$ bitiþi noktasý $t$'ye maksimum miktarda nakil edebilecek yolu
+noktasý $s$ bitiþi noktasý $t$'ye maksimum miktarda nakil edebilecek yollarý
 bulmaktýr. Dikkat: $s$'den mal göndermek deyince $s$'den çýkan pek çok
 yoldan nakliyat paylaþtýrýlarak gönderilebilir, altta görüldüðü gibi
 (kýrmýzý hat kapasitesi, yeþil bir optimal akýþ örneði, baþlangýç 0 bitiþ
@@ -334,7 +334,7 @@ yoldan nakliyat paylaþtýrýlarak gönderilebilir, altta görüldüðü gibi
 
 \includegraphics[width=25em]{func_55_duality_02.png}
 
-O zaman maksimum akisi bir LP olarak kodlayalim,
+O zaman maksimum akýþý bir LP olarak kodlayalým,
 
 $$
 \max_{f \in \mathbb{R}^{|E|}} \sum_{(s,j)\in E} f_{sj}, \quad \textrm{öyle ki}
@@ -349,22 +349,139 @@ $$
 Fakat tek bir toplam ile tüm çizit üzerinden maksimum akýþý nasýl formülize
 edebildik? Hedef fonksiyonundaki toplam sadece baþlangýç $s$'den çýkan
 akýþa bakýyor? Buradaki ufak numara yaptýðýmýz kýsýtlamayla baðlantýlý,
-akýþýn muhafaza edilmesini þart koþtuðumuz için optimal akýþ, her ne ise,
+akisin muhafaza edilmesini þart koþtuðumuz için optimal akýþ, her ne ise,
 çýkýþ noktasýndan olan toplamý ile varýþ noktasýna giriþi ayný tutmalý
 (aradaki geçiþ düðümleri için de ayný þey geçerli olduðu için tabii), bu
-sebeple optimizasyonu tek bir toplam ile tanýmlayabildik. Ustteki grafik
-ornekte goruluyor, çýkýþ toplam 3+2+1 varis toplam 4+2.
+sebeple optimizasyonu tek bir toplam ile tanýmlayabildik. Üstteki grafik
+örnekte görülüyor, çýkýþ toplam 3+2+1 varýþ toplam 4+2. O zaman çýkýþý
+optimize edersek $t$'ye varan, tüm düðümler üzerinden olabilecek akýþý
+maksimize etmiþ oluruz.
+
+Bu programýn ikizini hesaplayabiliriz, üstteki bir LP ikizini bulmayi
+biliyoruz, ana LP'dekiler kýsýtlamalar kadar yeni deðiþken elde ederiz,
+vs.. Daha önce minimizasyon problemlerinin ikizine baktýk, ana problemde
+bir alt sýnýr elde etmeye uðraþýyorduk. Þimdi ana problem maksimizasyon, o
+zaman hedef için üst sýnýr aramak bizi ikize götürür. Min probleminde bile
+hedefe bir eksi iþareti eklesem onu maksimizasyon olarak görebilirdim, ve
+üst sýnýra bakabilirdim. Ýkizin türetisi için notlara bakabilirsiniz
+[2]. Sonuçta þu minimizasyonu elde ediyorum,
+
+$$
+\min_{b \in \mathbb{R}^{|E|}, x \in \mathbb{R}^{|V|}} 
+\sum _{(i,j) \in E} b_{ij} c_{ij} \quad \textrm{öyle ki}
+$$
+
+$$
+b_{ij} \ge x_i - x_j
+$$
+$$
+b_{ij}, x_i,x_j \in \{ 0,1\} \quad \forall i,j
+$$
+
+Elde ettiðimiz sonuc (hala ikize gelmedik) þunu söylüyor, elimdeki
+düðümleri öyle iki gruba ayýrmak istiyorum ki (altta bir grup görülüyor,
+renkli kýsým), bir gruptan diðer gruba geçen kapasitelerin, geçen
+kenarlarýn kapasitelerinin toplamý minimal olsun.
+
+\includegraphics[width=15em]{func_55_duality_03.png}
+
+Bu arada üstteki program bir LP deðil, bir tamsayý programý (ýnteðer
+program) çünkü eldeki düðümleri bir gruba ya da diðerine (0,1 deðerleri
+üzerinden) atýyoruz, deðiþkenler ikisel, doðal olarak tam sayýlar. Þimdi
+ikize geliyoruz, ana problemi ikiz üstteki tamsayý programýnýn gevþetilmiþ
+(relaxation) hali. 0,1 tamsayýlarýný alýp onlarý 0 ile 1 arasýnda gidip
+gelebilen reel deðiþkenler olarak tanýmlarsak bir LP elde ederiz. 
+
+Yani ana / ikizlik ve üstteki gevþetme arasýndaki iliþkiler þöyle
+
+maksimum akýþ deðeri $\le$ 
+gevþetilmiþ minimum kesiþ $\le$ 
+minimum kesiþin kapasitesi
+
+Gevþetme ile minimum deðer daha azaldý, tamsayý programýný gevþetip
+dýþbükey program haline getirince bunun olduðu biliniyor, kýsýtlama
+kümesini geniþlettim, bu minimumu küçültecektir. 
+
+Herhalde keþiþ kelimesinin nereden geldiði anlaþýlýyor þimdi, eðer elimde
+bir makasla renkli bölgeye giden baðlantýlarý kessem, en az mýktarda akýþý
+kesmiþ olurum, ve o renkli bölge içindeki akýþ en yüksek kapasitede olur.
+Ve buradaki problemde güçlü ikizlik durumu olduðu için bu iki deðer
+birbirine eþit! 
+
+Þimdi LP ikizliðine farklý bir açýdan bakalým, ki bu açý oldukca faydalý
+olacak. 
 
 
 
+
+
+
+
+
+
+
+
+Örnek
+
+\includegraphics[width=12em]{func_55_duality_04.png}
+\includegraphics[width=12em]{func_55_duality_05.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.optimize import linprog
+import numpy as np
+
+A_ub = np.eye(5)
+b_ub = np.array([1.,2.,2.,3.,1.])
+A_eq = np.array([[1, 0, -1, -1, 0],
+                 [0, 1, 1, 0, -1]])
+b_eq = np.array([ 0, 0 ]);
+f = np.array( [ 1, 1, 0, 0, 0 ])
+res = linprog(-f, A_ub=A_ub, b_ub=b_ub, \
+                 A_eq=A_eq, b_eq=b_eq)
+print (np.round(res.x))
+\end{minted}
+
+\begin{verbatim}
+[1. 1. 0. 1. 1.]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (res.x.dot(f))
+\end{minted}
+
+\begin{verbatim}
+1.9999999998438802
+\end{verbatim}
+
+Not: \verb!linprog! minimize etmeye ayarlý olduðu için hedefi eksi ile
+çarptýk, yani maksimizasyon yaptýrmýþ olduk.
+
+Maksimum akýþ 2.0 olarak bulundu. Optimize edilen $-c^T x$ dersek vektör
+$x$ içindeki öðeler $e_1,e_2,e_3,e_4,e_5$, ve $c$ içinde $1,1,0,0,0$ var,
+yani aslýnda sadece $e_1,e_2$'nin akýþ toplamýna bakmýþ oluyoruz. Bu normal,
+sebeplerinden önce bahsetmiþtik. Bulunan sonuç $x^* = (1,1,0,1,1)$, onu
+$c^Tx^*$ çarpýmý ilk iki öðeyi toplatýyor, ve 1+1 = 2. 
+
+Eþitlik kýsýtlamalarý $A_{eq}$ ve $b_{eq}$ içinde, sadece iki kýsýtlama
+var, bu kýsýtlamalardan ilki 1'e giren $e_1$ ile ondan çýkan $e_3,e_4$'un
+eþit olmasý gerektiðini söylüyor, bu sebeple ilk kýsýtlama $1,0,-1,-1,0$,
+ve ona tekabül eden $b_{eq}$ sýfýr deðerinde, $e_1$ akýþý ile $e_3,e_4$
+toplanýrsa sýfýr olsun demiþ oluyoruz. Ýkinci kýsýtlama 2'ye giren iki akýþ
+$e_2,e_3$ ile çýkan $e_5$'i dengeliyor.
 
 
 [devam edecek]
 
 Kaynaklar
 
-[1] Tibshirani, {\em Convex Optimization, Lecture 10}, 
+[1] Tibshirani, {\em Convex Optimization, Lecture Video 10}, 
 \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
 
+[1] Tibshirani, {\em Convex Optimization, Lecture Notes}, 
+\url{https://www.stat.cmu.edu/~ryantibs/convexopt/}
+
 \end{document}
+
+
+
 
