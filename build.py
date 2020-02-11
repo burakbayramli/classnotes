@@ -75,6 +75,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\diag", "\\mathrm{diag}")
       line = line.replace("\\proj", "\\mathrm{proj}")
       line = line.replace("\\rank", "\\mathrm{rank}")
+      line = line.replace("\\sign", "\\mathrm{sign}")
       line = line.replace("\\ddim", "\\mathrm{dim}")
       line = line.replace("\\begin{tabular}","\\begin{array}")
       line = line.replace("\\end{tabular}","\\end{array}")
