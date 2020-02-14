@@ -2,22 +2,38 @@
 \begin{document}
 Ana-Çift Ýç Nokta Metotlarý (Primal-Dual Interior-Point Methods)
 
-Daha önce bariyer metotlarýný gördük,
+Ýkizliðe Dönüþ
 
-Verili problem 
+Diþbukey optimizasyonun en güzel tarafý bence ikizlik. Harika, muazzam bir
+fikir benim gözümde. Bu konunun üzerinden bir daha geçeceðiz, bazý eklerle,
+amacýmýz ardýndan iþleyeceðimiz ana-çift iç nokta yöntemi için altyapýyý
+hazýrlamak [1]. 
+
+Bariyer metotlarýný hatýrlarsak amaçlarý Newton'un yöntemini eþitlik ve
+eþitsizlik sýnýrlarýný içerecek þekilde geniþletmek. Eþitsizlik sýnýrlarý
+kullanmasý zor olan türden sýnýrlar. Bu durumda yapýlan 
 
 $$
-\min_x f(x) \quad \textrm{öyle ki}
+\min_x f(x) + I_C(x) \quad \textrm{öyle ki}
 $$
 $$
-h_i(x) \le 0, \quad i=1,..,m
+Ax = b
 $$
 
-$f$,$h_i$ dýþbükey ve pürüzsüz olmalý. Bu problemi þu þekilde yaklaþýk
-þekilde ifade ediyoruz,
+$I_C$ ifadesi $x$'lerin bir $C$ kümesinden gelmesi gerektiðini söylüyor
+sadece. Üstteki problemi 
 
 $$
 \min_x f(x) + \frac{1}{t} \phi(x) \quad \textrm{öyle ki}
+$$
+$$
+Ax = b
+$$
+
+þeklinde yaklaþýklayabiliyoruz. Üstteki problemin bir diðer þekli
+
+$$
+\min_x t f(x) + \phi(x) \quad \textrm{öyle ki}
 $$
 $$
 Ax = b
@@ -32,14 +48,50 @@ $$
 \phi(x) = -\sum_{i=1}^{m} \log(-h_i(x))
 $$
 
-Ýki üstteki Newton yöntemi ile çözülüyor, her adýmda $t$ arttýrýlýyor, vs. 
+Bu tabii $f$ ve $h_i$ dýþbükey ve pürüzsüz ise iþler. Eðer KKT koþullarý
+hem orijinal problem hem de onun bariyer hali için geçerliyse, o zaman KKT
+bize güzel bir ikizlik boþluðu veriyor, 
 
-Bariyer ve ana-çift metotlarý birbirlerine çok benziyor. Her ikisi de iç
-nokta tekniði mesela. Ama bazý net farklarý da var. 
+$$
+f(x^*(t)) - f^* \le m/t
+$$
 
-Her iki yöntem de sarsým uygulamýþ (pertürbed) KKT yöntemi olarak
-görülebilir fakat log bariyer birkaç adým atar, ana-çift tek Newton adýmý
-atar. 
+$t$ dýþarýdan ayarlanabilir, büyük $t$ kriteri daha iyi yaklaþýklama yapar,
+vs. 
+
+Simdi genel formatta bir ana problemi tekrar verelim,
+
+$$
+\min_x f(x) \quad \textrm{öyle ki}
+$$
+$$
+h_i(x) \le 0, \quad i=1,..,m
+$$
+$$
+l_j(x) = 0, \quad j=1,..,r
+$$
+
+Üsttekinin illa dýþbükey olmasý gerekmiyor. Bu fonksiyon için bir
+Lagrangian oluþturuyoruz,
+
+$$
+L(x,u,v) =  f(x) + \sum_{i=1}^{m} u_i h_i(x) +  \sum_{i=1}^{r} v_i l_i(x)
+$$
+
+Ana problemi þu þekilde yazabiliriz, bu notasyon sadece daha önce
+gördüklerimizden pek bir farký yok,
+
+$$
+\min_x \max_{\substack{{u,v} \\ u\ge 0}} L(x,u,v) 
+$$
+
+Bu iþler çünkü maksimizasyon ifadesinin kýsýtlamalarý yerine getirdiðini
+düþünebiliriz. Eðer herhangi bir kýsýtlama ihlal edilirse, mesela
+$h_i$'lerden biri pozitif haline gelmiþ, ya da $l_j$'lerden biri sýfýr
+deðil, o zaman öne tekabül eden çarpaný arttýrabilirdik, ve $\max$ ifadesi
+buyurdu. Ama $\max$ optimizasyonu sýfýra gider. Üstteki yaklaþýmla doðal
+olarak ikizi elde ederiz, $\min$ ve $\max$'in yerini deðiþtirirsek ikiz
+problemi elde ederiz. 
 
 
 
@@ -58,6 +110,30 @@ atar.
 
 
 
+
+
+
+
+
+
+
+
+
+
+[devam edecek]
+
+Daha önce bariyer metodundan bahsettik. Fakat bir açýdan bariyer metotu en
+basit iç nokta yöntemidir. Püf noktayý hatýrlarsak IN yöntemlerinde
+eþitsizlik kýsýtlamalarýndan bazýlarýný bir bariyer fonksiyonuna
+koyuyorduk. Bu fena bir teknik deðil, ama dýþbükey optimizasyon problemleri
+için en etkili, en hýzlý yöntem olduðu söylenemez. Hem teorik hem pratik
+açýdan dýþbükey optimizasyon problemlerini iç nokta baðlamýnda çözmenin en
+hýzlý yolu ana-çift iç nokta metotudur.
+
+Bir açýdan aslýnda ana-çift tekniði bariyer yönteminin bir varyasyonu, o
+yüzden birazdan göreceklerimizin bir kýsmý tanýdýk gelebilir. Fakat kodlama
+açýsýndan bazý nüans farklarý var ki bu farklar performansa pozitif yönde
+etki ediyor.
 
 [devam edecek]
 
