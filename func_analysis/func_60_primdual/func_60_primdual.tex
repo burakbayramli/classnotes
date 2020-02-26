@@ -134,6 +134,21 @@ daha da yaklaþýyordu.
 
 Ana-çift metotlarýna eriþmenin bir diðer yolu sarsýmýn ortaya çýkarttýðý
 denklemleri birarada çözmek ve Newton adýmýný ona göre atmak [1, 22:55]. 
+
+Denklemler ayrý ayrý olarak 
+
+$$
+r_{dual}= \nabla f(x) + Dh(x)^T u + A^T v 
+$$
+
+$$
+r_{cent} = -\diag(u)h(x) - 1/t 
+$$
+
+$$
+r_{prim} = Ax - b
+$$
+
 Sarsým denklem sistemini sýfýra eþitlemek amacýyla matris formunda
 düzenlersek, 
 
@@ -235,11 +250,12 @@ A & 0 & 0
 \Delta x \\ \Delta y \\ \Delta v
 \end{array}\right] = 
 \left[\begin{array}{c}
-r_1 \\ r_2 \\ r_3 
-\end{array}\right] 
+r_{dual} \\ r_{cent} \\ r_{prim}
+\end{array}\right]  
+\mlabel{5}
 $$
 
-Buyuk Jacobian'i nasil elde ettik? Mesela (3)'un ilk satirina bakalim, 
+Büyük Jacobian'ý nasýl elde ettik? Mesela (3)'ün ilk satýrýna bakalým, 
 
 $$
 \nabla f(x) + Dh(x)^T u + A^T v 
@@ -261,10 +277,10 @@ geldi, ve bu koþullara ana ve ikiz deðiþkenler ayný yerde mevcuttur, ve
 Not: Bu yaklaþýmla bariyer metotuna eriþmek mümkün, o durumda sistemden $u$
 çýkartýlýr, ve geri kalanlar çözülür. 
 
-Metotu algoritmik olarak görmeden önce bir konudan daha bahsetmek istiyorum
-- alternatif ikizlik boþluðu. Bu gerçek ikizlik boþluðu deðil, çünkü daha
-önce belirttiðimiz gibi bu metotta ikiz deðiþkenler her zaman olurlu
-olmayabiliyor. 
+Metotu algoritmik olarak görmeden önce bir konudan daha bahsetmek
+istiyorum; alternatif ikizlik boþluðu. Bu gerçek ikizlik boþluðu deðil,
+çünkü daha önce belirttiðimiz gibi bu metotta ikiz deðiþkenler her zaman
+olurlu olmayabiliyor.
 
 Bariyer metotu için ikizlik boþluðu basitti, $m/t$ çünkü
 $u_i = -1 / (t h_i(x))$, $i=1,..,m$ tanýmlamýþtýk ve bu ikiz olurlu idi.
@@ -304,13 +320,20 @@ Adýmlar
 
 1) $t = \mu \eta^{(k-1)} / m$ tanýmla. 
 
-2) Ana-çift güncelleme yönü $\Delta y$'yi hesapla.
+2) Ana-çift güncelleme yönü $\Delta y$'yi hesapla (nasýl yapýlacaðýný
+gördük, (5)'teki lineer sistemi çözerek).
 
+3) Geri iz sürme tekniði ile adým büyüklüðü $s$'yi hesapla (birazdan nasýl
+yapýlacaðýný göreceðiz)
 
+4) $y^{(k)} = y^{(k-1)} + s \cdot \Delta y$ ile $y$'yi güncelle. Yani bu
+hesapla tüm ana, ikiz deðiþkenleri güncellemiþ oluyoruz, $x,u,v$. 
 
+5) Alternatif ikizlik boþluðunu hesapla $\eta^{(k)} = -h(x^{(k)})^T
+u^{(k)}$. 
 
-
-
+6) Ana ve ikiz artiklar ufak ise, yani eðer $\eta^{(k)} < \epsilon$ ise ve 
+$(|| r_{prim} ||_2^2 + ||r_{dual}||_2^2)^{1/2} < \epsilon$ ise dur. 
 
 
 
