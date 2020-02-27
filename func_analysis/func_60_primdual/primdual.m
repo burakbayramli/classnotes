@@ -11,14 +11,17 @@ x = zeros(n,1);
 
 b = ones(n,1)*10.;
 q = ones(n,1)*3.;
-A = rand(n,n)
-P = rand(n,n)
+A = [2 3 5; 3 4 5; 4 5 3]
+%A = rand(n,n);
+P = rand(n,n);
 
 s = b-A*x;
 z = 1./s;
 for iters = 1:MAXITERS
   gap = s'*z;
   res = P*x + q + A'*z ;
+  disp(res);
+  exit();
   if ((gap < TOL) && (norm(res) < RESTOL)), break; end;
   tinv = gap/(m*MU);
   sol = -[ P A'; A diag(-s./z) ] \ [ P*x+q+A'*z; -s + tinv*(1./z) ];
