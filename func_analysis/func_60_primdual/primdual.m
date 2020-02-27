@@ -29,9 +29,10 @@ for iters = 1:MAXITERS
   ds = -A*dx;
   r = [P*x+q+A'*z; z.*s-tinv];
   step = min(1.0, 0.99/max(-dz./z));
-  step
-  exit();
-  while (min(s+step*ds) <= 0), step = BETA*step; end;
+  while (min(s+step*ds) <= 0),
+    step = BETA*step;
+    step
+  end;
   newz = z+step*dz; newx = x+step*dx; news = s+step*ds;
   newr = [P*newx+q+A'*newz; newz.*news-tinv];
   while (norm(newr) > (1-ALPHA*step)*norm(r))
@@ -40,5 +41,6 @@ for iters = 1:MAXITERS
     newr = [P*newx+q+A'*newz; newz.*news-tinv];
   end;
   x = x+step*dx; z = z +step*dz; s = b-A*x;
+
 end;
 x

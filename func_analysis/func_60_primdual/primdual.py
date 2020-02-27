@@ -15,11 +15,11 @@ x = np.zeros((n,1));
 
 b = np.ones((n,1))*10.
 q = np.ones((n,1))*3.
-#A = np.random.randn(n,n)
+
 A = np.array( [[2, 3, 5],
                [3, 4, 5],
                [4, 5, 3]] )
-#P = np.random.rand(n,n)
+
 P = np.array( [[1, 2, 4],
                [2, 4, 4],
                [1, 1, 1]] )
@@ -47,7 +47,29 @@ for iters in (range(MAXITERS)):
   tmp2 = z*s-tinv
   r = np.vstack((tmp1, tmp2))
   step = np.min([1.0, 0.99/np.max(-dz/z)]);
-  print (step)
+  while (np.min(s+step*ds) <= 0):
+    step = BETA*step
+    print (step)
+    
+  newz = z+step*dz
+  newx = x+step*dx
+  news = s+step*ds
 
+  tmp1 = np.dot(P,newx)+q+np.dot(A.T,newz)
+  tmp2 = newz*news-tinv
+  newr = np.vstack((tmp1,tmp2))
+  while (lin.norm(newr) > (1-ALPHA*step)*lin.norm(r)):
+    step = BETA*step;
+    newz = z+step*dz
+    newx = x+step*dx
+    news = s+step*ds
+    tmp1 = np.dot(P,newx)+q+np.dot(A.T,newz)
+    tmp2 = newz*news-tinv
+    newr = np.vstack((tmp1,tmp2))
+    
+  x = x+step*dx
+  z = z +step*dz
+  s = b-np.dot(A,x)
+
+print (x)
   
-  break
