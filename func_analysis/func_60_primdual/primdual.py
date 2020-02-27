@@ -21,7 +21,7 @@ A = np.array( [[2, 3, 5],
                [4, 5, 3]] )
 #P = np.random.rand(n,n)
 P = np.array( [[1, 2, 4],
-               [2, 3, 4],
+               [2, 4, 4],
                [1, 1, 1]] )
 
 s = b-np.dot(A,x);
@@ -45,6 +45,4 @@ for iters in (range(MAXITERS)):
   sol = lin.solve(tmp3, tmp4)
   print (sol)
 
-#  print (tmp1)
-#  print (tmp2)
   break
