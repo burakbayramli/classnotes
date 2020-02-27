@@ -38,11 +38,16 @@ for iters in (range(MAXITERS)):
   tmp1 = np.hstack((P, A.T))
   tmp2 = np.hstack((A, np.diag(  (-s/z).T[0]  )))
   tmp3 = -np.vstack((tmp1,tmp2))
-  tmp4 = np.vstack(( np.dot(P,x)+q+np.dot(A.T,z), -s+tinv*(1.0/z) ))
-  print (tmp3)
-  print (tmp4)
- 
+  tmp4 = np.vstack(( np.dot(P,x)+q+np.dot(A.T,z), -s+tinv*(1.0/z) )) 
   sol = lin.solve(tmp3, tmp4)
-  print (sol)
+  dx = sol[0:n]
+  dz = sol[n:n+m]
+  ds = -np.dot(A,dx)
+  tmp1 = np.dot(P,x)+q+np.dot(A.T,z)
+  tmp2 = z*s-tinv
+  r = np.vstack((tmp1, tmp2))
+  step = np.min([1.0, 0.99/np.max(-dz/z)]);
+  print (step)
 
+  
   break

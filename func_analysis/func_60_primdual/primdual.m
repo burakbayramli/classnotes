@@ -23,14 +23,14 @@ for iters = 1:MAXITERS
   res = P*x + q + A'*z ;
   if ((gap < TOL) && (norm(res) < RESTOL)), break; end;
   tinv = gap/(m*MU);
-  -[ P A'; A diag(-s./z) ]
-  [ P*x+q+A'*z; -s + tinv*(1./z) ]
   sol = -[ P A'; A diag(-s./z) ] \ [ P*x+q+A'*z; -s + tinv*(1./z) ];
-  sol
-  exit();
-  dx = sol(1:n); dz = sol(n+[1:m]); ds = -A*dx;
+  dx = sol(1:n);
+  dz = sol(n+[1:m]);
+  ds = -A*dx;
   r = [P*x+q+A'*z; z.*s-tinv];
   step = min(1.0, 0.99/max(-dz./z));
+  step
+  exit();
   while (min(s+step*ds) <= 0), step = BETA*step; end;
   newz = z+step*dz; newx = x+step*dx; news = s+step*ds;
   newr = [P*newx+q+A'*newz; newz.*news-tinv];
