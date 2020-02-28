@@ -35,17 +35,15 @@ for iters in (range(MAXITERS)):
       break
   tinv = gap/(m*MU)
 
-  tmp1 = np.hstack((P, A.T))
-  tmp2 = np.hstack((A, np.diag(  (-s/z).T[0]  )))
-  tmp3 = -np.vstack((tmp1,tmp2))
-  tmp4 = np.vstack(( np.dot(P,x)+q+np.dot(A.T,z), -s+tinv*(1.0/z) )) 
-  sol = lin.solve(tmp3, tmp4)
+  tmp1 = -np.vstack((np.hstack((P, A.T)),
+                     np.hstack((A, np.diag(  (-s/z).T[0]  )))))
+  tmp2 = np.vstack(( np.dot(P,x)+q+np.dot(A.T,z), -s+tinv*(1.0/z) )) 
+  sol = lin.solve(tmp1, tmp2)
   dx = sol[0:n]
   dz = sol[n:n+m]
   ds = -np.dot(A,dx)
-  tmp1 = np.dot(P,x)+q+np.dot(A.T,z)
-  tmp2 = z*s-tinv
-  r = np.vstack((tmp1, tmp2))
+  r = np.vstack((np.dot(P,x)+q+np.dot(A.T,z),
+                 z*s-tinv))
   step = np.min([1.0, 0.99/np.max(-dz/z)]);
   while (np.min(s+step*ds) <= 0):
     step = BETA*step
@@ -63,9 +61,8 @@ for iters in (range(MAXITERS)):
     newz = z+step*dz
     newx = x+step*dx
     news = s+step*ds
-    tmp1 = np.dot(P,newx)+q+np.dot(A.T,newz)
-    tmp2 = newz*news-tinv
-    newr = np.vstack((tmp1,tmp2))
+    newr = np.vstack((np.dot(P,newx)+q+np.dot(A.T,newz),
+                      newz*news-tinv))
     
   x = x+step*dx
   z = z +step*dz
