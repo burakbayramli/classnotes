@@ -31,7 +31,6 @@ for iters in (range(MAXITERS)):
   gap = np.dot(s.T,z)
   res = np.dot(P,x) + q + np.dot(A.T,z)
   if (gap < TOL) & (lin.norm(res) < RESTOL):
-      print ('breaking')
       break
   tinv = gap/(m*MU)
 
