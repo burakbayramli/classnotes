@@ -126,7 +126,7 @@ koþularýnýn güçlü ikizlik durumunda þart olduðunu göstermiþ olduk.
 
 Diðer yönden ispat etmeye uðraþalým. 
 
-Elimizde KKT þartlarýný tatmin eden bir $x^*,u^*,v^*$ üçlüsü olduðunü
+Elimizde KKT þartlarýný tatmin eden bir $x^*,u^*,v^*$ üçlüsü olduðunu
 düþünelim, ve bu üçlünün optimal olmasý gerektiðini ispat edelim, yani
 $x^*$'in ana $u^*,v^*$'nin ikiz problem için optimal olmasý
 gerektiðini.. Eðer $x^*,u^*,v^*$ KKT þartlarýna uygunsa, duraðanlýða göre
@@ -184,7 +184,7 @@ Soru
 Eðer KKT koþullarýný tatmin etmek optimallik için yeterliyse dünyadaki her
 problemi KKT üzerinde rahatça çözebilir miyim?
 
-Hayýr - çünkü 1. KKT þartý, duraðanlýk þartýyla problem çýkabilir. Pürüzsüz
+Hayýr çünkü 1. KKT þartý, duraðanlýk þartýyla problem çýkabilir. Pürüzsüz
 bir problem için duraðanlýk için $f$ ve $h_i,l_i$'in gradyanlarýný almam
 yeter, sýfýra eþitlerim vs. Bir de dýþbükeylik varsa tipik olarak
 altgradyaný yazmak basittir. Sonucu bulmak her zaman kolay olmayabilir ama
@@ -269,23 +269,123 @@ saðýndaki ifade ile çarparým, bu bana ana-ikiz sonucu verir.
 Üstteki matrise bazen KKT matrisi deniyor, KKT koþullarýný kullanarak
 oluþturulduðu için. 
 
-[atlandi, su doldurma problemi, SVM]
+[atlandý, su doldurma problemi, SVM]
 
+Ekler
 
+Örnek
 
+Þimdi [2]'den alýnan bir örneði görelim. 
 
+$$
+\min_{x_1,x_2} x_1^2 + x_2^2 \quad \textrm{öyle ki}
+$$
+$$
+x_1 + x_2 = 5
+$$
 
+Burada bir eþitlikle kýsýtlanmýþ QP (equality constrained QP) var ve biraz
+önce gördüðümüz KKT matrisini oluþturarak onu tek adýmda çözebiliriz. 
+Kriter ve kýsýtlama matris formunda þöyle, $x = (x_1,x_2)$ alýrsak,
 
+$$
+f(x) = \frac{1}{2} x^T 
+\underbrace{
+\left[\begin{array}{cc}
+2 & 0 \\ 0 & 2
+\end{array}\right]}_{Q} x + 
+\left[\begin{array}{cc}
+0 & 0
+\end{array}\right]^T x
+$$
+$$
+\underbrace{
+\left[\begin{array}{cc}
+1 & 1
+\end{array}\right]}_{A}
+\left[\begin{array}{c}
+x_2 \\ x_2
+\end{array}\right] = 5
+$$
 
+(Sýfýr vektörü var çünkü tek baþýna $x_1,x_2$ ifadeleri yok)
 
-[devam edecek]
+KKT matrisini þöyle oluþtururuz, 
+
+$$
+\left[\begin{array}{ccc}
+Q & A^T \\ A & 0
+\end{array}\right]
+\left[\begin{array}{c}
+x \\ u
+\end{array}\right] =
+\left[\begin{array}{r}
+-c \\ b
+\end{array}\right] 
+$$
+
+$$
+\left[\begin{array}{ccc}
+2 & 0 & 1 \\
+0 & 2 & 1 \\
+1 & 1 & 0
+\end{array}\right]
+\cdot
+\left[\begin{array}{c}
+x_1 \\ x_2 \\ u
+\end{array}\right] = 
+\left[\begin{array}{c}
+0 \\ 0 \\ 5
+\end{array}\right] 
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+X = np.array([[2,0,1],[0,2,1],[1,1,0]]) 
+a = np.array([[0],[0],[5]])
+print (lin.solve(X,a))
+\end{minted}
+
+\begin{verbatim}
+[[ 2.5]
+ [ 2.5]
+ [-5. ]]
+\end{verbatim}
+
+Doðrulamak için paket ile çözelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from cvxopt import matrix
+from cvxopt import solvers
+Q = matrix([ [2.0, 0], [0, 2.0] ])
+p = matrix([0.0, 0.0])
+G = matrix([[0.0,0.0],[0.0,0.0]])
+h = matrix([0.0,0.0])
+A = matrix([1.0, 1.0], (1,2))
+b = matrix(5.0)
+sol=solvers.qp(Q, p, G, h, A, b)
+print (sol['x'])
+\end{minted}
+
+\begin{verbatim}
+     pcost       dcost       gap    pres   dres
+ 0:  1.2500e+01  1.2500e+01  2e+00  1e+00  1e-15
+ 1:  1.2500e+01  1.2500e+01  2e-02  1e-02  0e+00
+ 2:  1.2500e+01  1.2500e+01  2e-04  1e-04  0e+00
+ 3:  1.2500e+01  1.2500e+01  2e-06  1e-06  0e+00
+ 4:  1.2500e+01  1.2500e+01  2e-08  1e-08  0e+00
+Optimal solution found.
+[ 2.50e+00]
+[ 2.50e+00]
+\end{verbatim}
+
 
 Kaynaklar
 
 [1] Tibshirani, {\em Convex Optimization, Lecture Video 12}, 
 \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
 
+[2] Lendek, {\em Optimization Lecture, Quadratic Programming}
+\url{http://www.lendek.net/teaching/opt_en/}
+
 \end{document}
-
-
-
