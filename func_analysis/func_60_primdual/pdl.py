@@ -38,7 +38,8 @@ def solve(c, A, b, epsilon=0.0001):
         b_ = np.zeros(shape=(n + m + n, ))
         b_[0:m] = np.copy(b - np.dot(A, x))
         b_[m:m + n] = np.copy(c - np.dot(A.T, l) - s)
-        b_[m + n:m + n + n] = np.copy( sigma_k * mu_k * np.ones(shape=(n, )) - np.dot(np.dot(np.diag(x), np.diag(s)), np.ones(shape=(n, ))) )
+        tmp = np.dot(np.dot(np.diag(x), np.diag(s)), np.ones(shape=(n, )))
+        b_[m + n:m + n + n] = np.copy( sigma_k * mu_k * np.ones(shape=(n, )) - tmp )
 
         delta = np.linalg.solve(A_, b_)
         delta_x = delta[0:n]
