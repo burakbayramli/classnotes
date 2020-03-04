@@ -3,8 +3,6 @@ from scipy.optimize import linprog
 from numpy.linalg import matrix_rank
 
 def solve(c, A, b, epsilon=0.0001):
-    assert A.shape[0] == b.shape[0], 'first dims of A and b must match, check input!'
-    assert A.shape[1] == c.shape[0], 'second dim of A must match first dim of c, check input!'    
     if matrix_rank(A) < min(A.shape[0], A.shape[1]):
         print('A is not full rank, dropping redundant rows')
         _, pivots = sympy.Matrix(A).T.rref()
@@ -24,7 +22,8 @@ def solve(c, A, b, epsilon=0.0001):
         k += 1
         primal_obj = np.dot(c, x)
         dual_obj = np.dot(b, l)
-        print('iteration #{}; primal_obj = {:.5f}, dual_obj = {:.5f}; duality_gap = {:.5f}'.format(k, primal_obj, dual_obj, primal_obj - dual_obj))        
+        print('iteration #{}; primal_obj = {:.5f}, dual_obj = {:.5f}; duality_gap = {:.5f}'.format
+              (k, primal_obj, dual_obj, primal_obj - dual_obj)) 
         sigma_k = 0.4
         mu_k = np.dot(x, s) / n
 
@@ -61,7 +60,8 @@ def solve(c, A, b, epsilon=0.0001):
 
     diff = np.dot(A, x) - b
     print('Ax - b = {}; ideally it should have been zero vector'.format(diff))
-    print('norm of Ax - b is = {}; ideally it should have been zero'.format(np.linalg.norm(diff)))
+    print('norm of Ax - b is = {}; ideally it should have been zero'.format
+          (np.linalg.norm(diff)))
 
     return x
 
