@@ -565,7 +565,7 @@ x^{(k)} = x^{(k-1)} - t_k \cdot g^{(k-1)}, \quad k=1,2,3,..
 $$
 
 adým atarak ilerliyoruz, öyle ki $g^{(k-1)} \in \partial f(x^{(k-1)})$
-yani $f$'nin $x^{(k-1)}$ noktasýndaki herhangi bir altgradyani. Adým ata
+yani $f$'nin $x^{(k-1)}$ noktasýndaki herhangi bir altgradyaný. Adým ata
 ata gidiyorum, her adýmda mevcut altgradyanlara bakýyorum, herhangi birini
 seçiyorum, ona $g^{(k-1)}$ diyelim, ve $x$'i bu yönde olacak þekilde bir
 $t_k$'ye oranlý olarak güncelliyorum [2, 49:50]. 
@@ -639,7 +639,7 @@ $$
 \lim_{k \to \infty} f(x_{best}^{(k)} ) = f^*
 $$
 
-[ek detaylar atlandi]
+[ek detaylar atlandý]
 
 Altgradyan metotuna bir örnek olarak [2, 1:01:36] regülarize edilmiþ
 lojistik regresyona bakabiliriz. $\beta$ katsayýlarýný bulmaya uðraþýyoruz,
@@ -664,12 +664,65 @@ $$
 \min_\beta f(\beta) + \lambda \cdot P(\beta)
 $$
 
-ki $P(\beta) = ||\beta||_2^2$ olabilir (Ridge cezasý) ya da $P(\beta) =
-||\beta|_1|$ (Lasso cezasý).
+ki $P(\beta) = ||\beta||_2^2$ olabilir (Ridge cezasý) ya da
+$P(\beta) = ||\beta|_1|$ (Lasso cezasý). Bu cezalardan ilki pürüzsüz,
+diðeri deðil. Böylece birinde gradyan iniþi diðerinde altgradyan metotu
+kullanmak zorunda olacaðýz.
 
+Ekler
 
+Alttaki ornek [3]'ten,
 
+$$
+\min_w F(w) = \frac{1}{2} \sum _{i=1}^{N} (x_i^T w - y_i)^2 + \lambda ||w||_1
+$$
 
+gibi bir Lasso ornegi var. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+def subgrad(w):
+    return X.T*(X*w-y) + lamda*np.sign(w)
+
+def obj(w):
+    r = X*w-y;
+    return np.sum(np.multiply(r,r))/2 + lamda * np.sum(np.abs(w))
+
+N = 40
+dim = 10
+max_iter = 100
+lamda = 1/np.sqrt(N);
+np.random.seed(50)
+w = np.matrix(np.random.multivariate_normal([0.0]*dim, np.eye(dim))).T
+X = np.matrix(np.random.multivariate_normal([0.0]*dim, np.eye(dim), size = N))
+y = X*w
+
+w = np.matrix([0.0]*dim).T
+obj_SD = []
+gamma = 0.01
+for t in range(0, max_iter):
+    obj_val = obj(w)
+    w = w - gamma * subgrad(w)/np.sqrt(t+1)
+    obj_SD.append(obj_val.item())
+
+print (w)        
+\end{minted}
+
+\begin{verbatim}
+[[-1.50683072]
+ [-0.03159227]
+ [-0.60208853]
+ [-1.39146151]
+ [ 1.28375374]
+ [-0.4670357 ]
+ [-0.80951798]
+ [ 1.01964403]
+ [-1.25206724]
+ [-1.33062765]]
+\end{verbatim}
 
 Kaynaklar
 
@@ -678,6 +731,9 @@ Kaynaklar
 
 [2] Tibshirani, {\em Convex Optimization, Lecture Video 7}, 
 \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}
+
+[3] He, {\em IE 598 - BIG DATA OPTIMIZATION},  
+    \url{http://niaohe.ise.illinois.edu/IE598_2016/}
 
 \end{document}
 
