@@ -18,6 +18,12 @@ while k<3 || (abs(f(k-1)-f(k-2))/f(k-1))>1e-5
     s = x;
     s(x>0)=1;
     s(x<0)=-1;
+    if x==0
+      disp('--');
+      x
+      length(find(x==0))
+      rand(length(find(x==0)),1)
+    end
     s(x==0) = -2*rand(length(find(x==0)),1)+1;
     g = A'*(A*x-b)+lambda*s;
     x = x - t*g;
