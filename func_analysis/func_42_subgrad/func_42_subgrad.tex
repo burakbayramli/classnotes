@@ -776,8 +776,80 @@ $$
 L1 normu $||x||_1$ gradyan iniþi için problemli o sebeple altgradyan metotu
 kullanacaðýz. 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.io as sio
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import numpy.linalg as lin
 
+def subgrad_func(A,b,lam):
+    n2 = A.shape[1]
+    x = np.zeros((n2,1))
+    k=1
+    g = np.ones((n2,1))
+    t = 0.01
+    f = []
+    while True:
+        if k>3: 
+            crit = np.abs(f[k-2]-f[k-3])/f[k-2]
+            if crit < 1e-5: break
+        tmp = 0.5*lin.norm(np.dot(A,x)-b,2)**2+lam*lin.norm(x,1);        
+        if k%10==0: print (tmp)
+        f.append(tmp)
+        s = x.copy()
+        s[x>0]=1
+        s[x<0]=-1
+        if len(s[x==0])>0: 
+            s[x==0] = -2*np.random.rand(len(x==0))+1
+        g = np.dot(A.T,np.dot(A,x)-b) + lam*s
+        x = x - t*g
+        k = k+1
+    return x
+                
+mat = sio.loadmat('A.mat'); A = mat['A']
+mat = sio.loadmat('y.mat'); y = mat['y']
 
+lam = 0.1;
+x = subgrad_func(A,y.T,lam);
+print (x)
+\end{minted}
+
+\begin{verbatim}
+6167530.301779426
+6017359.036775412
+5936042.989417635
+5887955.576080975
+5856837.075364264
+5835069.638727152
+5818932.345168407
+5806488.96598551
+5796653.577008183
+5788760.249437735
+5782366.839177568
+5777155.622641307
+5772889.323026038
+5769385.265031525
+5766499.567337589
+5764117.488506298
+5762146.803214461
+5760512.996033773
+5759155.637033945
+5758025.579617569
+5757082.759750484
+5756294.450219869
+5755633.866768847
+[[   5.34801494]
+ [-200.87783862]
+ [ 490.9416044 ]
+ [ 304.14906263]
+ [ -43.03807931]
+ [-107.97620764]
+ [-207.47164274]
+ [ 127.15473514]
+ [ 410.70895255]
+ [ 115.41865865]]
+\end{verbatim}
 
 
 

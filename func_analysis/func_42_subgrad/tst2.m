@@ -1,10 +1,7 @@
 load A.mat;
 load y.mat;
 
-y = y'
-
-size(A)
-size(y)
+y = y';
 
 lambda = 0.1;
 

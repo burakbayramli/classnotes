@@ -8,9 +8,10 @@ function subgrad_func(A,b,lambda)
   g = ones(n2,1);
   t = 0.01;
 
-  while k<3 || (abs(f(k-1)-f(k-2))/f(k-1))>1e-5
+  while k<3 || abs(f(k-1)-f(k-2))/f(k-1)>1e-5
     % f(round(k/10)+1)=0.5*norm(A*x-b,2)^2+lambda*norm(x,1);
     f(k)=0.5*norm(A*x-b,2)^2+lambda*norm(x,1);
+    disp(f(k));
     % the subgradient is A'*(A*x-b)
     s = x;
     s(x>0)=1;
