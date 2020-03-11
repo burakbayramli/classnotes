@@ -6,5 +6,3 @@ y = y';
 lambda = 0.1;
 
 subgrad_func(A,y,lambda);
-
-
