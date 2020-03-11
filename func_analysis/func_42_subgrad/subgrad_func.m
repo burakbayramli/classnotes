@@ -6,12 +6,9 @@ function subgrad_func(A,b,lambda)
   x = zeros(n2,1);
   k=1;
   g = ones(n2,1);
-  t = 0.0001;
-
-  t_lapse(1)=0;
+  t = 0.01;
 
   while k<3 || (abs(f(k-1)-f(k-2))/f(k-1))>1e-5
-    tic
     % f(round(k/10)+1)=0.5*norm(A*x-b,2)^2+lambda*norm(x,1);
     f(k)=0.5*norm(A*x-b,2)^2+lambda*norm(x,1);
     % the subgradient is A'*(A*x-b)
@@ -21,7 +18,6 @@ function subgrad_func(A,b,lambda)
     s(x==0) = -2*rand(length(find(x==0)),1)+1;
     g = A'*(A*x-b)+lambda*s;
     x = x - t*g;
-    t_lapse(k)=toc;
     k = k+1;
 end;
 x
