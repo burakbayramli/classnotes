@@ -69,23 +69,81 @@ $$
 f(x) = g(x) + h(x)
 $$
 
-formundadir. 
+formundadýr [1, 45:59]. 
 
 
 
 
 
 
+Proksimal [2]
 
+\begin{minted}[fontsize=\footnotesize]{python}
+N = 100
+dim = 30
+lamda = 1/np.sqrt(N);
+np.random.seed(50)
+w = np.matrix(np.random.multivariate_normal([0.0]*dim, np.eye(dim))).T
+X = np.matrix(np.random.multivariate_normal([0.0]*dim, np.eye(dim), size = N))
+y = X*w
 
+L = (np.linalg.svd(X)[1][0])**2
+print(L)
+max_iter = 100
 
+def obj(w):
+    r = X*w-y;
+    return np.sum(np.multiply(r,r))/2 +  lamda * np.sum(np.abs(w))
 
+def f_grad(w):
+    return  X.T*(X*w-y) 
+
+def soft_threshod(w,mu):
+    return np.multiply(np.sign(w), np.maximum(np.abs(w)- mu,0))  
+
+w = np.matrix([0.0]*dim).T
+obj_PG = []
+for t in range(0, max_iter):
+    obj_val = obj(w)
+    w = w - (1/L)* f_grad(w)
+    w= soft_threshod(w,lamda/L)
+    
+    obj_PG.append(obj_val.item())
+    if (t%5==0):
+        print('iter= {},\tobjective= {:3f}'.format(t, obj_val.item()))
+\end{minted}
+
+\begin{verbatim}
+228.3801231037125
+iter= 0,	objective= 1761.785102
+iter= 5,	objective= 28.002804
+iter= 10,	objective= 4.813366
+iter= 15,	objective= 2.892747
+iter= 20,	objective= 2.559209
+iter= 25,	objective= 2.465096
+iter= 30,	objective= 2.433524
+iter= 35,	objective= 2.422408
+iter= 40,	objective= 2.418440
+iter= 45,	objective= 2.417017
+iter= 50,	objective= 2.416505
+iter= 55,	objective= 2.416321
+iter= 60,	objective= 2.416255
+iter= 65,	objective= 2.416231
+iter= 70,	objective= 2.416222
+iter= 75,	objective= 2.416219
+iter= 80,	objective= 2.416218
+iter= 85,	objective= 2.416218
+iter= 90,	objective= 2.416218
+iter= 95,	objective= 2.416218
+\end{verbatim}
 
 Kaynaklar
 
 [1] Tibshirani, {\em Convex Optimization, Lecture Video 8}, 
 \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}
 
+[2] He, {\em IE 598 - BIG DATA OPTIMIZATION},  
+    \url{http://niaohe.ise.illinois.edu/IE598_2016/}
 
 
 \end{document}

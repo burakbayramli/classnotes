@@ -46,4 +46,3 @@ while k < MAX_ITERS
 end
 
 x
-
