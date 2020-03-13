@@ -66,15 +66,86 @@ yerine belli bir yapýya uyan çetrefil fonksiyonlarý optimize etmeye
 uðraþýr. Bu yapý
 
 $$
-f(x) = g(x) + h(x)
+f(x) = g(x) + h(x) \mlabel{1}
 $$
 
-formundadýr [1, 45:59]. 
+formundadýr [1, 45:59]. $g,h$'in ikisi de dýþbükey. $g$'nin pürüzsüz,
+türevi alýnabilir olduðu farz edilir (çoðunlukla oldukca çetrefil olabilir)
+ve $\dom(g) = \mathbb{R}^n$, $h$ ise pürüzsüz olmayabilir. Tabii pürüzsüz
+artý pürüzsüz olmayan iki fonksýsyon toplamý kriterin tamamýný pürüzsüz
+olmayan hale çevirir. Ama bu toplam daha basittir denebilir, onun üzerinde
+proksimal operatörü uygulanabilir.
+
+Hatýrlarsak eðer $f$ türevi alýnabilir olsaydý gradyan iniþ güncellemesi 
+
+$$
+x^{+} = x - t \cdot \nabla f(x)
+$$
+
+Bu formüle eriþmenin bir yöntemi karesel yaklaþýklama üzerinden idi,
+$f$'nin $x$ etrafýndaki yaklaþýklamasýnda $\nabla^2f(x)$ yerine
+$\frac{1}{t} I$ koyunca,
+
+$$
+x^{+} = \arg\min_x f(x) + 
+\underbrace{
+  \nabla f(x)^T (z-x) + \frac{1}{2t} ||z-x||_2^2 
+}_{f_t(z)}
+$$
+
+elde ediliyordu. Yani gradyan iniþi sanki ardý ardýna geldiði her noktada
+bir karesel yaklaþýklama yapýyor, ve onu adým atarak minimize etmeye
+uðraþýyor.
+
+Ama (1)'deki $f$ pürüzsüz deðil, o sebeple üstteki mantýk ise
+yaramayacak. Fakat, belki de karesel yaklaþýklamanýn bir kýsmýný hala
+kullanabiliriz, ve minimizasyonu sadece $g$'ye uygularýz çünkü pürüzsüz
+olan kýsým o. Yani niye $g$'nin yerine karesel yaklaþýklama koymayalým?
+Þimdi bunu yapacaðýz [1, 50:10]. 
+
+$$
+x^{+} = \arg\min_z \tilde{g}_t(z) + h(z)
+$$
+
+ki $\tilde{g}_t(z)$ $g$'nin $x$ noktasý etrafýndaki karesel yaklaþýklamasý
+oluyor.  Eðer elimizde $h$ olmasaydý üstteki sadece bir gradyan
+güncellemesine indirgenebilirdi. Neyse açýlýmý yaparsak
+
+$$
+= \arg\min_z g(x) + \nabla g(x)^T (z-x) + \frac{1}{2t} ||z-x||_2^2 + h(z)
+$$
+
+Daha uygun bir formda yazabiliriz, $z$'nin $g$ üzerindeki deðiþikliðe
+karesel uzaklýðý olarak,
+
+$$
+= \arg\min_z \frac{1}{2t} 
+\big|\big| z - \big( x-t\nabla g(x) \big) \big|\big|_2^2 + 
+h(z)
+$$
+
+Yani söylenmek istenen, hem sadece $g$ olsaydý atacaðýmýz gradyan adýmýna
+yakýn durmaya çalýþmak, hem de $h$'nin kendisini ufak tutmak. Dýþarýdan
+ayarlanan $t$ parametresi $g$ gradyan adýmý ile $h$ arasýnda bir denge
+kurmak gibi görülebilir, eðer $t$ ufak ise o zaman gradyan adýmýna yakýn
+durmaya daha fazla önem atfetmiþ olacaðýz, $h$'nin ufak tutulmasýna daha
+az. $t$ çok büyük ise tam tersi olacak. 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+[devam edecek]
 
 Proksimal [2]
 
@@ -109,7 +180,7 @@ for t in range(0, max_iter):
     w= soft_threshod(w,lamda/L)
     
     obj_PG.append(obj_val.item())
-    if (t%5==0):
+    if (t % 5==0):
         print('iter= {},\tobjective= {:3f}'.format(t, obj_val.item()))
 \end{minted}
 
@@ -147,15 +218,4 @@ Kaynaklar
 
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
 
