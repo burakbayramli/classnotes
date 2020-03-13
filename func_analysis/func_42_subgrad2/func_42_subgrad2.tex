@@ -146,11 +146,11 @@ $$
 Üstteki $x$'in bir fonksiyonu olarak $\arg\min$'de gösterilen kriteri
 minimize eden $z$'yi buluyor. Operatör $t$'ye baðlý, dýþarýdan verilen
 parametre. Tabii ki $h$'ye de baðlý, ki bazen üstteki operatörü
-$\prox_{h,t}$ olarak ta görebiliyoruz. 
+$\prox_{h,t}$ olarak gösteren de oluyor. 
 
 Üstteki ifadenin eþleme olduðunu kontrol edelim. Ciddi tanýmlý bir
 fonksiyon üstteki deðil mi? Ona bir $x$ veriyorsunuz, o da size tek bir
-sonuç donduruyor. Ayrýca bu eþleme / fonksiyonun kendisi bir
+sonuç döndürüyor. Ayrýca bu eþleme / fonksiyonun kendisi bir
 minimizasyon. Peki bu minimizasyon problemi dýþbükey mi? Evet. Peki bu
 problemin özgün bir sonucu var mýdýr? Vardýr çünkü üstteki problem harfiyen
 dýþbükey. Deðil mi? Eðer $h$ harfiyen dýþbükey olmasa bile ifadenin tümü
@@ -242,7 +242,7 @@ $$
 = S_{\lambda t}(\beta)
 $$
 
-Yine yumuþak eþikleme operatörüne gelmiþ olduk, 
+Yine yumuþak eþikleme (soft-threshold) operatörüne gelmiþ olduk, 
 
 $$
 [ S_{\lambda} (\beta) ]_i = 
@@ -276,7 +276,7 @@ yaklaþtýrýr.
 
 Üstteki Lasso algoritmasina ÝSTA adý da verilir. 
 
-Geriye Cizgisel Iz Surme  (Backtracking line search)
+Geriye Çizgisel Ýz Sürme  (Backtracking line search)
 
 Graydan iniþinde görmüþtük ki adým büyüklüklerini dinamik olarak
 seçebiliyorduk, her adýmdaki duruma adapte olabiliyorduk, tipik olarak
@@ -286,19 +286,9 @@ iyi iþlemesiyle beraber, teorik olarak yakýnsamayý da garantiliyordu.
 Proksimal gradyanlarý için benzer bir kavram geçerli. Ayrýca proksimal
 durumda geriye doðru iz sürmenin birden fazla yolu var. 
 
+[atlandý]
 
-
-
-
-
-
-
-
-
-
-[devam edecek]
-
-Proksimal [2]
+Örnek kod, Lasso problem çözümü [2]
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -308,16 +298,16 @@ X = np.array(diabetes.drop("response",axis=1))
 N,dim = X.shape
 print (N,dim)
 
-lamda = 1/np.sqrt(N);
+lam = 1/np.sqrt(N);
 w = np.matrix(np.random.multivariate_normal([0.0]*dim, np.eye(dim))).T
 
 L = (np.linalg.svd(X)[1][0])**2
 print(L)
-max_iter = 2000
+max_iter = 500
 
 def obj(w):
     r = X*w-y;
-    return np.sum(np.multiply(r,r))/2 +  lamda * np.sum(np.abs(w))
+    return np.sum(np.multiply(r,r))/2 +  lam * np.sum(np.abs(w))
 
 def f_grad(w):
     return  X.T*(X*w-y) 
@@ -329,8 +319,8 @@ w = np.matrix([0.0]*dim).T
 for t in range(0, max_iter):
     obj_val = obj(w)
     w = w - (1/L)* f_grad(w)
-    w= soft_threshod(w,lamda/L)    
-    if (t % 100==0):
+    w= soft_threshod(w,lam/L)    
+    if (t % 50==0):
         print('iter= {},\tobjective= {:3f}'.format(t, obj_val.item()))
 
 print (w)
@@ -340,35 +330,25 @@ print (w)
 442 10
 4.0242141761466925
 iter= 0,	objective= 6425460.500000
+iter= 50,	objective= 5751070.568959
 iter= 100,	objective= 5750285.357193
+iter= 150,	objective= 5749670.506866
 iter= 200,	objective= 5749177.635558
+iter= 250,	objective= 5748779.527464
 iter= 300,	objective= 5748457.810485
+iter= 350,	objective= 5748197.804952
 iter= 400,	objective= 5747987.670443
-iter= 500,	objective= 5747680.585550
-iter= 600,	objective= 5747480.840456
-iter= 700,	objective= 5747352.768333
-iter= 800,	objective= 5747269.117760
-iter= 900,	objective= 5747214.479036
-iter= 1000,	objective= 5747178.790173
-iter= 1100,	objective= 5747155.478960
-iter= 1200,	objective= 5747140.252567
-iter= 1300,	objective= 5747130.307008
-iter= 1400,	objective= 5747123.810778
-iter= 1500,	objective= 5747119.567577
-iter= 1600,	objective= 5747116.796008
-iter= 1700,	objective= 5747114.985678
-iter= 1800,	objective= 5747113.803208
-iter= 1900,	objective= 5747113.030844
-[[  -9.85465515]
- [-239.66588336]
- [ 520.00751394]
- [ 324.2393019 ]
- [-773.92350262]
- [ 462.44259156]
- [  92.6473529 ]
- [ 174.36392565]
- [ 744.5680112 ]
- [  67.64809844]]
+iter= 450,	objective= 5747817.840900
+[[  -8.71913404]
+ [-238.35531517]
+ [ 522.93302022]
+ [ 323.11825944]
+ [-526.09642955]
+ [ 265.58097894]
+ [ -17.84381222]
+ [ 143.15165377]
+ [ 652.14114865]
+ [  68.55685031]]
 \end{verbatim}
 
 Kaynaklar
@@ -381,4 +361,8 @@ Kaynaklar
 
 
 \end{document}
+
+
+
+
 
