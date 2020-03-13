@@ -301,17 +301,19 @@ durumda geriye doðru iz sürmenin birden fazla yolu var.
 Proksimal [2]
 
 \begin{minted}[fontsize=\footnotesize]{python}
-N = 100
-dim = 30
+import pandas as pd
+diabetes = pd.read_csv("../../stat/stat_120_regular/diabetes.csv",sep=';')
+y = np.array(diabetes['response'].astype(float)).reshape(442,1)
+X = np.array(diabetes.drop("response",axis=1))
+N,dim = X.shape
+print (N,dim)
+
 lamda = 1/np.sqrt(N);
-np.random.seed(50)
 w = np.matrix(np.random.multivariate_normal([0.0]*dim, np.eye(dim))).T
-X = np.matrix(np.random.multivariate_normal([0.0]*dim, np.eye(dim), size = N))
-y = X*w
 
 L = (np.linalg.svd(X)[1][0])**2
 print(L)
-max_iter = 100
+max_iter = 2000
 
 def obj(w):
     r = X*w-y;
@@ -321,42 +323,52 @@ def f_grad(w):
     return  X.T*(X*w-y) 
 
 def soft_threshod(w,mu):
-    return np.multiply(np.sign(w), np.maximum(np.abs(w)- mu,0))  
+    return np.multiply(np.sign(w), np.maximum(np.abs(w)-mu,0))  
 
 w = np.matrix([0.0]*dim).T
-obj_PG = []
 for t in range(0, max_iter):
     obj_val = obj(w)
     w = w - (1/L)* f_grad(w)
-    w= soft_threshod(w,lamda/L)
-    
-    obj_PG.append(obj_val.item())
-    if (t % 5==0):
+    w= soft_threshod(w,lamda/L)    
+    if (t % 100==0):
         print('iter= {},\tobjective= {:3f}'.format(t, obj_val.item()))
+
+print (w)
 \end{minted}
 
 \begin{verbatim}
-228.3801231037125
-iter= 0,	objective= 1761.785102
-iter= 5,	objective= 28.002804
-iter= 10,	objective= 4.813366
-iter= 15,	objective= 2.892747
-iter= 20,	objective= 2.559209
-iter= 25,	objective= 2.465096
-iter= 30,	objective= 2.433524
-iter= 35,	objective= 2.422408
-iter= 40,	objective= 2.418440
-iter= 45,	objective= 2.417017
-iter= 50,	objective= 2.416505
-iter= 55,	objective= 2.416321
-iter= 60,	objective= 2.416255
-iter= 65,	objective= 2.416231
-iter= 70,	objective= 2.416222
-iter= 75,	objective= 2.416219
-iter= 80,	objective= 2.416218
-iter= 85,	objective= 2.416218
-iter= 90,	objective= 2.416218
-iter= 95,	objective= 2.416218
+442 10
+4.0242141761466925
+iter= 0,	objective= 6425460.500000
+iter= 100,	objective= 5750285.357193
+iter= 200,	objective= 5749177.635558
+iter= 300,	objective= 5748457.810485
+iter= 400,	objective= 5747987.670443
+iter= 500,	objective= 5747680.585550
+iter= 600,	objective= 5747480.840456
+iter= 700,	objective= 5747352.768333
+iter= 800,	objective= 5747269.117760
+iter= 900,	objective= 5747214.479036
+iter= 1000,	objective= 5747178.790173
+iter= 1100,	objective= 5747155.478960
+iter= 1200,	objective= 5747140.252567
+iter= 1300,	objective= 5747130.307008
+iter= 1400,	objective= 5747123.810778
+iter= 1500,	objective= 5747119.567577
+iter= 1600,	objective= 5747116.796008
+iter= 1700,	objective= 5747114.985678
+iter= 1800,	objective= 5747113.803208
+iter= 1900,	objective= 5747113.030844
+[[  -9.85465515]
+ [-239.66588336]
+ [ 520.00751394]
+ [ 324.2393019 ]
+ [-773.92350262]
+ [ 462.44259156]
+ [  92.6473529 ]
+ [ 174.36392565]
+ [ 744.5680112 ]
+ [  67.64809844]]
 \end{verbatim}
 
 Kaynaklar
