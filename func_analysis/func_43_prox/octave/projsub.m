@@ -1,3 +1,5 @@
+% solves the diabetes problem using proximal desc
+
 load A.mat;
 load y.mat;
 y = y';
