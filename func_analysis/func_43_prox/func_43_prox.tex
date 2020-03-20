@@ -87,7 +87,7 @@ $$
 Üstteki $x$'in bir fonksiyonu olarak $\arg\min$'de gösterilen kriteri
 minimize eden $z$'yi buluyor. Operatör $t$'ye baðlý, dýþarýdan verilen
 parametre. Tabii ki $h$'ye de baðlý, ki bazen üstteki operatörü
-$\prox_{h,t}$ olarak gösteren de oluyor. 
+$\prox_{h,t}$ olarak gösteren de oluyor.
 
 Üstteki ifadenin eþleme olduðunu kontrol edelim. Ciddi tanýmlý bir
 fonksiyon üstteki deðil mi? Ona bir $x$ veriyorsunuz, o da size tek bir
@@ -127,7 +127,7 @@ alakalý ispatlarda kullanýlabilir.
 
 Þimdiye kadar anlattýklarýmýza bakanlara bu komik bir hikaye gibi
 gelebilir. Bir $g + h$ toplamýný minimize etmek istiyordum, bunu yapabilmek
-için (2) formunda adýmlar atacaðým, bir $\prox$ operatörüm var, ama bu
+için (2) formunda adýmlar atacaðým, bir prox operatörüm var, ama bu
 operatör bir sonuç döndürüyor aslýnda, ve bu sonuç bir baþka
 minimizasyondan geliyor. Yani $g + h$ türü bir toplam minimizasyonu yerine
 her adýmda, bir sürü minimizasyonlarý koymuþ oldum. Bu nasýl daha iyi bir
@@ -160,11 +160,11 @@ parametresi üzerinden katsayýlarýn 1. normu. Bu kriteri pürüzsüz, ve
 pürüzsüz olmayan ama basitçe olan iki kýsma ayýracaðýz, yani zaten oldukca
 bariz, pürüzsüz kýsým 1. terim, $g(\beta)$ diyelim, olmayan 2. terim,
 $h(\beta)$ diyelim. Proksimal gradyan iniþi için bize iki þey gerekiyor,
-birincisi $g$'nin gradyaný, ikincisi $h$ için $\prox$ operatörünü
+birincisi $g$'nin gradyaný, ikincisi $h$ için prox operatörünü
 hesaplayabilmek.
 
 $g$'nin gradyaný oldukca basit, onu bu noktada uykumuzda bile bulabiliyor
-olmamýz lazým. $h$'nin $\prox$ operatörü,
+olmamýz lazým. $h$'nin prox operatörü,
 
 $$
 \prox_t(\beta) = \arg\min_z \frac{1}{2t} ||\beta-z||_2^2 + \lambda ||z||_1
@@ -205,7 +205,7 @@ O zaman güncelleme
 
 $$\beta + t X^T (y-X\beta)$$ 
 
-olur. Buna $\prox$ uygularsak,
+olur. Buna prox uygularsak,
 
 $$
 \beta^+ = S_{\lambda t}(\beta + t X^T (y-X\beta))
@@ -248,7 +248,7 @@ $$
 Yani gradyan güncellemesi 1. derece Taylor güncellemesinden geldi. Üstteki
 ifadede de eðime ek olarak 1. derece Taylor güncellemesine göre de
 yeterince iniþ yapmýþ olmak istiyorum. Dikkat edersek eðer $G$ yerine
-$g$'nin gradyanini koyarsam, iki üstteki formüle benzer bir formül elde
+$g$'nin gradyanýný koyarsam, iki üstteki formüle benzer bir formül elde
 ederim.
 
 Geriye iz sürme genel algoritmasi þöyle, bir $0 < \beta < 1$ paremetresi
@@ -350,9 +350,109 @@ Bu operatörün yaptýðý verilen bir matrisin gözlem olmayan her öge için
 deðeri sýfýr yapmak, yoksa olduðu gibi býrakmak. Simdi kriteri yazabiliriz, 
 
 $$
-f(B) = \frac{1}{2} || P_\Omega (Y) - P_\Omega(B) ||_F^2 + \lambda ||B||_{tr}
+f(B) = 
+\underbrace{\frac{1}{2} || P_\Omega (Y) - P_\Omega(B) ||_F^2}_{g(B)} + 
+\underbrace{\lambda ||B||_{tr}}_{h(B)}
 $$
 
+Problemi proksimalin beklediði $g + h$ formuna soktuk. Hatýrlatalým, $g$
+dýþbükey ama pürüzsüz deðil. Bu yaklaþým için gerekenler neydi? Pürüzsüz
+kýsým için gradyan hesaplayabilmek, ve pürüzsüz olmayan kýsým için prox
+operatörünü hesaplayabilmek. Gradyan oldukca basit,
+
+$$
+\nabla g(B) = -(  P_\Omega (Y) - P_\Omega(B) ) 
+$$
+
+Sadece iþaretleri biraz deðiþtirdim çünkü onu sonra gradyandan
+çýkartacaðýz, o sebeple parantez dýþýnda bir eksi iþareti olmasý
+faydalý. Þimdi ikinci terim için prox operatörünü görelim. 
+
+$$
+\prox_t(B) = \arg\min_Z \frac{1}{2t} || B - Z ||_F^2 + \lambda ||Z||_{tr}
+\mlabel{5}
+$$
+
+Tüm mümkün $Z$ matrisleri üzerinden minimizasyon yapýyoruz, ve $B_i$ ile
+$Z_i$ arasýndaki tüm farklarýn kare toplamlarýný alýyoruz, artý bir sabit
+çarpý $Z$'nin iz normu. Yani optimizasyon hedefi $Z$, ve bu minimizasyonu
+prox operatörünü $B$ üzerinde uygulayarak elde ediyoruz [3, 22:15]. 
+
+Üstteki ifadeyi hesaplamak için altgradyan matematiðine inmek gerekiyor
+biraz. 
+
+$$
+\prox_t(B) = S_{\lambda t} (B)
+$$
+
+Yani prox'u $\lambda$ seviyesinde bir matriste yumuþak eþikleme olarak
+görmek mümkün. Yani aynen 1-norm'un prox operatörünün vektörsel yumuþak
+eþikleme olduðu gibi burada matris seviyesinde bir eþikleme var [3, 22:46].
+Bu demektir ki herhangi bir matris $B$'nin prox operatörü için $B$'nin
+SVD'sini alýyoruz, yani $B = U\Sigma V^T$ diyoruz, ve köþegen matris
+$\Sigma$ üzerinde yumuþak eþikleme iþletiyoruz, bunu yapmak için ya
+köþegendeki her ögeden $\lambda_i$ çýkartýyoruz ve eðer pozitifse o deðeri
+kullanýyoruz, ya da sýfýr alýyoruz. 
+
+$$
+S_\lambda (B) = U \Sigma_\lambda V^T
+$$
+ 
+$$
+(\Sigma_\lambda)_{ii}  = \max \{ \Sigma_{ii} - \lambda_i 0 \}
+$$
+
+$S_\lambda (B)$ normal $B$'den daha düþük kerteli olacaktýr, çünkü üstteki
+iþlem ile $\Sigma_\lambda$'nin köþegenindeki bazý deðerler sýfýrlanýr, ve
+bu matris ile hesaplanan $U \Sigma_\lambda V^T$, çarpým sýrasýnda
+$U,V$'deki bazý satýrlar, kolonlarý da sýfýrlar [3, 26:00].
+
+Peki $\prox_t(B) = S_{\lambda t} (B)$ nereden geliyor? Prox operatörünü
+oluþturan kriterin (5) altgradyanýný alýrýz, sýfýra eþitleriz, ve ortaya
+çýkan formülü doðrulayan $Z$'yi buluruz. Cevabýn ne olacaðýný biliyoruz,
+sadece tarif edilen altgradyan vs sonrasý ayný formülü bulup
+bulmayacaðýmýzý kontrol edeceðiz. 
+
+(5)'teki ilk terim puruzsuz, direk gradyan alinir, 
+
+$$
+0 \in Z - B + \lambda t \cdot \partial ||Z||_{tr} 
+$$
+
+Ýz normunun altgradyanýný gösterelim, 
+
+$$
+\partial ||Z||_{tr} = \{ 
+  UV^T + W : ||W||_{op} < 1, U^TW = 0, WV = 0 
+\}
+$$
+
+Üstteki notasyon diyor ki aradýðýmýz $W$'ler en büyük eþsiz deðeri 1'den
+küçük olan ve $U$'nun kolonlarýna ve $W$'nin satýrlarýna dikgen
+olmalý. Yýne sonradan doðrulama ile ispat yapýlabilir, üstteki tanýmý baz
+alarak $Z = S_{\lambda t}(B)$ olarak formüle sokarsak sýfýr sonucu
+aldýðýmýzý göreceðiz. Ek bazý bilgiler, iz normu ve op normu birbirinin
+ikizidir. Yani
+
+$$
+||Z||_{tr} = \max_{||Y||_{op} \le 1}  Z \cdot Y
+$$
+
+Üstteki $\cdot$ iþareti öðesel çarpým ve bu çarpýmlarýn toplamý
+anlamýnda. $||Y||_{op} \le 1$ þartýna uyan tüm $Y$'lere bakýyorum, ve bu
+$Y$'lerle $Z$ arasýnda ögesel çarpým yapýyorum topluyorum bu bana $Z$'nin
+iz normunu veriyor. 
+ 
+Ya da
+
+$$
+= \max_{||Y||_{op} \le 1}  \tr{Z^TY}
+$$
+
+iþlemi de ayný kapýya çýkar. 
+
+
+Bu arada iz normunun altgradyanýný almak zordur. 
 
 
 
@@ -361,6 +461,11 @@ $$
 
 
 
+
+
+
+
+[devam edecek]
 
 Ekler
 
