@@ -362,6 +362,7 @@ operatörünü hesaplayabilmek. Gradyan oldukca basit,
 
 $$
 \nabla g(B) = -(  P_\Omega (Y) - P_\Omega(B) ) 
+\mlabel{8}
 $$
 
 Sadece iþaretleri biraz deðiþtirdim çünkü onu sonra gradyandan
@@ -417,14 +418,14 @@ bulmayacaðýmýzý kontrol edeceðiz.
 
 $$
 0 \in Z - B + \lambda t \cdot \partial ||Z||_{tr} 
+\mlabel{7}
 $$
 
 Ýz normunun altgradyanýný gösterelim, 
 
 $$
-\partial ||Z||_{tr} = \{ 
-  UV^T + W : ||W||_{op} < 1, U^TW = 0, WV = 0 
-\}
+\partial ||Z||_{tr} = \{  UV^T + W : ||W||_{op} < 1, U^TW = 0, WV = 0 \}
+\mlabel{6}
 $$
 
 Üstteki notasyon diyor ki aradýðýmýz $W$'ler en büyük eþsiz deðeri 1'den
@@ -446,13 +447,98 @@ iz normunu veriyor.
 Ya da
 
 $$
-= \max_{||Y||_{op} \le 1}  \tr{Z^TY}
+= \max_{||Y||_{op} \le 1}  \tr (Z^TY)
 $$
 
-iþlemi de ayný kapýya çýkar. 
+iþlemi de ayný kapýya çýkar, bahsettiðimiz ikizlik sayesinde bu mümkün
+oluyor. Devam edersek, üstteki bir $\max$ ifadesi ve bu ifadeleri
+altgradyanýný almayý gördük, üstteki ifade üzerinden, $||Y||_{op} \le 1$
+þartýna uyan tüm $Y$'ler içinden $\tr{Z^TY}$ maksimumunu gerçekleþtiren,
+eþsiz deðerlerin toplamýný / iz normunu veren $Y$'leri istiyoruz. Ve (6)
+içindeki tüm $U,V$'lerin bunu yapabileceðini kontrol edebilirsiniz [3,
+31:56], $Z$ SVD'sinden gelen $U,V$'lerin herhangi bir öðesel çarpýmý size
+$Z$'nin eþsiz deðerlerinin toplamýný verecektir, ve tasarým itibariyle
+onlarýn operatör normu en fazla 1'dýr. $ UV^T$'un operatör normu en fazla
+1'dýr, $W$ için ayný þekilde, ve her iki terim birbirine dikgen olacak
+þekilde tasarlanmýþtýr. Tüm bu matrislerin $||Z||_{tr} $'in altgradyani
+olduðunu ispatlamanýn yolu budur. 
 
+Neyse üsttekilerin bize altgradyan verdiðini ispatladýktan sonra
+$Z = S_{\lambda t}(B)$'i (7)'ye sokup ispatý tamamlýyoruz.  
 
-Bu arada iz normunun altgradyanýný almak zordur. 
+Bu oldukca zor bir prox operatörüydü tabii. Hesaplamanabilir olduðu
+anlaþýldýðýnda pek çok araþtýrmacý sevinmiþti, pek çok yerde kullanýldý,
+vs. Ýspatý size ödev olarak veriyorum ama rutin bir ödev sorusu olmadýðýný
+belirtmek isterim. 
+
+Artýk algoritmayý oluþturabiliriz, $g$ gradyanýnýn negatif yönünde adým
+atýyoruz. Gradyaný (8)'de görmüþtük. 
+
+$$
+B^+ = S_{\lambda t} \bigg( 
+B + t (P_\Omega(Y) - P_\Omega(B) )
+\bigg)
+$$
+
+Büyük parantez içini gradyan ile hesaplýyoruz sonra elde edileni yumuþak
+eþikten geçiriyoruz. Bu ne demekti? Parantez içindekilerin SVD'sini al,
+eþsiz deðeri $\lambda t$'den küçük olan tüm deðerleri sýfýrla, ve
+kalanlardan $\lambda t$ çýkar, ve bu yeni deðerlerle yeni bir matris
+yarat. Prox operatörünü uygulamak bu demek.
+
+Bu arada pürüzsüz kýsmýmýzdaki gradyan $\nabla g(B)$, $L=1$ ile Lipschitz
+süreklidir. (8)'deki ifade lineer, sabit 1 üzerinden tabii ki
+Lipschitz. Yakýnsama analiz bilgimiz bize diyor ki proksimal gradyan
+iniþinde adým büyüklüðü en fazla $1/L$ olabilir, ki burada 1 sadece. Bu
+problemin güzel taraflarýndan biri bu, olabilecek en büyük adým büyüklüðünü
+kullanabiliyoruz ve onu hesaplamasý kolay, sadece 1.
+
+Ve $t=1$'i üstteki formüle sokuyoruz, 
+
+$$
+B^+ = S_{\lambda t} \bigg( B + P_\Omega(Y) - P_\Omega(B)  \bigg)
+$$
+
+elde ediyoruz. Formüldeki $B - P_\Omega(B)$  bize görülmeyen kümedeki
+herþeyi veriyor deðil mi? $B$'de herþey var, $P_\Omega(B)$'de görülen
+kümedeki $B$ öðeleri var (geri kalanlar sýfýr), o zaman bu çýkartmayý
+yapýnca görülmeyen kümedeki herþeyi elde ederiz. 
+
+$$
+= S_{\lambda t} \bigg( P_\Omega(Y) + P_{\Omega^C}(B) \bigg)
+$$
+  
+olarak yazabiliriz, $P_{\Omega^C}(B)$, $P_{\Omega}(Y)$'in tamamlayýcýsý
+(complement), görülmüþ öðeler için sýfýr, görülmemiþ $ij$ öðeleri için
+$B_{ij}$.  
+
+Algoritmanýn mantýðý çok doðal, her adýmda tahminim $P_{\Omega^C}(B)$'a
+bakýyorum, burada olanlarýn görülmemiþ kümede ne yapacaðýmý kontrol
+etmesine izin veriyorum, artý $P_\Omega(Y)$ ile orijinal veride görülen
+öðeleri alýyorum.
+
+Yani bir matris oluþturuyorum, görülen yerlerde $Y_{ij}$ var görülmeyen
+yerlerde $B_{ij}$ var. Sonra bu matrisi düþük kerteli hale getiriyorum,
+SVD'sini alýyorum, eþsiz deðerlerini iþleyerek bazýlarýný sýfýrlayýp tekrar
+matrisi oluþturuyorum yani. Ve bu tarif edilenleri ardý ardýna
+yapýyorum. Elde edileni yeni $B$ yap, mevcut olmayan ogeler icin bu matrisi
+kullan, vs. 
+
+Bu algoritmaya yumuþak atfetme (soft-impute) algoritmasi da deniyor, çünkü
+her adýmda kayýp deðerleri ``yüklüyoruz'',  yaklaþýk olarak atýyoruz, ve
+bunu yumuþak baðlamda yapýyoruz, eþikleme ile yavaþ yavaþ kerteye
+düþürüyoruz. 
+
+Bu arada üstteki yaklaþým ilk bulunduðunda proksimal gradyan olduðu
+bilinmiyordu. Bilimci yaklaþýmý buluyor, hakkýnda makale yazýyor, sonra
+sonra makaleyi revize ederken birdenbire anlýyor ki bu metot proksimal
+gradyan.  Daha önce gördüðümüz ÝSTA da biraz böyle aslýnda, deðil mi? Kendi
+baþýna durabilecek, gayet doðal bir mantýðý olan bir algoritma, sanki
+proksimal yapýsý dýþýnda da bulunabilecek bir þey.
+
+Devam edelim, algoritmadaki prox operatörü ne kadar pahalý? Her adýmda SVD
+iþletmemiz lazým, bu ÝSTA'dan farklý. SVD oldukca pahalý bir iþlemdir,
+özellikle büyük matrisler için. 
 
 
 

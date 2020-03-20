@@ -70,7 +70,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\curl", "\\mathrm{curl}")
       line = line.replace("\\sinc", "\\mathrm{sinc}")
       line = line.replace("\\bdiv", "\\mathrm{div}")
-      line = line.replace("\\tr", "\\mathrm{trace}")
+      line = line.replace("\\tr", "\\mathrm{tr}")
       line = line.replace("\\grad", "\\mathrm{grad}")
       line = line.replace("\\dom", "\\mathrm{dom}")
       line = line.replace("\\diag", "\\mathrm{diag}")
