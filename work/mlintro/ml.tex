@@ -1,0 +1,587 @@
+%Uses ecctd01.cls style file
+\documentclass{ecctd01} % 
+\usepackage{amsmath}
+\usepackage[latin5]{inputenc}
+\title{
+Regression, Least Squares
+}
+
+\author{Burak Bayramlý}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Machine Learning lets us derive short representations for raw data
+when we do not have a clear mathematical model for the domain we are
+interested in. Once we  acquire a model using ML methods, we can also
+use ML applications like classification, regression, clustering,
+anomaly detection, feature selection, all tools which fall under
+the umbrella of ML. 
+
+Throughout this paper, vector $\mathbf{x}$ will be used to define
+input data for one dimension, and $\mathbf{X}$ for many 
+dimensions. All elements of vector $\mathbf{x}$ should be assumed
+as data points, measurements for a single attribute, and should be
+assumed i.i.d unless stated otherwise.
+
+\section{Regression Based Methods}
+\subsection{The Model}
+A suitable starting point for a machine learning introduction is linear
+regression. Given data $\mathbf{x}$, we decide to model target
+function f(x) as a line whose slope and starting point are yet unknown. 
+
+\begin{equation}
+  \label{eq:reg1}
+  f(x;\theta) = \sum_{i=1}^N \theta_{1}x_{i} + \theta_{0}
+\end{equation}
+where $\theta_{0}$ and $\theta_{1}$ represent unknown variables. We
+have to search through many possible $f(x;\theta)$'s to find an 
+optimal $\theta$. 
+
+\begin{figure}[htpb]
+  \vspace{3.0cm}  
+  \special{psfile=linreg.eps vscale=60 hscale=60}
+  \caption{\label{linreg} Linear Regression.}
+\end{figure}
+
+First we convert (\ref{eq:reg1}) into matrix form so that linear
+algebra notation is used. Through linear algebra, we will later be
+able to expand the equation into many dimensions easily.
+\begin{equation}
+  \label{eq:reg2}
+  f(x;\theta) = \sum_{i=1}^N 
+  \left[ \begin{array}{cc}
+      1 & x_{i}
+  \end{array} \right]
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1}
+  \end{array} \right]
+\end{equation}
+
+ \begin{equation}
+  \label{eq:reg3}
+  f(\mathbf{x};\theta) = 
+  \left[ \begin{array}{cc}
+      1 & x_{1} \\
+      \vdots \\
+      1 & x_{N} \\      
+  \end{array} \right]
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1}
+  \end{array} \right]
+\end{equation}
+Notice the sum in (\ref{eq:reg2}) disappeared in (\ref{eq:reg3}) and
+is replaced by added dimensions in the first matrix. Further introduction
+of linear algebra notation simplifies the equation even further: 
+
+\begin{equation}
+  \label{eq:reg4}
+  f(\mathbf{X};\theta) = \mathbf{X}\theta
+\end{equation}
+
+Now for our search, we need to compare the calculated $f(x;\theta)$'s
+against a given $\mathbf{y}$. This comparison is done utilizing a loss
+function which defines our success/fail criteria. Let's say we choose
+sum of square distances between calculated $f(x;\theta)$'s and given
+$\mathbf{y}$ as our loss function. Based on this loss function, we can
+calculate overall risk as sum of square distances.
+
+\begin{equation}
+  \label{eq:reg5}
+  R(\theta) = \frac{1}{2N}|\mathbf{y} - \mathbf{X}\theta|^2
+\end{equation}
+
+Note: We are multiplying with $\frac{1}{2}$ so that it cancels out
+with $^2$ after derivation. It turns out multiplying with a scalar
+does not change the location of the minima.
+
+In ML literature, the function $R(\theta)$ is called empirical
+risk. We will aim to minimize R, which at the same time means we will  
+be searching for the best $\theta$. 
+
+\begin{figure}[htpb]
+  \vspace{3.0cm}  
+  \special{psfile=risk.eps vscale=70 hscale=70}
+  \caption{\label{risk} Risk Function in 2D.}
+\end{figure}
+
+The point where risk is lowest is where the rate of change at any
+point is zero, and the gradient of $R(\theta)$ equals to
+zero. Gradient contains all partial derivatives of $R(\theta)$ in
+vector form. Taking the gradient of a function produces a vector
+which always points to the direction of largest increase. At 
+the point where the increase is zero, it means we reached a flat
+region where we have no increase nor decrease.
+
+In cases when taking the gradient results in an algebraically messy
+formula, approximation  methods are used to iteratively {\em move} in the
+direction of fastest increase, trying to reach the region where
+gradient equals zero. In the current case, the algebra will come out clean,
+as we shall see below.
+
+\begin{eqnarray*}
+  \label{eq:reg6}
+  \bigtriangledown_{\theta} R\left(\theta\right) = \left[ \begin{array}{c}
+      0 \\
+      0 
+    \end{array} \right] &  \nonumber \\
+  \bigtriangledown_{\theta}\left( \frac{1}{2N}||\mathbf{y} -
+  \mathbf{X}\theta||^2\right) = 0 \nonumber \\
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \left(\mathbf{y} -  \mathbf{X}\theta \right) ^T
+  \left( \mathbf{y} -  \mathbf{X}\theta \right)
+  \right) = 0 \nonumber \\
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \left(\mathbf{y}^T -  \left(\mathbf{X}\theta\right)^T \right)
+  \left( \mathbf{y} -  \mathbf{X}\theta \right)
+  \right) = 0 \nonumber \\
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \mathbf{y}^T\mathbf{y} -
+  \mathbf{y}^T\mathbf{X}\theta -
+  \left( \mathbf{X}\theta \right)^T\mathbf{y} +
+  \theta^T\mathbf{X}^T\mathbf{X}\theta
+  \right) = 0 \nonumber 
+\end{eqnarray*}
+
+The second and third term are really the same because for vector
+multiplication, $\mathbf{u}^T \mathbf{v} = \mathbf{v}^T \mathbf{u}$.  
+
+\begin{eqnarray}
+  \label{eq:reg7}
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \mathbf{y}^T\mathbf{y} -2
+  \mathbf{y}^T\mathbf{X}\theta +
+  \theta^T\mathbf{X}^T\mathbf{X}\theta
+  \right) = 0 \nonumber \\
+  \frac{1}{2N} \left(
+  -2\mathbf{y}^T\mathbf{X}
+  +2\theta\mathbf{X}^T\mathbf{X} \right) = 0 \nonumber \\
+  \frac{1}{N} \left(
+  -\mathbf{y}^T\mathbf{X}
+  +\theta\mathbf{X}^T\mathbf{X} \right) = 0 \nonumber \\
+  \theta\mathbf{X}^T\mathbf{X} =
+  \mathbf{y}^T\mathbf{X} \nonumber \\
+  \theta = \left(\mathbf{X}^T\mathbf{X}\right)^{-1}
+  \mathbf{y}^T\mathbf{X}
+\end{eqnarray}
+
+Once $\theta$ is calculated, it can be plugged in $f(x;\theta)$
+to predict future data.
+
+\subsection{Multiple Dimensions }
+Linear regression can be easily extended to multiple dimensions. 
+
+\begin{displaymath}
+  \mathbf{X} = 
+  \left[ \begin{array}{cccc}
+      1 & x_{1} & \hdots & x_{1}(D) \\
+      \vdots & \vdots & \vdots & \vdots \\
+      1 & x_{N} & \hdots & x_{N}(D) \\
+  \end{array} \right] 
+\end{displaymath}
+
+\begin{displaymath}
+  \label{eq:reg8}  
+  R\left(\theta\right) = \frac{1}{2N}
+  \left|
+  \left[ \begin{array}{c}
+      y_{1} \\
+      \vdots \\
+      y_{N}
+  \end{array} \right]
+  -
+  \mathbf{X}
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1} \\
+      \vdots \\
+      \theta_{D} 
+  \end{array} \right]
+  \right|^2 
+\end{displaymath}
+This risk calculation is for N data points and D
+dimensions. Calculation for $\theta$ can still be performed through
+Equation \eqref{eq:reg7}. The result will be a N-dimensional
+hyperplane fit to our training data.  
+
+\subsection{Basis Functions}
+We also may choose to model the training data through so-called basis
+functions. With this method, a polynomial, sinusiodal, or radial basis
+function is selected, then every data point $\mathbf{x}_{i\in N}$ is
+fed through the basis function calculating a new $\mathbf{x}_{i}$. Then
+regression becomes an act of finding the optimal combination of N
+basis functions. Radial basis functions are particularly popular, as
+they allow learning in many dimensions.  
+
+Calculating a radial basis function means inserting a ``bump'' for
+every data point. The bump is shown as
+
+\begin{displaymath}
+  \phi_{i}(\mathbf{x}) = exp\left(
+  -\frac{1}{2\sigma}\left|\mathbf{x} - \mathbf{x}_{i}\right|^2
+  \right)
+\end{displaymath}
+
+where $\mathbf{x}$ can be in one or many dimensions. $\mathbf{x}$ here
+represents one data point in many dimensions unlike previously, when
+it represented all data points in one vector.
+
+The width of the bump is controlled through $\sigma$ which is held
+constant throughout the calculations. Risk then becomes  
+\begin{equation}
+  \label{eq:reg10}
+  R(\theta) = \frac{1}{2N}|\mathbf{y} - Q\theta|^2
+\end{equation}
+
+where Q is 
+\begin{displaymath}
+  \label{eq:reg9}
+  \left[ \begin{array}{cccc}
+      1 & \phi_{0}(x_{1}) & \hdots & \phi_{D}(x_{1}) \\
+      \vdots & \vdots & \vdots & \vdots \\
+      1 & \phi_{0}(x_{N}) & \hdots & \phi_{D}(x_{N}) \\
+  \end{array} \right]
+\end{displaymath}
+
+We can still use \eqref{eq:reg7} to perform the regression. 
+
+\subsection{Problems With Regression}
+A critical issue with regression is the absence of a firm mathematical
+foundation for choosing a modeling method for each
+problem. As we have seen, the loss function was pulled out of a
+hat. The loss function could easily have been based on the cube of 
+distances instead of squares. Certain approaches tried to address this
+issue by dividing the training data in two parts, one part used for
+training, the other to measure the performance of the training, hence
+evaluating each model. Ideally however, we would like to use one
+modeling technique for diverse set of problems.
+
+Using regression for classification also poses certain problems. In
+figure~\ref{clasreg1}, we see that ideal classification would be the
+dashed line. 
+
+\begin{figure}[htpb]
+\vspace{4.0cm}
+\special{psfile=clasreg1.eps voffset=-320 hoffset=5 vscale=90 hscale=100}
+\caption{\label{clasreg1} Classification as Regression}
+\end{figure}
+
+However, the points that are furthest to the right and left are being
+penalized the most by the algorithm, so the regression naturally wants
+to pull the line towards the furthest points. The result is the solid
+line shown. An engineering solution for this is using a squashing
+function triying to smooth out the regression line. This reverses the
+penalization effect for the larger points. A popular squashing
+function is the sigmoid function $g(z) = (1 + exp(-z))^{-1}$ and sign
+function used for building perceptrons. 
+
+\subsection{Neural Networks}
+
+With the introduction of squashing functions regression becomes more
+usable. On top of this, introducing several layers of regression each
+utilizing different squashing function lets us handle more complex
+classification problems as seen in figure~\ref{nn1}. This approach is
+also called a Neural Network.
+
+\begin{figure}[htpb]
+\vspace{3.0cm}
+\special{psfile=nn1.eps voffset=-320 hoffset=5 vscale=42 hscale=45}
+\caption{\label{nn1} Different Layers for a Neural Network.}
+\end{figure}
+
+With the introduction of squashing function in the network, finding
+the minima using the gradient becomes algebraically hard to
+derive. Therefore, we use an approximation technique such as gradient
+descent. For a multi-layered neural network, gradient descent is
+applied layer by layer, and idea which forms the basis of the BACKPROP
+algorithm. BACKPROP has been used successfully for many problems
+over the years.
+
+Despite the added power of neural networks, certain limitation still
+remain. For one, NNs are difficult to analyze. As we add a new layer
+to the network, the consequences of this action on the network cannot be
+determined. There are also problems that are still impossible to solve
+using NNs, such as learning the equation $x^2+y^2=1$, which is not a
+function but a {\em relation}. There is also the infamous Projectile
+Cannon problem which is a case of distal learning, and is also
+impossible to learn using a regression based approach. Problems such
+as these are much easily addressed using a statistical approach, such
+as Bayesian Networks. 
+
+
+\section{Statistical Approach}
+
+\subsection{Introduction}
+
+Statistical approach allows us to capture more about the training
+data. In two dimensions, when we do regression, we learn only a slope. With 
+statistical approach when we fit a Gaussian distribution, we learn
+the center of data distribution $\mu$ (mean), a width $\sigma$
+(variance), and a rotation of the ellipse $\Sigma$ (covariance).  
+
+Statistical approach also allows us to use all the tools of probabily theory and
+statistics. This means the foundation of the model is rigourous, and the
+applications will have to revert less to randomly applied solutions. This will
+later help in analysing and improving our model as well. 
+
+\subsection{The Method}
+
+With probability models, instead of learning an exact value for a
+variable, we may choose to learn a distribution on the same variable. A $y$
+would be replaced by $p(y)$. In comparison, using $y$ instead of $p(y)$ is akin
+to using a distribution with all its weight on one single point.
+
+Introducing more unknown variables into distribution results in a joint
+distribution. In discrete case, the joint distribution table size is a finite
+quantity.
+
+Dependence and independence between random variables play a factor in
+joint distribution table size. If two events, therefore their random variables
+are related, it is more accurate for our model to reflect this dependence. If
+for simplication's sake however, all variables were made dependent, the result
+will be an exponential blow up of the joint distribution table. As an example, a
+distribution over D unknown binary random variables all dependent on
+eachother results a table of size $2^D$. In comparison, if we make all
+variables as independent, the size drops to $2D$. 
+
+Perhaps we can start with $2D$ and slowly introduce
+dependencies. Dependency between variables are represented with
+$p(y|x)$ which reads ``the probability of $y$ given x''. The joint
+distribution is $p(x,y) = p(y|x)p(x)$ and is a well known equality in
+probability theory. Since writing down all dependencies algebraicly
+might be confusing, graph notation is also used. The joint
+distribution $p(x,y,z)$ seen in figure~\ref{graph2} will be equal to
+product of all probabilities, $p(x)p(y|x)p(z|x)$.  
+
+\begin{figure}[htpb]
+\vspace{3.0cm}
+\special{psfile=graph2.eps voffset=-320 hoffset=5 vscale=60 hscale=60}
+\caption{\label{graph2} Graphical Model.}
+\end{figure}
+
+Notice $p(x,y,z)$ does not equal $p(x)p(y)p(z)$ according to this model. That
+would only be the case if all variables were independent. 
+
+When dealing with probability distributions, we can also represent model
+variables as random variables with other variables depending on
+them. As an example, let's take the problem of classifying points in
+figure~\ref{gaussdata}. 
+
+\begin{figure}[htpb]
+\vspace{3.0cm}
+\special{psfile=gaussdata.eps voffset=-320 hoffset=5 vscale=80 hscale=80}
+\caption{\label{gaussdata} Sample Data.}
+\end{figure}
+
+In the example, $x \in \mathbf{R}^2$ is input and $y \in \{0,1\}$ is
+the output. Since y is binary, we can model $p(y)$ as a Bernoulli
+distribution, 
+
+\begin{equation}
+  p(y_{i}|\alpha)=\alpha^y_{i}(1-\alpha)^{1-y_{i}}
+\end{equation}
+where $i=1...N$. Using a distribution instead of a table
+allows us to manipulate the distribution algebraically, plug it in to
+methods such as Maximum Likelihood, take its derivative and so on. 
+
+For x's, we will pick a Gaussian distribution
+\begin{equation}
+  \label{eq:p_x_y}
+  p(x_{i}|y_{i},\mu,\Sigma)=N(x_{i}|\mu_{y},\Sigma_{y})  
+\end{equation}
+
+The graphical model for the data will look like in
+figure~\ref{gauss_repl_plate}. 
+
+\begin{figure}[htpb]
+\vspace{3.0cm}
+\special{psfile=gauss_repl_plate.eps voffset=-320 hoffset=5 vscale=55 hscale=55}
+\caption{\label{gauss_repl_plate} Model.}
+\end{figure}
+
+We see that $\mu,\alpha,\Sigma$ are also made random variables. Looking at the
+graph, the algebraic joint distribution $p(x,y,\mu,\alpha,\Sigma)$ can be shown
+as 
+
+\begin{equation}
+  \label{eq:graphjoint1}
+  p(y|\alpha)p(x|y,\mu,\Sigma)p(\Sigma)p(\mu)p(\alpha)
+\end{equation}
+For our classification needs, we need to turn Equation
+\eqref{eq:graphjoint1} into a version that answers
+$p(x,y|\alpha,\mu,\Sigma)$. From pure probability theory, we proceed 
+algebraically
+
+\begin{equation}
+  \label{eq:graphjoint2}
+  p(x,y|\alpha,\mu,\Sigma) =
+  \frac{p(x,y,\alpha,\mu,\Sigma)}
+       {p(\alpha)p(\mu)p(\Sigma)} 
+\end{equation}
+
+Now we replace the nominator in \eqref{eq:graphjoint2} with the joint
+distribution taken from the graphical model in \eqref{eq:graphjoint1}.
+
+\begin{eqnarray}
+  \label{eq:graphjoint3}
+  p(x,y|\alpha,\mu,\Sigma) &=&
+  \frac{p(y|x)p(x|y,\mu,\Sigma)p(\alpha)p(\mu)p(\Sigma)}
+       {p(\alpha)p(\mu)p(\Sigma)} \nonumber \\
+  &=& p(y|x)p(x|y,\mu,\Sigma) 
+\end{eqnarray}
+
+
+\subsection{Maximum Likelihood}
+
+In order to find the parameter which are most likely to fit traning data, we
+will use a method called Maximum Likelihood. This requires taking the product of
+\eqref{eq:graphjoint3} for N data points. The best estimation for the unknown
+parameters are at the point when this final super joint probability is at its
+heightest value. 
+
+\begin{equation}
+  \label{eq:likelihood1}
+Likelihood = \prod_{i=1}^N p(y|x)p(x|y,\mu,\Sigma)
+\end{equation}
+
+
+The point when likelihood is heightest is when the derivative of likelihood
+equals to zero.
+
+
+In order to simply the derivative later, we take the log of terms
+inside \eqref{eq:likelihood1}. This will turn the product into a
+sum. We can do this because the log of the formula in
+\eqref{eq:likelihood1} has the same rate of change, therefore the
+final result will not be effected.
+
+\begin{equation}
+  \label{eq:likelihood2}
+  l = \sum_{i=1}^N log (p(y_{i}|x_{i})) + \sum_{i=1}^N log (p(x_{i}|y_{i},\mu,\Sigma))
+\end{equation}
+
+We can break apart the last term into two sums. We need to marginalize over $y$
+in two chunks, one for each possible value of $y$.  
+
+\begin{eqnarray}
+  \label{eq:likelihood3}
+  l = \sum_{i=1}^N \log(p(y_{i}|\alpha)) + 
+  \sum_{y_{i}\in 0} \log(p(x_{i}|\mu_{0},\Sigma_{0})) + \nonumber \\
+  \sum_{y_{i}\in 1} \log(p(x_{i}|\mu_{1},\Sigma_{1}))
+\end{eqnarray}
+
+Now, if we take the gradient of the likelihood according to $\alpha, \Sigma,
+\mu$ (seperately) and set these equations equal to zero, we get equations for
+most likely parameter values. Let's do $\frac{\partial l}{\partial
+  \alpha}$ as an example. Because we are taking derivative with respect to
+$\alpha$, all the terms of \eqref{eq:likelihood3} go away except for
+the first term. Then we have
+
+\begin{eqnarray}
+  \label{eq:likelihood4}
+  \frac{\partial l}{\partial \alpha} &=&
+  \frac{\partial }{\partial \alpha}
+  \sum_{i=1}^N log (p(y_{i}|\alpha))  \nonumber \\
+  0 &=&
+  \frac{\partial}{\partial \alpha}
+  \sum_{i=1}^N log\left(\alpha^y_{i}(1-\alpha)^{1-y_{i}}\right) \nonumber \\
+  0 &=&
+  \frac{\partial}{\partial \alpha}
+  \sum_{i=1}^N y_{i}log(\alpha) + (1-y_{i})log(1-\alpha) \nonumber
+\end{eqnarray}
+
+From the problem domain, we know that some $y_{i}$'s are 0, some are
+1. Zero values would cancel out $y_{i}log(\alpha)$, one values would
+cancel out the $(1-y_{i})log(1-\alpha)$. So, in order to drop
+$y_{i}$'s from the equation, we change the equation to  
+
+\begin{eqnarray}
+  \label{eq:likelihood5}
+  0 &=&
+  \frac{\partial}{\partial \alpha}\
+  \left(
+  \sum_{i\in class1} \log(\alpha) +
+  \sum_{i\in class0} \log(1-\alpha)
+  \right)
+  \nonumber \\
+  0 &=&
+  \sum_{i\in class1}\frac{1}{\alpha} -
+  \sum_{i\in class0}\frac{1}{1-\alpha} \nonumber
+\end{eqnarray}
+
+Now, let $N_{0}$ be the quantity of $y_{i}$'s in class 0, $N_{1}$ the
+quantity of $y_{i}$'s in class 1. 
+
+\begin{eqnarray}
+  \label{eq:likelihood6}
+  0 = \frac{N_{1}}{\alpha}-\frac{N_{0}}{1-\alpha} \nonumber \\
+  \alpha = \frac{N_{1}}{N_{1}+N_{0}} = \frac{N_{1}}{N}\nonumber
+\end{eqnarray}
+
+This result supports the intuition that dividing the number of $y_{i}$'s
+such that $y_{i}=1$ in the training set with the total number of
+traning points results in the value for $\alpha$. We could guessed this,
+but it's nice to see verification for it through Maximum Likelihood
+mathematically.  
+
+The rest of the unknowns, namely $\mu_{0}, \mu_{1}, \Sigma_{0},
+\Sigma_{1}$ can be derived using the same idea. Taking the derivative
+of \eqref{eq:likelihood3} with respect the unknowns one by one, and 
+equating the results to zero will give us formulas for each
+unknown. The derivation will not be shown here due to lack of
+space. The final result will give all the unknown parameters of
+Equation \eqref{eq:p_x_y}. Using \eqref{eq:p_x_y} in conjunction with
+$p(y)$ we derived earlier, we can finally use \eqref{eq:graphjoint3}
+for classification. We should note here that in ML literature, $p(y)$
+is called {\em prior guess}.
+
+\subsection{Classification}
+
+For classification we need one final equation, namely $p(y|x)$ which
+is known as posterior in ML terminology. With the posterior known, when
+we are given a new $x$ we have not seen before, we can plug it into
+such as $p(y|x=new value)$ and calculate the likelihood of the new $y$. 
+
+Let's derive the posterior $p(y|x)$. From probability theory,
+
+\begin{equation}
+  p(y|x) = \frac{p(x,y)}{p(x)} 
+\end{equation}
+
+We need $p(x)$ for this to work. Let's take $p(x,y)$ and marginalize
+over $y$. 
+
+\begin{eqnarray}
+  p(y|x) &=& \frac{p(x,y)}{\sum_{y}p(x,y)}  \\
+  &=& \frac{p(x,y)}{p(x,y=0) + p(x,y=1)}
+\end{eqnarray}
+
+Now the act of classification becomes calculating $p(y=1|x)$, and
+$p(y=0|x)$ seperately for two possible values of $y$. Whichever
+probability value has the higher value, will be our classification
+answer for the new data point $x$. 
+
+\section{Acknowledgements}
+
+All figures in this paper with the exception of figure~\ref{clasreg1}
+are taken from Prof. Tony Jebara's Machine Learning lecture notes at
+{\tt http://www.cs.columbia.edu/~jebara/4771}. A list of Machine
+Learning literature I own is presented below. 
+
+\begin{thebibliography}{9}
+\itemsep=0ex % save space!
+  
+\bibitem{Bishop} C. Bishop {\em Neural Networks for Pattern
+  Recognition}, Oxford University Press, 1995.
+\bibitem{Duda} R. O. Duda, P. E. Hart \& D. G. Stork {\em Pattern
+  Classification (2nd ed)}, Wiley, 2000.
+\bibitem{BishopJordan} M. Jordan, C. Bishop, {\em Introduction to
+  Graphical Models}, not yet published.
+\bibitem{Mitchell} T. Mitchell, {\em Machine Learning}, McGraw-Hill, 1997.
+
+\end{thebibliography}
+
+\end{document}
