@@ -46,17 +46,28 @@ print (rbfi.nodes)
 minidx = np.argmin(rbfi.nodes)
 print (minidx)
 print (rbfi.xi.T[minidx])
+
+x1,y1 = rbfi.xi.T[minidx]
+z1 = rbfi(x1,y1)
+print (x1,y1,z1)
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.view_init(elev=49, azim=-109)
+ax.plot_wireframe(xx, yy, zz,rstride=2, cstride=2)
+ax.plot([x1],[y1],[z1],'rd')
+plt.savefig('/tmp/out3.png')
 ```
 
-```text
-[ 6.14175343e-05  2.89111875e-04 -4.27235071e-01  5.18883206e-02
-  7.08353381e-02  7.37285266e-03 -1.70998631e+00  2.34481250e+00
-  2.54064274e+00 -8.28222074e-01  4.10821862e-01 -3.42515772e+00
-  4.82589627e+00 -2.98631953e+00  2.19824828e+00  2.86198996e+00
-  5.18361207e-02 -5.80418410e-03  4.10485403e-01  2.39463033e-02]
-11
-[ 0.3   -1.125]
-```
+
+
+
+
+
+
+
+
+
 
 
 
