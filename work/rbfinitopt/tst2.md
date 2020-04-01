@@ -40,16 +40,19 @@ n = 20
 x = -3 + 6*hammer.hammersley([2,3],n)
 z = peaks(x[:,0],x[:,1])
 
+print (np.argsort(z)[1])
+
 rbfi = Rbf(x[:,0],x[:,1],z,function='gaussian',epsilon=0.15)
 print (rbfi.nodes)
 
-minidx = np.argmin(rbfi.nodes)
+#minidx = np.argmin(rbfi.nodes)
+minidx = np.argsort(z)[3]
 print (minidx)
 print (rbfi.xi.T[minidx])
 
 x1,y1 = rbfi.xi.T[minidx]
 z1 = rbfi(x1,y1)
-print (x1,y1,z1)
+print (x1,y1,z1,z[minidx])
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
@@ -59,6 +62,19 @@ ax.plot([x1],[y1],[z1],'rd')
 plt.savefig('/tmp/out3.png')
 ```
 
+```text
+13
+[ 6.14175343e-05  2.89111875e-04 -4.27235071e-01  5.18883206e-02
+  7.08353381e-02  7.37285266e-03 -1.70998631e+00  2.34481250e+00
+  2.54064274e+00 -8.28222074e-01  4.10821862e-01 -3.42515772e+00
+  4.82589627e+00 -2.98631953e+00  2.19824828e+00  2.86198996e+00
+  5.18361207e-02 -5.80418410e-03  4.10485403e-01  2.39463033e-02]
+9
+[-0.3   -2.625]
+-0.2999999999999998 -2.625 -0.8282220741262055 -0.8282220741262055
+```
+
+-1.34739625,  0.20451886]
 
 
 

@@ -18,7 +18,6 @@ x = np.linspace(-3,3,N); y = np.linspace(-3,3,N)
 xx,yy = np.meshgrid(x,y)
 zz = rosen(xx,yy)
 
-
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 fig = plt.figure()
@@ -37,6 +36,7 @@ import hammer
 n = 20
 x = -3 + 6*hammer.hammersley([2,3],n)
 z = rosen(x[:,0],x[:,1])
+print (np.argmin(z))
 
 rbfi = Rbf(x[:,0],x[:,1],z,function='gaussian',epsilon=0.15)
 print (rbfi.nodes)
@@ -47,7 +47,7 @@ print (rbfi.xi.T[minidx])
 
 x1,y1 = rbfi.xi.T[minidx]
 z1 = rbfi(x1,y1)
-print (x1,y1,z1)
+print (x1,y1,z1,z[minidx])
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
@@ -58,6 +58,7 @@ plt.savefig('/tmp/out3.png')
 ```
 
 ```text
+14
 [1.42265883e+04 1.03415309e+04 3.32932000e+03 3.50242000e+03
  3.10600000e+02 2.03125000e+03 5.24500000e+01 2.46970000e+02
  3.59770000e+02 7.38812500e+02 1.50625000e+01 1.48112500e+02
@@ -65,7 +66,7 @@ plt.savefig('/tmp/out3.png')
  3.84625000e+01 5.21766062e+03 3.10723563e+03 7.40319062e+03]
 14
 [1.2   1.125]
-1.1999999999999993 1.125 9.962499999999897
+1.1999999999999993 1.125 9.962499999999897 9.962499999999897
 ```
 
 
