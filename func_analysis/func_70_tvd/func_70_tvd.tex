@@ -408,9 +408,44 @@ io.imsave('lenad2.jpg', np.reshape(xcurr,(n,n)))
 \includegraphics[width=10em]{lenad2.jpg}
 
 Yine total varyasyon kullanan ama farklý optimizasyon çözücüyle hesabý
-yapan bir yöntem \verb!tlv_prim_dual.py! kodunda [1], sonuç
+yapan bir yöntem \verb!tlv_prim_dual.py! kodunda [1], sonuç (soldaki)
 
 \includegraphics[width=10em]{lenad3.jpg}
+\includegraphics[width=10em]{lenad4.jpg}
+
+Ayrýca \verb!cvxpy! adlý bir paket üzerinden ayný þeyi kodlayabiliriz, yani 
+
+$$
+\min_{\beta \in \mathbb{R}^n} 
+\frac{1}{2} \sum _{i=1}^{n} (y_i - \beta_i)^2 + 
+\lambda \sum _{(i,j) \in E)}  |\beta_i - \beta_j|
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import cvxpy
+
+lam = 35.0
+
+u_corr = plt.imread("lenad1.jpg")
+
+rows, cols = u_corr.shape
+
+U = cvxpy.Variable(shape=(rows, cols))
+
+obj = cvxpy.Minimize(0.5 * cvxpy.sum_squares(u_corr-U) + lam*cvxpy.tv(U))
+
+prob = cvxpy.Problem(obj)
+
+prob.solve(verbose=True, solver=cvxpy.SCS)
+
+plt.imshow(U.value, cmap='gray')
+plt.imsave(lena4.jpg', U.value, cmap='gray')
+\end{minted}
+
+Üstteki saðdaki resim bu sonucu gösteriyor. Bu yaklaþýmda
+\verb!cvxpy.tv! ile tam varyasyon hesabýný yapan kütüphanenin kendi iç
+çaðrýsýný kullandýk. 
+
 
 Kaynaklar
 
