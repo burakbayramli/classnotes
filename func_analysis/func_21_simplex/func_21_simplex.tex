@@ -1,0 +1,516 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Lineer Programlama ve Simplex
+
+LP, Operasyonel Araþtýrma konusunun mihenk taþlarýndan biridir, ve bu alanda
+George Dantzig simplex buluþu ile lineer optimizasyon alanýnda çýðýr açmýþtýr.
+Lineer programlama ile çözülebilen problemlerde bir hedef fonksiyonu vardýr, tüm
+deðiþkenler artý deðerdedir, ve sýnýrlama (constraint) ifadeleri vardýr, bu
+ifadeler $a_1x_1 + a_2x_2 + ... + a_nx_n \le b$ þeklinde olurlar, ki $b > 0$
+olacak þekilde.
+
+Örnek
+
+6000 akrelik (1 akre 0.4 hektara eþdeðer) bir tarlada ya mýsýr ya da soya
+ekebiliriz. Mýsýrýn her akresi için 9 galon (1 galon 3.78 litre) gübre, ve 3/4
+saatlik iþçilik gerekli. Her akre soya için 3 galon gübre ve 1 saat iþçilik
+gerekli. Çiftçinin elinde 40500 galonluk gübre, ve en fazla 5250 saatlik iþ gücü
+var. Eðer mýsýr için galon baþýna 60 lira, soya için 40 lira para kazanýlýyorsa,
+tarlada ne kadar mýsýr ve soya ekilmelidir ki kazanç maksimize edilsin [3,
+  sf. 306]?
+
+Eðer $x$ mýsýr $y$ soya miktarý ise, 
+
+$$ \textrm{maksimize et  } 60x + 40y, \textrm{ öyle ki} $$ 
+$$ x + y \le 6000 $$
+$$ 9x + 3y \le 40500 $$
+$$ \frac{3}{4}x + y \le 5250 $$ 
+
+Daha fazla ilerlemeden önce bazý numaralar: bugünlerde bu tür problemler
+bilgisayar üzerinden çözülüyor, ve her çözüm paketi girdileri farklý
+þekilde isteyebilir. Kimisi maksimizasyon deðil minimizasyon çözmek için
+yazýlmýþtýr mesela. Dert deðil, bir maksimizasyon problemini minimizasyona
+çevirmek için hedef fonksiyonunu eksi ile çarpmak yeterli (ya da
+minimizasyonu maksimizasyon yapmak için, ters yönde). O zaman $-60x - 40y$
+ifadesini minimize de edebilirdik.
+
+Pay býrakma deðiþkenleri (slack variables): Küçüktür büyüktür iþaretlerini
+eþitlik ifadelerine çevirmek istiyorsak, bunun için pay býrakma / gevþeklik
+deðiþkenleri kullanabiliriz. Mesela
+
+$$ x + y \le 6000 $$
+
+ifadesini
+
+$$ x + y + s_1 = 6000 $$
+
+olacak þekilde deðiþtirebiliriz, ki $s_1 \ge 0$. Pay býrakma kelimesinin nereden
+geldiðini görebiliyoruz burada, sanki $s_1$, $x+y$ deðeri ve 6000 deðeri
+arasýnda bir ``pay býrakýyor'', bir gevþeklik olmasýný saðlýyor. Eðer $x+y$ en
+fazla 6000 olabilirse o zaman $x+y$ ile 6000 arasýndaki fark kadar bir bölgede
+bir baþka deðiþken tanýmlanabilir, ve bu deðiþkenin herhangi bir deðere sahip
+olmasýna izin verilir, yeter ki $x+y+s_1$ 6000'e eþit olsun.
+
+Küçüktür ya da eþittir ifadelerini böyle çevirebiliriz. Büyüktür ya da eþittir
+ifadeleri için,
+
+$$ x + y \ge c $$
+
+$$ -x - y \le -c $$
+
+$$ -x - y + s_1 = -c $$
+
+$$ x + y - s_1 = c $$
+
+Yani büyüklük ifadelerini negatif pay býrakma deðiþkenleri ile eþitliðe
+çevirebiliriz. Ayný þekilde diðer eþitsizlikleri deðiþtiririz, tabii her deðiþim
+için ayrý bir pay býrakma deðiþkeni gerekir, $s_2,s_3,..$ böyle devam eder.
+
+Hedef fonksiyonu da ufak bir deðiþim üzerinden ayný sýnýrlamalar listesine dahil
+edilebilir, $P = 60x + 40y$ hedefi $-60x -40y + P = 0$ olarak deðiþtirilir.
+
+Tüm denklem sistemi þöyle,
+
+\includegraphics[height=2.5cm]{func_simplex_01.png}
+
+Bu sistemi matris üzerinden göstermek daha kolay,
+
+\includegraphics[height=3cm]{func_simplex_02.png}
+
+Çözümün genel stratejisi þudur: matris üzerinde satýr bazlý deðiþim yaparak (ki
+bu tür deðiþimlerin lineer denklem sisteminde deðiþiklik yaratmadýðýný
+biliyoruz) matrisin $x,y$ deðiþkenlerinin olduðu bölgede sadece $1,0$
+deðerleri kalacak hale getir. Ardýndan $x,y$ çözümünü matrisin en sað kolonundan
+oku.
+
+Deðiþimleri yaparken tabii ki maksimizasyon amacýna en hýzlý eriþecek þekilde bu
+deðiþimleri yapmak isteriz.
+
+En son satýr hedef fonksiyonuna tekabül ediyor, ve amacýmýz maksimizasyon olduðu
+için, maksimizasyona en hýzlý þekilde eriþmenin en iyi yolu en son satýrda
+deðeri en küçük (en negatif) olan deðeri deðiþtirmek. Bu kolonu pivot kolonu
+olarak seçeriz.
+
+Bu kolondaki hangi öðeyi seçeceðiz? Onun için o kolondaki her ögeyi matrisin en
+saðýndaki kolonda ona tekabül eden öðeye bölerek sonuca bakarýz. Bu sonuçlarýn
+içinde hangisi daha küçük ise o hücre pivot ögesi haline gelir. Bu seçim, ve
+sebepleri hakkýnda daha teorik detaylar [6, sf. 382]'da bulunabilir.
+
+\includegraphics[height=3cm]{func_simplex_03.png}
+
+Pivot ögesi 9'u 1 haline getirmek ve o kolonda diðer tüm deðerleri sýfýrlamak
+için satýr operasyonlarý yaparýz ($R_i$ i'inci satýr anlamýnda).
+
+\includegraphics[height=2.5cm]{func_simplex_04.png}
+
+\includegraphics[height=2.5cm]{func_simplex_05.png}
+
+Bu þekilde $A$ matrisini $B$'ye dönüþtürdük. Þimdi ayný algoritmaya devam
+edelim. En negatif deðer hangisi? -20 deðeri,
+
+\includegraphics[height=3cm]{func_simplex_06.png}
+
+\includegraphics[height=2.8cm]{func_simplex_07.png}
+
+\includegraphics[height=2.8cm]{func_simplex_08.png}
+
+Böylece $C$ matrisine eriþtik. Amaçladýðýmýz gibi $x,y$ bölgesinde 1 ve 0
+deðerleri var, bu noktada hedef fonksiyonun optimal deðeri 315,000 (sað alt
+köþe), ve $y=2250, x=3750$ bu optimal deðer anýndaki $x,y$ deðerleri. Demek ki
+çiftçinin tarlasýnýn 3750 akresinde mýsýr, 2250 akresinde soya ekmesi onun için
+en kazançlýsý olacak.
+
+Algoritma en alt satýrda hiç negatif deðer kalmayýncaya kadar devam eder. 
+
+Not: Her problem üstteki gibi acýsýz çözülemeyebilir; birden fazla, ya da hiç
+çözüm olmadýðý durumlar vardýr, bu gibi farklý þartlar için [3]'e
+danýþýlabilir. En iyisi tabii ki tüm bu hesaplarý ve þartlarý gözönüne alabilen
+bir optimizasyon yazýlýmýný kullanmak. Altta bunun örneðini göreceðiz.
+
+Berlin'e Hava Ýkmali (Berlin Airlift)
+
+Simplex, 2. Dünya Savaþý sýrasýnda Berlin'e Hava Ýkmali adlý yardým
+operasyonunda yoðun bir þekilde kullanýldý. 24 Haziran 1948'te Sovyetler Birliði
+Doðu Almanya'dan Berlin'e giden tüm kara ve deniz yollarýný týkadý. Bu yüzden
+Berlin'de yaþayan 2 milyon insana yiyecek, giyim, vb. eþyalarý nakil edebilmek
+için Amerikalý ve Ýngiliz uçaklarýndan oluþan dev bir nakliyat operasyonu
+planlandý. Elde sýnýrlý miktarda uçak, kargo kapasitesi vardý ve diðer bazý
+kýsýtlamalar (constraints) da göz önüne alýnarak, durum bir lineer programa
+verildi ve optimal seferler planlandý. Simplex metodunun muciti George Dantzig
+bu problem üzerinde bizzat uðraþtý.
+
+Bu problemin tam tanýmý halen yayýnlanmýþ deðil, fakat esasýna en yakýn olan bir
+örnek [5, sf. 20]'de bulunabilir. Bir diðeri, [4] baz alýnarak, þöyle:
+Deðiþkenler 3 tip uçaðýn kaç tanesinin yiyecek ve kömür için kullanýlacaðý, yani
+6 deðiþken var, bunlar 1. tip uçak yiyecek için $x_{1f}$, kömür için $x_{1c}$
+diye gidiyor, diðerleri $x_{2f}$, $x_{2c}$, $x_{3f}$, $x_{3c}$.
+
+Kýsýtlamalar þöyle; 1500 tondan daha fazla yiyecek, 3500 tondan daha fazla kömür
+lazým. 1. tip uçaktan en fazla 10 tane kullanabiliriz, 2. tipten en fazla 22
+tane, 3. tipten 10 tane. 
+
+Hedef fonksiyonu bir minimizasyon, bir masraf fonksiyonu bu, yani en az masrafý
+olacak þekilde hedefe ulaþmak istiyoruz, hepsini bir arada gösterelim,
+
+$$ \textrm{minimize et  }
+1000 x_{1f} + 1000 x_{1c} + 2000 x_{2f} + 2000 x_{2c} + 1200 x_{3f} + 1200 x_{3c},
+\textrm{ öyle ki} $$ 
+$$ 100 x_{1f} + 200 x_{2f} + 150 x_{3f} \ge 1500$$
+$$ 100 x_{1c} + 200 x_{2c} + 150 x_{3c} \ge 3500 $$
+$$ x_{1f} + x_{1c} \le 10 $$
+$$ x_{2f} + x_{2c} \le 22 $$
+$$ x_{3f} + x_{3c} \le 10 $$
+
+Basitleþtirme amaçlý olarak $x_{1f},x_{1c},..$ yerine $x_1,x_2,..$ kullanalým,
+yani düz sayý bazlý indisler olsun.
+
+Bu problemde hem daha küçüktür, hem daha büyüktür türünden eþitsizliklerin
+karýþýk þekilde kullanýldýðýný görüyoruz. Eþitsizliklerin hepsini pay býrakma
+deðiþkenleri üzerinden eþitliklere çevireceðimiz için bu dert deðil.
+
+Bu problemi çözerken \verb!scipy.optimize! adlý bir kütüphane çaðrýsý
+kullanacaðýz. Bu çaðrý minimizasyon yapar (yani maksimizasyon problemlerinin
+hedefi eksi ile çarpýlarak tersine çevirilmelidir) ve girdi olarak hem
+eþitsizlik, hem eþitlik þartlarýný alabilir, biz \verb!A_eq!, \verb!b_eq!
+parametreleri üzerinden ikincisini kullanacaðýz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.optimize import linprog
+import numpy as np
+
+A = np.array([[-100.,0,-200.,0,-150.,0.,-1.,0,0,0,0],
+              [0,-100.,0,-200.,0,-150.,0,-1.,0,0,0],
+              [1.,1.,0,0,0,0,0,0,1.,0,0],
+              [0,0,1.,1.,0,0,0,0,0,1.,0],
+              [0,0,0,0,1.,1.,0,0,0,0,1.]])
+
+b = np.array([-1500., -3500., 10., 22., 10.])
+
+c = np.array([1000., 1000., 2000., 2000., 1200., 1200.,0,0,0,0,0])
+
+res = linprog(-c, A_eq=A, b_eq=b, options={"disp": True})
+
+print (res)
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: -50000.000000
+         Iterations: 7
+     fun: -50000.0
+ message: 'Optimization terminated successfully.'
+     nit: 7
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([  0. ,  10. ,   7.5,  12.5,   0. ,   0. ,   0. ,
+                   0. ,   0. , 2. ,  10. ])
+\end{verbatim}
+
+Sonuç ilginç, 3. tip uçaktan hiç seçim yapýlmamýþ. Bu mantýklý aslýnda çünkü
+3. tip uçaðýn iþletim masrafý 1.'den daha fazla ve bu uçaklardan elimizde 1. tip
+kadar var.
+
+Bir numara: pay býrakma deðiþkenlerinin ana matris içinde sadece köþegen
+üzerinde deðerlerinin olduðu dikkati çekmiþ olabilir. Bu matrisi daha hýzlý bir
+þekilde, ayrý yaratýp soldaki diðer kýsma eklesek kodlama daha hýzlý olmaz mý?
+Evet; pay býrakma deðiþkenlerini bir vektörde tutup bir birim matrisi ile
+çarparsak
+
+\begin{minted}[fontsize=\footnotesize]{python}
+svec = [-1,-1,1,1,1]
+print np.eye(5,5) * svec
+\end{minted}
+
+\begin{verbatim}
+[[-1. -0.  0.  0.  0.]
+ [-0. -1.  0.  0.  0.]
+ [-0. -0.  1.  0.  0.]
+ [-0. -0.  0.  1.  0.]
+ [-0. -0.  0.  0.  1.]]
+\end{verbatim}
+
+saðdaki kýsmý elde ederiz. Þimdi soldaki kýsma \verb!hstack! ile ``yapýþtýralým'',
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.array([[-100.,0,-200.,0,-150.,0.],
+              [0,-100.,0,-200.,0,-150.],
+              [1.,1.,0,0,0,0],
+              [0,0,1.,1.,0,0],
+              [0,0,0,0,1.,1.]])
+
+print np.hstack((A, np.eye(5,5)*svec)) 
+\end{minted}
+	      
+\begin{verbatim}
+[[-100.    0. -200.    0. -150.    0.   -1.   -0.    0.    0.    0.]
+ [   0. -100.    0. -200.    0. -150.   -0.   -1.    0.    0.    0.]
+ [   1.    1.    0.    0.    0.    0.   -0.   -0.    1.    0.    0.]
+ [   0.    0.    1.    1.    0.    0.   -0.   -0.    0.    1.    0.]
+ [   0.    0.    0.    0.    1.    1.   -0.   -0.    0.    0.    1.]]
+\end{verbatim}
+
+Ýkmal Problemi, Tekrar
+
+Bu ikmal probleminin bir degisik tanýmý daha var, bu halini de dahil ettik,
+belki bilgilendirici olur.
+
+Bir Amerikalý uçaðýn kargo kapasitesi 30,000 $\textrm{feet}^3$, Ýngiliz uçaðýnýn
+kargo kapasitesi 20,0000 $\textrm{feet}^3$ idi. Sovyetlerin engellemelerini
+etkili bir þekilde aþabilmek için müttefik güçler taþýdýklarý yükü maksimize
+etmek zorundaydýlar. Diðer kýsýtlamalar þöyleydi: En fazla 44 uçak
+kullanýlabilecekti. Daha büyük Amerikan uçaklarýný uçurmak için 16 kiþilik bir
+ekip gerekiyordu, Ýngiliz uçaklarý için 8 kiþi gerekiyordu. Kullanýlabilecek
+elde olan ekipler toplam 512 kiþiydi. Amerikan uçaðýnýn her uçuþunun masrafý
+\$9000, Ýngiliz uçaðýn \$5000 idi. Ve nihayetinde haftalýk masraf toplam olarak
+\$300,000'i geçemeyecekti.
+
+$$ \textrm{maksimize et  } 30000x + 20000y, \textrm{ öyle ki} $$ 
+$$ x + y \le 44 $$
+$$ 16x + 8y \le 512 $$
+$$  9000x + 5000y \le 300000 $$ 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.optimize import linprog
+import numpy as np
+
+A = np.array([[1., 1., 1., 0., 0.],
+              [16., 8., 0., 1., 0.],
+              [9000., 5000., 0., 0., 1.]])
+b = np.array([44., 512., 300000.])
+c = np.array([30000., 20000., 0., 0., 0.])
+res = linprog(-c, A_ub=A_ub, A_eq=A, b_eq=b, options={"disp": True})
+print (res)
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: -1080000.000000
+         Iterations: 3
+     fun: -1080000.0
+ message: 'Optimization terminated successfully.'
+     nit: 3
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([ 20.,  24.,   0.,   0.,   0.])
+\end{verbatim}
+
+ekrana gelecek. Yani hesap (cost) adý verilen hedef fonksiyonu kargo
+büyüklüðünün 1080000.0 olduðu noktada maksimize oldu (haftada en fazla bu kadar
+kargo taþýnabilecek), ve bu optimal nokta için $x=20$, $y=24$ olmalý. Demek ki
+optimal bir Berlin ikmal operasyonu için 20 Amerikalý, ve 24 Ýngiliz uçaðý
+kullanmak gerekiyor.
+
+Dantzig hakkýnda da ilginç hikayelerden biri: Doktorasýný yaptýðý sýrada
+öðrenciyken bir istatistik dersine geç girer. Hoca, tahtaya bazý problemler
+yazmýþtýr, Dantzig bu problemleri ödev problemi olarak not eder. Ödevler
+Dantzig'i çok zorlar, ancak birkaç hafta sonra çözebilir, ödevleri hocasýnýn
+masasýna býrakýr, ve olayý unutur. Fakat birkaç gün sonra hocasýnýn heyecanla
+evine geldiðini görür, hocasý ona o problemlerin ödev sorusu deðil, istatistikin
+en çetin, halen çözülememiþ problemlerinden ikisi olduðunu o zaman söyler! Yani
+Dantzig farkýnda olmadan kýsa zaman içinde aslýnda ciddi bir tez araþtýrmasý
+yapmýþtýr!
+
+Bu hikayede ilginç psikolojik bir boyut var. Dantzig problemi ``bir ödev olarak
+verildiði için çözmesi beklendiðini'' düþündüðü için mi çözmüþtür?  Belki de. Bu
+hikaye Manuel Blum'un doktora hakkýnda söylediklerini çaðrýþtýrýyor (bkz. {\em
+ Doktora Derecesi} yazýsý).
+
+\newpage
+
+Karesel Programlama (Quadratic Programming -QP-)
+
+Ýçinde eþitsizlikleri de barýndýran ve karesel olan bir matematiksel sistemi
+çözmek için karesel programlama tekniklerini kullanabiliriz. Problemler þu
+þekilde verilir:
+
+$$ \frac{1}{2}x^TQx+p^Tx \textrm{ fonksiyonunu minimize et} $$
+
+þu koþullara uymak þartýyla (subject to)
+
+$$ Gx \leq h \textrm{ (eþitsizlik koþulu)} $$
+
+$$ Ax = b \textrm{ (eþitlik koþulu)} $$
+
+Küçük harfli gösterilen deðiþkenler vektördür, büyük harfler ise bir matrisi
+temsil ederler. $x$ içinde diðer bilinmeyenler $x_1, x_2, ..$ olarak
+vardýr, bulmak istediðimiz deðerler buradadýr.
+
+Somut örnek olarak þuna bakalým:
+
+$$ 2x_1^2 + x_2^2 + x_1x_2+x_1+x_2 \textrm{ fonksiyonunu minimize et} $$
+
+koþullar:
+
+$$ x_1 \geq 0, x_2 \geq 0 \textrm{ (eþitsizlik koþullarý)} $$
+
+$$ x_1 + x_2 = 1 \textrm{ (eþitlik koþulu)} $$
+
+Fakat bu formül þu anda matris formunda deðil. Matris formuna geçmek için iki
+aþama var. Önce $x$ deðiþkenlerinin birbiri ve kendileri ile çarpým durumlarýný
+halledelim. Öyle bir $Q$ matrisi bulmalýyýz ki, altta boþ olan $Q$ matrisinin
+deðerleri doldurulup, çarpým yapýldýðýnda $x$ deðiþkenlerinin tüm çarpým
+iliþkilerini bulsun. Çarpým iliþkileri nelerdir?  Formülün $2x_1^2 + x_2^2 +
+x_1x_2$ kýsmýdýr.
+
+$$ 
+\left[ \begin{array}{cc}
+x_1 & x_2 
+\end{array} \right]
+\left[ \begin{array}{cc}
+.. & .. \\ .. & ..
+\end{array} \right]
+\left[ \begin{array}{c}
+x_1 \\  x_2 
+\end{array} \right]
+$$
+
+$Q$ matrisinin $1,2,..$ gibi kordinatlarý $x_1,x_2,..$'ye tekabül ediyor
+olacaklar.  (1,1) kordinatlarý $x_1$'in kendisi ile çarpýmýný, $x_1^2$'i temsil
+eder, (1,2) ise $x_1x_2$'yi temsil eder, vs. O zaman (1,1) için 2 sayýsýný
+veriririz, çünkü $x_1^2$'nin baþýnda $2$ deðeri var. (2,2) için $1$ deðeri lazým
+çünkü $x_2^2$'nin baþýnda sayý yok (yani '1' deðeri var).
+
+(1,2) ve (2,1) ilginç çünkü ikisi de aslýnda $x_1x_2$'i temsil
+ediyorlar çünkü $x_1x_2 = x_2x_1$. O zaman (1,2) ve (2,1) için $0.5$
+deðeri verirsek, $0.5x_1x_2 + 0.5x_2x_1$'i kýsaltýp $x_1x_2$ haline
+getirebiliriz. Sonuç
+
+$$ 
+Q = \left[ \begin{array}{cc}
+2 & 0.5 \\ 0.5 & 1
+\end{array} \right]
+$$
+
+Kontrol edelim:
+
+$$ 
+\left[ \begin{array}{cc}
+ x_1 & x_2 
+\end{array} \right]
+\left[ \begin{array}{cc}
+2 & 0.5 \\ 0.5 & 1
+\end{array} \right]
+\left[ \begin{array}{c}
+x_1 \\  x_2 
+\end{array} \right] \\
+$$
+
+$$ 
+= \left[ 
+\begin{array}{cc}
+2x_1 + 0.5x_2 & 0.5x_1 + x_2 
+\end{array} 
+\right]
+\left[ 
+\begin{array}{c}
+x_1 \\ x_2 
+\end{array} 
+\right] 
+$$
+
+$$ = 2x_1^2 + 0.5x_2x_1 + 0.5x_1x_2 + x_2^2  $$
+
+$$ = 2x_1^2 + x_1x_2 + x_2^2  $$
+
+$p$ vektörü ise, her terimin, tek baþýna ana formüle nasýl ekleneceðini kontrol
+ediyor. Elimizde $x_1 + x_2$ olduðuna göre $p = [1, 1]$ yeterli olacaktýr,
+bakalým: $\left[\begin{array}{cc}1&1\end{array}\right]^T
+\left[\begin{array}{cc}x_1&x_2\end{array}\right] = x_1 + x_2$.
+ 
+Þimdi eþitsizlik koþullarý. Bizden istenen $x_1 \geq 0$ ve $x_2 \geq 0$
+þartlarýný $Gx \leq 0$ formunda temsil etmemiz. Burada önemli nokta matris
+formuna geçerken bir yandan da $\geq$ iþaretini tersine döndürmemiz, yani $\leq$
+yapmamýz. Bu çok dert deðil, deðiþkeni $-1$ ile çarparsak iþareti tersine
+döndürebiliriz çünkü $x_1 \leq 0$ ile $-x_1 \geq 0$ aynýdýr. O zaman $Gx$ þöyle
+olacak:
+
+$$ 
+\left[ \begin{array}{cc}
+-1 & 0 \\  0 & -1
+\end{array} \right]
+\left[ \begin{array}{c}
+ x_1 \\ x_2
+\end{array} \right]
+\leq
+\left[ \begin{array}{c}
+0 \\  0
+\end{array} \right]
+$$
+
+$$ 
+\left[ \begin{array}{c}
+-x_1 \\  -x_2
+\end{array} \right]
+\leq
+\left[ \begin{array}{c}
+ 0 \\  0
+\end{array} \right]
+$$
+
+Eþitlik koþullarý
+
+Eþitlik koþullarý için problemimizin istediklerini $Ax = b$ formuna uydurmamýz
+lazým. $x_1 + x_2$'yi nasýl forma sokarýz? $
+A = \left[\begin{array}{cc} 1 & 1 \end{array}\right]$, $b = 1$ ile
+
+$$ 
+[1, 1] \left[ \begin{array}{c}
+x_1 \\  x_2
+\end{array} \right] 
+= 1 \\
+$$
+
+$$ x_1 + x_2 = 1 $$
+
+CVXOPT
+
+Bu paket ile karesel denklemleri minimizasyon / maksimizasyon baðlamýnda çözmek
+mümkündür. Üstte bulduðumuz deðerleri altta görebiliyoruz. Q eþitliðinde 2 ile
+çarpým var, bunun sebebi karesel denklem formunun baþýnda $\frac{1}{2}$ çarpýmý
+olmasý, böylece bu iki çarpým birbirini dengeliyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from cvxopt import matrix
+from cvxopt import solvers
+Q = 2*matrix([ [2, .5], [.5, 1] ])
+p = matrix([1.0, 1.0])
+G = matrix([[-1.0,0.0],[0.0,-1.0]])
+h = matrix([0.0,0.0])
+A = matrix([1.0, 1.0], (1,2))
+b = matrix(1.0)
+sol=solvers.qp(Q, p, G, h, A, b)
+print sol['x']
+\end{minted}
+
+\begin{verbatim}
+     pcost       dcost       gap    pres   dres
+ 0:  1.8889e+00  7.7778e-01  1e+00  2e-16  2e+00
+ 1:  1.8769e+00  1.8320e+00  4e-02  0e+00  6e-02
+ 2:  1.8750e+00  1.8739e+00  1e-03  1e-16  5e-04
+ 3:  1.8750e+00  1.8750e+00  1e-05  6e-17  5e-06
+ 4:  1.8750e+00  1.8750e+00  1e-07  2e-16  5e-08
+Optimal solution found.
+[ 2.50e-01]
+[ 7.50e-01]
+
+\end{verbatim}
+
+Bazý notlar: A matrisi yaratýlýrken (1,2) kullanýmý görülüyor, bu matrisin
+boyutlarýný tanýmlamak için. Cvxopt paketi bu arada Numpy formatý deðil kendi
+matris, vektör objelerini kullanýyor, ama ikisi arasýnda gidip gelmek mümkün.
+
+Kaynaklar
+
+[2] Blondel, \url{https://gist.github.com/mblondel/586753}
+
+[3] Reynolds, {\em Mathematical Applications for the Management, Life, and Social Sciences}
+
+[4] Dantzig, Wolfe, {\em The Generalized Simplex Method for Minimizing a Linear Form under Linear Inequality Restraints}, \url{https://www.cs.virginia.edu/~evans/greatworks/LP_handout.pdf} %
+
+[5] Padberg, {\em Linear Optimization and Extensions}
+
+[6] Strang, {\em Linear Algebra and It's Applications, 4th Edition}
+
+\end{document}
