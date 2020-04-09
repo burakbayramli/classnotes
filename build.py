@@ -83,6 +83,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\end{tabular}","\\end{array}")
       line = line.replace('``','"')
       line = line.replace("''",'"')
+      line = line.replace("\$","\\$")
       line = line.replace("\\\\","\\\\\\\\")
       line = line.replace("\\left\{","\\left\\\\{")
       line = line.replace("\\right\}","\\right\\\\}")
