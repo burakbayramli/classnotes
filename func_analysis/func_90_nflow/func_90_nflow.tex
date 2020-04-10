@@ -267,12 +267,95 @@ olabilir.
 Nakliyat
 
 Hedef belli bir mali birkaç kaynak noktasýndan farklý varýþ noktalarýna
-ulaþtýrmak. 
+ulaþtýrmak. Kaynaklar bir sürü depo, ambar olabilir, varýþ noktasý farklý
+müþteriler olabilir, ürünlerin depodan müþterilere gitmesi gerekiyor. Ama
+mesela ambar 1'den müþteri 2'ye gönderim olabilir, ya da ambar 4'ten ayný
+müþteriye.. ? Karar verilmesi gerekiyor, her müþterinin kendine göre talebi
+var, her nakliyat yolunun farklý bedeli var, yollarýn kapasite limitleri
+var, depolarýn arz limitleri var, bu problem en az bedelli talebi tatmin
+eden nakliyat kararýný verecek.
+
+\includegraphics[width=10em]{func_90_nflow_05.png}
+
+Örnek þöyle olabilir, Millco'nun (hayali bir þirket) üç tane bakýr iþleme
+fabrikasý var, üç tane de maden bölgesi var. Nakliyatýn bedeli km baþýna 2
+lira. Madenler ve fabrikalar arasý mesafeler alttaki gibi, o zaman her
+talebi tatmin edip en az nakliyat masrafý için hangi nakliyat planý takip
+edilmeli?
 
 
+$$ 
+\begin{tabular}{|c|c|c|c|P{3cm}|}
+\hline
+Maden & Fabrika 1 & Fabrika 2 & Fabrika 3 & \textrm{Maden baþýna günlük
+                                            maksimum kamyon sevkiyatý}\\
+\hline
+1 & 8 & 15 & 50 & 20 \\
+\hline
+2 & 10 & 17 & 20 & 30 \\
+\hline
+3 & 30 & 26 & 15 & 45 \\
+\hline
+Fabrika talebi & 30 & 35 & 30 & \\
+\hline
+\end{tabular}
+$$
+
+Ýlk kontrol edebileceðimiz faktör acaba að dengeli mi? Tüm arz toplamý tüm
+talep toplamý ile ayný mý? Evet. O zaman üstteki çözülebilecek bir
+problem olabilir. Düðümleri $\left[\begin{array}{cccccc} 1&2&3&A&B&C \end{array}\right]$
+olarak düzenleyeyim, kaynaklar bir blok olarak önce, alýcýlar sonra. Geliþ
+matrisi [1, 43:55],
+
+\includegraphics[width=20em]{func_90_nflow_06.png}
+
+Bu tamamen baðlantýlý (full connected) bir çiziti temsil ediyor, yani
+herhangi bir maden düðümünden herhangi bir fabrika düðümüne gitmenin yolu
+var. Çözüm
+
+\begin{verbatim}
+   A  B  C
+1 20  0  0 
+2 10 20  0
+3 0  15  30
+\end{verbatim}
+
+Biz de \verb!linprog! ile kontrol edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = [[ 1,  1,  1,  0,  0,  0,  0,  0,  0],
+      [0,  0,  0,  1,  1,  1,  0,  0,  0],
+      [0,  0,  0,  0,  0,  0,  1,  1,  1],
+      [-1, 0,  0, -1,  0,  0, -1,  0,  0],
+      [0, -1,  0,  0, -1,  0,  0, -1,  0],
+      [0,  0, -1,  0,  0, -1,  0,  0, -1]]
+
+b = [ 20, 30, 45, -30, -35, -30 ]
+
+c = [ 8, 15, 50, 10, 17, 20, 30, 26, 15]
+
+A = np.array(A); b = np.array(b); c = np.array(c)
+
+from scipy.optimize import linprog
+
+res = linprog(-c, A_eq=A, b_eq=b)
+print (np.round(res.x))
+\end{minted}
+
+\begin{verbatim}
+[ 0.  0. 20.  0. 20. 10. 30. 15.  0.]
+\end{verbatim}
+
+Bu örnekteki $b$'de hiç sýfýr öðesi yok, niye? Çünkü bu að yapýsýnda talep
+ve arz tüm düðümlerde tanýmlý, yani her düðüm ya bir kaynak ya da
+alýcý. Böyle olmayabilirdi, arada geçiþ düðümleri olsaydý onlar üzerinde
+muhafaza mantýðý sebebiyle sýfýr tanýmý yapmak gerekebilirdi. 
 
 
+Atama (Assignment Problems)
 
+Bu tur problemler nakliyat problemine benzer, ama n tane calisanim n tane
+yapilacak isim var. Amac her n kisiye birer gorev vermek. 
 
 
 
