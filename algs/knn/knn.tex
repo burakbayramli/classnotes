@@ -185,34 +185,42 @@ Bu ifade ne diyor? Yeni noktanýn pivota olan uzaklýðýna yarýçap
  mesafesi olamaz, küredeki hangi nokta olursa olsun. Bu eþitsizlik te bize
  bir üst sýnýr (upper bound) vermiþ oldu. 
 
-Algoritma
+Algoritma \verb!ball_knn!$\left(PS^{in},node\right)$
+\begin{enumerate}
 
-\begin{algorithm}[h]
-\begin{pseudocode}
-\codename $\code{ball\_knn}\left(PS^{in},node\right)$\\
-\codeline /* Eðer alttaki þart geçerli ise node içindeki bir noktanýn daha önce \\
-\codeline    keþfedilmiþ $k$ en yakýn komþudan daha yakýn olmasý imkansýzdýr*/\\
-\codeline $\code{if } D^{node}_{minp} \ge D_{sofar}$ \\
-\codeline \> $\code{return } PS_{in}$ deðiþmemiþ halde;\\
-\codeline $\code{else if } node $ bir çocuk noktasý ise \\
-\codeline \> $PS_{out} = PS_{in}$;\\
-\codeline \> $\code{for } \forall x \in points(node)$\\
-\codeline \> \> $\code{if } \left( |x-q| < D_{sofar} \right)$; /* basit lineer arama yap*/\\
-\codeline \> \> $x$'i $PS_{out}$'a ekle;\\
-\codeline \> \> $\code{if } |PS^{out}| == k+1$;\\
-\codeline \> \> \> en uzak olan komþuyu $PS^{out}$'tan çýkart;\\
-\codeline \> \> \> $D_{sofar}$'i güncelle;\\
-\codeline \\
-\codeline /* eðer uç nokta deðil ise iki çocuk düðümden daha yakýn olanýný \\
-\codeline    incele, sonra daha uzakta olanýna bak. büyük bir ihtimalle   \\
-\codeline    arama devam ettirilirse bu arama kendiliðinden kesilecektir */ \\
-\codeline $\code{else }$\\
-\codeline \> $node_1 = node$'un $q$'ya en yakýn çocuðu;\\
-\codeline \> $node_2 = node$'un $q$'dan en uzak çocuðu;\\
-\codeline \> $PS^{temp} = \code{ball\_knn}(PS^{in},node_1)$;\\
-\codeline \> $PS^{out} = \code{ball\_knn}(PS^{temp},node_2);$
-\end{pseudocode}
-\end{algorithm}
+\item Eðer alttaki þart geçerli ise node içindeki bir noktanýn daha önce
+  keþfedilmiþ $k$ en yakýn komþudan daha yakýn olmasý imkansýzdýr
+
+\item \verb!if! $D^{node}_{minp} \ge D_{sofar}$ $\code{return } PS_{in}$
+  deðiþmemiþ halde;
+
+\item \verb!else if! $node$ bir çocuk noktasý ise
+
+  \begin{itemize}
+   \item  $PS_{out} = PS_{in}$
+   \item Her $\forall x \in points(node)$ için
+   \begin{itemize}
+     \item \verb!if! $\left( |x-q| < D_{sofar} \right)$, basit lineer arama yap
+     \item $x$'i $PS_{out}$'a ekle
+     \item \verb!if! $|PS^{out}| == k+1$ o zaman en uzak olan komþuyu
+       $PS^{out}$'tan çýkart ve $D_{sofar}$'i güncelle
+   \end{itemize}
+
+  \end{itemize}
+
+\item Eðer uç nokta deðil ise iki çocuk düðümden daha yakýn olanýný
+  incele, sonra daha uzakta olanýna bak. büyük bir ihtimalle arama devam
+  ettirilirse bu arama kendiliðinden kesilecektir.
+
+  \item \verb!else!
+    \begin{itemize}
+      \item $node_1 = node$'un $q$'ya en yakýn çocuðu;\\
+      \item $node_2 = node$'un $q$'dan en uzak çocuðu;\\
+      \item $PS^{temp} = \code{ball\_knn}(PS^{in},node_1)$;\\
+      \item $PS^{out} = \code{ball\_knn}(PS^{temp},node_2);$
+\end{itemize}
+        
+\end{enumerate}
 
 Küre Aðaçlarý (BT) metotu önce küreleri, aðaçlarý oluþturmalýdýr. Bu
 küreler hiyerarþik þekilde planlanýr, tüm noktalarýn içinde olduðu bir "en
