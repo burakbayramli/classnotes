@@ -1,39 +1,26 @@
-import os, sys, glob, shutil
+import os, sys, glob
 
+pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
 d = os.environ['HOME']
-if len(sys.argv) == 1 :
-    os.system("pdfunite \
-    phy_cover/phy_cover.pdf \
-    phy_basics/phy_basics.pdf \
-    phy_lagrange/phy_lagrange.pdf \
-    phy_dblpend/phy_dblpend.pdf \
-    phy_cartpole/phy_cartpole.pdf \
-    phy_intcont/phy_intcont.pdf \
-    phy_varcalc/phy_varcalc.pdf \
-    phy_opt/phy_opt.pdf \
-    phy_num/phy_num.pdf \
-    phy_path/phy_path.pdf \
-    phy_kf/phy_kf.pdf \
-    " + d + "/Downloads/phy.pdf" \
-    )
-    exit()
-    
+
+if len(sys.argv) == 1:
+    cmd = "pdfunite " + pdfs + " " + d + "/Downloads/phy.pdf"
+    os.system(cmd)
+    exit()    
 elif sys.argv[1] == 'all':
     for a in sorted(glob.glob("phy*")):
         os.chdir(a)
-        os.system("pdflatex -shell-escape %s" % glob.glob("phy_*.tex")[0] )
+        os.system("pdflatex -shell-escape %s" % glob.glob("calc_*.tex")[0] )
         os.chdir("..")
-        
-    
 elif sys.argv[1] == 'clean':
     os.system("find . -name '_region_*' | xargs rm  -rf")
     os.system("find . -name '_minted-*' | xargs rm  -rf")
-            
+    os.system("find . -name '*.log' | xargs rm  -rf")
+    os.system("find . -name '*.aux' | xargs rm  -rf")
+    os.system("find . -name '*.out' | xargs rm  -rf")
+
 elif sys.argv[1] == 'tex':
     file = glob.glob('phy_*.tex')
     os.system("pdflatex -shell-escape %s" % file[0])
-    d = "/data/data/com.termux/files/home/storage/downloads"
-    if os.path.isdir(d):
-        ff = file[0].replace(".tex",".pdf")
-        shutil.copy(ff,d)
+    
     

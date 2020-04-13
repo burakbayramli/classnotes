@@ -5,7 +5,7 @@
 #
 import os, sys, re, codecs, shutil, markdown
 
-topdirs = ['algs','calc_multi','chaos','compscieng','elecmag',
+topdirs = ['algs','calc_multi','chaos','compscieng',
            'func_analysis','linear','ode','pde','stat',
            'tser','vision','phy']
 
