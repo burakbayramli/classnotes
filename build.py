@@ -97,6 +97,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\big\}","\\big\\\\}")
       line = line.replace("\\begin{itemize}","")
       line = line.replace("\\end{itemize}","")
+      line = line.replace("\\begin{enumerate}","")
+      line = line.replace("\\end{enumerate}","")
       line = line.replace("\\item ","* ")
       line = re.sub(r'{\\em (.*?)}', r'*\1*', line)
       line = re.sub(r'\\url\{(.*?)\}', r'<a href="\1">\1</a>', line)
