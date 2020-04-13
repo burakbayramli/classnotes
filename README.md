@@ -37,8 +37,6 @@ Calculus gerekiyor mu bilmiyorum, benim zamanımda gerekiyordu).
 
 [Gayri Lineer Dinamik ve Kaos](chaos)
 
-[Elektrik ve Manyetik Etkileşimler](elecmag)
-
 [Çoklu Bakış Açı Geometrisi](vision)
 
 ### PDF
@@ -82,10 +80,6 @@ http://sayilarvekuramlar.blogspot.com/2015/12/bilgisayar-bilim-yapay-zeka.html
 Gayri Lineer Dinamik ve Kaos (Non-Linear Dynamics and Chaos)
 
 http://sayilarvekuramlar.blogspot.com/2015/12/gayr-lineer-dinamik-ve-kaos-chaos-non.html
-
-Elektrik ve Manyetik Etkileşimler (Electric and Magnetic Interactions)
-
-http://sayilarvekuramlar.blogspot.com/2015/01/elektrik-ve-manyetik-etkilesimler.html
 
 Çoklu Bakış Açı Geometrisi (Multiple View Geometry)
 
