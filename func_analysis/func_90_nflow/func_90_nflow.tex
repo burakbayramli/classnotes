@@ -509,13 +509,61 @@ O zaman bir minimum bedel akýþ problemindeki arzlar tam sayý ise, talepler
 tam sayý ise, ve tam sayý kenar kapasiteleri içeriyorsa, bu bir minimum
 bedel tam sayý akýþýdýr. 
 
+Ekler
 
+Kýsayol problemine örnek olarak [2]'deki probleme bakalým.
 
+\includegraphics[width=20em]{dijks_03.png}
 
+Baþlangýç \verb!'s!'den bitiþ \verb!x!'e en kýsa yol hangisi?
+Düðümlere $s=1,t=2,y=3,x=4,z=5$ olarak birer indis verelim, ve 
+$x = [x_{12}, x_{13}, x_{23}, x_{24}, x_{32}, x_{34}, x_{35}, x_{45}, x_{51}, x_{54}]$
+vektörünü tanýmlayalým. Geliþ matrisini aðdaki baðlantýlara göre yapýp çözersek,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+A = [
+     [ 1,  1,  0,  0,  0,  0,  0,  0,  0, 0],
+     [ -1,  1,  1,  -1,  0,  0,  0,  0,  0, 0],
+     [ 0,  -1,  -1,  0,  1,  1,  0,  0,  0, 0],
+     [ 0,  0,  0,  -1,  0,  -1,  0,  1,  0, -1],
+     [ 0,  0,  0,  0,  0,  0,  -1,  -1,  1, 1]]
 
+# tek birim yolla, 1'den arz, 4'ten talep
+# geri kalanlarda giris-cikis muhafaza
+b = [1, 0, 0, -1, 0]
 
-[devam edecek]
+c= [10, 5, 2, 1, 3, 9, 2, 4, 7, 6]
+A = np.array(A); b = np.array(b); c = np.array(c)
+
+from scipy.optimize import linprog
+
+res = linprog(c, A_eq=A, b_eq=b)
+res = np.round(res.x)
+res = res.reshape(len(res),1)
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[[0.]
+ [1.]
+ [0.]
+ [1.]
+ [1.]
+ [0.]
+ [0.]
+ [0.]
+ [0.]
+ [0.]]
+\end{verbatim}
+
+Sonuçta $x_{13}$, $x_{24}$, $x_{32}$ kenarlarýnýn 1 deðerini aldýðýný
+görüyoruz, bu yollar en kýsa yolun parçalarýdýr, demek ki 1-3, 3-2, ve 2-4
+yolu en kýsa yoldur. Orijinal problem çözümünde [2] sonucun ['s', 'y', 't',
+'x'] olduðunu görmüþtük. Yani ayný sonuca varmýþ olduk.  
+
+Dijkstra algoritmasýnýn bir ayrýksal algoritma olduðunu unutmayalým,
+üstteki LP bazlý yaklaþým sürekli taným kümesinde, optimizasyon araçlarý
+ile ayný sonuca varýyor!
 
 Kaynaklar
 
@@ -523,6 +571,10 @@ Kaynaklar
     University of Wisconsin-Madison,
     \url{https://laurentlessard.com/teaching/524-intro-to-optimization}
 
+[2] Bayramli, {\em Bilgisayar Bilim, Dijkstra Algoritmasý ile En Kýsa Yol}
 
 \end{document}
+
+
+
 
