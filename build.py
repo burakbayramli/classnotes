@@ -69,6 +69,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("^*", "@@RR@@@")
       line = line.replace("\\curl", "\\mathrm{curl}")
       line = line.replace("\\sinc", "\\mathrm{sinc}")
+      line = line.replace("\\begin{quote}", "```")
+      line = line.replace("\\end{quote}", "```")
       line = line.replace("\\bdiv", "\\mathrm{div}")
       line = line.replace("\\tr", "\\mathrm{tr}")
       line = line.replace("\\grad", "\\mathrm{grad}")
