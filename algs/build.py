@@ -25,7 +25,6 @@ if len(sys.argv) == 1:
     ./mesquita/mesquita.pdf \
     ./graph/graph.pdf \
     ./rsa/rsa.pdf \
-    ./street/street.pdf \
     ./mlp/mlp.pdf \
     ./autodiff/autodiff.pdf \
     ./tensorflow/tensorflow.pdf \
