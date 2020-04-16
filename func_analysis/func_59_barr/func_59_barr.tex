@@ -18,9 +18,209 @@ Tüm bu fonksiyonlarýn dýþbükey ve iki kere türevi alýnabilir olduðunu farz
 ediyoruz. Þimdi log bariyer metotu uygulayacaðýz, bu ilk göreceðimiz
 iç-nokta yöntemi olacak [1, 14:00]. 
 
+Bu yöntem ile önce eþitsizlik kýsýtlamalarýna tekabül eden bir log bariyer
+fonksiyonu tanýmlamak gerekiyor. Bu fonksiyon, 
+
+$$
+\phi(x) = -\sum_{i=1}^{m} \log(-h_i(x))
+$$
+
+Tabii $\log$'un negatif deðerler üzerinde iþletilemeyeceðini biliyoruz, o
+sebeple üstteki eksi ile çarpým var (kýsýtlamalara göre $h_i$'ler eksi
+olmalý, onu da biliyoruz). Bu fonksiyon ile yapmaya uðraþtýðýmýz gösterge
+(indicator) fonksiyonunu yaklaþýklamak. $\phi$'nin taným kümesi $h$'ye göre
+harfiyen olurlu olan $x$'ler. 
+
+Þimdi log bariyerin yaklaþýklamayý nasýl yaptýðýna gelelim. Eþitlik
+kýsýtlamalarýný atlarsak, üstteki minimizasyon problemi þu þekilde de
+gösterilebilir [1, 15:53],
+
+$$
+\min_x f(x) + \sum_{i=1}^{m} I_{h_i(x) \le 0}(x)
+$$
+
+$I$ her $h_i$'nin sýfýrdan küçük olup olmadýðýna göre 0 ya da çok büyük
+deðerler verir, bu yüzden üstteki gibi bir temsil, eþitsizlik
+kýsýtlamalarýný kullanmakla eþdeðerdir. Çünkü minimizasyon problemi doðal
+olarak çok büyük deðerlerden kaçacak, ve böylece kýsýtlamalar dolaylý
+yoldan problem çözümüne dahil olmuþ olacak. Altta kesikli çizgiyle
+göstergeç fonksiyonu görülüyor, 
+
+\includegraphics[width=15em]{func_59_barr_01.png}
+
+Diðer kavisli çizgiler ise $-\log(-u) \frac{1}{t}$, her $t$ için farklý bir
+eðri. $t$ büyütüldükçe log bariyer fonksiyonunu göstergeci daha da iyi
+yaklaþýk temsil etmeye baþlýyor / ona yaklaþýyor [1, 17:08]. 
+
+Altta farklý $\mu$ deðerleri için
+$-\mu \log(-u)$ fonksiyonun deðerlerini görüyoruz. Fonksiyon görüldüðü gibi
+$I$'ya oldukca yakýn.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def I(u): 
+   if u<0: return 0.
+   else: return 10.0
+
+u = np.linspace(-3,1,100)
+Is = np.array([I(x) for x in u])
+
+import pandas as pd
+df = pd.DataFrame(index=u)
+
+df['I'] = Is
+df['$\mu$=0.5'] = -0.5*np.log(-u)
+df['$\mu$=1.0'] = -1.0*np.log(-u)
+df['$\mu$=2.0'] = -2.0*np.log(-u)
+
+df.plot()
+plt.savefig('func_59_barr_02.png')
+\end{minted}
+
+\includegraphics[width=25em]{func_59_barr_02.png}
+
+Herhalde simdi en yapacagimiz tahmin edilebilir, gostergec fonksiyonlariyla
+ile calismak zor, o zaman göstergeç toplamlarý log toplamlarý olarak
+yaklaþýksallanabilir,
+
+$$
+\min_x f(x) + \frac{1}{t} \sum_{i=1}^{m} \log(-h_i(x))
+$$
+
+ki $t$ büyük olacak þekilde çünkü o zaman log, göstergeci iyi yaklaþýk
+olarak temsil ediyor, ardýndan bu yeni pürüzsüz problemi çözüyoruz,
+eþitsizlik þartlarýna ihtiyaç duymadan. 
+
+Log-Bariyer Calculus
+
+$\phi$ fonksiyonunun bazý özelliklerini dökmek faydalý olur, ileride Newton
+metotundan bahsettiðimizde bu özellikler faydalý olacak. $\phi$ için gradyan ve
+Hessian,
+
+$$
+\nabla \phi(x) = - \sum_{i=1}^{m} \frac{1}{h_i(x)} \nabla h_i(x)
+$$
+
+Hessian
+
+$$
+\nabla^2 \phi(x) = 
+\sum _{i=1}^{m} \nabla h_i(x) \nabla h_i(x)^T - 
+\sum _{i=1}^{m} \frac{1}{h_i(x)} \nabla^2 h_i(x)
+$$
+
+Merkezi gidiþ yolu (central path)
+
+Optimizasyon problemimizi $1/t$ yerine $t$ carpimi ile de gosterebiliriz,
+yani
+
+$$
+\min_x t f(x) + \phi(x) \quad \textrm{öyle ki}
+$$
+$$
+Ax = b
+$$
+
+Herneyse, merkezi yol $x^*(t)$, $t>0$'nin bir fonksiyonudur, yani her $t$
+için eldeki çözümlerin ortaya çýkarttýðý yoldur bir bakýma. Her $t$ için
+problemin çözümünü KKT koþullarý ile karakterize edebiliriz. 
+
+$$
+Ax^*(t) = b, \quad h_i(x^*(t)) < 0, \quad i=1,..,m
+$$
+
+$$
+t \nabla f(x^*(t)) - \sum \frac{1}{h_i(x^*(t))} \nabla h_i(x^*(t)) + A^T w= 0
+$$
+
+Bu koþullar $x^*(t)$'nin optimal olmasýnýn ne demek olduðunu
+tanýmlýyor. Ýki denklemdeki ilk denklem ana olurluktan geliyor, eþitlik
+sýnýrlamalarýna tekabül eden tek ikiz deðiþken var, $w$, onun iþareti
+üzerinde kýsýtlama yok çünkü eþitlik kýsýtlamasý. Duraðanlýk koþulu ikinci
+denklemde, ona nasýl eriþtik? Problemin Lagrangian'i
+
+$$
+t f(x) + \phi(x) + w^T (Ax - b)
+$$
+
+Eðer $x$'e göre gradyan alýp sýfýra eþitlersek duraðanlýðý elde
+ederim. Gradyan yeterli çünkü buradaki tüm fonksiyonlar dýþbükey ve
+pürüzsüz [1, 24:04]. 
+
+Eðer üstteki problemi bir $w$ için çözersem o zaman merkezi yoldaki bir
+çözümü belli bir $t$ için karakterize etmiþ / tarif etmiþ
+oluyorum. Umudumuz o ki $t$'yi sonsuzluða doðru büyüttükçe üstteki KKT
+koþullarýyla temsil edilen çözümler orijinal problemimdeki çözüme
+yaklaþmaya baþlayacak. Bu olabilir deðil mi? $t$'yi büyüttükçe log
+bariyerin nasýl göstergeç fonksiyonuna benzemeye baþladýðýný biraz önce
+gördük. Bu tür log bariyerlerden oluþan optimizasyon problemi için de
+benzer bir durum olacaðýný tahmin edebiliriz. 
+
+Bu kavramlarý lineer programlar için yakýndan görebiliriz. Tüm bu
+yaklaþýmlar bu arada ilk baþta LP'ler için ortaya atýlmýþtýr. 
+
+Önemli bir örnek,
+
+$$
+\min_x t c^T x - \sum _{i=1}^{m} \log(e_i - d_i^T x)
+$$
+
+Bu bir standart LP'nin bariyerleþtirilmiþ hali. 
+
+
+
+
+
+
+
 
 
 [devam edecek]
+
+Ekler
+
+Pek çok yerde kullanýlan bir eþitsizlik görelim, mesela bütün $x_i < 0$
+olduðu bir durum, yani $h_i(x) = -x$. O zaman bariyer neye benzer? 
+
+$$
+\phi(x) = - \sum _{i=1}^{n} \log x_i
+$$
+
+$$
+\nabla \phi(x) = 
+- \left[\begin{array}{c}
+1/x_1  \\ 
+\vdots \\
+1/x_n
+\end{array}\right] 
+= - X^{-1} \textbf{1} 
+$$
+
+Burada $X$ matrisi 
+
+$$
+X = \diag(x) = 
+\left[\begin{array}{ccc}
+x_1 & & \\
+    & \ddots & \\
+    & & x_n
+\end{array}\right]
+$$
+
+ve $\textbf{1}$ sembolu tamamen 1'lerden oluþan matris. 
+
+Hessian
+
+$$
+\nabla^2 \phi (x) = \left[\begin{array}{ccc}
+1/x_1^2 & & \\
+    & \ddots & \\
+    & & 1/x_n^2
+\end{array}\right] = X^2 
+$$
+
+Kod
+
+Standard LP cozen bariyer metot temelli kod alttadir [2]  
 
 \inputminted[fontsize=\footnotesize]{python}{barr.py}
 
@@ -70,10 +270,15 @@ linprog ===============
  success: True
        x: array([1.15454732e-13, 2.33333333e+00, 2.66666667e+00, 3.96953400e-12])
 \end{verbatim}
+
 Kaynaklar
 
-[1] Tibshirani, {\em Convex Optimization, Lecture Video 15}, 
-\url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
+[1] Tibshirani, 
+    {\em Convex Optimization, Lecture Video 15}, 
+    \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
+
+[2] Dong, {\em LP-Solver, Github}, 
+    \url{https://github.com/junjiedong/LP-Solver}
 
 \end{document}
 
