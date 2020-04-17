@@ -56,7 +56,8 @@ class LPCenteringSolver():
 
             # Compute primal and dual Newton steps (dx, dv) via block elimination
             h_inv =  x ** 2  # diagonal entries of inv(Hessian)
-            dv = np.linalg.solve( np.dot(A * h_inv, A.T), r_primal - np.dot(A * h_inv, r_dual) )
+            dv = np.linalg.solve( np.dot(A * h_inv, A.T), r_primal - \
+                                  np.dot(A * h_inv, r_dual) )
             dx = -h_inv * (r_dual + np.dot(A.T, dv))
 
             # Backtracking line search on ||r||_2
@@ -68,7 +69,8 @@ class LPCenteringSolver():
                 v_new = v + t * dv
                 r_dual_new = c - 1 / x_new + np.dot(A.T, v_new)
                 r_primal_new = A.dot(x_new) - b
-                r_norm_new = np.sqrt(np.sum(r_dual_new ** 2) + np.sum(r_primal_new ** 2))
+                r_norm_new = np.sqrt(np.sum(r_dual_new ** 2) + \
+                                     np.sum(r_primal_new ** 2))
 
                 if r_norm_new <= (1 - self.alpha * t) * r_norm:
                     x = x_new
@@ -169,7 +171,8 @@ class LPSolver():
         """
         m, n = A.shape
 
-        # Phase I: Check strict feasibility and obtain a strictly feasible starting point
+        # Phase I: Check strict feasibility and obtain a strictly
+        # feasible starting point
         x = np.linalg.pinv(A).dot(b)
         if np.min(x) <= 0:  # otherwise, x is already a strictly feasible point
             # Construct an LP for checking feasibility
