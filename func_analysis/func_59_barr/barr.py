@@ -1,4 +1,3 @@
-# https://github.com/junjiedong/LP-Solver
 import numpy as np
 
 class LPCenteringSolver():
