@@ -20,7 +20,7 @@ $$
 Birinci ayda 40, ikinci ayda 60, vs.. Þirketin bir deposu da var, bitmiþ
 teknelerin teslim etmeden önce tutulduklarý yer burasý. 1. ayýn baþýnda bu
 depoda 10 tane tekne var. Her ay kaç tane tekne (ve nasýl) üretileceðini
-hesaplamam lazým, burada iþçi turu ve depoda olanlar sayýyý etkiler tabii,
+hesaplamam lazým, burada iþçi türü ve depoda olanlar sayýyý etkiler tabii,
 mesela bir ayda 10 tane üretmem gerekiyorsa ve depoda zaten 10 tane varsa,
 hiç üretim yapmama gerek yok. Ama gelecekte çok fazla üretmem gerektiðini
 biliyorsam ekstra yapýp onlarý depoda tutabilirim, ki sonra gönderebileyim.
@@ -52,8 +52,8 @@ bir deðiþken olacak. Belki bu deðiþkenlerden bazýlarý fuzuli, hatta baþka
 bir þeyi tekrar ediyor sanki, baþka deðiþkenlerden türetilebilir gibi
 geliyor, olsun, yine de ekstra deðiþkeni koyun, ama diðer yandan
 aklýnýzdaki o kuralý probleme sýnýrlama olarak dahil edin. Literatürde bu
-degiskenlere karar degiskenleri deniyor ama aslinda onlarin direk karar
-verdigimiz seyler olmasina gerek yok.
+deðiskenlere karar deðiskenleri deniyor ama aslýnda onlarin direk karar
+verdiðimiz þeyler olmasýna gerek yok.
 
 Deðiþkenler þöyle,
 
@@ -391,6 +391,8 @@ yarýþamaz.
 
 Üstteki resimde kýrmýzý renk yapýlan tercihi belirtiyor [1, 54:08]. 
 
+Bu konu kodlamasý hakkýnda daha fazla detay ekler bölümünde. 
+
 Aktarmalý gemi nakliyatý
 
 Bu tür nakliyat problemlerinde bir mali kaynaktan alýcýya direk göndermeye
@@ -555,6 +557,156 @@ algoritmasýnýn bir ayrýksal algoritma olduðunu unutmayalým, ama üstteki LP
 bazlý yaklaþým sürekli (continuous) alanda optimizasyon araçlarý ile ayný
 sonuca varýyor!
 
+Yüzücüler
+
+Daha önceki problemi yazýlýmla çözelim. Atama problemleri aslýnda oldukca
+standart, çünkü iþ-iþçi að yapýsý hepsinde ayný, arada aktarma olmayan bir
+að yapýsý. Bu yapýyý $n$ tane iþ $n$ tane iþçi için mekanik bir þekilde
+yaratabiliyoruz. Bu sebeple çözüm yapan \verb!linear_sum_assignment!
+çaðrýsý sadece bir bedel matrisi alýyor, gerisini kendi hallediyor. 
+
+Püf nokta, ya elde iþten fazla iþçi varsa, mesela yüzme örneðinde olduðu
+gibi, 5 tane yüzücü, 4 tane stil? O zaman ufak bir numara þudur, bedel
+matrisine bir 'boþ stil' satýrý ekleriz, oradaki tüm bedeller sýfýr olur,
+yani diðer iþler için optimal olmayan bir kiþiyi buraya atamak için
+algoritmayi yönlendirmiþ oluruz bir bakýma ve problemi standart bir þekilde
+çözeriz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.optimize import linear_sum_assignment
+
+raw = [ [37.7, 32.9, 33.8, 37.0, 35.4],
+        [43.4, 33.1, 42.2, 34.7, 41.8],
+        [33.3, 28.5, 38.9, 30.4, 33.6],
+        [29.2, 26.4, 29.6, 28.5, 31.1] ]
+raw = np.array(raw)
+raw = np.vstack( (raw,  np.zeros((1,5))) )
+print (raw)
+row_ind, col_ind = linear_sum_assignment(raw)
+print (col_ind)
+print (row_ind)
+print (raw[row_ind, col_ind].sum())
+\end{minted}
+
+\begin{verbatim}
+[[37.7 32.9 33.8 37.  35.4]
+ [43.4 33.1 42.2 34.7 41.8]
+ [33.3 28.5 38.9 30.4 33.6]
+ [29.2 26.4 29.6 28.5 31.1]
+ [ 0.   0.   0.   0.   0. ]]
+[2 3 1 0 4]
+[0 1 2 3 4]
+126.2
+\end{verbatim}
+
+Sonuca göre David sýrtüstü stiline atanmýþ, Tony kurbaðalamaya atanmýþ.. ve
+Ken hiçbir þey atanmamýþ. Bu atamalarýn daha önceki tabloyla ayný olduðunu
+görebiliriz.
+
+Problemin matematik yapisina gelirsek, [4] orneginden hareket edelim,
+elimizde uc tane isci A, B, C var, ve uc tane is 1,2,3 var. Her iscinin her
+isi ne kadar surede yaptigi alttaki tabloda, satirlar isci, kolonlar is,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+C = [[17,10,12],[9,8,10], [14,4,7]]
+C = np.array(C)
+print (C)
+\end{minted}
+
+\begin{verbatim}
+[[17 10 12]
+ [ 9  8 10]
+ [14  4  7]]
+\end{verbatim}
+
+Problemin yapýsý alttaki að yapýsýyla gösterilebilir,
+
+\includegraphics[width=15em]{func_90_nflow_11.png}
+
+Karar deðiþkenleri $x_{A1}$, $x_{A2}$, .. þeklinde olacak. o zaman bedel
+
+$$
+17 x_{A1} + 10 x_{A2} + 12 x_{A3} + 
+9 x_{B1} + 8 x_{B2} + 10 x_{B3} + 
+14 x_{C1} + 4 x_{C2} + 7 x_{C3}
+$$
+
+Onemli bir nokta her isin sadece bir kisiye verilmesi. Bunu mesela A icin
+
+$$
+x_{A1} + x_{A2} +  x_{A3}  = 1
+$$
+
+kisitlamasi ile hallederiz, B,C icin benzer durum. 
+
+Her isin tek kisiye verilmesi icin, mesela 1 icin
+
+$$
+x_{A1} + x_{B1} + x_{C1} = 1
+$$
+
+kýsýtlamasý, 2,3 için benzer. Tüm bu kýsýtlamalarý matris formunda vermek için,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n = 3
+X = np.zeros((2*n,n**2))
+X[0,0:n] = np.ones((1,n))
+X[1,n:n+n] = np.ones((1,n))
+X[2,2*n:2*n+n] = np.ones((1,n))
+X[3:6,0:3] = np.eye(n,n)
+X[3:6,3:6] = np.eye(n,n)
+X[3:6,6:9] = np.eye(n,n)
+print (X)
+\end{minted}
+
+\begin{verbatim}
+[[1. 1. 1. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 1. 1. 1. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 1. 1. 1.]
+ [1. 0. 0. 1. 0. 0. 1. 0. 0.]
+ [0. 1. 0. 0. 1. 0. 0. 1. 0.]
+ [0. 0. 1. 0. 0. 1. 0. 0. 1.]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (C.flatten())
+\end{minted}
+
+\begin{verbatim}
+[17 10 12  9  8 10 14  4  7]
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+b = [1, 1, 1, 1, 1, 1]
+
+from scipy.optimize import linprog
+res = linprog(C.flatten(), A_eq=X, b_eq=b)
+res = np.round(res.x)
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[0. 0. 1. 1. 0. 0. 0. 1. 0.]
+\end{verbatim}
+
+Yani $x_{A3}$, $x_{B1}$, $x_{C2}$ atamasý yapýldý. Doðrulamasýný yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+row_ind, col_ind = linear_sum_assignment(C)
+print (col_ind)
+print (row_ind)
+print (C[row_ind, col_ind].sum())
+\end{minted}
+
+\begin{verbatim}
+[2 0 1]
+[0 1 2]
+25
+\end{verbatim}
+
+Ayný sonucu aldýk. 
+
 Kaynaklar
 
 [1] Lessard, {\em Introduction to Optimization, CS/ECE/ISyE 524, Lecture 5}, 
@@ -565,7 +717,9 @@ Kaynaklar
 
 [3] Bayramli, {\em Fonksiyonel Analiz ve Optimizasyon, Çifteþlik, Ýkizlik (Duality)}
 
+[4] Hebborn, {\em Decision Mathematics}, 
+    \url{https://www.pearsonschoolsandfecolleges.co.uk/Secondary/Mathematics/16plus/HeinemannModularMathematicsForEdexcelASAndALevel/Samples/Samplematerial/Chapter2.pdf}
+
+[5] Burkard, {\em Assignment Problems}
+
 \end{document}
-
-
-
