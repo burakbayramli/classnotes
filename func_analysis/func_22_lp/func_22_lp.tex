@@ -1,0 +1,152 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Lineer Programlar, Örnekler
+
+Bir lineer program (LP), 
+
+$$
+\min_x c^Tx \quad \textrm{öyle ki}
+$$
+$$
+Dx \le d
+$$
+$$
+Ax = b
+$$
+
+formundaki problemlerdir. Atama problemleri, nakliyat (transportation)
+problemleri hep LP olarak çözülebilir. 
+
+Örnekler
+
+Bir atama problemi gorelim. Ufak [1, sf. 29] örneðinden hareket edelim,
+elimizde üç tane iþçi A, B, C var, ve üç tane iþ 1,2,3 var. Her iþçinin her
+iþi ne kadar sürede yaptýðý alttaki tabloda. Satýrlar iþçi, kolonlar iþ,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+C = [[17,10,12],[9,8,10], [14,4,7]]
+C = np.array(C)
+print (C)
+\end{minted}
+
+\begin{verbatim}
+[[17 10 12]
+ [ 9  8 10]
+ [14  4  7]]
+\end{verbatim}
+
+Problemin yapýsý alttaki að ile gösterilebilir,
+
+\includegraphics[width=15em]{func_90_nflow_11.png}
+
+Karar deðiþkenleri $x_{A1}$, $x_{A2}$, .. þeklinde olacak. o zaman bedel
+
+$$
+17 x_{A1} + 10 x_{A2} + 12 x_{A3} + 
+9 x_{B1} + 8 x_{B2} + 10 x_{B3} + 
+14 x_{C1} + 4 x_{C2} + 7 x_{C3}
+$$
+
+Önemli bir nokta her iþin sadece bir kiþiye verilmesi. Bunu mesela A için
+
+$$
+x_{A1} + x_{A2} +  x_{A3}  = 1
+$$
+
+kýsýtlamasý ile hallederiz, B,C için benzer durum. 
+
+Her isin tek kisiye verilmesi icin, mesela 1 icin
+
+$$
+x_{A1} + x_{B1} + x_{C1} = 1
+$$
+
+kýsýtlamasý, 2,3 için benzer þekilde halledilir. Tüm bu kýsýtlamalarý
+matris formunda vermek için, alttaki gibi bir matris yaratýlabilir,
+
+\includegraphics[width=25em]{func_90_nflow_12.png}
+
+Notasyon $x_{11}$ diyor bizim örnek için $x_{A1}$ diye düþünülebilir. Bu
+matrisi LP çözümüne $Ax = b$ kýsýtlamasý olarak verebiliriz, $Ax$ çarpýmýný
+takip edersek bu çarpýmýn belli $x$'ler üzerinde toplama yaptýðýný
+görüyoruz, mesela ilk satýr sol üst blok $x_{A1} + x_{B1} + x_{C1} $
+toplamýný yapýyor ve ona tekabül eden kýsma $b$ içinde 1 verirsek, LP
+mekanizmasý bu kýsýtlamaya göre gerisini halleder.
+
+Kodda yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n = 3
+X = np.zeros((2*n,n**2))
+X[0,0:n] = np.ones((1,n))
+X[1,n:n+n] = np.ones((1,n))
+X[2,2*n:2*n+n] = np.ones((1,n))
+X[3:6,0:3] = np.eye(n,n)
+X[3:6,3:6] = np.eye(n,n)
+X[3:6,6:9] = np.eye(n,n)
+print (X)
+\end{minted}
+
+\begin{verbatim}
+[[1. 1. 1. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 1. 1. 1. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 1. 1. 1.]
+ [1. 0. 0. 1. 0. 0. 1. 0. 0.]
+ [0. 1. 0. 0. 1. 0. 0. 1. 0.]
+ [0. 0. 1. 0. 0. 1. 0. 0. 1.]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (C.flatten())
+\end{minted}
+
+\begin{verbatim}
+[17 10 12  9  8 10 14  4  7]
+\end{verbatim}
+
+Þimdi LP çaðrýsý,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+b = [1, 1, 1, 1, 1, 1]
+
+from scipy.optimize import linprog
+res = linprog(C.flatten(), A_eq=X, b_eq=b)
+res = np.round(res.x)
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[0. 0. 1. 1. 0. 0. 0. 1. 0.]
+\end{verbatim}
+
+Yani $x_{A3}$, $x_{B1}$, $x_{C2}$ atamasý yapýldý. Doðrulamasýný yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+row_ind, col_ind = linear_sum_assignment(C)
+print (col_ind)
+print (row_ind)
+print (C[row_ind, col_ind].sum())
+\end{minted}
+
+\begin{verbatim}
+[2 0 1]
+[0 1 2]
+25
+\end{verbatim}
+
+Ayný sonucu aldýk. 
+
+
+Kaynaklar
+
+[1] Hebborn, {\em Decision Mathematics}, 
+    \url{https://www.pearsonschoolsandfecolleges.co.uk/Secondary/Mathematics/16plus/HeinemannModularMathematicsForEdexcelASAndALevel/Samples/Samplematerial/Chapter2.pdf}
+
+[2] Burkard, {\em Assignment Problems}
+
+\end{document}
+
+
+
+
+
