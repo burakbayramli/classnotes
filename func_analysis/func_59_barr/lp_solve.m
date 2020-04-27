@@ -11,8 +11,6 @@ function [x_star,p_star,gap,status,nsteps] = lp_solve(A,b,c);
     b1 = b-A*ones(n,1);
     z0 = x0+t0*ones(n,1)-ones(n,1);
     c1 = [zeros(n,1);1];
-    [z0;t0]
-    exit;
     [z_star, history, gap] = lp_barrier(A1,b1,c1,[z0;t0]);
 
     if (z_star(n+1) >= 1)

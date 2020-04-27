@@ -492,70 +492,56 @@ $$
 
 problemini çözüyor. 
 
-Örnek olarak
-
-$$
-\min_x -x_1 - 5x_2 \quad \textrm{öyle ki}
-$$
-$$
-x_1 + x_2 + x_3  = 5 
-$$
-$$
-x_1 + 3 x_2 + x_4 = 7
-$$
-$$
-x_1,x_2,x_3,x_4 \ge 0
-$$
-
-LP'si üzerinde bu programý iþlettik.
-
 \inputminted[fontsize=\footnotesize]{python}{barr.py}
+
+Örnek olarak uydurma bir problemi seçtik, problem özellikle baþta olurlu
+nokta bulamayacak þekilde ayarlandý, böylece gidip kendi buluyor. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy as np
 from scipy.optimize import linprog
 import barr
 
-A = np.array([[1,  1, 1, 0],
-              [1,  3, 0, 1]])
+import barr
 
-b = np.array([5,7])
+A = [[1.,  1., 1., 0.],
+     [1.,  3., 0., 1.],
+     [9.,  1., -3., 1.]]
+b = [[5., 7., -1]]
+c = [[-1., -5., 0., 0. ]]
 
-c = np.array([-1, -5, 0, 0 ])
+A = np.array(A)
+b = np.array(b).T
+c = np.array(c).T
 
-solver = barr.LPSolver(mu=10, tol=1e-4)
-
-solver.solve(A, b, c)
+x_star,gap,nsteps = barr.lp_solve(A,b,c)
 
 print ('log bariyer ==========')
-print (solver.x_opt)
+print (x_star)
 
-res = linprog(c, A_eq=A, b_eq=b, options={"disp": True})
+res = linprog(c, A_eq=A, b_eq=b)
 print ('linprog ===============')
 print (res)
 \end{minted}
 
 \begin{verbatim}
+phase I
+[[1.44060995]
+ [3.1918138 ]
+ [3.37720706]
+ [1.        ]
+ [2.00321027]]
 log bariyer ==========
-[1.49999116e-05 2.33332633e+00 2.66665867e+00 5.99999936e-06]
-Primal Feasibility  Dual Feasibility    Duality Gap         Step             Path Parameter      Objective          
-1.0                 1.0                 1.0                 -                1.0                 -6.0                
-0.1105388427842     0.1105388427842     0.1105388427842     0.8919387648961  0.1105388427842     -10.34625028215     
-0.001400532337055   0.00140053233704    0.00140053233704    0.9918943193656  0.00140053233704    -11.65623916548     
-7.115191880125e-08  7.11519194345e-08   7.115191920093e-08  0.9999491966235  7.115192025851e-08  -11.66666613752     
-3.556266503391e-12  3.557079864332e-12  3.557332206583e-12  0.9999500067836  3.557595982315e-12  -11.66666666664     
-Optimization terminated successfully.
-         Current function value: -11.666667  
-         Iterations: 4
+[4.37502314e-01 2.18747454e+00 2.37502314e+00 7.40628401e-05]
 linprog ===============
-     con: array([1.18571819e-11, 1.18527410e-11])
-     fun: -11.66666666664022
+     con: array([ 2.05213624e-11,  2.05719886e-11, -9.18283227e-11])
+     fun: -11.37499999994356
  message: 'Optimization terminated successfully.'
      nit: 4
    slack: array([], dtype=float64)
   status: 0
  success: True
-       x: array([1.15454732e-13, 2.33333333e+00, 2.66666667e+00, 3.96953400e-12])
+       x: array([4.3750000e-01, 2.1875000e+00, 2.3750000e+00, 1.0991855e-11])
 \end{verbatim}
 
 Eski Anlatým
@@ -710,8 +696,8 @@ Kaynaklar
     {\em Convex Optimization, Lecture Video 15, Part 2}, 
     \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
 
-[3] Dong, {\em LP-Solver, Github}, 
-    \url{https://github.com/junjiedong/LP-Solver}
+[3] Bao, {\em LP-Solver, Github}, 
+    \url{https://github.com/rayjim/python_proj/blob/master/hm_8/lp_solver.py}
 
 [4] Boyd, {\em Convex Optimization}
 
