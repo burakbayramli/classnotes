@@ -173,6 +173,7 @@ class LPSolver():
         # Phase I: Check strict feasibility and obtain a strictly
         # feasible starting point
         x = np.linalg.pinv(A).dot(b)
+        print ('x from pinv',x)
         if np.min(x) <= 0:  # otherwise, x is already a strictly feasible point
             # Construct an LP for checking feasibility
             A1 = np.hstack(( A, -A.dot(np.ones((n, 1))) ))
@@ -182,6 +183,7 @@ class LPSolver():
 
             t = 2 - np.min(x)  # makes sure the starting (x, t) pair is feasible
             z0 = np.concatenate(( x + (t-1)*np.ones(n), [t] ))
+            print ('z0',z0)
             status, z_opt, _, value, _, _, _ = self.solve_feasible_start(A1, b1, c1, z0)
             if status == 'optimal' and value < 1:  # strictly feasible
                 x = z_opt[:n] - (z_opt[-1] - 1) * np.ones(n)
