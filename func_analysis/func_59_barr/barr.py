@@ -67,8 +67,6 @@ def lp_solve(A,b,c):
         b1 = b-np.dot(A,np.ones((n,1)))
         z0 = x0+t0*np.ones((n,1))-np.ones((n,1))
         c1 = np.vstack((np.zeros((n,1)),1))
-        arg = np.vstack((z0,t0))
-        print (arg)
         z_star,nu_star,gap = lp_barrier(A1,b1,c1,np.vstack((z0,t0)))
         if z_star[n] >= 1:
             print ('Problem is infeasible')
