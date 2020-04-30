@@ -141,17 +141,78 @@ $$
 
 $x$'e göre atmýþ olacaðýmýz adýma eriþtik yani [6, 22:30]. 
 
+Bu demektir ki lineer ölçeklemeden baðýmsýz davranabiliyoruz. Mesela size
+bir problem verdim, Hessian'ý hesapsal baðlamda uygunsuz (poorly
+conditioned) ama bir lineer transformasyon uygularsam iyi hale gelecek, o
+zaman prensipsel olarak ilk ya da transform edilmiþ problem üzerinde Newton
+iþletmeniz bir fark yaratmaz.  Dikkat, bu durum gradyan iniþi için geçerli
+deðildir.
+
+Newton azalýþý (decrement)
+
+Yeni bir kavram bu, Newton azalýþý. Bu kavram bize Newton adýmýný
+yorumlamada bir açý daha kazandýrýyor, ayrýca birazdan geriye çizgisel iz
+sürmeden bahsederken, ve duruþ kriterini hesaplamada da yardýmcý oluyor. 
+
+[atlandý]
+
+Geriye çizgisel iz sürmek
+
+Eðer pür Newton adýmý atarsak baþladýðýmýz noktaya göre uzaksama (diverge)
+mümkündür, yani optimal noktadan uzaklaþabiliriz. Newton metotunun çok
+hýzlý bir yakýnsama oraný vardýr, ama belirttiðimiz bu durumlarda ayný
+þekilde çok hýzlý bir þekilde de uzaksayabilir. Yani baþladýðýmýz noktaya
+göre Newton metotu ya çok iyi, ya da çok kötüdür. O sebeple araþtýrmacýlar
+pratik uygulamalarda muhakkak geriye çizgisel iz sürme yönteminin Newton'la
+beraber kullanýrlar. Pür Newton metotunu olduðu gibi kullanan neredeyse
+kimse tanýmýyorum. Gradyan iniþi de benzer þekilde kullanýlýr, hatta bu iki
+yöntemi aslýnda ayný altyapý odaklý görebiliriz.  
+
+Iz surme yontemi adim buyuklugu $t$'yi hesaplamak icin kullanilir, pur
+metot $t=1$ kullaniyor tabii ki.  Arama algoritmasi iki parametreyi baz
+alir, $\alpha,\beta$. Bu parametreler icin iyi isleyen bazi degerler mesela 
+$0 < \alpha <1/2$ ve $0 < \beta < 1$. Her adimda $t=1$ ile baslariz, ve
+
+$$
+f(x+tv) > f(x) + \alpha t \nabla f(x)^T v
+$$
+
+koþuluna bakarýz. Soldaki Newton adýmý, saðdaki o yönde ama daha ufak,
+$\alpha t$ kadar ufak bir lineer yaklaþýklama, ara deðerleme
+(interpolation). Yani $t$'nin bir kýsmý kadar, $\alpha$ kýsmý kadar yönde
+bir ilerleme kaydedip etmeyeceðimize bakýyoruz, eðer üstteki þart doðruysa
+o $t$'yi adým olarak seçiyoruz. Yoksa $t = \beta t$ ile $t$'yi küçültüp alt
+döngüde ayný iþlemi bir daha tekrarlýyoruz. 
+
+Newton yönteminin çok hýzlý yakýnsadýðýný söylemiþtik, arama adýmýný hesaba
+katýnca bile bu doðru. Peki hiç dezavantajý yok mu? Bir tane var, eðer
+Hessian yoðun (dense) matris ise o zaman temel lineer cebir'e göre tersini
+hesaplamak ne kadar yük getirir? $O(n^3)$ deðil mi? Bu aðýr bir yük olabilir.
+
+[yakýnsama analizi atlandý]
+
+Þimdi Newton'un yöntemini birinci derece yöntemlerle (gradyan iniþi gibi)
+karþýlaþtýralým.
+
+\begin{itemize}
+   \item Bellek: her adýmda Newton yöntemi $O(^2)$ yer tutar, çünkü
+     Hessian $n \times n$ boyutunda, kýyasla her gradyan adýmý $O(n)$ yer
+     tutar, çünkü $n$ boyutlu gradyan var. 
+
+   \item Hesap: her adýma $O(n^3)$ hýzýnda, eðer yoðun $n \times n$
+     boyutunda bir lineer sistemi çözmek gerekiyorsa. Ama her gradyan iniþ
+     adýmý $O(n)$ hýzýnda iþler, çünkü $n$ boyutlu bir vektörü topluyoruz,
+     ölçekliyoruz, basit iþlemler yapýyoruz yani.
+
+   \item Geriye iz sürme: her iki yöntem için de $O(n)$ hýzýnda iþler. 
+
+   \item Uyumlama, transformasyon: Newton yöntemi problemin mevcut haline
+     çok baðýmlý deðil, eðer transforme edersek eþit bir baþka problem elde
+     ediyoruz, ve Newton onu da çözüyor. 
+\end{itemize}
 
 
-
-
-
-
-
-
-[devam edecek]
-
-Eski Anlatým
+Alternatif Anlatým
 
 Newton birazdan bahsedeceðimiz yöntemi tek boyutlu problemler için kullandý
 [2]. Rhapson adlý bilimci yöntemi çok boyutlu problemler için
