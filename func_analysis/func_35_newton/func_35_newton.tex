@@ -208,9 +208,102 @@ karþýlaþtýralým.
 
    \item Uyumlama, transformasyon: Newton yöntemi problemin mevcut haline
      çok baðýmlý deðil, eðer transforme edersek eþit bir baþka problem elde
-     ediyoruz, ve Newton onu da çözüyor. 
+     ediyoruz, ve Newton onu da çözüyor. Gradyan iniþi problem çeþidine
+     göre hýzlý bir þekilde dejenere olabilir, sonuca varamayabilir.
+     
+   \item Kýrýlganlýk: Newton yönteminin hatalar, sayýsal hesap
+     problemlerine biraz daha hassas olduðu söylenebilir, gradyan iniþi
+     daha saðlamdýr. 
 \end{itemize}
 
+O zaman Newton yöntemini hangi durumlarda kullanmak iyidir? Eðer Hessian
+seyrek ve bir iç yapýya sahip ise o zaman o lineer sistemi çözmek hýzlý
+olur, bu durumda Newton yöntemi kullanmak uygundur. Yapýya sahip ile ne
+demek istiyorum? Mesela bantlý bir matris var ise. Bantlý matris köþegende
+bir veya daha fazla çapraz satýr olduðu durumlardýr, bir þerit, bir
+``bant'' vardýr, alttaki gibi,
+
+\includegraphics[width=15em]{banded.png}
+
+Bu durumda bellek ve hesapsal yük her adým için $O(n)$ olacaktýr. 
+
+Yapýya sahip Hessian'lar alttaki gibi durumlarda ortaya çýkabilir, 
+
+\begin{itemize}
+
+\item Eðer $g(\beta) = f(X\beta)$ ise o zaman
+  $\nabla^2 g(\beta) = X^T \nabla ^2 f(X\beta) X$ olur. Yani eðer $X$ bir
+  yapýya sahip tahmin edici matris ise ve $\nabla^2 f$ köþegen ise o zaman
+  $\nabla^2 g$ yapýya sahiptir.
+
+\item Amacýmýz $f(\beta) + g(D\beta)$'yi minimize etmek, $\nabla^2$
+  köþegen, $g$ pürüzsüz deðil, ve $D$ yapýya sahip bir ceza matrisi, o
+  zaman Lagrange ikiz fonksiyonu $-f^*(-D^Tu)-g^*(-u)$. Çoðunlukla bu
+  durumlarda $\nabla^2f^*$ köþegen olur (mesela
+  $f(\beta) = \sum _{i=1}^{p}f_i (\beta_i)$ ise bu durumda ikizdeki Hessian
+  yapýya sahiptir.
+
+\end{itemize}
+
+Eþitlik kýsýtlamalý Newton yöntemi
+
+Þu formdaki bir problem düþünelim, 
+
+$$
+\min_x f(x) \quad \textrm{öyle ki} \quad Ax = b
+$$
+  
+Bu tür problemleri çözmek için elimizde aþaðý yukarý üç yöntem var. 
+
+1) Eþitlik sýnýrlamalarýný yoket. Problemi $A$'nin sýfýr uzayý baðlamýnda
+tekrar parametrize et, yani $x = My + x_o$ yap, $M$, $A$'nin sýfýr uzayýný
+kapsar, ve $A x_0 = b$'dir. Çözümü $y$ baðlamýnda yap.
+
+Bu fena bir çözüm deðil, ama $A$'nin sýfýr uzayýný kapsayan bir $M$
+bulmamýzý gerektiriyor. Ayrýca problemde yapý varsa bunu bozmuþ olabiliriz,
+seyrek Hessian elimizde olabilir ama deðiþim sonrasý Hessian yoðun
+olabilir. 
+
+2) Ýkizi türet. Daha önce gördük ki bu tür problemlerde ikizi hesaplarken
+eþitlik sýnýrý kritere dahil ediliyordu. Ama bu da her zaman kolay
+deðildir. 
+
+3) Eþitlik kýsýtlamalý Newton yöntemi. Çoðu durumda en direk yaklaþým
+budur. Bu yöntemde $x^{(0)}$ ile baþlarýz, ki $Ax^{(0)}=b$ olacak þekilde,
+ve
+
+$$
+x^+ = x + tv
+$$
+
+adýmý atarýz, ama normal Hessian'lý karesel açýlýmý minimize etmek yerine
+yeni bir sýnýrlama ekleyeceðiz, her Newton adýmýnýn saygý göstermesi
+gereken $Az=0$ þartý koyacaðýz,  
+
+$$
+v = \arg\min_{Az=0} \nabla f(x)^T (z-x) + \frac{1}{2} (z-x)^T \nabla^2 f(x)(z-x)
+$$
+
+Böylece her adýmda kýsýtlanmýþ bölge içinde kalmýþ olacaðýz. Üstteki
+eþitlik þartýný KKT dersimizde görmüþtük, bu hesap tek bir lineer sistemi
+çözmeye indirgenebiliyordu. Lineer sistemi tekrar altta veriyorum, 
+
+$$
+\left[\begin{array}{cc}
+\nabla^2 f(x) & A^T \\ A & 0
+\end{array}\right]
+\left[\begin{array}{cc}
+v \\ w
+\end{array}\right] = 
+\left[\begin{array}{cc}
+-\nabla f(x) \\ 0
+\end{array}\right] 
+$$
+
+Bu lineer sistemi $v$ için çözersek bu bize eþitlikle sýnýrlanmýþ
+Newton adýmýný verecektir. Eþitliðin solundaki matris çoðunlukla seyrek ve
+yapýya sahiptir, çünkü $\nabla^2 f(x)$ Hessian'ý içindeki seyreklik ve
+yapý aynen orada da mevcuttur, ve $A$'lar blok halinde belli yerdeler, vs. 
 
 Alternatif Anlatým
 
