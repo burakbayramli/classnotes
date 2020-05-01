@@ -281,6 +281,233 @@ $$
 yaklaþým, bir problemden diðerine geçtiðimizde farklý bir $\epsilon$
 kullanmamýz gerekmez.
 
+Uygulama
+
+Gradyan Ýniþi ve Model Uydurmak
+
+Pek çok farklý probleme çözüm saðlayan bir teknik gradyan iniþidir. Ne yazýk ki
+bilgisayar bilim lisans seviyesinde bu teknik genellikle öðretilmiyor. Bu yazýda
+GÝ'nin hepimizin bildiði bir problemi, lineer regresyonu çözmek için nasýl
+kullanýlacaðýný anlatacaðým [1].
+
+Teorik seviyede GÝ bir fonksiyonu minimize etmeye yarar. Elde bazý parametreler
+üzerinden tanýmlý bir fonksiyon vardýr, ve GÝ bir baþlangýç deðerinden
+baþlayarak azar azar o parametreleri deðiþtirerek fonksiyonun minimal olduðu
+yeri bulmaya uðraþýr. Bu azar azar, adým atýlarak yapýlan minimizasyon Calculus
+sayesindedir, fonksiyonun gradyanýnýn negatif yönünde adým atýlarak mümkün
+olur. Bazen bu matematiksel açýklamanýn pratik kullanýmý nasýl olur görmek zor
+oluyor; Örnek olarak bir veriye lineer bir çizgi / model uyduralým.
+
+Basit bir taným yaparsak lineer regresyonun amacý eldeki bir veri kümesine düz
+çizgi uydurmaktýr. Veri alttaki gibi olabilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+points = np.genfromtxt("data.csv", delimiter=",")
+plt.scatter(points[:,0],points[:,1])
+plt.savefig('vision_90fitting_04.png')
+\end{minted}
+
+\includegraphics[height=6cm]{vision_90fitting_04.png}
+
+Üstteki veriyi düz çizgi olarak modellemek istiyoruz, bunun için lise
+matematiðinden bilinen $y = mx + b$ formülünü kullanacaðýz, $m$ eðim (slope),
+$b$ ise kesi (intercept), yani y-ekseninin kesildiði yer. Veriye uyan en iyi
+çizgiyi bulmak demek en iyi $m,b$ deðerlerini bulmak demek.
+
+Bunu yapmanýnýn standart yolu bir hata fonksiyonu tanýmlamak (bazen bedel
+fonksiyonu da deniyor). Hata fonksiyonu bir çizginin ne kadar ``iyi'' olduðunu
+ölçebilen bir fonksiyondur, bir $m,b$ çiftini alacak, veriye bakacak, ve bize
+uyumun ne kadar iyi olduðunu bir hata deðeri üzerinden raporlayacak. Hata deðeri
+hesabý için elimizdeki verideki tüm $x,y$ deðerlerine bakacaðýz, ve bunu
+yaparken her veri $y$ deðeri ile, yine veri $x$'i üzerinden hesapladýðýmýz
+$mx+b$ deðeri arasýndaki farka bakacaðýz; daha doðrusu farkýn karesini alacaðýz,
+ve her veri noktasý için hesaplanan tüm bu kare hesaplarýný toplayacaðýz. Kare
+alýnýyor, çünkü bu hatayý pozitif hale çevirmemizi saðlýyor, bir diðer fayda
+tabii kare fonksiyonun türevi alýnabilir olmasý (kýyasla mutlak deðer fonksiyonu
+iþleri daha karýþtýrýrdý). Pozitif bir hata yeterli, çünkü hata yapýlmýþsa
+alttan mý üstten mi olduðu bizi ilgilendirmiyor. Hata $E$ hesabý þöyle,
+
+Matematiksel olarak
+
+$$ E_{(m,b)} = \frac{1}{N} \sum _{i=1}^{N} (y_i - (mx_i + b))^2$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# y = mx + b
+# m is slope, b is y-intercept
+def compute_error_for_line_given_points(b, m, points):
+    totalError = 0
+    for i in range(0, len(points)):
+        x = points[i, 0]
+        y = points[i, 1]
+        totalError += (y - (m * x + b)) ** 2
+    return totalError / float(len(points))
+\end{minted}
+
+Veriye daha iyi uyan çizgiler (ki ``daha iyi''nin ne olduðu hata fonksiyonumuz
+üzerinden tanýmlý) daha az hata deðerleri anlamýna gelecektir. O zaman, eðer
+hata fonksiyonunu minimize edersek, veriye uyan iyi çizgiyi bulacaðýz
+demektir. Hata fonksiyonumuz iki parametreli olduðu için onu iki boyutlu bir
+yüzey olarak grafikleyebiliriz,
+
+\includegraphics[height=6cm]{vision_90fitting_06.png}
+
+Bu iki boyutlu yüzey üzerindeki her nokta deðiþik bir çizgiyi temsil
+ediyor. Yüzeyin alt düzlemden olan yüksekliði o çizgiye tekabül eden
+hata. Gördüðümüz gibi bazý çizgiler bazýlarýndan daha az hataya sahip (yani
+veriye daha iyi uymuþ). Gradyan iniþi ile arama yaptýðýmýz zaman bu yüzeyin
+herhangi bir noktasýndan baþlayacaðýz, ve yokuþ aþaðý inerek hatasý en az olan
+çizgiyi bulacaðýz.
+
+Hata fonksiyonu üzerinde GÝ iþletmek için önce fonksiyonun gradyanýný
+hesaplamamýz lazým. Gradyan bizim için nerede olursak olalým her zaman dip
+noktasýný gösteren bir pusula görevini görüyor. Gradyan hesabý için hata
+fonksiyonunun türevi alýnmalý. Hata fonksiyonunun $m,b$ adýnda iki tane
+parametresi olduðuna göre bu iki parametrenin her biri için ayrý ayrý kýsmi
+türev almamýz lazým. Bu türevler,
+
+$$ 
+\frac{\partial E}{\partial m} =
+\frac{2}{N} \sum _{i=1}^{N} -x_i (y_i - (mx_i+b))
+$$
+
+$$ 
+\frac{\partial E}{\partial b} =
+\frac{2}{N} \sum _{i=1}^{N} -(y_i - (mx_i+b))
+$$
+
+Artýk GÝ iþletmek için gerekli tüm araçlara sahibiz. Aramayý herhangi bir $m,b$
+noktasýndan (herhangi bir çizgi) baþlatýrýz, ve GÝ yokuþ aþaðý en iyi çizgi
+parametrelerine doðru gider. Her döngü $m,b$ deðerlerini bu iniþe göre günceller
+(dikkat inen {\em parametreler} deðil, hatada inilirken bu iniþe tekabül eden
+$m,b$ deðerleri), ki bu sayede döngünün bir sonraki adýmýndaki hata bir öncekine
+göre azalmýþ olur.
+
+Matematiðe biraz daha yakýndan bakalým [2]. Türev almak, türeve göre adým atmak
+bir fonksiyonunun minimum noktasýný bulmamýzý nasýl saðlýyor? Basit bir
+fonksiyon $f(x)$'i düþünelim, 
+
+\includegraphics[height=4cm]{vision_90fitting_05.png}
+
+Gradyan, ya da belli bir $x$ noktasýndaki deðiþim oraný $\oslash y / \oslash x$
+ile yaklaþýksallanabilir (çoðunlukla literatur $\Delta$ sembolünü kullanýr, [2]
+$\oslash$ kullanmýþ, önemli deðil). Ya da bu yaklaþýksallýðý þöyle yazabiliriz,
+
+$$ 
+\frac{\partial f}{\partial x} =
+\lim_{\oslash \to 0} \frac{\oslash y}{\oslash x} =
+\lim_{\oslash \to 0} \frac{f(x + \oslash x) - f(x)}{\oslash x}
+$$
+
+ki bu ifade $f(x)$'in $x$'e göre kýsmi türevi olarak bilinir. Üstteki yöntem ile
+sembolik olarak pek çok ifadenin türevini almayý biliyoruz, mesela $ax^2$ için
+$2ax$, vs.
+
+Þimdi elimizde bir $f(x)$ olduðunu düþünelim, ve $x$'i öyle bir þekilde
+deðiþtirmek istiyoruz ki $f(x)$ minimize olsun. Ne yapacaðýmýz $f(x)$'in
+gradyanýnýn ne olduðuna baðlý. Üç tane mümkün durum var:
+
+Eðer $\frac{\partial f}{\partial x} > 0$ ise $x$ artarken $f(x)$ artar, o zaman
+$x$'i azaltmalýyýz.
+
+Eðer $\frac{\partial f}{\partial x} < 0$ ise $x$ artarken $f(x)$ azalýr, o zaman
+$x$'i arttýrmalýyýz.
+
+Eðer $\frac{\partial f}{\partial x} = 0$ ise $f(x)$ ya minimum ya da maksimum
+noktasýndadýr, o zaman $x$'i olduðu gibi býrakmalýyýz.
+
+Özet olarak $x$'i alttaki miktar kadar azaltýrsak $f(x)$'i de azaltabiliriz,
+
+$$ \oslash x = x_{yeni} - x_{eski} = -\eta  \frac{\partial f}{\partial x}$$
+
+ki $\eta$ ufak bir pozitif sabittir, $x$'i deðiþtirirken bu atýlan adýmýn
+büyüklüðünü dýþarýdan ayarlayabilmemizi saðlar, deðiþimin hangi yönde olacaðýný
+$\frac{\partial f}{\partial x}$ belirtiyor zaten. Bu formülü ardý ardýna
+kullanýrsak, $f(x)$ yavaþ yavaþ minimum noktasýna doðru ``inecektir'', bu
+yönteme gradyan iniþi minimizasyonu adý verilmesinin sebebi de budur. 
+
+Örneðimize dönelim, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def step_gradient(b_current, m_current, points, eta):
+    b_gradient = 0
+    m_gradient = 0
+    N = float(len(points))
+    for i in range(0, len(points)):
+        x = points[i, 0]
+        y = points[i, 1]
+        b_gradient += -(2/N) * (y - ((m_current * x) + b_current))
+        m_gradient += -(2/N) * x * (y - ((m_current * x) + b_current))
+    new_b = b_current - (eta * b_gradient)
+    new_m = m_current - (eta * m_gradient)
+    return [new_b, new_m]
+
+eta = 0.0001
+initial_b = 0 # initial y-intercept guess
+initial_m = 0 # initial slope guess
+num_iterations = 8
+print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
+print "Running..."
+b = initial_b
+m = initial_m
+xx = np.linspace(np.min(points[:,0]),np.max(points[:,0]), 100)
+for i in range(num_iterations):
+    b, m = step_gradient(b, m, np.array(points), eta)
+    if i % 2 == 0: 
+        print i, b,m
+        yy = m * xx + b
+        plt.scatter(points[:,0],points[:,1])
+        plt.hold(True)
+        plt.scatter(xx,yy)
+        plt.hold(False)
+        plt.savefig('grad_desc_%d' % i)
+print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, b, m, compute_error_for_line_given_points(b, m, points))    
+\end{minted}
+
+\begin{verbatim}
+Starting gradient descent at b = 0, m = 0, error = 5565.10783448
+Running...
+0 0.0145470101107 0.737070297359
+2 0.0255792243213 1.29225466491
+4 0.0284450719817 1.43194723238
+6 0.029256114126 1.46709461772
+After 8 iterations b = 0.0294319691638, m = 1.47298329822, error = 112.737981876
+\end{verbatim}
+
+\includegraphics[height=6cm]{grad_desc_0.png}
+\includegraphics[height=6cm]{grad_desc_2.png}
+\includegraphics[height=6cm]{grad_desc_4.png}
+\includegraphics[height=6cm]{grad_desc_6.png}
+
+Optimal $m,b$ deðerleri bulundu. $m=-1, b=0$'da baþladýk ve optimal sonucu
+bulduk. Deðiþken \verb!eta! (yani $\eta$) adým büyüklüðü demiþtik, dikkat eðer
+adým çok büyük seçilirse minimum ``atlanabilir'', yani varýþ noktasý
+kaçýrýlabilir. Eðer $\eta$ çok küçük ise minimuma eriþmek için çok vakit
+geçebilir. Ayrýca GÝ'nin doðru iþlediðini anlamanýn iyi yollarýndan birisi her
+döngüde hatanýn azalýp azalmadýðýna bakmaktýr.
+
+Bu basit bir örnekti, fakat bir bedel fonksiyonunu minimize edecek parametre
+deðiþimlerini yapma kavramý yüksek dereceli polinomlarda, ya da diðer Yapay
+Öðrenim problemlerinde de iþe yarýyor.
+
+GÝ ile akýlda tutulmasý gereken bazý konular:
+
+1) Dýþbükeylik (Convexity): Üstteki problemde sadece bir tane minimum vardý,
+hata yüzeyi dýþbükeydi. Nereden baþlarsak baþlayalým, adým atarak minimuma
+eriþecektik. Çoðunlukla durum böyle olmaz. Bazý problemlerde yerel minimumda
+takýlý kalmak mümkün olabiliyor, bu problemleri aþmak için farklý çözümler var,
+mesela Rasgele Gradyan Ýniþi (Stochastic Gradient Descent) kullanmak gibi.
+
+2) Performans: Örnekte basit bir GÝ yaklaþýmý kullandýk, çizgi arama (line
+search) gibi yaklaþýmlarla döngü sayýsýnýn azaltmak mümkün olabiliyor.
+
+3) Yakýnsama (Convergence): Aramanýn bittiðinin kararlaþtýrýlmasýný kodlamadýk,
+bu çoðunlukla hata döngüsündeki deðiþimlere bakýlarak yapýlýr; eðer hatadaki
+deðiþim belli bir eþik deðerinden daha küçük ise, gradyanýn sýfýr olduðu yere
+yaklaþýlmýþ demektir, ve arama durdurulabilir.
+
+Not: Lineer regresyon tabii ki direk, tek bir adýmda çözülebilen bir
+problem. GÝ'yi burada bir örnek amaçlý kullandýk. 
+
 Kaynaklar 
 
 [1] Zak, {\em An Introduction to Optimization, 4th Edition}
