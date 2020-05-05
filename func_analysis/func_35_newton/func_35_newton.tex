@@ -749,6 +749,86 @@ $$
 
 sürekli iniþ özelliðinin mevcut olduðundan emin oluyoruz. 
 
+Örnek
+
+Newton metodunu bir örnek üzerinde görelim, fonksiyon [8, 10-9]'dan
+geliyor, 
+
+$$
+f(x_1,x_2) = e^{x_1 + 3x_2 - 0.1} + e^{x_1 - 3x_2 - 0.1} + e^{-x_1 - 0.1}
+$$
+
+Hessian ve gradyan hesaplarýný otomatik türev üzerinden yapacaðýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import autograd.numpy as anp
+import numpy.linalg as lin
+import autograd
+
+def f(x):
+    x1,x2=x
+    return anp.exp(x1 + 3.0*x2 - 0.1) + anp.exp( x1 - 3.0*x2 - 0.1 ) + anp.exp(-x1-0.1)
+
+alpha = 0.1
+beta = 0.7
+eps = 0.001
+x0 = np.array([-1.1, 1.0])
+x = x0
+hist = []
+for i in range(10):
+   h = autograd.hessian(f)
+   g = autograd.grad(f)
+   v = np.dot(-lin.inv(h(x)),g(x))
+   lamsq = np.dot(np.dot(g(x).T,lin.inv(h(x))),g(x))
+   hist.append(x)
+   if lamsq/2 <= eps:
+      print ('done')
+      break
+   t = 1.0
+   while f(x+t*v) >= f(x)+alpha*t*np.dot(g(x).T,v): t = t*beta
+   x = x + t*v
+h = np.array(hist)
+h = np.reshape(h,(len(h),2))
+print (h)
+\end{minted}
+
+\begin{verbatim}
+done
+[[-1.10000000e+00  1.00000000e+00]
+ [-1.43075233e-01  3.50917569e-01]
+ [-1.09323466e-01  8.11516892e-02]
+ [-3.28295993e-01  1.89932171e-02]
+ [-3.45760583e-01  3.51878538e-04]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits.mplot3d import Axes3D
+
+def f2(x1,x2):
+    return f([x1,x2])
+
+D = 50
+x = np.linspace(-2.0,1.0,D)
+y = np.linspace(-1.0,1.0,D)
+
+xx,yy = np.meshgrid(x,y)
+zz = f2(xx,yy)
+
+contours = [1,2,3,4,5,6]
+cs=plt.contour(xx,yy,zz,contours)
+plt.plot(h[:,0],h[:,1],'rd')
+plt.plot(h[:,0],h[:,1])
+plt.savefig('boyd-1092.png')
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx, yy, zz)
+plt.savefig('boyd-1091.png')
+\end{minted}
+
+\includegraphics[width=20em]{boyd-1091.png}
+\includegraphics[width=20em]{boyd-1092.png}
+
 
 Kaynaklar 
 
@@ -764,6 +844,8 @@ Kaynaklar
 [6] Tibshirani, {\em Convex Optimization, Lecture Video 14}, 
 \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
 
-[7], Boyd, {\em Convex Optimization I, Lecture 16}
+[7], Boyd, {\em Convex Optimization I, Video Lecture 16}
+
+[8], Boyd, {\em Convex Optimization I, Lecture Notes}
 
 \end{document}
