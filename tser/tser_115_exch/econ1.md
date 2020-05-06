@@ -30,16 +30,49 @@ $$
 \dot{z}(t) = -\phi_1 z(t)  - \phi_2 q(t)
 $$
 
+
+Balance of payments identity in our model can be stated as
+
 $$
-r(t) = -z(t) - k(t) - d(t)
+z(t) + d(t) + k(t) + c(t) + r(t) = 0 \quad (8)
 $$
 
-International payment flows, $c(t)$, are driven by the sum of a
-country's current account and its financial balance:
+Absent official intervention in the foreign exchange market,
+international payment flows, c(t), are driven by the sum of a
+country's current account and its financial balance
 
 $$
 c(t) = -z(t) - k(t) - d(t)
 $$
+
+However, when a country wants to stabilize its exchange rate, it needs
+to offset any cross-border payment flows... the net quantity of
+foreign reserves that the authorities need to sell in this case is
+therefore:
+
+$$
+r(t) = -z(t) - k(t) - d(t)
+$$
+
+
+### Models
+
+$$
+\xi = 0.1, \quad \phi_1 = 0.03, \quad \phi_2 = 0.06, \quad \phi_3 = 0.1, \eta = 0.05
+$$
+
+$$
+q(0) = z(0) = 0
+$$
+
+
+
+
+
+
+
+
+
 
 
 
