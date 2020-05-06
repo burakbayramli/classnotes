@@ -18,18 +18,12 @@ behind the trade balance and therefore behind the current account,
 $z(t)$. An appreciated real exchange rate leads to a deterioration of
 a country's international competitiveness and thus puts a downward
 pressure on the trade balance; a weak real exchange rate, on the other
-hand, strengthens the trade balance:
+hand, strengthens the trade balance. The parameter $\phi_1$ determines
+the speed with which the current account reverts to equilibrium
 
 $$
-\dot{z}(t) = -\phi_1 z(t)  - \phi_2 q(t)
+\dot{z}(t) = -\phi_1 z(t)  - \phi_2 q(t) \quad (6a)
 $$
-
-Flows finance existing current account imbalances,
-
-$$
-\dot{z}(t) = -\phi_1 z(t)  - \phi_2 q(t)
-$$
-
 
 Balance of payments identity in our model can be stated as
 
@@ -61,10 +55,15 @@ $$
 \xi = 0.1, \quad \phi_1 = 0.03, \quad \phi_2 = 0.06, \quad \phi_3 = 0.1, \eta = 0.05
 $$
 
+Model 1
+
 $$
-q(0) = z(0) = 0
+q(0) = 0, z(0) = 1
 $$
 
+$$
+\dot{q} \approx \xi c_1 (t)
+$$
 
 
 

@@ -374,6 +374,84 @@ sýfýr deðerleri nihai ortalamanýn aþaðý inmesini saðlayacaktýr.
 
 
 \newpage
+
+Kurlarý Tahmin Etmek (Taslak)
+
+Ýki ülke arasýndaki kurlar o ülkelerin fiyat seviyelerinin oranýdýr. Deðil
+mi? Eðer berbere Japonya'da 1000 yen Türkiye'de 10 lira veriyorsam (ve
+baþka fiyat olmadýðýný düþünelim) o zaman Yen/TR kuru 100 yen
+olmalý. Tekrar ana formülden baþlayarak her iki ülke için bu formülleri
+düzenleyip bölüm haline getirirsek,
+
+$$ M_1V_1 = P_1Y_1, \quad M_2V_2 = P_2Y_2 $$
+
+$$ \frac{P_2}{P_1} = \frac{M_2}{M_1} \cdot \frac{Y_1}{Y_2} \cdot \frac{V_2}{V_1} $$
+
+$$ \log \left( \frac{P_2}{P_1} \right) = 
+\log \left( \frac{M_2}{M_1} \right) + 
+\log \left( \frac{Y_1}{Y_2} \right) +
+\log \left( \frac{V_2}{V_1} \right) 
+$$
+
+$$    = \log(M_2) - \log(M_1) + \log(Y_1) - \log(Y_2)  + \log(V_2) - \log(V_1) $$
+
+$$ = \log(M_2) - \log(M_1) + \log(Y_1) - \log(Y_2)  $$
+
+$V$'ler iptal oldu çünkü hýzý sabit kabul ediyoruz, 
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.read_csv('exch.csv',parse_dates=['DATE'])
+df = df.set_index('DATE')
+df = df.interpolate(method='linear')
+k = 5
+df['lm1'] = np.log(df.nonfinloanus).shift(k)
+df['lm2'] = np.log(df.nonfinloanjp).shift(k)
+df['ly1'] = np.log(df.realgdpus).shift(k)
+df['ly2'] = np.log(df.realgdpjp).shift(k)
+df['lxjpus'] = np.log(df.xjpus)
+
+df = df.dropna(axis=0)
+import statsmodels.formula.api as smf
+results = smf.ols('lxjpus ~ lm1 + lm2 + ly1 + ly2', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                 lxjpus   R-squared:                       0.432
+Model:                            OLS   Adj. R-squared:                  0.424
+Method:                 Least Squares   F-statistic:                     53.88
+Date:                Wed, 30 May 2018   Prob (F-statistic):           1.00e-33
+Time:                        20:09:26   Log-Likelihood:                 249.15
+No. Observations:                 288   AIC:                            -488.3
+Df Residuals:                     283   BIC:                            -470.0
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept    -35.7050      4.321     -8.263      0.000       -44.211   -27.199
+lm1           -0.5512      0.118     -4.663      0.000        -0.784    -0.318
+lm2            1.2863      0.190      6.768      0.000         0.912     1.660
+ly1            1.7492      0.305      5.732      0.000         1.148     2.350
+ly2            0.8758      0.408      2.146      0.033         0.073     1.679
+==============================================================================
+Omnibus:                       13.370   Durbin-Watson:                   0.067
+Prob(Omnibus):                  0.001   Jarque-Bera (JB):                9.922
+Skew:                          -0.346   Prob(JB):                      0.00701
+Kurtosis:                       2.409   Cond. No.                     1.67e+04
+==============================================================================
+\end{verbatim}
+
+Uyum oldukca iyi, $R^2$ yüksek. Ýlginç bir gözlem, $k$ ile ne kadar geriye
+giderek kuru tahmin edebileceðimizi kontrol etmeye uðraþtýk, 5 periyot geriye
+gitmek en iyi sonucu verdi, bu zaman serisinde periyot ay bazlý, yani 5 ay
+öncesinden gelecekteki kuru tahmin etmek mümkün!
+
+\newpage
+
 Finans Terimleri Açýklamalarý
 
 Arbitrage (Arbitraj)
@@ -599,7 +677,7 @@ Kaynaklar
 
 Yunan Harfleri
 
-\includegraphics[width=30em]{../../algs/zapp/letters.png}
+\includegraphics[width=30em]{../../algs/algs_999_zapp/letters.png}
 
 \end{document}
 
