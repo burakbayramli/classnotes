@@ -109,9 +109,62 @@ $$
 c(t) = -z(t) - k(t) - d(t) \qquad (9)
 $$
 
-Bu denkleme $r(t)=0$ ve (8)'ýn tekrar düzenlemei ile ulaþýlýyor. 
+Bu denkleme $r(t)=0$ ve (8)'ýn tekrar düzenlemesi ile ulaþýlýyor. 
 
+Ama ülke kurundaki dalgalanmalarý azaltmak isterse, o zaman sýnýrötesi
+ödeme akýþlarýný telafi etmelidir, çünkü o akýþlar, (5) denklemine göre
+kurunu direk etkileyecektir. Bu durumda eldeki rezervden yapýlacak net
+satýþ 
 
+$$
+r(t) = -z(t) -k(t) -d(t)
+$$
+
+olur. 
+
+Modeller
+
+Aksi belirtilmedikçe tüm modeller alttaki sabitleri kullanýr,
+
+$$
+\xi = 0.1, \phi_1 = 0.03, \phi_2 = 0.06, \phi_3 = 0.1, \gamma = 0.05
+$$
+
+Model 1
+
+(5) ve (6a) denklemlerini baz alalým. Baþlangýç þartlarý 
+
+$$
+q(0) = 0, z(0) = 1
+$$
+
+olsun. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+import pandas as pd
+
+phi1 = 0.03
+phi2 = 0.06
+gamma = 0.05
+xi = 0.1
+
+def dmod1(y, t):
+    z, q = y
+    return [-(phi1*z) - (phi2*q), xi*z]
+
+t = np.linspace(0, 140, 200)
+y0 = [1.0,0.0]
+sol = odeint(dmod1, y0, t)
+df = pd.DataFrame( sol )
+df.columns = ['cari hesap','kur']
+df['t'] = t
+df = df.set_index('t')
+df.plot(grid=True)
+plt.savefig('mod1.png')
+\end{minted}
+
+\includegraphics[width=20em]{mod1.png}
 
 
 
