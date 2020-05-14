@@ -75,7 +75,8 @@ $c(t)$: Uluslararasý odeme girisleri (international payment flows)
 kurar. 
 
 $$
-\dot{q} \approx -\xi c(t), \qquad (5)
+\dot{q} \approx -\xi c(t)
+\mlabel{5}
 $$
 
 Bu denklem uluslararasý nakit giriþi bir ülkenin kurundaki deðiþimi
@@ -90,7 +91,8 @@ yönde etkiler, bu durum ticari dengeyi aþaðý çeker. Diðer yandan zayýf para
 ticari dengeyi düzeltir. 
 
 $$
-\dot{z}(t) = -\phi_1 z(t)  - \phi_2 q(t) \qquad (6a)
+\dot{z}(t) = -\phi_1 z(t)  - \phi_2 q(t) 
+\mlabel{6a}
 $$
 
 Parametre $\phi_1$ cari hesabýn bir denge noktasýna dönüþ hýzýný tanýmlar. 
@@ -98,7 +100,8 @@ Parametre $\phi_1$ cari hesabýn bir denge noktasýna dönüþ hýzýný tanýmlar.
 Ödemeler Dengesi 
 
 $$
-z(t) + d(t) + k(t) + c(t) + r(t) = 0 \qquad (8)
+z(t) + d(t) + k(t) + c(t) + r(t) = 0 
+\mlabel{8}
 $$
 
 ile belirtilebilir. O zaman, eðer ülkenin kendisi döviz piyasasýnda
@@ -106,10 +109,11 @@ müdahelede bulunmuyorsa, uluslararasý ödeme akýþlarý $c(t)$ o ülkenin cari
 iþlem ve finans dengesiyle tanýmlýdýr, 
 
 $$
-c(t) = -z(t) - k(t) - d(t) \qquad (9)
+c(t) = -z(t) - k(t) - d(t)
+\mlabel{9}
 $$
 
-Bu denkleme $r(t)=0$ ve (8)'ýn tekrar düzenlemesi ile ulaþýlýyor. 
+Bu denkleme $r(t)=0$ ve (8)'in tekrar düzenlemesi ile ulaþýlýyor. 
 
 Ama ülke kurundaki dalgalanmalarý azaltmak isterse, o zaman sýnýrötesi
 ödeme akýþlarýný telafi etmelidir, çünkü o akýþlar, (5) denklemine göre
@@ -138,7 +142,9 @@ $$
 q(0) = 0, z(0) = 1
 $$
 
-olsun. 
+olsun. Bu modelde uluslararasý nakit akýþý ödemeler dengesi (8) üzerinden
+tanýmlanýr, ve borç, otonom sermaye, müdahele olmadýðý için
+$d(t)=k(t)=r(t)=0$'dir. Geri kalan $c(t) = -z(t)$. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.integrate import odeint
@@ -149,13 +155,13 @@ phi2 = 0.06
 gamma = 0.05
 xi = 0.1
 
-def dmod1(y, t):
+def dsys1(y, t):
     z, q = y
     return [-(phi1*z) - (phi2*q), xi*z]
 
 t = np.linspace(0, 140, 200)
 y0 = [1.0,0.0]
-sol = odeint(dmod1, y0, t)
+sol = odeint(dsys1, y0, t)
 df = pd.DataFrame( sol )
 df.columns = ['cari hesap','kur']
 df['t'] = t
@@ -166,16 +172,100 @@ plt.savefig('mod1.png')
 
 \includegraphics[width=20em]{mod1.png}
 
+Almanya'nýn cari hesabý ve parasýna bakalým,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('de.csv',parse_dates=True,index_col=0)
+ax1 = df.BPBLTT01DEQ188S.plot(color='blue', grid=True, label='cari islem hesabi')
+ax2 = df.DE.plot(color='red', grid=True, label='neer',secondary_y=True)
+h1, l1 = ax1.get_legend_handles_labels()
+h2, l2 = ax2.get_legend_handles_labels()
+plt.legend(h1+h2, l1+l2, loc=2)
+plt.savefig('neer-de.png')
+\end{minted}
 
+NEER terimi nominal efektiv kur fiyatý (nominal effective exchange rate)
+anlamýna gelir. NEER bir ülkenin parasýnýn diðer bazý ülkelerin
+dövizlerinden oluþan bir sepete olan karþýlýðýný ölçer. Kabaca yabancý
+döviz almak için bir ülkenin parasýndan ne kadar gerekeceði sorusunun
+cevabýný verir. 
 
+Model 2
 
+Þimdi cari iþlem hesabýnýn bir kýsmý borç ile finans edilince ne olur ona
+bakalým. Bunun etkisi ödeme akýþlarý üzerinde bir gecikmedir, çünkü cari
+hesabýn kur üzerindeki etkisi zamana yayýlýr. Cari hesap ile kur yine
+dolamlý bir þekilde hareket eder, ama bu iki deðiþken arasýndaki etkisel
+zaman farký büyür. (9) þu hale gelir ($k(t)$ hala sýfýr),
 
+$$
+c(t) = -z(t) - d(t) 
+$$
 
+(5) ise soyle olur,
 
+$$
+\dot{q} \approx -\xi c(t) = -\xi (z(t) + d(t))
+$$
 
+[1]'deki borç dinamiðini biraz deðiþtirmek mümkün, orada 
 
+$$
+d(t) = -(z(t) + k(t)) - \gamma D(t)
+$$
 
+kullanýlmýþ, ki $D(t)$ $t$ anýna kadar olan tüm $d(t)$ üzerinden bir
+entegral, ki bu entegralin $\gamma$ kadarý $t$'de geri ödeniyor. Analitik
+cozumle rahat isledigi icin boyle secilmis, biz $t$ anýna kadar olan tüm
+borcu $d(t)$ ile göstereceðiz, ve bir azalma dinamiðini oraya
+ekleyeceðiz. $z(t)$ ve $k(t) = 0$
+
+$$
+\dot{d} = -\dot{z}-\gamma d(t) \qquad (7)
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+import pandas as pd
+
+phi1 = 0.03
+phi2 = 0.06
+gamma = 0.1
+xi = 0.04
+
+def dmod2(y, t):
+    z, q, d = y
+    zdot = -(phi1*z)-(phi2*q)
+    return [zdot, xi*(z+d), -zdot - gamma*d   ]
+
+t = np.linspace(0, 140, 200)
+y0 = [1.0, 0.0, -1]
+sol = odeint(dmod2, y0, t)
+df = pd.DataFrame( sol )
+df.columns = ['cari hesap','kur','borc']
+df['t'] = t
+df = df.set_index('t')
+df.plot(grid=True)
+plt.savefig('mod2.png')
+\end{minted}
+
+\includegraphics[width=20em]{mod2.png}
+
+Üstteki grafik tezimizi doðruladý, cari hesap ile kurun dalgalanma frekansý
+azaldý, ve iki deðiþken arasýndaki makas açýldý. 
+
+Veri Ornegi; Japonya
+
+Borç akýþýnýn Japonya'nýn ekonomik performansý üzerinde bir rol oynadýðý
+iddia edilebilir. 1970 sonlarý 80 baþlarýna kadar borç varlýklarýna olan
+Japonya'dan çýkýþ ya da giriþ baðlamýnda akýþ çok azdý. Fakat 80'lý yýllar
+ortasýnda bu akýþlar büyüdü, bu büyüme çoðunlukla Japonya'nýn ABD'ye olan
+finansal yatýrýmlarýyla açýklanabilir. Bunlar olurken cari iþlem ve Japon
+para birimi Yen arasýnda 70'lý yýllarda fazla olmayan fark 80/90'li
+yýllarda çok daha büyüdü. 
+
+\includegraphics[width=30em]{japan-acc-model2.png}
 
 [devam edecek]
 
