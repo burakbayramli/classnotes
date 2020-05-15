@@ -122,6 +122,7 @@ satýþ
 
 $$
 r(t) = -z(t) -k(t) -d(t)
+\mlabel{10}
 $$
 
 olur. 
@@ -203,7 +204,7 @@ $$
 c(t) = -z(t) - d(t) 
 $$
 
-(5) ise soyle olur,
+(5) ise þöyle olur,
 
 $$
 \dot{q} \approx -\xi c(t) = -\xi (z(t) + d(t))
@@ -234,14 +235,14 @@ phi2 = 0.06
 gamma = 0.1
 xi = 0.04
 
-def dmod2(y, t):
+def dsys2(y, t):
     z, q, d = y
     zdot = -(phi1*z)-(phi2*q)
     return [zdot, xi*(z+d), -zdot - gamma*d   ]
 
 t = np.linspace(0, 140, 200)
 y0 = [1.0, 0.0, -1]
-sol = odeint(dmod2, y0, t)
+sol = odeint(dsys2, y0, t)
 df = pd.DataFrame( sol )
 df.columns = ['cari hesap','kur','borc']
 df['t'] = t
@@ -255,7 +256,7 @@ plt.savefig('mod2.png')
 Üstteki grafik tezimizi doðruladý, cari hesap ile kurun dalgalanma frekansý
 azaldý, ve iki deðiþken arasýndaki makas açýldý. 
 
-Veri Ornegi; Japonya
+Veri Örneði; Japonya
 
 Borç akýþýnýn Japonya'nýn ekonomik performansý üzerinde bir rol oynadýðý
 iddia edilebilir. 1970 sonlarý 80 baþlarýna kadar borç varlýklarýna olan
@@ -267,11 +268,172 @@ daha arttý, ki bu durumu modelimiz gayet iyi tahmin ediyor.
 
 \includegraphics[width=30em]{japan-acc-model2.png}
 
+Model 3
+
+Bu modelle ülkeye otonom sermaye giriþini formüllere dahil ediyoruz, yani
+artýk $k(t) \ne 0$ olacak. O zaman,
+
+$$
+c(t) = -z(t) - d(t) - k(t)
+$$
+
+Ve $k(t)$ sýfýr olmadýðý için,
+
+$$
+\dot{q} \approx -\xi c(t) = -\xi (z(t) + d(t) + k(t))
+$$
+
+Bu sermaye giriþler dýþarýda olan þeyler, sistemin etkilediði þeyler deðil,
+onlarý bir dýþ fonksiyon olarak tanýmlamak lazým. Simülasyon amaçlý belli
+zaman aralýklarýnda belli deðerler veren bir kademeli fonksiyon olarak onu
+tanýmlayabiliriz, mesela,
+
+$$
+k(t) = \left\{ \begin{array}{l}
+0.05 t \quad 0 \le t < 20,  \\
+2 -0.05t \quad  20 \le t < 40 \\
+0 \quad 40 \le t 	
+\end{array} \right.
+$$
+
+Türevi de lazým olacak, onu da alalým,
+
+$$
+\dot{k}(t) = \left\{ \begin{array}{l}
+0.05  \quad 0 \le t < 20,  \\
+-0.05 \quad  20 \le t < 40 \\
+0 \quad 40 \le t 	
+\end{array} \right.
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+import pandas as pd
+
+def k(t):
+    if t >= 0 and t<20.0: return 0.05*t
+    if t >= 20.0 and t<40.0: return 2.0-0.05*t
+    else: return 0
+
+def dk(t):
+    if t >= 0 and t<20.0: return 0.05 
+    if t >= 20.0 and t<40.0: return -0.05
+    else: return 0
+
+from scipy.integrate import odeint
+import pandas as pd
+
+phi1 = 0.03
+phi2 = 0.06
+gamma = 0.2
+xi = 0.05
+
+def dsys3(y, t):
+    z, q, d, k = y
+    zdot = -(phi1*z)-(phi2*q)
+    qdot = xi*(z+d+k)
+    kdot = dk(t)    
+    ddot = -zdot -kdot - gamma*d
+    return [zdot, qdot, ddot, kdot ]
+
+t = np.linspace(0, 140, 200)
+y0 = [0.0, 0.0, 0, 0.0]
+sol = odeint(dsys3, y0, t)
+df = pd.DataFrame( sol )
+df.columns = ['cari','kur','borc','otonom sermaye']
+df['t'] = t
+df = df.set_index('t')
+df[['cari','kur','otonom']].plot(grid=True)
+plt.savefig('mod3.png')
+\end{minted}
+
+\includegraphics[width=20em]{mod3.png}
+
+Sermaye giriþi arttýkça yerel paraya olan talep artýyor. Bu durumda cari
+hesap bozuluyor, bu tecrübeyi yaþayan pek çok ülkede olduðu gibi. Ortaya
+çýkan cari iþlem açýgi bir süre sonra gelen otonom sermayeden daha fazla
+oluyor, çünkü baðýmsýz sermaye geçici bir süre için artýþ göstermiþ. Tabii
+ülke borç alarak açýgi kapatabilir. Fakat açýk orada durduðu sürece ve
+borcun geri ödenmesi gerektiði için ülke bir süre sonra kendisini içeri
+aldýðýndan daha fazla dýþarý para gönderir halde buluyor. Bu durumda
+deðerlenmekte olan yerel para düþmeye baþlýyor. Ama cari hesapta düzelmeye
+dönmek için bu düþüþün bir süre daha devam etmesi gerekiyor. 
+
+Model 4
+
+Þimdi sabit kurlara ve ödemeleri bu tür kura sahip ülkelere nasýl girip
+çýktýðýna bakalým, ve rezervlerin her þeyi nasýl etkilediðini
+inceleyelim. Amacýmýz sayýsal ve anektodsal delillere uyan bir döviz piyasa
+krizini modellemek. 
+
+(6a)'yý deðiþtiriyoruz, 
+
+$$
+\dot{z}(t) = \phi_1 z(t) - \phi_2 q(t) - \phi_3 k(t)
+$$
+
+(5) ve (7) hala ayný. Sabit kur rejiminde rezerv akýþý $r(t)$ yabancý ve
+yerliler arasýndaki ödemeleri nötralize eder. Fakat rezervler sonsuz
+deðildir, bu modelde belli bir seviyede olduklarýný farz edeceðiz. ODE
+çözerken bunu yapmak zor olabilir, bu sebeple alttaki $r$'nin türevini
+temsil eden fonksiyon \verb!drfun! içinde bunu yaptýk, belli bir zaman
+aralýðýna gelince rezerv ``bitmeye'' baþlayacak ve $r(t)=0$ olana kadar bu
+düþüþ simüle edilecek. 
+
+Bu ``devalüasyon'' gerçekleþtikten sonra daha fazla döviz piyasa müdahelesi
+olmayacak. Bir önceki modelde olduðu gibi ülke sýfýr borçla baþlýyor,
+geçici baðýmsýz sermaye giriþi yaþanýyor, bkz (13). Ayrýca uluslararasý
+nakit akýþý ve net rezerv satýrlarý (9) ve (10) ile kontrol edilecek.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+import pandas as pd
+
+def drfun(rr,t):
+    if t <= 40: return rr
+    elif t > 40 and t<50: return -0.07
+    else: return 0
+
+phi1 = 0.03
+phi2 = 0.06
+phi3 = 0.1
+gamma = 0.1
+xi = 0.05
+
+def dsys4(y, t):
+    z, q, d, k, r = y
+    c = -z - d - k - r
+    qdot = -0.01*c
+    zdot = -phi1*z - phi2*q - phi3*k
+    kdot = dk(t) 
+    ddot = -zdot-kdot-gamma*d
+    rdot = drfun(-zdot -ddot - kdot, t)
+    return [zdot, qdot, ddot, kdot, rdot ]
+
+ts = np.linspace(0, 140, 200)
+y0 = [0.0, 0.0, 0, 0.0, 0.0]
+sol = odeint(dsys4, y0, ts)
+df = pd.DataFrame( sol )
+df.columns = ['z','q','d','k','r']
+df['t'] = ts
+df = df.set_index('t')
+df[['z','q','k','r']].plot(grid=True)
+plt.savefig('mod4.png')
+\end{minted}
+
+\includegraphics[width=20em]{mod4.png}
+
+
+
+
+
+
+
 [devam edecek]
 
 Kaynaklar
 
-[1] Nikolas Muller-P, {\em Balance of payments accounting and exchange rate dynamics},
+[1] Nikolas Müller-P, {\em Balance of payments accounting and exchange rate dynamics},
     \url{https://www.researchgate.net/publication/46490787_Balance_of_payments_accounting_and_exchange_rate_dynamics}
 
 
