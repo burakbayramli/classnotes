@@ -165,6 +165,15 @@ if __name__ == "__main__":
  
     if len(sys.argv) == 1: exit()
 
+    if sys.argv[1] == 'clean-light':
+        os.system("find . -name _region_* | xargs rm -rf ")
+        os.system("find . -name '*.log' | xargs rm -rf ")
+        os.system("find . -name '*.aux' | xargs rm -rf ")
+        os.system("find . -name '*.out' | xargs rm -rf ")
+        os.system("find . -name '_minted*' | xargs rm -rf ")
+        os.system("find . -name '_preview*' | xargs rm -rf ")
+        os.system("find . -name '*ltxpng*' | xargs rm -rf ")
+
     if sys.argv[1] == 'clean':
         os.system("find . -name _region_* | xargs rm -rf ")
         os.system("find . -name '*.log' | xargs rm -rf ")
