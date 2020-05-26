@@ -1,4 +1,8 @@
 
+MPU6050 İvme ve Gyro Sensör Kartı
+
+
+
 brushless motor
 thrust G
 efficiency g/w
