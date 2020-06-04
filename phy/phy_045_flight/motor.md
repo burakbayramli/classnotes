@@ -1,7 +1,16 @@
 
+
+https://www.motorobit.com/urun/l9110-4-kanal-motor-surucu-karti
+https://www.youtube.com/watch?v=JJXzlCK4vnY
+
+
+https://www.youtube.com/watch?v=Yum1ilAGT4Y
+Controlling and ESC with a Raspberry Pi PWM
+BLHeli ESC
+https://www.f1depo.com/urun/emax-blheli-series-30a-esc-2s-4s-surucu-one-shot?gclid=EAIaIQobChMI6-LY9qTm6QIVwhUYCh1XGgiuEAQYAyABEgIW6_D_BwE
+ 
+
 MPU6050 İvme ve Gyro Sensör Kartı
-
-
 
 brushless motor
 thrust G
@@ -48,20 +57,6 @@ The vast majority of robots today are driven by rotary electric motors
 motors while small laboratory or hobby robots use brushed DC motors or
 stepper motors
 
-Controlling motor, rasperry pi
-
-https://howchoo.com/g/mjg5ytzmnjh/controlling-dc-motors-using-your-raspberry-pi
-
-From https://all3dp.com/2/what-s-a-stepper-motor-driver-why-do-i-need-it/
-
-How they accurately control axis feed and speed is much easier to
-grasp once you understand a simple fact: As their name suggests,
-stepper motors don’t rotate in the manner of a traditional
-motor. Instead, they step. Steppers make repeated movements of small,
-fixed increments, appearing to the naked eye as continuous motor
-rotation.
-
-
 Magazalar
 
 Direnc
@@ -74,13 +69,5 @@ https://yazicioglu.business.site/
 Yazıcıoğlu Bilgisayar & Elektronik
 Address: Osmanağa, Başçavuş Sk. No:4,
 34714 Kadıköy/İstanbul
-
-
-
-
-
-
-
-
 
 
