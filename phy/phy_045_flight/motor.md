@@ -1,5 +1,9 @@
 
 
+https://youtu.be/uOQk8SJso6Q
+BLDC design
+
+
 https://www.motorobit.com/urun/l9110-4-kanal-motor-surucu-karti
 https://www.youtube.com/watch?v=JJXzlCK4vnY
 
