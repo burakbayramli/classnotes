@@ -1,16 +1,15 @@
 
 
-\begin{minted}[fontsize=\footnotesize]{python}
+3 generators, 3000 Watt, 30 kg each
+
 rho0 = 1.226
 W = (70+10+20+30+30+30) * 9.8
 r = 1.2*3
 A = np.pi * r**2
 print ( np.sqrt( W**3 / (2 * rho0 * A)  )  )  
-\end{minted}
 
-\begin{verbatim}
+
 8041.403320811664
-\end{verbatim}
 
 
 
