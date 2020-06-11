@@ -1,15 +1,10 @@
 
 
-3 generators, 3000 Watt, 30 kg each
-
-rho0 = 1.226
-W = (70+10+20+30+30+30) * 9.8
-r = 1.2*3
-A = np.pi * r**2
-print ( np.sqrt( W**3 / (2 * rho0 * A)  )  )  
-
-
-8041.403320811664
+two rotor cylindrical
+Bouabdallah
+https://youtu.be/kxfCGZ-pN3E
+https://www.skyfilabs.com/project-ideas/cylinder-shaped-coaxial-drone
+https://diydrones.com/profiles/blogs/tdrone-open-source-coaxial-drone
 
 
 
@@ -30,8 +25,18 @@ https://www.forbes.com/sites/quora/2013/12/23/what-makes-the-quadcopter-design-s
 https://www.modlabupenn.org/2014/10/23/underactuated-rotor/
 https://youtu.be/KZe7l5_LfoA
 
-Bouabdallah
-https://youtu.be/kxfCGZ-pN3E
+--------------------------------------------------------
+
+3 generators, 3000 Watt, 30 kg each
+
+rho0 = 1.226
+W = (70+10+20+30+30+30) * 9.8
+r = 1.2*3
+A = np.pi * r**2
+print ( np.sqrt( W**3 / (2 * rho0 * A)  )  )  
+8041.403320811664
+
+---------------------------------------------------------
 
 
 
