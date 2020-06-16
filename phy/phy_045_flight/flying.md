@@ -27,16 +27,55 @@ https://youtu.be/KZe7l5_LfoA
 
 --------------------------------------------------------
 
-3 generators, 3000 Watt, 30 kg each
+2 generators, 4000 Watt, 40 kg each
 
+
+```python
 rho0 = 1.226
-W = (70+10+20+30+30+30) * 9.8
-r = 1.2*3
+W = (70+10+20+50+50) * 9.8
+r = 2.2*2
 A = np.pi * r**2
-print ( np.sqrt( W**3 / (2 * rho0 * A)  )  )  
-8041.403320811664
+print ( np.sqrt( W**3 / (2.0 * rho0 * A)  )  )
+print (3800*2)
+print (110 / 2.2)
+```
+
+```text
+7105.526463908701
+7600
+49.99999999999999
+```
+
+```python
+rho0 = 1.226
+W = (70+10+20+35+35) * 9.8
+r = 2.2*2
+A = np.pi * r**2
+print ( np.sqrt( W**3 / (2.0 * rho0 * A)  )  )
+```
+
+```text
+5568.325955750578
+```
+
 
 ---------------------------------------------------------
 
+3000 Watt generators weight about 30 kg
+
+1. Generac GP3000i - https://amzn.to/2nhZT8F
+
+2. WEN 56380i - https://amzn.to/31IQHsZ
+   50 kg, 3400 Watt
+
+3. Champion 75537i - https://amzn.to/2LKPPhZ
+
+4. Briggs and Stratton P 3000 - https://amzn.to/2IE3DsP
+
+5. Honda EU3000IH1A Handi - https://amzn.to/354Ovhw
+   3000 Watts, 35 kg
+
+helicop
+https://www.youtube.com/watch?v=HrsGM0PzQFo
 
 
