@@ -1,19 +1,28 @@
 
 
-https://youtu.be/uOQk8SJso6Q
+universal joint
+https://youtu.be/ZIFDbHsuOV0
+https://youtu.be/CZIlFiRCmBg
+https://youtu.be/Tjn5BAqSb2Q
+https://youtu.be/cUC3W_rW7dc
+
+2dof simple
+https://youtu.be/FEZ8B2HyTEw
+
+dual axis servo control
+https://youtu.be/mz9E5B5VlTE
+
 BLDC design
+https://youtu.be/uOQk8SJso6Q
 
 https://www.motorobit.com/urun/l9110-4-kanal-motor-surucu-karti
 https://www.youtube.com/watch?v=JJXzlCK4vnY
-
 
 https://www.youtube.com/watch?v=Yum1ilAGT4Y
 Controlling and ESC with a Raspberry Pi PWM
 BLHeli ESC
 https://www.f1depo.com/urun/emax-blheli-series-30a-esc-2s-4s-surucu-one-shot?gclid=EAIaIQobChMI6-LY9qTm6QIVwhUYCh1XGgiuEAQYAyABEgIW6_D_BwE
  
-
-MPU6050 İvme ve Gyro Sensör Kartı
 
 brushless motor
 thrust G
