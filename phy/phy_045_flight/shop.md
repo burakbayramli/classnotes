@@ -1,10 +1,11 @@
-
 ---------------------------------------------------------------------
 
 Direnc
 
 motor
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
+https://i.pinimg.com/736x/31/d6/5a/31d65abb55e72689ed7051611c3b3067.jpg
+http://www.yinyanmodel.com/En/ProductView.asp?ID=58
 
 surucu
 https://www.direnc.net/30a-esc-fircasiz-motor-surucu
@@ -31,16 +32,25 @@ erkek-erkek
 https://www.direnc.net/40-adet-erkek-erkek-jumper-20cm
 krokodil
 https://www.direnc.net/krokodil-kablo-kucuk-boy
+tek damarli siyah montaj
+https://www.direnc.net/22-awg-tek-damarli-montaj-kablosu-15m-siyah
+tek damarli kirmizi montaj
+https://www.direnc.net/22-awg-tek-damarli-montaj-kablosu-15m-kirmizi
 
 pil yuvasi
-https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
-https://www.direnc.net/aa-tipi-icin-10li-pil-yuvasi-arkali/onlu
+2 x https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
+1 x https://www.direnc.net/aa-tipi-icin-10li-pil-yuvasi-arkali/onlu
 
 multimetre
 https://www.direnc.net/mas-830l-digital-multimetre
 
 pan/tilt
 https://www.direnc.net/mini-pan-tilt-kit-assembled-with-micro-servos-adafruit
+
+tornavida, pense, vs
+https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
+https://www.direnc.net/jm-s214-yildiz-tornavida-150mm-6mm
+https://www.direnc.net/elektronikci-kargaburun-pense-140mm
 
 ------------------------------------------------------------------------
 
