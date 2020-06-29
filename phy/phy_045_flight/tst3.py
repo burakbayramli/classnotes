@@ -49,6 +49,7 @@ class Main(pyglet.window.Window):
                 print ('shape')
                 body = shape.body
                 print (body.position)
+                #shape.body.apply_force_at_local_point((0, 1000), (0, 0))
                 
         step_dt = 1/250.
         x = 0
@@ -64,7 +65,7 @@ class Main(pyglet.window.Window):
 
     def on_key_press(self, symbol, modifiers):
         print (symbol)
-        #arrow_body.apply_impulse_at_world_point(impulse, arrow_body.position)
+        #arrow_body
         if symbol == 65361:
             arrow_body.apply_impulse_at_world_point(impulse, arrow_body.position)
             print ('left arrow')
