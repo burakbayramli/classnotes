@@ -1,7 +1,4 @@
-import pymunk
-import pygame
-import random
-import sys
+import pymunk, pygame, random, sys
 from pymunk.pygame_util import DrawOptions
 
 width = 600
@@ -49,8 +46,15 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                sys.exit(0)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == 274:
+                    print ('down')
+                elif event.key == 273:
+                    print ('up')
+                elif event.key == 275:
+                    print ('right')
+                elif event.key == 276:
+                    print ('left')
 
         """
         This is the code that applies force to the body of the drone
