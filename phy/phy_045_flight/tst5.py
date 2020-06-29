@@ -1,4 +1,4 @@
-import pymunk, pygame, random, sys, numpy as np
+import pymunk, pygame, random, sys, numpy as np, pyglet
 from pymunk.pygame_util import DrawOptions
 
 width = 600
@@ -11,13 +11,8 @@ class Dualcopter:
         self.moment = pymunk.moment_for_poly(self.mass, self.shape.get_vertices())
         self.body = pymunk.Body(self.mass, self.moment)
         self.shape.body = self.body
-        #leg1 = pymunk.Segment(self.body, (-20, -30), (-10, 0), 3)  # 2
-        #leg2 = pymunk.Segment(self.body, (20, -30), (10, 0), 3)
-
         self.shape.body.position = position
         space.add(self.shape, self.body)
-        #space.add(self.shape, self.body, leg1, leg2)
-
 
 class Ground:
     def __init__(self, space):
@@ -44,7 +39,10 @@ def main():
     thrust_angle = 0
     thrust = 0
 
+    i = 0
     while True:
+        i += 1
+        #if i%20==0: pygame.image.save(screen, "/tmp/out-%d.jpeg" % i)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
