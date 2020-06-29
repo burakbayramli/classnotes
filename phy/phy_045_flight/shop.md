@@ -44,8 +44,8 @@ pil yuvasi
 multimetre
 https://www.direnc.net/mas-830l-digital-multimetre
 
-pan/tilt
-https://www.direnc.net/mini-pan-tilt-kit-assembled-with-micro-servos-adafruit
+matkap
+https://www.direnc.net/12v-mini-el-matkabi-siyah
 
 tornavida, pense, vs
 https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm

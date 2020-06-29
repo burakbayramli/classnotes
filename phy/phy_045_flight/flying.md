@@ -1,5 +1,15 @@
 
 
+github.com/rodolfojt
+
+
+quadcopter, simulation
+https://github.com/WittmannF/quadcopter-best-practices/
+https://github.com/WittmannF/quadcopter-best-practices/blob/master/README.md#visualizations
+http://rodolfojt.github.io/projects/Quadcopter_Project.html
+https://github.com/sandeeppaulraj/RL-Quadcopter-2/blob/master/Quadcopter_Project.ipynb
+
+
 two rotor cylindrical
 Bouabdallah
 https://youtu.be/kxfCGZ-pN3E
