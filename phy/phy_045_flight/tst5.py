@@ -56,8 +56,11 @@ def main():
         """
         This is the code that applies force to the body of the drone
         """
+#        if ball.shape.body.position.y > 300:
+#            ball.shape.body.apply_force_at_local_point((400, 400), (0, 50))
         if ball.shape.body.position.y < 200:
-            """  (0, 400) means apply 400 units of force in the dirction of y (0,0) is the co-ordinate to apply the force too"""
+            """  (0, 400) means apply 400 units of force in the dirction
+            of y (0,0) is the co-ordinate to apply the force too"""
             ball.shape.body.apply_force_at_local_point((0, 400), (0, 0))
 
         screen.fill((0, 0, 0))
