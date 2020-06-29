@@ -21,7 +21,6 @@ class Ground:
         self.shape.body.position = (width//2, 10)
         space.add(self.shape, self.body)
 
-
 def main():
 
     pygame.init()
@@ -61,7 +60,7 @@ def main():
                     thrust_angle -= 10
                     print ('left')
 
-        ball.shape.body.apply_force_at_local_point((0, thrust), (0, 0))
+        ball.shape.body.apply_force_at_local_point((0, thrust), (5, 0))
         ball.shape.body.apply_force_at_local_point((thrust*np.sin(np.deg2rad(thrust_angle)), thrust*np.cos(np.deg2rad(thrust_angle)) ), (5, 50))
 
         screen.fill((0, 0, 0))
