@@ -7,8 +7,7 @@ from pymunk.pygame_util import DrawOptions
 width = 600
 height = 600
 
-
-class Ball:
+class Dualcopter:
     def __init__(self, position, space):
         self.mass = 1
         self.shape = pymunk.Poly.create_box(None, size=(10, 50))
@@ -44,7 +43,7 @@ def main():
     space.gravity = 0, -100
     x = random.randint(120, 380)
     ground = Ground(space)
-    ball = Ball((x, 550), space)
+    ball = Dualcopter((x, 550), space)
 
     while True:
         for event in pygame.event.get():

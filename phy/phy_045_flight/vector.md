@@ -26,7 +26,6 @@ https://youtu.be/cUC3W_rW7dc
 http://www.prototipyap.com/?gclid=EAIaIQobChMIlqTk5_mY6gIVkU8YCh0qAQJNEAMYASAAEgJju_D_BwE
 
 
-
 3D, gazebo, CAD
 https://youtu.be/aP4sDyrRzpU
 http://gazebosim.org/tutorials?tut=build_model
