@@ -1,4 +1,28 @@
 
+```python
+f = 30
+a = 0
+print ( f*np.cos(np.deg2rad(a)), f*np.sin(np.deg2rad(a)) )
+a = 10
+print ( f*np.cos(np.deg2rad(a)), f*np.sin(np.deg2rad(a)) )
+a = -10
+print ( f*np.cos(np.deg2rad(a)), f*np.sin(np.deg2rad(a)) )
+```
+
+```text
+30.0 0.0
+29.544232590366242 5.2094453300079095
+29.544232590366242 -5.2094453300079095
+```
+
+
+
+
+
+
+
+
+
 Thrust Vectoring Mount - 
 https://youtu.be/mA7TwcemOh0
 https://youtu.be/gU74BF0-DcA

@@ -1,4 +1,4 @@
-import pymunk, pygame, random, sys
+import pymunk, pygame, random, sys, numpy as np
 from pymunk.pygame_util import DrawOptions
 
 width = 600
@@ -41,30 +41,30 @@ def main():
     x = random.randint(120, 380)
     ground = Ground(space)
     ball = Dualcopter((x, 550), space)
+    thrust_angle = 0
+    thrust = 0
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             elif event.type == pygame.KEYDOWN:
+                print ('thrust',thrust,'angle',thrust_angle)
                 if event.key == 274:
                     print ('down')
+                    thrust -= 20
                 elif event.key == 273:
                     print ('up')
+                    thrust += 20
                 elif event.key == 275:
                     print ('right')
+                    thrust_angle += 10
                 elif event.key == 276:
+                    thrust_angle -= 10
                     print ('left')
 
-        """
-        This is the code that applies force to the body of the drone
-        """
-#        if ball.shape.body.position.y > 300:
-#            ball.shape.body.apply_force_at_local_point((400, 400), (0, 50))
-        if ball.shape.body.position.y < 200:
-            """  (0, 400) means apply 400 units of force in the dirction
-            of y (0,0) is the co-ordinate to apply the force too"""
-            ball.shape.body.apply_force_at_local_point((0, 400), (0, 0))
+        ball.shape.body.apply_force_at_local_point((0, thrust), (0, 0))
+        ball.shape.body.apply_force_at_local_point((thrust*np.sin(np.deg2rad(thrust_angle)), thrust*np.cos(np.deg2rad(thrust_angle)) ), (5, 50))
 
         screen.fill((0, 0, 0))
         space.debug_draw(draw_options)
