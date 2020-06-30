@@ -2,13 +2,14 @@
 
 github.com/rodolfojt
 
+duocopter with legs
+https://youtu.be/NgvFFxGhTmU
 
 quadcopter, simulation
 https://github.com/WittmannF/quadcopter-best-practices/
 https://github.com/WittmannF/quadcopter-best-practices/blob/master/README.md#visualizations
 http://rodolfojt.github.io/projects/Quadcopter_Project.html
 https://github.com/sandeeppaulraj/RL-Quadcopter-2/blob/master/Quadcopter_Project.ipynb
-
 
 two rotor cylindrical
 Bouabdallah

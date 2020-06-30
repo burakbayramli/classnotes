@@ -60,8 +60,8 @@ def main():
                     thrust_angle -= 10
                     print ('left')
 
-        ball.shape.body.apply_force_at_local_point((0, thrust), (5, 0))
-        ball.shape.body.apply_force_at_local_point((thrust*np.sin(np.deg2rad(thrust_angle)), thrust*np.cos(np.deg2rad(thrust_angle)) ), (5, 50))
+        ball.shape.body.apply_force_at_local_point((0, thrust), (5, -25))
+        ball.shape.body.apply_force_at_local_point((thrust*np.sin(np.deg2rad(thrust_angle)), thrust*np.cos(np.deg2rad(thrust_angle)) ), (5, 25))
 
         screen.fill((0, 0, 0))
         space.debug_draw(draw_options)
