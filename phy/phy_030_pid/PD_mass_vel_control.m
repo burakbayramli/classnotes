@@ -8,35 +8,37 @@
 
 M = 2; % The mass is 2kg
 desired_vel = 4; % The desired velocity is 4 m/second
-Gain = [2 1 0;
-	2 2 0;
-	3 0.5 0;
-	4 1 0]; % A set of gain vectors we are going to try
+%Gain = [2 1 0;
+%	2 2 0;
+%	3 0.5 0;
+%	4 1 0]; % A set of gain vectors we are going to try
 
 %[P_gain D_gain I_gain] The integral gain: this is not used in many industrial applications due to stability issues
 T = 0.1; % Sampling interval is 10 msec
 % The problem: what force or sequence of forces will achieve this?
-for gain_index = 1:4
-    %First we study a conventional PID controller often found in the industry
-    vel = 0; %Inititial velocity is zero
-    data = [];
-    P_gain = Gain(gain_index,1);
-    D_gain = Gain(gain_index,2);
+%for gain_index = 1:4
+%First we study a conventional PID controller often found in the industry
+vel = 0; %Inititial velocity is zero
+data = [];
+%P_gain = Gain(gain_index,1);
+%D_gain = Gain(gain_index,2);
+P_gain = 2;
+D_gain = 1;
+
+vel_error = desired_vel - vel; %Velocity error
+
+for index = 1:100
+    prev_vel_error = vel_error;
     vel_error = desired_vel - vel; %Velocity error
-    
-    for index = 1:100
-        prev_vel_error = vel_error;
-        vel_error = desired_vel - vel; %Velocity error
-        force = P_gain*vel_error + D_gain*(vel_error - prev_vel_error)/T; % Force is calculated like this
-        
-        accel = force/M;
-        vel = vel + accel*T;
-        data = [data;[index*T vel vel_error force]];
-    end
-    
-    Time = data(:,1);
-    velocities = data(:,2);
-    vel_errors = data(:,3);
+    force = P_gain*vel_error + D_gain*(vel_error - prev_vel_error)/T; % Force is calculated like this    
+    accel = force/M;
+    vel = vel + accel*T;
+    data = [data;[index*T vel vel_error force]];
+end
+
+Time = data(:,1);
+velocities = data(:,2);
+vel_errors = data(:,3);
 %    figure(1)
 %    subplot(4,1,gain_index);
 %    plot(Time,velocities,'k-',Time,vel_errors,'m-');
@@ -50,7 +52,7 @@ for gain_index = 1:4
 %    end
 %    hold on;
     
-    Force = data(:,4); 
+Force = data(:,4); 
 %    figure(2)
 %    subplot(4,1,gain_index);
 %    plot(Time,Force,'k-');
@@ -61,6 +63,6 @@ for gain_index = 1:4
 %    end
 %    hold on;
 
-    Force
+Force
     
-end
+%end
