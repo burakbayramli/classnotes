@@ -138,6 +138,7 @@ gym==0.9.4
 slycot
 control
 pyglet
+pymunk
 ```
 
 Python paket kurulumu Ubuntu Linux üzerinde `pip install [paket ismi]`
