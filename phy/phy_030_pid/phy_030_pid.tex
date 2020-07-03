@@ -38,13 +38,13 @@ ettikleri degiskenleri hatirlarlar,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 class PID:
-   def __init__(self, dt, Kp, Ki, Kd):
+   def __init__(self, dt, Kp, Ki, Kd, lastErr=0.0):
       self.Kp = Kp
       self.Ki = Ki
       self.Kd = Kd
       self.dt = dt
       self.errSum = 0
-      self.lastErr = 0
+      self.lastErr = lastErr
 
    def compute(self, setpoint, input):
       error = setpoint - input
@@ -60,7 +60,7 @@ class PID:
 uygulanacak kontrolü hesaplayalým. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-p = PID(0.01, 1, 1, 0)
+p = PID(0.01, 1, 1, 0, 10)
 
 print (p.compute(10,3))
 print (p.compute(10,4))
@@ -77,15 +77,16 @@ print (p.compute(10,8))
 
 Klasik fizik üzerinden ilerleyelim.. Alttaki örnek [2, sf. 12]'den
 alýnmýþtýr, $M$ kütlesindeki bir objeyi masa üzerinden ittirerek bir hedef
-hýzýna ulaþtýrmak istiyoruz.
+hýzýna ulaþtýrmak istiyoruz. 
 
 \includegraphics[width=20em]{phy_030_pid_02.png}
 
 $F = m \ddot{x}$ formülü standart fizik, herhangi bir zaman noktasýndaki
 $T$ zaman aralýðýndaki hýz artýþý $F = \frac{m v_t - m v_{t-1}}{T}$ ile
-hesaplanabilir. Zaman aralýðý 10 milisaniye olsun, kütle $M = 2$ kg,
-ulaþýlmak istenen hedef hýz 4 metre / saniye. Duraðan hýzdan baþlýyoruz, ve
-PID kontrol ile uygulanmasý gereken kuvveti görmek istiyoruz,
+hesaplanabilir. Sürtünmeyi hesaba katmayalým. Zaman aralýðý 10 milisaniye
+olsun, kütle $M = 2$ kg, ulaþýlmak istenen hedef hýz 4 metre /
+saniye. Duraðan hýzdan baþlýyoruz, ve PID kontrol ile her $t$ anýnda
+uygulanmasý gereken kuvveti görmek istiyoruz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -94,7 +95,7 @@ T = 0.1
 M = 2.0
 desired_vel = 4.0
 vel = 0
-p = PID(T, 2.0, 0, 1.0)
+p = PID(T, 2.0, 0, 1.0, 4.0)
 forces = []; vels = []; velerrs = []; ts = []
 for i in range(100):
     vels.append(vel)
@@ -104,6 +105,7 @@ for i in range(100):
     forces.append(force)
     velerrs.append(p.lastErr)
     ts.append(i*T)
+
 df = pd.DataFrame([ts, forces, vels, velerrs]).T
 df.columns = ['ts','forces','vels','velerrs']
 df = df.set_index('ts')
@@ -115,6 +117,9 @@ plt.savefig('phy_030_pid_04.png')
 
 \includegraphics[width=20em]{phy_030_pid_03.png}
 \includegraphics[width=20em]{phy_030_pid_04.png}
+
+
+
 
 
 [devam edecek]
