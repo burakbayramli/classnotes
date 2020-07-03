@@ -43,6 +43,10 @@ def main():
     i = 0
     while True:
         i += 1
+        print ('================')
+        print ('velocity', copter.shape.body.velocity)
+        print ('angle', copter.shape.body.angle)
+        print ('rv', copter.shape.body.rotation_vector)
         #if i%20==0: pygame.image.save(screen, "/tmp/out-%d.jpeg" % i)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
