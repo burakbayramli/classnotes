@@ -54,13 +54,18 @@ class PID:
       self.lastErr = error
       return output
 
+\end{minted}
+
+Örnek olarak basit bir hedef, 10, ve rasgele bazý çarpanlar üzerinden
+uygulanacak kontrolü hesaplayalým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
 p = PID(0.01, 1, 1, 0)
 
 print (p.compute(10,3))
 print (p.compute(10,4))
 print (p.compute(10,5))
 print (p.compute(10,8))
-
 \end{minted}
 
 \begin{verbatim}
@@ -70,11 +75,17 @@ print (p.compute(10,8))
 2.2
 \end{verbatim}
 
-
-
+Klasik fizik üzerinden ilerleyelim.. Alttaki örnek [2, sf. 12]'den
+alýnmýþtýr, $M$ kütlesindeki bir objeyi masa üzerinden ittirerek bir hedef
+hýzýna ulaþtýrmak istiyoruz.
 
 \includegraphics[width=20em]{phy_030_pid_02.png}
 
+$F = m \ddot{x}$ formülü standart fizik, herhangi bir zaman noktasýndaki
+$T$ zaman aralýðýndaki hýz artýþý $F = \frac{m v_t - m v_{t-1}}{T}$ ile
+hesaplanabilir. Zaman aralýðý 10 milisaniye olsun, kütle $M = 2$ kg,
+ulaþýlmak istenen hedef hýz 4 metre / saniye. Duraðan hýzdan baþlýyoruz, ve
+PID kontrol ile uygulanmasý gereken kuvveti görmek istiyoruz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -84,23 +95,26 @@ M = 2.0
 desired_vel = 4.0
 vel = 0
 p = PID(T, 2.0, 0, 1.0)
-forces = []
-vels = []
-velerrs = []
+forces = []; vels = []; velerrs = []; ts = []
 for i in range(100):
+    vels.append(vel)
     force = p.compute(desired_vel, vel)
     accel = force / M
     vel = vel + accel*T
     forces.append(force)
-    vels.append(vel)
     velerrs.append(p.lastErr)
-df = pd.DataFrame([results, vels, velerrs]).T
-df.columns = ['forces','vels','velerrs']
-df[['vels','velerrs']].plot()
+    ts.append(i*T)
+df = pd.DataFrame([ts, forces, vels, velerrs]).T
+df.columns = ['ts','forces','vels','velerrs']
+df = df.set_index('ts')
+df[['forces','vels']].plot()
 plt.savefig('phy_030_pid_03.png')
+df[['vels','velerrs']].plot()
+plt.savefig('phy_030_pid_04.png')
 \end{minted}
 
 \includegraphics[width=20em]{phy_030_pid_03.png}
+\includegraphics[width=20em]{phy_030_pid_04.png}
 
 
 [devam edecek]
