@@ -3,15 +3,15 @@
 PID (Proportional, Integral, Derivative) Kontrol
 
 En basit kontrol yöntemi PID kontrol yöntemidir. Bu yaklaþým kontrol edilen
-mekanizma, süreç, fabrika, vs için elde denklemler yok ise çoðunlukla iþler
-(mekanizmanýn fazla gayrý lineer olmamasý kaydýyla). Kabaca elde edilmek
-istenilen bir parametre hedefi vardýr, mesela bu arabanýn hýzý olabilir,
-kontrol edilen ise bir gaz pedalý olabilir (pedalýn basýlma açýsý gibi), ve
-arabanýn belli $\Delta t$ aralýklarýnda hýz ölçümüne bakýlýr, ve en basit
-formda istenilen hýz ile o anda olunan hýz arasýndaki fark, hataya oranlý
-bir kontrol uygulamasý yapýlýr. Eðer 60 km/saat ile gidilmek isteniyorsa
-ama ölçüm 40 km/saat diyorsa aradaki farka oranla gaz pedalýna biraz daha
-basýlýr.
+mekanizma, süreç, fabrika, vs için elde denklemler elde olmasa bile
+çoðunlukla iþler (mekanizmanýn fazla gayrý lineer olmamasý
+kaydýyla). Kabaca elde edilmek istenilen bir parametre hedefi vardýr,
+mesela bu arabanýn hýzý olabilir, kontrol edilen ise bir gaz pedalý
+olabilir (pedalýn basýlma açýsý gibi), ve arabanýn belli $\Delta t$
+aralýklarýnda hýz ölçümüne bakýlýr, ve en basit formda istenilen hýz ile o
+anda olunan hýz arasýndaki fark, hataya oranlý bir kontrol uygulamasý
+yapýlýr. Eðer 60 km/saat ile gidilmek isteniyorsa ama ölçüm 40 km/saat
+diyorsa aradaki farka oranla gaz pedalýna biraz daha basýlýr.
 
 En basit formda dedik, bazý ekler, o ana kadar olan hatalarýn toplamýna
 oranlý, ya da hatanýn önceki hataya göre artýþýna oranlý da olabilir. Tüm
@@ -20,14 +20,55 @@ bunlar biraraya koyulunca PÝD kontrolünü elde ederiz [1, sf. 42],
 $$
 u(t) = 
 K_p \cdot e(t) + 
-K_i \cdot \int_0^t e(\tau) \ud \tau + 
+K_i \cdot \int_0^t e(\tau) \ud \tau + f
 K_d \frac{\ud e(t)}{\ud t}
 $$
 
+Yani aslýnda kontrole edilen parametre ve hedef deðiþken arasýnda
+genelgeçer / hafiften yapay bir iliþki kurmuþ oluyoruz. Sabitleri
+ayarlayarak herhangi bir sistem için bu iliþkinin iþlemesini saðlýyoruz,
+fakat formülsel olarak elimide bir iliþki yok. Bir ``hata'' büyüklüðüne,
+onun birkaç formuna bakarak, ona oranla bir kontrol uygulamak PÝD
+yaklaþýmýnýn özüdür. Pratikte iyi iþler, bu sebeple oldukca popülerdir. 
 
+Bir sistemi kontrol etmek icin birden fazla degisken olabilir, ustteki
+formulu o sebeple objesel yaklasimla kodlamak iyi olabilir. Her degisken
+icin ayri bir PID objesi yaratilabilir, bu objeler eski hatalari, takip
+ettikleri degiskenleri hatirlarlar,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+class PID:
+   def __init__(self, dt, Kp, Ki, Kd):
+      self.Kp = Kp
+      self.Ki = Ki
+      self.Kd = Kd
+      self.dt = dt
+      self.errSum = 0
+      self.lastErr = 0
 
+   def compute(self, setpoint, input):
+      error = setpoint - input
+      self.errSum += (error * self.dt)
+      dErr = (error - self.lastErr) / self.dt
+      output = self.Kp * error + self.Ki * self.errSum + self.Kd * dErr
+      self.lastErr = error
+      return output
 
+p = PID(0.01, 1, 1, 0)
+
+print (p.compute(10,3))
+print (p.compute(10,4))
+print (p.compute(10,5))
+print (p.compute(10,8))
+
+\end{minted}
+
+\begin{verbatim}
+7.07
+6.13
+5.18
+2.2
+\end{verbatim}
 
 
 
