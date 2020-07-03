@@ -31,10 +31,15 @@ for index = 1:100
     prev_vel_error = vel_error;
     vel_error = desired_vel - vel; %Velocity error
     force = P_gain*vel_error + D_gain*(vel_error - prev_vel_error)/T; % Force is calculated like this    
+    disp(P_gain);
+    disp(force);
+    disp(vel);
     accel = force/M;
     vel = vel + accel*T;
     data = [data;[index*T vel vel_error force]];
+    exit;
 end
+
 
 Time = data(:,1);
 velocities = data(:,2);

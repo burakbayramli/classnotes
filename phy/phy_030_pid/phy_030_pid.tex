@@ -73,11 +73,34 @@ print (p.compute(10,8))
 
 
 
+\includegraphics[width=20em]{phy_030_pid_02.png}
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
 
+T = 0.1
+M = 2.0
+desired_vel = 4.0
+vel = 0
+p = PID(T, 2.0, 0, 1.0)
+forces = []
+vels = []
+velerrs = []
+for i in range(100):
+    force = p.compute(desired_vel, vel)
+    accel = force / M
+    vel = vel + accel*T
+    forces.append(force)
+    vels.append(vel)
+    velerrs.append(p.lastErr)
+df = pd.DataFrame([results, vels, velerrs]).T
+df.columns = ['forces','vels','velerrs']
+df[['vels','velerrs']].plot()
+plt.savefig('phy_030_pid_03.png')
+\end{minted}
 
-
+\includegraphics[width=20em]{phy_030_pid_03.png}
 
 
 [devam edecek]
