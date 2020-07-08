@@ -56,6 +56,45 @@ $$
 a_t = r \alpha
 $$
 
+Dönüşsel Kinetik Enerji
+
+Dönmekte olan katı bir objenin kinetik enerjisini nasıl hesaplarız? 
+
+![](torque_03.png)
+
+Objenin en ufak parçalarından başlayarak bunu yapmaya uğraşalım. Obje
+$z$ ekseni etrafında dönüyor olsun, ve açısal hızı $\omega$
+diyelim. Obje içindeki her parçacık $i$'nin kütlesi $m_i$ diyelim,
+kinetik enerji bu parçacığın lineer hızına bağlıdır (objenin her
+parçacığı aynı açısal hızda döner ama farklı noktalarda lineer hız
+$v_i$ farklı olabilir, $v_i = r_i \omega$ üzerinden), o zaman her
+parçacık için kinetik enerji [1, sf. 299]
+
+$$
+K_i = \frac{1}{2} m_i v_i^2
+$$
+
+ile gosterilebilir. Tum obje icin, 
+
+$$
+K_R = \sum_i K_i =
+\sum_i \frac{1}{2} m_i v_i^2 =
+\frac{1}{2} \sum_i m_i r_i^2 \omega^2
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Kaynaklar

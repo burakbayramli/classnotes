@@ -13,8 +13,7 @@ DC (PMDC) motor
 
 https://www.motioncontroltips.com/faq-different-ways-industry-classifies-servo-motors/#:~:text=Brushed%20vs%20Brushless&text=While%20the%20majority%20of%20motors,magnet%20DC%20(PMDC)%20motor.
 
-
-
+Horsepower = watts, the same thing.
 
 
 propeller, sizes
