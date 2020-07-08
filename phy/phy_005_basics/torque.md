@@ -82,10 +82,27 @@ K_R = \sum_i K_i =
 \frac{1}{2} \sum_i m_i r_i^2 \omega^2
 $$
 
+Bu ifadede $\omega^2$'yi dışarı çekebiliriz, çünkü her parçacık için aynı,
 
+$$
+K_R = \frac{1}{2} \left( \sum_i m_i r_i^2 \right) \omega^2
+$$
 
+Parantez içindeki ifadeye bir isim verip değişken atayarak daha da işi
+basitleştirebiliriz, bu ifadeye dönme direnci (moment of inertia) ismi
+verilir,
 
+$$
+I \equiv  \sum_i m_i r_i^2
+$$
 
+$I$'nin birimi $kg \cdot m^2$'dir, bu notasyonla nihai denklem
+
+$$
+K_R = \frac{1}{2} I \omega^2
+$$
+
+haline gelir. 
 
 
 
