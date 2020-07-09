@@ -1,5 +1,4 @@
-Heroku
-========
+# Heroku
 
 İdare edilen (managed) bulut ortamlarında Google'ın App Engine
 yaklaşımına benzer bir yaklaşım Heroku. Gerçi esnek bir sistem

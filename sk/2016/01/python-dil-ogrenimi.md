@@ -1,45 +1,53 @@
 # Python Öğrenelim
 
-
-Python Öğrenelim
-
-
-
-
 Python dilini Türkçe öğrenmek için bir kaynak alttadır.
 
-Baglanti
+[Baglanti](https://belgeler.yazbel.com/python-istihza.pdf)
 
 Python öğreten bazı video dersleri
 
-YouTube
+[YouTube](https://www.youtube.com/watch?v=CF8C5gOZaws&list=PLP6Cnd5VHAi5M0NvHDfsQaokaw_4kPAEu)
 
 Ustteki dokümanda kuruluş bilgileri var. Temel kurulum icin python.org sitesinden baslanabilir. Alternatif kurulum icin Anaconda başlıklı bir makale. Nihai amaç komut satırından python komutunu verince yorumlayıcıya erisebilir halde olmak.
 
-Komut satırı nedir? Windows üzerindeyseniz `Start | All Programs | Accessories | Command Prompt` ile başlatılır. Terminal usulü metin bazlı bir iletişim aracıdır - `dir`, `ls` gibi komutları
-vardır. Ubuntu üzerinde `Applications | Accessories | Terminal` ile başlatılabilir. Kodları ve dökümanları nereye açtıysanız, o dizine komut satırından `cd [dizin ismi]` ile gidebilirsiniz.
+Komut satırı nedir? Windows üzerindeyseniz `Start | All Programs |
+Accessories | Command Prompt` ile başlatılır. Terminal usulü metin
+bazlı bir iletişim aracıdır - `dir`, `ls` gibi komutları
+vardır. Ubuntu üzerinde `Applications | Accessories | Terminal` ile
+başlatılabilir. Kodları ve dökümanları nereye açtıysanız, o dizine
+komut satırından `cd [dizin ismi]` ile gidebilirsiniz.
 
-Ayrica virtualenv sanal ortamini anlamak icin surada.
+Ayrica virtualenv sanal ortamini anlamak icin
+[surada](../../2018/08/virtualenv-python-izole-sanal-calsma.md).
 
-Matematik, veri analizi için çok kullanılan paketler numpy, scipy, pandaş paketleridir. Bunlar hakkında yazılarımız altta,
+Matematik, veri analizi için çok kullanılan paketler numpy, scipy,
+pandaş paketleridir. Bunlar hakkında yazılarımız altta,
 
-Numpy
+[Numpy](../../2016/10/numpy.md)
 
-Scipy Sparse (Seyrek Matrisler)
+[Scipy Sparse (Seyrek Matrisler)](../../2016/04/scipy-seyrek-matrisler-sparse-matrices.md)
 
-Pandas
+[Pandas](../../2016/08/pandas.md)
 
 Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı yazılar,
 
-Komut Satırı Seçeneklerini İşlemek (Command Line Option Processing), Python
-Yerel, Network Dosyasini Canlı, Anlık, Azar Azar Islemek (Stream, Incremental File Processing)
-Üreticiler (Generators), Yield
-Birim Testler
-With
-imap
-izip
-Tarih Zaman Icin datetime
-Objeleri Yazip Okumak - Pickle, zlib
+[Komut Satırı Seçeneklerini İşlemek (Command Line Option Processing), Python](../../2018/08/komut-satr-seceneklerini-islemek.md)
+
+[Yerel, Network Dosyasini Canlı, Anlık, Azar Azar Islemek (Stream, Incremental File Processing)](../../2018/08/canl-aks-anlk-azar-azar-islem-stream.md)
+
+[Üreticiler (Generators), Yield](../../2011/02/fonksiyon-gezmek-ve-yield.md)
+
+[Birim Testler](../../2016/05/birim-testleri-taklitlemek-mocking-ve.md)
+
+[With](../../2013/01/python-with-komutu-contextmanager.md)
+
+[imap](../../2011/02/imap.md)
+
+[izip](../../2010/06/izip.md)
+
+[Tarih Zaman Icin datetime](../../2016/06/datetime.md)
+
+[Objeleri Yazip Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)
 
 
 
