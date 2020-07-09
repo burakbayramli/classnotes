@@ -1,20 +1,4 @@
 
-```python
-import pymunk
-b = pymunk.Body(1, 1)
-```
-
-```text
-Loading chipmunk for Linux (64bit) [/home/burak/Documents/env3/lib/python3.5/site-packages/pymunk/libchipmunk.so]
-```
-
-```python
-b.
-```
-
-
-
-
 
 Thrust Vectoring Mount - 
 https://youtu.be/mA7TwcemOh0
@@ -47,16 +31,6 @@ http://www.prototipyap.com/?gclid=EAIaIQobChMIlqTk5_mY6gIVkU8YCh0qAQJNEAMYASAAEg
 https://youtu.be/aP4sDyrRzpU
 http://gazebosim.org/tutorials?tut=build_model
 https://3dwarehouse.sketchup.com/model/0a36a48e-ce57-4f41-bfc5-216b656cc9f3/Gimbal-lock
-
-
-
-
-
-
-
-
-
-
 
 
 

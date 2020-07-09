@@ -1,6 +1,4 @@
 
-
-
 Torque
 
 https://www.heidenhain.us/resources-and-news/torque-in-servo-motors/
@@ -15,12 +13,10 @@ https://www.motioncontroltips.com/faq-different-ways-industry-classifies-servo-m
 
 Horsepower = watts, the same thing.
 
-
 propeller, sizes
 https://youtu.be/Sjwi_UnCLWc?t=102
 diameter, pitch
 https://www.getfpv.com/learn/new-to-fpv/all-about-multirotor-fpv-drone-propellers
-
 
 Controlling and ESC with a Raspberry Pi PWM
 https://www.youtube.com/watch?v=Yum1ilAGT4Y
