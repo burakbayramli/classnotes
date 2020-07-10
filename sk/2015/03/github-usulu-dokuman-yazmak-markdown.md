@@ -52,8 +52,3 @@ print (markdown.markdown(content, extensions=['fenced_code']))
 ```
 
 `fenced_code` kullanimi birden fazla satira yayilan kodlari halletmek icin.
-
-
-
-
-

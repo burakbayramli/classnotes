@@ -2,21 +2,15 @@
 
 [Derin Ogrenim, Farkli Yaklasimlar](01/derin-ogrenim-farkli-yaklasimlar.md)
 
-[Elektrik ve Manyetik Etkileşimler](01/elektrik-ve-manyetik-etkilesimler.md)
-
 [iPython, rpy2, rmagic](02/ipython-rpy2-rmagic.md)
 
 [Julia](02/julia.md)
-
-[Kalici CD (Persistent Contrastive Divergence -PCD-)](02/kalici-cd-persistent-contrastive.md)
 
 [Python Bazli Tasinabilir Mobil UI Kodlari - Kivy](02/python-bazli-tasinabilir-mobil-ui.md)
 
 [Adium](03/adium.md)
 
 [Github Usulu Dokuman Yazmak, Markdown](03/github-usulu-dokuman-yazmak-markdown.md)
-
-[Mac OS, Mac Book](03/mac-book.md)
 
 [Python 3, Ubuntu, Anaconda](04/anaconda.md)
 
