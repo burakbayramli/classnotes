@@ -3,6 +3,8 @@
 
 ## En Son
 
+10/7 - [2 Boyutlu Fiziksel Simulasyon (Rigid Body 2d Physics Simulation), pymunk](2020/07/kati-govde-fizik-simulasyon-rigid-body-physics-pymunk.md)
+
 1/6 - [Grafiklemek](2020/02/grafiklemek.md)
 
 1/4 - [Lessard, Optimizasyon](2020/04/lessard.md)
