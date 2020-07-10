@@ -1,6 +1,23 @@
 
 Torque
 
+https://youtu.be/gpesDF6hzn4
+https://youtu.be/KS2T2mvMitA
+https://youtu.be/SrPHQh-M3pM
+
+Torque = (HP x 5252) / rpm
+
+SERVO MOTOR SG90
+https://youtu.be/xHDT4CwjUQE
+http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf
+https://opencircuit.shop/Product/TowerPro-SG90-9G-micro-servo-motor-180
+https://www.jsumo.com/sg90-micro-servo-motor
+
+torque 1,6kg / cm
+Stall Torque (4.8v):	1.3kg/cm
+Stall Torque (6v):	1.5kg/cm
+
+
 https://www.heidenhain.us/resources-and-news/torque-in-servo-motors/
 
 While the majority of motors used in servo systems are brushless

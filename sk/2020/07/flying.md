@@ -1,7 +1,5 @@
 
 
-github.com/rodolfojt
-
 duocopter with legs
 https://youtu.be/NgvFFxGhTmU
 
@@ -20,9 +18,6 @@ https://diydrones.com/profiles/blogs/tdrone-open-source-coaxial-drone
 How drones fly - it's all about forces
 newton -> kg conversion for thrust 1 kg = 10N
 https://youtu.be/AftJGgRk5f0
-
-Basic Physics of Drones
-https://youtu.be/PkbkO3e0ev0
 
 swash plate-less
 https://www.modlabupenn.org/2014/10/23/underactuated-rotor/
