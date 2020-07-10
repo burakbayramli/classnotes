@@ -4,7 +4,7 @@ Açık harita veri tabanı OSM bazlı bir diğer haritalama tabanı ve
 kodlama altyapısı mapsforge. Eğer kendi diskimizdeki bir dosyadan
 harita alıp basmak istiyorsak, en basit kod alttaki gibi
 
-```
+```java
 import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.graphics.TileBitmap;
 import org.mapsforge.core.model.Tile;
@@ -114,7 +114,7 @@ işletilebilir.
 Eğer Python üzerinden Java çağırmak istiyorsak, şu şekilde bir
 değişiklik yapabiliriz,
 
-```
+```java
 ...
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.Point;

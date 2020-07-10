@@ -240,7 +240,7 @@ SQLAlchemy bir ORM paketi, `class` tanımları ile SQL tabana erişmemizi
 sağlıyor, hatta tabloları sıfırdan yaratmamızı sağlıyor. Bu paket için
 bir kullanım kalıbı şöyle olabilir, Flask `app.py` içinde, ana script seviyesinde
 
-```
+```python
 class ConfigClass(object):
     ...
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']

@@ -19,7 +19,7 @@ için iş çok daha zor, ayrıca bu simülatörde kontroller sürekli
 Aya iniş için `gym==0.9.4` kurulur, altta rasgele hareketler yaptıran
 bir kod (ayrıca simülasyondan resim alınıyor),
 
-```
+```python
 import gym, six, pyglet, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 
@@ -59,7 +59,7 @@ rüzgar etkisi nasıl eklenir görüyoruz,
 dalga sebebiyle sola ya da sağa kayıyor olabilir, bunu
 `env.move_barge_randomly` ile veriyoruz.
 
-```
+```python
 from rocketlander import RocketLander
 from constants import LEFT_GROUND_CONTACT, RIGHT_GROUND_CONTACT
 import numpy as np

@@ -50,7 +50,7 @@ Step 3 altında Add advances variables kısmı var, bu kutu önemli,
 Paypal ödemeyi aldıktan sonra bizim sitemize bildirimi nasıl yapacak,
 onu gösteriyor. Bu kutuya
 
-```
+```python
 notify_url=[bizim site ve paypal url]
 ```
 
@@ -88,7 +88,7 @@ Paypal'den Bilgi Almak
 Flask ile servis ettiğimiz / dinlediğimiz bir adres olacak. Flask'te
 şu kodlar kullanılabilir,
 
-```
+```python
 from flask import Flask, jsonify, render_template, request
 import requests
 import urllib.parse

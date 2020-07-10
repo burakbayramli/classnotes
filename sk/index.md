@@ -3,9 +3,9 @@
 
 ## En Son
 
-1/6 [Grafiklemek](2020/02/grafiklemek.md)
+1/6 - [Grafiklemek](2020/02/grafiklemek.md)
 
-1/4 [Lessard, Optimizasyon](2020/04/lessard.md)
+1/4 - [Lessard, Optimizasyon](2020/04/lessard.md)
 
 ## Konular, Referans
 

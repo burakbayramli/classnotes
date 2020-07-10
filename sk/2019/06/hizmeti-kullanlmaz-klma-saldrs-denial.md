@@ -29,7 +29,7 @@ sınırlamaları aşmışsa onlara 429 hata kodu donduruluyor. Özgün
 "kullanıcı" tanımı ise `get_remote_address` ile okunabilen bağlananın
 IP adresi olabilir.
 
-```
+```python
 from flask import Flask
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
