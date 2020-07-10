@@ -33,11 +33,11 @@ Fakat dikkat edersek kopter hassas. Güç uygulandığı anda sağa sola
 yalpalanması çok kolay. Burada problem [1]'deki durumun iyi simüle
 edilmemiş olması. Simülasyon kuvveti tek noktaya uyguluyor, fakat [1]
 kopterine bakarsak, pervaneler objenin gövdesinden daha geniş, ve
-aerodinamik kurallarına göre pervanenin kuvvet kapsadığı tüm alan için
-geçerlidir. O zaman yeni bir simülasyon ile iki ufak çubuğu alttan
-üstten daha büyük olan gövdeye yapıştırarak, ve kuvveti tüm ufak çubuk
-alanına uygularız. Böylece gövdeden daha geniş olan pervane alanı
-simule edilmiş olur.
+aerodinamik kurallarına göre pervanenin sağladıği kuvvet kapsadığı tüm
+alan için geçerlidir. O zaman yeni bir simülasyon ile iki ufak çubuğu
+alttan üstten daha büyük olan gövdeye yapıştırarak, ve kuvveti tüm
+ufak çubuk alanına uygularız. Böylece gövdeden daha geniş olan pervane
+alanı simule edilmiş olur.
 
 Bu ikinci simülasyonun daha dengeli olduğu görülecektir. 
 
