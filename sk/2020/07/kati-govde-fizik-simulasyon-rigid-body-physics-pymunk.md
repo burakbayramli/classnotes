@@ -27,6 +27,8 @@ azaltılabiliyor, ve sağ sol ok tuşları ile kuvvetin acısı
 değiştiriliyor, [1] örneğindeki durumun simülasyonu gibi
 düşünülebilir.
 
+![](mcclay2.jpg)
+
 Fakat dikkat edersek kopter hassas. Güç uygulandığı anda sağa sola
 yalpalanması çok kolay. Burada problem [1]'deki durumun iyi simüle
 edilmemiş olması. Simülasyon kuvveti tek noktaya uyguluyor, fakat [1]
@@ -136,5 +138,7 @@ if __name__ == '__main__':
 
 Kaynaklar
 
-[1] Mcclay, [Dualkopter](https://youtu.be/b14_XQ5nd2A)
+[1] Mcclay, [Dualcopter](https://youtu.be/b14_XQ5nd2A)
+
+[2] Nielsen, [Drone Drop](https://gist.github.com/DuaneNielsen/25972133ec77c6cd5494217bbe3e3066)
 

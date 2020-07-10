@@ -2,12 +2,17 @@
 Torque
 
 https://youtu.be/gpesDF6hzn4
-https://youtu.be/KS2T2mvMitA
-https://youtu.be/SrPHQh-M3pM
 
 Torque = (HP x 5252) / rpm
+Horsepower = watts, the same thing.
+Horsepower = 33,000 lb-ft per minute
 
-SERVO MOTOR SG90
+https://youtu.be/KS2T2mvMitA
+
+https://youtu.be/SrPHQh-M3pM
+
+
+Tower Pro SERVO MOTOR SG90 9G
 https://youtu.be/xHDT4CwjUQE
 http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf
 https://opencircuit.shop/Product/TowerPro-SG90-9G-micro-servo-motor-180
@@ -28,7 +33,6 @@ DC (PMDC) motor
 
 https://www.motioncontroltips.com/faq-different-ways-industry-classifies-servo-motors/#:~:text=Brushed%20vs%20Brushless&text=While%20the%20majority%20of%20motors,magnet%20DC%20(PMDC)%20motor.
 
-Horsepower = watts, the same thing.
 
 propeller, sizes
 https://youtu.be/Sjwi_UnCLWc?t=102
