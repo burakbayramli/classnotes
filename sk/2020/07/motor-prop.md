@@ -1,4 +1,5 @@
 
+
 Torque
 
 https://youtu.be/gpesDF6hzn4
@@ -22,7 +23,6 @@ torque 1,6kg / cm
 Stall Torque (4.8v):	1.3kg/cm
 Stall Torque (6v):	1.5kg/cm
 
-
 https://www.heidenhain.us/resources-and-news/torque-in-servo-motors/
 
 While the majority of motors used in servo systems are brushless
@@ -33,6 +33,24 @@ DC (PMDC) motor
 
 https://www.motioncontroltips.com/faq-different-ways-industry-classifies-servo-motors/#:~:text=Brushed%20vs%20Brushless&text=While%20the%20majority%20of%20motors,magnet%20DC%20(PMDC)%20motor.
 
+-----------------------------------------------------------------
+
+https://www.tested.com/art/makers/846909-hobby-rc-analyzing-lipo-battery-discharge-rates/
+
+Going back to our example of a 4S-2200 battery, let's say it is rated
+for 20C discharge. To calculate the maximum discharge capability of
+the battery, we multiply 20 by the second number: 20 x 2200 = 44000
+milliamps = 44 amps
+
+The calculation tells us that this battery can safely be used in a
+system that is expected to continuously pull 44 amps or less. It also
+means that a fully-charged battery will last about three minutes at
+that current draw. Using the same logic, a 4S-2200 30C battery would
+be valid for applications requiring up to 66 amps of current.
+
+emax + pervane 
+https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
+Test değerleri 2 : 3s 10x4.5 6100 rpm 14.5A 745 gr thrust
 
 propeller, sizes
 https://youtu.be/Sjwi_UnCLWc?t=102
