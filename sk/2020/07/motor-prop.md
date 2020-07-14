@@ -15,13 +15,18 @@ https://youtu.be/SrPHQh-M3pM
 
 Tower Pro SERVO MOTOR SG90 9G
 https://youtu.be/xHDT4CwjUQE
+https://electronics.stackexchange.com/questions/246642/power-supply-circuit-for-powering-sg90-servo-how-to-handle-high-current-require
 http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf
 https://opencircuit.shop/Product/TowerPro-SG90-9G-micro-servo-motor-180
 https://www.jsumo.com/sg90-micro-servo-motor
 
 torque 1,6kg / cm
-Stall Torque (4.8v):	1.3kg/cm
-Stall Torque (6v):	1.5kg/cm
+Stall
+    Torque (4.8v): 1.3kg/cm
+    current: 700 mA
+Stall
+    Torque (6v): 1.5kg/cm
+    current: 800 mA
 
 https://www.heidenhain.us/resources-and-news/torque-in-servo-motors/
 
@@ -47,6 +52,32 @@ system that is expected to continuously pull 44 amps or less. It also
 means that a fully-charged battery will last about three minutes at
 that current draw. Using the same logic, a 4S-2200 30C battery would
 be valid for applications requiring up to 66 amps of current.
+
+```python
+print ((2200 * 60) / (20 * 2200))
+print ((2200 * 60) / (30 * 2200))
+print ((2200 * 60) / 15000.0 )
+print ((2200 * 60) / 15000.0 )
+```
+
+```text
+3.0
+2.0
+8.8
+8.8
+```
+
+Connecting batteries in series increases voltage, but does not
+increase overall amp-hour capacity. All batteries in a series bank
+must have the same amp-hour rating. Connecting batteries in parallel
+increases total current capacity by decreasing total resistance, and
+it also increases overall amp-hour capacity.
+
+Each battery can pump a set number of electrons per second, for a
+given circuit, so if two or more batteries are connected in parallel
+the number of electrons they push out each second and energy supplied
+is added, hence the total current in the circuit is increased.
+bhttps://www.primaryconnections.org.au/sites/all/modules/primaryconnections/includes/SBR/data/Phy/sub/seriespara/seriespara.htm
 
 emax + pervane 
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
