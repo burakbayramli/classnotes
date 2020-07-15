@@ -148,7 +148,6 @@ gibi tek bir satir olabilir, bu satir esas ayar dosyasini yukler. Bir ornek sur
 
 Emacs icinde beep seslerini kapatmak
 
-
 (setq ring-bell-function 'ignore)
 
 Font listesi icin herhangi bir buffer icinde

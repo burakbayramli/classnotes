@@ -111,7 +111,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = s
       
       if '\includegraphics' in line:
-          gf = re.findall("\includegraphics\[.*?\]\{(.*?)\}",line,re.DOTALL)[0]
+          gf = re.findall("includegraphics\[.*?\]\{(.*?)\}",line,re.DOTALL)[0]
           fout.write('![](' + gf + ')\n')
       elif '\\begin{minted}' in line:
           fout.write('```python\n')

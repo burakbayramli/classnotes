@@ -1,11 +1,5 @@
 # Ubuntu 16 ve Acer Aspire R11
 
-
-Ubuntu 16 ve Acer Aspire R11
-
-
-
-
 Bu bilgisayarda ekran 360 derece donup tablet haline gelebiliyor. Fiyat 300 Eur.
 
 Ubuntu kurmak icin

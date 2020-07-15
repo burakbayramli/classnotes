@@ -1,12 +1,5 @@
 # Ubuntu 14
 
-
-Ubuntu 14
-
-
-
-
-
 sudo apt-get install gnome-shell gnome-session-fallback xkbset git ubuntu-restricted-extras compiz compizconfig-settings-manager texlive vlc default-jdk transmission  imagemagick mplayer compiz-plugins emacs auctex gksu dvipng texlive-fonts-extra calibre djvulibre-bin recoll pdftk gimp x11-utils r-base-core
 
 sudo apt-get remove rhythmbox 
@@ -19,7 +12,8 @@ Soldaki Windows bolumundeni "Static Application Switcher"'i secin, boylece Alt-T
 
 Tuslar Ile Mouse Tiklamasi
 
-Bizim Github kod deposunde remap_mouse.sh'e cagri yap, /etc/profile icinden, boylece bazi tuslar mouse tiklamasi haline gelir. 
+Bizim Github kod deposunde remap_mouse.sh'e cagri yap, /etc/profile
+icinden, boylece bazi tuslar mouse tiklamasi haline gelir.
 
 Caps Control Yapmak
 

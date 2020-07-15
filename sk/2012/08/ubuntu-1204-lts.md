@@ -1,11 +1,5 @@
 # Ubuntu 12.04 LTS ve Acer Aspire S3
 
-
-Ubuntu 12.04 LTS ve Acer Aspire S3
-
-
-
-
 Acer Aspire S3 laptop uzerinde Ubuntu 12.04 LTS kullanmaya basladik.
 
 Bu laptop 250 GB boyutunda solid state disk'e sahip. Solid state teknolojisi ucucu bellek (RAM) teknolojisini sabit diskler icin kullanan bir teknolojidir, eskiden pahaliydi, son zamanlarda dizustu bilgisayarlarda gorulmeye basladi. Bazi yorumlara gore solid state disk erisimi normal disklere oranla 10 kat daha hizlidir. SS manyetik disk olmadigi icin oynayan bir okuyucu kafaya ihtiyaci yok, hata payi daha az. Manyetik diskler olmadigi icin daha hafif. Mekanik islem olmadigi icin ayrica daha az isiniyor. Her bakimdan tercih edilebilecek bir teknoloji.
@@ -81,11 +75,31 @@ sudo rm /usr/share/sounds/ubuntu/stereo/system-ready.ogg
 
 Clickpad
 
-Acer Aspire S3 bir clickpad ile geliyor. Clickpad hem dokunus (tap) hem de asagi yukari inebilen mekanik dugme gibi islev gorebilen bir mekanizma. Bu clickpad'i kullanmanin farkli yollari var, paketten cikan hali ile hem dugme olarak hem de tek, iki dokunuslar mouse tiklamasi yapabiliyor. Klavyeyi kullanirken yanlislikla dokunusun tiklama yapmasi  rahatsizlik yaratiyorsa (mouse isareti baska bir pencereye kaymis mesela, ve yazi yazarken yanlislikla tiklama odagi istemeden o pencereye kaydiriyor), ve "klavye kullanirken clickpad'in iptal edilmesi" secenegi ise yaramiyorsa, o zaman tum clickpad'i bir mouse gibi isler hale getirebilirsiniz. Once System Tools | System Settings | Mouse and Touchpad yapin ve "Enable mouseclicks with touchpad" secenegini iptal edin. Simdi, alttaki cagrilari her bilgisayar acildiginda cagrilacak bir yere yazin, mesela rc.local ya da .bashrc gibi
+Acer Aspire S3 bir clickpad ile geliyor. Clickpad hem dokunus (tap)
+hem de asagi yukari inebilen mekanik dugme gibi islev gorebilen bir
+mekanizma. Bu clickpad'i kullanmanin farkli yollari var, paketten
+cikan hali ile hem dugme olarak hem de tek, iki dokunuslar mouse
+tiklamasi yapabiliyor. Klavyeyi kullanirken yanlislikla dokunusun
+tiklama yapmasi rahatsizlik yaratiyorsa (mouse isareti baska bir
+pencereye kaymis mesela, ve yazi yazarken yanlislikla tiklama odagi
+istemeden o pencereye kaydiriyor), ve "klavye kullanirken clickpad'in
+iptal edilmesi" secenegi ise yaramiyorsa, o zaman tum clickpad'i bir
+mouse gibi isler hale getirebilirsiniz. Once System Tools | System
+Settings | Mouse and Touchpad yapin ve "Enable mouseclicks with
+touchpad" secenegini iptal edin. Simdi, alttaki cagrilari her
+bilgisayar acildiginda cagrilacak bir yere yazin, mesela rc.local ya
+da .bashrc gibi
 
-synclient ClickPad=1synclient RightButtonAreaLeft=1500synclient RightButtonAreaRight=2846synclient RightButtonAreaTop=101synclient RightButtonAreaBottom=1771
+synclient ClickPad=1
+synclient RightButtonAreaLeft=1500
+synclient RightButtonAreaRight=2846
+synclient RightButtonAreaTop=101
+synclient RightButtonAreaBottom=1771
 
-Ustteki komutlar clickpad'i bolgelere ayirarak o bolgelerde olan dokunuslari sag mouse tiklamasi gibi algilanmasini sagliyor. Ustteki bolge sag tiklama icin tanimli. Ayrica dokusun tiklama olmasini iptal ettik, boylece clickpad mouse gibi isler hale geldi.
+Ustteki komutlar clickpad'i bolgelere ayirarak o bolgelerde olan
+dokunuslari sag mouse tiklamasi gibi algilanmasini sagliyor. Ustteki
+bolge sag tiklama icin tanimli. Ayrica dokusun tiklama olmasini iptal
+ettik, boylece clickpad mouse gibi isler hale geldi.
 
 Balon tavsiyelerini yoketmek icin
 
