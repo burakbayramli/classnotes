@@ -1,20 +1,25 @@
 # Ubuntu 18, Acer Swift
 
 Acer 400 dollar'dan daha az fiyatlı sağlam makina. 4 cekirdekli, 128
-GB SSD (solid state disk). Ubuntu kurmak için USB diskten yüklenebilir
-Ubuntu problem çıkarmadı.
+GB SSD (solid state disk). Ubuntu kurmak için USB diskten
+yüklenebilir.
 
-Paketten çıkan masaüstü program Unity kullanışlı... Fakat iş alanı
-(workspace) ayarı biraz garip, diğer alanlara program yollanabiliyor,
-işleyen programlar listesinden diğer alandaki program seçilince alan
-değişiyor. Fakat bir alanda iken Alt-Tab ile geçiş yapınca diğer alana
-geçiş var. Bunu bilinen hale çevirmek için
+Paketten çıkan masaüstü idarecisi (desktop manager) program Unity
+kullanışlı... Fakat iş alanı (workspace) ayarı biraz garip, diğer
+alanlara program yollanabiliyor, işleyen programlar listesinden diğer
+alandaki program seçilince alan değişiyor. Fakat bir alanda iken
+Alt-Tab ile geçiş yapınca diğer alana geçiş var. Bunu bilinen hale
+çevirmek için
 
 ```
 gsettings set org.gnome.shell.app-switcher current-workspace-only true
 ```
 
 Böylece Alt-Tab sadece aynı iş alanındaki programlara geçiş yapar.
+
+Çalışma alanları arasında gidip gelmek için sol üst köşede
+`Activities` seçilir, ekranın sağında bir seçim alanı çıkıyor, buradan
+alan değişimi olabiliyor.
 
 Tuş üzerinden mouse tıklaması yapmak için bu makinada bazı kodlar
 farklı, bizde CAPS => Ctrl, sağ tıklama => Ctrl, sol tıklama => Alt
@@ -39,6 +44,7 @@ paketler ilk işlettiğimiz `apt-get install` listesi,
 ```
 git chromium-browser emacs xkbset virtualenv texlive-full pygmentize
 vlc mplayer xvkbd htop make libportaudio2 portaudio19-dev python3-dev
+cmake
 ```
 
 Emacs ile F tuşlarını kullananlar için, bu tuşlar Acer tarafından
@@ -70,10 +76,3 @@ Bizim Emacs ayarlari [surada](https://github.com/burakbayramli/kod/tree/master/s
 Kaynaklar
 
 [1] [AskUbuntu](https://askubuntu.com/questions/1092758/how-to-make-ubuntu-18-04-gnome-workspace-prohibit-alt-tab-to-windows-on-other)
-
-
-
-
-
-
-

@@ -10,5 +10,21 @@ cd build_dir
 
 cmake ..
 
+sudo make install
+
+Eigen sadece header .h dosyalari, derlenen bir sey yok.
+
 sudo apt-get install libirrlicht-dev
+
+Chrono
+
+git clone https://github.com/projectchrono/chrono.git
+
+cd chrono
+
+mkdir build_dir
+
+cd build_dir
+
+cmake ..
 
