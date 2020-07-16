@@ -1,7 +1,8 @@
 # Ubuntu 18, Acer Swift
 
-Acer 400 dollar'dan daha az fiyatlı sağlam makina. Ubuntu kurmak için
-USB diskten yüklenebilir Ubuntu problem çıkarmadı.
+Acer 400 dollar'dan daha az fiyatlı sağlam makina. 4 cekirdekli, 128
+GB SSD (solid state disk). Ubuntu kurmak için USB diskten yüklenebilir
+Ubuntu problem çıkarmadı.
 
 Paketten çıkan masaüstü program Unity kullanışlı... Fakat iş alanı
 (workspace) ayarı biraz garip, diğer alanlara program yollanabiliyor,
@@ -40,6 +41,35 @@ git chromium-browser emacs xkbset virtualenv texlive-full pygmentize
 vlc mplayer xvkbd htop make libportaudio2 portaudio19-dev python3-dev
 ```
 
+Emacs ile F tuşlarını kullananlar için, bu tuşlar Acer tarafından
+kullanılmakta. Eğer iptal etmek ile uğraşmak istemiyorsanız, Emacs
+içinde FN tuşu ile beraber F1, F2, vs. basmak normal F1, F2 etkisi
+yapar.
 
-[1] https://askubuntu.com/questions/1092758/how-to-make-ubuntu-18-04-gnome-workspace-prohibit-alt-tab-to-windows-on-other
+Emacs'ı her zaman bir Python
+[virtualenv](../../2018/08/virtualenv-python-izole-sanal-calsma.md)
+ortamından başlatmak iyi fikirdir, böylece komut satırında işletilen
+`python` çağrısı ortamda kurulan paketlere erisebilmiş olur. Bizim
+mesela bir `emacs3.sh` script var, program böyle başlatılıyor, orada
+hem `virtualenv` girişi yapılır, ardından Emacs başlatılır,
+
+```
+source /home/burak/Documents/env3/bin/activate 
+/usr/bin/emacs25 &
+```
+
+Bu script icin de bir `alias` yaratabiliriz,
+
+```
+alias em="cd $HOME/Documents/kod; bash emacs3.sh"
+```
+
+Bizim Emacs ayarlari [surada](https://github.com/burakbayramli/kod/tree/master/site-lisp).
+
+
+Kaynaklar
+
+[1] [AskUbuntu](https://askubuntu.com/questions/1092758/how-to-make-ubuntu-18-04-gnome-workspace-prohibit-alt-tab-to-windows-on-other)
+
+
 
