@@ -1,14 +1,9 @@
 # pyaudio
 
+Bilgisayar mikrofonundan ses verisi almak icin pyaudio
+kullanilabilir. Kurmak icin Ubuntu uzerinde once
 
-pyaudio
-
-
-
-
-Bilgisayar mikrofonundan ses verisi almak icin pyaudio kullanilabilir. Kurmak icin Ubuntu uzerinde once
-
-sudo apt-get install libportaudio0 libportaudio2 libportaudiocpp0 portaudio19-dev
+sudo apt-get install python3-dev libportaudio2 portaudio19-dev
 
 Sonra
 
