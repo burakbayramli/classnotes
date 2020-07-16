@@ -14,7 +14,7 @@ geçiş var. Bunu bilinen hale çevirmek için
 gsettings set org.gnome.shell.app-switcher current-workspace-only true
 ```
 
-Böylece Alt-Tab sadece aynı iş alanındaki problemlere geçiş yapar.
+Böylece Alt-Tab sadece aynı iş alanındaki programlara geçiş yapar.
 
 Tuş üzerinden mouse tıklaması yapmak için bu makinada bazı kodlar
 farklı, bizde CAPS => Ctrl, sağ tıklama => Ctrl, sol tıklama => Alt
@@ -33,7 +33,7 @@ Dikkat: Touchpad üzerinden sağ tıklama için taam alt köşeden basmak
 lazım. Pek kullanışlı denemez, tuşlarla daha iyi.
 
 Ubuntu kurulusu ile pek cok yazilim gelir, Transmission gibi. Alttaki
-paketler ek isletilen `apt-get install`,
+paketler ilk işlettiğimiz `apt-get install` listesi,
 
 
 ```
@@ -42,15 +42,15 @@ vlc mplayer xvkbd htop make libportaudio2 portaudio19-dev python3-dev
 ```
 
 Emacs ile F tuşlarını kullananlar için, bu tuşlar Acer tarafından
-kullanılmakta. Eğer iptal etmek ile uğraşmak istemiyorsanız, Emacs
-içinde FN tuşu ile beraber F1, F2, vs. basmak normal F1, F2 etkisi
-yapar.
+kullanılmakta, ses, ışık ayarı gibi... Eğer iptal etmek ile uğraşmak
+istemiyorsanız, Emacs içinde FN tuşu ile beraber F1, F2, vs. basmak
+normal F1, F2 etkisi yapar.
 
-Emacs'ı her zaman bir Python
+Emacs'i her zaman bir Python
 [virtualenv](../../2018/08/virtualenv-python-izole-sanal-calsma.md)
 ortamından başlatmak iyi fikirdir, böylece komut satırında işletilen
 `python` çağrısı ortamda kurulan paketlere erisebilmiş olur. Bizim
-mesela bir `emacs3.sh` script var, program böyle başlatılıyor, orada
+mesela bir `emacs.sh` script var, program böyle başlatılıyor, orada
 hem `virtualenv` girişi yapılır, ardından Emacs başlatılır,
 
 ```
@@ -70,6 +70,10 @@ Bizim Emacs ayarlari [surada](https://github.com/burakbayramli/kod/tree/master/s
 Kaynaklar
 
 [1] [AskUbuntu](https://askubuntu.com/questions/1092758/how-to-make-ubuntu-18-04-gnome-workspace-prohibit-alt-tab-to-windows-on-other)
+
+
+
+
 
 
 
