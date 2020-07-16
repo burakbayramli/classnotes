@@ -11,7 +11,6 @@ https://youtu.be/KS2T2mvMitA
 
 https://youtu.be/SrPHQh-M3pM
 
-
 Tower Pro SERVO MOTOR SG90 9G
 https://youtu.be/xHDT4CwjUQE
 https://electronics.stackexchange.com/questions/246642/power-supply-circuit-for-powering-sg90-servo-how-to-handle-high-current-require
@@ -136,5 +135,28 @@ The vast majority of robots today are driven by rotary electric motors
 (Fig. 9.1). Large industrial robots typically use brushless servo
 motors while small laboratory or hobby robots use brushed DC motors or
 stepper motors
+
+https://i.pinimg.com/736x/31/d6/5a/31d65abb55e72689ed7051611c3b3067.jpg
+
+http://www.yinyanmodel.com/En/ProductView.asp?ID=58
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

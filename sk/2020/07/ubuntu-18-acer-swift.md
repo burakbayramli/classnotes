@@ -3,7 +3,7 @@
 Acer 400 dollar'dan daha az fiyatlı sağlam makina. Ubuntu kurmak için
 USB diskten yüklenebilir Ubuntu problem çıkarmadı.
 
-Paketten çıkan masaüstü program Ünity kullanışlı... Fakat iş alanı
+Paketten çıkan masaüstü program Unity kullanışlı... Fakat iş alanı
 (workspace) ayarı biraz garip, diğer alanlara program yollanabiliyor,
 işleyen programlar listesinden diğer alandaki program seçilince alan
 değişiyor. Fakat bir alanda iken Alt-Tab ile geçiş yapınca diğer alana
@@ -13,8 +13,10 @@ geçiş var. Bunu bilinen hale çevirmek için
 gsettings set org.gnome.shell.app-switcher current-workspace-only true
 ```
 
-Tus üzerinden mouse tıklaması yapmak için bu makinada bazı kodlar
-farklı, bizde ÇAPS => Ctrl, sağ tıklama => Ctrl, sol tıklama => Alt
+Böylece Alt-Tab sadece aynı iş alanındaki problemlere geçiş yapar.
+
+Tuş üzerinden mouse tıklaması yapmak için bu makinada bazı kodlar
+farklı, bizde CAPS => Ctrl, sağ tıklama => Ctrl, sol tıklama => Alt
 Gr, ve Windows tuşu olur, bunun için `.bashrc` içinde
 
 ```
@@ -26,15 +28,17 @@ xmodmap -e "keycode 105 = Pointer_Button3"
 xkbset m
 ```
 
-Dikkat: Touchpad uzerinden sag tiklama icin taam alt koseden basmak
-lazim. Pek kullanisli denemez, tuslarla daha iyi.
+Dikkat: Touchpad üzerinden sağ tıklama için taam alt köşeden basmak
+lazım. Pek kullanışlı denemez, tuşlarla daha iyi.
+
+Ubuntu kurulusu ile pek cok yazilim gelir, Transmission gibi. Alttaki
+paketler ek isletilen `apt-get install`,
 
 
-
-
-
-
-
+```
+git chromium-browser emacs xkbset virtualenv texlive-full pygmentize
+vlc mplayer xvkbd htop make libportaudio2 portaudio19-dev python3-dev
+```
 
 
 [1] https://askubuntu.com/questions/1092758/how-to-make-ubuntu-18-04-gnome-workspace-prohibit-alt-tab-to-windows-on-other
