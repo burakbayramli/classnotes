@@ -16,6 +16,8 @@ Eigen sadece header .h dosyalari, derlenen bir sey yok.
 
 sudo apt-get install libirrlicht-dev
 
+sudo apt-get install swig
+
 Chrono
 
 git clone https://github.com/projectchrono/chrono.git
@@ -26,5 +28,8 @@ mkdir build_dir
 
 cd build_dir
 
-cmake ..
+cmake -D ENABLE_MODULE_PYTHON=ON ..
+
+http://api.projectchrono.org/pychrono_introduction.html
+
 

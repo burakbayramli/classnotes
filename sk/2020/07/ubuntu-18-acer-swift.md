@@ -34,6 +34,8 @@ xmodmap -e "keycode 105 = Pointer_Button3"
 xkbset m
 ```
 
+Farklı bilgisayarlardaki tus kodlarını almak için `xev` kullanılabilir.
+
 Dikkat: Touchpad üzerinden sağ tıklama için taam alt köşeden basmak
 lazım. Pek kullanışlı denemez, tuşlarla daha iyi.
 
