@@ -8,7 +8,7 @@ http://thoughtmountain.com/gnucap_demo.html
 
 Örnek şu devreyi kodlamış,
 
-![](http://thoughtmountain.com/gnucap_demo1.png)
+![](gnucap_demo1.png)
 
 ```python
 print (open("demo1.ckt").read())
