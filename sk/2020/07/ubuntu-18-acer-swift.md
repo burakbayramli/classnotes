@@ -46,7 +46,7 @@ paketler ilk işlettiğimiz `apt-get install` listesi,
 ```
 git chromium-browser emacs xkbset virtualenv texlive-full pygmentize
 vlc mplayer xvkbd htop make libportaudio2 portaudio19-dev python3-dev
-cmake
+cmake calibre fbreader
 ```
 
 Emacs ile F tuşlarını kullananlar için, bu tuşlar Acer tarafından
