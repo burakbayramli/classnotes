@@ -46,6 +46,8 @@ cmake -DENABLE_MODULE_IRRLICHT=TRUE \
       -DENABLE_MODULE_PYTHON=TRUE \
       -DENABLE_MODULE_POSTPROCESS=TRUE \
       -DCMAKE_BUILD_TYPE=Debug ..
+
+make
 ```
 
 Artık `chrono/build_dir/bin` altında görülen bir sürü program
