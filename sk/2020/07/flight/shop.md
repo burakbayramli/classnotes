@@ -3,7 +3,7 @@
 Direnc
 
 raspberry pi 3
-https://www.direnc.net/raspberry-pi-3-model-b-plus
+https://www.direnc.net/raspberry-pi-3-model-b-plus-kombo-kit-seti
 
 motor
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
@@ -14,10 +14,6 @@ https://www.direnc.net/30a-esc-fircasiz-motor-surucu
 pervane
 https://www.direnc.net/drone-quadcopter-ve-multikopter-pervanesi-karbon-9047-pervane-seti-4-adet
 
-gyro, accel sensor
-MPU 6050
-https://www.direnc.net/mpu6050-3-axis-gyro-ve-egim-sensoru
-
 pil
 https://www.direnc.net/111v-3s1p-2200-mah-30c-li-polymer-pil-soketli
 
@@ -26,10 +22,6 @@ https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
 
 pil yuvasi
 https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
-
-
-servo
-https://www.direnc.net/sg90-9g-servo-motor
 
 breadboard
 https://www.direnc.net/perma-proto-half-sized-breadboard-pcb-single-adafruit
@@ -55,6 +47,17 @@ tornavida, pense, vs
 https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
 https://www.direnc.net/jm-s214-yildiz-tornavida-150mm-6mm
 https://www.direnc.net/elektronikci-kargaburun-pense-140mm
+
+direnc
+https://www.direnc.net/2512-kilif-smd-direnc-paketi-33x10330-adet
+
+gyro, accel sensor
+MPU 6050
+https://www.direnc.net/mpu6050-3-axis-gyro-ve-egim-sensoru
+
+servo
+https://www.direnc.net/sg90-9g-servo-motor
+
 
 ------------------------------------------------------------------------
 

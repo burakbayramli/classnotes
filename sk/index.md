@@ -3,6 +3,8 @@
 
 ## En Son
 
+20/7 - [3D Fizik Simulasyonu, Chrono](2020/07/chrono-fizik-simulasyon-rigid-body-physics.md)
+
 16/7 - [Ubuntu 18, Acer Swift](2020/07/ubuntu-18-acer-swift.md)
 
 10/7 - [2 Boyutlu Fiziksel Simulasyon (Rigid Body 2d Physics Simulation), pymunk](2020/07/kati-govde-fizik-simulasyon-rigid-body-physics-pymunk.md)
