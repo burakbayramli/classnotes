@@ -1,7 +1,8 @@
 # 3D Fizik Simulasyonu, Chrono
 
 Daha önce 2 boyut için [gördüğümüz](kati-govde-fizik-simulasyon-rigid-body-physics-pymunk.md)
-simülasyon yazılımının 3 boyutta karşılığı Chrono. Derlemek için bazı bilgiler,
+simülasyon yazılımının 3 boyutta karşılığı Chrono. Ubuntu üzerinde derlemek
+için bazı bilgiler,
 
 http://api.projectchrono.org/4.0.0/tutorial_install_chrono.html
 
@@ -76,11 +77,5 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
 
 işletiriz. Bu işlem bir `Makefile` üretmiş olmalı. onu `make` ile
 derleriz, ve `template_project/build/myexe` olarak bir işletilebilir
-program üretilmiş olmalı. Onu rahatlıkla işletebiliriz. 
-
-
-
-
-
-
+program üretilmiş olmalı. 
 
