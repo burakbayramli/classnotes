@@ -67,15 +67,36 @@ simülasyon içinde gözleyebiliriz.
 Eğer kendi kodladığımız, kendi başına ayrı bir projeyi Chrono
 kullanacak şekilde derlemek istiyorsak, `chrono/template_project`
 altına gidebiliriz (ya da oradaki kodları herhangi bir yere
-kopyalayıp, vs), ve
+kopyalayıp, vs), ve Chrono'nun `/opt/chrono` da kurulmuş olduğunu
+varsayalim,
 
 ```
 cmake -DCMAKE_BUILD_TYPE=Debug \
-      -DChrono_DIR=/home/user/Downloads/repos/chrono/build_dir/cmake \
-      /home/user/Downloads/repos/chrono/template_project
+      -DChrono_DIR=/opt/chrono/build_dir/cmake \
+      /opt/chrono/template_project
 ```
 
 işletiriz. Bu işlem bir `Makefile` üretmiş olmalı. onu `make` ile
 derleriz, ve `template_project/build/myexe` olarak bir işletilebilir
 program üretilmiş olmalı. 
+
+Motorlar
+
+Chrono'da pek cok fiziksel kavram var, mesela
+[motorlar](http://api.projectchrono.org/tutorial_demo_motors.html),
+`demo_IRR_motors.cpp` bunu gorebiliriz.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
