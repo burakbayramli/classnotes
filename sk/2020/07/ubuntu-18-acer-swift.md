@@ -75,6 +75,30 @@ alias em="cd $HOME/Documents/kod; bash emacs3.sh"
 Bizim Emacs ayarlari [surada](https://github.com/burakbayramli/kod/tree/master/site-lisp).
 
 
+Eğer masaüstüne işletilebilir script için ikon koymak istersek,
+
+```
+sudo apt-get install gnome-panel
+```
+
+ve
+
+```
+gnome-desktop-item-edit --create-new ~/Desktop
+```
+
+işletiriz. Bu bize bir diyalog kutusu getiriyor, orada işler kod için
+mutlak ismi verilir, `/bin/bash /home/user/vs/vs/script.sh` gibi,
+tanım vs girildikten sonra masaüstünde ikon yaratılır. Dikkat masaüstü
+ikonları çift tıklama gerektirir, Ünity hızlı erişim barındakiler tek
+tıklama ile başlıyor.
+
+
+
 Kaynaklar
 
 [1] [AskUbuntu](https://askubuntu.com/questions/1092758/how-to-make-ubuntu-18-04-gnome-workspace-prohibit-alt-tab-to-windows-on-other)
+
+[2] [AskUbuntu](https://askubuntu.com/questions/64222/how-can-i-create-launchers-on-my-desktop)
+
+

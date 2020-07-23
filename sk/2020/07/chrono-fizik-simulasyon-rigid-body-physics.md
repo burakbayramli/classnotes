@@ -84,19 +84,6 @@ Motorlar
 
 Chrono'da pek cok fiziksel kavram var, mesela
 [motorlar](http://api.projectchrono.org/tutorial_demo_motors.html),
-`demo_IRR_motors.cpp` bunu gorebiliriz.
-
-
-
-
-
-
-
-
-
-
-
-
-
+`demo_IRR_motors.cpp` kodunda bunu gorebiliriz.
 
 

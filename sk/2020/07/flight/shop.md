@@ -1,10 +1,21 @@
+
 ---------------------------------------------------------------------
 
 Direnc
 
 raspberry pi 3
-https://www.direnc.net/raspberry-pi-4-seti-gelistirme-karti-1gb-ram-standart-kilif-guc-kaynagi
+https://www.direnc.net/raspberry-pi-3
 https://www.direnc.net/10-metre-hdmi-kablosu
+
+breadboard
+https://www.direnc.net/guc-kaynagi-girisli-metal-yuzey-breadboard
+
+multimetre
+https://www.direnc.net/mas-830l-digital-multimetre
+
+led
+3 x https://www.direnc.net/5mm-led-yesil
+3 x https://www.direnc.net/5mm-led-kirmizi
 
 motor
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
@@ -23,12 +34,6 @@ https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
 
 servo
 https://www.direnc.net/sg90-9g-servo-motor
-
-breadboard
-https://www.direnc.net/guc-kaynagi-girisli-metal-yuzey-breadboard
-
-multimetre
-https://www.direnc.net/mas-830l-digital-multimetre
 
 kablo
 disi-erkek
