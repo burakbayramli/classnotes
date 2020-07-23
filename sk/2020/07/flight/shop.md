@@ -5,6 +5,7 @@ Direnc
 
 raspberry pi 3
 https://www.direnc.net/raspberry-pi-3
+https://www.direnc.net/raspberry-pi-uyumlu-kablosuz-usb-klavye-siyah
 https://www.direnc.net/10-metre-hdmi-kablosu
 
 breadboard
@@ -44,10 +45,6 @@ erkek-erkek
 https://www.direnc.net/40-adet-erkek-erkek-jumper-20cm
 krokodil
 https://www.direnc.net/krokodil-kablo-kucuk-boy
-tek damarli siyah montaj
-https://www.direnc.net/22-awg-tek-damarli-montaj-kablosu-15m-siyah
-tek damarli kirmizi montaj
-https://www.direnc.net/22-awg-tek-damarli-montaj-kablosu-15m-kirmizi
 
 tornavida, pense, vs
 https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
