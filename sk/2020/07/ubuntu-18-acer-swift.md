@@ -93,6 +93,15 @@ tanım vs girildikten sonra masaüstünde ikon yaratılır. Dikkat masaüstü
 ikonları çift tıklama gerektirir, Ünity hızlı erişim barındakiler tek
 tıklama ile başlıyor.
 
+Android Dosya Transferi
+
+```
+sudo add-apt-repository "deb http://ppa.launchpad.net/samoilov-lex/aftl-stable/ubuntu artful main"
+Make sure to run a sudo apt update 
+sudo apt install android-file-transfer
+```
+
+
 
 
 Kaynaklar
