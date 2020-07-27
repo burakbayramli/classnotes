@@ -5,7 +5,7 @@ yıllarda başlayan ve C programlama diline yakın oluşuyla daha da
 yayılan bu sistem çekirdeksel olarak şu anda cep telefonlar dahil
 olmak üzere milyarlarca makina üzerinde işliyor.
 
-Surecler
+Süreçler
 
 Unix'i Unix yapan pek çok kavram var. Kullanıcıya pek gözükmeyen sahne
 arkasındaki programları denetleyen, işleten çekirdek seviyesinde
@@ -78,10 +78,88 @@ bash ekranına gidin, aynı komut boş sonuç verecektir.
 
 Her `bash` penceresinin başlangıç değerleri ana / ev (home) dizindeki
 `.bashrc` içinde set edilir. Dikkat, farklı kabuk kullananlar için bu
-başlangıç dosyası farklı olur, mesela `csh` için `.csh`.
+başlangıç dosyası farklı olur, mesela `csh` için `.csh`. Global
+ayarlar `.bashrc` den önce işletilen (bash icin) `/etc/profile`
+icindedir. Her kullanıcı başlangıçta yapılmasını istediği şeyleri
+kendi `.bashrc`'si içine koyabilir, admin her kullanıcı için
+işlemesini istediği şeyler varsa onları `/etc/profile` içine koyar.
 
 Ev dizini her kullanıcı için ana dizindir, `echo $HOME` ile ne
 olduğunu görebilirsiniz. Ubuntu'da bu benim icin `/home/burak` mesela.
+
+Program Baslatmak
+
+Kabuktan program baslattigimizda, mesela gunun tarihi veren `date`
+ile, satirda
+
+```
+$ date
+```
+
+dedik ve sonuc
+
+```
+Mon Jul 27 14:21:08 EEST 2020
+```
+
+geldi, bu komutu işlettiğimide arka planda birkaç şey oldu. `date`
+dedik ama hangi date? Bu programın işler kodunun olduğu dosya nerede?
+Soru cevabı `which date` ile alınabilir, cevap olarak `/bin/date`
+geldi bizde. Hakikaten orada bir `date` programı var,
+
+```
+$ ls -al /bin/date
+-rwxr-xr-x 1 root root 100568 Jan 18  2018 /bin/date
+```
+
+Pek cok "sistem komutu" `/bin/` altindadir bu arada.
+
+Ustteki `ls` sonucunun soldaki kismi kafa karistirmis olabilir,
+`-rwxr-xr-x` ne demek? Alttaki resimle anlatmaya ugrasalim,
+
+![](ls.png)
+
+En soldaki harf `d` ise baktığımız şey bir dizindir, `-` ise dosyadır.
+
+Dikkat edersek kullanıcı (user) harfleri üç tane, grup (group) üç
+tane, diğerleri (other) üç tane. Bu harf üçlüleri, sırasıyla, o an
+olduğumuz kullanıcı, dahil olduğumüz grup ve diğerlerinin bu dosya
+üzerindeki izinlerini gösterir.
+
+Hangi kullanıcı olduğumuzu `id` ile hemen bulabiliriz.
+
+Her harf öbeği `rwx` olabilir, tabii bu harflerden bazıları iptal
+olabilir, mesela `-w-` olabilir. Harfler sırasıyla okuma (read), yazma
+(write) ve işletme (execute) haklarını temsil eder. Yani üstteki
+`/bin/date` için gördüğümüz `-rwxr-xr-x` kullanıcı (dosyanın sahibi
+olan kişi) için `rwx` diyor, yani tüm hakları vermiş, ama grup için
+`r-x` demiş, yani grup için yazma hakkı vermemiş.
+
+Grup bu tür izinleri idare etmenin bir kolay yolu bir bakıma, her Unix
+kullanıcısı admin tarafından birden fazla gruba atanmış
+olabilir. Hangi gruba dahil olunduğunu her kullanıcı `groups` komutunu
+işleterek bulabilir. Grup atamaları `/etc/groups` dosyası içinde
+tutulur. Basit bir metin dosyasıdır, ama tabii ki herkes göremez,
+`sudo ls -al /etc/group` deyin,
+
+```
+-rw-r--r-- 1 root root 936 Jul 20 15:46 /etc/group
+```
+
+Dosya sahibi (admin) hariç başka kimsenin dosyaya yazma hakkı
+olmadığını görüyoruz.
+
+Pek çok şey kabuk etrafında döner dedik, program başlatmak bunlardan
+en önemlisi. Bir program ismini yazarak onu komut satırından
+başlatırız, ama o programı arka plana atarak ta işletebiliriz. Burada
+`&` işareti devreye girer, mesela `xclock` desem grafik saat programı
+başlar ama onu başlattığım komut satırının "bloklanmış" olduğunu
+görebilirim çünkü başlatan program başlatılanın bitmesini
+bekliyor. Programı üst sağ köşesindeki kapatma düğmesinden kapatırsam,
+ya da başlatan kabuktan Ctrl-C ile durdurursam, ya da `kill -9` ile, o
+zaman kabuğa geri dönüldüğünü görürüm. Eğer bu bloklamanın olmasını
+istemiyorsak, `xclock &` işletebiiriz, bu `xlock` programını arka
+plana atar, böylece ana kabukta hala başka komutlar işletebilir halde oluruz. 
 
 Referans
 
@@ -90,4 +168,7 @@ Referans
 [Ubuntu 18, Acer Swift](ubuntu-18-acer-swift.md)
 
 [htop](../../2012/12/htop.md)
+
+
+
 

@@ -39,7 +39,13 @@ Bilgisayarı başlatın bu sırada [F2] basılı tutun, BIOS'a girin
 
 [F10] [Enter] ile Save and Exit
 
-Tekrar baslayinca USB flash diskten yukleme yapilacak.
+Tekrar başlayınca USB flash diskten yükleme yapılacak.
+
+Kuruluş sırasında basit olduğu için 'önceki sistemi tamamen silme'
+seçeneğini tercih edin. Böylece bir önceki Windows silinecek ve sadece
+sistemde Ubuntu olacak.
+
+Kuruluş Sonrası
 
 Paketten çıkan masaüstü idarecisi (desktop manager) program Unity
 kullanışlı... Fakat iş alanı (workspace) ayarı biraz garip, diğer
