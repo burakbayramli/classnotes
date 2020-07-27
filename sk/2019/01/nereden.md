@@ -1,4 +1,4 @@
-# Nereden Baslarim - 2019
+# Nereden Başlarım - 2019
 
 Programcılığa giriş yapmak, ilerlemek isteyen arkadaşlar bu ise
 nereden başlayabilir? Site kurmak, şirketlerde bu işleri yapabilmek,

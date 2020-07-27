@@ -1,78 +1,106 @@
-# Faydali Unix Komutlari
+# Faydalı Unix Komutları
 
+Hangi süreç (process) port 8080'i dinliyor?
 
-Faydali Unix Komutlari
-
-
-
-
-Hangi surec (process) port 8080'i dinliyor?
-
+```
 netstat -n --tcp -p -l |grep ":8080"
+```
 
 Sadece bastaki satiri gostermek
 
+```
 head -1 [DOSYA]
+```
 
 Bir dosyanin son N satirini atlamak / gostermemek (silme amacli olabillir), mesela son iki satir icin 
 
+```
 head -n-2 [DOSYA]
+```
 
 Bir dosyanin ilk satirini atlamak icin
 
+```
 tail -n+2 [DOSYA]
+```
 
-Bir komut ciktisini text olarak baska bir komut icine gommek
+Bir komut çıktısını text olarak başka bir komut içine gömmek
 
 `` kullanilir. Mesela  
 
+```
 echo "b.txt" > a.txt
 echo "filan" > b.txt
 echo "falan" >> b.txt
+```
 
-Yani a.txt icinde b.txt yaziyor, simdi 
+Yani `a.txt` içinde `b.txt` yazıyor, şimdi 
 
+```
 wc -l `cat a.txt`
+```
 
-dersek, a.txt icindeki b.txt arguman olarak wc'ye verilecek. Ve
+dersek, `a.txt` icindeki `b.txt` arguman olarak `wc`'ye verilecek. Ve
 
+```
 2 b.txt
+```
 
-sonucu gelecek. Yani burada a.txt degil onun icindeki b.txt wc'ye gecildi.
+sonucu gelecek. Yani burada `a.txt` degil onun icindeki `b.txt` `wc`'ye gecildi.
 
-Eger bir Unix script'inizin .bashrc icinde tanimladiginiz alias (kisayollari) kullanmasini istiyorsaniz, bu script'i soyle isletmeniz gerekir:
+Eğer bir Ünix script'inizin `.başhrç` içinde tanımladığınız alias
+(kısayolları) kullanmasını istiyorsanız, bu script'i şöyle işletmeniz
+gerekir:
 
+```
 bash -i [script]
+```
 
-Emacs icin benzer durum, M-x compile mesela alias'lari gormuyor. Onun icin
+Emacs icin benzer durum, `M-x compile` alias'lari gormuyor. Onun icin
 
+```
 (setq shell-file-name "bash")
 (setq shell-command-switch "-ic")
+```
 
-tanimlamak lazim.
+tanımlamak lazım.
 
-Sonsuz kere bir komutu isletmek icin, mesela surec listesini surekli gostermek
+Sonsuz kere bir komutu işletmek için, mesela süreç listesini sürekli
+göstermek
 
+```
 while true; do ps -eaf; sleep 2; done
+```
 
-Belli satirlar arasindaki satirlari cekip cikartmak, mesela 10 ile 20
+Belli satırlar arasındaki satırları çekip çıkartmak, mesela 10 ile 20
 
+```
 sed -n 10,20p [DOSYA]
+```
 
-Rasgele satirlar cekip cikarmak (.005 bir oran, daha fazla satir icin bu sayi arttirilabilir)
+Rasgele satırlar çekip çıkarmak (.005 bir oran, daha fazla satır için
+bu sayı arttırılabilir)
 
+```
 cat [DOSYA] | perl -n -e 'print if (rand() < .005)'
+```
 
-Dosya icinde metin aramak (/usr seviyesinden asagi dogru inerek, tum altdizinlerde, xml soneki tasiyan dosyalarda)
+Dosya içinde metin aramak (`/usr` seviyesinden aşağı doğru inerek, tüm
+altdızinlerde, xml soneki taşıyan dosyalarda)
 
+```
 find /usr -name '*.xml' -exec grep -l 'filan' {} \;
+```
 
-Dosya icinde kelime degistirmek (xml sonekli dosyalarda, altdizinlere girmez)
+Dosya içinde kelime değiştirmek (xml sonekli dosyalarda, altdizinlere girmez)
 
+```
 perl -pi -e 's/filan/falan/sg' *.xml
+```
 
-Usttekinden daha iyisi replace.py diye ufak bir Python script yazmak,
+Üsttekinden daha iyisi `replace.py` diye ufak bir Python script yazmak,
 
+```python
 import os, re, sys
 filename = sys.argv[1]
 content = open(filename).read()
@@ -81,39 +109,64 @@ fout = open(filename,"w")
 content = content.replace("burak","bayramli")
 fout.write(content)
 fout.close()
+```
 
+Üstteki script'i `python replace.py [dosya]` şeklinde çağırabiliriz. Bu
+tek dosya üzerinde değişim yapar. Eldeki content üzerinde her türlü
+regex, vs. bazlı işlemleri yapabiliriz. Hatta gerekirse başa, sona
+istediğimiz metni ekleyebiliriz.
 
-Ustteki script'i python replace.py [dosya] seklinde cagirabiliriz. Bu tek dosya uzerinde degisim yapar. Eldeki content uzerinde her turlu regex, vs. bazli islemleri yapabiliriz. Hatta gerekirse basa, sona istedigimiz metni ekleyebiliriz.
+Eğer birçok dosya üzerinde üstteki değişimi yapmak istersek,
 
-Eger bircok dosya uzerinde ustteki degisimi yapmak istersek,
-
+```
 find .-type f -name "*" -exec python replace.py {} \;
+```
 
-Dosyayi kullanan program hangisi
+Dosyayı kullanan program hangisi
 
 lsof [DOSYA]
 
-Bir dizinden başlayarak özyineli (recursive) olarak o dizin altındaki en büyük dosyaları listelemek için
+Bir dizinden başlayarak özyineli (recursive) olarak o dizin altındaki
+en büyük dosyaları listelemek için
 
-du -h | sort -hr | head -20  
+```
+du -h | sort -hr | head -20
+```
 
 Bir makinadaki tüm donanımları listele (Ubuntu)
 
-
+```
 lspci
-Harici sabit diskte bazı dizinlerimin yedeğini tutuyoruz, ve iki yerel dizini senkronize etmek için
+```
 
+Harici sabit diskte bazı dizinlerimin yedeğini tutuyoruz, ve iki yerel
+dizini senkronize etmek için
+
+```
 rsync --delete -r /tmp/dira/ /tmp/dirb
+```
 
-Ustteki rsync komutu kaynak dizini "belirleyici (master)" olarak kabul edecektir, ve /tmp/dira icinde olan her sey, yeni dosya, mevcutun silinmesi, ekleme islemi aynen /tmp/dirb'ye yansitilacaktir. Not: Eger /tmp/dirb FAT32, NTFS gibi Windows temelli bir dosya sistemi ise azar azar guncelleme ise yaramaz, tum dosyalar her seferinde tekrar silbastan yollanir. Bunun sebebi Win temelli dosya sistemlerinin dosya sahibi, erisim haklari gibi bilgileri -Unix ile uyumlu- tutmuyor olmasidir. 
+Üstteki rsynç komutu kaynak dizini "belirleyici (master)" olarak kabul
+edecektir, ve /tmp/dira içinde olan her şey, yeni dosya, mevcutun
+silinmesi, ekleme işlemi aynen /tmp/dirb'ye yansıtılacaktır. Not: Eğer
+/tmp/dirb FAT32, NTFS gibi Windows temelli bir dosya sistemi ise azar
+azar güncelleme ise yaramaz, tüm dosyalar her seferinde tekrar
+silbaştan yollanır. Bunun sebebi Win temelli dosya sistemlerinin dosya
+sahibi, erişim hakları gibi bilgileri -Unix ile uyumlu- tutmuyor
+olmasıdır.
 
-Bir dosya içinde mesela her "dropbox" kelimesinden önce gelen 700 karakteri göster
+Bir dosya içinde mesela her "dropbox" kelimesinden önce gelen 700
+karakteri göster
 
+```
 grep -E -o ".{700}dropbox" dosya.txt
+```
 
 Programın sonuçlarını hem ekrana basmak aynı anda bir log dosyasına yazmak
 
+```
 sh script.sh  2>&1 | tee out.log
+```
 
 
 
