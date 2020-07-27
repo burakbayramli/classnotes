@@ -66,27 +66,8 @@ ls -al out.txt
 -rwxrwxr-- 1 burak burak 10 Jul 27 23:36 out.txt
 ```
 
-Usta adminler üstteki sayıları kullanırlar, çok kullanılan çoğunu
+Usta adminler üstteki sayıları kullanırlar, sık kullanılan çoğunu da
 ezbere bilirler, ya da kafadan ikisel / onlu tercüme yaparlar.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
