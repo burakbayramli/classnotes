@@ -6,23 +6,38 @@ yüklenebilir.
 
 ![](acerswift.jpg)
 
+Ubuntu İmaj
+
+Sistemi kurabilmek için bir USB flash disk üzerine onu "yakmak" lazım.
+
+https://releases.ubuntu.com/18.04/
+
+adresinden `ubuntu-18.04.4-desktop-amd64.iso.torrent` dosyasını
+indirdim, ve Torrent ile imajı aldım. Yakma işlemi için
+
+https://help.ubuntu.com/community/BurningIsoHowto
+
+adresine danıştık, benim bir önceki sistemim de Ubuntu olduğu için
+Startup Disk Creator programını başlattık, oradan indirilen iso, ve
+hedef olarak USB dışkı seçtik ve yakma işlemini gerçekleştirdik. 
+
 BIOS
 
-Bir USB flash diskten yukleme yapmak icin Bios hazirlanmali,
+Bir USB flash diskten yükleme yapmak için Bios hazırlanmalı,
 
-Once bilgisayari tamamen kapatin, guc dugmesini 5+ saniye basili tutun
+Önce bilgisayarı tamamen kapatın, güç düğmesini 5+ saniye basılı tutun
 
-Bilgisayari baslatin bu sirada <F2> basili tutun, BIOS'a girin
+Bilgisayarı başlatın bu sırada [F2] basılı tutun, BIOS'a girin
 
-<Sag> <Sag> <Sag> ok tusu ile "Security" tab'ine gidin
+[Sag] [Sag] [Sag] ok tusu ile "Security" tab'ine gidin
 
-<Enter>'e basin supervisor password girisi yapin
+[Enter]'e basin supervisor password girisi yapin
 
-<Sag> ile Boot tab'ine
+[Sag] ile Boot tab'ine
 
-<Enter> <Asagi> <Enter> ile 'disable Secure Boot' secin
+[Enter] [Asagi] [Enter] ile 'disable Secure Boot' secin
 
-<F10> <Enter> ile Save and Exit
+[F10] [Enter] ile Save and Exit
 
 Tekrar baslayinca USB flash diskten yukleme yapilacak.
 
@@ -112,7 +127,7 @@ gnome-desktop-item-edit --create-new ~/Desktop
 işletiriz. Bu bize bir diyalog kutusu getiriyor, orada işler kod için
 mutlak ismi verilir, `/bin/bash /home/user/vs/vs/script.sh` gibi,
 tanım vs girildikten sonra masaüstünde ikon yaratılır. Dikkat masaüstü
-ikonları çift tıklama gerektirir, Ünity hızlı erişim barındakiler tek
+ikonları çift tıklama gerektirir, Unity hızlı erişim barındakiler tek
 tıklama ile başlıyor.
 
 Android Dosya Transferi
@@ -122,8 +137,6 @@ sudo add-apt-repository "deb http://ppa.launchpad.net/samoilov-lex/aftl-stable/u
 Make sure to run a sudo apt update 
 sudo apt install android-file-transfer
 ```
-
-
 
 
 Kaynaklar
