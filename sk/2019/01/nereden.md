@@ -8,17 +8,18 @@ nereden yapılabilir?
 Önce Python dili. Hem servis tarafında, hem GUİ kodlamasına, hem
 bilimsel hesaplarda bu dil artık her yerde. 
 
-[Link](http://sayilarvekuramlar.blogspot.com/2016/01/python-dil-ogrenimi.html)
+[Link](../../2016/01/python-dil-ogrenimi.md)
 
-Program işletmek (birazdan gorulecek), Flask, SQL, bunlar hep komut
-satırında yapılacak şeyler. Unix öğrenilmeli, dizüstü, masaüstü
-bilgisayarında Ubuntu (Unix) kurulabilir. Unix'in bir sürü komut
-satırı yardımcı programı var, bunlar nasıl işletilir,
-öğrenilmeli. Unix'e girilince kullanici hesabimiz vardir, bu
-kullanicinin ayarlari nasil yapilir, kullanici izinleri, dosyalar,
-dizinler, komut satirindan bunlari gezmek, `find` ile bulmak, `grep`
-ile icerik aramak, text dosyalarina veri eklemek, `cat` ile gosterip
-`>>` ile ekleme yapabilmek, vs.
+Program işletmek, Flask, SQL, bunlar hep komut satırında yapılacak
+şeyler. Unix öğrenilmeli, dizüstü, masaüstü bilgisayarında Ubuntu
+(Unix) kurulabilir. Unix'in bir sürü komut satırı yardımcı programı
+var, bunlar nasıl işletilir, öğrenilmeli. Unix'e girilince kullanici
+hesabimiz vardir, bu kullanicinin ayarlari nasil yapilir, kullanici
+izinleri, dosyalar, dizinler, komut satirindan bunlari gezmek, `find`
+ile bulmak, `grep` ile icerik aramak, text dosyalarina veri eklemek,
+`cat` ile gosterip `>>` ile ekleme yapabilmek, vs.
+
+[Link](../../2020/07/unix.md)
 
 Unix ve Python dili öğrenilince ardından servis tarafı kodlamalarına
 bir dalış, mesela Flask üzerinden sayfa servis edebilmek. Bu arada
@@ -27,14 +28,14 @@ yazılıp neye benzediği görülebilir, ardından Flask ile servis
 tarafında içi veri tabanından gelen verilerle nasıl doldurulup servis
 edilir, bu öğrenilir.
 
-[Link](http://sayilarvekuramlar.blogspot.com/2016/09/flask-ile-dinamik-web-sayfalari.md)
+[Link](../../2016/09/flask-ile-dinamik-web-sayfalari.md)
 
 Veri tabanı için python içinden sqlite3 ile başlanır, bu taban
 verisini tek bir dosya içinde tutan, hızlı basit bir taban. Veriye
 erişim dili SQL bu sırada öğrenilir. Sonra daha büyük işler için
 Postgreql'e geçilebilir.
 
-[Link](http://sayilarvekuramlar.blogspot.com/2018/03/basit-sekilde-hzl-diske-deger-yazma.md)
+[Link](../../2018/03/basit-sekilde-hzl-diske-deger-yazma.md)
 
 Flask ile sayfa servis edince APİ servisi nasıl olur, buraya giriş
 yapılabilir. Flask'te ufak birkaç değişim sonrası bir metottan JSON
@@ -48,7 +49,7 @@ işlemler bir başlar, sürekli ayaktadır, veri varsa hemen işler, işi
 bitince bekleme döngüsüne girebilir, çökerse kaldığı yerden devam
 edebilmelidir. Bunlar bilinmeli.
 
-[Link](http://sayilarvekuramlar.blogspot.com/2016/02/toptan-islemler-paralelizasyon-tekrar_18.html)
+[Link](../../2016/02/toptan-islemler-paralelizasyon-tekrar_18.md)
 
 Bizim video'lar
 
@@ -57,7 +58,7 @@ Bizim video'lar
 Eğer veri bilimi (data science) konusuna girmek isteyenler olursa, bu
 farklı bir gidiş yolu, ama üsttekiler hala faydalı. Bu durumda
 
-[Link](http://sayilarvekuramlar.blogspot.com/2015/12/bilgisayar-bilim-yapay-zeka.html)
+[Link](https://burakbayramli.github.io/dersblog/algs)
 
 
 
