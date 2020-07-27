@@ -33,7 +33,7 @@ Süreç listesini daha renkli olarak htop komutu ile görebiliriz (bağlantı al
 
 Komut Satırı, Kabuk
 
-Ünix'te pek çok şey komut satırı etrafında döner, en azından usta
+Unix'te çoğu işlem komut satırı etrafında döner, en azından usta
 admin, kullanıcılar onu tercih eder. Programları başlatmak, idare
 etmek, gözetlemek için tercih edilir, script yazabilme ve onları
 işletebilme açısından komut satırı hep faydalı olmuştur. Görsel
@@ -67,30 +67,30 @@ deyince
 /bin/bash
 ```
 
-cevabı alıyorum. 
+cevabı alıyorum. Kabuk tipi orada tanımlı. Bu arada `SHELL` bir çevre
+değişkeni (environment variable), bir anlamda içinde olduğumüz sürecin
+"çevresini" tanımlıyor, bu açıdan uygun isim. Çevre değişkenleri her
+kabuk için farklı olabilir, birinden set ettiğimiz değişkeni
+diğerinden göremeyebiliriz, `ALI=veli` deyin, `echo $ALI` bir `veli`
+sonucunu verir, bir diğer bash ekranına gidin, aynı komut boş sonuç
+verecektir.
 
-Bu arada `SHELL` bir çevre değişkeni (environment variable), bir
-anlamda içinde olduğumüz sürecin "çevresini" tanımlıyor, bu açıdan
-uygun isim. Çevre değişkenleri her kabuk için farklı olabilir,
-birinden set ettiğimiz değişkeni diğerinden göremeyebiliriz,
-`ALI=veli` deyin, `echo $ALI` bir `veli` sonucunu verir, bir diğer
-bash ekranına gidin, aynı komut boş sonuç verecektir.
-
-Her `bash` penceresinin başlangıç değerleri ana / ev (home) dizindeki
-`.bashrc` içinde set edilir. Dikkat, farklı kabuk kullananlar için bu
-başlangıç dosyası farklı olur, mesela `csh` için `.csh`. Global
-ayarlar `.bashrc` den önce işletilen (bash icin) `/etc/profile`
-icindedir. Her kullanıcı başlangıçta yapılmasını istediği şeyleri
-kendi `.bashrc`'si içine koyabilir, admin her kullanıcı için
-işlemesini istediği şeyler varsa onları `/etc/profile` içine koyar.
+Her `bash` penceresinin başlangıç değerleri her kullanıcı için ana /
+ev (home) dizindeki `.bashrc` içinde set edilir. Dikkat, farklı kabuk
+kullananlar için bu başlangıç dosyası farklı olur, mesela `csh` için
+`.csh`. Global ayarlar `.bashrc` den önce işletilen (bash icin)
+`/etc/profile` icindedir. Her kullanıcı başlangıçta yapılmasını
+istediği şeyleri kendi `.bashrc`'si içine koyabilir, admin her
+kullanıcı için işlemesini istediği şeyler varsa onları `/etc/profile`
+içine koyar.
 
 Ev dizini her kullanıcı için ana dizindir, `echo $HOME` ile ne
 olduğunu görebilirsiniz. Ubuntu'da bu benim icin `/home/burak` mesela.
 
 Program Baslatmak
 
-Kabuktan program baslattigimizda, mesela gunun tarihi veren `date`
-ile, satirda
+Kabuktan program başlattığımızda, mesela günün tarihi veren `date`
+ile, satırda
 
 ```
 $ date
@@ -112,7 +112,23 @@ $ ls -al /bin/date
 -rwxr-xr-x 1 root root 100568 Jan 18  2018 /bin/date
 ```
 
-Pek cok "sistem komutu" `/bin/` altindadir bu arada.
+Pek çok "sistem komutu" `/bin/` altındadır bu arada. Peki sadece
+`date` deyince sistem `/bin/date` işletmesini gerektiğini nasıl bildi?
+Burada `PATH` kavramı var, kabuk çevre değişkenleri içinde `PATH` adlı
+dizin listesi program işletince nerelere bakılması gerektiğini tanımlar,
+
+```
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin...
+```
+
+Görüldüğü gibi `/bin` dizini listede (sonda), ve `bash` işletilmesi
+istenen programı arayıp bu son dizinde buldu.
+
+Eğer karışıklığı meydan bırakmayacak şekilde bir programı direk
+işletmek istersek bunu komut satırında `/bin/date` yazarak
+yapabilirdik. Hatta script yazarken tavsiye edilen yaklaşım budur. 
+
 
 Ustteki `ls` sonucunun soldaki kismi kafa karistirmis olabilir,
 `-rwxr-xr-x` ne demek? Alttaki resimle anlatmaya ugrasalim,
