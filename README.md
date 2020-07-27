@@ -43,47 +43,47 @@ Calculus gerekiyor mu bilmiyorum, benim zamanımda gerekiyordu).
 
 Lineer Cebir (Linear Algebra)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/lineer-cebir-linear-algebra.html
+https://burakbayramli.github.io/dersblog/linear
 
 Diferansiyel Denklemler (Ordinary Differential Equations)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/diferansiyel-denklemler.html
+https://burakbayramli.github.io/dersblog/ode
 
 Çok Değişkenli Calculus (Multivariable Calculus)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/cok-degiskenli-calculus-multivariable.html
+https://burakbayramli.github.io/dersblog/calc_multi
 
 Hesapsal Bilim (Computational Science)
 
-http://sayilarvekuramlar.blogspot.co.uk/2015/12/hesapsal-bilim-computational-science.html
+https://burakbayramli.github.io/dersblog/compscieng
 
 İstatistik, Yapay Öğrenim, Veri Analizi (Statistics, Machine Learning, Data Analysis)
 
-http://sayilarvekuramlar.blogspot.co.uk/2015/12/istatistik-ve-veri-analizi.html
+https://burakbayramli.github.io/dersblog/stat
 
 Zaman Serileri ve Finans (Time Series and Finance)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/zaman-serileri-ve-finans.html
+https://burakbayramli.github.io/dersblog/tser
 
 Kısmi Diferansiyel Denklemler (Partial Differential Equations)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/kismi-diferansiyel-denklemler-partial.html
+https://burakbayramli.github.io/dersblog/pde
 
 Fonksiyonel Analiz (Functional Analysis)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/fonsiyonel-analiz-functional-analysis.html
+https://burakbayramli.github.io/dersblog/func_analysis
 
-Yapay Zeka, Çetrefillik (AI, Computational Complexity)
+Bilgisayar Bilim, Yapay Zeka (Computer Science, AI)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/bilgisayar-bilim-yapay-zeka.html
+https://burakbayramli.github.io/dersblog/algs/index.html
 
 Gayri Lineer Dinamik ve Kaos (Non-Linear Dynamics and Chaos)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/gayr-lineer-dinamik-ve-kaos-chaos-non.html
+https://burakbayramli.github.io/dersblog/chaos
 
-Çoklu Bakış Açı Geometrisi (Multiple View Geometry)
+Yapay Görüş (Computer Vision)
 
-http://sayilarvekuramlar.blogspot.com/2015/12/coklu-baks-ac-geometrisi-multiple-view.html
+https://burakbayramli.github.io/dersblog/vision
 
 İçeriğe ek yapmak isteyenler [için](CONTRIBUTING.md).
 
