@@ -4,6 +4,28 @@ Acer 400 dollar'dan daha az fiyatlı sağlam makina. 4 cekirdekli, 128
 GB SSD (solid state disk). Ubuntu kurmak için USB diskten
 yüklenebilir.
 
+![](acerswift.jpg)
+
+BIOS
+
+Bir USB flash diskten yukleme yapmak icin Bios hazirlanmali,
+
+Once bilgisayari tamamen kapatin, guc dugmesini 5+ saniye basili tutun
+
+Bilgisayari baslatin bu sirada <F2> basili tutun, BIOS'a girin
+
+<Sag> <Sag> <Sag> ok tusu ile "Security" tab'ine gidin
+
+<Enter>'e basin supervisor password girisi yapin
+
+<Sag> ile Boot tab'ine
+
+<Enter> <Asagi> <Enter> ile 'disable Secure Boot' secin
+
+<F10> <Enter> ile Save and Exit
+
+Tekrar baslayinca USB flash diskten yukleme yapilacak.
+
 Paketten çıkan masaüstü idarecisi (desktop manager) program Unity
 kullanışlı... Fakat iş alanı (workspace) ayarı biraz garip, diğer
 alanlara program yollanabiliyor, işleyen programlar listesinden diğer
@@ -110,4 +132,4 @@ Kaynaklar
 
 [2] [AskUbuntu](https://askubuntu.com/questions/64222/how-can-i-create-launchers-on-my-desktop)
 
-
+[3] [Ubuntu 18.04 on Acer Swift SF114-32](http://michaelb.org/ubuntu-18-04-on-acer-swift/)
