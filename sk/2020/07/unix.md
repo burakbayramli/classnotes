@@ -26,7 +26,7 @@ root     17133     2  0 11:54 ?        00:00:01 [kworker/u8:2+ev]
 ```
 
 listesi var. Hakikaten şu anda Emacs içindeyim, arka planda Firefox
-işliyor, vs. Bunların hepsi görülüyor. Bu surecler yokedilebilir, vs.,
+işliyor, vs. Bunların hepsi görülüyor. Bu süreçler yokedilebilir, vs.,
 bkz [Faydalı Unix Komutları](../../2012/04/faydali-unix-komutlari.md).
 
 Süreç listesini daha renkli olarak htop komutu ile görebiliriz (bağlantı altta). 
@@ -58,7 +58,6 @@ vs. Terminale gidip
 
 ```
 echo $SHELL
-
 ```
 
 deyince
@@ -68,7 +67,7 @@ deyince
 ```
 
 cevabı alıyorum. Kabuk tipi orada tanımlı. Bu arada `SHELL` bir çevre
-değişkeni (environment variable), bir anlamda içinde olduğumüz sürecin
+değişkeni (environment variable), bir anlamda içinde olduğumuz sürecin
 "çevresini" tanımlıyor, bu açıdan uygun isim. Çevre değişkenleri her
 kabuk için farklı olabilir, birinden set ettiğimiz değişkeni
 diğerinden göremeyebiliriz, `ALI=veli` deyin, `echo $ALI` bir `veli`
@@ -78,16 +77,18 @@ verecektir.
 Her `bash` penceresinin başlangıç değerleri her kullanıcı için ana /
 ev (home) dizindeki `.bashrc` içinde set edilir. Dikkat, farklı kabuk
 kullananlar için bu başlangıç dosyası farklı olur, mesela `csh` için
-`.csh`. Global ayarlar `.bashrc` den önce işletilen (bash icin)
-`/etc/profile` icindedir. Her kullanıcı başlangıçta yapılmasını
-istediği şeyleri kendi `.bashrc`'si içine koyabilir, admin her
-kullanıcı için işlemesini istediği şeyler varsa onları `/etc/profile`
-içine koyar.
+`.csh`.
+
+Global ayarlar `.bashrc` den önce işletilen (bash icin) `/etc/profile`
+icindedir. Her kullanıcı başlangıçta yapılmasını istediği şeyleri
+kendi `.bashrc`'si içine koyabilir, admin her kullanıcı için
+işlemesini istediği şeyler varsa onları `/etc/profile` içine koyar.
 
 Ev dizini her kullanıcı için ana dizindir, `echo $HOME` ile ne
-olduğunu görebilirsiniz. Ubuntu'da bu benim icin `/home/burak` mesela.
+olduğunu görebilirsiniz, tek `cd` komutu çoğu kabukta otomatik olarak
+sizi ev dizine götürür. Ubuntu'da bu benim icin `/home/burak` mesela.
 
-Program Baslatmak
+Program Başlatmak
 
 Kabuktan program başlattığımızda, mesela günün tarihi veren `date`
 ile, satırda
@@ -96,13 +97,13 @@ ile, satırda
 $ date
 ```
 
-dedik ve sonuc
+dedik ve sonuç
 
 ```
 Mon Jul 27 14:21:08 EEST 2020
 ```
 
-geldi, bu komutu işlettiğimide arka planda birkaç şey oldu. `date`
+geldi, bu komutu işlettiğimizde arka planda birkaç şey oldu. `date`
 dedik ama hangi date? Bu programın işler kodunun olduğu dosya nerede?
 Soru cevabı `which date` ile alınabilir, cevap olarak `/bin/date`
 geldi bizde. Hakikaten orada bir `date` programı var,
@@ -165,6 +166,8 @@ tutulur. Basit bir metin dosyasıdır, ama tabii ki herkes göremez,
 Dosya sahibi (admin) hariç başka kimsenin dosyaya yazma hakkı
 olmadığını görüyoruz.
 
+Izinleri değiştirmek icin [chmod](chmod.md) kullanılır.
+
 Pek çok şey kabuk etrafında döner dedik, program başlatmak bunlardan
 en önemlisi. Bir program ismini yazarak onu komut satırından
 başlatırız, ama o programı arka plana atarak ta işletebiliriz. Burada
@@ -186,3 +189,5 @@ Referans
 [Ubuntu 18, Acer Swift](ubuntu-18-acer-swift.md)
 
 [htop](../../2012/12/htop.md)
+
+
