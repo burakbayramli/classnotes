@@ -1,5 +1,20 @@
 # Faydalı Unix Komutları
 
+Süreçleri listelemek,
+
+```
+ps -eaf
+```
+
+Listedeki ikinci kolon süreç kimliği (PİD). Onu alıp
+
+```
+kill -9 [PID]
+```
+
+ile sureci yokedebiliriz.
+
+
 Hangi süreç (process) port 8080'i dinliyor?
 
 ```
