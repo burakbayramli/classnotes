@@ -31,19 +31,28 @@ bkz [Faydalı Unix Komutları](../../2012/04/faydali-unix-komutlari.md).
 
 Komut Satırı, Kabuk
 
-Unix'te pek çok şey komut satırı etrafında döner, en azından usta
-admin, kullanıcılar onu tercih eder. Komut satırını başlattığımızda,
-mesela Ubuntu Linux'ta Terminal programı ile, bir süreç
-başlatılmıştır, ve bu süreç bir işler programın çağrılması ile
-olmuştur. Başlatıyorum ve süreç listesine bakıyorum,
+Ünix'te pek çok şey komut satırı etrafında döner, en azından usta
+admin, kullanıcılar onu tercih eder. Programları başlatmak, idare
+etmek, gözetlemek için tercih edilir, script yazabilme ve onları
+işletebilme açısından komut satırı hep faydalı olmuştur. Görsel
+tıklamayı hatırlamak yerine istenen aksiyonu temsil eden birkaç harfi
+hatırlamak ve klavyede yazmak her zaman daha hızlıdır, bu açıdan 'bir
+resim bin kelimeye bedeldir' sözü Ünix'te tepetaklak olmuştur, 'birkaç
+harf bin resme bedeldir' demek daha doğru olur.
+
+Komut satırını başlattığımızda, mesela Ubuntu Linux'ta Terminal
+programı ile, bir süreç başlatılmıştır, ve bu süreç bir işler
+programın çağrılması ile olmuştur. Komut satırı başlatıyorum ve süreç
+listesine bakıyorum,
 
 ```
 burak    14899 14890  0 11:20 pts/0    00:00:00 bash
 ```
 
 görülüyor. Komut satırı "programı" bu işte. Tabii komut satırları tek
-tip değil, pek çok farklı program var, üstteki `bash`, ama `sh` var,
-`tsch` var, vs. Terminale gidip
+tip değil, pek çok farklı program var, üstteki `bash`, ona has
+özellikleri var, ama `sh` de var, ya da `tsch` var, vs. Terminale
+gidip
 
 ```
 echo $SHELL
@@ -64,4 +73,6 @@ cevabi aliyorum.
 Referans
 
 [Faydalı Unix Komutları](../../2012/04/faydali-unix-komutlari.md)
+
+[Ubuntu 18, Acer Swift](ubuntu-18-acer-swift.md)
 
