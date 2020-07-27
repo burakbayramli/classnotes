@@ -27,6 +27,8 @@
 
 [Teknik Terimler Sozlugu](https://burakbayramli.github.io/dersblog/algs/dict/teknik_terimler_sozlugu.html)
 
+[Nereden Başlarım](2019/01/nereden.md)
+
 ## Arşiv
 
 [Sene](year.md)
