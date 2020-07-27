@@ -8,7 +8,7 @@
 
 [Go Oyunu, GnuGo](02/go-gnugo.md)
 
-[Basit, Hızlı Diske Değer Yazma Okuma](03/basit-sekilde-hzl-diske-deger-yazma.md)
+[sqlite, Basit, Hızlı Diske Değer Yazma Okuma](03/sqlite-basit-sekilde-hzl-diske-deger-yazma.md)
 
 [Veri Taban İçeriğini Gezmek](03/veri-taban-icerigini-gezmek.md)
 

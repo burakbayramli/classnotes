@@ -14,15 +14,11 @@
 
 [TunesViewer, iTunesU](02/tunesviewer-itunesu.md)
 
-[Almanya'da Calisma Vizesi - Gecici](03/almanyada-calisma-vizesi.md)
-
 [Bulut](03/bulut.md)
 
 [Iklim Verisi](03/iklim-verisi.md)
 
 [Milyonluk Satirlari Birlestirmek](03/milyonluk-satirlari-birlestirmek.md)
-
-[Pentaho](03/pentaho.md)
 
 [PostgreSql](03/postgresql.md)
 
@@ -40,7 +36,7 @@
 
 [Clicktale](04/clicktale.md)
 
-[Faydali Unix Komutlari](04/faydali-unix-komutlari.md)
+[FaydalÄ± Unix KomutlarÄ±](04/faydali-unix-komutlari.md)
 
 [Meta, Sema ve Postgresql](04/meta-sema-ve-postgresql.md)
 
@@ -55,16 +51,6 @@
 [OpenCV Ubuntu](04/opencv-ubuntu.md)
 
 [Pandas ile Birlesim (Join)](04/pandas-ile-birlesim-join.md)
-
-[Pentaho Community Server ve Raporlama](04/pentaho-community-server-ve-raporlama.md)
-
-[Pentaho Community ve Ticari Urun Farklari](04/pentaho-community-ve-ticari-urun.md)
-
-[Pentaho ile Ambar Tasarimi](04/pentaho-ile-ambar-tasarimi.md)
-
-[Pentaho ile Pivotlama (Crosstabs)](04/pentaho-ile-pivotlama-crosstabs.md)
-
-[Pentaho ve Rapor Sonuclarini Zamanli Olarak Email ile Postalama](04/pentaho-ve-raport-sonuclarini-zamanli.md)
 
 [plpython](04/plpython.md)
 
@@ -112,9 +98,9 @@
 
 [PyMC](06/pymc.md)
 
-[Python ile API Bazli Postgresql Erisimi](06/python-ile-api-bazli-postgresql-erisimi.md)
+[pyscopg2, Python ile API Bazli Postgresql Erisimi](06/python-ile-api-bazli-postgresql-erisimi.md)
 
-[Python ile Mail Göndermek, SMTP, GMail](06/python-ile-mail-gondermek-smtp-gmail.md)
+[Python ile Mail GÃ¶ndermek, SMTP, GMail](06/python-ile-mail-gondermek-smtp-gmail.md)
 
 [Python Ile Mail - Metin Eklentileri (Text Attachment)](06/python-ile-mail-metin-eklentileri-text.md)
 
