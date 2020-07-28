@@ -1,6 +1,7 @@
 # SQL
 
 
+![](chinook_er.jpeg)
 
 
 
@@ -19,6 +20,10 @@ Referans
 https://github.com/Olamiotan/PythonStarter
 
 https://database.guide/2-sample-databases-sqlite/
+
+https://data-xtractor.com/knowledgebase/chinook-database-sample/
+
+https://github.com/KAPrueved/Chinook-SQL-Exercise
 
 
 
