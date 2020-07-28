@@ -1,5 +1,47 @@
 # SQL
 
+```python
+import sqlite3
+DB = '/tmp/chinook.db'
+def runsql(sql):
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    rows = c.execute(sql)
+    for row in rows: print (row)
+    conn.close()
+```
+
+
+Hangi ulkenin musteri en cok odeme yapti? (Chinook-SQL-Exercise/top_country.sql)
+
+
+```python
+sql = """
+SELECT "Country", MAX("Total Sales For Country") as "Total Spent"
+FROM 
+  (SELECT BillingCountry as "Country" , SUM(Total) as "Total Sales For Country"
+FROM Invoice 
+GROUP BY BillingCountry);
+"""
+
+```
+
+```text
+('USA', 523.0600000000003)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ![](chinook_er.jpeg)
 
