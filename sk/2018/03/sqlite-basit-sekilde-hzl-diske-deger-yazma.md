@@ -119,11 +119,9 @@ for row in rows: print (row)
 
 Chinook Tabani
 
-Ornek bir taban olarak Chinook tabani var. 
-
-[Chinook_Sqlite.zip](Chinook_Sqlite.zip) dosyasını açın, ve
-[load_chinook.py](load_chinook.py) dosyasını işletin bu yüklemeyi
-yapacaktır.
+Orta ölçekte bir veri tabanı örneği olarak Chinook tabanı var. [Chinook_Sqlite.zip](Chinook_Sqlite.zip)
+dosyasını açın, ve [load_chinook.py](load_chinook.py) dosyasını işletince
+bu yüklemeyi yapılacaktır.
 
 GUI
 
