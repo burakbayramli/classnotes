@@ -1,7 +1,7 @@
 # SQL
 
-SQL ilişkisel tabanları sorgulamak için kullanılır. Iliskisel model,
-ve giris bilgileri [1]'de bulunabilir.
+SQL ilişkisel tabanları sorgulamak için kullanılır. İlişkisel model,
+ve giriş bilgileri [1]'de bulunabilir.
 
 Chinook
 
@@ -88,12 +88,12 @@ Out[1]:
 4  Johnson  Sales Support Agent
 ```
 
-Sarkilar, Turler 
+Şarkılar, Türler 
 
 Basit bir birleştirim (join) ile başlayalım. Tüm şarkılar `Track`
 tablosunda, o şarkının hangi türe ait olduğu `Genre`
-tablosunda. Aradaki bağlantı `Track` üzerinde durak bir yabancı
-anahtar, `GenreId`. O zaman her şarkının ait olduğu tur için `GenreId`
+tablosunda. Aradaki bağlantı `Track` üzerinde duran bir yabancı
+anahtar, `GenreId`. O zaman her şarkının ait olduğu tür için `GenreId`
 üzerinden bir birleştirme gerekiyor,
 
 
@@ -120,9 +120,19 @@ Out[1]:
 
 Sonuçları `LIMIT 5` ile sınırladık, yoksa tüm kayıtlar geri gelirdi.
 
-Biraz önce bir iç birleşim (inner join) yapmış olduk. Bu tur
-birlesimde eğer üzerinden birleşim yapılan kimlik iki tarafta da
+Biraz önce bir iç birleşim (inner join) yapmış olduk. Bu tür
+birleşimde eğer üzerinden birleşim yapılan kimlik iki tarafta da
 yoksa, sonuca alınmaz.
+
+Fakat bu derece harfiyen bir uyum olmasını her zaman
+istemeyebilirdik. Diyelim ki şarkıları o şarkının ait olabileceği
+(dikkat, olabileceği) bir fatura detay `InvoiceLine` satırıyla eşlemek
+istiyoruz. Eğer bir şarkı hiçbir zaman satılmadıysa fatura detayında
+olmayabilir. Ama biz tüm şarkıları yine de görmek istiyoruz, ve
+faturalamanın bizi sınırlamasını istemiyoruz. Bu durumda bir sol
+birleşim `LEFT JOİN` yaparız, bu durumda soldaki tablo asal tablo
+olur, onun tüm satırları her zaman geri döndürülür, ama sağda uyum
+yoksa fatura detay için boş değer gelir.
 
 ```python
 psql("""
@@ -182,14 +192,4 @@ Referans
 * https://github.com/mamineofficial/Query-a-Digital-Music-Store-Part-I-SQL
 
 [9] https://shichaoji.com/2016/10/10/database-python-connection-basic/
-
-
-
-
-
-
-
-
-
-
 

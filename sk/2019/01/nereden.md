@@ -35,7 +35,7 @@ verisini tek bir dosya içinde tutan, hızlı basit bir taban. Veriye
 erişim dili SQL bu sırada öğrenilir. Sonra daha büyük işler için
 Postgreql'e geçilebilir.
 
-[Link](../../2018/03/sqlite-basit-sekilde-hzl-diske-deger-yazma.md)
+[Link](../../2012/03/sql.md)
 
 Flask ile sayfa servis edince APİ servisi nasıl olur, buraya giriş
 yapılabilir. Flask'te ufak birkaç değişim sonrası bir metottan JSON
