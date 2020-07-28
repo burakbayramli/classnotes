@@ -40,26 +40,6 @@ def psql(sql):
 
 ```
 
-
-Hangi ülkenin müşteri en çok ödeme yaptı? (Chinook-SQL-Exercise/top_country.sql)
-
-
-```python
-sql = """
-SELECT "Country", MAX("Total Sales For Country") as "Total Spent"
-FROM 
-  (SELECT BillingCountry as "Country" , SUM(Total) as "Total Sales For Country"
-FROM Invoice 
-GROUP BY BillingCountry);
-"""
-runsql(sql)
-```
-
-```text
-('USA', 523.0600000000003)
-```
-
-
 ```python
 runsql("SELECT LastName, Title FROM Employee limit 5")
 ```
@@ -156,15 +136,162 @@ Out[1]:
 7                          Let's Get It Up          Angus Young, Malcolm Young, Brian Johnson     NaN
 ```
 
+Sonuçlarda `Let's Get İt Up` şarkısının ait olduğu hiçbir
+`InvoiceLine` yok. Bu durumda o kimlik için boş değer var, NaN
+diyor. 
+
+Kendine Birlesim
+
+Bir tabloyu kendisiyle de birlestirebilirdik. Diyelim bir calisanin
+tum ismini ve onun amirinin tum ismini raporlamak istiyoruz. Bu
+durumda `ReportTo` kolonu tablonun kendisine isaret ediyor.
+
+```python
+psql("""
+SELECT a.FirstName || ' ' || a.LastName AS employee,
+       b.FirstName || ' ' || b.LastName AS supervisor
+  FROM Employee a
+  JOIN Employee b
+    ON a.ReportsTo = b.EmployeeId""")
+    
+```
+
+```text
+Out[1]: 
+                  0                 1
+0     Nancy Edwards      Andrew Adams
+1      Jane Peacock     Nancy Edwards
+2     Margaret Park     Nancy Edwards
+3     Steve Johnson     Nancy Edwards
+4  Michael Mitchell      Andrew Adams
+5       Robert King  Michael Mitchell
+6    Laura Callahan  Michael Mitchell
+```
+
+Altsorgu (Subquery)
+
+Bir altsorgu ana sorgunun icinde isleyen bir gecici sorgudur. Kendi
+basina isleyebilen bir sorgu olmalidir, bu iyidir, cunku bu sekilde
+ayri test edilebilir. Mesela her ulkeden gelen hasilati yuzdesini
+hesaplamak icin once tum hasilati bilmek gerekir, bu bir altsorgu olur.
+
+```python
+psql("""SELECT BillingCountry,
+(SUM(Total)/(SELECT SUM(Total) FROM Invoice))*100 AS Perc_Rev
+FROM Invoice
+GROUP BY BillingCountry""")
+
+```
+
+```text
+Out[1]: 
+                 0          1
+0        Argentina   1.615563
+1        Australia   1.615563
+2          Austria   1.830284
+3          Belgium   1.615563
+4           Brazil   8.163704
+5           Canada  13.053337
+6            Chile   2.002061
+7   Czech Republic   3.875290
+8          Denmark   1.615563
+9          Finland   1.787340
+10          France   8.378425
+11         Germany   6.719918
+12         Hungary   1.959117
+13           India   3.231985
+14         Ireland   1.959117
+15           Italy   1.615563
+16     Netherlands   1.744396
+17          Norway   1.701452
+18          Poland   1.615563
+19        Portugal   3.317015
+20           Spain   1.615563
+21          Sweden   1.658507
+22             USA  22.462424
+23  United Kingdom   4.846689
+```
+
+Bu sorgu isletilmeden once altsorgu isletilir, ardindan geri kalan isletilir.
+
+Bir altsorguyu bir geçici tablo olarak bile kullanabiliriz, mesela
+`FROM` içinde parantezler arasında bir sorgu işletip ona bir isim verirsek, bu isme
+dış sorguda sanki bir tabloymuş gibi erisebiliriz.
+
+Örnek isminde `The` kelimesi olan sanatçıların listelemek istesek
+
+```python
+psql("""SELECT names_with_the.*
+FROM (SELECT Name 
+        FROM Artist 
+       WHERE Name LIKE '%The%') AS names_with_the
+LIMIT 10""")
+```
+
+```text
+Out[1]: 
+                               0
+0    Santana Feat. Dave Matthews
+1  Santana Feat. The Project G&B
+2               The Black Crowes
+3                      The Clash
+4                       The Cult
+5                      The Doors
+6                     The Police
+7             The Rolling Stones
+8                  The Tea Party
+9                        The Who
+```
+
+Gerçi dış sorguda fazla sükseli işlemler yapmadık ama yapabilirdik.
+
+`WHERE` kisminda da altsorgu kullanilabilir,
+
+```python
+psql("""SELECT FirstName, LastName, BirthDate
+FROM Employee
+WHERE BirthDate IN (SELECT BirthDate 
+                      FROM Employee 
+                  ORDER BY BirthDate 
+                     LIMIT 10)""")
+```
+
+```text
+Out[1]: 
+          0         1                    2
+0    Andrew     Adams  1962-02-18 00:00:00
+1     Nancy   Edwards  1958-12-08 00:00:00
+2      Jane   Peacock  1973-08-29 00:00:00
+3  Margaret      Park  1947-09-19 00:00:00
+4     Steve   Johnson  1965-03-03 00:00:00
+5   Michael  Mitchell  1973-07-01 00:00:00
+6    Robert      King  1970-05-29 00:00:00
+7     Laura  Callahan  1968-01-09 00:00:00
+```
+
+Bu sorgu bize en yaşlı 10 çalışanın ismini verdi.
+
+İlginç bir altsorgu daha. Hangi ülkenin müşteri en çok ödeme yaptı?
+(Chinook-SQL-Exerçise/top_country.sql). Bunun için önce tüm ülkeler
+bazında satış toplamı alıyoruz, dış sorguda ise bunlar içinden
+maksimum olanını çekip çıkartıyoruz.
 
 
+```python
+psql("""
+SELECT "Country", MAX("Total Sales For Country") as "Total Spent"
+FROM
+   (SELECT BillingCountry as "Country" , SUM(Total) as "Total Sales For Country"
+    FROM Invoice
+    GROUP BY BillingCountry)
+""")
+```
 
-
-
-
-
-
-
+```text
+Out[1]: 
+     0       1
+0  USA  523.06
+```
 
 Referans
 
