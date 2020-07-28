@@ -116,3 +116,43 @@ c = conn.cursor()
 rows = c.execute('''SELECT * FROM sqlite_master WHERE type='table' ''')
 for row in rows: print (row)
 ```
+
+Chinook Tabani
+
+Ornek bir taban olarak Chinook tabani var. 
+
+[Chinook_Sqlite.zip](Chinook_Sqlite.zip) dosyasını açın, ve
+[load_chinook.py](load_chinook.py) dosyasını işletin bu yüklemeyi
+yapacaktır.
+
+GUI
+
+```
+sudo apt-get install sqlitebrowse
+```
+
+```
+sqlitebrowse
+```
+
+ile işletirsek, şu şekilde bir görsel program başlayacak.
+
+![](sqlitebrowse2.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
