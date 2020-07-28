@@ -11,7 +11,15 @@ gitmesini, ve hızlı okunabilmesini sağlıyor.
 
 Bu yazılım sqlite3'ten başkası değil. Eğer az SQL yazmayı göze
 alırsak, ki bu dili tüm bilişimciler bilir, sqlite3 üstteki tüm
-ihtiyaçlara cevap verir. Test edelim,
+ihtiyaçlara cevap verir.
+
+Kurmak
+
+```
+pip install pysqlite3
+```
+
+Test edelim,
 
 ```python
 import sqlite3
