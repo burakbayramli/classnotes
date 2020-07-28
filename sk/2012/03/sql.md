@@ -1,22 +1,26 @@
 # SQL
 
-SQL ilişkisel tabanları sorgulamak için kullanılır.  
+SQL ilişkisel tabanları sorgulamak için kullanılır. Iliskisel model,
+ve giris bilgileri [1]'de bulunabilir.
 
 Chinook
 
-Bu tabanın nasıl kurulacağını [2]'de anlattık. Chinook iTunes gibi bir
-dijital medya satış şirketini işletmek için gereken veriyi
-içeriyor. Verilerin bazıları gerçek iTunes'dan alınmış, müşterilerle
-alakalı kısımları yapay.
+Bu tabanın sqlite ortamında nasıl kurulacağını [2]'de
+anlattık. Chinook iTunes gibi bir dijital medya satış şirketi için
+hazırlanmış bir taban, verilerin bazıları gerçek iTunes'dan alınmış,
+müşterilerle alakalı kısımları yapay.
 
 ![](chinook_er.jpeg)
 
 Varlık-İlişki (Entity-Relationship -ER-) diyagramına bakınca ana
-iliskileri gorebiliyoruz. 
+ilişkileri görebiliyoruz. Bazı yardımcı fonksiyonlar,
 
 
 ```python
 import sqlite3, pandas as pd
+
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_columns', 10)
 
 DB = '/tmp/chinook.db'
 
@@ -33,6 +37,7 @@ def psql(sql):
     rows = c.execute(sql)
     df = pd.DataFrame(rows.fetchall())
     return df
+
 ```
 
 
@@ -56,10 +61,7 @@ runsql(sql)
 
 
 ```python
-sql="""
-SELECT LastName, Title FROM Employee limit 5
-"""
-runsql(sql)
+runsql("SELECT LastName, Title FROM Employee limit 5")
 ```
 
 ```text
@@ -86,11 +88,63 @@ Out[1]:
 4  Johnson  Sales Support Agent
 ```
 
+Sarkilar, Turler 
+
+Basit bir birleştirim (join) ile başlayalım. Tüm şarkılar `Track`
+tablosunda, o şarkının hangi türe ait olduğu `Genre`
+tablosunda. Aradaki bağlantı `Track` üzerinde durak bir yabancı
+anahtar, `GenreId`. O zaman her şarkının ait olduğu tur için `GenreId`
+üzerinden bir birleştirme gerekiyor,
 
 
+```python
+psql("""
+SELECT t.Name AS track_name,
+       g.name AS genre_name
+  FROM Track t
+  JOIN Genre g
+    ON t.GenreId = g.GenreId
+ LIMIT 5""")
 
+```
 
+```text
+Out[1]: 
+                                         0     1
+0  For Those About To Rock (We Salute You)  Rock
+1                        Balls to the Wall  Rock
+2                          Fast As a Shark  Rock
+3                        Restless and Wild  Rock
+4                     Princess of the Dawn  Rock
+```
 
+Sonuçları `LIMIT 5` ile sınırladık, yoksa tüm kayıtlar geri gelirdi.
+
+Biraz önce bir iç birleşim (inner join) yapmış olduk. Bu tur
+birlesimde eğer üzerinden birleşim yapılan kimlik iki tarafta da
+yoksa, sonuca alınmaz.
+
+```python
+psql("""
+SELECT t.name, t.composer, i.InvoiceLineId
+  FROM Track t
+  LEFT JOIN InvoiceLine i
+  ON t.TrackId = i.TrackId
+LIMIT 8""")
+```
+
+```text
+Out[1]: 
+                                         0                                                  1       2
+0  For Those About To Rock (We Salute You)          Angus Young, Malcolm Young, Brian Johnson   579.0
+1                        Balls to the Wall                                               None     1.0
+2                        Balls to the Wall                                               None  1154.0
+3                          Fast As a Shark  F. Baltes, S. Kaufman, U. Dirkscneider & W. Ho...  1728.0
+4                        Restless and Wild  F. Baltes, R.A. Smith-Diesel, S. Kaufman, U. D...     2.0
+5                     Princess of the Dawn                         Deaffy & R.A. Smith-Diesel   580.0
+6                    Put The Finger On You          Angus Young, Malcolm Young, Brian Johnson     3.0
+7                          Let's Get It Up          Angus Young, Malcolm Young, Brian Johnson     NaN
+```
 
 
 
