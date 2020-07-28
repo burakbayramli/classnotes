@@ -1,6 +1,6 @@
 # SQL
 
-SQL iliskisel tabanlari sorgulamak icin kullanilir.  
+SQL ilişkisel tabanları sorgulamak için kullanılır.  
 
 Chinook
 
@@ -104,19 +104,21 @@ Out[1]:
 
 Referans
 
-[1] [psycopg2](../../2012/06/psycopg2-python-ile-api-bazli-postgresql-erisimi.md)
+[1] Veri Tabanları, Kurumsal Java 2005 Kitabından, [PDF](https://github.com/burakbayramli/classnotes/raw/master/sk/2012/03/db-kj.pdf)
 
 [2] [sqlite](../../2018/03/sqlite-basit-sekilde-hzl-diske-deger-yazma.md)
 
-[3] https://github.com/Olamiotan/PythonStarter
+[3] [psycopg2](../../2012/06/psycopg2-python-ile-api-bazli-postgresql-erisimi.md)
 
-[4] https://database.guide/2-sample-databases-sqlite/
+[4] https://github.com/Olamiotan/PythonStarter
 
-[5] https://data-xtractor.com/knowledgebase/chinook-database-sample/
+[5] https://database.guide/2-sample-databases-sqlite/
 
-[6] https://github.com/KAPrueved/Chinook-SQL-Exercise
+[6] https://data-xtractor.com/knowledgebase/chinook-database-sample/
 
-[7] Mando Iwanaga
+[7] https://github.com/KAPrueved/Chinook-SQL-Exercise
+
+[8] Mando Iwanaga
 
 * https://medium.com/@mandoiwanaga08/introduction-to-sql-beginner-level-7acb59286e7b
 * https://medium.com/@mandoiwanaga08/sql-continued-3ff70f613d96
@@ -125,9 +127,8 @@ Referans
 * https://github.com/mandoiwanaga/sql_practice
 * https://github.com/mamineofficial/Query-a-Digital-Music-Store-Part-I-SQL
 
-[8] https://shichaoji.com/2016/10/10/database-python-connection-basic/
+[9] https://shichaoji.com/2016/10/10/database-python-connection-basic/
 
-[9] [Veri Tabanları, Kurumsal Java 2005 Kitabından, PDF](https://github.com/burakbayramli/classnotes/raw/master/sk/2012/03/db-kj.pdf)
 
 
 
