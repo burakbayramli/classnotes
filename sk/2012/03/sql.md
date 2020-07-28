@@ -127,7 +127,7 @@ Referans
 
 [8] https://shichaoji.com/2016/10/10/database-python-connection-basic/
 
-
+[9] [Veri Tabanları, Kurumsal Java 2005 Kitabından, PDF](db-kj.pdf)
 
 
 
