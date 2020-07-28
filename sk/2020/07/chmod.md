@@ -7,7 +7,7 @@ En basit yol `+` ve `-` isaretleri kullanmak, mesela
 
 `echo 'birseyler' >> out.txt`
 
-ile yeni bir dosya yaratlim. Sonra
+ile yeni bir dosya yaratalım. Sonra
 
 ```
 ls -al out.txt 
@@ -33,7 +33,7 @@ ls -al out.txt
 -rw-r--rw- 1 burak burak 10 Jul 27 23:36 out.txt
 ```
 
-Diğerleri için yazma eklenmiş.
+Diğerleri için yazma izni eklenmiş.
 
 Fakat bu işi yapmanın daha hızlı bir yolu var. Öbekleri hatırlarsak,
 üçlü harfler idi, fakat bu harflerin yerleri belli, ve belli yerdeki
