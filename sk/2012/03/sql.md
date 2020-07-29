@@ -13,7 +13,13 @@ müşterilerle alakalı kısımları yapay.
 ![](chinook_er.jpeg)
 
 Varlık-İlişki (Entity-Relationship -ER-) diyagramına bakınca ana
-ilişkileri görebiliyoruz. Bazı yardımcı fonksiyonlar,
+ilişkileri görebiliyoruz. ER diyagramlarını çokluğu belirtmek icin
+bazı semboller kullanır, bunlar,
+
+![](er.png)
+
+
+Bazı yardımcı fonksiyonlar,
 
 
 ```python
