@@ -192,3 +192,15 @@ Referans
 
 [Unix, Kurumsal Java 2005 Kitabından, PDF](https://github.com/burakbayramli/classnotes/raw/master/sk/2020/07/unix-kj.pdf)
 
+[Unix, Servisleri Nasıl Başlatıyor?](../..//2002/10/unix-servisleri-nasl-baslatyor.md)
+
+
+
+
+
+
+
+
+
+
+
