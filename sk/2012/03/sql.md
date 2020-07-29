@@ -404,10 +404,10 @@ sorgular tarafından kullanılabilir.
 
 Altsorgu (Subquery)
 
-Bir altsorgu ana sorgunun icinde isleyen bir gecici sorgudur. Kendi
-basina isleyebilen bir sorgu olmalidir, bu iyidir, cunku bu sekilde
-ayri test edilebilir. Mesela her ulkeden gelen hasilati yuzdesini
-hesaplamak icin önce tüm hasılatı bilmek gerekir, bu bir altsorgu olur.
+Bir altsorgu ana sorgunun içinde işleyen bir geçici sorgudur. Kendi
+başına işleyebilen bir sorgu olmalıdır, bu iyidir, çünkü bu şekilde
+ayrı test edilebilir. Mesela her ülkeden gelen hasılatı yüzdesini
+hesaplamak için önce tüm hasılatı bilmek gerekir, bu bir altsorgu olur.
 
 ```python
 psql("""SELECT BillingCountry,
@@ -449,8 +449,8 @@ Out[1]:
 Bu sorgu işletilmeden önce altsorgu işletilir, ardından geri kalan işletilir.
 
 Bir altsorguyu bir geçici tablo olarak bile kullanabiliriz, mesela
-`FROM` içinde parantezler arasında bir sorgu işletip ona bir isim verirsek, bu isme
-dış sorguda sanki bir tabloymuş gibi erisebiliriz.
+`FROM` içinde parantezler arasında bir sorgu işletip ona bir isim
+verirsek, bu isme dış sorguda sanki bir tabloymuş gibi erişebiliriz.
 
 Örnek isminde `The` kelimesi olan sanatçıların listelemek istesek
 
@@ -507,6 +507,11 @@ Out[1]:
 ```
 
 Bu sorgu bize en yaşlı 10 çalışanın ismini verdi.
+
+`WHERE` içinde `BirthDate İN` görülüyor, yani `BirthDate` kolonunun
+`IN` den sonra tarif edilen küme içinde olma şartını koymuş
+oluyoruz. Bazen birleşim ve eşitlik şartı yerine bu tür tarif daha
+rahat oluyor.
 
 İlginç bir altsorgu daha, hangi ülkenin müşteri en çok ödeme yaptı?
 [7]'den top_country.sql. Bunun için önce tüm ülkeler bazında satış
@@ -723,5 +728,3 @@ Referans
 [12] https://www.guru99.com/er-diagram-tutorial-dbms.html
 
 [13] https://www.c-sharpcorner.com/article/diving-into-basics-of-sql-server/
-
-
