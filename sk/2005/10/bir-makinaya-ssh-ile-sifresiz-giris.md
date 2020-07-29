@@ -1,9 +1,9 @@
 # Bir Makinaya SSH ile Şifresiz Giriş
 
 SSH gizli/açık anahtar kavramına göre çalışır (public/private key
-encryption). Bu sistemi başka yazılarda anlatacağız. Şimdilik, uzak
-bir makinada şifresiz giriş yapmak, komutlar işletmek, ve scp ile
-şifresiz kopyalama yapmak için, şunları yapmamız lâzım.
+encryption). Uzak bir makinada şifresiz giriş yapmak, komutlar
+işletmek, ve scp ile şifresiz kopyalama yapmak için, şunları yapmamız
+lâzım.
 
 Kendimiz için bir gizli/açık anahtar çifti yaratmak için şu komutu
 çalıştırın.
@@ -31,11 +31,10 @@ cat $HOME/.ssh/id_rsa.pub >> authorized_keys
 ```
 
 Kutlarım. Artık ssh ya da CVS komutları kullanırken şifreye
-ihtiyacınız olmayacak.
-
-Not: `authorized_keys` dosyasina ekleme yapmak yerine, baglanilan
-bilgisayardan ssh-copy-id komutu da ayni islemi yapiyor, tabii ki
-sifre soruluyor (simdilik), fakat bu yontem daha kolay.
+ihtiyacınız olmayacak. Artık `ssh kullanıcı@makina` ile şifresiz
+yapabiliriz, hatta `ssh kullanıcı@makina komut` ile uzaktaki
+makinadaki bir programı başlatıp sonuçlarını direk kendi makinamızda
+görebiliriz.
 
 Unix `cat` komutu ile `>>` işlecini kullandığımıza dikkat edin. Bu
 demektir ki, birden fazla .pub dosyasına tek bir authorized_keys
@@ -106,10 +105,4 @@ $ chmod 0600 id_rsa
 ```
 
 .. ve bundan sonra ssh ve scp komutlarınız düzgün çalışacak.
-
-
-
-
-
-
 
