@@ -1,5 +1,94 @@
 # Bir Makinaya SSH ile Şifresiz Giriş
 
+Bir makinadan diğerine hem şifresiz hem de güvenli bir şekilde girip, orada
+komut işletmek, ya da oraya dosya kopyalamak için iki program vardır: ssh ve
+scp. Kullanmak için komut satırından (ssh için)
+
+```
+ssh host1 -l remoteuser
+```
+
+komutunu kullandığınızda host1 adlı makinaya remoteuser kullanıcısı
+üzerinden login etmiş olursunuz. Ya da uzak makinada bir komut işletip
+sonucunu kendi makinanıza almak isterseniz (meselâ ikinci makinada
+listeleme komutu olan ls işletelim), şunu yaparız
+
+```
+ssh host1 -l remoteuser ls
+```
+
+Eğer uzak makinaya bir dosya kopyalamak istersek
+
+```
+scp file.txt remoteuser@host1:/tmp
+```
+
+Bu komut ile uzaktaki makinaya sanki yerel dizinlerimiz arasında dosya
+kopyalıyormuş kadar rahat bir şekilde bir dosya
+kopyalayabiliyoruz. Girişte bahsettiğimiz ba- sit teknik işte
+budur. ssh ve scp bir kez kurulduktan sonra, uzaktaki makina, yerel
+makinanızın bir uzantısı hâline gelir. Bir makinayı uzaktan idare
+etmek demek, ya bir dosya değişimi, ya da bir komut işletmek demek
+olduğu için, bu iki programı kullanarak uzaktaki bir makinada
+yapamayacağımız şey yoktur.
+
+Şifresiz Kullanımı Kurmak
+
+Eğer ssh’i hiçbir ek ayar yapmadan kullanırsanız, (ilk kurduğumuz haliyle)
+her kullanışınızda size bir şifre sorulacaktır. Aynı şekilde scp komutu da böyle
+davranır. Fakat, biz meselâ yüz tane makina için arka arkaya scp ya da ssh
+kullanmamız gerekeceği için, şifre isteme işlemini iptal edip, güvenlik kon-
+trolünü kullanıcıya sorulmayan başka bir şekilde yapmamız gerekiyor. Bu yöntem
+de, açık / gizli (public / private) anahtarlar kullanarak yapılan güvenlik kon-
+trolüdür.
+
+Windows üzerinde ssh ve scp’nin işler kodlarını kurmayı, A.8 bölümünde
+bulabilirsiniz. Linux üzerinde ssh ve scp genellikle otomatik olarak kurulur,
+eğer kurulmamışsa, Linux kurulum disklerinizde bu programı bulabilirsiniz, ya
+da admin’inize bu programları kurdurabilirsiniz.
+
+Açık / gizli anahtar kurulumunu yapmak için şunları yapın: İlk önce kod
+gönderimi ya da uzaktan idareyi yapan yerel makinamızı tanıtan bir gizli
+anahtar, bir de açık anahtar üretmemiz gerekiyor.
+
+```
+$ ssh-keygen -t rsa
+```
+
+Sorulan sorular için hiç cevap girmeden ENTER’e basarak geçin. Bu
+bittikten sonra, `$HOME/.ssh/` dizininiz icinde 2 dosya
+göreceksiniz. Bu dosyalar id_¬ rsa.pub ve id_rsa dosyaları
+olacaktır. HOME değişkeninin nerede olduğunu ko- mut satırından
+Unix/Cygwin’de echo \$HOME ile öğrenebilirsiniz. Windows’da dosyaların
+nereye yazıldığı OpenSSH tarafından zaten ssh-keygen sonunda size
+bildirilecektir.
+
+Biraz önce üretilen dosyalardan `id_rsa`, gizli anahtarınızdır. Dosya
+`id_rsa.pub` ise açık anahtarınızdır. Şimdi, `id_rsa.pub` kayıdındaki
+açık anahtarı, uzaktan erişeceğiniz servis bilgisayarına FTP ya da scp
+ile gönderin (scp kullanırsanız, -şimdilik- şifre girmeniz gerekecek
+tabii ki). Sonra, uzaktaki bilgisa- yardaki kullanacağınız kullanıcı
+hesabına girin, hesabın üst seviyesinde `$HOME/.ssh/` dizini altına
+id_rsa.pub kayıdını bırakın. Sonra, servis sisteminde
+
+```
+cat > $HOME/.ssh/id_rsa.pub >> authorized_keys
+```
+
+komutunu calıştırın. Kuruluş işlemi bundan ibarettir. Bu son işlemden
+sonra artık uzaktan işlettiğiniz ssh ve scp işlemleri şifresiz bir
+şekilde işinizi yapmanıza izin verecektir.
+
+Açık anahtarımızı servis makinasına eklemek için, Unix cat komutu ile
+`>>` işlecini kullandığımıza dikkat edelim. Bu demektir ki, birden
+fazla .pub dosyasına tek bir authorized_keys dosyasına ekleyebiliriz
+(ve birden fazla kullanıcıyı desteklebilmek için bunu yapmamız
+gerekir). Böylece aynı makinaya erişen birden fazla erişen kişi, aynı
+servis makinasına ve aynı kullanıcıya değişik açık anahtarlar ile
+erişebilir.
+
+Eski Anlatim
+
 SSH gizli/açık anahtar kavramına göre çalışır (public/private key
 encryption). Uzak bir makinada şifresiz giriş yapmak, komutlar
 işletmek, ve scp ile şifresiz kopyalama yapmak için, şunları yapmamız
