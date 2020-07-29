@@ -68,6 +68,46 @@ Out[1]:
 4  Johnson  Sales Support Agent
 ```
 
+Basit
+
+`SELECT` ile satır seçimi yapılır, hangi satırlar, hangi kolonlar
+olacağı bu komutun seçeneklerindendir. En basit olan her şeyi seçmek,
+tüm sanatçılar mesela (10 tane ile sınırladık aslında ama `LİMİT`
+olmasa her şey gelir),
+
+```python
+psql("""SELECT * FROM Artist LIMIT 10""")
+```
+
+```text
+Out[1]: 
+    0                     1
+0   1                 AC/DC
+1   2                Accept
+2   3             Aerosmith
+3   4     Alanis Morissette
+4   5       Alice In Chains
+5   6  Antônio Carlos Jobim
+6   7          Apocalyptica
+7   8            Audioslave
+8   9              BackBeat
+9  10          Billy Cobham
+```
+
+Bu tablonun semasinin
+
+```
+CREATE TABLE [Artist]
+(
+[ArtistId] INTEGER  NOT NULL,
+[Name] NVARCHAR(120),
+CONSTRAINT [PK_Artist] PRIMARY KEY  ([ArtistId])
+);
+```
+
+Yani `ArtistId` ve `Name` almış olduk.
+
+
 Şarkılar, Türler 
 
 Basit bir birleştirim (join) ile başlayalım. Tüm şarkılar `Track`
@@ -292,6 +332,39 @@ Out[1]:
      0       1
 0  USA  523.06
 ```
+
+Case When [6]
+
+`CASE WHEN` ifadeleri ile koşulsal alt işlemler yapmak
+mümkündür. Mesela hem sene hem de ülke bazlı toplam almak istesek,
+ülke ismi, sene metninde `CASE WHEN` uygulayıp `SUM` alabilirdik,
+
+```python
+df = \
+psql("""SELECT CAST(strftime('%Y', invoice_."InvoiceDate") AS BIGINT) AS "Year",
+   SUM(CASE WHEN invoice_."BillingCountry" = 'USA'
+      THEN invoice_."Total" END) AS "USA",
+   SUM(CASE WHEN invoice_."BillingCountry" = 'United Kingdom'
+      THEN invoice_."Total" END) AS "United Kingdom",
+   SUM(CASE WHEN invoice_."BillingCountry" = 'Canada'
+      THEN invoice_."Total" END) AS "Canada"
+FROM "Invoice" AS invoice_
+WHERE invoice_."BillingCountry" IN ('USA', 'United Kingdom', 'Canada')
+GROUP BY 1
+ORDER BY 1 DESC""")
+df.columns = ['Year','USA', 'United Kingdom', 'Canada']
+print (df)
+```
+
+```text
+   Year     USA  United Kingdom  Canada
+0  2013   85.14           28.71   72.27
+1  2012  127.98            9.90   42.57
+2  2011  103.01           17.82   55.44
+3  2010  102.98           30.69   76.26
+4  2009  103.95           25.74   57.42
+```
+
 
 Referans
 
