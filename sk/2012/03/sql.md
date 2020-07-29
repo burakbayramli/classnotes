@@ -37,7 +37,6 @@ def psql(sql):
     rows = c.execute(sql)
     df = pd.DataFrame(rows.fetchall())
     return df
-
 ```
 
 ```python
@@ -107,14 +106,92 @@ CONSTRAINT [PK_Artist] PRIMARY KEY  ([ArtistId])
 
 Yani `ArtistId` ve `Name` almış olduk.
 
+Gruplama
+
+Bir tablodaki, ya da birleştirimler üzerinden oluşturulmuş bir sonuç
+kümesindeki kolonlar üzerinde gruplama yapmak mümkündür. Mesela fatura
+tablosunda ülkeler üzerinden gruplama yapabilirim, ve bu grubun satır
+sayısını raporlamak isteyebilirim.
+
+```python
+psql("""
+SELECT BillingCountry, COUNT(InvoiceId)
+FROM Invoice
+GROUP BY BillingCountry
+""")
+```
+
+```text
+Out[1]: 
+                 0   1
+0        Argentina   7
+1        Australia   7
+2          Austria   7
+3          Belgium   7
+4           Brazil  35
+5           Canada  56
+6            Chile   7
+7   Czech Republic  14
+8          Denmark   7
+9          Finland   7
+10          France  35
+11         Germany  28
+12         Hungary   7
+13           India  13
+14         Ireland   7
+15           Italy   7
+16     Netherlands   7
+17          Norway   7
+18          Poland   7
+19        Portugal  14
+20           Spain   7
+21          Sweden   7
+22             USA  91
+23  United Kingdom  21
+```
+
+Önemli not, `SELECT` içinde sadece üzerinden gruplama yaptığım
+kolonlardan seçebilirim. Üzerinden gruplama yapmadığım şeylerden
+seçmek anlamsız olurdu, çünkü o şeyleri grup parçası olarak
+listeleyemezik.
+
+Gruplar üzerinde uygulanabilen özetleme hesapları vardır, `COUNT`,
+`MAX`, `MIN` bunlardan.
+
+`HAVING` ile gruplar üzerinde filtreleme yapabilirim, mesela üstteki
+sonuçlarda sadece 10 taneden daha fazla olan grupları görmek
+isteyebilirim,
+
+```python
+psql("""
+SELECT BillingCountry, COUNT(InvoiceId)
+FROM Invoice
+GROUP BY BillingCountry
+HAVING COUNT(InvoiceId) > 10
+""")
+```
+
+```text
+Out[1]: 
+                0   1
+0          Brazil  35
+1          Canada  56
+2  Czech Republic  14
+3          France  35
+4         Germany  28
+5           India  13
+6        Portugal  14
+7             USA  91
+8  United Kingdom  21
+```
+
 Şarkılar, Türler 
 
-Basit bir birleştirim (join) ile başlayalım. Tüm şarkılar `Track`
+Basit bir birleştirim (join) ile devam edelim. Tüm şarkılar `Track`
 tablosunda, o şarkının hangi türe ait olduğu `Genre`
 tablosunda. Aradaki bağlantı `Track` üzerinde duran bir yabancı
 anahtar, `GenreId`. O zaman her şarkının ait olduğu tür için `GenreId`
 üzerinden bir birleştirme gerekiyor,
-
 
 ```python
 psql("""
@@ -137,7 +214,7 @@ Out[1]:
 4                     Princess of the Dawn  Rock
 ```
 
-Sonuçları gene sınırladı `LIMIT 5` ile.
+Sonuçları gene sınırladık `LIMIT 5` ile.
 
 Biraz önce bir iç birleşim (inner join) yapmış olduk. Bu tür
 birleşimde eğer üzerinden birleştirilen kimlik iki tarafta da yoksa,
@@ -523,4 +600,6 @@ Referans
 [10] https://github.com/douglasnavarro/chinook-analysis
 
 [11] [Postgresql](../../2012/03/postgresql.md)
+
+
 
