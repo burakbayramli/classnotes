@@ -522,5 +522,5 @@ Referans
 
 [10] https://github.com/douglasnavarro/chinook-analysis
 
-[11] [Postgresql](../../2012/03postgresql.md)
+[11] [Postgresql](../../2012/03/postgresql.md)
 
