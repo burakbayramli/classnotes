@@ -574,9 +574,10 @@ Out[1]:
 
 Case When [6]
 
-`CASE WHEN` ifadeleri ile koşulsal alt işlemler yapmak
-mümkündür. Mesela hem sene hem de ülke bazlı toplam almak istesek,
-ülke ismi, sene metninde `CASE WHEN` uygulayıp `SUM` alabilirdik,
+`CASE WHEN` ifadeleri ile seçilmiş her satır üzerinde koşulsal yan
+işlemler yapmak mümkündür. Mesela hem sene hem de ülke bazlı toplam
+almak istesek, ülke ismi, sene metninde `CASE WHEN` uygulayıp `SUM`
+alabilirdik,
 
 ```python
 df = \
@@ -605,7 +606,7 @@ print (df)
 ```
 
 Her ülke için en popüler müzik türünü seçmek istiyoruz. Yani en fazla
-alım olan şarkıları ülke bazında gruplamak lazım. Altta `WİTH` ile bir
+alım olan şarkıları ülke bazında gruplamak lazım. Altta `WITH` ile bir
 altsorgu yaratılıyor, bu sonuca bir isim veriliyor, `t1`, ve bu sonuç
 bir diğer alt sorguyla `t2` üzerinden birleştiriliyor [10]. 
 
@@ -728,3 +729,5 @@ Referans
 [12] https://www.guru99.com/er-diagram-tutorial-dbms.html
 
 [13] https://www.c-sharpcorner.com/article/diving-into-basics-of-sql-server/
+
+
