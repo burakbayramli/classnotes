@@ -50,7 +50,4 @@ alanlarda olabilir.  Fakat takımın çoğunluğunun çalıştığı türden
 görevleri paylaştırma konusunda, önceden açıklanan kural geçerli
 olmalıdır.
 
-
-
-
 ![](cake.jpg)

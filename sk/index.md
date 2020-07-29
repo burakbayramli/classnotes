@@ -19,7 +19,13 @@
 
 [Python](2016/01/python-dil-ogrenimi.md)
 
-[Unix](2020/07/unix)
+[Unix](2020/07/unix.md)
+
+[SQL](2012/03/sql.md)
+
+[Proje İdaresi](2020/07/proje-idaresi.md)
+
+[Nereden Başlarım](2019/01/nereden.md)
 
 [Youtube Kanalım](https://www.youtube.com/channel/UCMAUsgUq5ODy8kMnJlUBUdQ)
 
@@ -30,8 +36,6 @@
 [Matematik İçerik Kodu](https://github.com/burakbayramli/classnotes)
 
 [Teknik Terimler Sozlugu](https://burakbayramli.github.io/dersblog/algs/dict/teknik_terimler_sozlugu.html)
-
-[Nereden Başlarım](2019/01/nereden.md)
 
 ## Arşiv
 
