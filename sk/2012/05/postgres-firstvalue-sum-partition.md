@@ -1,12 +1,12 @@
 # Postgres First_Value, Sum, Partition
 
-
-Postgres First_Value, Sum, Partition
-
-
-
-
-Su yazida PG tabaninin bir kolondaki degerin ayniligini temel alarak o grup icinde / uzerinde islemler yaptigini gosterdik. Bu gruba PG bir "pencere (window)" adini veriyor. Klasik GROUP BY islemi satirlari azaltir, ozetler, pencere bazli OVER .. PARTITION komutu ise satirlari oldugu gibi birakip onlara ek bilgi eklenebilmesini saglar. Akla gelebilecek her seyi bir pencereye yayabilirsiniz. min teknigini gorduk, ama su da mumkun,
+Su yazida PG tabaninin bir kolondaki degerin ayniligini temel alarak o
+grup icinde / uzerinde islemler yaptigini gosterdik. Bu gruba PG bir
+"pencere (window)" adini veriyor. Klasik GROUP BY islemi satirlari
+azaltir, ozetler, pencere bazli OVER .. PARTITION komutu ise satirlari
+oldugu gibi birakip onlara ek bilgi eklenebilmesini saglar. Akla
+gelebilecek her seyi bir pencereye yayabilirsiniz. min teknigini
+gorduk, ama su da mumkun,
 
 select 
 o.orderid, 
@@ -37,19 +37,22 @@ Sonuc
      379 |            379 |         13 |      246.21
     9447 |            379 |         13 |       90.18
 
-Musteri 13'un ilk siparisi id 379, sonraki 9447. Biz first_value ile 379'u aldik, first_order_id uzerinden otekine "yaydik". first_value cagrisina kolon degeri verilebildigi gibi depolu islem (stored procedure) cagrisi da verilebilir.
+Musteri 13'un ilk siparisi id 379, sonraki 9447. Biz first_value ile
+379'u aldik, first_order_id uzerinden otekine "yaydik". first_value
+cagrisina kolon degeri verilebildigi gibi depolu islem (stored
+procedure) cagrisi da verilebilir.
 
-Boyle islemler nerede ise yarar? Mesela musterinin her sipariste hangi (belki degisik bir) kanaldan geldigini biliyoruz, Web kanalindan mi, Internet kanalindan mi, vs. Fakat raporlama amacli olarak bu musterinin bize getirdigi tum kazanci "ilk geldigi kanalin" hanesine yazmak istiyoruz. Bu gibi durumlarda bu ilk kanal bilgisini "cogaltarak" o musterinin tum diger kayitlarina yaymak, over.. partition ile mumkun olur.
+Boyle islemler nerede ise yarar? Mesela musterinin her sipariste hangi
+(belki degisik bir) kanaldan geldigini biliyoruz, Web kanalindan mi,
+Internet kanalindan mi, vs. Fakat raporlama amacli olarak bu
+musterinin bize getirdigi tum kazanci "ilk geldigi kanalin" hanesine
+yazmak istiyoruz. Bu gibi durumlarda bu ilk kanal bilgisini
+"cogaltarak" o musterinin tum diger kayitlarina yaymak,
+over.. partition ile mumkun olur.
 
-Sonra SQL'in geri kalan mekanizmalari oldugu gibi calisirlar, GROUP BY mesela bu yeni yaratilan kolonu sanki gercek bir kolonmus gibi kullanabilmeye baslar. SQL kumesel olarak dusunur, ve her satirin bu sebeple atomik olmasi iyidir, satirlarin kendi hakkindaki bilgiyi kendi uzerinde tasimasi lazimdir -- OVER.. PARTITION ile gereken bu tur ek bilgileri satirlara ekleyebilmis oluruz. 
-
-
-
-
-
-
-
-
-
-
-
+Sonra SQL'in geri kalan mekanizmalari oldugu gibi calisirlar, GROUP BY
+mesela bu yeni yaratilan kolonu sanki gercek bir kolonmus gibi
+kullanabilmeye baslar. SQL kumesel olarak dusunur, ve her satirin bu
+sebeple atomik olmasi iyidir, satirlarin kendi hakkindaki bilgiyi
+kendi uzerinde tasimasi lazimdir -- OVER.. PARTITION ile gereken bu
+tur ek bilgileri satirlara ekleyebilmis oluruz.

@@ -98,7 +98,7 @@
 
 [PyMC](06/pymc.md)
 
-[pyscopg2, Python ile API Bazli Postgresql Erisimi](06/python-ile-api-bazli-postgresql-erisimi.md)
+[pyscopg2](06/pyscopg2.md)
 
 [Python ile Mail GÃ¶ndermek, SMTP, GMail](06/python-ile-mail-gondermek-smtp-gmail.md)
 

@@ -72,8 +72,8 @@ Basit
 
 `SELECT` ile satır seçimi yapılır, hangi satırlar, hangi kolonlar
 olacağı bu komutun seçeneklerindendir. En basit olan her şeyi seçmek,
-tüm sanatçılar mesela (10 tane ile sınırladık aslında ama `LİMİT`
-olmasa her şey gelir),
+her kolono, her satırı (gerçi 10 tane ile sınırladık aslında ama
+`LIMIT` olmasa her şey gelir),
 
 ```python
 psql("""SELECT * FROM Artist LIMIT 10""")
@@ -94,7 +94,7 @@ Out[1]:
 9  10          Billy Cobham
 ```
 
-Bu tablonun semasinin
+Bu tablonun şeması,
 
 ```
 CREATE TABLE [Artist]
@@ -106,7 +106,6 @@ CONSTRAINT [PK_Artist] PRIMARY KEY  ([ArtistId])
 ```
 
 Yani `ArtistId` ve `Name` almış olduk.
-
 
 Şarkılar, Türler 
 
@@ -120,11 +119,11 @@ anahtar, `GenreId`. O zaman her şarkının ait olduğu tür için `GenreId`
 ```python
 psql("""
 SELECT t.Name AS track_name,
-       g.name AS genre_name
-  FROM Track t
-  JOIN Genre g
-    ON t.GenreId = g.GenreId
- LIMIT 5""")
+g.name AS genre_name
+FROM Track t
+JOIN Genre g
+ON t.GenreId = g.GenreId
+LIMIT 5""")
 
 ```
 
@@ -138,28 +137,27 @@ Out[1]:
 4                     Princess of the Dawn  Rock
 ```
 
-Sonuçları `LIMIT 5` ile sınırladık, yoksa tüm kayıtlar geri gelirdi.
+Sonuçları gene sınırladı `LIMIT 5` ile.
 
 Biraz önce bir iç birleşim (inner join) yapmış olduk. Bu tür
-birleşimde eğer üzerinden birleşim yapılan kimlik iki tarafta da
-yoksa, sonuca alınmaz.
-
-Fakat bu derece harfiyen bir uyum olmasını her zaman
-istemeyebilirdik. Diyelim ki şarkıları o şarkının ait olabileceği
-(dikkat, olabileceği) bir fatura detay `InvoiceLine` satırıyla eşlemek
-istiyoruz. Eğer bir şarkı hiçbir zaman satılmadıysa fatura detayında
-olmayabilir. Ama biz tüm şarkıları yine de görmek istiyoruz, ve
-faturalamanın bizi sınırlamasını istemiyoruz. Bu durumda bir sol
-birleşim `LEFT JOİN` yaparız, bu durumda soldaki tablo asal tablo
-olur, onun tüm satırları her zaman geri döndürülür, ama sağda uyum
-yoksa fatura detay için boş değer gelir.
+birleşimde eğer üzerinden birleştirilen kimlik iki tarafta da yoksa,
+sonuca alınmaz. Buna iç birleşim (inner join) ismi verilir. Fakat bu
+derece harfiyen bir uyum olmasını her zaman istemeyebilirdik. Diyelim
+ki şarkıları o şarkının ait olabileceği (dikkat, olabileceği) bir
+fatura detay `InvoiceLine` satırıyla eşlemek istiyoruz. Eğer bir şarkı
+hiçbir zaman satılmadıysa fatura detayında olmayabilir. Ama biz tüm
+şarkıları yine de görmek istiyoruz, ve faturalamanın bizi
+sınırlamasını istemiyoruz. Bu durumda bir sol birleşim `LEFT JOİN`
+yaparız, o zaman soldaki tablo asal tablo olur, onun tüm satırları her
+zaman geri döndürülür, ama sağda uyum yoksa fatura detay için boş
+değer gelir.
 
 ```python
 psql("""
 SELECT t.name, t.composer, i.InvoiceLineId
-  FROM Track t
-  LEFT JOIN InvoiceLine i
-  ON t.TrackId = i.TrackId
+FROM Track t
+LEFT JOIN InvoiceLine i
+ON t.TrackId = i.TrackId
 LIMIT 8""")
 ```
 
@@ -176,15 +174,15 @@ Out[1]:
 7                          Let's Get It Up          Angus Young, Malcolm Young, Brian Johnson     NaN
 ```
 
-Sonuçlarda `Let's Get İt Up` şarkısının ait olduğu hiçbir
+Sonuçlarda `Let's Get It Up` şarkısının ait olduğu hiçbir
 `InvoiceLine` yok. Bu durumda o kimlik için boş değer var, NaN
 diyor. 
 
-Kendine Birlesim
+Kendisiyle Birleşim (Self Join)
 
-Bir tabloyu kendisiyle de birlestirebilirdik. Diyelim bir calisanin
-tum ismini ve onun amirinin tum ismini raporlamak istiyoruz. Bu
-durumda `ReportTo` kolonu tablonun kendisine isaret ediyor.
+Bir tabloyu kendisiyle de birleştirebilirdik. Diyelim bir çalışanın
+tüm ismini ve onun amirinin tüm ismini raporlamak istiyoruz. Bu
+durumda `ReportTo` kolonu tablonun kendisine işaret ediyor.
 
 ```python
 psql("""
@@ -213,7 +211,7 @@ Altsorgu (Subquery)
 Bir altsorgu ana sorgunun icinde isleyen bir gecici sorgudur. Kendi
 basina isleyebilen bir sorgu olmalidir, bu iyidir, cunku bu sekilde
 ayri test edilebilir. Mesela her ulkeden gelen hasilati yuzdesini
-hesaplamak icin once tum hasilati bilmek gerekir, bu bir altsorgu olur.
+hesaplamak icin önce tüm hasılatı bilmek gerekir, bu bir altsorgu olur.
 
 ```python
 psql("""SELECT BillingCountry,
@@ -252,7 +250,7 @@ Out[1]:
 23  United Kingdom   4.846689
 ```
 
-Bu sorgu isletilmeden once altsorgu isletilir, ardindan geri kalan isletilir.
+Bu sorgu işletilmeden önce altsorgu işletilir, ardından geri kalan işletilir.
 
 Bir altsorguyu bir geçici tablo olarak bile kullanabiliriz, mesela
 `FROM` içinde parantezler arasında bir sorgu işletip ona bir isim verirsek, bu isme
@@ -261,9 +259,10 @@ dış sorguda sanki bir tabloymuş gibi erisebiliriz.
 Örnek isminde `The` kelimesi olan sanatçıların listelemek istesek
 
 ```python
-psql("""SELECT names_with_the.*
+psql("""
+SELECT names_with_the.*
 FROM (SELECT Name 
-        FROM Artist 
+       FROM Artist 
        WHERE Name LIKE '%The%') AS names_with_the
 LIMIT 10""")
 ```
@@ -285,15 +284,17 @@ Out[1]:
 
 Gerçi dış sorguda fazla sükseli işlemler yapmadık ama yapabilirdik.
 
-`WHERE` kisminda da altsorgu kullanilabilir,
+`WHERE` kısmında da altsorgu kullanılabilir,
 
 ```python
-psql("""SELECT FirstName, LastName, BirthDate
+psql("""
+SELECT FirstName, LastName, BirthDate
 FROM Employee
-WHERE BirthDate IN (SELECT BirthDate 
-                      FROM Employee 
-                  ORDER BY BirthDate 
-                     LIMIT 10)""")
+WHERE BirthDate IN (
+  SELECT BirthDate FROM Employee ORDER BY BirthDate
+)
+LIMIT 10  
+""")
 ```
 
 ```text
@@ -311,17 +312,17 @@ Out[1]:
 
 Bu sorgu bize en yaşlı 10 çalışanın ismini verdi.
 
-İlginç bir altsorgu daha. Hangi ülkenin müşteri en çok ödeme yaptı?
-(Chinook-SQL-Exerçise/top_country.sql). Bunun için önce tüm ülkeler
-bazında satış toplamı alıyoruz, dış sorguda ise bunlar içinden
-maksimum olanını çekip çıkartıyoruz.
+İlginç bir altsorgu daha, hangi ülkenin müşteri en çok ödeme yaptı?
+[7]'den top_country.sql. Bunun için önce tüm ülkeler bazında satış
+toplamı alıyoruz, dış sorguda ise toplamların içinden maksimum olanını
+çekip çıkartıyoruz.
 
 
 ```python
 psql("""
-SELECT "Country", MAX("Total Sales For Country") as "Total Spent"
+SELECT Country, MAX(Total_Sales_For_Country) as Total_Spent
 FROM
-   (SELECT BillingCountry as "Country" , SUM(Total) as "Total Sales For Country"
+   (SELECT BillingCountry as Country , SUM(Total) as Total_Sales_For_Country
     FROM Invoice
     GROUP BY BillingCountry)
 """)
@@ -332,6 +333,43 @@ Out[1]:
      0       1
 0  USA  523.06
 ```
+
+Daha çetrefil birleşimler görelim, [7]'den
+line_item_track_artist.sql. Burada her fatura detayı için şarkı ve
+sanatçı isimlerinin dahil edilmesini istiyoruz.  Bu bilgi normalde
+fatura detayında yok, o zaman bir bir dörtlü birleşim (four way join)
+gerekiyor.
+
+```python
+psql("""
+SELECT InvoiceLineId, t.name as "Song", ar.Name as "Artist"
+FROM InvoiceLine i 
+JOIN Track t
+ON t.TrackId = i.TrackId
+JOIN Album a 
+ON a.AlbumId = t.AlbumId
+JOIN Artist ar 
+ON ar.ArtistId = a.ArtistId
+ORDER BY t.TrackId
+LIMIT 10
+""")
+```
+
+```text
+Out[1]: 
+      0                                        1       2
+0   579  For Those About To Rock (We Salute You)   AC/DC
+1     1                        Balls to the Wall  Accept
+2  1154                        Balls to the Wall  Accept
+3  1728                          Fast As a Shark  Accept
+4     2                        Restless and Wild  Accept
+5   580                     Princess of the Dawn  Accept
+6     3                    Put The Finger On You   AC/DC
+7     4                         Inject The Venom   AC/DC
+8  1155                         Inject The Venom   AC/DC
+9   581                               Snowballed   AC/DC
+```
+
 
 Case When [6]
 
@@ -365,6 +403,95 @@ print (df)
 4  2009  103.95           25.74   57.42
 ```
 
+Her ülke için en popüler müzik türünü seçmek istiyoruz. Yani en fazla
+alım olan şarkıları ülke bazında gruplamak lazım. Altta `WİTH` ile bir
+altsorgu yaratılıyor, bu sonuca bir isim veriliyor, `t1`, ve bu sonuç
+bir diğer alt sorguyla `t2` üzerinden birleştiriliyor [10]. 
+
+```python
+psql("""
+WITH t1 AS (
+	SELECT
+		COUNT(i.InvoiceId) Purchases, c.Country, g.Name, g.GenreId
+	FROM Invoice i
+		JOIN Customer c ON i.CustomerId = c.CustomerId
+		JOIN InvoiceLine il ON il.Invoiceid = i.InvoiceId
+		JOIN Track t ON t.TrackId = il.Trackid
+		JOIN Genre g ON t.GenreId = g.GenreId
+	GROUP BY c.Country, g.Name
+	ORDER BY c.Country, Purchases DESC
+	)
+
+SELECT t1.*
+FROM t1
+JOIN (
+	SELECT MAX(Purchases) AS MaxPurchases, Country, Name, GenreId
+	FROM t1
+	GROUP BY Country
+	) t2
+ON t1.Country = t2.Country
+WHERE t1.Purchases = t2.MaxPurchases""")
+```
+
+```text
+Out[1]: 
+      0               1                   2  3
+0     9       Argentina  Alternative & Punk  4
+1     9       Argentina                Rock  1
+2    22       Australia                Rock  1
+3    15         Austria                Rock  1
+4    21         Belgium                Rock  1
+5    81          Brazil                Rock  1
+6   107          Canada                Rock  1
+7     9           Chile                Rock  1
+8    25  Czech Republic                Rock  1
+9    21         Denmark                Rock  1
+10   18         Finland                Rock  1
+11   65          France                Rock  1
+12   62         Germany                Rock  1
+13   11         Hungary                Rock  1
+14   25           India                Rock  1
+15   12         Ireland                Rock  1
+16   18           Italy                Rock  1
+17   18     Netherlands                Rock  1
+18   17          Norway                Rock  1
+19   22          Poland                Rock  1
+20   31        Portugal                Rock  1
+21   22           Spain                Rock  1
+22   12          Sweden               Latin  7
+23  157             USA                Rock  1
+24   37  United Kingdom                Rock  1
+```
+
+Averaj şarkı isminden daha uzun olan şarkıları geri döndür. Yine bir
+altsorgu, averaj şarkı uzunluğunu hesaplamak için [10].
+
+```python
+psql("""
+SELECT Name, Milliseconds FROM (
+	SELECT t.Name, t.Milliseconds, (SELECT AVG(Milliseconds) FROM Track) AS AvgLenght
+	FROM Track t
+	WHERE AvgLenght < t.Milliseconds
+	ORDER BY t.Milliseconds DESC  )
+LIMIT 10	
+""")
+```
+
+```text
+Out[1]: 
+                             0        1
+0       Occupation / Precipice  5286953
+1      Through a Looking Glass  5088838
+2  Greetings from Earth, Pt. 1  2960293
+3      The Man With Nine Lives  2956998
+4  Battlestar Galactica, Pt. 2  2956081
+5  Battlestar Galactica, Pt. 1  2952702
+6    Murder On the Rising Star  2935894
+7  Battlestar Galactica, Pt. 3  2927802
+8            Take the Celestra  2927677
+9                Fire In Space  2926593
+```
+
 
 Referans
 
@@ -372,7 +499,7 @@ Referans
 
 [2] [sqlite](../../2018/03/sqlite-basit-sekilde-hzl-diske-deger-yazma.md)
 
-[3] [psycopg2](../../2012/06/psycopg2-python-ile-api-bazli-postgresql-erisimi.md)
+[3] [psycopg2](../../2012/06/psycopg2.md)
 
 [4] https://github.com/Olamiotan/PythonStarter
 
@@ -392,4 +519,8 @@ Referans
 * https://github.com/mamineofficial/Query-a-Digital-Music-Store-Part-I-SQL
 
 [9] https://shichaoji.com/2016/10/10/database-python-connection-basic/
+
+[10] https://github.com/douglasnavarro/chinook-analysis
+
+[11] [Postgresql](../../2012/03postgresql.md)
 

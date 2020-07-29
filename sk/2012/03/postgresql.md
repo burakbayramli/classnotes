@@ -197,5 +197,16 @@ GUI
 
 Sema, ana / yabancı anahtar, tablolar hakkında detaylı bilgiler, SQL
 işletmek için faydalı bir GUİ,
+
 [Squirrel](squirrel-sql.sourceforge.net).
+
+Diğer Postgres Yazıları
+
+[Tabanlar Arasi Buyuk Veri Transferi, pg_dump](../../2012/08/tabanlar-arasi-buyuk-veri-transferi.md)
+
+[Postgresql ve Levenhstein](../../2012/08/kolon-degerleri-arasinda-harfleme.md)
+
+[Postgres First_Value, Sum, Partition](../../2012/05/postgres-firstvalue-sum-partition.md)
+
+[Postgresql ile Yuzdelik (Percentile) Hesabi](../../2012/09/postgresql-ile-yuzdelik-percentile.md)
 
