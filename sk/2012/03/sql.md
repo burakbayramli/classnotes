@@ -14,7 +14,7 @@ müşterilerle alakalı kısımları yapay.
 
 Varlık-İlişki (Entity-Relationship -ER-) diyagramına bakınca ana
 ilişkileri görebiliyoruz. ER diyagramlarını çokluğu belirtmek icin
-bazı semboller kullanır, bunlar,
+bazı semboller kullanır [12], bunlar,
 
 ![](er.png)
 
@@ -607,5 +607,5 @@ Referans
 
 [11] [Postgresql](../../2012/03/postgresql.md)
 
-
+[12] https://www.guru99.com/er-diagram-tutorial-dbms.html
 
