@@ -137,20 +137,3 @@ ile işletirsek, şu şekilde bir görsel program başlayacak.
 
 ![](sqlitebrowse2.png)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,6 +3,12 @@
 SQL ilişkisel tabanları sorgulamak için kullanılır. İlişkisel model,
 ve giriş bilgileri [1]'de bulunabilir.
 
+2010'lu yıllarda anahtar/değer (key/value) tabanları ön plana çıkmış
+olsa da, SQL hala popüler olmaya devam ediyor. Burada SQL'un
+tasarlanma felsefesi rol oynamış olabilir, SQL ne istendiğini tarif
+eder nasıl alınacağının tarif etmez. Bu tür bir yapıyı istenen ölçeğe
+uygulamak mümkündür, hatta Google'ün BigQuery dili de aynen bunu yapıyor. 
+
 Chinook
 
 Bu tabanın sqlite ortamında nasıl kurulacağını [2]'de
@@ -17,7 +23,6 @@ ilişkileri görebiliyoruz. ER diyagramlarını çokluğu belirtmek icin
 bazı semboller kullanır [12], bunlar,
 
 ![](er.png)
-
 
 Bazı yardımcı fonksiyonlar,
 
@@ -73,11 +78,15 @@ Out[1]:
 4  Johnson  Sales Support Agent
 ```
 
+Bu fonksiyonları ile Python üzerinden SQL işletebilmek için kullandık,
+fakat yine [2]'de tarif edilen `sqlitebrowse` programı üzerinden de bu
+sorguları işletebiliriz.
+
 Basit
 
 `SELECT` ile satır seçimi yapılır, hangi satırlar, hangi kolonlar
 olacağı bu komutun seçeneklerindendir. En basit olan her şeyi seçmek,
-her kolono, her satırı (gerçi 10 tane ile sınırladık aslında ama
+her kolon, her satırı (gerçi 10 tane ile sınırladık aslında ama
 `LIMIT` olmasa her şey gelir),
 
 ```python
@@ -111,6 +120,104 @@ CONSTRAINT [PK_Artist] PRIMARY KEY  ([ArtistId])
 ```
 
 Yani `ArtistId` ve `Name` almış olduk.
+
+En basit sorgulardan bir diğeri satır saymak,
+
+```python
+runsql("""SELECT count(*) FROM Artist""")
+```
+
+```text
+(275,)
+```
+
+Belli bir kolondaki büyüklüğe göre sıralama yapmak isteyebiliriz [9],
+
+
+```python
+psql("""SELECT Lastname, Firstname, Birthdate FROM Employee ORDER BY BirthDate""")
+```
+
+```text
+Out[1]: 
+          0         1                    2
+0      Park  Margaret  1947-09-19 00:00:00
+1   Edwards     Nancy  1958-12-08 00:00:00
+2     Adams    Andrew  1962-02-18 00:00:00
+3   Johnson     Steve  1965-03-03 00:00:00
+4  Callahan     Laura  1968-01-09 00:00:00
+5      King    Robert  1970-05-29 00:00:00
+6  Mitchell   Michael  1973-07-01 00:00:00
+7   Peacock      Jane  1973-08-29 00:00:00
+```
+
+`WHERE` ile filtreleme yapabiliriz,
+
+```python
+psql("""
+SELECT EmployeeId, Lastname, Firstname, Birthdate FROM Employee
+where  EmployeeID >= 6
+""")
+```
+
+```text
+Out[1]: 
+   0         1        2                    3
+0  6  Mitchell  Michael  1973-07-01 00:00:00
+1  7      King   Robert  1970-05-29 00:00:00
+2  8  Callahan    Laura  1968-01-09 00:00:00
+```
+
+Bu kavramları beraber kullanabilirim, mesela fatura miktarı 10
+dolardan yüksek olan tüm faturaları göster, ve miktara göre sırala [13],
+
+```python
+psql("""SELECT InvoiceId, InvoiceDate, Total  
+FROM Invoice  
+WHERE Total > 10  
+ORDER BY Total LIMIT 10""")
+```
+
+```text
+Out[1]: 
+     0                    1      2
+0  298  2012-07-31 00:00:00  10.91
+1  312  2012-10-01 00:00:00  10.91
+2  311  2012-09-28 00:00:00  11.94
+3    5  2009-01-11 00:00:00  13.86
+4   12  2009-02-11 00:00:00  13.86
+5   19  2009-03-14 00:00:00  13.86
+6   26  2009-04-14 00:00:00  13.86
+7   33  2009-05-15 00:00:00  13.86
+8   40  2009-06-15 00:00:00  13.86
+9   47  2009-07-16 00:00:00  13.86
+```
+
+`WHERE` için birden fazla şartı zincirlemek mümkün, `AND` ve `OR` ile
+bunu yapabilirim,
+
+```python
+runsql("""SELECT count(*)
+FROM Invoice  
+WHERE BillingState IS NOT NULL  
+AND BillingState = 'AZ'  
+OR BillingState = 'CA'  
+AND Total > 4 """)
+```
+
+```text
+(16,)
+```
+
+Hic sart vermeseydim,
+
+```python
+runsql("""SELECT count(*) FROM Invoice  """)
+```
+
+```text
+(412,)
+```
 
 Gruplama
 
@@ -191,9 +298,9 @@ Out[1]:
 8  United Kingdom  21
 ```
 
-Şarkılar, Türler 
+Birleştirim (Join)
 
-Basit bir birleştirim (join) ile devam edelim. Tüm şarkılar `Track`
+Basit bir birleştirme işlemi ile devam edelim. Tüm şarkılar `Track`
 tablosunda, o şarkının hangi türe ait olduğu `Genre`
 tablosunda. Aradaki bağlantı `Track` üzerinde duran bir yabancı
 anahtar, `GenreId`. O zaman her şarkının ait olduğu tür için `GenreId`
@@ -261,11 +368,10 @@ Sonuçlarda `Let's Get It Up` şarkısının ait olduğu hiçbir
 `InvoiceLine` yok. Bu durumda o kimlik için boş değer var, NaN
 diyor. 
 
-Kendisiyle Birleşim (Self Join)
-
-Bir tabloyu kendisiyle de birleştirebilirdik. Diyelim bir çalışanın
-tüm ismini ve onun amirinin tüm ismini raporlamak istiyoruz. Bu
-durumda `ReportTo` kolonu tablonun kendisine işaret ediyor.
+Kendisiyle Birleşim (Self Join); Bir tabloyu kendisiyle de
+birleştirebilirdik. Diyelim bir çalışanın tüm ismini ve onun amirinin
+tüm ismini raporlamak istiyoruz. Bu durumda `ReportTo` kolonu tablonun
+kendisine işaret ediyor.
 
 ```python
 psql("""
@@ -288,6 +394,13 @@ Out[1]:
 5       Robert King  Michael Mitchell
 6    Laura Callahan  Michael Mitchell
 ```
+
+Bu arada dikkat çektiyse `||` komutu var, bu komut kolon değeri
+birleştirmek için kullanılır. İsim ve soyisimi birleştirebilirim,
+arasına bir boşluk koyarak yeni bir kolon oluşturmuş olurum. Bu kolona
+`AŞ ...` şeklinde bir isim de verirsem, çıktılar buna göre
+düzenlenir. Hatta altsorgularda bile tanımlanan bu tür kolonlar üst
+sorgular tarafından kullanılabilir.
 
 Altsorgu (Subquery)
 
@@ -608,4 +721,7 @@ Referans
 [11] [Postgresql](../../2012/03/postgresql.md)
 
 [12] https://www.guru99.com/er-diagram-tutorial-dbms.html
+
+[13] https://www.c-sharpcorner.com/article/diving-into-basics-of-sql-server/
+
 
