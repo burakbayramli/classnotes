@@ -79,8 +79,10 @@ Out[1]:
 ```
 
 Bu fonksiyonları ile Python üzerinden SQL işletebilmek için kullandık,
-fakat yine [2]'de tarif edilen `sqlitebrowse` programı üzerinden de bu
-sorguları işletebiliriz.
+fakat yine [2]'de tarif edilen `sqlitebrowser` programı üzerinden de
+bu sorguları işletebiliriz.
+
+![](chinook-browser.png)
 
 Basit
 
