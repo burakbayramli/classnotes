@@ -3,6 +3,8 @@
 
 ## En Son
 
+30/7 - [Raspberry Pi](2020/07/raspberrypi.md)
+
 27/7 - [chmod](2020/07/chmod.md)
 
 27/7 - [Unix](2020/07/unix.md)
@@ -11,9 +13,6 @@
 
 16/7 - [Ubuntu 18, Acer Swift](2020/07/ubuntu-18-acer-swift.md)
 
-10/7 - [2 Boyutlu Fiziksel Simulasyon (Rigid Body 2d Physics Simulation), pymunk](2020/07/kati-govde-fizik-simulasyon-rigid-body-physics-pymunk.md)
-
-1/6 - [Grafiklemek](2020/02/grafiklemek.md)
 
 ## Konular, Referans
 
@@ -24,6 +23,8 @@
 [SQL](2012/03/sql.md)
 
 [Proje İdaresi](2020/07/proje-idaresi.md)
+
+[Network, TCP/IP, Internet](2000/10/network.md)
 
 [Nereden Başlarım](2019/01/nereden.md)
 

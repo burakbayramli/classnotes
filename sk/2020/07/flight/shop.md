@@ -4,16 +4,22 @@
 Direnc
 
 multimetre
-https://www.direnc.net/mas-830l-digital-multimetre
+https://www.direnc.net/uni-t-ut33c-multimetre
 
 potansiyometre
-https://www.direnc.net/10k-uzun-mil-pot
+2 x https://www.direnc.net/10k-uzun-mil-pot
 
 krokodil
-https://www.direnc.net/krokodil-kablo-kucuk-boy
+3 x https://www.direnc.net/krokodil-kablo-kucuk-boy
 
 servo
 https://www.direnc.net/sg90-9g-servo-motor
+
+gyro, accel sensor
+MPU 6050
+https://www.direnc.net/mpu6050-3-axis-gyro-ve-egim-sensoru
+
+
 
 
 motor
@@ -35,10 +41,6 @@ tornavida, pense, vs
 https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
 https://www.direnc.net/jm-s214-yildiz-tornavida-150mm-6mm
 https://www.direnc.net/elektronikci-kargaburun-pense-140mm
-
-gyro, accel sensor
-MPU 6050
-https://www.direnc.net/mpu6050-3-axis-gyro-ve-egim-sensoru
 
 pil yuvasi
 https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi

@@ -7,7 +7,7 @@ ve giriş bilgileri [1]'de bulunabilir.
 olsa da, SQL hala popüler olmaya devam ediyor. Burada SQL'un
 tasarlanma felsefesi rol oynamış olabilir, SQL ne istendiğini tarif
 eder nasıl alınacağının tarif etmez. Bu tür bir yapıyı istenen ölçeğe
-uygulamak mümkündür, hatta Google'ün BigQuery dili de aynen bunu yapıyor. 
+uygulamak mümkündür, hatta Google'un BigQuery dili de aynen bunu yapıyor. 
 
 Chinook
 
@@ -19,7 +19,7 @@ müşterilerle alakalı kısımları yapay.
 ![](chinook_er.jpeg)
 
 Varlık-İlişki (Entity-Relationship -ER-) diyagramına bakınca ana
-ilişkileri görebiliyoruz. ER diyagramlarını çokluğu belirtmek icin
+ilişkileri görebiliyoruz. ER diyagramları çokluğu belirtmek icin
 bazı semboller kullanır [12], bunlar,
 
 ![](er.png)
@@ -731,5 +731,12 @@ Referans
 [12] https://www.guru99.com/er-diagram-tutorial-dbms.html
 
 [13] https://www.c-sharpcorner.com/article/diving-into-basics-of-sql-server/
+
+
+
+
+
+
+
 
 
