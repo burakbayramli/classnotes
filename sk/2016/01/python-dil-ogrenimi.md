@@ -45,9 +45,11 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [izip](../../2010/06/izip.md)
 
-[Tarih Zaman Icin datetime](../../2016/06/datetime.md)
+[Tarih Zaman İçin datetime](../../2016/06/datetime.md)
 
-[Objeleri Yazip Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)
+[Objeleri Yazıp Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)
+
+[Düzenli İfadeler, Python, Regex (Regular Expressions)](../../duzenli-ifadeler-python-regex-regular.md)
 
 
 

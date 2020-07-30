@@ -400,7 +400,7 @@ Out[1]:
 Bu arada dikkat çektiyse `||` komutu var, bu komut kolon değeri
 birleştirmek için kullanılır. İsim ve soyisimi birleştirebilirim,
 arasına bir boşluk koyarak yeni bir kolon oluşturmuş olurum. Bu kolona
-`AŞ ...` şeklinde bir isim de verirsem, çıktılar buna göre
+`AS ...` ile bir isim de verirsem, çıktılar buna göre
 düzenlenir. Hatta altsorgularda bile tanımlanan bu tür kolonlar üst
 sorgular tarafından kullanılabilir.
 
