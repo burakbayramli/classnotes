@@ -49,7 +49,7 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Objeleri Yazıp Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)
 
-[Düzenli İfadeler, Python, Regex (Regular Expressions)](../../duzenli-ifadeler-python-regex-regular.md)
+[Düzenli İfadeler, Python, Regex (Regular Expressions)](../.././2016/02/duzenli-ifadeler-python-regex-regular.md)
 
 
 
