@@ -87,7 +87,9 @@ gerekir). Böylece aynı makinaya erişen birden fazla erişen kişi, aynı
 servis makinasına ve aynı kullanıcıya değişik açık anahtarlar ile
 erişebilir.
 
-Eski Anlatim
+[Youtube Video](https://www.youtube.com/watch?v=V_ukbRUdcGU)
+
+Eski Anlatım
 
 SSH gizli/açık anahtar kavramına göre çalışır (public/private key
 encryption). Uzak bir makinada şifresiz giriş yapmak, komutlar
