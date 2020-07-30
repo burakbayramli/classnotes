@@ -6,6 +6,16 @@ Direnc
 multimetre
 https://www.direnc.net/mas-830l-digital-multimetre
 
+potansiyometre
+https://www.direnc.net/10k-uzun-mil-pot
+
+krokodil
+https://www.direnc.net/krokodil-kablo-kucuk-boy
+
+servo
+https://www.direnc.net/sg90-9g-servo-motor
+
+
 motor
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
 
@@ -20,10 +30,6 @@ https://www.direnc.net/111v-3s1p-2200-mah-30c-li-polymer-pil-soketli
 
 sarj
 https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
-
-servo
-https://www.direnc.net/sg90-9g-servo-motor
-
 
 tornavida, pense, vs
 https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
@@ -40,6 +46,7 @@ https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
 
 ------------------------------------------------------------------------
 
+PAKET 1
 
 x raspberry pi 3
 x https://www.direnc.net/raspberry-pi-3
