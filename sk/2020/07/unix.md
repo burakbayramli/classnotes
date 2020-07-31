@@ -124,7 +124,9 @@ $ echo $PATH
 ```
 
 Görüldüğü gibi `/bin` dizini listede (sonda), ve `bash` işletilmesi
-istenen programı arayıp bu son dizinde buldu.
+istenen programı arayıp bu son dizinde buldu. `PATH` değişkeni
+başlangıç ayar dosyasında set edilir, `bash` için `.bashrc` ve
+`/etc/profile`.
 
 Eğer karışıklığı meydan bırakmayacak şekilde bir programı direk
 işletmek istersek bunu komut satırında `/bin/date` yazarak

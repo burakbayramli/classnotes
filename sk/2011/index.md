@@ -34,19 +34,7 @@
 
 [Sympy](04/sympy.md)
 
-[GAE ve Facebook Connect](05/gae-ve-facebook-connect.md)
-
-[App Arama Motoru](06/app-arama-motoru.md)
-
-[Emacs, Ubuntu, Yeni Font (Monaco)](06/emacs-ubuntu-yeni-font-monaco.md)
-
-[Kinect](06/kinect.md)
-
-[OpenCV ve Goruntu Kaydetmek](06/opencv-ve-goruntu-kaydetmek.md)
-
 [Ses Kayit, audiolab](06/ses-kayit-audiolab.md)
-
-[Sol Tarafta Cikan Formuller, Paragraf Araligi](06/sol-tarafta-cikan-formuller-paragraf.md)
 
 [Ubuntu 11](06/ubuntu-11.md)
 
@@ -58,8 +46,6 @@
 
 [Scipy 2011](07/scipy-.md)
 
-[Arastirmacilar Icin Bedava EC2](08/arastirmacilar-icin-bedava-ec2.md)
-
 [Ders Notlari ve Github](08/ders-notlari-ve-github.md)
 
 [Emacs Uzerinden Twitter](08/emacs-uzerinden-twitter.md)
@@ -67,8 +53,6 @@
 [Git Tavsiyeleri](08/git-tavsiyeleri.md)
 
 [KineticsKit](08/kineticskit.md)
-
-[Lineer Optimizasyon, Simplex ve Berlin Hava Ikmali](08/lineer-optimizasyon-simplex-ve-berlin.md)
 
 [Lokal Dosya Arama - recoll](08/lokal-dosya-arama-recoll.md)
 

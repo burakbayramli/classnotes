@@ -22,3 +22,5 @@
 
 [Unix](07/unix.md)
 
+[Video Islemleri](07/video-islemleri.md)
+

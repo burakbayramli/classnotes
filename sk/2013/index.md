@@ -16,10 +16,6 @@
 
 [R ve iPython Baglantisi](01/r-ve-ipython-baglantisi.md)
 
-[Taavi Burns Pandas Konusmasi](01/taavi-burns-pandas-konusmasi.md)
-
-[Wakari](01/wakari.md)
-
 [Not Defteri Icinde Animasyon](02/not-defteri-icinde-animasyon.md)
 
 [Starcluster](03/starcluster.md)

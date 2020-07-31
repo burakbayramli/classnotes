@@ -26,6 +26,8 @@
 
 [Java İle Toptan İşlem Kalıbı](10/java-ile-toptan-islem-kalb.md)
 
+[Network, TCP/IP, Internet](10/network.md)
+
 [Organizasyonlarda Teknik Bilgi İletişimi](10/organizasyonlarda-teknik-bilgi.md)
 
 [Program Nasıl Test Edilir](10/program-nasl-test-edilir.md)
@@ -45,8 +47,6 @@
 [Tekil Nesne Kalıbı (Singleton Pattern)](10/tekil-nesne-kalb-singleton-pattern.md)
 
 [Tomcat ile Dağıtık (Distributed) Sistem İnşâsı](10/tomcat-ile-dagtk-distributed-sistem.md)
-
-[Veri Modelini Normâlleştirmek](10/veri-modelini-normallestirmek.md)
 
 [Yazıcıdan Güzel Java Basmak (Pretty Print)](10/yazcdan-guzel-java-basmak-pretty-print.md)
 

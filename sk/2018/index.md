@@ -10,8 +10,6 @@
 
 [sqlite, Basit, Hızlı Diske Değer Yazma Okuma](03/sqlite-basit-sekilde-hzl-diske-deger-yazma.md)
 
-[Veri Taban İçeriğini Gezmek](03/veri-taban-icerigini-gezmek.md)
-
 [basemap](06/basemap.md)
 
 [Genel GPS: HTML5, Javascript, Python, Kodlari, Tavsiyeleri](06/genel-gps-html5-javascript-python.md)

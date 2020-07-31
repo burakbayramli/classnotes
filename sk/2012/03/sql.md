@@ -225,7 +225,7 @@ Gruplama
 
 Bir tablodaki, ya da birleştirimler üzerinden oluşturulmuş bir sonuç
 kümesindeki kolonlar üzerinde gruplama yapmak mümkündür. Mesela fatura
-tablosunda ülkeler üzerinden gruplama yapabilirim, ve bu grubun satır
+tablosunda ülkeler üzerinden gruplama yapabilirim, ve her grubun satır
 sayısını raporlamak isteyebilirim.
 
 ```python
@@ -732,7 +732,7 @@ Referans
 
 [13] https://www.c-sharpcorner.com/article/diving-into-basics-of-sql-server/
 
-
+[14] [MongoDB](../../2014/05/mongodb.md)
 
 
 

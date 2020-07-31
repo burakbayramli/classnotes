@@ -36,7 +36,7 @@
 
 [Clicktale](04/clicktale.md)
 
-[FaydalÄ± Unix KomutlarÄ±](04/faydali-unix-komutlari.md)
+[Faydalı Unix Komutları](04/faydali-unix-komutlari.md)
 
 [Meta, Sema ve Postgresql](04/meta-sema-ve-postgresql.md)
 
@@ -96,11 +96,11 @@
 
 [Numpy Temelli 2 Kolon Icin Basit Gruplama (Group By)](06/numpy-temelli-2-kolon-icin-basit.md)
 
+[pyscopg2](06/psycopg2.md)
+
 [PyMC](06/pymc.md)
 
-[pyscopg2](06/pyscopg2.md)
-
-[Python ile Mail GÃ¶ndermek, SMTP, GMail](06/python-ile-mail-gondermek-smtp-gmail.md)
+[Python ile Mail Göndermek, SMTP, GMail](06/python-ile-mail-gondermek-smtp-gmail.md)
 
 [Python Ile Mail - Metin Eklentileri (Text Attachment)](06/python-ile-mail-metin-eklentileri-text.md)
 
@@ -124,7 +124,7 @@
 
 [Klavye Tusunu Mouse Tiklamasi Haline Getirmek](08/klavye-tusunu-mouse-tiklamasi-haline.md)
 
-[Kolon Degerleri Arasinda Harfleme (Spelling) Hata Farki Var mi?](08/kolon-degerleri-arasinda-harfleme.md)
+[Postgresql ve Levenhstein](08/kolon-degerleri-arasinda-harfleme.md)
 
 [Matriste Bos Degerleri Yakin Degerle Doldurmak (Interpolation)](08/matriste-bos-degerleri-yakin-degerle.md)
 

@@ -1,13 +1,5 @@
 # ggplot
 
-
-
-
-ggplot
-
-
-
-
 R dilinde cokca kullanilan ggplot2 kutuphanesi nihayet Python'a tasinmaya baslandi. Kurmak icin,
 
 sudo pip install ggplot

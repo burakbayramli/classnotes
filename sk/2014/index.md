@@ -28,8 +28,6 @@
 
 [Lindley'in Paradoksu](08/lindleyin-paradoksu.md)
 
-[Esle / Indirge Anlatimi (Map / Reduce)](09/esle-indirge-anlatimi.md)
-
 [Eşle-İndirge Mimarisi (Map/Reduce -MR- Architecture)](09/esle-indirge-mimarisi-mapreduce-mr.md)
 
 [Gradyan Destekli Regresyon Agaclari (Gradient Boosted Regression Trees -GBRT-)](09/gradient-boosted-regression-trees-gbrt.md)

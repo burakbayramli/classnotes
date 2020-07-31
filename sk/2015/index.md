@@ -18,11 +18,9 @@
 
 [Vagrant](04/vagrant.md)
 
-[Komut Satirindan Haber Basliklari](06/komut-satirindan-haber-basliklari.md)
-
 [Algorithmic Trading Kitabi, Python](09/algorithmic-trading-kitabi-python.md)
 
-[ffmpeg, avconv, moviepy](10/ffmpeg-yerine-avconv.md)
+[ffmpeg, avconv, moviepy](10/ffmpeg-avconv-moviepy.md)
 
 [Histogram Numaralari](10/histogram-numaralari.md)
 

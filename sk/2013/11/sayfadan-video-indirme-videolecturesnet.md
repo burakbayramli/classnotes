@@ -1,11 +1,5 @@
 # Sayfadan Video Indirme, videolectures.net, rtmpdump
 
-
-Sayfadan Video Indirme, videolectures.net, rtmpdump
-
-
-
-
 Komut satiri araclari kullanarak mesela videolectures.net gibi bir siteden nasil video indiririz? Once rtmpdump kurmak lazim, 
 
 sudo apt-get install rtmpdump

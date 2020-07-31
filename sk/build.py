@@ -16,4 +16,9 @@ if __name__ == "__main__":
         print (cmd)
         os.system(cmd)
 
-        
+    if sys.argv[1] == 'years':
+        for year in range(2000,2021):
+            if year == 2007: continue
+            os.system("echo '# %d\n' > %d/index.md" % (year,year))
+            os.system("python -u gen.py %d >> %d/index.md" % (year,year))
+

@@ -14,8 +14,6 @@
 
 [Cozunurluluk Ayari](02/cozunurluluk-ayari_24.md)
 
-[FB Connect Video](02/fb-connect-video_16.md)
-
 [Tim Bray ile Roportaj](02/tim-bray-ile-roportaj_16.md)
 
 [Arama Mimarisi](03/arama-mimarisi_29.md)
@@ -158,17 +156,7 @@
 
 [Stephen Marsland - Yapay Ogrenim Kitabi](10/stephen-marsland-yapay-ogrenim-kitabi.md)
 
-[Pyrobot](11/pyrobot.md)
-
-[Regresyon, Least Squares](11/regresyon-least-squares.md)
-
-[Simbad, Sensor, Python](11/simbad-sensor-python.md)
-
-[Simbad](11/simbad.md)
-
 [SrPy](11/srpy.md)
-
-[Video Kirpmak](11/video-kesmek.md)
 
 [Aktiviteler Arasi Gecis](12/aktiviteler-arasi-gecis.md)
 
