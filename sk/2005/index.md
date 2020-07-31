@@ -20,5 +20,3 @@
 
 [Java İle Nasıl Dosya Kopyalanır?](10/java-ile-nasl-dosya-kopyalanr.md)
 
-[Nesne Tasarımı](10/nesne-tasarm.md)
-

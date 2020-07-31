@@ -14,8 +14,6 @@
 
 [Genel Yazılım Teknikleri](10/genel-yazlm-teknikleri.md)
 
-[Instanceof, Çokyüzlülük (Polymorphism)](10/instanceof-cokyuzluluk-polymorphism.md)
-
 [İnternet Sayfası İstenince Ne Olur](10/internet-sayfas-istenince-ne-olur.md)
 
 [IP Yönlendirme](10/ip-yonlendirme.md)
@@ -25,6 +23,8 @@
 [Java İle Düzenli İfadeler - Jakarta ORO](10/java-ile-duzenli-ifadeler-jakarta-oro.md)
 
 [Java İle Toptan İşlem Kalıbı](10/java-ile-toptan-islem-kalb.md)
+
+[Nesnesel Programlama (Object-Oriented Programming)](10/nesnesel-programlama.md)
 
 [Network, TCP/IP, Internet](10/network.md)
 
