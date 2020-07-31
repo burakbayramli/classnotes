@@ -199,12 +199,3 @@ Referans
 [Unix, Servisleri Nasıl Başlatıyor?](../..//2002/10/unix-servisleri-nasl-baslatyor.md)
 
 [Bir Makinaya SSH ile Şifresiz Giriş](../../2005/10/bir-makinaya-ssh-ile-sifresiz-giris.md)
-
-
-
-
-
-
-
-
-
