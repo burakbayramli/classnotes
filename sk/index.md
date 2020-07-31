@@ -3,6 +3,8 @@
 
 ## En Son
 
+31/7 - [SQL](2012/03/sql.md)
+
 30/7 - [Raspberry Pi](2020/07/raspberrypi.md)
 
 27/7 - [chmod](2020/07/chmod.md)
