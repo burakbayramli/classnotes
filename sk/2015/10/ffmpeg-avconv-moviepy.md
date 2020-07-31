@@ -24,8 +24,8 @@ baslayip 10 saniyelik kismi cikartalim. Once sadece goruntu dosyalari
 alacagiz,
 
 ```
-ffmpeg -ss 00:00:20 -t 00:00:10 -i [video dosyasi]  -vf \
-   scale=320:-1:flags=lanczos,fps=10  frames/ffout-%03d.png
+ffmpeg -ss 00:00:20 -t 00:00:10 -i [video dosyasi]  -vf \
+   scale=320:-1:flags=lanczos,fps=10  frames/ffout-%03d.png
 ```
 
 Simdi bu dosyalari ImageMagick ile birlestirip animasyonu yaratalim
@@ -34,7 +34,23 @@ Simdi bu dosyalari ImageMagick ile birlestirip animasyonu yaratalim
 convert -loop 0 frames/ffout*.png output.gif
 ```
 
-Format degisimi, kucultmek, mumkun oldugu kadar kaliteyi istenen sekilde tutmak, 440 yuksekliginde, genislik izafi, kalite 23 (en kaliteli 0)
+Eger direk gif yaratmak istersek,
+
+```
+ffmpeg -ss 61.0 -t 2.5 -i vid/devil.mp4 -f gif devil.gif
+```
+
+GIF icinde yazi yazmak istersek,
+
+```
+ffmpeg -ss 30 -t 3 -i [DOSYA] -filter_complex "fps=10,scale=720:-1:flags=lanczos,drawtext=enable='between(t,0,1)':fontfile=font3.ttf:text='word':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,drawtext=enable='between(t,1,2)':fontfile=font3.ttf:text='word what':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,split[x1][x2];[x1]palettegen[p];[x2][p]paletteuse" output.gif
+```
+
+
+
+Format degisimi, kucultmek, mumkun oldugu kadar kaliteyi istenen
+sekilde tutmak, 440 yuksekliginde, genislik izafi, kalite 23 (en
+kaliteli 0)
 
 ```
 ffmpeg -i input.mkv -vf scale=-1:440 -crf 23  output.avi
@@ -131,4 +147,6 @@ seceneklerde "endpos" ibaresinin tercumesi "bitis noktasi" olmasina
 ragmen komut "reklam edildigi gibi" islemiyor.
 
 
+Kaynaklar
 
+https://engineering.giphy.com/how-to-make-gifs-with-ffmpeg/
