@@ -4,7 +4,7 @@
 üzerinde bulmak, algılayıcı, GPS değerlerini kaydetmek için. Diğeri
 hızlı frekansta ivmeölçer (acceloremeter), GPS kaydeder.
 
-https://github.com/burakbayramli/kod/tree/master/sensorcam
+https://github.com/burakbayramli/classnotes/tree/master/sk/2017/02/sensorcam
 
 1) uygulama kamera görüntüleri, yön algılayıcısı, GPS verilerini
 kaydetme özelliği var. Uygulama başka bir proje için veri kaydı, test
