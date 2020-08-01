@@ -23,6 +23,18 @@ source /home/burak/Documents/env3/bin/activate
 
 Bu script'i bir ikon üzerinden başlatmak için Ubuntu kuruluş notlarına bakılabilir.
 
+Emacs'ın tüm başlangıç ayarlarını bir el dosyasında
+tutabiliriz. Olağan haliyle Emacs ev dizini `$HOME` altındaki `.emacs`
+dosyasını arar. Fakat bu dosya ev dizininde silinir, kaybolur endisesi
+ile biz orada
+
+```
+(load-file "/dizin/dizin/emacs-ayar.el")
+```
+
+gibi başka bir dosyayı yükleriz, yani ayarlar `emacs-ayar.el` içinde
+oluyor mesela, ki bu dosya kod deposu içinde güvenli.
+
 Emacs,  
 
 * LISP'i andıran bir dil ile her şeyini değiştirmenize izin veriyor.  
@@ -156,4 +168,6 @@ Control gibi işliyor olacak.
 Referans
 
 [Pymacs](/2009/04/pymacs.md)
+
+[Ayarlarim](https://github.com/burakbayramli/kod/tree/master/site-lisp)
 
