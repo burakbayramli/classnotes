@@ -48,8 +48,6 @@
 
 [Ders Notlari ve Github](08/ders-notlari-ve-github.md)
 
-[Emacs Uzerinden Twitter](08/emacs-uzerinden-twitter.md)
-
 [Git Tavsiyeleri](08/git-tavsiyeleri.md)
 
 [KineticsKit](08/kineticskit.md)

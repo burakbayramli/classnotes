@@ -52,6 +52,16 @@ SD Card)" için daha önce formatlamış olduğumuz kart seçilir. Tamam
 dedikten sonra bu işlem 1 GB üzerinde bir indirme yapacak, yani hızlı
 ve yeterince kapasitesi olan bir Internet bağlantımız olması iyi olur.
 
+Güç Kaynağı
+
+Her Pi için gerekli güç kaynağı parametreleri [4]'te. Bizim aldığımız
+3B+ modeli için 5.1 V ve 2.5 A diyor, ve giriş Mikro USB. Mikro USB
+çoğu Samsung cep telefonunun güç girişi, bende birkaç tane şarj edici
+vardı, fakat bazıları farklı amper seviyelerinde idi. Bir tanesi 5.0 V
+ve 2.0 Amper diyor, bunu taktık, çalıştı. [4]'un bahsettiği gibi
+RPi'nin ne kadar akım çektiği ona bağlı olan diğer donanımlara
+bağlıdır. 
+
 İlk Sistem Başlatımı
 
 Ufak olan SD kartını büyük olandan çıkartıp Pi'ye takarız. RPi
@@ -106,3 +116,4 @@ Kaynaklar
 
 [3] https://www.raspberrypi.org/documentation/remote-access/ssh/
 
+[4] https://www.raspberrypi.org/documentation/hardware/raspberrypi/power/README.md

@@ -1,11 +1,15 @@
 # Stallman ve Tasarim
 
-
-Stallman ve Tasarim
-
-
-
-GNU hareketinin kurucusu Richard Stallman'dan veciz bir soz:"Emacs programi, her noktayi dikkatle planmayi dikte eden tur bir surecle ortaya cikamazdi. O tur surecler sadece onceden ne olduklari ve niye istenildigi cok iyi anlasilmis hedeflere erismek icin kullanilirlar. Emacs'i yazmadan once ne ben ne de bir baskasi ucuncu partiler tarafindan eklenebilen, buyutulebilen bir gorsel editor hayal edebiliyordu, ne de bu tur eklenebilen bir yazilimin faydalarini, onu ilk elden tecrubeleyince kadar, bilebiliyordu. Emacs mevcut olabilmisse, bu, sonu bile gozukmeyen bir yolda ufak iyilestirmeleri yapmakta kendimi ozgur hissetmem sayesinde olmustur".
+GNU hareketinin kurucusu Richard Stallman'dan veciz bir söz: "Emacs
+programı, her noktayı dikkatle planmayı dikte eden tur bir süreçle
+ortaya çıkamazdı. O tür süreçler sadece önceden ne oldukları ve niye
+istenildiği çok iyi anlaşılmış hedeflere erişmek için
+kullanılırlar. Emacs'ı yazmadan önce ne ben ne de bir başkası üçüncü
+partiler tarafından eklenebilen, büyütülebilen bir görsel editör hayal
+edebiliyordu, ne de bu tür eklenebilen bir yazılımın faydalarını, onu
+ilk elden tecrübeleyince kadar, bilebiliyordu. Emacs mevcut
+olabilmişse, bu, sonu bile gözükmeyen bir yolda ufak iyileştirmeleri
+yapmakta kendimi özgür hissetmem sayesinde olmuştur".
 
 
 

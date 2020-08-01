@@ -24,3 +24,5 @@
 
 [Video Islemleri](07/video-islemleri.md)
 
+[Network Ölçümü](08/network-olcumu.md)
+

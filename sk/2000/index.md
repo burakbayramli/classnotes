@@ -12,8 +12,6 @@
 
 [Extreme Programming Nedir?](10/extreme-programming-nedir.md)
 
-[Genel Yazılım Teknikleri](10/genel-yazlm-teknikleri.md)
-
 [İnternet Sayfası İstenince Ne Olur](10/internet-sayfas-istenince-ne-olur.md)
 
 [IP Yönlendirme](10/ip-yonlendirme.md)

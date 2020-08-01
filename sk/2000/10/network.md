@@ -6,3 +6,5 @@
 
 [TCP/IP'ye Genel Bir Bakis](tcpip-genel-bir-bakis.md)
 
+[Network Ölçümü](../../2020/08)
+

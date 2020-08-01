@@ -46,17 +46,11 @@
 
 [Wine](03/wine_11.md)
 
-[The Case for Emacs](04/case-for-emacs_03.md)
-
 [Cok Cekirdekli Islemciler](04/cok-cekirdekli-islemciler_26.md)
-
-[DJ Patil](04/dj-patil_29.md)
 
 [Git, Emacs, Python: Dosyalarin Eski Hali](04/git-emacs-python-dosyalarin-eski-hali.md)
 
 [Git ile Baslangic](04/git-ile-baslangic_21.md)
-
-[gksudo](04/gksudo_12.md)
 
 [Google AppEngine ve Java](04/google-appengine-ve-java_29.md)
 
@@ -70,15 +64,11 @@
 
 [@Out ve @Scope](04/out-ve-scope_16.md)
 
-[Pymacs](04/pymacs_06.md)
+[Pymacs](04/pymacs.md)
 
 [Scipy](04/scipy_27.md)
 
 [Stallman ve Tasarim](04/stallman-ve-tasarim_20.md)
-
-[Yerel Makinada FB Connect Testleri](04/yerel-makinada-fb-connect-testleri_12.md)
-
-[Yorum Mimarisi](04/yorum-mimarisi_01.md)
 
 [Closure](05/closure_30.md)
 

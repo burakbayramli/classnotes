@@ -16,5 +16,3 @@
 
 [Ubuntu'da CAPS Tusunu Control Yapmak](12/ubuntu-caps-tusunu-control-yapmak.md)
 
-[Ubuntu ve Emacs](12/ubuntu-ve-emacs_10.md)
-

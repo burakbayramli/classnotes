@@ -21,6 +21,8 @@ ile bulmak, `grep` ile icerik aramak, text dosyalarina veri eklemek,
 
 [Link](../../2020/07/unix.md)
 
+Kod yazmak için editör, [Emacs](../../2004/10/emacs.md)
+
 Unix ve Python dili öğrenilince ardından servis tarafı kodlamalarına
 bir dalış, mesela Flask üzerinden sayfa servis edebilmek. Bu arada
 HTML ve CSS temeli yanda öğrenilir. HTML/CSS sayfaları direk editörde
