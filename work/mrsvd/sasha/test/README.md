@@ -1,3 +1,4 @@
+# README
 
 netstat -g shows multicast groups
 

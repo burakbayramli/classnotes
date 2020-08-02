@@ -98,6 +98,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\big\{","\\big\\\\{")
       line = line.replace("\\big\}","\\big\\\\}")
       line = re.sub(r'\\hspace\{(.*?)\}', r'\n', line)
+      line = line.replace("\\begin{center}","")
+      line = line.replace("\\end{center}","")
       line = line.replace("\\begin{itemize}","")
       line = line.replace("\\end{itemize}","")
       line = line.replace("\\begin{enumerate}","")
@@ -196,7 +198,7 @@ if __name__ == "__main__":
     if sys.argv[1] == 'html':
         
         fr = os.getcwd()
-        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s' --ignore-list=.md,.git,.zip,.pdf" % (fr, TARGET_DIR)
+        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s' --ignore-list=.md,.git,.zip,.pdf,.apk" % (fr, TARGET_DIR)
         print (cmd)
         os.system(cmd)
         shutil.copy(".gitignore", TARGET_DIR)

@@ -1,4 +1,4 @@
-##Architecture
+# Architecture
 
 There are three threads, one main loop that processes outside machines
 from other servers and the job runner (this send commands, defining

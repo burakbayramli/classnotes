@@ -1,4 +1,4 @@
-**Large Scale SVD on map/reduce**
+#  Large Scale SVD on map/reduce
 
 Arxiv paper http://arxiv.org/abs/1310.4664.
 
