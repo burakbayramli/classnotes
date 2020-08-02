@@ -89,7 +89,7 @@ paketler ilk işlettiğimiz `apt-get install` listesi,
 ```
 git chromium-browser emacs xkbset virtualenv texlive-full pygmentize
 vlc mplayer xvkbd htop make libportaudio2 portaudio19-dev python3-dev
-cmake calibre fbreader
+cmake calibre fbreader evince
 ```
 
 Emacs ile F tuşlarını kullananlar için, bu tuşlar Acer tarafından
@@ -97,8 +97,7 @@ kullanılmakta, ses, ışık ayarı gibi... Eğer iptal etmek ile uğraşmak
 istemiyorsanız, Emacs içinde FN tuşu ile beraber F1, F2, vs. basmak
 normal F1, F2 etkisi yapar.
 
-Emacs'i her zaman bir Python
-[virtualenv](../../2018/08/virtualenv-python-izole-sanal-calsma.md)
+Emacs'i her zaman bir Python [virtualenv](../../2018/08/virtualenv-python-izole-sanal-calsma.md)
 ortamından başlatmak iyi fikirdir, böylece komut satırında işletilen
 `python` çağrısı ortamda kurulan paketlere erisebilmiş olur. Bizim
 mesela bir `emacs.sh` script var, program böyle başlatılıyor, orada
@@ -112,7 +111,7 @@ source /home/burak/Documents/env3/bin/activate
 Bu script icin de bir `alias` yaratabiliriz,
 
 ```
-alias em="cd $HOME/Documents/kod; bash emacs3.sh"
+alias em="cd $HOME/Documents/kod; bash emacs.sh"
 ```
 
 Bizim Emacs ayarlari [surada](https://github.com/burakbayramli/kod/tree/master/site-lisp).
@@ -144,6 +143,13 @@ Make sure to run a sudo apt update
 sudo apt install android-file-transfer
 ```
 
+Evince
+
+PDF dosyalarını gösteren bu program her farklı dosya için sol tarafta
+bir menü ortaya ciakrtiyor, kapatılsa bile bir sonraki dosya için
+aynısını yapıyor. Her PDF aynı şekilde çıksın istiyorsanız bir PDF'i o
+hale getirin, boyut vs ayarlayın, sonra sağ üst köşeden `File Options |
+Save Current State Aş Default` seçin
 
 Kaynaklar
 
