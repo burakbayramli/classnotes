@@ -10,7 +10,7 @@ sudo apt-get install emacs25
 
 Başlatmak için ben bir bash script yazdım, çünkü o script içinden bir
 Python sanal ortam başlatıyorum, böylece Emacs ıcindeyken istediğim
-Python paketlerine de erisebilmiş oluyorum. Çünkü Python script'leri
+Python paketlerine de erişebilmiş oluyorum. Çünkü Python script'leri
 çoğunlukla Emacs ıcinden işletirim, eğer Emacs süreci Python
 paketlerinden habersiz ise, script işini yapamaz. Mesela `env3` adlı
 bir ortam için

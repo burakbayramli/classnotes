@@ -1,7 +1,5 @@
 # 2008
 
-[Ardabot4j](10/ardabot4j.md)
-
 [Firefox Icin SSH Tunelleme](11/firefox-icin-ssh-tunelleme_24.md)
 
 [Hatali Tarih Saptamak](12/hatali-tarih-saptamak_22.md)

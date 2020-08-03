@@ -38,8 +38,6 @@
 
 [Veri Tabanı Bağlantı Havuzları (DB Connection Pools)](10/veri-taban-baglant-havuzlar-db.md)
 
-[Bilişim Kelimelerinin Telâfuzu](11/bilisim-kelimelerinin-telafuzu.md)
-
 [Oracle VARCHAR İndeksleri Üzerinden Erişim Yavaş mıdır?](11/oracle-varchar-indeksleri-uzerinden.md)
 
 [Türev İşlevi Nasıl Türetilir](11/turev-islevi-nasl-turetilir.md)
