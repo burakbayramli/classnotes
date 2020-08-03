@@ -1,8 +1,14 @@
 ### İçerik
 
-İçeriğe ek yapmak isteyenler gerekli .tex dosyasını değiştirip,
-ekleyip içinde oldukları dizinde `python ../build.py tex` komutunu
-işletebilirler, gerekli PDF dosyası otomatik olarak üretilecektir.
+İçeriğe ek yapmak isteyenler bizim repo'yu kendi hesaplarina
+kopyalayarak gerekli .tex dosyasını değiştirip, ekleyip içinde
+oldukları dizinde `python ../build.py tex` komutunu işletebilirler,
+gerekli PDF dosyası otomatik olarak üretilecektir.  Degisimden sonra
+Github uzerinden bana "pull request" bir gonderilir, ve ben de
+degisiklikleri ana repo'ya dahil ederim.
+
+İngilizce-Türkçe teknik terimler için `claşsnotes/algs/dict/dict.tex`
+dosyasına bakılabilir.
 
 LaTeX dosyalarının tamamını HTML'e çevirmek için `python build.py
 html` komutu kullanılır, sonuç içerik`TARGET_DIR` altına yazılır. HTML
@@ -20,7 +26,7 @@ yapabilirler.
 
 US klavyede Türkçe yazmak isteyenler (ve Emacs kullananlar için)
 
-http://sayilarvekuramlar.blogspot.com/2017/12/emacs.html
+https://burakbayramli.github.io/dersblog/sk/2004/10/emacs.html
 
 HTML, PDF islemler icin gereken programlar
 
