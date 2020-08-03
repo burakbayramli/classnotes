@@ -1,8 +1,8 @@
 # Emacs
 
-Emacs hic kuşkusuz, bol özellikli, ve esnek bir editor.
+Emacs hiç kuşkusuz, bol özellikli, ve esnek bir editör.
 
-Ubuntu uzerinde kurmak icin
+Ubuntu üzerinde kurmak için
 
 ```
 sudo apt-get install emacs25
@@ -52,10 +52,10 @@ Emacs,
 * Emacs içinden dış kaynak kodları derleme, ve sonuçları tarayıp
   hatalı olan satırı göstermek çok rahat.
   
- Ekte göstereceğimiz kodlar, benim .emacs config dosyamdan alındı. İlk
- önce açıklamayı, sonra kodun kendisini sunacağım.
+Ekte göstereceğimiz kodlar, benim .emacs config dosyamdan alındı. İlk
+önce açıklamayı, sonra kodun kendisini sunacağım.
   
- Örnek .emacs
+Örnek .emacs
   
 Emacs içinden derleme yapmak, istenilen komut buraya girilebilir,
 
@@ -169,5 +169,5 @@ Referans
 
 [Pymacs](/2009/04/pymacs.md)
 
-[Ayarlarim](https://github.com/burakbayramli/kod/tree/master/site-lisp)
+[Ayarlarım](https://github.com/burakbayramli/kod/tree/master/site-lisp)
 

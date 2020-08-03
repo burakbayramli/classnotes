@@ -12,7 +12,7 @@ if __name__ == "__main__":
         shutil.copy("_config.yml","/home/burak/Documents/dersblog")
             
         fr = os.getcwd()
-        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'  --delete 1 --ignore-list=.git,.zip,.pdf,out.html" % (fr, TARGET_DIR)
+        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'  --delete 1 --ignore-list=.git,.zip,.pdf,out.html,apk" % (fr, TARGET_DIR)
         print (cmd)
         os.system(cmd)
 
