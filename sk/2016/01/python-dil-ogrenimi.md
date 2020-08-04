@@ -51,7 +51,11 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Düzenli İfadeler, Python, Regex (Regular Expressions)](../.././2016/02/duzenli-ifadeler-python-regex-regular.md)
 
-[Python Profilleme (Profiling)](python-profilleme-profiling.md)
+[Python Profilleme (Profiling)](../../2014/09/python-profilleme-profiling.md)
+
+
+
+
 
 
 

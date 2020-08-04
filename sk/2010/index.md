@@ -92,7 +92,7 @@
 
 [Stackoverflow Turu Yardimci Siteler](08/stackoverflow-turu-yardimci-siteler.md)
 
-[Imagemagick, Imaj Dosyalarini Islemek, Format Degisimi, Convert Komutu](08/yazi-scan-ve-imagemagick.md)
+[Imagemagick](08/imagemagick.md)
 
 [Kitap Scan Dosyalari ve DJVU](09/kitap-scan-dosyalari-ve-djvu.md)
 
