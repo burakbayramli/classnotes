@@ -108,6 +108,19 @@ Wifi üzerinden bu bağlantı işliyor çünkü aynı hotspot'a bağlandıysak
 aynı network'un içindeyiz demektir ve aynı network içinde makinalar
 birbirlerini bulabilirler.
 
+Taşınabilir RPi 
+
+Çok az miktarda elektronik aletle, mesela kampta vs, seyahat etmek
+isteyenler, cep telefonuna bir SSH müşteri programı kurup onun
+üzerinden RPi'ye komut satırından bağlanabilir, Linux bazlı
+programlarını text bazlı kullanabilir. RPi tam tekmilli bir Linux
+olduğu için istenen her ağır işlem burada gerçekleştirilir, pür metin
+bazlı Emacs kullanmak mümkün, `emacs -nw` ile. Diğer her Unix aracı da
+zaten komut bazlı gayet iyi işler, SSH programı olarak Android'da
+Juice SSH tavsiye edilir, böylece yanımızda taşınabilen hafif bir
+Linux'a kavuşmuş oluyoruz.
+
+
 Kaynaklar
 
 [1] https://www.raspberrypi.org/documentation/installation/noobs.md

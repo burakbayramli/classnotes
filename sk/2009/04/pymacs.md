@@ -20,8 +20,9 @@ Biraz arama sonucunda Emacs'i Python ile uzatmami saglayacak bir araci
 buldum: Pymacs. Pymacs, tum Emacs lisp fonksiyonlarina bir Python
 script'i icinden ve tum Python modullerine de Emacs icinden
 erisebilmenize izin veriyor. Kurmak icin ya apt-get ile ya da kaynagi
-indirip python setup.py install ile kurabilirsiniz. Tarifleri takip
-edin, oldukca kolay.
+indirip python setup.py install ile kurabilirsiniz.
+
+https://github.com/pinard/Pymacs
 
 Hemen bir Emacs uzantısı yazalım, mesela pymaçstest.py adında bir
 program yazalım; bu programı /usr/share/emacs/22.2/site-lisp/ altında
