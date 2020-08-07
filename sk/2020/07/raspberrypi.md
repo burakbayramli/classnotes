@@ -120,6 +120,81 @@ bazlı Emacs kullanmak mümkün, `emacs -nw` ile. SSH programı olarak
 Android'da Juice SSH tavsiye edilir. Böylece yanımızda taşınabilen
 hafif bir Linux'a kavuşmuş oluyoruz.
 
+Pin Kontrolu, Ilk Program
+
+RPi'i ustte anlatildigi gibi kurunca donanim uzerinde gorulen pinlerin
+durumunu raporlayabilen, onlara erisebilen programlara sahip
+oluyoruz. Mesela
+
+```
+pinout
+```
+
+komutu elimizdeki Pi'nin pin halini gösterir.
+
+Bende mesela
+
+```
+   3V3  (1) (2)  5V    
+ GPIO2  (3) (4)  5V    
+ GPIO3  (5) (6)  GND   
+ GPIO4  (7) (8)  GPIO14
+   GND  (9) (10) GPIO15
+GPIO17 (11) (12) GPIO18
+GPIO27 (13) (14) GND   
+GPIO22 (15) (16) GPIO23
+   3V3 (17) (18) GPIO24
+GPIO10 (19) (20) GND   
+ GPIO9 (21) (22) GPIO25
+GPIO11 (23) (24) GPIO8 
+   GND (25) (26) GPIO7 
+ GPIO0 (27) (28) GPIO1 
+ GPIO5 (29) (30) GND   
+ GPIO6 (31) (32) GPIO12
+GPIO13 (33) (34) GND   
+GPIO19 (35) (36) GPIO16
+GPIO26 (37) (38) GPIO20
+   GND (39) (40) GPIO21
+```
+
+Bu raporun sonu bu arada, üstünde daha grafiksel bir görüntü de var.
+
+Pi'ye USB portları aşağı dönük halde baktığımızı düşünmek gerekiyor, o
+zaman sağda üstten üçüncü pin GND yani toprak oluyor.
+
+Python'dan erisim icin `virtualenv` Python 3 ortamina gecelim, ve
+
+
+```
+pip install RPi.GPIO
+pip install gpiozero
+```
+
+kuralim. Ilk program
+
+```
+from gpiozero import LED
+from signal import pause
+
+red = LED(17)
+
+red.blink()
+
+pause()
+```
+
+500 Ohm civarı bir direnç ile seri halde bir LED'i GND ile GPİO17
+pinine takalım, ve üstteki programı çalıştıralım. LED'in yanip
+söndüğünü göreceğiz.
+
+PIN'lere voltaj gidip gitmedigini gormek icin
+
+```
+gpio readall
+```
+
+faydalı olabilir.
+
 
 Kaynaklar
 
