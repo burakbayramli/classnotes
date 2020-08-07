@@ -1,8 +1,8 @@
 import RPi.GPIO as GPIO
 import time
-
+GPIO.cleanup() 
 GPIO.setmode(GPIO.BCM)
-led_pin = 18
+led_pin = 17
 GPIO.setup(led_pin, GPIO.OUT)
 try:
         while True:

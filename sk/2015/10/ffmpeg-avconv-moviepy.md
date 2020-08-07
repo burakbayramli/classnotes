@@ -37,7 +37,7 @@ convert -loop 0 frames/ffout*.png output.gif
 Eger direk gif yaratmak istersek,
 
 ```
-ffmpeg -ss 61.0 -t 2.5 -i vid/devil.mp4 -f gif devil.gif
+ffmpeg -ss 61.0 -t 2.5 -i vid/dosya.mp4 -f gif dosya.gif
 ```
 
 GIF icinde yazi yazmak istersek,
@@ -74,7 +74,10 @@ Video'yu numarali JPG imaj dosyalari haline getirmek
 ffmpeg -i vid.avi -vcodec mjpeg %05d.jpg
 ```
 
-Ses ve goruntu dosyalarini islemek icin ffmpeg kullananlar icin Ubuntu 14'da surpriz: ffmpeg programi apt-get ile kurulamiyor. Dolambacli yollardan kurmak mumkun fakat yeni one surulen program avconv. Kurmak icin
+Ses ve goruntu dosyalarini islemek icin ffmpeg kullananlar icin Ubuntu
+14'da surpriz: ffmpeg programi apt-get ile kurulamiyor. Dolambacli
+yollardan kurmak mumkun fakat yeni one surulen program avconv. Kurmak
+icin
 
 ```
 sudo apt-get install libav-tools

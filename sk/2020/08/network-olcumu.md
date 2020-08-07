@@ -1,4 +1,4 @@
-# Network Ölçümü
+# Network Ölçümü, Izlemek
 
 Network'umuzu izlemek icin araclar
 
@@ -18,4 +18,10 @@ ile o donanimi izleyebiliriz.
 
 Veri akis hizi bit / saniye olarak verilir, gigabayt / gun olarak almak icin
 1 GB / gun = 92592 bit / saniye oldugunu bilelim.
+
+Hangi IP'ye sahip oldugumuzu anlamak icin `ifconfig -a`.
+
+Eger DHCP ile bir network'e dahil olduysak bize dinamik olarak bir IP
+adresi verilecektir. Bazen admin statik olarak bir IP vermeyi de
+secebilir. 
 

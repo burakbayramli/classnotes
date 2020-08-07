@@ -65,10 +65,10 @@ Geri Surum Paket
 Termux kendi izole alanında işliyor. Eğer Android ana dizinlerine
 Termux komut satırından erişmek istersek,  `termux-setup-storage`
 deriz, izin isteyen diyalog kutusu gelince ona 'allow (izin ver)'
-deriz. Artık ana dizinde bir storage adlı bir alt dizin olacak, bu alt
-dizine bakınca içinde downloads, movies, music gibi Anroid'in bilinen
-dizinlerini göreceğiz. Bu dizinlere yazılan her dosya dışarıda da
-gözükecektir. Ya da ters yönde oraya yazılan Termux'da okunur.
+deriz. Artık ana dizinde bir `storage` adlı bir alt dizin olacak, bu
+alt dizine bakınca içinde downloads, movies, music gibi Anroid'in
+bilinen dizinlerini göreceğiz. Bu dizinlere yazılan her dosya dışarıda
+da gözükecektir. Ya da ters yönde oraya yazılan Termux'da okunur.
 
 `ssh` var, dışarı bağlanılıp envai türden iş yapılabilir. Kimisi web
 geliştirmeyi DevX üzerinden direk telefonda yapıyor, flask, django

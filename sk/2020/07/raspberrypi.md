@@ -130,3 +130,4 @@ Kaynaklar
 [3] https://www.raspberrypi.org/documentation/remote-access/ssh/
 
 [4] https://www.raspberrypi.org/documentation/hardware/raspberrypi/power/README.md
+

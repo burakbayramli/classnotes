@@ -13,6 +13,17 @@ dosya.png yapmak için
 convert dosya.jpg dosya.png
 ```
 
+Bir imajı yarısına indirmek / küçültmek için `-scale 50` denir, 50
+yüzde 50'den geliyor. Eğer Web'de yayın için fotoğraf boyutu indirmek
+istiyorsak çoğunlukla ufak bir dosya isteriz ve biraz kalite kaybetmek
+bizi endiselendirmez, o zaman kalitede indirim de yapılabilir, `-strip
+-qualıty 90` ile,
+
+```
+convert buyuk_resim.jpg  -strip -quality 90  -scale 50% yeni_resim.jpg
+```
+
+
 Eğer animasyon gif dosyası üzerinde aynı komutu işletirsek,
 animasyondaki her kare ayrı bir png dosyası olarak verilirdi. Sonek
 png dosyalarının numaralandırması kontrol edilebilir, Dikkat: tüm
