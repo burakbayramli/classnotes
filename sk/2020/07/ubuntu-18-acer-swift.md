@@ -135,6 +135,17 @@ tanım vs girildikten sonra masaüstünde ikon yaratılır. Dikkat masaüstü
 ikonları çift tıklama gerektirir, Unity hızlı erişim barındakiler tek
 tıklama ile başlıyor.
 
+Pencereler Arası Geçiş (Uygulamalar Değil)
+
+Bu Ubuntu sürümünde Unity masaüstü programı her nedense Alt-Tab ile
+pencereler arası geçişi programlar arası geçise değiştirmiş, yani iki
+tane tarayıcı, iki tane terminal pencereniz varsa, geçiş sadece iki
+şey arasında oluyor. Bunu eski haline getirmek için `Settings |
+Devices | Keyboard`, ve `Keyboard shortcuts` listesinde `Switch
+applications` iptal edilir (tıkla, sil düğmesi ve set butonu),
+ardından `Switch windows` tıklanır ve ona Alt-Tab ataması yapılır.
+
+
 Android Dosya Transferi
 
 ```

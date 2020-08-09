@@ -113,12 +113,14 @@ Taşınabilir RPi
 Çok az miktarda elektronik aletle, mesela kampta vs, seyahat etmek
 isteyenler, cep telefonuna bir SSH müşteri programı kurup onun
 üzerinden RPi'ye komut satırından bağlanabilir. Bluetooth klavye
-Android'e, oradan SSH ile RPi'ye bağlanıyor yani. Linux bazlı
+Android'e, oradan SSH ile RPi'ye bağlanır yani. Linux bazlı
 programlarını text bazlı kullanabiliriz. RPi tam tekmilli bir Linux
 olduğu için istenen her ağır işlem burada gerçekleştirilir, pür metin
 bazlı Emacs kullanmak mümkün, `emacs -nw` ile. SSH programı olarak
 Android'da Juice SSH tavsiye edilir. Böylece yanımızda taşınabilen
-hafif bir Linux'a kavuşmuş oluyoruz.
+hafif bir Linux'a kavuşmuş oluyoruz. Pi uzerindeki SSD 64, 256 GB bile
+olabilir, disk problemi olmaz. Ayrica Pi cok rahat sekilde (Ubuntu
+oldugu icin) her turlu harici diske erisebilir. 
 
 Pin Kontrolu, Ilk Program
 

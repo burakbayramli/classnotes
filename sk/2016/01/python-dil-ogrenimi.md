@@ -53,7 +53,7 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Python Profilleme (Profiling)](../../2014/09/python-profilleme-profiling.md)
 
-
+[Python ve Komut Satırına Erişmek, Popen](../../2014/12/popen-python-ve-komut-satirina-erismek.md)
 
 
 
