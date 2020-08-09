@@ -16,8 +16,6 @@
 
 [Keras](06/keras.md)
 
-[Bitcoin, Electrum Cuzdani](07/bitcoin-electrum-cuzdani.md)
-
 [Unicode, Ascii, Deascii, Python, Emacs](07/unicode-ascii-deascii-python-emacs.md)
 
 [Yerel, Network Dosyasını Canlı, Anlık, Azar Azar Islemek (Stream, Incremental File Processing),  Python](08/canl-aks-anlk-azar-azar-islem-stream.md)

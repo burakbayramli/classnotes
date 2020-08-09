@@ -50,7 +50,7 @@
 
 [Movielens, Funk SVD, Numba](11/movielens-funk-svd-numba.md)
 
-[Popen, Python ve Komut Satirina Erismek](12/popen-python-ve-komut-satirina-erismek.md)
+[Python ve Komut Satırına Erişmek, Popen](12/popen-python-ve-komut-satirina-erismek.md)
 
 [Proje: Adam](12/proje-adam.md)
 

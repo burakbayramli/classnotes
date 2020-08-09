@@ -86,13 +86,13 @@
 
 [Bulutta Python - PiCloud](08/bulutta-python-picloud.md)
 
+[Imagemagick, Imaj Dosyalarini Islemek, Format Degisimi, Convert Komutu](08/imagemagick.md)
+
 [R ve BUGS](08/r-ve-bugs.md)
 
 [Scanimage](08/scanimage.md)
 
 [Stackoverflow Turu Yardimci Siteler](08/stackoverflow-turu-yardimci-siteler.md)
-
-[Imagemagick](08/imagemagick.md)
 
 [Kitap Scan Dosyalari ve DJVU](09/kitap-scan-dosyalari-ve-djvu.md)
 

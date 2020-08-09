@@ -2,10 +2,6 @@
 
 [Matplotlib ile Hareketli Grafikler](01/matplotlib-ile-hareketli-grafikler.md)
 
-[Matristeki Z Degerlerini 3 Boyutta Gostermek](01/matristeki-z-degerlerini-3-boyutta.md)
-
-[Chrome Uygulamasi Hazirlamak](02/chrome-uygulamasi-hazirlamak.md)
-
 [Esnek Parametre Listesi](02/esnek-parametre-listesi.md)
 
 [Fonksiyon Gezmek ve Yield](02/fonksiyon-gezmek-ve-yield.md)
@@ -15,10 +11,6 @@
 [meshgrid](02/meshgrid.md)
 
 [Operatorler](02/operatorler.md)
-
-[TyphoonAE](02/typhoonae.md)
-
-[Windows'da Caps'i Control Yapmak](02/windowsda-capsi-control-yapmak.md)
 
 [Liste Gezerken Eleman Silmek](03/liste-gezerken-eleman-silmek.md)
 

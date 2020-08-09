@@ -1,12 +1,15 @@
 # Esnek Parametre Listesi
 
+Bir fonksiyona geçilecek parametre listesi önceden belli değilse,
+yıldız ısareti, mesela *liste gibi bir kullanımla parametre listesi
+esnek hale getirilebilir. Mesela geçilen parametreleri sadece ekrana
+basan bir fonksiyon yazsak:
 
-Esnek Parametre Listesi
+```
+def f(*list):
+   for x in list: print x
+```
 
-
-
-Bir fonksiyona gecilecek parametre listesi onceden belli degilse, yildiz isareti, mesela *liste gibi bir kullanimla parametre listesi esnek hale getirilebilir. Mesela gecilen parametreleri sadece ekrana basan bir fonksiyon yazsak:def f(*list):   for x in list:       print xFonksiyon f()'de gecilen parametreler esnek olarak tanimlanmis. Bu fonksiyonu cagirmak icinf(3,4,5,6)  ya daf(3,4)  kullanilabilir.
-
-
-
+Fonksiyon `f()`'de geçilen parametreler esnek olarak tanımlanmış. Bu
+fonksiyonu çağırmak için `f(3,4,5,6)` ya da `f(3,4)` kullanılabilir.
 

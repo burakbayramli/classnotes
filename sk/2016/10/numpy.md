@@ -277,6 +277,9 @@ print np.einsum('ij,ji->i',np.dot(rs.T,R),rs)
 [[ 18  128]]
 ```
 
+Ekler
+
+[meshgrid](../../2011/02/meshgrid.md)
 
 
 

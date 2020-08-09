@@ -6,8 +6,6 @@
 
 [Emacs](10/emacs.md)
 
-[Entity Bean'lerin Ölümü - Bir Analiz](10/entity-bean-olumu-bir-analiz.md)
-
 [Grep + Cygwin + Emacs ile Dosya İçinde Kelime Arama](10/grep-cygwin-emacs-ile-dosya-icinde.md)
 
 [Hata Takip Aracı - ITracker](10/hata-takip-arac-itracker.md)

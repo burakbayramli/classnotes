@@ -267,8 +267,8 @@ Out[1]:
 
 Önemli not, `SELECT` içinde sadece üzerinden gruplama yaptığım
 kolonlardan seçebilirim. Üzerinden gruplama yapmadığım şeylerden
-seçmek anlamsız olurdu, çünkü o şeyleri grup parçası olarak
-listeleyemezik.
+seçmek anlamsız olurdu, çünkü o şeyler gruplamanın ima ettiği nicelik
+sayısında (cardinality), toplam seviyesinde değiller. 
 
 Gruplar üzerinde uygulanabilen özetleme hesapları vardır, `COUNT`,
 `MAX`, `MIN` bunlardan.

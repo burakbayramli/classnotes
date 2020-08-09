@@ -55,6 +55,11 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Python ve Komut Satırına Erişmek, Popen](../../2014/12/popen-python-ve-komut-satirina-erismek.md)
 
+[Esnek Parametre Listesi](../../2011/02/esnek-parametre-listesi.md)
+
+[Operatorler](../../2011/02/operatorler.md)
+
+[Liste Gezerken Eleman Silmek](../../2011/03/liste-gezerken-eleman-silmek.md)
 
 
 

@@ -24,5 +24,7 @@
 
 [Video Islemleri](07/video-islemleri.md)
 
-[Network Ölçümü](08/network-olcumu.md)
+[Elektronik, Olcum, Temel Aletler](08/elektronik-giris.md)
+
+[Network Ölçümü, Izlemek](08/network-olcumu.md)
 

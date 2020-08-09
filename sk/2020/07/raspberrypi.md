@@ -189,6 +189,8 @@ pause()
 pinine takalım, ve üstteki programı çalıştıralım. LED'in yanip
 söndüğünü göreceğiz.
 
+![](piled.jpg)
+
 PIN'lere voltaj gidip gitmedigini gormek icin
 
 ```
