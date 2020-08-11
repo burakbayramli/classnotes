@@ -30,5 +30,7 @@
 
 [Network Ölçümü, Izlemek](08/network-olcumu.md)
 
-[3D Baskıya Hazır CAD Tasarımlarına Erişmek, Numpy-ŞTL](08/numpy-stl.md)
+[3D Baskıya Hazır CAD Tasarımlarına Erişmek, Numpy-STL](08/numpy-stl.md)
+
+[Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Partıcle Hydrodynamics -SPH-)](08/sph.md)
 
