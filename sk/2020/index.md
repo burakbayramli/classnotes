@@ -30,3 +30,5 @@
 
 [Network Ölçümü, Izlemek](08/network-olcumu.md)
 
+[3D Baskıya Hazır CAD Tasarımlarına Erişmek, Numpy-ŞTL](08/numpy-stl.md)
+
