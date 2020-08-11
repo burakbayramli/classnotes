@@ -36,7 +36,7 @@ gibi bir derleme yapilabilir.
 
 [SPH Kod 2](gl2.cpp)
 
-
+Kaynaklar
 
 [1] https://imdoingitwrong.wordpress.com/2010/12/14/why-my-fluids-dont-flow/
 

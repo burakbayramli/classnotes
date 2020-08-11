@@ -1,4 +1,4 @@
-#include <GL/glut.h>
+3#include <GL/glut.h>
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -30,9 +30,9 @@ const static float BOUND_DAMPING = -0.5f;
 // stores position, velocity, and force for integration
 // stores density (rho) and pressure values for SPH
 struct Particle {
-	Particle(float _x, float _y) : x(_x,_y), v(0.f,0.f), f(0.f,0.f), rho(0), p(0.f) {}
-	Vector2d x, v, f;
-	float rho, p;
+  Particle(float _x, float _y) : x(_x,_y), v(0.f,0.f), f(0.f,0.f), rho(0), p(0.f) {}
+  Vector2d x, v, f;
+  float rho, p;
 };
 
 // solver data
@@ -51,164 +51,164 @@ const static double VIEW_HEIGHT = 1.5*600.f;
 
 void InitSPH(void)
 {
-	cout << "initializing dam break with " << DAM_PARTICLES << " particles" << endl;
-	for(float y = EPS; y < VIEW_HEIGHT-EPS*2.f; y += H)
-		for(float x = VIEW_WIDTH/4; x <= VIEW_WIDTH/2; x += H)
-			if(particles.size() < DAM_PARTICLES)
-			{
-				float jitter = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				particles.push_back(Particle(x+jitter,y));
-			}
+  cout << "initializing dam break with " << DAM_PARTICLES << " particles" << endl;
+  for(float y = EPS; y < VIEW_HEIGHT-EPS*2.f; y += H)
+    for(float x = VIEW_WIDTH/4; x <= VIEW_WIDTH/2; x += H)
+      if(particles.size() < DAM_PARTICLES)
+        {
+          float jitter = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+          particles.push_back(Particle(x+jitter,y));
+        }
 }
 
 void Integrate(void)
 {
-	for(auto &p : particles)
-	{
-		// forward Euler integration
-		p.v += DT*p.f/p.rho;
-		p.x += DT*p.v;
+  for(auto &p : particles)
+    {
+      // forward Euler integration
+      p.v += DT*p.f/p.rho;
+      p.x += DT*p.v;
 
-		// enforce boundary conditions
-		if(p.x(0)-EPS < 0.0f)
-		{
-			p.v(0) *= BOUND_DAMPING;
-			p.x(0) = EPS;
-		}
-		if(p.x(0)+EPS > VIEW_WIDTH) 
-		{
-			p.v(0) *= BOUND_DAMPING;
-			p.x(0) = VIEW_WIDTH-EPS;
-		}
-		if(p.x(1)-EPS < 0.0f)
-		{
-			p.v(1) *= BOUND_DAMPING;
-			p.x(1) = EPS;
-		}
-		if(p.x(1)+EPS > VIEW_HEIGHT)
-		{
-			p.v(1) *= BOUND_DAMPING;
-			p.x(1) = VIEW_HEIGHT-EPS;
-		}
-	}
+      // enforce boundary conditions
+      if(p.x(0)-EPS < 0.0f)
+        {
+          p.v(0) *= BOUND_DAMPING;
+          p.x(0) = EPS;
+        }
+      if(p.x(0)+EPS > VIEW_WIDTH) 
+        {
+          p.v(0) *= BOUND_DAMPING;
+          p.x(0) = VIEW_WIDTH-EPS;
+        }
+      if(p.x(1)-EPS < 0.0f)
+        {
+          p.v(1) *= BOUND_DAMPING;
+          p.x(1) = EPS;
+        }
+      if(p.x(1)+EPS > VIEW_HEIGHT)
+        {
+          p.v(1) *= BOUND_DAMPING;
+          p.x(1) = VIEW_HEIGHT-EPS;
+        }
+    }
 }
 
 void ComputeDensityPressure(void)
 {
-	for(auto &pi : particles)
-	{
-		pi.rho = 0.f;
-		for(auto &pj : particles)
-		{
-			Vector2d rij = pj.x - pi.x;
-			float r2 = rij.squaredNorm();
+  for(auto &pi : particles)
+    {
+      pi.rho = 0.f;
+      for(auto &pj : particles)
+        {
+          Vector2d rij = pj.x - pi.x;
+          float r2 = rij.squaredNorm();
 
-			if(r2 < HSQ)
-			{
-				// this computation is symmetric
-				pi.rho += MASS*POLY6*pow(HSQ-r2, 3.f);
-			}
-		}
-		pi.p = GAS_CONST*(pi.rho - REST_DENS);
-	}
+          if(r2 < HSQ)
+            {
+              // this computation is symmetric
+              pi.rho += MASS*POLY6*pow(HSQ-r2, 3.f);
+            }
+        }
+      pi.p = GAS_CONST*(pi.rho - REST_DENS);
+    }
 }
 
 void ComputeForces(void)
 {
-	for(auto &pi : particles)
-	{
-		Vector2d fpress(0.f, 0.f);
-		Vector2d fvisc(0.f, 0.f);
-		for(auto &pj : particles)
-		{
-			if(&pi == &pj)
-				continue;
+  for(auto &pi : particles)
+    {
+      Vector2d fpress(0.f, 0.f);
+      Vector2d fvisc(0.f, 0.f);
+      for(auto &pj : particles)
+        {
+          if(&pi == &pj)
+            continue;
 
-			Vector2d rij = pj.x - pi.x;
-			float r = rij.norm();
+          Vector2d rij = pj.x - pi.x;
+          float r = rij.norm();
 
-			if(r < H)
-			{
-				// compute pressure force contribution
-				fpress += -rij.normalized()*MASS*(pi.p + pj.p)/(2.f * pj.rho) * SPIKY_GRAD*pow(H-r,2.f);
-				// compute viscosity force contribution
-				fvisc += VISC*MASS*(pj.v - pi.v)/pj.rho * VISC_LAP*(H-r);
-			}
-		}
-		Vector2d fgrav = G * pi.rho;
-		pi.f = fpress + fvisc + fgrav;
-	}
+          if(r < H)
+            {
+              // compute pressure force contribution
+              fpress += -rij.normalized()*MASS*(pi.p + pj.p)/(2.f * pj.rho) * SPIKY_GRAD*pow(H-r,2.f);
+              // compute viscosity force contribution
+              fvisc += VISC*MASS*(pj.v - pi.v)/pj.rho * VISC_LAP*(H-r);
+            }
+        }
+      Vector2d fgrav = G * pi.rho;
+      pi.f = fpress + fvisc + fgrav;
+    }
 }
 
 void Update(void)
 { 
-	ComputeDensityPressure();
- 	ComputeForces();
- 	Integrate();
+  ComputeDensityPressure();
+  ComputeForces();
+  Integrate();
 
-	glutPostRedisplay();
+  glutPostRedisplay();
 }
 
 void InitGL(void)
 {
-	glClearColor(0.9f,0.9f,0.9f,1);
-	glEnable(GL_POINT_SMOOTH);
-	glPointSize(H/2.f);
-	glMatrixMode(GL_PROJECTION);
+  glClearColor(0.9f,0.9f,0.9f,1);
+  glEnable(GL_POINT_SMOOTH);
+  glPointSize(H/2.f);
+  glMatrixMode(GL_PROJECTION);
 }
 
 void Render(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	
-	glLoadIdentity();
-	glOrtho(0, VIEW_WIDTH, 0, VIEW_HEIGHT, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+        
+  glLoadIdentity();
+  glOrtho(0, VIEW_WIDTH, 0, VIEW_HEIGHT, 0, 1);
 
-	glColor4f(0.2f, 0.6f, 1.0f, 1);
-	glBegin(GL_POINTS);
-	for(auto &p : particles)
-		glVertex2f(p.x(0), p.x(1));
-	glEnd();
+  glColor4f(0.2f, 0.6f, 1.0f, 1);
+  glBegin(GL_POINTS);
+  for(auto &p : particles)
+    glVertex2f(p.x(0), p.x(1));
+  glEnd();
 
-	glutSwapBuffers();
+  glutSwapBuffers();
 }
 
 void Keyboard(unsigned char c, __attribute__((unused)) int x, __attribute__((unused)) int y)
 {   
-	switch(c)
-	{
-	case ' ':
-		if(particles.size() >= MAX_PARTICLES)
-			std::cout << "maximum number of particles reached" << std::endl;
-		else
-		{
-			unsigned int placed = 0;
-			for(float y = VIEW_HEIGHT/1.5f-VIEW_HEIGHT/5.f; y < VIEW_HEIGHT/1.5f+VIEW_HEIGHT/5.f; y += H*0.95f)
-				for(float x = VIEW_WIDTH/2.f-VIEW_HEIGHT/5.f; x <= VIEW_WIDTH/2.f+VIEW_HEIGHT/5.f; x += H*0.95f)
-					if(placed++ < BLOCK_PARTICLES && particles.size() < MAX_PARTICLES)
-						particles.push_back(Particle(x,y));
-		}
-		break;
-	case 'r':
-	case 'R':
-		particles.clear();
-		InitSPH();
-		break;
-	}
+  switch(c)
+    {
+    case ' ':
+      if(particles.size() >= MAX_PARTICLES)
+        std::cout << "maximum number of particles reached" << std::endl;
+      else
+        {
+          unsigned int placed = 0;
+          for(float y = VIEW_HEIGHT/1.5f-VIEW_HEIGHT/5.f; y < VIEW_HEIGHT/1.5f+VIEW_HEIGHT/5.f; y += H*0.95f)
+            for(float x = VIEW_WIDTH/2.f-VIEW_HEIGHT/5.f; x <= VIEW_WIDTH/2.f+VIEW_HEIGHT/5.f; x += H*0.95f)
+              if(placed++ < BLOCK_PARTICLES && particles.size() < MAX_PARTICLES)
+                particles.push_back(Particle(x,y));
+        }
+      break;
+    case 'r':
+    case 'R':
+      particles.clear();
+      InitSPH();
+      break;
+    }
 }
 
 int main(int argc, char** argv)
 {
-	glutInitWindowSize(WINDOW_WIDTH,WINDOW_HEIGHT);
-	glutInit(&argc, argv);
-	glutCreateWindow("Müller SPH");
-	glutDisplayFunc(Render);
-	glutIdleFunc(Update);
-	glutKeyboardFunc(Keyboard);
+  glutInitWindowSize(WINDOW_WIDTH,WINDOW_HEIGHT);
+  glutInit(&argc, argv);
+  glutCreateWindow("Müller SPH");
+  glutDisplayFunc(Render);
+  glutIdleFunc(Update);
+  glutKeyboardFunc(Keyboard);
 
-	InitGL();
-	InitSPH();
+  InitGL();
+  InitSPH();
 
-	glutMainLoop();
-	return 0;
+  glutMainLoop();
+  return 0;
 }
