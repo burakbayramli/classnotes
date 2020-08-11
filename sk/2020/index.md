@@ -26,5 +26,7 @@
 
 [Elektronik, Olcum, Temel Aletler](08/elektronik-giris.md)
 
+[Markdown Bazli Web Yayinciligi, Github Pages](08/github-pages.md)
+
 [Network Ölçümü, Izlemek](08/network-olcumu.md)
 

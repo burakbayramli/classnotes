@@ -202,7 +202,7 @@ Referans
 
 [../../2011/08/Lokal Dosya Arama - recoll](lokal-dosya-arama-recoll.md)
 
-
+[Serviste İşleyen Komut Satırı - tmux](../../2017/11/serviste-isleyen-komut-satr-tmux.md)
 
 
 
