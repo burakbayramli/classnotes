@@ -1,4 +1,4 @@
 # Elektronik, Olcum, Temel Aletler
 
-![](multimeter.jpg)
+<img width="340" src="multimeter.jpg"/>
 
