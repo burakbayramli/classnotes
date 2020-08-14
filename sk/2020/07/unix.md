@@ -200,7 +200,7 @@ Referans
 
 [Bir Makinaya SSH ile Şifresiz Giriş](../../2005/10/bir-makinaya-ssh-ile-sifresiz-giris.md)
 
-[../../2011/08/Lokal Dosya Arama - recoll](lokal-dosya-arama-recoll.md)
+[Lokal Dosya Arama - recoll](../../2011/08/lokal-dosya-arama-recoll.md)
 
 [Serviste İşleyen Komut Satırı - tmux](../../2017/11/serviste-isleyen-komut-satr-tmux.md)
 
