@@ -58,6 +58,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
 
    fin.readline()
    fin.readline()
+   fout.write("[Yukarı](..)\n\n")
    title = "# " + fin.readline()
    fout.write(title)
 

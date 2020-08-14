@@ -5,7 +5,8 @@
 #include <assert.h>
 #include <memory.h>
 #include <GL/glut.h>
- 
+#include <iostream> 
+using namespace std;
  
 #define kScreenWidth 640
 #define kScreenHeight 480
@@ -81,7 +82,13 @@ struct Rgba
 struct Material
 {
     Material() { }
-    Material(const Rgba& colour, float mass, float scale, float bias) : colour(colour) , mass(mass) , scale(scale) , bias(bias) { }
+    Material(const Rgba& colour,
+	     float mass,
+	     float scale,
+	     float bias) : colour(colour) ,
+			   mass(mass) ,
+			   scale(scale) ,
+			   bias(bias) { }
     Rgba colour;
     float mass;
     float scale;
@@ -199,6 +206,7 @@ void ApplyBodyForces()
     {
 	Particle& pi = particles[i];
 	pi.v -= 9.8f*kDt;
+	//cout << pi.v << endl << endl;
     }
 }
  
