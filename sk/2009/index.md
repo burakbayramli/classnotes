@@ -18,19 +18,9 @@
 
 [Arama Mimarisi](03/arama-mimarisi_29.md)
 
-[Bilimsel Hesaplama: Hangi Dil?](03/bilimsel-hesaplama-hangi-dil_12.md)
-
 [FriendFeed ve MySQL](03/friendfeed-ve-mysql_03.md)
 
 [Git](03/git_18.md)
-
-[Hibernate Shards](03/hibernate-shards_19.md)
-
-[Icerik Guncelleme](03/icerik-guncelleme_16.md)
-
-[InnoDB ve Hibernate](03/innodb-ve-hibernate_08.md)
-
-[Katta](03/katta_26.md)
 
 [Master/Slave Modeli ve Voldemort](03/masterslave-modeli-ve-voldemort_25.md)
 
@@ -62,8 +52,6 @@
 
 [Oracle Gunesi Gorunce](04/oracle-gunesi-gorunce_21.md)
 
-[@Out ve @Scope](04/out-ve-scope_16.md)
-
 [Pymacs](04/pymacs.md)
 
 [Scipy](04/scipy_27.md)
@@ -77,8 +65,6 @@
 [Linux ile Mikrofona Baglanmak](05/linux-ile-mikrofona-baglanmak_24.md)
 
 [Python ve MySql](05/python-ve-mysql_22.md)
-
-[Seam ile Kullanici Idaresi](05/seam-ile-kullanici-idaresi_20.md)
 
 [Amazon Fiziksel Veri Transferi](06/amazon-fiziksel-veri-transferi_20.md)
 
@@ -94,8 +80,6 @@
 
 [OpenCV, Python ile Yuz Takip Etme](06/opencv-python-ile-yuz-takip-etme_09.md)
 
-[Seam ve Cookie Idaresi](06/seam-ve-cookie-idaresi_30.md)
-
 [Sistem Zamanini Ayarlamak](06/sistem-zamanini-ayarlamak_06.md)
 
 [Detexify](07/detexify.md)
@@ -103,10 +87,6 @@
 [Facebook Import](07/facebook-import.md)
 
 [Lineer Cebir Karikaturu](07/lineer-cebir-karikaturu_18.md)
-
-[Sayfa Oncesi Aksiyon](07/sayfa-oncesi-aksiyon.md)
-
-[Seam ve Hata Mesajlari](07/seam-ve-hata-mesajlari.md)
 
 [Apache 2, mod_jk, Ubuntu ve Seam](08/apache-2-modjk-ubuntu-ve-seam.md)
 
@@ -120,10 +100,6 @@
 
 [Java Enum Tipleri](08/java-enum-tipleri.md)
 
-[JBoss'a Ne Kadar Bellek Ayirmak Lazim?](08/jbossa-ne-kadar-bellek-ayirmak-lazim.md)
-
-[JBoss'u Zayiflatmak](08/jbossu-zayiflatmak.md)
-
 [S3 ve Yedeklemek](08/s3-ve-yedeklemek.md)
 
 [Sabitler](08/sabitler.md)
@@ -132,15 +108,9 @@
 
 [Yourkit Java Profiler](08/yourkit-java-profiler.md)
 
-[Enum, Seam ve Map Kullanimi](09/enum-seam-ve-map-kullanimi.md)
-
-[Genel Hata Ekrani](09/genel-hata-ekrani.md)
-
 [Git ve Branch Kavrami](09/git-ve-branch-kavrami.md)
 
 [Link Verilebilen Uygulamalar](09/link-verilebilen-uygulamalar.md)
-
-[Pocketbudda.com](09/pocketbuddacom.md)
 
 [OpenCv -> Numpy](10/opencv-numpy.md)
 

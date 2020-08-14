@@ -2,8 +2,6 @@
 
 [Açık Anahtar Şifreleme](10/ack-anahtar-sifreleme.md)
 
-[Bilgi İşlem Tasarım Kalıpları](10/bilgi-islem-tasarm-kalplar.md)
-
 [Davranış Kavramı](10/davrans-kavram.md)
 
 [Döngüler ve Ziyaretler (Iterators)](10/donguler-ve-ziyaretler-iterators.md)

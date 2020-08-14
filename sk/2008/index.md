@@ -2,13 +2,7 @@
 
 [Firefox Icin SSH Tunelleme](11/firefox-icin-ssh-tunelleme_24.md)
 
-[Hatali Tarih Saptamak](12/hatali-tarih-saptamak_22.md)
-
-[Hibernate ve Tarih Kolonlari](12/hibernate-ve-tarih-kolonlari_30.md)
-
-[JBoss Seam ve Tarih Gostermek](12/jboss-seam-ve-tarih-gostermek_30.md)
-
-[Seam ve Sayfa Navigasyonu](12/seam-ve-sayfa-navigasyonu_30.md)
+[Hatali Tarih Saptamak, Java](12/hatali-tarih-saptamak_22.md)
 
 [Ubuntu 8 on Toshiba Satellite u300](12/ubuntu-8-on-toshiba-satellite-u300.md)
 
