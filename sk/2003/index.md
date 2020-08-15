@@ -28,11 +28,7 @@
 
 [Unix Rsync - Makineler Arası Dosya Kopyalamanın Hızlı Yolu](10/unix-rsync-makineleraras-dosya.md)
 
-[Yapay Zeka ile Problem Çözümü](10/yapay-zeka-ile-problem-cozumu.md)
-
 [Yazılım Patentleri Hakkında - Donald Knuth](10/yazlm-patentleri-hakknda-donald-knuth.md)
-
-[DOM ve XPATH kullarak XML işlemek](11/dom-ve-xpath-kullarak-xml-islemek.md)
 
 [JDOM yardımı ile daha kolay XML işlemek](11/jdom-yardm-ile-daha-kolay-xml-islemek.md)
 
