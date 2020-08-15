@@ -48,7 +48,7 @@
 
 [Pandas ile Birlesim (Join)](04/pandas-ile-birlesim-join.md)
 
-[plpython](04/plpython.md)
+[Python ile Kayıtlı Prosedürler (Stored Procedures) - plpython](04/plpython.md)
 
 [Postgres Min, Partition](04/postgres-min-partition.md)
 
@@ -57,12 +57,6 @@
 [Python Paketleme](04/python-paketleme.md)
 
 [Python Profiler](04/python-profiler.md)
-
-[Almanya'da Calisma - Ikamet Kaydi (Anmeldung)](05/almanyada-calisma-oturma-anmeldung.md)
-
-[Almanya'da Calisma - Oturma Izni (Residence Permit, Aufenthaltstitels)](05/almanyada-calisma-oturma-izni-residence.md)
-
-[Almanya'da Calisma](05/almanyada-calisma.md)
 
 [Box ve Whisker Grafikleri](05/box-ve-whisker-grafikleri.md)
 

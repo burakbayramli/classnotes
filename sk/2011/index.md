@@ -24,7 +24,7 @@
 
 [Sosyal Kodlama = Github](04/sosyal-kodlama-github.md)
 
-[Sympy](04/sympy.md)
+[Sembolik Matematik - Sympy](04/sympy.md)
 
 [Ses Kayit, audiolab](06/ses-kayit-audiolab.md)
 
@@ -32,15 +32,7 @@
 
 [Web Sayfalarindan Gorunen Metni Kazimak (Scraping)](06/web-sayfalarindan-gorunen-metni-kazimak.md)
 
-[Basit Rasgele Muzik Calici](07/basit-rasgele-muzik-calici.md)
-
-[Data Science Toolkit](07/datascience-toolkit.md)
-
-[Scipy 2011](07/scipy-.md)
-
-[Ders Notlari ve Github](08/ders-notlari-ve-github.md)
-
-[Git Tavsiyeleri](08/git-tavsiyeleri.md)
+[OCR, Data Science Toolkit](07/datascience-toolkit.md)
 
 [KineticsKit](08/kineticskit.md)
 
@@ -51,10 +43,6 @@
 [vpython](08/vpython.md)
 
 [PDF Formlarin Uzerine Yazi Yazmak](09/pdf-formlari-otomatik-olarak-doldurmak.md)
-
-[İkili PDF Sayfaları Tek Sayfalı Yapmak (Ortadan Bölmek)](09/pdf-ikili-sayfalari-tek-sayfali-yapmak.md)
-
-[Uygulamalı Matematik Kitapçığı ve Github](09/uygulamal-matematik-kitapcg-ve-github.md)
 
 [EPUB -> PDF](10/epub-pdf.md)
 
@@ -70,8 +58,6 @@
 
 [Python Radyo](10/python-radyo.md)
 
-[DTA, TXT Cevirmek, R Dili](12/dta-txt-cevirmek-r-dili.md)
-
 [Excel, CSV, Python](12/excel-csv-python.md)
 
 [GPU](12/gpu.md)
@@ -80,7 +66,7 @@
 
 [PDF Formlari Otomatik Olarak Doldurmak](12/pdf-formlari-otomatik-olarak-doldurmak.md)
 
-[pdftk](12/pdftk.md)
+[PDF Numaralari, pdftk, pdfjam](12/pdftk.md)
 
 [Polinom Bolmek](12/polinom-bolmek.md)
 

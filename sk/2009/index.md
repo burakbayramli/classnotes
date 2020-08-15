@@ -1,20 +1,10 @@
 # 2009
 
-[Fakir Adamin HTML Include Teknigi](01/fakir-adamin-html-include-teknigi_07.md)
-
-[IE ve Firefox Farklari](01/ie-ve-firefox-farklari_6248.md)
-
-[Ubuntu 8 ve IE Kullanimi](01/ubuntu-8-ve-ie-kullanimi_16.md)
-
-[Ubuntu ve Media Dosyalari](01/ubuntu-ve-media-dosyalari_25.md)
-
 [Alternatif Combobox](02/alternatif-combobox_08.md)
 
 [Amazon EC2 ile Barindirma](02/amazon-ec2-ile-barindirma_15.md)
 
 [Cozunurluluk Ayari](02/cozunurluluk-ayari_24.md)
-
-[Tim Bray ile Roportaj](02/tim-bray-ile-roportaj_16.md)
 
 [Arama Mimarisi](03/arama-mimarisi_29.md)
 
@@ -22,23 +12,13 @@
 
 [Git](03/git_18.md)
 
-[Master/Slave Modeli ve Voldemort](03/masterslave-modeli-ve-voldemort_25.md)
-
 [Mysql Proxy](03/mysql-proxy_20.md)
-
-[OpenJPA: Olmadi](03/openjpa-olmadi_19.md)
-
-[OpenJPA ve Slice](03/openjpa-ve-slice_19.md)
 
 [Proje Voldemort - II](03/proje-voldemort-ii_25.md)
 
-[Site Ismi Bulmak](03/site-ismi-bulmak_04.md)
-
 [Wine](03/wine_11.md)
 
-[Cok Cekirdekli Islemciler](04/cok-cekirdekli-islemciler_26.md)
-
-[Git, Emacs, Python: Dosyalarin Eski Hali](04/git-emacs-python-dosyalarin-eski-hali.md)
+[Çok Çekirdekli İşlemciler](04/cok-cekirdekli-islemciler_26.md)
 
 [Git ile Baslangic](04/git-ile-baslangic_21.md)
 
@@ -53,8 +33,6 @@
 [Oracle Gunesi Gorunce](04/oracle-gunesi-gorunce_21.md)
 
 [Pymacs](04/pymacs.md)
-
-[Scipy](04/scipy_27.md)
 
 [Stallman ve Tasarim](04/stallman-ve-tasarim_20.md)
 

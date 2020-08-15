@@ -63,3 +63,9 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek](../../2013/07/onbelleklemeyi-dekorator-ile-yapmak.md)
 
+[Python Paketleme](../../2012/04/python-paketleme.md)
+
+[Cython](../../2010/11/cython.md)
+
+
+

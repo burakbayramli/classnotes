@@ -210,3 +210,9 @@ Diğer Postgres Yazıları
 
 [Postgresql ile Yuzdelik (Percentile) Hesabi](../../2012/09/postgresql-ile-yuzdelik-percentile.md)
 
+[Postgresql DB Baglantisi (dblink)](../../2012/04/postgresql-db-baglantisi-dblink.md)
+
+[Python ile Kayıtlı Prosedürler (Stored Procedures) - plpython](../../2012/04/plpython.md)
+
+[Enlemler, Boylamlar ve PostgreSql PostGis](../../2012/06/enlemler-boylamlar-ve-postgresql.md)
+

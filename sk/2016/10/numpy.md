@@ -270,7 +270,7 @@ R = np.array([[2,2],[2,2]])
 
 ```python
 rs = np.array([[1,2],[4,4]]).T
-print np.einsum('ij,ji->i',np.dot(rs.T,R),rs)
+print (np.einsum('ij,ji->i',np.dot(rs.T,R),rs))
 ```
 
 ```
@@ -283,8 +283,8 @@ Ekler
 
 [Histogram Numaraları](../../2015/10/histogram-numaralari.md)
 
+[Sembolik Matematik - Sympy](../../2011/04/sympy.md)
 
-
-
+[Ubuntu Server ve Matplotlib](../../2010/11/ubuntu-server-ve-matplotlib.md)
 
 

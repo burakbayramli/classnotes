@@ -1,32 +1,34 @@
-# Cok Cekirdekli Islemciler
+# Çok Çekirdekli İşlemciler
 
 Mahout sitesinde bir makalenin islemciler ile alakali bolumunde guzel
 bir saptama:
 
-"Mikroislemcilerde frekans bazli olcekleme yapmak, yani islemcinin
-saat hizini daha yukselterek daha yuksek performans elde etmek guc
-kaynagi kullanimi sinirlarina carpmaya basladi. Islemcinin boyutu
-kuculdukce guc sizmasi (power leakage) yasaniyor. Diger taraftan Moore
-kanununa gore islemcilerin yogunlugu her nesilde ikiye
-katlanacaktir. O zaman frekansi sabit tutarak ama her cipteki islemci
-cekirdegi ikiye katlayarak hala dusuk guc kullaniminda devam
-edebiliriz ve islemci gucunu ikiye katlamis oluruz. Bu durum, mikrocip
-endustrisini cok cekirdekli mimarilere itmistir".Yani soylenmek
-istenen tek islemcinin transistor yogunlugu ile oynayarak artik daha
-fazla hiz elde edemiyoruz, bazi sinirlara toslamaya basladik. O zaman
-cok cekirdekli mimari, ayni hizda ama paralel calisan ek cekirdekler
-koyarak hizlanmayi saglayacaktir.Bunun programcilar icin getirdikleri
-faydalar / sorunlar nelerdir? Programcilar daha paralel kodlama
-baglaminda dusunmeye alismali, programlama dilleri bu servisleri daha
-rahat saglayabilmeli. Referans verilen makale paralelizasyon fikrini
-yapay ogrenim konularina uygulamaya calisiyor mesela. Yelpazenin diger
-ucunda ise, daha fazla paralel calisan "makinalarin" sayesinde devasa
-boyutlarda veri isleyebilme konulari var. Aslinda bu iki trend
-birbiriyle yakinda alakali. Hem tekil makinalarin fiyati ucuzlarken,
-hem de tekil makinalarin icindeki paralel cekirdeklerin sayisi
-artiyor. Yelpazenin her noktasinda paralelizasyona dogru bir gidisat
-yasaniyor.Bu konu hakkinda hemen bir sey yapilmasi gerekli demiyoruz;
-sadece akilda tutulmasi gereken bir konu.
+"Mikroişlemcilerde frekans bazlı ölçekleme yapmak, yani işlemcinin
+saat hızını daha yükselterek daha yüksek performans elde etmek güç
+kaynağı kullanımı sınırlarına çarpmaya başladı. İşlemcinin boyutu
+küçüldükçe güç sızması (power leakage) yaşanıyor. Diğer taraftan Moore
+kanununa göre işlemcilerin yoğunluğu her nesilde ikiye
+katlanacaktır. O zaman frekansı sabit tutarak ama her cipteki işlemci
+çekirdeği ikiye katlayarak hala düşük güç kullanımında devam
+edebiliriz ve işlemci gücünü ikiye katlamış oluruz. Bu durum, mikroçip
+endüstrisini çok çekirdekli mimarilere itmiştir".
+
+Yani söylenmek istenen tek işlemcinin transistör yoğunluğu ile
+oynayarak artık daha fazla hız elde edemiyoruz, bazı sınırlara
+toslamaya başladık. O zaman çok çekirdekli mimarı, aynı hızda ama
+paralel çalışan ek çekirdekler koyarak hızlanmayı sağlayacaktır.Bunun
+programcılar için getirdikleri faydalar / sorunlar nelerdir?
+Programcılar daha paralel kodlama bağlamında düşünmeye alışmalı,
+programlama dilleri bu servisleri daha rahat sağlayabilmeli. Referans
+verilen makale paralelizasyon fikrini yapay öğrenim konularına
+uygulamaya çalışıyor mesela. Yelpazenin diğer ucunda ise, daha fazla
+paralel çalışan "makinaların" sayesinde devasa boyutlarda veri
+işleyebilme konuları var. Aslında bu iki trend birbiriyle yakında
+alakalı. Hem tekil makinaların fiyatı ucuzlarken, hem de tekil
+makinaların içindeki paralel çekirdeklerin sayısı artıyor. Yelpazenin
+her noktasında paralelizasyona doğru bir gidişat yaşanıyor.Bu konu
+hakkında hemen bir şey yapılması gerekli demiyoruz; sadece akılda
+tutulması gereken bir konu.
 
 
 

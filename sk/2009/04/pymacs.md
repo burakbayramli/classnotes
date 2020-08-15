@@ -1,12 +1,12 @@
 # Pymacs
 
-Lisp surekli kullandigim dillerden biri degil; sadece uzun aralarla
-Emacs editorumu kisisellestirmek icin kullaniyorum ve uzun sure
-gectikten bazi Lisp numaralarini tekrar ogrenmem gerekiyor. Bir araci
-birden yerde fazla kullanabilme meraklisi oldugumuz icin Lisp'ten
-mumkun oldugu kadar uzak durmaya karar verdik. Bu kararda onemli bir
-faktor, bir editor uzantisi icin okkali kodlama yapmamiz gerektigi
-idi... Peki bu is hangi dilde yapilacakti?
+Lisp sürekli kullandığım dillerden biri değil; sadece uzun aralarla
+Emacs editörümü kışiselleştirmek için kullanıyorum ve uzun süre
+geçtikten bazı Lisp numaralarını tekrar öğrenmem gerekiyor. Bir araçı
+birden yerde fazla kullanabilme meraklısı olduğumüz için Lisp'ten
+mümkün olduğu kadar uzak durmaya karar verdik. Bu kararda önemli bir
+faktör, bir editör uzantısı için okkalı kodlama yapmamız gerektiği
+idi... Peki bu iş hangi dilde yapılacaktı?
 
 Bilimsel hesaplama icin zaten Python kullanmaya karar vermistik. Acaba
 Python'u Emacs'i uzatmak/kisisellestirmek icin kullanamaz miyiz?

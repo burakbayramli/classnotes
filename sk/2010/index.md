@@ -1,9 +1,5 @@
 # 2010
 
-[Android Uygulamasi Yayinlamak, Satmak](01/android-uygulamasi-yayinlamak-satmak.md)
-
-[Ubuntu Balon Tavsiyeleri](01/ubuntu-balon-tavsiyeleri.md)
-
 [Android ve Performans](02/android-ve-performans.md)
 
 [Cok Fazla Meta Data](02/cok-fazla-meta-data.md)
@@ -80,10 +76,6 @@
 
 [Yaklasim](06/yaklasim.md)
 
-[Numpy ile Text Veri Okumak](07/numpy-ile-text-veri-okumak.md)
-
-[PDF Icinde Kelime Aramak](07/pdf-icinde-kelime-aramak.md)
-
 [Bulutta Python - PiCloud](08/bulutta-python-picloud.md)
 
 [Imagemagick, Imaj Dosyalarini Islemek, Format Degisimi, Convert Komutu](08/imagemagick.md)
@@ -121,8 +113,6 @@
 [PyMC Yerine JAGS ve rpy](10/pymc-yerine-jags-ve-rpy.md)
 
 [Cython](11/cython.md)
-
-[IETT Duraklari ve Hatlari](11/iett-duraklari-ve-hatlari.md)
 
 [preview-latex](11/preview-latex.md)
 
