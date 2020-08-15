@@ -2,7 +2,7 @@
 
 [Açık Anahtar Şifreleme](10/ack-anahtar-sifreleme.md)
 
-[Davranış Kavramı](10/davrans-kavram.md)
+[Davranış Bazlı Robotlar (Behavior-Based Robots)](10/davrans-kavram.md)
 
 [Döngüler ve Ziyaretler (Iterators)](10/donguler-ve-ziyaretler-iterators.md)
 

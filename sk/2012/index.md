@@ -64,8 +64,6 @@
 
 [Gaussian Kontrolu](05/gaussian-kontrolu.md)
 
-[Pentaho ve Hesaplanmis Olcutler, Yuzdeler](05/pentaho-ve-hesaplanmis-olcutler.md)
-
 [Postgres First_Value, Sum, Partition](05/postgres-firstvalue-sum-partition.md)
 
 [Python ile Dinamik Excel Dosyasi Yaratmak](05/python-ile-dinamik-excel-dosyasi.md)
@@ -101,10 +99,6 @@
 [Dongu Yazmamak, Fonksiyonel Diller, Python](07/dongu-yazmamak-fonksiyonel-diller-python.md)
 
 [Kelime Benzerligi - Levenshtein Mesafesi](07/kelime-benzerligi-levenshtein-mesafesi.md)
-
-[Pentaho ile Tablolari Senkronize Etmek](07/pentaho-ile-tablolari-senkronize-etmek.md)
-
-[Pur PDI ile Takvimleme](07/pur-pdi-ile-takvimleme.md)
 
 [supervisord](07/supervisord.md)
 
