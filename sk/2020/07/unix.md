@@ -208,7 +208,7 @@ Referans
 
 [Ubuntu SWAP Alanı Nasıl Arttırılır?](../../2013/03/ubuntu-swap-alani-nasil-arttirilir.md)
 
-
+[Unix Rsync - Makineler Arası Dosya Kopyalamanın Hızlı Yolu](../../2003/10/unix-rsync-makineleraras-dosya.md)
 
 
 

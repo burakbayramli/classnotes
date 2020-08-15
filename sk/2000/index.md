@@ -28,8 +28,6 @@
 
 [Organizasyonlarda Teknik Bilgi İletişimi](10/organizasyonlarda-teknik-bilgi.md)
 
-[Program Nasıl Test Edilir](10/program-nasl-test-edilir.md)
-
 [Projelerde İşbölümü](10/projelerde-isbolumu.md)
 
 [Properties Dosyaları - Java İçin Ayar Yapmak](10/properties-dosyalar-java-icin-ayar.md)

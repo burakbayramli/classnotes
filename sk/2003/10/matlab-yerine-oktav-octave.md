@@ -21,7 +21,9 @@ değil, çünkü gnuplot programı da bedava.
 
 Octave'i Ubuntu uzerinde kurmak cok kolay: 
 
-sudo apt-get install octave3.2  octave-optim octave-image. 
+```
+sudo apt-get install octave3.2 octave-optim octave-image
+```
 
 En son iki paket imaj isleyebilmek ve optimizasyon yapabilmek
 icin. kaynak kodlarından derlenerek kurulabilir. 
