@@ -203,10 +203,10 @@ if __name__ == "__main__":
         print (cmd)
         os.system(cmd)
         shutil.copy(".gitignore", TARGET_DIR)
-        pdfs = json.loads(open("pdfs.conf").read())
+        lecs = json.loads(open("lecs.conf").read())
         for topdir in topdirs:
             print ('main',topdir)
-            print ('pdf', pdfs[topdir])
+            print ('pdf', lecs['pdfs'][topdir])
             dir = TARGET_DIR + "/" + topdir
             print ('dir',dir)
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
@@ -215,6 +215,7 @@ if __name__ == "__main__":
             <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <title>%s</title>
             </head>  
             <body>                    
             <p>
@@ -222,7 +223,11 @@ if __name__ == "__main__":
             &nbsp;&nbsp;&nbsp;&nbsp;
             <a href='%s'>PDF</a>
             </p>
-            """ % pdfs[topdir])
+            <p>
+            <h4>%s</h4>
+            </p>
+            """ % (lecs['titles'][topdir],lecs['pdfs'][topdir],lecs['titles'][topdir]) )
+            
             for subdir in sorted(os.listdir(dir)):
                 if not os.path.isdir(dir + "/" + subdir): continue
                 print ('subdir',subdir)
