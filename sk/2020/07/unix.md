@@ -210,6 +210,8 @@ Referans
 
 [Unix Rsync - Makineler Arası Dosya Kopyalamanın Hızlı Yolu](../../2003/10/unix-rsync-makineleraras-dosya.md)
 
+[supervisord](../../2012/07/supervisord.md)
+
 
 
 
