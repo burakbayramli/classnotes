@@ -204,7 +204,7 @@ Referans
 
 [Serviste İşleyen Komut Satırı - tmux](../../2017/11/serviste-isleyen-komut-satr-tmux.md)
 
-
+[Bellek Dosyalari - /dev/shm](../../2016/01/bellek-dosyalari-devshm.md)
 
 
 
