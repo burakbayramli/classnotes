@@ -3,7 +3,7 @@
 #
 # __TODO__: for html, put article title inside <title></title>
 #
-import os, sys, re, codecs, shutil, markdown
+import os, sys, re, codecs, shutil, markdown, json
 
 topdirs = ['algs','calc_multi','chaos','compscieng',
            'func_analysis','linear','ode','pde','stat',
@@ -203,9 +203,10 @@ if __name__ == "__main__":
         print (cmd)
         os.system(cmd)
         shutil.copy(".gitignore", TARGET_DIR)
-        
+        pdfs = json.loads(open("pdfs.conf").read())
         for topdir in topdirs:
             print ('main',topdir)
+            print ('pdf', pdfs[topdir])
             dir = TARGET_DIR + "/" + topdir
             print ('dir',dir)
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
@@ -218,8 +219,10 @@ if __name__ == "__main__":
             <body>                    
             <p>
             <a href='..'>Ana Menü</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href='%s'>PDF</a>
             </p>
-            """)
+            """ % pdfs[topdir])
             for subdir in sorted(os.listdir(dir)):
                 if not os.path.isdir(dir + "/" + subdir): continue
                 print ('subdir',subdir)
