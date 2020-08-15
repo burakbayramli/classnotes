@@ -44,10 +44,6 @@
 
 [Ne Zaman Ambar, Ne Zaman Gelisiguzel Sorgu](04/ne-zaman-ambar-ne-zaman-gelisiguzel.md)
 
-[Olcutler (Measures)](04/olcutler.md)
-
-[Parametreli Pentaho Raporlari](04/onceki-yazida-nasil-rapor-tanimlanip.md)
-
 [OpenCV Ubuntu](04/opencv-ubuntu.md)
 
 [Pandas ile Birlesim (Join)](04/pandas-ile-birlesim-join.md)

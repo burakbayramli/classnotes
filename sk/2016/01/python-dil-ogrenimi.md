@@ -61,6 +61,5 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Liste Gezerken Eleman Silmek](../../2011/03/liste-gezerken-eleman-silmek.md)
 
-
-
+[Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek](../../2013/07/onbelleklemeyi-dekorator-ile-yapmak.md)
 

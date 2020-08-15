@@ -4,8 +4,18 @@ Komut satirindan surec kontrolu, idaresi gibi isler icin Unix bash'in
 guzel ozellikleri var. Bash icin bir script'i sh script.sh ile degil
 bash script.sh olarak isletmek gerekli. Mesela
 
-set -m # Enable Job Controlfor (( i = 0; i < $2; i++ ))do    cmd="baz komut "    cmd+=" ";cmd+=$2;cmd+=" ";cmd+=$i    if [ $1 == "secim1" ]; then        xterm -hold -e $cmd &    fi    if [ $1 == "secim2" ]; then        $cmd &    fidonewaitecho "hepsi tamam"
+```
+set -m # Enable Job Controlfor (( i = 0; i < $2; i++ ))do
+    cmd="baz komut "
+    cmd+=" ";cmd+=$2;cmd+=" ";cmd+=$i
+    if [ $1 == "secim1" ]; then
+        xterm -hold -e $cmd &
+    fi
+    if [ $1 == "secim2" ]; then
+        $cmd &
+    fidonewaitecho "hepsi tamam"
 ...
+```
 
 Ustteki script icinde surec kontrolu (job control) icin -m en basta
 tanimlanmali.
@@ -30,7 +40,9 @@ ozelligidir. Belki tum alt komutlar bitince bazi ek birlestirme,
 vs. islemleri yapilacaktir. Onlari yapmanin en uygun yeri burasi, yani
 hemen wait sonrasi. Bunu test etmek icin su script'e bakalim
 
+```
 set -m # Enable Job Controlecho "1 saniye bekle..."sleep 1 &echo "3 saniye bekle..."sleep 3 &waitecho "hepsi tamam"
+```
 
 Bu script isletilence 3 saniye bekleme olacaktir, 1 saniyelik "uyku
 (sleep)" komutu bitmis olsa bile 3 saniyelik olanin bitmesi

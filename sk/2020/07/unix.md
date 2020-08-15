@@ -206,6 +206,7 @@ Referans
 
 [Bellek Dosyalari - /dev/shm](../../2016/01/bellek-dosyalari-devshm.md)
 
+[Ubuntu SWAP Alanı Nasıl Arttırılır?](../../2013/03/ubuntu-swap-alani-nasil-arttirilir.md)
 
 
 

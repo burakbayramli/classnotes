@@ -1,7 +1,5 @@
 # 2014
 
-[Euler Fontlari](01/euler-fontlari.md)
-
 [Netflix Veri Analiz, Tahmin Altyapisi](01/netflix-veri-analiz-tahmin-altyapisi.md)
 
 [Projelerde Git](03/projelerde-git.md)

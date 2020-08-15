@@ -22,7 +22,7 @@
 
 [ffmpeg, avconv, moviepy](10/ffmpeg-avconv-moviepy.md)
 
-[Histogram Numaralari](10/histogram-numaralari.md)
+[Histogram Numaraları](10/histogram-numaralari.md)
 
 [htlatex ve minted, make4ht](12/htlatex-ve-minted.md)
 

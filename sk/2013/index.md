@@ -22,7 +22,7 @@
 
 [Ubuntu, Nautilus, Dosya / Dizin Uzerinde Islem Yapmak](03/ubuntu-nautilus-dosya-dizin-uzerinde.md)
 
-[Ubuntu SWAP Alani Nasil Arttirilir?](03/ubuntu-swap-alani-nasil-arttirilir.md)
+[Ubuntu SWAP Alanı Nasıl Arttırılır?](03/ubuntu-swap-alani-nasil-arttirilir.md)
 
 [IP ve Bolge Eslemesi, Python](04/ip-ve-bolge-eslemesi-python.md)
 
@@ -38,7 +38,7 @@
 
 [Oracle SQL ile Orneklemek (Sampling)](06/oracle-sql-ile-orneklemek-sampling.md)
 
-[Dekoratorler, Onbellek Kodlamasi, Fonksiyon Degistirmek](07/onbelleklemeyi-dekorator-ile-yapmak.md)
+[Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek](07/onbelleklemeyi-dekorator-ile-yapmak.md)
 
 [Oracle, Pandas, HDF5](07/oracle-pandas-hdf5.md)
 
@@ -60,7 +60,7 @@
 
 [Storm, Python, Gercek Zamanda Veri Islemek](09/storm-python-gercek-zamanda-veri-islemek.md)
 
-[Yerel Ag Kurmak - Ubuntu](09/yerel-ag-kurmak-ubuntu.md)
+[Yerel Ağ (Network) Kurmak - Ubuntu](09/yerel-ag-kurmak-ubuntu.md)
 
 [Buyuk Matrisler Uzerinde SVD Ayristirmasi (SVD Factorization for Tall-and-Fat Matrices on Map/Reduce Architectures)](10/buyuk-matrisler-uzerinde-svd.md)
 

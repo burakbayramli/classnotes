@@ -281,6 +281,8 @@ Ekler
 
 [meshgrid](../../2011/02/meshgrid.md)
 
+[Histogram Numaraları](../../2015/10/histogram-numaralari.md)
+
 
 
 
