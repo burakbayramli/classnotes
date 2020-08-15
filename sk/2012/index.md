@@ -130,8 +130,6 @@
 
 [Postgresql ile Yuzdelik (Percentile) Hesabi](09/postgresql-ile-yuzdelik-percentile.md)
 
-[SVD ile Kumeleme](09/svd-ile-kumeleme.md)
-
 [Bir Vektorun Kismi Toplamini Almak](10/bir-vektorun-kismi-toplamini-almak.md)
 
 [Zaman Kolonlari Arasindaki Farki Gun Olarak Gostermek](10/zaman-kolonlari-arasindaki-farki-gun.md)
