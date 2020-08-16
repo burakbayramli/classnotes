@@ -85,6 +85,14 @@ Yapay Görüş (Computer Vision)
 
 https://burakbayramli.github.io/dersblog/vision
 
+Fizik
+
+https://burakbayramli.github.io/dersblog/phy/index.html
+
+IT, Bilisim
+
+https://burakbayramli.github.io/dersblog/sk/index.html
+
 İçeriğe ek yapmak isteyenler [için](CONTRIBUTING.md).
 
 Dokümanların içinde görülen kod Jupyter not defteri ya da ipython

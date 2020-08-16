@@ -11,7 +11,9 @@ Sitemizin ilk başlangıç yıllarında kullandığımız Unix scp programı,
 her kayıtı sürekli sonuç ortamına kopyalıyordu. Örnek bir scp komutu
 aşağıda gösteriliyor.
 
- scp *.jsp kullanici@bizim.isp.makinasi.com:/usr/local/site/dizin/
+```
+scp *.jsp kullanici@bizim.isp.makinasi.com:/usr/local/site/dizin/
+```
 
 Rsync
 

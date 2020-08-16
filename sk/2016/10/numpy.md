@@ -287,4 +287,6 @@ Ekler
 
 [Ubuntu Server ve Matplotlib](../../2010/11/ubuntu-server-ve-matplotlib.md)
 
+[Grafiklemek, Matplotlib, Pandas](../../2020/02/grafiklemek.md)
+
 
