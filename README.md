@@ -39,6 +39,8 @@ Calculus gerekiyor mu bilmiyorum, benim zamanımda gerekiyordu).
 
 [Çoklu Bakış Açı Geometrisi](vision)
 
+[Fizik](phy)
+
 ### PDF
 
 Lineer Cebir (Linear Algebra)
