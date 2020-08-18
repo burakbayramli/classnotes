@@ -13,9 +13,8 @@ diğer yaklaşım, ki bu SPH yaklaşımı, sistemdeki her parçacığı takip
 eder, onun değişkenlerini hatırlar. Ama bunu bir ekle yapar, her
 parçacık etrafındaki diğer parçacıklardan etkilenir o zaman bu
 parçacık üzerine bir çekirdek (kernel) koyulabilir, ve bu çekirdek
-üzerinden takip yapılır.
-
-Bu yaklaşım stabil bir sistem ortaya çıkartıyor.
+üzerinden takip yapılır. Bu yaklaşım stabil bir sistem ortaya
+çıkartıyor.
 
 Alttaki iki kod, C++ üzerinden 2 boyutta bu tür sistemlerin
 modellemesi. Derleyebilmek için
