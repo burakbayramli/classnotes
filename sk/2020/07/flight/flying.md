@@ -74,8 +74,8 @@ print ( np.sqrt( W**3 / (2.0 * rho0 * A)  )  )
 
 4. Briggs and Stratton P 3000 - https://amzn.to/2IE3DsP
 
-5. Honda EU3000IH1A Handi - https://amzn.to/354Ovhw
-   3000 Watts, 35 kg
+5. Honda EU3000IH1A Handi - https://amzn.to/354Ovhw 3000 Watts, 35
+   kg. At full throttle, a single tank will last 3.5 hours.
 
 helicop
 https://www.youtube.com/watch?v=HrsGM0PzQFo
