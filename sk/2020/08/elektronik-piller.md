@@ -61,7 +61,7 @@ Paralel bağlı pillerde ise akım kapasitesinde artış olur, fakat voltajda ar
 olmaz. Dikkat akım seviyesi aynı kalır, sadece aynı akımı daha uzun süre
 çekebiliriz [9, 10, 11].
 
-\includegraphics[width=20em]{battery_series_parallel.jpg}
+![](battery_series_parallel.jpg)
 
 LiPo Pilleri
 
@@ -92,8 +92,8 @@ Kaynaklar
 
 [1] https://www.tested.com/art/makers/846909-hobby-rc-analyzing-lipo-battery-discharge-rates/
 
-[9] \url{https://www.endesa.com/en/discover-energy/blogs/volts-watts-amps-what-are-they-how-do-they-differ}
+[9] https://www.endesa.com/en/discover-energy/blogs/volts-watts-amps-what-are-they-how-do-they-differ
 
-[10] \url{https://www.quora.com/What-is-the-difference-between-volts-and-amps}
+[10] https://www.quora.com/What-is-the-difference-between-volts-and-amps
 
-[11] \url{https://batteryuniversity.com/learn/article/serial_and_parallel_battery_configurations}
+[11] https://batteryuniversity.com/learn/article/serial_and_parallel_battery_configurations
