@@ -3,25 +3,6 @@
 
 Direnc
 
-multimetre
-https://www.direnc.net/uni-t-ut33c-multimetre
-
-potansiyometre
-2 x https://www.direnc.net/10k-uzun-mil-pot
-
-krokodil
-3 x https://www.direnc.net/krokodil-kablo-kucuk-boy
-
-servo
-https://www.direnc.net/sg90-9g-servo-motor
-
-gyro, accel sensor
-MPU 6050
-https://www.direnc.net/mpu6050-3-axis-gyro-ve-egim-sensoru
-
-
-
-
 motor
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
 
@@ -45,10 +26,12 @@ https://www.direnc.net/elektronikci-kargaburun-pense-140mm
 pil yuvasi
 https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
 
+breadboard
+3 x https://www.direnc.net/mini-yapiskanli-breadboard-yesil
 
 ------------------------------------------------------------------------
 
-PAKET 1
+ALINDI
 
 x raspberry pi 3
 x https://www.direnc.net/raspberry-pi-3
@@ -72,4 +55,18 @@ x https://www.direnc.net/krokodil-kablo-kucuk-boy
 
 x direnc
 x https://www.direnc.net/2512-kilif-smd-direnc-paketi-33x10330-adet
+
+potansiyometre
+2 x https://www.direnc.net/10k-uzun-mil-pot
+
+krokodil
+3 x https://www.direnc.net/krokodil-kablo-kucuk-boy
+
+servo
+https://www.direnc.net/sg90-9g-servo-motor
+
+gyro, accel sensor
+MPU 6050
+https://www.direnc.net/mpu6050-3-axis-gyro-ve-egim-sensoru
+
 

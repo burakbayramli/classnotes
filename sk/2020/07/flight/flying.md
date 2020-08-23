@@ -77,6 +77,10 @@ print ( np.sqrt( W**3 / (2.0 * rho0 * A)  )  )
 5. Honda EU3000IH1A Handi - https://amzn.to/354Ovhw 3000 Watts, 35
    kg. At full throttle, a single tank will last 3.5 hours.
 
+Turkiye Inverter Motor
+
+https://www.koctas.com.tr/jeneratorler/c/106001
+
 helicop
 https://www.youtube.com/watch?v=HrsGM0PzQFo
 
