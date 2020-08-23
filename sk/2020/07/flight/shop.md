@@ -3,6 +3,32 @@
 
 Direnc
 
+pil
+https://www.direnc.net/111v-2500mah-25c-3s-lipo-pil-gens-ace
+
+sarj
+https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
+
+pil yuvasi
+https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
+
+breadboard
+3 x https://www.direnc.net/mini-yapiskanli-breadboard-yesil
+
+usb soket
+https://www.matiot.com/ms101-mini-usb-socket
+
+pi kutusu
+https://www.direnc.net/raspberry-pi-3-model-b-icin-seffaf-kutu
+
+led isik
+https://www.direnc.net/350ma-dogal-beyaz-power-led-cw-4000k-cree
+
+tornavida, pense, vs
+https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
+https://www.direnc.net/jm-s214-yildiz-tornavida-150mm-6mm
+https://www.direnc.net/elektronikci-kargaburun-pense-140mm
+
 motor
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
 
@@ -12,22 +38,7 @@ https://www.direnc.net/skywalker-20a-esc-fircasiz-motor-hiz-kontrol-surucu-devre
 pervane
 https://www.direnc.net/drone-quadcopter-ve-multikopter-pervanesi-karbon-9047-pervane-seti-4-adet
 
-pil
-https://www.direnc.net/111v-3s1p-2200-mah-30c-li-polymer-pil-soketli
 
-sarj
-https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
-
-tornavida, pense, vs
-https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
-https://www.direnc.net/jm-s214-yildiz-tornavida-150mm-6mm
-https://www.direnc.net/elektronikci-kargaburun-pense-140mm
-
-pil yuvasi
-https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
-
-breadboard
-3 x https://www.direnc.net/mini-yapiskanli-breadboard-yesil
 
 ------------------------------------------------------------------------
 
