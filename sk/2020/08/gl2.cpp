@@ -1,5 +1,6 @@
 #include <GL/glut.h>
 #include <iostream>
+#include <fstream> 
 #include <vector>
 using namespace std;
 
@@ -52,6 +53,8 @@ const static int WINDOW_WIDTH = 800;
 const static int WINDOW_HEIGHT = 600;
 const static double VIEW_WIDTH = 1.5*800.f;
 const static double VIEW_HEIGHT = 1.5*600.f;
+
+int renderCount = 0;
 
 void InitSPH(void)
 {
@@ -177,6 +180,19 @@ void Render(void)
     glEnd();
 
     glutSwapBuffers();
+
+    // her 40'inci goruntuyu diske yazmak
+    if (renderCount % 40 == 0) {
+	int* buffer = new int[ WINDOW_WIDTH * WINDOW_HEIGHT * 3 ];
+	glReadPixels( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR, GL_UNSIGNED_BYTE, buffer );
+	std::string fname = "/tmp/gl2-out-" + std::to_string(renderCount) + ".tga";
+	FILE   *out = fopen(fname.c_str(), "w");
+	short  TGAhead[] = {0, 2, 0, 0, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 24};
+	fwrite(&TGAhead, sizeof(TGAhead), 1, out);
+	fwrite(buffer, 3 * WINDOW_WIDTH*WINDOW_HEIGHT, 1, out);
+	fclose(out);
+    }
+    renderCount++;    
 }
 
 void Keyboard(unsigned char c,
