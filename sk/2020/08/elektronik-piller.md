@@ -66,16 +66,15 @@ olmaz. Dikkat akım seviyesi aynı kalır, sadece aynı akımı daha uzun süre
 LiPo Pilleri
 
 Bu tür piller yüksek amper üretebilirler. Etikletlenmeleri kafa
-karıştırabilir, mesela 4S-2200 20C etiketli pil 2200 mAh
-üretir. Burada 20C yük boşaltımı (discharge) belirtiyor, pilin
-maksimum akım verme kapasitesini bulmak için 20 sayısını 2200 ile
-çarpıyoruz, 20 x 2200 = 44000 milliamper = 44 amper.
-
-Bu hesap bize bu pilin güvenli bir şekilde sürekli maksimum 44 amper
-verebileceğini söylüyor. Tabii dolaylı olarak bu da demektir ki 44
-amperi verirse pil ancak 3 dakika civarı dayanir, cunku enerji
-kapasitesini biliyoruz, 2200 mah, ki bu miliamper saat, 2200 x 60
-miliamper dakika eder, o zaman
+karıştırabilir, mesela 4S-2200 20C diyor, bu ne demek. Bu etiketli pil
+2200 mAh üretir. Burada 20C yük boşaltımı (discharge) demek, pilin
+maksimum akım verme kapasitesini bulmak için 20C icindeki 20 sayısını
+2200 ile çarpıyoruz, 20 x 2200 = 44000 milliamper = 44 amper
+buluyoruz. Bu hesap bize bu pilin güvenli bir şekilde sürekli maksimum
+44 amper verebileceğini söylüyor. Tabii dolaylı olarak bu da demektir
+ki 44 amperi bu şekilde sürekli olarak alsak pil ancak 3 dakika civarı
+dayanır, çünkü enerji kapasitesini biliyoruz, 2200 mah, ki bu
+miliamper saat, 2200 x 60 miliamper dakika eder, o zaman
 
 ```python
 print ((2200 * 60) / 44000, 'dakika')
@@ -85,8 +84,8 @@ print ((2200 * 60) / 44000, 'dakika')
 3.0 dakika
 ```
 
-Benzer mantikla 4S-2200 30C pili 66 ampere kadar gereksinim duyan
-uygulamalar icin kullanilabilir.
+Benzer mantıkla 4S-2200 30C pili 66 ampere kadar gereksinim duyan
+uygulamalar için kullanılabilir.
 
 Kaynaklar
 
@@ -97,3 +96,6 @@ Kaynaklar
 [10] https://www.quora.com/What-is-the-difference-between-volts-and-amps
 
 [11] https://batteryuniversity.com/learn/article/serial_and_parallel_battery_configurations
+
+
+

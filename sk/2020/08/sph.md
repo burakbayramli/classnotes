@@ -1,4 +1,4 @@
-# Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Partıcle Hydrodynamics -SPH-)
+# Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Particle Hydrodynamics -SPH-)
 
 Şu akışını modellemek fizikteki en zor problemlerden biri, hatta bu
 akışı temsil eden Navier-Stokes denklemlerinin her durumda analitik
@@ -40,4 +40,6 @@ Kaynaklar
 [1] https://imdoingitwrong.wordpress.com/2010/12/14/why-my-fluids-dont-flow/
 
 [2] https://github.com/cerrno/mueller-sph
+
+
 

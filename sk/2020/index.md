@@ -24,7 +24,11 @@
 
 [Video Islemleri](07/video-islemleri.md)
 
-[Elektronik, Olcum, Temel Aletler](08/elektronik-giris.md)
+[Piller](08/elektronik-piller.md)
+
+[Elektronik, Olcum, Temel Parcalar](08/elektronik-temel-parcalar-aletler.md)
+
+[Elektronik](08/elektronik.md)
 
 [Markdown Bazli Web Yayinciligi, Github Pages](08/github-pages.md)
 

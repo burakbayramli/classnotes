@@ -6,6 +6,7 @@
 #include <memory.h>
 #include <GL/glut.h>
 #include <iostream> 
+#include <fstream> 
 using namespace std;
  
 #define kScreenWidth 640
@@ -36,7 +37,8 @@ using namespace std;
 #define kEpsilon 0.0000001f
 #define kEpsilon2 (kEpsilon*kEpsilon)
  
- 
+int renderCount = 0;
+
 struct Particle
 {
     float x;
@@ -368,7 +370,7 @@ void ResolveCollisions()
  
  
 void Render()
-{
+{    
     glClearColor(0.02f, 0.01f, 0.01f, 1);
     glClear(GL_COLOR_BUFFER_BIT);
  
@@ -405,6 +407,20 @@ void Render()
     glDisableClientState(GL_VERTEX_ARRAY);
  
     glutSwapBuffers();
+
+    // her 40'inci goruntuyu diske yazmak
+    if (renderCount % 40 == 0) {
+	int* buffer = new int[ kScreenWidth * kScreenHeight * 3 ];
+	glReadPixels( 0, 0, kScreenWidth, kScreenHeight, GL_BGR, GL_UNSIGNED_BYTE, buffer );
+	std::string fname = "/tmp/gl1-out-" + std::to_string(renderCount) + ".tga";
+	//std::string fname = "/tmp/gl1-out-1.tga";
+	FILE   *out = fopen(fname.c_str(), "w");
+	short  TGAhead[] = {0, 2, 0, 0, 0, 0, kScreenWidth, kScreenHeight, 24};
+	fwrite(&TGAhead, sizeof(TGAhead), 1, out);
+	fwrite(buffer, 3 * kScreenWidth*kScreenHeight, 1, out);
+	fclose(out);
+    }
+    renderCount++;
 }
  
  
