@@ -118,3 +118,36 @@ helicop
 https://www.youtube.com/watch?v=HrsGM0PzQFo
 
 
+Benzin motoru
+
+```python
+rho0 = 1.226
+engw = 50
+myw = 80
+luggw = 20
+W = (myw+luggw+engw*2) * 9.8
+r = 1.5*2
+A = np.pi * r**2
+w = np.sqrt( W**3 / (2.0 * rho0 * A)  ) 
+print ( w / 750, 'hp' )
+```
+
+```text
+13.895251751643682 hp
+```
+
+
+https://www.irhaltarim.com.tr/urun/honda-gx200-yatay-milli-motor-6-5-hp/4810
+
+
+
+
+
+
+
+
+
+
+
+
+
