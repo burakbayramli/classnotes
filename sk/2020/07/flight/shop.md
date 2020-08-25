@@ -9,14 +9,11 @@ https://www.direnc.net/111v-2500mah-25c-3s-lipo-pil-gens-ace
 sarj
 https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
 
-pil yuvasi
-https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
-
 breadboard
-3 x https://www.direnc.net/mini-yapiskanli-breadboard-yesil
+3 x https://www.direnc.net/mini-yapiskanli-breadboard-kirmizi
 
 usb soket
-https://www.matiot.com/ms101-mini-usb-socket
+2 x https://www.matiot.com/ms101-mini-usb-socket
 
 pi kutusu
 https://www.direnc.net/raspberry-pi-3-model-b-icin-seffaf-kutu
@@ -38,11 +35,14 @@ https://www.direnc.net/skywalker-20a-esc-fircasiz-motor-hiz-kontrol-surucu-devre
 pervane
 https://www.direnc.net/drone-quadcopter-ve-multikopter-pervanesi-karbon-9047-pervane-seti-4-adet
 
+pil yuvasi
+https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
+
 
 
 ------------------------------------------------------------------------
 
-ALINDI
+ALINDI 1
 
 x raspberry pi 3
 x https://www.direnc.net/raspberry-pi-3
@@ -66,6 +66,8 @@ x https://www.direnc.net/krokodil-kablo-kucuk-boy
 
 x direnc
 x https://www.direnc.net/2512-kilif-smd-direnc-paketi-33x10330-adet
+
+ALINDI 2
 
 potansiyometre
 2 x https://www.direnc.net/10k-uzun-mil-pot

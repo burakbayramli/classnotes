@@ -26,7 +26,7 @@
 
 [Piller](08/elektronik-piller.md)
 
-[Elektronik, Olcum, Temel Parcalar](08/elektronik-temel-parcalar-aletler.md)
+[Elektronik, Ölçüm, Temel Parçalar](08/elektronik-temel-parcalar-aletler.md)
 
 [Elektronik](08/elektronik.md)
 
@@ -36,5 +36,7 @@
 
 [3D Baskıya Hazır CAD Tasarımlarına Erişmek, Numpy-STL](08/numpy-stl.md)
 
-[Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Partıcle Hydrodynamics -SPH-)](08/sph.md)
+[OpenGL, PyOpenGL](08/pyopengl.md)
+
+[Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Particle Hydrodynamics -SPH-)](08/sph.md)
 
