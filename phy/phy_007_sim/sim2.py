@@ -25,14 +25,15 @@ class Simulation:
         self.rt = False
         
     def init(self):
-        p = [0.5,0.1,0.9]
-#        v = [-1,-1,-1]
-        f = [-1,-1,-1]
-        self.balls.append({'pos':p,'f':f})
+        v = [0.0, 0.0, 0.0]
         
-        p = [0.1,0.9,0.9]
-        f = [1,0.5,-1]
-        self.balls.append({'pos':p,'f':f})
+        p = [0.5, 0.1, 0.9]
+        f = [-1, -1, -1]
+        self.balls.append({'pos':p, 'f':f, 'v': v})
+        
+        p = [0.1, 0.9, 0.9]
+        f = [1, 0.5, -1]
+        self.balls.append({'pos':p, 'f':f, 'v': v})
                 
         tm = 0.0
 
