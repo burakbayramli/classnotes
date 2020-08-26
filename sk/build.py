@@ -10,9 +10,11 @@ if __name__ == "__main__":
     if sys.argv[1] == 'html':
 
         shutil.copy("_config.yml","/home/burak/Documents/dersblog")
-            
+
+        ignore = " --ignore-list=.git,.zip,.pdf,out.html,.apk,.stl"
         fr = os.getcwd()
-        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'  --delete 1 --ignore-list=.git,.zip,.pdf,out.html,apk" % (fr, TARGET_DIR)
+        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'  --delete 1" % (fr, TARGET_DIR)
+        cmd += ignore
         print (cmd)
         os.system(cmd)
 

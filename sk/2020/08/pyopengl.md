@@ -191,8 +191,8 @@ Sonuc
 ![](pyopengl_01.png)
 
 
-Dikkat üstteki kodda duvar çarpım fiziği var fakat duvarların
-birbirine çarpa fiziği yok.
+Dikkat üstteki kodda duvar çarpım fiziği var fakat topların birbirine
+çarpma fiziği yok.
 
 
 Kaynaklar

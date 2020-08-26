@@ -6,9 +6,6 @@ Direnc
 pil
 https://www.direnc.net/111v-2500mah-25c-3s-lipo-pil-gens-ace
 
-sarj
-https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
-
 breadboard
 3 x https://www.direnc.net/mini-yapiskanli-breadboard-kirmizi
 
@@ -38,6 +35,8 @@ https://www.direnc.net/drone-quadcopter-ve-multikopter-pervanesi-karbon-9047-per
 pil yuvasi
 https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
 
+sarj
+https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
 
 
 ------------------------------------------------------------------------
