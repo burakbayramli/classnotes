@@ -1,13 +1,23 @@
+'''
+Traceback (most recent call last):
+  File "_ctypes/callbacks.c", line 234, in 'calling callback function'
+  File "sim2.py", line 68, in update
+    self.integrate()
+  File "sim2.py", line 60, in integrate
+    b['v'] += self.dt*b['f'] / m
+TypeError: can't multiply sequence by non-int of type 'float'
+'''
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from random import random
 from PIL import Image
 from PIL import ImageOps
+import numpy as np
 import sys
 
-G = [0., 0, -9.8]
-m = 1
+G = np.array([0.0, 0.0, -9.8])
+m = 1.0
 
 class Simulation:
     def __init__(self):
@@ -25,14 +35,14 @@ class Simulation:
         self.rt = False
         
     def init(self):
-        v = [0.0, 0.0, 0.0]
+        v = np.array([0.0, 0.0, 0.0])
         
-        p = [0.5, 0.1, 0.9]
-        f = [-1, -1, -1]
+        p = np.array([0.5, 0.1, 0.9])
+        f = np.array([-1.0, -1.0, -1.0])
         self.balls.append({'pos':p, 'f':f, 'v': v})
         
-        p = [0.1, 0.9, 0.9]
-        f = [1, 0.5, -1]
+        p = np.array([0.1, 0.9, 0.9])
+        f = np.array([1.0, 0.5, -1.0])
         self.balls.append({'pos':p, 'f':f, 'v': v})
                 
         tm = 0.0
@@ -52,11 +62,15 @@ class Simulation:
     def computeForces(self):
         for b in self.balls:
             b['f'] = G * m
-        print (self.balls)
-        exit()
+
         
     def integrate(self):
-        pass
+        for b in self.balls:
+            b['v'] += self.dt*(b['f']/m)
+            b['pos'] += self.dt*b['v']
+        print (self.balls)
+        print ('----------------------')
+        exit()
         
     def update(self):
         self.computeForces()
