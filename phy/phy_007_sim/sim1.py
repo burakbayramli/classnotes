@@ -22,23 +22,12 @@ class Simulation:
         self.rt = False
         
     def init(self):
-#        for i in range(self.n):
-#            p = [
-#                self.mmin + random()*(self.mmax-self.mmin),
-#                self.mmin + random()*(self.mmax-self.mmin),
-#                0.9]
-#            v = [
-#                -1.5 + random()*3.0,
-#                -1.5 + random()*3.0,
-#                -1.0 + random()*2.0]
-                        
-#            self.balls.append({'pos':p,'vel':v})
         p = [0.5,0.1,0.9]
         v = [-1,-1,-1]
         self.balls.append({'pos':p,'vel':v})
         
         p = [0.1,0.9,0.9]
-        v = [-1,-1,-1]
+        v = [1,0.5,-1]
         self.balls.append({'pos':p,'vel':v})        
                 
         tm = 0.0
