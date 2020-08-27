@@ -32,6 +32,8 @@
 
 [Markdown Bazli Web Yayinciligi, Github Pages](08/github-pages.md)
 
+[ipyvolume](08/ipyvolume.md)
+
 [Network Ölçümü, Izlemek](08/network-olcumu.md)
 
 [3D Baskıya Hazır CAD Tasarımlarına Erişmek, Numpy-STL](08/numpy-stl.md)

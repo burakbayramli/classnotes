@@ -1,6 +1,6 @@
 # ipyvolume
 
-```
+```python
 import numpy as np
 import ipyvolume as ipv 
 

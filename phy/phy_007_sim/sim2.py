@@ -1,12 +1,3 @@
-'''
-Traceback (most recent call last):
-  File "_ctypes/callbacks.c", line 234, in 'calling callback function'
-  File "sim2.py", line 68, in update
-    self.integrate()
-  File "sim2.py", line 60, in integrate
-    b['v'] += self.dt*b['f'] / m
-TypeError: can't multiply sequence by non-int of type 'float'
-'''
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
