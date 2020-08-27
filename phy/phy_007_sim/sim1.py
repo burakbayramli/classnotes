@@ -95,7 +95,7 @@ class Simulation:
 
 	# her 40'inci resmi diske png olarak yaz
         if self.i % 40 == 0: 
-            width,height = 640,480
+            width,height = 480,480
             data = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
             image = Image.frombytes("RGBA", (width, height), data)
             image = ImageOps.flip(image)

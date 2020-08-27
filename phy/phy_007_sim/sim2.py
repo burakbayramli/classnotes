@@ -8,7 +8,7 @@ import numpy as np
 import sys
 
 G = np.array([0.0, 0.0, -9.8])
-m = 1.0
+m = 0.1
 
 class Simulation:
     def __init__(self):
@@ -24,16 +24,18 @@ class Simulation:
         self.mmax =  1.0-self.r
         self.mmin = -1.0+self.r
         self.rt = False
+        print ('self.mmax',self.mmax)
+        print ('self.mmin',self.mmin)
         
     def init(self):
         v = np.array([0.0, 0.0, 0.0])
         
-        p = np.array([0.5, 0.1, 0.9])
-        f = np.array([-1.0, -1.0, -1.0])
+        p = np.array([0.2, 0.3, 0.9])
+        f = np.array([5.0, -3.0, 0.0])
         self.balls.append({'pos':p, 'f':f, 'v': v})
         
-        p = np.array([0.1, 0.9, 0.9])
-        f = np.array([1.0, 0.5, -1.0])
+        p = np.array([0.5, 0.3, 0.9])
+        f = np.array([-4.0, 3.5, 0.0])
         self.balls.append({'pos':p, 'f':f, 'v': v})
                 
         tm = 0.0
@@ -51,17 +53,37 @@ class Simulation:
         glLoadIdentity()
 
     def computeForces(self):
-        for b in self.balls:
-            b['f'] = G * m
-
-        
+        if (self.i==1):
+            for b in self.balls:
+                b['f'] = b['f'] + (G * m)
+        else: 
+            for b in self.balls:
+                b['f'] = G * m
+                        
     def integrate(self):
-        for b in self.balls:
+        for j,b in enumerate(self.balls):
             b['v'] += self.dt*(b['f']/m)
             b['pos'] += self.dt*b['v']
-        print (self.balls)
-        exit()
-        
+
+            print (j, b['pos'])
+            
+            if (abs(b['pos'][0]) >= self.mmax):
+                b['v'][0] *= -self.cor
+                if b['pos'][0] < 0:
+                    b['pos'][0] = self.mmin
+
+            if (abs(b['pos'][1]) >= self.mmax):
+                b['v'][1] *= -self.cor
+                if b['pos'][1] < 0:
+                    b['pos'][1] = self.mmin
+                    
+            if (abs(b['pos'][2]) >= self.mmax):
+                b['v'][2] *= -self.cor
+                if b['pos'][2] < 0:
+                    b['pos'][2] = self.mmin
+
+
+            
     def update(self):
         self.computeForces()
         self.integrate()
@@ -89,9 +111,7 @@ class Simulation:
             image = ImageOps.flip(image)
             image.save('/tmp/glutout-%03d.png' % self.i, 'PNG')
         self.i += 1
-
         
-
     def mouse(self,button,state,x,y):
         if button == GLUT_LEFT_BUTTON:
             rt = not state
