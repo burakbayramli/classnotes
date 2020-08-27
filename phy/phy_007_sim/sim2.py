@@ -93,9 +93,13 @@ class Simulation:
         glRotatef(self.th,0.0,1.0,0.0)
         glRotatef(90.0,-1.0,0.0,0.0)
         glutWireCube(2.0)
-        for b in self.balls:
+        for j,b in enumerate(self.balls):
             glPushMatrix()
             glTranslatef(b['pos'][0],b['pos'][1],b['pos'][2])
+            if j==0:
+                glMaterialfv(GL_FRONT, GL_DIFFUSE, [1.0, 0.0, 0.0, 1.0])
+            if j==1:
+                glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.0, 0.0, 1.0, 1.0])
             glutSolidSphere(self.r,50,50)
             glPopMatrix()
         glPopMatrix()
