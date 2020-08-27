@@ -34,7 +34,7 @@ class Simulation:
         self.balls.append({'pos':p, 'f':f, 'v': v})
         
         v = np.array([0.0, 0.0, 0.0])
-        p = np.array([-0.8, 0.0, 0.9])
+        p = np.array([-0.8, -0.0, 0.9])
         f = np.array([40.0, 0.0, 0.0])
         self.balls.append({'pos':p, 'f':f, 'v': v})
                 
@@ -81,9 +81,6 @@ class Simulation:
                 if b['pos'][2] < 0:
                     b['pos'][2] = self.mmin
                     
-        print ('\n')
-
-
             
     def update(self):
         self.computeForces()
