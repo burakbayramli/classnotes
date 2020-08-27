@@ -63,17 +63,9 @@ class Simulation:
                 b['f'] = G * m
                         
     def integrate(self):
-        print ('ball 0 v',self.balls[0]['v'])
-        print ('ball 1 v',self.balls[1]['v'])
         for j,b in enumerate(self.balls):
-            print ('bv',j,b['v'])
-            print ('v addition',j,self.dt*(b['f']/m))
             b['v'] += self.dt*(b['f']/m)
-            print ('av',j,b['v'])
             b['pos'] += self.dt*b['v']
-
-            #print (j, b['pos'])            
-            
             if (abs(b['pos'][0]) >= self.mmax):
                 b['v'][0] *= -self.cor
                 if b['pos'][0] < 0:
