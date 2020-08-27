@@ -29,13 +29,13 @@ class Simulation:
         
     def init(self):
         v = np.array([0.0, 0.0, 0.0])
-        
-        p = np.array([0.2, 0.3, 0.9])
-        f = np.array([5.0, -3.0, 0.0])
+        p = np.array([0.8, 0.0, 0.9])
+        f = np.array([-40.0, 0.0, 0.0])
         self.balls.append({'pos':p, 'f':f, 'v': v})
         
-        p = np.array([0.5, 0.3, 0.9])
-        f = np.array([-4.0, 3.5, 0.0])
+        v = np.array([0.0, 0.0, 0.0])
+        p = np.array([-0.8, 0.0, 0.9])
+        f = np.array([40.0, 0.0, 0.0])
         self.balls.append({'pos':p, 'f':f, 'v': v})
                 
         tm = 0.0
@@ -54,18 +54,25 @@ class Simulation:
 
     def computeForces(self):
         if (self.i==1):
-            for b in self.balls:
+            for j,b in enumerate(self.balls):
                 b['f'] = b['f'] + (G * m)
+                print ('i==1 f',j,b['f'])
+                #exit()
         else: 
             for b in self.balls:
                 b['f'] = G * m
                         
     def integrate(self):
+        print ('ball 0 v',self.balls[0]['v'])
+        print ('ball 1 v',self.balls[1]['v'])
         for j,b in enumerate(self.balls):
+            print ('bv',j,b['v'])
+            print ('v addition',j,self.dt*(b['f']/m))
             b['v'] += self.dt*(b['f']/m)
+            print ('av',j,b['v'])
             b['pos'] += self.dt*b['v']
 
-            print (j, b['pos'])
+            #print (j, b['pos'])            
             
             if (abs(b['pos'][0]) >= self.mmax):
                 b['v'][0] *= -self.cor
@@ -81,6 +88,8 @@ class Simulation:
                 b['v'][2] *= -self.cor
                 if b['pos'][2] < 0:
                     b['pos'][2] = self.mmin
+                    
+        print ('\n')
 
 
             
