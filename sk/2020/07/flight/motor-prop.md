@@ -106,3 +106,7 @@ https://i.pinimg.com/736x/31/d6/5a/31d65abb55e72689ed7051611c3b3067.jpg
 http://www.yinyanmodel.com/En/ProductView.asp?ID=58
 
 
+Big motor
+
+https://turkish.alibaba.com/product-detail/310v-48v-2000-rpm-2000-watt-brushless-dc-motor-48v-worm-gear-reducer-60754085106.html?spm=a2700.md_tr_TR.maylikeexp.2.3fc3d248Z5V6EJ
+

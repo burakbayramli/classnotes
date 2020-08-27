@@ -69,7 +69,6 @@ class Simulation:
             b['v'] += self.dt*(b['f']/m)
             b['pos'] += self.dt*b['v']
         print (self.balls)
-        print ('----------------------')
         exit()
         
     def update(self):
