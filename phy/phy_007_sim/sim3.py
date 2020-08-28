@@ -93,7 +93,11 @@ class Simulation:
 
         for j,b in enumerate(self.balls):
             self.geo_hash_list[spatial_hash(self.balls[j]['pos'])].append(self.balls[j])
-        print (self.geo_hash_list)
+
+
+        for j,b in enumerate(self.balls):
+            
+            
             
     def update(self):
         self.computeForces()
