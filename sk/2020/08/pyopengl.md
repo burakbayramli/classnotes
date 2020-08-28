@@ -200,6 +200,29 @@ Sonuc
 Dikkat üstteki kodda duvar çarpım fiziği var fakat topların birbirine
 çarpma fiziği yok.
 
+Görüntüsüz (Headless) İsletmek
+
+Bazen uzun sürebilecek, ya da otomize şekilde script içinden grafik
+rutinleri çağırmak isteyebiliriz, ve program işlerken bir pencere
+açılip görüntü gösterilsin istemiyoruz. Bu durumda normal bir Ünix
+script çağırır gibi ÖpenGL ya da PyOpenGL çağrıları yapabiliriz,
+görüntüyü işletim sistemi seviyesine yakalayıp göstermemek
+lazım. `xvfb` ile bunu yapabiliriz, Ubuntu'da
+
+```
+sudo apt-get install xvfb
+```
+
+Isletmek icin
+
+```
+xvfb-run -s "-screen 0 1x1x24"  python -u script.py
+```
+
+Görüntü gösterilmeyecek fakat program işleyecek, eğer kod içinde png
+dosyaları yazıyorsak mesela bunların normal olduğu gibi üretildiğini
+göreceğiz. .
+
 
 Kaynaklar
 

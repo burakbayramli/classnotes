@@ -93,6 +93,8 @@ class Simulation:
             self.th -= 0.2
             if self.th>360.0:
                 self.th -= 360.0
+                
+        if self.i > 300: exit()
         
         glutPostRedisplay()
 
