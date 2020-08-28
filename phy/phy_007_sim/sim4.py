@@ -11,13 +11,13 @@ import sys
 p1,p2,p3 = 73856093, 19349663, 83492791
 G = np.array([0.0, 0.0, -9.8])
 
-l = 0.1 # hash box size
-n = 300 # size of hash table
 m = 0.1
 B = 3 # balls
+l = 0.2 # hash box size
+n = B*10 # size of hash table
 
 def spatial_hash(x):
-    ix,iy,iz = np.floor(x[0]/l), np.floor(x[1]/l), np.floor(x[2]/l)
+    ix,iy,iz = np.floor((x[0]+2.0)/l), np.floor((x[1]+2.0)/l), np.floor((x[2]+2.0)/l)
     return (int(ix*p1) ^ int(iy*p2) ^ int(iz*p3)) % n
 
 class Simulation:
@@ -123,10 +123,7 @@ class Simulation:
         for j,b in enumerate(self.balls):
             glPushMatrix()
             glTranslatef(b['pos'][0],b['pos'][1],b['pos'][2])
-            if j==0:
-                glMaterialfv(GL_FRONT, GL_DIFFUSE, [1.0, 0.0, 0.0, 1.0])
-            if j==1:
-                glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.0, 0.0, 1.0, 1.0])
+            #glMaterialfv(GL_FRONT, GL_DIFFUSE, [np.random.rand(), np.random.rand(), np.random.rand(), 1.0])
             glutSolidSphere(self.r,50,50)
             glPopMatrix()
         glPopMatrix()
