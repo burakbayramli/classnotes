@@ -6,7 +6,7 @@ from PIL import Image
 from PIL import ImageOps
 from collections import defaultdict 
 import numpy as np, datetime
-import sys
+import sys, numpy.linalg as lin
 
 p1,p2,p3 = 73856093, 19349663, 83492791
 G = np.array([0.0, 0.0, -9.8])
@@ -42,7 +42,7 @@ class Simulation:
             v = np.array([0.0, 0.0, 0.0])
             p = np.array([np.random.rand(), np.random.rand(), 0.9])
             f = 30*np.array([np.random.rand(), np.random.rand(), 0.0])
-            self.balls.append({'pos':p, 'f':f, 'v': v})
+            self.balls.append({'pos':p, 'f':f, 'v': v, 'i': b})
                 
         tm = 0.0
 
@@ -93,7 +93,11 @@ class Simulation:
 
         for j,b in enumerate(self.balls):
             if (len(self.geo_hash_list[spatial_hash(self.balls[j]['pos'])])>1):
-                print (datetime.datetime.now(),'collision')
+                otherList = self.geo_hash_list[spatial_hash(self.balls[j]['pos'])]
+                for other in otherList:
+                    if (other['i'] != b['i']):
+                        dist = lin.norm(other['pos']-b['pos'])
+                        if (dist<2*self.r): print (dist)
             
             
     def update(self):
