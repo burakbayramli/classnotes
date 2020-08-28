@@ -96,7 +96,8 @@ class Simulation:
 
 
         for j,b in enumerate(self.balls):
-            
+            if (len(self.geo_hash_list[spatial_hash(self.balls[j]['pos'])])>1):
+                print ('collision')
             
             
     def update(self):
