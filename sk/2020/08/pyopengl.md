@@ -81,7 +81,8 @@ class Simulation:
         self.th  = 0.0
         self.mmax =  1.0-self.r
         self.mmin = -1.0+self.r
-        self.rt = False
+        self.right = False
+        self.left = False
         
     def init(self):
         for i in range(self.n):
@@ -136,8 +137,14 @@ class Simulation:
                 else:
                     b['pos'][2] = self.mmax
 
-        if self.rt:
+        # kamerayi saga sola dondurmek icin
+        if self.right:
             self.th += 0.2
+            if self.th>360.0:
+                self.th -= 360.0
+
+        if self.left:
+            self.th -= 0.2
             if self.th>360.0:
                 self.th -= 360.0
 
@@ -166,13 +173,11 @@ class Simulation:
             image.save('/tmp/glutout-%03d.png' % self.i, 'PNG')
         self.i += 1
 
-        
-
     def mouse(self,button,state,x,y):
         if button == GLUT_LEFT_BUTTON:
-            rt = not state
+            self.right = not state
         elif button == GLUT_RIGHT_BUTTON:
-            sys.exit(0)
+            self.left = not state
 
 if __name__ == '__main__':
     s = Simulation()
