@@ -23,9 +23,8 @@ class Simulation:
         self.th  = 0.0
         self.mmax =  1.0-self.r
         self.mmin = -1.0+self.r
-        self.rt = False
-        print ('self.mmax',self.mmax)
-        print ('self.mmin',self.mmin)
+        self.right = False
+        self.left = False
         
     def init(self):
         v = np.array([0.0, 0.0, 0.0])
@@ -56,8 +55,6 @@ class Simulation:
         if (self.i==1):
             for j,b in enumerate(self.balls):
                 b['f'] = b['f'] + (G * m)
-                print ('i==1 f',j,b['f'])
-                #exit()
         else: 
             for b in self.balls:
                 b['f'] = G * m
@@ -86,6 +83,17 @@ class Simulation:
     def update(self):
         self.computeForces()
         self.integrate()
+
+        if self.right:
+            self.th += 0.2
+            if self.th>360.0:
+                self.th -= 360.0
+
+        if self.left:
+            self.th -= 0.2
+            if self.th>360.0:
+                self.th -= 360.0
+        
         glutPostRedisplay()
 
     def display(self):
@@ -117,9 +125,9 @@ class Simulation:
         
     def mouse(self,button,state,x,y):
         if button == GLUT_LEFT_BUTTON:
-            rt = not state
+            self.right = not state
         elif button == GLUT_RIGHT_BUTTON:
-            sys.exit(0)
+            self.left = not state
 
 if __name__ == '__main__':
     s = Simulation()

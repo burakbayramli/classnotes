@@ -41,7 +41,7 @@ class Simulation:
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(60.0,1.0,1.0,50.0)
-        glTranslatef(0.0,0.0,-3.5)
+        glTranslatef(0.0, 0.0, -3.5)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
@@ -107,8 +107,6 @@ class Simulation:
             image = ImageOps.flip(image)
             image.save('/tmp/glutout-%03d.png' % self.i, 'PNG')
         self.i += 1
-
-        
 
     def mouse(self,button,state,x,y):
         if button == GLUT_LEFT_BUTTON:
