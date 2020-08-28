@@ -4,6 +4,7 @@ from OpenGL.GLUT import *
 from random import random
 from PIL import Image
 from PIL import ImageOps
+from collections import defaultdict 
 import numpy as np
 import sys
 
@@ -20,6 +21,7 @@ def spatial_hash(x):
 
 class Simulation:
     def __init__(self):
+        self.geo_hash_list = None
         self.i = 0
         self.n   = 2
         self.r   = 0.1
@@ -68,10 +70,8 @@ class Simulation:
                 b['f'] = G * m
                         
     def integrate(self):
-        near = spatial_hash(self.balls[0]['pos'])==spatial_hash(self.balls[1]['pos'])
-        print (near)
-        if near: exit()
-
+        self.geo_hash_list = defaultdict(list)
+        
         for j,b in enumerate(self.balls):
             b['v'] += self.dt*(b['f']/m)
             b['pos'] += self.dt*b['v']
@@ -90,7 +90,10 @@ class Simulation:
                 b['v'][2] *= -self.cor
                 if b['pos'][2] < 0:
                     b['pos'][2] = self.mmin
-                    
+
+        for j,b in enumerate(self.balls):
+            self.geo_hash_list[spatial_hash(self.balls[j]['pos'])].append(self.balls[j])
+        print (self.geo_hash_list)
             
     def update(self):
         self.computeForces()
