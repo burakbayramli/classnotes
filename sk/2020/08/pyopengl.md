@@ -1,6 +1,6 @@
 # OpenGL, PyOpenGL
 
-3 boyutlu simülasyonlar için ÖpenGL ünlü bir paket. Çeşitli objeler,
+3 boyutlu simülasyonlar için OpenGL ünlü bir paket. Çeşitli objeler,
 satıhlar, onları gösteren bir kamera gibi kavramların kodlaması
 basit. Birkaç örnek C++ kodunu [SPH](sph.md) yazısında gördük. Ek bazı
 kodlar [2]'den alınmıştır,
@@ -204,8 +204,8 @@ Görüntüsüz (Headless) İsletmek
 
 Bazen uzun sürebilecek, ya da otomize şekilde script içinden grafik
 rutinleri çağırmak isteyebiliriz, ve program işlerken bir pencere
-açılip görüntü gösterilsin istemiyoruz. Bu durumda normal bir Ünix
-script çağırır gibi ÖpenGL ya da PyOpenGL çağrıları yapabiliriz,
+açılip görüntü gösterilsin istemiyoruz. Bu durumda normal bir Unix
+script çağırır gibi OpenGL ya da PyOpenGL çağrıları yapabiliriz,
 görüntüyü işletim sistemi seviyesine yakalayıp göstermemek
 lazım. `xvfb` ile bunu yapabiliriz, Ubuntu'da
 
@@ -213,7 +213,7 @@ lazım. `xvfb` ile bunu yapabiliriz, Ubuntu'da
 sudo apt-get install xvfb
 ```
 
-Isletmek icin
+İşletmek için
 
 ```
 xvfb-run -s "-screen 0 1x1x24"  python -u script.py

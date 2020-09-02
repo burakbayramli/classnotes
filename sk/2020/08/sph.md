@@ -35,6 +35,22 @@ gibi bir derleme yapilabilir.
 
 [SPH Kod 2](gl2.cpp)
 
+[Hokusai](https://github.com/manteapi/hokusai.git)
+
+3 boyutlu örnekleri olan bir SPH çözücü bu.
+
+```
+sudo apt-get install libboost-dev libboost-timer-dev libboost-system-dev
+```
+
+Kod indirilir, `python compile.py` işletilir (biraz garip çünkü bu
+çağrı `cmake` işletiyor). Bitince `examples/build` altındaki örnekler
+işletilebilir, mesela `damBreak`. Yanlız dikkat bu kodda `write_frame`
+çağrısının iptal edilmemiş olduğuna bakmak lazım, yoksa uzun süre
+işleyip hiç çıktı göstermez. Diğer örnek kodlardan bu çağrının nasıl
+yapıldığı görülebilir, mesela `cube.cpp`. 
+
+
 Kaynaklar
 
 [1] https://imdoingitwrong.wordpress.com/2010/12/14/why-my-fluids-dont-flow/
