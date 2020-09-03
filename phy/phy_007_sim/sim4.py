@@ -9,12 +9,12 @@ import numpy as np, datetime
 import sys, numpy.linalg as lin
 
 p1,p2,p3 = 73856093, 19349663, 83492791
-G = np.array([0.0, 0.0, -9.8])
+G = np.array([0.0, 0.0, -0.8])
 
 m = 0.1
 B = 2 # balls
 l = 0.2 # hash box size
-n = B*10 # size of hash table
+n = B*20 # size of hash table
 
 def spatial_hash(x):
     ix,iy,iz = np.floor((x[0]+2.0)/l), np.floor((x[1]+2.0)/l), np.floor((x[2]+2.0)/l)
@@ -38,11 +38,11 @@ class Simulation:
         self.left = False
         
     def init(self):
-#        for b in range(B):
-#            v = np.array([0.0, 0.0, 0.0])
-#            p = np.array([np.random.rand(), np.random.rand(), 0.9])
-#            f = 30*np.array([np.random.rand(), np.random.rand(), 0.0])
-#            self.balls.append({'pos':p, 'f':f, 'v': v, 'i': b})
+        # for b in range(B):
+        #     v = np.array([0.0, 0.0, 0.0])
+        #     p = np.array([np.random.rand(), np.random.rand(), 0.9])
+        #     f = 140*np.array([np.random.rand(), np.random.rand(), 0.0])
+        #     self.balls.append({'pos':p, 'f':f, 'v': v, 'i': b})
 
         v = np.array([0.0, 0.0, 0.0])
         p = np.array([0.8, 0.0, 0.9])
@@ -108,7 +108,7 @@ class Simulation:
                 for other in otherList:
                     if (other['i'] != b['i'] and b['i'] not in vDone and other['i'] not in vDone):
                         dist = lin.norm(other['pos']-b['pos'])
-                        if (dist<2*self.r):
+                        if (dist < (2*self.r)):
                             print ('collision')
                             vrel = b['v']-other['v']
                             n = (other['pos']-b['pos']) / dist
@@ -148,10 +148,6 @@ class Simulation:
         for j,b in enumerate(self.balls):
             glPushMatrix()
             glTranslatef(b['pos'][0],b['pos'][1],b['pos'][2])
-            if j==0:
-                glMaterialfv(GL_FRONT, GL_DIFFUSE, [1.0, 0.0, 0.0, 1.0])
-            if j==1:
-                glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.0, 0.0, 1.0, 1.0])
             glutSolidSphere(self.r,50,50)
             glPopMatrix()
         glPopMatrix()
