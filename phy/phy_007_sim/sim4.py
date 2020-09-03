@@ -12,7 +12,7 @@ p1,p2,p3 = 73856093, 19349663, 83492791
 G = np.array([0.0, 0.0, -9.8])
 
 m = 0.1
-B = 3 # balls
+B = 2 # balls
 l = 0.2 # hash box size
 n = B*10 # size of hash table
 
@@ -38,12 +38,22 @@ class Simulation:
         self.left = False
         
     def init(self):
-        for b in range(B):
-            v = np.array([0.0, 0.0, 0.0])
-            p = np.array([np.random.rand(), np.random.rand(), 0.9])
-            f = 30*np.array([np.random.rand(), np.random.rand(), 0.0])
-            self.balls.append({'pos':p, 'f':f, 'v': v, 'i': b})
-                
+#        for b in range(B):
+#            v = np.array([0.0, 0.0, 0.0])
+#            p = np.array([np.random.rand(), np.random.rand(), 0.9])
+#            f = 30*np.array([np.random.rand(), np.random.rand(), 0.0])
+#            self.balls.append({'pos':p, 'f':f, 'v': v, 'i': b})
+
+        v = np.array([0.0, 0.0, 0.0])
+        p = np.array([0.8, 0.0, 0.9])
+        f = np.array([-40.0, 0.0, 0.0])
+        self.balls.append({'pos':p, 'f':f, 'v': v, 'i': 0})
+        
+        v = np.array([0.0, 0.0, 0.0])
+        p = np.array([-0.8, 0.0, 0.9])
+        f = np.array([40.0, 0.0, 0.0])
+        self.balls.append({'pos':p, 'f':f, 'v': v, 'i': 1})
+                        
         tm = 0.0
 
         glEnable(GL_LIGHTING)
@@ -91,13 +101,24 @@ class Simulation:
         for j,b in enumerate(self.balls):
             self.geo_hash_list[spatial_hash(self.balls[j]['pos'])].append(self.balls[j])
 
+        vDone = {}
         for j,b in enumerate(self.balls):
             if (len(self.geo_hash_list[spatial_hash(self.balls[j]['pos'])])>1):
                 otherList = self.geo_hash_list[spatial_hash(self.balls[j]['pos'])]
                 for other in otherList:
-                    if (other['i'] != b['i']):
+                    if (other['i'] != b['i'] and b['i'] not in vDone and other['i'] not in vDone):
                         dist = lin.norm(other['pos']-b['pos'])
-                        if (dist<2*self.r): print (dist)
+                        if (dist<2*self.r):
+                            print ('collision')
+                            vrel = b['v']-other['v']
+                            n = (other['pos']-b['pos']) / dist
+                            vnorm = np.dot(vrel,n)*n
+                            #print (vnorm)
+                            b['v'] = b['v'] - vnorm
+                            other['v'] = other['v'] + vnorm                            
+                            vDone[b['i']] = 1
+                            vDone[other['i']] = 1
+                            
             
             
     def update(self):
@@ -127,7 +148,10 @@ class Simulation:
         for j,b in enumerate(self.balls):
             glPushMatrix()
             glTranslatef(b['pos'][0],b['pos'][1],b['pos'][2])
-            #glMaterialfv(GL_FRONT, GL_DIFFUSE, [np.random.rand(), np.random.rand(), np.random.rand(), 1.0])
+            if j==0:
+                glMaterialfv(GL_FRONT, GL_DIFFUSE, [1.0, 0.0, 0.0, 1.0])
+            if j==1:
+                glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.0, 0.0, 1.0, 1.0])
             glutSolidSphere(self.r,50,50)
             glPopMatrix()
         glPopMatrix()

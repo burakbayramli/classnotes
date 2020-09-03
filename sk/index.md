@@ -3,15 +3,17 @@
 
 ## En Son
 
+1/9 - [Elektronik, Ölçüm, Temel Parçalar](2020/08/elektronik-temel-parcalar-aletler.md)
+
+1/9 - [Piller](2020/08/elektronik-piller.md)
+
+1/9 - [SPH](2020/08/sph.md)
+
 26/8 - [OpenGL, PyOpenGL](2020/08/pyopengl.md)
 
 31/7 - [SQL](2012/03/sql.md)
 
 30/7 - [Raspberry Pi](2020/07/raspberrypi.md)
-
-27/7 - [chmod](2020/07/chmod.md)
-
-27/7 - [Unix](2020/07/unix.md)
 
 
 ## Konular, Referans
