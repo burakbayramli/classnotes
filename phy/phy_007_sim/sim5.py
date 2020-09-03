@@ -27,7 +27,8 @@ class Simulation:
         self.r   = 0.1
         self.g   = 9.8
         self.dt  = 0.01
-        self.cor = 0.6
+        #self.cor = 0.6        
+        self.cor = 1.0
         self.balls = []
         self.tm  = 0.0
         self.th  = 0.0
@@ -50,7 +51,7 @@ class Simulation:
         
         v = np.array([0.0, 0.0, 0.0])
         p = np.array([-0.8, 0.0, 0.9])
-        f = 50*np.array([1.0, 0.0, 0.0])
+        f = 50*np.array([1.0, -0.0, 0.0])
         self.balls.append({'pos':p, 'f':f, 'v': v, 'i': 1})
                         
         tm = 0.0
