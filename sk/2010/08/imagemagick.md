@@ -1,6 +1,6 @@
 # Imagemagick, Imaj Dosyalarini Islemek, Format Degisimi, Convert Komutu
 
-Ubuntu Linux üzerinden formatlararası geçiş çok basit, İmageMagick kurulur,
+Ubuntu Linux üzerinden formatlararası geçiş çok basit, ImageMagick kurulur,
 
 ```
 sudo apt-get install imagemagick
@@ -94,6 +94,10 @@ Bir video dosyasını numaralanmış görüntü dosyalarına çevirmek için,
 convert video.avi chessb-right/video%03d.png
 ```
 
+Iki resmi yanyana eklemek icin
 
+```
+convert resim1.jpg resim2.jpg +append output.jpg
+```
 
 
