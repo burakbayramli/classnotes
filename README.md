@@ -188,13 +188,7 @@ installation command is shown above in the TR section.
 
 Blog
 
-http://sayilarvekuramlar.blogspot.com
-
-Latex Format
-
-The format of these documents, fonts, the pseudocode look-and-feel was
-taken from Andrew Cotter's thesis called *Stochastic Optimization for
-Machine Learning*.
+https://burakbayramli.github.io/dersblog
 
 ## LICENSE
 

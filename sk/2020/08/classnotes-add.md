@@ -30,3 +30,10 @@ lme4
 tseries
 urca
 ```
+
+Latex Format
+
+The format of these documents, fonts, the pseudocode look-and-feel was
+taken from Andrew Cotter's thesis called *Stochastic Optimization for
+Machine Learning*.
+
