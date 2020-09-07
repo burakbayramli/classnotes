@@ -3,6 +3,8 @@
 
 ## En Son
 
+6/9 - [Elastik Çarpışma (Elastic Collision)](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donusler_basinc_carpisma.html)
+
 1/9 - [Elektronik, Ölçüm, Temel Parçalar](2020/08/elektronik-temel-parcalar-aletler.md)
 
 1/9 - [Piller](2020/08/elektronik-piller.md)
