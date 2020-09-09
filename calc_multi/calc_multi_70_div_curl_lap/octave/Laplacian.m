@@ -1,0 +1,12 @@
+function L = Laplacian(m,n)
+[I,J] = ndgrid(1:m,1:n);
+indL = sub2ind([m,n], I(:,1:end-1) , J(:,1:end-1) );
+indR = sub2ind([m,n], I(:,2:end ) , J(:,2:end ) );
+indU = sub2ind([m,n], I(1:end-1,:) , J(1:end-1,:) );
+indD = sub2ind([m,n], I(2:end ,:) , J(2:end ,:) );
+ind1 = [ indL(:) ; indU(:) ];
+ind2 = [ indR(:) ; indD(:) ];
+L = sparse(ind1,ind2,1,m*n,m*n);
+L = L + L';
+row_sum = full(sum(L,2));
+L = L - spdiags(row_sum,0,m*n,m*n);
