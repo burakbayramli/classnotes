@@ -126,23 +126,78 @@ $$
 $$
 
 $$
-=
-\left( \frac{\partial }{\partial x} \right)(f_1) + 
+= \left( \frac{\partial }{\partial x} \right)(f_1) + 
 \left( \frac{\partial }{\partial y} \right)(f_2) + 
 \left( \frac{\partial }{\partial z} \right)(f_3) 
 $$
 
 $$
-=
-\frac{\partial f_1}{\partial x} +
+= \frac{\partial f_1}{\partial x} +
 \frac{\partial f_2}{\partial y} +
 \frac{\partial f_3}{\partial z}
 $$
 
-Uzaklaþýmýn fiziksel yorumu bir vektör alanýndaki ufak bir yüzeyde görülen akýþ
-(flux) olabilir.
+Uzaklaþýmýn fiziksel yorumu bir vektör alanýndaki ufak bir alanda görülen akýþ
+(flux) olabilir. Onu bir vektör alanýnýn geniþleme ya da küçülme oraný olarak ta
+görebiliriz.
 
-Onu bir vektör alanýnýn geniþleme ya da küçülme oraný olarak ta görebiliriz.
+Örnek olarak elimizde iki boyutlu bir vektör alaný olduðunu farzedelim, $x,y$
+kordinatlarý $U(x,y) = [u_1(x,y), u_2(x,y)$ ile bir vektör donduruluyor, mesela
+
+$$
+U(x,y) = [\cos(x + 2y), \sin(x - 2y)]
+$$
+
+Bu alanýn uzaklaþýmý analitik olarak
+
+$$
+\bdiv U = - 2\cos(x - 2y) - \sin(x + 2y)
+$$
+
+Bu bize her noktada bir tek sayý deðeri veriyor, o noktada akýþýn çýkmakta mý
+(kaynak -source-) yoksa yokolmakta mý (alýcý -sink) olduðunu bu sayý ile
+irdeleyebiliyoruz. Hem vektör alanýný hem de uzaklaþým tek sayýsýný bir renk
+kodu ile ayný grafikte gösterirsek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+NY = 20; ymin = -2.; ymax = 2.
+dy = (ymax -ymin )/(NY-1.)
+NX = NY
+xmin = -2.; xmax = 2.
+dx = (xmax -xmin)/(NX-1.)
+
+def divergence(f):
+    num_dims = len(f)
+    print (num_dims)
+    return np.ufunc.reduce(np.add, [np.gradient(f[i], axis=i) for i in range(num_dims)])
+
+y = np.array([ ymin + float(i)*dy for i in range(NY)])
+x = np.array([ xmin + float(i)*dx for i in range(NX)])
+
+x, y = np.meshgrid( x, y, indexing = 'ij', sparse = False)
+
+Fx  = np.cos(x + 2*y)
+Fy  = np.sin(x - 2*y)
+
+F = [Fx, Fy]
+g = divergence(F)
+
+plt.pcolormesh(x, y, g, shading='nearest', cmap=plt.cm.get_cmap('coolwarm'))
+plt.colorbar()
+plt.quiver(x,y,Fx,Fy)
+plt.savefig('calc_multi_70_div_curl_lap_05.png')
+\end{minted}
+
+\begin{verbatim}
+2
+\end{verbatim}
+
+\includegraphics[width=20em]{calc_multi_70_div_curl_lap_05.png}
+
+
 
 Laplasyan (Laplacian)
 
@@ -176,8 +231,7 @@ $$
 $$
 
 $$
-=
-\frac{\partial^2 f}{\partial x^2} +
+= \frac{\partial^2 f}{\partial x^2} +
 \frac{\partial^2 f}{\partial y^2} +
 \frac{\partial^2 f}{\partial z^2} 
 $$
@@ -215,7 +269,7 @@ denir, 'del2' ile onun karesi çaðrýþtýrýlýyor),
 
 \inputminted[fontsize=\footnotesize]{python}{del2.py}
 
-Ayrýksal Laplasyanini grafiklersek,
+Ayrýksal Laplasyaný grafiklersek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from del2 import del2
@@ -229,8 +283,6 @@ plt.savefig('calc_multi_70_div_curl_lap_02.png')
 \includegraphics[width=20em]{calc_multi_70_div_curl_lap_02.png}
 
 Evet, üst saðdaki resim $4 x^2 + 4 y^2$ gibi duruyor [5].
-
-
 
 Curl, $\nabla$
 
