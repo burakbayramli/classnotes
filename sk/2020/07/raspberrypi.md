@@ -71,12 +71,14 @@ sistemi USB'ye takılan klavye, fare gibi araçları tanır. Fakat
 başta, RPi ilk kez yüklenirken, başlarken bazı girişlerin olması
 lazım. Ne yapacağız?
 
-Burada çözüm en minimal kablolu gereci almak, bir fare. Başlarken
-kablolu fare USB'den takılır, RPi bunu hemen tanır, ekrana zaten HDMI
-ile hemen gösterim olur, sistem kendini kurarken tıklama ile Sonra
-(Next) düğmeleriyle ilerleyebiliriz, ve en son noktaya gelindiğinde
-Bluetooth açılir ve mesela Bluetooth klavyesi tanıtılır. Artık
-klavyeden giriş yapıp daha çetrefil işleri yapabiliriz.
+Burada çözüm en minimal kablolu gereci almak, mesela uzerinde touchpad
+olan (yani sanal fare) kablosuz klavye ama kablosuz baglanti dongle
+ile, yani RPi'nin USB soketine baglanan bir ufak ozel alici var,
+klavye direk bu alici ile iletisime geciyor, boylece Bluetooth vs
+isleriyle Rpi uzerinden kurcalamaya gerek kalmiyor. Aliciyi
+takiyorsunuz, pat diye klavye ve uzerindeki fare taniniyor.  Bu
+olduktan sonra artık klavyeden giriş yapıp daha çetrefil işleri
+yapabiliriz.
 
 Bundan sonrası / daha da iyisi, SSH ile erişim.  Eğer sisteme
 girebildiysek ve ekranda Pi gözüküyorsa şimdi SSH ile başka
@@ -112,15 +114,30 @@ Taşınabilir RPi
 
 Çok az miktarda elektronik aletle, mesela kampta vs, seyahat etmek
 isteyenler, cep telefonuna bir SSH müşteri programı kurup onun
-üzerinden RPi'ye komut satırından bağlanabilir. Bluetooth klavye
-Android'e, oradan SSH ile RPi'ye bağlanır yani. Linux bazlı
-programlarını text bazlı kullanabiliriz. RPi tam tekmilli bir Linux
-olduğu için istenen her ağır işlem burada gerçekleştirilir, pür metin
-bazlı Emacs kullanmak mümkün, `emacs -nw` ile. SSH programı olarak
-Android'da Juice SSH tavsiye edilir. Böylece yanımızda taşınabilen
-hafif bir Linux'a kavuşmuş oluyoruz. Pi uzerindeki SSD 64, 256 GB bile
-olabilir, disk problemi olmaz. Ayrica Pi cok rahat sekilde (Ubuntu
-oldugu icin) her turlu harici diske erisebilir. 
+üzerinden RPi'ye komut satırından bağlanabilir. RPi tam tekmilli bir
+Linux olduğu için istenen her ağır işlem burada gerçekleştirilir, pür
+metin bazlı Emacs kullanmak mümkün, `emacs -nw` ile. SSH programı
+olarak Android'da Juice SSH tavsiye edilir. Böylece yanımızda
+taşınabilen hafif bir Linux'a kavuşmuş oluyoruz. Pi uzerindeki SSD 64,
+256 GB bile olabilir, disk problemi olmaz. Ayrica Pi cok rahat sekilde
+(Ubuntu oldugu icin) her turlu harici diske erisebilir.
+
+Fakat SSH'den daha iyi bir erişim yine kablosuz klavye ile RPi'ye
+baglanmak, ve onun ekran görüntüsünü sanal ekran ile tamamen Android'e
+taşımak. Kurulum için RPi'a girip [5]'te anlatılan adımları atarız,
+
+```
+sudo apt update
+sudo apt install realvnc-vnc-server realvnc-vnc-viewer
+```
+
+Şimdi Menü | Preferences | Raspberry Pi Configuration | İnterfaces
+seçiminden VNC'ye gideriz ve onu Enabled haline getiririz.
+
+Artık Android'de müşteri programını kurabiliriz. Google Play'den
+RealVNC şirketinin VNC Viewer programı kurulur. Bağlantı için
+RPi'mizin IP adresini veririz, ve bağlantıyı kurarız. Kullanıcı /
+şifre için RPi Unix kullanıcı ve şifresi yeterli.
 
 Pin Kontrolu, Ilk Program
 
@@ -210,3 +227,4 @@ Kaynaklar
 
 [4] https://www.raspberrypi.org/documentation/hardware/raspberrypi/power/README.md
 
+[5] VNC (Virtual Network Computing), https://www.raspberrypi.org/documentation/remote-access/vnc/README.md

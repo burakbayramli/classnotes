@@ -6,7 +6,7 @@ Elimizde iki türlü fonksiyon olabilir, ya skalar (tek sayý) fonksiyonu, ya da
 vektör fonksiyonu. Bu fonksiyonlarýn skalar alan (scalar field) ve vector alaný
 (vector field) oluþturduðu söylenebilir. Alan tarifi fonksiyonlarýn çýktýsý ile
 alakalýdýr, eðer fonksiyon çok boyutlu girdi alýp tek boyut (tek sayý)
-donduruyorsa skalar alan, çok boyutlu vektör döndürüyorsa vektör alaný
+döndürüyorsa skalar alan, çok boyutlu vektör döndürüyorsa vektör alaný
 tanýmlýyor demektir.
 
 Mesela bir skalar alan $f(x,y,z)$ fonksiyonu ile tanýmlanýyor olabilir, ve
@@ -144,7 +144,7 @@ fazla / büyük ise o nokta bir kaynaktýr, uzaklaþým sýfýrdan büyüktür, tersi ise
 uzaklaþým sýfýrdan küçüktür.
 
 Örnek olarak elimizde iki boyutlu bir vektör alaný olduðunu farzedelim, $x,y$
-kordinatlarý $U(x,y) = [u_1(x,y), u_2(x,y)$ ile bir vektör donduruluyor, mesela
+kordinatlarý $U(x,y) = [u_1(x,y), u_2(x,y)]$ ile bir vektör döndürülüyor, mesela
 
 $$
 U(x,y) = [\cos(x + 2y), \sin(x - 2y)]
@@ -158,8 +158,9 @@ $$
 
 Bu bize her noktada bir tek sayý deðeri veriyor, o noktada akýþýn çýkmakta mý
 (kaynak -source-) yoksa yokolmakta mý (alýcý -sink) olduðunu bu sayý ile
-irdeleyebiliyoruz. Hem vektör alanýný hem de uzaklaþým tek sayýsýný bir renk
-kodu ile ayný grafikte gösterirsek,
+irdeleyebiliyoruz. Biz uzaklaþýmý altta sayýsal olarak hesapliyoruz, ve hem
+vektör alanýný hem de uzaklaþým tek sayýsýný bir renk kodu ile ayný grafikte
+gösterirsek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy as np
@@ -173,7 +174,8 @@ dx = (xmax -xmin)/(NX-1.)
 
 def divergence(f):
     num_dims = len(f)
-    return np.ufunc.reduce(np.add, [np.gradient(f[i], axis=i) for i in range(num_dims)])
+    tmp = [np.gradient(f[i], axis=i) for i in range(num_dims)]
+    return np.ufunc.reduce(np.add, tmp)
 
 y = np.array([ ymin + float(i)*dy for i in range(NY)])
 x = np.array([ xmin + float(i)*dx for i in range(NX)])
@@ -194,10 +196,15 @@ plt.savefig('calc_multi_70_div_curl_lap_05.png')
 
 \includegraphics[width=20em]{calc_multi_70_div_curl_lap_05.png}
 
-Üstteki kodda \verb!gradient! ile her boyut üzerinde sayýsal gradyan hesabý
-yapýlýyor ve sonuçlar toplanýyor. Not: vektör alanýnýn kendisi de bir gradyan
-iþleminin sonucu olabilir, o noktaya nasýl gelindiðinden bahsetmiyoruz, biz elde
-nereden gelmiþ olursa olsun bir vektör alaný olduðunu farz ediyoruz.
+Sonuç [7]'deki analitik hesaba yakýn. Üstteki kodda \verb!gradient! ile her
+boyut üzerinde sayýsal gradyan hesabý yapýlýyor ve sonuçlar toplanýyor. Not:
+vektör alanýnýn kendisi de bir gradyan iþleminin sonucu olabilir, o noktaya
+nasýl gelindiðinden bahsetmiyoruz, biz elde nereden gelmiþ olursa olsun bir
+vektör alaný olduðunu farz ediyoruz.
+
+Oklara ve renklere bakarsak hakikkaten de mavi renkli bölgelere daha fazla giriþ
+olduðundan þüphe yok, bu iyi, hesap doðru iþliyor demektir. Ayný þekilde kýrmýzý
+bölglerde daha fazla kaçýs var.
 
 Laplasyan (Laplacian)
 
@@ -282,7 +289,7 @@ plt.savefig('calc_multi_70_div_curl_lap_02.png')
 
 \includegraphics[width=20em]{calc_multi_70_div_curl_lap_02.png}
 
-Evet, üst saðdaki resim $4 x^2 + 4 y^2$ gibi duruyor [5].
+Evet, üstteki resim $4 x^2 + 4 y^2$ gibi duruyor [5].
 
 Curl, $\nabla$
 
@@ -349,5 +356,7 @@ Kaynaklar
 [5] Mathworks del2, \url{https://www.mathworks.com/help/matlab/ref/del2.html#bt1j8dn-5}
 
 [6] Kazarinoff, \url{https://pythonforundergradengineers.com/quiver-plot-with-matplotlib-and-jupyter-notebooks.html}
+
+[7] Petersdorff, {\em Example for curl and div of a 2D vector field}, \url{http://www2.math.umd.edu/~petersd/241/html/ex27b.html#4}
 
 \end{document}
