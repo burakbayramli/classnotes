@@ -2,7 +2,7 @@
 close all
 clear
 clc
-M = imread('../cameraman.gif');
+M = imread('cameraman.gif');
 U = double(M)/255;
 U_noisy = add_noise(U,0.3);
 
