@@ -1,4 +1,4 @@
-load wind
+load ../wind
 figure()
 cav = curl(x,y,z,u,v,w);
 slice(x,y,z,cav,[90 134],[59],[0]); 
