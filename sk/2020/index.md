@@ -24,6 +24,8 @@
 
 [Video Islemleri](07/video-islemleri.md)
 
+[Ek Bilgiler](08/classnotes-add.md)
+
 [Piller](08/elektronik-piller.md)
 
 [Elektronik, Ölçüm, Temel Parçalar](08/elektronik-temel-parcalar-aletler.md)
@@ -41,4 +43,6 @@
 [OpenGL, PyOpenGL](08/pyopengl.md)
 
 [Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Particle Hydrodynamics -SPH-)](08/sph.md)
+
+[Octave ile Ruzgar Verisi - wind.dat](09/octave-3d-wind.md)
 
