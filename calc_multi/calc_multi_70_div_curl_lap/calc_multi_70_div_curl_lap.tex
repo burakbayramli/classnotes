@@ -427,24 +427,7 @@ $$
 
 $F_1,F_2,F_3$ yerine $F_x,F_y,F_z$ kullanmýþ olduk.
 
-Hesapsal olarak [10]'dan alýnmýþ bir curl hesap kodunu alta görebiliriz,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import vapor_utils
-def CurlFinDiff(M,N,P,dx,dy,dz,order=2):
-    aux1 = vapor_utils.DerivFinDiff(P,1,dy,order)       #curl x bileseni
-    aux2 = vapor_utils.DerivFinDiff(N,0,dz,order)     
-    outx = aux1-aux2                        
-    aux1 = vapor_utils.DerivFinDiff(M,0,dz,order)       #curl y bileseni
-    aux2 = vapor_utils.DerivFinDiff(P,2,dx,order)
-    outy = aux1-aux2
-    aux1 = vapor_utils.DerivFinDiff(N,2,dx,order)       #curl z bileseni
-    aux2 = vapor_utils.DerivFinDiff(M,1,dy,order)
-    outz = aux1-aux2
-    return outx, outy, outz
-\end{minted}
-
-Bu hesabý bizim uydurduðumuz bir üç boyutlu vektör alanýna uygulayalým. 
+Bir üç boyutlu vektör alaný,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -462,23 +445,12 @@ v = -np.cos(np.pi * xx) * np.sin(np.pi * yy) * np.cos(np.pi * zz)
 w = (np.sqrt(2.0 / 3.0) * np.cos(np.pi * xx) * np.cos(np.pi * yy) *  np.sin(np.pi * zz))
 
 ax.quiver(xx, yy, zz, u, v, w, length=0.1, color = 'black')
-
-ci,cj,ck=CurlFinDiff(u,v,w,0.4, 0.8, 1.0)
-
-i,j,k=1,3,2
-ax.quiver(xx[i,i,k], yy[i,i,k], zz[i,i,k], ci[i,i,k],cj[i,i,k],ck[i,i,k], length=0.2)
-i,j,k=3,3,0
-ax.quiver(xx[i,i,k], yy[i,i,k], zz[i,i,k], ci[i,i,k],cj[i,i,k],ck[i,i,k], length=0.2)
 plt.savefig('calc_multi_70_div_curl_lap_11.png')
 \end{minted}
 
 \includegraphics[width=30em]{calc_multi_70_div_curl_lap_11.png}
 
-Görüldüðü gibi akýntýnýn çok olduðu alt kýsýmdaki curl vektörü oldukca büyük ve
-sað el kuralýna göre yukarý iþaret ediyor. Üstteki ok aþaðý yönde, orada da
-dönme etkisi var, bu o saat yönüne doðru, curl aþaðý gösteriyor.
-
-Analitik ve hesapsal sonuçlarý karþýlaþtýralým,
+Analitik hesap,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sympy
@@ -490,35 +462,28 @@ Fz = (sympy.sqrt(2.0 / 3.0) * sympy.cos(sympy.pi * x) * sympy.cos(sympy.pi * y) 
 cx = sympy.diff(Fz, y) - sympy.diff(Fy, z) 
 cy = sympy.diff(Fx, z) - sympy.diff(Fz, x)
 cz = sympy.diff(Fy, x) - sympy.diff(Fx, y)
-#print (cx)
-#print (cy)
-#print (cz)
 
-i,j,k=1,3,2
-x0,y0,z0 = xx[i,i,k], yy[i,i,k], zz[i,i,k]
+i,j,k=2,2,1
+x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
 print ( cx.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
         cy.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
         cz.subs([(x, x0), (y, y0), (z, z0)]).evalf()  )
-
-print (ci[i,i,k],cj[i,i,k],ck[i,i,k])
 
 i,j,k=3,3,0
-x0,y0,z0 = xx[i,i,k], yy[i,i,k], zz[i,i,k]
+x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
 print ( cx.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
         cy.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
         cz.subs([(x, x0), (y, y0), (z, z0)]).evalf()  )
 
-print (ci[i,i,k],cj[i,i,k],ck[i,i,k])
 \end{minted}
 
 \begin{verbatim}
--0.985806851811338 -0.0995867153021923 -4.59780093263389
--0.1490400880980864 0.5446911650279062 -1.2723807530496438
+0 0 5.68319449974743
 -1.59506899257328 -0.161134690186906 -1.75620368276018
--0.47891605730277054 -0.6209959291131278 2.5396433577491435
 \end{verbatim}
 
-
+Bu sonucun sayisal olarak hesaplanan [10]'daki curl sonucuna yakin oldugunu
+gorebiliriz.
 
 Kaynaklar 
 
@@ -541,6 +506,6 @@ Kaynaklar
 
 [9] Hass, {\em Thomas Calculus, 11th Ed}
 
-[10] Vapor, \url{https://github.com/NCAR/VAPOR.git}
+[10] Bayramli, {\em Octave ile Ruzgar Verisi, wind.dat, Curl Ornekleri}
 
 \end{document}
