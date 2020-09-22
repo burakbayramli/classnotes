@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 import scipy.io as sio
 
-
 def curl(x,y,z,u,v,w):
     dx = x[0,:,0]
     dy = y[:,0,0]
@@ -18,8 +17,6 @@ def curl(x,y,z,u,v,w):
     rot_z = dFy_dx - dFx_dy
 
     l = np.sqrt(np.power(u,2.0) + np.power(v,2.0) + np.power(w,2.0));
-
-    print (l.shape)
 
     m1 = np.multiply(rot_x,u)
     m2 = np.multiply(rot_y,v)
