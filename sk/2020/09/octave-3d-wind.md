@@ -149,6 +149,8 @@ view(-10,-10);
 print -djpg image8.jpg
 ```
 
+![](image8.jpg)
+
 Kaynaklar
 
 [1] https://github.com/burakbayramli/classnotes/blob/master/calc_multi/calc_multi_70_div_curl_lap/wind.mat
