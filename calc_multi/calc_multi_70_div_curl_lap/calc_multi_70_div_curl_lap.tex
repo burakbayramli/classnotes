@@ -427,7 +427,34 @@ $$
 
 $F_1,F_2,F_3$ yerine $F_x,F_y,F_z$ kullanmýþ olduk.
 
-Bir üç boyutlu vektör alaný,
+Bir üç boyutlu vektör alaný, ve onun analitik olarak curl hesabýný verelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sympy
+x, y, z = sympy.symbols('x y z', real=True)
+pi = sympy.symbols('pi', constant=True)
+Fx = sympy.sin(sympy.pi * x) * sympy.cos(sympy.pi * y) * sympy.cos(sympy.pi * z)
+Fy = -sympy.cos(sympy.pi * x) * sympy.sin(sympy.pi * y) * sympy.cos(sympy.pi * z)
+Fz = (sympy.sqrt(2.0 / 3.0) * sympy.cos(sympy.pi * x) * sympy.cos(sympy.pi * y) * sympy.sin(sympy.pi * z))
+cx = sympy.diff(Fz, y) - sympy.diff(Fy, z) 
+cy = sympy.diff(Fx, z) - sympy.diff(Fz, x)
+cz = sympy.diff(Fy, x) - sympy.diff(Fx, y)
+
+i,j,k=2,2,1
+x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
+
+i,j,k=1,3,1
+x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
+c1,c2,c3 = cx.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
+           cy.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
+           cz.subs([(x, x0), (y, y0), (z, z0)]).evalf()
+print ( c1,c2,c3  )
+
+\end{minted}
+
+\begin{verbatim}
+0 0 3.51240736552037
+\end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from mpl_toolkits.mplot3d import axes3d
@@ -444,45 +471,47 @@ v = -np.cos(np.pi * xx) * np.sin(np.pi * yy) * np.cos(np.pi * zz)
 w = (np.sqrt(2.0 / 3.0) * np.cos(np.pi * xx) * np.cos(np.pi * yy) *  np.sin(np.pi * zz))
 
 ax.quiver(xx, yy, zz, u, v, w, length=0.1, color = 'black')
+ax.quiver(x0, y0, z0, c1, c2, c3, length=0.3, color = 'blue')
 plt.savefig('calc_multi_70_div_curl_lap_11.png')
 \end{minted}
 
 \includegraphics[width=30em]{calc_multi_70_div_curl_lap_11.png}
 
-Analitik hesap,
+Sað el kuralýndan ve akýntýya bakarak bu sonucun doðru olduðunu görebiliriz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import sympy
-x, y, z = sympy.symbols('x y z', real=True)
-pi = sympy.symbols('pi', constant=True)
-Fx = sympy.sin(sympy.pi * x) * sympy.cos(sympy.pi * y) * sympy.cos(sympy.pi * z)
-Fy = -sympy.cos(sympy.pi * x) * sympy.sin(sympy.pi * y) * sympy.cos(sympy.pi * z)
-Fz = (sympy.sqrt(2.0 / 3.0) * sympy.cos(sympy.pi * x) * sympy.cos(sympy.pi * y) * sympy.sin(sympy.pi * z))
-cx = sympy.diff(Fz, y) - sympy.diff(Fy, z) 
-cy = sympy.diff(Fx, z) - sympy.diff(Fz, x)
-cz = sympy.diff(Fy, x) - sympy.diff(Fx, y)
-
-i,j,k=2,2,1
-x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
-print ( cx.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
-        cy.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
-        cz.subs([(x, x0), (y, y0), (z, z0)]).evalf()  )
-
-i,j,k=3,3,0
-x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
-print ( cx.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
-        cy.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
-        cz.subs([(x, x0), (y, y0), (z, z0)]).evalf()  )
 
 \end{minted}
 
-\begin{verbatim}
-0 0 5.68319449974743
--1.59506899257328 -0.161134690186906 -1.75620368276018
-\end{verbatim}
 
-Bu sonucun sayisal olarak hesaplanan [10]'daki curl sonucuna yakin oldugunu
-gorebiliriz.
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits.mplot3d import axes3d
+import scipy.io as sio
+
+mat = sio.loadmat('wind.mat')
+x = mat['x']; y = mat['y']; z = mat['z']
+u = mat['u']; v = mat['v']; w = mat['w']
+
+i=5;j=7;k=8;
+
+S = 3
+x = x[i-S:i+S, j-S:j+S, k-S:k+S]; 
+y = y[i-S:i+S, j-S:j+S, k-S:k+S]; 
+z = z[i-S:i+S, j-S:j+S, k-S:k+S];
+
+u = u[i-S:i+S, j-S:j+S, k-S:k+S]; 
+v = v[i-S:i+S, j-S:j+S, k-S:k+S]; 
+w = w[i-S:i+S, j-S:j+S, k-S:k+S];
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.view_init(elev=47, azim=-145)
+
+ax.quiver(x, y, z, u, v, w, length=0.05, color = 'black')
+plt.savefig('calc_multi_70_div_curl_lap_12.png')
+\end{minted}
+
+
 
 Kaynaklar 
 
