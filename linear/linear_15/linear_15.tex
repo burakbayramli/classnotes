@@ -1,0 +1,453 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 15
+
+Bu önemli bir ders, ana konumuz yansýtma / izdüþüm (projection). Mesela
+$b$ vektörünü alýp $a$ üzerine olan ``yansýmasýný'' hesaplamak. Bu
+yansýmayý sanki $a$'ya dik bir þekilde bir lamba açtýk ve oradan gelen
+ýþýk sonucunda $b$'nin $a$ üzerine düþen ``gölgesini'' hesaplýyoruz gibi
+düþünebiliriz. 
+
+\includegraphics[height=2cm]{15_1.png}
+
+Yansýtmayý yapmak için $b$'nin $a$'ya en yakýn olduðu noktayý bulmalýyým. 
+
+\includegraphics[height=2cm]{15_2.png}
+
+Bu noktaya $p$ diyebilirim, $b,a$ arasýndaki en kýsa mesafeye de bir nevi
+``hata (error)''  olarak bakabilirim, bu mesafeye $e$ harfini
+vereceðim. Hata sözünü kullandýk, çünkü, sanki $b$, $a$'dan ``sapmýþ'' ve
+biz bu sapmanýn ölçüsünü buluyoruz gibi bakýlabilir bu probleme. 
+
+Peki niye $e = b-p$? Þu resme bakalým, 
+
+\includegraphics[height=3cm]{15_3.png}
+
+Basit vektör aritmetiðinden biliyoruz ki, birbirine zincirleme duran
+vektörlerde, zincirin baþýndan sonuna direk gidilmek için zincirdeki tüm
+vektörler birbiriyle toplanýr. Üstteki resimde $b = p + e$. Ufak bir
+cebirsel iþlemle $e = b - p$ buluruz. 
+
+Peki $p$'yi nasýl bulacaðýz? Amacýmýz bu, yansýmayý bulmak. Muhakkak
+elimizde bir dik üçgen var, eðer trigonometri yapýyor olsaydýk, $\cos,
+\sin$, vs kullanýp birþeyler bulabilirdik. Lýneer Cebir'in metotlarý çok
+daha temiz.
+
+Bildiklerimiz neler? Biliyoruz ki $p$, $a$'nin bir katý, çünkü ayný çizgi
+üzerindeler. 
+
+$$ p = xa $$
+
+diyelim. O zaman bulmak istediðim bu $x$ sayýsý. 
+
+Bildiðimiz bir diðer þey, $e$ ve $a$'nin birbirine dik olduðu. Ýki vektörün
+dik olmasýnýn tercümesi nedir? Ýki vektörün noktasal çarpýmýnýn sýfýr
+olmasý. O zaman
+
+$$ a^T e = 0 $$
+
+$$ a^T(b - p) = 0 $$
+
+$$ a^T(b - xa) = 0 $$
+
+Tekrar düzenlersem
+
+$$ xa^Ta = a^Tb $$
+
+Sol taraftaki $a^Ta$ bir tek sayý artýk (çünkü bir noktasal çarpým), onu
+alýp sað tarafa bölüm olarak taþýyabilirim,
+
+$$ x = \frac{ a^Tb}{a^Ta} $$
+
+Ýþte ihtiyacýmýz olan katsayý bu. Bunun içinde cosine bir þekilde var
+tabii, ama trigonometriye hiç girmemize gerek yok, pür vektörler ile bu iþi
+hallettik. Sonra bu $x$'i alýp $p = ax$ ile $p$'yi hesaplýyoruz. Hepsini
+biraraya koyarsak, 
+
+$$ p = a\frac{ a^Tb}{a^Ta} $$
+
+Biraz zihin egzersizi yapalým: eðer $b$'yi iki katýna çýkarýrsam, $p$ ne
+olur? Ýki katýna çýkar. Peki $a$'yi  iki katýna çýkarýrsam? Üstteki resmi
+düþünürsek, hiç deðiþmemeli. Cebirsel olarak ta bunu görebiliriz, üstteki
+ve alttaki $a$'lardaki artýþ birbirini iptal edecektir. 
+
+Þimdi, olaya matrissel olarak bakmak gerekirse, bir yansýtma matrisi $P$
+olsun istiyorum, öyle ki 
+
+$$ p = P b $$
+
+olsun, yani bu matris $b$'ye uygulanýnca $p$'yi bulayým. O zaman iki üstteki $p$
+formülü içinden $b$ haricindeki kýsýmlarý çekip çýkartmam lazým.
+
+$$ P  = \frac{ aa^T}{a^Ta} $$
+
+Bu bir matris. Bölünen bir matris, bölen bir skalar. Bazý örnekleri
+hesaplayalým, ve grafikleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+o = np.array([5,5,5])
+b = np.array([[3.,3.,3.]]).T
+a = np.array([[0,5.,5.]]).T
+P = a.dot(a.T) / a.T.dot(a)
+p = P.dot(b)
+print P
+print p
+\end{minted}
+
+\begin{verbatim}
+[[ 0.   0.   0. ]
+ [ 0.   0.5  0.5]
+ [ 0.   0.5  0.5]]
+[[ 0.]
+ [ 3.]
+ [ 3.]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../../vision/vision_02')
+from mpl_toolkits.mplot3d import Axes3D
+
+import plot3d
+fig = plt.figure(); ax = Axes3D(fig)
+
+plot3d.plot_vector(fig, o, b)
+ax.hold(True)
+plot3d.plot_vector(fig, o, a, 'cyan')
+ax.hold(True)
+plot3d.plot_vector(fig, o, p, 'yellow')
+ax.hold(True)
+plt.savefig('linear_15_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{linear_15_01.png}
+
+$P$ ilginç bir matristir. Özellikleri nedir?
+
+Kolon uzayý neydi? Bir vektörü o matris ile çarptýðýmýzda sonuç her zaman
+matrisin kolon uzayýndadýr. $P$'nin kolon uzayý $a$'dan geçen çizgidir,
+seviyesi (rank) 1'dir, simetriktir (bir vektörü devriði ile saðdan çarpýnca
+sonuç matrisi simetrik olur), yani $P^T = P$. 
+
+Eger yansýtma matrisini iki kere uygularsam ne olur? Ikinci yansýtmanin
+hicbir etkisi olmamasi gerekir, yani $P = P^2$. 
+
+Eðer daha yüksek boyutlara geçersek? O zaman üstüne yansýtma yaptýðýmýz bir
+çizgi olmayacak, üç boyutta bir düzlem, daha yüksek boyutlarda N boyutlu
+bir altuzay olacak.
+
+Yansýtma neye yarar? Önemli faydalarýndan biri $Ax = b$ denklemini çözerken
+ise yarar. Bazen bu denklemin çözümü yoktur. Belki bilinmeyenlerin sayýsýndan
+daha fazla denklem verilmiþtir. O zaman tam denklemi çözmeye uðraþmak
+yerine, çözülebilecek en yakýn þeyi çözmeye uðraþmak gerekir, yani 
+
+$$ A\hat{x} = p $$
+
+ki $p$, $b$'nin $A$'nin kolon uzayýna yansýtýlmýþ hali olacak. Bir
+``çözüm'' olmak kolon uzayýnýn bir kombinasyonu olmak demek ise, bu kolon
+uzayýna yansýtýlan $b$ üzerinden çözümü elde edebilmeyi umabiliriz. 3
+boyutta
+
+\includegraphics[height=3cm]{15_4.png}
+
+Üzerine yansýtma yapýlacak düzlem nedir? Düzlemi belirlemek için onu
+tanýmlayacak bir baz bulabilirim, iki vektör yani, mesela $a_1,a_2$
+diyelim. 
+
+\includegraphics[height=3cm]{15_5.png}
+
+Bu iki vektörün birbirine dik olmasý þart deðil, baðýmsýz olmasý gerekli
+ama. $a_1,a_2$'nin yarattýðý düzlem $A$'nin kolon uzayý ile aynýdýr, yani
+
+$$ A = 
+\left[\begin{array}{rr}
+\uparrow &  \uparrow \\
+a_1 &   a_2 \\
+\downarrow &  \downarrow 
+\end{array}\right]
+ $$
+
+$e$ düzleme diktir. Peki $p$ nedir? $a$ vektörlerinin bir kombinasyonudur, yani
+
+$$ p = \hat{x}_1a_1 + \hat{x}_2a_2 $$
+
+ya da daha temiz olarak
+
+$$ p = A\hat{x} $$
+
+Aradýðýmýz $\hat{x}$. Anahtar þurada, $e$ yani 
+
+$$  b - A\hat{x}$$
+
+düzleme dik. Ve düzleme dik ise, düzlemdeki {\em her vektöre} dik. O zaman 
+
+$$ a_1^T( b - A\hat{x}) = 0$$
+
+$$ a_2^T( b - A\hat{x}) = 0$$
+
+Fakat üstteki gibi iki ayrý formül yazmak yerine, matris formu kullanamaz
+mýyým? 
+
+$$ 
+\left[\begin{array}{rrr}
+ & a_1^T & \\
+ & a_2^T & 
+\end{array}\right]
+(b - A\hat{x}) = 
+\left[\begin{array}{rrr}
+0 \\
+0 
+\end{array}\right]
+ $$
+
+Ya da
+
+$$ A^T(b - A\hat{x})  = 0 $$
+
+Bu problemin çizgizel versiyonunde $A$ yerine $a$ kullanmýþtýk, ve $a$ tek
+bir vektördü. Zaten $A$ yerine $a$ kullanýrsak, ayný formülü elde
+ediyoruz. 
+
+Bir soru soralým þimdi: $e$, yani $b - A\hat{x}$ hangi uzayýn içindedir?
+Cevap, $A^T$'nin sýfýr uzayýndadýr (nullspace), yani $N(A^T)$ içinde. Sýfýr
+uzayý hakkýnda neler biliyoruz? Sýfýr uzayý ve kolon uzaylarý birbirine
+dikgendir (orthogonal). O zaman $e$ $N(A^T)$ içinde ise, $e \perp C(A)$
+demektir, yani $e$ de kolon uzayýna dikgendir. Devam edelim, üstteki
+formülü düzenlersek,
+
+$$ A^TA\hat{x} = A^Tb $$
+
+Dikkat edersek, önceki versiyonda $a^Ta$ bir tek sayýydý, böylece onu
+bölen olarak saða geçirmiþtik. Þimdi ne yapacaðýz? 
+
+$$ \hat{x} = (A^TA)^{-1}A^Tb $$
+
+Daha önce 
+
+$$ p = A\hat{x} $$
+
+demiþtik, o zaman 
+
+$$ p = A(A^TA)^{-1}A^Tb $$
+
+Demek ki yansýtma matrisi eþitliðin saðýnda $b$ harici olan tüm semboller, 
+
+$$ P = A(A^TA)^{-1}A^T $$
+
+Þimdi dikkat, bilerek bir hata yapacaðým, üstteki formülün sað tarafýný
+cebirsel olarak manipüle edeceðim
+
+$$  AA^{-1}(A^T)^{-1}A^T = I$$
+
+Bu yanlýþ duruyor, $P$ birim matris olamaz. Nerede hata yaptýk?
+Manipülasyon mekanik, teknik olarak doðru. Hata $A$'nin kare matrisi
+olmamasýnda. O sebeple $A^TA$'yi üstte yaptýðým gibi parçalayamam çünkü
+bir matrisin tersini alabilmek için onun en azýndan kare olmasý gerekir (bu
+yeterli þart deðil tabii ki). 
+
+Yansýma matrislerinin simetrik olmasýný bekliyordum, ve bakýyorum ki öyle. 
+
+$$ P^T = P $$
+
+ve 
+
+$$ P^2 = P $$
+
+Kontrol edelim
+
+$$=  A(A^TA)^{-1}A^T \ A(A^TA)^{-1}A^T $$
+
+$$=  A(A^TA)^{-1}\cancel{A^T \ A(A^TA)^{-1}}A^T $$
+
+$$=  A(A^TA)^{-1}A^T $$
+
+Üstteki son ifade $P$'ye eþit. 
+
+Uygulama: En Az Kareler (Least Squares)
+
+Ne zaman formülden daha fazla veri vardýr? Mesela veriye çizgi ``uydurmak
+(fitting)'' istediðimde durum budur. Diyelim ki $t,D$ eksenleri üzerinde
+
+\includegraphics[height=3cm]{15_6.png}
+
+Veri þöyle olsun, $(1,1),(2,2),(3,2)$, üç tane nokta. Bu noktalara en yakýn
+þekilde geçecek çizgi kabaca þöyle olur [çizgi pek düz olmadý ama neyse].
+
+\includegraphics[height=3cm]{15_7.png}
+
+Bu problem ödevde $b = C+Dt$ olarak gösterildi. O zaman 
+
+$$ C + D = 1 $$
+
+$$ C + 2D = 2 $$
+
+$$ C + 3D = 2 $$
+
+Bu tür problemleri çözerken anahtar yaklaþým bu, formülü yazalým, ve çözmek
+istediðimiz (ama çözemediðimiz) denklemler serisini ortaya
+çýkaralým. Matris olarak yazarsak, 
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+1 & 1 \\
+1 & 2 \\
+1 & 3 
+\end{array}\right]
+}_{A}
+\underbrace{
+\left[\begin{array}{r}
+C  \\
+D  
+\end{array}\right]
+}_{x}
+=
+\underbrace{
+\left[\begin{array}{r}
+1 \\
+2 \\
+2  
+\end{array}\right]
+}_{b}
+ $$
+
+Gördüðümüz gibi 3 tane denklem ve 2 tane bilinmeyen var. Yani verilen
+(denklemler) bilinmeyenlerden daha fazla. Bu sebeple bazý denklemler (ya da
+hiçbiri) doðal olarak tam olarak uymayacak. Amaç $Ax = b$'yi çözmek deðil,
+yansýmayý çözmek. O zaman $A$'yi alttaki yerine koyunca, çözüm ortaya
+çýkacaktýr. 
+
+$$ \hat{x} = (A^TA)^{-1}A^Tb $$
+
+Matris tersi kullanmadan vektörün düzlem üzerine yansýtmasýný daha direk
+bir þekilde þöyle anlatabilirdik [1]: hatýrlarsak, bir $u$ vektörünün diðer
+bir $v$ vektörünün üzerine yansýtmasý (operasyonu $\proj$ ile belirtelim)
+
+$$ \proj_v(u) = \frac{u \cdot v}{||v||^2} $$
+
+idi. O zaman $u$'nun bir düzlem üzerine yansýtmasýný $u$'nin içinde o
+düzleme dik olan bileþenlerini çýkartarak bulabiliriz. Düzlemi yatay olarak
+düþünürsek $u$ içinden düzleme dikey olan bileþenleri çýkartýnca geriye
+$u$'nun yatay bileþenleri kalýr, bu da $u$'nun düzleme yansýtýlmýþ hali
+demektir. Peki düzleme dikey olan vektörü nasýl buluyoruz? Bu vektör zaten
+biliniyor, bu vektör düzlemin normal vektöründen baþka bir þey
+deðil. Normal vektor $n$ icin formul,
+
+$$ \proj_{\textrm{düzlem}}(u) = u - \proj_{n}(u) = u - \frac{u \cdot n}{||n||^2} n $$
+
+Bir örnek üzerinde görelim, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../../vision/vision_02')
+from mpl_toolkits.mplot3d import Axes3D
+import plot3d
+o = np.array([5,5,5])
+u = np.array([3,3,3])
+n = np.array([-1/3.,2/3.,2/3.])
+
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_plane(ax, o, n, size=5)
+plot3d.plot_vector(fig, o, u)
+plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
+plt.savefig('15_8.png')
+\end{minted}
+
+\includegraphics[width=20em]{15_8.png}
+
+Mavi vektörü düzleme yansýtmak istiyoruz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p = u - (np.dot(u,n) / np.dot(n,n)) * n
+print p
+\end{minted}
+
+\begin{verbatim}
+[ 4.  1.  1.]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_plane(ax, o, n, size=5)
+plot3d.plot_vector(fig, o, u)
+plot3d.plot_vector(fig, o, p, 'cyan')
+plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
+plt.savefig('15_9.png')
+\end{minted}
+
+\includegraphics[width=20em]{15_9.png}
+
+Bir Düzlem Üzerindeki Ýki Vektör Arasýndaki Açýyý Bulmak
+
+Þu resme bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n = np.array([-1/3.,2/3.,2/3.])
+o = np.array([5,5,5])
+u1 = np.array([3,3,3])
+u2 = np.array([-3,0,3])
+
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_plane(ax, o, n, size=5)
+p1 = u1 - (np.dot(u1,n) / np.dot(n,n)) * n
+p2 = u2 - (np.dot(u2,n) / np.dot(n,n)) * n
+plot3d.plot_vector(fig, o, 3*n,'red')
+plot3d.plot_vector(fig, o, u1)
+plot3d.plot_vector(fig, o, u2)
+plot3d.plot_vector(fig, o, p1,'cyan')
+plot3d.plot_vector(fig, o, p2,'skyblue')
+plot3d.plot_vector(fig, o, 0.5*np.cross(p1,p2),'yellow')
+ax.view_init(elev=30, azim=30)
+plt.savefig('15_10.png')
+\end{minted}
+
+\includegraphics[width=20em]{15_10.png}
+
+Koyu mavi iki vektörün düzlem üzerinde yansýtýlmasýný görüyoruz (açýk ve
+biraz daha açýk mavi iki vektör). Bu vektörler arasýndaki açý nedir? Tabii
+açý derken {\em hangi yöne doðru açý} bulunmak isteniyor, bu soru da
+önemli. Çoðu zaman bir referans vektörüne olan ikinci bir vektörün saat
+yönü ya da onun tersi yöndeki açýsýný isteriz. Eger açýyý bilinen
+
+$$ \theta = \arccos \frac{u \cdot v}{||u||||v|||}$$
+
+ile hesaplarsak, bu hesap bize her zaman iki vektör arasý en ``yakýn''
+açýyý verir (yani 180'den daha az olan açýyý). Fakat biz mesela saat yönü
+tersindeki açýyý istiyorsak, o zaman potansiyel olarak 180'den fazla açýlar
+da elde edebilmemiz gerekir.
+
+Çözüm için çapraz çarpým kullanabiliriz, $n \cdot (u \times v)$ hesabýna
+bakarýz, bu hesap artý ise üstteki $\theta$'yi olduðu gibi alýrýz, deðil
+ise $360-\theta$'yi kullanýrýz. Bunun sebebi $u \times v$ bize sað el
+kuralýna göre, bkz [2], $u,v$ referanslý bir üçüncü vektör veriyor. Sað el
+kuralýnýnda eðer $u$'dan baþlayýp $v$'ye saat yönü tersine giderken 180
+dereceden az bir gidiþ yeterli ise, üçüncü vektör yukarý doðru iþaret
+ediyor, yoksa aþaðý doðru. Mesela üstteki örnekte vektör düzlem normaline
+ters, yani aþaðý. Bu bize ilgilendiðimiz gidiþ yönündeki açýnýn 180'den
+fazla olduðuna dair bir iþaret, o zaman $360 - \theta$ kullanmamýz
+gerekir. Noktasal çarpým ayný yön / terslik hesabý için; üçüncü vektörün
+düzlem normali ile noktasal çarpýmý eðer ayný yönde ise artý, deðil ise
+eksi olacaðý için 360'dan çýkartma irdelemesini bu þekilde yapabiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+deg = np.rad2deg(np.arccos(np.dot(p1,p2) / (lin.norm(p1)*lin.norm(p2))))
+s = np.dot(n, np.cross(p1,p2))
+print 'deg', deg
+if s < 0: print '360 - deg =', 360-deg
+else: print 'deg', deg
+\end{minted}
+
+\begin{verbatim}
+deg 135.0
+360 - deg = 225.0
+\end{verbatim}
+
+Kaynaklar
+
+[1] Maplesoft, {\em Projection of a Vector onto a Plane}, \url{http://www.maplesoft.com/support/help/Maple/view.aspx?path=MathApps/ProjectionOfVectorOntoPlane}
+
+[2] Bayramli, Yapay Görüþ ve Robotik, {\em Ders 2}
+
+\end{document}

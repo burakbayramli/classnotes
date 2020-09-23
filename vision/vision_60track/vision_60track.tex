@@ -1,0 +1,161 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Obje Takibi
+
+Video görüntülerinde obje takibi için filtreleme kullanmak mümkün, bu
+teknik ile iki boyutlu yansýmadan üç boyutlu konum bilgisini takip
+edebiliriz. Kalman Filtreleri (KF) ile görüntüde ilgilendiðimiz objeyi her
+seferinde iki boyutta ``bulmalýyýz'', yani bu objenin örüntüsünün ne
+olduðunu önceden biliyor olmamýz gerekir, ve onu sonraki resimlerde takip
+etmemiz gerekir. Bulduðumuz, iki boyutlu kordinat deðerleridir, yani
+ölçümsel büyüklüklerdir, ardýndan KF'in en son konumuna göre ürettiði
+tahmin ile aradaki fark KF'i düzeltmek için kullanýlýr.
+
+Parçacýk filtreleri (PF) ile yine konum ve ölçüm fonksiyonu ikilisi var,
+fakat ölçüm ile konumdan üretilen tahmin arasýndaki uyumu bir olasýlýk,
+olurluk (likelihood) olarak belirtmemiz gerekiyor, ki böylece PF tahminde
+baþarýlý olan parçacýklara daha fazla önem verebilsin, ve hipotezler o
+yönde devam etsin. 
+
+Alttaki örnekte OpenCV kütüphanesinden elde ettiðimiz 2 boyutlu deðerleri
+ölçüm $y_t$ için kullanacaðýz. Deðerler OpenCV'nin bir satranç tahtasý
+þeklinin köþe noktalarýný \verb!cvFindChessboardCorners! ile buluyor (ve
+onlarý \verb!cvDrawChessboardCorners! ile onlarý resimde gösteriyoruz).
+
+Elimizdeki ``gürültülü'' ölçümler iki boyutlu noktasal deðerler. Gürültülü çünkü
+kamera bize bu imajlarý aktarýrken hata eklemiþ olabilir, OpenCV fonksiyonu
+hesabý yaparken hata eklemiþ olabilir, bir sürü olasýlýk var.
+
+Bu örnekte, ayrýca, ilk kez KF ortamýnda boyut deðiþikliði olasýlýðýný net bir
+þekilde görebiliyoruz. Gizli konum bilgisi $x_t$ 3 boyutlu bir nokta, ama
+elimizdeki ölçüm 2 boyutlu bir ``yansýma''. Yansýma sýrasýnda kaçýnýlmaz olarak
+deðer kaybediliyor, bir boyutun bilgisi ortadan yokoluyor. Ama tüm bu
+bilinmezlere raðmen Kalman filtresinin bizim için gizli bilgiyi hesaplamasýný
+istiyoruz.
+
+Bu problemde $\Phi$ matrisi ne olacaktýr? Obje takibi konularýnda $\Phi$'nin ne
+olduðunu hayal etmek daha kolay, $\Phi$ matrisi iki zaman dilimi arasýndaki
+``hareketi'' temsil edecek. Bu problemdeki ek bir kolaylýk bu hareketi önceden
+bildiðimiz, ve hareketin tek yönde olduðu. Yani resimde benim tuttuðum kartonu
+ne kadar hýzla hareket ettirdiðimi ben önceden probleme bildiriyorum. Yer
+deðiþikliðini $d$ olarak tanýmladým, ve $\Phi$ þöyle oldu:
+
+$$ 
+\Phi = 
+\left[\begin{array}{rrrr}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & d \\
+0 & 0 & 0 & 1
+\end{array}\right]
+$$
+
+Dikkat edersek $\Phi$ 4x4 boyutunda, 3x3 deðil. 3 boyutlu kordinatlarý temsil
+etmek için homojen kordinat sistemini kullandýðýmýz için böyle oldu, o sebeple
+zaten $x_t$ de 4x1 oldu, ona uymak için $\Phi$'nin deðiþmesi gerekiyordu. $\Phi
+x_t$ çarpýmýnýn hakikaten kartonu hareket ettirdiðini göstermek için bu çarpýmý
+bir örnek üzerinde yapalým: Diyelim ki $x_t =
+\left[\begin{array}{cccc}a_1&a_2&a_3&a_4\end{array}\right]$ o zaman $\Phi x_t$
+ya da $x_{t+1}$ þu hale gelir:
+$\left[\begin{array}{cccc}a_1&a_2&a_3+d&a_4\end{array}\right]$.
+
+
+Bakýyoruz, hakikaten de d kadarlýk bir yer deðiþimi z kordinatý, yani
+derinlik üzerinde eklenmiþ. Test amaçlarýmýz için d = -0.5 aldýk, yani
+satranç tahta kartonunun her zaman diliminde kameraya doðru 0.5 cm
+ilerlediðini belirttik. Tabii bu da kabaca bir tahmindi (her ne kadar
+hareketi yaptýran ben olsam bile!), ama filrelemenin gücünü burada
+görüyoruz. Benim tahminimde ``gürültü'' yani ``hata payý'' var, ölçümde
+gürültü var, tüm bunlar üst üste konsa bile filtre yine de gizli konumu
+bulacak.
+
+Ölçümsel dönüþümü temsil eden H'e ben onun temeli olan yansýtma
+(projection) kelimesinden gelen P matrisinden bahsedelim. Yansýma matrisi
+görüntü (vision) literatüründe iðne delik kamerasý (pinhole camera)
+modelinden ileri gelen bir matristir ve bu matrisi hesaplamak ayarlama /
+kalibrasyon (calibration) denen apayrý bir iþlemin parçasýdýr. OpenCV
+içinde kalibrasyon için fonksiyonlar var, biz de bunlarý denedik,
+kalibrasyon için kullandýðýmýz resimlerle alakalý olmalý, elde edilen
+sonuçlardan memnun kalmadýk. Alternatif olarak þunu yaptýk; resimde görülen
+yeþil yüzey bizim programýn oluþturduðu hayali bir yüzey. Filtrenin o anki
+tahminini P üzerinden görüntüye yansýtarak bu yüzeyi oluþturduk, böylece
+deneme / yanýlma yöntemiyle pek çok P deðerini deneyerek, yüzeyin resimde
+görülen masanýn sonunda çýkacak þekilde olmasýný saðladýk. Yansýtma için
+kullanýlan $K$ matrisi, yansýtma metotu ve baþlangýç imajý altta:
+
+\includegraphics[height=6cm]{tser_kf_02.png}
+
+\inputminted[fontsize=\footnotesize]{python}{util.py}
+
+O noktaya gelince istediðimiz P deðerini bulmuþ oluyorduk. Yansýtma
+matrisleri 3x3 olur, KF buna bir dördüncü [0 0 0] satýrý ekleyerek onu 4x3
+H haline getiriyor.
+
+KF'in baþlangýç noktasý olarak P'yi bulmak için kullandýðýmýz masa sonunu
+kullandýk. Kararsýzlýk ölçütü Q için, ki bu deðiþken bir Gaussian
+kovaryansýdýr, $Q = I \cdot 150 cm$ deðerini kullandýk, yani oldukça büyük bir
+kararsýzlýk deðeri kullandýk. Sebep baþlangýç deðeri olan masa ortasýný
+seçtik, ve takip edeceðimiz satranç tahtasýnýn nerede olduðunu bilmiyoruz,
+``emin deðiliz''.  Bu kararsýzlýðý sayýsal olarak programa bildirmiþ olduk.
+
+\inputminted[fontsize=\footnotesize]{python}{track-chess-kf.py}
+
+Kalman filtreleri (KF), eðer kararsýzlýk Gaussian olarak gösterilebiliyorsa çok
+faydalý, ve hýzlý bir yöntem. Bir KF bellekte çok az yer tutar, 3 boyutlu bir
+Gaussian için 3x1 boyutunda bir ortalama vektörü, ve 3x3 boyutunda bir kovaryans
+matrisi yeterlidir, yani 3 + 9 = 12 sayý.
+
+Parçacýk filtreleri (PF) bir daðýlýmý ayrýksal olarak temsil
+edebilirler. Diyelim ki tek boyutlu bir daðýlýmý 100 öðe içeren bir dizin ile
+temsil edebiliriz, o zaman daðýlýmýn deðerlerini 100 tane noktada taþýmamýz
+gerekir.  Bunun faydalarý her türlü daðýlým þeklini temsil edebilmemiz. Gaussian
+ile sadece tek bir tepe noktasý olabilir, fakat ayrýksal temsil ile 2, 3,
+istediðimiz kadar tepe noktasý olan bir daðýlýmý temsil edebiliriz. Bu sayede
+birden fazla gayrý lineer hipotezi ayný anda iþletebiliriz. KF ile tepe noktasý
+en iyi tahminimizdir (mesela.. satranç kartonu masa ortasýnda), PF ile birkaç
+tahmini ayný anda hesaplatmak mümkün olabilir.
+
+PF kodlamasý $x_t$ için iki tane veri yapýsý gerektirir. Biri daðýlým
+deðerlerini temsil eden parçacýklardýr, diðeri daðýlýmdaki önemini temsil eden
+aðýrlýklardýr.  Filtreleme mekaniði KF'e benzer, önce bir geçiþ uygulanýr, ki bu
+geçiþ kararsýzlýðý arttýracaktýr, ardýndan gözlem verisi ve bir hata fonksiyonu
+üzerinden daðýlým güncellenir. Bu iþlem sýrasýnda hatasý yüksek olan parçacýklar
+cezalandýrýlýr, onlarýn aðýrlýðý azalýr, ötekilerinki yükselir. Her parçacýk
+için hata fonksiyonu þudur:
+
+$$
+w^{[i]} = \frac{1}{1 + (y^{[i]} - p^{[i]})^2  )}
+$$
+
+$y^{[i]}$ gözlem deðeri, $p^{[i]}$ geçiþ uygulandýktan sonra elimizdeki
+tahminimizdir, ki bu KF dünyasýndaki $\Phi x_t + Q$'nun karþýlýðýdýr. PF için
+hareket geçiþi þöyle hesaplanýr: Bir birörnek (uniform) daðýlýmdan örnekleme
+yapýlýr, ve bu örneklenen deðerler $x$'e eklenir. Örnekleme için z-kordinatý
+için $Unif (-0.1, -1)$'i, x kordinatý için $Unif (-40, 40)$'i kullandýk. Yani
+ileri doðru 0.1 ve 1 santimetre arasýnda bir hareket ekliyoruz, ve saða ve sola
+dönük olarak 80 santimetrelik bir kararsýzlýðý hesaplara ekliyoruz.
+
+Üstteki formülde $(y^{[i]} - p^{[i]})^2$ e niye 1 deðeri eklediðimiz açýktýr
+herhalde, bu sayede hata fonksiyonunun olasýlýk deðerlerini andýran bir sonuç
+döndürmesini istiyoruz. Çok ufak hatalar için $1 + hata$ bölünendeki 1'i
+bölecek, ve 1'e yakýn bir deðer geri getirecek. Ýstediðimiz de bu zaten, küçük
+hatalarýn daha büyük aðýrlýða, büyük hatalarýn ise tam tersine sebep olmalarý.
+
+Tekrar örnekleme (resampling) sürecinde parçacýklar tekrar düzenlenerek aðýrlýðý
+çok olan parçacýklarýn aðýrlýðý az olanlara göre daha fazla tekrarlanmasýný
+istiyoruz. Dikkat: tekrar örnekleme süreci yeni parçacýk deðerleri yaratmýyor,
+sadece mevcut olanlarý tekrarlýyor ya da onlarý atlýyor.
+
+\inputminted[fontsize=\footnotesize]{python}{track-chess-pf.py}
+
+Kaynaklar
+
+[1] Bayramlý, Sample Video, \url{https://www.dropbox.com/s/bytm6o34rdxraru/chessb-left.avi?dl=1}
+
+[2] Bayramlý, Sample Video, \url{https://www.dropbox.com/s/cmoq0y1rm9g8plb/chessb-right.avi?dl=1}
+
+\end{document}
+
+
+
+

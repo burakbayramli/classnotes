@@ -1,0 +1,166 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Dijkstra Algoritmasý ile En Kýsa Yol
+
+Elimizde alttaki gibi bir að yapýsý var; bu yapý belli noktalar arasýndaki
+yollarý, ya da elektrik devrelerindeki baðlantýlarý, ya da þehirler arasý
+nehirleri temsil ediyor olabilir. Að yapýsýnda yollarýn ne kadar uzak, ya
+da ``pahalý'' olduðu da verilmiþ, ve bizim merak ettiðimiz bir noktadan
+diðerine diðerine en kýsa þekilde nasýl gidileceði.
+
+\includegraphics[height=4cm]{dijks_03.png}
+
+Üstteki resimdeki örnekte baþlangýç noktasý s'den bitiþ noktasý x'e diyelim
+en kýsa yol hangisi? Acaba s-y-z-x gidiþi mi? Bu yolun toplamý 5+2+6=13
+ediyor. Daha kýsa yol var mýdýr?
+
+Dijkstra (telafuz {\em Daykstra}) algoritmasý bu sorunun cevabýný veriyor
+[1, sf. 659]. Algoritmanýn iþleyiþ þekli þöyledir; elde bir öncelik kuyruðu
+vardýr, bakýlacak olan yollar önce oraya konulur. Her noktanýn, düðümün
+sayýsal aðýrlýðý onun baþlangýca olan uzaklýðýdýr. Dikkat: onun baðlý
+olduðu komþu düðümler deðil, {\em baþlangýca} olan uzaklýðý. Algoritma iþleyiþi
+sýrasýnda bu aðýrlýðý deðiþtirebilir, eðer bir düðüme baþlangýçtan daha
+kýsa bir yol bulunursa bu aðýrlýkta deðiþim yapýlacaktýr, bu iþleme
+gevþetme (relaxing) ismi veriliyor.
+
+Neyse; müstakbel düðümler kuyruða konur. Ýlk baþta kuyrukta sadece
+baþlangýç noktasý s olacaktýr, o kuyruktan çekilir, komþularý geri
+konur. Komþularýn aðýrlýðý tabii ki s ile komþular arasýndaki
+mesafedir. Öncelik kuyruðu aðýrlýk deðerine göre otomatik olarak sýralama
+yaptýðý için bir düðüm çekildiðine en kýsa yollu olan gelir. Kuyruktan
+çekilen her düðümün aðýrlýðý artýk o düðüme olan en kýsa yol olarak kabul
+edilir (niye - sebebine birazdan geleceðiz). Algoritma ayný þekilde devam
+eder, çekilen düðümün komþularý alýnýp kuyruða konur, böyle gider.
+
+Bazen ayný düðüme farklý yollardan eriþmek mümkündür, bu durumda farklý
+yolan eriþilen düðümün aðýrlýðý daha ``gevþetilebilir'', mesela 10 iken 8
+haline getirilebilir (örnekte t düðümünde bu oluyor), tabii ki bu durumda
+düðümün kuyruktaki yeri de deðiþebilecekir, belki bir baþka düðümün önüne
+geçer.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from pqdict import pqdict
+
+def dijkstra(G,basla,bitis):
+    # nihai uzakliklarin sozlugu
+    D = {}  
+    # ebeveyn dugumlerin sozlugu
+    P = {}  
+    # dugumlerin baslangica olan tahmini uzakliginin kuyrugu
+    Q = pqdict() 
+
+    Q[basla] = 0
+
+    while len(Q)>0:
+       (v,vv) = Q.popitem()
+       D[v] = vv
+       for w in G[v]:
+          vwLength = D[v] + G[v][w]
+          if w in D:
+              if vwLength < D[w]:
+                  raise ValueError("sonuca giden daha iyi yol bulundu")
+          elif w not in Q or vwLength < Q[w]:
+              Q[w] = vwLength
+              P[w] = v
+    path = []
+    while 1:
+       path.append(bitis)
+       if bitis == basla: break
+       bitis = P[bitis]
+    path.reverse()
+    return path
+
+G = {'s':{'t':10, 'y':5}, 't':{'x':1, 'z':2}, 'x':{'z':4}, \
+     'y':{'t':3, 'x':9, 'z':2}, 'z':{'s':7, 'x':6}}
+path = dijkstra(G, 's', 'x')
+print (path)
+\end{minted}
+
+\begin{verbatim}
+['s', 'y', 't', 'x']
+\end{verbatim}
+
+Kod en kýsa yolu buldu. Bu algoritmanýn hesaplama karmaþýklýðý $m$ kenar
+$n$ düðüm içeren bir çizit için $O((m+n) \log n)$'dir. Bu karmaþýklýk hiç
+fena deðil. 
+
+\includegraphics[height=4.2cm]{dijks_01.png}
+
+\includegraphics[height=4.2cm]{dijks_02.png}
+
+Þekillerde görülen düðümler siyah renkli olunca  kuyruktan çekilmiþ
+demektir, ve onlara olan en kýsa yol hesaplanmýþtýr. 
+
+Peki Dijkstra algoritmasýnýn doðruluðundan nasýl emin olacaðýz?
+Dijkstra'nýn iþleyiþi sýrasýnda sürekli iki tane kümeyi idare ettiðini
+söyleyebiliriz. Bir küme öncelik kuyruðu içindeki müstakbel, diðeri ise ona
+olan baþlangýç uzaklýðýnýn artýk bilindiði bitmiþ düðümlerdir. Ýddia þu ki
+öncelik kuyruðundan (en tepedeki, en yakýn, aðýrlýðý en az) çektiðimiz her
+düðüm ikinci kümeye transfer edilebilir, yani ona olan uzaklýktan
+eminiz. Neden? Þimdi o düðüme gidebilecek daha kýsa bir yol olduðunu farz
+edelim. Fakat elimizdeki düðüme eriþilirken diðer komþular deðil ona
+gelindi, çünkü ona gelen yol daha kýsaydý, bu demektir ki komþular
+üzerinden tur atarak elimizeki düðüme eriþmek demek taným itibariyle yolu
+uzatmak demektir. Bu durumda kuyruktan çekilen düðümün aðýrlýðýnýn ona
+giden en kýsa yol olduðuna güvenebiliriz. Ýspat tamamlandý.
+
+Alttaki alternatif kod [2]'yi temel alýyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from heapq import heappush, heappop
+
+inf = float('inf')
+def relax(W, u, v, D, P):
+    d = D.get(u,inf) + W[u][v]                  # Muhtemel kisayol tahmini
+    if d < D.get(v,inf):                        # Bu hakikaten bir kisa yol mu?
+        D[v], P[v] = d, u                       # Tahmini ve ebeveyni guncelle
+        return True                             # Degisim oldu
+
+def dijkstra2(G, s, e):
+    D, P, Q, S = {s:0}, {}, [(0,s)], set()      # Tahmin, agac, kuyruk, ziyaret?
+    while Q:                                    # Hala islenmemis dugum?
+        _, u = heappop(Q)                       # En dusuk tahminli dugum
+        if u in S: continue                     # Coktan ziyaret edildi? Atla
+        S.add(u)                                # Simdi ziyaret ettik
+        for v in G[u]:                          # Tum komsularina bak
+            relax(G, u, v, D, P)                # Disari cikan baglantiyi gevset
+            heappush(Q, (D[v], v))              # Tahminiyle beraber kuyruga ekle
+    path = []
+    while 1:
+        path.append(e)
+        if e == s: break
+        e = P[e]
+    path.reverse()
+    return path
+
+path = dijkstra2(G, 's','x')
+print path
+\end{minted}
+
+\begin{verbatim}
+['s', 'y', 't', 'x']
+\end{verbatim}
+
+Not: Aslýnda Dijkstra'nýn ana hesabý bir düðüme olan baþlangýçtan olan
+uzaklýktýr. Fakat çoðunlukla net bir ``kýsa yol'', x,t,z,vs.. þeklinde
+gerektiðinden algoritma iþleyiþi sýrasýnda her düðüme giden bir önceki
+düðüme geriye doðru bir iþaret konur, bu ebeveyn düðümü eldeki düðüme
+nereden gelindiðini hatýrlamamýzý saðlar. Sonra algoritma bitince bu yolu
+geriye doðru takip ederek en kýsa yolu buluruz.
+
+Not: Eðer elimizdeki çizit yapýsý öyle ki iki düðüm arasýnda iki yönlü
+gidiþ te mümkün ise algoritma deðiþir mi? Bu durumda algoritmaya dokunmadan
+çizit að yapýsýnda ufak bir deðiþiklik yeterli; a,b arasýnda baðlantý varsa
+ayný þekilde bir b,a baðlantýsý da ekleriz. 
+
+Java kodu \verb!Dijkstra.java! dosyasýnda bulunabilir.
+
+Kaynaklar
+
+[1] Stein, {\em Introduction to Algorithms}
+
+[2] Heatland, {\em Python Algorithms}
+
+\end{document}
+
+

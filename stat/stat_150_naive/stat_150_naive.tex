@@ -1,0 +1,277 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Naive Bayes
+
+Reel sayýlar arasýnda baðlantý kurmak için istatistikte regresyon
+kullanýlýr. Eðer reel deðerleri, (mesela) iki kategorik grup arasýnda seçmek
+için kullanmak istenirse, bunun için lojistik regresyon gibi teknikler de
+vardýr.
+
+Fakat kategoriler / gruplar ile baþka kategorik gruplar arasýnda
+baðlantýlar kurulmak istenirse, standart istatistik yöntemleri faydalý
+olamýyor. Bu gibi ihtiyaçlar için yapay öðrenim (machine learning)
+dünyasýndan Naive Bayes gibi tekniklere bakmamýz lazým.
+
+Not: Daha ilerlemeden belirtelim, bu tekniðin ismi Naive Bayes ama bu taným
+tam doðru deðil, çünkü NB Olasýlýk Teorisi'nden bilinen Bayes Teorisini
+kullanmýyor.
+
+Öncelikle kategorik deðerler ile ne demek istediðimizi belirtelim. Reel
+sayýlar $0.3423, 2.4334$ gibi deðerlerdir, kategorik deðerler ile ise
+mesela bir belge içinde 'a','x' gibi harflerin mevcut olmasýdýr. Ya da, bir
+evin 'beyaz', 'gri' renkli olmasý.. Burada öyle kategorilerden bahsediyoruz
+ki istesek te onlarý sayýsal bir deðere çeviremiyoruz; kýyasla mesela bir
+günün 'az sýcak', 'orta', 'çok sýcak' olduðu verisini kategorik bile olsa
+regresyon amacýyla sayýya çevirip kullanabilirdik. Az sýcak = 0, orta = 1,
+çok sýcak = 2 deðerlerini kullanabilirdik, regresyon hala anlamlý olurdu
+(çünkü arka planda bu kategoriler aslýnda sayýsal sýcaklýk deðerlerine
+tekabül ediyor olurlardý). Fakat 'beyaz', 'gri' deðerlere sayý atamanýn
+regresyon açýsýndan bir anlamý olmazdý, hatta bunu yapmak yanlýþ
+olurdu. Eðer elimizde fazla sayýda 'gri' ev verisi olsa, bu durum regresyon
+sýrasýnda beyaz evlerin beyazlýðýný mý azaltacaktýr?
+
+Ýþte bu gibi durumlarda kategorileri olduðu gibi iþleyebilen bir teknik
+gerekiyor. Bu yazýda kullanacaðýmýz örnek, bir belgenin içindeki kelimelere
+göre kategorize edilmesi. Elimizde iki türlü doküman olacak. Bir tanesi
+Stephen Hawking adlý bilim adamýnýn bir kitabýndan 3 sayfa, diðeri baþkan
+Barack Obama'nýn bir kitabýndan 3 sayfa. Bu sayfalar ve içindeki kelimeler
+NB yöntemini "eðitmek" için kullanýlacak, sonra NB tarafýndan hiç
+görülmemiþ yeni sayfalarý yöntemimize kategorize ettireceðiz.
+
+Çok Boyutlu Bernoulli ve Kelimeler
+
+\includegraphics[height=2.5cm]{dims.png}
+
+Bir doküman ile içindeki kelimeler arasýnda nasýl baðlantý kuracaðýz?
+Burada olasýlýk teorisinden Çok Boyutlu Bernoulli (Multivariate Bernoulli)
+daðýlýmýný kullanacaðýz. Üstteki resimde görüldüðü gibi her doküman bir
+$x^i$ rasgele deðiþkeniyle temsil edilecek. Tek boyutlu Bernoulli deðiþkeni
+'1' ya da '0' deðerine sahip olabilir, çok boyutlu olaný ise bir vektör
+içinde '1' ve '0' deðerlerini taþýyabilir. Ýþte bu vektörün her hücresi,
+önceden tanýmlý bir kelimeye tekabül edecek, ve bu kelimeden bir doküman
+içinde en az bir tane var ise, o hücre '1' deðerini taþýyacak, yoksa '0'
+deðerini taþýyacak. Üstteki örnekte 2. kelime "hello" ve 4. doküman
+içinde bu kelimeden en az bir tane var, o zaman $x_2^4 = 1$. Tek bir
+dokümaný temsil eden daðýlýmý matematiksel olarak þöyle yazabiliriz:
+
+$$ p(x_1,...,x_{D}) = \prod_{d=1}^{D} p(x_d)=\prod_{d=1}^{D}
+\alpha_d^{x_d}(1-\alpha_d)^{1-x_d} 
+$$
+
+Bu formülde her $d$ boyutu bir tek boyutlu Bernoulli, ve bir doküman
+için tüm bu boyutlarýn ortak (joint) daðýlýmý gerekiyor, çarpýmýn
+sebebi bu. Formüldeki $\alpha_d$ bir daðýlýmý "tanýmlayan" deðer,
+$\alpha$ bir vektör, ve unutmayalým, her "sýnýf" için NB ayrý ayrý
+eðitilecek, ve her sýnýf için farklý $\alpha$ vektörü olacak. Yani
+Obama'nýn kitaplarý için $\alpha_2 = 0.8$ olabilir, Hawking kitabý
+için $\alpha_2 = 0.3$ olabilir. Birinin kitabýnda "hello" kelimesi
+olma þansý fazla, diðerinde pek yok. O zaman NB'yi "eðitmek" ne
+demektir? Eðitmek her sýnýf için yukarýdaki $\alpha$ deðerlerini
+bulmak demektir.
+
+Bunun için istatistikteki "olurluk (likelihood)" kavramýný kullanmak
+yeterli. Olurluk, bir daðýlýmdan geldiði farzedilen bir veri setini
+alýr, tüm veri noktalarýný teker teker olasýlýða geçerek olasýlýk
+deðerlerini birbirine çarpar. Sonuç ne kadar yüksek çýkarsa, bu
+verinin o daðýlýmdan gelme olasýlýðý o kadar yüksek demektir. Bizim
+problemimiz için tek bir sýnýfýn olurluðu, o sýnýf içindeki tüm (N
+tane) belgeyi kapsamalýdýr, tek bir "veri noktasý" tek bir belgedir,
+o zaman:
+
+$$ L(\theta) = \prod_{i=1}^N \prod_{d=1}^{D} p(x_d^i) = 
+\prod_{i=1}^N \prod_{d=1}^{D} \alpha_d^{x_d^i}(1-\alpha_d)^{1-x_d^i}
+ $$
+
+$\theta$ bir daðýlýmý tanýmlayan her türlü deðiþken anlamýnda kullanýldý, bu
+örnekte içinde sadece $\alpha$ var.
+
+Devam edelim: Eðer $\alpha$'nin ne olduðunu bilmiyorsak (ki bilmiyoruz
+-eðitmek zaten bu demek-) o zaman maksimum olurluk (maximum likelihood)
+kavramýný resme dahil etmek gerekli. Bunun için üstteki olurluk formülünün
+$\alpha$'ya göre türevini alýp sýfýra eþitlersek, bu formülden bir maksimum
+noktasýndaki $\alpha$ elimize geçecektir. Ýþte bu $\alpha$ bizim aradýðýmýz
+deðer. Veriyi en iyi temsil eden $\alpha$ deðeri bu demektir. Onu bulunca
+eðitim tamamlanýr.
+
+Türev almadan önce iki tarafýn log'unu alalým, böylece çarpýmlar toplamlara
+dönüþecek ve türevin formülün içine nüfuz etmesi daha kolay olacak.
+
+$$ \log(L) = \sum_{i=1}^N \sum_{d=1}^{D} {x_d^i}\ log (\alpha_d) + 
+(1-x_d^i)\ log (1-\alpha_d) $$
+
+Türevi alalým:
+
+$$ \frac{dlog(L)}{d\alpha_d} = \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} -
+\frac{1-x_d^i}{1-\alpha_d} \bigg) = 0
+ $$
+
+1- $\alpha_d$'ye göre türev alýrken $x_d^i$'ler sabit sayý gibi muamele
+görürler. 2- log'un türevi alýrken log içindeki deðerlerin türev alýnmýþ hali
+bölümün üstüne, kendisini olduðu gibi bölüm altýna alýnýr, örnek 
+$dlog(-x)/dx = -1/x$ olur üstteki eksi iþaretinin sebebi bu. 
+
+Peki $\sum_{d=1}^{D}$ nereye gitti? Türevi $\alpha_d$'ye göre alýyoruz ve o
+türevi alýrken tek bir $\alpha_d$ ile ilgileniyoruz, mesela $\alpha_{22}$,
+bunun haricindeki diðer tüm $\alpha_?$ deðerleri türev alma iþlemi
+sýrasýnda sabit kabul edilirler, türev sýrasýnda sýfýrlanýrlar. Bu sebeple
+$\sum_{d=1}^{D}$ içinde sadece bizim ilgilendiðimiz $\alpha_d$ geriye
+kalýr. Tabii ki bu ayný zamanda her $d=1,2,..D$, $\alpha_d$ için ayrý bir
+türev var demektir, ama bu türevlerin hepsi birbirine benzerler, yani tek
+bir $\alpha_d$'yi çözmek, hepsini çözmek anlamýna gelir.
+
+Devam edelim:
+
+$$ \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} - \frac{1-x_d^i}{1-\alpha_d} \bigg) =
+\frac{N_d}{\alpha_d} - \frac{N-N_d}{1-\alpha_d} = 0
+ $$
+
+$\sum_{i=1}^N x_d^i = N_d$ olarak kabul ediyoruz, $N_d$ tüm veri içinde $d$
+boyutu (kelimesi) '1' kaç tane hücre olduðunu bize söyler. $x_d^i$ ya '1' ya '0'
+olabildiðine göre bir $d$ için, tüm $N$ hücrenin toplamý otomatik olarak bize
+kaç tane '1' olduðunu söyler. Sonra:
+
+$$ \frac{N_d}{\alpha_d} - \frac{N-N_d}{1-\alpha_d} = 0  $$
+
+$$ \frac{1-\alpha_d}{\alpha_d} = \frac{N-N_d}{N_d}   $$
+
+$$ \frac{1}{\alpha_d} - 1 = \frac{N}{N_d} - 1  $$
+
+$$ \frac{1}{\alpha_d} = \frac{N}{N_d}  $$
+
+$$ \alpha_d = \frac{N_d}{N}  $$
+
+Python Kodu
+
+$\alpha_d$'nin formülünü buldumuza göre artýk kodu yazabiliriz. Ýlk önce bir
+dokümaný temsil eden çok boyutlu Bernoulli vektörünü ortaya çýkartmamýz
+lazým. Bu vektörün her hücresi belli bir kelime olacak, ve o kelimelerin ne
+olduðunu önceden kararlaþtýrmamýz lazým. Bunun için her sýnýftaki tüm
+dokümanlardaki tüm kelimeleri içeren bir sözlük yaratýrýz:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import re
+import math
+
+words = {}
+
+# find all words in all files, creating a 
+# global dictionary.
+base = './data/'
+for file in ['a1.txt','a2.txt','a3.txt',
+             'b1.txt','b2.txt','b3.txt']:
+    f = open (base + file)
+    s = f.read()
+    tokens = re.split('\W+', s)
+    for x in tokens: words[x] = 0.
+    
+hawking_alphas = words.copy()   
+for file in ['a1.txt','a2.txt','a3.txt']:
+    words_hawking = set()
+    f = open (base + file)
+    s = f.read()
+    tokens = re.split('\W+', s)
+    for x in tokens: 
+        words_hawking.add(x)
+    for x in words_hawking:
+        hawking_alphas[x] += 1.
+        
+obama_alphas = words.copy()   
+for file in ['b1.txt','b2.txt','b3.txt']:
+    words_obama = set()
+    f = open (base + file)
+    s = f.read()
+    tokens = re.split('\W+', s)
+    for x in tokens: 
+        words_obama.add(x)
+    for x in words_obama:
+        obama_alphas[x] += 1.
+
+for x in hawking_alphas.keys():
+    hawking_alphas[x] = hawking_alphas[x] / 3.        
+for x in obama_alphas.keys():
+    obama_alphas[x] = obama_alphas[x] / 3.        
+
+def prob(xd, alpha):
+    return math.log(alpha*xd + 1e-10) + \
+        math.log((1.-alpha)*(1.-xd) + 1e-10)
+        
+def test(file):
+    test_vector = words.copy()   
+    words_test = set()
+    f = open (base + file)
+    s = f.read()
+    tokens = re.split('\W+', s)
+    for x in tokens: 
+        words_test.add(x)
+    for x in words_test:  
+        test_vector[x] = 1.
+    ob = 0.
+    ha = 0.
+    for x in test_vector.keys(): 
+        if x in obama_alphas: 
+            ob += prob(test_vector[x], obama_alphas[x])
+        if x in hawking_alphas: 
+            ha += prob(test_vector[x], hawking_alphas[x])
+                
+    print "obama", ob, "hawking", ha, \
+    "obama", ob > ha, "hawking", ha > ob
+
+
+print "hawking test"    
+test('a4.txt')
+print "hawking test"    
+test('a5.txt')
+print "obama test"    
+test('b4.txt')
+print "obama test"    
+test('b5.txt')
+\end{minted}
+
+\begin{verbatim}
+hawking test
+obama -34048.7734496 hawking -32192.3692113 obama False hawking True
+hawking test
+obama -33027.3182425 hawking -32295.7149639 obama False hawking True
+obama test
+obama -32531.9918709 hawking -32925.037558 obama True hawking False
+obama test
+obama -32205.4710748 hawking -32549.6924713 obama True hawking False
+\end{verbatim}
+
+Test için yeni dokümaný kelimelerine ayýrýyoruz, ve her kelimeye tekabül eden
+alpha vektörlerini kullanarak bir yazar için toplam olasýlýðý
+hesaplýyoruz. Nasýl? Her kelimeyi $\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}$ formülüne
+soruyoruz, yeni dokümaný temsilen elimizde bir $[1,0,0,1,0,0,...,1]$ þeklinde
+bir vektör olduðunu farz ediyoruz, buna göre mesela $x_1=1$, $x_2=0$. Eðer bir
+$d$ kelimesi yeni belgede "var" ise o kelime için $x_d = 1$ ve bu durumda
+$\alpha_d^{x_d} = \alpha_d^{1} = \alpha_d$ haline gelir, ama formülün öteki
+tarafý yokolur, $(1-\alpha_d)^{1-x_d} = (1-\alpha_d)^0 = 1$, o zaman $\alpha_d
+\cdot 1 = \alpha_d$.
+
+Çarpým diyoruz ama biz aslýnda sýnýflama sýrasýnda
+$\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}$ çarpýmý yerine yine log() numarasýný
+kullandýk; çünkü olasýlýk deðerleri hep 1'e eþit ya da ondan küçük sayýlardýr,
+ve bu küçük deðerlerin birbiriyle sürekli çarpýmý nihai sonucu aþýrý fazla
+küçültür. Aþýrý ufak deðerlerle uðraþmamak için olasýlýklarýn log'unu alýp
+birbirleri ile toplamayý seçtik, yani hesapladýðýmýz deðer $x_d \cdot
+log(\alpha_d) + (1-x_d) \cdot \log(1-\alpha_d)$
+
+Fonksiyon \verb!prob! içindeki \verb!1e-7! kullanýmý neden? Bu
+kullaným log numarasýný yapabilmek için -- sýfýr deðerinin log deðeri
+tanýmsýzdýr, bir kelime olmadýðý zaman log'a sýfýr geleceði için hata
+olmamasý için log içindeki deðerlere her seferinde yeterince küçük bir
+sayý ekliyoruz, böylece pür sýfýrla uðraþmak zorunda kalmýyoruz. Sýfýr
+olmadýðý zamanlarda çok eklenen çok küçük bir sayý sonuçta büyük
+farklar (hatalar) yaratmýyor.
+
+Toparlarsak, yeni belge \verb!a4.txt! için iki tür alpha
+deðerleri kullanarak iki farklý log toplamýný hesaplatýyoruz. Bu iki
+toplamý birbiri ile karþýlaþtýrýyoruz, hangi toplam daha büyükse,
+dokümanýn o yazardan gelmesi daha olasýdýr, ve o seçimimiz o yazar
+olur.
+
+Kaynaklar
+
+[1] Jebara, T., {\em Columbia U. COMS 4771 Machine Learning Lecture Notes, Lecture 7}
+
+\end{document}

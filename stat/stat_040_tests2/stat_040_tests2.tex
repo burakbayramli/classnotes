@@ -1,0 +1,949 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Testlere Devam 
+
+Ýstatistiki test yaratmak için takip edilen teknik basit; bir istatistiki
+ölçüt hesaplýyoruz, ya da hesabýmýzýn baþka noktasýndan çýkaný alýyoruz, ki
+bu ölçüt mesela bir ortalama olabilir bu durumda bilinen bir daðýlýmý
+vardýr, ya da lineer regresyondan bize verilen bir katsayýdýr, onun t
+deðeri vardýr, bu durumda da daðýlýmýn ne olduðunu biliyoruz. Yani hangi
+ölçüte bakarsak bakalým, ya da biz yeni bir tanesini uyduralým, önce elde
+ettiðimiz rasgele deðiþkeninin ideal koþullarda daðýlýmýnýn ne olduðuna
+bakarýz, ki test ettiðimiz bir anlamda bu ideal koþullar
+olacaktýr. Ardýndan bir kriter ortaya koyarak testi ortaya çýkartýrýz.
+
+Ama ondan önce biraz regresyon.
+
+Örnek veri olarak Big Andy's Burger Barn adýnda hamburger satan bir
+restoran zincirinin verisini kullanalým [1, sf. 168]. Veride her nokta ayrý
+bir þehirdeki belli bir aydaki dükkan için kaydedilmiþ reklam gideri
+$ADVERT$, burger fiyatý $PRICE$, ve satýþ getirisi $SALES$ ($SALES$ ve
+$ADVERT$ bin dolarlýk birimde kaydedilmiþ). Þirket yönetimi diyelim ki
+reklam harcamalarýnýn satýþlarý nasýl etkilediðini merak ediyor. Ayrýca
+yönetim bir fiyatlama stratejisi belirlemek istiyor, fiyatýn geliri nasýl
+etkilmektedir? Fiyatta düþüþ çok az satýþ artýþý yaratýyorsa bu durum
+kazancý düþürür, demek ki talep fiyatsal-elastik deðildir (price
+inelastic). Tam tersi de olabilir, fiyat deðiþimi satýþý arttýrýr, o zaman
+talep fiyatsal-elastiktir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('andy.dat',sep='\s*',names=['sales','price','advert'])
+print df.head(3)
+\end{minted}
+
+\begin{verbatim}
+   sales  price  advert
+0   73.2   5.69     1.3
+1   71.8   6.49     2.9
+2   62.4   5.63     0.8
+\end{verbatim}
+
+Regresyon modelini kuralým,
+
+$$ SALES = \beta_1 + \beta_2 PRICE + \beta_3 ADVERT $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('sales ~ price + advert', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  sales   R-squared:                       0.448
+Model:                            OLS   Adj. R-squared:                  0.433
+Method:                 Least Squares   F-statistic:                     29.25
+Date:                Mon, 24 Aug 2015   Prob (F-statistic):           5.04e-10
+Time:                        08:59:52   Log-Likelihood:                -223.87
+No. Observations:                  75   AIC:                             453.7
+Df Residuals:                      72   BIC:                             460.7
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept    118.9136      6.352     18.722      0.000       106.252   131.575
+price         -7.9079      1.096     -7.215      0.000       -10.093    -5.723
+advert         1.8626      0.683      2.726      0.008         0.501     3.225
+==============================================================================
+Omnibus:                        0.535   Durbin-Watson:                   2.183
+Prob(Omnibus):                  0.765   Jarque-Bera (JB):                0.159
+Skew:                          -0.072   Prob(JB):                        0.924
+Kurtosis:                       3.174   Cond. No.                         69.5
+==============================================================================
+\end{verbatim}
+
+Fiyatsal elastikliði kontrol etmek için $\beta_2$'nin t deðerine
+bakabiliriz çünkü bu deðer $\beta_2=0$ hipotezini reddedip
+reddedemeyeceðimiz hakkýnda bize bir þeyler söylüyor. Eðer t deðer ve
+\verb!P>|t|! deðeri 0.05'ten küçük ise hipotezi reddedebiliriz. Çýktýya
+bakýyoruz, 0 deðerini görüyoruz. Demek ki fiyatsal elastiklik vardýr. 
+
+Gayrý Lineerlik: Fakat acaba reklam harcamasý ile satýþ arasýnda tam lineer
+bir iliþki mi var? Belli bir noktadan sonra ne kadar harcarsak harcayalým
+daha fazla kazanamayacaðýmýz bir durum da olamaz mý? Bunu test edelim,
+$ADVERT^2$ deðiþkenini ekleyip yeni bir regresyon yaratalým. $ADVERT$'in
+karesini aldýk çünkü karesi alýnmýþ $ADVERT$ normal olana göre daha hýzlý
+büyür, yani büyük deðerlerde karesinin sonucu çok daha büyüktür, ve eðer bu
+uç noktalarda bir kalýp var ise, onu ``yakalamak'' bu karesi alýnmýþ yeni
+deðiþken sayesinde mümkün olur.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+df['advert2'] = df.advert**2 # kare aldik
+results2 = smf.ols('sales ~ price + advert + advert2', data=df).fit()
+print results2.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  sales   R-squared:                       0.508
+Model:                            OLS   Adj. R-squared:                  0.487
+Method:                 Least Squares   F-statistic:                     24.46
+Date:                Mon, 24 Aug 2015   Prob (F-statistic):           5.60e-11
+Time:                        15:54:13   Log-Likelihood:                -219.55
+No. Observations:                  75   AIC:                             447.1
+Df Residuals:                      71   BIC:                             456.4
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept    109.7190      6.799     16.137      0.000        96.162   123.276
+price         -7.6400      1.046     -7.304      0.000        -9.726    -5.554
+advert        12.1512      3.556      3.417      0.001         5.060    19.242
+advert2       -2.7680      0.941     -2.943      0.004        -4.644    -0.892
+==============================================================================
+Omnibus:                        1.004   Durbin-Watson:                   2.043
+Prob(Omnibus):                  0.605   Jarque-Bera (JB):                0.455
+Skew:                          -0.088   Prob(JB):                        0.797
+Kurtosis:                       3.339   Cond. No.                         101.
+==============================================================================
+
+\end{verbatim}
+
+Yeni regresyon için $R^2=0.50$! Bu yeni model verideki varyansýn yüzde
+50'sini açýklýyor! Eskisinden daha iyi bir model ve AIC'i de daha düþük
+zaten, ve $ADVERT^2$ için hesaplanan katsayý -2.768 eksi deðeri
+taþýyor. Demek ki reklam harcamalarýnýn belli bir noktadan sonra etkisinin
+ayný olmayacaðý varsayýmýmýz doðru. 
+
+Birleþik Hipotez Testleri
+
+Ne yazýk ki t testi ile ortak (joint) hipotez testleri
+yapamýyoruz. Mesela sadece bir deðil, {\em birkaç deðiþkenin} model için ne
+kadar önemli olduðunu bilmek istiyoruz. Tabii bu deðiþkenleri regresyondan
+atabiliriz, sonra çýplak gözle AIC'e bakarýz, vs. Fakat bu testi daha
+Ýstatistiksel bir hipotez testi olarak yapmak daha iyi olmaz mýydý? Alttaki
+test bu durumlar için kullanýlýr,
+
+F Testi
+
+Diyelim ki reklam harcamasýnýn satýþý etkileyip etkilemediðini merak
+ediyoruz. Fakat artýk bir deðil iki tane reklam ile alakalý deðiþkenimiz
+var! Biri $ADVERT$ diðeri onun karesi $ADVERT^2$. Sýfýr hipotezimiz þu
+olacak, ``reklam harcamasý satýþlarý belirlemede etkili deðildir''. Yani 
+
+$$ H_0: \beta_3=0, \beta_4=0 $$
+
+$$ H_1: \beta_3 \ne 0, \textrm{ ya da } \beta_4 \ne 0 \textrm{ ya da ikisi
+  de sýfýr deðil} $$
+
+Hipotez bu þekilde tanýmlanýnca onu reddetmek demek reklamýn satýþlarý
+etkilediði hakkýnda güçlü bir kanýt ortaya koyar. Bu nokta önemli, aþýrý
+fantastik bir þekilde zaten umduðumuz þeyi desteklemek için kanýt aramak
+yerine, onun tam tersini reddetmek için kanýt arýyoruz. 
+
+Peki bu testi nasýl yaratacaðýz? Bir regresyona deðiþken eklemek onun
+hatasýný azaltýr, çýkartmak ise çoðaltýr. Eðer ana regresyondan deðiþken
+çýkartýrsak onun hatasý $SSE_u$ diyelim, çoðalarak $SSE_r$ olur. Notasyonel
+açýdan deðiþik bir þekilde de duruma bakabiliriz, $\beta_3=0, \beta_4=0$
+þartýný koþmak aslýnda bir modeli kýsýtlamak ta (restrict) anlamýna gelir,
+üzerinde þart belirlenmemiþ olan model de kýsýtlanmamýþ (unrestricted)
+olur. Neyse, F testi ile yapmaya çalýþacaðýmýz bu çoðalmanýn istatistiki
+olarak önemli (significant) olup olmadýðýný anlamaktýr. $SSE$ notasyonu bu
+arada hata karelerinin toplamý (sum of squared errors) kelimelerinden
+geliyor.
+
+Þimdi, daha önce belirttiðimiz gibi, ideal þartlarda doðru olacak bir ölçüt
+yaratmak, ve bu ideal þartlarda bu ölçütün daðýlýmýný bulmak, ve veriyi
+kullanýp bu ölçütü hesaplayýp sonucu bu daðýlýma ``sormak''
+gerekiyor. Eðer sýfýr hipotezi doðru ise,
+
+$$ F = \frac{(SSE_r - SSE_u)/j}{SSE_u/(n-k)} $$
+
+hesabý bir $F_{j,n-k}$ daðýlýmýdýr. F daðýlýmýnýn tanýmýný hatýrlayalým,
+iki chi kare daðýlýmýnýn birbiriyle bölünmüþ hali idi,
+
+$$ F_{j,n-k} = \frac{\chi^2 / j}{\chi^2 / n-k} $$
+
+SSE hesaplarý karelerin toplamý olduðu için ve hatalarýn normal daðýldýðý
+varsayýmýndan hareketle bölüm ve bölendeki rasgele deðiþkenler Chi kare
+daðýlýmýna sahiptir.
+
+Peki neden üstteki F daðýlýmýnýn $j,n-k$ derece serbestliði vardýr? Ýki chi
+kare daðýlýmýný toplayýnca onlarýn dereceleri toplanýr. Ayný þekilde
+çýkartma derece eksiltir. Þimdi, $SSE_r$'nin derecesi $n-k$'dir, $k$ tane
+katsayý dereceyi / serbestliði azaltmýþtýr. Eðer $SSE_r$ elde etmek için
+$j$ tane katsayýyý çýkartýrsak, bu durum dereceyi fazlalaþtýrýr, yani
+$SSE_r$ için $n-k+j$ elde ederiz. O zaman bölümdeki çýkartmanýn derecesi
+
+$$ (n-r+j) - (n-r) = j$$
+
+olacaktýr. Þimdi nihai hesabý yapalým, regresyonu reklamla alakalý iki
+deðiþkeni çýkartýlmýþ þekilde bir daha iþletiriz, sonra SSE hesabý için her
+iki regresyondan gelen artýklar \verb!resid!'leri kullanýrýz, onlarýn
+karelerinin toplamý bize gerekli $SSE$ hesabýný verecektir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results3 = smf.ols('sales ~ price ', data=df).fit()
+SSE_u = np.sum(results2.resid**2)
+SSE_r = np.sum(results3.resid**2)
+print 'SSE_u', SSE_u
+print 'SSE_r', SSE_r
+J = 2; N=len(df); K = len(results2.params)
+F = (SSE_r - SSE_u)/J / SSE_u*(N-K)
+print 'j,n-k',J,N-K
+print 'F =', F
+\end{minted}
+
+\begin{verbatim}
+SSE_u 1532.0844587
+SSE_r 1896.39083709
+j,n-k 2 71
+F = 8.44135997807
+\end{verbatim}
+
+p deðeri $P(F_{j,n-k}>8.44)$. Kumulatif yoðunluk fonksiyonu (CDF)
+kullanabilmek için formülü þu þekilde tekrar yazalým,
+$1-P(F_{j,n-k}<8.44)$,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.stats as st
+f = st.f(J,N-K)
+print 1-f.cdf(F)
+\end{minted}
+
+\begin{verbatim}
+0.000514159058424
+\end{verbatim}
+
+Üstteki deðer 0.05 kritik deðerinden daha ufak olduðu için hipotez
+reddedilmiþtir. Direk p deðeri hesabý yerine yüzde 95 güven için bir eþik
+deðeri de hesaplayabilirdik,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print f.ppf(0.95)
+\end{minted}
+
+\begin{verbatim}
+3.12576423681
+\end{verbatim}
+
+Ve eðer F deðeri bu deðerden büyük ise hipotez reddedilmiþtir diyebilirdik,
+ki hesapladýðýmýz F deðeri eþik deðerinden büyük idi. Vardýðýmýz sonuç
+reklam harcamalarýnýn satýþ için önemli olduðudur.
+
+Daha Basit bir F-Test Örneði
+
+F-Test'in ana fonksiyonu ve ilk kullanýmý varyans karþýlaþtýrmak aslýnda,
+iki ölçüm grubunu standard sapma karesinin oraný alýnýr, ve sonuç bir F
+rasgele deðiþkenidir, belli serbestlik dereceleri vardýr,
+
+$$ F = \frac{S_x^2}{S_y^2} $$
+
+ki $S_x,S_y$ 1. ve 2. grubun örneklem standart sapmasýdýr. Bu þekilde bir
+örnek te görelim [2, sf. 42]. Diyelim ki elimizde göz hareketlerini ölçen
+iki metod var, gözümüzü 20 derece hareket ettirince metotlar þu rakamlarý
+veriyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+method_1 = [20.7, 20.3,20.3, 20.3, 20.7, 19.9, 19.9, 19.9, \
+            20.3, 20.3, 19.7, 20.3]
+method_2 = [19.7, 19.4, 20.1, 18.6, 18.8, 20.2, 18.7, 19.]
+\end{minted}
+
+F-testini kullanarak bu metotlarýn, ölçümlerin doðruluðunun (accuracy) ayný
+mý, yoksa birinin diðerinden daha doðru mu olduðunu bulacaðýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+m1 = np.array(method_1); m2 = np.array(method_2)
+df = pd.DataFrame([m1,m2]).T
+ss = df.std()
+F = ss.ix[0]**2/ss.ix[1]**2
+print F
+\end{minted}
+
+\begin{verbatim}
+0.243934673841
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.stats as st
+f = st.f(len(m1)-1,len(m2)-1)
+print 1-f.cdf(F)
+\end{minted}
+
+\begin{verbatim}
+0.981334830069
+\end{verbatim}
+
+F daðýlýmý $n-1 ve $m-1$ serbestlik derecesine sahip. $ Üstteki p deðeri
+0.05'ten küçük deðildir, demek ki iki metotun ölçüm doðruluðunun ayný olduðu
+hipotezini reddedemiyoruz. Not: Örneklem standart sapma hesabý için $n-1$'e
+bölünme durumu var, bu bölüm kullanýlan $F$'in derecesine yansýyor tabii.
+
+Testin özünde þu var, ki varyansýn eþitsizliði oranýn 1'den ne kadar uzak
+olduðuna baðlý. Ama ne kadar uzak istatistiki olarak önemli bir uzaklýk? Ýþte
+bunun cevabýný F-daðýlýmý veriyor. 
+
+Örneklem Korelasyonu 
+
+Korelasyon $\rho$'yu daha önce gördük, tahmin edicisi $r$'dir, 
+
+$$ 
+\hat{\rho} = r = \frac{S_{xy}}{\sqrt{S_{xx}S_{yy}}} 
+\mlabel{1} 
+$$
+
+ki örneklem hesaplarý $S_{xx},S_{xy},S_{yy}$ 
+
+$$ S_{xx} = \sum _{i=1}^{n} (x_i-\bar{x})^2 $$
+
+$$ S_{xy} = \sum _{i=1}^{n} (x_i-\bar{x})(y_i-\bar{y}) $$
+
+$$ S_{yy} = \sum _{i=1}^{n} (y_i-\bar{y})^2 $$
+
+olsun; bu hesaplarýn teorik varyans ile olan baðlantýsý görülebilir. Eðer
+$X,Y$ iki deðiþkenli (bivariate) bir normal daðýlýmýndan geliyorsa, o zaman
+ortada bir regresyon varmýþ gibi gösterebiliriz
+
+$$ E(Y|X=x) = \beta_0 + \beta_1 x + \epsilon $$
+
+ki $\beta_1 = \sigma_Y / \sigma_X \cdot \rho$ olur. Detaylar için [4]. Soru þu, $r$ için bir  istatistiksel 
+önemlilik (significance) hesabý nasýl yapardýk? Yani, eðer $-1 \le r \le 1$
+iþe,  ve $r=0$ hiç korelasyon olmama durumu ise, acaba bu ``sýfýr olmama'' 
+durumunu test edebilir miydim? Evet. Yukarýdaki normallik faraziyesi doðru 
+ise $\beta_1 = 0$ olmama durumunu test etmek $\rho = 0$ olmama testi ile ayný, bu durumda
+
+$$ t_0 = \frac{\hat{\beta_1}}{\sqrt{ Var(\hat{\beta_1} ) }} $$
+
+gibi bir test istatistiði yaratýrýz, ki bu istatistik Öðrenci t daðýlýmýna
+sahip olurdu çünkü sýfýr hipotezi $\hat{\beta_1} = 0$, ve üstteki
+istatistik sýfýr hipotezi altýnda ile Öðrenci t daðýlýmýna sahip olmak
+zorundadýr, çünkü bölünen normal daðýlmýþ, bölen chi karenin karekökü
+olarak daðýlmýþ. Eðer $t_o$ hesabý veriye uygulandýktan sonra hipotezin
+öngördüðü daðýlýma uymaz ise, sýfýr hipotezini reddederiz. 
+
+Bu noktada lineer regresyon ile alakalý bilgiler devreye sokulabilir,
+[4]'den biliyoruz ki
+
+$$ Var(\hat{\beta_1}) = \frac{\sigma^2}{S_{xx}} $$
+
+$\sigma$ yerine örneklemden gelen $S$ kullanýrsak ve üstteki formüle koyarsak,
+
+$$ t_0 = \frac{\hat{\beta_1}}{\sqrt{S / S_{xx}}} $$
+
+Bu ifadeyi $r$ bazýnda ifade edebilir miyiz?  Deneyelim, $\hat{\beta_1} =
+S_{xy} / S_{xx}$ ve $r = \hat{\beta_1}\sqrt{\frac{S_{xx}}{S_{yy}}}$ olduðunu
+biliyoruz [4], ayrýca
+
+$$ S = \frac{SSE}{n-2}, \qquad SSE = S_{yy} - \hat{\beta_1} S_{xy} $$
+
+ki $SSE$ hata karelerinin toplamýdýr (sum of squared errors),
+
+$$ t_0 = \frac{  \sqrt{S_{xx}} \hat{\beta_1} \sqrt{n-2} }{\sqrt{SSE}} $$
+
+$$ = \frac{  \sqrt{S_{xx}} \hat{\beta_1} \sqrt{n-2} }{\sqrt{S_{yy} - \hat{\beta_1} S_{xy}}} $$
+
+Bölümün iki kýsmýný $\sqrt{S_y}$ ile bölelim, 
+
+$$ = 
+\frac{ \sqrt{S_{xx}/S_{yy}} \hat{\beta_1} \sqrt{n-2} }
+{\sqrt{1 - \hat{\beta_1} S_{xy}/S_{yy}}} 
+$$
+
+Bölünen kýsmýnda bir $r$ ortaya çýktý,
+
+$$ = 
+\frac{ r\sqrt{n-2} }
+{\sqrt{1 - \hat{\beta_1} S_{xy}/S_{yy}}} 
+$$
+
+Bölen kýsmýndaki $\hat{\beta_1}$ yerine $\hat{\beta_1} = S_{xy} / S_{xx}$
+koyarsak yine (1)'deki $r$ tanýmýna geliriz, ve alttaki basitleþtirilmiþ
+ifade ortaya çýkar,
+
+$$ t_o = \sqrt{\frac{(n-2)r^2}{(1-r^2)}} $$
+
+Bu istatistik $n-2$ derece serbestliðe sahip bir Öðrenci t daðýlýmýdýr. 
+
+Örnek
+
+Possum adý verilen bir tür hayvanýn diþilerinin tüm uzunluðu ve kafa ölçümü
+\verb!totlngth,hdlngth! deðiþkenleri arasýnda korelasyon olup olmadýðý
+merak edilmektedir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import scipy.stats
+
+def p_corr(df1, df2):
+    corr = df1.corr(df2)
+    N = np.sum(df1.notnull())
+    t = corr*np.sqrt((N-2)/(1-corr**2))
+    p = 1-scipy.stats.t.cdf(abs(t),N-2)  # one-tailed
+    return corr, t, p
+
+df = pd.read_csv('fossum.csv')
+c,tval, pval = p_corr(df.totlngth,df.hdlngth)
+print c, pval
+\end{minted}
+
+\begin{verbatim}
+0.779239322172 3.75045772216e-10
+\end{verbatim}
+
+p-deðeri çok küçük, demek ki korelason olmadýðý tezi reddedildi. Korelasyon
+var.
+
+Pearson Chi Kare Uyum Derecesi (Goodness-of-Fit) Testi
+
+Her sene günde kaç saat çalýþtýðýmýzý bir yere yazdýk diyelim, elde 365
+veri noktasý var. Ertesi sene yine ayný veriyi topladýk, þu soruyu
+soruyoruz, iki veri birbirinden istatistiki olarak farklý mýdýr?  Ya da;
+elimizdeki belli bir veri var, ve o verinin normal mi, ya da üstel
+(exponential) daðýlýmdan mý geldiðini merak ediyoruz. Acaba veri
+istatistiki olarak hangi {\em tip} daðýlým fonksiyona (yani teorik yoðunluk
+fonksiyonuna) daha yakýndýr? Ya da; eldeki bir verinin $\mu = 0$ merkezli
+normal daðýlýmdan mý, yoksa $\mu = 30$ merkezli normal daðýlýmdan mý
+geldiðini merak ediyoruz.
+
+Her üç sorunun ve benzerlerinin cevabý Pearson'un chi kare (chi square)
+uyum derece testi ile verilebilir. 
+
+Ýki veriyi karþýlaþtýrdýðýmýz durumda bu iki veri kümesini daðýlým olarak
+kabul edip, birini diðerine uyum açýsýndan test edebiliriz. Bu
+karþýlaþtýrma her iki tarafta histogram alýnýp histogram kutucuklarýnýn
+(bins) içine her iki tarafta düþen miktarlarýn bir test istatistiði
+üzerinden karþýlaþtýrýlmasý ile olabilir. Veri ile yoðunluk
+karþýlaþtýrdýðýmýzda ise veriyi histogram kutucuklarý, yoðunluðu ise ayný
+aralýklara düþen olasýlýklarýn fonksiyonel hesaplarýyla karþýlaþtýrýlmasý
+ile yaparýz. 
+
+Test istatistiði 
+
+Diyelim ki her kutucukta görülen miktar $N_i$, ki $N_1 + N_2 + .. + N_k =
+n$, ve karþýlaþtýrmak istediðimiz, bu miktara tekabül eden ``ideal''
+olasýlýk $p_i$, o zaman ideal miktar $n p_i$. Kutucuktaki sayýlarý bir
+binom daðýlýmýndan geliyormuþ gibi modelleyebiliriz, 1. kutucuk için mesela
+$N_1 \sim Bin(n,p_1)$, ve $N_1$ rasgele deðiþkeni $N$ tane deneyde
+``baþarýlý'' olan sayý - tipik binom kullanýmý. Bu durumda Pearson uyum
+derecesi istatistiði
+
+$$
+\chi^2 = \sum_{j=1}^{k} \frac{(N_j - np_j)^2}{np_j}
+$$
+
+ile belirtilir, üstteki toplamýn yaklaþýksal olarak $\chi^2_{k-1}$
+daðýlýmýna yaklaþtýðý ispatlanmýþtýr. Detaylar için [5, sf 318, 6]. Nihai
+ispat oldukça çetrefil, biz burada alternatif bazý yaklaþýksal ispatlardan
+bahsetmek istiyoruz (okkalý ispat için yukarýdaki referanslar geçerli
+tabii).
+
+Eðer her $N_j$ binom daðýlýmýný Gaussian ile yaklaþýkladýðýmýzý düþünürsek,
+ki bu yeterince büyük $n$, ve $np_i>5$ için mümkün, bu daðýlým $\mu=np_j$
+ve varyans $np_j(1-p_j)$'ye sahip olur, o zaman Gaussian'ý standardize
+etmek için
+
+$$ \frac{N_j-np_j}{\sqrt{np_j(1-p_j)}} \approx N(0,1) $$
+
+$Z=N(0,1)$ diyelim,
+
+$$
+\frac{(N_j - np_j)}{\sqrt{np_j} } \approx  \sqrt{(1-p_j)}Z
+$$
+
+Ýki tarafýn karesini alalým, ve her $j$ üzerinden toplam alalým,
+
+$$
+\sum_j \frac{(N_j - np_j)^2}{np_j} \approx \sum_j (1-p_j)Z^2
+$$
+
+Üstteki eþitliðin sol tarafý Pearson istatistiðiyle ayný. Sað tarafý neye
+eþit? 
+
+$$
+\sum_j (1-p_j)Z^2 =  (1-p_1)Z^2 + (1-p_2)Z^2 + ... + (1-p_k)Z^2 
+$$
+
+$$
+ =  Z^2 [(1-p_1) + (1-p_2) + ... + (1-p_k)]
+$$
+
+$$
+ =  Z^2 [k - (p_1+p_2+..+p_k))] = (k-1)Z^2 = \sum_{k-1} Z^2 
+$$
+
+Þimdi, bu eriþtiðimiz toplamýn $\chi^2_{k-1}$ daðýlýmý, yani $k-1$ derece
+serbestliði olan bir chi kare daðýlýmý olduðunu iddia edebilir miyiz? Eðer
+$Z_j$'ler birbirinden baðýmsýz ise kesinlikle evet, çünkü standart normal
+rasgele deðiþkenlerin toplamý chi kare daðýlýmýný verir. Üstteki kolay
+ispatýn önündeki tek engel budur, bizim burada yapacaðýmýz yaklaþýksal
+argüman $i,j$ ikilisi için $Z$'lerin baðlantýsýnýn, kovaryansýnýn küçük
+olduðudur, ki bu küçüklük sebebiyle $Z_j$'ler çoðu durumda baðýmsýz kabul
+edilebilir.
+
+Diyelim ki $X_1,X_2,..$ deðiþkenleri baðýmsýz ve $Mult(1,p)$, yani multinom 
+daðýlýmdan geliyorlar [7, sf. 180], ve $p = \left[\begin{array}{ccc} p_1 & p_2 &
+ \dots \end{array}\right]$, ve $\sum_j p_j = 1$. 
+Yani her $X_i$ zar attýðýnda $1 \times k$ boyutlu bir vektör ortaya çýkýyor, bu vektörün
+sadece bir hücresi 1 diðerleri 0. Multinom daðýlýmlarýn
+tanýmýndan biliyoruz ki $Cov(X_i,X_j) = -n p_ip_j = -p_ip_j$ (çünkü $n=1$). 
+
+Bu demektir ki 1'den küçük iki deðer çarpýlýyor bu daha da küçük bir deðer
+verecektir. Eðer $k$ yeterince büyük ise, bu, mesela sürekli yoðunluklarý
+ayrýksal olarak gösterdiðimiz durumda ve yeterince çok kutucuk var ise bu
+kutucuklara ``düþen'' olasýlýklarýn ufalmasý demektir, ve ufak deðerlerin
+çarpýmý iyice ufalýr, ki bu kovaryansý sýfýra yaklaþtýrýr. Yani yeterince
+büyük $k$ için $i,j$ baðlantýsýný sezgisel baðlamda etkisiz olduðunu
+görebiliriz. Tabii, toplamýn {\em kesinlikle} chi kare olduðunun ispatý
+için dediðimiz gibi verdiðimiz referanslara bakýlabilir. 
+
+Ýstatistiki testlerin mantýðýný hatýrlarsak, tarif edilen Pearson
+istatistiði sýfýr hipotezi. Bize reddetmeye uðraþacaðýmýz bir daðýlým /
+hesap ikilisi üretiyor. Eðer hesap beklenen, normal (sýfýr hipotez durumu)
+uymuyorsa, hipotezi reddediyoruz. Ret durumu özellikle seçiliyor çünkü
+kabul edilmezlik daha kesin bir cevap. 
+
+Örnek
+
+Bir paralý otoyolunda geçiþ noktasýnda durulmuþ ve her dakika gelen araç
+sayýlmýþ, ve dakika baþýna bu araç sayýsý yazýlmýþ. Bu deney 106 dakika
+süresince yapýlmýþ (elde 106 satýrlý bir veri var yani). Bu veri için
+Poisson daðýlýmýnýn uygun olup olmadýðýný yüzde 5 önemlilik seviyesinde
+ispatlamamýz isteniyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('vehicles.csv',header=None)
+\end{minted}
+
+Verinin histogramýna bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+f = plt.figure(); df.hist(bins=13)
+plt.savefig('stat_tests2_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_tests2_01.png}
+
+Poisson daðýlýmý muhtemel gözüküyor. Ama þimdi bunu uyum derece testi ile
+daha kararlý þekilde göstermeye uðraþacaðýz. Verideki sayýmlarý o sayým
+rakamý bazýnda gruplayalýp gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+kt = plt.hist(np.array(df),bins=range(20))
+kt = pd.DataFrame([kt[1],kt[0]]).T
+kt = kt[:-1] # sonuncu satiri at
+kt.columns = ['kac araba','kac kere']
+print kt
+\end{minted}
+
+\begin{verbatim}
+    kac araba  kac kere
+0           0         0
+1           1         0
+2           2         1
+3           3         3
+4           4         5
+5           5         7
+6           6        13
+7           7        12
+8           8         8
+9           9         9
+10         10        13
+11         11        10
+12         12         5
+13         13         6
+14         14         4
+15         15         5
+16         16         4
+17         17         0
+18         18         1
+\end{verbatim}
+
+Yani bir dakikada 6 araba sayýmý 13 kere yapýlmýþ (13 deðiþik dakikada).
+
+Bazý kutucuklarýn boþ olduðunu görüyoruz, bu durum özellikle tek tepeli
+(unimodel) daðýlýmlý verilerde etekleri temsil eden uçlardaki kutucuklarýn
+boþ olmasý sonucunu verebilir. Bu durumda o kutucuklarýn verisi daha dolu
+olanlara aktarabilmek için kutucuk noktalarýný tekrar tanýmlýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+bins = [0] + range(5,15) + [100]
+kt2 = plt.hist(np.array(df),bins=bins)
+kt2 = pd.DataFrame([kt2[1],kt2[0]]).T
+kt2.columns = ['int_low','n_i']
+print kt2
+\end{minted}
+
+\begin{verbatim}
+    int_low  n_i
+0         0    9
+1         5    7
+2         6   13
+3         7   12
+4         8    8
+5         9    9
+6        10   13
+7        11   10
+8        12    5
+9        13    6
+10       14   14
+11      100  NaN
+\end{verbatim}
+
+Þimdi bu deðerler üzerinden Pearson $\chi^2$ hesabýný yapalým. Ama ondan
+önce, hatýrlayalým, bu verinin {\em herhangi bir} Poisson'dan gelip
+gelmediðini kontrol ediyoruz, ama testimiz için parametresi belli olan,
+özel bir Poisson lazým, bunun için bize bir $\lambda$ gerekiyor. Önemli
+deðil, $\lambda$'nin tahmin edicisi $\hat{\lambda}$'yi biliyoruz,
+
+$$ \hat{\lambda} = \frac{1}{n} \sum _{j=1}^{n}x_j $$
+
+Bu $\hat{\lambda}$'yi kullanarak Poisson hesaplarýný yapabiliriz artýk. Bir
+kutucuða düþen Poisson olasýlýðýnýn hesabý $P(a \le X < b)$, ki bu basit
+bir $F(b)-F(a)$, yani $a,b$ noktalarýndaki kümülatif yoðunluk fonksiyonun
+farký üzerinden hesaplanabilir, altta kullanýlan çaðrý \verb!poisson.cdf!.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import poisson
+kt2['int_high'] = kt2.shift(-1).int_low
+lam = df.mean() # tahmin edici
+def f(x): 
+   high = poisson.cdf(x.int_high-1,lam)
+   low = poisson.cdf(x.int_low-1,lam)
+   return pd.Series(high-low)
+kt2['p_i'] = kt2.apply(f,axis=1)
+kt2['np_i'] = len(df) * kt2['p_i']
+kt2['chi'] = (kt2['n_i']-kt2['np_i'])**2 / kt2['np_i']
+kt2 = kt2[:-1]
+print kt2
+print '\nchi kare istatistigi', kt2.chi.sum()
+\end{minted}
+
+\begin{verbatim}
+    int_low  n_i  int_high       p_i       np_i       chi
+0         0    9         5  0.051863   5.497487  2.231492
+1         5    7         6  0.058217   6.171048  0.111352
+2         6   13         7  0.088242   9.353602  1.421508
+3         7   12         8  0.114643  12.152118  0.001904
+4         8    8         9  0.130325  13.814437  2.447271
+5         9    9        10  0.131691  13.959242  1.761849
+6        10   13        11  0.119764  12.695009  0.007327
+7        11   10        12  0.099016  10.495702  0.023412
+8        12    5        13  0.075040   7.954290  1.097248
+9        13    6        14  0.052496   5.564539  0.034078
+10       14   14       100  0.078703   8.342527  3.836608
+
+chi kare istatistigi 12.9740502104
+\end{verbatim}
+
+Þimdi üstteki deðerin istatistiki önem taþýyýp taþýmadýðýný anlamaya geldi
+sýra. Eþik deðerimiz $\chi^2_{9,0.05}$ olacak. Peki niye serbestlik
+derecesi 9 alýndý? Elde kaç tane kutucuk var? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print len(kt2), 'kutucuk'
+\end{minted}
+
+\begin{verbatim}
+11 kutucuk
+\end{verbatim}
+
+11-1=0 niye olmadý, -1 ile serbestlik derecesi hesaplamýyor muyduk?
+Evet. Fakat bir kavis daha var, tahmin edici ile $\lambda$'yi hesaplayýnca
+1 serbestlik derecesi daha kaybettik! $\chi_2$ ile çalýþýrken hatýrlanmasý
+gereken bilgilerden biri bu. Pearson bu testi keþfettiðinde aslýnda bu
+eksiltmeye gerek görmüyordu, daha sonralarý Fisher adlý istatistikçi bunun
+gerekli olduðunu ispatladý.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import chi2
+dof = len(kt2)-1-1 # lambda tahmini 1 derece kaybettirdi
+print 'serbestlik derecesi', dof
+print 'chi kare', chi2.ppf(0.95,dof)
+\end{minted}
+
+\begin{verbatim}
+serbestlik derecesi 9
+chi kare 16.9189776046
+\end{verbatim}
+
+Hesaplanan deðer üstteki deðerden küçük olduðu için Poisson hipotezi kabul
+edilmiþtir (ya da olmadýðý reddedilememiþtir, eðer p-deðeri hesaplasaydýk,
+0.05'den az sonuca bakacaktýk, ayný þey). 
+
+Chow Testi ve Yapýsal Kopma (Structural Break)
+
+Diyelim ki elimizdeki bir modelin bir verinin iki parçasýnda deðiþik
+sonuçlar verip vermeyeceðini merak ediyoruz. Önceki regresyon örneðinde
+bunu tek kesi ve deðiþken üzerinden gördük. Peki ya model daha çetrefil
+olsaydý?
+
+Bu durumda Chow Testini kullanabiliriz. Bu test daha önce gördüðümüz
+F-testini verinin iki parçasý üzerinde iþletir, modelin her iki parça
+üzerindeki SSE deðeri, yani hata karelerinin toplamý (sum of squared
+errors) üzerinden bir istatistik yaratýr. Sýfýr hipotezi katsayýlarýn iki
+bölgede ayný olduðudur, ve bunun irdelenmesi modelin her iki bölgedeki
+varyansýna bakýlarak yapýlýr. Tersi yönde kanýt var ise faraziyeyi
+reddederiz, ve iki bölgenin (en azýndan kullandýðýmýz model açýsýndan) çok
+farklý olduðu sonucuna varýrýz.
+
+F-testi için kýsýtlý (restricted), ve kýsýtlý olmayan (unrestricted) modeli
+tanýmlamak gerekiyor. Regresyonun her iki veri bölgesinde deðiþik deðerlere
+sahip olmasýna izin verirsek (yani regresyonu ayrý ayrý iki parça üzerinde
+iþletirsek) bu kýsýtlý olmayan demektir, eðer tüm veri üzerinde ayný
+regresyonu kullanýyorsak o zaman katsayýlar deðiþik bölgelere göre
+deðiþemezler, bu da kýsýtlý model olacaktýr. Getirdiðimiz kýsýtlama sayýsý
+regresyonun kullandýðý deðiþken sayýsýna eþittir. Eðer deðiþken sayýsý $k$
+veri nokta sayýsý $n$ iþe formül,
+
+$$ 
+F = \frac{SSE_r - (SSE_1 + SSE_2) / k}{(SSE_1 + SSE_2) / (n-2k)}
+ $$
+
+ki $SSE_1,SSE_2$ sýrasýyla 1. ve 2. bölgedeki hatalarýn kare toplamýdýr,
+$SSE_u = SSE_1 + SSE_2$, yani bölgelerin ayrý ayrý hesaplanan hata kare
+toplamýnýn toplamý kýsýtlý olmayan SSE'yi verir. $F$ rasgele deðiþkeni 
+$F_{k,n-2k}$ serbestlik derecesine sahip bir F daðýlýmýna
+sahiptir. Kiþislama $k$ çünkü ikinci bölgede $k$ kadar deðiþkenin deðiþik
+olmasýna izin vermedik.
+
+Örnek
+
+Kullanacaðýmýz veri Amerika'daki benzin tüketimi ile alakalý, bu veri
+içinde aslýnda iki farklý periyotu kapsýyor [8, sf. 209]. 1973'e kadar
+dünyada petrol böldü ve dünya petrol fiyatlarý ya stabil ya da düþüþ
+trendinde idi. Fakat 1973'teki ambargo piyasada büyük deðiþimlere sebep
+oldu, kýtlýk baþladý, fiyatlar yükseldi, ve karýþýklýk fazlalaþtý.
+
+Alttaki figürde benzin fiyatý (PG) ile kiþi baþýna tüketim (per capita
+consumption) grafikli, ve görüldüðü gibi 1973 öncesi piyasa oldukça stabil
+gidiyor (kýrmýzý noktalar) ama sonrasýnda iþler karýþýyor (mavi noktalar).
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(df[df.Year<=1973].G,df[df.Year<=1973].Pg,'r.')
+plt.xlabel('G'); plt.ylabel('PG')
+plt.plot(df[df.Year>1973].G,df[df.Year>1973].Pg,'b.')
+plt.savefig('stat_tests2_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_tests2_02.png}
+
+1973 ve 1980'deki fiyat zýplamalarý net bir þekilde görülüyor, ayrýca
+tüketimde de daha fazla deðiþkenlik / varyans mevcut. Eðer bu veriye bir
+model uydurmak isteseydik, ayný modelin iki ayrý bölgeye her deðiþken için
+ayný mükemmeliyette uymasýný beklemek hayalcilik olurdu.
+
+Test edeceðimiz model þöyle, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+model = 'Ln_G_Pop ~ Ln_Income_Pop + Ln_Pg + Ln_Pnc + Ln_Puc'
+\end{minted}
+
+Bu modeldeki fiyatlar \verb!G,Pnc,Puc!, sýrasýyla benzin, yeni araba ve
+kullanýlmýþ araba fiyatlarý. \verb!Ln_G_Pop!, \verb!G! ile \verb!Pop!
+(nüfus) bölünmesiyle elde ediliyor, ve \verb!Ln! notasyonumuz log iþlemi
+demek. \verb!Income! ülke geliri, o da \verb!Pop! ile bölünüyor ve log'u
+alýnýyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df['Ln_G_Pop'] = np.log(df.G/df.Pop)
+df['Ln_Income_Pop'] = np.log(df.Y/df.Pop)
+df['Ln_Pg'] = np.log(df.Pg)
+df['Ln_Pnc'] = np.log(df.Pnc)
+df['Ln_Puc'] = np.log(df.Puc)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(df.Year,df.Ln_G_Pop)
+plt.xlabel('Sene')
+plt.ylabel('Ln(G/Nufus)')
+plt.title('Amerika Benzin Tuketimi')
+plt.savefig('stat_tests2_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_tests2_03.png}
+
+Modeli tüm veri üzerinde iþletirsek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+res_r = smf.ols(model, data=df).fit()
+print res_r.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               Ln_G_Pop   R-squared:                       0.969
+Model:                            OLS   Adj. R-squared:                  0.965
+Method:                 Least Squares   F-statistic:                     243.2
+Date:                Thu, 12 Jan 2017   Prob (F-statistic):           6.25e-23
+Time:                        14:06:38   Log-Likelihood:                 79.913
+No. Observations:                  36   AIC:                            -149.8
+Df Residuals:                      31   BIC:                            -141.9
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+=================================================================================
+                    coef    std err          t      P>|t|      [95.0% Conf. Int.]
+---------------------------------------------------------------------------------
+Intercept        -7.7892      0.359    -21.679      0.000        -8.522    -7.056
+Ln_Income_Pop     2.1175      0.099     21.443      0.000         1.916     2.319
+Ln_Pg            -0.0979      0.028     -3.459      0.002        -0.156    -0.040
+Ln_Pnc            0.1224      0.112      1.092      0.283        -0.106     0.351
+Ln_Puc           -0.1022      0.069     -1.475      0.150        -0.243     0.039
+==============================================================================
+Omnibus:                        2.323   Durbin-Watson:                   0.891
+Prob(Omnibus):                  0.313   Jarque-Bera (JB):                1.281
+Skew:                           0.049   Prob(JB):                        0.527
+Kurtosis:                       2.081   Cond. No.                         319.
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+\end{verbatim}
+
+Þimdi her iki parça üzerinde ayrý ayrý regresyon iþletelim, ki parçalarý
+1973 deðeri üzerinden oluþturacaðýz, bu bildiðimiz bir deðer ve bir anlamda
+bu deðerin gerçekten bir kopuþ noktasý olup olmadýðýný test etmek
+istiyoruz, ve ardýndan Chow testi için gerekli deðerleri hesaplýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df_x = df[['Ln_Income_Pop','Ln_Pg','Ln_Pnc','Ln_Puc']]
+df_y = df['Ln_G_Pop']
+
+print len(df[df.Year<=1973]), len(df[df.Year>1973])
+res1 = smf.ols(model, data=df[df.Year<1974]).fit()
+res2 = smf.ols(model, data=df[df.Year>=1974]).fit()
+S_1 = np.sum(res1.resid**2)
+S_2 = np.sum(res2.resid**2)
+S_r = np.sum(res_r.resid**2)
+print 'S 1 =', S_1
+print 'S 2 =', S_2
+print 'S_r =', S_r
+print 'N =', len(df)
+k = df_x.shape[1]
+tmp1 = (S_r-(S_1+S_2))/k
+tmp2 = (S_1+S_2)/(len(df)-2*k-1)
+F = tmp1/tmp2
+print 'F =', F
+
+import scipy.stats as st
+f = st.f(k,len(df)-2*k-1)
+print 'p degeri =', 1-f.cdf(F)
+\end{minted}
+
+\begin{verbatim}
+14 22
+S 1 = 0.00256733994753
+S 2 = 0.00491175470666
+S_r = 0.024873436262
+N = 36
+F = 15.6986655847
+p degeri = 9.40286063456e-07
+\end{verbatim}
+
+Hesaplanan p deðeri çok küçük, ve 0.05'ten daha az, demek ki hipotez
+reddedildi. Demek ki hakikaten 1973'te bir deðiþim olmuþ!
+
+Deðiþim Noktasýný Bulmak
+
+Eðer deðiþim aný 1973'ü bilmeseydik onu nasýl ortaya çýkartýrdýk? Bir
+yaklaþýma göre [5] tüm seneleri teker teker deneyerek Chow testini ardý
+ardýna iþletebilirdik ve elde edilen en büyük F deðeri bize deðiþim
+noktasýný verirdi. Bu kodu iþletirsek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+from numpy.linalg import pinv
+def supf(y, x, p):
+    N = y.shape[0]
+    range = np.floor(np.array([N * p, N * (1 - p)]))
+    range = np.arange(range[0], range[1] + 1, dtype=np.int32)
+    x = x - np.mean(x)
+    y = y - np.mean(y)
+    e = smf.OLS(y,x).fit().resid
+    S_r = np.sum(e**2)
+    k = x.shape[1]
+    print 'N =',N
+    print 'k =',k
+    print 'N-k =',N-k
+    F_stat = np.zeros(N)
+    for t in range:
+        X1 = x[:t]
+        X2 = x[t:]
+        e[:t] = smf.OLS(y[:t],X1).fit().resid
+        e[t:] = smf.OLS(y[t:],X2).fit().resid
+        R2_u = 1 - e.dot(e) / y.dot(y)
+        S_u = np.sum(e**2)
+        F_stat[t] = ((S_r - S_u) / k) / (( S_u) / (N-2*k))
+    return F_stat.argmax(),F_stat.max()
+    
+p = 0.2
+
+idx,val = supf(df_y, df_x, p)
+print idx,val
+print 'Sene', df.Year[idx]
+\end{minted}
+
+\begin{verbatim}
+N = 36
+k = 4
+N-k = 32
+14 3.9049721931
+Sene 1974
+\end{verbatim}
+
+Not: Sene aramasý için baþtan ve sonda bir kýsým veri atlandý, ki her iki
+parça için elde yeterli veri olabilsin. 
+
+Not: \verb!lmfit! hakkýnda bazý tavsiyeler için bkz [12] yazýsý.
+
+Sonucu 1974 olarak bulduk. Fena deðil!
+
+
+Kaynaklar
+
+[1] Hill, {\em Principles of Econometrics}
+
+[2] Uriel, {\em Introduction to Econometrics, Lecture}
+
+[3] Haslwanter, {\em Introduction to Statistics Using Python}
+
+[4] Wackerly, {\em Mathematical Statistics, 7th Edition}
+
+[5] Soong, {\em Fundamentals of Probability and Statistics for Engineers}
+
+[6] OCW MIT, {\em Statistics for Applications, 18.443}
+
+[7] Hunter, {\em Asymptotics for Statisticians}
+
+[8] Steiger, {\em Correlation and Regresion, Lecture Notes}
+
+[9] Sheppard, {\em Introduction to Python for Econometrics}
+
+[10] Greene, {\em Econometric Analysis}
+
+[11] Uriel, {\em Introduction to Econometrics}
+
+[12] Bayramli, Istatistik, {\em Gayri Lineer Regresyon, Petrol Tepe Noktasý}
+
+\end{document}

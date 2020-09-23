@@ -1,0 +1,267 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Paralel Rasgele Ýzdüþümü
+
+Rasgele yansýtma tekniði $m \times b$ boyutunda bir matrisi $n \times k$
+boyutunda ve her hücresinde $N(0,1)$ daðýlýmýndan gelen bir sayý içeren
+matris ile çarpmak sonunda elde edilir. Böylece ana veri matrisi
+"yansýtýlmýþ" olur, boyut azaltmak için çok kullanýþlý bir tekniktir, çünkü
+elde edilen matrisin ana matris $A$'nin "menzilini" iyi temsil ettiði
+ispatlanmýþtýr. Daha fazla detay için bkz [1] yazýsý.
+
+Eþle/indirge ortamýnda rasgele yansýtma için önce [2] adlý yazýya da bakmak
+gerekebilir. Bu yazýda iki matris arasýndaki çarpýma "satýr bakýþý" bizim
+için gerekli. Çünkü çarpýmýn solunda $m \times n$ boyutundaki matrisin
+verileri bize satýr satýr geliyor, yani her $m$ satýrdan sadece bir
+tanesine bakarak iþlem yapýyoruz. Faraziyemiz $n$'in de büyük olabilmesine
+raðmen en azýndan $n$ tane veri noktasýný tek bir makinada
+iþleyebileceðimiz.
+
+Satýr bakýþýna dönersek, bu çarpým görüþüne göre soldaki her satýr
+için, o satýrdaki bir öðeyi saðda ona tekabül eden $n \times k$
+boyutundaki matrisin satýrýyla (yani her gelen satýrýn 5. öðesi
+saðdaki matrisin 5 satýrýn tamamý ile) çarpýp, sonuç olan "çarpýlmýþ"
+satýrlarý birbiriyle topluyoruz. Bu Hadoop veri iþleme mentalitesine
+uygun çünkü her seferinde $A$'nin tek bir satýrýna bakýyoruz.
+
+Saðdaki rasgele sayýlar içeren matris kritik. Biz bu matrisi bellekte
+tut\textbf{ma}maya karar verdik, çünkü $n$ sayýsý da büyük olabilir, her
+ne kadar $k$ küçük olsa da (çoðunlukla 100 civarý) yine de bu kadar
+belleði eðer mümkün ise israf etmemek en iyisi.
+
+\includegraphics[height=6cm]{proj.png}
+
+Eðer bellekte tutmuyorsak rasgele matrisin deðerlerini (sadece
+ilgilendiðimiz öðe için, tüm matrisi deðil) her seferinde tekrar
+üretmek gerekir. Hýz açýsýndan performans çok kötü olmayacaktýr, çünkü
+rasgele sayý üretimi toplama, çarpma, $mod$ gibi direk matematiksel
+hesaplar ile yapýlýr.
+
+Fakat burada önemli bir diðer konu þudur: her $A$ satýrý için {\em ayný}
+rasgele matris (öðelerini) ayný þekilde üretebilmeliyiz.
+
+Bu problemin en basit çözümü rasgele sayý üretimi için tohum (seed)
+kullanýmýdýr. Eðer tohum kullanýlmazsa, Python \verb!random!
+paketindeki üretici çaðrýlar günün zamanýna göre bir tohum
+kullanýrlar, ve böylece her çaðrý deðiþik bir sayý üretmiþ olur (çünkü
+komut iþletildiði her seferinde günün zamaný deðiþiktir). Fakat
+rasgele sayý üretimini, "her seferinde ayný þekilde" yaptýrmanýn yolku
+vardýr, bunun için tohum dýþarýdan set edilir ve böylece ayný tohumdan
+baþlayan rasgele sayý üretim zinciri hep ayný olur. Rasgele sayý
+üretimi deterministik bir algoritmadýr, zaten literatürde bu iþlem
+"yarý rasgele sayý üretimi (pseudorandom number generation)" olarak
+geçer.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import random
+
+# tohumsuz, bu kod her seferinde degisik sayi uretir
+print random.gauss(0,1), random.gauss(0,1)
+print random.gauss(0,1), random.gauss(0,1)
+\end{minted}
+
+\begin{verbatim}
+-0.49078710907 1.97156772689
+-0.612135407803 -0.0159405924623
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import random
+# tohumlu
+random.seed(100000)
+print random.gauss(0,1), random.gauss(0,1)
+random.seed(100000)
+print random.gauss(0,1), random.gauss(0,1)
+\end{minted}
+
+\begin{verbatim}
+1.46560757321 0.974749135866
+1.46560757321 0.974749135866
+\end{verbatim}
+
+Üstteki kodda ayný tohumu verince arka arkaya üretilen iki (daha fazla
+da olabilirdi) "rasgele" sayýnýn hep ayný olduðunu görüyoruz.
+
+Rasgele "matrise" dönersek, eðer bu matrisin her $A$ veri satýrý için
+hücre deðerlerinin ayný þekilde üretilmesini istiyorsak, tohum
+kullanmalýyýz. Tohum deðeri ne olacak? Bu deðer mesela $n \times k$
+boyutundaki rasgele matris için indis deðerleri yanyana koyularak
+üretilebilir, mesela 111. satýr ve 2. kolon için 1112 tohum deðeri
+kullanýlýr, ve bu tohumla tek bir rasgele sayý üretilir, (111,2)
+hücresine konulur ve sonraki indis için yeni bir tohum
+kullanýlýr. Evet üst üste çakýþmalar olabilir tabii ki, mesela
+11. satýr 12. kolon da üstteki tohumla ayný sonucu getirir, ama bu tür
+nadir çakýþmalar o kadar önemli deðil, sonuçta rasgele sayýlarla
+uðraþýyoruz, "yeterince raslantýsal olmalarý" kafi.
+
+Altta bu veri matrisini satýr satýr çarpýp yansýtýlmýþ yeni bir
+matrisi üreten mrjob programýný bulabilirsiniz.
+
+\inputminted[fontsize=\footnotesize]{python}{mrproj.py}
+
+Tek bir eþle çaðrýsý var, çünkü çarpým iþlemi oldukça basit, indirgeme
+iþlemine gerek yok.
+
+Çýktý için yield ile yayýnladýðýmýz (emit) satýrlarda anahtar
+kullanmýyoruz, yani verinin paralel iþlenirken nasýl yük daðýtýmý
+yapýldýðýna göre sonuç matrisinin sýrasý ana matrisin satýr sýrasýna
+uymayabilir. Fakat satýr sýrasý bizim için çoðunlukla önemli olmuyor
+(kolon sýrasý önemli), çünkü genelde, her satýr, diðerinden ayrý /
+baðýmsýz bir veri ölçümünü temsil eder çoðunlukla. Eðer zamansal bir
+boyut var ise, bazý þeyler arka arkaya iþlenmeliyse, o bilgi ayrý bir
+kolon (mesela tarih, zaman damgasý -timestamp-) olarak veride
+bulunurdu.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python mrproj.py A_matrix > /tmp/out
+\end{minted}
+
+\begin{verbatim}
+using configs in /home/burak/.mrjob.conf
+creating tmp directory /tmp/mrproj.burak.20131203.094548.254606
+writing to /tmp/mrproj.burak.20131203.094548.254606/step-0-mapper_part-00000
+Counters from step 1:
+  (no counters found)
+Moving /tmp/mrproj.burak.20131203.094548.254606/step-0-mapper_part-00000 -> /tmp/mrproj.burak.20131203.094548.254606/output/part-00000
+Streaming final output from /tmp/mrproj.burak.20131203.094548.254606/output
+removing tmp directory /tmp/mrproj.burak.20131203.094548.254606
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!head -10 /tmp/out
+\end{minted}
+
+\begin{verbatim}
+20.2369671373,13.9358970644,0.524561578258
+19.8581349841,13.7724732852,5.23992858318
+27.6790861925,18.8833585029,-1.56199395804
+9.3255498646,7.52383094482,2.58977793605
+27.3677257439,33.0438553532,18.4819155509
+27.6790861925,18.8833585029,-1.56199395804
+9.3255498646,7.52383094482,2.58977793605
+27.3677257439,33.0438553532,18.4819155509
+27.6790861925,18.8833585029,-1.56199395804
+9.3255498646,7.52383094482,2.58977793605
+\end{verbatim}
+
+Performans Ýyileþtirmeleri
+
+Üstteki kod daha hýzlý olabilir. Diyelim ki $n$'in milyonlarda olduðu
+þartlarý da hýzlý bir þekilde iþleyebilmek istiyoruz. Fakat bu noktada
+kendimize þu soruyu sormamýz gerekir: hangi þartlarda $n$ milyonlarý
+bulacaktýr?
+
+Büyük bir ihtimalle bu durum eðer bolca kategorik veri boyutu var ise
+ortaya çýkar. Kategorik verileri bildiðimiz gibi 1-in-n, ya da 1-hot
+kodlama (encoding) ile temsil ediyoruz, bu demektir ki 1000 tane
+farklý deðer içerebilen tek bir kolon, 1000 tane yeni kolon haline
+geliyor. Bazý boyutlarýn (mesela web sayfa ismi, URL deðeri) taþýyan
+veri setlerinde özgün (unique) deðerlerin milyonlar hatta milyara
+varabileceðini düþünürsek aþýrý yüksek $n$ rakamlarýnýn nereden
+geldiðini anlarýz.
+
+Ama bunun bize ek bir faydasý var: 1-in-n kodlamasý var ise, bu her
+satýrda çok fazla sýfýr olacak demektir, ve içinde çok sýfýrý olan
+vektörleri / matrisleri seyrek matrisler ile çok rahat þekilde temsil
+edebiliriz.
+
+\inputminted[fontsize=\footnotesize]{python}{mrprojs.py}
+
+Üstteki kodda her satýrý okur okumaz hemen onu bir seyrek matrise
+çeviriyoruz. Þimdi en kritik numara: \verb!itertools.izip!
+çaðrýsý ile bu seyrek matrisin {\em sadece sýfýr olmayan deðerlerini
+ziyaret ediyoruz}. Eðer 1000 tane kolon var ise, ama bu 1000
+kolonun 20 tanesi dolu ise, bu 50 kat bir performans iyileþtirmesi
+saðlayacak demektir (bu arada seyrek verilerde yüzde 2 doluluk gayet
+normal bir rakamdýr). Sadece dolu hücreleri ziyaret ediyoruz, ayrýca
+\verb!izip! bu dolu hücrelerin indis deðerlerini de bize geri
+getiriyor, biz de bu deðerleri \verb!seed! için önceden olduðu
+gibi kullanýyoruz. Bir diðer ilerleme $K$ tane rasgele sayýyý bir
+kerede üretiyoruz, ve tohum ayarlamasýný bir kere, dýþ döngü baþýnda
+gerçekleþtiriyoruz. 
+
+Sonuçlara bakalým:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python mrprojs.py A_matrix > /tmp/out
+!head -10 /tmp/out
+\end{minted}
+
+\begin{verbatim}
+using configs in /home/burak/.mrjob.conf
+creating tmp directory /tmp/mrprojs.burak.20131203.094635.908870
+writing to /tmp/mrprojs.burak.20131203.094635.908870/step-0-mapper_part-00000
+Counters from step 1:
+  (no counters found)
+Moving /tmp/mrprojs.burak.20131203.094635.908870/step-0-mapper_part-00000 -> /tmp/mrprojs.burak.20131203.094635.908870/output/part-00000
+Streaming final output from /tmp/mrprojs.burak.20131203.094635.908870/output
+removing tmp directory /tmp/mrprojs.burak.20131203.094635.908870
+20.4375200961,1.09117093744,-9.27846872665
+13.2830062024,-0.654868464606,-9.66445859893
+26.4299520755,0.628144156713,-14.4142094864
+9.52053667131,0.337287636006,-3.17826479151
+34.6111912648,-0.763663777689,-2.06399979621
+26.4299520755,0.628144156713,-14.4142094864
+9.52053667131,0.337287636006,-3.17826479151
+34.6111912648,-0.763663777689,-2.06399979621
+26.4299520755,0.628144156713,-14.4142094864
+9.52053667131,0.337287636006,-3.17826479151
+\end{verbatim}
+
+Daha önceki sonuçlar ile ayný (rasgelelik var ama \verb!seed!
+deðerleri deðiþmedi, o sebeple ayný sonucu aldýk, bu iyi).
+
+Bir kontrol daha var, eðer rasgelelik bazlý yansýtma iyi yapýldýysa, $A$
+matrisini izdüþümünü aldýktan daha önce anlattýðýmýz teknik ile SVD
+hesabýný çok rahat bir þekilde yapabilmeliyiz. Bunun için izdüþümünü
+\verb!/tmp/Y! içine yazacaðýz, ve ardýndan daha önceki QR bazlý
+teknikle SVD hesabýný yapacaðýz. Ardýndan pür SVD ile $A$'yi iþleyeceðiz ve
+sonuç $U$ matrisindeki en büyük iki eþsiz (singular) deðeri her iki
+teknikten alýp ekranda grafikleyeceðiz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python mrprojs.py A_matrix > /tmp/Y
+\end{minted}
+
+\begin{verbatim}
+using configs in /home/burak/.mrjob.conf
+creating tmp directory /tmp/mrprojs.burak.20140104.064956.493025
+writing to /tmp/mrprojs.burak.20140104.064956.493025/step-0-mapper_part-00000
+Counters from step 1:
+  (no counters found)
+Moving /tmp/mrprojs.burak.20140104.064956.493025/step-0-mapper_part-00000 -> /tmp/mrprojs.burak.20140104.064956.493025/output/part-00000
+Streaming final output from /tmp/mrprojs.burak.20140104.064956.493025/output
+removing tmp directory /tmp/mrprojs.burak.20140104.064956.493025
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+
+n = 4; k = 3
+A = np.loadtxt('A_matrix')
+Y = np.loadtxt("/tmp/Y",delimiter=',')
+
+Q, xx = lin.qr(Y)
+B = np.dot(Q.T,A)
+Uhat, Sigma, V = lin.svd(B)
+U = np.dot(Q, Uhat)
+
+plt.plot(U[:,0],U[:,1],'r+')
+plt.hold(True)
+
+U, Sigma, V = lin.svd(A);
+plt.plot(U[:,0],U[:,1],'bx')
+plt.savefig('rnd_1.png')
+\end{minted}
+
+\includegraphics[height=5cm]{rnd_1.png}
+
+Sonuçlar fena deðil.
+
+Kaynaklar
+
+[1] Bayramli, Lineer Cebir, {\em Rasgele Ýzdüþümü ile SVD}
+
+[2] Bayramli, Lineer Cebir, {\em Matris Çarpýmý, Ders 1}
+
+\end{document}

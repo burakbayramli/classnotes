@@ -1,0 +1,92 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Kalýcý CD (Persistent Contrastive Divergence -PCD-)
+
+Kýsýtlý Boltzman Makinalarý (RBM) yazýsýnda gösterilen eðitim CD
+(contrastive divergence) üzerinden idi. Amaç alttaki formülde, özellikle
+eksiden sonraki terimi yaklaþýksal olarak hesaplamaktýr. 
+
+$$ 
+\sum_{n=1}^{N}  < y_iy_j >_{P(h|x^n;W)} - < y_iy_j >_{P(x,h;W)} 
+$$
+
+Bu terime basýnda eksi olduðu için negatif parçacýklar (negatýve partýcles)
+ismi de veriliyor. 
+
+Þimdi RBM'de gördüðümüz CD'yi hatýrlayalým, CD bir tür ``tek adýmlýk Gibbs
+örneklemesi'' yapýyordu; bu tek adým örnekleme sonrasýnda bir sonraki adým
+öncesi, veri, tekrar baþlangýç noktasý olarak zincire veriliyordu. Yani her CD
+adýmýnýn baþlangýcý illa ki verinin kendisi olacaktýr. Bu usul Gibbs'in veriden
+uzaklaþma þansý çok azdýr. Fakat çoðu ilginç yapay öðrenim verisi çok dorukludur
+(multimodal), optimizasyon baðlamýnda düþünülürse birden fazla tepe (ya da
+çukur) noktasý içerir. Eðer eldeki veri, eðitimi bu noktalara yeterince kanalize
+edemiyorsa o noktalar öðrenilmemiþ olur. Bazen verinin (bile) söylediðinden
+deðiþik yönleri gezebilen bir prosedür bu çokdoruklu alaný gezmesi açýsýndan
+daha baþarýlý olabilecektir.
+
+PCD bu eksikleri düzeltmeye çabalar. PCD'ye göre modelden gelen ``negatif
+parçacýklarýn'' örneklemesi arka planda, kendi baþlarýna ilerler, ve bu
+zincir hiçbir zaman veriye, ya da baþka bir þeye set edilmez (hatta
+zincirin baþlangýç noktasý bile veriden alakasýz olarak, rasgele
+seçilir). Bu yönteme göre $h^0,x^0, h^1, x^1, ...$ üretimi neredeyse
+tamamen ``kapalý devre'' kendi kendine ilerleyen bir süreç olacaktýr. Diðer
+yanda pozitif parçacýklar veriden geliyor (ve tabii ki her gradyan adýmý
+sonrasý deðiþen $W$ hem pozitif hem negatif parçacýklarý etkiler), ve bu
+al/ver iliþkisi, hatta bir bakýma model ile verinin kapýþmasýnýn PCD'yi
+daha avantajlý hale getirdiði iddia edilir, ki PCD, CD'den genellikle daha
+iyi öðrenim saðlar [5].
+
+CD'ye kýyasla PCD'nin Gibbs ya da genel olarak MCMC örneklemesinin
+prensibine daha yakýn durduðu iddia edilebilir, çünkü PCD ile bir örneklem
+zinciri kesintisiz olarak devam ettirilir. 
+
+\inputminted[fontsize=\footnotesize]{python}{rbmp.py}
+
+Üstte görülen kod daha önce RBM için kullanýlan kodla benzeþiyor, sadece
+\verb!fit! deðiþik, ve \verb!_fit! eklendi. Bu kodda miniparça (minibatch)
+kavramý da var, her gradyan adýmý ufak verinin mini parçalarý üzerinden
+atýlýr. Bu parçalar hakikaten ufak, mesela 10 ila 100 satýrlýk veri
+arasýndadýrlar ve bu ilginç bir durumu ortaya çýkartýr, özellikle negatif
+parçacýklar için, ki bu parçacýklar $W$ baðlantýsý haricinde kendi baþlarýna
+ilerler, çok az veri noktasý ile iþlem yapabilmektedirler.
+
+Metot \verb!fit! içinde \verb!self.h_samples_! deðiþkenine dikkat, bu
+deðiþken PCD'nin ``kalýcý'' olmasýný saðlar, her \verb!_fit! çaðrý sonrasý
+negatif parçacýk örneklemesi \verb!self.h_samples_! 'in býraktýðý yerden
+baþlar.
+
+RBM için kullandýðýmýz ayný veri seti üzerine k-katlama ile test edelim,
+
+\inputminted[fontsize=\footnotesize]{python}{test_rbmkfold.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+! python test_rbmkfold.py
+\end{minted}
+
+\begin{verbatim}
+0.989898989899
+\end{verbatim}
+
+Daha çetrefil bir veri seti MNIST veri setine [2] bakalým. Veri 28x28
+boyutunda ikisel veri olarak kodlanmýþ rakamlarýn el yazýsýndan alýnmýþ
+resimlerini içerir. Veri seti ünlü çünkü Derin Öðrenim'in ilk büyük
+baþarýlarý bu veri seti üzerinde paylaþýldý. MNIST'i aldýktan sonra eðitim
+/ test kýsýmlarýnýn ilk 1000 tanesi üzerinde algoritmamýzý kullanýrsak, tek
+komþulu KNN (yani 1-NN) yüzde 85.4 baþarý sonucunu verir. Alttaki
+parametreler üzerinden PCD ile RBM'in baþarýsý yüzde 86 olacaktýr.
+
+\inputminted[fontsize=\footnotesize]{python}{test_mnist.py}
+
+Kaynaklar
+
+[1] Tieleman, {\em Using Fast Weights to Improve Persistent Contrastive Divergence},\url{http://videolectures.net/icml09_tieleman_ufw/}
+
+[2] Montreal Institute for Learning Algorithms, {\em MNIST Data}, \url{http://www.iro.umontreal.ca/~lisa/deep/data/mnist/mnist.pkl.gz}
+
+[3] Bengio, Y., {\em Learning Deep Architectures for AI}
+
+[4] Larochelle, H., {\em Neural networks [5.6] : Restricted Boltzmann machine - persistent CD},  \url{https://www.youtube.com/watch?v=S0kFFiHzR8M}
+
+[5] Murphy, K. {\em Machine Learning A Probabilistic Perspective}
+
+\end{document}

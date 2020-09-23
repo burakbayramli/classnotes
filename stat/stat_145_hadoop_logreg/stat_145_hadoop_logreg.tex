@@ -1,0 +1,149 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Paralel Lojistik Regresyon, Eþle/Ýndirge
+
+Lojistik regresyon kodunu eþle-indirge (map-reduce) üzerinden paralelize
+etmek için literatüre [1-7] bakýnca, genel yaklaþýmýn makinalara bölünen
+veri parçalarý üzerinde ayrý ayrý gradyan çýkýþýnýn (gradient aþçent)
+iþletilmesi ve sonuç $\theta$'larýn son bir makinada ortalamasýnýn alýnmasý
+olduðunu görürüz.
+
+Daha önceki lojistik regresyon yazýmýzda iki farklý gradyan çýkýþ
+algoritmasi görmüþtük. Bu algoritmalardan kullanacaðýmýz daha basit olaný,
+her döngüde alpha'yý deðiþtiren versiyon deðil tek alpha kullanan, ve kod
+içinde zar atan deðil, veriyi sýrayla iþleyen. Bunun birkaç sebebi var,
+öncelikle altta göreceðimiz üzere veriyi Hadoop'a vermeden önce kendimiz
+karýþtýracaðýz, yani kod içinde zar atmaya gerek kalmayacak. Ýkincisi pek
+çok makinada iþlem yapýldýðý için tek bir sabit üzerinden azaltma yapmak
+mümkün deðil (fakat her iþleyicinin -deðiþmeyen- kendine has / ayrý bir
+sabiti olabilir, bu konuyu ileride iþleyebiliriz), bu sebeple ve basitlik
+amacýyla tek sabitli kod kullanýldý. Ayrýca artýk döngü (iterasyon) yok,
+yani veri baþtan sona bir kez tarandý mý, o makinanýn iþlemi bitecek. Fakat
+büyük veri ortamýnda (ki zaten onun için Hadoop kullanýyoruz herhalde)
+elimizde o kadar çok veri olacak ki bu verinin tamamýný iþleyince zaten
+100,200 kere döngüyü iþletmek ile ayný etkiyi almýþ oluyoruz.
+
+Örnek veri olarak alttakini ürettik,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from pandas import *
+mean1 = [10,10]
+mean2 = [20,20]
+cov = [[5,0],[0,5]]             
+d1 = DataFrame(np.random.multivariate_normal(mean1,cov,10000))
+d2 = DataFrame(np.random.multivariate_normal(mean2,cov,10000))
+d1['labels'] = 1
+d2['labels'] = 0
+data = DataFrame(np.vstack((d1,d2)))
+data.to_csv("testSet.txt",sep='\t',index=None,header=None)
+print data[:4]
+\end{minted}
+
+\begin{verbatim}
+           0          1  2
+0  10.287025  11.158653  1
+1   7.390719  12.214295  1
+2  11.720941   8.711403  1
+3  11.543380  11.627805  1
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(d1.ix[:,0],d1.ix[:,1],'b.')
+plt.hold(True)
+plt.plot(d2.ix[:,0],d2.ix[:,1],'r.') %
+plt.hold(True)
+plt.savefig('logreg1.png')
+\end{minted}
+
+\includegraphics[height=6cm]{logreg1.png}
+
+Altta veriyi iþletmeden önce kendimiz karýþtýrýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!sort --random-sort testSet.txt > /tmp/testSet1.txt
+\end{minted}
+
+\inputminted[fontsize=\footnotesize]{python}{logreg.py}
+
+Üstte eþleyici içinde tek bir tane anahtar üretiyoruz, tüm makinalarda tüm
+eþleyiciler ayný anahtarý, bir kez üretiyor olacaklar. Bunun sebebi nedir?
+Ne yapmaya çalýþtýðýmýzý hatýrlayalým, tüm makinalarda lojistik regresyon
+iþletiyoruz, gradyan çýkýþý yapýyoruz, ve sonuçta o makinanýn iþi bitince
+elimizde tek bir tane aðýrlýk vektörü yani theta olacak. Ýlgilendiðimiz
+sonuç bu, o yüzden çýktý stdout'a tek bir satýr yazýlýyor. Peki niye ayný
+anahtar? Çünkü her makinadaki tüm aðýrlýk vektörlerinin "hep beraber" bir
+noktada ortalamasýnýn alýnmasýný istiyoruz, bunu Hadoop'a yaptýrmanýn bir
+yolu herkese ayný anahtarý kullandýrtmak, böylece bu anahtarlar tek bir
+indirgeyiciye (ve makinaya) gidecek, ve orada ortalamalarý alýnacak. Tüm
+eþleyicilerin sonucunun tek bir indirgeçiye gitmesi performans problemi
+çýkartmaz mý? Çýkmaz, çünkü 1000 tane, 10000 tane eþleyici paralel iþ
+yapmýþ olabilir, ama iþleri bitince elimizde 1000,10000 tane aðýrlýk
+vektörü olacak, ve bu zaten tek makinanýn rahatlýkla baþa çýkabileceði bir
+yüktür.
+
+Bu yaklaþým, eþleyicinin her veri satýrý baþýna bir ya da daha fazla
+anahtar-deðer satýrý ürettiði yaklaþýmdan (mesela klasik kelime sayma
+problemi) biraz farklý, o sebeple bu farklýlýðý belirtmek istedik.
+
+Bir püf nokta, her veri satýrý için iþletilen map'e de aslýnda anahtar
+ürettirmiyoruz, tüm map çaðrýlarý bittikten sonra son bir kez çaðýrýlacak
+map\_final'a bu iþi yaptýrýyoruz. Oraya gelinceye kadar (map içinde) deðiþen
+theta'yý sürekli hafýzada tutmuþuz, son noktaya gelince o sonucu ayný
+anahtar ile eþleyerek üretiyoruz ve iþ bitiyor.
+
+Komut satýrýndan iþletelim:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python logreg.py /tmp/testSet1.txt 
+\end{minted}
+
+\begin{verbatim}
+using configs in /home/burak/.mrjob.conf
+creating tmp directory /tmp/logreg.burak.20131201.234703.391390
+writing to /tmp/logreg.burak.20131201.234703.391390/step-0-mapper_part-00000
+Counters from step 1:
+  (no counters found)
+writing to /tmp/logreg.burak.20131201.234703.391390/step-0-mapper-sorted
+> sort /tmp/logreg.burak.20131201.234703.391390/step-0-mapper_part-00000
+writing to /tmp/logreg.burak.20131201.234703.391390/step-0-reducer_part-00000
+Counters from step 1:
+  (no counters found)
+Moving /tmp/logreg.burak.20131201.234703.391390/step-0-reducer_part-00000 -> /tmp/logreg.burak.20131201.234703.391390/output/part-00000
+Streaming final output from /tmp/logreg.burak.20131201.234703.391390/output
+"result"	"[[ 9.50705297]\n [-0.32580375]\n [-0.31237616]]"
+removing tmp directory /tmp/logreg.burak.20131201.234703.391390
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def plot_theta(theta):
+    x = np.array(arange(-10.0, 40.0, 0.1))
+    y = np.array((-theta[0]-theta[1]*x)/theta[2])
+    plot(x, y)
+    hold(True)
+    plot(d1.ix[:,0],d1.ix[:,1],'b.')
+    hold(True)
+    plot(d2.ix[:,0],d2.ix[:,1],'r.')
+    hold(True)
+    ylim(0,30)
+    xlim(0,30)
+
+theta = [9.50829527,-0.36317422,-0.34354905]
+plot_theta(theta)
+plt.savefig('logreg2.png')
+\end{minted}
+
+\includegraphics[height=5cm]{logreg2.png}
+
+Kaynaklar
+
+[1] Smola, {\em Scalable Machine Learning, Optimization}, \url{http://alex.smola.org/teaching/berkeley2012/slides/4_Optimization.pdf}
+
+[2] Bhandarkar, {\em Modeling with Hadoop}, \url{http://www.slideshare.net/hadoop/modeling-with-hadoop-kdd2011}
+
+[3] Simianer, {\em Joint Feature Selection in Distributed Stochastic Learning for Large-Scale Discriminative SMT}, \url{http://simianer.de/P12-1002-slides.pdf}
+
+[4] Allen, {\em A Python implementation of binary regularized logistic
+  regression with stochastic gradient descent, packaged as scripts for use
+  with Hadoop streaming}, \url{https://github.com/elsevierlabs/logistic-regression-sgd-mapreduce}
+
+\end{document}

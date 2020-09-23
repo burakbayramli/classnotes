@@ -1,0 +1,486 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ayrýksal Fourier Transformu (Discrete Fourier Transform -DFT-)
+
+Frekans Analizi, Periyodik Sinyaller
+
+Bir periyodik sinyali nasýl analiz ederiz? Kendimiz bir sinyal oluþturmak
+istesek bunu nasýl yapacaðýmýzý düþünelim; $\sin$ ya da $\cos$
+fonksiyonlarýnýn bir periyotu vardýr, $0,2\pi$ arasýndaki deðerler
+$2\pi,4\pi$ arasýnda tekrar eder, vs.. Bazý ek özellikler; mesela $\cos$
+sýfýr noktasýnda 1 deðerine sahip, fakat elimizdeki zaman serisi saða ya da
+sola ``kaymýþ'' olabilir, buna faz kaymasý (phase shift) deniyor, yani
+sýfýr noktasýnda deðer 1 olmayabilir. Ayrýca -1,+1 arasýnda gidip gelmek
+yerine mesela -10,+10 arasýnda gidip gelinebilir, buna genlik deniyor
+(amplitude). Bir diðer özellik $0,2\pi$ arasýnda tek bir periyot yerine
+birden fazla periyot olabilmesi (frekans deðiþimi).
+
+Frekans ile baþlayalým, önce normal bir kosinüs sinyali,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+t = np.linspace(0,10,100)
+plt.plot(t, np.cos(t))
+plt.xlim(0,10)
+plt.savefig('compscieng_1_30_04.png')
+\end{minted}
+
+\includegraphics[height=5cm]{compscieng_1_30_04.png}
+
+Her $\pi$ noktasýný gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(t, np.cos(t))
+plt.axvline(0,lw='1',ls='dashed',color='r')
+plt.axvline(np.pi,lw='1',ls='dashed',color='r')
+plt.axvline(2*np.pi,lw='1',ls='dashed',color='r')
+plt.axvline(3*np.pi,lw='1',ls='dashed',color='r')
+plt.xlim(0,10)
+plt.savefig('compscieng_1_30_05.png')
+\end{minted}
+
+\includegraphics[height=5cm]{compscieng_1_30_05.png}
+
+Bu sinyalde $\cos$'a verilen $t$ deðerlerini iki ile çarpsam ne olur?
+$0,2\pi$ arasýnda bir periyot için daha önceki $t$'lerin yarýsý ile bu iþ
+yapýlabilir, demek ki önceki tek periyot içinde þimdi sinyal iki kez tur
+atacaktýr. O zaman $\cos$ içinde bir sabit ile çarpým yapmak ile frekansý o
+kadar arttýrmýþ oldum,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(t, np.cos(2*t))
+plt.axvline(0,lw='1',ls='dashed',color='r')
+plt.axvline(np.pi,lw='1',ls='dashed',color='r')
+plt.axvline(2*np.pi,lw='1',ls='dashed',color='r')
+plt.axvline(3*np.pi,lw='1',ls='dashed',color='r')
+plt.xlim(0,10)
+plt.savefig('compscieng_1_30_06.png')
+\end{minted}
+
+\includegraphics[height=5cm]{compscieng_1_30_06.png}
+
+-1/+1 arasýnda gidip gelmeyi arttýrmak en kolayý, $\cos$ hesabýndan elde
+edilen deðeri mesela 10 ile çarparsam genlik o kadar artar. Faz kaydýrma
+$\cos$ içinde bir toplam olabilir. Tüm resmi göstermek gerekirse, $A$
+genlik, $f_0$ frekans, faz kaymasý $\phi$ olacak þekilde,
+
+$$ 
+x(t) = A \cos (2\pi f_0 t - \phi)
+$$
+
+Bu formülün grafiði,
+
+\includegraphics[height=4cm]{compscieng_1_30_07.png}
+
+Direk formüle bakarak $A$ hemen anlaþýlabiliyor. Frekans $t$'yi çarpan
+deðerle orantýlý, yanlýz dikkat, bu deðer her zaman $2\pi$'ye oranlý bir
+þey, yani formül $\cos(10 t)$ gibi bir ifade içeriyorsa, $10 / 2\pi$ ile
+$f_0$'yi çýkartmamýz gerekir. Eðer $t$ saniye birimine sahipse, bir periyot
+$T_0 = 1/f_0 = 0.5$ saniyedir, ve frekans 2 Hertz olacaktýr. Eðer frekans
+$w_0 = 2\pi f_o$ formunda gösterilirse, o zaman birim radyan / saniye olur.
+
+Faz kaymasý $\phi$ sebebiyle tepe noktanýn nerede olduðu da direk formülden
+anlaþýlamýyor, biraz ek hesap lazým, üstteki örnekte 3/16, bunu bulmak
+için ``kosinüse geçilen deðerin sýfýr olduðu yer'' gerekli,
+
+$$ 0 = 2\pi \cdot 2 \cdot t  - 3\pi/4 
+\implies t = 3\pi / (4 \cdot 4\pi)  
+\implies t = 3/16
+$$
+
+Fakat hala faz kaymasý $3\pi/4$ diyebiliriz. 
+
+Örneklemek (Sampling)
+
+Sayýsal, yani bilgisayar ortamýnda bilgiler ayrýksaldýr, kimse bize üstteki
+sürekli formül formatýyla sinyal parametrelerini vermez. Diyelim ki bir
+sinyalin saniyede 10 tane örneklemini alýyoruz. O zaman 3 saniye sonra
+elimizde 30 veri noktasý olacak. Fakat her örneklem frekansý gerçek sinyali
+anlamak için yeterli deðildir. Nyquist teorisine göre örneklem gerçek
+frekansýn en az iki katý olmalýdýr. Altta bazý örnekler görülüyor, en
+alttaki örneklem frekansý dalga frekansý ile ayný, ve bu sinyali anlamak
+için yeterli deðil. Veri noktalarýna bakarak onlarýn ilk üç noktada bir
+düz çizgi oluþturduðunu zannedebilirdik.
+
+\includegraphics[width=20em]{compscieng_1_30_10.png}
+
+Tabii sadece ayrýksal frekansa bakarak sinyalin frekansýnýn ne olduðunu
+anlamak ta mümkün degil. Eðer bir þekilde gercek sinyalin kaç örneklemde
+bir tekrar ettiðini bulursak, o zaman yaklaþýk bir frekans bulabiliriz;
+mesela bir sinüssel sinyalin 20 ölçümde bir tekrar ettiðini bulduk, ve
+örneklem periyotu 0.05 milisaniye / örneklem ise (her iki örneklem arasý
+geçen zaman), o zaman
+
+$$ 
+\textrm{sinüs dalgasý periyotu} =  
+\frac{20 \textrm{ örneklem}}{periyot}
+\frac{0.05 \textrm{ milisaniye}}{\textrm{örneklem}} = 1 milisaniye
+$$
+
+Demek ki periyot 1 / 1 milisaniye = 1 Khz. Ya örneklem periyotu 2
+milisaniye olsaydý? O zaman sinüs dalga periyotu 40 milisaniye olurdu, ve
+gerçek frekans 25 Hz olurdu. Söylemek istediðimiz ayrýksal durumda
+Hz. bazýnda gerçek frekansýn hesabý her zaman örneklem frekansýna $f_s$'e
+baðlýdýr,
+
+$$ f_s = 1 / t_s$$
+
+Ayrýksal Fourier Transformu
+
+[4]'te sürekli Fourier Transformunu gördük,
+
+$$ X(f) = \int _{-\infty}^{\infty} x(t) e^{j2\pi ft} \ud t $$
+
+ki $x(t)$ zaman bazlý sürekli bir sinyaldir. Bilgisayarlar sayesinde
+üstteki iþlemi ayrýksal olarak yapabiliyoruz [2, sf. 46], 
+
+$$ X(m) = \sum _{n=0}^{N-1} x(n) e^{-j2\pi nm / N} $$
+
+$x(n)$ her $n$ anýnda, bir $n$ indisiyle eriþilen, bir anlamda $x(t)$'den
+``örneklenmiþ'' sinyal verisi olacaktýr, $e$ tabii ki doðal logaritma bazý,
+$j$ ise hayali sayý $j = \sqrt{-1}$.  Euler iliþkisi $e^{-j\phi} =
+\cos(\phi) - j\sin(\phi)$'den 
+hareketle üstteki ayrýksal denklem alttakine eþittir,
+
+$$ X(m) = \sum _{n=0}^{N-1} x(n) [ \cos(2\pi nm / N) - j \sin(2\pi nm / N)] 
+\mlabel{1}
+$$
+
+$X(m)$: $m$'inci DFT bileþeni / katsayýsý - $X(0),X(1),..$ diye gidiyor
+
+$m$: Frekans yöresindeki (domain) DFT çýktýsýnýn katsayý indisi
+
+$x(n)$: Zaman yöresindeki bilginin ayrýksal verisi
+
+$n$: Zaman verisi indisi
+
+$N$: Giriþ verisinden ve çýktý frekans noktalarýndan kaç tane olduðu
+
+Örnek
+
+Diyelim ki elimizde biri 1 kHz ve diðeri 2 kHz'lük frekanslardan oluþan bir
+sinyal var, bu sinyalin sürekli hali þöyle,
+
+$$ x(t) = \sin(2\pi \cdot 1000 \cdot t) + 0.5 \sin (2\pi \cdot t + 3\pi/4)$$
+
+Sinyali örnekleme oranýmýz $f_s = 8000$, her saniye $f_s$ kadar örneklem
+alýyoruz, her veri nokta arasýndaki zaman farký $t_s = 1/f_s$. Elimizdeki
+bu hýzda ardý ardýna alýnmýþ 8 tane veri noktasý olsun, yani
+$N=8$. Ayrýksal formül,
+
+$$ x(n) = \sin(2\pi \cdot 1000 \cdot nt_s) + 0.5 \sin (2\pi \cdot nt_s + 3\pi/4) $$
+
+Bu noktalarda $x(n)$ deðerleri
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fs = 8000.; ts = 1/fs
+def x(n):
+    return np.sin(2*np.pi*1000*n*ts) + 0.5*np.sin(2*np.pi*2000*n*ts + 3*np.pi / 4)
+
+for n in range(8): print np.round(x(n),4),
+\end{minted}
+
+\begin{verbatim}
+0.3536 0.3536 0.6464 1.0607 0.3536 -1.0607 -1.3536 -0.3536
+\end{verbatim}
+
+Þimdi $x(n)$ girdisine DFT uygulayacaðýz. Eðer 1 kHz'un Fourier
+katsayýlarýný merak ediyorsak, $X(1)$ hesaplarýz, yani (1) formülü
+kullanýlacak, ki formül þuna benzer,
+
+$$ X(1) = \sum _{n=0}^{7}  x(n)\cos(2\pi n / 8) - jx(n)\sin(2\pi n / 8) $$
+
+Genel kodla gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def X(m):
+    real = 0.0; imag = 0.0
+    for n in range(8): 
+        real += x(n)*np.cos(2*np.pi*m*n/8.)
+        imag -= x(n)*np.sin(2*np.pi*m*n/8.)
+    return np.round(real,4), imag
+
+print X(1)
+\end{minted}
+
+\begin{verbatim}
+(-0.0, -4.0)
+\end{verbatim}
+
+2 kHz için ne olur?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print X(2)
+\end{minted}
+
+\begin{verbatim}
+(1.4141999999999999, 1.4142135623730947)
+\end{verbatim}
+
+Bu sonuçlarda 1. kýsým sayýnýn reel tarafý, 2. kýsmý pür kompleks
+tarafý. Çoðunlukla bu elde edilen $X(m)$ sayýsýnýn büyüklüðü (magnitude) ile
+ilgileniriz, bu hesap
+
+$$ X_{\textrm{büyüklük}} = |X(m)| = \sqrt{X_{reel}(m)^2 + X_{kompleks}(m)^2}$$
+
+olarak yapýlýyor. \verb!numpy.abs! çaðrýsý bu hesabý hayali sayýlar
+üzerinde otomatik olarak yapar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+r,i = X(2)
+print res, u'büyüklük', np.abs(complex(r,i))
+\end{minted}
+
+\begin{verbatim}
+-5.55111512313e-17j büyüklük 1.99999040998
+\end{verbatim}
+
+Büyüklüðe bakýlýrsa 2 Khz frekansýnýn katsayýsý ufak deðil, demek ki bu
+frekans sinyal içinde var / önemli. 3 Khz'e bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+r,i = X(3)
+print res, u'büyüklük', np.abs(complex(r,i))
+\end{minted}
+
+\begin{verbatim}
+-5.55111512313e-17j büyüklük 5.55111512313e-17
+\end{verbatim}
+
+Çok ufak, demek ki bu frekans sinyal içinde mevcut deðil.
+
+Örnekte sürekli bir formül kullanarak $x(n)$ hesabý yapýlmýþ olmasý
+ayrýksallýðýn nerede baþlayýp bittiði hakkýnda kafa karýþýklýðý yaratmasýn;
+analitik formül iki yöre arasýnda gidiþ / geliþ nasýl oluyor bunu göstermek
+için verildi. Çoðunlukla elimizde sadece bir tek boyutlu bir dizi içinde
+bir veri serisi olur, bu verinin hangi analitik formülden geldiðini
+bilmeyiz (Fourier analizini onun için yapýyoruz zaten!), veri hakkýnda
+eldeki diðer tek bilgi onun örneklem frekansý olur.
+
+Bir örnek üzerinde daha görelim [3, sf. 152], bu sefer kütüphane çaðrýsý
+\verb!scipy.fft! ile analiz yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy
+
+N = 64; n = np.arange(N) - 1; T = 0.05;
+t = n*T; xbn = np.sin(w1*t)+ 0.5*np.sin(w2*t);
+plt.stem(t,xbn)
+plt.savefig('compscieng_1_30_08.png')
+k = np.arange(N) - 1
+Xb = scipy.fft(xbn);
+plt.figure()
+plt.stem(k,abs(Xb))
+plt.savefig('compscieng_1_30_09.png')
+\end{minted}
+
+\includegraphics[width=17em]{compscieng_1_30_08.png}
+\includegraphics[width=17em]{compscieng_1_30_09.png}
+
+Üst saðdaki frekans analizine göre $k=2$ ve $5$'te büyüklük var, bu
+deðerler $k\omega_0 = 2\pi k / NT$ ile $\pi$ bazýna çevirilebilir, $k=2$
+için $2\pi k / 3.2 = 1.25 \pi$ olur, $k=5$ için $3.125 \pi$ elde ederiz.
+
+Ders 15
+
+[Strang hocanýn notlarýndan. Üstteki DFT yöntemi toplamlar, döngüler, belli
+indisler kullanarak yapýlýyor. Altta Strang'in anlattýðý yaklaþýmla, bir
+sinyalin belli frekanslarýn katsayýlarla aðýrlýklanmýþ toplamý olduðu temel
+Fourier formülüyle baþlarýz, fakat diðer yöne gitmek için pür lineer cebir
+kullanýrýz, böylece katsayý hesabý bir matris tersi alma iþlemi haline
+gelir].
+
+Ayrýksal (discrete) olarak Fourier modellemesi yapmak istiyorsak, elimizde
+devamlý (continuous) f(x) fonksiyonu olmayacak, bir f(x) fonksiyonun belli
+noktalarýndaki deðerleri (olduðunu farzettiðimiz) verileri içeren bir {\em
+  vektör} olacak. Bu vektörün N elemaný var diyelim. Fonksiyon periyodik
+olduðuna göre, x için $2\pi$'i N eþit parçaya böleriz (tahtadan alýnan
+resim altta). Bunu söylemekle fonksiyonun periyotunun $N$ olduðunu farz
+etmiþ oluyoruz, bir anlamda diyoruz ki eðer elimizde $N$ tane daha nokta
+olsaydý, onlar elimizde olan deðerlerle týpatýp ayný olacaktý. Örneðimizde
+N=4 olsun.
+
+\includegraphics[height=3cm]{compscieng_1_30_01.png}
+
+Ayrýca $F(x)$ formülü biraz deðiþecek. Elimizde sonsuz tane nokta olmadýðýna göre
+
+$$ F(x) = \sum_{n=0}^{N} c_ne^{inx} $$
+
+olmasý lazým. Þimdi, eðer bütün $c_k$ deðerlerini biliyor olsaydýk, bu
+fonksiyon, x=0 noktasýnda hangi deðere sahip olurdu?
+
+$$ f(0) = c_0 + c_1 + c_2 + c_3 + c_4 = Y_0 $$
+
+Sonraki $x$ deðerleri $2\pi/N, 4\pi/N, ..$ için (çünkü her parça $2\pi/N$,
+bir sonraki parça $2\pi/N + 2\pi/N$, bir kere topluyoruz, yani parçayý $2$
+ile çarpýyoruz, sonra $3$ ile, vs) aþaðýdaki gibi devam edeceðiz, ama ondan
+önce bir $w$ deðiþkeni tanýmlayalým, bu deðiþkeni $w=e^{2\pi i/N}$ olarak
+alalým. Böylece $w^2$ dediðimizde üstel iþlemlerde çarpým iþlemi toplama
+iþlemine dönüþeceði için $e^{4i\pi/N}$ deðeri elde edilebilir, $w^3$ ile
+$e^{6i\pi/N}$ elde edilir, vs. Bu deðerler bize lazým olacak deðerler, $w$
+sayesinde formüller daha temiz olacak. $F(2\pi/N)$ içindeki 3. terim
+($n=2$) nedir?  $c_ne^{inx} = c_2e^{2i2\pi/N} = c_2e^{4i\pi/N} = c_2w^2$. O
+zaman
+
+$$ f(2\pi/N) = c_o + wc_1 + w^2c_2 + w^3c_3 = Y_1 $$
+
+Devam edelim:
+
+$$ f(4\pi/N) = c_o + w^2c_1 + w^4c_2 + w^6c_3 = Y_2  $$
+
+$$ f(6\pi/N) = c_o + w^3c_1 + w^6c_2 + w^9c_3 = Y_3  $$
+
+Elimizdeki dört toplam iþlemine bakýnca, bu toplamlar ve çarpýmlarýn aslýnda
+lineer cebir üzerinden matrisler ile gösterilebildiðini farkedebiliriz. 
+
+$$  
+\left[ \begin{array}{c}
+    Y_0 \\
+    Y_1 \\
+    Y_2 \\
+    Y_3
+\end{array} \right]
+=
+\left[ \begin{array}{cccc}
+    1 & 1 & 1 & 1 \\
+    1 & w & w^2 & w^3  \\
+    1 & w^2 & w^4 & w^6  \\
+    1 & w^3 & w^6 & w^9  
+\end{array} \right]
+\left[ \begin{array}{c}
+    c_0 \\
+    c_1 \\
+    c_2 \\
+    c_3
+\end{array} \right] \\
+$$
+
+Her matris için bir deðiþken kullanýrsak
+
+$$ Y = WC $$
+
+F(x)'ten (yani Y'den) C'ye gitmek istersek, elimizde $Y_n$ deðerleri var, $w$
+deðerleri zaten sabittir, W bu sabit deðere göre oluþturulur, o zaman, $c_n$
+sayýlarýný nasýl buluruz?
+
+$$ Y = WC  $$
+
+$$ W^{-1}Y = W^{-1}WC  $$
+
+$$ W^{-1}Y = C $$
+
+Yani $W$ matrisinin tersini (inverse) alýp, onu $Y$ ile çarpýnca elimize $C$
+deðerleri geçecek [1, sf. 340-370].
+
+Güneþ Benekleri
+
+Güneþte periyodik olarak olan benekler, aþaðý yukarý 11 senede bir ortaya
+çýkarlar. Bu benekler uzun süredir gözlenmekte ve ölçülmektedir,
+þiddetlerine göre, \verb!sunspots.dat! adlý dosyada bulabiliriz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+tempdata = np.loadtxt('sunspots.dat')
+year=tempdata[:,0]; sunspots=tempdata[:,1]
+year=year[year<2001]; sunspots=sunspots[year<2001]
+plt.plot(year,sunspots)
+plt.title(u'Güneþ Benekleri')
+plt.savefig('compscieng_1_30_03.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_30_03.png}
+
+Benek verisindeki periyodik oluþu Fourier transformu ile analiz
+edelim. Alttaki kod $w$, $W$'yi kullanarak üstteki çarpýmlarla $C$
+vektörünü bulacak. Bu vektör içindeki sayýlar Fourier analizindeki belli
+frekanslara, harmoniklere tekabül ediyor olacaklar. Bu $C$ deðerlerinde
+bazýlarý diðerlerinden daha güçlü bir etkidir, mesela 11 senelik periyot C
+içinde daha belirgin olarak çýkmalý.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy
+
+tempdata = np.loadtxt("sunspots.dat")
+
+year=tempdata[:,0]
+
+Y=tempdata[:,1]
+
+N = len(Y)
+
+w = np.exp((2*np.pi*1j)/N)
+
+W = np.zeros((N,N), complex)
+for i in range(N):
+    for k in range(N):
+        W[i,k] = w**(i*k)
+        
+C = np.dot(np.linalg.inv(W), Y) 
+\end{minted}
+
+Periyotlarýn grafiði,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n=len(Y); print 'n=',n
+power = np.abs(C[0:int(n/2)])**2
+nyquist = 1./2
+freq = np.array(map(float, np.array(arange(0,int(n/2))))) / (n/2)*nyquist
+print 'len(freq)=',len(freq)
+period=1./freq;
+plt.plot(period,power)
+plt.xlim(0,30)
+plt.savefig('compscieng_1_30_02.png')
+\end{minted}
+
+\begin{verbatim}
+n= 305
+len(freq)= 152
+\end{verbatim}
+
+\includegraphics[height=6cm]{compscieng_1_30_02.png}
+
+11 sene civarýnda belirgin bir frekans olduðunu görebiliyoruz. 
+
+FFT
+
+Bitirmeden önce FFT konusundan bahsedelim. $\textbf{D}$FT algoritmasý kodda
+görüldüðü gibi bir W matrisi ortaya çýkarýr ve önce tersini alma, sonra bu ters
+ile bir çarpým iþlemi yaparak C sonucunu üretir. $O$ notasyonunu kullanýrsak
+DFT'nin karmaþýklýðý $O(N^2)$'dir. Bu iyi bir hýzdýr.
+
+FFT algoritmasý üstteki çarpýmýn bazý özelliklerini kullanarak DFT'yi daha
+da hýzlandýrýr ve $O(\frac{1}{2}Nlog_2N)$ hýzýna getirir. FFT'den bu
+makalede bahsetmeyeceðiz, aklýmýzda olsun, \verb!scipy.fft! çaðrýsý bu
+algoritmayý kullanýr, örnek:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+C = scipy.fft(Y)
+print C[:3]
+\end{minted}
+
+\begin{verbatim}
+[ 15318.00000000   +0.j           1153.09522938 +866.74784921j
+    -72.35158374+1347.22954505j]
+\end{verbatim}
+
+Soru
+
+FFT yaklaþýksal bir algoritma mýdýr? Yani DFT'nin elde deðerlere ``yakýn''
+deðerler daha hýzlý mý hesaplanýyor? 
+
+Cevap
+
+FFT ile DFT týpatýp ayný katsayýlarý hesaplýyorlar, FFT sadece bu hesabý
+daha hýzlý yapýyor.
+
+
+Kaynaklar
+
+[1] Strang, {\em Computational Science and Engineering}
+
+[2] Lyons, {\em Understanding Digital Signal Processing, 2nd Edition}
+
+[3] Wang, {\em Applied Numerical Methods Using Matlab}
+
+[4] Bayramli, Diferansiyel Denklemler, {\em Ders 15}
+
+\end{document}
+

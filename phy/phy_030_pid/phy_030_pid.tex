@@ -1,0 +1,201 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+PID (Proportional, Integral, Derivative) Kontrol
+
+Endüstride en yaygýn kullanilan, en basit kontrol yöntemi PID kontrol
+yöntemi. Bu yaklaþým kontrol edilen mekanizma, süreç, fabrika, vs için elde
+denklemler elde olmasa bile çoðunlukla iþler (mekanizmanýn fazla gayrý
+lineer olmamasý kaydýyla). Elde edilmek istenilen bir parametre hedefi
+vardýr, mesela bu arabanýn hýzý olabilir, kontrol edilen ise bir gaz pedalý
+olabilir (pedalýn basýlma açýsý gibi), ve arabanýn belli $\Delta t$
+aralýklarýnda hýz ölçümüne bakýlýr, ve en basit formda istenilen hýz ile o
+anda olunan hýz arasýndaki fark, hataya oranlý bir kontrol uygulamasý
+yapýlýr. Eðer 60 km/saat ile gidilmek isteniyorsa ama ölçüm 40 km/saat
+diyorsa aradaki farka oranla gaz pedalýna biraz daha basýlýr. En basit
+formda dedik, bazý ekler, o ana kadar olan hatalarýn toplamýna oranlý
+(integral), ya da hatanýn önceki hataya göre artýþýna oranlý (derivative)
+da olabilir.
+
+Tüm bunlar biraraya koyulunca PID kontrolünü elde ederiz [1, sf. 42] [3]. Formül,
+
+$$
+u(t) = 
+K_p \cdot e(t) + 
+K_i \cdot \int_0^t e(\tau) \ud \tau + 
+K_d \frac{\ud e(t)}{\ud t}
+$$
+
+$K_p$ ile hataya oranlý (proportional) bir kontrol uygulanýr, $K_I$
+üzerinden önceki hatalarýn entegrali (toplamý) üzerinden bir kontrol, $K_D$
+ile hata deðiþimine oranlý kontrol uygulamýþ oluruz. Bu sabitlerin
+bulunmasý deneme / yanýlma ile olabilir (ayar -tune-) safhasýnda bunlar
+yapýlabilir.
+
+Bu yaklaþýmda genel olarak kontrol edilen parametre ve hedef deðiþken
+arasýnda yapay / lineer bir iliþki kurulduðu söylenebilir. Sabitleri
+ayarlayarak herhangi bir sistem için bu iliþkinin iþlemesini saðlýyoruz,
+fakat formülsel olarak elimizde daha derin bir baðlantý yok. ``Hata''
+büyüklüðüne, onun birkaç formuna bakarak, bunlara oranla bir kontrol
+uygulamak PID yaklaþýmýnýn özüdür. Pratikte iyi iþliyor.
+
+Bir sistemi kontrol etmek için birden fazla deðiþken olabilir, tipik olarak
+her deðiþken için ayrý bir PID hesabý iþletilir. Kod idaresi açýsýndan bu
+sebeple üstteki formülü bir obje içine koymak böylece her deðiþken için
+ayrý bir PID objesi yaratmak iyi bir yaklaþým olabilir. Her obje kendi eski
+hatasýný, kendi deðiþkenini takip edip, ona özel kontrol hesabýný her
+adýmda hesaplayacaktýr.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+class PID:
+   def __init__(self, dt, Kp, Ki, Kd, lastErr=0.0):
+      self.Kp = Kp
+      self.Ki = Ki
+      self.Kd = Kd
+      self.dt = dt
+      self.errSum = 0
+      self.lastErr = lastErr
+
+   def compute(self, setpoint, input):
+      error = setpoint - input
+      self.errSum += (error * self.dt)
+      dErr = (error - self.lastErr) / self.dt
+      output = self.Kp * error + self.Ki * self.errSum + self.Kd * dErr
+      self.lastErr = error
+      return output
+
+\end{minted}
+
+(Kurucuda \verb!lastErr! geçildi, bu baþta çok yüksek olabilecek 'önceki
+hata' problemini düzeltmek için)
+
+Örnek olarak basit bir hedef, 10, ve rasgele bazý çarpanlar üzerinden
+uygulanacak kontrolü hesaplayalým. 3 ile baþlýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p = PID(0.01, 1, 1, 0, 10)
+
+print (p.compute(10,3))
+print (p.compute(10,4))
+print (p.compute(10,5))
+print (p.compute(10,8))
+\end{minted}
+
+\begin{verbatim}
+7.07
+6.13
+5.18
+2.2
+\end{verbatim}
+
+Örnek
+
+Klasik fizik üzerinden ilerleyelim.. Alttaki örnek [2, sf. 12]'den
+alýnmýþtýr, $M$ kütlesindeki bir objeyi masa üzerinden ittirerek bir hedef
+hýzýna ulaþtýrmak istiyoruz. 
+
+\includegraphics[width=20em]{phy_030_pid_02.png}
+
+$F = m \ddot{x}$ formülü standart fizik, herhangi bir zaman noktasýndaki
+$T$ zaman aralýðýndaki hýz artýþý için gereken kuvvet
+$F = \frac{m v_t - m v_{t-1}}{T}$ ile hesaplanabilir. Sürtünmeyi hesaba
+katmayalým. Zaman aralýðý 10 milisaniye olsun, kütle $M = 2$ kg, ulaþýlmak
+istenen hedef hýz 4 metre / saniye. Duraðan hýzdan baþlýyoruz, ve PID
+kontrol ile her $t$ anýnda uygulanmasý gereken kuvveti görmek
+istiyoruz. Endüstriyel uygulamalarda bu tür problemler için PD yaklaþýmý
+kullanýlýyor, yani I yok, o yüzden onun sabitini sýfýr yapýyoruz (iptal
+etmiþ oluyoruz), geri kalanlar için $K_p=2$, $K_D=1$ üzerinden,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+T = 0.1
+M = 2.0
+desired_vel = 4.0
+vel = 0
+p = PID(T, 2.0, 0, 1.0, 4.0)
+forces = []; vels = []; velerrs = []; ts = []
+for i in range(100):
+    vels.append(vel)
+    force = p.compute(desired_vel, vel)
+    accel = force / M
+    vel = vel + accel*T
+    forces.append(force)
+    velerrs.append(p.lastErr)
+    ts.append(i*T)
+
+df = pd.DataFrame([ts, forces, vels, velerrs]).T
+df.columns = ['ts','forces','vels','velerrs']
+df = df.set_index('ts')
+df[['forces','vels']].plot()
+plt.savefig('phy_030_pid_03.png')
+df[['vels','velerrs']].plot()
+plt.savefig('phy_030_pid_04.png')
+\end{minted}
+
+\includegraphics[width=20em]{phy_030_pid_03.png}
+\includegraphics[width=20em]{phy_030_pid_04.png}
+
+Quadkopter
+
+Bir quadkopter dört tane motor üzerinden kontrol edilen bir ÝHA'dýr (drone,
+insansýz hava aracý). Helikopter aksine pervanelere / dört motora eðim
+verilemez, sabit dururlar, ve araç sadece bu motorlarýn daha az veya daha
+çok döndürülmesi üzerinden kontrol edilir. Her motorun pervanesi bir
+yanýndakinin tersi yönünde döner, böylece her motorun getirebileceði
+savrulma dengelenmiþ olur, teorik olarak dengeli bir quadkopterde her motor
+ayný hýzda döndüðünde araç havada asýlý duruyor olmalýdýr. Tabii pratikte
+pek çok sebep dolayýsýyla bu olmayabilir, o yüzden asýlý durma, herhangi
+bir yöne uçma, dönme için quadkopter sürekli kontrol edilmelidir.
+
+\includegraphics[width=20em]{phy_030_pid_01.png}
+
+Resimde dönüþ açýlarý gösteriliyor, havacýlýktaki adým, yalpa , sapma
+(pitch, roll, yaw) açýlarý bunlar, mesela z ekseni bazlý bir dönüþ
+sapma. Kontrol $T = [T_0,T_1,T_2,T_3]$ üzerinden dört motora uygulanacak
+güçtür [1, sf. 44], quadkopterin hedeflenen duruþ açýlarý
+$\theta_c, \phi_c, \psi_c$ olsun, ölçüm aletlerinden o andaki duruþ
+$\theta_{IMU}, \phi_{IMU}, \psi_{IMU}$ ile geliyor olsun.
+
+\includegraphics[width=20em]{phy_030_pid_05.png}
+
+Kontrol için üç açý, artý, yukarý aþaðý iniþ çýkýþ amaçlý yerçekimi
+telafisiyle (gravity compensation) beraber dört tane PÝD kontrolü
+tasarlanýyor. Mesela [1, sf. 46]'daki koda bakarsak, istenen adým açýsýna
+ulaþmak için adým PID'den gelen kontrolü alýyoruz, ve bu kontrolü yine
+belli bir sabitle çarpýp $T_0,T_1$'e ekliyoruz, $T_2,T_3$'ten
+çýkartýyoruz. Ýki üstteki resimden pozitif bu þekilde uygulanan bir deðerin
+ÝHA'yý ön kýsma göre yukarý kaldýracaðýný, yani $y$ eksen bazlý bir dönme
+yaratacaðýný kestirebiliriz. Tabii her quadkopterin fiziki yapýsý sebebiyle
+her açýnýn hatasýna oranla uygulanacak düzeltme $K_p,K_I,K_D$ sabitleri
+farklý olabilir, ne olduklari baþta bilinmez, bu sabitler tasarlama
+evresinde deneme / yanýlma ile ayarlanarak ÝHA iþler hale getirilir.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[devam edecek]
+
+Kaynaklar
+
+[1] Zimmerman, {\em Flight Control and Hardware Design of Multi-Rotor Systems}
+
+[2] Jamshidi, {\em Intelligent Control Systems with an Introduction to System of Systems Engineering}
+
+[3] Beauregard, {\em Improving the Beginner's PID - Introduction}, 
+    \url{http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/}
+
+
+
+\end{document}
+
+

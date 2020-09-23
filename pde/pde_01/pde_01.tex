@@ -1,0 +1,754 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 1
+
+Konumuz Kýsmi Türevsel Denklemler (partial differential equations -PDE-). Bu
+dersin ön gerekliliklerinden en önemlisi normal diferansiyel denklemlerdir
+(ordinary differential equtions -ODE-), çünkü pek çok PDE'yi çözmenin
+tekniði onlarý bir ODE sistemine indirgemekten geçiyor. Yani PDE çözmek
+için ODE çözme tekniklerini de bilmek gerekiyor. Bir diðer gerekli bilgi
+Lineer Cebir dersi.
+
+Bu dersin ana amacý, bir mühendislik dersi olarak, denklem çözmek, ve pek
+çok denklemin çýkýþ noktasý fiziksel problemler. Mesela sýcaklýk yayýlmasý
+(heat diffusion), dalga hareketi (wave motion), titreþen hücre zarý
+(vibrating membrane) gibi. Fakat PDE kavramý finansta bile ortaya çýkabilen
+bir kavram, mesela Black-Sholes denklemlerinde olduðu gibi. 
+
+Yani dersimiz çok teori odaklý olmayacak, bazý ispatlardan bahsedeceðiz,
+ama onun haricinde teori üzerinde fazla durmayacaðýz. 
+
+PDE nedir? Ýlk önce ODE tanýmýndan baþlayalým. 
+
+$$ y = y(x) $$
+
+$$ \frac{dy}{dx} = y $$
+
+Baþlangýç þartlarý
+
+$$ y(0) = y_0 $$
+
+Çözüm 
+
+$$ y = y_0e^x $$
+
+Bu bir ODE çünkü sadece bir tane baðýmsýz deðiþken var ($x$), ve bir tane
+baðýmlý deðiþken var ($y$). 
+
+PDE ise içinde kýsmi türevleri, ve bir veya {\em birden fazla} baðýmsýz
+deðiþkeni barýndýran bir denklemdir.
+
+Eðer güneþ etrafýndaki yörüngeleri temsil etmek istiyorsanýz gezegenleri
+boyutsuz parçacýklar gibi kabul ederek ODE'ler ile temsil etmek yeterli
+olabilir, ama diðer problemlerde daha fazla baðýmsýz deðiþken gerekeceði
+için ODE yetmez, mesela zaman, cismin 3D uzaydaki boyutlarý gibi.
+
+Mesela bir PDE
+
+$$ u = u(x,y) $$
+
+Çoðunlukla problem tanýmýnýn ilk baþýnda fonksiyonel iliþkiyi hemen
+göstermek iyi olur, mesela üstte baðýmsýz deðiþkenler $x,y$, ve $u$ bu iki
+deðiþkene baðýmlý. Devam edelim, PDE þöyle olsun
+
+$$ \frac{\partial^3 u}{\partial x^3} + 
+\cos(y)\frac{\partial u}{\partial y} + 3 = 0
+$$
+
+Bir PDE problemine çoðunlukla ek olarak sýnýr koþullarý (boundary condition
+-BC-) ve baþlangýç koþullarý (initial conditions) eklemek de gerekir.
+
+Kýsmi Türev nedir? 
+
+$$ u = u(x_1, x_2,...,x_n) $$
+
+$$ 
+\frac{\partial u}{\partial x_i} = 
+\lim_{\Delta x_i \to 0} 
+\frac{
+u(x_1,..,x_i+\Delta x_i,x_{i+1},...,x_n) - u(x_1,..,x_i,x_{i+1},...,x_n)}
+{\Delta x_i}  $$
+
+Yani bir fonksiyonun kýsmi türevini almak istediðimiz deðiþken haricinde
+tüm diðer deðiþkenlerinin sabit tutulduðu bir durum. 
+
+Örnek
+
+$$ u = x_1^2 + x_1\sin(x_2) $$
+
+$$ 
+\frac{\partial u}{\partial x_1} = 2x_1 + \sin(x_2)
+ $$
+
+$$ 
+\frac{\partial u}{\partial x_2} = x_1 \cos(x_2)
+ $$
+
+Notasyon
+
+Çoðunlukla kýsmi türevler 3 farklý þekilde gösteriliyor. 
+
+$$ \frac{\partial u}{\partial x} \equiv u_x \equiv \partial_x u $$
+
+Üstte soldaki tanýmý gördük, bazen ortadaki de tercih edilebiliyor, ya da
+bazen en saðdaki. 
+
+PDE Derecesi
+
+Bir PDE'nin derecesi, o denklemdeki kýsmi türevlerin en yüksek dereceli
+olanýn derecesi neyse o'dur.
+
+Mesela
+
+$$ u_{xxx} + u_y = 5 $$
+
+derecesi 3. Ayný zamanda bu lineer ve homojen olmayan (inhomogeneous) bir
+PDE. Bu son iki kavramý birazdan tanýmlayacaðým. 
+
+Örnek 
+
+$$ (u_{xx})^2 + u_xu_y = u $$
+
+Bu 2. derece. Bu bazý insanlarýn kafasýný karýþtýrýyor, çünkü $u_{xx}$'in
+karesi var. Bu ayný zamanda homojen, ve gayrý lineer. Bu dersteki çoðu PDE
+lineer olacak. 
+
+Lineer ve gayrý lineerlikten bahsetmiþken, þunu ekleyelim. 
+
+\includegraphics[height=3cm]{1_5.png}
+
+Þimdi diyelim ki bir girdi (input) fonksiyonu $I(t)$ bir iþleme giriyor
+($L$ operatörü) ve çýktý (output) olarak $R(t)$ çýkýyor. Yani sistem
+
+$$ R = \mathcal{L} \ I $$
+
+Bir lineer sistemde eðer girdiyi iki ile çarparsanýz, çýktý da iki katýna
+çýkar. O zaman kurallar
+
+\begin{enumerate}
+
+   \item $\mathcal{L}(\alpha I) = \alpha \ \mathcal{L}(I)$, ki $\alpha$ bir sabit.
+
+   \item $\mathcal{L}(I_1 + I_2) = \mathcal{L}(I_1) + \mathcal{L}(I_2)$, ki
+     buna üst üste eklenebilme (superposition) prensibi deniyor. Bu
+     prensibi bu dersteki çoðu PDE'yi çözmek için kullanacaðýz. Bir lineer
+     sistem varsa çoðu zaman arka planda bir yerlerde üst üste eklenebilme
+     prensibi geziniyordur.
+
+\end{enumerate}
+
+Diyelim ki PDE'nizi þöyle yazdýnýz
+
+$$\mathcal{L}u = f(\vec{x}) $$
+
+Burada $u$ baðýmlý deðiþken, $\vec{x}$ bir vektör, $\vec{x} \in \mathbb{R} ^n$, ve
+bu vektörün içinde birden fazla deðiþken var, bu deðiþkenlerin hepsi
+baðýmsýz.
+
+$$ 
+\vec{x} = 
+\left(\begin{array}{r}
+x_1,\\
+.. \\
+x_n
+\end{array}\right)
+ $$
+
+Bu denkleme benzer bir diðer denklem lineer cebirdeki $A\vec{x} = \vec{b}$
+denklemidir.  PDE sisteminde de cevabýný aradýðýmýz, lineer cebir
+sisteminde ``$A$ ile çarpýlýp $b$ sonucunu verecek $\vec{x}$ hangisidir?''
+sorusuna benzer bir þekilde ``$\mathcal{L}$ operatörü uygulanýp $f(\vec{x})$
+sonucunu verecek $u$ hangisidir?'' sorusudur.
+
+Bu analojiden devam etmek gerekirse, belli bir noktada $u$'nun içinde
+olduðu ``fonksiyon uzayý'' hakkýnda düþünmemiz gerekebilir, $\vec{x}$'in
+içinde olduðu $\mathbb{R}^n$ uzayý gibi. Lineer cebir durumunda operatörün
+özelliklerine bakýlýr, mesela `` $b$'nin içinde olduðu ve $A$ operatörü
+uygulanýp hiç sonuç alýnamayacak uzayýn belli kýsýmlarý var
+mýdýr?'' gibi sorularla uðraþýlabilir, bunlar $A$'nin ``ulaþamadýðý
+yerlerdir'' vs. PDE'deki $\mathcal{L}$ operatörü için de benzer sorular sorulabilir. 
+
+Yani lineer cebirle pek çok kavram PDE dünyasýna benziyor, orada vektör
+uzayý var, burada fonksiyon uzayý var. Yani bir analoji olarak bu
+benzerliði aklýmýzda tutmamýz faydalý. 
+
+Bir operatör þu þekilde de olabilir
+
+$$ \mathcal{L} = \mathcal{L} \bigg(
+\frac{\partial }{\partial x_1}, \frac{\partial }{\partial x_2},..,
+u,..
+\bigg)
+ $$
+
+Yani operatör kýsmi türevlere ve hatta $u$'nun kendisine de baðýmlý
+olabilir. 
+
+Eðer elimizde gayrý lineer bir PDE var ise, baþýmýz dertte demektir. Böyle
+bir sistemi çözmek için çoðunlukla sayýsal çözümlere baþvurmak
+gerekir. Eðer lineer ise çözümde bayaðý ilerlemek mümkündür. 
+
+Lineerlik
+
+Bir operatör ve onun tanýmladýðý bir üst üste eklenebilme durumu düþünelim
+
+$$ \mathcal{L} = \mathcal{L}(\alpha_1 u_1 + \alpha_2 u_2) = 
+\alpha_1 \mathcal{L}u_1 + \alpha_2 \mathcal{L}u_2 $$
+
+ki $\alpha_1,\alpha_2$ birer tek sayýdýr (scalar), ya reel, ya da kompleks. 
+
+Örnek
+
+Birazdan bakacaðýmýz denklem dalga denklemi. Orada
+
+$$ u_{tt} - c^2u_x = 0 $$
+
+Bu denklemi
+
+$$ \mathcal{L}u = 0 $$
+
+þeklinde yazabiliriz ki $\mathcal{L}$ þöyle tanýmlý olacaktýr
+
+$$ \mathcal{L} = \frac{\partial^2}{\partial t^2} - 
+c^2 \frac{\partial ^2}{\partial x^2 = 0}$$
+
+$c$ bir sabittir. 
+
+Þimdi diyelim ki þu denklemi çözmemiz lazým
+
+$$\mathcal{L} u = f $$
+
+ki
+
+$$ \mathcal{L}: V \to V $$
+
+Yani, $\mathcal{L}$ bir vektör uzayýný bir diðerine eþlemekte (map), ve yine diyelim
+ki bu uzaylar birer Hilbert Uzayý (bunun anlamýna þimdi bilmemiz
+gerekmiyor, ileride bu konuya döneceðiz, bu kelimeyi þöyle bir ortaya atmak
+istedim). 
+
+Yani sorduðumuz Hilbert Uzayý $V$'de bir $f$'e eþleyecek bir $u$ fonksiyonu
+olup olmadýðý. Bu arada tipik bir Hilbert Uzayý mesela kare alýp bir sýnýr
+bölgesinde (boundary domain) entegre edince elde edilen sonlu (finite) bir
+sonuçlarýn oluþturduðu uzay. Yani ``derli toplu'' fonksiyonlar bir anlamda,
+absürt sonuçlar vermeyen türden, sonsuzluða doðru patlayýp giden türden
+olanlarý deðil. 
+
+Faraziyeye devam edelim, diyelim ki $V$ içinde bir baz (basis) var. Baz
+nedir? Lineer cebirden hatýrlayalým, mesela üç boyutlu Öklitsel (Euclidian)
+uzayý $\mathbb{R}^3$. 
+
+\includegraphics[height=4cm]{1_6.png}
+
+$$ 
+\vec{x} = 
+\left[\begin{array}{r}
+1 \\ 0 \\ 0
+\end{array}\right]
+ $$
+
+$$ 
+\vec{y} = 
+\left[\begin{array}{r}
+0 \\ 1 \\ 0
+\end{array}\right]
+ $$
+
+$$ 
+\vec{z} = 
+\left[\begin{array}{r}
+0 \\ 0 \\ 1
+\end{array}\right]
+ $$
+
+\includegraphics[height=4cm]{1_7.png}
+
+Bu uzaydaki herhangi bir vektör $\vec{r}$ üstteki üç baz vektörü
+kullanýlarak parçalarýna ayýrýlabilir, ya da, onlarýn bir lineer
+kombinasyonu olarak gösterilebilir. Mesela
+
+$$ \vec{r} = x\vec{x} +  y\vec{y} +  z\vec{z} $$
+
+Bu üç vektörün bu uzay için bir ``baz oluþturduðu'' söylenebilir, çünkü bu
+uzaydaki her vektör bu üç vektörün bir kombinasyonu olarak temsil
+edilebilir. Dikkat edelim, iki baz vektör yeterli olmazdý, dört taneye
+gerek yok. Tamý tamýna üç tane vektör bu uzayýn bazýný oluþturuyor. 
+
+Bu sonlu (finite) miktarda bir uzay, herhangi bir vektörü tanýmlamak için
+sonlu miktarda baz vektörü yeterli. Sonsuz boyutlu bir uzay da olabilirdi,
+o zaman herhangi bir fonksiyonu tanýmlamak için sonsuz tane baz vektörü
+gerekirdi. Mesela Fourier Serilerini düþünelim
+
+$$ u = \sum_{i=1}^{\infty} \alpha_i \phi_i(x) $$
+
+ki baz fonksiyonlar $\bigg\{ \phi_i(x)  \bigg\}_{i=1}^\infty$.
+
+Bu fonksiyonlarýn her biri trigonometrik fonksiyonlar olabilir (cos, sin)
+gibi, o zaman seri Fourier Serisi olur. Her halükarda, yukarýdaki tanýmla
+diyoruz ki özgün (unique) $\alpha$ deðerleri var ki, o deðerleri zaten
+önceden bilinen baz fonksiyonlarý ile çarpýp toplayarak $u$'yu
+oluþturabiliyoruz.
+
+Eðer lineer operatörümüzü hatýrlarsak
+
+$$ \mathcal{L} = \mathcal{L}(\alpha_1 u_1 + \alpha_2 u_2) = 
+\alpha_1 Lu_1 + \alpha_2 Lu_2 $$
+
+Bu operatör herhangi iki katsayýyý kullanýyordu, fakat iki üstteki sonsuz
+tane toplamý da içerecek þekilde geniþletilebilir, ve baz kavramý ile üst
+üste eklenebilme kavramýnýn arasýndaki alakayý gösterir. 
+
+Diyelim ki $\mathcal{L}$'nin her baz vektörünü nasýl eþlediðini biliyoruz, 
+
+$$ \mathcal{L} \phi_i = -\lambda_i \phi_i $$
+
+Üstteki ifade $\phi$'in $L$'in özfonksiyonu olduðunu söylüyor ayný
+zamanda. Eðer alttaki açýlýmý yaparsak, ki bunu yapabiliriz çünkü
+$\phi$'ler bazdýrlar, 
+
+$$ \mathcal{L}u = \mathcal{L} \bigg( \sum_i \alpha_i \phi_i(x) \bigg) =
+\sum_i \alpha_i \bigg( \mathcal{L} \phi_i \bigg)
+ $$
+
+$$ = -\sum_i \alpha_i \lambda_i \phi_i  $$
+
+Bir operatörün herhangi bir baz üzerinde nasýl iþlem yaptýðýný anladýðýmýz
+anda, o zaman $\mathcal{L}$'in herhangi bir $u$ fonksiyonu üzerinde ne etki yaptýðýný
+bilebiliriz. Diðer bir deyiþle bir uzayda sonsuz tane fonksiyon olabilir,
+ama biz operatörümüzün bazlara nasýl etki ettiðini biliyorsak, o bazlarla
+oluþturulan tüm fonksiyonlara nasýl etki ettiðini de biliyoruz demektir. 
+
+Tekrar belirtelim, bu sadece $\mathcal{L}$ lineer bir operatör olduðu zaman mümkün. 
+
+Örnek
+
+Klasik Burger denklemi
+
+$$ u_t + u u_x = v u_{xx} $$
+
+Denklemi 
+
+$$ \mathcal{L}u = 0 $$
+
+olarak yazabiliriz, ki 
+
+$$ \mathcal{L} = \frac{\partial }{\partial t} + 
+u \frac{\partial }{\partial x} - v\frac{\partial ^2}{\partial x^2}
+$$
+
+Bu gayrý lineer
+
+Örnek
+
+$$ u_{xx} + u_{yy} + \sin(u) $$
+
+$$ \mathcal{L} u = 0 $$
+
+$$ \mathcal{L} = \partial_{xx} + \partial_{yy} + \sin(\cdot) $$
+
+Üsttteki ilginç bir durum sinüs fonksiyonun da içi boþ halde, operatör
+olarak kullanýlmýþ olmasý. Operatör tanýmýnda bazen böyle nokta konulduðu
+oluyor, ki neyin üzerinde operasyon yapýldýðý anlaþýlsýn diye, mesela
+üstteki þöyle de gösteriliyor bazen
+
+$$ \mathcal{L} = \partial\cdot_{xx} + \partial\cdot_{yy} + \sin(\cdot) $$
+
+Bu da gayrý lineer çünkü $\sin$ fonksiyonu lineer deðil, yani
+
+$$ \sin(u_1 + u_2) \ne \sin(u_1) + \sin(u_2) $$
+
+Lineerlik üzerinde çok duruyoruz çünkü diferansiyel denklemimiz hakkýnda
+bilmemiz gereken en önemli bilgilerden / ipuçlarýndan biri bu, çünkü
+denklemimizin lineer ya da gayrý lineer olmasý, bizi çok farklý çözüm
+teknikleri kullanmaya itecek.
+
+Bir diðer önemli terim homojen (homogeneous), homojen olmayan
+(inhomogeneous) kavramý. 
+
+Homojenlik
+
+Eðer $u=0$ bir çözüm ise PDE homojendir. 
+
+Yani $\mathcal{L} u = f(\vec{x})$ denklem tanýmýnda eðer $f(\vec{x})=0$ ise
+PDE homojendir.
+
+Ornek
+
+$$ u_{xx} + u_y^2 = xu $$
+
+Denklem 2. derece,  gayrý lineer çünkü bir kare var, ve homojen çünkü
+$u=0$'in bir çözüm olduðunu görebiliyoruz. 
+
+Örnek
+
+$$ u_x^2 + u_y = 6y \sin\bigg(\frac{x^3}{5}\bigg) $$
+
+PDE 1. derece,  gayrý lineer, ve homojen deðil. 
+
+Soru
+
+Baðýmsýz deðiþkenlere baðlý bir lineer operatör olabilir mi? 
+
+Cevap 
+
+Evet. Mesela $u=u(x,y)$, ve denklem $xu_x + u_y = u$. 
+
+Bu homojen bir denklem, ve $\mathcal{L} u = 0$ olarak gösterilebilen bir
+denklem, ve 
+
+$$ \mathcal{L} = x\frac{\partial }{\partial x} + 
+\frac{\partial }{\partial y} - 1
+$$
+
+ve görüldüðü üzere operatör tanýmýnda baðýmsýz deðiþken $x$ var.
+
+Bu lineer bir operatör. Lineerliðin baðlý olduðu þey baðýmlý deðiþkenler,
+baðýmsýzlar deðil, mesela üstteki $x$, $x^3$ gibi bir þey olabilirdi ama
+problem hala lineer olurdu. 
+
+Sýnýr koþullarý da bu baðlamda çok önemli, mesela diyelim ki tanýmý lineer
+olan bir PDE var, ama problem tanýmýndaki sýnýr koþullarý eðer fonksiyonun
+gayrý lineer bir kombinasyonunu içeriyorsa o zaman problemin tamamý gayrý
+lineer hale gelir. 
+
+Biraz formel olarak düþünürsek, mesela tek boyutlu ýsý denklemi
+
+$$ u_t = k u_{xx} $$
+
+ki $x$ mesafe belirten deðiþken, $t$ zaman, 
+
+\includegraphics[height=2cm]{1_8.png}
+
+Bu denklem üstteki gibi bir borudaki ýsýnýn daðýlýmýný, akýþýný gösteriyor
+olsun. $u|_{x=L}$ ile gösterilen bir sýnýr þartý, yani $L$ uzunluðundaki
+borunun en ucunda (saðýndaki) olmasý þart olan ýsý seviyesi. Mesela bu þart
+$u|_{x=L} = T_2$ olsun, ki $T_2$ bir tek sayý, $100^o$ , $200^o$ gibi. Þimdi homojenliðe
+ne oldu? Ana denklem homojen, ama homojenlik testini sinir þartýna uyguladýðýmýz
+zaman $0 = T_2$ gibi bir sonuç alýyoruz, ki bu absürt bir sonuç demek ki sýnýr
+þartý homojen deðil. O zaman bu problemin tamamý homojen olamaz. 
+
+Benzer þekilde borunun öteki ucu için tanýmlanan þart gayrý lineer olsa
+
+\includegraphics[height=2cm]{1_9.png}
+
+ki bu þart o uçtan bir tür sinüsoidal bir enerji, ýsý verildiði bir durumu
+tarif ediyor, o zaman ana denklem lineer olsa bile, sýnýr þartýnda gayrý
+lineerlik olduðu için problemin tamamý gayrý lineer olacaktýr. 
+
+Aslýnda formel olarak sýnýr þartlarýný alýp 
+
+$$ \mathcal{L}  = \frac{\partial }{\partial t} - k \partial_{xx}$$
+
+operatör tanýmýna bir þekilde dahil etmenin yollarý var, ama biz bunlar çok
+ileri seviye teknikler, bu derste bu teknikleri görmeyeceðiz. 
+
+Baþlangýç Þartlarý
+
+Mesela yayýlma (diffusion) denklemi $u(x,t)$ için $u(x,0) = f(x)$, yani
+baþlangýç anýnda ýsý daðýlýmýnýn tüm boru boyunca hangi seviyelerde
+olduðunun (burada bu daðýlým $f(x)$) belirtilmesi , baþlangýç þartýný
+tanýmlamak demektir.
+
+Genel bir kural PDE'deki türev sayýsý kadar þart tanýmlanmasý
+gerektiðidir. Mesela iki zaman türevi var ise, iki tane koþul gerekir,
+mesela $t=0$ anýndaki bir koþul, artý zamana göreve türevin $t=0$ anýndaki
+deðeri, vs. 
+
+Þöyle düþünebiliriz, $u_{xx}$'in olduðu bir denklemde $u$ elde etmek için
+iki kere entegre edilir, ve bunun sonucu olarak iki tane entegrasyon sabiti
+ortaya çýkar, ki bu deðerler herhangi bir sayý olabilir. O iki sabiti
+hesaplamak için iki tane koþul gerekecektir. 
+
+Genel kuralý daha somutlaþtýrýrsak, ``her baðýmsýz deðiþken için gereken
+sýnýr koþulu, o baðýmsýz deðiþkenin derecesine eþittir''. Tabii bu genel
+bir kural, bazen gerçek dünyadaki fizik problemlerinde bu geçerli
+olmayabiliyor, bir problem için düzgün sýnýr koþullarý bulmak baþlý baþýna
+bir sanat denebilir aslýnda. 
+
+Ornek
+
+Laplace denklemi
+
+$$ \nabla^2 u \equiv \frac{\partial ^2u}{\partial x^2} + 
+\frac{\partial ^2u}{\partial y^2}  +
+\frac{\partial ^2u}{\partial z^2} 
+$$
+
+ki $\nabla^2$ Laplacian operatörü olarak bilinir. 
+
+Üstteki türden bir denklem hiç kaynak akým verilmeyen sonsuz uzayda
+elektrik potansiyeli alanýný temsil ediyor olabilir. 
+
+Bu denklemin bir çözümün (ki sýnýr þartlarýna dikkat edelim) þu þekilde
+olduðunu göstermek kolaydýr:
+
+$$ u(\vec{x}) = \frac{1}{\sqrt{x^2+y^2+z^2}} $$
+
+Bu Potansiyel Teori'sinde tipik bir problem, bir alan deðiþkeni var, ve
+orijinden uzaklaþtýkça bu deðiþken azalýyor, bu azalma $1 / $ uzaklýðýn
+karesi oranýnda. 
+
+Bu ``bir'' çözüm, fakat bir sürü 2. derece türev var ortalýkta, o zaman
+$x,y,z$'nin her türlü lineer fonksiyonu de aslýnda bir çözümdür. Mesela
+
+$$ u(\vec{x}) = \alpha x + \beta y + \gamma z + \delta $$
+
+formülü de bir çözüm olabilir. Niye? Herhangi bir lineer fonksiyonun iki
+kere türevini alýrsak o fonksiyon yokolur. 
+
+Demek ki bu problemin tanýmý eksik, sýnýr þartlarý da tanýmlanmasý gerekli,
+aksi takdirde elde edilen sonuçlar özgün olmayacak. Envai türden çözüm
+mümkün. 
+
+Bu problem için tipik bir sýnýr koþulu $\lim_{|\vec{x}|\to \infty} u = 0$
+ifadesidir. Elektrik alan örneðine dönersek, elektrik alaný sonsuzluða
+giderken sýfýra düþüyor demiþ oluyoruz. Bir sabite gidiyor da diyebilirdik,
+o da iþlerdi. 
+
+O tür bir þart 
+
+$$ u(\vec{x}) = \frac{1}{\sqrt{x^2+y^2+z^2}} $$
+
+sonucunu saðlardý, diðer seçenekleri elemiþ olurdu. Bu örneði sýnýr
+koþullarýnýn önemini belirtmek için seçtik, bu koþullar ana denklemin
+kendisi kadar önemli. 
+
+Bir nokta daha:
+
+Þöyle bir ODE düþünelim
+
+$$ \frac{du}{dt} = 1 $$
+
+Entegre edince genel çözüm
+
+$$ u(t) = t + c_1 $$
+
+Fakat PDE için
+
+$$ u = u(x,y) $$
+
+$$ u_x = xy $$
+
+Burada $y$ bazlý bir türev yok, basit bir PDE, çözmesi kolay, fakat unutmayalým,
+entegre edince
+
+$$ u = \frac{1}{2}x^2y + [..] $$
+
+Noktalarýn olduðu yere ne gelecek? Bir sayý sabiti deðil bir fonksiyon
+gelecek. 
+
+$$ u = \frac{1}{2}x^2y + g(y) $$
+
+çünkü $u$, $y$'nin bir fonksiyonu, o zaman elimize geçen $y$'nin herhangi
+bir fonksiyonu olacak, ki bu fonksiyonun deðeri sinir koþullarý üzerinden
+tanýmlanmýþ olmalý. Bunu özellikle vurgulamak istedim çünkü insanlar bu
+detayý unutabiliyor.
+
+Sýnýr koþulu nasýl olabilir? Mesela $u(\alpha,y) = f(y)$ þeklinde
+olabilir. Bu koþulu yerine sokunca
+
+$$ \frac{1}{2}\alpha^2 y + g(y) = f(y) $$
+
+Bu bize $g(y)$'in ne olduðunu söyler
+
+$$ g(y)  = f(y) - \frac{1}{2}\alpha^2 y $$
+
+ve bu örnek için nihai çözüm
+
+$$ u(x,y) = \frac{1}{2}x^2y + f - \frac{1}{2}\alpha^2 y $$
+
+Tekrarlamak gerekirse
+
+Bir Kýsmi Türevsel Denklem (PDE) çok deðiþkenli bilinmeyen bir fonksiyon ve
+o fonksiyonun kýsmi türevleri arasýnda kurulan bir iliþkidir. 
+
+Örnek 
+
+$$ u = u(x,t) $$
+
+olmak üzere
+
+$$ \frac{\partial u}{\partial x} + \frac{\partial u}{\partial t} = 0$$
+
+denklemi bir PDE'dir. Çözüm bir tek sayýsal sonuç deðil, bir
+fonksiyondur. Düþünelim, mesela $f$ fonksiyonu tek deðiþkenli ve türevi
+alýnabilir bir fonksiyon ise
+
+$$ u(x,t) = f(x-t) $$
+
+çözümdür diyebilir miyiz? Yani çözüm $f(x-t)$ olabilir mi? Kontrol edelim 
+
+$$ u_x = f'(x-t) $$
+
+$$ u_t = -f'(x-t) $$
+
+Bu iki kýsmi türev toplanýnca sýfýr çýkar, yani sonuç üstte tanýmlý PDE'ye
+uyar. Bu genel tanýma uyan bir sürü fonksiyon vardýr, mesela 
+
+$$ u(x,t) = (x-t)^2 $$
+
+\includegraphics[height=4cm]{1_1.png}
+
+$$ u(x,t) = e^{-(x-t)^2} $$
+
+\includegraphics[height=4cm]{1_2.png}
+
+$$ u(x,t) = 3\sin(x-t) $$
+
+\includegraphics[height=4cm]{1_4.png}
+
+Not: Burada $f$'i bir $f(z)$ olarak görebiliriz, bu fonksiyona $(x-y)$
+geçiliyor, yani bir içiçe fonksiyon ortaya çýkýyor. O zaman üstteki formlar
+aslýnda $f(z) = z^2$, ve $e^{-z^2}$ þeklinde. Tabii kýsmi türevler ile
+türev alýnca Zincirleme Kanunu devreye girmelidir ve geçilen deðerlerin,
+``fonksiyonlarýn'' da türevi alýnmalýdýr, vs. 
+
+Yani üstteki sonuç aslýnda diyor ki $x-t$ þeklinde hep beraber olmak üzere
+bu ikiliyi kullanan herhangi bir fonksiyon, üstteki PDE'nin çözümüdür. Bu
+þekilde çözüm birden fazla fonksiyon oluyor, ve bu çözüm fonksiyonlarýnýn
+birbirinden ne kadar farklý olabildiði, göstermeye çalýþtýðýmýz noktalardan
+biri.
+
+Üstteki PDE bir taþýným (convection) örneðidir, ve 1. seviye lineer homojen
+bir denklemdir. 1. seviye en yüksek türev seviyesinin seviyesine iþaret
+eder, lineer homojen ise tüm çözümlerin lineer bir þekildeki kombinasyonu
+yine bir çözümdür anlamýna gelir. Üstteki PDE için ne kadar çeþitli
+çözümler olabildiðini gördük, onlarýn kombinasyonlarýyla bu çeþitlerin daha
+da artacaðýný düþünebiliriz. kýyasla þöyle bir ODE 
+
+$$  y' - y  = 0$$
+
+için çözümler
+
+$$ y = Ae^x $$
+
+denklemidir Tek bir çözüme indirgemek için baþlangýç þartý mesela $y(0) =2$ 
+veririz ve oradan tek çözüm $y = 2e^x$ buluruz. 
+
+Örnek PDE'miz için de, benzer þekilde, tek bir fonksiyonu bulmak için
+baþlangýç, ya da sýnýr þartlarý koymalýyýz. 
+
+Örnek
+
+Örnek PDE çözümleri arasýnda hangisi x ekseni boyunca $u = e^{-x^2}$
+þartýný tatmin eder? 
+
+$u = e^{-x^2}$ demek, $u(x,0)$ demektir, çünkü $t$ yoktur. Çözümlerimizi
+teker teker gözden geçirirsek, $u(x,0)$ denklemi $u = e^{-x^2}$ olan
+çözüm
+
+$$ u(x,t) =  e^{-(x-t)^2} $$
+
+çözümüdür. Görsel olarak durumu canlandýrmak gerekirse, $t$'yi bir zaman
+deðiþkeni olarak kabul edelim, ve 
+
+\includegraphics[height=2cm]{1_3.png}
+
+her $t$ deðerinde o anda $u$'nun $x$ üzerinde düþen yansýmasýnýn bir
+fotoðrafýný çekiyoruz sanki, üstteki resimde soldaki $t=0$ anýndaki
+mesela. 
+
+Devam edelim. Örnek 1 için bir sürü çözümden bahsettik ama bu çözümleri
+nasýl türettiðimizi söylemedik. Ayrýca bu örnekte ``tüm mümkün çözümleri''
+bulup bulmadýðýmýzý da söylemedik. Þimdi göstereceðimiz iþlemler hakikaten
+tüm çözümleri bulduðumuzu gösterecek, ve akýllýca kullanýlabilecek bir
+deðiþken deðiþtirme (change of variables) tekniðinin bir problemi
+basitleþtirmekte nasýl faydalý olacaðýný anlatmaya uðraþacak. 
+
+Örnek
+
+Üstteki PDE'yi lineer deðiþken deðiþimi kullanarak bir ODE'ye indirgemeye
+uðraþacaðýz. Diyelim ki
+
+$$ \alpha = a x + b t $$
+
+$$ \beta = cx + dt $$
+
+Kýsmi türevler $u_x$ ve $u_t$ þu þekilde geniþletilebilir
+
+$$ u_x = 
+\frac{\partial u}{\partial \alpha}\frac{\partial \alpha}{\partial x}  +
+\frac{\partial u}{\partial \beta}\frac{\partial \beta}{\partial x} 
+$$
+
+
+$$ u_t = 
+\frac{\partial u}{\partial \alpha}\frac{\partial \alpha}{\partial t}  +
+\frac{\partial u}{\partial \beta}\frac{\partial \beta}{\partial t} 
+$$
+
+Ýlk baþtaki deðiþken deðiþimine göre bazý kýsmi türevler þöyle:
+
+$$ \frac{\partial \alpha}{\partial x} = a , \ \frac{\partial \alpha}{\partial t} = b, \ \frac{\partial \beta}{\partial x} = c , \
+\frac{\partial \beta}{\partial t} = d 
+$$
+
+Bunlarý $u_x$ ve $u_t$ içinde yerlerine geçirirsek,
+
+$$ u_x = 
+\frac{\partial u}{\partial \alpha} a +
+\frac{\partial u}{\partial \beta} c
+\mlabel{1}
+$$
+
+$$ u_t = 
+\frac{\partial u}{\partial \alpha} b +
+\frac{\partial u}{\partial \beta} d
+\mlabel{2}
+$$
+
+Üstteki iki kýsmi türevi ana PDE'de yerine koyarsak
+
+$$ \frac{\partial u}{\partial x} + \frac{\partial u}{\partial t} = 0$$
+
+þöyle olur
+
+$$ 
+\frac{\partial u}{\partial \alpha} a  +
+\frac{\partial u}{\partial \beta} c + 
+\frac{\partial u}{\partial \alpha} b + 
+\frac{\partial u}{\partial \beta} d = 0
+$$
+
+Benzer terimleri gruplayalým
+
+$$ 
+\frac{\partial u}{\partial \alpha} (a+b)
+\frac{\partial u}{\partial \beta} (c+d) = 0
+$$
+
+Þimdi öyle $a,b,c,d$ deðerleri seçelim ki bir kýsmi türev yokolsun. Mesela 
+
+$$ a = 1, b = 0, c=1, d=-1 $$
+
+O zaman 
+
+$$ \frac{\partial u}{\partial \alpha} = 0 $$
+
+kalýr. Bu artýk bir basit diferansiyel denklemdir, çözüm için entegral
+alýrýz, 
+
+$$ u = C(\beta) $$
+
+Unutmayalým, sýfýrýn entegrali bir sabittir, ama $u$ birden fazla deðiþkene
+sahip olduðu için bu ``sabitin'' $\beta$ içermesi gerekir. $C(\beta)$,
+$\alpha$'ya göre bir sabittir. 
+
+$C(\beta)$'yi daha somutlaþtýralým, 
+
+$$ \beta = cx + dt $$
+ 
+demiþtik, ayrýca $c=1,d=-1$. O zaman çözüm
+
+$$ u = C(x-t) $$
+
+Bu da baþta bulduðumuz çözüm ile ayný zaten. 
+
+
+\end{document}
+
+
+
+
+
+
+

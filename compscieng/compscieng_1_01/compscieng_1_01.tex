@@ -1,0 +1,623 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 1
+
+Bu derste matrislerden bahsedilecek, onlarýn canlanmasýný, dile gelmesini
+isxtiyoruz. Mesela alttaki gibi bir matris
+
+$$ 
+K =
+\left[\begin{array}{rrrr}
+2 & -1 & 0 & 0\\
+-1 & 2 & -1 & 0\\
+0 & -1 & 2 & -1\\
+0 & 0 & -1 & 2
+\end{array}\right]
+ $$
+
+nedir? Nereden gelir? Bu matris bir þeyi temsil edecek, bilimsel bir
+problemi çözmemizi saðlayacak. 
+
+Matrisin özelliklerine bakalým. Ýlk bakýþta bunun simetrik bir matris
+olduðunu görüyoruz. Yani $K = K^T$. Bu tür matrisler özellikle dengedeki
+sistemler (equilibrium) problemlerinde çok ortaya çýkýyorlar. Baþka
+özellikler? $K$'yi büyütseydik, seyrek (sparse) olacaktý, yani içinde çok
+fazla sayýda sýfýr olacaktý. Þu haliyle tam seyrek denemez, ama ayný
+kalýpla büyütülürsek seyrek olur. Eðer Python kullanarak sýfýr olmayan
+elemanlarý saydýrmak isteseydik, sonuç ne gelecekti? 4x4 olan $K$ için
+alttaki kod þu sonucu verir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+K = np.array([[2,-1,0,0],[-1,2,-1,0],
+              [0,-1,2,-1],[0,0,-1,2]])
+print (np.count_nonzero(K))
+\end{minted}
+
+\begin{verbatim}
+10
+\end{verbatim}
+
+4x4 = 16 içinden 10 eleman sýfýr deðildir. Eðer 100x100 olsaydý? Matris
+ayný kalýbý takip ederse, yani çaprazý, ve çaprazýn bir altý ve bir üstü
+dolu kalýrsa, çaprazda 100 eleman olur (boyutla ayný), alt ve üstünde birer
+az eleman olur, yani 99+99 = 198. Toplayalým, 100 + 198 = 298. Yani 100x100
+= 10000 eleman içinden 298 eleman sýfýr deðildir, geri kalan bir sürü
+eleman sýfýrdýr. Matris seyrektir.
+
+Sayýsal hesaplamada yoðun (dense -sýfýrý fazla olmayan-) matrisler, büyük
+boyutlarda baþýmýzý aðrýtabilir. Seyrek matrisleri daha hýzlý çözmenin
+yöntemleri vardýr, ama 1 milyon x 1 milyon bir yoðun matris çözmesi imkansýz
+hale gelebilir.
+
+Baþka özellikler? Matris üçlü köþegen (tridiagonal) -üçlü köþegenlik, matris
+çaprazý, onun bir üstü ve altý haricindeki tüm diðer elemanlarýn sýfýr olduðu
+bir matristir-. Bu tür matrisler çok önemlidir, Newton saðolsun, ikinci seviye
+diferansiyel denklemlerden sürekli ortaya çýkarlar mesela.
+
+Dahasý? Bu bir Toeplitz matrisi, çaprazdaki deðerler sabit deðerler, çapraz
+boyunca hiç deðiþmiyorlar. Bu matrislere lineer zamana göre deðiþmeyen
+filtreler (linear time invariant filters) ismi de veriliyor, çünkü her
+satýr birbirinin ayný (ve hesabýmýzda satýrlarýn zamaný temsil ettiði
+kabulünden hareketle). Python ile bir Toeplitz yaratmanýn yöntemi þöyle:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+K = lin.toeplitz([2, -1, 0, 0])
+print (K)
+\end{minted}
+
+\begin{verbatim}
+[[ 2 -1  0  0]
+ [-1  2 -1  0]
+ [ 0 -1  2 -1]
+ [ 0  0 -1  2]]
+\end{verbatim}
+
+100x100 için Toeplitz komutuna verdiðimiz tek satýrda daha fazla sýfýr
+gerekli. Ýçinde tamamen sýfýr olan bir vektör yaratýrýz, baþýndaki birkaç
+elemaný istediðimiz deðerle atarýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+vec = np.zeros((1,100))
+vec[0,0] = 2
+vec[0,1] = -1
+print (lin.toeplitz(vec))
+\end{minted}
+
+\begin{verbatim}
+[[ 2. -1.  0. ...  0.  0.  0.]
+ [-1.  2. -1. ...  0.  0.  0.]
+ [ 0. -1.  2. ...  0.  0.  0.]
+ ...
+ [ 0.  0.  0. ...  2. -1.  0.]
+ [ 0.  0.  0. ... -1.  2. -1.]
+ [ 0.  0.  0. ...  0. -1.  2.]]
+\end{verbatim}
+
+Seyrek matrislerle iþlem yaptýðýmýzý Python'a bir þekilde belirtmemiz
+lazým, eðer mevcut haliyle bu matrisi çözmeye uðraþýrsak, Python sýfýrlara
+gelene kadar onlarýn sýfýr olduðunu bilemeyecektir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.sparse as sparse
+import numpy as np
+import scipy.linalg as lin
+vec = np.zeros((1,100))
+vec[0,0] = 2
+vec[0,1] = -1
+K = lin.toeplitz(vec)
+A = sparse.lil_matrix(K)
+print (A.shape)
+\end{minted}
+
+\begin{verbatim}
+(100, 100)
+\end{verbatim}
+
+Yanlýz yukarýda yoðun matrisi önce yarattým, sonra onu deðiþtirerek seyrek
+matris yarattým, daha iyisi baþtan bir seyrek matris yaratmaktý. Neyse, bu
+yöntemi ileri de göreceðiz. 
+
+Daha derine inelim þimdi. $K$ matrisi tersi alýnabilen (invertible) bir
+matris midir? Evet. Bu ne demektir? $KK^{-1} = I$, ve $I$ matrisi birim
+(identity) matrisidir, Python'da \verb!np.eye(N)! komutuyla 
+yaratýlabilir. 
+
+Bir matrisin tersinin alýnýp alýnamayacaðýný nasýl anlayabiliriz? Bu çok önemli,
+temel bir sorudur.
+
+Bazýlarýnýn aklýna determinantý hesaplamak gelebilir. Fakat benim ilk
+seçimim bu deðil, tercihim satýr indirgemek (row reduce). Önümüzde bir
+matris var, ve içinde neler olup bittiðini bilmiyoruz. Satýr indirgeme
+yapýn.
+
+Bu nasýl yapýlýr? $K$'in çaprazýnýn altýndaki -1 deðerlerini sýfýrlamak
+istiyorum. Orayý temizlemek istiyorum, çünkü matrislerim eðer üçgensel
+(triangular) ise, olan biteni anýnda görebilirim.
+
+Birinci satýrý ikiye bölüp, ikinci satýra eklerim. Terminoloji: 0,0 kordinatý
+(en üst sol köse) bu iþlem sýrasýnda pivot oldu.
+
+$$ 
+\left[\begin{array}{rrrr}
+2 & -1  &  0 & 0 \\
+0 &  3/2 & -1 &  0 \\
+0 & -1 & 2 & -1 \\
+0 &  0 & -1 & 2 
+\end{array}\right]
+$$
+
+Þimdi pivot 3/2, ve onun altýndaki deðeri temizlemek istiyoruz. Ýkinci
+satýrýn 2/3'ünü alta eklersek, oradaki -1 sýfýrlanýr.
+
+$$ 
+\left[\begin{array}{rrrr}
+2 & -1 & 0 & 0 \\
+0 & 3/2 & -1 & 0 \\
+0 & 0 & 4/3 & -1 \\
+0 & 0 & -1 & 2
+\end{array}\right]
+$$
+
+ve sonunda
+
+$$ 
+\left[\begin{array}{rrrr}
+2 & -1 & 0 & 0 \\
+0 & 3/2 & -1 & 0 \\
+0 & 0 & 4/3 & -1 \\
+0 & 0 &  0 & 5/4
+\end{array}\right]
+$$
+
+Bu gerçekten hýzlý bir iþlem oldu. Python da determinantý zaten böyle
+bulacaktý. Yoketme (elimination) kullanacaktý, teker teker -1'leri
+yokedecekti. Peki determinantýn deðeri nedir? 5. Niye 5? Çünkü elimizdeki
+artýk üçgensel bir matris, ve böyle matrislerde çaprazdaki elemanlarý
+birbiriyle çarpmakla determinant hemen hesaplanýr. Python aynen böyle
+yapacaktý, $2 \cdot 3/2 \cdot 4/3 \cdot 5/4 = 5$.
+
+Þimdi tersinin olup olmadýðý sorusuna geri dönelim: Bir üst üçgensel (upper
+triangular) matris ne zaman tersine çevirilebilir haldedir? Determinant
+kelimesini kullanmamýza gerek yok, çapraza bakarýz, eðer bu çapraz sýfýr
+deðeri olmayan bir çapraz ise bu matris tersine çevirilebilir
+demektir. Terminoloji: demek ki elimizde N tane ($K_4$ için 4) tane sýfýr
+olmayan pivot var. 
+
+1. dersin amaçlarýndan biri matrislere isim vermek. $K$ matrisi bunlardan
+biri, önemli bir matris, onu ileride tekrar göreceðiz, görünce
+tanýyacaðýz. 
+
+$$ 
+C = 
+\left[\begin{array}{rrrr}
+2 & -1 & 0 & -1\\
+-1 & 2 & -1 & 0\\
+0 & -1 & 2 & -1\\
+-1 & 0 & -1 & 2\\
+\end{array}\right]
+$$
+
+Peki þu matris? Toeplitz formunda ama üst sað ve alt sol köþelerde ekstra
+bir -1 deðeri var. Fakat iddia ediyorum ki bu matris tersine çevirebilir
+deðil ve bunun için determinant, ya da yoketme tekniðine gerek
+yok. Terminoloji: Matrise $C$ denilmesi onun deðerlerinin dairesel
+(circulant) olmasýndan ileri geliyor. -1 deðerlerine bakýn, sanki bir
+yuvarlak oluþturuyorlar, sýfýr deðerleri ayný þekilde. 
+
+Devam edelim: Diyelim ki $C$ bir vektörü çarpýyor (zaten matrislerin tek amacý
+bu, vektörler ile çarpýlmak), ve ortaya sýfýr vektörü çýkýyor. Boþ olan vektör
+ne olabilir?
+
+$$ C = 
+\left[\begin{array}{rrrr}
+2 & -1 & 0 & -1\\
+-1 & 2 & -1 & 0\\
+0 & -1 & 2 & -1\\
+-1 & 0 & -1 & 2\\
+\end{array}\right]
+\left[\begin{array}{r}
+\\
+\\
+\\
+\\
+\end{array}\right]
+=
+\left[\begin{array}{r}
+0\\
+0\\
+0\\
+0
+\end{array}\right]
+ $$
+
+Þu olabilir
+
+$$ C = 
+\left[\begin{array}{rrrr}
+2 & -1 & 0 & -1\\
+-1 & 2 & -1 & 0\\
+0 & -1 & 2 & -1\\
+-1 & 0 & -1 & 2\\
+\end{array}\right]
+\left[\begin{array}{r}
+1\\
+1\\
+1\\
+1\\
+\end{array}\right]
+=
+\left[\begin{array}{r}
+0\\
+0\\
+0\\
+0
+\end{array}\right]
+ $$
+
+Ýddia ediyorum ki böyle bir vektörün olabilmesi $C$'nin tersine çevirilebilir
+olma olasýlýðýný yoketti. Nasýl?
+
+Eðer $C$'nin tersi olabilseydi, $Cu = 0$ denklemi ne olurdu? Ýki tarafý bu
+``olabilen'' $C^{-1}$ ile çarpýp sonuca bakalým:
+
+$$ C^{-1}Cu = C^{-1}0 $$
+
+$$ I u = 0 $$
+
+$$ u = 0 $$
+
+Yani eðer $C$'nin tersi olsaydý, $Cu = 0$ denkleminin tek sonucu $u=0$
+olurdu. Fakat bu böyle deðildir, üstte içinde 1 olan vektör bunun kanýtý. O
+zaman bir uyuþmazlýk, absürtlük elde ettik, demek ki $C$'nin tersi olduðu
+iddiasý yanlýþtýr.
+
+Fiziksel olarak $K$ ve $C$'yi kütle ve yay sistemi olarak kabul
+edebiliriz. Mesela $K$ þöyle bir sistemi temsil edebilir:
+
+\includegraphics[height=2.5cm]{1_5.png}
+
+Yuvarlak olan $C$ sistemi þunu temsil edebilir
+
+\includegraphics[height=3cm]{1_6.png}
+
+Resimdeki noktalar kütleler, ve yaylar o kütleleri birbirine baðlýyorlar.
+
+$T$ Matrisi
+
+Bu matris $K$'ye benzer, fakat en üst satýrda 2 yerine 1 var. 
+
+$$ 
+\left[\begin{array}{rrrr}
+1 & -1 & 0 & 0\\
+-1 & 2 & -1 & 0\\
+0 & -1 & 2 & -1\\
+0 & 0 & -1 & 2
+\end{array}\right]
+$$
+
+Kütle ve yay sistemine dönersek bu matris bir ucu serbest olan bir mekanik
+sistemi gösterebilir. 
+
+B Matrisi
+
+$$ 
+\left[\begin{array}{rrrr}
+1 & -1 & 0 & 0\\
+-1 & 2 & -1 & 0\\
+0 & -1 & 2 & -1\\
+0 & 0 & -1 & 1
+\end{array}\right]
+$$
+
+Bu sistem de her iki ucu da serbest olan bir sistemdir. Bu sistemi alýp
+istediðimiz yere götürebiliriz. 
+
+Son iki matrisin ikisi de simetriktir, üçgensel ve köþegen (diagonal)
+matrislerdir. Niye üçgensel ve köþegen? Çünkü her kütle sað ve solunda
+tek bir (diðer) kütleye baðlýdýr, o yüzden baðlý olmadýðý kütlelere olan
+matris deðeri 0 olarak gösterilir, bu da bir üçgensel köþegen sistem
+ortaya çýkarýr.
+
+Ama T ve B artýk Toeplitz deðildir. 
+
+Bu noktada sýnýr þartlarý (boundary conditions) kavramýna vurgu yapmakta
+yarar var. Mekanik sistemde üçün ne olduðu matrislere sýnýr þartý olarak
+yansýyor. Ve bu þartlar bir sistemin çözülmesinde son derece önemli. Hoca
+kendisine bir problemle gelenlere genelde ilk önce bu soruyu soruyor o
+yüzden: ``sýnýr þartlarýn ne?''. 
+
+Tersine çevirilme durumu? T tersine çevirilebilir, B çevirilemez. B için
+yine ayný
+$u = \left[\begin{array}{cccc} 1 & 1 & 1 & 1 \end{array}\right]^T$ ispatýný
+kullanabiliriz.
+
+K, T, B, C matrislerini ayný anda yaratan bir Python programý
+þurada. Kullaným mesela 4x4 boyutlarý için \verb!K, T, B, C = ktbc(4)!
+þeklinde, bu bize tüm özel matrisleri bir kerede oluþturuyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+def ktbc(n):
+    vec = np.zeros((1,n))
+    vec[0,0] = 2
+    vec[0,1] = -1
+    K = lin.toeplitz(vec)
+    T = np.copy(K)
+    T[0,0] = 1
+    B = np.copy(K)
+    B[0,0] = 1
+    B[n-1,n-1] = 1
+    C = np.copy(K)
+    C[n-1,n-1] = 1
+    
+    return K, T, B, C
+\end{minted}
+
+Kapatýrken þu özellikleri de ekleyelim. 
+
+K, T pozitif kesin (positive definite) matrislerdir. 
+
+C, B pozitif yarý-kesin (positive semi-definite) matrislerdir. 
+
+Eðer simetrik bir matrisim var ise ve pivotlarýn hepsi pozitif ise, o
+matris hem tersine çevirelebilir, hem de pozitif kesin demektir. Yani bir
+matrise bakarýz, yoketme tekniðini uygularýz sonra pivotlarýna bakarýz. 
+
+Pozitif kesinlik çok önemli bir kavramdýr, lineer cebirin tamamýný biraraya
+getirir sanki, özdeðerlere (eigenvalue) baðlýdýr, least square yöntemine
+baðlýdýr, determinantlar. Her yerden çýkar. 
+
+Geriye Doðru Farklýlýk Matrisi
+
+Python \verb!toeplitz! çaðrýsýnýn deðiþik bir þekilde kullanarak geriye
+doðru farklýlýk (backward difference) matrisi de yaratabiliriz. Bu
+kullanýmda matrisin sol kolonunu, ve üst satýrýný tamamen belirtmek
+gerekiyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+D = lin.toeplitz([1, -1, 0, 0], [1, 0, 0, 0])
+print (D)
+\end{minted}
+
+\begin{verbatim}
+[[ 1  0  0  0]
+ [-1  1  0  0]
+ [ 0 -1  1  0]
+ [ 0  0 -1  1]]
+\end{verbatim}
+
+Çözülmüþ Soru 1.1 B
+
+Soru: $T$ matrisini $H$ matrisine çevir bunu $J$ matrisini kullanarak
+yap. 
+
+$$ H = 
+\left[\begin{array}{rrr}
+2 & -1 &  0\\
+-1 & 2 & -1\\
+0 & -1 & 1
+\end{array}\right]
+ $$
+
+$$ T = 
+\left[\begin{array}{rrr}
+1 & -1 &  0\\
+-1 & 2 & -1\\
+0 & -1 & 2
+\end{array}\right]
+ $$
+
+Kitaptaki bu sorunun çözümündeki $J$ matrisi birimsel matrisin tersidir, 
+þu þekildedir:
+
+$$ 
+\left[\begin{array}{rrr}
+0 & 0 & 1\\
+0 & 1 & 0\\
+1 & 0 & 0
+\end{array}\right]
+ $$
+
+Yani 1 sayýlarý sola yatýk çaprazda deðil saða yatik çaprazda. Bu matrisin
+çarpým iþlemi sýrasýnda ilginç etkileri var. Eðer saðdan çarpýlýrsa bir
+matrisin her satýrýnýn içindeki sýrayý tersine çeviriyor. Eðer soldan
+çarpýlýrsa her kolon içindeki sýrayý tersine çeviriyor. $J*T*J$ çarpýmý
+aradýðýmýz sonuç. Yani satýrlarý çevirdikten sonra, kolonlarý çevirince
+istediðimiz sonuca eriþiyoruz. Python kodlarý
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+T = lin.toeplitz([2, -1, 0])
+T[0,0] = 1
+J = np.fliplr(np.eye(3))
+print (T)
+print (np.dot(T,J))
+print (np.dot(J, np.dot(T,J)))
+\end{minted}
+
+\begin{verbatim}
+[[ 1 -1  0]
+ [-1  2 -1]
+ [ 0 -1  2]]
+[[ 0. -1.  1.]
+ [-1.  2. -1.]
+ [ 2. -1.  0.]]
+[[ 2. -1.  0.]
+ [-1.  2. -1.]
+ [ 0. -1.  1.]]
+\end{verbatim}
+
+Soru 1.1 2
+
+$T_3^{-1}$ hesabýný üç basamakta yap ve bunu yaparken daha önce gördüðümüz
+$U$ ve $U^{-1}$ matrislerini kullan.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+T = lin.toeplitz([2, -1, 0])
+
+T[0,0] = 1
+
+U = np.array([[1, -1, 0],
+              [0, 1, -1],
+              [0, 0, 1]])
+
+print (np.dot(U.T,U))
+print (np.dot(U,lin.inv(U)))
+print (np.dot(lin.inv(U), lin.inv(U).T))
+\end{minted}
+
+\begin{verbatim}
+[[ 1 -1  0]
+ [-1  2 -1]
+ [ 0 -1  2]]
+[[1. 0. 0.]
+ [0. 1. 0.]
+ [0. 0. 1.]]
+[[3. 2. 1.]
+ [2. 2. 1.]
+ [1. 1. 1.]]
+\end{verbatim}
+
+Soru 1.1.5
+
+$K_3$ ve $K_4$'un tersini al ($K_2$'yi de bir zahmet), ve þu kesirler olsun
+
+$$ \frac{1}{det} = \frac{1}{4} \frac{1}{5}$$. 
+
+$$
+K_3^{-1} = \frac{1}{4}
+\left[\begin{array}{rrr}
+3 & 2 & 1 \\
+2 & 4 & 2 \\
+1 & 2 & 3
+\end{array}\right]
+\quad \textrm{ve} \quad
+K_4^{-1} = \frac{1}{5}
+\left[\begin{array}{rrrr}
+4 & 3 & 2 & 1 \\
+3 & 6 & 4 & 2 \\
+2 & 4 & 6 &  3 \\
+1 & 2 & 3 & 4
+\end{array}\right]
+$$
+
+
+Ýlk önce $K=K_5$ determinantýný tahmin edin. Sonra $\det(K)$ ve
+$inv(K)$'yi hesaplayýn ve $\det(K) * inv(K)$ hesabýný yapýn. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+K, T, B, C = ktbc(3)
+print (lin.inv(K))
+print (lin.det(K))
+print (lin.det(K) * lin.inv(K))
+
+K, T, B, C = ktbc(5)
+print (lin.det(K))
+print (lin.inv(K))
+print (lin.det(K) * lin.inv(K))
+\end{minted}
+
+\begin{verbatim}
+[[0.75 0.5  0.25]
+ [0.5  1.   0.5 ]
+ [0.25 0.5  0.75]]
+4.0
+[[3. 2. 1.]
+ [2. 4. 2.]
+ [1. 2. 3.]]
+6.0
+[[0.83333333 0.66666667 0.5        0.33333333 0.16666667]
+ [0.66666667 1.33333333 1.         0.66666667 0.33333333]
+ [0.5        1.         1.5        1.         0.5       ]
+ [0.33333333 0.66666667 1.         1.33333333 0.66666667]
+ [0.16666667 0.33333333 0.5        0.66666667 0.83333333]]
+[[5. 4. 3. 2. 1.]
+ [4. 8. 6. 4. 2.]
+ [3. 6. 9. 6. 3.]
+ [2. 4. 6. 8. 4.]
+ [1. 2. 3. 4. 5.]]
+\end{verbatim}
+
+Soru 1.1.22
+
+Çözülmesi istenen denklem $du^2/dx^2 = 1$, elastik çubuk problemi ve
+çubuðun iki tarafý sabitlenmiþ.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.sparse as sparse
+import scipy.sparse.linalg
+import scipy.linalg as lin
+
+n = 1000
+vec = np.zeros((1,n))
+vec[0,0] = 2; vec[0,1] = -1
+K = lin.toeplitz(vec)
+A = sparse.csc_matrix(K)
+e = np.ones((n,1))
+
+u = sparse.linalg.spsolve(A,e)
+plt.plot(u)
+plt.savefig('1-1-22.png')
+\end{minted}
+
+\includegraphics[height=5cm]{1-1-22.png}
+
+Sonuç üstteki grafik gibi olmalý. Yani çözümümüz olan $u$ deðerleri bir parabol
+oluþturuyorlar. Bu demektir ki çubuðun orta noktalarý daha fazla yer
+deðiþtiriyor, uç noktalarý daha az yer deðiþtiriyor.
+
+Elastik Çubuk
+
+Derste çokça kullanýlan elastik çubuk kavramýndan þimdi bahsetmek iyi olur. Bu
+çubuk tek boyutlu ve sadece boyuna doðru (yana doðru deðil) uzayýp kýsalabilen
+matematiksel bir kurgu. Bu çubuðu hayalimizde birbirine zincirler ile baðlý
+sonsuz sayýda ufak parcaçýðýn toplamý olarak düþünebiliriz. $x$ ve $u(x)$
+baðlamýnda ise çubuðun iki kere fotoðrafýnýn çekildiðini düþünelim. Ýlk
+fotoðrafta $x$ bu çubuðun üzerindeki bir parcaçýk. $u(x)$ ise tüm aðýrlýklar,
+kuvvetler etkilerini gösterip uzama, kýsalma bitince çekilen {\em ikinci}
+fotoðrafta ilk resimdeki $x$ noktasýnýn ne kadar yer deðiþtirmiþ olduðu.
+
+\includegraphics[height=4cm]{1_7.png}
+
+``Ucu sabitlemek'' gibi kavramlar duyacaðýz, bunlar bazen fiziksel olarak
+anlamlý, bazen ise ikinci fotoðrafta esneme sonrasý hangi noktaya
+gelindiðinin önceden belirlenmesi anlamýnda. $du/dx$ gibi bir türevi
+irdelerken ise ortada zaman olmadýðýný dikkate alalým, türev $x$'e göre
+yani ilk resimdeki parcaçýgin yeri. O zaman $du/dx$ ikinci resimdeki
+esnemenin çubuktaki yer arttýkça (aþaðý indikçe) ne kadar deðiþtiði. 
+
+Denklemin saðýnda yer alan deðerler, sisteme dýþarýdan verilen güç olarak
+görülebiliyor, hakikaten de deðiþimin ikinci türevi ivmedir. 1.2.22 sorusunu
+görsel olarak nasýl hayal edebiliriz? Çubuðun iki ucu sabitlenmiþ, o sebeple K
+matrisi kullanýyoruz zaten, böylece sýnýr þartlarý dahil oluyor.
+
+Python, VPython üzerinden kullanýlabilecek KineticsKit adlý paket sistemi
+zihinde canlandýrmak için yardýmcý olabilir. Birbirine eþit uzaklýkta, ayný
+kütlede ve arasýnda yaylar olan 7 tane topu býrakýnca ne olduðunu simüle
+edebiliriz. Resimdeki sol kýsým baþlamadan önce, sað kýsým yerçekimi iþini
+bitirdikten ve toplar durduktan sonrasýný gösteriyor.
+
+\includegraphics[height=5cm]{elastic_uniform_load.png}
+
+Alttaki program hem görsel simülasyonu yapacak, hem de toplarýn önce ve
+sonra deðerlerini hatýrlayarak yerçekimi sonrasý aradaki farký
+hesaplayacak. Sonuçlara bakýnca hakikaten de ortadaki toplarýn daha fazla
+hareket ettiðini görebiliyoruz. Grafiksel olarak düþünürsek te mantýklý,
+üste yakýn toplar üstten baðlý olduklarý için fazla uzaklaþamýyorlar,
+ortalara yakýn toplar, bir üstlerinden de aldýklarý ek mesafe sayesinde
+daha fazla yer deðiþtirebiliyor. Ama alt kýsýma yaklaþtýkça orada bir
+birikme oluyor, çünkü alt üç kýsým da sabitlenmiþ. 
+
+\inputminted[fontsize=\footnotesize]{python}{elastic_uniform_load.py}
+
+
+\end{document}

@@ -1,0 +1,684 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Temel Algoritmalar, Veri Yapýlarý
+
+Bilgisayar Bilimdeki (Computer Science) pek çok algoritmanýn kullandýðý
+bazý temel yapýlar var. Bu yapýlarý görelim. 
+
+Sözlükler, Böleç Anahtarlarý (Hash Keys)
+
+Elde anahtarlar ve deðerlerden oluþan bir liste var, bize bir anahtar
+verilince o anahtara tekabül eden deðeri geri getirmek istiyoruz. Bu
+anahtarlarý ve deðerleri bildik düz listeye koyabiliriz, ama düz listeler
+indis bazlý eriþim saðlarlar, bu durumda arama yapmak gerekince listeyi
+sürekli baþtan sona kadar taramak gerekecektir. Hesapsal karmaþýklýk
+$O(n)$.
+
+Daha iyi bir yöntem anahtardan dizin indisi üretmek, boylece dizin indisi
+ile direk aradýðýmýz elemana gidebiliriz. Eðer anahtarlar, mesela, meyve
+isimleri ise ``portakal'' anahtarýný bir sayý indisine nasýl çeviririz?
+
+Tüm harflerin sayýsal karþýlýðýný kullanabiliriz, ve bu sayýlarý bir
+þekilde daha büyük bir sayýya çevirerek her anahtar deðerinden bir sayýsal
+indis üretebiliriz. Bu indis deðeri bir dizine direk eriþim
+saðlayacaktýr. Not: Sayý deðeri bazen dizinin nihai kapasitesinden daha
+büyük bir deðer döndürebilir, o zaman matematiksel modülo kullanarak (yani
+bölümden arta kalan) indisin sürekli belli bir aralýkta kalmasýný
+saðlayabiliriz. 
+
+Tabii bu durumda farklý anahtarlar ayný indisi deðerine gidebilir (çarpýþma
+-collision- durumu, problemler bitmiyor (!)), o zaman çarpýþma olan yere
+bir alt liste ekleriz, arama o noktadan sonra kaba kuvvet ile devam eder.
+
+Programlama dillerinin çoðunda böleç kabiliyeti vardýr;
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print hash('portakal')
+print hash('armut')
+\end{minted}
+
+\begin{verbatim}
+5699995722992068222
+4709300584609918268
+\end{verbatim}
+
+Modülo uygulayalým, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print hash('portakal') % 15 # dizin 15 buyuklugunde 
+print hash('armut') % 15
+\end{minted}
+
+\begin{verbatim}
+7
+8
+\end{verbatim}
+
+Yýðýt (Stacks)
+
+Bu yapý bir listedir, fakat özel bir tür listedir. Ona eklenen öðe en
+tepeye / sona eklenir, yani ``yýðýlmýþ'' olur, bir saman yýðýný gibi,
+eklenen her þey en tepeye eklenir. Öðe alýnmasý gerektiðinde de en son
+eklenen öðe alýnýr, yani en tepedeki / sondaki öðe. Bu yaklaþýma
+ilk-giren-son-çýkar (first-in-last-out, FILO) ismi de veriliyor. Python ile
+düz listeler direk yýðýt olarak kullanýlabiliyor, ve üzerinde ekleme icin
+\verb!extend!, çýkarma için \verb!pop! çaðrýlarý yapýlabiliyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a  = []
+a.extend(["ddd"])
+a.extend(["eddd"])
+print a
+print a.pop()
+print a
+\end{minted}
+
+\begin{verbatim}
+['ddd', 'eddd']
+eddd
+['ddd']
+\end{verbatim}
+
+Kuyruk (Queue)
+
+Bu yapý da yine liste gibi, dizili öðeler var, ama eklenen öðe baþa
+eklenir, alýnan öðe sondan alýnýr. Kuyruklara ilk-eklenen-ilk-çýkar
+(first-in-first-out, FIFO) ismi veriliyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from collections import deque
+class Queue(deque):
+    pull = deque.popleft
+    push = deque.append
+
+q = Queue([3,4,5,4])
+print q.pull()
+q.push(44)
+print q.pull()
+print q
+\end{minted}
+
+\begin{verbatim}
+3
+4
+deque([5, 4, 44])
+\end{verbatim}
+
+\includegraphics[height=4cm]{basic_01.png}
+
+Hem yýðýt hem de kuyruklarýn farklý kodlama þekilleri görülebiliyor.
+Üstteki örnekte basitlik amaçlý olarak liste bazlý bir kodlama gösterdik,
+fakat baðlanmýþ liste (linked list) kullanan çok hýzlý iþleyen, etkili
+kodlar da vardýr. Baðlanmýþ listeler bilindiði gibi hafýzada öðeler arasý
+göstergeç (pointer) kullanarak öðede öðeye çok hýzlý þekilde
+atlayabilirler, iki öðe arasýna yeni öðe sokmak çok kolaydýr,
+vs. Baðlantýlý öðe kullanýnca, ayrýca, dizinlerde olduðu gibi illa önceden
+belli bir büyüklükteki yeri ayýrmak gerekmiyor.
+
+Baðlanmýþ Listeler
+
+Eðer bir listede baþa, sona ya da araya öðe sokmak hýzlý olsun istiyorsak
+baðlantýlý liste kullanabiliriz. Listede öðeler (node) vardýr, ve her öge
+kendinden sonra gelecek diðer öðeye bir referans tutmakla
+yükümlüdür. Referans derken bir objeye olan referanstan bahsediyoruz;
+Python gibi yorumlanan, dinamik, temiz diller arka planda neler olduðunu
+biraz saklýyorlar aslýnda, fakat C, C++ gibi diller ile uðraþanlar
+bilirler, bir referans, ya da göstergeç (pointer) bir hafýza adresidir. O
+adresin gösterdiði bir baþka obje vardýr. Göstergecin hangi objeye iþaret
+ettiði rahatlýkla deðiþtirilebilir.
+
+Alttaki kodda düðüm (node) sýnýfýný görüyoruz, ve baðlantýlý liste bu
+düðümleri tutan (daha doðrusu sadece en baþtakini tutan) bir objeden
+ibaret. Baþa yeni bir eleman eklemek demek baþlangýç referansý
+\verb!head!'i bu yeni düðüme doðru ``göstertmek'' ile olur, ayný þekilde
+yeni elemanýn sonraki obje referansý \verb!next! daha önceki baþ elemana
+doðru yönlendirilir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+class Node(object):
+    def __init__(self, value, next=None):
+        self.value = value
+        self.next = next
+    def __str__(self): return str(self.value)
+        
+class LinkedList(object):
+    def __init__(self):
+        self.head = None
+  
+    def _add(self, value):
+        self.head = Node(value, self.head)
+            
+    def _printList(self):
+        node = self.head
+        while node:
+            print node.value,
+            node = node.next
+        print 
+            
+    def _find(self, index):
+        prev = None
+        node = self.head
+        i = 0
+        while node and i < index:
+            prev = node
+            node = node.next
+            i += 1
+        return node, prev, i
+
+    def _insert_middle(self, index, value):
+        node, prev, i = self._find(index)
+        tmp = Node(value, node)
+        prev.next = tmp
+        
+    def _delete(self, prev, node):
+        if not prev:
+            self.head = node.next
+        else:
+            prev.next = node.next
+    
+    def deleteNode(self, index):
+        node, prev, i = self._find(index)
+        if index == i:
+            self._delete(prev, node)
+        else:
+            print('Node with index {} not found'.format(index))
+
+ll = LinkedList()
+ll._add(37)
+ll._add(99)
+ll._add(12)
+ll._printList()
+node, prev, i = ll._find(1)
+print str(node), 'bulundu'
+\end{minted}
+
+\begin{verbatim}
+12 99 37
+99 bulundu
+\end{verbatim}
+
+\includegraphics[width=7cm]{basic_02.png}
+
+Þimdi yeni bir örnekte araya bir öðe sokmayý görelim. Ortalarda bir yerde
+öðe sokmak için önce indis deðerine göre eski eleman bulunur, bu öðeden
+sonra eleman sokulacak, ve daha önce \verb!head! ile yapýlan ekleme
+örneðinde olduðu gibi, bu eski elemanýn göstergeci yeni objeye, yeni
+objenin göstergeci eski objenin gösterdiði objeye yönlendirilecek.
+
+\includegraphics[width=9cm]{basic_03.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ll = LinkedList()
+ll._add(99)
+ll._add(12)
+ll._insert_middle(1,37)
+ll._printList()
+\end{minted}
+
+\begin{verbatim}
+12 37 99
+\end{verbatim}
+
+Aradan bir öðe silelim. Silmek için yine göstergeç cambazlýðý; silinecek
+öðeye iþaret eden göstergeç silinecek öðenin gösterdiði objeye iþaret
+ettiriliyor, böylece silinecek objeye kimse iþaret etmez hale
+geliyor. Eriþilemez hale gelen obje silinmiþ demektir. 
+
+Not: Bellek idaresi açýsýndan hiç iþaret edilmeyen objelere ne olur? Bu
+objeler dinamik programlama dillerinde etrafta hala bir süre daha kalmaya
+devam edebilirler, ne zaman dilin çöp toplayýcýsý devreye girerse o zaman
+silinirler. Yani bellekten gerçekten çýkartýldýklarý an çöp toplama iþlemi
+sonrasýdýr. C gibi dillerde bellekten silme iþlemi programcý tarafýndan
+tetiklenir, çöp toplayýcý yoktur. 
+
+\includegraphics[width=9cm]{basic_04.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ll = LinkedList()
+ll._add(37)
+ll._add(99)
+ll._add(12)
+ll._printList()
+node, prev, i = ll._find(1)
+ll._delete(prev, node)
+ll._printList()
+\end{minted}
+
+\begin{verbatim}
+12 99 37
+12 37
+\end{verbatim}
+
+Baðlantýlý listelerin yýðýt, kuyruk gibi yapýlarýn kodlamasý için ne kadar
+faydalý olabileceði sürpriz deðil; yýðýt ya da kuyruk için hem baþ hem
+sondaki düðümlere referans tutulur, sona, baþa ekleme, oradan obje alma
+gibi iþlemler biraz göstergeç cambazlýðý ile çok hýzlý bir þekilde kodlanabilir.
+
+Ýki Yönlü Baðlantýlý Liste
+
+Üstteki örnek tek yönlü baðlantýlý listeydi, iki yönlü referans tutmak ta
+mümkün. 
+
+\includegraphics[width=9cm]{basic_05.png}
+
+Önce Geniþliðine (Breadth-First) ve Önce Derinliðine (Depth-First) Arama
+
+Elimizde alttaki gibi bir çizit olsun, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+graph = {'A': set(['B', 'C']),
+         'B': set(['A', 'D', 'E']),
+         'C': set(['A', 'F']),
+         'D': set(['B']),
+         'E': set(['B', 'F']),
+         'F': set(['C', 'E'])}
+\end{minted}
+
+\includegraphics[width=10em]{graph.png}
+
+Arama için bir baþlangýç düðümünü alýyoruz, onun komþularýný, komþularýn
+komþularýný ziyaret ede ede tüm çiziti ziyaret etmiþ oluyoruz. Ama bu
+ziyaret hangi sýrada olmalý?
+
+Bu sýrayý belirlemek için bir yýðýt kullanabiliriz. Yýðýt kullanýnca
+aslýnda önce derinliðe türden bir arama kodlamýþ oluyoruz. Her ziyaret
+öncesi bir düðümün komþularýný alýp, onlarý yýðýta koyuyoruz, sonra yýðýtýn
+en üstündeki düðümü alýp onu ziyaret ediyoruz. Bu iþlem ayný seviyedeki tüm
+komþularý ziyaret etmeden sürekli komþunun komþusu, vs. aldýðý için bu bir
+derinliðe iniþ kodlar. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import collections
+
+def dfs(graph, start):
+    visited, stack = collections.OrderedDict(), [start]
+    while stack: # yigit bos ise bu ifade false olur
+        vertex = stack.pop()
+        # bu kontrol hizli olsun diye OrderedDict kullandik
+        # boylece hem ziyaret sirasi hatirlanacak, hem de
+        # dugum ziyaret edilip edilmedigi sorusu cok hizli cevaplanacak
+        if vertex not in visited:
+            visited[vertex] = ''
+            stack.extend(graph[vertex])
+    return visited
+print dfs(graph, 'A')
+\end{minted}
+
+\begin{verbatim}
+OrderedDict([('A', ''), ('B', ''), ('D', ''), ('E', ''), ('F', ''), ('C', '')])
+\end{verbatim}
+
+Özyineli formda da yazabiliriz, eðer her komþu için teker teker
+\verb!dfs!'in kendisini çaðýrýrsak derinleme dalýþ yapmýþ oluruz, çünkü
+komþu listesinde ilk elemanda özyineli çaðrý yapýnca o geri gelene kadar o
+çaðrý içindeyiz, o çaðrý da bir komþu listesi alýp öðelerde özyineli çaðrý
+yapacak, böyle derinleme devam edecek... Tabii bu durumda gidilen yolu
+hatýrlamak için onu bir liste olarak sürekli bir sonraki özyineli çaðrýya
+geçeriz ve her çaðrýdan da geriye döndürürüz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import collections
+def dfs(graph,curr,path = collections.OrderedDict()):
+    path[curr] = ''
+    for edge in graph[curr]:
+        if edge not in path:
+            path = dfs(graph,edge,path)
+    return path
+
+print dfs(graph,'A')
+\end{minted}
+
+\begin{verbatim}
+OrderedDict([('A', ''), ('C', ''), ('F', ''), ('E', ''), ('B', ''), ('D', '')])
+\end{verbatim}
+
+Þimdi diðer arama þekline, önce geniþliðine aramaya gelelim. Bunu yapmak
+için yýðýt veri yapýsý yerine kuyruk kullanmak yeterli. Bu durumda
+komþularý kuyruða koyduðumuz zaman o komþularýn iþlenmesi bitmeden sonraki
+düðümlere geçilmeyecektir, çünkü kuyruða ilk konan ilk önce iþlenir, yani
+komþularýn kendisinin iþlenmesi bitmeden onlarýn alt çocuklarýna sýra
+gelmeyecektir. Bu, ziyareti seviye seviye iþlem yapmaya zorlar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bfs(graph, start):
+    visited, queue = collections.OrderedDict(), Queue([start])
+    while queue:
+        vertex = queue.pull()
+        if vertex not in visited:
+            visited[vertex] = ''
+            for x in graph[vertex]: queue.push(x)
+    return visited
+print bfs(graph, 'A')
+\end{minted}
+
+\begin{verbatim}
+OrderedDict([('A', ''), ('C', ''), ('B', ''), ('F', ''), ('E', ''), ('D', '')])
+\end{verbatim}
+
+Ýkisel Arama Aðaçlarý (Binary Search Trees -BST-)
+
+Bir BST þu özelliklere sahiptir: bir düðümün sadece iki tane alt düðümü
+vardýr, bu alt düðümlerden solda olaný üst düðümden her zaman küçük, saðda
+olaný her zaman büyüktür. Aðaçta tekrarlanan öðe yoktur. Aðaç eðer dengeli
+ise (yani birkaç düðümün altý sürekli dallanarak gittiði ama ötekilerin
+ayný seviyede kaldýðý durum yok ise) o zaman aðaç derinliði $n$ öðe için
+$\log n$ olacaktýr. 
+
+\includegraphics[height=6cm]{basic_06.png}
+
+Böyle bir yapýnýn pek çok farklý þekildeki aramalar için ne kadar elveriþli
+olduðunu görmek zor olmaz; mesela ``belli bir aralýktaki tüm düðümleri
+getir'' algoritmasý hýzlý iþler [3, sf. 403]. Üst düðümden baþlarýz,
+baktýðýmýz düðümün eldeki deðerden küçük ya da büyük olduðuna göre sola ya
+da saða gideriz, vs. Bir özellik daha; mesela alttaki gibi bir aðaca
+bakalým (harfler arasýnda da küçüktür / büyüktür irdelemesi yapýlabiliyor
+tabii ki),
+
+\includegraphics[height=4cm]{basic_07.png}
+
+Þimdi bu aðacý üstten alta doðru ``yassýlaþtýrdýðýmýzý'' düþünelim, bu bize
+anahtarlarý sýralanmýþ bir düz yapý vermez mi? Evet. Yani bir aðaç
+yapýsýnýn doðal bir sonucu olarak her zaman bize çok hýzlý bir þekilde
+sýralanmýþ bir liste verebilir. Üstelik aðaca ekleme, silme iþlemleri de
+hýzlý olduðu için bu sýralanmýþlýk kalýcý olacaktýr. Altta
+\verb!_printInorder! bu özelliði gösteriyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+class Node:
+    def __init__(self, val):
+        self.l = None
+        self.r = None
+        self.v = val
+
+class BST:
+    def __init__(self):
+        self.root = None
+        
+    def add(self, val):
+        if(self.root == None):
+            self.root = Node(val)
+        else:
+            self._add(val, self.root)
+
+    def _add(self, val, node):
+        if(val < node.v):
+            if(node.l != None):
+                self._add(val, node.l)
+            else:
+                node.l = Node(val)
+        else:
+            if(node.r != None):
+                self._add(val, node.r)
+            else:
+                node.r = Node(val)
+
+    def find(self, val):
+        if(self.root != None):
+            return self._find(val, self.root)
+        else:
+            return None
+
+    def _find(self, val, node):
+        if(val == node.v):
+            return node
+        elif(val < node.v and node.l != None):
+            return self._find(val, node.l)
+        elif(val > node.v and node.r != None):
+            return self._find(val, node.r)
+
+    def printInOrder(self):
+        if(self.root != None):
+            self._printInOrder(self.root)
+
+    def _printInOrder(self, node):
+        if(node != None):
+            self._printInOrder(node.l)
+            print str(node.v) + ' '
+            self._printInOrder(node.r)
+
+    def printPreOrder(self):
+        if(self.root != None):
+            self._printPreOrder(self.root)
+
+    def _printPreOrder(self, node):
+        if(node != None):
+            print str(node.v) + ' '
+            self._printPreOrder(node.l)
+            self._printPreOrder(node.r)            
+                        
+    def printPostOrder(self):
+        if(self.root != None):
+            self._printPostOrder(self.root)
+
+    def _printPostOrder(self, node):
+        if(node != None):
+            print str(node.v) + ' '
+            self._printPostOrder(node.l)
+            self._printPostOrder(node.r)
+                        
+    def closest(self, target):
+        gap = float("inf")
+        closest = float("inf")
+        curr = self.root
+        while curr:
+            if abs(curr.v - target) < gap:
+                gap = abs(curr.v - target)
+                closest = curr
+            if target == curr.v:
+                break
+            elif target < curr.v:
+                curr = curr.l
+            else:
+                curr = curr.r
+        return closest.v
+
+bst = BST()
+print "Adding nodes 1 to 10 in the tree..."
+for i in range(1, 11):
+    bst.add(i)
+
+print
+print "Searching for nodes 16 and 6"
+f = bst.find(16)
+if f: print f.v
+f = bst.find(6)
+if f: print f.v
+
+print
+print "Printing preorder..."
+bst.printInOrder()
+\end{minted}
+
+\begin{verbatim}
+Adding nodes 1 to 10 in the tree...
+
+Searching for nodes 16 and 6
+6
+
+Printing preorder...
+1 
+2 
+3 
+4 
+5 
+6 
+7 
+8 
+9 
+10 
+\end{verbatim}
+
+En yakýn öðe arama fonksiyonu \verb!closest! ilginç; BST'de bir öðeyi tam
+eþitlik üzerinden aramak zaten oldukca hýzlý. Þimdi düðümler arasýnda ayný
+gezinme tekniðini kullanarak istenen yaklaþýk bir deðere olan o gezilen
+düðümlere ``yakýnlýðý'' hesaplayýp, en yakýn olaný sürekli akýlda tutup iþ
+bittiðinde bu elemaný geri döndürmek bize en yakýn öðeyi verecektir. 
+
+Vektörler ve Ýkisel Arama (Binary Search)
+
+Aslýnda aðaç üzerinde gördüðümüz saða ya da sola gitme kavramý
+genelleþtirilerek bir dizin üzerinde arama yapmak için
+kullanýlabilir. Elimizde sýralanmýþ (bu önemli) bir dizin olduðunu
+düþünelim. Þimdi eldeki bir test noktasýnýn bu dizinde olup olmadýðýný
+merak ediyoruz. Þöyle bir algoritma kullanabiliriz: dizinin tam ortasýndaki
+öðesine bakarýz, eðer aranan eleman o ise, iþ biter. Eðer deðil ise ve
+elimizdeki öðe bakýlan orta noktadan küçük ise o orta noktanýn solundaki
+hiçbir öðeye artýk bakmaya gerek yoktur. Sað kýsma geçeriz, ve ayný iþlemi
+tekrarlarýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def binary_search(alist, item):
+    first = 0
+    last = len(alist)-1
+    found = False
+
+    while first<=last and not found:
+        midpoint = (first + last)//2 # // tamsayi bolumu demek, 5//2=2
+        if alist[midpoint] == item:
+            found = True
+        else:
+            if item < alist[midpoint]:
+                last = midpoint-1
+            else:
+                first = midpoint+1
+
+    return found, midpoint
+
+testlist = [0, 1, 2, 8, 13, 17, 19, 32, 42,]
+print(binary_search(testlist, 3))
+print(binary_search(testlist, 13))
+print(binary_search(testlist, 20))
+\end{minted}
+
+\begin{verbatim}
+(False, 3)
+(True, 4)
+(False, 7)
+\end{verbatim}
+
+Yakýn öðe bulmak benzer mantýðý kullanýr. 
+
+Bakýlan kýsýmlar sürekli yarýya bölündüðü için bakýlan kýsým çok hýzlý bir
+þekilde küçülecektir, bu iþlem hýzýný arttýrýr. Karmaþýklýk $O(\log
+N)$. Lineer arama yapmaktan (kaba kuvvet) daha hýzlý. 
+
+Yarýya bölüp arama hakkýnda ilginç bir hikaye: bir projede bir arkadaþýmýn
+üzerinde çalýþtýðý aþaðý yukarý 1000 satýrlýk bir CSS dosyasý vardý (CSS'i
+web sayfalarý ile uðraþanlar bilirler). Her nasýlsa dosya bir þekilde
+deðiþime uðramýþ, ve iþleyen dosya artýk iþlemez hale gelmiþ. Bu dosya
+üzerinde kaynak kod deposu da kullanýlmamýþ, yani deðiþimin ne olduðunu
+depoya sorma þansý yok. CSS'in bir tarafý bozuk ama neresi?
+
+Benim fikrim ikiye bölme tekniði ile hatayý bulmaktý; CSS'in bir yarýsýný
+iptal edip diðer kýsmýný kullan, iþliyorsa öteki kýsýmda devam et, ayný
+þekilde onu yarýla, ta ki hata ortadan yokoluncaya kadar. Bu þekilde birkaç
+deneme ile hatalý satýrý bulduk. 
+
+Öncelik Kuyruðu (Priority Queue)
+
+Bu tür kuyruklarda öðe alma iþlemi her zaman en küçük öðeyi verir. Bir öðe
+eklediðimiz zaman o öðe büyüklüðüne göre kuyruk içindeki yerine otomatik
+olarak sokulur. Öncelik kuyruklarý arka planda ikisel aðaç (binary tree)
+üzerinden kodlanýrlar, en küçük öðeyi almak sabit, müthiþ hýzlýdýr çünkü en
+küçük öðe her zaman aðacýn en tepesindeki düðümdedir. Ekleme de oldukca iyi
+çalýþýr. Yani öncelik kuyruklarý dýþarýdan ikidebir ``sýrala'' komutu
+verilmeden sürekli kendilerini sýralý halde tutan bir yapýdýrlar. Bu
+kuyruklar pek çok bilgisayar bilim algoritmasýnýn demirbaþýdýr.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from heapq import heappush, heappop
+from random import randrange
+
+class pqueue():
+    def __init__(self): self.data = []
+    def push(self,x): heappush(self.data,x)
+    def pull(self): return heappop(self.data)
+    def __str__(self): return ''.join(str(self.data))
+
+pq = pqueue()
+# rasgele degerler
+for i in range(10): pq.push(randrange(100))
+print pq
+print pq.pull()
+pq.push(100)
+print pq
+\end{minted}
+
+\begin{verbatim}
+[2, 12, 15, 37, 70, 54, 42, 92, 54, 82]
+2
+[12, 37, 15, 54, 70, 54, 42, 92, 82, 100]
+\end{verbatim}
+
+Biraz daha kapsamlý bir kod `pqdict` paketinde, bu önemsel kuyruða anahtar /
+deðerler veriliyor, anahtar deðerleri mesela araba modelleri, önem ise fiyatlarý
+olabilir, ve deðerler çekildiðinde deðeri en az (önemi en fazla) olan deðer
+çekilecektir. Ayrýca bu kuyruðu bir döngüyle ``gezmek'' kuyruktan deðerlerin
+çekilmesini de saðlýyor. Kuyruðun iç kodlamasýnda kullandýðý temel yapý ikisel
+yýðýn (binary heap) adlý bir yapýdýr.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from pqdict import pqdict
+Q = pqdict() 
+Q['toyota'] = 4
+Q['mercedes'] = 10
+Q['bmw'] = 6
+for c in Q: print c
+\end{minted}
+
+\begin{verbatim}
+toyota
+bmw
+mercedes
+\end{verbatim}
+
+Bir ilginç özellik daha: bir döngü içinde deðilsek \verb![]!  operatörü hem
+öncelik deðerine bakýlmasýný hem de o deðerin, anahtar kuyruktan
+çekilmeden, deðiþtirilebilmesini saðlýyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+Q['toyota'] = 4
+Q['mercedes'] = 10
+Q['bmw'] = 6
+print len(Q)
+Q['bmw'] = 1
+print 'hala', len(Q)
+for c in Q: print c
+\end{minted}
+
+\begin{verbatim}
+3
+hala 3
+bmw
+toyota
+mercedes
+\end{verbatim}
+
+Silmeden bakabilmek ve güncelleyebilmek önemli bir özellik (Java karþýlýðý
+\verb!PG.java! dosyasýnda).
+
+Bellek Kullanýmý
+
+Bitirmeden önce bellek kullanýmý hakkýnda birkaç paragraf
+yazalým. Algoritmalarýmýz için veri yapýsý seçerken o veri yapýsýnýn
+belleði nasýl idare ettiðini bilmek iyi olur. Mesela sayý indisli bir dizin
+/ liste kullanýyoruz, dizinlere indis bazlý eriþim çok hýzlýdýr, burasý
+güzel. Fakat dizinin sürekli büyümesi gerekiyorsa bu büyüme arka planda
+nasýl idare ediliyor? Bazý kodlamalar vardýr ki dizinleri parça parça
+büyütür, yani 10'dan 20'ye büyümek gerekiyorsa 20 öðelik yeni yer ayrýlýr,
+ve 10 öðe yeni listeye kopyalanýr. O zaman parçalar küçük ise bu kopyalama
+iþleminde sýrasýnda zaman kaybý olabilir. Eðer baþa, sona sürekli ekleme
+yapýldýðý dinamik bir durum var ise belki baðlantýlý liste kullanmak daha
+iyidir.
+
+
+Kaynaklar
+
+[1] Heatland, {\em Python Algorithms}
+
+[2] Wahl, {\em Algorithms in Python}
+
+[3] Sedgewick, {\em Algorihms, 4th Edition}
+
+\end{document}
+

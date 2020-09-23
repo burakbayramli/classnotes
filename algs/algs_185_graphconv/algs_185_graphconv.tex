@@ -1,0 +1,81 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Evriþimsel Çizit Aðlarý (Graph Convolutional Networks)
+
+Gerçek dünyadaki pek çok veriyi çizit olarak temsil etmek doðal; arkadaþlýk
+verisi, bilgi temsili. Çizitler bildiðimiz gibi düðümler ve o düðümler
+arasýndaki baðlantýlardan oluþur, bilgi temsili örneðinde mesela A kiþisi B
+okulunda okudu için A ve B düðümleri arasýnda ``okudu'' baðlantýsý konur,
+ve yine bu kiþinin C þehrinde ``yaþamýþ'' olduðu yine bir baðlantý ile
+temsil edilebilir. Bu þekilde tüm çizit kurulabilir, ve sonra çizitin
+özetsel bir halini hesaplattýrabiliriz (temsili gömme verisi yaratmak
+mümkün), sonra bu ``öðrenilmiþ'' özet üzerinden eksik bilgileri çizite
+sormak mümkün olabilir. Acaba A kiþisi D iþinde ``çalýþmýþ mýdýr?''. Bu
+eksik bir baðlantý, belki veride yok ama olmasý gerekiyor, eldeki özetten
+bu bilgi tamamlanabilir. 
+
+Matematiksel olarak bir düðüm verisinin etrafýndaki komþu düðümlerin bir
+fonksiyonu olarak modellenir.
+
+\includegraphics[width=30em]{graphconv_02.png}
+
+Yaklaþýma evriþimsel denmesinin sebebi tüm 1. derece komþuluk iliþkilerinin
+ayný aðýrlýklar ile hesaplanýyor olmasý. Bu isim yaklaþýmýn ismi derin
+yapay sinir aðlarýndaki evriþimsel operatörlere benzemesinden geliyor, bir
+evriþimsel operatörü veri üzerinde gezdirdiðimiz zaman o gezdirme
+yapýlýrken operatörün hep ayný aðýrlýklarý kullanýldýðý varsayarýz / o
+þekilde kodlarýz.
+
+$$ h_v = ReLU(W_{loop}h_v + \sum _{u \in N(v)} W h_u ) $$
+
+$W_{loop}$ düðümlerin kendilerine olan baðlantýsýný (loop) modelliyor, buna
+etraftaki baðlantýlar ekleniyor. Fakat bir DYSA'da evriþimsel (ve diðer)
+tabakalar, katmanlar vardýr, GCN'de katmanlar nerede? Katmanlar bir düðümün
+hesabý için kaç komþuluk seviyesi geriye gitmesi üzerinden
+hesaplanýyor. Eðer bir düðüm için komþunun komþusuna gidiyorsak bu iliþki
+aðýn ikinci katmanýný oluþturur.
+
+\includegraphics[width=35em]{graphconv_01.png}
+
+Üstteki figürde gördüðümüz gibi ilk seviye komþuluklar mavi komþular ve
+kýrmýzý düðüm arasýnda, bu birinci katman (her kýrmýzý düðüm için komþuluk
+ayný aðýrlýklarla). Ýkinci katmanda komþunun komþusu sarý düðümler de dahil
+ediliyor, ve bunlar da farklý (ama yine her ikinci seviye komþuluk için
+ayný) aðýrlýklarla hallediliyor.
+
+GCN'lerin diðer çizit iþleyen yaklaþýmlara göre bir diðer avantajý hem
+baðlantý yapýsýný, hem de düðümler üzerindeki referans bilgisini de (mesela
+kiþileri temsil eden düðümlerde yaþ, cinsiyet gibi bilgiler)
+kullanabilmesi. 
+
+[2] konudaki yayýnlardan biri, örnek olarak bilimsel yayýnlarýn
+birbirini referansýný analiz etmiþler, ayrýca tavsiye sistemleriyle kendi
+yaklaþýmlarýný yarýþtýrmýþlar, sonuçlar oldukca iyi [3].
+
+Kod
+
+\inputminted[fontsize=\footnotesize]{python}{util.py}
+
+\inputminted[fontsize=\footnotesize]{python}{train.py}
+
+Peki bu metotu keþfedenler çizitleri evriþimsel kavramlarla baðlantýlamak
+istemiþler? Bunun sebebi büyük bir ihtimalle mevcut DYSA hesaplayan kodlama
+altyapýsýndan faydalanmak istemeleri. DYSA hesaplamak için Tensorflow gibi
+kütüphanelerden oluþan kuvvetli bir kod altyapýsý var artýk, eðer
+problemimizi bu kütüphanelerin çözebileceði formlara sokabilirsek pek çok
+yan faydayý bedava elde edebilmiþ oluruz. 
+
+Üstteki kodu \verb!train.py!'dan iþletince sonucu göreceðiz, AUC yüzde 90
+civarýnda olmalý.
+
+[devam edecek]
+
+Kaynaklar
+
+[1] Titov, {\em Extracting and Modeling Relations with Graph Convolutional Networks}, \url{http://www.akbc.ws/2017/slides/ivan-titov-slides.pdf}
+
+[2] Kipf, {\em Variational Graph Auto-Encoders}, \url{https://arxiv.org/abs/1611.07308}
+
+[3] Kipf, {\em Implementation of Graph Auto-Encoders in TensorFlow}, \url{https://github.com/tkipf/gae}
+
+\end{document}

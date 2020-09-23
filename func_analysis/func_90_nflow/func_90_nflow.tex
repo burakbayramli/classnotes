@@ -1,0 +1,686 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Að Akýþ Problemleri (Network flow problems)
+
+Daha önce iþlediðimiz [3] að akýþ konusunu biraz daha geniþletelim. Sailco
+adlý hayali bir þirket düþünelim, bu þirket yelkenli tekne (sailbot)
+üretiyor. Problem þöyle, önümüzdeki 4 ay içinde alttaki üretim sayýsýný
+gerçekleþtirmesi gerekiyor (müþteri talebi)
+
+$$ 
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textrm{Ay} & 1 & 2 & 3 & 4 \\
+\hline
+\textrm{Üretilen tekne sayýsý} & 40 & 60 & 70 & 25 \\
+\hline
+\end{tabular}
+$$
+
+Birinci ayda 40, ikinci ayda 60, vs.. Þirketin bir deposu da var, bitmiþ
+teknelerin teslim etmeden önce tutulduklarý yer burasý. 1. ayýn baþýnda bu
+depoda 10 tane tekne var. Her ay kaç tane tekne (ve nasýl) üretileceðini
+hesaplamam lazým, burada iþçi türü ve depoda olanlar sayýyý etkiler tabii,
+mesela bir ayda 10 tane üretmem gerekiyorsa ve depoda zaten 10 tane varsa,
+hiç üretim yapmama gerek yok. Ama gelecekte çok fazla üretmem gerektiðini
+biliyorsam ekstra yapýp onlarý depoda tutabilirim, ki sonra gönderebileyim.
+
+Ýþçi kýsýtlamasý þöyle, normal iþçiyle 400 lira / tekne üzerinden fazla
+mesai ile 450 lira / tekne üzerinden üretim yapabilirim. Tek bir tekneyi
+depoda tutmak 20 lira. Ayrýca normal iþçi ile ayda sadece 40 tekne
+yapabiliyorum, eðer o ayda daha fazla tekne yapmam gerekiyorsa fazla mesai
+kullanmam þart.
+
+Problem þöyle, öyle bir üretim ve depolama takvimi planla ki önümüzdeki 4
+aydaki üretimi minimum masrafla yapabileyim. 
+
+Karar deðiþkenleri neler olacak? Görüyorum ki bu tür problemlerle uðraþan
+bazý öðrenciler genelde az sayýda deðiþken kullanmaya meyilli, mesela ``X
+ayýnda üretilecek tekne sayýsý'' gibi, ve beklenti o ki formüller iþin
+gerisini halletsin. Yani mesela ilk ay bariz zaten, depoda 10 tane tekne
+var, geri kalanýný ilk ayda normal iþçilere yaptýrýrým çünkü bu en ucuzu. O
+zaman o ayda üretilen tekne sayýsý deðiþkeni yeter, vs. Fakat göreceðiz ki
+bu tür yaklaþýmlar aslýnda iþi daha zorlaþtýrýyor. Ýþimize yaramayabilecek
+ekstra deðiþkenler tanýmlamak, sonra o deðiþkenleri kýsýtlayýp probleme
+uygun þekilde dahil etmek daha kolay.
+
+Biz de böyle yapacaðýz. Bir sürü deðiþken; mesela X ayý için kaç tane
+``normal iþçi teknesi'' üretilmesi gerektiði, yani bu sayý sadece normal
+iþçiler tarafýndan üretilecek tekneleri kontrol edecek, fazla mesai için
+farklý olacak.. Her ay depoda kaç tekne tutulduðu ayrý sayýlacak, her þey
+bir deðiþken olacak. Belki bu deðiþkenlerden bazýlarý fuzuli, hatta baþka
+bir þeyi tekrar ediyor sanki, baþka deðiþkenlerden türetilebilir gibi
+geliyor, olsun, yine de ekstra deðiþkeni koyun, ama diðer yandan
+aklýnýzdaki o kuralý probleme sýnýrlama olarak dahil edin. Literatürde bu
+deðiskenlere karar deðiskenleri deniyor ama aslýnda onlarin direk karar
+verdiðimiz þeyler olmasýna gerek yok.
+
+Deðiþkenler þöyle,
+
+$x_1,x_2,x_3,x_4$: her ayda normal iþçilik ile üretilen tekne sayýsý
+
+$y_1,y_2,y_3,y_4$: her ayda fazla mesai ile üretilen tekne sayýsý
+
+$h_1,h_2,h_3,h_4,h_5$: her ay baþýnda depoda olan tekne sayýsý. 5 ay var
+çünkü ay sonundaki sayýyý $h_5$ deðiþkeninde tutuyoruz. Tabii problemi iyi
+anlayanlarýmýz farketmiþtir ki bu deðiþkende sýfýr deðeri olmalý, tüm
+tekneler gönderilmiþ olmalý.
+
+Parametreler
+
+Bunlar deðiþken deðil dikkat, dýþarýdan tanýmlanan parametreler. Baþta
+gördüðümüz sayýlar bunlar, her ay müþteriden gelen talep, 
+
+$d_1,d_2,d_3,d_4$: her ay için talep (demand). 
+
+Kýsýtlamalar
+
+$0 \le x_i \le 40$, ki $i=1,2,3,4$: normal iþçilikle üretilebilecek tekne
+sayýsý, çünkü üstte belirttik, o tür üretimin sýnýrý bu
+
+$y_i \ge 0$: fazla mesai ile üretilebilecek tekne sayýsý sýnýrsýz. Tabii ki
+negatif tekne üretilemez, o sebeple sýfýrdan büyüklük var. 
+
+$h_i + x_i + y_i = d_i + h_{i+1}$: teknelerin muhafazasý denklemi. Burada
+diyoruz ki her ay baþýnda depodaki tekneler artý normal ve fazla mesai
+iþçilik ile ürettiðim teknelerin toplamý, o aydaki talep ve sonraki aya
+kalacak depodaki teknelerin toplamý ile ayný olmalý. 
+
+Ayrýca $h_1=10$ olduðunu biliyoruz.
+
+Önceki noktayý tekrar vurgulamak gerekirse üstteki $h$ deðiþkenlerini belki
+tanýmlamam fuzuli, onlarý $h,d$'ler üzerinden de tanýmlayabilirdim. Ama bu
+þekilde yapmak çok daha açýk. 
+
+[atlandi]
+
+Bu problemin lineer program olduðunu görebiliyoruz, ama hiçbir að akýþý
+filan göstermedim. O zaman dersimizin baþlýðý niye að akýþý? Çünkü bu
+problemi bir að yapýsý içinden akýþ olarak görmek te oldukça doðal. 
+Aðdaki 1,2,3,4 düðümleri aylar olacak, ve tekneler o aylar içinden
+``akýyorlar'', eðer bir ay sonrasýnda depoya bir tekne koyuyorsak sanki o
+tekne geleceðe doðru gönderiliyor, sonraki aya veriliyor, o sebeple aylar
+arasýndaki oklar $h_i$. 
+
+\includegraphics[width=25em]{func_90_nflow_01.png}
+
+Tabii tüm tekneler bir aydan ötekine akmýyor, müþterilerin (customers)
+talebine göre o aydan onlara da belli sayýda tekne ``akýyor'', $d_i$ ile
+gösterilenler. Her aya giren akýþ üretim, R ile gösterilen normal
+iþçilikle, OT ile gösterilen fazla mesai ile.  Bu resimle problemi bir að
+akýþý olarak göstermiþ olduk.
+
+Daha önce gördüðümüz muhafaza denklemi bu resimde daha bariz hale geldi,
+çünkü bu resimle aslýnda þunu söylüyoruz, her ay düðümüne giren akýþlar
+çýkýþ akýþlarýna eþit olmalý. Bu hem kuvvetli bir ifade ama ayný anda
+bariz. Düðümler içinde bir þey tutmamalý, oradan sadece akýþ var. 
+
+Bugün genel olarak göreceðimiz konu minimum bedel akýþ problemleri olacak,
+ki üstteki problem bunun bir örneði. Pek çok optimizasyon problemi yönlü
+bir að üzerindeki akýþ olarak görülebiliyor. 
+
+Alttaki gibi bir að düþünelim,
+
+\includegraphics[width=20em]{func_90_nflow_02.png}
+
+8 tane düðümü var, bazý kenarlarý var. Bu aðdaki karar deðiþkenleri her
+kenardaki akýþ. Dikkat, karar deðiþkeni düðümde deðil, kenarda. Bulmak
+istediðimiz bu akýþ çünkü, bilahere karar deðiþkenleri. Bu kenarlarýn her
+birinde ne kadar akýþ var? 
+
+Her kenardaki akýþýn bir bedeli olabilir, ayrýca her kenarýn bir kapasite
+sýnýrlamasý olabilir (bedeli ne olursa olsun üzerine çýkýlamayacak bir eþik
+deðeri). Bedel örneði olarak mesela bir kenar 2 lira/birimlik olabilir
+diðeri 10 lira/birim bedelinde olabilir. O zaman ilk kenardan 5 birim
+göndermek istersem bunun bana bedeli 10 lira ikincisinden gondermek
+istersem 50 lira olacak. Her kenarýn akýþ bedeli, kapasitesi bizim
+dýþarýdan bir parametre ile tanýmladýðýmýz bir þey olacak tabii
+ki. Kapasitenin illa sýnýrlanmýþ olmasý gerekmez, sýnýrsýz da olabilir.
+
+Her düðüm bir akýþ kaynaðý (source) da olabilir, yani akýþý kendi içinden
+``doðuruyor'' olabilir. Bazý düðümler akýþý yutuyor olabilir, onlara akýþ
+gelir ve yokolur, bu düðümlere alýcý (sink) diyebiliriz. O zaman önceki
+gördüðümüz sadece aktarýcý düðümlere ek olarak bu iki tip düðümü de
+kullanabiliriz. Üstteki resimde en soldaki iki düðüm kaynak gibi duruyor,
+oradan sadece çýkan akýþ görüyoruz. En saðdaki ise alýcý, ona akýþ sadece
+giriyor. 
+
+Optimizasyon probleminin sorduðu soru þu olacak, ``en minimum bedelli akýþ
+hangisi?''. Pek çok türlü akýþ olabilir, bizim aradýðýmýz bedeli en az
+olan. Bugün göreceðimiz tüm problemler birer minimum bedelli akýþ problemi
+olarak formülize edilebilir. Ýlk önce en baþta gördüðümüz problemi að
+yapýsýna tercüme edeceðiz, sonra diðer göreceðimiz problemlerin birer LP
+olup olmadýðýna bakacaðýz. 
+
+Düðümleri numaralandýralým,
+
+\includegraphics[width=20em]{func_90_nflow_03.png}
+
+Her akýþý, karar deðiþkenini $x_{ij}$ olarak gösterebiliriz, ki
+$(i,j) \in \varepsilon$, 1'den 3'e akýþ $x_{13}$ olacak. Akýþ bedeli
+$c_{ij}$. Toplam bedel her akýþ çarpý o akýþýn bedeli toplanmýþ
+hali. Kapasite sýnýrlarý $p_{ij} \le x_{ij} \le q_{ij}$ ile gösterilebilir,
+her kenarýn bir alt bir de üst sýnýrý olabilir ($p_{ij}$ çoðu problem için
+sýfýrdýr). Muhafaza denklemi, her düðüm $k$ için [1, 26:22]
+
+$$
+\sum_{j \in N} x_{kj} - \sum_{i \in N} x_{ik} = b_k, \quad \forall k \in N
+$$
+
+Toplam bedel
+
+$$
+\sum_{(i,j) \in \varepsilon } c_{ij} x_{ij}
+$$
+
+Üstteki ifade üzerinden toplam bedeli minimize eden akýþý bulabiliriz. 
+
+Bu bir lineer program deðil mi? Bedel lineer, lineer eþitlik, eþitsizlik
+sýnýrlamalarý. Evet bu bir LP. 
+
+Formel ve öz bir þekilde yazmak gerekirse, 
+
+$$
+\min_{x_{ij} \in \mathbb{R}} \sum_{(i,j) \in \varepsilon } c_{ij} x_{ij}
+\quad \textrm{öyle ki}
+$$
+$$
+\sum_{j \in N} x_{kj} - \sum_{i \in N} x_{ik} = b_k, \quad \forall k \in N
+$$
+$$
+p_{ij} \le x_{ij} \le q_{ij}
+$$
+
+Þimdi muhafaza kýsýtlamasýna dönmek istiyorum, aslýnda bu formülü matris
+formunda yazmanýn çok güzel bir yolu var. 
+
+\includegraphics[width=22em]{func_90_nflow_04.png}
+
+Matrise $A$ sembolü verilir çoðunlukla ve ona oluþ, geliþ (incidence)
+matrisi denir.  Örnek olarak sonuncu satýra bakalým, bu satýr 8'inci düðüme
+olanlarý gösteriyor, $-x_{68}-x_{78}$ hesabý var, eksi iþareti düðüme giriþ
+göstergesi, ve sonuç $b_8$'e eþit. 
+
+$A$'da sadece 0, -1 ve +1 deðerleri vardýr ve eldeki düðüm kadar satýrý
+vardýr, ve eldeki kenar kadar kolonu vardýr. Dikkat geliþ matrisi sadece að
+yapýsýný kodlar, kenarlardan giden akýþ miktarý hala $x_{ij}$ deðerlerinin
+kendisinde. 
+
+Eðer gereken yerde vektörler de kullanýrsak en öz haliyle model þöyle,
+
+$$
+\min_{x \in \mathbb{R}^{|\varepsilon|}} c^T x, \quad \textrm{öyle ki}
+$$
+$$
+Ax = b
+$$
+$$
+p \le x \le q
+$$
+
+Denge konusundan bahsedelim, minimum bedelli akýþ probleminin ``dengeli''
+olmasý durumu var. Üstteki örnekteki gibi bir problemi düþünürsek, bazý
+düðümle kaynak, bazýlarý alýcý, tüm düðümlerdeki girenler çýkanlar sýfýra
+toplanýr, o zaman tüm kaynaklarýn toplamýnýn da tüm talebin toplamýna eþit
+olmasý beklenir. Çünkü ekstra kaynak varsa mesela tüm denklemleri tatmin
+etmek mümkün olmaz. Bunu ispatlayabiliriz, geliþ matrisinin bir özelliði
+tüm kolonlarýnýn toplamýnýn sýfýr olmasý, yani $1^T A = 0$. Ayrýca $Ax =
+b$'nin de doðru olduðunu biliyoruz çünkü çözeceðimiz sistemin bir
+kýsýtlamasý bu formül. O zaman alttaki de doðru olmalý, 
+
+$$
+1^T A x = 1^T b = 0
+$$
+
+Eþitliðin saðýndaki $1^T b$ tüm $b$ öðelerinin toplamý demek, yani
+
+$$
+\sum _{i \in N} b_i = 0
+$$
+
+olmalý. Demek ki tüm arz tüm talebe eþit olacak. O zaman size $b$'sý sýfýra
+toplanmayan bir minimum bedel akýþ problemi verirsem bu problem olurlu
+olmayacaktýr. Toplam sýfýr ise bu probleme ``dengeli problem''
+deniyor. Tabii dengeli bir modelin de illa olurlu olmasý þart deðil, mesela
+öyle kapasite sýnýrlamalarý getirebilirsiniz ki olurluluk mümkün olmaz, ama
+denge yoksa problem kesinlikle olurlu deðildir.
+
+Ama bazen dengesiz problemleri de ufak deðiþiklikler ile çözmek mümkün
+oluyor, mesela bazý $=$'leri $\le$ yaparak, ki bunun karþýlýðý aða bir
+kukla (dummy) düðüm eklemek olabilir .. Ya da pay býrakma (slack)
+deðiþkenleri ekleyip bazý eþitsizlikleri eþitlikge çevirerek..
+
+Örnek Alanlar 
+
+Ne kadar çok problemin minimum akýþ problemi olabildiði þaþýrtýcý
+olabilir. 
+
+\begin{itemize}
+\item nakliyat problemleri  (transportation)
+\item görev verme / atama problemleri (assignment)
+\item aktarmalý gemi nakliyatý (transshipment)
+\item en kýsa yol problemleri (shortest path)
+\item maksimum akýþ problemleri (max-flow)
+\end{itemize}
+
+Nakliyat
+
+Hedef belli bir mali birkaç kaynak noktasýndan farklý varýþ noktalarýna
+ulaþtýrmak. Kaynaklar bir sürü depo, ambar olabilir, varýþ noktasý farklý
+müþteriler olabilir, ürünlerin depodan müþterilere gitmesi gerekiyor. Ama
+mesela ambar 1'den müþteri 2'ye gönderim olabilir, ya da ambar 4'ten ayný
+müþteriye.. ? Karar verilmesi gerekiyor, her müþterinin kendine göre talebi
+var, her nakliyat yolunun farklý bedeli var, yollarýn kapasite limitleri
+var, depolarýn arz limitleri var, bu problem en az bedelli talebi tatmin
+eden nakliyat kararýný verecek.
+
+\includegraphics[width=10em]{func_90_nflow_05.png}
+
+Örnek þöyle olabilir, Millco'nun (hayali bir þirket) üç tane bakýr iþleme
+fabrikasý var, üç tane de maden bölgesi var. Nakliyatýn bedeli km baþýna 2
+lira. Madenler ve fabrikalar arasý mesafeler alttaki gibi, o zaman her
+talebi tatmin edip en az nakliyat masrafý için hangi nakliyat planý takip
+edilmeli?
+
+
+$$ 
+\begin{tabular}{|c|c|c|c|P{3cm}|}
+\hline
+Maden & \textrm{Fabrika 1} & 
+\textrm{Fabrika 2} & 
+\textrm{Fabrika 3} & 
+\textrm{Maden baþýna günlük maksimum kamyon sevkiyatý}\\
+\hline
+1 & 8 & 15 & 50 & 20 \\
+\hline
+2 & 10 & 17 & 20 & 30 \\
+\hline
+3 & 30 & 26 & 15 & 45 \\
+\hline
+\textrm{Fabrika talebi} & 30 & 35 & 30 & \\
+\hline
+\end{tabular}
+$$
+
+Ýlk kontrol edebileceðimiz faktör acaba að dengeli mi? Tüm arz toplamý tüm
+talep toplamý ile ayný mý? Evet. O zaman üstteki çözülebilecek bir
+problem olabilir. Düðümleri $\left[\begin{array}{cccccc} 1&2&3&A&B&C \end{array}\right]$
+olarak düzenleyeyim, kaynaklar bir blok olarak önce, alýcýlar sonra. Geliþ
+matrisi altta [1, 43:55],
+
+Bu tamamen baðlantýlý (full connected) bir çiziti temsil ediyor, yani
+herhangi bir maden düðümünden herhangi bir fabrika düðümüne gitmenin yolu
+var. Çözüm
+
+\begin{verbatim}
+   A  B  C
+1 20  0  0 
+2 10 20  0
+3 0  15  30
+\end{verbatim}
+
+Biz de \verb!linprog! ile kontrol edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = [[ 1,  1,  1,  0,  0,  0,  0,  0,  0],
+      [0,  0,  0,  1,  1,  1,  0,  0,  0],
+      [0,  0,  0,  0,  0,  0,  1,  1,  1],
+      [-1, 0,  0, -1,  0,  0, -1,  0,  0],
+      [0, -1,  0,  0, -1,  0,  0, -1,  0],
+      [0,  0, -1,  0,  0, -1,  0,  0, -1]]
+
+b = [ 20, 30, 45, -30, -35, -30 ]
+
+c = [ 8, 15, 50, 10, 17, 20, 30, 26, 15]
+
+A = np.array(A); b = np.array(b); c = np.array(c)
+
+from scipy.optimize import linprog
+
+res = linprog(-c, A_eq=A, b_eq=b)
+print (np.round(res.x))
+\end{minted}
+
+\begin{verbatim}
+[ 0.  0. 20.  0. 20. 10. 30. 15.  0.]
+\end{verbatim}
+
+Bu örnekteki $b$'de hiç sýfýr öðesi yok, niye? Çünkü bu að yapýsýnda talep
+ve arz tüm düðümlerde tanýmlý, yani her düðüm ya bir kaynak ya da
+alýcý. Böyle olmayabilirdi, arada geçiþ düðümleri olsaydý onlar üzerinde
+muhafaza mantýðý sebebiyle sýfýr tanýmý yapmak gerekebilirdi. 
+
+Atama (Assignment Problems)
+
+Bu tür problemler nakliyat problemine benzer, ama n tane çalýþaným n tane
+yapýlacak iþim var. Amaç her n kiþiye birer görev vermek. Diyelim ki her
+çalýþanýn her görev için farklý tercihi var, mesela ev iþlerinde bulaþýk,
+çöp atmak, duvar boyamak için A, B kiþileri 1 ile 10 arasýnda tercih
+belirtmiþ olabilir. Amaç her iþi bir kiþiye atamak, öyle ki tüm iþler
+yapýlsýn ayný anda herkes olabildiði kadar mutlu olsun. 
+
+Bu problem de nakliyat problemi gibi! Ama þimdi akýþ 1 ya da 0. Her kaynaða
+1 giriyor, her alýcýdan 1 çýkýyor. Kenarlar üzerinde hiç kýsýtlama yok. 
+
+Ama bazýlarýmýz sorabilir, 0.2 insaný bir göreve, 0.8 insani diðerine
+gönderme gibi bir sonuç ta istemem, bir tür tam sayý kýsýtlamasý da olmalý
+bu problemde, yani her kenardaki akýþ ya 0 ya da 1 olmalý. Bu tür
+kýsýtlamalarý ileride iþleyeceðiz. 
+
+Örnek görelim, bir yüzücü antrenörüyüz diyelim, eðittiðimiz 5 yüzücü
+arasýndan bayrak yarýþý için seçme yapmamiz gerekiyor. Bayrak yarýþýnda her
+gidiþ geliþte ardý ardýna dört ayrý stil gerekiyor, dört farklý yüzücü bu
+stillerde yarýþabiliyor, bir gidip geliþ sonrasý bir yüzücü diðerine
+bayraðý aktarýyor. Stiller sýrtüstü (backstroke), kurbaðalama
+(breaststroke), kelebek (butterfly), serbest stil (freestyle). Her stil bir
+turda kullanýlýnca toplam tüm stilleri en çabuk kullanmýþ olan takým
+kazanýyor. Elimizdeki yüzücülerin bu her alandaki geçmiþteki zamanlarýný
+biliyoruz, bu o yüzücülerin her stildeki kuvvetleri bir bakýma,
+
+\includegraphics[width=20em]{func_90_nflow_07.png}
+
+Þu mümkün; bir süper yüzücümüz olabilir her stilde en iyi o'dur. Ama bu tek
+adamý 4 kez, her stilde kullanamayýz, her stil için farklý birini seçmemiz
+lazým. Bu iyi yüzücüyü tabii ki bir stil için kullanmak isteriz, ama
+hangisi için?  Optimal sonuç için bir dengeleme yapmak lazým.
+
+Bu bir atama / görevlendirme problemi iþte, her yüzüþ stilini birine
+``atýyorum''. Bu arada elimizde 4 stil ama 5 yüzücü var, yani bir yüzücü
+görevsiz kalacak. Bir kýsýtlama var, o da bir yüzücü birden fazla stilde
+yarýþamaz.
+
+Üstteki resimde kýrmýzý renk yapýlan tercihi belirtiyor [1, 54:08]. 
+
+Bu konu kodlamasý hakkýnda daha fazla detay ekler bölümünde. 
+
+Aktarmalý gemi nakliyatý
+
+Bu tür nakliyat problemlerinde bir mali kaynaktan alýcýya direk göndermeye
+ek olarak arada bir depoda da tutmamýz mümkün, bu durum tabii ki lojistik
+planlamada deðiþiklikler getirebilir. Amazon gibi þirketler bunu sürekli
+yapýyor mesela, bir ürünü önce büyük bir antrepoya gönderiyorlar, oradan
+baþka bir yere aktarma yapýyorlar. 
+
+\includegraphics[width=10em]{func_90_nflow_08.png}
+
+Orta kýsýmda sarýmsý renkle görülen aktarma noktalarý. Normal aktarma
+problemlerinde olduðu gibi kaynak, alýcý var, arz ve talep sýnýrlarý var,
+kenarlarda sýnýrlar olabilir, aktarma noktalarý için giren ve çýkan
+birbirini dengelemeli, yani muhafaza denklemi onlar için geçerli [1,
+56:00]. Aslýnda baþta gördüðümüz Sailco problemi bir aktarmalý nakliyat
+problemi.. Depo var, üretici, alýcý var..
+
+En kýsa / en uzun yol problemleri
+
+En kýsa yol problemleri de minimum bedel akýþ problemleridir. Size alttaki
+gibi bir çizit veriyorum mesela, her kenar, ``yol'' uzunluðu / zorluðu /
+bedeli çizitte veriliyor ve mavi düðümden kýrmýzý düðüme en kýsa bedelle,
+en kýsa þekilde ulaþmak istiyorum. Bu problemi minimum bedel akýþ olarak
+çözmek için elimizde sadece tek birimlik akýþ olduðunu hayal
+edebiliriz. 
+
+\includegraphics[width=10em]{func_90_nflow_09.png}
+
+Yani mavi düðümün tek birimlik arzý var, kýrmýzý düðümün tek birimlik
+talebi var, ve geri kalan her düðüm aktarýcý, yani giriþi, çýkýþý muhafaza
+etmesi gerekiyor. Kenarlarýn bedeli tabii ki o yolun uzunluðu, kýsalýðý
+olarak yorumlanabilir. O zaman, bu akýþ problemini çözünce, elde ettiðim
+akýþ bana hangi yolun en kýsa olduðunu söyleyecektir. Tabii 1 birimlik
+arzýn bölünüp farklý yönlere gitmesini istemem ve yine bir tam sayý
+kýsýtlamasý gerektiði akla gelebilir. Bu konuya deðineceðiz. Fakat bu
+problemi bir LP olarak çözünce tam sayý kýsýtlamasý olmasa bile 1/0 bazlý
+sonuçlar alýyorsunuz. Sihirli bir þey sanki.
+
+[uzun yol atlandi]
+
+Maksimum flow problemi de olabilirdi, bir çizit alalým mesela,
+
+\includegraphics[width=10em]{func_90_nflow_10.png}
+
+Bu çizitteki kenarlarý kapasite olarak görebiliriz, yani her kenardan ne
+kadar akýþ olabileceði hakkýnda bir sýnýr var, mesela üstteki bir su boru
+hattý aðý olsaydý, her kenar bir boru olabilirdi ve bu borularýn çapýna
+göre, kimisi küçük kimisi büyük, o borudan ne kadar þu
+pompalayabileceðimizle alakalý bir kýsýtlama var. Amaçým mavi düðümden
+kýrmýzý düðüme mümkün olduðunca fazla þu pompalamak. 
+
+Peki çýplak gözle bakýnca en fazla ne kadar akýþ gönderebileceðimizi
+görebilir miyiz? Evet. Alýcýya bakarsak en fazla 1+2=3 alabilir, o zaman
+3'ten fazla göndermeyiz. Bu 3 nasýl gönderilecek? 2 hattýndan 1, 3
+hattýndan 2 birimle belki.. Dikkat bu problemde yine kaynaktaki akýþý
+bölebiliyoruz. 
+
+[maks akýþý min akýþa çeviren numara atlandý]
+
+Tam sayý çözümleri
+
+Nihayet ``sonra deðineceðiz'' dediðimiz konuya geldik [1, 1:09:21]. Atama
+problemi, en kýsa yol gibi problemlerde tam sayý sonuçlara ihtiyacýmýz
+vardý. Tam sayý kýsýtlama getirmeden tam sayý sonuç elde etmenin bir yolu
+var. Yani normal bir LP çözüyorsunuz ve tam sayý bazlý sonuçlar elde
+ediyorsunuz. Bu nasýl oluyor? Anlatmadan önce biraz lineer cebire dalmak
+gerekiyor. 
+
+Taným
+
+Bir matris $A$ tamamen tekbirimseldir (totally unimodular -TU-) eðer
+$A$'nin her mümkün kare altmatrisinin determinantý 0, 1 ya da -1
+ise. Hatýrlarsak determinantlar kare matrisler üzerinde hesaplanan þeyler,
+burada tüm karesel altmatrislerden bahsediyoruz, ve onlarýn determinanti
+belirttiðimiz gibi ise matris TU diyoruz. 
+
+Aslýnda TU'luðun kontrolü biraz çetrefil olabilir, düþünürsek bir matris ne
+kadar buyurse o kadar mümkün altmatrisi olur. Ama bir matris tamamen 0,1,-1
+öðelerinden oluþuyorsa bu kontrol belki daha kolay olur..? 
+
+Alttaki matrislerde mesela soldaki TU, ama saðdaki deðil. 
+
+$$
+\left[\begin{array}{ccc}
+1 & 1 & 0 \\ -1 & 0 & 1
+\end{array}\right], \quad 
+\left[\begin{array}{ccc}
+1 & 1 & 1 \\ -1 & 0 & 1
+\end{array}\right]
+$$
+
+Tamam. Þimdi bir teori daha göreceðiz, resim iyice ortaya çýkacak. 
+
+Teori
+
+Eðer bir matris $A$ TU ise ve $b$ bir tam sayý vektör ise, o zaman
+$\{ x : Ax \le b\}$ çözümündeki $x$ tam sayý kordinatlarýnda olacaktýr.
+Yani üstteki þartlar yerindeyse $Ax \le b$ çokyüzlüsünün (polyhedron) tüm
+köþeleri tam sayý noktalarýndadýr. Bu teoriyi ispatsýz veriyoruz. Ve, bir LP
+için eðer elimizde tüm köþeleri tam sayý kordinatlar olan bir çokyüzlü var
+ise, o LP'nin çözümünün tam sayýlar olacaðýný biliyoruz.
+
+O zaman, eðer elimde matris $A$'sý tamamen tekbirimsel olan bir LP var ise,
+o zaman tam sayý çözümler elde etmem garanti, tabii $b$ de tamamen tam
+sayýlar içeriyorsa. 
+
+Ve nihai zirveye geldik: tüm geliþ matrisleri tamamen tekbirimseldir. 
+
+Yani bir að akýþ problemindeki geliþ matrisi tamamen tekbirimsel. Ayrýca
+eðer o problemin $b$ vektörü de tam sayý ise sonuç muhakkak tam sayýlar
+içerecek. 
+
+Bu çok önemli bir sonuç. 
+
+O zaman bir minimum bedel akýþ problemindeki arzlar tam sayý ise, talepler
+tam sayý ise, ve tam sayý kenar kapasiteleri içeriyorsa, bu bir minimum
+bedel tam sayý akýþýdýr. 
+
+Ekler
+
+Kýsayol problemine örnek olarak [2]'deki probleme bakalým.
+
+\includegraphics[width=20em]{dijks_03.png}
+
+Baþlangýç \verb!'s!'den bitiþ \verb!x!'e en kýsa yol hangisi?  Düðümlere
+$s=1$,$t=2$,$y=3$,$x=4$,$z=5$ olarak birer indis verelim, ve
+$x = [x_{12}, x_{13}, x_{23}, x_{24}, x_{32}, x_{34}, x_{35}, x_{45},
+x_{51}, x_{54}]$ vektörünü tanýmlayalým. Geliþ matrisini aðdaki
+baðlantýlara göre yapýp çözersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = [
+     [ 1,  1,  0,  0,  0,  0,  0,  0,  0, 0],
+     [ -1,  1,  1,  -1,  0,  0,  0,  0,  0, 0],
+     [ 0,  -1,  -1,  0,  1,  1,  0,  0,  0, 0],
+     [ 0,  0,  0,  -1,  0,  -1,  0,  1,  0, -1],
+     [ 0,  0,  0,  0,  0,  0,  -1,  -1,  1, 1]]
+
+# tek birim yolla, 1'den arz, 4'ten tek birim talep et
+# geri kalanlarda giris-cikis muhafaza
+b = [1, 0, 0, -1, 0]
+
+c= [10, 5, 2, 1, 3, 9, 2, 4, 7, 6]
+A = np.array(A); b = np.array(b); c = np.array(c)
+
+from scipy.optimize import linprog
+
+res = linprog(c, A_eq=A, b_eq=b)
+res = np.round(res.x)
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[0. 1. 0. 1. 1. 0. 0. 0. 0. 0.]
+\end{verbatim}
+
+Sonuçta $x_{13}$, $x_{24}$, $x_{32}$ kenarlarýnýn 1 deðerini aldýðýný
+görüyoruz, bu yollar en kýsa yolun parçalarýdýr, demek ki 1-3, 3-2, ve 2-4
+yolu en kýsa yoldur. Orijinal problem çözümünde [2] sonucun ['s', 'y', 't',
+'x'] olduðunu görmüþtük. Yani ayný sonuca varmýþ olduk. Dijkstra
+algoritmasýnýn bir ayrýksal algoritma olduðunu unutmayalým, ama üstteki LP
+bazlý yaklaþým sürekli (continuous) alanda optimizasyon araçlarý ile ayný
+sonuca varýyor!
+
+Yüzücüler
+
+Daha önceki problemi yazýlýmla çözelim. Atama problemleri aslýnda oldukca
+standart, çünkü iþ-iþçi að yapýsý hep ayný, arada aktarma olmayan bir
+að yapýsý. Bu yapýyý $n$ tane iþ $n$ tane iþçi için mekanik bir þekilde
+yaratabiliyoruz. Bu sebeple çözüm yapan \verb!linear_sum_assignment!
+çaðrýsý sadece bir bedel matrisi alýyor, gerisini kendi hallediyor. 
+
+Bir pürüz nokta, elde iþten fazla iþçi varsa, mesela yüzme örneðinde olduðu
+gibi, 5 tane yüzücü, 4 tane stil varsa ortaya çýkar. O zaman numara þudur,
+bedel matrisine bir 'boþ stil' satýrý ekleriz [4, sf. 40], oradaki tüm
+bedeller sýfýr olur, yani diðer iþler için optimal olmayan bir kiþiyi
+buraya atamak için algoritmayi yönlendirmiþ oluruz bir bakýma ve yine
+problemi standart bir þekilde çözeriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.optimize import linear_sum_assignment
+
+raw = [ [37.7, 32.9, 33.8, 37.0, 35.4],
+        [43.4, 33.1, 42.2, 34.7, 41.8],
+        [33.3, 28.5, 38.9, 30.4, 33.6],
+        [29.2, 26.4, 29.6, 28.5, 31.1] ]
+raw = np.array(raw)
+raw = np.vstack( (raw,  np.zeros((1,5))) )
+print (raw)
+row_ind, col_ind = linear_sum_assignment(raw)
+print (col_ind)
+print (row_ind)
+print (raw[row_ind, col_ind].sum())
+\end{minted}
+
+\begin{verbatim}
+[[37.7 32.9 33.8 37.  35.4]
+ [43.4 33.1 42.2 34.7 41.8]
+ [33.3 28.5 38.9 30.4 33.6]
+ [29.2 26.4 29.6 28.5 31.1]
+ [ 0.   0.   0.   0.   0. ]]
+[2 3 1 0 4]
+[0 1 2 3 4]
+126.2
+\end{verbatim}
+
+Sonuca bakarsak David sýrtüstü stiline atanmýþ, Tony kurbaðalamaya
+atanmýþ.. ve Ken hiçbir þeye atanmamýþ. Bu sonuçlarýn daha önceki tablodaki
+kýrmýzý seçimler ayný olduðunu görebiliriz.
+
+Problemin matematik yapýsýna gelelim, ufak bir örnek, elde
+$c_1,c_2,p_1,p_2$ þeklinde $c$ ile müþteriler $p$ ile ürünleri eþlediðimizi
+düþünürsek, að yapýsýnda düðümler tüm müþteriler, tüm ürünler, yani
+$c_1,c_2,p_1,p_2$ ve tüm kenarlar ise $(c_1,p_1)$, $(c_1,p_2)$,
+$(c_2,p_1)$, $(c_2,p_2)$ gibi olurdu. Burada yine tek birim kaynaktan,
+müþterilerden gönderilen tek birimlik yükün bir alýcý ürün tarafýndan
+alýndýðýný düþünüyoruz, o zaman geliþ matrisi satýrlar düðümler, kolonlar
+kenarlar olacak þekilde,
+
+$$
+\left[\begin{array}{rrrr}
+1  & 1 &  0 & 0 \\
+0  & 0 &  1 & 1 \\
+-1 & 0 & -1 & 0 \\
+0  &-1 &  0 &-1  
+\end{array}\right]
+$$
+
+olurdu, tabii ki $b = [1,1,-1,-1]$. Üstteki matriste kalýp belli oluyor
+herhalde, satýrlarýn müþteri kýsmýnda her ürün baþýna tamamen birler var,
+ürünler kýsmýnda blok blok yanyana birim matrisleri.. Üstteki matrisi
+ötomatik olarak yaratmak mümkün. Hatta þimdi {\em Lineer Programlar,
+ Örnekler} yazýsýndaki problemi að mantýðý çözelim, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+C = [[17,10,12],[9,8,10], [14,4,7]]
+C = np.array(C)
+print (C)
+
+n = 3
+X = np.zeros((2*n,n**2))
+X[0,0:n] = np.ones((1,n))
+X[1,n:n+n] = np.ones((1,n))
+X[2,2*n:2*n+n] = np.ones((1,n))
+X[3:6,0:3] = -np.eye(n,n)
+X[3:6,3:6] = -np.eye(n,n)
+X[3:6,6:9] = -np.eye(n,n)
+print (X)
+
+b = [1, 1, 1, -1, -1, -1]
+
+from scipy.optimize import linprog
+res = linprog(C.flatten(), A_eq=X, b_eq=b)
+res = np.round(res.x)
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[[17 10 12]
+ [ 9  8 10]
+ [14  4  7]]
+[[ 1.  1.  1.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  1.  1.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  1.  1.  1.]
+ [-1. -0. -0. -1. -0. -0. -1. -0. -0.]
+ [-0. -1. -0. -0. -1. -0. -0. -1. -0.]
+ [-0. -0. -1. -0. -0. -1. -0. -0. -1.]]
+[0. 0. 1. 1. 0. 0. 0. 1. 0.]
+\end{verbatim}
+
+Ayný sonuca eriþtiðimizi görüyoruz. Not: hem üstteki geliþ matrisi hem de
+diðer LP yazýsýndaki problemin tamamen tekbirimsel olduðuna dikkat, bu
+sebeple her iki problem de tamsayý çözümü veriyor. 
+
+5 yüzücü için ve yine sýfýrlý satýrý ekleyip, yüzücü problemini de ayný
+þekilde çözebilirdik. 
+
+Kaynaklar
+
+[1] Lessard, {\em Introduction to Optimization, CS/ECE/ISyE 524, Lecture 5}, 
+    University of Wisconsin-Madison,
+    \url{https://laurentlessard.com/teaching/524-intro-to-optimization}
+
+[2] Bayramli, {\em Bilgisayar Bilim, Dijkstra Algoritmasý ile En Kýsa Yol}
+
+[3] Bayramli, {\em Fonksiyonel Analiz ve Optimizasyon, Çifteþlik, Ýkizlik (Duality)}
+
+\end{document}
+
+
+

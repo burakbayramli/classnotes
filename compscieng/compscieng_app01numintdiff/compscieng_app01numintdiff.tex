@@ -1,0 +1,204 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Sayýsal Entegrasyon (Numerical Integration) ve Sonlu Farklýlýklar ile Sayýsal Türev (Differentiation with Finite Differences)
+
+$F(x)$ fonksiyonunu bazen sembolik olarak entegre etmek zor olabilir. Bu
+durumlarda sayýsal çözüm daha kullanýþlý olabilir. Mesela $F(x)$'in $x_0$
+ve $x_1$ arasýndaki entegrali aslýnda bir alan hesabýdýr, ve bu alaný, $x$
+aralýðýný ufak parçalara bölerek, ve bu parçalarý kullanarak yaklaþýk bir
+alan hesabý yapýp sonuçlarý toplayarak elde edebiliriz. 
+
+$x_0$ ve $x_1$ arasýný $N$ parçaya bölelim. 
+
+Artýk entegrali yaklaþýk olarak 
+
+$$
+\int_{x_0}^{x_1} F(x) \ud x \approx \sum_{i=1}^{N} F(x_i)
+$$
+
+hesaplayabiliriz. $N$ arttýrýldýkça dikdörtgenler daha fazlalaþacak, ve
+gerçek alana daha fazla yaklaþacaðýz. 
+
+Üstteki metot Euler'in metotu olarak biliniyor, ve anlatmasý, kodlamasý en
+rahat olan yöntem bu. Bir diðer yöntem, trapezoid yöntemi olarak bilinir,
+ve daha iyi yaklaþýksal yeteneðinin olduðu bilimektedir. Bu yöntemle pek
+çok dikdörtgen alaný yerine pek çok trapezoid alaný hesaplýyoruz [1,
+sf. 279].
+
+\includegraphics[width=25em]{compscieng_app01numint_01.png}
+
+$$
+\sum _{i=1}^{N} \Delta x \frac{1}{2} [F(x_i) + F(x_{i+1})]
+$$
+
+Bu formül iki kenarý $a,b$ olan ve geniþliði $\Delta x$ olan trapezoid'in
+alanýnýn $1/2(a+b)\Delta x$ olmasýndan ileri geliyor.
+
+Örnek
+
+$F(x) = 3 x e^{-0.7 x}$'in $x_0=0.5$ ve $x_1=5$ arasýndaki entegralini
+hesaplayalým,
+
+Rutin \verb!trapz! ile bunu yapabiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = np.linspace(0.5,5.0,1000)
+y = 3.0*x*np.exp(-0.7*xval)
+W = np.trapz(y,x=x)
+print (W)
+\end{minted}
+
+\begin{verbatim}
+4.99249134896902
+\end{verbatim}
+
+Trapezoidsel hesabý elle yapmak isteyenler için bazý kolaylaþtýrýcý ek
+formüller [2, sf. 605] alttadýr,
+
+\includegraphics[width=20em]{compscieng_app01numint_02.png}
+
+Trapezoidsel entegral $T$ ve $y_i = f(x_i)$ için 
+
+$$
+T = \frac{1}{2} (y_0 + y_1)\Delta x + \frac{1}{2} (y_1 + y_2)\Delta x +... +
+\frac{1}{2} (y_{n-2} + y_{n-1})\Delta x + \frac{1}{2} (y_{n-1} + y_n)\Delta x
+$$
+
+$$
+= \Delta x (\frac{1}{2}y_0 + y_1 + y_2 + ... + y_{n-1} + \frac{1}{2} y_n )
+$$
+
+$$
+= \frac{\Delta x}{2} (y_0 + 2y_1 + 2y_2 + ... + 2y_{n-1} + y_n)
+$$
+
+Örnek
+
+$n=4$ ile  $\int_{1}^{2} x^2 \ud x$ hesabýný yapalým. 
+
+$\Delta x$ = 1/4 olur,
+
+$$
+T = \frac{\Delta x}{2} (y_0 + 2y_1 + 2y_2 + 2y_3 + y_4)
+$$
+
+$$
+= \frac{1}{8} (1 + 2 (\frac{25}{16}) + 2(\frac{36}{16}) + 2 (\frac{49}{16}) + 4)
+$$
+
+$$
+= \frac{75}{32} = 2.34375
+$$
+
+Çaðrý \verb!trapz! ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = np.linspace(1.0,2.0,4)
+y = x**2
+T = np.trapz(y,x=x)
+print (T)
+\end{minted}
+
+\begin{verbatim}
+2.351851851851852
+\end{verbatim}
+
+Ustteki hesap tabii ki analitik sekilde de cok rahat yapilabilir, 
+
+$$
+\int_{1}^{2} x^2 \ud x = \frac{x^3}{3} \biggr|_{1}^{2} = 
+\frac{8}{3}-\frac{1}{3} = 
+\frac{7}{3}
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (7./3)
+\end{minted}
+
+\begin{verbatim}
+2.3333333333333335
+\end{verbatim}
+
+Sayýsal Türev
+
+Sonlu farklýlýklar (finite differences) ile yaklaþýk türev almak için,
+herhangi bir $x$ noktasýnda
+
+$$
+f'(x) = \frac{f(x + \epsilon) - f(x)}{\epsilon}
+$$
+
+hesabýný yapabiliriz. Tek boyutta tek sayý $\epsilon$ ile adým atýlýp $f$
+üzerindeki deðiþiklik üzerinden hesap yapýlýr, çok boyutlu durumda birer
+birer her kordinatta $\epsilon$ kadar adým atýlýr, ve bu adým üzerinden $f$
+türevi alinip o kordinat için kýsmý türev olarak kaydedilir, $x =
+\left[\begin{array}{ccc} x_0 & ... & x_n \end{array}\right]$ için
+
+$$
+f'(x) = \left[\begin{array}{c}
+\frac{ f \left( [\begin{array}{ccc} x_0 + \epsilon & ... & x_n \end{array}]\right) - f(x)}{\epsilon} \\
+\vdots \\
+\frac{ f \left( [\begin{array}{ccc} x_0  & ... & x_n+\epsilon \end{array}]\right) - f(x)}{\epsilon} 
+\end{array}\right]
+$$
+
+Alttaki kod [3]'teki \verb!approx_fprime! metotunu
+baz almýþtýr, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+eps = np.sqrt(np.finfo(float).eps)
+
+def _approx_fprime_helper(xk, f, epsilon):
+    f0 = f(xk)
+    grad = np.zeros((len(xk),), float)
+    ei = np.zeros((len(xk),), float)
+    for k in range(len(xk)):
+        ei[k] = 1.0
+        d = epsilon * ei
+        df = (f(xk + d) - f0) / d[k]
+        if not np.isscalar(df):
+            try:
+                df = df.item()
+            except (ValueError, AttributeError):
+                raise ValueError("The user-provided "
+                                 "objective function must "
+                                 "return a scalar value.")
+        grad[k] = df
+        ei[k] = 0.0
+    return grad
+\end{minted}
+
+Test olarak optimizasyonda bolca kullanýlan Rosenbrock fonksiyonunu
+kullanabiliriz. Altta hem analitik olarak hem de sayýsal olarak hesaplanmýþ
+türev sonuçlarýný görebiliyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+rosen = lambda x: (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
+
+def rosen_d(x):
+    return np.array([2*100*(x[1] - x[0]**2)*(-2*x[0]) - 2*(1.-x[0]), 2*100*(x[1]-x[0]**2)])
+
+x = [0.5, 0.5]
+res = _approx_fprime_helper(x, rosen, eps)
+print ('analitik', res, 'sayisal', rosen_d(x))
+
+x = [-0.5, 0.5]
+res = _approx_fprime_helper(x, rosen, eps)
+print ('analitik', res, 'sayisal', rosen_d(x))
+\end{minted}
+
+\begin{verbatim}
+analitik [-50.99999928  50.00000149] sayisal [-51.  50.]
+analitik [47.00000072 50.00000143] sayisal [47. 50.]
+\end{verbatim}
+
+Kaynaklar
+
+[1] Sorenssen, {\em Elementary Mechanics Using Python}
+
+[2] Hass, {\em Thomas's Calculus}
+
+[3] Scipy,
+    \url{https://github.com/scipy/scipy/blob/master/scipy/optimize/optimize.py}
+
+\end{document}

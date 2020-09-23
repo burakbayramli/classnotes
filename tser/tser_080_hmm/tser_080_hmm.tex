@@ -1,0 +1,687 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Saklý Markov Modelleri (Hidden Markov Models -HMM-)
+
+Zaman serilerini temsil etmek için Markov bazlý modeller sýkça
+kullanýlýr. Genelde istatistiki analiz baðýmsýz özdeþçe daðýlmýþ (iid)
+örneklem noktalarý olduðunu farz eder, fakat çoðu zaman serisinde veri
+noktalarý birbirinden baðýmsýz deðildir, $t$ anýndaki bir nokta $t-1$
+anýndaki nokta ile baðlantýlýdýr. 
+
+Saklý {\em olmayan} Markov modellerini, yani Markov Zincirlerini [5]'de
+görmüþtük. Bir MZ sistemi her $t$ adýmýnda bir konumda (state) olan bir
+sistem, $X_1,..,X_T$ rasgele deðiþkenleri ile temsil edelim, e bu modelde
+bir konumdan diðerine geçiþ belli olasýlýklar üzerinden temsil edilir. Hiç
+deðiþme olmamasý da aslýnda bir geçiþtir, bu durumda konum kendisine doðru
+bir geçiþ yapar. Matematiksel olarak bir konumdan diðerine geçme olasýlýðý
+
+$$ P(X_t = j | X_{t-1} = i)  $$
+
+ile gösterilir. Önceki adýmda $i$ konumundayýz, geçiþ sonrasý $j$'e
+geliyoruz, $t$ anýndaki konuma geçiþ için sadece $t-1$'deki konumu bilmek
+yeterlidir. Resme bakalým,
+
+\includegraphics[height=5cm]{tser_hmm_01.png}
+
+Konumlar ayrýksal, üstte 1,2,3 gibi deðerler görülüyor. Bu deðerler anlamý
+olan yine ayrýksal bir alfabeyi indisliyor olabilirler. Mesela 1 belki
+``araba'', 2 ``bisiklet'', 3 ``uçak'' gibi.  Geçiþ olasýlýklarý bir $A$
+matrisi içinde toplanabilir, resimde görüldüðü gibi, formülsel olarak
+
+$$ P(X_t = j | X_{t-1} = i) = a_{ij} $$
+
+Resimde ayrýca örnek bir konum serisi / dizisi de görüyoruz. Bu þekilde bir
+seri bilinen MZ geçiþ olasýlýklarýndan ``üretilebilir''; bir baþlangýç
+konumu seçeriz, bir sonrakine geçiþ olasýlýklarýna bakarýz (5 tane), bu
+olasýlýklar üzerinden zar atarýz, birini seçeriz, ve o konuma
+geçeriz. Ýþlemi tekrarlarýz. Böylece $X_1,X_2,..$ ``zincirini'' elde
+ederiz.
+
+Tam tersi yönde bir hesap yapmamýz da gerekebilir; elde bir seri var, ama
+$A$ bilinmiyor, o zaman konum dizisinden $A$ matrisini
+``öðrenebiliriz''. Öðrenim için bildiðimiz maksimum olurluk hesabý
+kullanýlýr, herhangi bir konum serisinin olasýlýðý nedir sorusunun cevabý
+þu formül;
+
+$$ P(X_1=x_1,..,X_T=x_T) = 
+P(X_1=x_1) \prod _{t=2}^{T} P(X_t=x_t | X_{t-1}=x_{t-1})
+$$
+
+Üstteki formül bir olurluk (likelihood) hesabý - $L(A)$ diyelim, 
+
+$$ L(A) = P(X_1=x_1) \prod _{ t=2}^{T} a_{x_{t-1},x_t} $$
+
+Olurluðun maksimize edilmesi ardýndan $A$ için bir tahmin edici
+(estimator) hesaplanabilir - detaylar için [2, Ders 6]; $n_{ij}$'yi veri
+serisinde $i$'inci konumdan $j$'ye kaç kere geçildiðinin sayýsý olarak
+tanýmlarsak, $A$ tahmin edicisi þöyle olur,
+
+$$ \hat{a}_{ij} = \frac{n_{ij}}{\sum_j n_{ij}}  $$
+
+Bu hesap akla yatkýn (intuitive) bir sonuç, çünkü $i$'den $j$'ye geçiþ
+``olasýlýðýný'' veriden hesaplamak istiyorsak, veride $i$'den $j$'ye kaç
+kere geçildiðini sayýp, bu sayýyý yine verideki tüm $j$'ye olan geçiþlere
+(hangi konumdan olursa olsun) bölmek bize iyi tahmin saðlar. Bir
+Gaussian'ýn $\mu$'sünü tahmin ederken tüm reel veri noktalarýný toplayýp
+bölmek ayný þekilde akla yatkýn bir tahmin edicidir.
+
+Þimdi MZ kavramýna bir ek daha yapalým. Diyelim ki bir katman daha
+ekleyeceðiz, öyle ki artýk konum geçiþlerini dýþarýdan göremiyoruz, sadece
+konumlarýn {\em baþka bir daðýlýma göre} dýþarýya ürettiði farklý bir
+alfabeden deðerleri görüyoruz.
+
+\includegraphics[height=8cm]{tser_hmm_02.png}
+
+Konum geçiþleri bu sayede ``saklý'' hale geldi, ve bir HMM elde
+ettik. Matris olarak görelim,
+
+$$ 
+A = \left[\begin{array}{rrr}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33} 
+\end{array}\right], \qquad
+B = 
+\left[\begin{array}{rrrr}
+b_{11} & b_{12} & b_{13} & b_{14} \\
+b_{21} & b_{22} & b_{23} & b_{24} \\
+b_{31} & b_{32} & b_{33} & b_{34} 
+\end{array}\right]
+$$
+
+Üstteki model bir ayrýksal HMM örneðidir, yani hem saklý geçiþler
+ayrýksal (Markov durumunda hep öyle olmak zorunda) ve dýþarý üretilen
+deðerler de ayrýksal. Dýþarý yansýtýlan / salýmlanan (emission)
+sembollerinden 4 tane var, $v_1,v_2,v_2,v_4$. Salýmlar sürekli de
+olabilirdi, mesela her konumun ayrý bir Gaussian daðýlýmý olabilirdi. Bu
+konuya sonra deðineceðiz. 
+
+Not: Salým sembolleri olarak $v_1,v_2,..$ kullandýk fakat matematik olarak
+bunlar da aslýnda bir indis; saklý konumlarýn ayný þekilde tamsayý olan
+indisleri ile karýþmamasý için semboller seçildi. Tabii aynen saklý konumda
+olduðu gibi salýmlarýn indisleri de herhangi bir alfabeyi
+indeksleyebilir. Mesela 1 ``a'', 2 ``b'' olabilir. Ýndislerin direk kendisi
+de kullanýlabilir; mesela saklý konumlara baðlý zar atýþlarýný
+modelliyorsak salýmlar 1,2,3,4,5,6 olacaktýr.
+
+Devam edelim; HMM bu salým sembollerinden herhangi birini üretebilir, ama
+her saklý konumda üretim farklý bir daðýlýma göre olur. Bu daðýlýmlarý
+içeren salým olasýlýklarý ayrý bir $B$ matrisi üzerinde tutulur. Matrisin
+boyutu 3 saklý 4 görünen konum üzerinden $3 \times 4$ olmalýdýr, ve
+matrisin öðeleri $b_{jk}$'nin matematiksel tanýmý,
+
+$$ 
+b_{jk} =  P (V_t = k | X_t = j )
+$$
+
+(Görüldüðü gibi üstte salým indisini kullandýk). $V_t$ deðiþkeni $t$ anýnda
+gizli $j$ konumunda olan bir HMM'in ürettiði semboldur. Ýki þarttan
+bahsetmek lazým þimdi, bunlardan birincisi pür MZ durumunda da geçerli,
+
+$$ \sum_j a_{ij} = 1, \quad \forall i$$
+
+HMM ek bir þart,
+
+$$ \sum_k b_{jk} = 1, \quad \forall j $$
+
+Þimdi diyelim ki $V$ bir görünen sembol vektörü, $S_r$ ise $T$ boyutunda
+bir saklý konum vektörü, ve bu boyutta olabilecek {\em tüm} konum
+serilerini düþünelim, $c$ mümkün gizli konum için $c^T$ tane olur. $T=6$
+için bir vektör $S_1 = \{1,4,2,2,1,4\}$ gibi.. Þimdi görünen herhangi bir
+dizinin olasýlýðýný hesaplayalým,
+
+$$ P(V) = \sum _{r}^{c^n} P(V | S_r) P(S_r) 
+\mlabel{1}
+$$
+
+Üstteki formüldeki $P(S_r)$'in açýlýmýný MZ'lerden zaten biliyoruz, 
+
+$$ P(S_r) = \prod _{t=1}^{T}P(X_t|X_{t-1}) $$
+
+Yani gizli konum geçiþlerine tekabül eden $a_{ij}$'leri bulup onlarý
+sýrasýyla çarpýyoruz. Üstteki $\{1,4,2,2,1,4\}$ örneði için bu
+çarpým $a_{14}a_{42}a_{22}a_{21}a_{14}$ olurdu. 
+
+Ayrýca $P(V|S_r)$'in açýlýmýný da biliyoruz, 
+
+$$ P(V|S_r) = \prod _{t=1}^{T} P(V_t | X_t) $$
+
+Birleþtirelim ve (1)'i geniþletelim,
+
+$$ 
+P(V) = \sum _{r}^{c^T} \prod _{t=1}^{T} P(V_t | X_t)  P(X_t|X_{t-1}) 
+$$
+
+Formül biraz korkutucu duruyor ama aslýnda söylediði þu: verilen bir
+$V$'nin olasýlýðýný hesaplamak için tüm mümkün saklý konum dizileri
+üzerinden bir toplam almalýyýz, bu toplamdaki her dizi için $a_{ij}$
+üzerinden gizli geçiþlerin çarpýmýný alýrýz, sonra görünen salýmlarýn bir
+çarpýmýný alýrýz, ki bu bilgi zaten $b_{jk}$ içinde. $A,B$ bilindiðine göre
+tarif edilen iþlemler direk yapýlabilir.
+
+Fakat bu hesap aþýrý yüksek boyutlu bir hesaptýr, çetrefilliði $O(c^T \cdot T)$, 
+mesela $c=10,T=20$ olsa $10^{21}$ ölçeðinde bir hesaptan bahsediyoruz.
+Ýçinde $c$ sembol olan bir alfabenin $n$ uzunluðunda çok fazla farklý dizilimi
+mümkündür. 
+
+Ýleri Algoritmasý (Forward Algorithm)
+
+Fakat $P(V)$'yi literatürde ileri algoritmasý denilen bir yöntemle özyineli
+(recursive) olarak hesaplamak mümkündür. Bakýyoruz her terim $P(V_t | X_t)
+P(X_t|X_{t-1}) $için sadece $V_t,X_t,X_{t-1}$ gerekli. O zaman özyineli
+hesap için  yeni bir  deðiþken tanýmlarýz, bilinen bir model 
+$\lambda = (A,B)$ için
+
+$$ \alpha_t(i) = P(V_1,V_2,..,V_t, X_t = i; \lambda) $$
+
+Bu gözlenen salým dizisinin sadece bir kýsmý üzerinden tanýmlanmýþ bir
+olasýlýk; tanýma göre zaman indisi 1'den $t$'ye kadar, ve bu en son $t$
+noktasýnda saklý konum $i$'de olmalý. Özyineli tanýmý görmek için
+$\alpha_1(i)$'nin ne olduðuna bakalým, notasyon kýsalýðý için 
+$\pi_i = P(X_1 = i)$,
+
+$$ \alpha_1(i) = \pi_i b_{i,V_1} $$
+
+Tümevarýmsal (induction), özyineli kýsým ise þöyle tanýmlanýr,
+
+$$ \alpha_{t+1}(j) = \bigg[ \sum _{i=1}^{c} \alpha_t(i)a_{ij} \bigg] b_{j,V_{t+1}} $$
+
+Formülün niye performans ilerlemesi getirdiðini görmek için örnek 1,2,3,4
+gizli konumlarýn tüm permutasyonlarýnýn düþünelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import itertools
+l = list(itertools.permutations([1, 2, 3, 4]))[:10]
+for x in l: print x
+print '...'
+\end{minted}
+
+\begin{verbatim}
+(1, 2, 3, 4)
+(1, 2, 4, 3)
+(1, 3, 2, 4)
+(1, 3, 4, 2)
+(1, 4, 2, 3)
+(1, 4, 3, 2)
+(2, 1, 3, 4)
+(2, 1, 4, 3)
+(2, 3, 1, 4)
+(2, 3, 4, 1)
+...
+\end{verbatim}
+
+Mesela $t=2$'de $\alpha_2(V_2)$ hesabýný düþünelim; bu hesap ilk satýrdaki
+1,2,.. için bir kere yapýlmýþ olacaktýr, 2. satýrda bir daha hesaplanmasý
+gerekmez. Hatta daha geriye gidersek ilk adýmda 1 konumunda olan tüm
+satýrlar da (6 tane) sadece bir kez $\alpha$ ile hesaplanýrlar.
+
+Geri Algoritmasý (Backward Algorithm) 
+
+Benzer þekilde $\beta_t(i)$ üzerinden bir geri algoritmasý diye bilinen bir
+algoritma vardýr; bu algoritma ileri versiyonun bir nevi aynadaki
+yansýmasý. Bu algoritmada $t=1$'den ileri deðil, $T$'den geriye doðru
+gitmiþ oluyoruz.
+
+$$ \beta_t(i) = P(V_{t+1}, v_{t+2},...,V_{T} | X_t = i ; \lambda )  $$
+
+Bu formül bilinen model $\lambda$ ve $t$ anýnda saklý konum $i$'de olma
+koþuluna göre, $t+1$'den en sona kadar olan verili salýmlarýn olasýlýðýnýn
+hesabýný yapar. Özyineli adým, 
+
+$$ \beta_T(i) = 1 $$
+
+$$ \beta_t(i) = \sum _{j=1}^{c} a_{ij}b_{j,V_{t+1}} \beta_{t+1}(j)  $$
+
+
+Viterbi Algoritmasý
+
+Bilinen $\lambda$ için verili bir $V$ salýmlarýna tekabül eden saklý konum
+geçiþlerini bulmak için Viterbi algoritmasý kullanalým. Detaylara girmeden
+önce hemen bir örnek görelim [3, sf. 606].
+
+Bir kumarhanede tek zar üzerinden oynanan bir oyunda zarlarýn hileli
+olduðundan þüphe ediyoruz. Bu problemi HMM ile þu þekilde modelleyebiliriz:
+bir iyi zar bir de hileli zar var. Bu iki zar iki farklý ``saklý'' konuma
+tekabül edecekler. Ama biz bu saklý konumlarý görmüyoruz, sadece zar
+atýþlarýnýn sonucunu görüyoruz. 
+
+\includegraphics[height=6cm]{tser_hmm_09.png}
+
+Üstteki modele göre hileli zardan 6 gelme olasýlýðý (salým olasýlýðý) daha
+yüksek. Ýki saklý konum arasýndaki geçiþ anormal sayýlmaz, ``arada sýrada''
+birinden bir konumdan diðerine geçiþ var, kumarhane ``bazen'' zarlarý
+deðiþtiriyor yani. Þimdi saklý geçiþi bulalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import dhmm
+
+rolls = [1,2,4,5,5,2,6,4,6,2,1,4,6,1,4,6,1,3,6,1,3,6,\
+         6,6,1,6,6,4,6,6,1,6,3,6,6,1,6,3,6,6,1,6,3,6,1,\
+         6,5,1,5,6,1,5,1,1,5,1,4,6,1,2,3,5,6,2,3,4,4]
+rolls = np.array(rolls)-1
+a = np.array([[0.95, 0.05],[0.05, 0.95]])
+b = np.array([[1/6., 1/6., 1/6., 1/6., 1/6., 1/6.], 
+              [1/10.,1/10.,1/10.,1/10.,1/10.,1/2.]])
+pi = np.array([0.5, 0.5])
+
+hmm = dhmm.HMM(2,6,pi,a,b)
+print hmm.viterbi_path(rolls)
+\end{minted}
+
+\begin{verbatim}
+[0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+\end{verbatim}
+
+Müthiþ! Viterbi ile ne zaman hileli, ne zaman düzgün zar kullanýldýðýný pat
+diye hesapladýk. Kumarhane önce hilesiz baþlýyor, ardýndan zarlarý
+deðiþtiriyor ve uzun süre hile yapýyor. 
+
+Algoritmanýn nasýl iþlediðini anlamak için farklý bir modele bakalým,
+
+\includegraphics[height=6cm]{tser_hmm_03.png}
+
+Bu modelde 3 tane saklý konum var, ve salým alfabesi $a,b$ (tabii kodlama /
+matematiksel olarak 1,2 olacak). Viterbi algoritmasýnýn iþleyiþini anlatmak
+için saklý konumlar ve aralarýndaki geçiþ zamana doðru saða doðru yayýlacak
+þekilde resimlenir, bu resme ``trellis'' deniyor.
+
+\includegraphics[height=6cm]{tser_hmm_08.png}
+
+Kýsayol algoritmasý þöyle; üstteki resimde zaman/konum düðümlerine
+baþlangýçtan o noktaya gelmenin olasýlýðý yazýlmýþ. Yani bu deðer o
+noktanýn ne kadar olasý olduðunu gösteriyor. Hesabýn bir örneði; trellisin
+ortasýndan secelim, diyelim ki $t=1$ anýnda 3 konumundan 1 konumuna geçmek
+istiyoruz, bu geçiþ sonrasý yol ne olur?  $t=1$'de 3 üzerinde 0.1 diyor,
+3-1 geçiþinin olasýlýðý 0.4 çarpý 1 konumundan 'b' salýmý olasýlýðý 0.5, o
+zaman 0.1*0.4*0.5 = 0.02. Böylece baþla-3-1 yolunun olasýlýðý 0.02 haline
+geldi. Bu hesap saða doðru geniþletilir, eðer bir noktaya birden fazla
+geçiþ mümkün ise, nihai hesaplar arasýnda en yüksek olan seçilir. En saða
+geldiðimizde 1'de biten bir 0.016 yolu görüyoruz, bir de 3'de biten bir
+0.016 yolu görüyoruz. Ýki yolun hesabý ayný çýktý, çoðunlukla bu durum
+olmaz, fakat bu yollardan herhangi birini seçmek, ya da ikisini birden
+raporlamak problem deðildir.
+
+Yolu \verb!dhmm!'e hesaplatýrsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import dhmm
+a = np.array([[0.1,0.4,0.4],[0.4,0.1,0.5],[0.4,0.5,0.1]])
+b = np.array([[0.5,0.5],[0.8,0.2],[0.2,0.8]])
+pi = np.array([0.5, 0, 0.5])
+
+hmm = dhmm.HMM(3,2,pi,a,b)
+print hmm.viterbi_path([0,1,1])
+\end{minted}
+
+\begin{verbatim}
+[0 2 0]
+\end{verbatim}
+
+Eðer 1 ve 3'e en soldan giriþ yapan bir baþlangýç noktasý S, ve en sonda
+tüm düðümlerin gittiði bir bitiþ noktasý E hayal edersek, aslýnda üstteki
+tarif edilen [6] yazýsýnda anlatýlan kýsayol algoritmasýna
+benziyor. Elimizde bir yönlü ve çevrimsiz bir çizit (directed, acyclic
+graph) var, S'den baþlýyoruz, sürekli adým atarak arkada býraktýðýmýz yolun
+uzunluðunu (bu durumda olasýlýðýný) sürekli toplayarak her adýmda
+hesaplýyoruz, ve hatýrlýyoruz (gerçi üstteki örnekte olasýlýklar çarpýldý
+-çünkü o yolun birleþik olasýlýðý hesaplanmalýydý- fakat log alýnýp
+toplanabilirdi, hatta sayýsal stabilite sebepleriyle bu
+yapýlmalýdýr). Trellis'teki her geçiþ çizitte bir kenar, daha önce
+kullandýðýmýz örnek $t=1$ anýndaki 3-1 geçiþi için kenar 0.4*0.5=0.2. Bu
+kenarlar takip edilerek bir kýsayol bulunacaktýr.
+
+Model Öðrenmek, Ýleri-Geri Algoritmasý
+
+HMM'in güzellikleri bitmedi; sadece görünen semboller dizisini kullanarak,
+sadece kaç tane saklý konum olacaðýný tanýmlayarak, tüm HMM modelini
+öðrenmek mümkün. Yani $A,B$ matrisleri, ve tabii ki bunu elde edince
+görünen salýmlara tekabül eden saklý geçiþleri de
+hesaplayabilecegiz. Kumarhane örneðine dönelim, yeni bir HMM yaratalým, ve
+dýþarýdan bir model tanýmlamadan, onu direk veri ile eðitelim.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+hmm2 = dhmm.HMM(2,6)
+hmm2.train([rolls],iter=20)
+print hmm2.viterbi_path(rolls)
+print 'aic', hmm2.aic()
+print hmm2.transmat
+print hmm2.prior
+print hmm2.obsmat
+\end{minted}
+
+\begin{verbatim}
+[0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+aic 233.31799296
+[[ 0.97008754  0.02991246]
+ [ 0.32816368  0.67183632]]
+[ 0.5  0.5]
+[[ 0.12184793  0.23208224  0.19549656  0.10143301  0.27422243  0.07491783]
+ [ 0.18905143  0.2018225   0.17782606  0.17010257  0.01788689  0.24331055]]
+\end{verbatim}
+
+Saklý konum geçiþleri ayný çýktý! Gerçi eðitimi birkaç kez iþletmek gerekti,
+çünkü HMM eðitimi bir tür Beklenti-Maksimizasyon (Expectation-Maximization -EM-)
+algoritmasý kullanýr, ve bu algoritmanýn yerel maksimada takýlýp kalmasý
+mümkündür, o yüzden birkaç kez iþlettik, ve AIC'si en düþük olaný seçtik. Fakat
+bu zaten EM kullanýldýðýnda uygulanmasý tavsiye edilen bir tekniktir.
+
+Detaylara inmeden önce formülsel olarak, bize verili bir $V$ dizisi
+baðlamýnda $t$ anýnda $i$ konumunda olmanýn olasýlýðý lazým; yani 
+$P(X_t = i | V; \lambda)$. Bu formüle nasýl eriþiriz? $X_t = i$ ile $V$'nin
+birleþik daðýlýmýný düþünelim ($\lambda$'yi kalabalýk olmasýn diye
+göstermiyoruz), onu $V$'leri ortadan bölerek iki parçalý olarak 
+gösterebiliriz,
+
+$$ P(X_t = i, V) = P( V_1,V_2,..,V_t,X_t=i) P (V_{t+1},V_{t+2},..,V_T | X_t=i )
+$$
+
+Eþitliðin sað tarafýndaki ilk kýsým $\alpha$ ikinci kýsým $\beta$ deðil mi?
+Evet. O zaman 
+
+$$  = \alpha_t(i) \beta_t(i) $$
+
+Fakat hala $V$'nin verili olduðu hali elde etmedik, onun için bir bölüm
+lazým. Bölümü yapalým ve sonuca yeni bir sembol verelim,
+
+$$ 
+\gamma_t(i) \equiv P(X_t = i | V) = 
+\frac{P(X_t = i, V) }{P(V)} = 
+\frac{\beta_t(i)\alpha_t(i)}{ P(V)} 
+$$
+
+Bu noktada, teorik olarak, 
+
+$$ \argmax_{1 \le i \le c} [ \gamma_t(i) ] $$
+
+çözümü, yani $t$ anýnda $\gamma_t(i)$ maksimize edecek en iyi $X_t$
+konumunu bulmak ve bunu tüm $t$'ler için yapmak bize verili $V$ için en
+optimal saklý yolu verir diye düþünebilirdik, fakat üstteki ifade teker
+teker konumlara bakýyor, ve geçiþleri gözönüne almýyor. Bunun için Viterbi
+algoritmasý hala en iyi çözüm. Detaylar için [1]. Her halükarda, üstteki
+ifade bize eðitim için yardýmcý olacak. 
+
+Devam edelim, $\xi$'i tanýmlayalým,
+
+$$ \xi_t(i,j) = P(X_t = i, X_{t+1}= j | V; \lambda) 
+\mlabel{2}
+$$
+
+$\xi$ ile $t$ anýnda $i$ konumunda $t+1$ anýnda $j$ konumunda olma
+olasýlýðýný tanýmlamýþ oluyoruz. Üstteki ifadeyi 
+
+$$  = \frac{\alpha_t(i)a_{ij}b_{j,V_{t+1}}\beta_{t+1}(j)  }{P(V;\lambda)}$$
+
+olarak yazabiliriz, ve
+
+$$  
+= \frac{\alpha_t(i)a_{ij}b_{j,V_{t+1}}\beta_{t+1}(j)  }
+{\sum _{i=1}^{c}\sum _{j=1}^{c} \alpha_t(i)a_{ij}b_{j,V_{t+1}}\beta_{t+1}(j)  }
+$$
+
+Bölendeki ifade bölünendeki ifadenin tüm $i,j$ üzerinden alýnan toplamýnýn
+geriye sadece $P(V;\lambda)$ býrakacak olmasýndan ileri geliyor, çünkü (2)'den
+hareketle bölünendeki ifade $P(X_t = i, X_{t+1}= j, V; \lambda) $. 
+
+$\gamma_t(i)$'yi daha önce $V$'nin verildiði ve $\lambda$ modeli bilindiði
+durumda $t$ anýndaki saklý konum $i$'de olmak diye açýklamýþtýk. O zaman 
+$\gamma_t(i)$ ve $\xi_t(i,j)$ arasýnda bir iliþki kurabiliriz,
+
+$$ \gamma_t(i) =  \sum _{j=1}^{c} \xi_t(i,j) $$
+
+Eðer $\gamma_t(i)$'nin tüm $t$'ler üzerinden toplamýný alýrsak, bu hesap
+tüm zamanlar için $i$ konumunda olmanýn, ya da $i$ konumundan baþka
+herhangi bir konuma geçmiþ olmanýn beklentisi olarak görülebilir (tabii en
+son zaman indisi $T$'yi bu durumda toplamdan çýkartmak lazým, çünkü o
+noktadan baþka bir noktaya geçmek mümkün deðil). Ayný þekilde
+$\xi_t(i,j)$'nin $t=1,..,T-1$ üzerinden toplamýný almak, bize konum $i$ ve
+$j$ arasýndaki tüm geçiþlerin beklentisini verebilir.
+
+
+$$ \sum _{t=1}^{T-1} \gamma_t(i) = \textrm{ i'den baþka bir konuma geçiþ beklentisi} $$
+
+$$ \sum _{t=1}^{T-1} \xi_t(i,j) = \textrm{ i'den j'ye geçiþ beklentisi} $$
+
+Üstteki formülleri kullanarak HMM'in parametreleri $\lambda = (\pi,A,B)
+$'yi tahminsel hesaplamak mümkündür. 
+
+$$ \overline{\pi} = \textrm{t=1 anýnda i konumunda olma frekansý} = \gamma_1(i)
+\mlabel{3}
+$$
+
+$$ \overline{a_{ij}} = \frac{\textrm{i konumundan j konumuna geçiþ beklentisi}}
+{\textrm{i konumundan baþka herhangi bir konuma geçiþin beklentisi}}
+$$
+
+$$  = \frac{ \sum _{t=1}^{T-1}\xi_t(i,j) }{ \sum _{t=1}^{T-1} \gamma_t(i) } 
+\mlabel{4}
+$$
+
+$$ 
+\overline{b_{j,k}} = 
+\frac{\textrm{j konumunda olup } v_k \textrm{ sembolunu görmüþ olmanýn beklentisi}}
+{j \textrm{ konumunda olmanýn beklentisi} }
+ $$
+
+$$ = \frac{\sum _{t=1}^{T-1} \gamma_t(j) 1(V_t=k) }{\sum_{t=1}^{T-1}\gamma_t(j) } 
+\mlabel{5}
+$$
+
+Tüm bunlarý kullanarak eðitim yaklaþýmýný þöyle belirleyebiliriz: bir
+$\lambda=(\pi,A,B)$ modeli ile baþla, ki baþlangýç model rasgele deðerler
+ile bile tanýmlanmýþ olabilir. Ardýndan formüller (3,4,5)'i kullanarak
+$\overline{\pi},\overline{a_{ij}}$ ve $\overline{b_{j,k}}$'yi hesapla. Bu
+hesap  ardýndan Baum ve arkadaþlarý  tarafýndan ispatlanmýþtýr ki [1]
+$P(V;\overline{\lambda}) > P(V;\lambda)$, yani  yeni hesaplanan model
+veriyi  eskisinden daha iyi açýklayacaktýr.  O zaman  üstteki hesaplarý 
+yeni hesaplanan $\overline{\lambda}$ ile tekrarlarsak, tekrar daha 
+iyi bir model elde ederiz. Bunu ardý ardýna yaparsak en optimal 
+modele eriþmiþ oluruz. Bu yaklaþým aslýnda bir Beklenti-Maksimizasyon'dur (EM). 
+Karýþým modellerinde olduðu gibi akýlda tutmak gerekir ki EM lokal
+maksima'yý bulur, eðer bu maksimum nokta global (tüm modelin) maksimumu
+deðil ise yanlýþ bir noktada takýlýp kalmýþ olabilir. Bu yüzden standart
+tekniði burada da kullanýyoruz, farklý rasgele baþlangýç noktalarýndan
+baþlatýp en iyi olurluðu rapor eden modeli nihai model olarak seçeriz. 
+
+Sürekli Salýmlar (Continuous Emissions)
+
+Þimdiye kadar gördüðümüz ayrýksal HMM'ler her konumunda farklý bir ayrýksal
+daðýlýma göre zar atýyordu. A,B,C konumlarý olsun, A konumundan
+ayrýksal daðýlým $\left[\begin{array}{ccc} 0.2 & 0.5 &
+    0.3 \end{array}\right]^T$'a göre zar atýyor olabiliriz, B konumunda
+farklý bir ayrýksal daðýlým $\left[\begin{array}{ccc} 0.4 & 0.5 &
+    0.1 \end{array}\right]^T$'e göre zar atýyor olabiliriz.
+
+Fakat HMM matematiði ayrýksal daðýlýmlar ile kýsýtlý deðildir. Her konumun
+salým daðýlýmýnýn ayrýksal olduðu gibi sürekli olmasý da mümkündür.
+
+\includegraphics[height=6cm]{tser_hmm_10.png}
+
+Üstteki resimde iki tane HMM gösteriyoruz, A,B,C diye tanýmlý 3 konum var
+(üst sýra bir HMM, alt sýra bir diðeri). Bu modele göre her konumda farklý
+olan salým daðýlýmý ayrýksal deðil, bir Gaussian. Mesela 1. HMM için A
+konumunun mavi renkle gösterilen tek boyutlu bir Gaussian daðýlýmý var (sol
+üst köþe), bu Gaussian $\mu=1$ üzerinden tanýmlý, yeþil olan $\mu=2$,
+vs. 1. HMM için örnek bir sürekli salým zinciri üst sað köþedeki gibi
+olabilir. Bir blokta 1 deðeri etrafýnda bazý deðerler görüyoruz, ardýndan 2
+etrafýnda bir blok, sonra 3, sonra 2, böyle devam ediyor. Bu salým
+deðerlerine bakarak bir HMM'i eðitip hangi konumda hangi Gaussian olduðunu
+ve konumlar arasý geçiþ olasýlýklarýný öðrenebiliriz! Resimde alt sýrada
+farklý Gaussian'lar ve (tabii ki) daha farklý salým zinciri var (saklý
+geçiþ zinciri ayný, ki bu durum modele uygun, fakat saklý zincir biraz daha
+farklý da olabilirdi).
+
+Sürekli daðýlým bazlý HMM matematiði biraz daha farklý, bu konunun
+detaylarý için [3, sf. 603]. Bu tür HMM hesaplarý için \verb!mhmm!
+modülünü paylaþtýk. Bu modülle salým daðýlýmlarýný hem çok boyutlu
+Gaussian, hem de her konum için çok boyutlu {\em birkaç} Gaussian karýþýmý
+olarak modelleyebiliriz. 
+
+Bu modül ile [4, sf. 50]'de gösterilen deprem örneðini çözebiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('earthquakes.txt',sep='\s*',header=None,index_col=0)
+data = df[1]
+data.plot()
+plt.title('Depremler')
+plt.savefig('tser_hmm_04.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_hmm_04.png}
+
+Üstteki grafikte dünyada her sene kaç tane büyük (Richter ölçeði 7 ve
+üzeri) deprem olduðu gösteriliyor. Eþit büyüklükteki zaman aralýklarýnda
+vuku bulan olaylarýn sayýsý çoðunlukla Poisson ile modellenir, ki [4]
+problemi böyle çözmüþ. Gaussian karýþýmlarý ile herhangi bir daðýlýmý
+yaklaþýklayabileceðimizi biliyoruz, o zaman tek boyutlu iki Gaussian
+karýþýmý üzerinden salýmlarý modelleyebiliriz.  Kaç tane saklý konum
+olmalý? [4]'te 2 ve 3 denenmiþ; 2 konumlu durum depremlerin düþük seviyeli
+ya da yüksek seviyeli zaman bloklarýnda meydana geldiði þeklinde
+görülebilir. 3 konum veriyi düþük, orta, yüksek olarak ayýrýr. Bu
+modellerden hangisi daha iyidir?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import mhmm
+c=2
+prior0 = np.ones(c) * 1/c
+transmat0, _ = mhmm.mk_stochastic(np.random.rand(c,c))
+d = np.reshape(data,(1,len(data),1))
+hmm = mhmm.HMM(n_components=c, n_mix=2, startprob=prior0, 
+               transmat=transmat0, covariance_type='diag')        
+hmm.fit(dd)
+
+print 'aic', hmm.aic()        
+print hmm.score(d)
+print hmm.transmat_
+\end{minted}
+
+\begin{verbatim}
+(4, 1)
+iteration 1, loglik = -344.981925
+iteration 2, loglik = -339.666685
+iteration 3, loglik = -338.222636
+aic 696.445271513
+[-337.77961902]
+[[ 0.92211706  0.07788294]
+ [ 0.06461021  0.93538979]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+c=3
+prior0 = np.ones(c) * 1/c
+transmat0, _ = mhmm.mk_stochastic(np.random.rand(c,c))
+d = np.reshape(data,(1,len(data),1))
+hmm = mhmm.HMM(n_components=c, n_mix=2, startprob=prior0, 
+               transmat=transmat0, covariance_type='diag')        
+hmm.fit(d)
+print 'aic', hmm.aic()        
+print hmm.score(d)
+print hmm.transmat_
+\end{minted}
+
+\begin{verbatim}
+(6, 1)
+iteration 1, loglik = -363.687193
+iteration 2, loglik = -355.604032
+iteration 3, loglik = -351.994401
+iteration 4, loglik = -347.108994
+iteration 5, loglik = -341.249047
+iteration 6, loglik = -336.556782
+iteration 7, loglik = -333.417138
+aic 702.834275264
+[-331.17921244]
+[[ 0.85777432  0.10857336  0.03365233]
+ [ 0.16314564  0.70421656  0.1326378 ]
+ [ 0.05122129  0.16358917  0.78518954]]
+\end{verbatim}
+
+Her iki örnek için geçiþ matrisi [4, sf. 51]'de gösterilen sonuçlara
+oldukça yakýn çýktý. AIC sonuçlarýna göre 2 saklý konumlu model 3 saklý
+modelliden biraz daha iyi gibi duruyor. AIC deðerleri de [4. sf. 91]'de
+raporlanan deðerlere oldukça yakýn.
+
+Ses Tanýmak
+
+Bir ses kaydý zaman dilimlerinin birbiri ile baðlantýlý olduðu bir zaman
+serisine örnektir. \verb!rec.py! ile istediðimiz sesi bilgisayarýmýzýn
+mikrofonu ile kaydedebiliriz. Bizim önceden kaydettiðimiz bazý sesler altta,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.io.wavfile
+from scikits.talkbox.features import mfcc
+
+sample_rate, computer = scipy.io.wavfile.read('computer.wav')
+sample_rate, emacs = scipy.io.wavfile.read('emacs.wav')
+sample_rate, nothing = scipy.io.wavfile.read('nothing.wav')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(computer)
+plt.title('Computer')
+plt.savefig('tser_hmm_05.png')
+plt.hold(False)
+plt.plot(emacs)
+plt.title('Emacs')
+plt.savefig('tser_hmm_06.png')
+plt.hold(False)
+plt.plot(nothing)
+plt.title('Nothing')
+plt.savefig('tser_hmm_07.png')
+plt.hold(False)
+\end{minted}
+
+\includegraphics[height=6cm]{tser_hmm_05.png}
+\includegraphics[height=6cm]{tser_hmm_06.png}
+\includegraphics[height=6cm]{tser_hmm_07.png}
+
+HMM'ler ses tanýma için biçilmiþ kaftan. Fakat genellikle üstteki zaman
+serileri direk olduklarý þekilde kullanýlmazlar. Ses kayýtlarý belli
+dilimlere bölünerek, o bölümler üzerinde özellik çýkarýmý (feature
+extraction) uygulanýr. Bu özelliklerden en popüleri Mel Frekansý Cepstral
+Katsayýlarý (MFCC). Alttaki çaðrýyla 2 saniyelik kaydýmýz üzerinde MFCC
+hesabýný görüyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scikits.talkbox.features import mfcc
+ceps_c, mspec, spec = mfcc(emacs)
+print 'ses kaydi', len(emacs) , 'boyut', ceps_c.shape
+print len(emacs) / 549
+\end{minted}
+
+\begin{verbatim}
+ses kaydi 88064 boyut (549, 13)
+160
+\end{verbatim}
+
+Eðer HMM'ses tanýmak için kullanmak istiyorsak HMM eðitimini üstte
+boyutlarý gösterilen MFCC vektör dizisi üzerinde uygularýz. HMM salýmý 13
+boyutlu bir Gaussian karýþýmý olur (karýþým sayýsý uygulamaya göre farklý
+olabilir). Optimal saklý konum sayýsý AIC üzerinden saptanýr. Her bilinen
+ses kaydý için ayrý bir HMM eðitilir, mesela 'emacs' kaydý için bir HMM,
+'computer' sesi için ayrý bir HMM... Nihai uygulama ise mikrofondan gelen
+sesleri 2. saniyelik kýsýmlara bölerek üzerlerinde yine ayný MFCC hesabýný
+yapar, ve bu vektör dizisinin ne kadar olasý olduðunu her HMM'e
+``sorar''. Hangi HMM daha iyi olurluk rapor ediyorsa ses o etikete aittir.
+
+Ödev: Ekteki \verb!mic.py!'da mikrofondan sürekli gelen verilerin iþlenmesi
+gösteriliyor, bu örnek üstteki teknik ile HMM için uzatýlabilir.
+
+
+Kaynaklar 
+
+[1] Rabiner, {\em A Tutorial on Hidden Markov Models and Selected Applications in Speech
+Recoognition}
+
+[2] Shalizi, {\em Statistics, Chaos, Complexity and Inference Lecture}
+
+[3] Murphy, {\em Machine Learning, A Probabilistic Perspective}
+
+[4] Zuccini, {\em Hidden Markov Models for Time Series}
+
+[5] Bayramli, Lineer Cebir, {\em Ders 21}
+
+[6] Bayramli, Bilgisayar Bilim, {\em Dinamik Programlama}
+
+\end{document}

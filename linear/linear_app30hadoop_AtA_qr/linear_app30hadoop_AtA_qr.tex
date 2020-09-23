@@ -1,0 +1,411 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Paralel Matris Çarpýmý, Ax, QR ve SVD
+
+[5] adlý yazý tek makinalý ortamda matris çarpýmýnýn nasýl yapýlacaðýný, ve
+nasýl görülecebileðini anlattý. Satýr bakýþ açýsý, kolon bakýþ açýsý
+iþlendi. Parallel (Hadoop), eþle/indirge ortamýnda matris çarpýmýný nasýl
+yaparýz?  Mesela $A^TA$'yi ele alalým. Bu çarpým oldukça önemli çünkü baþka
+sonuçlar için de kullanýlabiliyor. Mesela $A$ üzerinde $QR$ ayrýþtýrmasý
+yapmak isterseniz (bkz. Lineer Cebir ders notlarýmýz) bu çarpým
+kullanýlabiliyor.
+
+Nasýl? QR ayrýþtýrmasý kolonlarýn hepsi bilindiði gibi birbirine dik
+(orthogonal) birim vektörler olan bir $Q$ matrisi ve üst üçgensel (upper
+triangular) bir $R$ matrisi oluþturur. Ayrýþtýrmanýn $A^TA$ ile baðlantýsý
+nedir? Eðer $A$ yerine onun ayrýþtýrmasýný $QR$ koyarsak,
+
+$$
+C = A^TA = (QR)^T (QR) = R^T Q^T QR
+$$
+
+Tum $Q$ vektorleri birbirine dik, ve birim vektorler ise, $Q^T Q$
+birim matrisi $I$ olur. O zaman
+
+$$
+C = R^T Q^T QR = R^T R
+$$
+
+Yani
+
+$$
+C = R^TR
+$$
+
+Peki $A^TA$ hesaplayýp (böylece $R^TR$'yi elde edince) onun içinden $R$'yi nasýl
+çekip çýkartýrýz? Þimdi Cholesky ayrýþtýrmasý kullanmanýn zamaný. Cholesky
+ayrýþtýrmasý (herhangi bir simetrik pozitif kesin $C$ matrisi üzerinde)
+
+$$C = LL^T$$
+
+olarak bilinir, yani bir matris alt üçgensel (lower triangular -ki L harfi
+oradan geliyor-) $L$ matrisine ve onun devriði olan üst üçgensel $L^T$'nin
+çarpýmýna ayrýþtýrýlýr. Elimizde $R^TR$ var, ve ona benzer $LL^T$ var, $R$
+bilindiði gibi üst üçgensel, $L$ alt üçgensel, $L^T$ ve $R$ birbirine eþit demek
+ki. Yani $A^TA$ üzerinde sayýsal hesap kütüphenimzin Cholesky çaðrýsý kullanmak
+bize $QR$'in $R$'sini verir.
+
+Þu anda akla þu soru gelebilir: madem kütüphane çaðrýsý yaptýk, niye $A$
+üzerinde kütüphenimizin $QR$ çaðrýsýný kullanmýyoruz?
+
+Cevap Büyük Veri argümanýnda saklý. Bu ortamda uðraþýlan verilerde $A$ matrisi
+$m \times n$ boyutlarýndadýr, ve $m$ milyonlar, hatta milyarlarca satýr
+olabilir. Þimdilik $m >> n$ olduðunu farzedelim, yani $m$, $n$'den "çok, çok
+büyük", yani "boyut kolonlarýnýn", ki $n$, sayýsý binler ya da onbinlerde. Bu
+gayet tipik bir senaryo aslýnda, ölçüm noktalarý (boyutlar) var, ama çok fazla
+deðil, diðer yandan o ölçümler için milyonlarca veri noktasý toplanmýþ. Tipik
+bir aþýrý belirtilmiþ (överdetermined) sistem - ki en az kareler (least squares)
+gibi yaklaþýmlarýn temel aldýðý sistemler bunlardýr, eldeki denklem sayýsýndan
+daha fazla ölçüm noktasý vardýr. Bu arada en az karelerden bahsettik, $QR$'in
+kullanýldýðý alanlardan biri en az karelerin çözümüdür.
+
+Argümana devam ediyoruz, kütüphane \verb!qr! çaðrýsýný $A$ üzerinde yaparsak, $m
+\times n$ gibi devasa bir matris üzerinde iþlem yapmak gerekir. Ama $A^TA$
+üzerinde iþlem (Cholesky) yaparsak, ki bu çarpýmýn boyutu $n \times m \cdot m
+\times n = n \times n$, yani çok daha ufak bir matristir. $A^TA$'in iþlem bedeli
+çok ufak, birazdan anlatacaðýmýz yöntem sayesinde bu bedel $O(m)$.
+
+Paralel $A^TA$
+
+Paralel çarpýma gelelim. Öncelikle elimizdeki becerilere (çapabilities)
+bakalým. Hadoop ortamý bize aþýrý büyük bir dosyayý otomatik olarak makinalara
+bölerek bir hesap yapýlmasý gerektiðinde o hesabýn her makinadaki veri parçasý
+üzerinde yaptýrýlabilmesini saðlýyor.
+
+$A^TA$ örneðinde eldeki veri $A$, ve "çok olan" $A$'nin satýrlarý, yani $m
+\times n$ boyutlarýnda matris var ve $m$ devasa boyutlarda (olabilir). Bir $A$
+dosyasý tipik olarak þöyle gözükecek:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!head -5 A_matrix
+\end{minted}
+
+\begin{verbatim}
+3 4 5 6
+3 4 5 2
+3 6 7 8
+2 2 2 2
+9 9 3 3
+\end{verbatim}
+
+Eþle/indirgeye gelelim: Eðer çarpýma satýr bakýþýný hatýrlarsak,
+
+\includegraphics[height=6cm]{AtA.png}
+
+Bu bakýþa göre soldaki matriste satýr boyunca giderken, saðdakinde ona tekabül
+eden kolon boyunca gidiyoruz, ve birbirine eþlene her ögeyi çarpýyoruz, ve
+çarpýmlarý topluyoruz.
+
+Þimdi bu matrisin Hadoop'ta parça parça bize geldiðini düþünürsek (ki üstte
+hayali bir ilk parçayý kýrmýzý çizgi ile belirttik), bu parça içinde mesela ilk
+satýrý kendisi ile çarparken (1'inci ok) ayný blok içindeyiz. Bu önemli bir
+nokta, çarparken bloklar arasý geçiþ yok.
+
+Tabii ki nihai çarpýmdaki (1,1) hesabý için $A^T$'deki birinci satýrýn {\em
+  tamamen} $A$'daki birinci kolonla nokta çarpýmýnýn bitirilmiþ olmasý gerekir,
+ama þimdi düþünelim, baþka bir makinaya ikinci parça verilmiþ ise, makinada o
+birinci satýrýn geri kalaný çarpýlýp toplanacaktýr (2. ok), ve eðer tüm
+parçalar, tüm makinalarda bu þekilde iþlenirse, (1,1) hesabý için o
+makinalardaki o tüm çarpýmlarý alýp nihai bir noktada toplamak bize (1,1) için
+nihai sonucu verecektir. Bu tipik bir eþle/indirge hesabý olabilir, eþle
+safhasýnda eldeki parça $A_p$ üzerinde $A_p^T A_p$ yapýlýr, indirge safhasýnda
+bu parçalar toplanýr.
+
+Eþleme safhasýndan yayýnlanacak (emit) anahtar ve deðerler, bizce, $A_p^T A_p$
+içindeki her satýrýn satýr no'su ve satýr deðeri olmalý. Niye? (Ayný sabit bir
+anahtar deðeriyle beraber $A_p^T A_p$'in tamamýný da yayýnlayabilirdik).
+
+Hatýrlayalým, nihai çarpým $n \times n$ boyutunda, her parça $p$ olsa bile, $n
+\times p \cdot p \times n$ yine bize $n \times n$ veriyor. Yani her makina $n
+\times n$ boyutunda bir çarpým sonucunu üretiyor. Evet $n$ nispeten küçük bir
+sayý, fakat yine de onbinlerde olsa bile $10,000 \times 10,000$ mesela, büyük
+bir sayý. Eðer tüm toplamý tek bir indirgeyici makinaya yaptýrýrsak, pek çok $n
+\times n$ boyutunda matrisin toplamý bu makinayý kaþar. O sebeple indirgeme
+sonrasý matrisleri deðil, o matrislerin her $n$ satýrýný satýr no'su ile
+yayýnlýyoruz, böylece ayný satýrlar ayný indirgeyiciye gidip orada
+toplanýyorlar, ama birçok indirgeyici var yani toplama iþlemi paralel hale
+gelmiþ oluyor. Tabii indirgeme sonrasý o sonuçlar yayýnlanýyor, ve satýr no'ya
+göre doðal olarak sýralanmýþ halde nihai sonuç çýkýyor.  Ama toplama iþlemi
+paralel. Kod alttaki gibi
+
+\inputminted[fontsize=\footnotesize]{python}{AtA.py}
+
+Fonksiyon \verb!mapper_final! MRJob kurallarýna göre bir makinadaki tüm eþleme
+bittikten sonra çaðýrýlýr, biz bu çengeli (hook), "artýk parçalarý çarpýp
+yayýnlamak için" kullandýk, her parça $p$ büyüklüðünde, ama $m / p$ tam sayý
+olmayabilir, yani iþlem sonunda bazý artýk veriler kalmýþ olabilir, onlarý
+\verb!mapper_final!  içinde çarpýyoruz.
+
+Bu arada kodun kendi içinde de bir "parçalama", "biriktirme ve iþleme" yaptýðýna
+dikkat, yani 20,000 satýr olabilir, iki tane eþleyici var ise her eþleyici bu
+verinin 10,000 satýrýný iþler, ama ayrýca iþleyiciler daha ufak ufak (üstte 4)
+parçalarla çarpým yapýyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python AtA.py A_matrix
+\end{minted}
+
+\begin{verbatim}
+using configs in /home/burak/.mrjob.conf
+creating tmp directory /tmp/AtA.burak.20131202.225802.256844
+writing to /tmp/AtA.burak.20131202.225802.256844/step-0-mapper_part-00000
+Counters from step 1:
+  (no counters found)
+writing to /tmp/AtA.burak.20131202.225802.256844/step-0-mapper-sorted
+> sort /tmp/AtA.burak.20131202.225802.256844/step-0-mapper_part-00000
+writing to /tmp/AtA.burak.20131202.225802.256844/step-0-reducer_part-00000
+Counters from step 1:
+  (no counters found)
+Moving /tmp/AtA.burak.20131202.225802.256844/step-0-reducer_part-00000 -> /tmp/AtA.burak.20131202.225802.256844/output/part-00000
+Streaming final output from /tmp/AtA.burak.20131202.225802.256844/output
+0	"[ 420.  463.  264.  265.]"
+1	"[ 463.  538.  351.  358.]"
+2	"[ 264.  351.  316.  321.]"
+3	"[ 265.  358.  321.  350.]"
+removing tmp directory /tmp/AtA.burak.20131202.225802.256844
+\end{verbatim}
+
+Karþýlaþtýrmak için ayný iþlemi tek bir script içinde yapalým, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.loadtxt('A_matrix')
+print np.dot(A.T,A)
+\end{minted}
+
+\begin{verbatim}
+[[ 420.  463.  264.  265.]
+ [ 463.  538.  351.  358.]
+ [ 264.  351.  316.  321.]
+ [ 265.  358.  321.  350.]]
+\end{verbatim}
+
+Týpatýp ayný. 
+
+Þimdi bu sonuç üzerinde Cholesky yapalým
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+print lin.cholesky(np.dot(A.T,A))
+\end{minted}
+
+\begin{verbatim}
+[[ 20.49390153   0.           0.           0.        ]
+ [ 22.59208669   5.25334361   0.           0.        ]
+ [ 12.88188096  11.41585875   4.44244436   0.        ]
+ [ 12.93067597  12.53849977   2.54158031   4.37310096]]
+\end{verbatim}
+
+Bu bize $L$'yi verdi. Karþýlaþtýrmak için $A$ üzerinde direk \verb!qr!
+yapalým
+
+\begin{minted}[fontsize=\footnotesize]{python}
+q,r = lin.qr(A)
+print r.T
+\end{minted}
+
+\begin{verbatim}
+[[-20.49390153   0.           0.           0.        ]
+ [-22.59208669  -5.25334361   0.           0.        ]
+ [-12.88188096 -11.41585875   4.44244436   0.        ]
+ [-12.93067597 -12.53849977   2.54158031  -4.37310096]]
+\end{verbatim}
+
+Bu matris Cholesky sonucunun eksi ile çarpýlmýþ hali, fakat bu nihai sonuç
+açýsýndan farketmiyor. 
+
+Q
+
+\includegraphics[height=4cm]{qr.png}
+
+Q hesabý için biraz daha takla atmak lazým,
+
+$$A = QR$$
+
+$$AR^{-1} = QRR^{-1} $$
+
+$$Q = AR^{-1} $$
+
+Demek ki $R$'i elde ettikten sonra onu tersine çevirip (inverse) $A$ ile
+çarparsak, bu bize $Q$'yu verecek. Dert deðil, $R$ ufak bir matris, $n \times
+n$, ve tersini alma operasyonu pahalý bir iþlem olsa da bu boyutlarda yavaþ
+olmaz. Daha sonra bu $R^{-1}$'i alýp bu sefer baþka bir eþle/indirge ile çarpým
+iþlemine tabi tutarýz. R'yi direk alttaki script içine yazdýk (B olarak) bir
+sonuç ortamýnda bu verinin baþka bir þekilde MRJob iþlemine verilmiþ olmasý
+lazým. Bir iþleme zinciri var, zincirde önce $A^TA$, Cholesky, oradan $R$ alýnýp
+baþka bir iþleme (job) aktarýlýyor.
+
+\inputminted[fontsize=\footnotesize]{python}{AB.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python AB.py A_matrix
+\end{minted}
+
+\begin{verbatim}
+using configs in /home/burak/.mrjob.conf
+creating tmp directory /tmp/AB.burak.20131202.230008.985111
+writing to /tmp/AB.burak.20131202.230008.985111/step-0-mapper_part-00000
+Counters from step 1:
+  (no counters found)
+writing to /tmp/AB.burak.20131202.230008.985111/step-0-mapper-sorted
+> sort /tmp/AB.burak.20131202.230008.985111/step-0-mapper_part-00000
+writing to /tmp/AB.burak.20131202.230008.985111/step-0-reducer_part-00000
+Counters from step 1:
+  (no counters found)
+Moving /tmp/AB.burak.20131202.230008.985111/step-0-reducer_part-00000 -> /tmp/AB.burak.20131202.230008.985111/output/part-00000
+Streaming final output from /tmp/AB.burak.20131202.230008.985111/output
+null	"[[ -61.48170459  -88.78963451  -62.09685608  -84.98432736]\n [ -20.49390153  -27.8454303   -19.85529535  -27.30069639]\n [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]\n [-184.44511377 -250.6088727  -205.35232431 -234.71714361]]"
+null	"[[ -61.48170459  -99.29632173  -76.04368486 -131.21677204]\n [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]\n [-184.44511377 -250.6088727  -205.35232431 -234.71714361]\n [ -61.48170459  -88.78963451  -62.09685608 -102.4767312 ]]"
+null	"[[-184.44511377 -250.6088727  -205.35232431 -234.71714361]\n [ -61.48170459  -99.29632173  -76.04368486 -131.21677204]\n [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]\n [-184.44511377 -250.6088727  -205.35232431 -234.71714361]]"
+null	"[[ -61.48170459  -88.78963451  -62.09685608 -102.4767312 ]\n [ -61.48170459  -88.78963451  -62.09685608  -84.98432736]\n [ -61.48170459  -99.29632173  -76.04368486 -131.21677204]\n [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]]"
+removing tmp directory /tmp/AB.burak.20131202.230008.985111
+\end{verbatim}
+
+Kontrol edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+B = np.array([[-20.49390153,   0.        ,   0.        ,   0.        ],
+              [-22.59208669,  -5.25334361,   0.        ,   0.        ],
+              [-12.88188096, -11.41585875,   4.44244436,   0.        ],
+              [-12.93067597, -12.53849977,   2.54158031,  -4.37310096]])
+print np.dot(A,B.T)
+\end{minted}
+
+\begin{verbatim}
+[[ -61.48170459  -88.78963451  -62.09685608 -102.4767312 ]
+ [ -61.48170459  -88.78963451  -62.09685608  -84.98432736]
+ [ -61.48170459  -99.29632173  -76.04368486 -131.21677204]
+ [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]
+ [-184.44511377 -250.6088727  -205.35232431 -234.71714361]
+ [ -61.48170459  -99.29632173  -76.04368486 -131.21677204]
+ [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]
+ [-184.44511377 -250.6088727  -205.35232431 -234.71714361]
+ [ -61.48170459  -99.29632173  -76.04368486 -131.21677204]
+ [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]
+ [-184.44511377 -250.6088727  -205.35232431 -234.71714361]
+ [ -61.48170459  -88.78963451  -62.09685608 -102.4767312 ]
+ [ -61.48170459  -88.78963451  -62.09685608  -84.98432736]
+ [ -20.49390153  -27.8454303   -19.85529535  -27.30069639]
+ [ -40.98780306  -55.6908606   -39.7105907   -54.60139278]
+ [-184.44511377 -250.6088727  -205.35232431 -234.71714361]
+ [ -81.97560612 -116.63506481  -90.83704015 -126.11438629]]
+\end{verbatim}
+
+Çarpýmlar ayný. Yanlýz dikkat, satýrlarýn sýrasý deðiþik olabilir, burada
+problem eþle/indirge iþleminin $A$'yi parçalama sonucu her çarpým parçasýnýn
+deðiþik bir sýrada ele geçiyor olmasý. Eðer sýralamayý ayný $A$ gibi istiyorsak,
+bu sýra no'sunu $A$ verisi içinde ilk satýra koymak lazým ve eþleyiciler oradan
+alýp bu no'yu anahtar olarak yayýnlamalýlar. Bu eklemeyi okuyucuya býrakýyorum!
+
+Þimdi QR hesabýný bu þekilde yapýp yapamayacaðýmýzý kontrol edelim. Eðer
+\verb!qr! ile $Q$ hesaplarsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+q,r = lin.qr(A)
+print q
+\end{minted}
+
+\begin{verbatim}
+[[-0.14638501 -0.13188879  0.36211188 -0.35057934]
+ [-0.14638501 -0.13188879  0.36211188  0.56410341]
+ [-0.14638501 -0.51259871 -0.16600517 -0.02328772]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.14638501 -0.51259871 -0.16600517 -0.02328772]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.14638501 -0.51259871 -0.16600517 -0.02328772]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.14638501 -0.13188879  0.36211188 -0.35057934]
+ [-0.14638501 -0.13188879  0.36211188  0.56410341]
+ [-0.048795    0.01948872  0.1336897  -0.06256975]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.19518001 -0.11240007  0.04559899 -0.21745867]]
+\end{verbatim}
+
+$R$'in tersi ile $A$ carpilinca hakikaten $Q$ elde ediliyor mu?
+Kontrol edelim.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.dot(A,lin.inv(B.T))
+\end{minted}
+
+\begin{verbatim}
+[[-0.14638501 -0.13188879  0.36211188 -0.35057934]
+ [-0.14638501 -0.13188879  0.36211188  0.56410341]
+ [-0.14638501 -0.51259871 -0.16600517 -0.02328772]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.14638501 -0.51259871 -0.16600517 -0.02328772]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.14638501 -0.51259871 -0.16600517 -0.02328772]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.14638501 -0.13188879  0.36211188 -0.35057934]
+ [-0.14638501 -0.13188879  0.36211188  0.56410341]
+ [-0.048795    0.01948872  0.1336897  -0.06256975]
+ [-0.09759001  0.03897744  0.26737941 -0.1251395 ]
+ [-0.43915503  0.1753985  -0.14740047  0.02394349]
+ [-0.19518001 -0.11240007  0.04559899 -0.21745867]]
+\end{verbatim}
+
+Sonuçlar birebir ayný.
+
+Üstteki teknikleri kullanarak artýk devasa boyutlarda satýrý olan bir $A$
+matrisi üzerinde artýk QR hesabý yapýlabilir.
+
+SVD
+
+Peki $QR$ sonuçlarýný kullanarak SVD sonuçlarýný alabilir miyiz?  SVD bize ne
+verir?
+
+$$ A = U \Sigma V^T $$
+
+$U$ ve $V^T$ dikgen (orthogonal) matrislerdir, $\Sigma$ sadece köþegeni
+boyunca deðerleri olan bir matristir. Daha fazla detay için bkz [4]. Þimdi
+$A = QR$ yerine koyalým,
+
+$$ QR =  U \Sigma V^T $$
+
+$$ R = Q^T U \Sigma V^T $$
+
+Bu son formüledeki $Q^TU$ ibaresi, iki dikgen matrisin çarpýmýdýr. Lineer Cebir
+kurallarýna göre iki dikgen matrisin çarpýmý bir diðer ortogonal matristir. Bu
+yeni dikgen matrise $U_R$ adý verelim, o zaman
+
+$$ R = U_R \Sigma V^T $$
+
+Bu son formül bize bir þeyler söylüyor. $R$'nin SVD üzerinden
+ayrýþtýrýlabileceðini söylüyor ve bu ayrýþtýrma sonrasý ele geçen $U_R,V^T$ ve
+$\Sigma$ köþegen matrisleridir! Bu çok önemli bir sonuç.  Bu ayrýþtýrmanýn
+sonucu $A$'nin ki ile birbirine çok benziyor, tek fark $U$ ile $U_R$. Bu iki
+matris arasýndaki geçiþ þöyle:
+
+$$ U_R = Q^T U $$ 
+
+$$ U = QU_R $$ 
+
+\includegraphics[height=6cm]{ur.png}
+
+Bu demektir ki eðer $R$ üzerinde kütüphanemizin \verb!svd!  çaðrýsýný
+kullanýrsak (ki $R$ nispeten ufak olduðu için bu ucuz olur) ele geçen $U_R$'i
+alýp, $Q$ ile çarparsak, $A$ ayrýþtýrmasýnýn $U$'þunu elde ederiz! $Q$ ile
+çarpým eþle/indirge üzerinden yapýlabilir, fakat basit bir çarpým iþlemi olduðu
+için paralelize edilmesi kolaydýr (üstteki mrjob script'inde yaptýðýmýz gibi).
+
+Kaynaklar
+
+[1] Benson, A., {\em Tall-and-skinny Matrix Computations in MapReduce}
+
+[2] Constantine, P. G., Gleich, D. F. , {\em Tall and Skinny QR factorizations in MapReduce architectures}
+
+[3] Dasgupta, S., Gupta, A., {\em An Elementary Proof of a Theorem of Johnson and Lindenstrauss}
+
+[4] Bayramli, Lineer Cebir, {\em Ders 29}
+
+[5] Bayramli, Lineer Cebir, {\em Matris Çarpýmý, Ders 1}
+
+
+\end{document}

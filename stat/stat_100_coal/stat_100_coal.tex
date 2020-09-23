@@ -1,0 +1,426 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Deðiþim Noktasý Analizi (Changepoint Analysis)
+
+Ýngiltere'de 1851 ve 1962 yýllarý arasýnda kömür madenlerinde olan
+kazalarýn sayýsý yýllýk olarak kayýtlýdýr. Acaba bu kazalarýn daðýlýmýna
+bakarak, deðiþimin olduðu seneyi bulabilir miyiz? Böyle bir deðiþim aný
+neyi gösterir? Belki madenlerle alakalý regülasyonlarda, denetimlerde bir
+deðiþiklik olmuþtur, ve kaza oraný azalmýþtýr [1, 2], [3, sf. 141]. Veriye
+bakalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+coal = pd.read_csv('coal.txt',header=None)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+coal.hist(bins=7)
+plt.savefig('stat_coal_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_coal_02.png}
+
+Eðer veride bir deðiþim noktasý var ise, bu durum veride iki fark bölge
+olduðunu gösterir, ki bu bölgelerin iki farklý daðýlýmla temsil edileceðini
+tahmin edebiliriz. 
+
+Ayný zaman diliminde vuku bulan olay toplamlarýnýn (event counts) Poisson
+daðýlýmýna sahip olduðunu biliyoruz. O zaman, belki de ilk yapmamýz gereken
+bu veriye iki tane Poisson uydurmak, yani veriyi iki Poisson daðýlýmýnýn
+karýþýmý olarak temsil etmek. Karýþýmlar konusu [5] yazýsýnda görülebilir,
+buradaki tek fark Bernoulli yerine Poisson kullanýlacak olmasý. Ýdeal
+olarak uydurma operasyonu için Beklenti-Maksimizasyon
+(Expectation-Maximization -EM-) kullanýlýr. Fakat denklemleri türetmek
+zaman alabilir, biz þuradaki tavsiyeyi [4, sf. 11] takip ederek bu örnek
+için uydurmayý bir gayrý lineer optimizasyon paketi \verb!lmfit! ile
+yapacaðýz (tavsiyenin R kodu \verb!coal.r! içinde).
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import poisson
+from lmfit import Parameters, minimize
+from lmfit.printfuncs import report_fit
+
+def f(pars,x):
+    m1 = pars['m1'].value
+    lam1 = pars['lam1'].value
+    lam2 = pars['lam2'].value
+    model = m1*poisson(lam1).pmf(x) + (1-m1)*poisson(lam2).pmf(x) 
+    return model
+    
+def residual(pars,y,x):
+    return -np.log(f(pars,x).T[0])
+
+fit_params = Parameters()
+fit_params.add('m1', value=0.5, min=0,max=1.)
+fit_params.add('lam1', value=1.0, min=1.,max=7.)
+fit_params.add('lam2', value=2.0, min=2.,max=7.)
+
+out = minimize(residual, fit_params, args=(coal,coal,))
+report_fit(fit_params)
+\end{minted}
+
+\begin{verbatim}
+[[Variables]]
+    m1:     0.51428096 +/- 0.406949 (79.13%) (init= 0.5)
+    lam1:   1.00000004 +/- 0.557045 (55.70%) (init= 1)
+    lam2:   3.35150806 +/- 1.791094 (53.44%) (init= 2)
+[[Correlations]] (unreported correlations are <  0.100)
+    C(m1, lam1)                  =  0.905 
+    C(m1, lam2)                  =  0.878 
+    C(lam1, lam2)                =  0.772 
+\end{verbatim}
+
+Sonuçlar yaklaþýk $\lambda_1=1,\lambda_2=3$ (tam sayýya yuvarladýk, çünkü
+olay sayýsý tam sayý olmalý). Bu iki daðýlýmý verinini normalize
+edilmiþ histogramý üzerinde gösterirsek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import poisson
+coal.hist(bins=7,normed=True)
+plt.hold(True)
+p = poisson(1.0)
+x = np.arange(1,10)
+plt.plot(x, p.pmf(x))
+p = poisson(3.0)
+plt.hold(True)
+plt.plot(x, p.pmf(x))
+plt.savefig('stat_coal_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_coal_03.png}
+
+Peki bu bulguyu þimdi deðiþim noktasý keþfine nasýl çevireceðiz? Dikkat,
+üstteki iki daðýlýmýn ayrýldýðý $\lambda$ aný deðil aradýðýmýz, verideki
+senesel akýþ içinde hangi sene sonrasý bir daðýlýmýn diðerinin yerine
+geçtiði. 
+
+Þöyle bir yaklaþým olabilir mi acaba: bir döngü içinde potansiyel ayraç
+noktasý olabilecek tüm seneler için veriyi iki parçaya ayýrýrýz. Sýfýr
+hipotezi nedir? Bu veri parçalarý üstteki bulduðumuz Poisson
+daðýlýmlarýndan geliyor. O zaman þöyle devam ederiz: Üstteki
+optimizasyondan elimizde her iki daðýlýmýn beklentisi, yani $\lambda$
+deðerleri var, ve Poisson daðýlýmlarýnýn bir avantajý beklentisinin ve
+varyansýnýn ayný olmasý!  Þimdi, eðer her iki parçanýn sayýsal ortalamasýný
+ve sýfýr hipoteze göre bilinen $\mu,\sigma^2$ (her ikisi de $\lambda$)
+üzerinden standardize edersek, yani $N(0,1)$ haline getirirsek, elimize iki
+tane $N(0,1)$ geçer, diyelim ki $Z_1,Z_2$. Bunlarýn karelerinin toplamýnýn
+chi kare olacaðýný biliyoruz. Sýfýr hipotezine göre böyle olmalý. O zaman
+bundan ``sapma'' sýfýr hipotezinden ne kadar uzaklaþýldýðýný gösterir, bu
+baðlamda en yüksek p-deðerini veren ayraç noktasý bize deðiþim anýný verir.
+
+Daha detaylý matematiði vermek gerekirse; Merkezi Limit Teori'sine göre
+birbirinden baðýmsýz, ayný daðýlýmlý $X_1,..,X_n$'in, ki her birinin
+beklentisi $E(X_i) = \mu$ ve varyansý $Var(X_i)=\sigma^2$, o zaman sayýsal
+ortalama $\bar{X}$ üzerinden, ve $n \to \infty$
+
+$$ Z = \frac{\bar{X} - \mu }{\sigma \sqrt{n}}   $$
+
+yani standard normal $Z \sim N(0,1)$. Daha önce belirttiðimiz gibi Poisson
+için $\mu = \sigma^2$. 
+
+Gerekli olan diðer teori: $\chi_{n}^2 \sim Z_1^2 + ... + Z_n^2$, yani $n$
+tane standart normalýn toplamý yaklaþýk olarak serbestlik derecesi $n$ olan
+chi kare daðýlýmý. Bu iki bilgiyi yan yana koyarsak, ve üstte bahsettiðimiz
+döngüyü yazarsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import chi2
+# buyuk olan lambda degerini ilk parca icin kullaniyoruz, cunku
+# test ettigimiz kaza oranlarinin once fazla sonra az olmasi
+lam1 = 3.; lam2 = 1.
+dof = 2
+res = []
+cutoffs = range(20,80)
+for cutoff in cutoffs:
+     p1 = coal[0:cutoff]; p2 = coal[cutoff+1:]
+     z1 = (p1.mean()-lam1) / lam1*np.sqrt(len(p1))
+     z2 = (p2.mean()-lam2) / lam2*np.sqrt(len(p2))
+     chi = z1**2+z2**2
+     res.append(float(1-chi2.cdf(chi,dof)))
+
+print 1851 + cutoffs[np.array(res).argmax()]
+\end{minted}
+
+\begin{verbatim}
+1885
+\end{verbatim}
+
+Tarihten biliyoruz ki deðiþimin sebebi büyük ihtimalle Ýngiltere'de 1887
+yýlýnda kanunlaþan {\em Kömür Madenleri Yasasý}'dýr [3]. Yakýnlýk fena
+deðil.
+
+Ödev: Verinin iki tane Poisson karýþýmýyla temsil edilmesi gerektiðinden
+emin olmak istiyorsak, AIC kullanarak tek Poisson uyumu, daha sonra
+karýþýmýn uyumu için ayrý ayrý AIC'leri hesaplayarak hangisinin daha düþük
+olduðuna göre bu kararý verebiliriz.
+
+Bayes ve MCMC 
+
+Bir deðiþik yöntem Bayes yaklaþýmýný kullanarak ve hesapsal olarak Markov
+Chain Monte Carlo (MCMC) tekniði. Kazalarýn sayýsýnýn tümünü iki Poisson
+daðýlýmýnýn ortak daðýlýmý (joint distribution) üzerinden modelleyeceðiz,
+ve bu daðýlýmlarýn birinci Poisson'dan ikincisine geçtiði aný hesaplamaya
+uðraþacaðýz.
+
+Poisson daðýlýmý
+
+$$ p(y|\theta) = \frac{e^{-\theta}\theta^y}{y!} $$
+
+Eldeki n tane veri noktasý $y=y_0, y_1,...,y_n$'nin hep birlikte
+$\theta$ ile tanýmlý bir Poisson daðýlýmýndan gelip gelmediðinin ne
+kadar mümkün olduðu (likelihood) hesabý þöyledir:
+
+$$ p(y|\theta) = \frac{e^{-n\theta}\theta^{\sum y_i}}{\prod y_i!}  $$
+
+Formülün bölünen kýsmýndaki tüm y noktalarý toplanýyor, bölen kýsminde
+ise tüm y deðerleri teker teker faktoryel hesabý sonrasý birbiri ile
+çarpýlýyor.
+
+Þimdi yukarýdaki $\theta$ deðiþkeni de noktasal bir deðer yerine bir
+"daðýlýma", mesela $\theta$ Gamma daðýlýmýna sahip olabilirdi:
+$Gamma(\alpha, \beta)$. Formülde $\alpha$, $\beta$ sabit deðerlerdir
+(fonksiyon deðiþkeni deðil). Gamma olasýlýk formülü þöyledir:
+
+$$ p(\theta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\theta^{\alpha-1}e^{-\beta\theta} $$
+
+O zaman $p(y|\theta)$ formülünü bulmak için Bayes teorisini
+kullanmamýz gerekecekti. Bayes teorisi bilindiði gibi
+
+$$ p(\theta|y) = \frac{p(y|\theta)p(\theta)}{p(y)} $$
+
+$$ p(\theta|y) \propto p(y|\theta)p(\theta) $$
+
+Ýkinci formüle dikkat, eþitlik yerine orantýlý olma (proportional to)
+iþaretini kullanýyor. Sebep: bölen kýsmýndaki p(y)'yi kaldýrdýk, sonuç
+olarak soldaki $p(\theta|y)$ deðeri artýk bir daðýlým deðil -- bu bir
+bakýmdan önemli ama örnekleme amacý için bir fark yaratmýyor,
+basitleþtirme amacýyla bunu yaptýk, böylece $p(y)$'yi hesaplamamýz
+gerekmeyecek, ama örnekleme üzerinden diðer tüm hesaplarý hala
+yapabiliriz. Tamam.
+
+Þimdi Bayes Teorisini Gamma önsel (apriori) ve Poisson olurluðu
+(likelihood) üzerinden kullanýrsak,
+
+$$ 
+p(\theta|y) = \frac{\beta^\alpha}{\Gamma(\alpha)}
+\theta^{\alpha-1}e^{-\beta\theta} \times
+\frac{e^{-n\theta}\theta^{\sum y}}{\prod y!} 
+$$
+
+Benzer terimleri yanyana getirelim:
+
+$$ 
+p(\theta|y) = \frac{\beta^\alpha}{\Gamma(\alpha)\prod y!}
+\theta^{\alpha-1}\theta^{\sum y}e^{-\beta\theta} e^{-n\theta} 
+$$
+
+Þimdi sol taraftaki bölümü atalým; yine üsttekine benzer numara, bu
+kýsým gidince geri galan daðýlým olamayacak, ama ona "oranlý" baþka
+bir formül olacak.
+
+$$ p(\theta|y)  \propto  \theta^{\alpha-1}\theta^{\sum y}e^{-\beta\theta} e^{-n\theta} $$
+
+$$  \propto \theta^{\alpha-1+\sum y}e^{-(\beta+n)\theta}  $$
+
+Bu daðýlým nedir? Formülün sað tarafý Gamma daðýlýmýnýn formülüne
+benzemiyor mu?  Evet, formülün sað tarafý $Gamma(\alpha+\sum y, \beta
++ n)$ daðýlýmý, yani ona orantýlý olan bir formül. Yani Bayes teorisi
+üzerinden þunu anlamýþ olduk; eðer önsel daðýlým Gamma ise, Poisson
+mümkünlük bizi tekrar Gamma sonuç daðýlýmýna götürüyor. Gamma'dan
+baþlayýnca tekrar Gamma'ya ulaþýyoruz. Bu bir rahatlýk, bir kolaylýk,
+bir matematiksel numara olarak kullanýlabilir. Sonsal (posterior)
+daðýlýmlarýn þekli, hesaplanma, cebirsel iþlemler açýsýndan önemli,
+eðer temiz, kýsa, öz olurlarsa hesap iþlerimiz kolaylaþýr.
+
+Not: Hatta üzerinde çalýþtýðýmýz problem sebebiyle eðer Poisson
+mümkünlük olacaðýný biliyorsak, sadece bu sebeple bile önsel daðýlýmý,
+üstteki kolaylýk bilindiði için, özellikle Gamma seçebiliriz, çünkü
+biliriz ki Gamma ile baþlarsak elimize tekrar Gamma geçecektir.
+
+Þimdi kömür madeni verisine gelelim. Bu madendeki kazalarýn sayýsýnýn Poisson
+daðýlýmýndan geldiðini öne sürüyoruz, ve kazalarýn "iki türlü" olduðunu
+bildiðimizden hareketle, birinci tur kazalarýn ikinci tur kazalardan deðiþik
+Poisson parametresi kullandýðýný öne süreceðiz.
+
+O zaman deðiþim anýný, deðiþim senesini nasýl hesaplarýz?
+
+Kazalarýn ilk k senede ortalama $\theta$ ile, ve k ve n arasýndaki
+senelerde ortalama $\lambda$ Poisson ile daðýldýðýný söyleyelim: Yani
+
+$$ Y_i = Poisson(\theta) \qquad i=1,..,k   $$
+
+$$ Y_i = Poisson(\lambda) \qquad i=k+1,..,n $$
+
+Burada $Y_i$ sene i sýrasýnda olan kazalarýn sayýsýný belirtiyor. Bayes kuralýný
+hatýrlarsak $\theta$ ve $\lambda$ parametrelerine önsel daðýlým atayacaðýz. Bu
+daðýlým Gamma olacak. Yani $\theta \sim Gamma(a_1, b_1)$ ve $\lambda \sim
+Gamma(a_2, b_2)$.
+
+Ayrýca k deðerini de bilmiyoruz, k deðeri yani "deðiþim noktasý" Poisson
+daðýlýmlarýn birinden ötekine geçtiði andýr. Bu seneyi bulmaya
+çalýþýyoruz. Þimdi tüm verinin, tüm seneleri kapsayacak þekilde modelini
+kurmaya baþlayalým. k parametresinin aynen öteki parametreler gibi bir
+önsel daðýlýmý olacak (ki sonradan elimize k için de bir sonsal daðýlýmý
+geçecek), ama bu parametre elimizdeki 112 senenin herhangi birinde "eþit
+olasýlýkta" olabileceði için onun önsel daðýlýmý Gamma deðil $k \sim Unif(1,112)$ 
+olacak. Yani ilk baþta her senenin olasýlýðý birbiriyle eþit,
+her sene $\frac{1}{112}$ olasýlýk deðeri taþýyor.
+
+Bu modelin tamamýnýn olurluðu nedir?
+
+$$ L(\theta, \lambda, k | y) = \frac{1}{112} \times \displaystyle \prod_{i=1}^k
+\frac{e^{-\theta}\theta^{y_i}}{y_i!}  \times \displaystyle \prod_{i=k+1}^n
+\frac{e^{-\lambda}\lambda^{y_i}}{y_i!} 
+ $$
+
+Sonsal geçiþini yapýnca yukarýda olduðu gibi Gamma daðýlýmlarýný elde
+ederiz:
+
+$$ L(\theta, \lambda, k | y)  \propto 
+\theta^{a_1-1+\sum_{i=1}^{k} y_i}e^{-(b_1+k)\theta} 
+\lambda^{a_2-1+\sum_{i=k+1}^n y_i}e^{-(b_2+n-k)\lambda} 
+ $$
+
+$\frac{1}{112}$'yi bir sabit olduðu için formülden attýk, bu durum orantýlý hali
+etkilemiyor. Üstteki formül içindeki Gamma daðýlýmlarýný görebiliyoruz, hemen
+yerlerine koyalým:
+
+$$ L(\theta, \lambda, k | y)  \propto 
+Gamma(a_1 + \sum_{i=1}^{k} y_i, b_1+k) \
+Gamma(a_2 + \sum_{i=k+1}^{n} y_i, b_2+n-k)
+ $$
+
+Gibbs örneklemeye gelelim. Bu örneklemeye göre þartsal daðýlým (conditional
+distribution) formülü bulunmaya uðraþýlýr, hangi deðiþkenlerin verili olduðuna
+göre, o deðiþkenler sabit kabul edilebilir, ve orantýsal formülden
+atýlabilir. Bu her deðiþken için teker teker yapýlýr. 
+
+Sonra hesap sýrasýnda her þartsal daðýlýma teker teker zar attýrýlýr, ve
+elde edilen deðer, bu sefer diðer þartsal daðýlýmlara deðer olarak
+geçilir. Bu iþlem sonuca eriþilinceye kadar özyineli (iterative) olarak
+tekrar edilir (mesela 1000 kere). O zaman,
+
+$$ \theta | Y_1,..,Y_n,k \sim Gamma(a_1 + \sum_{i=1}^{k} y_i, b_1+k) $$
+
+$$ \lambda | Y_1,..,Y_n,k \sim Gamma(a_2 + \sum_{i=k+1}^{n} y_i, b_2+n-k) $$
+
+$$ 
+p(k | Y_1,..,Y_n) \propto \theta^{\sum_{i=1}^{k} y_i}e^{-k\theta} 
+\lambda^{\sum_{i=k+1}^n y_i}e^{k\lambda} 
+ $$
+
+En son formülde içinde k olan terimleri tuttuk, gerisini attýk. Formül $e$
+terimleri birleþtirilerek biraz daha basitleþtirilebilir:
+
+$$ p(k | Y_1,..,Y_n) \propto
+\theta^{\sum_{i=1}^{k} y_i} \lambda^{\sum_{i=k+1}^n y_i}e^{(\lambda-\theta)k} 
+ $$
+
+Bir basitleþtirme daha þöyle olabilir
+
+$$ K = \sum_{i=1}^{k} y_i  $$
+
+$$ \lambda^{\sum_{i=k+1}^n y_i} = \lambda^{\sum_{i=1}^n y_i - \sum_{i=1}^k y_i} $$
+
+Üstel iþlemlerde eksi iþareti, üstel deðiþken ayrýlýnca bölüm iþlemine dönüþür:
+
+$$ = \frac{\lambda^{\sum_{i=1}^n y_i}}{\lambda ^{\sum_{i=1}^k y_i}} $$
+
+$$ = \frac{\lambda^{\sum_{i=1}^n y_i}}{\lambda ^{K}} $$
+
+$$ p(k | Y_1,..,Y_n) \propto 
+\theta^{K} \frac{\lambda^{\sum_{i=1}^n y_i}}{\lambda ^{K}} e^{(\lambda-\theta)k} 
+ $$
+
+$$ = \bigg(\frac{\theta}{\lambda}\bigg)^{K} \lambda^{\sum_{i=1}^n  y_i} e^{(\lambda-\theta)k} $$
+
+$\lambda^{\sum_{i=1}^n y_i}$ terimi $k$'ye deðil $n$'ye baðlý olduðu
+için o da final formülden atýlabilir
+
+$$  
+p(k | Y_1,..,Y_n) \propto \bigg(\frac{\theta}{\lambda}\bigg)^{K} 
+e^{(\lambda-\theta)k}  
+$$  
+
+$p(k)$ için ortaya çýkan bu formüle bakarsak, elimizde verilen her k
+deðeri için bir olasýlýk döndürecek bir formül var. Daha önceki Gamma
+örneðinde formüle bakarak elimizde hemen bir Gamma daðýlýmý olduðunu
+söyleyebilmiþtik. Bu kodlama sýrasýnda iþimize yarayacak bir þeydi,
+hesaplama için bir daðýlýma "zar attýrmamýz" gerekiyor, ve Gamma
+örneðinde hemen Python Numpy kütüphanesindeki random.gamma çaðrýsýna
+Gamma'dan gelen rasgele sayýlar ürettirebiliriz. Üstteki formüle
+bakarsak, hangi daðýlýma zar attýracaðýz?
+
+Cevap þöyle: $p(k|..)$ pdf fonsiyonundaki k deðiþkeni $1,..,119$ arasýndaki
+tam sayý deðerleri alabilir, o zaman ortada bir ayrýksal (discrete) daðýlým
+var demektir. Ve her k noktasý için olabilecek olasýlýk deðerini üstteki
+$p(k|..)$ formülüne hesaplattýrabiliyorsak, ayrýksal bir daðýlýmý her nokta
+için üstteki çaðrý, ve bu sonuçlarý normalize ederek (vektörün her
+elemanýný vektörün toplamýna bölerek) bir daðýlým þekline
+dönüþtürebiliriz. Daha sonra bu "vektörsel daðýlým" üzerinden zar
+attýrýrýz. Python kodundaki \verb!w_choice! ya da R dilindeki \verb!sample!
+çaðrýsý bu iþi yapar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import math
+import random
+
+np.random.seed(0); random.seed(0)
+
+# samples indexes from a sequence of probability table
+# based on those probabilities
+def w_choice(lst):
+    n = random.uniform(0, 1)
+    for item, weight in enumerate(lst):
+        if n < weight:
+            break
+        n = n - weight
+    return item
+
+#
+# hyperparameters: a1, a2, b1, b2
+#
+def coal(n,x,init,a1,a2,b1,b2):
+    nn=len(x)
+    theta=init[0]
+    lam=init[1]
+    k = init[2]
+    z=np.zeros((nn,))
+    for i in range(n):
+        ca = a1 + sum(x[0:k])
+        theta = np.random.gamma(ca, 1/float(k + b1), 1) 
+        ca = a2 + sum(x[(k+1):nn])
+        lam = np.random.gamma(ca, 1/float(nn-k + b2), 1)
+        for j in range(nn):
+            z[j]=math.exp((lam-theta)*(j+1)) * (theta/lam)**sum(x[0:j])
+        # sample
+        zz = z / sum(z)
+        k = w_choice(zz)
+    print float(theta), float(lam), float(k)
+                
+data = np.loadtxt("coal.txt")
+coal(1100, data, init=[1,1,30], a1=1,a2=1,b1=1,b2=1)
+\end{minted}
+
+\begin{verbatim}
+3.32561369453 0.931821137936 42.0
+\end{verbatim}
+
+Kodlarý iþletince elimize k = 42 deðeri geçecek, yani deðiþim aný 1851+42 =
+1893 senesidir. 
+
+Kaynaklar: 
+
+[1] Ioana A. Cosma, Ludger Evers, {\em Markov Chain Monte Carlo Methods (Lecture)}
+
+[2] Koop, {\em Bayesian Econometric Methods}
+
+[3] Anderson, A. (1911). Labour legislation. In H. Chisholm (Ed.),
+{\em Encyclopedia britannica (11th ed., Vol. 16, sf. 7-28)}
+
+[4] Zuccini, {\em Hidden Markov Models for Time Series An Introduction Using R}
+
+[5] Bayramli, Istatistik, {\em Çok Deðiþkenli Bernoulli Karýþýmý}
+
+\end{document}

@@ -1,0 +1,116 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Otomatik Tercüme, Makine Tercümesi (Machine Translation)
+
+Dizin-Dizin Ýliþkisini Öðrenmek (Sequence to Sequence Learning)
+
+Dillerarasý otomatik tercüme yazýlýmý Google Translate ile popüler hale
+geldi. Google bu servisi ilk kodladýðýnda parça parça, istatistiki bir
+yaklaþým kullanarak kodlamýþ, fakat 2017 yýlýnda bu servis tamamen derin
+öðrenme üzerinden iþleyecek þekilde deðiþtirildi, kod satýr sayýsý
+500,000'den 500'e indi!
+
+DO bazlý tercüme sistemleri nasýl iþler? 
+
+\includegraphics[width=30em]{seq_02.png}
+
+Not: kaynak cümlesi ters þekilde girilmiþ, bu mimarý ilk teklif edildiðinde
+bu þekilde yapýlýyordu, fakat [3]'e göre her eðitim verisi için dinamik
+þekilde yaratýlabilen RNN hücreleri durumunda buna gerek yok.
+
+Servisin temelinde, üstte görüldüðü gibi bir RNN tabakasý var. Fakat bu RNN
+yapýsýnda ilk (soldaki) bölüm kodlayýcý, ikinci (saðdaki) bölüm kod çözücü
+olarak planlanmýþ.  Eðitim verisinde kaynak ve hedef cümle beraber, yanyana
+olarak hem girdi olarak veriliyor, ayrýca tercüme sonuç cümlesi alýnýp bir
+de etiket verisi olarak kullanýlýyor, bir farkla, etiketteki cümle zaman
+indisinde eðitimdeki sonuç cümlenin bir geri kaydýrýlmýþ hali.
+
+Kaynak, sonuç tercüme cümleleri farklý boylarda olabilir, hem ayný eðitim
+noktasý içinde birbirlerinden, hem de deðiþik eðitim noktalarýnda
+kendilerinden bile farklý boyutlarda olabilirler, bu sebeple RNN öðe
+sayýlarý dinamik þekilde, her eðitim verisine göre farklý olacak. Fakat bu
+farklý boyutlar karýþýklýk yaratmýyor, çünkü tercüme için önemli olan þey
+kodlayýcý bloktan kod çözücü bloða geçen gizli konum.
+
+Bu konuma daha önceki yazýlarda $h$ adý vermiþtik. Eðitim süreci þöyle, tüm
+cümleler + tüm kelimeler üzerinden bir sözlük oluþtururuz, bu sözlüðe göre
+her kelimeye bir tam sayý indis deðeri atarýz, sonra kelimeleri tam
+sayýlara çevirip gömme tabakasýna veririz, bu tabaka reel sayý içeren
+vektörlere dönüþür, ve eðitim ilerledikçe referans gömme matrisinde
+kelimelerin temsil deðerleri iyileþir. Bunlar otomatik oluyor tabii, biz
+soldan saða YSA'ya her eðitim veri noktasýndaki kelimeleri teker teker
+geçiyoruz, bir eðitim noktasý için önce birinci kelimeyi ilk RNN öðesine,
+oradan çýkan $h$'yi ve ikinci kelimeyi ikinci RNN öðesine, böyle devam
+ediyor.
+
+Kodlayýcýdan çýkýþ olduðu anda (dikkat hala tek bir eðitim noktasýný
+iþliyoruz) elimizde olan $h$'nin özel bir anlamý var. Üstteki mimariye göre
+bu gizli katman tüm kaynak cümleyi temsil eden bir $h$'dir. Baþta pek
+deðildir ama zaman geçtikçe öyle olacaktýr. $h$ boyutu önceden planlanan
+þekilde, yani cümleye göre küçülüp büyüyen bir þey deðil. Neyse tabii ileri
+besleme orada durmuyor, kod çözücüye devam ediliyor, burada kelimeler sonuç
+tercümeden geliyor, þimdi onun kelimelerini almaya baþlýyoruz ve etikette
+bahsettiðimiz þekilde kaydýrýlan kelimelere tekabül edecek þekilde eðitime
+devam ediyoruz, ve saða en sona gelince bir eðitim noktasý ile iþimiz
+bitiyor.
+
+Hedef kelimeleri softmax olarak planlanmýþ, yani kod çözücüdeki RNN öðeleri
+mümkün tüm kelimeler üzerinden bir olasýlýk vektörü üretiyor. Gerçek dünya
+uygulamalarýnda bu yaklaþým külfetli olabilir, çünkü sözlük çok büyük ise
+softmax boyutu tek bir kelime çýktýsý için olasýlýklarý temsil etmek için
+çok fazla boyutlu olmalýdýr, burada performansý iyileþtirebilecek baþka
+bazý yaklaþýmlar var, ama kavramsal olarak çýktýnýn sanki her mümkün kelime
+üzerinden bir softmax olduðunu düþünebiliriz.
+
+Eðitim bittikten sonra hiç görülmemiþ yeni test verisi için tercüme nasýl
+yaparýz? Biraz önce gördüðümüz gibi kaynak cümlenin kelimeleri soldan saða
+YSA'ya verilir, kod çözücüye geldiðimizde $h$ ile beraber Go sembolü
+verilecektir, ve bu sembol sonuç tercümede ilk kelimeyi üretir. Tercümenin
+ilk kelimesini bu þekilde elde etmiþ oluruz. Eðer eðitim iyi yapýlmýþsa
+derin YSA ilk kelimeyi güzel bir þekilde üretecektir (daha doðrusu softmax
+tüm kelimelerin olasýlýklarýný hesaplar, biz bu olasýlýklara göre en olasý
+kelimeyi örnekleme yaparak alýrýz). Sonra bu üretilen kelimeyi alýp alttan
+YSA'ya (artýk kod çözücüde tabii) beslemeye devam ederiz, mesela Go sonucu
+``içeri'' kelimesi verilmiþ, biz ``içeri'' kelimesini alttan ikinci RNN
+öðesine veririz, bu bize üstten ``girmesine'' kelimesini üretebilir, böyle
+devam ederiz.
+
+Dikkat Etme Vektörü (Attention Vector)
+
+Bazý yaklaþýmlara göre kodlayýcý bloktan çýkan $h$ bir cümleyi temsil etmek
+için yeterli görülmüyor, kod çözücü bloðundaki RNN öðelerinden kaynak
+cümledeki tüm kelimelere giden bir dikkat etme vektörü üzerinden baðlantý
+koyuluyor. Detaylar [2]'de bulunabilir. Alttaki örnekte Ýngilizce
+``I am a student'', yani ben bir öðrenciyim cümlesinin Fransýzca karþýlýðý
+``Je suis etuidant'' gösterilmiþ. 
+
+\includegraphics[width=30em]{attention.jpg}
+
+Ayrýca RNN katmaný tek bir zincir olmayabilir, üst üste konulmuþ birkaç
+katmandan da oluþuyor olabilir. Resimde istiflenmiþ iki RNN seviyesi
+görüyoruz mesela.
+
+Not: Bilgisayar ile söyleþi yapýlmasýný saðlayan chatbot teknolojisi
+aslýnda üstteki tercüme teknolojisinin deðiþik bir kullanýmý sadece. Eðer
+kaynak ve sonuç cümleler ayný cümlenin iki farklý dildeki karþýlýðý yerine
+iki kiþi arasýndaki konuþmalar olsaydý, YSA yapýsý gömme tabakasý, cümleler
+alakasý üzerinden ``bir konuþmayý'' öðrenmeye baþlardý. ``Nasýlsýn''
+cümlesine ``çok iyiyim'' karþýlýðý veriliyor, bu iki cümle ve onun gibi
+cümleleri üstteki teknikle eðitince yavaþ yavaþ YSA nasýl karþýlýk
+vereceðini öðrenebilmeye baþlýyor. 
+
+Örnek kod [1] alttadýr, veri [4]'ten.
+
+\inputminted[fontsize=\footnotesize]{python}{translate.py}
+
+Kaynaklar
+
+[1] Mohandas, {\em The Neural Perspective, RNN - Part 3 - Encoder - Decoder},\url{https://theneuralperspective.com/2016/11/20/recurrent-neural-networks-rnn-part-3-encoder-decoder/}
+
+[2] TensorFlow, {\em TensorFlow Neural Machine Translation Tutorial}, \url{https://github.com/tensorflow/nmt}
+
+[3] Géron, {\em Hands-On Machine Learning with Scikit-Learn and TensorFlow}
+
+[4] ManyThings Verisi, Ýngilizce-Türkçe, {\em Tab-delimited Bilingual Sentence Pairs}, \url{https://www.dropbox.com/s/z39xv08541hhmue/tur-eng.zip?dl=1}
+
+\end{document}

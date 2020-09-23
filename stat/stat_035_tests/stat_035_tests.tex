@@ -1,0 +1,915 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Binom Ýçin Normal Yaklaþýksallýðý
+
+Merkezi Limit Teorisinden $\bar{X}$'nin her $X_i$ için ayný olan nüfus
+beklentisi ve sapmasýný içeren $N(\mu,\sigma)$ olarak daðýlacaðýný
+biliyoruz. Ve bu durum, nüfus {\em hangi daðýlýma sahip olursa olsun}
+geçerlidir. $X_1,..,X_n$ birbirinden baðýmsýz ve ayný Bernoulli olarak
+daðýlmýþ, ve onlarýn toplamýný temsil eden binom daðýlýmý $X$ olarak
+tanýmlayalým, o zaman
+
+$$ X = X_1 + X_2 + .. +  X_n $$
+
+Daha önceden biliyoruz ki $E(X_i) = p, Var(X_i) = p(1-p)$, standart sapma
+varyansýn karekökü. O zaman Merkezi Limit Teorisine göre, 
+
+$$ 
+Z = 
+\frac{X/n - p}{\sqrt{p(1-p)/n}} =
+\frac{X - np}{\sqrt{np(1-p)}}
+$$
+
+Soru
+
+Amerikalýlarýn yüzde 12'sinin zenci olduðunu biliyoruz. Eðer 1500 kiþiyi
+içeren bir örneklem alsaydýk, bu örneklemde 170'den daha az zenci
+olmasýnýn olasýlýðý nedir? 
+
+Cevap
+
+\%12 nüfus parametresidir, yani $p=0.12$. Örneklem $n=1500$. Normal
+yaklaþýksallamasý ile 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import norm
+n = 1500
+p = 0.12
+mu = n*p
+std = np.sqrt(n*p*(1-p))
+print mu,std
+print 'olasilik',norm.cdf(170,loc=mu,scale=std)
+\end{minted}
+
+\begin{verbatim}
+180.0 12.585706178
+olasilik 0.213437028747
+\end{verbatim}
+
+Yani $N(180,12.58)$ daðýlýmýný elde ettik ve hesaplarý onun üzerinden
+yaptýk. Sonuç diyor ki verilen örneklem ve nüfus $p$ deðeri ile 170 altýnda
+zenci sayýsý elde etmek oldukça düþük bir ihtimalde. 
+
+Örnek
+
+Diyelim ki elimizde bir Web sitesinin günlük ziyaret, týklama sayýlarýný
+gösteren bir veri seti var, CVR ziyaretçilerin sitedeki týklayan müþteriye
+dönüþmesi oraný (conversion). 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+from scipy import stats
+a = pd.DataFrame({'tiklama': [20.,2.,40.,5.,10.,100.],
+                  'ziyaret': [100.,10.,300.,400.,30.,800.]})
+a['cvr'] = a['tiklama'] / a['ziyaret'] 
+print a
+\end{minted}
+
+\begin{verbatim}
+   tiklama  ziyaret       cvr
+0       20      100  0.200000
+1        2       10  0.200000
+2       40      300  0.133333
+3        5      400  0.012500
+4       10       30  0.333333
+5      100      800  0.125000
+\end{verbatim}
+
+Bu veri seti için cvr'in 0.16, yani yüzde 16 olduðunu önceden biliyoruz. Üstteki
+baþarý oraný binom daðýlý ile modellenebilir, ziyaretler "deneylerdir", yani
+örneklem büyüklüðünü gösterirler. Týklama ise baþarýdýr, önceki binom
+örneðindeki ayný formülü kullanýrsak, normal yaklaþýksallýðý üzerinden bir
+z-skoru hesaplayabiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p = 0.16
+btest = lambda x: (x['cvr']-p) / np.sqrt( p*(1-p)/x['ziyaret'])
+a['guven'] = a.apply(btest, axis=1)
+a['guven'] = np.round(stats.zprob(a['guven'])*100,2)
+print a
+\end{minted}
+
+\begin{verbatim}
+   tiklama  ziyaret       cvr  guven
+0       20      100  0.200000  86.24
+1        2       10  0.200000  63.50
+2       40      300  0.133333  10.39
+3        5      400  0.012500   0.00
+4       10       30  0.333333  99.52
+5      100      800  0.125000   0.35
+\end{verbatim}
+
+Soru 
+
+Amerika'da 2009 yýlýnda halkýn ne kadarýnýn arabalarýnda yakýt tasarrufunu
+desteklediði merak konusuydu. Bir Gallup telefon anketinde bu soru 1012
+yetiþkine (18 ve üstü yaþta) soruldu. Cevap 810 kiþinin tasarrufu
+desteklediði yönündeydi. Yani $n=1012,k=810$. O zaman $p$ için \%95 güven
+aralýðýný bulun.
+
+Cevap 
+
+$$ \bigg(
+\frac{810}{1012}
+-1.96 \sqrt{ \frac{(810/1012)(1-810/1012)}{1012} } ,
+1.96  \sqrt{ \frac{(810/1012)(1-810/1012)}{1012} }
+\bigg)
+$$
+
+$$ = (0.776,0825) $$
+
+Python ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+m = 810/1012.
+low = m - 1.96*np.sqrt(m*(1-m)/1012.)
+high = m + 1.96*np.sqrt(m*(1-m)/1012.)
+print low, high
+\end{minted}
+
+\begin{verbatim}
+0.775768711331 0.825021802503
+\end{verbatim}
+
+Soru
+
+Borsa konusunda okuyuculara tiyo veren bir gazete, bir þirket hissesinin
+belli bir olay ardýndan çoðunlukla yükseldiðini söylüyor. Yazara göre hisse
+9 olay içinden 6'sýnda bu çýkmýþ. Buradan hareketle yazar hissenin tekrar
+çýkma þansýnýn 6/9=\%66.7 olduðunu iddia ediyor. Okuyucu bunu ciddiye alsýn
+mý?
+
+
+Cevap 
+
+Ufak örneklemler için Agresti ve Coull yöntemini kullanmak iyi olur, bu
+yönteme göre baþarýlý olay sayýsýna iki, tüm olay sayýsýna 4 ekleriz (yani
+2 baþarýsýzlýk eklemiþ oluruz) ve $\hat{p} = (x+2)(n+4)$ elde edilir. Bu
+ekler hem genel teorik olarak bir deðiþim yaratmaz, hem de örneklem
+sayýsýný arttýrarak Normal yaklaþýksallýðýný kullanabilmemizi saðlar. Güven
+aralýðý, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x=6.;n=9.;p=(x+2)/(n+4); z = 1.96
+print p + np.array([-1,+1])*z*np.sqrt(p*(1-p)/n)
+\end{minted}
+
+\begin{verbatim}
+[ 0.29753517  0.93323406]
+\end{verbatim}
+
+Demek ki yazar okuyucularýna kötü bir tavsiye vermiþ, güven aralýðýnýn alt
+kýsmý \%30 olduðuna göre hissenin yükselmesi garanti deðildir, garanti için
+güven aralýðýnýn iki ucu da \%50 üzerinde olmalýydý. Noktasal tahmin
+baðlamýnda \%66.7 rakamý da yanýltýcýdir. Bu yazar okuyucularýnýn para
+kaybetmesine sebep olabilir.
+
+Örneklem Büyüklüðü
+
+Bir araþtýrmacý $n$ baðýmsýz deney baz alýnarak elde edilen binom
+parametresi $p$'yi tahmin etmek istiyor, fakat kaç tane $n$ kullanmasý
+gerektiðini bilmiyor. Tabii ki daha büyük $n$ deðerleri daha iyi sonuçlar
+verecektir, ama her deneyin bir masrafý vardýr. Bu iki gereklilik nasýl
+birbiri ile uzlaþtýrýlýr?
+
+Yeterli olacak en az kesinliði, duyarlýlýðý (precision) bulmak için Z
+transformasyonu kullanýlabilir belki. Diyelim ki $p$ için maksimum olurluk
+tahmini olan $X/n$'in en azýndan $100(1-\alpha)\%$ olasýlýkta $p$'nin $d$
+kadar yakýnýnda olmasýný istiyoruz. O zaman alttaki denklemi tatmin eden en
+ufak $n$'i bulduðumuz anda problemimizi çözdük demektir, 
+
+$$ P\bigg( -d \le \frac{X}{n} - p \le d \bigg)  = 1-\alpha
+\mlabel{1}
+$$
+
+Tahmin edici $X/n$'nin kendisi de bir rasgele deðiþkendir. Bu deðiþken
+normal olarak daðýlmýþtýr, çünkü $X$ Binom olarak daðýlmýþ ise, bu daðýlým
+ayrý Bernoulli daðýlýmlarýnýn toplamýna eþittir. Fakat baþka bir irdeleme
+bizi daha basitçe sonuca götürür, binom daðýlýmý bir toplamdýr, bu toplamý,
+yani $X$'i $n$ ile bölüyorsak, otomatik olarak bir aritmetik averaj iþlemi
+yapmýþ oluyoruz. Baðýmsýz özdeþçe daðýlmýþ (ýid) rasgele deðiþkenlerin
+aritmetik ortalamasý Merkezi Limit Kanunu'na göre normal'e yaklaþtýðýna
+göre o zaman, elimizde bir normal daðýlým var demektir.
+
+Standardize etmek için $X/n$'den beklentiyi çýkartýp standart sapmaya
+bölebiliriz. Beklenti zaten çýkartýlmýþ durumda (þansa bak!),
+beklentinin ne olduðunu kontrol edelim tabii, ezbere yapmayalým bu iþi,
+eðer her Bernoulli'yi $X_i$ olarak temsil edersek,
+
+$$ X = X_1 + .. + X_n $$
+
+$$ X/n = 1/n(X_1 + .. + X_n )$$
+
+$$ E[X/n] = E[1/n(X_1 + .. + X_n )]$$
+
+$$  = 1/nE[(X_1 + .. + X_n )]$$
+
+$$  = (1/n)np = p$$
+
+Varyans için
+
+$$
+Var(X/n) = \frac{1}{n^2}Var(X) = \frac{1}{n^2}np(1-p)=
+\frac{1}{n}p(1-p) 
+$$
+
+Binom daðýlýmlar için $Var(X) = np(1-p)$ olduðunu biliyoruz. Standart sapma
+üstteki ifadenin karekökü, yani
+
+$$ Std(X/n) = \sqrt{p(1-p)/n}
+$$
+
+Simdi standardize edelim,
+
+$$ P\bigg( 
+\frac{-d}{\sqrt{p(1-p)/n}} \le 
+\frac{\frac{X}{n} - p }{\sqrt{p(1-p)/n}}\le 
+\frac{d}{\sqrt{p(1-p)/n}} 
+\bigg)  = 
+1-\alpha$$
+
+
+$$ P\bigg( 
+\frac{-d}{\sqrt{p(1-p)/n}} \le 
+Z
+\frac{d}{\sqrt{p(1-p)/n}} 
+\bigg)  = 
+1-\alpha$$
+
+Daha önceki z-skoru içeren eþitsizlikleri hatýrlarsak, üstteki ifade 
+
+$$ \frac{d}{\sqrt{p(1-p)/n}} = z_{\alpha/2} 
+$$
+
+O zaman 
+
+$$ \frac{z_{\alpha/2}^2p(1-p)}{d^2} = n $$
+
+Fakat bu bir nihai sonuç olamaz, çünkü $n$, $p$'nin bir fonksiyonun haline
+geldi ve $p$ bilinmeyen bir deðer. Fakat biliyoruz ki $0 \le p \le 1$, ve
+$p(1-p) \le \frac{1}{4}$. Yani bir üst sýnýr (upper bound) elde ettik. 
+
+Bunu kontrol edelim, $p(1-p)$ hangi $p$'de maksimize olur? $p$'ye göre
+türev alýrýz, sýfýra eþitleriz, $(p-p^2)' = 1 - 2p = 0, p=1/2$. Ve hesabý
+yaparsak, $1/2(1-1/2)=1/4$. Demek ki $p(1-p)$ deðeri $1/4$'ten daha büyük
+olamaz. Buna göre, üstteki formüle $p(1-p)$ yerine onun olabileceði en
+büyük deðeri koyarsak, 
+
+$$ \frac{z_{\alpha/2}^21/4}{d^2} = n $$
+
+$$ n = \frac{z_{\alpha/2}^2}{4d^2} $$
+
+Not: $p(1-p)$, 1/4 deðerinden daha küçük olabilir mi? Olabilir. Bu durumda
+$n$ üstteki formülden elde edebileceðimiz deðerden daha küçük te
+çýkabilecektir. Fakat $p(1-p)$'in olabileceði en büyük deðer 1/4'u
+kullanarak ``$n$'in bundan daha büyük olmasýna gerek yok'' diyebilen bir
+formüle eriþmiþ olduk, yani, aslýnda $n$ için bir üst sýnýr elde ettik. 
+
+Örnek
+
+Büyük bir þehirde çocuklarýn kaçta kaçýnýn aþýsýný almýþ olup olmadýðýný
+anlamak için bir anket gerçekleþtirilecek. Anketi düzenleyenler örneklem
+oraný olan $X/n$'in en az 98\% oranda gerçek oran $p$'nin 0.05 yakýnýnda
+olmasýný istiyorlar. Örneklem ne kadar büyük olmalýdýr? 
+
+Burada $100(1-\alpha) = 98$, o zaman $\alpha = 0.02$, demek ki $z_{\alpha/2}
+= z_{0.02/2} = z_{0.01}$ deðerine ihtiyacýmýz var. Python ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import norm
+print norm.ppf(0.99)
+\end{minted}
+
+\begin{verbatim}
+2.32634787404
+\end{verbatim}
+
+Tüm hesap için
+
+$$ n = \frac{(2.33)^2}{4(0.05)^2} = 543$$
+
+Demek ki kabul edilebilir en ufak deðer 543. 
+
+Hata Payý (Margin of Error)
+
+Basýnda oranlarý rapor ederken onunla beraber telafuz edilen bir kavram
+hata payýdýr. Aslýnda bu binom daðýlýmlarda güven aralýðý ile çok yakýndan
+alakalýdýr;  hata payý \%95 güven aralýðýnýn en maksimum geniþliðinin yarýsý
+olarak bilinir. Yani \%95 aralýðýnýn bir ucunu diðer ucundan çýkartýrsak ve
+ikiye bölersek, istenen sonuca eriþiriz. Formülsel olarak geniþlik $w$,
+
+$$ w = \frac{k}{n} + 
+1.96 \sqrt{\frac{(k/n)(1-k/n)}{n}} - 
+- \bigg[ 
+\frac{k}{n} -
+1.96 \sqrt{\frac{(k/n)(1-k/n)}{n}}
+\bigg]
+ $$
+
+$$ = 3.92 \sqrt{\frac{(k/n)(1-k/n)}{n}} $$
+
+Þimdi $(k/n)(1-k/n)$ çarpýmýný düþünelim. [8] bölümünde gördük, $n$ her
+zaman $k$'den büyük olduðuna göre $k/n$ her zaman 0 ve 1 arasýndadýr, o
+zaman $(k/n)(1-k/n) \le 1/4$ olmalýdýr, yani gösterilen çarpým 1/4'ten
+büyük olamaz. Bunu alýp üstteki formül içine koyarsak,
+
+$$ \max w = 3.92 \sqrt{\frac{1}{4n}} $$
+
+elde ederiz. Bunun yarýsý hata payýdýr $d$ olur, yani
+
+$$ d = \frac{0.98}{\sqrt{n}} $$
+
+Örnek
+
+Bir seçim kampanyasý sýrasýnda A ve B adaylarý arasýnda hangisinin daha
+önce olduðunu bulmak için bir anket yapýlýr. Telefonda 597 kiþiye
+sorulduðunda A adayýnýn 299 kiþinin oyunu alacaðý saptanmýþtýr. Basýn
+durumu ``A adayýnýn avantajý hata payý \%4 içinde olduðu için o önde kabul
+edilebilir'' diye rapor etmiþtir. A oylarýnýn hata payý hakikaten
+\%4'müdür?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n = 597.
+k = 299
+print n/2
+print k/n
+d = 0.98/np.sqrt(n) 
+print d*100
+\end{minted}
+
+\begin{verbatim}
+298.5
+0.500837520938
+4.01087299444
+\end{verbatim}
+
+Evet hata payý \%4 çýktý. 
+
+Dikkat edilirse hata payýnýn anketten gelen sonuçlarla hiçbir alakasý yok,
+A için tercih \%25, \%75 olabilirdi ama üstteki hata payý hesabý yine ayný
+kalýrdý. Bunun sebebi formülün $n$'ye baðlý olmasý. 
+
+Daha önemli soru hata payý basýnýn üstteki ifadesinin gerçekten seçim
+sonucu ile alakalý olup olmadýðý! 
+
+Hipotez Testleri (Hypothesis Testing)
+
+Ýstatistik tek ya da aralýklar olarak sayýsal tahminler üretmenin ötesinde,
+``iki þey arasýnda birisini seçmek'' türünde bir karar baðlamýnda da
+kullanýlabilir. Bir psikolog bir davaya uzman görüþ vermek için
+çaðrýlmýþtýr ve sanýk hakkýnda 'aklý olarak dengesiz ya da dengeli'
+arasýnda bir seçim yapacaktýr. Ýlaç regülasyonu ile uðraþan kurum yeni bir
+ilaç hakkýnda 'etkili' ya da 'etkisiz' þeklinde bir karara ulaþacaktýr. 
+
+Bir deneyin mümkün sonuçlarýný belli seçeneklere yönlendirip olasýlýk
+teorisini kullanarak bunlardan birisini seçmeye Ýstatistik biliminde
+Hipotez Test Etmek adý verilir.  
+
+Birbiriyle yarýþ halinde olan iki hipotez vardýr, bunlar sýfýr hipotezi
+($H_0$ olarak yazýlýyor) ve alternatif hipotezdir ($H_1$ olarak
+yazýlýyor). $H_o$ ve $H_1$ arasýnda nasýl seçim yapacaðýmýz kavramsal
+olarak bir davada jürinin yaptýðý seçime benzer: aynen sanýðýn, tersi
+ispatlanana kadar, masum kabul edilmesi gibi eðer veri tersi sonuca varmaya
+yetmezse $H_0$ da ``kabul edilir'', yani suçsuzluðun devam etmesi gibi
+$H_0$ görüþü terkedilmemiþ olur. Statüko devam eder. Bu kararý verirken
+mahkemenin kanýtlarý incelemesi, hipotez testinde rasgele deðiþkenlerle
+verinin üzerinden hesaplar yapmaya benzer.
+
+Bunu bir örnek üzerinden daha iyi anlayabiliriz. Diyelim ki araba üreten
+bir þirket yakýt performansýný (gas mileage) arttýrmaya uðraþýyor. Benzine
+katýlan yeni bir madde üzerinde deneyler yapýyorlar, deney için Boston /
+Los Angeles arasýnda 30 tane araba sefer yapýyor. Yeni katký maddesi
+olmadýðý durumda (statüko) yakýt performansýnýn ortalama 25.0 mil/galon ve
+standart sapmanýn 2.4 mil/galon olduðu biliniyor. Diyelim ki deney
+sonrasýnda arabalar ortalama olarak $\bar{y}$=26.3 mil/galon performansý
+göstermiþler. Katký maddesi etkili mi, etkili deðil mi?
+
+Araþtýrmacýlar 25.0'dan 26.3'e olan deðiþikliði daha önce bahsettiðimiz
+mahkeme örneðindeki gibi bir çerçevede incelerler. Tipik olarak sýfýr
+hipotezi statükoyu temsil eder, yani deðiþmesi için ``ezici þekilde aksi
+yönde veri olmasý gereken þey'' budur. Öyle deðil mi? Eðer etkisiz bir
+katký maddesine evet dersek, ve ileride öyle olmadýðý belli olursa bunun
+þirket için çok negatif etkileri olacaktýr, aynen masum bir kiþiyi
+yanlýþlýkla hapse atmýþ olmak gibi. O yüzden kalmak istediðimiz güvenli
+konum $H_0$'i temsil etmelidir. 
+
+Bu noktada problemi rasgele deðiþkenlerin terminolojisi üzerinden tekrar
+tanýmlamak faydalý olur. Diyelim ki test sýrasýnda 30 tane aldýðýmýz ölçüm
+$y_1,..,y_n$, her $y_i$ normal olarak daðýlmýþ ve bu daðýlýmlarýn $\mu$'þu
+ayný, ve $\mu$'u birazdan ``eski'' ölçümlerin ortalamasý olarak alacaðýz,
+çünkü çürütmek istediðimiz hipotez bu. Ayrýca daha önceki tecrübelerimiz
+gösteriyor ki $\sigma = 2.4$. Yani,
+
+$$ 
+f_Y(y;\mu) = \frac{1}{\sqrt{2\pi}(2.4)} 
+e^{-\frac{1}{2}(\frac{y-\mu}{2.4})^2},
+-\infty < y < \infty
+$$
+
+Hipotezleri þöyle tanýmlayalým,
+
+$H_0$: $\mu = 25.0$ (Katký maddesi etkili {\em deðildir})
+
+$H_0$: $\mu > 25.0$ (Katký maddesi etkilidir)
+
+Þimdi yeni daðýlýmý standardize edip, bir hayali ortalama eþik deðeri
+üzerinden bir sonuç çýkartalým, standardize etmek için kullandýðýmýz $\mu =
+25.0$ çünkü eski ortalama bu. Þimdi diyelim ki test ettiðimiz eþik deðer 25.25
+(esas  amaç 26.3 ama oraya geleceðiz), aradýðýmýz olasýlýk,
+
+$$ P(\bar{Y}  \ge 25.25) $$
+
+Üstteki ifade ``eðer örneklem eski daðýlýmdan geliyor olsaydý, 25.25
+eþik deðerini geçmesi ne kadar mümkün olabilirdi'' diye bir soru
+soruyor. $\bar{Y}$'yi standardize edelim, o sýrada eþitsizliðin sað tarafý da
+deðiþir,
+
+$$ P(\frac{\bar{Y} - 25.0}{2.4 / \sqrt{30}} \ge 
+\frac{25.25 - 25.0}{2.4 / \sqrt{30}}) 
+$$
+
+
+$$ P(Z \ge 0.57)$$
+
+z-Skoru tablosunu kullanakarak bu hesabý yapmak için
+
+$$ 1 - P(Z < 0.57)$$
+
+0.57'nin z-skoru (satýr 0.5 kolon .07) 0.7157 olarak gösterilmiþ, o zaman
+1-0.7157 = 0.2843. Kod ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 1-norm.cdf(0.57)
+\end{minted}
+
+\begin{verbatim}
+0.284338849046
+\end{verbatim}
+
+Demek ki
+
+$$ P(Z \ge 0.57) = 0.2843$$
+
+Demek ki yeni deney sonuçlarýnýn, eski daðýlýma göre, eþik deðerinden fazla
+gelmesi hala az da muhtemel, demek ki eski hipotezi tam
+çürütemedik. Seçtiðimiz eþik deðeri bize kesin bir sonuç saðlamadý,
+sezgisel olarak bu olasýlýðýn büyük olduðunu görüyoruz. Mahkeme durumunda
+suçsuz olmasý çok muhtemeldir diyemiyoruz. Ya da araba örneðinde (ve
+pozitif baðlamda) yeni yakýt kesinlikle farklýdýr / fazladýr
+diyemiyoruz. Bize daha kesin noktalar lazým, aklýmýzda bize ``acaba?''
+dedittirecek eþik deðerler istemiyoruz.
+
+\includegraphics[height=6cm]{carhyp1.png}
+
+Hayali eþik noktasý $\bar{y}^*$'nin daha büyük yapsak (ki o zaman ona baðlý
+olan saðdaki olasýlýk küçülecek). Bu olur mu? Eðer $\bar{y}^* = 26.50$
+olsaydý? 
+
+$$ P(\frac{\bar{Y} - 25.0}{2.4 / \sqrt{30}} \ge 
+\frac{26.50 - 25.0}{2.4 / \sqrt{30}}) 
+$$
+
+$$ P(Z \ge 3.42) $$
+
+$$ = 0.0003 $$
+
+Bu olasýlýk ise çok küçük, yani eþik deðeri çok büyük! Çýtayý çok fazla
+kaldýrdýk, mahkeme durumunda sanki diyoruz ki suçun 1000 tane tanýðý lazým,
+sanýk suçunu itiraf etmiþ olmalý, herþey apaçýk olmalý, bir de herþeyi
+bizzat ben görmüþ olmalýyým, yoksa kabul etmem. Araba örneðinde katký
+maddesi arabaya Formula-1 yarýsý kazandýrmazsa biz bu yakýtý daha iyi
+olarak kabul etmeyiz diyoruz.
+
+\includegraphics[height=6cm]{carhyp2.png}
+
+Peki eðer 0.28 çok fazla, 0.0003 çok küçük ise hangi olasýlýk en iyi eþik
+deðerini verir? Bu soruya kesin olarak ve matematiksel bir cevap vermek
+mümkün deðil, fakat hipotez test etme tekniðini kullanan araþtýrmacýlarýn
+ulaþtýðý konsensüs 0.05 olasýlýk seviyesinin en iyi sonuçlar verdiðidir. Bu
+durumda sýfýr hipotezinin çok kolayca kenara atýlmamasý, ya da ona
+gereðinden fazla baðlý kalýnmamasý mümkün oluyor.
+
+O zaman 0.05 olasýlýðýný verdirtecek eþik deðeri hesaplayalým,
+
+$$ P(\frac{\bar{Y} - 25.0}{2.4 / \sqrt{30}} \ge 
+\frac{\bar{y}^* - 25.0}{2.4 / \sqrt{30}}) = 0.05
+$$
+
+$$ P(Z \ge  \frac{\bar{y}^* - 25.0}{2.4 / \sqrt{30}}) = 0.05
+$$
+ya da
+
+$$ P(Z \le  \frac{\bar{y}^* - 25.0}{2.4 / \sqrt{30}}) = 0.95 $$
+
+z-Skor tablosuna bakýyoruz, ``hangi z deðeri 0.95 deðeri sonucunu verir'',
+kordinatlardan 1.64 z-skorunu buluyoruz. Ya da
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print norm.ppf(0.95)
+\end{minted}
+
+\begin{verbatim}
+1.64485362695
+\end{verbatim}
+
+
+$$ P(Z \le 1.64)  = 0.95 $$
+O zaman 
+
+$$ \frac{\bar{y}^* - 25.0}{2.4 / \sqrt{30}} = 1.64 $$
+
+ve buradan $\bar{y}^* = 25.178$ sonucu çýkýyor. 26.3 deðeri bu deðerden
+yüksektir demek ki sýfýr hipotezi çürütülmüþtür. Yeni yakýt katkýsýnýn
+performansý arttýrýyor olmasý büyük bir olasýlýktýr. 
+
+Not: Bu testi aslýnda daha basit þekilde $\bar{y}^* = 26.3$ deðerini
+vererek elde edilen deðeri 0.05'ten küçük olup olmadýðýna bakarak ta
+yapabilirdik. Fakat metotu inþa ediyorduk o sebeple daha fazla örnekli
+anlatmak gerekti. 
+
+Örnek
+
+SAT-I testinde ülke averajýna oldukça yakýn sonuçlar alan bir lisede yeni
+bir müfredat denenmesine karar veriliyor. Deneme için 86 öðrenci rasgele
+þekilde seçiliyor ve yeni bir tür cebir ve geometri dersine
+sokuluyor. Sonraki SAT-1 testinde sonuçlarýna göre bu çocuklar ortalama 502
+sonuç almýþlar, ülke çapýndaki ortalama 494, standart sapma
+124. $\alpha=0.05$ önemliliði (significance) seviyesinde yeni müfredatýn
+baþarýlý olduðu iddia edilebilir mi? 
+
+Ýlk önce $\mu$ parametresinin yeni müfredatýn gerçek ortalamasý olduðunu
+farzediyoruz. O zaman statüko nedir? Bu ortalamanýn ülke ortalamasý
+seviyesinde kalmasýdýr, yani $\mu_0 = 494$ olmasýdýr. Fakat bu sefer
+alternatif hipotez iki yönlü (two-sided) olmalý çünkü yeni müfredat, hiç
+istenmese de, test sonuçlarýnda negatif sonuca da yol açabilir! O zaman
+$H_0$'i reddetmeliyiz eðer z istatistiði $\le -z_{0.025}$ ise (yani
+-1.96'dan küçük ise), ya da $\ge z_{0.025}$ (yani 1.96'dan büyük ise). 
+
+$$ z = \frac{502-494}{124\sqrt{86}} = 0.60$$
+
+Sonuç 1.96'dan büyük deðil. O zaman $H_0$'i, yani statükoyu
+deðiþtiremedik. Elde edilen sonuçlar bir ilerlemedir fakat bu ilerlemenin þans
+eseri olmasý da muhtemel.
+
+\includegraphics[height=5cm]{sat1.png}
+
+Binom Hipotez Testleri
+
+Örnek
+
+Erteleme Teorisi: Yaygýn bir inanýþa göre insanlar ölüm tarihlerini onlar
+için önemli bir gün sonrasýna erteleyebiliyorlar, mesela kendi doðum
+günleri, aile toplantýlarý, bir akrabanýn dönüþünü beklemek, vs. gibi Hatta
+ülke çapýnda seçimlerin bile ölüm günlerini etkilediði görülmüþtür,
+baþkanlýk seçimleri olan Eylül ve Ekim aylarý sýrasýnda ölüm oranlarýnýn
+düþtüðü saptanmýþtýr. Bu teoriye göre pek çok yaþlý insan kimin kazandýðýný
+görmek için ``biraz daha dayanýyor''.
+
+Bir araþtýrma bu teorinin doðru olup olmadýðýný kontrol etti. Bu baðlamda
+Salt Lake City þehrindeki bir gazetenin ölüm ilaný kýsmýna bakýldý ve 747
+kiþi içinden sadece 60 kiþinin, daha doðrusu \%8'inin kendi doðumgünlerinin
+3 ay öncesi içinde olduðunu saptadý. Eðer insanlarýn ölümü rasgele olsaydý
+yaklaþýk olarak \%25'inin bu periyod içinde ölmesini beklerdiniz. O zaman
+bu \%25'den \%8'e düþüþü nasýl açýklamalýyýz?  Araþtýrma teoriyi
+destekleyecek rakamlarý veriyor mu?
+
+Diyelim ki 747 ölüm iki kategori üzerinden temsil edilsin, doðumgünü
+öncesindeki 3 ay içinde ölenler ve ölmeyenler. $k_i=1$ ile $i$'inci kiþinin
+1. kategoriye, $k_i=0$ ise 2. kategoriye ait olmasýný temsil ediyoruz. O
+zaman $k = k_1 + k_2 + .. + k_{747}$ birinci kategorideki toplam ölümü
+temsil ediyor. Üstteki her $k$ doðal olarak Binom daðýlýmý, ve $p$
+parametresini kullanýyor ki 
+
+$$ p = P(\textrm{sahýs doðumgünü öncesindeki 3 ay içinde ölüyor}) $$
+
+Eðer insanlar ölümlerini ertelemeseydi $p = 3/12 = 0.25$ olurdu. Eðer
+erteliyorlar ise $p$ 0.25'den daha küçük olmalý. Bu azalmanýn ne kadar
+önemli (significant) olduðunu irdelemek için tek taraflý bir Binom Testi
+uygulamak lazým. 
+
+$H_0$: $p = 0.25$
+
+$H_1$: $p < 0.25$
+
+Test için $p_0$ olduðunu farzettiðimiz ``gerçek'' daðýlýmý (ki statükoyu
+onun üzerinden temsil edeceðiz) kullanacaðýz. 
+
+$$ z = \frac{k-np_0}{\sqrt{np_0(1-p_0)}} \le -z_{0.05} = -1.64 $$
+
+$$ = \frac{60-747(0.25)}{747(0.25)(0.75)} = -10.7 \le -1.64  $$
+
+Test istatistiði kritik deðerin aþýrý derecede sol tarafýna düþtü. Demek ki
+ezici miktarda kanýt, veri, sonuç elde ettik, \%25'ten \%8'e düþüþün pür
+þans dýþýnda baþka bir sebebi var. Tabii bu sebep Erteleme Teorisi
+haricinde bir þey de olabilir, fakat yine de ortaya çýkan kalýp bize ölüm
+vaktimizin kontrolümüzde olduðunu destekleyen yönde bir sonuç veriyor.
+
+Not: Üstteki test ``büyük örneklem'' olduðu durumlarda geçerlidir. Küçük
+örneklem durumunda Binom daðýlýmýnýn kendisi test için kullanýlabilir.
+
+Tek Örneklem t Testi (The One-Sample t test)
+
+Bu test verinin bir $N(\mu,\sigma)$ Normal daðýlýmýndan geldiðini farzeder,
+test etmek istediðimiz hipotez / karþýlaþtýrma $\mu = \mu_0$. Ayrýca
+$\sigma$ bilinmiyor, ki Öðrenci t daðýlýmýndan bahsetmemizin ana sebebi
+buydu zaten, o zaman hipotez testine Tek Örneklem t Testi adý verilir.
+
+Örnek
+
+Alttaki veride bir grup hanýmýn ne kadar kalori tükettiði
+kayýtlanmýþ. Acaba bu hanýmlarýn aldýðý enerji tavsiye edilen 7725'ten ne
+kadar sapmýþtýr?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+daily_intake = np.array([5260.,5470.,5640.,6180.,6390.,6515.,6805.,\
+7515.,7515.,8230.,8770.])
+\end{minted}
+
+Örneklem küçük. O sebeple t daðýlýmý kullanmak mantýklý. t deðerini
+$\frac{\bar{y}-\mu_o}{s/\sqrt{n}}$ olarak hesaplayacaðýz, ki $\mu_0=7725$
+olacak.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import t
+import pandas as pd, math
+data = pd.DataFrame(daily_intake)
+n = len(data)
+df = n-1 # serbestlik derecesi
+mu0 = 7725.
+ybar = float(data.mean())
+s = float(data.std())
+print 'ortalama',ybar,'std',s
+tval = (ybar-mu0)/(s/np.sqrt(n))
+print 'df',df,'tval',tval
+print 'sol',t.ppf(0.025,df)
+print 'sag',t.ppf(0.975,df)
+\end{minted}
+
+\begin{verbatim}
+ortalama 6753.63636364 std 1142.12322214
+df 10 tval -2.82075406083
+sol -2.22813885196
+sag 2.22813885196
+\end{verbatim}
+
+Sol ve sað eþik deðerlerini hesapladýk ve t deðeri bu aralýðýn içine
+düþmüyor. Yani hipotezi reddediyoruz. Bazýlarý bu problemde p deðeri görmek
+isteyebilir, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 't degeri', tval
+print 'iki tarafli p degeri', 2*t.cdf(tval,df)
+\end{minted}
+
+\begin{verbatim}
+t degeri -2.82075406083
+iki tarafli p degeri 0.0181372351761
+\end{verbatim}
+
+p deðeri hesapladýk 0.05'ten küçük çýktý. Ýkiyle çarpmamýzýn sebebi
+iki-taraflý p-testi yapmýþ olmamýz, yani kabul edilebilir bölgenin hem
+solundan hem de saðýndan ne kadar dýþýna düþüyorsak, bu iki taraftaki p
+deðerini birbirine toplamalýyýz. Tabii t daðýlýmý simetrik olduðu için her
+iki taraftan da ayný þekilde dýþarýda kalýyoruz. Bazý kaynaklar iki taraflý
+p testinin $|t| < -t_{esik,derece}$ karþýlaþtýrmasýný yaptýðýný söyler.
+
+Benzer bir hesabý kütüphane çaðrýsý ile yaparsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import ttest_1samp
+t_statistic, p_value = ttest_1samp(daily_intake, mu0)
+print 't', t_statistic, 'one-sample t-test', p_value
+\end{minted}
+
+\begin{verbatim}
+t -2.82075406083 one-sample t-test 0.0181372351761
+\end{verbatim}
+
+Sonuç p deðeri 0.05'ten küçük çýktý yani yüzde 5 önemliliðini
+(significance) baz aldýk bu durumda veri hipotezden önemli derecede
+(significantly) uzakta. Demek ki ortalamanýn 7725 olduðu hipotezini
+reddetmemiz gerekiyor.
+
+Ýki Örneklemli Test
+
+Gruplar 0/1 deðerleri ile iþaretlendi, ve test etmek istediðimiz iki grubun
+ortalamasýnýn (mean) ayný olduðu hipotezini test etmek. t-test bu arada
+varyansýn ayný olduðunu farzeder.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+energ = np.array([
+[9.21, 0],[7.53, 1],
+[7.48, 1],[8.08, 1],
+[8.09, 1],[10.15, 1],
+[8.40, 1],[10.88, 1],
+[6.13, 1],[7.90, 1],
+[11.51, 0],[12.79, 0],
+[7.05, 1],[11.85, 0],
+[9.97, 0],[7.48, 1],
+[8.79, 0],[9.69, 0],
+[9.68, 0],[7.58, 1],
+[9.19, 0],[8.11, 1]])
+group1 = energ[energ[:, 1] == 0][:, 0]
+group2 = energ[energ[:, 1] == 1][:, 0]
+t_statistic, p_value = ttest_ind(group1, group2)
+print "two-sample t-test", p_value
+\end{minted}
+
+\begin{verbatim}
+two-sample t-test 0.00079899821117
+\end{verbatim}
+
+$p$ deðeri $< 0.05$ yani iki grubun ortalamasý ayný deðildir. Ayný olduðu
+hipotezi reddedildi.
+
+Eþlemeli t-Test (Paired t-test)
+
+Eþlemeli testler ayný deneysel birimin ölçümü alýndýðý zaman
+kullanýlabilir, yani ölçüm alýnan ayný grupta, deney sonrasý deneyin
+etki edip etmediði test edilebilir. Bunun için ayný ölçüm deney
+sonrasý bir daha alýnýr ve "farklarýn ortalamasýnýn sýfýr olduðu"
+hipotezi test edilebilir. Altta bir grup hastanýn deney öncesi ve
+sonrasý ne kadar yiyecek tükettiði listelenmiþ. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+intake = np.array([
+[5260, 3910],[5470, 4220],
+[5640, 3885],[6180, 5160],
+[6390, 5645],[6515, 4680],
+[6805, 5265],[7515, 5975],
+[7515, 6790],[8230, 6900],
+[8770, 7335],
+])
+pre = intake[:, 0]
+post = intake[:, 1]
+t_statistic, p_value = ttest_1samp(post - pre, 0)
+print "paired t-test", p_value
+\end{minted}
+
+\begin{verbatim}
+paired t-test 3.05902094293e-07
+\end{verbatim}
+
+Wilcoxon iþaretli-sýralý testi (Wilcoxon signed-rank test)
+
+t Testleri Normal daðýlýma göre sapmalarý yakalamak açýsýndan,
+özellikle büyük örneklemler var ise, oldukça saðlamdýr. Fakat bazen
+verinin Normal daðýlýmdan geldiði faraziyesini yapmak istemeyebiliriz.
+Bu durumda {\em daðýlýmdan baðýmsýz metotlar} daha uygundur, bu tür
+metotlar için verinin yerine çoðunlukla onun sýra istatistiklerini
+(order statistics) kullanýr.
+
+Tek örneklemli Wilcoxon testi için prosedür $\mu_0$'i tüm veriden çýkartmak ve
+geri kalan (farklarý) iþaretine bakmadan sayýsal (numeric) deðerine göre
+sýralamak, ve bu sýra deðerini bir kenara yazmak. Daha sonra geri dönüp bu sefer
+çýkartma iþlemi sonucunun iþaretine bakmak, ve eksi iþareti taþýyan sýra
+deðerlerini toplamak, ayný iþlemi artý iþareti için yapmak, ve eksi toplamý artý
+toplamýndan çýkartmak. Sonuçta elimize bir istatistik $W$ gelecek. Bu test
+istatistiði aslýnda $1..n$ tane sayý içinden herhangi birini $1/2$ olasýlýðýyla
+seçmek, ve sonuçlarý toplamaya tekabül etmektedir. Ve bu sonuç yine \verb!0.05!
+  ile karþýlaþtýrýlýr.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import wilcoxon, ttest_ind
+daily_intake = np.array([5260,5470,5640,6180,6390,6515,6805,7515,7515,8230,8770])
+z_statistic, p_value = wilcoxon(daily_intake - 7725)
+print "one-sample wilcoxon-test", p_value
+\end{minted}
+
+\begin{verbatim}
+one-sample wilcoxon-test 0.0279991628713
+\end{verbatim}
+
+Hipotezi reddettik.
+
+Eþlemeli t-testi þimdi Wilcoxon testi ile yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+z_statistic, p_value = wilcoxon(post - pre)
+print "paired wilcoxon-test", p_value
+\end{minted}
+
+\begin{verbatim}
+paired wilcoxon-test 0.00463608893545
+\end{verbatim}
+
+Normallik Testi
+
+Paket \verb!scipy.stats! altýnda normallik testleri için bazý çaðrýlar var,
+bu tekniklerden ikisini altta gösteriyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.stats as st
+arr = np.array([3,4,3,10,10,444,444,3,98])
+arr2 = np.array([np.random.normal() for i in range(100)])
+
+print 'D-Agostino and Pearsons'
+print st.normaltest(arr)
+print st.normaltest(arr2)
+print
+print 'Shapiro-Wilk'
+print st.shapiro(arr)
+print st.shapiro(arr2)
+\end{minted}
+
+\begin{verbatim}
+D-Agostino and Pearsons
+(4.6919700569024814, 0.095752836393526289)
+(1.4265636263795889, 0.49003335773235424)
+
+Shapiro-Wilk
+(0.6167718172073364, 0.00015052134403958917)
+(0.9891485571861267, 0.5962899923324585)
+\end{verbatim}
+
+Sonuçlara göre Shapiro-Wilk yaklaþýmý daha güvenilir gözüküyor, zaten [6,
+sf 53]'e göre örneklem sayýsý $\le 50$ olduðu durumlarda bu test tercih
+edilmelidir.
+
+Biraz Matematik
+
+Diyelim ki Gaussian daðýlýmýna sahip olduðunu düþündüðümüz $\{ x_i\}$
+verilerimiz var. Bu verilerin Gaussian daðýlýmýna uyup uymadýðýný nasýl
+kontrol edeceðiz? Normal bir daðýlýmý her veri noktasý için þöyle temsil
+edebiliriz,
+
+$$ y_i = \Phi\bigg(\frac{ x_i - \mu}{\sigma}\bigg) $$
+
+Burada $\Phi$ standart Gaussian'ý temsil ediyor (detaylar için [7] ve CDF
+fonksiyonuna tekabül ediyor. CDF fonksiyonunun ayný zamanda yüzdelik dilimi
+(quantile) hesapladýðý söylenir, aslýnda CDF son derece detaylý bir
+olasýlýk deðeri verir fakat evet, dolaylý yoldan noktanýn hangi çeyrek
+içine düþtüðü de görülecektir.
+
+Þimdi bir numara yapalým, iki tarafa ters Gaussian formülünü uygulayalým,
+yani $\Phi^{-1}$.
+
+$$ \Phi^{-1}(y_i) = \Phi^{-1}\bigg( \Phi\bigg(\frac{ x_i - \mu}{\sigma}\bigg)\bigg) $$
+
+$$ \Phi^{-1}(y_i) = \frac{ x_i - \mu}{\sigma}$$
+
+$$ x_i = \Phi^{-1}(y_i) \sigma + \mu  $$ 
+
+Bu demektir ki elimizdeki verileri $\Phi^{-1}(y_i)$ bazýnda grafiklersek,
+bu noktalar eðimi $\sigma$, kesisi (intercept, y ekseninin kesildiði yer)
+$\mu$ olan bir düz çizgi olmalýdýr. Eðer kabaca noktalar düz çizgi
+oluþturmuyorsa, verimizin Gaussian daðýlýma sahip olmadýðýna karar
+verebiliriz.
+
+Üstte tarif edilen grafik,  olasýlýk grafiði (probabýlýty plot) olarak
+bilinir. 
+
+Ters Gaussian teorik fonksiyonunu burada vermeyeceðiz, Scipy
+\verb!scipy.stats.ýnvgauss! hesaplar için kullanýlabilir. Fakat $y_i$'nin
+kendisi nereden geliyor? Eðer $y_i$, CDF'in bir sonucu ise, pür veriye
+bakarak bir CDF deðeri de hesaplayabilmemiz gerekir. Bunu yapmak için bir
+baþka numara lazým. 
+
+1. Eldeki sayýlarý artan þekilde sýralayýn
+
+2. Her veri noktasýna bir derece (rank) atayýn (sýralama sonrasý hangi
+seviyede olduðu yeterli, 1'den baþlayarak). 
+
+3. Çeyrek deðeri $y_i$ bu sýra / $n+1$, $n$ eldeki verinin büyüklüðü. 
+
+Bu teknik niye iþliyor? $x$'in CDF'i $x_i < x$ þartýna uyan $x_i$'lerin
+oraný deðil midir? Yani bir sýralama söz konusu ve üstteki teknik te bu
+sýralamayý biz elle yapmýþ olduk, ve bu sýralamadan gereken bilgiyi aldýk. 
+
+Basit bir Gaussian kontrolü, \verb!qqplot! kullanarak. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.api as sm
+fig = sm.qqplot(arr)
+plt.savefig('stat_tests_01.png')
+\end{minted}
+\includegraphics[height=6cm]{stat_tests_01.png}
+
+Gerçekten Gaussian olan bir veri þöyle gözükür, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fig = sm.qqplot(arr2)
+plt.savefig('stat_tests_02.png')
+\end{minted}
+\includegraphics[height=6cm]{stat_tests_02.png}
+
+Kaynaklar
+
+[1] Dalgaard, {\em Introductory Statistics with R}
+
+[2] Kerns, {\em Introduction to Probability and Statistics Using R}
+
+[3] Blondel, {\em t-test and wilcoxon-test examples in Python}, url{https://gist.github.com/mblondel/1761714}
+
+[4] Runger, {\em Applied Statistics and Probability for Engineers}
+
+[5] Stack Exchange, {\em Sample variance converge almost surely}, \url{http://math.stackexchange.com/questions/243348/sample-variance-converge-almost-surely}
+
+[6] Haslwanter, {\em Introduction to Statistics using Python}
+
+[7] Bayramli, Ýstatistik, {\em Giris})
+
+[8] Bayramli, Istatistik, {\em Örneklem Büyüklüðü}
+
+\end{document}
+

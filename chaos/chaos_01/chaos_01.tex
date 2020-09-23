@@ -1,0 +1,638 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 1
+
+Bu ders için önkoþul bilgi: en önemlisi Calculus. Bir baþkasý bir eðriyi
+taslaksal olarak çizmek, zihinde hayal edebilmek. Derste bir belli parametreleri
+olan bir fonksiyondan bahsettiðim zaman bu fonksiyonlarý bilgisayara ihtiyaç
+duymadan taslak olarak çizebilmek önemli. Bu çizimi belli aileye ait eðriler
+için bir parametreye göre / deðiþirken yapabilmek iyi olur, Calculus'un o
+tarafýyla kendimizi rahat hissetmemiz lazým. Lineer Cebir'den özdeðerler ve
+özvektörler gerekli. Biraz Ýleri Calculus iyi olur, mesela bir Jacobian'ýn ne
+olduðu. Kýsmi türev nasýl alýnýr bu kesin lazým... Biraz çok deðiþkenli Taylor
+Serileri bilgisi, ama çok deðil. Derste bir noktada Fourier analizi
+kullanacaðýz, ama bu konuyu bildiðiniz farzedilmeyecek, derste o konuyu da
+anlatacaðýz.
+
+Genel bilim bilgisi faydalý olur tabii, mesela Kimya, Biyoloji gibi
+konular, genel mühendislik te öyle, ama bu bilgi de þart deðil; Gereken
+bilim bilgisini o bilim dalýna dokunduðumuz zaman o anda göstereceðim. 
+
+Dersimizin sene olarak seviyesi 1. sene üstlisans diyebilirim. Bazen lisans
+öðrencileri dersi almak istiyorlar, onlara evet diyorum, bu mümkün. Fakat
+bu ders biraz aldatýcý, gözyanýltýcý olabilir. Dýþarýdan ilk bakýþta
+basitmiþ gibi gözüküyor, fakat içinde bazý incelikler, kavisler var, bunlar
+insaný zorlayabilir. Zorluk þurada aslýnda, bu ders sizi deðiþik bir stilde
+düþünmeye zorlayacak. Ýçinde bir sürü ispatlar, hesaplar olan bir ders
+deðil bu, zihinde canlandýrma, geometrikleþtirme gerekecek, ve sezgi
+(intuition) çok önemli.
+
+Bilgisayarý bol bol kullanýn; bir diferansiyel denklemi Matlab [Python!]  ile
+çözmeyi rahatça yapabilmek iyi olur, paketler üzerinden, kendi kodunuzu yazarak,
+nasýl yapacaðýnýz size kalmýþ, sadece þunu bilelim, gayrý lineer sistemleri
+çözmek için bazen bilgisayar hesabý gerekli.
+
+Artýk derse baþlayabiliriz. 
+
+Önce biraz tarih: konumuz nasýl baþladý? Nasýl geliþti? Ana geliþme
+noktalarý þunlar, 
+
+1666: Newton
+
+Basit Diferansiyel Denklemler (Ordinary Differential Equations
+-ODE-). Isaac Newton bu noktada 23 yaþýnda, bu onun için büyük bir sene,
+Calculus'u o yýl icat etti, optik konusunun kurallarýný keþfetti, evrensel
+yerçekim gücünü keþfetti, baþka iþler de yaptý.. bu sene onun için iyi
+geçti yani. Newton ODE'leri tamamen keþfetti denemez tabii, ama o ana kadar
+ODE alanýnda en ileri giden o'ydu. Hangi tür hesaplar için? Kepler
+gezegenlerin eliptik þekilde hareketini teorize etmiþti, Newton bunlarý
+Calculus kullanarak modelleyebildi. Dinamik (dynamics) alanýnýn baþlangýcý
+burasý. Daha ilginci Newton bizim bugün 2-cisim problemi (2-body problem)
+dediðimiz problemi çözdü, yani güneþ ile dünyanýn etkileþimi nasýldýr,
+vs. ve eliptik yörünge zaten bu çözümden ortaya çýktý. Fakat Newton 3-cisim
+problemini denediðinde, yani dünya, güneþ, ay üçlüsü için, bu problemi
+çözemediðini farketti. Newton etrafýndaki tanýdýklarýna ``hiçbir problem
+bende týbbi baþaðrýsý yaratmamýþtý'' demiþ, 3-cisim problemi onu hakikaten
+zorlamýþ olmalý. Bu problemi diðer bilimciler de çözmeye uðraþtý. 
+
+1800 Sonlarý:
+
+Bu noktaya ileri sarýyoruz; ve hala kimse 3-cisim problemini
+çözemedi. Okkalý bilim adamlarýndan kim varsa denedi: Euler, Gauss, vs. Ve
+nihayet matematikçi Poincare meselenin ne olduðunu keþfetti - problemin
+analitik (closed form solution) çözümü mümkün deðildi. Poincare Calculus'a
+ek olarak geometri kullanarak bizim bugün kaos dediðimiz matematiksel
+olguyu görmüþtür. Kaos'u ilk gözlemleyen, belirten o'dur.  Bu geometrik
+yaklaþýmda faz alaný (phase space) dediðimiz bir kavram var, bunu ileride
+göreceðiz.
+
+Not - Tabii kaos deyince kaos'u tanýmlamak lazým.
+
+Kaos deterministik sistemlerde ortaya çýkar. Bu ilginç gelebilir, çünkü
+kaos kelimesini çoðunlukla kargaþa, karmaþa ile özdeþleþtiririz, ve bu
+rasgelelik kavramlarýný çaðrýþtýrýr. Fakat tamamen deterministik olarak,
+yani hiç rasgelelik (stochastics) içermeyecek þekilde matematiksel kaos
+ortaya çýkabilir. Bu tür deterministik sistemlerde dönemsiz (aperiodic),
+yani kendini tekrar etmeyen, ve bir noktada durmayýp devam edebilen
+durumlar oluyor, ve bu durum dýþ dünyaya ``tahmin edilemez'' þekilde
+yansýyor. 
+
+Bir diðer özellik kaotik sistemlerin ``baþlangýç anýna olan hassas
+baðlantýsý''dýr, bu özelliðe sahip sistemler baþlangýç noktasýndan bir süre
+sonra bir konuma geldiler diyelim, eðer baþlangýç þartlarýný azýcýk bile
+deðiþtirsek (simülasyonu baþa sardýk mesela) ve sistemi tekrar iþletsek bu
+tür sistemler ayný süre ardýndan tamamen baþka bir konumda
+olabiliyorlar. Bu iki simülasyon baþlangýç ardýndan az bir süre aþaðý
+yukarý ayný gidebiliyorlar, fakat bir süre sonra, üstel bir hýzda,
+birbirlerinden farklýlaþýyorlar. ``Hassas baðlantý'' ile söylemek
+istediðimiz bu, baþlangýçtaki ufak farklýlýklar aþýrý bir hýzda
+alternatiften ayrýþýyorlar, bu da öngörülemezliðin ana sebeplerinden
+biri. Rasgelelik deðil bu, tekrar belirtelim, yakýn vade tahminler hala
+mümkün olabiliyor.
+
+Poincare bunlarý 3-cisim probleminde görebiliyordu. Bu noktada Poincare'nin
+konu hakkýndaki yayýnladýklarýnýn Kaos'ta bir patlama yaratacaðýný
+düþünüyor olabiliriz, bunlar olmadý çünkü kimse Poincare'nin yaptýklarýný
+anlamadý. Bana göre sebeplerden biri Poincare'nin resim çizme yeteneðinin
+çok kötü olmasý; deha bir matematikçiydi, hatta görsel / geometrik olarak
+düþünebiliyordu, fakat iþ çizmeye gelince bunu yapamýyordu, ki kaosu
+öðretmek için bu biraz gerekli.
+
+Kaos'un bir türlü patlama yapamamasýndaki bir diðer sebep zamanlama: Poincare
+zamanýnda, 1800'lu yýllarýn sonu 1900'lerin baþýnda, klasik mekanik alaný
+hareketin ve bereketin olduðu yerler deðil. Aksiyon diðer matematik alanlarýnda,
+hatýrlarsak 1900'lu yýllar baþýnda kuantum mekaniði baþlýyor, izafiyet kuramý
+üzerinde çalýþýlýyor.. ve artýk kimse 3-cisim problemine bakmak istemiyor. 200
+senedir bakýlmýþ bu probleme, ve herkes býkmýþ, baþka þeyler yapýlmak isteniyor.
+
+1920 - 1950s: Gayrý-Lineer Titreþirler (Non-linear Oscillators). 
+
+Bu dönemde mühendislik ve fizikte mesela radyonun keþfi var, ki radyolar vakum
+tüpü teknolojisiyle iþlerler (tüpler bugünkü transistörlerin babasý sayýlýr), ve
+radyoda kullanýlan tüplerde gayrý lineer bir titreþir kullanýlmýþtýr. Radar,
+lazer hep gayrý lineer dinamiðe baðlý olarak çalýþan þeyler. Bu dönemde gayrý
+lineerlik hakkýnda bir kitap okumak isteseniz sadece titreþirler konusunu
+görürdünüz, çünkü kaos dediðimiz gibi artýk unutulmuþ durumdaydý.
+
+1950: Bilgisayar keþfedildi. 
+
+Bu keþifte 2. Dünya Savaþý'nýn etkisi oldu, ardýndan Soðuk Savaþ. Bilgisayar
+gayrý lineer sistemler alanýnda faydalý bir araç oldu, görsel olarak grafiklemek
+olsun, çözümde, simülasyonda olsun, pek çok fayda getirdi.
+
+1960'lý Yýllar: 
+
+MIT'den meteorolog ve matematikçi Lorenz, ki kendisi dersimizin kahramanlarýndan
+biri, bu bilgisayarlar sayesinde bazý buluþlar yaptý. Lorenz'in en önemli
+buluþlarýndan biri taþýným (convection) sistem modelinde kaos bulmasý. Lorenz'in
+asýl ilgilendiði hava tahminiydi, o konuyu araþtýrýrken sývý dinamiðinden
+esinlenen havadaki taþýným kurallarýný modelleyen bir yaklaþýmý inceliyordu, ve
+bu modelin öngörülemez bir þekilde davrandýðýný gördü. Konu hakkýnda yazdýðý
+makalede kaos kelimesini kullanmadý, ``deterministik dönemsiz akým''
+kelimelerini kullandý; bu makaleyi tavsiye ederim, çok güzel yazýlmýþ,
+anlaþýlabilir bir makale. Bu noktada diyebilirsiniz ki, tamam kaos patlamasý
+artýk þimdi baþlayacak, ama Lorenz'in bulduklarýyla da kimse ilgilenmedi. Sebep
+kýsmen Lorenz'in yayýnlarýnýn fizikçilerin okumadýðý meteoroloji dergisinde
+çýkmasý, ama diðeri Lorenz'in sývý mekaniði'ndeki arkadaþlarýnýn bile modele
+bakýp ``bu ne biçim model?'' diye yapýlaný beðenmemeleri! Yani yapýlanlarýn,
+Lorenz'in buluþunun öneminin kavranamamasý.
+
+Bu sýrada Smale, diðer bir köþede, KAM baþ harfleriyle bilinen bir (üçlü)
+matematikçi grubunun yaptýklarý da var, bu araþtýrma pür matematiksel
+olarak devam eden bir araþtýrmaydý, bugün daha matematiksel bir kaos dersi
+alsanýz Smale ve KAM o derste sürekli iþlenir. Bu kiþiler Poincare'nin
+yolundan gittiler, o araþtýrmayý canlý tutmaya çalýþtýlar, ve onlar da çok
+önemli, derin iþler yaptýlar. Ama ana akým bilim onlarla da pek
+ilgilenmedi. 
+
+1975: 
+
+Nihayet kaos patlamasý baþlýyor. Bir sürü buluþ 70'li yýllarda ardý ardýna
+gelmeye baþladý. Robert May adlý nüfus bioloðu yinelenen eþlemlerinde (iterated
+maps) kaos keþfetti, ki bu modellerde zaman ayrýksal ve $x_{n+1}= f(x_n)$
+deðiþim olarak gösteriliyor, bu yaklaþým nüfus dinamiðini daha basit bir þekilde
+temsil etmeye yarýyor. $f()$'i mesela hesap makinesinde ardý ardýna
+iþletebileceðimiz bir hesap gibi görebiliriz, belki hesap makinesinde bunu
+yapmýþsýnýzdýr, sürekli kosinüs (cos) düðmesine basmak mesela [böylece kosinüs
+  çýktýsý bir sonraki kosinüs hesabý için girdi oluyor]. Bu ardý ardýna iþletim
+bir tür yinelen eþlenim olarak görülebilir. Lorenz sisteminden sonra bu dinamiðe
+bakacaðýz.
+
+May 1960'da bir makale yazdý, baþlýðý ``çok çetrefil dinamiði olan basit lineer
+sistemler'', bu makale ünlü {\em Nature} dergisinde çýktý, ve artýk pek çok kiþi
+önlerinde araþtýrýlacak koca yeni bir alan olduðunu farketmeye baþladý. May
+diðer yandan pedagojik olarak ta önemli bir mesaj veriyordu, ``öðrencilerimize
+habire lineer sistemler öðretiyoruz, yeni problemlerden haberleri olmalý,
+lineerliðe girince pek çok bilinen alt-üst oluyor'' vs. May kendini duyurmayý
+baþardý. May'in ilgi alaný lojistik denklemlerdi denebilir.
+
+Diðer yanda Mandelbrot var, o fraktallar konusuna baktý, ki bu konunun da kaos
+ile çok yakýndan baðlantýlarý olduðu ortaya çýktý.
+
+Winfree - biyolojide lineer titreþirleri inceliyordu. Winfree benim hocamdýr, bu
+sebeple onun yaptýklarýna daha yakýnlýk hissediyorum tabii (!), fakat Winfree
+matematikte, kaosta önemli ilerlemeler yaptý, mesela topolojiyi matematiksel
+biyolojiye getirmek gibi.
+
+Nihayet, pür matematikçi Ruelle ve Takens - kaos alanýnda yapýlmaya
+baþlananlarýn klasik mekaniðin en büyük çözülmemiþ problemi türbülansý analiz
+etmekle yakýn baðlantýlarýnýn olabileceðini düþünmeye baþladýlar, ve konuya o
+yandan yaklaþtýlar. Türbülans bilindiði gibi Navier Stokes denklemlerinde,
+gerçek akýþkan sistemlerde türbülansýn nasýl davrandýðý. Belki türbülans kaosun
+farklý bir formundan ibaretti?
+
+70'lerde bu iþ iyice büyüdü. Ýsmini de bu sýrada aldý (Jim York
+isimlendirdi). 
+
+1978:
+
+Bu sürecin zirve yaptýðý an herhalde Feigenbaum adlý genç bir fizikçinin
+lojistik eþlemi ve diðer tür yinelen eþlemlerinin arasýnda, ve faz geçiþleri
+(phase transitions) arasýnda baðlantýyý bulmasý. Feigenbaum ``kaosa giden
+evrensel yol''u keþfetti, birbirinden tamamen farklý, kimi biyolojik, kimi
+kimyasal sistemlerin sayýsal olarak kaosa týpatýp ayný þekilde gidebildiðini
+gördü. Yani düzenli konumdan kaosa evriliþin matematiksel kurallarý
+vardý. Feigenbaum tüm bunlarý istatistiki fizikteki faz geçiþine baðlayýnca, pek
+çok insana bu inanýlmaz geldi.
+
+Bu nokta kaosun, ve bu dersin tepe noktalarýndan biri, dersin süreci içinde
+bunlarý göreceðiz. Feigenbaum'un yaptýðý ana iþ þudur: tekrar normalizasyon
+(renormalization) tekniðini kullanmaktýr, ki bu buluþ daha sonra tekrar
+normalizasyon grubu denklemleri olarak geliþtirildi, bunu yapan bilimci
+fizikte Nobel ödülü aldý.
+
+1980'li Yýllar:
+
+Artýk patlama noktasýndayýz. Kaos, fraktallar her yerde. James Gleick adlý
+yazar kaos hakkýnda {\em Kaos} adýnda bir kitap yazdý, müthiþ satýþ
+yaptý. Steven Spielberg'in {\em Jurassic Park} filminde (erken 90'li
+yýllar, ama senaryo 80'li yýllarda yazýlmýþ) karakterlerden biri kaos
+teorisyeni, ``dinazorlarý þuraya koyarsanýz, ne olacaðý belli
+olmayabilir'', gibi þeyler söylüyor. Yani artýk popüler kültüre de giriþler
+yapýlmýþ.
+
+Diðer yandan deneysel olarak kaosun teorik bulgularý da sürekli doðrulanýyor. 
+
+1990'li Yýllar: 
+
+Zirveden iniþ, daha doðrusu, artýk kaos baþka alanlara dönüþüyor, onlarý
+etkiliyor. Dönüþümlerden biri çetrefil sistemler (complex systems). Kaos
+3-4 deðiþkenleri sistemlere bakýyordu, çetrefil sistemler ``milyon, milyar
+sayýda deðiþken olsa ne olur?'' gibi sorular sormaya baþladý. 
+
+2000'li Yýllardan Bugüne: 
+
+Artýk hareket ve bereket çetrefil sistemlerde, ve çizit teorisi'nde
+(network theory). Artýk sýrf kaoscu olan yok, ilgi baþka alanlara kaydý.
+
+Soru
+
+Uzay Yarýþý baþladýðýnda [Sovyetler ve Amerikalýlar arasýnda] kimse
+Poincare'nin buluþlarýný kullandý mý? 
+
+Cevap
+
+Kaosun bulgularý uzay taþýtlarýnýn en az enerji ile ilerlemesini saðlayacak
+gidiþ yollarýný (trajectory) bulmakta faydalý oldu. Uzaydaki gezegen çekim
+alanlarýnýn etkileþiminden kaotik gidiþ yollarý ortaya çýkýyor, ve ne
+yaptýðýnýzý biliyorsanýz kaosun baþlangýç anýna olan hassas baðlantý
+prensibini kullanarak bu alanlar üzerinden sörf yapabilirsiniz. Bir kere
+yakýtsýz kalan bozuk bir uzay aracýný mühendisler bu þekilde dünyaya geri
+getirdiler.
+
+Soru
+
+Mandenbrot kaosta yapýlanlardan etkilendi mi? 
+
+Cevap
+
+Onun yaptýklarý paralel bir yolda gerçekleþti bence. O borsayý inceledi,
+bulutlarýn þekillerine baktý, vs. Mandelbrot kümesini keþfetti, ki bu kavram
+yinelenen eþlenimlerle çok yakýndan alakalý, yani Mandelbrot kaosa pek çok
+yönden yakýnlaþtý, fakat onun ana hedefi baþkaydý. Ana baðlantý kaosta
+incelediðimiz pek çok geometrik þeklin fraktal olmasý.
+
+Tarih böyle. Þimdi iþin matematiðine gelelim. 
+
+Önce tüm dönem iþleyeceðimiz konularýn bir resmini çizmek istiyorum. Böylece her
+an bu resmin neresindeyiz onu görebileceðiz. Ayrýca konuya ``dinamik''
+kelimesiyle atýf yapacaðým, çünkü zamana baðlý olarak deðiþen her þeyi benim
+gözümde dinamik alanýna giriyor.
+
+Dinamiðin Mantýki Yapýsý 
+
+1) Diferansiyel denklemleri çoðunlukla böyle yazarýz; $\dot{\underline{x}} =
+\underline{f}(\underline{x}) $. $\underline{x}$ bir vektor, $ \underline{x} \in
+\mathbb{R}^n$, yani $\underline{x} = (x_1,...,x_n)$. $\mathbb{R}^n$ faz uzayýmýz,
+ya da konum uzayýmýz, yani sistemimizin aldýðý deðerler hep bu``evren''
+içinden. $f$ bir fonksiyon ve çoðunlukla lineer bir fonksiyon. Bileþenler þöyle,
+
+$$ \dot{x}_1 = f_1(x_1,...,x_n)$$
+
+$$ \vdots $$
+
+$$ \dot{x}_n = f_n(x_1,...,x_n)$$
+
+Yani bu sistem birbiriyle baðlantýlý (coupled) n tane ODE sistemi, $f$'ler
+incelediðimiz problem ile alakalý fonksiyonlar. ``Sistem lineer'' deriz eðer
+eþitliðin sað tarafýndaki tüm $x_i$'larýn üstellik derecesi 1'den fazla deðil
+ise, ve $x_i$'lar birbiriyle çarpýlmýyor, ya da $x_i$'lerin lineer olmayan
+fonksiyonlarý kullanýlmýyor ise. Gayrý lineer bir terim mesela $x_1^2$
+olabilirdi, ya da $x_2x_3$, ya da $\sin(x_4)$.
+
+Soru
+
+Sadece otonom sistemlerle mi ilgileneceðiz? Yani eþitliðin sað tarafýnda zamanýn
+olmadýðý türden sistemlerle? Üstteki sistemde görüldüðü gibi eþitliðin sað
+tarafýnda zaman, $t$ yok, bu durumda sistem otonom oluyor.
+
+Cevap
+
+Evet, bu derste çoðunlukla otonom sistemlerle iþ yapýyor olacaðýz. Bazý
+durumlarda, modele dýþarýdan güç etkisi olduðu durumlarda mesela, zaman
+faktörünü denkleme eklemek doðal oluyor, fakat bu tür örneklere çoðunlukla
+bakmayacaðýz. Aslýnda o tür sistemleri bile otonom hale getirebilirsiniz,
+ek bir $\dot{t} = 1$ deðiþkeni eklersiniz mesela, böylece 
+
+$$ \dot{x}_1 = f_1(x_1,...,x_n)$$
+
+$$ \vdots $$
+
+$$ \dot{x}_n = f_n(x_1,...,x_n)$$
+
+$$ \dot{t} = 1$$
+
+olur, ve yeni deðiþken sanki $x_i$'larýn uzantýsý gibi kabul
+edilebilir. Otonom sistemleri tercih etmemizin sebebi problemlere geometrik
+olarak yaklaþmamýzda bize yardým edecek, faz uzayýný vektörler, vektör
+alanlarý ile temsil etmek istiyoruz, ve bu alanlar zamana göre deðiþmez ise
+bu problem çözümünü kolaylaþtýrýyor. Yani çizdiðimiz resmin donmuþ olmasýný
+istiyoruz, zaman göre oynamasýný istemiyoruz. Eðer zaman baðlantýsý olsaydý
+o zaman vektörler zamana göre habire oynuyor olacaklardý. 
+
+Not: Burada ufak bir nüans var, zaman, evet, otonom durumda da denklemlerin
+içinde; fakat eþitliðin solunda olan $\dot{x}$ yani $\frac{\partial x}{\partial
+  t}$ ve onun $x$'e olan baðlantýsý baðýmsýz deðiþkenin sistemin o anki konumu
+olduðunu gösterir.  Baðýmsýz $t$ deðildir [1].
+
+Örnek
+
+Basit harmonik titreþir (simple harmonic oscillator)
+
+$$ m\ddot{x} + kx = 0 $$
+
+Farketmiþ olabilirsiniz, bu sistem önce belirttiðimiz, tercihimiz olan
+model tipine uymuyor, bu denklemde ikinci derece türev var,
+$\ddot{x}$. Fakat bu sistemi ufak bir numara ile 1. derece türevli hale,
+$\dot{\underline{x}} = \underline{f}(\underline{x})$ formuna çevirebiliriz. 
+
+$$ x_1 = x $$
+
+$$ x_2 = \dot{x} $$
+
+Bu durumda sistem
+
+$$ \dot{x}_1 = x_2 $$
+
+$$ \dot{x}_2 = -\frac{kx_1}{m} $$
+
+Ýstediðimiz forma eriþtik; iki tane 1. dereceden birbiriyle baðlantýlý
+denklem. Sistem lineer çünkü $x_1,x_2$ tek üstelliðe sahip sadece. Bu
+sistem lineer 2. seviye sistem olarak kabul edilir. Kýyasla bir sarkaç
+(pendulum) 
+
+$$ \ddot{x} + \sin(x) = 0 $$
+
+için ayný numara, 
+
+$$ \dot{x}_1 = x_2 $$
+
+$$ \dot{x}_2 = -\sin(x_1) $$
+
+Bu sistem gayrý lineer olurdu, çünkü eþitliðin sað tarafýnda $\sin$ var, $x_1$
+1. üstellikte deðil. Bu arada bazý giriþ fizik derslerinde $\sin(x)$ yerine
+yaklaþýksal olarak $x$ kullanmak size öðretilmiþ olabilir, bu yaklaþýksallýk
+ufak açýlar için ise yarar, fakat bunu yapmak üstteki problemin özünü tamamen
+dýþarý atmak demektir; sistemde mesela þarkaçýn ta dönüp dönüp 180 derece yukarý
+çýkmasý durumunda ne yapacaðýz? Bu tür problemlere nasýl yaklaþacaðýmýzý bu
+derste göreceðiz.
+
+Çözüme nasýl eriliþir? Sarkaç problemine baktýysanýz analitik çözümde
+``elliptik fonksiyonlar'' denen bir kavram kullanýlýr, her nedense bu
+yaklaþýmý neredeyse kimse öðretmiyor bu günlerde, biz de bu fonksiyonlarý
+kullanmayacaðýz ama, ilginç bir durum.. Çözüm için grafiksellemeye
+baþvuracaðýz, Poincare'nin yaklaþýmýný takip ediyoruz yani, sistemleri
+grafiksel olarak görmek.
+
+Çözmek için nihai çözüm noktalarý $x_1(t),x_2(t)$'nin bir kordinat
+sisteminde hareket ettiðini düþünebilirim, bir baþlangýç noktasýndan bir
+gidiþ noktasýný takip edecek þekilde,
+
+\includegraphics[height=4cm]{1_01.png}
+
+$x_1(t),x_2(t)$ formülasyonu parametrik denklemler olarak görülebilir, biz
+çözümü pür cebirsel görmek yerine üstteki ``faz uzayýnda'' iþ yapýyor
+olacaðýz. Poincare'nin bu noktadaki iyi fikri þuydu, bu yapý geri yönde de
+iþletilebilir. Daha doðrusu gidiþ yolu hakkýnda bir fikir sahibi olursak bu
+bize çözüm hakkýnda anlayýþ kazandýrýr, denklemleri cebirsel olarak çözmeye
+gerek kalmaz. Numara bu. Bunun için kullanýlan araç faz portreleri (phase
+portraits). Faz portresiyle söylemek istediðimiz birbirinden niteliksel
+olarak tüm farklý gidiþ yollarýnýn resmedilmiþ hali. Ve bunu yaparken
+diferansiyel denklem sistemini analitik olarak çözmemek. Bu sýnýfýn aþaðý
+yukarý tüm amacýnýn da bu olduðunu söyleyebilirim. 
+
+Dünyayý lineer ve gayrý lineer denklemlere bölersek ve bu denklemlerin
+derecelerini de hesaba alýrsak, bunu gösterecek bir tablo yaratalým,
+
+
+$$ 
+\begin{tabular}{|P{2cm}|P{2cm}|P{2cm}|P{2cm}|P{2cm}|P{2cm}|}
+\hline
+ & n=1 & n=2 & n=3 & n $\gg$ 1 & n = $\infty$ \\
+\hline 
+Lineer & 
+Elektrik Devre & 
+\textrm{Basit Harmonik Titreþir} & 
+& 
+& 
+\textrm{Dalga Denklemleri, Elektrik ve Manyetiklik, Schrödinger}\\
+\hline 
+\textrm{Gayrý Lineer} & 
+\textrm{Lojistik Büyüme Denklemi, Skydiving} & 
+Sarkaç & 
+\textrm{Lorenz Sistemleri, Fraktallar, Yinelenen Eþlemleri} & 
+& 
+\textrm{Genel Ýzafiyet, Türbülans, Fibrilasyon}\\
+\hline
+\end{tabular}
+$$
+
+Fibrilasyon kalpteki ölümcül bir titreþim þekli. Skydiving uçaktan atlayýp uzun
+süre paraþütsüz iniþ yapmak, bu kiþilerin yeryüzüne düþüþü, havanýn direnci
+gayrý lineer denklemler ile modellenebiliyor.
+
+Bu sýnýfýn gidiþatý nasýl olacak? Tablonun sol üst köþesi elektrik
+devreler, harmonik titreþirler 1. sýnýf lisans fizik dersi. Sonra
+geleneksel olarak bu öðrenciler tablonun sað üst köþesine zýplarlar, dalga
+denklemi, ýsý denklemi, vs., yani lineer kýsmi türevsel denklemler. Fakat
+biz sol üstten sol altta gideceðiz, mesela Lorenz sistemleri, ki kaos ilk
+kez burada ortaya çýkýyor. Hatta öyle bir teori var ki 1. ve 2. boyutta
+kaos ortaya çýkamaz, en az 3 boyut lazým (topolojik sebeplerden
+dolayý). Ayný noktada fraktallar, yinelenen eþlenimler var, bunlar sürekli
+deðil ayrýksal sistemler olmalarýna raðmen boyut olarak ayný noktadalar. 
+
+Sýnýfta sol alttan saða doðru bir gidiþ yapacaðýz; sýnýf konularýmýzýn
+tablonun sol alt köþesi olduðunu söyleyebiliriz.
+
+Sað altta $n \gg 1$'den baþlayarak, yani aþýrý büyük $n$ deðerleri için, ve
+oradan saða doðru olan kýsým en çok araþtýrmanýn olduðu yer. Bu nokta artýk
+bilimin uç noktasý diyebiliriz, bu konularda yapýlacak çok iþ var, ve o
+noktalarda çok ciddi araþtýrmalar oluyor. Kýyasla sol alt köþenin iþi bitti
+denebilir. Bizim dersin konusu da orasý!
+
+Bu noktaya kadar tüm gördüklerimiz kitabýmýn [2] 1. bölümünü
+oluþturuyor. Þimdi artýk bir örneði çözmeye baþlayabiliriz.
+
+Tek boyutlu sistem, $x \in \mathbb{R}$ ve
+
+$$ \dot{x} = f(x) $$
+Mesela 
+
+$$ \dot{x} = \sin(x) $$
+
+Bu 1. derece ama gayrý lineer. 
+
+Geleneksel yaklaþým, formülsel olarak bakmak, mesela deðiþkenleri ayýrma
+yöntemi, 
+
+$$ \frac{dx}{\sin(x)} = \ud t $$
+
+Bu ayýrýlabilir bir diferansiyel denklem yani, sonra iki tarafýn entegrali
+alýnýr, 
+
+$$ \int \frac{\ud x}{\sin(x)} = \int \ud t $$
+
+Eþitliðin sað tarafýndaki entegral basit, sonuç $t + C$, ki $C$ bir sabit,
+ama öteki biraz daha zor olabilir, hafýzamýzý yoklamamýz lazým, ya da
+sembolik iþlem yapabilen bir yazýlýma sormak, neyse bir þekilde
+hatýrlýyoruz ki,
+
+$$ \int \csc(x) \ud x = - \ln |\csc (x) + \cot (x)| $$
+
+Okkalý bir fonksiyon. Neyse, bunu kullanarak ve baþlangýç konumu
+$x=x_0,t=0$ deðerlerinden üstteki sabiti hesaplarýz (ve bir sürü cebiri
+atlýyorum tabii), ve takla ata ata suna eriþiriz,
+
+$$ t = \ln \bigg| \frac{\csc(x_0) + \cot(x_0)}{\csc(x) + \cot(x)} \bigg|   $$
+
+Bu örneði sizi korkutmak için seçtim tabii ki :) Bu örnekle þunu göstermek
+istedim; Evet bu sonuç doðru, ama pek aydýnlatýcý deðil. Hatta yardýmcý / iþe
+yarar olduðu da söylenemez çünkü ana amacýmýz $x$'i $t$ bazýnda çözmekti deðil
+mi? Fakat üstteki ifade bunu basitleþtirmedi.. Trigonometriniz çok iyi ise
+yapýlabilir tabii; bu ifadeyi tersine çevirmek mümkün, fakat, þunu unutmayalým,
+baþlangýç noktamýz basit bir $\sin$ fonksiyonu idi, biraz daha çetrefil bir
+fonksiyondan baþlasaydýk üstteki entegrali bile hesaplamak mümkün olmazdý. Yani
+üstteki yaklaþým bizi yapýlabileceðin sýnýrýna getirdi, bazý basit sorularýn
+cevaplarý hemen verecek hale getiremedi, mesela $x_0 = \pi / 4$ için $\lim_{t
+  \to \infty} x(t)$ nasýl davranýr? Bu sorunun cevabýnýn üstteki ``çözümden''
+hemen dökülmesi lazým, ama bunu yapmak çok zor.
+
+Biz bu problemi grafiksel olarak çözeceðiz. Ýki boyutta bir grafik düþünelim, y
+ekseninde $\dot{x}$, x ekseninde $x$ var. $x$'in hayali bir parçacýðýn pozisyonu
+olduðunu düþünelim, ve bu parçacýk x eksenine sýnýrlý olsun, yani sadece onun
+üzerinde saða, sola hareket edebiliyor, yukarý çýkamýyor. Bu durumda
+$\dot{x}$'in o parcacýðýn ``hýzý'' olduðu düþünülebilir. Bunlarý bir araya
+koyarsak, $\dot{x} = \sin(x)$ x ekseninde olan bir hýz vektör alaný. Eðer $x$
+noktasýnda isek hýz $\dot{x}$. Bu hýz parçacýða nasýl hareket edeceðini
+söylecek, böylece sonraki noktaya gidilecek, vs.
+
+\includegraphics[height=4cm]{1_02.png}
+
+Peki ortadaki kamburun altýnda $x$ nedir? Burada $\dot{x}$ pozitif, o zaman
+$x$ artýyor, vektör saða doðru, 
+
+\includegraphics[height=4cm]{1_03.png}
+
+Diðer bölgeleri de bu mantýðý takip ederek doldurabiliriz, 
+
+\includegraphics[height=4cm]{1_04.png}
+
+Farketmiþ olabilirsiniz, $\dot{x}$'in sýfýr olduðu yerler var, bu noktalar
+özel noktalar, onlara sabit noktalar (fixed points) diyoruz ve $x^*$ ile
+gösteriyoruz. Noktalar özel çünkü orada $\dot{x}=0$, yani hýz sýfýr, demek
+ki hareket yok. 
+
+Daha büyük bir grafikte tekrar çizelim, ve sabit noktalarý daire ile
+gösterelim. Bu arada, iki tür sabit nokta olduðunu görüyoruz, oklarýn ona
+doðru olduðu bir tip, oklarý ondan dýþarý gittiði bir diðer tip. Oklarýn
+iþaret ettiði türü içi dolu daire ile gösterelim, diðeri boþ olsun,
+
+\includegraphics[height=4cm]{1_05.png}
+
+Þimdi diyelim ki $x=\pi/4$ noktasýndan baþladýk, 
+
+\includegraphics[height=4cm]{1_06.png}
+
+Üstteki grafikte tam gözükmeyebilir, ama soldaki faz uzayýnda x ekseninde
+iþaretledik. Bu noktada $\sin(\pi/4)$'in deðeri belli, o zaman hýz o
+kadar. Þimdi $t,x$ için bir grafik çizelim (üstte saðda), bu hýzý bu yeni
+grafikte eðimin büyüklüðü olarak görebiliriz, ardý ardýna iki tane daha
+çizersek neler olduðunu görebiliriz. Parçacýk faz uzayýnda saða doðru
+gidiyor gittikçe hýzý artýyor, $\sin(\pi)$ altýnda hýz 1, sonra düþmeye
+baþlýyor. Tabii tam deðerleri gösteremiyoruz, bu sebeple bu metot
+sayýsal deðil niteliksel. 
+
+Devam edelim, $x$ parçacýðý saða gittikçe sabit noktaya yaklaþýr, hiçbir
+zaman ona eriþemez, ama limitte bir noktaya yaklaþýr, ki bu deðer $\lim_{t
+  \to \infty} x(t) = \pi$. Zaman serisi $x(t)$'nin gidiþ yolunu da
+görebiliyoruz,  üst saðdaki parçalarý birleþtirelim, 
+
+\includegraphics[height=4cm]{1_07.png}
+
+$x$ önce içbükey yukarý (concave up) bir þekilde artýyor, $\pi/4$
+noktasýndan sonra içbükey aþaðý bir þekilde artýyor, ve $\pi$'ye
+yaklaþýyor. 
+
+Ýþte faz uzayýný kullanmanýn faydasý burada. Çok fazla iþ yapmadan neler
+olduðunu görebildik. 
+
+Bu arada yukarýda içi dolu daireler / sabit noktalar stabil sabit noktalar
+olarak isimlendirilir. Eðer o noktalarýn üzerinde isek ve sistemi sarsarsak
+(perturb), tekrar geri o noktaya döneriz, çünkü oraya doðru bir ``çekim''
+vardýr. Kýyasla oklarýn ondan dýþarý doðru aktýðý sabit noktalar stabil
+olmayan sabit noktalardýr, sistemi o noktalarda sarsarsak bu deðiþim,
+sarsýntý katlana katlana bir etki yaratacak ve o noktadan bir kaçýs
+oluþturacaktýr.
+
+Örnek
+
+Nüfus biyolojisindeki lojistik denklemden bahsettik. 
+
+$$ \dot{x} = rx \big( 1- \frac{x}{k}\big) $$
+
+ki $r,k > 0$. 
+
+Bu denklemi nasýl rasyonalize ederiz / açýklarýz? $x$ nüfusun büyüklüðü
+olsun, belki belli sayýda bakterilerden bahsediyoruz, deney ortamýnda
+duruyorlar, beslenecekleri yiyecekleri var, belki her 20 dakikada bir
+bölünerek çoðalýyorlar, vs. Eðer $x$ bu ise, o zaman $\dot{x}$ büyüme hýzý
+olurdu, birim zamanda üretilen organizma sayýsý. Denkleme göre nüfus ne
+kadar fazla ise ona oranla büyüme oraný da o kadar hýzlý
+olacak. Biyologlara göre daha iyi bir ölçü normalize edilmiþ bir büyüme
+hýzý, $\dot{x}/x$, bir tür kiþi, kafa baþýna büyüme oraný [hoca ekonomiye
+de atýf yaptý bu arada], tabii bakterilerde kafa olmayabileceði için belki
+terminoloji tam doðru deðil ama, anlýyorsunuz iþte.  
+
+Bu sistemi grafikleyelim, 
+
+\includegraphics[height=4cm]{1_08.png}
+
+Eðri bir parabol, parabolun kökleri 0 ve $K$. 
+
+Oklar ve sabit noktalarla çizersek, 
+
+\includegraphics[height=4cm]{1_09.png}
+
+Bu nüfusun / sistemin taþýma kapasitesi $K$, grafiðe göre nüfusu herhangi
+bir yerden, $x_0 > 0$'dan baþlatýrsak, nüfus büyüye büyüye en sonunda
+$K$'ye eriþecek, $x(t) \to K, t \to \infty$. Azýcýk bakteri bile varsa
+bölüne bölüne nihai nüfus kapasitesine eriþecekler. Taþýma kapasitesi
+deney ortamýndaki yiyecekle alakalý, o ortam bu kadar nüfusu
+``taþýyabiliyor''. Daha fazlasý mümkün deðil. Ondan fazlasýnda ölümler
+baþlýyor, ve tekrar $K$'ye bir dönüþ oluyor (saðýndan da ok ona doðru). 
+
+Gördüðümüz gibi bu sonuca ulaþmak için çok az efor gerekti. Bu metotun
+avantajý iþte burada. 
+
+Ekler
+
+Sarkaç problemini sayýsal olarak çözelim, denklem
+
+$$ \ddot{\theta}(t) = + \alpha \sin(\theta(t)) = 0  $$
+
+Bu denklemi birinci derece ODE sistemine çevirebiliriz, dýþarýdan
+$v(t) = \dot{\theta}$ deðiþkenini tanýmlayalým, 
+
+$$ \dot{\theta} = v(t)$$
+
+$$ \dot{v} = \alpha \sin (\theta(t))$$
+
+Baþlangýç þartlarý $\theta(0) = \pi/6$, $v(0) = 0$, ve $\alpha = -5$ olsun,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy as sp
+from scipy.integrate.odepack import odeint
+
+def f(y,t):
+    alpha = -5.0
+    r = sp.array([0,0],float)
+    r[0] = y[1]
+    r[1] = alpha*sp.sin(y[0])
+    return r
+
+T = 10; n = 1000
+theta0 = sp.pi/6; v0 = 0
+tspan = sp.linspace(0,T,n+1)
+initc = sp.array([theta0,v0])
+y = odeint(f,initc,tspan)
+theta = y[:,0]
+v = y[:,1]
+
+plt.plot(t,v,label='velocity(t)')
+
+plt.savefig('1_10.png')
+\end{minted}
+
+\includegraphics[height=6cm]{1_10.png}
+
+Kaynaklar
+
+[1] Wikipedia, {\em Autonomous system (mathematics)}, \url{https://en.wikipedia.org/wiki/Autonomous_system_(mathematics)}
+
+[2] Strogatz, {\em Nonlinear Dynamics and Chaos}
+
+[3] Strogatz, {\em YouTube Video'lari}, \url{https://www.youtube.com/watch?v=ycJEoqmQvwg&list=PLbN57C5Zdl6j_qJA-pARJnKsmROzPnO9V}
+
+\end{document}
+
+

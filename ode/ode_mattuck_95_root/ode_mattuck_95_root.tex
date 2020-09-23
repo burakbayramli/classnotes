@@ -1,0 +1,251 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Kök Bulmak, Karesel Formül (Root Finding, Quadratic Formula)
+
+$$ ax^2 + bx + c = 0$$
+
+Yukarýdaki gibi bir formülü çözmek için, lise matematiðinden
+hatýrlayabileceðimiz aþaðýdaki formül kullanýlýr.
+
+$$ x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} $$
+
+Böylece denklemin kökleri bulunur, karesel durumda $(x-r_1)(x-r_2)=0$,
+$r_1,r_2$ iki tane köktür.
+
+Çözümü türetmek için kullanacaðýmýz yöntem, "kareyi tamamlama (completing
+the square)" yöntemi. Bu yönteme göre, c deðerini denklemin solundan,
+saðýna atýyoruz, ve öyle bir yeni c deðeri buluyoruz ki, karesel denklemin
+tek bir kökü oluyor. Tek kökü olan karesel denklemleri biliyoruz, $x^2 +
+6x + 9 = 0$ gibi bir denklem, tek kökü olan bir denklemdir.
+
+Gelelim çözüm türetilmesine.. iki üstteki förmül ile baþlayalým, iki tarafý
+a ile bölelim. Elimize aþaðýdaki sonuç gelecek.
+
+$$ x^2 + \frac{b}{a}x + \frac{c}{a} $$
+
+$c/a$ deðerini sað tarafa taþýyalým. 
+
+$$ x^2 + \frac{b}{a}x = -\frac{c}{a} $$
+
+Þimdi, kareyi tamamlama yöntemi ile, iki tarafa da aþaðýdaki deðeri ekleyelim.
+
+$$ \bigg( \frac{b}{2a} \bigg)^2 $$
+
+Böylece, aþaðýdaki iþlem serisini baþlatmýþ olacaðýz.
+
+$$ x^2 + \frac{b}{a}x + \bigg( \frac{b}{2a} \bigg)^2 = 
+-\frac{c}{a} + \bigg( \frac{b}{2a} \bigg)^2 $$
+
+$$ \bigg( x + \frac{b}{2a} \bigg)^2 = 
+-\frac{c}{a} + \frac{b^2}{4a^2}
+ $$
+
+$$ \bigg( x+ \frac{b}{2a} \bigg)^2 = \frac{b^2 - 4ac}{4a^2} $$
+
+Ýki tarafýn karekökünü alýrsak: 
+
+$$ x + \frac{b}{2a} = \pm \frac{\sqrt{b^2 - 4ac}}{2a}  $$
+
+ya da
+
+$$ x = -\frac{b}{2a} \pm \frac{\sqrt{b^2 - 4ac}}{2a} $$
+
+Ýþte bu formüle karesel formül denir, ve normalde þöyle yazýlýr. 
+
+$$ x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} $$
+
++ ve - iþareti, elimizde 'iki' sonuç var demektir, yani elimizdeki
+sayýlardan biri
+
+$$ x = \frac{-b + \sqrt{b^2-4ac}}{2a} $$
+
+Öteki de 
+
+$$ x = \frac{-b - \sqrt{b^2-4ac}}{2a} $$
+
+olacak.
+
+Örnek
+
+$a=3,b=3,c=5$, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a=1.0;b=3.0;c=1.0
+tmp=np.sqrt((b**2)-(4.0*a*c))
+print (-b-tmp) / (2.0 * a)
+print (-b+tmp) / (2.0 * a)
+\end{minted}
+
+\begin{verbatim}
+-2.61803398875
+-0.38196601125
+\end{verbatim}
+
+Kütüphane çaðrýsý ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.roots([a, b, c])
+\end{minted}
+
+\begin{verbatim}
+[-2.61803399 -0.38196601]
+\end{verbatim}
+
+Sayýsal Yöntemler
+
+Eðer analitik bir þekilde $f(x)=0$'da kök bulmak mümkün deðilse, sayýsal
+yöntemler kullanýlabilir. Newton'un yöntemi (Newton's method) bunlardan
+biri, bu yöntem $f(x)$ karesel, küpsel, ne kadar çetrefil olursa olsun
+kullanýlabilir. Diyelim ki $f(x)$'in köklerinden birini $x_0$ olarak
+tahmin ediyoruz. Bu tahmin etrafýnda fonksiyonun Taylor açýlýmý [1,
+sf. 175],
+
+$$ f(x) = f(x_0) + f'(x_0)(x-x_0) + ...$$
+
+Kök aradýðýmýz için $f(x)=0$ yaparýz, ve $x$'i bir tarafa alacak þekilde
+tekrar düzenleriz (ayrýca noktalý kýsmý atarýz çünkü belli bir yaklaþýk
+temsil ile yetinmeye karar verdik), 
+
+$$ 0 = \frac{f(x_0)}{f'(x_0)} + x-x_0$$
+
+$$ x = x_0 - \frac{f(x_0)}{f'(x_0)} $$
+
+Bu denklemi $x_0$'i baz alarak bir sonraki $x$'i hesaplayacak bir formül
+gibi görebiliriz, 
+
+$$ x_1 = x_0 - \frac{f(x_0)}{f'(x_0)} $$
+
+Genel olarak
+
+$$ x_{i+1} = x_i - \frac{f(x_i)}{f'(x_i)} $$
+
+Yani bir $x_0$ tahmini ile baþlýyoruz, oradan $x_1$ elde ediyoruz, onu geri
+verip $x_2$ elde ediyoruz, böyle devam ediyor.
+
+Not: yöntemin iþlemesi için $f(x)$'in türevi $f'(x)$ gerekiyor, fakat çoðu
+zaman türev elde olmaz, o zaman türevi de yaklaþýk olarak hesaplayabiliriz, 
+
+$$ f'(x) \approx \frac{f(x + \ud x) - f(x)}{\ud x}$$
+
+Türev yaklaþýk olarak hesaplandýðýnda Newton'un Yöntemi ismi deðiþtirilip
+Sekant Yöntemi (Secant Method) ismi kullanýlýyor.
+
+Örnek
+
+$$ x^2 + 3 x + 1 = 0$$ formülünün köklerini bulalým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def newton(f, x, dfdx=None, eps=1e-6):
+    if dfdx is None: 
+        delta = eps**0.5
+    while True:
+        fx = f(x)
+        # turev bilinmiyorsa onu da sayisal hesapla
+        if dfdx is None:
+            dx = delta*x
+            if abs(dx) < delta: dx = delta
+            df = (f(x+dx) - fx)/dx
+        else:
+            df = dfdx(x)
+        dx = -fx/df
+        x += dx
+        if abs(dx) < eps: return x
+
+a=1.0;b=3.0;c=1.0
+
+def f1(x): return a*(x**2.0) + b*x + c
+print newton(f1,0.0) # baslangic 0'da
+print newton(f1,-3.0) # farkli noktadan baslatalim
+
+# bilinen turev 
+def df1(x): return 2*a*x + b
+print '\n',newton(f1,0.0,df1)
+print newton(f1,-3.0,df1) 
+
+\end{minted}
+
+\begin{verbatim}
+-0.381966010827
+-2.61803398875
+
+-0.38196601125
+-2.61803398875
+\end{verbatim}
+
+Çok Boyutlu Newton'un Yöntemi
+
+Çok boyutta Taylor açýlýmý,
+
+$$ 
+0 = f(x_i + \Delta x_i) = f(x_i) + J(x_i) \cdot \Delta x_i + ... 
+$$
+
+$x_i$ bir $N$ boyutlu vektör, ve $J$ Jacobian matrisi
+
+$$ 
+J = \left[\begin{array}{rrr}
+\frac{\partial f_1}{\partial x_1}  & \dots & \frac{\partial f_1}{\partial x_n} \\
+ \vdots & \ddots & \vdots \\
+\frac{\partial f_N}{\partial x_1}  & \dots & \frac{\partial f_n}{\partial x_N} 
+\end{array}\right]
+$$
+
+$\Delta x_i$ adýmlarýný hesaplamak için,
+
+$$  -f(x_i) =  J(x_i) \cdot \Delta x_i  $$
+
+$$  -f(x_i)J(x_i)^{-1} = \Delta x_i  $$
+
+Üstte ters alma iþlemi yapýldý fakat çoðunlukla Gaussian eliminasyon
+kullanýlarak bu pahalý ters alma iþleminden kaçýnýlmaya uðraþýlýr.
+
+O zaman güncellemeyi
+
+$$ x_{i+1} = x_i + \Delta x_i $$
+
+olarak özyineli bir þekilde yapabiliriz.
+
+Ýkiye Bölme Yöntemi (Bisection Method)
+
+Bu yöntemle kök aramasý belli $x$ aralýklarý içinde yapýlýr, her aralýðýn
+orta noktasýnýn $f(x)=0$'a ne kadar yaklaþtýðý kontrol edilir, eðer
+yaklaþma yoksa aralýk ikiye bölünerek sýfýra daha yaklaþtýracak parça
+içinde devam edilir. Parçalar bölündüðü için $O(\log)$ hýzýnda sonuca
+ulaþmak mümkündür.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bisect(f, a, b, eps=1e-6):
+     if f(a) > 0: # swap a and b
+          (a, b) = (b, a)
+     xmid = None
+     while np.abs(a - b) > eps:
+         xmid = (a+b)/2.0
+         if f(xmid) < 0:
+             a = xmid
+         else:
+             b = xmid
+     return xmid
+
+print bisect(f1,-5.0,0.0) 
+print bisect(f1,-2.0,0.0) 
+\end{minted}
+
+\begin{verbatim}
+-2.618034482
+-0.381966590881
+\end{verbatim}
+
+Dikkat, hem Newton hem de ikiye bölme yönteminde bazý patalojik durumlar
+ortaya çýkabiliyor, bunlara karþý tetikte olunmalý, detaylar için [2, sf. 71]
+
+Kaynaklar 
+
+[1] Creighton, {\em Numerical Methods}
+
+[2] Kincaid, {\em Numerical Analysis}
+
+\end{document}
+
+
+
+

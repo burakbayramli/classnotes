@@ -1,0 +1,775 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ýliþkisel Madencilik (Association Mining)
+
+Ýkisel Matris Ayrýþtýrmasý (Binary Matrix Factorization)
+
+Veri madenciliði denince pek çok kiþinin aklýna gelen ilk örnek, aslýnda,
+sýk bulunan öðe kümeleri (frequent itemsets) örneðidir: "filanca ülkeden
+sitemize gelen müþterilerin ayný zamanda vs özelliklerinin olduðunu da
+keþfettik" gibi. 
+
+Benzer bir örnek, ki bu alan öðe kümelerinin aslýnda en önemli çýkýþ
+sebeplerinden birisidir, alýþveriþ sepeti analizidir. Müþterinin her
+alýþveriþinde sepetinde belli mallar vardýr, ve bu mallarýn hangilerinin ayný
+anda, ayný sepette olduðu analiz edilmeye uðraþýlýr. Eðer sürekli ekmek ve reçel
+ayný anda alýnýyorsa, bu bilgi kullanýlarak belki mallarýn daha iyi
+konumlandýrýlmasý yapýlacaktýr, vs. Sýk bulunan öðe kümeleri teknikleri bazen
+deðiþik adlar altýnda da geçebiliyor, mesela iliþki madenciliði (association
+mining) gibi. Algoritma olarak kullanýlan pek çok teknik var, APriori iyi
+bilinenlerden, FPGrowth ondan daha hýzlý çalýþan ve daha tercih edilen bir
+teknik. Ýstatistiki bir teknik olan Çok Boyutlu Bernoulli Karýþýmlarý da bu
+alanda kullanýlan bir yaklaþým.
+
+Bir diðer alternatif ikisel matris ayrýþtýrmasý (binary matrix
+factorýzation -BMF-) kullanmaktýr [3]. Aynen SVD'de olduðu gibi BMF de bir
+matrisi ayrýþtýrýr, fakat üç matris yerine iki matrise ayrýþtýrýr ve hem
+sonuç matrisi hem de ayrýþtýrýlan matrisler sadece 0 ya da 1 deðerini
+taþýyabilirler. Yani bu ayrýþtýrma sonuç matrislerinin ikisel olmasýný
+mecbur tutar, negatif olmayan matris ayrýþtýrmasýnýn (non-negative matrix
+factorýzation) sonuç matrisinin pozitif deðerler taþýmasýný mecbur kýlmasý
+gibi. Bunlar birer kýsýtlama (constraint) ve bu sonuç o kýsýtlamalara göre
+ortaya çýkýyor. {\em Dikkat}: BMF için toplama iþlemi $1+0 = 1, 1+1=1, 0+0
+= 0$ olarak tekrar tanýmlanýr, yani mantýksal OR iþlemi haline gelir.
+
+Ayrýþtýrma öncesi hangi kerte (rank) $k$ deðerine geçmek istediðimizi biz
+belirtiriz. BMF'nin öðe kümeleri madenciliði için faydasý þurada: öðe
+kümeleri ararken baktýðýmýz öðeler kategorik þeylerdir, alýþveriþ sepeti
+örneðinde mesela ekmek, reçel gibi. Kategorik öðeleri daha önce 1-hot
+kodlamasý (encoding) ile 1/0 deðerleri taþýyan yeni kolonlara
+geçirebildiðimizi görmüþtük. Yani tamamen kategorik deðerler taþýyan
+veriler tamamen 1/0 taþýyacak þekilde tekrar kodlanabilir, yani ikisel
+matris haline getirilebilir. Bu ikisel matrisi ayrýþtýrdýðýmýz zaman ve
+kendileri de ikisel olan iki yeni matris elde ettiðimizde ise bir anlamda
+boyut indirgemesi yapmýþ oluruz, yani sanki ana matrisi ``özetleriz''. Ýþte
+bu özet, özellikle çarpýlan ``baz'' matris, öðe kümelerinin hangileri
+olduðu hakkýnda ipuçlarý içeriyor olabilir.
+
+Bir örnek üzerinde görelim, mesela altta Alice (A), Bob Marley (B) ve Prens
+Charles (C) verileri var. Bu kiþiler için saçý uzun mu (long-haired), ünlü
+mü (well-known) ve bay mý (male) verileri var. 
+
+\includegraphics[height=5cm]{abc.png}
+
+Bu matris üzerinde ikisel ayrýþtýrma yaparsak, $k=2$
+
+\includegraphics[height=2cm]{abc_res.png}
+
+Eðer kontrol etmek istersek, matris çarpýmý yapmamýz gerekir, bunun için
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a = np.array([[1,  0],
+               [1,  1],
+               [0,  1]], dtype=bool)
+b = np.array([[1,  1,  0],
+               [0,  1,  1]], dtype=bool)
+
+print np.dot(a,b)
+\end{minted}
+
+\begin{verbatim}
+[[ True  True False]
+ [ True  True  True]
+ [False  True  True]]
+\end{verbatim}
+
+0 ve 1 deðerleri görmek için 1 ile çarpmak yeterli
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 1*np.dot(a,b)
+\end{minted}
+
+\begin{verbatim}
+[[1 1 0]
+ [1 1 1]
+ [0 1 1]]
+\end{verbatim}
+
+Sonuç baþlangýç matrisi ile ayný, demek ki \verb!bool! tipi matris
+tanýmlayýnca Numpy çarpýmý \verb!dot!, çarpým sýrasýndaki toplama iþlemi
+için aritmetik toplama yerine VEYA (OR) kullanmasý gerektiðini anladý.
+
+Þimdi ayrýþtýrmayý analiz edelim, özellikle sol taraftaki çarpýlan ``baz''
+matrise bakalým.. [6] yazýsýndan hareketle, bu yazýdaki kolon kombinasyon
+bakýþýný kullanalým (tabii toplamanýn BMF için OR olduðunu unutmadan), o
+zaman soldaki baz matrisin dikey, kolon bazlý olarak, bir özet olduðunu
+görebiliyoruz. Çünkü çarpan sað taraf bu kolonlarý alýp onlarý belli
+þekillerde ``kombine ederek'' nihai (orijinal) matrisi ortaya
+çýkartabilmeli. Bu sebeple soldaki çarpýlan matris bir özet olmalý / baz
+oluþturmalý, ve bunun yan etkisi olarak kolonlardaki deðerlerde belli bir
+kalýp / örüntü (pattern) olmalý. O zaman her baz kolonunda birbiriyle
+alakalý olan ögeler ayný anda 1 deðeri taþýyor olacaktýr.
+
+Sonuca göre uzun saçlý ve ünlü olmak (1. kolon) arasýnda baðlantý varmýþ ,
+ayrýca erkek olmak ve ünlü olmak (2. kolon) arasýnda da baðlantý varmýþ :)
+Veriye göre böyle en azýndan.. Bu sonucu orijinal matrise bakarak ta
+kontrol edebiliriz.
+
+Ayrýþtýrma Kodlamasý 
+
+BMF özel bir hesaptýr ve Numpy / Scipy içinde mevcut deðildir, ayrý bir
+kütüphane kullanmak gereklidir, \verb!nimfa! paketi içinde gerekli kodlar
+var. Kurduktan sonra üstteki örneði þöyle çözebiliriz;
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import nimfa
+import pandas as pd
+import scipy.sparse as sp
+
+def __fact_factor(X):
+    return X.todense() if sp.isspmatrix(X) else X
+
+A = np.array([[1., 1., 0],
+              [1., 1., 1.],
+              [0, 1., 1.]])
+
+fctr = nimfa.mf(A,
+              seed = "nndsvd", 
+              rank = 2, 
+              method = "bmf", 
+              max_iter = 40, 
+              initialize_only = True,
+              lambda_w = 1.1,
+              lambda_h = 1.1)
+
+res = nimfa.mf_run(fctr)
+
+threshold = 0.2
+res1 = __fact_factor(res.basis())
+res2 = __fact_factor(res.coef())
+res1 = np.abs(np.round(res1 - 0.5 + threshold))
+res2 = np.abs(np.round(res2 - 0.5 + threshold))
+res1 = pd.DataFrame(res1, index=['long-haired','well-known','male'])
+res2 = pd.DataFrame(res2, columns=['A','B','C'])
+print res1
+print '\n'
+print res2
+\end{minted}
+
+\begin{verbatim}
+             0  1
+long-haired  1  0
+well-known   1  1
+male         0  1
+
+
+   A  B  C
+0  1  0  0
+1  0  1  1
+\end{verbatim}
+
+Sonuç neredeyse týpatýp ayný; sadece çarpan matriste [0,B] kordinatý 1
+deðil, fakat bize lazým olan baz matris ayný çýktý. 
+
+BMF hakkýnda bazý ek bilgiler: [2]'ye göre en az hatalý BMF hesaplamak
+NP-hard zorluðunda, yani 3SAT gibi, ya da Seyahat Eden Satýþ Elemaný
+(Traveling Salesman) problemi gibi ki bu problemler kombinatoryel
+(combinatorial) optimizasyon problemleridir; çözüm için tüm olasýlýklar
+denendiði ve kýsayolun mevcut olmadýðý çeþitten problemler. Fakat
+yaklaþýksal BMF metotlarý oldukça hýzlýdýr, ayrýca seyreklik çok fark
+yaratýyor (pozitif anlamda) ki kategorik veriler gerçek dünyada çoðunlukla
+seyrek olarak görülüyor. Eldeki 2000 tane mal çeþidi içinden bir sepette
+ancak 5-10 tane ürün oluyor mesela, tüm 2000 tane malý bir sepete koymak
+mümkün deðil.
+
+FPGrowth
+
+
+Öðe kümeleri bulmak için BMF haricinde bir yöntem FPGrowth yöntemidir
+[1,2]. Bu yöntem önce her ögeden (tek baþýna) kaç tane olduðunu sayar,
+belli bir eþik deðeri \verb!minsup! altýnda olanlarý atar, sonucu
+sýralar. Bu liste bir yapýsýna iþaret eden bir baþlýk yapýsý haline
+gelir. Aðacýn kendisini oluþturmak için veri satýrlarý teker teker iþlenir,
+her satýrdaki her öge için baþlýk yapýsýndaki en fazla deðeri taþýyan öðe
+önce olmak üzere tepeden baþlanýp alta doðru uzayan bir aðaç yapýsý
+oluþturulur. Aðaçtaki her düðüm altýndaki düðümün sayýsal toplamýný
+taþýr. Madencilik için alttan baþlanarak yukarý doðru çýkýlýr (amaç en üste
+ulaþmak) ve bu sýrada öðeler \verb!minsup! altýnda ise, atýlýrlar. Sonuçta
+ulaþýlan ve atýlmayan yollar bir öðe kümesini temsil ederler. 
+
+Örnek verisi olarak alttakini kullanalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = [
+['outlook=sunny', 'temparature=hot', 'humidity=high', 'windy=false', 'play=no'],
+['outlook=sunny', 'temparature=hot', 'humidity=high', 'windy=true', 'play=no'],
+['outlook=overcast', 'temparature=hot', 'humidity=high', 'windy=false', 'play=yes'],
+['outlook=rainy', 'temparature=mild', 'humidity=high', 'windy=false', 'play=yes'],
+['outlook=rainy', 'temparature=cool', 'humidity=normal', 'windy=false', 'play=yes'],
+['outlook=rainy', 'temparature=cool', 'humidity=normal', 'windy=true', 'play=no'],
+['outlook=overcast', 'temparature=cool', 'humidity=normal', 'windy=true', 'play=yes'],
+['outlook=sunny', 'temparature=mild', 'humidity=high', 'windy=false', 'play=no'],
+['outlook=sunny', 'temparature=cool', 'humidity=normal', 'windy=false', 'play=yes'],
+['outlook=rainy', 'temparature=mild', 'humidity=normal', 'windy=false', 'play=yes'],
+['outlook=sunny', 'temparature=mild', 'humidity=normal', 'windy=true', 'play=yes'],
+['outlook=overcast', 'temparature=mild', 'humidity=high', 'windy=true', 'play=yes'],
+['outlook=overcast', 'temparature=hot', 'humidity=normal', 'windy=false', 'play=yes'],
+['outlook=rainy', 'temparature=mild', 'humidity=high', 'windy=true', 'play=no']
+]
+\end{minted}
+
+Hava ile alakalý bazý veriler [1] bunlar; bu veriler tahmin (outlook),
+sýcaklýk (temparature), nem (humidity), rüzgar (windy), dýþarýda oyun
+oynayan var mý (play). Mesela ilk satýrda tahmin güneþli, ýsý sýcak, nem
+yüksek, rüzgar yok ve oyun oynayan yok. Bu þekilde bir sürü satýr. Biz bu
+veride bir kalýp olup olmadýðýna bakacaðýz. [2]'deki kodu [1]'den aldýðýmýz
+üstteki veriye uygularsak, sonuç þöyle:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import fp
+items = fp.fpgrowth(data, minsup=6)
+for x in items:
+    if len(x) > 1: print x
+\end{minted}
+
+\begin{verbatim}
+<fp.node instance at 0x5017ef0>
+   Null Set   1
+     play=yes   9
+       humidity=high   1
+         windy=true   1
+           temparature=mild   1
+       windy=false   6
+         humidity=high   2
+           temparature=mild   1
+         humidity=normal   4
+           temparature=mild   1
+       humidity=normal   2
+         windy=true   2
+           temparature=mild   1
+     humidity=high   2
+       windy=true   2
+         temparature=mild   1
+     windy=false   2
+       humidity=high   2
+         temparature=mild   1
+     humidity=normal   1
+       windy=true   1
+   Null Set   1
+     play=yes   6
+   Null Set   1
+     play=yes   6
+set(['play=yes', 'humidity=normal'])
+set(['play=yes', 'windy=false'])
+\end{verbatim}
+
+Bulunan sonuçlar iki tane (tek öðeli sonuçlar da var ama onlarý
+eledik). Bunlar hakikaten veri içindeki kalýplarý temsil ediyorlar. Fena
+deðil. 
+
+Kýyas için BMF üzerinden madencilik yapalým. Önce 1-hot kodlamasý yapalým,
+ve örnek için bir veri satýrýný ekrana basalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.feature_extraction import DictVectorizer
+import pandas as pd, re
+
+def one_hot_dataframe(data, cols, replace=False):
+    vec = DictVectorizer()
+    mkdict = lambda row: dict((col, row[col]) for col in cols)
+    tmp = data[cols].apply(mkdict, axis=1)
+    vecData = pd.DataFrame(vec.fit_transform(tmp).toarray())
+    vecData.columns = vec.get_feature_names()
+    vecData.index = data.index
+    if replace is True:
+        data = data.drop(cols, axis=1)
+        data = data.join(vecData)
+    return (data, vecData, vec)
+
+cols = ['outlook','temparature','humidity','windy','play']
+df = pd.DataFrame(data,columns=cols)
+# kolon ismini veriden cikart, cunku tekrar geri koyulacak
+# fpgrowth icin veri icinde olmasi lazim
+df = df.applymap(lambda x: re.sub('.*?=','',x))
+df2, _, _ = one_hot_dataframe(df, cols, replace=True)
+# tek ornek ekrana bas
+print df2.ix[0]
+\end{minted}
+
+\begin{verbatim}
+humidity=high       1
+humidity=normal     0
+outlook=overcast    0
+outlook=rainy       0
+outlook=sunny       1
+play=no             1
+play=yes            0
+temparature=cool    0
+temparature=hot     1
+temparature=mild    0
+windy=false         1
+windy=true          0
+Name: 0, dtype: float64
+\end{verbatim}
+
+Þimdi BMF iþletelim, $k=4$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import nimfa
+import scipy.sparse as sp
+
+def __fact_factor(X):
+    return X.todense() if sp.isspmatrix(X) else X
+
+fctr = nimfa.mf(np.array(df2).T, seed = "nndsvd", 
+              rank = 4, method = "bmf", 
+              max_iter = 40, initialize_only = True,
+              lambda_w = 1.1, lambda_h = 1.1)
+
+res = nimfa.mf_run(fctr)
+
+threshold = 0.2
+res1 = __fact_factor(res.basis())
+res2 = __fact_factor(res.coef())
+res1 = np.abs(np.round(res1 - 0.5 + threshold))
+res2=  np.abs(np.round(res2 - 0.5 + threshold))
+res1 = pd.DataFrame(res1,index=df2.columns)
+print res1
+\end{minted}
+
+\begin{verbatim}
+                  0  1  2  3
+humidity=high     1  0  0  1
+humidity=normal   0  1  0  0
+outlook=overcast  0  0  1  0
+outlook=rainy     1  0  0  0
+outlook=sunny     0  0  0  1
+play=no           0  0  0  1
+play=yes          0  1  1  0
+temparature=cool  0  0  0  0
+temparature=hot   0  0  0  0
+temparature=mild  1  0  0  0
+windy=false       0  0  1  0
+windy=true        1  0  0  0
+\end{verbatim}
+
+Bu sonuçlarý kategoriksel hale çevirip tekrar ekrana basalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+for i in range(4):
+    print np.array(df2.columns)[res1.ix[:,i] == 1]
+\end{minted}
+
+\begin{verbatim}
+['humidity=high' 'outlook=rainy' 'temparature=mild' 'windy=true']
+['humidity=normal' 'play=yes']
+['outlook=overcast' 'play=yes' 'windy=false']
+['humidity=high' 'outlook=sunny' 'play=no']
+\end{verbatim}
+
+1. sonuç atlanabilir, buradaki ``kalabalýk'' orada bir kalýp olmadýðýna
+dair bir iþaret. Ayrýþtýrma sonucu bu tür kolonlar ortaya çýkabilir, diðer
+kolonlardaki kalýplar bütünü temsil etmeye {\em tam} yetmemiþse, arta kalan
+her türlü gereklilik bir yerlere týkýlabiliyor, bu normal. 2. sonuç
+FPGrowth sonucunda var, güzel. 3. sonuç ta neredeyse ayný, sadece ek olarak
+\verb!outlook=overcast! var. Fakat, 3. sonuç aslýnda önemli bir kalýp
+içeriyor olabilir, yani kalmasý daha iyi olur.
+
+4. sonuç ise çok önemli bir kalýp ve FPGrowth bunu tamamen kaçýrmýþ!
+
+Sebep FPGrowth'un çözüme lokal olarak eriþmeye çalýþýyor olmasý, kýyasla
+BMF bütüne (global) bakýyor [3]. Bu ne demektir? Bir ayrýþtýrmanýn ne
+olduðunu düþünürsek, bir matrisi oluþturan çarpýmý ayrýþtýrýyoruz ve bu
+ayrýþtýrma olduktan sonra iki matris elde ediyoruz. Bu iki matris özgündür 
+(unique). Yani belli bir ikisel matrisi oluþturan çarpým sadece tek bir
+þekilde olabilir. Buradan hareketle diyebiliriz ki bu ayrýþtýrma bütünü
+göze alarak yapýlmalýdýr, saðý, solu tutan ama köþesi tutmayan bir
+ayrýþtýrma olmaz. Bu sebeptendir ki ayrýþtýrma çözümünden belli bir
+kapsayýcýlýk bekleyebiliriz.
+
+FPGrowth ise olaya yerel bakýyor; aðaç oluþtururken deðiþik bir sýra takip
+edilirse mesela deðiþik aðaçlar ortaya çýkabilir. Ayrýca her önemli iliþki
+muhakkak özgün bir dal yapýsýnda olmayabilir. Madencilik algoritmasý alt
+dallardan baþlar ve yukarýya doðru çýkar, fakat bu her zaman iyi bir yöntem
+midir?
+
+Kodlama Notlarý
+
+Þu kod \verb!np.round(num - 0.5 + threshold)! kullanýmý yuvarlama
+(rounding) yapýyor, çünkü Nimfa 1 deðeri yerine 0.9, 0.8 gibi deðerler
+üretebiliyor, ayrýca 0.1 gibi deðerler de oluyor. Biz bildiðimiz yuvarlama
+\verb!.5!  sonrasý üzerini 1 yapmak yerine belli bir eþik deðeri
+(threshold) üzerinden yuvarlama yaptýk. Yani eþik=0.2 ise 0.7 alta
+yuvarlanýr ve 0 olur, 0.9 eþik üstünde olduðu için üste yuvarlanýr 1 olur.
+
+BMF için kerte $k$ kullanýcý tarafýndan seçilmeli, ama bu durum SVD, ya da
+GMM ile kümeleme gibi diðer yapay öðrenim metotlarýndan farklý deðildir. Bu
+oynanmasý gereken, keþfedilmesi gereken bir deðer.
+
+Çok Deðiþkenli Bernoulli Karýþýmý Kümelemesi ile Ýliþkisel Madencilik
+
+Bir diger yaklasim kümeleme üzerinden kural çýkartmak. Örnek veri olarak
+[7] yazýsýndanki Movielens 1M verisini kullanacaðýz. Ayrýca bu verideki
+posta kodu (zip) ve meslek (occupation) verisine README'ye ve bir Internet
+sitesine [4] danýþarak sözel açýklamalarýný koyduk. Böylece sonuçlarý
+yorumlamak çok daha kolay olacak.
+
+Ýliþkilerin keþfi için çok deðiþkenli Bernoulli modelini kullanacaðýz, ki
+[8] yazýsýnda bu kümeleme yöntemi iþlendi. CDBK kullanmak için veriyi 0/1
+bazýna indirgeyeceðiz (ki verinin büyük bir kýsmý zaten bu durumda)
+ardýndan CDBK'yý veriye uyduracaðýz, ve karýþým öðeleri $\theta_k$'lerin
+bir nevi ``þablon'' oluþturmasý sebebiyle iliþki keþfini bu þablonlar
+üzerinden yapmaya uðraþacaðýz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, zipfile
+import sys; sys.path.append('../stat_mixbern')
+import mixbern
+
+unames = ['user_id', 'gender', 'age', 'occupation', 'zip']
+rnames = ['user_id', 'movie_id', 'rating', 'timestamp']
+mnames = ['movie_id', 'title', 'genres']
+with zipfile.ZipFile('../stat_ratings/ml1m.zip', 'r') as z:
+    users = pd.read_table(z.open('users.dat'), sep='::', header=None,names=unames)
+    ratings = pd.read_table(z.open('ratings.dat'), sep='::', header=None,names=rnames)
+    movies = pd.read_table(z.open('movies.dat'), sep='::', header=None,names=mnames)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+occup_map = \
+{ 0:  "other" or not specified,1:  "academic/educator",
+  2:  "artist",3:  "clerical/admin",
+  4:  "college/grad student",5:  "customer service",
+  6:  "doctor/health care",7:  "executive/managerial",
+  8:  "farmer",9:  "homemaker",
+  10:  "K-12 student", 11:  "lawyer",
+  12:  "programmer",13:  "retired",
+  14:  "sales/marketing",15:  "scientist",
+  16:  "self-employed",17:  "technician/engineer",
+  18:  "tradesman/craftsman",19:  "unemployed",
+  20:  "writer"}
+
+zip_map = \
+{ 0: 'Northeast', 1: 'NY Area', 2: 'DC', 3: 'Florida', 4: 'Michigan/Ohio', 
+  5: 'North', 6: 'Illinois', 7: 'Texas / Arkansas', 8: 'Nevada / Utah', 
+  9: 'California / Alaska'}
+
+from sklearn.feature_extraction import DictVectorizer
+def one_hot_dataframe(data, cols):
+    vec = DictVectorizer()
+    mkdict = lambda row: dict((col, row[col]) for col in cols)
+    tmp = vec.fit_transform(data[cols].to_dict(outtype='records')).toarray()
+    vecData = pd.DataFrame(tmp)
+    vecData.columns = vec.get_feature_names()
+    vecData.index = data.index
+    data = data.drop(cols, axis=1)
+    data = data.join(vecData)
+    return data
+
+df = users.copy()
+df['occupation'] = df.apply(lambda x: occup_map[x['occupation']], axis=1)
+df['zip2'] = users['zip'].map(lambda x: int(str(x)[0]))
+df['zip2'] = df.apply(lambda x: zip_map[x['zip2']], axis=1)
+df['age2'] = pd.qcut(df['age'],5)
+df = one_hot_dataframe(df,['occupation','gender','zip2','age2'])
+df = df.drop(['zip','age'],axis=1)
+df = df.set_index('user_id')
+\end{minted}
+
+ZIP kodlarý altta gösteriliyor
+
+\includegraphics[height=7cm]{zip_code_zones.png}
+
+Þimdi hangi film genre'sinin (türünün) kullanýcý tarafýndan kaç kez alýnmýþ
+olduðunu özetleyip kullanýcý verisine bitiþik olarak ekleyeceðiz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+genre_iter = (set(x.split('|')) for x in movies.genres)
+genres = sorted(set.union(*genre_iter))
+dummies = pd.DataFrame(np.zeros((len(movies), len(genres))), columns=genres)
+for i, gen in enumerate(movies.genres):
+   dummies.ix[i, gen.split('|')] = 1
+movies_windic = movies.join(dummies.add_prefix('Genre_'))
+movies_windic = movies_windic.drop(['title','genres'],axis=1)
+joined = ratings.merge(movies_windic, left_on='movie_id',right_on='movie_id')
+genres = joined.groupby('user_id').sum()
+genres = genres.drop(['movie_id','rating','timestamp'],axis=1)
+X = pd.merge(df, genres, left_index=True, right_index=True,how='left')
+print X.shape
+\end{minted}
+
+\begin{verbatim}
+(6040, 56)
+\end{verbatim}
+
+En iyi küme sayýsý nedir? Bunun için mümkün tüm küme sayýlarýný deneriz,
+AIC sonuçlarýna bakarýz, sonuçlar arasýndan düþüþ ardýndan ilk çýkýþ olduðu
+aný en iyi küme sayýsý olarak kullanýrýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+iter=40; eps=1e-15; attempts=5
+for K in range(5,16):
+    lR,lPi,lP,lbest,aic = mixbern.EMmixtureBernoulli(X,K,iter,eps,attempts)
+    print K,aic
+\end{minted}
+
+\begin{verbatim}
+5,173126.633281
+6,172007.606772
+7,170285.383519
+8,169043.301004
+9,168457.12051
+10,167463.532805
+11,167253.486012
+12,166290.598818
+13,165764.506989
+14,164964.964083
+15,164989.85056
+16,164321.25051
+\end{verbatim}
+
+Sonuçlara göre $K=14$ bu çýkýþ anýný yakalar. Bu sayýyla tekrar kümelemeyi
+iþletelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+iter=40; eps=1e-15; attempts=5; K=14
+lR,lPi,lP,lbest,aic = mixbern.EMmixtureBernoulli(X,K,iter,eps,attempts)
+rules = np.exp(lP)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def print_rule(j):
+    for i,r in enumerate(rules[j]): 
+         if r > 0.5: print X.columns[i], r
+\end{minted}
+
+Þimdi bazý kurallarý ekrana basalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print_rule(0)
+\end{minted}
+
+\begin{verbatim}
+age2=(25, 35] 1.0
+gender=M 1.0
+Genre_Action 0.997646429789
+Genre_Adventure 0.976908591072
+Genre_Animation 0.73312197406
+Genre_Children's 0.815806962254
+Genre_Comedy 1.0
+Genre_Crime 0.888200034236
+Genre_Drama 1.0
+Genre_Fantasy 0.759168898223
+Genre_Film-Noir 0.535819148049
+Genre_Horror 0.859145011653
+Genre_Musical 0.704293299334
+Genre_Mystery 0.735085517947
+Genre_Romance 0.999999999621
+Genre_Sci-Fi 0.98865549819
+Genre_Thriller 1.0
+Genre_War 0.948000910806
+Genre_Western 0.590038323721
+\end{verbatim}
+
+25 ila 35 yaþ arasýndaki erkekler komedi ve aksiyon çok seviyorlar, en çok
+beðendiklerinin arasýnda en alt sýrada Western var. Ýlginç.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print_rule(1)
+\end{minted}
+
+\begin{verbatim}
+age2=(18, 25] 1.0
+gender=M 1.0
+Genre_Action 0.999999916342
+Genre_Adventure 0.968035357641
+Genre_Animation 0.618607301467
+Genre_Children's 0.733114850427
+Genre_Comedy 1.0
+Genre_Crime 0.895303009556
+Genre_Drama 1.0
+Genre_Fantasy 0.621607330213
+Genre_Horror 0.826409070694
+Genre_Mystery 0.667105230382
+Genre_Romance 0.962487486107
+Genre_Sci-Fi 0.981703990034
+Genre_Thriller 0.999998477836
+Genre_War 0.884260074733
+\end{verbatim}
+
+Daha dar bir yaþ aralýðý 18-25 yaþ grubu, komedi, dram, aksiyon, gerilim
+var, en az sevilen filmler bu sefer animasyon.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print_rule(2)
+\end{minted}
+
+\begin{verbatim}
+gender=F 1.0
+Genre_Action 1.0
+Genre_Adventure 0.997753376918
+Genre_Animation 0.925605697933
+Genre_Children's 0.989223061984
+Genre_Comedy 0.999411653044
+Genre_Crime 0.978893423529
+Genre_Drama 1.0
+Genre_Fantasy 0.890898944372
+Genre_Film-Noir 0.810452619282
+Genre_Horror 0.901607018088
+Genre_Musical 0.93690169152
+Genre_Mystery 0.949990841295
+Genre_Romance 1.0
+Genre_Sci-Fi 0.999467975234
+Genre_Thriller 0.997148167548
+Genre_War 0.987837234705
+Genre_Western 0.801075654907
+\end{verbatim}
+
+Bayanlar için (yaþ grubu yok dikkat), üstte aksiyon var, ama romantik
+filmler de en üstte. 
+
+Þu da ilginç bir bulgu; meslek kollarý ve adres verilerini analize dahil
+etmiþ olmamýza raðmen kümelerin þablonu içinde hiçbiri yok! Demek ki
+meslekler, adresler film beðenisinde fark yaratmýyor.
+
+Üstteki analiz müþteri bilgisine müþteri seviyesinde baktý. Eðer iþlemsel
+(transactional) bir analiz yapýyor olsaydýk, yaklaþým benzer olacaktý,
+sadece veri odaðý biraz farklý olurdu; müþterilerin her alýþveriþ
+sepetlerine bakýlacaktý mesela, bir sepete koyulan mesela ekmek, çikolata,
+su, bir diðerine koyulan ekmek, su, biberon gibi alýmlar bir satýrda 1 ile
+iþaretli, diðerleri 0 ile iþaretli olacaktý, ve kümeleme algoritmasý bu çok
+boyutlu Bernoulli veriye bir uyum yapýp þablonlarý raporlayacaktý.
+
+Ýlginçlik - Ýstatistiki Ölçüt
+
+Kümeleri uydurduktan sonra bile bu kümelerin içinde hangisinin ``daha iyi''
+olduðunu bulmak için istatistiki ölçüt kullanmak faydalý olabilir. Hatta
+birazdan bahsedeceðimiz teknik aslýnda her türlü iliþki madenciliði
+yaklaþýmý için faydalý, çünkü hangi teknik olursa olsun bize verinin belli
+bir grubunu ``önemli'' olarak gösterecek. Ardýndan biz bu grubu alýp onun
+ne kadar önemli olduðunun ölçütünü hesaplayabileceðiz.
+
+Teknik þöyle: Ýstatistiki testlerden [9] yazý bölümünü hatýrlarsak, bir
+ideal daðýlým vardý, ve eldeki verinin bu ideale olan yakýnlýðýný
+ölçüyorduk. Chi Kare testi ayrýksal bazda iþliyordu, eðer eldeki sürekli
+fonksiyon bazlý bir daðýlým ise onun ideal hesaplarýný kutucuklara
+bölüþtürüyorduk.
+
+Ýliþkisel madencilikte elde ettiðimiz kural bir vektör içinde 0/1 deðerleri
+olacak. Yaklaþým þöyle; önce verideki her kolonun tek baþýna oranýný
+buluruz. Bu oranlar her kolon ``daðýlýmýnýn'' birbirinden baðýmsýz farz
+edildiði ``idealize'' ortamýn ölçütleri olacaklar. Veri mesela þöyle,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = [[1,1,0,0,1],
+        [1,0,0,0,0],
+        [1,0,0,1,1],
+        [1,1,0,1,1],
+        [1,1,1,0,1],
+        [0,0,1,1,0],
+        [0,1,1,0,0]
+        ]
+data = np.array(data)
+sums = data.sum(axis=0)
+means = data.mean(axis=0)
+print 'toplam', sums
+print 'ortalama', means
+\end{minted}
+
+\begin{verbatim}
+toplam [5 4 3 3 4]
+ortalama [ 0.71428571  0.57142857  0.42857143  0.42857143  0.57142857]
+\end{verbatim}
+
+Þimdi bulunan kurallardan birini, diyelim \verb![1,1,0,0,1]!, ana veride en
+fazla 1 sayýsýna tekabül eden kolonunu seçeriz, ve bu kolonun 1 olduðu tüm
+satýrlarý bir alt küme olarak toparlarýz. Bu alt kümede diyelim 5 tane
+satýr var, ve kuralýn diðer ögeleri 1. haricinde 2. ve 5.  kolonun da '1'
+deðerinde olmasý. O zaman, toplam 5 satýr için 2. ve sonuncu satýrda 5*0.57
+ve 5*0.57 tane satýr olmalý. Sýfýr hipotezi baðýmsýzlýk olduðu için bu
+``beklenen (expected)'' sayý. Diðer yandan gerçek rakamlar var, bu rakamlar
+alt kümedeki '1' deðerlerinin toplamý, ki bu da ``görünen (observed)''
+sayý. Bu iki vektör üzerinden chi kare deðerini hesaplýyoruz [5, sf. 391],
+
+$$ \chi^2 = \sum_i \frac{(O_i-E_i)^2}{E_i} $$
+
+$\chi^2$'nin serbestlik derecesi 3-1=2 (çünkü kuralda 3 tane kolon var,
+1. kolonu alt kümeyi bulmak için kullandýk). p-deðeri ne kadar yüksek ise
+kural o kadar ilginç diyebiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import chi2
+
+def interesting(rule): 
+     idx = (sums*rule).argmax()
+     subset = data[data[:,idx] == 1]
+     print subset
+     print subset[:,rule==1]
+     obs = subset[:,rule==1].sum(axis=0)
+     exp = len(subset)*means[rule==1]
+     print 'gorunen (observed)', obs
+     print 'beklenen (expected)', exp
+     chi = np.sum((obs-exp)**2 / exp)
+     dof = rule.sum()-1
+     print 1-chi2.cdf(chi,dof)
+
+rule = np.array([1,1,0,0,1])
+interesting(rule)
+\end{minted}
+
+\begin{verbatim}
+[[1 1 0 0 1]
+ [1 0 0 0 0]
+ [1 0 0 1 1]
+ [1 1 0 1 1]
+ [1 1 1 0 1]]
+[[1 1 1]
+ [1 0 0]
+ [1 0 1]
+ [1 1 1]
+ [1 1 1]]
+gorunen (observed) [5 3 4]
+beklenen (expected) [ 3.57142857  2.85714286  2.85714286]
+0.595795886519
+\end{verbatim}
+
+Bir baþka kural deneyelim, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+rule = np.array([1,0,0,0,1])
+interesting(rule)
+\end{minted}
+
+\begin{verbatim}
+[[1 1 0 0 1]
+ [1 0 0 0 0]
+ [1 0 0 1 1]
+ [1 1 0 1 1]
+ [1 1 1 0 1]]
+[[1 1]
+ [1 0]
+ [1 1]
+ [1 1]
+ [1 1]]
+gorunen (observed) [5 4]
+beklenen (expected) [ 3.57142857  2.85714286]
+0.310494434317
+\end{verbatim}
+
+Bu daha az ilginçmiþ. Hakikaten de ilk kuralýn veriye bakarak daha ilginç
+olduðunu söyleyebiliriz. 
+
+Gösterdiðimiz tekniði film sonuçlarýnda kullanmadýk, bunu ödev olarak
+okuyucuya býrakýyoruz.
+
+Kaynaklar
+
+[1] Ian H. Witten, Eibe Frank, Mark A. Hall, {\em Data Mining Practical Machine Learning Tools and Techniques}
+
+[2] Harrington, P., {\em Machine Learning in Action}
+
+[3] Miettinen, {\em Boolean Matrix Factorizations}, \url{http://www.mpi-inf.mpg.de/~pmiettin/slides/BooleanMatrixFactorizationsForDataMining_Antwerp_slides.pdf}
+
+[4] Zip boundary, {\em ZIP Code FAQs}, \url{http://www.zipboundary.com/zipcode_faqs.html}
+
+[5] Rao, {\em Linear Statistical Inference and Its Applications}
+
+[6] Bayramli, Lineer Cebir, {\em Matris Çarpýmý, Ders 1}
+
+[7] Bayramli, Istatistik, {\em Pivotlama}
+
+[8] Bayramli, Istatistik, {\em Çok Deðiþkenli Bernoulli Karýþýmý}
+
+[9] Bayramli, Istatistik, {\em Pearson Chi Kare Uyum Derecesi Testi}
+
+\end{document}

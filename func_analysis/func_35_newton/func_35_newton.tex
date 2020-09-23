@@ -1,0 +1,851 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Newton'un Metodu (Newton's Method)
+
+Kýsýtlanmamýþ bir pürüzsüz optimizasyon problemini düþünelim [6, 6:00], 
+
+$$
+\min f(x)
+$$
+
+Baktýðýmýz $f$'in iki kez türevi alýnabilir olduðunu düþünelim. Hatýrlarsak
+gradyan iniþi nasýl iþliyordu? Alttaki gibi,
+
+$$
+x^{k} = x^{k-1} - t_k \cdot \nabla f(x^{k-1}), k=1,2,...
+$$
+
+Bir baþlangýç $x^{(0)} \in \mathbb{R}^n$ seçiliyor ve üstteki ardý ardýna
+iþletiliyor, her adýmda negatif gradyan yönünde $t_k$ boyunda adým
+atýlýyor.
+
+Kýyasla Newton metotu alttakini iþletir,
+
+$$
+x^{k} = x^{k-1} - 
+\left( \nabla^2 f(x^{(k-1)}) \right)^{-1} \nabla f(x^{k-1}), k=1,2,...
+$$
+
+ki $\nabla^2 f(x^{(k-1)})$ $f$'in $x^{(k-1)}$ noktasýndaki Hessian'ý. Yani
+$t_k$ boyunda eksi gradyan yönünde gitmek yerine gradyanin ``negatif
+Hessian'ý yönünde'' gideceðiz. Dikkat edersek bu yöntemde adým büyüklüðü
+kavramý yok, seçilen yönde tam bir adým atýlýyor.
+
+Newton metotunu nasýl yorumlamak gerekir? Gradyan iniþini hatýrlarsak, bir
+fonksiyon $f$'i alalým, ve onu $x$ noktasýnda karesel olarak
+yaklaþýklamasýný alýyorduk,
+
+\includegraphics[width=20em]{func_35_newton_01.png}]
+
+Hessian nerede? Aslýnda var, ama birim matris $\frac{1}{2t} I$ olarak
+alýndý. Alttaki resimde Newton metotu için yaratýlan yaklaþýklamayý
+görüyoruz, bu büyük ihtimalle daha iyi bir yaklaþýklama olacak çünkü
+karesel açýlýmda daha fazla bilgi kullanýyor, bu sefer formülde $\nabla^2
+f(x)$ ile Hessian da var. 
+
+\includegraphics[width=20em]{func_35_newton_02.png}
+
+Bu yeni yaklaþýklama üzerinden $x - (\nabla^2 f(x))^{-1}\nabla f(x)$ ile
+adým atýnca belki yeþil okla gösterilen yere geleceðiz, bu daha iyi bir
+nokta olabilecek. Atýlan adým formülünün resimdeki karesel formun minimize
+edicisi olduðunu görmek zor deðil.
+
+Gradyan iniþi ve Newton metotu adýmlarý arasýndaki farký görmek için örnek
+bir fonksiyona bakalým, $f(x) = (10 x_1^2 + x_2^2)/2 + 5 \log (1+e^{-x_1 - x_2})$. 
+Fonksiyonu kontur grafiðini basýnca alttaki gibi çýkýyor, 
+
+\includegraphics[width=20em]{func_35_newton_03.png}
+
+Siyah çizgi gradyan iniþi, mavi Newton. Ayný yerden baþlattým, ve
+gördüðümüz gibi minimal noktaya doðru çok farklý yollar takip
+ediyorlar. Karþýlaþtýrmasý kolay olsun diye her iki tarafta atýlan adým
+büyüklüklerini ayný tutmaya uðraþtým. Graydan iniþinin attýðý adýmlarýn
+yönünün niye böyle olduðu gayet bariz, tüm adýmlar görüldüðü gibi o
+noktadaki kontura dikgen, ki bu gradyanýn tanýmýdýr zaten, bir noktadaki
+gradyan oradaki konturun teðetine diktir / normaldir. 
+
+Newton tamamen farklý bir þekilde gidiyor. Resimde tüm adýmlar tek bir
+çizgide gibi duruyor ama aslýnda deðil, baþka bir yerden baþlatsaydým bazen
+zigzaglý bile gidilebileceðini görürdük [6, 13:40]. Newton'un adýmlarýný
+yorumlamanýn görsel olarak zihinde hayal etmenin iyi bir yolu onun her
+adýmda bir küre, bir balon yarattýðýný düþünmek, ve o balonun gradyanina
+göre adým atmak. 
+
+Dersin geri kalanýnda Newton metotunda geriye çizgisel iz sürme
+(backtracking) yöntemini göreceðiz, ki ``Newton metotu'' denince aslýnda bu
+çeþitten bahsedilir, üstteki bahsettiðimize ``pür Newton'' adý
+veriliyor. Sonra bazý yakýnsama özelliklerine bakacaðýz, ardýndan Newton
+metotunun bir çeþidi, eþitlik kýsýtlamalý Newton metotunu göreceðiz. Eðer
+zaman kalýrsa Newton-umsu (quasi-Newton) metotlara da bakmak istiyorum.
+
+Newton metotuna bakmanýn bir diðer yolu nedir? Onun her adýmda bir karesel
+açýlýmý minimize ettiðini biliyoruz. Bir diðeri [6, 17:04] birinci derece
+optimalite þartýný lineerize etmek. Biz $x$'teyiz diyelim, öyle bir yön $v$
+arýyoruz ki o yönde bir adým atýnca gradyan sýfýr hale gelsin, 
+$\nabla f(x+v)=0$. Bu genel bir ifade deðil mi, ayrýca $v$ baðlamýnda
+lineer, $x$ sabit. Þimdi bu gradyanin lineer yaklaþýklamasýný yaparsak
+doðal olarak Hessian'lý ifadeye eriseceðiz, 
+
+$$
+0 = \nabla f(x+v) \approx \nabla f(x) + \nabla^2 f(x) v
+$$
+
+Ve üstteki formülü $v$ için çözersek, bu bizi tekrar daha önce
+gösterdiðimiz Newton adýmýna götürüyor, 
+$v = - \left( \nabla^2 f(x) \right)^{-1} \nabla f(x)$
+
+Bu metotun tarihi bir arka planý da var, Ýsaac Newton bizim bugün Newton
+metotu dediðimiz yöntemi minimizasyon için deðil, kök bulmak için
+keþfetti. Düþündü ki gayrý-lineer bir denklemin çözümlerini bulmak
+istiyorsan böyle bir metot gerekli. Tek boyutta düþünelim, mesela bir $g$
+var, onun köklerini bulmak istiyoruz, o zaman Newton metotu kullan. Hatta
+genel fonksiyonlar için bile deðil, polinomlar için bu yöntemi
+bulmuþtu. Rhapson, bir diðer bilimci, ayný þekilde, ayný metotu düþündü. O
+sebeple bu metota bazen Newton-Rhapson adý verildiðini de görebilirsiniz.
+Çok sonralarý bilimciler bu metotu minimizasyon için kullanmayý akýl etti,
+gradyaný sýfýra eþitliyerek. Bu kullaným çoðunlukla Simpson'a atfedilir.
+
+Devam edelim, Newton adýmýnýn önemli bir özelliði onun ýlgýn deðiþmezliði
+(affine invariance). Bu ne demek? Bir lineer transformasyona
+bakalým. Diyelim ki $f,x$ üzerinden Newton adýmý hesaplýyorken ben gelip
+diyorum ki ``$x$ üzerinde deðil yeni bir deðiþken $y$ üzerinden bunu
+yapmaný istiyorum'' ve formül $x = Ay$, ve $g(y) = f(Ay)$. O zaman $g$
+üzerinde Newton adýmlarý neye benzer? 
+
+$$
+y^+ = y - (\nabla^2 g(y))^{-1} \nabla g(y)
+$$
+
+$$
+= y - (A^T \nabla^2 f(Ay) A)^{-1} A^T \nabla f(Ay)
+$$
+
+$$
+= y - A^{-1} (\nabla^2 f(Ay))^{-1} f(Ay)
+$$
+
+Eðer üsttekini $A$ ile çarparsam, ki solda $Ay^+$ elde edebileyim, 
+
+
+$$
+Ay^+ = Ay -  (\nabla^2 f(Ay))^{-1} f(Ay)
+$$
+
+ki
+
+$$
+\underbrace{Ay^+}_{x^+} =
+\underbrace{Ay}_{x} -  
+(\nabla^2 f(\underbrace{Ay}_{x}))^{-1} f(\underbrace{Ay}_{x})
+$$
+
+$x$'e göre atmýþ olacaðýmýz adýma eriþtik yani [6, 22:30]. 
+
+Bu demektir ki lineer ölçeklemeden baðýmsýz davranabiliyoruz. Mesela size
+bir problem verdim, Hessian'ý hesapsal baðlamda uygunsuz (poorly
+conditioned) ama bir lineer transformasyon uygularsam iyi hale gelecek, o
+zaman prensipsel olarak ilk ya da transform edilmiþ problem üzerinde Newton
+iþletmeniz bir fark yaratmaz.  Dikkat, bu durum gradyan iniþi için geçerli
+deðildir.
+
+Newton azalýþý (decrement)
+
+Yeni bir kavram bu, Newton azalýþý. Bu kavram bize Newton adýmýný
+yorumlamada bir açý daha kazandýrýyor, ayrýca birazdan geriye çizgisel iz
+sürmeden bahsederken, ve duruþ kriterini hesaplamada da yardýmcý oluyor. 
+
+[atlandý]
+
+Geriye çizgisel iz sürmek
+
+Eðer pür Newton adýmý atarsak baþladýðýmýz noktaya göre uzaksama (diverge)
+mümkündür, yani optimal noktadan uzaklaþabiliriz. Newton metotunun çok
+hýzlý bir yakýnsama oraný vardýr, ama belirttiðimiz bu durumlarda ayný
+þekilde çok hýzlý bir þekilde de uzaksayabilir. Yani baþladýðýmýz noktaya
+göre Newton metotu ya çok iyi, ya da çok kötüdür. O sebeple araþtýrmacýlar
+pratik uygulamalarda muhakkak geriye çizgisel iz sürme yönteminin Newton'la
+beraber kullanýrlar. Pür Newton metotunu olduðu gibi kullanan neredeyse
+kimse tanýmýyorum. Gradyan iniþi de benzer þekilde kullanýlýr, hatta bu iki
+yöntemi aslýnda ayný altyapý odaklý görebiliriz.  
+
+Ýz sürme yöntemi adým büyüklüðü $t$'yi hesaplamak için kullanýlýr, pür
+metot $t=1$ kullanýyor tabii ki.  Arama algoritmasý iki parametreyi baz
+alýr, $\alpha,\beta$. Bu parametreler için iyi iþleyen bazý deðerler mesela 
+$0 < \alpha <1/2$ ve $0 < \beta < 1$. Her adýmda $t=1$ ile baþlarýz, ve
+
+$$
+f(x+tv) > f(x) + \alpha t \nabla f(x)^T v
+$$
+
+koþuluna bakarýz. Soldaki Newton adýmý, saðdaki o yönde ama daha ufak,
+$\alpha t$ kadar ufak bir lineer yaklaþýklama, ara deðerleme
+(interpolation). Yani $t$'nin bir kýsmý kadar, $\alpha$ kýsmý kadar yönde
+bir ilerleme kaydedip etmeyeceðimize bakýyoruz, eðer üstteki þart doðruysa
+o $t$'yi adým olarak seçiyoruz. Yoksa $t = \beta t$ ile $t$'yi küçültüp alt
+döngüde ayný iþlemi bir daha tekrarlýyoruz. 
+
+Newton yönteminin çok hýzlý yakýnsadýðýný söylemiþtik, arama adýmýný hesaba
+katýnca bile bu doðru. Peki hiç dezavantajý yok mu? Bir tane var, eðer
+Hessian yoðun (dense) matris ise o zaman temel lineer cebir'e göre tersini
+hesaplamak ne kadar yük getirir? $O(n^3)$ deðil mi? Bu aðýr bir yük olabilir.
+
+[yakýnsama analizi atlandý]
+
+Þimdi Newton'un yöntemini birinci derece yöntemlerle (gradyan iniþi gibi)
+karþýlaþtýralým.
+
+\begin{itemize}
+   \item Bellek: her adýmda Newton yöntemi $O(n^2)$ yer tutar, çünkü
+     Hessian $n \times n$ boyutunda, kýyasla her gradyan adýmý $O(n)$ yer
+     tutar, çünkü $n$ boyutlu gradyan var. 
+
+   \item Hesap: her adýma $O(n^3)$ hýzýnda, eðer yoðun $n \times n$
+     boyutunda bir lineer sistemi çözmek gerekiyorsa. Ama her gradyan iniþ
+     adýmý $O(n)$ hýzýnda iþler, çünkü $n$ boyutlu bir vektörü topluyoruz,
+     ölçekliyoruz, basit iþlemler yapýyoruz yani.
+
+   \item Geriye iz sürme: her iki yöntem için de $O(n)$ hýzýnda iþler. 
+
+   \item Uyumlama, transformasyon: Newton yöntemi problemin mevcut haline
+     çok baðýmlý deðil, eðer transforme edersek eþit bir baþka problem elde
+     ediyoruz, ve Newton onu da çözüyor. Gradyan iniþi problem çeþidine
+     göre hýzlý bir þekilde dejenere olabilir, sonuca varamayabilir.
+     
+   \item Kýrýlganlýk: Newton yönteminin hatalar, sayýsal hesap
+     problemlerine biraz daha hassas olduðu söylenebilir, gradyan iniþi
+     daha saðlamdýr. 
+\end{itemize}
+
+O zaman Newton yöntemini hangi durumlarda kullanmak iyidir? Eðer Hessian
+seyrek ve bir iç yapýya sahip ise o zaman o lineer sistemi çözmek hýzlý
+olur, bu durumda Newton yöntemi kullanmak uygundur. Yapýya sahip ile ne
+demek istiyorum? Mesela bantlý bir matris var ise. Bantlý matris köþegende
+bir veya daha fazla çapraz satýr olduðu durumlardýr, bir þerit, bir
+``bant'' vardýr, alttaki gibi,
+
+\includegraphics[width=15em]{banded.png}
+
+Bu durumda bellek ve hesapsal yük her adým için $O(n)$ olacaktýr. 
+
+Yapýya sahip Hessian'lar alttaki gibi durumlarda ortaya çýkabilir, 
+
+\begin{itemize}
+
+\item Eðer $g(\beta) = f(X\beta)$ ise o zaman
+  $\nabla^2 g(\beta) = X^T \nabla ^2 f(X\beta) X$ olur. Yani eðer $X$ bir
+  yapýya sahip tahmin edici matris ise ve $\nabla^2 f$ köþegen ise o zaman
+  $\nabla^2 g$ yapýya sahiptir.
+
+\item Amacýmýz $f(\beta) + g(D\beta)$'yi minimize etmek, $\nabla^2$
+  köþegen, $g$ pürüzsüz deðil, ve $D$ yapýya sahip bir ceza matrisi, o
+  zaman Lagrange ikiz fonksiyonu $-f^*(-D^Tu)-g^*(-u)$. Çoðunlukla bu
+  durumlarda $\nabla^2f^*$ köþegen olur (mesela
+  $f(\beta) = \sum _{i=1}^{p}f_i (\beta_i)$ ise bu durumda ikizdeki Hessian
+  yapýya sahiptir.
+
+\end{itemize}
+
+Eþitlik kýsýtlamalý Newton yöntemi
+
+Þu formdaki bir problem düþünelim, 
+
+$$
+\min_x f(x) \quad \textrm{öyle ki} \quad Ax = b
+$$
+  
+Bu tür problemleri çözmek için elimizde aþaðý yukarý üç yöntem var. 
+
+1) Eþitlik sýnýrlamalarýný yoket. Problemi $A$'nin sýfýr uzayý baðlamýnda
+tekrar parametrize et, yani $x = My + x_o$ yap, $M$, $A$'nin sýfýr uzayýný
+kapsar, ve $A x_0 = b$'dir. Çözümü $y$ baðlamýnda yap.
+
+Bu fena bir çözüm deðil, ama $A$'nin sýfýr uzayýný kapsayan bir $M$
+bulmamýzý gerektiriyor. Ayrýca problemde yapý varsa bunu bozmuþ olabiliriz,
+seyrek Hessian elimizde olabilir ama deðiþim sonrasý Hessian yoðun
+olabilir. 
+
+2) Ýkizi türet. Daha önce gördük ki bu tür problemlerde ikizi hesaplarken
+eþitlik sýnýrý kritere dahil ediliyordu. Ama bu da her zaman kolay
+deðildir. 
+
+3) Eþitlik kýsýtlamalý Newton yöntemi. Çoðu durumda en direk yaklaþým
+budur. Bu yöntemde $x^{(0)}$ ile baþlarýz, ki $Ax^{(0)}=b$ olacak þekilde,
+ve
+
+$$
+x^+ = x + tv
+$$
+
+adýmý atarýz, ama normal Hessian'lý karesel açýlýmý minimize etmek yerine
+yeni bir sýnýrlama ekleyeceðiz, her Newton adýmýnýn saygý göstermesi
+gereken $Az=0$ þartý koyacaðýz,  
+
+$$
+v = \arg\min_{Az=0} \nabla f(x)^T (z-x) + \frac{1}{2} (z-x)^T \nabla^2 f(x)(z-x)
+$$
+
+Böylece her adýmda kýsýtlanmýþ bölge içinde kalmýþ olacaðýz. Üstteki
+eþitlik þartýný KKT dersimizde görmüþtük, bu hesap tek bir lineer sistemi
+çözmeye indirgenebiliyordu. Lineer sistemi tekrar altta veriyorum, 
+
+$$
+\left[\begin{array}{cc}
+\nabla^2 f(x) & A^T \\ A & 0
+\end{array}\right]
+\left[\begin{array}{cc}
+v \\ w
+\end{array}\right] = 
+\left[\begin{array}{cc}
+-\nabla f(x) \\ 0
+\end{array}\right] 
+$$
+
+Bu lineer sistemi $v$ için çözersek bu bize eþitlikle sýnýrlanmýþ
+Newton adýmýný verecektir. Eþitliðin solundaki matris çoðunlukla seyrek ve
+yapýya sahiptir, çünkü $\nabla^2 f(x)$ Hessian'ý içindeki seyreklik ve
+yapý aynen orada da mevcuttur, ve $A$'lar blok halinde belli yerdeler, vs. 
+Ayrýca Boyd [7, 1:04:00]'da benzer bir anlatým var.
+
+Alternatif Anlatým
+
+Newton birazdan bahsedeceðimiz yöntemi tek boyutlu problemler için kullandý
+[2]. Rhapson adlý bilimci yöntemi çok boyutlu problemler için
+geniþletti. Biz bu yönteme optimizasyon çerçevesinde bakacaðýz.  Konunun
+tarihinden biraz bahsetmek istiyorum, bu dersi öðretmeye baþladýðýmda 1986
+senesiydi, Newton'un metodunu nasýl gördüðümüz o zamandan beri deðiþime
+uðradý, o zamanlar son baþvurulan metot diye öðretiliyordu, çünkü kullanmak
+için ``büyük'' bir denklem sistemi çözmek gerekiyordu, 500 x 500 bir sistem
+mesela. Bugüne gelelim Newton metotu artýk ilk baþvurulan metot haline
+geldi, 50,000 x 50,000 boyutlarýnda bir sistem çözmek ``yetiyor'' ve böyle
+bir sistem artýk idare edilebilen bir boyut haline geldi. Yani hesapsal
+kapasite Newton metodunun optimizasyon alanýnda oynadýðý rolü tamamen
+deðiþtirdi.
+
+Diðer bir faktör ileride öðreneceðimiz iç nokta (interior-point)
+metotlarýnýn Newton'un metodunu kullanýyor olmalarý. Ýç nokta metotlarý
+içbükey optimizasyonda çok popüler, onlar için Newton metotu gerekiyor, bu
+da onun popülaritesini arttýrýyor.
+
+NM nedir? Elimde bir kýsýtlanmamýþ (unconstrained) problemim var diyelim,
+
+$$
+\min f(x), \quad \textrm{ öyle ki } \quad x \in X = \mathbb{R}^n
+$$
+
+Bir Taylor açýlýmý yapabiliriz,
+
+$$
+f(x) \approx 
+f(\bar{x}) + 
+\nabla f(\bar{x})^T (x-\bar{x}) + 
+\frac{1}{2} (x-\bar{x})^T F (x-\bar{x}) 
+$$
+
+ki $F$ Hessian matrisi. Üstteki formüle $h(x)$ diyelim. Böylece bir karesel
+model ortaya çýkartmýþ oldum, formülün sað tarafýndaki çarpým onu karesel
+yapýyor, ve þimdi onu kesin olarak çözmek istiyorum. Bunu nasýl yaparým?
+Formülün gradyanýný sýfýra eþitleyebilirim. Üstteki fonksiyonun $x$'teki
+gradyaný nedir? 
+
+Gradyaný $x$'e göre aldýðýmýzý unutmayalým, $h(x)$'in ikinci terimi
+$\nabla f(\bar{x})^T$ bir sabit sayý, ikinci gradyan alýnýrken sýfýrlanýr,
+ve tüm ikinci terim sýfýrlanýr. Üçüncü terimin gradyanýný almak bir nevi
+$\frac{\partial (x^TAx)}{\partial x} $ almak gibi [1], $F$ belli bir
+noktadaki ikinci türev matrisi olduðu için $A$ gibi bir sabit matris kabul
+edilebilir, $A$ simetrik olunca gradyan $2Ax$ sonucunu veriyordu, $F$
+simetrik, o zaman üçüncü terimde $F$ kalýr, 2 ve $1/2$ birbirini iptal
+eder, sonuç
+
+$$
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + F(\bar{x})(x-\bar{x}) 
+$$
+
+Ýki üstteki karesel yaklaþýksal ifadenin gradyaný bu iþte. Onu sýfýra
+eþitleriz ve çözeriz. $F$ tersi alinabilir bir matristir, o zaman 
+
+$$
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + F(\bar{x})(x-\bar{x}) = 0
+$$
+
+
+$$
+(x-\bar{x}) = -F^{-1} \nabla f(\bar{x})
+$$
+ 
+Üstteki ifadeye $d$ diyebilirim, ve bu $d$ benim Newton yönüm olarak
+görülebilir, yön derken optimizasyon baðlamýnda minimuma giden yön. 
+
+Bu bizi gayet basit 4 adýmlýk bir algoritmaya taþýyor,
+
+0) $x^0$ verildi, bu baþlangýç noktasý, $k = 0$ yap.
+
+1) $d^k = -F(x^k)^{-1} \nabla f(x^k)$. Eðer $d^k=0$ ise dur.
+
+2) $\alpha^k = 1$ adým boyu seç
+
+3) $x^{k+1} = x^k + \alpha^k d^k$, $k = k + 1$ yap, ve 1. adýma geri dön.
+
+Bu metodun önemli bir özelliðinin her adýmda sadece bir lineer sistemi
+çözmek olduðunu görüyoruz (tersini alma iþlemi). Bir lineer sistemi çözmek
+kolay mýdýr? Sisteme göre deðiþir, 100 x 100 sistem, problem yok. 10,000 x
+10,000 yoðun bir sistem var ise (seyrek matrisle temsil edilen lineer
+sisteme nazaran) iþimiz daha zor olacaktýr. Bu tür sistemlerde Gaussian
+eliminasyon iþlemeyebilir, bir tür özyineli metot gerekli. Demek istediðim
+Newton yönteminin darboðazý bir lineer denklem sistemini her seferinde
+sýfýrdan baþlayarak çözmek, ve bunu her döngüde yapmak.
+
+Fakat bu çözümün bize pek çok þey kazandýrdýðýný da görmek lazým;
+bahsedilen sistemi çözmek bize pek çok bilgi kazandýrýyor çünkü çözülen
+problem içinde 1. ve 2. türev bilgisi var. Bu bilgi minimizasyon açýsýndan
+daha akýllýca adým atýlabilmesini saðlýyor. 
+
+Metot Hessian'ýn her adýmda tersi alýnabilir olduðunu farzediyor, bu her
+zaman doðru olmayabilir. O sebeple bunun doðru olduðu türden problemler ile
+uðraþacaðýz, ya da Hessian'ýn tersi alýnabilir olmasýný saðlayan
+mekanizmalarý göreceðiz. $F$'nin özünü bozmadan deðiþtirerek tersi
+alýnabilir olmasýný saðlayan yöntemler var. 
+
+Ayrýca hedef her adýmda fonksiyonunu oluþturduðumda bu fonksiyonun azalma
+garantisi yok. Öyle ya akýllý bir algoritmanin her adýmda hedef
+fonksiyonumu daha iyiye götürdüðümü düþünebilirdim, ama þu anda kadar
+gördüklerimiz ýþýðýnda, bunun garantisi yok. Bu konuya sonra deðineceðiz. 
+
+Bir diðer nokta 2. adýmýn çizgi arama ile geniþletilebilmesi [bu konuya
+altta baska kaynaklardan deginiyoruz]
+
+NY'nin en çekici tarafý, eðer yakýnsama (convergence) mümkün ise bu
+yakýnsamanýn çok hýzlý bir þekilde olmasý, ki bu iyi. Bu konuya gelmeden
+metodun bazý ek özelliklerini görelim.
+
+Terminoloji: bir matrise SPD denir eger matris simetrik, pozitif kesin ise
+(simetric positive-definite). 
+
+Teklif (Proposition) 1: 
+
+Eðer $F(x)$ SPD ise $d \ne 0$, o zaman $d$ $\bar{x}$ noktasýnda bir iniþ
+yönüne iþaret eder. Ýniþ yönü olmasý demek, eðer makul ufak bir adým
+çerçevesinde gidilen noktada $f$'in deðerinin o an olduðumuz noktadan daha
+az olmasý demektir.
+
+Nasýl ispatlarým? Önceki dersten hatýrlarsak, eðer yönüm gradyan ile
+negatif iç çarpýma sahip ise, o zaman yönüm kesinlikle bir iniþ yönüydü.
+
+Teori 
+
+Diyelim ki $f(x)$ fonksiyonu $\bar{x}$ noktasýnda türevi alýnabilir halde
+[2, sf. 9]. Eðer elimizde $\nabla f(\bar{x})^T d < 0$ sonucunu veren bir
+$d$ vektörü var ise, öyle ki her yeterince küçük $\lambda > 0$ için
+$f(\bar{x}+\lambda d) < f(\bar{x})$ olacak þekilde, o zaman $d$ bir iniþ
+yönüdür.
+
+Ýspat 
+
+Taylor açýlýmý ile yönsel türev tanýmýna bakarsak,
+
+$$
+f(\bar{x} + \lambda d ) = 
+f(\bar{x}) + \lambda \nabla f(\bar{x})^T d + 
+\lambda ||d|| \alpha(\bar{x},\lambda d)
+$$
+
+öyle ki $\alpha(\bar{x},\lambda d) \to 0$, $\lambda \to 0$ olurken. Not:
+Norm içeren üçüncü terimdeki $\lambda ||d|| \alpha(\bar{x},\lambda d)$
+ifadesi Taylor serisinin artýklý tanýmýndan geliyor. Detaylar için [3,
+sf. 360]'a bakýlabilir.
+
+Üstteki ifadeyi tekrar düzenlersek,
+
+$$
+\frac{f(\bar{x} + \lambda d) - f(\bar{x})}{\lambda} = 
+\nabla f(\bar{x})^T + ||d||\alpha(\bar{x},\lambda d)
+$$
+
+$\nabla f(\bar{x})^T d < 0$ olduðuna göre (aradýðýmýz þart bu) o zaman, ve
+$\alpha(\bar{x},\lambda d) \to 0$, $\lambda \to 0$ iken, her yeterince
+küçük $\lambda > 0$ için $f(\bar{x} + \lambda d)-f(\bar{x}) < 0$ olmalýdýr,
+yani her hangi bir yönde atýlan adým bir önceki $f$ deðerinden bizi daha
+ufak bir $f$ deðerine götürmelidir. 
+
+Ana Teklif'e dönelim. Newton adýmýnýdaki SPD $F$ için $0 < d^T \nabla f$
+olduðunu göstermemiz lazým (ki böylece iniþ yönü olduðunu ispatlayabilelim,
+bir önceki teori),
+
+$$
+d = -F^{-1} \nabla f(\bar{x})
+$$
+
+demiþtik, her iki tarafý $\nabla f(x)$ ile çarpalým,
+
+$$
+d \nabla f(x) = -\nabla f(x) F^{-1} \nabla f(x) 
+$$
+
+Eþitliðin sað tarafýndaki ifade hangi þartlarda eksi olur? Eðer $F$ matrisi
+pozitif kesin ise deðil mi? Genel matrislerden hatýrlarsak, matris $A$ ve
+bir vektör için $v$ eðer $A$ pozitif kesin ise $v^TAv > 0$. Daha önce
+$F$'nin pozitif kesin olduðunu söylemiþtik, o zaman bir þekilde eðer $F$
+pozitif kesin olmasýnýn sadece ve sadece $F$'nin tersinin pozitif kesin
+olmasýna baðlý olduðuna gösterebilirsem amacýma ulaþabilirim.
+
+Bunu yapmak aslýnda pek zor deðil. Biliyorum ki $F(x)$ SPD. Simdi herhangi
+bir vektor $v$ icin 
+
+$$
+0 < v^T F(x)^{-1}v
+$$
+
+ifadeyi þöyle geniþletelim, $F(x)F(x)^{-1}$ eklemek hiçbir þeyi deðiþtirmez
+çünkü bu çarpým birim matristir, 
+
+$$
+v^T F(x)^{-1}v = v^T F(x)^{-1} F(x)F(x)^{-1} v > 0
+$$
+
+Geniþlemiþ ifadenin harfiyen pozitif olduðunu biliyorum, iki üstteki
+tanýmdan. Ama þimdi üstteki ifadeye farklý bir þekilde bakarsak,
+
+$$
+v^T F(x)^{-1}v = \underbrace{v^TF(x)^{-1}} F(x) \underbrace{F(x)^{-1} v} > 0
+$$
+
+Ýþaretlenen bölümlerin birer vektör olduðunu görebiliriz, bu durumda
+$v^TAv > 0$ pozitif kesinlik formülü farklý bir $v$ için hala geçerlidir, o
+zaman ortadaki $A$, bu durumda $F(x)$ pozitif kesin olmalýdýr. 
+
+Örnek 1
+
+$f(x) = 7x - \ln(x)$ olsun. O zaman $\nabla f(x) = 7 - \frac{1}{x}$ ve
+$F(x) = f''(x) = \frac{1}{x^2}$. Bu fonksiyonun özgün global minimumunun
+$x^* = 1/7 = 1.428..$ olduðunu kontrol etmek zor deðil. $x$ noktasýndaki
+Newton yönü
+
+$$
+d = -F(x)^{-1} \nabla f(x) = -\frac{f'(x)}{f''(x)} = 
+-x^2 \left( 7 - \frac{1}{x}  \right)=
+x - 7x^2
+$$
+
+Newton yöntemi $\{ x^k \}$ serisini üretecek, öyle ki
+
+$$
+x^{k+1} = x^k + ( x^k - 7(x^k)^2  ) = 2x^k - 7(x^k)^2
+$$
+
+Altta farklý baþlangýç noktalarýna göre üretilen serileri
+görüyoruz. Yakýnsamanýn hangi deðere doðru olduðu bariz, ve global minimum
+da o deðer zaten. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+pd.set_option('display.notebook_repr_html', False)
+pd.set_option('display.max_columns', 20)
+pd.set_option('display.max_rows', 30) 
+pd.set_option('display.width', 82) 
+pd.set_option('precision', 6)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.DataFrame(index=np.arange(11))
+
+def calculate_newton_ex1(x):
+    arr = []
+    for i in range(11):
+        arr.append(x)
+        x = 2*x - 7*x**2
+        if (x > 1e100):  x = np.inf
+        if (x < -1e100):  x = -np.inf
+    return arr
+
+df['1'] = calculate_newton_ex1(1.0)
+df['2'] = calculate_newton_ex1(0.0)
+df['3'] = calculate_newton_ex1(0.1)
+df['4'] = calculate_newton_ex1(0.01)
+
+print (df)    
+\end{minted}
+
+\begin{verbatim}
+               1    2         3         4
+0   1.000000e+00  0.0  0.100000  0.010000
+1  -5.000000e+00  0.0  0.130000  0.019300
+2  -1.850000e+02  0.0  0.141700  0.035993
+3  -2.399450e+05  0.0  0.142848  0.062917
+4  -4.030157e+11  0.0  0.142857  0.098124
+5  -1.136952e+24  0.0  0.142857  0.128850
+6  -9.048612e+48  0.0  0.142857  0.141484
+7  -5.731417e+98  0.0  0.142857  0.142844
+8           -inf  0.0  0.142857  0.142857
+9           -inf  0.0  0.142857  0.142857
+10          -inf  0.0  0.142857  0.142857
+\end{verbatim}
+
+Örnek 2
+
+Bu örnekte iki deðiþkenli bir fonksiyon görelim. Global minimum
+$(1/3,1/3)$. Bakalým bu deðeri bulabilecek miyiz?
+
+$f(x) = -\ln( 1 - x_1 - x_2) - \ln x_1 - \ln x_2$
+
+$$
+\nabla f(x) = 
+\left[\begin{array}{r}
+\frac{1}{1-x_1-x_2} - \frac{1}{x_1} \\
+\frac{1}{1-x_1-x_2} - \frac{1}{x_2} 
+\end{array}\right]
+$$
+
+$$
+F(x) = 
+\left[\begin{array}{rr}
+(\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_1})^2 & (\frac{1}{1-x_1-x_2} )^2 \\
+(\frac{1}{1-x_1-x_2} )^2 & (\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_2})^2
+\end{array}\right]
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+df = pd.DataFrame(index=np.arange(11))
+
+def calculate_newton_ex2(x):    
+    arr = []
+    for i in range(8):
+        arr.append(x)
+        x1,x2 = x[0],x[1]    
+        F = [[(1.0/(1.0-x1-x2))**2 + (1.0/x1)**2.0, (1.0/(1.0-x1-x2))**2.0],
+             [(1.0/(1.0-x1-x2))**2, (1.0/(1.0-x1-x2))**2.0 + (1.0/x2)**2.0]]
+        F = np.array(F)
+
+        Df = [[1.0/(1.0-x1-x2) - (1.0/x1)], [1.0/(1.0-x1-x2)-(1.0/x2)]]
+        Df = np.array(Df)
+
+        d = np.dot(-lin.inv(F),Df)
+        x = x + d.flatten()
+
+    return np.array(arr)
+
+res = calculate_newton_ex2([0.85,0.05])
+print (res)
+\end{minted}
+
+\begin{verbatim}
+[[0.85  0.05 ]
+ [0.717 0.097]
+ [0.513 0.176]
+ [0.352 0.273]
+ [0.338 0.326]
+ [0.333 0.333]
+ [0.333 0.333]
+ [0.333 0.333]]
+\end{verbatim}
+
+[diðer yakýnsama konusu atlandý]
+
+Dikkat edilirse þimdiye kadar dýþbükeylik (convexity) farzýný yapmadýk,
+sadece Hessian matrinin tersi alýnabilir olduðunu farzettik. 
+
+Devam edersek, özyineli þekilde güncelememizi yaparken Hessian'ýn eþsiz
+olduðu bazý noktalara gelmiþ olabiliriz. Bu olduðunda çoðu yazýlým bu
+durumu yakalayacak þekilde yazýlmýþtýr, ``yeterince eþsiz'' Hessian
+matrislere önceden tanýmlý ufak bir $\epsilon$ çarpý birim matrisi kadar
+bir ekleme yaparlar, böylece tersin alýnamama durumundan kurtulunmuþ olur. 
+Bu metotlara Newton-umsu (quasi-Newton) ismi de veriliyor. 
+
+Eskiden Newton-umsu metotlar koca bir araþtýrma sahasýydý. Benim bildiðim
+kadarýyla tarihte 15 sene kadar geriye gidersek, üstteki görüldüðü gibi her
+adýmda büyük bir denklem sistemi çözmek istemiyoruz, $x$ noktasýndayým,
+Hessian iþliyorum, Newton yönümü buluyorum, adým atýyorum, yeni bir
+noktadayým. Newton-umsu metotlarda bu yeni noktada sil baþtan bir Hessian
+iþlemek yerine bir önceki adýmdaki iþlenen Hessian sonuçlarýný, bir
+þekilde, az ek iþlem yaparak sonraki adýmda kullanmaya uðraþýyorlar.
+Aslýnda pek çok farklý Newton-umsu metot var, hepsi farklý þekilde Newton
+metotundan farklý (!)
+
+[teori 1.1 ispatý atlandý]
+
+Newton metodunun eðer baþlangýç noktasý nihai minimuma yakýnsa iyi
+yakýnsaklýk özellikleri var. Fakat eðer sonuca uzaktan bir yerden
+baþlamýþsak yakýnsaklýk garantisi yok. Geldiðimiz yeni noktada Hessian
+eþsiz olabilir. Bu sebeple metot sürekli iniþ özelliðine (descent property)
+sahip olmayacaktýr, yani $f(x_{x+1}) \ge f(x_k)$ olabilir, ve yakýnsaklýk
+garantisi bu durumda kaybolur [4, sf. 167]. Fakat bu algoritmayý biraz
+deðiþtirerek sürekli iniþ özelliðine sahip olmasýný saðlayabiliriz. 
+
+Teori
+
+$x_1,x_2,...$ ya da kýsaca $\{x_k\}$ Newton'un metodu tarafýndan üretilmiþ
+$f(x)$ hedef fonksiyonunu minimize etme amaçlý bir çözüm dizisi olsun. Eðer
+Hessian $F(x)_k$ pozitif kesin ise ve gradyan $g_k = \nabla f(x_k) \ne 0$
+ise, o zaman çözüm yönü
+
+$$
+d_k = -F(x_k)^{-1} g_k = x_{k+1} - x_k
+$$
+
+bir iniþ yönüdür, ki bu ifadeyle kastedilen bir $\bar{\alpha} > 0$
+kesinlikle vardýr öyle ki her $\alpha \in  (0,\bar{\alpha})$ için 
+
+$$
+f(x_k + \alpha d_k) < f(x_k)
+$$
+
+ifadesi doðrudur. 
+
+Ýspat
+
+$\phi(\alpha)$ diye yeni bir eþitlik yaratalým,
+
+$$
+\phi(\alpha) = f(x_k + \alpha d_k)
+$$
+
+Üstteki formülün türevini alalým. Zincirleme Kuralýný kullanarak,
+
+$$
+\phi(\alpha)' = f(x_k + \alpha d_k) d_k
+$$
+
+elde ederiz. Þimdi $\phi(0)'$ ne oluyor ona bakalým,
+
+$$
+\phi(0)' = \nabla f(x_k) d_k = -g_k^T F(x_k) ^{-1} g_k < 0
+$$
+
+$-g_k^T F(x_k) ^{-1} g_k$ ifadesinin sýfýrdan küçük olduðunu biliyoruz
+çünkü $F(x_k) ^{-1}$ pozitif kesin, ve $g_k \ne 0$. O zaman diyebiliriz ki 
+bir $\bar{\alpha} > 0$ mevcuttur öyle ki her $\alpha \in (0,\bar{\alpha})$
+için $\phi(\alpha) < \phi(0)$. Bu da demektir ki her $\alpha \in
+(0,\bar{\alpha})$ için
+
+$$
+\phi(\alpha) < \phi(0) =  f(x_k + \alpha x_k) < f(x_k)
+$$
+
+Ýspat tamamlandý.
+
+Üstteki gördüklerimiz $d_k$ yönünde bir arama yaparsak, muhakkak bir
+minimum bulacaðýmýzý söylüyor. Eðer her geldiðimiz noktada, bir sonraki
+gidiþ noktasýný hesap için bu minimum yeri ararsak, sürekli iniþ özelliðine
+kavuþmuþ olacaðýz, ve böylece Newton metodunu kurtarmýþ olacaðýz. Demek ki
+Newton metotunu þu þekilde deðiþtirmemiz gerekiyor, 
+
+$$
+x_{k+1} = x_k - \alpha_k F(x_k)^{-1} g_k
+$$
+
+ki 
+
+$$
+\alpha_k = \arg\min_{\alpha \ge 0} f(x_k -\alpha F(x_k)^{-1} g_k)
+$$
+
+Yani döngünün her adýmýnda $-F(x_k)^{-1} g_k$ yönünde bir arama
+gerçekleþtiriyoruz, o yöndeki en fazla azalmayý buluyoruz, ve $\alpha_k$
+adýmýný o büyüklükte seçiyoruz. Ve üstteki teori sayesinde $g_k \ne 0$
+olduðu sürece 
+
+$$
+f(x_{k+1}) < f(x_k)
+$$
+
+sürekli iniþ özelliðinin mevcut olduðundan emin oluyoruz. 
+
+Örnek
+
+Newton metodunu bir örnek üzerinde görelim, fonksiyon [8, 10-9]'dan
+geliyor, 
+
+$$
+f(x_1,x_2) = e^{x_1 + 3x_2 - 0.1} + e^{x_1 - 3x_2 - 0.1} + e^{-x_1 - 0.1}
+$$
+
+Hessian ve gradyan hesaplarýný otomatik türev üzerinden yapacaðýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import autograd.numpy as anp
+import numpy.linalg as lin
+import autograd
+
+def f(x):
+    x1,x2=x
+    return anp.exp(x1 + 3.0*x2 - 0.1) + anp.exp( x1 - 3.0*x2 - 0.1 ) + anp.exp(-x1-0.1)
+
+alpha = 0.1
+beta = 0.7
+eps = 0.001
+x0 = np.array([-1.1, 1.0])
+x = x0
+hist = []
+for i in range(10):
+   h = autograd.hessian(f)
+   g = autograd.grad(f)
+   v = np.dot(-lin.inv(h(x)),g(x))
+   lamsq = np.dot(np.dot(g(x).T,lin.inv(h(x))),g(x))
+   hist.append(x)
+   if lamsq/2 <= eps:
+      print ('done')
+      break
+   t = 1.0
+   while f(x+t*v) >= f(x)+alpha*t*np.dot(g(x).T,v): t = t*beta
+   x = x + t*v
+h = np.array(hist)
+h = np.reshape(h,(len(h),2))
+print (h)
+\end{minted}
+
+\begin{verbatim}
+done
+[[-1.10000000e+00  1.00000000e+00]
+ [-1.43075233e-01  3.50917569e-01]
+ [-1.09323466e-01  8.11516892e-02]
+ [-3.28295993e-01  1.89932171e-02]
+ [-3.45760583e-01  3.51878538e-04]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits.mplot3d import Axes3D
+
+def f2(x1,x2):
+    return f([x1,x2])
+
+D = 50
+x = np.linspace(-2.0,1.0,D)
+y = np.linspace(-1.0,1.0,D)
+
+xx,yy = np.meshgrid(x,y)
+zz = f2(xx,yy)
+
+contours = [1,2,3,4,5,6]
+cs=plt.contour(xx,yy,zz,contours)
+plt.plot(h[:,0],h[:,1],'rd')
+plt.plot(h[:,0],h[:,1])
+plt.savefig('boyd-1092.png')
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx, yy, zz)
+plt.savefig('boyd-1091.png')
+\end{minted}
+
+\includegraphics[width=20em]{boyd-1091.png}
+\includegraphics[width=20em]{boyd-1092.png}
+
+
+Kaynaklar 
+
+[1] Bayramlý, Çok Boyutlu Calculus, {\em Vektör Calculus, Kurallar, Matris Türevleri}
+
+[2] Freund, {\em MIT OCW Nonlinear Programming Lecture},
+    \url{https://ocw.mit.edu/courses/sloan-school-of-management/15-084j-nonlinear-programming-spring-2004/}
+
+[3] Miller, {\em Numerical Analysis for Scientists and Engineers}
+
+[4] Zak, {\em An Introduction to Optimization, 4th Edition}
+
+[6] Tibshirani, {\em Convex Optimization, Lecture Video 14}, 
+\url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
+
+[7], Boyd, {\em Convex Optimization I, Video Lecture 16}
+
+[8], Boyd, {\em Convex Optimization I, Lecture Notes}
+
+\end{document}

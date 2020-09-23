@@ -1,0 +1,225 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Derin Takviyeli Öðrenme, Ýlke Gradyanlarý (Deep Reinforcement Learning, Policy Gradients )
+
+Bilgisayar otomatik olarak oyun oynamayý öðrenebilir mi? Diyelim herhangi
+bir bilgisayar oyunu, dama, satranç, ya da eðlence oyunlarýndan Pong. Eðer
+elimizde bir simülasyon ortamý var ise, ve takviyeli öðrenme teknikleri ile
+bu sorunun cevabý evet. Simülasyon ortamýnda bilgisayara karþý istediðimiz
+kadar oynayýp RL teknikleri bir oyunu oynamayý öðrenebilir.
+
+Daha önce [7] yazýsýnda farklý bir yaklaþým gördük, bir deðer fonksiyonu
+vardý, bu fonksiyona tahtanýn son halini veriyorduk, deðer fonksiyonu bize
+pozisyonun taraflar için ne kadar avantajlý olduðunu raporluyordu (tek bir
+sayý). Bu fonksiyon bir kez, ve önceden kodlanmaktaydý, ve oyun oynayan
+yapay zeka altüst (minimax) algoritmasý ile kendisi için en avantajlý karþý
+taraf için en avantajsýz pozisyonlarý bu fonksiyon ile deðerlendirerek ve
+arama yaparak buluyordu. Fakat deðer fonksiyonu yaklaþýmýnýn bazý
+dezavantajlarý var, birincisi fonksiyonun deterministik olmasý. Oyun
+sýrasýnda deðiþmiyor, önceden kodlanmýþ.
+
+Daha iyi bir yaklaþým olasýlýksal bir ilke $\pi_\theta(a,s)$ kodlamak,
+atýlan adýmlarý örnekleme ile atmak, ve ilkeyi her oyun sonunda
+güncellemek. Böylece oyun sýrasýnda hem oyuncu yeni þeyler denemeye (açýk
+fikirli!) hazýr oluyor, takýlýp kalmýyor, oyun durumundan tam emin
+olunamadýðý durumlar icin bile hazýr oluyor, ve kazandýran ilkeler daha
+yoðun olasýlýklara tekabül ettiði için yine iyi bir oyun oynama becerisine
+kavuþuyor, ve kendini sürekli güncelliyor.
+
+Ýlke $\pi_\theta(a,s)$, oyun konumu (state) $s$ ile, yapýlacak hareket
+(action) ise $a$ ile belirtilir. Pong örneðinde konum tüm oyunun o andaki
+piksel görüntüsü olarak bize bildiriliyor olabilir, hareket ise raketin
+yukarý mý aþaðý mý gideceði; verili konum $s$ için $\pi_\theta(a|s)$
+(kazanmak için optimallik baðlamýnda) mümkün tüm davranýþlarýn daðýlýmýný
+verecek.
+
+Peki ilke fonksiyonunu nasýl güncelleriz? Ýlke gradyaný (policy gradient)
+kavramý ile. Ýlke bir fonksiyondur, bir softmax fonksiyonu ile ya da yapay
+sinir aðý ile temsil edilebilir. YSA'lar her türlü fonksiyonu temsil
+edebildikleri için sofistike kabiliyetleri için daha tercih ediliyorlar
+(daha önemlisi gradyanlarý otomatik alýnabiliyor, bunun niye faydalý
+olduðunu birazdan göreceðiz). 
+
+\includegraphics[width=20em]{policy.png}
+
+Güncelleme nasýl olacak? Burada skor fonksiyonunu kavramý gerekli, optimize
+etmek istediðimiz bir skor fonksiyonunun beklentisinin optimize edilmesi,
+skor fonksiyonu tabii ki ilke fonksiyonuna baðlýdýr, yani skor beklentisi
+en iyi olacak ilkeyi arýyoruz. Bu beklentinin gradyanýný istiyoruz, çünkü
+ilkeyi tanýmlayan $\theta$'yi skor baðlamýnda öyle güncelleyeceðiz ki eðer
+ayný konumu tekrar gelmiþ olsak, daha iyi hareketlerle daha iyi skora
+eriþelim. Aradýðýmýz gradyan ($s,a$ yerine kýsaca $x$ kullanalým, skor $Q$
+olsun [2]),
+
+$$ 
+\nabla_\theta E_{x \sim \pi_\theta(x)} [Q(x)] 
+$$
+
+Üstteki ifadeyi açalým, beklentinin tanýmý üzerinden,
+
+$$ \nabla_\theta E_{x \sim \pi_\theta(s)} [Q(x)] = 
+\nabla_\theta \sum_x \pi(x) Q(x)
+$$
+
+Gradyan içeri nüfuz edebilir,
+
+$$ 
+= \sum_x \nabla_\theta \pi_\theta(x) Q(x)
+$$
+
+$\pi(x)$ ile çarpýp bölersek hiç bir þey deðiþmemiþ olur,
+
+$$ 
+= \sum_x \pi(x) \frac{\nabla_\theta \pi(x)}{\pi(x)} Q(x)
+$$
+
+Cebirsel olarak biliyoruz ki $\nabla_\theta \log(z) =
+\frac{1}{z}\nabla_\theta$, o zaman,
+
+$$ 
+= \sum_x \pi(x) \nabla_\theta \log \pi(x)Q(x)
+$$
+
+Yine beklenti tanýmýndan hareketle
+
+$$ 
+= E_x \big[ \nabla_\theta \log \pi(x) Q(x) \big]
+$$
+
+$x = (s,a)$ demistik, o zaman nihai denklem
+
+$$ 
+\nabla_\theta E_{x \sim \pi_\theta(s,a)} [Q(s,a)] 
+= E_{s,a} \big[ \nabla_\theta \log \pi_\theta(s,a) Q(s,a) \big]
+$$
+
+Eþitliðin sað tarafý bize güzel bir kabiliyet sunmuþ oldu, orada bir
+beklenti var, bu hesabý analitik olarak yapmak çok zor olabilir, fakat
+beklentilerin örneklem alarak nasýl hesaplanacaðýný biliyoruz! Detaylar
+için {\em Ýstatistik, Monte Carlo, Entegraller, MCMC} yazýsý. O zaman
+$v_t \sim Q(s,a)$ örneklemi alýrýz, yani oyunu baþtan sonra kadar oynarýz
+ve skora bakarýz, ve $\theta$ güncellemesi için [5],
+
+$$ \Delta \theta_t = \alpha \nabla_\theta \log \pi_\theta (s_t,a_t) v_t$$
+
+Oyun oynamak ile örneklemin alakasý ne? Oynanan bir oyun mümkün tüm oyunlar
+içinden alýnan bir örneklem deðil midir? Evet. Ayrýca DYSA durumunda da
+olasý her aksiyonun olasýlýðýný hesaplýyoruz ve bu olasýklar üzerinden zar
+atarak bir hareket seçiyoruz. Daha olasý olan daha fazla seçiliyor tabii
+ama az olasý olan da bazen seçilebiliyor.
+
+Tabii mesela Pong oyunu bir sürü adým $a_1,..,a_n$ sonrasý bitiyor, bu
+durumda en sondaki kazanç (ya da kaybý) o oyundaki tüm adýmlara geriye
+giderek uyguluyoruz. Güncelleme sonrasý ilke fonksiyonumuz deðiþiyor, ve
+bir oyun daha oynayarak ayný þeyi tekrarlýyoruz.
+
+$\pi_\theta (s,a)$'nin ilke fonksiyonu olduðunu söyledik, bu fonksiyon DYSA
+olabilir, ya da daha basit, sonlu sayýda seçenek üzerinden ayrýksal
+olasýlýklarý depolayan softmax olabilir (bu durum için gradyan türetmesi
+altta). DYSA durumunda üstteki formüle göre $\log \pi_\theta (s,a)$'un
+gradyanýnýn gerektiðini görüyoruz, otomatik türev uzerinden bu gradyan DYSA
+paketinden rahatça alýnabilir.
+
+Pong oyunu kodunu göreceðiz, ama ondan önce daha basit çubuk dengeleme
+problemine bakalým [1], kuruluþ, oyun açýklamasý için [3]. Bir simulasyon
+ortamýndayýz, ve bu ortamda bize bir çubuk veriliyor, ve çubuðun konumu
+dört tane sayý üzerinden bildirilir, ödül her adýmda anýnda alýnýr (çubuk
+düþmediyse, ekrandan çýkmadýysa o anda baþarý).
+
+\inputminted[fontsize=\footnotesize]{python}{cartpole_train.py}
+
+Eðitim fazla sürmüyor. Bittikten sonra alttaki kodla sonucu
+görebiliriz. Çubuðun dengeli bir þekilde tutulabildiðini göreceðiz. 
+
+\inputminted[fontsize=\footnotesize]{python}{cartpole_play.py}
+
+Pong oyunu kodu alttadýr [6]. Bu eðitim paralellik özelliði olmayan normal
+bilgisayarda uzun sürüyor (ben birkaç gün eðittim), fakat TensorFlow
+çizitini arada sýrada kaydedip kaldýðý yerden devam edebildiði için parça
+parça iþletilebilir. Oyunun otomatik nasýl oynandýðýný görmek için alttaki
+\verb!env.render! satýrýný aktive etmek yeterli. Bilgisayarýn kendi baþýna
+öðrenip oynamasý müthiþ!
+
+\inputminted[fontsize=\footnotesize]{python}{pong.py}
+
+Softmax
+
+Softmax sonlu sayýda seçenek üzerinden bir daðýlým tanýmlar,
+
+$$ 
+\pi_\theta(s,a) = \frac{e^{h(s,a,\theta)}}{\sum_b e^{h(s,b,\theta)} }
+$$
+
+ki $h(s,a,\theta) = \phi(s,a)^T\theta$. Þimdi ilke gradyanýný softmax ile
+nasýl iþletiriz onu görelim. Softmax'in kodlamasý için bir çözüm ayrýksal
+olarak (bir matriste mesela) her $s,a$ kombinasyonu için gerekli
+aðýrlýklarý tutmak. O zaman spesifik bir $\phi$ çaðrýsý sonrasý $\theta$
+ile bu katsayýlar çarpýlýr ve sonuç alýnýr. $\theta$ ilkenin ne olduðunu,
+onun özünü tanýmlar. DYSA durumundan bir fark softmax için otomatik
+türeve gerek olmadan direk türevi kendimiz hesaplayabiliriz [4]. Üstteki
+formülün log gradyaný
+
+$$ 
+\nabla_\theta \log \pi_\theta = 
+\nabla_\theta \log \frac{e^{h(s,a,\theta)}}{\sum_b e^{h(s,b,\theta)} }
+$$
+
+$$ = \nabla_\theta \big[ \log e^{h(s,a,\theta)} - \log \sum_b e^{h(s,b,\theta)}\big]$$
+
+çünkü 
+
+$$ \log(\frac{x}{y}) = \log x - \log y $$
+
+Devam edelim
+
+$$ = \nabla_\theta \big[ h(s,a,\theta) - \log \sum_b e^{h(s,b,\theta)} \big]$$
+
+Gradyan her iki terime de uygulanýr,
+
+$$ 
+= \phi(s,a) - \sum_b h(s,b,\theta)\frac{e^{h(s,b,\theta)}}{\sum_b e^{h(s,b,\theta)}} 
+$$
+
+$$ 
+= \phi(s,a) - \sum_b h(s,b,\theta) \pi_\theta(b,s)
+$$
+
+$$ 
+= \phi(s,a) - E_{\pi_\theta} \big[ \phi(s,\cdot) \big]
+$$
+
+Ýlginç ve ilk bakýþta anlaþýlabilen / akla yatacak (intuitive) bir sonuca
+ulaþtýk. Log gradyaný içinde bulunduðumuz konum ve attýðýmýz adým için
+hesaplanan $\phi$'den mevcut atýlabilecek tüm adýmlar üzerinden hesaplanan
+bir $\phi$ ortalamasýnýn çýkartýlmýþ hali. Yani ``bu spesifik $\phi$
+normalden ne kadar fazla?'' sorusunu sormuþ oluyorum, ve gradyanýn gideceði,
+iyileþtirme yönünü bu sayý belirliyor. Yani bir $\phi$ eðer normalden fazla
+ortaya çýkýyorsa ve iyi sonuç alýyorsa (skorla çarpým yaptýðýmýzý
+unutmayalým), ilkeyi o yönde daha fazla güncelliyoruz ki bu baþarýlý
+sonuçlarý daha fazla alabilelim.
+
+Kaynaklar
+
+[1] Géron, {\em Hands-On Machine Learning with Scikit-Learn and TensorFlow}
+
+[2] Karpathy, {\em Deep Reinforcement Learning: Pong from Pixels}, 
+    \url{http://karpathy.github.io/2016/05/31/rl/}
+
+[3] Bayramli, {\em OpenAI Gym, Pong, Derin Takviyeli Öðrenme},
+    \url{https://burakbayramli.github.io/dersblog/sk/2017/09/openai-gym-pong-derin-takviyeli-ogrenme.html}
+
+[3] Bayramli, {\em OpenAI, Çubuklu Araba, CartPole},
+   \url{https://burakbayramli.github.io/dersblog/sk/2017/09/openai-cubuklu-araba-cartpole.html}
+
+[4] Silver, {\em Monte-Carlo Simulation Balancing},
+    \url{http://www.machinelearning.org/archive/icml2009/papers/500.pdf}
+
+[5] Silver, {\em Reinforcement Learning}, 
+    \url{http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html}
+
+[6] Greydanus, {\em Solves Pong with Policy Gradients in Tensorflow}, 
+    \url{https://gist.github.com/greydanus/5036f784eec2036252e1990da21eda18}
+
+[7] Bayramli, Bilgisayar Bilim, {\em Yapay Zeka ve Müsabaka}
+
+\end{document}

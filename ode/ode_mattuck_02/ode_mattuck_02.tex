@@ -1,0 +1,324 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 2
+
+Gerçek dünyada çoðu ODE sayýsal (numerical) yöntemlerle
+çözülür. Bilgisayarýnýzda bir ODE'yi grafiklettirdiðiniz zaman da aslýnda arka
+planda bilgisayar o denklemi sayýsal olarak çözmekte ve sonucu
+grafiklettirmektedir. Bir baþlangýç deðerli (initial value) probleminin formunu
+yazalým: 
+
+$$ y' = f(x,y) $$
+
+$$ y_1(x_o) = y_o $$
+
+Problemde ilk satýr ODE, ikinci satýr bu ODE'nin baþlangýç deðeri, $x_0$ ve $y_0$
+sabit deðerler. 
+
+Sayýsal olarak (mesela Euler yöntemiyle) bu denklemi çözmek ne demektir?
+Alttaki çizime bakalým, $y_0$'dan deðerinden baþlýyoruz, bu noktada
+$x_0,y_0$ noktasýndaki eðimi $y'$ ile hesaplýyoruz, ve bu eðim bize $y$'nin
+olacaðý bir sonraki yeri söylüyor. Bu eðim ile yukarý ya da aþaðý
+çýkýyoruz, ve bunu devam ettiriyoruz, ta ki bir sonuca gelinceye kadar.
+
+\includegraphics[height=4cm]{2_1.png}
+
+Peki bahsedilen ODE baðlamýnda bir yere ``gitmek'' ne demektir? Takip ettiðimiz,
+cevap olarak odaklandýðýmýz $y$ fonksiyonudur. Unutmayalým ki bu fonksiyonun tam
+hali $y(x)$, yani $y$, $x$'in bir fonksiyonu, $y$'nin türevi $y$'nin $x$'e göre
+türevi demek. Türev eðim demektir, eðim fonksiyonun o noktadaki kabaca,
+yaklaþýksal bir yönüdür. O yönü takýp edersek o fonksiyonu aþaðý yukarý takip
+ediyoruz demektir.
+
+Grafikte $h$ basamak mesafesi, yani $x$ üzerinde yaptýðýmýz sabit zýplama
+mesafesi. Bu kordinatta hangi aralýkla zýplýyoruz? 0.1 mi, 1 mi, 5 mi? Bunun
+seçimini biz yapýyoruz. 
+
+Euler Denklemleri bir adým için þöyle tanýmlýdýr:
+
+$$ x_{n+1} = x_n + h $$
+
+$$ y_{n+1} = y_n + hA_n $$
+
+$$ A_n = f(x_n, y_n) $$
+
+Bu basamaklar özyineli (recursive) olarak tanýmlanýr, bir sonraki adým, bir
+önceki adýmýn deðerlerini kullanýr. 
+
+Örnek
+
+$$ y' = x^2 - y^2 $$
+
+$$ y_1(0) = 1 $$
+
+$$ h = 0.1 $$
+
+Üstteki formül temel (elementary) fonksiyonlar kullanýlarak çözülemez. O yüzden
+Euler'in yöntemi gibi bir sayýsal çözüm burada uygun olur. 
+
+\begin{tabular}{ccccc}
+n & $x_n$ & $y_n$ & $A_n$ & $hA_n$ \\
+\hline
+0 & 0 & 1 & -1 & -0.1 \\
+\hline
+1 & .1 & .9 & -.80 & -0.08 \\
+\hline
+2 & .2 & .82 &  & 
+\end{tabular}
+
+$y$ için eriþtiðimiz sonuç .82 deðeridir. Þimdi þunu soralým: Bu cevap çok
+yukarýda mý çok aþaðýda bir cevap mý? Pür sayýsal sonuçlarda karþýlaþýlan bir
+problem budur, gerçek cevabý analitik olarak bilmediðimiz için ona ne kadar
+yaklaþýp yaklaþmadýðýmýz. Cevabý geometrik olarak verelim. Eðer çözüm bir düz
+çizgi olsaydý, Euler metodu her bu çizgi üzerinde hep doðru cevabý veriyor
+olurdu. 
+
+\includegraphics[height=4cm]{2_2.png}
+
+Eðer çözüm dýþbükey (concave) olsaydý, üstteki gibi Euler metodu çok aþaðý
+düþecekti. Ýlk adýmda fazla aþaðý inecekti, ve sonra bu hatadan dönemeyecek, hep
+esas fonksiyona uzak kalacaktý. Ýçbükey olunca benzer þekilde, ama fazla
+yukarýda kalacaktý. 
+
+Peki elimizde bir analitik cevap olmadýðýna göre cevabýn düþbükey (convex) mi
+içbükey mi (concave) olup olmadýðýný nereye bakarak anlayacaðýz? Calculus tekrar
+hýzýr gibi imdada yetiþiyor. Ýkinci türevi hatýrlayalým: Eðer $y'' > 0$ ise
+birinci türev sürekli artýyor demektir, yani $y$ diþbükeydir. Eðer $y'' < 0$ ise
+tam tersi. Fakat hala bir problem var, analitik fonksiyon yok ise ikinci türevi
+nasýl hesaplayacaðýz? Cevap: Diferansiyel fonksiyonun kendisini kullanarak.
+
+$y' = x^2 - y^2$'nin türevini alýrsak, 
+
+$y'' = 2x - 2yy'$ sonucunu elde ederiz (türev alýrken zincirleme kanununu
+kullandýðýmýza dikkat).
+
+O zaman baþlangýç noktasý $(0,1)$ de $y''$ nedir? $y'(0) = -1$, $y''= 2 \cdot 0
+- 2\cdot 1 = 2$. Demek ki çözüm baþlangýçta diþbükey, ve Euler çözümünü
+uzun süreli takip etmezsek çözümün çok altýnda kalabiliriz. 
+
+Tabii ki çözüm bir dýþ bir iç olarak sürekli deðiþen, dalgalý bir yapýda
+olabilir, bu da mümkün. Burada asýl göstermek istediðimiz diferansiyel denklemin
+kendisini kullanarak çözüm hakkýnda analitik hiçbir þey bilmeden onun hakkýnda
+nasýl bilgi edinebileceðimizi görmektir. 
+
+Hata Analizi
+
+\includegraphics[height=2cm]{2_3.png}
+
+Hata analizi Euler'in çözüme ne kadar uzak kaldýðýnýn hesabýdýr, yani $e$
+sayýsýný hesaplamaktýr. Bu deðerin mutlak deðeri (absolute value) kullanýlýr. 
+
+Daha iyi sonuçlar için daha küçük $h$ basamaklarý kullanýlabilir, o zaman sonuca
+daha yakýn kalabiliriz. O zaman $e$'nin $h$'ye baðlý olduðunu
+söyleyebiliriz. Formülsel olarak bu ifade suna benzer:
+
+$$ |e \sim c_1 h| $$
+
+Buna ifadeye göre Euler metotu birinci derece bir metottur denir, bu derecenin
+ODE'nin derecesiyle alakasý yok, $h$'nin üstteki formülde hangi üstel formde
+olduðuyla alakalý. Birincil derecede bir iliþki mesela basamaðý yarýsýna
+indirince hatayý yarýsýna indirirmek demektir.
+
+Euler metodundan daha bir yöntem bulmak demek, eðimi daha iyi hesaplayan bir
+yöntem bulmak demektir. Eðer hatada rol oynayan en önemli faktör eðim olduðuna
+göre, daha az hata için daha iyi eðim hesaplamak mantýklý olacaktýr. 
+
+\includegraphics[height=4cm]{2_4.png}
+
+Daha iyi eðim nasýl hesaplanýr? Diyelim ki tek bir zýplama yerine iki kere
+zýpladýk. Diþbükey durumda birinci zýplamada çok aþaðý, ikincide biraz daha
+yukarý gidiyor olurduk, o zaman bunlarýn ortalamasýný alýrsak, daha iyi bir eðim
+elde edebilirdik. 
+
+$$ x_{n+1} = x_n + h $$
+
+$$ \hat{y}_{n+1} = y_n + h A_n $$
+
+$$ B_n = f(x_{n+1},\hat{y}_{n+1}) $$
+
+$$ y_{n+1} = y_n + h(\frac{A_n+B_n}{2}) $$
+
+Niye þapkalý $y$ yani $\hat{y}$ kullandýk? Çünkü ortalama hesaplamak için
+aslýnda n+1 noktasýnda geçici bir deðer hesaplýyoruz, bu geçiciliði göstermek
+için $\hat{y}$ ifadesini kullandýk.
+
+Bu metot Heun, Geliþtirilmiþ (Improved) Euler, Deðiþtirilmiþ (Modified)
+Euler, RK2 gibi isimlerle anýlýr. RK2 Runga-Kutta'nýn kýsaltmasý, '2'
+ibaresi bu yöntemin ikinci dereceli bir metot olmasýdýr. Yani
+
+$$ e \sim c_2 h^2 $$
+
+Basamaðý yarýsýna indirmek hatayý dörtte birine indirmek demektir. O zaman niye
+bu metot her yerde kullanýlmýyor? Çünkü RK2 ile eðim iki kere hesaplanýyor,
+Euler ile bir kere, yani sayýsal kod iki kat daha fazla çalýþmak, yani daha
+yavaþlamak zorundadýr. 
+
+RK4 te var, bu dördüncü seviyede bir metot. Eðim þöyle hesaplanýr:
+
+$$ \frac{A_n + 2B_n + 2C_n + D_n}{6} $$
+
+Sayýsal Yöntemlerde Bazý Tehlikeli Noktalar
+
+1) Hoca ödevde bizim keþfetmemizi istedi
+
+2) Þu basit denkleme bakalým: $y' = y^2$. Deðiþkenleri ayýralým ve analitik cevabý
+$y=\frac{1}{c}$. O zaman bu denklemi sayýsal olarak çözerken alttaki grafik
+takip ediliyor olacak.
+
+\includegraphics[height=4cm]{2_5.png}
+
+Diyelim ki $y(0) = 1$'den baþladýk ve $y(2)$'i bulacaðýz. Saða doðru yavaþ yavaþ
+gidiyoruz ama problem, bu fonksiyon $y(1)$ deðerinde sonsuza gidiyor. Demek ki
+adým adým saða giden sayýsal çözüm o noktayý hiçbir zaman aþamayacaktýr,
+sonsuzlukta kaybolacaktýr. Bu tehlikeli noktayý önceden tahmin edemez miydik?
+Hayýr. Üstteki diferansiyel denklemin her çözümünün kendine has bir eþsizsel
+(singularity) noktasý vardýr ve bundan sadece kendisi haberdadýr.
+
+Ekler
+
+Euler yöntemininin çoðu kaynakta ODE sistemini ``entegre ettiði'' söylenir;
+hakikaten de bir entegrasyon yapýyoruz, yani $dy$ deðiþim formülünü $y$'ye
+uygulayarak adým adým ilerliyoruz, $y$'nin deðerlerini bulmuþ oluyoruz, bu
+bir entegrasyon iþlemidir. Euler fonksiyonu ile analitik fonksiyonlarý
+sayýsal entegre etmiþ oluyoruz.
+
+Taylor Açýlýmý ile ODE çözümü [1, sf. 395]
+
+Range-Kutta ile atýlan adýmlar üzerinde oynama yapýlarak ilerleme
+saðlanmaya uðraþýlýyor. Fakat aslýnda Taylor açýlýmý kullanarak ta ODE
+çözmek mümkün. Bu metot çoðunlukla teþvik edilmiyor çünkü bazý denklemlerin
+2., 3. türevini sembolik olarak almak çok zor. Fakat otomatik türev ile,
+bkz [2], bu türevler rahatlýkla alýnabilir. Altta gösterme amaçlý olarak
+sembolik alýnabilen türevli ODE gösteriyoruz.
+
+ODE bir $y(t)' = f(x,y)$ sistemidir, 
+
+$$ y(t)' = t + y , \quad y(1) = 2$$
+
+Bu sistemin çözümü biliniyor, 
+
+$$ y(t) = -t -1 + 4e^{-1}e^t$$
+
+Eðer çözüm bilinmeseydi, sayýsal olarak çözmek gerekecekti. $a$ yakýnýnda
+$g(x)$'in Taylor açýlýmýný analitik olarak biliyoruz,
+
+$$ g(x) = g(a) + g'(a)(x-a) + g''(a) \frac{(x-a)^2}{2}$$
+
+Eðer $x$'i $h$ adým atarak $a$'den gelinen nokta olarak belirtirsek
+
+$$ x=a+h$$
+
+$$ g(a+h) = g(a) + g'(a)h + g''(a)\frac{h^2}{2}$$
+
+Bu açýlým özyineli bir hesabý ima ediyor; yani $h$ adýmý sonrasýnda elde
+edilen yeni $g$'nin bir önceki adýmdaki deðerler ile nasýl baðlantýlý
+olduðunu gösteriyor. O zaman $g$ yerine üstteki $f$ tanýmýný geçirirsek,
+
+$$ y_{k+1} = y_k + h \frac{d}{dt} f(t_k,y_l) + \frac{h^2}{2} \frac{d^2}{dt} f(t_k,y_l)$$
+
+$$  = y_k + hf(t_k,y_k) + \frac{h^2}{2} \frac{d}{dt} f(t_k,y_l)$$
+
+Aslýnda Euler yöntemi olarak bilinen yöntem üstteki formülde ilk iki
+terimin tutulup gerisinin atýlmasýyla elde edilmiþtir. O zaman daha iyi
+hesap için üstteki tüm terimleri (hatta açýlýmý devam ettirerek daha bile
+fazlasýný) kullanabilirdik. 3. terimdeki diferansiyel hesabý için, tam
+diferansiyel (total derivative) tanýmýndan,
+
+
+$$ 
+df = \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial y} dy
+$$
+
+Yani
+
+$$ 
+\frac{df}{dt} = \frac{\partial f}{\partial t} + 
+\frac{\partial f}{\partial y} \frac{dy}{dt} 
+$$
+
+$y'(t)=dy/dt$ olduðuna göre $t + y$'ye eþittir, onu üstte yerine koyarýz,
+kýsmi türevleri de hesapladýktan sonra,
+
+$$ 
+\frac{df}{dt} =  1 + t + y
+$$
+
+O zaman 
+
+$$  = y_k + hf(t_k,y_k) + \frac{h^2}{2} (1 + t_k + y_k) $$
+
+Ýlk önce normal Euler gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+y1 = 2; t = 1.; N = 5; h = 0.1
+vals = []
+for i in range(N): 
+    yreal = -t-1+4*(1./np.e)*np.exp(t)
+    vals.append([t, y1, yreal])
+    y1 = y1 + (t + y1)*h
+    t = t + h
+df = pd.DataFrame(vals)
+df.columns = ['t','euler', 'analitik']
+df = df.set_index('t')
+print df
+df.plot()
+plt.savefig('2_6.png')
+\end{minted}
+
+\begin{verbatim}
+      euler  analitik
+t                    
+1.0  2.0000  2.000000
+1.1  2.3000  2.320684
+1.2  2.6400  2.685611
+1.3  3.0240  3.099435
+1.4  3.4564  3.567299
+\end{verbatim}
+
+\includegraphics[width=20em]{2_6.png}
+
+Oldukça büyük bir sapma var. Þimdi tüm Taylor terimlerini kullanalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+y2 = 2; t = 1.; N = 5; h = 0.1
+vals = []
+for i in range(N): 
+    yreal = -t-1+4*(1./np.e)*np.exp(t)
+    vals.append([t, y2, yreal])
+    y2 = y2 + (t + y2)*h + (1+t+y2)*(h**2/2)
+    t = t + h
+df = pd.DataFrame(vals)
+df.columns = ['t','taylor', 'analitik']
+df = df.set_index('t')
+print df
+df.plot()
+plt.savefig('2_7.png')
+\end{minted}
+
+\begin{verbatim}
+       taylor  analitik
+t                      
+1.0  2.000000  2.000000
+1.1  2.320000  2.320684
+1.2  2.684100  2.685611
+1.3  3.096931  3.099435
+1.4  3.563608  3.567299
+\end{verbatim}
+
+
+\includegraphics[width=20em]{2_7.png}
+
+
+Kaynaklar 
+
+[1] Ackleh, {\em Classical and Modern Numerical Analysis Theory}
+
+[2] Bayramli, Bilgisayar Bilim, Yapay Zeka, {\em Otomatik Türev Almak}
+
+\end{document}
+
+
+
+

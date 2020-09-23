@@ -1,0 +1,574 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{KALMAN FILTERS}
+
+Compiling an exhaustive list of fields where Kalman Filters (KF) are in use
+would be a formiddable task: The list could start with navigation, radar
+tracking, satellite orbit computation \cite{welling}, continue with sonar
+ranging, stock price prediction (which hopefully this thesis will prove), and
+many other fields where there is a dynamical system present. When the {\em
+  Eagle} module of the Apollo 11 mission landed on the moon, it is widely known
+that it did so with the help of a Kalman Filter. KF was first proposed in a
+seminal paper by \cite{kalman}, later Kalman and Bucy \cite{kalman2} - the
+method's first application setting was space tracking.
+
+Kalman Filters, or in general, SSM methods try to model dynamic data using
+two-level graphic model. In the first level, there are hidden states, one per
+time step, which are random variables distributed as Gaussians. An outside
+observer (modeler) does not see these states directly, instead sees them through
+an ``observed'' variable whose outputs are assumed to be distorted by another
+Gaussian distribution, refered to as white noise. In each time step, it is
+assumed the hidden variables evolve linearly, in linear algebra this means the
+hidden state is multiplied by a constant matrix $A$. Mathematically,
+\begin{eqnarray*}
+x_{t+1} &=& Ax_t + v_t 
+\end{eqnarray*}
+where
+\begin{itemize}
+   \item $v_0,v_1,...$ is white Gaussian noise with $\mathbf{E}v_t = 0$ and $cov
+   \: v_t = Q$
+   \item $x_t \sim N(\mu_t, \Sigma_t)$.
+\end{itemize}
+In order to model the output variables, we multiply hidden states with another
+constant matrix and add another Gaussian white noise. All together our SSM looks
+as follows:
+\begin{eqnarray}
+x_{t+1} = Ax_t + v_t \label{m1}\\
+y_t = Cx_t + w_t \label{m2}
+\end{eqnarray}
+where $w_0,w_1,...$ are white Gaussian noise with $\mathbf{E}w_t = 0$ and $cov
+\:\: w_t = R$. Random variables $w_t$ and $v_t$ are independent of $x_t$
+and $y_t$, and from eachother, this assumption is put forth for simplicity. The
+dimensions of each variable are:
+
+\begin{itemize}
+   \item $x(t) \in \mathbb{R}^n$ is the state
+   \item $y(t) \in \mathbb{R}^p$ is the observed output
+   \item $v(t) \in \mathbb{R}^n$ is process noise
+   \item $w(t) \in \mathbb{R}^p$ is measurement noise
+\end{itemize}
+
+Kalman Filters carry the same conditional independence properties that
+characterized HMMs - given a state for time $t$, the future is conditionally
+independent from the past, hence KF also carries the first-order Markovian
+property just like HMMs. Structurally there are many similarities between two
+models as well and its methods for inference, as we shall soon see, the main
+difference being that HMM uses multinomial distribution for hidden states
+whereas KF uses Gaussians.
+
+\begin{figure}[!hbp]
+\center{
+  \scalebox{0.6}{
+  \includegraphics{./kalman/kf.JPG}
+  }
+}
+\caption{Hidden and observed states of a KF}
+\end{figure}
+
+Inference with Kalman Filters means estimating the posterior probability given
+an observed output sequence. There are two tasks here, filtering and
+smoothing. Filtering is formulized by $p(x_t|y_0,...,y_t)$ which tries to
+calculate posterior probability for hidden states using measurements up to time
+$t$. In smoothing, we will calculate the same probability using measurements
+taken after time $t$, which gives us $p(x_t|y_{t+1},...,y_T)$. We also hope to
+formulize recursive formulas for both filtering and smoothing.
+
+Both filtering and smoothing have direct consequences in terms of real-life
+applications. KFs' natural roots are embedded in space tracking, the method
+started as an ``online'' algorithm trying to track down targets using noisy
+measurements, as each new measurement is received. In this sense, KF can be seen
+as an estimator trying to guess a ``hidden'' position at time $t$ using
+measurements up to time $t$. Smoothing, on the other hand, can be thought of a
+global ``corrector'' - once we have better knowledge on hand, through smoothing
+we can go back to old estimations and correct previous online estimates using
+backward recursion.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Filtering}
+
+Following the notation and the derivation steps used by Bishop and Jordan
+\cite{jordan}, let's first denote
+
+\begin{itemize}
+   \item $\hat{x}_{t}^t \triangleq \mathbf{E}[x_t|y_0,...,y_t]$
+   \item $P_{t}^t \triangleq \mathbf{E}[(x_t - \hat{x}_{t|t})(x_t -
+   \hat{x}_{t|t})'|y_0,...,y_t]$ 
+\end{itemize}
+Our first goal is going to be trying to calculate $\hat{x}_{t+1}^{t+1}$ and
+$P_{t+1}^{t+1}$ using a new measurement $y_{t+1}$. For this, we need to
+``reverse the arrow'' so to speak, in other words formulize the distribution
+where $x_t$ has conditional dependence on $y_t$ instead of other way around,
+which is what the base equations state right now.
+
+If we take expectation of both sides of \eqref{m1}
+\begin{eqnarray*}
+\mathbf{E}x_{t+1} = \hat{x}_{t+1} = A\mu_t = A\hat{x}_t
+\end{eqnarray*}
+Taking covariance of both sides of \eqref{m1} and denoting $P_t$ as $cov \: x(t)$
+\begin{eqnarray*}
+P_{t+1} = AP_{t}A' + Q
+\end{eqnarray*}
+This transition is called a ``time update''. It will allow us to propagate the
+normal distribution at time $t$ to time $t_1$. The formulas that contain given
+$y$'s use the same technique;
+\begin{eqnarray*}
+\hat{x}_{t+1}^t = Ax_{t}^t\\
+P_{t+1}^t = AP_{t}^tA' + Q
+\end{eqnarray*}
+\begin{eqnarray*}
+y_{t+1} &=& Cx_{t+1} + w_t\\
+\mathbf{E}[y_{t+1}|y_0,...,y_t] &=& \mathbf{E}[Cx_{t+1}+w_t|y_0,...,y_t]\\
+\hat{y}_{t+1}^t &=& C\hat{x}_{t+1}
+\end{eqnarray*}
+Similarly for covariance
+\begin{eqnarray*}
+E[(y_{t+1}-\hat{y}_{t+1}^t)(y_{t+1}-\hat{y}_{t+1}^t)'|y_0,...,y_t] =
+CP_{t+1}^tC' + R
+\end{eqnarray*}
+
+Now the harder task of reversing the arrow: If our goal is formulizing
+$p(x_t|y_t)$, then we need to derive the joint distribution between both
+variables. Addition of Gaussians is another Gaussian, we can surmize the joint
+probability $p(x_t,y_t)$ will be one huge Gaussian.
+
+In order to define the joint normal distribution of $x_{t}$ and $y_{t}$, we need
+to write the joint mean and covariance of this big Gaussian. Writing down the
+mean will be easy, covariance will be little harder to derive. We can use a
+trick \cite{lall} where we write $y_{t} = Cx_{t} + w_t$ as $z = Hu$
+where
+\begin{eqnarray*}
+z =   \left[ \begin{array}{c}
+      x_{t} \\
+      y_{t}
+      \end{array} \right],
+H =   \left[ \begin{array}{cc}
+      I & 0 \\
+      C & I
+      \end{array} \right]
+u =   \left[ \begin{array}{c}
+      x_{t} \\
+      w_t
+      \end{array} \right],      
+\end{eqnarray*}
+Now we need to take the covariance of the simpler equation:
+\begin{eqnarray*}
+cov(z) &=& H cov(u) H'\\
+cov(u) &=& \left[ \begin{array}{cc}
+      P_{t} & 0 \\
+      0 & R
+      \end{array} \right]     
+\end{eqnarray*}
+The full product is:
+\begin{eqnarray*}
+\left[ \begin{array}{cc}
+      I & 0 \\
+      C & I
+      \end{array} \right]
+\left[ \begin{array}{cc}
+      P_{t} & 0 \\
+      0 & R
+      \end{array} \right]
+\left[ \begin{array}{cc}
+      I & C' \\
+      0 & I
+      \end{array} \right]           
+\end{eqnarray*}
+which results in
+\begin{eqnarray*}
+\left[ \begin{array}{cc}
+      P_{t} & P_{t}C' \\
+      CP_{t} & CP_{t}C'+R
+      \end{array} \right]           
+\end{eqnarray*}
+We can also re-write this for conditional and with the mean;
+\begin{eqnarray}
+\left[ \begin{array}{c}
+      \hat{x}_{t}^t \\
+      C\hat{x}_{t}^t
+      \end{array} \right]
+\:and\:      
+\left[ \begin{array}{cc}
+      P_{t}^t & P_{t}^tC' \\
+      CP_{t}^t & CP_{t}^tC'+R
+      \end{array} \right] \label{jointxy}
+\end{eqnarray}
+Same for the joint distribution for $x_{t+1}, y_{t+1}$.
+\begin{eqnarray}
+\left[ \begin{array}{c}
+      \hat{x}_{t+1}^t \\
+      C\hat{x}_{t+1}^t
+      \end{array} \right]
+\:and\:      
+\left[ \begin{array}{cc}
+      P_{t+1}^t & P_{t+1}^tC' \\
+      CP_{t+1}^t & CP_{t+1}^tC'+R
+      \end{array} \right] \label{jointxy2}
+\end{eqnarray}
+
+Now in order to get statements for mean and variance for $x_{t+1}^{t+1}$, we
+need to understand partitioned Gaussians. This will guide us when we use
+portions of \eqref{jointxy2} and deriving the final equation \cite{jordan}. 
+
+An $n$ dimensional Gaussian distribution can be partitioned into $p$ and $q$
+dimensional sub-distributions where $n = p + q$. Hence we can say,
+
+\begin{eqnarray}
+\mu = 
+\left[ \begin{array}{c}
+      \mu_1 \\
+      \mu_2
+      \end{array} \right]           
+\Sigma = 
+\left[ \begin{array}{cc}
+      \Sigma_{11} & \Sigma_{12}\\
+      \Sigma_{21} & \Sigma_{22}
+      \end{array} \right] \label{condgeneric}
+\end{eqnarray}
+\begin{eqnarray*}
+p(x|\mu,\Sigma) &=& \frac{1}{(2\pi)^{(p+q)/2}|\Sigma|^{1/2}} \\
+&& exp\bigg\{
+-\frac{1}{2}
+\left( \begin{array}{c}
+      x_1 - \mu_1 \\
+      x_2 - \mu_2
+      \end{array} \right)'
+\bigg\}
+\left[ \begin{array}{cc}
+      \Sigma_{11} & \Sigma_{12}\\
+      \Sigma_{21} & \Sigma_{22}
+      \end{array} \right]^{-1}
+\left( \begin{array}{c}
+      x_1 - \mu_1 \\
+      x_2 - \mu_2
+      \end{array} \right)
+\bigg\} 
+\end{eqnarray*}
+After much algebra, we can obtain equation for $p(x_1|x_2)$. From this, we can
+get {\em conditioned} $\mu$ and $\Sigma$, as
+\begin{eqnarray}
+\mu_{1|2} &=& \mu_1 + \Sigma_{12}\Sigma_{22}^{-1}(x_2 - \mu_2) \label{condx} \\
+\Sigma_{1|2} &=& \Sigma_{11}-\Sigma_{12}\Sigma_{22}^{-1}\Sigma_{21} \nonumber
+\end{eqnarray}
+Now plugging elements from  \eqref{condx} into \eqref{jointxy2} according
+to placement in \eqref{condgeneric} we can formulize $\hat{x}_{t+1}^{t+1}$ and
+$P_{t+1}^{t+1}$. 
+\begin{eqnarray*}
+\hat{x}_{t+1}^{t+1} &=& \hat{x}_{t+1}^t + P_{t+1}^tC'
+                  (CP_{t+1}^tC'+ \Sigma_{w})^{-1} \\
+               &&   (y_{t+1} - C\hat{x}_{t+1}^t) \\
+P_{t+1}^{t+1} &=& P_{t+1}^t - P_{t+1}^tC' (CP_{t+1}^tC' + R)^{-1}CP_{t+1}^t
+\end{eqnarray*}
+If we declare $K_t \triangleq P_{t+1}^tC' (CP_{t+1}^tC'+ \Sigma_{w})^{-1}$ then,
+\begin{eqnarray}
+\hat{x}_{t+1}^{t+1} &=& \hat{x}_{t+1}^t + K_t (y_{t+1} -
+C\hat{x}_{t+1}^t) \label{xtplus1} \\
+P_{t+1}^{t+1} &=& P_{t+1}^t - K_t C P_{t+1}^t
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Smoothing}
+
+Filtering involves applying a new measurement $y_{t+1}$ to calculate
+$\hat{x}_{t+1}^{t+1}$ and $P_{t+1}^{t+1}$ which is an excellent tool for an
+online algorithm. However for stock price prediction, we will have all data we
+need already at hand. As opposed to a tracking application where data cannot be
+known in advance, we will have our data available, as measurements
+$y_1,...,y_T$, in the form of stock prices, to train a Kalman filter based
+solution, all at once. Hence we need an equation for $x_{t}'$. For this we need
+RTS (Rauch-Tung-Striebel) Smoother.
+
+Based on \eqref{jointxy}, we can write the covariance of joint distribution
+$(x_t,x_{t+1})$. In \eqref{jointxy} the multiplication was with $C$, here it's
+$A$. Hence,
+\begin{eqnarray*}
+\left[ \begin{array}{cc}
+      P_{t}^t & P_{t}^tA' \\
+      AP_{t}^t & AP_{t}^tA'+R
+      \end{array} \right]
+\end{eqnarray*}
+Combining the previous equations together, we need to reach to a statement for
+$x_{t}'$. We can start with $\mathbf{E}[x_t|x_{t+1},y_0,...,y_t)]$.
+\begin{eqnarray*}
+\mu_{1|2} &=& \mu_1 + \Sigma_{12}\Sigma_{22}^{-1}(x_2 - \mu_2)
+\end{eqnarray*}
+which becomes
+\begin{eqnarray*}
+\mathbf{E}[x_t|x_{t+1},y_0,...,y_t)] = \hat{x}_{t}^t+P_{t}^tA'(P_{t+1}^t)^{-1}(x_{t+1}-\hat{x}_{t+1}^t)
+\end{eqnarray*}
+Define $L_t \triangleq P_{t}^tA'(P_{t+1}^t)^{-1}$. Then,
+\begin{eqnarray*}
+\mathbf{E}[x_t|x_{t+1},y_0,...,y_t)] =
+\hat{x}_{t}^t+L_t(x_{t+1}-\hat{x}_{t+1}^t)
+\end{eqnarray*}
+How about $Var[x_t|x_{t+1},y_0,...,y_t]$? If we remember the joint covariance
+for $(x_t,x_{t+1})$
+\begin{eqnarray*}
+ \left[ \begin{array}{cc} 
+      P_{t}^t & P_{t}^tA' \\
+      AP_{t}^t & AP_{t}^tA'+R
+      \end{array} \right] && \\
+\end{eqnarray*}
+Then
+\begin{eqnarray*}
+\Sigma_{1|2} &=& \Sigma_{11}-\Sigma_{12}\Sigma_{22}^{-1}\Sigma_{21}
+\end{eqnarray*}
+becomes
+\begin{eqnarray*}
+Var[x_t|x_{t+1},y_0,...,y_t] &=& P_{t}^t - P_{t}^tA'(P_{t+1}^t)^{-1}AP_{t}^t
+\end{eqnarray*}
+Why?
+\begin{eqnarray*}
+\left[ \begin{array}{cc}
+      P_{t}^t & P_{t}^tA' \\
+      AP_{t}^t & AP_{t}^tA'+R
+      \end{array} \right]
+=      
+\left[ \begin{array}{cc}
+      P_{t}^t & P_{t}^tA' \\
+      AP_{t}^t & P_{t+1}^t
+      \end{array} \right]
+\end{eqnarray*}
+If we try to substitute $L_t \triangleq P_{t}^tA'(P_{t+1}^t)^{-1}$ in to the
+equation:
+\begin{eqnarray*}
+Var[x_t|x_{t+1},y_0,...,y_t] &=& P_{t}^t - P_{t}^t A'(P_{t+1}^t)^{-1}AP_{t}^t \\
+&=& P_{t}^t - P_{t}^tA'(P_{t+1}^t)^{-1} (P_{t+1}^t(P_{t+1}^t)^{-1}) AP_{t}^t\\
+&=& P_{t}^t - (P_{t}^tA'(P_{t+1}^t)^{-1}) P_{t+1}^t ((P_{t+1}^t)^{-1} AP_{t}^t)\\
+&=& P_{t}^t - L_t  P_{t+1}^t L_t'
+\end{eqnarray*}
+Due to conditional independence, when we condition on $x_{t+1}$, we make $x_t$
+independent of future observations $y_{t+1},...,y_T$. Hence we can simply say;
+\begin{eqnarray*}
+E[x_t|x_{t+1},y_0,...,y_T]  &=& E[x_t|x_{t+1},y_0,...,y_t]\\
+&=& \hat{x}_{t}^t +L_t(x_{t+1}-\hat{x}_{t+1}^t) \\
+Var[x_t|x_{t+1},y_0,...,y_T]  &=& Var[x_t|x_{t+1},y_0,...,y_t] \\
+&=& P_{t}^t - L_t  P_{t+1}^t L_t'
+\end{eqnarray*}
+We are almost done. If we can drop the $x_{t+1}$ from LHS of both equations, we
+can have our smoothing equations. Due to the so-called Tower Property:
+\begin{eqnarray*}
+\mathbf{E}[X|Z] &=& \mathbf{E}[\mathbf{E}[X|Y,Z]|Z]\\
+Var[X|Z] &=& Var[\mathbf{E}[X|Y,Z]|Z] + \mathbf{E}[Var[X|Y,Z]|Z]
+\end{eqnarray*}
+we can drop $x_{t+1}$ from LHS.
+\begin{eqnarray}
+\hat{x}_{t}' & \triangleq & \mathbf{E}[x_t|y_0,...,y_T] \nonumber\\
+& = & \mathbf{E}[\mathbf{E}[x_t|x_{t+1},y_0,...,y_T]|y_0,...,y_T] \nonumber\\
+& = & \mathbf{E}[\hat{x}_{t}^t +L_t(x_{t+1}-\hat{x}_{t+1}^t)] \nonumber\\
+& = & \hat{x}_{t}^t +L_t(\hat{x}_{t+1}' -\hat{x}_{t+1}^t) \label{xsmooth}
+\end{eqnarray}
+Using similar algebra, we get
+\begin{eqnarray*}
+P_{t}'  = P_{t}^t + L_t(P_{t+1}'-P_{t+1}^t)L_t'
+\end{eqnarray*}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Training}
+
+In order to train a Kalman Filter based predictor, we need to estimate
+parameters $A,C,Q,R,\pi$. These parameters define a KF.
+
+Making use of Markov property, we write our joint probability as;
+
+\begin{eqnarray*}
+p(x_0,..,x_t,y_0,..,y_t) =
+p(x_0)\prod_{t=1}^{T-1}p(x_{t+1}|x_t)\prod_{t=0}^{T-1}p(y_t|x_t)
+\end{eqnarray*}
+
+\begin{eqnarray*}
+p(y_{t}|x_t) &=& exp
+\bigg\{
+-\frac{1}{2}(y_{t}-Cx_t) ' R^{-1}(y_{t}-Cx_t)
+\bigg\}
+(2\pi)^{-\frac{p}{2}}|R|^{-\frac{1}{2}}\\
+p(x_{t+1}|x_t) &=& exp
+\bigg\{
+-\frac{1}{2}(x_{t+1}-Ax_t) ' Q^{-1}(x_{t+1}-Ax_t)
+\bigg\} \\
+&& (2\pi)^{-\frac{k}{2}}|Q|^{-\frac{1}{2}}\\
+p(x_{1}) &=& exp
+\bigg\{
+-\frac{1}{2}(x_{1}-\pi) ' \Sigma_{\pi}^{-1}(x_{1}-\pi)
+\bigg\}
+(2\pi)^{-\frac{k}{2}}|\Sigma_{\pi}|^{-\frac{1}{2}}
+\end{eqnarray*}
+We take log
+\begin{eqnarray*}
+\log p(x,y) &=& \\
+&& -\sum_{t=0}^{T-1}(-\frac{1}{2}(y_{t}-Cx_t) ' R^{-1}(y_{t}-Cx_t)) - \frac{T}{2}\log|R|\\
+&& -\sum_{t=1}^{T-1}(-\frac{1}{2}(x_{t+1}-Ax_t) ' Q^{-1}(x_{t+1}-Ax_t))\\
+&& - \frac{T-1}{2}\log|Q|\\
+&& -\frac{1}{2}(x_{1}-\pi) ' \Sigma_{\pi}^{-1}(x_{1}-\pi) - \frac{T(p+k)}{2}\log|\Sigma_{\pi}|
+\end{eqnarray*}
+
+In order to estimate parameters, we take derivative of expected log likelihood,
+set to zero and solve
+
+\begin{eqnarray*}
+Q &=& \mathbf{E}[\log p(x,y|y)] \\
+\frac{\partial Q}{\partial C} &=& -\sum_{t=1}^{T}R^{-1}y_t \hat{x}_{t}' +
+\sum_{t=1}' R^{-1} C P_t = 0
+\end{eqnarray*}
+
+\begin{eqnarray*}
+C^{new} &=& \bigg( \sum_{t=1}' y_t \hat{x}_t' \bigg) \bigg( P_{t}' \bigg) ^{-1}
+\end{eqnarray*}
+
+Using similar technique, we can calculate other constants as;
+\begin{eqnarray*}
+R^{new} &=& \frac{1}{T}\sum_{t=1}^T \big( y_ty_t' - C^{new}\hat{x}_ty_t' \big) \\
+A^{new} &=& \big( \sum_{t=2}^T P_{t,t-1})(\sum_{t=2}^TP_{t-1} \big) ^{-1} \\
+Q^{new} &=& \frac{1}{T-1} \big( \sum_{t=2}^T P_t - A^{new}\sum_{t=2}^TP_{t-1,t} \big)\\
+\pi_1^{new} &=& \hat{x}_1
+\end{eqnarray*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Usage}
+
+While using Kalman Filters for analysis and prediction purposes, one needs to be
+careful about starting condition of the training algorithm. Because of the
+nature of the training algorithm, the parameters $\mu_i, \sigma_i,A,C,Q,R,P$ are
+all used for likelihood calculation/estimation and are {\em themselves} targets
+for estimation. The ``chicken and egg'' nature of the EM training process
+required us to start somewhere, and that somewhere is picking appropiate
+parameters for the parameters mentioned above.
+
+We had to determine said values by trial and error, as part of the process where
+we were trying to determine meta parameters such as number of iterations
+required for MC process, the lowest likelihood value threshold (which was used
+to determine when to stop in the training process - if likelihood difference
+fell below this threshold value, we would conclude that training was complete).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Algorithm}
+
+The algorithm that applies forward-backward algorithm and learning through EM is
+described below \cite{ghahramani}.
+
+\begin{figure}[!hbp]
+\center{
+\begin{tabbing}
+{\tt LDS}\={\tt Inf}\={\tt erence}$(Y,A,C,Q,R,x,P)$\\
+\> {\tt for } $t = 1$ {\tt to } $T$ \% forward recursion \\
+\> \> $x_t^{t-1} = Ax_{t-1}^{t-1}$\\
+\> \> $P_t^{t-1} = AP_{t-1}^{t-1}A' + Q$ {\tt if } $t>1$\\
+\> \> $K_t = P_t^{t-1}C'(CP_t^{t-1}C'+R)^{-1}$\\
+\> \> $x_t^t = x_t^{t-1} + K_t(y_t - Cx_t^{t-1})$\\
+\> \> $P_t^t = P_t^{t-1} - K_tCP_t^{t-1}$\\
+\> {\tt end}\\
+\> {\tt initialize } $\hat{P}_{T,T-1}=(I-K_TC)AP_{T-1}^{T-1}$\\
+\> \> {\tt for } $t=T$ {\tt to } $2$ \% backward recursion \\
+\> \> $J_{t-1} = P_{t-1}^{t-1}A'(P_t^{t-1})^{-1}$\\
+\> \> $\hat{x}_{t-1} = x_{t-1}^{t-1} + J_{t-1}(\hat{x}_{t} - Ax_{t-1}^{t-1})$\\
+\> \> $\hat{P}_{t-1} = P_{t-1}^{t-1} + J_{t-1}(\hat{P}_t - P_t^{t-1})J_{t-1}'$\\
+\> \> $\hat{P}_{t,t-1} = P_t^t J_{t-1}' + J_t(\hat{P}_{t+1,t} - AV_t^t)J_{t-1}'$
+   {\tt if } $t<T$\\
+\> {\tt end}\\
+\> {\tt return }$\hat{x}_t, \hat{P}_t, \hat{P}_{t,t-1}$ {\tt for all } $t$
+\end{tabbing}
+}
+\caption{LDS Inference Algorithm}
+\vspace{0.6cm}
+\end{figure}
+
+\begin{figure}[!hbp]
+\center{
+\begin{tabbing}
+{\tt LDS}\={\tt Learn}\=$(Y,k,$\=$\epsilon)$\\ \> {\tt initialize } $A, C, Q, R,
+x_1^0, P_1^0$\\ \> $\alpha = \sum_t y_ty_t'$\\ \> {\tt while change in
+  likelihood >} $\epsilon$\\ \> \> {\tt LDSInference}$(Y,A,C,Q,R,x_1^0,P_1^0)$
+\% E-step\\ \> \> {\tt initialize } $\delta = 0, \gamma = 0, \sigma = 0$\\ \> \>
+   {\tt for } $t = 1$ {\tt to } $T$\\ \> \> \> $\delta = \delta +
+   y_t\hat{x}_t$\\ \> \> \> $\gamma = \gamma + \hat{x}_t\hat{x}_t' +
+   \hat{P}_t$\\ \> \> \> $\beta = \beta + \hat{x}_t\hat{x}_{t-1}' + P_{t,t-1}$
+       {\tt if } $t>1$\\ \> \> {\tt end}\\ \> \> $\gamma_1 = \gamma -
+       \hat{x}_T\hat{x}_T' - \hat{P}_T$\\ \> \> $\gamma_2 = \gamma -
+       \hat{x}_1\hat{x}_1' - \hat{P}_1$\\ \> \> \% M-step\\ \> \> $C = \delta
+       \gamma^{-1}$\\ \> \> $R = (\gamma - C\delta')/T$\\ \> \> $A =
+       \beta\gamma_1^{-1}$\\ \> \> $Q = (\gamma_2 - A\beta') / (T-1)$\\ \> \>
+       $x_1^0 = \hat{x}_1$\\ \> \> $P_1^0 = \hat{P}_1$\\ \> {\tt end}\\ \> {\tt
+         return } $A, C, Q, R, x_1^0, P_1^0$
+\end{tabbing}
+}
+\caption{LDS Learning Algorithm}
+\vspace{0.6cm}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prediction with Kalman Filters}
+
+Generating future values with a KF model is somewhat easier than generating
+random values from an HMM. We know state space model assigns one hidden Gaussian
+distribution per data point, which itself is modeled by another Gaussian. In
+comparison, the number of hidden states of an HMM is specified by the modeler
+and is usually less than the number of data points used for training.
+
+The fact that we have as many hidden/observed random variables as data points
+makes the following more intuitive: After the training phase of the KF which
+includes forward recursion and smoothing, we have estimates for the mean and
+variance for all Gaussian distributions. Another knowledge we have at hand is
+the basic time transition equation for KFs - if we have an estimate at $t$ for
+hidden state, we know how to propagate those estimates to the future at
+$t+1$. Therefore, once training is complete, we can simply fast forward to the
+emission Gaussian at time $T$, and using propagation equation generate a new
+observation Gaussian at time $T+1$ which we use to generate a random number that
+represents ``generatively'' an output at time $T+1$.
+
+One point we have to be careful with is propagating the emission Gaussian, not
+simply the hidden Gaussian. In the literature the basic time transition equation
+is for the latter not the former, hence we need to expand the equation for $y_t$
+by taking time transition into account:
+
+Given,
+\begin{eqnarray}
+x_{t+1} = Ax_t + v_t \\
+y_t = Cx_t + w_t
+\end{eqnarray}
+where $v_0,v_1,...$ is white Gaussian noise with $\mathbf{E}v_t = 0$ and $cov \:
+v_t = Q$ and $w_0,w_1,...$ are also white Gaussian noise with $\mathbf{E}w_t =
+0$ and $cov \: w_t = R$, we can determine $y_{t+1}$ as
+\begin{eqnarray}
+y_{t+1} &=& Cx_{t+1} + w_{t+1}\\
+&=& C(Ax_t + v_t) + w_{t+1} \\
+&=& CAx_t + Cv_t + w_{t+1}
+\end{eqnarray}
+which gives us the distribution of the emission Gaussian $y_{t+1}$. The
+conditional expectation and variance of this distribution given $y_{1,..,t}$ is
+\begin{eqnarray}
+y_{t+1} &=& Cx_{t+1} + w_{t+1}\\
+&=& C(Ax_t + v_t) + w_{t+1} \\
+&=& CAx_t + Cv_t + w_{t+1} \\
+\hat{y}_{t+1|t} &=& CA\hat{x}_{t|t} \\
+cov(y_{t+1}|y_{0,...,t}) &=& CA P_{t|t}A'C' + CQC' + R
+\end{eqnarray}
+We can apply this recursive formula to have our KF generate $M$ many random
+observations starting at $T$ up to $T+N$. The algorithm is
+
+\begin{figure}[!hbp]
+\center{
+\begin{tabbing}
+{\tt ob}\={\tt ser}\={\tt vation}\={\tt Genera}\={\tt tion}$(A,C,R,Q,\mu,\Sigma,T,N)$\\
+\> $mu_x = mu[T-1];$\\
+\> $sigma_x = sigma[T-1];$\\
+\> {\tt for} $i = 1$ {\tt to } $N$\\
+\> \> $mu_y = C A mu_x;$\\
+\> \> $sigma_y = CA sigma_x A'C' + CQC' + R;$\\
+\> \> $o[i] = $ {\tt gaussianNumberGeneration}$(mu_y, sigma_y);$\\
+\> \> $mu_x = A mu_x$\\
+\> \> $sigma_x = A  sigma_x A + Q$\\
+\> {\tt end}\\
+\> {\tt return} $o;$
+\end{tabbing}
+}
+\caption{Generating Observations from an LDS Algorithm}
+\vspace{0.6cm}
+\end{figure}
+

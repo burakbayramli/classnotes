@@ -1,0 +1,472 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 7
+
+Vektör uzaylarýndan, özellikle sýfýr uzayýndan (nullspace), ve kolon
+uzayýndan bahsettik, þimdi bu uzaylarýn içindeki vektörleri nasýl
+bulacaðýmýzý, nasýl hesaplayacaðýmýzý göreceðiz. Yani önceki derste
+gördüðümüz tanýmlarý bu derste algoritmaya dönüþtüreceðiz. $Ax=0$'i çözen
+algoritma nedir, mesela. Örnek üzerinde görelim,
+
+$$ 
+A = 
+\left[\begin{array}{cccc}
+1 & 2 & 2 & 2  \\
+2 & 4 & 6 & 8 \\
+3 & 6 & 8 & 10
+\end{array}\right]
+ $$
+
+Ýlk bakýþta gözüme çarpan 2. kolon 1. kolonun bir katý. Ya da 2. kolon
+1. ile ``ayný yönde'', bu iki kolon ``baðýmsýz deðil''. Tabii bu bilgileri
+çözüm sýrasýnda da algoritmanýn bir yan etkisi olarak keþfetmeyi
+bekleriz. Satýrlara bakýyorum, 1. ve 2. toplamý 3. ile ayný, yani 3. satýr
+baðýmsýz deðil. Tüm bunlar eliminasyonun yan ürünleri olarak bulunmalýlar.
+
+Ana algoritmamýz eliminasyon olacak, ama onun dikdörtgensel koþula adapte
+edilmiþ hali, pivotta sýfýr var ise durmadan çözüme devam ediyoruz, vs.
+
+Eliminasyon sýrasýnda yapýlan iþlemler sýfýr uzayýný deðiþtirmez. Deðil mi?
+Bu önemli. Bir denklem sisteminde bir denklemin (satýrýn) bir katýný bir
+diðer denklemden çýkartýyorsam bu nihai çözümü deðiþtirmez, çünkü denklem
+sistemi bir bütün olarak deðiþmemiþtir. Satýr uzayý deðiþmez, ama dikkat,
+kolon uzayý deðiþir. Eliminasyonun neyi deðiþtirdiði neyi deðiþtirmediðini
+bilmek lazým. 
+
+Ýlk pivot'tan baþlayalým (paranteze alýnmýþ olan öðe)
+
+$$ 
+\left[\begin{array}{cccc}
+(1) & 2 & 2 & 2  \\
+2 & 4 & 6 & 8 \\
+3 & 6 & 8 & 10
+\end{array}\right]
+ $$
+
+Pivot satýrýný 2 ile çarpýp 2. satýrdan çýkartýyoruz. Sonra pivot satýrýný
+3 ile çarpýp 3. satýrdan çýkartýyoruz. Sonuç
+
+$$ 
+\left[\begin{array}{cccc}
+1 & 2 & 2 & 2  \\
+0 & 0 & 2 & 4 \\
+0 & 0 & 2 & 4
+\end{array}\right]
+ $$
+
+Þimdi sonraki pivot'u arýyoruz, normal durumda bu pivot
+
+$$ 
+\left[\begin{array}{cccc}
+1 & 2 & 2 & 2  \\
+0 & (0) & 2 & 4 \\
+0 & 0 & 2 & 4
+\end{array}\right]
+ $$
+
+olurdu. Ama orada sýfýr var, o zaman bir alttaki satýra bakýyoruz, ki
+umuyoruz ki satýr deðiþ-tokuþu yaparak o noktaya sýfýr olmayan bir deðer
+gelsin. Ama müstakbel pivot'un altýndaki hücre de sýfýr deðerini taþýyor!
+Bu bir þeyin iþareti aslýnda.. Neyin? Bu baktýðýmýz kolonun kendinden önce
+gelen kolonlarýn bir kombinasyonu olduðunun iþareti. Fakat bunun üzerinde
+fazla durmaya gerek yok, algoritmik olarak durup düþünmeye gerek yok, eðer
+bir pivot'u kullanamýyorsak hemen yana geçeriz, yani
+
+$$ 
+\left[\begin{array}{cccc}
+1 & 2 & 2 & 2  \\
+0 & 0 & (2) & 4 \\
+0 & 0 & 2 & 4
+\end{array}\right]
+ $$
+
+Þimdi 2. satýrý 3. satýrdan çýkartmak yeterli. Sonuç altta. Bu matrise $U$
+diyebiliriz, gerçi tam üstüçgensel (uppertriangular) sayýlmaz, çünkü sýfýr
+dengesi tam deðil, ama basamaklý (echelon) formda, ``hafiften''
+üstüçgensel. Tüm pivot'larý gösterirsek,
+
+$$ 
+U = 
+\left[\begin{array}{cccc}
+(1) & 2 & 2 & 2  \\
+0 & 0 & (2) & 4 \\
+0 & 0 & 0 & 0
+\end{array}\right]
+ $$
+
+Ýki tane pivot var; ve bu iki sayýsý bu matris hakkýnda önemli bir bulguya
+iþaret ediyor, bu matrisin kertesi (rank) 2. Kerte bir matrisin pivot
+sayýsýdýr. 
+
+Bu noktada geriye sokmak (backsubstitution) ile sonucu elde
+edebiliriz. Tabii $Ax=0$'in bir sonucu vardýr, deðil mi? Evet, ki bu
+beklenir çünkü elde 3 denklem ve 4 bilinmeyen var, bu sistemden ``bir''
+çözüm çýkmasý normal. Þimdi onlarý bulmak istiyorum.
+
+Bu çözümleri bulurken kritik adým þu, ki bu adýma ``pivot kolonlarýný /
+deðiþkenlerini ayýrma'' adý veriyoruz. Pivot kolonlarý pivot hücrelerinin
+olduðu kolonlar ki bunlar 1. ve 3. kolonlar, ve ``serbest kolonlar'' ki
+bunlar geri kalanlarý, yani 2. ve 4. Niye bu isimleri kullandým, özellikle
+pivot olmayan kolonlara niye ``serbest'' adýný verdim?
+
+Þimdi $Ux=0$'nun çözümünü bulma baðlamýnda düþünelim. Bu durumda
+$x_2,x_4$'a istediðim deðeri atayabilirim. Belki cebirsel olarak tüm
+denklemleri görmek daha faydalý olur, $Ux=0$'i þöyle yazabiliriz, 
+
+$$ x_1 + 2x_2 + 2x_3 + 2x_4 = 0 $$
+
+$$ 2x_3 + 4x_4 = 0 $$
+
+Ve daha önce dediðimiz gibi bu denklem sistemini geriye sokma yöntemi ile
+çözebiliriz, bunlar bildiðimiz þeyler. Yeni olan, elimizde serbest
+deðiþkenler olmasý, ki bu deðiþkenlere herhangi bir deðer verebiliyorum. Ve
+ben þimdi, onlara sistematik olarak ``belli'' deðerler atayacaðým (herhangi
+bir deðer olabildiklerine görelim, istediðim deðeri atayabilirim), mesela
+
+$$ x = 
+\left[\begin{array}{r}
+\\
+1\\
+\\
+0
+\end{array}\right]
+ $$
+
+Yani $x_2=1,x_4=0$ seçtim. Þimdi üstteki 2. formülde $x_4=0$ geriye
+koyarsam, $x_3=0$ elde ederim. $x_2=1$ ise, $x_1=-2$. Böylece tamamlanmýþ $x$,
+
+$$ x = 
+\left[\begin{array}{r}
+-2\\
+1\\
+0\\
+0
+\end{array}\right]
+ $$
+
+Ýþte sýfýr uzayýnda bir vektör bu, çünkü bu $Ax=0$'in çözümlerinden biri. 
+
+Baþka hangi çözümler olabilir? Elimizdeki çözümden daha fazla çözüm
+üretebilir miyiz? Evet. Üstteki vektörü katlarýný alýrsak elde edilen
+vektörler de sýfýr uzayýndadýr, bir $c$ sabiti kullanalým,
+
+$$ x = 
+c \cdot 
+\left[\begin{array}{r}
+-2\\
+1\\
+0\\
+0
+\end{array}\right]
+ $$
+
+Bu bize 4 boyutlu uzayda olan bir çizgiyi tarif ediyor. Peki sýfýr
+uzayýnýn tamamýný tarif etmiþ olduk mu? Hayýr. Çünkü iki tane serbest
+deðiþkenim vardý, onlar için belli bir seçim yaptým. Ama þöyle bir seçim de
+yapabilirdim,
+
+
+$$ x = 
+\left[\begin{array}{r}
+\\
+0\\
+\\
+1
+\end{array}\right]
+ $$
+
+Yani $x_2=0,x_4=1$. Bu yeni deðerleri geri koyalým; $x_3=-2$, ve 1. denklem
+bize $x_1=2$ verir. Hepsi (ve bir $d$ sabiti üzerinden),
+
+$$ x = d \cdot 
+\left[\begin{array}{r}
+2\\
+0\\
+-2\\
+1
+\end{array}\right]
+ $$
+
+Terminoloji; üstte belli deðerler üzerinden elde ettiðim iki çözüme ``özel
+çözümler'' ismi veriyorum, çünkü kendi seçtiðim belli ``özel'' deðerler
+üzerinden o çözümlere eriþtim. 
+
+Nihai çözüm, yani sýfýr uzayý üstte hesapladýðým iki özel çözümün tüm
+lineer kombinasyonlarý olacaktýr. 
+
+Soru: serbest deðiþken sayýsý nereden gelir? Kerte (rank) $r$ ise, kolon boyutu
+$n$ olan matris için $n-r = 4-2 = 2$ serbest deðiþken vardýr. Kertenin kolon
+boyutundan az olmasý o matrisin sýfýr uzayýnýn büyüklüðü hakkýnda bir iþaret
+yani.
+
+Azaltýlmýþ Basamaklý (Reduced Echelon) Matris 
+
+Eliminasyon sonrasý elde ettiðimiz matrisi hatýrlarsak,
+
+$$ 
+\left[\begin{array}{cccc}
+1 & 2 & 2 & 2  \\
+0 & 0 & 2 & 4 \\
+0 & 0 & 0 & 0
+\end{array}\right]
+ $$
+
+ki bu matris basamaklý, üstüçgensel sayýlabilecek bir matristir. 3. satýrýn
+tamamen sýfýr olduðuna dikkat edelim, bu oldu çünkü orijinal matriste
+3. satýr, 1. ve 2. satýrlarýn bir kombinasyonu idi ve eliminasyon bu durumu
+keþfetti, üstteki 3. satýr bu sebeple tamamen sýfýr haline geldi. 
+
+Neyse, þimdi bu matrisi biraz daha temizlemek istiyorum. Ne yapabilirim? 
+
+Eliminasyon iþlemini yukarý doðru uygulayamaz mýyým? Böylece pivotlarýn
+üstünde de, altýnda olduðu gibi, sýfýr deðerleri gelebilir - ki bu
+azaltýlmýþ basamaklý matrislerin tanýmý zaten; bu matrislerde pivotlarýn
+hem altýnda hem üstünde sýfýr vardýr.
+
+Ýlerleyelim, 2. satýrý 1. satýrdan çýkartýrsam, 
+
+$$ 
+\left[\begin{array}{cccc}
+(1) & 2 & 0 & -2  \\
+0 & 0 & (2) & 4 \\
+0 & 0 & 0 & 0
+\end{array}\right]
+ $$
+
+Yeni bir sýfýr elde etmiþ olduk (pivotlar parantezde). Bu arada
+pivotlarda hep 1 sayýsý görmek istiyorum, 2. satýrý 2 ile bölebilirim, bu
+denklem sistemini deðiþtirmez, o zaman
+
+$$ R = 
+\left[\begin{array}{cccc}
+(1) & 2 & 0 & -2  \\
+0 & 0 & (1) & 2 \\
+0 & 0 & 0 & 0
+\end{array}\right]
+ $$
+
+Bu formdaki bir matrise azaltýlmýþ satýr basamaklý formu (reduced row
+echelon form -rref-) adý veriliyor. Python \verb!sympy! paketindeki
+\verb!rref! çaðrýsý bu çözümü yapar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sympy
+A = sympy.Matrix([[1., 2., 2., 2. ],
+                 [2., 4., 6., 8. ],
+                 [3., 6., 8., 10.]] )
+print A.rref()[0]
+\end{minted}
+
+\begin{verbatim}
+[1.0, 2.0,   0, -2.0]
+[  0,   0, 1.0,  2.0]
+[  0,   0,   0,    0]
+\end{verbatim}
+
+$R$ olabilecek en özet bilgiyi içeriyor. Pivot kolonlarý 1,2 görülüyor,
+pivot satýrlarý 1,2 ayný þekilde. Bu arada eðer pivot kolon ve satýrlarý
+dýþarý çekmiþ olsam, bu matris bir birim (identity) matrisi olurdu. 
+
+Eðer $Ux=0$ yerine $Rx=0$'i görmek istersem, 
+
+
+$$ x_1 + 2x_2 - 2x_4 = 0 $$
+
+$$ x_3 + 2x_4 = 0 $$
+
+Umarým anlaþýlýyordur, $Ax=0$ ile baþladýk, sonra ``orta nokta'' olarak
+görebileceðimiz $Ux=0$'i elde ettik, ve þimdi üstte $Rx=0$'i
+görüyoruz... Bu sistemlerin hepsi birbiri ile eþdeðerdir, çünkü birinden
+diðerine giderken sistemi bozmadýk. Bir satýrý bir þey ile çarpýp bir
+diðerinden çýkartmak gibi iþlemler uyguladýk ki bu tür iþlemler denklem
+sistemini bozmuyor.
+
+Tüm çözümler, 
+
+$$ 
+x = 
+c \cdot 
+\left[\begin{array}{r}
+-2\\ 1\\ 0\\ 0
+\end{array}\right]
++
+d \cdot 
+\left[\begin{array}{r}
+2\\ 0\\ -2\\ 1
+\end{array}\right]
+ $$
+
+Önemli nokta: üstteki serbest deðiþkenlerin deðerleri $R$'içindeki
+deðerlerin negatifi alýnmýþ hali. Niye?
+
+\includegraphics[height=4cm]{7_01.png}
+
+Eðer pivot kolonlarýný bir araya, serbest (free) kolonlarýný biraraya
+koyarsam üstteki þekil ortaya çýkar. 
+
+$$ R = 
+\left[\begin{array}{cccc}
+I & F   \\
+0 & 0
+\end{array}\right]
+ $$
+
+Üstte görülen oldukça tipik bir rref matrisidir. $I$'nin boyutlarý $r
+\times r$, çünkü $r$ tane pivot kolonu var, $F$'nin kolon sayýsý $n-r$,
+çünkü o kadar serbest deðiþken var. Peki özel çözümler nedir? Madem matris
+bir blok matris halinde (yani $I,F$ bloklar olarak bir diðerinin içinde),
+eh o zaman $Rx = 0$'in çözümlerini direk bu matris üzerinden elde
+edebilirim. Bir sýfýr uzayý matrisi oluþturacaðým ki bu matrisin kolonlarý
+özel çözümüm olacak. Bu matrise $N$ diyeyim, öyle ki $RN = 0$ olsun,
+
+$$ 
+N = 
+\left[\begin{array}{rr}
+-F & I
+\end{array}\right]
+$$
+
+Eksi iþaret nereden geldi? $Rx=0$'i þöyle gösterirsek,
+
+$$ 
+\left[\begin{array}{rr}
+I & F
+\end{array}\right]
+\left[\begin{array}{l}
+x_{pivot} \\ x_{serbest} 
+\end{array}\right] = 0
+ $$
+
+Açarsak, 
+
+$x_{pivot} = -F x_{serbest}$
+
+Yeni bir örnek çözelim. 
+
+$$ 
+A = \left[\begin{array}{rrr}
+1 & 2 & 3 \\
+2 & 4 & 6 \\
+2 & 6 & 8 \\
+2 & 8 & 10 \\
+\end{array}\right]
+ $$
+
+Çözmeye baþlamadan önce hemen ilk bakýþla ne gördüðümüzü söyleyelim; Kaç
+tane pivot olmasýný, yani kaç tane kolonun pivot'unun olmasýný
+beklemeliyiz? Bu matriste üç tane kolon var, peki üç tane pivot elde edecek
+miyiz? Hayýr, çünkü 3. kolon 1. ve 2. kolonlarýn bir toplamý. Bu kolon yeni
+bir enformasyon saðlamýyor, yani ``baðýmsýz deðil''. Çözüm sýrasýnda benim
+beklentim þöyle, 1. ve 2. kolon pivot olacak, ama 3. baðýmlý olduðu için
+serbest kolon olacak. Eliminasyon bunu bulmalý. 
+
+2 tane 1. satýrý 2., 3. ve 4. satýrdan çýkartýrsam, 
+
+$$ 
+\left[\begin{array}{rrr}
+1 & 2 & 3 \\
+0 & 0 & 0 \\
+0 & 2 & 2 \\
+0 & 4 & 4 \\
+\end{array}\right]
+ $$
+
+Þimdi sonraki pivot'a gidiyorum, yani (2,2) kordinatýna, orada sýfýr
+var. Altýna gidiyorum, orada 2 var. Demek ki satýr deðiþ-tokuþu lazým, bunu
+yaptýktan sonra istediðim noktada pivot var,
+
+$$ 
+\left[\begin{array}{ccc}
+(1) & 2 & 3 \\
+0 & (2) & 2 \\
+0 & 0 & 0 \\
+0 & 4 & 4 \\
+\end{array}\right]
+ $$
+
+2. tane 2. satýrý 4.'den çýkartýyorum, nihayet $U$'yu elde ediyorum,
+
+$$ 
+U = \left[\begin{array}{rrr}
+1 & 2 & 3 \\
+0 & 2 & 2 \\
+0 & 0 & 0 \\
+0 & 0 & 0 \\
+\end{array}\right]
+ $$
+
+Kerte yine $r=2$. Kaç tane özel çözüm var? $3-2=1$, demek ki 1 tane serbest
+kolon var. Özel çözümü bulmak için serbest deðiþkene 1 deðeri veririm, 
+
+Denklem halinde
+
+$$ x_1 + 2x_2 + 3x_3 = 0 $$
+
+$$ 2x_2 + 2x_3 = 0 $$
+
+$x_3=1$ ile baþlarsak geriye koyma ile,
+
+$$ x = 
+\left[\begin{array}{r}
+-1\\
+-1\\
+1
+\end{array}\right]
+ $$
+
+Hýzlý bir doðrulama yapmak gerekirse, üstteki çözüm ne diyor? $A$'nin
+1. ve 2. kolonundan -1 tane ve 3. kolonundan 1 tane alýp toplarsam sonuç
+sýfýr olacaktýr. Ve hakikaten de bu doðru, zaten problemin baþýnda 1. ve
+2. kolonun toplamýnýn 3.'ye eþit olduðunu söylemememiþ miydik? Evet.
+
+Tüm çözümler, 
+
+$$ x = 
+c \cdot \left[\begin{array}{r}
+-1\\
+-1\\
+1
+\end{array}\right]
+ $$
+
+Sýnavda üstteki çözümü göstermenizi beklerim. Daha ilerideki sýnavlarda
+sýfýr uzayýn ``bazýný'' soracaðým, o zaman $c$ olmadan tek vektörü
+verebilirsiniz, ama sýfýr uzayýný istiyorsam üstteki problem için tüm bir
+çizgiyi vermeniz lazým. 
+
+Bu örnekte gidilecek sonraki doðal adým, rref formuna gitmek. 2. satýrý
+alýp 1. den çýkartabilirim, ve 2. satýrý 2'ye bölebilirim, 
+
+$$ 
+R = \left[\begin{array}{rrr}
+1 & 0 & 1 \\
+0 & 1 & 1 \\
+0 & 0 & 0 \\
+0 & 0 & 0 \\
+\end{array}\right]
+ $$
+
+$I$ kýsmý görülüyor, sol üst köþedeki $2 \times 2$ boyutlu blok
+matris. Onun hemen yanýndaki $2 \times 1$ boyutlu içinde sadece 1 olan
+kýsým $F$. Üstte $x$ için gösterdiðimiz bölümde $F$'in negatifi olduðunu
+dikkat, yani 
+
+$$ x = 
+c \cdot \left[\begin{array}{r}
+-F \\
+I
+\end{array}\right]
+ $$
+
+ki $c$'nin çarptýðý matris $N$ matrisi, yani sýfýr uzayý matrisidir, ki bu
+matrisin kolonlarý bizim özel çözümlerimiz. 
+
+$Ax=0$ hakkýnda söyleyecek daha fazla bir þey kalmadý sanýyorum. $Ax=b$
+konusunda söyleyeceklerimiz daha var, ama bu bir sonraki derste. 
+
+
+\end{document}
+
+
+
+

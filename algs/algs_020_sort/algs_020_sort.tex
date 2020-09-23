@@ -1,0 +1,128 @@
+ \documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Sýralama (Sorting)
+
+Kabarcýk Sýralamasý (Bubblesort)
+
+Kabarcýk Sýralamasý (KS) öðe deðiþtirerek sýralama yapan bir algoritma. Yer
+deðiþtirerek sýralamanýn en kolay yolu baþtan baþlayarak bir dizin içindeki iki
+öðeyi karþýlaþtýrmak, ve eðer soldaki öðe saðdakinden büyük ise iki öðenin
+yerini deðiþtirmek. $A$ dizini içinde $A_1,A_2,..,A_n$ öðeleri için $A_1,A_2$
+ile baþlarýz, sonra $A_2,A_3$ diye gideriz, böyle devam eder. Bu iþlem sýrasýnda
+tüm dizindeki büyük öðeler saðda toparlanmaya baþlar, hatta en büyük öðe en saða
+gidip $A_n$ olacaktýr. Bu iþlemi ardý ardýna tekrarlamak (ikinci sefer ilk $n-1$
+öðe üzerinde, sonra $n-2$, vs) dizinin tamamen sýralanmasýný saðlayacaktýr.
+
+Anlatým amaçlý olarak $A_1$'i en altta $A_n$'i en üstte olacak þekilde
+gösterelim,
+
+\includegraphics[height=8.5cm]{sort_02.png}
+
+Algoritma ismindeki ``kabarcýk'' ismi büyük deðerlerin sanki su içindeki bir
+hava kabarcýðý gibi üste doðru çýkmalarýndan geliyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bubble_sort(l):
+    last = len(l)-1  
+    for passes_left in range(len(l)-1, 0, -1):
+        if passes_left > last: continue # atla
+        for index in range(passes_left):
+            if l[index] < l[index + 1]:
+               # hucredeki degerlerin yerini degistir
+               l[index], l[index + 1] = l[index + 1], l[index]
+               # for dongusu bittiginde en son degisim yapilan indis
+               # alttaki deger icinde olacak, bu indisten yukari cikmaya
+               # gerek yok, onun ustunu siralanmis kabul ederiz
+               last = index        
+    return l
+
+arr = [703, 765, 677, 612, 509, 154, 426, 653, 275, 897, \
+       170, 908, 61, 512, 87, 503]
+
+print bubble_sort(arr)
+\end{minted}
+
+\begin{verbatim}
+[908, 897, 765, 703, 677, 653, 612, 512, 509, 503, 426, 275, 170, 154, 87, 61]
+\end{verbatim}
+
+KS en kötü ihtimalde dizin üzerinde o dizin sayýsý kadar geçiþ (pass)
+yapar. Fakat her geçiþ bittiðinde en son deðiþimi yapýlan en üstteki öðeyi bir
+sýnýr kabul edebiliriz, ve onun üstündekilerin sýralamasýnýn tamamlanmýþ
+olduðunu kabul edebiliriz, bu bize performans açýsýndan fayda saðlar. Bu bilgiyi
+sonraki geçiþte kullanabiliriz, en son deðiþimi yapýlmýþ en üst indis yukarýsýna
+sonraki geçiþte gitmeye gerek yoktur. Algoritmik olarak bu faraziye doðrudur,
+çünkü en üstteki deðiþim sýnýr noktasý olmasa, kabarcýk o geçiþ sýrasýnda yukarý
+çýkmaya devam ederdi.  Etmediðine göre o geçiþteki en üst deðiþim o demektir.
+
+KS'nin hesapsal çetrefilliði $O(N^2)$.
+
+Quicksort
+
+En ünlü ve hýzlý iþleyen sýralama algoritmasý hýzlý sýralama anlamýna gelen
+quicksort. Quicksort böl-ve-ele-geçir (divide-and-conquer) usulü sýralama
+yöntemlerinden biridir. Bir dizini alýr, ve iki parçaya (partition) böler,
+her parçayý ayrý ayrý sýralar. Peki alt parçalarýn sýralamasý nasýl
+yapýlýr? Quicksort'un kendisiyle! Yani bir özyineli çaðrý var.
+
+Bu noktada pivot kavramýný anlamak lazým: pivot seçilen bir dizi öðesi sadece;
+her geçiþte eldeki dizinin ilk öðesi olarak seçilebilir; sonra iki parçayý
+yaratýrken pivottan az ve fazla olan deðerler olarak parçalar
+yaratýlýr. Ardýndan her parça üzerinde o parçayý sýralamak için özyineli çaðrý
+yapýlýr, her iki özyineden geri döndükten sonra ve bir üst seviyeye geri
+vermeden önce ``az olan deðerler + pivot + fazla olan deðerler'' olarak tüm
+parçalarý birleþtiriyoruz. Her alt özyineli çaðrýnýn kendi iþini yaptýðýný
+tümevarýmsal olarak biliyoruz, o zaman birleþtirme de doðru olduðu için en
+tepede çaðrýyý baþlatan her þey bittikten sonra elinde tamamen sýralanmýþ bir
+dizin bulacaktýr.
+
+Peki her iki parça üzerindeki özyineli çaðrýnýn kendi iþini yaptýðýndan nasýl
+emin oluruz? Özyineli bir þekilde daha küçük, daha küçük ikili parçalara gide
+gide en sonra tekil öðeler seviyesine ineriz, ve bu seviyede pozisyonlandýrma
+artýk sýralamanýn ta kendisidir, ardýndan özyineli çaðrýlar geri sarýlýrken
+artýk dizin sýralanmýþ olacaktýr.
+
+\includegraphics[height=5cm]{sort_01.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def partition(seq):
+    # pivot'u bul ve ana dizinden cikart
+    pivot, seq = seq[0], seq[1:] 
+    # pivot'tan tum kucuk ogeler
+    lo = [x for x in seq if x <= pivot]
+    # pivot'tan tum buyuk ogeler
+    hi = [x for x in seq if x > pivot]
+    return lo, pivot, hi 
+
+def quicksort(seq):
+    if len(seq) <= 1: return seq 
+    lo, pivot, hi = partition(seq)
+    # lo ve hi parcalarinin ayri ayri sirala, siralanmis
+    # kucuk ogeler + ortada pivot + siralanmis buyuk ogeler
+    # olacak sekilde birlesimi geri dondur
+    return quicksort(lo) + [pivot] + quicksort(hi) 
+    
+array = [97, 200, 100, 101, 211, 107]
+res = quicksort(array)
+print res
+letters = list('KRATELEPUIMQCXOS')
+res = quicksort(letters)
+print res
+\end{minted}
+
+\begin{verbatim}
+[97, 100, 101, 107, 200, 211]
+['A', 'C', 'E', 'E', 'I', 'K', 'L', 'M', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'X']
+\end{verbatim}
+
+HS'nin hesapsal çetrefilliði $N\log(N)$. 
+
+Kaynaklar
+
+[1] Sedgewick, {\em Algorithms, 4th Edition}
+
+[2] Knuth, {\em The Art of Computer Programming, Volume 3, 2nd Edition}
+
+[3] Heatland, {\em Python Algorithms}
+
+\end{document}

@@ -1,0 +1,447 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Çok Deðiþkenli Bernoulli Karýþýmý (Mixture of Multivariate Bernoulli)
+
+Eðer verimizi, her biri verinin deðiþik bir bölümünü, yönünü temsil eden bir
+``daðýlým grubu'' yani karýþým ile modellemek istiyorsak, karýþým modellemesi
+kullanýlabilir. Mesela boy ve aðýrlýk verisinde bayanlar ve erkekler ayrý
+daðýlýmlara sahip olabilir, bu durumu modele dahil etmek modelin tahmin gücünü
+arttýrýr. Karýþým modellerinin güzel bir tarafý kümeleme teknikleri ile baþta
+``bilinmeyen'' kümelerinin neye benzediðini bulmalarý, ayrýca her veri
+noktasýnýn bu kümelere olasýlýksal olarak aidiyetini, ``yakýnlýðýný''
+hesaplamamýzý mümkün kýlmalarý.
+
+Formel olarak bir karýþým daðýlýmý $f$ her biri ayrý bir daðýlým olan
+$f_1,f_2,...,f_K$ ile $K$ öðeden oluþan, bir yeni daðýlýmdýr diyoruz, eðer
+
+$$ f(x) = \sum _{k=1}^{K} \lambda_k f_k(x)  $$
+
+ise, ve $\lambda_k$ karýþým oranlarý, $\lambda_k > 0, \sum_k \lambda_k =
+1$ olacak þekilde.
+
+Üstteki model üzerinden zar atýlabilecek bir model ayný zamanda (tüm olasýlýksal
+daðýlýmlar simule edilebilir tabii, ama üstteki için simulasyon oldukça direk),
+$\lambda$ içindeki olasýlýklara göre zar atýp bir karýþým öðesi seçilir, daha
+sonra bu öðenin daðýlýmýna gidilip ona zar attýrýlýr. Bunun olabileceðini
+ispatlamak için, $Z$ rasgele deðiþkeninin $\lambda_k$ ile daðýldýðýný (ayrýksal
+daðýlým) düþünelim, yani
+
+$$ Z \sim Mult(\lambda_1,..,\lambda_k) $$
+
+$f_k(x)$ bir diðer açýdan $f(x|Z=k)$'dir, notasyonel olarak böyle. O zaman,
+
+$$ = \sum _{k=1}^{K} f(x|Z=k)\lambda_k $$
+
+$$ = \sum _{k=1}^{K} f(x|Z=k)P(Z=k)  $$
+
+$$ = \sum _{k=1}^{K} f(x,k)  $$
+
+$$ = f(x)  $$
+
+Yani $\lambda$ olasýlýklarýna göre $f_k$ seçmek üstteki ifadedeki koþullu
+olasýlýk durumuna karþýlýk geliyor, koþullu olasýlýk $P(A|B)$ $B$'nin
+verildiði / bilindiði durumda $A$'nin olasýlýðý hatýrlayacaðýmýz üzere.
+
+Karýþýmýn içindeki daðýlýmlar parametrik daðýlýmlar olduðu zaman onlarý
+nasýl hesapsal olarak kestiririz? Bir daðýlýmýn parametrelerini
+kestirebilmek için en iyi yöntemlerden biri maksimum olurluk (maximum
+likelihood) yöntemi. Olurluk eldeki verinin belli daðýlým parametreleri
+üzerinden olasýlýðý, yani ``verinin olasýlýðý''. Örneklemlerin baðýmsýz
+olduðundan hareketle $x_1,x_2,...,x_N$ verisi için olurluk,
+
+$$ \prod _{i=1}^{N} f(x_i;\theta) $$
+
+Her zaman olduðu gibi çarpýmý toplam haline döndürmek için log alýrýz, 
+
+$$ \ell(\theta) = \sum _{i=1}^{N} \log f(x_i;\theta) $$
+Karýþýmlarý da dahil edersek,
+
+$$ = \sum _{i=1}^{N} \log \sum _{k=1}^{K} \lambda_k f(x_i;\theta_k) 
+\mlabel{2}
+$$
+
+Þimdi log olurluðun mesela $\theta_j$'ye göre türevini almayý deneyelim,
+yani $j$'inci öðenin parametresine göre bir kýsmi türev. 
+
+$$ \frac{\partial \ell}{\partial \theta_j}  = 
+\sum _{i=1}^{N}  \frac{1}{\sum _{k=1}^{K} \lambda_k f(x_i;\theta_k) } 
+\lambda_j
+\frac{\partial f(x_i;\theta_j)}{\partial \theta_j}
+$$
+
+Bölüm ve bölene $f(x_i;\theta_j)$ ekleyelim, bu sonucu deðiþtirmez, 
+
+$$ = \sum _{i=1}^{N}  
+\frac{\lambda_j f(x_i;\theta_j)}{\sum _{k=1}^{K} \lambda_k f(x_i;\theta_k)}
+\frac{1}{f(x_i;\theta_j)}
+\frac{\partial f(x_i;\theta_j)}{\partial \theta_j}
+$$
+
+$$ = \sum _{i=1}^{N}  
+\frac{\lambda_j f(x_i;\theta_j)}{\sum _{k=1}^{K} \lambda_k f(x_i;\theta_k)}
+\frac{\partial \log f(x_i;\theta_j)}{\partial \theta_j}
+$$
+
+Eðer elimizdeki, karýþým olmayan, basit bir parametrik model olsaydý, log
+olurluk þuna benzeyecekti, 
+
+$$ \frac{\partial \log f(x_i;\theta_j)}{\partial \theta_j} $$
+
+Bu formül iki üstteki formülün en saðýndaki çarpan sadece. Demek ki
+``karýþým olmak'' log olurluðu bir tür belli aðýrlýklara göre ortalanan
+(weighted) normal olurluk haline getirdi. Karýþýmýn log olurluðunu
+maksimize etmek istiyorsak, bu aðýrlýðý alýnmýþ olurluðu maksimize etmemiz
+gerekli. Bu aðýrlýðýn alýndýðý kýsmý iki üstteki formülden çekip
+çýkartýrsak, 
+
+$$ w_{ij} = \frac{\lambda_j f(x_i;\theta_j)}{\sum _{k=1}^{K} \lambda_k f(x_i;\theta_k)} $$
+
+Bu aðýrlýk hesabý $i,j$ için yapýlacak. Bu noktaya niçin geldik
+hatýrlayalým, olurluk üzerinden parametreleri hesaplamak istiyoruz. Fakat
+üstteki formülde $w_{ij}$ hesabý için $\theta_j$'in bilinmesi gerekiyor!
+
+Ne yapacaðýz? Þu $w_{ij}$'ye yakýndan bakalým. Daha önce belirttiðimiz gibi
+$\lambda_j$ $Z$'nin $j$ olma olasýlýðý, o zaman bölünendeki ifade $X = x_i$
+$Z=j$ olmasýnýn ortak (joint) daðýlýmýdýr, yani $P(Z=j,X=x_i)$
+diyelim. Koþullu daðýlým durumundan baþlayarak bu sonuca nasýl
+eriþildiðini görmüþtük. Bölendeki ifade ise $f(x_i)$'dir, bir kýsmý
+daðýlýmdýr - tüm $k$'ler üzerinden olasýlýðýn bir bölümü toplanarak kýsmen
+çýkartýlmýþ halidir (marginalized out) - o zaman tüm bölümden ele geçen
+sonuç $Z=j$'nin $X=x_i$ verildiði, koþullu olasýlýðýdýr,
+
+$$  
+ w_{ij} 
+= \frac{\lambda_j f(x_i;\theta_j)}{\sum _{k=1}^{K} \lambda_k f(x_i;\theta_k)} 
+= P(Z=j | X=x_i;\theta)
+\mlabel{1}
+$$
+
+O zaman 
+
+$$ \frac{\partial \ell}{\partial \theta_j}  = \sum _{i=1}^{N}
+w_{ij} \frac{\partial \log f(x_i;\theta_j)}{\partial \theta_j}
+$$
+
+$w_{ij}$ ile, veriye göre, $Z$'nin sonsal (posterior) hesaplamýþ oluyoruz. Yani
+karýþýmsal modeli hesaplarken bir aðýrlýksal olurluk hesabý yapýyoruz, ki bu
+aðýrlýklar sonsal daðýlýmlardan gelen deðerlere ihtiyaç duyuyor. Ama bu sonsal
+daðýlýmlar da aslýnda hesaplamaya çalýþtýðýmýz parametrelere ihtiyaç duyuyor,
+yani bir kördüðüm!
+
+Ama þöyle bir deyiþ vardýr; kimisine kördüðüm gibi gözüken, bir baþkasýna
+ardýþýl yaklaþýksal prosedür gibi gözükür (succcessive approximation procedure)
+[hoca þakadan uydurdu bu deyiþi, ama teknik doðru]. Demek istiyorum ki eðer
+kördüðümde takýlý kaldýysak, bir taraf için tahmin yapýp diðer tarafý
+hesaplarýz, sonra bu hesaplanan deðerleri kullanarak ilk tarafý hesaplarýz. Bunu
+sürekli devam ettiririz.
+
+Ünlü Beklenti-Maksimizasyon (Expectation-Maximization -EM-) prosedürü tam da
+bunu yapýyor. Detaylar için [3, sf. 450]. EM özyinesel çalýþan bir rutindir,
+birkaç adýmda sonuca eriþir, ve her adýmda olurluðu iyileþtirmesi ve yerel
+maksimuma eriþmesi garantidir; Tabii baþlangýç noktasýna göre bu yerel maksimum
+tamamýn (global) maksimumu olmayabilir, o zaman EM yerel maksimumda takýlýp
+kalmýþ olur (stuck at local maxima), bu sebeple EM'i birkaç deðiþik rasgele
+baþlangýç noktasýndan baþlatýp en iyi yerel maksimimumu, yani en iyi olurluðu
+veren parametreleri bulmak iyi bir yaklaþýmdýr.
+
+\includegraphics[height=6cm]{localmax.png}
+
+$w_{ij}$'ye Deðiþik bir Yönden Eriþmek
+
+$\theta_j$ hesabý için formülasyonu biraz deðiþtirmek lazým. Tüm ortak daðýlýmý
+yazalým, ayrýca $z_{ik}$ deðiþkenini katalým, $Z$ deðiþkeni multinom idi, onu
+0/1 deðerleri içeren vektörel olarak tasarlayalým, yani $z$ veri noktasý $i$ ve
+bileþen $k$ için, $Z_i$ ise $i$'inci nokta için
+
+$$  P(X_i = x_i, Z_i=k) =  
+\prod _{k=1}^{K} \big( f(x_i;\theta_k)P(Z_i=k) \big)^{z_{ik}} $$
+
+Þimdi log alalým, 
+
+$$  = \sum _{k=1}^{K} z_{ij} \ln \big( f(x_i;\theta_k)P(Z_i=k) \big) $$
+
+Tüm veri noktalarý için
+
+$$  \ell(\theta) = 
+\sum _{i=1}^{N} \sum _{k=1}^{K} z_{ij} \ln \big( f(x_i;\theta_k)P(Z_i=k) \big) $$
+
+$$ 
+= \sum _{i=1}^{N} \sum _{k=1}^{K} z_{ik} 
+\big( \ln f(x_i;\theta_j) + \ln(\lambda_j) \big)   
+$$
+
+Þimdi bu ifadenin beklentisini almamýz lazým; bunun sebebi EM'in yakýnsamasý
+(convergence) ile alakalý [3, sf. 450]. Beklentiyi ``eksik'' olan yani
+bilinmeyen küme atamasý üzerinden alýyoruz, $\theta_k$,$P(Z_i=k)$ ve $x_i$ sabit
+olarak kalýyor,
+
+$$ 
+E[l(\theta)] = \sum _{i=1}^{N} \sum _{k=1}^{K} E[z_{ik}]
+\big( \ln f(x_i;\theta_j) + \ln(\lambda_j) \big)   
+$$
+
+Hesaplanacak tek þey burada $E[z_{ik}]$. Peki bu beklenti nedir? 
+
+$$ E[z_{ik}] = 1 \cdot P(z_{ik}=1 | x_i) + 0 \cdot P(z_{ik}=1 | x_i)  $$
+
+$$=  P(z_{ik}=1 | x_i)  $$
+
+Bu formül (1)'deki formülün aynýsýdýr! Yeni notasyon üzerinden tabii; o
+zaman 
+
+$$  E[z_{ik}] = w_{ik} $$
+
+Yani
+
+$$ 
+E[l(\theta)] = \sum _{i=1}^{N} \sum _{k=1}^{K} w_{ik}
+\big( \ln f(x_i;\theta_j) + \ln(\lambda_j) \big) 
+\mlabel{4}
+$$
+
+EM Hesap Adýmlarý
+
+$w_{ij}$ hesabýna EM'in ``beklenti adýmý (expectation step)'' ismi veriliyor,
+çünkü görüldüðü gibi beklenti alýyoruz. Bu adým için $\theta$'nin bilindiði farz
+edilir, bilinmiyorsa, ki hesap döngüsünün ilk adýmýnda durum böyledir, o zaman
+rasgele $\theta$ kullanýlýr. Döngünün diðer adýmlarýnda döngünün bir önceki
+adýmýndaki deðerler kullanýlýr.
+
+Maksimizasyon adýmý için bilinen $w_{ij}$ için $\theta$'nin hesaplanmasý
+gerekir; bu adýma maksimizasyon adý verilmesi de mantýklý, çünkü altta da
+görüleceði üzere, kýsmi türevler alýp sýfýra eþitleyerek maksimal deðerler
+hesaplayacaðýz.
+
+Bu hesap þöyle: Eðer (4) çok deðiþkenli Bernoulli modeli içinse, ki $x_{id}$
+$i$'inci veri noktasýnýn $D$ boyutlu Bernoulli için $d$'inci hücresinin deðeri,
+$\theta_{jd}$ ise $j$'inci karýþým öðesinin $D$ boyut içinden $d$'inci olasýlýk
+deðeri olsun, $f$ içinde yerine koyunca ve $f$ üzerinde log etki yapýnca çarpým
+yine toplam olur,
+
+$$ 
+= \sum _{i=1}^{N} \sum _{k=1}^{K} w_{ik}
+\bigg[ \ln(\lambda_k)  + 
+\sum _{d=1}^{D} \ln \big( \theta_{kd}^{x_{id}} (1-\theta_{kd})^{1-x_{id}} \big)
+\bigg]
+$$
+
+$$ 
+E[l(\theta)]= \sum _{i=1}^{N} \sum _{k=1}^{K} w_{ik}
+\bigg[ \ln(\lambda_k)  + 
+\sum _{d=1}^{D} x_{id} \ln \theta_{kd} + (1-x_{id}) \ln (1-\theta_{kd})
+\bigg]
+$$
+
+Þimdi $\theta_{kd}$ hesabý için ona göre türevi alýp sýfýra eþitleriz,
+
+$$ 
+\frac{\partial }{\partial \theta_{kd}} E[l(\theta)] = 
+w_{ik} \sum _{i=1}^{N} 
+x_{id} \frac{\partial }{\partial \theta_{kd}} (\ln \theta_{kd}) + 
+\frac{\partial }{\partial \theta_{kd}}\big[ (1-x_{id}) \ln (1-\theta_{kd})\big]
+= 0
+$$
+
+$$ 
+\sum _{i=1}^{N}  w_{ik} 
+(
+\frac{x_{id}}{\theta_{kd}}  -
+\frac{1-x_{id}}{1-\theta_{kd}}
+) = 0
+$$
+
+$$ 
+\sum _{i=1}^{N} \frac{w_{ik}  x_{id}}{\theta_{kd}} =
+\sum _{i=1}^{N} \frac{w_{ik}-w_{ik}x_{id}}{1-\theta_{kd}}
+$$
+
+$$ 
+\frac{1}{\theta_{kd}}\sum _{i=1}^N w_{ik}  x_{id} =
+\frac{1}{1-\theta_{kd}}\sum _{i=1}^{N} w_{ik}-w_{ik}x_{id}
+$$
+
+
+$$ 
+\frac{1-\theta_{kd}}{\theta_{kd}}\sum _{i=1}^N w_{ik}  x_{id} =
+\sum _{i=1}^{N} w_{ik}-w_{ik}x_{id}
+$$
+
+
+$$ 
+\frac{1-\theta_{kd}}{\theta_{kd}} =
+\frac{\sum_i w_{ik}-\sum_i w_{ik}x_{id}}{\sum_i w_{ik}  x_{id}}
+$$
+
+
+$$ 
+\frac{1}{\theta_{kd}} - 1=
+\frac{\sum_i w_{ik}}{\sum_i w_{ik}  x_{id}} - 1
+$$
+
+$$ 
+\hat{\theta}_{kd}=
+\frac{\sum_i w_{ik}  x_{id}}{\sum_i w_{ik}} 
+$$
+
+Ya da 
+
+$$ 
+\hat{\theta}_{k}=
+\frac{\sum_i w_{ik}  x_{i}}{\sum_i w_{ik}} 
+$$
+
+$\lambda_j$ Hesabý
+
+Þimdi $\lambda_j$'ye göre bir türev almamýz, sýfýra eþitlememiz ve çözmemiz
+lazým. Tek bir pürüz $\sum_k \lambda_k = 1$ olmasý þartý, yani tüm aðýrlýklarýn
+toplamý 1'e eþit olmalý ve bu þartý bir þekilde denklemlere dahil etmemiz
+lazým. Lagrange çarpan tekniði burada kullanýlýr [1, sf. 395].
+
+$$ \frac{\partial }{\partial \lambda_j} 
+\big[ \ell(\theta)  + \alpha (\sum_k \lambda_k - 1) \big]
+ $$
+
+Ondan önce olurluðun $\lambda_j$'ye göre kýsmi türevi lazým, (1) formülüne
+dönersek, ve kýsmi türevi alýrsak,
+
+$$ 
+\frac{\partial \ell}{\partial \lambda_j}  = 
+\sum _{i=1}^{N}
+\frac{f(x_i;\theta_j)}{\sum _{k=1}^{K} \lambda_k f(x_i;\theta_k) }
+=
+\sum _{i=1}^{N}
+\frac{f(x_i;\theta_j)}{f(x_i) }
+$$
+
+O zaman iki üstteki türev su hale gelir, sýfýra da eþitlersek,
+
+$$  
+\sum _{i=1}^{N} \frac{f(x_i;\theta_j)}{f(x_i) } + \alpha = 0
+$$
+
+Biraz düzenleyip iki tarafý da $\lambda_j$ ile çarpalým,
+
+$$
+\sum _{i=1}^{N} \frac{f(x_i;\theta_j) \lambda_j}{f(x_i) } = - \alpha \lambda_j 
+$$
+
+Eþitliðin sol tarafýnda toplam içinde yine (1)'de görülen $w_{ij}$'ye eriþtik!
+Yerine koyalým,
+
+$$
+\sum _{i=1}^{N} w_{ij} = - \alpha \lambda_j 
+\mlabel{3} 
+$$
+
+Þimdi tüm öðeler / kümeler üzerinden bir toplam alalým (yani $\sum_k$'yi her iki
+tarafa da uygulayalým),
+
+$$
+\sum _{k=1}^{K} \sum _{i=1}^{N} w_{ij} = - \alpha  \sum _{k=1}^{K} \lambda_j
+$$
+
+
+$ \sum_k \lambda_j = 1 $, $\sum_j w_{ij} = 1 $ olduðu için,
+
+$$ 
+N = - \alpha 
+$$
+
+Üstteki formülü (3) içine koyarsak, ve tekrar düzenlersek,
+
+$$ 
+\lambda_j = \frac{\sum _{i=1}^{N} w_{ij}}{N} 
+$$
+
+\inputminted[fontsize=\footnotesize]{python}{mixbern.py}
+
+Kodda kullanýlan log-toplam-exp numarasý için {\em Ekler}'e bakýlabilir.
+
+Örnek olarak ikisel olarak siyah/beyaz olarak kodlanmýþ üç tane farklý sayýnýn
+8x8 boyutundaki imajlarýný içeren veriyi kullanabiliriz. Küme sayýsýný 3 olarak
+verdik.
+
+Veriden bazý örnekler görelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+Y = np.loadtxt('binarydigits.txt')
+plt.imshow(Y[4,:].reshape((8,8),order='C'), cmap=plt.cm.gray)
+plt.savefig('mixbern_04.png')
+plt.imshow(Y[7,:].reshape((8,8),order='C'), cmap=plt.cm.gray)
+plt.savefig('mixbern_05.png')
+\end{minted}
+
+\includegraphics[height=4cm]{mixbern_04.png}
+\includegraphics[height=4cm]{mixbern_05.png}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+import mixbern
+
+K=3; iter=40; eps=1e-15; attempts=5
+lR,lPi,lP,lbest,aic = mixbern.EMmixtureBernoulli(Y,K,iter,eps,attempts)
+labels =  np.argmax(lR.T,axis=0)
+print labels
+print 'log olurluk', lbest, 'aic', aic
+\end{minted}
+
+\begin{verbatim}
+[0 0 0 2 2 1 2 0 2 2 1 1 2 1 0 0 0 1 0 1 1 0 0 1 0 2 0 2 1 1 1 2 0 0 0 0 0
+ 0 1 2 0 0 0 0 0 1 2 0 0 2 2 2 1 2 1 2 2 0 0 1 2 1 2 1 0 1 0 0 2 2 2 1 0 2
+ 2 2 0 1 1 2 2 0 1 0 2 0 0 2 2 0 0 2 0 2 1 2 0 1 0 2]
+log olurluk -3049.95050527 aic 6483.90101054
+\end{verbatim}
+
+Elde edilen sonuçlara göre, ve paylaþtýðýmýz say resimlerindeki sýraya bakarsak,
+mesela ilk üç sayý imajýný birbirine benziyor olmasý lazým.  Yine ayný sýrada
+gidersek Daha sonra 4. ve 6. sayýlarýn birbirine benziyor olmasý lazým, ve
+8. imajýn ilk üç imaja benziyor olmasý lazým, vs. Resimlere bakýnca bunun
+hakikaten böyle olduðunu görüyoruz. Demek ki kümeleme baþarýyla
+gerçekleþtirilmiþ.
+
+Her veri noktasýnýn üyeliðini için $w_{ij}$'ye baktýk (kodda \verb!lR!, üyeliðin
+log'u), $i$ hangi kümeye en fazla yakýn ise (yüksek olasýlýk) bunu bir aidiyet
+olarak kabul ettik.
+
+Daha ilginç bir hesap þu; her $\theta_k$ (kodda \verb!lP!, log'u alýnmýþ
+parametreler) artýk bir kümeyi ``temsil'' ediyor (multinom bir deðiþken bu
+hatýrlarsak) ve bu daðýlýmlarýn her biri, bir nevi ``þablon'' haline dönüþmüþ
+olmalý; öyle ya, $Z$ ile zar atýyoruz bir daðýlým seçiyoruz, sonra o daðýlýma
+bir daha zar attýrýyoruz, ve herhangi bir sayýnýn imajýný üretmek istiyorsak
+þablon gerçeðine oldukça yakýn olmalý! Yani mantýki olarak düþünürsek, eðer
+model veriye iyi uymuþ ise, her þablon daðýlýmýnýn 0,7,5 sayýlarýnýn þeklini
+aþaðý yukarý temsil etmesini bekleriz. Kontrol edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+dim = (8,8)
+templates = np.exp(lP)
+digit0 = np.reshape(templates[0,:], dim,order='C')
+plt.imshow(digit0, cmap=plt.cm.gray)
+plt.savefig('mixbern_01.png')
+digit1 = np.reshape(templates[1,:], dim,order='C')
+plt.imshow(digit1, cmap=plt.cm.gray)
+plt.savefig('mixbern_02.png')
+digit2 = np.reshape(templates[2,:], dim, order='C')
+plt.imshow(digit2, cmap=plt.cm.gray)
+plt.savefig('mixbern_03.png')
+\end{minted}
+
+\includegraphics[height=4cm]{mixbern_01.png}
+\includegraphics[height=4cm]{mixbern_02.png}
+\includegraphics[height=4cm]{mixbern_03.png}
+
+Hakikaten de þeklen benziyorlar!
+
+Kaynaklar
+
+[1] Zaki, {\em Data Mining and Analysis: Fundamental Concepts and Algorithms}
+
+[2] Alfons Juan, Enrique Vidal, {\em Bernoulli mixture models for binary images}
+
+[3] Shalizi, {\em Advanced Data Analysis from an Elementary Point of View}
+
+[4] Bishop, C., {\em Pattern Recognition and Machine Learning}
+
+
+\end{document}

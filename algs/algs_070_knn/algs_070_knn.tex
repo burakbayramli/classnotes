@@ -1,0 +1,523 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+En Yakýn k-Komþu (k-Nearest Neighbor), Geometrik Yakýnlýk Hesabý
+
+Yapay Öðrenim alanýnda örnek bazlý öðrenen algoritmalardan bilinen KNN, eðitim
+verinin kendisini sýnýflama (classification) amaçlý olarak kullanýr, yeni bir
+model ortaya çýkartmaz. Algoritma þöyle iþler: etiketleri bilinen eðitim verisi
+alýnýr ve bir kenarda tutulur. Yeni bir veri noktasý görülünce bu veriye geri
+dönülür ve o noktaya ``en yakýn'' k tane nokta bulunur. Daha sonra bu noktalarýn
+etiketlerine bakýlýr ve çoðunluðun etiketi ne ise, o etiket yeni noktanýn
+etiketi olarak kabul edilir. Mesela elde \verb!1! kategorisi altýnda
+\verb![2 2]!, \verb!2! kategorisi altýnda \verb![5 5]!  var ise, yeni nokta
+\verb![3, 3]! için yakýnlýk açýsýndan \verb![2 2]! bulunmalý ve etiket olarak
+\verb!1!  sonucu döndürülmelidir.
+
+Üstte tarif edilen basit bir ihtiyaç, yöntem gibi görülebilir. Fakat yapay
+öðrenim ve yapay zeka çok boyutlarda örüntü tanýma (pattern recognition)
+ile uðraþýr, ve milyonlarca satýrlýk veri, onlarca boyut (üstteki örnekte
+2, fakat çoðunlukla çok daha fazla boyut vardýr) iþler hakikaten
+zorlaþabilir. Mesela görüntü tanýmada veri \verb!M x N! boyutundaki dijital
+imajlar (düzleþtirilince $M \cdot N$ boyutunda), ve onlarýn içindeki
+resimlerin kime ait olduðu etiket bilgisi olabilir. KNN bu tür multimedya,
+çok boyutlu veri ortamýnda baþarýlý þekilde çalýþabilmektedir. Ayrýca en
+yakýn k komþunun içeriði tarifsel bilgi çýkarýmý (knowledge extraction)
+amacýyla da kullanýlabilir [2].
+
+``En yakýn'' sözü bir kordinat sistemi anlamýna geliyor, ve KNN, aynen GMM
+ve diðer pek çok kordinatsal öðrenme yöntemi gibi eldeki çok boyutlu veri
+noktalarýnýn elemanlarýný bir kordinat sistemindeymiþ gibi görür. Kýyasla
+mesela APriori gibi bir algoritma metin bazlý veriyle olduðu gibi
+çalýþabilirdi.
+
+Peki arama baðlamýnda, bir veri öbeði içinden en yakýn noktalarý bulmanýn
+en basit yolu nedir? Listeyi baþtan sonra taramak (kaba kuvvet yöntemi
+-brute force-) listedeki her nokta ile yeni nokta arasýndaki mesafeyi teker
+teker hesaplayýp en yakýn k taneyi içinden seçerdi, bu bir yöntemdir.. Bu
+basit algoritmanýn yükü $O(N)$'dir. Eðer tek bir nokta arýyor olsaydýk,
+kabul edilebilir olabilirdi. Fakat genellikle bir sýnýflayýcý (classifier)
+algoritmasýnýn sürekli iþlemesi, mesela bir online site için günde
+milyonlarca kez bazý kararlarý almasý gerekebilir. Bu durumda ve $N$'in çok
+büyük olduðu þartlarda, üstteki hýz bile yeterli olmayacaktýr.
+
+Arama iþlemini daha hýzlý yapmanýn yollarý var. Akýllý arama algoritmalarý
+kullanarak eðitim verilerini bir aðaç yapýsý üzerinden tarayýp eriþim
+hýzýný $O(\log N)$'e indirmek mümkündür.
+
+K-D Aðaçlarý (k-d tree)
+
+Bilgisayar bilimde K-D aðaçlarý (k-boyutlu aðaçlar kelimesinin
+kýsaltýlmýþý) bir çok boyutlu bölümlere ayýrma yaklaþýmýdýr, eldeki çok
+boyutlu veri noktalarý bölgelere ayrýlarak arama ile bulunmalarý
+kolaylaþtýrýlmaya uðraþýlýr. Bu yapý belli bir noktaya en yakýn k nokta
+bulmaya yardýmcý olur.
+
+Yapý þöyledir: K-D aðaçlarý bir ikisel aðaç olarak kodlanýr, aðacýn her
+düðümü k boyutlu uzayý sadece tek bir kordinat üzerinden ikiye böler. Eðer
+3 boyutta isek mesela 1. kordinat üzerinden bu ikiye bölüm
+yapýlabilir. Ardýndan o düðümde seçilen kordinat üzerinden bakýlan öðeden
+daha küçük olan veri noktalarý sol dala büyük olanlarý sað dala verilir. Bu
+iþleyiþ aðacýn altýna doðru benzer þekilde devam eder, her seviyede farklý
+bir kordinat seçilir.
+
+\inputminted[fontsize=\footnotesize]{python}{kdtree.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import bpq, kdtree
+tree = kdtree.create([[2,3,4], [4,5,6], [5,3,2]])
+print tree.search_nn( (1, 2, 3) )
+\end{minted}
+
+\begin{verbatim}
+(<KDNode - [2, 3, 4]>, 3.0)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = np.random.random((1000,2)) * 100.
+kx = [list(xxx) for xxx in x]
+tree = kdtree.create(kx)
+kres = tree.search_knn( [39, 39], k=7 )
+for kx in kres: print kx
+\end{minted}
+
+\begin{verbatim}
+(<KDNode - [37.944809008167091, 36.859556115064997]>, 5.694928053800966)
+(<KDNode - [36.282279773622861, 39.25727857203173]>, 7.452195492486094)
+(<KDNode - [36.011835939092215, 39.387237685986818]>, 9.07907748034933)
+(<KDNode - [38.766178732185438, 34.670053651771802]>, 18.803107763817117)
+(<KDNode - [39.443975626797602, 34.581772823651235]>, 19.7178457390171)
+(<KDNode - [42.733856969186199, 36.292326352854367]>, 21.27318444578728)
+(<KDNode - [43.489959416330848, 37.855783990677935]>, 21.468965836286962)
+\end{verbatim}
+
+Küre Agaçlarý (Ball Tree, BT) 
+
+Bir noktanýn diðer noktalara yakýn olup olmadýðýnýn hesabýnda yapýlmasý
+gereken en pahalý iþlem nedir? Mesafe hesabýdýr. BT algoritmasýnýn püf
+noktasý bu hesabý yapmadan, noktalara deðil, noktalarý kapsayan "kürelere"
+bakarak hýz kazandýrmasýdýr. Noktalarýn her biri yerine o noktalarý temsil
+eden kürenin pivot noktasýna (bu nokta küre içindeki noktalarýn ortalamasal
+olarak merkezi de olabilir, herhangi bir baþka nokta da) bakýlýr, ve oraya
+olan mesafeye göre bir küre altýndaki noktalara olabilecek en az ve en
+fazla uzaklýk hemen anlaþýlmýþ olur.
+
+Not: Küre kavramý üç boyutta anlamlý tabii ki, iki boyutta bir çemberden
+bahsetmek lazým, daha yüksek boyutlarda ise merkezi ve çapý olan bir
+``hiper yüzeyden'' bahsetmek lazým. Tarifi kolaylaþtýrdýðý için çember ve
+küre tanýmlarýný kullanýyoruz.
+
+Mesela elimizde alttaki gibi noktalar var ve küreyi oluþturduk. 
+
+\includegraphics[height=4cm]{knn0.png}
+
+Bu küreyi kullanarak küre dýþýndaki herhangi bir nokta $q$'nun küredeki
+"diðer tüm noktalar $x$'e" olabileceði en az mesafenin ne olacaðýný
+üçgensel eþitsizlik ile anlayabiliriz.
+
+Üçgensel eþitsizlik 
+
+$$ |x-y| \le |x-z| + |z-y| $$
+
+Operatör $|\hspace{0.2cm}|$ norm anlamýna gelir ve uzaklýk hesabýnýn
+genelleþtirilmiþ halidir. Konu hakkýnda daha fazla detay {\em Fonksiyonel
+  Analiz} ders notlarýnda. Kýsaca söylenmek istenen iki nokta arasýnda
+direk gitmek yerine yolu uzatýrsak, mesafenin artacaðýdýr. Tabii uzaklýk,
+yol, nokta gibi kavramlar tamamen soyut matematiksel ortamda da iþleyecek
+þekilde ayarlanmýþtýr. Mesela mesafe (norm) kavramýný deðiþtirebiliriz,
+Öklitsel yerine Manhattan mesafesi kullanýrýz (blok mesafesi, binalar
+etrafýndan dolaþýlýyor, direk gidiþ yok), fakat bu kavram bir norm olduðu
+ve belirttiðimiz uzayda geçerli olduðu için üçgensel eþitsizlik üzerine
+kurulmuþ tüm diðer kurallar geçerli olur.
+
+\includegraphics[height=6cm]{tri1.png}
+
+Þimdi diyelim ki dýþarýdaki bir $q$ noktasýndan bir küre içindeki diðer tüm
+$x$ noktalarýna olan mesafe hakkýnda bir þeyler söylemek istiyoruz. Üstteki
+þekilden bir üçgensel eþitsizlik çýkartabiliriz,
+
+$$ |x-c| + |x-q| \ge |q-c|  $$
+
+Bunun doðru bir ifade olduðunu biliyoruz. Peki þimdi yarýçapý bu iþe dahil
+edelim, çünkü yarýçap hesabý bir kere yapýlýp küre seviyesinde depolanacak
+ve bir daha hesaplanmasý gerekmeyecek, yani algoritmayý hýzlandýracak bir
+þey olabilir bu, o zaman eðer $|x-c|$ yerine yarýçapý (radius) kullanýrsak,
+eþitsizlik hala geçerli olur, sol taraf zaten büyüktü, þimdi daha da büyük
+olacak, 
+
+$$ radius + |x-q| \ge |q-c|  $$
+
+Bunu nasýl böyle kesin bilebiliyoruz? Çünkü BT algoritmasý radius'u
+$|x-c|$'ten kesinlikle daha büyük olacak þekilde seçer). Þimdi yarýçapý
+saða geçirelim,
+
+$$ |x-q| \ge |q-c| - radius $$
+
+Böylece güzel bir taným elde ettik. Yeni noktanýn küredeki herhangi bir
+nokta $x$'e olan uzaklýðý, yeni noktanýn pivota olan uzaklýðýnýn yarýçapý
+çýkartýlmýþ halinden {\em muhakkak} fazladýr. Yani bu çýkartma iþleminden
+ele geçen rakam yeni noktanýn $x$'e uzaklýðýna bir "alt sýnýr (lower
+bound)" olarak kabul edilebilir. Diðer tüm mesafeler bu rakamdan daha büyük
+olacaktýr. Ne elde ettik? Sadece bir yeni nokta, pivot ve yarýçap
+kullanarak küredeki "diðer tüm noktalar hakkýnda" bir irdeleme yapmamýz
+mümkün olacak. Bu noktalara teker teker bakmamýz gerekmeyecek. Bunun nasýl
+ise yaradýðýný algoritma detaylarýnda göreceðiz.
+
+Benzer þekilde 
+
+\includegraphics[height=6cm]{tri2.png}
+
+Bu ne diyor? 
+
+$$ |q-c| + |x-c| \ge |q-x| $$
+
+$|x-c|$ yerine yarýçap kullanýrsak, sol taraf büyüyeceði için büyüklük hala
+büyüklük olarak kalýr, 
+
+$$ |q-c| + radius \ge |q-x| $$
+
+Ve yine daha genel ve hýzlý hesaplanan bir kural elde ettik (önceki
+ifadeye benzemesi için yer düzenlemesi yapalým)
+
+$$ |q-x| \le |q-c| + radius $$
+
+Bu ifade ne diyor? Yeni noktanýn pivota olan uzaklýðýna yarýçap
+``eklenirse'' bu uzaklýktan, büyüklükten daha büyük bir yeni nokta / küre
+ mesafesi olamaz, küredeki hangi nokta olursa olsun. Bu eþitsizlik te bize
+ bir üst sýnýr (upper bound) vermiþ oldu. 
+
+Algoritma \verb!ball_knn!$\left(PS^{in},node\right)$
+\begin{enumerate}
+
+\item Eðer alttaki þart geçerli ise node içindeki bir noktanýn daha önce
+  keþfedilmiþ $k$ en yakýn komþudan daha yakýn olmasý imkansýzdýr
+
+\item \verb!if! $D^{node}_{minp} \ge D_{sofar}$ $\code{return } PS_{in}$
+  deðiþmemiþ halde;
+
+\item \verb!else if! $node$ bir çocuk noktasý ise
+
+  \begin{itemize}
+   \item  $PS_{out} = PS_{in}$
+   \item Her $\forall x \in points(node)$ için
+   \begin{itemize}
+     \item \verb!if! $\left( |x-q| < D_{sofar} \right)$, basit lineer arama yap
+     \item $x$'i $PS_{out}$'a ekle
+     \item \verb!if! $|PS^{out}| == k+1$ o zaman en uzak olan komþuyu
+       $PS^{out}$'tan çýkart ve $D_{sofar}$'i güncelle
+   \end{itemize}
+
+  \end{itemize}
+
+\item Eðer uç nokta deðil ise iki çocuk düðümden daha yakýn olanýný
+  incele, sonra daha uzakta olanýna bak. büyük bir ihtimalle arama devam
+  ettirilirse bu arama kendiliðinden kesilecektir.
+
+  \item \verb!else!
+    \begin{itemize}
+      \item $node_1 = node$'un $q$'ya en yakýn çocuðu;
+      \item $node_2 = node$'un $q$'dan en uzak çocuðu;
+      \item $PS^{temp} = \verb!ball_knn!(PS^{in},node_1)$;
+      \item $PS^{out} = \verb!ball_knn!(PS^{temp},node_2);$
+\end{itemize}
+        
+\end{enumerate}
+
+Küre Aðaçlarý (BT) metotu önce küreleri, aðaçlarý oluþturmalýdýr. Bu
+küreler hiyerarþik þekilde planlanýr, tüm noktalarýn içinde olduðu bir "en
+üst küre" vardýr her kürenin iki tane çocuk küresi olabilir. Belli bir
+(dýþarýdan tanýmlanan) minimum $r_{min}$ veri noktasýna gelinceye kadar
+sadece noktalarý geometrik olarak kapsamakla görevli küreler oluþturulur,
+küreler noktalarý sahiplenmezler. Fakat bu $r_{min}$ sayýsýna eriþince
+(artýk oldukça alttaki) kürelerin üzerine noktalar konacaktýr.
+
+Önce tek kürenin oluþturuluþuna bakalým. Bir küre oluþumu için eldeki veri
+içinden herhangi bir tanesi pivot olarak kabul edilebilir. Daha sonra bu
+pivot'tan diðer tüm noktalara olan uzaklýk ölçülür, ve en fazla, en büyük
+olan uzaklýk yarýçap olarak kabul edilir (her þeyi kapsayabilmesi için).
+
+Not: Bu arada "tüm diðer noktalara bakýlmasý" dedik, bundan kaçýnmaya
+çalýþmýyor muyduk?  Fakat dikkat, "küre oluþturulmasý" evresindeyiz, k
+tane yakýn nokta arama evresinde deðiliz. Yapmaya çalýþtýðýmýz aramalarý
+hýzlandýrmak - eðitim / küre oluþturmasý bir kez yapýlacak ve bu eðitilmiþ
+küreler bir kenarda tutulacak ve sürekli aramalar için ardý ardýna
+kullanýlacaklar.
+
+Küreyi oluþturmanýn algoritmasý þöyledir: verilen noktalar içinde herhangi
+birisi pivot olarak seçilir. Sonra bu noktadan en uzakta olan nokta $f_1$,
+sonra $f_1$'den en uzakta olan nokta $f_2$ seçilir. Sonra tüm noktalara
+teker teker bakýlýr ve $f_1$'e yakýn olanlar bir gruba, $f_2$'ye yakýn
+olanlar bir gruba ayrýlýr. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import balltree, pprint
+
+points = np.array([[3.,3.],[2.,2.]])
+q = [1.,1.]
+print 'diff', points-q
+print 'dist', balltree.dist(points,q)
+\end{minted}
+
+\begin{verbatim}
+diff [[ 2.  2.]
+ [ 1.  1.]]
+dist [ 2.82842712  1.41421356]
+\end{verbatim}
+
+\inputminted[fontsize=\footnotesize]{python}{balltree.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+points = np.array([[3.,4.],[5.,5.],[9.,2.],[3.2,5.],[7.,5.],
+                 [8.,9.],[7.,6.],[8,4],[6,2]])
+tree = balltree.new_node()
+balltree.form_tree(points,tree,all_points=points)
+pp = pprint.PrettyPrinter(indent=4)
+print "tree"
+pp.pprint(tree)
+newp = np.array([7.,7.])
+dummyp = [np.Inf,np.Inf] # it should be removed immediately
+res = balltree.search_tree(newp,[np.Inf, [dummyp]], tree, k=2)
+print "done", res
+\end{minted}
+
+\begin{verbatim}
+tree
+[   array([ 3.,  4.]),
+    7.0710678118654755,
+    None,
+    [   [   array([ 8.,  9.]),
+            3.1622776601683795,
+            array([[ 8.,  9.],
+       [ 7.,  6.]]),
+            [None, None]],
+        [   array([ 3.,  4.]),
+            6.324555320336759,
+            None,
+            [   [   array([ 9.,  2.]),
+                    3.6055512754639891,
+                    None,
+                    [   [   array([ 7.,  5.]),
+                            1.4142135623730951,
+                            array([[ 7.,  5.],
+       [ 8.,  4.]]),
+                            [None, None]],
+                        [   array([ 9.,  2.]),
+                            3.0,
+                            array([[ 9.,  2.],
+       [ 6.,  2.]]),
+                            [None, None]]]],
+                [   array([ 3.,  4.]),
+                    2.2360679774997898,
+                    None,
+                    [   [   array([ 5.,  5.]),
+                            0.0,
+                            array([[ 5.,  5.]]),
+                            [None, None]],
+                        [   array([ 3.,  4.]),
+                            1.019803902718557,
+                            array([[ 3. ,  4. ],
+       [ 3.2,  5. ]]),
+                            [None, None]]]]]]]]
+None
+done [1.0, [[[8.0, 9.0]], [[7.0, 6.0]]]]
+\end{verbatim}
+
+Bu iki grup, o anda iþlemekte olduðumuz aðaç düðümün (node) iki
+çocuklarý olacaktýr. Çocuk noktalarý kararlaþtýrýldýktan sonra artýk
+sonraki aþamaya geçilir, fonksiyon \verb!form_tree! bu çocuk
+noktalarý alarak, ayrý ayrý, her çocuk grubu için özyineli (recursive)
+olarak kendi kendini çaðýrýr. Kendi kendini çaðýran
+\verb!form_tree!, tekrar baþladýðýnda kendini yeni (bir) nokta
+grubu ve yeni bir düðüm objesi ile baþbaþa bulur, ve hiçbir þeyden
+habersiz olarak iþleme koyulur. Tabii her özyineli çaðrý yeni düðüm
+objesini yaratýrken bir referansý üstteki ebeveyn düðüme koymayý
+unutmamýþtýr, böylece özyineli fonksiyon dünyadan habersiz olsa bile,
+aðacýn en üstünden en altýna kesintisiz bir baðlantý zinciri hep
+elimizde olur.
+
+Not: \verb!form_tree! içinde bir numara yaptýk, tüm noktalarýn $f_1$'e olan
+uzaklýðý \verb!dist1!, $f_2$'e olan uzaklýðý ise \verb!dist2!. Sonra
+\verb!diffs = dist1-dist2! ile bu iki uzaklýðý birbirinden çýkartýyoruz ve
+mesela \verb!points[diffs <= 0]!  ile $f_1$'e yakýn olanlarý buluyoruz,
+çünkü bir tarafta $f_1$'e yakýnlýk 4 diðer tarafta $f_2$'ye yakýnlýk 6 ise,
+4-6=-2 ie o nokta $f_1$'e yakýn demektir. Ufak bir numara ile numpy
+dilimleme (slicing) tekniðini kullanabilmiþ olduk ve bu önemli çünkü
+böylece \verb!for! döngüsü yazmýyoruz, numpy'in arka planda C ile yazýlmýþ
+hýzlý rutinlerini kullanýyoruz.
+
+Tekrar hatýrlatalým: kürelerin sýnýrlarý kesiþebilir.
+
+Arama 
+
+Üstte sözde program (pseudocode) \verb!ball_knn! olarak gösterilen ve bizim
+kodda \verb!search_tree! olarak anýlan fonksiyon arama fonksiyonu. Aranan
+\verb!new_point!'e olan k en yakýn diðer veri noktalar. Dýþarýdan verilen
+deðiþken \verb!knn_matches! üzerinde fonksiyon özyineli bir þekilde arama
+yaparken "o ana kadar bulunmuþ en yakýn k nokta" ve o noktalarýn
+\verb!new_point!'e olan en yakýn mesafesi saklanýr, arama iþleyiþi
+sýrasýnda \verb!knn_matches!, \verb!knn_matches_out! sürekli verilip geri
+döndürülen deðiþkenlerdir, sözde programdaki $P^{in},P^{out}$'un
+karþýlýðýdýrlar.
+
+Arama algoritmasý þöyle iþler: þimdi önceden oluþturulmuþ küre
+hiyerarþisini üstten alta doðru gezmeye baþlarýz. Her basamakta yeni nokta
+ile o kürenin pivot'unu, yarýçapýný kullanarak bir "alt sýnýr mesafe
+hesabý" yaparýz, bu mesafe hesabýnýn arkasýnda yatan düþünceyi yazýnýn
+baþýnda anlatmýþtýk. Bu mesafe küre içindeki tüm noktalara olan bir en az
+mesafe idi, ve eðer eldeki \verb!knn_matches!  üzerindeki þimdiye kadar
+bulunmuþ mesafelerin en azýndan daha az ise, o zaman bu küre "bakmaya
+deðer" bir küredir, ve arama algoritmasý bu küreden iþleme devam
+eder. Þimdiye kadar bulunmuþ mesafelerin en azý \verb!knn_matches! veri
+yapýsý içine \verb!min_so_far!  olarak saklanýyor, sözde programdaki
+$D_{sofar}$.
+
+Bu irdeleme sonrasý (yani vs küresinden yola devam kararý arkasýndan)
+iþleme iki þekilde devam edilebilir, çünkü bir küre iki türden
+olabilir; ya nihai en alt kürelerden biridir ve üzerinde gerçek
+noktalar depolanmýþtýr, ya da ara kürelerden biridir (sona gelmedik
+ama doðru yoldayýz, daha alta inmeye devam), o zaman fonksiyon yine
+özyineli bir þekilde bu kürenin çocuklarýna bakacaktýr - her çocuk
+için kendi kendini çaðýracaktýr. Ýkinci durumda, kürede noktalar
+depolanmýþtýr, artýk basit lineer bir þekilde o tüm noktalara teker
+teker bakýlýr, eldekilerden daha yakýn olaný alýnýr, eldeki liste
+þiþmeye baþlamýþsa (k'den daha fazla ise) en büyük noktalardan biri
+atýlýr, vs.
+
+Not: Silme iþlemi örnek kodumuzda Python \verb!del! ile
+gerçekleþtirildi. Eðer bu iþlem de hýzlandýrýlmak istenirse, en alt küre
+seviyesindeki veriler bir öncelik kuyruðu (priority queue) üzerinde
+tutulabilir, ve silme iþlemi hep en sondaki elemaný siler, ekleme iþlemi
+ise yeni elemaný (hep sýralý olan) listede doðru yere koyar.
+
+Daha alta inmemiz gereken birinci durumda yapýlan iki çaðrýnýn bir
+özelliðine dikkat çekmek isterim. Yeni noktanýn bu çocuklara olan
+uzaklýðý da ölçülüyor, ve en önce, en yakýn olan çocuða doðru bir
+özyineleme yapýlýyor.  Bu nokta çok önemli: niye böyle yapýldý? Çünkü
+içinde muhtemelen daha yakýn noktalarýn olabileceði kürelere doðru
+gidersek, özyineli çaðrýlarýn teker teker bitip yukarý doðru çýkmaya
+baþlamasý ve kaldýklarý yerden bu sefer ikinci çocuk çaðrýlarýný
+yapmaya baþlamasý ardýndan, elimizdeki \verb!knn_matches!
+üzerinde en yakýn noktalarý büyük bir ihtimalle zaten bulmuþ
+olacaðýz. Bu durumda ikinci çaðrý yapýlsa bile tek bir alt sýnýr
+hesabý o kürede dikkate deðer hiçbir nokta olamayacaðýný ortaya
+çýkaracak (çünkü en iyiler zaten elimizde), ve ikinci çocuða olan
+çaðrýlar hiç alta inmeden pat diye geri dönecektir, hiç aþaðý
+inilmeyecektir.
+
+Bu müthiþ bir kazanýmdýr: zaten bu stratejiye litetürde "budamak (pruning)"
+adý veriliyor, bu da çok uygun bir kelime aslýnda, çünkü aðaçlarla
+uðraþýyoruz ve bir düðüm (küre) ve onun altýndaki hiçbir alt küreye
+uðramaktan kurtularak o dallarýn tamamýný bir nevi "budamýþ" oluyoruz. Bir
+sürü gereksiz iþlemden de kurtuluyoruz, ve aramayý hýzlandýrýyoruz.
+
+Model
+
+KNN'in model kullanmayan, model yerine verinin kendisini kullanan bir
+algoritma olarak tanýttýk. Peki ``eðitim'' evresi sonrasý ele geçen küreler
+ve aðaç yapýsý bir nevi model olarak görülebilir mi? 
+
+Bu önemli bir soru, ve bir bakýma, evet aðaç yapýsý sanki bir modelmiþ gibi
+duruyor. Fakat, mesela istatistiksel, grafiksel, yapay sýnýr aðlarý (neural
+net) baðlamýnda bakýlýrsa bu yapýya tam bir model denemez. Model bazlý
+metotlarda model kurulunca veri atýlýr, ona bir daha bakýlmaz. Fakat KNN,
+küre ve aðaç yapýsýný hala eldeki veriye eriþmek için kullanmaktadýr. Yani
+bir bakýma veriyi ``indeksliyoruz'', ona eriþimi kolaylaþtýrýp
+hýzlandýrýyoruz, ama ondan model çýkartmýyoruz. 
+
+Not: Verilen Python kodu ve algoritma yakýn noktalarý hesaplýyor sadece,
+onlarýn etiketlerinden hareketle yeni noktanýn etiketini tahmin etme
+aþamasýný gerçekleþtirmiyor. Fakat bu son aþama iþin en basit tarafý,
+eðitim veri yapýsýna eklenecek bir etiket bilgisi ve sýnýflama sonrasý k
+noktanýn aðýrlýklý etiketinin hesabý ile basit þekilde
+gerçekleþtirilebilir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python plot_circles.py
+\end{minted}
+
+Aðaç oluþumu sýrasýndaki kürelerin grafiði alttadýr. 
+
+\includegraphics[height=6cm]{knn0.png}
+\includegraphics[height=6cm]{knn1.png}
+\includegraphics[height=6cm]{knn2.png}
+\includegraphics[height=6cm]{knn3.png}
+\includegraphics[height=6cm]{knn4.png}
+\includegraphics[height=6cm]{knn5.png}
+\includegraphics[height=6cm]{knn6.png}
+\includegraphics[height=6cm]{knn7.png}
+\includegraphics[height=6cm]{knn8.png}
+\includegraphics[height=6cm]{knn9.png}
+
+Bölec (Hash) ile Geometrik Anahtarlama
+
+Grafik, fiziksel simülasyonlarda pek çok sayýda obje 3 boyutlu ortamda dünyaya
+salýnýp, ayrý ayrý onlara fiziksel kurallar uygulanýr ve nereye geldiklerine
+bakýlýr. Bu hesap sýrasýnda objelerin birbirine çarpýp çarpmadýðýný hesaplamak
+gerekir fakat böyle bir hesap, eðer mesela $n$ tane obje var ise, her görüntü
+karesinde her $n$ tane objenin her $n-1$ diðer objenin yakýnýnda olup olmadýðý
+anlamýna gelir, ki bu hesapsal yük $O(n^2)$ demektir. Eðer $n$ milyonlar ise bu
+aðýr bir yük olurdu.
+
+Böleç tekniðini burada da kullanabiliriz. Öyle bir sihirli böleç fonksiyonumuz
+olsun ki her kordinat için bir böleç deðeri üretse ve birbirine yakýn
+kordinatlar için bu deðer ayný olsa? Böylece basit eþitlik kontrolü ile iki
+kordinatýn birbirine yakýn olup olmadýðýný hemen anlayabilirdik. Tabii daha
+detaylý kontrol için böleçleri ayný olan kordinatlarý daha detaylý teste tabi
+tutardýk, ama detaylý kontrolün yapýlacaðý obje sayýsýný çok daha azaltmýþ
+olurduk.
+
+Böyle bir tekniði [4]'te görüyoruz. Teknik kordinat sistemini $l$ büyüklüðünde
+kutulara bölüyor, her eksen deðerini bu büyüklük ile bölüyoruz, bölüm sonrasý
+elde edilen sayýyý taban (floor) tamsayýya indirgiyoruz, ardýndan her eksen için
+farklý bir asal sayýyla çarpýp sonuçlarý XOR ile birleþtiriyoruz (ki XOR yaygýn
+kullanýlan bir böleç birleþtirme yaklaþýmý).
+
+\begin{minted}[fontsize=\footnotesize]{python}
+l = 5
+n = 5
+p1,p2,p3 = 73856093, 19349663, 83492791
+
+x1 = [33,4,11]
+x2 = [31,1,14]
+x3 = [10,44,19]
+
+def spatial_hash(x):
+    ix,iy,iz = np.floor(x[0]/l), np.floor(x[1]/l), np.floor(x[2]/l)
+    return (int(ix*p1) ^ int(iy*p2) ^ int(iz*p3)) % n
+
+print (spatial_hash(x1))
+print (spatial_hash(x2))
+print (spatial_hash(x3))
+\end{minted}
+
+\begin{verbatim}
+1
+1
+3
+\end{verbatim}
+
+Görüldüðü gibi ilk iki kordinat ayný böleç anahtarýna düþtü, ki bu iki kordinat
+birbirine yakýn.
+
+Genel algoritma þöyle olabilir. Her görüntü karesi için iki faz düþünebiliriz,
+ilk fazda tüm objelerin kordinat böleci hesaplanýr, her bölec deðeri altýnda bir
+liste vardýr, ve her obje anahtarýnýn deðerine tekabül eden o listeye
+eklenir. Ýkinci fazda bir objeye bakarken onun üzerinde daha detaylý çarpýþma
+hesabý gerekip gerekmediðini anlamak için böleç anahtarýndaki listeye bakarýz,
+listede sadece bir öðe var ise çarpýþma yok, birden fazla ise o listedeki her
+diðer obje için detaylý çarpýþma hesabýna devam edilebilir.
+
+
+Kaynaklar
+
+[1] Liu, Moore, Gray, {\em New Algorithms for Efficient High Dimensional
+  Non-parametric Classification}
+
+[2] Alpaydýn, {\em Introduction to Machine Learning}
+
+[3] {\em A simple kd-tree in Python}, \url{https://github.com/stefankoegl/kdtree}
+
+[4] {\em Optimized Spatial Hashing for Collision Detection of Deformable Objects}
+    \url{https://matthias-research.github.io/pages/publications/tetraederCollision.pdf}
+
+
+\end{document}

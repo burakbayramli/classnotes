@@ -1,0 +1,419 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+F(X) = U
+
+Baþlýktaki matematiðin alt dallarýndan Simulasyon'un en temel 
+formüllerinden biri. Basitliði derin bir sonucu gizliyor aslýnda; ve
+simulasyon dahil olmak üzere en az iki istatistiksel yöntemi mümkün
+kýlýyor. Formülü ve mümkün kýldýðý iki yöntemi bu yazýda göreceðiz.
+
+Baþlýkta söylemi tam notasyonla vermek gerekirse;
+
+$$ F_X(X) \sim U(0,1) $$
+
+Yani, daðýlýmý her ne olursa olsun, bu daðýlýmdan gelen bir rasgele
+deðiþkenin deðerlerini o daðýlýmýn kümülatif daðýlým fonksiyonuna (cdf)
+geçersek, elde edilen deðerler yeni bir rasgele deðiþken $U(0,1)$ olarak,
+yani birörnek (uniform) olarak daðýlacaktýr!  Müthiþ bir sonuç. Bu metot
+simülasyonda Ters Transform Metotu (Inverse Transform Method) olarak
+geçiyor.
+
+Teori 
+
+Diyelim ki $X$ cdf $F_X$'e sahip surekli rasgele degisken. O zaman $F_X(X)
+\sim U(0,1)$.
+
+Ýspat
+
+$Y = F_X(X)$ olsun, ve $Y$'nin cdf'i $G(y)$. O zaman 
+
+$$ G(y) = P(Y \le y) = P(F_X(X) \le y) $$
+
+Olasýlýk operatörü içinde iki tarafa $F_X$'in tersini uygulayalým, sol
+tarafta tersi ile kendisi sonucu fonksiyon kaybolur, geri kalanlar,
+
+$$ = P(X \le F_X^{-1}(y) ) $$
+
+Üstteki ifadeye geldik. Bu ifade de aslýnda bir cdf hesabý deðil midir?
+Evet. $X$'in cdf hesabýdýr, 
+
+$$ = F_X(F_X^{-1}(y)) = y $$
+
+$$ G(y) = y $$
+
+Yani $y$'nin cdf deðeri $y$'nin kendisidir, bu da sadece $Y$ birörnek
+olarak daðýlmýþsa mümkündür [1]. 
+
+Herhangi Bir Daðýlým Ýçin Rasgele Sayý Üretmek
+
+Bu teorinin rasgele sayý üretmek için nasýl kullanýldýðýný görmek zor
+deðil. Çünkü eðer
+
+$$ F_X(X) = U $$
+
+ise 
+
+$$ X = F_X^{-1}(U) $$
+
+de doðrudur; O zaman birörnek daðýlýmdan örneklem alýrýz, bu örneklem
+içindeki sayýlarý teker teker üretmek istediðimiz daðýlýmýn cdf'inin {\em
+  tersine} geçeriz, ve elimizdeki sonuçlar otomatik olarak hedeflediðimiz
+daðýlýmdan gelen sayýlar olur!
+
+Not: Tabii $F^{-1}$ hesabýnýn yapýlabilmesi için bu fonksiyonun bir
+analitik formu olmasý gerekir; bazý durumlarda bu mümkün
+olmayabilir. Mesela normal (gaussian) daðýlýmýn cdf'inin tersinin analitik
+formu mevcut deðildir. Ya da çok daha çetrefil, çok boyutlu daðýlýmlar
+durumunda da bu mümkün olmayabilir. Bu tür durumlar için baþka yöntemler
+var, Markov Zinciri Monte Carlo (MCMC) yöntemleri mesela, ya da daha basit
+Kabul-Reddet (Accept-Rejection) yöntemi... Daðýlýmlarý simüle etme
+konusunun arkasýnda derin bir literatür var [2].
+
+Peki $U$ Nereden Geliyor? 
+
+Diyelim ki elimizde tersi alýnabilir bir cdf var, ve artýk bu daðýlýmdan
+sayý üretmek istiyoruz. Peki cdf tersine verilecek birörnek sayýlar nereden
+gelecek?
+
+Bu durumda sözde rasgele (pseudorandom) sayý üretimi konusuna
+girebiliriz. Favori hesap kütüphanemizden birörnek sayýlar üretebiliriz,
+fakat bu kütüphanelerin ne yaptýðýný bilmek iyi olur. Kendimiz rasgele sayý
+üretmek istiyorsak, bunun en kolay, etkili yolu lineer eþleþikþel üretici
+(linear congruential generator) kullanmak.
+
+$$ Z_i = (a Z_{i-1} + c) \bmod m $$
+
+$a$ çarpan, $m$ ise genlik (modülüs). $\bmod$ bildiðimiz gibi modülo
+matematiðinden geliyor, $4 \bmod 2 = 0$, $5 \bmod 3 = 2$, vs., bölümden
+arta kalanlarýn matematiði yani. Modülo operatörü sayesinde $Z_i$ sonuçlarý
+1 ile $m-1$ arasýnda olacaktýr. Çoðunlukla $m$ büyük ve asal bir sayý
+olarak seçilir. $R_i = Z_i / m$ ve $R_i \in (0,1)$. Amaç bir dizi $R_i$'in
+$U(0,1)$'den  geliyormuþ gibi gözükmesini saðlamak. Bu seri tabii ki bir 
+süre sonra kendini tekrar edecektir, ama bunun olmasý için uzun zaman 
+geçiyorsa bu bizim için iyi bir sonuçtur. 
+
+$a,c,m$'in dikkatli seçilmesi gerekir, ki tekrarsýz periyot uzun ve
+üretilen sayýlarýn istatistiki kalitesi iyi olsun. Eðer $c=0$ ise üstte
+gösterilene çarpýmsal üreteç ismi veriliyor. Neyse, örnek olarak 
+
+$$ Z_i = (5 Z_{i-1} + 3) \bmod 8 $$
+
+kullanalým. Eðer $Z_0 = 0$ ise (ki bu baþlangýç noktasýna tohum -seed- ismi
+de verilir) bir sonraki sayý $Z_1 = (5 Z_0 + 3) \bmod 8 = 3$ olur, ve böyle
+devam edersek,
+
+\includegraphics[height=2cm]{stat_fxu_01.png}
+
+Görüldüðü gibi 8. adýmda baþa dönmüþ olduk, çünkü $Z_8 = 0$. Bu üreteç
+tam-periyot üretecidir, yani $\bmod \ 8$ dedik ve tekrar edene kadar 8 tane
+sayý ürettik. Genel olarak tam periyot iyi bir þeydir. Eðer 
+
+$$ Z_i = (5 Z_{i-1} + 1) \bmod 7$$
+
+seçseydik, $Z_0=1$ ile $1,6,3,2,4,6$ yani küt diye 6'ya döndük. Bu olmadý, tam
+periyot deðil. Eðer $Z_0=5$ seçseydik sonuç daha da kötü olurdu, bir sonraki
+sayý baþlangýcýn kendisi, yani 5! Bu durumda tek bir tane bile sözde rasgele
+sayý bile üretememiþ olurduk.
+
+Çok iyi üreteçlerden biri
+
+$$ Z_i = 16807 Z_{i-1} \bmod (2^{31}-1)$$
+
+Bu çok hýzlý iþleyen, tekrar edene kadar 2 milyar (dikkat: {\em milyar})
+sayýdan daha fazla sayý üretebilen bir üreteçtir. Kodu altta
+bulunabilir, $2^{31}-1=2147483647$ olduðunu biliyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def do_unif(ix): 
+    u = (16807*ix) % 2147483647
+    return u
+
+u = do_unif(1e7)
+print u
+u = do_unif(u)
+print u
+u = do_unif(u)
+print u
+\end{minted}
+
+\begin{verbatim}
+566275534.0
+1892860081.0
+476634709.0
+\end{verbatim}
+
+Biraz daha farklý bir yaklaþým [1], [5, sf. 215],
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def do_unif(ix): 
+    k1 = int(ix/127773)
+    ix = 16807*(ix - k1*127773) - k1*2836
+    if ix < 0: ix = ix + 2147483647
+    u = ix*4.656612875e-10 # 1'den kucuk olmasi icin
+    return ix, u
+
+ix, u = do_unif(1e7)
+print u
+ix, u = do_unif(ix)
+print u
+ix, u = do_unif(ix)
+print u
+\end{minted}
+
+\begin{verbatim}
+0.263692594242
+0.881431662376
+0.22195033226
+\end{verbatim}
+
+Eðer tek bir çaðrý ile istediðimiz kadar birörnek sayý üretmek istiyorsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def unif(size,seed=1e7):
+    tmp = seed; res = []
+    for i in range(size):
+       tmp,u=do_unif(tmp)
+       res.append(u)
+    return np.array(res)
+print unif(size=10)
+\end{minted}
+
+\begin{verbatim}
+[ 0.26369259  0.88143166  0.22195033  0.31923449  0.37412169  0.8632809
+  0.16214486  0.16868319  0.05836612  0.95940828]
+\end{verbatim}
+
+Örnek: Üstel Rasgele Deðiþken Üretmek
+
+$X = F^{-1}(U)$ prensibini kullanarak üstel (exponential) daðýlýmdan gelen
+rasgele sayýlar üretelim. Birörnek üreticimiz var, üstel daðýlým için
+cdf'in tersini biliyoruz, ki bu $F^{-1}(p;\lambda) = -\ln(1-p) /
+\lambda$. Tüm bunlarý biraraya koyarsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = unif(size=1000)
+lam = 4.
+y = -np.log(1-x) / lam # cdf tersi
+f=plt.figure();
+plt.hist(y)
+plt.savefig('stat_fxu_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_fxu_02.png}
+
+Üstel daðýlýma benziyor! Ýþin iyi tarafý bu üretimi yapmak için tüm
+öðeleri evde kendimiz piþirdik. Birörnek rasgele sayýlarý bile kendimiz
+üretiyoruz. 
+
+Uyum Derecesi ve Düzgünlük Testi (Goodness-of-Fit, Smooth Test)
+
+$F_X(X) = U$ baþka bir açýdan bir ``numara'' olarak ta kullanýlabilir,
+çünkü teoriye göre sadece ve sadece $F_X$ fonksiyonu hakikaten $X$'in cdf'i
+ise ispat geçerli. Bu gerçeði bir istatistiki test için baþlangýç noktasý
+olarak kullanabiliriz; Diyelim ki elimizde bir $X$ var ve daðýlýmýnýn ne
+olduðunu bilmiyoruz. Ama eðer doðru daðýlýmý seçmiþsek, mesela $F_0$,
+$F_0(X)$ bize birörnek sonuç verir, deðilse vermez. O zaman bir tahmini
+cdf'i birörneklik testiyle birleþtirirsek, verinin / rasgele deðiþkenin
+daðýlýmýn ne olduðunu test eden bir istatistiki test bulmuþ oluruz [3,
+sf. 325].
+
+Birörneklik testi dedik, bunun için zaten bilinen chi kare, K-S uyum derece
+testi gibi testleri mi kullansak acaba? Neyman adlý istatistikçi mevcut
+olanlarý kullanmak yerine özellikle birörnek daðýlýmýna odaklý bir test
+yaratmaya karar verdi. Neyman'ýn düzgünlük testi (Neyman's smooth test)
+birkaç baz fonksiyonunun toplamýndan oluþan bir alternatifi (0,1) aralýðýna
+gömüyor (embed), ki sýfýr hipotezinde bu gömülü fonksiyon bize birörnek
+sonuçla ayný sonucu verir, ama birörneklikten sapma varsa, baz
+fonksiyonlarý öyle oluþturulmuþtur ki bu sapmanýn etkisi düzgün, sürekli
+bir þekilde birörneklikten ayrýlýr (ki testin ismi buradan geliyor). Ayrýca
+baz fonksiyonlarý öyle seçilmiþtir ki sýfýr hipotezi altýnda test için bir
+chi kare daðýlýmý elde ederiz, birörnek olmama durumunu bu chi kare
+daðýlýmda aykýrý bölgeye düþmek olarak irdeleyebiliriz, ve testimiz bunun
+üzerinden hesaplanýr.
+
+Bu özel fonksiyonlar nelerdir? Onlarý $h_j(y)$ olarak gösterelim, ki $j=1,..,d$
+olsun, yani $d$ tane baz fonksiyonu var. Neyman'a göre $d=4$ yeterlidir (baz
+fonksiyonuna göre deðiþir tabii, biz alttaki örnekte 5 kullandýk). Bu
+fonksiyonlara bazý þartlar getiriliyor, öncelikle $h_j$'ler sabit fonksiyona
+(yani 1'e) ve birbirlerine dikgen (orthogonal) olmalýlar. Yani
+
+$$ \int _{0}^{1} h_j(y) \ud y = 0 $$
+
+$$ \int _{0}^{1} h_k(y)h_j(y) \ud y = 0 $$
+
+Ayrýca büyüklüðü (yani karesi) normalize edilmiþ olmalý
+
+$$ 
+\int _{0}^{1} h_j(y)^2 \ud y = 1 
+\mlabel{1}
+$$
+
+Bu þartlarý tatmin eden hangi fonksiyonlar vardýr? Aklýmýza gelen her
+fonksiyon tipi üstteki þartlara uymayabilir. Neyman Legendre polinomlarý
+denen polinomlarý kullandý, fakat aslýnda üstteki þartlarý yerine getiren
+
+$$ h_j(y) = c_j \cos (2\pi j y) $$
+
+ki $c_j$ normalizasyon sabiti, gayet rahat kullanýlabilir. Dikkat, üstteki
+sabit $h_j$'yi bir daðýlým haline getirmez, ``büyüklük hesabý için'' onu
+normalize eder. Sebebini birazdan göreceðiz. 
+
+Not: Üstteki fonksiyon eðer Fourier serilerini hatýrlattýysa bu doðru bir
+gözlemdir, böyle bir baðlantý var.. Birbirine dikgen fonksiyonlar özel
+fonksiyonlar tabii, Fourier serilerinde bu sebeple kullanýlýyorlar, ve
+dikgenlik lineer cebirde de çok ortaya çýkar. Kontrol edilmek istenirse 
+$1, \cos (2\pi y), \cos (4\pi y), \cos (6 \pi y), ..$ fonksiyonlarýnýn birbirine
+dikgen olduðu entegral hesabýný yapýlarak görülebilir. 
+
+Devam edelim, (1)'i tatmin etmek için gereken $c_j$'i hesaplayalým,
+
+$$ 
+\int _{0}^{1} c_j^2 \cos(2 \pi y)^2 \ud y = 1
+$$
+
+$$ 
+\int _{0}^{1}\cos(2 \pi y)^2 \ud y = 1/c_j^2 
+$$
+
+
+Trigonometrik eþitlik [4, sf 435]
+
+$$ \cos(\theta)^2 = \frac{1 + \cos 2 \theta }{2}$$
+
+O zaman,
+
+$$ 
+ \cos(2 \pi y)^2 = \frac{1}{2} + \frac{1}{2}\cos(4 \pi y)
+ $$
+
+Entegrale geri koyalým,
+
+$$ 
+\int _{0}^{1} \frac{1}{2} + \frac{1}{2}\cos(4 \pi y) \ud y
+$$
+
+$$ 
+= \frac{y}{2} + \frac{1}{8\pi}\sin(4 \pi y)  \bigg|_{0}^{1} 
+\Rightarrow \frac{1}{2} = 1/c_j^2
+$$
+
+$$ c_j = \sqrt{2} $$
+
+Bulunan $c_j$ her $j$ için geçerli olacaktýr.
+
+Düzgünlük testi için önce $x_i$ veri noktalarý o verinin geldiðini
+düþündüðümüz cdf'e geçilir, yani $y_i = F(x_i)$ hesaplanýr. Ardýndan,
+
+$$ \overline{h_j} = \frac{1}{n} \sum _{i=1}^{n} h_j(y_i) $$
+
+Sýfýr hipotezi altýnda ve Büyük Sayýlar Kanununa göre $\overline{h_j} \to0$.  
+$\sqrt{n} \cdot \overline{h_j}$ ise Merkezi Limit Teorisi'ne göre Gaussian'dýr, 
+ve bu Gaussian'ýn varyansý  1 olacaktýr. Demek ki
+
+$$ 
+\Psi^2 = n \sum _{j=1}^{d} \overline{h_j}^2
+$$
+
+hesabý sýfýr hipotezi altýnda $\chi^2_d$ daðýlýmýna sahiptir. $h_j$'lerin
+birbirine dikgen seçilmesinin sebebi þimdi biraz daha açýklýk kazanýyor
+herhalde, dikgen fonksiyonlar ile arasýnda hiç korelasyon olmayan standart
+normaller üretiyoruz, ve bu normallerin toplamýnýn bize chi kare vermesini
+bekliyoruz (chi kare için korelasyonsuz standard normallerin toplamý
+gerekir).
+
+$\overline{h_j} \to 0$ ispatý için sýfýr hipotezinde $y_i$'lerin, ya da
+$u_i$ diyelim, birörnek daðýlým $U(0,1)$'dan geldiðini hatýrlayalým, yani o
+zaman $h_j(U)$ bir rasgele deðiþkendir, ve
+
+$$ h_j(u_1) + h_j(u_2) + .. + h_j(u_n) / n $$
+
+$h_j$'nin nüfus beklentisine yaklaþýr. Peki $h_j$'in nüfus beklentisi
+nedir? Bunun için 
+
+$$ E(h_j) = \int _{-\infty}^{\infty} f_U(u)h_j(u) \ud u $$
+
+$f_U(u) = 1$, ayrýca (0,1) arasýna odaklý olduðumuz için,
+
+$$
+= \int _{0}^{1} h_j(u) \ud u = \int_{0}^{1} \cos 2\pi j u \ud u
+= \frac{\sin 2j\pi u }{2j\pi u} \bigg|_{0}^{1} = 0
+$$
+
+$j$ ne olursa olsun beklenti sýfýr demektir bu. Peki varyans? 
+
+$$
+Var(h_j) = E(h_j^2)-E(h_j)^2 = \int _{-\infty}^{\infty} f_U(u)h_j^2(u) \ud u
+$$
+
+üstte $E(h_j)=0$ olduðunu bulduk, bu terim üstteki formülde iptal oldu. Ve
+(1)'ýn de yardýmýyla,
+
+$$  = \int_{0}^{1}  h_j^2(u) \ud u = 1$$
+
+Prosedür böylece tamamlandý. 
+
+1) cdf ile veriden $y=F(x)$ hesapla
+
+2) $h_j$ hesapla, ki bizim seçtiðimiz baz için $c_j = \sqrt{2}$, ardýndan $\overline{h_j}$
+
+3) En son $\Psi^2$, sonucu $\chi^2_d$ üzerinde kontrol et. 
+
+Örnek
+
+Bir standart normal, bir 4 derece serbestliðe sahip bir Öðrenci t daðýlýmý,
+bir de üstel (exponential) daðýlýmdan üretilmiþ veriyi standart normal olup
+olmadýðýna bakmak için test ettik. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import norm
+from scipy.stats import t
+from scipy.stats import expon
+s = 200000
+np.random.seed(0)
+xnorm = norm.rvs(size=s)
+xstudent = t.rvs(df=4, size=s)
+xexp = expon.rvs(scale=1,size=s)
+
+from scipy.stats import norm
+def test(x,d=5,cdf=norm.cdf):
+    y = cdf(x)
+    c = np.sqrt(2)
+    # baz fonksiyonlar
+    hs = [c*np.cos(2*np.pi*i*x) for i in range(1,d+1)]
+    res = [xx.mean() for xx in hs]
+    res = [xx**2 for xx in res]
+    print len(x)*np.sum(res)
+
+test(xstudent)
+test(xnorm)
+test(xexp)
+
+from scipy.stats import chi2
+dof = 5
+print 'chi kare', chi2.ppf(0.95,dof)
+\end{minted}
+
+\begin{verbatim}
+12.1463285033
+2.20265705473
+259.103849686
+chi kare 11.0704976935
+\end{verbatim}
+
+Görüldüðü gibi Öðrenci t reddedildi, normal kabul edildi, üstel çok ciddi
+þekilde reddedildi. Öðrenci t daðýlýmý normal daðýlýma çok benzer bu arada,
+buna raðmen arada büyük fark dikkate deðer.
+
+Kaynaklar
+
+[1] Goldsman, D., {\em ISyE 6644 - Simulation Lecture}, \url{http://www2.isye.gatech.edu/~sman/courses/6644/}
+
+[2] Ross, {\em Introduction to Probability Models, 10th Edition}
+
+[3] Shalizi, {\em Advanced Data Analysis from an Elementary Point of View}
+
+[4] Hass, {\em Thomas' Calculus, 11th Ed}
+
+[5] Schrage, {\em A Guide to Simulation}
+
+\end{document}

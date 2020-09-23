@@ -1,0 +1,426 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 8
+
+Ýki Görüntüden Tekrar Oluþturma (Reconstruction from Two Views)
+
+Problemi formüle edelim. Ýki faraziyemiz olacak. Faraziyeler þart, çünkü zor
+problemler ile uðraþýyoruz, ve bazý faraziyeler ile iþimizi kolaylaþtýrmamýz
+gerekli. Araþtýrmacýlara tavsiyem yeni bir problem üzerinde uðraþýyorlarsa ise
+güçlü faraziyeler ile baþlayýp çözüm alanýný kýsýtlamalarý ki bu þekilde çözüm
+daha rahat bulunabilsin; ve yer geldiðinde kýsýtlamalar gevþetilebilir. Bunu
+vurguladým çünkü bazý öðrencileri görüyorum, herþeyi tek seferde yapmaya
+uðraþýyorlar, sonra o koca problem için bir program alelacele kodlanýyor, ve
+program iþlemeyince moralleri bozuluyor, vs. Önce kýsýtlý baþlayýn, sonra
+genelleþtirirsiniz.
+
+Faraziyeler þunlar;
+
+1) Ýki imajdaki ayný objelerin her iki görüntüdeki ilginç noktalarýný ve o ayný
+noktalarýn birbirleri ile nasýl eþleþtiðini biliyoruz.
+
+2) Ýki imaj statik bir dünyayý resmediyor, yani 1. ve 2. görüntü arasýnda
+resimdeki objeler hareket etmiyorlar.
+
+3) Kameranýn iç parametreleri sabit ve biliniyor.
+
+Bu bilgilere ve faraziyelere dayanarak ve eðer kameranýn izafi yerini ve
+duruþunu biliyorsak 3D yer bilgisini üçgenleme (triangulation) ile
+hesaplayabiliriz.
+
+Çözmeye uðraþacaðýmýz bir kameranýn dýþ parametreleri ve görüntüdeki objenin 3D
+yeri. Elimizde iki resim var, resimdeki ilginç noktalarýn eþleþmesi var,
+kameranýn katý gövde hareketini, ve $X$'i bulacaðýz.
+
+\includegraphics[height=6cm]{twoview.png}
+
+Üstteki aslýnda çetin bir tavuk-yumurta problemi. Eðer kamera hareketini
+biliyor olsaydým iki görüntüdeki eþlemesini bildiðim noktalar üzerinden
+hemen 3D yer hesaplayabilirdim. Mesela cep telefonlarýnda artýk hareket
+algýlayýcýlarý oluyor, bu bilgi yeterince kesin olsa $R,T$'yi hemen bulmuþ
+olurdum, imajlara bakmak gerekmezdi. O zaman üstteki resimde gösterilen iki
+çizginin kesiþtiði noktayý üçgenleme ile bulurdum, ve 3D noktasý $X$
+bulunmuþ olurdu. Bu hesap çok basittir. Ya da tam ters yönden, $X$'i bir
+þekilde biliyorsak kamera hareketi hesaplanabilir. Eðer elimizde yeterince
+nokta var ise çözüm tek olacaktýr. 3D tekrar oluþturma hesaplarýnýn zorluðu
+bu iki bilgiyi de ayný anda kestirmemiz gerektiðidir.
+
+Bu derste takip edeceðimiz yöntem önce kamera hareketini, sonra obje yerini
+bulmak. Dediðimiz gibi bu problem yumurta-tavuk problemi, fakat bu iki problemin
+birbiriyle iliþkisini kesmek (decouple) mümkün.
+
+Tipik bir resim üzerinde görelim,
+
+\includegraphics[height=8cm]{scene.png}
+
+Manzara iki farklý yönden görüntülenmiþ. Birinde olan bazý noktalar diðerinde
+olmayabilir ama çoðu nokta iki tarafta da var. Mesela bir 3D noktasý $P$'yi
+düþünelim, bu nokta bir bakýþ açýsýnda 2D $x_1$ noktasýna, diðerinde $x_2$
+noktasýna düþüyor. Kamera merkezleri $o_1$ ve $o_2$. Ýki bakýþ açýlý örnek
+böyle. Bu derste üstteki gibi, yani iki bakýþ açý üzerinden hesaplarla oldukça
+çok uðraþacaðýz, fakat çoklu bakýþ açýsýndan da bu hesaplarý nasýl
+genelleþtirebileceðimizi göreceðiz [dersimizin adýna sadýk kalmak lazým!].
+
+Notasyonu netleþtirelim (üstteki gibi bir resim daha)
+
+\includegraphics[height=7cm]{epi.png}
+
+Kamera orijin noktalarý $o_1,o_2$ görülüyor. Bu iki orijini bir düz çizgi ile
+birleþtirelim, bu çizginin her iki görüntü düzlemini kestiði noktalar $e_1,e_2$
+eþ kutuplar (epipoles) olarak isimlendirilir. $X,e_1,e_2$ noktalarýnýn üzerinde
+olduðu düzlem ise eþ kutupsal düzlemdir (epipolar plane).
+
+Notasyon böyle. Peki o zaman tekrar oluþturma (reconsruction) problemini nasýl
+tanýmlarýz? Aslýnda bu problemi bir maliyet (cost) fonksiyonu üzerinden
+formülize etmek oldukça basit. Bilimde pek çok problem belli bazý parametrelerin
+hesapsal tahminiyle alakalýdýr, ve bu tahmini yapabilmek için tipik olarak bir
+maliyet tanýmlanýr, ki bu maliyet fonksiyonu verilen belli parametre deðerleri
+için bu deðerlerin iyi mi kötü mü olduðunu cevaplar. Tabii bir sonraki adým o
+maliyeti minimize etmeye uðraþmak, ve bu minimizasyonu saðlayan ``optimal''
+parametreleri bulmaya uðraþmaktýr.
+
+Diyelim ki elimizde iki deðiþik açýdan alýnmýþ görüntüde eþleþmesi yapýlmýþ 100
+tane nokta var, $x_1^j,x_2^j$, $j \in \{1,..,100\}$, yani $j$ bir indis. Bu
+noktalar 3D $X_j$ noktalarýndan geliyorlar, tahmin etmeye çalýþtýðýmýz onlar -
+bilinmeyen deðiþkenler. Ayrýca $R,T$ de bilinmiyor tabii, 6 tane bilinmeyen
+deðiþken de buradan geliyor. Yani bilinmeyen parametreler çok, 100 x 3 (çünkü
+$X_1$'in 3 tane öðesi var) artý 6 tane bilinmeyen var. Optimizasyon baðlamýnda
+bu 306 boyutlu bir uzayda iþ yapmaya çalýþacaðýz demektir, ve bu pek iyi bir þey
+deðil!
+
+Problemi çözmek için yansýtma hatasýný minimize etmeye uðraþabiliriz, 
+
+$$ E(R,T,X_1,..,X_{100}) = 
+\sum _{j} || x_1^j - \pi(X_j)||^2 + || x_2^j - \pi(R,T,X_j)||^2
+$$
+
+Üstteki formülün eþitliðin sað tarafýnýn ilk teriminde kendimizi 1. kameranýn
+kordinat dünyasýna alýyoruz; 3D $X$ noktalarýný kameraya yansýtýyoruz, ve
+aradaki hatayý hesaplýyoruz. Ýkinci terimde 2. kamera kordinat dünyasýndayýz,
+ayný $X$ noktalarýný bu sefer rotasyon, yer deðiþtirme sonrasý 2. kameraya
+yansýttýktan sonra o kameradaki yansýtma hatasýný hesaplýyoruz. Minimizasyonun
+amacý $E()$ içindeki parametrelerin en optimal olanlarýný bulmak ki $E$ hatasý
+en az olsun.
+
+Üstteki yaklaþýma demet ayarlamasý (bundle adjustment) ismi veriliyor; demet
+çünkü pek çok parametreyi ayný anda vererek optimize etmeye uðraþýyoruz. Tek
+problem maliyet fonksiyonu içbükey (convex) deðil. Optimizasyon dersinden
+hatýrlayabileceðimiz üzere eðer elimizde çok boyutlu ve içbükey olmayan bir
+problem var ise, bu kötü haber, bu çözümü büyük ihtimalle bulamayacaðýz
+demektir. Bilim dalýmýz aslýnda hala bu problemi nihai olarak çözmek için yoðun
+araþtýrma yapýyor, çünkü çözüm bulunabildiði zaman bile çözüm özgün deðil, vs.
+
+Üstteki problemin çözümü için iki deðiþik yaklaþým var. Birisi problem tanýmýný
+olduðu gibi almak, ve bir þekilde ``becerikli'' bir algoritma ile minimizasyonu
+iyi becermeye uðraþmak. Mesela bir yaklaþýma göre birkaç nokta ile iþe baþlanýr,
+minimize edilir, sonra ötekiler eklenir ve rafine ede ede nihai sonuca
+eriþilmeye uðraþýlýr. Eðer varýlan sonuçtan memnun olunmadýysa, optimizasyon
+baþlangýç noktasý rasgele olarak tekrar seçilir, ve rutin tekrar iþletilir,
+böylece iyi baþlangýç noktasý ile daha iyi sonuca varýlmaya uðraþýlýr, fakat
+tahmin edileceði üzere bu kolay bir iþ deðil.
+
+Bu derste takip edeceðimiz yöntem farklý maliyet fonksiyonlarýyla çalýþmak; bu
+fonksiyonlar orijinal maliyete benzeyecekler, fakat biraz daha basit olduklarý
+için minimize edilmeleri daha kolay olacak. Mesela $R,T$ ile $X$ noktalarýnýn
+arasýndaki iliþki kesilecek, bu parametreler ayrý ayrý optimize edilecek. Bu
+iliþki kesimi nasýl oluyor? Biraz sihirli bir yaklaþým gibi geliyor kulaða,
+kullanacaðýmýz numara eþ kutupsal kýsýtlama (epipolar constraint) kavramýný
+devreye sokmak, böylece 8-nokta algoritmasýný (8-point algorithm) elde etmiþ
+olacaðýz.
+
+Kamera matrisi $K$'nin bilindiðini varsayýyoruz. Ayrýca $K = 1$ alacaðýz, yani
+her þeyin kameranýn odak uzaklýðýnýn birimi üzerinden tanýmlý olduðunu
+farzedeceðiz. Birinci kamera için sadece bilinmeyen derinlik bilgisi bilinmeyen
+bir yansýtma var. Ýkinci kamera için rotasyon ve yer deðiþtirme sonrasý ardýndan
+bir yansýtma var. Yani,
+
+$$ \lambda_1 x_1 = X, \qquad \lambda_2 x_2 = RS + T 
+\mlabel{1}
+$$
+
+Resim üzerinde
+
+\includegraphics[height=7cm]{epi2.png}
+
+Yani $X$'den $x_1$'e gelmek demek sadece $\lambda_1$ ile ölçeklemektir.  Ayný
+durum dönme ve yer deðiþim sonrasý $x_2$ için de geçerli. Tatmin etmemiz gereken
+iki denklem bunlar. Bu iki denklemi birleþtirerek ve diðer noktalarý ekleyerek
+yavaþ yavaþ $X$'i dýþarý atmaya uðraþacaðýz. Ýliþki kesmeyi bu þekilde
+yapacaðýz. 1. denklemi 2. denklem içine koyalým,
+
+$$ \lambda_2 x_2 = R(\lambda_1x_1) + T $$
+
+Ýki tarafý soldan $T$'nin eksi bakýþýmlý hali $\hat{T}$ ile çarpalým ($\hat{T}v
+\equiv T \times v$). Niye?  Çünkü biliyoruz ki bir vektörün kendi eksi bakýþýmlý
+matrisi ile çarpýmý sýfýrdýr (ya da vektörün kendisi ile çapraz çarpýmý sýfýr
+verir), böylece eþitliðin saðýndaki $T$'den kurtulmaya uðraþýyoruz. O zaman
+
+$$ \lambda_2 \hat{T} x_2 = \lambda_1 \hat{T} R x_1  $$
+
+Böylece $T$'den kurtulmuþ olduk, ayný zamanda $X$'den de kurtulmuþ
+olduk. Dolaylý olarak $X$ hala formülde tabii, çünkü $\lambda_1$ ve $\lambda_2$
+3D noktaya olan uzaklýklar, ve $\lambda_1 x_1$ mesela bize 3D noktasýný verir.
+
+Devam edelim, üstteki ifadeyi $x_2$'ye yansýtalým. Niye? Çünkü üstteki eþitliðin
+sol tarafýndaki $\hat{T}x_2$ bir çapraz çarpým, ve bu çapraz çarpým bize
+$x_2$'ye dikgen bir vektör verir, ve eðer bu vektörü $x_2$'ye yansýtýrsam sýfýr
+elde ederim, yani sol taraf yokolur. Ayrýca $\lambda_1$ ile bölerim. Geri
+kalanlar,
+
+$$ x_2^T \hat{T} R x_1 = 0 $$
+
+olur. Buna eþ kutupsal kýsýtlama ismi veriliyor. Formül ilginç çünkü iki 2D
+noktasý $x_1,x_2$ ve döndürme, yer deðiþtirme arasýnda bir iliþki kuruyor, 3D
+nokta bilgisi ortada yok. Bu bize bir kabiliyet kazandýrdý, buradan hareketle
+diðer bilinen 2D nokta eþlerini alarak, ve üstteki sýnýrlamayý kullanarak
+bilinmeyen $R,T$'yi hesapsal tahmin etmeye uðraþabilirim.
+
+(1)'den üstteki formüle gelmek için bazý transformasyonlar yaptýk, bunlardan
+bazýlarýnýn tersi alýnabilir olmadýðýna dikkat; mesela son adýmda $x_2$'ye
+yansýtma yaptýk, bu durumda $x_2$'e dikgen olan bilgi yokolmuþ oldu. Ya da
+$\hat{T}$ ile çarpým iþlemi - $\hat{T}$ tersi alýnabilir bir matris olmadýðý
+için bu iþlemi de geriye almak mümkün deðil. Yani son iki adýmýn ikisinde de bir
+þeyler kaybetmiþ oluyoruz aslýnda. Tabii kaybettiklerimiz yanýnda
+kazandýklarýmýz var, daha önce belirttiðimiz gibi, 3D bilgisi ile uðraþmak
+zorunda deðiliz artýk. Belli kýsýtlamalarla iþe baþladýk, bazý transformasyonlar
+sonunda daha zayýf bir kýsýtlama elde ettik, ama bir avantaj elde ettik.
+
+Üstteki önemli bir formül, biraz daha üzerinde durmak iyi olur. Formüle bazen
+gerekli kýsýtlama (essential constraint) ya da iki lineerli kýsýtlama (bilinear
+contraint) deniyor. Ayrýca formülün ortasýndaki $\hat{T} R $ çarpýmýna, ki bir
+$3 \times 3$ matristir, gerekli matris (essential matrix) ismi veriliyor.
+
+Genel kural olarak bir kavrama bir isim verilmiþse, hatta birden fazla isim
+verilmiþse, o konunun önemli olduðunu ve çoðu zaman pek çok kiþi tarafýndan
+araþtýrýlmýþ olduðu sonucuna varabiliriz.
+
+Kolaylaþtýrmalar ardýndan buraya geldik, fakat $R,\hat{T}$ çözümü hala zor; $E =
+\hat{T}R$ bilindiði durumda bu çarpýmdan $\hat{T}$ ve $R$'yi nasýl çýkartacaðýz?
+
+O hesaba gelmeden önce eþ kutupsal kýsýtlamanýn geometrik anlamýna yakýndan
+bakalým. Amacýmýz bir düzlem tanýmlamak, ve düzlemin olma þartýný eþ kutupsal
+sýnýrlamaya baðlamak.
+
+\includegraphics[height=8cm]{epi3.png}
+
+Eðer 1. kamera orijin kabul edilirse $x_1$'e giden vektör $\vec{o_1x_1}$ olur,
+ya da sadece $x_1$. Bu vektörü 2. kamerayý orijin olacak þekilde transforme
+edersek $Rx_1$. Bir diðer vektör 2. kamera orijinli $x_2$ noktasý /
+vektörü. Ayrýca $o_2$ çýkýþlý ve $T$'ye oranlý (proportional, $\propto$ iþareti
+oradan geliyor), bir vektör daha var. Bu üç vektör üzerinden (üçlü çarpýmla
+-triple product-) bir paralelepipe hacmi hesaplanabilir, ve eþ kutupsal
+kýsýtlama formülünün söylediði bu hacmin sýfýr olmasýdýr, yani bir düzlem
+olmasýdýr (sýfýr hacimli obje düz demektir)
+
+$$ hacim = x_2^T (T \times Rx_1) = 0 $$
+
+ki o da dolaylý olarak $o_1,o_2$'den çýkan ve $x_1,x_2$'den geçen huzmelerin bir
+yerde birleþiyor olmalarý anlamýna gelir. Artýk 3D noktadan bahsetmeye gerek
+yok, sadece iki huzmenin kesiþiyor olmasý yeterli. Kesiþiyorlarsa bir düzlem
+vardýr, kýsýtlamanýn söylediði de budur.
+
+Gerekli matris $E = \hat{T}R$ demiþtik, tüm gerekli matrislerinin uzayý gerekli
+uzay olarak adlandýrýlýr,
+
+$$ \varepsilon \equiv \bigg\{ 
+\hat{T}R \mid R \in SO(3), T \in \mathbb{R}^3
+\bigg\}
+$$
+
+$E$'den $\hat{T},R$ çýkartmak matris ayrýþtýrmasý çaðrýþýmlarý yapýyor olabilir;
+ve hakikaten de Huang ve Faugeras'ýn 1989 tarihinde ispatladýðý bir teoriye göre
+sýfýr olmayan bir $E \in \mathbb{R}^3$ matrisi bir gerekli matristir sadece ve
+sadece $E = U \Sigma V^T$ þeklinde bir Eþsiz Deðer Ayrýþtýrmasý (Singular Value
+Decomposition -SVD-) var ise, ve bu ayrýþtýrma $\Sigma =
+diag\{\sigma,\sigma,0\}$ olmalý, $\sigma > 0$ için, $U,V \in SO(3)$.
+
+Bu teori gerekli matrisler ve SVD arasýnda bir eþdeðerlik (equivalence)
+tanýmlamýþ oluyor, gerekli matrislerin SVD'si olmalý, ve bu SVD'nin iki eþsiz
+deðeri olmalý, en küçüðü sýfýr, en büyüðü $\sigma$ olacak þekilde ve ondan iki
+tane var. Bu çok faydalý çünkü sonuç itibariyle olabilecek mümkün matris
+seçeneklerini daraltmýþ oluyor, ki bu iyi. Gerekli matrisi hesaplayan
+optimizasyonumuz bu bilgiyi kullanabilir.
+
+Bir sonraki adým eldeki bir gerekli matristen rotasyon ve yer deðiþimi
+çýkartmak. Ufak bir problem - bu sonuç özgün deðil, pratikte 2 tane mümkün çözüm
+olabilir. Ama iyi haber $E = U\Sigma V^T$ sonrasý alttaki çözümlerden sadece
+biri anlamlý pozitif derinlik bilgisi verir.
+
+$$ 
+(\hat{T}_1,R_1) = (UR_Z(+\pi/2)\Sigma U^T, UR_Z(+\pi/2)V^T)
+$$
+
+$$ 
+(\hat{T}_2,R_2) = (UR_Z(-\pi/2)\Sigma U^T, UR_Z(-\pi/2)V^T)
+$$
+
+Formüller biraz çetrefil gözüküyor, evet. Ýspat için [1, sf. 116]. Yani eðer
+gerekli matrisi tahminsel hesaplayabiliyorsak, onu kullanarak rotasyon ve yer
+deðiþimini üstteki formüllerle hesaplayabiliriz.
+
+Algoritma
+
+Bir 3D tekrar oluþturma algoritmasý þöyle olabilir; iki görüntüdeki birbiriyle
+baðlantýlý 2D noktalar birbirleriyle eþ kutupsal kýsýtlama üzerinden
+iliþkideler. O zaman
+
+1) Belli sayýda eþlenmiþ noktayý kullanarak eþ kutupsal kýsýtlama üzerinden
+$E$'yi hesapla.
+
+2) $E$'den $R,T$'yi hesapla. 
+
+Adým \#2 için iki seçenek var. Birincisi direk $E$'yi hesaplamak, ama bu
+matrisin gerekli (essential) uzayda olma zorunlulu olduðu için onu gerekli uzaya
+yansýt. Yine bir pürüz; Biliniyor ki bu yöntem optimal altý (suboptimal). Diðer
+seçenek eþ kutupsal kýsýtlamalardan $E$'yi hesaplarken o optimizasyon içinde ek
+bir kýsýtlamayla çözümü gerekli uzayda olmaya zorlamak.
+
+Pratikte ikinci seçeneði kodlamak külfetlidir, çünkü bu bir gayrý lineer, dertli
+kýsýtlý optimizasyon, ayrýca ek kýsýtlamalar SVD'nin her üç eþsiz deðeri
+üzerinde olmalýdýr... Biz lineer, lineer cebirsel bir yaklaþým tercih ediyoruz.
+
+8-Nokta Algoritmasý
+
+Algoritmanýn ismi en az 8 noktaya ihtiyaç duymasýndan geliyor.  Bu algoritma
+için $x_2^TEx_1 = 0$ kýsýtlamasýný farklý bir þekilde tanýmlamaya çalýþacaðýz.
+
+Bu kýsýtlama $E$ merkezli bir ikili lineerlik (bilinear) içeriyor. Bu ne
+demektir? Bir tekrar düzenleme ile bu kýsýtlama ifadesini ``$E$'nin öðeleri
+çarpý $x_1,x_2$ öðeleri'' þeklinde ifade edebiliriz demektir. Bunun için önce
+$E$ matrisinin öðelerini ``açarak''' düz bir vektör içine dizelim. Üstsimge $s$
+hatýrlarsak yýðma (stacking) operatörüydü, $E^s =\left[\begin{array}{ccccccccc}
+  e_{11} & e_{21} & e_{31} & e_{12} & e_{22} & e_{23} & e_{31} & e_{32} &
+  e_{33} \end{array}\right]^T \in \mathbb{R}^9 $ olacak. Þimdi
+
+$$ a \equiv x_1 \otimes x_2 $$
+
+tanýmlayalým, ki $\otimes$ Kronecker çarpýmý. $x_i = \left[\begin{array}{ccc}
+    x_i & y_i & z_i \end{array}\right]^T$ üzerinden üstteki çarpýmýn açýlýmý
+
+$$ a = \left[\begin{array}{ccccccccc} 
+x_1x_2 & 
+x_1y_2 & 
+x_1z_2 & 
+y_1x_2 & 
+y_1y_2 & 
+y_1z_2 & 
+z_1x_2 & 
+z_1y_2 & 
+z_1z_2 
+\end{array}\right]^T \in \mathbb{R}^9 $$
+
+Bu tanýmlar sayesinde eþ kutupsal kýsýtlama
+
+$$ x_2^TEx_1 = a^TE^s = 0 $$
+
+olarak yazýlabilir. Böylece bilinen deðiþkenleri bilinmeyenlerden net bir
+þekilde ayýrmýþ olduk, bilinen her þey $a^T$ içinde, bilinmeyenler $E^s$
+içinde. Ayrýca kýsýtlama bir skalar çarpým haline geldi, ve bu çarpýmýn
+söylediði bir þey var, sonuç sýfýr olduðu için $a,E^s$ birbirine dikgen
+(orthogonal) vektörler. Eþlenmiþ bir çift 2D nokta için yapýlanlar bunlar. Tüm
+$n$ nokta çiftleri için üstteki denklemi bir lineer sistem haline getirebiliriz,
+
+$$
+\chi E^s = 0, \qquad \chi =
+\left[\begin{array}{cccc} a^1 & a^2 & \dots & a^n \end{array}\right]^T
+$$
+
+Yani $\chi$ içinde $a$ vektörleri bir kolon olarak yanyana diziliyorlar. Lineer
+Cebir dilinde ``$E$'nin ne olduðunu bilmiyoruz ama biliyoruz ki o $\chi$'in
+sýfýr uzayýnda yaþýyor'' diyebiliriz. Bir pürüz bu sýfýr uzayýndan gelen çözümün
+özgün olmamasý.  $\chi E^s = 0$'i tatmin eden herhangi bir çözüm vektörünün
+katlarý da çözümdür, yani sonsuz tane çözüm vardýr.
+
+Bunun negatif sonucu ölçek bilgisini, 8 ya da kaç tane nokta daha olursa olsun
+hiçbir zaman gerçek ölçekte tahmin edemiyor olacaðýmýz. Ýki ev resmine bakýyoruz
+mesela, fakat belki maket bir evin resimleri bunlar!  Robot kodlamasýna bu
+problem çok ortaya çýkar, mesela biz görsel kamera ile yol bulan bir quadcopter
+kodu geliþtirdik, ek olarak sonar algýlayýcýsý eklememiz gerekti ki bu eksik
+olan ölçek bilgisini elde edebilelim.
+
+Pratikte hesaplarý kolaylaþtýrmak için $o_1o_2$ uzaklýðý 1'e eþitlenir, yani
+birim $o_1o_2$ uzaklýðý haline gelir; hesaplarýn sonucu bu birim üzerinden
+raporlanmýþ olur.
+
+Fakat pozitif yönde þu da var; sýfýr uzayýnýn {\em tek boyutlu} olmasýný
+garantileyebilirsek, evet oradaki çözümün katlarý da çözümdür ama en azýndan
+ölçekleme problemi tamir edilince elimize tek çözüm geçer. Bunu
+garantileyebiliriz; en az 8 nokta gerekliliði (ve algoritmanýn ismi) buradan
+geliyor. Bunun için $\chi$'nin kertesi tamý tamýna 8 olmalýdýr. Eðer 8'den daha
+fazla eþli nokta var ise bunun zararý yok. Ama daha az var ise, mesela 7, o
+zaman sýfýr uzayý iki boyutlu olurdu, ve özgün çözüm elde edilemezdi.
+
+Patajolik durumlarda 8'den daha fazla nokta çifti bile özgün nokta bulmaya
+yetmez; mesela tüm noktalarýn 3D dünyada ayný düzlem üzerinde olduðu durumda. O
+zaman çözüm dejenere çözümdür, çünkü $a^i$ vektörleri birbirinden baðýmsýz
+deðildir. Örnek olarak mesela ev resminde 2D nokta çiftlerinin hepsi evin ön
+duvar üzerinden alýnmýþ ise, bu problem çýkartýr. Ama bazý noktalar evin ön
+duvarý, diðerleri yoldan, diðerleri evin arkasýndaki aðaçtan, vs. geliyor ise
+8-nokta algoritmasý düzgün iþler.
+
+$E$'nin artý ya da eksi iþareti tekrar oluþturulamýyor. Her $E$ için iki $R$ iki
+de $T$ mümkündür, yani mümkün $R,T$ çiftleri 4'tür. Ama pratikte $E$'nin
+iþaretini bulmak kolaydýr.
+
+Ayrýca, daha önce söylediðimiz gibi, çoðunlukle hesaplanan $E^s$ öðeleri bir
+gerekli matrise tekabül etmez, bir gerekli matrisi bulmak için $E^s$'i gerekli
+uzaya yansýtmamýz gerekir, yani en yakýn gerekli matrisi hesaplamamýz gerekir.
+
+$\chi E^s = 0$ hususunda bir nokta daha, eþlemelerde hata olabileceði için
+bu ifade tam olarak çözülemeyebilir. O zaman, ona en yakýn olabilecek
+çözüme eriþmeye uðraþýrýz; yani $||\chi E^s||^2$'yi en az kareler
+baðlamýnda minimize edecek $E^s$'i hesaplarýz. Bu minimizasyon $E^s$'i
+$\chi^T\chi$'nin en ufak özdeðerine tekabül eden özvektörü olarak seçmek
+ile mümkün olabilir. Tabii $\chi^T\chi$ özvektör hesabý ile $\chi$ eþsiz
+deðer ayrýþtýrmasýnýn iliþkisi var, bkz [2], ve [3].
+
+\includegraphics[height=4cm]{eproj.png}
+
+Yansýtma için kullanacaðýmýz teorinin ispatý [1, sf. 119]'da. Herhangi bir $F$
+matrisini alalým, ki bu matrisin SVD'si $F = U \textrm{diag}
+\{\lambda_1,\lambda_2,\lambda_3\} V^T$ olsun, $\lambda_1 > \lambda_2 >
+\lambda_3$ olmak üzere. O zaman Frobenius normu $|| F - E||_f^2$'i minimize eden
+matris $E$
+
+$$ E = U \textrm{ diag}\{\sigma,\sigma,0\} V^T , \qquad \sigma = \frac{\lambda_1+\lambda_2}{2}$$
+
+Yani $F$'nin SVD'sini alýp buradan gelen en büyük iki eþsiz deðerinin
+ortalamasýný $E$'nin SVD'sindeki en büyük iki eþsiz deðer yapýyoruz, $E$'nin en
+küçük eþsiz deðerini sýfýr kabul ediyoruz, bu kadar. Niye bu basit ortalamanýn
+iþlediði teorinin ispatýnda.
+
+Algoritma \verb!8nokta! $\left(x_1^i,x_2^i\right)$
+\begin{enumerate}
+  \item Gerekli matrisin yaklaþýk halini bul.
+  \item $\chi = \left[\begin{array}{cccc} a^1 & a^2 & \dots & a^n \end{array}\right]^T$'yi hesapla,  ki $a^i = x_1^i \otimes x_2^i$.
+  \item $||\chi E^s||$'i minimize edecek þekilde $E^s \in \mathbb{R}^9$'i bul, yani
+    $\chi = U_\chi \Sigma_\chi V_\chi^T$ ayrýþtýrmasýnda $V_\chi$'nin 9. kolonunu al,
+    çünkü o kolon en küçük eþsiz deðere tekabül ediyor. 
+  \item $E^s$'i tersine yýðma iþlemiyle $3 \times 3$ $E$ vektörüne aç. 
+  \item Gerekli uzaya yansýtma yap; $E = U diag\{\sigma_1,\sigma_2,\sigma_3\} V^T $.
+  \item  $E$ belli bir skalara kadar tanýmlý olduðu için $E$'yi normalize edilmiþ \\
+    gerekli uzayýna yansýt, $\sigma_1,\sigma_2,\sigma_3$ yerine 1,1,0 deðerleri kullan.
+  \item $R,\hat{T}$'yi hesapla. Dört mümkün çözüm $R=UR_Z(\pm \pi/2)V^T$,$\hat{T}=UR_Z(\pm\pi/2)\Sigma U^T$
+  \verb!return! $R,\hat{T}$ 
+\end{enumerate}
+
+
+8'den daha az nokta mümkün mü? Evet. [Atlandý]
+
+Eðer sadece rotasyon var ama yer deðiþtirme yok ise, 8-nokta algoritmasý
+iþlemez, çünkü o zaman $\hat{T}$ sýfýr olacak, gerekli matris te sýfýr
+olacak. Bu tür durumlar hiç yok deðil, tatilde çekilmiþ fotoðraflarda oluyor
+(hoca sadece kendi etrafýnda dönerek ardý ardýna fotoðraf çeken turist taklidi
+yapýyor, bu durumda yer deðiþimi yok, rotasyon var.
+
+[statik olmayan manzara yorumlarý atlandý]
+
+Kaynaklar 
+
+[1] Sastry, {\em An Invitation to 3-D Vision}
+
+[2] Bayramli, Lineer Cebir, {\em PCA}
+
+[3] Bayramli, Lineer Cebir, {\em Rayleigh-Ritz Teoremi}
+
+\end{document}

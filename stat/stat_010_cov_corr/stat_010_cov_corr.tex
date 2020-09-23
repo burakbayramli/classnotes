@@ -1,0 +1,1129 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Beklenti, Varyans, Kovaryans ve Korelasyon
+
+Özellik Ýþleme, Seçme, Veri Ýncelemesi
+
+Medyan ve Yüzdelikler (Percentile)
+
+Üstteki hesaplarýn çoðu sayýlarý toplayýp, bölmek üzerinden yapýldý. Medyan
+ve diðer yüzdeliklerin hesabý (ki medyan 50. yüzdeliðe tekabül eder) için
+eldeki tüm deðerleri "sýraya dizmemiz" ve sonra 50. yüzdelik için
+ortadakine bakmamýz gerekiyor. Mesela eðer ilk 5. yüzdeliði arýyorsak ve
+elimizde 80 tane deðer var ise, baþtan 4. sayýya / vektör hücresine / öðeye
+bakmamýz gerekiyor. Eðer 100 eleman var ise, 5. sayýya bakmamýz gerekiyor,
+vs.
+
+Bu sýraya dizme iþlemi kritik. Kýyasla ortalama hesabý hangi sýrada olursa
+olsun, sayýlarý birbirine topluyor ve sonra bölüyor. Zaten ortalama ve
+sapmanýn istatistikte daha çok kullanýlmasýnýn tarihi sebebi de aslýnda bu;
+bilgisayar öncesi çaðda sayýlarý sýralamak (sorting) zor bir iþti. Bu
+sebeple hangi sýrada olursa olsun, toplayýp, bölerek hesaplanabilecek
+özetler daha makbuldü. Fakat artýk sýralama iþlemi kolay, ve veri setleri
+her zaman tek tepeli, simetrik olmayabiliyor. Örnek veri seti olarak ünlü
+\verb!dellstore2! tabanýndaki satýþ miktarlarý kullanýrsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.mean(data)
+\end{minted}
+
+\begin{verbatim}
+213.948899167
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.median(data)
+\end{minted}
+
+\begin{verbatim}
+214.06
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.std(data)
+\end{minted}
+
+\begin{verbatim}
+125.118481954
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+  print np.mean(data)+2*np.std(data)
+\end{minted}
+
+\begin{verbatim}
+464.185863074
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.percentile(data, 95)
+\end{minted}
+
+\begin{verbatim}
+410.4115
+\end{verbatim}
+
+Görüldüðü gibi üç nokta hesabý için ortalamadan iki sapma ötesini
+kullanýrsak, 464.18, fakat 95. yüzdeliði kullanýrsak 410.41 elde
+ediyoruz. Niye? Sebep ortalamanýn kendisi hesaplanýrken çok üç
+deðerlerin toplama dahil edilmiþ olmasý ve bu durum, ortalamanýn
+kendisini daha büyük seviyeye doðru itiyor. Yüzdelik hesabý ise sadece
+sayýlarý sýralayýp belli bazý elemanlarý otomatik olarak üç nokta
+olarak addediyor.
+
+Box Whisker Grafikleri
+
+Tek boyutlu bir verinin daðýlýmýný görmek için Box ve Whisker grafikleri
+faydalý araçlardýr; medyan (median), daðýlýmýn geniþliðini ve sýradýþý
+noktalarý (outliers) açýk þekilde gösterirler. Ýsim nereden geliyor? Box
+yani kutu, daðýlýmýn aðýrlýðýnýn nerede olduðunu gösterir, medyanýn
+saðýndada ve solunda olmak üzere iki çeyreðin arasýndaki kýsýmdýr, kutu
+olarak resmedilir. Whiskers kedilerin býyýklarýna verilen isimdir, zaten
+grafikte birazcýk býyýk gibi duruyorlar. Bu uzantýlar medyan noktasýndan
+her iki yana kutunun iki katý kadar uzatýlýr sonra verideki "ondan az olan
+en büyük" noktaya kadar geri çekilir. Tüm bunlarýn dýþýnda kalan veri ise
+teker teker nokta olarak grafikte basýlýr. Bunlar sýradýþý (outlier)
+olduklarý için daha az olacaklarý tahmin edilir.
+
+BW grafikleri iki veriyi daðýlýmsal olarak karþýlaþtýrmak için
+birebirdir. Mesela Larsen and Marx adlý araþtýrmacýlar çok az veri
+içeren Quintus Curtius Snodgrass veri setinin deðiþik olduðunu
+ispatlamak için bir sürü hesap yapmýþlardýr, bir sürü matematiksel
+iþleme girmiþlerdir, fakat basit bir BW grafiði iki setin farklýlýðýný
+hemen gösterir.
+
+BW grafikleri iki veriyi daðýlýmsal olarak karþýlaþtýrmak için
+birebirdir. Mesela Larsen and Marx adlý araþtýrmacýlar çok az veri
+içeren Quintus Curtius Snodgrass veri setinin deðiþik olduðunu
+ispatlamak için bir sürü hesap yapmýþlardýr, bir sürü matematiksel
+iþleme girmiþlerdir, fakat basit bir BW grafiði iki setin farklýlýðýný
+hemen gösterir.
+
+Python üzerinde basit bir BW grafiði 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+spread= rand(50) * 100
+center = ones(25) * 50
+flier_high = rand(10) * 100 + 100
+flier_low = rand(10) * -100
+data =concatenate((spread, center, flier_high, flier_low), 0)
+plt.boxplot(data)
+plt.savefig('stat_feat_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_feat_01.png}
+
+Bir diðer örnek Glass veri seti üzerinde
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = loadtxt("glass.data",delimiter=",")
+head = data[data[:,10]==7]
+tableware = data[data[:,10]==6]
+containers = data[data[:,10]==5]
+
+print head[:,1]
+
+data =(containers[:,1], tableware[:,1], head[:,1])
+
+plt.yticks([1, 2, 3], ['containers', 'tableware', 'head'])
+
+plt.boxplot(data,0,'rs',0,0.75)
+plt.savefig('stat_feat_02.png')
+\end{minted}
+
+\begin{verbatim}
+[ 1.51131  1.51838  1.52315  1.52247  1.52365  1.51613  1.51602  1.51623
+  1.51719  1.51683  1.51545  1.51556  1.51727  1.51531  1.51609  1.51508
+  1.51653  1.51514  1.51658  1.51617  1.51732  1.51645  1.51831  1.5164
+  1.51623  1.51685  1.52065  1.51651  1.51711]
+\end{verbatim}
+
+\includegraphics[height=6cm]{stat_feat_02.png}
+
+Beklenti ve varyans
+
+Beklenti (Expectation) 
+
+Bu deðer, daðýlým $f(x)$'in tek sayýlýk bir özetidir. Yani beklenti hesabýna
+bir taraftan bir daðýlým fonksiyonu girer, diðer taraftan tek bir sayý
+dýþarý çýkar. 
+
+Taným
+
+Sürekli daðýlým fonksiyonlarý için $E(X)$
+
+$$  E(X) = \int x f(x) \ud x$$
+
+ayrýksal daðýlýmlar için
+
+$$ E(X) = \sum_x xf(x) $$
+
+Hesabýn, her $x$ deðerini onun olasýlýðý ile çarpýp topladýðýna dikkat. Bu
+tür bir hesap doðal olarak tüm $x$'lerin ortalamasýný verecektir, ve
+dolaylý olarak daðýlýmýn ortalamasýný hesaplayacaktýr. Ortalama $\mu_x$
+olarak ta gösterilebilir.
+
+$E(X)$'in bir taným olduðuna dikkat, yani bu ifade tamamen bizim
+yarattýðýmýz, ortaya çýkarttýðýmýz bir þey, matematiðin baz kurallarýndan
+gelerek türetilen bir kavram deðil. Notasyonel basitlik için üstteki toplam
+/ entegral yerine
+
+$$ = \int x \ud F(x) $$
+
+diyeceðiz, bu notasyonel bir kullaným sadece, unutmayalým, reel analizde
+$\int x \ud F(x)$'in özel bir anlamý var (hoca tam diferansiyel $dF$'den
+bahsediyor) [2, sf. 69]. 
+
+Beklentinin tanýmýnýn kapsamlý / eksiksiz olmasý için $E(X)$'in
+``mevcudiyeti'' için de bir þart tanýmlamak gerekir, bu þart þöyle olsun, 
+
+$$ \int_x |x|dF_X(x) < \infty $$
+
+iþe beklenti mevcut demektir. Tersi sözkonusu ise beklenti mevcut
+deðildir. 
+
+Örnek 
+
+$$
+X \sim Unif(-1,3)
+$$
+
+olsun.
+
+$$
+E(X) = \int x \ud F(x) = \int x f_X(x) \ud x
+= \frac{1}{4} \int _{ -1}^{3} x \ud x = 1
+$$
+
+Örnek 
+
+Cauchy daðýlýmýnýn $f_X(x) = \{ \pi (1+x^2) \} ^{-1}$ olduðunu
+söylemiþtik. Þimdi beklentiyi hesaplayalým. Parçalý entegral tekniði lazým,
+$u=x$, $dv = 1/1+x^2$ deriz, ve o zaman $v = \tan ^{-1}(x)$ olur, bkz
+[6]. Demek ki
+
+$$
+\int |x| \ud F(x)
+= \frac{ 2}{\pi} \int _{ 0}^{\infty}\frac{x \ud x}{1+x^2}
+$$
+
+2 nereden çýktý? Çünkü $|x|$ kullanýyoruz, o zaman sýnýr deðerlerinde
+sadece sýfýrýn saðýna bakýp sonucu ikiyle çarpmak yeterli. Bir sabit olduðu
+için $\pi$ ile beraber dýþarý çýkýyor. Þimdi
+
+$$ \int udv = uv - \int vdu $$
+
+üzerinden
+
+$$ = [x \tan ^{-1}(x) ] _{ 0}^{\infty} - \int _{ 0}^{\infty} \tan ^{-1}(x)
+dx  = \infty$$
+
+Yani üstteki hesap sonsuzluða gider. O zaman üstteki tanýmýmýza göre Cauchy
+daðýlýmýnýn beklentisi yoktur. 
+
+$Y$ rasgele deðiþkeninin varyansý (variance) 
+
+Ayrýsak olarak diyelim ki her biri $p_j$ olasýlýða sahip $n$ tane deðer
+$y_i$ arasýndan, ve beklenti $E(Y) = \mu$ ise, varyans bir tür ``yayýnýmýn
+ortalamasýdýr''. Yani ortalama olarak ortalamadan (!) ne kadar sapýlýr
+sorusunun cevabýný verir,
+
+$$ Var(Y) = \sum _{i=1}^{n}(y_i-\mu)^2 p_i$$
+
+Kare alma iþlemi yapýldý çünkü sapmanýn eksi mi artý mý olduðu bizi
+ilgilendirmiyor, sadece onun mutlak deðeri, büyüklüðü bizi
+ilgilendiriyor. $p_i$ ile çarptýk çünkü mesela bazý sapmalarýn deðeri büyük
+olabilir, ama eðer o sapmalarýn ortaya çýkma olasýlýðý düþük ise bu
+sapmalar toplama, yani varyansa, daha az etki edecektir. Deðerlerin $p_i$
+ile çarpýlýp sonuçlarýn toplanmasý beklenti hesabýný çaðrýþtýrabilir, ve
+evet, matematiksel olarak varyans bir tür beklenti hesabýdýr. O sebeple
+genel bir þekilde alttaki gibi belirtilir,
+
+$$ Var(Y) = E((Y-E(Y))^2) $$
+
+Ýfadede toplama ve bölme gibi iþlemler olmadýðýna dikkat; onun yerine kare
+ifadeleri üzerinde beklenti ifadesi var. Yani $Y$'nin beklentisini rasgele
+deðiþkenin kendisinden çýkartýp kareyi alýyoruz, ve bu iþlemin $Y$'den
+gelen tüm zar atýþlarý üzerinden beklentisi bize varyansý veriyor. Bir
+rasgele deðiþken görünce onun yerine ``daðýlýmdan üretilen sayý'' düþünmek
+faydalýdýr, ki bu gerçek dünya þartlarýndan (ve büyük miktarda olunca) veri
+noktalarýný temsil eder. 
+
+Varyans formülünü açarsak, ileride iþimize yarayacak baþka bir formül elde
+edebiliriz, 
+
+$$ Var(Y) = E( Y^2  - 2YE(Y) + (E(Y)^2) )$$
+
+$$  = E(Y^2)  - 2E(Y)E(Y) + (E(Y)^2)$$
+
+$$ Var(Y) = E(Y^2) - (E(Y)^2)$$
+
+Taným
+
+$y_1,..,y_n$ örnekleminin varyansý (literatürde $S^2$ olarak geçebiliyor,
+
+$$ 
+S^2 = 
+\frac{1}{n} \sum (y_i - \bar{y})^2
+\mlabel{2}
+$$
+
+Standart sapma veri noktalarýn "ortalamadan farkýnýn ortalamasýný"
+verir. Tabii bazen noktalar ortalamanýn altýnda, bazen üstünde olacaktýr,
+bizi bu negatiflik, pozitiflik ilgilendirmez, biz sadece farkla
+alakalýyýz. O yüzden her sapmanýn karesini alýrýz, bunlarý toplayýp nokta
+sayýsýna böleriz. 
+
+Ýlginç bir cebirsel iþlem þudur ve bize verinin üzerinden tek bir kez
+geçerek (one pass) hem sayýsal ortalamayý hem de sayýsal varyansý
+hesaplamamýzý saðlar. Eðer $\bar{y}$ tanýmýný üstteki formüle sokarsak,
+
+$$ = \frac{ 1}{n} \sum_i y_i^2 + \frac{ 1}{n} \sum_i m^2 - \frac{ 2}{n} \sum_i y_i\bar{y}  $$
+
+$$ = \frac{ 1}{n} \sum_i y_i^2 + \frac{ \bar{y}^2n}{n} - \frac{ 2\bar{y}n}{n}\bar{y} $$
+
+$$ = \frac{ 1}{n} \sum_i y_i^2 +  \bar{y}^2 - 2\bar{y}^2 $$
+
+$$ = \frac{ 1}{n} \sum_i y_i^2 - \bar{y}^2 $$
+
+ya da 
+
+$$ = \sum _{i=1}^{n} y_i^2 - \frac{1}{n} \bigg( \sum _{i=1}^{n} y_i \bigg)^2  
+\mlabel{5}
+$$
+
+Bu arada standard sapma varyansýn kareköküdür, ve biz karekök olan versiyon
+ile çalýþmayý tercih ediyoruz. Niye? Çünkü o zaman veri noktalarýnýn ve
+yayýlma ölçüsünün birimleri birbiri ile ayný olacak. Eðer veri setimiz bir
+alýþveriþ sepetindeki malzemelerin lira cinsinden deðerleri olsaydý,
+varyans bize sonucu "kare lira" olarak verecekti ve bunun pek anlamý
+olmayacaktý.
+
+Artýmsal (Incremental) Varyans Hesabý
+
+(5) formülünü $x$ kullanarak bir daha yazalým,
+
+$$ 
+S = \sum _{i=1}^{n} x_i^2 - \frac{1}{n} \bigg( \sum _{i=1}^{n} x_i \bigg)^2  
+$$
+
+Bu formülü her yeni veri geldikçe eldeki mevcut varyansý ``güncelleme''
+amaçlý olarak tekrar düzenleyebilirdik, böylece veri üzerinden bir kez
+geçmekle kalmayýp en son bakýlan veriye göre en son varyansý
+hesaplayabilmiþ olurduk. Ortalama için mesela her yeni veri bir toplama
+eklenebilir, ayrýca kaç veri noktasý görüldüðü hatýrlanýr, ve o andaki en
+son ortalama en son toplam bölü bu en son sayýdýr. 
+
+Fakat varyans için (5)'in bir problemi var, $\sum x_i^2$ ve $(\sum x_i)^2$
+sayýlarý uygulamalarda aþýrý büyüyorlar, ve yuvarlama hatalarý (rounding
+errors) hatalarý ortaya çýkmaya baþlýyor. Eðer varyans küçük ise bu aþýrý
+büyük sayýlardaki tüm basamaklar birbirini iptal eder, geriye hiçbir þey
+kalmaz. Bu hatalardan uzak durmak için varyansý farklý bir artýmsal
+yöntemle hesaplamak istiyoruz.
+
+Youngs ve Cramer'in yöntemine göre [3, sf. 69] bu hesap þöyle
+yapýlabilir. $T_{ij}$, $M_{ij}$ ve $S_{ij}$,  veri noktalarý $x_i$ $x_j$
+arasýndaki verileri kapsayacak þekilde sýrasýyla toplam, ortalama ve
+verinin karesinin toplamý olsun, 
+
+$$ 
+T_{ij} = \sum _{k=i}^{j} x_k , \quad  
+M_{ij} = \frac{1}{(j-1+1)}, \quad
+S_{ij} = \sum _{k=i}^{j} (x_k - M_{ij})^2
+$$
+
+Güncelleme formülleri þunlardýr, 
+
+$$ T_{1,j} = T_{i,j-1} + x_j$$
+
+$$ S_{1,j} = S_{i,j-1} + \frac{1}{j(j-1)} (jx_j - T_{1,j})^2  $$
+
+ki $T_{1,1} = x_1$ ve $S_{1,1}=0$ olacak þekilde.
+
+Ýspat
+
+$$ 
+\sum _{k=1}^{j} \bigg( x_k - \frac{1}{j} T_{1j} \bigg) = 
+\sum _{k=1}^{j} \bigg( x_k - \frac{1}{j} (T_{1,j-1}+x_j)  \bigg)^2
+$$
+
+$$ = \sum _{k=1}^{j} \bigg(
+\bigg(x_k - \frac{1}{j-1}T_{1,j-1} \bigg) + 
+\bigg( \frac{1}{j(j-1)} T_{1,j-1} - \frac{1}{j} x_j\bigg) 
+\bigg)^2
+$$
+
+çünkü $\frac{1}{j} = \frac{1}{j-1}-\frac{1}{j(j-1)}$
+
+
+$$
+= \sum _{k=1}^{j-1} \bigg( x_k - \frac{1}{j-1} T_{1,j-1} \bigg)^2  
+ \bigg( x_j - \frac{1}{j-1} T_{1,j-1} \bigg)^2 +
+$$
+$$
+2 \sum _{k=1}^{j}  \bigg( x_k - \frac{1}{j-1} T_{1,j-1} \bigg)
+\bigg( \frac{1}{j(j-1)} T_{1,j-1} - \frac{1}{j} x_j \bigg) +
+$$
+$$
+j \bigg( \frac{1}{j(j-1)} T_{1,j-1} - \frac{1}{j} x_j \bigg) 
+$$
+
+$$ 
+= \sum _{k=1}^{j-1} \bigg( x_k - \frac{1}{j-1} T_{1,j-1} \bigg)^2 + 
+\bigg( x_j - \frac{1}{j-1} T_{1,j-1} \bigg)^2 \bigg( 1-\frac{2}{j} \bigg) + 
+j \bigg( \frac{1}{j(j-1)} T_{1,j-1} - \frac{1}{j}x_j \bigg)^2
+$$
+
+çünkü $\sum _{k=1}^{j-1} (x_k-\frac{1}{j-1} T_{1,j-1} )=0$
+
+$$ 
+= S_{1,j-1}  + \bigg( x_j - \frac{1}{j-1} (T_{1j}-x_j) \bigg) ^2
+\bigg( 1-\frac{2}{j}+\frac{1}{j}\bigg)
+$$
+
+$$ = S_{1,j-1} + \frac{1}{(j-1)^2} (jx_j - T_{1j})^2 \frac{j-1}{j} $$
+
+Bu algoritma (5) algoritmasýndan daha stabil. Kod üzerinde görelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def incremental_mean_and_var(x, last_sum, last_var, j):
+    new_sum = last_sum + x
+    new_var = last_var + (1./(j*(j-1))) * (j*x - new_sum)**2 
+    return new_sum, new_var
+
+N = 10
+arr = np.array(range(N)) # basit veri, 0..N-1 arasi sayilar
+print arr
+last_sum = arr[0]; last_var = 0.
+for j in range(2,N+1):
+    last_sum,last_var = incremental_mean_and_var(arr[j-1], last_sum, last_var, j)
+
+print 'YC =', last_var / N, 'Standart = ', arr.var()
+print last_sum, arr.sum()
+\end{minted}
+
+\begin{verbatim}
+[0 1 2 3 4 5 6 7 8 9]
+YC = 8.25 Standart =  8.25
+45 45
+\end{verbatim}
+
+Kovaryans ve Korelasyon
+
+Harvard Joe Blitzstein dersinden alýnmýþtýr
+
+Bugün ``kovaryans günü'', bu tekniði kullanarak nihayet bir toplamýn
+varyansýný bulabileceðiz, varyans lineer deðildir (kýyasla beklenti
+-expectation- lineerdir). Bu lineer olmama durumu bizi korkutmayacak tabii,
+sadece yanlýþ bir þekilde lineerlik uygulamak yerine probleme farklý bir
+þekilde yaklaþmayý öðreneceðiz. 
+
+Diðer bir açýdan, hatta bu ana kullanýmlardan biri, kovaryans iki rasgele
+deðiþkeni beraber / ayný anda analiz etmemize yarayacak. Ýki varyans
+olacak, ve onlarýn alakasýna bakýyor olacaðýz, bu sebeple bu analize {\em
+  ko}varyans deniyor zaten. 
+
+Taným
+
+$$ 
+Cov(X,Y) = E((X-E(X))(Y-E(Y))) 
+\mlabel{1} 
+$$
+
+Burada $X,Y$ ayný uzayda tanýmlanmýþ herhangi iki rasgele deðiþken. Üstteki
+diyor ki rasgele deðiþken $X,Y$'in kovaryansý $X$'ten ortalamasý
+çýkartýlmýþ, $Y$'ten ortalamasý çýkartýlmýþ halinin çarpýlmasý ve tüm bu
+çarpýmlarýn ortalamasýnýn alýnmasýdýr.
+
+Taným böyle. Þimdi bu tanýma biraz bakýp onun hakkýnda sezgi / anlayýþ
+geliþtirmeye uðraþalým. Taným niye bu þekilde yapýlmýþ, baþka bir þekilde
+deðil?
+
+Ýlk önce eþitliðin sað tarafýndaki bir çarpýmdýr, yani ``bir þey çarpý bir
+baþka þey''. Bu ``þeylerden'' biri $X$ ile diðeri $Y$ ile alakalý, onlarý
+çarparak ve çarpýmýn bir özelliðinden faydalanarak þunu elde ettik; artý
+çarpý artý yine artý deðerdir, eksi çarpý artý eksidir, eksi çarpý eksi
+artýdýr. Bu þekilde mesela ``ayný anda artý'' olmak gibi kuvvetli bir
+baðlantý çarpýmýn artý olmasý ile yakalanabilecektir. Ayný durum eksi, eksi
+de için geçerli, bu sefer her iki rasgele deðiþken ayný þekilde
+negatiftir. Eksi çarpým sonucu ise sýfýrdan az bir deðerdir, ``kötü
+korelasyon'' olarak alýnabilir ve hakikaten de eksi artý çarpýmýnýn iþareti
+olduðu için iki deðiþkenin ters yönlerde olduðunu gösterir. Demek ki bu
+araç / numara hakikaten faydalý.
+
+Unutmayalým, üstteki çarpýmlardan birisinin büyüklüðü $X$'in ortalamasýna
+baðlý olan bir diðer, $Y$ ayný þekilde. Þimdi $X,Y$'den bir örneklem
+(sample) aldýðýmýzý düþünelim. Veri setinin her veri noktasý baðýmsýz
+özdeþçe daðýlmýþ (i.i.d) durumda. Yani $X,Y$ deðiþkenlerine ``gelen''
+$x_i,y_i$ ikilileri her $i$ için diðerlerinden baðýmsýz; fakat her ikilinin
+arasýnda bir baðlantý var, yani demek ki bu rasgele deðiþkenlerin baz
+aldýðý daðýlýmlarýn bir alakasý var, ya da bu iki deðiþkenin bir ortak
+daðýlýmý (joint distribution) var.
+
+Not: Eðer $X,Y$ baðýmsýz olsaydý, o zaman 
+
+$$ Cov(X,Y) = E((X-E(X))) E(Y-E(Y))  $$
+
+olarak yazýlabilirdi, yani iki beklentinin ayrý ayrý çarpýlabildiði
+durum... Ama biz bu derste baðýmsýzlýðýn olmadýðý durumla ilgileniyoruz..
+
+Korelasyon kelimesinden bahsedelim hemen, bu kelime günlük konuþmada çok
+kullanýlýyor, ama bu ders baðlamýnda korelasyon kelimesinin matematiksel
+bir anlamý olacak, onu birazdan, kovaryans üzerinden tanýmlayacaðýz.
+
+Bazý ilginç noktalar:
+
+Özellik 1
+
+varyansý nasýl tanýmlamýþtýk? 
+
+$$ Var(X) = E( (X-E(X))^2 )  $$
+
+Bu denklem aslýnda 
+
+$$ Cov(X,Y) = E( (X-E(X))(Y-E(Y)) )  $$
+
+denkleminde $Y$ yerine $X$ kullandýðýmýzda elde ettiðimiz þeydir, yani
+
+$$ Cov(X,X) = E((X-E(X))(X-E(X)))  $$
+
+$$ Cov(X,X) = E((X-E(X))^2)   $$
+
+$$ = Var(X) $$
+
+Yani varyans, bir deðiþkenin ``kendisi ile kovaryansýdýr''. Ýlginç deðil
+mi? 
+
+Özellik 2
+
+$$ Cov(X,Y) = Cov(Y,X) $$
+
+Ýspatý kolay herhalde, (1) formülünü uygulamak yeterli.
+
+Teori
+
+$$ Cov(X,Y) = E((X-E(X))(Y-E(Y))) = E(XY) - E(X)E(Y)$$
+
+Ýspat
+
+Bu ispat çok kolay, eþitliðin sol tarafýndaki çarpýmý parantezler üzerinden
+açarsak, ve beklenti lineer bir operatör olduðu için toplamýn terimleri
+üzerinde ayrý ayrý uygulanabilir, 
+
+$$ E(XY) -E(X)E(Y) -E(X)E(Y) + E(X)E(Y) $$
+
+$$  =  E(XY) - E(X)E(Y) $$
+
+Çarpýmý uygularken mesela $E(-X \cdot E(Y))$ gibi bir durum ortaya çýktý,
+burada $E(Y)$'nin bir sabit olduðunu unutmayalým, çünkü beklenti rasgele
+deðiþkene uygulanýnca tek bir sayý ortaya çýkartýr, ve vu $E(Y)$ üzerinde
+bir beklenti daha uygulanýnca bu ``içerideki'' beklenti sabitmiþ gibi
+dýþarý çýkartýlabilir, yani $-E(X)E(Y)$. 
+
+Devam edelim, $E(XY) - E(X)E(Y)$ ifadesini gösterdik, çünkü çoðu zaman bu
+ifade hesap açýsýndan (1)'den daha uygundur. Ama (1) ifadesi anlatým /
+sezgisel kavrayýþ açýsýndan daha uygun, çünkü bu ifade $X$'in ve $Y$'nin
+kendi ortalamalarýna izafi olarak belirtilmiþtir, ve akýlda canlandýrýlmasý
+daha rahat olabilir. Fakat matematiksel olarak bu iki ifade de aynýdýr. 
+
+Ýki özellik bulduk bile. Bir özellik daha,
+
+Özellik 3
+
+$$ Cov(X,c) = 0 $$
+
+Bu nereden geldi? (1)'e bakalým, $Y$ yerine $c$ koymuþ olduk, yani bir
+sabit. Bu durumda (1)'in $(Y-E(Y))$ kýsmý $c-E(c)=c-c=0$ olur [aslýnda
+bayaðý absürt bir durum], ve bu durumda (1) tamamen sýfýra dönüþür, sonuç sýfýr.
+
+Özellik 4
+
+$Cov(cX,Y) = c \cdot Cov(X,Y)$ 
+
+Ýspat için alttaki formülde
+
+$$ Cov(X,Y) =  E(XY) - E(X)E(Y) $$
+
+$X$ yerine $cX$ koymak yeterli, $c$ her iki terimde de dýþarý çýkacaktýr,
+ve grubun dýþýna alýncan bu özelliði elde ederiz.
+
+Özellik 5
+
+$$ Cov(X,Y+Z) = Cov(X,Y) + Cov(X,Z) $$
+
+Ýspat için bir üstteki özellikte yaptýðýmýzýn benzerini yaparýz. 
+
+En son iki özellik oldukça faydalýdýr bu arada, onlara ikili-lineerlik
+(bilinearity) ismi veriliyor. Ýsim biraz renkli / sükseli bir isim,
+söylemek istediði þu aslýnda, bu son iki özellikte sanki bir kordinatý
+sabit tutup diðeri ile iþlem yapmýþ gibi oluyoruz, yani bir kordinat sabit
+olunca diðeri ``lineermiþ gibi'' oluyor; Mesela $c$'nin dýþarý çýktýðý
+durumda olduðu gibi, bu özellikte $Y$'ye hiçbir þey olmadý, o deðiþmeden
+kaldý. Ayný þekilde 5. özellikte $X$ hiç deðiþmeden eþitliðin saðýna
+aktarýldý sanki, sadece ``$Z$ durumu için'' yeni bir terim ekledik. 
+
+4. ve 5. özellik çok önemlidir, bunlarý bilirsek bir ton hesabý yapmadan
+hýzlýca türeterek hesaplar kolaylaþtýrýlabilir.
+
+Özellik 6
+
+$$ Cov(X+Y, Z+W) = Cov(X,Z) + Cov(X,W) + Cov(Y,Z) + Cov(Y,W) $$
+
+Þimdi 5. özelliði hatýrlayalým, orada gösterilen sanki bir nevi basit
+cebirdeki daðýtýmsal (distributive) kuralýn uygulanmasý gibiydi sanki, yani
+$(a+b)(c+d)$'i açtýðýmýz gibi, 5. özellik te sanki kovaryansý çarpýp
+topluyormuþ gibi ``açýyordu''. En temelde gerçekten olan bu deðil ama nihai
+sonuç benzer gözüktüðü için akýlda tutmasý kolay bir metot elde etmiþ
+oluyoruz. Her neyse, 6. özellik için aslýnda 5. özelliði tekrar tekrar
+uygulamak yeterli. Bu arada 5. özellik $Cov(X,Y+Z)$ için ama $Cov(Y+Z,X)$
+yine ayný sonucu veriyor. 
+
+Bu arada 6. özellik çok çetrefil toplamlar üzerinde de uygulanabilir,
+mesela 
+
+$$ Cov \bigg( \sum _{i=1}^{m}a_iX_i, \sum _{j=1}^{n}b_iY_i \bigg) $$
+
+Bu son derece karmaþýk gözüküyor, fakat çözümü için aynen 6. özellikte
+olduðu gibi 5. özelliði yine tekrar tekrar uygulamak yeterli (4. özellik
+ile de sabiti dýþarý çýkarýrýz, vs).
+
+Çoðu zaman üstteki gibi pür kovaryans içeren bir açýlýmla çalýþmak, içinde
+beklentiler olan formüllerle uðraþmaktan daha kolaydýr. 
+
+Þimdi toplamlara dönelim; kovaryanslara girmemizin bir sebebi toplamlarla
+iþ yapabilmemizi saðlamasý. Mesela, bir toplamýn varyansýný nasýl
+hesaplarýz? 
+
+Özellik 7
+
+$$ Var(X_1+X_2) $$
+
+Þimdilik iki deðiþken, ama onu genelleþtirip daha fazla deðiþkeni
+kullanabiliriz. 
+
+Çözelim. 1. özellik der ki varyans deðiþkenin kendisi ile kovaryansýdýr,
+yani $Var(X) = Cov(X,X)$. O zaman $Var(X_1+X_2) = Cov(X_1+X_2,
+X_1+X_2)$. Böylece içinde toplamlar içeren bir kovaryans elde ettik ama bunu çözmeyi 
+biliyoruz artýk. ``Daðýtýmsal'' iþlemleri yaparken $Cov(X_1,X_1)$ gibi
+ifadeler çýkacak, bunlar hemen varyansa dönüþecek. Diðer taraftan
+$Cov(X_1,X_2)$ iki kere gelecek, yaný
+
+$$ Var(X_1+X_2) = Var(X_1) + Var(X_2)  + 2 Cov(X_1,X_2)$$
+
+Bu alanda bilinen tekerleme gibi bir baþka deyiþ, ``eðer kovaryans sýfýrsa
+toplamýn varyansý varyanslarýn toplamýdýr''. Hakikaten kovaryans sýfýr
+olunca üstteki denklemden düþecektir, geriye sadece varyanslarýn toplamý
+kalacaktýr. Kovaryans ne zaman sýfýrdýr? Eðer $X_1,X_2$ birbirinden
+baðýmsýz ise. Tabii bu baðýmsýzlýk her zaman ortaya çýkmaz. 
+
+Ýkiden fazla deðiþken olunca? Yine tüm varyanslarýn ayrý ayrý toplamý, ve
+kovaryanslar da sonda toplanacak,
+
+$$ Var(X_1+ .. + X_n ) = Var(X_1) + .. + Var(X_n) + 2 \sum _{i<j}^{} Cov(X_i,X_j) $$
+
+Sondaki toplamýn indisinde bir numara yaptýk, sadece 1 ile 2, 2 ile 3,
+vs. eþlemek için, ve mesela 3 ile 1'i tekrar eþlememek için. Tekrar dedik
+çünkü $Cov(X_1,X_3) = Cov(X_3,X_1)$. Eðer indisleme numarasý
+kullanmasaydýk, 2 ile çarpýmý çýkartýrdýk (ona artýk gerek olmazdý),
+
+$$ ..  + \sum _{i \ne j} Cov(X_i,X_j) $$
+
+Þimdi, korelasyon konusuna gelmeden önce, baðýmsýzlýk kavramýný iyice
+anladýðýmýzdan emin olalým. 
+
+Teori
+
+Eðer $X,Y$ baðýmsýz ise bu deðiþkenler baðýmsýzdýr, yani $Cov(X,Y)=0$.
+
+DÝKKAT! Bu mantýk çizgisinin tersi her zaman doðru olmayabilir, yani
+baðýmsýzlýk kesinlikle $Cov(X,Y)=0$ demektir, ama her $Cov(X,Y)=0$ olduðu
+zaman ortada bir baðýmsýzlýk var diyemeyiz. Bunu bir örnekle görelim. 
+
+$$ Z \sim N(0,1), X=Z, Y=Z^2 $$
+
+Þimdi $X,Y$ kovaryansýnýn hesabý yapalým
+
+$$ Cov(X,Y) = E(XY) - E(X)E(Y) = E(Z^3) - E(Z)E(Z^2)$$
+
+En sondaki terim sýfýrdýr, çünkü hem $E(Z)$ ve $E(Z^3)$ sýfýrdýr [hoca
+burada standart normalin tek sayýlý (odd) moment'leri hep sýfýrdýr dedi]. O
+zaman þu sonucu çýkartýyoruz, $X,Y$ arasýnda korelasyon yok. 
+
+Ama baðýmlýlýk var mý? Var. Çünkü hem $X$ hem $Y$ $Z$'nin birer deðiþkeni,
+yani bu durumda $X$'i bilmek bize $Y$'yi tamamen bilmemizi saðlýyor (sadece
+ek olarak bir kare alýyoruz). Tabii baðýmlýlýk illa herþeyin bilinmesi
+demek deðildir, biraz baðýmlýlýk ta olabilir, ama biraz baðýmlýlýk bile
+varsa, baðýmsýzlýk var diyemeyiz. Ayný þey ters yön için de geçerli, $Y$
+bilinince $X$'in ``büyüklüðünü'' bilebiliriz, karekök iþlemi olduðu için
+-/+ iþareti bilemeyiz ama skalar bir büyüklüðü elde edebiliriz. Yani ters
+yönde de baðýmsýzlýk yoktur. 
+
+Faydalý bir Eþitlik [1, sf 120]
+
+$$ Var(aX+b) = a^2Var(X) $$
+
+Ya da $b=0$ olduðu durumda (hatta ne olursa olsun)
+
+$$ Var(aX) = a^2Var(X) $$
+
+Ýspat
+
+$\mu = E(X)$ olsun ve  $E(aX + b) = a\mu + b$ olduðunu hatýrlayalým. 
+Varyans tanýmýndan hareketle, 
+
+$$ Var(aX+b) = E\big[ (aX + b - E[aX+b] )^2 \big] $$
+
+$$ =  E\big[ (aX + b - a\mu + b )^2 \big]  $$
+
+$$ =  E\big[ (aX - a\mu  )^2 \big]  $$
+
+$$ =  E\big[ a^2(X - \mu)^2 \big]  $$
+
+$$ =  a^2 E\big[ (X - \mu) \big]  $$
+
+$$ =  a^2 Var(X) $$
+
+
+Korelasyon
+
+Taným
+
+$$ Corr(X,Y) = \frac{Cov(X,Y)}{SD(X)SD(Y)} 
+\mlabel{2}
+$$
+
+Bu arada hatýrlarsak üstte SD ile gösterilen standart sapma, varyansýn
+karesidir. 
+
+Bu taným genelde kullanýlan tanýmdýr. Fakat ben daha farklý bir tanýmý
+tercih ediyorum. Standardize etmeyi hatýrlýyoruz deðil mi? Bir rasgele
+deðiþkenden ortalamasýný çýkartýp standart sapmaya bölünce standardize
+ediyorduk. Bunu kullanarak aslýnda korelasyonu alttaki gibi
+tanýmlayabiliriz, 
+
+$$ Corr(X,Y) = Cov \bigg( \frac{X-E(X)}{SD(X)}, \frac{Y-E(Y)}{SD(Y)}
+\bigg) 
+\mlabel{3}
+$$
+
+Yani korelasyonun anlamý aslýnda þudur: $X,Y$ deðiþkenlerini standardize
+et, ondan sonra kovaryanslarýný al (üstteki ifadeye Pearson korelasyonu
+ismi de verilir).
+
+Niye standardize edilmiþ kovaryans içeren ifadeyi tercih ediyoruz? Çünkü,
+diyelim ki $X,Y$ deðiþkenleri bir uzaklýk ölçüsünü temsil ediyor, ve
+birimleri mesela nanometre. Fakat bir baþkasý gelip ayný ölçümü, atýyorum,
+ýþýk yýlý olarak kullanmaya baþlarsa problem çýkabilir. Yani eðer birim
+yoksa ve ben ``$X,Y$ korelasyonum 42'' dersem, bunun ne olduðunu anlamak
+zordur. 42 önümüzdeki veriye göre küçük müdür, büyük müdür? Bilemeyiz. Yani
+42 sayýsý tabii ki evrendeki tüm sorularýn cevabýdýr [hoca bir filme atfen
+espri yapýyor, orada 42 sayýsýnýn özel bir anlamý vardý], ama önümüzdeki
+problem için, nedir?
+
+Fakat üstteki formül ölçü birimsiz (dimensionless) bir sonuç verir, yani
+bir ölçü biriminden bahsetmeden birine rahatça aktarabileceðimiz bir
+bilgidir. Niye birimsiz oldu? Çünkü $X$'in birimi $cm$ olsa, $X-E(X)$ yine
+$cm$, $SD(X)$ varyansýn karekökü olduðu için $cm^2$'nin karekökü yine $cm$,
+$cm$ bölü $cm$ birim ortadan kalkar.
+
+Bu arada (3) niye (2) ile aynýdýr? Eðer bir rasgele deðiþkenden bir sabiti
+çýkartýrsam onun baþka bir deðiþken ile kovaryansýný deðiþtirmiþ olmam. Ki
+standardize etme iþlemi bunu yapar. O zaman niye bu çýkartma iþlemini
+yaptým? Çünkü standardize etme iþlemini özellikle kullanmak istedim -
+standardizasyon bilinen ve rahatça kullanýlabilen bir iþlem. Standart
+sapmayý bölmeye gelirsek, þimdiye kadar gördüðümüz özelliklerden biri,
+bölümü dýþarý alabileceðimizi gösteriyor, böyle olunca (2) ifadesini aynen
+elde ediyorum. 
+
+Önemli bir nokta daha: korelasyon her zaman $-1$ ve $+1$ arasýndadýr. 
+
+Teori
+
+$$ -1 \le Corr(X,Y) \le 1 $$
+
+Yani ölçü biriminden baðýmsýz olmasý avantajýna ek olarak hep ayný skalada
+olan bir deðerin rapor edilmesi de faydalýdýr. Eðer korelasyon 0.99
+bulursam bunun hemen yüksek bir korelasyon olduðunu bilirim. 
+
+Bu arada, Çauchy-Schwarz eþitsizliðinden bahsedeyim -ki bu eþitsizlik
+tanýmý tüm matematikteki en önemli eþitsizliklerden biridir- eðer
+korelasyon formülünü lineer cebirsel þekilde ifade etseydim direk
+Cauchy-Schwarz eþitsizliðini elde ederdim. 
+
+Ýspat
+
+Önce ``WLOG çerçevesinde'' $X,Y$'nin önceden standardize edilmiþ olduðunu
+kabul edelim. [WLOG ne demek? Matematikçiler ispatlar sýrasýnda bunu bazen
+kullanýrlar, genelleme kuvvetinde bir kayýp olmadan (without loss of
+generality) takip eden þeyi kullanabiliriz demektir, yani ``bir baþka þey
+kullanýyorum, ama teori bu çerçevede de hala geçerli'' demek isterler]. 
+
+Önceden standardize edildiðini kabul etmek niye fark yaratmýyor? Çünkü bunu
+gördük, standart olmayan deðiþkenleri standardize edince yine ayný sonucu
+elde ediyorum, yani bir þey farketmiyor. 
+
+$Var(X+Y)$'i hesaplayalým. 
+
+$$ Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y) 
+\mlabel{4}
+$$
+
+Þimdi sembol olarak $\rho = Corr(X,Y)$ kullanalým,
+
+Standardize ettiðimizi kabul etmiþtik, o zaman $Var(X)=1,Var(Y)=1$. Ayrýca
+(3)'te gördüðümüz üzere, standardize durumda kovaryans korelasyona eþittir,
+o zaman $Cov(X,Y)=\rho$, yani $2Cov(X,Y) = 2\rho$. Tüm ifade,
+
+$$ Var(X+Y) = 1 + 1 + 2 \rho  = 2 + 2\rho$$
+
+Peki farklarýn varyansý, $Var(X-Y)$ nedir? Bir numara kullanalým,
+$Var(X-Y)$'i $Var(X+(-Y))$ olarak görelim, 
+
+$$ Var(X-Y) = Var(X) + Var(Y) - 2Cov(X,Y) = 2 - 2\rho $$
+
+Aslýnda bu son ifade ispatý tamamlamýþ oldu, çünkü varyans negatif olmayam
+bir þeydir, yani 
+
+$$ 0 \le Var(X+Y) = 2 + 2\rho$$
+
+$$ 0 \le Var(X-Y) = 2 - 2\rho$$
+
+Bu iki eþitsizliði kullanarak 
+
+$$ -2 \le 2\rho$$
+
+$$ -2 \le - 2\rho$$
+
+ve 
+
+$$ -1 \le \rho$$
+
+$$ \rho \le 1 $$
+
+Multinom Daðýlýmýn Kovaryansý
+
+Kovaryansý multinom daðýlýmý baðlamýnda ele alalým, bildiðimiz gibi
+multinom daðýlýmý bir vektördür [ve binom daðýlýmýnýn daha yüksek boyuttaki
+halidir, binom daðýlýmý bildiðimiz gibi $n$ deney içinde kaç tane baþarý
+sayýsý olduðunu verir], ve vektörün her hücresinde ``vs. kategorisinde kaç
+tane vs var'' gibi bir deðer taþýnýr, ki bu her hücre baðlamýnda ``o
+kategori için zar atýlsa kaç tane baþarý elde edilir'' gibi okunabilir. 
+
+Biz ise bu hücrelerden iki tanesini alýp aralarýndaki kovaryasyona bakmak
+istiyoruz. Gayet doðal bir istek. 
+
+Notasyon
+
+Elimizde $k$ tane obje var, 
+
+$$ (X_1,..,X_k) \sim Mult(n,\vec{p}) $$
+
+Dikkat, $p$ bir vektör, tabii ki, çünkü binom durumunda $p$ tek sayý idi,
+þimdi ``pek çok $p$''ye ihtiyaç var. 
+
+Her $i,j$ için $Cov(X_i,X_j)$'yi hesapla. 
+
+Eger $i=j$ ise $Cov(X_i,X_i)=Var(X_i) = np_i(1-p_i)$. 
+
+ki son ifade binom daðýlýmýnýn varyansýdýr. Bu basit durum tabii ki, ilginç
+olan $i \ne j$ olmadýðý zaman. 
+
+Tek örnek seçelim, mesela $Cov(X_1,X_2)$, buradan gelen sonuç gayet kolayca
+genelleþtirilebilir. 
+
+Hesaba baþlamadan önce kabaca bir akýl yürütelim; $Cov(X_1,X_2)$ için artý
+mý eksi mi bir deðer elde ederdik acaba? Multinom daðýlýmý hatýrlayalým,
+belli sayýda ``þey'' yine belli sayýda kategori arasýnda ``kapýþýlýyor'',
+yani bu kategoriler arasýnda bir yarýþ var. O zaman herhangi iki
+kategorinin kovaryansýnýn negatif olmasýný bekleriz. 
+
+Çözüm için (4) formülünü kullanacaðým, ama seçici bir þekilde, 
+
+$$ Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y) $$
+
+içinde $Var(X+Y),Var(X),Var(Y)$'i biliyorsam, geriye bilinmeyen $Cov(X,Y)$
+kalýr. Kýsaltma amacýyla $c = Cov(X,Y)$ diyelim,
+
+$$ Var(X_1+X_2) = np_1(1-p_1) + np_2(1-p_2) + 2c$$
+
+Þimdi $X_1+X_2$'nin ne olduðunu düþünelim, bu yeni rasgele deðiþken ``ya
+kategori 1 ya da 2'' sonucunu taþýyan bir deðiþkendir, ki bu da yeni bir
+``birleþik'' binom deðiþkenidir. Bu deðiþkenin $p$'sý toplamý olduðu iki
+kategorinin $p$'sinin toplamýdýr, yani $p_1+p_2$. O zaman bu yeni
+deðiþkenin varyansý, 
+
+$$ Var(X_1+X_2) = n(p_1+p_2)(1-(p_1+p_2))  $$
+
+Eh artýk denklemdeki her þeyi biliyoruz, sadece $c$'yi bilmiyoruz, ona göre
+herþeyi düzenleyelim, 
+
+$$ n(p_1+p_2)(1-(p_1+p_2))  = np_1(1-p_1) + np_2(1-p_2) + 2c $$
+
+Burada biraz haldir huldür iþlem lazým [bu kýsmý okuyucu isterse
+yapabilir], sonuç
+
+$$ Cov(X_1,X_2) = -np_1p_2 $$
+
+Genel olarak 
+
+$$ Cov(X_i,X_j) = -np_ip_j, \forall i \ne j $$
+
+Dikkat edelim, bu sonuç her zaman negatiftir (çünkü $p$ deðerleri olasýlýk
+deðerleridirler, yani pozitif olmak zorundadýrlar)
+
+Örnek
+
+Binom deðiþkenin varyansýný hesaplayalým þimdi. Bunu daha önce yapmýþtýk
+ama göstergeç (indicator) rasgele deðiþkenleri kullanarak yapmýþtýk bunu,
+þimdi elimizde yeni bir araç var, onu kullanalým. Varacaðýmýz sonuç 
+$Var(X) = npq$ olacak. Tanýmlar,
+
+$$ X \sim Bin(n,p), X = X_1+..+X_n $$
+
+ki $X_i$ deðiþkenleri i.i.d. Bernoulli. 
+
+Aslýnda her $X_i$ deðiþkeni bir göstergeç deðiþkeni gibi
+görülebilir. Diyelim ki bir $A$ olayý için göstergeç deðiþken $I_A$
+olsun. Bu durumda
+
+$$ I_A^2 = I_A $$
+
+$$ I_A^3 = I_A $$
+
+Deðil mi? Göstergeç sadece 1/0 olabiliyorsa onun karesi, küpü ayný þekilde
+olur. Bunu vurguluyorum, çünkü bazen atlanýyor. 
+
+Peki $I_AI_B$? Ki $A,B$ ayrý ayrý olaylar. Gayet basit, 
+
+$$ I_AI_B = I_{A \cap B} $$
+
+Bu normal deðil mi? Eþitliðin solundaki çarpým sadece her iki deðiþken de 1
+iþe 1 sonucunu verir, bu ise sadece $A,B$ olaylarý ayný anda olduðu zaman
+mümkündür, ki bu ayný anda olmak küme kesiþmesinin tanýmýdýr. 
+
+Bernoullli durumuna dönelim, her Bernoulli için
+
+$$ Var(X_i) = EX_j^2 - E(X_j)^2 $$
+
+$X_j^2 = X_j$'dir, bunu biraz önce gördük, ve Binom deðiþkenleri göstergeç
+gibi görüyoruz, o zaman $EX_j^2 = E(X_j) = p$. 
+
+$$ Var(X_i) = p - p^2 = p(1-p) = pq$$
+
+Tüm binom daðýlýmýn varyansý, 
+
+$$ Var(X) = npq $$
+
+Bu kadar basit. Çünkü $Cov(X_i,X_j)=0,\forall i \ne j$, yani her bernoulli
+deneyi birbirinden baðýmsýz, o sebeple binom varyansý için tüm bernoulli
+varyanslarýný toplamak yeterli, eðer varyansý $pq$ olan $n$ tane bernoulli
+varsa, binom varyansý $npq$. 
+
+Örnek
+
+Daha zor bir örneði görelim. 
+
+$$ X \sim HGeom(w,b,n) $$
+
+Bu bir hipergeometrik daðýlým. Parametreleri þöyle yorumlayabiliriz, bir
+kutu içinde $w$ tane beyaz top var, $b$ tane siyah top var, ve biz bu
+kutudan $n$ büyüklüðünde bir örneklem alýyoruz, ve ilgilendiðimiz
+örneklemdeki beyaz toplarýn daðýlýmý. 
+
+[dersin gerisi atlandi]
+
+Matrisler Ýle Kovaryans Hesabý
+
+Eðer verinin kolonlarý arasýndaki iliþkiyi görmek istersek, en hýzlý yöntem
+matristeki her kolonun (deðiþkenin) ortalamasýný kendisinden çýkartmak,
+yani onu ``sýfýrda ortalamak'' ve bu matrisin devriðini alarak kendisi ile
+çarpmaktýr. Bu iþlem her kolonu kendisi ve diðer kolonlar ile noktasal
+çarpýmdan geçirecektir ve çarpým, toplama sonucunu nihai matrise
+yazacaktýr. Çarpýmlarýn bildiðimiz özelliðine göre, artý deðer artý deðerle
+çarpýlýnca artý, eksi ile eksi artý, eksi ile artý eksi verir, ve bu bilgi
+bize ilinti bulma hakkýnda güzel bir ipucu sunar. Pozitif sonucun pozitif
+korelasyon, negatif ise tersi þekilde ilinti olduðu sonucuna böylece
+kolayca eriþebiliriz.
+
+Taným
+
+$$ S = \frac{1}{n} (X-E(X))^T(X-E(X))) $$
+
+Pandas ile \verb!çov! çaðrýsý bu hesabý hýzlý bir þekilde yapar,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print df.cov()
+\end{minted}
+
+\begin{verbatim}
+              Sepal Length  Sepal Width  Petal Length  Petal Width
+Sepal Length      0.685694    -0.039268      1.273682     0.516904
+Sepal Width      -0.039268     0.188004     -0.321713    -0.117981
+Petal Length      1.273682    -0.321713      3.113179     1.296387
+Petal Width       0.516904    -0.117981      1.296387     0.582414
+\end{verbatim}
+
+Eger kendimiz bu hesabi yapmak istersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+means = df.mean()
+n = df.shape[0]
+df2 = df.apply(lambda x: x - means, axis=1)
+print np.dot(df2.T,df2) / n
+\end{minted}
+
+\begin{verbatim}
+[[ 0.68112222 -0.03900667  1.26519111  0.51345778]
+ [-0.03900667  0.18675067 -0.319568   -0.11719467]
+ [ 1.26519111 -0.319568    3.09242489  1.28774489]
+ [ 0.51345778 -0.11719467  1.28774489  0.57853156]]
+\end{verbatim}
+
+Verisel kovaryansýn sayýsal gösterdiðini grafiklemek istersek, yani iki
+veya daha fazla boyutun arasýndaki iliþkileri grafiklemek için yöntemlerden
+birisi verideki mümkün her ikili iliþkiyi grafiksel olarak
+göstermektir. Pandas \verb!scatter_matrix! bunu yapabilir. Iris veri seti
+üzerinde görelim, her boyut hem y-ekseni hem x-ekseninde verilmiþ, iliþkiyi
+görmek için eksende o boyutu bulup kesiþme noktalarýndaki grafiðe bakmak
+lazým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('iris.csv')
+df = df.ix[:,0:4]
+pd.scatter_matrix(df)
+plt.savefig('stat_summary_01.png')
+\end{minted}
+
+\includegraphics[height=8cm]{stat_cov_corr_01.png}
+
+Ýliþki olduðu zaman o iliþkiye tekabül eden grafikte ``düz çizgiye benzer''
+bir görüntü olur, demek ki deðiþkenlerden biri artýnca öteki de artýyor
+(eðer çizgi soldan sage yukarý doðru gidiyorsa), azalýnca öteki de azalýyor
+demektir (eðer çizgi aþaðý doðru iniyorsa). Eðer ilinti yok ise bol
+gürültülü, ya da yuvarlak küreye benzer bir þekil çýkar. Üstteki grafiðe
+göre yaprak geniþliði (petal width) ile yaprak boyu (petal length) arasýnda
+bir iliþki var.
+
+Taným
+
+$X,Y$ rasgele deðiþkenlerin arasýndaki kovaryans,
+
+$$ Cov(X,Y) = E(X-E(X))(Y-E(Y)) $$
+
+Yani hem $X$ hem $Y$'nin beklentilerinden ne kadar saptýklarýný her veri
+ikilisi için, çýkartarak tespit ediyoruz, daha sonra bu farklarý birbiriyle
+çarpýyoruz, ve beklentisini alýyoruz (yani tüm olasýlýk üzerinden ne
+olacaðýný hesaplýyoruz). 
+
+Ayrý ayrý $X,Y$ deðiþkenleri yerine çok boyutlu $X$ kullanýrsak, ki boyutlarý
+$m,n$ olsun yani $m$ veri noktasý ve $n$ boyut (özellik, öðe) var, tanýmý þöyle
+ifade edebiliriz,
+
+$$ \Sigma = Cov(X) = E((X-E(X))^T(X-E(X))) $$
+
+Phi Korelasyon Katsayýsý
+
+Phi katsayýsý iki tane ikisel deðiþkenin birbiriyle ne kadar alakalý,
+baðlantýlý olduðunu hesaplayan bir ölçüttür. Mesela $x,y$ deðiþkenleri için
+elde olan $(x_1,y_1),(x_2,y_2),..$ verilerini kullanarak hem $x=1$ hem
+$y=1$ olan verileri sayýp toplamý $n_{11}$'e yazarýz, $y=1,x=0$ icin
+$n_{10}$, ayný þekilde diðer kombinasyonlara bakarak alttaki tabloyu
+oluþtururuz [5],
+
+\includegraphics[width=12em]{phitable.png}
+
+Phi korelasyon katsayýsý
+
+$$ 
+\phi = \frac{n_{11}n - n_{1\bullet}n_{\bullet 1}}
+{\sqrt{n_{0\bullet} n_{1\bullet} n_{\bullet 0} n_{\bullet 1}}} 
+\mlabel{6}
+$$
+
+ile hesaplanýr. Bu ifadeyi türetmek için iki rasgele deðiþken arasýndaki
+korelasyonu hesaplayan formül ile baþlýyoruz,
+
+$$ Corr(X,Y) = \frac{E (x-E(X)) (y-E(Y)) }{\sqrt{Var(X) \cdot Var(Y) } } $$
+
+$$ 
+= \frac{E(XY) - E(X)E(Y)}{ \sqrt{Var(X) \cdot Var(Y)} }
+$$
+
+$X,Y$ deðiþkenlerinin Bernoulli daðýlýmýna sahip olduðunu düþünelim, çünkü
+0/1 deðerlerine sahip olabilen ikisel deðiþkenler bunlar, o zaman
+
+$$
+E[X]= \frac{n_{1\bullet}}{n}, \quad
+Var[X]= \frac{n_{0\bullet}n_{1\bullet}}{n^2}, \quad
+E[Y]= \frac{n_{\bullet 1}}{n}, \quad
+Var[Y]= \frac{n_{\bullet 0}n_{\bullet 1}}{n^2}, \quad
+E[XY]= \frac{n_{11}}{n^2}
+$$
+
+olacaktýr. $E(XY)$ nasýl hesaplandý? Ayrýksal daðýlýmlar için beklenti
+formülünün iki deðiþken için þöyle ifade edildiðini biliyoruz,
+
+$$  E[XY] = \sum_i\sum_j x_i\cdot y_j \cdot P\{X = x_i, Y = y_j\} $$
+
+Bu ifadeyi tabloya uyarlarsak, ve tablodaki hesaplarýn üstteki ifadeler
+için tahmin ediciler olduðunu biliyoruz, iki üstteki sonucu elde
+edebileceðimizi görürüz, çünkü tek geçerli toplam $x_i y_i$ her iki
+deðiþken de ayný anda 1 olduðunda geçerlidir. Bu deðerleri yerine geçirince
+(6) elde edilir.
+
+Phi katsayýsýnýn bir diðer ismi Matthews korelasyon katsayýsý. Bu hesabý
+mesela bir 0/1 tahmini üreten sýnýflayýcýnýn baþarýsýný ölçmek için
+kullanabiliriz, gerçek, test 0/1 verileri bir dizinde, üretilen tahminler
+bir diðerinde olur, ve Phi katsayýsý ile aradaki uyumu raporlarýz. Sonuç
+-1,+1 arasýnda olacaðý için sonuca bakarak irdeleme yapmak kolaydýr, bu bir
+baþarý raporu olarak algýlanabilir. Ayrýca Phi hesabýnýn, AUC hesabý gibi,
+dengesiz veri setleri üzerinde (mesela 0'a kýyasla çok daha fazla 1 olan
+veriler, ya da tam tersi) üzerinde bile hala optimal olarak çalýþtýðý [4]
+bulunmuþtur.
+
+Bazý örnekler,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.metrics import matthews_corrcoef
+y_true = [+1, +1, +1, -1]
+y_pred = [+1, -1, +1, +1]
+print (matthews_corrcoef(y_true, y_pred)  )
+\end{minted}
+
+\begin{verbatim}
+-0.333333333333
+\end{verbatim}
+
+Ya da
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a = [[0,  0],[0,  0],[0,  0],[0,  0],[0,  0],[1,  0],\
+[1,  0],[1,  0],[0,  1],[0,  1],[1,  1],[1,  1],\
+[1,  1],[1,  1],[1,  1],[1,  1],[1,  1],[1,  1],\
+[1,  1], [1,  1],[1,  1],[1,  1],[1,  1],[1,  1],\
+[1,  1],[1,  1],[1,  1]]
+a = np.array(a)
+print (matthews_corrcoef(a[:,0], a[:,1]))
+\end{minted}
+
+\begin{verbatim}
+0.541553390893
+\end{verbatim}
+
+
+Kaynaklar
+
+[1] Ross, {\em Introduction to Probability and Statistics for Engineers, 3rd Edition}
+
+[2] Wasserman, {\em All of Statistics}
+
+[3] Weihs, {\em Foundations of Statistical Algorithms With References to R Packages}
+
+[4] Boughorbel, {\em Optimal classifier for imbalanced data using Matthews Correlation Coefficient metric}, \url{http://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0177678&type=printable}
+
+[5] Cross Validated, {\em Relation between the phi, Matthews and Pearson correlation coefficients?}, \url{https://stats.stackexchange.com/questions/59343/relation-between-the-phi-matthews-and-pearson-correlation-coefficients}
+
+[6] Bayramli, Diferansiyel Denklemler, {\em Ters Trigonometrik Formüller}
+
+\end{document}

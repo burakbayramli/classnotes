@@ -1,0 +1,393 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Dýþbükey Optimizasyonuna (Convex Optimization) Giriþ
+
+Yapay öðrenme (machine learning) ve optimizasyonda sürekli optimizasyonu
+görürüz. Diðer disiplenlerde de görülür tabii ama bu ikisi benim ana
+konularým o yüzden o konulardan bu derste daha fazla bahsedeceðiz. Derste
+belirli bir amaç için gereken optimizasyon problemini çözmekten çok
+optimizasyon mekanizmasýnýn detaylarýný inceleyeceðiz. Optimallik
+þartlarýna bakmak, varýlan çözümün niteliðine bakmak bu detaylardan
+bazýlarý.
+
+Þimdi aklýnýza gelen bazý optimizasyon örneklerini verin bana [öðrenciler
+söylüyor]
+
+1) Regresyon - En Az Kareler. Evet. Hata karelerinin toplamý minimize
+edilir burada, bir hedef $y$ vardýr, onu bir formül üzerinden katsayýlarý
+olan bir denklem vardýr, ve model uyum iyiliðini hata kare toplamý
+üzerinden ölçeriz.
+
+$$
+\min_\beta \sum (y_i - x_i^T \beta)^2 
+$$
+
+Baþka ne tür regresyon þekilleri var?  
+
+2) Regülarize Edilmiþ Regresyon - Lasso. Burada yine hata karelerin toplamý
+var, ama üstüne katsayýlarýn L1 norm'unu minimize etmeye çalýþýrýz. Yani 
+
+$$
+\min_\beta \sum (y_i - x_i^T \beta)^2 \quad \textrm{oyle ki}
+$$
+$$
+\sum |\beta| \le t
+$$
+
+3) En Az Mutlak Sapma Regresyonu (Least Absolute Deviations) - bu da
+benden. Bu tür regresyon ile kare yerine mutlak deðer operasyonu
+kullanýlýyor [1, 14:35].   
+
+$$
+\min_\beta \sum |y_i - x_i^T \beta |
+$$
+
+BU tür regresyon ile aykýrý (outlier) deðerlere daha az önem verilmiþ
+olur. Fakat mutlak deðer hesabý kullanýnca optimizasyon zorlaþýyor çünkü
+üstteki formül artýk pürüzsüz deðil. 
+
+4) Sýnýflama - Lojistik Regresyon. LR ile $y_i$ ikisel olur, 0 ya da 1. LR
+formülizasyonu normal regresyona benziyor, 
+
+5) Bilgisayar Bilim - Seyahet Eden Satýþ Görevlisi Problemi (TSP),
+Planlama, Ayrýksal Optimizasyon. Bu ders bloklarýnýn sonunda Tam Sayý
+Programlama (Ýnteðer Programming) konusuna bakacaðýz, bu tür konulara orada
+daha çok yaklaþmýþ olacaðýz. 
+
+6) Ýstastistik - Maksimum Olurluk. MO istatistikte pek çok yaptýðýmýz iþin
+mihenk taþýdýr. Hatta LR, En Az Kareler, vs aslinda MO'nun özel, spesifik
+halleridir. Burada vurgu içbükey olurluk elde etmek, ki bir içbükey
+fonksiyonu maksimize etmiþ olalým, bu bir dýþbükey fonksiyonu minimize
+etmek ile ayný þey. 
+
+Böyle devam edebilirdik, optimizasyon örnekleri sayfalar
+doldurabilirdik. Optimizasyon her yerde. Ama belki de neyin optimizasyon
+olmadýðýna da bakmak iyi olur. Mesela istatistikte optimizasyon olmayan
+problemler nedir?
+
+Hipotez test etmek, p-deðerleri. Ya da takviyelemek (boosting), önemli bir
+konu ama optimizasyon deðil. Rasgele Ormanlar (Random Forests),
+deðil. Önyükleyiciler (bootstrap), çapraz-saðlama (cross-validation), yine
+deðil [1, 22:09].  
+
+Ve iddiam þu ki optimizasyon olmayan konular hakkýnda olanlara kýyasla daha
+fazla teorik bilgimiz var. Üstteki teknikler çoðunlukla prosedürsel. Ama
+mesela Lasso diyelim, bu bir dýþbükey optimizasyonun çýktýsý olduðu için
+optimalite þartlarý üzerinden onun çözümünün özellikleri hakkýnda konuþmak
+kolaylaþýyor. 
+
+Peki biz niye bu dersteki konuyu öðrenmek isteriz, isteyebiliriz? Sonuçta
+Lasso'yu birisi bulmuþ onun kodunu çaðýrýrýz, iþ biter. Üç sebep
+var. Birincisi farklý algoritmalar duruma göre daha iyi performans
+gösterebilir, durum derken veriden bahsediyorum. Bu sebeple her
+algoritmanin özünü anlamak çok önemli. Ýkincisi herhangi bir alandaki
+problemi çözen optimizasyonun temelini bilmek bize alan hakkýnda ek görüþ
+kazandýrabilir. 
+
+Üçüncü sebep optimizasyon hýzlý hareket eden bir alan, eðlenceli! Mesela
+optimizasyon alanýndaki NIPS Çalýþtayýna (Workshop) bakarsanýz, her sene
+deðiþiyor! Birkaç sene önce dýþbükey olmayan optimizasyon büyük konuydu,
+tabii o zaman bu dersi iþlerken utanýr gibi oluyorduk çünkü bizim konu
+dýþbükey optimizasyon ve yapay öðrenimdeki en büyük konferansta dýþbükey
+olmayan konular iþleniyor.. Fakat o zamanki odaðýn sebebi o zamanlarda bir
+sürü yeni dýþbükey olmayan ve yakýnsadýðý ispat edilen metotlarýn bulunmuþ
+olmasýydý. Ama bir sonraki sene rasgele (stochastic) optimizasyon geri
+dönüþ yapmýþtý, rasgele gradyan iniþi vs. Böyle her sene deðiþim oluyor, bu
+güzel bir þey demek ki hala ilerleme için oldukça alan var.
+
+Ornekler
+
+Bu orneklerin cogu tam varyasyon gurultu yoketmek (denoising) etrafinda,
+bunun bir diger ismi kaynasmis (fused) lasso. Elimizde iki boyutlu izgara
+halinde bir veri var, bir goruntu, $i,j$ kordinatlarinda bir renk degeri
+var, 3 ile 7 arasindaki renkler. 
+
+\includegraphics[width=25em]{func_19_intro_01.png}
+
+En soldaki gerçek resim. Ortadaki ise onun gürültülü hali, bizim elimizdeki
+veri bu diyelim. Görüntüyü $y$ vektörü olarak temil edeceðiz, bu tek
+boyutlu ama düþünün ki görüntüdeki iki boyutu alýp düzleþtirdik, tek vektör
+yaptýk, alt alta satýr satýrlarý yanyana koyduk mesela, vs. Bu resim
+hakkýnda þunu biliyoruz, görüntü parçasal olarak sabit, yani yanyana
+hücreler birbirinden çok farklý deðil. Bazý yerlerde olabilir mesela mavi
+arka plandan kýrmýzý objeye geçiþ yapýlan yerlerde, ama diðer yerlerde
+benzerlik var. Biz gürültülü resimden gürültüsüz resmi çýkartmak istiyoruz.
+
+Gürültü yoketme alanýnda pek çok yöntem var. Fakat gürültü yoketme
+problemine optimizasyon açýsýndan yaklaþabiliriz. Mesela, hedef kriteri þu
+haldeki bir optimizasyon problemi,
+
+$$
+\min_{\beta \in \mathbb{R}^n} 
+\frac{1}{2} \sum _{i=1}^{n} (y_i - \beta_i)^2 + 
+\lambda \sum _{(i,j) \in E)}  |\beta_i - \beta_j|
+$$
+
+Ýlk terimde aradýðýmýz ideal resim ile gerçek resim arasýndaki karesel
+kayýp hesabý var, yani her hücredeki $\theta_i$'in olabildiði kadar $y_i$
+verisine yakýn olmasýný istiyoruz. Ýkinci terimdeki $\lambda$ bizim
+dýþarýdan atadýðýmýz bir parametre, iki terim arasýndaki dengeyi
+kuruyor. Bu parametrenin çarptýðý ikinci terim bir ceza terimi. Yanyana
+olan her $i,j$'ye bakýyor, saðda solda altta üstte olsun, bu hücrelerin
+renk farkýný cezalandýrýyor, yani farkýn daha az olmasýný zorluyor çünkü
+resimde genel olarak bir süreklilik olmasýný istiyoruz. Oldukça sofistike
+bir iþlem aslýnda, ama optimizasyon formülasyonu açýsýndan oldukca
+basit. Ýki terim var, o kadar.
+
+Çözüm resimde en saðdaki resimde görülüyor. $\lambda=25$ seçtim onun için,
+ve çözdüm. $\lambda$'yi arttýrdýkça resmin daha kaba görüntülü olmaya
+baþladýðýný görebilirdiniz, mesela kýrmýzý ile pembe bölgeler birbiri içine
+geçmeye baþlayabilirdi. $\lambda=\infty$ için ne olur? Her þey tek bir renk
+olur, o renk $y$'nin ortalamasý olurdu. $\lambda=0$ için gürültülü verinin
+aynýsýný elde ederiz. 
+
+Çözümü nasýl elde ettim? Üstteki sonucu ADMM ile elde ettim. Bu ders
+bloðunun sonunda bu algoritmayi göreceðiz. Bu problemde ADMM'in spesifik
+bir versiyonunu kullandým, bu versiyonun bu problemde iyi iþleyeceðini
+biliyordum. 300x200 boyutunda bir resimdi, 20 döngü sonrasý sonucu elde
+ettim, her döngüde lineer zaman harcadý. Tüm iþleyiþi bir saniyenin ufak
+bir parçasýydý. 
+
+Proksimal gradyan iniþi ile 1000 kere döndük, sonuç fena deðil ama bazý
+renkler tam birleþmedi. Eðer 10000 kere döndürseydim ADMM sonucuna
+yaklaþýrdý. Bu metot ile de her döngüde lineer zaman harcanýyor, ama
+algoritmanýn tamamý daha yavaþ yakýnsadý. Yani, amaç için doðru araç
+diyemeyiz. 
+
+Sonra kordina iniþ adýnda çok popüler bir diðer metot iþlettim, 10000 kere
+döndü, adýmlar lineer zaman, ama yakýnsama olmadý. Hatta sonuç oldukca
+kötüydü. Kesinlikle amaç için yanlýþ araç. Yani iyi ile kötü metot arasýnda
+boyutsal fark var (order of magnitude), iþlem hýzý bakýmýndan 1, 2, daha
+kötü deðil, 10, 100 kat daha kötüden bahsediyoruz, ve kalite iyi deðil.
+
+Bu arada kordinat iniþini öðrenince üstteki kriteri nasýl kullandýðým kafa
+karýþtýrabilir, cevap algoritmayi kriterin ikizi üzeride
+iþlettim. Dersimizde ilerledikçe bunun anlamýný öðreneceðiz. Bir problemin
+ikizini almak ve bu ikize algoritmalarý nasýl uygulanacaðýný
+görmek.. bunlarý hep göreceðiz. 
+
+Mesajým ne? ADMM her yerde çok iyi iþler demek mi? Hayýr. ADMM bazý
+yerlerde daha kötü iþler. Diðer yerlerde proksimal gradyan daha iyidir. Bu
+sebeple tüm seçenek yelpazesinin bilmek, her algoritmanin özelliklerini
+anlamak faydalýdýr. 
+
+Bir diger ornek [1, 42:53]. Tam varyasyon gurultu yoketme yapiliyor yine
+ama burada iki boyuta bakmak yerine tek boyuta bakiyoruz, yani bazi
+acilardan bu problem daha kolay. Veri yine $y_1,..,y_n$ ama duzlestirilmis
+goruntu yerine tek bir eksende veri. Ayrica verinin ortalamasi parcasal
+sabit, yani tek duz cizgi. 
+
+$$
+\min_\theta \frac{1}{2} (y_i-\theta_i)^2 + 
+\lambda \sum _{i=1}^{n-1} |\theta_i - \theta_{i+1}|
+$$
+
+Burada ceza teriminde yanyana olan iki $\theta$'nin farkini
+cezalandiriyoruz, yani yanyana verinin benzer olmasini istiyoruz. 
+
+\includegraphics[width=25em]{func_19_intro_02.png}
+
+Veriye bakarsak iki bolge var, bir bolgede ortalama sabit digerinde de
+(baska) bir sabit. Ama algoritma bunu bilmiyor tabii onu kesfetmesi
+gerekecek. Eger $\lambda$ buyukse global ortalama ortaya cikiyor, tek
+cizgi. Goruntu orneginde soyledigimiz oluyor yani ama tek
+boyutta. $\lambda$ kuculdukce farkli ortalama bloklarinin ortaya cikmasini
+sagliyoruz. Ortadaki sonuc oldukca iyi. 3. resimde $\lambda$ biraz daha
+kucultuldu, burada bakiyoruz algoritma basta ufak bir blok daha yaratmayi
+secti. Bloklarin arasindaki noktaya ``degisim noktasi (changepoints)''
+denir. 
+
+Bir deðiþim noktasý elde edince, þimdi kendimize bir istatistiki soru
+sorabiliriz. Bu deðiþim noktalarýnýn istatistiki önemi (significance)
+nedir? Görsel olarak ben bakýnca diyorum ki 3. resimde saðdaki deðiþim
+noktasý önemli ama o baþtaki ufak deðiþim deðil. O yapma (spurious) bir
+deðiþim herhalde. Tabii $\lambda$'yi daha da ufaltsam daha da fazla uyduruk
+deðiþim noktalarý elde ederdim. Optimizasyon probleminin özü böyle, ayar
+deðiþkeni $\lambda$ elde edilen sonuçlara, neye ne kadar aðýrlýk
+verildiðini kontrol ediyor. Fakat istatistiki öneme dönersek bu tür
+sorularý sadece tam varyasyonu iyi anladýðýmýz takdirde
+cevaplandýrabiliriz. 
+
+\includegraphics[width=20em]{func_19_intro_03.png}
+
+Çünkü istatistiki önem hesabý için mesela 1. blok ile 2. bloktaki noktalarýn
+ortalamasýnýn farkýna bakýlýr, ve bir Normal daðýlým referans alýnarak
+sýfýr hipotezi test edilir, ve bu hipotez neredeyse her seferinde
+rededilecektir (yani test bloklar farklýdýr diyor ama biz olmadýðýný
+görüyoruz). Niye böyle oldu? Çünkü optimizasyonun kriterine bakarsak biz
+orada aktif olarak ortalama farkýný fazlalaþtýrmaya uðraþýyoruz. Ve tabii
+ki uðraþtýðýmýz þeyi test edince farklýlýk olduðunu buluyoruz. Bu doðru
+deðil! Eðer optimizasyonun ne yaptýðýný bilmesek bu sonuca varamazdýk.
+
+Devam edelim; Bu dersin merkezi kavramý dýþbükeylik. Tarihsel olarak ilk
+baþta lineer programlar vardý, çok ciddi bir þekilde araþtýrýldý bu konu,
+koca dersler bu konuya harcandý. O zamanlar düþünülüyordu ki lineer olan ve
+olmayan ayrýmý optimizasyonda en önemli ayrýmdýr. Bir tarafta
+çözebildiðimiz LP'ler var, diðer tarafta daha zor, çözülmez LP olmayan
+problemler.
+
+Ama sonradan anlaþýldý ki bazý LP olmayan problemler aslýnda o kadar
+çözülemez deðil. Mesela biraz önceki 1D lasso problemi LP deðil ama
+çözülebiliyor. Ama tabii bazý LP olmayan ve çok çetin problemler de
+var.. Devam eden araþtýrmayla ortaya çýktý ki esas ayrým LP/olmayan deðil,
+dýþbükey / olmayan arasýnda. Çünkü dýþbükey problemler ve olmayan
+problemler çok çok farklý mahlukatlar. Diþbukey problemlerde genel
+algoritmalardan bahsedebiliyoruz, bu algoritmalar bazý þartlarda iyi, kötü
+iþleyebilir ama hepsinin ispatlanabilir yakýnsanabilirliði var. Elimizde
+KKT optimallik þartlarý ve ikizlik gibi teorik araçlar var bu sayede
+dýþbükeylikte elde edilen sonuçlarýn özelliðini anlamamýza yardým ediyor. 
+
+Teoriye giriþ yapalým artýk. 
+
+Dýþbukey Kümeler ve Fonksiyonlar
+
+Dýþbukey küme $C \subseteq \mathbb{R}^n$, öyle ki 
+
+$$
+x,y \in C \Rightarrow tx + (1-t) y \in C, \quad \forall 0 \le t \le 1
+$$
+
+Yani dýþbükey küme $C$ de seceðim herhangi iki nokta arasýnda çekeceðim düz
+çizgi o küme içinde kalmalýdýr [1, 1:00:24]. 
+
+\includegraphics[width=20em]{func_19_intro_04.png}
+
+Üstteki resimde soldaki küme dýþbükey deðil, saðdaki dýþbükey.
+
+Dýþbükey fonksiyon $f: \mathbb{R}^n \to \mathbb{R}$, ki
+$\dom{(f)} \subseteq \mathbb{R}^n$ dýþbükey olacak þekilde, ve 
+
+$$
+f( tx + (1-t) y ) \le t f(x) + (1-t) f(y), \quad 0 \le t \le 1 \textrm{ için.} 
+$$
+
+Üstteki diyor ki dýþbükey fonksiyonun taným kümesi, alaný dýþbükey küme
+olmalý, ki $\mathbb{R}^n$ öyledir, ve bu fonksiyonu herhangi iki noktada
+hesaplayýnca elde ettiðim deðer o iki nokta arasýnda çektiðim düz çizgi
+altýnda kalmalý. 
+
+\includegraphics[width=20em]{func_19_intro_05.png}
+
+Tipik problem 
+
+$$
+\min_{x \in D} f(x), \quad \textrm{öyle ki}
+$$
+$$
+g_i(x) \le 0, \quad i=1,..,m
+$$
+$$
+h_j(x) \le 0, \quad j=1,..,r
+$$
+
+ki $D$ her $f,g,h$ fonksiyonunun ortak taným kümesi. Diþbukey optimizasyon
+probleminde $f,g$ dýþbükey ve $h$ ilgin (affine) olmalýdýr. $f,g$ üzerinden
+gösterilen þartlara uyan deðerler olurlu (feasible) deðerler olarak
+bilinir.
+
+Diþbukey problemler için yerel minimum [1, 1:06:03] global minimumdur. Yani
+tek baþýna diðerlerinden izole bir yerel minima diye bir þey yoktur. Bu
+demektir ki eðer optimizasyon sýrasýnda bir alt noktaya varýrsanýz, bu
+nokta global çözümdür. 
+
+Formel þekilde, bir $x$ noktasý yerel minimumdur, eðer
+
+$$
+f(x) \le f(y) \quad ||x-y||_2 \le \rho \textrm{ ve her olurlu } y \textrm{ icin}
+$$
+
+doðru ise, yani alt noktadayým ve $\rho$ büyüklüðünde bir top içinde olurlu
+deðerler üzerinden etrafa bakýnca $f(x)$'den daha ufak bir deðer
+görmüyorum. 
+
+Diþbukey problemlerde 
+
+$$
+f(x) \le f(y) \textrm{ her olurlu } y \textrm{ icin}
+$$
+
+ifadesi doðrudur, yani $\rho$ sonsuzluktur. Minimuma geldik, ne kadar uzaða
+bakarsak bakalým, sonsuz büyüklükte top içinde her yerde en minimum biziz.
+
+Ýspatlayalým. Bunu çeliþki ile ispat üzerinden yapacaðýz. Diyelim ki
+elimizde olurlu bir nokta $z$ var, yani $\exists z \in D$ ve öyle ki 
+$f(z) < f(x)$. Bu $z$ noktasý $x$'den daha minimal. O zaman $||z-x||_2 >
+\rho$ olmali, yerel optimal $x$'in etrafýndaki $\rho$ topunun dýþýndayým. 
+
+Þimdi $x$ ve $z$ arasýndaki $y$ noktalarýna bakalým, 
+
+$$
+y = tx + (1-t) z, \quad 0 \le t \le 1
+$$
+
+$y$ hakkýnda neler biliyoruz? 
+
+- $y \in D$? $y$ ortak küme içinde mi? $x,y$ küme içinde onlarýn kesiþtiði
+$y$ kümesi tabi ki $D$ içinde. 
+
+- $y$ olurlu mu? Evet. 
+
+$$
+g_i(tx + (1-t) z) \le t g_i(x) + (1-t) g_i(z)
+$$
+
+$$
+\le 0
+$$
+
+Ayrýca, bunu ödev olarak kontrol edin,
+
+$$
+h_i(tx + (1-t) z) = 0
+$$
+
+çünkü $h$ lineer. 
+
+Yani $y$ olurlu, her kýsýtlamaya uygun. 
+
+Ayrýca yeterince büyük (1'e yakýn) $t$ için 
+
+$$
+||x-y||_2 \le \rho
+$$
+
+demek istiyoruz ki $x$'den $z$'ye bir çizgi çekiyorum ve yeterince $z$'ye
+yakýn bir notkada $\rho$ topunun dýþýna çýkmýþ oluyorum. 
+
+\includegraphics[width=20em]{func_19_intro_06.png}
+
+Güzel. Top içinde olurlu bir noktam var, taným kümesi içinde, $y$ de
+orada. $f(y)$ hakkýnda ne söyleyebilirim?
+
+$$
+f( t x + (1-t) z) 
+$$
+
+$f$ dýþbükey deðil mi? O zaman üsttekini dýþbükeylik üzerinden açarsam,
+
+$$
+\le t f(x) + (1-t) f(z) 
+$$
+
+Ve biliyorum ki $f(z) < f(x)$, yani harfiyen küçüklük var, çünkü daha önce
+söylemiþtik, $x$ global minimum deðil, kriterler ýþýðýnda $z$ ondan daha
+iyi. Ayrýca üstte ``yeterince büyük $t$'' dedik, bunun için, topun dýþýna
+çýkýyoruz, $z$'ye yakýnýz ama tam $z$ deðiliz. O zaman üstteki formül
+
+$$
+< f(x)
+$$
+
+olacaktýr. Þimdi çeliþkiye geldik, top içinde öyle bir $y$ noktasý bulduk
+bu nokta harfiyen $f(x)$'den küçük ama bunu yapýnca yerel minimum /
+optimumluk faraziyesini ihlal etmiþ olduk. 
+
+Kaynaklar
+
+[1] Tibshirani, {\em Convex Optimization, Lecture Video 7}, 
+\url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}
+
+\end{document}
+
+
+

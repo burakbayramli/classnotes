@@ -1,0 +1,491 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+GPS, Kullanýcý Yerini Bulmak, GPS Uydularýna Olan Açý, Uzaklýk
+
+Küresel Konumlama Sistemi (Global Positioning System -GPS-) ile dünyada
+nerede olduðumuzu kolay bir þekilde bulabiliyoruz. GPS'in temelinde eldeki
+bir alýcýnýn dünya etrafýnda sürekli dönen uydulara olan mesafesini ölçerek
+bunlara göre bir konumlama yapmasý yatýyor. Eldeki alýcý, ki artýk ucuz bir
+akýllý telefon bile olabiliyor, önce Almanak denen bir bilgiyi (eðer o anda
+elde yoksa) uydudan alýyor. Bu bilgi tüm GPS uydularýnýn kesin yerlerini
+alýcýya söyler. Ardýndan uydu ve alýcý arasýnda sinyallerin alýnýp
+verilmesindeki zaman farkýna bakýlarak olabildiðince detaylý bir mesafe
+bilgisi alýnýr. Eðer en az 4 tane uyduya olan mesafe bu þekilde
+alýnabiliyorsa bir üçgenleme yapýlarak alýcýnýn yeryüzündeki yeri
+saptanabilir. Uydular her biri yeterince büyük bir bölgeye servis edebilsin
+diye çok uzaktaki bir yörüngededirler, dünyaya ortalama mesafeleri 20,000
+kilometre (evet, yirmi bin), kýyasla ISS uzay istasyonu yaklaþýk 200
+km. mesafede.
+
+\includegraphics[width=15em]{sat1.jpg}
+
+Bu yazýda mesafeleri kullanýp nerede olduðumuz konusuna girmeden eðer
+nerede olduðumuz biliniyor olsa uyduya olan yatay açý / azimut (azimuth) ve
+yüksekliði (elevation) nasýl buluruz konusunu iþleyeceðiz.
+
+Azimut nedir? Yeryüzünde duruyoruz, yüzümüzü kuzeye dönelim, bu referans
+duruþu. Eðer mesela azimut 320 derece ise, doðuya doðru o kadar döneriz (ya
+da batýya 360-320 kadar dönebiliriz), ve baþýmýzý yukarý doðru yükseklik
+açýsý kadar kaldýrýrýz, mesela 60 derece yukarý doðru, ki 90 derece tam dik
+yukarý bakýyoruz demektir. Aþaðý yukarý alttaki resimdeki gibi bir durum
+olur,
+
+\includegraphics[width=20em]{azelzen.png}
+
+Üstteki türden bir gösterim kullanýcý merkezlidir. GPS uydularý, hatta
+kullanýcýnýn yerini dünyayý merkez alan, daha net þekilde belirtmek
+gerekirse dünyanýn merkezini merkez alan (orasý orijin sayýlýyor, (0,0,0)
+noktasý) sisteminde almak daha kullanýþlý oluyor.
+
+\includegraphics[width=20em]{eci.jpg}
+
+Bu sisteme ECI sistemi, ya da ECEF kordinatlarý deniyor. Tabii mesela
+kilometre baðlamýnda mesela (1,1,1) noktasý anlamsýz olabilir, dünyanýn
+``içinde'', yerkabuðunun altýnda bir nokta olacaktýr, fakat dünya yüzeyi,
+ve yüzeyden daha üstteki uydular için anlamlý ve kullanýþlý bir
+sistem. Daha önemlisi bu sistem Kartezyen geometrisi kullanmamýza izin
+verecek, ve daha ileride göreceðimiz gibi uzaklýk hesaplarýnda faydalý
+olacak. ECI ve alýcý bazlý kordinat sistemlerini ayný resimde görelim,
+
+\includegraphics[width=25em]{ecef_topo.png}
+
+Hesabýn detaylarý [3]'te bulunabilir. Dünyanýn duruþunun hesabý için yýldýz
+günü (sidereal day) kavramý gerekli. Bilinen gün hesabý güneþin ayný
+boylamdan iki geçiþi arasýndaki zamandýr. Öðlen 12'de güneþ yukarýdadýr,
+güneþin tekrar ayný noktada olduðu zaman bir gün geçmiþ demektir. Fakat
+astronomi hesaplarý için etrafýnda döndüðümüz güneþ deðil, daha uzaktaki
+bir noktayý merkez almak gerekebiliyor, bu daha uzaktaki noktanýn ayný
+boylamýn üzerinden iki geçiþi arasýndaki zaman bir yýldýz günüdür. Normal
+gün ile yýldýz günü arasýnda 4 dakikalýk bir fark var. Yýldýz günü ve
+ayrýca tek reel sayý bazlý tarih kullanabilmek için için Jülyen Tarihi
+kullanýlýr, bu tarih bir referans baþlangýç anýndan mevcut ana olan gün
+sayýsýdýr. Altta bazý ölçümler aldýðýmýz zamaný milisaniye olarak
+kaydettik, onun Jülyen çevrimi alttaki gibi hesaplanýyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import orbital
+from datetime import datetime
+millis = 1493036068479
+dt = datetime.fromtimestamp(millis/1000.0)
+dtj = orbital.jdays(datetime.fromtimestamp(millis/1000.0))
+print dtj
+\end{minted}
+
+\begin{verbatim}
+2457868.09339
+\end{verbatim}
+
+Azimut, yükseklik hesaplarý ölçüm aldýðýmýz an için [1]'den uydularýn
+nerede olduðunu bir dosyaya kaydettik. GPS uydularýnýn PRN kodlarý vardýr,
+örnek seçilen PRN 11,18,16,24,31 uydularýnýn enlem / boylam pozisyonlarý
+altta,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+df = pd.read_csv('Waas_Sv_Status.txt',sep='\s*',index_col=0)
+sats = [11,18,16,24,31]
+df = df.ix[sats]
+print df[['Lat','Long']]
+\end{minted}
+
+\begin{verbatim}
+           Lat        Long
+PRN                       
+11   30.518234 -164.259351
+18    1.027207  -57.092297
+16  -55.533692 -122.123140
+24   45.299193   17.625305
+31   13.344068 -102.581100
+\end{verbatim}
+
+Ölçüm alýnan yerin kordinatlarý altta \verb!lat,lon!  içinde. Þimdi bu
+noktadan bakýlacak olsa (Berlin'deyiz) uydularýn hangi azimut, yükseklikte
+olacaðýnýn hesabýný yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+lon = 13.442383333333332
+lat = 52.483086666666665
+alt = 0
+sat_alt = 20*1000*1000
+print df.apply(lambda x: orbital.get_observer_look(x.Long, \
+               x.Lat, sat_alt, dt, lon, lat, alt),axis=1)
+\end{minted}
+
+\begin{verbatim}
+PRN
+11     (358.005492414, -6.99245765159, 20007166.964)
+18        (254.95693367, 12.52250143, 20004991.9173)
+16    (245.378821316, -64.1703023622, 20012088.4789)
+24     (157.451172143, 82.3085240779, 20000057.3405)
+31    (298.723320912, -4.42938085218, 20006877.4437)
+dtype: object
+\end{verbatim}
+
+[2]'den tüm uydularýn o anda dünya üzerinde nerede olduðuna baktýk,
+
+\includegraphics[width=40em]{waas_sats.png}
+
+Peki bu hesaplarý mesela cep telefonunun aldýðý azimut, yükseklik ile
+karþýlaþtýrsak ne görürüz? 
+
+\includegraphics[width=15em]{gpstest.png}
+
+Telefonun raporladýðý rakamlar uydu ve alýcý pozisyonuna göre deðil, antene
+ve sinyale göre hesaplanýyor, GPS kitlemesi yapýlmadan da bu deðerleri bir
+GPS programýnda [7] görebiliyoruz. 11,31,24 fena durmuyor, fakat 18 tam
+ters yönde çýkmýþ. Telefondaki ölçümlere tam güvenilir diyemeyiz. Zihin
+egzersizi: acaba elde yeteri kadar azimut, yükseklik ölçümü olsa ve uydu
+pozisyonu ile birleþtirince üstteki hesapta geriye doðru giderek bir alýcý
+pozisyonu elde edilebilir mi? Ýstatistiki bir yaklaþým belki bunu
+yapabilir. Ödev olsun!
+
+Tüm kodlar
+
+\inputminted[fontsize=\footnotesize]{python}{orbital.py}
+
+Uzaklýktan Kullanýcý Pozisyonunu Bulmak
+
+Ayný zamanda bir GPS alýcýsý olan akýllý cep telefonlarý GPS uydularýna
+olan mesafeyi hesaplayabilir. Bunu uydudan gönderilen sinyallerin eriþim
+süresini hesaplayarak yaparlar. Uydulardan gelen her sinyal içinde o
+sinyalin gönderilme aný vardýr, alýcý bu zamana bakar, ve kendi elindeki
+saate bakar ve aradaki farký sinyalin hýzý ile çarparak mesafeyi
+bulur. Birden fazla yeri bilinen uyduya olan mesafelerin kesiþme noktasý
+alýcýnýn olduðu yerdir. 
+
+\includegraphics[width=25em]{trilat1.png}
+
+Yanlýz bu hesap yapýlýrken iki potansiyel problem ortaya çýkar. 
+
+Birinci problem alýcýdaki saat yanlýlýk problemi (clock bias). GPS sinyali
+yerine ses dalgasý temelli bir örnek üzerinde bu kavramý anlatalým:
+Denizcilikte sis sireni (foghorn) denen bir þey var, sisli durumlarda
+gemicileri yakýnda tehlikeli kayalar hakkýnda uyarmak için
+kullanýlýr. Þimdi diyelim ki sis sirenini yerimizi bulmak için
+kullanacaðýz. Yine basitleþtirme amaçlý olarak tek boyutlu bir dünya
+düþünelim, bir çizgi üzerindeyiz, bu çizgide ya sola ya da saða
+gidebiliyoruz, sis sireni ise çizginin sýfýr noktasýnda.
+
+\includegraphics[width=25em]{foghorn1.png}
+
+Sis sireninin her gün öðlen 12:00'de çalýndýðýný biliyoruz. Diyelim ki
+saat 12:00:10 (yani 10 saniye sonra) sireni duyduk. Üstteki çizgide
+neredeyiz? Ses hýzý 330 metre / saniye, o zaman 10 saniye sonra 3.3
+kilometre uzaktayýz. 
+
+Fakat bu hesap eðer saatimiz mükemmel bir þekilde siren saati ile
+senkronize ise geçerli. Uzaktan bu senkronizasyon var mý yok mu
+bilemiyoruz, çünkü sireni duyduðumuzda saate baktýk acaba önceden 5 saniye
+geri miydik de 15 saniye sonra gelen sireni acaba 12:00:10'da gördük?  Ya
+da senkronizasyon haricinde belki saatimiz daha yavaþ, ya da daha hýzlý
+iþliyor, ses havada seyahat ederken bu hýzlanma / yavaþlama ölçüme etki
+etti?
+
+Bu problemden kurtulmak için elimizdeki saatin yanlýlýðýný denklemlerde
+direk kullanarak onu da hesaplamak bir çözüm olabilir. Yanlýlýðý
+modelleyebiliyoruz çünkü sis sirenleri birbirleri ile mükemmel þekilde
+senkronize (GPS uydularý için de bu böyle, uydularda birbirleri ile
+senkronize atomik saatler var), ve bizim saatimizde yanlýlýk varsa bu
+yanlýlýk her iki siren için ayný. Yani yanlýþlýk olmasý önemli deðil,
+yanlýþlýk tutarlý ise ondan kurtulabiliriz!
+
+Yanlýlýk ikinci bir bilinmeyen tabii, o zaman ikinci bir ölçüm
+lazým. Diyelim ki birinci sirenden 990 m. saðda olan ikinci bir sirenden
+saat 12:00:09'da bir sinyal aldýk.
+
+\includegraphics[width=25em]{foghorn2.png}
+
+Þimdi nerede olduðumuzu bulabilir miyiz?  Uzaklýk, daha doðrusu içinde
+yanlýlýk ta olduðu için, ``sözde uzaklýk (pseudorange)'' þöyle modellenir,
+
+$$ R_1' = v_{ses} (\Delta t_1 + \tau ) = x + v_{ses}\tau = 3300 $$
+
+$$ R_2' = v_{ses} (\Delta t_2 + \tau ) = 990 - x + \tau = 2970$$
+
+ki $\Delta t_1, \Delta t_2$ geçen zaman, $\tau$ yanlýlýk, $v_{ses}$ ses
+hýzý. Tekrar düzenlersek, 
+
+$$ x + v_{ses} \tau = 3300$$
+
+$$ x - v_{ses} \tau = -1980  $$
+
+Çözersek, 
+
+$$ \tau = 8 \textrm{ saniye} \quad x = 660 \textrm{ metre}$$
+
+Yanlýlýk hesabý böyle. Þimdi ikinci probleme gelelim. Bu problem kesiþme
+hesabý sýrasýnda ortaya çýkýyor. Yanlýlýk doðru modellense bile diðer pek
+çok sebepten dolayý uzaklýk hesabýnda eksikler olabilir. O zaman mükemmel
+kesiþme yerine alttaki gibi durum ortaya çýkabilir,
+
+\includegraphics[width=25em]{trilat2.png}
+
+1. uydu uzaklýðý normalden kýsa, 2. ve 3. uzun gelmiþ. Acaba bu
+uzaklýklarýn gürültülü bir ortamda olsak bile kesiþtiði yeri yaklaþýk bir
+þekilde bulamaz mýyýz? Hatta sistemi öyle kuralým ki ne kadar çok uydu
+ölçümü eklersek ölçüm o kadar ilerlesin, yani bir tür istatistiksel en az
+kareler (least squares) çözümü arýyoruz.
+
+Fakat yine bir problem var, alýcý $x,y,z$ pozisyonu ve uydu $i$ arasýndaki
+sözde mesafe, $P^i$ diyelim, gayrý-lineer bir hesap.
+
+$$ 
+P^i = \sqrt{ \big( (x^i-x)^2 + (y^i-y)^2 + (z^i-z)^2  \big) } + \tau
+$$
+
+Hesapta kareler, onlarýn toplamý, karekök iþlemi var. Üstteki denklemi, ve
+bu denklemi kullanacaðýmýz denklem sistemini bir þekilde lineerleþtirmemiz
+lazým.
+
+Her sözde uzaklýk ölçümünü üstteki model artý gürültü olarak gösterelim,
+
+$$ P_{\textrm{gözlem}} = p_{model} + \textrm{gürültü} $$
+
+$$ = P(x,y,z,\tau) + v $$
+
+Þimdi model üzerinde çok boyutlu Taylor açýlýmý uygulayalým, 
+
+$$ 
+P(x,y,z,\tau) = P(x_0,y_0,z_0,\tau_0) + 
+(x-x_0)\frac{\partial P}{\partial x} + 
+(y-y_0)\frac{\partial P}{\partial y} + 
+(z-z_0)\frac{\partial P}{\partial z} + 
+(\tau-\tau_0)\frac{\partial P}{\partial \tau}  + ...
+$$
+
+Bu açýlýmda noktalý yerlerde daha yüksek üstelli terimler var, onlarý
+atalým, geri kalanlar lineer terimler, ve atýlan terimler sebebiyle açýlým
+yaklaþýksal olacak doðal olarak. Taylor açýlýmýný $x_0,y_0,z_0,\tau_0$
+noktasý ``etrafýnda'' yaptýk, þimdi $ P(x_0,y_0,z_0,\tau_0)$'e $P_{hesap}$
+diyelim, bunun sebebini birazdan göreceðiz, ve tüm denklem þu hale gelir,
+
+$$ 
+= P_{hesap} + \frac{\partial P}{\partial x} \Delta x + 
+\frac{\partial P}{\partial y} \Delta y + 
+\frac{\partial P}{\partial z} \Delta z + 
+\frac{\partial P}{\partial \tau} \Delta \tau 
+$$
+
+Þimdi
+
+$$ \Delta P \equiv P_{\textrm{gözlem}} - P_{hesap} $$
+
+diyelim, ve
+
+$$ 
+= \frac{\partial P}{\partial x} \Delta x + 
+\frac{\partial P}{\partial y} \Delta y + 
+\frac{\partial P}{\partial z} \Delta z + 
+\frac{\partial P}{\partial \tau} \Delta \tau 
++ v
+$$
+
+Matris formunda yazarsak, 
+
+$$ 
+\Delta P = \left[\begin{array}{cccc}
+\dfrac{\partial P}{\partial x} \Delta x & 
+\dfrac{\partial P}{\partial y} \Delta y & 
+\dfrac{\partial P}{\partial z} \Delta z & 
+\dfrac{\partial P}{\partial \tau} \Delta \tau
+\end{array}\right]
+\left[\begin{array}{c}
+\Delta x \\ \Delta y \\ \Delta z \\ \Delta \tau 
+\end{array}\right] + v
+$$
+
+Üstteki tek bir ölçüm için. Her uydudan gelen ölçüm matriste yeni bir satýr
+oluþturur, $m$ tane ölçüm için,
+
+$$ 
+\begin{bmatrix}
+\Delta P^1 \\[1ex]
+\Delta P^2 \\[1ex] 
+\Delta P^3 \\[1ex] 
+\vdots \\[1ex]
+\Delta P^m 
+\end{bmatrix}
+= 
+\begin{bmatrix}
+\dfrac{\partial P^1}{\partial x} & 
+\dfrac{\partial P^1}{\partial y} & 
+\dfrac{\partial P^1}{\partial z} & 
+\dfrac{\partial P^1}{\partial \tau}
+\\[2ex]
+\dfrac{\partial P^2}{\partial x} & 
+\dfrac{\partial P^2}{\partial y} & 
+\dfrac{\partial P^2}{\partial z} & 
+\dfrac{\partial P^2}{\partial \tau}
+\\[2ex]
+\dfrac{\partial P^3}{\partial x} & 
+\dfrac{\partial P^3}{\partial y} & 
+\dfrac{\partial P^3}{\partial z} & 
+\dfrac{\partial P^3}{\partial \tau} 
+\\[2ex]
+\vdots & \vdots & \vdots & \vdots \\[2ex]
+\dfrac{\partial P^m}{\partial x} & 
+\dfrac{\partial P^m}{\partial y} & 
+\dfrac{\partial P^m}{\partial z} & 
+\dfrac{\partial P^m}{\partial \tau} 
+\end{bmatrix} 
+\begin{bmatrix}
+\Delta x \\[1ex]
+\Delta y \\[1ex] 
+\Delta z \\[1ex] 
+\Delta \tau
+\end{bmatrix} + 
+\begin{bmatrix}
+v_1 \\[1ex]
+v_2 \\[1ex] 
+v_2 \\[1ex] 
+\vdots \\[1ex] 
+v_m
+\end{bmatrix}
+$$
+
+Bu sistemi bir $b = Ax + v$ lineer sistemi olarak görebiliriz, ki en az
+kareler yöntemi sistemi çözer. $A$ matrisinin içeriði için kýsmi türevlerin
+alýnmasý lazým, bu türevler, mesela $P^1$ ve $x$ için 
+
+$$ 
+\frac{\partial P^1}{\partial x} = 
+\frac{x^1-x}{\sqrt{ \big( (x^1-x)^2 + (y^1-y)^2 + (z^1-z)^2  \big) }} = \frac{x^1-x}{\rho}
+$$
+
+Tüm ölçümler ve deðiþkenler için yapalým,
+
+$$ 
+A = \left[\begin{array}{cccc}
+\dfrac{x^1 - x}{\rho} & \dfrac{y^1 - y}{\rho} & \dfrac{z^1 - z}{\rho} & 1 \\
+\dfrac{x^2 - x}{\rho} & \dfrac{y^2 - y}{\rho} & \dfrac{z^2 - z}{\rho} & 1 \\
+\dfrac{x^3 - x}{\rho} & \dfrac{y^3 - y}{\rho} & \dfrac{z^3 - z}{\rho} & 1 \\
+\vdots & \vdots & \vdots & \vdots \\
+\dfrac{x^m - x}{\rho} & \dfrac{y^m - y}{\rho} & \dfrac{z^m - z}{\rho} & 1 
+\end{array}\right]
+$$
+
+Böylece bir $b = Ax + v$ sistemi elde ettik, $\Delta$ deðiþkenleri
+bilinmeyen, $A$'yý üstte kurduk, standart en az kareler uygulayýnca $v$'yi
+minimize eden bilinmeyenler bulunacaktýr.
+
+Þimdi çözülenin ne olduðuna dikkat, çözümler $\Delta$ deðiþkenleri, yani
+$x_0,y_0,z_0,\tau_0$ noktasý ile olan {\em fark}. Þimdi, bir de Taylor
+açýlýmlarýnýn püf noktasýný hatýrlayalým, bu açýlýmlar açýlým noktasý
+etrafýnda, yakýnýnda geçerlidir. O zaman nihai çözüme bir döngü içinde
+eriþmek gerekecek, yavaþ yavaþ, bir önceki çözüme ekleye ekleye. Herhangi
+bir baþlangýç noktasý mesela dünyanýn merkezi ve sýfýr yanlýlýk
+$x_0,y_0,z_0,\tau_0 = (0,0,0,0)$ ile baþlarýz, $\Delta$'larý hesaplarýz, ve
+baþlangýca ekleriz, bunlar yeni ``baþlangýç'' noktasý olur, hesabý
+tekrarlarýz, ve farklar çok ufak oluncaya kadar (çözüme yaklaþtýk) bunu
+tekrar ederiz.
+
+Baþlangýç noktasýný referans alýp ekleme yaparak hesabýn bir ek faydasý
+var; mesela cep telefonu ile yürüme durumunda bir yeri hesapladýktan /
+kitledikten sonra bir sonraki yer hesabý için tekrar dünya merkezini
+baþlangýç almamýza gerek yok, en son kitlenen yeri baþlangýç kabul ederiz,
+ve büyük ihtimalle tek bir ek hesap ile yeni konumu hesaplayabiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import matplotlib.pyplot as plt
+import scipy.linalg as lin
+
+xtrue = [3507884.948, 780492.718, 5251780.403, 0]
+
+xxyyzz = [[16577402.072, 5640460.750, 20151933.185],
+	  [11793840.229, -10611621.371, 21372809.480],
+	  [20141014.004, -17040472.264, 2512131.115],
+	  [22622494.101, -4288365.463, 13137555.567],
+	  [12867750.433, 15820032.908, 16952442.746],
+	  [-3189257.131, -17447568.373, 20051400.790],
+	  [-7437756.358, 13957664.984, 21692377.935]]
+
+xxyyzz = np.array(xxyyzz)
+
+pseudorange = np.array([20432524.0, 21434024.4, 24556171.0, 
+                        21315100.2, 21255217.0, 24441547.2, 23768678.3])
+
+\end{minted}
+
+Üstte örnek ölçümler görüyoruz. [6]'daki araþtýrmacý Danimarka'da bir ölçüm
+merkezinde GPS aletinden 7 tane GPS uydusuna olan sözde uzaklýðý ve bu
+uydularýn o anki yerlerini kaydetmiþ, bu kiþi acaba nerededir? Tarif edilen
+yaklaþým ile hesaplayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+xx = xxyyzz[:,0]
+yy = xxyyzz[:,1]
+zz = xxyyzz[:,2]
+x = [0, 0, 0, 0]
+A = np.ones((len(xxyyzz),4))
+for iter in range(20):
+    rng = np.sqrt((x[0]-xx)**2+(x[1]-yy)**2+(x[2]-zz)**2);
+    F = rng + x[3]
+    irange = 1/rng;
+    A[:,0] = irange*(x[0]-xx)
+    A[:,1] = irange*(x[1]-yy);
+    A[:,2] = irange*(x[2]-zz);
+    c = np.dot(A.T,pseudorange-F)
+    N = np.dot(A.T,A)
+    deltahat = lin.solve(N,c)
+    x = x+deltahat
+    if np.max(np.abs(deltahat))<0.001: break
+
+print 'iter', iter
+print np.reshape(x, (4,1))
+\end{minted}
+
+\begin{verbatim}
+iter 4
+[[ 3507889.12958827]
+ [  780490.02116445]
+ [ 5251783.75537277]
+ [   25511.14592576]]
+\end{verbatim}
+
+Döngü beþ kez tekrarladý ama dünya merkezinden baþlamýþ olmamýza raðmen
+sonuca çabukça eriþti. ECEF sisteminden enlem / boylam çevirimini yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import orbital
+print orbital.ecef2lla(x)
+\end{minted}
+
+\begin{verbatim}
+(55.796250049381591, 12.543735075055356, 73.165498103015125)
+\end{verbatim}
+
+Bu kordinatlarý bir harita uygulamasýndan kontrol ettik; yazar Danimarka'da
+teknik üniversite yakýnlarýnda imiþ. Zaten [6] gerçek yerini de paylaþmýþ,
+üstteki çözüme çok yakýn. Sistem iþliyor demektir.
+
+\includegraphics[width=20em]{denmark.jpg}
+
+GPS uydu uzaklýklarýný baz alarak konum hesabý niye faydalý? Cep
+telefonlarý zaten enlem / boylam raporlamýyor mu? Bu doðru, fakat farklý
+mobil uygulamalarý farklý þekilde bu hesabý yapmayý, hýzlandýrmayý
+seçebilirler. Bu ihtiyaçtan dolayý olmalý Android iþletim sistemi
+tasarlayýcýlarý 7.0 (Nougat), API 24'ten itibaren ham uzaklýk verisini bir
+arayüz ile geliþtiricilere açmaya karar verdi.
+
+Kaynaklar 
+
+[1] Federal Aviation Administration, {\em Uydu Pozisyonlarý}, \url{http://www.nstb.tc.faa.gov/incoming/Waas_Sv_Status.txt}
+
+[2] Federal Aviation Administration, {\em WAAS Satellite Status}, \url{http://www.nstb.tc.faa.gov/RT_WaasSatelliteStatus.htm}
+
+[3] Kelso, {\em Orbital Coordinate Systems, Part II}, \url{http://celestrak.com/columns/v02n02/}
+
+[4] Raspaud, {\em PyOrbital}, \url{https://github.com/pytroll/pyorbital}
+
+[5] Blewitt, {\em Basics of the GPS Technique: Observation Equations},  \url{http://www.nbmg.unr.edu/staff/pdfs/Blewitt%20Basics%20of%20gps.pdf}
+
+[6] Nielsen, {\em Least Squares Adjustment: Linear and Nonlinear Weighted Regression Analysis}, \url{http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/2804/pdf/imm2804.pdf}
+
+[7] Chartcross Limited, {\em GPS Test}, \url{https://play.google.com/store/apps/details?id=com.chartcross.gpstest}
+
+[8] Raquet, {\em Calculation of GPS PNT Solution}, \url{http://indico.ictp.it/event/a12180/session/21/contribution/12/material/0/0.pdf}
+
+\end{document}
+
+

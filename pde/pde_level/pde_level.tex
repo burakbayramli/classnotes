@@ -1,0 +1,385 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Kesit Seviyeleri, Kenar Bazlý Ýmaj Gruplamak
+
+Bir dijital imajý renklere, objelere göre belli parçalara bölmek
+(segmentation) için, matematiksel bir formül kullanmak iyi çözümlerden
+biridir. Bunu yapmanýn bazý yollarý var. Basitleþtirerek bir örnek
+verelim: diyelim ki gruplama için elimizdeki formül bir yuvarlak
+formülü $x^2+y^2 - c = 0$, ki $c$ bir sabit. Bu formülü x ve y
+kordinatlarý üzerinde bastýðýmýz zaman radius'u $\sqrt{c}$ olan bir
+çember elde ederiz. Gruplama için bu çemberi büyütüp
+küçültebildiðimizi farzedelim, çember imaj üzerindeki istediðimiz
+bölüme en iyi uyduðu anda gruplamayý baþarýlý olarak kabul ediyoruz.
+
+Fakat problem þurada: eðer imajda birden fazla grup var ise, o zaman
+birden fazla çember gerekecektir, bu sefer algoritmik olarak üstteki
+formülü ikinci, üçüncü kere yaratmamýz, ve o formüllerin o gruplara
+uyumunu ayrý ayrý takip etmemiz gerekirdi. Ya da diyelim ki özyineli
+(iterative) bir uydurma iþlemi takip ediyoruz, bu iþlem sýrasýnda
+belki iki çemberin birleþmesi gerekse, o zaman iki formülü silip,
+yerine yenisini oluþturmakla uðraþmak gerekli olacaktý. Bunlar hem
+matematiksel, hem kodlama açýsýndan külfet oluþturacaktýr.
+
+Kesit Seviyeleri kavramýný kullanarak bu iþi daha
+basitleþtirebiliriz. Diyelim ki bölme görevini yapan $\phi$ adli
+fonksiyonumuzu 2 boyutlu olmak yerine 3 boyutlu eksende tanýmladýk,
+ve, 2 boyutta bölme yapma görevini onun bir kesitine verdik. Kesit
+derken, alttaki üç boyutlu fonksiyonu yatay olarak bir noktadan
+``kestiðimizi'' farz ediyoruz, ve o kesit üzerinde düþen $\phi$
+deðerlerine bakýyoruz.
+
+Bakýç açýþýmýzý, tanýmlamamýzý deðiþtirerek, bazý avantajlar elde
+etmeyi umuyoruz aslýnda. Altta iki tane $\phi$ fonksiyonu ve onlarýn
+altýnda kesitlerini görebiliriz.
+
+
+Kesit Seviyeleri tekniðini kullanarak elde ettiðimiz avantaj nedir?
+Artýk sadece \textbf{tek} bir $\phi$ fonksiyonu kullanarak 2 boyutlu
+imajýmýz üzerinde birbirinden ayrý gruplamalar yaratabiliyoruz. Bu
+gruplar birbiri ile birleþebilir, ayrýlabilir, bu artýk bizi
+ilgilendirmiyor. Biz sadece 3. boyuttaki $\phi$ fonksiyonunu
+deðiþtirmekle uðraþacaðýz, imaj üzerindeki gruplamalar ise o
+fonksiyonun 2. boyuta yansýmasý (projection) üzerinden kendiliðinden
+gerçekleþecekler.
+
+Matematiksel olarak $\phi$ fonksiyonunu nasýl temsil ederiz? $\phi$
+fonksiyonu $x$, $y$, boyutlarýný alýp bize bir üçüncü $z$ boyutu
+döndürmeli, ayrýca bu fonksiyonu imajý parçalarýna ayýrma iþlemini
+gerçekleþtirmek için kademeli olarak deðiþtirmeyi planladýðýmýza göre,
+o zaman bir $t$ deðiþkeni de gerekiyor. Yani $\phi(x,y,t)$
+fonksiyonu. Gruplama için kullanýlacak kesiti ise sýfýr kesiti olarak
+alalým, yani $\phi(x,y,t) = 0$. Doðal olarak
+
+$$ \frac{d}{dt}(\phi(x,y,t) = 0) = 0 $$
+
+Þimdi $x$, ve $y$ deðiþkenlerinin zaman göre deðiþimini formüle bir
+þekilde dahil etmek lazým. Bunun için sýfýr kesit seviyesi üzerinde
+bir parçacýk hayal edilir, ve bu parçacýðýn gittiði yol $x(t)$, ve
+$y(t)$ olarak tanýmlanýr. O zaman
+
+$$ \frac{d}{dt}(\phi(x(t),y(t),t)) = 0 $$
+
+Tam diferansiyel formülünden hareketle:
+
+$$ 
+d(\phi(x(t),y(t),t) = 
+\frac{\partial \phi}{\partial x}dx + 
+\frac{\partial \phi}{\partial y}dy + 
+\frac{\partial \phi}{\partial t}dt  = 0
+ $$
+
+$$ 
+\frac{d(\phi(x(t),y(t),t))}{dt} = 
+\frac{\partial \phi}{\partial x}\frac{dx}{dt} + 
+\frac{\partial \phi}{\partial y}\frac{dy}{dt} + 
+\frac{\partial \phi}{\partial t} = 0
+ $$
+
+$$
+ = 
+\frac{\partial \phi}{\partial x}\frac{dx}{dt} + 
+\frac{\partial \phi}{\partial y}\frac{dy}{dt} + 
+\phi_t = 0
+\mlabel{1}
+$$
+
+Temsilen daha kýsa bir iþaret kullanmak gerekirse, $\bigtriangledown$
+ile $\phi$'nin gradyanýný (gradient) alarak, elde edilecek vektörün
+nokta çarpýmýný kullanabiliriz.  O zaman formül (1) daha kýsa
+olarak:
+
+$$ \phi_t + \bigtriangledown \phi \cdot \vec{V} = 0 $$
+
+olarak temsil edilebilir, ki
+
+$$ \bigtriangledown \phi = \bigg(
+\frac{\partial \phi}{\partial x},
+\frac{\partial \phi}{\partial y} \bigg)
+ $$
+
+$$ \vec{V} = \bigg(
+\frac{dx}{dt} ,
+\frac{dy}{dt} \bigg)
+ $$
+
+Ýki vektörün nokta çarpýmý bilindiði gibi sýrayla her iki vektörün
+sýrasýyla uyan elemanlarýnýn birbirleri ile çarpýlmasý ve o
+çarpýmlarýn toplanmasýdýr.
+
+$\vec{V}$ vektörü neyi temsil eder? Formüle göre bu vektör $\phi$'nin
+üzerindeki deðiþimi etkiliyor, ve bu deðiþimler $t$'nin deðiþimine
+göre tanýmlandýðýna göre bu deðerler ``hýz'' olarak
+tanýmlanabilir. Ýmaj baðlamýnda düþünürsek mesela $\phi$ renklerin
+ayný olduðu yerlerde yüksek hýzda, renklerin deðiþtiði yerler düþük
+hýzda deðiþebilir þeklinde bir kurgu yapýlabilir, iþte bu bölgelerde
+deðiþiminin hýzýný $\vec{V}$ ile gösterebiliriz.
+
+$\vec{V}$ yerine kesit seviyelerine dik olan (normal) vektörler ile çalýþmak
+isteseydik, $\vec{V}$'yi dik ve teðet bileþenlerine ayýrarak tekrar temsil
+edebilirdik: $\vec{V} = V_N\vec{N} + V_T\vec{T}$. Bu formülde $\vec{T}$ teðet,
+$\vec{N}$ dik vektörler, $V_N$ ve $V_T$ skalar. Yerine koyalým:
+
+$$ \phi_t + \bigtriangledown \phi \cdot (V_N\vec{N} + V_T\vec{T}) = 0 $$
+
+$\phi$'ye göre dik vektörün diðer bir formülü $\vec{N} =
+\frac{\bigtriangledown\phi}{|\bigtriangledown\phi|}$ olduðuna göre
+
+$$ \phi_t + (\bigtriangledown \phi \cdot
+V_N\frac{\bigtriangledown\phi}{|\bigtriangledown\phi|} + \bigtriangledown
+\phi \cdot V_T\vec{T}) = 0 $$
+
+Devam edelim: $\bigtriangledown \phi$ yüzeye dik olduðuna göre, bu dik vektörün
+teðet olan $\vec{T}$ ile noktasal çarpýmý sýfýr deðerini verecektir, o çarpým
+formülden atýlabilir. Kalanlar:
+
+$$ \phi_t + (\bigtriangledown \phi \cdot 
+V_N\frac{\bigtriangledown\phi}{|\bigtriangledown\phi|}) = 0 $$
+
+Daha da kýsaltabiliriz: $\bigtriangledown \phi \cdot \bigtriangledown \phi
+= |\bigtriangledown \phi|^2$ olduðunu biliyoruz, gradyanýn kendisi ile
+noktasal çarpýmý, o gradyan vektörünün uzunluðunun karesidir. Daha genel
+olarak, bir vektörün uzunluðu, o vektörün kendisi ile noktasal çarpýmýnýn
+kareköküdür. O zaman en son formülde bu çarpýmý gerçekleþtirip, uzunluk
+olarak yazalým:
+
+$$ \phi_t + V_N\frac{|\bigtriangledown\phi|^2}{|\bigtriangledown\phi|} = 0  $$
+
+$$ \phi_t + V_N |\bigtriangledown\phi| = 0  $$
+
+Þimdi bu formül hakkýnda biraz anlayýþ geliþtirelim. Eðer elimizdeki
+bir $\phi$ seviye kesitinin þeklen olduðu gibi kalmasýný ama sadece
+küçülmesini isteseydik, $\phi$'nin normalinin tersi yönünde bir büyüme
+tanýmlamamýz gerekirdi. Normal vektör dýþa doðru iþaret ettiðine göre
+üstteki formülde mesela $V_N = -1$ tanýmlayabilirdik. O zaman
+
+$$ \phi_t + -1 |\bigtriangledown\phi| = 0 $$
+
+$$ \phi_t = |\bigtriangledown\phi|   $$
+
+Hesapsal olarak bunu nasýl gerçekleþtiririz? 80 x 80 boyutunda bir
+matris içinde $\phi$ fonksiyonu ayrýksal olarak tutalým. Yani 80 tane
+x, 80 tane ayrý y deðeri var, her x ve y deðerlerin kombinasyonlarýna
+tekabül eden $\phi$ deðerleri bu matris içinde. Gradyanýn ne olduðunu
+hatýrlayalým. Gradyan
+
+$$ 
+\bigtriangledown \phi = \bigg(
+\frac{\partial \phi}{\partial x},
+\frac{\partial \phi}{\partial y} \bigg)
+$$
+
+olarak tanýmlýdýr, ve her $(x_i,y_i)$ noktasýndaki $\phi(x_i,y_i)$
+deðerine göre deðiþik bir vektör sonucunu getirecektir. Bilgisayar
+dünyasýnda parçalý türevler hesapsal ``farklýlýklara'' dönüþürler,
+\verb!phi! matrisindeki farklýlýklarý Python ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+gradPhiY, gradPhiX = np.gradient(phi)
+\end{minted}
+
+olarak hesaplayabiliriz. Üstte elimize geçen gradyan dizinlerindeki
+deðerler ile $|\bigtriangledown\phi|$ büyüklüðünü hesaplayabiliriz, ve bu
+sonucu $\phi$ üzerindeki deðiþim oraný $\phi_t$ olarak kabul ederiz. O
+zaman $\phi_t$ ile zaman $t$ deðimi \verb!dt! çarptýðýmýz zaman ele geçecek
+olan $\phi$'nin deðiþimidir. Döngünün her basamaðýnda eski \verb!phi!
+deðerlerine bu farklarý eklediðimiz zaman $\phi$ fonksiyonu istediðimiz
+gibi evrilecektir.
+
+Alttaki kodda bizim baþlangýç $\phi$'miz kenarlardan w uzaklýðýnda içi boþ
+bir kutu olacak. 
+
+Ortalama Eðim (Mean Curvature) Kullanmak
+
+Eðer sabit hýz yerine sýfýr kesit seviyesinin herhangi bir noktada ne kadar
+``eðri'' olduðuna göre ilerlemesini iþletseydik ne olurdu?  Diyelim ki çok
+eðri bölgelerde çok hýzlý, az eðik (düz, düze yakýn) bölgelerde ilerleme az
+hýz istiyoruz. O zaman hangi þekille baþlarsa baþlasýndalar $\phi$ kesiti
+sonuçta bir çember þekline doðru evrilecektir. Ortalama eðim (mean
+curvature) hesabý için þu denklem kullanýlýr:
+
+$$ \kappa = -div \bigg( \frac{\bigtriangledown \phi}
+{|\bigtriangledown \phi| } \bigg) $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+
+def plot_phi(phi):
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    x = []
+    y = []
+    for (i,j),val in np.ndenumerate(phi):
+        x.append(i)
+        y.append(j)
+    ax.plot(xs=x, ys=y, zs=phi.flatten(), 
+            zdir='z', label='ys=0, zdir=z')
+
+f, ax = plt.subplots()
+
+# initial function phi - level set is a square 4 pixels
+# away from borders on each side, in 3D it looks like an empty
+# box
+c0=2; w=2
+nrow, ncol= (30,30)
+phi=c0*np.ones((nrow,ncol))
+phi[w+1:-w-1, w+1:-w-1]=-c0
+
+dt=1.
+
+phiOld=np.zeros((nrow,ncol))
+
+iter=0
+
+while iter < 50:
+    # gradient of phi
+    gradPhiY, gradPhiX = np.gradient(phi)
+    # magnitude of gradient of phi
+    absGradPhi=np.sqrt(gradPhiX**2+gradPhiY**2)                               
+    
+    # normalized gradient of phi - eliminating singularities
+    normGradPhiX=gradPhiX/(absGradPhi+(absGradPhi==0))
+    normGradPhiY=gradPhiY/(absGradPhi+(absGradPhi==0))
+    
+    divYnormGradPhiX, divXnormGradPhiX=np.gradient(normGradPhiX)
+    divYnormGradPhiY, divXnormGradPhiY=np.gradient(normGradPhiY)
+                           
+    # curvature is the divergence of normalized gradient of phi
+    K = divXnormGradPhiX + divYnormGradPhiY
+    dPhiBydT = K * absGradPhi # makes everything circle
+    
+    # level set evolution equation    
+    phi = phi + ( dt * dPhiBydT )
+    if iter % 10 == 0: 
+        CS = plt.contour(phi,0,colors='r')
+        plt.hold(False)
+        plt.savefig('level_1_'+ str(iter) + '.png')
+        #plot_phi(phi)
+        plt.savefig('phi_1_'+ str(iter) + '.png')
+    iter += 1
+\end{minted}
+
+\includegraphics[height=4cm]{level_1_0.png}
+\includegraphics[height=4cm]{level_1_10.png}
+\includegraphics[height=4cm]{level_1_20.png}
+\includegraphics[height=4cm]{level_1_30.png}
+\includegraphics[height=4cm]{level_1_40.png}
+
+Ýmaj Gruplamak
+
+Ýmajý bölümlere ayýrmak için (segmentation) birkaç faktörün bileþimi
+kullanýlýyor. Köþeleri kullanan aktif kontur (edge based active contour)
+yönteminde ortalama eðim ve imajýn piksel deðerlerinin farklýlýklarý (image
+gradient) ayný anda kullanýlýr. Yani kesit seviyesini ilerletirken hýzý hem
+eðime oranlýyoruz, hem de imaj piksel renk deðerleri arasýndaki farka ters
+oranda hýzlandýrýyor, ya da yavaþlatýyoruz. Böylece kesit seviyemiz renk
+farklýlýðý çok olmayan yani büyük bir ihtimalle tek bir objeye ait bir
+bölgede hýzla ilerliyor, büyük renk farkýnýn olduðu büyük bir ihtimalle bir
+kenar noktasýna gelince ise yavaþlýyor. O sýrada kesit seviyesinin geri
+kalan taraflarý tabii ki baþka hýzlarda hareket ediyor olabilirler, zaten
+iþin püf noktasý burada, sonunda resim bölgelere ayrýlmýþ oluyor.
+
+Bitirirken önemli gözlemi vurgulayalým. Problemi matematiksel olarak temsil
+ederken, hedefe doðru türetirken sürekli (continous) alemde, sürekli,
+kesintisiz fonksiyonlarla iþ yapýyoruz. Hesaplama aný gelince sürekli
+fonksiyonlarý ayrýksal (discrete) hale çeviriyoruz, iþte uygulamalý
+matematiðin hesapsal kýsmý burada devreye giriyor. Fakat diferansiyel
+denklemler, fonksiyonlar, türevler gibi sürekli matematiðin kavramlarý çok
+önemli, bunlar olmasa problemi soyut bir þekilde temsil edemez, ve
+basitleþtiremezdik. Temel matematiðin kavramlarýný kullanýrken yüzyýllarýn
+matematiksel bilgisi devreye girebiliyor, matematiðin en yoðun þekilde
+kullanýldýðý fizikten bol bol teknik alýnabilir. Yani söylemek istediðimiz
+problemi çözmek için hemen kodlamaya baþlamýyoruz, düþünsel eylemin önemli
+bir kýsmý matematiksel formüllerle (belki kalem kaðýtla) yapýlýyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.signal as signal
+import scipy.ndimage as image
+import time
+
+def gauss_kern():
+    """ Returns a normalized 2D gauss kernel array for convolutions """
+    h1 = 8
+    h2 = 8
+    x, y = np.mgrid[0:h2, 0:h1]
+    x = x-h2/2
+    y = y-h1/2
+    sigma = 10.0
+    g = np.exp( -( x**2 + y**2 ) / (2*sigma**2) );
+    return g / g.sum()
+
+Img = plt.imread("twoObj.bmp")
+Img = Img[::-1] 
+g = gauss_kern()
+Img_smooth = signal.convolve(Img,g,mode='same')
+Iy,Ix=np.gradient(Img_smooth)
+absGradI=np.sqrt(Ix**2+Iy**2);
+rows, cols = Img.shape
+
+# initial function phi - level set is a square 4 pixels
+# away from borders on each side, in 3D it looks like an empty
+# box
+c0=4
+w=4
+nrow, ncol=Img.shape
+phi=c0*np.ones((nrow,ncol))
+phi[w+1:-w-1, w+1:-w-1]=-c0
+
+# edge-stopping function
+g = 1 / (1+absGradI**2)
+
+# gradient of edge-stopping function
+gy,gx = np.gradient(g)
+
+# gradient descent step size
+dt=1
+
+# number of iterations after which we reinitialize the surface
+num_reinit=10
+
+phiOld=np.zeros((rows,cols))
+
+# number of iterations after which we reinitialize the surface
+iter=0
+
+while iter<150:
+    # gradient of phi
+    gradPhiY, gradPhiX = np.gradient(phi)    
+    # magnitude of gradient of phi
+    absGradPhi=np.sqrt(gradPhiX**2+gradPhiY**2)
+    # normalized gradient of phi - eliminating singularities
+    normGradPhiX=gradPhiX/(absGradPhi+(absGradPhi==0))
+    normGradPhiY=gradPhiY/(absGradPhi+(absGradPhi==0))
+    
+    divYnormGradPhiX, divXnormGradPhiX=np.gradient(normGradPhiX)
+    divYnormGradPhiY, divXnormGradPhiY=np.gradient(normGradPhiY)
+                           
+    # curvature is the divergence of normalized gradient of phi
+    K = divXnormGradPhiX + divYnormGradPhiY
+    tmp1 = g * K * absGradPhi
+    tmp2 = g * absGradPhi
+    tmp3 = gx * gradPhiX + gy*gradPhiY
+    dPhiBydT =tmp1 + tmp2 + tmp3    
+    
+    phiOld=phi
+    # level set evolution equation    
+    phi = phi + ( dt * dPhiBydT )
+    iter=iter+1
+    if np.mod(iter,20)==0:
+        f=plt.figure()
+        plt.imshow(Img, cmap='gray')
+        CS = plt.contour(phi,0, colors='r') 
+        plt.savefig('level_2_' + str(iter) + '.png')
+\end{minted}
+
+\includegraphics[height=4cm]{level_2_20.png}
+\includegraphics[height=4cm]{level_2_40.png}
+\includegraphics[height=4cm]{level_2_60.png}
+\includegraphics[height=4cm]{level_2_80.png}
+\includegraphics[height=4cm]{level_2_100.png}
+\includegraphics[height=4cm]{level_2_120.png}
+\includegraphics[height=4cm]{level_2_140.png}
+
+
+\end{document}

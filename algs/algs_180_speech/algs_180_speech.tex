@@ -1,0 +1,238 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Konuþma Tanýma (Speech Recognition)
+
+Frekans Üzerinden Özellik Çýkartýmý, RNN, LSTM, GRU
+
+1 saniyelik ses dosyalarý var, bu dosyalardaki ses kayýtlarý dört farklý
+komutu içeriyor, Ýngilizce up, down, yes, no (yukarý, aþaðý, evet, hayýr)
+komutlarý. Ses kayýtlarý aslýnda zaman serileridir, tek boyutlu bir veri,
+mesela 1 saniyelik 16,000 sayý içeren bir vektör. Örnek bir 'down' kaydýnýn
+neye benzediðini görelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import util
+import scipy.io.wavfile, zipfile
+import io, time, os, random, re
+
+f = util.train_dir + '/down/004ae714_nohash_0.wav'
+wav = io.BytesIO(open(f).read())
+v = scipy.io.wavfile.read(wav)
+print v[1]
+plt.plot(v[1])
+plt.savefig('speech_01.png')
+\end{minted}
+
+\begin{verbatim}
+train 8537 val 949
+[-130 -135 -131 ..., -154 -190 -224]
+\end{verbatim}
+
+\includegraphics[width=20em]{speech_01.png}
+
+Yapay öðrenme baðlamýnda zaman serileri için daha önce [7] yazýsýnda LSTM
+yapýsýný görmüþtük. Örnek olarak zaman serilerini sýnýfladýk, zaman
+serisindeki tüm veriler LSTM'e verilmiþti, o zaman bir þeride 150 kusur
+veri noktasý varsa, o kadar LSTM hücresi yaratýlacaktý. Fakat içinde
+binlerce öðe olan seriler için bu iyi olmayabilir. Çözüm seriyi bir þekilde
+özetleyerek bu daha az olan veriyi LSTM'e vermek. Bu özetlere ses iþleme
+alanýnda parmak izi (fingerprint) ismi de verilmekte.
+
+Ses verilerini frekans üzerinden özetlemek bilinen bir teknik, ses verisi
+ufak pencerelere bölünür, bu pencereler üzerinde Fourier transformu
+iþletilir, ve oradaki frekans bilgileri, hangi frekansýn ne kadar önemli
+olduðu elde edilir. Spektogram bu bilgiyi renkli olarak göstermenin bir
+yolu, üstteki ses için,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.specgram(v[1], Fs=util.fs, NFFT=1024)
+plt.savefig('speech_02.png')
+\end{minted}
+
+\includegraphics[width=20em]{speech_02.png}
+
+Spektogramýn örüntü tanýma için kullanýlabileceðini anlamak için bir tane
+daha farklý 'down' sesi, bir de 'no' sesinin spektogramýna bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+f1 = util.train_dir + '/down/0f3f64d5_nohash_2.wav'
+wav1 = io.BytesIO(open(f1).read())
+v1 = scipy.io.wavfile.read(wav1)
+plt.specgram(v1[1], Fs=util.fs, NFFT=1024)
+plt.savefig('speech_03.png')
+
+f2 = util.train_dir + '/no/01bb6a2a_nohash_0.wav'
+wav2 = io.BytesIO(open(f2).read())
+v2 = scipy.io.wavfile.read(wav2)
+plt.specgram(v2[1], Fs=util.fs, NFFT=1024)
+plt.savefig('speech_04.png')
+\end{minted}
+
+\includegraphics[width=20em]{speech_03.png}
+\includegraphics[width=20em]{speech_04.png}
+
+Görüyoruz ki 'down' seslerinin spektogramlarý birbirine benziyor. Öðrenme
+için bu yapýyý kullanabiliriz. Bu arada spektogram ``grafiði'' y-ekseninde
+frekanslarý, x-ekseni zaman adýmlarý gösterir, grafikleme kodu her zaman
+penceresindeki belli frekans kuvvetlerinin hangi frekans kutucuðuna
+düþtüðüne bakar ve o kutucukta o kuvvete göre renklendirme yapar. Þimdi bu
+grafikleme amaçlý, ama bazýlarý bu grafiðe bakarak ``ben çýplak gözle bunu
+tanýyabiliyorum, o zaman görsel tanýmayla üstteki imajla sesi tanýyacak bir
+DYSA kullanayým'' diye düþünebiliyor. Bu iþleyen bir metot, zaten DYSA'nýn
+görsel tanýma tarihi eski, orada bilinen bir sürü teknik var. Her neyse
+bazýlarý üstteki görsel spektogram grafiði, yani R,G,B kanallý çýktý
+üzerinde görsel tanýma yapmayý da seçebiliyor, fakat bu þart deðil, bir
+spektogram, bir veri durumunda iki boyutlu bir matriste gösterilebilir.
+TensorFlow ile bu hesabý örnek rasgele bir veri üzerinde yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+init_op = tf.global_variables_initializer()
+data = tf.placeholder(tf.float32, [1, 16000])
+print data
+stfts = tf.contrib.signal.stft(data, frame_length=400, 
+                               frame_step=100, fft_length=512)
+
+spec = tf.abs(stfts)
+print spec
+
+s = np.random.rand(1,16000) # rasgele bir zaman serisi uret
+with tf.Session() as sess:
+     sess.run(tf.global_variables_initializer())
+     res = sess.run(spec, feed_dict={data: s })  
+print res
+\end{minted}
+
+\begin{verbatim}
+Tensor("Placeholder_1:0", shape=(1, 16000), dtype=float32)
+Tensor("Abs_1:0", shape=(1, 157, 257), dtype=float32)
+[[[  99.39490509   65.10092163   12.84116936 ...,    5.39213753
+      3.90902305    1.35875702]
+  [ 100.60041809   66.32343292   12.92744541 ...,    4.64194965
+      1.80256999    2.0458374 ]
+  [ 104.70896149   70.13975525   15.93750095 ...,    3.21846962
+      1.70909929    1.34316254]
+  ..., 
+  [  97.82588196   63.51060867   11.62135887 ...,    3.23712349
+      1.94706416    0.41742325]
+  [ 105.89834595   71.85715485   17.83632851 ...,    4.6476922
+      2.42140603    1.37829971]
+  [ 106.46664429   71.12073517   16.69457436 ...,    6.58148479
+x      3.24354243    3.80913925]]]
+\end{verbatim}
+
+Cok Katmanlý LSTM
+
+LSTM, ya da diðer her RNN çeþidi çok katmanlý olarak kullanýlabilir. 
+
+\includegraphics[width=20em]{stacked-rnn.png}
+
+Girdiler en alttaki LSTM hücrelerine geçiliyor, bu hücreler birbirlerine
+konum aktarýmý yaptýklarý gibi bir sonraki LSTM katmanýna girdi de 
+saðlýyorlar, bu aktarým en üst tabakaya kadar gidiyor. Peki o zaman
+sýnýflama amaçlý olarak kullanýlan ``en son'' hücre hangisi olacaktýr?
+Bunun için tipik olarak katmanlý LSTM'de en üst ve en sondaki hücre
+kullanýlýr. 
+
+Her hücrede 200 nöron var, o zaman her katman (124,200) boyutunda çünkü
+spektogramdan 124 zaman boyutu geldi, ve LSTM'in en sondaki hücreden alýnan
+vektör 200 boyutunda olacak, bu çýktý bir tam baðlanmýþ (fully-connected)
+katmana verilerek buradan 4 tane etiket için olasýlýk üretilecek, ve tahmin
+için kullanýlan sonuçlar bunlar olacak. O sayýlardan en büyük olaný en
+olasý olan ses komutudur.
+
+Tüm modeli görelim,
+
+\inputminted[fontsize=\footnotesize]{python}{model_lstm.py}
+
+Modelin girdi tensor'un boyutlarýný nasýl deðiþtirdiði altta (üstteki resim
+iki katman gösterdi, bizim modelde 4 katman var),
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import model_lstm
+m = model_lstm.Model()
+\end{minted}
+
+\begin{verbatim}
+Tensor("Placeholder_1:0", shape=(?, 16000), dtype=float32)
+Tensor("stft/rfft:0", shape=(?, 124, 129), dtype=complex64)
+Tensor("Abs:0", shape=(?, 124, 129), dtype=float32)
+Tensor("rnn/transpose:0", shape=(?, 124, 200), dtype=float32)
+LSTMStateTuple(c=<tf.Tensor 'rnn/while/Exit_2:0' shape=(?, 200) dtype=float32>, h=<tf.Tensor 'rnn/while/Exit_3:0' shape=(?, 200) dtype=float32>)
+LSTMStateTuple(c=<tf.Tensor 'rnn/while/Exit_4:0' shape=(?, 200) dtype=float32>, h=<tf.Tensor 'rnn/while/Exit_5:0' shape=(?, 200) dtype=float32>)
+LSTMStateTuple(c=<tf.Tensor 'rnn/while/Exit_6:0' shape=(?, 200) dtype=float32>, h=<tf.Tensor 'rnn/while/Exit_7:0' shape=(?, 200) dtype=float32>)
+LSTMStateTuple(c=<tf.Tensor 'rnn/while/Exit_8:0' shape=(?, 200) dtype=float32>, h=<tf.Tensor 'rnn/while/Exit_9:0' shape=(?, 200) dtype=float32>)
+Tensor("rnn/while/Exit_8:0", shape=(?, 200), dtype=float32)
+Tensor("fully_connected/BiasAdd:0", shape=(?, 4), dtype=float32)
+\end{verbatim}
+
+Eðitim kodu,
+
+\inputminted[fontsize=\footnotesize]{python}{train_rnn.py}
+
+Eðitim sonrasý modelin baþarýsý eðitim verisi üzerinde yüzde 91, doðrulama
+verisinde yüzde 92. Kullanýlan veri [6]'da.
+
+Dropout
+
+TF ile katmanlararasý her noktada dropout kullanýlabilir. Dropout ile bir
+katmandan çýkan ya da ona giren baðlantýlarýn bir kýsmý yoksayýlýr, ve
+model elde kalanlar ile iþ yapmaya uðraþýr, aþýrý uygunluk problemlerinden
+böylece kaçýnýlmýþ olur. Üstteki kodda hangi olasýlýkla dropout
+yapýlacaðýnýn olasýlýðý bir yer tutucu (placeholder) ile TF çizitinin
+parçasý haline getirildi, niye? Böylece son üründeki kullanýmda bu
+parametre 0 yapýlarak hiç dropout yapýlmamasý saðlanabiliyor. Eðitim
+sýrasýnda bu deðer 0.5, 0.2, vs yapýlabilir, o zaman dropout devrede
+olur. Gerçi biz eðitim sýrasýnda da 0 ile eðittik, yani dropout
+kullanmadýk, ama lazým olduðu yerler olabilir, referans açýsýndan burada
+dursun.
+
+Uygulama
+
+Mikrofondan 1 saniyelik ses parçalarýný alýp onu model üzerinde iþletip
+dört komuttan birini seçen örnek kod \verb!mic.py!'da
+bulunabilir. Performans gerçek zamanlý kullaným için yeterliydi, DYSA ufak
+bir þey deðil aslýnda, kaç parametre olduðuna bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print util.network_parameters(), 'tane degisken var'
+\end{minted}
+
+\begin{verbatim}
+1227204 tane degisken var
+\end{verbatim}
+
+1 milyon küsur parametreli bir DYSA , yani potansiyel olarak her saniye en
+az bir milyon iþlem yapýlýyor demektir. Görünüþe göre hesap iþliyor, TF
+bazý optimizasyonlar yapmýþ belki, ve mikroiþlemciler yeterince
+hýzlý. Teknoloji güzel þey.
+
+CTC
+
+Ses tanýma için bir diðer yaklaþým optik karakter tanýma yazýsýnda görülen
+CTC kullanýmý [4,5]. Alttaki kodun kullandýðý veri [1]'de, yaklaþýmýn
+detaylarý [2]'de görülebilir. Bu ses verisi koca kelimeler, cümleleri
+içeriyor, çok daha uzun veriler bunlar, ve kayýp fonksiyonu artýk basit,
+belli sayýda komut arasýndan seçim bazlý deðil, büyük bir alfabeden gelen
+öðelerin yanyana geliþini kontrol ediyor.
+
+\inputminted[fontsize=\footnotesize]{python}{train_ctc.py}
+
+Kaynaklar
+
+[1] Bayramli, {\em VCTK Ses Tanima Verisi, Konusmaci 225}, \url{https://www.dropbox.com/s/xecprghgwbbuk3m/vctk-pc225.tar.gz?dl=1}
+
+[2] Remy, {\em Application of Connectionist Temporal Classification (CTC) for Speech Recognition},\url{https://github.com/philipperemy/tensorflow-ctc-speech-recognition}
+
+[3] Graves, {\em Supervised Sequence Labelling with Recurrent Neural Networks}, \url{https://www.cs.toronto.edu/~graves/preprint.pdf}
+
+[4] Graves, {\em How to build a recognition system (Part 1): CTC Loss}, \url{https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI}
+
+[5] Graves, {\em How to build a recognition system (Part 2): CTC Loss}, \url{https://docs.google.com/presentation/d/12gYcPft9_4cxk2AD6Z6ZlJNa3wvZCW1ms31nhq51vMk}
+
+[6] Bayramli, {\em Ses Komut Verisi}, \url{https://drive.google.com/open?id=1BIGj3NtUZfSrXMaJ8hCqsz0UzS01MSrF}
+
+[7] Bayramli, Bilgisayar Bilim, {\em Uzun Kýsa-Vade  Hafýza Aðlarý}
+
+\end{document}

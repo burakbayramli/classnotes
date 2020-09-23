@@ -1,0 +1,637 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Olasýlýksal Calculus (Stochastic Calculus)
+
+Rasgele Yürüyüþ (Random Walk)
+
+Senet fiyatlarýnýn rasgele yürüyüþe göre hareket ettiði söylenir. Modelin
+bir þekli
+
+$$ y_t = y_{t-1} + z $$
+
+ki $z \sim N(0,\sigma)$. Formülü alttaki þekliyle görürsek daha açýk olabilir,
+$Z_1,Z_2,..,$ baðýmsýz özdeþçe daðýlmýþ (independently, identically distributed
+-iid-), ortalamasý $\mu$, standart sapmasý $\sigma$ olan daðýlýmlar olsun, ve
+herhangi bir baþlangýç noktasý $X_o$'dan $t$ anýnda gelinen nokta
+
+$$ X_t = X_0 + Z_1 + Z_2 + ... + Z_t , t \ge 1$$
+
+olarak belirtilebilir. Her $t$ anýnda bir rasgele deðiþkene göre bir yere
+savruluyoruz. Modele dikkat, önceki veri noktasý ile bir korelasyonumuz yok, her
+noktada zar atýlýyor, baþka hiçbir þey yapýlmýyor.
+
+$X_t$ bu durumda bir rasgele yürüyüþtür, ve adýmlarý $Z_1,Z_2,..$'dir. Eðer
+adýmlar normal olarak daðýlmýþ ise, sürece normal rasgele yürüyüþ adý
+verilir. $X_0$ verildiði / bilindiði durumda $X_t$'nin beklentisi ve varyansý,
+
+$$ E(X_t|X_0) = X_o + \mu t $$
+
+$$ Var(X_t|X_0) = \sigma^2 t $$
+
+Varyans için baðýmsýzlýk durumunda $Var(X+Y) = Var(X)+Var(Y)$ olduðunu
+hatýrlayalým, varyans toplamlarý $\sigma t$ olur, sabit $\sigma$ varyans dýþýna
+karesi alýnmýþ olarak çýkar. Sabit $X_0$ zaten yokolur, onun varyansý yoktur.
+
+Bu modelin bir diðer ismi Brown Hareketi (Brownian Motion), $\mu$ parametresi
+kaymadýr (drift), tüm zaman serisine bir genel yön verir. Kaymanýn tanýmlandýðý
+duruma Kaymalý Brown Hareketi (Brownian Motion with Drift) ismi verilir.
+
+Simüle edelim, iki tane $\mu=0$, iki tane $\mu=0.5$ ile. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.api as sm
+import pandas as pd
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+np.random.seed(0)
+def random_walk(i,mu=0):
+    Z_s = np.random.normal(loc=mu,scale=1.0,size=100)
+    X_0 = 10
+    X_t = X_0 + Z_s.cumsum()
+    plt.plot(X_t)
+    plt.title('Rasgele Yürüyüþ %d' % i)
+    plt.savefig('tser_stoc_0%d.png' % i)
+    plt.hold(False)
+random_walk(1)
+random_walk(2)
+random_walk(3,mu=0.5)
+random_walk(4,mu=0.5)
+\end{minted}
+
+\includegraphics[height=6cm]{tser_stoc_01.png}
+\includegraphics[height=6cm]{tser_stoc_02.png}
+\includegraphics[height=6cm]{tser_stoc_03.png}
+\includegraphics[height=6cm]{tser_stoc_04.png}
+
+Görüldüðü gibi rasgele yürüyüþ üretimini saðlayan çaðrýya $\mu$ haricinde (bir
+de dokümantasyon amaçlý bir indis) haricinde baþka hiçbir parametre vermedik,
+yani ayný kod arka arkaya dört kez iþledi, ama herbirinde ayný baþlangýç deðeri
+olmasýna raðmen tamamen farklý görüntüler çýktý. Görüntüler borsadaki senet
+fiyatlarýný da andýrýyor!
+
+Her adýmda Gaussian gürültü eklendiði için veri analizi yaparken Guassian'lýðý
+fiyatlarýn getirisi / farkýnda görmek mümkündür. Günlük bazda diyelim artýþ /
+azalýþýn histogramýný alýrsak, ünlü can eðrisini elde ederiz. Tabii þunu da
+eklemek lazým, deðiþimin daðýlýmý ``tam olarak'' Gaussian kabul edilmiyor, bu
+daðýlýmýn ``etekleri daha kabarýktýr'', yani ekstrem deðerler Gaussian'a göre
+daha muhtemeldir. Bu daðýlýmýn Öðrenci t (Student t) daðýlýmý olduðu
+söylenir. Fakat kolaylýk açýsýndan, kriz þartlarýna dikkat etmek koþuluyla,
+Gaussian kullanýlabilir.
+
+Baðýmlýlýk
+
+Genel Ýstatistik öðrenirken çoðunlukla veri noktalarýnýn birbirinden baðýmsýz
+olduðunu farzettik, mesela regresyon durumunda eðer $X_i$ biliniyorsa her $Y_i$
+birbirinden baðýmsýzdý, ayrýca $X_i$'ler birbirinden baðýmsýzdý. Çok deðiþkenli
+durumda veri noktalarýnýn öðelerinin birbiriyle çetrefil þekilde alakalý olma
+durumunda bile veri noktalarýnýn birbirinden baðýmsýz olduðunu farzettik. Þimdi
+bu faraziyeyi gevþeteceðiz, yani ayrý veri noktalarý arasýnda baðýmlýlýk
+durumuna bakacaðýz.
+
+Baðýmlý verilere en iyi örnek zaman serileridir, ve bu veri tipi aynen isminin
+çaðrýþtýrdýðý gibi bir deðerin bir zaman süreci içinde kaydedilmiþ deðerleri
+olacaktýr. Ýstatistik uygulamalarýnda bu durum çoðunlukla bir $X$ deðiþkeninin
+$t$ anýndan baþlanarak eþit zaman aralýklarýnda, mesela $h$ aralýklarýyla
+deðerinin kaydedilmesiyle ortaya çýkabilir, $X_t,X_{t+h},X_{t+2h},...$ gibi..
+
+Altta iki tipik zaman serisi görüyoruz. Bunlardan ilki yapay olarak üretilmiþ,
+ikincisi Kanada'nýn bir bölgesinde her sene yakalanan lynx (orta boylu bir kedi
+türü) sayýsý baz alýnarak yaratýlmýþ. Bu verilerin dalgalanýþ þekilleri, kabaca
+gidiþatlarý, vs. aslýnda birbirlerine çok benziyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def logistic_map(x,r=4): return r*x*(1-x) 
+def logistic_iteration(n,x_init,r=4):
+   x = [0 for i in range(n)]
+   x[0] = x_init
+   for i in range(n-1): x[i+1] = logistic_map(x[i])
+   return x
+n = 1000
+x = logistic_iteration(n, x_init=0.01)
+y = x + np.random.normal(size=n,loc=0.,scale=0.05)
+plt.title('Yapay Veri')
+df_artificial = pd.DataFrame()
+df_artificial['y'] = y
+df_artificial.y[:100].plot()
+plt.savefig('tser_stoc_05.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_stoc_05.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('lynx.csv',index_col=0)
+df.plot()
+plt.title('Lynx')
+plt.savefig('tser_stoc_06.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_stoc_06.png}
+
+Soru: Yapay veriyi üretirken niye lojistik harita (logistic map) kullandýk?
+Cevap: Hoca [1] herhalde hem birbirine baðýmlý noktalar yaratmak, hem de onlarýn
+biraz ``kaotik'' olmasýný istedi, ki lojistik harita kaos matematiðinde iyi
+bilinen bir fonksiyondur.
+
+Zaman serisi analizinde yapmaya çalýþtýðýmýz Ýstatistiðin geri kalanýndan bize
+tanýdýk: önümüzde gördüðümüz zaman serisini, o seriyi üreten, görmediðimiz,
+yarý-rasgele (``stochastic'') bir süreçten alýnmýþ bir yansýma / oluþ
+(realization) olarak görmek, önümüzdeki veriyi bu süreç hakkýnda tahminler
+(çýkarsama / inference) yapmak için kullanmak, ve bu tahminlerin, rasgeleliðini
+açýkça belirledikten sonra güvenilir olmasý için uðraþmak. Ýþimizi zorlaþtýran
+her gözlemin / veri noktasýnýn birbiri ile baðlantýlý olmasý; diðer yandan çoðu
+zaman üzerinde çýkarsama yapmak istediðimiz þey de aslýnda bu baðlantýnýn ta
+kendisi.
+
+Notasyon
+
+Eþit aralýklý örneklenmiþ zaman serisini göstermek için indeks olarak
+zamanýn kendisini kullanmak yerine (mesela 1920 senesinde, 1921 senesinde,
+vs demek yerine) her öðenin seri içindeki yerini kullanmak daha rahattýr,
+$X_1,X_2,..$ gibi. Buradan hareketle bir kýsayol notasyonu þudur: bir zaman
+blokunu göstermek için $X_i^j = (X_i,X_{i+1},...,X_{j-1},X_j)$.
+
+Duraðanlýk (Stationarity)
+
+Eski dünyamýzda durum nasýldý? IID veri noktalarýmýz vardý, bu bize analizde
+bazý faydalar saðlýyordu. Zaman serileri için de benzer bir aynýlýk özelliðinin
+olmasý iyi olmaz mýydý?  Böyle bir özellik var, ve ismi duraðanlýk. Kelimenin
+anlamý zaman serisinin hiç deðiþmediði anlamýna gelmiyor tabii, onun {\em
+  daðýlýmýnýn} deðiþmediði anlamýna geliyor.
+
+Daha kesin bir þekilde belirtmek gerekirse, eðer tüm $k,t$ için $X_1^k$ ve
+$X_t^{t+k-1}$ ayný daðýlýma sahipse bu zaman serisi $X$'in güçlü duraðan
+(strongly stationary), ya da kesin duraðan (strictly stationary) olduðu
+söylenir, yani $k$ büyüklüðündeki bloklarýn daðýlýmý zamana baðlý deðildir
+(time-ýnvariant). Tekrarlamak gerekirse bu tüm bloklarýn ayný deðerlere sahip
+olduðu anlamýna gelmez, sadece ayný daðýlýma sahip olduðu anlamýna gelir.
+
+Çoðunlukla finans zaman serileri duraðan olmaz, ama serinin deðiþimi, yani $t$
+ile $t-1$ arasýndaki fark duraðan olabilir, arada bir log transform da da
+gerekebilir. Ýstatistiki modelleme açýsýndan bu iþlemlerin pek negatif bir
+etkisi yoktur, her halükarda ise yarar bir model elde ederiz.
+
+Duraðan süreçlerin güzel tarafý þudur, onlarý çok az parametre ile
+modelleyebilirsiniz. Mesela her $X_t$ için farklý bir beklentiye (expectation)
+ihtiyaç yoktur, hepsinin beklentisi aynýdýr, $\mu$. Bu demektir ki $\mu$'yu
+$\bar{X}$ ile doðru doðru bir þekilde kestirmek (estimate) mümkündür.
+
+Eh bir ``güçlü'' duraðanlýk varsa, herhalde bir ``zayýf'' duraðanlýk ta
+olmalý.. Hakikaten de bu var. Zayýf duraðanlýk için tek gereken þartlar $E(X_1)
+= E(X_t)$ ve $Cov(X_1,X_k) = Cov(X_t,X_{t+k-1})$ olmasý. Dikkat, bu þart için
+bloklar üzerinden deðil tek veri noktalarý üzerinden bir beyan yapýyoruz. Doðal
+olarak güçlü duraðanlýk ayný zamanda zayýf duraðanlýk ta olduðunu söyler (bunu
+egzersiz olarak doðrulayabilirsiniz) , fakat çoðunlukla bu eþitlik ters yönde
+geçerli deðildir.
+
+Kendisiyle Korelasyon (Autocorrelation) 
+
+Zaman serileri çoðunlukla zincirleme olarak baðlantýlýdýr, yani $X_t$ noktasý
+kendinden önceki ve sonraki tüm deðerler ile baðlantýlýdýr. Fakat bu baðlantý
+her mesafede ayný etkide deðildir, çoðunlukla bir baðlantý kaybý (decay of
+dependence) durumu sözkonusudur (bazen korelasyon kaybý -decay of correlations-
+ismi de veriliyor), yani $h \to \infty$ iken $X_t,X_{t+h}$ deðiþkenleri
+birbirinden gittikçe daha çok neredeyse tam baðýmsýz hale gelir [kelimelendirme
+  kritik, hoca tam baðýmsýz olur demiyor, çok az baðýmlýlýk hala kalabilir, ama
+  aralýk büyüdükçe, hatta sonsuzluða yaklaþtýkça baðýmsýzlýk artar, neredeyse
+  tam baðýmsýzlýk haline gelir].
+
+Bu durumu ölçmenin bilinen en eski yöntemi kendisiyle koveryans (dikkat
+korelasyon deðil) ölçütüdür,
+
+$$ \gamma(h) = Cov(X_t,X_{t+h}) $$
+
+Ayný þekilde kendisiyle korelasyon (autocorrelation) da kullanabilirdik, 
+
+$$ 
+\rho(h) = \frac{Cov(X_t,X_{t+h}) }{Var(X_t) } = \frac{\gamma(h)}{\gamma(0)}
+$$
+
+Korelasyon tanýmýndan üstteki ilk eþitliðe nasýl geldik? Korelasyon bilindiði
+gibi
+
+$$ \frac{Cov(X_t,X_{t+h}) }{\sqrt{Var(X_t)}\sqrt{Var(X_{t+h})} } $$
+
+Daha önceki zayýf duraðanlýk tanýmýndan,
+
+$$ Cov(X_1,X_k) = Cov(X_t,X_{t+k-1}) $$
+
+Eðer $k=1$ olsaydý, 
+
+$$ Cov(X_1,X_1) = Cov(X_t,X_t) = Var(X_1) = Var(X_t)$$
+
+Bu ifadenin her $t$ için doðru olmasý gerektiði için $Var(X_t) = Var(X_{t+h})$
+diyebiliriz. O zaman korelasyon þu hale gelir,
+
+$$
+\frac{Cov(X_t,X_{t+h}) }{\sqrt{Var(X_t)}\sqrt{Var(X_t)} }  =
+\frac{Cov(X_t,X_{t+h}) }{Var(X_t)} 
+$$
+
+Sað taraftaki eþitliðe gelelim: sadece $\gamma$ formu kullanmaya uðraþalým,
+$h=0$ dersek $\gamma(0) = Cov(X_t,X_{t+0}) = Cov(X_t,X_t)$ elde ediliyor ve
+bilindiði gibi $Var(X_t)=Cov(X_t,X_t)$. O zaman
+
+$$ \frac{Cov(X_t,X_{t+h}) }{Var(X_t)} = \frac{\gamma(h)}{\gamma(0)} $$
+
+Daha önce belirttiðimiz gibi çoðu zaman serisi için $h \to \infty$
+$\gamma(h) \to 0$. 
+
+Python Pandas ile korelasyon grafiði þöyle basýlýr,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fig = plt.figure(figsize=(12,8))
+plt.hold(True)
+ax1 = fig.add_subplot(211)
+fig = sm.graphics.tsa.plot_acf(df.values.squeeze(), lags=40, ax=ax1)
+ax2 = fig.add_subplot(212)
+fig = sm.graphics.tsa.plot_pacf(df, lags=40, ax=ax2)
+plt.savefig('tser_stoc_07.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_stoc_07.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fig = plt.figure(figsize=(12,8))
+plt.hold(True)
+ax1 = fig.add_subplot(211)
+fig = sm.graphics.tsa.plot_acf(df_artificial.values.squeeze(), lags=40, ax=ax1)
+plt.hold(True)
+ax2 = fig.add_subplot(212)
+fig = sm.graphics.tsa.plot_pacf(df_artificial, lags=40, ax=ax2)
+plt.savefig('tser_stoc_08.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_stoc_08.png}
+
+Üstteki her iki verinin de kendisiyle korelasyonunu görüyoruz. Ýlginç bir durum
+ortaya çýktý, yapay zaman serisinin kendisiyle korelasyonu neredeyse hep sýfýr
+etrafýnda, yani hangi aralýðý baz alýrsak alalým, iki veri noktasý arasýndaki
+baðlantý çok az. Bu durum serinin ilk grafiðini düþününce garip
+geliyor. Hakikaten bir acaiplik var, bu þeride bir takým baðlantýlar olduðunu
+$X_{t+1},X_t$ grafiðini basarak bile görebiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df_artificial['lagged_y'] = df_artificial.y.shift(-1)
+df_artificial.plot(kind='scatter',x='y',y='lagged_y')
+plt.title('Yapay')
+plt.savefig('tser_stoc_09.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_stoc_09.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df['lagged_x'] = df.x.shift(-1)
+df.plot(kind='scatter',x='x',y='lagged_x')
+plt.title('Lynx')
+plt.savefig('tser_stoc_10.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_stoc_10.png}
+
+Yani kendisiyle korelasyon her zaman gerekli bilgiyi vermeyebilir, ama bilinmesi
+iyi olur. Daha genel ölçütler mesela Spearman $X_{t+h},X_t$ kerte korelasyonu
+(Spearman rank-correlation) ya da ortak bilgi (mütual ýnformation) gibi
+ölçütler.
+
+Ama aslýnda kendisiyle korelasyonun önemli olmasýnýn 4 sebebi var. Ýlki, bu
+ölçüt istatistikteki en eski ölçütlerden biri, yani ``kullanýcý bazý'' geniþ,
+herkes kk hakkýnda birþeyler biliyor, iletiþimde bu kavramý kullanýyorlar, ve
+gelip size bu ölçüt hakkýnda birþeyler soracaklar. Ýkincisi, son derece nadir
+bir durum olan Gaussian süreçleri durumunda kk size hakikaten bilmeniz gereken
+{\em herþeyi} söyler. Üç, birazcýk daha az nadir olan lineer tahmin durumunda
+yine bilmemiz gereken herþeyi bize söyler. Dört, kk sonraki bölümde
+iþleyeceðimiz teorik bir sonuçta kritik bir rol oynuyor.
+
+Wiener Süreçleri 
+
+Ayrýksal olarak iþlediðimiz $X_t$'yi sürekli ortamda þöyle geliþtirebiliriz;
+Yeni bir deðiþken tanýmlayalým, $\{ X_t^{\Delta}, t \ge 0 \}$ kronolojik olarak
+sýralanmýþ rasgele deðiþkenler olacaklar, fakat artýk $t$ artýk bir tamsayý /
+indis deðil, bir reel sayý. Finansal varlýklar, senetler tabii ki ayrýksal
+olarak hesaplanýrlar, mesela her günün kapanýþ fiyatý baz alýnýrak, fakat
+fiyatlarýn dalgalanýþýna sürekli zaman süreci olarak bakmak matematiksel olarak
+bazý hesaplarýn kolaylaþmasýný saðlýyor.
+
+Öyle bir rasgele (stochastic) süreç $\{ X_t^{\Delta}, t \ge 0 \}$ düþünelim ki
+her eþit zaman adýmý $\Delta t$ içinde 1/2 olasýlýkla $\Delta x$ kadar yukarý ya
+da aþaðý inecek. $n$ adým sonrasý zaman aný $t = n \cdot \Delta t$ sürecin
+içinde olduðu konum
+
+$$ X_t^{\Delta} = \sum _{k=1}^{n} Z_k \Delta x = X_n \Delta x $$
+
+olacaktýr, ki $Z_k = -1/+1$ deðerini $1/2$ þansla verebilecek rasgele
+deðiþken. Böylece $Z_1 \Delta x,Z_2 \Delta x$ artýþlarý ortaya çýkýyor, bu
+artýþlar birbirinden baðýmsýzdýr, ve $1/2$ þans ile $-\Delta x$ ya da $\Delta x$
+deðerine sahiptir. Bazý hesaplar
+
+$$ E[X_t^{\Delta}] = 0 $$
+
+çünkü beklenti operatörü toplama nüfuz edebilir, ve $E[Z_k] = 0$. Ayrýca,
+
+$$ Var(X_t^{\Delta}) = (\Delta x)^2 Var(X_n) =  (\Delta x)^2 \cdot n$$
+
+çünkü $Var(Z_k) = 1,Var(X_n)=n$. Ayrýca önce belirttik, $t = \Delta x \cdot n$,
+cebirsel deðiþim ile $n = t / \Delta t$, o zaman üstteki,
+
+$$ Var(X_t^{\Delta}) = t \cdot \frac{(\Delta x)^2}{\Delta t}  $$
+
+Þimdi $\Delta t,\Delta x$'i çok küçültelim. Fakat bu sürecin bir sonsuza gidip
+patlamamasý, yani makul bir limitinin olmasý için $Var(X_t^{\Delta})$ sonlu
+(finite) olmalýdýr. Diðer yandan varyans sýfýr a da yaklaþmamalýdýr, çünkü o
+zaman bu süreç rasgele olmaz (hiç sapma yok ise rasgelelik kalmamýþ
+demektir). Demek ki bize bir sonsuz olmayan bir tam sayý verecek bir seçim
+yapmak lazým, bunu da
+
+$$\Delta t \to 0, \Delta x = c \cdot \sqrt{\Delta t}$$
+
+olarak yapmamýz gerekir, ki böylece 
+
+$$Var(X_t^{\Delta}) \to c^2t$$ 
+
+olur. 
+
+$\Delta t$'nin ufak olduðu durumda $n = t/\Delta t$ doðal olarak büyük olur. Bu
+derece büyüklüklerde olanlara sonuþur (asymptotic) baðlamda olarak bakabiliriz,
+ayrýksal versiyondaki rasgele deðiþken $X_n$ yaklaþýksal olarak $N(0,n)$
+daðýlýmýna sahiptir, o zaman tüm $t$'ler için (dikkat sadece $t = n \Delta t$
+olan $t$'ler için deðil) $X_t^{\Delta} \sim N(0, n(\Delta x)^2) \sim N(0, c^2t)$
+daðýlýmýna sahip olacaktýr.
+
+Yani $\{ X_t^{\Delta}, t \ge 0 \}$'nin limitli süreci olarak elde ettiðimiz yeni
+$\{ X_t, t \ge 0 \}$'nin $\Delta x = c \sqrt{\Delta t}, \Delta t \to 0$ iken þu
+özellikleri vardýr,
+
+1) $X_t$ tüm $t \ge 0$ için $N(0,c^2t)$ daðýlýma sahiptir. 
+
+2) $\{ X_t, t \ge 0 \}$ baðýmsýz adýmlara sahiptir, mesela $0 \le s < t,
+X_t-X_s$ deðeri $X_s$'den baðýmsýzdýr, çünkü $\{ X_t, t \ge 0 \}$'yi tanýmlamak
+için kullandýðýmýz rasgele yürüyüþ $\{ X_n, t \ge 0 \}$ baðýmsýz adýmlara
+sahiptir.
+
+3) $0 \le s < t$ için artýþ $X_t-X_s$'in daðýlýmý $N(0, c^2 \cdot (t-s))$'tir,
+yani herhangi bir artýþýn daðýlýmý sadece ve sadece $t-s$'in büyüklüðüne
+baðlýdýr. Tabii bu özellik aslýnda (i), (ii) ve normal daðýlýmlarýn
+özelliklerinin doðal bir uzantýsý.
+
+Sürekli zamanda tanýmlý olan rasgele süreç $\{ X_t, t \ge 0 \}$ eðer (1)-(3)
+þartlarýna uygunsa bu sürece Wiener süreci, ya da Brownian süreci ismi verilir,
+sürecin 0 anýnda $X_0=0$ olarak baþladýðý kabul edilir. Eðer $c=1$ alýnýrsa
+ortaya çýkan sürece {\em standart Wiener süreci} denir ve çoðu kaynakta bu süreç
+$W$ harfiyle tanýmlanýr, yani $\{ W_t, t \ge 0 \}$.
+
+Standart Wiener süreçleri için, $0 \le s < t$ baðlamýnda, þu alttakiler
+geçerlidir,
+
+$$ E[W_t] = 0, Var(W_t) = t $$
+
+$$ Cov(W_t,W_s) = Cov(W_t-W_s+W_s, W_s) $$
+
+$$ = Cov(W_t-W_s,W_s) + Cov(W_s,W_s) $$
+
+$$ = 0 + Var(W_s) = s $$
+
+Ýlginç bir durum þudur: Wiener sürecinin türevi yoktur [4, sf. 59]!.
+
+Rasgele Entegraller (Stochastic Integrals)
+
+Farz edelim ki $f(\cdot)$ $[a,b]$ aralýðýnda türevi olan sürekli bir
+fonksiyon. Rasgele entegral þu þekilde tanýmlanabilir, $\forall i$
+
+$$
+\int_{ a}^{b} f(t) \ud W_t \equiv  
+\lim_{ n \to \infty, |t_i-t_{i-1}| \to 0 }
+\sum _{i=1}^{n} f(t_{i-1}) ( W_{t_i} - W_{t_{i-1}})
+$$
+
+Tanýmýn saðýndaki bir Riemann toplamýdýr. Dikkat, burada $dW_t$ ``türev almak''
+olarak görülmemeli çünkü $W_t$'nin türevi yok. Üstte bir entegral tanýmý yaptýk
+ve o tanýma tekabül eden açýlýmý belirttik. Yani bu tanýmý ne zaman görürsek
+içinde limit olan ifadeyi hatýrlamamýz lazým.
+
+Not: $W_{t_i} - W_{t_{i-1}}$'in daha önce normal daðýlýmda olduðunu
+görmüþtük. Demek ki aralýklar bir tür ``beyaz gürültü''dür (white noise).
+
+Bir numara / taným deðiþtirme durumu daha: Diyelim ki parçalý entegral yöntemini
+kullanabiliyoruz,
+
+$$ \int u \cdot \ud v = uv - \int v \cdot \ud u $$
+
+Ana formülü $u,v$ bazýnda bölüþtürelim,
+
+$$ \int _{a}^{b} \underbrace{f(t)}_{u}\underbrace{\ud W_t}_{\ud v}$$
+
+O zaman 
+
+$$ \int _{a}^{b} f(t)\ud W_t = f(b)W_b - f(a)W_a - \int _{a}^{b} W_t \ud f(t) $$
+
+Genellikle eþitliðin sol tarafýnýn kullanýlan, bilinen tanýmý budur. Rasgele
+entegral dediklerinde bahsedilen bu yani. Bir ek güzellik, $f$'in türevi
+alýnabildiði için çoðunlukla $df(t)$ yerine $f'(t)$ de kullanýlabilir.
+
+Parçalý entegral yöntemi iyi iþledi, üstelik iþi kitabýna uygun yapýyor - $u,dv$
+bölüþtürmesi yaparken $dv=dW_t$ elde ettik, bu sayede $v$'ye atladýk, ki bu
+tekrar bize $W_t$ verdi.
+
+Rasgele Diferansiyel Denklemler (Stochastic Differential Equations -SDE-)
+
+Wiener süreçleri sýfýr etrafýnda salýnan bir süreçtir, fakat uygulamalarda bize
+büyüyen seriler gerekebilir, bir trendi ya da kaymasý (drift) olacak
+þekilde. Herhangi bir sabit deðeri $\sigma^2$ ve $\mu$ ile genelleþtirilmiþ bir
+Wiener süreci $\{ X_t; t>0\}$'i þöyle gösterebiliriz [4, sf. 64],
+
+$$ 
+X_t = \mu \cdot t + \sigma \cdot W_t, \qquad t>0 
+\mlabel{1}
+$$
+
+Bu süreç $t$ anýnda $N(\mu,\sigma^2t)$ daðýlýmýna sahip olacaktýr. Ufak bir
+zaman artýþý $\Delta t$ için
+
+$$ X_{t + \Delta t} - X_t = \mu \cdot \Delta t + \sigma (W_{t+\Delta t}-W_t)$$
+
+$\Delta t \to 0$ iken diferansiyel notasyonunu kullanabiliriz, 
+
+$$ dX_t = \mu \cdot dt + \sigma dW_t $$
+
+Bu formül (1)'in deðiþik bir halinden ibarettir. Üsttekini entegral
+formunda da yazabiliriz, 
+
+$$ X_t = \int _{0}^{t}\mu \ud s + \int _{ 0}^{t} \sigma \ud W_s $$
+
+Dikkat edersek daha önceki rasgele entegral tanýmýndan, hemen þu hesabý
+yapabildiðimizi görürüz, $\int _{0}^{s} \ud W_s = W_t - W_0 = W_t$, çünkü
+$W_0=0$. 
+
+Ornstein-Uhlenbeck Süreçleri
+
+[3, sf. 46]'da bahsedilen bu formül, ve hayat yarýlama zamaný arasýndaki
+iliþkiyi daha iyi anlamak için önce formülün nasýl türetildiðini görelim,
+ardýndan beklentisi üzerinden hayat yarýlama zamanýný bulabileceðiz. Ortalamay
+dönüþ bölümünde senet üzerinde hesapsal bir örnek te veriyoruz.
+
+$$ dX_t = \alpha(\mu - X_t)dt + \sigma dW_t $$
+
+Bazen tüm formül $dt$ ile bölünüp þu þekilde de belirtilebiliyor, 
+
+$$ \frac{dX_t}{dt} = \alpha(\mu - X_t) + \sigma W_t' $$
+
+Rasgele diferansiyel denklemlerde $dW_t$, $W_t'$ benzeri ifadeler ne demektir?
+$dW_t$ mesela ``beyaz gürültü'' olarak tanýmlanýr, peki niye gürültü için
+bilinen normal daðýlým denkleme rasgele deðiþken olarak dahil edilmemiþtir?
+Bunun sebebi üsttekinin bir diferansiyel denklem olmasý, çözüm için bir þekilde
+entegral alýnca bir rasgele deðiþkenin çarpýmý üzerinden entegral almak
+gerekirdi. Onun tanýmý belli deðiþimi üzerinden entegralini almak için
+geliþtirilmiþ rasgele calculus var, bu araçlarý devreye sokabiliriz.
+
+Ornstein-Uhlenbeck formülüne dönelim, O-U aslýnda ortalamaya dönüþün
+(mean-reversion) SDE formunda belirtilmiþ halidir. $X_t$ yerine $y_t$
+kullanalým, ve + kullanýp $\lambda$ ekleyelim, ki [3] notasyonuna uysun,
+
+$$ dy_t = (\lambda y_t + \mu)dt + dW_t  $$
+
+Bu formül $\mu$'den ne kadar uzaklaþýlýrsa, ve eðer $\lambda$ eksi ise o kadar
+zaman serisi üzerinde ters yönde bir baský yaratacaktýr. $\lambda$'nin ne
+olduðu, büyüklüðü ve hatta eksi mi artý mý olduðu veriden hesaplanýr, bu hesap
+bize zaman serisi hakkýnda önemli sinyaller verecek. Eðer $\lambda$ eksi deðil
+ise ortalamaya dönüþ sonucuna varamayacaðýz mesela.
+
+Üstteki denklemi çözelim. Önce iki tarafý da $e^{-\lambda t}$ çarpalým, ve
+tekrar düzenleyelim,
+
+$$ e^{-\lambda t}dy_t = e^{-\lambda t}(\lambda y_t + \mu)dt + e^{-\lambda t} dW_t  $$
+
+$$ e^{-\lambda t}dy_t - e^{-\lambda t}(\lambda y_t + \mu)dt =  e^{-\lambda t} dW_t 
+\mlabel{2}
+$$
+
+Þimdi $e^{-\lambda t}(\lambda y_t + \mu)$'in diferansiyeline bakalým, bu
+bize ileride lazým olacak,
+
+$$ d(e^{-\lambda t}(\lambda y_t + \mu)) = 
+-\lambda e^{\lambda t} (\lambda y_t + \mu) dt + e^{\lambda t} \lambda dy_t 
+$$
+
+$dt$ nereden geldi? Hatýrlayalým 
+
+$$ d(uv) = u dv + v du $$
+
+$d(e^{?})/dt$ bize $e$'nin kendisini verirdi, ve $dt$ ile çarpýnca, tek $dt$
+üstteki görülen yerdedir. Devam edelim, iki üstteki denklemin sað tarafýnýn
+(2)'nin sol tarafý ile ayný olduðunu görüyoruz (zaten bütün bu taklalarý o
+eþitliðe eriþmek için attýk). O zaman
+
+$$ d(e^{-\lambda t}(\lambda y_t + \mu)) =  e^{-\lambda t} dW_t  $$
+
+diyebiliriz. Þimdi iki tarafýn entegralini alalým,
+
+$$
+\int _{0}^{t} d(e^{-\lambda s}(\lambda y_s + \mu)) =
+\int_{0}^{t} e^{-\lambda s} \ud W_s
+$$
+
+$$
+e^{-\lambda s}(\lambda y_s + \mu) \big|_{0}^{t} =
+\int_{0}^{t} e^{-\lambda s} \ud W_s
+$$
+
+$$
+e^{-\lambda t}(\lambda y_t + \mu) - \lambda y_0 - \mu =
+\int_{0}^{t} e^{-\lambda s} \ud W_s
+$$
+
+$$
+e^{-\lambda t}\lambda y_t + e^{-\lambda t}\mu - \lambda y_0 - \mu =
+\int_{0}^{t} e^{-\lambda s} \ud W_s
+$$
+
+$$ 
+e^{-\lambda t}\lambda y_t  =
+- e^{-\lambda t}\mu + \lambda y_0 + \mu + \int_{0}^{t} e^{-\lambda s} \ud W_s 
+$$
+
+$$ 
+\lambda y_t   =
+- \mu + e^{\lambda t} \lambda y_0 + e^{\lambda t}\mu + \int_{0}^{t} e^{\lambda (t-s)} \ud W_s 
+$$
+
+$$ 
+y_t   = \frac{-\mu}{\lambda} + e^{\lambda t} y_0 + e^{\lambda t}\frac{\mu}{\lambda} + 
+\frac{1}{\lambda}\int_{0}^{t} e^{\lambda (t-s)} \ud W_s 
+$$
+
+$$ 
+y_t = \frac{-\mu}{\lambda} ( 1 - e^{\lambda t}) + e^{\lambda t} y_0 + 
+\frac{1}{\lambda}\int_{0}^{t} e^{\lambda (t-s)} \ud W_s 
+$$
+
+Nihayet $y_t$'ye eriþtik. Þimdi iki tarafýn beklentisini alýrsak, entegral
+içine nüfuz eden bu iþlem ardýndan $dW$ beklentisi doðal olarak sýfýra
+gidip yokolacak, geri kalanlar,
+
+$$ 
+E[y_t] = y_0 e^{\lambda t} - \frac{\mu}{\lambda} ( 1 - e^{\lambda t}) 
+\mlabel{3}
+$$
+
+Zaman Yarýlamasý
+
+Radyoaktif çürüme (decay), mesela Uranyum 238 için, alttaki denklemle
+modellenir [5, sf. 269],
+
+$$ \frac{\ud u}{\ud t} = - \lambda u$$
+
+$u(t)$ formülü $t$ anýnda ne kadar madde olduðu, $\lambda > 0$ ise çürüme
+oranýný kontrol ediyor. Üstteki denklemin çözümü,
+
+$$ u(t) = c e^{-\lambda t} $$
+
+ki $c$ baþlangýç madde miktarý. Bu tür konularda hayat yarýlama zamaný
+(half-life) kabaca madde yokoluþu hakkýnda fikir yürütmek için iyi bir ölçüttür,
+bu süre, $u(t)$'nin baþlangýç maddesinin yarýsý, yani $1/2 c$ olduðu $t^*$
+anýdýr,
+
+
+$$ u(t^*) = c e^{-\lambda t^*} = 1/2 c$$
+
+$$  e^{-\lambda t^*} = 1/2 $$
+
+Ýki tarafýn log'unu alýp tekrar düzenleyelim,
+
+$$ t^* = -\log(0.5)/\lambda $$
+
+$$ t^* = \log(2)/\lambda $$
+
+bize hayat yarýlama zamanýný verir. Þimdi (3)'e bir daha bakalým, burada çürüme
+$y_0 e^{\lambda t}$ teriminde. O zaman hayat yarýlama zamaný $-\log(2)/\lambda$
+ile; eksi çünkü O-U denkleminde $\lambda$'nin negatif olmasýna izin verdik.
+
+Bazý örnek deðerler ile bir grafik,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+y0 = 10; lam=-0.5;mu=2
+x = np.linspace(0,10,100)
+y = y0*np.exp(lam*x) - mu/lam* (1-np.exp(lam*x))
+plt.scatter(x,y)
+plt.savefig('tser_stoc_11.png')
+plt.hold(False)
+\end{minted}
+
+\includegraphics[height=6cm]{tser_stoc_11.png}
+
+\inputminted[fontsize=\footnotesize]{python}{halflife.py}
+
+Kaynaklar 
+
+[1] Shalizi, {\em Advanced Data Analysis from an Elementary Point of View}
+
+[2] Rupert, {\em Statistics and Data Analysis for Financial Engineering}
+
+[3] Chan, {\em Algorithmic Trading}
+
+[4] Franke, {\em Statistics of Financial Markets}
+
+[5] Olver, {\em Applied Mathematics}
+
+\end{document}

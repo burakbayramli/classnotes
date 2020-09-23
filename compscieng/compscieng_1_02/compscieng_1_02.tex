@@ -1,0 +1,625 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 2
+
+Bir diferansiyel denklemle baþlayýp çözebileceðimiz bir ayrýksal (discrete)
+probleme nasýl ulaþýrýz? Ýkinci türevi içeren basit bir diferansiyel
+denkleme bakalým
+
+$$ -\frac{d^2u}{dx^2} = f(x) $$
+
+$$ u(0) = 0, \ u(1) = 0 $$
+
+Eksi iþareti var çünkü ikinci türevler negatif kesin (negative definite)
+þeylerdir ve eksi iþareti bu durumu telafi etmek için, onu pozitif kesin
+hale çevirmek için konuldu. Ayrýca dikkat edersek sýnýr (boundary) þartlarý
+var, her iki uçta da fonksiyona sýfýr deðeri vermiþiz, her iki uçta da onu
+``sabitlemiþiz''. Dikkat edelim, bu baþlangýç deðer probleminden farklý,
+$u$, $x$'in bir fonksiyonu, $t$ yani zamanýn deðil. Diyelim ki bu problem
+iki tarafý sabitlenmiþ bir elastik çubuðu temsil ediyor, $f(x)$ çubuk
+üzerindeki her $x$ noktasýndaki yükü gösteriyor. Bu derste $f(x) = 1$
+alacaðýz, yani
+
+$$ -\frac{d^2u}{dx^2} = 1 $$
+
+Amacýmýz bir diferansiyel denklem alýp, onu ayrýksal olarak temsil edebilmek,
+yani þöyle
+
+$$ \frac{-u_{i+1}+2u_i - u_{i-1}}{(\Delta x)^2} = f(x_i)$$
+
+Bu denklem ikinci farklýlýklarý (second difference) gösteriyor. 
+
+Diferansiyelden (differential) farklýlýklara (differences) geçiþin birkaç
+yöntemi olabilir. 
+
+Birinci Farklýlýklar (Ýleri Doðru)
+
+$$ \Delta_Fu = \frac{u(x+h)-u(x)}{h} $$
+
+Ayrýksal: $(u_{i+1} - u_{i}) / h$
+
+Birinci Farklýlýklar (Geriye Doðru)
+
+$$ \Delta_Bu = \frac{u(x)-u(x-h)}{h} $$
+
+Ayrýksal: $(u_{i-1} - u_{i}) / h$
+
+Birinci Farklýlýklar (Ortalanmýþ)
+
+$$ \Delta_Cu = \frac{u(x+h)-u(x-h)}{2h} $$
+
+Ayrýksal: $(u_{i+1} - u_{i-1}) / h$
+
+Bunlar Calculus'tan hatýrlanabilecek þeyler, fakat burada $h$ limitte
+sýfýra doðru gitmiyor. Hesapsal dünyada $h$ bizim belirlediðimiz bir
+mesafe, belki $1$, belki $0.1$. O kadar bir hesapsal adým atmayý biz
+seçiyoruz, her þey ayrýksal. 
+
+Ayrýca Calculus'ta hep $\Delta_F u$ gösterilir ve yaklaþýksal olarak türeve
+eþittir yani $u'(x)$. Geriye adým da vardýr, hesapsal olarak ileri adým
+kadar iyidir, ve o da aþaðý yukarý türeve eþittir. Çok önemli bir farklýlýk
+hesabý ise ortalanmýþ (centered) olandýr, bu hesap ileri ve geri
+farklýlýklarýn ortalamasýdýr, ayný þekilde aþaðý yukarý türeve eþittir.
+
+Baþtaki denklemimize birinci türevi dahil etmedik, çünkü birinci türevler
+anti-simetriktir. 
+
+Birinci farklýlýklar yöntemine dönelim, türeve ne kadar yakýndýrlar? 
+
+Birinci Farklýlýklar (Ýleri Doðru)
+
+$$ \Delta_Fu  \approx u'(x) + O(h) $$
+
+Birinci Farklýlýklar (Geriye Doðru)
+
+$$ \Delta_Bu \approx u'(x) + O(h)$$
+
+Birinci Farklýlýklar (Ortalanmýþ)
+
+$$ \Delta_Cu  \approx u'(x) + O(h^2)$$
+
+$O(h)$ $h$'ye oranlý (order of $h$) anlamýna gelir, gerçek deðerden
+``kesilip atýlmýþ fark'' olduðunu farz edelim. Ortalama için niye $O(h^2)$?
+Hesabý yapalým. Taylor serilerinin ne olduðunu hatýrlayalým ve $u(x+h)$
+açýlýmýni yapalým. Dikkat, ayrýksal formla deðil, sürekli fonksiyonla
+çalýþýyoruz, sürekli fonksiyon üzerinde ``ayrýksal bir adým'' atýlýnca ne
+olacaðýný bulmaya çalýþýyoruz, bu þekilde sürekli formatta, cebirsel bir
+kural elde etmeye uðraþýyoruz.
+
+$$ u(x+h) = u(x)+hu'(x)+\frac{h^2}{2}u''(x) + \frac{h^3}{6}u'''(x) ...$$
+
+Taylor açýlýmlarýnda ve hesapsal bilimde ikinci seviye kesinlik (accuracy)
+çoðunlukla yeterli oluyor. Hesapsal kodlarý geliþtirirken, test ederken
+tipik olarak birinci seviyede baþlanýr, ve nihai ürün, sonuç ortamý
+(production) için 2. seviye eklenir. Devam edelim, geriye doðru:
+
+$$ u(x-h) = u(x)-hu'(x)+\frac{h^2}{2}u''(x) - \frac{h^3}{6}u'''(x) + ...$$
+
+Ortalanmýþ farklýlýk için iki formülü birbirinden çýkartýrýz, ve $2h$'ye
+böleriz.
+
+$$ u(x+h)-u(x-h) = 2hu'(x) + \frac{h^3}{3}u'''$$
+
+Ýki tarafý $2h$'ye bölelim
+
+$$ \frac{u(x+h)-u(x-h)}{2h} = u'(x) + \frac{h^2}{6}u'''$$
+
+Görüyoruz ki ortalama farklýlýk doðru türevi $u'$ eþitliðin saðýnda
+veriyor, ve $h^2$ terimine bakarak yaklaþýklýðýn, hatanýn ikinci seviyede
+olduðunu anlýyoruz. 
+
+Türevlerin yerine farklýlýk geçirirken seçenekler bunlar. Elimizde 3
+seçenek var, ve çoðunlukla ortalanmýþ olan en iyisidir.
+
+Þimdi ikinci farklýlýklara gelelim: Ýkinci türev nedir? Türevin
+türevidir. Ýkinci farklýlýk nedir? Farklarýn farkýdýr.
+
+Nasýl hesaplanýr? $\Delta_F \Delta_B$ yapabiliriz. Ya da $\Delta_B
+\Delta_F$. Birisi cikip $\Delta_C \Delta_C$ diyebilir. Hangisi? Hoca
+$\Delta_C \Delta_C$'yi sevmiyor çünkü elimize [1 0 -2 0 1] gibi bir
+farklýlýk vektörü geçiyor, fazla ``daðýlýyoruz''.  $\Delta_F \Delta_B$, ve
+$\Delta_B \Delta_F$ daha iyi çünkü ikisi de [1 -2 1] kullanýr. Onlar daha
+'odaklý''.
+
+Ýkincil farklýlýklar (second differences) formülünü de türetelim. Bu formül
+ileri doðru bir adým attýktan sonraki fark ile geri doðru adým attýktan
+sonraki farkýn farký. Yani
+
+$$ \frac{1}{h} 
+\bigg[
+\bigg(\frac{u_{i+1}-u_{i}}{h}\bigg) -
+\bigg(\frac{u_{i}-u_{i-1}}{h}\bigg) 
+\bigg]
+ $$
+
+$$ = \frac{1}{h} 
+\bigg[
+\frac{u_{i+1} - 2u_{i}+u_{i-1}}{h}
+\bigg]
+ $$
+
+$$ = \frac{u_{i+1} - 2u_{i}+u_{i-1}}{h^2} $$
+
+Ýkinci seviye diferansiyel denklem çözüme dönelim. 
+
+$$ -\frac{d^2u}{dx^2} = 1 $$
+
+denkleminin genel çözümü ne olabilir? Özel (particular) çözüm ikinci
+türevi 1 olan ve negatifi alýnan þey nedir sorusunun cevabýndan
+bulunabilir, iki kere entegre edilerek
+
+$$ -\frac{1}{2}x^2 $$
+
+buna ikinci türevi sýfýr olan iki tane daha çözüm eklemek istiyorum, çünkü
+elimizde ikinci dereceden bir diferansiyel denklem var.
+
+$$ u(x) = -\frac{1}{2}x^2 + Dx + C$$
+
+Bu ek iki sabiti nasýl kullanacaðým? Onlarý elimdeki iki tane sýnýr þartýný
+tatmin etmek için kullanacaðým. Bunu yapmak zor deðil, birinci þartý
+formüle koyarým, sabitler için bir formül elde ederim, ikinci þartý
+koyarým, ikinci bir formül elde ederim, iki sabit, iki formül, böylece
+sonuç gelir. 
+
+$u(0)$ ise $C = 0$, $u(1)$ için $D=1/2$. 
+
+$$ u(x) = -\frac{1}{2}x^2  + \frac{1}{2} x$$
+
+Þimdi ana diferansiyel denklem
+
+$$ -\frac{d^2u}{dx^2} = 1 $$
+
+ve onun ayrýksal formu
+
+$$ \frac{-u_{i+1}+2u_i - u_{i-1}}{(\Delta x)^2} = f(x_i)$$
+
+nasýl matris formatýnda göstereceðimize gelelim. $u_i$, $u_{i+1}$ gibi
+deðerlerin birbirinden çýkartýlmasý, vs gibi iþlemler gerekiyor. Altta
+böyle bir iþlemi matris üzerinden yapmanýn yolunu görüyoruz.
+
+$$ 
+\left[\begin{array}{rrrr}
+\ddots &&& \\
+-1 & 0 & 1 & \\
+ & -1 & 0 & 1 \\
+&&& \ddots 
+\end{array}\right]
+\left[\begin{array}{l}
+u_{i-1} \\
+u_{i} \\
+u_{i+1} \\
+u_{i+2} 
+\end{array}\right]
+=
+\left[\begin{array}{c}
+\vdots \\
+u_{i+1}-u_{i-1} \\
+u_{i+2}-u_i \\
+\vdots
+\end{array}\right]
+ $$
+
+Soldaki matris $\left[\begin{array}{ccc} -1 & 0 & 1\end{array}\right]$
+yerine ikinci farklýlýklar için
+$\left[\begin{array}{ccc} -1 & 2 & 1\end{array}\right]$ de kullanabilir, o zaman
+ikinci farklýlýk hesabýný yapmýþ oluruz. Yani þöyle
+
+$$ 
+\frac{1}{h^2} \left[\begin{array}{rrrrr} 2 & -1 & & & \\ -1 & 2 & -1 & & \\ & -1
+    & 2 & -1 & \\ & & -1 & 2 & -1 \\ & & & -1 & 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_1 \\
+u_2 \\
+u_3 \\
+u_4 \\
+u_5 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1 \\
+1 \\
+1 \\
+1 \\
+1 
+\end{array}\right]
+ $$
+
+Bu $KU = F$ denkleminin matris formudur. Diferansiyel denklem çözmek demek
+$u$ fonksiyonunu bulmak demektir, o zaman yukarýdaki bilinmeyen
+$u_1,u_2,..$ deðerlerinin hesaplamamýz gerekiyor. Onlar ``ayrýksal'' $u$
+fonksiyonunun her veri noktasýndaki deðerlerini temsil ediyor olacaklar. 
+
+Bu çözüm perde arkasýnda Python tarafýndan nasýl hesaplanacak? Yoketme
+(eliminasyon) tekniði ile. 
+
+$h^2$, ayrýksal formüldeki $\Delta x^2$, nedir?  $u$'yu kaç parçaya ve
+hangi deðerler arasýnda bolduðumüze bakalým: 0 ve 1 arasýnda ve 6 parçaya
+bölüyoruz, o zaman $h=1/6$, $h^2=1/36$, yani $1/h^2 = 36$, yani üstteki
+imajda $h^2$'yi en solda çarpan 36 olarak yazabiliriz. Sonra $u$'yu
+hesaplatýrýz. 
+
+\includegraphics[height=4cm]{2_6.png}
+
+$K$ matrisinin 5x5 olmasý karýþýklýk yaratmýþ olabilir. Burada sebep K
+matrisine $u_0$ ve $u_6$'nin dahil edilmemiþ olmasý, çünkü o deðerleri
+zaten biliyoruz. Bu deðerler olsaydý $K$ matrisinin sol ve saðýna tamamen
+sýfýr içeren iki kolon gerekecekti, $u$ vektörüne alttan ve üstten $u_0$ ve
+$u_6$ eklenecekti ve bu iki deðer sýfýr olduðu için $K$'nin sol ve
+saðýndaki sýfýrlar ile çarpýlacaklardý, bu yüzden mevcut toplam üzerinde
+hiç etkileri olmayacaktý . Bu sebeple bu iki kolonu ve $u$ deðerini tamamen
+kaldýrmak sonuç üzerine hiçbir etki yapmýyor.
+
+Devam edelim. Þimdi orijinal problemi deðiþtirelim. Eðer üstteki problem
+iki ucu sabitlenmiþ kendi aðýrlýðýyla asýlan bir elastik çubuðu
+gösteriyorsa (ve $u$ deðerleri çubuðun ne kadar uzadýðýný temsil ediyorsa),
+bu sefer üstteki ucu serbest býrakabiliriz. Yani $u(0)=0$ olmayacak.
+
+Yine birörnek (uniform) çubuk, eþit daðýlmýþ yük. 
+
+$$ -\frac{d^2u}{dx^2} = 1 $$
+
+$$ \frac{du}{dx}(0) = 0, \ u(1) = 0 $$
+
+Burada ilk þart $u$'nin eðiminin (slope) sýfýra eþitlenmiþ olmasý.
+
+Önceki denklemdeki genel çözüm hala ise yarar. 
+
+$$ u(x) = -\frac{1}{2}x^2 + Cx + D$$
+
+$$ \frac{du}{dx} = -x + C $$
+
+$$ \frac{du}{dx}(0) = 0 + C = 0 $$
+
+$$ C = 0 $$
+
+$$ u(1) = 0 = -1/2 + 0 + D  $$
+
+$$ D = 1/2  $$
+
+O zaman çözüm
+
+$$ u(x) = -\frac{1}{2}x^2  + 1/2$$
+
+Grafikleyince þuna benzer
+
+\includegraphics[height=2cm]{2_4.png}
+
+Eðimin sýfýr noktasýnda sýfýr olduðunu görüyoruz.
+
+Þimdi farklýlýklar formülüne gelelim. Diferansiyel denklemin karþýlýðý olan
+farklýlýk formülü nedir? Hala ayný:
+
+$$ \frac{-u_{i+1}+2u_i - u_{i-1}}{h^2} = f(x_i)$$
+
+Þimdi önemli noktaya geldik: baþlangýç þartlarý ne olacak? $u(1)=0$ kolay,
+$ du/dx(0) = 0$ nasýl temsil edilecek? Bir fikir þu olabilir. 
+
+$$ \frac{u_1-u_0}{h} = 0 $$
+
+Bu ifadeyi matrise nasýl tercüme ederiz? Üstteki ifade ayný zamanda $u_1 -
+u_0 = 0$ demektir, yer degistirince $u_1 = u_0$. $K$ matrisinin birinci
+satýrý nedir?
+
+$$ -u_0 + 2u_1 - u_2 $$
+
+$u_0$ yerine $u_1$ koyalým
+
+$$ = -u_1 + 2u_1 - u_2 $$
+
+$$ = u_1 - u_2 $$
+
+O zaman birinci satýrý üstteki gibi deðiþtirirsek, sýnýr þartlarýndan
+birini yerine getirmiþ oluruz, yani ilk satýra
+$\left[\begin{array}{cc} 1&-1\end{array}\right]$ koyacaðýz, orada
+$\left[\begin{array}{cc} 2&-1\end{array}\right]$ yerine
+$\left[\begin{array}{cc} 1&-1\end{array}\right]$ var artýk. Matris bu
+þekilde deðiþince ona $K$ yerine $T$ matrisi deniyor.
+$TU = \left[\begin{array}{ccc} 1&1&\dots\end{array}\right]^T$.
+
+$$ 
+\frac{1}{h^2}
+\left[\begin{array}{rrrrr}
+1 & -1 & & & \\
+-1 & 2 & -1 & & \\
+& -1 & 2 & -1 & \\
+& & -1 & 2 & -1 \\
+& & & -1 & 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_1 \\
+u_2 \\
+u_3 \\
+u_4 \\
+u_5 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1 \\
+1 \\
+1 \\
+1 \\
+1 
+\end{array}\right]
+ $$
+
+
+Soru: ayrýksal çözüm gerçek çözüme ne kadar yakýn? Cevap hata payý $O(h)$
+çünkü $(u_1 - u_0) / h$ tanýmý birinci dereceden bir yaklaþýksallýk
+(approximation). Kabaca çizince þöyle gözükür:
+
+\includegraphics[height=2cm]{2_7.png}
+
+Hesap kalitesi pek iyi denemez. Çözümü ikinci dereceden yapsak daha iyi
+olacaktý. Nasýl? $(u_1 - u_0) / h$ yerine baþka bir þey kullanmamýz
+lazým. Ortalanmýþ farklýlýðý hatýrlayalým, bu yöntem ikinci derece
+doðruluðu olan bir yöntemdir, 
+
+Problem 1.2 A
+
+Kitaptaki ufak problemi hatýrlayalým
+
+$$ 
+\left[\begin{array}{rrr}
+1 & -1 & \\
+-1 & 2 & -1 \\
+& -1 & 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_1 \\
+u_2 \\
+u_3 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1 \\
+1 \\
+1 
+\end{array}\right]
+ $$
+
+Bu problem iþte $O(h)$ hatasýný azaltma konusunu iþliyor, bunun için ortalama
+farklýlýk (centered difference) kullanýlacak, $(u_1 - u_o)/h$ yerine 0'inci
+deðere denk gelecek þekilde farklýlýðý ortalayacaðýz, 0 üzerinde ortalama
+yapmamýz için onun bir gerisine ve bir ilerisine gitmek lazým, o zaman önce $K$
+matrisini bir geniþletelim, çünkü artýk $u_0$'in dahil edilmesi gerekecek ve
+hayali bir $u_{-1}$'i düþünelim, $u'(0) = 0$ için
+
+$$ \frac{u_1-u_{-1}}{2h} = 0$$
+
+tanýmýný kullanalým. O zaman
+
+$$ u_1 - u_{-1} = 0$$
+
+$$ u_1 =  u_{-1} $$
+
+$$ -u_{-1} + 2u_0 - u_1 = h^2 f(0) $$
+
+$u_1 =  u_{-1}$ ifadesini yerine koyalým
+
+$$ -u_1 + 2u_0 - u_1 = h^2 f(0) $$
+
+$$ -2u_1 + 2u_0 = h^2 f(0) $$
+
+$$ -u_1 + u_0 = \frac{1}{2} h^2 f(0) $$
+
+O zaman matrisin üst sol deðeri $u_0$ katsayýsýna göre 1, onun saðýndaki
+deðer $u_1$ katsayýsýna göre -1 olmalý. $1/2$ deðerini de eþitliðin
+saðýndaki $f$ için kullandýðýmýza dikkat. Tüm bunlarý $u_{-1}$'in yerine
+deðer geçirerek elde ettiðimiz için o kolona artýk ihtiyaç kalmadý, o
+geçici kolon, matristen atýldý. 
+
+$$ \frac{1}{h^2}
+\left[\begin{array}{rrrr}
+1 & -1 & & \\
+-1 & 2 & -1 & \\
+& -1 & 2 & -1 \\
+ & & -1 & 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_0 \\
+u_1 \\
+u_2 \\
+u_3 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1/2 \\
+1 \\
+1 \\
+1 
+\end{array}\right]
+ $$
+
+Matris boyutlarýnýn nasýl büyüdüðüne, ve $u_0$'in dahil edilmesine dikkat
+edelim. Problemin baþýndaki matris 3x3 boyutundaydý, bu 4x4 boyutunda,
+ayrýca $h$ hala $1/4$ deðerinde. 
+
+Problem 1-2-A
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+def ktbc(n):
+    vec = np.zeros((1,n))
+    vec[0,0] = 2
+    vec[0,1] = -1
+    K = lin.toeplitz(vec)
+    T = np.copy(K)
+    T[0,0] = 1
+    B = np.copy(K)
+    B[0,0] = 1
+    B[n-1,n-1] = 1
+    C = np.copy(K)
+    C[n-1,n-1] = 1
+    
+    return K, T, B, C
+
+K,T,B,C = ktbc(3); print T
+
+h = 1./4.
+
+discrete = lin.solve( (1./h)**2 * T, [1.,1.,1.] )
+
+discrete = np.insert(discrete, 0, discrete[0]) 
+discrete = np.append(discrete, 0.) 
+
+K,T,B,C = ktbc(4); print T
+
+discrete_2 = lin.solve( (1./h**2)*T, [1./2.,1.,1.,1.] )
+# add little diff for plotting
+# grafik ust uste binmesin diye azicik fark ekledik
+discrete_2 = discrete_2 + 0.01 
+discrete_2 = np.append(discrete_2, 0.) 
+
+def u(x): return (1./2.)*(1. - x**2)
+
+p1 = plt.plot([u(0.0), u(0.25), u(0.5), u(0.75), u(1.)])
+
+p2 = plt.plot(discrete)
+
+p3 = plt.plot(discrete_2)
+
+plt.legend([p1,p2,p3], ["analytical solution (analitik cozum)",
+                        "discrete solution 1 (ayriksal cozum 1)",
+                        "discrete solution 2 (ayriksal cozum 2)"
+                        ])
+
+plt.savefig('1-2-A.png')
+\end{minted}
+
+\begin{verbatim}
+[[ 1. -1.  0.]
+ [-1.  2. -1.]
+ [ 0. -1.  2.]]
+[[ 1. -1.  0.  0.]
+ [-1.  2. -1.  0.]
+ [ 0. -1.  2. -1.]
+ [ 0.  0. -1.  2.]]
+\end{verbatim}
+
+\includegraphics[height=6cm]{1-2-A.png}
+
+Güzel. Artýk hesap gerçek sonuca iyice yaklaþacak. 
+
+[Derse dönelim] Bunlardan bahsetmemizin önemli bir sebebi sýnýr þartlarýnýn
+ne kadar önemli olduðunu anlatmak. Görüldüðü gibi sýnýr þartlarý, onlarýn
+yaklaþýksallanma yöntemleri sonucun üzerinde direk bir etki yaratýyor.
+
+Bir dipnot olarak bahsedelim, burada kullandýðýmýz metot sýnýrlý
+farklýlýklar (finite differences) metodu. Eðer sýnýrlý elementler (finite
+elements) metodu kullanýyor olsaydýk, üstteki satýrýn deðiþmesi otomatik
+olarak gerçekleþecekti. Sýnýrlý elementler metotu ileriki derslerin birinde
+iþlenecek.
+
+Soru 1.2.7
+
+$u$'dan alýnacak dört veri noktasýyla (sample) $du/dx$ ortada olmak üzere
+4. seviye kesinlik elde edilebilir.
+
+$$
+\frac{-u_2 + 8u_1 - 8u_{-1} + u_{-2}}{12h} = \frac{du}{dx} + bh^4
+\frac{d^5}{dx^5} + ..
+$$
+
+1) Bunun $u=1$, $u=x^2$ ve $u=x^4$ için doðru olduðunu kontrol edin.
+
+2) $u_2,u_1,u_{-1},u_{-2}$'yi geniþletin. Elde edilen dört Taylor serisini
+birleþtirerek $h^4$ için gelecek $b$ katsayýsýný hesaplayýn. 
+
+Cevap
+
+Eþitliðin sol tarafýndaki 1, 8 gibi katsayýlar modelleyici tarafýndan seçilmiþ,
+bir teorinin, ispatýn sonucu deðil. Hala birincil farklýlýk (first differences)
+dünyasýndayýz, ama ileri, geriye gidip katsayý 1 kullanmak yerine dört noktayý
+kullanmak istemiþ, ve ortadaki noktalara daha fazla ``aðýrlýk'' vermek
+istemiþiz. Tabii bu katsayýlarla bu noktalar kullanýlýnca, ortalamanýn düzelmesi
+için katsayýlarýn bölüme yansýmasý gerekiyor, o yüzden bölümde $12h$ görüyoruz.
+
+Ve aynen ileri, geriye doðru ayrýksal formu sürekli fonksiyonlar üzerinde
+Taylor serisiyle temsil edebildiðimiz gibi, üstteki eþitliðin sol tarafýný
+da Taylor serisi ile $u(x+h)$ türü terimler üzerinden temsil
+edebiliriz. Üstte $u_{2}$, $u_{-1}$ gibi ibareler var, bunlarýn Taylor
+karþýlýðý $u(x+2h)$, $u(x-h)$ gibi ifadeler olur. Katsayý çarpýmlarýnýn ve
+$12h$'ye bölüm iþleminin Taylor serisi üzerinde de aynen kullanýlmasý
+gerekiyor tabii ki. 
+
+Bu arada $b$ sabitinin ne olduðunu soru söylemiyor, ama tüm bu cebirsel
+iþlemi gerçekleþtirince denklemdeki eþitliðin sað tarafý aynen elde
+edilecek ve böylece $b$ yerine hangi sayý geleceði de ortaya çýkacak.
+
+$$ \frac{-u_2 + 8u_{-1} + u_{-2}}{12h} = \frac{du}{dx} + bh^4 \frac{d^5u}{dx^5}+..$$
+
+$u(x) = 1$ için
+
+$$ \frac{du}{dx} = \frac{-1 + 8 -8 + 1}{12h}  = 0$$
+
+$u(x)=x^2$ için
+
+$$ \frac{du}{dx} = \frac{0(x+2h)^2 + 8(x+h)^2 - 8(x-h)^2 + (x-2h)^2}{12h}$$
+
+$$ \frac{(x-2h)^2 - (x+2h)^2 + 8\{ (x_h)^2 - (x-h)^2\}}{12h} $$
+
+$$ \frac{
+  (x-\cancel{2h} + x + \cancel{2h})
+  (\cancel{x}-2h-\cancel{x}-2h) +
+  8(x + \cancel{h} + x - \cancel{h})
+  (\cancel{x} + h - x + \cancel{h})}
+{12h}
+$$
+
+$$ \frac{-4h(2x) + 8(2x)(2h)}{12h} $$
+
+$$ 2x $$
+
+$u(x) = x^4$ için
+
+$$ \frac{du}{dx} = \frac{(x-2h)^4 - (x+2h)^4 + 8\{ (x+h)^4 - (x-h)^4\}}{12h} $$
+
+$$ =
+\bigg\{
+    [ (x-2h)^2 + (x+2h)^2 ] [ (x-2h)^2 - (x+2h)^2] +
+    8\{ [ (x+h)^2 + (x-h)^2 \ [(x+h)^2 - (x-h)]  \}
+\bigg\} / 12h
+$$
+
+$$ = \frac{1}{12h} \bigg\{
+-8hx [(x-2h)^2 + (x+2h)^2] + 8(4hx)[(x+h)^2 + (x-h)^2]
+\bigg\}
+$$
+
+$$ = \frac{1}{12h} \bigg\{
+-8hx[x^2 - \cancel{4hx} + 4h^2 + x^2 + \cancel{4xh} + 4h^2 ] +
+8(4hx)[x^2 + \cancel{2xh} + h^2 + x^2 - \cancel{2xh} + h^2]
+\bigg\}
+$$
+
+$$ = \frac{1}{12h} \bigg\{\
+-8hx [2x^2 + 8h^2] + 8(4xh)[2x^2+ 2h^2]
+\bigg\}
+$$
+
+$$ = \frac{8hx}{12h} \bigg\{ 2x^2 + \cancel{8h^2} - 8x^2 - \cancel{8h^2} \bigg\}$$
+
+$$ = 4x^3 $$
+
+$$ u(x+h) = u(x) + hu'(x) + \frac{1}{2}h^2u''(x) + \frac{1}{6}h^3u'''(x)+
+\frac{1}{24}h^4u''''(x) + \frac{1}{120}h^5u^{(5)} (x) + ...
+$$
+
+$$ u(x-h) = u(x) - hu'(x) + \frac{1}{2}h^2u''(x) - \frac{1}{6}h^3 u'''(x) +
+\frac{1}{24}h^4u''''(x) - \frac{1}{120}h^5u^{(5)}(x) + ...
+$$
+
+$$ u(x+2h) = u(x) + 2hu'(x) + \frac{1}{2}(2h)^2u''(x) + \frac{1}{6}(2h)^3u'''(x)+
+\frac{1}{24}(2h)^4 u^{(4)} (x) + \frac{1}{120} (2h)^5 u^{(5)} (x) + ...
+$$
+
+$$ u(x-2h) = u(x) - 2hu'(x) + \frac{1}{2}(2h)^2u''(x) -\frac{1}{6}(2h)^3u'''(x)+
+\frac{1}{24}(2h)^4 u^{(4)} (x) - \frac{1}{120} (2h)^5 u^{(5)} (x) + ...
+$$
+
+$$ \frac{-u_2 + 8u_1 - 8_{u-1} + u_{-2}}{12h} $$
+
+
+\end{document}

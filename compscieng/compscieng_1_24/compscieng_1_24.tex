@@ -1,0 +1,332 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 24
+
+[Ders notlarý atlandý]
+
+FIR Filtreleri
+
+Bir sinyalin içinden belli frekanslarý ayýklama iþlemine filtreleme adý
+veriliyor; çeþitleri alçak geçiren (low-pass), yüksek geçiren (high-pass),
+ve bant geçiren (band-pass) filtreleri. Alçak geçiren filtrelerle mesela 2
+kHz üstündeki tüm frekanlarý sinyalden çýkartmak istiyorsak eþik deðeri 2
+kHz'lük olan bir filtre kullanabiliriz, yüksek geçiren bunun tersini
+yapabilir. Bant geçiren ise sadece belli bir aralýktaki frekanslara izin
+vermek için kullanýlýr, mesela sinyalde 4 ve 5 kHz arasý frekanslar kalsýn
+istiyorsak bir bant geçiren filtre kullanýrýz.
+
+Bu yazýda sonlu dürtü yanýtlý (finite impulse response -FIR-) adý verilen
+sayýsal filtreleri kullanacaðýz, bu filtreler tipik olarak sonlu sayýda
+katsayý olarak hesaplanýrlar, sonra bu katsayýlar bir evriþim
+(convolution) operasyonu ile sinyale uygulanýr.
+
+FIR filtre tasarýmýný kolaylaþtýran en önemli numara evriþim ile ayrýksal
+Fourier transformu arasýndaki bir iliþkiye dayanýyor. Bir $x$'e evriþimle
+bir $h$ filtresi uygulayacaðýmýzý düþünelim, ve bu bize $y = x * h$
+sonucunu verecek. Ýliþki þudur ki eðer $x$ ve $h$'nin Fourier transformunu
+alýrsak $x * h$ iþlemi ``frekans yöresinde (frequency domain)'' $X \cdot H$
+çarpýmýna dönüþür, yani frekans yöresindeki çarpým iþlemi zaman yöresindeki
+evriþim iþlemine eþittir [1, sf. 161].
+
+$$ x(n) * h(n) \leftrightarrow X(\theta)H(\theta)$$
+
+ki $X$ ve $H$, $x,h$'nin Fourier transformu.
+
+Ýspat
+
+Ayrýksal evriþim formülünü hatýrlarsak,
+
+$$ y(n) = x(n) * h(n) = \sum _{m=-\infty}^{\infty} x(m) h(n-m) $$
+
+Eþitliðin iki tarafýnýn Fourier transformunu alalým, $y(n)$'nin transformu
+$Y(\theta)$ olsun,
+
+$$  
+Y(\theta) = \sum_{n=-\infty}^{\infty} \bigg[
+\sum_{m=-\infty}^{\infty} x(m) h(n-m)
+\bigg] e^{-j\theta n}
+$$
+
+Toplamlarýn yer deðiþtirebilme özelliðini kullanýrsak, 
+
+$$ 
+= \sum_{m=-\infty}^{\infty} x(m)  \sum_{n=-\infty}^{\infty} h(n-m)  e^{-j\theta n}
+$$
+
+Þimdi $k = n-m$ tanýmlayalým, 
+
+$$  
+= \sum_{m=-\infty}^{\infty} x(m)  \sum_{k=-\infty}^{\infty} h(k)  e^{-j\theta (k+m)}
+$$
+
+$$ 
+Y(\theta) =
+\sum_{m=-\infty}^{\infty} x(m)  e^{-j\theta m}
+\sum_{k=-\infty}^{\infty} h(k)  e^{-j\theta k}
+$$
+
+Son ifadede $x$ ve $h$'nin ayrý ayrý Fourier transformlarýný elde etmiþ
+olduk, ve bu transformlar birbiriyle çarpým halindeler. Ýspat tamamlandý,
+gerçekten de evriþtirilen iki öðenin arasýndaki iliþki ayrý ayrý Fourier
+transformu üzerinden çarpým haline geliyor.
+
+Bu özellik filtre tasarýmýnda son derece faydalý: çünkü eðer belli
+frekanslarý elemek istiyorsak bunu yapmanýn en rahat yolu frekans yöresinde
+öyle bir $H$ tanýmlamak ki $X$'in bazý bölgelerini olduðu gibi býraksýn
+diðerlerini sýfýrlasýn. Bu fonksiyon istenen yerlerde 1 deðerine diðer
+yerlerde 0 deðerine sahip olan bir fonksiyondan ibarettir. Fonksiyon bir
+dikdörtgene benzer, ki bu sebeple ona ``tuðla duvarý (brickwall)''
+deniyor. Bu tuðla duvarýnýn önemli bir avantajý (ters Fourier transformu
+ile) zaman yöresine geçiþ yapýldýðýnda yine basit bir fonksiyon olmasý, bu
+ünlü $\sinc$ fonksiyonudur,
+
+$$ \sinc (x) = \frac{\sin(x)}{x}$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x=np.linspace(-10.0,10.0,100)
+y=np.sinc(x)
+plt.plot(x,y); 
+plt.savefig('compscieng_1_24_14.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_24_14.png}
+
+Sayýsal olarak geçiþi yapalým, bir kýsmý 1 gerisi 0 olan tuðla duvarý
+tanýmlayýp \verb!numpy.fft.ifft! ile $h$'yi elde edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+H = np.zeros(242)
+H[128:142] = 1.
+plt.figure()
+plt.plot(H)
+plt.savefig('compscieng_1_24_02.png')
+h1 = np.fft.ifft(H,140)
+h = np.real(np.fft.ifftshift(h1))
+plt.figure()
+plt.plot(h)
+plt.savefig('compscieng_1_24_01.png')
+\end{minted}
+
+\includegraphics[width=15em]{compscieng_1_24_02.png}
+\includegraphics[width=15em]{compscieng_1_24_01.png}
+
+Ýspat
+
+Diyelim ki frekans yöresinde tanýmlý $H(\omega)$'nin tuðla duvarý þekli var
+[3, sf. 247], öyle ki sýfýrda ortalanmýþ ve $-\omega,\omega$ arasýndaki bir
+bölgede fonksiyon 1, diðer yerlerde 0, yani
+
+$$ H(\omega) = 
+\left\{ \begin{array}{ll}
+1, & -\omega_c \le \omega \le \omega_c \\
+0, & \omega_c \le |\omega|
+\end{array} \right.
+$$
+
+Bu fonksiyonun zaman yöresindeki karþýlýðýný analitik olarak bulalým. Ters
+Fourier transformu,
+
+$$ 
+h(t) = \frac{1}{2\pi}  \int _{-\infty}^{\infty} 
+H(\omega) e ^{j\omega t} \ud \omega = 
+\frac{1}{2\pi} \int _{-\omega_c}^{\omega_c} e ^{j\omega t} \ud \omega
+$$
+
+$$ 
+= \frac{1}{2\pi} \frac{1}{jt} (e ^{j\omega_c t} - e ^{-j\omega_c t}) =
+\frac{1}{\pi t} \sin(\omega_c t)
+$$
+
+$$ 
+= \frac{\omega_c}{\pi} \frac{\sin(\omega_c t)}{\omega_c t} 
+= \frac{\omega_c}{\pi} \sinc(\omega_c t)
+$$
+
+$\sinc$'e eriþmiþ olduk. Ayrýksal ortamda 
+
+$$ h[i] = \frac{\sin(2\pi f_c i)}{i \pi}$$
+
+Bu fonksiyonu bir sinyal ile evriþtirince ona frekans filtresi uygulamýþ
+oluruz, sadece $f_c$ altýndaki frekanslara izin veren alçak geçiren
+(low-pass) filtreyi ederiz [2, sf. 285].
+
+Fakat bir problem var, $\sinc$ fonksiyonu sýfýr genliðe eriþmeden eksi ve
+artý sonsuzluða sürekli devam eder. Bu sonsuz uzantý sayýsal ortamda
+kullanýþlý deðil. Bunun için fonksiyonu bize sýfýrda ortalanmýþ $M+1$ tane
+katsayý deðeri býrakacak þekilde kýrpacaðýz ($M$ çift sayý olmalý, sýfýrda
+ortalanýnca geri kalan katsayýlardan her iki yönde eþit sayýda olmasý
+için), ve geri kalan tüm $\sinc$ deðerleri sýfýr kabul edilecek.
+
+Bir diðer problem sýfýrda ortalama demek negatif indisler kullanmak demek,
+bu bilgisayarlar için problemli; o sebeple her þeyi $M/2$ saða
+kaydýrýyoruz. 
+
+Fakat kýrpmanýn bir yan etkisi þudur; kýrpma çok keskin bir þekilde
+yapýldýðý için bu fonksiyonda ani bitiþ (abrupt end) yaratýyor ve bu
+frekans yöresinde pürüzlere yol açýyor. 
+
+\includegraphics[width=30em]{compscieng_1_24_15.png}
+
+Bu problemin bir çözümü pencereleme fonksiyonu kullanmak, ve filtreleme
+yapacak çekirdeði bu pencereyle çarpýp ani geçiþi yumuþatmaya
+uðraþmak. Hamming penceresi bir seçenek,
+
+$$ w[i] = 0.54 - 0.46 \cos (2\pi i / M)  $$
+
+Nihai filtre
+
+$$ 
+h[i] = K \frac{\sin(2\pi f_c (i-M/2))}{i-M/2} \bigg[
+0.54 - 0.46 \cos (2\pi i / M)
+\bigg]
+$$
+
+\includegraphics[width=30em]{compscieng_1_24_16.png}
+
+Kodlarý altta görüyoruz, 
+
+\inputminted[fontsize=\footnotesize]{python}{filt.py}
+
+Terminoloji bilgisi: katsayýlarýn kaç tane olduðu filtre performansýnda
+deðiþiklik yaratabiliyor, bu sebeple filtrelerin bazen kaç tane katsayý
+içerdiði özellikle belirtilir, mesela alttaki örnekteki filtrelere ``33
+vuruþlu (33-tap)'' adý verilir.
+
+Alçak Geçiren Filtre
+
+Bir alçak geçiren filtre örneði $f_c$ eþik deðeri için altta görülüyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import filt
+fy=300; # Hz ile sinyal frekansi
+wy=2*np.pi*fy; # radyan / saniye ile sinyal frekansi
+fs=50; # Hz ile orneklem frekansi
+tiv=1./fs; # orneklemler arasinda zaman
+tend = 5 # saniye
+t=np.linspace(0,tend,tend/tiv); # gecen zaman (5 saniye)
+
+y=0.6*np.sin(wy*t)+0.3*np.sin(3*wy*t)+0.2*np.sin(5*wy*t); 
+f=plt.figure()
+plt.plot(t,y)
+plt.title(u'Ana Sinyal')
+plt.savefig('compscieng_1_24_05.png')
+f=plt.figure()
+plt.title(u'Filtre Öncesi Frekans')
+filt.plotSpectrum(y, fs)
+plt.savefig('compscieng_1_24_06.png')
+
+order = 32
+fc1 = 1.0
+f1 = filt.sinc_filter_low(order, fc1, fs=20).T[0];
+
+y1 = np.convolve(f1, y)
+f=plt.figure()
+plt.title(u'Alçak Geçiren Filtre Sonrasý Sinyal')
+plt.plot(np.arange(len(y1)), y1)
+plt.savefig('compscieng_1_24_08.png')
+
+f=plt.figure()
+filt.plotSpectrum(y1, fs)
+plt.title(u'Alçak Geçiren Filtre Sonrasý Frekanslar')
+plt.savefig('compscieng_1_24_07.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_24_05.png}
+
+\includegraphics[width=20em]{compscieng_1_24_06.png}
+
+\includegraphics[width=20em]{compscieng_1_24_07.png}
+
+\includegraphics[width=20em]{compscieng_1_24_08.png}
+
+Yüksek Geçiren Filtre
+
+Yüksek geçiren filtre elde etmek için herhangi bir $f_c$ için tanýmlý bir
+alçak geçiren filtreyi alýp katsayýlarýný negatife çevirmek yeterli (bir de
+ortada sýfýr noktasýnda bir pozitif deðer ekleniyor). Bu deðiþim o filtreyi
+$f_c$ için yüksek geçiren hale getirir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fc1 = 4
+f2 = filt.sinc_filter_high(order, fc1, fs).T[0];
+y2 = np.convolve(f2, y)
+f=plt.figure()
+plt.plot(np.arange(len(y2)), y2)
+plt.title(u'Yüksek Geçiren Filtre Sonrasý Sinyal')
+plt.savefig('compscieng_1_24_10.png')
+f=plt.figure()
+filt.plotSpectrum(y2, fs)
+plt.title(u'Yüksek Geçiren Filtre Sonrasý Frekanslar')
+plt.savefig('compscieng_1_24_09.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_24_09.png}
+
+\includegraphics[width=20em]{compscieng_1_24_10.png}
+
+Bant Geçiren Filtre
+
+$f_{c1}$ ve $f_{c2}$ frekanslarý arasý haricindeki tüm diðer frekanslar
+elensin istiyorsak $f_{c1}$ için alçak geçiren $f_{c2}$ için yüksek geçiren
+filtre tanýmlayýp bu iki filtreyi toplarýz. Bu toplam bize bir bant reddi
+(bant-reject) filtresi verir. Ama biz bunun tersini istiyoruz, o zaman
+eldeki katsayýlarýn üstteki bahsedilen yöntemle tersini alýrsak bir bant
+geçiren filtre elde ederiz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fc1 = 4.0
+fc2 = 4.5
+f3 = filt.sinc_filter_band(order, fc1, fc2, fs);
+y3 = np.convolve(f3, y)
+f=plt.figure()
+plt.title(u'Bant Geçiren Filtre Sonrasý Sinyal')
+plt.plot(np.arange(len(y3)), y3)
+plt.savefig('compscieng_1_24_12.png')
+f=plt.figure()
+filt.plotSpectrum(y3, fs)
+plt.title(u'Bant Geçiren Filtre Sonrasý Frekanslar')
+plt.savefig('compscieng_1_24_11.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_24_11.png}
+
+\includegraphics[width=20em]{compscieng_1_24_12.png}
+
+Karþýlaþtýrma amaçlý olarak \verb!scipy.signal.butter! kütüphane çaðrýsý
+ile bir Butterworth bant geçiren filtreyi de ayný veri üzerinde iþlettik.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.signal import butter, lfilter
+def butter_bandpass(lowcut, highcut, fs, order):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
+low = 4; high=4.5
+yb = butter_bandpass_filter(y, low, high, fs, order=1)
+plt.title(u'Bant Geçiren (Butterworth) Filtre Sonrasý Sinyal')
+plt.plot(np.arange(len(yb)), yb)
+plt.savefig('compscieng_1_24_13.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_1_24_13.png}
+
+Not: Butterworth filtreleri FIR deðil IIR filtreleri (bir sonraki yazýnýn konusu).
+
+Kaynaklar
+
+[1] ElAli, {\em Discrete Systems and Digital Signal Processing with Matlab, 2nd Edition}
+
+[2] Smith, {\em The Scientist and Engineer's Guide to Digital Signal Processing, 2nd Ed.}
+
+[3] Sierra, {\em Digital Signal Processng with Matlab Examples Volume 1}
+
+
+\end{document}

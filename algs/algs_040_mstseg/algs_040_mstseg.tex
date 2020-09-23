@@ -1,0 +1,357 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Felzenswalb Gruplamasý (Felzenswalb Clustering)
+
+Minimum Kapsayan Aðaç (Minimum Spanning Tree -MST-) kavramýný kullanan
+Felzenswalb kümelemesini göreceðiz. MST'yi daha önce iþledik. Literatürde
+Felzenswalb metotunun imaj gruplamasý için kullanýldýðý görülebilir, biz
+imaj gruplamasý yapan algoritma içinden veri kümelemesi yapan kýsmý
+çýkarttýk ve ayrý bir þekilde paylaþýyoruz. Bu gruplama algoritmasýnýn daha
+önce paylaþtýðýmýz Kruskal'ýn MST koduna yapýlacak birkaç ekleme sayesinde
+elde edilebilmesi hakikaten ilginç. Normal MST çizitin ayrý bölgelerinde
+ayrý aðaçlar yaratýr ve bunlarý yavaþ yavaþ büyütür, gerektiði noktalarda
+onlarý birleþtirir. Felzenswalb sadece bu birleþtirme mantýðýný biraz
+deðiþtirip, ayrý aðaçlarý bir grup olarak kabul eder, ve bu gruplarýn kendi
+içinde benzerliði maksimal, gruplararasý benzerliði minimal olacak hale
+getirir. Bu þekilde bildik Kruskal iþletilince çok hýzlý iþleyen hýzlý bir
+gruplama algoritmasý elde edilmiþ olur!
+
+Felzenswalb veri olarak, MST gibi, bir çizit alýr ve bu çizit veri
+noktalarýnýn arasýndaki yakýnlýk bilgisini içeren bir matris olarak
+verilebilir. Mesela 5 veri noktasý var ise, 0. nokta ile 1. nokta
+arasýndaki '10' büyüklüðündeki bir mesafe $A(0,1) = 10$ olarak
+kaydedilebilir. Kümeler birbirine yakýn öðeler arasýndan seçilir.
+
+Algoritmanýn önemli avantajlarýndan biri küme sayýsýnýn (GMM'de olduðu
+gibi) önceden tanýmlanmasýna gerek olmamasýdýr. Belli eþik deðerleri
+tanýmlanýnca küme sayýsý kendiliðinden bulunur. Tabii ``dýþarýdan verilen
+bir parametreyi baþka biriyle deðiþtirmiþ mi olduk?'' sorusu akla
+gelebilir, Felzenswalb'ýn aldýðý hiperparametreler kabaca ayarlanabilen ve
+veri kaynaðý baðlamýnda akla uygun þeyler, ve belli deðerler etrafýnda
+stabilite ortaya çýkabiliyor. Kýyasla ``küme sayýsý'' ciddi bir rakam ve
+deðiþmesi mümkün deðil. 
+
+Felzenswalb'ýn matematiðinde önce imaj bölgelerinin (ya da veri kümeleri
+olarak düþünebiliriz) arasýnda ikili karþýlaþtýrma için bir ölçüt
+gerekir. Bu bölümde bir beyan $D$'yi ortaya koyacaðýz, ki bu beyan,
+imajdaki iki bileþen (ki imaj gruplamasýnýn doðru olarak bulmaya çalýþacaðý
+bileþenler) arasýnda bir sýnýr olup olmadýðýna dair kanýtýn ölçüsü
+olacak. Beyanýn temeli þudur: iki bileþen arasýndaki sýnýrýn boyunda yer
+alan her iki tarafýn öðelerinin farklýlýðýna bak, ve onu her bileþenin
+kendi içindeki farklýlýða göre oranla. Yani bu beyan, bir bileþenin iç
+farklýlýðýný dýþ farklýlýðýna kýyaslar, ve bu sebeple verinin yerel
+karakteristikleri gözetmiþ olur. Kýyaslama mesela, global, verinin her
+yerinde aynen geçerli olacak bir sabit eþik deðerine vs. baðlý deðildir.
+
+Taným
+
+Bir bileþen $C \subseteq V$, ki $C$ bir bileþendir (component) ve $V$ çizitin tüm
+noktalarýdýr, {\em iç farklýlýðýný}, o $C$'nin minimum kapsayan aðacýnýn,
+yani $MST(C)$'sinin en büyük kenar aðýrlýðý olarak alýyoruz. Bu iç farklýlýðý
+$Int(C)$ olarak belirtirsek, 
+
+$$ Int(C) = \max_{e \in MST(C,E)} w(e) $$
+
+ki $w((v_i , v_j))$ bir çizit $G = (V,E)$'yi oluþturan bir kenar $(v_i,v_j)
+\in E$ aðýrlýðý olarak belirtilir. 
+
+Taným
+
+Ýki bileþen $C_1,C_2 \subseteq V$ arasýndaki farký o iki bileþeni
+birleþtiren kenarlardan en ufaðý olarak alýyoruz. Ýki bileþenin arasýnda
+birden fazla baðlantý olmasý mümkündür, tüm bunlara bakýyoruz, ve en
+ufaðýný alýyoruz.
+
+$$ Dif(C_1,C_2) = \min_{v_i \in C_1, v_j \in C_2, (v_i,v_j) \in E} w((v_i,v_j))$$
+
+Eðer $C_1,C_2$ arasýnda bir kenar yok ise $Dif(C_1,C_2) = \infty$ kabul
+ediliyor. 
+
+Prensip olarak iki bileþen arasýndaki en minimal baðlantýnýn problem
+çýkartabileceði düþünülebilirdi, niye en az, niye ortalama vs deðil?  Pratikte
+bu ölçütün çok iyi iþlediði görülmüþtür. Hatta iyi olmaktan öte, bu ölçüt
+minimal yerine medyan, ya da diðer yüzdelik dilim (quantile) ölçütle
+deðiþtirildiði zaman (ki bunu yaparak genel algoritmanýn aykýrý deðerlere
+-outlier- karþý daha dayanýklý olmasý istenmiþti), algoritma çetrefilliði NP-Zor
+haline geliyor. Yani gruplama kriterinde ufacýk bir deðiþiklik problemin çözüm
+zorluluðunda müthiþ bir deðiþim ortaya çýkartýyor.
+
+Þimdi iki bileþenin karþýlaþtýrma beyaný $D$'nin tanýmýna geldik. $D$ ölçütü,
+$Dif(C_1,C_2)$'nin $Int(C_1)$ ya da $Int(C_2)$'den herhangi birinden daha büyük
+olup olmadýðýna bakar. Ayrýca bu karþýlaþtýrmayý bir eþik deðeri üzerinden pay
+ekleyerek yapar, eðer irdeleme olumlu ise, iki bileþen arasýnda sýnýr vardýr,
+yoksa yoktur.
+
+$$ 
+D(C_1,C_2) = 
+\left\{ \begin{array}{ll}
+\textrm{Doðru} & \textrm{ Eðer } Dif(C_1,C_2) > MInt(C_1,C_2) \textrm{ ise } \\
+\textrm{Yanlýþ} & \textrm{ Diðer durumda }
+\end{array} \right.
+ $$
+
+Minimum iç fark $MInt$ ise þöyle tanýmlýdýr,
+
+$$ 
+MInt(C_1,C_2) = \min (Int(C_1)+\tau(C_1), Int(C_2)+\tau(C_2))
+ $$
+
+Eþik fonksiyonu $\tau$ üstteki irdelediðimiz fark hesaplarýnýn belli
+derecelerde dýþarýdan etkilemek için koyulmuþtur. Eðer bu kullanýlmasaydý
+sadece $Int$ fonksiyonu kullanýlmasý gerekecekti, fakat bu ölçüt tek
+baþýna ufak bir bileþenin yerel karakteristiklerini göstermesi açýsýndan yeterli
+deðildir. Aþýrý durumda mesela $|C| = 1,Int(C)=0$, yani en küçük $C$
+durumudur bu ($|C|$ bileþenin içindeki öðe sayýsý), içinde tek öðe vardýr,
+ve hiçbir kenar yoktur, $Int(C) = 0$.  
+
+Bu sebeple iyi bir $\tau$ bileþenin büyüklüðünü hesaba katarak, ona ters
+oranlý bir rakam oluþturursa iyi olur, mesela bir sabit $k$ üzerinden,
+
+$$ \tau(C) = \frac{k}{|C|} $$
+
+Bu demektir ki ufak bileþenler için daha kuvvetli bir ispat arýyoruz, çünkü
+küçük $|C|$, $\tau$'yu büyütecektir, ve $Dif$'in ondan büyük olmasý daha
+zorlaþacaktýr. Tabii dikkat edelim, $k$ bir ``bileþen sayýsý'' deðildir,
+yani fonksiyona dikkatli bakarsak, eðer bileþenler arasýnda yeterince büyük
+bir fark var ise ufak bileþenlere hala izin verilmiþtir.
+
+Algoritma þöyledir, girdi olarak $G=(V,E)$ alýr, ve $V$'yi $S$
+bileþenlerine ayýrýr ki her $S$ içinde ona ait olan kenarlar vardýr, yani
+$S=(C_1,..,C_r)$ 
+
+\verb!felzenswalb!$\left(G\right)$
+\begin{enumerate}
+  \item $E$ kenarlarýný $\pi = (o_1,..,o_m)$ þeklinde küçükten büyüðe doðru
+    sýrala.
+  \item Ýlk baþta $S^0$ gruplamasýný al. Bu durumda her kenar $v_i$
+    kendi bileþeni içindedir.
+  \item Her $q = 1,..,m$ icin
+  \begin{itemize}
+  \item $S^{q-1}$ gruplamasýný baz alýp $S^q$ gruplamasýný þöyle yarat;
+    $q$'inci sýradaki kenarýn birleþtirdiði noktalarýn $v_i,v_j$ olduðunu
+    farz edelim, yani $o_q = (v_i,v_j)$.
+  \item Eðer $v_i,v_j$ $S^{q-1}$ gruplamasý içinde farklý iki bileþen
+    içindeyseler, ve $w(o_q)$ her iki bileþenin içsel farkýna kýyasla çok
+    küçük ise, bu iki bileþeni birleþtir, yoksa hiçbir þey yapma.
+  \end{itemize}
+  \item \verb!return! $S^m$ 
+\end{enumerate}
+
+Üstteki döngü içindeki en son irdelemede içsel farktan bahsediliyor, bu
+tabii ki $MInt(C_1,C_2)$. Daha formel þekilde $MInt(C_1^{q-1},C_2^{q-1})$
+çünkü bileþenlerin içerikleri hangi adýmda olduðumuza göre deðiþebilir, $q$
+adýmýnda bir önceki $q-1$'den bize ``miras kalan'' gruplamalar ve
+bileþenler üzerinden iþ yapýyoruz. Bir sonraki adýma ya birleþmiþ, ya da
+birleþmemiþ (ayný) gruplamalarý aktarýyoruz. 
+
+Ayný algoritmanýn biraz daha fazla formül içeren hali [3]
+
+\verb!felzenswalb!$\left(G\right)$
+\begin{enumerate}
+  \item Bütün kenarlarý küçükten büyüðe doðru sýrala.
+  \item Ýlk baþta kenar $v_i$ kendi bileþeni içinde olsun, buna $S^0$ gruplamasý diyelim.
+  \item Her tüm kenarlar $e_i = (v_1,v_2) \in E$ için
+    \begin{itemize}
+    \item $v_1 \in C_1$ ve $v_2 \in C_2$'nin birbirinden ayrý, ayrý
+      bileþenler içinde ama ayný kenarý içeren noktalar olduðunu düþünelim,
+    \item \verb!if! $w(e_i) \le MInt(C_1,C_2)$ ise, o zaman
+    \item  $C_1$ ve $C_2$'yi birleþtir
+    \item \verb!else!
+    \item $S^i = S^{i-1}$ 
+   \end{itemize}
+   \verb!return!
+\end{enumerate}
+
+Felzenswalb gruplamasýnýn Python ile yazýlmýþ örneði alttadýr, daha hýzlý
+iþleyen C++ bazlý kodu þurada [2] bulunabilir.
+
+\inputminted[fontsize=\footnotesize]{python}{felz.py}
+
+Basit bir örnek
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.sparse as sps, felz
+import scipy.io as io
+X = io.mmread('simple.mtx')
+clf = felz.Felzenswalb(min_size=1,c=1.0)
+clf.fit(X)
+print clf.labels_    
+\end{minted}
+
+\begin{verbatim}
+(5, 5)
+[1, 1, 3, 3, 1]
+\end{verbatim}
+
+Biraz daha çetrefil bir örnek
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.sparse as sps
+import scipy.io as io, random
+import pandas as pd, os, sys
+syn = pd.read_csv("../kmeans/synthetic.txt",comment='#',names=['a','b'],sep="   ")
+data = np.array(syn)
+
+from sklearn.metrics.pairwise import euclidean_distances
+X = euclidean_distances(data, data)
+
+X2 = X.copy()
+# filter out large values / distances so matrix can be sparse
+X2[X > 2000] = 0.0
+X3 = sps.lil_matrix(X2)
+X4 = sps.triu(X3)
+print 'non-zero items', len(X4.nonzero()[0])
+print X4.shape
+\end{minted}
+
+\begin{verbatim}
+non-zero items 87010
+(3000, 3000)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import felz
+clf = felz.Felzenswalb(min_size=20,c=800)
+clf.fit(X4)
+\end{minted}
+
+\begin{verbatim}
+(3000, 3000)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+syn['cluster'] = clf.labels_
+print len(syn['cluster'].unique()), 'clusters found'
+print syn[:5]
+\end{minted}
+
+\begin{verbatim}
+19 clusters found
+       a      b  cluster
+0  54620  43523      120
+1  52694  42750      120
+2  53253  43024      120
+3  54925  42624      120
+4  54973  43980      120
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import random
+for clust in syn['cluster'].unique():
+    tmp = np.array(syn[syn['cluster'] == clust][['a','b']])
+    plt.scatter(tmp[:,0], tmp[:,1], c=np.random.rand(3,1))
+plt.savefig('mstseg_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{mstseg_01.png}
+
+Þimdi [4] yazýsýnda gördüðümüz kelime gruplamasý örneðini Felzenswalb ile
+gruplayalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+import scipy.sparse as sps
+import itertools, sys
+sys.path.append('../svdcluster/')
+import leven
+
+words = np.array(
+    ['the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have',
+     'I', 'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you',
+     'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we',
+     'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one', 'all',
+     'would', 'there', 'their', 'what', 'so', 'up', 'out', 'if',
+     'about', 'who', 'get', 'which', 'go', 'me', 'when', 'make',
+     'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take',
+     'people', 'into', 'year', 'your', 'good', 'some', 'could',
+     'them', 'see', 'other', 'than', 'then', 'now', 'look',
+     'only', 'come', 'its', 'over', 'think', 'also', 'back',
+     'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well',
+     'way', 'even', 'new', 'want', 'because', 'any', 'these',
+     'give', 'day', 'most', 'us'])
+
+(dim,) = words.shape
+f = lambda (x,y): leven.levenshtein(x,y)
+res=np.fromiter(itertools.imap(f, itertools.product(words, words)),dtype=np.uint8)
+A = sps.coo_matrix(np.reshape(res,(dim,dim)))
+print A.shape
+\end{minted}
+
+\begin{verbatim}
+(100, 100)
+\end{verbatim}
+
+Kümelemeyi yapalým, \verb!min_size=2! seçtik çünkü ufak kümeler de mümkün.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import felz
+clf = felz.Felzenswalb(min_size=1.5,c=0.2)
+clf.fit(A)
+labels = np.array(clf.labels_)
+c = len(np.unique(labels))
+print c, 'clusters found'
+\end{minted}
+
+\begin{verbatim}
+(100, 100)
+16 clusters found
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+for c in np.unique(labels):
+    print 'cluster', c
+    print words[labels==c]
+\end{minted}
+
+\begin{verbatim}
+cluster 9
+['a' 'I' 'as' 'at' 'up' 'also' 'use' 'because' 'us']
+cluster 10
+['in' 'it' 'with' 'which' 'its' 'first']
+cluster 13
+['of' 'for' 'on' 'from' 'or' 'one' 'if' 'people' 'only' 'after' 'our'
+ 'work']
+cluster 15
+['the' 'be' 'have' 'he' 'by' 'they' 'we' 'her' 'she' 'my' 'their' 'who'
+ 'get' 'me' 'when' 'time' 'year' 'them' 'see' 'other' 'then' 'over' 'back'
+ 'even' 'give']
+cluster 18
+['to' 'not' 'do' 'so' 'go' 'no' 'know' 'into' 'good' 'now' 'look' 'two'
+ 'how' 'new' 'most']
+cluster 22
+['this' 'his' 'him' 'think']
+cluster 31
+['and' 'an' 'all' 'can' 'want' 'any']
+cluster 39
+['that' 'what' 'than']
+cluster 42
+['but' 'out' 'about' 'just']
+cluster 59
+['make' 'like' 'take']
+cluster 63
+['you' 'your']
+cluster 66
+['would' 'could']
+cluster 75
+['some' 'come']
+cluster 88
+['will' 'well']
+cluster 89
+['say' 'way' 'day']
+cluster 95
+['there' 'these']
+\end{verbatim}
+
+Kaynaklar
+
+[1] Pedro F. Felzenszwalb and Daniel P. Huttenlocher, {\em Efficient
+  Graph-Based Image Segmentation}, \url{http://cs.brown.edu/~pff/segment/}
+
+[2] Github, \url{https://github.com/burakbayramli/kod/felzenszwalb}
+
+[3] Mihai-Cotizo Sima, {\em An extension of Felzenszwalb-Huttenlocher
+  segmentation to 3D point clouds}, 2012
+
+[4] Bayramli, Lineer Cebir, {\em SVD ile Kümeleme}
+
+\end{document}

@@ -1,0 +1,156 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Rasgele Ýzdüþümü (Random Projection) ile SVD
+
+Eðer ana matrisimiz $A$'nin çok fazla kolonu var ise bunu bir þekilde
+azaltmanýn yollarýný arayabiliriz. [1]'e göre bunu yapmanýn
+yollarýndan biri rasgele izdüþüm hesabýdýr. Ýlk önce $n \times k$
+boyutunda bir Gaussian rasgele matris $\Omega$ üretiriz. Ardýndan
+
+$$ Y = A\Omega $$
+
+hesaplanýr. Bu $Y$ üzerinde QR ayrýþtýrmasý yaparýz, ve elde edilen $Q$ ile
+
+$$ B = Q^T A $$
+
+hesabýný yaparýz. Ardýndan bu matris üzerinde SVD ayrýþtýrmasý yaparýz,
+
+$$ B = \hat{U}\Sigma V^T $$
+
+ve
+
+$$ U = Q\hat{U} $$
+
+matrisini hesaplarýz. Ana fikir þuradan geliyor,
+
+$$ A = QQ^TA $$
+
+ki bu standart bir cebir numarasý olurdu, $Q$ yerine rasgele
+izdüþumdan gelen yaklaþýksal $Q$'yu kullanabiliriz, o zaman
+
+$$ A \approx \tilde{Q}\tilde{Q}^TA $$
+
+olacaktýr. Yani izdüþümden gelen $Q,R$ gerçek versiyona yakýn. Üstteki
+çarpýmda $R$ yerine $B$ harfi kullanýyoruz, ki $B = \tilde{Q}^T A$
+oluyor, yani
+
+$$ A \approx \tilde{Q}B $$
+
+ya da 
+
+$$ B \approx \tilde{Q}^T A $$
+
+O zaman Ýstatistik notlarýmýz altýndaki [5] yazýsýnda olduðu gibi $B$'nin
+SVD'sini alarak yaklaþýksal bir $U$ elde etmek mümkün olacaktýr.
+
+Bu yaklaþýksal metot iþler çünkü noktalarý yaklaþýksal bir altuzaya
+yansýttýktan sonra elde edilen yeni noktalarýn arasýndaki mesafelerin
+fazla bozulmadan muhafaza edildiði söylenir, daha detaylý söylemek
+gerekirse, n-boyutlu verileri $O(\log n / \epsilon^2)$ boyutundaki bir
+rasgele altuzaya yansýtmak, pozitif olasýlýkla, yeni noktalarýn
+arasýndaki mesafeleri sadece $1 \pm \epsilon$ ölçüsünde deðiþtirir
+[2]. $Y$'nin, $A$'nin "menzilini" iyi temsil ettiði de söylenir.
+
+Test olarak þuradaki [3] veri seti üzerinde görelim:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.random as rand
+import numpy.linalg as lin
+import pandas as pd
+
+k = 7 # izdusum uzayinin boyutlari
+df = pd.read_csv("w1.dat",sep=';',header=None)
+A = np.array(df)[:,1:]
+
+print "A",A.shape
+
+rand.seed(1000)
+
+Omega = rand.randn(A.shape[1],k)
+
+Y = np.dot(A, Omega) 
+
+print "Y", Y.shape
+
+Q, R = lin.qr(Y) 
+
+# niye devrigi ile is yaptigimizi altta anlatiyoruz
+BT = np.dot(A.T, Q)
+
+print "Q", Q.shape
+print "BT", BT.shape
+
+x, x, V = lin.svd(BT)
+
+print 'V', V.shape
+
+Uhat = V.T # cunku B=USV', B'=VSU' U of B icin V' lazim
+
+print "Uhat", Uhat.shape
+
+U = np.dot(Q, Uhat) 
+
+print "U", U.shape
+
+plt.plot(U[:,0],U[:,1],'r+')
+
+plt.hold(True)
+        
+# gercek SVD ile karsilastir
+
+U, Sigma, V = lin.svd(A);
+plt.plot(U[:,0],-U[:,1],'bx')
+plt.savefig('rnd_1.png')
+\end{minted}
+
+\begin{verbatim}
+A (71, 30)
+Y (71, 7)
+Q (71, 7)
+BT (30, 7)
+V (7, 7)
+Uhat (7, 7)
+U (71, 7)
+\end{verbatim}
+
+\includegraphics[height=6cm]{rnd_1.png}
+
+Mavi noktalar $A$ üzerinde "gerçek" SVD sonucu, kýrmýzýlar yansýtma
+sonrasý elde edilen $U$. Sonuçlar çok iyi. 
+
+$B$ yerine $B^T$
+
+Kodlama açýsýndan, ya da büyük veri baðlamýnda baþka amaçlar [4] için
+$B = Q^T A$ yerine $B^T = A^T Q$ hesabý yapmak istenilebilir. Niye?
+Çünkü çýktý olarak $n \times k$ matrisi istiyor olabiliriz, $k \times
+n$ matrisi istemiyoruz, yani çok olanýn satýrlar olmasýný istiyoruz,
+kolonlar olmasýný istemiyoruz.
+
+O zaman, elde edilen $B^T$ iþe, $B$ üzerinde deðil $B^T$ üzerinde SVD
+alacaðýz demektir, bu da sonuçlarý birazcýk deðiþtirir, yani
+
+$$ B = U\Sigma V^T $$
+
+$$ B^T = V\Sigma U^T $$
+
+haline gelir. Yani $B$'nin $U$'sunu elde etmek için $B^T$'nin SVD'si
+sonrasýnda ele geçen sonuçta $(U_{BT}^T)^T$ yapmak gerekir. Her þeyin
+hafýzada yapýldýðý durumda bu fark yaratmaz, fakat "ilerisi için", yani
+eþle / indirge ortamlarý için akýlda tutmak faydalý olur.
+
+Kaynaklar
+
+[1] Halko, N., {\em Randomized methods for computing low-rank approximations of matrices}
+
+[2] Gupta, A., Dasgupta, S., {\em An Elementary Proof of a Theorem of Johnson and Lindenstrauss}
+
+[3] UCI Machine Learning Repository, 
+    {\em Breast Cancer Data Set}, 
+    \url{archive.ics.uci.edu/ml/datasets/Breast+Cancer}
+
+[4] Bayramlý, {\em SVD Factorization for Tall-and-Fat Matrices on Map/Reduce Architectures}, 
+    \url{arxiv.org/abs/1310.4664}
+
+[5] Bayramli, {\em Paralel Matris Çarpýmý, Ax, QR ve SVD} 
+
+\end{document}

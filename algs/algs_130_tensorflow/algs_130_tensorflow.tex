@@ -1,0 +1,953 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Tensorflow (TF)
+
+Google'ýn yazdýðý ve açýk yazýlým haline getirdiði paket TF çoðunlukla
+yapay öðrenim baðlamýnda gündeme geliyor, fakat TF aslýnda genel kullanýmý
+olan bir paket. TF bir sayýsal hesap kütüphanesi, daha spesifik olarak, ona
+çizit olarak verilen hesaplarý yapabilen bir sayýsal hesap paketi.
+
+TF ile hesap yapmak için hesabý temsil eden bir çizit kurulur, mesela
+$f(x,y) = x^2y + y + 2$ için
+
+\includegraphics[width=20em]{tf_01.png}
+
+Bu hesap aðaçýnda görülen sayýlar tek sayý olabilir, çok boyutlu vektör,
+matris, ya da çok boyutlu matris olabilir. Matematikte bu objelere genel
+olarak ``tensor'' ismi veriliyor, paketin ismi de buradan geliyor,
+tensorlar hesap çiziti içinde bir hesaptan diðerine ``akýyorlar''
+(flow). Hesabý çizit olarak belirtmenin bazý avantajlarý var, en önemlisi
+çizit üzerinde direk otomatik türev alýnabilir, bkz [4] yazýsý, ve bu
+þekilde gradyan hesaplarý kolay bir þekilde yapýlabiliyor. Bir diðeri
+çizitin paralelleþtirme için doðal bir yapý olmasý; çiziti istediðimiz
+þekilde bölerek parçalarý farklý mikroiþlemci (CPU), ya da grafik iþlemci
+(GPU) üzerinde paralel bir þekilde iþletebiliriz, mesela üstteki $f$ için
+$f(3,4)$ hesabý,
+
+\includegraphics[width=20em]{tf_02.png}
+
+þeklinde iki parçaya bölünebilir. 3 girilen soldaki parça kendi baþýna
+hesabýný yaparken ayný anda 4 girilen diðer parça iþlemine devam
+edebilir. Ayrýca Google TPU adý verilen tensor iþlemci üniteleri üzerinden
+artýk CPU, GPU yerine direk TF için optimize edilmiþ yeni iþlemciler
+üzerinden paralelizasyon yapýlabiliyor.
+
+TF kodlamasý nasýl olur? Üstteki örnek için
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+x = tf.Variable(3, name="x")
+y = tf.Variable(4, name="y")
+f = x*x*y + y + 2
+\end{minted}
+
+Ýçinde $x,y,f$ düðümleri (node) olan bir çizit yaratýldý. Bu kadar! Fakat
+anlamamýz gereken önemli bir nokta var, üstteki kodu iþletince halen bir
+hesap yapmýþ olmuyoruz, sadece üzerinden hesabýn yapýlabileceði çizit
+yapýsýný yaratmýþ oluyoruz. Hesabýn kendisi için bir TF oturumu (session)
+açmak lazým, bu oturum üzerinden deðiþkenler baþlangýç deðerlerlerine
+eþitlenir, ve sonra $f$ hesabý tetiklenir. Esas hesap bu þekilde ortaya
+çýkar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+sess = tf.Session()
+sess.run(x.initializer)
+sess.run(y.initializer)
+result = sess.run(f)
+print(result)
+\end{minted}
+
+\begin{verbatim}
+42
+\end{verbatim}
+
+Eðer iþimiz bitti ise ve kaynaklarýn (bellek, iþlemci gibi) geri
+dönüþümünü, serbest býrakýlmasýný istiyorsak oturumu kapatýrýz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+sess.close()
+\end{minted}
+
+Kodlama açýsýndan biraz daha temiz bir yol, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+with tf.Session() as sess:
+    x.initializer.run()
+    y.initializer.run()
+    result = f.eval()
+print result
+\end{minted}
+
+\begin{verbatim}
+42
+\end{verbatim}
+
+\verb!with! kullanýmý ile blok dýþýna çýkýlýnca kapatma iþlemi otomatik
+olarak yapýlýyor. Nihai hesap için \verb!eval! çaðrýsý yapýldýðýný gördük,
+bu çaðrý aslýnda herhangi bir düðümün hesaplanmasýný tetikleyebilir. Bu
+tetikleme sonrasýnda TF bir düðümün hangi diðer düðümlere baðlý olduðuna
+bakarak çizitte önce o düðümlerin hesabýný yapacaktýr, ve o çýktýlarý
+çizite göre birleþtirerek nihai sonucu bulacaktýr. Mesela
+
+\begin{minted}[fontsize=\footnotesize]{python}
+w = tf.constant(3)
+x = w + 2
+y = x + 5
+z = x * 3
+
+with tf.Session() as sess:
+    print 'y =', y.eval()
+    print 'z =', z.eval()
+\end{minted}
+
+\begin{verbatim}
+y = 10
+z = 15
+\end{verbatim} 
+
+TF otomatik olarak $y$'nin $w$'ye, onun da $x$'e baðlý olduðunu gördü, önce
+$w$'yi iþletti, sonra $y$'yi, ve onu da $z$ hesabý için kullandý. Dikkat,
+TF önbellekleme yapmaz, yani üstteki kod $w,x$ hesabýný iki kere
+yapar. Hesap çaðrýsý sonrasý deðiþken deðerleri muhafaza edilir (çünkü
+onlar çizitin parçasý) fakat düðüm deðerleri yokolur.
+
+TF bir anlamda numpy kütüphanesinin çizitli, çok iþlemcili versiyonu olarak
+görülebilir. Bir numpy matrisi üzerinde yapýlan pek çok iþlem TF ile de
+yapýlabilir. Mesela bir matrisin tümü, herhangi bir ekseni bazýndaki toplam
+alttaki gibi alýnabiliyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = tf.constant([[1., 1., 1.], [1., 1.,1.]])
+c1 = tf.reduce_sum(x)
+print tf.Session().run(c1)
+c1 = tf.reduce_sum(x, 0) # y ekseni uzerinden toplam
+print tf.Session().run(c1)
+c2 = tf.reduce_sum(x, 1) # x ekseni uzerinden toplam
+print tf.Session().run(c2)
+\end{minted}
+
+\begin{verbatim}
+6.0
+[ 2.  2.  2.]
+[ 3.  3.]
+\end{verbatim}
+
+Boyutlarý tekrar düzenlemek için \verb!reshape! var, alýþýk olunan numpy
+versiyonu gibi iþliyor. \verb!-1! deðerinin özel bir önemi var, sadece bir
+tane \verb!-1! kullanýlabilir, ve bu durumda o boyutta ``ne olduðu önemli
+deðil'' mesajý verilmiþ olur.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x1 = tf.constant([1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+x2 = tf.constant([[[1, 1, 1],[2, 2, 2]],
+                 [[3, 3, 3],[4, 4, 4]],
+                 [[5, 5, 5],[6, 6, 6]]])
+
+with tf.Session() as sess:
+    res1 = tf.reshape(x1, [3, 3])
+    print tf.Session().run(res1)
+    res2 = tf.reshape(x2, [2, -1])
+    print tf.Session().run(res2)
+\end{minted}
+
+\begin{verbatim}
+[[1 2 3]
+ [4 5 6]
+ [7 8 9]]
+[[1 1 1 2 2 2 3 3 3]
+ [4 4 4 5 5 5 6 6 6]]
+\end{verbatim}
+
+
+Dýþarýdan Okunan Veriyi Çizite Vermek
+
+Bunu yapmanýn en basit yolu yer tutucu düðüm (placeholder node)
+kullanmak. Bu düðümler özel düðümler, hiç bir iþ yapmýyorlar, içlerinde
+veri yok, sadece onlara dýþarýdan verdiðimiz veriyi çizit içine taþýyorlar,
+yani çizitin akýþýna dahil ediyorlar. Eðer iþleyiþ anýnda onlara dýþarýdan
+veri verilmezse TF bir hata mesajý verecektir.
+
+Yer tutucularý tanýmlarken onlarýn önceden tipini tanýmlayabiliriz, þart
+degil ama bir büyüklük te tanýmlanabilir, \verb!None! ile burayý boþ
+býrakmak ta mümkün. Þimdi yer tutucu \verb!A! tanýmlayalým, \verb!B! ona
+baðlý olsun, sonra \verb!B! deðerini hesaplamak için \verb!eval! çaðrýrken
+yer tutucunun içini o anda dolduralým, ve sonuca bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = tf.placeholder(tf.float32, shape=(None, 3))
+B = A + 5
+with tf.Session() as sess:
+    print  B.eval(feed_dict={A: [[1, 2, 3]]})
+\end{minted}
+
+\begin{verbatim}
+[[ 6.  7.  8.]]
+\end{verbatim}
+
+Yer tutucular tipik olarak gradyan iniþi ile optimizasyon sýrasýnda eðitim
+verisini ufak toptan parçalar olarak mesela $X,y$ uzerinden çizite vermek
+için kullanýlýr.
+
+Lineer Regresyon
+
+Þimdi bir toptan basit lineer regresyon hesabýný TF ile yapalým. Regresyonu
+California emlak veri seti üzerinde iþleteceðiz, bu veride bölge bazlý
+olarak ev sahiplerinin ortalama yaþý, geliri, gibi deðiþkenler ile hedef
+deðiþkeni olan ev fiyatý kayýtlý. Hedef ve kaynak deðiþkenler arasýndaki
+lineer iliþki lineer regresyon ile hesaplanabilir, tanýdýk formül,
+
+$\hat{\theta} = (X^TX )^{-1} X^T y $
+
+Veriye bir yanlýlýk (sadece 1 deðeri içeren yeni bir kolon) ekleyip üstteki
+hesabý yapalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+from sklearn.datasets import fetch_california_housing
+from sklearn.preprocessing import StandardScaler
+
+def reset_graph(seed=42):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+housing = fetch_california_housing(data_home="/home/burak/Downloads/scikit-data")
+print housing['data'].shape
+print housing['target'][:5]
+
+m, n = housing.data.shape
+
+housing_data_plus_bias = np.c_[np.ones((m, 1)), housing.data]
+X = tf.constant(housing_data_plus_bias, dtype=tf.float32, name="X")
+y = tf.constant(housing.target.reshape(-1, 1), dtype=tf.float32, name="y")
+XT = tf.transpose(X)
+theta = tf.matmul(tf.matmul(tf.matrix_inverse(tf.matmul(XT, X)), XT), y)
+
+with tf.Session() as sess:
+    theta_value = theta.eval()
+print 'theta'
+print theta_value
+\end{minted}
+
+\begin{verbatim}
+(20640, 8)
+[ 4.526  3.585  3.521  3.413  3.422]
+theta
+[[ -3.68059006e+01]
+ [  4.36796039e-01]
+ [  9.45724174e-03]
+ [ -1.07348330e-01]
+ [  6.44418657e-01]
+ [ -3.95741154e-06]
+ [ -3.78908939e-03]
+ [ -4.20193195e-01]
+ [ -4.33070064e-01]]
+\end{verbatim}
+
+TF'in matris çarpýmý için \verb!matmul!, tersini alma için
+\verb!matrix_inverse! çaðrýlarýný görüyoruz. Üstteki kodu olduðu gibi alýp
+pek çok iþlemci üzerinde direk paralel þekilde iþletebiliriz, ayný iþi pür
+numpy bazlý kodla yapmak daha külfetli olurdu.
+
+Gradyan Ýniþi
+
+Klasik toptan usül ile hesabý gördük. Peki gradyan iniþi ile lineer
+regresyon nasýl yaparýz? Burada iki yaklaþýmý göstereceðiz, biri daha zor,
+diðeri daha kolay. Zor olan matematiksel olarak elle kendimizin gradyan
+türevini almasý, daha kolay olaný türevi TF içindeki otomatik türev alma
+mekanizmasýný kullanarak o iþi de TF'e yaptýrmak.
+
+Veriyi hazýrlayalým ve çiziti oluþturalým; baþlangýç $\theta$ deðeri
+rasgele atansýn, $X,y$ deðerleri verinin kendisi olacak, tahmin ve hata
+için fonksiyonlar olsun.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+scaler = StandardScaler()
+scaled_housing_data = scaler.fit_transform(housing.data)
+scaled_housing_data_plus_bias = np.c_[np.ones((m, 1)), scaled_housing_data]
+
+reset_graph()
+
+X = tf.constant(scaled_housing_data_plus_bias, dtype=tf.float32, name="X")
+y = tf.constant(housing.target.reshape(-1, 1), dtype=tf.float32, name="y")
+theta = tf.Variable(tf.random_uniform([n + 1, 1], -1.0, 1.0, seed=42), name="theta")
+y_pred = tf.matmul(X, theta, name="predictions")
+error = y_pred - y
+mse = tf.reduce_mean(tf.square(error), name="mse")
+\end{minted}
+
+Elle türevi alýnmýþ gradyan nedir? [1, sf. 261]'e göre formül
+
+$$ 
+\nabla_\theta MSE(\theta) = \frac{2}{m} X^T (X \cdot \theta - y)
+$$  
+
+ve gradyan güncellemesi
+
+$$ 
+\theta^{t+1} = \theta - \eta \nabla_\theta MSE(\theta)
+$$
+
+Alttaki TF kodu bir döngü içinde gradyan güncellemesi yapacak ve hata
+karelerinin ortalamasý (mean square error -MSE-) hesaplayýp ekrana
+basacak. MSE'in gittikçe aþaðý inmesi lazým, çünkü gradyanýn tersi yönünde
+hatayý azaltacak þekilde hareket ediyoruz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n_epochs = 1000
+learning_rate = 0.01
+
+gradients = 2/np.float(m) * tf.matmul(tf.transpose(X), error)
+training_op = tf.assign(theta, theta-(learning_rate*gradients))
+
+init = tf.global_variables_initializer()
+
+with tf.Session() as sess:
+    sess.run(init)
+    for epoch in range(n_epochs):
+        if epoch % 100 == 0: print("Epoch", epoch, "MSE =", mse.eval())
+	sess.run(training_op)    
+    best_theta = theta.eval()
+    
+print 'theta'
+print best_theta
+\end{minted}
+
+\begin{verbatim}
+('Epoch', 0, 'MSE =', 9.1615429)
+('Epoch', 100, 'MSE =', 0.71450073)
+('Epoch', 200, 'MSE =', 0.56670469)
+('Epoch', 300, 'MSE =', 0.55557162)
+('Epoch', 400, 'MSE =', 0.54881161)
+('Epoch', 500, 'MSE =', 0.54363626)
+('Epoch', 600, 'MSE =', 0.53962916)
+('Epoch', 700, 'MSE =', 0.53650916)
+('Epoch', 800, 'MSE =', 0.53406781)
+('Epoch', 900, 'MSE =', 0.53214705)
+theta
+[[ 2.06855249]
+ [ 0.88740271]
+ [ 0.14401658]
+ [-0.34770882]
+ [ 0.36178368]
+ [ 0.00393812]
+ [-0.04269557]
+ [-0.66145277]
+ [-0.63752776]]
+\end{verbatim}
+
+Otomatik Türev ile Gradyan
+
+Sembolik türev yerine TF içindeki \verb!autodiff! paketine türevi aldýralým
+ve gradyan iniþini böyle yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+gradients = tf.gradients(mse, [theta])[0] # otomatik turev
+
+training_op = tf.assign(theta, theta-(learning_rate*gradients))
+
+init = tf.global_variables_initializer()
+
+with tf.Session() as sess:
+    sess.run(init)
+    for epoch in range(n_epochs):
+        if epoch % 100 == 0: print("Epoch", epoch, "MSE =", mse.eval())
+	sess.run(training_op)
+    
+    best_theta = theta.eval()
+    
+print best_theta
+\end{minted}
+
+\begin{verbatim}
+('Epoch', 0, 'MSE =', 9.1615429)
+('Epoch', 100, 'MSE =', 0.71450061)
+('Epoch', 200, 'MSE =', 0.56670463)
+('Epoch', 300, 'MSE =', 0.55557162)
+('Epoch', 400, 'MSE =', 0.54881167)
+('Epoch', 500, 'MSE =', 0.5436362)
+('Epoch', 600, 'MSE =', 0.53962916)
+('Epoch', 700, 'MSE =', 0.53650916)
+('Epoch', 800, 'MSE =', 0.53406781)
+('Epoch', 900, 'MSE =', 0.53214717)
+[[ 2.06855249]
+ [ 0.88740271]
+ [ 0.14401658]
+ [-0.34770882]
+ [ 0.36178368]
+ [ 0.00393811]
+ [-0.04269556]
+ [-0.66145277]
+ [-0.6375277 ]]
+\end{verbatim}
+
+Ayný sonuca eriþtik. 
+
+Daha da basitleþtirebiliriz, üstteki kodda \verb!assign! ile gradyan iniþi
+için gereken çýkartma iþlemi elle yapýldý. TF paketi içinde bu çýkartmayý
+yapacak optimizasyon rutinleri de var, mesela
+\verb!GradientDescentOptimizer!.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+training_op = optimizer.minimize(mse)
+
+init = tf.global_variables_initializer()
+
+with tf.Session() as sess:
+    sess.run(init)
+    for epoch in range(n_epochs):
+        if epoch % 100 == 0: print("Epoch", epoch, "MSE =", mse.eval())
+        sess.run(training_op)    
+    best_theta = theta.eval()
+
+print('theta')
+print(best_theta)
+\end{minted}
+
+\begin{verbatim}
+('Epoch', 0, 'MSE =', 9.1615429)
+('Epoch', 100, 'MSE =', 0.71450061)
+('Epoch', 200, 'MSE =', 0.56670463)
+('Epoch', 300, 'MSE =', 0.55557162)
+('Epoch', 400, 'MSE =', 0.54881167)
+('Epoch', 500, 'MSE =', 0.5436362)
+('Epoch', 600, 'MSE =', 0.53962916)
+('Epoch', 700, 'MSE =', 0.53650916)
+('Epoch', 800, 'MSE =', 0.53406781)
+('Epoch', 900, 'MSE =', 0.53214717)
+theta
+[[ 2.06855249]
+ [ 0.88740271]
+ [ 0.14401658]
+ [-0.34770882]
+ [ 0.36178368]
+ [ 0.00393811]
+ [-0.04269556]
+ [-0.66145277]
+ [-0.6375277 ]]
+\end{verbatim}
+
+Görüldüðü gibi matris iþlemi içeren her türlü hesap TF ile kodlanabilir, bu
+yapýldýðýnda kodlar rahat bir þekilde paralelize edilebilir. Yapay
+öðrenimde ne kadar çok lineer cebir kullanýmý olduðunu biliyoruz, ayrýca
+türev almak otomatikleþtirildiði için akla gelebilecek her türlü lineer
+cebir, optimizasyon iþlemi TF üzerinden kodlanabilir.
+
+TensorFlow ile Çok Katmanlý Yapay Sinir Aðlarý (Neural Network -NN-)
+
+Þimdi çok katmanlý NN ile regresyon yapma örneði görelim. Bir NN bildiðimiz
+gibi evrensel yaklaþýklayýcý, yeterli veri var ise her türlü fonksiyonu
+yaklaþýk olarak temsil edebilir, öðrenebilir. Düz lineer regresyon ile
+yaptýðýmýz da bir bakýma budur, bilinmeyen bir fonksiyonu veriden öðrenmeye
+uðraþýrýz, fakat nihai fonksiyon lineer olmalý. NN ile lineer, gayrý-lineer
+her türlü fonksiyon temsil edilebilir.
+
+Her katmanda girdi aðýrlýklar ile çarpýlacak, bir yanlýlýk (bias)
+eklenecek, ve sonuç bir aktivasyon fonksiyonuna verilecek (altta kullanýlan
+ReLu), buradan çýkan sonuç bir sonraki katmana aktarýlacak. Aktivasyon
+lazým çünkü aktivasyon olmasa, her katman sadece aðýrlýklarla çarpýlan
+sonucu bir sonraki katmana verse, tüm NN'in iþlemi ardý ardýna matrislerin
+çarpýmý olarak ta görülebilirdi, ama bu bir lineer iþlem olurdu, o zaman NN
+gayri-lineerligi modelleyemezdi. Diðer yandan lineer regresyon bir bakýma
+tek katmanlý ve aktivasyonu olmayan bir NN gibi görülebilir.
+
+Örnek için kullanýlan veri seti Low Birth Weight [2] verisi, bu veride
+yeni doðan çocuklarýn annenin týbbi verileri ile çocuðun doðduðundaki
+aðýrlýðý kaydedilmiþ, ve bu hedef deðiþkeni ile diðerleri arasýndaki
+iliþkiyi öðrenmek istiyoruz. Veriyi okuyup normalize edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from tensorflow.python.framework import ops
+import pandas as pd
+import tensorflow as tf
+
+cols_of_interest = ['AGE', 'LWT', 'RACE', 'SMOKE', 'PTL', 'HT', 'UI', 'FTV']
+df = pd.read_csv('lowbwt.dat',sep='\s*',engine='python')
+x_vals = np.array(df[cols_of_interest])
+y_vals = np.array(df['BWT'])
+
+ops.reset_default_graph()
+tf.set_random_seed(3)
+np.random.seed(3)
+
+sess = tf.Session()
+
+tmp = np.random.choice(range(len(x_vals)), size=len(x_vals), replace=False)
+first = int(len(x_vals)*0.80)
+train_indices = tmp[:first]
+test_indices = tmp[first:]
+
+x_vals_train = x_vals[train_indices]
+x_vals_test = x_vals[test_indices]
+y_vals_train = y_vals[train_indices]
+y_vals_test = y_vals[test_indices]
+
+def normalize_cols(m):
+    col_max = m.max(axis=0)
+    col_min = m.min(axis=0)
+    return (m-col_min) / (col_max - col_min)
+    
+x_vals_train = np.nan_to_num(normalize_cols(x_vals_train))
+x_vals_test = np.nan_to_num(normalize_cols(x_vals_test))
+\end{minted}
+
+NN katmanlarýný hazýrlayalým [3], üç katman olacak, katmanlarda sýrasýyla
+25, 10 ve 3 tane nöron olacak. Kayýp (loss) fonksiyonu L1 (mutlak deðer)
+üzerinden hesaplanýyor. Optimize edici olarak TF'in
+\verb!AdamOptimizer!'ini kullanacaðýz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def init_weight(shape, st_dev):
+    weight = tf.Variable(tf.random_normal(shape, stddev=st_dev))
+    return(weight)
+    
+def init_bias(shape, st_dev):
+    bias = tf.Variable(tf.random_normal(shape, stddev=st_dev))
+    return(bias)
+    
+x_data = tf.placeholder(shape=[None, 8], dtype=tf.float32)
+y_target = tf.placeholder(shape=[None, 1], dtype=tf.float32)
+
+def fully_connected(input_layer, weights, biases):
+    layer = tf.add(tf.matmul(input_layer, weights), biases)
+    return(tf.nn.relu(layer))
+
+weight_1 = init_weight(shape=[8, 25], st_dev=10.0)
+bias_1 = init_bias(shape=[25], st_dev=10.0)
+layer_1 = fully_connected(x_data, weight_1, bias_1)
+
+weight_2 = init_weight(shape=[25, 10], st_dev=10.0)
+bias_2 = init_bias(shape=[10], st_dev=10.0)
+layer_2 = fully_connected(layer_1, weight_2, bias_2)
+
+weight_3 = init_weight(shape=[10, 3], st_dev=10.0)
+bias_3 = init_bias(shape=[3], st_dev=10.0)
+layer_3 = fully_connected(layer_2, weight_3, bias_3)
+
+weight_4 = init_weight(shape=[3, 1], st_dev=10.0)
+bias_4 = init_bias(shape=[1], st_dev=10.0)
+final_output = fully_connected(layer_3, weight_4, bias_4)
+
+loss = tf.reduce_mean(tf.abs(y_target - final_output))
+
+my_opt = tf.train.AdamOptimizer(0.02)
+train_step = my_opt.minimize(loss)
+
+init = tf.initialize_all_variables()
+sess.run(init)
+\end{minted}
+
+NN að çizit yapýsý kuruldu, hatta aðýrlýklarýn deðerleri bile var. Tabii
+baþta bu deðerler rasgele deðerler, yani istediðimiz nihai deðerler
+deðiller. Fakat üsttekinin geçerli bir NN olduðunu ispatlamak için
+dýþarýdan bir test verisi versek bize bir hesap yapacaðýný göreceðiz. Bunun
+için yer tutuculara tek bir veri noktasý verelim, ve sonuç düðümünün
+hesaplanmasýný isteyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = np.array([20.,181.,1.,1.,0.,0.,1.,0.]) # uyduruk veri
+x = np.reshape(x, (1,8))
+print sess.run(final_output,feed_dict={x_data: x})
+\end{minted}
+
+\begin{verbatim}
+[[ 8723006.]]
+\end{verbatim}
+
+Bu sayý çok büyük, problem açýsýndan tabii ki anlamsýz, NN'i eðitim
+verisiyle eðittikçe NN aðýrlýklarý gerçek hallerine yaklaþacaklar, o zaman
+üstteki gibi bir veri noktasý için daha iyi bir sonuç alabileceðiz, fakat
+bir hesabýn yapýlabildiðini görüyoruz.
+
+Þimdi veriyi 80/20 oranýnda eðitim / doðrulama olarak ayýralým, ve eðitim
+veri seti üzerinde eðitim yapalým. Eðitim verisinden \verb!batch_size!
+büyüklüðünde mini toptan parçalar (minibatch) örnekleyelim, ve her eðitim
+döngüsünde optimize ediciye bu parçalarý verelim.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+loss_vec = []; test_loss = []
+
+batch_size = 200
+
+for i in range(200):
+    rand_index = np.random.choice(len(x_vals_train), size=batch_size)
+    rand_x = x_vals_train[rand_index]
+    rand_y = np.transpose([y_vals_train[rand_index]])
+    sess.run(train_step, feed_dict={x_data: rand_x, y_target: rand_y})
+
+    temp_loss = sess.run(loss, feed_dict={x_data: rand_x, y_target: rand_y})
+    loss_vec.append(temp_loss)
+
+    d = {x_data: x_vals_test, y_target: np.transpose([y_vals_test])}
+    test_temp_loss = sess.run(loss, feed_dict=d)
+    test_loss.append(test_temp_loss)
+    if (i+1)%25==0:
+        print('Epoch: ' + str(i+1) + '. Kayip = ' + str(temp_loss))
+
+# Plot loss over time
+plt.plot(loss_vec, 'k-', label=u'Eðitim Kaybý')
+plt.plot(test_loss, 'r--', label=u'Test Kaybý')
+plt.title(u'Her Epoch Ýçinde Kayýp')
+plt.xlabel('Epoch')
+plt.ylabel(u'Kayýp')
+plt.legend(loc="upper right")
+plt.savefig('tf_03.png')
+\end{minted}
+
+\begin{verbatim}
+Epoch: 25. Kayip = 16744.3
+Epoch: 50. Kayip = 8367.32
+Epoch: 75. Kayip = 4687.56
+Epoch: 100. Kayip = 1767.07
+Epoch: 125. Kayip = 1297.27
+Epoch: 150. Kayip = 852.689
+Epoch: 175. Kayip = 705.81
+Epoch: 200. Kayip = 728.779
+\end{verbatim}
+
+\includegraphics[width=30em]{tf_03.png}
+
+Görüldüðü gibi eðitim ve test kaybý birbirine yakýn ki bu iyiye iþaret,
+model iyi öðreniyor, eksik uyum, aþýrý uyum durumlarý yok demektir, ve
+nihai kayýp her iki tarafta da 0.7 kg civarý.
+
+Not: Girdi verisinde yaklaþýk 200 satýr veri olduðuna dikkat, þu
+sorulabilir, eðitim sýrasýnda 200 kere dönüyoruz, her döngüde 200 civarý
+toptan parça kullanýyoruz, bu nasýl oluyor? Ufak parçalarýn içeriðini {\em
+ örnekliyoruz}, o zaman döngü sayýsý, parça sayýsýna bakarsak bir anlamda
+veriyi örnekleyerek çoðaltmýþ (upsample) oluyoruz. Bu NN eðitiminde sürekli
+ortaya çýkan bir kavram, aklýmýzda olsun. 
+
+Ýki Kategori Sýnýflamasý
+
+Peki istatistikte lojistik regresyon ile yaptýðýmýz iki kategori arasýnda
+sýnýflamayý çok katmanlý NN ile nasýl yaparýz? Mesela bebeðin 2.5 kg
+altýnda doðup doðmamasý diyelim, bu bir riskli durum, ve iki farklý sýnýf
+olarak görülebilecek bu hedef deðiþkeni için 0/1 tarzýnda bir eðitim yapmak
+istiyoruz. Ýlk akla gelebilecek çözüm bir önceki NN'i alýp oradan gelecek
+tahminleri eþik deðeri 2.5 üstünde mi altýnda mý diye ek bir filtrelemeden
+geçirmek, yani regresyon sonucunu 0/1 tahminine çevirmek.  Bu yaklaþým
+yüzde 55 civarý baþarý veriyor.
+
+Daha iyisi, daha farklý bir NN'i özellikle 0/1 hedefi için eðitmek.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from tensorflow.python.framework import ops
+import pandas as pd
+import tensorflow as tf
+
+cols_of_interest = ['AGE', 'LWT', 'RACE', 'SMOKE', 'PTL', 'HT', 'UI', 'FTV']
+df = pd.read_csv('lowbwt.dat',sep='\s*',engine='python')
+x_vals = np.array(df[cols_of_interest])
+y_vals = np.array(df['LOW'])
+
+ops.reset_default_graph()
+tf.set_random_seed(1)
+np.random.seed(1)
+sess = tf.Session()
+
+tmp = np.random.choice(range(len(x_vals)), size=len(x_vals), replace=False)
+first = int(len(x_vals)*0.80)
+train_indices = tmp[:first]
+test_indices = tmp[first:]
+
+x_vals_train = x_vals[train_indices]
+x_vals_test = x_vals[test_indices]
+y_vals_train = y_vals[train_indices]
+y_vals_test = y_vals[test_indices]
+
+def normalize_cols(m):
+    col_max = m.max(axis=0)
+    col_min = m.min(axis=0)
+    return (m-col_min) / (col_max - col_min)
+    
+x_vals_train = np.nan_to_num(normalize_cols(x_vals_train))
+x_vals_test = np.nan_to_num(normalize_cols(x_vals_test))
+
+batch_size = 50
+
+x_data = tf.placeholder(shape=[None, 8], dtype=tf.float32)
+y_target = tf.placeholder(shape=[None, 1], dtype=tf.float32)
+
+def init_variable(shape):
+    return(tf.Variable(tf.random_normal(shape=shape)))
+
+def logistic(input_layer, multiplication_weight, bias_weight, activation = True):
+    linear_layer = tf.add(tf.matmul(input_layer, multiplication_weight), bias_weight)
+    if activation:
+        return(tf.nn.sigmoid(linear_layer))
+    else:
+        return(linear_layer)
+\end{minted}
+
+Üstteki \verb!logistic! çaðrýsý aðýrlýklarla çarpým sonucunu bir sigmoid
+fonksiyonundan geçiriyor. Yeni NN'imiz 20, 20, 10 nöron içeren bu yeni
+stili kullanacak.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A1 = init_variable(shape=[8,20])
+b1 = init_variable(shape=[20])
+logistic_layer1 = logistic(x_data, A1, b1)
+
+A2 = init_variable(shape=[20,10])
+b2 = init_variable(shape=[10])
+logistic_layer2 = logistic(logistic_layer1, A2, b2)
+
+A3 = init_variable(shape=[10,1])
+b3 = init_variable(shape=[1])
+final_output = logistic(logistic_layer2, A3, b3, activation=False)
+
+tmp = tf.nn.sigmoid_cross_entropy_with_logits(logits=final_output, labels=y_target)
+loss = tf.reduce_mean(tmp)
+     
+my_opt = tf.train.AdamOptimizer(learning_rate = 0.002)
+train_step = my_opt.minimize(loss)
+
+init = tf.global_variables_initializer()
+sess.run(init)
+
+prediction = tf.round(tf.nn.sigmoid(final_output))
+predictions_correct = tf.cast(tf.equal(prediction, y_target), tf.float32)
+accuracy = tf.reduce_mean(predictions_correct)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+loss_vec = []; train_acc = []; test_acc = []
+
+for i in range(1500):
+    rand_index = np.random.choice(len(x_vals_train), size=batch_size)
+    rand_x = x_vals_train[rand_index]
+    rand_y = np.transpose([y_vals_train[rand_index]])
+
+    sess.run(train_step, feed_dict={x_data: rand_x, y_target: rand_y})
+    temp_loss = sess.run(loss, feed_dict={x_data: rand_x, y_target: rand_y})
+    loss_vec.append(temp_loss)
+
+    d1 = {x_data: x_vals_train, y_target: np.transpose([y_vals_train])}
+    temp_acc_train = sess.run(accuracy, feed_dict=d1)
+    train_acc.append(temp_acc_train)
+
+    d2 = {x_data: x_vals_test, y_target: np.transpose([y_vals_test])}
+    temp_acc_test = sess.run(accuracy, feed_dict=d2)
+    test_acc.append(temp_acc_test)
+    if (i+1)%150==0: print('Loss = ' + str(temp_loss))
+
+plt.plot(loss_vec, 'k-')
+plt.title(u"Her Epoch Ýçin Çapraz Entropi Kaybý")
+plt.xlabel(u"Epoch")
+plt.ylabel(u"Çapraz Entropi Kaybý")
+plt.ylim(0.0,2.0)
+plt.savefig('tf_04.png')        
+
+plt.figure()
+plt.plot(train_acc, 'k-', label=u"Eðitim Seti Doðrulugu")
+plt.plot(test_acc, 'r--', label=u"Test Set Doðrulugu")
+plt.title(u"Eðitim ve Test Doðruluðu")
+plt.xlabel("Epoch")
+plt.ylabel(u"Doðruluk")
+plt.ylim(0.0,0.8)
+plt.legend(loc='lower right')
+plt.savefig('tf_05.png')        
+\end{minted}
+
+\begin{verbatim}
+Loss = 0.615425
+Loss = 0.593725
+Loss = 0.575125
+Loss = 0.664008
+Loss = 0.667132
+Loss = 0.617393
+Loss = 0.504238
+Loss = 0.447125
+Loss = 0.530287
+Loss = 0.528585
+\end{verbatim}
+
+\includegraphics[width=30em]{tf_04.png}
+
+\includegraphics[width=30em]{tf_05.png}
+
+Çoklu Kategori Hedefi
+
+Çiçeklerin ölçümleri ve çiçek çeþitlerini içeren ünlü IRIS veri setinde 4
+boyutlu sayýsal veri ile 3 çiçek çeþidi arasýnda softmax ile seçim yapacak
+bir kodu görelim. Bu kodda tamamen tamamen baðlanmýþ katman
+(fully-connected layer) hesabýný elle deðil, TF çaðrýsý
+\verb!tf.contrib.layers.fully_connected! ile yapýyoruz. 
+
+Ýlk önce sadece tek tamamen baðlanmýþ katman içeren bir kod görelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+
+np.random.seed(0)
+tf.set_random_seed(0)
+
+cols = ["sepal_length", "sepal_width", "petal_length", "petal_width", "iris_class"]
+data = pd.read_csv("iris.data", sep=",",names=cols)
+data = data.sample(frac=1,random_state=0).reset_index(drop=True)
+all_x = data[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
+min_max_scaler = preprocessing.MinMaxScaler()
+all_x = min_max_scaler.fit_transform(all_x)
+all_y = pd.get_dummies(data.iris_class)
+train_x, test_x, train_y, test_y = train_test_split(all_x, all_y, test_size=0.20)
+
+print(train_x.shape)
+print(train_y.shape)
+print(test_x.shape)
+print(test_y.shape)
+
+tf.reset_default_graph()
+
+learning_rate = 0.01
+
+x = tf.placeholder(tf.float32, [None, np.shape(train_x)[1]], name="x")
+y = tf.placeholder(tf.float32, [None, np.shape(train_y)[1]], name="y")
+
+prediction = tf.contrib.layers.fully_connected(inputs=x,
+                                               num_outputs=np.shape(train_y)[1], 
+                                               activation_fn=tf.nn.softmax)
+
+cost = tf.losses.softmax_cross_entropy(onehot_labels=y,logits=prediction)
+
+correct_prediction = tf.equal(tf.argmax(prediction,1),tf.argmax(y, 1))
+
+accuracy = tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+
+optimizer = tf.train.AdagradOptimizer(learning_rate).minimize(cost)
+
+sess = tf.InteractiveSession()
+
+init = tf.global_variables_initializer()
+
+sess.run(init)
+
+training_epochs = 3000
+for epoch in range(training_epochs):
+    sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
+
+print("Dogruluk:", accuracy.eval({x: test_x, y: test_y}))    
+\end{minted}
+
+\begin{verbatim}
+(120, 4)
+(120, 3)
+(30, 4)
+(30, 3)
+('Dogruluk:', 0.76666665)
+\end{verbatim}
+
+Þimdi sýrasýyla 10,20,10 olacak þekilde üç katmanlý bir YSA ile sýnýflama
+yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+tf.reset_default_graph()
+
+learning_rate = 0.01
+
+x = tf.placeholder(tf.float32, [None, np.shape(train_x)[1]], name="x")
+y = tf.placeholder(tf.float32, [None, np.shape(train_y)[1]], name="y")
+
+h1 = 10 # 1. gizli (hidden) katman
+h2 = 20 # 2. gizli katman
+h3 = 10 # 3. gizli katman
+
+k1 = tf.contrib.layers.fully_connected(inputs=x,
+                                       num_outputs=h1, 
+                                       activation_fn=tf.nn.relu)
+
+k2 = tf.contrib.layers.fully_connected(inputs=k1,
+                                       num_outputs=h2, 
+                                       activation_fn=tf.nn.relu)
+
+k3 = tf.contrib.layers.fully_connected(inputs=k2,
+                                       num_outputs=h3, 
+                                       activation_fn=tf.nn.relu)
+
+prediction = tf.contrib.layers.fully_connected(inputs=k3,
+                                               num_outputs=np.shape(train_y)[1], 
+                                               activation_fn=tf.nn.softmax)
+
+cost = tf.losses.softmax_cross_entropy(onehot_labels=y,logits=prediction)
+
+correct_prediction = tf.equal(tf.argmax(prediction,1),tf.argmax(y, 1))
+
+accuracy = tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+
+optimizer = tf.train.AdagradOptimizer(learning_rate).minimize(cost)
+
+sess = tf.InteractiveSession()
+
+init = tf.global_variables_initializer()
+
+sess.run(init)
+
+training_epochs = 3000
+for i in range(training_epochs):
+    sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
+
+print("Dogruluk:", accuracy.eval({x: test_x, y: test_y}))    
+\end{minted}
+
+\begin{verbatim}
+('Dogruluk:', 0.96666664)
+\end{verbatim}
+
+Notlar
+
+Vektorler, gradyanlar hakkinda birkac cabuk not,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+# y + 2x = 2x + x
+x = tf.constant(0.)
+y = 2 * x
+g1 = tf.gradients(x + y, [x, y])
+
+xvec = tf.Variable([[1.], [2.],[3.]]) 
+yvec = tf.Variable([[3.], [4.],[5.]]) 
+xvec = xvec + np.array([[1, 1, 1]]).T
+zvec = tf.matmul(tf.transpose(xvec),yvec)
+g2 = tf.gradients(zvec, xvec)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    print (sess.run(g1))
+    print (sess.run(xvec))
+    print (sess.run(yvec))
+    print (sess.run(zvec))
+    print (sess.run(g2))
+\end{minted}
+
+\begin{verbatim}
+[3.0, 1.0]
+[[2.]
+ [3.]
+ [4.]]
+[[3.]
+ [4.]
+ [5.]]
+[[38.]]
+[array([[3.],
+       [4.],
+       [5.]], dtype=float32)]
+\end{verbatim}
+
+Kaynaklar 
+
+[1] Géron, {\em Hands-On Machine Learning with Scikit-Learn and TensorFlow}
+
+[2] Heidelberg U., {\em Risk Factors Associated with Low Infant Birth Weight}, \url{http://www.statlab.uni-heidelberg.de/data/linmod/birthweight.html}
+
+[3] McClure, {\em TensorFlow Machine Learning Cookbook}
+
+[4] Bayramli, Bilgisayar Bilim, {\em Otomatik Türev Almak}
+
+\end{document}

@@ -1,0 +1,550 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Yapay Zeka ile Problem Çözümü
+
+Zeka nedir? Bu kavramýn tanýmý uzun süre filozoflarý, matematikçileri ve en
+sonunda yazýlým bilim adamlarýný uðraþtýrdý.
+
+Yapay Zeka olgusu, uzun bir deðiþim ve ne olduðunu tam bilmeyen bir
+süreçten geçerek bu günlere geldi. En sonunda üzerinde mutabakat kurulan
+taným, yapay zekayý genel ve temel olarak iki kategoriye ayýrdý.
+
+Genel zeka altýnda, insanlarýn bütün zihni güçlerini ve özelliklerini
+birgün bilgisayar ile kopyalama, yapabilme çabasý var. Tabii ki bu arayýþ
+uzun bir zaman alacak.
+
+Öteki dal temel zeka adý altýnda "sadece belli problemler için özel"
+algoritmalar yaratarak, problem çözebilen bir zeka türü peþinde
+koþmaktadýr. Yani zeki bir vekil yaratýp onu problemin üzerine atmak, ya da
+ufak bir temsilcimizi, bize benzeyen ufak bir kýsmýmýzý yaratýp, onu
+problem çözmek ile görevlendirmek diye nitelendirebileceðimiz bir zeka
+türüdür aranan.
+
+Teknik olarak detaya inersek, gerçek zamanda, sürekli girdi bilgisi
+iþleyerek hareket etmek zorunda olan zeka þeklini temel zeka altýnda
+inceliyoruz. Karar verme olgusu bu vekil zeka için çok önemlidir, özellikle
+belirsizlik altýnda bile karar verebilmek, vekil sistemler hayati önem
+taþýr.
+
+Örnek Problem
+
+Araþtýrmacýlar, yapay zeka kodlarýný denemek için bir deney ortamý ararken,
+þunu düþündüler. Eðer hayat bir problemler dizisi, çözüm bekleyen sorunlar,
+takip etmemiz gereken kurallar, ve plan gerektiren çözümler içeriyorsa, bu
+ortamý benzetimlemenin en rahat yolu nedir?
+
+Þans oyunlarý! Öyle ya, bir oyun hayatýn ufak bir kopyasý gibidir, kurallar
+içerir, bir amaç vardýr, plan gerektirir. Yapay zeka araþtýrmalarýnýn oyun
+oynamak üzerinde bu kadar durmasýnýn sebebi budur.
+
+8 Taþ Oyunu
+
+\includegraphics[height=4cm]{8-puzzle-start.png}
+
+Yukarýdaki 8 taþ oyununu, bilgisayara þöyle tanýmlayabiliriz. Baþlangýç
+durumu olan taþlarý (solda) sonuç durumuna (saða) dönüþtürmek için gerekli
+olan taþ hareketleri bul ve raporla kullanýcýya bildir. Bilgisayar bu
+sonuca birkac deðiþik algoritma takip ederek ulaþabilir.
+
+Kör Arama
+
+Kör, ya da mekanik, bir þekilde arama algoritmalarý, baþlangýç tahta durumu
+üzerinde yapýlabilecek bütün taþ hareketlerini iþletir ve sonuç tahtasýný
+kayýt eder. Mesela, baþlangýç tahtasýnda 8 yukarý çýkabilir, 4 saða
+gidebilir. (Not: Kodlama açýsýndan daha rahat olmasý için her taþýn
+hareketini deðil, boþluðun hareketini baz almak daha rahat olur. Sonuç
+ayný, ama kodlama daha rahat. Yani, boþluk sola gidebilir, aþagý
+inebilir). Bu iki mümkün iþlemden sonuç olarak iki yeni tahta
+çýkacak. Onlarýn da üzerinde olasý bütün iþlemleri yaparsak, daha da fazla
+tahtalar çýkacak, vs. Bunu yaparken bir yandan sonuç tahtasýna gelip
+gelmediðimizi kontrol edersek, kör bir arama algoritmasý yazmýþ olacaðýz.
+
+Bu iþlemlerin sonuçlarýný bir aðaç veri yapýsý olarak temsil etmek uygun
+olacak. Yani resimde görülen soldaki tahta üst düðüm, iki hareketten çýkan
+olasý yeni tahtalar o üst düðümün iki çocuðu olarak gösterilebilir. Böyle
+giderek elimize bir aðaç yapýsý çýkacak. Örneði aþaðýda,
+
+\includegraphics[height=8cm]{8-puzzle-tree.png}
+
+Aðaç yapýsý, birazdan göreceðimiz bütün arama algoritmalarýnýn temelini
+oluþturacak. Ama, bu aðacý yaratmanýn deðiþik yollarý var. Mesela, aðacýn
+her katýný mý önce oluþturmak istersiniz, yoksa bir dalý sonuna kadar
+derinliðine takip etmek, yoksa geri dönüp baþka bir dalý mý tekrar
+derinliðine aramak istersiniz.
+
+LISP'e Giriþ
+
+Bu iki yolu, LÝSP örnek kodu ile derinliðine inceleyelim. LÝSP en eski
+2. bilgisayar dilidir, ve Yapay Zeka araþtýrmalarý için
+yaratýlmýþtýr. LÝSP, fonksiyonlarý bile dinamik olarak yaratýp bildirgeç olarak
+iþlemlere verebilen bir dildir. Bu esnek yapýsý yapay zeka
+araþtýrmacýlarýnýn çok iþine yaramýþtýr.
+
+LISP dilinde temel veri yapýsý "listedir". Mesela, yukarýdaki baþlangýç
+tahtasýný LISP'de þöyle tanýmlanabiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+(setf tahta-baslangic '((5 4 nil)(6 1 8)(7 3 2)))
+\end{minted}
+
+Bu kullanýmda dikkat ederseniz, bir listenin listesini tanýmladýk. Yani,
+liste içeren bir liste. LISP referans kaynaklarýndan rahatça öðrenilebilir,
+böylece LISP'in çoðu iþleminin liste yapýsý üzerinde tanýmlanan iþlemler
+için olduðunu göreceksiniz. Zaten LISP'in ismi bile buradan gelir, LIST
+Processing, türkçesi "liste iþlemek".
+
+Örnek diðer bazý liste iþlemleri: (car liste) komutu listenin baþýndaki
+deðeri, (cdr liste) listenin geri kalan kýsmýný verir. (nth 2 liste)
+listenin baþtan 3. deðerini getirir, (setf liste (append 'a liste)) liste
+deðiþkenine 'a harfini ekler, vs..
+
+Aðac yapýsýndaki her düðümün, arama algoritmasý için, üst düðümünü
+hatýrlamasý gerekiyor. Ayrýca hangi taþ kaydýrma ile o tahta durumuna
+geldiðini de hatýrlamasý gerekiyor. Çünkü sonuca geldiðimizde, oradan
+tekrar baþlangýca dönerek (üstü izleyerek) kaydýrma iþlemlerini ekrana
+basarak göstereceðiz. Algoritmanýn da amacý bu deðil mi? Bilgisayarýn
+sonuca nasýl geldiðini bize göstermesi!
+
+Bu sebeple, yeni büyütülmüþ liste (listenin listesi) þu hale geldi. Örnek
+olarak boþluðu aþaðý kaydýrarak, geldiðimiz bir tahtayý þöyle gösterelim.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+;; listenin icine bakabilen islemler
+(Defun Durum (dugum) (first dugum))
+(Defun Kaydir (dugum) (second dugum))
+(Defun Ust (dugum) (third dugum))
+
+;; ornek bir tahta
+(setq baslangic (((1 3 2)(5 4 6)(7 8 nil)) 
+  'asagi (((1 3 2)(5 4 nil)(7 8 6))))
+
+;; tahtayi ve islemleri kullanarak dugum hakkinda bazi raporlar
+(print "kaydir islemi")
+(kaydir baslangic)
+
+(print "ust dugum")
+(ust baslangic)
+
+(print "tahta durumu")
+(durum baslangic)
+\end{minted}
+
+"Üst" düðümün, çocuk düðümü içine nasýl konduðunu görüyoruz. Aðaçta daha
+derine indikçe, liste içinde liste, onun içinde liste, onun da içinde liste
+gibi bu yapý daha da derinleþecektir. C ya da Java gibi dillerinde imleç
+(pointer) kullanarak ayný þey yapýlabilir. Ama LISP bu aðaç yapýsý için
+bile liste kullanýyor. Merak etmeyin, imleç kullanýmý kadar da etkili
+oluyor.
+
+Önce Geniþliðine (Breadth-First) ve Önce Derinliðine (Depth-First) Arama
+
+Aðaç yapýsýný tanýmladýktan sonra, algoritmaya gelelim. Kat kat arama
+algoritmasýnda, çocuk düðümleri yarattýktan sonra onlarý "iþlenmek üzere
+beklettiðimiz" bir listeye koyarýz. (gene mi liste?) :)
+
+Evet. Bu yapý üzerine ekleme yaparken, ya sonra, ya baþa ekleme yapmak
+mümkün. Eðer sona koyarsak, çocuklar en son girdiði yerden en son çýkacak,
+eðer baþa koyarsak girdiði gibi hemen çýkacaktýr. Bu þekilde kullanýmýn
+birincisi, listeyi kuyruk (queue) olarak, ikincisi yýðýt (stack) olarak
+kullanmak anlamýna gelir. Yazýlým bilimde bu iki olgu çok temeldir. Her
+algoritma kitabýnda kuyruklar ve yýðýtlar hakkýnda bilgi
+alabilirsiniz. Sonuçta, çocuklarý yýðýt üzerinde bekletmiþsek, arama önce
+geniþliðine arama olur, kuyruk olarak bekletmiþsek arama "önce derinliðine"
+arama olur.
+
+Bu iki arama þeklinin farký niçin önemlidir? Burada esas sormamýz gereken
+þu olacak. Hangi arama þekli daha baþarýlýdýr?
+
+Bu sorunun cevabý algoritmik analiz ile verilebilir, fakat özet olarak
+belirtmek gerekir ki, önce geniþliðine aramak istatistiki olarak daha
+baþarýlý oluyor. Derinliðine arama, ek baþka algoritmalar ile destekli
+olarak da baþarýlý olabiliyor.
+
+Gereken Kodlar ve Programlar
+
+Ekteki dosyalar LISP derleyicisi/yorumlayýcýsi ve örnek kodlar
+içeriyor. 
+
+Önce geniþliðine aramayý, derinliðine aramaya çevirmek için tek yapmanýz
+gereken yýðýtý, kuyruða çevirmektir.
+
+Bir önceki yapay zeka yazýsý, akýllý bilgisayarlar hakkýnda hayal kýrýklýðý
+yaratmýþ olabilir. Sonuçta gösterdiðimiz algoritma, derinliðine ya da önce
+geniþliðine arasa bile, "bütün" sonuçlarý deniyor! Yani insan ile yarýþmak
+için aslýnda hafýza geniþliðinden ve hesap hýzýndan yararlanýyor. Peki
+nerede zeka?
+
+Bunu düþündüyseniz haklýsýnýz. Hakikaten de, bu ilk bahsettiðimiz
+algoritmalar "kaba-kuvvet algoritmalarý" diye anýlýr. Direk ileri giderler,
+ve gayet mekanik þekilde sonuca ulaþmaya uðraþýrlar.
+
+Fakat, bir insan olarak biliyoruz ki, akýllý olmanýn bir özelliði de
+öðrenmektir. Yani, bazý kýsa yollar bulmak, bir takým dersler çýkartarak
+sonuca daha hýzlý ulaþmayý saðlamak insanlarýn gayet doðal yaptýðý
+þeylerdir. Eðer bunlar kodlanmamýþsa, oyun oynayan algoritmamýz kaba
+kuvvetten daha ileri gidemeyecek. Üstelik büyük problemler için o üstün
+hýzý bile yetiþmeyebilir!
+
+Pekala. Hadi o zaman þu programa biraz akýl verelim.
+
+Ýzlenen Yolun Fiyatý
+
+Algoritmamýzýn "arama" algoritmasýný olarak isimlendirilmesinin sebebi,
+mümkün olan birçok seçenek arasýndan kýsa olaný bulmak için "arama"
+yapmasýdýr. Bilgisayarýn önünde olan birçok seçeneðin her birinin fiyatý,
+yani uzunluðu, birbirinden farklýdýr. Akýllý bir programa lazým olan, bu
+yollardan en kýsa olanýný bulmaktýr. Ýnsanlar da, kendi düþüncelerini
+hýzlandýrmak için birtakým yan algoritmalar geliþtirirler ve çabuk sonuca
+ulaþmaya uðraþýrlar.
+
+Bu fiyatý iki türlü ölçebiliriz. Birincisi, karar aðacýnda çözümü ararken o
+an üzerinde bulunduðumuz düðüme gelmek için ödediðimiz fiyat (katedilen
+yol), öteki de önümüzde katedeceðimiz geri kalan yoldur.
+
+Katedilen yolun seçimde (arayýþta) ne yararý var diye
+düþünebilirsiniz. Eklemek gerekir ki, özellikle önce-derinliðine arama
+algoritmasý bazen ayný düðüme deðiþik yollardan ulaþabiliyor. Bu gibi
+durumlarda tuttuðumuz kayýtlarda ayný düðümü bulursak, ve bu düðümün
+içerdiði yol daha pahalý ise, eskiyi listeden atýp, yerine yeni düðümü
+koymamýz gerekiyor.
+
+Nihayet akýllý bir "seçim" yaptýk.
+
+Fakat hala geriye bakýyoruz. Ýleriye bakarak, bilgili bir tahminde hala
+bulunmadýk. Ýleriye dönük bir tahmin fonksiyonunu nasýl bilgisayarda kodlarýz?
+8'li Bulmaca oyununu düþünürsek; oyunun herhangi bir seviyesinde tahtaya
+bakarak, en iyi yapýlacak hareketi nasýl bulabiliriz?
+
+Akýllý Tahmin
+
+Öyle bir fonksiyon bulalým ki, elimizde olan düðümden yarattýðýmýz çocuk
+düðümler arasýnda hangisini takip edeceðimizi bize söylesin. Sözde program
+þöyle olabilir.
+
+\begin{itemize}
+   \item Düðümü al
+   \item Düðümün bütün olasý çocuklarýný yarat
+   \item Her çocuk için, sonuç tahtasýna olan tahmini bir uzaklýk deðeri
+     hesapla
+   \item Bu çocuk düðümler arasýnda sonuca en yakýn olaný seç
+\end{itemize}
+
+Pekala, nedir bu uzaklýk deðeri? Ýþte akýl devreye burada giriyor.
+
+Her tahta durumunun sonuca uzaklýðý, tahmini olarak þöyle
+hesaplanabilir. Mesela, baþlangýçtaki her taþý, sonuç tahtasýna bakarak
+bulalým. Eðer sonuç tahtasýndaki taþ, baþlangýçtaki ayný yerde deðil ise,
+ne kadar uzakta olduðunu bulalým.
+
+\includegraphics[height=4cm]{8-puzzle-start.png}
+
+Üstteki iki tahta arasýnda, bu uzaklýk deðeri "5" taþý için "4"
+olacaktýr. Çünkü 1,1 eksen konumundan 3,3 konumuna gitmiþtir. Ve aradaki
+fark 2 aþaðý 2 saða gittiðimiz için 4'tür. Bu tür uzaklýk hesabýna
+Manhattan uzaklýðý deniyor, çünkü hepsi eþit bloklar arasýnda yürüyerek
+giderken ölçülen türden bir hesap çeþididir.
+
+Bu uzaklýk hesabý, bir nevi þunu beyan etmektir - bu tahtayý, sonuç
+tahtasýna çevirmek için bu kadar hamle yapmak gerekiyor. Tabii ki bu hesap
+kesin bir hesap deðildir. Tam doðru da deðildir, ama, olmasý da
+gerekmez. Yeteri kadar doðru, ve en önemlisi, hiç bir zaman fazla keseden
+atmayan bir hesap doðru seçim için yeterlidir. Çünkü, ayný þekilde "tam
+doðru olmayan hesaplarý" öteki seçenekler için de yapýyoruz! Yani,
+birbirine olan izafi bir doðruluk, sayýnýn tamamen doðru olmasý etkisi
+yapar.
+
+LISP kodu
+
+Ekteki kodlarda göreceðiniz gibi, LISP kodu için 2 tane fonksiyon tanýmlamak
+gerekti. G-güncel deðiþkeni 'geriye bakan' türden olan fiyatý-sabit-arama
+algoritmasý için zaten gerekiyordu. Ekte olmayan, ama konu hakkýnda
+görebileceðiniz bir algoritma sýrf tahmine dayanarak seçim yapmaya uðraþýr,
+yani sadece t-guncel deðerini kullanýr. En güçlü olan yöntem, g-guncel ve
+t-guncel'in 'toplamýna' dayanarak seçim yapmaktýr. Böylece hem o ana kadar
+gözlediðimiz ölçümü, hem de ileriye bakarak yaptýðýmýz tahmini ayný anda
+gözönüne almýs oluyoruz.
+
+Ýki hesabýn birleþimine dayanarak seçim yapan arama algoritmasýna A* (a
+yýldýz) algoritmasý denir. Bu kodu da a-yildiz-arama.lisp altýnda
+bulabilirsiniz.
+
+Ayrýca, ödev olarak (yapay zeka dersi için) bizim kodladýðýmýz, A*'ý kendi
+akýl fonksiyonu ile geniþletip, kendi t-guncel kodunu yazmamýz
+gerekiyordu. 
+
+Bu yeni A* t-guncel hesabý, hem taþ uzaklýðýna dayanýyor, fakat bir toplam
+daha ekliyor. Eðer iki taþý deðiþ tokuþ yaptýrmamýz gerekiyorsa, bu normal
+uzaklýktan çok daha pahalý bir iþlemdir, ve 2 sayýlmasý gerekir! Bu þekilde
+yapýlan toplamýn, ve akabinde t-guncel deðerinin, algoritmayý daha
+geliþtirdiðini göreceksiniz.
+
+Yani biraz daha akýl kullanarak, iþimizi kolaylaþtýrmýþ oluyoruz.
+
+\inputminted[fontsize=\footnotesize]{python}{ortak.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{kat-kat-ara.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{kat-engelli-da.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{iki-yonlu-arama.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{git-gide-derin-kka.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{fiyati-sabit-arama.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{a-yildiz-arama.lisp}
+
+Yapay Zeka ve Müsabaka
+
+Bilgisayarlar bir problemi yapay zeka kullanarak çözerken, kullandýklarý
+teknikler; Karar aðacý, akýllý tahmin yeteneði ve o ana kadar geçilen yolu
+hatýrlamaktýr.
+
+Karar aðacý kullanýrken, seçeceðimiz yolun doðru yol mu olup olmadýðý
+tahmin etmek için deðerlendirme fonksiyonuna sorarýz. Bu fonksiyon gerçek bir
+tahmin mantýðýna ne kadar yakýn ise, (yani uzman bir insana) arama da o
+kadar baþarýlý olur.
+
+Bu örnekten yola çýkarsak, karþýlýklý müsabakalar da bir arama problemi
+gibi görülebilir. Bir baþlangýç noktasý vardýr, belli seçenekler vardýr, bu
+seçenekleri takip etmek için karar aðacý tekniði uygulanabilir.
+
+Tek bir deðiþiklik ile: Artýk kararlarýn hepsi bize ait deðil.
+
+Altüst (Minimax) Algoritmasý
+
+Mesela müsabaka, bir dama oyunu olsun. Oyun sýrasýnda sýra bir bilgisayara,
+bir karþý tarafa geçer. Bu yüzden iyi bir yapay zeka algoritmasý, hem kendi
+hareketlerinin arasýnda "deðerlendirme fonksiyonunun" en iyi bulduðunu seçmeli,
+hem de, ayný zamanda rakibi için en kötü olacak yolu takip etmelidir.
+
+Bu iki seçeneðe göre karar arama yapan algoritmaya altüst algoritmasý
+diyoruz. Çünkü rakip için an alt deðer ile, bilgisayar için en üst deðeri
+ayný anda arýyoruz.
+
+Normal tek kiþili arama algoritmalarýnda sadece "bir" ileriye bakarak
+deðerlendirme yapmýþ, ve en fazla olan seçeneði takip etmiþtik. Altüst için
+arama yaparken derinliðine ineceðiz, ve bu derinliði hafýzamýzýn elverdiði kadar
+yapabileceðiz. Çünkü, hamleye karþý hamle, ona karþý hamle derken en iyi
+seçeneði bulabilmek için bazen oldukça derinlere inmek gerekebilir. 10 seviye
+altta çok iyi gözüken bir birleþim olabilir, ama belki de 11. seviyede maçý
+kaybediyoruz! Tabii dallanma seviyesi fazla olan oyunlarda (mesela satranç) bu
+þekilde derinlik birçok bilgisayarý donaným olarak zorlayacaktýr. Bu yüzden
+Kasparov gibi bir ustayla ancak IBM'in satranç için özel yapýlmýþ makinesi
+rekabet edebiliyor.
+
+Oyun: Ýtalyan Damasý
+
+Altüst algoritmasýný dallanma faktörünün fazla olmadýðý bir oyun üzerinde
+göreceðiz. Bu oyunun ismi italyan damasý. Bildiðimiz dama oyununa çok
+benziyor, sadece taþlar düz olarak ileri, geri, saða, sola gitmek yerine
+çapraz hareket ediyorlar. Aynen damada olduðu gibi, en sona ulaþan taþ kral
+oluyor ve uzun sýçramalar yapabiliyor.
+
+Ekte verilen LISP kodu üzerinde göreceðimiz gibi, programý temel
+hareketler, deðerlendirme fonksiyonu, algoritma ve ekrandan giriþ yaparak
+oynanabilen kýsýmlara ayýrdýk.
+
+Altüst algoritmasý, özyineli olarak çalýþan bir algoritmadýr. Altüst, önce
+derinliðine bir sekilde müsaade edildiði kadar (programcý tarafýndan)
+derinliðe iner, ve vardýðý en uç noktalardaki tahtalarý deðerlendirir. Geri
+dönerken, bu deðerlerden bazen "en az" olaný bazen "en fazla" olaný
+seçer. En az/en fazla kýstasý her seviyede bir deðiþir. Rakip hareketlerini
+gösteren seviyede bulunuyorsak, enalt, kendi seviyemizde bulunuyorsak enüst
+seçimi yaparýz.
+
+Üzerinde karþýlaþtýrma yaptýðýmýz sayý, deðerlendirme fonksiyonunun tahta
+hakkýnda biçtiði deðerden baþkasý deðildir. Bu tür deðerlendirme fonksiyonlarýný
+A* algoritmasý altýnda görmüþtük.
+
+Tahta deðerlerinin arasýndaki seçimi özyineden geriye "dönerken"
+yaptýðýmýza özellikle dikkat edin. Yani, 10. seviyeye indiysek ve bütün
+önce-derinliðine olarak bir dalý açmýþ isek, ancak ondan sonra deðerleri
+birbirleri ile karþýlaþtýrarak ve seçerek döndürmeye
+baþlýyoruz. Deðerlendirme iþleminin kendisi, derinliðin en sonundaki
+tahtalar üzerinde yapýlýyor. "Ara tahtalarýn" üzerinde deðerlendirme
+yapmýyoruz. (Bkz. \verb!tahta-degerlendir! fonksiyonu).
+
+\includegraphics[height=4cm]{altust.jpg}
+
+Örnekteki resimde 2. seviyeye 99 ve 100'ün dönmüþ olduðunu
+görüyoruz. 1. seviye de sýrasýyla önce 99, sonra 100'ün dönmesi gerekir, ve
+bunlardan 100 deðeri 99'un üzerine çýkacaktýr. Çünkü 1. seviye 'üst'
+seviyesidir. Alt seviyesi olsa idi, 99 seçilecekti.
+
+Ayrýca, seviyeye göre bazen alt, bazen üst deðerler aradýðýmýz için, hangi
+seviyede olduðumuza baðlý olarak <> operatörlerini kullanmak yerine, hep ayný
+operatörü (>) kullansak, ve karþýlaþtýrma yaptýðýmýz deðeri sonraki seviyeye
+aktarmadan önce eksi (-) ile çarpsak kod daha temiz olacak. Bunu ufak bir
+algoritma numarasý olarak görebilirsiniz. Deðeri eksiye dönen bir deðerin
+üzerinde uygulanan büyüktür/küçüktür karþýlaþtýrmalarýnýn sonucu
+otomatikman tersine döner (basit aritmetik). Eksiyi eksi ile çarpýnca sayý
+tekrar artýya döndüðü için özyineli olarak bu çarpýmý tekrar tekrar
+yapmamýz mümkün olabiliyor. Ne güzel. Böylece iki tane if (ya da LISP cond)
+ifadesi yazmaktan kurtulmuþ olduk. Kod daha temiz hale geldi. Bahsedilen
+çaðýrým þekli dama-alg.lisp dosyasýndaki aþaðýdaki satýrda.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+(setf dene (eniyi-hareket (tas-oynat 
+   (first hareket-listesi) konumn)
+(- derinlik 1)
+(* onun-eniyi -1) ;; eksi carpimina dikkat
+(* enyuksek-deger -1))) ;; ;; eksi carpimina dikkat
+\end{minted}
+
+Bir baþka ilginç bir nokta da þudur: Rakibimizin tahtalarýný ve kendi
+tahtalarýna deðer biçerken hep ayný fonksiyonu kullanýyoruz. (Kod üzerinde
+\verb!tahta-degeri(tahta)! LISP fonksiyonu). Bunun demektir ki Kendi oyun
+bilgimize dayanarak rakibimizin ne yapacaðýný tahmin etmeye
+uðraþýyoruz. Yani zihnen, sanal bir alemde "rakibimizin yerine" hamle
+yapýyoruz ve bu sanal hamleye kendimize göre bir cevap veriyoruz. Hakikaten
+de satranç, dama, kaðýt oynarken yaptýðýmýz da bu deðil midir?
+
+Eniyileþtirme
+
+Gördüðümüz gibi, altüst'ün temeli oldukça basit. Bundan sonrasý, altüst'ü
+hýz ve hafýza bakýmýndan eniyileþtirme için yapýlmýþtýr. Alfa-beta budamasý
+denen altüst uzantýsý bu çerçevede düþünülmüþtür.
+
+Dama tahtalarý arasýnda alt/üst irdelemesi yaparken, þunu düþünebiliriz:
+Aðacýn herhangi yerindeki oyuncunun varabileceði bir yer olarak bir n adlý
+bir düðüm olduðunu düþünün; Eðer oyuncunun n'in bir üstü ya da daha
+tepesinde (dallanma olarak) m adýnda daha iyi seçeneði var ise, n düðümü
+oyun sýrasýnda asla eriþilmeyecektir. Bu yüzden n hakkýnda yeteri kadar
+bilgiye sahip olduðumuzda (cocuklarýndan birkaçýna bakarak), bu düðümü
+tümden budayabiliriz.
+
+Daha detaylý (ve matematiksel) bir örnekte göstermemiz gerekirse:
+
+\begin{minted}[fontsize=\footnotesize]{python}
+altust-degeri(en tepe) = 
+   üst ( alt(3, 12, 8), alt(2, x, y), alt(14, 5, 2) )
+altust-degeri(en tepe) = 
+   üst ( 3, alt(2, x, y), 2)
+altust-degeri(en tepe) = 
+   üst ( 3, z, 2)
+altust-degeri(en tepe) = 3
+\end{minted}
+
+Alt (2, x, y) fonksiyonunun deðeri Z'ye eþitlendi (ve atýldý), x ve y'nin ne
+olduðuna bile bakýlmadan. Çünkü alt(2, x, y) dediðimiz zaman ayný anda þunu
+söylemiþ oluyoruz: "alt (2, x, y) en fazla 2 olabilir". Deðil mi? Çünkü alt
+fonksiyonunun gereði olarak zaten en aþaðý olan deðeri seçeceðiz. X ya da y
+daha az olsa, onlarý seçerdik, daha fazla olsalar 2'yi seçeceðiz. Fakat,
+elimizde KESÝN bir 2 deðeri "zaten" var ise, alt(2, x, y)'yi bir tarafa
+atabiliriz, çünkü nasýl olsa alt(2, x, y)'nin sonucu 2'den daha iyi
+olamazdý. DAHA ÝYÝ'den kastýmýz üst fonksiyonu bakýmýndan daha iyi demektir,
+çünkü alt() fonksiyonlarýnýn sonucu üst() fonksiyonuna gidiyor, biliyorsunuz.
+
+Sonuçta, soyut olarak düþünerek alt(2, x, y)'nin üzerinde 2 yönlü bir
+traþlama yapýyoruz denebilir. X ve Y'nin 2'den fazla olmasýný fonksiyonun
+kendisi traþlýyor. Daha az olabilme ihtimallerini'de, elimizde zaten olan 2
+deðeri traþlýyor, çünkü bu iki deðerinin ne yaparsak yapalým üstüne
+çýkamayacaðýz. Alt deðerleri, üstte toplandýðý için...
+
+Alfa beta budamasý ismini aðaçta gezinirken o ana kadar en üst bulunmuþ
+olan deðeri alfa deðiþkeninde, ve en alt bulunmuþ deðeri beta deðiþkeninde
+sürekli olarak yanýnda gezdirmesinden alýr. En alt ve en üst deðerler
+aranýrken sürekli alfa ve beta'ya karþýlaþtýrma yapýlýr. Alfa/beta
+penceresinin içine düþmeyen seçenekler ve onlarýn alt-aðaçlarý tamamen
+budanýr. Bu þekilde yer ve zamandan oldukça istifade etmemiz mümkündür.
+
+\includegraphics[height=4cm]{altust_budama_1.jpg}
+
+\includegraphics[height=4cm]{altust_budama_2.jpg}
+
+\includegraphics[height=4cm]{altust_budama_3.jpg}
+
+\includegraphics[height=4cm]{altust_budama_4.jpg}
+
+\includegraphics[height=4cm]{altust_budama_5.jpg}
+
+\inputminted[fontsize=\footnotesize]{python}{dama-alg.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{dama-deger.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{dama-oyna.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{dama-temel.lisp}
+
+\inputminted[fontsize=\footnotesize]{python}{dama-test.lisp}
+
+Tek hamlelik bir oyun oynayalým, ve bilgisayarýn karþýlýðýný görelim, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!clisp dama-test.lisp
+\end{minted}
+
+\begin{verbatim}
+
+"Tamam. Temel Birim Testler Gecti" 
+"Tamam. Algoritma Birim Testleri Gecti" 
+WARNING: DEFUN/DEFMACRO: redefining function TAHTA-DEGERI in
+         /home/burak/Documents/classnotes/app-math-tr/probsolve/dama-deger.lisp,
+         was defined in
+         /home/burak/Documents/classnotes/app-math-tr/probsolve/dama-alg.lisp
+"Tamam. Degerlendirme Birim Testleri Gecti" 
++=0===1===2===3===4===5===6===7-+
+7   | b |   | b |   | b |   | b |
+|===============================|
+6 b |   | b |   | b |   | b |   |
+|===============================|
+5   | b |   | b |   | b |   | b |
+|===============================|
+4   |   |   |   |   |   |   |   |
+|===============================|
+3   |   |   |   |   |   |   |   |
+|===============================|
+2 s |   | s |   | s |   | s |   |
+|===============================|
+1   | s |   | s |   | s |   | s |
+|===============================|
+0 s |   | s |   | s |   | s |   |
++=0===1===2===3===4===5===6===7=+
+
+"su hareketi yaptiniz" 
+((0 2) (1 3)) 
++=0===1===2===3===4===5===6===7-+
+7   | b |   | b |   | b |   | b |
+|===============================|
+6 b |   | b |   | b |   | b |   |
+|===============================|
+5   | b |   | b |   | b |   | b |
+|===============================|
+4   |   |   |   |   |   |   |   |
+|===============================|
+3   | s |   |   |   |   |   |   |
+|===============================|
+2   |   | s |   | s |   | s |   |
+|===============================|
+1   | s |   | s |   | s |   | s |
+|===============================|
+0 s |   | s |   | s |   | s |   |
++=0===1===2===3===4===5===6===7=+
+
+"bilgisayarin hareketi" 
+((1 5) (0 4)) 
++=0===1===2===3===4===5===6===7-+
+7   | b |   | b |   | b |   | b |
+|===============================|
+6 b |   | b |   | b |   | b |   |
+|===============================|
+5   |   |   | b |   | b |   | b |
+|===============================|
+4 b |   |   |   |   |   |   |   |
+|===============================|
+3   | s |   |   |   |   |   |   |
+|===============================|
+2   |   | s |   | s |   | s |   |
+|===============================|
+1   | s |   | s |   | s |   | s |
+|===============================|
+0 s |   | s |   | s |   | s |   |
++=0===1===2===3===4===5===6===7=+
+\end{verbatim}
+
+Biz siyah (s) tarafýyýz ve ilk hamleyi \verb!0,2! kordinatýndan \verb!1,3!
+kordinatýna dogru yaptýk. Bilgisayar buna karþýlýk \verb!1,5!'ten
+\verb!0,4!'e doðru bir hamle yapti. %
+
+\end{document}

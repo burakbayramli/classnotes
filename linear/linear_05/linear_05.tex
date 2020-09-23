@@ -1,0 +1,331 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 5
+
+Permutasyonlar
+
+Bu derste bir anlamda lineer cebirin ruhunu görmeye baþlayacaðýz, sadece
+vektörler deðil artýk vektör uzaylarýna bakmaya baþlayacaðýz, yani daha
+büyük resme odaklanacaðýz. Ayrýca herhangi bir uzayýn alt-uzaylarýný
+(subspace) inceleyeceðiz. 
+
+Permutasyonlarý hatýrlayalým: permutasyon matrisi $P$ bir diðer matrisin
+satýrlarýný deðiþ-tokuþ etmek için kullanýlýyordu. Bu iþleme ihtiyacýmýz
+olabilir, çünkü, elimizde $Ax=b$ çözerken belki de (neredeyse) mükemmel bir
+$A$ olsa da bazen mesela tek bir yerdeki sýfýr iþi bozuyor olabilir, onu
+yerinden oynatýrsam, düzgün bir pivot elde edersem çözüm olacaktýr, iþte o
+zaman permutasyon kullanabilirim.
+
+Peki $A=LU$'nun bir sistemi çözerken gerekebilecek permutasyonlar ile
+alakasý nedir?
+
+$A=LU$'nin ne olduðunu hatýrlayalým, 
+
+\includegraphics[height=3cm]{5_01.png}
+
+Bu resme bakarsa, bu tür gösterilen bir $LU$ tarifi $P$'nin olmadýðýný
+farz ediyor, yani hiç satýr deðiþ-tokuþuna gerek olmadýðý farz
+ediliyor. Peki eðer satýr deðiþ tokuþu gerekseydi, bu durumu cebirsel
+olarak nasýl gösterirdim?
+
+Aslýnda üstteki tanýmda da $P$ ``var'', ya da olduðunu düþünebiliriz, ama
+$P$ bu durumda birim matrisidir. 
+
+Þimdi bir dakika durup mesela Matlab [artýk Python] lineer cebir
+kütüphanelerinin çözümü nasýl yaptýðýný düþünelim. Bu kütüphaneler pivot'in
+sýfýr olup olmadýðýna bakarlar, ki herhangi bir insan da bunu yapar, ayrýca
+pivot'in ``yeterince büyük olup olmadýðýna da'' bakýlýr, çünkü sýfýra
+yakýn, çok küçük pivotlar sayýsal hesap baðlamýnda kötüdür. Bu durumda
+kütüphaneye ``çöz'' dediðimizde kodun arka planda satýr deðiþ-tokuþlarý
+yaptýðýný görürürüz, bu deðiþimler pür matematiksel olarak gerekli
+olmayabilirler, ama hesap / sayýsal açýdan gereklidirler. 
+
+Neyse, ya sayýsal sebepten, ya da baþka bir sebepten dolayý satýr deðiþ
+tokuþu gerekebilir, o zaman nihai olarak satýr deðiþimini içeren
+eliminasyon þudur:
+
+$$ PA = LU $$
+
+$P$ satýr deðiþ-tokuþunu yapan matristir. $P$, $A$'yi ``ideal'' hale
+getirir, sýfýrlar pivot'ta olmaz, vs. 
+
+Bu arada bir permutasyon matrisinin yapýsýný hatýrlayalým, temelinde bir
+permutasyon matrisi satýrlarýnýn yeri deðiþtirilmiþ bir birim
+matristir. Permutasyon matrisleri pek çok satýr deðiþimi ayný anda
+yapabilir, kaç türlü deðiþim kombinasyonu vardýr? 
+
+$$ n! = n(n-1)...(3)(2)(1) $$
+
+çünkü üstteki kadar deðiþik satýr sýralamasý mümkündür, ve tüm
+permutasyonlarý böyle hesaplayabiliriz. 
+
+Ayrýca $P$ tersi alýnabilir (ýnvertible) bir matristir, ve 
+
+$$ P^{-1} = P^T $$
+
+ya da 
+
+$$ P^TP = I $$
+
+Bu ``güzel'' bir özellik, ve bu tür özelliklere sahip olan matrisler bizi
+özellikle ilgilendiriyor.
+
+Ornek
+
+$$ 
+\left[\begin{array}{rr}
+1 & 3 \\
+2 & 3 \\
+4 & 1 
+\end{array}\right]^T
+ $$
+
+Basit bir devrik iþlemi... Sonuç nedir?
+
+$$ =
+\left[\begin{array}{rrr}
+1 & 2 & 4 \\
+1 & 3 & 3 
+\end{array}\right]
+ $$
+
+Devrik iþlemi, formülsel olarak 
+
+$$ (A^T)_{ij} = A_{ji} $$
+
+Þimdi simetrik matrislerden bahsedelim, bunlar çok ``sevdiðimiz''
+matrislerden biri. Bu matrislerin güzel bir özelliði, devriði kendisine
+eþit olmasý,
+
+$$ A^T = A $$
+
+Mesela
+
+$$ 
+\left[\begin{array}{rrr}
+3 & 1 & 7 \\
+1 & 2 & 9 \\
+7 & 9 & 4
+\end{array}\right]
+$$
+
+Bu tür bir matrisi ne zaman elde ederiz? Ýki üstteki matris mesela $3
+\times 2$ boyutunda zaten, simetrik olmasý zaten mümkün deðil, çünkü devrik
+iþlemi boyut deðiþikliðine sebep oluyor. Fakat dikdörtgensel olsa bile
+(çünkü kare þeklinde deðil, yani boyutlarý farklý) bir matristen acaba bir
+iþlem uyguluyarak simetrik bir matris elde edemez miyim? Fikir: iki üstteki
+matrise $R$ diyelim, $R^TR$ ile simetrik bir matris elde edebilirim. Bu
+hakikaten mümkün, hatta kural olarak alabiliriz, $R^TR$ her zaman simetrik
+matris verir. Örnekte görelim, 
+
+$$ 
+\left[\begin{array}{rr}
+1 & 3 \\
+2 & 3 \\
+4 & 1 
+\end{array}\right]^T
+\left[\begin{array}{rrr}
+1 & 2 & 4 \\
+1 & 3 & 3 
+\end{array}\right]
+=
+\left[\begin{array}{rrr}
+10 & 11 & 7 \\
+11 & .. & .. \\
+7 & .. & ..
+\end{array}\right]
+ $$  
+
+Gerisi de ayný olacaktý. Sembolik olarak görelim, $R^TR$'in simetrik
+olduðunu nasýl bulurum? Onun devriðini alabilirim, ve sonucun deðiþmemesini
+kontrol edebilirim,
+
+$$ (R^TR)^T = R^T(R^T)^T $$
+
+$(R^T)^T$ nedir? Bir matrisin iki kere devriðini alýrsam tekrar kendisine
+dönmüþ olmaz mýyým? Evet. O zaman, 
+
+$$  R^T(R^T)^T = R^T R $$
+
+Baþtaki hale döndük! Demek ki $R^TR$ bir simetrik matristir. Ýspat
+tamamlandý. 
+
+Vektör Uzaylarý
+
+Vektörlerle ne iþlemleri yaptýðýmýzý düþünelim. Onlarý topluyoruz mesela,
+ya da onlarý bir skalar (yani tek sayý) ile çarpýyoruz... Bir uzayýn vektör
+uzayý olarak kabul edilmesi için bu tür iþlemlerin ``aile içinde''
+kalabilmesi gerekir, yani toplam, çarpým iþlemlerinin sonuçlarý da uzay
+içinde yer almalý. 
+
+Örnek
+
+Ýçinde tüm 2 boyutlu vektörleri içeren $ \mathbb{R}^2 $. Sembol
+$\mathbb{R}$'i görünce reel sayýlar anlýyoruz, yani reel sayýlar ama onun
+iki boyutlu hali.
+
+$$ 
+\left[\begin{array}{r}
+3 \\ 2 
+\end{array}\right], 
+\left[\begin{array}{r}
+0 \\ 0
+\end{array}\right], 
+\left[\begin{array}{r}
+\pi \\ e
+\end{array}\right], 
+..
+ $$
+
+Diðer yönden þöyle görebiliriz, $\mathbb{R}^2$ tüm $x-y$ düzlemidir. Ve bu
+düzlem bu uzay bir vektör uzayýdýr. Niye? Çünkü ihtiyacýmýz olan tüm noktalar
+oradadýr, orijin bile, oradadýr ve ona ihtiyaç vardýr. Farz edelim orijin
+noktasýný bu uzaydan çýkardým, yani $x-y$ düzleminin sanki ortasýna bir delik
+açtým. Fakat vektör uzayý tanýmýna göre herhangi bir vektörü istediðim bir
+skalar ile çarpabilmeliyim, sýfýrla da çarpabilmeliyim ve sonuç bu durumda
+orijin olacaktýr, ama orijin uzayda yoksa eriþebileceðim her türlü sonucu
+içermediði için bu bir vektör uzayý olamaz. Ya da
+$\left[\begin{array}{cc}3&2\end{array}\right]^T$ vektörüne
+$\left[\begin{array}{cc}-3&-2\end{array}\right]^T$ ekleyebilmeliyim, ve sonuç
+yine orijin olacak, ama yoksa problem çýkar.
+
+Eðer $\mathbb{R}^3$ kullansaydýk, bu içinde tüm 3 boyutlu reel vektörleri
+içeren uzay olurdu. 
+
+Ya $\mathbb{R}^n$? Ýçinde $n$ tane reel sayý olan, $n \times 1$ boyutunda
+kolon vektörleri. 
+
+Baþka bir örnek görelim, mesela alttaki durum. Burada sadece $x-y$
+düzleminin sað üst tarafýndaki (altta iþaretli) alaný bir uzay olarak almak
+istedik. 
+
+\includegraphics[height=4cm]{5_02.png}
+
+Soru þu: bu bir uzay mýdýr? Yani içindeki vektörlerin tüm lineer
+kombinasyonun yine kendisi içinde midir? 
+
+Eðer oradaki bir vektörü, mesela $\left[\begin{array}{rr}3 &
+ 2\end{array}\right]^T$ alýp bir diðer vektörle toplarsam mesela
+$\left[\begin{array}{rr}6 & 8\end{array}\right]^T$ sonuç hala bu üst 
+sað köþede olur. Problem bir skalar ile çarptýðýmýzda ortaya çýkar; eðer
+$\left[\begin{array}{rr}3 & 2\end{array}\right]^T$ alýp $-3$ ile çarparsam, 
+sonuç eksi yöne iþaret eden bir vektör olur, o zaman sað üst köþenin dýþýna
+taþmýþ olurum. Yani tanýmladýðým alan çarpma iþlemi için ``kapalý''
+(closed) deðildir. O zaman bu bir vektör uzayý deðildir. 
+
+Üstteki örnekte mevcut bir vektör uzayýnýn bir kýsmýný aldýk, ve vektör
+uzayý olmadýðýný gördük. Peki tüm alt uzaylar (subspace) bu þekilde vektör
+uzayý deðil midir? $\mathbb{R}^2$'ye dönelim, onun bir alt uzayýna
+bakalým. 
+
+\includegraphics[height=4cm]{5_03.png}
+
+Eðer orijinden geçen ve yukarý aþaðý sonsuza giden çapraz bir çizgi çizsem,
+bu çizgi bir vektör uzayý olan alt uzay olur muydu? Evet. Niye? Çünkü onun
+üzerindeki herhangi iki vektörü birbirine toplasam yine ayný çizgi üzerine
+olurum [hoca bunu göstermek için bir sürü oklar çizdi ayný çizgi
+üzerinde]. Eðer sað yukarý giden bir vektörü negatif bir skalar ile çarpsam
+ters yöne giderim ama problem deðil, bu yön de mevcut. Unutmayalým, tek
+sayý ile çarpýnca yönü deðiþtirebiliriz, ama 180 derece terse gidebiliriz
+sadece, azýcýk daha yukarý ya da aþaðý gidemeyiz. Demek ki hep ayný çizgi
+üzerindeyiz. 
+
+Tabii eklemeye gerek yok, orijin muhakkak uzayýn içinde olmalý, yoksa sýfýr
+ile çarpýnca orijin sonucu gelir, ama o nokta uzayda deðilse yine ``dýþarý
+taþmýþ'' olurum. Mesela 
+
+\includegraphics[height=4cm]{5_04.png}
+
+öncekine paralel [kesik çizgiyle gösteriliyor] yeni bir çizgi çizdim
+mesela. Bu çizgi bir vektör uzayý deðildir, çünkü sýfýrla çarpýnca orijin
+sonucu çýkar, bu nokta o kesikli olan uzayda yoktur.
+
+Bu arada $\mathbb{R}^2$'de iken kendimize þu soruyu soralým; kaç tane
+farklý alt uzay mümkündür? 
+
+1) $\mathbb{R}^2$'nin kendisi (o da bir alt-uzay)
+
+2) Orijinden geçen her çizgi. Dikkat, bir çizgiden bahsedince ve bu çizgi
+tek yönde olunca, akla ``acaba bu çizgi $\mathbb{R}^1$ mi?'' sorusu
+gelebilir. Bu alt uzay $\mathbb{R}^1$ deðil, $\mathbb{R}^1$ olsaydý içinde
+iki deðil tek sayý olan bir ``vektörden'' bahsediyor olurduk. 
+
+3) Ýçinde sadece sýfýr vektör olan bir uzay - ki ben buna çoðu zaman
+$\mathbb{Z}$ diyorum. Bu mantýklý deðil mi? Sýfýr vektörü alýyorum,
+kendisiyle topluyorum, ayný uzaydayým. Herhangi bir skalar ile çarpýyorum,
+mesela 17, sýfýr çarpý herhangi bir baþka þey sýfýr olduðuna göre, yine
+ayný uzaydayým! Öyle deðil mi? $\left[\begin{array}{rr}0 &
+ 0\end{array}\right]^T \cdot 17 = \left[\begin{array}{rr}0 &
+ 0\end{array}\right]^T$.
+
+Peki $\mathbb{R}^3$'un kaç alt uzayý vardýr? Yine $\mathbb{R}^3$'un
+kendisi, orijin noktasý, ve orijinden geçen tüm düzlemler (planes). Ya da
+orijinden geçen tüm çizgiler. 
+
+Matrislerin Alt Uzayý
+
+Üstteki örnek alt uzaylar $\mathbb{R}^2$, k$\mathbb{R}^3$'ten
+geldiler. Acaba bir matristen bir alt uzay yaramaz mýyýz? Mesela 
+
+$$  A =
+\left[\begin{array}{rr}
+1 & 3 \\
+2 & 3 \\
+4 & 1 
+\end{array}\right]
+ $$
+
+matrisinin alt uzayý nedir? 
+
+$A$'nin kolonlarýna bakýyorum, bu kolonlar $\mathbb{R}^3$ içindeler. Ve bir
+alt uzay yaratýyorum, o zaman bu kolonlarýn o alt uzay içinde olmasýný
+isterim. Fakat bir alt uzaya iki tane kolon atýp ``iþte bu bir alt uzay''
+diyemem. Oraya baþka ne koymam lazým? Bu iki kolonun her türlü lineer
+kombinasyonu orada olmalý, mesela $ \left[\begin{array}{rrr}4 & 5 &
+5\end{array}\right]^T$ orada olmalý o zaman, ya da sýfýrla çarpacaðým,
+$\mathbb{Z}^3$ orada olmalý, vs. Ya da ilk kolondan bir tane, ikincisinden
+üç tane alýp toplayacaðým, bu sonucun da uzay olmasý gerekir. 
+
+Eðer tüm bunlarý yaparsam bir alt uzay yaratmýþ olurum, ki matris
+baðlamýnda bu uzaya ``kolon uzayý (columnspace)'' ismi de verilir. Buna
+$C(A)$ diyelim. 
+
+Bu aradýðýmýz uzay nasýl bir þey olur acaba? Ýki vektör var, onlarýn tüm
+kombinasyonlarý ayný uzay içinde kalacak, ve orijin dahil
+olacak.. Geometrik olarak düþünelim,
+
+\includegraphics[height=4cm]{5_05.png}
+
+iki vektörü böyle çizdik diyelim. Bu her iki vektörü içinde barýndýran, ve
+her türlü kombinasyonunu da içeren þey nedir? Bu þey her ne ise, herhalde
+bir çizgi olamaz, çünkü basit bir kaç örnekle tamamen farklý yönlere iþaret
+eden kombinasyonlar bulabiliriz, ayrýca bu her iki vektörü üzerinde tutan
+bir çizgi zaten mümkün deðil. O zaman ne? 
+
+Bir düzlem! Her iki vektörü de üzerinde barýndýran ve orijinden geçen
+düzlem bir alt uzaydýr.
+
+\includegraphics[height=4cm]{5_06.png}
+
+Deðil mi? Bu iki vektörün her türlü kombinasyonu bu düzlem üzerindedir. Bu
+kritik bir bulgu - üzerinde iyice düþünelim. Görelim. Tabii 3 boyutta
+görebiliriz, ama $\mathbb{R}^{10}$ boyutunda da iþ yapacaðýz, ve bu uzayda
+diyelim 5 tane vektörün kombinasyonunu alýyoruz, ki bu bir alt uzay
+yaratýr, [hoca neredeyse $\mathbb{R}^5$'i görsel olarak tarif etmek ister
+gibi yaptý, ama bu uzayý görsel olarak düþünmek mümkün deðil, bilemeyiz
+dedi], 5 vektör ki her birinin 10 tane öðesi var, bunlarýn kombinasyonunu
+alýyoruz, sonuç olarak, dikkat, $\mathbb{R}^5$'te deðiliz çünkü elimizde 10
+öðeli vektörler var. Büyük ihtimalle bu kombinasyon bir düzlemde olacak,
+ama.. yani eðer vektörler o þekilde ise bir çizgi de ortaya
+çýkabilir. Anlatabiliyor muyum? Her þey o 5 vektörün ne olduðuna baðlý. 
+
+Ayný þekilde, bir önceki örnekte, eðer iki vektör bir çizgi üzerinde
+olsaydý, onlarýn kolon uzayý o çizgi olurdu (ama örnekte alt uzay bir
+düzlem haline geldi). 
+
+Bu noktada duralým; bir sonraki derste $Ax=b$'yi biraz önce belirttiðim dil
+ile nasýl görürüm, ona bakacaðýz. Bu dilde kolon uzaylarý, vektör uzaylarý
+var, bunlar $Ax=b$ ile nasýl baðlantýlý. Baþka ne tür uzaylar vardýr? Ýki
+tanesini gördük, baþka türleri de var. 
+
+\end{document}

@@ -1,0 +1,278 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Lineer Cebir ile Minimizasyon
+
+Diyelim ki $Ax$ deðerinin mümkün olduðu kadar 0'a yakýn olmasýný istiyoruz,
+yani öyle $x$ deðerleri arýyoruz ki $Ax$ olabildiðince sýfýra yakýn olsun, bir
+þartla, $||x||=1$ olmalý. Bu bir minimizasyon problemidir [8].
+
+$$ \min_{x} ||Ax||^2 \quad \textrm{ öyle ki } \quad ||x||^2 = 1  $$
+
+Her iki ifadeyi açarsak,
+
+$$ ||Ax||^2  = (Ax)^T(Ax) = x^TA^TAx $$
+
+$$ ||x||^2 = x^Tx = 1$$
+
+Optimizasyon için alttaki bedel fonksiyonunu yazabiliriz,
+
+$$ L(x) = x^TA^TAx - \lambda (x^Tx-1) $$
+
+Bu bedele Lagrangian bedeli denir ve $\lambda$ Lagrange çarpanýdýr. Lagrangian
+terimi kýsýtlama þartýný bedelin içine gömülmesini saðlar, böylece iki ayrý
+ifade yerine tek ifade yeterli oluyor. Artýk minimizasyonu þöyle yazabiliriz,
+
+$$ \min_{x} \left\{ L(x) = x^T A^T A x - \lambda (x^T x-1) \right\} $$
+
+$x$'e göre türev alýrsak,
+
+$$ A^TAx - \lambda x = 0 $$
+
+$$ A^TAx = \lambda x $$
+
+Bu ifade bir özvektör problemidir, $A^TA$'nin özvektörleri vardýr, þimdi
+$\lambda$'yi özdeðer gibi görebiliriz, ve her farklý özdeðere tekabül eden
+özvektör üstteki problemi çözer. Bu farklý $x$'lere $x_\lambda$ diyelim. Ama
+hangi $x_\lambda$'yi istiyoruz? Bedeli þu þekilde tekrar yazalým,
+
+$$ L(x_\lambda) = x_\lambda^T A^T A x_\lambda - \lambda (x_\lambda^Tx_\lambda-1) $$
+
+Özvektör tanýmýndan $A^TA  x_\lambda = \lambda x_\lambda$ olduðuna göre üstte
+yerine koyarsak ve saðdaki terim iptali yaparsak,
+
+$$  = \lambda x_\lambda^T  x_\lambda - \cancel{\lambda (x_\lambda^Tx_\lambda-1)} $$
+
+$x_\lambda^T  x_\lambda = 1$ olduðu için,
+
+$$ L(x_\lambda) = \lambda x_\lambda^T  x_\lambda  = \lambda$$
+
+Yani bedel fonksiyonu her $x_\lambda$ için o özvektörün baðlantýlý olduðu
+$\lambda$ deðerini verir. Böylece minimizasyon için hangi $x_\lambda$'yi
+seçmeliyiz sorusunun cevabýný vermiþ oluyoruz: en küçük $\lambda$'nin
+$x_\lambda$'sý!
+
+Örnek
+
+Sýfýr uzayý kavramýný gördük, eðer $A$ tam kertede deðil ise sýfýr uzayý boþ
+deðildir. Bir örnek uyduruyorum, mesela
+
+$$
+\left[\begin{array}{rrr} 1 & 2 \\ 3 & 6 \end{array}\right] x = 0
+$$
+
+Bu örnek için $x$'in ne olduðunu biliyorum, kolonlar baðýmsýz deðil, 2. kolon
+1.'nin iki katý, yani $\left[\begin{array}{cc} -2 & 1 \end{array}\right]$ bu
+problemi çözer, ya da bir öðesi diðerinin negatif iki katý olan herhangi bir
+diðer $x$. Peki ya problem þöyle olsaydý?
+
+$$
+\left[\begin{array}{cc} 1 & 2 \\ 3 & 5.5 \end{array}\right] x = 0
+$$
+
+Þimdi direk $\left[\begin{array}{cc} -2 & 1 \end{array}\right]$ diyemeyiz, ama
+biliyoruz ki sýfýra olabildiðince yaklaþabilmek mümkün, bu problemi minimizasyon
+olarak çözmek lazým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+A = np.array([[1,2],[3,5.5]])
+eval,evec = lin.eig(np.dot(A.T,A))
+print eval
+print evec
+\end{minted}
+
+\begin{verbatim}
+[[-0.8798189  -0.47530906]
+ [ 0.47530906 -0.8798189 ]]
+[  5.65043904e-03   4.42443496e+01]
+\end{verbatim}
+
+En küçük özdeðer birincisi,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print evec[:,0]
+\end{minted}
+
+\begin{verbatim}
+[-0.8798189   0.47530906]
+\end{verbatim}
+
+Yani $Ax$'i sýfýra en yaklaþtýran çozum $x = \left[\begin{array}{cc} -0.88 &
+ 0.47 \end{array}\right]$. Görüldüðü gibi 1. öðe ikincisinin negatif iki
+``katýmsý''. 
+
+Temel Bileþen Analizi (bkz [2]) tekniðinde görülecek, bu tekniðin
+bahsettiðimiz minimizasyon ile yakýn alakalarý var. Eðer $A$ matrisi
+kolonlarýný belli ölçümler, yaþ, aðýrlýk, vs gibi düþünürsek, bu ölçümler
+üzerinden kovaryansýn ne olduðunu biliyoruz: $A^TA$. Deðil mi? Peki þimdi
+þu sorunun cevabýný nasýl veririz?  Öyle yönler bul ki $A^TA$ o yönlerde
+kovaryans yansýmasý minimal ya da maksimal olsun.
+
+Yön demek bir birim vektördür, $x$ diyelim, yani gene $A^TAx$'yi minimize /
+maksimize etmeye geldik (ya da $x^TA^TAx$, ayný þey)! Þart $||x||^2 = 1$ aynen
+olduðu gibi geçerli çünkü sadece bir yön arýyoruz. Kovaryansýn minimal, maksimal
+olduðu yerler öyle yönler olacak ki o yönlerde deðiþkenlerin beraber deðiþimi en
+az, ya da en fazla olacak, altta örnek PCA örnek grafiðinde görülüyor,
+noktalarýn sað üste doðru ``beraber'' uzandýðý yer en fazla baðlantý, ona dik
+olan diðer yönde en az baðlantý var. Bunlar temel bileþenler.
+
+Rayleigh Bölümü (Quotient)
+
+Baþlangýçtaki minimizasyon formatýna dönersek, daha genel bir ifade ile, eðer
+$M$ simetrik ise (daha önceki örnekte $A^TA$ kullandýk, ama bu ifade de her
+zaman simetriktir, çünkü matrisin devriði çarpý kendisi her zaman simetrik bir
+matris doðurur),
+
+$$ 
+R(M,x) = \frac{x^TMx}{x^Tx} 
+\mlabel{1} 
+$$
+
+ifadesi de doðru olmalý. $R$'ye Rayleigh bölümü adý veriliyor, ve eþitliðin saðý
+biraz önce gördüðümüz gibi minimal noktasýna en küçük özdeðer/vektör ikilisiyle
+gelir. Üstte bir oran görülüyor, fakat bu karýþýklýk yaratmasýn, daha önce $x^Tx
+= 1$ þartýný ayrý bir þekilde yazmýþtýk, ve $x^T M x$ minizasyonu
+yapmýþtýk. Diyelim ki $x$ deðil $v$ kullandýk ve $v$ herhangi bir vektör
+olabilir, fakat herhangi bir vektörü birim vektör haline getirmeyi biliyoruz, $x
+= v/||v||$, ve $x^T M x$ içinde yerine koyarsak (1)'i elde ederiz [1].
+
+Böylece ileride göreceðimiz Rayleigh-Ritz Teorisi'nin ispatýnýn bir kýsmýna da
+farklý bir çözüm getirmiþ olduk.
+
+Optimizasyonu bölüm olarak belirtmenin bazý faydalý var, sýnýr þartýnýn illa 1'e
+eþit olma zorunluðu bazý uygulamalar için çok kýsýtlayýcý olabilir.
+
+Örnek
+
+Karesel denklemler de matris formunda gösterilebilir, mesela
+
+$$ q(x,y) = 3x^2 + 2xy + 3y^2 $$
+
+ile
+
+$$
+\left[\begin{array}{cc} x & y \end{array}\right]
+\left[\begin{array}{rrr}3 & 1 \\ 1 & 3 \end{array}\right]
+\left[\begin{array}{c} x \\ y \end{array}\right]
+$$
+
+ayný þey. Problem $q$'yu $x^2+y^2 = 1$ olacak þekilde optimize etmek. Fakat
+artýk þu þekilde de tanýmlayabiliriz,
+
+$$
+r(x,y) = \frac{ 3x^2 + 2xy + 3y^2}{x^2+y^2 }
+$$
+
+Çözüm $\lambda_1=4$ ve $\lambda_2 = 2$.
+
+$$
+q(-1/\sqrt{2},1/\sqrt{2}) =
+2 \le q(x,y) \le 4 =
+q(1/\sqrt{2},1/\sqrt{2})
+$$
+
+
+Rayleigh-Ritz Teoremi
+
+Sentetik görüntü algoritmasýný gösterdiðimizde, Rayleigh-Ritz kuramýna atýf
+yapmýþtýk. Bu yazýda bütün kuramýn ispatýný veriyoruz. Ýspatta kullanýlan
+küme sanal sayýlar kümesidir. Bizim örneðimiz için gerçek sayýlar kümesi
+kullanýlýyor, fakat ayný ispat hala geçerli olacak.
+
+Problem
+
+Bir kare matrisin özdeðerlerini büyüklük sýrasýna dizersek, bu deðerlerin
+kýsýtlý bir minimizasyon / maksimizasyon probleminin çözümü olduðun
+görüyoruz. Kýsýtlý derken, $x*x$ (x vektör devriði çarpý $x$, yani x'in
+uzunluðu) çarpýmýný 1'e kýsýtlý tutmaktan bahsediyorum. Böylece
+maksimizasyon problemimizin sonsuzluða gitmesini engellemiþ
+oluyoruz. $\lambda$ sembolu genelde özdeðerler için kullanýlýr. Yýldýz
+iþareti * ise sanal sayýlar uzayýnda, devrik yapmak demektir. Gerçek
+sayýlar uzayýnda olsaydýk, o zaman T iþaretini kullanabilirdik. (T
+transpose kelimesinden gelir).
+
+$$ \textrm{forall } x \in \ C^n  $$
+
+$$ \lambda_1x^*x \le x^*Ax \le \lambda_nx^*x  $$
+
+$$ 
+\lambda_{ust} = \lambda_n = 
+\max\limits_{x^*x=1} (\frac{x^*Ax}{x^*x}) =
+\max\limits_{x^*x=1}(x^*Ax)
+ $$
+
+$$ 
+\lambda_{alt} = \lambda_n = 
+\max\limits_{x^*x=1} (\frac{x^*Ax}{x^*x}) =
+\max\limits_{x^*x=1}(x^*Ax)
+$$
+
+Problemi üstte tanýmladýktan sonra, ispatýna gelelim. 
+
+A matrisi, Hermit matrisi olduðu için, elimizde bu A matrisine tekabül eden
+birincil (unitary) bir matris var demektir. Bu birincil matrisi U ile
+temsil edersek, þu sonuca da varýrýz.
+
+$$ A = U \Lambda U^* $$
+
+$$ \Lambda = diag(\lambda_1\lambda_2...,\lambda_n) $$
+
+Bu demektir ki, 
+
+$$ \forall \ x \ \in \ C^n  $$
+
+$$ x^*Ax = x^*U\Lambda U^*x = (U^*x)^*\Lambda(U^*x) $$
+
+$$ \sum_{i=1}^n \lambda_i |(U^*x)_i|^2 $$
+
+Ufak iki not olarak düþmek gerekiyor. Yukarýdaki 3. eþitliðe gelmemizin
+sebebi aþaðýdakinin doðru olmasýdýr.
+
+$$ x^*U = (U^*x)^* $$
+
+Doðrusal cebirde bilinen çevirimlerden biridir bu. En son not olarak,
+toplamlý eþitliðe gelebilmemizin sebebi (4. terim) þundandýr. $U^*x$ yerine
+$W$ koyarsak, $W^*W$ çarpýmýnýn her zaman $W$'nin uzunluðunu verir. Yani
+bir vektörün uzunluðunu bulmak için vektörün devriðini kendisi ile çarpmak
+gerekir, bu çarpým uzunluðun karesidir.
+
+Devam ediyoruz. Her $|(U^*x)_i|^2$ ifadesi artý deðerli olmaya mecbur
+olduðu için,
+
+$$ \lambda_{alt}\sum_{i=1}^n |(U^*x)_i|^2 \le x^*Ax = 
+\sum_{i=1}\lambda_i |(U^*x)|^2 \le
+\lambda_{ust}\sum_{i=1}^n |(U^*x)_i|^2 \le x^*Ax 
+ $$
+
+Üstteki eþitsizliðin doðru olmasýnýn bir sebebi var. Elimizde 3 tane
+deðiþik 1..n arasý yapýlan toplam var. Dikkatle bakarsanýz, ortadaki
+toplam içinde i ile kontrol edilen, bütün özdeðerlerin toplandýðýný
+göreceksiniz. Buna kýyasla mesela en soldaki, toplam içinde sürekli ayný
+'alt özdeðer' toplandýðýný farketmemiz lazým. Buna bakarak anlýyoruz ki,
+tabii ki bütün özdeðerlerin toplamý, tekrar eden ayný özdeðer deðerinin
+toplamýndan fazla olacaktýr! Çünkü iki tarafta da özdeðerler haricindeki
+bütün terimler birbirine eþit. Daha da basitleþtirmek için U'yu yokedelim.
+
+U'da birincil bir matris olduðu için, 
+
+$$ \sum_{i=1}^n |(U^*x)_i|^2 \sum_{i=1} |x_i|^2 = X^*x  $$
+
+çünkü
+
+$$ |U^*x| = |x|$$
+
+Ýspat
+
+$$ |U^*x| = (U^*x)^*(U^*x) = x^*UU^*x = x^*x = |x| $$
+
+Böylece göstermiþ oluyoruz ki, 
+
+$$ \lambda_1x^*x \le \lambda_{alt}x^*x \le x^*Ax \le \lambda_{ust}x^*x $$ 
+
+Kaynaklar
+
+[1] Olver, {\em Applied Linear Algebra}
+
+[2] Bayramli, Istatistik, {\em Principal Component Analysis -PCA-}
+
+\end{document}

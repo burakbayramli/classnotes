@@ -1,0 +1,1606 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Lojistik Regresyon (Logistic Regression)
+
+Lojistik regresyon normal regresyonun $\theta^T x$ olarak kullandýðý aðýrlýklar
+(katsayýlar) ile verinin çarpýmýný alýr ve ek bir filtre fonksiyonundan
+geçirerek onlarý 0/1 deðerleri baðlamýnda bir olasýlýða eþler. Yani elimizdeki
+veri çok boyutta veri noktalarý ve o noktalarýn 0 ya da 1 olarak bir
+"etiketi" olacaktýr. Mesela
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from pandas import *
+df = read_csv("testSet.txt",sep='\t',names=['x','y','labels'],header=None)
+df['intercept']=1.0
+data = df[['intercept','x','y']]
+labels = df['labels']
+print df[['x','y','labels']][:10]
+\end{minted}
+
+\begin{verbatim}
+          x          y  labels
+0 -0.017612  14.053064       0
+1 -1.395634   4.662541       1
+2 -0.752157   6.538620       0
+3 -1.322371   7.152853       0
+4  0.423363  11.054677       0
+5  0.406704   7.067335       1
+6  0.667394  12.741452       0
+7 -2.460150   6.866805       1
+8  0.569411   9.548755       0
+9 -0.026632  10.427743       0
+\end{verbatim}
+
+Görüldüðü gibi veride $x,y$ boyutlarý için etiketler (labels) verilmiþ. Lojistik
+regresyon bu veriyi kullanarak eðitim sonrasý $\theta$'larý elde eder, bunlar
+katsayýlarýmýzdýr, artýk bu katsayýlarý hiç görmediðimiz yeni bir veri üzerinde
+0/1 etiketlerinin tahminini yapmak için kullanabiliriz.
+
+Filtre fonksiyonu için kullanýlan bir fonksiyon sigmoid fonksiyonudur,
+$g(x)$ ismini verelim,
+
+$$ g(x) = \frac{e^{x}}{1+e^{x}} $$
+
+Bu nasýl bir fonksiyondur, kabaca davranýþýný nasýl tarif ederiz?  Cebirsel
+olarak bakarsak, fonksiyon öyle bir durumda ki ne zaman bir $x$ deðeri geçersek,
+bu deðer ne kadar büyük olursa olsun, bölendeki deðer her zaman bölünenden 1
+daha fazla olacaktýr bu da fonksiyonun sonucunun 1'den her zaman küçük olmasýný
+garantiler. Çok küçük $x$ deðerleri için bölüm sonucu biraz daha büyük olacaktýr
+tabii, vs.
+
+Daha temiz bir ifade için bölen ve bölüneni $e^{-x}$ ile çarpalým,
+
+$$ g(x) = \frac{e^{x}e^{-x}}{e^{-x}+e^{x}e^{-x}} $$
+
+$$ g(x) = \frac{1}{1+e^{-x}} $$
+
+Sigmoid fonksiyonun "-sonsuzluk ile +sonsuzluk arasýndaki deðerleri 0 ve 1
+arasýna eþlediði / indirgediði (map)" ifadesi de litaratürde mevcuttur.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def sigmoid(arr):
+    return 1.0/(1+exp(-arr))
+
+x = np.array(arange(-10.0, 10.0, 0.1))
+plt.plot(x,sigmoid(x))
+plt.savefig('stat_logit_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_logit_02.png}
+
+Üstteki grafiðe bakýnca katsayýlarla çarpým, toplam ardýndan sonucun niye bu
+fonksiyona verildiðini anlamak mümkün. Sigmoid'in 0 seviyesinden 1 seviyesine
+zýplayýsý oldukça hýzlý ve $x$ kordinatý baðlamýnda (ve 0.5'ten küçük $y$'ye
+eþlenen) sýfýr öncesi bölgesi, ayný þekilde sýfýr sonrasý (ve 0.5'ten büyük
+$y$'ye eþlenen) bölgesi oldukça büyük. Yani bu fonksiyonu seçmekle veriye
+katsayýlarla çarpýlýp 0 ya da 1 bölgesi altýna düþmesi için oldukça geniþ bir
+þans veriyoruz.  Böylece veriyi iki parçaya ayýrmak için þansýmýzý arttýrmýþ
+oluyoruz.
+
+Peki sigmoid fonksiyonu bir olasýlýk fonksiyonu (daðýlýmý) olarak kullanýlabilir
+mi?  Entegralini alalým, ve -/+ sonsuzluklar üzerinden alan hesabý yapalým,
+sonucun 1 çýkmasý gerekli,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sympy
+x = sympy.Symbol('x')
+print sympy.integrate('1/(1+exp(-x))')
+\end{minted}
+
+\begin{verbatim}
+x + log(1 + exp(-x))
+\end{verbatim}
+
+Daha temizlemek için
+
+$$ x + \ln(1 + e^{-x}) $$
+
+$x$ ifadesi ayný zamanda suna eþittir $x=ln( e^{x} )$. Bu ifade bize
+kolaylýk saðlayacak böylece,
+
+$$ \ln e^{x} + \ln(1+e^{-x})  $$
+
+diyebiliriz. Doðal log'un (ln) çarpýmlarý toplamlara dönüþtürdüðünü biliyoruz,
+bunu tersinden uygulayalým,
+
+$$ \ln (e^{x}\cdot 1 + e^{x}e^{-x})  $$
+
+$$ \ln (e^{x} + 1)  = \ln (1 + e^{x} )  $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print log (1+exp(-inf))
+print log(1+exp(inf))
+\end{minted}
+
+\begin{verbatim}
+0.0
+inf
+\end{verbatim}
+
+Demek ki fonksiyon bir olasýlýk daðýlýmý olamaz, çünkü eðri altýndaki alan
+sonsuz büyüklüðünde. Aslýnda bu fonksiyonun kümülatif daðýlým fonksiyonu
+(cumulative distribution function -CDF-) özellikleri vardýr, yani kendisi deðil
+ama türevi bir olasýlýk fonksiyonu olarak kullanýlabilir (bu konumuz
+dýþýnda). Her neyse, sigmoid'in bir CDF gibi hareket ettiðini $g$'nin 0 ile 1
+arasýnda olmasýndan da anlýyoruz, sonuçta CDF alan demektir (yoðunluðun
+entegrali) ve en üst deðeri 1 demektir, ki bu CDF tanýmýna uygundur.
+
+Þimdi elimizde olabilecek $k$ tane deðiþken ve bu deðiþkenlerin bilinmeyen
+katsayýlarý için 0 ve 1'e eþlenecek bir regresyon oluþturalým. Diyelim ki
+katsayýlar $\theta_0,..,\theta_k$. Bu katsayýlarý deðiþkenler ile çarpýp
+toplayarak $h(x)$'e verelim, (0/1) çýkýp çýkmayacaðý katsayýlara baðlý
+olacak, verideki etiketler ile $h(x)$ sonucu arasýnda bir baðlantý
+kurabilirsek, bu bize katsayýlarý verebilir. Bu modele göre eðer
+$\theta$'yi ne kadar iyi seçersek, eldeki veri etiketlerine o kadar
+yaklaþmýþ olacaðýz. Þimdi sigmoid'i katsayýlarla beraber yazalým,
+
+$$ h_\theta(x) = g(\theta^T x) = \frac{1}{1+e^{-\theta^T x}} $$
+
+"Veriye olabildiðince yaklaþmak için en iyi $\alpha$'yi bulmak" sözü bize
+maksimum olurluk (maximum likelihood) hesabýný hatýrlatmalý. Bu hesaba göre
+içinde bilinmeyen $\alpha$'yi barýndýran formülün üzerinden tüm verinin
+sonuçlarýnýn teker teker birbiri ile çarpýmý olabildiðince büyük olmalýdýr. Bu
+ifadeyi maksimize edecek $\alpha$ veriye en uygun $\alpha$ olacaktýr.
+
+Þimdi her iki etiket için ve sigmoid'i kullanarak olasýlýk hesaplarýný
+yapalým,
+
+$$ P(y=1 | x;\theta) = h_\theta(x) $$
+
+$$ P(y=0 | x;\theta) = 1 - h_\theta(x) $$
+
+Not: Olasýlýk deðerleri (büyük $P(\cdot)$ ile) ve CDF fonksiyonlarý olurluk
+hesabýnda kullanýlabilir. $P(\cdot)$ ile CDF baðlantýsý var, $P(X<x)$ gibi
+kümülatif alansal hesaplarýn CDF üzerinden gerçekleþtirilebildiðini
+hatýrlayalým.
+
+Devam edelim, hepsi bir arada olacak þekilde yanyana koyarsak ve sonuca, $y$'yi
+doðru tahmin edip etmediðimizin ölçümünü de eklersek,
+
+$$p(y | x;\theta) = (h_\theta(x))^y (1-h_\theta(x))^{1-y}$$
+
+Olurluk için tüm veri noktalarýný teker teker bu fonksiyona geçip sonuçlarýný
+çarpacaðýz (ve verilerin birinden baðýmsýz olarak üretildiðini farzediyoruz),
+eðer $m$ tane veri noktasý var ise
+
+$$ L(\theta) = \prod_{i=1}^{m} (h_\theta(x^i))^{y^i}
+(1-h_\theta(x^i))^{1-{y^i}}$$
+
+Eðer log'unu alýrsak çarpýmlar toplama dönüþür, iþimiz daha rahatlaþýr,
+
+$$ l(\theta) = \log L(\theta) $$
+
+$$ = \sum_{i=1}^{m}
+     y^i \log( (h_\theta(x^i)) ) +
+     (1-{y^i}) \log( (1-h_\theta(x^i)) )
+$$
+
+Ýþte bu ifadenin maksimize edilmesi gerekiyor.
+
+Ama daha fazla ilerlemeden önce bir eþitlik ve bir türev göstermemiz
+gerekiyor.  Önce eþitlik
+
+$$ 1-g(z) = g(-z) $$
+
+Ýspat
+
+$$ 1-\frac{1}{1+e^{-z}}  = \frac{1+e^{-z}-1}{1+e^{-z}}$$
+
+$$ \frac{e^{-z}}{1+e^{-z}} = \frac{1}{1+e^{z}}$$
+
+Hakikaten son eþitliðin sað tarafýna bakarsak, $g(-z)$'yi elde ettiðimizi
+görüyoruz. Þimdi türeve gelelim,
+
+$$
+g'(z) = \frac{d}{dz} \frac{ 1}{1+ e^{ -z}} 
+$$
+
+Ispat
+
+$$
+= \frac{1}{(1+ e^{-z})^2} (e^{-z}) 
+$$
+
+$e^{ -z}$ türevinden bir eksi iþareti geleceðini beklemiþ olabiliriz, fakat
+hatýrlanacaðý üzere
+
+$$\frac{d}{dx} \frac{ 1}{1+x}  = \frac{-1}{(1+x)^2}$$
+
+Yani eksiler birbirini yoketti. Þimdi iki üstteki denklemin sað tarafýný açalým
+
+$$
+ = \frac{1}{1+e^{-z}} \frac{e^{-z}}{1+e^{-z}}
+$$
+
+$$
+ = \frac{1}{1+e^{-z}} \frac{1}{1+e^{z}}
+ $$
+
+Çarpýmda iki bölüm var, bölümler $g(z)$ ve $g(-z)$ olarak temsil edilebilir, ya
+da $g(z)$ ve $1-g(z)$,
+
+$$
+ = g(z)(1-g(z))
+$$
+
+Bu baðlamda ilginç bir diðer denklem log þansý (log odds) denklemidir. Eðer ilk
+baþtaki denklemi düþünürsek,
+
+$$ p = P(y=1|x;\theta) = g(z) = \frac{e^{z}}{1+e^{z}}  $$
+
+Bu denklem 1 olma olasýlýðýný hesaplýyor. Temiz bir denklem log þansý olabilir
+ki bu denklem olma olasýlýðýný olmama olasýlýðýna böler ve log alýr.
+
+$$ \log \bigg( \frac{p}{1-p} \bigg)$$
+
+olarak gösterilir. Þimdi biraz daha cambazlýk, $1 - g(z) = g(-z)$ demiþtik, ve
+$g(-z)$'nin de ne olduðunu biliyoruz $\frac{1}{1+e^{z}}$, log þansýný bu þekilde
+yazalým, $\frac{1}{1+e^{z}}$ ile bölelim daha doðrusu $1+e^{z}$ ile çarpalým ve
+log alalým,
+
+$$ 
+\log \bigg( \frac{e^{z}}{1+e^{z}} (1+e^{z})  \bigg) 
+= \log(e^{z}) 
+= z = \theta^Tx
+$$
+
+Artýk olurluk denklemine dönebiliriz. Olurluðu nasýl maksimize ederiz?  Gradyan
+çýkýþý (gradient ascent) kullanýlabilir. Eðer olurluk $l(\theta)$'nin en
+maksimal olduðu noktadaki $\theta$'yi bulmak istiyorsak (dikkat sadece olurluðun
+en maksimal noktasýný aramýyoruz, o noktadaki $\theta$'yi arýyoruz), o zaman bir
+$\theta$ ile baþlarýz, ve adým adým $\theta$'yi maksimal olana doðru
+yaklaþtýrýrýz. Formül
+
+$$ \theta_{yeni} = \theta_{eski} + \alpha \nabla_\theta l(\theta)$$
+
+Üstteki formül niye iþler? Çünkü gradyan $\nabla_\theta l(\theta)$, yani
+$l(\theta)$'nin gradyaný her zaman fonksiyon artýþýnýn en fazla olduðu yönü
+gösterir. Demek ki o yöne adým atmak, yani $l(\theta)$'a verilen $\theta$'yi o
+yönde deðiþtirmek (deðiþim tabii ki $\theta$ bazýnda, $\theta$'nin deðiþimi),
+bizi fonksiyonun bir sonraki noktasýna yaklaþtýracaktýr. Sabit $\alpha$ bir tek
+sayý sadece, atýlan adýmýn (hangi yönde olursa olsun) ölçeðini azaltýp /
+arttýrabilmek için dýþarýdan eklenir. Adým yönü vektör, bu sabit bir tek
+sayý. Çarpýmlarý vektörü azaltýr ya da çoðaltýr.
+
+Not: Bu þekilde azar azar sonuca yaklaþmaya uðraþmak tabii ki her fonksiyon için
+geçerli deðildir, çünkü eðer fonksiyonda "yerel maksimumlar" var ise, gradyan
+çýkýþý bu noktalarda takýlýp kalabilir (o yerel tepelerde de birinci türev
+sýfýrlanýr, gradyanýn kafasý karýþýr). Gradyan metotunun kullanmadan önce
+fonksiyonumuzun tek (global) bir maksimumu olup olmadýðýný düþünmemiz
+gerekir. Fakat þanlýyýz ki olurluk fonksiyonu tam da böyle bir fonksiyondur
+(þans deðil tabii, bu özelliði sebebiyle seçildi). Fonksiyon içbükeydir
+(concave), yani tek bir tepe noktasý vardýr. Bir soru daha: olurluðun içbükey
+olduðunu nasýl anladýk?  Fonksiyona bakarak pat diye bunu söylemek mümkün,
+deðiþkenlerde polinom baðlamýnda küpsel ve daha üstü seviyesinde üstellik yok,
+ayrýca $\log$, $\exp$ içbükeyliði bozmuyor.
+
+Simdi $\nabla_\theta l(\theta)$ turetmemiz gerekiyor.
+
+Eðer tek bir $\frac{\partial l(\theta)}{\partial \theta_j}$'yi hesaplarsak ve
+bunu her $j$ için yaparsak, bu sonuçlarý bir vektörde üstüste koyunca
+$\nabla_\theta l(\theta)$'yi elde ederiz.
+
+$$ 
+\frac{\partial l(\theta)}{\partial \theta_j} =
+y \frac{\frac{\partial }{\partial \theta_j}g(\theta^Tx) }{g(\theta^Tx)}  -
+(1-y) \frac{\frac{\partial }{\partial \theta_j}g(\theta^Tx) }{1-g(\theta^Tx)} 
+$$
+
+$$ 
+= \big(
+y  \frac{1}{g(\theta^Tx)}  -
+(1-y) 
+\frac{1}{1-g(\theta^Tx)} 
+\big)
+\frac{\partial }{\partial \theta_j}g(\theta^Tx)
+$$
+
+Þimdi en saðdaki kýsmý açalým,
+
+$$ 
+\frac{\partial }{\partial \theta_j}g(\theta^Tx) 
+= g'(\theta^Tx) \frac{\partial }{\partial \theta_j} \theta^Tx 
+= g'(\theta^Tx) x_j 
+$$
+
+$\frac{\partial }{\partial \theta_j} \theta^Tx$ nasýl $x_j$ haline geldi?  Çünkü
+tüm $\theta$ vektörünün kýsmi türevini alýyoruz fakat o kýsmi türev sadece tek
+bir $\theta_j$ için, o zaman vektördeki diðer tüm öðeler sýfýr olacaktýr, sadece
+$\theta_j$ 1 olacak, ona tekabül eden $x$ öðesi, yani $x_j$ ayakta kalabilecek,
+diðer $x$ öðelerinin hepsi sýfýrla çarpýlmýþ olacak.
+
+Türevin kendisinden de kurtulabiliriz þimdi, daha önce gösterdiðimiz eþitliði
+devreye sokalým,
+
+$$ 
+= g(\theta^Tx)(1-g(\theta^Tx)) x_j 
+$$
+
+Bu son formülü 3 üstteki formülün sað tarafýna geri koyarsak, ve
+basitleþtirirsek,
+
+$$
+\big(
+y(1-g(\theta^Tx)) - (1-y)g(\theta^T x)
+\big) x_j
+ $$
+
+Çarpýmý daha temiz görmek için sadece $y,g$ harflerini kullanýrsak,
+
+$$
+\big(y(1-g) - (1-y)g \big) x_j =
+(y - yg - g + yg)x_j = (y - g)x_j
+ $$
+
+yani
+
+$$
+= (y - g(\theta^Tx))x_j
+$$
+
+$$
+= (y - h_\theta(x))x_j
+$$
+
+Ýþte $\nabla_\theta l(\theta)$ için ne kullanacaðýmýzý bulduk. O zaman
+
+$$ \theta_{yeni} = \theta_{eski} + \alpha (y - h_\theta(x))x_j $$
+
+Her $i$ veri noktasý için
+
+$$ \theta_{yeni} = \theta_{eski} + \alpha (y^{i} - h_\theta(x^{i}))x^{i}_j $$
+
+Kodu iþletelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def grad_ascent(data_mat, label_mat):
+    m,n = data_mat.shape
+    label_mat=label_mat.reshape((m,1))
+    alpha = 0.001
+    iter = 500
+    theta = ones((n,1))
+    for k in range(iter):   
+        h = sigmoid(dot(data_mat,theta))
+        error = label_mat - h
+        theta = theta + alpha * dot(data_mat.T,error) 
+    return theta
+
+theta = np.array(grad_ascent(array(data),array(labels).T ))
+print theta.T
+\end{minted}
+
+\begin{verbatim}
+[[ 4.12414349  0.48007329 -0.6168482 ]]
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def plot_theta(theta):
+     x = np.array(arange(-3.0, 3.0, 0.1))
+     y = np.array((-theta[0]-theta[1]*x)/theta[2])
+     plt.plot(x, y)
+     plt.hold(True)
+     class0 = data[labels==0]
+     class1 = data[labels==1]
+     plt.plot(class0['x'],class0['y'],'b.')
+     plt.hold(True)
+     plt.plot(class1['x'],class1['y'],'r.')
+     plt.hold(True)
+
+plot_theta(theta)
+plt.savefig('stat_logit_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_logit_03.png}
+
+Üstteki kod bir döngü içinde belli bir $x$ noktasýndan baþlayarak gradyan iniþi
+yaptý ve optimal $\theta$ deðerlerini, yani regresyon aðýrlýklarýný (weights)
+hesapladý. Sonra bu aðýrlýklarý bir ayraç olarak üstte grafikledi.  Ayracýn
+oldukça iyi deðerler bulduðu belli oluyor.
+
+Rasgele Gradyan Çýkýþý (Stochastic Gradient Ascent)
+
+Acaba $\theta$'yi güncellerken daha az veri kullanmak mümkün mü? Yani yön hesabý
+için sürekli tüm veriyi kullanmasak olmaz mý?
+
+Olabilir. Güncellemeyi sadece tek bir veri noktasý kullanarak yapabiliriz. Yine
+gradyaný deðiþtirmiþ oluruz, sadece azar azar deðiþim olur, fakat belki de bu
+þekilde sonuca daha çabuk ulaþmak mümkün olacaktýr.
+
+Kodlama açýsýndan, $\theta$ güncellemesi için bulduðumuz formülü tek nokta
+bazýnda da vermiþtik.  O zaman o tek noktayý sýrayla alýp güncellersek, otomatik
+olarak yeni bir þekilde gradyan çýkýþý yapmýþ oluruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def stoc_grad_ascent0(data_mat, label_mat):
+    m,n = data_mat.shape
+    label_mat=label_mat.reshape((m,1))
+    alpha = 0.01
+    theta = ones((n,1))
+    for i in range(m):
+        h = sigmoid(sum(dot(data_mat[i],theta)))
+        error = label_mat[i] - h
+        theta = theta + alpha * data_mat[i].reshape((n,1)) * error
+        theta = theta.reshape((n,1))
+    return theta
+
+theta = np.array(stoc_grad_ascent0(array(data),array(labels).T ))
+print theta.T
+\end{minted}
+
+\begin{verbatim}
+[[ 1.01702007  0.85914348 -0.36579921]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plot_theta(theta)
+plt.savefig('stat_logit_04.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_logit_04.png}
+
+Neredeyse iþimiz tamamlandý. Üstteki grafik pek iyi bir ayraç göstermedi.  Niye?
+Problem çok fazla salýným (oscillation) var, yani deðerler çok fazla uç noktalar
+arasýnda gidip geliyor. Ayrýca veri noktalarýný sýrayla iþliyoruz, veri tabii ki
+rasgele bir þekilde sýralanmýþ olabilir, ama sýralanmamýþsa, o zaman algoritmaya
+raslantýsal noktalarý vermek için kod içinde zar atmamýz lazým. Metotun ismi
+"rasgele (stochastic)" gradyan çýkýþý, bu rasgelelik önemli. 2. problemi
+düzeltmek için yapýlacak belli, 1. problem için $\alpha$ deðeri her döngüde
+belli oranda küçültülerek (yani $\alpha$ artýk sabit deðil) sonuca yaklaþýrken
+oradan buraya savrulmasýný engellemiþ olacaðýz. Yeni kod altta,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def stoc_grad_ascent1(data_mat, label_mat):
+    m,n = data_mat.shape
+    iter = 150
+    label_mat=label_mat.reshape((m,1))
+    alpha = 0.01
+    theta = ones((n,1))
+    for j in range(iter):
+        data_index = range(m)
+        for i in range(m):
+            alpha = 4/(1.0+j+i)+0.0001  
+            rand_index = int(random.uniform(0,len(data_index)))
+	    h = sigmoid(sum(dot(data_mat[rand_index],theta)))
+            error = label_mat[rand_index] - h
+            theta = theta + alpha * data_mat[rand_index].reshape((n,1)) * error
+            theta = theta.reshape((n,1))
+    return theta
+
+theta = np.array(stoc_grad_ascent1(array(data),array(labels).T ))
+print theta.T
+\end{minted}
+
+\begin{verbatim}
+[[ 14.67440542   1.30317067  -2.08702677]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plot_theta(theta)
+plt.savefig('stat_logit_05.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_logit_05.png}
+
+Sonuç çok iyi, ayrýca daha az iþlemle bu noktaya eriþtik, yani daha az iþlem ve
+daha hýzlý bir þekilde sonuca ulaþmýþ olduk.
+
+Tahmin (Prediction)
+
+Elde edilen aðýrlýklarý tahmin için nasýl kullanýrýz? Bu aðýrlýklarý alýp, yeni
+veri noktasý ile çarpýp sonuçlarý sigmoid'den geçirdiðimiz zaman bu noktanýn "1
+etiketi olma olasýlýðýný" hesaplamýþ olacaðýz. Örnek (diyelim ki mevcut veri
+noktasý içinden bir veriyi, -mesela 15. nokta- sanki yeniymiþ gibi seçtik)
+
+\begin{minted}[fontsize=\footnotesize]{python}
+pt = df.ix[15,['intercept','x','y']]
+print sigmoid(dot(array(pt), theta)), 
+print 'label =',labels[15]
+\end{minted}
+
+\begin{verbatim}
+[ 0.99999653] label = 1
+\end{verbatim}
+
+Oldukça yüksek bir olasýlýk çýktý, ve hakikaten de o noktanýn gerçek deðeri 1
+imiþ.
+
+Logit
+
+Ýstatistik kaynaklarýnda genellikle ``logit'' adlý bir regresyon türünden
+bahsedildiðini görebilirsiniz, burada aslýnda lojistik regresyondan
+bahsediliyor, ki bu konuyu [10] yazýsýnda bulabiliriz. Ama istatistik
+literatüründe (yapay öðrenim literatüründen farklý olarak), terminoloji
+biraz kafa karýþtýrýcý olabiliyor. Lojistik regresyon yazýsýnda odaðýmýz
+sigmoid fonksiyonuydu, peki logit nereden geliyor?  Logit,
+
+$$ logit(x) = \log ( x/(1-x) ) $$
+
+fonksiyonudur, ve bu fonksiyon (0,1) arasýndaki bir sayýyý $-\infty,\infty$
+arasýna eþler (map). Fonksiyona verilen $x$ bir olasýlýk, ve bu olasýlýk, bir
+olayýn (event) olma / olmama {\em oranlarýnýn} $\log$'una dönüþüyor. Ki bu
+fonksiyona ``log ihtimali (log odds)'' ismi de veriliyor. Hatýrlamanýn kolay bir
+yolu belki de logit, ``bir þeyi logla'' çaðrýþýmý yapýyor, sonra ``neyi
+logluyoruz?'' diye düþünürüz, cevap bir olasýlýðý, daha detaylý olarak olma /
+olmama oranýný.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def logit(p): return np.log(p/(1-p))
+p = 0.1; print logit(p)
+p = 0.5; print logit(p)
+p = 0.7; print logit(p)
+p = 0.99999; print logit(p)
+\end{minted}
+
+\begin{verbatim}
+-2.19722457734
+0.0
+0.847297860387
+11.5129154649
+\end{verbatim}
+
+Sigmoid bunun tam tersidir, $-\infty,\infty$ arasýndaki bir deðeri (0,1) arasýna
+eþler, ki lojistik regresyon katsayýlarýndan bir olasýlýk üretmek istiyorsak,
+sigmoid lazým. Bu ters gidiþi ispatlamak kolay, ki bu ``ters yönde'' harekete
+$logit^{-1}$ ismi de veriliyor, ters yöne doðru gidelim,
+
+$$ 
+\mlabel{1}
+logit(p) = \log ( \frac{p}{1-p} ) = x
+$$
+
+$$ 
+\Rightarrow  \frac{p}{1-p} = \exp(x) 
+\Rightarrow \frac{1}{e^x} = \frac{1}{p}-1
+$$
+
+$$ 
+\Rightarrow \frac{1}{e^x} + 1 = \frac{1}{p}
+\Rightarrow \frac{1+e^x}{e^x} =  \frac{1}{p}
+\Rightarrow p = \frac{e^x}{1+e^x}
+ $$
+
+
+Lojistik regresyon modeli 
+
+$$ Pr(y_i=1) = logit^{-1}(X_i\beta) $$
+
+ki her $X_i$ bir vektördür, veri noktalarýmýz $X_i,y_i$ olarak eþli olarak
+gelir. Diyelim ki elimizde 1992'de ABD seçimlerinde oy vermiþ insanlarýn gelir
+seviyesi (income) ve kime oy (vote) verdikleri var. Bush'a verilmiþ oyu 1
+verilmemiþi 0 olarak iþaretlersek, bu problemi lojistik regresyon problemine
+çevirebiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('nes.dat',sep=r'\s+')
+df = df[['presvote','year','female','income','black']]
+df = df[df['presvote'] < 3] # sadece 2 partinin oylarini al
+df = df.dropna()
+# 1,2 oylari 1,0 yap, Cumhuriyetciye verildi mi evet/hayir 
+# haline getir
+df['presvote2'] = df['presvote'].map(lambda x: x-1) 
+df = df.drop('presvote',axis=1)
+df2 = df[df['year'] == 1992]
+print df2[:4]
+\end{minted}
+
+\begin{verbatim}
+       year  female  income  black  presvote2
+32093  1992       1       4      0          1
+32094  1992       1       2      0          1
+32096  1992       1       1      1          0
+32097  1992       0       2      0          1
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+mdlm = smf.logit("presvote2 ~ income", df2)
+mdlmf = mdlm.fit()
+print(mdlmf.summary())
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.661553
+         Iterations 5
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:              presvote2   No. Observations:                 1207
+Model:                          Logit   Df Residuals:                     1205
+Method:                           MLE   Df Model:                            1
+Date:                Mon, 23 Feb 2015   Pseudo R-squ.:                 0.02134
+Time:                        09:01:08   Log-Likelihood:                -798.49
+converged:                       True   LL-Null:                       -815.91
+                                        LLR p-value:                 3.598e-09
+==============================================================================
+                 coef    std err          z      P>|z|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept     -1.3863      0.187     -7.400      0.000        -1.754    -1.019
+income         0.3245      0.056      5.775      0.000         0.214     0.435
+==============================================================================
+\end{verbatim}
+
+En basit haliyle bu denklem, 
+
+$$ 
+\mlabel{2}
+Pr(y_i=1) = logit^{-1}(\alpha + \beta x)  $$
+
+Üstteki katsayý deðerlerini baz alarak, 
+
+$$ Pr(y_i = 1) = logit^{-1}(-1.38 + 0.32 \cdot income) $$
+
+Katsayýlarý irdelemenin iyi bir yolu þudur. Logit tersinden kurtulmak
+istiyorsak, (1)'e deki formülü (2)'ye uygularýz, iki tarafýn logit'ini alýrýz,
+sað taraftaki ters logit kaybolur,
+
+$$ \log \bigg( \frac{Pr(y=1)}{Pr(y=0)} \bigg) = \alpha + \beta x$$
+
+Bu formülün sað tarafýna göre, $x$'e 1 eklemek demek, $\beta (1+x) = \beta x +
+\beta \cdot 1 = \beta x + \beta$, formüle bir bakýma $\beta$ eklemek
+demektir. Bunu bir tarafa koyalým, þimdi üstteki formülün iki tarafýnýn
+$\exp$'sini alalým,
+
+$$ \frac{Pr(y=1)}{Pr(y=0)} = \exp(\alpha + \beta x)$$
+
+Þimdi $\exp$ içindeki $x$'e 1 eklersek, $\exp(\alpha + \beta x + \beta)$ olur,
+bu da $\exp(\alpha)\exp(\beta x ) \exp (\beta)$ demektir, o zaman iki tarafý da
+dengelemek için her iki tarafý da $\exp(\beta)$ ile çarpmak lazým,
+
+$$ 
+\frac{Pr(y=1)}{Pr(y=0)}\exp(\beta) = \exp(\alpha + \beta x + \beta) = 
+\exp(\alpha)\exp(\beta x ) \exp (\beta)
+$$
+
+O zaman, $x$'deki bir birimlik deðiþimin, olma / olmama oraný olan ihtimal
+(odds) üzerindeki etkisini hesaplamak istiyorsak, incelediðimiz deðiþkenin
+katsayýsýný alýp mesela $\beta = 0.3$, onun $\exp$'sini hesaplarýz, $\exp(0.32)
+= 1.37$, ve bu deðerin üstteki eþitliðin sol tarafýný da çarpacaðý bilgisinden
+hareketle, ihtimalin o kadar artacak olduðunu rapor edebiliriz. Yani $\beta =
+0.3$ için bu artýþ 1.37 katýdýr. Yani gelirde 1 birimlik bir artýþ (ki gelir
+veride 1,2,3,4 gibi sayýsal aralýklar olarak gösterilmiþ) Bush'a oy verme
+þansýnýn 1.37 kat arttýrýyor. Bu aslýnda mantýklý, ABD'de Cumhuriyetçiler
+``zenginlerin partisi'' olarak biliniyor.
+
+Ýhtimal oranlarý (odds ratio) ile düþünmek için bazý örnekler, ihtimal oraný 1,
+olasýlýklarýn 0.5 olmasý demektir, yani her iki ihtimal de eþit
+aðýrlýktadýr. Ýhtimal oraný 0.5, ya da 2.0 (1/3,2/3) olasýlýklarýna tekabül
+eder, formülü hatýrlayalým, $p / (1-p)$.
+
+Katsayýlarý Ýrdelemek
+
+Eðer bir katsayý deðerinin sýfýrdan uzaklýðý Std. Hatanýn (Error) iki katýndan
+fazla ise katsayý istatistiki olarak anlamlý / deðerli (significant) demektir ve
+kullanýlabilir. Tabii burada biraz daha ek irdeleme gerekebilir; mesela
+kiþilerin arabalarýnýn beygir gücünü kazandýklarý maaþa baðlayan bir regresyon,
+beygir gücü katsayýsý için beygir baþýna 10 Eur ve std. hata 2 Eur vermiþse bu
+istatistiki olarak önemli, ama pratikte önemsizdir. Benzer þekilde eðer beygir
+katsayýsý için 10,000 Eur ve std. hata 10,000 Eur bulmuþsak, bu istatistiki
+olarak önemsiz, ama pratikte önemlidir.
+
+Ýlginç Durum
+
+Siyahi oylarýn bazý yýllara göre analizini yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 'coefs','error'
+
+df2 = df[df['year'] == 1960]
+mdlm = smf.logit("presvote2 ~ female + black + income", df2)
+mdlmf = mdlm.fit()
+print np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T
+
+df2 = df[df['year'] == 1964]
+mdlm = smf.logit("presvote2 ~ female + black + income", df2)
+mdlmf = mdlm.fit()
+print np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T
+
+df2 = df[df['year'] == 1968]
+mdlm = smf.logit("presvote2 ~ female + black + income", df2)
+mdlmf = mdlm.fit()
+print np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T
+\end{minted}
+
+\begin{verbatim}
+coefs error
+Optimization terminated successfully.
+         Current function value: 0.685646
+         Iterations 5
+[['Intercept' -0.15937090803207216 0.22525976274228318]
+ ['female' 0.23863850517270727 0.1365775569712597]
+ ['black' -1.0585625868981525 0.3621668012097297]
+ ['income' 0.03122275696614234 0.06237925936065817]]
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 0.590399
+         Iterations: 35
+[['Intercept' -1.1551333142403977 0.21592167898447412]
+ ['female' -0.07918311120690241 0.1361066805886836]
+ ['black' -26.62869325566435 93069.88953763059]
+ ['income' 0.190103316020662 0.05839253555236441]]
+Optimization terminated successfully.
+         Current function value: 0.626797
+         Iterations 7
+[['Intercept' 0.47889431087596257 0.24427421556953816]
+ ['female' -0.03135633331713884 0.1481293019619361]
+ ['black' -3.6417024852622455 0.5946042228547078]
+ ['income' -0.02613777851523365 0.06740777911367761]]
+\end{verbatim}
+
+1964 yýlýnda siyahi (black) seçmenlerin oylarýna ne oldu? Üstteki analizde
+katsayý müthiþ alçak (büyük negatif deðer), ve standard hata çok büyük. Eðer o
+sene için veriye bakarsak neler olduðunu anlýyoruz; elimizdeki anket verisindeki
+kiþilerden siyahi olan kimse 1964 yýlýnda Cumhuriyetçilere oy vermemiþ. Bu
+durumda katsayý tabii ki büyük negatif deðer (çünkü regresyon hedefimiz
+Cumhuriyetçilere oy verilip verilmeyeceði), siyahi olmak ile Cumhuriyetçilere oy
+vermek arasýnda negatif bir korelasyon ortaya çýkmýþ oluyor. Büyük standart hata
+iyi durmuyor tabii, ama bunun sebebi özyineli (iteratif) model uyduran (fitting)
+algoritmanýn bir nüansýdýr. Daha ufak bir deðer elde etmek için [3]'de görülen
+numaralar yapýlabilir, fakat pratikte bu büyük deðeri görünce analizi yapan kiþi
+veriye bakacak, ve neler olduðunu anlayacaktýr.
+
+Bangladeþ'te su kuyusu deðiþiminin lojistik modeli
+
+Verimizde 3,000 haneye gidilerek anketle toplanmýþ veri var. Veride hanelerin
+yakýnlarýndaki kuyudaki arsenik seviyesi toplanmýþ, ve paylaþýlan verideki tüm
+hanelerin kuyular saðlýksýz seviyede arsenik içeriyor. Verideki diðer bilgiler
+en yakýndaki "saðlýklý" bir kuyuya yakýnlýk, ve o hanenin bu saðlýklý su
+kuyusuna (bir sene sonra yapýlan kontrole göre) geçip geçmediði.  Ayrýca hanede
+fikri sorulan kiþinin eðitim seviyesi ve bu hanedeki kiþilerin herhangi bir
+sosyal topluluða (community assocation) ait olup olmadýklarý.
+
+Amacýmýz su kuyusunun deðiþimini modellemek. Bu eylem olup / olmama baðlamýnda
+evet / hayýr þeklinde bir deðiþken olduðu için ikili (binary) olarak temsil
+edilebilir ve ikili cevaplar / sonuçlar lojistik regresyon ile
+modellenebilirler.
+
+Veriye bakalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from pandas import *
+from statsmodels.formula.api import logit
+df = read_csv('wells.dat', sep = ' ', header = 0, index_col = 0)
+print df.head()
+\end{minted}
+
+\begin{verbatim}
+   switch  arsenic       dist  assoc  educ
+1       1     2.36  16.826000      0     0
+2       1     0.71  47.321999      0     0
+3       0     2.07  20.966999      0    10
+4       1     1.15  21.486000      0    12
+5       1     1.10  40.874001      1    14
+\end{verbatim}
+
+Model 1: Güvenli su kuyusuna uzaklýk
+
+Ýlk önce modelde kuyu uzaklýðýný kullanalým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+model1 = logit("switch ~ dist", df).fit()
+print model1.summary()
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.674874
+         Iterations 4
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 switch   No. Observations:                 3020
+Model:                          Logit   Df Residuals:                     3018
+Method:                           MLE   Df Model:                            1
+Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.01017
+Time:                        21:25:34   Log-Likelihood:                -2038.1
+converged:                       True   LL-Null:                       -2059.0
+                                        LLR p-value:                 9.798e-11
+==============================================================================
+                 coef    std err          z      P>|z|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept      0.6060      0.060     10.047      0.000         0.488     0.724
+dist          -0.0062      0.001     -6.383      0.000        -0.008    -0.004
+==============================================================================
+\end{verbatim}
+
+Uzaklýk (dist) için elde edilen katsayý -0.0062, fakat bu sayý kafa karýþtýrýcý
+olabilir çünkü uzaklýk metre olarak ölçülür, o zaman bu katsayý mesela 90 metre
+ile 91 metre uzaklýðýn deðiþime olan etkisini ölçmektedir, kýsacasý pek faydalý
+deðildir. Yani uzaklýk metre ile ölçüldüðü için 1 metrenin modeldeki etkisi
+ufak, o yüzden bu ölçütü ölçeklersek (scale) belki regresyon katsayýlarýmýz daha
+net çýkar.
+
+Bunu nasýl yapacaðýz?  Ölçeklenmiþ yeni bir deðiþken yaratmak yerine, onu
+formülün içinde tanýmlayabiliriz.  Burada bir ara not: eðer formül içinde +,-
+gibi operasyonlarý aritmetik iþlem olarak kullanmak istiyorsak, o zaman 'I()'
+çaðrýsýný yapmak lazým, çünkü + operasyonu mesela statsmodels formüllerinde
+baþka amaçlar için kullanýlýyor. 'I' harfi birim (identity) kelimesinden
+geliyor, yani hiçbir þeyin deðiþmediðini anlatmaya uðraþýyoruz, "içinde ne varsa
+onu ver" diyoruz .
+
+\begin{minted}[fontsize=\footnotesize]{python}
+model1 = logit('switch ~I(dist/100.)', df).fit()
+print model1.summary()
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.674874
+         Iterations 4
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 switch   No. Observations:                 3020
+Model:                          Logit   Df Residuals:                     3018
+Method:                           MLE   Df Model:                            1
+Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.01017
+Time:                        21:25:40   Log-Likelihood:                -2038.1
+converged:                       True   LL-Null:                       -2059.0
+                                        LLR p-value:                 9.798e-11
+==================================================================================
+                     coef    std err          z      P>|z|      [95.0% Conf. Int.]
+----------------------------------------------------------------------------------
+Intercept          0.6060      0.060     10.047      0.000         0.488     0.724
+I(dist / 100.)    -0.6219      0.097     -6.383      0.000        -0.813    -0.431
+==================================================================================
+\end{verbatim}
+
+Þimdi modelimizi grafikleyelim. Yanlýz deðiþim (switch) verisini suni olarak
+kaydýrmamýz / seðirtmemiz (jitter) gerekiyor, çünkü deðiþim 0 ve 1'den baþka bir
+þey olamaz ve grafik sürekli ayný iki bölgeye nokta basýp duracak.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def binary_jitter(x, jitter_amount = .05):
+    '''
+    0/1 vektoru iceren veriye segirtme ekle
+    '''
+    jitters = np.random.rand(*x.shape) * jitter_amount
+    x_jittered = x + np.where(x == 1, -1, 1) * jitters
+    return x_jittered
+
+plt.plot(df['dist'], binary_jitter(df['switch'], .1), '.', alpha = .1)
+plt.plot(np.sort(df['dist']), model1.predict()[np.argsort(df['dist'])], lw = 2)
+plt.ylabel('Switched Wells')
+plt.xlabel('Distance from safe well (meters)')
+plt.savefig('stat_logit_06.png')
+\end{minted}
+
+\includegraphics[height=5cm]{stat_logit_06.png}
+
+Mavi noktalar gerçek veri, yeþil çizgi ise uzaklýk geçilerek modelin oluþturduðu
+"tahmin". Modelin gerçek veriye ne kadar uyduðunu görüyoruz böylece, yeþil
+çizginin yüksek olasýlýk verdiði bölgelerde üst kýsmýn daha mavi olmasýný
+bekleriz mesela. Üstteki resimde aþaðý yukarý bunu gösteriyor.
+
+Bir problemin grafiklemesine baþka bir yönden yaklaþalým, kuyu deðiþtirenlerin
+deðiþim uzaklýðýnýn yoðunluðu, bir de kuyu deðiþtirmeyenlerin deðiþim
+uzaklýðýnýn yoðunluðu. Deðiþimi yapanlarýn daðýlýmýna bakýnca, kýsa mesafelerde
+daha fazla yoðunluk görmeyi bekliyoruz, deðiþtirmeyenlerin ise uzun mesafelerde
+daha fazla yoðunluðu olur herhalde.
+
+Yoðunluðu göstermek için çekirdek yoðunluk hesabý (kernel density estimation)
+tekniðini kullanýyoruz. Bu teknik her veri noktasýna Gaussian, kutu (box), ya da
+diðer türden bir "çekirdek" fonksiyonunu koyar (ve veriyi o fonksiyona geçer,
+sonucu kaydeder), ve bu iþ bitince tüm çekirdekler üst üste toplanarak genel
+daðýlým ortaya çýkartýlýr. Teknik histogram tekniðiyle ayný iþi yapmaya uðraþýr,
+bir anlamda verinin daðýlýmýný daha pürüzsüz (smooth) hale getirir.
+
+Bu teknik istatistikte oldukça yeni bir teknik sayýlýr, kullanýlmasý için
+bilgisayar hesabý gerekiyor (kýyasla histogram elle de yapýlabilir), yeni
+hesapsal tekniklerde olan ilerlemelerin veri analizine getirdiði bir yenilik
+yani!
+
+[KDE bölümü atlandý]
+
+Model 2: Güvenli kuyuya olan uzaklýk ve kendi kuyusunun arsenik seviyesi
+
+Þimdi arsenik seviyesini modelimize ekleyelim. Bekleriz ki kuyusunda yüksek
+arsenik miktarý olan kimselerin kuyu deðiþtirmesi daha çok beklenen bir þeydir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+model2 = logit('switch ~ I(dist / 100.) + arsenic', df).fit()
+print model2.summary()
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.650773
+         Iterations 5
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 switch   No. Observations:                 3020
+Model:                          Logit   Df Residuals:                     3017
+Method:                           MLE   Df Model:                            2
+Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.04551
+Time:                        21:25:48   Log-Likelihood:                -1965.3
+converged:                       True   LL-Null:                       -2059.0
+                                        LLR p-value:                 1.995e-41
+==================================================================================
+                     coef    std err          z      P>|z|      [95.0% Conf. Int.]
+----------------------------------------------------------------------------------
+Intercept          0.0027      0.079      0.035      0.972        -0.153     0.158
+I(dist / 100.)    -0.8966      0.104     -8.593      0.000        -1.101    -0.692
+arsenic            0.4608      0.041     11.134      0.000         0.380     0.542
+==================================================================================
+\end{verbatim}
+
+Ki katsayýlar da aynen bunu gösteriyor. Güvenli kuyuya olan uzaklýk büyüdükçe
+deðiþime negatif etki yapýyor ama kendi kuyusundaki arsenik seviyesinin artmasý
+deðiþimde pozitif etki yapýyor.
+
+Kýsmi (marginal) etkiler
+
+Tüm bu deðiþkenlerin deðiþim olasýlýðý üzerindeki etkilerini görmek için verinin
+ortalama noktasýnda bir kýsmi olasýlýk hesabý yapalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print model2.get_margeff(at = 'mean').summary()
+\end{minted}
+
+\begin{verbatim}
+        Logit Marginal Effects       
+=====================================
+Dep. Variable:                 switch
+Method:                          dydx
+At:                              mean
+==================================================================================
+                    dy/dx    std err          z      P>|z|      [95.0% Conf. Int.]
+----------------------------------------------------------------------------------
+I(dist / 100.)    -0.2181      0.025     -8.598      0.000        -0.268    -0.168
+arsenic            0.1121      0.010     11.217      0.000         0.092     0.132
+==================================================================================
+\end{verbatim}
+
+Bu sonuca göre, ankette soru sorulan ortalama kiþi için en yakýn kuyuya olan
+uzaklýkta 100 metrelik bir deðiþim olasýlýðýnda \%22 düþüþ anlamýna
+gelmektedir. Fakat kendi kuyusundaki arsenikte 1 seviyesinde bir artýþ deðiþim
+olasýlýðýný \%11 oranýnda arttýrmaktadýr.
+
+Sýnýflarýn ayýrýlabilirliði
+
+Bu modelin kuyu deðiþtirenler ile deðiþtirmeyenleri ne kadar iyi
+sýnýflayabildiðini anlamak için her sýnýftaki kiþiyi uzaklýk-arsenik uzayýnda
+grafikleyebiliriz.
+
+Biz pek bir iyi bir ayýrým göremedik, o sebeple modelin oldukça yüksek bir hata
+oranýnýn olmasýný bekliyoruz. Fakat baþka bir þey farkediyoruz, grafiðin "kýsa
+mesafe-yüksek arsenik" bölgesinde çoðunlukla deðiþimciler var, ve "uzun
+mesafe-düþük arsenik" bölgesinde çoðunlukla deðiþtirmeyenler var.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+logit_pars = model2.params
+intercept = -logit_pars[0] / logit_pars[2]
+slope = -logit_pars[1] / logit_pars[2]
+
+dist_sw = df['dist'][df['switch'] == 1]
+dist_nosw = df['dist'][df['switch'] == 0]
+arsenic_sw = df['arsenic'][df['switch'] == 1]
+arsenic_nosw = df['arsenic'][df['switch'] == 0]
+plt.figure(figsize = (12, 8))
+plt.plot(dist_sw, arsenic_sw, '.', mec = 'purple', mfc = 'None', 
+         label = 'Switch')
+plt.plot(dist_nosw, arsenic_nosw, '.', mec = 'orange', mfc = 'None', 
+         label = 'No switch')
+plt.plot(np.arange(0, 350, 1), intercept + slope * np.arange(0, 350, 1) / 100.,
+         '-k', label = 'Separating line')
+plt.ylim(0, 10)
+plt.xlabel('Distance to safe well (meters)')
+plt.ylabel('Arsenic level')
+plt.legend(loc = 'best')
+plt.savefig('stat_logit_07.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_logit_07.png}
+
+Model 3: Etkileþim eklemek
+
+Arsenik seviyesi ve uzaklýk deðiþkenlerinin modele ayrý ayrý yaptýðý etkiler
+yanýnda, beraber olarak ta bazý etkiler yapacaðýný düþünebiliriz.  100 metrelik
+mesafenin deðiþim kararýna olan etkisi kuyunuzdaki arsenik seviyesiyle
+baðlantýlý olabilmesi.. Ýnsanlarýn böyle düþünmesini bekleyebiliriz, yani, bu
+problem baðlamýnda, tipik kiþi durup ta "önce arsenik yokmuþ gibi düþüneyim,
+sadece mesafeye bakayým", sonra "þimdi arseniði düþüneyim, mesafe yokmuþ gibi
+yapayým", ve bunlardan sonra "þimdi bu iki ayrý kararý üst üste koyayým"
+þeklinde düþünmez.
+
+Statsmodels'de formül arayüzü ile modele etkileþim eklemenin yolu deðiþkenler
+arasýnda `:` operatörünü kullanmak ile olur.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+model3 = logit('switch ~ I(dist / 100.) + arsenic + I(dist / 100.):arsenic', df).fit()
+print model3.summary()
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.650270
+         Iterations 5
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 switch   No. Observations:                 3020
+Model:                          Logit   Df Residuals:                     3016
+Method:                           MLE   Df Model:                            3
+Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.04625
+Time:                        21:26:26   Log-Likelihood:                -1963.8
+converged:                       True   LL-Null:                       -2059.0
+                                        LLR p-value:                 4.830e-41
+==========================================================================================
+                             coef    std err          z      P>|z|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------------------
+Intercept                 -0.1479      0.118     -1.258      0.208        -0.378     0.083
+I(dist / 100.)            -0.5772      0.209     -2.759      0.006        -0.987    -0.167
+arsenic                    0.5560      0.069      8.021      0.000         0.420     0.692
+I(dist / 100.):arsenic    -0.1789      0.102     -1.748      0.080        -0.379     0.022
+==========================================================================================
+\end{verbatim}
+
+Sonuca göre etkileþimin katsayýsý negatif ve istatistiki olarak anlamlý
+(significant). Bu katsayýnýn deðiþim üzerindeki etkisini nicesel olarak hemen
+bakar bakmaz anlayamýyor olsak bile, niteliksel olarak etkisi sezgilerimiz ile
+uyuþuyor. Uzaklýk deðiþimde negatif etkili, ama bu negatif etki yüksek arsenik
+seviyesi devreye girince azalýyor.  Diðer yandan arsenik seviyesinin deðiþimde
+pozitif etkisi var, ama o etki en yakýn kuyu mesafesi arttýkça azalýyor.
+
+Model 4: Eðitim seviyesi ve ek bazý etkileþimler, ve deðiþkenleri ortalamak
+
+Eðitim seviyesi kiþilerin arseniðin kötü etkilerini anlamasýnda pozitif etki
+yapmasý beklenir, ve bu sebeple eðitim seviyesi deðiþim kararýna pozitif etki
+yapmalýdýr. Elimizdeki veride eðitim yýl bazýnda kayýtlanmýþ, biz bu veri
+noktasýný ölçekleyeceðiz (aynen uzaklýða yaptýmýz gibi, çünkü eðitimde 1 senelik
+deðiþimin pek bir anlamý yok), bunu için 4'e böleceðiz. Ayrýca bu yeni
+deðiþkenin diðer deðiþkenler ile etkileþimini devreye sokacaðýz.
+
+Ek olarak tüm deðiþkenleri ortalayacaðýz ki böylece onlarý yorumlamamýz
+rahatlaþacak. Bir kez daha bu iþi tamamen statsmodels sayesinde formül içinde
+halledeceðiz, dýþarýdan on hesap yapýp formüle geçmemiz gerekmeyecek.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+model_form = ('switch ~ center(I(dist / 100.)) + center(arsenic) + ' +
+              'center(I(educ / 4.)) + ' +
+              'center(I(dist / 100.)) : center(arsenic) + ' + 
+              'center(I(dist / 100.)) : center(I(educ / 4.)) + ' + 
+              'center(arsenic) : center(I(educ / 4.))'
+             )
+model4 = logit(model_form, df).fit()
+print model4.summary()
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.644328
+         Iterations 5
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 switch   No. Observations:                 3020
+Model:                          Logit   Df Residuals:                     3013
+Method:                           MLE   Df Model:                            6
+Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.05497
+Time:                        21:27:19   Log-Likelihood:                -1945.9
+converged:                       True   LL-Null:                       -2059.0
+                                        LLR p-value:                 4.588e-46
+===============================================================================================================
+                                                  coef    std err          z      P>|z|      [95.0% Conf. Int.]
+---------------------------------------------------------------------------------------------------------------
+Intercept                                       0.3563      0.040      8.844      0.000         0.277     0.435
+center(I(dist / 100.))                         -0.9029      0.107     -8.414      0.000        -1.113    -0.693
+center(arsenic)                                 0.4950      0.043     11.497      0.000         0.411     0.579
+center(I(educ / 4.))                            0.1850      0.039      4.720      0.000         0.108     0.262
+center(I(dist / 100.)):center(arsenic)         -0.1177      0.104     -1.137      0.256        -0.321     0.085
+center(I(dist / 100.)):center(I(educ / 4.))     0.3227      0.107      3.026      0.002         0.114     0.532
+center(arsenic):center(I(educ / 4.))            0.0722      0.044      1.647      0.100        -0.014     0.158
+===============================================================================================================
+\end{verbatim}
+
+Modelin baþarýsýný irdelemek: Kutulanmýþ Kalýntý grafikleri (Binned Residual plots)
+
+Model kalýntýsýnýn (yani model ile gerçek veri arasýndaki hatalar -residual-)
+ile ayrý ayrý her deðiþken ile grafikleri, uzaklýk-kalýntý, arsenik-kalýntý
+gibi, bizi modelde gayrý lineerlik olup olmadýðý hakkýnda uyarabilir. Çünkü
+kalýntýnýn Gaussian bir daðýlýmda olmasýný bekleriz, model hatasý tam anlamýyla
+bir "gürültü" halinde olmalýdýr, ki doðada gürültünün tanýmý Gaussian daðýlýmýna
+sahip olmaktýr. Eðer bu grafikte kabaca her yere eþit þekilde daðýlmýþ bir
+görüntü görmüyorsak, o zaman modelimizde yakalayamadýðýmýz bir gayrý lineerlik
+(nonlinearity) vardýr, ya da, birbirinden farklý olan kalýntý grafikleri
+kalýntýlarý daðýlýmlarýnýn birbirinden farklý olduðunun iþaretidir
+(heteroskedaþtýcýty).
+
+Ýkili bir modelde kalýntýlarý ham þekilde grafiklemenin pek anlamý yoktur, o
+sebeple biraz pürüzsüzleþtirme uygulayacaðýz. Altta deðiþkenler için
+oluþturduðumuz kutucuklar (bins) içine kalýntýlarýn ortalamasýný koyacaðýz ve
+bunlarý grafikleyeceðiz (lowess ya da hareketli ortalama -moving average-
+tekniði de burada ise yarayabilirdi).
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bin_residuals(resid, var, bins):
+    '''
+    Compute average residuals within bins of a variable.
+    
+    Returns a dataframe indexed by the bins, with the bin midpoint,
+    the residual average within the bin, and the confidence interval 
+    bounds.
+    '''
+    resid_df = DataFrame({'var': var, 'resid': resid})
+    resid_df['bins'] = qcut(var, bins)
+    bin_group = resid_df.groupby('bins')
+    bin_df = bin_group['var', 'resid'].mean()
+    bin_df['count'] = bin_group['resid'].count()
+    bin_df['lower_ci'] = -2 * (bin_group['resid'].std() / 
+                               np.sqrt(bin_group['resid'].count()))
+    bin_df['upper_ci'] =  2 * (bin_group['resid'].std() / 
+                               np.sqrt(bin_df['count']))
+    bin_df = bin_df.sort('var')
+    return(bin_df)
+
+def plot_binned_residuals(bin_df):
+    '''
+    Plotted binned residual averages and confidence intervals.
+    '''
+    plt.plot(bin_df['var'], bin_df['resid'], '.')
+    plt.plot(bin_df['var'], bin_df['lower_ci'], '-r')
+    plt.plot(bin_df['var'], bin_df['upper_ci'], '-r')
+    plt.axhline(0, color = 'gray', lw = .5)
+    
+arsenic_resids = bin_residuals(model4.resid, df['arsenic'], 40)
+dist_resids = bin_residuals(model4.resid, df['dist'], 40)
+plt.figure(figsize = (12, 5))
+plt.subplot(121)
+plt.ylabel('Residual (bin avg.)')
+plt.xlabel('Arsenic (bin avg.)')
+plot_binned_residuals(arsenic_resids)
+plt.subplot(122)
+plot_binned_residuals(dist_resids)
+plt.ylabel('Residual (bin avg.)')
+plt.xlabel('Distance (bin avg.)')
+plt.savefig('stat_logit_08.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_logit_08.png}
+
+Üstteki kutulama sýrasýnda kullanýlan \verb!qcut! iþlemlerin
+için en altta ek bölümüne bakýn
+
+Model 5: arseniði log ölçeklemek
+
+Kutulanmýþ artýk grafiklerine bakýnca arsenik deðiþkeninde biraz gayrý lineerlik
+görüyoruz, çünkü noktalarýn daðýlýmý çok fazla belli bir bölgede. Dikkat edelim,
+model nasýl düþük arseniði gerçekte olduðundan daha fazla olacaðýný tahmin etmiþ
+(overestimate), ayrýca yüksek arseniði gerçekte olduðundan daha az olacaðýný
+tahmin etmiþ (underestimate). Bu bize arsenik deðiþkeni üzerinde belki de log
+transformasyonu gibi bir þeyler yapmamýzýn gerektiðinin iþareti.
+
+Bu deðiþimi de direk formül içinde yapabiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+model_form = ('switch ~ center(I(dist / 100.)) + center(np.log(arsenic)) + ' +
+              'center(I(educ / 4.)) + ' +
+              'center(I(dist / 100.)) : center(np.log(arsenic)) + ' + 
+              'center(I(dist / 100.)) : center(I(educ / 4.)) + ' + 
+              'center(np.log(arsenic)) : center(I(educ / 4.))'
+             )
+
+model5 = logit(model_form, df).fit()
+print model5.summary()
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.639587
+         Iterations 5
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 switch   No. Observations:                 3020
+Model:                          Logit   Df Residuals:                     3013
+Method:                           MLE   Df Model:                            6
+Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.06192
+Time:                        21:26:41   Log-Likelihood:                -1931.6
+converged:                       True   LL-Null:                       -2059.0
+                                        LLR p-value:                 3.517e-52
+==================================================================================================================
+                                                     coef    std err          z      P>|z|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------------------------------------------
+Intercept                                          0.3452      0.040      8.528      0.000         0.266     0.425
+center(I(dist / 100.))                            -0.9796      0.111     -8.809      0.000        -1.197    -0.762
+center(np.log(arsenic))                            0.9036      0.070     12.999      0.000         0.767     1.040
+center(I(educ / 4.))                               0.1785      0.039      4.577      0.000         0.102     0.255
+center(I(dist / 100.)):center(np.log(arsenic))    -0.1567      0.185     -0.846      0.397        -0.520     0.206
+center(I(dist / 100.)):center(I(educ / 4.))        0.3384      0.108      3.141      0.002         0.127     0.550
+center(np.log(arsenic)):center(I(educ / 4.))       0.0601      0.070      0.855      0.393        -0.078     0.198
+==================================================================================================================
+\end{verbatim}
+
+Þimdi arsenik için kutulanmýþ kalýntý grafikleri daha iyi gözüküyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+arsenic_resids = bin_residuals(model5.resid, df['arsenic'], 40)
+dist_resids = bin_residuals(model5.resid, df['dist'], 40)
+plt.figure(figsize = (12, 5))
+plt.subplot(121)
+plot_binned_residuals(arsenic_resids)
+plt.ylabel('Residual (bin avg.)')
+plt.xlabel('Arsenic (bin avg.)')
+plt.subplot(122)
+plot_binned_residuals(dist_resids)
+plt.ylabel('Residual (bin avg.)')
+plt.xlabel('Distance (bin avg.)')
+plt.savefig('stat_logit_09.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_logit_09.png}
+
+Model hata oranlarý
+
+\verb!pred_table()! çaðrýsý bize bu modelin "kafa karýþýklýðý matrisini
+(confusion matrix)" veriyor. Bu matrisi kullanarak modelimizin hata oranýný
+hesaplayabiliriz.
+
+Not: Kafa karýþýklýðý matrisi sýnýflandýrma hatalarýný verir, ve her türlü hata
+kombinasyonunu içerir, mesela iki sýnýf için, gerçekte 0 ama 1 tahmin hatalarý,
+gerçekte 1 ama 0 hatalarý vs. Bu matrisin satýrlar gerçek veri, kolonlarý
+tahminleri içerir. Tabii ki köþegendeki sayýlar doðru tahmin oranlarýdýr.
+
+Sonra bu sonucu, en fazla verilen cevabý herkesin cevabýymýþ gibi farzeden daha
+basit bir "sýfýr (null) modelinin" hata oraný ile karþýlaþtýrmalýyýz. Mesela
+burada kiþilerin \%58'i kuyu deðiþtirmiþ, bu durumda sýfýr modeli "herkes kuyu
+deðiþtiriyor" diye modeller, ve bu basit modelin hata payý 42\% olur. Bizim
+model bu modelden daha iyi bir sonuç verecek midir? Sonuç altta.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print model5.pred_table()
+print 'Model Error rate: {0: 3.0%}'.format(
+    1 - np.diag(model5.pred_table()).sum() / model5.pred_table().sum())
+print 'Null Error Rate: {0: 3.0%}'.format(
+    1 - df['switch'].mean())
+\end{minted}
+
+\begin{verbatim}
+[[  568.   715.]
+ [  387.  1350.]]
+Model Error rate:  36%
+Null Error Rate:  42%
+\end{verbatim}
+
+Ek: qcut
+
+Yukarýdaki \verb!qcut! kullanýmýný özetlemek gerekirse; arsenik deðiþkeni için
+mesela daðýlým bölgeleri (n-tile) üzerinden bir atama yapacaðýz, önce DataFrame
+yaratalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+resid_df = DataFrame({'var': df['arsenic'], 'resid': model4.df_resid})
+print resid_df[:10]
+\end{minted}
+
+\begin{verbatim}
+    resid   var
+1    3013  2.36
+2    3013  0.71
+3    3013  2.07
+4    3013  1.15
+5    3013  1.10
+6    3013  3.90
+7    3013  2.97
+8    3013  3.24
+9    3013  3.28
+10   3013  2.52
+\end{verbatim}model4.
+
+Þimdi 40 tane daðýlým bölgesi yaratalým
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print qcut(df['arsenic'], 40)
+\end{minted}
+
+\begin{verbatim}
+1      (2.327, 2.47]
+2       (0.68, 0.71]
+3      (1.953, 2.07]
+4        (1.1, 1.15]
+5      (1.0513, 1.1]
+6     (3.791, 4.475]
+7       (2.81, 2.98]
+8       (3.21, 3.42]
+9       (3.21, 3.42]
+10      (2.47, 2.61]
+11      (2.98, 3.21]
+12      (2.98, 3.21]
+13      (2.81, 2.98]
+14      (2.98, 3.21]
+15      (1.66, 1.76]
+...
+3006      (0.64, 0.68]
+3007     (2.327, 2.47]
+3008      (0.71, 0.75]
+3009       (1.25, 1.3]
+3010      (0.71, 0.75]
+3011      (0.56, 0.59]
+3012    (0.95, 1.0065]
+3013       (0.86, 0.9]
+3014      [0.51, 0.53]
+3015    (0.95, 1.0065]
+3016      [0.51, 0.53]
+3017     (1.0513, 1.1]
+3018      [0.51, 0.53]
+3019      (0.62, 0.64]
+3020      (0.64, 0.68]
+Name: arsenic, Length: 3020, dtype: category
+Categories (40, object): [[0.51, 0.53] < (0.53, 0.56] < (0.56, 0.59] <
+(0.59, 0.62] ... (3.21, 3.42] 
+                          < (3.42, 3.791] < (3.791, 4.475] < (4.475, 9.65]] 
+\end{verbatim}
+
+Görüldüðü gibi bölgeler bir obje aslýnda ve içinde levels diye bir deðiþkeni
+var. Ayrýca labels diye bir deðiþken de var,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print qcut(df['arsenic'], 40).labels
+\end{minted}
+
+\begin{verbatim}
+[31  6 28 ...,  0  4  5]
+\end{verbatim}
+
+ki bu deðiþken içinde hangi noktanýn hangi olasýlýk bölgesine ait olduðunun
+atamasý var. Mesela 2. nokta 6. bölgeye aitmiþ, bu bölge hangisi?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print qcut(df['arsenic'], 40).levels[6]
+\end{minted}
+
+\begin{verbatim}
+(0.68, 0.71]
+\end{verbatim}
+
+Þimdi þöyle bir atama yaparsak, yani qcut sonucunu direk olduðu gibi
+\verb!resid_df! içine atarsak, \verb!qcut! içindeki \verb!levels!,
+\verb!resid_df!  üzerindeki index (sýra) ile uyumlandýrýlacaktýr, ve her var
+için doðru olan \verb!qcut! sonucu atanmýþ olacaktýr!
+
+\begin{minted}[fontsize=\footnotesize]{python}
+resid_df['bins'] = qcut(df['arsenic'], 40)
+print resid_df[:10]
+\end{minted}
+
+\begin{verbatim}
+       resid   var            bins
+1   0.842596  2.36   (2.327, 2.47]
+2   1.281417  0.71    (0.68, 0.71]
+3  -1.613751  2.07   (1.953, 2.07]
+4   0.996195  1.15     (1.1, 1.15]
+5   1.005102  1.10   (1.0513, 1.1]
+6   0.592056  3.90  (3.791, 4.475]
+7   0.941372  2.97    (2.81, 2.98]
+8   0.640139  3.24    (3.21, 3.42]
+9   0.886626  3.28    (3.21, 3.42]
+10  1.130149  2.52    (2.47, 2.61]
+\end{verbatim}
+
+Üstte hakikaten bakýyoruz ki 2. nokta var=\verb!0.71! doðru aralýk olan
+\verb!(0.68, 0.71]! ile eþleþmiþ.
+
+Kredi Kart Analizi ve Lojistik Regresyon
+
+Kredi Kart baþvurularýnýn kabul edilip edilmediðinin kayýtlarý üzerinde
+baþvurunun kabul edilip edilmeyeceðini tahmin etmek için bir model
+kullanabiliriz. Örnek [1, sf. 390]'dan alýndý. Veri
+
+\verb!card! = Baþvuru kabul edilmiþ mi? 
+
+\verb!reports! = Kiþi hakkýnda kötü bir olay rapor edilmiþ mi?
+
+\verb!income! = Yýllýk gelir, birim \$10000
+
+\verb!age! = Yaþ
+
+\verb!owner! = Kiþi kendi evinin sahibi mi?
+
+\verb!dependents! = Bakýlan / baðýmlý kaç kiþi var (çocuk, yaþlý kiþi, vs)
+
+\verb!months! = Mevcut adreste kaç aydýr yaþanýyor
+
+\verb!share! = Aylýk kredi kart harcamalarýnýn yýllýk kazanca olan oraný
+
+\verb!selfemp! = Kiþi kendi iþinin sahibi mi?
+
+\verb!majorcards! = Büyük kredi kart þirketlerinden kaç tane kartý var
+
+\verb!active! = Kaç tane aktif kredi kart hesabý var
+
+\verb!expenditure! = Aylýk kredi kartý harcamasý
+
+Tahmin edeceðimiz ilk deðiþken \verb!card! olacak, ki bu deðiþken evet/hayýr
+bazýnda; ona baðlý olarak modellenecek deðiþkenler geri kalanlarý, bu
+deðiþkenlerin kredi kart kabulünde ne kadar etkili olacaðýný analiz edeceðiz.
+
+Biraz veri öniþlemesi yapalým; 1'den küçük bazý yaþ verileri var, onlarý silelim
+ve deðiþkenlerin histogramýný basalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('CreditCard.csv',index_col=0)
+
+# etiketi 1/0 degerine cevir
+df['card'] = (df['card']=='yes').astype(int)
+df['owner'] = (df['owner']=='yes').astype(int)
+
+# 1'den kucuk yaslari sil
+df = df[df['age'] > 1]
+df['log_reports1'] = np.log(df['reports']+1)
+df['log_share'] = np.log(df['share'])
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+fig, axes = plt.subplots(3, 3, figsize=(10, 10))
+
+col='reports';ax=axes[0,0];ax.set_title(col)
+df[col].hist(ax=ax)
+col='income';ax=axes[0,1];ax.set_title(col)
+df[col].hist(ax=ax)
+col='share';ax=axes[0,2];ax.set_title(col)
+df[col].hist(ax=ax)
+
+col='age';ax=axes[1,0];ax.set_title(col)
+df[col].hist(ax=ax)
+col='owner';ax=axes[1,1];ax.set_title(col)
+df[col].hist(ax=ax)
+col='dependents';ax=axes[1,2];ax.set_title(col)
+df[col].hist(ax=ax)
+
+col='months';ax=axes[2,0];ax.set_title(col)
+df[col].hist(ax=ax)
+col='log(share)';ax=axes[2,1];ax.set_title(col)
+df[col].hist(ax=ax)
+col='log(reports+1)';ax=axes[2,2];ax.set_title(col)
+df[col].hist(ax=ax)
+
+plt.savefig('stat_logit_01.png')
+\end{minted}
+
+\includegraphics[height=12cm]{stat_logit_01.png}
+
+Görüldüðü gibi \verb!share! sola doðru çok yamuk (highly skewed) duruyor, bu
+deðiþkenin bu sebeple log'unu aldýk. Deðiþken \verb!reports! ayný durumda,
+ayrýca bu deðiþkenin çoðu deðeri 0 ya da 1, ama maksimum deðeri 14. Bu sebeple
+\verb!log(reports+1)! kullandýk ki 0'in logunu almak zorunda olmayalým, ki zaten
+bu tanýmsýzdýr. Bu transformasyonu yapýyoruz çünkü belli noktalarda aþýrý yoðun
+olan deðiþkenler (ki yamukluklarýnýn sebebi bu) çok yüksek katsayý deðerlerinin
+çýkmasýný tetikleyebiliyor, bu yüzden transformasyon ile onlarý biraz daha
+yaymaya uðraþýyoruz. Alttaki regresyon transformasyon yapýlmýþ hali, onun
+altýnda yapýlmamýþ hali de var.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+import statsmodels.api as sm
+model = "card ~ log_reports1 + income + log_share + age + " + \
+        "owner + dependents + months "
+model=smf.glm(model, data=df, family=sm.families.Binomial()).fit()
+print(model.summary())
+print 'BIC', model.bic
+print 'AIC', model.aic
+\end{minted}
+
+\begin{verbatim}
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                   card   No. Observations:                 1312
+Model:                            GLM   Df Residuals:                     1304
+Model Family:                Binomial   Df Model:                            7
+Link Function:                  logit   Scale:                             1.0
+Method:                          IRLS   Log-Likelihood:                -69.895
+Date:                Thu, 21 May 2015   Deviance:                       139.79
+Time:                        10:14:51   Pearson chi2:                     247.
+No. Iterations:                    13                                         
+================================================================================
+                   coef    std err          z      P>|z|      [95.0% Conf. Int.]
+--------------------------------------------------------------------------------
+Intercept       21.4739      3.674      5.844      0.000        14.272    28.675
+log_reports1    -2.9086      1.098     -2.650      0.008        -5.060    -0.757
+income           0.9033      0.190      4.760      0.000         0.531     1.275
+log_share        3.4230      0.530      6.452      0.000         2.383     4.463
+age              0.0227      0.022      1.036      0.300        -0.020     0.066
+owner            0.7052      0.533      1.323      0.186        -0.340     1.750
+dependents      -0.6649      0.267     -2.487      0.013        -1.189    -0.141
+months          -0.0057      0.004     -1.435      0.151        -0.014     0.002
+================================================================================
+BIC -9222.02662057
+AIC 155.790971664
+\end{verbatim}
+
+Deðiþken \verb!reports! ve \verb!share! transforme edilmemiþ hali,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+
+reg2 = "card ~ reports + income + share + age + " + \
+       "owner + dependents + months "
+model2=smf.glm(reg2, data=df, family=sm.families.Binomial()).fit()
+print(model2.summary())
+print 'BIC', model2.bic
+print 'AIC', model2.aic
+\end{minted}
+
+\begin{verbatim}
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                   card   No. Observations:                 1312
+Model:                            GLM   Df Residuals:                     1304
+Model Family:                Binomial   Df Model:                            7
+Link Function:                  logit   Scale:                             1.0
+Method:                          IRLS   Log-Likelihood:                    nan
+Date:                Thu, 21 May 2015   Deviance:                       142.88
+Time:                        10:14:59   Pearson chi2:                     229.
+No. Iterations:                    18                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept     -4.5817      0.859     -5.334      0.000        -6.265    -2.898
+reports       -2.0253      0.900     -2.249      0.024        -3.790    -0.261
+income         0.3850      0.133      2.884      0.004         0.123     0.647
+share       2966.3111    587.349      5.050      0.000      1815.128  4117.495
+age            0.0174      0.022      0.801      0.423        -0.025     0.060
+owner          0.5966      0.526      1.135      0.256        -0.434     1.627
+dependents    -0.6130      0.249     -2.457      0.014        -1.102    -0.124
+months        -0.0046      0.004     -1.201      0.230        -0.012     0.003
+==============================================================================
+BIC -9218.93777391
+AIC nan
+\end{verbatim}
+
+Görüldüðü gibi \verb!share! katsayýsý oldukça büyük, ve bu modelde modelin
+veriye uyum kalitesini ölçen BIC deðeri aþaðý yukarý 3 civarýnda büyüdü (daha
+küçük BIC daha iyi).
+
+Bir önceki regresyona bakarsak (ki doðru olarak onu kabul ediyoruz artýk)
+deðiþkenlerin p-deðerine göre \verb!log_reports1!, \verb!share!, \verb!income!,
+ve \verb!dependents! deðiþkenlerinin önemli (significant) olduðunu
+görüyoruz. Demek ki bu deðiþkenlerin kredi kartý baþvurusunun kabulü baðlamýnda
+en önemli deðiþkenler. Sayýsal olarak \verb!income! ve \verb!share! arttýkça
+kabul þansý artýyor, \verb!reports! ve \verb!dependents! arttýkça þans azalýyor.
+
+Not: Üstte AIC deðeri niye \verb!nan! oldu? Tabii ondan önce AIC ve BIC
+nedir tanýmlayalým. 
+
+$$ AIC = -2\log \{ L(\hat{\theta}_{ML}) \} + 2p $$
+
+$$ BIC = -2\log \{ L(\hat{\theta}_{ML}) \} + \log(n)p $$
+
+AIC ve BIC bir modelin veriye ne kadar iyi uyduðunu gösteren ölçütlerdir. Log
+olurluk, yani verinin bir modele göre kadar ne kadar olasý olduðu AIC'in önemli
+bir parçasý. Fakat ek olarak modelin parametre sayýsý $p$ e $2p$ olarak AIC'e
+dahil edilmiþ, yani olurluðu ayný olan iki modelden daha basit olaný tercih
+edilecektir [8].
+
+Ayrýca AIC ölçütünün, standart varsayýmlar altýnda, verinin bir parçasýný
+dýþarýda býrakarak yapýlan çapraz saðlamaya (cross-validation) eþdeðer olduðu da
+ispatlanmýþtýr [9, sf. 90]. Bu çok ciddi bir avantajdýr!  Düþünürsek, yeni veri
+üzerinde elde edilecek baþarýnýn ölçümü çoðunlukla ana ``eðitim'' verisinin bir
+kýsmý dýþarýda býrakýlarak, yani hakikaten ``yeni veri'' yaratarak hesaplanmaya
+uðraþýlýr - AIC bu iþi verinin kendisine bakarak doðal olarak yapýyor.
+
+Bozukluða dönelim: sebep nedir? Burada tahmin yürütmek gerekirse, AIC
+hesabýndaki log olurluk (likelihood) hesabý bozukluða yol açmýþ olabilir, çünkü
+problem log transform edilmemiþ veride ortaya çýktý. Hatýrlarsak
+transformasyonda sýfýrlara 1 eklenmiþti çünkü sýfýrýn log'u tanýmsýzdýr. Bu
+tanýmsýzlýk AIC hesabýndaki log olurluk hesabýný da bozmuþ olabilir. BIC için de
+ayný þey geçerli olabilirdi, fakat bu modül deðiþik bir þekilde bu hesabý
+yapýyor herhalde (ayrý kiþiler ayrý tekniklerle yazýlmýþ olabilirler).
+
+Kaynaklar
+
+[1] Ruppert, {\em Statistics and Data Analysis for Financial Engineering}
+
+[2] Vogel, {\em Logistic models of well switching in Bangladesh}, 
+    \url{http://nbviewer.ipython.org/urls/raw.github.com/carljv/Will_it_Python/master/ARM/ch5/arsenic_wells_switching.ipynb}
+
+[3] {\em A Weakly Informative Default Prior Distribution for Logistic and Other Regression models}, 
+    \url{http://www.stat.columbia.edu/~gelman/research/published/priors11.pdf}
+
+[5] Harrington, P. {\em Machine Learning in Action}
+
+[7] Gelman, Hill, {\em Data Analysis Using Regression and Multilevel/Hierarchical Models}
+
+[8] Burnham, {\em Model Selection and Inference}
+
+[9] Shalizi, {\em Advanced Data Analysis from an Elementary Point of View}
+
+[10] Bayramli, Istatistik, {\em Lojistik Regresyon}
+
+\end{document}

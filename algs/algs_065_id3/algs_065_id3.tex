@@ -1,0 +1,492 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+ID3 Karar Aðacý
+
+Zeki arama yazýsýnda, arama algoritmasýna tahmin yeteneði kazandýrdýðýmýzda
+problem sonucuna ulaþým hýzýný arttýrmýþtýk. Tahmin yeteneði oyun tahtasýna
+deðer biçebilen iþlev sayesinde bilgisayara kodlanmýþtý.
+
+Bir soru; Ýnsan zekasýnda tahmin neye dayanýr? Üzerinde bilgimiz,
+tecrübemiz olmayan konu hakkýnda tahmin yapabilirmiyiz? Hayýr. Öyleyse
+bilgisayara tahmin özelliði kazandýrdýðýmýz zaman ayný zamanda makinaya
+"bilgi" verdiðimizi söyleyebiliriz. Makinayý bilgilendirdik, ona tecrübe
+kazandýrdýk da diyebiliriz çünkü tahmin, bir konu hakkýnda bilgimize,
+tecrübemize dayandýðý ölçüde baþarýlý olabilir.
+
+Bilgisayara bilgiyi iki þekilde verebiliriz: Yapýsal, ya da iþlevsel. Zeki
+arama örneði iþlevsel bir örnek gösterdi. Bilgiyi, bilgisayara algoritma
+halinde verdik. Tahta deðerlendiren iþlev, her taþa göre nasýl hesap
+yapacaðýný biliyordu. Bu hesabý toplama ve çarpma iþlemlerini kullanarak ve
+daha önceden "bildiði" aðýrlýklara göre birbirine ekleyerek tahta hakkýnda
+ne düþündüðünü tek bir sayý halinde bildirdi, ve algoritmanýn geri kalaný
+bu deðerler ile doðru seçimi yaparak sonuca ulaþtý.
+
+Bu yazýda oyun oynama yerine birçok seçeneðin arasýnda karar vermek
+konusunu iþleyeceðiz. Zeki aramanýn aksine bilgi bilgisayara iþlev olarak
+deðil, bir karar aðaç yapýsý olarak verilecek, ve daha da iyisi
+bilgisayarýn bu yapýyý "örnek veriden" kendi kendine öðrenmesi
+saðlanacak.
+
+Karar Aðacý Nedir?
+
+Video, televizyon gibi bir ev elektronik eþyasýnýn kýlavuzunda "þu, þöyle
+olduysa þöyle yap" gibi tarifler vardir. Ýlk önce kontrol edilmesi tavsiye
+edilen ayarlar vardýr, ve bu ayarlardan gelen cevaba göre deðiþik ayarlara
+bakýlmasý tavsiye edilir ve en sonunda kýlavuz ne hangi özel düðmeye
+basýlmasý gerektiðini söyler. Kullaným kýlavuzlarý onlarca sayfalýk bir
+karar aðacýdýr denebilir. Ýnsanlara karar aðacýn kavramý doðal geldiði için
+kýlavuzlar bu þekilde hazýrlanmýþtýr.
+
+Diðer bir örnek, lokantalarda çok yemek yiyen birisinin kullandýðý karar
+aðacý olabilir. Bu kimse her türlü deðiþik þart altýnda deðiþik lokantalara
+gitmiþ, ve her seferindeki memnuniyet/piþmanlýk durumunu kayýt ederek bir
+karar aðacý oluþturmuþ ise, artýk yeni bir lokantada karar kýlmasý için
+kapýsýndan þöyle içeri bakýp menüye göz gezdirmesi yeterli olacaktýr. Bu
+kiþinin lokanta deneyimleri mesela aþaðýdaki gibi kayýtlý olsun.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+labels = ['BASKA','BAR','HAFTASONU','ACMIYIZ','MUSTERILER',\
+'FIYAT','YAGMUR', 'RESERVASYON','YEMEKTURU','BEKLEMESURESI','BEKLEYELIM']
+dataSet = [
+['EVET','HAYIR','HAYIR','EVET','BIRAZ','DDD','HAYIR','EVET','FRANSIZ','0','EVET'],
+['EVET','HAYIR','HAYIR','EVET','DOLU','D','HAYIR','HAYIR','TAYLAND','30','HAYIR'],
+['HAYIR','EVET','HAYIR','HAYIR','BIRAZ','D','HAYIR','HAYIR','KEBAP','0','EVET'],
+['EVET','HAYIR','EVET','EVET','DOLU','D','EVET','HAYIR','TAYLAND','10','EVET'],
+['EVET','HAYIR','EVET','HAYIR','DOLU','DDD','HAYIR','EVET','FRANSIZ','60','HAYIR'],
+['HAYIR','EVET','HAYIR','EVET','BIRAZ','DD','EVET','EVET','ITALYAN','0','EVET'],
+['HAYIR','EVET','HAYIR','HAYIR','HIC','D','EVET','HAYIR','KEBAP','0','HAYIR'],
+['HAYIR','HAYIR','HAYIR','EVET','BIRAZ','DD','EVET','EVET','TAYLAND','0','EVET'],
+['HAYIR','EVET','EVET','HAYIR','DOLU','D','EVET','HAYIR','KEBAP','60','HAYIR'],
+['EVET','EVET','EVET','EVET','DOLU','DDD','HAYIR','EVET','ITALYAN','10','HAYIR'],
+['HAYIR','HAYIR','HAYIR','HAYIR','HIC','D','HAYIR','HAYIR','TAYLAND','0','HAYIR'],
+['EVET','EVET','EVET','EVET','DOLU','D','HAYIR','HAYIR','KEBAP','30','EVET']
+]
+\end{minted}
+
+Peki bu veriye bakarak karar aðacýný nasýl oluþturacaðýz?
+
+Ýnsanýn aklýnda karar aðacýný oluþturmasý baþka bilim dallarý altýnda
+araþtýrýlýyor. Bilgisayar için karar aðacýný "kendi kendine çýkartan" bir
+yapay zeka algoritmasý (ID3), bu yazýmýzýn konusu olacak. ID3 ve genelde
+öðrenen algoritmalar ve ileride mekanize-öðrenme konusuna giriþ açýsýndan
+yararlý olabilir, ve bu konuda zaten en popüler yaklaþým olan ID3'ün geniþ
+bir uygulama alaný vardýr.
+
+Algoritma
+
+Karar aðacýmýz öyle olsun ki, eðitim verisi ile eðitildikten sonra, yeni
+bir soruya karþýlýlk, üstten baþlayarak yeni þartlar çerçevesinde (ama eski
+veriye göre kurulmuþ) aðaçta bizi bir 'evet' ya da 'hayýr' cevabýna doðru
+yönlendirsin. Ýyi kurulmuþ bir karar aðacý, "en az" soru ile "en çabuk"
+cevaba eriþmemizi saðlayan aðaçtýr. Çünkü ileride de göreceðimiz gibi, ayný
+veri için birden fazla deðiþik karar aðacý kurmak mümkündür.
+
+Evet, algoritmamýza baþlayalým. Veriyi bölmek için, bir baþlýk seçmemiz
+gerekiyor. Bu seçimi þimdilik rasgele yapalým, diyelim ki "Müþteri"
+baþlýðýný seçtik. Veriye bakýnca, bu baþlýk altýnda "Hiç", "Biraz" ya da
+"Dolu" deðerlerini görüyoruz. Bu baþlýðý en üst düðüm olarak aðaca
+yerleþtirelim, ve veriyi, bu baþlýðýn tekrar eden deðerlere göre
+guruplayýp, bölelim.
+
+Alttaki aðaç, müþteri baþlýðý üzerinden oluþturulan aðacýmýzýn ilk
+seviyesidir.
+
+\includegraphics[height=5cm]{id3_hangi_baslik_1.jpg}
+
+Yeþil ve kýrmýzý toplar evet=yeþil, hayýr=kýrmýzý cevaplarýný temsil
+ediyorlar. Resimin anlatmak istediði, karar aðacý öðreniminin, eðitim
+verisinin tamamýný böldüðü, ve seçenekler arasýnda taksim
+ettiði. Elimizdeki verinin "hedef baþlýðý" "bekleyelim mi?" sorusudur, ve
+cevabý sadece evet ya da hayýr olabilir. Yazýnýn geri kalan kýsmýnda
+kýrmýzý ve yeþil toplarýn hepsini göstermeyeceðiz. Kolaylýk bakýmýndan
+aðacýn en uç kýsmýnda tamamen yeþil ya da tamamen kýrmýzý var ise tek bir
+renk göstermek yeterli olacak.
+
+Aðacýn bu ilk seviyesine bakýnca, görüyoruz ki daha þimdiden elimizde
+yararlý bir karar aðacý var. Çünkü eðer, 'müþteriler' sorusuna yeni sorunun
+cevabý "hiç" olsaydý, direk olarak bir "Y" (Yanlýþ) cevabýna eriþmemiz
+mümkün oluyordu. Bu noktada iþ bitiyor, karar verilmiþ olurdu. Tabii bu
+cevap senaryosu çok iyimser bir senaryodur, çünkü eðer yeni sorunun cevabý
+"Dolu" olsa idi, bu dalý izleyerek hala bölünmüþ olan bir dala geldiðimizi
+görecektik. Demek ki aðaç oluþturan algoritmanýn iþi daha bitmedi. "Dolu"
+dalýný takip ederek, oradaki verileri de bölmeye devam etmemiz gerekiyor.
+
+Bu dalý bölmek için, 'müþteriler' baþlýðýndan sonra, gene rasgele olarak,
+'bekleme süresi' baþlýðýný seçebiliriz. Eðer lokanta dolu ise, kapýda
+beklememiz için eðitim verisinde elimizde olan bekleme süreleri bu baþlýk
+altýnda toplanmýþ. Mümkün deðerler 60 dakika'dan fazla, 30-60 dakika arasý,
+10-30 dakika arasý, ya da 10 dakikadan daha az beklemek olarak
+görülüyor. Bu bölünmeyi de yaptýktan sonra, sýrasý ile ``müþteriler=dolu''
+ve ``bekleme süresi=60 dakidan fazla'' sorusunun bizi kesin bir cevaba
+eriþtirdiðini göreceðiz. Ayrýca, ``müþteriler=dolu'' ve ``10 dakikadan az
+beklemek'' sorusu bizi 'evet' cevabýna getirecektir. Bunlar da güzel. Fakat
+iþimiz daha bitmedi, halâ bölünmemiþ dallar var, vs.
+
+Herhalde algoritmanýn bölen ve aðaç oluþturan kýsmýnýn mantýðý
+anlaþýldý. Tahmin edilecegi gibi bu bölme ve dal oluþturma iþlemi tamamen
+'evet' ve 'hayýr' sonuçlarýna eriþinceye kadar devam edecek. Sonuç karar
+aðacýný aþaðýda görüyoruz.
+
+\includegraphics[height=9cm]{id3_agac_ilk.jpg}
+
+Optimizasyon
+
+Yapay zeka dalýnda, algoritmalarýn doðruluðu kadar, bilgisayara getirdiði
+yükün ne kadar önemli olduðunu görmüþtük. O kadar ki, eðer bu yük kontrol
+edilir bir ölçüde deðil ise, algoritmanýn iþe yararlýlýðý sorgulanmaya
+baþlanýr. Test olarak, bir algoritmanýn 12 veri satýrý (yukarýdaki örnek)
+yerine , 500,000 satýrlýk veri ile ne yapacaðýný sormak yerinde olur. Çünkü
+insan beyninin yaptýðý binbir türlü teknik kullanarak bu kadar veriyi
+iþlemektir, aktif zekamýzda farkýnda olmasak bile, belli bir seviyede bu
+iþlemler olmaktadýr. Basit bir iþ gibi görünen bir yerden bir yere kalkýp
+yürümek için kullandýðýmýz algoritmalarýn neler çözmek zorunda olduðunu,
+robot yazýlýmlar ile uðraþanlar bilir.
+
+O yüzden, ID3 algoritmasýný 500,000 satýrlýk veriyi idare edebilecek
+þekilde ilerletmemiz gerekiyor.
+
+Baþlýk Seçimi
+
+Ilerletme için uygun bir zaman herhalde baþlýk seçimi esnâsýnda
+olacaktýr. Ýlk karar aðacýnda gördüðümüz gibi bazý sorulara olan cevaplar
+daha ilk seviyede kesin cevaba eriþebiliyordu. Demek ki, sürekli olarak
+"uygun baþlýðý uygun zamanda" seçersek, aðacýmýzý oldukça küçültmemiz
+mümkün olur. Böylece kesin cevaba eriþmemiz kolaylaþýr. Tabii kolaylýk
+derken, 500,000 satýrlýk veri için 100 derinliðindeki bir aðaç ile 10 birim
+arasýndaki bir farktan bahsediyorum, ki bu fark hiç yabana atýlacak bir
+fark deðildir.
+
+Peki uygun baþlýk nedir? Mesela ilk seviye için, müþteri yerine, "yemek
+türü" baþlýðýný seçseydik, daha mý iyi bir seçim yapmýþ olurduk? Bu farazi
+bölünmeyi aþaðýdaki þekilde görelim.
+
+\includegraphics[height=5cm]{id3_hangi_baslik_2.jpg}
+
+Görüyoruz ki, bu yeni bölünme bizi hiç bir kesin cevaba götürmedi. Üstüne
+üstlük, bütün bu dallarýn alt-dallarý, onlarýnda alt-dallarý derken
+aðacýmýzýn arap saçýna dönmesi ihtimal dahilinde. Demek ki 'yemek türü'
+bölünmesi bize yeni "bilgi" sâðlamadý. Halâ elimizde kesin cevaplar deðil,
+seçenekler var.
+
+Bize öyle bir iþlev lazým ki, her parçaya bakýp kazandýrdýðý bilgiyi
+ölçsün, hala bölünmüþ kalan kýsýmlar içinde bile, onlardan en iyi olanýný
+seçsin. Ýþte bu noktada bilgi kuramý yardýmýmýza yetiþiyor.
+
+Bilgi Kuramý
+
+Bilgi kuramý (information theory), bilgiyi nasýl kodlayacaðýmýzý ve sonuç
+kodlamanýn ne kadar yer tutacaðý gibi sorunlar ile uðraþýr. Mesela,
+elimizde 2 deðiþik deðer var ise ve bu deðerleri ikili düzende kodlamamýz
+gerekse, bu iþ için kaç tane bit gerekir?
+
+Cevap: Bir tane.
+
+Peki, 4 tane deðer olduðunu düþünelim. Þimdi kaç tane? Cevap: Ýki. Tekrar
+eden mantýk belki farkedilmistir; eðer "kaç bit" sorusu ile "eldeki
+bilgi" arasýnda matematiksel bir bâglantý kurmak gerekse (K ye B), þöyle
+yazabiliriz. Parça Bilgi Deðeri þuna eþit:
+
+$$ -\frac{d}{d+y} \log_2 \bigg( \frac{d}{d+y} \bigg) - 
+\frac{y}{d+y} \log_2 \bigg( \frac{y}{d+y} \bigg) 
+$$
+
+Adresleme, onluk düzen ve ikilik düzen arasýnda gidip gelme gibi
+problemlerden hatýrlayabileceðimiz bir sonuç bu. Ya da, 'iki tane bit en
+fazla kaç onluk sayýyý gösterir' sorusunun tersten sorulmuþ þeklidir
+denebilir.
+
+Þimdi bu ters soruyu karar aðacýnýn böldüðü her parçaya soralým. Tabii
+birkaç deðiþiklik yapmamýz gerekecek. Mesela elimizde
+\verb!yemekturu=tayland! sonucunda tek bir parça üzerine 2 yanlýþ ve 2
+doðru deðer var ise, bu düðümün bilgi deðerini kesirler ile hesaplamamýz
+gerekecek. Kesirler ile uðraþýrken log iþlevi eksi deðerler getireceði için
+cevabý önce kesirin kendisi, sonra da eksi ile çarpmamýz lazým ($\log$, 0
+ve 1 arasý için eksi deðer getirir). Yani, genel olarak iki cevaplý bir
+uzayda, tek parçanýn bilgi deðeri þöyle gösterilebilir. Parça Bilgi Deðeri
+suna eþit:
+
+$$ B(O(v_1),...,O(V_n)) = \sum_{i=1}^{n} -O(v_i)\log_2O(v_i) $$
+
+$O$, olasýlýðý temsil ediyor. 
+
+Genel olarak göstermek gerekirse, n cevaplý bir uzayda parçanýn bilgi
+deðeri þudur. 
+
+$$ B \bigg(\frac{1}{2}, \frac{1}{2} \bigg) = 
+\frac{1}{2}\log_2 \bigg(\frac{1}{2} \bigg) 
+- \frac{1}{2}\log_2 \bigg(\frac{1}{2} \bigg) = \textrm { 1 bit }
+ $$
+
+Formülü kontrol etmek için, baþta verdiðimiz bit örneðini kullanalým: 2
+deðiþik deðer için kaç bit gerekir?
+
+$$ \sum_{i=1}^{parca} \frac{d_i + y_i}{d+y} 
+\bigg( \frac{d_i}{d_i+y_i}, \frac{y_i}{d_i+y_i} \bigg)
+$$
+
+$d_i$: i'inci parça doðru sayýsý
+
+$y_i$: i'inci parca yanlis sayisi
+
+$d$: tüm doðrular
+
+$y$: tüm yanlýþlar
+
+1 bit gerektiðini halâ bulabiliyoruz.
+
+Parçalarýn Bilgi Deðer Toplamý
+
+Bölündükten sonra elimize geçen parçalarýn bilgi deðer toplamý için 
+
+Müþteri Parçalarý
+
+$$  
+\frac{2}{12}B(0,1) + \frac{4}{12}B(1,0) + \frac{6}{12} B(\frac{2}{6},
+\frac{4}{6}) = 0.459
+$$
+
+Yemek Türü Parçalarý
+
+$$ 
+\frac{2}{12}B(\frac{1}{2},\frac{1}{2}) + 
+\frac{2}{12}B(\frac{1}{2},\frac{1}{2}) + 
+\frac{4}{12}B(\frac{2}{4},\frac{2}{4}) + 
+\frac{4}{12}B(\frac{2}{4},\frac{2}{4}) 
+= 1
+ $$
+
+Problemi sözel olarak biraz daha berraklaþtýralým. Herhangi bir düðümde
+iken, bu düðümün bilgi deðerini B() ile bulabiliriz. Lokanta örneðinin ilk
+seviyesinde, en üst düðümün bilgi deðeri '1' olduðunu görülebilir, çünkü
+elimizde tek düðüm, 6 yanlýþ, 6 doðru cevap var. Güzel.
+
+Þimdi bir seviye aþaðý inelim. Her baþlýðý teker teker deneyip, ve veriyi
+her baþlýk için geçici olarak parçalayýp, muhtemel her bölünme için bu
+baþlýða tekâbül eden parçalarýn bilgi deðerini toplayalým (bir üstteki
+formül).
+
+Örnek veri üzerinde üstteki formülü deneyelim (1. seviye parçalanmasý için)
+
+Müþteri Parçalarý
+
+$$ 
+\frac{2}{12}B(0,1) +
+\frac{4}{12}B(1,0) +
+\frac{6}{12}B(\frac{2}{6}, \frac{4}{6}) = 0.459
+ $$
+
+Yemek Türü Parçalarý
+
+$$ 
+\frac{2}{12}B(\frac{1}{2}, \frac{1}{2}) + 
+\frac{2}{12}B(\frac{1}{2}, \frac{1}{2}) + 
+\frac{4}{12}B(\frac{2}{4}, \frac{2}{4}) + 
+\frac{4}{12}B(\frac{2}{4}, \frac{2}{4})  = 1
+ $$
+
+Görüyoruz ki, aðacýn en üst seviyesini temsil etmek için 1 bit gerekiyor
+iken, müþteri bölünmesinden sonra 0.459 bit yetiyor (daha az). Fakat yemek
+türü bölünmesinden sonra halâ 1 bit lâzým! Yani, yemek türü bölünmesi bize
+hiç bir þey kazandýrmadý.
+
+Kazanç kelimesini aritmetik olarak þöyle târif edebiliriz: Bir düðümün
+bilgi deðerinden, bu düðümün alt-parçalarýnýn bilgi deðer toplamýnýn
+düþülmesi kazanç deðerini verir. ID3 algoritmasý, tabii ki daha az bit
+gerektiren ya da, daha çok bilgi "kazandýran" seçeneði takip ederse daha
+etkili olur. Böylece her seviyede gitgide daha berraklaþan karar aðacý, "en
+az" seviyede, kesin kararlara "en çabuk" þekilde ulaþan karar aðacý
+olacaktýr.
+
+Eðer B() iþlevinin iç mekanizmalarý hala anlaþýlmadý ise, þunlarý bilmek
+yardýmcý olabilir:
+
+Parça tamamen yanlýþ deðerler içeriyor (kesin cevap) = B(0,1) = 0 bit
+
+Parça tamamen doðru deðerler  içeriyor (kesin cevap) = B(1,0)  = 0 bit
+
+...   3 doðru, 3 yanlýþ = B(3,3)  = 1 bit 
+...   2 doðru, 4 yanlýþ = B(2,4)  = 0.92 bit 
+...   1 doðru, 5 yanlýþ = B(1,5)  = 0.65 bit 
+
+Yeni algoritmanýn sonucu ortaya çýkacak karar aðacý þöyle olacaktýr. Bu
+aðacýn ilk baþtaki aðaca kýyasla çok daha küçük olduðunu görüyoruz.
+
+\includegraphics[height=7cm]{id3_agac_eniyi.jpg}
+
+Kodu Python ile göstermek gerekirse [1]
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from math import log
+import operator
+
+def calcShannonEnt(dataSet):
+    numEntries = len(dataSet)
+    labelCounts = {}
+    # kac ozgun deger var ve bu degerler kac kere ortaya cikiyorlar
+    for featVec in dataSet: 
+        currentLabel = featVec[-1]
+        if currentLabel not in labelCounts.keys(): labelCounts[currentLabel] = 0
+        labelCounts[currentLabel] += 1
+    shannonEnt = 0.0
+    for key in labelCounts:
+        prob = float(labelCounts[key])/numEntries
+        shannonEnt -= prob * log(prob,2) #log base 2
+    return shannonEnt
+    
+def splitDataSet(dataSet, axis, value):
+    retDataSet = []
+    for featVec in dataSet:
+        if featVec[axis] == value:
+            reducedFeatVec = featVec[:axis]     
+            reducedFeatVec.extend(featVec[axis+1:])
+            retDataSet.append(reducedFeatVec)
+    return retDataSet
+    
+def chooseBestFeatureToSplit(dataSet):
+    numFeatures = len(dataSet[0]) - 1      
+    baseEntropy = calcShannonEnt(dataSet)
+    bestInfoGain = 0.0; bestFeature = -1
+    # tum ozellikleri ziyaret et
+    for i in range(numFeatures):        
+        featList = [example[i] for example in dataSet]
+        uniqueVals = set(featList)       
+        newEntropy = 0.0
+        for value in uniqueVals:
+            subDataSet = splitDataSet(dataSet, i, value)
+            prob = len(subDataSet)/float(len(dataSet))
+            newEntropy += prob * calcShannonEnt(subDataSet)     
+        # enformasyon kazancini hesapla, yani entropideki azalisi
+        infoGain = baseEntropy - newEntropy     
+        # bu hesabi simdiye kadarki en iyi kazancla karsilastir
+        if (infoGain > bestInfoGain):       
+            bestInfoGain = infoGain         
+            bestFeature = i
+    return bestFeature                      
+
+
+def createTree(dataSet,labels):
+    classList = [example[-1] for example in dataSet]
+    if classList.count(classList[0]) == len(classList): 
+        # tum siniflar esitse bolmeyi durdur
+        return classList[0]
+    if len(dataSet[0]) == 1: 
+        return majorityCnt(classList)
+    bestFeat = chooseBestFeatureToSplit(dataSet)
+    bestFeatLabel = labels[bestFeat]
+    myTree = {bestFeatLabel:{}}
+    del(labels[bestFeat])
+    featValues = [example[bestFeat] for example in dataSet]
+    uniqueVals = set(featValues)
+    for value in uniqueVals:
+        #copy all of labels, so trees don't mess up existing labels
+        subLabels = labels[:]       
+        myTree[bestFeatLabel][value] = \
+            createTree(splitDataSet(dataSet, bestFeat, value),subLabels)
+    return myTree                            
+
+def getNumLeafs(myTree):
+    numLeafs = 0
+    firstStr = myTree.keys()[0]
+    secondDict = myTree[firstStr]
+    for key in secondDict.keys():
+        if type(secondDict[key]).__name__=='dict':
+            numLeafs += getNumLeafs(secondDict[key])
+        else:   numLeafs +=1
+    return numLeafs
+
+def getTreeDepth(myTree):
+    maxDepth = 0
+    firstStr = myTree.keys()[0]
+    secondDict = myTree[firstStr]
+    for key in secondDict.keys():
+        if type(secondDict[key]).__name__=='dict':
+            thisDepth = 1 + getTreeDepth(secondDict[key])
+        else:   thisDepth = 1
+        if thisDepth > maxDepth: maxDepth = thisDepth
+    return maxDepth
+
+def plotNode(nodeTxt, centerPt, parentPt, nodeType):
+    createPlot.ax1.annotate(nodeTxt, xy=parentPt,  xycoords='axes fraction',
+             xytext=centerPt, textcoords='axes fraction',
+             va="center", ha="center", bbox=nodeType, arrowprops=arrow_args )
+    
+def plotMidText(cntrPt, parentPt, txtString):
+    xMid = (parentPt[0]-cntrPt[0])/2.0 + cntrPt[0]
+    yMid = (parentPt[1]-cntrPt[1])/2.0 + cntrPt[1]
+    createPlot.ax1.text(xMid, yMid, txtString, \
+                        va="center", ha="center", rotation=30)
+
+def plotTree(myTree, parentPt, nodeTxt):
+    numLeafs = getNumLeafs(myTree)  
+    depth = getTreeDepth(myTree)
+    firstStr = myTree.keys()[0]     
+    cntrPt = (plotTree.xOff + (1.0 + float(numLeafs))/2.0/plotTree.totalW,\
+              plotTree.yOff)
+    plotMidText(cntrPt, parentPt, nodeTxt)
+    plotNode(firstStr, cntrPt, parentPt, decisionNode)
+    secondDict = myTree[firstStr]
+    plotTree.yOff = plotTree.yOff - 1.0/plotTree.totalD
+    for key in secondDict.keys():
+        if type(secondDict[key]).__name__=='dict':
+            plotTree(secondDict[key],cntrPt,str(key))        
+        else:  
+            plotTree.xOff = plotTree.xOff + 1.0/plotTree.totalW
+            plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), \
+            cntrPt, leafNode)
+            plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))
+    plotTree.yOff = plotTree.yOff + 1.0/plotTree.totalD
+
+def createPlot(inTree):
+    fig = plt.figure(1, facecolor='white')
+    fig.clf()
+    axprops = dict(xticks=[], yticks=[])
+    createPlot.ax1 = plt.subplot(111, frameon=False, **axprops)    
+    plotTree.totalW = float(getNumLeafs(inTree))
+    plotTree.totalD = float(getTreeDepth(inTree))
+    plotTree.xOff = -0.5/plotTree.totalW; plotTree.yOff = 1.0;
+    plotTree(inTree, (0.5,1.0), '')
+    plt.savefig('id3_1.png')
+
+decisionNode = dict(boxstyle="sawtooth", fc="0.8")
+leafNode = dict(boxstyle="round4", fc="0.8")
+arrow_args = dict(arrowstyle="<-")
+
+tree = createTree(dataSet, labels)
+createPlot(tree)
+\end{minted}
+
+\includegraphics[height=10cm]{id3_1.png}
+
+Ayný kodu LÝSP ile görelim,
+
+\inputminted[fontsize=\footnotesize]{python}{id3.lisp}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!clisp id3.lisp
+\end{minted}
+
+\begin{verbatim}
+MUSTERILER
+ = BIRAZ => EVET
+ = DOLU
+     ACMIYIZ
+      = EVET
+          YEMEKTURU
+           = TAYLAND
+               HAFTASONU
+                = HAYIR => HAYIR
+                = EVET => EVET
+           = ITALYAN => HAYIR
+           = KEBAP => EVET
+      = HAYIR => HAYIR
+ = HIC => HAYIR
+
+"Tamam. Birim Testler Isledi." 
+\end{verbatim}
+
+Kaynaklar 
+
+[1] Harrington, P., {\em Machine Learning In Action}
+
+
+\end{document}

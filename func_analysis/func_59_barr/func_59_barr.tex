@@ -1,0 +1,796 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Log-Bariyer Yöntemi
+
+Bir dýþbükey probleme bakalým þimdi, artýk tanýdýk olan genel form bu,
+
+$$
+\min_x f(x) \quad \textrm{öyle ki}
+$$
+$$
+h_i(x) \le 0, \quad i=1,..,m
+$$
+$$
+Ax = b
+$$
+
+Tüm bu fonksiyonlarýn dýþbükey ve iki kere türevi alýnabilir olduðunu farz
+ediyoruz. Þimdi log bariyer metotu uygulayacaðýz, bu ilk göreceðimiz
+iç-nokta yöntemi olacak [1, 14:00]. 
+
+Bu yöntem ile önce eþitsizlik kýsýtlamalarýna tekabül eden bir log bariyer
+fonksiyonu tanýmlamak gerekiyor. Bu fonksiyon, 
+
+$$
+\phi(x) = -\sum_{i=1}^{m} \log(-h_i(x))
+$$
+
+Tabii $\log$'un negatif deðerler üzerinde iþletilemeyeceðini biliyoruz, o
+sebeple üstteki eksi ile çarpým var (kýsýtlamalara göre $h_i$'ler eksi
+olmalý, onu da biliyoruz). Bu fonksiyon ile yapmaya uðraþtýðýmýz gösterge
+(indicator) fonksiyonunu yaklaþýklamak. $\phi$'nin taným kümesi $h$'ye göre
+harfiyen olurlu olan $x$'ler. 
+
+Þimdi log bariyerin yaklaþýklamayý nasýl yaptýðýna gelelim. Eþitlik
+kýsýtlamalarýný atlarsak, üstteki minimizasyon problemi þu þekilde de
+gösterilebilir [1, 15:53],
+
+$$
+\min_x f(x) + \sum_{i=1}^{m} I_{h_i(x) \le 0}(x)
+$$
+
+$I$ her $h_i$'nin sýfýrdan küçük olup olmadýðýna göre 0 ya da çok büyük
+deðerler verir, bu yüzden üstteki gibi bir temsil, eþitsizlik
+kýsýtlamalarýný kullanmakla eþdeðerdir. Çünkü minimizasyon problemi doðal
+olarak çok büyük deðerlerden kaçacak, ve böylece kýsýtlamalar dolaylý
+yoldan problem çözümüne dahil olmuþ olacak. Altta kesikli çizgiyle
+göstergeç fonksiyonu görülüyor, 
+
+\includegraphics[width=15em]{func_59_barr_01.png}
+
+Diðer kavisli çizgiler ise $-\log(-u) \frac{1}{t}$, her $t$ için farklý bir
+eðri. $t$ büyütüldükçe log bariyer fonksiyonunu göstergeci daha da iyi
+yaklaþýk temsil etmeye baþlýyor / ona yaklaþýyor [1, 17:08]. 
+
+Altta farklý $\mu$ deðerleri için
+$-\mu \log(-u)$ fonksiyonun deðerlerini görüyoruz. Fonksiyon görüldüðü gibi
+$I$'ya oldukca yakýn.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def I(u): 
+   if u<0: return 0.
+   else: return 10.0
+
+u = np.linspace(-3,1,100)
+Is = np.array([I(x) for x in u])
+
+import pandas as pd
+df = pd.DataFrame(index=u)
+
+df['I'] = Is
+df['$\mu$=0.5'] = -0.5*np.log(-u)
+df['$\mu$=1.0'] = -1.0*np.log(-u)
+df['$\mu$=2.0'] = -2.0*np.log(-u)
+
+df.plot()
+plt.savefig('func_59_barr_02.png')
+\end{minted}
+
+\includegraphics[width=25em]{func_59_barr_02.png}
+
+Herhalde simdi en yapacagimiz tahmin edilebilir, gostergec fonksiyonlariyla
+ile calismak zor, o zaman göstergeç toplamlarý log toplamlarý olarak
+yaklaþýksallanabilir,
+
+$$
+\min_x f(x) + \frac{1}{t} \sum_{i=1}^{m} \log(-h_i(x))
+$$
+
+ki $t$ büyük olacak þekilde çünkü o zaman log, göstergeci iyi yaklaþýk
+olarak temsil ediyor, ardýndan bu yeni pürüzsüz problemi çözüyoruz,
+eþitsizlik þartlarýna ihtiyaç duymadan. 
+
+Log-Bariyer Calculus
+
+$\phi$ fonksiyonunun bazý özelliklerini dökmek faydalý olur, ileride Newton
+metotundan bahsettiðimizde bu özellikler faydalý olacak. $\phi$ için gradyan ve
+Hessian,
+
+$$
+\nabla \phi(x) = - \sum_{i=1}^{m} \frac{1}{h_i(x)} \nabla h_i(x)
+$$
+
+Hessian
+
+$$
+\nabla^2 \phi(x) = 
+\sum _{i=1}^{m} \nabla h_i(x) \nabla h_i(x)^T - 
+\sum _{i=1}^{m} \frac{1}{h_i(x)} \nabla^2 h_i(x)
+$$
+
+Merkezi gidiþ yolu (central path)
+
+Optimizasyon problemimizi $1/t$ yerine $t$ carpimi ile de gosterebiliriz,
+yani
+
+$$
+\min_x t f(x) + \phi(x) \quad \textrm{öyle ki}
+$$
+$$
+Ax = b
+$$
+
+Herneyse, merkezi yol $x^*(t)$, $t>0$'nin bir fonksiyonudur, yani her $t$
+için eldeki çözümlerin ortaya çýkarttýðý yoldur bir bakýma. Her $t$ için
+problemin çözümünü KKT koþullarý ile karakterize edebiliriz. 
+
+$$
+Ax^*(t) = b, \quad h_i(x^*(t)) < 0, \quad i=1,..,m
+$$
+
+$$
+t \nabla f(x^*(t)) - \sum \frac{1}{h_i(x^*(t))} \nabla h_i(x^*(t)) + A^T w= 0
+$$
+
+Bu koþullar $x^*(t)$'nin optimal olmasýnýn ne demek olduðunu
+tanýmlýyor. Ýki denklemdeki ilk denklem ana olurluktan geliyor, eþitlik
+sýnýrlamalarýna tekabül eden tek ikiz deðiþken var, $w$, onun iþareti
+üzerinde kýsýtlama yok çünkü eþitlik kýsýtlamasý. Duraðanlýk koþulu ikinci
+denklemde, ona nasýl eriþtik? Problemin Lagrangian'i
+
+$$
+t f(x) + \phi(x) + w^T (Ax - b)
+$$
+
+Eðer $x$'e göre gradyan alýp sýfýra eþitlersek duraðanlýðý elde
+ederim. Gradyan yeterli çünkü buradaki tüm fonksiyonlar dýþbükey ve
+pürüzsüz [1, 24:04]. 
+
+Eðer üstteki problemi bir $w$ için çözersem o zaman merkezi yoldaki bir
+çözümü belli bir $t$ için karakterize etmiþ / tarif etmiþ
+oluyorum. Umudumuz o ki $t$'yi sonsuzluða doðru büyüttükçe üstteki KKT
+koþullarýyla temsil edilen çözümler orijinal problemimdeki çözüme
+yaklaþmaya baþlayacak. Bu olabilir deðil mi? $t$'yi büyüttükçe log
+bariyerin nasýl göstergeç fonksiyonuna benzemeye baþladýðýný biraz önce
+gördük. Bu tür log bariyerlerden oluþan optimizasyon problemi için de
+benzer bir durum olacaðýný tahmin edebiliriz. 
+
+Bu kavramlarý lineer programlar için yakýndan görebiliriz. Tüm bu
+yaklaþýmlar bu arada ilk baþta LP'ler için ortaya atýlmýþtýr. 
+
+Önemli bir örnek,
+
+$$
+\min_x t c^T x - \sum _{i=1}^{m} \log(e_i - d_i^T x)
+$$
+
+Bu bir standart LP'nin bariyerleþtirilmiþ hali. Eþitlik kýsýtlamasý yok, ve
+bariyer fonksiyonu çokyüzlü kýsýtlama  $D x \le e$ ifadesine tekabül
+ediyor. Bu problemi belli bir $t$ için çözersem, $t$'yi büyütürsem, bunu
+ardý ardýna tekrar edersem umudum orijinal LP'nin çözümüne yaklaþmak. 
+
+\includegraphics[width=20em]{func_59_barr_03.png}
+
+Resimde görüldüðü gibi, ortadan baþlýyoruz, $t=0$'da diyelim, ve $t$'yi
+büyüttükçe yolda ilerliyoruz, ve sonuca eriþiyoruz. Gidiþ pürüzsüz, ve
+LP'lerin karakterinden biliyoruz ki nihai sonuç çokyüzlümün (polyhedra)
+ekstrem noktalarýnýn birinde olmalý. Yarý yolda $t=10$'daki bir nokta
+gösteriliyor, nihai sonuç belki $t=100$'da [2, 26:59]
+
+KKT koþulu üzerinden duraðanlýðý temiz bir þekilde gösterebiliyoruz, ya da
+iç nokta ve ortada, merkezde bir yol takip edilmesini zorlama baðlamýnda,
+merkezlik þartý da deniyor buna, gradyan alýnýnca
+
+$$
+0 = tc - \sum _{i=1}^{m} \frac{1}{e_i - d_t ^T x^(t)} d_i
+$$
+
+Bu demektir ki gradyan $\nabla (x^*(t))$, $-c$'ye paralel olmalýdýr, ya da
+$\{ x: c^T x = c^T x^*(t) \}$ hiper düzlemi $\phi$'nin $x^*(t)$'deki
+konturuna teðet durmalýdýr [1, 28:12].
+
+Ikiz noktalar
+
+Birazdan merkezi yoldan ikiz noktalar alabileceðimizi göreceðiz. Bu çok
+faydalý olacak çünkü bu ikiz noktalarý bir ikiz boþluðu hesaplamak için
+kullanacaðýz. Merkezi yoldayken bu yoldaki noktalar $x*(t)$'leri
+kullanarak olurlu ikiz noktalar hesaplayabiliriz. Orijinal probleme
+tekrar bakarsak, bu problem için ikiz deðiþkenleri elde etmek için her
+eþitsizlik için bir $u_i$'ye, her eþitlik þartý için bir $v_i$'ya ihtiyacým
+var. Onlarý nasýl tanýmlarým? Merkezi yol üzerindeki çözümler üzerinden,
+
+$$
+u_i^*(t) = \frac{1}{t h_i(x^*(t))}, \quad i=1,..,m, \quad v^*(t) = w/t
+$$
+
+$w$ bariyer problemi için KKT koþullarýný çözerken elde ettiðim deðiþken
+idi. 
+
+Niye üsttekiler orijinal problem için olurlu? Bunu görmek kolay, ilk önce,
+$u_i^*(t)$'nin her ögesi harfiyen pozitif, çünkü $h_i(x^*(t))$'nin her
+ögesi harfiyen negatif. Bu bariyer probleminin ana olurluk þartýndan
+geliyor. Ayrýca $(u^*(t),v^*(t))$ Lagrange ikiz fonksiyonu $g(u,v)$'nin
+taným kümesinde (domain). Hatýrlarsak Lagrange ikizi formülize ettiðimizde
+taným kümesinde bazý dolaylý sýnýrlamalar elde ediyorduk. Tarif itibariyle
+
+$$
+\nabla f(x^*(t)) + \sum _{i=1}^{m} u_i (x^*(t)) \nabla h_i(x^*(t)) + 
+A^T v^*(t) = 0
+$$
+
+
+Yani $x^*(t)$, Lagrangian $L(x,u^*(t),v^*(t))$'i tüm $x$'ler üzerinden
+minimize edeceði için $g(u^*(t),v^*(t)) > -\infty$. Bu direk duraðanlýk
+þartýndan geliyor iþte. O kadar bariz birþey ki aslýnda bazen kafa
+karýþtýrýyor. Merkezi yol probleminden çözdüðümüz duraðanlýk koþulu
+þöyleydi,
+
+$$
+t \nabla f(x^*(t)) - \sum \frac{1}{h_i(x^*(t))} \nabla h_i(x^*(t)) + A^T w= 0
+$$
+
+Bir $x^*$ çözümü ve $w$ olduðunu farz ediyoruz. Tüm formülü $t$ ile
+bölersem,
+
+$$
+\nabla f(x^*(t)) - \sum \frac{1}{t h_i(x^*(t))} \nabla h_i(x^*(t)) + A^T \frac{w}{t}= 0
+$$
+
+Tek yaptýðýmýz ``üstteki orijinal problemdeki duraðanlýk þartýna çok
+benziyor'' demek, deðil mi, çünkü 
+
+$$
+\nabla f(x^*(t)) +
+\sum \underbrace{\frac{-1}{t h_i(x^*(t))}}_{u_i} \nabla h_i(x^*(t)) + 
+A^T \underbrace{\frac{w}{t}}_{v}= 0 
+\mlabel{4}
+$$
+
+desem, orijinal problemin duraðanlýk þartýna benzeyen bir ifade elde etmiþ
+olurum [2, 33:48]. Demiþtik ki üstteki $u_i,v$ tanýmlarý üzerinden orijinal
+problem için olurlu ikiz noktalarý alabiliyoruz. 
+
+Soru: niye orijinal problem için optimal noktalarý elde etmedim? Biraz önce
+gördük, duraðanlýk koþulunu tatmin ettim, ana, ikiz olurluk
+var.. ama.. tamamlayýcý gevþeklik tatmin edilmedi. Çok önemli. Onun yerine
+ne var? $u_i h_i (x) = 0$ olmasý lazým, onun yerine ne var? Taným
+itibariyle $u_i = -1/t ..$ var. O zaman sýfýra yakýnsak çok yakýnsak bölüm
+büyür, dolaylý olarak $t$'yi büyüttükçe orijial problemin KKT koþullarýný
+yaklaþýksallamýþ oluruz. O zaman log bariyer problemini çözmüþ olmamýza
+raðmen belli bir $t$ deðer için orijinal problem için çözüm olmamasýnýn
+sebebi tamamlayýcý gevþekliðin tatmin edilmiyor olmasý.
+
+Ama elimizdekiler hala çok faydalý, çünkü herhangi bir anda merkez yol
+üzerinde $t$'nin fonksiyonu olarak ne kadar alt optimal olduðumuzu
+sýnýrlamak mümkün oluyor. Bunun için sadece ikiz boþluðunu hesaplýyoruz, o
+kadar. O zaman $u^*,v^*$'da Lagrange ikiz fonksiyonu hesaplýyorum, ve $f^*$
+ile bu Lagrange farkýný buluyorum, ve ikiz boþluðu hesaplanmýþ oluyor. 
+(4)'te gördük ki $x^*$ Lagrangian'i $u^*,v^*$'da minimize eder, o zaman
+ikizi alttaki gibi hesaplayarak 
+
+$$
+g(u^*(t),v^*(t)) = 
+f(x^*(t)) + \sum_{i=1}^{m} u_i^*(t) h_i(x^*(t)) + v^*(t)^T (Ax^*(t) - b)
+$$
+
+Büyük toplamdaki ikinci terim sýfýr, çünkü merkezi yolda $Ax^*$ her zaman
+$b$'ye eþittir. Birince terimde, $u_i$'i $-1/t$'ye eþitledik, ve bu $m$
+kere toplanacak, sonuç
+
+$$
+= f(x^*(t)) - m/t
+$$
+
+Yani göstermiþ olduk ki merkezi yolun optimallikten olan uzaklýðý en fazla
+$m/t$ olacaktýr,
+
+$$
+f(x^*(t)) - f^* \le m/t
+$$
+
+Üstteki bariyer metorun iþlediðine dair ispata en yakýn sonuç, bize diyor
+ki eðer herhangi bir $t$ için bariyer problemini çözersem optimalliðe
+yakýnlýk her zaman $m/t$'den küçük olur. $t$'yi isteðe baðlý olarak
+büyüttükçe o ölçüde optimalliðe yaklaþmýþ olurum. 
+
+Merkezi yolu yorumlamanýn bir diðer yolu ``sarsýma uðratýlmýþ KKT
+koþullarý'' denen bir teknik üzerinden. Þimdiye kadar gördük ki merkez yol
+ve ona tekabül eden ikiz deðerler (4)'teki duraðanlýk þartýný çözüyor. 
+$u_i \ge 0$, $h_i(x) \le 0$, ve $Ax = b$. Tamamlayýcý gevþeklik haricinde tüm
+koþullar tatmin. Esas KKT koþullarýnda 
+
+$$
+u_i^*(t) \cdot h_i^*(t) = 0, \quad i=1,..,m
+$$
+
+olurdu, biz onun yerine 
+
+$$
+u_i^*(t) \cdot h_i^*(t) = -1/t, \quad i=1,..,m
+$$
+
+dedik. Yani bir anlamda log bariyer fonksiyonunu unutuyoruz, onun yerine þu
+probleme bakýyoruz,
+
+$$
+\nabla f(x^*(t)) + \sum_{i=1}^{m} u_i(x^*(t))\nabla h_i(x^*(t)) + A^T v^*(t) = 0
+$$
+
+$$
+u_i^*(t) \cdot h_i^*(t) = -1/t, \quad i=1,..,m
+$$
+
+$$
+h_i(x^*(t)) \le 0, \quad i=1,..,m, \quad Ax^*(t) = b
+$$
+
+$$
+u_i(x^*(t)) \ge 0
+$$
+
+Ve $t$'yi büyüterek üstteki problemi çözüyorum. Yani olurluðu, duraðanlýðý
+tam olarak, tamamlayýcý gevþekliði ise yaklaþýk olarak çözmüþ oluyorum, ve
+yaklaþýksallýðý gittikçe büyüyen $t$'ler üzerinden daha sýký hale getiriyorum. 
+Yani log bariyer tekniði ile sarsýma uðratýlmýþ KKT koþullarý sýnýrlý
+problemleri çözmenin iki yolu. 
+
+Niye ufak $t$ ile baþlayýp büyütüyorum [2, 02:19]? Çünkü pratikte bu iyi
+iþliyor. Niye iþlediðini görmek zor deðil, $t$ küçükken tüm fonksiyon
+oldukca pürüzsüz, ve onun üzerinde Newton adýmlarý rahat iþler. Ama $t$'yi
+büyüttükçe onun kontrol ettiði fonksiyon kýsýmlarýný gittikçe daha az
+pürüzsüz yapmaya baþlýyorum, ama bu çok kötü deðil çünkü bu noktada çözüm
+bölgesine kabaca yaklaþmýþ olmalýyým. 
+
+Yakýnsama analizi (convergence analysis) 
+
+Teori 
+
+Diyelim ki merkezleþtirme adýmlarýný kesin olarak çözebiliyoruz, yani,
+diyelim ki ne zaman Newton metotunu uygularsam mükemmel bir sonuç
+alýyorum. Tabii ki bu gerçekte olmuyor ama farz edelim. O zaman, sadece
+$t$'yi her adýmda $\mu$ ile çarpmamýzýn doðal sonucu olarak ve ikizlik
+boþluðununun $m / t$ olmasý sebebiyle $k$ adým sonrasý alttakini görürdük, 
+
+$$
+f(x^(k)) - f^* \le \frac{m}{\mu^k t^{0}}
+$$
+
+Bu ifade diyor ki istenen $\epsilon$ seviyesinde bir doðruluða eriþmek için 
+
+$$
+\frac{\log ( m / (t^{(0)} \epsilon) )}{\log \mu}
+$$
+
+tane merkezleþtirme adýmýna ihtiyacýmýz var. 
+
+Olurluk metotu (feasibility method)
+
+Bariyer metotunun bir noktadan baþlamasý gerekir ve bu nokta olurlu
+olmalýdýr. Olurlu derken 
+
+$$
+h_i(x) < 0, \quad i=1,..,m, \quad Ax = b
+$$
+
+þartlarýna uyan bir noktadan bahsediyorum. Fakat ya öyle bir nokta elimizde
+yoksa? Baþta olurlu olan bir noktayý bulmanýn kendisi de zor bir
+problem. Böyle bir noktayý elde etmek için olurluk metotu denen bir yöntem
+kullanmak gerekecek. Boyd'un kitabý [4, Bölüm 11] bu metota ``1. Faz (Phase
+I)'' ismi veriyor, problemin kendisini çözmeye ``2. Faz'' diyor. Pratikte
+bariyer metotunu kullanmak isteyenler bunu hatýrlamalý.
+
+Harfiyen olurlu bir noktayý nasýl buluruz? Kulaða biraz dolambaçlý gibi
+gelebilir ama bu noktayý bulmak için ayrý, farklý bir optimizasyon problemi
+daha kurarýz, onu da bariyer metotu ile çözeriz. Tabii illa bariyer metotu
+olmasý gerekmez, ana-çift iç-nokta yöntemi de olabilir, ama her halükarda
+alttaki problemi çözeriz. 
+
+Bu problemde elimizde iki tane deðiþken grubu var, $x,s$. Problem [2, 23:02], 
+
+$$
+\min_{x,s} s \quad \textrm{öyle ki}
+$$
+$$
+h_i(x) \le s, \quad i=1,..,m
+$$
+$$
+Ax = b
+$$
+
+Amaç harfiyen negatif bir $s$ elde etmek, böylece $h_i(x) \le s$ üzerinden
+ana problemin eþitsizlik þartlarý tatmin olacak, ayrýca $Ax = b$'e uygun
+bir baþlangýç noktasý elde edilmiþ olacak ki bu da ana problem için
+gerekli. 
+
+Bu problemi bariyer metotu ile çözmek oldukca kolay, ana problemin kendisi
+kadar zor deðil. Niye? Ýki sebep: ilki, üstteki problemi çözmek için de
+harfiyen olurlu bir baþlangý noktasý lazým, ama bu noktayý bulmak aslýnda
+çok kolay. Bana tek gereken eþitlik kýsýtlamasý $Ax = b$'yi tatmin eden bir
+$x$ bulmak, ama bu lineer bir sistem çözümü, her lineer cebir paketi bunu
+çözer. Ardýndan elde edilen $x$ ile $h_i(x)$'i hesaplamak, ve bunlarýn en
+büyüðünü artý mesela 0.01 diyerek kullanmak [2, 24:00]. Elde edeceðimiz
+sonuç üstteki problem için harfiyen olurludur, eþitsizlik kýsýtlamalarýna
+harfiyen uygun. Þimdi elimde bir baþlangýç $x$'i ve $s$'i var, ve buradan
+baþlayarak bariyer metotunun adýmlarýný uygulayabilirim. Ýþin güzel tarafý
+durma þartýmýz çok basit, $s$'in her ögesinin negatif olduðunu gördüðüm
+anda þak diye durabilirim, yani üstteki programýn ``optimal'' olmasýyla
+ilgilenmiyorum sonuçta bana tek gereken ana problemim için olurlu bir
+baþlangýç noktasý. Çoðunlukla yapýlan tarif edilen þekilde $x,s$ bulmak ve
+bunu ardý ardýna yapmak ta ki tamamen negatif elde edilene kadar ve o
+noktada durulur, ana probleme dönülür.
+
+Alternatif olarak þu problem de çözülebilir,
+
+$$
+\min_{x,s} 1^T s, \quad \textrm{öyle ki}
+$$
+$$
+h_i(x) \le s_i, \quad i=1,..,m
+$$
+$$
+Ax = b, s \ge 0
+$$
+
+Bu metotun avantajý eðer sistem olurlu deðilse hangi kýsýtlamanýn harfiyen
+yerine getirilemediðini bize söyler. Dezavantaj çözmesinin biraz daha zor
+olabilmesi.
+
+Ekler
+
+Bir diðer baþlangýç noktasý bulma metotu, Faz I yaklaþýmý daha [5]. Burada
+
+$$
+\min t, \quad \textrm{öyle ki}
+$$
+$$
+Ax = b, \quad x \ge (1-t) 1, \quad t \ge 0
+$$
+
+problemini çözüyoruz, ki deðiþkenler $x$ ve $t \in \mathbb{R}$. Eðer
+üstteki problemde $t < 1$ olacak þekilde olurlu bir $x,t$ bulabilirsek, o
+zaman elimizdeki $x$ orijinal problem için de harfiyen olurlu
+olacaktýr. Argümanýn tersi de geçerli, esas LP harfiyen olurludur sadece ve
+sadece $t^* < 1$ ise ki $t^*$ Faz I probleminin optimal deðeri.
+
+Ama þimdi üstteki problem için nasýl baþlangýç deðeri buluruz sorusu var,
+ama bu daha basit. $Ax^0 = b$'ye çözüm olan herhangi bir $x^0$'yu alýrýz,
+ve $t^0 = 2 - \min_i x_i^0$ seçeriz. Tabii eðer $\min_i x_i^0 < 0$ deðil
+ise, yani tüm $x_i$'lar pozitif ise, o zaman iþ bitti demektir, $x^0$ zaten
+harfiyen olurlu. Deðil ise log bariyer ile devam edeceðiz, problemi
+standart forma çevirmek için $z = x + (t-1)\vec{1}$ diyebiliriz,
+
+$$
+z = x + t \vec{1} - \vec{1}
+$$
+
+Ya da
+
+$$
+x = z - t\vec{1} + \vec{1}
+$$
+
+Bunu $Ax = b$ üzerinde uygularsak, 
+
+$$
+A (z - t\vec{1} + \vec{1}) = b
+$$
+
+$$
+Az - A t\vec{1} = b - A\vec{1}
+$$
+
+Eþitliðin solundakiler yerine $x$'i geniþletip $t$ için yeni bir hücre
+yaratabiliriz, ve $A$'ya yeni kolon ekleriz, bu kolondaki her öge mevcut
+$A$'nin satýrlarýnýn toplamýnýn negatifi olur. Bedel vektörü de
+$c = [0, 0, ..., 1]$ haline gelir, son öðe $t$ için.
+
+Standard LP çözen bariyer metot temelli [3] kod alttadýr. 
+
+\inputminted[fontsize=\footnotesize]{python}{barr.py}
+
+Örnek olarak uyduruk bir problem seçtik, problem özellikle baþta olurlu
+nokta bulamayacak þekilde ayarlandý, böylece gidip kendimizin bulmasý
+gerekiyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+from scipy.optimize import linprog
+import barr
+
+import barr
+
+A = [[1.,  1., 1., 0.],
+     [1.,  3., 0., 1.],
+     [9.,  1., -3., 1.]]
+b = [[5., 7., -1]]
+c = [[-1., -5., 0., 0. ]]
+
+A = np.array(A)
+b = np.array(b).T
+c = np.array(c).T
+
+x_star,gap,nsteps = barr.lp_solve(A,b,c)
+
+print ('log bariyer ==========')
+print (x_star)
+
+res = linprog(c, A_eq=A, b_eq=b)
+print ('linprog ===============')
+print (res)
+\end{minted}
+
+\begin{verbatim}
+phase I
+[[1.44060995]
+ [3.1918138 ]
+ [3.37720706]
+ [1.        ]
+ [2.00321027]]
+log bariyer ==========
+[4.37502314e-01 2.18747454e+00 2.37502314e+00 7.40628401e-05]
+linprog ===============
+     con: array([ 2.05213624e-11,  2.05719886e-11, -9.18283227e-11])
+     fun: -11.37499999994356
+ message: 'Optimization terminated successfully.'
+     nit: 4
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([4.3750000e-01, 2.1875000e+00, 2.3750000e+00, 1.0991855e-11])
+\end{verbatim}
+
+Þimdi daha önce de çözdüðümüz bir örneðe tekrar bakalým,
+
+$$
+\min_x -x_1 - 5x_2 \quad \textrm{öyle ki}
+$$
+$$
+x_1 + x_2 + x_3  = 5 
+$$
+$$
+x_1 + 3 x_2 + x_4 = 7
+$$
+$$
+x_1,x_2,x_3,x_4 \ge 0
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.array([[1,  1, 1, 0],
+              [1,  3, 0, 1]])
+b = np.array([5,7])
+c = np.array([-1, -5, 0, 0 ])
+A = np.array(A)
+b = np.array(b).T
+c = np.array(c).T
+
+x_star,gap,nsteps = barr.lp_solve(A,b,c)
+
+print ('log bariyer ==========')
+print (x_star)
+
+res = linprog(c, A_eq=A, b_eq=b)
+print ('linprog ===============')
+print (res)
+\end{minted}
+
+\begin{verbatim}
+Ax=b solution already feasible
+log bariyer ==========
+[1.87451194e-04 2.33324585e+00 2.66656670e+00 7.49883368e-05]
+linprog ===============
+     con: array([1.18571819e-11, 1.18527410e-11])
+     fun: -11.66666666664022
+ message: 'Optimization terminated successfully.'
+     nit: 4
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([1.15454732e-13, 2.33333333e+00, 2.66666667e+00, 3.96953400e-12])
+\end{verbatim}
+
+Bu durumda $Ax^0=b$ çözümü baþlangýç için yeterliydi ve o kullanýldý.
+
+Gradyan ve Hessian
+
+Pek çok yerde kullanýlan bir eþitsizlik görelim, mesela bütün $x_i < 0$
+olduðu bir durum, yani $h_i(x) = -x$. O zaman bariyer neye benzer? 
+
+$$
+\phi(x) = - \sum _{i=1}^{n} \log x_i
+$$
+
+$$
+\nabla \phi(x) = - \left[\begin{array}{c}
+1/x_1  \\ 
+\vdots \\
+1/x_n
+\end{array}\right] 
+= - X^{-1} \vec{1}
+$$
+
+Burada $X$ matrisi 
+
+$$
+X = \diag(x) = 
+\left[\begin{array}{ccc}
+x_1 & & \\
+    & \ddots & \\
+    & & x_n
+\end{array}\right]
+$$
+
+ve $\vec{1}$ sembolu tamamen 1'lerden oluþan matris. 
+
+Hessian
+
+$$
+\nabla^2 \phi (x) = \left[\begin{array}{ccc}
+1/x_1^2 & & \\
+    & \ddots & \\
+    & & 1/x_n^2
+\end{array}\right] = X^2 
+$$
+
+Eski Anlatým
+
+$$
+\min_x f(x),  \quad  \textrm{öyle ki}, 
+$$
+$$
+c_i(x) \ge 0, \quad i=1,2,..,m
+$$
+
+$c_i$ ile gösterilen eþitsizlik içeren (üstte büyüklük türünden)
+kýsýtlamalar olduðunu düþünelim. Bu problemi nasýl çözeriz?
+
+Bir fikir, problemin eþitizliklerini bir gösterge (indicator)
+fonksiyonu üzerinden, Lagrange yönteminde olduðu gibi, ana hedef
+fonksiyonuna dahil etmek, ve elde edilen yeni hedefi kýsýtlanmamýþ bir
+problem gibi çözmek. Yani üstteki yerine, alttaki problemi çözmek,
+
+$$
+\min_x f(x) + \sum_{i=1}^{m} I(c_i(x))
+$$
+
+ki $I$ pozitif reel fonksiyonlar için göstergeç fonksiyonu,
+
+$$
+I(u) = 
+\left\{ \begin{array}{ll}
+0 & u \le 0 \\
+\infty & u > 0
+\end{array} \right.
+$$
+
+Bu yaklaþýmýn nasýl iþleyeceðini kabaca tahmin edebiliriz. $I$ fonksiyonu
+0'dan büyük deðerler için müthiþ büyük deðerler veriyor, bu sebeple
+optimizasyon sýrasýnda o deðerlerden tabii ki kaçýnýlacak, ve arayýþ
+istediðimiz noktalara doðru kayacak. Tabii $x_1 > 3$ gibi bir þart varsa
+onu $x_1 - 3 > 0$ þartýna deðiþtiriyoruz ki üstteki göstergeci
+kullanabilelim. Bu yaklaþýma "bariyer metotu" ismi veriliyor çünkü $I$ ile
+bir bariyer yaratýlmýþ oluyor.
+
+Fakat bir problem var, göstergeç fonksiyonunun türevini almak, ve pürüzsüz
+rahat kullanýlabilen bir yeni fonksiyon elde etmek kolay deðil. Acaba $I$
+yerine onu yaklaþýk temsil edebilen bir baþka sürekli fonksiyon kullanamaz
+mýyýz?
+
+Log fonksiyonunu kullanabiliriz. 
+O zaman eldeki tüm $c_i(x) \ge 0$ kýsýtlamalarýný
+
+$$
+- \sum_{i=1}^{m} \log c_i(x)
+$$
+
+ile hedef fonksiyonuna dahil edebiliriz, yeni birleþik fonksiyon,
+
+$$
+P(x;\mu) = f(x) - \mu \sum_{i=1}^{m} \log c_i(x) 
+$$
+
+olur. Böylece elde edilen yaklaþým log-bariyer yaklaþýmý
+olacaktýr. Mýnýmizasyon sýrasýnda hem baþta bariyerden kaçýnilmiþ olunacak,
+hem de $\mu$ küçükdükçe hedefin geri kalanýnda istenilen minimal deðerlere
+doðru kayýlmýþ olunacak. 
+
+Algoritma olarak optimizasyon þu þekilde gider;
+
+1) Bir $x$ ve $\mu$ deðerinden baþla.
+
+2) Newton metotu ile birkaç adým at (durma kriteri yaklaþýma göre deðisebilir)
+
+3) $\mu$'yu küçült
+
+4) Ana durma kriterine bak, tamamsa dur. Yoksa baþa dön
+
+Bu yaklaþýmýn dýþbükey (convex) problemler için global minimuma
+gittiði ispatlanmýþtýr [4, sf. 504].
+
+Örnek
+
+$\min (x_1 + 0.5)^2 + (x_2 - 0.5)^2$ problemini çöz, $x_1 \in [0,1]$ ve $x_2 \in
+[0,1]$ kriterine göre.
+
+Üstteki fonksiyon için log-bariyer,
+
+$$
+P(x;\mu) = (x_1 + 0.5)^2 + (x_2-0.5)^2 -
+\mu 
+\big[
+\log x_1 + \log (1-x_1) + \log x_2 + \log (1-x_2)
+\big]
+$$
+
+Bu formülasyonu nasýl elde ettiðimiz bariz herhalde, $x_1 \ge 0$ ve
+$x_1 \le 1$ kýsýtlamalarý var mesela, ikinci ifadeyi büyüktür
+iþaretine çevirmek için eksi ile çarptýk, $-x_1 \ge 1$, ya da $1-x_1
+\ge 0$ böylece $\log(1-x_1)$ oldu.
+
+Artýk Newton yöntemini kullanarak sanki elimizde bir kýsýtlanmasý
+olmayan fonksiyon varmýþ gibi kodlama yapabiliriz, $P$'yi minimize
+edebiliriz. Newton yönü $d$ için gereken Hessian ve Jacobian
+matrislerini otomatik türevle hesaplayacaðýz, belli bir noktadan
+baþlayacaðýz, ve her adýmda $d = -H(x)^{-1} \nabla f(x)$ yönünde adým
+atacaðýz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from autograd import numpy as anp, grad, hessian, jacobian
+import numpy.linalg as lin
+
+x = np.array([0.8,0.2])
+mu = 2.0
+for i in range(10):
+    def P(x):
+    	x1,x2=x[0],x[1]
+    	return (x1+0.5)**2 + (x2-0.5)**2 - mu * \
+	   (anp.log(x1) + anp.log(1-x1) + anp.log(x2)+anp.log(1-x2))
+
+    h = hessian(P)
+    j = jacobian(P)
+    J = j(np.array(x))
+    H = h(np.array(x))
+    d = np.dot(-lin.inv(H), J)
+    x = x + d
+    print (i, x, np.round(mu,5))
+    mu = mu*0.1
+\end{minted}
+
+\begin{verbatim}
+0 [0.61678005 0.34693878] 2.0
+1 [-0.00858974  0.486471  ] 0.2
+2 [-0.02078755  0.49999853] 0.02
+3 [-0.18014768  0.5       ] 0.002
+4 [-0.49963245  0.5       ] 0.0002
+5 [-0.50002667  0.5       ] 2e-05
+6 [-0.50000267  0.5       ] 0.0
+7 [-0.50000027  0.5       ] 0.0
+8 [-0.50000003  0.5       ] 0.0
+9 [-0.5  0.5] 0.0
+\end{verbatim}
+
+Görüldüðü gibi 5. adýmda optimal noktaya gelindi, o noktada $\mu$
+oldukca küçük, ve bariyerle tanýmladýðýmýz yerlerden uzak duruldu,
+optimal nokta $x_1=-0.5,x_2=0.5$ bulundu.
+
+
+Kaynaklar
+
+[1] Tibshirani, 
+    {\em Convex Optimization, Lecture Video 15, Part 1}, 
+    \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
+
+[2] Tibshirani, 
+    {\em Convex Optimization, Lecture Video 15, Part 2}, 
+    \url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
+
+[3] Bao, {\em LP-Solver, Github}, 
+    \url{https://github.com/rayjim/python_proj/blob/master/hm_8/lp_solver.py}
+
+[4] Boyd, {\em Convex Optimization}
+
+[5] Boyd, {\em Convex Optimization, Solutions to additional exercises}
+
+\end{document}
+
+
+

@@ -1,0 +1,357 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Koentegrasyon (Cointegration)
+
+Daha önce bahsettiðimiz gibi çoðu finansal zaman serisi duraðan ya da
+ortalamaya dönüþlü deðildir. Neyse ki sadece o tür varlýklara baðlý
+deðiliz. Kendimiz proaktif olarak içinde birden fazla fiyat serisi içeren
+bir paket / portföy / enstrüman yaratabiliriz ki bu porföyün bütününün
+zaman serisi duraðan olur. Koentegrasyon iþte budur: duraðan olmayan zaman
+serilerinin lineer kombinasyonunu yaratýp duraðan olan bir seri yaratmak,
+ki bu durumda birleþtirilen serilerin {\em koentegre edilmiþ} olduðu
+söylenir. Çoðunlukla bu iki zaman serisi ile yapýlýr, belli yüzdeler
+üzerinden bir varlýðý alýp, diðerini açýða satarýz; bu strateji iyi bilinen
+``eþli oynama (pairs trading)'' stratejisidir. Fakat koentegrasyon tekniði
+kolaylýkla üç ve daha fazla fiyat serisi için de kullanýlabilir. Bu bölümde
+CADF ve Johansen testini göreceðiz, bunlar iki yaygýn koentegrasyon
+testidir. CADF sadece iki seri için kullanýlabilir, Johansen ikiden fazla
+seri ile iþleyebilir.
+
+Ýki zaman serisi olduðu durumda aslýnda olan þudur: iki serinin lineer
+kombinasyonu demek aslýnda bu iki serinin arasýnda lineer regresyon
+iþletmekten ibarettir. Regresyonun sonucu olan düz çizginin katsayýsý iki
+deðiþkenin nasýl birleþtirilebileceðini gösterir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('ETF.csv',index_col=0)
+df[['ewa','ewc']].plot()
+plt.savefig('tser_coint_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_coint_01.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.scatter(df['ewa'],df['ewc'])
+plt.title('ewa / ewc')
+plt.savefig('tser_coint_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_coint_02.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('ewc ~ ewa', data=df).fit()
+hedgeRatio = results.params['ewa']
+print hedgeRatio
+\end{minted}
+
+\begin{verbatim}
+0.962429398685
+\end{verbatim}
+
+Birleþtirince 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df['coint'] = df['ewc']-hedgeRatio*df['ewa']
+df['coint'].plot()
+plt.title(u'Koentegrasyon Üzerinden Birleþim')
+plt.savefig('tser_coint_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_coint_03.png}
+
+Aslýnda ``birleþtirmek'' tam doðru bir kelime deðil. Bir regresyon
+iþlettik, ve $y$ içinden $x$'i {\em çýkarttýk}. Arada lineer baðlantý
+vardý, ve bu durumda (eðer model iyi ise) geri kalan nedir? Gürültüdür!
+Gürültü, yani verili bir ortalama (mean) etrafýnda salýným Gaussian /
+Normal daðýlým deðil midir?  Evet! Aslýnda zamana yayýlmýþ Gaussian gürültü
+duraðandýr. Yani gürültü üzerinde borsa iþlemi karlý bir þeydir! Ýlginç
+deðil mi? Örnek olarak 100 tane standart normal daðýlýmdan gelen veri
+noktasý üretelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(np.random.normal(loc=0,scale=1.0,size=100))
+plt.title(u'Standard Normal Yapay Veri Noktalarý')
+plt.savefig('tser_coint_04.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_coint_04.png}
+
+Görüldüðü gibi üstteki sonuca oldukça benziyor. Yazýnýn geri kalanýnda
+koentegrasyon sonrasý ortaya yeni seri çýkartmaya birleþim diyeceðiz.
+
+Bir diðer bakýþ açýsýndan daha bahsedelim; bir seneti $x$ diðerini $y$
+ekseni üzerinden ve zaman serisi noktalarýný $x,y$ kordinatlarý gibi
+eþleyip kullanýnca, 3 üstteki grafiði elde ettik. Bu grafikte lineer iliþki
+görülüyordu, bu veriye çizgi uydurarak geri kalan gürültü üzerinde
+ortalamaya dönüþ yapabiliyoruz. Bunu söylemek, aslýnda 4 üstte her iki
+zaman serisinin $y$ ekseni grafiklenmiþ halindeki serilerin birbiriyle olan
+``farkýnýn'' bir ortalamaya dönüyor olmasý ile aynýdýr. Dikkat edersek iki
+seri birbiri ile yakýndan alakalý, ve aralarýndaki fark bazen çoðalsa bile,
+çoðunlukla belli bir seviyeye düþüyor. Ýþte bu aralýk, fark (spread), ya da
+marj üzerinde de ortalamaya dönüþ teknikleri uygulanabiliyor. Düþünülürse
+bu iliþki bariz gelecektir; iki seri $x,y$ arasýnda iliþki ortalamadan
+uzaklaþtýðýnda bu noktalarda gürültü artmýþ olacaktýr, ayný noktalarda
+ikili $y$ grafiðinde aradaki fark fazlalaþmýþ demektir.
+
+Bu arada, ortalamaya dönüþ tekniði çoðunlukla ikinci yaklaþým üzerinden tarif
+edilir, farkýn olup olmadýðý, artýp artmadýðý anlatýlýr.
+
+Þimdi daha ilerlemeden önce ortaya çýkan birleþimin gerçekten duraðan olup
+olmadýðýný anlamak için yapýlan testi görelim.
+
+CADF (Koentegreli Geniþletilmiþ Dickey-Fuller Testi)
+
+Akla bir soru gelebilir: eðer serileri birleþtirip duraðanlýk
+yaratabiliyorsak elimizde zaten duraðanlýk testi var, niye yeni bir testi
+kullanalým? Lineer regresyon yapýp birleþtiririz, sonra sonuç üzerinde eski
+ADF testini yaparýz. Aslýnda Engle ve Granger adlý araþtýrmacýlarýn 
+yaptýðý tam da bu, alttaki çýktýda duraðanlýðý test etmek mümkün. Not:
+hangi deðiþkenin $y$ hangisinin $x$ olduðu önemli (lineer regresyon
+yapýldýðýnda da önemli tabii ki). Ayrýca bu test sadece iki deðiþken için
+iþliyor. Daha çok deðiþken için baþka bir yöntem gerekecek.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pyconometrics
+print pyconometrics.cadf(np.matrix(df['ewa']).H,
+                         np.matrix(df['ewc']).H,0,1)
+\end{minted}
+
+\begin{verbatim}
+{'adf': -3.6434663488715664, 'alpha': -0.02041081198399386, 'nlag': 1,
+'crit': matrix([[-3.88031, -3.35851, -3.03798, -1.01144, -0.65334,
+0.15312]]), 'nvar': 1} 
+\end{verbatim}
+
+Bu sonuçlarý þu þekilde okuyabiliriz; -3.64 deðeri \%95 seviyesindeki deðer
+-3.35'den daha negatiftir (eþik deðerleri sýrasýyla \%99,\%95,\%90). O
+zaman sýfýr hipotezini (null hypothesis) reddederiz, yani yani EWA ve
+EWC'nin \%95 kesinlikle koentegre olduðunu söyleyebiliriz.
+
+Sonuç zaman serisi üzerinde Hurst hesabýný yaparsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.tsa.stattools as st
+import sys; sys.path.append('../tser_mean')
+import hurst 
+print 'hurst', hurst.hurst(df['coint'])
+print st.adfuller(df['coint'],maxlag=1)
+\end{minted}
+
+\begin{verbatim}
+hurst 0.418507486699
+(-3.6422479807847292, 0.0050028483243865635, 1, 1498, {'5%':
+                                %-2.863471337969528, '1%':
+                                %-3.4347228578139943, '10%':
+                                %-2.5677982210726897}, 550.21641296353755) 
+\end{verbatim}
+
+Johansen Testi
+
+Eðer birden fazla zaman serisi arasýnda koentegrasyon arýyorsak, baþka bir
+yöntem gerekli. Bu konuda ilk akla þu gelebilir: regresyon sonrasý artýklar
+ortalamaya-dönüþ ise, çok boyutta regresyon yaparým ve artýklarý
+kullanýrým. Burada problem þudur: hangi deðiþken $y$ hangisi $x$ (vektörü)
+olacak? Tüm seçenekleri denemek zaman alabilir. Johansen testi aslýnda
+akýllýca bir özvektör hesabý ile tam da bunu gerçekleþtiriyor (detaylar
+için [1]). 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from johansen import coint_johansen, print_johan_stats
+res = coint_johansen(df[['ewa','ewc']], 0, 1)
+print_johan_stats(res)
+\end{minted}
+
+\begin{verbatim}
+trace statistic [ 19.98321869   3.98276124]
+critical vals %90,%95,%99
+r<=0 [ 13.4294  15.4943  19.9349]
+r<=1 [ 2.7055  3.8415  6.6349]
+
+eigen statistic [ 16.00045745   3.98276124]
+critical values  %90,%95,%99
+r<=0 [ 12.2971  14.2639  18.52  ]
+r<=1 [ 2.7055  3.8415  6.6349]
+
+ozdegerler [ 0.01062437  0.00265519]
+
+ozvektorler
+
+[[ 0.74078233 -0.12758778]
+ [-0.74218753 -0.08957951]]
+\end{verbatim}
+
+Þimdi üçüncü bir varlýk, IGE ekleyelim, ve üçü arasýnda koentegrasyon testi
+yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cols = ['ewc','ewa','ige']
+res3 = coint_johansen(df[cols], 0, 1)
+print_johan_stats(res3)
+\end{minted}
+
+\begin{verbatim}
+trace statistic [ 34.42862022  17.53171895   4.47102054]
+critical vals %90,%95,%99
+r<=0 [ 27.0669  29.7961  35.4628]
+r<=1 [ 13.4294  15.4943  19.9349]
+r<=2 [ 2.7055  3.8415  6.6349]
+
+eigen statistic [ 16.89690127  13.06069841   4.47102054]
+critical values  %90,%95,%99
+r<=0 [ 18.8928  21.1314  25.865 ]
+r<=1 [ 12.2971  14.2639  18.52  ]
+r<=2 [ 2.7055  3.8415  6.6349]
+
+ozdegerler [ 0.01121626  0.00868086  0.00298021]
+
+ozvektorler
+
+[[-1.04602749 -0.5796762  -0.26467204]
+ [ 0.7599635  -0.11204898 -0.0789828 ]
+ [ 0.22330592  0.53159644  0.09515547]]
+\end{verbatim}
+
+Johansen testi iki türlü hesap yapar, biri iz istatistiði (trace statistic)
+diðeri öz istatistiði (eigen statistic). Bu sonucu irdelemek için, herhangi
+bir metot için, o metotun raporladýðý istatistik deðere bakarýz, ve bu
+deðerlerin kritik aralýklara düþüp düþmediðini kontrol ederiz. Eðer
+düþüyorsa, $r \le 0, r \le 1, ..$ için kontrol ederiz, o kadar fiyat serisi
+arasýnda koentegrasyon var demektir. Üstteki örnekte iz istatistiði her üç
+senet için \%95-\%99 aralýðýna düþüyor, demek ki \%95 seviyesinde
+hipotezleri reddediyoruz, ve koentegrasyonu kabul ediyoruz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df['yport'] = np.dot(df[cols], res3.evec[:,0])
+df['yport'].plot()
+plt.savefig('tser_coint_05.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_coint_05.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../tser_stat')
+import halflife
+hf = halflife.halflife(df, 'yport')[1]
+data_mean = pd.rolling_mean(df['yport'], window=hf)
+data_std = pd.rolling_std(df['yport'], window=hf)
+# yport evec ile senet carpimi
+# numUnits yport'un Z skoru
+df['numUnits'] = -1*(df['yport']-data_mean) / data_std
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# Z skoru 3 kolon yap
+tmp1 = np.ones(df[cols].shape) * np.array([df['numUnits']]).T
+# evec tekrarla, her satirda tekrar tekrar
+tmp2 = np.ones(df[cols].shape) * np.array([res3.evec[:,0]])
+# evec sermayenin nasil bolusturuldugu olarak gorulebilir
+# positions ise her senete dolar biriminde ne kadar para ayrildigi
+positions = tmp1 * tmp2 * df[cols]
+positions = pd.DataFrame(positions)
+# stratejinin gunluk kar/zarari
+pnl = positions.shift(1) * (df[cols] - df[cols].shift(1))  / df[cols].shift(1)
+pnl = pnl.sum(axis=1)
+# getiri ise pnl'in portfoyun brut piyasa degeri ile bolunmesi
+ret=pnl / np.sum(np.abs(positions.shift(1)),axis=1)
+# Kumulatif birlesik getiri
+plt.plot(np.cumprod(1+ret)-1)
+plt.savefig('tser_coint_06.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_coint_06.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
+print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+\end{minted}
+
+\begin{verbatim}
+APR 0.123570040726
+Sharpe 1.37987492827
+\end{verbatim}
+
+Ne kadar para kazanabileceðimizi ölçmek için yine Z skoru yarattýk, ve bu
+skora ters oranda alým ve satým farz ediyoruz. Tabii özvektör üzerinden
+birleþtirilmiþ yeni seri üzerinden Z skoru yarattýk, sonra bu alým/satým
+kararlarýný tekrar özvektör üzerinden ``geriye'' tercüme etmemiz gerekiyor,
+ki böylece 3 varlýk üzerinde ne kadar alým / satým yaptýðýmýzý
+görebilelim. Ek anlatýmlarý üstteki kodun içindeki yorumlarda
+bulabilirsiniz. 
+
+Koentegrasyson ve Korelasyon
+
+Koentegrasyon kavramý pek çok borsacý tarafýndan bilinmez, ama korelasyonu
+çoðu kiþi iyi biliyor. Bu iki kavram pek çok kiþinin kulaðýna sanki ayný
+þey imiþ gibi gelebilir; fakat matematiksel olarak koentegrasyon ve
+korelasyon birbirinden oldukça farklýdýr. Ýki fiyat serisinin korelasyon
+halinde olmasý bu iki serinin belli zaman aralýklarýndaki (mesela günlük)
+getirisiyle alakalýdýr, korelasyon var ise bu iki fiyatýn çoðu günde ayný
+yönde hareket edeceði tahmin edilebilir. Fakat pozitif korelasyon iki
+senedin uzun vadeli davranýþý hakkýnda hiçbir þey söylemez. Mesela iki
+senet birbirinden çok ayrýlmýþ bile olabilir, ama çoðu günde kabaca ayný
+yönde hareket ediyorlar ise korelasyon bunu pozitif olarak
+gösterir. Alttaki örnekte görelim, senetler Pepsi (PEP) ve Coca-Cola (KO) 
+senetleri,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfpepko = pd.read_csv('pep_ko.csv',index_col='Date')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+dfpepko[['pep','ko']].plot()
+plt.savefig('tser_coint_07.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_coint_07.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import corr
+dfpepko['retpep'] = dfpepko.pep.pct_change()
+dfpepko['retko'] = dfpepko.ko.pct_change()
+dfpepko = dfpepko.dropna()
+c,tval, pval = corr.p_corr(dfpepko.retpep, dfpepko.retko)
+print c, 'p degeri', pval
+\end{minted}
+
+\begin{verbatim}
+0.484740095488 p degeri 0.0
+\end{verbatim}
+
+0 seviyesinde p-deðeri senetlerin yüksek korelasyona sahip olduðunu
+söylüyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pyconometrics
+print pyconometrics.cadf(np.matrix(dfpepko.ko).H,
+                         np.matrix(dfpepko.pep).H,0,1)
+\end{minted}
+
+\begin{verbatim}
+{'adf': -2.6276464487688465, 'alpha': -0.0013797381503306329, 'nlag': 1,
+'crit': matrix([[-3.88031, -3.35851, -3.03798, -1.01144, -0.65334,
+0.15312]]), 'nvar': 1} 
+\end{verbatim}
+
+Koentegrasyon ise -2.62 deðeri vermiþ, kritik deðerler \%99,\%95,\%90 için
+gösteriliyor, ve bu deðer \%90 için olan kritik deðerden bile daha büyük,
+yani koentegrasyon ihtimali yüzde 90'dan düþük. Demek ki PEP ve KO arasýnda
+korelasyon var ama koentegrasyon yok.
+
+Matematiksel olarak düþünürsek bu aslýnda mantýklý, koentegrason bir
+regresyondur, serilerden birinin diðerini ``açýklamasý'' üzerine
+kurulmuþtur. Korelasyon ise ayný tek tek, atomik noktalardaki deðiþimlerin
+ayný yönde olup olmadýðýnýn istatistiði bir anlamda. Bu iki hesap çok
+farklý þeyleri anlatýyorlar.
+
+Kaynaklar 
+
+[1] Hauser, {\em Financial Econometrics Lecture Notes}
+
+[2] Chan, {\em Algorithmic Trading}
+
+[3] Chan, {\em Quantitative Trading}
+
+\end{document}

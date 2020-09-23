@@ -1,0 +1,482 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Yapay Sinir Aðlarý (Neural Networks)
+
+YSA'larý anlamak için onlarýn temel taþý olan tek nöron'u görmemiz lazým. 
+
+\includegraphics[height=3cm]{mlp_03.png}
+
+Üstteki resimde üç girdisi ve tek çýktýsý olan bir nöron görüyoruz. Girdi
+olarak $x_1,x_2,x_3$ ve çýktý olarak bir fonksiyon hesabý. Literatürde
+üstteki yapýya perseptron (perceptron) ismi de veriliyor. Eðer 0/1,
+evet/hayýr türünde çýktýlarý modellemek istersek bu fonksiyon çoðunlukla
+sigmoid fonksiyonu olarak seçilir. Yani
+
+$$ h (x) = f(w^Tx) = f(\sum _{i=1}^{3} w_ix_i + b)$$
+
+ve 
+
+$$ f(z) = \frac{1}{1 + \exp(-z)}$$
+
+ki $w$ aðýrlýk deðerlerinin taþýyan bir vektördür. Sigmoid seçiminin bir
+diðer sebebi türevinin rahat alýnabilmesi. Alternatif fonksiyonlar $\tanh$
+olabilirdi, ya da düzeltilmiþ lineer ünite (rectified linear unit -ReLu-)
+fonksiyonlarý. ReLu'lar YSA'larýn uzantýsý Derin Öðrenim'de oldukca popüler
+oldu, tanýmý
+
+$$ f(z) = \max(0,z)$$
+
+Þimdi tek nörondan çok katmanlý bir YSA nasýl oluþturulur görelim, 
+
+\includegraphics[height=6cm]{mlp_04.png}
+
+Bu yapýda her $x_i$'in her nörona gittiðini görüyoruz, bu katmanlara bu
+sebeple tamamen baðlanmýþ katman (fully-connected layer), ya da yoðun
+(dense) katman deniyor. Her türlü girdi / nöron kombinasyonu çarpýldýðý
+için aðýrlýklar bir matris içinde tutulur, ve aktivasyondan önceki vektör
+basit bir matris çarpýmý haline gelir, mesela 2. katman aktivasyonu $f_2$
+olsun, 1. gizli katman çýktýsý
+
+$$ f_2 (W_1x + b) $$
+
+Girdi $4 \times 1$, aðýrlýk $W_1$ boyutu $3 \times 4$, o zaman çarpým
+$3 \times 1$ olacak, $f_2$ uygulanýnca boyut deðiþmez (her öge üzerinde
+ayný fonksiyon iþletiliyor) sonuç $3 \times 1$, bu da zaten 2. katmana
+giren (sonra oradan sonraki katmana çýkan) hesap. Üstteki diyagramda
+yanlýlýk (bias) ayrý bir nöron olarak eklenmiþ (bazen bu yapýlmayabiliyor).
+
+Ýki gizli seviyesi (hidden layer) olan bir YSA,
+
+\includegraphics[height=6cm]{mlp_05.png}
+
+Görüldüðü gibi çok seviyeli durumda bir seviyenin çýktýsý bir diðer
+seviyenin girdisi haline geliyor. YSA'lar denetimli (supervised) þekilde
+eðitilirler. Elde $x_i,y_i$ veri noktalarý vardýr, ve her bir ya da çok
+boyutlu $x_i$ yine bir ya da çok boyutlu $y_i$ ile eþlidir. Aynen
+regresyonda olduðu gibi bu veri çiftlerini alýrýz ve onlarý en iyi temsil
+eden YSA'yý eðitmek için kullanýrýz. Eðitim tamamlandýðýnda $i$
+katmanýndaki $W_i$ aðýrlýklarý belli deðerlere sahip olurlar, ve eldeki
+``model'' bu aðýrlýklardýr. Yeni bir veri noktasý verildiðinde o veri
+noktasý aðýrlýklar her katmanýn $W_i$'sý ile çarpýlýp, toplanýp, aktivasyon
+fonksiyonlarýna geçilip, tüm katmanlardan bu þekilde geçirildikten sonra en
+sondaki çýktý deðerine eriþilir.
+
+Yanlýlýk taþýmayan þekilde að yapýsý görelim ve matris çarpýmý ile tüm
+girdileri /  çýktýlarý gösterelim,
+
+\includegraphics[width=30em]{nn_nobias.PNG}
+
+$$ Girdi = x_0$$
+
+$$ x_1 = f_1(W_1x_0)$$
+
+$$ x_2 = f_2(W_2x_1)$$
+
+$$ Çýktý = f_3(W_3x_2) $$
+
+Aktivasyon için $f_1,f_2,f_3$ ReLu ya da sigmoid seçilebilir.
+
+Ýki gizli seviyesi olan (ve yeterince sayýda nöron içeren) YSA'nýn evrensel
+yaklaþýklayýcý (universal approximator) olduðu iddia edilir, yani üstteki
+gibi yeterince çetrefil bir YSA her türlü fonksiyonu yaklaþýk olarak temsil
+edebilir. Ýþin tarihine gidersek, ilk baþta tek seviyeli YSA vardý, fakat
+XOR fonksiyonunu baþarýlý þekilde temsil edemedi. Gizli (tek) seviyeli olan
+bunu baþardý.
+
+YSA'lar imaj tanýma alanýnda bolca kullanýlmýþtýr. Bir imajda, mesela sayý
+tanýma uygulamasýnda, alttaki gibi pek çok resimler olabilir,
+
+\includegraphics[height=5cm]{mlp_01.png}
+\includegraphics[height=5cm]{mlp_02.png}
+
+Bir imaj nihayetinde o resmi temsil eden gri deðerlerin olduðu bir
+matristen ibarettir. YSA'ya girdi olmasý için matris genelde düzleþtirilir,
+ve tek bir vektör olarak verilir, 8x8 matris 64x1 vektörü olur, girdi 64
+boyutlu bir $x_i$ çýktý ise tek boyutlu 0,1,2,..,9 gibi
+etiketler.. Çoðunlukla bu tür kategorik çýktýlar ikisel olarak modellenir,
+0,..,9 yerine 10 öðeli bir ikisel vektör alýnýr, 9. öðesi 1 diðerleri 0 yapýlýr.
+
+YSA'lar nasýl eðitilir? Eldeki $x_i,y_i$ çiftleri YSA'ya verilir, her $x_i$
+önce tahmin için kullanýlýr, ve bir YSA'nýn tahmin ettiðine, bir de gerçek
+veriye bakýlýr. Bu fark, hata, YSA'nýn düzeltilmesi / iyileþtirilmesi için
+kullanýlýr, burada geriye yayýlým (backpropagation -backprop-) adlý bir
+teknik var. YSA içinde, üstte gördüðümüz gibi, sol seviyeden baþlayarak
+saða gidecek þekilde, fonksiyonlar, fonksiyonlarýn fonksiyonlarý þeklinde
+çetrefil bir yapý var. Backprop elde hatayý alýp YSA'daki tüm nöronlarýn
+aðýrlýklarýný bu hataya göre düzeltilmesini, düzelmenin ``yayýlmasýný''
+saðlar [1,2]. Bu iþlem ardý ardýna, farklý her döngüde tekrarlanýr, bir
+süre sonra YSA eldeki veriyi en iyi temsil eden ideal bir hale
+yaklaþacaktýr.
+
+Formüller ve Kod
+
+\includegraphics[width=35em]{mlp_07.png}
+
+Backprop'un genel bir resmi üstte: a) Eðitim verisi ileri yönde (soldan
+saða) YSA'ya veriliyor, ve bu veri her nokta için, o anda sahip olunan
+aðýrlýklara göre bir tahmin üretiyor. b) Eðitim verisindeki beklenen ve
+tahmin edilen deðerler arasýndaki hata hesaplanýyor c) Hata YSA'ya ``geri
+yönde'' veriliyor, her aðýrlýk $w_i$'dan $\frac{\partial E}{\partial w_i}$
+büyüklüðünün bir kýsmý çýkartýlýyor, bu düzeltmenin ne oranda yapýldýðý
+dýþarýdan, önceden kararlaþtýrýlan bir sabit $\eta$'e oranda
+yapýlýyor. 
+
+Daha detaylý bir resimde gösterelim,
+
+\includegraphics[width=20em]{neural-net.png}
+
+Tek bir gizli katman var, girdi katmaný $a_i$'den gelen sinyaller $w_{ij}$
+aðýrlýklarý ile çarpýlýyor, daha önce gördüðümüz gibi bu tamamen baðlanmýþ
+katman, çünkü tüm girdi sinyalleri her gizli katman düðümüne hep beraber
+giriþ yapýyorlar (tabii farklý aðýrlýklar üzerinden). Devam edelim,
+aðýrlýklar sonrasý bir de yanlýlýk (bias) eklenecek (resimde atlandý), ve
+elde edilen $z_i = b_j + \sum_i a_i w_{ij}$. Bu 3. katmandaki aktivasyon
+önceki son hal. Gizli katmandan çýkan sinyal $a_j$, bu sinyaller son
+katmanda bu sefer $w_{jk}$ aðýrlýklarý ile çarpýlýp toplanacak, $b_k$
+yanlýlýðý eklenecek, ve sonuç $g_k$ aktivasyon fonksiyonundan geçirilip
+çýktý $a_k$ haline getirilecek.
+
+Bir YSA'yý eðitmek demek öyle bir parametre demeti $\theta = (W,b)$
+bulmaktýr ki aðýn hatasý en minimal seviyede olsun. Çoðunlukla bu hata
+hedef (eðitim) çýktýsý $t_k$ ile aðýn en son aðýrlýklara göre kendi
+hesapladýðý $a_k$ fark karelerinin toplamý üzerinden hesaplanýr. 
+
+$$ E = \frac{1}{2}  \sum_k (a_k - t_k)^2$$
+
+Çýktý katmanýnýn hata fonksiyonu üzerinde direk etkisi olduðu için bu
+parametreler için gradyaný hesaplamak oldukca kolay, 
+
+$$ \frac{\partial E}{\partial w_{jk}} = \frac{1}{2} \sum_k (a_t - t_k)^2$$
+
+$$ = (a_k-t_k) \frac{\partial }{\partial w_{jk}} (a_k-t_k)$$
+
+Bu türevde Zincirleme Kanununu kullandýk. Dikkat edersek toplama operatörü
+kayboldu, bunun sebebi $j$'inci düðüme göre türev alýyor olmamýz o yüzden
+$j$'inci haricinde tüm diðer parametreler türevde sýfýrlanýyor, toplamdan
+geriye tek bir terim kalýyor. $t_k$'in türevi de sýfýr çünkü içinde
+$w_{jk}$'ye baðlý hiçbir deðiþken yok ($t_k$ dýþarýdan verilen eðitim
+verisi sonuçta, çoðu durum için sabit sayýlabilir). Ayrýca $a_k =
+g(z_k)$ olduðunu hatýrlayalým. O zaman 
+
+$$  
+\frac{\partial E}{\partial w_{jk}}  = 
+(a_k-t_k)  \frac{\partial}{\partial w_{jk}} a_k 
+$$
+
+$$  
+= (a_k-t_k)  \frac{\partial}{\partial w_{jk}} g_k(z_k) 
+$$
+
+$$  
+= (a_k-t_k)g_k'(z_k)\frac{\partial}{\partial w_{jk}} z_k 
+\mlabel{1}
+$$
+
+Yine Zincirleme Kanununu kullandýk. Þimdi hatýrlayalým ki
+$z_k=b_j+\sum_j g_j(z_j)w_{jk}$, yani
+$\frac{\partial z_k}{\partial w_{jk}} = g_j(z_j) = a_j$, demek ki
+
+$$  
+\frac{\partial E}{\partial w_{jk}} =  (a_k-t_k)g_k'(z_k) a_j
+$$
+
+Bu üç terimin çarpýmý, birincisi að çýktýsý ``tahmini'' ile hedef deðerinin
+farký, diðeri çýktý katmanýnýn aktivasyon fonksiyonunun türevi. Üçüncüsü
+gizli katmandaki $j$'inci düðümün aktivasyon çýktý deðeri. Bu üçlü çarpýmý
+kýsaltýlmýþ þekilde göstermek için $k$ indisi için $\delta_k$ deðiþkeni
+tanýmlayabiliriz, 
+
+$$ \delta_k = (a_k-t_k)g_k'(z_k)$$
+
+O zaman 
+
+$$ \frac{\partial E}{\partial w_{jk}} =  \delta_k a_j $$
+
+$\delta_k$ deðiþkeni hatanýn çýktý aktivasyonunden geriye doðru
+filtrelenmiþ hali olarak görülebilir, yani bir tür hata sinyali olarak
+alýnabilir. Kabaca belirtmek gerekirse üstteki formül her $w_{jk}$'nin
+nihai hataya ne kadar ek yaptýðýný belirtir. Bu sebeple, eðitim sýrasýnda,
+bu hatalarýn tersi yönde gidilmelidir ki hata daha azalsýn. 
+
+$$ w_{jk} \leftarrow w_{jk} - \eta  \frac{\partial E}{\partial w_{jk}} $$
+
+Çýktý Katman Yanlýlýðý, $b_k$
+
+Yanlýlýk için $w_{jk}$'ye benzer bir yaklaþýmý takip ediyoruz, tek fark
+(1)'deki 3. terim þöyle, 
+
+$$ 
+\frac{\partial }{\partial b_k} z_k = 
+\frac{\partial }{\partial b_k} \big[ b_k + \sum_j g_j(z_j) \big] = 1 
+$$
+
+ve sonuç olarak alttaki gradyaný elde ediyoruz, 
+
+$$  \frac{\partial E}{\partial b_k} (a_k-t_k) g_k'(z_k)(1)$$
+
+$$ = \delta_k$$
+
+Yani yanlýnlýk gradyaný sadece çýktý ünitelerinin geriye yayýlmýþ hali. Bu
+mantýklý aslýnda çünkü yanlýlýðýn aktivasyon üzerindeki aðýrlýðý hep 1'e
+eþit, ileri doðru giden sinyal ne olursa olsun. Bu sebeple yanlýlýk
+gradyaný ileri giden sinyalden hiç etkilenmiyor, sadece hatanýn kendisinden
+etkileniyor. 
+
+Gizli Katman Aðýrlýklarýnýn Gradyaný
+
+Bu katmanýn nihai hata üzerinde etkisi dolaylý olduðu için gizli katman
+aðýrlýklarý $w_{ij}$ için gradyanlarý hesaplamak biraz daha zor. Fakat
+hesaba yine ayný þekilde baþlýyoruz, 
+
+$$ \frac{\partial E}{\partial w_{ij}} = 
+\frac{1}{2} \sum_k (a_k-t_k)^2
+$$
+
+$$ = \sum_k (a_k-t_k) \frac{\partial }{\partial w_{ij}} a_k$$
+
+Dikkat edersek toplam operatörü bu sefer kaybolmadý, çünkü katmanlarýn tam
+baðlý olmasý sebebiyle, her gizli katman ünitesinden çýkan sonuç her çýktý
+katmanýndaki üniteyi etkiliyor. Devam edersek, ve $a_k = g_k(z_k)$
+olmasýndan hareketle,
+
+$$ 
+\frac{\partial E}{\partial w_{ij}} = 
+\sum_k (a_k-t_k) \frac{\partial }{\partial w_{ij}} g_k(z_k)
+$$
+
+$$ 
+= \sum_k (a_k-t_k) g_k'(z_k) \frac{\partial }{\partial w_{ij}}z_k \mlabel{2}
+$$
+
+Yine Zincirleme Kanununu kullandýk. Evet, þimdi iþler biraz daha
+karmaþýklaþacak. Üstteki formüldeki üçüncü terimde olan kýsmi türeve
+bakarsak, bu türev $w_{ij}$'e göre ama türevi alýnan $z_j$ $j$ indisine
+baðlý. Þimdi ne yapacaðýz? $z_k$'yi açýnca içinde alt fonksiyonlar olduðunu
+görüyoruz, 
+
+$$ z_k = b_k + \sum_j a_j w_{jk}$$
+
+$$ = b_k + \sum_j g_j(z_j) w_{jk}$$
+
+$$ = b_k + \sum_j g_j (b_i + \sum_i z_i w_{ij})w_{jk}  $$
+
+Üstteki son denklemdeki son terime göre $z_k$ sadece dolaylý olarak
+$w_{ij}$'ye baðlý. Bu ayrýca demektir ki Zincirleme Kanununu kullanarak
+$\frac{\partial z_k}{\partial w_{ij}}$'i hesaplayabiliriz. Türetimin belki
+de en püf noktalý yeri burasý.. 
+
+$$ 
+\frac{\partial z_k}{\partial w_{ij}} =
+\frac{\partial z_k}{\partial a_j}\frac{\partial a_j}{\partial w_{ij}}
+$$
+
+$$ = \frac{\partial }{\partial a_j} a_j w_{jk} \frac{\partial a_j}{\partial w_{ij}}$$
+
+$$ = w_{jk} \frac{\partial a_j}{\partial w_{ij}}$$
+
+$$ = w_{jk} \frac{\partial g_j(z_j)}{\partial w_{ij}}$$
+
+$$ = w_{jk}g_k'(z_j)\frac{\partial z_j}{\partial w_{ij}}$$
+
+$$ = w_{jk}g_j'(z_j) \frac{\partial }{\partial w_{ij}}(b_i + \sum_i a_iw_{ij})$$
+
+$$ = w_{jk}g_j'(z_j)a_i$$
+
+Eðer üstteki formülü (2)'deki $z_k$'ye koyarsak, $\frac{\partial E}{\partial w_{ij}}$ 
+için þunu elde ederiz, 
+
+$$ \frac{\partial E}{\partial w_{ij}} = 
+\sum_k (a_k-t_k)g_k'(z_k)w_{jk}g_j'(z_j)a_i
+$$
+
+$$ g_j'(z_j)a_i \sum_k (a_k-t_k)g_k'(z_k)w_{jk} $$
+
+$$ = a_ig_j'(z_j) \sum_k \delta_k w_{jk} $$
+
+Gizli katman yanlýlýðýnýn gradyaný için Zincirleme Kanunu ile 
+$\frac{\partial z_k}{\partial b_i}$ hesabýný yapmak lazým. 
+
+$$ \frac{\partial z_k}{\partial b_i} = 
+w_{jk}g_j'(z_j) \frac{\partial z_j}{\partial b_i} 
+$$
+
+$$ = w_{jk}g_j'(z_j) \frac{\partial }{\partial b_i} (b_i + \sum_i a_iw_{ij})$$
+
+$$ = w_{jk}g_j'(z_j) (1)$$
+
+bunun sonucu
+
+$$ \frac{\partial E}{\partial b_i} = g_j'(z_j) \sum_k \delta_k w_{jk} $$
+
+$$ = \delta_j $$
+
+Özet olarak YSA eðitimi için yapýlan hesaplar þunlar: 
+
+1. Ýleri yönde sinyalleri girdiden çýktýya doðru hesapla
+
+2. Tahmin $a_k$ ve hedef $t_k$'ye göre hata $E$'yi hesapla
+
+3. Hatayý önceki katmanlardaki aðýrlýklar ve aktivasyon fonksiyonlarýnýn
+gradyanlarýna göre geriye doðru yay.
+
+4. Parametreleri her parametrenin gradyaný için $\theta \leftarrow \theta -
+\eta \frac{\partial E}{\partial \theta}$ þeklinde güncelle.
+
+Kodlar
+
+Alttaki kod [3] baz alýnarak yazýldý. Bu arada hem gizli, hem çýktýdaki
+aktivasyonlar $g_k,g_j$, ya da hata $E$ hesabýnda farklý seçimler
+yapýlabilir. Mesela [3] üstte belirttiðimiz gibi hata hesaplýyor ama
+[2]'deki hata
+
+$$ E = -\frac{1}{N} \sum_n \sum_i y_{n,i} \log \hat{y}_{n,i}$$
+
+ile hesaplanýyor. Her iki kod çýktý aktivasyonu için ``softmax'' denen
+fonksiyon kullanýyor. Softmax 0/1 kararý yapan lojistik fonksiyonun 2'den
+fazla çýktý boyutu için genellenmiþ halidir, yani iki seçimden biri yerine
+K seçimden biri için kullanýlýr, ve
+
+$$ \sigma(z)_j = \frac{e^{z_j}}{\sum _{k=1}^{K} e^{z_k}}$$
+
+ile hesaplanýr, $z$ vektöründeki herhangi bazý reel deðerleri ``ezerek''
+$\sigma(z)$ vektörü içinde toplamý 1 olacak deðerlere çevirir. 
+
+Alttaki kod gizli katman aktivasyonu için sigmoid kullanmýþ. 
+
+\inputminted[fontsize=\footnotesize]{python}{mlp.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.cross_validation import train_test_split
+from sklearn import datasets
+import mlp
+
+def generate_data():
+    np.random.seed(0)
+    X, y = datasets.make_moons(200, noise=0.20)
+    return X, y
+
+one_hot = lambda x, K : np.array(x[:,None] == np.arange(K)[None, :], dtype=int)
+
+X, y = generate_data()
+y2 = one_hot(y, 2)
+print X.shape, y2.shape
+X_train, X_test, y_train, y_test = train_test_split(X, y2, test_size=0.2,random_state=0)
+print X_train.shape, y_train.shape
+print X_test.shape, y_test.shape
+net = mlp.mlp(X_train,y_train,2)
+print net.earlystopping(X_train,y_train,X_test,y_test,0.1)
+\end{minted}
+
+\begin{verbatim}
+(200, 2) (200, 2)
+(160, 2) (160, 2)
+(40, 2) (40, 2)
+Stopped 2.86548233378 2.86551829438 2.86620503073
+Out[1]: 
+2.8654823337797608
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def predict(x): 
+    inputs2 = np.concatenate((x,-np.ones((np.shape(x)[0],1))),axis=1)
+    outputs = net.mlpfwd(inputs2)
+    return np.where(outputs>0.5,1,0)
+
+def plot_decision_boundary(XX, yyy):
+    # Set min and max values and give it some padding
+    x_min, x_max = XX[:, 0].min() - .5, XX[:, 0].max() + .5
+    y_min, y_max = XX[:, 1].min() - .5, XX[:, 1].max() + .5
+    h = 0.01
+    # Generate a grid of points with distance h between them
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+    # Predict the function value for the whole gid
+    Z = predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.argmax(axis=1)
+    Z = Z.reshape(xx.shape)
+    # Plot the contour and training examples
+    plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral)
+    yyy = yyy.argmax(axis=1)
+    XX1 = XX[yyy==0]; XX2 = XX[yyy==1]
+    plt.scatter(XX1[:, 0], XX1[:, 1], color='blue')
+    plt.hold(True)
+    plt.scatter(XX2[:, 0], XX2[:, 1], color='red')
+
+plot_decision_boundary(X, y2)
+plt.savefig('mlp_06.png')
+\end{minted}
+
+\includegraphics[width=20em]{mlp_06.png}
+
+Alttaki alternatif bir kod, bu kod [2]'yi baz alýyor, YSA ile 0/1
+regresyonu yapacak, gizli katman aktivasyonu için $\tanh$
+kullanýlmýþ. Karar sýnýrlarý grafikleniyor.
+
+\inputminted[fontsize=\footnotesize]{python}{mlp2.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import mlp2
+X, y = mlp2.generate_data()
+
+model = mlp2.build_model(X, y, 3, print_loss=True)
+mlp2.plot_decision_boundary(lambda x:predict(model,x), X, y)
+plt.title('YSA')
+plt.savefig('mlp_08.png')
+\end{minted}
+
+\begin{verbatim}
+Loss after iteration 0: 0.432387
+Loss after iteration 1000: 0.068947
+Loss after iteration 2000: 0.068883
+Loss after iteration 3000: 0.070752
+Loss after iteration 4000: 0.070748
+Loss after iteration 5000: 0.070751
+Loss after iteration 6000: 0.070754
+Loss after iteration 7000: 0.070756
+Loss after iteration 8000: 0.070757
+Loss after iteration 9000: 0.070758
+Loss after iteration 10000: 0.070758
+Loss after iteration 11000: 0.070758
+Loss after iteration 12000: 0.070758
+Loss after iteration 13000: 0.070758
+Loss after iteration 14000: 0.070758
+Loss after iteration 15000: 0.070758
+Loss after iteration 16000: 0.070758
+Loss after iteration 17000: 0.070758
+Loss after iteration 18000: 0.070758
+Loss after iteration 19000: 0.070758
+\end{verbatim}
+
+\includegraphics[width=30em]{mlp_08.png}
+
+Karþýlaþtýrmak için lojistik regresyon kullanalým, ve ayný karar
+sýnýrlarýný grafikleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+clf = linear_model.LogisticRegressionCV()
+clf.fit(X, y)
+mlp2.plot_decision_boundary(lambda x: clf.predict(x), X, y)
+plt.title('Lojistik Regresyon')
+plt.savefig('mlp_09.png')
+\end{minted}
+
+\includegraphics[width=30em]{mlp_09.png}
+
+Görüldüðü gibi karar sýnýrý daha basit, kýyasla YSA çok daha esnek bir
+þekilde ayrým yapabiliyor. 
+
+Aktivasyon Fonksiyonlarý
+
+Biraz once ReLu'dan bahsettik, $tanh$ yerine kullanilabilir. Bir diger
+fonksiyon sigmoid. Bu fonksiyonlarin tipik grafikleri alttadir. 
+
+\includegraphics[width=35em]{mlp_10.png}
+
+Kaynaklar
+
+[1] Stansbury, {\em Derivation: Error Backpropagation \& Gradient Descent for Neural Networks}, \url{https://theclevermachine.wordpress.com/2014/09/06/derivation-error-backpropagation-gradient-descent-for-neural-networks/}
+
+[2] Britz, {\em Implementing a Neural Network from Scratch in Python - An Introduction}, \url{http://www.wildml.com/2015/09/implementing-a-neural-network-from-scratch/}
+
+[3] Marsland, {\em Machine Learning - An Algorithmic Approach}
+
+\end{document}

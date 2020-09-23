@@ -1,0 +1,244 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Zaman Serileri 
+
+Bir zaman serisi $t$ anýnda belli bir deðeri olan veri noktalarýdýr. Finans
+baðlamýnda çoðunlukla birbirini takip eden iki veri noktasý arasýnda baðlantý
+olduðu ispatlanmýþtýr. Altta örnek bir zaman serisi görüyoruz; 500 senetin
+aðýrlýklý ortalamasý olan S\&P 500 indisinin zaman göre gidiþatý (düzeltilmiþ
+kapanýþ hesaplarýný baz alarak),
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('../tser_risk/SPY2.csv',parse_dates=True,index_col='Date')
+df = df.sort_index()
+df = df[df.index > '1950-01-01']
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df['Adj Close'].plot()
+plt.savefig('tser_intro_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_intro_01.png}
+
+Zaman serileri hakkýnda önemli bir bilgi onlarýn ``getirisidir
+(returns)''. Getiri hesabý $t$ ile $t-1$ arasýndaki deðiþim oraný, yani
+$X_{t}-X_{t-1}/X_{t-1}$. Bu sayýyý 100 ile çarpýnca ise yüzde deðiþimi elde
+ederiz. Pandas ile,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+returns = df['Adj Close'].pct_change()
+print returns.head()
+\end{minted}
+
+\begin{verbatim}
+Date
+1993-01-29         NaN
+1993-02-01    0.007022
+1993-02-02    0.002034
+1993-02-03    0.010728
+1993-02-04    0.004303
+Name: Adj Close, dtype: float64
+\end{verbatim}
+
+Ýlk veri noktasý \verb!NaN! oldu çünkü bir önceki veri noktasý yok.
+
+Bu deðiþim oraný getiri zaman serilerinin doðasýna göre bir yukarý bir aþaðý
+iner, çünkü arz talebe, ya da diðer sebeplere göre senet fiyatlarý bazen çýkar,
+bazen düþer. Bir trend de olabilir tabii, bazen daha çok çýkabilir, bazen daha
+çok inebilir. Tamama bakýlýnca ve bu {\em getirilerin}, dikkat fiyat veri
+noktalarýnýn deðil, frekansýný düþünürsek bu getirilerin bir daðýlýmdan geldiði
+kabul edilebilir, histograma bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+returns.plot(kind='hist',bins=100)
+plt.savefig('tser_intro_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_intro_02.png}
+
+Ýstatistikten hatýrlarsak histogram bize belli deðerlerin hangi frekansla
+görüldüðünü söylüyor. Bir histogram ile bir olasýlýk daðýlýmý arasýnda yakýn
+baðlantýlar var, histogram bir daðýlýmýn sayýsal hali denebilir. Þekil Gaussian
+daðýlýmýna benziyor. Fakat genel baðlamda finans serilerinde tüm getirilerin
+Gaussian olduðunu direk söylemek hatalý olur, bu konuyu iþleyeceðiz.
+
+Histogramý okurken þöyle çýkarýmlar yapabiliriz; mesela yüzdeliklere bakarýz, ve
+diyelim ki yüzde 5 noktasýnda (histogram alanýnýn yüzde 5'ine tekabül eden
+x-eksenindeki nokta) deðeri okuruz, bu deðer 0.02 civarýnda gibi duruyor; o
+zaman varýlacak sonuç þöyle seslendirilebilir, ``100 günün 5 gününde \%2'lik
+düþüþler görülebilir''.  Bu mantýklý herhalde, çünkü bir daðýlýmdaki belli bir
+alan o alanýn x-eksenindeki deðerlerin ortaya çýkma olasýlýðýný verir. Ortaya
+çýkma birimi gün ise, yüzde 5, 100 gün içinde 5 gün demektir.
+
+Çýplak gözle bakmak yerine direk veriden bu hesabý yapabiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print returns.quantile(q=0.05)
+\end{minted}
+
+\begin{verbatim}
+-0.0177541105196
+\end{verbatim}
+
+Gaussian durumu ilginç; kabaca Gaussian kabulü yapýlabilir, fakat literatürdeki
+çoðu yazý finans serilerinde düþüþlerin daha sert olduðunu belirtir, yani
+Gaussian'da sola, negatif deðerlere doðru bir yamukluk (skew) vardýr. Ayrýca
+fazla sayýda zaman serilerine bakýldýðýnda her iki yönde aþýrý deðerlerin
+Gaussian faraziyesine uymayan þekilde daha fazla olduðu tespit edilmiþtir, yani
+finans getirilerinin daðlýmý ``etekleri kabarýk'' bir Gaussian'dýr, daha doðrusu
+Öðrenci t daðýlýmýdýr. Fakat basitleþtirme amacýyla Gaussian kullanýlabilir,
+tabii bu faraziyenin sýnýrlarýný bilmek þartýyla.
+
+Oynaklýk (Volatility)
+
+Artýþlarýn, düþüþlerin ne kadar sert, yüksek boyutta olduðunun iyi bir
+göstergesi olarak oynaklýk kullanýlýr, oynaklýk üstteki Gaussian faraziyesinden
+hareketle getirilerin standart sapmasý $\sigma$'dan (sigma) ibarettir, o zaman
+tanýdýðýmýz, bildiðimiz $\sigma$ hesabý direk burada kullanýlabilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print returns.std()
+\end{minted}
+
+\begin{verbatim}
+0.010654265587
+\end{verbatim}
+
+Üstte en soldan yüzde 5 noktasýna baktýk, her iki yönde tek sigma büyüklüðünde
+bir getirinin Gaussian baðlamýnda alanýn yüzde 68'ine tekabül ettiðini
+biliyoruz.
+
+\includegraphics[height=6cm]{gausspercentiles.png}
+
+Bu demektir ki getiriler Gaussian ile daðýlmýþsa artý ya da eksi tek sigmalýk
+(ya da ondan azý olan) deðiþimlerin olasýlýðý yüzde 68'dir. Ýki sigmalýk (ve
+daha azý) büyüklüðünde getirilerin olasýlýðý yüzde 95'týr.
+
+Günlükten yýllýða geçmek için getiriler için direk 256 ile çarpýlýr, bir yýl
+içinde aþaðý yukarý 256 tane iþ günü vardýr. Standart sapma geçiþi için
+$\sqrt{256}$ yani 16 ile çarpmak gerekir. Bazýlarý 252 kullanýyor, çünkü NYSE
+borsasýnda 252 günde alýþveriþ yapýlabilir. Karekök basitliði sebebiyle bizce
+256 daha uygun.
+
+Niye $\sqrt{252}$ ile çarpýyoruz? Bu durum varlýk fiyat zaman serisinin Brownian
+yürüyüþ olmasýyla alakalý. BM serilerinde varyans $t$ ile doðru orantýlýdýr,
+yani baþlangýç noktasýndan ne kadar uzaklaþýrsak varyans o kadar büyür, çünkü
+her adýmdaki varyans toplanýr (oynaklýk standart sapmadýr, ki bu varyansýn
+kareköku o sebeple zamanýn kareköku ile çarpýyoruz). {\em Olasýlýksal Calculus}
+yazýsýnda bu matematiði görüyoruz. Kabaca düþünmek gerekirse BM 'sarhoþ
+yürüyüþü' ise ve bu yürüyüþ her adýmda rasgele bir hareket yapýyorsa, bu adýmlar
+toplana toplana tabii ki baþlangýç noktasýndan bizi çok uzak noktalara
+taþýyabilir (ve geri getirebilir).
+
+Kabaca borsacýlar bilir ki senetlerin yýllýk standart sapmasý \%20 civarýdýr,
+daha güvenli olan tahvillerin ise \%1.5. Kaldýraç, yani borç kullanýldýðý zaman,
+mesela 10 kat kaldýraç olduðunu düþünelim, bu oynaklýðý 10 ile çarpmak
+demektir. Normal bir hisse için 10 kat kaldýraç sizi yýllýk sigma \%200'e
+seviyesine getirir, bu günde \%200 / 16 = \%12.5 demektir. Eðer getirimiz son
+derece iyimser bir bakýþla yýlda \%200 olsaydý, bu günlük \%0.8 olurdu (256 ile
+böldük) ve ters yönde bir sigma'lýk düþüþ geldiði anda 0.8-12.5=-\%11.7'ý
+görürdük, diðer yönde 0.8+12.5=\%13.3. Fakat bu demektir ki günlük getiriler 100
+günün 68'inde -\%11.7 ile \%13.3 arasýnda gidip geliyor, 95'inde \%-24.2 ile
+\%25.8 arasýnda gidip geliyor. O zaman günlerin 100-95=\%5'inde bu bantýn her
+iki taraftan dýþýnda (en azdan daha az, en fazladan fazla) rakamlar göreceðiz
+demektir, 5/2=\%2.5 kadar zamanda \%-24.2'dan daha fazla düþüþ olacak demektir
+bu! 100 günde 2.5 demek, 40/1 oran anlamýna geliyor, bir ay içinde 20 iþgünü
+olduðuna göre bahsedilen olayýn aþaðý yukarý iki ayda bir ortaya çýkmasý
+muhtemeldir. Yani iki ayda bir günde -\%24.2'lik getiri kaybý! Bu frekans olarak
+çok ciddi bir kayýptýr, ve psikolojik olarak yatýrýmcýyý rahatsýz edecektir. Bu
+noktaya nasýl geldiðimizi hatýrlayalým, son derece iyimser bir getiri, 10 kat
+seviyesinde bir kaldýraçla baþlamýþtýk.
+
+Sharpe Oraný (Sharpe Ratio)
+
+Sharpe oraný (SO) bir iþlem stratejisinin, ya da bir varlýðý elde tutmanýn, ki
+basit olsa bile bu da bir strateji, ne kadar karlý olacaðýný ölçek bir
+hesaptýr. Hesaplamak için getirileri riske göre uyarlarýz. Formel olarak
+getirinin ortalamasýný ayný periyottaki standart sapmaya böleriz. Bu bize günlük
+SO verir, yýllýðý hesaplamak için $\sqrt{256}$ ile çarpmak gerekir. 
+
+Kayýplarý Hesaplamak
+
+Rasgele sayý üretimi kullanarak zaman serisi üretmek simülasyon amaçlý faydalý
+bir iþlem; mesela istediðimiz hedeflediðimiz oynaklýk seviyesi, ve SO üzerinden
+belli bir yamukluða sahip bir zaman serisini üretip (daha doðrusu getirileri
+üretip sonra zaman kumulatif hesap ile seriyi üretip), onun üzerinden muhtemel
+kayýplarýn ne seviyede olacaðýný görebiliriz. Diyelim ki hiç yamukluðu olmayan,
+yüzde 50 oynaklýk hedefi ile yýllýk SÖ=0.5 üzerinden kayýplar ne olacaktýr?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from commonrandom import arbitrary_timeindex, skew_returns_annualised
+from common import account_curve
+import pandas as pd
+
+want_skew = 0.0
+annualSR = 0.5
+days = 256*10. # 10 senelik
+res = skew_returns_annualised(annualSR=annualSR, want_skew=want_skew, \
+                              voltarget=0.50, size=days) 
+df = pd.DataFrame(res)
+df = df.set_index(pd.to_datetime(df.index, unit='d'))
+df['cum'] = (1+df).cumprod() # kumulatif - zaman serisinin kendisi burada
+\end{minted}
+
+Her ayýn en kötü günlük kaybý, 100,000 Eur'lik sermaye üzerinden diyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+K = 1000; capital = 100*K
+print capital * df[0].quantile(q=0.05)
+\end{minted}
+
+\begin{verbatim}
+-5144.01215594
+\end{verbatim}
+
+0.05 yüzdelik dilimine (quantile) baktýk, çünkü 100 gün içinde 5 gün 20 gün
+içinde 1 gün demektir, bir ayda 20 iþ günü olduðunu kabul edersek her ayýn en
+kötü kaybýný bu þekilde hesaplayabiliriz.
+
+Yüzdelik dilime bakmak güzel bir numara; getirilerin daðýlýmýna bakýyoruz, ama
+yamukluk sebebiyle bu daðýlýmýn analitik bir formülü elimizde yok, sadece
+sayýsal bir daðýlým var, yani verinin kendisi. Bu sayýsal daðýlýmda yüzdelik
+dilime bakmak, analitik durumda ters kumulatif yoðunluk fonksiyonu (inverse cdf)
+hesabý yapmak ile eþdeðerdir, yani ``olasýlýðý (olasýlýk yoðunluk alaný, ya da
+cdf) vesaire olan þey hangi deðere tekabül eder?'' sorusunun cevabýný sayýsal
+olarak buluyoruz.
+
+Her sene en kötü haftalýk kayýp için elimizdeki günlük getirileri haftalýk
+getiriye çevirmemiz lazým. Bunun için getirilerin kumulatifi (yani zaman
+serisinin gerçek hali) alýp, ondan haftasal örneklem alýp, bu yeni zaman serisi
+üzerinde getirileri tekrar hesaplamak lazým, ve bakacaðýmýz yüzdelik dilimi
+yüzde 1/52 noktasý çünkü bir yýl içinde 52 hafta var.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+weekly_returns = df.cum.resample('W').pct_change()
+print capital * weekly_returns.quantile(q=1/52.)
+\end{minted}
+
+\begin{verbatim}
+-12480.850705
+\end{verbatim}
+
+Her 10 sene en kötü aylýk kayýp,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+weekly_returns = df.cum.resample('M').pct_change()
+print capital * weekly_returns.quantile(q=1/120.)
+\end{minted}
+
+\begin{verbatim}
+-26703.5859597
+\end{verbatim}
+
+Oynaklik icin 
+
+Kaynaklar
+
+[1] Carver, {\em Systematic Trading}
+
+[2] Macrooption, {\em Why Is Volatility Proportional to the Square Root of  Time},
+    \url{https://www.macroption.com/why-is-volatility-proportional-to-square-root-of-time/}
+
+\end{document}

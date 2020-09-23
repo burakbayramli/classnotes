@@ -1,0 +1,533 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 1
+
+Ders kitabýmýz Ma, Soatto, Kosecka, ve Sastry'nin {\em An Invitation to 3-D
+  Vision} kitabýdýr. Videolar [1] adresinde. Dersin ana odaðý kameradan
+gelen iki boyuttaki görüntüleri birleþtirerek o görüntülerin geldiði
+dünyanýn 3 boyutlu modelini oluþturmak. 
+
+Bilgisayar kontrollü arabalar bugünlerde çok konuþuluyor, bu arabalar
+etrafýný nasýl algýlýyor acaba?  Ýnsan gibi mi davranýyorlar? Bu soruya
+kýsa cevap hayýr. [2015 itibariyle] bu arabalar aslýnda Lidar adý verilen
+lazer bazlý uzaklýk ölçüm algýlayýcýlarý kullanýyorlar (bu kelime ýþýk
+-light- ile radar kelimelerinin birleþimi), etraflarýna lazer ýþýðý
+yollayýp yansýmayý alýyorlar, ve bunu çok yüksek çözünürlük ile yapýyorlar,
+sonuç olarak dýþ dünya hakkýnda çok detaylý bilgileri var. Fakat biz insan
+olarak biliyoruz ki sadece görüntü ile araba kullanmak mümkün, çünkü
+insanlar Lidar'a sahip deðil. Bunu nasýl yapýyoruz?
+
+Bazýlarý stereo görüþ (stereo vision) ile bunu yapabildiðimizi söylüyor
+fakat bir gözümüzü kapatsak tek gözümüz ile bile araba
+kullanabiliriz. Ýnsanlar aslýnda þunu beceriyor; hareket ederken farklý
+açýlardan gördüðümüz objelerin 3 boyutlu yerini hesaplayabilmek. Bu iþi iyi
+yapýyoruz, hatta bilim adamlarýna göre zihinsel iþlem gücümüzün neredeyse
+yarýsý görüntü iþlemekle haþýr neþir! Peki bu hesap nasýl yapýlýyor?
+
+Bir binaya bakalým, þimdi birkaç adým atarak tekrar bakalým, bina iki
+boyutlu görüntümüz içinde, yani gözümüzde, farklý bir yere gelmiþ
+olacak. Bu fark, attýðýmýz adým, o binanýn büyüklüðü, ve yeri ile orantýlý
+bir fark. Solumuzda ve çok ileride olan bir obje ona yaklaþtýktan sonra
+gözümüzde çok az sola kayma oluþturabilir, saðýmýzda çok yakýnýmýzda olan
+bir obje ona doðru ilerlerken ve yanýndan geçerken çok hýzlý bir þekilde
+gözümüzdeki resimde saða doðru kayar. Eðer yeterince adým atýp o binanýn,
+objenin yeterince deðiþik görüntüsünü alýrsak, ve kuvvetli algoritmalar
+kullanarak bina hakkýnda üç boyutlu bir þekil oluþturmuþ oluruz. Hareketten
+Yapý Oluþturmak (Structure from Motion -SfM-) bilim dalýnýn yapmaya
+uðraþtýðý iþte budur, SfM bu derslerin ana amacý olacaktýr.
+
+Altta örnek olarak Alkatraz adasýnýn iki deðiþik açýdan çekilmiþ resmini
+görüyoruz. 
+
+\includegraphics[height=5cm]{alcatraz1.png}
+\includegraphics[height=5cm]{alcatraz2.png}
+
+Biri daha uzaktan, biri daha yakýndan, büyük bir ihtimalle adaya
+yaklaþmakta olan bir tekne üzerinden ayný kiþi tarafýndan çekilmiþ. SfM
+için önce her iki resim üzerinde o resimlerin özelliklerini (features)
+çýkartan bir algoritma kullanýrýz (alttaki örnekte SURF kullandýk, bir
+diðer alternatif SIFT). Daha sonra bu özelliklerin her iki resim arasýnda
+eþleþtirilmesini saðlayan bir diðer algoritma kullanýrýz, böylece onlarýn
+hangi yöne kaymýþ olduklarýný anlayabiliriz. SURF hakkýnda daha fazla detay
+bu yazýnýn altýnda. Eþleþtirmeleri 1. resim üzerinde görsel olarak
+gösterirsek (kýrmýzý nokta ilk resimden, yeþil nokta ikinci resimden),
+
+\includegraphics[height=10cm]{alcatraz3.png}
+
+Yani kamera hareketini, ve hareketin resim üzerinde nasýl bir deðiþim
+yarattýðýnýn bulabiliyoruz. Muhakkak 1. resimdeki tüm özellik noktalarýnýn
+2. resimde nerede olduðu mükemmel bir þekilde bulunamamýþ olabilir, ama bu
+``gürültü'' içerisinden bir model çýkartmak SfM'in bir parçasý olacaktýr.
+
+Ýlk önce Lineer Cebir'den bazý kavramlarý hatýrlayalým. 
+
+Uzaylar
+
+Her tür kavram için akýlda tek bir örnek tutmak iyi oluyor; Vektör uzayý
+için mesela $\mathbb{R}^3$, altuzay (subspace) için ise bu uzay içindeki
+bir düzlem (plane) olabilir. Bu düzlemin orijinden (0,0,0) noktasýndan
+geçmesi gerekir.
+
+Bazlar
+
+Sonsuz tane baz olabilir, mesela $\mathbb{R}^3$ için. Örnek, kordinat
+eksenleri bir bazdýr, onlarý, birbirine dikgen olma þartýyla, pek çok
+deðiþik þekilde seçebilirim. 
+
+Bir bazý oluþturan vektörlerin lineer kombinasyonunu alarak bir baþka baz
+oluþturabilirim. Buna baz transformasyonu deniyor. Baz $B = \{
+b_1,..,b_n\}$ olsun, yeni bir baz $b_j' \in B'$,
+
+$$ b_j' = \sum _{j=1}^{n} \alpha_{ji}b_j $$
+
+ki $\alpha_{ji}$ özgün bir transformasyonu temsil eden transformasyon
+katsayýlarý olacaktýr. 
+
+Katsayýlarý bir matris $A$ içine koyarsak bu matrisi bir transformasyon
+matrisi olarak kullanabiliriz,
+
+$$ B' = BA \iff B = B'A^{-1} $$
+
+Baz transformasyonu çok faydalý çünkü 3 boyutlu dünyayý oluþtururken onu
+hangi þekilde oluþturacaðýz? Artýk biliyoruz ki hiçbir model, temsiliyet
+özgün deðil. Mesela kameranýn ardý ardýna aldýðý resimleri birleþtiriyoruz,
+fakat baz aldýðýmýz kameranýn yeri sürekli deðiþiyor, bu sýrada bazý
+deðiþtirmemiz gerekebiliyor. Ya da, yeri deðiþmeyen tek bir ``referans
+temsiliyet'' baz alarak ona dönük transformasyon yapmak gerekebiliyor. 
+
+Ýçsel / Noktasal Çarpým (Inner / Dot Product)
+
+Ýki vektörün noktasal çarpýmý $\langle u,v \rangle$. Norm, yani $v$
+vektörünün uzunluðu ile noktasal çarpým arasýnda bir iliþki var, 
+$|v| = \sqrt{\langle v,v \rangle}$.
+
+Tabii ki $\langle v,v \rangle \ge 0$ yani pozitif kesin. 
+
+Ýki vektör arasýndaki mesafeyi bir tür norm hesabý ile yapabilirim, 
+
+$$ d(v,w) = |v - w| = \sqrt {\langle v-w, v-w \rangle }  $$
+
+Yani iki vektörün farkýnýn normu bu iki vektör arasýndaki mesafeyi verir.
+
+Üstteki mümkün ölçevlerden (metric) sadece biri, farklý ölçevler olabilir,
+mesela 2D iki nokta arasýnda Manhattan mesafesi kullanýlabilir, 
+
+\includegraphics[height=3.0cm]{manhattan.png}
+
+Bu mesafeye Manhattan deniyor çünkü Manhattan bilindiði gibi New York'un
+üzerinde pek çok gökdeleni olan bir adasý, ve bir noktadan diðerine gitmek
+için binalarýn etrafýndan dolaþarak gitmemiz gerekiyor, direk pat diye
+dümdüz istediðimiz noktaya gidemiyoruz. Düz mesafe Öklitsel (Euclidian)
+olurdu. 
+
+Üstte noktasal çarpým üzerinden bir eþleme ($V$ diyelim) yaratmýþ olduk
+aslýnda, bu durumda $V$ bir ölçev uzayý haline geldi. Bu uzay noktasal
+çarpýmla yaratýldýðý için bu sebeple ona bir Hilbert Uzayý deniyor
+(detaylar için [2] notlarý). Her ölçek uzayý noktasal çarpým üzerinden
+yaratýlmayabilir, mesela bir ezber tablo üzerinde bile bir mesafe eþlemesi
+yaratýrdým, bu bir tür ölçev olurdu, ama bu ölçev noktasal çarpým olmadýðý
+için ortaya bir Hilbert Uzayý çýkmazdý.
+
+Doðal Baz
+
+$I_n$ ile $n \times n$ boyutunda birim matrise doðal baz (canonical basis)
+ismi veriliyor. Diyelim bu bazdan diðer bir baz $B'$'ye $A$ ile geçiþ
+yapabiliyoruz, ve $\langle x,y \rangle$'nin bu bazda nasýl gözükeceðini
+merak ediyoruz,
+
+$$ \langle x',y' \rangle = x'^Ty' = 
+(Ax)^T (Ay) = x^TA^TAy = {\langle x',y' \rangle}_{A^T A}
+ $$
+
+Eþitliðin en sað tarafý notasyonel bir ek. Bu çarpýma doðuþturucu
+(induced) içsel çarpým ismi veriliyor, doðuþturucu kelimesi kullanýlmýþ
+çünkü yeni bazýn ``etkisi'' ile ortaya çýkan, ``doðan'' bir içsel çarpým
+bu. 
+
+Dikgenlik
+
+Eðer $\langle x,y \rangle = 0$ ise $x,y$ birbirine dikgen demektir. 
+
+Bir bazýn, yani o bazý temsil eden vektörlerin birbirine dikgen olmasý
+gerekmez. Ama bu durum var ise, faydalýdýr.
+
+Kronecker Çarpýmý
+
+$A$ herhangi bir matris olabilir, illa karesel olmasý gerekmez, 
+$A \in \mathbb{R}^{m \times n }$ ve $B \in \mathbb{R}^{k \times l }$. 
+Çarpým þöyle,
+
+$$ A \otimes B =  
+\left[\begin{array}{ccc} 
+a_{11}B & \dots & a_{1n}B \\ 
+\vdots & \ddots & \vdots \\
+a_{m1}B & \dots & a_{mn}B
+\end{array}\right]
+$$
+
+Yani $A$'nin her öðesi $B$'nin {\em tamamý} ile çarpýlýyor ve bu sonuçlar
+yanyana, üst üste diziliyor. Bu tabii ki devasa yeni bir matris ortaya
+çýkartýr, sonuç $A \otimes B \in \mathbb{R}^{mk \times nl}$. 
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.array([[3,4,5],[4,3,5]])
+B = np.array([[3,4],[4,5]])
+print np.kron(A,B)
+\end{minted}
+
+\begin{verbatim}
+[[ 9 12 12 16 15 20]
+ [12 15 16 20 20 25]
+ [12 16  9 12 15 20]
+ [16 20 12 15 20 25]]
+\end{verbatim}
+
+Yýðma (Stacking)
+
+Yine çok basit bir operasyon, $A^S$, bir matrisin kolonlarýný alýyoruz, ve
+her kolonu diðerinin altýna gelecek þekilde koyuyoruz, ve dikey olarak çok
+büyük bir vektör ortaya çýkartýyor. Numpy ile,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print A
+print A.flatten(order='F')
+\end{minted}
+
+\begin{verbatim}
+[[3 4 5]
+ [4 3 5]]
+[3 4 4 3 5 5]
+\end{verbatim}
+
+Bu iki operasyondan ilginc bir yetenek elde ettik, 
+
+$$ u^T A v = ( v \otimes  u)^T A^S $$
+
+Yani eþitliðin sol tarafý $A$'nin öðeleri üzerinden bir lineer
+kombinasyon. 
+
+[Gruplar, Halkalar konularý atlandý]
+
+Gruplarý matris olarak temsil etmek mümkündür, bu fikir biraz garip
+gelebilir, çünkü grup oldukça soyut bir kavram, ama matrisler gayet somut,
+sayýsal kavramlar. Bunun nasýl olduðuna gelelim; çoklu bakýþ açýdan 3D
+tekrar oluþturma (reconstruction) halinde hareket halindeki bir kameranýn
+bir eksen etrafýnda tüm mümkün dönüþleri bir grup oluþtururlar. Nasýl?
+Mesela kamera 30 derece dönmüþ (rotate) olsun, sonra bir 30 derece daha
+dönmüþ olsun. Toplam 60 derece dönüþün kendisi, ayrý ayrý 30 dereceler
+gibi, bir dönüþ sayýlýr. Yani dönüþler, toplam operasyonu için
+kapalýdýr. Ayrýca her dönüþün bir tersi vardýr.
+
+$\mathbb{R}^2$'daki bir $\theta$ dönüþü tipik olarak
+
+$$ A_\theta = \left[\begin{array}{rr}
+\cos \theta & -\sin \theta \\
+\sin \theta & \cos \theta
+\end{array}\right] $$
+
+þeklinde gösterilir, ki $0 \le \theta \le 2\pi$. Üstteki matris soyut bir
+grubun somut olarak belirtilmiþ hali, 2 boyuttaki tüm dönüþler. Yani bir
+grubun her üyesi somut bir matris ile ifade edilebiliyor.
+
+Dönüþ dýþýnda ve yine kamera baðlamýnda diðer transformasyonlar vardýr;
+mesela kameranýn yerini deðiþtirebilirim (translation). Dönüþ ile beraber
+bu hareket te bir grup oluþturur, çünkü üç eksende ileri geri hareket, üç
+eksende dönüþ, toplam 6 boyutlu bir grup ortaya çýkar, ya da ``serbestlik
+derecemiz 6'' diyebiliriz, ki bu grubun da bir matris temsili olacaktýr. 
+
+Yani matris üzerinden gruplarý incelemiþ olurum. Matrisler somuttur, onlarý
+hesapsal rutinlerde de kullanabilirim. 
+
+Ýlgin Transformasyon (Affine Transformation) 
+
+Hareket ettirmek bir vektör toplamýdýr, döndürmek / rotasyon matris
+çarpýmýdýr (eðer matris döndürme için tasarlammýþsa), bir araya koyarsak,
+
+$L: \mathbb{R}^n \to \mathbb{R}^n$, $A \in GL(n)$ ve $b \in \mathbb{R}^n$ olmak uzere
+
+$$ L(x) = Ax + b $$
+
+iþlemini tanýmlayabiliriz, bu bir ilgin transformasyondur. Verilen bir $x$
+vektörünün yerini deðiþtirir ve döndürür. Tabii $A$ tersi alýnabilir
+(invertible) bir matris olmalýdýr çünkü bu iþlemin tersini de alabilmek
+isterim, $A$ tersi alýnabilir olmasaydý tüm transformasyon tersi alýnabilir
+olmazdý. 
+
+Dikkat: eðer $b=0$ deðilse, $L$ bir lineer transformasyon olamaz (bu
+cebirsel olarak kontrol edilebilir, mesela $x+y$ vektörünün ilgin
+transformasyonu, sonuç içinde $2b$ olur tek $b$ deðil), fakat bu iþlemi
+boyut büyüterek bir lineer transformasyon haline getirebiliriz. Bu arada,
+bu boyut büyütme iþlemini bu derste çok kullanacaðýz. Bu iþlem þöyle; bir
+$x$ vektörünü alýyoruz, altýna '1' ekliyoruz. Bu iþleme ``homojen kordinata
+çevirmek'' ismi veriliyor. Bu iþlem ardýndan $L(x)$'i
+
+$$ \left[\begin{array}{rr}
+A & b \\ 0 & 1
+\end{array}\right]
+\left[\begin{array}{r}
+x \\ 1
+\end{array}\right]
+$$
+
+olarak temsil edebiliriz, yani tek bir matris çarpýmýyla. Üstteki iþlem
+sonucunun $Ax+b$ ile ayný olduðu kontrol edilebilir. 
+
+Homojen kordinata çevirerek ilgin transformasyonu bir lineer transformasyon
+haline getirmiþ olduk. Bu numara iþimize yarayacak, dersin ilerisinde
+göreceðiz, pek çok kez kamera açýsý, yer deðiþimini hesaplamak gerekecek,
+ve bunun için lineer cebir kullanmak istiyoruz [lineer cebirin çarpým
+iþlemini yani] ve bu numarayla bu kullaným mümkün oluyor.
+
+Üstteki matrislerden solda olaný ilgin matris; bu matris ayrýca tersi
+alýnabilir bir matris, eðer $A$ da böyle ise. 
+
+Ilgin matrisler grubu lineer $GL(n+1)$'in bir alt grubunu oluþturur. Alt
+grup olduklarýný ispatlamak için grubun çarpým operasyonu için kapalý
+olduðunu, ve tersi alýnabilir olduðunu ispatlamak gerekir.
+
+Dikgen Grup (Orthogonal Group)
+
+Bu grubu tanýþtýrmanýn pek çok yolu var, bizim seçeceðimiz yol, eðer $A \in
+M(n)$ üzerinden transformasyon noktasal çarpýmý muhafaza ediyorsa, yani
+deðiþtirmiyorsa, yani
+
+$$ \langle Ax, Ay \rangle = \langle x,y \rangle,  
+\qquad \forall x,y \in \mathbb{R}^n
+$$
+
+Noktasal çarpým hesabýnýn hatýrlayacaðýmýz üzere iki vektör arasýndaki
+açýyý hesaplamak ile yakýndan bir baðlantýsý var. Yani iki vektörü $A$ ile
+çarpmak o vektörler arasýndaki açýyý deðiþtirmiyor. Ýspat için
+
+$$ \langle Ax, Ay \rangle = x^T A^TA y = x^Ty $$
+
+çünkü $A^TA = AA^T = I$. Lineer Cebir kaynaklarýnda dikgenlik tanýmý için
+çoðunlukla bu devriði ile çarpýmýn birim matrise eþit olmasý kavramýnýn
+kullanýldýðýný görürsünüz; bana göre bu taným akýlda canlandýrmak için
+yeterli deðil, üstte gördüðümüz ``$A$ ile çarpýmýn iki vektörün arasýndaki
+açýyý deðiþtirmiyor olduðu'' tanýmý baþlangýç noktasý olarak akýlda
+canladýrmakta daha faydalý. Dikgen grup ($A$ yerine $R$ kullanalým artýk)
+
+$$ O(n) = \{ R \in GL(n) \mid R^TR = I \} $$
+
+$GL$ bir genel lineer grup notasyonu.  Devam edelim, bir dikgen matris $R$
+için
+
+$$ \det(R^TR) = (\det(R))^2 = \det(I) = 1 $$
+
+ki o zaman $\det(R) \in \{\pm 1\}$. 
+
+$O(n)$'in bir alt grubu $\det(R) = +1$ þartýný getirince tanýmlanabilir, bu
+gruba özel dikgen grup ismi veriliyor, $SO(n)$. Bu grup aslýnda tüm
+rotasyon matrislerini tanýmlýyor; sezgisel olarak bunu görebiliriz, eðer
+iki vektörü dikgen matrisle transform edersem aradaki açý deðiþmez, ama
+baþka bir lineer transformasyon uygularsam açýnýn deðiþmeyeceði garanti
+deðil.
+
+Soru
+
+Eðer $\det(R) = -1$ þartýný kullansaydým baþka bir alt grup elde edebilir
+miydim? 
+
+Cevap
+
+Hayýr, çünkü mesela 
+
+$$ 
+\left[\begin{array}{rrr}
+1 & 0 \\ 0 & -1
+\end{array}\right]
+ $$
+
+matrisini düþünelim, bu matrisin determinantý -1. Ama bu matrisin devriðini
+kendisi ile çarparsam sonucun determinantý -1 deðil.
+
+Gerçek dünyada üstteki gibi bir matrisle transformasyon ne anlama gelir
+acaba? Bir tür aynadaki yansýmayý almak.. mesela $x$ ekseninde eksi
+bölgedeyken artý bölgeye geçmek, bir tür ``çevirmek (flip)''. 
+
+Öklitsel Grup (Euclidian Group)
+
+$R \in O(n)$ ve $T \in \mathbb{R}^n$ olmak üzere ($T$ bir vektör)
+
+$$ L: \mathbb{R}^n \to \mathbb{R}^n; x \to Rx + T $$
+
+Üstteki tanýma uyan tüm transformasyonlar Öklitsel Grubu oluþturur. Bu grup
+doðal olarak ilgin grubun bir alt grubudur. Homojenleþtirmek mümkündür, 
+
+$$ E(n) = 
+\bigg\{
+\left[\begin{array}{rrr}
+R & T \\ 0 & 1
+\end{array}\right]
+\bigg |
+R \in O(n), T \in \mathbb{R}^n
+\bigg\}
+ $$
+
+Öklitsel Grup içinde, eðer $R \in SO(n)$ olan alt grubu alýrsam (yani
+$\det R = 1$), o zaman özel Öklitsel Grup $SE(n)$'i elde ederim. Bu grup
+önemli bir grup, çünkü bu grubun $SE(3)$ formu, fizikte katý gövde
+hareketi (rigid-body motion) diye bilinen hareketi modellememize izin
+veriyor, ki kameramýzýn hareketini bu grupla modelleyeceðiz; katý gövde
+normal bildiðimiz cisimler (hareket ederken kütlesi þekil deðiþtirmeyen).
+
+Özet olarak 
+
+$$ SO(n) \subset O(n) 
+\subset GL(n)
+\subset SE(n) 
+\subset E(n)
+\subset A(n) 
+\subset GL(n+1)
+$$
+
+ki $\subset$ altküme sembolüdür.
+
+$GL(n)$, genel lineer grup, tüm tersi alýnabilir matrisler. $O(n)$ dikgen
+matrisler, ayna imajý, dönüþümler için. $SO(n)$ özel dikgen grup ki dikgen
+matrisin determinantýnýn +1 olduðu durum. $GL(n+1)$ genel lineer grubun
+homojenleþtirilmiþ hali. Onun alt kümesi $A(n)$ ki bu kümede $R,T$
+geliþigüzel matrisler. $A(n)$'in altkümesi $E(n)$, bu durumda $R$ dikgen
+olmalý. Onun altkümesi için özel Öklitsel grup, ki katý gövde
+transformasyonu burada. 
+
+Çekirdek (Kernel), Menzil (Range)
+
+Aslýnda çekirdek sýfýr uzayý (nullspace), menzil ise kapsam (span) ayný
+þey. Daha fazla detay için [3] notlarý.
+
+Menzil ve sýfýr uzayý kavramlarý bir lineer denklem sistemini çözerken
+faydalý. Hatýrlayacaðýmýz üzere $Ax = b$ denklem sisteminin çözüm
+baðlamýnda 3 seçeneði vardýr; ya hiç çözüm yoktur, ya tek çözüm vardýr, ya
+da sonsuz tane çözüm vardýr. Bunlardan hangisinin olacaðý menzil ve sýfýr
+uzayýna baðlýdýr. 
+
+$Ax=b$'nin, ki $x \in \mathbb{R}^n$ olacak þekilde, sadece ve sadece $b \in
+range(A)$ ise çözümü vardýr. Bu çözüm özgündür eðer $kernel(A) =\{0\}$ ise,
+yani sýfýr uzayý boþ ise (sýfýr haricinde boþ tabii). Ayrýca eðer $x_s$ bir
+çözüm ise ve $x_o \in kernel(A)$ olacak þekilde ise, o zaman $x_s + x_0$ da
+bir çözümdür. yani $A(x_s+x_0) = Ax_s + Ax_o = b$.
+
+Algoritma þöyle; elimdeki vektör $A$'nin menzilinde mi? Evet ise o zaman
+elimde bir çözüm var (hatta bu çýkarým neredeyse kendi etrafýnda dönmeye
+benziyor, menzil taným itibariyle zaten $A$'nin tüm lineer
+kombinasyonlarýdýr), bundan sonra sýfýr uzayýna bakarýz, boþ mu? Öyleyse
+elimizdeki çözüm özgündür. Eðer sýfýr uzayý boþ deðilse, bu uzaydaki her
+öðe $x_0$ üzerinden $x_s+x_0$ da bir çözümdür. Niye? Çünkü $x_0$ sýfýr
+uzayýnda olduðu için $Ax_0 = 0$, o zaman $Ax_s + \cancel{Ax_0} = b$, ve bu
+durumda sonsuz tane çözüm olacaktýr, çünkü $x_0$'i istediðim sabitle çarpýp
+büyütebilirim, o hala sýfýr uzayýnda olur. 
+
+Kerte (Rank)
+
+Bir matrisin kertesi o matrisin menzilinin boyutudur. 
+
+Sylvester'in eþitsizliði
+
+$A \in \mathbb{R}^{m \times n}, B \in \mathbb{R}^{n \times k}$ olsun. O zaman 
+
+$$ rank(A) + rank(B) - n \le rank(AB) \le \min(rank(A),rank(B)) $$
+
+Yani $A,B$'nin kertesi üzerinden bu iki matrisin çarpýmýnýn kertesi
+hakkýnda bir fikir edinebiliyorum. 
+
+Eðer elimde iki eþsiz olmayan (nonsingular), yani tersi alýnabilir matris var
+ise, diyelim $C \in \mathbb{R}^{m \times m}, D \in \mathbb{R}^{n \times n}$, o
+zaman $rank(A) = rank(CAD)$, yani eþsiz olmayan matrisler ile çarpým kerteyi
+deðiþtirmiyor.
+
+SURF
+
+Ýmajlardan özellik çýkartýp bunlarý eþleþtireceðiz demiþtik; SURF
+algoritmasý özellik bulabilen yaklaþýmlardan biri. SURF resimde köþe olarak
+betimlenebilecek, ya da diðer ilginç yerlere odaklanýyor, bu bölgelerin
+yeri, genel rengi, resmin bütününe göre açýsý, vs. hesaplanýyor. Ýmajda bu
+tür yerler keþfedilince, SURF onlarý 64 öðesi olan bir vektör olarak temsil
+eder, ve bu vektöre ``tarif edici (descriptor)'' adý verilir. Bu vektördeki
+deðerler o özelliði özgün olarak temsil ederler. 
+
+SURF ve SÝFT yaklaþýmlarý genel kategori olarak görüntü iþleme (image
+processing) alanýna girerler, bu alandaki diðer yaklaþýmlar mesela kenar
+keþfi (edge detection), köþe (corner) keþfi -Harris algoritmasý burada
+ünlü-, imajdan bulanýklýk giderme gibi iþlemlerdir. 
+
+Altta 1. Alkatraz resmindeki SURF noktalarýný görebiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mahotas.features import surf
+import pandas as pd
+from PIL import Image
+
+im=Image.open("alcatraz1.pgm")
+descriptors = pd.DataFrame(surf.surf(np.array(im)))
+print descriptors.shape
+\end{minted}
+
+\begin{verbatim}
+(461, 70)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+descriptors.plot(kind='scatter',x=1,y=0)
+plt.hold(True)
+plt.imshow(im,cmap = plt.get_cmap('gray'))
+plt.savefig('vision_02_01.png')
+\end{minted}
+
+\includegraphics[height=9cm]{vision_01_01.png}
+
+Üstteki imajýn mesela ilk SURF vektörünün içeriðine bakarsak (sadece ilk 10
+öðesi)
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print descriptors.ix[0][:10]
+\end{minted}
+
+\begin{verbatim}
+0     226.943034
+1     339.099974
+2       2.125709
+3    1477.629660
+4      -1.000000
+5      -0.029199
+6       0.003429
+7       0.000933
+8       0.003470
+9       0.001833
+Name: 0, dtype: float64
+\end{verbatim}
+
+Ýlk iki hücre özelliðin yeridir (x,y kordinatý olarak), tarif edici bölge
+ise 6. hücreden baþlar, ve 64 tane vardýr.
+
+Peki eþleþtirmenin baþarýlý olmasý ne kadar garantidir? Cevap için yazýnýn
+baþýndaki örneðe dönelim tekrar, mesela bir binaya bakýyorum, SURF
+iþletiyorum, sonra adým atýp ayný binaya tekrar bakýyorum (daha doðrusu
+bakar halde adým atýyorum). Büyük bir ihtimalle bina iki adým arasýnda mor
+rengine dönüþmedi. Hala beyaz renkte, hala kapýsý, penceresi ayný þekilde,
+ayný yerlerde duruyor. O zaman ikinci imaj üzerinde bir daha SURF
+iþletirsem, benzer özelliklerin çýkartýlýyor olmasýný beklerim, yani tarif
+edici bölgeleri birbirine çok benzeyen özellik vektörleri elde etmem
+lazým. Kullanýlan ana numara da bu zaten; birinci imajýn özelliklerinin
+tarif edici bölgeleri (vektörlerini) ikinciye eþleþtiriyorum, ki bu
+eþleþtirme basit vektör uzaklýðý üzerinden olabilir; 1. resimdeki
+vektörlerin her biri için 2. resimden gelen vektörlerin en yakýnýný
+bulurum, ve bir eþleþme elde ederim. Bu eþleþmeleri bulduktan sonra
+imajdaki piksellerin hangi yöne hareket ettiði hakkýnda bir fikir edinmiþ
+oluyorum, çünkü mesela, belli bir tarif bloðuna sahip bir bölge (10,10)
+kordinatýndan (12,12) kordinatýna gitmiþ olsun - bu önemli bir bilgi. Bu
+bilgiyi kendi hareketim, kamera açýsý, ve diðer imajlar ile birleþtirince
+ve SfM algoritmalarý uygulayarak baktýðým objelerin üç boyutlu uzaydaki
+yerlerini hesaplayabilirim.
+
+Kaynaklar
+
+[1] Cremers, {\em Multiple View Geometry}, \url{https://www.youtube.com/watch?v=RDkwklFGMfo&list=PLTBdjV_4f-EJn6udZ34tht9EVIW7lbeo4}
+
+[2] Bayramli, Fonksiyonel Analiz
+
+[3] Bayramli, Lineer Cebir
+
+\end{document}

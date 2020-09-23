@@ -1,0 +1,189 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Bir ODE Sistemi Sayýsal Olarak Nasýl Çözülür
+
+Yazýda \verb!scipy! paketinin içindeki \verb!odeint! çözücüyü iþleyeceðiz.
+Sayýsal çözümler önemli çünkü çoðu ODE sisteminin analitik çözümü
+yoktur. Onlarý sayýsal paketler kullanarak çözmek gerekir. 
+
+Bir sarkaç denklemi düþünelim, bu denklem ikinci dereceden $\theta$'yi baz
+alan bir denklemdir,
+
+$$
+\ddot{\theta}(t) + \frac{b}{m} \dot{\theta}(t) +  \frac{g}{L} \sin(\theta(t)) = 0
+$$
+
+Ya da $m = 1$ dersek ve $\frac{g}{L} = c$ ile
+
+$$
+\ddot{\theta}(t) + b \dot{\theta}(t) +  c \sin(\theta(t)) = 0
+$$
+
+ki $b,c$ dýþarýdan tanýmlanan sabitler, ve üst nokta zamansal türevi temsil
+ediyor. 
+
+Bu denklemi \verb!odeint! ile çözmek için onu ilk önce bir birinci derece
+denklemler sistemine çevirmemiz gerekiyor.
+
+$$
+\omega(t) = \dot{\theta}(t)
+$$
+
+dersek (okunuþ olarak $\omega$ omega, $\theta$ theta),
+
+$$
+\dot{\theta} = \omega(t)
+$$
+
+$$
+\dot{\omega}(t) = -b \omega(t) - c\sin(\theta(t))
+$$
+
+elde ederiz. Þimdi \verb!pend! adlý bir fonksiyon tanýmlayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+b = 0.25
+c = 5.0
+
+def pend(y, t):
+    theta, omega = y
+    return [omega, -b*omega - c*np.sin(theta)]
+\end{minted}
+
+Bu fonksiyon ana ODE çözücünün denklemimiz hakkýnda bilgi aldýðý nokta,
+\verb!y! dizini içinde $\dot{\theta}$ ve $\dot{\omega}$ var, onlarý $y$
+içinde aynen bu sýrada almayý bekliyoruz ve yenilerini hesapladýktan sonra
+geri döndürürken de aynen bu sýrada döndürüyoruz. Mesela döndürülen dizinde
+ilk öðe \verb!omega! var, bu doðru, çünkü biraz önce
+$\dot{\theta} = \omega(t)$ tanýmýný yapmýþtýk, yani ilk öðede \verb!theta!
+turevi geri vermiþ olduk, alýrken \verb!theta,omega=y! ile \verb!theta!
+aldýðýmýz gibi.
+
+\verb!t! deðiþkeninde çoðunlukla zaman tanýmlanýr, ve bu zaman
+ilgilendiðimiz zaman aralýðý belli (çoðunlukla eþit aralýklý) noktalar
+üzerinden dizin olarak \verb!odeint!'e verilir, bunu \verb!linspace! ile
+yapabiliriz. $y$ için baþlangýç þartlarýný ayrý bir deðiþken içinde, mesela
+\verb!y0!, tanýmlarýz, bu aynen \verb!y! büyüklüðünde bir dizin olacaktýr
+ve \verb!y!  için olduðu gibi ilk öðe \verb!theta! ikinci öðe \verb!omega!
+için baþlangýç deðerini tanýmlayacak.
+
+Hepsi bir arada
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+
+b = 0.25
+c = 5.0
+
+def pend(y, t):
+    theta, omega = y
+    return [omega, -b*omega - c*np.sin(theta)]
+
+t = np.linspace(0, 10, 101)
+
+y0 = [np.pi - 0.1, 0.0]
+
+sol = odeint(pend, y0, t)
+
+print (sol.shape)
+\end{minted}
+
+\begin{verbatim}
+(101, 2)
+\end{verbatim}
+
+Baþlangýç noktasý $\theta$ için $\pi - 0.1$, yani þarkacýn en üst
+noktasýndan biraz yanda. Açý olarak $\theta=0$ sarkacýn nötr durduðu nokta,
+$\pi$ en üst noktasý.
+
+Sayýsal çözüm sýrasýnda bir dizi $\theta,\omega$ elde edildi. Bu deðerler
+hesaplandýklarý gibi zamansal sýrada, bir dizin içindeler ve üstte
+gördüðümüz gibi \verb!101,2! boyutlu bir dizin bu. En son varýlan deðer
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (sol[-1])
+\end{minted}
+
+\begin{verbatim}
+[0.02001168 1.56781812]
+\end{verbatim}
+
+Degiskenleri grafiklersek
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import matplotlib.pyplot as plt
+plt.plot(t, sol[:, 0], 'b', label='theta(t)')
+plt.plot(t, sol[:, 1], 'g', label='omega(t)')
+plt.legend(loc='best')
+plt.xlabel('t')
+plt.grid()
+plt.savefig('ode_mattuck_70_odeint_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{ode_mattuck_70_odeint_01.png}
+
+Þarkaçýn hareketini görmek istiyorsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+L = 9.8 / c
+x1 = L*np.sin(sol[:,0])
+y1 = -L*np.cos(sol[:,0])
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from matplotlib.patches import Circle
+import matplotlib.pyplot as plt
+from numpy import cos, sin
+
+def make_plot(fout,x1,y1):
+    r = 0.05
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_xlim(-3,3)
+    ax.set_ylim(-3,3)
+    plt.plot([0, x1], [0, y1], lw=2, c='k')
+    c0 = Circle((0, 0), r/2, fc='k', zorder=10)
+    c1 = Circle((x1, y1), r, fc='b', ec='b', zorder=10)
+    ax.add_patch(c0)
+    ax.add_patch(c1)
+    plt.savefig(fout)
+
+for i in range(len(x1)):
+    if i % 5 == 0: 
+        make_plot('frames/img{:04d}.png'.format(i),x1[i],y1[i])
+\end{minted}
+
+\includegraphics[width=12em]{frames/img0000.png}
+\includegraphics[width=12em]{frames/img0020.png}
+\includegraphics[width=12em]{frames/img0030.png}
+\includegraphics[width=12em]{frames/img0040.png}
+\includegraphics[width=12em]{frames/img0050.png}
+\includegraphics[width=12em]{frames/img0060.png}
+
+Animasyon yaratabiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+! convert -loop 0 -delay 100 frames/*.png frames/pend.gif
+\end{minted}
+
+Sonuç [2]'de görülebilir.
+
+Not: Bir ODE sistemini çözmek hakkýnda konuþurken bazen onu ``entegre
+ettiðimiz'' de söylenir. Bu aslýnda yanlýþ bir tarif deðil, çünkü
+eþitliklerin sol tarafýnda $\dot{x}_1$, $\dot{x}_2$ gibi deðiþkenler var,
+bizim ilgilendiðimiz, çözerek elde etmek istediðimiz sonuç $x_1$, $x_2$
+deðerleri. Aslýnda yapýlanýn bir bakýma sistemi ``ileri doðru iþletmek''
+olduðu da söylenebilir, deðiþim denklemlerini kullanarak sistemýn
+simülasyonunu yapýyoruz bir bakýma.
+
+Kaynaklar
+
+[1] SciPy.org, {\em scipy.integrate.odeint}, \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html}
+
+[2] Bayramli, {\em Sarkac Animasyonu}, \url{https://github.com/burakbayramli/classnotes/blob/master/ode/ode_mattuck_70_odeint/frames/pend.gif}
+
+\end{document}
+
+
+
+

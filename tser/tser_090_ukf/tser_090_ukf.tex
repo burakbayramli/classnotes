@@ -1,0 +1,733 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Sigma Bazlý Kalman Filtreleri (Unscented Kalman Filters -UKF-)
+
+{\em Kalman Filtereleri} yazýsýnda dýþ ölçümlerin bir iç konumu anlamak
+için nasýl kullanýldýðýný gördük, fakat KF'ler gayrý lineerliði iyi idare
+edemiyorlar. Mesela havaya atýlan bir topu gürültülü ölçümlerden takip
+ettiðimizi düþünelim, top çýkýp inecek, deðiþim (state transition) /
+hareket parabol þeklinde (parabol gayrý lineer). Bu basit hareket bile KF
+ile takip edilemiyor. Gayri lineerlik ölçüm sýrasýnda da ortaya çýkabilir,
+mesela bir objenin uzaklýðýný radardan alýyorsak ölçüm bize yerden
+yükseklik ve eðim olarak gelebilir, bu ölçümleri direk mesafeye çevirmek
+için karelerin toplamýnýn karekökü gerekir ve bu yine bir gayrý lineerliði
+probleme sokmuþ olur.
+
+Çözüm için farklý yaklaþýmlar var; geniþletilmiþ KF (EKF) lokal bir nokta
+etrafýnda Taylor açýlýmý kullanarak gayrý lineerliði yakalamaya
+uðraþýyor. Fakat hem performans hem doðruluk açýsýndan daha verimli bir
+yaklaþým sigma bazlý Kalman filtreleri (UKF).
+
+UKF'in yaptýðý nedir? Normal KF'in iþleyiþi sýrasýnda geçiþ ya da gözlem
+fonsiyonlarýnýn içinden Gaussian'lar geçirdiði söylenebilir.  Gaussian'lar
+(yani onlarýn $\mu,\sigma$ parametreleri) lineerlige tabi olduklarýnda
+bozulmazlar, iki Guassian toplamý yine bir Gaussian'dýr, vs. Fakat gayrý
+lineer fonksiyonlar iþleri bozar.
+
+UKF'in püf noktasý o an eldeki Gaussian'ýn standart sapma $\sigma$'sýna
+oranlý seçilmiþ birkaç noktanýn deðiþim yapan fonksiyona verilmesi; normal
+KF'i o zaman sadece merkez nokta $\mu$'yu iþlemden geçiriyor olarak
+görebiliriz, fakat UKF ile seçenekleri arttýrýyoruz [1]. Bu noktalar
+seçildiðinde onlarý deðiþim fonksiyonuna tabi tutuyoruz, böylece ele geçen
+sonuç Gaussian'ý daha gerçeðe yakýn oluyor. UKF yaklaþýmýnda ayrýca seçilen
+her nokta için bir aðýrlýk gerekiyor, ve bu aðýrlýklar da önceden
+kararlaþtýrýlýr, bazý uygulamalarda merkez noktaya daha fazla aðýrlýk
+vermek istenebilir, diðerleri dýþ noktalarý tercih edebilir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+import math, util, scipy.linalg as linalg, filter
+from numpy import eye, zeros, dot, isscalar, outer
+from scipy.linalg import inv, cholesky
+from numpy.random import randn
+from scipy.stats import norm, multivariate_normal
+
+ax=plt.figure().gca()
+
+x = np.array([0, 5])
+P = np.array([[4, -2.2], [-2.2, 3]])
+
+util.plot_covariance_ellipse(x, P, facecolor='b', alpha=0.6, variance=9,plt=plt)
+sigmas = filter.MerweScaledSigmaPoints(2, alpha=.5, beta=2., kappa=0.)
+
+S = sigmas.sigma_points(x=x, P=P)
+plt.scatter(S[:,0], S[:,1], c='k', s=80)
+
+x = np.array([15, 5])
+P = np.array([[3, 1.2],[1.2, 6]])
+util.plot_covariance_ellipse(x, P, facecolor='g', variance=9, alpha=0.3,plt=plt)
+
+ax.add_artist(util.arrow(S[0,0], S[0,1], 11, 4.1, 0.6))
+ax.add_artist(util.arrow(S[1,0], S[1,1], 13, 7.7, 0.6))
+ax.add_artist(util.arrow(S[2,0], S[2,1], 16.3, 0.93, 0.6))
+ax.add_artist(util.arrow(S[3,0], S[3,1], 16.7, 10.8, 0.6))
+ax.add_artist(util.arrow(S[4,0], S[4,1], 17.7, 5.6, 0.6))
+
+ax.axes.get_xaxis().set_visible(False)
+ax.axes.get_yaxis().set_visible(False)
+
+plt.savefig('tser_ukf_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_ukf_02.png}
+
+``Sigma bazlý transform edilmiþ'' (unscented transform) yeni Gaussian
+hesabý þöyle olur,
+
+$$ \mu = \sum_i w_i^m y_i $$
+
+$$ \Sigma = \sum_i w_i^c (y_i-\mu)(y_i-\mu)^T $$
+
+Dikkat, bu yaptýðýmýz parçacýk filtrelerindeki gibi örneklemek, ya da her
+deðiþik hipotezi temsil eden ``parçacýklar'' yaratmak deðil, bir
+Gaussian'ýn hep belli yerlerindeki belli noktalara bakmak. Bu seçim tamamen
+{\em deterministik}, hiçbir rasgelelik yok. Seçim nasýl yapýlýr?  Her
+uygulama için tasarýmcý buna karar verir, altta bazý örnekler görülüyor,
+
+\includegraphics[height=2.5cm]{tser_ukf_03.png}
+
+Fakat endüstri sigmayý ve aðýrlýklarýný seçmek için 2005'ten itibaren
+[2]'deki yöntemi kabul etmiþ görünüyor.
+
+Trasform Örneði
+
+Alttaki gibi bir gayrý-lineer fonksiyon
+
+$$ 
+\left\{ \begin{array}{ll}
+x = x + y \\
+y = 0.1 x^2 + y^2
+\end{array} \right.
+$$
+
+olsun, bu fonksiyona  alttaki çok boyutlu Gaussian'dan örneklenmiþ
+noktalarý geçeceðiz, 
+
+$$ 
+\mu = \left[\begin{array}{r} 0 \\ 0 \end{array}\right],
+\quad 
+\Sigma = \left[\begin{array}{rr} 32 & 15 \\ 15 & 40 \end{array}\right]
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def f_nonlinear_xy(x, y):
+    return np.array([x + y, .1*x**2 + y*y])
+
+mean = (0, 0)
+p = np.array([[32, 15], [15., 40.]])
+# Compute linearized mean
+mean_fx = f_nonlinear_xy(*mean)
+
+#generate random points
+xs, ys = multivariate_normal.rvs(mean=mean, cov=p, size=2000).T
+util.plot_monte_carlo_mean(xs, ys, f_nonlinear_xy, mean_fx, 'Lineerize Edilmis Ortalama');
+plt.savefig('tser_ukf_13.png')
+\end{minted}
+
+\begin{verbatim}
+Ortalamalardaki fark x=-0.471, y=43.237
+\end{verbatim}
+
+\includegraphics[height=8cm]{tser_ukf_13.png}
+
+Görülüyor ki eðer EKF ile olduðu gibi bir lineerizasyon yapýlsa ortaya çok
+büyük bir hata çýkacak. Tekrar vurgulamak gerekirse figürde görülen
+``lineerize edilmiþ ortalama'' Gaussian $\mu$'sunun gayrý lineer fonksiyona
+geçilmiþ hali, ki EKF bu þekilde iþlem yapar, diðeri Gaussian'dan alýnan
+noktalarýn gayrý-lineer fonksiyona geçildikten sonra alýnan ortalama. 
+
+Fakat sigma bazlý transform kullanýrsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from numpy.random import multivariate_normal
+import util
+
+#initial mean and covariance
+mean = (0, 0)
+p = np.array([[32., 15], [15., 40.]])
+
+# create sigma points - we will learn about this later
+points = filter.MerweScaledSigmaPoints(n=2, alpha=.3, beta=2., kappa=.1)
+Wm, Wc = points.weights()
+sigmas = points.sigma_points(mean, p)
+
+### gayri-lineer fonksiyondan gecir
+sigmas_f = np.empty((5, 2))
+for i in range(5):
+    sigmas_f[i] = f_nonlinear_xy(sigmas[i, 0], sigmas[i ,1])
+
+### sigma bazli transform ile yeni ortalama ve kovaryansi hesapla
+ukf_mean, ukf_cov = filter.unscented_transform(sigmas_f, Wm, Wc)
+
+# rasgele noktalar uret
+np.random.seed(100)
+xs, ys = multivariate_normal(mean=mean, cov=p, size=5000).T
+util.plot_monte_carlo_mean(xs, ys, f_nonlinear_xy, ukf_mean, 'Sigma Bazli Ortalama')
+plt.xlim(-30, 30); plt.ylim(0, 90)
+plt.subplot(121)
+plt.scatter(sigmas[:,0], sigmas[:,1], c='r', s=30);
+plt.savefig('tser_ukf_12.png')
+\end{minted}
+
+\begin{verbatim}
+Ortalamalardaki fark x=-0.097, y=0.549
+\end{verbatim}
+
+\includegraphics[height=8cm]{tser_ukf_12.png}
+
+Bu sonuç bana müthiþ geliyor; sadece 5 nokta kullanarak ortalamaya çok
+yakýn bir sonucu hesaplayabildik, ayrýca bunu gayrý lineerliðin ne
+olduðundan tamamen baðýmsýz olarak yaptýk; eðer sigma noktalarýný üreten
+koda bakarsak göreceðiz ki bu kod gayrý-lineer fonksiyondan habersiz.
+
+Filtre
+
+UKF formüllerine bakalým. Geçiþ ve gözlemin $f,h$ olduðunu
+düþünelim, matris formunda $F,H$. O anda elde olan $\mu,\Sigma$'yý alýp,
+önceden seçilmiþ sigma noktalarý üzerinden bir $X$ elde ediyoruz. Bir
+sonraki zaman dilimine
+
+$$ Y = f(X) $$
+
+ile geçiyoruz. Þimdi sigma bazlý transform ile tahmini ortalama kovaryans
+hesaplarýz,
+
+$$ \bar{\mu} = \sum w^m Y $$ 
+
+$$ \bar{\Sigma} = \sum w^c (Y-\hat{\mu})(Y-\hat{\mu})^T + Q $$
+
+KF ile geçiþ ortalama için $\bar{x} = Fx$ ve kovaryans $\bar{P} = FPF^T + Q$ 
+ile olurdu. 
+
+Güncelleme adýmýnda eldeki sigma noktalarýný bir tahmine çeviriyoruz,
+
+$$ Z = h(Y) $$
+
+Sonra bu noktalarýn ortalama ve kovaryansýný sigma bazlý transformu
+kullanarak hesaplayabiliriz, 
+
+$$ \mu_z = \sum w^m Z $$
+
+$$ P_z = \sum w^c (Z-\bar{\mu}) (Z-\bar{\mu})^T + R$$
+
+Þimdi Kalman kazancý (gain) ve artýklarý hesaplanabilir. Artýklar basit
+
+$$ y = z - \mu_z$$
+
+Kazanç için önce konum ve ölçümlerin çapraz kovaryansýný hesaplarýz, 
+
+$$ P_{xz} = \sum w^c (X-\mu)(Z-\mu_z)^T    $$
+
+sonra kazancý hesaplarýz, 
+
+$$ K = P_{xz}P_z^{-1} $$
+
+Üstteki matris tersi iþlemi bir nevi oran hesabý gibi görebiliriz, o zaman
+Kalman kazancý
+
+$$ 
+K \approx \frac{P_{xz}}{P_z^{-1}} \approx 
+\frac{\textrm{mevcut konuma inanç}}{\textrm{ölçüme olan inanç}}
+$$
+
+oranýndan ibarettir. Nihayet yeni kestirme hesabý artýk ve kazanç
+kullanarak hesaplanabilir,
+
+$$ x = \bar{x} + Ky $$
+
+yeni kovaryans
+
+$$ P = \bar{P} - KP_zK^T $$
+
+Filtrenin iç kodlamasý hakkýnda diðer matematiksel detaylar için [1, sf. 382].
+
+Dikkat çekilmesi gereken püf nokta KF'te olduðu gibi ölçümleri üretenin
+artýk bir matris olmadýðýdýr. Normal Kalman filtreleri ile elde bir ölçüm
+``fonksiyonu'' vardýr fakat bu fonksiyonu bir $H$ matrisi olarak temsil
+etmek zorundayýz. Efendim boyutlarý düzgün olmalý, ki konum $x$'i
+çarpabilsin, vs. UKF ile bir $h$ {\em fonksiyonu} var, bu fonksiyonlar ek
+iþlemler yapýlmadan önce verinin kendisini transforme ediyorlar, ve
+``yeni'' veri üzerinde ek filtreleme iþlemleri yapýyoruz, mesela Kalman
+kazancýný bu transform edilmiþ veri üzerinden hesaplýyoruz. Kýyasla KF ile
+$H$ matrisi matris olarak direk kazanç hesabýnda kullanýlýyor. Ardýndan UKF
+ile veriye öyle noktalarda (sigma noktalarý) bakýyoruz ki $h$ ne kadar
+gayrý-lineer olursa olsun onun temel özelliklerini yakalayabilmiþ
+oluyoruz. Bu geçiþ fonksiyonu $f$ için de geçerli tabii, artýk onun da bir
+matris olmasý gerekmiyor. Ama hala $F,H$ matrislerini tasarlayýp onlarý
+$f,h$ fonksiyonlarý içinde $x$'i çarpmak için kullanabiliriz tabii, ama bu
+þart deðil. 
+
+Örnek
+
+Bir KF tasarlamak için $x,F,H,R$ matrislerinin ne olduðunu kararlaþtýrmak
+gerekiyor demiþtik, bu durum daha önce KF yazýsýnda iþlendi. Konum bilgisi
+nedir, geçiþ nedir, ölçüm nedir? Hareket halindeki bir objeyi takip
+ettiðimizi düþünelim, konum
+
+$$ x=\left[\begin{array}{cccc} x&\dot{x}&y&\dot{y} \end{array}\right]^T $$
+
+olabilir. Konum geçiþi 
+
+$$ F = 
+\left[\begin{array}{rrrr}
+1 & \Delta t & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & \Delta t \\
+0 & 0 & 0 & 1
+\end{array}\right]
+$$
+
+Üstteki denklemle bir Newton formülünü kodlamýþ oluyoruz, 
+
+$$ x_k = x_{k-1} + \dot{x}_{k-1}\Delta t $$
+
+Algýlayýcýlar hareketli aracýn yerini bildiriyor ama hýzýný bildiremiyor, o
+zaman 
+
+$$ H = \left[\begin{array}{rrrr}
+1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 
+\end{array}\right]$$
+
+Diyelim ki algýlayýcýnýn pozisyonu belirleme hatasý hem $x$ hem $y$
+kordinatlarý için $1\sigma = 0.3$ metre, bu bize alttaki ölçüm gürültü
+matrisini veriyor, 
+
+$$ R = \left[\begin{array}{cc}
+0.3^2  & 0 \\ 0 & 0.3^2
+\end{array}\right]$$
+
+Konum geçiþinde  de gürültü var, o da 
+
+$$ Q = \left[\begin{array}{cc}
+\frac{1}{4} \Delta t^4 & \frac{1}{2} \Delta t^3 \\
+\frac{1}{2} \Delta t^3 & \Delta t^2 
+\end{array}\right] \sigma^2  $$
+
+Tabii biz simülasyon amaçlý veri üretirken de üstteki matrisi
+kullanacaðýz. 
+
+Kodlar altta,
+
+\inputminted[fontsize=\footnotesize]{python}{filter.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import filter
+
+def f_cv(x, dt):
+    F = np.array([[1, dt, 0, 0],
+                 [0, 1, 0, 0],
+	      	 [0, 0, 1, dt],
+	      	 [0, 0, 0, 1]])
+    return np.dot(F, x)
+
+def h_cv(x):
+    return np.array([x[0], x[2]])
+
+dt = 1.0
+std_x, std_y = .3, .3
+zs = [np.array([i + randn()*std_x,i + randn()*std_y]) for i in range(100)]
+
+sigmas = filter.MerweScaledSigmaPoints(4, alpha=.1, beta=2., kappa=1.)
+ukf = filter.UKF(dim_x=4, dim_z=2, fx=f_cv,hx=h_cv, points=sigmas)
+ukf.x = np.array([0., 0., 0., 0.])
+ukf.R = np.diag([0.09, 0.09])
+ukf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=1, var=0.02)
+ukf.Q[2:4, 2:4] = filter.Q_discrete_white_noise(2, dt=1, var=0.02)
+uxs = []
+for z in zs:
+    ukf.predict(dt=dt)
+    ukf.update(z)
+    uxs.append(ukf.x.copy())
+uxs = np.array(uxs)
+plt.plot(uxs[:, 0], uxs[:, 2])
+plt.savefig('tser_ukf_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_ukf_01.png}
+
+Bir Uçaðý Radar ile Takip Etmek
+
+Þimdi ilk gayrý lineer problemimize gelelim. Yeryüzündeki sabit bir radarý
+algýlayýcý olarak kullanarak bir uçaðý takip edeceðiz. Basitlik amaçlý
+olarak radar sinyalleri ve takip iki boyutta olacak. Radarlar bilindiði
+gibi radyo sinyallerini etrafa yayarlar, ve etraftaki cisimlerden geri
+gelen yansýmalara bakarak bir mesafe hesaplarlar. Bu problemdeki radar bize
+bir uzaklýk ve cismin yerle olan açýsýný (slant) raporlayacak. Biz bu eðimi
+ve mesafeyi alýp bir uzaklýk ve irtifa / yükseklik (altitude) hesabýna
+çevireceðiz.
+
+\includegraphics[height=4cm]{tser_ukf_07.png}
+
+Uçaðýn sabit irtifada uçtuðunu farz edelim, 
+
+$$ \vec{x} = 
+\left[\begin{array}{c}  
+\textrm{uzaklýk} \\ \textrm{hýz} \\ \textrm{irtifa}
+\end{array}\right] = 
+\left[\begin{array}{c}  
+x_{pos} \\ x_{vel} \\ x_{alt}
+\end{array}\right] = 
+\left[\begin{array}{c}  
+x \\ \dot{x} \\ y
+\end{array}\right]
+$$
+
+Geçiþ fonksiyonu lineer
+
+$$ F = 
+\left[\begin{array}{ccc}
+1 & \Delta t & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
+\end{array}\right]
+\left[\begin{array}{c} x \\ \dot{x} \\ y \end{array}\right]
+$$
+
+Þimdi ölçüm fonksiyonunu tasarlamak lazým, probleme tersten bakýyoruz
+þimdi, yani ``eðer yer seviyesindeki uzaklýðý ve irtifayý biliyor
+olsaydýk açýyý (bearing) ve sinyal uzaklýðýný (range) nasýl ölçüyor
+olurduk?'' sorusunu cevaplýyoruz. Pitagor denklemini kullanabiliriz,
+
+$$ range = \sqrt{(x_{ac} - x_{radar})^2 + (z_{ac}-z_{radar})^2 } $$
+
+Yer ile açý için 
+
+$$ bearing = \tan^{-1} \frac{z_{ac}-z_{radar}}{x_{ac}-x_{radar}}$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def f_radar(x, dt):
+    F = np.array([[1, dt, 0],
+                  [0, 1, 0],
+                  [0, 0, 1]], dtype=float)
+    return np.dot(F, x)
+
+def h_radar(x):
+    dx = x[0] - h_radar.radar_pos[0]
+    dz = x[2] - h_radar.radar_pos[1]
+    slant_range = math.sqrt(dx**2 + dz**2)
+    bearing = math.atan2(dz, dx)
+    return slant_range, bearing
+
+h_radar.radar_pos = (0, 0)
+
+from numpy.linalg import norm
+from math import atan2
+
+class RadarStation(object):
+    def __init__(self, pos, range_std, bearing_std):
+        self.pos = np.asarray(pos)
+        self.range_std = range_std
+        self.bearing_std = bearing_std
+
+    def reading_of(self, ac_pos):
+        diff = np.subtract(ac_pos, self.pos)
+        rng = norm(diff)
+        brg = atan2(diff[1], diff[0])
+        return rng, brg
+
+
+    def noisy_reading(self, ac_pos):
+        rng, brg = self.reading_of(ac_pos)
+        rng += randn() * self.range_std
+        brg += randn() * self.bearing_std
+        return rng, brg
+
+
+    def z_to_x(self, slant_range, angle):
+        x = cos(angle)*slant_range
+        z = sin(angle)*slant_range
+        
+        return self.pos + (x,z)
+        
+class ACSim(object):
+    def __init__(self, pos, vel, vel_std):
+        self.pos = np.asarray(pos, dtype=float)
+        self.vel = np.asarray(vel, dtype=float)
+        self.vel_std = vel_std
+
+    def update(self, dt):
+         dx = self.vel*dt + (randn() * self.vel_std) * dt
+         self.pos += dx
+         return self.pos
+
+import math
+from numpy import random
+
+dt = 12. # 12 seconds between readings
+range_std = 5 # meters
+bearing_std = math.radians(0.5)
+ac_pos = (0., 1000.)
+ac_vel = (100., 0.)
+radar_pos = (0., 0.)
+h_radar.radar_pos = radar_pos
+points = filter.MerweScaledSigmaPoints(n=3, alpha=.1, beta=2., kappa=0.)
+kf = filter.UKF(3, 2, fx=f_radar, hx=h_radar, points=points)
+kf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
+kf.Q[2,2] = 0.1
+kf.R = np.diag([range_std**2, bearing_std**2])
+kf.x = np.array([0., 90., 1100.])
+kf.P = np.diag([300**2, 30**2, 150**2])
+random.seed(200)
+pos = (0, 0)
+radar = RadarStation(pos, range_std, bearing_std)
+ac = ACSim(ac_pos, (100, 0), 0.02)
+time = np.arange(0, 360 + dt, dt)
+xs = []
+for _ in time:
+    ac.update(dt)
+    r = radar.noisy_reading(ac.pos)
+    kf.predict(dt=dt)
+    kf.update([r[0], r[1]])
+    xs.append(kf.x)
+
+xs = np.asarray(xs)
+
+
+plt.figure()
+plt.plot(time, xs[:, 0]/1000.)
+plt.xlabel('zaman(saniye)')
+plt.ylabel('yer(km)')
+plt.tight_layout()
+plt.savefig('tser_ukf_04.png')
+
+plt.figure()
+plt.plot(time, xs[:, 1])
+plt.xlabel('zaman(saniye)')
+plt.ylabel(u'hýz')
+plt.tight_layout()
+plt.savefig('tser_ukf_05.png')
+
+plt.figure()
+plt.plot(time, xs[:,2])
+plt.xlabel('zaman(saniye)')
+plt.ylabel('irtifa')
+plt.tight_layout()
+plt.savefig('tser_ukf_06.png')
+\end{minted}
+
+\includegraphics[width=10cm]{tser_ukf_04.png}
+
+\includegraphics[width=10cm]{tser_ukf_05.png}
+
+\includegraphics[width=10cm]{tser_ukf_06.png}
+
+Sonuçlar iyi, fakat uçaðýn hiç irtifa deðiþtirmediðini farzettik. Þimdi
+uçaðýn bir dakika sonra daha yükseðe týrmanmaya baþladýðýný düþünelim, ve
+simülasyon verisini ona göre üretelim. O zaman týrmanma oranýný da konum
+matrisine eklememiz gerekir, 
+
+$$ \vec{x} = 
+\left[\begin{array}{c}  
+\textrm{uzaklýk} \\ \textrm{hýz} \\ \textrm{irtifa} \\ \textrm{týrmanma oraný}
+\end{array}\right] = 
+\left[\begin{array}{c}  
+x \\ \dot{x} \\ y \\ \dot{y}
+\end{array}\right]
+$$
+
+Konum geçiþ matrisi de deðiþir, 
+
+$$ \vec{x}_{\textrm{geçiþ sonrasý}} = 
+\left[\begin{array}{cccc}
+1 & \Delta t & 0 & 0 \\ 
+0 & 1 & 0 & 0 \\ 
+0 & 0 & 1 & dt \\
+0 & 0 & 0 & 1
+\end{array}\right]
+\left[\begin{array}{c}  x \\ \dot{x} \\ y \\ \dot{y} \end{array}\right]
+$$
+
+ki geçiþ hala lineer. Ölçüm fonksiyonu ayný kalýyor, sadece boyutlar
+deðiþtiði için $Q$'yi buna göre uyarlamak gerekiyor. Bu kadar. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def f_cv_radar(x, dt):
+    F = np.array([[1, dt, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, dt],
+    [0, 0, 0, 1]], dtype=float)
+    return np.dot(F, x)
+def cv_UKF(fx, hx, R_std):
+    points = filter.MerweScaledSigmaPoints(n=4, alpha=.1, beta=2., kappa=-1.)
+    kf = filter.UKF(4, len(R_std), fx=fx, hx=hx, points=points)
+    kf.Q[0:2, 0:2] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
+    kf.Q[2:4, 2:4] = filter.Q_discrete_white_noise(2, dt=dt, var=0.1)
+    kf.R = np.diag(R_std)
+    kf.R = np.dot(kf.R, kf.R) # square to get rariance
+    kf.x = np.array([0., 90., 1100., 0.])
+    kf.P = np.diag([300**2, 3**2, 150**2, 3**2])
+    return kf
+
+random.seed(200)
+ac = ACSim(ac_pos, (100, 0), 0.02)
+kf = cv_UKF(f_cv_radar, h_radar, R_std=[range_std, bearing_std])
+time = np.arange(0, 360 + dt, dt)
+xs = []
+for t in time:
+    if t >= 60:
+        ac.vel[1] = 300/60 # 300 meters/minute climb
+    ac.update(dt)
+    r = radar.noisy_reading(ac.pos)
+    kf.predict(dt=dt)
+    kf.update([r[0], r[1]])
+    xs.append(kf.x)
+
+xs = np.array(xs)
+
+plt.figure()
+plt.plot(time, xs[:,2])
+plt.xlabel('zaman(saniye)')
+plt.ylabel('yükseklik')
+plt.tight_layout()
+plt.savefig('tser_ukf_08.png')
+    
+print(u'Gerçek irtifa: {:.1f}'.format(ac.pos[1]))
+print(u'UKF ile hesaplanan irtifa: {:.1f}'.format(xs[-1][2]))
+\end{minted}
+
+\begin{verbatim}
+Gerçek irtifa: 2561.9
+UKF ile hesaplanan irtifa: 2432.9
+\end{verbatim}
+
+\includegraphics[width=10cm]{tser_ukf_08.png}
+
+Görüldüðü gibi irtifa tahmini daha zor hale geldi, bolca gürültü var, fakat
+takip baþarýlý. 
+
+Birden Fazla Pozisyon Verisini Birleþtirmek 
+
+GPS icat edilmeden önce gemiler ve uçaklar uzaklýk ve açý üzerinden konum
+bulma sistemleri kullanýrlardý, VOR sistemi bunlardan biriydi. Mesela bir
+uçakta iki tane VOR alýcýsý olabilirdi, pilot bu alýcýlardan her birini
+farklý bir istasyona ayarlardý (radyoda doðru frekans ile kanal bulmak gibi
+herhalde), ve her VOR alýcýsý ``radyal (radial)'' denen bir bilgiyi
+verirdi, bu bilgi VOR istasyonunun alýcýya olan açýsýydý. Bu iki radyalý,
+istasyon sinyal uzaklýk kapasitesini kullanýp onun etrafýnda bir çember
+çizerek, istasyonlarýn bilinen yerlerini kullanarak, ve çemberlerin kesiþme
+noktasýnda uçaðýn olduðu yeri bulabilirdiniz. 
+
+Ama tek bir kerelik kesiþme bulmak, elle bu hesaplarý yapmak çok hataya
+açýk bir yaklaþým. Kalman filtrelemesi ile, ardý ardýna, özyineli olarak
+çok daha iyi hesap yapabiliriz. Problemi tarif edelim, elde iki tane
+algýlayýcý var, ve bilinen A, B istasyonlarýna olan açýyý elde ediyoruz,
+
+\includegraphics[width=25em]{tser_ukf_09.png}
+
+Çemberler katlý çizildi, eðer algýlayýcýda gürültü varsa çember çizgisi
+daha kalýn oluyor. Ýstasyon ile algýlayýcý arasýndaki açý (bearing) þöyle
+hesaplanýyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def bearing(sensor, target_pos):
+    return math.atan2(target_pos[1] - sensor[1], 
+                      target_pos[0] - sensor[0])
+
+\end{minted}
+
+Filtre her güncelleme için bir vektör içinde farklý iki algýlayýcýdan gelen
+iki tane ölçüm alýyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def measurement(A_pos, B_pos, pos):
+    angle_a = bearing(A_pos, pos)
+    angle_b = bearing(B_pos, pos)
+    return [angle_a, angle_b]
+\end{minted}
+
+Þimdi filtrelemeyi yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from numpy.random import randn
+import math, filter
+
+def fx_VOR(x, dt):
+    x[0] += x[1] * dt
+    x[2] += x[3] * dt
+    return x
+
+sa_pos = [-400, 0]
+sb_pos = [400, 0]
+
+def hx_VOR(x):
+    # measurement to A
+    pos = (x[0], x[2])
+    return measurement(sa_pos, sb_pos, pos)
+
+def run_vor_filter(target_pos):
+    np.random.seed(123)
+    std_noise = math.radians(0.5)
+    Q = 1.0
+    dt=0.1
+    kappa=0.0
+    points = filter.MerweScaledSigmaPoints(n=4, alpha=.1, beta=2., kappa=kappa)
+    f = filter.UKF(dim_x=4, dim_z=2, hx=hx_VOR, fx=fx_VOR, points=points)
+    f.x = np.array([target_pos[0], 1., target_pos[1], 1.])
+    q = filter.Q_discrete_white_noise(2, dt, Q)
+    f.Q[0:2, 0:2] = q
+    f.Q[2:4, 2:4] = q
+    f.R *= std_noise**2
+    f.P *= 1000    
+
+    xs, txs = [], []
+    for i in range(300):
+        target_pos[0] += 1 + randn()*0.0001
+        target_pos[1] += 1 + randn()*0.0001
+        txs.append((target_pos[0], target_pos[1]))
+
+        z = measurement(sa_pos, sb_pos, target_pos)
+        z[0] += randn() * std_noise
+        z[1] += randn() * std_noise
+
+        f.predict(dt=dt)
+        f.update(z)
+        xs.append(f.x)
+
+    xs = np.asarray(xs)
+    txs = np.asarray(txs)
+    plt.plot(xs[:, 0], xs[:, 2])
+    plt.plot(txs[:, 0], txs[:, 1])
+
+run_vor_filter(target_pos = [100, 200])
+plt.savefig('tser_ukf_10.png')
+\end{minted}
+
+\includegraphics[width=25em]{tser_ukf_10.png}
+
+Sonuç oldukca iyi. Baþlangýçta biraz hata var ama hata hemen düzeliyor, ve
+gerçeðe oldukca yakýn hesabý elde etmeye baþlýyoruz. Þimdi, problemin
+gayrý-lineerliðini iyi gözlemlemek için hedefi iki istasyon arasýna, ayný
+y-ekseninde olacak þekilde koyacaðým, bu sigma ortalamalarýndaki
+gayrý-lineerliði daha çok ortaya çýkartacak, çünkü açý sýfýr derece
+etrafýnda olacak, ama açý sýfýr altýna inmeye baþlayýnca birdenbire çok
+büyük bir açý hesaplanýyor olacak tabii, çünkü orada $2\pi$ açýsý var. Bu
+tabii ki filtrenin iþleyiþini oldukca bozuyor,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+run_vor_filter(target_pos = [100, 0])
+plt.savefig('tser_ukf_11.png')
+\end{minted}
+
+\includegraphics[width=25em]{tser_ukf_11.png}
+
+Not: 
+
+Filtrenin ismindeki ``unscented'' kelimesi nereden geliyor? Bu kelime ilk
+kez ``unscented transform'' baðlamýnda bu kavramý icat eden kiþi tarafýndan
+kullanýlmýþ, fakat yazar o makalede niye kelimeyi kullandýðýný
+anlatmamýþ. Anlamsal olarak terimin çok uyduðu söylenemez, belki ``scent''
+kullanýmý Ýngilizce ``iz takibi'', ``iz sürme'' çaðrýþýmý yaptýðý için, bu
+filtre, örneklem bazlý parçacýk filtreleri gibi, bir hipotez peþinden
+gitmiyor (o alandaki parçacýklarý arttýrýp), hep deterministik seçilen
+belli noktalarý kullanýyor. Ýsmin belki buradan geldiði düþünülebilir.
+
+Kaynaklar
+
+[1] Labbe, {\em Kalman and Bayesian Filters in Python}, \url{https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python}
+
+[2] Van der Merwe, {\em Sigma-Point Kalman Filters for Probabilistic Inference in Dynamic State-Space Models, dissertation (2004)},\url{http://www.cslu.ogi.edu/publications/ps/merwe04.pdf}  
+
+[3] Julier, {\em The Scaled Unscented Transformation}, \url{https://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF}
+
+\end{document}

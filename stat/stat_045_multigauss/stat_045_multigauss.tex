@@ -1,0 +1,625 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Çok Deðiþkenli Gaussian Daðýlýmlar
+
+Çok deðiþkenli normal daðýlýmlarla iþ yaparken, mesela Gaussian karýþýmlarý
+kullanýrken, bazý numaralarý bilmek faydalý olabiliyor. Bunlardan birincisi
+$(x-\mu)^T\Sigma^{-1}(x-\mu)$ hesabýný yapmaktýr, diðer log-toplam-exp
+numarasý (logsumexp trick) diye bilinen hesaptýr.
+
+Birinciden baþlayalým, daha kýsalaþtýrmak için $y=x-\mu$ diyelim, yani
+$y^T\Sigma^{-1}y$ olsun. Þimdi bu formülde bir ters alma (inversion)
+iþleminin olduðunu görüyoruz. Fakat bu iþlem oldukça pahalý bir iþlem
+olarak bilinir, hele hele boyutlarýn yükseldiði durumlardan (binler,
+onbinler), kovaryansý temsil eden $\Sigma$, $n \times n$ olacaktýr. Acaba
+tersini almayý baþka bir þekilde gerçekleþtiremez miyiz?
+
+$\Sigma$ matrisi bir kovaryans matrisi olduðu için simetrik, pozitif yarý
+kesin bir matristir. Bu tür matrislerin Cholesky ayrýþtýrmasýnýn olduðunu
+biliyoruz ve bu iþlem çok hýzlý yapýlabiliyor. O zaman 
+
+$$ \Sigma = LL^T $$
+
+ki $L$ matrisi alt-üçgensel (lower triangular) bir matristir,
+
+$$ \Sigma^{-1} = (LL^T)^{-1} $$
+
+$$ = L^{-T}L^{-1} $$
+
+Bunu temel alarak iki taraftan $y$'leri geri koyalým,
+
+$$ y^T\Sigma^{-1}y= y^TL^{-T}L^{-1}y $$
+
+Bilindiði gibi lineer cebirde istediðimiz yere parantez koyabiliriz,
+
+$$ = (y^TL^{-T})L^{-1}y $$
+
+Parantezden bir þeyin devriði gibi temsil edersek, parantez içindekilerin
+sýrasý deðiþir ve tek tek devriði alýnýr,
+
+$$ = (L^{-1}y)^TL^{-1}y $$
+
+$$  = |L^{-1}y|^2 $$
+
+Üstteki ifadede $|\cdot|$ içindeki kýsým $Ax=b$ durumundaki $x$'in en az
+kareler çözümü olan $A^{-1}b$'ye benzemiyor mu? Evet. Gerçi $n \times n$
+boyutunda bir matris olduðu için elimizde ``bilinmeyenden fazla denklem''
+yok, yani bu sistem artýk belirtilmiþ (overdetermined) deðil, yani en az
+kareler deðil direk lineer sistem çözümü yapýyoruz. Bu durumda her standart
+lineer cebir kütüphanesinde mevcut bir çaðrý kullanacaðýz, mesela
+\verb!solve_triangular! (ve lower -alt- doðru seçeneðini kullanacaðýz), ki
+bu çaðrý özellikle alt üçgensel matris üzerinden çözüm yapmaktadýr, çünkü
+$L$ alt-üçgensel olduðu için çözüm geriye deðer koymak (back substitution)
+ile anýnda bulunabilir. Geriye deðer koymayý hatýrlarsak, mesela
+
+$$ 
+\left[\begin{array}{cc}
+2 & 0 \\
+3 & 4
+\end{array}\right]
+\left[\begin{array}{c}
+x_1\\
+x_2
+\end{array}\right]
+= 
+\left[\begin{array}{c}
+6\\
+8
+\end{array}\right]
+ $$
+
+En üst satýrda her zaman tek bir bilinmeyen olacak, çünkü matris alt üçgensel,
+en üst satýr her zaman en boþ satýrdýr. Bu tek bir eþitlik
+demektir, yani $2x_1 = 6$, ki $x_1 = 3$. Bunu alýp bir sonraki satýra gideriz,
+artýk $x_1$'i biliyoruz, sonraki satýrda sadece $x_2$ bilinmeyen
+kalýyor, $3\cdot x_1 + 4 \cdot x_2 = 8$, yani $x_2 = -1/4$. Sonuca
+ulaþtýk. Daha fazla boyut olsaydý durum deðiþmezdi, ayný iþlem daha fazla
+tekrarlanýrdý. Bu arada bu türden bir çözümün ne kadar hýzlý olacaðýný
+belirtmemize gerek yok herhalde.
+
+Demek ki $y^T\Sigma^{-1}y$ hesabý için önce $\Sigma$ üzerinde Cholesky
+alýyoruz, sonra $L^{-1}y$ çözdürüyoruz. Elde edilen deðerin noktasal
+çarpýmýný alýnca $\Sigma$'nin tersini elde etmiþ olacaðýz. 
+
+Örnek (önce uzun yoldan),
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+Sigma = np.array([[10., 2.],[2., 5.]])
+y = np.array([[1.],[2.]])
+print np.dot(np.dot(y.T,lin.inv(Sigma)),y)
+\end{minted}
+
+\begin{verbatim}
+[[ 0.80434783]]
+\end{verbatim}
+
+Þimdi Cholesky ve \verb!solve_triangular! üzerinden
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as slin
+L = lin.cholesky(Sigma)
+x = slin.solve_triangular(L,y,lower=True)
+print np.dot(x.T,x)
+\end{minted}
+
+\begin{verbatim}
+[[ 0.80434783]]
+\end{verbatim}
+
+Ayný sonuca eriþtik.
+
+
+
+Çok Boyutlu Gaussian'ý Parçalamak (Partitioning)
+
+Diyelim ki Normal bir vektör $X$'i $X = (X_1,X_2)$ olarak parçaladýk. Bunu
+Gaussian'a etkileri ne olur? Ayný þekilde $\mu = (\mu_1,\mu_2)$ olarak
+parçalayabiliriz. $\Sigma$ ise
+
+$$ \Sigma = 
+\left[\begin{array}{rr}
+\Sigma_{11} & \Sigma_{12}\\
+\Sigma_{21} & \Sigma_{22}
+\end{array}\right]
+ $$
+
+olarak parçalanabilir. $a,b$'nin parçalarýnýn boyutlarý $p,q$ olsun, $n = p+q$.
+
+Þimdi birleþik Gaussian'ý 
+
+$$ f(x;\mu,\Sigma) = 
+\frac{ 1}{(2\pi)^{(p+q)/2} \det(\Sigma)^{1/2}} 
+\exp 
+\bigg\{ 
+-\frac{ 1}{2}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]^T
+\left[\begin{array}{rr}
+\Sigma_{11} & \Sigma_{12}\\
+\Sigma_{21} & \Sigma_{22}
+\end{array}\right]^{-1}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]
+\bigg\}
+ $$
+
+Birleþik yoðunluðu parçalar üzerinden belirtirsek, bu yoðunluðu $X_2$ için
+bileþen yoðunluða ve $X_1$ için bir koþullu yoðunluða ayýrabiliriz. Yani 
+
+$$ f(x_1,x_2) = f(x_1|x_2) f(x_2) $$
+
+tanýmýndaki parçalarý elde etmeye çalýþacaðýz.  Ama bundan önce
+bölüntülenmiþ matrislere yakýndan bakalým. 
+
+Bir bölüntülenmiþ (partitioned) matrisin tersini almak için, o matrisin
+parçalarýnýn tersini almak doðru deðildir, yani
+
+$$ 
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right] ^{-1} \ne
+\left[\begin{array}{rr}
+E^{-1} & F ^{-1}\\
+G^{-1} & H^{-1}
+\end{array}\right]  
+ $$
+
+Tersini alma iþlemi için bazý numaralar lazým. Ana numara bölüntülenmiþ matrisi 
+köþegen bir matris haline getirmek, çünkü köþegen matrislerin tersi,
+köþegendeki elemanlarýn tersidir, yani ters alma operasyonu bu tür
+matrislerin ``içine iþler'', o yüzden bir þekilde bir köþegen matris
+elde etmeye uðraþacaðýz. Bunun için bölüntülenmiþ matrisimizi saðdan ve
+soldan bazý matrislerle çarpacaðýz. Ayrýca þunu da bilelim, 
+
+$$ XYZ = W $$
+
+durumunda $Y$'nin tersini almak istersek, sað ve soldaki $X,Z$
+matrislerinin tersini almak gerekmez, niye?
+
+$$ X^{-1}XYZ = X^{-1}W $$
+
+$$ YZZ^{-1} = X^{-1}WZ^{-1} $$
+
+$$ Y = X^{-1}WZ^{-1} $$
+
+Þimdi iki tarafýn da tersini alalým, 
+
+$$ Y^{-1} = ZW^{-1}X $$
+
+Tamam, baþlayalým. 
+
+$$ M = 
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right] 
+ $$
+
+matrisini köþegen yapacaðýz. Eðer sadece alt sol köþeyi sýfýrlayasaydýk, 
+bunu yapacak özel bir matrisle soldan çarpardýk,
+
+$$ 
+\left[\begin{array}{rr}
+I & -FH^{-1} \\
+0 & I
+\end{array}\right] 
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right] = 
+\left[\begin{array}{rr}
+E & F \\
+0 & H
+\end{array}\right] 
+ $$
+
+Sadece üst sað köþeyi sýfýrlamak isteseydik, saðdan çarpardýk
+
+$$ 
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right] 
+\left[\begin{array}{rr}
+I & 0 \\
+-H^{-1}G & I
+\end{array}\right] 
+=
+\left[\begin{array}{rr}
+E & 0 \\
+G & H
+\end{array}\right] 
+ $$
+
+Hepsini biraraya koyalým, 
+
+$$ 
+\left[\begin{array}{rr}
+I & -FH^{-1} \\
+0 & I
+\end{array}\right] 
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right] 
+\left[\begin{array}{rr}
+I & 0 \\
+-H^{-1}G & I
+\end{array}\right] 
+= 
+\left[\begin{array}{rr}
+E-FH^{-1}G & 0 \\
+0 & H
+\end{array}\right] 
+\mlabel{2}
+ $$
+
+Bu çarpýmýn doðruluðu çarpým elle yapýlarak kontrol edilebilir.
+
+Üstte gördüðümüz gibi 
+
+$$ XYZ = W $$
+
+ifadesindeki $Y$'nin tersi 
+
+$$ Y^{-1} = ZW^{-1}X $$
+
+ile olur. 
+
+$$ 
+\underbrace{
+\left[\begin{array}{rr}
+I & -FH^{-1} \\
+0 & I
+\end{array}\right] 
+}_{X}
+\underbrace{
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right] 
+}_{Y}
+\underbrace{
+\left[\begin{array}{rr}
+I & 0 \\
+-H^{-1}G & I
+\end{array}\right] 
+}_{Z}
+= 
+\underbrace{
+\left[\begin{array}{rr}
+E-FH^{-1}G & 0 \\
+0 & H
+\end{array}\right] 
+}_{W}
+ $$
+
+O zaman 
+
+$$ 
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right]^{-1}
+=
+\left[\begin{array}{rr}
+I & 0 \\
+-H^{-1}G & I
+\end{array}\right] 
+\left[\begin{array}{rr}
+E-FH^{-1}G & 0 \\
+0 & H
+\end{array}\right]^{-1}
+\left[\begin{array}{rr}
+I & -FH^{-1} \\
+0 & I
+\end{array}\right] 
+ $$
+
+Daha kýsa olmasý eþitliðin sað tarafýnda, ortadaki matris için
+$E-FH^{-1}G$ yerine $M/H$ kullanalým (bu arada $M/H$ lineer cebirde ``$M$'in
+$H$'e göre Schur tamamlayýcýsý (complement)'' olarak bilinir),
+
+$$ 
+\left[\begin{array}{rr}
+E & F \\
+G & H
+\end{array}\right]^{-1}
+=
+\left[\begin{array}{rr}
+I & 0 \\
+-H^{-1}G & I
+\end{array}\right] 
+\left[\begin{array}{rr}
+(M/H)^{-1} & 0 \\
+0 & H^{-1}
+\end{array}\right]
+\left[\begin{array}{rr}
+I & -FH^{-1} \\
+0 & I
+\end{array}\right] 
+\mlabel{3}
+ $$
+
+Eþitliðin sað tarafýndaki çarpýmý gerçekleþtirirsek, 
+
+$$ =
+\left[\begin{array}{rr}
+(M/H)^{-1} & -(M/H)^{-1}FH^{-1} \\
+-H^{-1}G(M/H)^{-1} & H^{-1}+H^{-1}G(M/H)^{-1}FH^{-1} 
+\end{array}\right]
+ $$
+
+Bu final ifade bölüntülenmiþ bir matrisin tersini o matrisin içindeki parçalar
+üzerinden temsil eden bir ifadedir. 
+
+Ýçinde bir köþesi sýfýr olan bölüntülenmiþ matrislerde determinantlar þöyle
+iþler,
+
+$$ 
+\det \bigg(
+\left[\begin{array}{rr}
+E & 0 \\
+G & H
+\end{array}\right]
+\bigg) 
+= 
+\det \bigg(
+\left[\begin{array}{rr}
+E & F \\
+0 & H
+\end{array}\right] 
+\bigg) =
+\det(E)\det(H)
+ $$
+
+Ayrýca 
+
+$$ \det(AB) = \det(A)\det(B) $$
+
+O zaman (2)'nin determinantýný alýrsak, $\det$ yerine $||$ kullandýk, 
+
+$$ |M| = |M/H||H| 
+\mlabel{4}
+$$
+
+Bu ifade gayet doðal duruyor (bir raslantý herhalde, ya da Schur tamamlayýcýsý 
+iþareti özellikle böyle seçilmiþ),
+
+Bölüntülenmiþ bir matrisin devriðini almak için her bloðunun ayrý ayrý devriði
+alýnýr, ve tüm bloklarýn yaný bölüntülenmiþ tamamýnýn bir daha devriði alýnýr,
+yani
+
+$$ 
+\left[\begin{array}{rr}
+A & B \\ C & D 
+\end{array}\right]^T = 
+\left[\begin{array}{rr}
+A^T & C^T \\ B^T & D^T
+\end{array}\right]
+ $$
+
+Þimdi çok deðiþkenli Normal için bileþen ve koþullu yoðunluk hesaplarýna
+gelelim. Gaussian formülünün $\exp$ kýsmýný alýrsak, 
+
+$$ \exp 
+\bigg\{ 
+-\frac{ 1}{2}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]^T
+\left[\begin{array}{rr}
+\Sigma_{11} & \Sigma_{12}\\
+\Sigma_{21} & \Sigma_{22}
+\end{array}\right]^{-1}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]
+\bigg\}
+ $$
+
+(3)'teki açýlýmý kullanýrsak, ve $E = \Sigma_{11},F=\Sigma_{12},..$ olacak þekilde,
+
+$$ \exp 
+\bigg\{ 
+-\frac{ 1}{2}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]^T
+\left[\begin{array}{rr}
+I & 0 \\ 
+-\Sigma_{22}^{-1}\Sigma_{21} & I
+\end{array}\right]
+\left[\begin{array}{rr}
+(\Sigma/\Sigma_{22}) & 0 \\ 
+0 & \Sigma_{22}^{-1} 
+\end{array}\right]
+\left[\begin{array}{rr}
+I & -\Sigma_{12}\Sigma_{22}^{-1}  \\ 
+0 & I
+\end{array}\right]
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]
+\bigg\}
+ $$
+
+Açýlýmý tamamen yaparsak, 
+
+$$ 
+ \begin{array}{lll}
+= && \exp \bigg\{
+-\frac{1 }{2} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))^T 
+(\Sigma/\Sigma_{22})^{-1} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))
+\bigg\} \cdot \\
+&& \exp \bigg\{
+1\frac{ 1}{2}(x_2-\mu_2)^T\Sigma_{22}^{-1} (x_2-\mu_2)
+ \bigg\}
+\end{array}
+ $$
+
+Not: $\Sigma_{12}^T = \Sigma_{21}$. Üstte birinci $\exp$ içinde sol bölümde devriðin içindeki ifadelerden,
+mesela $x_1^T,\mu_1^T$'den ve $\Sigma_{21}$'li ifadeden devrik iþlemini çekip, büyük paranteze 
+alýnýnca bu deðiþim oldu. 
+
+Þimdi mesela 1. $\exp$'ye dikkat edersek, ortada $(\Sigma/\Sigma_{22})^{-1} $ var, ve bu ifadenin solunda ve saðýnda 
+birbirinin devriði olan ayný terimler duruyor. Ýfadenin tamamý bir Normal
+daðýlým. Ayný þey 2. $\exp$ için geçerli. 
+
+Ýþin $\exp$ tarafýný halletik. Þimdi $\exp$ öncesindeki kesiri (4) kullanarak
+parçalayalým, 
+
+$$ 
+\frac{ 1}{(2\pi)^{(p+q)/2} \det(\Sigma)^{1/2}}  = 
+\frac{ 1}{(2\pi)^{(p+q)/2} \bigg(\det(\Sigma/\Sigma_{22})\det(\Sigma_{22})\bigg)^{1/2}} 
+ $$
+
+$$ =
+\bigg( \frac{ 1}{(2\pi)^{p/2} \det(\Sigma/\Sigma_{22})^{1/2}} \bigg)
+\bigg( \frac{ 1}{(2\pi)^{q/2} \det(\Sigma_{22})^{1/2}} \bigg)
+ $$
+
+Bu parçalarýn her birini ayrý bir $\exp$ önünde kullanabiliriz, ve ikinci $\exp$
+ifadesinin 
+
+$$ 
+\frac{ 1}{(2\pi)^{q/2} \det(\Sigma_{22})^{1/2}}
+\exp \bigg\{
+\frac{ 1}{2}(x_2-\mu_2)^T\Sigma_{22}^{-1} (x_2-\mu_2)
+ \bigg\}
+ $$
+
+
+olduðunu görüyoruz. Bu ifade $f(x_2)$ bileþen yoðunluðudur! O zaman geri
+kalanlar, yani diðer kesir ve birinci $\exp$ hep beraber $f(x_1|x_2)$
+yoðunluðu olmalýdýr. Yani,
+
+$$ 
+\frac{ 1}{(2\pi)^{p/2} \det(\Sigma/\Sigma_{22})^{1/2}} \cdot
+ $$
+$$ 
+\exp \bigg\{
+-\frac{1 }{2} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))^T 
+(\Sigma/\Sigma_{22})^{-1} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))
+\bigg\}
+ $$
+
+Buradan genel bir kural çýkartabiliriz, 
+
+1) $X_2$'nin bileþen yoðunluðu $X_2 \sim N(\mu_2, \Sigma_{22})$
+
+2) $X_2 = x_2$ olmak üzere $X_1$'in koþullu daðýlýmý 
+
+$$ X_1 | X_2 = x_2 \sim 
+N\bigg(\mu_1 + \Sigma_{12}\Sigma_{22}^{-1} (x_2 -\mu_2) \ , \
+\Sigma/\Sigma_{22} \bigg)
+ $$
+
+$\Sigma/\Sigma_{22}$ nedir? Hatýrlarsak, $M/H = E-FH^{-1}G$, ve 
+$E = \Sigma_{11},F=\Sigma_{12},..$ o zaman 
+
+$$ \Sigma/\Sigma_{22} = \Sigma_{11}-\Sigma_{12} \Sigma_{22}^{-1} \Sigma_{21} $$
+
+Yani
+
+$$ X_1 | X_2 = x_2 \sim 
+N\bigg(\mu_1 + \Sigma_{12}\Sigma_{22}^{-1} (x_2 -\mu_2) \ , \
+\Sigma_{11}-\Sigma_{12} \Sigma_{22}^{-1} \Sigma_{21}
+\bigg)
+ $$ 
+
+
+
+
+
+
+log-toplam-exp (log-sum-exp trick)
+
+Bu numaranýn ilk kýsmý nisbeten basit. Bazý yapay öðrenim algoritmalarý için
+olasýlýk deðerlerinin birbiriyle çarpýlmasý gerekiyor, mesela 
+
+$$ r = p_1 \cdot p_2 \dots p_n $$
+
+Olasýlýklar 1'den küçük olduðu için 1'den küçük deðerlerin çarpýmý aþýrý
+küçülebilir, ve küçüklüðün taþmasý (underflow) ortaya çýkabilir. Eðer
+çarpým yerine $\log$ alýrsak, çarpýmlar toplama dönüþür, sonra sonucu
+$\exp$ ile tersine çeviririz, ve $\log$'u alýnan deðerler çok küçülmez,
+çarpma yernie toplama iþlemi kullanýldýðý için de nihai deðer de küçüklüðe
+doðru taþmaz.
+
+$$ \log r = \log p_1 + \log p_2 + \dots + \log p_n $$
+
+$$ r = \exp(\log p_1 + \log p_2 + \dots + \log p_n )$$
+
+Bir diðer durum içinde $exp$ ifadesi taþýyan bir olasýlýk deðerinin çok
+küçük deðerler taþýyabilmesidir. Mesela çok deðiþkenli Gaussian karýþýmlarý
+için alttaki gibi bir hesap sürekli yapýlýr, 
+
+$$ = \sum_i w_i
+\frac{ 1}{(2\pi)^{k/2} \det(\Sigma)^{1/2}} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)
+\bigg\}
+ $$
+
+ki $0 \le w_i \le 1$ þeklinde bir aðýrlýk deðeridir. Üstteki formülün
+çoðunlukla $\log$'u alýnýr, ve, mesela bir örnek üzerinde görürsek (ve
+aðýrlýklarý bir kenara býrakýrsak), 
+
+$$ \log(e^{-1000} + e^{-1001}) $$ 
+
+gibi hesaplar olabilir. Üstteki deðerler tamamen uyduruk denemez,
+uygulamalarda pek çok kez karþýmýza çýkan deðerler bunlar. Her neyse, eðer
+üstteki ifadeyi kodla hesaplarsak, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print np.log(np.exp(-1000) + np.exp(-1001))
+\end{minted}
+
+\begin{verbatim}
+-inf
+\end{verbatim}
+
+Bu durumdan kurtulmak için bir numara þudur; $\exp$ ifadeleri arasýnda en
+büyük olanýný dýþarý çekeriz, ve $\log$'lar çarpýmý toplam yapar,
+
+$$ \log(e^{-1000}(e^{0} + e^{-1} ))$$
+
+$$ -1000 + \log(1 + e^{-1})$$
+
+Bunu hesaplarsak, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print -1000 + np.log(1+np.exp(-1))
+\end{minted}
+
+\begin{verbatim}
+-999.686738312
+\end{verbatim}
+
+Bu numaranýn yaptýðý nedir? Maksimumu dýþarý çekerek en az bir deðerin
+küçüklüðü taþmamasýný garantilemiþ oluyoruz. Ayrýca, bu þekilde, geri kalan
+terimlerde de aþýrý ufalanlar terimler kalma þansý azalýyor. 
+
+Kaynaklar
+
+[1] Flannery, {\em Numerical Recipes, 3rd Edition}
+
+[2] Tapaswi, {\em Log-Sum-Exp Trick}, \url{http://makarandtapaswi.wordpress.com/2012/07/18/log-sum-exp-trick/}
+
+
+\end{document}

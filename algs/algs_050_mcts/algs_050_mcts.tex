@@ -1,0 +1,201 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Monte-Carlo Aðaç Aramasý (Monte Carlo Tree Search -MCTS-), Oyun Oynayan Yapay Zeka
+
+Otomatik oyun oynayan yapay zeka öðreten derslerdeki kilometre taþlarýndan
+biri altüst / minimaks algoritmasiydi. Notlarýmýzda anlattýðýmýz bu
+algoritma, bir oyunda bizim yaptýðýmýz, rakibin yaptýðý tüm hamle
+seçeneklerine göre oluþan tahta konfigürasyonlarýna bakarak ve bu tahtalara
+deðer atayabilen bir deðer fonksiyonuyla onlarý irdeleyerek rakip için en
+kötü bizim için en iyi olacak þekilde bir arama ile optimal oyun
+hamlelerini buluyordu. 
+
+Fakat minimaksýn bir problemi þudur: birkaç hamle sonrasýna bakmak için tüm
+mümkün hamlelere göre kurulan aðaç müthiþ büyük olabilir. Özellikle Go
+oyunu [1] gibi dallanma faktörü çok büyük olan oyunlarda minimaks zorluk
+yaþayabiliyor. Bu gibi durumlarda MCTS yaklaþýmýnýn daha baþarýlý olduðu
+bulunmuþtur. 
+
+Þimdi MCTS'i anlatalým, özelde UCT adý verilen üst güven aralýðýnýn
+aðaçlara uygulanmasý (upper-confidence applied to trees) adlý çeþidini
+gösterelim. Bunun için tabii önce UCT'yi ve onun baz çeþidi UCB1'i anlamak
+lazým.
+
+Kumarhanelerdeki o kollu oyun makinalarýný düþünelim, oyuncunun önünde
+bunlardan birkaç tane olsun, ve bu makinalardan her birinin farklý ve
+bilinmeyen bir getiri daðýlýmý var. Tek kollu makinalara argoda ``tek kollu
+soyguncu (one-armed bandit)'' de denilir, bilgisayarcýlar üstteki üstteki
+probleme ``çok kollu soyguncu (multi-armed bandit)'' ismi veriyorlar. Biraz
+esprili bir þekilde bu makinalarý çok kollu bir ahtapotun hayal ediliyor
+bazen, ki ahtapot akýllý, yani oyunu optimal oynayacak bilgisayar programý.
+
+\includegraphics[width=13em]{mcts_01.png}
+
+Aklýmýzdaki soru þu; Getirisi en iyi olacak makina acaba hangisi? Bilsek
+hemen onu oynardýk. Bunu baþta bilmiyoruz, oturup baþkasýný seyredecek
+durumda deðiliz, o zaman hem seçenekleri bir þekilde deneyecek ama bu
+sýrada çok getiri kaybý yaþamayacak ayný zamanda uzun vadede kazançta
+kalacak þekilde bu oyunu oynamak istiyoruz. UCB1 adlý bir strateji bunu
+yapabiliyor, bu stratejiye göre her makina $i$ için bir istatistiki güven
+aralýðý yaratýlýr, 
+
+$$ \overline{x}_i \pm \sqrt{\frac{2 \ln n}{n_i}} $$
+
+$\overline{x}_i$: Makine $i$'nin ortalama getirisi
+
+$n_i$: Makine $i$'nin kaç kere oynandýðý
+
+$n$: Tüm oyunlar (tüm makinelerde kaç kere oynandýðý)
+
+Ve stratejimiz her adýmda üst sýnýrý en yüksek olan makinayý
+oynamaktýr. Bunu yaptýkça o makinanýn gözlenen ortalamasý kazanca / kayýba
+göre kayacak, ve güven aralýðý ufalacak (elimizde daha fazla veri var
+çünkü, daha fazla veri daha fazla kesinlik demek), ve diðer makinalarýn
+aralýðý geniþleyecek. Bir noktada baþka bir makinanýn üst sýnýrý o anda
+oynadýðýmýzý geçecek, o zaman biz bu öteki makinaya geçeceðiz. Uzun vadede
+bu strateji optimal olarak sonuç vermektedir.
+
+Türetmek için notasyonu biraz deðiþtirelim [3], $a$ bir aksiyon (ya da
+makina seçimi), $Q(a) = E(r|a)$, bir aksiyon için ortalama getiri, $U_t(a)$
+adým $t$'de bir aksiyonun üst sýnýrý, $\hat{Q}, \hat{U}$ kestirme deðerler,
+$N(a)$ bir aksiyonun kaç kez seçildiði. Hem $\hat{U}$ kestirme deðerini
+sürekli hesaplayacaðýz, hem de güven aralýðýný maksimize eden aksiyonu
+seçeceðiz, yani.
+
+$$ a_t = \arg \max_{a \in A} \hat{Q}_t(a) + \hat{U}_t(a) $$
+
+Bu seçimi yaparken yüksek olasýlýkla (with high probability)
+$Q(a) \le \hat{Q}_t(a) + \hat{U}_t(a)$ olmasýný saðlayacaðýz. Bu þart için
+Hoeffding eþitsizliðinden baþlayabiliriz (bkz [5]).
+
+$X_1,...X_n$ $[0,1]$ aralýðýnda baðýmsýz özdeþçe daðýlmýþ (i.i.d.)
+deðerlere sahip rasgele deðiþkenler olsunlar, ve
+$\overline{X}_t = \frac{1}{\tau} \sum_{\tau=1}^{t} X_\tau$ örneklem
+ortalamasý olsun. O zaman
+
+$$ P(E(X) > \overline{X}_t + u ) \le e^{-2 t u^2}$$
+
+olduðunu biliyoruz, soyguncu problemindeki getiri rasgele deðiþkenleri için
+uyarlarsak,
+
+$$ 
+P \big( Q(a) > \hat{Q}_t(a) + U_t(a)  \big) \le 
+e^{-2 N_t(a)U_t(a)^2 }
+$$
+
+Ýstediðimiz þartlarýn oluþmasý için üstteki formülün doðruluðu yeterli,
+þimdi bu formülü baz alarak bir $U_t(a)$ hesaplayabiliriz, formülü $U_t(a)$
+tek baþýna kalacak þekilde tekrar düzenleyebiliriz. Eþitliðin sol tarafýna
+$p$ diyelim, burada sanki istenilen bir güven aralýk büyüklüðünü baz almýþ
+oluyoruz, 95\% (yani 0.95) gibi, ama burada sembolik bir deðer kulladýk,
+ilk amacýmýz $u$ deðerine eriþmek,
+
+$$ e^{-2 N_t(a)U_t(a)^2 } = p $$ 
+
+$$ \ln p = -2 N_t(a)U_t(a)^2 $$
+
+$$ \frac{-\ln p}{2 N_t(a)} = U_t(a)^2 $$
+
+$$ U_t(a) = \sqrt{\frac{-\ln p}{2 N_t(a)}} $$
+
+$t$ büyüdükçe $p$ azalsýn istiyoruz, o zaman $p = t^{-4}$ seçebiliriz, bu
+spesifik deðer formülü de basitleþtirmek için seçildi bir yandan,
+
+$$ U_t(a) = \sqrt{\frac{\log t}{N_t(a)}} $$
+
+Böylece UCB1 algoritmasýna eriþmiþ olduk, 
+
+$$ 
+a_t = \arg \max_{a \in A} Q(a) + \sqrt{\frac{\log t}{N_t(a)}}
+$$
+
+UCT ve Tic-Tac-Toe
+
+Oyunlar ve Monte Carlo iþin için nasýl dahil oluyor? Mesela her adýmda bir
+sonraki en iyi adýmý bulmak istiyoruz, MC ile bu geçiþi simüle ederiz, yani
+rasgele tahta hamlelerini deneyerek iyi olan bitiþleri bulmaya
+uðraþýrýz. Bu yöntemin bir kötü tarafý, minimaks durumunda olduðu gibi, çok
+fazla hamle seçeneði olduðu zaman ortaya çýkar, rasgele seçim de,
+tüm seçenekleri deneyen deterministik seçim gibi yetersiz kalabilir.
+
+UCT burada bir çözüm olarak görülebilir. Fikir þu: verili bir tahta
+konumundan atýlacak bir adým ötesi bir çok-kollu soyguncu problemi olarak
+görülebilir. 
+
+Ýlk faz seçim fazýdýr, baþlangýç konumundan aþaðý inmeye baþlarýz, ve eðer
+baktýðýmýz tüm düðümlerde çok-kollu soyguncu seçimi için gerekli
+istatistikler var ise seçim UCB1 ile yapýlýr, ve devam edilir. Bu ta ki
+üzerinde istatistik olmayan (yani hiç ziyaret edilmemiþ) bir düðüme
+gelinceye kadar devam eder. Eðer böyle bir düðüm(ler) var ise onlar
+arasýndan rasgele seçim yapýlýr, böylece o düðüm ve altýndakiler ziyaret
+edilmiþ olur ve kayýp / kazanç sonrasý onlarýn da artýk istatistikleri olur
+ve bir sonraki adýmda onlar da UCB1 ile seçiliyor (ya da seçilmiyor)
+olacaktýr.
+
+Örnek olarak bir Tic-Tac-Toe oyunu için bir örnek görelim. X ve O taþlarý
+var, biz O için hesap yapýyoruz diyelim. A pozisyonunda (en üst) tüm alt
+pozisyonlar hakkýnda istatistik var. Mesela 1/2 görüyoruz, bu o pozisyondan
+iki kere geçilmiþ bu geçiþlerden birisi oyunun kazanýlmasý ile bitmiþ (bu
+bir kazanç en sol alttaki bitiþ). Þimdi bir A'dan bir kez daha geliyoruz,
+UCB1 bize pozisyon B'ye git diyor, o seviyede en saðdaki düðüm için hiç
+bilgi yok, o zaman rasgele olarak o seçiliyor, oradan tek seçenek var, ve O
+kazanýyor. Böylece B pozisyonundaki istatistik 2/3 haline
+geliyor. Baþlangýçtan oyun bitiþine kadar her gidiþ simulasyonda bir döngü,
+eðer 100 kere simüle et dersek bu döngü 100 kere döner.
+
+\includegraphics[width=30em]{mcts_02.png} 
+
+Kod üzerinde görelim, üstteki baþlangýç pozisyonundan X için (oyuncu 1,
+öteki oyuncu -1) simulasyon yapalým, 1000 kere,
+
+\inputminted[fontsize=\footnotesize]{python}{tictac_uct.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tictac_uct
+board_state = ((1, 0, 0),
+               (0, -1, 0),
+               (1, -1, -1))
+
+res, move = tictac_uct.monte_carlo_tree_search_uct(board_state, 1, 1000)
+print move
+\end{minted}
+
+\begin{verbatim}
+(1, 0)
+\end{verbatim}
+
+X taþýný üstten 2. satýr ve 1. kolona koymamýz isteniyor (Python 0 indisli
+hatýrlarsak), bu hareketi yapýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+b = np.array(board_state)
+b[move] = 1.0
+print b
+\end{minted}
+
+Ve bu kazanan hareket, resimde ikinci seviyede en saðdaki hamle
+oluyor. UCB1 doðru tavsiyeyi vermiþ gibi duruyor.
+
+Not: MCTS algoritmasinin bol kullaným alaný var, A/B testlerinin
+istatistiksel hesabý yerine MCTS kullanmak mümkün, yani iki sayfa versiyonu
+arasýnda hangisinin daha iyi olduðu da bir tür çok-kollu soyguncu problemi
+olarak görülebiliyor. 
+
+
+Kaynaklar
+
+[1] Bayramli, 
+   {\em Go Oyunu, GnuGo}, 
+   \url{https://burakbayramli.github.io/dersblog/sk/2018/02/go-gnugo.html}
+
+[2] Bradberry, {\em Introduction to Monte Carlo Tree Search}, 
+    \url{https://jeffbradberry.com/posts/2015/09/intro-to-monte-carlo-tree-search}
+
+[3] Silver, {\em Reinforcement Learning}, 
+    \url{http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html}
+
+[4] Zocca, {\em Python Deep Learning}
+
+[5] Bayramli, Ýstatistik, {\em Ekler}
+
+\end{document}

@@ -1,0 +1,560 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Google Nasýl Ýþler? 
+
+Lineer Cebir hocalarý Google'a müteþekkir olmalý, çünkü bu ünlü arama
+motorunun kullandýðý PageRank tekniðinin özü aslýnda lineer cebirin
+temelini oluþturan kavramlardan özdeðer / özvektör hesabý. Öðrenciler
+``niye bu kavramlarý öðreniyoruz hocam?''  diye sorunca artýk cevap
+kolay: ``bu yöntemi Google da kullanýyor!''.
+
+Þimdi arama motorunun yapmasý gerekenleri düþünelim: Google'a bir kelime
+yazdýðýmýzda geri gelen sonuçlar nasýl kararlaþtýrýlýr? Ýlk akla gelen
+yöntem tabii ki Web'deki tüm sayfalarýn (milyarlarca sayfa) sayfalar
+üzerindeki kelimelerin o sayfa ile iliþkilendirilmesi ve arama yapýlýnca
+kelimeye göre sayfa geri getirilmesi. Mesela alttaki örnekte ``book
+(kitap)'' yazýnca geriye 1., 2. ve 5. sayfalar geri gelecek. Fakat hangi
+sýrada? Bu sayfalardan hangisi diðerlerinden daha önemli?
+
+\includegraphics[height=9cm]{pg2.png}
+
+PageRank'in temelinde daha fazla referans edilen sayfalarýn daha üstte
+çýkmasý yatar. Hatta o referans eden sayfalarýn kendilerine daha fazla
+referans var ise bu etki ta en sondaki sayfaya kadar yansýtýlýr, hatta bu
+zincir baþtan sona her seviyede hesaplanabilir. Peki bu nasýl
+gerçekleþtirilir?
+
+PageRank Web sayfalarýný bir Markov Zinciri olarak görür. Markov Zincirleri
+seri halindeki $X_n, n=0,1,2,..$ rasgele deðiþkenini modeller ve bu
+deðiþkenler belli sayýdaki konumlarýn birinde olabilirler. Mesela konumlarý
+bir doðal sayý ile ilintilendirirsek $X_n = i$ olabilir ki $i=\{0,1,..\}$
+diye kabul edelim.
+
+Markov Zincirlerinde (MZ) $i$ konumundan $j$ konumuna geçiþ olasýlýðýný,
+$P_{ij}$, biliriz ve bu $P(X_{n+1} = j | X_{n} = i)$ olarak açýlabilir. Açýlýmdan  
+görüleceði üzere bir MZ sonraki adýma geçiþ olasýlýðý için sadece
+bir önceki adýma bakar. Bu tür önce/sonra yapýsýndaki iki boyutlu hal, 
+çok rahat bir þekilde matrisine çevirilebilir / gösterilebilir. Önceki konum 
+satýrlar, sonraki konum kolonlar olarak betimlenir mesela. 
+
+Örnek
+
+Bir sonraki günde yaðmur yaðmayacaðýný bir MZ olarak tasarlayalým. Bir
+sonraki günde yaðmur yaðmayacaðýný sadece bugün etkiliyor olsun. Eðer bugün
+yaðmur yaðýyorsa yarýn yaðmur yaðmasý 0.7, eðer bugün yaðmýyor ise yarýn
+yaðmasý 0.4. MZ þöyle
+
+$$ 
+P =
+\left[\begin{array}{cc}
+0.7 & 0.3 \\
+0.4 & 0.6
+\end{array}\right]
+ $$
+
+Geçiþ olasýlýklarýndan bahsettiðimize göre ve elimizde sýnýrlý / belli
+sayýda konum var ise, bir MZ'nin her satýrýndaki olasýlýklarýn toplamý
+tabii ki 1'e eþit olmalýdýr. 
+
+MZ'lerin ilginç bir özelliði $n$ adým sonra $i,j$ geçiþinin $P^n$ hesabýyla
+yapýlabilmesidir. Yani $P$'yi $n$ defa kendisiyle çarpýp $i,j$ kordinatýna 
+bakarsak $n$ adým sonrasýný rahatça görebiliriz. Bunun ispatýný burada
+vermeyeceðiz. 
+
+Mesela üstteki örnekte, eðer bugün yaðmur yaðýyorsa 4 gün sonra yaðmur
+yaðma olasýlýðý nedir? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+P = np.array([[0.7,0.3],[0.4,0.6]])
+P4 = lin.matrix_power(P,4)
+print P4
+\end{minted}
+
+\begin{verbatim}
+[[ 0.5749  0.4251]
+ [ 0.5668  0.4332]]
+\end{verbatim}
+
+Aradýðýmýz geçiþ için kordinat 0,0'a bakýyoruz ve sonuç 0.5749. Numpy
+\verb!matrix_power! bir matrisi istediðimiz kadar kendisiyle çarpmamýzý
+saðlýyor. 
+
+Duraðan Daðýlým (Stationary Distribution)
+
+Eðer yaðmur örneðindeki matrisi çarpmaya devam edersek, mesela 8 kere
+kendisiyle çarpsak sonuç ne olurdu? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+P = np.array([[0.7,0.3],[0.4,0.6]])
+P8 = lin.matrix_power(P,8)
+print P8
+\end{minted}
+
+\begin{verbatim}
+[[ 0.57145669  0.42854331]
+ [ 0.57139108  0.42860892]]
+\end{verbatim}
+
+Dikkat edilirse, her satýr bir deðere yaklaþmaya baþladý. Bu deðer MZ'nin
+duraðan daðýlýmýdýr, belli koþullara uyan her MZ'nin böyle bir duraðan
+daðýlýmý vardýr. Bu koþullar MZ'nin periyodik olmayan (aperiodic) ve tekrar
+eden (recurrent) olmasýdýr. Bu þartlar çok ``özel'' þartlar deðildir
+aslýnda, daha çok ``normal'' bir MZ'yi tarif ediyor diyebiliriz. Tüm
+konumlarý tekrar eden yapmak kolaydýr, MZ tek baðlý (singly connected) hale
+getirilir, yani her konumdan her diðer konuma bir geçiþ olur, ve periyodik
+olmamasý için ise MZ'ye olmadýðý zamanlarda bir konumdan kendisine geçiþ
+saðlanýr (az bir gürültü üzerinden). 
+
+Nihayet duraðanlýk þu denklemi ortaya çýkartýr,
+
+$$ \pi = \pi P $$
+
+Burada duraðan daðýlým $\pi$'dir. Bu denklem tanýdýk geliyor mu?  Devriðini
+alarak þöyle gösterelim, belki daha iyi tanýnýr, 
+
+$$ P^T\pi^T = \pi^T $$
+
+Bir þey daha ekleyelim, 
+
+$$ P^T\pi^T = 1 \cdot \pi^T $$
+
+Bu özdeðer/vektör formuna benzemiyor mu? Evet! Bu form 
+
+$$ Ax = \lambda x $$
+
+MZ denklemi þunu söylüyor, 1 deðerindeki özdeðere ait özvektör bir MZ'nin
+duraðan daðýlýmýdýr! Bu arada, MZ geçiþ matrisi $P$'nin en büyük
+özdeðerinin her zaman 1 olduðunu biliyoruz (çünkü üstteki tarif ettiðimiz
+özel þartlara sahip olan türden matrisler böyle özdeðerlere sahip
+olmalý). Bu durumda en büyük özdeðere ait özvektörü hesaplamak yeterli
+olacaktýr. Bunu yapmayý zaten [6]'da öðrenmiþtik, üst metot (power method)
+sayesinde bu hesap kolayca yapýlabiliyor.
+
+Þimdi en baþtaki Web sayfalarýna ait geçiþleri yazalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+P = [[1./4, 2./4, 0, 0, 1./4],
+     [1./6, 0, 2./6, 1./6, 2./6],
+     [0, 0, 0, 2./4, 2./4],
+     [1./8, 0, 0, 4./8, 3./8],
+     [0, 1./2, 0, 1./2, 0]]
+
+P = np.array(P)
+print P
+\end{minted}
+
+\begin{verbatim}
+[[ 0.25        0.5         0.          0.          0.25      ]
+ [ 0.16666667  0.          0.33333333  0.16666667  0.33333333]
+ [ 0.          0.          0.          0.5         0.5       ]
+ [ 0.125       0.          0.          0.5         0.375     ]
+ [ 0.          0.5         0.          0.5         0.        ]]
+\end{verbatim}
+
+Þimdi üst metotu kullanarak duraðan daðýlýmý hesaplayalým. Herhangi bir
+baþlangýç vektörünü $P$ ile 20 kere  çarpmak yeterli olur.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+x=np.array([.5, .3, .1, .1, 0]) # herhangi bir vektor
+for i in range(20): 
+    x = np.dot(x,P)
+print 'pi = ', x
+\end{minted}
+
+\begin{verbatim}
+pi =  [ 0.10526316  0.18421053  0.06140351  0.38596491  0.2631579 ]
+\end{verbatim}
+
+Not: Aslýnda cebirsel olarak $P$'yi 20 kere kendisiyle çarpmak ve sonucu
+baþlangýç vektörü ile bir kere çarpmak ta düþünülebilirdi. Fakat 20 kere
+vektör / matris çarpýmlarý yapmak, 20 kere matris / matris çarpýmý
+yapmaktan daha verimli olacaktýr. Büyük Veri ortamý için de bu söylenebilir.
+
+Neyse, eðer özvektör hesabýný kendimiz elle yapmak yerine direk kütüphane
+çaðrýsý kullansaydýk,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+evals,evec = lin.eig(P.T)
+pi =  evec[:,0] / np.sum(evec[:,0])
+print np.abs(pi)
+\end{minted}
+
+\begin{verbatim}
+[ 0.10526316  0.18421053  0.06140351  0.38596491  0.26315789]
+\end{verbatim}
+
+Ayný sonuca ulaþtýk. Bu sonuç gösteriyor ki ``book'' yazdýðýzda Google bize
+5. sayfayý en baþta olacak þekilde sonuç döndürmeli, çünkü onun duraðan
+daðýlýmý 1,2,5 sayfalarýnýn arasýnda en yüksek.
+
+Duraðan Daðýlýma Bakýþ
+
+MZ ve duraðan daðýlýmýn PageRank'le alakasýný bir daha düþünelim. MZ ile
+$n$ adým sonrasýný hesaplayabiliyoruz, duraðan daðýlým ise sonsuz adým
+sonrasýný ifade ediyor. Ve bu daðýlým, bir anlamda, sonsuz yapýlan adýmlar
+sýrasýnda {\em en fazla hangi konumlarda} zaman geçirileceðini
+gösteriyor. Konum yerine sayfa dersek duraðan daðýlýmýn niye en önemli
+sayfalarý belirlemek için önemli olduðunu anlarýz. 
+
+Kullanýcý herhangi bir sayfada iken hangi diðer sayfalara gideceði o sayfa
+üzerinde baðlantýlar üzerinden anlaþýlýr, PageRank bu baðlantýnýn
+mevcudiyetine bakar sadece, o mevcudiyet üzerinden bir geçiþ olasýlýðý
+hesaplar, ve bu olasýlýða göre (raslantýsal þekilde) baðlantýnýn takip
+edileceði düþünülür. Bu arada çoðunlukla sayfalar arasýndaki baðlantýlarýn
+aðýrlýðý 1 olacaktýr, fakat örnek amaçlý 2,3 gibi sayýlar da kullanýlýyor. 
+
+Rasgele Sayfa Geçiþi
+
+Google veri temsili üzerinde bazý ekler yapmaktadýr, mesela kullanýcýnýn
+hiçbir baðlantý takip etmeyip tarayýcýya direk URL girerek baþka bir
+sayfaya zýplamasý (teleporting) bir þekilde temsil edilmelidir. Ayrýca hiç
+dýþa baðlantý vermeyen sayfalar (ölü noktalar) hesaba katýlmalýdýr. Þimdi
+$\pi^T$ yerine $p$, $P$ yerine $N$ kullanalým, PageRank özyineli
+algoritmasý
+
+$$ p = N^Tp $$ 
+
+olarak gösterilebilir. 
+
+Bu her iki durum için formül þu þekilde ikiye ayýrýlýr,
+
+$$ p = (1-d)N^Tp + dN_f^Tp $$
+
+$$ = ((1-d)N^T + dN_f^T) p $$
+
+$$ = M^Tp $$
+
+ki,
+
+$$M = (1-d)N^T + dN_f^T$$ 
+
+olacaktýr. $N_f$ bir normalize edilmiþ ``zýplama'' matrisidir, yani her
+sayfadan her diðer sayfaya bir baðlantý ``varmýþ gibi'' yapar, mesela 5x5
+boyutunda tüm öðeleri 0.20 olacaktýr. $d$ bir aðýrlýk sabitidir, Google'ýn
+bunu 0.85 olarak tanýmladýðý duyulmuþtur, ve gerçek baðlantý matrisi ve
+rasgele zýplama matrisi arasýnda bir aðýrlýk tanýmlar, her ikisinde de
+birazcýk alarak (daha çok ana $N$'den tabii) niahi matrisi oluþturur. Örnek
+olarak þu grafiðe bakalým, 
+
+\includegraphics[height=4cm]{pg3.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+N = [[0, 0, 0, 1., 0],
+     [0, 0, 1./2, 0, 1./2],
+     [1, 0, 0, 0, 0],
+     [0, 1./3, 1./3, 0, 1./3],
+     [0, 1, 0, 0, 0]]
+
+N = np.array(N)
+
+Nf = 0.20 * np.ones((5,5))
+d = 0.85
+M = d*N + (1-d)*Nf
+x=np.array([.5, .3, .1, .1, 0]) # herhangi bir vektor
+for i in range(20): 
+    x = np.dot(x,M)
+print 'result = ', x 
+\end{minted}
+
+\begin{verbatim}
+result =  [ 0.18959094  0.24375097  0.18775335  0.19115138  0.18775335]
+\end{verbatim}
+
+Sonuca göre $v_2$ en yüksek PageRank deðerine sahip. 
+
+Mimari
+
+Google tabii ki arama sonuçlarýný iyileþtirmek için yýllar içinde diðer ek
+fonksiyonlarý motoruna ekledi. Duyumlarýmýza göre artýk PageRank gibi
+onlarca ek kriter kullanýlmaktadýr; fakat PageRank hala çok önemli ve
+þirketin kuruluþu baðlamýnda Google'ý Google yapan algoritmaydý, onun diðer
+motorlara nazaran elindeki avantajý, en büyük ilerlemesiydi.
+
+Sistem kodlamasý açýsýndan PageRank'e tüm Web sayfalarý ve onlarýn
+arasýndaki iliþkiler verilmelidir, bu milyarlarca sayfa ve onlarýn
+arasýndaki baðlantýlar demektir. Google bunu yapabilmek için Web ``aðýný''
+örümcek (spider) programlarý ile sürekli geziyor, ve bu veriyi alýp,
+PageRank'e hesap için aktarýyor.
+
+Ülkelerin Ekonomik Kapasiteleri
+
+Ýstatistiki fizik alanýndan ekonomiye geçiþ yapan araþtýrmacý Hidalgo'ya
+göre ekonomiler için en önemli olan bilgi, yöntem bilgisi (know-how), yani
+bilgiyi planlamaya, üretime yönelik kullanabilme yetisi ve bu bilgilere
+sahip pek çok insanýn olduðu bir að. Mesela yazýlým alanýnda Silikon Vadisi
+bu tür yoðun bir að. Peki ülkelerde bu aðlarýn kuvvetini nasýl ölçeriz?
+Ürünlerin karmaþýklýðýný kullanarak belki bunu yapabiliriz. 
+
+Ekonomide her ürünün bir karmaþýklýðý var - bir cep telefonunu üretmek için
+gereken bilgi düzeyi, koyun yünü üretmek için gereken bilgi düzeyinden daha
+farklý. Bir ülkenin ekonomisinin onun ürettiði ürünleri ortalama
+karmaþýklýðýna oranlý olduðunu düþünebiliriz, ters yöne de gidilebilir, bir
+ürünün karmaþýklýðý onu üreten ülkelerin karmaþýklýðýna oranlýdýr. Fakat
+þimdi burada bir tavuk-yumurta durumu var, ne ülke ne de ürün
+karmaþýklýðýný baþta biliyoruz. Bu problemi nasýl çözeriz? Özdeðer ve
+özvektörler bu tür problemleri çözmek için sürekli kullanýlýr.
+
+Ana veri ülkenin hangi ürünü ihraç ettiði. Eðer bir ülke $i$ ürün $j$'yi
+üretmiþ ve ihraç etmiþ ise $m_{ij}=1$ olsun, üretmiyor ise $m_{ij}=0$ olsun
+denebilir, fakat bir ülkenin herhangi bir ürünü azýcýk bile üretmiþ olmasý
+yeterli deðil. Bize gereken, [4]'te bahsedilen, ülkenin bir ürünü ``hakkýna
+düþenden'' daha fazlasýnýn ihraç ettiði durumlar. Mesela 2008 yýlýnda soya
+fasulyesi 42 milyar dolarlýk hacim ile dünya ticaretinin yüzde 0.35\%'ini
+temsil ediyordu. Bu toplam içinde Brezilya yaklaþýk 11 milyar dolarlýk
+ihraç yaptý, ve o sene Brezilya'nýn toplam ihracatý 140 milyar dolar olduðu
+için soya fasulyesi Brezilya'nýn ihracatýnýn yüzde 7.8'ini oluþturdu. Bu
+miktar Brezilya'nýn ``hakkýna düþen'' ihracatýn 21 katýydý (yüzde 7.8 bölü
+yüzde 0.35). Yani burada önemli bir ihracat var, ve bu verimizde 1 olarak
+iþaretlenmeli. O zaman kullanacaðýmýz öniþlem büyüklüðüne RCA dersek,
+
+$$
+RCA_{ij} = \frac{X_{ij}}{\sum_i X_{ij}} / \frac{\sum_j X_{ij}}{\sum_{i,j} X_{i,j}}
+$$
+
+$RCA_{ij} > 1.0$'den büyük ise $m_{ij}=1$ deriz, yoksa 0. 
+
+Birazdan ortalama hesabý için gerekecek aðýrlýklarý hesaplayalým [5]
+$v_{ij} = m_{ij} / d_i$, $w_{ij}=m_{ij}/u_j$. Burada $d$ kelimesi
+çeþitlilikten (diversification) geliyor, yani herhangi bir ülkenin kaç
+deðiþik ürünü ürettiði, $u$ ise ürünün yaygýnlýðý (ubiquity), herhangi bir
+ürünü kaç diðer ülkenin ürettiði. Ülke $i$ ve ürün $j$ için bunlar
+$d_i = \sum_j m_{ij}$ ve $u_j = \sum_i m_{ij}$.
+
+O zaman ülke $i$'nin ekonomik karmaþýklýk / yetkinlik düzeyi $c_i$, ve ürün
+$j$ karmaþýklýðý $p_j$ þöyle gösterilebilir,
+
+$$
+c_i = \alpha \sum_j v_{ij}p_j
+$$
+
+$$
+p_j  = \beta \sum_i w_{ij} c_i
+$$
+
+ki $\alpha,\beta>0$. Yani bir ülkenin karmaþýklýðý onun ürettiði ürünlerin
+karmaþýklýðýnýn ortalamasýdýr, ayný zamanda bir ürünün karmaþýklýðý o ürünü
+üreten ülkelerin karmaþýklýðýnýn ortalamasýdýr. Tavuk-yumurta durumu artýk
+matematiksel olarak üstte görülüyor. Þimdi $c$, $p$ deðiþkenlerini bir
+matris içine alalým, $V=[v_{ij}]$ and $W=[w_{ij}]$. O zaman daha kýsaca
+$c = \alpha V p$ ve $p = \beta W c$ diyebiliriz. 2. formülü 1. içine
+sokarsak $c = \alpha \beta (V^T W) c $ olur, 1. formülü 2. içine sokarsak
+$p = \alpha \beta (V W^T) p$. Bu demektir ki ülkelerin ve ürünlerin
+çetrefilliði sýrasýyla $V^T W$'nin ve $V W^T$'nin özvektörü üzerinden
+hesaplanabilir!
+
+Not: hangi özvektör? [4]'e göre en büyük 1. özdeðere tekabül eden özvektör
+kullanýþlý deðil, bu vektördeki aðýrlýklarýn hepsi eþit. Bu durumda
+2. büyük özdeðerin özvektörü kullanýlýyor. 
+
+Altta bu yaklaþýmý kullanan tüm ülkelerin 2014'te yaptýðý ihracat verisini
+kullanan hesaplar bulunabilir, veri için [2]'yi temel aldýk, bizim
+ek iþlemlerimiz sonrasý [3].
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, zipfile
+with zipfile.ZipFile('/home/burak/Documents/Dropbox/Public/data/hidalgo.zip', 'r') as z:
+      df =  pd.read_csv(z.open('hidalgo.csv'),sep='\t')
+      gdp =  pd.read_csv(z.open('gdp1416.csv'),sep=',',index_col=0)
+      hs =  pd.read_csv(z.open('hs.csv'),sep='|')
+      hs2 =  pd.read_csv(z.open('hs2.csv'),sep=',',index_col='ProductCode_x')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print len(df)
+print df.tail(10)
+\end{minted}
+
+\begin{verbatim}
+726013
+        year origin    hs92  export_val  import_val  export_rca  import_rca
+726003  2014    ven  961610     39395.0   2026297.0       0.011       0.947
+726004  2014    ven  961620         NaN   1084958.0         NaN       2.413
+726005  2014    ven  961700     29666.0   1701096.0       0.005       0.495
+726006  2014    ven  961800      2066.0    113839.0       0.001       0.074
+726007  2014    ven  970110    210867.0    385141.0       0.004       0.014
+726008  2014    ven  970190    179993.0    118881.0       0.136       0.155
+726009  2014    ven  970200    976805.0         NaN       0.563         NaN
+726010  2014    ven  970300    717009.0    277338.0       0.068       0.045
+726011  2014    ven  970500     12723.0         NaN       0.004         NaN
+726012  2014    ven  970600         NaN      2484.0         NaN       0.000
+\end{verbatim}
+
+Ülkeler satýrlarda, ürünler kolonlarda olacak þekilde bir tablo oluþturalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cp = df.pivot_table('export_val', index='origin', columns='hs92')
+print cp.shape
+print len(np.unique(df.hs92)), 'urun'
+\end{minted}
+
+\begin{verbatim}
+(220, 4858)
+4858 urun
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+denom = cp.sum(axis=1) / cp.sum().sum()
+denom = cp.sum(axis=1) / cp.sum().sum()
+cp2 = cp.div(cp.sum(axis=0).T)
+cp2 = cp2.div(denom,axis=0)
+cp2 = cp2.fillna(0)
+cp2[cp2 > 1.0] = 1.0
+cp2[cp2 != 1.0] = 0.0
+cp3 = cp2
+cp4 = cp3.div(cp3.sum(axis=1),axis=0)
+cp5 = cp3.div(cp3.sum(axis=0),axis=1)
+print cp4.shape, cp5.shape
+\end{minted}
+
+\begin{verbatim}
+(220, 4858) (220, 4858)
+\end{verbatim}
+
+Özanaliz ile en ileri 10 ülkeye bakalým, ülkeler için hesaplanan vektöre
+ECI adý veriliyor (economic complexity index -ekonomik çetrefillik
+indisi-),
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+print cp4.shape
+uc,vc = lin.eig(np.dot(cp4,cp5.T))
+print vc.shape
+eci = np.array(vc)[:,1]
+print len(eci)
+print np.argmax(eci)
+top_countries = cp.index[np.argsort(eci)[:10]]
+print top_countries
+\end{minted}
+
+\begin{verbatim}
+(220, 4858)
+(220, 220)
+220
+181
+Index([u'jpn', u'che', u'deu', u'kor', u'swe', u'xxb', u'usa', u'sgp', u'cze',
+       u'fin'],
+      dtype='object', name=u'origin')
+\end{verbatim}
+
+Þimdi ürünler, buna PCI deniyor (product complexity index -ürün çetrefillik
+indisi-). En çetrefil 10 ürün (en saðdaki en yüksek olacak þekilde),
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.sparse.linalg as lin
+import scipy.sparse as sps
+
+scp4 = sps.lil_matrix(cp4)
+scp5 = sps.lil_matrix(cp5)
+
+A = scp4.T.dot(scp5)
+up,vp = lin.eigs(A,k=2)
+pci = np.array(vp)[:,1]
+top_prods = cp.columns[np.argsort(pci)[-10:]]
+print top_prods
+\end{minted}
+
+\begin{verbatim}
+Int64Index([851410, 390940, 847990, 847790, 840999, 852610, 841221, 848390,
+            870810, 848590],
+           dtype='int64', name=u'hs92')
+\end{verbatim}
+
+Bu ürünler hangileri?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+pd.set_option('expand_frame_repr', False)
+top_prods2 = [str(x) for x in list(top_prods)]
+print len(top_prods2)
+print hs2.ix[top_prods2][['Product Description_y','Product Description_x']]
+\end{minted}
+
+\begin{verbatim}
+10
+                                           Product Description_y                              Product Description_x
+ProductCode_x                                                                                                      
+851410         Industrial or laboratory electric furnaces and...             - Resistance heated furnaces and ovens
+390940         Amino-resins, phenolic resins and polyurethane...                                  - Phenolic resins
+847990         Machines and mechanical appliances having indi...                                            - Parts
+847790         Machinery for working rubber or plastics or fo...                                            - Parts
+840999         Parts suitable for use solely or principally w...                                           -- Other
+852610         Radar apparatus, radio navigational aid appara...                                  - Radar apparatus
+841221                                 Other engines and motors.                       -- Linear acting (cylinders)
+848390         Transmission shafts (including cam shafts and ...  -Toothed wheels, chain sprockets and other tra...
+870810         Parts and accessories of the motor vehicles of...                        - Bumpers and parts thereof
+848590         (-2006) Machinery parts not specified or inclu...                                    (-2006) - Other
+\end{verbatim}
+
+Ýþ makinalarý, radar ürünleri, araba þanzýmaný, kimya, metalurji ürünleri
+aðýrlýkta. Üstteki ürünlerin teknik olarak çetrefil olduklarýný
+görebiliyoruz. Acaba ECI'yi 2014 yýlýnda ülkelerin kiþi baþýna gayrýsafi
+yurtiçi hasýlasýný tahmin etmek için kullanabilir miyiz?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cindex = [x.upper() for x in cp.index]
+ecigdp = pd.DataFrame(eci,index=cindex)
+ecigdp = ecigdp.join(gdp)
+print ecigdp.shape
+ecigdp.columns = ['eci', u'gdp2014', u'gdp2016']
+ecigdp['prods'] = np.array(cp3.sum(axis=1))
+ecigdp = ecigdp.dropna()
+print ecigdp.tail()
+import statsmodels.formula.api as smf
+results = smf.ols('np.log(gdp2014) ~ prods', data=ecigdp).fit()
+print results.rsquared_adj
+results = smf.ols('np.log(gdp2014) ~ eci', data=ecigdp).fit()
+print results.rsquared_adj
+\end{minted}
+
+\begin{verbatim}
+(220, 3)
+          eci      gdp2014      gdp2016  prods
+WSM  0.025062  3761.912686  3524.649880  209.0
+YEM  0.075479   679.667360  1101.117444  147.0
+ZAF  0.008537  7504.295250  7627.851926  742.0
+ZMB  0.048409  1622.409958  1620.823290  182.0
+ZWE  0.063000   908.829980   932.548383  275.0
+0.230701679034
+0.55503440264
+\end{verbatim}
+
+Sonuç yüzde 55 varyansý açýklýyor, fena deðil. Yani bir ülkenin zenginliði
+onun ürettiði ürünlerin çetrefilliði ile direk alakalý. Dikkat edersek düz
+ürün sayýsýný kullanarak yapýlan regresyon o kadar baþarýlý deðil, demek ki
+ECI hakikaten bir niceliði yakalayabilmiþ.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(ecigdp.eci,np.log(ecigdp.gdp2014),'.')
+plt.savefig('linear_app03eigen_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{linear_app03eigen_01.png}
+
+Bu alanda daha fazla okuma yapmak isteyenler için [4] güzel bir
+kaynak. Üretime uygulanabilen bilgiden bahsedilirken mesela geliþmiþ
+ekonomilerdeki kiþi aðlarýnda, o kiþilerde olan yazýlarak anlatýlmasý zor
+olan bilgilerden (tacit knowledge) bahsediliyor. Bu ``tecrübe'' diye
+sýnýflanabilecek bir bilgi ama tam o da deðil. Bu bilgi kiþinin çalýþma
+þeklinden, neye, nasýl, nerede odaklanacaðýyla, günlük çalýþma þekli,
+davranýþ þekliyle alakalý, yazýtsal olmayan bir tür bilgi. Aktarýlmasý son
+derece zor, neredeyse tek yol o kiþiyle yanyana çalýþmak. Yoðun bilgi
+aðlarýnýn belli yerlerde olmasýnýn bir sebebi de bu.
+
+Kaynaklar
+
+[1] Ross, S., {\em Introduction to Probability Models, 8th Edition}
+
+[2] Hidalgo, {\em Veri}, \url{http://atlas.media.mit.edu/en/resources/data/}
+
+[3] Bayramli, {\em Urun Verisi}, \url{https://www.dropbox.com/s/wdg2x524h7ysldu/hidalgo.zip?dl=0}
+
+[4] Hidalgo, {\em The Atlas of Economic Complexity}, \url{http://atlas.cid.harvard.edu}
+
+[5] Inoua, {\em A Simple Measure of Economic Complexity}, \url{https://arxiv.org/abs/1601.05012}
+
+[6] Bayramli, Lineer Cebir, {\em Ders 21}
+
+\end{document}

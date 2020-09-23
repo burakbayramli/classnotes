@@ -1,0 +1,177 @@
+ \documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Model Baþarýsýný Ölçmek
+
+Eðitim ve kontrol (validation) verisini ayrý tutmak iyi fikirdir, model
+eðitim verisinde eðitilir, kontrol verisinde kontrol edilir. Yani modelin
+hiç görmediði veriler üzerinde kontrolünün yapýlmasý gerekir. Bazen bu
+ayrýþmanýn veri üzerinde olan bir deðer üzerinden olmasý da istenebilir,
+mesela parakende satýþ verileri üzerinde eðitim yapýyorsak, bir müþterinin
+hem eðitim hem kontrol verisinde olmasýný istemeyebiliriz. Bu durumda
+ayýrma nasýl yapýlýr? Çok basit bir yöntem kullanýcý kimliði üzerinde
+\verb!hash! çaðrýsý yapmak ve sonuç üzerinde 2 üzerinden (mesela) modülo
+uygulamak. Eðer çift sayý ise eðitim tek ise kontrol. Böylece ayrý bir
+liste tutmadan kimliðe bakarak direk ayrýmý yapabilmiþ oluruz.  
+
+Kafa Karýþýklýðý Matrisi (Confusion Matrix) 
+
+Ýki ya da daha fazla etiketli tahmin problemlerinin sonuçlarýný irdelemek
+için kafa karýþýklýðý matrisi (KKM) kullanýlabilir. Bu matrisin dikey
+eksenini test verisinde gerçekten olan etiket, yatay eksenini tahmin edilen
+etiket olarak düþünürsek, kordinate kesiþimleri her özgün etiket deðeri
+için tahmin etme baþarýsýný gösterecektir. Mesela herhangi bir yapay
+öðrenim algoritmasýndan \verb!y_tahmin! üretilmiþ olsun,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.metrics import confusion_matrix
+y_gercek = ["kedi", "sinek", "kedi", "kedi", "sinek", "balik"]
+y_tahmin = ["sinek", "sinek", "kedi", "kedi", "sinek", "kedi"]
+print confusion_matrix(y_gercek, y_tahmin, labels=["sinek", "balik", "kedi"])
+\end{minted}
+
+\begin{verbatim}
+[[2 0 0]
+ [0 0 1]
+ [1 0 2]]
+\end{verbatim}
+
+Bakýyoruz gerçekten sinek olduðu zaman 2 kere sinek tahmin edilmiþ
+(matriste sol üst köþe), kedi ayný þekilde iki, ama bir defa kedi için
+sinek denmiþ, bu matrisin sol alt köþesinde. KKM matrisi tüm bu doðrularý,
+hatalarý tek bir yerde gösterebilen faydalý bir raporlama aracýdýr. 
+
+Eger sadece iki etiket varsa, matris alttaki gibi olur,
+
+\includegraphics[width=20em]{modeval_06.png}
+
+Ýki etiket durumunda matristeki sayýlarýn özel isimleri var. Her eksende
+ilk hücre 1 tahmini, diðeri 0 tahmini olursa, üst sol köþedeki tahmin
+gerçekten 1 olduðu ve 1 tahmin edildiði durum, buna doðru pozitif (true
+positive) ismi veriliyor. 0 tahmin yapýlmýþ ama aslýnda etiket 1 ise buna
+yanlýþ negatif (false negative), 1 tahmini yapýlmýþ ama 0 ise buna yanlýþ
+pozitif (false positive), 0 tahmini yapýlmýþ ve gerçekten 0 ise buna doðru
+negatif (true negative) ismi veriliyor. Kýsaltýlmýþ olarak sýrasýyla TP,
+FN, FP, TN [1, sf. 190].
+
+Doðruluk (Accuracy)
+
+Üstteki deðerler ile bazý özet hesaplar var, bunlardan biri
+doðruluk. Formülü
+
+$$ 
+ACC = \frac{FP + FN}{FP + FN + TP + TN}
+$$
+
+Kesinlik (Precision)
+
+Diyelim ki bir fotografta 12 kedi, birkac tane fare var. Bir program 8 tane
+kedi var diyor, ama kedi denen objelerden sadece 5 tanesi gercekten kedi. O
+zaman programin kesinligi 5/8. 
+
+$$ 
+PRE = \frac{TP}{TP + FP}
+$$
+
+Hatýrlama (Recall)
+
+Üstteki örnekte hatýrlama 5/12
+
+$$ 
+REC = \frac{TP}{FN + TP}
+$$
+
+F1 Skoru
+
+Cogu zaman kesinlik ve hatirlamayi birlestirmek iyi bir fikirdir, bu bize
+F1-Skoru verir, 
+
+$$ 
+F1 = 2 \frac{PRE \cdot REC}{PRE + REC}
+$$
+
+Özetlemek gerekirse doðruluk tahminlerimizin ne oranda doðru olduðudur,
+fakat bu ölçü eðer eðitim verisinde dengesizlik var ise baþarýsýz olur (100
+içinde 90 resim kedi ise sürekli ``kedi'' cevarý vermek yüzde 90 doðruluk
+verir ama bu iyi bir algoritma deðildir). Kesinlik ise algoritmamiz
+``kedi'' dediði zaman bu cevaplar içindeki doðruluk oranýdýr. Yani pozitif
+tahmin edebilme oranýdýr. Hatýrlama ise sistemin tüm kediler içinde kaçýni
+bulabildiðidir, yani doðru pozitif oraný.
+
+AUC
+
+Eðitim verisindeki dengesizliði dikkate alarak baþarý hesaplamanýn bir yolu
+þu: algoritmalar 0/1 tahmini yerine ``1 olma olasýlýðý'' üretirler, yani 0
+ile 1 arasý bir sayý. Bu olasýlýklarý 0/1 tahminine çevirmek kolay, bir
+eþik deðeri kararlaþtýrýrýz, ondan büyük olanlar 1 küçükler 0 olur; mesela
+eþik deðeri 0.5 olabilir. AUC hesabý için eþik deðerini sürekli
+deðiþtirerek bir döngü içinde doðru pozitif oraný, yanlýþ pozitif oraný
+hesaplarýz, bunu grafikleyince ortaya bir eðri çýkar. Bu eðri 45 derece
+eðimli düz çizgi ne kadar üzerinde ise algoritmamiz o kadar baþarýlýdýr. 
+
+Matthews Korelasyon Katsayýsý
+
+AUC kadar iyi iþleyen, verideki dengesizliklere dayanýklý bir diðer ölçüt
+budur. Detaylar için [4] yazýsý.
+
+
+Yanlýlýk-Varyans Dengesi  (Bias-Variance Trade-off)
+
+\includegraphics[width=30em]{modeval_01.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn import linear_model
+from sklearn import ensemble
+from sklearn.model_selection import ShuffleSplit
+from sklearn.datasets import load_digits
+import lcurve
+
+digits = load_digits()
+X, y = digits.data, digits.target
+
+title = "Naive Bayes"
+cv = ShuffleSplit(n_splits=100, test_size=0.2, random_state=0)
+estimator = GaussianNB()
+lcurve.plot(estimator, title, X, y, cv=cv, n_jobs=2)
+plt.savefig('modeval_02.png')
+
+title = u'SVM, RBF çekirdek (kernel), $\gamma=0.001$'
+cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
+estimator = SVC(gamma=0.001)
+lcurve.plot(estimator, title, X, y, cv=cv, n_jobs=2)
+plt.savefig('modeval_03.png')
+
+title = "Lojistik Regresyon"
+cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
+estimator = linear_model.LogisticRegression()
+lcurve.plot(estimator, title, X, y, ylim=(-0.1,0.1), cv=cv, n_jobs=2)
+plt.savefig('modeval_04.png')
+
+title = "RandomForestClassifier"
+cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
+estimator = ensemble.RandomForestClassifier()
+lcurve.plot(estimator, title, X, y, ylim=(-0.1,0.1), cv=cv, n_jobs=2)
+plt.savefig('modeval_05.png')
+\end{minted}
+
+\includegraphics[width=30em]{modeval_02.png}
+
+\includegraphics[width=30em]{modeval_03.png}
+
+\includegraphics[width=30em]{modeval_04.png}
+
+
+Kaynaklar
+
+[1] Raschka, {\em Python Machine Learning}
+
+[2] Ng, Diagnosing Bias vs Variance, \url{https://www.youtube.com/watch?v=ymg03eGEBds}
+
+[3] Ng, Regularization and Bias Variance, \url{https://www.youtube.com/watch?v=yzS8bl75FV0}
+
+[4] Bayramli, Ýstatistik, {\em Beklenti, Varyans, Kovaryans ve Korelasyon}
+
+\end{document}
+
+

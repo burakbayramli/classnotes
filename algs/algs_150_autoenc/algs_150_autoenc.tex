@@ -1,0 +1,313 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Özkodlama (Autoencoding)
+
+Özkodlamanýn yaptýðýnýn bir tür "veriyi sýkýþtýrma" iþlemi olduðu
+söylenebilir. Yapay öðrenmede algoritmalarýn denetimli ve denetimsiz olarak
+ikiye ayrýldýðýndan bahsetmiþtik, özkodlama denetimsiz çalýþýr yani ortada
+etiket yoktur, daha doðrusu özkodlama verinin kendisini etiket olarak
+kullanýr.
+
+\includegraphics[width=30em]{autoenc_02.png}
+
+Yani girdi olarak verilen veriyi çýktý olarak ta kullanýrsak, YSA'yý
+kendi çýktýsýný tekrar oluþturmayý öðrenmeye zorlamýþ oluruz, bu
+YSA'yý veriyi özetlemeye doðru yöneltecektir, ve bu tekrar oluþturma
+için ileri besleme sýrasýnda veriyi dar bir noktadan geçmeye zorlarsak
+(üstteki resimde görülüyor, 7 nöronluk girdi 5 nöronluk "daha dar" bir
+katmandan geçmeye zorlanýyor), bu YSA'yý "sýkýþtýrma" yapmaya daha da
+meyillendirecektir.
+
+\inputminted[fontsize=\footnotesize]{python}{mnist_autoenc.py}
+
+Üstteki kodla modeli eðittikten sonra herhangi bir sayý resmini alýyoruz,
+kodluyoruz, kodçözme yapýyoruz ve tekrar oluþturulmuþ hali ekrana
+basýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from keras.datasets import mnist
+import mnist_autoenc
+
+(x_train, _), (x_test, y_test) = mnist.load_data()
+x_test = x_test.astype('float32') / 255.
+autoencoder, encoder, decoder = mnist_autoenc.get_model()
+encoder.load_weights("mod-enc-1.h5")
+decoder.load_weights("mod-dec-1.h5")
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+idx = 1090  # herhangi bir sayi resmini al
+print y_test[idx]
+tmp = x_test[idx, :, :].reshape(1,28*28)
+encoded = encoder.predict(tmp)
+print (encoded.shape)
+decoded = decoder.predict(encoded).reshape(28,28)
+print (decoded.shape)
+plt.imshow(decoded)
+plt.gray()
+plt.savefig('autoenc_01.png')
+\end{minted}
+
+\begin{verbatim}
+9
+(1, 32)
+(28, 28)
+\end{verbatim}
+
+\includegraphics[width=20em]{autoenc_01.png}
+
+9 resmini elde ettik. 
+
+Biraz onceki resmin kodlanmis halini gosterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (encoded)
+\end{minted}
+
+\begin{verbatim}
+[[ 13.18540382   9.90277767   2.81214857  14.67686176   3.90287089
+    0.95043498   4.25797892  13.59305477   8.71218967   2.61786652
+    8.67911053   5.27269077   3.68898463   6.26301765   0.           3.73920846
+    4.90339994   6.61260319   8.80308342   5.41205883   0.           6.12768221
+   11.42174625   3.13173342   3.79943371  11.27116108   6.003757
+   10.82552242   8.44533443   4.84582376   5.63021088  11.27607727]]
+\end{verbatim}
+
+32 boyutlu bir vektör içinde reel sayýlar bunlar. Þimdi bu sayýlarý alýp
+baþka bir sýnýflayýcý içinde kullanabilirdim. Öyle bir uygulama düþünelim
+ki mesela müþterilerin yaþý, cinsiyeti bilgisi var, biz ayrýca herkesin
+fotoðraflarý üzerinden bir özkodlayýcý eðitiyoruz, ve müþterinin resmi
+üzerinden elde edilen üstteki gibi bir temsili sýkýþtýrýlmýþ gizli tabaka
+verisini yaþ, cinsiyet ile beraber bu ayrý sýnýflayýcýya verip cevap
+bekliyoruz. Bu sýnýflayýcý ``potansiyel yaz alýþveriþçisi mi / deðil mi''
+þeklinde bir sýnýflama yapýyor olabilir mesela, belki kiþilerin resminde bu
+sýnýflayýcýya yardým edecek bir þeyler vardýr.. Bu ayrý sýnýflayýcý bir YSA
+olabilir, ama çoðu zaman basit lojistik regresyon bile kullanýlabiliyor.
+Ayrýca sadece bir deðil, farklý veriler üzerinde iþletilmiþ pek çok
+özkodlayýcýdan gelen özet bilgisini de yan yana ayný lojistik regresyona
+verebiliriz.
+
+Zaman Serisi Özkodlamasý, RNN 
+
+Eðer zamana baðlý bir veri yapýsýný özkodlamak istesek nasýl bir model
+kullanýrdýk? Mesela birkaç boyutlu bir finans verisini (bir andaki hisse
+fiyatý, satým miktarý çok boyutlu bir vektörde olabilirdi) modelliyor
+olabilidiik. MNIST verisini bu þekilde kullanabiliriz aslýnda, 28 x 28
+boyutlu veride sanki 28 tane 28 boyutlu veriyi zamana baðlý alýyormuþuz
+gibi görebilirdik, sanki resimde soldan saða doðru dikey þeritler alýp
+teker teker bunlarý iþlediðimizi düþünebiliriz. MNIST sayý görüntülerine bu
+þekilde bakmak aslýnda çok anlamsýz deðil, mesela bir altý görüntüsünü
+düþünürsek soldan saða giderken kavisli yukarý doðru bir gidiþ vardýr, bu
+gidiþi zamana baðlý bir NN yakalayabilir. 
+
+\inputminted[fontsize=\footnotesize]{python}{mnist_autoenc_rnn_simple.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import mnist_autoenc_rnn_simple
+
+seq_autoencoder, encoder = mnist_autoenc_rnn_simple.get_model()
+seq_autoencoder.load_weights("mod-rnn-autoenc-sim.h5")
+encoder.load_weights("mod-rnn-enc-sim.h5")
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+decoded = seq_autoencoder.predict(tmp).reshape(28,28)
+print (decoded.shape)
+plt.imshow(decoded)
+plt.gray()
+plt.savefig('autoenc_03.png')
+\end{minted}
+
+\includegraphics[width=20em]{autoenc_03.png}
+
+Varyasyonel Özkodlayýcýlar (Variational Autoencoder -VAE-)
+
+Standard özkodlayýcýlarýn bir problemi kodlama yaptýklarý daralmýþ
+alandaki vektörlerin sürekli olmayabileceði, ve buradaki deðerlerin
+kolay bir þekilde interpolasyon yapýlmasýndaki bazý zorluklar.
+
+VAE özkodlayýcýlarda, kodlayýcý tabaka bir tamamen baðlanmýþ / yoðun
+(dense) bir katmandan geçiyor ama bir deðiþiklik var; yoðun katman
+$\mu,\sigma$ rasgele {\em deðiþkenleri} haline geliyor ve ondan bir sonraki
+katman bu deðiþkenlerden örneklem alýyor! Bu dahiyene bir düþünce. Fakat
+akla gelebilir - YSA yapýsý deterministik bir yapýdýr, örneklem, yani zar
+atma rasgele (stochastic) bir hesap. Bu kavramý YSA mekanizmasýna nasýl
+dahil ediyoruz?
+
+\includegraphics[width=40em]{autoenc_06.png}
+
+Çözüm örneklem operasyonunu gürültü, yani Gaussian $N(0,1)$ + $\mu$ çarpý
+$\sigma$ olarak modellemek, bu þekilde sanki $N(\mu,\sigma)$'dan örneklem
+alýyoruz, ama eðitilen, optimize edilen çarpma, toplama üzerinden
+$\mu,\sigma$ deðiþkenleri, ve halen YSA mekanizmasý devrede ve bu
+deðiþkenler deterministik deðiþkenler. Gürültü iþin içinde var, ama gürültü
+eh, Gaussian sýfýr merkezli bir stardart sapmalý gürültü. Bir gürültü bir
+diðerinden farklý deðil, model için hepsi ayný gürültü.
+
+Üstteki mantýðýn temelinde þu bilgi  var: Biliyoruz ki herhangi bir
+daðýlýma sahip rasgele deðiþken $z$'yi bir $g$ fonksiyonu kullanarak
+$X=g(z)$ ile baþka bir daðýlýma çevirebiliyoruz. Altta örneði görülüyor,
+soldaki resim Gaussian daðýlýmdan, saðdaki resim soldaki verilerin
+$g(z) = z/10 + z/||z||$ ile baþka bir daðýlýma eþlenmiþ hali ve bu yeni
+daðýlým bir çember þeklini oluþturmuþ. VAE'nin rasgele daðýlýmlar
+yaratabilmesinin arkasýnda yatan gizem bu iþte. Eðitim ile VAE $g$'yi
+öðrenmiþ oluyor, ki bu bir determinstik fonksiyon.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import random, numpy.linalg as lin, pandas as pd
+x = np.random.randn(1000,2)
+x = pd.DataFrame(x)
+x['n'] = np.sqrt(x[0]*x[0] + x[1]*x[1])
+x['g0'] = (x[0]/10.0) + x[0]/x['n']
+x['g1'] = (x[1]/10.0) + x[1]/x['n']
+plt.figure()
+ax = plt.subplot(1, 2, 1)
+plt.plot(x[0],x[1],'.')
+ax = plt.subplot(1, 2, 2)
+plt.plot(x['g0'],x['g1'],'.')
+plt.xlim(-4,4)
+plt.ylim(-4,4)
+plt.savefig('autoenc_10.png')
+\end{minted}
+
+\includegraphics[width=40em]{autoenc_10.png}
+
+\includegraphics[width=20em]{autoenc_07.png}
+
+\inputminted[fontsize=\footnotesize]{python}{mnist_lstm_vae.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import mnist_lstm_vae
+
+vae, enc, gen = mnist_lstm_vae.create_lstm_vae(mnist_lstm_vae.input_dim, 
+    timesteps=mnist_lstm_vae.timesteps, 
+    batch_size=mnist_lstm_vae.batch_size, 
+    intermediate_dim=mnist_lstm_vae.latent_dim,
+    latent_dim=mnist_lstm_vae.latent_dim,
+    epsilon_std=1.)
+vae.load_weights('mnist_lstm_vae.h5')
+enc.load_weights('mnist_lstm_enc.h5')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import random
+idx = 400 # herhangi bir imaji sec
+print (tmp.shape)
+x_test_tmp = x_test[idx]
+res = vae.predict(x_test_tmp.reshape((1, 28, 28)))
+
+plt.figure()
+ax = plt.subplot(1, 2, 1)
+pixels = res.reshape((28, 28))
+plt.imshow(pixels)
+plt.gray()
+ax = plt.subplot(1, 2, 2)
+plt.imshow(x_test_tmp)
+plt.gray()
+
+plt.savefig('autoenc_04.png')
+\end{minted}
+
+\includegraphics[width=20em]{autoenc_04.png}
+
+Gördüðümüz gibi zamansal iþlem yaptýk ama VAE çok iyi sonuç verdi. Hatta
+test imajýný daha netleþtirdi!
+
+Hasýmsal Özkodlayýcý (Adverserial Autoencoder -AA-)
+
+Üretici Hasýmsal Aðlar (Generative Adverserial Networks -GAN-) kavramýnýn
+özkodlayýcýlara uygulanmýþ hali AA olur. 
+
+\includegraphics[width=40em]{autoenc_09.png}
+
+Burada bir kodlayýcý / kodçözücü yapýsý var (üst blok) bu yapýdan kodlanmýþ ara
+tabaka $z \sim q(z)$ ``kötü'' örnekler çekilip $p(z)$'den gelen ``iyi'' örnekler
+ile birleþtiriliyor ve ayýrdedici yine bu iki grup arasýnda ayýrým yapmayý
+öðreniyor. Bu durumda üst bloktaki kodçözücü GAN'deki üretici gibi olur, ona
+dönüþür bir bakýma, çünkü öyle iyi üretim yapmaya çalýþacaktýr ki $p(z)$
+gürültüsü ile onun aldýðý kodlanmýþ tabaka verisi ayiredilemez hale gelmelidir.
+Tabii ki üst soldaki kodlayýcý bu ara tabakaya o þekilde temsili veri üretmeye
+çalýþacaktýr, bu arada kodlayýcý / kodçözücü yapýsý da eðitilmiþ olur. Yani $z$
+bir anlamda alt soldaki gerçek gürültüye yaklaþýr, bu gürültüden sayý üretebilir
+hale geliriz, bu klasik GAN, ayrýca bu ``kodlanmýþ'' gürültüyü üreten kodlayýcý
+/ kodçözücü tabaka da ayrý bir þekilde kendini optimize eder ve kodlama iþini
+yapar hale gelir.
+
+\inputminted[fontsize=\footnotesize]{python}{aae_normal.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import aae_normal
+latent_dim = 100
+input_shape = (28, 28)
+encoder = aae_normal.model_encoder(latent_dim, input_shape)
+encoder.load_weights('aae-norm-encoder.h5')
+generator = aae_normal.model_generator(latent_dim, input_shape)
+generator.load_weights('aae-norm-generator.h5')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+idx = 100 # herhangi bir imaji sec
+print (x_test[idx, :].shape)
+res = encoder.predict(x_test[idx, :].reshape(1,28,28))
+print (res.shape)
+pixels = generator.predict(res)
+pixels = pixels.reshape((28, 28))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig('autoenc_05.png')
+\end{minted}
+
+\includegraphics[width=20em]{autoenc_05.png}
+
+\inputminted[fontsize=\footnotesize]{python}{aae_lstm.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import aae_lstm
+latent_dim = 200
+input_shape = (28, 28)
+encoder = aae_lstm.model_encoder(latent_dim, input_shape)
+encoder.load_weights('aae-lstm-encoder.h5')
+generator = aae_lstm.model_generator(latent_dim, input_shape)
+generator.load_weights('aae-lstm-generator.h5')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+idx = 1030 # herhangi bir imaji sec
+res = encoder.predict(x_test[idx, :].reshape(1, 28,28))
+pixels = generator.predict(res)
+pixels = pixels.reshape((28, 28))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig('autoenc_08.png')
+\end{minted}
+
+\includegraphics[width=20em]{autoenc_08.png}
+
+Kaynaklar
+
+[1] \url{https://blog.keras.io/building-autoencoders-in-keras.html}
+
+[2] {\em Adverserial Autoencoder Keras}, 
+    \url{https://github.com/bstriner/keras-adversarial/blob/master/examples/example_aae.py}
+
+[3] \url{https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf}
+
+[4] \url{https://hsaghir.github.io/data_science/denoising-vs-variational-autoencoder/}
+
+[5] Doersch, Tutorial on Variational Autoencoders, 
+    \url{https://arxiv.org/pdf/1606.05908.pdf}
+
+[6] Goodfellow, Adversarial Autoencoders, 
+    \url{https://arxiv.org/pdf/1511.05644.pdf}
+
+[7] What is Adversarial Autoencoder?, 
+    \url{https://www.quora.com/What-is-Adversarial-Autoencoder}
+
+[8] \url{http://www.inference.vc/adversarial-autoencoders/}
+
+
+\end{document}
+
+
+
+

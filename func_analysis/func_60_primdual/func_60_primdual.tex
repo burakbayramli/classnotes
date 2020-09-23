@@ -1,0 +1,661 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ana-Çift Ýç Nokta Metotlarý (Primal-Dual Interior-Point Methods)
+
+Þimdiye kadar gördüðümüz problem tiplerini hatýrlayalým þimdi ve çözme
+zorluðu açýsýndan sýralayalým. En üstte, en basit olan karesel
+problemlerdi, 
+
+$$
+\min_x \frac{1}{2}  x^T Q x + c^T x
+$$
+
+formunda oluyorlardý. Bu problemler en basiti, eðer $Q$ pozitif yarý-kesin
+ise. Basit çünkü gradyaný alýp sýfýra eþitliyorum, pat diye sonucu
+buluyorum. 
+
+Sonraki seviye, biraz daha zor, üstteki probleme $Ax=b$ formunda eþitlik
+kýsýtlamasý getirmek. Bu problemi de kapalý / analitik halde (closed-form)
+çözebiliriz, KKT koþullarýný kullanarak. $Ax=b$ ifadesini ek deðiþkenler
+üzerinden kritere ekleriz, Lagrangian'ý oluþtururuz, KKT koþulunda iki tane
+öðe olur, duraðanlýk, ve ana olurluk, bu iki öðeyi eþzamanlý olarak çözerek
+sonuca ulaþýrýz, koca bir lineer sistemdir bu. 
+
+Bir sonraki pürüzsüz minimizasyon, yani üstteki kriterin yerine $f(x)$
+kullanmak ki $f(x)$ bir pürüzsüz fonksiyon. Bu durumda Newton metotu
+kullanýyoruz, bu metot $Ax=b$ kýsýtlamasýnda $f(x)$ minimizasyonunu birkaç
+adýmda çözmeye uðraþýyor, bunu her adýmda $f(x)$'e bir karesel yaklaþýklama
+yaparak baþarýyor. 
+
+Sonraki seviye ise iç nokta metotlarý, eþitlik kýsýtlamalarýna ek olarak
+$h_i(x) \le 0, i=1,..,m$ formunda eþitsizlik kýsýtlamalarý eklemek.  Bu
+derste bu tür problemleri ana-çift yöntemi ile çözeceðiz, daha önceki bir
+derste bariyer yöntemi iç nokta metotu ile çözdük. 
+
+Genel olarak yaptýðýmýz herhangi bir seviyedeki problemi çözmeye
+uðraþtýðýmýzda onu bir önce seviyedeki probleme indirgemek, problemi belli
+adýmlara bölerek her adýmda nasýl iþlediðini bildiðimiz önceki seviyedeki
+tekniði uygulamak. Bariyer metotunda öyle oldu mesela, eþitsizlik
+problemini bariyer terimini kritere ekleyerek bilinen Newton adýmlarýyla
+onu çözmeye uðraþtýk. 
+
+Ana-çift metotu biraz daha farklý olacak. Onu öðrendiðimizde göreceksiniz
+ki bir problemi açýk bir þekilde baþka bir probleme indirgemediðini
+göreceksiniz [1, 5:55]. Bu tekniði sarsýma uðratýlmýþ KKT koþullarý
+ýþýðýnda ele almak lazým, ana prensibi bu.
+
+[bariyer metot özeti atlandý]
+
+Ana-çift metotu, bariyer metodundan farklý olarak, $t$ parametresinin
+güncellemeden önce sadece tek Newton adýmý atar. Yani ana-çift metotunda da
+yaklaþýksallamanýn kuvvetini kontrol eden bir $t$ var, ama o belli bir $t$
+üzerinden yakýnsama oluncaya kadar Newton adýmý atmak yerine her $t$ için
+tek Newton adýmý atýlýyor. Bu demektir ki dýþ döngü, iç döngü farký yok,
+her þey tek bir döngü içinde.
+
+Bir diðer fark ana-çift döngüsünde giderken üretilen (ziyaret edilen)
+noktalar illa olurlu olmayabiliyor. Yapýsý itibariyle metot döngüsü
+sýrasýnda eþitsizlik kýsýtlamalarýný tatmin eder, fakat her zaman eþitlik
+kýsýtlamalarýný tatmin etmeyebilir. Hatta bazen ikiz olurlu noktalar bile
+mevcut olmayabilir, bu daha ciddi bir durum. Hatýrlarsak bariyer metotunda
+ikiz olurlu nokta her zaman vardý ve bu noktayý bir ikiz boþluðu hesaplamak
+için kullanabiliyorduk. Bu boþluðu hesaplamak kolaydý, her noktada
+$m / t < \epsilon$ deðerindeydi.
+
+O zaman ana-çift ile bu hesap yoksa, ne zaman duracaðýmýzý tam bilmiyoruz
+demektir, demek ki akýllýca uydurma (heuristic) yaparak bir durma þartý
+bulmamýz lazým.
+
+Pozitif baðlamda ana-çift metotlarý daha verimli çalýþýr. Ýspatýna
+girmeyeceðiz ama ana-çift yakýnsamasý lineerden daha iyidir.
+
+Negatif olarak ana-çift metotlarýný kabaca, sezgisel kavramak bariyer
+metotu kadar direk olmayabilir. Þahsen bu alanda araþtýrmacý olan ben bile
+ana-çift metot adýmlarýnýn temelii hatýrlamakta bazen zorlanýyorum, bariyer
+metotunu hatýrlamak basit, kýsýtlamanýn log'unu alýp kritere ekliyorsunuz,
+sonra Newton metotu uyguluyorsunuz [1, 13:35].
+
+Detaylara gelelim. KKT koþul sarsýmýný hatýrlarsak, bariyer metotunu KKT
+koþullarýnda bir sarsým olarak görebiliyorduk, þu ifadelerde
+
+$$
+\nabla f(x) + \sum_{i=1}^{m} u_i\nabla h_i + A^T v = 0
+\mlabel{1}
+$$
+
+$$
+u_i \cdot h_i(x) = (-1/t) 1, \quad i=1,..,m
+$$
+
+$$
+h_i(x) \le 0, \quad i=1,..,m, \quad Ax = b
+$$
+
+$$
+u_i \ge 0
+$$
+
+Normal sartlarda bloktaki ikinci ifade yerine 
+
+$$
+u_i \cdot h_i(x) = 0, \quad i=1,..,m
+\mlabel{2}
+$$
+
+olacaktý. Deðiþen tamamlayýcý gevþeklik yani.
+
+Ana problem neydi?
+
+$$
+\min_x f(x) \quad \textrm{öyle ki}
+$$
+$$
+Ax = b
+$$
+$$
+h_i(x) \le 0, \quad i=1,..,m
+$$
+
+Bu problemin KKT þartlarý görülen blokta, duraðanlýk için gradyan alýp
+sýfýra eþitlenir, (1) elde edilir, tabii $f,h_i$'in pürüzsüz ve dýþbükey
+olduðu farz edilir, o sebeple gradyan yeterli, altgradyana gerek yok, vs.
+Tek deðiþtirdiðimiz tamamlayýcý gevþeklik ve onun artýk sýfýra eþit
+olmasýný þart koþmuyorum, ufak baþka bir deðere, ve doðru iþarete sahip
+olan baþka bir deðere eþit olmasýný zorluyorum, $u_i \cdot h_i(x) = (-1/t)$
+þartý bu. $1/t$ gibi bir deðerin sebebi aslýnda $\log(x)$'in türevinin
+$1/\log(x)$ olmasýyla alakalý, çünkü log bariyerleþtirilmiþ kriterin
+türevini alýp sýfýra eþitleyince ve ikiz deðiþkenleri uygun þekilde
+tanýmlayýnca log bariyer metotunun orijinal KKT koþullarý yerine üstteki
+þekilde bir problemi çözülebildiðini görmüþtük [1, 16:19], ve $t$
+büyütüldükçe görülen deðiþtirilmiþ tamamlayýcý gevþeklik esas versiyonuna
+daha da yaklaþýyordu.
+
+Ana-çift metotlarýna eriþmenin bir diðer yolu sarsýmýn ortaya çýkarttýðý
+denklemleri birarada çözmek ve Newton adýmýný ona göre atmak [1, 22:55]. 
+
+Denklemler ayrý ayrý olarak 
+
+$$
+r_{dual}= \nabla f(x) + Dh(x)^T u + A^T v 
+\mlabel{6}
+$$
+
+$$
+r_{cent} = -\diag(u)h(x) - 1/t 
+$$
+
+$$
+r_{prim} = Ax - b
+$$
+
+Sarsým denklem sistemini sýfýra eþitlemek amacýyla matris formunda
+düzenlersek, 
+
+$$
+r(x,u,v) = 
+\left[\begin{array}{c}
+\nabla f(x) + Dh(x)^T u + A^T v \\
+-\diag(u)h(x) - 1/t \\
+Ax - b
+\end{array}\right]
+\mlabel{3}
+$$
+
+ki
+
+$$
+h(x) = \left[\begin{array}{c}
+h_1(x) \\
+\dots \\
+h_m(x)
+\end{array}\right]
+\quad
+D h(x) = \left[\begin{array}{c}
+D h_1(x)^T \\
+\dots \\
+D h_m(x)^T
+\end{array}\right]
+\mlabel{4}
+$$
+
+$r(x,u,v)$'yu sýfýra eþitliyoruz, yani bir anlamda 
+
+$$
+0 = r (x+\Delta x, u + \Delta u, v + \Delta v)
+$$
+
+çözülecek, bunu 1. derece Taylor açýlýmý ile yaklaþýklarým,
+
+$$
+\approx r(x,u,v) + D r(x,u,v) \left[\begin{array}{c}
+\Delta x \\ \Delta u \\ \Delta v
+\end{array}\right]
+$$
+
+Üstteki denklemde (3) ve (4) öðelerini kullanarak özyineli þekilde dönersem
+gayrý-lineer denklemi çözmüþ olurum. Notasyonu biraz degistirirsek,
+$y = (x,u,v)$ ile,
+
+$$
+0 = r(y + \Delta y) \approx r(y) + D r(y) \Delta y
+$$
+
+ve $\Delta y$ için çözmek istiyoruz. 
+
+Ya da, genel bir $F$ için $F(y) = 0$ çözümü, yani ``kök bulmak'' amacýyla
+her döngü adýmýnda bir $\Delta y$ hesaplayabilmek istiyoruz. Þu þekilde
+
+$$
+F(y + \Delta y) \approx F(y) + D F(y) \Delta y
+$$
+
+yaklaþýklarsak, ve kök amaçlý $F(y)=0$ olmalý ama $F(y + \Delta y) = 0$ da
+denebilir,
+
+$$
+0 \approx F(y) + D F(y) \Delta y
+$$
+
+$$
+-F(y) =  D F(y) \Delta y
+$$
+
+$$
+\Delta y = -(DF(y))^{-1} F(y) 
+$$
+
+Ya da
+
+$$
+DF(y) \Delta y = -F(y) 
+$$
+
+Bu problemde $F$ yerine $r$ var. 
+
+$$
+D r(y) \Delta y = -r(y) 
+$$
+
+O zaman (3)'teki $r(y)$'nin türevi, yani Jacobian'ý gerekiyor. Üsttekini
+þöyle yazýyoruz, 
+
+$$
+\left[\begin{array}{ccc}
+\nabla^2 f(x) + \sum _{i=1}^{m} u_i \nabla^2 h_i(x) & D h(x)^T & A^T \\
+-\diag(u) D h(x) & -\diag(h(x)) & 0 \\
+A & 0 & 0
+\end{array}\right]
+\left[\begin{array}{c}
+\Delta x \\ \Delta y \\ \Delta v
+\end{array}\right] = 
+\left[\begin{array}{c}
+r_{dual} \\ r_{cent} \\ r_{prim}
+\end{array}\right]  
+\mlabel{5}
+$$
+
+Büyük Jacobian'ý nasýl elde ettik? Mesela (3)'ün ilk satýrýna bakalým, 
+
+$$
+\nabla f(x) + Dh(x)^T u + A^T v 
+$$
+
+var, onun $x,u,v$'ye göre türevlerini almak bize iki üstteki matrisin
+1. satýr 1. 2. ve 3. kolonunu veriyor, mesela $x$'e göre türev alýnca bir
+üstteki ifadede 1. ve 2. terimin türevi alýnýr, $A^T v $ yokolur, bu bize
+$\nabla^2 f(x) + \sum _{i=1}^{m} u_i \nabla^2 h_i(x)$ verir [1, 28:43].
+Ayný þekilde devam edersek görülen matrisi elde ederiz. Tüm sistemi
+$\Delta y$ için çözünce de istediðimiz Newton yönünü elde ederiz.
+
+Bu yönteme ana-çift denmesinin sebebi üstte görülüyor aslýnda, çünkü dikkat
+edersek hem ana hem ikiz deðiþkenleri ayný sistemde, ayný anda
+çözüyoruz. Deðil mi? Denklem sistemi KKT koþularýnýn formülize edilmesinden
+geldi, ve bu koþullarda ana ve ikiz deðiþkenler ayný yerde mevcuttur, ve
+çözerken tüm $x,u,v$ için çözüyoruz. 
+
+Not: Bu yaklaþýmla bariyer metotuna eriþmek mümkün, o durumda sistemden $u$
+çýkartýlýr, ve geri kalanlar çözülür. 
+
+Metotu algoritmik olarak görmeden önce bir konudan daha bahsetmek
+istiyorum; alternatif ikizlik boþluðu. Bu gerçek ikizlik boþluðu deðil,
+çünkü daha önce belirttiðimiz gibi bu metotta ikiz deðiþkenler her zaman
+olurlu olmayabiliyor.
+
+Bariyer metotu için ikizlik boþluðu basitti, $m/t$ çünkü
+$u_i = -1 / (t h_i(x))$, $i=1,..,m$ tanýmlamýþtýk ve bu ikiz olurlu idi.
+Alternatif boþluk için sanki ikiz olurluk varmýþ gibi yapýyoruz, ve 
+
+$$
+\eta = -h(x)^T u = - \sum _{i=1}^{m} u_i h_i(x)
+$$
+
+hesabýný yapýyoruz. Eðer üstteki hesabý bariyer problemi için yapýyor
+olsaydýk, $u_i = -1/t$ tanýmlamýþ olacaktýk ve o zaman bariyer metotu için
+olan boþluðu elde edecektik. Ana-çift yönteminde böyle deðil tabii, sistemi
+çözerken $u_i$ için de çözüm yapýyoruz, onu önceden tanýmlamýyoruz, fakat
+üstteki formu kullanarak alternatif ikizlik boþluðunu elde edebiliriz.  
+$\eta$ her zaman pozitif olacak, çünkü kendimizi her zaman $h_i(x) \le 0$
+olacak þekilde kýsýtlayacaðýz, ve $u_i \ge 0$ zaten, o zaman çarpýmlarýnýn
+ekþi ile çarpýlmasý pozitif sonuç verir.
+
+Tüm bunlarý durma þartý için nasýl kullanýrýz? Her ne kadar $u_i$'lar
+olurlu olmayabilse bile yine de boþluðu hesaplýyoruz, ardýndan ikiz
+deðiþkenlerin olurluða ne kadar yakýn olduðunu ayrý bir yerde
+hesaplýyoruz. Yani eðer alternatif boþluk az, ve olurluða yakýnlýk varsa,
+akýllýca bir uydurma ile kullanarak durma / durmama kararý verebiliriz.
+Gerçi bu teknik uydurmadan biraz daha iyi aslýnda, ana-çift metotunun
+yakýnsadýðýna dair matematiksel ispatlar var, fakat terminolojik olarak bu
+boþluk hesabý gerçek bir boþluk hesabý deðil.
+
+Artýk metotu tanýmlayabiliriz. Bir harfiyen olurlu $x^{(0)}$ ile baþla,
+yani bu nokta $h_i(x^{(0)}) < 0 $, ve $A x^{(0)}= b$. Ayrýca $u^{(0)} > 0$,
+$v^{(0)}$ herhangi bir deðer. Alternatif ikizlik boþluðu
+$\eta^{(0)} = -h(x^{(0)})^T u^{(0)}$ olarak tanýmla [1, 45:21].
+
+$t$'yi büyütmek için $\mu > 1$ kullanýyoruz. Her döngü sonunda eski $t$'yi
+$\mu$ ile çarpýp yeni $t$ elde edeceðiz.  
+
+Adýmlar
+
+1) $t = \mu m / \eta^{(k-1)}$ tanýmla. 
+
+2) Ana-çift güncelleme yönü $\Delta y$'yi hesapla (nasýl yapýlacaðýný
+gördük, (5)'teki lineer sistemi çözerek).
+
+3) Geri iz sürme (backtracking) tekniði ile adým büyüklüðü $s$'yi hesapla
+(birazdan nasýl yapýlacaðýný göreceðiz)
+
+4) $y^{(k)} = y^{(k-1)} + s \cdot \Delta y$ ile $y$'yi güncelle. Yani bu
+hesapla tüm ana, ikiz deðiþkenleri güncellemiþ oluyoruz, $x,u,v$. 
+
+5) Alternatif ikizlik boþluðunu hesapla $\eta^{(k)} = -h(x^{(k)})^T
+u^{(k)}$. 
+
+6) Ana ve ikiz artýklar ufak ise, yani eðer $\eta^{(k)} < \epsilon$ ise ve 
+$(|| r_{prim} ||_2^2 + ||r_{dual}||_2^2)^{1/2} < \epsilon$ ise dur. 
+
+$r_{prim}$ hatýrlarsak eþitlik sýnýrlamasýndan ne kadar uzak
+olduðumüz. $r_{dual}$ ise duraðanlýk þartýydý, onun sýfýrdan ne kadar uzak
+olduðuydu. Niye ona ``ikiz (dual)'' etiketi verdik? Bunun ikiz olurluk ile
+ne alakasý var? Burada biraz nüans var.. 
+
+Not: artýk kelimesini kullandýk daha önce  $r_{dual}$ ikiz artýk,
+$r_{prim}$ ana artýk. 
+
+Hatýrlarsak $u,v$ üzerindeki kýsýtlamalar nelerdi? $u \ge 0$, ve $v$
+herhangi bir þey olabilir. Ama dolaylý bir kýsýtlama daha var aslýnda, o da
+$u,v$'nin Lagrange iki fonksiyonunun taným alanýnda olma zorunluluðu.. Ve
+bu kýsýtlamalar iþte (6)'dan baþlayan üç denklemde aslýnda belirtiliyor. 
+Yani, çünkü eðer alttaki sýfýr ise
+
+$$
+\nabla f(x) + D h(x)^T u + A^T v = 0
+$$
+
+bu sadece ve sadece doðru olabilir $x$ eðer $x$ üzerinden $L(x,u,v)$'i
+minimize ediyorsa. Ki bu durumda 
+
+$$
+g(u,v) = L(x,u,v)
+$$
+
+doðru olur. Yani $x$ Lagrangian'ý minimize ediyorsa, taným itibariyle
+$L(x,u,v)$ eksi sonsuzluk deðildir. Deðil mi? Çünkü eksi sonsuzluða gidiþ
+olmasýn diye ikizde spesifik kýsýtlamalar getirdik. Ve bu da demektir ki
+$u,v$ Lagrangian'ýn taným alanýnda olmalý.
+
+Geriye Ýz Sürme
+
+Üstteki algoritmada \#4 adýmýnda bir adým atýldýðýný gördük, fakat bu adým
+atýlýrken $s$'nin nasýl bulunacaðýný anlatmadýk. Adým atýlýrken
+$y^+ = y + s \Delta y$ ile, $h_i(x) \le 0$, ve $u_i(x) > 0$ þartlarýnýn
+hala geçerli olmasýný garantilemek istiyoruz, ve $s$'yi bu olacak þekilde
+seçeceðiz. Tabii $y^+ = y + s \Delta y$ derken
+
+$$
+x^+ = x + s \Delta y
+$$
+
+$$
+u^+ = u + s \Delta y
+$$
+
+$$
+v^+ = v + s \Delta y
+$$
+
+demek istiyoruz. Bu seçim þöyle yapýlabilir, önce $s$'yi her öge için
+$u_i > 0, i=1,..,m$ olacak sekide mümkün en büyük adýmdan baþlarýz. Bu
+çözüm kolaydýr, çünkü her $u_i$ için her $\Delta u_i$ bizi sýfýra
+yaklaþtýrýyor mu, eðer yaklaþtýrýyorsa sýfýra gelmeden ne kadar uzaða
+gidebiliriz sorusunuz sorabiliriz, ve tüm bu uzaklýklar arasýndan en ufak
+olaný $s$ seçimi için baþlayacaðýmýz en büyük uzaklýk
+olacaktýr. Matematiksel olarak 
+
+$$
+s_{max} = \min \bigg\{
+  1, \min \{ -u_i / \Delta u_i : \Delta u_i < 0  \}
+\bigg\}
+$$
+
+Tabii harfiyen olurluk istiyoruz, yani $u > 0$ o zaman bulunan büyüklüðün
+0.999'ü kadarýný alýrýz. Bu deðeri alýnca oradan ``geriye iz sürmeye''
+baþlarýz, yani küçülte küçülte bu sefer $h$ þartlarýný da tatmin eden bir
+$s$ aramaya baþlayabiliriz. Bu aramayý yaparken $u$ iþaretini tatmin
+edeceðimizden eminizdir çünkü en büyük $s$'yi özellikle $u$ için ayarladýk.
+
+Döngünün bu aþamasýnda her küçültme sonrasý alttaki þartlarý da kontrol
+edeceðiz, þu þekilde;
+
+$s = \beta s$ yap, ta ki 
+
+1 - $h_i(x^+) < 0, i=1,..,m$. 
+
+2 - $|| r(x^+, u^+, v^+) ||_2 \le (1-\alpha s) || r(x,u,v) ||_2 $
+
+olana kadar. 2. þartta eþitsizliðin sol tarafý sarsýma uðratýlmýþ KKT
+koþullarý, onu $1-\alpha s$ oranýnda azaltýyorum.
+
+Ya da þu þekilde bakabiliriz, 1. kontrolda $s$'i ana olurluk tatmin
+oluncaya kadar azalt. Ondan sonra 2. adým üzerinden normal geriye iz sürme
+gerçekleþtir. 
+
+Artik elimizde ana-cift metotunu kodlamak icin gereken her sey var. Bir
+ornek uzerinde gorelim, standart form LP. 
+
+$$
+\min_x c^T x, \quad \textrm{öyle ki}
+$$
+$$
+Ax = b
+$$
+$$
+x \ge 0
+$$
+
+ki $c \in \mathbb{R}^n$, $A \in \mathbb{R}^{m \times n}$, $b \in \mathbb{R}^m$.
+
+Ikiz
+
+$$
+\max_{u,v} \quad \textrm{öyle ki}
+$$
+$$
+A^T u + u = c
+$$
+$$
+u \ge 0
+$$
+
+Bu formu ezberlemek aslýnda faydalý olabilir çünkü optimizasyonda baþka
+yerlerde bu formu görebilmek faydalý olabiliyor. 
+
+Ana-çift metotu bu problem üzerinde iþleyecek, ve bize olurluða çok yakýn
+olan hem ana hem de ikiz problem için bir çözüm verecek. $Ax=b$, ya da
+$A^T u + u = c$ þartýný tam olarak tatmin etmiyor olabilirim ama onlara
+yakýn bir yerde olacaðým. Tabii ana-çift metotu iþleyiþi sýrasýnda doðal
+olarak bu þartlara yakýn durmayabilir, o sebeple artýklarý kontrol
+ediyoruz. 
+
+Þimdi bu konunun tarihi hakkýnda biraz konuþalým. Lineer programlarý ilk
+çözen araþtýrmacý Dantzig, simplex adlý bir metodu keþfetti. Hala bu yöntem
+LP çözmek için en yaygýn metotdur. Ne yazýk ki onu LP'ler ötesine
+genelleþtirmek mümkün deðil, o sebeple bu derste onu iþlemedik. Ýç nokta
+metotlarý, kýyasla, çok daha geniþ bir problem sýnýfýnda geçerlidir, Newton
+metotu, gradyan iniþi, hep bu baðlamda devreye girer, vs. 
+
+Tabii simplex deðiþik bir mahluktur, ``direk yöntem'' denen bir metot
+sýnýfýndadýr, þimdiye kadar gördüðümüz metotlarda olduðu gibi döngü içinde
+daha iyi, daha iyi çözüme gitmiyor, en iyi, kesin çözümü bulmaya uðraþýyor
+[tabii lineerlik burada faydalý herhalde, ayrýksal þekilde seçenek arama
+açýsýndan, ama diðer yandan lineerlik ötesine geçilemiyor].
+
+Simplex iyi isler fakat bir sure sonra anlasildi ki en-kotu durum
+cetrefilligi oldukca kotu. 
+
+Ýç-nokta metotlarý simplex'den sonra geliþtirildi, burada 70'ler, 80'lerde
+müthiþ bir aktivite oldu. Khachiyan ve Karmarkar burada önemli isimler,
+LP'ler için ilk ispatlanabilir polinom zamanlý çözümü
+geliþtirdiler. Khachiyan'ýn metotu elipsoid yakasýmýný kullanýyordu, teorik
+olarak çok kuvvetliydi ama pratikte ne yazýk ki böyle olmadýðý görüldü,
+fakat en azýndan alternatif bir þekilde LP çözülebileceðini
+gösterdi. Karmarkar'ýn buluþu en önemlisi, buluþu bugün gördüðümüz ana-çift
+iç nokta yöntemine benziyordu, ispatlanabilir polinom hýzdaydý, ve pratikte
+oldukca verimliydi. Karmarkar'ýn yaklaþýmý iç-nokta alanýnda bir
+araþtýrma patlamasýna sebep oldu.  
+
+Örnekle devam edelim. Bir LP'yi ana-çift yöntemi ile çözeceðiz ve
+farklarýna bakacaðýz. Standart form LP'nin KKT koþullarý,
+
+$$
+A^T v + u = c
+$$
+$$
+x_i u_i = 0, i=1,..,n
+$$
+$$
+Ax = b
+$$
+$$
+x,u \ge 0
+$$
+
+Ýç-nokta yöntemleri ilk ve son iki þarta uyacak þekilde ayarlanýr ve döngü
+içinde yavaþ yavaþ 2. þartý yerine getirmeye uðraþýr [2, 13:47]. 
+
+Sarsýma uðratýlmýþ KKT þartlarý, üstteki formülde tamamlayýcý gevþeklik için
+eþitlikte $1/t$ kullanarak  elde edilir,
+
+$$
+A^T v + u = c
+$$
+$$
+x_i u_i = 1/t, \quad i=1,..,n
+$$
+$$
+Ax = b
+$$
+$$
+x,u \ge 0
+$$
+
+Sonra üstteki tüm eþitlik sýnýrlamalarýný alýyorum (eþitsizlikleri döngü
+sýrasýnda tatmin etmeye uðraþacaðým) ve onlarý bir matriste istifliyorum,
+
+$$
+0 = r_{pd}(x,u,v)
+$$
+
+$$
+= \left[\begin{array}{c}
+A^T v + u - c \\
+\diag(x) u - (1/t) \\
+Ax - b
+\end{array}\right]
+$$
+
+Sonra matrisin türevini alýyorum, bir lineer yaklaþýklama yaratýyorum,
+güncelleme yönünü buluyorum, geriye iz sürme yapýyorum, vs [2, 15:42]. 
+
+
+Genel olarak ana-çift yönteminin (log bariyere nazaran) daha büyük bir
+sistemi çözdüðünü söyleyebiliriz, $0 = r_{pd}(y + \Delta y) \approx
+r_{pd}(y) + D r_{pd}(y) + D r_{pd}(y) \Delta y$ diyoruz, ve alttaki sistemi
+çözüyoruz, 
+
+$$
+\left[\begin{array}{ccc}
+0 & I & A^T \\
+\diag(u) & \diag(x) & 0 \\
+A & 0 & 0 
+\end{array}\right]
+\left[\begin{array}{c}
+\Delta x \\ \Delta u \\ \Delta v  
+\end{array}\right] = -r_{pd}(x,u,v)
+$$
+
+Güncelleme için her $t$ ile tek bir adým atýyorum,m adým $y^+ = y + \Delta
+s$ (tabii $s > 0$ için çizgi aramasý yaparak) ama tek bir kez. Sonra 
+$t = \mu t$ ile $t$'yi güncelliyorum [1, 18:13]. 
+
+Ekler
+
+LP Kodu
+
+Altta þimdiye kadar anlatýlan metotlar ile çözüm yapan ve sonucu
+\verb!linprog! çaðrýsý ile karþýlaþtýran bir kod [5] görüyoruz. Çözülen
+problem [4, sf. 209]
+
+$$
+\min_x -x_1 - 5x_2 \quad \textrm{öyle ki}
+$$
+$$
+x_1 + x_2 + x_3  = 5 
+$$
+$$
+x_1 + 3 x_2 + x_4 = 7
+$$
+$$
+x_1,x_2,x_3,x_4 \ge 0
+$$
+
+
+\inputminted[fontsize=\footnotesize]{python}{pdl.py}
+
+\begin{verbatim}
+iteration #1; primal_obj = -6.00000, dual_obj = 12.00000; duality_gap = -18.00000
+iteration #2; primal_obj = -9.21750, dual_obj = -1.11750; duality_gap = -8.10000
+iteration #3; primal_obj = -11.15521, dual_obj = -9.33695; duality_gap = -1.81826
+iteration #4; primal_obj = -11.60327, dual_obj = -11.70816; duality_gap = 0.10489
+iteration #5; primal_obj = -11.64091, dual_obj = -11.69203; duality_gap = 0.05113
+iteration #6; primal_obj = -11.65622, dual_obj = -11.67707; duality_gap = 0.02084
+iteration #7; primal_obj = -11.66243, dual_obj = -11.67089; duality_gap = 0.00846
+iteration #8; primal_obj = -11.66495, dual_obj = -11.66838; duality_gap = 0.00344
+iteration #9; primal_obj = -11.66597, dual_obj = -11.66736; duality_gap = 0.00140
+iteration #10; primal_obj = -11.66638, dual_obj = -11.66695; duality_gap = 0.00057
+iteration #11; primal_obj = -11.66655, dual_obj = -11.66678; duality_gap = 0.00023
+Ax - b = [0. 0.]; ideally it should have been zero vector
+norm of Ax - b is = 0.0; ideally it should have been zero
+[3.50107272e-05 2.33331700e+00 2.66664799e+00 1.40040490e-05]
+Primal Feasibility  Dual Feasibility    Duality Gap         Step             Path Parameter      Objective          
+1.0                 1.0                 1.0                 -                1.0                 -6.0                
+0.1105388427842     0.1105388427842     0.1105388427842     0.8919387648961  0.1105388427842     -10.34625028215     
+0.001400532337055   0.00140053233704    0.00140053233704    0.9918943193656  0.00140053233704    -11.65623916548     
+7.115191880125e-08  7.11519194345e-08   7.115191920093e-08  0.9999491966235  7.115192025851e-08  -11.66666613752     
+3.556266503391e-12  3.557079864332e-12  3.557332206583e-12  0.9999500067836  3.557595982315e-12  -11.66666666664     
+Optimization terminated successfully.
+         Current function value: -11.666667  
+         Iterations: 4
+     con: array([1.18571819e-11, 1.18527410e-11])
+     fun: -11.66666666664022
+ message: 'Optimization terminated successfully.'
+     nit: 4
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([1.15454732e-13, 2.33333333e+00, 2.66666667e+00, 3.96953400e-12])
+\end{verbatim}
+
+QP Kodu
+
+[3]'den odev sorusu 11.24 cozumu olarak altta ana-çift yöntemi ile bir QP
+nasýl çözülür görüyoruz. QP þu formda,
+
+$$
+\min_x (1/2) x^T P x + q^T x \quad \textrm{öyle ki}
+$$
+$$
+Ax \le b
+$$
+
+\inputminted[fontsize=\footnotesize]{python}{pdq.py}
+
+\begin{verbatim}
+[[-4.50000029]
+ [ 2.25000012]
+ [-0.75000002]]
+\end{verbatim}
+
+
+Kaynaklar
+
+[1] Tibshirani, {\em Convex Optimization, Lecture Video 16 (Part 1)}, 
+\url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
+
+[2] Tibshirani, {\em Convex Optimization, Lecture Video 16 (Part 2)}, 
+\url{https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg}   
+
+[3] Boyd, {\em Convex Optimization I}, 
+    \url{http://web.stanford.edu/class/ee364a/}
+
+[4] Wright, {\em Linear Programming with MATLAB}
+
+[5] Kamal, {Linear Program Solvers},
+    \url{https://github.com/hasan-kamal/Linear-Program-Solvers}
+
+\end{document}
+
+
+
+
+

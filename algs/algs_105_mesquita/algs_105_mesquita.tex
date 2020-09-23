@@ -1,0 +1,374 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Oyun Teorisi ile Grup Kararlarý Tahmini
+
+Bruce de Mesquita mutabakata / anlaþmaya varma / savaþ konularýnda tahminler
+yapabilen bir araþtýrmacý. Girdi olarak alttaki gibi bir veriyi alýp,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfemis = pd.read_csv('emission.csv'); print dfemis
+\end{minted}
+
+\begin{verbatim}
+         Actor  Capability  Position  Salience
+0  Netherlands        0.08         4        80
+1      Belgium        0.08         7        40
+2   Luxembourg        0.03         4        20
+3      Germany        0.16         4        80
+4       France        0.16        10        60
+5        Italy        0.16        10        60
+6           UK        0.16        10        90
+7      Ireland        0.05         7        10
+8      Denmark        0.05         4       100
+9       Greece        0.08         7        70
+\end{verbatim}
+
+onu hangi mutabakatýn olacaðý tahmini için kullanabiliyor. Üstteki veri bazý
+ülkeler arasýnda orta boy arabalarda emisyon kontrolünü kaç sene sonra devreye
+sokulacaðý hakkýnda bir grup kararý. BDM'nin bu hesabý yapmak için iki yöntemi
+var, birincisi yarý-Oyun Teorisel (quasi Game Theoretic), ikincisi tam Oyun
+Teorik (ve daha kuvvetli bazý özellikleri var). Birinci model hakkýnda daha çok
+dokümantasyon var, bu model ile BDM pek çok baþarýlý tahmine de imza attý bu
+arada. Bu yazýda paylaþacaðýmýz birinci model ve onun kodlamasý.
+
+Veride güç / beceri (capability), ve ilgi (salience) parametreleri var. Bunlarýn
+ne olduðu belli. Pozisyon üzerinde anlaþmazlýk olan þeydir, her türlü karar
+ilginç bir þekilde tek boyutlu bir skala üzerinden temsil edilebiliyor, yani bir
+þey hiç istememek 0, çok istemek 100, ve arada tüm seçimler aradaki deðerler
+olabilir. Çok / az istemek arasýndaki her nokta belli seçenek kombinasyonlarýný
+bile barýndýrýyor olabilir.
+
+Oyunun sonucu ``evreler'' üzerinden iþlenir. Her evrede aktörler güçleri
+oranýnda diðer aktörleri kendi pozisyonlarýna davet ediyorlar, ya da
+etmiyorlar. Bir evrede her aktör pek çok diðer aktörden ``benim yanýma gel''
+isteði almýþ olabilir, evre sonunda aktör bu tekliflerden (offer) kendisi için
+en az deðiþim gerektirecek seçeneðe gidiyor (ilk baþlangýç noktasýna göre, bir
+öncekine göre deðil). Hoca bunu bu þekilde seçmiþ ve iyi bir seçim bizce çünkü
+doða enerji israfýný sevmez. Ýnsanlar da öyle!
+
+Ortalamalar
+
+Bir oyunun, herhangi bir evresi için, aðýrlýklý ortalama ve aðýrlýklý doruðu
+(mode) hesaplanabilir. Aðýrlýklý çünkü herkesin pozisyonunun basit ortalamasý
+deðil, kiþilerin ilgi ve gücü ile orantýlý bir ortalama. Aðýrlýklý ortalama için
+formül
+
+$$ \frac{\sum_{i=1}^{n} c_i s_i x_i}{\sum_{i=1}^{n} c_i s_i} $$
+
+Aðýrlýklý doruk için biraz takla lazým, önce tüm veriyi pozisyonlara göre
+sýralarýz, herkesin $c_is_i$ çarpýmýný hesaplayýp normalize ederiz, ve kümülatif
+olarak bu rakamlarý toplarýz. Hangi noktada 0.5'e eriþilmiþ ise o nokta
+``aðýrlýklý orta'' oluyor, ve o noktanýn pozisyonu doruk olarak kabul
+ediliyor. Hatýrlanabileceði üzere basit doruk hesabý için, yani düz bir liste
+sayý için, o sayýlar sýralanýyordu, ve ortadaki sayý mode olarak
+seçiliyordu. Burada ayný kavram sadece $c_i,s_i$ iþin içinde.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scholz
+dfiran.Salience = dfiran.Salience/100.
+game = scholz.Game(dfiran)
+print 'ortalama', game.mean()
+print 'mode', game.weighted_median()
+\end{minted}
+
+\begin{verbatim}
+ortalama 54.3833734112
+mode 50.0
+\end{verbatim}
+
+Her evrede hesaplanan ana formüller þunlar,
+
+$$ E(U_{ij}|\textrm{teklif et}) = (1-s_j)U_{si} + s_jP_i^i U_{si} + s_j(1-P_i^i)U_{fi} $$
+
+$$ E(U_{ij}|\textrm{teklif etme}) = QU_{sq} + (1-Q) \big( T U_{bi}) + (1-T)U_{wi} \big)$$
+
+$$ E(U_{ij}) = E(U_{ij}|\textrm{teklif et}) - E(U_{ij}|\textrm{teklif etme}) $$
+
+Teklif etmek bir diðer oyuncuyu pozisyonunu deðiþtirmesi için iknaya uðraþmak /
+ona ``sormak'' (challange).  Formülerin bileþenlerini altta açacaðýz. Önce genel
+faydadan baþlayalým. Fayda (utility) $U_{ij}^i$ aktör $i$'nin kendi pozisyonuna
+benzerliðe verdiði deðerdir, diðer aktör $j$ uzaksa buna atanan fayda az,
+yakýnsa çoktur.
+
+$$ U_{ij}^i = 1-2 \bigg| \frac{x_i - x_j}{x_{max}-x_{min}}\bigg|   $$
+
+$U_{ii}^i$ doðal olarak 1 deðerinde, aktör kendi pozisyonunda en çok
+faydayý görüyor. 
+
+Bir aktör bir diðer aktörü iknaya uðraþabilir. Bu durumda elde edeceði
+fayda -baþarýlý olursa- aktörün kendi pozisyon faydasý ve diðerinin
+arasýndaki uzaklýða oranlý görülebilir. Yani bana en uzak pozisiyondaki
+birini ikna etmek bana en çok fayda getirir, daha yakýn, daha az. Her
+aktörün içinde olduðu risk $ 0 \le r_i \le 1$ olacak þekilde (ki risk ile
+ne denmek istediðini ileride anlatacaðýz),
+
+$$ U_{si}^i = 2 - 4 \bigg[ \frac{2-(U_{ii}^i - U_{ij}^i)}{4}  \bigg]^{r_i}$$
+
+Kaybetme durumunda kaybedilen fayda $U_{fi}^i$ ise üstteki faydalar
+çýkartmalarýnýn ters çevirilmiþ hali olarak düþünebilirim, bir anlamda ikna
+edilmiþ olma durumu olabilir bu, ikna ettiðimde kazandýðýma göre
+edildiðimde kaybederim, ve bu çýkarma iþleminin ters çevirilmiþ hali gibi
+görülebilir, yani $ U_{ij}^i - U_{ii}^i$, o zaman
+
+$$ U_{fi}^i = 2 - 4 \bigg[ \frac{2-(U_{ij}^i - U_{ii}^i)}{4}  \bigg]^{r_i}$$
+
+$U_{ij}^i$ formülünü üstteki iki formüle sokarsak, ve $U_{ii}^i=1$ olduðuna
+göre, basitleþtirdikten sonra,
+
+$$ U_{si}^i = 2 - 4 
+\bigg[ 
+0.5 - 0.5 \bigg| \frac{x_i-x_j}{x_{max}-x_{min}} \bigg|
+\bigg]^{r_i}
+$$
+
+$$ U_{fi}^i = 2 - 4 
+\bigg[ 
+0.5 - 0.5 \bigg| \frac{x_j-x_i}{x_{max}-x_{min}} \bigg|
+\bigg]^{r_i}
+$$
+
+elde ederim.
+
+Yarýþma
+
+Nihai hesap için aktörler arasýndaki muhtemel bir yarýþta kim üstte kalýr,
+bunu hesaplamamýz gerekiyor. Bu ölçütü $v_i^{jk}$ ile gösterebilirim, yani
+aktör $i$ eðer aktörler $j,k$ arasýnda seçim yapmasý gerekirse kimi tercih
+eder? Daha doðrusu, $i$'nin oyu (vote) ne olur? Bunun formülü,
+
+$$ v_i^{jk} = c_is_i (U_{ij} - U_{ik}) $$
+
+olarak gösterilebilir. 
+
+\inputminted[fontsize=\footnotesize]{python}{scholz.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 'v'
+print game.v(1,0,2)
+print game.v(0,1,2)
+print game.v(0,2,3)
+\end{minted}
+
+\begin{verbatim}
+v
+63.1578947368
+84.2105263158
+94.7368421053
+\end{verbatim}
+
+Kabiliyet ve ilgi ile çarpmak mantýklý herhalde, çünkü aktörün oyunu
+hesaplýyoruz, bu oy aktörün gücüne oranlý olmalý. Hesapta $i$ aktörünün $j$'den
+elde edeceði faydayý $j$ faydasýndan çýkartýyoruz. $j$ solda olduðu için bu
+hesap, artý sayýlar baðlamýnda, $i$'nin $j$'yi tercihi olarak ta görülebilir,
+eðer $j$'ye verilen tüm oylarý hesaplamak istersek, o zaman her $i$ için yapýlan
+$v_i^{jk}$'leri toplayýp bölümde kullanmalýyýz, ve bölümde ise $j$'den gelen
+faydanýn daha fazla olduðu oylarý kullanmalýyýz,
+
+$$
+P^j = 
+\sum_{ U_{ij} > U_{ik} } v_i^{jk} \bigg/ 
+\sum_i \big| v_i^{jk} \big|
+$$
+
+Ýndiste $j$ kullanýmý biraz garip oldu, genellikle eþitliðin sol tarafýnda
+$i$ kullanmaya alýþtýk, ufak bir indis deðiþimi yapalým,
+
+$$
+P^i = 
+\sum_{ U_{ji} > U_{jk} } v_j^{ik} \bigg/ 
+\sum_j \big| v_j^{ik} \big|
+$$
+
+Üstteki hesap ``kim benimle beraber'' hesabý olarak ta görülebilir. Eðer daha
+fazla aktör bu kiþiyle beraber ise (bölümdeki kýsým), bu durum herhangi bir
+ikili çarpýþmada üstte kalýnabileceði anlamýna gelir. 
+
+Alttaki ``oyun aðacý (game tree)'' þöyle okunabilir, ana beklenti formülleri bu
+aðacýn ``düzleþtirilmiþ'' hali bir bakýma. Her seçenek, seçilebilecek her yol o
+yolun olasýlýðý ve nihai uç deðeri ile çarpýlýp toplanýyor.
+
+\includegraphics[height=9cm]{gametree.png}
+
+Kodlama açýsýndan bir yaklaþým [10]'da.
+
+\inputminted[fontsize=\footnotesize]{python}{bdm.py}
+
+Bu yaklaþýmý örnek olarak 1998'de Britanya'nýn Avro para birliðine girip
+girmeyeceði kararý üzerinde uygulayalým [6]. Alttaki deðerler Ýþçi Partisinin
+iktidarda olduðu senaryosuna göre seçilmiþ, Muhafazakar iktidarý seçeneðinde
+sadece aktörlerin gücü / etkileri deðiþiyor, pozisyonlar her iki durumda da
+ayný. Skalada güç 0-1 arasý, pozisyon 0-10.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfuk = pd.read_csv('uk_emu_labor.csv'); print dfuk
+\end{minted}
+
+\begin{verbatim}
+                       Actor  Capability  Position  Salience
+0      Isci Partisi (Avrocu)         1.0         8        40
+1  Isci Partisi (AB Karsiti)         0.5         4        40
+2     Ingiliz Merkez Bankasi         0.1         5        60
+3               Teknokratlar         0.1        10        40
+4                Sanayiciler         0.1         5        40
+5      Direktorler Enstitusu         0.1         4        40
+6                Finanscilar         0.1         9        60
+7     Muhafazakar AB Karsiti         0.3         1        95
+8   Muhafazakar AB Taraftari         0.3         6        50
+\end{verbatim}
+
+Oyunu isletince sonuc,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import bdm
+bdm.run("uk_emu_labor.csv",iter=5)
+\end{minted}
+
+\begin{verbatim}
+Isci Partisi (Avrocu) tarafina geciyor Sanayiciler
+Isci Partisi (AB Karsiti) tarafina geciyor Finanscilar
+Teknokratlar tarafina geciyor Sanayiciler
+Direktorler Enstitusu tarafina geciyor Finanscilar
+Finanscilar kaybediyor Sanayiciler
+Muhafazakar AB Karsiti tarafina geciyor Sanayiciler
+5.0
+Isci Partisi (AB Karsiti) tarafina geciyor Isci Partisi (Avrocu)
+Direktorler Enstitusu tarafina geciyor Isci Partisi (Avrocu)
+5.0
+5.0
+5.0
+5.0
+\end{verbatim}
+
+5 deðeri çýktý, ki bu [6]'daki sonuca yakýn. Eðer Muhafazakar Parti iktidarýna
+göre iþletirsek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import bdm
+bdm.run("uk_emu_cons.csv",iter=5)
+\end{minted}
+
+\begin{verbatim}
+Isci Partisi (Avrocu) tarafina geciyor Ingiliz Merkez Bankasi
+Isci Partisi (AB Karsiti) tarafina geciyor Ingiliz Merkez Bankasi
+Teknokratlar tarafina geciyor Ingiliz Merkez Bankasi
+Direktorler Enstitusu tarafina geciyor Ingiliz Merkez Bankasi
+Finanscilar tarafina geciyor Ingiliz Merkez Bankasi
+Muhafazakar AB Taraftari tarafina geciyor Ingiliz Merkez Bankasi
+1.0
+Isci Partisi (Avrocu) tarafina geciyor Muhafazakar AB Karsiti
+Isci Partisi (AB Karsiti) tarafina geciyor Muhafazakar AB Karsiti
+Teknokratlar tarafina geciyor Muhafazakar AB Karsiti
+Sanayiciler tarafina geciyor Muhafazakar AB Karsiti
+Direktorler Enstitusu tarafina geciyor Muhafazakar AB Karsiti
+1.0
+Ingiliz Merkez Bankasi tarafina geciyor Muhafazakar AB Karsiti
+Finanscilar tarafina geciyor Muhafazakar AB Karsiti
+Muhafazakar AB Taraftari tarafina geciyor Muhafazakar AB Karsiti
+1.0
+1.0
+1.0
+\end{verbatim}
+
+Sonuç 1, yani Avro'ya hiç destek yok. Bu pek beklenmez bir durum deðil, çünkü
+Ýngiltere'de Muhafazakarlar AB'ye zaten soðuk dururlar. Tarihten biliyoruz ki
+Britanya Avro'ya girmedi, hatta bilindiði gibi 2016'da referandumda AB'den çýkma
+kararý aldý!
+
+Ödev: Britanya'nýn AB'den çýkýþýný (Brexit) tahmini.  Mesquita'ya göre metotu
+için gereken ham veriyi yeterince haberleri izleyen herhangi biri
+yaratabilir. Aktörler herhalde üstteki örneðe yakýn olur, halkýn seçiminin bu
+aktörlerin seçimini yansýttýðý varsayýlabilir. Sonuç ne olur?
+
+Ýlk baþtaki emisyon örneði,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import bdm
+bdm.run("emission.csv",iter=10,xmin=4)
+\end{minted}
+
+\begin{verbatim}
+Belgium tarafina geciyor France
+Luxembourg orta noktada anlasiyor France
+Ireland tarafina geciyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland orta noktada anlasiyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0
+\end{verbatim}
+
+Yeni Model
+
+BDM'in yeni modeli yeni parametreler kullanýyor, örnek \verb!mugabe-full.csv!
+içinde bulunabilir. Uzun yýllar baþta kalan bir diktatör Mugabe'nin nasil o
+noktada kalabildiðini destekcileri uzerinden görmek mümkün, bir türlü gitmek
+bilmeyen liderlerin arkasýndaki dinamikleri anlamak için bilgilendirici
+herhalde!
+
+Hocanýn yeni modeli [4,9]'ta anlatýlýyor fakat, kodlamak için hala yeterli bilgi
+yok.
+
+Kaynaklar 
+
+[1] Stack Exchange, {\em Expected Utility Method and a Repeated Game Solution}, \url{http://math.stackexchange.com/questions/1366279/expected-utility-method-and-a-repeated-game-solution}
+
+[2] Bueno De Mesquita BB (1994) {\em Political forecasting: an expected utility
+method}. In: Stockman F (ed.) {\em European Community Decision Making}. Yale, CT:
+Yale University Press, Chapter 4, 71-104.
+
+[3] Scholz, {\em Unravelling Bueno De Mesquita's group decision model},
+\url{https://oficiodesociologo.files.wordpress.com/2012/03/scholz-et-all-unravelling-bueno-de-mesquita-s-group-decision-model.pdf}
+
+[4] {\em A New Model for Predicting Policy Choices: Preliminary Tests}
+\url{http://irworkshop.sites.yale.edu/sites/default/files/BdM_A%20New%20Model%20for%20Predicting%20Policy%20ChoicesREvised.pdf}
+
+[5] Eftekhari, {\em Preana: Game Theory Based Prediction with Reinforcement Learning}, \url{http://www.scirp.org/journal/PaperDownload.aspx?paperID=49058}
+
+[6] {\em The Predictability of Foreign Policies}, The British EMU Policy,
+\url{https://www.rug.nl/research/portal/files/3198774/13854.pdf}
+
+[7] J. Velev, Python Code, \url{https://github.com/jmckib/bdm-scholz-expected-utility-model.git}
+
+[8] {\em The Visible Hand}, \url{http://s3.amazonaws.com/os_extranet_files_test/27236_59690_fa12visible.pdf}
+
+[9] Mesquita, {\em The Predictioneer's Game}
+
+[10] Masad, {\em Replicating the replication of BDM's Expected Utility Model}, \url{https://github.com/dmasad/BDM_DecisionModel_Replication}
+
+
+
+\end{document}

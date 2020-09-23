@@ -1,0 +1,241 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Dinamik Programlama
+
+Dinamik programlamanýn (DP) temelinde ardý ardýna verilen kararlarýn
+bulunmasý / hesaplanmasý fikri vardýr; ilgilendiði problemler her verilen
+kararýn diðer karar seçeneklerini ortaya çýkardýðý türden problemlerdir, ve
+her seferinde bu seçeneklerin arasýndan bir tanesi seçilmelidir. Amaç en
+iyi karar zincirini bulmaktýr. Metot olarak kullanýlanlar kýsmen ``açgözlü
+algoritmalar (greedy algorithms)'' olarak bilinen algoritmalarýn yaptýðýna
+benzer fakat açgözlü algoritmalar en kýsa yolu bulmaya uðraþýrken, gezilen
+düðümlerde sadece ``o an için'' en iyi seçimi yapar. Bu tür seçim nihai
+sonuç göze alýndýðý zamanen iyi sonucu vermeyebilir. Alttaki grafiðe
+bakarsak,
+
+\includegraphics[height=6cm]{dp1.png}
+
+diyelim ki \verb!a! noktasýndan \verb!f! noktasýna en kýsa yoldan ulaþmaya
+çalýþýyoruz - açgözlü algoritma \verb!a,b,c,d! üzerinden gidiþ yapardý
+çünkü her an, sadece o an için en iyi olaný seçerdi. Fakat en iyi yol
+\verb!a,b,d! üzerinden giden yoldur. Gösterilen çizit / að yapýsý (graph)
+yönlü ve çevrimsiz (directed, acyclic graph -DAG-) olarak bilinen bir
+yapý. Tipik kýsa yol problemleri bu yapýlar üzerinde çalýþýrlar.
+
+DP problemleri özellikle bir problemi alt problemlere bölebildiðimiz zaman
+faydalýdýrlar, ve bu alt problemler tekrar tekrar hesaplanýyorlarsa da bu
+daha iyidir, çünkü DP o alt problemleri önbellekleyerek (caching) tekrar
+hesaplanmadan geri getirilmelerini saðlayabilir. 
+
+Üstteki en kýsa yol problemini DP ile çözelim.
+
+Önce bazý teorik, mantýksal konular: tümevarýmsal olarak düþünelim. Diyelim
+ki üstteki DAG'de $a,f$ arasýndaki en kýsa yolu kesinlikle
+``biliyoruz''. Ve yine diyelim ki bu yol üzerinde / bir ara nokta $x$
+noktasý var. O zaman, $a,x$, ve $x,f$ arasýndaki yollar da taným itibariyle
+en kýsadýr. Ýspatlayalým: eðer mesela $x,f$ arasýndaki en kýsa yol
+bildiðimizden {\em baþka} olsaydý, o zaman eldekini atýp o yolu kullanýyor
+olurduk (en kýsa olduðunu kesin biliyoruz ya), ve bu sefer o alternatif en
+kýsa olurdu. Fakat ilk baþta en kýsa yolu bildiðimiz faraziyesi ile
+baþladýk. Bir çeliþki elde ettik, demek ki ara noktanýn kýsalýðý doðrudur
+$\square$
+
+Bu ispattan hareketle kýsa yolu tek sayýsal (numeric) bir deðer olarak
+hesaplamaya uðraþabiliriz.
+
+Öyle bir fonksiyon $d(v)$ olsun ki herhangi bir $v$ nodu için o nod'dan
+bitiþ noktasýna olan en kýsa uzaklýðý kesin biliyor olsun (dikkat, bu
+hesabýn nasýl olacaðýný düþünmüyoruz þimdilik, sadece olabileceðini, olmuþ
+olduðunu farz ediyoruz). Çoðu tümevarýmsal tasarýmda olduðu gibi hesabýn
+kendisinin özyinelilik (recursive) çaðrý zincirinin mekaniði içinde
+halolmasýný amaçlýyoruz. Doðru olan bir ifadeyi düþünüyoruz öncelikle, ve
+hesabýn kendisini sürekli bir sonraki noktaya erteliyoruz. 
+
+Devam edelim: $u,v$ arasýndaki parça mesafeler $w(u,v)$'dir. Þimdi, eðer
+bir ara nokta $u$'ya gelmiþsek -yine tümevarýmsal olarak düþünmeye devam
+ediyoruz- bu noktanýn her komþusu $w$ için $d(w)$'yi ``bildiðimize'' göre,
+en kýsa yol için tek yapmamýz gereken her seçim anýnda en minimal $w(u,v) +
+d(v)$'yi  $u$'nun uzaklýðý olarak almaktýr.
+
+Veri yapýsý olarak DAG'ý alttaki gibi gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+DAG = {
+    'a': {'b':2, 'f': 9},
+    'b': {'d':2, 'c':1, 'f': 6},
+    'c': {'d':7},
+    'd': {'e':2, 'f': 3},
+    'e': {'f':4},
+    'f': {}
+}
+\end{minted}
+
+Böylece $w(u,v)$ basit bir Python sözlük (dictionary) eriþimi haline
+geliyor, \verb!a,b! arasý parça mesafe için 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print DAG['a']['b']
+\end{minted}
+
+\begin{verbatim}
+2
+\end{verbatim}
+
+En kýsa yolu bulacak program
+
+\inputminted[fontsize=\footnotesize]{python}{memo.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from memo import *
+
+def rec_dag_sp(W, s, t): 
+    @memo                                    
+    def d(u):
+        print 'Dugum:' + u[0]
+        if u == t:  print 'Son nokta t, geri donus'; return 0  
+        min_dist = min(W[u][v]+d(v) for v in W[u])  
+        print 'Geri donus,',u,'uzerindeyiz, mesafe=',min_dist
+        return min_dist
+    return d(s)                                 
+
+dist = rec_dag_sp(DAG, 'a', 'f')
+print 'toplam mesafe=', dist
+\end{minted}
+
+\begin{verbatim}
+onbellekte yok - a
+Dugum:a
+onbellekte yok - b
+Dugum:b
+onbellekte yok - c
+Dugum:c
+onbellekte yok - d
+Dugum:d
+onbellekte yok - e
+Dugum:e
+onbellekte yok - f
+Dugum:f
+Son nokta t, geri donus
+Geri donus, e uzerindeyiz, mesafe= 4
+onbellekte var - f
+Geri donus, d uzerindeyiz, mesafe= 3
+Geri donus, c uzerindeyiz, mesafe= 10
+onbellekte var - d
+onbellekte var - f
+Geri donus, b uzerindeyiz, mesafe= 5
+onbellekte var - f
+Geri donus, a uzerindeyiz, mesafe= 7
+toplam mesafe= 7
+\end{verbatim}
+
+Þimdi çaðrý mekaniðinin hakikaten nasýl iþlediðini görelim. Not: Önbellek
+kodlamasý dekoratör kullanýyor, dekoratörler hakkýnda bir yazý için [2].
+
+Baþlangýç $u$, oradan, minimum seçerken, sürekli $d()$ çaðrýsý yapýyoruz,
+yani $d()$ kendini çaðýrýyor. Çaðrýnýn geri dönmesinin tek yolu son noktaya
+eriþmek. Bu ne demektir? Programýmýz daha hesap yapmadan ``derinliðine bir
+dalýþ'' yapýyor. Son noktalara gelene kadar özyineli çaðrýlarý ardý ardýna
+uyguluyor, esas hesaplarý geri dönüþ sýrasýnda yapýyor. Bu nasýl ise
+yarýyor? Ayrýca önbelleklemenin hakikaten iþleyip iþlemediðini nasýl
+bileceðiz?  Ya da önbellekteki bir deðerin hep en iyisi olduðunu nereden
+bileceðim? 
+
+Bu arada, böyle bir yaklaþýmda, önbellek deðeri bir kez set edildi mi,
+hiç deðiþtirmeye gerek yok.
+
+Nokta \verb!d!'ye bakalým. Bu noktanýn mesafesi (yani son nokta \verb!f!'ye
+uzaklýðý) kararlaþtýrýlýrken algoritma \verb!d!'nin her komþusuna
+bakacaktýr, bunu \verb!for v in W[u])! ile yapacaktýr. Her komþu için
+\verb!f!'ye gelene kadar o yol derinliðine takýp edilecektir. Üstteki
+çýktýda görüyoruz ki \verb!d! sonrasý iki komþu \verb!e,f! için önce
+\verb!d-f! ve \verb!d-e-f! gidiþi yapýlmýþtýr (amaç hep o son noktaya
+ulaþmak, unutmayalým). 'Komþulara bakma ve aralarýndan en azý seçme''
+mantýðý tüm bu yollar denenene kadar bekleyecektir, ancak hepsi bittikten
+sonra içlerinden bir minimum seçecektir.
+
+Ýþte þimdi niye her düðümdeki minimum hesabýnýn en iyisi olduðunu
+anlýyoruz, çünkü o noktadan nihai noktaya varýþ için tüm alternatifler
+deneniyor. O derine dalýþýn sonuçlarý arasýndan bir tanesi
+seçiliyor. önbellekteki deðer bu sebeple bir kez set ediliyor, ve hiç
+deðiþmiyor. Tabii ki önbellekteki deðer tekrar tekrar kullanýlabiliyor,
+\verb!c!  için bir \verb!d! uzaklýðý gerektiðinde bu önbellekten servis
+edilecektir.
+
+Ve her düðümdeki minimum hesabý en iyiyse, bu hesaplarý kullanan baþlangýca
+yakýn noktalarýn hesabý da doðal olarak en iyisi (kýsasý) olacaktýr. Baþta
+tümevarýmsal olarak belirttiðimizin tekrar ifade edilmesidir bu. 
+
+Kýsa Yol Tarifini Bulmak
+
+Mesafe hesabý iþte böyle yapýlýyor... Peki en kýsa yolun kendisini nasýl
+biliriz? Yani önce þuraya, sonra þuraya git türünden yol tarifi bilgisi
+nasýl hesaplanýr? Aslýnda komþular arasýndaki en kýsa mesafeyi seçme
+problemi, o komþular içinden hangisinin o en mesafeyi saðladýðýný hatýrlama
+problemine oldukça benziyor. Yani, her düðüm üzerindeyken ve komþular
+arasýndan en kýsa mesafeyi seçerken, o mesafenin ``hangi komþudan''
+geldiðini hatýrlamak ve bunu bir yerlere kaydetmek yeterli. Her düðüm için,
+son noktaya olan en kýsa mesafe deðiþmediðine göre, ``o mesafe bilgisinin
+geldiði komþunun hangisi olduðu'' bilgisi de deðiþmeyecektir. Ve her nokta
+için o ``ebeveyn komþu'' bilindiði zaman herþey iþleyip bittikten sonra en
+kýsa yol tarifi için eldeki kayda bakarýz, ve baþlangýç noktasý
+\verb!a!'dan baþlayarak zýplaya zýplaya o ebeveyn zinciri ile sona kadar
+geliriz. Bu deðiþiklikleri ekleyince kod þu hale gelir,
+
+\inputminted[fontsize=\footnotesize]{python}{sp.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sp
+dist, parent = sp.rec_dag_sp2(DAG, 'a', 'f')
+print 'ebeveynler', parent
+\end{minted}
+
+\begin{verbatim}
+onbellekte yok - a
+onbellekte yok - b
+onbellekte yok - c
+onbellekte yok - d
+onbellekte yok - e
+onbellekte yok - f
+Geri donus, e uzerindeyiz, mesafe= 4
+onbellekte var - f
+Geri donus, d uzerindeyiz, mesafe= 3
+Geri donus, c uzerindeyiz, mesafe= 10
+onbellekte var - d
+onbellekte var - f
+Geri donus, b uzerindeyiz, mesafe= 5
+onbellekte var - f
+Geri donus, a uzerindeyiz, mesafe= 7
+ebeveynler {'a': 'b', 'c': 'd', 'b': 'd', 'e': 'f', 'd': 'f'}
+\end{verbatim}
+
+Not: \verb!argmin! bir liste içindeki en minimal deðerin indisini verir. 
+
+Ýþte sonuç. Baþlangýç \verb!a!, onun ebeveyni \verb!b!. \verb!b!'ye
+bakýyoruz, onunki \verb!d!. Oradan \verb!f!'ye atlýyoruz, ve sonuca eriþmiþ
+oluyoruz, en kýsa yol \verb!a-b-d-f!. 
+
+Analiz
+
+Açgözlü yaklaþýmdan bu yaklaþýmýn farkýný þimdi daha iyi görebiliriz,
+açgözlü teknik her düðümde en azý bizzat takip eder, ve kýsayol hesabý,
+mesafe hesabý hep bu takip eylemi sýrasýn o anda yapýlýr, elde bir toplam
+vardýr ve ona eklenir, vs. Bu yaklaþým daha hangi yolu seçtiði, sonradan,
+birkaç adým sonrasýnda hiçbir seçimle ilgilenmez. Dinamik Programlama ise
+takip etme eylemi ile hesap eylemini birbirinden ayýrýr, ve tümevarýmsal
+bir tanýmdan yola çýkarak, hep en kýsa, en optimali bulmayý baþarýr.
+
+DP algoritmasýnýn karmaþýklýðý, $M$ tane baðlantý (edges) ve $N$ tane düðüm
+için $O(N + M)$'dir. Yani çözüm lineer zamandadýr! Alt problemleri tekrar
+tekrar çözüyoruz evet, ve \verb!@memo! ibaresini koddan çýkartsaydýk
+algoritmamýzýn üstel (exponential) zamanda iþlediðini görürdük, ki bu çok
+kötüdür. Fakat çözülen alt problemleri bir daha çözmeyip sonuçlarýný
+önbellekten aldýðýmýz için algoritma son derece hýzlý iþliyor.
+
+Kaynaklar
+
+[1] Hetland, M., L., {\em Python Algorithms, 8. Bolum}
+
+[2] Bayramlý, {\em Dekoratorler, Onbellek Kodlamasi, Fonksiyon Degistirmek}, 
+    \url{https://burakbayramli.github.io/dersblog/sk/2013/07/onbelleklemeyi-dekorator-ile-yapmak.html}
+
+\end{document}

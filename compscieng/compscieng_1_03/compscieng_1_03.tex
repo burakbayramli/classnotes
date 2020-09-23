@@ -1,0 +1,267 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 3
+
+Konumuz $Au = b$ sistemini çözmek. Bu çözüm için Python'da
+\verb!linalg.solve! çaðrýsý var. Mesela
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg
+A = [[2,3,4],[5,5,6],[7,7,7]]
+b = [1,2,3]
+u = scipy.linalg.solve(A, b)
+print u
+\end{minted}
+
+\begin{verbatim}
+[ 0.14285714  0.42857143 -0.14285714]
+\end{verbatim}
+
+\verb!linalg.solve! çaðrýsý Matlab'de \verb!\! çaðrýsýnýn karþýlýðý,
+oradaki kullaným u = A \verb!\! b þeklinde. 
+
+Eðer elimizde ikinci bir \verb!c! vektörü var ise, ve eþitliðin sað
+tarafýnda \verb!b! sonrasý onu kullanmak istiyorsak ayrý ayrý \verb!solve!
+komutlarýna gerek yoktur. Her iki vektörü birbirine ekleyerek,
+\verb!solve!'u toplu halde çaðýrabiliriz, bu performans açýsýndan daha iyi
+olur. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+c = [2,3,8]
+bc = np.vstack((b,c)).T
+u = scipy.linalg.solve(A,  bc)
+print u
+\end{minted}
+
+\begin{verbatim}
+[[ 0.14285714 -1.28571429]
+ [ 0.42857143  5.14285714]
+ [-0.14285714 -2.71428571]]
+\end{verbatim}
+
+Python \verb!vstack! komutu iki matrisi üst üste koymak için kullanýlýr.
+
+Her iki çözüm beraber olarak geri gelecektir. Bu niye daha hýzlý? Çünkü
+Python'un çözücüsü daha eþitliðin sað tarafýna bile gelmeden sadece
+\verb!A!'ya bakarak bir sürü iþlem gerçekleþtiriyor, eliminasyon yaparak
+\verb!A!'yý üçgensel hale getirmek gibi. Bu tür iþlemleri gereksiz kere iki
+kere yapmak pahalý olurdu.
+
+Eðer $A$ karesel deðilse, ama biz her iki durumda da iþleyen bir komut
+istiyorsak, \verb!np.linalg.lstsq(A,b)! kullanabiliriz. 
+
+Soru: matematiksel olarak $u$'yu bulmak 
+
+$$ Au = b $$
+
+$$ u = A^{-1}b $$
+
+demektir. Peki Python bu hesap için gerçekten $A^{-1}$'i hesaplar mý?
+
+Hayýr. Çünkü büyük problemler için matris tersini hesaplamak oldukça
+pahalýdýr. Ayrýca $A$ matrisi zaten üçlü köþegen (tridiagonal) bir halde
+olabilir, ve cevap zaten hazýr haldedir, bu noktada ters alma iþlemi
+gereksiz olurdu. 
+
+Biraz zihin egzersizi yapalým. Eðer þöyle bir komut kullansam ne elde
+ederim (ki \verb!I! matrisi birim matrisi) ?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+solve(A, I)
+\end{minted}
+
+Cevap, tabii ki $A$'nin tersini elde ederim, yani $A^{-1}$ çünkü $AA^{-1} =I$,
+sað tarafta birim matrisi var ise çözüm sadece $A^{-1}$ olabilir.
+
+$$ 
+A 
+\left[\begin{array}{rrr}
+u_1 & u_2 & u_3
+\end{array}\right]
+=
+\left[\begin{array}{rrr}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{array}\right]
+ $$
+
+Bu probleme bakmanýn deðiþik bir yolu: sað taraftaki birim matrisi içindeki
+[1 0 0] gibi deðerler içindeki 1 deðerlerini birer zýplama (impulse) aný
+gibi görmek, sanki elimizde bir düz [0 0 .. 0] bir veri var, içinde tek
+zýplama olan yer orasý, ve bu [1 0 0], [0 1 0], .. içinde tek zýplama olan
+veriler ``iþlenerek'' bize $u_1$, $u_2$, .. gibi sonuçlarý veriyorlar. 
+
+Elle $A$'nin tersini bulmak için ne yapardýk? Bir blok matrisi yaratýrdýk,
+\verb![A Ý]!, yani 3x3 ve 3x3 iki matrisi yanyana koyup 3x6 boyutunda yeni
+bir matris elde ederdik, ve bu matriste $A$ üzerinde eliminasyon, pivotlarý
+sýfýrlama gibi numaralarý kullanarak onu birim matrise çevirirdik, bu arada
+ayný operasyonlarý tabii ki $I$ üzerinde uygulardýk. En sonunda $A$ birim
+olunca $I$ $A^{-1}$'e dönüþmüþ olurdu!
+
+Þimdi biraz büyük resme bakalým. 
+
+Lineer cebirin 4 büyük problemi Python komutlarý ile beraber þunlardýr:
+
+1) Eliminasyon, 
+\verb!scipy.linalg.lu(A)! $A = LU$
+
+2) Dikgenleþtirme (orthogonalization), 
+\verb!scipy.linalg.qr(A)!, $A = QR$
+
+3) Özdeðerler (eigenvalues), 
+\verb!scipy.linalg.eig(A)! $A = SAS^{-1}$
+
+4) Eþsiz deðerler (singular values), 
+\verb!scipy.linalg.svd(A)! $A = U \Sigma V^{T}$
+
+Eliminasyon ne yapar? Dikkat edersek aslýnda bu iþlemin bir alt üçgensel
+(lower triangular) matris ($L$) ve bir tane de üst üçgensel matris ($U$)
+ortaya çýkardýðýný görürüz. Þimdi alttaki matris üzerinde eliminasyon
+yapalým ve bu arada tersini de bulmuþ olalým. 
+
+$$
+\left[\begin{array}{rrr}
+1 & -1 & 0 \\
+-1 & 2 & -1 \\
+0 & -1 & 2 
+\end{array}\right]
+$$
+
+Eliminasyon iþlemlerini yapalým (pivotlar öðeleri parantez içinde)
+
+$$
+\left[\begin{array}{rrr}
+(1) & -1 & 0 \\
+-1 & 2 & -1 \\
+0 & -1 & 2
+\end{array}\right]
+\to
+\left[\begin{array}{rrr}
+(1) & -1 & 0 \\
+0 & (1) & -1 \\
+0 & 0 & (1)
+\end{array}\right] = U
+$$
+
+$$ l_{21} = -1 \quad l_{31} = 0 \quad l_{32} = -1 $$
+
+$$
+L = \left[\begin{array}{rrr}
+1 & 0 & 0 \\ -1 & 1 & 0 \\ 0 & -1 & 1
+\end{array}\right]
+$$
+
+$l_{21} = -1$ yapýlan ilk iþlemi kodluyor, 1. satýrý -1 ile çarp ve
+2. satýrdan çýkart anlamýna geliyor. Diðerlerini de sýrasýyla görüyoruz ve
+bu iþlemlerin sonucunda üst üçgensel matris $U$'yu elde ediyoruz. Tüm $l$
+deðerlerini bir araya koyup $L$'yi elde edebiliriz. Bir tane daha yapalým:
+
+$$
+\left[\begin{array}{rrr}
+2 & -1 & \\ -1 & 2 & -1 \\ & -1 & 2
+\end{array}\right]
+\to
+\left[\begin{array}{rrr}
+2 & -1 & 0 \\ 0 & 3/2 & -1 \\ 0 & 0 & 4/3
+\end{array}\right] = U
+$$
+
+$$ l_{21}=-\frac{1}{2}, \quad
+l_{31} = 0, \quad
+l_{32} = -\frac{2}{3}
+$$
+
+$$ L =
+\left[\begin{array}{ccc}
+1 &  &  \\ -1/2 & 1 &  \\ 0 & -2/3 & 1
+\end{array}\right] 
+$$
+
+
+Eðer eþsiz (singular) bir matris üzerinde eliminasyon yapsak, bu iþlemi
+nasýl etkilerdi? 
+
+$$
+\left[\begin{array}{rrr}
+(1) & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 1
+\end{array}\right]
+\to
+\left[\begin{array}{rrr}
+(1) & -1 & 0 \\ 0 & (1) & -1 \\ 0 & 0 & (0)
+\end{array}\right] 
+$$
+
+Yani bu durumda 3 tane pivot elde edemezdik, sað alt köþedeki deðer
+eliminasyon sýrasýnda 0 olurdu, ve sað matris, aynen sol matris gibi, eþsiz
+olurdu. Bu iþimize yaramazdý. 
+
+Ýki üstteki probleme dönelim: Burada ilk matris simetrik idi, ama $L$ ve $U$
+matrisi artýk simetrik deðil. Simetriyi geri getirebilir miyiz? $U$ içinden
+sadece çaprazlarý çekip çýkartalým
+
+$$
+\left[\begin{array}{rrr}
+(2) & -1 & 0 \\
+0 & (3/2) & -1 \\
+0 & 0 & (4/3)
+\end{array}\right] = U =
+\left[\begin{array}{rrr}
+2 & & \\ & 3/2 & \\ & & 4/3
+\end{array}\right] 
+\left[\begin{array}{rrr}
+1 & -1/2 & 0 \\ 0 & 1 & -2/3 \\ 0 & 0 & 1
+\end{array}\right]
+$$
+
+
+Böylece çaprazýnda
+$\left[\begin{array}{ccc} 2 & 3/2 & 4/3 \end{array}\right]$ olan bir matris
+elde ettik. Peki bu matrisin çarptýðý (onun hemen saðýnda) içinden
+çaprazlarý çekip çýkardýðýmýz matristen geri kalanlar tanýdýk geliyor mu?
+Evet, bu matris te $L^T$'e eþit. Demek ki $LU = LDL^T$ gibi bir ifade
+mümkün.
+
+Biliyoruz ki 
+
+$K = LDL^T$
+
+ifadesinde $K$ her zaman simetriktir. Ters yönden söylersek, herhangi bir
+simetrik $K$ matrisini alýp eliminasyon yaparsam ve $L$ ve $D$ elde edince,
+$L^T$ ile çarpabilirim. 
+
+Peki þunu ispat edebilir miyiz? Herhangi bir $L$ ve çapraz $D$ var ise,
+$LDL^T$ her zaman simetrik midir? Bir matrisin simetrik olmasý demek
+kendi devriðine (transpose) eþit olmasý demektir. Yani 
+
+$$ K = LDL^T $$
+
+$$ K^T = (LDL^T)^T $$
+
+Devriði alýnca parantez içindeki çarpýmlarýn sýrasý deðiþir.
+
+$$ = (L^T)^TD^TL^T $$
+
+$D^T = D$ çünkü $D$ zaten köþegen bir matris, önemli tüm deðerleri
+çaprazýnda ve devrik iþlemi bu durumu deðiþtirmiyor. O zaman
+
+$$ = LDL^T $$ 
+
+Tekrar baþladýðýmýz noktaya döndük. Demek ki baþladýðýmýz matris
+simetriktir. Ýspat tamamlandý. 
+
+Genele dönelim: $A^TA$'nin mesela karesel olduðunu biliyorduk ($n \times m$ ile
+$m \times n$ çarpýlýnca $n \times n$ boyutu elde edilir). Þimdi bunun üzerine
+simetrik olduðunu da artýk biliyoruz, üstte ispatladýk.
+
+Kural: Simetrik matrislerin tersi (inverse) de simetriktir. O zaman
+$K^{-1}$ de simetriktir. 
+
+\end{document}
+
+
+
+
+
+
+

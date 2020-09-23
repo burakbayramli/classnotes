@@ -1,0 +1,440 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Optik Karakter Tanýma, Yazý Tanýma (Optical Character Recognition -OCR-)
+
+OCR, iki dizini birbiriyle uyuþturma problemi olarak görülebilir. Dizi
+derken neden bahsetmek istediðimi anlatmaya uðrasayým. Çoðunlukla tanýmak
+istediðimiz görüntü bir kelime, bir sayý dizisidir, ve bu dizi ufak ya da
+büyük bir kelime olabilir. Girdi ise boyutlarý önceden tanýmlanan görüntüyü
+temsil eden veri parçalarý olacaktýr, bu görüntü bir kelimeye
+odaklanabilir, görüntü aktarýlmadan önce o kelime bir kare içine alýnmaya
+çalýþýr.
+
+Kelime görüntüsünü bir evriþim tabakasý üzerinden mesela iþlenmiþ veriler
+olarak parça parça, kesitler olarak alabiliriz. Ardýndan veri parçalarýnýn
+zamansal ilintilerini yakalayabilmek için onlarý bir LSTM katmanýna
+verebiliriz, ve her zaman adýmýndaki alfabe boyutundaki çýktýlar, bir
+vektör olarak, her hücrede belli bir harfin olma olasýlýðý olarak
+ayarlanabilir. Eðer en son katmandan sonra uygun bir hata fonksiyonu
+tanýmlayabilirsek bilinen etiketli kelimeler, onlarýn görüntüsünü içeren
+eðitim verisi üzerinden tüm bu yapýyý eðitebiliriz.
+
+\includegraphics[width=30em]{ocr_01.png}
+
+Üstteki figürde Ýngilizce apple (elma) kelimesini görüyoruz. Girdi görüntü
+(input image) geniþliði 128, yüksekliði 64 ve üç kanal var, bu kanallar her
+renk için R,G,B olabilir. Ýlk önce evriþimsel sinir aðý özellik çýkartma
+(CNN feature extraction) katmaný ile özellik bulmaya uðraþýlýyor, buradan
+(4,8,4) boyutunda bir tensor elde ediliyor. Bu tensor (16,8) boyutuna
+getiriliyor, bu yeni tensor'daki her kolon (biri yeþille iþaretli) önceki
+tensorda bir parçaya tekabül eder, yani kelime görüntüsünün bir parçasýna.
+
+Ardýndan þekillendirme (reshape) sonrasý alýnan yeni tensoru parça parça
+LSTM tabakasýna veriyoruz, ilk LSTM hücresi mesela alttaki gibi,
+
+\includegraphics[width=30em]{ocr_02.png}
+
+LSTM sonrasý tamamen baðlanmýþ (fully-connected) tabaka ve softmax ile
+alfabe tahmini üretiliyor. Bu örnekte alfabede 6 karakter var, bu sebeple
+vektör (6,1) boyutlu, karakterler 'a','e','l','p','z','-'. En son '-'
+karakteri ``boþ karakter'' demek, boþ karakterin niye lazým olduðunu
+göreceðiz. Vektördeki ilk hücre $y_a^1$ yani 'a', o noktada 'a'
+karakterinin olma olasýlýðý. Diðerleri o birinci hücre için aþaðý doðru
+$y_e^1$, $y_l^1$, vs. diye devam edecek. Þimdi tüm LSTM hücrelerini iceren
+resme bakalým,
+
+\includegraphics[width=35em]{ocr_03.png}
+
+Þimdi elimizde 8 tane 6 boyutlu softmax vektörü var. 
+
+Bu noktada iki sorumuz var: ilki YSA eðitimi baðlamýnda nasýl bir kayýp
+fonksiyonu bulalým ki uyan kelimeler için az, kötü uyanlar için yüksek
+rakam üretsin, ikincisi farklý boyutlardaki iki vektörün birbirine uymasý
+ne demektir? Tüm bunlar tabii ki üstteki softmax vektörlerini nasýl dekode
+edip bir kelime üretiriz sorusu ile yakýn alakalý.
+
+Uyum konusu önemli çünkü el yazýsý, ya da font seçimi dolasýyla bazý
+karakterler diðerlerinden daha fazla yer tutuyor olabilir. Ayný þey ses
+tanýma için de geçerli, ``merhaba'' derken kimisi ``meeeerhaba'' demiþ
+olabilir, burada 'e' harfinden daha fazla ses verisi alýnacaktýr, ama o
+noktada üzerinde olunan harf deðiþmemiþtir.
+
+Dekode için akla gelebilecek ilk yaklaþým her vektör için en yüksek
+olasýlýktaki hücreye tekabül eden karakteri seçmek (find the most probable
+symbol), sonra bir ek iþlem tabakasýna giderek bazý elemeler, düzeltmeler
+yaparak bir kelimeye eriþmeye uðraþmak. Mesela en olasýlý karakter seçimi
+sonrasý arka arka gelen tekrar eden harfleri çýkartýrýz, sonra boþ
+karakteri çýkartýrýz,
+
+\includegraphics[width=37em]{ocr_04.png}
+
+Tüm bunlar oldukca basit görünüyor. Fakat tüm bu iþlemleri bir kayýp
+fonksiyonu olarak kullanmak istersek iþler karýþýyor. Çünkü kelime bulmaya
+uðraþýrken softmax'lerde baþlangýçtan sona pek çok farklý gidiþ yolu var,
+tüm kombinasyonlarý iþlemek zor.
+
+\includegraphics[width=37em]{ocr_05.png}
+
+Ayrýca üstteki kýsaltma algoritmasý en iyi sonucu da her zaman
+vermeyebilir. Kombinasyon derken üstteki örnek için bile $6^8 = 1,679,616$
+tane seçenekten bahsediyoruz. Daha büyük bir sözlük, ve daha fazla LSTM
+adýmý için bu sayý astronomik boyutlara varabilir.
+
+Çözüm nedir? Seçenekler arasýndan uygun yolu bulup hesaplayan, ya da verili
+bir etiket için olurluk (likelihood) hesabý yapan bir yaklaþým var, buna
+baðlantýsal zamansal bedel (connectionist temporal cost) adý veriliyor,
+detaylar için [1,2,3]. CTC dinamik programlama kullanýr, ayrýca yolu
+hesaplarken Gizli Markov Modellerine benzer $\alpha,\beta$ fonksiyonlarý
+yaratýr, ve YSA öðrenimi baðlamýnda bu fonksiyonlar üzerinden gradyan
+hesabý mümkün oluyor, ve farklý boyuttaki girdi / çýktý arasýndaki uyuþma,
+eðitim iþte bu þekilde yapýlýyor.
+
+TensorFlow ile CTC
+
+TF ile CTC hesabýný görelim. Alttaki çýktýnýn daha önce þemasýný verdiðimiz
+YSA'ya benzer bir yapýnýn son adýmýndan çýkan softmax olasýlýklarý olduðunu
+düþünelim. Verinin satýrlarý her LSTM adýmý, her kolon alfabedeki farklý
+bir karakter. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+train_inputs_0 = np.asarray(
+    [[0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
+     [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
+     [0.0357786, 0.633813, 0.321418, 0.00249248, 0.00272882, 0.0037688],
+     [0.0663296, 0.643849, 0.280111, 0.00283995, 0.0035545, 0.00331533],
+     [0.458235, 0.396634, 0.123377, 0.00648837, 0.00903441, 0.00623107]],
+    dtype=np.float32)
+\end{minted}
+
+Bu yapý üzerinde için mesela \verb![0, 1, 2, 1, 0]! dizisini kontrol
+etmemiz istense dizinin kaybý / hatasý nedir?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import tensorflow as tf
+
+def sparse_tuple_from(sequences, dtype=np.int32):
+    indices = []
+    values = []
+    for n, seq in enumerate(sequences):
+        indices.extend(zip([n] * len(seq), range(len(seq))))
+        values.extend(seq)
+    indices = np.asarray(indices, dtype=np.int64)
+    values = np.asarray(values, dtype=dtype)
+    shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
+    return indices, values, shape
+
+train_seq_len = [5]
+num_features = 6
+
+tf.reset_default_graph()
+
+targets = tf.sparse_placeholder(tf.int32)
+logits1 = tf.placeholder(tf.float32, [None, num_features] )
+logits2 = tf.reshape(logits1, [1, -1, num_features])
+logits3 = tf.transpose(logits2, (1, 0, 2))
+seq_len = tf.placeholder(tf.int32, [None])
+loss = tf.nn.ctc_loss(targets, logits3, seq_len)
+decoded, log_prob = tf.nn.ctc_greedy_decoder(logits3, seq_len)
+
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     train_targets = sparse_tuple_from([[0, 1, 2, 1, 0]])     
+     feed_t = { logits1: train_inputs_0, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+\end{minted}
+
+\begin{verbatim}
+kayýp [ 7.27719784]
+\end{verbatim}
+
+Farklý veri, farklý çýktý,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+train_inputs_1 = np.asarray(
+    [[0.30176, 0.28562, 0.0831517, 0.0862751, 0.0816851, 0.161508],
+     [0.24082, 0.397533, 0.0557226, 0.0546814, 0.0557528, 0.19549],
+     [0.230246, 0.450868, 0.0389607, 0.038309, 0.0391602, 0.202456],
+     [0.280884, 0.429522, 0.0326593, 0.0339046, 0.0326856, 0.190345],
+     [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
+    dtype=np.float32)
+
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     train_targets = sparse_tuple_from([[0, 1, 1, 0]])     
+     feed_t = { logits1: train_inputs_1, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+\end{minted}
+
+\begin{verbatim}
+kayýp [ 8.08572388]
+\end{verbatim}
+
+Þimdi ilginç bir veri, burada veri direk 2. karakter olsun diyor. O zaman
+buna uyan çýktýlar alçak (kayýp az), uymayanlar yüksek sonuç vermeli,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+train_inputs_2 = np.asarray(
+    [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+     [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]],
+    dtype=np.float32)
+
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     train_targets = sparse_tuple_from([[2, 2, 2]]) 
+     feed_t = { logits1: train_inputs_2, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+
+     train_targets = sparse_tuple_from([[0, 1, 1, 0]]) 
+     feed_t = { logits1: train_inputs_2, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res = sess.run(loss, feed_t)     
+     print u'kayýp', res
+\end{minted}
+
+\begin{verbatim}
+kayýp [ 7.21795845]
+kayýp [ 10.21795845]
+\end{verbatim}
+
+Dekode
+
+TF CTC ile dekode iþlemi de yapýlabilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}        
+with tf.Session() as sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     feed_dec = { logits1: train_inputs_0, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
+     
+     feed_dec = { logits1: train_inputs_1, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
+     
+     feed_dec = { logits1: train_inputs_2, seq_len: train_seq_len }
+     decoded_res = sess.run(decoded, feed_dec)     
+     print 'dekode', decoded_res
+\end{minted}
+
+\begin{verbatim}
+dekode [SparseTensorValue(indices=array([[0, 0],
+       [0, 1],
+       [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
+dekode [SparseTensorValue(indices=array([[0, 0],
+       [0, 1],
+       [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
+dekode [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]
+\end{verbatim}
+
+En son örnekte \verb!values=array([2])! sonucu geldi, yani dekode iþlemi
+doðru bir þekilde tüm adýmlar için tek bir seçim olan 2 seçimini yaptý. Bu
+seçim arka arkaya tekrarlanmýþ olacaktý tabii ki bu sebeple bir kez
+gösteriliyor, appleeee yerine apple demek gibi.
+
+Að Yapýsý ve Kod
+
+Þimdi örnek veriyi, alfabeyi geniþletelim ve að yapýsýný daha
+derinleþtirelim. Altta gösterilen að yapýsý [4] tezi ve onun esinlendiði
+[5] kütüphanesini baz alýyor. Nihai kodda teze göre bazý boyut
+deðiþiklikleri var, okur bunu akýlda tutarak diyagramlarý, iþlemleri takip
+edebilir. Mimaride ilk evriþim tabakasýnda arka arkaya iki evriþim ve max
+pool operasyonlarý var, sonra bir boyut deðiþtirme sonrasý tamamen
+baðlanmýþ (fully connected) bir tabakaya sonuç geçiliyor, oradan çýkan
+sonuç iki yönlü (bi-directional) GRU tabakasýna veriliyor. Bu zamansal YSA
+ilk baþta görülen tek LSTM seviyesinden daha çetrefil yani. GRU hücreleri,
+LSTM hücre yapýsýnýn biraz daha basitleþtirilmiþ halidir. Devam edelim,
+buradan çýkan sonuçlar bir baþka yoðun tabakaya oradan da softmax
+aktivasyonuna veriliyor, kayýp fonksiyonu CTC.
+
+\includegraphics[width=35em]{ocr_07.png}
+
+\inputminted[fontsize=\footnotesize]{python}{train.py}
+
+Eðitim verisi ne olacak? Burada ilginç bir teknik kullanacaðýz, bir
+kelimenin imajýný üretebilen yazýlýmlar var, yani masaüstünde Paint ya da
+Gimp ile bir imaj içine yazý yazmak gibi, bu kodlardan birini kullanýp,
+hatta üretilen imajý deforme bile ederek tanýma algoritmasýnýn iþini
+bilerek zorlaþtýrabiliriz, ve eðitime bu verileri sokarak, hiç ek eðitim
+verisi diskte tutmadan eðitim operasyonunu istediðimiz þekilde
+gerçekleþtiririz. Bir örnek kelime imajý üretelim mesela,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import util
+
+img_w = 256
+img_h = 64
+
+img_gen = util.TextImageGenerator(minibatch_size=1,
+                                  img_w=img_w,
+                                  img_h=img_h,
+                                  downsample_factor=4,
+                                  absolute_max_string_len=12)
+
+for x in img_gen.next_train(): break
+img = x[0]['the_input'].reshape(img_w,img_h).T
+print x[0]['source_str'],
+plt.imshow(img,cmap='gray',interpolation="none")
+plt.savefig('ocr_06.png')    
+\end{minted}
+
+\begin{verbatim}
+[u'daxco7mu1']
+\end{verbatim}
+
+Ýmaj neye benziyor?
+
+\includegraphics[width=20em]{ocr_06.png}
+
+Eðitim verisini üreteç (generator) tekniði [6] üzerinden yaratýyoruz dikkat
+edildiyse, üreteç eðitim verisini bir gezici arayüzü üzerinden eðitim
+rutinine vermemizi saðlýyor. Üreteç, döngüsünde her dönüldüðünde ve çaðýran
+veri istendiðinde rasgele bir kelime üretir, bu kelimeyi imaja çevirip
+etiketi ile birlikte çaðrýyý yapana veriyor. Üreteç yapýsýný kullanmanýn
+güzel tarafý çaðýran tarafýn döngü sözdizimini kullanabilmesi. Üstte tek
+bir kere dönüp çýktýk (tek imaj istiyorduk), eðitim mekanizmasý istediði
+kadar dönerek istediði kadar eðtim verisi alabilir.
+
+Görüldüðü gibi imaj biraz aþaðý doðru eðimli çýktý, bu iyi, çünkü gerçek
+dünyada olan þartlarý tekrarlamak istiyoruz, belki bir cep telefonunun
+çektiði resimdeki kelimeleri tanýyacaðýz ve telefonu mükemmel þekilde
+tutmak mümkün deðil, farklý açýlardan kelimeleri tanýyabilmek çok iyi
+olur. Ayrýca kullandýðýmýz rutin suni ``gürültü'' bile ekliyor, karlandýrma
+yapýyor mesela, hatta kelimenin imajýn çok farklý yerlerinden
+baþlatabiliyor. 
+
+Neyse, iþte bu þekilde üretilen veri üzerinden eðitimi yapýp raporlanan
+kaybý belli bir seviyeye indirdikten sonra (5,6 civarý mesela, fakat uzun
+süre sonra 2 seviyesi de mümkün), YSA hazýr demektir. Bizim önceden
+eðittiðimiz YSA'yý yükleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import train
+mfile = '/tmp/ocr.h5'
+
+pool_size = 3
+img_w = 256
+img_h = 64
+minibatch_size = 1
+model, test_func = train.get_model(img_w,img_h,minibatch_size,pool_size)
+model.load_weights(mfile)
+\end{minted}
+
+\begin{verbatim}
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+the_input (InputLayer)           (None, 256, 64, 1)    0                                            
+____________________________________________________________________________________________________
+conv1 (Conv2D)                   (None, 256, 64, 20)   100         the_input[0][0]                  
+____________________________________________________________________________________________________
+max1 (MaxPooling2D)              (None, 85, 21, 20)    0           conv1[0][0]                      
+____________________________________________________________________________________________________
+conv2 (Conv2D)                   (None, 85, 21, 20)    1620        max1[0][0]                       
+____________________________________________________________________________________________________
+max2 (MaxPooling2D)              (None, 28, 7, 20)     0           conv2[0][0]                      
+____________________________________________________________________________________________________
+reshape (Reshape)                (None, 28, 140)       0           max2[0][0]                       
+____________________________________________________________________________________________________
+dense1 (Dense)                   (None, 28, 32)        4512        reshape[0][0]                    
+____________________________________________________________________________________________________
+gru1 (GRU)                       (None, 28, 256)       221952      dense1[0][0]                     
+____________________________________________________________________________________________________
+gru1_b (GRU)                     (None, 28, 256)       221952      dense1[0][0]                     
+____________________________________________________________________________________________________
+add_1 (Add)                      (None, 28, 256)       0           gru1[0][0]                       
+                                                                   gru1_b[0][0]                     
+____________________________________________________________________________________________________
+gru2 (GRU)                       (None, 28, 256)       393984      add_1[0][0]                      
+____________________________________________________________________________________________________
+gru2_b (GRU)                     (None, 28, 256)       393984      add_1[0][0]                      
+____________________________________________________________________________________________________
+concatenate_1 (Concatenate)      (None, 28, 512)       0           gru2[0][0]                       
+                                                                   gru2_b[0][0]                     
+____________________________________________________________________________________________________
+dense2 (Dense)                   (None, 28, 40)        20520       concatenate_1[0][0]              
+____________________________________________________________________________________________________
+softmax (Activation)             (None, 28, 40)        0           dense2[0][0]                     
+====================================================================================================
+Total params: 1,258,624
+Trainable params: 1,258,624
+Non-trainable params: 0
+____________________________________________________________________________________________________
+\end{verbatim}
+
+Þimdi üstteki örnek imajý tanýmaya uðraþalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import itertools
+
+def labels_to_text(labels):
+    ret = []
+    for c in labels:
+        if c == len(util.alphabet):  # CTC Blank
+            ret.append("")
+        else:
+            ret.append(util.alphabet[c])
+    return "".join(ret)
+
+
+def decode_batch(test_func, word_batch):
+    out = test_func([word_batch])[0]
+    ret = []
+    for j in range(out.shape[0]):
+        out_best = list(np.argmax(out[j, 2:], 1))
+        out_best = [k for k, g in itertools.groupby(out_best)]
+        outstr = labels_to_text(out_best)
+        ret.append(outstr)
+    return ret
+
+pred_result = decode_batch(test_func, x[0]['the_input'])[0]
+print pred_result
+\end{minted}
+
+\begin{verbatim}
+qaxco7mu4
+\end{verbatim}
+
+Fena deðil.
+
+Kaynaklar
+
+[1] Graves, {\em Supervised Sequence Labelling with Recurrent Neural Networks}, 
+    \url{https://www.cs.toronto.edu/~graves/preprint.pdf}
+
+[2] Graves, {\em How to build a recognition system (Part 2): CTC Loss}, 
+    \url{https://docs.google.com/presentation/d/12gYcPft9_4cxk2AD6Z6ZlJNa3wvZCW1ms31nhq51vMk}
+
+[3] Graves, {\em How to build a recognition system (Part 1): CTC Loss}, 
+    \url{https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI}
+
+[4] Troller, {\em Practical OCR system based on state of art neural networks}, 
+    \url{https://support.dce.felk.cvut.cz/mediawiki/images/2/24/Bp_2017_troller_milan.pdf}
+
+[5] Chollet, {\em Keras}, 
+    \url{https://github.com/fchollet/keras/blob/master/examples/image_ocr.py}
+
+[6] Bayramli, {\em Fonksiyon Gezmek ve Yield}, 
+    \url{https://burakbayramli.github.io/dersblog/sk/2011/02/fonksiyon-gezmek-ve-yield.html}
+
+\end{document}

@@ -1,0 +1,373 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Üstel Kanunlar (Power Laws)
+
+Bir web sitesini bir ayda ziyaret etmiþ olan özgün kullanýcý sayýsý
+üzerinden bir alarm programý yazmak gerekti diyelim. Eðer çok fazla
+kullanýcý var ise bir admin'e bir email gönderilecek.. Akla gelen
+çözümlerden aylýk kullanýcý sayýlarýnýn ortalamasýný alýp 2 ya da 3
+standart sapma kadar olan cevaplarý aykýrý deðer (outlier) olarak kabul
+etmek ve bu durumlarda alarm çalmak [1, sf. 255]. Çünkü, eh, veri
+noktalarýnýn yüzde 99.7'si 3 standart sapma içine düþer deðil mi?
+
+Burada gözardý edilen nokta þudur: verinin yüzde 99.7'si 3 standart sapma
+içine düþer {\em eðer veri Gaussian olarak daðýlmýþ ise}. Ayrýca ortalama
+hesabý da problemli, burada ilk akla gelebilecek Merkezi Limit Teorisi
+üzerinden örneklem ortalamasý gerçek ortalamaya yaklaþacaðý, ki bu çoðu
+daðýlým için doðrudur, fakat bazý daðýlýmlar üzerinde Merkezi Limit Teorisi
+iþlemez! Güç Kanunlarý ile istatistik biliminin sýnýrlarýna geliyoruz -
+gerçek dünyadan önümüze atýlan veriler artýk sýkça bir þekilde normal dýþý
+verileri içerebiliyor, ve bu durumlara hazýr olmamýz lazým.
+
+Üstte bahsettiðimiz senaryo için aslýnda elimizde veri var (pek çok ay
+için). Verinin histogramýna bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfvis=pd.read_csv('visits.csv',header=None,sep='\t',index_col=0)
+visits = np.array(dfvis[1])
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+dfvis.hist(bins=80)
+plt.ylim([0,50])
+plt.savefig('stat_powerlaw_05.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_powerlaw_05.png}
+
+Görüldüðü gibi bazý deðerlerden aþýrý çok var, bazýlarýndan neredeyse yok.
+Aþýrý deðerler her iki uçta da gözüküyor, büyük olanlardan daha az var,
+evet, ama oradaki yoðunluk dikkate alýnmaz seviyede de deðil. Bu arada eðer
+y eksenini ufaltmasaydýk aþýrý deðerler haricinde kalan deðerler üstteki
+kadar bile gözükmeyecekti.
+
+Olasýlýk yoðunluk fonksiyonu (probability density function),
+
+$$ p(x) = C x^{-\alpha}  $$
+
+$C$ bir normalizasyon sabiti, ki $\lambda > 0$ olmak üzere, daðýlýmýn
+parametresi. Bu daðýlýma üstel kanun (power law) ismi verilir. Zýpf, ya
+Pareto daðýlýmý üstteki formülün farklý þekilde temsilinden ibaret. 
+
+Her özgün $\lambda$ farklý bir üstel kanuna iþaret eder. Mesela $p(x) = C/
+x^2$ bir ustel kanun olabilir! Bildigimiz $x^2$'yi baz alan bir daðýlýmdan
+bahsediyoruz yani! $\alpha > 1$ olmalýdýr, sebebini altta
+göreceðiz. Doðadaki çoðu üstel kanun $2 < \alpha < 3$
+arasýndadýr. Beklentiyi hesaplayalým,
+
+$$ 
+E[X] = \int _{x_{min}}^{\infty} x p(x) \ud x  = 
+C \int _{x_{min}}^{\infty} x ^{-\alpha + 1} \ud x
+$$
+
+$$ = \frac{C}{2-\alpha} \bigg[ x ^{-\alpha+2}  \bigg] _{x_{min}}^{\infty} $$
+
+Bu ifadenin $\alpha \le 2$ için sonsuza gittiðine dikkat edelim,
+bahsettiðimiz gariplik burada... $x_{min}$'in ne olduðunu birazdan göreceðiz.
+
+Log-Log Grafikleri
+
+Üstel kanun daðýlýmlarýnýn ilk kez histogram log-log skalasýnda
+grafiklenince keþfedildiði düþünülmektedir, bir üstel kanun sürecinden
+gelen veriyi anlamaya çalýþýrken hem $p(x)$ hem $x$'in log'u alýnmýþtýr, ve
+bu grafik negatif eðimli düz çizgi olarak ortaya çýkmýþtýr. Yani
+
+$$ 
+\ln p(x) = -\alpha \ln x + c 
+\mlabel{1}
+$$
+
+Üstteki yaklaþýmla grafiði nasýl oluþturuz? Bunun için \verb!hist!
+çaðrýsýndan histogram grafiðini deðil, histogramdaki kutucuklarýn üç
+noktalarýný düz veri olarak almamýz lazým, ki bu deðerler $x$ deðerlerimizi
+oluþturacak, sonra onlarýn normalize edilmiþ deðerlerini almamýz gerekiyor
+[4], bu deðerler de $\ln p(x)$ olacak. Grafiklemeden önce elle log almamýza
+gerek yok, grafik rutinine skalayý log bazýnda ayarlamasýný söylememiz
+yeterli, \verb!xscale,yscale! çaðrýlarý ile bunu yapabiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def plot_power(data):
+    hst = plt.hist(data, normed=True,bins=1000)
+    f=plt.figure() # histogram halinden cik
+    x = hst[1][:-1]; y = hst[0]
+    plt.plot(x, y,'o')
+    plt.xscale('log')
+    plt.yscale('log')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plot_power(visits)
+plt.title('Ziyaretler')
+plt.ylim(1e-5,1e-3)
+plt.savefig('stat_powerlaw_04.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_powerlaw_04.png}
+
+Düz çizgiye benzer bir þekil ortaya çýktý, negatif eðimli, demek ki bir
+üstel kanun mümkün.
+
+Üstel kanunu yoðunluk formülüne nasýl eriþiriz? Baþlangýç önceden
+gösterdiðimiz formül olmak üzere,
+
+$$ \ln p(x) = -\alpha \ln x + c $$
+
+Eger $\ln(c) = C$ dersek, 
+
+$$ \ln p(x) = -\alpha \ln x + \ln C $$
+
+$$  = \ln C x^{-\alpha}  $$
+
+ve iki tarafý $e$ üzerine alýrsak,
+
+$$ p(x) = C x^{-\alpha}  $$
+
+Olasýlýk yoðunluk fonksiyonuna eriþtik. 
+
+$x_{min}$ Hesabý
+
+Dikkat edilirse $C x^{-\alpha}$ fonksiyonu $x \to 0$ iken sonsuza gidiyor
+(diverge), demek ki her $x \ge 0$ için yoðunluk fonksiyonu geçerli
+deðildir. O zaman üstel kanunun geçerli olduðu bir alt sýnýr olmalý. Bu alt
+sýnýra $x_{min}$ diyeceðiz.
+
+Artýk normalizasyon sabiti $C$'yi hesaplayabiliriz, 
+
+$$ \int _{x_{min}}^{\infty} C x^{-\alpha} = 1$$
+
+$$ \frac{C}{(-\alpha+1) } \bigg[ x^{-\alpha+1} \bigg] _{x_{min}}^{\infty} = 1$$
+
+$$ \frac{C}{(1-\alpha) } \bigg[ x^{-\alpha+1} \bigg] _{x_{min}}^{\infty} = 1$$
+
+Görülebileceði üzere bu formül sadece $\alpha > 1$ için anlamlýdýr, diðer
+durumlarda sonsuzluða gider. Demek ki üstel kanun daðýlýmý 
+için $\alpha > 1$ þartýný da getirmemiz gerekiyor. Devam edelim,
+
+$$ \frac{C}{(-\alpha+1) }  x_{min}^{-\alpha+1} = 1$$
+
+$$ C = (\alpha-1)x_{min}^{\alpha-1} $$
+
+$C$ ile beraber ve bazý düzeltmeler ardýndan $p(x)$ bazen þöyle
+gösteriliyor [5], 
+
+$$ p(x) = \frac{\alpha-1}{x_{min}}\bigg( \frac{x}{x_{min}} \bigg)^{-\alpha}  $$
+
+$\alpha,x_{min}$'i Kestirmek (Estimation)
+
+(1) formülüne bakarak bazýlarý lineer regresyon kullanarak $x_{min}$ hesabý
+yapabileceðini düþünüyor. Yani grafiðe bakýlýyor, eh ortada lineer bir
+durum var, regresyon ile eðim için bir tahmin elde ederim ve bu tahmini
+$\alpha$ için kullanýrým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+hst = plt.hist(visits, normed=True,bins=1000)
+visitx = hst[1][:-1];visity = hst[0]
+yy = np.log(visity);xx = np.log(visitx)
+yy = yy[visity>0];xx = xx[visity>0]
+df = pd.DataFrame([yy,xx]).T
+df.columns = [['y','x']]
+results = smf.ols('y ~ x', data=df).fit()
+print 'alpha', -1 * results.params[1]
+print 'kesi', np.exp(results.params[0])
+\end{minted}
+
+\begin{verbatim}
+alpha 0.540551473071
+kesi 0.00241514844497
+\end{verbatim}
+
+Bu basit yöntemin, ne yazýk ki, çok ciddi problemleri var. Bu metotun niye
+kullanýlmamasý gerektiði [3, sf. 31]'de bulunabilir.
+
+Alternatif yöntem þöyle; önce $\alpha$ için hýzlý çalýþan bir tahmin edici
+mevcut, bunu görelim; Maksimum olurluk üzerinden,
+
+$$ p(x;\alpha) = \prod _{i=1}^{n} \frac{\alpha-1}{x_{min}} \bigg( \frac{x_i}{x_{min}}\bigg)^{-\alpha}  $$
+
+Maksimum log olurluk,
+
+$$ \ln p(x;\alpha) = \ln \prod _{i=1}^{n} \frac{\alpha-1}{x_{min}} \bigg( \frac{x_i}{x_{min}}\bigg)^{-\alpha}  $$
+
+$$ = \sum _{i=1}^{n} \ln \frac{\alpha-1}{x_{min}} \bigg( \frac{x_i}{x_{min}}\bigg)^{-\alpha}  $$
+
+$$ = \sum _{i=1}^{n} \bigg[ \ln (\alpha-1) + \ln x_{min} - \alpha \ln \frac{x_i}{x_{min}} \bigg]   $$
+
+$$ = n \ln (\alpha-1) + n \ln x_{min} - \alpha \sum _{i=1}^{n}  \ln \frac{x_i}{x_{min}}   $$
+
+Maksimum deðer için $\alpha$'ya göre türevi alýp sýfýra eþitleriz ve
+çözeriz, $\ln(\alpha-1)$'in türevini hatýrlayalým bu arada,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sympy
+alpha = sympy.symbols('alpha')
+print sympy.diff(sympy.log(alpha-1))
+\end{minted}
+
+\begin{verbatim}
+1/(alpha - 1)
+\end{verbatim}
+
+$$ =  \frac{n}{(\alpha - 1)} - \sum _{i=1}^{n}  \ln \frac{x_i}{x_{min}}  = 0 $$
+
+$$  \frac{n}{(\alpha - 1)} = \sum _{i=1}^{n}  \ln \frac{x_i}{x_{min}}   $$
+
+$$ \frac{(\alpha - 1)}{n} =  \bigg( \sum _{i=1}^{n}  \ln \frac{x_i}{x_{min}} \bigg)^{-1}  $$
+
+$$ \hat{\alpha} =  1 + n  \bigg( \sum _{i=1}^{n}  \ln \frac{x_i}{x_{min}} \bigg)^{-1}   $$
+
+Fakat tahmin edicinin hesabý için $x_{min}$'i bilmek gerekiyor. Bir
+tavuk-yumurta problemi var, $\hat{\alpha}$ için $x_{min}$ gerekli, ama
+$x_{min}$'in kendisi de bilinmiyor. 
+
+O zaman üstteki tahmin ediciyi þöyle kullanýrýz; verideki her noktayý potansiyel
+bir $x_{min}$'mis gibi alýrýz (ve bu nokta altýndaki hiçbir noktayý dikkate
+almayýz, bu alt sýnýrý bunun için seçtik), ve bu nokta için yukarýdaki formül
+ile $\hat{\alpha}$'yi hesaplarýz, sonra elde ettiðimiz $x_{min}, \hat{\alpha}$
+ikilisini kullanarak (artýk özgün bir üstel kanun daðýlýmýmýz var), bu daðýlým
+ile veri arasýndaki uyum derecesini Kolmogorov-Þmirnov testi ile
+hesaplarýz. Elimizdeki $n$ veri noktasý için $n$ tane hesap elde ederiz, ve
+raporlanan mesafeler arasýndan en ufak olanýný seçeriz, ve bu mesafeye tekabül
+eden $x_{min},\hat{\alpha}$ ikilisini optimal parametreler olarak seçeriz. Altta
+örneði gösterilen \verb!powerlaw!  adlý paket [6] tam da bunu yapýyor. Ziyaret
+verisi üzerinde iþletelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import powerlaw
+fitvis = powerlaw.Fit(visits, discrete=False)
+print 'xmin', fitvis.xmin, 'alpha', fitvis.alpha
+\end{minted}
+
+\begin{verbatim}
+xmin 34.0 alpha 1.57060706124
+\end{verbatim}
+
+Hesaplanan $\alpha$ deðerinin lineer regresyondan gelen hesaptan ne kadar
+farklý olduðuna dikkat! 
+
+\verb!powerlaw! paketine, biraz önce yaptýðý tahminler üzerinden, üstel
+(exponential) daðýlýmýn mý, üstel kanun daðýlýmýnýn mý (isimler birbirine
+çok benziyor doðru) bu veri için daha olasý olduðunu sorabiliriz, daha
+doðrusu her iki daðýlým için Kolmogorov-Þmirnov testini iþletiriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print fitvis.exponential.KS()
+print fitvis.power_law.KS()
+\end{minted}
+
+\begin{verbatim}
+0.487151691713
+0.0312634791749
+\end{verbatim}
+
+Üstel kanun görüldüðü gibi daha olasý (p-deðer 0.05 altýnda). Bir olasýlýk
+hesabýný da elle yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x0 = 1e2
+p = x0**-fitvis.alpha
+C = (fitvis.alpha-1) * fitvis.xmin**(fitvis.alpha-1)
+print p*C
+\end{minted}
+
+\begin{verbatim}
+0.00308315744794
+\end{verbatim}
+
+Bazý farklý veriler üzerinde ayný hesaplarý görelim. Mesela 2003
+senesindeki en zengin 300 Amerikalýnýn net varlýklarýnýn daðýlýmý. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import powerlaw
+dfwl=pd.read_csv('wealth.dat',header=None)
+wealth=np.array(dfwl)[:,0]
+fitwl = powerlaw.Fit(wealth, discrete=True)
+print 'xmin', fitwl.xmin, 'alpha', fitwl.alpha
+print 'K-S testi', fitwl.power_law.KS()
+\end{minted}
+
+\begin{verbatim}
+xmin 1100000000.0 alpha 2.40575306524
+K-S testi 0.0432807151071
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plot_power(wealth)
+plt.savefig('stat_powerlaw_03.png')
+plt.hold(False)
+\end{minted}
+
+\includegraphics[height=6cm]{stat_powerlaw_03.png}
+
+Dikkat, çoðunlukla bu konularda araþtýrma yapanlar zengin, fakir herkesi
+kapsayan bir ölçüm üzerinden (bu konulara ilk bakan Pareto öyle yapmýþtý)
+tüm kazancýn üstel kanunu takip ettiðini söylerler, ki bu doðrudur. Üstteki
+sonuç, bunun üstüne, en zengin 400 kiþinin {\em kendi arasýnda} bile üstel
+kanunun iþlediðini söylemektedir. Yani zenginlik öyle dengesiz daðýlan bir
+þeydir ki, en zengin 400 içinde çoðunluk en tepedekilere göre daha
+fakirdir!
+
+Devam edelim: Herman Melville adlý yazarýn ünlü {\em Moby Dick} romanýndaki
+özgün kelimelerin kullanýlma frekansýnýn daðýlýmý,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import powerlaw
+
+dfwords=pd.read_csv('words.txt',header=None)
+words=np.array(dfwords)[:,0]
+fitw = powerlaw.Fit(words, discrete=True)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plot_power(words)
+plt.ylim(1e-6,1e-3)
+plt.savefig('stat_powerlaw_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_powerlaw_02.png}
+
+Bu arada \verb!powerlaw! paketinin bazý grafikleme özellikleri de
+var. Veriyle beraber tahmin edilen $-\alpha$ (düz çizgi olarak), üstel
+daðýlým (kýrmýzý çizgi) ve üstel kanun uyumunu ayný grafikte gösterebiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+f = plt.figure()
+fitw.power_law.plot_pdf(linestyle='--', color='g')
+plt.hold(True)
+fitw.exponential.plot_pdf(linestyle='--', color='r')
+plt.hold(True)
+fitw.plot_pdf(color='b', linewidth=2)
+plt.xlim(1e2,1e4)
+plt.ylim(1e-8,1e-4)
+plt.savefig('stat_powerlaw_01.png')
+plt.hold(False)
+\end{minted}
+
+\includegraphics[height=6cm]{stat_powerlaw_01.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 'Kolmogorov-Smirnov testi', fitw.power_law.KS()
+\end{minted}
+
+\begin{verbatim}
+Kolmogorov-Smirnov testi 0.00922886388026
+\end{verbatim}
+
+Kaynaklar
+
+[1] Janert, {\em Data Analysis with Open Source Tools}
+
+[2] Shalizi, {\em Advanced Data Analysis from an Elementary Point of View}
+
+[3] Causet, {\em Power-Law Distributions in Empirical Data}
+
+[4] Bayramlý, 
+    {\em Histogram Numaralari}, 
+    \url{https://burakbayramli.github.io/dersblog/sk/2015/10/histogram-numaralari.html}
+
+[5] Newman, {\em Power laws, Pareto distributions and Zipf's law}
+
+[6] Alstott, {\em powerlaw: A Python Package for Analysis of Heavy-Tailed Distributions}
+
+\end{document}

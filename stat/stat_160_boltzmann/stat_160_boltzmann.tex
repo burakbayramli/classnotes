@@ -1,0 +1,556 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Boltzman Makinalarý (Rasgele Hopfield Aðlarý) 
+
+Alttaki ifade bir Boltmann daðýlýmýný gösterir, 
+
+$$  
+P(x;W) = \frac{1}{Z(W)} 
+\exp \bigg[ \frac{1}{2} x^T W x \bigg]
+\mlabel{3}
+$$
+
+ki $x$ çok boyutlu ve -1,+1 deðerleri içeren bir vektör, $W$ simetrik ve
+çaprazýnda (diagonal) sýfýr içeren bir matristir, $n \times d$ boyutlarýndaki
+bir veri için $d \times d$ boyutlarýnda olacaktýr.  Boltzmann Makinalarý (BM),
+Kýsýtlý Boltzmann Makinalarý (Restricted Boltzmann Machines) kavramýna geçiþ
+yapmadan önce iyi bir durak noktasý.
+
+BM $W$ içinde aslýnda tüm deðiþkenlerin ikisel iliþkisini içerir. $W$ çok
+deðiþkenli Gaussian daðýlýmýndaki $\Sigma$'da olduðu gibi ikisel baðlantýlarý
+saptar. Veriden $W$'yu öðrenmek için olurluðu hesaplamak lazým. Olurluk
+(likelihood)
+
+$$  
+\prod _{n=1}^{N} P(x^{(n)};W) = \frac{1}{Z(W)} 
+\exp \bigg[ \frac{1}{2} x^{(n)^T} W x^{(n)} \bigg]
+$$
+
+Log olurluk
+
+$$  
+\mathcal{L} = \ln \big( \prod _{n=1}^{N} P(x^{(n)};W) \big) = 
+\sum _{n=1}^{N} \bigg[ \frac{1}{2} x^{(n)^T} W x^{(n)} - \ln Z(W) \bigg]
+\mlabel{1}
+$$
+
+Birazdan $\frac{\partial \mathcal L}{\partial w_{ij}}$ türevini alacaðýz, o
+sýrada $\ln Z(W)$'nin türevi lazým, daha doðrusu $Z(W)$'yi nasýl türevi alýnýr
+hale getiririz?
+
+$Z(W)$ normalizasyon sabiti olduðuna göre, daðýlýmýn geri kalanýnýn sonsuzlar
+üzerinden entegrali (ya da toplamý) normalizasyon sabitine eþittir,
+
+$$ 
+Z(W) = \sum_x  \exp \bigg[ \frac{1}{2} x^T W x \bigg]
+$$
+
+$$ 
+\ln Z(W) = \ln \bigg[ \sum_x  \exp \big( \frac{1}{2} x^T W x \big) \bigg]
+$$
+
+Log bazlý türev alýnca log içindeki herþey olduðu gibi bölüme gider, ve log
+içindekinin türevi alýnýrak bölüme koyulur. Fakat log içine dikkatli
+bakarsak bu zaten $Z(W)$'nin tanýmýdýr, böylece denklemi temizleme þansý
+doðdu, bölüme hemen $Z(W)$ deriz, ve türevi log'un içine uygularýz,
+
+$$ 
+\frac{\partial}{\partial w_{ij}} \ln Z(W) = 
+\frac{1}{Z(W)}
+\bigg[ 
+\sum_x \frac{\partial}{\partial w_{ij}} \exp \big( \frac{1}{2} x^T W x \big) 
+\bigg]
+$$
+
+$$ 
+\frac{\partial}{\partial w_{ij}} \exp \big( \frac{1}{2} x^T W x \big)  = 
+\frac{1}{2}  \exp \big( \frac{1}{2} x^T W x \big) 
+\frac{\partial}{\partial w_{ij}}x^T W x
+\mlabel{2}
+$$
+
+(2)'in içindeki bölümü açalým,
+
+$$ 
+\frac{\partial}{\partial w_{ij}}x^T W x = x_i x_j 
+$$
+
+Þimdi (2)'ye geri koyalým,
+
+$$ 
+= \frac{1}{2} \exp \big( \frac{1}{2} x^T W x \big) x_i x_j
+$$
+
+$$ 
+\frac{\partial}{\partial w_{ij}} \ln Z(W) = 
+\frac{1}{Z(W)}
+\bigg[ 
+\sum_x \frac{1}{2}  \exp \big( \frac{1}{2} x^T W x \big) x_i x_j
+\bigg]
+$$
+
+$$ 
+= \frac{1}{2} \sum_x 
+\frac{1}{Z(W)} \exp \big( \frac{1}{2} x^T W x \big) x_i x_j 
+$$
+
+$$ 
+= \frac{1}{2}  \sum_x P(x;W) x_i x_j
+$$
+
+Üstteki son ifadede bir kýsaltma kullanalým,
+
+$$ 
+\sum_x P(x;W) x_i x_j =  < x_i,x_j >_{P(x;W)}
+\mlabel{4}
+$$
+
+Artýk $\ln Z(W)$'nin türevini biliyoruz. O zaman tüm log olurluðun türevine
+(1) dönebiliriz, 
+
+$$  
+\frac{\partial \mathcal{L}}{\partial w_{ij}} = 
+\sum _{n=1}^{N} \bigg[ 
+\frac{\partial}{\partial w_{ij}}  \frac{1}{2} x^{(n)^T} W x^{(n)} - 
+\frac{\partial}{\partial w_{ij}}  \ln Z(W) \bigg]
+$$
+
+$$  
+= \sum_{n=1}^{N} 
+\bigg[ 
+\frac{1}{2} x_i^{(n)^T}x_j^{(n)} - 
+\frac{\partial}{\partial w_{ij}}  \ln Z(W) 
+\bigg]
+$$
+
+$$  
+= \sum _{n=1}^{N} 
+\bigg[ 
+\frac{1}{2} x_i^{(n)^T}x_j^{(n)} - 
+\frac{1}{2}< x_i x_j >_{P(x;W)}
+\bigg]
+$$ 
+
+1/2 sabitlerini atalým, 
+
+$$  
+= \sum _{n=1}^{N} 
+\bigg[ 
+ x_i^{(n)^T}x_j^{(n)} - < x_i x_j >_{P(x;W)}
+\bigg]
+$$
+
+Eðer 
+
+$$
+< x_i x_j >_{Data} = \frac{1}{N} \sum _{n=1}^{N}  x_i^{(n)^T}x_j^{(n)}
+$$
+
+olarak alýrsak, eþitliðin sað tarafý verisel kovaryansý (empirical
+covariance) temsil eder. Düzenleyince,
+
+$$ 
+N \cdot < x_i x_j >_{Data} = \sum _{n=1}^{N}  x_i^{(n)^T}x_j^{(n)}
+$$
+
+þimdi eþitliðin sað tarafý üç üstteki formüle geri koyulabilir,
+
+$$ 
+\frac{\partial \mathcal{L}}{\partial w_{ij}}  = 
+N \big[ < x_i x_j >_{Data}  - < x_ix_j >_{P(x;W)} \big] 
+$$
+
+Her ne kadar $N$ veri noktasý sayýsýný gösteriyor olsa da, üstteki ifade
+bir gradyan güncelleme formülü olarak ta görülebilir, ve $N$ yerine bir
+güncelleme sabiti alýnabilir. Gradyan güncelleme olarak görülebilir çünkü
+$w_{ij}$'ye göre türev aldýk, o zaman bizi $\mathcal{L}$'in minimumuna götürecek
+$w$ adýmlarý üstte görüldüðü gibidir. 
+
+(4)'te görülen $< x_ix_j >_{P(x;W)}$'in anlamý nedir? Bu ifade mümkün tüm $x$
+deðerleri üzerinden alýnýyor ve ikisel iliþkilerin olasýlýðýný ``mevcut
+modele'' göre hesaplýyor. Yani bu ifade de bir korelasyon hesabýdýr, sadece
+veriye göre deðil, tüm mümkün deðerler ve model üzerinden alýnýr. Bu hesabý
+yapmak oldukça zordur, fakat yaklaþýksal olarak Monte Carlo yöntemi ile
+hesaplanabilir. Nihayet MC ve MCMC metotlarýnýn kullanýlma sebebini görmeye
+baþlýyoruz; bu metotlar zaten aþýrý yüksek boyutlu, analitik çözümü
+olmayan, hesaplanamaz (intractable) entegraller (ya da toplamlar) için
+keþfedilmiþtir. 
+
+Yani bu ifadeyi hesaplamak için Monte Carlo simulasyonu kullanacaðýz. Tüm
+deðerleri teker teker ziyaret etmek yerine (ki bu çok uzun zaman alýrdý)
+mevcut modele en olasý $x$ deðerleri ``ürettireceðiz'', ve bu deðerleri
+alýp sanki gerçek veriymiþ gibi sayýsal korelasyonlarýný
+hesaplayacaðýz. Eðer veriler daðýlýmýn en olasý noktalarýndan geliyorlarsa,
+elimizde veri daðýlýmý ``iyi'' temsil eden bir veri setidir. Daha sonra bu
+korelasyon hesabýný deðeri gerçek veri korelasyonunundan çýkartýp bir sabit
+üzerinden gradyan adýmý atmamýz mümkün olacak.
+
+Gibbs Örneklemesi (Sampling)
+
+Gibbs örneklemesinin detaylarý için [5]. Bolzmann daðýlýmýndan örneklem
+almak için bize tek bir deðiþken (hücre) haricinde diðer hepsinin bilindiði
+durumun olasýlýk hesabý lazým, yani koþulsal olasýlýk
+$P(x_i = 1 | x_j, j \ne i)$. Yani $x$ üzerinde, biri hariç tüm öðelerin
+bilindiði durumda bilinmeyen tek hücre $i$'nin 1 olma olasýlýk deðeri,
+
+$$ 
+P(x_i = 1 | x_j, j \ne i) = \frac{1}{1 + e^{-a_i}} 
+$$
+
+ve,
+
+$$ 
+a_i = \sum_j  w_{ij}x_j 
+$$
+
+Bu koþulsal olasýlýðýn temiz / basit bir formül olmasý önemli, üstteki
+görülen bir sigmoid fonksiyonu bu türden bir fonksiyondur... Bu
+fonksiyonlar hakkýnda daha fazla bilgi [6] yazýsýnda bulunabilir.
+
+Ama, ana formül (3)'ten bu noktaya nasýl eriþtik? Bu noktada biraz türetme
+yapmak lazým. $x$ vektörü içinde sadece $x_i$ öðesinin $b$ olmasýný $x^b$ olarak
+alalým. Önce koþulsal daðýlýmda ``verili'' olan kýsmý elde etmek lazým. O
+uzaman
+
+$$ 
+P(x_j,j \ne i) = P(x^0) + P(x^1) 
+$$
+
+Bu bir marjinalizasyon ifadesi, tüm olasý $i$ deðerleri üzerinde bir toplam
+alýnca geri kalan $j$ deðerlerinin daðýlýmýný elde etmiþ oluruz. 
+
+$$  
+P(x_i = 1 | x_j,j \ne i)  = \frac{P(x^1)}{P(x^0) + P(x^1)} 
+$$
+
+çünkü $P(A|B) = P(A,B) / P(B)$ bilindiði gibi, ve $P(x^1)$ içinde $x_1=1$
+setini içeren tüm veriler üzerinden. 
+
+Eþitliðin sað tarafýnda $P(x^1)$'i bölen olarak görmek daha iyi, ayrýca
+ulaþmak istediðimiz $1/1 + e^{-a_i}$ ifadesinde $+1$'den kurtulmak iyi
+olur, böylece sadece $e^{-a_i}$ olan eþitliði ispatlarýz. Bunun her iki
+denklemde ters çevirip 1 çýkartabiliriz,
+
+$$  
+1 / P(x_i = 1 | x_j,j \ne i) = \frac{P(x^0) + P(x^1)}{P(x^1)} 
+$$
+
+$$
+= 1 + \frac{ P(x^0)}{P(x^1)}
+$$
+
+Bir çýkartýrsak, $\frac{ P(x^0)}{P(x^1)}$ kalýr. Bu bize ulaþmak
+istediðimiz denklemde $e^{-a_i}$ ibaresini býrakýr. Artýk sadece
+$\frac{P(x^0)}{P(x^1)}$'in $e^{-a_i}$'e eþit olduðunu göstermek yeterli.
+
+
+$$ 
+\frac{ P(x^0)}{P(x^1)} = \exp( x^{0^T}Wx^0 -   x^{1^T}Wx^1 )
+$$
+
+Þimdi $x^TWx$ gibi bir ifadeyi indisler bazýnda açmak için þunlarý yapalým, 
+
+$$ 
+x^TWx = \sum_{k,j} x_kx_jw_{kj} 
+$$
+
+Üstteki çok iyi bilinen bir açýlým. Eðer
+
+$$ 
+\sum_{k,j} \underbrace{x_kx_jw_{ij}}_{Y_{kj}} = \sum_{k,j}Y_{kj} 
+$$
+
+alýrsak birazdan yapacaðýmýz iþlemler daha iyi görülebilir. Mesela $k=i$
+olan durumu dýþ toplamdan dýþarý çekebiliriz
+
+$$ 
+= \sum_{k \ne i}\sum_j Y_{kj} + \sum_{j} Y_{ij}
+$$
+
+Daha sonra $j = i$ olan durumu iç toplamdan dýþarý çekebiliriz, 
+
+$$ 
+= \sum_{k \ne i}( \sum_{j \ne i} Y_{kj} + Y_{ki}) + \sum_{j} Y_{ij}
+$$
+
+Ýç dýþ toplamlarý birleþtirelim,
+
+$$ 
+= \sum_{k \ne i,j \ne i} Y_{kj} + \sum_{k \ne i}  Y_{ki} + \sum_{j} Y_{ij}
+$$
+
+$$ 
+= \sum_{k \ne i,j \ne i} Y_{kj} + \sum_{k}  Y_{ki} + \sum_{j} Y_{ij} + Y_{ii}
+$$
+
+Üstteki ifadeyi $ \exp( x^{0^T}Wx^0 -   x^{1^T}Wx^1 )$ için kullanýrsak,
+
+$$ 
+\exp 
+\big( 
+\sum_{k}  Y_{ki}^0 + \sum_{j} Y_{ij}^0 + Y_{ii}^0 - 
+( \sum_{k}  Y_{ki}^1 + \sum_{j} Y_{ij}^1 + Y_{ii}^1  )
+\big)
+$$
+
+$\sum_{k \ne i,j \ne i} Y_{kj}$ teriminin nereye gittiði merak edilirse,
+bu ifade $i$'ye dayanmadýðý için bir eksi bir artý olarak iki defa dahil
+edilip iptal olacaktý. 
+
+$$ 
+= \exp \big( 
+0 - ( \sum_{k}  Y_{ki}^1 + \sum_{j} Y_{ij}^1 + Y_{ii}^1  ) 
+\big)
+$$
+
+$W$'nin simetrik matris olduðunu düþünürsek, $\sum_{k}  Y_{ki}^1$ ile 
+$\sum_{j}Y_{ij}^1$ ayný ifadedir, 
+
+$$ 
+= \exp \big( 
+- ( 2 \sum_{j} Y_{ij}^1 + Y_{ii}^1  ) 
+\big)
+$$
+
+$W$ sýfýr çaprazlý bir matristir, o zaman $Y_{ii}^1=0$, 
+
+$$ 
+= \exp \big( 2 \sum_{j} Y_{ij}^1 \big) = \exp (- 2 a_i )
+$$
+
+Orijinal daðýlým denkleminde $1/2$ ifadesi vardý, onu baþta iþlemlere dahil
+etmemiþtik, edilseydi sonuç  $\exp (- a_i)$ olacaktý. 
+
+\inputminted[fontsize=\footnotesize]{python}{boltz.py}
+
+Fonksiyon \verb!draw! içinde, tek bir veri satýrý için ve sýrayla her
+deðiþken (hücre) için, diðer deðiþkenleri baz alýp diðerinin koþulsal
+olasýlýðýný hesaplýyoruz, ve sonra bu olasýlýðý kullanarak bir sayý üretimi
+yapýyoruz. Üretimin yapýlmasý için \verb!np.random.rand!'dan gelen 0 ve 1
+arasýndaki birörnek (uniform) daðýlýmdan bir rasgele sayýyý geçip geçmeme
+irdelemesi yeterli. Bir Bernoulli olasýlýk hesabýný üretilen bir rasgele
+deðiþkene bu þekilde çevirebilirsiniz. Bu niye iþler? Üstte belirttiðimiz
+irdelemeyi rasgele deðiþken olarak kodlarsak (ki bu da bir Bernoulli
+rasgele deðiþkeni olur), ve birörnek rasgele deðiþken $U$ olsun,
+
+$$ Y = 
+\left\{ \begin{array}{ll}
+1 & U < p \\
+0 & U \ge p \\
+\end{array} \right.
+$$
+
+Bu durumda $P(X=1) = P(U<p) = p$ olurdu. Neden? Çünkü üstte bir sürekli
+(continuous) bir birörnek deðiþken yarattýk, ve $P(U<p) = F_u(p) = p$.
+
+Devam edelim; Çaðrý \verb!sample! ise \verb!draw!'u kullanarak pek çok veri
+satýrýný içeren ve daðýlýmý temsil eden bir örneklem yaratmakla
+sorumlu. Bunu her örneklem satýrýný baz alarak bir sonrakini ürettirerek
+yapýyor, böylelikle MCMC'nin daðýlýmý ``gezmesi'' saðlanmýþ oluyor.
+
+Normalizasyon Sabiti
+
+Birazdan göreceðimiz örnek için normalizasyon sabitini de hesaplamamýz
+gerekecek. Niye? Mesela iki farklý BM daðýlýmýný farklý etiketli verilerden
+öðreniyoruz, sonra test veri noktasýný her iki ayrý daðýlýma ``soruyoruz''?
+Olasýlýðý nedir? Bu noktada kesin bir olasýlýk hesabý istediðimiz için
+artýk $Z$ bilinmek zorunda. Bu sabitin hesaplanmasý için ise
+$< x_ix_j >_{P(x;W)}$ için olduðu gibi, tüm mümkün $x$'ler üzerinden bir
+toplam gerekir, bu toplam $\sum_x \exp 1/2 x^T W x$ toplamý. Bu toplamýn
+hesaplanmasý çok zor olduðu için, yine MCMC'ye baþvuracaðýz. Tek fark
+alýnan örneklemi (3) formülüne geceðiz, ve bir olasýlýk hesabý yapacaðýz,
+ve bu olasýlýklarý toplayacaðýz. Tabii ayný $x$'i (eðer tekrar tekrar
+üretilirse -ufak bir ihtimal ama mümkün-) tekrar tekrar toplamamak için
+hangi $x$'lerin üretildiðini bir sözlük içinde hatýrlayacaðýz, yani bir $x$
+olasýlýðý sadece bir kere toplanacak.
+
+Þimdi ufak bir örnek üzerinde BM'i iþletelim. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import boltz
+A = np.array([\
+[0.,1.,1.,1],
+[1.,0.,0,0],
+[1.,1.,1.,0],
+[0, 1.,1.,1.],
+[1, 0, 1.,0]
+])
+A[A==0]=-1
+
+clf = boltz.Boltzmann(n_iter=50,eta=0.01,sample_size=200,init_sample_size=50)
+clf.fit(A)
+print 'W'
+print clf.W
+print 'normalizasyon sabiti', clf.C
+\end{minted}
+
+\begin{verbatim}
+Iteration 0
+Iteration 10
+Iteration 20
+Iteration 30
+Iteration 40
+W
+[[ 0.    -0.065 -0.06  -0.055]
+ [-0.065  0.     0.17   0.105]
+ [-0.06   0.17   0.    -0.09 ]
+ [-0.055  0.105 -0.09   0.   ]]
+normalizasyon sabiti 16.4620358997
+\end{verbatim}
+
+Sonuç $W$ üstte görüldüðü gibi. Örnek veriye bakarsak 2. satýr 3. kolonda
+artý bir deðer var, 1. satýr 4. kolonda eksi deðer var. Bu beklediðimiz bir
+þey çünkü 2. ve 3. deðiþkenlerin arasýnda bir korelasyon var, $x_2$ ne
+zaman 1/0 ise $x_3$ te 1/0. Fakat $x_1$ ile $x_4$ ters bir korelasyon var,
+birbirlerinin zýttý deðerlere sahipler. 
+
+Þimdi yeni test verisini daðýlýma ``soralým'', 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+test = np.array([\
+[0.,1.,1.,1],
+[1.,1.,0,0],
+[0.,1.,1.,1]
+])    
+print clf.predict_proba(test)
+\end{minted}
+
+\begin{verbatim}
+[ 0.0730905   0.05692294  0.0730905 ]
+\end{verbatim}
+
+Görüntü Tanýma
+
+Elimizde el yazýsý tanýma algoritmalarý için kullanýlan bir veri seti var.
+Veride 0,5,7 harflerinin görüntüleri var. Mesela 5 için bazý örnek
+görüntüler,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+Y = np.loadtxt('../../stat/stat_mixbern/binarydigits.txt')
+label = np.ravel(np.loadtxt('../../stat/stat_mixbern/bindigitlabels.txt'))
+Y5 = Y[label==5]
+plt.imshow(Y5[0,:].reshape((8,8),order='C'), cmap=plt.cm.gray)
+plt.savefig('boltzmann_01.png')
+
+plt.imshow(Y5[1,:].reshape((8,8),order='C'), cmap=plt.cm.gray)
+plt.savefig('boltzmann_02.png')
+
+plt.imshow(Y5[2,:].reshape((8,8),order='C'), cmap=plt.cm.gray)
+plt.savefig('boltzmann_03.png')
+\end{minted}
+
+\includegraphics[height=3cm]{boltzmann_01.png}
+\includegraphics[height=3cm]{boltzmann_02.png}
+\includegraphics[height=3cm]{boltzmann_03.png}
+
+Bu görüntüleri tanýmak için BM kullanalým. Eðitim ve test olarak veriyi
+ikiye ayýracaðýz, ve eðitim seti her etiketin $W$'sini öðrenmek için
+kullanýlacak. Daha sonra test setinde her veri noktalarýný her üç BM'ye
+ayrý ayrý ``sorup'' o test verisinin o BM'e göre olasýlýðýný alacaðýz, ve
+hangi BM daha yüksek olasýlýk döndürüyorsa etiket olarak onu kabul
+edeceðiz. Hangi BM daha yüksek olasýlýk döndürüyorsa, o BM ``bu verinin
+benden gelme olasýlýðý yüksek'' diyor demektir, ve etiket o olmalýdýr.
+
+\inputminted[fontsize=\footnotesize]{python}{testbm.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+!python testbm.py
+\end{minted}
+
+\begin{verbatim}
+Iteration 0
+Iteration 10
+Iteration 20
+Iteration 0
+Iteration 10
+Iteration 20
+Iteration 0
+Iteration 10
+Iteration 20
+Boltzmann Makinasi 0.975
+KNN 0.975
+\end{verbatim}
+
+Sonuç yüzde 97.5, oldukça yüksek, ve KNN metotu ile ayný sonucu aldýk, ki
+bu aslýnda oldukça temiz / basit bir veri seti için fena deðil.
+
+Biraz Hikaye
+
+Boltzman Makinalarýyla ilgilenmemizin ilginç bir hikayesi var. Aslýnda bu
+metottan haberimiz yoktu, ayrýca mevcut iþimizde 0/1 içeren ikisel
+verilerle çok hasýr neþirdik, ve bu tür verilerde ikisel iliþkiler
+(coöccürence) hesabý iyi sonuçlar verir, ki bu hesap basit bir matris
+çarpýmý ile elde edilir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy as np
+A = np.array([\
+[0.,1.,1.,0],
+[1.,1.,0, 0],
+[1.,1.,1.,0],
+[0, 1.,1.,1.],
+[0, 0, 1.,0]
+])
+c = A.T.dot(A).astype(float)
+print c 
+\end{minted}
+
+\begin{verbatim}
+[[ 2.  2.  1.  0.]
+ [ 2.  4.  3.  1.]
+ [ 1.  3.  4.  1.]
+ [ 0.  1.  1.  1.]]
+\end{verbatim}
+
+Burada bakýlýrsa 2. satýr 3. kolon 3 deðerini taþýyor çünkü 2. ve
+3. deðiþkenlerin ayný anda 1 olma sayýsý tam olarak 3. Sonra acaba bu
+bilgiyi veri üzerinde hesaplayýp bir kenara koysak bir daðýlým gibi
+kullanamaz mýyýz, sonra yeni veri noktasýný bu ``daðýlýma sorabiliriz''
+diye düþündük. Biraz matris çarpým cambazlýðý sonrasý, yeni veri noktasý
+için
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = np.array([0,1,1,0])
+print np.dot(np.dot(x.T,c), x) / 2
+\end{minted}
+
+\begin{verbatim}
+7.0
+\end{verbatim}
+
+gibi sonuçlar alabildiðimizi gördük; Bu deðerin iliþki matrisinin tam
+ortasýndaki 4,3,3,4 sayýlarýnýn toplamýnýn yarýsý olduðuna dikkat
+edelim. Yani $x$ çarpýmý iliþki matrisinin sadece kendini ilgilendiren
+kýsmýný çekip çýkarttý, yani 2. ve 3. deðiþenleri arasýndaki iliþkiyi
+toplayýp aldý.
+
+Buradan sonra, ``acaba bu bir daðýlým olsa normalizasyon sabiti ne
+olurdu?'' sorusuna geldik, ki [4] sorusu buradan çýktý ve bu soruya bomba
+bir cevap geldi. Sonra diðer okumalarýmýz sýrasýnda Boltzmann Daðýlýmýna
+ulaþtýk, bu daðýlýmýn ek olarak bir $\exp$ tanýmý var (ki türev alýmý
+sýrasýnda bu faydalý), ve tabii öðrenim için daha net bir matematiði
+var. Biz de maksimum olurluk ile [4]'teki fikrin sayýsal kovaryansa
+ulaþtýrýp ulaþtýrmayacaðýný merak ediyorduk, BM formunda verisel kovaryans
+direk elde ediliyor. Böylece BM konusuna girmiþ olduk. 
+
+Bitirmeden önce ufak not, BM'ler Kýsýtlý BM (RBM) için bir zýplama tahtasý,
+ve RBM'ler Derin Öðrenimin (Deep Learning) bir türü için kullanýlabilir, bu
+yapay sinir aðlarýný birden fazla RBM'leri üst üste koyarak elde etmek
+mümkün (gerçi son zamanlarda moda yaklaþým evriþimsel að -convolutional
+network- kullanmak).
+
+[1] D. MacKay, {\em Information Theory, Inference and Learning Algorithms}, sf. 523
+
+[2] Flaxman, {\em Notebook}, \url{http://nbviewer.ipython.org/gist/aflaxman/7d946762ee99daf739f1}
+
+[3] Stack Exchange, {\em From $P(x;W) = \frac{1}{Z(W)} \exp \bigl[ \frac{1}{2} x^T W x
+  \bigr]$ to Sigmoid}, \url{http://math.stackexchange.com/questions/1095491/from-pxw-frac1zw-exp-bigl-frac12-xt-w-x-bigr-to-sigmoid/}
+
+[4] Stack Exchange, {\em Calculating the sum $\frac{1}{2} \sum x^T \Sigma x$ for all $x \in
+  \{0,1\}^n$}, \url{http://math.stackexchange.com/questions/1080504/calculating-the-sum-frac12-sum-xt-sigma-x-for-all-x-in-0-1-n}
+
+[5] Bayramli, Istatistik, {\em Monte Carlo, Entegraller, MCMC}
+
+[6] Bayramli, Istatistik, {\em Lojistik Regresyon}
+
+\end{document}

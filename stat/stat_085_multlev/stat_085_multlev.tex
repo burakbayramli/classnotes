@@ -1,0 +1,223 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Çok Seviyeli Modeller (Multilevel Models)
+
+Lineer, lojistik regresyon tek seviyeli modellerdir; modellenen verinin
+regresyona bildirilen tüm katsayýlarýnýn hepsi, ayný anda kullanýlýr. Fakat
+bazý durumlarda, mesela coðrafi bir parametrenin modelin parçasý olduðu
+durumlarda daha deðiþik bir yaklaþým gerekli olabilir. Eðer regresyonumuzun
+katsayýlarýnýn belli bir grup için (þehir, okul, zaman, bölge, vs), her
+grup için farklý þekillerde veriye uydurulmasýný (fit) istiyorsak, o zaman
+çok seviyeli modelleri kullanmak gerekebilir.
+
+Altta gösterilen iki parametreli klasik regresyon 
+
+$$ y_i = \alpha + \beta x_i + \epsilon_i $$
+
+çok seviyeli modellerde mesela $\alpha$'yi, yani kesisi (intercept) her
+grupta farklý olacak þekilde uydurabilir,
+
+$$ y_i = \alpha_{j[i]} + \beta x_i + \epsilon_i $$
+
+Bu durumda her grup $j$'nin kendi kesi deðeri olacaktýr. Ya da her grubun
+kendi eðimi (slope) olacak þekilde $\beta$'nin gruptan gruba deðiþmesine
+izin verilebilir,
+
+$$ y_i = \alpha + \beta_{j[i]} x_i + \epsilon_i $$
+
+Ya da her ikisinin birden deðiþmesine izin verilebilir,
+
+$$ y_i = \alpha_{j[i]} + \beta_{j[i]} x_i + \epsilon_i $$
+
+Terminoloji
+
+Literatürde bazen çok seviyeli modeller hakkýnda sabit etkiler (fixed
+effects), rasgele etkiler (random effects) gibi kelimeler kullanýldýðýný
+görürsünüz. Bu terminolojiye göre grup seviyesinde deðiþmesine izin verilen
+$\alpha_j,\beta_j$ gibi parametrelere ``sabit etki'' adý veriliyor, çünkü o
+parametreler grup içinde deðiþmemektedir, modelin geri kalaný ise rasgele
+etki olacaktýr. Bu iki kavramýn karýþýmý da (ki neredeyse her zaman öyle
+olur) ``karýþýk etki (mixed effects)'' modeli olarak anýlýyor. Bu
+terminoloji biraz kafa karýþtýrýcý olabilir, bilinmesi iyidir böylece
+literatürü takip edebiliriz, ama biz [1]'deki tavsiyeyi kullanýp ``çok
+seviyeli modeller'' kelimelerini kullanacaðýz.
+
+Örnek
+
+Yeni bir ilacýn etkili olup olmadýðýný anlamak için hastalar (subject)
+üzerinde deneyler yapýlýr [2]. Bu veride ilginç olan hastanýn durumunun
+tekrar tekrar belli aralýklarla ölçülmesi, ve durumun (status) yeni bir
+veri satýrý olarak kaydedilmesi. Ayrýca rasgele seçilen hastalara ya ilaç,
+ya da etkisiz ilaç (placebo) veriliyor. Veride cinsiyet (gender), yaþ
+(age), tedavi merkezi numarasý (centre) kolonlarý var. Ýlk aydaki durum
+``baþlangýç noktasý (baseline)'' olarak ayrý bir kolona ayrýlýyor, ve ilk
+ay satýrlarý regresyon öncesi siliniyor. Soru þudur: ilaç etkili midir?
+
+Soru bir evet/hayýr sorusu olduðu için lojistik regresyon kullanacaðýz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.api as sm, pandas as pd
+import statsmodels.formula.api as smf
+df = pd.read_csv('respiratory.csv',index_col=0)
+baseline = df[df['month'] == 0][['subject','status']].set_index('subject')
+df['status'] = (df['status'] == 'good').astype(int)
+df['baseline'] = df.apply(lambda x: baseline.ix[x['subject']],axis=1)
+df['centre'] = df['centre'].astype(str)
+df = df[df['month'] > 0]
+print (df.head(4).to_string())
+\end{minted}
+
+\begin{verbatim}
+    centre treatment  gender  age  status  month  subject baseline
+112      1   placebo  female   46       0      1        1     poor
+223      1   placebo  female   46       0      2        1     poor
+334      1   placebo  female   46       0      3        1     poor
+445      1   placebo  female   46       0      4        1     poor
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+mdlm = smf.logit("status ~ baseline + month  + treatment + gender + \
+age + C(centre)", df)
+mdlmf = mdlm.fit()
+print(mdlmf.summary())
+\end{minted}
+
+\begin{verbatim}
+Optimization terminated successfully.
+         Current function value: 0.543694
+         Iterations 6
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 status   No. Observations:                  444
+Model:                          Logit   Df Residuals:                      437
+Method:                           MLE   Df Model:                            6
+Date:                Tue, 13 Nov 2018   Pseudo R-squ.:                  0.2071
+Time:                        12:00:13   Log-Likelihood:                -241.40
+converged:                       True   LL-Null:                       -304.47
+                                        LLR p-value:                 8.385e-25
+==========================================================================================
+                             coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+Intercept                  1.1436      0.426      2.682      0.007       0.308       1.979
+baseline[T.poor]          -1.8841      0.241     -7.802      0.000      -2.357      -1.411
+treatment[T.treatment]     1.3006      0.237      5.488      0.000       0.836       1.765
+gender[T.male]             0.1194      0.295      0.405      0.686      -0.458       0.697
+C(centre)[T.2]             0.6723      0.240      2.805      0.005       0.203       1.142
+month                     -0.0643      0.100     -0.646      0.518      -0.259       0.131
+age                       -0.0182      0.009     -2.050      0.040      -0.036      -0.001
+==========================================================================================
+\end{verbatim}
+
+Statsmodels altyapýsý kategorik gördüðü deðerleri 1-hot kodlamasýyla 1/0
+deðerli kolonlara çevirir, yani \verb!treatment[T.treatment]! tedavi
+uygulanýp uygulanmadýðýný gösteren 1/0 deðerli kolondur. Bir baþkasý
+\verb!treatment[T.placebo]!; fakat bu kolon regresyonda ``önemli''
+bulunmadýðý için üstte gösterilmemiþ. 
+
+Görülen katsayýlara göre tedavinin (treatment) katsayýsý 1.3,
+$exp(1.3)=3.66$. Yani tedavi katsayýsýndaki 1 birimlik deðiþiklik (ki bu
+0/1 bazlý bir deðiþken olduðu için tedavi uygulamak ya da uygulamamak
+anlamýna gelir), hastanýn iyileþmesinde 3.66 kat etki yaratýyor.
+
+Fakat bu regresyon sonuçlarýndaki standart hatalarýnýn bazýlarýndan pek
+memnun deðiliz, mesela gruplararasý deðiþkenlerin (between-subject
+covariates), yaþ gibi, standart hatalarý aþýrý ufak. Bunun sebebi regresyon
+iþleminin tüm veri satýrlarýný baðýmsýz (independent) kabul etmesidir, yani
+her satýrdaki verinin çoðu ayný kiþiye ait olsa bile farklý kiþilere aitmiþ
+gibi iþlenmektedir. Regresyon sonuçlarýný irdelerken sürekli tetikte olmak
+gerekir, görüldüðü gibi ufak hata bile bazen iyi bir þey olmayabiliyor!
+
+Peki çözüm nedir? Çok seviyeli modeller burada devreye girebilir. Eðer
+kiþiyi ve ona tekabül eden tüm verileri bir grup olarak alýrsak, o kiþi
+için alýnan tüm ölçümlerin tekrar eden kýsýmlarýnýn genele daha az etkide
+bulunmasýný saðlayabiliriz. Altta \verb!glmer! adlý komut üzerinden çok
+seviyeli regresyon örneðini görüyoruz, ayrýca R diliyle baðlantý kurmak ta
+burada gösteriliyor; Python \verb!statsmodels!'a bu fonksiyon daha
+taþýnmadý. Daha fazla detay için [3]'e bakýlabilir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%load_ext rpy2.ipython
+%R library(lme4)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%R -i df 
+%R p1 = "status ~ baseline + month + treatment + gender "
+%R p2 = "+ age + centre + (1 | subject) "
+%R params = paste(p1,p2)
+%R resp_lmer <- glmer(as.formula(params), family = binomial(), data = df)
+%R -o res res = summary(resp_lmer)
+%R -o exp_res exp_res = exp(fixef(resp_lmer))
+print res
+print exp_res
+\end{minted}
+
+\begin{verbatim}
+Generalized linear mixed model fit by maximum likelihood (Laplace
+  Approximation) [glmerMod]
+ Family: binomial  ( logit )
+Formula: status ~ baseline + month + treatment + gender + age + centre +  
+    (1 | subject)
+   Data: df
+
+     AIC      BIC   logLik deviance df.resid 
+   444.3    477.1   -214.2    428.3      436 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.8574 -0.3590  0.1427  0.3693  2.2393 
+
+Random effects:
+ Groups  Name        Variance Std.Dev.
+ subject (Intercept) 3.89     1.972   
+Number of obs: 444, groups:  subject, 111
+
+Fixed effects:
+                   Estimate Std. Error z value Pr(>|z|)    
+(Intercept)         1.68254    0.84436   1.993 0.046296 *  
+baselinepoor       -3.07838    0.60272  -5.107 3.26e-07 ***
+month              -0.10133    0.12518  -0.809 0.418257    
+treatmenttreatment  2.16325    0.55644   3.888 0.000101 ***
+gendermale          0.20249    0.67270   0.301 0.763402    
+age                -0.02546    0.02014  -1.264 0.206125    
+centre2             1.04667    0.54784   1.911 0.056064 .  
+---
+
+Correlation of Fixed Effects:
+            (Intr) bslnpr month  trtmnt gndrml age   
+baselinepor -0.367                                   
+month       -0.383  0.041                            
+trtmnttrtmn -0.178 -0.301 -0.031                     
+gendermale   0.065 -0.102 -0.003  0.219              
+age         -0.655 -0.015  0.009 -0.050 -0.263       
+centre2     -0.184  0.150 -0.015  0.058 -0.147 -0.223
+
+       (Intercept)       baselinepoor              month treatmenttreatment 
+        5.37919357         0.04603378         0.90363768         8.69940763 
+        gendermale                age            centre2 
+        1.22445202         0.97485954         2.84815273 
+
+\end{verbatim}
+
+\verb!(1+subject)! kullanýmý gruplamayý kiþi bazýnda yapýyor ve her grup
+için kesinin deðiþmesine izin veriliyor. Regresyonun sonucu 2.16,
+$exp(2.16)=8.67$, yani bu ilaç aslýnda hastanýn iyileþmesinde 8.67 kat
+etkili! Bu çok daha büyük bir rakam ve gerçek sonuç aslýnda bu. Yaþ
+deðiþkeninin standart hatasýna bakarsak, daha büyük olduðunu görüyoruz,
+yani bu katsayý daha uygun bir seviyeye gelmiþ bulunuyor.
+
+Kaynaklar
+
+[1] Gelman, Hill, {\em Data Analysis Using Regression and
+  Multilevel/Hierarchical Models}
+
+[2] Everitt, {\em A Handbook of Statistical Analysis Using R}
+
+[3] Bayramlý, 
+   {\em iPython, rpy2, rmagic}, 
+   \url{https://burakbayramli.github.io/dersblog/sk/2015/02/ipython-rpy2-rmagic.html}
+
+\end{document}
+
+
+

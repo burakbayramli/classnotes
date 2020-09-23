@@ -1,0 +1,114 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Açýk Anahtar Þifrelemesi (RSA, Public Key Cryptography)
+
+RSA þifrelemesi iki anahtar sistemiyle iþler. Kullanýcý kendisine anahtar
+üretmek istediðinde programý ona iki tane anahtar verir, biri açýk diðeri gizli
+tutulacaktýr, kullanýcý gizli anahtarý Web'e koymaz, güvenli yerde saklar, kendi
+diskinde tutar. Ve birazdan anlatacaðýmýz matematiksel özellikler sayesinde ve
+anahtarlar doðru seçildiðinde bir anahtar ile þifrelenen mesaj diðeri ile
+çözülebilir. Bu her iki yönde de olabilir, gizli ile þifrele açýk olanla çöz, ya
+da açýk olanla þifrele gizli olanla çöz.
+
+Bu matematiksel özelliðin pek çok kullaným alaný olabilir. En bariz olaný bana
+mesaj göndermek isteyen açýk anahtarýmý kullanarak þifreler, ve sadece ben
+okuyabilirim, çünkü gizli anahtarým ile þifreyi sadece ben çözebilirim. Diðer
+bir kullaným mesajýn benden geldiðinin doðrulanabilmesi; eðer bir mesajý gizli
+anahtarým ile þifreler ve yayýnlarsam (broadcast) ve mesajýn benden olduðunu
+söylersem, insanlar benim açýk anahtarýmý alýp bu mesajýn þifresini
+çözebilirler, mesaj tabii ki okunabilir bir metin olacaktýr, böylece mesajýn
+benden geldiðine inanýlýr.
+
+RSA'yý zor (hatta çok büyük anahtarlar ile neredeyse imkansýz) kýrýlabilen bir
+sistem yapan özellik asal sayýlar ve çarpanlara ayýrmakla alakalý. Özet þudur:
+Ýki asal sayýyý alýp çarparsam sonucu hem gizli hem açýk anahtarýmda
+kullanabilirim (nasýl, birazdan göreceðiz), ve herkes bu çarpýmý görebilir, ama
+o çarpýmý alýp hangi asal sayýlardan olduðunu bulmaya uðraþmak, yani geri yönde
+gitmek çok zordur. Burada ``kolay'' ve ``zor'' kelimeleri hesapsal çetrefillik
+(computational complexity) baðlamýnda, zor demek tüm seçeneklerin denenmesi
+gerektiði türden bir zorluk. Kýsayol yok. ``Kolay'' ise polinom hýzda iþleyen
+algoritma demektir, toplama, çýkartma, sýralamak bu tür algoritmalardýr.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ls = 'abcdefghijklmnopqrstuvyz'
+print ls[7],ls[8]
+m = 78
+\end{minted}
+
+\begin{verbatim}
+h i
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p1 = 53; p2 = 59
+n = p1*p2
+print 'n =',n
+phi_n = (p1-1)*(p2-1)
+print 'phi(n) =', phi_n
+\end{minted}
+
+\begin{verbatim}
+n = 3127
+phi(n) = 3016
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+e = 3
+d = int( (2 * (phi_n) + 1 ) / 3. )
+print d
+\end{minted}
+
+\begin{verbatim}
+2011
+\end{verbatim}
+
+$n,e$ haricinde her seyi sakla, onlar acik anahtar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import math
+c = int( math.pow(m,3) % n )
+print 'sifrelenmis mesaj', c
+\end{minted}
+
+\begin{verbatim}
+sifrelenmis mesaj 2375
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print pow(c,d,n)
+\end{minted}
+
+\begin{verbatim}
+78
+\end{verbatim}
+
+Üstteki \verb!pow! çaðrýsýnýn üstel bir hesabýn mod hesabý olduðuna dikkat,
+bu fonksiyon üstel hesabý yapmadan mod hesabý yapmayý saðlýyor, çünkü eðer
+önce üstel hesabý yapsak sonuç çok büyük olurdu, fakat mod dahil olunca bu
+hesabý yapmanýn daha hýzlý bir yolu var. Hesabýn temeli üstel almanýn ardý
+ardýna çarpým yapmakla eþdeðer olduðuyla alakalý ve mod çarpým kuralý
+alttaki gibidir,
+
+$$ 
+(a \cdot b) \mod m = [(a \mod m) \cdot (b \mod m)] \mod m
+$$
+
+Yani bir döngü içinde üstel kadar dönülür, ve o sýrada üstteki formülün
+uygun bir hali uygulanýr. Detaylar için [5]. 
+
+
+
+
+[devam edecek]
+
+
+
+Kaynaklar
+
+[3] Khanacademy, {\em RSA encryption: Step 4}, \url{https://youtu.be/UjIPMJd6Xks}
+
+[4] Samid, {\em RSA -- The Math}, \url{https://www.youtube.com/watch?v=EOhLZRwxaVo}
+
+[5] Wikipedia, {\em Modular exponentiation}, \url{http://en.wikipedia.org/wiki/Modular_exponentiation}
+
+\end{document}

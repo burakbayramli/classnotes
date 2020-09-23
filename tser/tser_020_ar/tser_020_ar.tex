@@ -1,0 +1,590 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama
+
+Kendisiyle Regresyon ve Yürüyen Ortalama (Autoregression, Moving Average)
+
+Bir zaman serisi rasgele yürüyüþe (random walk) sahipse $t$ anýndaki deðeri
+önceki rasgele hareketlerin, gürültülerin birleþimiydi. Diðer alternatif
+bir serinin {\em önceki deðerlerine} arada gürültü olmadan baðlantýlý
+olmasýdýr. Bu her iki yaklaþýmý genelleþtirerek ARIMA formunda
+gösterebiliriz. Ýlk önce AR formuna bakalým; Birinci seviyede kendisiyle
+regresyon (autoregression, first order) AR(1)'dýr [1, sf. 23],
+
+$$ 
+y_t = c + \phi y_{t-1} + \epsilon_t  
+\mlabel{1} 
+$$
+
+Daha yüksek seviyeler AR(p) olarak gösterilir, 
+
+$$ y_t = c + \phi_1 y_{t-1} +  \phi_2 y_{t-2} + ... +  \phi_p y_{t-p}  + \epsilon_t  $$
+
+Bu durumda $t$ anýndaki deðer önceki $t-1,..,t-p$ anýndaki deðerlerle
+(belli oranlar üzerinden tabii) artý gürültüye eþittir.
+
+Bir diðer zaman serisi yürüyen ortalama (moving average) serisidir, bu
+tür seriler $t$ anýný önceki {\em gürültülerin} bir ortalamasý olarak
+gösterir. Dikkat, önceki tüm gürültüleri olduðu gibi toplamýyoruz, belli
+sayýdaki önceki gürültüleri belli aðýrlýklar üzerinden topluyoruz. Birinci
+seviyede bu seriler MA(1) olarak tanýmlanýr,
+
+$$ y_t = \mu + \epsilon_t + \theta \epsilon_{t-1} $$
+
+Daha yüksek seviyeleri MA(q) olarak tanýmlarýz, 
+
+$$ y_t = \mu + \epsilon_t + \theta_1 \epsilon_{t-1} + .. + \theta_q \epsilon_{t-q} $$
+
+Pratikte pür birer AR(p) ya da MA(q) serisini tanýmlamak zordur, çoðunlukla
+ikisinin bir karýþýmý olan ARMA(p,q) serileri test edilir (ya da daha genel
+olarak, AR\textbf{I}MA)(p,d,q). Ek I sembolü modele bir diferansiyel etkisi
+saðlýyor, bu eke göre eðer farký alýnmýþ seri bir ARMA modeli oluyorsa bu
+model ARIMA kabul ediliyor. Mesela ilk farklar $d=1$ için $y_t - y_{t-1}$
+modeli ARMA ise, bu model ARIMA'dýr [4, sf. 92].
+
+Rasgele yürüyüþ bu genel formda gösterilebilir, rasgele yürüyüþ
+ARIMA(0,1,0) modelidir. 
+
+Daha odaklý bir örnek olarak Lynx verisine bakalým [2, sf. 727],
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import statsmodels.api as sm
+df = pd.read_csv('../tser_stoc/lynx.csv')
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df.x.plot()
+plt.savefig('tser_ar_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_ar_01.png}
+
+Çýplak gözle bakýldýðýnda zaman serisinde 10 senelik kuvvetli bir periyot
+olduðunu görüyoruz. Acaba hangi ARIMA serisi, hangi $p,q$ parametreleri
+üzerinden Lynx'i modelleyebilir? Bunun için önce bir kendisiyle korelasyon
+(autocorrelation) ACF ve kýsmi kendisiyle korelasyon PACF analizi yapmak
+faydalý olabilir. PACF, aynen ACF gibi, seriyi bir ya da daha fazla geriye
+kaydýrarak kendisiyle olan korelasyonunu inceler, ama bunu diðer tüm diðer
+kaydýrýlmýþ serilerin etkisini çýkartarak yapar, böylece gerideki belli
+bir $t-n$ noktasýnýn etkisi daha açýk olarak görülebilir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.api as sm
+sm.graphics.tsa.plot_acf(df.x.values.squeeze(), lags=40)
+plt.savefig('tser_ar_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_ar_02.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+sm.graphics.tsa.plot_pacf(df.x, lags=40)
+plt.savefig('tser_ar_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_ar_03.png}
+
+ACF'te 10 senelik periyot açýk þekilde görülüyor. Hangi evre gecikmesi
+(lag) daha önemli? PACF grafiðinde 2. evrede güçlü bir negatif korelasyon
+görülüyor, 1 ve 8'de güçlü pozitif korelasyonlar var, ve 4'te yine
+negatif. 
+
+Þimdi belli ARIMA modellerini test edelim, modelleri birbiri ile kýyaslamak
+için AIC istatistiðini kullanacaðýz, daha düþük AIC daha iyi demektir. Ama
+ondan önce bir AR modelinin nasýl veriye uydurulduðunu düþünelim; (1)'deki
+formülde $y_t$ ve $y_{t-1}$ arasýnda lineer bir iliþki görüyoruz. Bu
+durumda bu iki veri noktasýnýn bir lineer regresyona verirsek, $\phi$
+deðeri bu regresyondan ortaya çýkacaktýr. Regresyonun iþlemesi için veri
+noktalarýnýn bir aþaðý kaydýrýrýz, ve bu kaydýrýlmýþ deðeri asýl deðer ile
+regresyona sokarýz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+df['x_lag1'] = df.x.shift(1)
+print (df[['x','x_lag1']].head(6), '\n')
+results = smf.ols('x ~ x_lag1', data=df).fit()
+print (results.params)
+print ('aic', results.aic)
+\end{minted}
+
+\begin{verbatim}
+      x  x_lag1
+0   269     NaN
+1   321   269.0
+2   585   321.0
+3   871   585.0
+4  1475   871.0
+5  2821  1475.0 
+
+Intercept    454.151675
+x_lag1         0.719712
+dtype: float64
+aic 1907.7277269856995
+\end{verbatim}
+
+Þimdi bir ARIMA paketi ile aynýsýný yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from statsmodels.tsa.arima_model import ARIMA
+model10 = ARIMA(df.x, order=(1,0,0))
+model_fit = model10.fit(disp=0)
+print(model_fit.summary())
+\end{minted}
+
+\begin{verbatim}
+                              ARMA Model Results                              
+==============================================================================
+Dep. Variable:                      x   No. Observations:                  114
+Model:                     ARMA(1, 0)   Log Likelihood                -960.495
+Method:                       css-mle   S.D. of innovations           1100.247
+Date:                Tue, 13 Nov 2018   AIC                           1926.991
+Time:                        11:45:20   BIC                           1935.199
+Sample:                             0   HQIC                          1930.322
+                                                                              
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const       1550.1773    356.690      4.346      0.000     851.078    2249.276
+ar.L1.x        0.7173      0.065     11.042      0.000       0.590       0.845
+                                    Roots                                    
+=============================================================================
+                  Real          Imaginary           Modulus         Frequency
+-----------------------------------------------------------------------------
+AR.1            1.3941           +0.0000j            1.3941            0.0000
+-----------------------------------------------------------------------------
+\end{verbatim}
+
+Sonuçlar oldukça yakýn (gerçi kesi farklý -niye?-, ama katsayý daha önemli).
+
+En Ýyi Model?
+
+AR, ARIMA, MA, onlarýn dereceleri arasýnda bir seçim yapmak gerekiyor. Önce
+sýrf AR deneyelim,
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+res = []
+res.append(ARIMA(df.x, order=(1,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(2,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(3,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(4,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(5,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(6,0,0)).fit(disp=0))
+for x in res: print (x.df_model+1, x.aic)
+\end{minted}
+
+\begin{verbatim}
+3 1926.9906490207566
+4 1878.031850120836
+5 1879.9567487161364
+6 1874.221797648189
+7 1875.2758635012437
+8 1876.858328122954
+\end{verbatim}
+
+En iyi model AR(4) olarak gözüküyor. Þimdi sadece MA olarak bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+lynx = df.x
+%R -i lynx
+%R model01<-arima(lynx,order=c(0,0,1))
+%R model02<-arima(lynx,order=c(0,0,2))
+%R model03<-arima(lynx,order=c(0,0,3))
+%R model04<-arima(lynx,order=c(0,0,4))
+%R model05<-arima(lynx,order=c(0,0,5))
+%R model06<-arima(lynx,order=c(0,0,6))
+%R -o res res <- AIC(model01,model02,model03,model04,model05,model06)
+print res
+\end{minted}
+
+\begin{verbatim}
+        df      AIC
+model01  3 1917,947
+model02  4 1890,061
+model03  5 1887,770
+model04  6 1888,279
+model05  7 1885,698
+model06  8 1885,230
+
+\end{verbatim}
+
+Bu AIC'ler  AR'dekilerden yüksek. Belki bir $p,q$ kombinasyonu daha iyidir?
+En iyi p olan $p=4$'u tutalým, ve diðer $q$'leri test edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+lynx = df.x
+%R -i lynx
+%R model40<-arima(lynx,order=c(4,0,0))
+%R model41<-arima(lynx,order=c(4,0,1))
+%R model42<-arima(lynx,order=c(4,0,2))
+%R model43<-arima(lynx,order=c(4,0,3))
+%R -o res res<-AIC(model40,model41,model42,model43)
+print res
+\end{minted}
+
+\begin{verbatim}
+        df      AIC
+model40  6 1874,222
+model41  7 1875,351
+model42  8 1862,435
+model43  9 1880,432
+
+\end{verbatim}
+
+Görülüyor ki hareketli ortalama ekine hiç gerek yok, çünkü en iyi AIC
+$q=0$ için. Ya farklý diferansiyeller, yani ARIMA'nýn I'si? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+lynx = df.x
+%R -i lynx
+%R model400<-arima(lynx,order=c(4,0,0))
+%R model401<-arima(lynx,order=c(4,1,0))
+%R model402<-arima(lynx,order=c(4,2,0))
+%R model403<-arima(lynx,order=c(4,3,0))
+%R -o res res<-AIC(model400,model401,model402,model403)
+print res
+\end{minted}
+
+\begin{verbatim}
+         df      AIC
+model400  6 1874,222
+model401  5 1890,961
+model402  5 1917,882
+model403  5 1946,143
+
+\end{verbatim}
+
+Diferansiyele de ihtiyaç yok, en iyi diferansiyel $d=0$. En düþük AIC
+1874.22, ve AR'ýn gecikmeli evresi 4, ve hiçbir hareketli ortalama ve
+diferansiyle ihtiyaç yok. $p=4$ deyince tabii ki $t$ anýnýn $p-1,..,p-4$
+ile alakasý olmasý hali, yani $t$ aný kendinden önceki 4 nokta ile iliþkide
+olacaktýr. Bu iliþkiler gecikmeli sadece evre 2'deki kýsmý korelasyonu
+deðil, 4'teki kýsmý korelasyonu da dikkate almak zorundadýr yani.
+
+Oynaklýk (Volatility) ve GARCH Modelleri
+
+ARCH Ýngilizce autoregressive conditional heteroskedasticity kelimelerinden
+geliyor, yani kendisiyle regresyonda olan koþullu deðiþen varyans
+serileri. GARCH ise genelleþtirilmiþ ARCH demektir. Þimdiye kadar gördük ki
+getiri $r_t$'ler (returns) tipik olarak $N(0,\sigma^2)$'den
+gelmektedir. Fakat finans zaman serilerinde çoðunlukla oynaklýðýn,
+matematiksel olarak varyansýn zamana göre deðiþebildiði görülmektedir,
+varyans $h_t$ belli noktalarda farklý olabilmektedir, hatta belli oynaklýk
+bloklarý (volatility regions) olabilmektedir. Daha önce ARIMA'nýn MA
+kýsmýnda $t$ anýndaki gürültünün önceki zaman noktalarýndaki gürültünün bir
+ortalamasý olduðunu görmüþtük, burada varyans da bir trend ve kaymaya
+(drift) sahip olabilmektedir. 
+
+ARCH(1) modeli
+
+$$ y_t = \phi + e_t $$
+
+$$ e_t \sim N(0,h_t) $$
+
+$$ h_t = \alpha_0 + \alpha_1 e_{t-1}^2 $$
+
+olarak gösterilir. $\phi,\alpha_0,\alpha_1$ veriden hesaplanacaktýr, ya da
+simulasyon durumunda dýþarýdan belirlenecektir. 
+
+ARCH(q) modeli üstteki formül üzerinde basit bir uzatma yapar,
+
+$$ h_t = \alpha_0 + \alpha_1 e_{t-1}^2 + ... + \alpha_1 e_{t-q}^2 $$
+
+GARCH
+
+Matematiksel olarak GARCH(p,q) $p=1,q=1$ modeli, yani GARCH(1,1)
+
+$$ h_t = \omega + \alpha_1 e_{t-1}^2 + \beta_1 h_{t-1}$$
+
+GARCH(1,1) olduðu farzedilen bir finans serisinin parametrelerini bulmak
+için R \verb!tseries! paketi kullanýlabilir. Veri S\&P 500 tüm 90'li
+yýllarýn düzeltilmiþ (adjusted) kapanýþ fiyatlarýný içeriyor, getiri hesabý
+için $\ln (P_t/P_{t-1})$ ya da $\ln (P_t) - \ln(P_{t-1})$ yapýyoruz, ve bu
+getiriler üzerinde \verb!garch! parametrelerini hesaplýyoruz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfsp500 = pd.read_csv('SP500.csv')
+ret = np.log(dfsp500['Adj Close']).diff()*100.
+ret = ret.fillna(0)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from arch import arch_model
+am = arch_model(ret)
+res = am.fit(update_freq=5)
+print (res.summary())
+\end{minted}
+
+\begin{verbatim}
+Iteration:      5,   Func. Count:     41,   Neg. LLF: 3034.2183086575697
+Iteration:     10,   Func. Count:     76,   Neg. LLF: 3032.126998485467
+Iteration:     15,   Func. Count:    107,   Neg. LLF: 3032.061301642375
+Optimization terminated successfully.    (Exit mode 0)
+            Current function value: 3032.061301642018
+            Iterations: 15
+            Function evaluations: 107
+            Gradient evaluations: 15
+                     Constant Mean - GARCH Model Results                      
+==============================================================================
+Dep. Variable:              Adj Close   R-squared:                      -0.000
+Mean Model:             Constant Mean   Adj. R-squared:                 -0.000
+Vol Model:                      GARCH   Log-Likelihood:               -3032.06
+Distribution:                  Normal   AIC:                           6072.12
+Method:            Maximum Likelihood   BIC:                           6095.46
+                                        No. Observations:                 2528
+Date:                Tue, Nov 13 2018   Df Residuals:                     2524
+Time:                        12:31:10   Df Model:                            4
+                                 Mean Model                                 
+============================================================================
+                 coef    std err          t      P>|t|      95.0% Conf. Int.
+----------------------------------------------------------------------------
+mu             0.0588  1.466e-02      4.014  5.975e-05 [3.010e-02,8.755e-02]
+                               Volatility Model                              
+=============================================================================
+                 coef    std err          t      P>|t|       95.0% Conf. Int.
+-----------------------------------------------------------------------------
+omega      5.4768e-03  3.144e-03      1.742  8.155e-02 [-6.861e-04,1.164e-02]
+alpha[1]       0.0517  1.700e-02      3.041  2.356e-03  [1.838e-02,8.501e-02]
+beta[1]        0.9421  1.858e-02     50.694      0.000      [  0.906,  0.979]
+=============================================================================
+
+Covariance estimator: robust
+\end{verbatim}
+
+Bu parametreler acaba doðru mu? Parametreler ile verinin kendisinin
+üretmeye uðraþalým. $\phi=0$ kabul edersek, $y_t = e_t$ olarak
+alabiliriz, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+np.random.seed(1)
+import pandas as pd
+N = len(dfsp500)
+alpha0=0.0048
+alpha1=0.05
+beta1 = 0.946773
+y = np.zeros(N)
+h = np.zeros(N)
+w = np.random.standard_normal(N)
+for i in range(1,N): 
+    h[i] = alpha0 + alpha1 * (y[i-1]**2) + beta1 * h[i-1]
+    y[i] = w[i] * np.sqrt(h[i])
+\end{minted}
+
+Gerçek veriyi ve simulasyonu yan yana iki grafikte basalým, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+dfsp500['SP500'] = ret
+dfsp500['simulasyon'] = y
+dfsp500['SP500'].plot()
+plt.title('SP500')
+plt.savefig('tser_ar_04.png')
+dfsp500['simulasyon'].plot()
+plt.title('Simulasyon')
+plt.savefig('tser_ar_05.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_ar_04.png}
+\includegraphics[height=6cm]{tser_ar_05.png}
+
+Bir serinin deðiþen varyansa sahip olup olmadýðýný anlamak için bir
+istatistiki test [3, sf. 355] Breusch-Pagan testi, 
+
+\inputminted[fontsize=\footnotesize]{python}{breusch.py}
+
+Lynx verisi üzerinde uygulayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import breusch
+dflynx = pd.read_csv('../tser_stoc/lynx.csv');
+print breusch.breusch_pagan_test(dflynx.x, range(len(dflynx)))
+\end{minted}
+
+\begin{verbatim}
+(0.429236, 1.0, 0.6677515)
+\end{verbatim}
+
+En sondaki deðer p-deðeridir, 0.05'ten düþüklük varyansýn sabit olduðu
+hipotezinin reddedildiði anlamýna gelir, yani deðiþen varyans durumu
+vardýr. Üstteki sonuçta tezi reddedemedik, demek ki Lynx verisinde varyans
+deðiþmiyor.
+
+Basit Yürüyen Ortalama
+
+Kabaca bir zaman serisini pürüzsüzleþtirmenin (smoothing) en basit yolu
+basit bir yürüyen ortalama almaktýr. Bir pencere büyüklüðü tanýmlarýz, bu
+pencereyi zaman serisinin üzerine koyarýz, içine düþen tüm noktalarýn
+ortalamasýný alýrýz, ve pencereyi bir yana kaydýrarak iþlemi tekrarlarýz. 
+Tüm zaman serisi için bu yapýlýnca elimize bir ortalama geçmiþ olur,
+
+Yani $x_1,..,x_t$ zaman serisi için 
+
+$$ 
+y_t = \frac{1}{k} \sum _{n=0}^{k-1} x_{t-n}  
+= \frac{x_t + x_{t-1} + ... + x_{t-k+1}}{k} 
+$$
+
+Burada hiç aðýrlýk kullanmadýk, yani pencere içinde veri noktalarýnýn
+bazýlarýna daha fazla, bazýlarýna daha az aðýrlýk vermedik. Daha doðrusu
+aðýrlýk kullandýk, ama tüm noktalara '1' aðýrlýðý verdik ve bu sebeple k
+tane '1' aðýrlýk verilmiþ toplamý $k$'ye böldük. Fakat '1' yerine farklý
+aðýrlýklar da verebilirdik, mesela $w_1,w_2,..$ ki aðýrlýk toplamý 1 olacak
+þekilde, 
+
+$$ y_t = w_1x_t + w_2x_{t-1} + ... + w_kx_{t-k+1}
+$$
+
+Aðýrlýklarýn toplamý 1, fakat 1 ile bölmeyi göstermeye gerek yok. 
+
+Ya da $0 < \alpha < 1$ olacak þekilde, tüm zaman serisini kullanarak
+(pencere yok), aðýrlýklarý $(1-\alpha)$'nin katlarý olacak þekilde
+ayarlarsak,
+
+$$ y_t = \frac{x_t + (1-\alpha)x_{t-1} + (1-\alpha)^2x_{t-2} + ... }
+{1 + (1-\alpha) + (1-\alpha)^2 + ...} 
+$$
+
+Üstteki hesaba üstel aðýrlýklý yürüyen ortalama (exponentially weighted
+moving average -EWMA-) deniyor. Verinin tamamý kullanýlýr, aðýrlýklar
+$x_1$'e kadar gider. 0 ile 1 arasýndaki deðerler, ve onlarýn gittikçe artan
+üstelleri ile çarptýðýmýz için yakýn zamandaki verilerin aðýrlýðý fazladýr,
+eskiye gittikçe hýzlý bir þekile bu etki azalmaya baþlar. Eðer
+$1-\alpha=0.2$ ise mesela, önce $0.2$, sonra $0.2^2=0.04$, ardýndan
+$0.2^3=0.008$, küçülmenin ne kadar hýzlý olduðunu görüyoruz.
+
+Ayrýca bölende olan ifadelerin baþlangýcý 1 oraný $1-\alpha$ olan bir
+geometrik seri olduðunu görelim, bkz [9], o zaman bölen
+$\frac{1}{1-(1-\alpha)}$'a yani $\frac{1}{\alpha}$'ya eþittir,
+
+$$ y_t = \frac{x_t + (1-\alpha)x_{t-1} + (1-\alpha)^2x_{t-2} + ... }
+{\frac{1}{\alpha}}
+$$
+
+$$  = [ x_t + (1-\alpha)x_{t-1} + (1-\alpha)^2x_{t-2} + ... ] \alpha $$
+
+Üstteki hesabý özyineli yapmak ta mümkündür, türetmeye devam edersek,
+
+$$  = \alpha x_t + [(1-\alpha)x_{t-1} + (1-\alpha)^2x_{t-2} + ... ]\alpha $$
+
+$$  = \alpha x_t + (1-\alpha) [x_{t-1} + (1-\alpha)x_{t-2} + ... ]\alpha $$
+
+$\alpha$ ile çarpýlan köþeli parantezdekiler $y_{t-1}$'in ta kendisi. O
+zaman özyineli ifade þu olur [8, sf. 502],
+
+$$ y_t = \alpha x_t + (1-\alpha) y_{t-1}$$
+
+Periyot Bulmak
+
+Daha önceki bir yazida güneþ beneklerinin ortaya çýkýþý verisinde
+periyotlar bulmak için Fourier analizi kullanmýþtýk. Bu analizin eksik bir
+tarafý istatistiki önemlilik (significance) hesabýný göstermemesi. Daha iyi
+bir yöntem Lomb-Scargle yöntemi, ki bu yönteme göre periyot bulmak pek çok
+sinüs eðrisinin hangilerinin veriye daha iyi uyduðunu bulma problemine
+çeviriliyor, problem bir tür en az kareler çözümü haline geliyor, arka
+planda FFT kullanýlýyor fakat problemin ana modeli artýk FFT deðil. Güneþ
+benekleri,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+tempdata = np.loadtxt('../../compscieng/compscieng_1_30/sunspots.dat')
+year=tempdata[:,0]; sunspots=tempdata[:,1]
+year=year[year<2001]; sunspots=sunspots[year<2001]
+plt.plot(year,sunspots)
+plt.title(u'Güneþ Benekleri')
+plt.savefig('tser_ar_06.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_ar_06.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from astroML.time_series import lomb_scargle
+omega = np.linspace(1, 40, 200)
+
+dy = 0.5 + 0.5 * np.random.random(len(sunspots))
+sig = np.array([0.1, 0.01, 0.001])
+PS, z = lomb_scargle(year, sunspots, dy, omega, generalized=True, significance=sig)
+
+plt.plot(omega,PS)
+plt.hold(True)
+
+xlim = (omega[0], omega[-1])
+for zi, pi in zip(z, sig):
+    plt.plot(xlim, (zi, zi), ':k', lw=1)
+    plt.text(xlim[-1] - 0.001, zi - 0.02, "$%.1g$" % pi, ha='right', va='top')
+    plt.hold(True)
+plt.title(u'Güneþ Benekleri Periyotlarý')
+plt.savefig('tser_ar_07.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_ar_07.png}
+
+Grafikte 0.1, 0.01, 0.001 önemliliðini yatay çizgiler olarak görüyoruz; bu
+çizgilerin üzerindeki her tepe noktasý önemli bir periyottur.
+
+Bir diðer örnek: Altta dünyada 500 kusur milyon yýl geriye giden canlý tükenme
+yüzde grafiði görülüyor [7]. Mesela yaklaþýk 66 milyon sene önce bir göktaþý
+çarpmasýyla müthiþ bir tükeniþ yaþandý, zaten dinazorlarýn yokolmasý bu olay ile
+oldu. Bu olay grafikte açýk bir þekilde görülüyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+ext = pd.DataFrame(pd.read_csv('extinct.csv',header=None))
+ext2 = ext.set_index(np.linspace(542,1,len(ext)))
+ext2[0].plot()
+ext = ext[0]
+plt.savefig('tser_ar_09.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_ar_09.png}
+
+Soru þu: acaba bu verideki periyotlar hangileri? Tükeniþte belli periyotlar var mý?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from astroML.time_series import lomb_scargle
+
+dy = 0.5 + 0.5 * np.random.random(len(ext))
+omega = np.linspace(10, 100, 1000)
+sig = np.array([0.1, 0.01, 0.001])
+PS, z = lomb_scargle(ext.index, ext, dy, omega, generalized=True, significance=sig)
+
+plt.plot(omega,PS)
+plt.hold(True)
+
+xlim = (omega[0], omega[-1])
+for zi, pi in zip(z, sig):
+    plt.plot(xlim, (zi, zi), ':k', lw=1)
+    plt.text(xlim[-1] - 0.001, zi - 0.02, "$%.1g$" % pi, ha='right', va='top')
+    plt.hold(True)
+plt.title(u'Canlýlarýn Tükenme Periyotlarý')
+plt.savefig('tser_ar_08.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_ar_08.png}
+
+Grafiðe göre yaklaþýk 25 milyon, 70 milyon yýlda bir rutin tükeniþler görülüyor.
+
+Kaynaklar
+
+[1] Pfaff, {\em Analysis of Integrated and Co-Integrated Time Series}
+
+[2] Crawley, {\em The R Book}
+
+[3] Hilpisch, {\em Python for Finance}
+
+[4] Shumway, {\em Time Series Analysis with Applications in R}
+
+[5] Carter Hill, {\em Principles of Econometrics}
+
+[6] Metcalfe , {\em Introductory Times Series with R}
+
+[7] Bayramlý, 
+    {\em Grafikten Veri Çýkartmak}, 
+    \url{https://burakbayramli.github.io/dersblog/sk/2017/01/grafikten-veri-cikartmak.html}
+
+[8] McKinney, {\em Pandas Reference Documentation, 0.17.1}
+
+[9] Bayramli, Diferansiyel Denklemler, {\em Seriler}
+
+
+\end{document}

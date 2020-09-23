@@ -1,0 +1,324 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ýki Boyut Nokta Eþleþmesi, Homografi, Video Stabilizasyonu
+
+Oldukça çok ortaya çýkan bir imaj iþleme problemi þudur: elimizde iki nokta
+grubu var, bu noktalarýn arasýndaki eþleþmeyi biliyoruz. Öyle bir $H$
+iliþkisi bulmak istiyoruz ki verili $x$ noktasýnýnýn (homojen) kordinatýný
+$x'$ noktasýna taþýsýn, yani eldeki her veri noktasýnýn ima ettiði eþleþmeyi
+bulsun. 
+
+Örnek
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x1 = [[25.8064516129,25.0],[23.87096,45.625],
+      [20.0,69.375],[28.387,92.5],
+      [38.709,116.875],[64.5161290323,115.0],
+      [64.516,89.375],[65.16,66.875],
+      [57.4193,45.0],[45.80645,23.75]]
+x2 = [[93.548,66.25],[114.838,110.0],
+      [138.709,153.125],[182.580,179.375],
+      [241.935,204.375],[276.77,163.75],
+      [254.193,123.125],[212.903,73.125],
+      [158.064,54.375],[120.6451,40.625]]
+
+x1 = np.array(x1)
+x2 = np.array(x2)
+plt.plot(x1[:,0], x1[:,1], 'rd')
+plt.plot(x2[:,0], x2[:,1], 'bd')
+plt.xlim(0,320)
+plt.ylim(0,240)
+plt.savefig('vision_30vstab_02.png')
+\end{minted}
+
+\includegraphics[width=20em]{vision_30vstab_02.png}
+
+Yani kýrmýzý noktalarý mavi noktalara çeviren iliþkiyi arýyoruz. Bu
+transformasyonda ne var? Saða doðru bir yer deðiþtirme (translation),
+ölçekleme (scaling), ve saat yönüne doðru bir döndürme (rotation). Bu tür
+2D-2D iliþkilerine homografi adý veriliyor. Aradýðýmýz alttaki türden bir
+formül [3],
+
+$$ x' = H x$$
+
+yani her $x$ noktasý $H$ üzerinden $x'$ haline gelecek. $H$ matrisi homojen
+kordinatlarý baz alýr,
+
+$$ 
+\left[\begin{array}{r} x' \\ y' \\ w' \end{array}\right]
+\left[\begin{array}{rrr}
+h_1 & h_2 & h_3 \\ h_3 & h_4 & h_5 \\ h_6 & h_7 & h_8 
+\end{array}\right]
+\left[\begin{array}{r} x \\ y \\ w \end{array}\right]
+$$
+
+$H$ matrisinin bazý þekilleri vardýr, mesela 
+
+$$ 
+\left[\begin{array}{r} x' \\ y' \\ 1 \end{array}\right]
+\left[\begin{array}{rrr}
+a_1 & a_2 & t_x \\ a_3 & a_4 & t_y \\ 0 & 0 & 1
+\end{array}\right]
+\left[\begin{array}{r} x \\ y \\ 1 \end{array}\right]
+$$
+
+Ya da matris içindeki bölgeleri vektör / matrisler ile özetlersek,
+
+$$ 
+x' = \left[\begin{array}{rr} A & t \\ 0 & 1 \end{array}\right] x
+$$
+
+Üstteki transformasyona ilgin transformasyonu (affine transformation)
+deniyor, yamultma (warping) denen iþlem budur. Bu transformasyon $w=1$
+þartýný korur.
+
+Eðer $H$ þu türden olursa,
+
+$$ 
+\left[\begin{array}{r} x' \\ y' \\ 1 \end{array}\right]
+\left[\begin{array}{rrr}
+s\cos(\theta) & -s\sin(\theta) & t_x \\ 
+s\sin(\theta) & s\cos(\theta) & t_y \\ 
+0 & 0 & 1
+\end{array}\right]
+\left[\begin{array}{r} x \\ y \\ 1 \end{array}\right]
+$$
+
+Ya da 
+
+$$ 
+x' = \left[\begin{array}{rr}
+sR & t \\ 0 & 1
+\end{array}\right] x
+$$
+
+Dönüþ $R$, taþýnma $t$, dönme $\theta$, ölçekleme $s$. Bu transformasyona
+ölçeklemeye (scaling) izin veren bir katý (rigid) transformasyon
+deniyor. ``Katý'' demek $s=1$, yani noktalar arasý mesafeler deðiþmeyecek
+demek, daha büyük $s$ ile tabii ölçekleme olabilir, mesafeler artabilir,
+ama mesafe oranlarý yine ayný kalýr, ayrýca döndürme de -rotation-
+yapýlabilir. Bu transformasyona yansýtsal (projective) ismi de
+verilir. Yansýtsal transformasyonun ilgin transformasyondan daha esnek /
+kuvvetli olduðu bilinir.
+
+Not: ilgin transformasyon ve onu kestirme hesabý bazen literatürde iki
+boyutlu kordinat sisteminde ve $x' = R x + t$, yani rotasyon artý yer
+deðiþimi gibi bir formda da görülebilir, biz homojen sisteme geçerek her
+ikisini ayný matris $H$ içinde ve tek çarpým operasyonu ile gösterebilmiþ
+oluyoruz. Homojen, tek matrisli formda hesap yapmak daha kolay.
+
+Homografi hesabýnýn kullaným alanlarý geniþ; mesela elde olan iki imaj
+arasýnda birbirine uyan noktalarý biliyorsak, $H$'yi hesaplayarak tüm imaj
+üzerinde bir deðiþim matrisi hesaplamýþ oluruz. 
+
+Yansýtsal $H$ hesabý için direk lineer transform (direct linear transform
+-DLT-) tekniði var. Eldeki tüm eþleþmeler için alttaki sistemi yaratýrýz,
+
+$$ 
+\left[\begin{array}{rrrrrrrrr}
+-x_1 & -y_1 & -1 & 0 & 0 & 0 & x_1x_1' & y_1x_1' & x_1' \\
+0 & 0 & 0 & -x_1 & -y_1 & -1 & x_1y_1' & y_1y_1' & y_1' \\
+-x_2 & -y_2 & -1 & 0 & 0 & 0 & x_2x_2' & y_2x_2' & x_2' \\
+0 & 0 & 0 & -x_2 & -y_2 & -1 & x_2y_2' & y_2y_2' & y_2' \\
+ &  \vdots &  &  \vdots &  & \vdots &  &  \vdots & 
+\end{array}\right]
+\left[\begin{array}{r}
+h_1 \\ h_2 \\ h_3 \\ h_4 \\ h_5 \\ h_6 \\ h_7 \\ h_8 \\ h_9 
+\end{array}\right] = 0
+$$
+
+Bu sistem $x' - Hx = 0$ sistemini temsil etmiþ oluyor, ne kadar fazla nokta
+olursa üstteki matris o kadar aþaðý doðru geniþleyecektir (öðe ayarlamasý
+öne göre yapýlacak tabii). Mükemmel $H$ bulunamayabilir, ama sýfýra
+olabildiðince yaklaþmak için üstteki problemi bir minimizasyon problemi
+olarak görürüz, SVD bu çözümü bize saðlar. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+
+def H_from_points(fp,tp):
+    if fp.shape != tp.shape:
+        raise RuntimeError('number of points do not match')
+        
+    m = np.mean(fp[:2], axis=1)
+    maxstd = np.max(np.std(fp[:2], axis=1)) + 1e-9
+    C1 = np.diag([1/maxstd, 1/maxstd, 1]) 
+    C1[0][2] = -m[0]/maxstd
+    C1[1][2] = -m[1]/maxstd
+    fp = np.dot(C1,fp)
+    
+    m = np.mean(tp[:2], axis=1)
+    maxstd = np.max(np.std(tp[:2], axis=1)) + 1e-9
+    C2 = np.diag([1/maxstd, 1/maxstd, 1])
+    C2[0][2] = -m[0]/maxstd
+    C2[1][2] = -m[1]/maxstd
+    tp = np.dot(C2,tp)
+    
+    nbr_correspondences = fp.shape[1]
+    A = np.zeros((2*nbr_correspondences,9))
+    for i in range(nbr_correspondences):        
+        A[2*i] = [-fp[0][i],-fp[1][i],-1,0,0,0,
+                    tp[0][i]*fp[0][i],tp[0][i]*fp[1][i],tp[0][i]]
+        A[2*i+1] = [0,0,0,-fp[0][i],-fp[1][i],-1,
+                    tp[1][i]*fp[0][i],tp[1][i]*fp[1][i],tp[1][i]]
+    
+    U,S,V = lin.svd(A)
+    H = V[8].reshape((3,3))    
+    
+    H = np.dot(lin.inv(C2),np.dot(H,C1))
+    
+    # normalize and return
+    return H / H[2,2]
+
+x1h = np.ones((len(x1),3))
+x1h[:,:2] = x1
+x2h = np.ones((len(x1),3))
+x2h[:,:2] = x2
+A = H_from_points(x1h.T,x2h.T)
+res = np.dot(A, x1h.T).T
+res = res.T / res[:,2]
+
+plt.plot(x1[:,0], x1[:,1], 'rd')
+plt.plot(x2[:,0], x2[:,1], 'bd')
+plt.plot(res.T[:,0], res.T[:,1], 'bx')
+plt.xlim(0,320)
+plt.ylim(0,240)
+plt.savefig('vision_30vstab_03.png')
+\end{minted}
+
+\includegraphics[width=30em]{vision_30vstab_03.png}
+
+Çarpý ile iþaretli noktalar kestirme hesabý yapýlan $H$ ile kýrmýzý
+noktalarýn transform edilmesiyle elde edildi. Gerçek noktalara oldukca
+yakýn! 
+
+Ýlgin transformasyon matrisinin hesabý için üstteki metotta $h_7=0,h_8=0$
+kullanmak yeterli. Alternatif bir yöntem de var, daha fazla detay için [3,
+sf. 76]. 
+
+Ýmaj Bölgesi Çekip Çýkarmak
+
+Üstteki tekniðin ilginç uygulamalarýndan biri; diyelim ki bir imajýn belli
+bir bölgesindeki görüntüyü eþit kenarlý olacak þekilde çekip çýkarmak
+istiyorum, mesela alttaki Sudoku oyun karesini,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy import ndimage
+from PIL import Image
+
+im = np.array(Image.open('sudoku81.JPG').convert('L'))
+corners = [[257.4166, 14.9375], 
+           [510.8489, 197.6145], 
+           [59.30208, 269.65625], 
+           [325.598958, 469.05729]]
+corners = np.array(corners)
+plt.plot(corners[:,0], corners[:,1], 'rd')
+plt.imshow(im, cmap=plt.cm.Greys_r)
+plt.savefig('vision_30vstab_04.png')
+\end{minted}
+
+\includegraphics[width=30em]{vision_30vstab_04.png}
+
+Kenarlarý kýrmýzý noktalarla ben seçtim, þimdi o bölgenin alýnýp eþit
+kenarlý halde gösterilmesini istiyorum. Bu ne demektir? Bu seçilen her köþe
+noktasýnýn eþit kenarlý bir karenin köþelerine transform edilmesi demektir,
+mesela bu köþeler $(1,300),(300,300),..$ gibi olabilir (imajýn en uç
+noktalarý). Sonra daha önce yaptýðým gibi $H$ hesaplarým, ve o bölgedeki
+tüm pikselleri alýp hesapladýðým transformasyonu onlara uygularým,
+\verb!scipy.ndimage.geometric_transform! bu iþi yapar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy import ndimage
+import scipy
+
+fp = [ [p[1],p[0],1] for p in corners]
+fp = np.array(fp).T
+tp = np.array([[0,0,1],[0,300,1],[300,0,1],[300,300,1]]).T
+H = H_from_points(tp,fp)
+
+def warpfcn(x):
+    x = np.array([x[0],x[1],1])
+    xt = np.dot(H,x)
+    xt = xt/xt[2]
+    return xt[0],xt[1]
+im_g = ndimage.geometric_transform(im,warpfcn,(300,300))
+scipy.misc.imsave('vision_30vstab_05.png', im_g)
+\end{minted}
+
+\includegraphics[height=6cm]{vision_30vstab_05.png}
+
+Video Stabilizasyonu
+
+Elde tutulan kamera ile kaydedilen görüntülerde titreme çok
+olabilir. Mesela þurada [1] bizim cep telefonu ile kaydettiðimiz bir örnek
+var. Bu görüntüyü yazýlým ile stabilize etmek mümkün mü? Cevap evet - ve
+çözüm þaþýrtýcý derecede basit.  [4]'ün tekniði þöyle özetlenebilir: bir
+video'yu baþtan itibaren kare kare iþlerken, her karede ilginç köþe
+noktalarý (Harris tekniði ile) buluruz, ve bu noktalarýn bir sonraki
+resimdeki eþlerini elde ederiz, bu artýk görüntü iþlemede demirbaþ haline
+gelmiþ bir iþlem. Sonra tüm eþlemeleri kullanarak her video karesi için bir
+homografi / transformasyon hesaplarýz, bu transformasyon matrisi içinde
+$x,y$ deðiþimi, yani taþýnma, ve $a$ açýsý ki döndürme bilgisi vardýr. Bu
+bilgileri $dx,dy,da$ olarak biriktiririz.
+
+Tüm kareler iþlenince baþa dönüp tüm bu deðiþimlerin kümülatif toplamýný
+alarak $x,y,a$ zaman serilerini oluþtururuz. Bu zaman serileri üzerinde bir
+yürüyen ortalama (moving average) hesabý yaparýz, bu bize
+pürüzüþleþtirilmiþ zaman serileri verir. Þimdi kümülatif serinin pürüzsüz
+seriden olan farklarýný buluruz, ve her kare için bu farký alýp, onunla bir
+$H$ oluþtururuz ve bu $H$ ile bir önceki kare üzerinde yamultma yaparak onu
+``düzeltiriz''. Bu kadar.
+
+Bu teknik niye iþliyor? Ýþliyor çünkü üstte gösterdiðimiz türde video'larda
+"beklenen" bir ``akýþ'', bir nokta eþleþmesi var. Düz yürüyoruz, kamera
+ileri dönük, ortadaki pikseller dýþa doðru eþleþmeli, saðdakiler daha saða
+doðru, vs.  Bu beklentiyi hareketli ortalama ile hesaplamak mümkün, ve
+ondan olan sapmalarý kameranýn istenmeyen titremesi olarak algýlýyoruz, ve
+düzeltiyoruz.
+
+\inputminted[fontsize=\footnotesize]{python}{vidstab.py}
+
+\verb!cv2.estimateRigidTransform! çaðrýsý katý transformasyonu hesaplayan
+bir çaðrýdýr, aynen \verb!H_from_points! gibi. 
+
+Üstteki kodu [1] üzerinde uygularsak stabilizasyon yapýldýðýný
+göreceðiz. Sonuç [2]'de. C++ kodu \verb!vidstab.cpp!'de bulunabilir.
+
+Canlý Zamanda (Real-Time) Stabilizasyon
+
+[4]'ün tekniði toptan (batch) iþleyen bir teknik, ortalama alýnmasý,
+düzeltme yapýlmasý için video'nun baþtan sona iþlenmesi, ve geriye
+dönülmesi gerekiyor. Düzeltme iþlemini canlý olarak yapamaz mýyýz?
+
+Bu mümkün olmalý; yürüyen ortalama için [6] yazýsýna bakabiliriz;
+orada iþlenen üstel aðýrlýklý hareketli ortalama kullanýlabilir. Bu
+ortalamanýn özyineli (recursive) formu da vardýr,
+
+$$ z_t = \alpha g_t + (1-\alpha) z_{t-1}$$
+
+ki $\alpha$ kullanýcý tarafýndan seçilen parametredir, en son verilere ne
+kadar aðýrlýk verileceðini tanýmlar. Algoritma þöyle olabilir:
+Stabilizasyon için her video karesi iþlenirken $dx,dy,da$ farklarýný
+hesaplarýz, bunlarýn kümülatif toplamýný da anlýk hesaplarýz (kolay). Bu
+kümülatif $x,y,a$'yý üstteki tanýmda $g_t$ olarak formüle veririz, en son
+ortalama her zaman $z_t$ içinde olacaktýr. Bu ortalamanýn kumulatif olandan
+farký, ``sapmasý'' her kare üzerinde düzeltme amacý ile kullanýlabilir. Bu
+kod \verb!vsonline.py! içinde bulunabilir.
+
+Kaynaklar
+
+[1] Bayramlý, Veri 1, \url{https://www.dropbox.com/s/dlcd1ooxyvvp4cv/bwalk1.mp4?dl=1}
+
+[2] Bayramlý, Veri 2, \url{https://www.dropbox.com/s/gr4ny0w7lzsdw4s/bwalk1-stab.avi?dl=1}
+
+[3] Solem, {\em Computer Vision with Python}
+
+[4] Nghia Ho, {\em Simple Video Stabilization using OpenCV},
+    \url{http://nghiaho.com/?p=2093}
+
+[5] Bayramlý, {\em OpenCV 3.0}, 
+    \url{https://burakbayramli.github.io/dersblog/sk/2017/03/opencv-30.html}
+
+[6] Bayramli, Zaman Serileri ve Finans, {\em ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama}
+
+\end{document}

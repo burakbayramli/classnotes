@@ -1,0 +1,323 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Özyineli En Az Kareler (Recursive Least Squares)
+
+$Ax = b$ denklem sistemini çözmek için 
+
+$$ 
+x = (A^TA)^{-1}A^Tb  
+\mlabel{1} 
+$$ 
+
+formülü en az kareler çözümü olarak biliniyor, bkz [2]. Bu çözüm iyi iþler,
+fakat bazý durumlarda negatif bir tarafý var, çözüm toptan (batch) olarak
+yapýlýyor. $A$ içinde 100 tane satýr olabilir, ona göre bir çözüm bulunur,
+ardýndan 1 tane ek veri satýrý gelirse olsa 101 tane satýr için tüm
+iþlemlerin tekrar baþtan yapýlmasý gerekir. Acaba sadece o yeni verilen
+satýr için önceki $x$ tahminini bir þekilde güncellemek mümkün mü?
+
+Özyineli en az kareler ile bunu yapabiliriz. Diyelim ki 
+
+$$ c_1 t + c_2 = b $$
+
+lineer sistemini çözmek istiyoruz, yani bu bir çizgi uydurma (line fitting)
+olacak, kesi $c_2$, eðim $c_1$. Notasyon altta, altsimge $k$ kaç tane veri
+satýrý olduðunu gösterecek,
+
+$$ A_kx_k \approx b_k, \quad 
+A_k = \left[\begin{array}{cc}
+t_1 & 1 \\
+t_2 & 1 \\
+\vdots & \vdots \\
+t_k & 1 
+\end{array}\right], \quad 
+x_k = \left[\begin{array}{r}
+c_{1,k} \\ c_{2,k}
+\end{array}\right], \quad
+b_k = \left[\begin{array}{r}
+B_1 \\ B_2 \\ \vdots \\ B_k
+\end{array}\right]
+$$
+
+Eðer tek istediðimiz tek boyutlu bir zaman serisi için çizgi uydurma yapmak
+ise $t_1,..,t_k$ 1 ve $k$ arasý tam sayýlar olurdu, bu durumda $A_k$ iyice
+basitleþir. Devam edelim, eðer (1)'i üstteki format için uyarlarsak,
+
+$$ 
+x_k = (A_k^TA_k)^{-1}A_k^T b_k 
+\mlabel{5} 
+$$
+
+Yani elde $k$ tane veri var, üstteki formülü uyguladýk ve bir çözüm
+bulduk. Þimdi diyelim ki yeni ölçümler $(t_{k+1}, B_{k+1})$ aldýk, ve 
+
+$$ 
+x_{k+1} = (A_{k+1}^TA_{k+1})^{-1}A_{k+1}^T b_{k+1} 
+\mlabel{3} 
+$$
+
+hesabýný yapmamýz lazým. Ek notasyon;
+
+$$ 
+A_{k+1} = \left[\begin{array}{c}
+A_k \\ a_{k+1}^T
+\end{array}\right], \quad
+a_{k+1}^T = \left[\begin{array}{c}
+t_{k+1} \\ 1
+\end{array}\right], \quad 
+b_{k+1} = \left[\begin{array}{c}
+b_k \\ B_{k+1}
+\end{array}\right], \quad 
+P_k = (A_k^TA_k)^{-1}
+\mlabel{4}
+ $$
+
+Matris tersi $P_k$'nin yeni veri noktasý gelince nasýl güncellendiðini
+görelim, 
+
+$$ 
+P_{k+1} = (A_{k+1}^TA_{k+1})^{-1} = 
+\bigg[
+\left[\begin{array}{cc}A_k & a_{k+1} \end{array}\right]
+\left[\begin{array}{c}A_k \\ a_{k+1}^T \end{array}\right]
+\bigg]^{-1}
+$$
+
+Eþitliðin saðýndaki matris çarpýmýný yaparsak, ve $P_k$'yi yerine koyarsak,
+
+$$ = [ A_k^TA_k + a_{k+1}a_{k+1}^T ]^{-1} 
+= [ P_k + a_{k+1}a_{k+1}^T ]^{-1} 
+\mlabel{2}
+$$
+
+Üstte yine saðdaki formül $(A+BCD)^{-1}$ formunda bir ters alma iþlemi gibi
+gözüküyor; Matris Tersi Yardýmcý Teorisi (Matrix Inversion Lemma) diyor ki
+[1, sf. 469], herhangi bir $A,B,C,D$ için,
+
+$$ [A + BCD]^{-1} = A^{-1} - A^{-1}B[C^{-1} + DA^{-1} B]^{-1} DA^{-1} $$
+
+(2)'deki ifadenin üstteki forma göre paylaþtýrmasýný þöyle yapalým, 
+$A = P_k$, $B = a_{k+1}$, $C=I$, $D=a_{k+1}^T$. Buna göre (2) üstteki 
+açýlým üzerinden ve paylaþtýrýlan sembollere göre þu hale gelir,
+
+$$ P_{k+1} = P_k - P_k a_{k+1}(I + a_{k+1}^T P_k a_{k+1})^{-1} a_{k+1}^TP_k  $$
+
+Parantez içindeki büyük çarpým bir tek sayý olduðu için $I$ deðeri 1
+yapýlabilir,
+
+$$ P_{k+1} = P_k - P_k a_{k+1}(1 + a_{k+1}^T P_k a_{k+1})^{-1} a_{k+1}^TP_k  
+\mlabel{6}
+$$
+
+Bu durumda tersi alýnan parantez içindeki tüm ifade de tek sayý demektir,
+ve bu tek sayýnýn tersini almak çok basittir ($x$ için $1/x$). 
+
+Nihai güncelleme formülü için devam edelim; (3) formülüne (4)'teki
+eþitlikleri koyalým,
+
+$$ x_{t+1} = 
+P_{k+1} 
+\left[\begin{array}{cc} A_k^T & a_{k+1} \end{array}\right]  
+\left[\begin{array}{c} b_k \\ B_{k+1} \end{array}\right]  
+$$
+
+$$ = P_{k+1} [A_k^Tb_k + a_{k+1}B_{k+1} ] $$
+
+(5) formülünü deðiþtirerek þu hale getirebiliriz,
+
+$$ (A_k^TA_k) x_k = A_k^T b_k $$
+
+Bu sonucu iki üstteki formüle sokarsak, 
+
+$$ = P_{k+1} [A_k^TA_kx_k + a_{k+1}B_{k+1} ] $$
+
+(4)'teki formlar üzerinden 
+
+$$ A_{k+1}^TA_{k+1} =  A_k^TA_k + a_{k+1}a_{k+1}^T  $$
+
+diyebileceðimizi görmüþtük, o zaman 
+
+$$ A_{k+1}^TA_{k+1}x_k =  (A_k^TA_k + a_{k+1}a_{k+1}^T)x_k  $$
+
+Üç üstteki formülde yerine koyalým,
+
+$$ = P_{k+1} [(A_k^TA_k + a_{k+1}a_{k+1}^T)x_k + a_{k+1}B_{k+1} ] $$
+
+$$ = P_{k+1} [P_{k+1}^{-1}x_k + a_{k+1}a_{k+1}^Tx_k + a_{k+1}B_{k+1} ] $$
+
+$$ x_{k+1} = x_k + P_{k+1}a_{k+1}a_{k+1}^Tx_k  + P_{k+1}a_{k+1}B_{k+1}  $$
+
+$$ 
+x_{k+1} = x_k + P_{k+1}a_{k+1}(a_{k+1}^Tx_k  + B_{k+1})  
+\mlabel{7}
+$$
+
+Þimdi $P_{k+1}$'yi özyineli olarak temsil etmek þunlarý yapalým. $K_{k+1} =
+P_{k+1}a_{k+1}$  sistemin kazanç matrisi (gain matrix) olsun, ve (6)'daki 
+$P_{k+1}$ eþitliði kullanarak formülü geniþletelim,
+
+$$ K_{k+1} = P_{k+1}a_{k+1} = 
+[ P_k - P_k a_{k+1} [ 1 + a_{k+1}^T P_k a_{k+1} ]^{-1} a_{k+1}^TP_k ] a_{k+1}
+$$
+
+$$ = P_ka_{k+1} - P_k a_{k+1}[a_{k+1}^T P_k a_{k+1} + 1]^{-1} a_{k+1}^TP_ka_{k+1} $$
+
+$$ = P_ka_{k+1} 
+\big[ I - [ a_{k+1}^T P_k a_{k+1} + 1 ]^{-1} a_{k+1}^TP_ka_{k+1} \big] $$
+
+Eðer bu formülü ayný anda hem $(a_{k+1}^TP_ka_{k+1})$ hem de $(a_{k+1}^TP_ka_{k+1})^{-1}$ 
+ile çarparsak (hiçbir etkisi olmayan bir iþlem, birbirini iptal ediyor
+çünkü) bazý temizleme iþlemlerini yapmak mümkün olur,
+
+$$ 
+= P_ka_{k+1} 
+\big[ (a_{k+1}^T P_k a_{k+1} + 1) -  a_{k+1}^TP_ka_{k+1} \big] (a_{k+1}^T P_k a_{k+1} + 1)^{-1}
+$$
+
+Büyük parantez içinde sadece +1 sað kalýr, geri kalanlar iptal olur,
+
+$$ 
+K_{k+1} = P_ka_{k+1} (a_{k+1}^T P_k a_{k+1} + 1)^{-1}
+$$
+
+Bu formülü (7) içine geri $K_{k+1}$ olarak koyarsak, 
+
+$$ x_{k+1} = x_k + K_{k+1}(a_{k+1}^Tx_k  + B_{k+1})  
+$$
+
+Ayný þekilde (6) içine koyarsak,
+
+$$ 
+P_{k+1} = P_k - 
+\underbrace{P_k a_{k+1}(1 + a_{k+1}^T P_k a_{k+1})^{-1}}_{K_{k+1}}
+a_{k+1}^TP_k 
+$$
+
+$$ 
+P_{k+1} = P_k - K_{k+1}a_{k+1}^TP_k 
+$$
+
+Böylece $K_{k+1},P_{k+1},x_{k+1}$ özyineli güncelleme formüllerini elde
+etmiþ oluyoruz. 
+
+Kodlar
+
+Güncelleme kodlarý alttadýr,
+
+\inputminted[fontsize=\footnotesize]{python}{rls.py}
+
+Örnek olarak alttaki veriyi kullanalým. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+b = np.array([[3.0,4.0,6.0,3.0,8.0,7.0,5.0]]).T
+A= np.ones((len(b),2)); A[:,1] = range(len(b))
+\end{minted}
+
+Özyineli olarak problemi çözelim; her veri noktasýný teker teker güncelleme 
+rutinine geçelim. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import rls
+n = 2
+P = np.eye(n,n)*100.
+x = np.zeros((n,1))
+for k in range(len(b)):
+   x,K,P = rls.rlse_online(np.array([[k,1]]),b[k,:],x,P)
+print x
+\end{minted}
+
+\begin{verbatim}
+[[ 0.5037057 ]
+ [ 3.62655923]]
+\end{verbatim}
+
+Üstteki sonuç bulundu. Þimdi ayný verileri en az kareler ile toptan þekilde
+çözelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.api as sm
+
+y = b; x = A
+f = sm.OLS(y,x).fit()
+print f.params
+\end{minted}
+
+\begin{verbatim}
+[ 3.64285714  0.5       ]
+\end{verbatim}
+
+Önce Toptan, Sonra Özyineli
+
+Eðer verinin bir kýsmý için toptan baþlayýp sonra özyineli gitmek istersek
+ne yaparýz? O zaman elde bir $(A_k^TA_k)^{-1}$, yani $P_{k}$ olurdu, toptan
+þekilde hesaplanmýþ olacaktý, ve bu deðerin sonraki hali için güncelleme
+formülünü biliyoruz, böyle devam ederdik. Tabii bu durumda
+$(A_k^TA_k)^{-1}$'yi toptan hýzlý hesaplamak için bir teknikten bahsetmek
+lazým, en az kareler rutinleri genelde bu deðeri geri döndürmezler, {\em
+  Lineer Cebir Ders 16}'dan hatýrlarsak bu hesabý direk yapmak oldukça
+pahalý, o yüzden QR bazlý bir yaklaþým lazým (aynen $x$'in kendisinin QR
+bazlý hesaplandýðý gibi). Her $A_k$ matrisinin bir $A_k = QR$ açýlýmý
+olacaðýndan hareketle, 
+
+$$ A_k^TA_k = (QR)^TQR = R^TQ^TQR = R^TR $$
+
+O zaman 
+
+$$ (A_k^TA_k)^{-1} = (R^TR)^{-1} = R^{-1}R^{-T} $$
+
+Þimdi verinin en son satýrý hariç ilk kýsmý üzerinde bu deðeri hesaplayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A_k = A[:-1,:]
+b_k = b[:-1,:]
+print A.shape, A_k.shape
+q,r = lin.qr(A_k)
+Pk_r = np.dot(lin.inv(r), lin.inv(r.T))
+print Pk_r
+Pk = lin.inv(np.dot(A_k.T,A_k))
+print Pk
+\end{minted}
+
+\begin{verbatim}
+(7, 2) (6, 2)
+[[ 0.52380952 -0.14285714]
+ [-0.14285714  0.05714286]]
+[[ 0.52380952 -0.14285714]
+ [-0.14285714  0.05714286]]
+\end{verbatim}
+
+Direk usül ve QR bazlý ters iþleminin ayný sonuçlara eriþildiðini
+görüyoruz. Toptan $x_k$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x_batch = np.dot(np.dot(lin.inv(r), q.T), b_k)
+print x_batch.T[0]
+\end{minted}
+
+\begin{verbatim}
+[ 3.0952381   0.82857143]
+\end{verbatim}
+
+Þimdi yeni veri noktasý ile güncelleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A_new = A[-1,:]
+b_new = b[-1,:]
+x_new,K_new,P_new = rls.rlse_online(A_new,b_new,x_batch.T[0],Pk_r)
+print x_new
+\end{minted}
+
+\begin{verbatim}
+[ 3.64285714  0.5       ]
+\end{verbatim}
+
+Ayný sonuca eriþtik. 
+ 
+Kaynaklar
+
+[1] Yang, {\em Applied Numerical Methods using Matlab}
+
+[2] Bayramli, Lineer Cebir, {\em Ders 16}
+
+\end{document}

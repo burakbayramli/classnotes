@@ -1,0 +1,328 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Piksel Takibi, Optik Akýþ, Lucas Kanade Algoritmasý
+
+Hareket halindeki bir kameranýn aldýðý görüntülerdeki herhangi bir pikseli
+nasýl takip ederiz? 
+
+Matematiksel olarak temsil etmek gerekirse, zamana göre deðiþen 2 boyutlu
+görüntüyü bir fonksiyon olarak düþünelim, ki bu fonksiyonun deðerleri
+ayrýksal olarak, imajýn ta kendisi. Bir $I(x(t),y(t),t)$ fonksiyonu piksel
+deðerlerini veriyor. Bu fonksiyonda $x,y$ ekran kordinatlarýna tekabül
+ediyor, $t$ ise zaman, $1,2,..$ gibi deðerleri indeks deðerleri var, mesela
+$I(100,200,1)$, bize 1. video karesindeki $x=100,y=200$ kordinatlarýndaki
+piksel deðerini verecek.
+
+$x,y$ deðiþkenleri parametrize edildi, bir noktayý takip etmek istiyoruz
+çünkü, ve $t$'ye göre bu takip edilen noktanýn $x,y$ kordinatlarý belli bir
+gidiþat yönünde deðiþiyor.
+
+Þu faraziyeyi yaparak takip problemimizi kolaylaþtýrabiliriz. Diyelim ki
+takip edilen bir nokta, görüldüðü her karede ayný piksel rengindedir. Bu
+çok sýradýþý bir faraziye deðil, resim karelerinden bir araba geçiyor
+mesela, ve bu arabanýn üzerindeki piksellerin renkleri, en azýndan iki kare
+arasýnda deðiþmiyor. Iþýk seviyesi, gölgede olma, vs. gibi durumlarda biraz
+deðiþebilir, fakat basitleþtirme amacýyla bu faraziye geçerlidir. 
+
+\includegraphics[height=4cm]{disp2.png}
+
+Bir diðer faraziye, kameralar hareket ettiklerinde alýnan iki görüntü
+arasýndaki tüm piksellerin yer deðiþimi genellikle ayný yönde olmasýdýr. Bu
+deðiþim yönünü $<u,v>$ vektörü olarak görebiliriz, ve bu deðiþkenler iki
+görüntü arasýndaki deðiþimde tüm pikseller için ayný olacaktýr. Bu da
+normal, kamerayý alýp mesela saða doðru hareket ettiriyoruz, ve görüntüdeki
+tüm pikseller sola doðru gidiyorlar.
+
+\includegraphics[height=4cm]{disp1.png}
+
+Tüm bunlarý modelimizde nasýl kullanýrýz? 
+
+Takip edilen nokta her karede ayný renkte ise, þu ifade doðru demektir 
+
+$$ I(x(t),y(t),t) = \textrm{ sabit } $$
+
+Eðer bu fonksiyonun zamana göre türevini alýrsak
+
+$$ \frac{d \ I(x(t),y(t),t)}{dt} = 0$$
+
+sonucu gelir. Eþitliðin saðý sýfýr, çünkü bir sabitin türevini aldýk. Sol
+tarafa Zincirleme Kanununu uygularsak, 
+
+$$ \frac{\partial I}{\partial x}\frac{dx}{dt} +
+\frac{\partial I}{\partial y}\frac{dy}{dt} +
+\frac{\partial I}{\partial t} = 0
+$$
+
+Bu formülde $dx/dt$ ve $dy/dt$, hareket halindeki (zaman geçerken) noktanýn
+sonsuz küçüklükteki yer deðimi. Ayrýksal baðlamda arka arkaya iki kare
+içindeki yer deðiþimi. O zaman,
+
+$$ \frac{dx}{dt}, \frac{dy}{dt} = u, v $$
+
+Alttakiler ise mesafesel (spatial) gradyanlardýr, bunlarýn nasýl
+hesaplanacaðýný çok iyi biliyoruz! 
+
+$$ 
+\frac{\partial I}{\partial x}, \frac{\partial I}{\partial y}
+ $$
+
+Alttaki ise resim karelerinin zamana göre türevidir.
+
+$$ 
+\frac{\partial I}{\partial t}
+ $$
+
+Daha derli toplu olarak göstermek gerekirse ana formül nihai olarak þöyle
+
+$$ I_x u + I_y v + I_t = 0 $$
+
+ya da
+
+$$ 
+\nabla I \cdot <u, v> = -I_t
+ $$
+
+Þimdi $u,v$'nin hesaplanmasýna gelelim. Üstteki formülü bir veri noktasý
+için yazmak yeterli deðil. Ama bu formülü hem takip ettiðimiz, hem de onun
+etrafýndaki pikseller için yazarsak (onlarýn yer deðiþimi de ayný deðil
+mi?), ve bu sistemi çözersek, sonuca varabiliriz. 
+
+Ýki tane bilinmeyenimiz var, ama böylece pek çok formül elde
+ediyoruz. Veriler gürültülü olduðu için, aslýnda bilinmeyenden "daha
+fazla" formül elde etmek iyi, bu tür denklem sistemlerine "çok eþitliðe
+sahip (overdetermined)" denir, ve böyle tür sistemler En Az Kareler (Least
+Squares) ile çözülür. Tüm bunlarý biraraya koyunca þu ortaya çýkar.
+
+$$ 
+\left[\begin{array}{cc}
+I_x(p_1) & I_y(p_1) \\
+I_x(p_2) & I_y(p_1) \\
+\vdots & \vdots \\
+I_x(p_k) & I_y(p_k) 
+\end{array}\right]
+\left[\begin{array}{r}
+u \\
+v
+\end{array}\right] = 
+-
+\left[\begin{array}{c}
+I_t(p_1) \\
+I_t(p_2) \\
+\vdots \\
+I_t(p_k) 
+\end{array}\right]
+ $$
+
+Gradyanlarýn belli noktalarda hesaplandýðýný unutmayalým, o sebeple $p_1,
+p_2$ gibi piksel noktalarýný bu fonksiyonlara geçiyoruz. 
+
+Bu sistemi
+
+$$ A \ d = b $$
+
+olarak gösterebiliriz, ki $d = <u,v>$. Sol tarafý $A^T$ ile çarpalým
+
+$$ A^TA \ d = A^Tb $$
+
+Eðer $A^TA$'nin matris tersini iki tarafla çarparsak, $d$ yanlýz kalýr, ve
+sonuç elde edilir. 
+
+Bu denklemi Python Numpy'da \verb!pinv! kullanarak çözeriz.
+
+Test için üç tane resim kullandýk, bu resimlerden \verb!flow1-bw-0.png!
+baþlangýç resmi, bu resmin ortasýndaki objeleri GIMP kullanarak elle kopyaladýk,
+bir üst sað çapraza doðru, bir alt sol çapraza doðru, ve iki yeni resim elde
+ettik (\verb!upright.png!, \verb!dleft.png!). Takip edilen nokta gri dörtgenin
+alt sol köþesinde. Lucas Kanade algoritmasý bu noktayý takip ederek, yeþil ile
+iþaretledi.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.signal as si
+from PIL import Image
+
+def gauss_kern():
+    h1 = 15
+    h2 = 15
+    x, y = np.mgrid[0:h2, 0:h1]
+    x = x-h2/2
+    y = y-h1/2
+    sigma = 1.5
+    g = np.exp( -( x**2 + y**2 ) / (2*sigma**2) );
+    return g / g.sum()
+
+def deriv(im1, im2):
+    g = gauss_kern()
+    Img_smooth = si.convolve(im1,g,mode='same')
+    fx,fy=np.gradient(Img_smooth)    
+    ft = si.convolve2d(im1, 0.25 * np.ones((2,2))) + \
+        si.convolve2d(im2, -0.25 * np.ones((2,2)))
+                    
+    fx = fx[0:fx.shape[0]-1, 0:fx.shape[1]-1]    
+    fy = fy[0:fy.shape[0]-1, 0:fy.shape[1]-1];
+    ft = ft[0:ft.shape[0]-1, 0:ft.shape[1]-1];
+    return fx, fy, ft
+
+import warnings
+warnings.simplefilter("ignore", np.ComplexWarning)
+
+im1 = np.asarray(Image.open('flow1-bw-0.png'))
+im2 = np.asarray(Image.open("upright.png"))
+fx, fy, ft = deriv(im1, im2)
+print fx[:5]
+\end{minted}
+
+\begin{verbatim}
+[[ 34.37477011  45.94010835  51.877951   ...,  53.83264716  51.877951
+   45.94010835]
+ [ 26.01168277  34.76327322  39.25648957 ...,  40.73562489  39.25648957
+   34.76327322]
+ [ 11.72919465  15.67546405  17.70154632 ...,  18.36851839  17.70154632
+   15.67546405]
+ [  3.51803959   4.70167857   5.30937909 ...,   5.50942984   5.30937909
+    4.70167857]
+ [  0.6961225    0.93033183   1.05057892 ...,   1.09016341   1.05057892
+    0.93033183]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.signal as si
+from PIL import Image
+import numpy.linalg as lin
+
+def lk(im1, im2, i, j, window_size) :
+    fx, fy, ft = deriv(im1, im2)
+    halfWindow = np.floor(window_size/2)
+    curFx = fx[i-halfWindow-1:i+halfWindow, 
+               j-halfWindow-1:j+halfWindow]
+    curFy = fy[i-halfWindow-1:i+halfWindow, 
+               j-halfWindow-1:j+halfWindow]
+    curFt = ft[i-halfWindow-1:i+halfWindow, 
+               j-halfWindow-1:j+halfWindow]
+    curFx = curFx.T
+    curFy = curFy.T
+    curFt = curFt.T
+
+    curFx = curFx.flatten(order='F') 
+    curFy = curFy.flatten(order='F') 
+    curFt = -curFt.flatten(order='F') 
+    
+    A = np.vstack((curFx, curFy)).T
+    U = np.dot(np.dot(lin.pinv(np.dot(A.T,A)),A.T),curFt)
+    return U[0], U[1]
+
+def test(image1,image2,output): 
+    x=165
+    y=95
+    win=50
+    im1 = np.asarray(Image.open(image1))
+    im2 = np.asarray(Image.open(image2))
+    u, v = lk(im1, im2, x, y, win)
+    plt.imshow(im1, cmap='gray')
+    plt.hold(True)
+    plt.plot(x,y,'+r');
+    # 3 ile carptik cunku vektor degisimi iyi hesaplandi ama
+    # grafikleme icin cok ufakti, ikinci yesil nokta iyi gozuksun
+    # diye onu biraz buyuttuk
+    plt.plot(x+u*3,y+v*3,'og')
+    plt.savefig(output)
+
+test('flow1-bw-0.png','dleft.png','lk_1.png')
+\end{minted}
+
+\includegraphics[height=6cm]{lk_1.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+test('flow1-bw-0.png','upright.png', 'lk_2.png')
+\end{minted}
+
+\includegraphics[height=6cm]{lk_2.png}
+
+Bu matematiksel modele alternatif bir bakýþ þöyle olabilir. Ýki imaj karesi
+içinde birincisine $I(x,y)$ ikincisine $H(x,y)$ diyelim, burada $t$
+üzerinden parametrizasyon olmasýn; $x,y$ pikselinin $H$ içinde $u,v$ kadar
+yer deðiþiminden sonra, bu noktalarýn $I$'de geldiði yerdeki grilik deðerinin
+ayný olduðunu (yine) farzediyoruz. Sonra $I(x+u,y+v)$'nin birinci
+dereceden Taylor Açýlýmýný yapýyoruz, 
+
+$$ I(x+u,y+v) = I(x,y) + \frac{\partial I}{\partial x}u + 
+\frac{\partial I}{\partial y}v + ...
+$$
+
+ya da
+
+$$ I(x+u,y+v) \approx I(x,y) + \frac{\partial I}{\partial x}u + 
+\frac{\partial I}{\partial y}v 
+$$
+
+Grilik aynýlýðýný ise þöyle belirtebiliriz
+
+$$  I(x+u,y+v) - H(x,y) = 0$$
+
+Taylor açýlýmýný üstteki formülde $I$ yerine geçirelim
+
+$$ I(x,y) + 
+\frac{\partial I}{\partial x}u + 
+\frac{\partial I}{\partial y}v - H(x,y) = 0
+$$
+
+$H$'in yerini deðiþtirelim
+
+$$ I(x,y)  - H(x,y) + I_xu + I_yv = 0$$
+
+Þu ifade $I(x,y) - H(x,y)$ nedir? Bunlar iki imajýn, sonrasý ve öncesi
+arasýndaki fark deðil midir?  O zaman bu hesabý imajýn zamana göre alýnmýþ
+türevi olarak görebiliriz, yani $I_t = I(x,y) - H(x,y)$. Yerine koyalým
+
+$$ I_t + I_xu + I_yv = 0$$
+
+$$ I_xu + I_yv = -I_t $$
+
+Böylece ayný denkleme eriþmiþ olduk. Bu aslýnda normal, birinci
+dereceden Taylor açýlýmý ile tam diferansiyel denklemi (ve Zincirleme
+Kanununu) birbiriyle çok yakýndan alakalý.
+
+Ufak Piksel Deðiþimleri
+
+Konu hakkýnda bir nokta daha þu; Lucas-Kanade yöntemi 1. derece Taylor
+açýlýmý kulladýðý için ufak piksel deðiþimleri için geçerlidir, çünkü
+Taylor açýlýmý yerel bir noktaya çok yakýn bölgelerde bir fonksiyona
+yakýn sonuçlar verir. Bu da aklýmýzda bulunsun.e
+
+OpenCV
+
+OpenCV ile optik akýþ kullanýmý altta görülüyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, zipfile
+import numpy as np
+import cv2
+
+def draw_flow(img, flow, step=16):
+    h, w = img.shape[:2]
+    y, x = np.mgrid[step/2:h:step, step/2:w:step].reshape(2,-1).astype(int)
+    fx, fy = flow[y,x].T
+    lines = np.vstack([x, y, x+fx, y+fy]).T.reshape(-1, 2, 2)
+    lines = np.int32(lines + 0.5)
+    vis = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    cv2.polylines(vis, lines, 0, (0, 255, 0))
+    for (x1, y1), (x2, y2) in lines:
+        cv2.circle(vis, (x1, y1), 1, (0, 255, 0), -1)
+    return vis
+
+prevgray = cv2.imread('106.jpg', cv2.IMREAD_GRAYSCALE)
+gray = cv2.imread('107.jpg', cv2.IMREAD_GRAYSCALE)
+flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+cv2.imwrite('pde_lk_01.png', draw_flow(gray, flow))
+\end{minted}
+
+\includegraphics[width=20em]{pde_lk_01.png}
+
+Kaynaklar
+
+[1] Collins, {\em Introduction to Computer Vision},  \url{http://www.cse.psu.edu/~rtc12/CSE486/}
+
+[2] Khurram Hassan-Shafique, {\em CAP 5415 Lecture Notes, Spring 2003}
+
+[3] Suhr, {\em Kanade-Lucas-Tomasi (KLT) Feature Tracker Feature Tracker}, \url{http://web.yonsei.ac.kr/jksuhr/articles/Kanade-Lucas-Tomasi%20Tracker.pdf}
+
+\end{document}

@@ -1,0 +1,113 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Üretici Hasýmsal Aðlar (Generative Adverserial Networks -GAN-)
+
+Derin Öðrenme ustalarýndan Yann LeCun GAN'leri ``son 10 senede yapay öðrenmede
+görülen en büyük ilerleme'' olarak tarif ediyor. Burada haksýz deðil. YSA'lar
+ilk baþta (geri geliþinden sonraki ilk evresinde de) bir resimde kedi, köpek ya
+da uçak olup olmadýðýný sýnýflayabiliyordu. Yeni evriþimsel (convolutional) yapý
+ile çetrefil görüntü iliþkilerini öðrenip bunlarý sýnýflama özelliði kazandý,
+fakat bunlar basit bir etikete baðlý olarak denetimli (süpervised) olarak
+yapýyordu.
+
+GAN'ler denetimsiz olarak eðitilebiliyor, ve daha ilginci ``üretimsel
+(generative)'' olarak kullanýlabiliyor. Mesela pek çok görüntüye bakýp yeni
+görüntüler üreten bir GAN olabilir, ya da, sözel tarif verilince o tarifteki
+söylenen görüntüyü üreten bir GAN olabilir! Öyle ya sonuçta verilen girdi bir
+takým reel sayýlar içeren çok boyutlu vektörlerdir, bu sayýlarýn kelimeleri,
+baþka görüntüleri temsil etmesi mimarý açýsýndan çok fark yaratmaz.
+
+\includegraphics[width=30em]{gan_02.png}
+
+Resimden resime tercüme edebilmek, ``üretim yapmak'' elle çizilmiþ taslaklarý
+gerçeðe çok yakýn resimlere dönüþtürmek, ya da tam tersi yönde gitmek mesela
+bir uydunun çektiði þehir resmini haritasal yollar, evler þemasýna tercüme
+etmek, vs.
+
+\includegraphics[width=30em]{gan_04.png}
+
+Mimari
+
+Þimdi GAN'lerin nasýl kurulduðuna gelelim. Bir GAN yapýsý kabaca bir kalpazan
+(üretimsel) ve polis (ayýrtaç -discriminatör-) arasýndaki iliþkiyi
+benzetilebilir. Ýlk baþta kalpazan polise bir sahte para gösterir, polis buna
+sahte der. Bu noktada polis kalpazana önemli bir bilgi / geri besleme vermiþ
+olur, kalpazan bu bilgiyi kullanarak bir sonraki sefere daha iyi sahte para
+basmaya uðraþabilir. Bu döngü uzun süre devam ettirilir ta ki kalpazan iþleri
+iyice ilerletip polisi tamamen aldatabilinceye kadar. 
+
+Ýmajlar baðlamýnda düþünelim þimdi; sahte imajlar üretmek ve onlarý
+ayýrdedebilmek. Üstteki anlatýmdan bize iki tane að gerektiðinin
+anlayabiliriz. Birincisi ayýrtaç, bu aða imaj verilir, o da cevap olarak 0/1
+olarak sahte / deðil, doðru / yanlýþ þeklinde bir cevap hesaplar. 
+
+\includegraphics[width=30em]{gan_05.png}
+
+Ýkinci að yapýsý sahte imaj üretmeye uðraþýyor, ve bu üretimi çok iyi yapmaya
+uðraþýyor. Peki girdi nedir? Gürültü! Ýkinci aða 100 boyutlu gürültü vereceðiz
+(baþka boyutlar da olabilir), ve bu gürültüyü iþleyerek 28x28 boyutlarýnda bir
+imaj üretmesini bekleyeceðiz. Bu dahiyane bir yöntem. Aðýn hayal görmesini,
+üretmesini istiyoruz, bu tür bir aða gürültü, ya da hiçlikten daha iyi bir girdi
+verilemezdi herhalde. Bu arada eðitildikten sonra YSA'nýn deterministik bir
+yapýda olduðunu unutmayalým, yani eðitim bitince ayný gürültü iki kere verilince
+ayný imaj üretilir. Deðiþik imajlar için deðiþik gürültüler vermek lazým!
+Deðiþik gürültü nasýl olur? Gaussian bazlý N(0,1) gürültü ürettiðimizi
+düþünelim, bazen 0'in solundan bazen saðýndan deðer üretiyor olabiliriz. Müthiþ
+olan YSA'nýn eðitim sýrasýnda bu tür gürültü farklarýna hassas hale
+gelmesidir! Ýkinci að altta,
+
+\includegraphics[width=30em]{gan_06.png}
+
+Peki eðitim verisi $X,y$ nedir, yani kaynak etiket nasýl ayarlanýr? Eðitim
+sýrasýnda gerçek görüntüler arasýndan belli sayýda dosya toplanýr, bunlar
+``gerçek'' yani 1 etiketi, ardýndan elde en son olan üretece görüntü üretmesi
+söylenir ve bu veriler 0 etiketi ile eðitim verisine dahil edilir. Dikkat
+edersek MNIST baðlamýnda mesela bu tabandan gelen 0,1,2,. gibi etiketleri
+kullanmýyoruz, etiketleri kendimiz üretiyoruz. 
+
+\includegraphics[width=30em]{gan_07.png}
+
+Amaç üretecin o kadar iyi hale gelmesi ki ayýrtaç gerçek imaj ile hayali
+olaný birbirinden ayýrt edemesin.
+
+\inputminted[fontsize=\footnotesize]{python}{mnist_dcgan.py}
+
+Eðittikten sonra bir gürültü verip üretim yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import mnist_dcgan
+generator, discriminator, gan = mnist_dcgan.get_model()
+generator.load_weights("dcgan_generator_epoch_50.h5")
+noise = np.random.randn(1,200)
+pixels = generator.predict(noise).reshape((28,28))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig('gan_01.png')
+\end{minted}
+
+\includegraphics[width=20em]{gan_01.png}
+
+Bir kez daha gürültü üretelim ve imaj üretelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+noise = np.random.randn(1,200)
+pixels = generator.predict(noise).reshape((28,28))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig('gan_03.png')
+\end{minted}
+
+\includegraphics[width=20em]{gan_03.png}
+
+Bu çýktýlarýn görüntüsü ilginç deðil mi? Aslýnda MNÝST imajlarýna týpatýp
+benzemiyorlar, ``hayal edilmiþ'' ya da ``tekrar oluþturulmuþ'' bir halleri
+var sanki. GAN'lerin sihri burada. 
+
+Kaynaklar
+
+[1] \url{https://towardsdatascience.com/gans-n-roses-c6652d513260}
+
+[2] \url{https://towardsdatascience.com/gan-by-example-using-keras-on-tensorflow-backend-1a6d515a60d0}
+
+\end{document}
+

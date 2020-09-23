@@ -1,0 +1,595 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Yaklaþýksal SVD ile Tavsiye Sistemleri
+
+Geçmiþ verilere bakarak bir kullanýcýnýn hiç seyretmediði bir filme nasýl
+not vereceðini tahmin etmek ünlü Netflix yarýþmasýnýn konusuydu. Önceki bir
+yazý [14]'te benzer bir veri seti Movielens üzerinde SVD uygulayarak önce
+boyut azaltmýþtýk, azaltýlmýþ boyut üzerinden yeni (o film için notu
+bilinmeyen) bir kullanýcýnýn diðer mevcut kullanýcýlara mesafesini
+hesaplamýþ, ve böylece beðeni açýsýndan en çok benzediði diðer kullanýcýyý
+bulmuþtuk (birkaç tane de bulunabilir). Bu kullanýcýnýn bir film için
+verdiði notu yeni kullanýcý için tahmin olarak baz almýþtýk. SVD'yi
+kullanmanýn bir yöntemi daha var, Netflix yarýþmasýnda kullanýlan [1] bir
+yaklaþým þöyle; alttaki SVD ayrýþtýrmasýna bakalým,
+
+\includegraphics[height=4cm]{svdapprox_1.png}
+
+1'inci kullanýcýnýn 1'inci filme verdiði not üstte köyü gösterilen
+satýrlarýn çarpýmý ile oluyor, eðer ufak harfler ve kullanýcý (user) için
+$u$, film için $i$ indisini, ve $q,p$ vektörlerini $Q,P$ matrislerinin
+sýrasýyla kolon ve satýrlarýný göstermek için kullanýrsak, ayrýþtýrma
+sonrasý beðeni deðeri (önemli bir kýsmý daha doðrusu) $q_i^Tp_u$
+çarpýmýndadýr. Çarpým içinde $S$'ten gelecek eþsiz deðeri (singular value)
+ne olacak?  Þimdi formülasyonda bir deðiþiklik düþünelim, bu deðerin çarpým
+dýþýna alýndýðýný hayal edelim; bu deðerin kabaca birkaç toplamýn sonucuna
+dönüþtüðünü düþünelim. Matematiksel olarak imkansýz deðil. Bu toplam
+terimleri, toplam olduklarý için, bir baz seviyesi tanýmlayabilirler. Bir
+kullanýcýnýn ne kadar yanlý (bias) not verdiðini, ya da bir filmin nasýl
+not almaya meyýllý olduðunu modelleyebilirler (ki bu da bir yanlýlýk
+ölçüsü). Ayrýca tüm filmlere verilen notlarýn yanlýlýðý da ayrý bir terim
+olarak gösterilebilir. Tüm bunlarý bir araya koyarsak, bir beðeni notunu
+tahmin edecek formül þöyle gösterilebilir,
+
+$$
+\hat{r}_{ui} = \mu + b_i + b_u + q_i^Tp_u
+$$
+
+$\mu$ bir skalar, tüm filmlere verilen ortalamayý gösteriyor, ki tüm beðenilerin
+sayýsal ortalamasý üzerinden basit bir þekilde hýzla
+hesaplanabilir. $\hat{r}_{ui}$'ya bir tahmin dedik çünkü modelimizdeki
+vektörlerin deðerlerini bulduktan sonra (eðitim verisiyle bu hesabý yapacaðýz)
+modeli kullanarak gerçek not $r_{ui}$ için bir tahmin olarak kullanýlacak.
+
+Yanlýlýk hakkýnda bazý örnekler vermek gerekirse, diyelim ki kullanýcý Bob not
+verirken yüksek seviyede oy vermeye meyýllý. Bu durumda bu kullanýcýnýn ortalama
+hatta düþük oy vermesi onun bir filmden hakikaten hiç hoþlanmadýðýný
+sinyalleyebilir. Ya da bir film genellikle ortalama oy almaktadýr, bu durumda
+ona çok iyi not veren bir kiþinin bu filmi çok beðendiði ortaya çýkar. Modeldeki
+yanlýlýk parametreleri bu durumu saptayabilirler. Eðer verimizde / gerçek
+dünyada yanlýlýk var ise, modelin bu bilgiyi kullanmasý onun baþarýsýný
+arttýracaktýr.
+
+Eðitim
+
+Eðitim için ne yapmalý? Minimize edeceðimiz bir hedef fonksiyonu kuralým, ki
+çoðunlukla bu karesi alýnmýþ hata ile olur. Mesela gerçek not $r_{ui}$
+deðerinden tahmin notu $\hat{r}_{ui}$'yi çýkartýp karesini alabiliriz. Bu iþlemi
+tüm $u,i$'ler için yaparak sonuçlarý toplarýz, ve bu toplamý minimize etmeye
+uðraþabiliriz. Yani
+
+$$
+\min_{b\star,q\star,p\star} \sum_{u,i} (r_{ui} - \hat{r}_{ui})^2 + 
+\lambda (b_i^2 + b_u^2 + ||q_i||^2 + ||p_u||^2)
+$$
+
+$$
+= \min_{b\star,q\star,p\star} \sum_{u,i} (r_{ui} - \mu - b_i - b_u - q_i^Tp_u)^2 + 
+\lambda (b_i^2 + b_u^2 + ||q_i||^2 + ||p_u||^2)
+$$
+
+Kýsaltma olarak $e_{ui}$ tanýmlayalým, bu faydalý olabilir, formüldeki ilk
+parantez içindeki kýsýmda kullanmak üzere,
+
+$$ e_{ui} := r_{ui} - \hat{r}_{ui} $$
+
+$\lambda$ ile çarpýlan bölüm regülarizasyon için. Ýstatistik, yapay öðrenimde
+modelimizin aþýrý uygunluk (överfitting) yapmasýný engellemek için
+regülarizasyon kullanýlýr, bunun için istediðimiz deðiþkenlerin fazla büyümesini
+cezalandýrýrýz, üstteki minimizasyon modelinde bu ceza için tüm deðerlerin
+büyüklüðünü (magnitude) hesapladýk -skalar deðerlerin karesini, vektör
+deðerlerinin kare norm'unu alarak- ve bu büyüklükleri bizim dýþarýdan
+tanýmlayacaðýmýz bir sabitle çarpýmý üzerinden minimizasyon problemine direk
+dahil ettik. Böylece bu büyüklükler azaltýlma hedefinin parçasý haline
+geldiler. Yani hem $e_{ui}^2$ hem de hatayý oluþturan deðerlerin kendileri
+minimize edilecek. Bu minimizasyon sýrasýnda bazý deðiþkenlerin sýfýra inip o
+$u,i$ için tamamen etkisiz hale gelmesi bile mümkündür (ki bu bize o
+parametrenin önemsiz olduðunu sinyalleyebileceði için faydalýdýr).
+
+Rasgele Gradyan Ýniþi (Stochastic Gradient Descent -SGD-)
+
+Modeli nasýl minimize ederiz? Bu model konveks (convex) deðil, ki
+konvekslik bilindiði gibi fonksiyonun düzgün bir çukur gibi olduðu
+problemlerdir. Böyle çukur fonksiyonlarýnda herhangi bir noktadan
+baþlarsýnýz, gradyaný hesaplarsýnýz, ve bu gradyan hep optimal iniþ
+noktasýný (daha doðrusu tersini) gösterir, ve yolda giderken takýlýp
+kalabileceðiniz yerel minimumlar mevcut deðildir, ve sonunda çukur dibine
+ulaþýlýr. Bizim problemimizde $q_i^Tp_u$ var, bu deðiþkenlerin ikisi de
+bilinmiyor, ve bu çarpýmýn karesi alýndýðý için genel karesellliði
+(quadratic) kaybetmiþ oluyoruz. Fakat yine de SGD bu problemi
+çözebiliyor. Bunun sebeplerini, SGD SVD'nin hikayesiyle beraber yazýnýn
+sonunda bulanabilir.
+
+SGD için gradyanlar lazým, her deðiþken için minimizasyon toplamý içindeki
+kýsmýn (bu kýsma $E$ diyelim) ayrý ayrý kýsmý türevini almak lazým. Mesela
+$b_u$ için
+
+$$ \frac{\partial E}{\partial b_u}  = -2e_{ui} + 2 \lambda b_u
+$$
+
+Gradyan her zaman en yüksek çýkýþý gösterir, o zaman hesapsal algoritma onun
+tersi yönüne gitmelidir. Bu gidiþin adým büyüklüðünü kontrol etmek için
+dýþarýdan bizim belirlediðimiz bir $\gamma$ sabiti ile çarpým yapabiliriz, ve
+bir numara daha, sabit 2 deðerlerinin $\gamma$ içinde eritilebileceðini
+farzederek onlarý sileriz. Yani adým $\gamma(e_{ui} - \lambda b_u)$ haline
+geldi. Bir döngü içinde eski $b_u$ bulunacak, gördüðümüz yönde adým atýlacak,
+yani adým önceki deðere toplanacak, ve yeni deðer elde edilecek. Diðer
+deðiþkenler için türev alýp benzer iþlemleri yaparsak, sonuç þöyle,
+
+$$ b_u \leftarrow b_u + \gamma (e_{ui} - \lambda \cdot b_u) $$
+
+$$ b_i \leftarrow b_i + \gamma (e_{ui} - \lambda \cdot b_i) $$
+
+$$ q_i \leftarrow q_i + \gamma (e_{ui}\cdot p_u - \lambda \cdot q_i) $$
+
+$$ p_u \leftarrow p_u + \gamma (e_{ui}\cdot q_i - \lambda \cdot p_u) $$
+
+Her deðiþken için baþlangýç noktasý rasgele olarak seçilebilir, hatta
+seçilmelidir; Ýnternet'te bu konu hakkýnda ``efendim tüm deðerleri 0.1
+deðeri yapsanýz olur'' gibi yorumlar okuyabilirsiniz, bu durumda $q_i,p_u$
+deðiþkenlerinin tüm hücreleri ayný deðerde kalýr! Yani $q_3$ mesela,
+tamamen 0.6 deðerine sahip olur, ki bu istenen bir þey
+olmaz. $\gamma,\lambda$ sabitleri için en iyi deðerler deneme/ yanýlma ya
+da çapraz saðlama (crossvalidation) ile bulunabilir, biz bu örnekte deneme
+/ yanýlma yöntemini seçtik.
+
+Rasgelelik, aynen {\em Lojistik Regresyon} örneðinde olduðu gibi verinin
+rasgeliliðinden geliyor, her veri noktasýný teker teker sýrayla iþliyoruz
+aslýnda fakat bu ``sýranýn'' rasgele olduðunu farzettiðimiz için özyineli
+algoritmamýz rasgelelik elde ediyor. Python kodu altta, eðitim için kod sadece
+bir kere verinin üzerinden geçiyor. Baþa dönüp birkaç kere (hatta yüzlerce)
+veriyi iþleyenler de olabiliyor.
+
+\inputminted[fontsize=\footnotesize]{python}{ssvd.py}
+
+Kodun önemli bir özelliði þudur, boþ yani \verb!nan! deðeri içeren notlar eðitim
+sýrasýnda atlanýr. SGD seyrek verilerle de iþleyebilen bir eðitim yöntemidir. Bu
+durumda verinin seyrekliði (sparsýty) bizim için çok faydalý, çünkü o veri
+noktalarýna bakýlmayacak, \verb!row.notnüll()! ile boþ olmayan öðelerin indis
+deðerlerini alýyoruz. Bilindiði üzere Movielens, Netflix verileri oldukça
+seyrektir, kullanýcý binlerce film içinden onlar, yüzler baðlamýnda not verimi
+yapar, geri kalan deðerler boþtur.
+
+Pratikte Atlanabilecek Formüller
+
+Üstteki formülasyon içinde genel, film ve kullanýcý yanlýlýklarý formül içinde
+belirtilmiþtir. Pratikte sayýsal hesap açýsýndan bu yanlýlýklarý daha SVD
+baþlamadan önce veriden çýkartmak, ve yanlýlýlýklarý rasgele güncelleme
+mantýðýndan çýkartmak daha iyi sonuç veriyor. Bu çýkartma þöyle yapýlýr; önce
+film ortalamalarý hesaplanýr, her kullanýcý için o kullanýcýnýn o film
+ortalamasýna olan farký (offset) hesaplanýr ve bu fark eðitim sýrasýnda not
+olarak kullanýlýr. Böylece SVD tüm yanlýlýklardan arýnmýþ bir fark hesabý ile
+çalýþýr sadece, ve sayýsal olarak bu daha avantajlýdýr. Yoksa ilk atýlan adýmda
+fark çok büyük olacaðý için bu fark gradyan iniþinin yönününü aðýrlýklý olarak
+belirleyecektir, ve bu ilk atýlan adým hesabýn geri kalanýna aþýrý baskýn
+çýkabilecektir (dominate). Zaten SVD'nin kuzeni olan PCA'den de bildiðimiz gibi,
+bu yöntem ortalamadan arýndýrýlmýþ (demeaned) farklarla iþ yapýyor.
+
+Niye Azar Azar (Incremental) Hesap? 
+
+Madem $U,S,V$ hesabý yapar gibi $q_i,p_u$ hesaplýyoruz, niye bu hesabý adým
+adým yapýyoruz? 
+
+Bu sorunun cevabý azar azar hesap yaparken hafýzaya sadece o satýrý alarak daha
+az bellek kullanmamýz. Milyarlarca boyut ve milyarlarca satýr iþliyor olsaydýk
+bu matrisin tamamýný hafýzaya almamýz mümkün olmazdý.
+
+Ayrýca olmayan verileri atlamak bu SVD hesabýný bir ``veri tamamlama problemi''
+haline getiriyor, piyasadaki neredeyse diðer tüm kütüphaneler olmayan veriyi
+sýfýr olarak kabul eder. Bu farklý bir problemdir. Bu diðer SVD yöntemlerinde
+her ne kadar olan veriyi ortalasak ve sýfýr deðerleri sýfýr averajla ayný anlama
+gelmeye baþlasa bile, yine de olmayan veriyi sýfýr kabul etmek onu atlamaktan
+farklýdýr [12].
+
+Basit bir örnek
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+import ssvd
+d =  np.array(
+[[  5.,   5.,   3.,  nan,   5.,   5.],
+ [  5.,  nan,   4.,  nan,   4.,   4.],
+ [ nan,   3.,  nan,   5.,   4.,   5.],
+ [  5.,   4.,   3.,   3.,   5.,   5.],
+ [  5.,   5.,  nan,  nan,  nan,   5.]
+])
+data = pd.DataFrame (d, columns=['0','1','2','3','4','5'],
+       index=['Ben','Tom','John','Fred','Bob'])
+avg_movies_data = data.mean(axis=0)
+data_user_offset = data.apply(lambda x: x-avg_movies_data, axis=1)
+q_i,p_u = ssvd.ssvd(data_user_offset,k=3)
+print 'q_i',q_i
+print 'p_u',p_u
+u = 4; i = 2 # Bob icin tahmin yapalim
+r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:]) + avg_movies_data.ix[i] + \
+           np.nan_to_num(data_user_offset.ix[u,i])
+print r_ui_hat
+\end{minted}
+
+\begin{verbatim}
+q_i [[ 0.77564986  0.1768796   0.56224297  0.42870962  0.94723452  0.55772707]
+ [ 0.74100171  0.18146607  0.07704434  0.17631144  0.48868432  0.90470742]
+ [ 0.70541948  0.28729857  0.091619    0.46184649  0.64498754  0.27410096]]
+p_u [[ 0.41549541  0.59784095  0.45227968]
+ [ 0.7756159   0.1197948   0.2921504 ]
+ [ 0.82274016  0.58432802  0.46501307]
+ [ 0.1877425   0.21364635  0.1924456 ]
+ [ 0.80554597  0.59254732  0.9775562 ]]
+3.92146103113
+\end{verbatim}
+
+Not: Artýmsal SVD için bir diðer teknik için bkz. {\em Ders 29}. 
+
+Test Etmek
+
+Test verisi oluþturmak için eðitim verisinde rasgele olarak bazý notlarý seçtik,
+bunlarý bir kenara kaydederek onlarýn ana matris içindeki deðerini sildik
+(yerine \verb!nan!  koyarak), ve bir kýsmý silinmiþ yeni bir eðitim matrisi
+yarattýk, \verb!create_training_test! iþlevinde bu görülebilir. Bu iþlevde her
+kullanýcýdan sadece bir tane not verisi alýyoruz, ve bunu sadece belli bir
+sayýda, \verb!collim! kadar, not vermiþ kullanýcýlar için yapýyoruz, ki böylece
+az sayýda not vermiþ kullanýcýlarýn verisini azaltmamýþ oluyoruz. Ayrýca belli
+miktarda, \verb!rowlim! kadar test noktasý elde edince iþ bitti kabul
+ediyoruz. Test verisi yaratmak için \%80-\%20 gibi bir ayrým yapmadýk, yani
+eðitim veriþindeki tüm kullanýcýlarý ve onlarýn neredeyse tüm verisini eðitim
+için kullanýyoruz.
+
+Movielens verisine gelelim. {\em SVD, Toplu Tavsiye} yazýsýndaki
+\verb!movielens_prep.py! ile gerekli eðitim dosyasý üretildiðini farzederek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, os
+df = pd.read_csv("%s/Downloads/movielens.csv" % os.environ['HOME'] ,sep=';')
+print df.shape
+df = df.ix[:,1:3700] # id kolonunu atla,
+df.columns = range(3699) # kolon degerlerini tekrar indisle
+print df.shape
+\end{minted}
+
+\begin{verbatim}
+(6040, 3731)
+(6040, 3699)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+avg_movies = df.mean(axis=0)
+df_user_offset = df.apply(lambda x: x-avg_movies, axis=1)
+print df.ix[6,5], avg_movies.ix[5], df_user_offset.ix[6,5]
+\end{minted}
+
+\begin{verbatim}
+4.0 3.87872340426 0.121276595745
+\end{verbatim}
+
+Eðitim ve test verisi yaratýyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import ssvd
+df_train, test_data = ssvd.create_training_test(df_user_offset,rowlim=500,collim=300)
+print len(test_data)
+\end{minted}
+
+\begin{verbatim}
+501
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+q_i,p_u = ssvd.ssvd(df_train,k=8)
+\end{minted}
+
+Test
+
+\begin{minted}[fontsize=\footnotesize]{python}
+rmse = 0; n = 0
+for u,i,real in test_data:
+    r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:])
+    rmse += (real-r_ui_hat)**2
+    n += 1
+print "rmse", np.sqrt(rmse / n)
+\end{minted}
+
+\begin{verbatim}
+rmse 0.936136196897
+\end{verbatim}
+
+Sonuç fena deðil.
+
+Formülasyonun Hikayesi
+
+SGD SVD'nin hikayesi þöyle. Yýl 2009, Netflix Yarýþmasý [11] katýlýmcýlarýndan
+Simon Funk (gerçek adý Brandyn Webb) SGD SVD yaklaþýmýný kodlayýp veri üzerinde
+iþletince birden bire sýralamada ilk 3'e fýrlar; Webb artýk çok ünlü olan blog
+yazýsýnda [1] yaklaþýmý detayýyla paylaþýp forum'da haberini verince bu haber
+tam bir bomba etkisi yaratýr. Pek çok kiþi yaklaþýmý kopyalar, hatta kazanan
+BellKor ürününde Webb'in SVD yaklaþýmýnýn kullanýldýðý biliniyor.
+
+Bu metotun keþfi hangi basamaklardan geçti? Beni meraklandýran minimizasyon
+formülasyonun konveks olmamasýydý -- genellikle optimizasyon problemlerinde
+konveksliðin mevdudiyeti aranýr, çünkü bu durumda sonuca yaklaþmak (convergence)
+için bir garanti elde edilir. Bu durumda konvekslik yoktu. ``O zaman Webb nasýl
+rahat bir þekilde SGD kullanabildi?'' sorusunun cevabýný merak ediyorduk
+yani. Biraz araþtýrýnca Bottou ve LeCunn gibi araþtýrmacýlarýn yazýlarýna
+ulaþtýk [4]. Onlara göre konvekslik olmamasý yapay öðrenim araþtýrmacýlarýný
+korkutmamalý, eðer sayýsal (empiriçally) iþleyen bir algoritma var ise, teorik
+ispat gelene kadar bu metotun kullanýlmasýnda sakýnca yoktur.
+
+Fakat böyle buluþlarda yine de bazý garantiler temel alýnmýþ olabilir,
+araþtýrmacý tamamen balýklama atlayýþ yapmaz. Webb'in kendisine bu sorularý
+sorduk ve bize buluþun hangi seviyelerden geçtiðini anlattý. Geriye sarýyoruz,
+Webb Netflix'den çok önce yapay sýnýr aðlarýný araþtýrmaktadýr, ve Sanger,
+Oja'nýn [5,6] yayýnlarýný baz alarak kurduðu bir YSA için bir çözüm bulduðunu
+farkeder. Sayýsal çözümde özdeðer/vektör bulmaya yarayan Üstel Metotun (power
+method) bir þeklini kullanmýþtýr, ki Sanger'in Genel Hebbian Algorýtmasýnýn
+(GHA) üstel metot ile baðlantýlarý var, ve bu GHA yayýnýnda ``eðitilince''
+özdeðer/vektör ve PCA hesabý yapabilen bir YSA'dan bahsediliyor. Daha önemlisi
+GHA 1 olasýlýkla (yani kesin) bu sonuçlara eriþebiliyor.
+
+Daha sonra Webb bu çözümü arkadaþý Gorrell ile tartýþýrken Gorrell ona
+problem formülasyonunun SVD olarak görülebileceðini söyler. Bilindiði gibi
+özdeðer/vektör hesabý ile SVD yakýn akraba sayýlýr. Ýkili bu baðlamda
+birkaç yayýn da yaparlar. Daha sonra Netflix yarýþmasý baþladýðýnda Webb
+çözüm için gradyan baz alarak SGD kullanabileceðini farkediyor, ki SGD ile
+üstel metot arasýnda teorik baðlantý var [7]. Ve sonuç olarak SGD SVD
+metotu ortaya çýkýyor.
+
+Tabii ki ``SGD SVD ne kadar SVD sayýlýr?'' gibi bir soru sorulabilir. Evet,
+regülarizasyon bazý gayrý lineerlikleri probleme sokar, zaten bu çözümü
+``yaklaþýksal'' yapan kýsým da budur. Fakat belli þartlarda, regülarizasyon
+olmasa çözüm tam SVD olacaktýr. Bu buluþun püf noktasý bu bilgide, ve üstteki
+teorik benzerliklerde, onlarý biliyor olmakta yatýyor. Eðer bunlar biliniyor
+ise, ve saðlam lineer cebir bilgisi ile gerektiði zaman onlarý ne kadar
+esnetebileceðimizi biliriz. Konu hakkýndaki daha fazla detay [10]'da
+bulunabilir.
+
+Tavsiye
+
+\begin{minted}[fontsize=\footnotesize]{python}
+movies = pd.read_csv("../../stat/stat_pandas_ratings/movies.dat",\
+         sep='::',names=['idx','movie','type'])
+def eval_user(u):
+    res = {}
+    for i in range(df_user_offset.shape[1]):
+        r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:])
+        res[i] = float(r_ui_hat) + avg_movies.ix[i] + df_user_offset.ix[u,i]
+    res = sorted(res.items(), key=lambda x:x[1], reverse=True)
+
+    print "\n\nTavsiyeler\n\n"
+    for j,(si,sm) in enumerate(res):
+        print movies[movies['idx'] == si]['movie']
+        if j == 10: break
+
+    print "\n\nMevcut Filmler\n\n"
+    row = df.ix[u]
+    idxs = row.index[row.notnull()]
+    for j,idx in enumerate(idxs):
+        print movies[movies['idx'] == idx]['movie'], row[idx]
+        if j == 10: break
+
+eval_user(300)
+eval_user(2900)
+\end{minted}
+
+\begin{verbatim}
+Tavsiyeler
+
+
+3441    Frequency (2000)
+Name: movie, dtype: object
+105    Muppet Treasure Island (1996)
+Name: movie, dtype: object
+Series([], dtype: object)
+2    Grumpier Old Men (1995)
+Name: movie, dtype: object
+4    Father of the Bride Part II (1995)
+Name: movie, dtype: object
+1    Jumanji (1995)
+Name: movie, dtype: object
+3    Waiting to Exhale (1995)
+Name: movie, dtype: object
+0    Toy Story (1995)
+Name: movie, dtype: object
+5    Heat (1995)
+Name: movie, dtype: object
+6    Sabrina (1995)
+Name: movie, dtype: object
+7    Tom and Huck (1995)
+Name: movie, dtype: object
+
+
+Mevcut Filmler
+
+
+Series([], dtype: object) 5.0
+0    Toy Story (1995)
+Name: movie, dtype: object 3.0
+1    Jumanji (1995)
+Name: movie, dtype: object 4.0
+3    Waiting to Exhale (1995)
+Name: movie, dtype: object 3.0
+4    Father of the Bride Part II (1995)
+Name: movie, dtype: object 5.0
+9    GoldenEye (1995)
+Name: movie, dtype: object 4.0
+15    Casino (1995)
+Name: movie, dtype: object 4.0
+19    Money Train (1995)
+Name: movie, dtype: object 5.0
+20    Get Shorty (1995)
+Name: movie, dtype: object 3.0
+23    Powder (1995)
+Name: movie, dtype: object 4.0
+30    Dangerous Minds (1995)
+Name: movie, dtype: object 5.0
+
+
+Tavsiyeler
+
+
+Series([], dtype: object)
+0    Toy Story (1995)
+Name: movie, dtype: object
+1    Jumanji (1995)
+Name: movie, dtype: object
+2    Grumpier Old Men (1995)
+Name: movie, dtype: object
+3    Waiting to Exhale (1995)
+Name: movie, dtype: object
+4    Father of the Bride Part II (1995)
+Name: movie, dtype: object
+5    Heat (1995)
+Name: movie, dtype: object
+6    Sabrina (1995)
+Name: movie, dtype: object
+7    Tom and Huck (1995)
+Name: movie, dtype: object
+8    Sudden Death (1995)
+Name: movie, dtype: object
+9    GoldenEye (1995)
+Name: movie, dtype: object
+
+
+Mevcut Filmler
+
+
+19    Money Train (1995)
+Name: movie, dtype: object 4.0
+23    Powder (1995)
+Name: movie, dtype: object 4.0
+37    It Takes Two (1995)
+Name: movie, dtype: object 3.0
+45    How to Make an American Quilt (1995)
+Name: movie, dtype: object 5.0
+48    When Night Is Falling (1995)
+Name: movie, dtype: object 5.0
+66    Two Bits (1995)
+Name: movie, dtype: object 5.0
+78    Juror, The (1996)
+Name: movie, dtype: object 4.0
+104    Nobody Loves Me (Keiner liebt mich) (1994)
+Name: movie, dtype: object 5.0
+118    Race the Sun (1996)
+Name: movie, dtype: object 4.0
+134    From the Journals of Jean Seberg (1995)
+Name: movie, dtype: object 2.0
+142    Brothers McMullen, The (1995)
+Name: movie, dtype: object 3.0
+\end{verbatim}
+
+Numba ve Funk SVD
+
+Eðer Numba [13] kullanýrsak, SVD kodunu çok daha hýzlý iþletebiliriz. Ayrýca
+Funk'ýn kodlamasý (ki alttaki kodu onu temel alacak) biraz daha ilginç, mesela
+en dýþ döngü özellikler (feature) geziyor, onun içindeki birkaç yüz kez yine
+kendi içinde olan tahmin/hata hesabýný yapýyor, tüm veri seti üzerinde. Bunun
+için Movielens 100k verisi lazým, ardýndan \verb!data_m100k.py! ile veri
+yaratýlýr,
+
+\inputminted[fontsize=\footnotesize]{python}{funk2.py}
+
+Üstteki script'i iþlettikten sonra bazý tavsiyeleri gösterebiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, os
+items_file = '%s/Downloads/ml-100k/u.item' % os.environ['HOME']
+item_df = pd.read_csv(items_file, sep='|',header=None)
+item_df['idx'] = item_df[0] - 1
+item_df = item_df.set_index('idx')
+
+from scipy.io import mmread, mmwrite
+import numpy as np, time, sys, os
+import funk2, pandas as pd
+
+user_feature_matrix = np.loadtxt("/tmp/user_feature_matrix2.dat")
+movie_feature_matrix = np.loadtxt("/tmp/movie_feature_matrix2.dat")
+
+preds = []
+user_id = 110
+for movie_id in range(1682):
+    pred = funk2.predict_rating(user_id, movie_id, user_feature_matrix, movie_feature_matrix)
+    preds.append([movie_id, pred])
+
+preds_df = pd.DataFrame(preds,columns=['movie','score'])
+preds_df.sort_index(by='score',ascending=False,inplace=True)
+preds_df['movie_name'] = item_df[1]
+print preds_df.head(10)
+\end{minted}
+
+\begin{verbatim}
+      movie     score                                         movie_name
+1448   1448  4.600873                             Pather Panchali (1955)
+407     407  4.538450                              Close Shave, A (1995)
+168     168  4.424078                         Wrong Trousers, The (1993)
+482     482  4.406603                                  Casablanca (1942)
+99       99  4.402690                                       Fargo (1996)
+11       11  4.362673                         Usual Suspects, The (1995)
+319     319  4.323309  Paradise Lost: The Child Murders at Robin Hood...
+49       49  4.315158                                   Star Wars (1977)
+113     113  4.308009  Wallace & Gromit: The Best of Aardman Animatio...
+172     172  4.288836                         Princess Bride, The (1987)
+\end{verbatim}
+
+Bu kiþinin seyrettiði ve en çok beðendiði filmler altta
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = mmread('%s/Downloads/A_m100k_train' % os.environ['HOME']).tocsc()
+movies = A[user_id,:].nonzero()[1]
+ratings = A[user_id,A[user_id,:].nonzero()[1]]
+ratings = np.ravel(ratings.todense())
+likes_df = pd.DataFrame()
+likes_df['movie'] = movies; likes_df['rating'] = ratings
+likes_df = likes_df.set_index('movie')
+likes_df.sort_index(by='rating',ascending=False,inplace=True)
+likes_df['movie_name'] = item_df[1]
+print likes_df.head(10)
+\end{minted}
+
+\begin{verbatim}
+       rating                     movie_name
+movie                                       
+301         5       L.A. Confidential (1997)
+314         5               Apt Pupil (1998)
+257         4                 Contact (1997)
+285         4    English Patient, The (1996)
+303         4           Fly Away Home (1996)
+310         4  Wings of the Dove, The (1997)
+353         4     Wedding Singer, The (1998)
+302         3             Ulee's Gold (1997)
+320         3                  Mother (1996)
+304         2          Ice Storm, The (1997)
+\end{verbatim}
+
+Kaynaklar
+
+[1] Funk, {\em Netflix Update: Try This at Home}, \url{http://sifter.org/~simon/journal/20061211.html}
+
+[2] Koren, Bell, {\em Recommender Systems Handbook}, \url{http://www.cs.bme.hu/nagyadat/Recommender_systems_handbook.pdf}
+
+[3] Koren, {\em MATRIX FACTORIZATION TECHNIQUES FOR RECOMMENDER SYSTEMS }, \url{https://datajobs.com/data-science-repo/Recommender-Systems-%5BNetflix%5D.pdf}
+
+[4] LeCun, {\em Who is Afraid of Non-Convex Loss Functions?}, \url{http://videolectures.net/eml07_lecun_wia}
+
+[5] Sanger, {\em Optimal Unsupervised Learning in a Single-Layer Linear Feedforward Neural Network }, \url{http://courses.cs.washington.edu/courses/cse528/09sp/sanger_pca_nn.pdf} %
+
+[6] Oja, {\em A Simplified Neuron Model as a Principal Component Analyzer}, \url{http://users.ics.aalto.fi/oja/Oja1982.pdf}
+
+[7] Cotter, {\em Stochastic Optimization for Machine Learning}, \url{http://arxiv.org/pdf/1308.3509}
+
+[8] Touchette, {\em Introduction to Numerical Computing}, \url{http://www.maths.qmul.ac.uk/~wj/MTH5110/notes/MAS235_lecturenotes1.pdf}
+
+[10] Stack Exchange, {\em Gradient Descent on Non-Convex Function Works But How?},\url{http://math.stackexchange.com/questions/649701/gradient-descent-on-non-convex-function-works-but-how}
+
+[11] Netflix, {\em Netflix Prize}, \url{http://www.netflixprize.com}
+
+[12] Gleich, {\em SVD on the Netflix matrix}, \url{https://dgleich.wordpress.com/2013/10/19/svd-on-the-netflix-matrix}
+
+[13] Bayramlý, 
+     {\em Numba, LLVM, ve SVD}, 
+     \url{https://burakbayramli.github.io/dersblog/sk/2014/09/numba-llvm-ve-svd.html}
+
+[14] Bayramli, Lineer Cebir, {\em SVD, Toplu Tavsiye}
+
+\end{document}
+
+
+
+

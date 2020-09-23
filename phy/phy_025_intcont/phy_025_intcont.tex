@@ -1,0 +1,599 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Kontrole Giriþ
+
+Daha Az Kumandalý Robotlar 
+
+HONDA þirketinin Asimo adlý robotu 1996 yýlýnda ortaya çýktýðýnda herkes
+robotik konusunda önemli bir noktaya eriþildiðini anlamýþtý. Asimo rahat
+bir þekilde yürüyor, merdiven çýkýyor, hatta futbol oynuyordu [1,
+3:50]. Fakat robotun hareketlerine yakýndan bakarsak bir ayaðýnýn sürekli
+düz þekilde yerde olduðunu görüyoruz, robot sanki kendi dinamiði ile
+barýþýk deðil / ondan istifade etmiyor. Çok muhafazakar bir þekilde hareket
+ediyor, ve her hareketinin her noktasý planlý, ve güvenli. 
+
+Bu niye tercih edilir deðil? Öncelikle çok fazla enerji sarfediliyor,
+Asimo'nun yürüyüþü normal insanýn yürüyüþüne kýyasla 20 kat daha fazla
+enerji gerektiriyor, bu sebeple büyük bir pil taþýmasý gerekiyor ve o pil
+bile ancak yarým saat yetiyor. 
+
+Pek çok açýdan Asimo fabrikalardaki robot iþçi kollarýn evriminin vardýðý
+nihai nokta. Yüksek kazançlý (bunun anlamýný ileride göreceðiz) bir sistem,
+aynen fabrika robot kollari gibi çok miktarda enerji ve geri besleme
+kullanýyor, ve üzerinde çok detaylý düþündüðü planladýðý bir aksiyonu
+uyguluyor.
+
+Ama yürümenin farklý yollarý var. Mesela insanlarýn yürüyüþü aslýnda bir
+nevi ``kontrollü düþüþ'' denebilir. Yani insanlar çevre dinamiðine,
+çevrenin fiziðinden istifade ederek yerçekim, yukarý gidiþ, sürtünme
+arasýnda bir optimal nokta bulup az mýktarda bir kontrol uygular, ve bu
+þekilde yürür. Mesela þuradaki robot [1, 7:22] pasif dinamik yürüyüþ
+sergiliyor, bu robot dýþ enerji bile kullanmýyor, sadece yerçekiminden
+istifade ederek düþmeden, aþaðý yürüyor. Bu robotun yürüyüþü insan
+yürüyüþüne daha çok benziyor aslýnda. Robot bize þunu sergiliyor, yürümek
+için etrafýn dinamiðini aþýrý kontrol, aþýrý geri beslemeli müthiþ planlý
+bir gidiþ yoluyla sýfýrlamak yerine o dinamiði daha yakýndan
+inceleyebiliriz. Burada bütün iþi yapan robotun kontrol dinamiði,
+bilgisayar yok, kontrol sistemi yok.
+
+[Uçuþ, denizaltý örnekleri atlandý]
+
+Doðada gördüðümüz çok verimli çalýþan örnekler bir bakýma daha az kumandalý
+(underactuated) denen sistemler. Dersimizin ana konusu bu. Amacýmýz insan
+gibi koþan, kartal gibi inen robotlar yapmak.  Þimdi daha az kumandalý
+tarifi ile ne demek istediðimi daha detaylý þekilde anlatmaya uðrasayým.
+
+Bir örnek görelim, iki baðlantýsý olan bir robot kol. 
+
+\includegraphics[width=15em]{phy_control_1_01.png}
+
+Ýki uzunluk, iki acý var burada. Ders boyunca $q$ ile robotun kordinatlarý
+kastedilecek, örneðimiz için bu kordinatlar $\theta_1,\theta_2$. Büküm
+noktalarýna kontrol $u$ amaçlý bir dönme kuvveti (torque) uygulayabildiðimiz
+düþünelim, bunlarý üstten alta doðru $\tau_1,\tau_2$ ile gösterelim.
+
+$$
+q = 
+\left[\begin{array}{r}
+\theta_1 \\
+\theta_2
+\end{array}\right], \quad
+u = \left[\begin{array}{r}
+\tau_1 \\
+\tau_2
+\end{array}\right]
+$$
+
+Bu sistemin, bu þarkacýn nasýl hareket ettiðini tarif etmek istiyorsak, bu
+derste ilgilendiðimiz çoðu robot ikinci derece sistemler. Herþeyi kontrol
+eden ünlü,
+
+$$
+F = ma
+$$
+
+formülü. Bu örnekte $a$, $q$'nun ikinci türevi olacak. $\dot{q}$ birleþik
+hýz, $\ddot{q}$ birleþik ivme. Bu sistemin ivmelenmesini mevcut yer, hýz,
+ve kontrol girdisi üzerinden tarif eden bir formüle ihtiyacým var. Ýkinci
+seviye mekanik dünyada yaþýyorsak, þöyle bir denklem lazým,
+
+$$
+\ddot{q} = f(q,\dot{q},u,t)
+$$
+
+Bu dersin aþaðý yukarý tamamýnda üstteki türden gayri lineer bir denklemle
+temsil edilen ikinci derece sistemlere bakacaðýz. Hatta bizim
+ilgilendiðimiz çoðu robot daha da basit bir formda olabiliyor, hareket
+denklemleri $u$ bazýnda lineer olabiliyor, robota dönme kuvveti ekleyince
+bu etki sistemin ivmesine lineer bir etki uyguluyor yani.
+
+$$
+\ddot{q} = f_1 (q, \dot{q}, t) + f_2 (q, \dot{q}, t) u 
+\mlabel{1}
+$$
+
+Pek yeni bir þey söylemiþim olmadým aslýnda, $f_1$ ile bir takým gayrý
+lineer iliþkilerle görülen deðiþkenler sisteme etki ediyor, sonra $f_2$ ile
+yine bir takým gayrý lineer iliþkilerle bir iliþki daha var, tek deðiþik
+söylediðim $u$'nun lineer olarak etki ettiði. 
+
+Devam edelim, tamamen kumandalý ne demek? Üstteki denkleme bakalým, $q$ bir
+2x1 vektör, tabii ki $\ddot{q}$ da öyle, yani (1)'de gördüðümüz bir vektör
+denklemi. $f_1$ ayný þekilde. $u$ da öyle, 2x1 vektör. Bu durumda
+boyutlarýn uymasý için $f_2$'nin 2x2 matris olmasý gerekir. Hayatý
+kavramsal, düþünüþ olarak en kolaylaþtýran, ve çoðu robot tasarýmcýsýnýn
+yaptýðý $f_2$ matrisinin tam kerte olduðunu düþünmektir. O zaman deriz ki
+eðer $f_2$ tam kerte ise bir robot tamamen kumandalýdýr. Matematiksel olarak,
+
+$$
+\rank [f_2(q,\dot{q},t)] = \ddim [q]
+$$
+
+Bu demektir ki eðer $f_1,f_2$'yi biliyorsam $u$ ile istediðim $\ddot{q}$'yu
+elde edebilirim. Deðil mi? Tam kerte bu demek, eðer $f_2$ tam kerte olmasa,
+tüm uzayý kapsayazdým, çünkü içinde tekrar eden kolonlar olurdu ve bu
+tekrar yeni bilgi eklemezdi, bu sebeple belli bir $u$ ile her $\ddot{q}$'ya
+erisemezdim.
+
+Daha az kumandalý nedir? Eðer 
+
+$$\rank [f_2(q,\dot{q},t)] < \ddim [q] 
+\mlabel{2}$$ 
+
+ise. 
+
+[geri besleme lineerlestirme atlandi]
+
+Tarif edersek, bir sistemin kontrol girdisi sistemi her yönde
+ivmelendiremezse o sistem daha az kumandalýdýr. 
+
+Bu arada (2) formülüne dikkatle bakarsak, $f_2$, $q,\dot{q}$'a baðlý, o
+zaman daha az, tam kumandalý olma olmamama irdelemesi o anki konuma
+baðlý. Sistem dinamiði sýrasýnda bazen tam kumandalý olabilirim, bazen
+olmayabilirim. Bu nasýl olur? Bir engel vardýr belki, dinamiði belli
+þekillerde deðiþtirir, ve bazý þeyler mümkün olur, bazýlarý olmaz... 
+
+Asimo örneðine dönersek çok dikkatli, muhafazakar bir þekilde hareket
+ediyor deðil mi? Ýþte bu þekilde dikkatli olarak tam kumandalý konumlarda
+kalmaya uðraþýyor, yaptýðý bu. 
+
+Umarým bu tarif ettiðim ayrýmýn ne kadar derin olduðunu
+anlatabilmiþimdir. Robotik alanýnda bu fark her yerde; son 30 senedir çoðu
+araþtýrmacý robot kontrol tasarlarken $f_2$'nin tam kerte olduðunu
+farzetmiþtir. Mesela uyarlanýr (adaptýve) kontrol, hesaplanan dönme kuvveti
+metotlarý, tüm bunlar dolaylý olarak bu tam kerte faraziyesini yapar, ki
+böylece kafanýza esen þekilde kontrol uygulayarak kafanýza esen þekilde
+ivme yaratabilesiniz.  Ýþte bu sebeple uyarlanýr kontrolde mesela tüm bu
+matematiksel ispatlar vardýr, ki sistemi lineerize edebilesiniz, onun
+hakkýnda kolay þekilde düþünebilesiniz.
+
+Ýþte bu sebeple tam ile daha az kumandalý sistemler, tasarýmcýlar arasýnda
+bu kadar ayrýlýk var, çünkü eðer gayrý lineer sistemi alýp lineer hale
+getirme þansýmýz yoksa, o zaman gayrý lineer dinamiði anlamaya uðraþmaktan,
+onun uzun vadeli davranýþý hakkýnda düþünmekten baþka bir þansýnýz
+yoktur. Analitik yaklaþýmlar neredeyse ise baþlar baþlamaz ise yaramaz hale
+gelir, bilgisayarlar burada yardým edebilir.
+
+Fabrikadaki montaj bantýnda çalýþan robot kollarýn çoðu tam kumandalýdýr,
+yürüyen robotlarýn çoðu deðildir. 
+
+[atlandi]
+
+Daha Az Kumandalý Robotlar - 3
+
+Önceki derste gayrý-lineer dinamikten bahsettik, faz grafiklerine baktýk,
+çekim bölgesine (basýn of attraction) baktýk, sabit noktalara baktýk..
+Kontrol konusuna hafifçe dokunduk ve bu konuya iþaret ederken onu bir takým
+matris denklemlerinin manipülasyonu olarak deðil, faz grafikleriyle
+alakalandýrmaya uðraþtým, öyle ki kontrol demek bu faz grafiklerini
+deðiþtirmek, onlarý hareket ettirmek demek oluyordu, sistemi kendi
+istediðiniz noktaya kanalize etmek için grafiði (sistemi) tekrar
+þekillendirmiþ, eðip, bükmüþ oluyorduk. Tabii biraz eðmekten bahsediyoruz,
+bu derste çok fazla eðme bükme yapmýyoruz [1]. 
+
+Ýlk bakacaðýmýz örnek çift entegratör, $\ddot{q} = u$. Bu örnekte herþeyi
+analitik olarak yapabilirim. Bu denklemin fiziksel karþýlýðýný düþünmek
+istersek, buz üzerinde duran birim kütlede bir tuðla düþünebiliriz. Tuðlaya
+uygulanan kontrol kuvveti $F = u$, sürtünme yok. 
+
+\includegraphics[width=10em]{phy_control_01.png}
+
+[Dikkat hem kordinat üzerinde hem de konumsal deðiþken olarak $x$
+kullanýlmýþ, karýþýklýk olmasýn] 
+
+Bu çift entegratör ile yapmak istediðimiz onu orijin noktasýna ve sýfýr
+hýza getirmek. Bariz olmayabilir ama bunu yapmanýn pek çok yolu var ve
+bizim amacýmýz bu iþi yaparken bir tür optimallik kriterine uyarak onu
+yapmak. Derslerimizin geri kalan tümünde optimallik kriteri bizim için bir
+tür hesapsal baston görevini görecek.
+
+Ýlk önce kutup yerleþtirme (pole placement) analiziyle baþlamak
+istiyorum. Sistemi durum uzay (state space) formatýnda yazalým. Durum için
+çoðunlukla $x$, kordinat için $q$ kullanýlýr, altta solda görülüyor. Altta
+saðda durum uzay dinamiðidir, genel bir sistemi tarif ediyor,
+
+$$ 
+x = \left[\begin{array}{c} q \\ \dot{q}  \end{array}\right] \quad
+\dot{x} = A x + Bu
+$$
+
+O zaman üstteki en basit sistemi tarif etmek için
+
+$$ 
+\dot{x} = \left[\begin{array}{rr}
+0 & 1 \\ 0 & 0
+\end{array}\right] x + 
+\left[\begin{array}{c} 0 \\ 1 \end{array}\right] u
+$$
+
+Verili $A,B$ ile açýlýmý yapýnca çift entegratör sistemini elde ettiðimizi
+göreceðiz.
+
+Amacýmýz $u$'yu bulmak, tuðla üzerinde etki eden öyle bir kontrol eylemi
+$u = \pi(x)$ bulalým ki sistemi sýfýr noktasýna getirsin. Yani amacýmýz bir
+geri besleme kanunu $\pi$ bulmak ($\pi$ sembolünü $x$'in fonksiyonu olan
+kontrol ilkeleri için kullanýyorum). Þu formdaki $u$'lar ile
+baþlayabiliriz; $u = -K x$. Görülen $K$ bir matris, $x$ alýnýyor ve $-K$
+ile ölçekleniyor. Bu örnekte $K$ matrisi $1 \times 2$ boyutunda,
+$\left[\begin{array}{cc} k_1 & k_2 \end{array}\right]$,
+
+$$ 
+-K x = 
+\left[\begin{array}{cc} k_1 & k_2 \end{array}\right] 
+\cdot
+\left[\begin{array}{cc} q \\ \dot{q} \end{array}\right] =
+-k_1 q - k_2 \dot{q}
+$$
+
+Bazýlarýmýz bir formu orantýlý türevsel kontrolör olarak tanýyacaktýr. 
+
+Þimdi $K$'yi deðiþtirince sistemime ne olacak diye düþünüyorum, bu hesap
+lineer sistemlerde kolay, $u = -Kx$'i denkleme geri sokarsam 
+
+$$ 
+\dot{x} = (A - BK)x = \left[\begin{array}{rr}
+0 & 1 \\ -k_1 & -k_2
+\end{array}\right] x
+$$
+
+elde ederim. Diferansiyel denklemler dersi alanlar üstteki denklemi nasýl
+çözeceðimizi bilir, çözüm sistemin özdeðerlerini kullanýr, üstteki matrisin
+özdeðerlerini hesaplarýz, sonra özvektörler $v_1,v_2$'yi buluruz,
+
+$$ 
+\lambda_{1,2} = \frac{-k_2 \pm \sqrt{k_2^2 - 4 k_1}}{2}, \quad
+v_1 = \left[\begin{array}{r}
+1 \\ \lambda_1
+\end{array}\right], \quad 
+v_2 = \left[\begin{array}{r}
+1 \\ \lambda_2
+\end{array}\right]
+$$
+
+Peki sistemin stabil olmasý için özdeðelerin belli deðerlerde olmasý
+gerekiyor deðil mi? Ýkisinin de negatif olmasý. Sistemde salýným olup
+olmadýðýný merak ediyoruz, bu durum kompleks özdeðerler varsa olur, ki bu
+durum üstteki karekök içinde eksi deðer varsa ortaya çýkar, onun olmasý
+için de $4 k_1$ deðeri $k_2^2$ olmalý. 
+
+Biz salýným istemiyoruz, $4 k_1 > k_2^2$, bu durumda sistem aþýrý sönümlu,
+$4 k_1 = k_2^2$ ise kritik sönümlu, $4 k_1 < k_2^2$ ise eksik sönümlu,
+ayrýca stabilite için $\lambda_{1,2} < 0$ olmalý.
+
+Bu sonuçlarý faz grafiklerine baðlayalým; özdeðer ayrýþtýrmasý yapmamýzýn
+bir diðer sebebi sistemi çok güzel grafiksel þekilde yorumlamamýza izin
+vermesi. Spesifik bir duruma bakalým, $k_1 = 1$, ve aþýrý sönümlu bir
+sistem için $k_2$ en az 2 olmalý, onu $k_2 = 4$ yapayým. Özdeðerler bu
+durumda  
+
+$$
+\lambda_{1,2} =  \frac{-4 \pm \sqrt{16-4}}{2} =
+-2 \pm 3 
+$$
+
+$$
+\lambda_1 = 0.25, \lambda_2 = -3.75
+$$
+ 
+Þimdi durum uzay grafiðini çizebilirim, $q,\dot{q}$ kordinat sisteminde,
+ilk önce $-0.25$ eðiminde $v_1$ bir çizgisi çizerim,  sonra kabaca $-4$
+eðiminde bir çizgi daha çizerim, $v_2$. Sonumlu sistemdeyiz, bu yüzden
+çizgilerdeki oklar dýþarýdan içeri doðru. 
+
+\includegraphics[width=20em]{phy_control_02.png}
+
+Bu arada anlatým açýsýndan, ve birkaç tane grafik çizmemek için aþýrý
+sönümlü sistem seçtim, böylece tekrarlanan özdeðer çýkmadý, yani salýným
+olmadý. Ama aþýrý sönümlü sistem konuyu irdelemek için yine de iyi çünkü
+tekrarlanan özdeðer olmayýnca özvektörler uzayý kapsar (span). Ya da, her
+baþlangýç konumu iki özvektörün lineer kombinasyonu olarak yazýlabilir.
+
+$$
+x(0) = \alpha_1 v_1 + \alpha_2 v_2
+$$
+
+gibi, ki $\alpha_{1,2}$ bir kombinasyonu oluþturacak herhangi iki
+sabit. Nihai sistem ise 
+
+$$ 
+x(t) = \alpha_1 e^{\lambda_1 t}v_1  + \alpha_1 e^{\lambda_2 t} v_2
+$$
+
+Lineer sistemlerin güzel tarafý bu. Bu demektir ki özvektörleri
+grafiklediðim zaman sistemýn tüm faz grafiðini biliyorum. Mesela altta
+görülen baþlangýçtan $v_2$ çok hýzlý, $v_1$ biraz daha az hýzda bizi sýfýra
+götürecek, bu ikisinin birleþimi sonucunda alttaki gibi bir gidiþ yolu
+takip edilecektir.
+
+\includegraphics[width=20em]{phy_control_03.png}
+
+Kontrol konusuna gelelim. $k_1,k_2$'yi deðiþtirebiliyoruz, ve bu
+parametreleri deðiþtirmek demek faz portresini deðiþtirmek demektir deðil
+mi? Onlarý öyle deðiþtirmeliyim ki sistem istediðim þeyi yapsýn. Bu
+deðiþimi, o deðiþimi yaratacak $k$'leri nasýl ortaya
+çýkartmalýyým. Optimalliðe girmeden önce mesela $k_2^2$ $4k_1$'ten büyük
+olduðu sürece salýnýma girmeyeceðimi biliyorum, bu iyi. O zaman niye
+$k_{1,2}$'yi sonsuza çýkartmýyorum, hemen kut diye sonuç ulasayým? Bu baþka
+problemler çýkartabilir, biriniz fazla enerji diyor, doðru. $k_{1,2}$
+olmasa ne olurdu? O zaman $\dot{x} = Ax$ kalýr sadece bu sistem sadece
+direk grafikte saða doðru gider. 
+
+Biz bu basit sistemde optimal geri beslemeli kontrol hesaplayacaðýz. 
+
+Katý bir kýsýtlama ekleyelim, $|u| < 1$, $u$'nun mutlak deðeri 1'den küçük
+olsun. Bu pek çok þeyi deðiþtirir, biraz önceki lineer sistem analizim ise
+yaramaz hale gelir mesela. Formülize ederken 
+
+$$ 
+u = sat(-Kx)
+$$
+
+diyebilirim, $sat$ ifadesi Ýngilizce satüration'dan (doygunluk) geliyor, -1
+altý için -1, +1 üstü için +1 yapýyorum. Üstte görülen gidiþ yollarý hala
+hafiften geçerli, hala orijine gideriz, ama yol biraz daha uzayabilir çünkü
+kut diye inebilmek yerine daha ufak artýþlarla gitmek zorundayýz, ve hala
+stabilliði kaybetmiyoruz. Ama katý kýsýtlýlýklarý iyi ayarlamam gerekiyor
+ki yol da çok uzamasýn. 
+
+Bu ayarý yapmanýn bir yolu optimal kontrol ile. Tek yolu deðil muhakkak,
+bir yolu. Diyelim ki hayattaki tek amaçým orijine gidebileceðim en hýzlý
+þekilde gitmek, ama $|u| \le 1$ kýsýtlamasýna tabiyim. Bu aslýnda ünlü
+minimum zaman problemi, 
+
+$\left[\begin{array}{cc} 0 & 0 \end{array}\right]^T$'a gidebildiðin kadar
+çabuk git $|u| \le 1$ kýsýtlamasýna tabi olarak. Tabii hem $q=0$ hem de
+$\dot{q}=0$, yani hýz da sýfýr olacak. Orijin derken yer ve hýzdan oluþan
+kordinat sistemindeki ``orijinden'' bahsediyoruz. 
+
+Soruya teorik olarak daha dalýnca bu sorunun iyi þekillenmiþ olmasý için
+kýsýtlamanýn olmasý gerektiðini de görürdük, yoksa, daha önce dediðim gibi,
+sonsuz büyüklükte $u$ kullanabilirdim, sonsuz hýzda ulaþýrdým ve birþey
+öðrenmemiþ olurdum. 
+
+Þimdi buz üzerinde tuðla hakkýnda zihnimizdeki tüm hayal gücü, bilgi
+kýrýntýsýný kullanalým. Eðer sýnýrlý bir kuvvet uygulayabiliyorsam, ve
+orijine en çabuk þekilde ulaþmak istiyorsam, ne yapmalýyým? Biriniz çat-çat
+(bang-bang) dedi. Doðru. Ýleride bir yere mümkün olduðu kadar çabuk ulaþmak
+istiyorsam çat diye gaza basarým hýzlanabildiðim kadar hýzlanýrým, sonra
+belli bir kritik noktada çat diye frene baþarým ve yavaþlamaya baþlarým ve
+kaya kaya hedef noktasýna geleceðim. Bundan daha iyisi mümkün deðil. Bunu
+ispatlayacaðýz tabii. Bu cevabý çift entegratör olarak kafadan
+düþünebilirdik, ama yürüyen bir robot için o kadar kolay düþünülemeyebilir,
+ve biz cevabý genel bir altyapý üzerinden türetmeye uðraþacaðýz.
+
+Bazen bazýlarýnýn ``çat-çat kontrol optimaldir'' dediðini duyabilirsiniz,
+bu sonuç yapýcýlarýnýz (actuator) üzerinde katý sýnýrlar olduðu zaman sýkça
+ortaya çýkar, ve bu sýnýrlar olduðu zaman o sýnýrlara en yakýn þekilde
+davranmak her zaman daha iyidir (o yüzden cat diye hýzlanmak gerekli).
+Robotlarda bu yaklaþým her zaman iþlemiyor, çünkü tek bir zaman aralýðýnda
+yapýcýya maksimum kuvvet, sonra maksimum negatif kuvvet o durumda iyi
+olmuyor.
+
+Ýþin püf noktasý herhalde çat diye gaza bastýktan sonra ne zaman frene
+geçeceðimizi bulmak deðil mi? Önce onu bulmaya uðraþalým, ortaya çýktýðý
+sistem durumlarý herhalde birkaç tanedir. O durumlarý bulmaya
+çalýþalým. $q>0$ durumuna bakalým önce, bir bölüm seçelim, bu durumda fren
+$u=1$ deðil mi (gidiþ orijine doðru ise fren onun tersi yönde, yani pozitif
+yönde olmalý)? O zaman alttaki formülü entegre edelim,
+
+$$ 
+\ddot{q}(t) = u = 1
+$$
+
+$$ 
+\dot{q}(t) = u t + \dot{q}(0) 
+\mlabel{1}
+$$
+
+Bir daha entegre
+
+$$ 
+q(t) = q(0) + \dot{q}(0) t + \frac{1}{2} u t^2 
+\mlabel{2}
+$$
+
+Formüle bakalým ve $u=1$ ile bizi bir nihai $t$'de $q(t)=0$ ve
+$\dot{q}(t)=0$ götürecek hangi gidiþ yollarýnýn ortaya çýktýðýna bakalým. 
+
+$\dot{q}(t)=0$ formülünü (1)'e sokarsak, 
+
+$$
+\dot{q}(0) = - u t 
+\mlabel{3}
+$$
+
+Üstteki formülü (2)'ye sokarsak, ve $q(t)=0$ olduðu için (2) formülü
+
+$$
+q(0) = \frac{1}{2} ut^2 \mlabel{4}
+$$
+
+$t$ için çözelim, $u=1$ demiþtik, o zaman (3)
+
+$$
+t = -\dot{q}(0)
+$$
+
+olur. Ve üsttekini (4)'e koyarsak, ve yine $u=1$ ile
+
+$$
+q(0) = \frac{1}{2} \dot{q}(0)^2
+$$
+
+Bu sonucu konum uzayýnda grafiklersem bir sonuçlar manifoldu elde edeceðim.
+
+\includegraphics[width=20em]{phy_control_04.png}
+
+Sað üst köþe niye boþ, orada zaman eksi olmalý ama negatif zamana izin
+yok. Sað alt köþede bir sürü çözümlerin oluþturduðu bir çizgi
+görüyoruz. Diyelim çizginin sonunda frene basýyoruz, ve çizgi boyunca
+yavaþlayýp yavaþlayýp orijine eriseceðiz (durmuþ olacaðýz). $-q$ durumu
+için sol üstteki grafiði elde ediyoruz, orada $u=-1$.
+
+Peki eðer karalanan yerlerden birinde isem mesela yeþil noktada ne yaparým?
+Gösterilen manifold fren yapmanýn grafiði. Önce hýzlanýrým sonra fren
+yaparým demiþtim deðil mi? O zaman yeþil noktadaysam yukarý çýkarým ve
+grafiðe gelirim ve oradan frenler orijine eriþirim. 
+
+\includegraphics[width=10em]{phy_control_05.png}
+
+Eðer çizginin üstteki baþlýyorsam? O zaman manifolda paralel bir þekilde
+aþaðý inerim, ve yukarý doðru ufak bir gidiþ yaparým. 
+
+Göstermesi daha zor olan bunlarý yapmanýn optimal olduðunu
+ispatlamak. Optimallik konusu diger derslerde islenecek.
+
+Çift Entegre Edici ve Hamiltonian Çözüm
+
+Cift-entegre edici (double-integrator) problemine farkli bir sekilde
+bakalim [3, sf. 519], [2, sf. 308], [4, sf. 250]. Bu problemde amac
+tek eksen üzerinde $y$ diyelim, bir objeyi bir konumdan diðerine
+hareket ettirmekti.
+
+Ana fizik formülleri $F = ma$'dan hareketle,
+
+$$
+m \ddot{y} = f(t)
+$$
+
+olabilir, hýz $\dot{y}(t)$, ivme $\ddot{y}(t)$, konum $y(t)$. Eðer
+
+$$
+x_1(t) = y(t), \quad x_2(t) = \dot{y}(t)
+$$
+
+dersek ODE sistemini þu þekilde tanýmlayabiliriz,
+
+$$
+\dot{x}_1(t) = x_2(t)
+$$
+
+$$
+\dot{x}_2(t) = u(t)
+$$
+
+ki $u(t) = f(t)/m$ olacak. O zaman sistem formulu
+
+$$
+\dot{x} = f(x) = \left[\begin{array}{r}
+x_2(t) \\ u(t)
+\end{array}\right]
+$$
+
+Þimdi bir optimal zaman problemi soralým, ve bir kýsýtlama
+yaratalým.
+
+Kontrol $|u(t)| < 1, \forall t \in [t_0,t_f]$ olmalý. Bu objeyi
+herhangi bir $[x_1(0),x_2(0)]$ baþlangýcýndan orijine minimal zamanda
+götürmek için kullanýlacak optimal kontrol nasýl hesaplanýr?
+
+Zaman optimize edildiði için, $V = 1$ kabul ederiz çünkü onun
+üzerinden alýnan entegral zamaný optimize etmeye çalýþacaktýr,
+
+$$
+J = \int_{t_0}^{t_f} V \ud t  = \int_{t_0}^{t_f} 1 \ud t = t_f - t_0
+$$
+
+Hamiltonian þöyle oluþturulur,
+
+$$
+\mathcal{H}(x,\lambda,u) = V + \lambda^T f 
+$$
+
+$$
+= 1 + \lambda_1 x_2 + \lambda_2 u
+$$
+
+Elimizde lineer ve içbükey bedelli sistem var, bu sistemler için optimalliðin
+yeterli þartý $0 = \left( \frac{\partial \mathcal{H}}{\partial u} \right)$, optimallik noktasýnda elde edilen $u^*$ için
+
+$$
+\mathcal{H}(x^*,\lambda^*,u^*) \le \mathcal{H}(x^*, \lambda^*, u) 
+$$
+
+$$
+= \min_{|u|<1} \mathcal{H}(x^*, \lambda^*, u)
+$$
+
+doðru anlamýna gelir. Problemimiz icin
+
+$$
+1 + \lambda_1^* x_2^* + 1 + \lambda_2^* u^* \le
+1 + \lambda_1^* x_2^* + 1 + \lambda_2^* u 
+$$
+
+ki bu da
+
+$$
+\lambda_2^* u^* \le \lambda_2^* u
+$$
+
+demektir. Bu þartý tatmin eden optimal kontrol $u^*$ ne olabilir?
+Eðer $\lambda_2^*$ pozitif ise $u^*$ mümkün olan en büyük negatif
+deðere sahip olmalýdýr ki üstteki küçüklük þartý her zaman geçerli
+olsun, yani $-1$. Eðer $\lambda_2^*$ negatif ise $u^*$ mümkün olan
+pozitif deðerde kalmalýdýr, yani $+1$. Bu deðerleri en basit þekilde
+
+$$
+u^*(t) = -sgn(\lambda_2^* (t))
+$$
+
+ile özetleyebiliriz, ki $sgn$ fonksiyonu iþaret (sign) fonksiyonu, bir
+sayýnýn sadece iþaretini verir, yani -, + anlaminda, ya da -1, +1.
+Mesela 3,4 gibi deðerler için +1 döndürür, -3,-4 gibi deðerler için -1
+döndürür.
+
+Kontrolün $\lambda_2^*$'ya baðlý olduðu görülüyor, o zaman
+$\lambda_2^*$'yi bulmak için, eskonum denklemlerini kullanarýz,
+
+$$
+\dot{\lambda}_1 ^*(t) = \frac{\partial \mathcal{H}}{\partial x_1^*} = 0
+$$
+
+$$
+\dot{\lambda}_2 ^*(t) = \frac{\partial \mathcal{H}}{\partial x_2^*} = -\lambda_1^*(t)
+$$
+
+Üstteki denklemleri entegre edersek, mesela $\dot{\lambda}_1 ^*(t)=0$ ile baþlayalým,
+
+$$
+\lambda_1^*(t) = \lambda_1^*(0)
+$$
+
+Deðil mi? Sýfýrý entegre edince bir sabit elde edilir, bu sabit
+$\lambda_1^*(t)$'nin baþlangýç deðeri $\lambda_1^*(0)$. Ýkinci
+entegrasyon $\dot{\lambda}_2 ^*(t) $ için, bu deðiþken
+$-\lambda_1^*(t)$'a eþit, biraz önce bu deðeri bulduk, onu yerine
+koyup entegre edince,
+
+$$
+\lambda_2^*(t) = \lambda_2^*(0) - \lambda_1(0) t
+$$
+
+$u^*(t)$'nun baðlý olduðu $\lambda_2^*(t)$ ortaya çýktý, bu bir düz çizgiyi
+gösteriyor. Bir düz çizgi ya eksiden artýya, ya artýdan eksiye, ya da
+ekside, artýda kalacaðý için (baþka seçenek yok), optimal kontrol
+seçenekleri [-1], [+1], [+1,-1], [-1,+1] olabilir.
+
+Çözümde daha da ilerleyince [3, sf. 519] sonuç olarak $x_1,x_2$
+grafiðinde paraboller ortaya çýkar.
+
+\includegraphics[width=30em]{phy_control_07.png}
+
+Bu grafikte -1 aþaðý giden gidiþ yollarýný +1 yukarý giden gidiþ
+yollarýný temsil eder. Eðer bir baþlangýç noktasý, mesela $d$'den
+orijine gitmek istiyorsak, önce -1 ile aþaðý ineriz, sonra +1 ile
+$a$'dan geçen yukarý yolla kesiþtiðimiz yerde o gidiþ yoluna deðiþim
+yaparýz ve orijine ulaþýrýz.
+
+Kaynaklar
+
+[1] Tedrake, {\em MIT, 6.832 Underactuated Robotics, Ders 1}, \url{https://youtu.be/Z8oMbOj9IWM}
+
+[2] Athans, {\em Optimal Control An Introduction to the Theory and Its Applications}
+
+[3] Naidu, {\em Optimal Control Systems}
+
+[4] Kirk, {\em Optimal Control Theory An Introduction}
+
+\end{document}

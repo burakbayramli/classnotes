@@ -1,0 +1,575 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Yapay Ögrenime Giriþ
+
+Bu makalede, yapay öðrenim (machine learning) konusunun amacýndan, motive eden
+faktörlerden bahsedeceðiz, ve yapay öðrenimde istatistiki yöntemler ve
+grafik modelleri savunan/yeðleyen bir açý ile yaklaþmaya çalýþacaðýz. 
+
+Yapay ögrenim, doðada görülen/gözlemlenen herhangi bir veriyi, veriden daha ufak
+þekilde temsil etmemize yardým eder. Ve bunlarý, gözlemlenen olay için net bir
+matematiksel model olmadýðý zaman yapmaya uðraþýr. Modeli bilgisayara
+oluþturttuktan sonra, bu modeli kullanarak, diðer yapay öðrenim araçlarýný
+kullanmaya baþlayabiliriz: Bunlar kümeleme (clustering), anormallik farketme
+(anomaly detection), regresyon (regression) ve özellik seçme (feature selection)
+gibi uygulamalardýr.
+
+YÖ'de iki ana kavram denetimli ve denetimsiz eðitim kavramý. Çok boyutlu
+bir girdiyle beraber onun etiketi, ya da eþlendiði bir hedef deðeri var
+ise, ve algoritmamýzý bu iki veriyi kullanarak eðitiyorsak, bu denetimli
+(supervised) bir eðitim. Ýstatistikteki regresyon aslýnda bir çeþit
+denetimli eðitim olarak görülebilir. Ýki boyutta çizgi uyduruyoruz, $x,y$
+girdileri var, $x$ ana girdi, $y$ ise hedef / etiket. Ya da lojistik
+regresyonla bir email içeriði verisini o email spam'mý deðil mi etiketi
+(0/1 deðerleri ile) beraber eðitmek bir diðer örnek. Denetimsiz
+(unsupervised) eðitim örneði veriyi kümelere ayýrmak; kümelemeyi baþka bir
+veriden öðrenip bir diðerine uygulamýyoruz, elde hiç eðitilmiþ bir yapý
+olmadan her veride mevcut kümeleri keþfetmeye uðraþýyoruz.
+
+Bu makalede $\mathbf{x}$ vektörü bir boyuttaki girdiyi temsil etmek için,
+$\mathbf{X}$ çok boyutlu girdiyi temsil etmek için kullanýlacak. Vektör
+$\mathbf{x}$'in bütün elemanlarý tek bir özelliði ölçen büyüklükler olarak
+kabul edelim, ve tersi belirtilmezse baðýmsýz özdeþçe daðýlmýþ (iid) olarak
+görelim.
+
+Regresyon Bazlý Yöntemler
+
+Model
+
+Yapay öðrenim için uygun bir baþlangýç noktasý, doðrusal regresyondur (linear
+regression). Veri olarak alýnan $\mathbf{x}$ açýklamak için, hedef iþlevi olarak
+eðriliði ve baþlangýç noktasýný bilmediðimiz bir doðru olan f(x)'i öðrenmeye
+çalýþalým. 
+
+$$
+  f(x;\theta) = \sum_{i=1}^N \theta_{1}x_{i} + \theta_{0}
+  \mlabel{1}
+$$
+
+ki $\theta_{0}$ ve $\theta_{1}$ bilinmeyen deðiþkenleri temsil ediyorlar. Birçok
+muhtemel $f(x;\theta)$ arasýndan araya araya en optimal $\theta$'yý bulmamýz
+gerekiyor. Altta doðrusal regresyon grafini goruyoruz.
+
+\includegraphics[width=20em]{linreg.jpg}
+ 
+Ýlk önce (1)'i matris formuna çeviriyoruz, ki doðrusal cebir
+notasyonu kullanmamýz mümkün olsun. Doðrusal cebir sayesinde, denklemi daha
+ileride çok boyutta iþler hâle getirmek çok basit olacak. 
+
+$$
+  f(x;\theta) = \sum_{i=1}^N 
+  \left[ \begin{array}{cc}
+      1 & x_{i}
+  \end{array} \right]
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1}
+  \end{array} \right]
+  \mlabel{2}
+$$
+
+$$
+  f(\mathbf{x};\theta) = 
+  \left[ \begin{array}{cc}
+      1 & x_{1} \\
+      \vdots \\
+      1 & x_{N} \\      
+  \end{array} \right]
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1}
+  \end{array} \right]
+  \mlabel{3}
+$$
+
+(2)'de gösterilen toplama dikkat edersek, (3) formülünden kaybolduðunu
+göreceðiz. Toplamýn yerine ilk matriste ek boyutlar geldi. Doðrusal cebirin
+biraz daha eklenmesi, tüm formülü daha da temiz hâle getirecektir.
+
+$$  
+  f(\mathbf{X};\theta) = \mathbf{X}\theta
+$$
+
+Arama iþleminin sonuca varmasý için, hesaplanmýþ $f(x;\theta)$ ile verilen
+$\mathbf{y}$'i karþýlaþtýrmasý gerekir. Bu karþýlaþtýrmayý matematiksel olarak
+yapmanýn karþýlýðý bir kayýp fonksiyonu (loss function) tanýmlamaktýr. Bu
+fonksiyon, baþarý/baþarýsýzlýk kriterimizi tanýmladýðýmýz yer olacaktýr. Diyelim
+ki kayýp kriteri (yâni bizim o an elimizde olan en iyi tahminin ne kadar yanlýþ
+olduðu) $f(x;\theta)$ iþlevinin sonucu ile, veri olarak elimizde olan
+$\mathbf{y}$'nin farkýnýn karesi olsun. Bu kayýp fonksiyonunu baz
+alarak, tüm noktalar için bu hesabý yapýp sonucu toplarsak, tüm riski
+hesaplamýþ oluruz.  
+
+$$
+  R(\theta) = \frac{1}{2N}|\mathbf{y} - \mathbf{X}\theta|^2
+$$
+
+Not: $2$ teriminin kullanýlma sebebi, cebirsel iþlemlerin ileri safhalarýnda
+$^2$ ile otomatikman iptal olmasý içindir. Risk fonksiyonunu herhangi bir sayý
+ile çarpmak, en alt (minima) noktasýnýn nerede olduðunu deðiþtirmez. 
+
+Yapay öðrenim literatüründe $R(\theta)$ fonksiyonu ölçümsel risk olarak bilinir. 
+Bizim amacýmýz R'yi minimize etmektir, ve bu þekilde, ve ayný zamanda, en iyi
+$\theta$'yý aramaktýr. Altta 3 boyutlu risk fonksiyonu grafigi.
+
+\includegraphics[width=20em]{risk.jpg}
+
+Risk'in en az olduðu nokta, fonksiyon deðiþimin en az olduðu noktadýr, bunu
+analiz dersinden biliyoruz. Bu demektir ki, bu noktada $R(\theta)$'nin gradyan
+sýfýr olacaktýr. Gradyan, $R(\theta)$'nýn bütün parça türevlerini (partial
+derivatives) vektör halindeki þeklidir. Bir iþlevin gradyanýný almanýn sonucu
+elimize geçen vektör, her zaman o fonksiyonun, o noktadan hareketle en yüksek
+deðiþimin/artýþýn/azalýþýn olacaðý yönü gösterecektir. Eðer bu gradyan sýfýr
+olmuþ ise, demek ki bir tam yatay düzleme geldik, ve hiç artýþ ve azalýþ imkaný
+kalmamýþ. 
+
+Bazý çeþit risk formüllerinin türevi cebirsel olarak çözülmesi zor bir sonuç
+verebilir. Bu gibi durumlarda, yaklaþýksal (approximate) tekniklerden birini
+kullanarak hesaplamayý yapabiliriz: Bir bilgisayar programý ile gradyanýn iþaret
+ettiði yöne doðru {\em yürüyen} bir yöntem takip ederiz. Bu sayede gradyanýn
+sýfýr olduðu bölgeye eriþmeye uðraþýrýz. Program gradyan = 0 gördüðü anda
+duracaktýr. Önümüzdeki örnek için çýkardýðýmýz türev, cebirsel olarak temiz
+olacak, o yüzden yaklaþýksal, algoritmik tekniklere þimdilik ihtiyacýmýz yok.
+
+$$ 
+  \bigtriangledown_{\theta} R\left(\theta\right) = \left[ \begin{array}{c}
+      0 \\
+      0 
+    \end{array} \right]
+ $$
+
+$$ 
+  \bigtriangledown_{\theta}\left( \frac{1}{2N}||\mathbf{y} -
+  \mathbf{X}\theta||^2\right) = 0 
+ $$
+
+$$ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \left(\mathbf{y} -  \mathbf{X}\theta \right) ^T
+  \left( \mathbf{y} -  \mathbf{X}\theta \right)
+  \right) = 0 
+ $$
+
+$$ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \left(\mathbf{y}^T -  \left(\mathbf{X}\theta\right)^T \right)
+  \left( \mathbf{y} -  \mathbf{X}\theta \right)
+  \right) = 0 
+ $$
+
+$$ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \mathbf{y}^T\mathbf{y} -
+  \mathbf{y}^T\mathbf{X}\theta -
+  \left( \mathbf{X}\theta \right)^T\mathbf{y} +
+  \theta^T\mathbf{X}^T\mathbf{X}\theta
+  \right) = 0 
+ $$
+
+Ýkinci ve üçüncü terimler aslýnda birbirine eþittir, çünkü vektör
+çarpým kurallarýna göre, $\mathbf{u}^T \mathbf{v} = \mathbf{v}^T \mathbf{u}$.
+
+$$ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \mathbf{y}^T\mathbf{y} -2
+  \mathbf{y}^T\mathbf{X}\theta +
+  \theta^T\mathbf{X}^T\mathbf{X}\theta
+  \right) = 0
+ $$
+
+$$ 
+  \frac{1}{2N} \left(
+  -2\mathbf{y}^T\mathbf{X}
+  +2\theta\mathbf{X}^T\mathbf{X} \right) = 0
+ $$
+
+$$ 
+  \frac{1}{N} \left(
+  -\mathbf{y}^T\mathbf{X}
+  +\theta\mathbf{X}^T\mathbf{X} \right) = 0
+ $$
+
+$$ 
+  \theta\mathbf{X}^T\mathbf{X} =
+  \mathbf{y}^T\mathbf{X} 
+ $$
+
+$$ 
+  \theta = \left(\mathbf{X}^T\mathbf{X}\right)^{-1}
+  \mathbf{y}^T\mathbf{X}
+ $$
+
+$\theta$ hesaplandýktan sonra, artýk bu deðeri $f(x;\theta)$ içine
+koyabilir ve gelecekte bilinmeyen verileri tahmin için
+kullanabiliriz. 
+
+Yüksek Boyutlar
+
+Doðrusal regresyon rahat bir þekilde çok boyutlu çalýþacak þekilde
+uzatýlabilir. 
+
+$$
+  \mathbf{X} = 
+  \left[ \begin{array}{cccc}
+      1 & x_{1} & \cdots & x_{1}(D) \\
+      \vdots & \vdots & \vdots & \vdots \\
+      1 & x_{N} & \cdots & x_{N}(D) \\
+  \end{array} \right] 
+  \mlabel{7}
+$$
+
+$$ 
+  R\left(\theta\right) = \frac{1}{2N}
+  \left|
+  \left[ \begin{array}{c}
+      y_{1} \\
+      \vdots \\
+      y_{N}
+  \end{array} \right]
+  -
+  \mathbf{X}
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1} \\
+      \vdots \\
+      \theta_{D} 
+  \end{array} \right]
+  \right|^2 
+ $$
+
+Yeni risk hesabý, N veri deðeri ve D boyutu için kullanýlabilir. $\theta$
+hesabýný ise gene aynen (7) denklemi üzerinden gerçekleþtirebiliriz. Bu
+denklemden gelen sonuç, N boyutlu bir hiper düzlemin hâm veriye en uygun
+(fit) hâli olacaktýr.
+
+Baz Fonksiyonlar
+
+Eðitim verisini modellemenin diðer bir yolu baz fonksiyonlarý olarak
+bilinen fonksiyonlardýr. Bu yöntem ile, bir polinom, sinüsyen (sinüs
+bazlý) ya da radyal bir {\em baz} fonksiyon seçilir, ve her veri noktasý 
+$\mathbf{x}_{i\in N}$, baz fonksiyonundan geçirtilerek yeni bir
+$\mathbf{x}$ oluþturulur. Bu noktadan sonra uygulanacak regresyon
+iþlemi, N baz fonksiyonunun en optimal hâldeki toplamýnýn bulunma
+iþlemine dönüþecektir. Baz fonksiyonlarý arasýnda en popüler olan
+radyal fonksiyonlardýr, çünkü çok boyutlu veriyi modellememize izin
+verirler. Karþýlaþtýrma olarak polinom bazlý fonksiyonlarda tek
+boyutun üzerine çýkamayýz. 
+
+Bir radyal baz fonksiyonu hesaplamak, bir bakýma her nokta yerine bir
+tepe fonksiyonu yerleþtirmektir. Bu tepe þöyle gösterilir:
+
+$$
+  \phi_{i}(\mathbf{x}) = exp\left(
+  -\frac{1}{2\sigma}\left|\mathbf{x} - \mathbf{x}_{i}\right|^2
+  \right)
+$$
+
+ki $\mathbf{x}$ bir ya da çok boyutlu olabilir. Tepenin geniþliði
+$\sigma$ parametresi ile kontrol edilir, ve regresyon iþlemi
+baþlamadan modelci tarafýndan seçilen bir deðerdir. Bundan sonra risk
+fonksiyonu þu hâle gelecektir. 
+
+$$
+  R(\theta) = \frac{1}{2N}|\mathbf{y} - Q\theta|^2
+$$
+
+ki Q deðeri þuna eþittir:
+
+$$
+  \left[ \begin{array}{cccc}
+      1 & \phi_{0}(x_{1}) & \cdots & \phi_{D}(x_{1}) \\
+      \vdots & \vdots & \vdots & \vdots \\
+      1 & \phi_{0}(x_{N}) & \cdots & \phi_{D}(x_{N}) \\
+  \end{array} \right]
+$$
+
+Ve hâla (7) denklemini regresyon için kullanabiliriz. 
+
+Yapay Sinir Aðlarý
+
+Düzeltici fonksiyonlarýn eklenmesi ile regresyon biraz daha iþe yarar hâle
+gelir. Bunun da üstüne, regresyonu deðiþik seviyelerde birkaç kez yapar ve
+her seviyede deðiþik düzeltici (ya da ayný) düzeltici fonksiyonlar
+kullanýrsak, Alttaki sekilde gördüðümüz daha çetrefilli ayrýcý problemleri
+çözmemiz mümkün olacaktýr. Bu tür yaklaþýmlara aða benzer yapýsý sebebiyle
+yapay sinir aðlarý (neural network) adý verilmiþtir. 
+
+\includegraphics[width=20em]{nn1.jpg}
+
+Düzeltici fonksiyonlarýn að yapýsýna eklenmesiyle birlikte, gradyan
+yöntemini kullanarak pür cebirsel olarak en alt noktayý bulmak zorlaþýr. Bu
+yüzden yaklaþýksal yöntemler kullanmaya mecbur oluyoruz. Bu yöntemlerden
+biri gradyan iniþi (gradient descent) adý verilen bir yöntemdir. Çok
+katmanlý bir yapay sinir að için gradyan iniþi her katmana sýrayla
+uygulanýr, ki YSA eðitmekte kullanýlan ünlü BACKPROP algoritmasýnýn altýnda
+yatan temel fikir budur. BACKPROP birçok uygulama alanýnda baþarý ile
+kullanýlmýþtýr.
+
+Bu ek gücüne raðmen, YSA'nýn bazý limitasyonlarý hâlen mevcuttur. Öncelikle
+YSA'larýn matematiksel analizi hala zordur. Að yapýsýna yeni bir katman
+eklediðimizde bunun sonuçlarýnýn ne olacaðýný hâlen bilmiyoruz. Ayrýca
+analiz bir tarafa, YSA ile çözülmesi mümkün olmayan problemler de
+mevcuttur. Meselâ $x^2+y^2=1$ formülünü öðrenmek bunlardan biridir çünkü,
+bu formül bir fonksiyon deðil, bir {\em iliþkidir}. Diðer bir ünlü problem
+balistikten Gülle Atmanýn Açýsý ve Uzaklýðý problemidir ve regresyon bazlý
+bir yöntem kullanarak çözmek imkansýzdýr. Bu tür problemler en rahat
+þekilde Bayes Aðlarý gibi bir istatistiki yaklaþým ile çözülebilir.
+
+Ýstatistiki Yaklaþým
+
+Ýstatistiki yaklaþým, veriyi daha iyi ve kesin özetleyebilmemizi
+saðlar. Ýki boyutlu bir veri için regresyon yapýnca, bilinmeyen bir
+doðrunun sadece açýsýný öðrenmiþ oluyoruz. Ýstatistiki yaklaþým ile bir
+Gauss Normal daðýlýmýn parametrelerini veriden çýkartýnca, elimize geçenler
+merkez nokta $\mu$ (ortalama), daðýlýmýn geniþliði $\sigma$ (varyans), ve
+elipsin açýsý $\Sigma$ (kovaryans) olacaktýr. Ýstatistiki yaklaþým, ayný
+zamanda, olasýlýk kuramýnýn bütün araçlarýný kullanmamýza imkan verdiði
+için, altyapý daha saðlam olacaktýr, ve böylece rasgele yöntemlere daha az
+baþvurmuþ olacaðýz, ve ileride modeli analiz etmemiz kolaylaþacak.
+
+Olasýlýk modellerinde, tek bir parametreyi öðrenmek yerine, o parametrenin
+üstünden tanýmlanan bir daðýlýmý öðreniyoruz. Yâni $y$ yerine $p(y)$
+kullanýyoruz. Diðer taraftan, eski yöntemde $p(y)$ yerine $y$ kullanmak,
+bütün aðýrlýðý tek bir noktada toplanmýþ bir daðýlým öðrenmek ile ayný þey
+oluyor.
+
+Bir daðýlýma birden fazla bilinmeyen eklemenin sonucu elimize bir ortak
+daðýlým (joint distribution) geçmesidir. Ayrýksal (discrete) þartlarda
+ortak daðýlým bir tablo olarak gösterilebilir ve belli (sonlu) sayýda
+elemaný vardýr.
+
+Rasgele (random) deðiþkenler arasýndaki baðýmlýlýk ve baðýmsýzlýk da ortak
+daðýlým tablo büyüklüðünde etkileyici bir faktördür. Eðer iki olayýn, ve bu
+sebeple bu olaylarýn rasgele deðiþkenlerinin arasýnda bir iliþki var ise,
+modelimizin bu iliþkiyi yansýtmasý isabetli olacaktýr. Fakat basitleþtirmek
+için (meselâ) bütün deðiþkenlerin arasýnda bir iliþki kuracak olsaydýk,
+bunun sonucu tablomuzun büyüklüðünde üstel bir patlama olurdu. Örnek olarak
+D bilinmeyenli ve hepsi birbiri ile iliþkili rasgele deðiþkenler üstünden
+bir daðýlýmýn tablo büyüklüðü $2^D$ iken, bütün rasgele deðiþkenler
+birbirinden baðýmsýz olduðu durumda ise büyüklük $2D$'a inecektir.
+
+Bu yüzden verimli bir yöntem þöyle olabilir: $2D$, yâni tam baðýmsýzlýk ile
+baþlarýz ve baðýmlýlýk iliþkisini yavaþ yavaþ modele
+tanýþtýrýrýz. Deðiþkenler arasýndaki baðýmlýlýk iliþkisi $p(y|x)$ olarak
+gösterilir, ve okunuþu``x verildiðinde $y$'nin olasýlýðý'' olarak
+tanýmlanýr. Ortak daðýlým $p(x,y) = p(y|x)p(x)$ olarak bilinir ve bu
+eþitlik olasýlýk kuramýndan iyi bilinen bir eþitliktir. Çok bilinmeyen
+içeren bir problemde bütün baðýmlýlýklarýn formül olarak yazýlmasý karýþýk
+olabileceðinden, genelde çizit notasyonu kullanýlýr. Alttaki sekilde
+görülen ortak daðýlým $p(x,y,z)$, bütün olasýlýklarýn çarpýmýna eþittir,
+yâni $p(x)p(y|x)p(z|x)$.
+
+\includegraphics[width=20em]{graph2.jpg}
+
+Dikkat edilirse, bu modele göre $p(x,y,z)$ ortak daðýlýmý $p(x)p(y)p(z)$
+çarpýmýna eþit deðildir. Bu sonuç sadece ve sadece bütün deðiþkenler
+birbirinden baðýmsýz ise ortaya çýkacaktýr.
+
+Olasýlýk daðýlýmlarýný kullanýrken, modelin bilinmeyenlerini, yâni
+parametrelerini bile bir rasgele deðiþken olarak gösterilebilir. Böylece
+diðer rasgele deðiþkenler ile bu tür deðiþkenler arasýnda baðýmlýlýk
+iliþkisi kurulabilir. Meselâ, alttaki sekildeki noktalarý sýnýflandýrma
+örneðinden baþlayalým.
+
+\includegraphics[width=20em]{gaussdata.jpg}
+
+Bu örnekte, $x \in \mathbf{R}^D$ girdi verisidir, ve $y \in \{0,1\}$ de
+sonuçtur. Deðiþken y ikili sistemde olduðu için, bu daðýlýmý bir Bernoulli
+Daðýlýmý olarak modelleyebiliriz.
+
+$$
+p(y_{i}|\alpha)=\alpha^y_{i}(1-\alpha)^{1-y_{i}}
+$$
+  
+ki $i=1...N$. Bir daðýlým tablosu yerine daðýlým {\em formülü} kullanmak
+bize daðýlýmý cebirsel olarak manipüle etme avantajýný saðlar. Bu sayede
+formülü En Büyük Olurluk (Maximum Likelihood) gibi bir metoda girdi olarak
+verebiliriz, formülün türevini alabiliriz, vs.
+
+X'leri temsil etmek için Gaussian daðýlýmýný seçeceðiz. 
+
+$$
+p(x_{i}|y_{i},\mu,\Sigma)=N(x_{i}|\mu_{y},\Sigma_{y})  
+\mlabel{11}
+$$
+
+Ortak daðýlým da alttaki gibi gözükecektir. 
+
+\includegraphics[width=20em]{gauss_repl_plate.jpg}
+
+Gördüðümüz gibi $\mu,\alpha,\Sigma$ deðiþkenleri de rasgele deðiþkeni hâline
+getirildi. Grafiðe bakarak cebirsel ortak daðýlýmý $p(x,y,\mu,\alpha,\Sigma)$
+þöyle gösterebiliriz.
+
+$$
+p(y|\alpha)p(x|y,\mu,\Sigma)p(\Sigma)p(\mu)p(\alpha) 
+\mlabel{12}
+$$
+
+Sýnýflandýrma amacýmýza eriþebilmek için (12) formülünü,
+$p(x,y|\alpha,\mu,\Sigma)$ sorusunu cevaplandýrabilen bir hâle
+getirmeliyiz. Olasýlýk kuramýndan bilinen bir deðiþim ile pür cebirsel
+olarak þöyle devam edebiliriz.
+
+$$
+p(x,y|\alpha,\mu,\Sigma) =
+\frac{p(x,y,\alpha,\mu,\Sigma)}
+     {p(\alpha)p(\mu)p(\Sigma)} 
+\mlabel{13}
+$$
+
+Þimdi (13)'deki bölüneni, grafik modelden gelen ortak daðýlým (12) ile
+deðiþtireceðiz.
+
+$$
+p(x,y|\alpha,\mu,\Sigma) =
+\frac{p(y|x)p(x|y,\mu,\Sigma)p(\alpha)p(\mu)p(\Sigma)}
+     {p(\alpha)p(\mu)p(\Sigma)} \nonumber \\
+= p(y|x)p(x|y,\mu,\Sigma) 
+\mlabel{14}
+$$
+
+Eðitim (hâm) verisine en uygun olan parametreleri bulmak için, En Büyük
+Olurluk yöntemini kullanacaðýz. Bu metoda göre (14) formülünün her N veri
+noktasý ile hesabýndan sonra birbiri ile çarparýz. O zaman, bilinmeyen
+parametrelerin en iyi hesapsal tahmini (estimation), bu süper ortak
+daðýlýmýn en yüksek olduðu noktada bulunabilir.
+
+$$
+Olurluk = \prod_{i=1}^N p(y|x)p(x|y,\mu,\Sigma)
+\mlabel{15}
+$$
+
+Olurluðun en yüksek olduðu nokta, olurluk formülünün türevinin sýfýr olduðu
+noktadadýr.
+
+Ýleride yapýlacak türev alma iþlemini rahatlatmak için, (15) içindeki
+terimlerin log'unu alýrýz. Bu iþlem, çarpým iþaretini toplam iþaretine
+dönüþtürecektir. Bunu yapmamýz en yüksek noktayý bulma açýsýndan bir fark
+yaratmaz, çünkü (15) formülünün deðiþim hýzý, toplamlý olan formülünkiyle
+aynýdýr.
+
+$$
+l = \sum_{i=1}^N \log (p(y_{i}|x_{i})) + \sum_{i=1}^N \log
+(p(x_{i}|y_{i},\mu,\Sigma))
+$$
+
+Son terimi iki toplama çevirebiliriz. Bunun için $y$ üzerinden özetlemeyi
+(marginalize) iki parça halinde, $y$'nin mümkün her deðeri için yapacaðýz.
+
+$$
+l = \sum_{i=1}^N \log(p(y_{i}|\alpha)) + 
+\sum_{y_{i}\in 0} \log(p(x_{i}|\mu_{0},\Sigma_{0})) + 
+\sum_{y_{i}\in 1} \log(p(x_{i}|\mu_{1},\Sigma_{1}))
+\mlabel{16}
+$$
+
+Þimdi, olurluðun gradyanýný $\alpha, \Sigma, \mu$'a göre (ayrý ayrý)
+alýrsak ve bu sonuç formülleri sýfýra eþitleyip çözersek, elimize geçen
+parametre deðerleri veriyi açýklayan en mümkün parametre deðerleri
+olacaktýr. Örnek olarak $\frac{\partial l}{\partial \alpha}$ gradyanýný
+alalým. Parçalý türevi $\alpha$'ya göre aldýðýmýz için, birincisi hariç
+(16) içindeki bütün terimler yokolur. Sonuç olarak þu olur:
+
+$$ 
+  \frac{\partial l}{\partial \alpha} =
+  \frac{\partial }{\partial \alpha}
+  \sum_{i=1}^N \log (p(y_{i}|\alpha)) 
+$$
+
+$$ 
+  0 =
+  \frac{\partial}{\partial \alpha}
+  \sum_{i=1}^N \log\left(\alpha^y_{i}(1-\alpha)^{1-y_{i}}\right) 
+$$
+
+$$  
+  0 =
+  \frac{\partial}{\partial \alpha}
+  \sum_{i=1}^N y_{i}\log(\alpha) + (1-y_{i})\log(1-\alpha) 
+$$
+
+Problem alanýndan bildiðimiz üzere, bazý $y_{i}$'ler 0 olacak, bazýlari ise
+1. Sýfýr deðerler $y_{i}\log(\alpha)$'yi iptal edecektir, bir deðerleri de
+$(1-y_{i})\log(1-\alpha)$'i iptal edecektir. O zaman, $y_{i}$'leri
+formülden yoketmek için tüm formülü þöyle deðiþtirebiliriz.
+
+$$ 
+0 =
+\frac{\partial}{\partial \alpha}\
+\left(
+\sum_{i\in class1} \log(\alpha) +
+\sum_{i\in class0} \log(1-\alpha)
+\right)
+$$
+
+$$ 
+0 =
+\sum_{i\in class1}\frac{1}{\alpha} -
+\sum_{i\in class0}\frac{1}{1-\alpha}
+$$
+
+Eðer $N_{0}$ deðiþkenini 0 sýnýfýnda olan i'larýn toplamý, $N_{1}$'i 1
+sýnýfýnda olan i'larýn sayýsý olarak alýrsak
+
+$$ 
+0 = \frac{N_{1}}{\alpha}-\frac{N_{0}}{1-\alpha} 
+$$
+
+$$ 
+\alpha = \frac{N_{1}}{N_{1}+N_{0}} = \frac{N_{1}}{N}
+$$
+
+olur. Bu sonuç, $y_{i}=1$ olan $y_{i}$'leri, toplam veri noktasý sayýsýna
+bölünce $\alpha$'nýn bulunabileceði þeklindeki önseziyi de desteklemiþ
+oluyor. Bunu tahmin de edebilirdik, ama bu önsezinin En Büyük Olurluk yöntemi
+tarafýndan matematiksel olarak doðrulanmýþ olmasý daha rahatlatýcý oldu. 
+
+Diðer bilinmeyenler $\mu_{0}, \mu_{1}, \Sigma_{0}, \Sigma_{1}$ için benzer
+yöntemi takip edebiliriz. (16)'in türevini bilinmeyen rasgelen deðiþkene
+göre alýrýz, sýfýra eþitleriz ve çözeririz. Bu iþlem yer darlýðý sebebiyle
+burada gösterilmeyecektir. Bu iþlemlerin sonunda formül (11)'deki tüm
+bilinmeyenleri bulabiliriz. (11)'i daha önce bulunmuþ olan $p(y)$ ile
+kullanýnca, (14)'u nihayet sýnýflama için kullanmamýz mümkün
+olacaktýr. Yapay Öðrenim literatüründe $p(y)$, ilk tahmin (prior guess)
+olarak da bilinir.
+
+Sýnýflama
+
+Sýnýflama için bir formül daha türetmemiz gerekiyor: $p(y|x)$. Bu formül,
+sonraki tahmin (posterior) olarak bilinir, ve bilindikten sonra bize
+verilen ve sýnýflandýrýlmamýþ yeni veri $x$'i $p(y|x=yeni deger)$ þeklinde
+bu formülden geçiririz, ve $y$'nin olurluðunu hesaplarýz.
+
+Þimdi sonraki tahmin, $p(y|x)$'i türetelim. Olasýlýk kuramýndan,
+
+$$
+p(y|x) = \frac{p(x,y)}{p(x)} 
+$$
+
+Bunun iþlemesi için $p(x)$'e ihtiyacýmýz var. $p(x,y)$'i alalým, ve $y$
+üzerinden özetleyelim.
+
+$$ 
+p(y|x) = \frac{p(x,y)}{\sum_{y}p(x,y)}  
+$$
+
+$$   
+= \frac{p(x,y)}{p(x,y=0) + p(x,y=1)}
+$$ 
+
+Artýk sýnýflama iþlemi, $p(y=1|x)$ ve $p(y=0|x)$ formüllerini ayrý ayrý
+hesaplamaktan ibarettir. Hangi olasýlýk daha büyük ise, o y deðeri $x$'in
+ait olduðu sýnýf olacaktýr.
+
+Kaynaklar
+  
+[1] C. Bishop {\em Neural Networks for Pattern Recognition}, Oxford University Press, 1995.
+
+[2] R. O. Duda, P. E. Hart \& D. G. Stork {\em Pattern Classification (2nd ed)}, Wiley, 2000.
+
+[3] M. Jordan, C. Bishop, {\em Introduction to  Graphical Models (Online)}, not yet published.
+
+[4] T. Mitchell, {\em Machine Learning}, McGraw-Hill, 1997.
+
+\end{document}

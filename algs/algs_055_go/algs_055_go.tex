@@ -1,0 +1,175 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Derin Öðrenme ile Go Oyununu Oynamak, DeepMind AlphaGo Zero
+
+Yapay Zeka alanýndaki heyecan verici ilerlemelerden biri Google DeepMind
+þirketinin AlphaGo programýnýn 17 kez Go þampiyonu olmuþ Lee Sedol'u
+yenmesiydi. Fakat DeepMind orada durmadý, mimariyi geliþtirerek AlphaGo'yu
+100-0 yenecek AlphaGo Zero'yu geliþtirdi! Yeni mimarinin ilginç tarafý
+YZ'nin hiç dýþ veriye ihtiyaç duymadan eðitilmiþ olmasý. AGZ sýfýr
+kabiliyet ile baþlýyor (clean slate), ve kendisiyle oynaya oynaya Go
+þampiyonlarýný yenecek hale geliyor.  Bu ve ek ilerlemeleri bu yazýda
+paylaþýyoruz.
+
+Mimari
+
+Genel olarak AG ve AGZ'nin benzer bazý özellikleri var. Bunlardan ilki
+Monte Carlo Aðaç Aramasýnýn (Monte Carlo Tree Search -MCTS-) bir derin YSA
+ile geniþletilerek kabiliyetinin ilerletilmiþ olmasý. MCTS konusunu
+iþledik, herhangi bir tahta pozisyonundan baþlayarak simülasyon yapýlýr, ve
+kazanç / kayýp verisi yukarý alýnarak karar mekanizmasý için
+kullanýlýr. Fakat simülasyon yapýlýrken ve her tahta pozisyonundan hamle
+seçenekleri üretilirken ne kadar derine inilecek? Oyun bitene kadar
+inilirse bu özellikle Go gibi bir oyunda çok derin ve geniþ bir aðaç ortaya
+çýkartabilir, bilgisayarlar performans açýsýndan böyle bir aðaçla
+zorlanýrlar. Çözüm belli bir tahtaya bakarak o oyunun kazanýlýp
+kazanýlmayacaðý hakkýnda ``sezgisel'' bir karar verebilmek. Bu iþi örüntü
+tanýma üzerinden YSA çok güzel yapabilir. Önceden (kendisiyle oynarken)
+elde edilen oyun verisine bakarak, tahta pozisyonlarý ve o oyunun kazanýlýp
+kazanýlmadýðý verisiyle eðitilen ``deðer YSA'sý'' artýk yeni bir tahtayý
+görünce o durumun kazanç þansýnýn olup olmadýðýný -1,+1 arasýnda bir deðer
+ile hesaplayabilir. Bu durumda MCTS'in herhangi bir dalda oyunu sonuna
+kadar simüle etmesine gerek yoktur, belli bir seviye sonra durup YSA'ya
+kazanç þansýný sorar, bu deðeri kullanýr.
+
+Ýkinci özellik bir ilke / siyaset / strateji YSA'sý kullanmak, ilke YSA'sý
+bir tahtayý girdi olarak alýp, yapýlabilecek tüm hamleler için bir kazanç
+olasýlýðý üretebilir, ilke YSA'sin çýktýsý potansiyel olarak tüm tahta
+hücreleri olabilir [1,3]. MCTS bu çýktýlarý kazanma olasýlýðý daha yüksek
+olan hamle aðaç dallarýný simüle etmek için kullanacaktýr.
+
+Yazýnýn geri kalanýnda 9x9 Go boyutlarýný referans alacaðýz, AG ve AGZ
+19x19 oyunu üzerinde iþliyor. 
+
+\includegraphics[width=20em]{go_02.jpg}
+
+Bir not düþelim, YSA ``bir tahtayý girdi alýyor'' dedik ama girdi verisi
+oldukca zenginleþtirilmiþ halde, sadece (9,9) boyutunda tek bir tahta
+deðil, (9,9,17) boyutunda yani 17 katmanlý bir veri ``balyasý''. Bu balyayý
+hazýrlamak için herhangi bir oyun anýnda tahtaya bakýlýr, her renk için
+(siyah/beyaz) 8 katman yaratýlýr, bu katmanlardan biri o rengin o andaki
+tahtadaki pozisyonu, diðer 7'si hemen önceki 7 adýmdaki ayný rengin
+pozisyonlarý, ayný þekilde diðer renk için 8 katman, ve ek bir katman
+sýranýn kimde olduðu. Tüm bunlar istiflenerek toplam 17 katman
+yaratýlýr. Herhangi bir anda oyunun durumu bu tensor üzerinden
+belirtilir. Verinin bu þekilde zenginleþtirilmesinin sebebi herhalde
+zamansal baðlantýlarý yakalamaya uðraþmak. 
+
+\includegraphics[width=30em]{go_01.png}
+
+AlphaGo Zero
+
+AGZ'nin yaptýðý ilerlemeler ise þunlar [3]: AlphaGo deðer ve ilke için iki
+ayrý að kullanýyordu. AGZ'de deðer ve ilke YZ'leri birleþtirilerek tek bir
+YSA ile iki çýktý üretilmesi saðlanýyor, bu yapýya esprili bir þekilde
+``iki baþlý canavar (two-headed monster)'' ismi de veriliyor. Bu mimari
+biraz garip gelebilir, çünkü çoðu uygulamada genellikle tek bir çýktý
+kullanýlýr, mesela bir resimde kedi olup olmadýðýný tahmin edecek bir YZ
+tek bir ikisel çýktý ile bunu yapabilir, ya da resmin belli kategorilere
+ait olup olmadýðý tek bir vektör çýktýsý ile, bu vektörde obje olasýlýklarý
+vardýr. Fakat biraz düþününce iki farklý çýktýlý yapýnýn niye iþlediðini
+anlayabiliriz, sonuçta YZ bir fonksiyonu yaklaþýk olarak temsil etmeye
+çabalar, eðitim sýrasýnda kafa \#1 fonksiyonu bir tahmin üretir, ve eðitim
+o kafanýn yaptýðý tahmine sonuç veren parametreleri günceller, ayný þekilde
+kafa \#2 için düzeltme yapýlýr.
+
+\includegraphics[width=15em]{go_03.png}
+
+Ýkinci bir AGZ ilerlemesi artýksal að (residual network) adý verilen bir
+derin YSA yapýsý kullanmak. Artýksal aðlar pür evriþimsel aðlarýn daha
+geliþmiþ hali, bu yapýlarda evriþimsel aðda bölge atlamasý yapýlarak
+sonraki bölgelere direk / kýsayol baðlantýlarý koyuluyor [6]. Örnek bir
+yapý altta,
+
+\includegraphics[width=10em]{resnet34.png}
+
+Üçüncü ilerleme ise AGZ'nin kendisine karþý oynayarak kendini eðitmesi (AG
+için baþkalarýn oynadýðý oyunlarýn kayýtlarý kullanýldý). DeepMind
+bilimcileri araþtýrmalarý sýrasýnda þunu anladýlar: hangi baz mimariyle
+baþlarsak baþlayalým, MCTS onu daha iyileþtirir. Bu durumda herhangi bir YZ
+alýnýr ki baþta aðýrlýk deðerleri rasgele yani hiç bir doðru karar vermez,
+ama bu YZ, MCTS ile daha iyi performans gösterecektir, bu sýrada oyundan
+eðitim verisi toplanýr ve bu veri YZ'yi iyileþtirmek için aða uygulanýr, ve
+iþlem baþa dönerek devam edilir. Bu sayede en kötü performanstan en iyisine
+doðru ilerlemek mümkündür.
+
+Eðitim verisinde hedefin ne olduðunu daha iyi vurgulamak gerekirse, deðer
+kafasý için bu tek bir deðer, ilke kafasý için tüm 9x9 tahta
+pozisyonlarýnda hangi hamlenin yapýlmýþ olduðu, o hücre 1 diðerleri 0
+deðerinde olacak. Bu þekilde eðitilen YSA, ilke tahmini üreteceði zaman tüm
+hücrelerde olasýlýk deðerleri üretecektir.
+
+Alttaki kod [4]'u baz almýþtýr. Eðitmek için \verb!train.py! kullanýlýr,
+eðitim sýrasýnda en son YSA belli aralýklarla sürekli kaydedilecektir,
+eðitim sonunda ya da yeterince eðitilince iþlem durulabilir, ve
+\verb!gnugo_play.py! kaydedilen ayný modeli kullanarak GnuGo [1] programýna
+karþý oynatýlabilir. YSA olarak biz ResNet yerine daha basit bir yapý
+kullandýk,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import simplenet
+simplenet.PolicyValue.create_network()
+\end{minted}
+
+\begin{verbatim}
+Tensor("input_1:0", shape=(?, 17, 9, 9), dtype=float32)
+Tensor("conv2d/BiasAdd:0", shape=(?, 17, 9, 64), dtype=float32)
+Tensor("batch_normalization/batchnorm/add_1:0", shape=(?, 17, 9, 64), dtype=float32)
+Tensor("conv2d_2/BiasAdd:0", shape=(?, 17, 9, 128), dtype=float32)
+Tensor("batch_normalization_2/batchnorm/add_1:0", shape=(?, 17, 9, 128), dtype=float32)
+------------- value -------------------
+Tensor("conv2d_3/BiasAdd:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("activation_3/Relu:0", shape=(?, 17, 9, 2), dtype=float32)
+Tensor("flatten/Reshape:0", shape=(?, 306), dtype=float32)
+policy_output Tensor("activation_4/Softmax:0", shape=(?, 82), dtype=float32)
+------------- policy -------------------
+Tensor("conv2d_4/BiasAdd:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("activation_5/Relu:0", shape=(?, 17, 9, 1), dtype=float32)
+Tensor("flatten_2/Reshape:0", shape=(?, 153), dtype=float32)
+Tensor("dense_2/BiasAdd:0", shape=(?, 256), dtype=float32)
+Tensor("activation_6/Relu:0", shape=(?, 256), dtype=float32)
+Tensor("dense_3/BiasAdd:0", shape=(?, 1), dtype=float32)
+Tensor("dense_3/BiasAdd:0", shape=(?, 1), dtype=float32)
+Out[1]: <tensorflow.python.keras._impl.keras.engine.training.Model at 0x7fa2dd30de50>
+\end{verbatim}
+
+\inputminted[fontsize=\footnotesize]{python}{mcts.py}
+
+\inputminted[fontsize=\footnotesize]{python}{train.py}
+
+\inputminted[fontsize=\footnotesize]{python}{simplenet.py}
+
+Ýki YSA kendisine karþý oynarken ayný aðýrlýklara sahip iki farklý YSA ile
+baþlýyoruz, ve oyun sonuçlarýný kullanarak sadece birini
+güncelliyoruz. Eðer her toptan demeti (minibatch) ile her iki YSA'yý
+güncelleseydik birbirlerinden farklýlaþmalarý zorlaþabilirdi. Ama döngünün
+daha ileri bir noktasýnda esitleme yapariz yine de, ilk YSA'yý
+güncellenenin aðýrlýklarýný diskten okuyarak güncelliyoruz, ve böyle devam
+ediyor. AGZ tasarýmcýlarý ``en iyi'' olan aðýrlýklara geçmeden yeni YSA'nýn
+diðerini yüzde 55'ten fazla yenmesi þartýný koymuþlar, tam donanýmla
+testleri yapanlar bunu takip ederse iyi olur.
+
+Üstteki mimari birkaç saat eðitim sonrasý GnuGo (kendi YZ'si olan bir dýþ
+Go programý) baþlangýç, orta seviyelerini yenebiliyor. Okuyucular, grafik
+kartlý güçlü bir mimaride, ya üstteki YSA'yý derinleþtirerek (daha fazla
+evriþim filtresi ekleyerek), ya da \verb!resnet.py! ile, ve \verb!n_play!'i
+arttýrarak daha fazla simülasyonla sonuçlarý daha da iyileþtirmeye
+uðraþabilirler.
+
+Kaynaklar
+
+[1] Bayramli, 
+    {\em Go Oyunu, GnuGo}, 
+    \url{https://burakbayramli.github.io/dersblog/sk/2018/02/go-gnugo.html}
+
+[2] Silver, {\em Mastering the game of Go with deep neural networks and tree search}, \url{https://www.nature.com/articles/nature16961}
+
+[3] Weidman, {\em The 3 Tricks That Made AlphaGo Zero Work}, \url{https://hackernoon.com/the-3-tricks-that-made-alphago-zero-work-f3d47b6686ef}
+
+[4] Yi, {\em A reproduction of Alphago Zero in 'Mastering the game of Go without human knowledge'}, \url{https://github.com/sangyi92/alphago_zero}
+
+[5] {\em AlphaGo Zero Cheat Sheet}, \url{https://applied-data.science/static/main/res/alpha_go_zero_cheat_sheet.png}
+
+[6] Kristiadi, {\em Residual Net}, \url{https://wiseodd.github.io/techblog/2016/10/13/residual-net/}
+
+\end{document}

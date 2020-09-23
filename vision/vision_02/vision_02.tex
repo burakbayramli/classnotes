@@ -1,0 +1,644 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 2
+
+Çoðunlukla özvektör kavramýna atýf yapýldýðýnda söylenmek istenen ($C$
+kompleks sayýlarýn kümesi olsun),
+
+$$ Av = \lambda v, \qquad \lambda \in C $$
+
+ifadesidir, yani ``sað özvektör'', yani bir matrisi {\em saðdan} çarpýnca
+boyu büyüyen ya da küçülen vektör. Sol özvektörler de mümkün, bu durumda, 
+
+$$ v^TA = \lambda v^T, \qquad \lambda \in C $$
+
+$A$'nin spektrumu $\sigma(A)$ o matrisin tüm özvektörlerinin
+kümesidir. Numpy ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+A = [[3,4,3],[5,5,6],[5,5,5]]
+A = np.array(A)
+[V,D] = lin.eig(A)
+print 'ozvektorler'
+print D
+print 'ozdegerler'
+print V
+\end{minted}
+
+\begin{verbatim}
+ozvektorler
+[[-0.41963784+0.j          0.72738656+0.j          0.72738656-0.j        ]
+ [-0.66394149+0.j         -0.42567121+0.33744486j -0.42567121-0.33744486j]
+ [-0.61893924+0.j         -0.25117492-0.33579002j -0.25117492+0.33579002j]]
+ozdegerler
+[ 13.75351937+0.j          -0.37675969+0.47073926j  -0.37675969-0.47073926j]
+\end{verbatim}
+
+Eðer $B = PAP^{-1}$, ki $P$ eþsiz olmayacak þekilde, o zaman $\sigma(B) =
+\sigma(A)$. Ýspatsýz veriyoruz. Yani $P$ ve onun tersi ile bir matrisi iki
+taraftan çarpmak, o matrisin spektrumunu deðiþtirmiyor.
+
+Eðer $\lambda \in C$ bir özdeðer ise, onun eþleniði (conjugate)
+$\bar{\lambda}$ da bir özdeðerdir. Bu sebeple reel matris $A$ için
+$\sigma{A} = \overline{\sigma{A}}$. 
+
+Bir reel matrisin tüm özdeðerlerinin reel olduðu ``güzel'' bir durum
+vardýr; bu durum matrisin simetrik olduðu durumdur, yani $S^T = S$. Bu
+güzel durum aslýnda pratikte pek çok kez karþýmýza çýkar; mesela kovaryans
+matrisleri olarak.
+
+Simetrik matrisin özgün özdeðerlerine tekabül eden özvektörleri birbirine
+dikgendir. Ýspat, $v_i^T S v_j $ formülüne bakalým, ki $v_i,v_j$
+özvektörler, $S$ simetrik matris.
+
+Özdeðer eþitliðinden $S v_j = \lambda_j v_j$ kullanýrsam,
+
+$$ v_i^T S v_j  = \lambda_j v_i^T v_j $$
+
+Eðer  $v_i^TS = \lambda_i v_i^T$ kullanýrsam,
+
+$$ v_i^T S v_j  = \lambda_i v_i^T v_j $$
+
+elde ederim. Ýkisini bir araya koyalým,
+
+$$ \lambda_j v_i^T v_j =  \lambda_i v_i^T v_j $$
+
+$$ (\lambda_j-\lambda_i) v_i^T v_j = 0$$
+
+Bu eþitliðin doðru olmasý sadece iki durumda olabilir; ya
+$\lambda_i,\lambda_j$ birbiriyle aynýdýr, ya da birbirinden farklýdýr ama
+o zaman  $v_i,v_j$ birbirine dikgen olmalýdýr. 
+
+[norm atlandý]
+
+Eksi Bakýþýmlý Matrisler (Skew-symmetric Matrices)
+
+Eðer $A^T = -A$ ise bu matrislere eksi bakýþýmlý deniyor. Mesela
+
+$$ 
+\left[\begin{array}{rr}
+0 & 2 \\ -2 & 0
+\end{array}\right]
+ $$
+
+Bu matrisin devriði ve negatifi aynýdýr. Eksi bakýþýmlý matrislerin
+köþegeni sýfýr olmalýdýr. Bu tür matrislerin ilginç bazý özellikleri var,
+mesela, hatýrlarsak simetrik matrislerin pür reel spektrumu vardý. Eksi
+bakýþýmlý matrislerin spektrumu pür sanaldýr (imaginary).
+
+[köþegenleþtirme atlandý]
+
+Çapraz Çarpým (cross-product) 
+
+Noktasal çarpým bize bir skalar verir. Ýki vektör arasýndaki çapraz çarpým
+bize baþka bir vektör verir; $u,v \in \mathbb{R}^3$ olmak üzere çapraz çarpým,
+
+$$ 
+u \times v = 
+\left[\begin{array}{r}
+u_2v_3 - u_3v_2 \\
+u_3v_1 - u_1v_3 \\
+u_1v_2 - u_2v_1 
+\end{array}\right]
+$$
+
+Yani $\mathbb{R}^3$'teki iki vektör $u,v$'nin çapraz çarpýmý alýnabilir, ve
+$\mathbb{R}^3$'te yeni bir vektör elde ederiz. Bu yeni vektör $u,v$'ye
+dikgendir. Sað el kuralý (alttaki resimde $u,v$ yerine $a,b$ kullanýlmýþ)
+
+\includegraphics[height=3cm]{righthand.png}
+
+Ayrýca çapraz çarpým simetriktir, $u \times v = - u \times v$. 
+
+Eksi Bakýþýmlý Matris (Skew-Symmetric Matrix)
+
+Bilgisayar Görüþü (Computer Vision) alanýnda oldukça yaygýn bir matris olan
+eksi bakýþýmlý bir matris alttadýr, ve onu herhangi bir vektörden oluþturan
+þapka operatörüyle gösterelim, yani $u$ için $\hat{u}$ olsun,
+
+$$ 
+\hat{u} = \left[\begin{array}{rrr}
+0 & -u_3 & u_2 \\
+u_3 & 0 & -u_1 \\
+-u_2 & u_1 & 0
+\end{array}\right] \in \mathbb{R}^{3 \times 3}
+ $$
+
+Bu tür matrislerin kertesinin çift sayý olmasý þarttýr.
+
+$\hat{u}$'nun ilginç bir özelliði var, herhangi bir vektör $v$ ile
+
+$$ \hat{u}v = u \times v $$
+
+ki $\times$ bir çapraz çarpým. Yani, öncelikle, her vektörün bir eksi
+bakýþýmlý matris karþýlýðý var, ve üstteki operatör ile bu geçiþi
+yapabiliriz, ayrýca ne zaman bir çapraz çarpým görsek, onu eksi bakýþýmlý
+matris çevirimi üzerinen bir normal matris çarpýmý olarak temsil
+edebiliriz. Bu faydalý çünkü çapraz çarpýmla uðraþmak biraz külfetli
+olabiliyor. 
+
+3 boyut baðlamýnda $\hat{u}$'nun kertesi tabii ki 2'dir; çünkü eksi
+bakýþýmlý matrislerinin kertesinin çift olmasý þart ise, ve 3 boyutlu
+durumda bu kerte en fazla 3 olabilir, ama 3 olamaz çünkü 3 çift sayý deðil,
+o zaman 2 olur.
+
+\inputminted[fontsize=\footnotesize]{python}{skew.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.array([[1,2,3]]).T
+print skew(A)
+\end{minted}
+
+\begin{verbatim}
+[[ 0 -3  2]
+ [ 3  0 -1]
+ [-2  1  0]]
+\end{verbatim}
+
+$A^3$
+
+Diyelim ki $A$ bir $3 \times 3$ eksi bakýþýmlý matris, ve $a =
+(a_1,a_2,a_3)$ vektörü üzerinden oluþturulmuþ. $A^3$ nedir? 
+
+$$A \cdot x = u \times x$$
+
+olduðunu biliyoruz. O zaman 
+
+$$A^3 x = a \times ( a \times ( a \times x))$$
+
+demektir. Eþitliðin sað tarafýna bakarsak, eðer $a=e$, ki $e$ bir birim vektörü
+olsun, yani $||e||=1$, o zaman norm'larýn iliþkisi þu þekilde olurdu,
+
+$$||e\times(e\times (e\times x)))\|=||e\times (e\times x))|| =||e\times x||$$
+
+Neden? 
+
+$$ ||e \times x|| = ||e||||x|| \sin \theta = ||x|| \sin \theta$$
+
+O zaman,
+
+$$||e\times (e\times x))|| = ||e|||| e \times x|| \sin 90 = ||e \times x||$$
+
+Böyle gider. Yani norm eþitlikleri doðru. 
+
+Eðer $a = ||a||e$ kabul edersek,
+
+$$||a\times(a\times (a\times x)))|| = ||a||^3 ||e\times(e\times (e\times x)))||$$
+
+$$ =\|a\|^3\|e\times x\| $$
+
+$$ =\|a\|^2\|a\times x\| $$
+
+$$ =(a^Ta)\|a\times x\| $$
+
+Yani $A^3x = \pm (a^Ta) Ax$; eksi mi artý mý? Eksi iþareti olduðunu sað el
+kuralýyla görebiliriz. Demek ki $A^3 = -(a^Ta) \cdot A$. 
+
+Simetrik matrisler için 
+
+$$ A = UDU^T $$ 
+
+olduðunu biliyoruz. Eksi bakýþýmlý matrisler için 
+
+$$ S = UBU^T $$
+
+olur ki $B$ bir blok köþegen matristir, $U$ dikgen. $S$'in özdeðerleri pür
+sanaldýr. Blok köþegen matris $diag(a_1Z,a_2Z,...,z_mZ,0,..0)$, ve $Z =
+\left[\begin{array}{cc} 0 & 1 \\ -1 & 0 \end{array}\right]$. 
+Köþegende blok olmasý garip gelebilir, fakat tek sayýlar yerine çapraz
+yönde birkaç sayýnýn ``üst üste'' olduðu bir durum bu. Basit matris
+çarpýmý ile kolay bir þekilde kontrol edilebilir ki
+
+$Z^2 = -I, \qquad Z^3 = -Z, \qquad Z^4 = I$
+
+Matris Üstelleri (Matrix Exponentials) [1, sf. 482]
+
+$t \in \mathbb{R}$ ve bir kare matris $n \times n$ matrisi $A$ için, matris üsteli,
+
+$$ U(t) = e^{tA} = \exp(tA) $$
+
+alttaki problem için özgün bir $n \times n$ çözümüdür;
+
+$$ \frac{dU}{dt} = AU, \qquad U(0) = I $$
+
+Dikkat: matris üsteli $\exp$ fonksiyonun teker teker matris öðeleri
+üzerinde iþletilmiþ hali deðildir.
+
+Matris üstelleri bir seri olarak ta gösterilebilir, 
+
+$$ e^{tA} = \sum_{n=0}^{\infty} \frac{t^n}{n!} A^n = 
+I + tA + \frac{t^2}{2}A^2 + \frac{t^3}{6}A^3 + ...
+$$
+
+Bu seri yakýnsayan (converging) bir seridir. 
+
+Örnek
+
+$$ A = \left[\begin{array}{rrr}
+0 & 1 \\ 0 & 0
+\end{array}\right] $$
+
+için 
+
+$$ e^{tA} = \left[\begin{array}{rrr}
+1 & t \\ 0 & 1
+\end{array}\right] $$
+
+Örnek
+
+$$ A = \left[\begin{array}{rrr}
+1 & 0 \\ 0 & 1
+\end{array}\right] $$
+
+için 
+
+$$ e^{tA} = \left[\begin{array}{rrr}
+e^t & 0 \\ 0 & e^t
+\end{array}\right] $$
+
+Teori 
+
+Eðer $A$ bir eksi bakýþýmlý matris ise, $Q(t) = e^{tA}$ muntazam 
+(proper) bir dikgen matristir. 
+
+Ýspat 
+
+Dikgenlik tersi ile devriðin ayný olmasý demektir, o zaman üstteki
+eþitlikte sol tarafýn tersi, sað tarafýn devriði ayný olmalý, yani
+$Q(t)^{-1}$ ile $e^{tA^T}$.
+
+$$ Q(t)^{-1} = e^{-tA} = e^{tA^T} = (e^{tA})^T = Q(t)^T $$
+
+Hakikaten de öyle. 
+
+Not: Bir diðer ispata göre {\em tüm} dikgen matrisler bir eksi bakýþýmlý
+matrisin $e$'nin üsteli alýnarak oluþturulabilir. Buradaki nüansa dikkat,
+tüm eksi bakýþýmlý matrislerin üsteli dikgendir demek ile {\em tüm} dikgen
+matrisler eksi bakýþýmlý matrislerin üsteli alýnmýþ halidir demek farklý.
+
+Rotasyon
+
+Genel olarak rotasyon bir eksen ve o eksen etrafýndaki bir açý olarak
+gösterilebilir,
+
+\includegraphics[height=6cm]{rotation.png}
+
+Ya da rotasyon eksenini $\hat{n}$ olarak gösterelim, ve dönüþün o eksene
+dikgen olan bir düzlem üzerinde olduðunu düþünelim [3, sf. 37],
+
+\includegraphics[height=6cm]{rotation2.png}
+
+Yani $v$ vektörü, $\hat{n}$ etrafýnda $\theta$ kadar dönüp $u$ olacak. $\hat{n}$ birim vektör, 
+ve dikgen olduðu düzlemi tanýmlamak için kullanýlýyor.
+
+$v$'nin dönüþten etkilenmeyen bileþeni $v_\parallel$'yi hesaplamak için
+$v$'nin $\hat{n}$ üzerine olan yansýmasýný (projection) hesaplayabiliriz. 
+Yansýtma formülü, bkz [2],
+
+$$ v_\parallel =  \frac{\hat{n}\hat{n}^T}{\hat{n}^T\hat{n}} v 
+= (\hat{n}\hat{n}^T) v
+$$
+
+Peki $v$'nin düzlem üzerindeki yansýmasý $v_\perp$ nedir? Resme göre $v =
+v_\perp + v_\parallel$ olduðuna göre ve üstteki formülü yerine koyunca,
+
+$$ v_\perp = v - v_\parallel 
+= v - (\hat{n}\hat{n}^T) v 
+= (I - \hat{n}\hat{n}^T) v
+$$
+
+Burada $v_\perp$'in 90 derece çevrilmiþ hali $v_x$ nedir? Aslýnda bu
+$\hat{n} \times v$ olmalý, sað el kuralýyla bu görülebilir. Eðer $N$
+matrisini $\hat{n}$'i baz alan bir eksi bakýþýmlý matris olarak alýrsak, 
+
+$$ v_x = \hat{n} \times v = Nv $$
+
+ki $\hat{n}$ öðeleri $\hat{n}_x,\hat{n}_y,\hat{n}_z$ olacak þekilde
+
+$$ 
+N = \left[\begin{array}{rrr}
+0 & -\hat{n}_x  & \hat{n}_y \\
+\hat{n}_z & 0 & -\hat{n}_x \\
+-\hat{n}_y & \hat{n}_z & 0
+\end{array}\right]
+ $$
+
+Eðer $v_\perp$'u tekrar saat yönü tersinde 90 derece döndürmek istesek,
+tekrar ayný çarpýmý yapardýk,
+
+$$ v_{xx} = \hat{n} \times v_x =  N  v_x = N \cdot N v = N^2v = -v_\perp
+$$
+
+çünkü $v_{xx} = -v_\perp$. Þimdi tekrar $v_\parallel = v - v_\perp$ formülüne dönelim,
+
+$$ v_\parallel = v - v_\perp = v + v_{xx} = v + N^2v  = (I+N^2)v $$
+
+Eðer $u_\perp$'u $v_\perp$ ve $v_x$ üzerinden tanýmlamak istersek, önce $u_\perp$'un $v_\perp$ 
+vektörünün $\theta$ kadar döndürülmüþ hali olduðu bilgisini kullanabiliriz. 
+
+Bu dönme iþlemi iki boyuttadýr (yani ayný düzlem üzerinde) o zaman standart
+rotasyon matrisi yeterli,
+
+$$ 
+u_\perp = R_\theta \cdot v_\perp = 
+\left[\begin{array}{rrr}
+\cos \theta & -\sin \theta \\
+\sin \theta & \cos \theta
+\end{array}\right]
+\left[\begin{array}{rrr}
+v_\perp^1 \\
+v_\perp^2
+\end{array}\right] = 
+\left[\begin{array}{rrr}
+v_\perp^1 \cos \theta  - v_\perp^2 \sin \theta \\
+v_\perp^2 \cos \theta  + v_\perp^1 \sin \theta  
+\end{array}\right]
+$$
+
+$$ =
+\cos \theta
+\left[\begin{array}{rrr}
+v_\perp^1  \\
+v_\perp^2   
+\end{array}\right] 
++ 
+\sin \theta
+\left[\begin{array}{rrr}
+ - v_\perp^2  \\
+ + v_\perp^1  
+\end{array}\right] 
+$$
+
+Dikkat, $\sin \theta$ ile çarpýlan vektör, ayný zamanda $v_\perp$'un 90 derece
+döndürülmüþ hali. Kontrol edelim, $\theta = 90$'lik rotasyon matrisi 
+üzerinden,
+
+$$ 
+\left[\begin{array}{rrr}
+0 & -1 \\ 1 & 0
+\end{array}\right]
+\left[\begin{array}{rrr}
+v_\perp^1 \\
+v_\perp^2
+\end{array}\right] = 
+\left[\begin{array}{rrr}
+-v_\perp^2 \\
+v_\perp^1
+\end{array}\right]
+$$
+
+Doðrulandý. Ayrýca önceden biliyoruz ki $v_\perp$'u 90 derece döndürerek $v_x$'i elde
+etmiþtik. O zaman iki üstteki formül
+
+$$ u_\perp = \cos \theta v_\perp + \sin \theta v_x $$
+
+olarak gösterilebilir. Daha önce hesapladýðýmýz $v_\perp$ ve $v_x$'i
+yerlerine koyarsak, 
+
+$$ = \sin \theta Nv - \cos \theta N^2 v $$
+
+$$ u_\perp = (\sin \theta N - \cos \theta N^2) v $$
+
+Hepsini bir araya koyarsak, 
+
+$$ u = u_\perp + v_\parallel $$
+
+$$ = ( \sin \theta N - \cos \theta N^2 + I + N^2)v  $$
+
+$$ = \big( I + \sin \theta N - (1-\cos \theta) N^2 \big) v  $$
+
+Yani bir eksen $\hat{n}$ etrafýnda $\theta$ kadar dönüþü bir matris olarak
+yazabiliriz ki bu matrisin formülü þu þekilde olur, 
+
+$$ R(\hat{n},\theta) =  I + \sin \theta N - (1-\cos \theta) N^2 $$
+
+ki bu Rodriguez formülüdür. 
+
+Altta $(-1/3,2/3,2/3)$ ekseni etrafýnda 70 derece dönüþ birkaç farklý
+açýdan gösteriliyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+o = np.array([5,5,5])
+v = np.array([3,3,3])
+n = [-1/3.,2/3.,2/3.]
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import skew
+theta = np.deg2rad(70)
+N = skew.skew(n)
+R = np.eye(3) + np.sin(theta) * N - (1-np.cos(theta))*N**2
+print R
+vr = np.dot(R,v)
+print vr
+\end{minted}
+
+\begin{verbatim}
+[[ 1.         -0.91889724  0.33402626]
+ [ 0.33402626  1.          0.240122  ]
+ [-0.91889724 -0.38633975  1.        ]]
+[ 1.24538705  4.72244477 -0.91571096]
+\end{verbatim}
+
+\inputminted[fontsize=\footnotesize]{python}{plot3d.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits.mplot3d import Axes3D
+import plot3d
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_vector(fig, o, v)
+ax.hold(True)
+plot3d.plot_vector(fig, o, vr, 'cyan')
+ax.hold(True)
+plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
+ax.hold(True)
+plot3d.plot_plane(ax, o, n, size=3)
+ax.view_init(elev=40., azim=10)
+plt.savefig('vision_02_01.png')
+ax.view_init(elev=30., azim=40)
+plt.savefig('vision_02_02.png')
+ax.view_init(elev=40., azim=50)
+plt.savefig('vision_02_03.png')
+ax.view_init(elev=50., azim=80)
+plt.savefig('vision_02_04.png')
+\end{minted}
+
+\includegraphics[height=6cm,width=6cm]{vision_02_01.png}
+\includegraphics[height=6cm,width=6cm]{vision_02_02.png}
+
+\includegraphics[height=6cm,width=6cm]{vision_02_03.png}
+\includegraphics[height=6cm,width=6cm]{vision_02_04.png}
+
+SVD 
+
+Bu iþlemin özdeðer / özvektör hesabýnýn karesel olmayan matrisler
+durumundaki genelleþtirilmiþ hali olduðu düþünülebilir. Pek çok lineer
+cebir iþlemi, mesela tersini alma, kerte hesabý, vs. SVD baðlamýnda
+incelenebilir. Genelleþtirme dedik, eðer $A$ karesel deðilse özvektörleri
+hesaplayamayýz, ama $A^TA$ kareseldir, ve bu matrisin özvektörleri $A$'nin
+SVD'si ile yakýndan alakalýdýr.
+
+[Ýspat atlandý]
+
+Geometrik olarak $A = U \Sigma V^T$ ile gösterilen SVD'nin bir $x \in
+\mathbb{R}^n$'yi $A$ uzerinden transform ettiðimiz durumda, $y = Ax$
+diyelim, $y$'nin $U$'da bazýndaki kordinatlarýnýn $V$ bazýndaki
+kordinatlarý ile bir iliþki ortaya çýkarttýðýný söyleyebiliriz; bu iliþki
+$\Sigma$'nin öðeleri üzerinden bir ölçeklemeden ibarettir. Yani
+
+$$ y = Ax = U\Sigma V^Tx 
+\quad \Leftrightarrow \quad
+U^Ty = \Sigma V^T x
+$$
+
+[birim küre ellipsoid eþlemesi atlandý]
+
+Genelleþtirilmiþ Ters (Generalized -Moore Penrose- Inverse)
+
+Lineer sistem çözerken $Ax = b$ için eðer $A$'nin tersi alýnabiliyorsa,
+çözüm kolay, $x^* = A^{-1}b$. Fakat $A$'nin tersi alýnamýyorsa, ki bu $A$
+karesel olmadýðýnda otomatik olarak doðru olacaktýr, ne yapacaðýz?
+Genelleþtirilmiþ tersi alma, ya da sözde ters (pseudoinverse) iþlemi burada
+ise yarar. Sözde ters için, her $A$ için bir SVD olduðuna göre, $A = U
+\Sigma V^T$, ve $\Sigma$'nýn sýfýr olmayan eþsiz deðerlerinin tersi alýnýr (yani 
+öðe $\sigma_i$, $1/\sigma_i$ olur), sýfýr deðerlerine dokunulmaz, bu sonuçlar yeni 
+bir $\Sigma^{\dagger}$'in köþegenine dizilir, ``sözde ters'' bu matris olur,
+
+$$ \Sigma^{\dagger} = \left[\begin{array}{cc}
+\Sigma_1^{-1} & 0 \\ 0 & 0 
+\end{array}\right]$$
+
+Ve bu ters iþlemi tüm $A$'nin tersini almak için kullanýlýr, ki bu sözde
+tersi de boyutu $n \times m$ olan bir $A^{\dagger}$ ile gösteriyoruz
+(Ýngilizce ``$A$-dagger'' olarak telafuz ediliyor, biz ``$A$-kama''
+diyelim), 
+
+$$ 
+A^{\dagger} = V \Sigma^{\dagger} U^T  
+\mlabel{1}
+$$
+
+Bu noktaya nasýl geldiðimize dikkat, eðer SVD sonucunun pür tersini
+alabilseydik, 
+
+$$ A^{-1} = V^{-T}\Sigma^{-1}U^{-1} $$
+
+Dikgen matrisler için $Q^{-1}=Q^T$ olduðu için 
+
+$$ = V\Sigma^{-1}U^{T} $$
+
+$\Sigma^{-1}$ olmadýðý için yerine $\Sigma^{\dagger}$ kullanýyoruz ve (1)'e eriþiyoruz.  
+
+Bazý özellikler,
+
+$$ A A^{\dagger} A = A $$
+
+ya da
+
+$$ A^{\dagger} A  A^{\dagger} =  A^{\dagger} $$
+
+Peki sözde tersi alma iþlemini denklem sistemi çözmekte nasýl kullanýrýz? 
+
+Lineer sistem çözümü baðlamýnda durumunda 3 türlü sonuç olabileceðini
+görmüþtük. Eðer sonsuz tane çözüm varsa, bu büyük bir ihtimalle problemin
+tam kýsýtlanmamýþ (constrained) olmasý ile alakalýdýr. Tabii hiçbir çözüm
+olmayabilir, ve size para veren kiþi sizden hala çözüm beklemektedir (!),
+bu durumda $Ax=b$'yi çözmek yerine ona en yakýn olabilecek þeyi
+çözebiliriz, yani $|Ax - b|^2$'yi minimize etmeyi seçebiliriz, $Ax$'i
+$b$'yi mümkün olduðu kadar yaklaþtýrýrýz. Burada sözde ters ise yarar,
+çünkü $x^* = A^{\dagger}b$ ile hesaplanan çözüm ayný zamanda $|Ax - b|^2$'yi
+minimize eder! Bu çözüm En Az Kareler (Least Squares) çözümü olarak ta
+bilinir, tabii burada sistem aþýrý belirtilmiþ (overdetermined) deðil,
+eksik belirtilmiþ (underdetermined) durumda. Not: Ayrýca sözde ters ile
+bulunan $x^*$'in mümkün tüm çözümler arasýnda ``norm'ü en az olan $x^*$'i
+bulduðu da'' söylenir.
+
+Eðer çözüm özgün ise, sözde ters yine iþler, özgün çözümü bulur. Yani her
+halükarda sözde ters tüm problemlerimizi çözer.
+
+Lineer cebir'i böylece gözden geçirmiþ olduk. Artýk dersimizin ana
+konularýna baþlayabiliriz. 
+
+Hareketli bir Sahneyi Temsil Etmek
+
+Burada sahne dýþ dünya, yani kamera ile hareket ederken gördüðümüz þeyler. 
+
+Hareket ederken kamera pek çok resim alabilir, tabii bu dersimiz uzun
+zamandýr yapýlan araþtýrmalara dayanýyor, ve bu araþtýrmalar çoðunlukla iki
+resim durumuna odaklandýlar; fakat günümüzde bir kamera saniyede mesela 30
+tane resim çekebilir, bu durum için gerekli matematiði de göreceðiz. Önce
+iki resimle baþlayacaðýz, ve bu matematiðin daha genel, çok resimli haline
+de kendimizi hazýrlayacaðýz. 
+
+3D'de Yeniden Oluþturmak (3D Reconstruction)
+
+Duraðan olduðu kabul edilen 3D dýþ dünyayý pek çok açýdan ama iki boyutlu
+resmi ile tekrar oluþturma çabasýnýn bilimde uzun bir tarihi var. Bu
+problem klasik bir ``kötü konumlanmýþ (ill-posed)'' problemdir, çünkü
+yeniden oluþturulan sonuç tipik olarak özgün deðildir (pek çok farklý
+yeniden oluþturma mümkündür). Bu yüzden ek bazý kýsýtlamalar getirmek
+gerekir. Bu alanda hala yapýlacak çok iþ olduðunu belirtmek isterim, yani
+bilim dalýmýz oldukça bakir [araþtýrmacýlar, atlayýn]. 
+
+Dýþ dünyanýn gördüðümüz imajdaki nasýl oluþtuðunu perspektif izdüþümü
+(perspective projection) üzerinden modelleyeceðiz, bu modelleme kamera modeli
+olarak iðne deliði kamera (pinhole camera) modelini kullanýr. Bu modeli þöyle
+hayal etmek mümkün, karanlýk bir odadayýz, duvarda tek bir delik var, ve bu oda
+dýþýndaki tüm görüntüler bu delik üzerinden odaya giriyor. Perspektif izdüþüm
+ilk kez Öklit tarafýndan, I.O. 400 yýlýnda araþtýrýldý; bu hakikaten çok ilginç,
+yani sonuçta bugün bilgisayarlar ile araþtýrdýðýmýz bu konunun temelindeki bazý
+kavramlarýn ne kadar önceden beri bilindiði þaþýrtýcý olabiliyor.
+
+Ardýndan bu konu Rönesans sýrasýnda çok yoðun araþtýrýldý, bu zamanlarda
+yapýlan resimlerdeki derinliði temsil etme çabalarý bugüne kalan eserlerden
+hepimiz biliyoruz. Sanatçýlar, bilimciler iki boyut üzerinde derinliði, üç
+boyutluluðu gösterebilmek için kafa yordular, ve perspektif izdüþümün
+araþtýrýlmasý 17. ve 18. yüzyýlda perspektif geometrisi adýnda bir yeni alana
+dönüþtü.
+
+Çoklu Bakýþ Açýdan Tekrar Oluþturma (Multiview Reconstruction) alanýnda
+yapýlan ilk araþtýrma oldukça eskiye gidiyor, ki bu da þaþýrtýcý. Kruppa bu
+konuyu 1913'te araþtýrdý, iki farklý kameranýn ayný objeye dönük iki
+resmine odaklandý, kendine þu soruyu sordu, ``bu iki resimde en az kaç tane
+noktaya bakmalýyým ki 3 boyutta bir model oluþturabileyim''. Kruppa
+gösterdi ki en az 5 nokta sonlu miktarda çözüm bulmak için yeterli, ki
+kameranýn hareketi de buna dahil. Tabii bulunan özgün tek çözüm deðildir,
+ama daha önce söylediðimiz gibi bu problem kötü konumlanmýþ bir problemdir,
+ama en azýndan çözüm sonsuz tane deðil, sonlu sayýda.
+
+Ýki görüntüden hareket ve yapýyý çýkartabilen ilk lineer algoritma
+Lonquet-Higgins tarafýndan 1981'de bulundu, bu algoritma eþ kutupsal
+kýsýtlama (epipolar constraint) kullanarak bu iþi becerdi. Bu derste eþ
+kutupsal kýsýtlama konusunu öðreneceðiz. Bu buluþ pek çok takip eden diðer
+buluþa ilham verdi, 80 ve 90'li yýllarda ek buluþlar yapýldý. Ardýndan
+alanýmýzýn klasik kitaplarýndan Zisserman ve arkadaþlarýnýn yazdýðý Çoklu
+Bakýþ Açý Geometrisi ({\em Multiple View Geometry}) adlý kitap var, ve iþ
+giderek bizim bu derste kullandýðýmýz en güncel olan kitaba geliyor, 
+{\em An Invitation to 3D Vision}. 
+
+Derste iþlediðimiz konu farklý isimlerde ortaya çýkabiliyor, hareketten
+yapý çýkartmak (structure from motion) ismini gördük, bir diðer isim görsel
+(visual) SLAM, ki SLAM kýsaltmasý ``ayný anda yer belirlemek ve haritalamak
+(simultaneous localization and mapping)'' kelimelerinden geliyor. Robotik
+alanýndakiler bu kelimeyi çok kullanýrlar, bir robotun dýþ dünyada hem
+etrafýný haritalamasý, hem de ayný anda o harita içindeki yerini
+kestirebilmesi, hesaplamasý bu alanýn baþ problemlerinden. Tabii görsel
+SLAM bunu görsel olarak yapabilmek; çünkü çok farklý þekillerde SLAM
+yapýlabiliyor, mesela 1. ders baþýnda söylediðimiz gibi lazer
+algýlayýcýlarla SLAM yapýlabilir, hatta sonar algýlayýcýlarla bile, ya da
+tüm bunlarý bir algýlayýcý füzyonu (sensor fusion) üzerinden birleþtirerek.
+
+
+Kaynaklar 
+
+[1] Olver, {\em Applied Linear Algebra}
+
+[2] Bayramli, Lineer Cebir, {\em Ders 15}
+
+[3] Sastry, {\em An Invitation to 3-D Vision}
+
+[4] Zissermann, {\em Multiple View Geometry}
+
+\end{document}

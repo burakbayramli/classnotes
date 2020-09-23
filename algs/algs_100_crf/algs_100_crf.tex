@@ -1,0 +1,859 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Log Lineer Modeller ve Koþulsal Rasgele Alanlar (Log Linear Models and Conditional Random Fields -CRF-)
+
+Charles Elkan ders notlarý
+
+Elkan'ýn yapay öðrenim konusuna bakýþý ilginç, ona göre yapay öðrenim
+bir bilgisayar bilim (computer science) konusudur, mesela altta iþlenen
+maksimum olurluk bilgisayar bilimdir. 
+
+Koþulsal Olurluk (Conditional Likelihood)
+
+Diyelim ki elimizde eðitim verisi olarak ikili $< x,y >$ veri noktalarý
+var. O zaman $y$'nin $x$'e koþulsal olarak baðlý (conditional on) bir
+daðýlýmý olduðunu söyleyebiliriz. 
+
+$$ y \sim f(x;\theta) $$
+
+Yani her $x$ için farklý bir $y$ daðýlýmý ortaya çýkabilir. Ve tüm bu
+farklý daðýlýmlarýn ortak noktasý $\theta$ parametresidir. Koþulsal
+olasýlýk yani þöyle yazýlabilir, 
+
+$$ P(Y=y | X=x;\theta) $$
+
+Üsttekiler $Y$ için bir model ortaya koydu, peki elimizde $X$'in daðýlýmý
+için bir olasýlýk modelimiz var mý? Cevap hayýr. Niye? Düþünelim, $p(y,x)$
+nedir ?
+
+$$ p(x,y) = p(x)p(y|x) $$
+
+Üstte $p(y|x)$'i tanýmlayacak ($\theta$ üzerinden) bir olasýlýk demeti /
+ailesi tanýmladýk, fakat elimizde $p(x)$ daðýlýmýný verecek bir model
+yok, o zaman $p(x,y)$'yi tanýmlayacak bir model de yok.
+
+Fakat bu dünyanýn sonu deðil. Belki de Yapay Öðrenim (machine learning)
+branþýnýn bir sloganý þu olmalý: ``Öðrenmen gerekmeyen þeyi
+öðrenme''. Üstteki örnekte $p(y|x)$'i öðrenebiliriz, ama $p(x)$'i illa
+öðrenmemiz gerekir mi?
+
+Sýnýflayýcý (classifier) ve denetimli (supervised) öðrenim durumunu
+düþünürsek, bize eðitim amaçlý olarak $< x,y >$ ikili veri noktalarý
+saðlanacak. $x$ kaynak veri, $y$ tahmin edilecek (ya da baþta eðitim hedefi
+olan) etiket olacak. $y$ için bir model ortaya çýkartýyoruz, çünkü test
+zamanýnda $y$ olmayacak, fakat $x$ hep olacak. Yani $y$'nin modellenmesi
+mecburi, çünkü ``genelleyerek'' onun ne olduðunu bulacaðýz, ama $x$ hep
+verili.
+
+Koþulsal Olurluk Maksimum Olurluk Prensibi
+
+Eðitim verisi $< x_1,y_1 >,...,< x_n,y_n >$ için, $\theta$'yi þöyle seç
+
+$$ \hat{\theta} =  \arg\max_{\theta} \prod _{i=1}^{n} p(y_i | x_i;\theta) $$
+
+Normal maksimum olurlukta bilindiði gibi olasýlýklarýn çarpýmý maksimize
+edilir, burada maksimize ettiðimiz ``koþulsal'' olasýlýklarýn çarpýmý. 
+
+Burada önemli bir soru þu: bildiðimiz gibi maksimum olurluk hesabý her veri
+noktasýnýn bir diðerinden baðýmsýz olduðunu farzeder [çünkü her olurluk
+hesabýný bir diðer ile çarpýyoruz, baþka ek çarpým, toplama, vs
+yapmýyoruz], bu faraziye doðru bir faraziye midir? Bu soru ve ona verilecek
+cevap çok önemli. Evet, eðer eðitim noktalarý birbirinden baðýmsýz deðilse
+maksimum olurluk kullanmamalýyýz. Baðýmsýzlýðý da iyi tanýmlamak gerekiyor
+tabii, eðer üstteki durumda $x_i$ {\em verildikten sonra} $y_i$'larýn
+birbirinden baðýmsýz olmasý yeterli.
+
+Bu model klasik Ýstatistik'te çokça kullanýlan bir yaklaþýmdýr, hatta
+lineer regresyon'un temeli üstteki faraziyedir. 
+
+$$ y = \alpha + \bar{\beta}\bar{x} + N(0,\sigma^2) $$
+
+Bu standart lineer regresyon modeli, ve bu modelde her $y$ ona tekabül eden
+$x$'e baðlý, bu sayede $x$'ler biliniyorsa $y$'ler birbirinden koþulsal
+olarak baðýmsýz hale geliyor, böylece $x$'ler birbirine baðýmlý olsa bile
+$\alpha$ ve $\beta$'nin bulunmasý mümkün oluyor. 
+
+\includegraphics[height=4cm]{crf_1.png}
+
+Üstteki resimde eðitim noktalarý (training points) mavi olsun, test noktalarý
+yeþil olsun (hemen altýnda). Bazý Yapay Öðrenim yaklaþýmlarý diyebilir ki eðitim
+$x$'lerinin daðýlýmý test $x$'lerinin daðýlýmýndan farklý, bu veri seti
+öðrenilemez (yani genellenemez, modellenemez). Fakat klasik Ýstatistik buna
+bakar ve der ki $x$'lerin verildiði durumda $y$'ler baðýmsýzdýr, bu þekilde bir
+koþulsal model öðrenilebilir.
+
+Lojistik Regresyon ayný þekilde iþler (lojistik regresyon, log lineer
+modellerin özel bir halidir, CRF'ler ayný þekilde). Burada
+da öðrenilen bir
+
+$$ p = p(y | x;\alpha,\beta) $$
+
+modeli vardýr ve $y$ deðerleri sadece 0 ve 1 olabilir. Tahmin edilen
+olasýlýk ise $y$'nin 1 olma olasýlýðýdýr. Bu model Rasgele Gradyan Çýkýþý
+ile eðitilir [detaylar için bkz {\em Lojistik Regresyon} notlarý].
+
+$$ log \frac{p}{1-p} = \alpha + \sum_j \beta_j x_j $$
+
+\includegraphics[height=4cm]{crf_2.png}
+
+$p$ log þansýnýn monotonik bir fonksiyonudur, ve ters yönden bakarsak, log
+þans $p$'nin monotonik bir fonksiyonudur. Yani lineer bir fonksiyon (sað
+taraf) ne kadar büyürse, olasýlýk / log þans o kadar büyüyecektir. Bu
+büyüme durumu mesela $\beta_j$ katsayýsýný veri analizi baðlamýnda
+yorumlanabilir hale getirir. Diyelim ki $\beta_4$ katsayýsý pozitif, o
+zaman diðer tüm þartlarýn eþit olduðu durumda (with all else being equal)
+$x_4$ ne kadar buyurse 1 olma olasýlýðý o kadar artar.
+
+Lojistik modellerin önemli bazý avantajlarý var, ki bu avantajlar log
+lineer modellere de sirayet ediyor (bu iyi). 
+
+1) Deðiþkenler arasý ilinti (correlation) probleme yol açmaz: Bu fayda aslýnda
+daha önce belirttiðimiz $x$'lerin birbirine baðýmlý olabilmesi ile
+alakalý. Baðýmsýzlýk önþartý aranmadýðý için istediðimiz kadar $x$'i problemin
+üzerine atabiliriz, eðitici algoritma bunlardan çýkartabildiði kadar iyi bir
+model bulacaktýr.
+
+Kýyasla mesela Naive Bayes böyle deðildir, eðer bir NB sýnýflayýcýsýný
+eðitiyorsak, ve öðelerin (feature) arasýnda ilinti var ise, sýnýflayýcýnýn
+doðrulugu (accuracy) azalabilir.
+
+2) LR ile ``1 olma olasýlýðýný'', yani ``bir sayýsal skoru'', elde
+ediyoruz, bu sadece 1/0 deðerinden daha fazla bir bilgi demektir.
+
+3) Bu skor, anlamý olan bir olasýlýksal deðerdir: Sonuçta SVM
+sýnýflayýcýlarý da $-\infty$ ve $+\infty$ arasýnda deðerler döndürürler, ve
+bu deðerler sýralama (ranking) amaçlý kullanýlabilir, fakat olasýlýk
+matematiði açýsýndan anlamý olan bir deðerin olmasý bundan bile
+iyidir. Naive Bayes 0 ve 1 arasýnda deðer döndürebilir, fakat bu deðerlerin
+de olasýlýksal olarak aslýnda anlamý yoktur, pratikte görüldü ki bu
+deðerler çok uç noktalarda, ya sýfýra çok yakýn, ya bire çok
+yakýn. Literatürde NB skorlarýnýn ``iyi kalibre edilmiþ olmadýðý''
+söylenir.
+
+$X_1,...,X_n$ test örnekleri ve tahmin edilen olasýlýklar $P(Y=1 | x_i) = v_i$ 
+olsun. Diyelim ki $s = \sum_i v_i$ ve $t$ sayýsý $1,..,n$ tane öðenin
+içinden $y = 1$ deðerini taþýyan öðelerin sayýsý olsun. Örnek, elimizde 100
+tane eðitim noktasý var, bunlarýn 60'ý 1 deðerinde. Bu durumda $s$ yaklaþýk
+60 olacaktýr (rasgele gürültüyü hesaba katarsak tabii), yani  $E[t] = s$ 
+denebilecektir ve bu sadece eðer olasýlýklar iyi kalibre edilmiþse
+söylenebilir.
+
+4) Dengesiz eðitim verisi kullanýlabilir: pek çok eðitim setinde mesela 1
+deðeri taþýyan deðerleri 0 deðeri taþýyanlardan çok daha fazla. Lojistik
+regresyon bu tür veriyle rahatça çalýþabilir.
+ 
+Ders 3
+
+Lojistik regresyon için log olurluðun (LCL) türevini almak lazým. Önce
+basitleþtirme amaçlý $\alpha = \beta_o$, ve $x_0 = 1$. O zaman log þansýn
+eski hali (altta eþitliðin sol tarafý) þöyle yazýlabilir (sað taraf), daha
+derli toplu bir formül olur,
+
+$$ \alpha + \sum_j \beta_j x_j  = \sum_{j=0}^{d} \beta_j x_j $$ 
+
+Bulmak istediðim her $j$ için $\frac{d}{d\beta_j} LCL$ lazým
+
+$$ 
+\frac{d}{d\beta_j} LCL = 
+\sum _{i:y_i=1} \frac{d}{d\beta_j} \log p(1|..)
++ \sum _{i:y_i=0} \frac{d}{d\beta_j} \log p(0|..)
+\mlabel{3}
+$$
+
+Eðer üstteki bir bölümü $p$ diðerine $1-p$ dersem, yani þöyle
+
+$$ 
+= \sum _{i:y_i=1} \frac{d}{d\beta_j} \underbrace{\log p(1|..)}_{p}
++ \sum _{i:y_i=0} \frac{d}{d\beta_j} \underbrace{\log p(0|..)}_{1-p}
+$$
+
+O zaman 
+
+
+$$ 
+= \sum _{i:y_i=1} \frac{d}{d\beta_j}\log p
++ \sum _{i:y_i=0} \frac{d}{d\beta_j} \log (1-p)
+$$
+
+Biliyoruz ki
+
+$$ 
+\frac{d}{d\beta_j}\log p = \frac{1}{p}\frac{d}{d\beta_j} p
+\mlabel{1}
+$$
+
+$$ 
+\frac{d}{d\beta_j}\log (1-p) = \frac{1}{1-p}(-1)\frac{d}{d\beta_j} p
+\mlabel{2}
+$$
+
+Üstteki son iki formülün her ikisinde de $d/d\beta_j p$ kýsmý olduðuna dikkat.
+
+Notasyon
+
+$$ e = \exp \big[ - \sum_{j=0}^n \beta_jx_j \big] $$
+
+$$ p = \frac{ 1}{1+e} $$
+
+$$ 1-p = \frac{ 1+e-1}{1+e} = \frac{ e}{1+e} $$
+
+Þimdi  $d/d\beta_j p$'e dönelim, ve $p$'nin üstteki gibi olduðundan
+hareketle,
+
+$$ \frac{ d}{d\beta_j}p = (-1)(1+e)^{-2} \frac{ d}{d\beta_j}e $$
+
+$$ = (-1)(1+e)^{-2} (e) \frac{ d}{d\beta_j}(x_j) $$
+
+$$ = \frac{ 1}{1+e} \frac{ e}{1+e}x_j = p(1-p)x_j$$
+
+Son ifade kodlama için oldukça uygun, $d/d\beta_j p$ hesabýný yine içinde
+$p$ içeren bir ifadeye baðladýk, ayrýca türev $x_j$ ile orantýlý. 
+
+Bu hesapla aslýnda (1) içindeki $d/d\beta_j p$ kýsmýný hesaplamýþ
+olduk. Eðer yerine koyarsak, 
+
+$$ 
+\frac{d}{d\beta_j}\log p = \frac{1}{p}p(1-p)x_j 
+$$
+
+$p$'ler iptal olur
+
+$$ 
+= (1-p)x_j 
+$$
+
+Ayný þekilde (2) için 
+
+$$ 
+\frac{d}{d\beta_j}\log (1-p) = \frac{1}{1-p}(-1) p(1-p)x_j 
+$$
+
+$$ 
+ =  -px_j 
+$$
+
+Üstteki türevler tek bir eðitim veri noktasý için. Tüm eðitim veri setinin
+türevi her noktanýn türevlerinin toplamý olacak, (3)'de görüldüðü gibi.
+
+$$ \frac{d}{d\beta_j} LCL = 
+\sum _{i: y_i = 1} (1-p_i)x_{ij} + 
+\sum _{i: y_i = 0} -p_i x_{ij}  
+\mlabel{4}
+$$
+
+$x_{ij}$ notasyonunda $j$, $j$'inci öðe / özellik anlamýna geliyor. Þimdi 
+notasyonel bir numara kullanacaðým, 
+
+$$ = \sum _{tum \ i} (y_i - p_i)x_{ij} $$
+
+Bunu niye yaptým? (4) formülünde eþitliðin sað tarafý, birinci terim içinde
+1 sayýsý var, sonraki terimde 1 yok. Eðer 1 olup olmamasý yerine $y_i$
+kullanýrsam, ki zaten 1'in olup olmamasý $y_i$'nin 1 olup olmamasýna baðlý,
+tek bir terimde iþi halledebilirim. $y_i=1$ olduðu zaman üstteki ifade
+$1-p_i$ olacaktýr, olmadýðý zaman $-p_i$ olacaktýr. 
+
+Eriþtiðimiz sonucu analiz etmemiz gerekirse, nihai formül gayet basit ve
+temiz çýktý. 
+
+[24:10] kalibrasyonla alakalý bir yorum
+
+Rasgele Gradyan Çýkýþý (Stochastic Gradient Ascent)
+
+Fikir: türevi eðitim noktasý basýna hesapla, ve modeli hemen güncelle. 
+
+Eðitim noktalarý $< x,y >$ olarak gelsinler. Her nokta için, ve her $\beta_j$
+için
+
+$$ \frac{d}{d\beta_j}p(y|x;\beta) = g_j$$ hesapla. 
+
+$$ \beta_j := \beta_j + \alpha g_j $$
+
+Gradyanýn ne olduðunu hatýrlayalým, bir fonksiyonun maksimumuna ``doðru''
+olan bir gidiþ yönünü gösterir, ve bu gidiþ yönü o fonksiyonu oluþturan
+deðiþkenlerin (parçalý türevleri) üzerinden belirtilir. O zaman elimizdeki
+gradyan o iç deðiþkenlerin maksimum yöndeki deðiþim þeklini bize tarif
+eder. 
+
+Algoritmanýn tamamý: alttaki formül için
+
+$$ \frac{d}{d\beta_j}p(y|\bar{x};\bar{\beta}) = (y-p)x_j $$
+
+Her $x$ için
+
+- O anki modele göre $p$'yi hesapla
+
+- Her $j = 0,..,d$ için
+
+\ \ \ - $ \beta_j := \beta_j + \alpha \underbrace{ (y-p) x_j}_{\textrm{kýsmi türev}} $ hesapla
+  
+Peki metotun ismindeki ``rasgele (stochastic)'' tanýmý nereden geliyor? Ýyi
+bir soru bu çünkü metotta rasgele sayý üretimi gibi þeyler
+görmüyoruz. Cevap, metot yine de rasgele, çünkü her noktayý ayrý ayrý
+iþliyoruz, ve bu noktalarýn eðitim algoritmasýný geliþi bir nevi ``veriyi
+örneklemek'' gibi sanki, ek olarak veriyi eðitime almadan önce rasgele
+þekilde karýþtýrmak ta iyi olabilir. 
+
+Bazý Tavsiyeler (Heuristics)
+
+1) Her özellik (feature) $x_j$'i ölçeklemek, yani ayný ortalama (mean) ve
+varyansa sahip olacak þekilde tekrar ayarlamak. Yani mesela 0 ile 100
+arasýnda olabilecek ``yaþ'' gibi bir özelliði, 0 ve 1 arasýnda deðiþen
+özellikler ile ayný ortalama ve varyansa sahip olacak þekilde
+ayarlamak. Bunun sebebi güncelleme hesabýndaki $\lambda$'nin tek bir sabit
+olmasý, ve bu sabit her $j$ için aynýdýr, o sebeple $\lambda$'nin her öðeye
+``ayný þekilde'' uygulanabilmesi için öðelerin birbirine yakýn olmasý
+iyidir. Ek olarak, genellikle eðitim verisinde 0 ile 1 arasýnda ikisel
+türden öðeler vardýr, o sebeple bu þekilde olmayan diðer ögeleri 0 ve 1
+arasýnda çekmek daha uygun ve kolay olur.
+
+2) Veriyi rasgele þekilde sýralamak. Terminoloji: eðitim veri seti
+üzerinden bir geçiþ yapmak bir ``çað'' (epoch) olarak bilinir. 
+
+3) $\lambda$'yi deneme / yanýlma yöntemi ile bulun (bu sabiti bulmanýn
+sistemik bir yöntemi yok). Belki verinin içinden alýnan daha ufak bir
+örneklem üzerinde bu deneme / yanýlma iþlemi yapýlabilir.
+
+4) Deneme yanýlma iþlemini þöyle yapabilirsiniz: büyük bir $\lambda$ ile
+ise baþlarsýnýz, ve her çaðda $\lambda$ deðerini azaltabilirsiniz (mesela
+her çað sonunda $1/2$ ile çarparak).
+
+Ders 4
+
+Log Lineer Modeller
+
+Bu modeller lojistik regresyonun yapýya sahip (structured) girdiler ve
+çýktýlar için genellenmiþ halidir. Lojistik regresyonda girdi $\bar{x} \in
+\mathbb{R}^d$ ve çýktý $y \in {0,1}$ idi, yani çýktý ikiseldi. Fakat biz bundan 
+daha genel yapay öðrenim problemlerini çözmek istiyoruz, yani 
+istediðimiz $x \in \mathbb{X}$, ki $\mathbb{X}$ herhangi bir 
+uzay olabilmeli, ve $y \in \mathbb{Y}$ ki $\mathbb{Y}$ ayný þekilde
+herhangi  bir uzay olabilmeli. 
+
+Mesela $x$ bir cümle olabilmeli, diyelim ki $x$ = ``he sat on the mat'',
+tercümesi ``adam paspasýn üzerinde oturdu''. Buna karþýlýk olan $y$ ise
+mesela þöyle olabilmeli, $y$ = ``pronoun verb article noun'', yani her
+kelimenin hangi gramer ögesi olduðunu gösteren bir ibare. Mesela ``sat''
+yani oturmak, bir fiil (verb), ``mat'' paspas, bir isim (noun), ve $y$
+içinde gelen eðitim verisinde bunlar olabilmeli (üstteki örnekte ikinci
+öðe), sadece 0/1 deðerleri deðil.
+
+Bu tabii ki denetimli bir eðitim þekli olacak. Fakat dikkat bazý yapay
+öðrenim uygulamalarýnda ``çok sýnýftan gelen'' ama tek bir deðer vardýr,
+mesela $y \in {1,2,3}$ olabilir, 3 sýnýflý bir çýktý yani. Bazen çýktý
+gerçek sayý (real number) olabilir, ama yine de tek bir $y$ deðeri
+vardýr. Üstteki durum böyle deðildir. Potansiyel olarak $y$'nin büyüklüðü
+$x$ ile birebir ayný bile olmayabilir. Bu tür bir karýþýk eþlemeden
+bahsediyoruz.  Tek sýnýrlamamýz $\mathbb{Y}$'nin sonlu (finite) olmasý.
+
+Model þöyle (notasyonu biraz deðiþtirdik, $\beta$ yerine $w$ kullanýyoruz
+mesela, $w$ modelin ``aðýrlýklarýný (weights)'' temsil ediyor. 
+
+$$ p(y|x;w) = 
+\frac{\exp \big[ \sum_{j} w_j F_j (x,y) \big]}{Z(x,w)}
+$$
+
+Yakýndan bakarsak model LR modeline benziyor. Bir lineer fonksiyonun
+$\exp$'sý alýnýyor ve bu deðer olasýlýk hesabýnda kullanýlýyor. Ýleride
+zaten göreceðiz ki LR üstteki yaklaþýmýn bir ``özel durumu'', yani üstteki
+model daha genel bir taným. 
+
+Aklýmýza birçok soru geliyor herhalde, mesela ``$Z$ nedir?'' ya da ``$F_j$
+nasýl hesaplanýr?'' gibi. $Z$ þöyle tanýmlanýr
+
+$$ Z(x,w) = \sum_{y'} \exp \big[ \sum_j w_j F_j(x,y') \big] $$
+
+Tüm $y'$'lere bakýlýyor, yani tüm mümkün $\mathbb{Y}$ deðerleri teker teker
+$y'$ üzerinden toplamda kullanýlýyor. $\mathbb{Y}$'nin sonlu olma
+faraziyesi burada önemli hale geliyor, toplamý sonsuz bir küme üzerinden
+yapamayýz. 
+
+$Z$ normalizasyon için kullanýlýyor, çünkü olasýlýk teorisinde eðer
+elimizde çoklu bir hedef var ise, bu hedeflere olan olasýlýk deðerlerinin
+toplamý 1 olmalýdýr. $Z$ iþte bunu garantiler, bu sebeple bölen
+(denominator) bölümün (nominator) toplamý olmalýdýr. 
+
+Her $F_j(x,y)$ bir özellik fonksiyonudur (feature function). Niye? Çünkü
+elimdeki $x$'ler illa bir vektör olmayabilir, yani $x_j$ ``vektörünü'' alýp
+$w_j$ ``vektörü'' ile çarpamam, bu sebeple önce bir fonksiyon ile bir
+sayýsal (numerical) deðer üretmem gerekiyor. Küme olarak
+
+$$ F_J: \mathbb{X} \times \mathbb{Y} \to \mathbb{R} $$
+
+Eðer $ F_j(x,y) > 0 $ ve $w_i > 0$ ise, o zaman $F_j(x,y) = 0$'a kýyasla
+$p(y|x;w)$ artar. Sezgisel olarak tarif edersek özellik fonksiyonun (OF)
+söylediði þudur, eðer aðýrlýk pozitif ise OF'in deðeri ne
+kadar buyurse elimizdeki $y$, $x$ ile o kadar ``uyumludur'' (tabii ki belli
+bir özellik yani $j$ için). Negatif ilinti bunun tam tersi olurdu. 
+
+Eðitim $w_j$ aðýrlýklarýný bulmamýzý saðlar. $F$ önceden tanýmlýdýr (yani
+eðitime bile baþlamadan önce), bu fonksiyonun ne olacaðý
+``seçilir''. Seçilirken tabii ki $x,y$ arasýndaki ilintiye göre fazla / az
+sonuç geri getirebilecek þekilde seçilmelidir. 
+
+Kelime örneðine geri dönersek, bir $F$ þöyle olabilir, 
+
+$ F_{15}(x,y) =$ ``eðer ikinci kelimenin baþ harfi büyük ve ikinci etiket
+isim (noun)''. OF'ler reel deðerlidir. Bunun özel durumu 0/1 deðeri veren
+OF'lerdir. Biraz önceki örnek mesela 0/1 döndürüyor.
+
+Ya da $F_{14}(x,y)$ diyelim ki þöyle ``ilk kelimenin baþ harfi büyük, ve
+ilk etiket bir isim''. Tahmin edebiliriz ki eðitim setimizde ilk
+kelimesinin baþ harfi büyük {\em olan} ama o kelimesi isim olmayan pek çok
+örnek olacaktýr. Bu durumda $w_{14}$ küçük olur. 
+
+Dediðimiz gibi $F$ reel deðeri olabilir, mesela
+
+$$ F_{16}(x,y) = length(y) - length(x) $$
+
+yani bu fonksiyonda $x$'nin uzunluðunu $y$'nin uzunluðundan
+çýkartýyoruz. Bu ne iþe yarar? Diyelim ki otomatik tercüme yapmasý için bir
+yapay öðrenim programý yazýyoruz, $x,y$ eðitim noktalarý birbirinin
+tercümesi olan Ýngilizce/Fransýzca cümleler. Çoðunlukla Fransýzca cümleler
+tekabül ettikleri Ýngilizce cümlelerden çok daha uzun oluyorlar, yani
+üstteki çýkarma çoðunlukla pozitif sonuç verecek. Deðiþik bir açýdan
+bakarsak, pozitif bir sonuç, bir tercümenin doðru olduðu yönünde bir iþaret
+olarak kabul edilebilir, ve üstteki OF üzerinden eðitim algoritmasý bunu
+kullanýr. Eðitim sonrasý $w_{16}$ pozitif bir aðýrlýk alacaktýr.
+
+Bir log lineer modelde (buna CRF'ler de dahil) ilk yapýlan iþ probleminiz
+için önemli olan OF'leri ortaya çýkartmak.
+
+$F$ tanýmlamanýn deðiþik bir baþka yolu:
+
+$a(x)$ bir fonksiyon olsun. Her $v \in \mathbb{Y}$ için
+
+$$ F_j(x,y) = a(x) I(y=v)$$
+
+tanýmlayalým. 
+
+$$ p(y|x;w) = \frac{\exp \sum_j w_j F_j (x,y)}{Z} $$
+
+Þimdi lineer zincirli CRF konusuna bakalým. Yine $x \in \mathbb{X}$ ve $y
+\in \mathbb{Y}$.  $x$ bir girdi zinciri, $y$ bir çýktý zinciri ve en basit
+durumda $x$ ile ayný uzunlukta. Konuþma bölümlerini etiketlemek bu
+kategoriye dahil, ama bir diðer uygulama kelimeyi arasýna eksi iþaretleri
+koyarak bölme (hyphenation). 
+
+Mesela girdi $x=$''beloved'', çýktý $y=$''00100000'' çünkü bu kelime
+``be-loved'' olarak bölünür. 
+
+Bu uygulama için bir OF 
+
+$$ F_j(x,y) = \frac{\textrm{kaç  tane 1 var}}{\textrm{x uzunluðu}} $$
+
+$x=$''beloved'', çýktý $y=$''00100000'' için sonuç $1/7$ olurdu.
+
+Lineer zincir CRF için hangi OF'lerin bazý sýnýrlarý var. 
+
+$$ F_j (\bar{x},\bar{y}) = \sum_i f_j(y_{i-1}y_i\bar{x} i) $$
+
+ki sembol üzeri düz çizgiyi ($\bar{x}$ gibi) bu sefer bir sýralý veri
+temsil etmek için kullanýyorum)
+
+Mesela
+
+$$ f_{18} =   f_j(y_{i-1}y_i\bar{x} i) = " i=2, y_{i-1} = 0, y_i = 1,
+x_1x_2 = "as" "$$
+
+Mesela ``async'' kelimesi ``a-sync'' olarak bölünebilir, ve eðitim setinde
+``async'' ile ``$y=$01...'' gelirse üstteki OF bu bölünmeyi ödüllendirir /
+öðrenir.
+
+Þimdi CRF olmayan bir Lineer Model'e bakalým, 
+
+Mesela çok etiketli denetimli (supervised) öðrenim. ``Çok etiketli'' ne
+demektir?  Dikkat, ``çok sýnýflý (multi label)'' deðil, yani tek öðenin iki
+veya daha fazla deðer arasýndan birini seçmesinden bahsetmiyoruz. Birden
+fazla etiket alabilmekten bahsediyoruz, mesela bir Ýnternet sayfasý, bir
+veya daha fazla kategoriye ayný anda ait olabilir, mesela hem Spor, hem Ýþ
+Dünyasý. Diyelim ki 10 mümkün etiket var, bir doküman kaç deðiþik þekilde
+etiketlenebilir?
+
+$2^{10} = 1024$ þekilde (bu sayý, hesap bir kümenin kaç deðiþik þekilde alt
+kümesi olabilir hesabýný yansýtýyor ayný zamanda, yani sýralama önemli
+olmadan belli sayýda öðenin kaç deðiþik þekilde alt kümeleri olabilir
+sorusu). Bu büyük bir rakam. Ve bu kadar çok olasýlýk var ise, eðitim
+verisi tüm kombinasyonlar için örnek veri içermeyebilir. Fakat muhakkak
+algoritmamýzýn bu kombinasyonlarý tahmin edebilmesini tercih ederiz.
+
+Çözüm? 10 deðiþik sýnýflayýcý kurarark bu problemi çözebiliriz (ayrý ayrý,
+tek baþýna tek sýnýfa bakýlýnca yeterli veri çýkar herhalde), fakat bu
+þekilde ``sýnýflararasý'' iliþkileri yakalayamayýz. Log lineer model
+yaklaþýmýnda öyle bir ikisel (binary) OF yaratýrsýnýz ki, mesela,
+
+$$F_{19}(x,y) = "Spor \in y, \textrm{Ýþ Dünyasý} \in y" $$ 
+
+Dikkat edersek OF sadece $y$'ye bakýyor. Bu OF'yi içeren algoritma
+eðitilince üstteki OF için bir pozitif aðýrlýk öðrenilebilecektir. 
+
+Soru: bir anlamda problemin yerini deðiþtirmiþ olmuyor muyuz? Mesela
+üstteki þekilde bu sefer her türlü kombinasyon için OF'mi yaratacaðýz?
+Cevap: eðer sadece ikili eþlere bakýyorsak, kombinasyon hesabý 
+$C(10,2) = 45$ sonucunu verir. Bu fena bir sayý deðil.
+
+Ayrýca verinin seyrekliði bize hangi kombinasyonlarýn dahil edilip
+edilmeyeceði yönünde yardýmcý olabilir. 
+
+Soru: çok sýnýflý problemler lojistik regresyonu geliþtirerek çözülemez mi?
+Cevap: böyle bir yaklaþým var, buna multinom lojistik regresyon
+deniyor. Fakat bu yaklaþýmýn log lineer modellerin özel bir hali olduðunu
+belirtmek isterim, yani yapay öðrenim dünyasýnýn aktif olarak araþtýrdýðý
+alan artýk burasý, multinom lojistik regresyon aþýldý. Zaten log lineer
+modeller ile çok etiketli problemleri de çözebiliyorsunuz.
+
+Ders 5
+
+Soru: biraz önce sadece $y$'ler arasýnda bir OF tanýmlayabildiðimizi
+gördük. Peki sadece $x$'ler arasýnda OF tanýmlamak faydalý olur muydu?
+Cevap: Formülü tekrar hatýrlayalým,
+
+$$ p(y|x;w) = \frac{\exp \sum_j w_j F_j (x,y)}{Z(x,w)} $$
+
+OF'nin görevi hangi $y$'lerin daha yüksek olasýlýðý olduðunu
+belirtmek. Eðer sadece $x$ var ise, bu durumda bölüm ve bölendeki deðerler
+birbirini iptal ederdi. Her $y$ için ayný $x$ ``katkýsý'' olurdu ve bunun
+sýnýflayýcýya hiçbir faydasý olmazdý. 
+
+[8:00-18:00 atlandý]
+
+Çözdüðümüz problemler þu formatta
+
+$$ p(\bar{y}|\bar{x};w) = \frac{\exp \sum_j w_j F_j (\bar{x},y)}{Z(\bar{x},w)} $$
+
+Tahmin etmek için 
+
+$$ \hat{y} = \arg\max_{y}  \exp \sum_j w_j F_j(\bar{x},y)$$
+Bir $\bar{y}$ tahmin etmek için bu modellerden birini kullanacaksak, $
+p(\bar{y}|\bar{x};w)$ formülüne $\bar{x}$'i koyarýz, ve elde edilen
+daðýlýmda hangi $\bar{y}$'nin olasýlýðý daha yüksekse onu seçeriz. Daha
+yüksek olasýlýða sahip olan $\bar{y}$, $p(\bar{y}|\bar{x};w)$ formülünde
+bölümü daha yüksek olandýr. Bölen her $\bar{y}$ için sabit / ayný.
+
+Aslýnda $\exp$'ye ihtiyaç yok, çünkü $\exp$ monotonik bir fonksiyon, yani
+sadece þu kullanýlabilir,
+
+$$ \hat{y} = \arg\max_{y}  \sum_j w_j F_j(\bar{x},y)$$
+
+En olasý $y$'yi bulmak için $Z$'nin gerekmediðine de dikkat, çünkü bu sabit
+tüm seçenekler için ayný.
+
+Burada tahmin etmek baðlamýnda zor olan þey, en yüksek $y$'yi bulmak
+için tüm $y$'lere teker teker bakmaya mecbur olmamýz. Bu bakma iþlemi
+çok zaman alabilir, o zaman bu problemi bir þekilde çözmem lazým. 
+
+Diðer problem, tüm olasýlýklarýn 1'e toplanabilmesini saðlayan normalize
+sabitinin hesabý, yani $Z(\bar{x},w) = \sum_{y'}\exp [ \sum_j w_j F_j(\bar{x},\bar{y})]$, 
+ki eðer olasýlýk deðeri hesaplayacaksak bu sabit gerekli. 
+
+Yani iki ana problem var, bir de eðitim algoritmasý var, ki bu aynen
+lojistik regresyon örneðinde olduðu gibi rasgele gradyan çýkýþý üzerinden
+olacak, bu 3 algoritmayý þimdi sunacaðýz. 
+
+Algoritma 1
+
+Önce,
+
+$$ \hat{y} = \arg\max_{\bar{y}}  \sum_j w_j F_j(\bar{x},\bar{y})$$
+
+Bu hesabý polinom zamanda (polynomial time) yapmak istiyoruz. Tanýmý biraz
+deðiþtirelim, 
+
+$$ = \arg\max_{\bar{y}}  \sum_j w_j \sum_i f_j(y_{i-1}y_i \bar{x} i )$$
+$j$ tüm özellikler, $i$ $x,y$ ``boyunca'' ilerleyen indisler. Üstteki ibare
+tek bir eðitim veri noktasý için yapýlýyor, yani $i$ deðiþik veri
+noktalarýný indislemiyor (genellikle öyle olur, o yüzden belirtmek
+istedik). 
+
+Toplam iþlemlerinin sýrasýný deðiþtirelim, 
+
+$$ = \arg\max_{\bar{y}}  \sum_i  \sum_j w_j f_j(y_{i-1}y_i \bar{x} i )$$
+Ýçerideki toplama $g_i(y_{i-1}y_i)$ ismi verelim, böylece her $i$ için
+deðiþik bir $g$ fonksiyonuna sahip oluyorum. 
+
+$$  = \arg\max_{\bar{y}}  \sum_i  g_i(y_{i-1}y_i) $$
+
+$y_{i-1},y_i$ kelime bölme probleminde iki deðerden birini alabilir. Cümle
+etiketleme probleminde belki 20 deðerden birini alabilirler. $\bar{x},\bar{w}$ zaten 
+sabit (eðitim verisi içindeler, ya da sabit olarak görülüyorlar). Bu 
+durumda $g$'yi temsil etmek için nasýl bir veri yapýsý kullanmalýyým? Çünkü
+bilgisayar bilim yapýyoruz, ve bilgisayar bilimde veri yapýlarý vardýr. 
+Bize gereken belli $y_{i-1},y_i$ kombinasyonu için bir $g$ deðeri
+döndürülmesi, ve bu sonucu bir yerde depolayabilmek.
+
+Gereken yapý basit bir matris olabilir. Diyelim ki $m$ farklý $y$ deðeri
+var ise, $m^2$ hücresi olan bir matris iþimizi görür. Her $g_i$ için ayrý
+bir $m^2$ matrisi olacak tabii ki. $n$ tane matris, $d$ deðer var ise 
+iþlem zamaný $O(m^2nd)$. 
+
+Algoritmamda ilk yapacaðým iþ mümkün $g$ deðerlerini önceden hesaplayýp
+(precompute) bir yerde depolu olarak tutmak / hazýr etmek. 
+
+Taným
+
+$Skor(y_1,...,y_k) = \sum _{i=1}^{k} g_i(y_{i-1} y_i)$
+
+Amacýmýz öyle bir $y$ sýralamasý (sequence) bulmak ki bu sýranýn skoru 
+en yüksek olsun. 
+
+$U(k)$ = en iyi sýralama $y_1,...,y_k$'nin skoru
+
+$U(k,v)$ = $y_k=v$ olma þartýyla en iyi sýralama $y_1,...,y_k$'nin skoru
+
+Amacým $U(n+1, \textrm{BÝTÝÞ})$'i bulmak. Mümkün etiketlere BAÞLA, BÝTÝÞ adlý iki
+yeni deðer ekledik, bu bazý formülleri kolaþlaþtýracak. Bu taným aslýnda
+$\arg\max$ ile bulmaya çalýþtýðým þeyin bir bölümj aslýnda, sadece amacýmý
+bu þekilde tekrar tanýmladým. Tekrar belirtmek gerekirse, 
+
+$$U(k,v) = \max_{y_1,y_{k-1}}  [ \sum _{ i=1}^{k-1}  g_i(y_{i-1}y_i) +  g_k(y_k,v) ]$$
+
+Ýlginç bölüme geldik. Üstteki tanýmý özyineli olarak tanýmlarsak, 
+
+$$ U(k,v) = \max_{y_{k-1}} [ U({k-1},y_{k-1}) + g_k(y_{k-1},v)]  $$
+
+Bu özyineli fonksiyonun avantajý nedir? Aslýnda bir önceki formüle göre çok
+daha çetrefil duruyor. Avantaj þurada, dinamik programlama (dynamiç
+programming) tekniklerini kullanarak bir döngü içinde üstteki özyineli
+hesabý yapmak mümkün. Þimdi teker teker bakalým,
+
+$y_0 = \textrm{BAÞLA}$
+
+$U(1,v) = \max_{y_0} [ U(0,y_o) + g_1(y_0,v)]$
+
+Bu ilk basamakta aslýnda bir maksimizasyon yok, o zaman 
+
+$ = g(\textrm{BAÞLA},v)$
+
+yeterli. 
+
+Ama ikinci basamakta iþler zorlaþýyor, 
+
+$U(2,v) = \max_{y_1} [ U(1,y_1) + g_2(y_1,v) ]$
+
+Fakat eþitliðin sað tarafýndaki $U$ hesabýný bir önceki basamakta
+hesapladým ve depoladým, onu hemen kullanabilirim. Bu hesabýn yükü nedir? 
+Her mümkün $v$ deðerine ($m$ tane) bakmam lazým, ve bu iþlem sýrasýnda her
+$y_1$ mümkün deðeri (yine $m$ tane) irdelemem lazým. Yani $O(m^2)$. 
+
+Bu iþlemi $U(n+1, \textrm{BÝTÝÞ})$'e kadar yapmam lazým. Toplam yük $O(nm^2)$. 
+
+$g$ matrislerini hesaplamak için $O(nm^2d)$ demiþtik, bu  $O(nm^2)$'ten
+daha büyüktür / ona baskýndýr, ve $O$ aritmetiðine göre daha büyük olan 
+kullanýlýr. 
+
+Bu algoritma dinamik programlamanýn özel bir halidir, bazen ona Viterbi
+algoritmasý ismi de verilir. Bilindiði gibi Viterbi algoritmasý Gizli
+Markov Modelleri (Hidden Markov Models) yapýsýný dekode etmek için
+kullanýlýyor. CRF'lerin HMM'e kýsmen baðlantýsý olduðu düþünülürse, Viterbi
+algoritmasýnýn burada da ortaya çýkmasý þaþýrtýcý deðil. 
+
+Algoritma 2
+
+Þunu hesapla
+
+$$Z(\bar{x},w) = \sum_{y'} \exp 
+\underbrace{\sum_j w_j F_j(\bar{x},\bar{y})}_{g}
+$$
+
+Ýçerideki toplama $g_i$ demiþtik, 
+
+$$ g = \sum_i g_i(y_{i-1}y_i) $$
+Yani
+
+$$
+Z(\bar{x},w) = 
+\sum_{\bar{y}} \exp 
+\sum_i g_i(y_{i-1}y_i) 
+$$
+
+Bir toplamýn $\exp$'sý, $\exp$'lerin çarpýmý haline dönüþür, yani $\exp$
+toplamdan ``içeri'' nüfuz eder, 
+
+$$
+ = \sum_{\bar{y}} \prod_i \exp  g_i(y_{i-1}y_i) 
+\mlabel{5}
+$$
+
+$t=1,..,n+1$ için þunu tanýmlayalým,
+
+$M_t(u,v) = \exp g_t(u,v)$
+
+$M_t$ aþaðý yukarý $g$ ile ayný þey, her deðiþik $g$ fonsiyonu için deðiþik
+bir matris var, bu matris hücrelerinin $\exp$'sinin alýnmýþ hali $M_t$ matrisi.
+
+$M_1(u,v)$ sadece $u=\textrm{BAÞLA}$ için geçerli. 
+
+$M_{n+1}(u,v)$ sadece $b=\textrm{BÝTÝÞ}$ için geçerli. 
+
+$M_{12} = M_1M_2$ yani matris çarpýmý. 
+
+$M_{12}(\textrm{BAÞLA},w)$'yu düþünelim (ki bu tek bir hücre deðeri) 
+
+\includegraphics[height=4cm]{crf_3.jpg}
+
+Bu ifadenin sol taraftaki $M_1$ içinde $\textrm{BAÞLA}$ satýrýný sað taraftaki $M_2$
+$w$ kolonu ile çarptýðýný düþünebiliriz.
+
+$$M_{12}(\textrm{BAÞLA},w) = \sum_v M_1(\textrm{BAÞLA}, v)M_2(v,w)  $$
+
+$$ = \sum_v \exp [g_1(\textrm{BAÞLA},v) + g_2(v,w)] $$
+
+Bu istediðimiz gibi bir ifadeye dönüþmeye baþladý, çünkü hatýrlarsak, (5)'e
+benzeyen bir þeyleri elde etmeye uðraþýyoruz. Gerçi üstteki ifade tüm $y$
+deðerleri için deðil, tek bir $v$ için, ama yine de uygun, üstteki $v$
+yerine $y_1$ dersek belki daha uygun olur,
+
+$$ = \sum_{y_1} \exp [g_1(\textrm{BAÞLA},y_1) + g_2(y_1,w)] $$
+
+Üçlü bir çarpma görelim: $M_{123}$. 
+
+$$ M_{123} = \sum_{y_2} M_{12}(\textrm{BAÞLA}, y_2)M_3(y_2,w)  $$
+
+$$ = \sum_{y_2} [ \sum_{y_1}\exp [g_1(\textrm{BAÞLA},y_1) + g_2(y_1y_2) ] 
+\exp g_3(y_2,w) ]
+$$
+
+$$ \sum_{y_1,y_2} \exp [g_1(\textrm{BAÞLA},y_1) + g_2(y_1y_2) + g_3(y_2,v)]  $$
+
+Yani üç matrisi birbiriyle çarparak $y_1,y_2$ üzerinden toplam almýþ
+oluyorum. Ve böyle devam edersem, yani tüm matrisleri birbiriyle çarparsam
+ve $\textrm{BAÞLA}, \textrm{BÝTÝÞ}$ deðerlerine bakarsam, 
+
+$$ 
+M_{123...n+1} (\textrm{BAÞLA}, \textrm{BÝTÝÞ}) =  
+$$
+$$
+\sum_{y_1,...,y_n}  \exp [
+(g_1(\textrm{BAÞLA},y_1) + g_2(y_1,y_2) + g_3(y_2,y_3) + ... + g_{n+1}
+(y_n, \textrm{BÝTÝÞ} )
+]
+$$
+
+Bu ifade parçalara ayýrma (partition) fonsiyonu için tam ihtiyacým olan
+þey. Daha önce Viterbi algoritmasýndan bahsettik, hatta bu algoritma
+dinamik programlama kategorisine girer dedik, üstteki algoritma dinamik
+programlama bile sayýlmaz, aslýnda bir matris çarpýmý sadece. Daha genel
+olarak üstteki algoritma ileri-geri (forward-backward) algoritmasýnýn bir
+türevi, bu algoritmalar bildiðimiz gibi HMM'lerde sýkça kullanýlýyorlar.
+
+Bu iki algoritma CRF'ler için gerekli. Þimdi CRF'leri nasýl eðiteceðimizi
+görelim. 
+
+Eðitim
+
+Maksimizasyon için rasgele gradyan çýkýþý kullanacaðýz. 
+
+$$ 
+p(y|x;w) = \frac{\exp \sum_j w_j F_j(x,y)  }{Z(x;w)}
+$$
+
+Gradyan çýkýþý için üstteki formülün türevini alabilmeliyiz. Önce
+$\log$'unu almak lazým, çünkü $\partial / \partial w_j \log p$ hesabý
+gerekli, üsttekinin $\log$'u ise bölümün $\log$'u eksi bölenin $\log$'u.
+
+$$
+ \frac{\partial}{\partial w_j} \log p
+=
+\frac{\partial}{\partial w_j} [ \sum_j w_j F_j(x,y)] -
+\frac{\partial}{\partial w_j} \log Z(x;w)
+ $$
+
+Türevin eksi öncesi ilk bölümü çok basit, $w_j$ ve toplam yokolacak (tüm
+$j$'lerin toplamý yokoldu, çünkü türev ``tek'' bir $j$ deðeri ile
+ilgileniyor, diðerleri sýfýr oluyor)
+
+
+$$ 
+= F_j(x,y) -
+\frac{\partial}{\partial w_j} \log Z(x;w)
+$$
+
+Eksiden sonraki kýsým çok zarif bir sonuca dönüþecek, birazdan göreceðiz. 
+
+$$ 
+\frac{\partial}{\partial w_j} \log Z(x;w) = 
+\frac{1}{Z} \frac{\partial}{\partial w_j} Z 
+$$
+
+Türevi toplam içine taþýyoruz, 
+
+$$ 
+= \frac{1}{Z} \sum_{y'} \frac{\partial}{\partial w_j} [
+\exp [ \sum_{j'} w_j' F_{j'}(x,y') ] ] 
+$$
+
+$$  
+= \frac{1}{Z}\sum_{y'} 
+\bigg[
+\exp [ \sum_{j'} w_{j'} F_{j'}(x,y') ] F_j(x,y')
+\bigg]
+$$
+
+$$ 
+= \sum_{y'} F_j (x,y')
+\frac{
+\exp [ \sum_{j'} w_{j'} F_{j'}(x,y') ]
+}
+{Z}
+$$ 
+
+Þimdi ilginç kýsma geldik, üstteki kesirli kýsým $p(y' | x;w)$ deðerine
+eþittir. 
+
+$$ = \sum_{y'} F_j (x,y') p(y' | x;w)$$ 
+
+Ýlginç durum burada ortaya çýkýyor, çünkü üstteki ayný zamanda bir beklenti
+(expectation) tanýmý deðil mi? Tüm $F_j$ deðerlerini o deðerlerin
+olasýlýklarý ile çarpýp toplarsak bir beklenti elde etmez miyiz? Evet. O
+zaman beklenti tanýmýný kullanabiliriz,
+
+$$\frac{\partial}{\partial w_j} \log p = F_j(x,y) - E[F_j(x,y') ] $$
+
+ki $y'$ þöyle bir daðýlýmý takip ediyor, 
+
+$$ y' \sim p(y'|x;w) $$
+
+Soru: $\frac{\partial}{\partial w_j} \log p = ?$ Yani bu türev ne zaman 
+sýfýra eþittir? 
+
+Cevap: Türevin açýlýmýna bakýnca mesela, $F_j=0$ olunca mý? Hayýr, çünkü OF
+sýfýr olsa bile beklenti kýsmý sýfýr olmayabilir. O zaman þöyle söylemek
+gerekir, eðer tüm $y'$ için $F_j(x,y') - 0$ ise, o zaman türev sýfýr olur. 
+
+Çoðunlukla $F_j(x,y) = a(x)I(y=v)$. Hatýrlarsak bu yöntem bir özelliði (ki
+$(a(x)$ ile temsil ediliyor), her mümkün $v$ deðeri için bir OF'ye
+çevirmenin yolu idi (tek $x$'e baðlý OF olamaz).
+
+O zaman þunu da söyleyebiliriz, eðer $a(x) = 0$ ise, her $y$ için $F_j(x,y)
+= 0$ demektir. 
+
+Bu bilginin faydasý þudur, veride seyreklik var ise, lojistik regresyon
+bunlarý atlamayý bilir. Demek ki ayný þekilde koþulsal lineer modeller de
+bu özellikleri atlayabilir. Eðer bir özellik $a(x)=0$ ise, o özellik
+aðýrlýk güncellemesi (weight update) sýrasýnda atlanýr. 
+
+Algoritma \verb!train_crf!
+\begin{itemize}
+   \item Her eðitim noktasý $x,y$ için
+   \begin{itemize}
+      \item $j$ için
+     \begin{itemize}
+       \item $E[F_j(x,y')]$ hesapla (buna sadece $E$ diyelim) 
+       \item Güncelle: $w_j := w_j + \lambda[F_j(x,y) - E]$
+    \end{itemize}
+   \end{itemize}
+\end{itemize}
+
+Bu hesabýn en pahalý kýsmý neresi? Beklenti hesabý. Bu beklentileri
+hesaplanmasý için daha önce verdiðimiz matris çarpýmý yöntemine benzer bir
+yöntem kullanmak gerekiyor (burada vermeyeceðiz, arama motorunda Rahul
+Gupta üzerinden arayabilirsiniz, bu kiþi bu konuyu anlatýyor).
+
+Kaynak
+
+[1] Elkan, {\em Log-linear Models and Conditional Random Fields}, 
+    \url{http://videolectures.net/cikm08_elkan_llmacrf}
+
+\end{document}
+
+
+

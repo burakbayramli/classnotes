@@ -1,0 +1,697 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Gaussian Karýþým Modeli (GMM) ile Kümelemek
+
+Gaussian (normal) daðýlýmý tek tepesi olan (unimodal) bir daðýlýmdýr. Bu
+demektir ki eðer birden fazla tepe noktasý olan bir veriyi modellemek
+istiyorsak, deðiþik yaklaþýmlar kullanmamýz gerekir. Birden fazla
+Gaussian'ý "karýþtýrmak (mixing)" bu tür bir yaklaþým. Karýþtýrmak, karýþým
+içindeki her Gaussian'dan gelen sonuçlarý toplamaktýr, yani kelimenin tam
+anlamýyla her veri noktasýný teker teker karýþýmdaki tüm daðýlýmlara geçip
+sonuçlarý ve bir aðýrlýk üzerinden toplamaktýr. Çok boyutlu Gaussian'lar
+için mesela,
+
+$$ f(x) = \sum_z \pi_k N(x | \mu_k,\Sigma_k) $$
+
+$\pi_k$ karýþtýrma oranlarýdýr (mixing proportions). Bernoulli
+karýþýmlarýný anlatan yazýya kýyasla, oradaki $\theta$'yi 0/1 hücreleri
+için olasýlýklar olarak aldýk, þimdi $\theta$ içinde $\mu_k,\Sigma_k$ var,
+yani $\theta=(\mu_k,\Sigma_k)$. 
+
+Ýki Gaussian olsa $\pi_1,\pi_2$ oranlarý 0.2, 0.8 olabilir ve her
+nokta her Gaussian'a verildikten sonra tekabül eden aðýrlýkla mesela
+sýrayla $0.2,0.8$ ile çarpýlýp toplanýr. 
+
+Maksimizasyon adýmý için gereken hesaplarýn türetilmesi [5, sf. 392]'de
+bulunabilir.
+
+Örnek olarak alttaki veriye bakalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = np.loadtxt('biometric_data_simple.txt',delimiter=',')
+
+women = data[data[:,0] == 1]
+men = data[data[:,0] == 2]
+
+plt.xlim(55,80)
+plt.ylim(80,280)
+plt.plot (women[:,1],women[:,2], 'b.')
+plt.hold(True)
+plt.plot (men[:,1],men[:,2], 'r.')
+plt.xlabel('boy (inch)')
+plt.ylabel('agirlik (pound)')
+plt.savefig('mixnorm_1.png')
+\end{minted}
+
+\includegraphics[height=6cm]{mixnorm_1.png}
+
+Bu grafik kadýnlar ve erkeklerin boy (height) ve kilolarýný (weight) içeren
+bir veri setinden geliyor, veri setinde erkekler ve kadýnlara ait olan
+ölçümler önceden iþaretlenmiþ / etiketlenmiþ (labeled), biz de bu
+iþaretleri kullanarak kadýnlarý kýrmýzý erkekleri mavi ile grafikledik. Ama
+bu iþaretler / etiketler verilmiþ olsun ya da olmasýn, kavramsal olarak
+düþünürsek eðer bu veriye bir daðýlým uydurmak (fit) istersek bir karýþým
+kullanýlmasý gerekli, çünkü iki tepe noktasiyle daha rahat temsil
+edileceðini düþündüðümüz bir durum var ortada.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# Multivariate gaussian, contours
+#
+import scipy.stats
+import em
+
+data = np.loadtxt('biometric_data_simple.txt',delimiter=',')
+
+women = data[data[:,0] == 1]
+men = data[data[:,0] == 2]
+
+plt.xlim(55,80)
+plt.ylim(80,280)
+plt.plot (women[:,1],women[:,2], 'b.')
+plt.hold(True)
+plt.plot (men[:,1],men[:,2], 'r.')
+plt.xlabel('boy (inch)')
+plt.ylabel('agirlik (pound)')
+plt.hold(True)
+
+x = np.arange(55., 80., 1)
+y = np.arange(80., 280., 1)
+X, Y = np.meshgrid(x, y)
+
+Z = np.zeros(X.shape)
+nx, ny = X.shape
+mu1 = np.array([  72.89350086,  193.21741426])
+sigma1 = np.matrix([[    7.84711283,    25.03111826],
+                    [   25.03111826,  1339.70289046]])
+for i in xrange(nx):
+    for j in xrange(ny):
+        Z[i,j] = em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu1,sigma1)
+        
+levels = np.linspace(Z.min(), Z.max(), 4)
+
+plt.contour(X, Y, Z, colors='b', levels=levels)
+plt.hold(True)
+
+Z = np.zeros(X.shape)
+nx, ny = X.shape
+mu2 = np.array([  66.15903841,  135.308125  ])
+sigma2 = np.matrix([[  14.28189396,   51.48931033],
+                    [  51.48931033,  403.09566456]])
+for i in xrange(nx):
+    for j in xrange(ny):
+        Z[i,j] = em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu2,sigma2)
+        
+levels = np.linspace(Z.min(), Z.max(), 4)
+
+plt.contour(X, Y, Z, colors='r', levels=levels)
+plt.savefig('mixnorm_2.png')
+\end{minted}
+
+\includegraphics[height=6cm]{mixnorm_2.png}
+
+Bu karýþým içindeki Gaussian'larý üstteki gibi çizebilirdik (gerçi üstteki
+aslýnda ileride yapacaðýmýz net bir hesaptan bir geliyor, ona birazdan
+geliyoruz, ama çýplak gözle de bu þekil uydurulabilirdi). Modeli kontrol
+edelim, elimizde bir karýþým var, nihai olasýlýk deðeri $p(x)$'i nasýl
+kullanýrýz? Belli bir noktanýn olasýlýðýný hesaplamak için bu noktayý her
+iki Gaussian'a teker teker geçeriz (örnekte iki tane), ve gelen olasýlýk
+sonuçlarýný karýþým oranlarý ile çarparak toplarýz.  Aðýrlýklar sayesinde
+karýþým entegre edilince hala 1 deðeri çýkýyor zaten bir daðýlýmýn uymasý
+gereken þartlardan biri bu. Ayrýca bir daðýlýmýn diðerinden daha önemli
+olduðu aðýrlýklar üzerinden modele verilmiþ oluyor. 
+
+Etiketler Bilinmiyorsa
+
+Eðer etiketler bize önceden verilmemiþ olsaydý, hangi veri noktalarýnýn
+kadýnlara, hangilerinin erkeklere ait olduðunu bilmeseydik o zaman ne
+yapardýk? Bu veriyi grafiklerken etiketleri renkleyemezdik tabii ki, þöyle
+bir resim çizebilirdik ancak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.stats
+data = np.loadtxt('biometric_data_simple.txt',delimiter=',')
+
+women = data[data[:,0] == 1]
+men = data[data[:,0] == 2]
+
+plt.xlim(55,80)
+plt.ylim(80,280)
+plt.plot (data[:,1],data[:,2], 'k.')
+plt.xlabel('boy (inch)')
+plt.ylabel('agirlik (pound)')
+plt.savefig('mixnorm_3.png')
+\end{minted}
+
+\includegraphics[height=6cm]{mixnorm_3.png}
+
+Fakat yine de þekil olarak iki kümeyi görebiliyoruz.  Acaba öyle bir yapay
+öðrenim algoritmasý olsa da, biz bir karýþým olduðunu tahmin edip, sonra o
+karýþýmý veriye uydururken, etiket deðerlerini de kendiliðinden tahmin
+etse?
+
+Alttaki kod Beklenti-Maksimizasyon üzerinden kümeleme yapar. Konunun teorik
+kýsmý altta ve [6] yazýsýnda bulunabilir.
+
+Türetmek 
+
+Karýþýmda birden fazla çok boyutlu Gaussian olacak, bu Gaussian'lardan
+$i$'inci Gaussian
+
+$$ 
+f_i(x) = f(x;\mu_i,\Sigma_i) = 
+\frac{1}{(2\pi)^{d/2} |\Sigma_i|^{1/2}} \exp 
+\bigg\{
+-\frac{(x-\mu)^T\Sigma_i^{-1}(x-\mu_i)}{2} 
+\bigg\} 
+\mlabel{1}
+$$
+
+olur, $x$ çok boyutlu veri noktasýdýr, ve kümeleme baþlamadan önce
+$\mu_i,\Sigma_i$ bilinmez, küme sayýsý $k$ bilinir. O zaman karýþým modeli
+
+$$ f(x) = \sum _{i=1}^{k} f_i(x)P(C_i) =
+\sum _{i=1}^{k} f(x;\mu_i,\Sigma_i)P(C_i)
+$$
+
+$P(C_i)$'a karýþým oranlarý deniyor, ki $\sum_i P(C_i) = 1$. Bazý
+metinlerde bu $\pi_i$ olarak ta gösterilebiliyor.  Tüm veri için maksimum
+olurluk
+
+$$ 
+L = \sum _{j=1}^{n} \ln f(x_j) = \sum _{j=1}^{n} \ln \bigg(
+\sum _{i=1}^{k} f(x_j;\mu_i,\Sigma_i)P(C_i)
+\bigg)
+$$
+
+Þimdi herhangi bir parametre $\theta_i$ için (yani $\mu_i$ ya da $\Sigma_i$), 
+
+$$ 
+\frac{\partial L}{\partial \theta_i} = 
+\frac{\partial }{\partial \theta_i} 
+\bigg(\sum _{j=1}^{n} \ln f(x_j) \bigg)
+$$
+
+$$ 
+= 
+\sum _{j=1}^{n} \big( \frac{1}{f(x_j)} \cdot
+\frac{\partial f(x_j)}{\partial \theta_i} \big)
+$$
+
+$$ 
+\sum _{j=1}^{n} \bigg(
+\frac{1}{f(x_j)} \sum _{a=1}^{k} \frac{\partial }{\partial \theta_i}
+\big( f(x_j;\sigma_a,\Sigma_a)P(C_a) \big)
+\bigg)
+$$
+
+$$ 
+\sum _{j=1}^{n} \bigg(
+\frac{1}{f(x_j)} \cdot \frac{\partial }{\partial \theta_i}
+\big( f(x_j;\sigma_i,\Sigma_i)P(C_i) \big)
+\bigg)
+$$
+
+En son adým mümkün çünkü $\theta_i$ parametresi $i$'inci kümeye
+(Gaussian'a) ait, ve diðer kümelerin bakýþ açýsýna göre (onlara göre kýsmi
+türev alýnýnca) bu parametre sabit sayýlýyor. 
+
+Þimdi $|\Sigma_i| = \frac{1}{|\Sigma^{-1}|}$ eþitliðinden hareketle
+(1)'deki çok boyutlu Gaussian'ý þöyle yazabiliriz, 
+
+$$ 
+f(x_j;\sigma_i,\Sigma_i) = (2\pi)^{-d/2} |\Sigma^{-1}|^{1/2} 
+\exp \big[ g(\mu_i,\Sigma_i) \big]
+$$ 
+ki
+
+$$ g(\mu_i,\Sigma_i) = -\frac{1}{2}(x_j-\mu_i)^T\Sigma_i^{-1}(x_j-\mu_i) $$
+
+Yani log-olurluk fonksiyonunun türevi þu þekilde yazýlabilir,
+
+$$ 
+\frac{\partial L}{\partial \theta_i} =
+\sum _{j=1}^{n} \bigg(
+\frac{1}{f(x_j)} \frac{\partial }{\partial \theta_i} \big(
+(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2} \exp\big[ 
+g(\mu_i,\Sigma_i) \big] P(C_i)
+\big) \bigg)
+\mlabel{3}
+$$
+
+$\mu_i$ için maksimum-olurluk kestirme hesabý yapmak için log olurluðun
+$\theta_i=\mu_i$'a göre türevini almamýz gerekiyor. Üstteki formülde
+gördüðümüz gibi $\mu_i$'a baðlý olan tek terim $\exp\big[ g(\mu_i,\Sigma_i)
+\big]$. Þimdi 
+
+$$ 
+\frac{\partial }{\partial \theta_i} \exp \big[ g(\mu_i,\Sigma_i) \big] =
+\exp \big[ g(\mu_i,\Sigma_i) \big] \cdot 
+\frac{\partial }{\partial \theta_i} g(\mu_i,\Sigma_i)
+\mlabel{2}
+$$
+
+ve
+$$ \frac{\partial }{\partial \mu_i}g(\mu_i,\Sigma_i) = 
+\Sigma_i^{-1}(x_j-\mu_i)
+$$
+
+formüllerini kullanarak log olurluðun $\mu_i$'ya göre türevi
+
+$$ \frac{\partial L}{\partial \mu_i} = 
+\sum _{j=1}^{n} \bigg(
+\frac{1}{f(x_j)} 
+(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2} \exp\big[ 
+g(\mu_i,\Sigma_i) \big] P(C_i) \Sigma^{-1} 
+(x_j-\mu_i)
+\bigg)
+$$
+
+$$ 
+= \sum _{j=1}^{n} \bigg(
+\frac{f(x_j;\mu_i,\Sigma_i)P(C_i)}{f(x_j)} \cdot 
+\Sigma_i^{-1} (x_j-\mu_i)
+\bigg)
+$$
+
+$$ =
+\sum _{j=1}^{n} w_{ij} \Sigma_i^{-1}(x_j-\mu_i)
+$$
+
+Üstteki forma eriþmek için (2) ve alttaki formülü kullandýk.
+
+$$ P(C_i|x_j) = \frac{P(x_j|C_i)P(C_i)}{\sum _{a=1}^{k}P(x_j|C_a)P(C_a)}$$
+
+ki bunun anlamý
+
+$$ w_{ij} = P(C_i|x_j) = \frac{f(x_j;\mu_i,\Sigma_i)P(C_i)}{f(x_j)}$$
+
+Üstteki kýsmi türevi sýfýra eþitleyip çözer ve her iki tarafý $\Sigma_i$
+ile çarparsak, 
+
+$$ \sum _{j=1}^{n} w_{ij} (x_j-\mu_i) = 0 $$
+
+elde ederiz, bu demektir ki 
+
+$$ \sum _{j=1}^{n} w_{ij}x_j = \mu_i\sum _{j=1} w_{ij}  $$
+
+o zaman 
+
+$$ \mu_i = \frac{\sum _{j=1}^{n} w_{ij}x_j}{\sum _{j=1}^{n} w_{ij}}$$
+
+Kovaryans Matrisi $\Sigma_i$'i Hesaplamak
+
+$\Sigma_i$ hesabý için (3) kýsmi türevinin $|\Sigma_i^{-1}|^{1/2}
+\exp(g(\mu_i,\Sigma_i))$ üzerindeki çarpým 
+kuralý (product rule) kullanýlarak $\Sigma_i^{-1}$'ye göre alýnmasý gerekiyor.
+
+Her kare matris $A$ için $\frac{\partial |A|}{\partial A} = |A| \cdot
+(A^{-1})^T$ olduðundan hareketle, $|\Sigma_i^{-1}|^{1/2}$'nin
+$\Sigma_i^{-1}$'ya göre türevi  
+
+$$ 
+\frac{\partial |\Sigma_i^{-1}|^{1/2}}{\partial \Sigma_i^{-1}} = 
+\frac{1}{2} \cdot |\Sigma_i^{-1}|^{-1/2} \cdot |\Sigma_i^{-1}| \cdot \Sigma_i  = 
+\frac{1}{2} |\Sigma_i^{-1}|^{1/2} \cdot \Sigma_i
+$$
+
+Þimdi $A \in \mathbb{R}^{d \times d}$ ve vektörler $a,b \in \mathbb{R}^d$
+için $\frac{\partial }{\partial A}a^TAb = ab^T$ olmasýndan hareketle
+(3)'teki $\exp [g(\mu_i,\Sigma_i)]$'in $\Sigma_i^{-1}$ gore türevi,
+
+$$ 
+\frac{\partial }{\partial \Sigma^{-1}} \exp\big[ g(\mu_i,\Sigma_i)\big] = 
+-\frac{1}{2} \exp \big[  g(\mu_i,\Sigma_i) (x_j-\mu_i)(x_j-\mu_i)^T \big]
+$$
+
+Üstteki ve iki üstteki formül üzerinde türev çarpým kuralýný kullanýrsak, 
+
+$$ 
+\frac{\partial }{\partial \Sigma_i^{-1}} |\Sigma_i^{-1}|^{1/2} 
+\exp\big[ g(\mu_i,\Sigma_i) \big] =
+$$
+
+$$ 
+= \frac{1}{2} |\Sigma_i^{-1}|^{1/2}  \Sigma_i \exp\big[ g(\mu_i,\Sigma_i) \big]-
+\frac{1}{2} |\Sigma_i^{-1}|^{1/2} \exp\big[ g(\mu_i,\Sigma_i) \big]
+(x_j-\mu_i)(x_j-\mu_i)^T
+$$
+
+$$ 
+= \frac{1}{2} \cdot  |\Sigma_i^{-1}|^{1/2} \cdot 
+\exp\big[ g(\mu_i,\Sigma_i) \big] \big( 
+\Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T
+\big)
+$$
+
+Üstteki son formülü (3)'e sokarsak, $\Sigma_i^{-1}$'e göre log olurluðun
+türevi
+
+$$ 
+\frac{\partial L}{\partial \Sigma_i^{-1}} =
+\frac{1}{2} \sum _{j=1}^{n} \frac
+{(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2}\exp\big[ g(\mu_i,\Sigma_i) P(C_i) }{f(x_j)}
+\big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big)
+$$
+
+
+$$ =
+\frac{1}{2} \sum _{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i) P(C_i)}{f(x_j)} \cdot
+\big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big)
+$$
+
+$$ 
+= \frac{1}{2} \sum _{j=1}^{n} w_{ij} 
+\big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big)
+$$
+
+Türevi sýfýra eþitlersek,
+
+$$ \sum _{j=1}^{n} w_{ij} \big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big) = 0 $$
+
+olur, ve devam edersek alttaki sonucu elde ederiz,
+
+$$ 
+\Sigma_i = \frac{\sum _{j=1}^{n} w_{ij} (x_j-\mu_i)(x_j-\mu_i)^T}
+{\sum _{j=1}^{n} w_{ij}}
+$$
+
+Karýþým Aðýrlýklarý $P(C_i)$'i Hesaplamak
+
+Bu hesabý yapmak için (3) türevinin $P(C_i)$'a göre alýnmasý lazým fakat 
+$\sum _{a=1}^{k}P(C_a)=1$ þartýný zorlamak için Lagrange çarpanlarý
+tekniðini kullanmamýz gerekiyor. Yani türevin alttaki gibi alýnmasý lazým,
+
+$$ 
+\frac{\partial }{\partial P(C_i)} \bigg(
+\ln L + \alpha \big( \sum _{a=1}^{k} P(C_a)-1 \big)
+\bigg)
+$$
+
+Log olurluðun $P(C_i)$'a göre kýsmi türevi alýnýnca,
+
+$$ 
+\frac{\partial L}{\partial P(C_i)} = 
+\sum _{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i)}{f(x_j)}
+$$
+
+O zaman iki üstteki türevin tamamý þu hale gelir,
+
+$$ 
+\bigg( \sum _{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i)}{f(x_j)} \bigg) + \alpha
+$$
+
+Türevi sýfýra eþitlersek ve her iki tarafý $P(C_i)$ ile çarparsak, 
+
+$$ 
+\sum _{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i) P(C_i)}{f(x_j)} = -\alpha P(C_i)
+$$
+
+$$ 
+\sum _{j=1}^{n} w_{ij} = -\alpha P(C_i)
+\mlabel{4}
+$$
+
+Üstteki toplamý tüm kümeler üzerinden alýrsak
+
+$$ 
+\sum _{i=1}^{k} \sum _{j=1}^{n} w_{ij} = -\alpha \sum _{i=1}^{k} P(C_i)
+$$
+
+ya da $n = -\alpha$. 
+
+
+Son adým $\sum_{i=1}^{k}w_{ij}=1$ sayesinde mümkün oldu. $n = -\alpha$'yi
+(4) içine sokunca $P(C_i)$'in maksimum olurluk hesabýný elde ediyoruz, 
+
+$$ P(C_i) = \frac{\sum _{j=1}^{n}w_{ij}}{n}$$
+
+
+\inputminted[fontsize=\footnotesize]{python}{em.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = np.loadtxt('biometric_data_simple.txt',delimiter=',')
+data = data[:,1:3]
+import em
+mc = [0.4, 0.4, 0.2] 
+centroids = [ np.array([0,0]), np.array([3,3]), np.array([0,4]) ]
+ccov = [ np.array([[1,0.4],[0.4,1]]), np.diag((1,2)), np.diag((0.4,0.1)) ]
+cen_lst, cov_lst, p_k, logL = em.em_gm(data, K = 2, max_iter = 400)
+for cen in cen_lst: print cen
+for cov in cov_lst: print cov
+\end{minted}
+
+\begin{verbatim}
+[  66.22733783  135.69250285]
+[  72.92994695  194.55997484]
+[[  14.62653617   53.38371315]
+ [  53.38371315  414.95573112]]
+[[    7.77047547    24.7439079 ]
+ [   24.7439079   1369.68034031]]
+\end{verbatim}
+Kod \verb!biometric_data_simple.txt! verisi üzerinde iþletildiðinde rapor
+edilen $\mu,\Sigma$ deðerlerini grafikleyince baþta paylaþtýðýmýz grafik
+görüntüleri çýkacaktýr, yani kümeleme baþarýyla iþletilmiþtir.
+
+En Ýyi K Nasýl Bulunur
+
+Bu sayýyý keþfetmek artýk kolay; K-Means ile atýlan bir sürü taklaya, ki
+çoðu gayrý matematiksel, sezgisel, uydurulmuþ (heuristic) yöntemlerdi,
+artýk gerek yok. Mesela 10 ila 30 arasýndaki tüm küme sayýlarýný deneriz,
+ve en iyi AIC vereni seçeriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+ff = '../../app_math/kmeans/synthetic.txt'
+df = pd.read_csv(ff,comment='#',names=['a','b'],sep="   ")
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.mixture import GMM
+for i in range(10,30):
+   g = GMM(n_components=i).fit(df)
+   print i, 'clusters', g.aic(df)
+\end{minted}
+
+\begin{verbatim}
+10 clusters 124325.897319
+11 clusters 124132.382945
+12 clusters 123931.508911
+13 clusters 123865.913489
+14 clusters 123563.524338
+15 clusters 123867.79925
+16 clusters 123176.509776
+17 clusters 123239.708813
+18 clusters 123019.873822
+19 clusters 122728.247239
+20 clusters 122256.554363
+21 clusters 122259.954752
+22 clusters 122271.805211
+23 clusters 122265.886637
+24 clusters 122265.344662
+25 clusters 122277.924153
+26 clusters 122184.54412
+27 clusters 122356.971927
+28 clusters 122195.916167
+29 clusters 122203.347265
+\end{verbatim}
+
+Görüldüðü gibi AIC azalýyor, azalýyor, ve K=20'de azýcýk artýyor, sonra
+25'e kadar artmaya devam ediyor, sonra tekrar düþmeye baþlýyor ama bizi
+ilgilendiren uzun süreli düþüþten sonraki bu ilk çýkýþ. O nokta optimal K
+deðerini verecektir, ki bu sayý 20.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.mixture import GMM
+g = GMM(n_components=20).fit(df)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.scatter(df.a,df.b)
+plt.hold(True)
+plt.plot(g.means_[:,0], g.means_[:,1],'ro')
+plt.savefig('stat_gmm_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_gmm_03.png}
+
+Gaussian Karýþýmlarý ile Deri Rengi Saptamak
+
+Bir projemizde dijital resimlerdeki deri rengi içeren kýsýmlarý çýkartmamýz
+gerekiyordu; çünkü fotoðrafýn diðer renkleri ile ilgileniyorduk (resimdeki
+kiþinin üzerindeki kýyafetin renkleri) ve bu sebeple deri renklerini ve o
+bölgeleri resimde saptamak gerekti. Bizim de önceden aklýmýzda kalan bir tembih
+vardý, Columbia Üniversitesi'nde yapay öðrenim dersi veren Tony Jebara derste
+paylaþmýþtý bir kere (bu tür gayrý resmi, lakýrdý seviyesinde tiyolar bazen çok
+faydalý olur), deri rengi bulmak için bir projesinde tüm deri renklerini R,G,B
+olarak grafiðe basmýþlar, ve beyaz olsun, zenci olsun, ve sonuç grafikte deri
+renklerinin çok ince bir bölgede yanyana durduðunu görmüþler. Ýlginç deðil mi?
+
+Buradan þu sonuç çýkýyor ki diðer renklerin arasýnda deri renklerine
+odaklanan, onlarý ``tanýyan'' bir yapay öðrenim algoritmasýnýn oldukça
+þansý vardýr. Ama ondan önce veriye bakýp grafiksel olarak ne olduðunu
+görelim. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, zipfile
+with zipfile.ZipFile('skin.zip', 'r') as z:
+    d =  pd.read_csv(z.open('skin.csv'),sep=',')
+print d[:3]
+\end{minted}
+
+\begin{verbatim}
+   Unnamed: 0   rgbhex   skin         r         g         b         h  \
+0           0  #200e08  False  0.125490  0.054902  0.031373  0.041667   
+1           1  #6d6565  False  0.427451  0.396078  0.396078  0.000000   
+2           2  #1f2c4d  False  0.121569  0.172549  0.301961  0.619565   
+
+          s         v  
+0  0.750000  0.125490  
+1  0.073394  0.427451  
+2  0.597403  0.301961  
+\end{verbatim}
+
+Burada önemli olan R,G,B ve H,S,V kolonlarý. Bu iki grup deðiþik renk
+kodlama yöntemini temsil ediyorlar. Grafikleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+nd = d[d['skin'] == False]
+sd = d[d['skin'] == True]
+plt.plot(nd['r'],nd['g'],'.')
+plt.hold(True)
+plt.plot(sd['r'],sd['g'],'rx')
+plt.savefig('stat_gmm_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_gmm_01.png}
+
+Ya da H,S üzerinden
+
+\begin{minted}[fontsize=\footnotesize]{python}
+nd = d[d['skin'] == False]
+sd = d[d['skin'] == True]
+plt.plot(nd['h'],nd['s'],'.')
+plt.hold(True)
+plt.plot(sd['h'],sd['s'],'rx')
+plt.savefig('stat_gmm_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_gmm_02.png}
+
+Demek ki Jebara haklýymýþ. Veriye bakýnca bir kabaca / sezgisel (intuitive)
+bazý çýkarýmlar yapmak mümkün. Mesela her iki grafikte de deri renklerini
+belirten bölgenin grafiði sanki 3 boyutlu bir Gaussian'ýn üstten görünen /
+kontur (contour) hali. Bunu bilmek bir avantaj, bu avantajý kullanmak
+lazým. Modelimiz gerçek dünya verisine ne kadar yakýnsa, yapay öðrenim
+þansý o kadar fazlalaþacaktýr. Eðer o bölgeye bir Gaussian uydurursak (fit)
+tanýma þansýmýz artacaktýr.
+
+O zaman deri rengi tanýma þu þekilde yapýlabilir. Scikit Learn
+kütüphanesinin Gaussian Karýþýmlarý (GMM) paketini kullanabiliriz. Tek
+problem bu karýþýmlar olasýlýk fonksiyonunu öðreniyorlar, sýnýflama
+(classification) yapmýyorlar. Önemli deðil, þöyle bir ek kod ile bunu
+halledebiliriz; iki tane GMM yaratýrýz, bir tanesi deri renk bölgeleri
+için, diðeri diðer bölgeler için. Eðitim sýrasýnda her iki GMM'i kendi
+bölgeleri üzerinde eðitiriz. Sonra, test zamanýnda, her yeni (bilinmeyen)
+veri noktasýný her iki GMM'e veririz, hangisinden daha yüksek olasýlýk
+deðeri geliyorsa, etiket deðeri olarak o GMM'in deðerini alýrýz.
+
+GMM'leri, ve onlarýn içindeki Gaussian'larýn kovaryanslarýný kullanmak
+faydalý, kovaryans bildiðimiz gibi bir Gaussian'ýn hangi yönde daha fazla
+aðýrlýðýnýn olacaðýný belirler, eðer kovaryans hesabý yapýlmazsa, yani
+kovaryans matrisinin sadece çaprazýnda deðerler varsa, mesela üç boyutta
+Gaussian'ýn konturu bir çember olarak gözükür [1, sf 90]. Tabii her yönde
+ayný aðýrlýkta olan bir Gaussian her türlü veriyi temsil edemez, en esneði
+(ki grafiðe bakýnca bu gerekliliði görüyoruz) tam kovaryans
+kullanmaktýr. Scikit Learn ile bu seçim GMM için \verb!full! ile yapýlýr,
+sadece çaprazý kullan anlamýna gelen \verb!diag! da olabilirdi.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import zipfile
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_auc_score
+from sklearn.mixture import GMM
+import pandas as pd
+
+class GMMClassifier():
+   def __init__(self,k,var):
+       self.clfs = [GMM(n_components=k,
+                    covariance_type=var,thresh=0.1, 
+                    min_covar=0.0001,n_iter=100) for i in range(2)]
+
+   def fit(self,X,y):
+       self.clfs[0].fit(X[y==0])
+       self.clfs[1].fit(X[y==1])
+
+   def predict(self,X):
+       res0 = self.clfs[0].score(X)
+       res1 = self.clfs[1].score(X)
+       res = (res1 > res0)
+       return res.astype(float)
+
+if __name__ == "__main__": 
+ 
+   with zipfile.ZipFile('skin.zip', 'r') as z:
+      df =  pd.read_csv(z.open('skin.csv'),sep=',')
+   y = (df['skin'] == True).astype(float)
+   X = df[['h','s','v','r','g']]
+   
+   res = []   
+   for i in range(5):
+      clf = GMMClassifier(k=10,var='full')
+      x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=2000)
+      clf.fit(x_train,y_train)
+      preds = clf.predict(x_test)
+
+      fpr, tpr, thresholds = roc_curve(y_test, preds)
+      roc_auc = auc(fpr, tpr)
+      res.append(roc_auc)
+
+   print 'deneyler'
+   print res
+   print 'nihai ortalama', np.array(res).mean()
+\end{minted}
+
+\begin{verbatim}
+deneyler 
+[0.99075081610446136, 0.98417442945172173, 0.98641291695170819,
+ 0.98779826464208242, 0.99239130434782608] 
+nihai ortalama 0.9883055463
+\end{verbatim}
+
+Baþarý oraný yüzde 98.8! Bu problem üzerinde pek çok diðer yöntem denedik,
+mesela KNN sýnýflayýcý, Lojistik Regresyon, vs. gibi, bu yöntem tüm
+diðerlerini geçti. 
+
+Ýlginç bir yan bir soru, ``hangi kolonlarýn kullanýlacaðý''. Bu baðlamda
+projede arkadaþlardan ``ama HSV deðerleri RGB deðerlerinden
+türetilebiliyor, ya birini ya ötekini kullanmak yeterli olmaz mý?'' yorumu
+yapanlar oldu. Evet, bu verinin diðerinden ``türetilmiþ'' olduðu doðru, ve
+beklenir ki ideal bir dünyada mükemmel bir yapay öðrenim algoritmasýnýn bu
+tür bir yardýma ihtiyacý olmaz, algoritma o kadar iyidir ki ona sanki ayný
+veriyi tekrar vermiþ gibi oluruz, en iyi ihtimalle ek külfet
+yaratýrýz. Fakat pratikte bu ek veri algoritmaya ek bazý sinyaller
+verebilir. Mesela eðer müþterilerin kilosu üzerinden bir öðrenim yapýyor
+olsaydýk, 80 kilodan daha az ya da daha fazla olmayý (problem alanýna göre)
+ayrý bir kolon olarak kodlamak avantaj getirebilirdi. Tabii ki kilo verisi
+sayýsal deðer olarak azýyla fazlasýyla oradadýr, fakat önem verdiðimiz
+noktalarý türetilmiþ veri olarak öðrenim algoritmasýna vermenin zararý
+yoktur. Üstteki örnekte GB deðerlerinin HSV ile beraber kullanýlmasýnýn
+baþarý þansýný biraz daha arttýrdýðýný görebiliriz.
+
+Kaynaklar
+
+[1] Alpaydin, E., {\em Introduction to Machine Learning}
+
+[2] Jebara, T., {\em Columbia Machine Learning Course}
+
+[3] Aaron A. D'Souza, {\em Using EM To Estimate A Probability Density With A
+Mixture Of Gaussians}, \url{http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf}
+
+[4] {\em Expectation-Maximization (Python Recipe)}, \url{http://code.activestate.com/recipes/577735-expectation-maximization}
+
+[5] Zaki, {\em Data Mining and Analysis: Fundamental Concepts and Algorithms}
+
+[6] Bayramli, Istatistik, {\em Çok Deðiþkenli Bernoulli Karýþýmý}
+
+\end{document}

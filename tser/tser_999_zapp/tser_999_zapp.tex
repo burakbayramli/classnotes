@@ -1,0 +1,685 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ekler
+
+Log Veri Analizi 
+
+Zaman serisi veri analizlerini anlatan kaynaklarda bazen ``þimdi veriyi
+iliþkisel olarak analiz etmek için onun log'unu alalým'' gibi ifadeler
+görebiliyoruz. Bu sözle ne demek isteniyor? 
+
+Diyelim ki $y_1,y_2,..,y_n$ zaman serimiz var, log matematiðinden biliyoruz ki
+
+$log(y_{t}/y_{t-1}) = \log(y_t) - \log(y_{t-1})$  
+
+Yani bu serinin önce log'unu alýp sonra farkýný hesaplarsak, sanki artýþ
+yüzdesinin log'unu analiz etmiþ gibi oluruz, yani yüzde deðiþim rakamýna
+odaklanmýþ oluruz, o artýþýn baz aldýðý önceki seviye ne olursa olsun. 
+
+Ama baþta sadece log'u analiz edelim diyor, farký hesaplamadýk diyelim?
+Yine de dolaylý olarak o farka odaklanýyor olabiliriz, mesela kullandýðýmýz
+metot matematiksel olarak arda arda gelen noktalarýn farkýný bir þekilde
+ortaya çýkartmaya uðraþýyor ise (pek çok metot bu kategoriye girer), o
+zaman yine veriye ``iliþkisel olarak'' bakmýþ oluruz.
+
+Sayýsal örnek: hisse senedi A 1 TL'den 1.10 TL'ye çýktý, senet B 100 TL'den
+110 TL'ye çýktý. Hem A, hem B yüzde 10 arttý. Fakat A TL olarak 10 kuruþ
+kazandý, B 10 TL kazandý. Eðer log uzayýna çevirirsek, 
+
+A $\log_{10}(1)$'den $\log_{10}(1.10)$'a çýktý yani 0'dan 0.0413'e çýktý. 
+B $\log_{10}(100)$'den $\log_{10}(110)$'a çýktý yani 2'de 2.0413'e çýktý. 
+
+Görüldüðü gibi yüzde deðiþiklik salt deðer deðiþimine dönmüþ oldu.
+
+\newpage
+
+Bazý Zaman Serileri Hesaplama Numaralarý
+
+Faiz Getiri Hesabý
+
+Eldeki sermaye 100 lira, ve her ay yüzde 5 kazandýran bir yatýrým var, 10
+ay sonra elde ne var? Not: her ay sonunda eldeki tüm sermayeyi tekrar geri
+yatýrýlýyor, yani birleþik faiz (compound interest) hesabý lazým, bu
+hesaplarda ilk aydaki 100 lira 105 olur, 105 geri koyulur, ikinci ay 
+$105 \cdot 0.05 = 5.25$ kazanýlýr, 110.25 geri koyulur, vs.
+
+Numpy / Pandas ile bu hesaplarý basitleþtirmenin yolu \verb!cumprod!
+kullanmak, bu çaðrý ile her hücre kendinden önce gelen tüm hücrelerin
+çarpýmýdýr, yani bu çarpým bir kümülatif çarpýmdýr (cumulative product),
+mesela her hücrede 2 deðeri olsa
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.DataFrame(np.ones((10,1))*2,columns=['x'])
+df['kumulatif carpim'] = df.x.cumprod()
+print df
+\end{minted}
+
+\begin{verbatim}
+   x  kumulatif carpim
+0  2                 2
+1  2                 4
+2  2                 8
+3  2                16
+4  2                32
+5  2                64
+6  2               128
+7  2               256
+8  2               512
+9  2              1024
+\end{verbatim}
+
+Bu numarayý birleþik faiz hesabý için kullanabiliriz; her zaman anýnda elde
+olan faiz sermaye $s$, faiz $f$ için $s \cdot (1+f) \cdot (1+f) ... $
+olarak hesaplanabilir, ki $(1+f)$ çarpýmýný istediðimiz zaman dilimi için
+uzatabiliriz. Baþtaki örnek için 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df2 = pd.DataFrame(np.ones((10,1))*0.05,columns=['f'])
+df2['s'] = 100. * (1+df2.f).cumprod()
+print df2
+\end{minted}
+
+\begin{verbatim}
+      f           s
+0  0.05  105.000000
+1  0.05  110.250000
+2  0.05  115.762500
+3  0.05  121.550625
+4  0.05  127.628156
+5  0.05  134.009564
+6  0.05  140.710042
+7  0.05  147.745544
+8  0.05  155.132822
+9  0.05  162.889463
+\end{verbatim}
+
+Yani 10 ay sonunda eldeki para 162 lira. 
+
+Bu numarayý pek çok deðiþik hesap için uyarlayabiliriz. 
+
+Soru
+
+Öyle bir oyun var ki eðer yazý/tura sonucunu tahmin ederseniz koyduðunuz
+para kadar getiri elde ediyorsunuz, yoksa o kadar kaybediyorsunuz. Bir
+oyuncunun tahmin baþarýsý yüzde 55. Bu kiþi her elde, o anki sermayesinin
+yüzde 5'ini koyuyor. Simülasyon ile 1000 el sonraki kümülatif getiriyi
+bulun.
+
+Cevap
+
+``Eldeki sermayenin yüzde 2'sini yatýrmak'' aslýnda bir tür birleþik faiz
+hesabý olarak görülebilir, tabii bu faiz tahminin tutup tutmamasýna göre ya
+pozitif etkilidir, ya negatif etkilidir. Bunun için \verb!numpy!  binom
+daðýlýma 1000 tane 0/1 zar attýrýrýz, sonra 0 deðerleri -1 yaparýz, yani
+-1/+1 zar olur, zar deðerlerini 0.05 ile çarparýz, sonuçlarý \verb!cumprod!
+ile birleþtiririz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = np.random.binomial(n=1,p=0.55,size=1000)
+df3 = pd.DataFrame(data,columns=['dice'])
+df3.loc[df3.dice==0,'dice'] = -1
+cumret = 100.*(1+0.05*df3.dice).cumprod()
+print cumret.tail(1)
+\end{minted}
+
+\begin{verbatim}
+999    3157.474029
+Name: dice, dtype: float64
+\end{verbatim}
+
+\newpage
+
+Zaman Serisinden Trend Çýkartmak (Detrending)
+
+Bazen bir zaman serisi verisinde genel gidiþata deðil diðer deðiþikliklere
+odaklanmak istiyoruz. O zaman genel gidiþat, yani trendi veriden
+çýkartabiliriz. Örnek olarak Apple þirketinin borsa fiyatlarýný kullanalým.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('stock_px.csv').reset_index()
+df = df.head(1000)
+df['AAPL'].plot()
+plt.savefig('tser_z001_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_z001_02.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print df[['AAPL','index']].head(10)
+\end{minted}
+
+\begin{verbatim}
+   AAPL  index
+0  7.40      0
+1  7.45      1
+2  7.45      2
+3  7.43      3
+4  7.28      4
+5  7.34      5
+6  7.36      6
+7  7.32      7
+8  7.30      8
+9  7.22      9
+\end{verbatim}
+
+Trendi çýkartmak için önce veri üzerinde lineer regresyon yaparýz. LR taným
+itibariyle veriye bir düz çizgi uydurduðu (fit) için, bu düz çizgiyi alýp
+veriden çýkartarak trend çýkartma iþlemi olarak kullanabiliriz. Ama LR
+katsayýlarýna dalmadan önce þunu düþünelim, LR'de yan ürün olarak
+hesaplanan artýklar (residuals) aslýnda lineer çizgi ile gerçek verinin
+farký deðil midir? O zaman bu artýklar zaten verinin trend çýkartýlmýþ
+halidir!
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('AAPL ~ index', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                   AAPL   R-squared:                       0.904
+Model:                            OLS   Adj. R-squared:                  0.904
+Method:                 Least Squares   F-statistic:                     9385.
+Date:                Tue, 10 Mar 2015   Prob (F-statistic):               0.00
+Time:                        22:16:39   Log-Likelihood:                -3485.1
+No. Observations:                1000   AIC:                             6974.
+Df Residuals:                     998   BIC:                             6984.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept     -6.1205      0.499    -12.255      0.000        -7.101    -5.140
+index          0.0839      0.001     96.876      0.000         0.082     0.086
+==============================================================================
+Omnibus:                       36.045   Durbin-Watson:                   0.017
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               38.365
+Skew:                           0.464   Prob(JB):                     4.67e-09
+Kurtosis:                       2.752   Cond. No.                     1.15e+03
+==============================================================================
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df['AAPL Trendsiz'] = results.resid
+df[['AAPL','AAPL Trendsiz']].plot()
+plt.savefig('tser_z001_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_z001_01.png}
+
+Üstteki grafiði artýklar ile direk \verb!resid! kullanarak yaptýk. 
+
+\newpage
+
+Getiri Eðrisi (Yield Curve)
+
+Bir tahvilin getirisinden bahsettik. Önemli bir grafik türü farklý olgunlaþma
+(maturity) tarihlerindeki ayný tip tahvillerin herhangi bir gündeki
+getirisi. Mesela herhangi bir gün için 3-ay, 6-ay, 1-sene, 5-sene, 10-sene,
+30-senede olgunlaþan hazine tahvillerinin getirisine bakýyoruz, bu noktalarý
+yanyana koyup bir grafik olarak resmediyoruz. Olgunlaþma zamaný arttýkça þekil
+neye benziyor? Alttaki üç farklý gün için getiri eðrisini gösteriyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd  
+ts = ['treas3M','treas6M','treas1Y','treas5Y','treas10Y','treas30Y']
+dfs  = [pd.read_csv('%s.csv' % t, index_col=0,parse_dates=True) for t in ts]
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# verileri getmat.py ile indirdik
+#
+dt = '2000-08-21'
+res = pd.DataFrame([df.ix[dt,'VALUE'] for df in dfs],columns=[dt])
+res.plot(); plt.savefig('tser_z001_05.png')
+dt = '1988-11-16'
+res = pd.DataFrame([df.ix[dt,'VALUE'] for df in dfs],columns=[dt])
+res.plot(); plt.savefig('tser_z001_06.png')
+dt = '1981-09-01'
+res = pd.DataFrame([df.ix[dt,'VALUE'] for df in dfs],columns=[dt])
+res.plot(); plt.savefig('tser_z001_07.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_z001_05.png}
+\includegraphics[height=6cm]{tser_z001_06.png}
+\includegraphics[height=6cm]{tser_z001_07.png}
+
+Bir grafik Kasým 16, 1988 yýlýn için, normal olan bu grafik, uzun vadeli faiz
+(hazine tahvillerinin getirisine uzun vadeli faiz deniyor) kýsa vadeden daha
+yüksek, fakat bu yükseklik yüzde 1 civarýnda, bu eðriye ``düz'' denebilir.
+
+Diðer grafik Eylül 1981 için, uzun vade kýsa vadeden daha düþük, yani tahvil
+piyasalarý ileride faizlerin daha düþük olacaðýný tahmin ediyor.  Bu tür
+eðrilere ``tersine dönmüþ (inverted)'' deniyor, normalde olanýn tersi
+çünkü. Terse dönmüþ eðrilerin gelmekte olan ekonomik durgunluðu tahmin ettiði
+söylenir [4, sf. 85]. 
+
+\newpage
+
+Taylor Kuralý (Taylor Rule)
+
+Merkez Bankalarýna yardýmcý olan araçlardan biri Taylor Kuralý; bu kural,
+yani formül, olmasý gereken Merkez Bankasý faiz oraný, mevcut enflasyon
+$\pi$, hedef enflasyon $\pi^*$, ideal faiz oraný $r^*$ ve reel ve
+potansiyel gayrýsafi milli hasýla (GSYH) farký arasýnda bir iliþki kurar.
+
+$$
+FF_t = r^* + \pi_t + 0.5 (\pi_t-\pi^*) + 0.5 Gap_t
+$$
+
+Alttaki script ile ABD için kuralý hesaplayabiliriz, FEDFUNDS ABD Merkez Bankasý
+FED'in ne yaptýðý, Taylor ise formülün taviyesi,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# veri indiren script gettaylor.py 
+import pandas as pd
+df = pd.read_csv('taylorfred.csv', parse_dates=True,\
+                  index_col=0,comment='#')
+df = df.resample('AS');longrun = 2.0
+df['GDPC1'] = df.GDPC1.interpolate(method='spline',order=1)
+df['Gap'] =  100. * (df.GDPC1/df.GDPPOT-1)
+df['Curr'] = df.PCEPI.pct_change()*100.
+df['Taylor'] = longrun + df.Curr + 0.5*(df.Curr - longrun) + 0.5*df.Gap
+df[['FEDFUNDS','Taylor']].plot()
+plt.savefig('tser_z001_09.png')
+\end{minted}
+
+\includegraphics[height=8cm]{tser_z001_09.png}
+
+Ýki grafik çoðunlukla birbirine yakýn gidiyor, ayrýldýklarý noktalar da var
+tabii; ve fomülü keþfeden John Taylor'a göre bunlar FED'in hata yaptýðý
+yerler. Mesela 2000'lý yýllarýn baþlarýnda faizler formülün dediðinden daha
+düþük, ve 2008 krizine giden yol taþlarýndan birinin aþýrý düþük faizler olduðu
+biliniyor. Daha fazla detay için [4, sf. 278]. 
+
+\newpage
+
+Alýþ Fiyatý-Satýþ Fiyatý Aralýk Tahmini (Bid/Ask Spread Estimation)
+
+AFSF aralýðýnýn tanýmý terimler kýsminda bulunabilir. Akla soru gelebilir, aynen
+günün en düþük, en yüksek fiyatlarý gibi AFSF fiyatlarý piyasalar tarafýndan
+kaydedilmiyor mu?  Bazen hayýr. Özellikle açýk kaynaklardan veri alýnýnca her
+tür veriyi alabileceðimizi beklememiz lazým, ki AFSF fiyatlarý bundan
+biri. Aracý kurumumuz bize anlýk bu bilgileri yakýn tarihler için saðlasa bile,
+geriye dönük veri için bu veri mevcut olmayabilir. Bu durumda eldeki bilgilerden
+tahminsel hesap yapýlabilir.
+
+[5]'teki yaklaþýma göre ardý ardýna iki günün en düþük / en yüksek fiyatlarýna
+bakarak AFSF için bir tahmin edici yaratmak mümkündür. Yaklaþýmlarýnýn
+arkasýndaki ana fikirler þunlar; Birincisi, en yüksek fiyatlar alýmlar, en düþük
+satýmlar tarafýndan tetiklendiðine göre AFSF aralýðý bu fiyatlarla muhakkak
+baðlantýlý olmalýdýr. Ýkinci fikir, yüksek / düþük fiyatlarýnýn oranýnýn
+oynaklýða baðlý olan kýsmý, onu üzerinden hesapladýðýmýz zaman dilimi büyüdükçe
+ona oranla büyür, fakat onun AFSF'ye baðlý olan kýsmi deðiþmeden kalýr. Bu
+fikirleri kullanarak sadece arka arkaya iki güne bakarak yazarlar bir tahmin
+edici ortaya çýkartýyorlar [6]. Formüller þöyle,
+
+$$
+\beta =
+\bigg(
+ \ln \frac{H_t}{L_t} \bigg)^2 +  \bigg( \ln \frac{H_{t+1}}{L_{t+1}}
+\bigg)^2, \quad
+\gamma = \bigg( \ln \frac{H_{t,t+1}}{L_{t,t+1}} \bigg)^2
+$$
+
+ki $H_t,L_t$ $t$ gününün sýrasýyla en yüksek ve en düþük fiyatlarý,
+$H_{t+1,t},L_{t,t+1}$ ise ardý ardýna iki günün en yüksek ve en düþük
+fiyatlarý. Ardýndan,
+
+$$ \alpha = \frac{\sqrt{2 \beta} - \sqrt{\beta}}{3 - 2 \sqrt{2}} -
+\sqrt{\frac{\gamma}{3 - 2\sqrt{2}}}
+$$
+
+Ve nihai tahmin edici
+
+$$ S = \frac{2 (e^{\alpha} - 1 )}{1 + e^{\alpha}} $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.read_csv('20day.csv',sep='\s*')
+df['Lt1'] = df.Lt.shift(-1)
+df['Ht1'] = df.Ht.shift(-1)
+
+def f(x):
+    beta = np.log(x.Ht/x.Lt)**2 + np.log(x.Ht1/x.Lt1)**2
+    gamma = np.log( max(x.Ht,x.Ht1) / min(x.Lt,x.Lt1)  )**2
+    alpha1 = (np.sqrt(2*beta)-np.sqrt(beta)) / (3 - 2*np.sqrt(2))
+    alpha2 = np.sqrt(gamma / (3-2*np.sqrt(2)))
+    alpha = alpha1 - alpha2
+    S = 2*(np.exp(alpha)-1) / (1 + np.exp(alpha))
+    return S
+
+df['S'] = df.apply(f, axis=1)
+df = df.fillna(0)
+df.loc[df.S<0,'S'] = 0
+print df.head()
+\end{minted}
+
+\begin{verbatim}
+   Close     Lt     Ht    Lt1    Ht1         S
+0  25.25  25.25  25.32  25.19  25.32  0.001683
+1  25.32  25.19  25.32  25.28  25.41  0.000000
+2  25.30  25.28  25.41  25.28  25.38  0.003243
+3  25.33  25.28  25.38  25.27  25.37  0.002995
+4  25.33  25.27  25.37  25.36  25.45  0.000000
+\end{verbatim}
+
+Corvin, Schultz (CS) tahmin edicisi bazen negatif deðerler verebiliyor, bu
+durumda bir yaklaþým bu deðerleri sýfýr yapmak, ve bu aralýðý ``çok küçük''
+olarak kabul etmek. Eðer birkaç gün üzerinden ortalama alýnýrsa tabii ki bu
+sýfýr deðerleri nihai ortalamanýn aþaðý inmesini saðlayacaktýr. 
+
+
+\newpage
+
+Kurlarý Tahmin Etmek (Taslak)
+
+Ýki ülke arasýndaki kurlar o ülkelerin fiyat seviyelerinin oranýdýr. Deðil
+mi? Eðer berbere Japonya'da 1000 yen Türkiye'de 10 lira veriyorsam (ve
+baþka fiyat olmadýðýný düþünelim) o zaman Yen/TR kuru 100 yen
+olmalý. Tekrar ana formülden baþlayarak her iki ülke için bu formülleri
+düzenleyip bölüm haline getirirsek,
+
+$$ M_1V_1 = P_1Y_1, \quad M_2V_2 = P_2Y_2 $$
+
+$$ \frac{P_2}{P_1} = \frac{M_2}{M_1} \cdot \frac{Y_1}{Y_2} \cdot \frac{V_2}{V_1} $$
+
+$$ \log \left( \frac{P_2}{P_1} \right) = 
+\log \left( \frac{M_2}{M_1} \right) + 
+\log \left( \frac{Y_1}{Y_2} \right) +
+\log \left( \frac{V_2}{V_1} \right) 
+$$
+
+$$    = \log(M_2) - \log(M_1) + \log(Y_1) - \log(Y_2)  + \log(V_2) - \log(V_1) $$
+
+$$ = \log(M_2) - \log(M_1) + \log(Y_1) - \log(Y_2)  $$
+
+$V$'ler iptal oldu çünkü hýzý sabit kabul ediyoruz, 
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.read_csv('exch.csv',parse_dates=['DATE'])
+df = df.set_index('DATE')
+df = df.interpolate(method='linear')
+k = 5
+df['lm1'] = np.log(df.nonfinloanus).shift(k)
+df['lm2'] = np.log(df.nonfinloanjp).shift(k)
+df['ly1'] = np.log(df.realgdpus).shift(k)
+df['ly2'] = np.log(df.realgdpjp).shift(k)
+df['lxjpus'] = np.log(df.xjpus)
+
+df = df.dropna(axis=0)
+import statsmodels.formula.api as smf
+results = smf.ols('lxjpus ~ lm1 + lm2 + ly1 + ly2', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                 lxjpus   R-squared:                       0.432
+Model:                            OLS   Adj. R-squared:                  0.424
+Method:                 Least Squares   F-statistic:                     53.88
+Date:                Wed, 30 May 2018   Prob (F-statistic):           1.00e-33
+Time:                        20:09:26   Log-Likelihood:                 249.15
+No. Observations:                 288   AIC:                            -488.3
+Df Residuals:                     283   BIC:                            -470.0
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept    -35.7050      4.321     -8.263      0.000       -44.211   -27.199
+lm1           -0.5512      0.118     -4.663      0.000        -0.784    -0.318
+lm2            1.2863      0.190      6.768      0.000         0.912     1.660
+ly1            1.7492      0.305      5.732      0.000         1.148     2.350
+ly2            0.8758      0.408      2.146      0.033         0.073     1.679
+==============================================================================
+Omnibus:                       13.370   Durbin-Watson:                   0.067
+Prob(Omnibus):                  0.001   Jarque-Bera (JB):                9.922
+Skew:                          -0.346   Prob(JB):                      0.00701
+Kurtosis:                       2.409   Cond. No.                     1.67e+04
+==============================================================================
+\end{verbatim}
+
+Uyum oldukca iyi, $R^2$ yüksek. Ýlginç bir gözlem, $k$ ile ne kadar geriye
+giderek kuru tahmin edebileceðimizi kontrol etmeye uðraþtýk, 5 periyot geriye
+gitmek en iyi sonucu verdi, bu zaman serisinde periyot ay bazlý, yani 5 ay
+öncesinden gelecekteki kuru tahmin etmek mümkün!
+
+\newpage
+
+Finans Terimleri Açýklamalarý
+
+Arbitrage (Arbitraj)
+
+Bir teminatýn döviz kuru vs. gibi nedenlerle farký piyasalarda çok kýsa
+süreli de olsa farklý deðerden iþlem görmesi sonucu aradaki ufacýk farktan
+yararlanma iþlemi. Kelimenin kökü {\em arbitrate} kelimesinden geliyor,
+yani hakemlik yapma, aradaki anlaþmazlýklarý çözmek. Finans durumunda arada
+bir anlaþmazlýk var, sadece bu bir fiyat anlaþmazlýðý, ya da kýsa süreli
+bir ``uyumsuzluk''. Borsacý bu uyumsuzluðu görerek ondan faydalanýyor.
+
+Arbitraged Away (Arbitrajýn Tüketilmesi)
+
+Arbitraj iþlemleri piyasadaki enformasyon verimsizliðinden istifade etmek
+anlamýna geliyorsa, o zaman pek çok kiþinin belli bir verimsizlik üzerinden
+iþlem yapmasý o verimsizliði yokedebilir. Mesela bir ortalama dönüþ
+stratejisinde alttan alýp üstten satýyoruz, fakat pek çok kiþi bu
+stratejiyi kullanýyor ise en tepede pek çok kiþi satar, ve fiyat
+çýkabileceði kadar tepeye çýkmaz, ki bu ortalamaya dönüþ karýný etkiler.
+
+ETF - Exchange Traded Fund (Piyasa Fonlarý)
+
+Bir indisi, ya da baz ürünü (commodity) takip eden ve bu altta takip edilen
+``þey''in piyasada alýnýp, satýlmasýný saðlayan varlýk [1]. Mesela petrol,
+altýn gibi mallarýn fiyatý baz alýnarak oluþturulmuþ bir ETF borsada alýnýp
+satýlabilir. Ya da S\&P 500 indisi, ki aslýnda 500 þirketi kapsayan bir
+formülden ibarettir, baz alýnarak bir ETF oluþturulabilir (SPY) ve bu ETF
+alýnýp satýlýnca S\&P 500 fiyatýnýn iniþ çýkýþý üzerinde oynanmýþ
+olacaktýr. 
+
+Bonds, Yields (Tahviller, Getiriler)
+
+Þirketlerin, devletlerin, hatta belediyelerin borç alabilmesini saðlayan
+enstrümanlar. Tahviller belli bir miktarda borcun alýnmasýný, ödemesini,
+vadesini, borç üzerinden ödenecek faizi belli kurallara baðlar. Faiz ödemesi
+sabit bir kupon miktarý üzerinden yapýlýr. Tahvili alýp vade (maturity) süresi
+boyunca tutan kiþiler için hiçbir risk yoktur, onlar paralarýný söz verildiði
+gibi geri alýrlar, ve (çoðunlukla yýlda iki kez) olan faiz ödemeleriyle
+beraber. Tahvilleri ikincil piyasada baþkasýna satmak ta mümkündür. 
+
+Merkez Bankasý faiz oranlarý tahvillerin fiyatýný direk etkiler, tahviller
+risksiz enstrümanlardýr, ayrýca kupon fiyatlarý sabittir; Fakat ayný vadeli yeni
+tahviller çýkarsa, eski tahviller ``rekabet'' edebilmek için ikinci elde
+fiyatlarý duruma göre artaacak ya da azalacaktýr. Tahvil piyasalarýndaki
+oynaklýðýn en büyük sebebi budur; banka faiz oranlarý deðiþir, ona göre eldeki
+tahvilin fiyatý yukarý ya da aþaðý dalgalanabilir.
+
+Mesela \%4 kupon verimliliði (coupon yield) olan 30 yýllýk hazine tahvili
+aldýk. \%4, kupon ödemelerini belirtir, hemen aklýmýzda para miktarý olarak
+hesabýný yaparýz, sabit olan ödeme budur (birkaç parçaya bölünerek ödenebilir
+ama ödemenin tamamý budur) . Þimdi diyelim ki yeni 30 yýllýk tahviller çýktý,
+bunlarýn verimi \%10, yani kupon ödemeleri daha yüksek, tam da bu sýrada biz
+eldeki tahvili satmak istiyoruz. Ne yapacaðýz?  O zaman bizim elimizdeki tahvili
+daha düþük bir fiyattan satmamýz gerekecek ki kupon ödemelerindeki fark buradan
+kapansýn, çünkü \%10'luk tahvili alabilecek alýcýlar baþka türlü niye bizim
+tahvili alsýn ki?  [2].
+
+Bir tahvilin mevcut veriminden (current yield) bahsedilir, bu hesap kupon
+ödemeleri bölü tahvil fiyatýndan ibaret. Neredeyse alýr almaz bir tahvilin
+fiyatý deðiþir, üç tane \$1000, \$1200, \$800'lük tahvil aldýk diyelim,
+1.'nin verimi \%10, 2.'nin \%8.33, 3.'nün \%12.5.
+
+Medyada çoðunlukla hisse senet piyasalarý iþlenir, fakat tahvil piyasasý
+hisse senet piyasalarýndan kat kat daha büyüktür. NYSE, Nasdaq, ÝMKB gibi
+tek bir ``piyasa''dan bahsetmek te mümkün deðildir, çoðu tahvil alýþveriþi
+aracý kurumlar üzerinden kurumlararasý yapýlýr. 2007/08 krizi mesela birincil
+olarak senet piyasalarý deðil, tahvil piyasalarýyla alakalýydý (mortgage
+tahvilleri).
+
+Bid/Ask Spread (Alýþ Fiyatý-Satýþ Fiyatý Arasýndaki Fark, Fiyat Marjý)
+
+Her piyasada iki türlü fiyat vardýr, birisi alýþ fiyatý (the ask) öteki ise
+satýþ fiyatý (the bid). Bir borsacý olarak siz her zaman yüksek olan fiyattan
+almak, düþük olandan satmak zorundasýnýz. Bu aradaki fark iþlemimizi
+gerçekleþtiren kiþilerin kazancýný saðlayan þeydir bir bakýma, bu kiþileri kötü
+gözle görmemek lazým (o fark üzerinden spekülasyon mu yapýyor?), çünkü
+unutmayalým iþlemimizi gerçekleþtiren bu kiþi o iþlemin öteki tarafýndan riske
+giriyor, yani satýþýmýzý alarak, ya da alýmýmýza satýþ yaparak. Tabii ki onlar
+da risklerini azaltmak isteyeceklerdir, bu sebeple alýþ/satýþ fiyatý arasýndaki
+fark üzerinden kara girmeye uðraþacaklardýr [2]. Ýþlem hacmin arttýkça AFSF
+aralýðýnýn küçüldüðü bilinir, çünkü aracý kurumlar her iki uçta yeterince
+müþteri bulabilirler ve riskleri azalýr, bunu aralýk fiyatlarýna yansýtýrlar. 
+
+Short Selling, Shorting - Açýða Satmak
+
+Bir seneti açýða sattýðýnýzda aracý kurumunuz aslýnda bu senedin bedelini
+size ödünç verir; o senedi satar, bir yerden bulur onu, kendi havuzunda
+vardýr, anlaþmalý baþka bir kurumdan bulur vs. onu satar ve senedin satýþý
+sonucu ortaya çýkan parayý da hemen sizin hesabýnýza yazar. Yani o para
+sizindir. Bir ek þart vardýr, o senedi gelecekte bir zaman, ne zaman
+olursa, ayný miktarda alýp aracý kurumunuza geri vermeniz gerekir. Bu
+noktada artýk o senedin düþüþünden para kazanacaðýnýz gayet bariz herhalde,
+eðer tek birimlik 100 lira deðerinde senet borç verilmiþ ise ve ertesi gün
+fiyat 90'a düþmüþse, ve, eðer istiyorsanýz, o tek birimi alýp aracý
+kurumunuza verirsiniz (bu alma / geri verme iþine ``pozisiyonu kapatmak
+(covering)'' adý veriliyor, ve aradaki karý cebe atarsýnýz.
+
+Market Open, Market Close Prices (Borsa Açýlýþ, Kapanýþ Fiyatlarý)
+
+Bir gün içinde bir varlýðýn son iþlem fiyatý kapanýþ fiyatýdýr, açýlýþ
+fiyatý günün ilk fiyatýdýr. Ýlginç bir durum, bir önceki günün kapanýþý ile
+sonraki günün açýlýþý yani olmayabilir; mesela bir þirketin senedi 40
+liradan kapanýyor, o gece, o þirketin bir ürününün ciddi bir arýzasý olduðu
+haberi yayýlýyor. Sonraki gün o þirket senedi 40 liradan alýcý bulacak
+mýdýr? Büyük ihtimalle hayýr. Diyelim ki o senet üzerindeki ilk iþlem 30
+lira seviyesinde, ve açýlýþ fiyatý iþte bu fiyat. 
+
+Time Deposit - Zamanlý Mevduat
+
+Bir bankaya yatýrýlan ve belli zaman süresince dokunulamayan / cekilemeyen (1
+ay, 3 ay, 1 yýl, vs.) mevduata zamanlý mevduat ismi verilir. Belli bir süre
+dokulamayacaðý için bankalar bu parayý alýp onu baþka yatýrýmlarda
+kullanabilirler, ve bu sebeple mevduat sahibine yüksek bir faiz verebilirler
+(aradaki kar onlara kalýr tabii). Zaman süresi arttýkça faizin daha yüksek
+olacaðý beklenebilir.
+
+Eurodollar
+
+ABD dýþýndaki bankalarda zamanlý mevduat olarak tutulan dolarlarla Eurodollar
+ismi verilir. Para ABD dýþýndaki bankalarda tutulduðu için bu mevduat ABD Merkez
+Bankasýnýn (FED) kontrolü dýþýndadýr, ve bu sebeple daha az regülasyona
+tabidirler, onlarý çekici yapan bir faktör budur. Terimin çýkýþ noktasý
+Avrupa bankalarýnda tutulan dolarlardýr, fakat artýk herhangi bir yabancý
+bankada zamanlý mevduat olarak tutulan dolarlara Eurodollar deniyor. Hatta
+yabancý bankada tutulan her döviz için euro öneki kullanýlabilir, mesela
+Euroyen, hatta Euroeuro gibi! 
+
+Fed Faiz Oranlarý, Fed Fon Oraný (Fed Funds Rate)
+
+Her banka ABD Merkez Bankasý'nda belli bir nakit rezervi tutmak zorundadýr, bu
+kanuna göre böyledir. Fakat her gün sonunda bankalarýn elinde bu gerekli miktar
+olmayabilir, bu durumda birbirlerinden nakit borç alýrlar. Bu alým, satým
+sýrasýnda kullanýlan faiz, fed fon oranýdýr; ve ``FED'in kararlaþtýrdýðý oran''
+olarak bilinir, fakat iþin ilginç tarafý FED kimseye ``oran bu olacak'' diye bir
+emir vermez. Arz talep kanunlarýný belli yönde etkileyerek bu sonucun çýkmasýný
+saðlar. Eðer fed fon'un yükselmesini istiyorsa iletiþimde olduðu bankalara
+hazine tahvili satar, onlardan nakit çekmiþ olur, bu dolaylý olarak bankalarýn
+rezervini azaltýr, bu durumda birbirlerine ve dýþarý verdikleri faizi arttýrmak
+zorunda kalýrlar. Azaltma durumunda tam tersi olur.
+
+LIBOR
+
+Dünyadaki büyük, ünlü bankalarýn birbirine borç vermekte kullandýðý oraný
+yansýtan bir gösterge (benchmark) fair oranýdýr. LÝBOR'ý yayýnlayan kurum her
+gün ünlü bankalardan birbirlerine borç için kullandýklarý faiz hakkýnda bilgi
+alýr, ve bir averaj formülü üzerinden LÝBOR'u yayýnlar. Pek çok farklý vadeli
+LOBOR'lar vardýr, ama en çok referans edileni 1 yýllýk LÝBOR'dur. Doðal olarak
+LÝBOR pek çok diðer enstrüman için bir tür referans noktasý oluþturur.
+
+Opsiyon (Option)
+
+Bir varlýðý, mesela senedi, baz alan bir opsiyon alýcýya baz alýnan senedi alma
+seçeneðini verir, almaya mecbur etmez [7]. Bu hak önceden belirlenen belli bir
+fiyat ve belli bir tarih üzerinden verilir (tarihten önce alýnmasýný mümkün
+kýlan opsiyonlar da vardýr). Opsiyonlarýn önemli bir özellliði eðer alýcý
+isterse, kafasýna estiði gibi opsiyondan çýkabilir, hiçbir yükümlülüðü
+yoktur. Opsiyon fiyatlarý da çoðunlukla buna izin verecek þekilde az tutulur. 
+
+Her opsiyonun bir alýcýsý bir satýcýsý vardýr, en azýndan ilk baþtan alýnan /
+satýlan sadece opsiyondur (baz varlýðýn alýmý sonra devreye girer). Baþka bir
+varlýðý baz aldýðý için opsiyona bir türevsel araç denebilir.
+
+Ýki türlü opsiyon vardýr, alým opsiyonu (call option) ve satým opsiyonu (put
+option). Önceden kararlaþtýrýlan fiyata kullaným fiyatý (strike price)
+denir. Opsiyonun kendisinin fiyatý teklif fiyatý (bid) ve satýþ fiyatý (aþk)
+olarak ikiye ayrýlýr. Mesela, diyelim bugün 2015-02-25 ve son kullaným tarihi
+2015-02-27 olan kullaným fiyatý \$75 olan bir AAPL (Apple) opsiyonu olabilir,
+teklif fiyatý \$53.60 üzerinden. Opsiyonlar genelde en az baz varlýktan 100
+birimi kullanýrlar, o zaman bu alým opsiyonuna baþtan verilen ücret 100 x
+\$53.60 = \$5,360 olacaktýr. Dikkat: bu opsiyon bize hemen 100 tane AAPL þenedi
+almýyor. 2015-02-27 tarihinde tanesi \$75'ten 100 tane AAPL þenedi alma {\em
+ hakký} veriyor.
+
+Eðer 27'sinde opsiyonu kullaným fiyatý üzerinden almak istersek, \$7,500 +
+\$5,360 = \$12,860 ödemiþ oluruz ve karþýlýðýnda 100 AAPL hissesine sahip
+oluruz. 25'inde AAPL fiyatý \$128.79 idi, 100 ile carpinca \$12,879 olur, yani
+biraz fazla ödeme yapmýþ olurduk. Fakat opsiyon ile bir güvenlik elde ettik,
+eðer senet \$75 altýna düþse opsiyonu býrakýp kaçarýz, ve sadece ona ödediðimiz
+parayý kaybetmiþ oluruz. Kýyasla eðer 25'inde 100 tane AAPL almýþ olsak ve fiyat
+\$74.99'a çakýlsa \$12,879 - \$7,499 = \$5,380 kaybetmiþ olurduk yani opsiyona
+ödediðimizden daha fazlasý.
+
+Opsiyonlarýn fiyatlanmasýnda Black-Scholes formülü denen bir formül kullanýlýr,
+üstte ince dengeler var gördüðümüz gibi, opsiyonun her iki tarafýndaki aktör
+kendine en faydalý olacak seviyede fiyat bulmak, vermek ister, ve B-S formülü
+bunu yapmalarýný saðlar. B-S birkaç varsayýmý baz alýr, ve bir de formüle
+dýþarýdan verilen oynaklýk 'öngörüsü' $\sigma$ üzerinden optimal bir hesap
+verir. Bu hesabý her iki taraf ta yapacaktýr; kimisi gelecekteki oynaklýk
+tahminini herkesden daha iyi yaparak kara geçmeye uðraþýr, opsiyon ticareti
+geniþ bir alandýr.
+
+Kaldýraç (Leverage)
+
+Getiriyi fazlalaþtýrmak için kullanýlan yöntemlerden biri kaldýraçtýr, yani borç
+kullanmak. Borsa araçý kurumlarý bazen kaldýraç kullanýmýna izin verirler. Bazen
+de iþlem yapýlan enstrümanýn doðasýndan ileri gelen bir kaldýraç vardýr; mesela
+vadeli iþlem sözleþmesi (futures contract) alýþverisinde belli bir yüzdede
+teminat (margin) verildikten sonra (yüzde 10 gibi) iþlem yapýlabilir, burada 10
+katlýk bir kaldýraç sözkonusu. Kaldýraç kullanýnca getiri o kadar katlanýr,
+ayrýca oynaklýkta o kadar katlanýr. 10 TL sermaye var ise, yýlda yüzde 1
+getirisi olan varlýk bana 1 TL kazandýrýr, fakat 10 kat kaldýraç ile 100 TL'ye
+çýkabilirim, kazancým 10 TL olur. Borç geri verilir, 10 TL bende kalýr. Tabii
+eðer yüzde 1 kayýp olursa, o zaman 10 TL kayýp elimdeki tüm sermayeyi
+siler. Dikkat! 
+
+Kaynaklar 
+
+[1] Investopedia, {\em Exchange-Traded Fund (ETF)}, \url{http://www.investopedia.com/terms/e/etf.asp}
+
+[2] Thau, {\em The Bond Book}
+
+[3] Ekstrand, {\em Financial Derivatives Trading}
+
+[4] Ang, {\em Asset Management}
+
+[5] Corvin, Schultz, {\em A Simple Way to Estimate Bid-Ask Spreads from Daily High and Low Prices}
+
+[6] Kostanjcar, Jeren, {\em Relationship between bid-ask spreads and fluctuations in market prices}
+
+[7] Heydt, {\em Mastering Pandas for Finance}
+
+\newpage
+
+Yunan Harfleri
+
+\includegraphics[width=30em]{../../algs/algs_999_zapp/letters.png}
+
+\end{document}
+
+
+

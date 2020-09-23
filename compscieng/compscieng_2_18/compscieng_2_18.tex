@@ -1,0 +1,186 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 18
+
+[bazý multigrid yorumlarý atlandý]
+
+Krylov Matrisleri 
+
+Bu matrislerden $K$ olarak bahsedeceðiz ve bu yöntem baðlamýnda 
+
+$$ Ax = b $$
+
+sistemini çözüyor olacaðýz. Krylov matrisleri þöyle yaratýlýr
+
+$$ K_j = \left[\begin{array}{rrrrr}
+b & Ab & A^2b & .. & A^{j-1}b
+\end{array}\right] $$
+
+Krylov altuzayý $\mathscr{K}$ ise üstteki kolonlarýn lineer kombinasyonudur
+(span), ya da üstteki matrisin kolon uzayýdýr da denebilir. Bu tür bir
+matrisle niye ilgilenirim? Jacobi iþlemi aslýnda bu kolonlarýn
+kombinasyonlarýndan birini her adýmda yavaþ yavaþ seçer, yani aslýnda
+Krylov altuzayýnýn bir parçasýnda çalýþýr. Daha doðrusu ufak ufak baþlar, o
+altuzayda yavaþ yavaþ büyür.
+
+Jacobi sürekli bir kombinasyon seçimi yapar, tabii bu seçimin en iyi seçim
+olduðu söylenemez. Seçimin en iyisini yapsak daha iyi olmaz mý? 
+
+En iyiyi seçmek için kullanýlacak metot eþlenik gradyan (conjugate
+gradient) olacak. Bu metot $K$ içinde $x_j$'yi seçer. 
+
+$\mathscr{K}$ uzayý yaklaþýksal çözümümüzü aradýðýmýz yer tabii ki. Bu arada üstteki
+$K$ matrisinin elemanlarýný yaratmak çok kolay, matris çarpýmý yapýyoruz, ve
+bir sonraki eleman bir öncekinin $A$ katýdýr, ve $A$ çoðunlukla seyrektir
+(sparse), bazen de simetriktir (eþlenik gradyan metotu için $A$ simetrik,
+pozitif kesin olmalý).
+
+Ama EG metotundan önce Arnoldi kavramýný görmemiz lazým. 
+
+Uygulamalý Matematikte sürekli bir þeyler ``seçeriz'', ve çoðunlukla baz
+vektörleri seçeriz ve birkaç özellik ararýz. Aradýðýmýz özellikler
+öncelikle hýzdýr, yukarýda gördüðümüz gibi, matris çarpýmý var, bu çok
+hýzlý. Bir diðer özellik baðýmsýzlýk. Bir diðeri baz vektörlerinin birimdik
+(orthonormal) olmasý. Bu son özellik elde edilebilirse en iyisidir. Üstteki
+$K$ pek iyi bir baz deðildir. Arnoldi'nin amacý Krylov bazýný
+dikgenleþtirmektir. $b,Ab,..$'yi alýp $q_1,q_2,..,q_j$ oluþturmaktýr. Koda
+bakalým,
+
+Algoritma \verb!arnoldi!
+\begin{enumerate}
+  \item $q_1 = b / ||b||$, normalize et
+  \item  Her $j = 1,..,n-1$ için $q_{j+1}$'i hesaplamaya baþla
+  \begin{itemize}
+     \item $t = A * q_j$
+     \item Her $i = 1,..,j $ için $t$, $\mathscr{K}_{j+1}$ uzayýnda
+     \begin{itemize}
+       \item $h_{ij} = q_i^T t$,  $h_{ij}q_i$, $t$'nin $q_i$'ye yansýmasý
+       \item $t = t - h_{ij}q_i$, yansýmayý çýkart
+     \end{itemize}
+  \end{itemize}
+  \item // $t$, $q_1,..,q_j$'ye dikgen oldu
+  \item $h_{j+1,j} = ||t||$, $t$'nin büyüklüðünü hesapla
+  \item // $q_{j+1} = t / h_{j+1,j}$
+  $q_1,..,q_j$ birimdik
+\end{enumerate}
+
+Fikir Gram-Schmidt fikriyle çok benzer. 1. satýrda ilk vektörü olduðu gibi
+alýyoruz, sadece normalize ediyoruz. Sonra 3. satýrda bir deneme
+amaçlý bir vektör $t$'ye  bakýyoruz. Bu vektör ilk baþtaki $b$'ye dikgen
+olmayacak muhakkak. O zaman 5. satýrda bir iç çarpým (inner product)
+sonrasý, 6. satýrda $t$'den çýkartýyoruz. 8 ve 9. satýrlarda bu
+vektörü normalize ediyoruz. 
+
+Eðer $A$ simetrik ise, $h_{ij}h_{ij-1}$ çarpýmýný birkaç kere çýkartmam
+yeterlidir. 
+
+Örnek 
+
+$$  
+A = 
+\left[\begin{array}{rrrr}
+1 &&& \\
+ & 2 && \\
+ && 3 & \\
+ &&& 4 
+\end{array}\right],
+b = 
+\left[\begin{array}{r}
+1 \\ 1\\ 1 \\ 1
+\end{array}\right]
+,
+K_4 = 
+\left[\begin{array}{rrrr}
+1 & 1 & 1 & 1\\
+1 & 2 & 4 & 8\\
+1 & 3 & 9 & 27\\
+1 & 4 & 16 & 64 
+\end{array}\right]
+$$
+
+$A$ hem simetrik, onun ötesinde köþegen, ayrýca oldukça seyrek. Krylov
+matrisi de üstte. Ýlk kolonu $b$ ile ayný. 2. kolon için $A$ ile
+çarpmýþýz. 3. için bir daha $A$ ile çarpmýþsýz, 4. için bir daha.
+
+$K$ eðer bir baz ise, temsil ettiði uzay tüm $\mathbb{R}^4$'tür. Üstteki
+örnekte $j = n = 4$, tüm deðerleri iþledik. Eðer $n$ çok büyük bir sayi ise
+mesela $10^5$ gibi, $j << n$ yani sona gelmeden çok önce durmak
+isteriz. Eþlenik gradyan bunu baþarýyor. 
+
+$K$ formatýndaki bir matrise Vondermonde matrisi de denir, bu tür
+matrislerde ilk kolon sabit, 3., 4., .. kolonlar ikincinin üstel 
+halidir. 
+
+Vondermond matrisleri pek iyi koþullandýrýlmýþ (conditioned) matrisler
+deðildir. Alakalý bir soru: iyi, kötü koþullandýrýlmýþ matrisi nasýl
+anlarýz? Matris eþsiz (singular) deðil. Determinanti hesaplasak sýfýr
+çýkmaz. Ama neredeyse ``eþsiz olmaya yakýn''. Bunun testini nasýl yaparýz? 
+
+Matris eþsiz deðil, o zaman özdeðerleri hesaplamak akla gelebilir,
+oradan $\lambda_{min}$, $\lambda_{maks}$'i kontrol etmek.. Fakat simetrik
+olmayan matrislerin özdeðerlerini hesaplamak hoþ deðildir, ``güvenilir''
+hesaplar deðildirler. Çok kötü koþullandýrýlmýþ ama tüm özdeðerleri 1 olan
+matrisler olabilir mesela, çaprazýnda 1'ler olur, çaprazýn üstünden
+katrilyonlar olabilir.. 
+
+Bu iþi doðru yapmanýn yolu $V^TV$'ye bakmak. Yani genel kural, matris
+simetrik deðilse, devriði ile kendisini çarp, sonucun özdeðerleri hep
+pozitif olur. $V^TV$'nin $i$'inci özdeðeri, $V$'nin $i$'inci özdeðerinin
+karesi olacaktýr. 
+
+Bu arada $V^TV$ matrisine Gram matrisi denir. 
+
+Eðer $Q^TQ$ olsaydý koþullandýrma sayýsý (condition number), yani en büyük /
+en küçük özdeðer ne olurdu? $Q^TQ = I$  o zaman çaprazda hep 1 var, $1/1 =
+1$. Bu en iyi koþullandýrma sayýsýdýr. 
+
+Þimdi þu çok önemli formül için gerekli her bileþene sahibiz. 
+
+$$ AQ = QH $$
+
+$A$ bize verilen -diyelim ki- simetrik matris. $Q$ Arnoldi'den gelen
+baz. $H$ ise kodda görülen çarpan deðerleri. Yani $QH$ bir nevi
+Gram-Schmidt'teki gibi, hatýrlarsak Gram-Schmidt $QR$ ile temsil
+ediliyordu. $Q$ yine birimdik, Gram-Schmidt'te $R$ üst köþegen. 
+
+$H$ hesaplanýrsa
+
+$$  H = 
+\left[\begin{array}{rrrr}
+5/2 & \sqrt{ 5/2} && \\
+\sqrt{ 5/2} & 5/2 & \sqrt{ 4/5}& \\
+ & \sqrt{ 4/5} & 5/2 & \sqrt{ 9/20}\\
+ &&  \sqrt{ 9/20} & 5/2 
+\end{array}\right]
+$$
+
+$H$ simetrik ve üçlü köþegen (tridiagonal). Üçlü köþegenlik bize ne
+söyler?  Tekrarýn (recurrence) kýsa olduðunu.
+
+$$ AQ = QH $$
+
+formülüne dönelim, kolonsal olarak üstteki çarpýmý nasýl gösteririz? 
+
+$$ Aq_1  = \frac{ 5}{2}q_1  + \frac{ \sqrt{ 5}}{2} q_2 $$
+
+Tek bir kalemde eðer $A$ simetrik ise $H$'in de simetrik olduðunu nasýl
+gösteririm? $H$'nin formülü lazým, 
+
+$$ H = Q^{-1}AQ $$
+
+$Q^{-1}$ nedir? $Q$'nun dikgen olduðunu hatýrlayalým, o zaman 
+$Q^{-1} = Q^T$. Üstte yerine koyalým,
+
+$$ H = Q^{T}AQ $$ 
+
+Buna bakarak $H$ kesin simetriktir diyebiliriz, simetrik matrisler aynen
+üstteki gibi yaratýlýr zaten, ortaya bir simetrik matris koyarsýn, saðdan
+herhangi bir matris, soldan onun devriði ile çarparsýn, ve yeni bir
+simetrik matris ortaya çýkar. 
+
+Yani vardýðýmýz sonuç Krylov bazýnýn hýzlý, basit þekilde dikgen hale
+getirilebileceðidir.
+
+
+
+\end{document}

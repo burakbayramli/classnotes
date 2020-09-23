@@ -1,0 +1,527 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Rasgele Yürüyüþ Testleri
+
+Bir zaman serisinin rasgele yürüyüþ (RY, random walk) olup olmadýðýný
+anlamak için Geniþletilmiþ Dickey-Fuller (ADF) testini görmüþtük. Þimdi bu
+testin hangi teoriye dayandýðýný göreceðiz, önemli bir bölümünü kendimiz
+kodlayacaðýz, ve \verb!urca! paketi üzerinden bu testin bazý yan ürünlerini
+irdelemeyi öðreneceðiz. Alttaki tabloda farklý çeþitlerde rasgele yürüyüþ
+modellerini görüyoruz, bunlar sýrasýyla trendlý RY, kaymalý (drift) RY ve
+normal RY olarak tanýmlanabilir. Bu modellerin test istatistikleri vardýr.
+
+\begin{tabular}{|c|c|c|c|}
+\hline 
+Sýfýr Modeli & Alternatif & Kýsýtlama & Test \\
+\hline 
+$y_t = y_{t-1} + e_t$ & 
+$y_t = \alpha + \rho y_{t-1} + e_t$ & 
+$\alpha=0,\rho=1$ &
+$\phi_1$ \\
+\hline   
+$y_t = y_{t-1} + e_t$ & 
+$y_t = \alpha + \beta t + \rho y_{t-1} + e_t$ & 
+$\alpha=0,\beta=0,\rho=1$ &
+$\phi_2$ \\
+\hline   
+$y_t = \alpha + y_{t-1} + e_t$ & 
+$y_t = \alpha + \beta t + \rho y_{t-1} + e_t$ & 
+$\beta=0,\rho=1$ &
+$\phi_3$ \\
+\hline   
+$y_t =  y_{t-1} + e_t$ & 
+$y_t = \alpha + \rho y_{t-1} + e_t$ & 
+$\alpha = 0,\rho=1$ &
+$\tau_\mu$ \\
+\hline   
+$y_t =  \alpha + y_{t-1} + e_t$ & 
+$y_t = \alpha + \beta t + \rho y_{t-1} + e_t$ & 
+$\beta = 0,\rho=1$ &
+$\tau_\tau$ \\
+\hline   
+\end{tabular}
+
+
+$e_t$ birbirinden baðýmsýz, ayný daðýlýmlý Gaussian'dýr. Bu testlerden
+$\phi_1,\phi_2,\phi_3$ birleþik hipotez testleridir, bu kavramý {\em
+  Ýstatistik, Birleþik Hipotez Testleri} altýnda görmüþtük. Mesela $\phi_2$
+için ``kýsýtlanmýþ'' durum sýfýr hipotezi altýnda gösteriliyor,
+``kýsýtlanmamýþ'' durum ise alternatif kolonu altýnda. Reddetmek
+istediðimiz hipotez iptal edilen deðiþkenlerin önemli olmadýðý, eðer
+F-testi ile bu hipotezi reddedersek, yani önemli olduklarýný kanýtlarsak,
+üstteki tablodaki sýfýr hipotezi reddedilmiþ olur.
+
+Peki eðer $\phi_2$ için mesela, hem sýfýr hem alternatif hipotez altýnda
+$y_{t-1}$ görülüyor, o zaman rasgele yürüyüþ varlýðýný nasýl reddederiz?
+Evet iki tarafta da $y_{t-1}$ var fakat bir tarafta birim kök (unit root)
+olarak var, yani $1 \cdot y_{t-1}$ olarak, öteki tarafta bir katsayý
+üzerinden modele dahil, ayrýca diðer deðiþkenler de bu durumda mevcut. Eðer
+pür birim kök'e karþý alternatif güçlü çýkar ise o tüm diðer deðiþkenler
+zamann serisinin açýklamak için önemli sonucu çýkar, bu durum rasgele
+yürüyüþ olmadýðýna dair güçlü bir iþarettir (tabii tamamen yok denemez).
+
+Hesaplar bir tür birleþik hipotezdir demiþtik, yani F-test'i olarak
+hesaplanýrlar,
+
+$$ \phi_i = \frac{(SSE_r - SSE_u) / r}{SSE_u} / (N-k) $$
+
+$r$ kýsýtlanan deðiþken sayýsýdýr, $\phi_3$ için bu 3 olurdu mesela, SSE
+deðerleri ise artýklarýn karesi kullanýlarak hesaplanacaktýr, $SSE_r$
+kýsýtlanan durum için, $SSE_u$ kýsýtlama olmayan durum için, $N-k$ iþe
+kýsýtlý olmayan modelin serbestlik derecesi.
+
+Örnek olarak Federal Reserve Board tarafýndan yayýnlanan Üretim Ýndisi
+verisinin logaritmasý alýnmýþ halini kullanacaðýz, veri 1950 1. çeyrek-1977
+4. çeyrek arasýný kapsar ve çeyreksel bazlýdýr. Endüstriyel Üretim Ýndisi
+bir ekonomik göstergedir, sanayisel, madencilik, elektrik, doðal gaz gibi
+sektörlerin üretimini tek bir sayý altýnda özetlemeye uðraþýr. Soru þu,
+acaba bu seri rasgele yürüyüþ özellikleri taþýyor mu, taþýmýyor ise, hangi
+alternatifler geçerli? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfind = pd.read_csv('ind.csv',index_col='date')
+dfind = dfind[dfind.index > '1950-01-01']
+dfind = dfind[dfind.index < '1977-10-01']
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+np.log(dfind.indpro).plot()
+plt.title(u'Üretim Indisi')
+plt.savefig('tser_rwtst_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_rwtst_02.png}
+
+Farz ediyoruz ki bu zaman serisi þu þekilde temsil edilebiliyor,
+
+$$ 
+y_t = \beta_0 + \beta_1 t + \alpha_1 y_{t-1} + \alpha_2 (y_{t-1} - y_{t-2}) + e_t 
+\mlabel{1}
+$$
+
+Þimdi mesela $\phi_2$ testi için bir regresyon iþleteceðiz, bunun için
+denklem üzerinde biraz deðiþiklik yapalým, kýsýtlamalar üzerinden
+$\beta_0=0,\beta_1=0,\alpha_1=1$ ve iki taraftan $y_{t-1}$ çýkartalým,
+
+$$ 
+y_t - y_{t-1} =  \cancel{y_{t-1} - y_{t-1}} + \alpha_2 (y_{t-1} - y_{t-2}) + e_t 
+$$
+
+$$ 
+\Delta y_t =  \alpha_2 \Delta y_{t-1}  + e_t  
+\mlabel{2}
+$$
+
+Bu durumda kýsýtlanmýþ regresyon (2)'yi kullanacaktýr, kýsýtlanmamýþ ise
+(1)'i. Ardýndan bu iki regresyonun sonucundan gelen hata karelerinin
+toplamlarýný (SSE) kullanarak bir F-testi hesaplanýr.
+
+$\phi_3$ için benzer bir durum, tek fark kýsýtlanmýþ formülde bir kesi hala
+var, yani her iki tarafta da $\beta_0$ mevcut.
+
+$$ 
+\Delta y_t =  \beta_0 + \alpha_2 \Delta y_{t-1}  + e_t  
+\mlabel{3}
+$$
+
+Tabii ana formül (1)'i de $\Delta y_t$ bazýnda göstermek iyi olur, iki
+taratan $y_{t-1}$ çýkartalým,
+
+$$ 
+y_t-y_{t-1} = \beta_0 + \beta_1 t + (\alpha_1-1) y_{t-1} + \alpha_2 (y_{t-1} - y_{t-2}) + e_t 
+$$
+
+$$ 
+\Delta y_t = \beta_0 + \beta_1 t + (\alpha_1-1) y_{t-1} + \alpha_2 \Delta y_{t-1} + e_t 
+$$
+
+$\alpha_1-1$ tek baþýna bir katsayý olarak girebilir, hangi sembolü
+taþýdýðý pek önemli deðil.
+
+Bu arada (1,2)'deki semboller tabloda gösterilenlerden biraz deðiþik
+olabilir, fakat iþin özü aynýdýr. (1) formülü bir gecikme (lag) ile önceki
+farklara baðlantý yaratmayý seçti, bunun için bazý sembollerin deðiþmesi
+gerekti.
+
+Regresyon ve F-test hesaplarý,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+
+dfind['y'] = np.log(dfind.indpro)
+dfind['dy'] = dfind.y.diff()
+dfind['ylag'] = dfind.y.shift(1)
+dfind['dylag'] = dfind.ylag.diff()
+dfind['t'] = range(len(dfind))
+
+res1 = smf.ols('dy ~ t + ylag + dylag', data=dfind).fit()
+sse1 = np.sum(res1.resid**2)
+print list(res1.params)
+print 'sse1',sse1
+
+res2 = smf.ols('dy ~ dylag ', data=dfind).fit()
+sse2 = np.sum(res2.resid**2)
+print list(res2.params)
+print 'sse2',sse2
+
+# dikkat kesi yok burada
+res3 = smf.ols('dy ~ 0 + dylag', data=dfind).fit()
+print list(res3.params)
+sse3 = np.sum(res3.resid**2)
+print 'sse3',sse3
+
+k = 3
+phi2 = (sse3-sse1)/(k*sse1/(len(dfind)-4))
+print '\nphi2', phi2
+k = 2
+phi3 = (sse2-sse1)/(k*sse1/(len(dfind)-4))
+print 'phi3', phi3
+\end{minted}
+
+\begin{verbatim}
+[0.32890563193314926, 0.0012176940580472463, -0.11592339963358432, 0.47618947733620209]
+sse1 0.0439920148353
+[0.0054652611288141572, 0.41767827251937806]
+sse2 0.0490062183592
+[0.49810699391267177]
+sse3 0.0517366340291
+
+phi2 6.22029276313
+phi3 6.04093237744
+\end{verbatim}
+
+Kontrol için ayný hesabý \verb!urca! paketi üzerinden iþletelim, ki kritik
+deðerleri de görebilelim. Not: kritik deðerler için de F daðýlýmý
+kullanamýyoruz, çünkü artýklarda (residuals) normallik farz edemiyoruz, ki
+onlarýn karesi ve toplamý chi kare olsun, ve chi kare bölümler F
+ölsün. Kalýntýlarda normallik niye farz edilemiyor? Çünkü regresyonda bir
+önkabul deðiþkenlerin de $N(0,\sigma)$ olarak daðýldýðýdýr, fakat sýfýr
+hipotezine bakarsak regresyona sokulan deðiþken zaman serisinin ta kendisi,
+ve zaman serisi sýfýr hipotezi altýnda normal daðýlmaz ({\d deðiþimi}
+normal daðýlýr), bu yüzden kalýntýlar da normal olamaz. [5] bu standard
+olmayan F daðýlýmý simülasyon ile üretiyor ve kritik deðerleri bir tabloda
+paylaþýyor. Simülasyonun nasýl yapýldýðý [1, sf 204]'te. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%load_ext rpy2.ipython
+%R library(urca)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+series = np.log(dfind.indpro)
+%R -i series
+%R  adf <- ur.df(series, type = 'trend',lags=1)
+%R -o adfout adfout <- summary(adf)
+print adfout
+\end{minted}
+
+\begin{verbatim}
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.068623 -0.007659  0.002293  0.011152  0.051096 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.3289056  0.0942984   3.488 0.000715 ***
+z.lag.1     -0.1159234  0.0337053  -3.439 0.000840 ***
+tt           0.0012177  0.0003568   3.412 0.000918 ***
+z.diff.lag   0.4761895  0.0826273   5.763  8.5e-08 ***
+---
+
+Residual standard error: 0.02057 on 104 degrees of freedom
+Multiple R-squared:  0.2706,	Adjusted R-squared:  0.2496 
+F-statistic: 12.86 on 3 and 104 DF,  p-value: 3.262e-07
+
+
+Value of test-statistic is: -3.4393 6.1029 5.927 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -3.99 -3.43 -3.13
+phi2  6.22  4.75  4.07
+phi3  8.43  6.49  5.47
+\end{verbatim}
+
+Sonuçlara göre $\phi_2 = 6.1$, kritik deðere göre yüzde 1 önemlilik
+(significance) seviyesinde $\phi_2$ hipotezini reddediyoruz, yani rasgele
+yürüyüþ hipotezini reddediyoruz (daha doðrusu kýsýtlamalarýn önemsiz
+olduðunu reddedince RY dolaylý olarak reddedilmiþ oluyor). Bu demektir ki
+veride bir kayýþ (drift), birim kök, ya da deterministik bir trend var
+($\beta_1 t$ ile gösterilen). Tabii birim kök hala ``tamamen yok'' diyemiyoruz,
+bu nüansý önce belirttik.
+
+Þimdi, acaba kayýþ (drift), yoksa trend varlýðýndan hangisi daha muhtemel
+diye görmek için $\phi_3$'e bakýyoruz. Bu test ile sýfýr hipotezi üstteki
+tabloda 1. model, alternatifi 2. model, aradaki tek fark $\beta_1=0$
+olmasý. Eðer bunu reddedebilirsek trendi kabul etmemiz gerekir. Test deðeri
+5.9, kritik deðere göre yüzde 10 seviyesinden bu hipotezi reddedebiliriz,
+ve alternatif tez olan bu zaman serisinin trend duraðan (trend stationary)
+olduðunu kabul ederiz. Trend duraðanlýk formüldeki $\beta_1 t$'nin sýfýr
+olmadýðý / etkin olduðunu söylemektedir.
+
+Not: Trend duraðanlýk nedir? Bir zaman serisi duraðan deðil ise bu duraðan
+olmamanýn birkaç farklý sebebi olabilir, birim kök durumu bunlardan biri ki bu
+durumda RY ortaya çýkýyor. Fakat RY yerine deterministik trend de
+duraðansýzlýðýn bir sebebi olabiliyor, $\beta_1 t$ kadar bir ek sürekli her
+zaman diliminde seriye ekleniyor; bu da duraðanlýðý bozar. Yani duraðanlýðýn
+bozulmasý hem birinci hem ikinci ya da ikisinin birden varlýðý sebebiyle ortaya
+çýkabilir [4, sf 270]. Üstteki testler bu iki durumu birbirine alternatif hale
+getirip test etmeye uðraþýr.
+
+Görüldüðü gibi elle yapýlan regresyon ve F-test sonuçlarý paketin
+sonuçlarýna oldukça yakýn. Bir de $\tau_\tau$ deðerini hesaplayalým, bu
+testin sonucu 1. regresyondaki $y_{t-1}$'nin katsayýsýndan gelir, daha
+doðrusu onun t deðeridir, yani regresyon katsayýsýný standart hatasý ile
+bölersek sonucu elde ederiz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 't degeri', res1.params['ylag'] / res1.bse['ylag']
+\end{minted}
+
+\begin{verbatim}
+t degeri -3.43932388217
+\end{verbatim}
+
+ki üstteki kritik deðerlere göre bu deðeri yüzde 5 seviyesi -3.43'ten küçük
+olduðu için bu hipotezi de reddetmek mümkün, yani birim kök varlýðý
+reddedilmiþtir.
+
+S\&P Fiyat / Kazanç Oraný
+
+Bu örnekte 1871-2002 yýllarý arasýnda S\&P Birleþik Hisse Ýndisi fiyat seviyesi
+ile bu indis altýnda izlenen þirketlerin getirdiði kazancýn oranýna
+bakacaðýz. Literatürde bu gibi deðerleme oranlarýnýn (valuation ratio)
+ortalamaya dönüþ (mean reversion) davranýþý gösterip göstermediði oldukça ilgi
+çeken bir konudur, çünkü hisse senetlerinin fiyatlarýnýn ne olacaðýný tahmin
+etmek gibi ilginç uygulama alanlarý vardýr [4, sf. 274]. Mesela Campbell and
+Shiller adlý araþtýrmacýlara göre 1990'larýn sonlarýnda görülen çok yüksek
+fiyat/getiri oraný hisse senetlerinin düþeceðinin habercisidir, ki böylece
+``tarihi normale dönüþ'' olacaktýr / olmalýdýr. Önce bu oranýný log'u alýnmýþ
+halini grafikleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfpe = pd.read_csv('pe.dat',sep='\s*')
+dfpe['ln_price_earnings'] = np.log(dfpe.PRICE/dfpe.EARNINGS)
+dfpe.ln_price_earnings.plot()
+plt.savefig('tser_rwtst_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_rwtst_01.png}
+
+Görünüþe göre bir ortalamayý merkez alan / etrafýnda salýným var gibi
+gözüküyor, bazen ortalamaya dönüþ uzun yýllar alabiliyor gibi de
+duruyor.. Þimdi birim kök varlýðýný test edelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+series = dfpe.ln_price_earnings
+%R -i series
+%R  adf <- ur.df(series, type = 'drift',lags=0)
+%R -o adfout adfout <- summary(adf)
+print adfout
+\end{minted}
+
+\begin{verbatim}
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0,53078 -0,10211  0,00324  0,12171  0,41194 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)   
+(Intercept)  0,33486    0,12790   2,618   0,0099 **
+z.lag.1     -0,12452    0,04847  -2,569   0,0113 * 
+---
+
+Residual standard error: 0,1777 on 129 degrees of freedom
+Multiple R-squared:  0,04867,	Adjusted R-squared:  0,04129 
+F-statistic:   6,6 on 1 and 129 DF,  p-value: 0,01134
+
+
+Value of test-statistic is: -2,569 3,4573 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3,46 -2,88 -2,57
+phi1  6,52  4,63  3,81
+\end{verbatim}
+
+Kritik deðer -2.569, yüzde 10 eþiðinden bile daha büyük bu, demek ki
+rasgele yürüyüþ tezini reddedemiyoruz. 
+
+Fakat diðer yandan, ve özellikle serinin görünüþünde net þekilde
+görülebileceði üzere, serinin duraðan-olmadýðýný da tam
+reddedemiyoruz. Hurst hesabý,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../tser_mean')
+import hurst as h
+print h.hurst(dfpe.ln_price_earnings)
+\end{minted}
+
+\begin{verbatim}
+0.0756699198133
+\end{verbatim}
+
+Bu deðer 0.5'ten oldukça uzak.
+
+Küresel Isýnma Var mý?
+
+Ýklimin daha sýcaklaþýp sýcaklaþmadýðý politikacýlar, bilim adamlarý
+arasýndaki tartýþma konularýndan biri. Eðer ýsýnma var ise, ve kaynaðý biz
+insanlar isek, bu durumu durdurmak için adýmlar atýlmalý, çünkü yine bilim
+adamlarýna göre sonuçlarý kötü olabilir. Isýnmanýn olup olmadýðýný kontrol
+etmek için GÝSS tarafýndan yayýnlanan veriye bakacaðýz, bu veri 1880-2010
+arasýnda ay bazlý tüm dünyadaki sýcaklýk anormalliklerini kaydetmiþtir,
+anormallik ise 1951-80 periyotunun ortalamasý baz alýnarak tanýmlanmýþtýr.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfclim = pd.read_csv('climate-giss.csv',index_col=0,parse_dates=True)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+dfclim.Temp.plot()
+plt.savefig('tser_rwtst_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_rwtst_03.png}
+
+``Küresel ýsýnma yok'' diyen arkadaþlar üstteki grafikte görüldüðü gibi
+özellikle 20. yüzyýlda mevcudiyeti bariz olan yükseliþi açýklamak
+durumundalar, bunun için sýcaklýk ``rasgele yürüyüþtür'' diyenler var; bu
+teze göre sýcaklýk verisi hisse senedi gibidir, ``yukarý da çýkabilir,
+aþaðý da inebilir, tahmin edilemez bir þekilde dalgalanýr''. Bu teze göre
+þimdiye kadar olan çýkýþýn bir iniþi de ``olabilir'', herþey rasgeledir
+belki de onlar için daha önemlisi ``olanlar bizim (insanlýðýn) kontrolü
+dýþýndadýr'' . Tabii ilk akla gelen soru 100 kusur senedir yükselen nasýl
+bir senet ki bu analoji doðru olabilsin..? Matematiksel olarak, yazýnýn
+baþýnda gördüðümüz RY testi herhalde faydalý bir bilgi saðlar.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+series = dfclim.Temp
+%R -i series
+%R  adf <- ur.df(series, type = 'trend',selectlags="AIC")
+%R -o adfout adfout <- summary(adf)
+print adfout
+\end{minted}
+
+\begin{verbatim}
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-80.967  -9.868   0.214  10.370  85.279 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -10.578706   1.163642  -9.091   <2e-16 ***
+z.lag.1      -0.277517   0.020894 -13.282   <2e-16 ***
+tt            0.014425   0.001428  10.105   <2e-16 ***
+z.diff.lag   -0.224780   0.024657  -9.116   <2e-16 ***
+---
+
+Residual standard error: 16.81 on 1562 degrees of freedom
+Multiple R-squared:  0.2205,	Adjusted R-squared:  0.219 
+F-statistic: 147.3 on 3 and 1562 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic is: -13.2819 58.8243 88.2169 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -3.96 -3.41 -3.12
+phi2  6.09  4.68  4.03
+phi3  8.27  6.25  5.34
+\end{verbatim}
+
+Testlere bakýnca \verb!tau3! reddedilmiþ, $\phi_2,\phi_3$ reddedilmiþ. Yani
+RY tezi net bir þekilde reddedildi, daha önemlisi trend duraðanlýðý kabul
+edildi. Bir trend var, ve bu trend bariz bir þekilde yukarýya doðru. 
+
+Bu noktada inkarcý arkadaþlar (!) vites deðiþtirip ``burada ortalamaya
+dönüþ var'' diyebilirler, eh tabii ki sýcaklýk verisinde ortalama dönüþ
+var, evet Hurst hesabýna bakarsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../tser_mean')
+import hurst as h
+print h.hurst(dfclim.Temp)
+\end{minted}
+
+\begin{verbatim}
+0.040611546891
+\end{verbatim}
+
+Varyans Oraný
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from arch.unitroot import VarianceRatio
+vr = VarianceRatio(dfclim.Temp, 12)
+print(vr.summary().as_text())
+\end{minted}
+
+\begin{verbatim}
+     Variance-Ratio Test Results     
+=====================================
+Test Statistic                -15.768
+P-value                         0.000
+Lags                               12
+-------------------------------------
+Computed with overlapping blocks (de-biased)
+\end{verbatim}
+
+Fakat bu iki sonuç rasgele yürüyüþ reddi aslýnda, direk ortalamaya dönüþün
+kabulü deðil! Bunun detaylarý için Varyans Ortalamasý teorisine yakýnda
+bakmak lazým. Yanlýz þu da var ki ADF testlerindeki red gözardý edilemez,
+ki bu red rasgele yürüyüþü reddedip onu trende göre test etti. Üstüne
+üstlük kritik deðerler çok yüksek seviyelerde asýldý, ki bu yüzden trendi
+kabul etmek zorunda kaldýk. Ýþin meteorolojik tarafý da önemli; bilimcilere
+göre iklimdeki birkaç derecelik kalýcý deðiþimin bile büyük etkileri
+olacaðýný duyuyoruz. Yanlýþ sonuca varmanýn bedeli aðýr olur.
+
+Kaynaklar 
+
+[1] Enders, {\em Applied Econometric Time Series}
+
+[2] Pfaff, {\em Analysis of Integrated and Cointegrated Time Series with R}
+
+[3] FRED, {\em Industrial Production Index}, \url{https://research.stlouisfed.org/fred2/graph/?g=1bHY}
+
+[4] Verbeek, {\em A Guide to Modern Econometrics}
+
+[5] Dickey D., Fuller W., {\em Likelihood Ratio Statistics for Autoregressive
+Time Series with Unit Root}, 1981
+
+\end{document}

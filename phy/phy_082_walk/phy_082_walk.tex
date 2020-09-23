@@ -1,0 +1,471 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Adým Ölçmek, Pedometre
+
+Cep telefonlarýnýn çoðunda artýk ivmeölçer (acceloremeter) algýlayýcýlar
+var; bu algýlayýcýlar telefonun $x,y,z$ eksenlerini baz alarak tüm
+eksenlerde ne kadar ivme etkisi olduðunu ölçüyorlar. Bu etkilerden en
+büyüklerinden biri tabii ki yerçekimi, telefonda hiçbir hareket olmasa bile
+telefonu tutuþa göre 9.8 metre / $s^2$'lik bir ivme tek ya da tüm eksenlere
+daðýlmýþ olarak ölçülecektir [4]. Yürürken, adým atarken meydana çýkan
+yukarý ve aþaðý yönde kuvvet uygulamasý da ivmeölçerlerle yakalanýr. Bu
+ölçümleri kullanarak acaba atýlan adým sayýsýný bulamaz mýyýz? [5]'deki
+uygulamayý kullanarak alýnan ölçümlere bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfacc = pd.read_csv('acc.txt',header=None,sep='\s+')
+print dfacc.head()
+\end{minted}
+
+\begin{verbatim}
+               0         1         2         3
+0  1493818386218 -0.147100  6.972528  6.707748
+1  1493818386422 -0.215746  7.001948  6.854848
+2  1493818386610 -0.304006  7.041174  6.697942
+3  1493818386812 -0.304006  7.050981  6.884268
+4  1493818387008 -0.225553  7.011754  6.943108
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+steps1 = np.sqrt(np.sum(dfacc[[1,2,3]]**2, axis=1))
+steps2 = steps1 - 9.8
+steps2[:200].plot()
+plt.savefig('compscieng_app40walk_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{compscieng_app40walk_01.png}
+
+Üç eksendeki ivme ölçümünün normalize ettik (karelerinin toplamýnýn
+karekökü), 
+
+$$ r = \sqrt{r_x^2 + r_y^2 + r_z^2}$$
+
+Daha önce belirtildiðimiz gibi telefonun duruþu deðiþik þekillerde
+olabilir, ve yerçekiminde olduðu gibi bu ölçümler üç eksene daðýlmýþ
+olacaktýr. Bu üç ölçümü birleþtirerek esas bizi ilgilendiren hesaba daha
+yaklaþmýþ olmayý umduk. 
+
+Sonuçlar fena deðil, baþtaki sýfýra yakýn bölgede hiç hareket etmiyorduk
+mesela, ve ivme hesabý burada ufak bir deðer gösteriyor. Yapýlan bir ek
+iþlemden daha bahsedelim, 9.8'lik yerçekimi ivmesini karekökten çýkarttýk
+çünkü yerçekimini ölçmekle de ilgilenmiyoruz (hep ayný zaten), bu deðeri
+çýkartarak yine bizi ilgilendiren veriyi daha net þekilde görebileceðimizi
+umduk. Altta bu çýkartma öncesi ve sonrasýnda yapýlan Fourier analizine
+göre yerçekimi çýkartýlmýþ verinin ilgilendiðimiz frekanslarý daha net
+gösterdiði belli oluyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../compscieng_1_32')
+import filt
+f=plt.figure()
+filt.plotSpectrum(steps1, 6)
+plt.savefig('compscieng_app40walk_02.png')
+f=plt.figure()
+filt.plotSpectrum(steps2, 6)
+plt.savefig('compscieng_app40walk_06.png')
+\end{minted}
+
+\includegraphics[height=6cm]{compscieng_app40walk_02.png}
+\includegraphics[height=6cm]{compscieng_app40walk_06.png}
+
+1 Hz. ve 2 Hz. seviyesindeki frekanslar ilginç, bunlar saniyede bir ve iki
+adýma tekabül ediyor olmalýlar. 
+
+Adým saymak için zaman serilerinde tepe / uç nokta bulabilen kodlar
+kullanacaðýz, \verb!peakutils! altýnda bu kodlarý görüyoruz; bu kodlarla
+belli eþik, minimum mesafe deðerlerini belirleyerek bir zaman serisindeki
+uç noktalarý bulabiliyoruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import peakutils
+idx = peakutils.indexes(steps2, thres=0.1, min_dist=3)
+print len(idx), u'tepe noktasý var'
+plt.plot(steps2)
+plt.plot(idx,steps2[idx],'rd')
+plt.savefig('compscieng_app40walk_03.png')
+\end{minted}
+
+\begin{verbatim}
+89 tepe noktasý var
+\end{verbatim}
+
+Bu noktalarýn alt bölümü de var tabii, bu nihai sayý için üstteki sonucu
+iki ile çarpabiliriz. Hesap fena deðil, bu deney için 170 adým atmýþtýk.
+
+\includegraphics[height=6cm]{compscieng_app40walk_03.png}
+
+Tepe bulmaktaki farklý parametre etkilerini de gösterelim. Önce gürültülü,
+iki büyük tepeden oluþan bir yapay veri üretelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import peakutils
+np.random.seed(0)
+centers = (30.5, 72.3)
+x = np.linspace(0, 120, 121)
+y = peakutils.gaussian(x, 5, centers[0], 3) + \
+    peakutils.gaussian(x, 7, centers[1], 10) + \
+    np.random.rand(x.size)
+\end{minted}
+
+Þimdi farklý parametrelerle tepe noktalarýný bulalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.figure()
+plt.plot(x, y)
+indexes = peakutils.indexes(y, thres=0.5, min_dist=30)
+plt.plot(x[indexes], y[indexes], 'rd')
+plt.savefig('compscieng_app40walk_04.png')
+plt.figure()
+plt.plot(x, y)
+indexes = peakutils.indexes(y, thres=0.5, min_dist=3)
+plt.plot(x[indexes], y[indexes], 'rd')
+plt.savefig('compscieng_app40walk_05.png')
+plt.figure()
+plt.plot(x, y)
+indexes = peakutils.indexes(y, thres=0.1, min_dist=5)
+plt.plot(x[indexes], y[indexes], 'rd')
+plt.savefig('compscieng_app40walk_07.png')
+\end{minted}
+
+\includegraphics[height=4cm]{compscieng_app40walk_04.png}
+\includegraphics[height=4cm]{compscieng_app40walk_05.png}
+\includegraphics[height=4cm]{compscieng_app40walk_07.png}
+
+Parametre \verb!thres! dikey bir eþik deðeri tanýmlýyor, en yüksek nokta
+1.0 olacak þekilde. Mesela yarým seviyede minimal bir yükseklik eþik deðeri
+0.5 ile tanýmlanabilir, o zaman sadece bu deðer üstündeki noktalar tepe
+olarak saptanacaktýr. Yatay yönde ama bu sefer reel deðer bazlý bir eþik
+deðeri \verb!min_dist! ile verilir, bu durumda tepe noktalarý arasýnda en
+az bu kadar mesafe olmasý gerekir.
+
+Yürüyüþ Yönünü Bulmak
+
+Cep telefonuyla, telefon hangi konumda olursa olsun (cepte, çantada, elde)
+hangi yöne yürüdüðümüzü nasýl buluruz? Bilim kurgu filmleri biz
+izleyicileri biraz þýmarttý aslýnda -zamanda seyahat, istediði yere inen
+uzay gemileri, ýþýktan hýzlý seyahat- fakat cep telefonu ile yürüyüþ yönünü
+hesaplamak 2014 civarýna kadar hala tam, genel bir þekilde çözülmüþ
+deðildi. GPS iþe yaramýyor mu? GPS kesin çözüm olabilirdi çünkü dünya
+üzerinde global kordinatlarý direk cihaza alýyoruz ve ardý ardýna alýnan
+ölçümler bir gidiþ yönünü gösteriyor olurdu, fakat GPS þehir ortamýnda
+binalardan sinyal yansýmasý (multipath) problemi sebebiyle herhangi bir
+yönde birkaç yüz metre hatalý olabiliyor, ve kapalý alanlarda zaten hiç GPS
+sinyali alamýyoruz. Baþka bir yöntemi kullanmamýz gerekiyor.
+
+Daha önce adým sayýsýnda olduðu gibi ivmeölçer kullanýmý akla gelecektir,
+ivmeölçer önemli, fakat bu algýlayýcýlarýn kaydettikleri veri yürüyüþ
+sýrasýnda pek çok diðer hareket ile karýþmýþ halde. Sallanma, aþaðý yukarý
+gidiþ geliþ gibi. Ayrýca ivmeölçerin kaydettiði telefon bazlý bir eksen
+sistemine göredir, bu sistem
+
+\includegraphics[width=10em]{compscieng_app40walk_08.png}
+
+Eðer telefonun ekraný bana tam dönük, yere dik þekilde tutup yürürsem
+ivmeölçer y kordinatýnda daha yüksek deðerler kaydediyor mesela. Bu bilgiyi
+alýp telefonun bir diðer algýlayýcýsý elektronik pusula / manyetometre
+(magnetometer) üzerinden bir global yön bilgisine belki çevirebilirim,
+fakat pusula da tam güvenli deðil, bu birleþtirmeyi dikkatli yapmak
+lazým. 
+
+Birleþtirme için Android ortamýnda rotasyon matrisi [3] bazlý bir yöntemi
+tavsiye edenler var; bu yönteme göre ivmeölçer ve pusula birleþtirilip
+kamera kordinat sistemini dünya kordinat sistemine tercüme edecek bir
+matris hesaplanýyor. Fakat bu hesap hareketli ortamda tam güvenilir deðil,
+ayrýca hesaplanan çok boyutlu bir ürün. Bu tür girift ara ürünler nihai
+çözümdeki hata ihtimalini daha arttýrýr, bize gereken tek bir yön sadece,
+{\em tüm} üç boyutlu eksenin bir diðer üç boyutlu eksene direk eþlemesine
+ihtiyaç yok. Bir diðer problem bu hesabýn nasýl kullanýlacaðý... Mesela
+ivme hesaplarýný rotasyon matrisi ile dünya kordinat sistemine çevirdik,
+þimdi kuzey-güney doðu-batý baðlamýnda ivlenmeyi ``biliyoruz''. Bu
+ivmelenmeyi bir kere sayýsal entegrasyon ile hýza çevirip oradan yön elde
+edebilir miyiz?  Ne yazýk ki entegrasyon hassas bir hesaptýr. Eðer olmayan
+yerde birkaç saniye bile fazla ivme ölçümü almýþsak, hýzda, yönde aþýrý
+farklýlýklar ortaya çýkabiliyor.
+
+Daha saðlam çözüm için yürüyüþün ivmeölçere nasýl yansýdýðýný yakýndan
+incelemek gerekiyor, ki [1, 2]'deki araþtýrma aynen bunu yapmýþ. 
+
+Not: Bu alanda bir diðer yaklaþým veri bilimi, yapay öðrenim
+yaklaþýmý. Eðer elde yeterince veri varsa, ham veri ve yürünen yön olarak,
+bu veriler denetimli eðitimde bir yapay öðrenme algoritmasina verilir ve
+algoritma aradaki iliþkiyi öðrenir. Hangi yaklaþýmýn nerede yeterli,
+kuvvetli olacaðýný anlamak tecrübeye baðlý. Bazen problemi elden geldiði
+kadar matematiksel olarak modellemek, temel fiziksel kavramlardan
+baþlayarak tanýmlamak daha iyi olur, bazen diðer yaklaþým daha kolay
+olabilir.
+
+[1]'e göre insan yürüyüþü belli bölgelere ayrýlabilir ve her bölgenin
+ivmeölçerde farklý bir yansýmasý vardýr. Ýki büyük bölge duruþ ve sallanýþ
+denebilecek konumlar; duruþta (aslýnda tam duruþ deðil, fakat senkronize
+hareket) bacak ve üst gövde ayný anda öne doðru gitmekte, sallanýþ ise bir
+bacaðýn arkadan öne doðru itilmesiyle üst gövdeden öne geçme aný.
+
+\includegraphics[width=30em]{compscieng_app40walk_13.png}
+
+Sallanýþ bölgesinin ilk kýsmýnda ivme pozitif, ikinci kýsmýnda ise
+negatif. Ayrýca, diyelim ki sallanýþ $t_1,..,t_9$ zaman kesitlerini
+kapsýyor, ivme $t_3$'te maksimum, $t_5$'te sýfýr, ve geriye doðru ters ivme
+(deceleration) $t_7$'de en üst noktasýnda.
+
+Araþtýrmanýn en önemli bulgusu þudur: güvenli bir þekilde ivmeölçere
+yansýyan ve yürüyüþ yönü bilgisini taþýyan en iyi veri bölgesi topuk
+vuruþuna giden maksimum yavaþlamanýn olduðu bir bölgedir, bunun için [1]
+önce ivme sinyalinde aþýrý yüksek frekanslý sinyalleri eler, ardýndan sýfýr
+geçiþ anlarýný bulur - bu noktalar sinyalin artýdan eksiye doðru geçiþ
+yaptýðý anlardýr. Ardýndan sýfýr geçiþ ve tepe noktalarý arasýndaki topuk
+vuruþuna en yakýn bölgeye odaklanýlýr, ve bu kesit çýkartýlarak bütün üç
+eksenler üzerinden o bölgedeki ortalama alýnýr. Bu ortalama telefonun tüm
+eksenlerindeki ivme ölçüsü olacaktýr, sonuç üç boyutlu bir vektör. Vektörün
+iþaretini tersine çevirirsek (yavaþlama yönünün tersi) bu bize yürüyüþ
+yönünü verecektir. Tekrar vurgulayalým, negatiflik, pozitiflik, sýfýr geçiþ
+irdelemeleri birleþtirilmiþ ivme verisinde, aranan bölge bulununca o
+bölgedeki ortalama üç eksendeki ivme verisinde hesaplanýr.
+
+Alttaki kodda bizim [5]'teki uygulama {\em Steps}'i kullanarak
+kaydettiðimiz verilerle yürüyüþ yönü hesabýný görüyoruz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, health
+import scipy.linalg as lin
+
+dir = './data/pots1/'
+dfacc = pd.read_csv(dir + 'lacc.txt',header=None,sep='\s+')
+fr=100; to=250
+dfacc = np.array(dfacc)[fr:to]
+t = dfacc[:,0] / 1e9
+ax = dfacc[:,1]
+ay = dfacc[:,2]
+az = dfacc[:,3]
+data = np.abs(ax) + np.abs(ay) + np.abs(az)
+
+sample_rate = 25.0 # orneklem orani
+cutoff = 5.0 # kac Hz yukarisini eleyelim
+threshold = 0.1 # esik degeri
+order=4 # butterworth filtresinin derecesi
+# sallanis bolumunu kac kesite bolelim (ki ilgilendigimiz son kesit). 
+# [1]'e gore 4, altta 8 parcaya boluyoruz.
+stride_fraction = 1.0/8.0 
+
+# Tum eksenlerdeki degerleri pozitifle ve topla
+data = np.abs(ax) + np.abs(ay) + np.abs(az)
+
+# ortalamayi cikar
+data -= np.mean(data)
+
+# Veri uzerinde alcak geciren (low-pass) Butterworth filtre islet,
+# esik noktasi  5 Hz. Bu cok alcak bir deger degil, Huseyin Bolt bile 
+# saniyede 5 adimdan fazla atmiyordur herhalde
+filtered = health.butter_lowpass_filter(data, sample_rate, cutoff, order)
+
+# Pozitiften negatife gecis noktalarini bul
+transitions = health.crossings_nonzero_pos2neg(filtered)
+
+f=plt.figure()
+plt.plot(filtered)
+plt.plot(transitions,filtered[transitions],'rd')
+plt.savefig('compscieng_app40walk_09.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app40walk_09.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+strike_indices_smooth = []
+filter_threshold = np.abs(threshold * np.max(filtered))
+for i in range(1, np.size(transitions)):
+    segment = range(transitions[i-1], transitions[i])
+    imax = np.argmax(filtered[segment])
+    if filtered[segment[imax]] > filter_threshold:
+        strike_indices_smooth.append(segment[imax])
+
+f=plt.figure()
+plt.plot(filtered)
+plt.plot(strike_indices_smooth,filtered[strike_indices_smooth],'rd')
+plt.plot(transitions,filtered[transitions],'gx')
+plt.savefig('compscieng_app40walk_10.png')
+
+# Tepe noktalari arasinda kac veri noktasi oldugunu FFT'nin reel kismini 
+# kullanarak hesapla
+interpeak = health.compute_interpeak(data, sample_rate)
+decel = np.int(interpeak / 2)
+
+# Puruzlestirilmis verinin maksimum noktalarina yakin olan maksimum
+# noktalarini bul
+strike_indices = []
+for ismooth in strike_indices_smooth:
+    istrike = np.argmax(data[ismooth - decel:ismooth + decel])
+    istrike = istrike + ismooth - decel
+    strike_indices.append(istrike)
+
+strikes = np.asarray(strike_indices)
+strikes -= strikes[0]
+strikes = strikes / sample_rate
+
+f=plt.figure()
+plt.plot(data)
+plt.plot(strike_indices,data[strike_indices],'rd')
+plt.savefig('compscieng_app40walk_11.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app40walk_10.png}
+
+\includegraphics[width=20em]{compscieng_app40walk_11.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+decel = np.int(np.round(stride_fraction * interpeak))
+
+# ters ivmenin oldugu bolgede ortalama al, sonuc uc boyutlu vektor
+vectors = []
+for ipeak in strike_indices:
+    decel_vectors = np.asarray([[ax[i], ay[i], az[i]]
+                                for i in range(ipeak - decel, ipeak)])
+    vectors.append(np.mean(decel_vectors, axis=0))
+
+# ve isareti tersine cevir
+direction = -1 * np.mean(vectors, axis=0)
+
+# Birim vektor haline getir / normalize et
+direction /= np.sqrt(direction.dot(direction))
+
+print u'yürüyüþ yönü', direction
+\end{minted}
+
+\begin{verbatim}
+yürüyüþ yönü [ 0.24212494 -0.25265038  0.93677281]
+\end{verbatim}
+
+Pusula
+
+Yürüyüþ yönünü telefon eksenleri bazlý saptadýk, peki bu yön dünyada nereyi
+gösteriyor? Pusulayý kullabiliriz, cep telefonlarý pusula algýlayýcýsý ile
+kuzey manyetik etkisinin telefon eksenlerine ne kadar etki ettiðini
+kaydedebiliyor, yani bu üç eksenden alýnan üç veri noktasý bir vektör
+olarak telefon kordinat sisteminde kuzeyin neresi olduðuna iþaret
+edecektir.
+
+Son durum þöyle, bir telefonun standart elde tutuluþ tarzýný baz alalým, ve
+iki örnek vektör alttaki gibi olsun,
+
+\includegraphics[width=15em]{compscieng_app40walk_14.png}
+
+Güzel, þimdi pusula ve yürüyüþ vektörlerini kullanarak kuzeye göre gidiþ
+yönünü bulalým. Üstteki vektörlerin üç boyutlu olduðuna dikkat, eðer
+yürüyüþ yönü ve kuzey vektörü arasýnda direk açý hesaplamaya uðraþsak,
+diyelim biri çok yukarýda diðeri çok aþaðýda ama yeryüzü bazýnda doðu-batý
+temelli çok az farklý olan iki vektör arasýnda çok büyük açý ortaya
+çýkabilirdi. Bize aslýnda gereken sadece kuzeye göre nasýl hareket
+ettiðimizi verecek ``yataysal'' bir açý. Þimdi iþimizi kolaylaþtýracak bir
+yeni kavramý daha kullanabiliriz: yerçekim vektörü. 
+
+Yerçekim ivmeölçerler tarafýndan sürekli kaydedilir, yerçekimi müthiþ bir
+kuvvettir, 9.8 $m/s^2$ ile sürekli üzerimizde etkisi var. Bunun iyi tarafý
+telefonlar bu kuvveti, ve onun yönünü bir vektör olarak güvenilir bir
+þekilde hesaplayabilirler. Hatta Android'in bu vektörü ivme verisinden
+çýkartan bir ``türevsel algýlayýcýsý'' bile var. Yerçekim vektör
+algýlayýcýsý (gravity vector sensor) hýzlý bir þekilde bu hesabý
+veriyor. Telefon hangi konumda olursa olsun yerçekimin, yine telefon
+kordinatlarýna göre, hangi yönde olduðunu gösteriyor.
+
+Yerçekim vektörünün faydasý þurada: bu vektörün normal olduðu düzlemi hayal
+edersek, bu üzerinde durduðumuz yeryüzeyi olacaktýr! Ve, eðer pusula ve
+yürüyüþ yönü vektörlerini bu düzlem üzerine yansýtýrsak, artýk bu iki
+vektör arasýndaki açýyý bulmak çok basittir. Yansýtma için bkz [6]. Açý
+hesabý için iki vektor arasýndaki þu iliþkiyi hatýrlayalým,
+
+$$ \cos \theta = \frac{u \cdot v}{||u||||v|||}$$
+
+Açý için,
+
+$$ \theta = \arccos \frac{u \cdot v}{||u||||v|||}$$
+
+\includegraphics[width=15em]{compscieng_app40walk_15.png}
+\includegraphics[width=20em]{compscieng_app40walk_12.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def proj(u, n):
+    return u - (np.dot(u,n) / np.dot(n,n)) * n
+
+dfmag = pd.read_csv(dir + 'mags.txt',header=None,sep='\s+')
+dfmag = np.array(dfmag)
+dfmag = dfmag[fr:to,1:].mean(axis=0)
+print u'kuzey yönü', dfmag
+
+dfg = pd.read_csv(dir + 'grav.txt',header=None,sep='\s+')
+dfg = np.array(dfg)
+dfg = dfg[fr:to,1:].mean(axis=0)
+print u'yerçekim vektörü', dfg
+
+pmag = proj(dfmag, dfg)
+print u'kuzey vektörü yeryüzeyinde yansýtma sonrasý'
+print pmag
+
+pwdir = proj(direction, dfg)
+pwdir = pwdir / lin.norm(pwdir)
+print u'yürüyüþ yönü yansýtma sonrasý'
+print pwdir
+a = np.arccos(np.dot(pwdir, pmag) / (lin.norm(pwdir)*lin.norm(pmag)))
+print u'Açý', np.rad2deg(a)
+print u'Açý 180 den az mi?', np.dot(dfg, np.cross(pmag, pwdir)) > 0
+\end{minted}
+
+\begin{verbatim}
+kuzey yönü [-41.02575884  16.51051212  -2.29159006]
+yerçekim vektörü [ 0.70329063  3.60535991  9.0586454 ]
+kuzey vektörü yeryüzeyinde yansýtma sonrasý
+[-41.098733    16.13641625  -3.23152448]
+yürüyüþ yönü yansýtma sonrasý
+[ 0.30343773 -0.89316924  0.33192509]
+Açý 129.15898241
+Açý 180 den az mi? True
+\end{verbatim}
+
+Bu yön hakikaten doðru, ölçüm alýrken aþaðý yukarý o yönde yürüyorduk. 
+
+Not: 180 dereden azlýk irdelemesinin mantýðý için bkz [6].
+
+Üstteki kodun kullandýðý yardýmcý kodlar alttadýr,
+
+\inputminted[fontsize=\footnotesize]{python}{health.py}
+
+Görüldüðü gibi bu hesap çok hassas ölçümlere dayanarak yapýlmadý. Yürüyüþ
+yönü için [1] araþtýrmasý veride yürüyüþün en çok iz býraktýðý bölgeye
+odaklanýyor, ve gürültüyü eleyip belli kesitler çýkartarak bir ortalama
+alýyor. Bu saðlam bir hesap. Pusula ölçümleri için de yaklaþým öyle,
+telefondan telefona, markadan markaya göre bir eksendeki ölçüm 20
+mikrotesla yerine 40 mikrotesla gelebilir, fakat bu tür bir fark hesapta
+savrulma yaratacaksa yaklaþýmýmýz saðlam deðil demektir. Fakat hesaplar
+vektörsel, ama ölçümdeki deðiþiklik, hata her ne ise, {\em tutarlý} ise
+vektörün tüm öðelerinde mevcut olacaktýr, ve vektörün yönünde deðiþiklik
+olmayacaktýr. Vektörler, düzlemler, tek açýlar ile iþ yaparak, tek bir
+amaca odaklý algýlayýcýlarýn verisine güvenerek ve onlarý bir araya
+getirerek iþimizi kolaylaþtýrmýþ olduk.
+
+Önemli bir diðer özellik üstteki yaklaþým telefon hangi konumda olursa
+olsun iþlemesi. Bu çok faydalý çünkü telefon cebimizde, çantada herhangi
+bir þekilde duruyor olabilir, fakat þimdiye kadar gördüðümüz tüm vektörleri
+hesapladýðýmýz anda kuzeye referanslý hangi yönde yürüdüðümüzü kolaylýkla
+bulabiliriz.
+
+Kaynaklar
+
+[1] Roy, {\em WalkCompass: Finding Walking Direction Leveraging Smartphone's Inertial Sensors}, 
+    \url{http://scholarcommons.sc.edu/etd/2352/}
+
+[2] Roy, {\em I am a Smartphone and I can Tell my User's Walking Direction}, 
+    \url{http://synrg.csl.illinois.edu/papers/walkcompass.pdf} 
+
+[3] Google, {\em Position Sensors}, 
+    \url{https://developer.android.com/guide/topics/sensors/sensors_position.html}
+
+[4] Daskalov, {\em A Pedometer in the Real World}, 
+    \url{http://www.aosabook.org/en/500L/a-pedometer-in-the-real-world.htm}
+
+[5] Bayramlý, 
+    {\em Algýlayýcý Ölçümleri, Video, Android}, 
+    \url{https://burakbayramli.github.io/dersblog/sk/2017/02/algilayici-olcumleri-video-android.html}
+
+[6] Bayramli, Lineer Cebir, {\em Ders 15}
+
+
+
+\end{document}

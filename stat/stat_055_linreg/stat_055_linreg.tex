@@ -1,0 +1,796 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Lineer Regresyon
+
+Bir hedef deðiþkeninin bir veya daha fazla kaynak deðiþkenine olan
+baðlantýsýný bulmak için en basit yöntemlerden biri bu iliþkinin lineer
+olduðunu kabul etmektir, yani eldeki deðiþkenlerin belli aðýrlýklar ile
+çarpýmýnýn toplamý olarak. Ýlk baþta bilinmeyen bu aðýrlýklarý, ya da
+katsayýlarý bulmak için En Az Kareler (Least Squares) en iyi bilinen
+yöntemlerden biri; En Az Kareler daha önce pek çok deðiþik ders notlarýnda,
+yazýda türetildi. Mesela [7], [8], ya da [9].
+
+Lineer Regresyonun sadece iki deðiþken temelli iþlemek gerekirse, 
+
+$$ Y = \beta_0 + \beta_1 x + \epsilon$$
+
+olabilir. Eðer iki deðiþkenden fazlasý var ise bu bir düzlem uydurulacak
+demektir. Deðiþken $\epsilon$, $N(0,\sigma^2)$ daðýlýmýndan gelen hatadýr
+ve $\sigma$ bilinmez. Eðer veriyi $(x_1,y_1),...(x_n,y_n)$ ikili olarak
+grafiklesek
+
+\includegraphics[height=4cm]{stat_linreg_02.png}
+
+gibi gözükebilirdi, lineer regresyon ile yapmaya çalýþtýðýmýz tüm noktalara
+olabilecek en yakýn düz çizgiyi (üstte görüldüðü gibi) bulmaktýr. 
+
+Bu düz çizgiyi (ki boyutlu ortamda bu çizgi bir hiper düzlem olurdu,
+$\beta_2,\beta_3,..$ gibi daha fazla katsayý gerekirdi), En Az Kareler ile
+bulduktan sonra elimize geçenler katsayý deðerlerinin tahminidir, ki bunlar
+bazý kaynaklarda $\hat{\beta}_0,\hat{\beta}_1$ olarak tanýmlanýr, bu
+notasyon istatistikteki ``tahmin edici (estimator)'' notasyon ile
+uyumlu. Bu tahmin ediciler ile elde edilen $y$'nin kendisi de bir tahmin
+edici haline gelir ve bir düz çizgiyi tanýmlar,
+
+$$ \hat{y} = \hat{\beta}_0 + \hat{\beta}_1x $$
+
+Katsayýlarýn tahmin edicilerinin de daðýlýmý vardýr ve bu daðýlým, ideal
+þartlarda bir normal daðýlýmdýr. Ýspat için bu yazýnýn sonuna bakýnýz. 
+
+Örnek olarak lineer regresyon için tarihte kullanýlan neredeyse ilk veri
+setini seçeceðim. Bu veri çocuklarýn ve onlarýn ebeveynlerinin boy
+uzunluðunu içeren Galton'un 19. yüzyýlda analiz ettiði veri setidir. Hatta
+öyle ki regresyon kelimesinin bile bu problem ile alakasý var, Ýngilizce
+regress kelimesi baþtaki (çoðunlukla daha iyi olmayan) bir hale dönmek
+anlamýnda kullanýlýr, ve problemde çocuklarýn boyunun ebeveyn boyuna ``geri
+döndüðü'' ya da ondan ne kadar etkilendiði incelenmektedir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('galton.csv',sep=',')
+print df.head(4)
+\end{minted}
+
+\begin{verbatim}
+   child  parent
+0   61.7    70.5
+1   61.7    68.5
+2   61.7    65.5
+3   61.7    64.5
+\end{verbatim}
+
+Þimdi regresyonu iþletelim, sadece baðýmsýz tek deðiþken olacak, ebeveyn
+boyu \verb!parent!, hedef deðiþken ise çocuk \verb!child! içinde.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('child ~ parent', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  child   R-squared:                       0.210
+Model:                            OLS   Adj. R-squared:                  0.210
+Method:                 Least Squares   F-statistic:                     246.8
+Date:                Thu, 03 Nov 2016   Prob (F-statistic):           1.73e-49
+Time:                        09:11:04   Log-Likelihood:                -2063.6
+No. Observations:                 928   AIC:                             4131.
+Df Residuals:                     926   BIC:                             4141.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept     23.9415      2.811      8.517      0.000        18.425    29.458
+parent         0.6463      0.041     15.711      0.000         0.566     0.727
+==============================================================================
+Omnibus:                       11.057   Durbin-Watson:                   0.046
+Prob(Omnibus):                  0.004   Jarque-Bera (JB):               10.944
+Skew:                          -0.241   Prob(JB):                      0.00420
+Kurtosis:                       2.775   Cond. No.                     2.61e+03
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 2.61e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print pd.Series(results.resid).describe()
+\end{minted}
+
+\begin{verbatim}
+count    9.280000e+02
+mean     4.484995e-13
+std      2.237339e+00
+min     -7.805016e+00
+25%     -1.366144e+00
+50%      4.869321e-02
+75%      1.633856e+00
+max      5.926437e+00
+dtype: float64
+\end{verbatim}
+
+Bu çýktýda gösterilenler ne anlama gelir? 
+
+1) \verb!coef! altýnda görülen deðerler sýrasýyla $\beta_o,\beta_1$
+tahminleridir, yani $\hat{\beta}_o,\hat{\beta}_1$. Bunlar bulmak istediðimiz
+katsayýlar.  Ýki boyutta olduðumuz için düz bir çizgiden bahsediyoruz, bu
+çizginin $y$ eksenini kestiði yer kesi (intercept) $\hat{\beta}_0$'da ve ebeyne
+(\verb!parent!)  tekabül eden katsayý $\hat{\beta}_1$.
+
+Teorik olarak eðer bir katsayý sýfýr ise bu iþe yaramaz bir katsayýdýr, çünkü
+modele hiçbir þey ``eklemez''.  Fakat Basit En Az Kareler (ordinary least
+squares -OLS-)'in hesapladýðý bir tahmindir nihayetinde ve hiçbir zaman sýfýr
+olmayacaktýr. O zaman soruyu biraz daha deðiþtirmek gerekir: istatistiki olarak
+düþünürsek gerçek katsayýnýn sýfýr olma {\em olasýlýðý} nedir?  Katsayý yanýnda
+görülen $t$ ve $P>|t|$ (diðer ismiyle p-deðeri) bunun için kullanýlýr.
+
+$t$ deðeri bir katsayý için onun tahminini ve standart hatasýna bölerek elde
+edilir. Üstteki çýktýda mesela 23.9415/2.811=8.517. Bu deðer katsayý tahmininin
+veriden veriye ne kadar deðiþik sonuçlar verebileceðini (variability) gösterir,
+ve bir bakýma bu katsayý tahmininin kesinliði (precision) hakkýnda bir
+rapordur. Eðer bir katsayý tahmini, standart hatasýna göre büyük ise (ki bölüm
+bunu gösterir) bu katsayýnýn sýfýr olmadýðýna dair güçlü bir iþaret olarak
+alýnabilir.
+
+Peki ne kadar büyük bir sayý büyük sayýlmalýdýr? Bunun için p-deðerine
+baþvuruyoruz. P-deðerini hesaplamak için t deðeri ve standart hatasýnýn
+daðýlýmýndan bahsetmek lazým.
+
+t deðeri bir rasgele deðiþken olduðu için bir daðýlýmý vardýr, ve bu daðýlým
+Öðrenci t (Student t) daðýlýmýdýr. Sebep þu, t deðerinin kendisi de iki rasgele
+deðiþkeninin bölümüdür, bu deðiþkenlerden biri katsayýnýn kendisidir, ki bu
+deðer nüfustaki ``gerçek'' katsayý etrafýnda normal olarak daðýlmýþ bir rasgele
+deðiþken olarak kabul edilir. Diðeri ise, yani bölen, tahmin edici $S$'týr ki
+bir chi kare rasgele deðiþkenin kareköküdür. Bu bölümün Öðrenci t daðýlýmýna
+sahip olduðu daha önce gösterildi.
+
+Standart hata ise, artýk / kalýntý deðerlerle (residuals) alakalýdýr
+(\verb!results.resid! içinde), ve bu deðerler model uydurulduktan sonra o modeli
+kullanarak gerçek veriye ne kadar uzak düþtüðümüzü gösterir. Formül olarak her
+veri noktasý $i$ için $r_i = y_i - \beta_1x_i - \beta_o$. Her katsayý için de
+ayrý ayrý kalýntý hesaplanabilir.
+
+Ýdeal durumda, yani modelin doðru, veriye uyduðu durumda artýklarýn
+mükemmel bir Normal daðýlýma sahip olmasý gerekir, çünkü veri içindeki tüm
+örüntü, kalýp model tarafýndan ``bulunmuþtur'' ve geri kalanlar gürültüdür
+(gürültü tabii ki Normal daðýlýmda). Ýdeal ortamda OLS algoritmasýnýn,
+matematiksel olarak, ortalamasý (mean) sýfýr olan artýklar üretmesi
+garantidir. Bir diðer varsayým uyduralan deðiþkenlerin katsayýlarýnýn
+onlarýn ``gerçek'' deðerleri etrafýnda merkezlenen bir Normal daðýlýma
+sahip olduðudur (ispat için [10] yazýsýnýn sonuna bakýlabilir). Bu
+normallik önemli çünkü katsayý tahmini ile standart hatayý bölünce baþka
+bir Öðrenci t daðýlýmý ortaya çýkacak.
+
+Kalýntýlarýn normalliði QQ grafiði ile kontrol edilebilir, bkz [11],
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.api as sm
+sm.qqplot(results.resid)
+plt.savefig('stat_linreg_01.png')
+\end{minted}
+
+\includegraphics[height=4cm]{stat_linreg_01.png}
+
+Oldukça düz bir çizgi, uyum baþarýlý demek ki..
+
+Þimdi, katsayý için olan kalýntý deðerlerinin karesini alýp toplarsak ve
+karekökü alýrsak, bu rasgele deðiþkenin Chi Kare (Chi Square) olarak
+daðýldýðý bilinir, ve yine bilinir ki standart normal rasgele deðiþken,
+bolu, chi kare karekökü bize bir Öðrenci t daðýlýmýný verir, mesela
+
+$$ t = \frac{Z}{\sqrt{V / m}} = t_m$$
+
+serbestlik derecesi $m$ olan bir Öðrenci t rasgele deðiþkenidir. 
+
+Öðrenci t'den p-deðeri üretmek için t deðerinin sýfýrdan ne kadar uzaða düþtüðü
+bir Öðrenci t olasýlýk hesabýna dönüþtürülür. Önce katsayýnýn tam deðeri
+(absolute value) alýnýr, eksileri artý yaparýz, çünkü sýfýrdan uzaklýk ile
+ilgileniyoruz sadece ve Öðrenci t daðýlýmý simetriktir, sonra bu deðer $t_m$
+daðýlýmý üzerinden bir olasýlýk hesabýna dönüþtürülür. Yani ``katsayý / standart
+hata bir $t_m$ ile daðýlmýþ ise, elde edilen bölümün o daðýlýmdan gelme
+olasýlýðý nedir?'' gibi bir soru. Olasýlýk hesabý yoðunluk fonksiyonu üzerinde
+bir alan hesabýdýr, t deðeri 2 ise ve $t_5$ için bu alan hesabý þöyle,
+
+\includegraphics[height=6cm]{stat_linreg_03.png}
+
+Ayrýca bu olasýlýk sonucu sýfýr ile karþýlaþtýrmak kolay olsun diye 1'den
+çýkartýlýr ve 2 ile çarpýlýr, istatistiðin böylece iki taraflý (two-sided)
+olduðu belirtilir. $m$, veri nokta sayýsý, eksi katsayý sayýsý, artý bir olarak
+hesaplanýyor. Eðer sonuç 0.05'ten küçük ise bu iyiye iþarettir, 0.05'ten büyük
+olan deðerler iyi deðildir. Galton örneðinde $\hat{\beta_0}$ için,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import t
+print 2*(1-t(927).cdf(np.abs(8.517)))
+\end{minted}
+
+\begin{verbatim}
+0.0
+\end{verbatim}
+
+Üstteki sonuç 0.0 deðeri çok iyi. Demek ki bu katsayý önemli (significant).
+
+2) Artýklarda sýfýrdan sapma, herhangi bir yöne doðru yamukluk (skew) OLS
+uyumsuzluðunun iþareti olabilir, üstte artýklar üzerinde \verb!describe!
+çaðrýsý ile medyaný (\%50 noktasý) hesaplattýk, bu deðerin 0.04 ile sýfýrdan
+çok az saða doðru saptýðýný görüyoruz. \%25, \%75 bölgelerinin iþaretlerine
+bakmadan tam (absolute) deðerlerine bakalým, 1.36 ve 1.63, çok az
+farklýlar. Ýdealde hiç fark olmamasýný isteriz çünkü normal daðýlým
+simetriktir, her iki tarafýnda da bu bölgelerin yakýn deðerde olmasýný
+bekleriz. Fakat bu deðerler alarm yaratacak nitelikte deðil.
+
+Artýklarýn minimum, maksimum (\verb!min,max!) deðerleri verideki ekstrem, aykýrý
+deðerlere (outlier) dair bir iþaret olabilir.
+
+3) $R^2$, ya da \verb!R-squared!, modelin kalitesiyle alakalýdýr, ne kadar
+büyükse o kadar iyidir. Matematiksel olarak bu deðer $y$'nin deðiþiminin /
+varyansýnýn oran olarak ne kadarýnýn regresyon modeli tarafýndan
+``açýklanabildiðini'' belirtir. Üstteki örnekte $R^2=0.21$ ise model varyansýn
+yüzde 21'ini açýklýyor. Ya da ``bir çocuðun boyunun yüzde 21'i ebeveyn boyu ile
+açýklanabilir'' sözü de söylenebilir. Geri kalan 0.75'lik yani yüzde 75'lik
+``açýklanamayan'' kýsmýn deðiþik sebepleri olabilir; belki hesaba katmadýðýmýz
+deðiþkenler vardýr, ya da örnekleme prosedüründe hatalar yapýlmýþtýr, ya da
+lineerlik bu probleme uygun deðildir, vs.
+
+Tavsiyemiz düz $R^2$ yerine OLS çýktýsýnda görülen ``düzeltilmiþ $R^2$'' yani
+\verb!Adj. R-squared! bilgisinin kullanýlmasýdýr, çünkü bu bilgi modeldeki
+deðiþken sayýsýný da hesaba katar ve daha iyi bir ölçüttür.
+
+4) F istatistiði: Bu istatistik tüm modelin önemli mi önemsiz mi olduðunu
+irdeler. Eðer modelde sýfýr olmayan en az bir katsayý var ise model önemlidir
+(herhangi bir $i$ için $\beta_i \ne 0$). Eðer tüm katsayýlar sýfýr ise model
+önemsizdir ($\beta_0=\beta_1,\dots,\beta_n=0$). Örnekte
+
+\begin{minted}[fontsize=\footnotesize]{python}
+... F-statistic:                     246.8
+... Prob (F-statistic):           1.73e-49
+\end{minted}
+
+\verb!Prob (F-statistic)! bir p-deðeri, ve bu deðer 0.05'ten küçük ise model
+büyük bir ihtimalle önemlidir, eðer 0.05'ten büyük ise büyük ihtimalle önemli
+deðildir. Üstteki p-deðeri 1.73e-49 gösteriyor, çok ufak bir deðer, yani bu iyi.
+
+Not: Çoðu kiþi OLS çýktýsýnda ilk önce $R^2$'ye bakar, fakat bilgili
+istatistikçi F'e bakar, çünkü bir model önemli deðilse, geri kalan hiçbir
+ölçütün önemi yoktur.
+
+Nihai analiz olarak bu veride \verb!parent! katsayýsýnýn pozitif olan deðerine
+bakarak çocuk ve ebeveyn boyu arasýnda bir baðlantý olduðunu söyleyebiliriz.
+
+Basamaklý Regresyon (Stepwise Regression)
+
+Eðer elimizde çok fazla deðiþken var ise, bu deðiþkenlerden hangilerinin en iyi
+olduðunu seçmek oldukça zor olabilir. Önemlilik sayýlarý burada biraz yardýmcý
+olabilir, fakat deðiþkenlerin eklenip, çýkartýlmasý regresyonun tamamýný
+etkilediði için deneme / yanýlma ile ekleme / çýkartma iþleminin yapýlmasý
+gerekebilir, ki bu iþlemi elle yapmak külfetli olur. Acaba bu yöntemi otomize
+edemez miyiz?
+
+R dilindeki \verb!lm!'in \verb!step! adlý özelliði burada yardýmcý
+olabilir. Önce yapay bir veri üretelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+n = 100
+df = pd.DataFrame()
+np.random.seed(10)
+df['x1'] = np.random.normal(size=n)
+df['x2'] = np.random.normal(size=n)
+df['x3'] = np.random.normal(size=n)
+df['x4'] = np.random.normal(size=n)
+df['y'] = 10 + -100*df['x1'] +  75*df['x3'] + np.random.normal(size=n)
+\end{minted}
+
+Yapay veride farkedileceði üzere \verb!x2,x4! modele eklenmedi bile. Bu
+deðiþkenler önemsiz, ürettiðimiz için biz bunu biliyoruz. Bakalým regresyon bunu
+keþfedecek mi? Þimdi tüm deðiþkenlerle bir OLS yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%load_ext rpy2.ipython
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%R -i df
+%R fullmodel <- lm(y~x1+x2+x3+x4,data=df)
+%R -o res res = summary(fullmodel)
+print res
+\end{minted}
+
+\begin{verbatim}
+
+Call:
+lm(formula = y ~ x1 + x2 + x3 + x4, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-3.15789 -0.63251 -0.01537  0.58051  2.30127 
+
+Coefficients:
+             Estimate Std. Error   t value Pr(>|t|)    
+(Intercept)   9.94953    0.09378   106.098   <2e-16 ***
+x1          -99.95333    0.09686 -1031.975   <2e-16 ***
+x2           -0.04103    0.09500    -0.432    0.667    
+x3           75.14720    0.10240   733.851   <2e-16 ***
+x4            0.04863    0.10015     0.486    0.628    
+---
+
+Residual standard error: 0.9292 on 95 degrees of freedom
+Multiple R-squared:  0.9999,	Adjusted R-squared:  0.9999 
+F-statistic: 4.23e+05 on 4 and 95 DF,  p-value: < 2.2e-16
+
+
+\end{verbatim}
+
+Görüldüðü gibi daha baþtan \verb!x2,x4! önemsiz bulundu. Ama daha karmaþýk bir
+modelde bu o kadar rahat bulunmayabilirdi. Þimdi \verb!step! ile tam modelden bu
+deðiþkenler çekip çýkartýlabiliyor mu ona bakacaðýz.
+
+R dilinde basamaklý regresyon iki þekilde iþler. Ya tam modelden geriye
+gidersiniz yani tam modelden ise yaramayan deðiþkenleri atarsýnýz, ya da en baz
+(boþ) modelden baþlayýp ileri gidersiniz yani ekleye ekleye en iyi deðiþkenlere
+eriþmeye uðraþýrsýnýz. Ýlk önce eliminasyonu görelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%R reducedmodel <- step(fullmodel, direction="backward")
+%R -o resred resred<-summary(reducedmodel)
+print resred
+\end{minted}
+
+\begin{verbatim}
+
+Call:
+lm(formula = y ~ x1 + x3, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1667 -0.6078 -0.0256  0.5732  2.3592 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   9.95039    0.09251   107.6   <2e-16 ***
+x1          -99.95181    0.09540 -1047.7   <2e-16 ***
+x3           75.14514    0.10101   744.0   <2e-16 ***
+---
+
+Residual standard error: 0.9217 on 97 degrees of freedom
+Multiple R-squared:  0.9999,	Adjusted R-squared:  0.9999 
+F-statistic: 8.599e+05 on 2 and 97 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+Doðru sonuçlar bulundu. Bu yöntem fena deðildir, ama bazen o kadar çok deðiþken
+vardýr ki tam modelle baþlamak iyi bir fikir olmayabilir, o zaman boþ baþlayýp
+ileri gitmek daha mantýklý olabilir. Boþ modelde sadece \verb!y ~ 1! olacak,
+biraz garip gelebilir, çünkü hiç deðiþken yok (ki bu durumda uydurulan tüm
+deðiþkenler sadece $y$'nin ortalamasýdýr). Neyse, ileri giden modelde
+\verb!step!'e hangi deðiþkenlerin aday / potansiyel deðiþken olduðunu belirtmek
+gerekir, bunu \verb!scope! ile yaparýz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%R minmodel <- lm(y ~ 1,data=df)
+%R fwd <- step(minmodel, direction="forward", scope = ( ~ x1 + x2 + x3 + x4))
+%R -o fwdres fwdres <- summary(fwd)
+print fwdres
+\end{minted}
+
+\begin{verbatim}
+
+Call:
+lm(formula = y ~ x1 + x3, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1667 -0.6078 -0.0256  0.5732  2.3592 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   9.95039    0.09251   107.6   <2e-16 ***
+x1          -99.95181    0.09540 -1047.7   <2e-16 ***
+x3           75.14514    0.10101   744.0   <2e-16 ***
+---
+
+Residual standard error: 0.9217 on 97 degrees of freedom
+Multiple R-squared:  0.9999,	Adjusted R-squared:  0.9999 
+F-statistic: 8.599e+05 on 2 and 97 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+Yine ayný sonuca geldik. Tabii bu çok basit bir yapay veri, o yüzden ayný yere
+gelmiþ olmamýz þaþýrtýcý deðil. Gerçek problemlerde geriye ve ileri giden
+modellerin ikisini de deneyip sonuçlarý karþýlaþtýrmak iyi oluyor. Sonuçlar
+þaþýrtýcý olabilir.
+
+Bir diðer tavsiye basamaklý regresyonu her derda deva bir yöntem olarak
+görmemek, çünkü üstteki çýktýlara göre sihirli bir þekilde en kullanýþlý alt
+kümeyi buluveriyor, vs, fakat bu metot, deðiþkenleri iyi tanýyan birisi
+tarafýndan dikkatli bir þekilde alt kümenin elenip, seçilerek bulunmasý yerine
+geçemez. Bunu özellikle belirtiyoruz, çünkü bazýlarýnýn aklýna þöyle bir þey
+gelebilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+%R full.model <- lm(y ~ (x1 + x2 + x3 + x4)^4)
+%R reduced.model <- step(full.model, direction="backward")
+\end{minted}
+
+Üstte görülen \verb!^4! kullanýmý dört deðiþken arasýndaki {\em tüm mümkün}
+etkileþimleri (interaction) ortaya çýkartýr, yani
+\verb!x1:x2,x1:x2:x3:x4,x3:x4,..!  gibi ve bunlarýn tamamýný basamaklý
+regresyona sokar, çünkü bu cinliðe göre nasýlsa eliminasyon metotu ise yaramayan
+deðiþkenleri atacaktýr (!). Bu metot iyi iþlemeyecektir, çoðu etkileþimin hiçbir
+anlamý yoktur, \verb!step!  fonksiyonu herhalde çok fazla seçenek arasýnda
+boðulur, sonuçta elimizde bir sürü ise yaramaz deðiþken kalacaktýr.
+
+Soru
+
+Diyelim ki elimde bir veri seti var ve üzerinde OLS uyguladým, sonuçlara
+baktým. Eðer bu veri setini alýp, kendisine eklersem, yani veriyi iki katýna
+çýkartýrsam, ilk iþlettiðim OLS'teki katsayýlara, ve standart hataya ne olur?
+
+Cevap 
+
+Dikkat, bu soru bir mülakat sorusudur! :) Düþünelim, sezgisel bir þekilde, 2
+boyutta, uydurulan tek çizginin altýnda ve üstünde yine ayný verilerin bir kez
+daha tekrarlanacaðýný farkederiz, ki bu çizginin yerini deðiþtirmezdi. Yani
+katsayýlar ayný kalýrdý. Fakat standart sapmaya ne olurdu? Artýklardan
+baþlayalým,
+
+$$ r_i = y_i - \beta_0 + \beta_1x_i $$
+
+Veriyi ikiye katlayýnca, 
+
+$$ 2y_i - 2\beta_0 + 2\beta_1x_i \Rightarrow 2r_i $$
+
+Standart hata hesabý, kolaylýk için $n-1$ yerine $n$, ve $C = r_i^2$,
+
+$$ \sqrt{\frac{\sum_i (2r_i)^2}{2n}} =
+\sqrt{\frac{4 \sum_i r_i^2}{2n}}  = 
+\sqrt{\frac{4 C}{2n}}  
+$$
+
+Eski veri seti için ayný hesap $\sqrt{C/n}$. Ýki tarafta da karekök var, sadece
+karekök içine bakalým,
+
+$$  
+\frac{C}{n} \quad ? \quad \frac{4 C}{2n}
+$$
+
+Aradaki iliþki nedir? Eðer veriyi ikiye katlarsak $C$ 4 katýna çýkýyor, ama
+herhangi bir $n > 2$ için, $2n$ bu büyümeyi geçer, ve saðdaki büyüklük soldakina
+nazaran küçülür.
+
+$$  
+\frac{C}{n} \quad > \quad \frac{4 C}{2n}, \qquad n>2 \textrm{ için }
+$$
+
+Demek ki yeni veri setinde standard hata küçülür. Eðer bu deðer küçülürse,
+katsayýlara ait olan standart hatalar da, ki onlar biraraya gelerek standart
+hatayý oluþturacaklar, küçülecektir. Standart hatanýn küçülmesi aslýnda
+þaþýrtýcý olmamalý, ayný yönde daha fazla veri alýnca elimizdeki katsayýlarýndan
+daha ``emin'' hale geldik. Bu iyi bir þey olarak görülebilirdi belki, ama bu
+durumun modelin geri kalaný üzerindeki etkilerini þimdi düþünelim. Eðer katsayý
+ayný kalýr, hata küçülürse katsayý / hata olarak hesaplanan t deðeri buyur. Daha
+büyüyen t deðeri daha küçülen p-deðeri demektir! Yani veriyi ikiye katlayýnca
+birden bire önemsiz olan ($>0.05$) bir deðiþken, önemli hale gelebilir. Altta
+örneðini görüyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import statsmodels.formula.api as smf
+results = smf.ols('y~x1+x2+x3+x4', data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       1.000
+Model:                            OLS   Adj. R-squared:                  1.000
+Method:                 Least Squares   F-statistic:                 4.230e+05
+Date:                Sat, 14 Mar 2015   Prob (F-statistic):          5.97e-201
+Time:                        15:56:03   Log-Likelihood:                -131.99
+No. Observations:                 100   AIC:                             274.0
+Df Residuals:                      95   BIC:                             287.0
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+Intercept      9.9495      0.094    106.098      0.000         9.763    10.136
+x1           -99.9533      0.097  -1031.975      0.000      -100.146   -99.761
+x2            -0.0410      0.095     -0.432      0.667        -0.230     0.148
+x3            75.1472      0.102    733.851      0.000        74.944    75.350
+x4             0.0486      0.100      0.486      0.628        -0.150     0.247
+==============================================================================
+Omnibus:                        3.126   Durbin-Watson:                   2.267
+Prob(Omnibus):                  0.210   Jarque-Bera (JB):                2.795
+Skew:                          -0.191   Prob(JB):                        0.247
+Kurtosis:                       3.724   Cond. No.                         1.26
+==============================================================================
+\end{verbatim}
+
+Veriyi ikiye katlayýp bir daha OLS,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df2 = pd.concat((df,df))
+results = smf.ols('y~x1+x2+x3+x4', data=df2).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       1.000
+Model:                            OLS   Adj. R-squared:                  1.000
+Method:                 Least Squares   F-statistic:                 8.683e+05
+Date:                Sat, 14 Mar 2015   Prob (F-statistic):               0.00
+Time:                        15:56:41   Log-Likelihood:                -263.98
+No. Observations:                 200   AIC:                             538.0
+Df Residuals:                     195   BIC:                             554.4
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+Intercept      9.9495      0.065    152.006      0.000         9.820    10.079
+x1           -99.9533      0.068  -1478.512      0.000      -100.087   -99.820
+x2            -0.0410      0.066     -0.619      0.537        -0.172     0.090
+x3            75.1472      0.071   1051.389      0.000        75.006    75.288
+x4             0.0486      0.070      0.696      0.487        -0.089     0.186
+==============================================================================
+Omnibus:                        4.922   Durbin-Watson:                   2.274
+Prob(Omnibus):                  0.085   Jarque-Bera (JB):                5.589
+Skew:                          -0.191   Prob(JB):                       0.0611
+Kurtosis:                       3.724   Cond. No.                         1.26
+==============================================================================
+\end{verbatim}
+
+Görüldüðü gibi \verb!x4! artýk $<0.05$ altýnda! 
+
+OLS'in bu tür nüanslarýný bilmek iyi olur. Eðer veride tekrar varsa, herhangi
+bir sebeple, tekrarlayan verileri çýkartmak belki de mantýklý olacaktýr.
+
+ABD Baþkanlýk Yarýþýný Tahmin Etmek
+
+ABD baþkanlýk yarýþlarýnýn oldukça tahmin edilebilir olduðu uzunca süredir iddia
+edilmektedir. Bu alanda pek çok model var, Andrew Gelman'ýn oldukça çetrefil,
+MCMC kullanan modelinden [4] (ki bunun için baþkasýnýn yazdýðý kod [5]'te
+bulunabilir), ya da daha öz, basit bir metot [3] mevcuttur. En basit ve etkili
+yöntem {\em Deðiþim Zamaný} ({\em Time for Change}) modeli, bu modele göre
+baþkanlýk yarýþýnýn olduðu Haziran ayý itibariyle ekonomik büyüme yüzdesi
+(\verb!gdp_growth!), mevcut baþkanýn net destek oraný (\verb!net_approval!, ki
+bu rakam destek yüzdesinden desteklemeyen yüzdesi çýkartýlarak hesaplanýr) ve o
+anki baþkanýnýn partisinin, 2 dönem ya da daha fazladýr Beyaz Ev'de olup
+olmadýðý bilgisi 1/0 deðeri ile kodlanarak (\verb!two_terms)!  lineer regresyona
+verilir ve hedef deðiþken olarak, yönetimi elinde tutan partinin ülke genelinde
+tüm oylarýn (popular vote) yüzde kaç alacaðý tahmin edilmeye uðraþýlýr.
+
+Örnek olarak Clinton ve Bush I arasýndaki 1992 yarýsýnda Cumhuriyetçi adayýn
+(çünkü o zamanki baþkan Cumhuriyetçi) yüzde kaç oy alacaðý tahmin edilecek,
+\verb!two_terms=1! çünkü iki dönem Cumhuriyetçi Reagan ardýndan bir dönem
+Cumhuriyetçi Bush gelmiþ, Cumhuriyetçiler uzun süredir baþtalar.
+
+Gore / Bush arasýndaki 2000 yýlý yarýsýnda Demokratlarýn yüzdesini tahmin etmeye
+uðraþýyoruz, çünkü baþta Demokrat Clinton var, ve iki dönemdir orada. Net
+popülarite ve büyüme hep o anki baþkan ve onun partisinin performansý ile
+alakalý. Bu regresyonu iþlettiðimizde, sonuçlar þöyle,
+
+\begin{minted}[fontsize=\footnotesize]{python} 
+import statsmodels.formula.api as smf
+import pandas as pd
+df = pd.read_csv('prez.csv')
+print df.head() , '\n'
+regr = 'incumbent_vote ~ gdp_growth + net_approval + two_terms'
+results = smf.ols(regr, data=df).fit()
+print results.summary()
+\end{minted}
+
+\begin{verbatim}
+   year  gdp_growth  net_approval  two_terms  incumbent_vote
+0  2012         1.3          -0.8          0            52.0
+1  2008         1.3         -37.0          1            46.3
+2  2004         2.6          -0.5          0            51.2
+3  2000         8.0          19.5          1            50.3
+4  1996         7.1          15.5          0            54.7 
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         incumbent_vote   R-squared:                       0.901
+Model:                            OLS   Adj. R-squared:                  0.878
+Method:                 Least Squares   F-statistic:                     39.52
+Date:                Fri, 11 Sep 2015   Prob (F-statistic):           8.50e-07
+Time:                        21:57:48   Log-Likelihood:                -32.747
+No. Observations:                  17   AIC:                             73.49
+Df Residuals:                      13   BIC:                             76.83
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+================================================================================
+                   coef    std err          t      P>|t|      [95.0% Conf. Int.]
+--------------------------------------------------------------------------------
+Intercept       51.4363      0.811     63.409      0.000        49.684    53.189
+gdp_growth       0.5799      0.118      4.903      0.000         0.324     0.835
+net_approval     0.0987      0.021      4.764      0.000         0.054     0.143
+two_terms       -4.2983      1.032     -4.164      0.001        -6.528    -2.069
+==============================================================================
+Omnibus:                        0.333   Durbin-Watson:                   1.545
+Prob(Omnibus):                  0.847   Jarque-Bera (JB):                0.484
+Skew:                          -0.169   Prob(JB):                        0.785
+Kurtosis:                       2.246   Cond. No.                         71.4
+==============================================================================
+\end{verbatim}
+
+Ýnanýlmaz bir baþarý, \verb!Prob (F-statistic)! deðeri neredeyse sýfýr,
+\verb!Adj. R-squared! deðeri yüzde 80'den daha fazla, tüm deðiþkenler
+istatistiki olarak önemli (\verb!P>|t|! deðerleri 0.05'ten küçük).
+
+Acaba bu modeli kullanarak geçmiþteki yarýþlarý ``tahmin etsek'' sonuç ne olurdu
+diye merak ediyoruz, bunun için tahmin edeceðimiz senenin veri noktasýný
+dýþarýda býrakarak (out-of-sample) regresyon iþletip o seneyi bilmiyormuþ gibi
+yapýp tahmin ediyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def out_of_sample_pred(year):
+    df2 = df[df['year'] != year]
+    results2 = smf.ols(regr, data=df2).fit()
+    conf = results2.conf_int()
+    pred = np.array(df[df['year'] == year])[0][:-1]; pred[0] = 1.
+    return np.dot(pred, conf)
+# o senenin verisinin disarida birakarak gecmisi tahmin et
+print 'bush/clinton'; print out_of_sample_pred(1992)
+print 'gore/bush'; print out_of_sample_pred(2000)
+print 'bush/kerry'; print out_of_sample_pred(2004)
+print 'mccain/obama'; print out_of_sample_pred(2008)
+print 'obama/romney'; print out_of_sample_pred(2012)
+\end{minted}
+
+\begin{verbatim}
+bush/clinton
+[ 43.68758927  52.47911415]
+gore/bush
+[ 48.31291287  60.68132985]
+bush/kerry
+[ 50.66667848  55.79188333]
+mccain/obama
+[ 41.05409775  46.15966954]
+obama/romney
+[ 49.81182614  54.45584122]
+\end{verbatim}
+
+Tahmin hesabýnda deðiþken katsayýlarýnýn \%95 güven aralýklarýný veren
+\verb!conf_int()! çaðrýsýný kullandýk, deðiþkenlerin noktasal deðerlerini
+kullanmadýk, bu þekilde tahmine olan güvenimizi aralýðýn büyüklüðüne bakarak
+görebilmiþ olacaðýz. Dikkat: aslýnda {\em tahminin} güven aralýðýný hesaplamak
+biraz daha ek iþ gerektiriyor, türetilmesi [12] bölümünde.
+
+Þimdi sonuçlara bakalým; Bush / Kerry yarýþý için kesin Bush diyor (çünkü güven
+aralýðýnýn iki ucu da yüzde 50 üstünde), Bush kazandý. McCain / Obama için
+McCain kesin kaybedecek diyor, McCain kaybetti. Obama / Romney yarýþý için Obama
+(neredeyse) kesin kazanacak diyor, Obama kazandý. Tahminler iyi!
+
+Gore / Bush ilginç bir durum, Gore çok, çok daha þanslý, ama Gore
+kaybetti. Fakat bu seçimin ne kadar yakýn olduðunu o zaman yarýsý takip edenler
+hatýrlar, ayrýca, Florida'da bir takým ``þaibeli'' iþlerin (!)  olduðu
+biliniyor, \textbf{ve} model ülke genelinde oyu tahmin etmeye uðraþýyor, ki ülke
+genelinde bakýlýnca Gore daha fazla oy almýþtý. Amerikan sistemine göre
+baþkanlýk seçimleri de eyalet bazýnda hesaplanýr, bir eyalette kazanan tüm
+oylarý alýr, bu sebeple ülke geneli ile eyalet bazý arasýnda uyumsuzluk ortaya
+çýkabiliyor.
+
+Gore / Bush olayýna bir diðer bakýþ açýsý þöyle: oy yüzdesi tahminini
+yüzdenin kendisi için deðil, kazanma / kazanmama için bir sinyal olarak
+kabul etmek, yani popüler oyun kime gittiðine bakmamak, o zaman modelimizin
+Göre / Bush seçimini baþarýsýz tahmin ettiðini kabul etmek lazým. Bu
+þaþýrtýcý deðil aslýnda çünkü 2000'de Bush kazandýðýna kendisi bile
+þaþýrmýþtý. 
+
+2016 senesindeki yarýþta kim kazanacak? Demokratlarýn þansý þöyle (dikkat
+belli bir adaydan bahsetmiyoruz bile); Haziran 2016 itibariyle büyüme 2\%,
+Obama'nýn net popülaritesi sýfýr olduðu durumda (bu deðiþkenlerin ne
+olduðuna o tarihte tekrar bakýlmalý),
+
+\begin{minted}[fontsize=\footnotesize]{python}
+conf = results.conf_int()
+pred = [1., 2.0, 0.0, 1]
+print np.dot(pred, conf), np.dot(pred, results.params)
+\end{minted}
+
+\begin{verbatim}
+[ 43.80446415  52.79105137] 48.2977577583
+\end{verbatim}
+
+Yani Demokrat adayýn kaybetme þansý daha fazla, her ne kadar kesin bir þey
+söylenemezse de, güven aralýðýnýn iki ucu da yüzde 50 altýnda (ya da
+üstünde) deðil, Hillary Clinton'un iþi zor olacaktý, ki kaybetti. Trump
+ülke genelinde oy çoðunluðunu kaybetti, ama eyalet bazýnda kazandý. Demek
+ki model tahminini kazanma sinyali olarak almak daha uygun.
+
+Analiz
+
+Model oldukça basit, 3 deðiþken ile tahmin yapýlýyor, fakat bu basitlik aldatýcý
+olabilir. Modele neyin dahil edildiði yanýnda neyin dahil edilmediði de
+önemlidir, mesela.. ham petrol fiyatý, iþsizlik, seçim yýlýndaki suç oraný,
+iklim vs kullanýlmamýþ, sadece bu 3 deðiþken kullanýlmýþ. Ya da model,
+Cumhuriyetçiler için ayrý, Demokratlar için ayrý bir tahmin üretmiyor, {\em o an
+  baþta hangi parti varsa} onun baþarýsýný tahmin etmeye uðraþýyor. Yani bir
+bakýma iddiasý þu, insanlar aslýnda baþta olan partiye göre oy verirler, bir
+süre sonra (2 dönem ardýndan) onu deðiþtirmeye meyilli olurlar, ve o anda baþta
+olan baþkanýn popülaritesi ve genel bir ekonomik performansýný kullanarak onun
+partisi hakkýnda bir tamam / devam kararýný verirler. Bu tür modelcilik yetenek
+ister. Basitlik zor iþ!
+
+Tahmin edilirliðin yüksekliði ve deðiþkenlerin azlýðý hakkýnda bir diðer yorum;
+bu durum aslýnda o kadar da þaþýrtýcý olmamalý belki de, çünkü baþkanlýk seçimi
+son derece kaba hatlý bir karar, tek bir kiþi / parti hakkýnda karar veriliyor,
+ve doðal olarak seçim için kullanýlan parametreler de oldukça genel. Bir bakýma,
+bu tahmin edilirlik iyi olarak ta görülebilir, stabilite, sakin ortamýn iþareti
+olarak algýlanabilir. ``Vay o taraf ne dedi, bu taraf ne dedi'' gibi faktörlerle
+oylar haldýr huldur inip çýkmýyor, belli genel parametreler ýþýðýnda sonuç ta
+dört ay önceden oldukça belli (baz veri Haziran sonu itibariyle alýnýr, seçim
+Kasým ayýnda).
+
+Model Karþýlaþtýrmak
+
+Bu alanda, mesela gazetelerde, yorumlara rastlanýyor. Bunlardan biri ``mevcut
+baþkanýn (incumbent) ikinci dönem için yarýþa girerse avantajlý olduðu''
+söylemidir, ki üstteki modelin ilk halini keþfeden Abromitz de bunu
+söylemektedir. Bizim referans aldýðýmýz model [6] o söylemi biraz deðiþtirmiþ,
+avantajlý olan yerindeki baþkan deðil, {\em dezavantajlý} olan 2 dönemden fazla
+baþta kalan {\em parti}. Ýnsanlar 2 veya daha dönemden fazla baþta olan partiyi
+görevden almaya meyilli oluyor. Tabii eðer parti yeni baþa gelmiþse, o zaman
+dezavantaj olmadýðý için bazý durumlarda ``ilk dönem baþkan avantajlýymýþ gibi''
+durmuþ olabilir. Þimdi bu faraziyeyi test edelim, hangi model daha doðru?  Yeni
+bir veri setinde bu deðiþikliði test edebiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python} 
+import statsmodels.formula.api as smf
+import pandas as pd
+df = pd.read_csv('prez_incumb.csv')
+regr = 'incumbent_vote ~ gdp_growth + net_approval + incumb_prez'
+results = smf.ols(regr, data=df).fit()
+print results.aic
+\end{minted}
+
+\begin{verbatim}
+84.6742088339
+\end{verbatim}
+
+AIC sonucu arttý, bu modelin daha kötüleþtiði anlamýna gelir. 
+
+Not: Gayri-safi yurtiçi hasýla (GDP) 2. çeyrekteki artýþýna bakýlýyor. Bu
+artýþ bir sene önceye kýyasla deðil (year-over-year) bir önceki çeyreðe
+göre artýþtýr dikkat, ve sonra bu artýþ, yýl ölçeðine çýkartýlýr, $d$
+artýþý diyelim $(1+\d)^4 - 1$ formülü üzerinden. Yani ``her çeyrekte artýþ
+$d$ olsaydý, tüm sene artýþý nereye gelirdi?'' sorusunun cevabý.
+
+Kaynaklar
+
+[1] Teetor, {\em R Cookbook}
+
+[2] The Yhat Blog ,{\em Fitting \& Interpreting Linear Models in R}, \url{http://blog.yhathq.com/posts/r-lm-summary.html}
+
+[3] Abramowitz, {\em Fasten Your Seat Belts: Polarization, Weak Economy Forecast
+Very Close Election}, \url{http://www.centerforpolitics.org/crystalball/articles/abramowitzpolarizationmodel/}
+
+[4] Gelman, A., {\em Bayesian Data Analysis}
+
+[5] Bayramlý, {\em Books Data}, \url{https://github.com/burakbayramli/books/tree/master/Gelman_BDA_ARM/bda/election}
+
+[6] Linzer, {\em R Code}, \url{https://github.com/dlinzer/BayesBARUG/blob/master/Linzer-BayesBARUG.R}
+
+[7] Bayramlý, Çok Deðiþkenli Calculus, {\em Ders 9}
+
+[8] Bayramlý, Lineer Cebir, {\em Ders 15}
+
+[9] Bayramlý, Bilgisayar Bilim, Yapay Zeka, {\em Regresyon, En Az Kareler}
+
+[10] Bayramlý, Istatistik, {\em Tahmin Aralýklarý}
+
+[11] Bayramlý, Istatistik, {\em Güven Aralýklarý, Hipotez Testleri}
+
+[12] Bayramlý, Istatistik, {\em Tahmin Aralýklarý (Prediction Interval)}
+
+\end{document}
+
+
+
+

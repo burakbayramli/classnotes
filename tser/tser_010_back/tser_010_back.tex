@@ -1,0 +1,442 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Geriye Dönük Testler (Backtesting)
+
+Bir stratejiyi tasarladýktan sonra onu piyasada kullanmadan önce geriye dönük
+veri üzerinde testten geçirmek gerekir. Stratejinin baþarýsýný ölçmek için bazý
+kriterler var, Sharpe Oraný, Düþüþ Kalýcýlýðý bu ölçütlerden bazýlarý. 
+
+Sharpe Oraný 
+
+Diyelim ki bir stratejiyi geriye dönük teste tabi tutuyoruz, yani tarihi veri
+üzerinde ileride ne olacaðýný ``bilmiyormuþ gibi'' yapýp alýþverisin
+performansýnýn ne olacaðýný ölçüyoruz. Belli zamanlarda alýnýp satýlan varlýðýn
+tabii ki bir getirisi (return) olacaktýr, getiri eksi de olabilir, yani
+kayýp. Bu getirinin istatistiki olarak önemli (significant) olup olmadýðýný
+anlamak için bazý testler uygulayabiliriz. Diyelim ki herhangi bir zaman
+$t$'deki getiri $R_t$, ve $\mu = E(R_t), \sigma^2=Var(R_t)$ - her $t$ için
+daðýlým ayný ve baðýmsýz (IID). Zaman bir günü temsil ediyor olabilir, ve eðer
+veri bunu doðruluyorsa, getirilerin Gaussian olduðu faraziyesi de
+yapýlabilir. IGE verisi için
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+ige = pd.read_csv('IGE.csv',index_col='Date')
+ige = ige.sort_index()
+ige['Returns'] = ige['Adj Close'].pct_change()
+ige.Returns.hist()
+plt.savefig('tser_back_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_back_01.png}
+
+Varlýðýn ``getirisi'' dedik, üstteki durumda sanki varlýðý en baþta alýp
+elde tutmuþuz gibi düþünüyoruz, bu durumda günlük yüzde deðiþimler o gündeki
+kazanç / kayýp gibi düþünülebiliyor. 
+
+Baþtaki soruya gelelim, getirinin sýfýrdan farklý mý, ve bu farklýlýk
+istatistiki olarak önemli mi?
+
+Sharpe Oraný (Sharpe Ratio) bu noktada devreye girer. SO ``risk bazýnda
+ölçeklenmiþ getiri'' diye adlandýrýlýr bazen, yani birimi oynaklýk (volatility)
+olan getiridir. Birim derken mesela hýzý belirtmek için arabanýn hýzý saatte 60
+km diyebiliyoruz, hýzý saat bazýnda belirtmiþ oluyoruz. Bu demektir ki 1 saat
+geçince alýnan yol 60 kilometredir. SO için benzer durum geçerli, birim risk, o
+zaman SO rakamý ``riskteki yüzde 1'lik deðiþimin getiriye ne kadar etki
+edeceði'' olarak ta görülebilir.
+
+Eðer yýllýk bazda getirilerin standart sapmasý (ki oynaklýðýn tanýmý bu) yüzde
+20 ise ve mesela borsadan / bir senetten / entrumandan yüzde 3'lük bir yýllýk
+getiri bekliyorsak, \%3 / \%20 = 0.15 Sharpe oranýný elde ederiz. Matematiksel
+olarak,
+
+$$ SR = \frac{E(R_t) - R_f}{\sqrt{Var(R_t)}} = \frac{\mu - R_f}{\sigma} $$
+
+$R_f$ ``risksiz yatýrým'' dýr, yatýrým sratejinizin finans edilmesi
+gerekiyor ve bu sebeple para yatýrýmda baðlý tutuluyorsa, risksiz yatýrýmýn
+getirisinin çýkartýlmasý gerekir (çünkü yatýrým yapmayýp risksiz getiri
+elde edebilirdiniz, gerçek getiri riskliden risksizin çýkartýlmýþ hali
+olmalýdýr), ve o zaman test edilen ``artýk getiri (excess return)''
+olacaktýr. Merak ettiðimiz getirimizin risksiz olan getiriye göre
+performansýdýr yani. $\mu,\sigma$ veriden tahmin edilecektir, ki
+$\hat{\mu},\hat{\sigma}$, böylece $SR$ için tahmin edici $\hat{SR}$ olur,
+
+$$ 
+\hat{SR} = \frac{\hat{\mu} - R_f}{\hat{\sigma}} 
+\mlabel{1} 
+$$
+
+Üstteki ifade standardizasyon, Z testine benzemesi raslantý deðil, hatta bu
+benzerlikten özellikle bahsetmemiz lazým; {\em Ýstatistik} notlarýndan
+hatýrlarsak, z-testi, standardizasyon,
+
+$$ Z = \frac{\bar{X} - \mu}{\sigma / \sqrt{n} } $$
+
+Nüfus $\mu$'nun sýfýr olduðunu kabul edersek, ve yeterince büyük örneklem
+$n$ için $\sigma$ yerine $s$ kullanabileceðimiz için,
+
+$$ Z = \frac{\bar{X}}{s / \sqrt{n} } $$
+
+$$ \frac{Z}{\sqrt{n}} = \frac{\bar{X}}{s} $$
+
+(1) ile benzerlik görülüyor, eðer $R_f=0$ alýrsak (hatta almasak bile,
+çünkü $R_f$ bir sabit, ve normal daðýlýmdan normal çýkartýnca sonuç yine
+normal daðýlým olacaktý), o zaman ifadeler daha da benzer. Bu benzerliðin
+verdiði yan bilgi bir iþe yarayacak. Sharpe Oraný tahminini, mesela gün
+seviyesinden yýl seviyesine çýkartmak gerekince (bunu yapmak gerekebilir,
+çünkü farklý periyotlardaki yatýrýmlarýn hepsini yýl seviyesinde getirip
+birbirleri ile karþýlaþtýrmak istenebilir) tecrübesiz heþapçýlar eþitliðin
+sað tarafýný alýp $n$ ile çarpar. Halbuki $\sqrt{n}$ ile çarpmak
+gerekir. Bu yapýlýnca bölendeki $\sqrt{n}$ iptal olacaðý için elde edilen
+$Z$ deðeridir, yani z-testi yapabileceðimiz, istatistiki önemliliðini
+kontrol edebileceðimiz bir deðer!
+
+Bir diðer açýdan gelirsek,  $R_t(q)$ bir $q$ periyodunun tamamýnýn getirisi
+olsun, ki
+
+$$ R_t(q) \equiv R_t + R_{t-1} + ... + R_{t-q+1}  $$
+
+$$ SR(q) = \frac{E(R_t(q)) - R_f(q)}{\sqrt{Var(R_t(q))}} $$
+
+$$ \frac{q(\mu-R_f)}{\sqrt{q} \sigma} $$
+
+$$ = \sqrt{q}SR $$
+
+Altta IGE üzerindeki Sharpe oraný,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print len(ige)
+n = 252 # bir yil, bu kadar ticari gun
+Rf = 0.04 # risksiz getiri yuzde 4
+ige['excessRet'] = ige['Returns'] - Rf/n
+sharpeRatio = np.sqrt(n)*ige['excessRet'].mean() / ige['excessRet'].std()
+print sharpeRatio
+\end{minted}
+
+\begin{verbatim}
+1504
+0.789317538345
+\end{verbatim}
+
+Averajý hesaplarken 252'den fazla veri noktasý kullandýk, niye hala 252'nýn
+karekökü ile çarpýyoruz? Dikkat risksiz getiri çýkartýrken bu çýkartma
+iþlemini $R_f/n$ ile yaptýk, ki $n=252$. Ayrýca bu çarpýmý bir ``daha büyük
+zaman dilimine ölçekleme'' olarak görebiliriz; eldeki verinin tamamýna
+ölçeklemek için veri sayýsý ile çarpabilirdik, eðer yýl bazýna ölçeklemek
+istersek 252 karekökü ile çarpacaðýz. Yani [4, sf. 120], 
+
+$$ \sigma_{sene}^2 = 252 \sigma_{gun}^2 $$
+
+Sharpe oranýný hesaplayýnca alttaki Z skorlarýna göre ne kadar iyi olduðunu
+görebiliriz. Üstteki deðer alttaki deðerlerin herhangi birinden yüksek mi?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import norm
+alpha=0.10; print norm.ppf(1-alpha), alpha
+alpha=0.05; print norm.ppf(1-alpha), alpha
+alpha=0.01; print norm.ppf(1-alpha), alpha
+alpha=0.001; print norm.ppf(1-alpha), alpha
+\end{minted}
+
+\begin{verbatim}
+1.28155156554 0.1
+1.64485362695 0.05
+2.32634787404 0.01
+3.09023230617 0.001
+\end{verbatim}
+
+Deðil. Demek ki istatistiki olarak önemli / büyük bir Sharpe oraný elde
+edemedik. Genel kural olarak bir stratejinin etkili kabul edilmesi için
+1'den büyük Sharpe Oranýna sahip olmasý gerekir. 
+
+Üstteki listedeki soldaki deðerlerle onlarýn \verb!alpha!, yani
+p-deðerlerinin beraber gösterilmiþ olmasýna dikkat, ikisi arasýnda iliþki
+var (aslýnda liste kullanmayýp direk \verb!statsmodels! çaðrýlarý ile
+p-deðerini her Sharpe deðeri için hesaplayabilirdik, bu da ödev olsun),
+p-deðeri sýfýra yakýn ise ``hipotezi reddetmemizi'' saðlar, ki bu problemde
+sýfýr hipotezimiz, yani reddetmek için ezici kanýt elde etmemiz gereken
+þey getirilerin Gaussian'ýnýn sýfýr merkezli olduðu idi, bu iddiayý
+reddedemedik.
+
+Daha direk / basit bir örnek üzerinde görmek gerekirse, mesela hisselerin
+mi, tahvillerin mi getirilerinin kriz zamanýnda daha iyi olacaðýný merak
+ediyoruz. 2008-2012 arasýnda SP\&500 ve 7-10 senelik tahvil fiyatlarýný
+takip eden bir enstrüman (ETF) olan ÝEF getirilerini Sharpe oraný
+ile karþýlaþtýrabiriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+df1 = pd.read_csv("sharpe-spy.csv")
+df2 = pd.read_csv("sharpe-ief.csv")
+
+def sharpe(series):
+   dailyret = series.pct_change()
+   excessRet=dailyret-0.04/252
+   return np.sqrt(252)*np.mean(excessRet)/np.std(excessRet)
+
+print (sharpe(df1['Adj Close']))
+print (sharpe(df2['Adj Close']))
+\end{minted}
+
+\begin{verbatim}
+-0.04718388850111191
+0.5100019269309098
+\end{verbatim}
+
+Sonuca gore tahviller kriz zamaninda daha iyi getiri veriyor.
+
+Düþüþ Kalýcýlýðý (Drawdown)
+
+Bir strateji eðer yakýn geçmiþte para kaybetmiþ ise düþüþte demektir. Ýki
+önemli düþüþ kavramý maksimum düþüþ ve maksimum düþüþ süresi - bu iki ölçüt
+ayrý düþüþleri temsil ediyor olabilirler.
+
+\includegraphics[height=7cm]{tser_back_02.png}
+
+Yatýrýmcýlar için en moral bozucu durumlardan biri budur, uzun süren ve
+içinden çýkalamayan düþüþler. Bu sebeple yatýrým stratejimiz onlardan
+uzak durmaya gayret etmeli, bu sebeple tarihi veriye bakýp bazý düþüþ
+ölçütlerini kestirmeye uðraþýyoruz ki gelecek hakkýnda bir fikir
+edinebilelim. Bunlarý öðrendikten sonra yatýrýmcý kendine þunu da
+sormalýdýr: ``ne kadarlýk düþüþü tolere edebilirim?''. \%20'lik ve 3 ay mý,
+yoksa \%10 ve bir ay mý?  Kullanmayý düþündüðümüz stratejinin geriye dönük
+testinden gelen ölçütleri bu toleransa göre irdelemek gerekir.
+
+Bir önceki örnek IGE varlýðýný alýp tutmak üzere kurulmuþtu. Þimdi bu
+stratejiye bir ek yapalým, IGE aldýðýmýz zaman dengeleme amaçlý olarak SPY
+adlý (Standard's and Poors endeksi üzerinden alým/satým yapýlmasýný
+saðlayan bir ETF üzerinden açýða satýþ yapalým. Bu sebeple SPY getirisi
+çýkartýlýyor, yani getiri ne ise onun etkisi bize tersi olarak gelecek,
+ayrýca ikiye bölüyoruz çünkü sermayemiz iki katýna çýktý.
+
+Düþüþ hesabýnýn kümülatif getiriyi baz aldýðýna dikkat. Yani herhangi bir
+ana kadar elde ettiðimiz biriken getirinin düþüþe geçip geçmediðini kontrol
+ediyoruz.
+
+\inputminted[fontsize=\footnotesize]{python}{dd.py}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import dd, pandas as pd
+spy = pd.read_csv('SPY.csv',index_col='Date')
+spy = spy.sort_index()
+spy['Returns'] = spy['Adj Close'].pct_change()
+spy['netRet']=(ige['Returns'] - spy['Returns'])/2.
+spy['cumret']=(1+spy['netRet']).cumprod()-1.0
+
+n = 252 
+sharpeRatio = np.sqrt(n)*spy['netRet'].mean() / spy['netRet'].std()
+print 'SR', sharpeRatio
+print 'Dusus', dd.calculateMaxDD(spy['cumret'])
+\end{minted}
+
+\begin{verbatim}
+SR 0.783681100181
+Dusus (-0.095292680472086833, 497.0)
+\end{verbatim}
+
+Bu stratejinin Sharpe oraný 0.78 çýktý. Maksimum düþüþ \%10 civarý,
+maksimum düþüþ süresi 497 gün! Oldukça uzun bir süre. SO zaten çok yüksek
+deðil.
+
+Stratejiler Kodlamak
+
+Strateji kodlarken günlük bazda sinyal üretmek, ve pozisyon hesaplama yapmak
+gerekiyor. Sinyal üretmek demek mesela al için +1 sat için -1 üretmek demek
+olabilir. Pozisyon üretmek ise bu sinyali alýp para miktarý bazlý ne kadar iþlem
+yapýldýðýdýr. Eðer +1 sinyali var ise ve ertesi günün fiyatý 1200 lira ise, +1200
+liralýk pozisyona girmiþim demektir.
+
+Kumulatif getiriyi hesaplamak için pozisyonlarý günlük getiri yüzdesine çevirmek
+en iyisi, böylece günlük getiri $r_i$'leri $1+r_i$ ile birbiri ile çarparak ele
+geçen kumulatif miktarý hesaplayabiliriz.
+
+Dikkat, sinyali hesapladýktan sonra bir ileri kaydýrýyoruz ki bir önceki günün
+sinyali bir sonraki günün alýmýna yansýsýn.
+
+Alttaki strateji basit bir momentum stratejisi, bu konuda daha fazla detay {\em
+  Momentum Stratejileri} bölümünde.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd, zipfile
+import numpy as np, dd
+
+with zipfile.ZipFile('amzn.zip', 'r') as z:
+    px = pd.read_csv(z.open('amzn.csv'),index_col=0,parse_dates=True)
+
+px = px[px.index < '27-01-2016']
+
+signals = pd.DataFrame(index=px.index) 
+signals['signal'] = 0 
+
+short_ma = pd.rolling_mean(px['Adj Close'], 40, min_periods=1) 
+long_ma = pd.rolling_mean(px['Adj Close'], 100, min_periods=1) 
+signals['signal'] = np.where(short_ma > long_ma, 1, 0) 
+px['signal'] = signals['signal'].shift(1) 
+px['ret'] = px['Adj Close'].pct_change() * px['signal']
+ret = px.ret.dropna()
+cumret=np.cumprod(1+ret)-1
+print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
+print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print 'Dusus', dd.calculateMaxDD(cumret)
+\end{minted}
+
+\begin{verbatim}
+APR 0.150911691294
+Sharpe 0.646084214921
+Dusus (-0.26067046806090866, 374.0)
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cumret.plot()
+plt.savefig('tser_back_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_back_02.png}
+
+Bir diðer ana yaklaþým Bollinger Bantlarýný baz alýr. Bu yaklaþýmda fiyatýn
+yürüyen ortalamasý ve yürüyen standart sapmasý hesaplanýr, iki zaman serisi elde
+edilir. Þimdi, günlük bazda, eðer fiyat serisi ortalamanýn iki standart sapma
+üstüne çýkmýþ ise satým, iki standart sapma altýnda ise alým sinyali üretilir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df_yhoo = pd.read_csv('yhoo.csv',parse_dates=True,index_col=0)
+signals = pd.DataFrame(index=df_yhoo.index) 
+signals['signal'] = np.nan
+middle = pd.rolling_mean(df_yhoo['Adj Close'], 40, min_periods=1) 
+std = pd.rolling_std(df_yhoo['Adj Close'], 40, min_periods=1)
+
+df_yhoo['Middle'] = middle
+df_yhoo['Top'] = middle+2*std
+df_yhoo['Bottom'] = middle-2*std
+df_yhoo[['Adj Close','Middle','Bottom','Top']].plot()
+plt.savefig('tser_back_04.png')
+
+signals['signal'] = np.where(df_yhoo['Adj Close'] > middle+2*std, -1, np.nan) 
+signals['signal'] = np.where(df_yhoo['Adj Close'] < middle-2*std, 1, np.nan)
+signals['signal'] = signals['signal'].fillna(method='ffill')
+df_yhoo['ret'] = df_yhoo['Adj Close'].pct_change() * signals['signal'].shift(1)
+ret = df_yhoo.ret.dropna()
+cumret=np.cumprod(1+ret)-1
+print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
+print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print 'Dusus', dd.calculateMaxDD(cumret)
+\end{minted}
+
+\begin{verbatim}
+APR 0.120315754795
+Sharpe 0.515472721337
+Dusus (-0.40536193029490575, 390.0)
+\end{verbatim}
+
+\includegraphics[height=6cm]{tser_back_04.png}
+
+Üstte \verb!ffill! ile her sinyali bir sonraki diðer sinyale kadar ``uzatmak''
+zorunda kaldýk, yani her iki sinyal arasýndaki boþluðu önceki sinyali
+tekrarlayarak doldurduk. Bunu yapmak zorunda kaldýk çünkü sinyal tek bir gün
+için üretiliyordu, fakat mesela bir al anýndan sat anýna kadar aradaki tüm
+getiri veri noktalarýný o alýma saymak lazýmdý, bu sebeple sinyal ileri doðru
+tekrarlandý. Momentum örneðinde bu problem olmamýþtý çünkü iki yürüyen ortalama
+sinyalinden biri diðerinin üzerine çýktýðý zaman bu sürede sürekli ayný sinyal
+üretiliyor, yani tekrarlamaya gerek kalmýyor. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cumret.plot()
+plt.savefig('tser_back_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_back_03.png}
+
+Farklar ile Sharpe Oraný
+
+Oynaklýk günlük getirilerin (fiyatlarýn yüzde deðiþimi) standart sapmasýdýr. Bir
+diðer yaklaþým fiyat {\em farklarýnýn} standart sapmasýný kullanýyor. Niye?
+Çünkü Vadeli Ýþlem Sözleþmeleri durumunda fiyatlar tüm sözleþmeler üzerinden
+Panama yöntemiyle birleþtirildiðinde bazý baþlangýçtaki zaman serisi eksi fiyat
+deðerlerine sahip olabilir. Eðer bu seri üzerinden yüzde deðiþimi hesaplarsak
+bölen eksi olacaðý için deðiþimin iþareti yanlýþ olur. Fakat fiyat farký her iki
+durumda da iþler. Peki fiyat farký üzerinden oynaklýk hesaplanabilir mi? Bu
+bilinen bir yaklaþým, evet iþliyor.
+
+Alttaki örnekte bir momentum stratejisi üzerinden bu hesabý görebiliriz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}  
+import sys; sys.path.append('../tser_voltar')
+import util, zipfile, pandas as pd
+
+DEFAULT_CAPITAL = 1.0
+DEFAULT_ANN_RISK_TARGET = 0.16
+
+def sharpe(price, forecast):
+    base_capital = DEFAULT_CAPITAL
+    daily_risk_capital = DEFAULT_CAPITAL * DEFAULT_ANN_RISK_TARGET / util.ROOT_BDAYS_INYEAR 
+    ts_capital=pd.Series([DEFAULT_CAPITAL]*len(price), index=price.index)        
+    ann_risk = ts_capital * DEFAULT_ANN_RISK_TARGET
+    daily_returns_volatility = util.robust_vol_calc(price.diff())
+    multiplier = daily_risk_capital * 1.0 * 1.0 / 10.0
+    numerator = forecast *  multiplier
+    positions = numerator.ffill() /  daily_returns_volatility.ffill()
+    cum_trades = positions.shift(1).ffill()
+    price_returns = price.diff()
+    instr_ccy_returns = cum_trades.shift(1)*price_returns 
+    instr_ccy_returns=instr_ccy_returns.cumsum().ffill().reindex(price.index).diff()
+    mean_return = instr_ccy_returns.mean() * util.BUSINESS_DAYS_IN_YEAR
+    vol = instr_ccy_returns.std() * util.ROOT_BDAYS_INYEAR
+    return mean_return / vol
+      
+with zipfile.ZipFile('../tser_voltar/legacycsv.zip', 'r') as z:
+     df = pd.read_csv(z.open('EDOLLAR_price.csv'), index_col=0,parse_dates=True )
+
+fast_ewma = pd.ewma(df.PRICE, span=32)
+slow_ewma = pd.ewma(df.PRICE, span=128)
+raw_ewmac = fast_ewma - slow_ewma
+vol = util.robust_vol_calc(df.PRICE.diff())
+forecast = raw_ewmac /  vol 
+print sharpe(df.PRICE, forecast)
+\end{minted}
+
+\begin{verbatim}
+0.508384873452
+\end{verbatim}
+
+Sharpe Oraný Ýstatistiki Önemi (Significance)
+
+SO'yu hesapladýk ama elde ettiðimiz sayýnýn istatistiki bir önemi var mý acaba?
+Bunu anlamanýn bir yolu getiriler üzerinde t-testi iþletmek. Getirilerin Normal
+daðýlýma sahip olduðunu farz ediyoruz, ve bu getirileri nüfus ortalamasý sýfýr
+hipotezine göre bir t-teste tabi tutuyoruz. Eðer getiriler sýfýrdan önemli bir
+þekilde farklý ise, o zaman bu getirilere baðlý olarak hesaplanan SO da önemli
+demektir. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.stats
+ret = util.ccy_returns(df.PRICE, forecast)
+tval,pval = scipy.stats.ttest_1samp(ret.dropna(), 0)
+print tval,pval
+\end{minted}
+
+\begin{verbatim}
+2.92942308888 0.00340494600657
+\end{verbatim}
+
+P-deðeri 0.05'ten küçük olduðuna göre bu SO önemli.
+
+Bu tekniði tüm portföyün SO önemliliði için de kullanabiliriz; her alt sistemin
+getirisi hesaplandýktan sonra bu getiriler portföy aðýrlýklarý üzerinden
+toplanýr, ve gerekli katsayý ile çarpýldýktan sonra portföyün gün bazýnda
+getirisi bir zaman serisi olarak elde edilir. Bu seri üzerinde üstteki test
+iþletilebilir. 
+
+Kaynaklar
+
+[1] Lo, {\em The Statistics of Sharpe Ratios}, \url{http://edge-fund.com/Lo02.pdf}
+
+[2] Berntson, {\em Introduction to Statistics}, \url{http://web.grinnell.edu/courses/sst/s02/sst115-03/practice/hypothesisteststeps1.pdf}
+
+[3] Pav, {\em Maximizing Sharpe and re-inventing the wheel}, \url{http://www.rinfinance.com/agenda/2012/talk/StevenPav.pdf}
+
+[4] Yan, {\em Python for Finance}
+
+[5] Chan, {\em Algorithmic Trading}
+
+\end{document}

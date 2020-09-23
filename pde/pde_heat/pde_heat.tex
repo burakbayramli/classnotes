@@ -1,0 +1,303 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Isý Denklemi
+
+$$ \frac{\partial u}{\partial t} = \frac{\partial^2u}{\partial x^2} $$
+
+olarak gösterilen denklem fizikte ýsý denklemi olarak bilinir, u fonksiyonu
+iki deðiþkenlidir $u(x,t)$. Örnek için bu denklemin çözümünü tek boyutta
+göstereceðiz, yani bir geniþliði önemli olmayan bir demir çubuðu üzerinde
+ýsýnýn daðýlmasý konusuna bakacaðýz, boyutu temsil için $x$ deðiþkeni
+kullanýlacak. $t$ deðiþkeni zamaný temsil ediyor olacak. Baþlangýç þartlarý
+(initial conditions) olarak ýsýnýn t=0 anýnda demir çubuk üzerinde $x$'e
+baðlý bir sinüs fonksiyonu ile daðýldýðýný farzedeceðiz, sýnýr þartlarý ise
+(boundary conditions) çubuðun iki ucunun sýfýr derecede tutulmasý
+olacak. Sonuçta ýsýnýn nereye gideceðini tahmin ederek te söyleyebiliriz --
+ýsý demirin iki ucundan kaçarak tüm çubuk boyunca sýfýr dereceye inecektir.
+
+Üstteki denklem bir kýsmi diferansiyel denklemdir (partial differential 
+equation).
+
+Elimizde model olarak bir diferansiyel denklem varsa çözüm bulmak demek bir
+fonksiyon bulmak demektir, bir sayý deðil. Ayrýca çözüm için analitik deðil
+yaklaþýksal bir metot kullanacaðýz; yani öyle bir $u$ fonksiyonu bulacaðýz
+ki, test / belli noktalarda gerçek fonksiyonla olabildiðince ayný sonuçlar
+verecek.
+
+Çözümde sýnýrlý farklar (finite differences) denen bir metot
+kullanýlacak. Bu yaklaþýksal metotta calculus'un sonsuz ufaklýklar için
+kullanýlan türevleri, bildiðimiz sayýsal çýkartma iþlemi üzerinden
+tanýmlanan ``farklýlýklara'' dönüþecekler. Mesela $d^2/dx^2$ nedir? $x$'e
+göre türevin türevidir, hesapsal olarak ise farkýn farkýdýr. Sonsuzluktan
+yaklaþýða þöyle geçeriz: Eðer $u_{j,i}$ bir 2 boyutlu dizin üzerinde $u$
+fonksiyonunun sayýsal deðerlerini taþýyor olsaydý, ve $j, i$ indis
+deðerleri $t, x$'i temsil ediyorlar ise, $x$ üzerinden birinci türev yani
+birinci fark (first difference) þöyle olur:
+
+$$ \frac{u_{j,i+1}-u_{j,i}}{h} $$
+
+$h$ hangi deðiþkenin farkýný alýyorsak, o farkýn büyüklüðünü
+tanýmlayan aralýk deðeridir, $h=\Delta x$, ve $u_{j,ý+1} = u(t,x +
+\Delta x)$.
+
+Ýkinci fark, farkýn farkýdýr:
+
+$$
+\frac{1}{h}
+\bigg[
+\bigg( \frac{u_{j,i+1}-u_{j,i}}{h} \bigg) -
+\bigg( \frac{u_{j,i}-u_{j,i-1}}{h} \bigg)
+\bigg] 
+$$
+
+$$
+= \frac{u_{j,i+1}-2u_{j,i}+u_{j,i-1}}{h^2} 
+\mlabel{1}
+$$
+
+Bu çarpýmý tüm $i$ deðerleri için ve matris üzerinden temsil etmenin yolu
+þudur: Bir ikinci farklýlýklar matrisi A yaratýrýz:
+
+$$ 
+A = \frac{1}{\Delta x^2}
+\left[ \begin{array}{ccccccc}
+-2 & 1 & 0 & 0 \ldots 0 & 0 & 0 \\
+1 & -2 & 1 & 0 \ldots 0 & 0 & 0 \\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+0 & 0 & 0 & 0 \ldots 1 & -2 & 1 \\
+0 & 0 & 0 & 0 \ldots 0 & 1 & -2
+\end{array} \right]
+ $$
+
+Ve u deðerlerini bir vektör içine çekeriz:
+
+$$ U_j =
+\left[ \begin{array}{c}
+u_{j,0} \\
+u_{j,1} \\
+u_{j,2} \\
+\vdots \\
+u_{j,n}
+\end{array} \right]
+ $$
+
+$AU_j$ çarpýmýnýn (1) denklemindeki toplamlarý her u için teker teker
+vereceðini görebiliriz. Ýndislerden $j$ zaman, $i$ mesafedir, yani üstteki
+denklem þimdilik sadece mesafeyi yani $x$'i parçalara bölmüþtür.
+
+Zamaný da modele dahil edelim ve çözümü elde etmeye uðraþalým. Isý
+denkleminin tamamýný þimdiye kadar elde ettiklerimizi kullanarak ve
+ayrýksal olarak yazalým:
+
+$$
+\frac{U_{j+1}-U_j}{\Delta t} = AU_j 
+\mlabel{2}
+$$
+
+$\frac{\partial^2u}{\partial x^2} \approx AU_j$, ve $\frac{\partial
+  u}{\partial t} \approx (U_{j+1}-U_j) / \Delta t$ olarak
+alýndý. $U_j$ tanýmýndaki $j$ indisi zaman için kullanýlýyor, mesafe
+yani $x$'i temsil eden indislerin tamamý $U$'nun içinde var zaten.
+
+Yaklaþýksal tekniklerden Crank-Nicholson'a göre $AU_j$'i ardý ardýna
+iki zaman indisi üzerinden hesaplanan bir ortalama olarak temsil
+edebiliriz, yani
+
+$$ AU_j \approx \frac{1}{2}(AU_{j+1}+AU_j) $$
+
+Niye bu açýlým yapýldý? Çünkü elimizde $U_{j+1}$ ve $U_j$ deðerleri var, bu
+deðerleri tekrar ortaya çýkararak bir "denklem sistemi" yaratmýþ olacaðýz, iki
+bilinmeyen için iki formül yanyana gelebilecek ve çözüme eriþilebilecek. 
+
+Üstteki formülü (2) denklemindeki $AU_j$ deðerleri
+için kullanalým ve tekrar düzenleyelim.
+
+$$ \frac{\Delta t}{2}AU_{j+1} + \frac{\Delta t}{2}AU_j = U_{i+1} - U_i  $$
+
+$$ U_{i+1} - \frac{\Delta t}{2}AU_{j+1} = U_i + \frac{\Delta t}{2}AU_j  $$
+
+$$ (I - \frac{\Delta t}{2}A) U_{j+1} = (I + \frac{\Delta t}{2}A)U_i $$
+
+Artýk bu formülü lineer cebirden bilinen $Ax=b$ formuna sokarak
+çözebiliriz. Forma göre formülün sað tarafý $b$ olur, sol tarafta parantez içi A
+olacak, $U_{j+1}$ ise bilinmeyen $x$ olacak (bizim $x$'ten farklý). Hesapsal
+kodlar bir döngü içinde, her zaman dilimi için bilinmeyen $U_{j+1}$ deðerini
+bulacak. Döngünün sonunda yeni $U_{j+1}$ eski $U_j$ olacak ve hesap devam
+edecek. 
+
+Sýnýr Þartlarý
+
+Her iki uçta $u$'nun sýfýr olma þartý uygulamalý matematikte Dirichlet sýnýr
+þartý olarak biliniyor. Bu þart $A$ matrisinin oluþturulmasý sýrasýnda
+kendiliðinden oluþuyor. Ufaltýlmýþ bir matris üzerinde göstermek gerekirse, 
+
+$$ \left[ \begin{array}{ccccc}
+1 & -2 & 1 & 0 & 0 \\
+0 & 1 & -2 & 1 & 0 \\
+0 & 0 & 1 & -2 & 1
+\end{array} \right]
+ $$
+
+deðerlerinin her satýrýnýn (1) denklemini temsil ettiðini söylemiþtik.
+Eðer þartlarýmýzdan biri $u_1$ ve $u_5$'un sýfýr olmasý ise, çarpým
+sýrasýnda ona tekabül eden üstteki matrisin en soldaki ve en saðdaki
+kolonlarýný tamamen sýfýr yapmamýz yeterli olurdu, çünkü çarpým sýrasýnda
+$U_j$ içinde o kolonlar $u_1$ ve $u_5$ ile çarpýlýp onu sýfýr
+yaparlardý. O zaman yeni matris þöyle olurdu:
+
+$$ 
+\left[ \begin{array}{ccccc}
+0 & -2 & 1 & 0 & 0 \\
+0 & 1 & -2 & 1 & 0 \\
+0 & 0 & 1 & -2 & 0
+\end{array} \right]
+ $$
+
+Bu iþler. Alternatif olarak sýfýr kolon yerine, o kolonlarý tamamen matristen
+atabilirdik, ayný þekilde $u$ deðerlerini üretirken birinci ve sonuncu deðerleri
+de atmamýz gerekirdi, nasýl olsa onlar "bilinmeyen" deðiþken deðiller. Bu yeni
+matris þöyle olurdu:
+
+$$ \left[ \begin{array}{ccc}
+-2 & 1 & 0  \\
+1 & -2 & 1  \\
+0 & 1 & -2 
+\end{array} \right]
+$$
+
+Alttaki kod içinde \verb!x = x[1:-1]! ibaresi $x$ ve dolaylý
+olarak $u$'nun ilk ve son deðerlerini atmak için kullanýlmakta.
+
+Seyrek (sparse) matrisler kullanarak çözüm altta.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+"""
+	This program solves the heat equation
+		u_t = u_xx
+	with dirichlet boundary condition
+		u(0,t) = u(1,t) = 0
+	with the Initial Conditions
+		u(x,0) = 10*sin( pi*x )
+	over the domain x = [0, 1]
+ 
+	The program solves the heat equation using a finite difference
+	method where we use a center difference method in space and
+	Crank-Nicolson in time.
+"""
+import scipy as sc
+import scipy.sparse as sparse
+import scipy.sparse.linalg
+f, ax = plt.subplots()
+
+ 
+# Number of internal points
+N = 200
+ 
+# Calculate Spatial Step-Size
+h = 1/(N+1.0)
+ 
+# Create Temporal Step-Size, TFinal, Number of Time-Steps
+k = h/2
+TFinal = 1
+NumOfTimeSteps = 120
+ 
+# Create grid-points on x axis
+x = np.linspace(0,1,N+2)
+x = x[1:-1]
+
+# Initial Conditions
+u = np.transpose(np.mat(10*np.sin(np.pi*x)))
+ 
+# Second-Derivative Matrix
+data = np.ones((3, N))
+data[1] = -2*data[1]
+diags = [-1,0,1]
+D2 = sparse.spdiags(data,diags,N,N)/(h**2)
+
+# Identity Matrix
+I = sparse.identity(N)
+ 
+# Data for each time-step
+data = []
+ 
+for i in range(NumOfTimeSteps):
+	# Solve the System: 
+	#
+	# (I - k/2*D2) u_new = (I + k/2*D2)*u_old
+	#
+	A = (I -k/2*D2)
+	b = ( I + k/2*D2 )*u
+	u = np.transpose(np.mat(sparse.linalg.spsolve(A, b)))
+        if i % 20 == 0:
+            plt.plot(x, u)
+            plt.axis((0,1,0,10.1))
+            plt.savefig("heat-" + str(i))
+            plt.hold(False)
+\end{minted}
+
+\includegraphics[height=4cm]{heat-0.png}
+
+\includegraphics[height=4cm]{heat-20.png}
+
+\includegraphics[height=4cm]{heat-40.png}
+
+\includegraphics[height=4cm]{heat-60.png}
+
+\includegraphics[height=4cm]{heat-80.png}
+
+\includegraphics[height=4cm]{heat-100.png}
+
+Seyrek matrislerden olmadan, normal matris kullanarak olan çözüm altta.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg
+f, ax = plt.subplots()
+
+# Number of internal points
+N = 200
+
+# Calculate Spatial Step-Size
+h = 1/(N+1.0)
+k = h/2
+
+x = np.linspace(0,1,N+2)
+x = x[1:-1] # get rid of the '0' and '1' at each end
+
+# Initial Conditions
+u = np.transpose(np.mat(10*np.sin(np.pi*x)))
+
+# second derivative matrix
+I2 = -2*np.eye(N)
+E = np.diag(np.ones((N-1)), k=1)
+D2 = (I2 + E + E.T)/(h**2)
+
+I = np.eye(N)
+
+TFinal = 1
+NumOfTimeSteps = 100
+
+for i in range(NumOfTimeSteps):
+    # Solve the System: 
+    # (I - k/2*D2) u_new = (I + k/2*D2)*u_old
+    A = (I - k/2*D2)
+    b = np.dot((I + k/2*D2), u)
+    u = scipy.linalg.solve(A, b)
+    if i % 20 == 0:
+        plt.plot(x, u)
+        plt.axis((0,1,0,10.1))
+        plt.savefig("heat-2-" + str(i))
+        plt.hold(False)
+\end{minted}
+
+\includegraphics[height=4cm]{heat-2-0.png}
+
+\includegraphics[height=4cm]{heat-2-20.png}
+
+\includegraphics[height=4cm]{heat-2-40.png}
+
+\includegraphics[height=4cm]{heat-2-60.png}
+
+\includegraphics[height=4cm]{heat-2-80.png}
+
+\end{document}
+

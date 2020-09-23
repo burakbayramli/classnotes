@@ -1,0 +1,229 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 17
+
+Sýnýrlý Öðeler Metodu (Finite Elements Method)
+
+Bu metot differansiyel, kýsmý differansiyel denklemleri (partial
+differential equations) yaklaþýksal olarak modelleme ve çözmenin
+yöntemleridir.
+
+Formül: Baþlangýç denklemi
+
+$$ \frac{-d}{\ud x} \bigg( c(x) \ \frac{\ud u}{\ud x} \bigg) = f(x) $$
+
+Ýki tarafý da  $v(x)$ ile çarpýyoruz ve 0 to 1 sýnýrlarýyla entegralini alýyoruz.
+
+$$
+\int_0^1 \frac{-d}{\ud x} \bigg( c(x) \frac{\ud u}{\ud x} \bigg) v(x)\ud x
+= \int_0^1 f(x)v(x) \ud x
+$$
+
+Parçalý entegral (integration by parts) formülü þöyledir:
+
+$$ \int y \ud z = y  z - \int z \ud y $$
+
+Ana formülün bölümlerini, parçalý entegrale göre bölüþtürürsek:
+
+$$ dz = \frac{-d}{dx} \bigg( c(x) \ \frac{du}{dx} \bigg) dx  $$
+
+$$ z = - c(x) \ \frac{du}{dx}  $$
+
+$$ y = v(x)  $$
+
+$$ dy = \frac{dv}{dx}dx $$
+
+Yukarýda $dz$ içinde $dx$ ve $\frac{1}{dx}$ birbirini iptal eder. Parçalý
+entegral formülünün sað tarafýna göre yerlerine koyarsak:
+
+$$
+\int_0^1 v(x)\ud x \frac{-d}{\ud x} \bigg( c(x) \frac{\ud u}{\ud x} \bigg)
+= - \bigg[ v(x) c(x) \frac{\ud u}{\ud x} \bigg]_{x=0}^{x=1} \int_0^1 c(x) \frac{\ud u}{\ud x} \frac{\ud v}{\ud x} \ud x
+$$
+
+Üstteki parçalý entegral açýlýmýnda sol taraf entegrale sýnýr
+deðerleri aldýðýnda, sað taraftaki $yz$ sonucunun ayný sýnýr
+deðerlerine tabi olduðuna dikkat edelim.
+
+Differansiyel denklemde sýnýr koþullarý $x=1$ durumunda $c(1)u'(1)=0$,
+ve $x=0$ durumunda $v(0)=0$ olarak biliniyor. O zaman üstteki
+denklemin sol tarafýnda $x=0$ ve $x=1$ koþullarý için tanýmlý bölüm $0
+- 0 = 0$ olacaktýr ve denklemden atýlabilir. Geriye kalanlar
+
+$$
+\int_0^1 c(x) \frac{\ud u}{\ud x} \frac{\ud v}{\ud x} \ud x
+= \int_0^1 f(x)v(x) \ud x
+$$
+
+Bu fonksiyonu Galerkin adlý bir matematikçi bulmuþ, "zayýf form (weak
+form)" olarak adlandýrýlýyor.
+
+Þimdi diyelim ki n tane test fonksiyonu seçtik $\phi_1(x),..,\phi(n)$
+ve bu fonksiyonlarýn $U_j$ sayýlarý ile çarpýmýnýn toplamýný, yani bir
+tür kombinasyonunu $u(x)$ yerine kullanmaya karar verdik.
+
+$$ U(x) = U_1 \phi_1+ ... + U_n\phi_n $$
+
+O zaman
+
+$$ U'(x) = U_1 \phi_1'+ ... + U_n\phi_n' $$
+
+$$ = \sum_1^n U_j \frac{d\phi_j}{dx} $$
+
+Þimdi $du / dx$ yerine $U'(x)$ koyarsak
+
+$$
+\int_0^1 c(x) \bigg( \sum_1^n U_j \frac{\ud\phi_j}{\ud x}\bigg)
+\frac{\ud V_i}{\ud x}\ud x
+= \int_0^1 f(x)V_i(x)\ud x
+$$
+
+Dikkat edelim, $v(x)$ yerine $V_i(x)$ kullandýk. Üstteki formül her i için yeni
+bir formül "üretecek". Niye $V_i$? Zayýf formdaki $v(x)$ formülünü de zaten
+biz uydurmuþtuk, yani $v(x)$ biz ne istersek o olur. O zaman bu fonksiyonu n
+tane formül üretmek için bir numara olarak kullanýlýyoruz, n tane formül olunca
+matrisin n x n elemanýný doldurabileceðiz ve çözüme eriþebileceðiz. Ek not,
+çoðunlukla $V_i(x)$ için $\phi_i$ formülleri kullanýlýyor. 
+
+Ayrýca formüldeki $U_j$ kýsmýný cekip çýkartýrsak ve bir vektör içine koyarsak,
+geri kalanlar bir $K_{ij}$ matrisi içinde tutulabilir. 
+
+$$ K_{ij} = \int_0^1 c(x) \frac{\ud\phi_j}{\ud x} \frac{\ud V_i}{\ud x} \ud x  $$
+
+Sað taraf ayný þekilde i tane formül üretir
+
+$$ F_i = \int_0^1 f(x)V_i(x) \ud x $$
+
+Final formül matrix formunda basit bir þekilde temsil edilebilecektir. 
+
+$$ KU = F $$
+
+Örnek
+
+Örnek olarak $-u'' = 1$ denklemini çözelim. Not: Differansiyel
+denklemlerde sonuç bulmak demek bir "fonksiyon" bulmak
+demektir. Normal cebirsel denklemlerde sonuç bulmak deðiþkenlerin
+"sayýsal" deðerini bulmak demektir. Birazdan bulacaðýmýz sonuç
+$u(x)$ "fonksiyonu" olacak.
+
+Eðer denklem $-u''=1$ ise o zaman bu formülü ana forma uygun hale
+getirmek için $c(x) = 1$ olarak almamýz gerekir. $-u''=1$ denkleminde
+eþitliðin sað tarafý 1 olduðuna göre $f(x) = 1$ demektir.
+
+Artýk $\phi$ fonksiyonlarýný seçme zamaný geldi. Bu fonksiyonlarýn
+"toplamý" hedeflediðimiz fonksiyonu yaklaþýksal (approximate) olarak
+temsil edecek. Örnek olarak seçebileceðimiz bir fonksiyon "þapka
+fonksiyonu (hat function)" olarak bilinen üçgen fonksiyonlar
+olabilir. Alttaki figürde bu fonksiyonlarý görüyoruz.
+
+\includegraphics[height=4cm]{fem_hat.png}
+
+Bu figürde x ekseninin h büyüklüðündeki parçalara bölündüðünü görüyoruz. 
+
+Entegralleri hesaplayalým
+
+$$ F_1 = \int_0^1 V_1(x) \ud x $$
+
+Daha önce $V_1$ ve $\phi_1$'i ayný kabul ettiðimizi belirtmiþtik. 
+
+Yukarýdaki entegralin aslýnda bir alan hesabý yaptýðýný
+görüyoruz. Sýnýrlar $0$ ve $1$ arasýnda, ama $2h$ ötesinde zaten
+$\phi_1$ fonksiyonu yok. $\phi_1$'in alaný nedir? Alan üçgenin alaný:
+Taban çarpý yükseklik bölü 2: $2h$, yüksekliði $1$, o zaman alan $(2h
+\times 1) / 2 = 1/3$
+
+Benzer mantýkla bakarsak, $F_2$ ile $F_1$ ayný, yani $1/3$. $F_3$ ise
+onlarýn yarýsý, yani $1/6$.
+
+$K_{ij}$ nasýl hesaplanacak? $c(x) = 1$ olduðu için formülden
+çýkarýlabilir ve $V_1$ ve $\phi_1$'in ayný olduðuna söyledik:
+
+$$ K_{ij} = \int_0^1 c(x) \frac{\ud\phi_j}{\ud x} \frac{\ud V_i}{\ud x} \ud x $$
+
+$$ K_{11} = \int_0^1 \bigg( \frac{\ud V_1}{\ud x} \bigg) ^2 \ud x  $$
+
+$dV_1/dx$ nedir? Birinci þapka fonksiyonunun türevidir. Bu türeve
+bakarsak, $0$ ve $h$ arasýnda artý eðim (slope) $1/h$, $h$ ve $2h$
+arasýnda eksi eðim $-1/h$ oluyor. Ama kare aldýðýmýz için sonuç ayný,
+$1/h^2$. O zaman h = 1/3 olduðuna göre $1/(1/3)^2$, yani $dV_1/dx =
+9$.
+
+$$ K_{11} = \int_0^{2/3} 9 \ud x = 9x \bigg|_0^{2/3} = (9)(2/3) - 0 = 6 $$
+
+$K_{22}$ þeklen ayný fonksiyon parçasýný temel aldýðý için ayný deðere
+sahip: 6. $K_{33}$ onlarýn yarýsý, eþittir 3.
+
+$K_{12}$ farklý eðimlerin çarpýmý anlamýna gelir, yani $V_1'$ ile
+$V_2'$ çarpýmý olur. Bu iki fonksiyona bakalým, 0 ile h arasýnda $V_2$
+yok, eðim 0. Ýkisinin de sýfýr olmadýðý, çarpýmda kullanýlabilecek bir
+eðiminin olduðu tek aralýk h ve 2h arasý. Burada $V_1' = -3, V_2 = 3$.
+
+$$
+K_{12} = \int_{1/3}^{2/3} (3)(-3) \ud x
+= -9x \bigg|_{1/3}^{2/3} = -6 - (-3) = -3
+$$
+
+Ayný þekilde $K_{23} = -3$. Ama $K_{13} = 0$ çünkü hiç çakýþma yok.
+
+Matrisi doldurursak, 
+
+$$
+KU = F
+$$
+
+$$ 
+\left[\begin{array}{ccc}
+    6 & -3 & 0 \\
+    -3 & 6 & -3 \\
+    0 & -3 & 3     
+\end{array}\right]
+\left[\begin{array}{c}
+    U_1 \\
+    U_2 \\
+    U_3
+\end{array}\right]
+=
+\left[\begin{array}{c}
+    1/3 \\
+    1/3 \\
+    1/6
+\end{array}\right]
+$$
+
+Python kodu 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+K = [[6., -3., 0],
+     [-3., 6., -3.],
+     [0., -3., 3.]]
+
+f = [1./3., 1./3., 1./6.]
+
+print np.linalg.solve(K,f)
+\end{minted}
+
+\begin{verbatim}
+[ 0.27777778  0.44444444  0.5       ]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 5./18., 4./9., 1./2.
+\end{minted}
+
+\begin{verbatim}
+0.277777777778 0.444444444444 0.5
+\end{verbatim}
+
+Rapor edilen deðerler bu denklemin bilinen çözümü $u(x) = x - \frac{1}{2}x^2$ 
+ile 0, h, 2h noktalarýnda (mesh points) birebir uyum gösterdiðini
+görüyoruz.  Yani yaklaþýksal olarak differansiyel denklemi çözmeyi 
+baþardýk.
+
+Kaynaklar
+
+[1] Strang, G., {\em Computational Science and Engineering}
+
+
+
+
+\end{document}

@@ -1,0 +1,1251 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Olasýlýk, Daðýlýmlar, Giriþ
+
+Bu notlar yapay öðrenim, veri madenciliði gibi konularda gerekli olasýlýk
+ve istatistik bilgisini paylaþmak için hazýrlanýyor. Notlarda olasýlýk ve
+istatistik ayný anda anlatýlacak, ve uygulamalara aðýrlýk verilecek. 
+
+Daðýlýmlar
+
+Doðada yapýlan çoðu ölçümlerin sýklýk / frekans grafiðini alýnca sonucun
+aþaðýda gibi çýkmasý ilginctir.
+
+\includegraphics[height=4cm]{stat_intro_01.png}
+
+Mesela Türkiye'deki 2000 yetiþkinin kilosunu ölçün. Grafiðini alýn
+kesinlikle yukarýdaki tepe þekli çýkacak. Ya da, 1000 kiþinin boyunu ölçün,
+ayný tepe þekli. Keskin niþancýnýn hedefe attýðý kurþunlarýn hedefe
+geliþini en iyi 12 en kötü 1 olmak üzere ölçün, sýklýk grafiðini alýn. Gene
+ayný tepe þekli!
+
+Nasýl oluyor bu iþ?
+
+Açýklama için, normal daðýlým eðrisinden bahsetmemiz gerekecek.
+
+Not olarak düþelim: Sýklýk grafiði, X sayýsýnýn ne kadar çýktýðýný sayýp, Y
+ekseni üzerinde bu sayýyý X'e tekabül ederek kolon olarak göstermeye
+denir. Mesela, 60 kilo deðeri 13 kere çýktý ise, X=60, Y=13 gibi bir kolon
+çizilecektir.
+
+Normal Daðýlým Eðrisi
+
+Normal daðýlýmýn olasýlýk kavramý ile yakýn baðlarý var. Bu konuda ünlü bir
+deney zar atma deneyidir. Mesela, elimizde tek bir zar olsun, ve bu zarý
+arka arkaya atalým. Sabrýmýz yeterse 1000 kere atalým. Sonuçta, sýklýk
+grafiði eþit bir daðýlým gösterecektir. (Zar tutmuyorsanýz :) )
+
+Bunun sebeplerini anlamak zor deðil. Her zar atýþ olayý birbirinden
+baðýmsýz, ve her sayýnýn üstte gelme ihtimali birbirine eþit olduðu için
+(1/6), her sayýdan eþit miktarda gelecektir. Tabii bunun için deneyin
+birçok kere tekrarlanmasý gerekiyor.
+
+Fakat, bir yerine 2 zar atalým. Hatta hatta, 4 zar atalým, ve bu sefer
+sýklýk grafik hanesine yazmadan çýkan sayýlarý önce toplayalým. Bu çýkan
+toplamýn sýklýk grafiðini alalým.
+
+Ýþte bu sýklýk grafiði göreceðiz ki, üstte görülen tepe grafiðine
+yaklaþýyor. Ne kadar çok zar atarsanýz, bu benzerlik o kadar daha fazla
+olacaktýr.
+
+Bunun sebebi sezgisel olarak tahmin edilebilir, 1 ile 6 arasý sayýlarýn tek
+bir zardan gelme olasýlýðý ayný, evet. Fakat toplamlara gelince, mesela iki
+zarlý örnekte, 10 sayýsýnýn olasýlýðý 2 sayýsýndan daha yüksek. Çünkü, 10
+sayýsýný 5-5, 4-6 ya da 6-4 ile alabiliyoruz. 2 sayýsý sadece 1-1 ile
+geliyor.
+
+Buradan þu sonuç çýkabilir: Eðer doðada ölçtüðümüz bir kavramýn oluþmasýnda
+birden fazla etken var ise, o ölçümlerin þýklýðý her zaman can þeklinde
+olacaktýr. Bir kiþinin boyunu, kilosunu etkileyen pek çok diðer faktör
+olduðu için bu ölçütlerin daðýlýmlarýnýn normal çýktýðý iddia edilebilir.
+
+Toplamlarýn daðýlýmýnýn çan eðrisine yaklaþmasý durumu Ýstatistikte Merkezi
+Limit Teorisi ile ispatlanmýþtýr. 
+
+Üsttekileri hesaplayarak ta gösterebiliriz. Ýlk önce, \url{random.org}
+sitesinden rasgele sayý üreteceðiz. Bu site kimsenin kullanmadýðý radyo
+kanallarýndan atmosfer gürültüsü dinleyip, bu gürültüleri sayýsal deðere
+çevirerek rasgele sayý üretiyor. Gerçek rasgele sayý üretmek pek kolay bir
+iþ deðil. Her ne kadar bilgisayarýmýzda rasgele sayý üreten birçok
+algoritma olsa bile, bu algoritmalar belli bir sayý üretiminden sonra
+kendini tekrar etmeye baþlýyorlar, bu sebeple onlara yarý-rasgele
+(pseudorandom) sayýlar ismi veriliyor. Gerçek rasgele sayýlar için dýþ bir
+kaynaða baðlanmak bir seçenek olabilir. Ama þunu da söylemek lazým,
+simulasyon tekniklerinin tamamý için yarý-rasgele sayýlar yeterlidir.
+
+Siteden rasgele sayýlarý üretip, bir veri dosyasýna koyuyoruz. Python ile
+bu sayýlarý okuyup, ilk önce teker teker sayýlarýn sýklýk grafiðini, ondan
+sonra sayýlarý üçer üçer toplayýp, onlarýn grafiðini alýp
+göstereceðiz. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.loadtxt('rasgele.dat')
+plt.hist(A, 50)
+plt.savefig('stat_intro_08.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_intro_08.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = np.loadtxt('rasgele.dat');
+B = []
+
+i = 1;
+
+while (i < 998):
+  toplam = 0
+  s = A[i]
+  toplam = toplam + s
+  s = A[i+1]
+  toplam = toplam + s
+  s = A[i+2]
+  toplam = toplam + s
+  B.append(toplam/3)
+  i = i + 3
+
+plt.hist(B, 50);
+plt.savefig('stat_intro_09.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_intro_09.png}
+
+Daðýlým normal daðýlýma benziyor! 
+
+Biraz Daha Derine
+
+Giriþ konularýný teker teker iþlemeden önce derinleme bir dalýþ yapýp tüm
+kavramlara biraz dokunalým.  Ýstatistiðin temel öðelerinden biri yoðunluk
+fonksiyonudur (probability density function), mesela
+
+$$ f(x) = e^{-\pi x^2} $$
+
+Pek çok farklý yoðunluk fonksiyonu vardýr, hangisinin hangi tür veriye
+uyacaðýný bulmak istatistikçinin önemli iþlerinden bir tanesidir. Her tür
+daðýlýmýn kendine has bir yoðunluðu var, yoðunluk çok boyutlu da
+olabilir. Bir yoðunluk fonksiyonun x-ekseni üzerindeki alaný her zaman 1'e
+eþit olmalýdýr (yani yoðunluðun $-\infty,\infty$ üzerinden entegrali her
+zaman 1 sonucunu vermeli). Olasýlýk teorisinin iþlemesi için bu gerekli.
+
+Yoðunluk fonksiyonlarý doðadan gelen bir ölçümü alýrlar, boy, kilo gibi, ve
+onun olasýlýk deðerini hesaplarlar. Üstteki örnek için mesela 3 ve 1
+deðerlerinin olasýlýðýný hesaplayalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def f(x): return np.exp(-np.pi * x**2)
+print '3 olasiligi', f(3)
+print '1 olasiligi', f(1)
+\end{minted}
+
+\begin{verbatim}
+3 olasiligi 5.25548517601e-13
+1 olasiligi 0.0432139182638
+\end{verbatim}
+
+1 olasýlýðý 3'ten daha düþük -- çünkü bu 0 merkezli bir yoðunluk
+fonksiyonu, sýfýra ne kadar yakýnsa olasýlýk o kadar fazla. Bu yoðunluðun
+tasarlanýþ þekli böyle. Eðer tüm olasý deðerleri $x$'e verip grafiklesek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+x = np.array(np.linspace(-3,3,num=50))
+y = f(x)
+plt.plot(x,y)
+plt.hold(False)
+plt.savefig('stat_intro_03.png')
+plt.hold(False)
+\end{minted}
+
+\includegraphics[height=6cm]{stat_intro_03.png}
+
+Þimdi mesela elimizde bir grup kiþinin 68 kiloya ne kadar yakýn / uzak
+olduðunun verisi var (68'ten az olanlar eksi deðerli olacak tabii). Veriyi
+grafikleyelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('boy68.csv')
+df.hist()
+plt.savefig('stat_intro_04.png')
+plt.hold(False)
+\end{minted}
+
+\includegraphics[height=6cm]{stat_intro_04.png}
+
+Dikkat veriyi grafiklemek için histogram kullandýk, yani verinin
+``frekansýný'' bastýk, bu tür grafiklere göre mesela eðer 3 deðeri 10 kere
+geldi, 1 deðeri 2 kere geldi ise 3'un üzerindeki sütun diðerinden daha
+yüksek olacaktýr, çünkü onun ``frekansý'' daha fazla.  
+
+Bir histogramýn aslýnda yoðunluk fonksiyonunun verisel / ayrýksal hali
+olduðu da düþünülebilir.
+
+Þimdi biz analizci olarak bu grafiðe bakarýz, ve deriz ki acaba biraz
+önceki $f(x)$ yoðunluðu bu veriye ``uyar mý''? Uyar ise ne güzel, $f(x)$
+bir sürekli fonksiyon, derli toplu, onun üzerinde pek çok iþlem
+yapabiliriz, bu veriyle iþlem yaparken o fonksiyonu kullanmak bize bazý
+avantajlar saðlayabilir. Eðer temsil edemez ise hangi baþka yoðunluk
+edebilir?  Vs..  Ýstatistik notlarýmýzda tüm bunlarýn cevabýný
+bulacaðýz. Bazen yoðunluklarýn sabitleri olacak (mesela merkez 0 yerine
+baþka bir yerde olsun diyebilmek), ve bu sabitleri, hiperparametreleri
+veriden hesaplamanýn yollarý var.. Veriden teoriksel yoðunluða, oradan
+baþka teorilere, oradan tekrar veriye atlayabilmek Ýstatistiðin özüdür.
+
+Rasgele deðiþkenler (RD): RD'ler çoðunlukla büyük harfle gösterilirler,
+mesela $X$ ya da $Y$ gibi ve bir daðýlýma / onun yoðunluk fonksiyonuna
+göbekten baðlantýlýdýrlar. RD'leri formül içinde görünce sanki her
+bakýþýnýzda içlerinin baþka bir rasgele sayý ile doldurulduðunu
+düþünebiliriz, ama tabii ki bu ``rasgelelik'' o RD'nin baðlý olduðu
+daðýlýma göredir! Eðer $X$ üstteki $f(x)$ ile daðýlmýþ dersek, o zaman
+sýfýra yakýn daha çok, 5'e yakýn daha az deðerler üretilir.
+
+RD'leri formül içinde bile kullanabilirsiniz, mesela 
+
+$$ 3X + \log X $$ 
+
+diyebilirdim. Baþka deðiþkenler $Y,Z$ vs formüle ekleyebilirdim. RD'lerin
+bu tür iþlemleri sonucu baþka tür RD'ler ortaya çýkabilir (yani sonuç
+RD'nin baðlý olduðu daðýlým farklý bir daðýlým olabilir), Ýstatistik ayrýca
+bu sonuç daðýlýmlarýnýn ne olabileceði hakkýnda güzel dersler içerir.
+
+Tekrarlamak gerekirse, $f(x)$'e verilen $x$ ile $X$'in deðerleri birbirine
+karýþmasýn. Ýlki için bildiðimiz bir $x$'in olasýlýðýný soruyoruz, mesela
+``3'ün olasýlýðý ne?'' diðerinde bize $f(x)$'e göre bir sayý üret diyoruz,
+ve 0.3, 0.1, 0., 0.5 gibi deðerler geliyor, kýrk yýlda bir de bir 3 geliyor
+belki.
+
+Þimdi istatistiðin temelini oluþturan olasýlýk teorisinden bahsedelim.
+
+Olasýlýk
+
+Örneklem Uzayý (Sample Space)
+
+Örneklem uzayý $\Omega$ bir deneyin mümkün tüm olasýlýksal sonuçlarýn
+(outcome) kümesidir. Eðer deneyimiz ardý ardýna iki kere yazý (T) tura (H)
+atýp sonucu kaydetmek ise, bu deneyin mümkün tüm sonuçlarý þöyledir
+
+$$\Omega = \{HH,HT,TH,TT\} $$
+
+Sonuçlar ve Olaylar (Outcomes and Events)
+
+$\Omega$ içindeki her nokta bir sonuçtur (outcome). Olaylar $\Omega$'nin
+herhangi bir alt kümesidir ve sonuçlardan oluþurlar. Mesela üstteki
+yazý-tura deneyinde ``iki atýþýn içinden ilk atýþýn her zaman H gelmesi
+olayý'' böyle bir alt kümedir, bu olaya $A$ diyelim, $A =
+\{HH,HT\}$.
+
+Ya da bir deneyin sonucu $\omega$ fiziksel bir ölçüm , diyelin ki sýcaklýk
+ölçümü. Sýcaklýk $\pm$, reel bir sayý olduðuna göre, $\Omega = (-\infty,
++\infty)$, ve sýcaklýk ölçümünün 10'dan büyük ama 23'ten küçük ya da eþit
+olma ``olayý'' $A = (10,23]$. Köþeli parantez kullanýldý çünkü sýnýr
+deðerini dahil ediyoruz. 
+
+Örnek 
+
+10 kere yazý-tura at. $A$ = ``en az bir tura gelme'' olayý olsun. $T_j$ ise
+$j$'inci yazý-tura atýþýnda yazý gelme olayý olsun. $P(A)$ nedir? 
+
+Bunun hesabý için en kolayý, hiç tura gelmeme, yani tamamen yazý gelme
+olasýlýðýný, $A^c$'yi hesaplamak, ve onu 1'den çýkartmaktýr. $^c$ sembolü
+``tamamlayýcý (complement)'' kelimesinden geliyor.
+
+$$ P(A) = 1 - P(A^c) $$
+
+$$ = 1 - P(\textit{hepsi yazý}) $$
+
+$$ = 1-P(T_1)P(T_2)...P(T_{10}) $$
+
+$$ = 1 - \bigg(\frac{1}{2}\bigg)^{10} \approx .999 $$
+
+Rasgele Deðiþkenler (Random Variables)
+
+Bir rasgele deðiþken $X$ bir eþlemedir, ki bu eþleme $X: \Omega \to
+\mathbb{R}$ her sonuç ile bir reel sayý arasýndaki eþlemedir.
+
+Kabaca anlatmak gerekirse rasgele deðiþken $X$'in, baðlý olduðu daðýlýmýn
+zar atýlmýþ deðerini içerdiði, ve bu deðerlerden bazýlarýný
+filtreyebildiði, düþünülebilir. Her rasgele deðiþken tek bir daðýlýma
+baðlýdýr, ve $X$'e ne zaman referens edersek onun içinin bu daðýlýmdan
+gelen bir sayý ile doldurulduðunu hayal etmek gerekir, tabii ki çoðu
+daðýlýmda bazý sayýlar daha olasýdýr, ve bu içi doldurmanýn çoðunlukla bu
+olasý sayýlardan olacaðý düþünülebilir.
+
+Olasýlýk derslerinde bir noktadan sonra artýk örnekleme uzayýndan
+bahsedilmez, ama bu kavramýn arkalarda bir yerde her zaman devrede olduðunu
+hiç aklýmýzdan çýkartmayalým. 
+
+Örnek
+
+10 kere yazý-tura attýk diyelim. VE yine diyelim ki $X(\omega)$ rasgele
+deðiþkeni her $\omega$ sýralamasýnda (sequence) olan tura sayýsý. Mesela
+eðer $\omega = HHTHHTHHTT$ ise $X(\omega) = 6$. Tura sayýsý eþlemesi
+$\omega$ sonucunu 6 sayýsýna eþledi.
+
+Örnek
+
+Rasgele deðiþken $X$ iki zar atýnýnýn toplamý olabilir. 
+
+$$ P(X=2) = P(\textrm{iki tane 1 gelme þansý}) = 1/36 $$
+
+$$ P(X=3) = P((1,2),(2,1)) = 2/36 $$
+
+$$ \vdots $$
+
+Örnek 
+
+$\Omega = \{ (x,y); x^2+y^2 \le 1 \}$, yani küme birim çember ve içindeki
+reel sayýlar (unit disc). Diyelim ki bu kümeden rasgele seçim
+yapýyoruz. Tipik bir sonuç $\omega = (x,y)$'dir. Tipik rasgele deðiþkenler
+ise $X(\omega) = x$, $Y(\omega) = y$, $Z(\omega) = x+y$ olabilir. Görüldüðü
+gibi bir sonuç ile reel sayý arasýnda eþleme var. $X$ rasgele deðiþkeni
+bir sonucu $x$'e eþlemiþ, yani $(x,y)$ içinden sadece $x$'i çekip
+çýkartmýþ. Benzer þekilde $Y,Z$ deðiþkenleri var. 
+
+Toplamsal Daðýlým Fonksiyonu (Cumulative Distribution Function -CDF-)
+
+Taným
+
+$X$ rasgele deðiþkeninin CDF'i $F_X: \mathbb{R} \to [0,1]$ tanýmý
+
+$$ F_X(x) = P(X \ge x) $$
+
+Eðer $X$ ayrýksal ise, yani sayýlabilir bir küme $\{x_1,x_2,...\}$ içinden
+deðerler alýyorsa olasýlýk fonksiyonu (probabýlýty function), ya da
+olasýlýk kütle fonksiyonu (probabýlýty mass function -PMF-) 
+
+$$ f_X(x) = P(X = x) $$
+
+Bazen $f_X$, ve $F_X$ yerine sadece $f$ ve $F$ yazarýz.
+
+Taným
+
+Eðer $X$ sürekli (continuous) ise, yani tüm $x$'ler için $f_X(x) > 0$,
+$\int_{-\infty}^{+\infty}f(x) \ud x = 1$ olacak þekilde bir $f_X$ mevcut ise, o
+zaman her $a \le b$ için
+
+$$ P(a<X<b) = \int_{a}^{b}f_X(x) \ud x $$
+
+Bu durumda $f_X$ olasýlýk yoðunluk fonksiyonudur (probabýlýty density function
+-PDF-). 
+
+$$ F_X = \int_{\infty}^{x}f_X(t) \ud t $$
+
+Ayrýca $F_X(x)$'in türevi alýnabildiði her $x$ noktasýnda  $f_X(x) = F'_X(x)$
+demektir. 
+
+Dikkat! Eðer $X$ sürekli ise o zaman $P(X = x) = 0$ deðerindedir. $f(x)$
+fonksiyonunu $P(X=x)$ olarak görmek hatalýdýr. Bu sadece ayrýksal rasgele
+deðiþkenler için iþler. Sürekli durumda olasýlýk hesabý için belli iki
+nokta arasýnda entegral hesabý yapmamýz gereklidir. Ek olarak PDF 1'den
+büyük olabilir, ama PMF olamaz. PDF'in 1'den büyük olabilmesi entegrali
+bozmaz mý? Unutmayalým, entegral hesabý yapýyoruz, noktasal deðerlerin 1
+olmasý tüm 1'lerin toplandýðý anlamýna gelmez. Bakýnýz {\em Entegralleri
+  Nasýl Düþünelim} yazýmýz.
+
+Olasýlýk {\em yoðunluk} fonksiyonundaki yoðunluk kelimesini tekrar
+vurgulamak iyi olur. Özellikle sürekli daðýlým baðlamýnda bu kavramý hakiki
+yoðunluk gibi düþünmek iyi olur. Mesela tamamý ayný maddeden olan bir küp
+düþünelim, yoðunluðu 2. Bu küpün neresine bakarsak bakalým yoðunluk hep
+ayný olur, 2. Yoðunluk bir bakýma belli bir alaný temsil eden bir {\em
+  özet}. Sonra bu küpün kütlesini bulmak için habire bir sürü 2'yi üst üste
+koyup toplamýyoruz; kütle hesabý için bir çarpým yapýyoruz / entegral
+alýyoruz.
+
+Örnek olarak çan eðrisi / normal daðýlýmdan sayýlar üretelim. Bu daðýlýmda
+``aðýrlýk'' ortadadýr. Rasgele sayý üretip histograma bakalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+mu=10;sigma=0.1
+data = np.random.normal(mu,sigma,100)
+hst = plt.hist(data, normed=True,bins=6)
+print hst[0]
+\end{minted}
+
+\begin{verbatim}
+[ 1.79234778  2.81654651  4.60889429  2.17642231  1.15222357  0.25604968]
+\end{verbatim}
+
+Görüldüðü gibi 1'den büyük deðerler var, ve ``yoðunluk'' ortadaki iki
+kutuda. Olasýlýk yoðunluk hesabýný formülsel yapsak, mesela 10 noktasýnýn
+aðýrlýðý nedir desek, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print norm.pdf(10,mu,sigma)
+\end{minted}
+
+\begin{verbatim}
+3.98942280401
+\end{verbatim}
+
+Þimdi olasýlýk deðerleri, $P(a < X < b)$ ifadesi, alan hesabý ve rasgele
+deðiþkenler arasýndaki baðlantýyý biraz daha detaylandýrmak gerekirse; $X$
+bir rasgele deðiþken, nokta (kesin) deðeri olmasa da denklemde
+kullanýlabiliyor, toplanýp çýkartýlabiliyor, vs. Bu deðiþkene ``deðeri
+sorulduðunda'' bu deðer o $X$'in baðlý olduðu daðýlýmýn zar atmasý
+sonucunda gelecektir. Bu zar atýþý ise olasýlýk fonksiyonunun yüksek deðer
+verdiði $x$ deðerlerini daha fazla üretecektir doðal olarak. Bunu kavramsal
+olarak söylüyoruz tabii, istatistiki problemlerde illa bu zar atýþýný
+yapmamýz gerekmeyebilir.
+
+\includegraphics[height=4cm]{stat_intro_10.png}
+
+Mesela üstteki daðýlým için 100 ve çevresindeki deðerlerinin olasýlýðý çok
+yüksek, mesela grafiðe bakarsak, kabaca, $f_X(100) = 0.027$, ya da
+$f_X(120) = 0.015$.  Demek ki bu daðýlýma baðlý bir $X$, o çevreden daha
+fazla deðer üretir.
+
+Rasgele deðiþkene baðlý olasýlýk hesabý için ise, mesela $P(X < 120)$
+diyelim, bu ifade ile ne diyoruz? Sorduðumuz þudur, zar atýþlarýnýn belli
+deðer altýnda gelmesi olasýlýðý... Bu hesap tabii ki bir alan hesabýdýr, x
+eksenindeki belli aralýklar, bölgelerin toplam olasýlýðýnýn ne olacaðý o
+bölgenin tam üzerindeki yoðunluðun toplamý olacaktýr, aynen tek
+deðerlerin olasýlýðýnýn o tek deðerin yoðunluk deðeri olmasý gibi. Yani
+bu tür olasýlýk hesaplarý direk $f_X(x)$ üzerinden yapýlacaktýr. Zar
+atýldýðýnda 100'den küçük deðerlerin gelme olasýlýðý nedir? Alana bakarsak
+0.5, yani 1/2, tüm alanýn yarýsý. Bu normal, çünkü 100'den küçük deðerler
+daðýlýmýn yarýsýný temsil ediyor. 200'den küçük deðerler gelme olasýlýðý
+nedir, yani $P(X < 200)$? Olasýlýk 1. $f_X$ alanýnýn tamamý. Yani
+kesin. Çünkü yoðunluk fonksiyonunun tamamý zaten 200'den küçük deðerler
+için tanýmlý. ``Yoðunluk orada''.
+
+Taným
+
+$X$ rasgele deðiþkeninin CDF'i $F$ olsun. Ters CDF (inverse cdf), ya da yüzdelik
+dilim fonksiyonu (quantile function)
+
+$$ F^{-1}(q) = \inf \bigg\{ x: F(x) \le q \bigg\} $$
+
+ki $q \in [0,1]$. Eðer $F$ kesinlikle artan ve sürekli bir fonksiyon ise
+$F^{-1}(q)$ tek bir $x$ sayýsý ortaya çýkarýr, ki $F(x) = q$. 
+
+Eðer $\inf$ kavramýný bilmiyorsak þimdilik onu minimum olarak düþünebiliriz. 
+
+$F^{-1}(1/4)$ birinci çeyrek
+
+$F^{-1}(1/2)$ medyan (median, ya da ikinci çeyrek), 
+
+$F^{-1}(3/4)$ üçüncü çeyrek 
+
+olarak bilinir. 
+
+Ýki rasgele deðiþken $X$ ve $Y$ daðýlýmsal olarak birbirine eþitliði, yani
+$X \ \buildrel d \over = \ Y$ eðer $F_X(x) = F_Y(x)$, $\forall x$. Bu $X,Y$ birbirine eþit, birbirinin 
+aynýsý demek deðildir. Bu deðiþkenler hakkýndaki tüm olasýlýksal iþlemler, 
+sonuçlar ayný olacak demektir.
+
+Uyarý! ``$X$'in daðýlýmý $F$'týr'' beyanýný $X \sim F$ þeklinde yazmak bir
+gelenek. Bu biraz kötü bir gelenek aslýnda çünkü $\sim$ sembolü ayný
+zamanda yaklaþýksallýk kavramýný belirtmek için de kullanýlýyor.
+
+
+Taným
+
+$x_1,..,x_n$ verilerini içeren örneklemin (sample) ortalamasý 
+
+$$ \bar{x} = \frac{1}{n} \sum x_i
+\mlabel{1}
+$$
+
+Dikkat bu örneklemdeki verinin ortalamasý. Hiçbir daðýlým hakkýnda hiçbir
+faraziye yapmadýk. Ayrýca taným kullandýk, yani bu ifadenin ne olduðu
+tamamen bize baðlý. 
+
+Örneklem ortalamasý sadece tek merkezi bir tepesi olan (unimodal)
+daðýlýmlar için geçerlidir. Eðer bu temel varsayým geçerli deðilse,
+ortalama kullanarak yapýlan hesaplar bizi yanlýþ yollara götürür. Ayrýca
+bir daðýlýmý simetrik olup olmadýðý da ortalama ya da medyan kullanýlýp
+kullanýlmamasý kararýnda önemlidir. Eðer simetrik, tek tepeli bir daðýlým
+var ise, ortalama ve medyan birbirine yakýn olacaktýr. Fakat veri baþka
+türde bir daðýlým ise, o zaman bu iki ölçüt birbirinden çok farklý
+olabilir.
+
+Daðýlýmlar
+
+Bernoulli Daðýlýmý
+
+$X$'in bir yazý-tura atýþýný temsil ettiðini düþünelim. O zaman $P(X = 1) =p$, 
+ve $P(X = 0) = 1 - p$ olacaktýr, ki $p \in [0,1]$ olmak üzere. O zaman
+$X$'in daðýlýmý Bernoulli deriz, $X \sim Bernoulli(p)$ diye
+gösteririz. Olasýlýk fonksiyonu, $x \in \{0,1\}$.
+
+$$ f(x;p) = p^x(1-p)^{(1-x)} $$
+
+Yani $x$ ya 0, ya da 1. Parametre $p$, 0 ile 1 arasýndaki herhangi bir reel 
+sayý. 
+
+$$ E(X) = p $$
+
+$$ Var(X) = p(1-p) $$
+
+Uyarý!
+
+$X$ bir rasgele deðiþken; $x$ bu deðiþkenin alabileceði spesifik bir deðer;
+$p$ deðeri ise bir \textbf{parametre}, yani sabit, önceden belirlenmiþ reel
+sayý. Tabii istatistiki problemlerde (olasýlýk problemlerinin tersi olarak
+düþünürsek) çoðunlukla o sabit parametre bilinmez, onun veriden
+hesaplanmasý, kestirilmesi gerekir. Her halükarda, çoðu istatistiki modelde
+rasgele deðiþkenler vardýr, ve onlardan ayrý olarak parametreler vardýr. Bu
+iki kavramý birbiriyle karýþtýrmayalým.
+
+Binom Daðýlýmý (Binomial Distribution)
+
+Her biri birbirinden baðýmsýz ve birbiriyle ayný Bernoulli Daðýlýmýna sahip
+deneylerden $n$ tane yapýldýðýný farzedelim, ki bu deneylerin sadece iki
+sonucu olacak (1/0. baþarý/baþarýsýzlýk, vs). Bu deneylerin $p$'sý ayný
+olacak. O zaman $n$ deney içinden toplam kaç tanesinin baþarýlý olduðunu
+gösteren $X$ rasgele deðiþkeni Binom Daðýlýmýna sahiptir denir. 
+
+Bu daðýlýmýn yoðunluðu 
+
+$$ f(x;p,n) = {n \choose{x}} p^x(1-p)^{n-x} 
+$$
+
+$$ = \frac{n!}{x!(n-x)!} p^x(1-p)^{n-x}  $$
+
+Bu fonksiyonun parametreleri $p,n$ deðerleridir. Beklenti ve varyans
+
+$$ \mu = E(X) = np $$
+
+$$ \sigma^2 = Var(X) = np(1-p) $$
+
+Birörnek (Uniform) Daðýlým
+
+\includegraphics[height=8cm]{stat_intro_05.png}
+
+$X$ birörnek, $Uniform(a,b)$ olarak daðýlmýþ deriz, ve  bu 
+$X \sim Uniform(a,b)$ olarak yazýlýr eðer 
+
+$$ f(x)  = 
+\left\{ \begin{array}{ll}
+\frac{ 1}{b-a} & x \in [a,b] \ icin \\
+0 & diger
+\end{array} \right.
+ $$
+
+iþe ve $a<b$ olacak þekilde. CDF hesabý olasýlýk eðrisinin entegralini
+temel alýr, düz daðýlým bir $a,b$ arasýnda $1/b-a$ yüksekliðinde bir 
+dikdörtgen þeklinde olacaðý için, bu dikdörtgendeki herhangi bir $x$
+noktasýnda CDF daðýlýmý, yani o $x$'in baþlayýp sol tarafýn alanýnýn hesabý
+basit bir dikdörtgensel alan hesabýdýr, yani $x-a$ ile $1/b-a$'nin
+çarpýmýdýr, o zaman 
+
+$$ F(x) = 
+\left\{ \begin{array}{ll}
+0 & x < a \\
+\frac{ x-a}{b-a} & x \in [a,b] \\
+1 & x > b
+\end{array} \right.
+ $$
+
+Beklenti $E[X] = 1$. 
+
+Multinom (Multinomial) Daðýlým 
+
+Çok boyutlu $X$ rasgele deðiþkeni, ki boyutu $k$ olarak tanýmlayalým, 
+$X \sim Mult(m,p)$ olarak daðýlmýþtýr deriz, eðer bu daðýlým $k$ sýnýf, kategori
+içinden birinin seçildiði durumda $m$ deney içinden kaç tanesinin hangi
+kategorilerde olduðunu temsil ediyorsa, ve $p$ çok boyutludur. Multinom, 
+binom daðýlýmýnýn çok kategorili halidir denebilir, ya da binom, 
+multinomun $k=2$ halidir. Olasýlýklar,
+
+$$ P(X_1=m_1,...,X_k=m_k) = f(x;m,p) $$
+
+ki $m_k$, $k$'inci kategoriden kaç tane görüldüðü. Olasýlýk yoðunluk
+fonksiyonu,
+
+$$ f(x;m,p) = \frac{m!}{x_1! \cdot \cdot !x_k!} p_{1}^{x_1} \cdot \cdot  p_{1}^{x_k} $$
+
+Beklenti $ E(X) = p $. Her kategori, hücre $i$ için tabii ki $ E(X_i) = p$, 
+varyans ise $Var(X_i) = m p_i(1-p_i)$. Kovaryans $Covar(X_i,X_j) =
+-mp_ip_j$. 
+Bunun türetilmesini ilerideki bir bölümde göreceðiz. 
+
+\includegraphics[height=5cm]{multinom.png}
+
+Poisson Daðýlýmý
+
+Sayým verilerini (count data) modellemek için bu daðýlým çok
+kullanýlýr. Tanýmý, 
+
+$$ f(x) = P(X=x) = e^{-\lambda}\frac{\lambda^{x}}{x!} $$
+
+Poisson daðýlýmýný tanýmlayan $\lambda$ sabitidir. Belli bir Poisson
+yoðunluk fonksiyonu göstermek için $f(x;\lambda)$ gibi bir taným
+görebilirsiniz. Bu daðýlýmýn önemli bir özelliði ortalama ve varyansýnýn
+ayný olmasýdýr. 
+
+Normal (Gaussian) Daðýlým
+
+$X \sim N(\mu, \sigma^2)$ ve PDF
+
+$$ f(x) = \frac{1}{\sigma\sqrt{2\pi}} 
+\exp \bigg\{ - \frac{1}{2\sigma^2}(x-\mu)^2  \bigg\}
+, \ x \in \mathbb{R}
+$$
+
+ki $\mu \in \mathbb{R}$ ve $\sigma > 0$ olacak þekilde. Bazýlarý bu
+daðýlýmý 
+
+$$  
+= \frac{1}{\sigma\sqrt{2\pi}} 
+\exp \bigg\{ -\frac{1}{2}(x-\mu)\sigma^{-2}(x-\mu)  \bigg\}
+$$
+
+olarak gösterebiliyor, çünkü bu þekilde (birazdan göreceðimiz) çok boyutlu
+Gaussian formülü ile alaka daha rahat gözüküyor. 
+
+Ýleride göreceðiz ki $\mu$ bu daðýlýmýn ``ortasý'', ve $\sigma$ onun
+etrafa ne kadar ``yayýldýðý'' (spread). Normal daðýlým olasýlýk ve
+istatistikte çok önemli bir rol oynar. Doðadaki pek çok olay
+yaklaþýksal olarak Normal daðýlýma sahiptir. Sonra göreceðimiz üzere,
+mesela bir rasgele deðiþkenin deðerlerinin toplamý her zaman Normal
+daðýlýma yaklaþýr (Merkezi Limit Teorisi -Central Limit Theorem-). 
+
+Eðer $\mu = 0$ ve $\sigma = 1$ ise $X$'in standart Normal daðýlým olduðunu
+söyleriz. Geleneðe göre standart Normal daðýlým rasgele deðiþkeni $Z$ ile
+gösterilmelidir, PDF ve CDF $\phi(z)$ ve $\Phi(z)$ olarak gösterilir. 
+
+$\Phi(z)$'nin kapalý form (closed-form) tanýmý yoktur. Bu, matematikte
+``analitik bir forma sahip deðil'' demektir, formülü bulunamamaktadýr,
+bunun sebebi ise Normal PDF'in entegralinin analitik olarak alýnamýyor
+oluþudur. 
+
+Bazý faydalý püf noktalarý
+
+1. Eðer $X \sim N(\mu, \sigma^2)$ ise, o zaman $Z = (X-\mu) / \sigma \sim N(0,1)$. 
+
+2. Eðer $Z \sim N(0,1)$ ise, o zaman $X = \mu + \sigma Z \sim N(\mu,\sigma^2)$
+
+3. Eðer $X_i \sim N(\mu_i, \sigma_i^2)$, $i=1,2,...$ ve her $X_i$
+diðerlerinden baðýmsýz ise, o zaman 
+
+$$ \sum_{i=1}^n X_i = N\bigg( \sum_{i=1}^n\mu_i, \sum_{i=1}^n\sigma^2 \bigg) $$
+
+Tekrar $X \sim N(\mu, \sigma^2)$ alýrsak ve 1. kuraldan devam edersek /
+temel alýrsak þu da doðru olacaktýr. 
+
+$$ P(a < X < b) = ? $$
+
+$$ 
+= P\bigg(
+\frac{a-\mu}{\sigma} < 
+\frac{X-\mu}{\sigma} < 
+\frac{b-\mu}{\sigma}
+\bigg) 
+$$
+
+$$
+= P\bigg(\frac{a-\mu}{\sigma} < Z < \frac{b-\mu}{\sigma}\bigg) 
+= 
+\Phi\bigg(\frac{b-\mu}{\sigma}\bigg) - 
+\Phi\bigg(\frac{a-\mu}{\sigma}\bigg) 
+$$
+
+Ýlk geçiþi nasýl elde ettik? Bir olasýlýk ifadesi $P(\cdot)$ içinde eþitliðin iki
+tarafýna ayný anda ayný toplama, çýkarma operasyonlarýný yapabiliriz. 
+
+Son ifadenin anlamý þudur. Eðer standart Normal'ýn CDF'ini
+hesaplayabiliyorsak, istediðimiz Normal olasýlýk hesabýný yapabiliriz
+demektir, çünkü artýk $X$ içeren bir hesabýn $Z$'ye nasýl tercüme
+edildiðini görüyoruz. 
+
+Tüm istatistik yazýlýmlarý $\Phi(z)$ ve $\Phi(z)^{-1}$ hesabý için gerekli
+rutinlere sahiptir. Tüm istatistik kitaplarýnda $\Phi(z)$'nin belli
+deðerlerini taþýyan bir tablo vardýr. Ders notlarýmýzýn sonunda da benzer
+bir tabloyu bulabilirsiniz. 
+
+Örnek 
+
+$X \sim N(3,5)$ ise $P(X > 1)$ nedir? Cevap:
+
+$$ 
+P(X>1) = 1 - P(X < 1) = 1 - P( Z < \frac{ 1 - 3}{\sqrt{5 }}) 
+ $$
+
+$$ = 1 - \Phi(-0.8944) =  1 - 0.19 = .81 $$
+
+Soru $P(a < X < b)$ formunda $a$ kullanmadý, sadece $b$ olduðu için
+yukarýdaki form ortaya çýktý. Python ile
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import norm
+print norm.cdf(-0.8944)
+print 1-norm.cdf(-0.8944)
+\end{minted}
+
+\begin{verbatim}
+0.18555395624
+0.81444604376
+\end{verbatim}
+
+Soru
+
+$\Phi(1.13)$ nedir? 
+
+\includegraphics[height=5cm]{stat_intro_06.png}
+
+Kümülatif olasýlýk fonksiyonuna geçilen z deðerlerinin bir diðer ismi ise
+z-skoru. Bu deðerleri anlamanýn bir yolu (skora çevirilmiþ) orijinal
+deðerlerin ``kaç standart sapma uzakta'' olduðunu göstermesidir. Bundan
+sonra ölçümüz standart sapma haline geliyor, ve bu deðer sola ya da saða
+çekildikçe ona tekabül eden alan (üstte sarý renkle gösterilen kýsým), yani
+olasýlýk azalýp çoðalýyor. Grafikte mesela ``1.13 standart sapma'' yani
+z-skor nereyi gösteriyor deyince, görülen þekil / olasýlýk ortaya
+çýkýyor. Tabii temel aldýðýmýz deðer baþtan z-skorunun kendisi ise daðýlým
+standart daðýlým ve standart sapma 1 olduðu için ``kaç standart sapma'' ile
+z-skoru birbirine eþit. z-Skorlarý hakkýnda ek bir anlatým bu bölümün
+sonunda bulunabilir.
+
+Örnek 
+
+Þimdi öyle bir $q$ bul ki $P(X < q) = .2$ olsun. Yani $\Phi^{-1}(.2)$'yi
+bul. Yine $X \sim N(3,5)$. 
+
+Cevap 
+
+Demek ki tablodan $.2$ deðerine tekabül eden eþik deðerini bulup, üstteki
+formül üzerinden geriye tercüme etmemiz gerekiyor. Normal tablosunda
+$\Phi(-0.8416) = .2$, 
+
+$$ .2 = P(X<q) = P( Z < \frac{ q - \mu}{\sigma}) = \Phi(\frac{ q - \mu}{\sigma})
+$$
+
+O zaman 
+
+$$ -0.8416 = \frac{q - \mu}{\sigma} = \frac{ q - 3}{\sqrt{ 5}} $$
+
+$$ q = 3 - 0.8416 \sqrt{ 5} = 1.1181 $$
+
+Hatýrlama Numarasý
+
+Normal Daðýlýmýn formülünü bazen hatýrlayamayabiliriz. Peki daha basit bir
+formülden baþlayarak onu türetebilir miyiz? Bu mümkün. Daha önce Çok
+Deðiþkenli Calculus Ders 18'de $e^{-x^2}$ Nasýl Entegre Edilir? yazýsýnda
+
+$$ \int _{-\infty}^{+\infty} e^{-x^2} \ud x= \sqrt{\pi} $$
+
+olduðunu görmüþtük. Dikkat edersek bu integral bir formülün olasýlýksal daðýlým
+olup olmadýðýný kontrol etmek için kullandýðýmýz integrale benziyor. Eðer
+integral 1 çýkarsa onun olasýlýksal daðýlým olduðunu biliyoruz. Üstteki sonuç
+$\sqrt{\pi}$, fakat iki tarafý $\sqrt{\pi}$'ye bölersek, sað taraf 1 olur ve
+böylece solda bir daðýlým elde ederiz. Yani
+
+$$ \int _{-\infty}^{+\infty} \frac{1}{\sqrt{\pi}} e^{-x^2} \ud x = 1$$
+
+formülünde entegralin saðýndaki kýsým bir daðýlýmdýr. Bu formülü dönüþtürerek
+Gaussian'a eriþebiliriz. Üstteki formülün orta noktasý (mean) sýfýr, varyansý
+(variance), yani $\sigma^2 = 1/2$ (bunu da ezberlemek lazým ama o kadar dert
+deðil). O zaman $\sigma = 1 / \sqrt{2}$.
+
+Ýlk amacýmýz $\sigma = 1$'e eriþmek olsun (çünkü oradan herhangi bir $\sigma$'ya
+atlayabiliriz), bunun için $x$'i $\sqrt{2}$'e bölmek lazým, tabii ayný anda onun
+etkisini sýfýrlamak için normalize eden sabiti dengelemek amacýyla $\sqrt{2}$'ye
+bölmek lazým,
+
+$$
+= \int _{-\infty}^{+\infty}
+\frac{1}{\sqrt{2\pi}} e^{-(\frac{x}{\sqrt{2}})^2}\ud x
+$$
+
+$\sigma = 1$'e eriþince oradan herhangi bir $\sigma$ için, $\sigma$ deðiþkenine
+bölelim, yine hem $e$ üstüne hem sabite bu eki yapalým,
+
+$$ = \int _{-\infty}^{+\infty} 
+\frac{1}{\sigma \sqrt{2\pi}} 
+e^{-(\frac{x}{\sqrt{2} \sigma })^2} dx
+$$
+
+Þimdi herhangi bir ortalama $\mu$ için bu deðiþkeni formüle sokalým, bunun
+için $\mu$'yu $x$'den çýkarmak yeterli
+
+$$ = \int _{-\infty}^{+\infty} 
+\frac{1}{\sigma \sqrt{2\pi}} 
+e^{-(\frac{x-\mu}{\sqrt{2} \sigma })^2} dx
+$$
+
+$e$ üstündeki kare alma iþlemini açarsak,
+
+$$ = \int _{-\infty}^{+\infty} 
+\frac{1}{\sigma \sqrt{2\pi}} 
+e^{-  \frac{(x-\mu)^2}{2 \sigma^2 }} dx
+$$
+
+Böylece integral içindeki kýsým tek boyutlu Gaussian formuna eriþmiþ
+oluyor. 
+
+Gamma Daðýlýmý
+
+$Y$ rasgele deðiþkeninin, verilmiþ $r>0$ ve $\lambda > 0$ üzerinden Gamma
+yoðunluk fonksiyonuna sahip olduðu söylenir, eðer bu fonksiyon
+
+$$ f_{\gamma} =  \frac{\lambda^r}{\Gamma(r)}y^{r-1}e^{\lambda y}$$
+
+$$ y>0  $$
+
+Peki $\Gamma$ sembolü nerede geliyor? Bu bir fonksiyondur; Herhangi bir
+$r>0$ için Gamma fonksiyonu $\Gamma(r)$ þu þekilde gösterilir,
+
+$$ \Gamma(r) = \int _{0}^{\infty}y^{r-1}e^{-y} \ud y $$
+
+olarak tanýmlý ise. 
+
+Eðer $Y$ Gamma olarak daðýlmýþ ise, beklenti $E(Y) = r/\lambda$, ve $Var(Y)
+= r/\lambda^2$. 
+
+Ýki Deðiþkenli Daðýlýmlar 
+
+Tanim
+
+Sürekli ortamda $(X,Y)$ rasgele deðiþkenleri için yoðunluk fonksiyonu $f(x,y)$
+tanýmlanabilir eðer i) $f(x,y) > 0, \forall (x,y)$ ise, ve ýý) $\int _{
+  -\infty}^{\infty} \int _{ -\infty}^{\infty} f(x,y) \ud x \ud y = 1$ ise ve her
+küme $A \subset \mathbb{R} \times \mathbb{R}$ için $P((X,Y) \in A) = \int \int_A
+f(x,y) \ud x \ud y$. Hem ayrýksal hem sürekli durumda ortak (joint) CDF
+$F_{X,Y}(x,y) = P (X \le x, Y \le y)$ diye gösterilir.
+
+Bu tanýmda $A$ kümesi olarak tanýmlanan kavram uygulamalarda bir olaya
+(event) tekabül eder. Mesela
+
+Örnek
+
+$(X,Y)$'in birim kare üzerinde birörnek (uniform) olsun. O zaman 
+
+$$ 
+f(x,y) =
+\left\{ \begin{array}{ll}
+1 & \textit{ eðer }  0 \le x \le 1, 0 \le y \le 1  \textit{ ise }\\
+0 & \textit{ diðer durumlarda }
+\end{array} \right.
+ $$
+
+$P(X < 1/2, Y < 1/2)$'yi bul. 
+
+Cevap
+
+Burada verilen $A = \{ X < 1/2, Y < 1/2\}$ bir altkümedir ve bir
+olaydýr. Olaylarý böyle tanýmlamamýþ mýydýk? Örneklem uzayýnýn bir
+altkümesi olay deðil midir? O zaman $f$'i verilen altküme üzerinden entegre
+edersek, sonuca ulaþmýþ oluruz. 
+
+Örnek 
+
+Eðer daðýlým kare olmayan bir bölge üzerinden tanýmlýysa hesaplar biraz
+daha zorlaþabilir. $(X,Y)$ yoðunluðu 
+
+$$ 
+f(x,y) = 
+\left\{ \begin{array}{ll}
+cx^2y & \textrm{eðer } x^2 \le y \le 1 \\
+0 & \textrm{diðer}
+\end{array} \right.
+ $$
+
+Niye $c$ bilinmiyor? Belki problemin modellemesi sýrasýnda bu bilinmez
+olarak ortaya çýkmýþtýr. Olabilir. Bu deðeri hesaplayabiliriz, çünkü
+$f(x,y)$ yoðunluk olmalý, ve yoðunluk olmanýn þartý $f(x,y)$ entegre
+edilince sonucun 1 olmasý. 
+
+Önce bir ek bilgi üretelim, eðer $x^2 \le 1$ ise, o zaman $-1 \le x \le 1$ 
+demektir. Bu lazým çünkü entegrale sýnýr deðeri olarak verilecek. 
+
+$$ 1 = \int  \int f(x,y) \ud y \ud x = c \int _{ -1}^{1} \int _{ x^2}^{1}x^2y  $$
+
+$$
+=  c \int _{ -1}^{1} x^2 \int _{ x^2}^{1} y \ud y \ud x = 
+\int _{ -1}^{1} x^2 (\frac{ 1}{2} - \frac{ x^4}{2} ) \ud x = 1
+$$
+
+$$ = c \int _{ -1}^{1} x^2 (\frac{ 1 - x^4}{2} ) \ud x = 1 $$
+
+$$ = \frac{ c}{2} \int _{ -1}^{1} x^2 - x^6 \ud x  = 1$$
+
+Devam edersek $c = 21/4$ buluruz. 
+
+Þimdi, diyelim ki bizden $P(X \ge Y)$'yi hesaplamamýz isteniyor. Bu hangi
+$A$ bölgesine tekabül eder? Elimizdekiler
+
+$$ -1 \le x \le 1, \  x^2 \le y, \ y \le 1   $$
+
+Þimdi bunlara bir de $y \le x$ eklememiz lazým. Yani ortadaki eþitsizliðe
+bir öðe daha eklenir.
+
+$$ -1 \le x \le 1 $$
+
+$$  x^2 \le y \le x $$
+
+$$  y \le 1   $$
+
+$x^2 \le y$'yi hayal etmek için $x^2 = y$'yi düþünelim, bu bir parabol
+olarak çizilebilir, ve parabolun üstünde kalanlar otomatik olarak $x^2 \le y$ 
+olur, bu temel irdelemelerden biri. 
+
+\includegraphics[height=4cm]{stat_intro_07.png}
+
+Ayný þekilde $y \le x$ için $y = x$'i düþünelim, ki bu 45 derece açýyla
+çizilmiþ düz bir çizgi. Çizginin altý $y \le x$ olur. Bu iki bölgenin
+kesiþimi yukarýdaki resimdeki gölgeli kýsým. 
+
+Ek bir bölge þartý $0 \le x \le 1$. Bu þart resimde bariz görülüyor, ama
+cebirsel olarak bakarsak $y \ge x^2$ olduðunu biliyoruz, o zaman $y \ge 0$
+çünkü $x^2$ muhakkak bir pozitif sayý olmalý. Diðer yandan $x \ge y$
+verilmiþ, tüm bunlarý yanyana koyarsak $x \ge 0$ þartý ortaya çýkar. 
+
+Artýk $P(X \ge Y)$ hesabý için hazýrýz, 
+
+$$
+P(X \ge Y) = 
+\frac{ 21}{4} \int_{ 0}^{1} \int _{ x^2}^{x} x^2y \ud y \ud x = 
+\frac{ 21}{4} \int_{ 0}^{1} x^2 \bigg[ \int _{ x^2}^{x} y \ud y \bigg] \ud x 
+$$
+
+$$ = \frac{21}{4} \int _{ 0}^{1} x^2 \frac{ x^2 - x^4}{2} \ud x = \frac{3}{20} $$
+
+``Hafýzasýz'' Daðýlým, Üstel (Exponential) Daðýlým
+
+Üstel daðýlýmýn hafýzasýz olduðu söylenir. Bunun ne anlama geldiðini
+anlatmaya uðraþalým. Diyelim ki rasgele deðiþken $X$ bir aletin ömrünü
+temsil ediyor, yani bir $p(x)$ fonksiyonuna bir zaman ``sorduðumuz'' zaman
+bize döndürülen olasýlýk, o aletin $x$ zamaný kadar daha iþlemesinin
+olasýlýðý. Eðer $p(2) = 0.2$ ise, aletin 2 yýl daha yaþamasýnýn olasýlýðý
+0.2. 
+
+Bu hafýzasýzlýðý, olasýlýk matematiði ile nasýl temsil ederiz?
+
+$$ P( X>s+t \ | X>t ) =  P(X>s) , \ \forall s, \ t \ge 0 $$
+
+Yani öyle bir daðýlým var ki elimizde, $X>t$ bilgisi veriliyor, ama (kalan)
+zamaný hala $P(X>s)$ olasýlýðý veriyor. Yani $t$ kadar zaman geçtiði 
+bilgisi hiçbir þeyi deðiþtirmiyor. Ne kadar zaman geçmiþ olursa olsun,
+direk $s$ ile gidip ayný olasýlýk hesabýný yapýyoruz. 
+
+Þartsal (conditional) formülünü uygularsak üstteki þöyle olur
+
+$$  \frac{P( X>s+t,  X>t )}{P(X>t)} = P(X>s)  $$
+
+ya da
+
+$$  P( X>s+t,  X>t ) = P(X>s)P(X>t) $$
+
+Bu son denklemin tatmin olmasý için $X$ ne þekilde daðýlmýþ olmalýdýr?
+Üstteki denklem sadece $X$ daðýlým fonksiyonu üstel (exponential) olursa
+mümkündür, çünkü sadece o zaman
+
+$$ e^{-\lambda(s+t)}  = e^{-\lambda s} e^{-\lambda t}$$
+
+gibi bir iliþki kurulabilir. 
+
+Örnek
+
+Diyelim ki bir bankadaki bekleme zamaný ortalama 10 dakika ve üstel olarak
+daðýlmýþ. Bir müþterinin i) bu bankada 15 dakika beklemesinin ihtimali
+nedir? ýý) Bu müþterinin 10 dakika bekledikten sonra toplam olarak 15
+dakika (ya da daha fazla) beklemesinin olasýlýðý nedir? 
+
+Cevap
+
+i) Eðer $X$ müþterinin bankada beklediði zamaný temsil ediyorsa
+
+$$ P(X>15) = e^{-15 \cdot 1/10} = e^{-3/2} \approx 0.223 $$
+
+ýý) Sorunun bu kýsmý müþteri 10 dakika geçirdikten sonra 5 dakika daha
+geçirmesinin olasýlýðýný soruyor. Fakat üstel daðýlým ``hafýzasýz'' olduðu
+için kalan zamaný alýp yine direk ayný fonksiyona geçiyoruz, 
+
+$$ P(X>5> = e^{-5 \cdot 1/10} = e^{-1/2} \approx 0.60$$
+
+Kýsmi (Marginal) Daðýlýmlar 
+
+Sürekli rasgele deðiþkenler için kýsmý yoðunluk 
+
+$$ f_X(x) = \int f(x,y) \ud x $$
+
+ve
+
+$$ f_Y(y) = \int f(x,y) \ud y $$
+
+
+Üstteki integraller gerçek bir daðýlým fonksiyonu $f(x,y)$ verilince alt ve
+üst limit te tanýmlamak zorundadýr. Çünkü kýsmý yoðunluk için bir veya
+daha fazla deðiþkeni ``integralle dýþarý atmak (integrate out)'' ettiðimiz
+söylenir, eðer ayrýksal (discrete) ortamda olsaydýk bu atýlan deðiþkenin
+tüm deðerlerini göze alarak toplama yapan bir formül yazardýk. Sürekli
+ortamda integral kullanýyoruz, ama tüm deðerlerin üzerinden yine bir
+þekilde geçmemiz gerekiyor. Ýþte alt ve üst limitler bunu
+gerçekleþtiriyor. Bu alt ve üst limitler, atýlan deðiþkenin ``tüm
+deðerlerine'' bakmasý gerektiði için $-\infty,+\infty$ olmalýdýr. Eðer
+problem içinde deðiþkenin belli deðerler arasýnda olduðu belirtilmiþ ise
+(mesela alttaki örnekte $x>0$) o zaman entegral limitleri alt ve üst
+sýnýrýný buna göre deðiþtirebilir. 
+
+Örnek 
+
+$f_{X,Y}(x,y) = e^{ -(x+y)}$, olsun ki $x,y \ge 0$. O zaman $f_X(x)$
+
+$$
+f_X(x) = e^{ -x} \int _{ 0}^{\infty} e^{ -y} \ud y = e^{ -x}  \cdot 1  = e^{-x} 
+$$
+
+Örnek 
+
+$$ f(x,y) = 
+\left\{ \begin{array}{ll}
+x+y & \textrm{eðer } 0 \le x \le 1, 0 \le y \le 1 \\
+0 & \textrm{diðer}
+\end{array} \right.
+ $$
+
+$$
+f_Y(y) = \int _{0}^{1}(x+y) \ud x = 
+\int _{0}^{1}x \ud x + \int _{0}^{1}y \ud x  = 
+\frac{ 1}{2} + y 
+\mlabel{1}
+$$
+
+Taným 
+
+Ýki rasgele deðiþken $A,B$ baðýmsýzdýr eðer tüm $A,B$ deðerleri için 
+
+$$ P(X \in A, Y \in B) = P(X \in A)P(Y \in B) $$
+
+eþitliði doðru ise. Bu durumda $X \amalg Y$ yazýlýr.
+
+Teori 
+
+$X,Y$'nin birleþik PDF'i $f_{X,Y}$ olsun. O zaman ve sadece 
+$f_{X,Y}(x,y) = f_X(x)f_Y(y)$ ise $X \amalg Y$ doðrudur. 
+
+Örnek 
+
+Diyelim ki $X,Y$ baðýmsýz, ve ikisinin de ayný yoðunluðu var.
+
+$$ f(x) = 
+\left\{ \begin{array}{ll}
+2x & \textrm{eðer } 0 \le x \le 1 \\
+0 & \textrm{diðerleri}
+\end{array} \right.
+ $$
+
+$P(X+Y < 1)$'i hesaplayýn. 
+
+Cevap
+
+Baðýmsýzlýðý kullanarak birleþik daðýlýmý hesaplayabiliriz
+
+$$ f(x,y) = f_X(x)f_Y(y) = 
+\left\{ \begin{array}{ll}
+4xy & \textrm{eðer } 0 \le x \le 1, 0 \le y \le 1 \\
+0 & \textrm{diðerleri}
+\end{array} \right.
+ $$
+
+Þimdi bu birleþik yoðunluk üzerinden istediðimiz bölgeyi hesaplarýz,
+bölgeyi tanýmlayan $X+Y \le 1$ ifadesi. 
+
+$$
+P(X+Y \le 1) = \int \int_{x+y \le 1} f(x,y) \ud y \ud x
+$$
+
+Entegralin limitinin üstteki hali sembolik, hesap için bu yeterli deðil, eðer
+$x+y \le 1$ ise,  $y \le 1-x$ demektir, ve bölge $y = 1-x$ çizgisinin altý
+olarak kabul edilebilir. $x,y$ zaten sýfýrdan büyük olmalý, yani sola doðru
+yatýk çizginin altý ve $y,x$ eksenlerinin üstü kýsmýný oluþturan bir üçgen,
+
+$$ =
+\int _{ 0}^{1} \int _{ 0}^{1-x} 4yx \ud y \ud x = 
+4 \int \int _{ 0}^{1} x \bigg[ \int _{ 0}^{1-x} y \ud y \bigg] \ud x
+$$
+
+Numaraya dikkat, hangi deðiþken üzerinden entegral aldýðýmýza bakarak, onun
+haricindekileri sabit kabul ederek bu ``sabitleri'' entegral dýþýna
+atýyoruz, böylece iþimizi kolaylaþtýrýyoruz. Hesabý tamamlarsak, 
+
+$$
+4 \int _{ 0}^{1} x \frac{ (1- x)^2}{2} \ud x = \frac{1}{6}
+$$
+
+Çok Deðiþkenli (Multivariate) Daðýlýmlar ve IID Örneklemler (Samples)
+
+$X = (X_1,...,X_n)$ olsun, ki $(X_1,...,X_n)$'lerin herbiri bir rasgele
+deðiþken, o zaman $X$'e rasgele vektör (random vector) ismi
+verilir. $f(x_1,...,x_n)$'in PDF'i temsil ettiðini düþünelim. Bu PDF'i baz
+alarak aynen iki deðiþkenli (bivariate) örneklerde olduðu gibi, benzer
+tekniklerle kýsmi olan, koþullu daðýlýmlarý, vs. hesaplamak mümkündür.
+
+Çok Deðiþkenli Normal 
+
+Tek deðiþkenli Normal daðýlýmýn iki parametresi vardý, $\mu,\sigma$. Çok
+deðiþkenli formda $\mu$ bir vektör, $\sigma$ yerine ise $\Sigma$ matrisi
+var. Önce rasgele deðiþkeni tanýmlayalým,
+
+$$ Z = 
+\left[\begin{array}{r} Z_1 \\ \vdots \\ Z_k \end{array}\right]
+$$
+
+ki $Z_1,...,Z_k \sim N(0,1)$. $Z$'nin yoðunluðu 
+
+$$ f(z) = \prod _{ i=1}^{k}f(z_i) = 
+\frac{ 1}{(2\pi)^{k/2}} \exp 
+\bigg\{  -\frac{ 1}{2}\sum _{ j=1}^{k}z_j^2 \bigg\}
+$$
+
+$$ =
+\frac{ 1}{(2\pi)^{k/2}} \exp 
+\bigg\{  -\frac{ 1}{2}z^Tz \bigg\}
+$$
+
+Bu durumda $Z$'nin {\em standart} çok deðiþkenli Normal daðýlýma sahip olduðu
+söylenir, ve $Z \sim N(0,I)$ olarak gösterilir. Buradaki $0$ deðeri içinde $k$
+tane sýfýr olan bir vektör olarak, $I$ ise $k \times k$ birim (identity) matrisi
+olarak anlaþýlmalýdýr.
+
+Daha genel olarak bir vektör $X$'in çok deðiþkenli Normal daðýlýmýna sahip
+olduðunu söyleriz, ve bunu $X \sim N(\mu,\Sigma)$ olarak gösteririz, eðer
+daðýlýmýn yoðunluðu
+
+$$
+f(x;\mu,\Sigma) = 
+\frac{ 1}{(2\pi)^{k/2} \det(\Sigma)^{1/2}} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)
+\bigg\}
+$$
+
+ki $k$ yine veri noktalarýnýn boyutudur, 2 boyutlu bir Gaussian için
+$k=2$. $\Sigma$ pozitif kesin (positive definite) bir matristýr. Hatýrlayalým,
+bir matris pozitif kesindir eðer tüm sýfýr olmayan $x$ vektörleri için
+$x^T\Sigma x > 0$ ise.
+
+Not: Karekök kavramý tek sayýlardan matrislere de aktarýlabilir. Bir
+matris $B$'nin $A$'nin karekökü olduðu söylenir, eðer $B \cdot B = A$ ise.
+
+Devam edersek, eðer $\Sigma$ pozitif kesin ise bir $\Sigma^{1/2}$ matrisini
+olduðu gösterilebilir, ki bu matrise $\Sigma$'nin karekökü ismi verilir, ve
+bu karekökün þu özellikleri vardýr, 1) $\Sigma^{1/2}$ simetriktir, 2)
+$\Sigma = \Sigma^{1/2}\Sigma^{1/2} = I$ ve $\Sigma^{-1/2} = (\Sigma^{1/2})^{-1}$.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+def gauss(m,v,x):
+    n,d = x.shape
+    S = lin.inv(v)
+    x = x-m
+    y = exp(-0.5*np.diag(dot(x,np.dot(S,x.T))))
+    return y * (2*pi)**(-d/2.0) / ( np.sqrt(lin.det(v)) + 1e-6)
+
+x = np.array( [[1.,1.]] )
+v = np.array( [[2.,0],[0,2.]] )
+m = np.array([1.,1.])
+print gauss(m, v, x)
+\end{minted}
+
+\begin{verbatim}
+[ 0.07957743]
+\end{verbatim}
+
+Maksimum olurluk ile elde edilen eldeki $n$ veri noktasý için $\mu,\Sigma$'nin
+tahmin edicileri $\hat{\mu},\hat{\Sigma}$,
+
+$$ \hat{\mu} = \frac{1}{n} \sum _{k=1}^{n} x_k $$
+
+$$ \hat{\Sigma} = \frac{1}{n} \sum _{k=1}^{n} (x_k-\hat{\mu}) (x_k-\hat{\mu})^T $$
+
+Ortalamanýn maksimum olurluk kestirmesi örneklem ortalamasý, aynen tek boyutlu
+durumda olduðu gibi. Kovaryans matrisi $\Sigma$ için tahmin edici
+$(x_k-\hat{\mu}) (x_k-\hat{\mu})^T$, yani $n$ tane matrisin aritmetik ortalamasý
+[4, sf. 112]. Bunlar gayet akla yatkýn sonuçlar.
+
+
+z-Skorlarý
+
+Bu deðerler bazen kafa karýþýklýðý yaratabiliyor, çünkü z-deðeri, z-''skoru''
+gibi kelimeler geçince sanki bu z büyüklükleri bir olasýlýk deðeriymiþ gibi bir
+anlam çýkabiliyor. Bu doðru deðil, z deðerleri kümülatif fonksiyonlara {\em
+  geçilen} þeyler. Yani $z=0.08$ ``skorunun'' olasýlýðýný hesaplamak için
+$\phi(z) = \int_{0}^{z} p(t) \ud t$ ile hesabýný yapmak lazým. Bir diðer
+karýþýklýk sebebi mesela $z_{0.05} = -1.64$ gibi bir ifade. Burada z-skoru
+$-1.64$ deðeridir, $z$ altýna yazýlan deðer bir notasyonel püf noktadýr, ve
+aslýnda $\phi(z)$ sonucunun ta kendisi, yani $\phi(-1.64) = 0.05$, bu bazý
+hesaplar için görmesi kolay olsun diye $z_{0.05}$ olarak yazýlýyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import norm
+print norm.cdf(-1.64)
+\end{minted}
+
+\begin{verbatim}
+0.0505025834741
+\end{verbatim}
+
+Bu yüzden, $P(z_1 < Z < z_2)$ gibi bir ifadede mesela, $Z$'nin iki
+tarafýndaki her iki deðer birer z-deðeri, olasýlýk deðerleri
+deðil. Olasýlýk deðeri $P(\cdot)$ hesabý sonucunda elde edilecek. 
+
+Tabii z-skorlarý ile ona baðlý olasýlýk deðeri arasýnda birebir baðlantý
+var, fakat z-deðerinin ``kendisi'' olasýlýk deðeri deðildir.
+
+Rasgele Deðiþkenler, Yoðunluklar
+
+Þimdi konularýn üzerinden bir daha geçelim; rasgele deðiþken, $X,Y$ gibi
+büyük harflerle gösterilen büyüklükler ``bir zar atýþ sonucu içleri
+doldurulan'' deðiþkenlerdir. Bu zar atýþý her zaman $X$'in, $Y$'nin baðlý
+olduðu daðýlýma göre olacaktýr. Eðer $X \sim N(10,2)$ ise, bir formülün /
+hesabýn içinde $X$ gördüðümüz zaman çoðunlukla o noktaya 10'a yakýn
+deðerler olacaðýný biliriz. Tabii ki ``kesin'' her zaman ne olacaðýný
+bilmeyiz, zaten bir modelde noktasal deðer (tipik cebirsel deðiþkenler)
+yerine rasgele deðiþken kullanmanýn sebeplerinden biri budur.
+
+Rasgele deðiþkenlerin matematiksel formüllerde kullanýlmasý $C = X + Y$
+þeklinde olabilir mesela. O zaman elde edilen yeni deðiþken de bir rasgele
+deðiþken olur. Bu tür formüller envai þekle girebilir, hatta rasgele
+deðiþken içeren formüllerin türevi bile alýnabiliyor, tabii bunun için özel
+bir Calculus gerekli, Ýto'nun Calculus'y bu tür iþlerle uðraþýyor.
+
+Elimizde þunlar var; olasýlýk fonksiyonu bir matematiksel denklem, öne
+deðerler geçiyoruz, ve bu deðerlerin olasýlýklarýný gayet direk, mekanik
+bir formülden cevap olarak alýyoruz. Rasgele deðiþkenler ise bu yoðunluk
+fonksiyonlarýný bir anlamda ``tersten iþletiyor'', o daðýlýma ``zar
+attýrýyor'' (hatta Simulasyon denen bir derste tam da bu öðretiliyor, yani
+yoðunluklara yarý-rasgele sayýlar üzerinden zar attýrmak!), ve kümülatif
+olasýlýk fonksiyonuna geçilen deðerler bu sefer dýþarý çýkýyor. Tabii
+yoðunluðun ne olduðuna göre bazý deðerler daha çok, bazýlarý daha az
+çýkýyor. Hesapsal olarak bir rasgele deðiþkene / daðýlýma zar attýrmak için
+özel kodlamalar, yarý-rasgele sayý üretimi gereklidir, biz kavramsal ve
+cebirsel olarak onlarýn neyi temsil ettiðinden bahsediyoruz.
+
+Ýki kavramdan daha bahsetmek bu noktada faydalý. 1) Nüfus (Population) 2)
+Örneklem (Sample). Nüfus, üzerinde istatistiksel analiz yaptýðýmýz kitlenin
+tamamý. Eðer insanlarýn boylarý hakkýnda istatistiki analiz yapýyor
+olsaydýk tüm insanlar nüfus olurdu. Nüfusun bazen hangi daðýlýmda olduðu
+bilinmiyor olabilir, biliniyor olsa da bazen bu daðýlýmýn parametreleri
+bilinmiyor olabilir. Örneklem, nüfus içinden alýnan rasgele ölçümlere
+verilen isimdir, $X_1,..,X_n$ olarak gösterilebiliyor, bu durumda nüfusun
+daðýlýmýnýn ``zar attýðý'' ve her zar atýþýnýn rasgele deðiþkenlerden
+birinin içini doldurduðu düþünebilir. Örneklem nüfustan geldiði için
+daðýlýmýnýn aynen nüfus gibi olduðu kabul edilir. Bu baðlantýdan yola
+çýkýlarak birçok istatistiki analiz yapmak mümkündür.
+
+Ýlginç iki teori daha, hatta bu teoriler Ýstatistiðin belkemiðini oluþturur,
+Büyük Sayýlar Kanunu ve Merkezi Limit Teorisi. Diyelim ki $X_1,X_2,...,X_n$ bir
+nüfustan gelen örneklem, ve her veri noktasý baðýmsýz ve daðýlýmý ayný (nüfus
+gibi), bu durumda basit ortalama $\bar{X} = (X_1+X_2+...+X_n) / n \to \mu$ olur,
+yani basit ortalama nüfus ortalamasýna yaklaþýr! Burada ne söylendiðine iyi
+dikkat, hakkýnda {\em hiçbir þey} bilmediðimiz nüfusun $\mu$'þu hakkýnda
+bir analiz yapabiliyoruz. 
+
+Merkezi Limit Teorisi biraz daha detay ekler, $\bar{X} = (X_1+X_2+...+X_n)
+/ n$ ortalamasý $\mu$ standart sapmasý $\sqrt{\sigma} / n$ olan bir Normal
+daðýlýma yaklaþýr. Bu teoriler, özellikle ikincisi kullanýlarak örneklem
+(eldeki ufak veri) ve büyük nüfus arasýnda baðlantý kurulabilir o tam
+bilinemeyen gerçek durum hakkýnda eldeki örnek verisi ile bir çok analiz
+yapmak mümkün olur.
+
+Kaynaklar
+
+[1] Wikipedia, {\em Confidence interval}, \url{http://en.wikipedia.org/wiki/Confidence_interval}
+
+[2] Janert, {\em Data Analysis with Open Source Tools}
+
+[4] Duda, Hart, {\em Pattern Clasification}
+
+\end{document}
+
+
+

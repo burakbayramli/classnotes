@@ -1,0 +1,583 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Güven Aralýklarý
+
+Diyelim ki $X_1,..,X_i$ örneklemi birbirinden baðýmsýz, ayný daðýlýmlý ve
+ortalamasý $\mu$, standart sapmasý $\sigma$ ve yine ayný olan bir nüfus
+daðýlýmýndan geliyor. O zaman biliyoruz ki, Merkezi Limit Teorisi (Central
+Limit Theorem) teorisine göre, $n$ arttýkça örneklem ortalamasý $\bar{X} =
+\frac{1}{n} X_1+..+X_n$, ortalamasý $\mu$, standart sapmasý $\sigma/n^2$
+olan bir normal daðýlýma yaklaþýyor.
+
+Peki veriyi (yani örneklemi) ve CLT'yi kullanarak $\mu$ hakkýnda bir tahmin
+yapabilir miyiz? Yani Büyük Sayýlar Kanunua göre $\mu$ hakkýnda noktasal
+tahmin yapabiliriz fakat, belki ondan bir adým ötesi, bir ``güven aralýðý''
+hesaplamaktan bahsediyoruz. Bu tahmin ``gerçek $\mu$, \%95 ihtimalde þu iki
+deðer arasýndadýr'' türünde bir tahmin olacak.
+
+Dikkat: burada verinin yüzde kaçýnýn belli bir aralýkta olup olmadýðýndan
+bahsetmiyoruz, tahminsel hesabý yapýlan ortalamanýn hangi güven seviyesinde
+bir aralýkta olup olmadýðýndan bahsediyoruz. Verinin güven aralýðý
+hakkýndaki notlar bu yazýnýn sonunda.
+
+Bu aralýðýn hesabý için önce $\bar{X}$'i standardize edelim, yani $N(0,1)$
+haline çevirelim,
+
+$$ Z = \frac{\bar{X} - \mu}{\sigma / \sqrt{n}} $$
+
+Z-skorlarýný iþlediðimiz yazýda 
+
+$$
+P(z_1 < Z < z_2) =  \Phi(z_1) - \Phi(z_2) 
+$$
+
+gibi bir ifade gördük. Eþitliðin sað tarafý aslýnda bir alan hesabýdýr,
+sürekli fonksiyonlarda olasýlýk bir entegral, ya da iki kümülatif yoðunluk
+fonksiyonunun farký. Güven aralýðý için bize lazým olan da bir olasýlýk,
+hatta ``kesin'' bir olasýlýk, \%95 olasýlýðý. Demek ki eþitliðin sað tarafý
+.95 olacak. .95 hesabý için, normal eðrisini düþünürsek, saðýndan ve
+solundan 0.25 büyüklüðünde iki parçayý ``kýrpmamýz'' lazým. O zaman 0.975
+olasýlýðýnýn z deðeri ile, 0.025 olasýlýðýnýn z deðeri arasýndaki
+olasýlýkta olmamýz lazým. Bu hesaplarda baz alýnan $z_{\alpha/2}$ deðeri ve
+bu $100 \cdot \alpha / 2$ üst yüzdelik kýsmýna, örneðimizde 0.975 kýsmýna
+tekabül ediyor. Normal daðýlýmýn simetrisi sebebiyle onun eksisi alýnmýþ
+hali öteki (soldaki) parçayý verir, yani $-z_{\alpha/2}$. 
+
+\includegraphics[height=6cm]{stat_ci_03.png}
+
+Z-skoru hesaplarken tabloya danýþmýþtýk, þimdi tabloya tersinden bakacaðýz,
+kesiþme noktasýnda 0.975 diyen yeri bulup kordinatlarý alacaðýz, ki bu
+deðer 1.96. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import norm
+print norm.ppf(0.975)
+\end{minted}
+
+\begin{verbatim}
+1.95996398454
+\end{verbatim}
+
+Bazý Ýstatistik kaynaklarýnda ``sihirli deðer'' þeklinde tarif edilen bir
+deðer bu, gözlerimiz kamaþmasýn, geldiði yer burasý iþte. Þimdi formülü
+buna göre deðiþtirelim,
+
+$$ 
+P \bigg( 
+-z_{\alpha/2} \
+\le \frac{\bar{X} - \mu}{\sigma / \sqrt{n}} 
+\le z_{\alpha/2}
+\bigg) = 1-\alpha
+ $$
+
+$P(\cdot)$ içinde biraz düzenleme, tüm terimleri $\sigma / \sqrt{n}$ ile
+çarpalým, $\bar{X}$ çýkartalým, ve $-1$ ile çarpalým,
+
+$$ 
+P \bigg( 
+\bar{X} - z_{\alpha/2}\frac{\sigma}{\sqrt{n}}
+\le \mu
+\le \bar{X} + z_{\alpha/2}\frac{\sigma}{\sqrt{n}}
+\bigg) = 1-\alpha
+\mlabel{1}
+ $$
+
+Güven aralýðý ifadesine aslýna eriþmiþ olduk. Eðer \%95 kesinlikten
+bahsediyor olsaydýk, ve nüfusun gerçek varyansý $\sigma^2$ biliniyor
+olsaydý, $P(\cdot)$ içine bu deðerleri geçecektik, $\bar{X}$ zaten verinin
+aritmetik ortalamasýndan ibarettir, bu bize $\mu$'nun solunda ve saðýnda
+bazý deðerler döndürecekti. Bu deðerler bizim güven aralýðýmýz
+olacaktý. Mesela veri 64.1, 64.7, 64.5, 64.6, 64.5, 64.3, 64.6, 64.8,
+64.2, 64.3 þeklinde, $n=10$ çünkü 10 nokta var, $\sigma = 1$ olarak
+verilmiþ.  Ortalamayý hesaplýyoruz, 64.46. $\alpha=0.05$ için
+
+$$ 
+P \bigg( 
+64.46 - 1.96\frac{1}{\sqrt{10}}
+\le \mu
+\le 64.46 + 1.96\frac{1}{\sqrt{10}}
+\bigg) = 0.95
+ $$
+
+$$ P\bigg(63.84 \le \mu \le 65.08\bigg) = 0.95 $$
+
+Yani \%95 güven aralýðý $63.84 \le \mu \le 65.08$. 
+
+Neler yaptýk? CLT bilgisinden hareketle $\bar{X}$ hakkýnda bir þeyler
+biliyorduk. Fakat $\bar{X}$'in {\em kesin} hangi normal daðýlýma
+yaklaþtýðýný bilmek için nüfus paremetreleri $\mu,\sigma$ da
+bilinmelidir. Diðer yandan eðer tek bilinmeyen $\mu$ ise, teoriyi bu
+bilinmez etrafýnda tamamen tekrar þekillendirip / deðiþtirip CLT'yi
+bilinmeyen $\mu$ etrafýnda bir güven aralýðý yaratmak için kullandýk.
+
+Not: Eðer $\sigma$ bilinmiyor ise onu da veriden hesaplarýz, $S^2$ tahmin
+edicisi ile, yanlýz bu durumda $S^2$ te bir daðýlýma sahip olacaktýr, $\chi^2$
+daðýlýmý, ve üstte $P()$ içindeki bölüm bir Normal rasgele deðiþkeni bolu
+$\chi^2$ bölümü haline gelir, ki bu bölüm Öðrenci t daðýlýmý adýnda baþka bir
+daðýlýma sahiptir! O zaman üstteki cebirsel hareketleri bunu hesaba katarak
+yapmak gerekir. Bunun detaylarýný ilerideki bir bölümde göreceðiz. 
+
+Kac Tane $n$?
+
+Hatýrlarsak güven aralýðýný üstteki þekilde hesaplayabilmemizin sebebi CLT
+sayesinde $\bar{X}$'in normal daðýlýma yaklaþýyor olmasýydý. Ve, teoriyi
+tekrar düþünürsek yaklaþma $n \to \infty$ olduðu zaman oluyordu. Buradan
+$\bar{X}$'in normalliðinin ``büyükçe'' $n$ deðerleri için daha geçerli
+olacaðý sonucuna varabiliriz. Peki $n$ ne kadar büyük olmalý?  Literatüre
+göre CLT'nin genellikle $n \ge 30$ durumunda geçerli olduðu söylenir. Tabii
+nüfus daðýlýmýnýn ne olduðu da önemlidir, eðer nüfus normal ise, ya da
+genel olarak simetrik tek tepeli daðýlým ise örneklem daha ufak kalsa da
+bazý sonuçlara varabiliriz. Eðer nüfus daðýlýmý çok yamuk (skewed),
+etekleri geniþ daðýlým ise o zaman daha büyük örneklem daha iyi olur.
+
+Soru
+
+ÝÖ 800 yýllarýnda Ýtalya'da Etrusyalý (Etruscan) toplumu vardý, bilinmeyen
+bir sebeple bu insanlar geldikleri gibi birdenbire ortadan
+kayboluverdiler. Bilimciler bu toplumun Ýtalyalýlar ile fizyolojik, genetik
+ve kültürel olarak baðlantýsý olup olmadýðýný hep merak etmiþtir. Bazýlarý
+hafa ölçülerine bakarak sonuçlara varmaya uðraþmýþtýr. Arkeolojik kazýlarda
+yapýlan ölçümlerde 84 Etrusyalýnýn kafasý ölçülmüþtür. Ayrýca bugünkü
+Ýtalyanlarýn kafa ölçümlerinin normal daðýlýmda $\mu=132.4 mm,\sigma=6.0mm$
+olduðu bilinmektedir. Ýki toplum arasýndaki baðlantý kurmak için, veriye
+bakarak kafa ölçümü ortalamasý için bir \%95 güvenlik aralýðý
+oluþturabiliriz, ve eðer bugünkü Ýtalyanlarýn ölçüsü o aralýða düþmüyorsa,
+Etrusyalýlarla baðlantýlarýnýn olmadýðýný iddia edebiliriz.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+dfetr = pd.read_csv('../stat_035_tests/etrus.csv')
+print (float(dfetr.mean()-1.96*(6.0/np.sqrt(84))))
+print (float(dfetr.mean()+1.96*(6.0/np.sqrt(84))))
+\end{minted}
+
+\begin{verbatim}
+142.524107721075
+145.09035011025028
+\end{verbatim}
+
+Bugünkü Ýtalyanlarýn kafa ortalamasý $\mu=132.4$ bu aralýða düþmüyor. Diðer
+bir deyiþle, 84 tane örneklemden gelen örneklem ortalamasý 143.8 büyük bir
+ihtimalle $\mu=132.4,\sigma=6.0$ boyutlarýndaki bir normal daðýlýmdan
+gelmemiþtir. Buna göre, büyük bir ihtimalle Etrusyalýlar Ýtalyanlarýn atasý
+deðildir. 
+
+Bilinmeyen $\sigma$
+
+Güven Aralýklarý bölümünden devam edelim. Bilinmeyen $\mu$ durumunu
+gördük. Eðer $\sigma$ bilinmiyorsa, bu durumda $\sigma$ yerine örneklem
+varyansý $S$ kullanýlabilir,
+
+$$ S^2 = \frac{1}{n} \sum (X_i - \bar{X})^2
+$$
+
+ki üstteki deðerin karekökü $S$ olacaktýr. $\sigma$ yerine $S$ kullanmanýn 
+büyük $n$ deðerlerinde CLT'yi etkilemediði ispat edilmiþtir [5]. Fakat daha
+küçük örneklem durumunda t Daðýlýmý daha uygun olur. 
+
+T Daðýlýmý
+
+Daha önce Z oranýný temel alarak güven aralýklarý ya da hipotez testleri
+oluþturmuþtuk. Bu iþlemler için standart normal daðýlýmýn üst ve alt
+yüzdelikleri hakkýnda bazý bilgiler gerekmiþti. Bu bilgiler bir tablodan
+bakýlan deðerlerdi ya da istatistik yazýlýmýmýzda gerekli bir çaðrý ile
+hemen bulunabiliyorlardý.
+
+\includegraphics[height=4cm]{stat_ci_04.png}
+
+Öðrenci t'nin Z'ye göre farklý bir tarafý belli bir deðeri bulmak için iki
+parametreye ihtiyaç olmasý, bunlardan biri $\alpha$ diðeri ise serbestlik
+derecesi (degree of freedom -dof-). Standart normal için tablo paylaþtýk,
+fakat t için artýk tablolarla uðraþmayacaðýz, bilgisayar çaðýndayýz,
+yazýlým ile bu iþi halledelim! 
+
+Örnek
+
+$T$ bir Öðrenci t daðýlýmý ise, ve serbestlik derecesi 3 ise, $\alpha=0.01$
+için için $f_T(t)$'nin $100(1-\alpha)$ yüzdeliði nedir? Üstteki grafikteki
+$t_{\alpha,n}$ notasyonundan hareketle $t_{0.01,3}$ deðerini arýyoruz yani.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import t
+df = 3
+print t.ppf(0.99,df)
+print 1-t.cdf(4.541,df)
+\end{minted}
+
+\begin{verbatim}
+4.5407028587
+0.00999823806449
+\end{verbatim}
+
+Yani
+
+$$ P(T_3 \ge 4.541) = 0.01 $$
+
+$\frac{\bar{Y}-\mu}{S/\sqrt{n}}$ ifadesinin n-1 derece serbestliðe 
+sahip Öðrenci t daðýlýmýna sahip olduðunu bilmek alttaki ifadeyi mümkün kýlar, 
+
+$$ P \bigg(
+-t_{\alpha/2,n-1} \le
+\frac{\bar{Y}-\mu}{S/\sqrt{n}} \le 
+t_{\alpha/2,n-1}
+\bigg) = 1-\alpha
+ $$
+
+Bu ifadeyi daha önce standart normal için yaptýðýmýz gibi tekrar
+düzenlersek,
+
+$$ P \bigg(
+\bar{Y}-t_{\alpha/2,n-1}\frac{S}{\sqrt{n}} \le
+\mu \le 
+\bar{Y}+t_{\alpha/2,n-1}\frac{S}{\sqrt{n}}
+\bigg) = 1-\alpha
+$$
+
+Tabii, $Y_i$'larýn normal daðýlýmdan gelmiþ olmasý lazým. Bunun sonucunda
+gerçek veri temel alýnarak hesaplanacak $S$ ve $\bar{Y}$ bize $\mu$ için
+bir $\%100(1-\alpha)$ güven aralýðý verecektir. 
+
+
+Örnek
+
+Yapýþkan elementlerin üzerinde yapýlan deneyler sonucundaki ölçümler altta
+verilmiþtir. Acaba $\mu$ için \%95 güven aralýðý nedir?
+
+Öncelikle verinin normal daðýlýmdan geldiði doðru mudur? Bu faraziyeyi
+kontrol etmemiz gerekir yoksa t daðýlýmýný kullanamayýz. Önce bir kutu
+grafiði (boxplot) yapalým,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+data = np.array([19.8,10.1,14.9,7.5,15.4,15.4,15.4,18.5,7.9,12.7,
+11.9,11.4,11.4,14.1,17.6,16.7,15.8,19.5,8.8,13.6,11.9,11.4])
+plt.boxplot(data)
+plt.savefig('stat_ci_01.png')
+\end{minted}
+
+\includegraphics[height=4cm]{stat_ci_01.png}
+
+Þimdi normal olasýlýk grafiði (normal probability plot) yapalým, ki bu
+grafik verinin normal daðýlýma ne kadar uyumlu olduðunu grafik olarak
+gösterir, eðer uyumlu ise veri düz çizgiye yakýn çýkmalýdýr,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.stats as stats
+res = stats.probplot(data, plot=plt)
+plt.savefig('stat_ci_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_ci_02.png}
+
+Bu grafiklere bakýnca verinin normal olduðu belli oluyor. Zaten örneklem
+sayýsý az, bu sebeple t daðýlýmý kullanmak uygun. Veri sayýsal ortalamasý
+ve sayýsal standart sapmasýna bakalým, ve güven aralýðýný hesaplayalým, 
+yani
+
+$$ \bar{x} - t_{\alpha/2,n-1}s/\sqrt{n} \le
+\mu \le
+ \bar{x} + t_{\alpha/2,n-1}s/\sqrt{n}
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import t
+n = len(data)
+dof = len(data)-1
+m = np.mean(data)
+s = np.std(data)
+print 'ortalama',m
+print 'sapma',s
+print m + t.ppf(0.025,dof) * s / np.sqrt(n),\
+      m - t.ppf(0.025,dof) * s / np.sqrt(n)
+\end{minted}
+
+\begin{verbatim}
+ortalama 13.7136363636
+sapma 3.47187340764
+12.174293931 15.2529787962
+\end{verbatim}
+
+Güven aralýðý oldukça geniþ, çünkü (demek ki) ölçümlerde yüksek deðiþkenlik
+var. 
+
+Normal Nüfusun Varyansýnýn Güvenlik Aralýðý
+
+Bazen nüfusun varyansý ya da standart sapmasý üzerinde bir güven aralýðý
+hesaplamak gerekebilir. Eðer nüfus normal olarak daðýlmýþ ise, þimdiye
+kadar gösterdiðimiz tekniklerin hepsi kullanýlabilir. (1) teorisinin b
+kýsmýndaki ifadeyi kullanýrsak, nüfusu $\mu,\sigma$ parametreli bir
+normalden alýnan $X_1,..,X_n$ örneklemi üzerinden hesaplanan
+$X^2 = \frac{(n-1)S^2}{\sigma^2}$ ifadesinin $n-1$ serbestlik derecesindeki bir
+chi kare daðýlýmý olduðunu biliyoruz.
+
+Chi karenin yüzdelik kýsýmlarý altta görülebilir,
+
+\includegraphics[height=5cm]{chi_1.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import chi2
+print chi2.ppf(0.05,5)
+print chi2.ppf(0.99,5)
+\end{minted}
+
+\begin{verbatim}
+1.14547622606
+15.0862724694
+\end{verbatim}
+
+Dikkat edilmesi gereken bir konu chi karenin yamuk (skewed) olmasý
+sebebiyle saðdaki ve soldaki alan hesaplarýnýn arasýnda z skorunda olduðu
+gibi her seferinde birebir geçiþ yapýlamayabileceði. 
+
+Notasyonel olarak $\chi_{p,n}^2$ ifadesi, x eksenindeki bir eþik noktasýný
+ifade eder ki bu deðerin sol tarafýndaki alan büyüklüðü $p$, $n$ serbestlik
+derecesindeki chi kare daðýlýmýnýn alanýdýr. Mesela üstte $\chi_{0.05,5}^2 =
+1.145$ ve $\chi_{0.99,5}^2 = 15.086$. Olasýlýk ifadesi olarak 
+
+$$ P(\chi_5^2 \le 1.145) = 0.05 $$
+
+$$ P(\chi_5^2 \le 15.086) = 0.05 $$
+
+Not: Bazý kaynaklar eþik deðerinin sað kýsmýný referans alýyor her
+nedense, bu duruma dikkat.
+
+$\sigma^2$ Ýçin Güvenlik Aralýðý
+
+Chi kare tanýmýndan hareketle þu ifadeyi yazabiliriz, 
+
+$$ P\bigg(
+\chi_{\alpha/2,n-1}^2 \le
+\frac{(n-1)S^2}{\sigma^2}  \le
+\chi_{1-\alpha/2,n-1}^2
+\bigg) = 1-\alpha
+$$
+
+Belirtildiði üzere, üstteki ifadenin $Z$'li halinde olduðu gibi, bir z
+deðerini alýp, eksi ile çarparak (ve çarpmayarak) hem sol hem saðda eþik
+deðeri olarak kullanamadýk çünkü chi kare simetrik deðil. Eþik deðerinin
+belli noktalarda ayrý ayrý hesaplanmasý gerekiyor.
+
+Üstteki denklem birkaç cebirsel iþlem sonrasýnda $\sigma^2$'yi ortada tek
+baþýna býrakacak þekilde deðiþtirilebilir, önce eþitsizlikleri tersine
+çeviriyoruz, ayný anda ortadaki bölüme tersine çeviriyoruz, ve yeni böleni
+hem sol hem saða çarparak taþýyoruz,
+
+$$
+P
+\bigg(
+\frac{(n-1)S^2}{\chi_{1-\alpha/2,n-1}^2} \le
+\sigma^2  \le
+\frac{(n-1)S^2}{\chi_{\alpha/2,n-1}^2} 
+\bigg) = 1-\alpha
+$$
+
+Eþitsizliðin karekökünü alýrsak, $\sigma$ için $\%100(1-\alpha)$ güven
+aralýðý
+
+$$
+\bigg(
+\sqrt{\frac{(n-1)S^2}{\chi_{1-\alpha/2,n-1}^2}}
+,
+\sqrt{\frac{(n-1)S^2}{\chi_{\alpha/2,n-1}^2}}
+\bigg) 
+$$
+
+Örnek
+
+Bir fabrikada deterjanlarý doldurmak için bir makina kullanýlýyor. Rasgele
+seçilen bir örneklemde 20 tane deterjan plastik þiþeden alýnan ölçümlerde
+örneklem varyansýnýn $s^2 = 0.0153$ olduðu hesaplanýyor (birim $ons^2$). Bu
+ölçümlerin standart sapmasý $\sigma^2$ için \%95'lik üst güven sýnýrý nedir? 
+
+$$ 
+\sigma^2 \le
+\sqrt{\frac{(19)0.0153}{\chi_{0.05,19}^2}}
+ $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import chi2
+print chi2.ppf(0.05,19)
+\end{minted}
+
+\begin{verbatim}
+10.1170130639
+\end{verbatim}
+
+$$ 
+\sigma^2 \le
+\sqrt{\frac{(19)0.0153}{10.117}} = 0.0287
+ $$
+
+Yani
+
+$$ \sigma \le 0.17 $$
+
+Demek ki nüfusun gerçek standart sapmasý 0.17 ons kadar büyük olabilir.
+
+Nüfus Ortalama Farký, $\mu_1-\mu_2$ Güven Aralýðý 
+
+Ýki farklý nüfusun ortalamalarý $\mu_1,\mu_2$'nin birbirinden farklý olup
+olmadýðýný, ve bu farkýn istatistiki önemli olup olmadýðýný nasýl anlarýz?
+Bir yaklaþým, iki nüfusun örneklem ortalamasý $\bar{X}_1,\bar{X}_2$'i
+kullanmak ve farklýlýk $\mu_1-\mu_2$' için bir güven aralýðý oluþturmak,
+eðer sýfýr deðeri bu aralýk içine düþüyorsa, farklýlýk vardýr. Birbirinden
+ayný olan þeylerin farký sýfýr olduðuna göre eðer sýfýr güven aralýðý
+içinde ise bu iki nüfusun ortalamasýnýn birbirine yakýn olduðundan emin
+olabiliriz.  
+
+Devam edelim; Merkezi Limit Teorisi'ne göre yeterince büyük örneklemler,
+yani $n_1>30,n_2>30$ için, $\bar{X}_1,\bar{X}_2$ Normal olarak daðýlmaya
+mecbur. 
+
+Diðer yandan biliyoruz ki iki Normal daðýlýmýn toplamý, ya da çýkartýlmasý
+yeni bir Normal daðýlým verir. $\mu_a,\mu_b$ ve $\sigma_a,\sigma_b$ için,
+toplam $N(\mu_a+\mu_b, \sigma_a+\sigma_b)$ elde edilir. Örneklem durumunda
+ve çýkartma sonrasý yeni ortalama ve standart sapma
+
+$$ \mu_1-\mu_2, \qquad \frac{\sigma_1^2}{n_1} + \frac{\sigma_2^2}{n_2}$$
+
+olacaktýr [1, sf. 257].
+
+Ayrýca $\mu$ ortalamasýna, $\sigma$ varyansýna sahip bir $\bar{X}$'i
+
+$$ Z = \frac{\bar{X}-\mu}{\sigma/\sqrt{n}} $$
+
+ile standart normal $Z = N(0,1)$'e cevirilebileceðimizi biliyoruz. 
+
+O zaman yaklaþým þöyle olabilir; $\bar{X}_1-\bar{X}_2$'i hesaplarýz, bu
+daðýlýmýn kesinlikle normal olduðunu biliyoruz; o zaman nüfus ortalama ve
+standart sapmasý üzerinden standardizasyon ve biraz cebirsel cambazlýk ile
+$\mu_1-\mu_2$ için bir güven aralýðý oluþtururuz.
+
+$$ 
+Z =
+\frac{\bar{X}_1-\bar{X}_2 - (\mu_1-\mu_2)}
+{\sqrt{\sigma_1^2/n_1 + \sigma_2^2/n_2}}
+$$
+
+
+$$ 
+P \bigg(
+-z_{\alpha/2} \le 
+\frac{\bar{X}_1-\bar{X}_2 - (\mu_1-\mu_2)} {\sqrt{\sigma_1^2/n_1 + \sigma_2^2/n_2}} \le
+z_{\alpha/2} 
+\bigg) = 1-\alpha
+ $$
+
+$$ 
+P[
+(\bar{X}_1 - \bar{X}_2) - z_{\alpha/2}\sigma_w \le
+\mu_1-\mu_2 \le
+(\bar{X}_1 - \bar{X}_2) + z_{\alpha/2}\sigma_w 
+] = 1-\alpha
+$$
+
+ki  $\sigma_w = \sqrt{\sigma_1^2/n_1 + \sigma_2^2/n_2}$. Eðer $\sigma$ 
+bilinmiyorsa, onun yerine, yine yeterince  büyük örneklem için örneklem 
+standart sapmasý $s$ kullanýlabilir. 
+
+$\sigma^2$ için yansýz (unbiased) tahmin edici 
+
+$$ s^2 = \sigma_i (X_i-\bar{X})^2 / (n-1) $$
+
+Not: Kaynaklarda çoðunlukla $\sigma^2$ yerine $s^2$ kullanýlýrsa $Z$ yerine
+$T$ yani Öðrenci T daðýlýmý kullanýlmasý tavsiye edilir, fakat eðer
+örneklem yeterince büyük ise $Z$ kullanýmýnda problem yoktur [3, sf. 544].
+
+Bir biyolog erkek ve diþi çekirgelerin uzunluk ölçümünü (ölçek milimetre)
+alýyor. Bu iki ölçümlerin ortalamasý birbirinden farklý mýdýr?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a = [5.20, 4.70, 5.75, 7.50, 6.45, 6.55, 4.70, 4.80, 5.95, \
+5.20, 6.35, 6.95, 5.70, 6.20, 5.40, 6.20, 5.85, 6.80, \
+5.65, 5.50, 5.65, 5.85, 5.75, 6.35, 14.1, 12.2, 14.0, 14.6, \
+5.75, 5.95, 5.90, 7.00, 6.10, 5.80]
+
+b = [8.25, 9.95, 5.90, 7.05, 8.45, 7.55,\
+9.80, 10.80, 6.60, 7.55, 8.10, 9.10, \
+6.10, 9.30, 8.75, 7.00, 7.80, 8.00, \
+9.00, 6.30, 8.35, 8.70, 8.00, 7.50, \
+9.50, 8.30, 7.05, 8.30, 7.95, 9.60 ]
+a = np.array(a)
+b = np.array(b)
+
+ma = np.mean(a); sa = np.std(a,ddof=1)
+mb = np.mean(b); sb = np.std(b,ddof=1)
+
+from scipy.stats.distributions import norm
+sw = np.sqrt(sa**2/len(a) - sb**2/len(b))
+
+print (mb-ma) + np.array([-1,1]) * norm.ppf(0.975)*sw
+\end{minted}
+
+\begin{verbatim}
+[ 0.53624225  2.09983618]
+\end{verbatim}
+
+Yüzde 95 güven aralýðý 0 deðerini içermediði için nüfus ortalamalarýnýn
+birbirinden farklý olduðu sonucuna varýyoruz.
+
+Verinin Yüzde Kaçý, Ortalama
+
+Verinin yüzde 68'inin hangi aralýk olduðu hesabý biraz farklý, ve
+daha basit. Mesela kafatasý ölçümü için
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (np.array([dfetr.mean() - dfetr.std(),
+                 dfetr.mean() + dfetr.std()]).T)
+\end{minted}
+
+Yani ortalam etrafýnda saðda ve solda tek standart sapmayla belirli bölge,
+bir Normal daðýlýmýn yüzde 68'ine tekabül eder, ve bir veri Normal þekilde
+daðýlmýþ ise, o verinin yüzde 68'inin hangi aralýkta olduðu bu þekilde
+hesaplanabilir.
+
+\begin{verbatim}
+[[137.80833099 149.80612685]]
+\end{verbatim}
+
+\includegraphics[width=20em]{areanorm2.jpg}
+
+Yüzde 95 hesabý için saðda ve solda iki standart sapmaya bakmak gerekir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (np.array([dfetr.mean() - 2*dfetr.std(),
+                 dfetr.mean() + 2*dfetr.std()]).T)
+\end{minted}
+
+\begin{verbatim}
+[[131.80943306 155.80502478]]
+\end{verbatim}
+
+Peki yüzde 68, yüzde 95, gibi deðerlerin standart sapma ile baðlantýsýnýn
+nereden biliyoruz? Düþünelim, her normal daðýlým standart normal daðýlýma
+indirgenebilir, ve standart normal daðýlým $N(0,1)$'dir, yani ortalamasý 0
+standart sapmasý 1. O zaman bu daðýlýmýn, sýfýr etrafýnda -1 ve +1
+sýnýrlarý içindeki alan nedir hesabý basit kumulatif yoðunluk ile
+yapýlabilir, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats.distributions import norm
+print (norm.cdf(1)-norm.cdf(-1)) # tek standart sapma
+print (norm.cdf(2)-norm.cdf(-2)) # iki standart sapma
+\end{minted}
+
+\begin{verbatim}
+0.6826894921370859
+0.9544997361036416
+\end{verbatim}
+
+Her daðýlýmýn tamamýnýn alaný bilindiði gibi 1, bu sebeple üstteki rakamlar
+bir yüzde olarak algýlanabilir.
+
+Kaynaklar 
+
+[1] Larsen, {\em Introduction to Mathematical Statistics and Its Applications}
+
+[2] Runger, {\em Applied Statistics and Probability for Engineers}
+
+[3] Dekker, {\em Probability and Statistical Inference}
+
+
+\end{document}
+
+

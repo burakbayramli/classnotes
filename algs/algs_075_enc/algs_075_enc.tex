@@ -1,0 +1,324 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Dýþbükeylik, Noktalarý Çevreleyen Bölgeler, Dýþbükey Zarf (Convex Hull)
+
+Verili herhangi bir boyuttaki bir nokta bulutunu düþünelim. Bu noktalar
+mesela bir yapay görüþ uygulamasýnda bir görüntüsel bölgeyi (blob) temsil
+ediyor olabilir, ki gerçek dünyada o bölge bir obje olabilir. Ya da uzaklýk
+ölçümü yapan algýlayýcýdan kordinatlar aldýk, bu kordinatlar arasýndaki bir
+grubun etrafýný tanýmlayan sýnýrlarý bilmek istiyoruz. Bu bölgenin
+özellikle dýþbükey olmasýný istiyoruz.
+
+Dýþbükeylik özellikle istenen bir özellik, çünkü gerçek dünya objelerinin
+kabaca dýþ çeperleri dýþbükey olmaya meyillidir. Ya da veri içinde dýþtan
+izole, dýþa kapalý bölgeler dýþbükey gözükebilir. Bu bölgeleri bulmak ve
+dýþ hatlarýný raporlamak faydalý.
+
+Þöyle bir nokta bulutu olsun, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.spatial import ConvexHull
+import pandas as pd
+
+points = np.array(pd.read_csv('quadri.csv'))
+plt.plot(points[:,0], points[:,1], 'o')
+plt.xlim(6,12); plt.ylim(8,15)
+plt.savefig('enc_09.png')
+\end{minted}
+
+\includegraphics[height=6cm]{enc_09.png}
+
+Bu noktalarýn dýþbükey zarfýný (convex hull) bulmak için pek çok algoritma
+var. Mesela Quickhull [1], ya da Graham Scan adlý algoritmalar. Altta
+\verb!scipy!'in çaðrýsýný kullanýyoruz, bu çaðrý içinde [2] koduna çaðrý
+yapýyor, QHull Quickhull kullanýyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.spatial import ConvexHull
+import pandas as pd
+
+points = np.array(pd.read_csv('quadri.csv'))
+hull = ConvexHull(points)
+plt.plot(points[:,0], points[:,1], 'o')
+for simplex in hull.simplices:
+    plt.plot(points[simplex, 0], points[simplex, 1], 'k-')
+plt.xlim(6,12); plt.ylim(8,15)
+plt.savefig('enc_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{enc_01.png}
+
+3 boyutlu bir veri için,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.spatial import ConvexHull
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.spatial import ConvexHull
+
+np.random.seed(2)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+points3 = np.random.rand(20,3)
+hull = ConvexHull(points3)
+edges= zip(*points3)
+
+for i in hull.simplices:
+    plt.plot(points3[i,0], points3[i,1], points3[i,2], 'r-')
+
+ax.plot(edges[0],edges[1],edges[2],'bo')
+
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z')
+
+plt.savefig('enc_08.png')
+\end{minted}
+
+\includegraphics[width=20em]{enc_08.png}
+
+Sonuçlar üstte. Piyasadaki en iyi dýþbükey zarf algoritmalarýnýn algoritmik
+karmaþýklýðý $O(n \log n)$ olarak biliniyor. Bu bazý uygulamalar için yavaþ
+gelebilir, ayrýca çoðu uygulamanýn kesin bir dýþ çeper bilgisine
+ihtiyacý yoktur, yaklaþýk bir çeper, kabaca þeklin ne olduðunu bildiren bir
+algoritma da kabul edilir olabilir.
+
+Yaklaþýk olarak iþleyen yaklaþýmlardan biri [3, sf. 154]'de. Bu yaklaþýma
+göre veri noktalarýnda önce minimum $x$ ve maksimum $x$ deðerleri bulunur
+(yani en sol ve en sað uç noktalar), ardýndan bu noktalar arasý dikey
+þeritlere bölünür.
+
+\includegraphics[width=15em]{enc_03.png}
+
+Sonra algoritma solda saða giderek her þerit içinde dikey en maksimum ve
+minimum iki noktayý bulur. Bu noktalar sýrasýyla üst ve alt zarf noktalarý
+olacaktýr. Algoritma tamamlanýnca bu minimal, maksimal noktalarýnýn hepsini
+alýp üzerinde standart dýþbükey zarf algoritmalarýndan birini
+iþletiriz. Fakat eldeki noktalarýn sayýsý artýk oldukça azaldýðý için
+algoritmanýn tamamý çok hýzlý çalýþacaktýr. Algoritmanýn karmaþýklýðý
+$O(N)$.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+xmin = np.min(points[:,0])
+xmax = np.max(points[:,1])
+print xmin, xmax
+bins = np.linspace(xmin,xmax,10)
+bidx = np.digitize(points[:,0], bins)
+mins = []; maxs = []
+for idx in np.unique(bidx):
+    tmp=points[bidx==idx]
+    mins.append(tmp[np.argmin(points[bidx==idx,1])])
+    maxs.append(tmp[np.argmax(points[bidx==idx,1])])
+mins=np.array(mins)
+maxs=np.array(maxs)
+\end{minted}
+
+\begin{verbatim}
+6.85483870968 13.2291666667
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(points[:,0], points[:,1], 'o')
+plt.plot(mins[:,0], mins[:,1], 'dr')
+plt.plot(maxs[:,0], maxs[:,1], 'dr')
+plt.xlim(6,12); plt.ylim(8,15)
+plt.savefig('enc_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{enc_02.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+approx = np.vstack((mins,maxs))
+hull = ConvexHull(approx)
+plt.plot(approx[:,0], approx[:,1], 'o')
+for simplex in hull.simplices:
+    plt.plot(approx[simplex, 0], approx[simplex, 1], 'k-')
+plt.xlim(6,12); plt.ylim(8,15)
+plt.savefig('enc_10.png')
+\end{minted}
+
+\includegraphics[height=6cm]{enc_10.png}
+
+Nokta, Bölge Ýçinde mi Dýþýnda mý?
+
+Diyelim ki 2 boyutta olmak üzere, elimizde dýþbükey bir bölgeyi temsil eden
+noktalar var, ve elimizdeki bir baþka noktanýn bu bölge içinde mi dýþýnda
+mý olduðunu merak ediyoruz. Bölgeyi tanýmlayan analitik bir fonksiyon yok,
+mesela bir elips formülü gibi bir taným olsaydý, direk herhangi bir
+kordinatý geçip $<1$, ya da $>1$ cevabýný alabilirdik. Burada noktalar var,
+ama aralarý birleþik deðil.
+
+\includegraphics[height=4cm]{enc_05.png}
+
+Çapraz çarpýmla bu sorunu çözebiliriz [4]. Bir nokta bir vektörün saðýnda
+mý solunda mý sorusunun cevabýný çapraz çarpýmdan alabiliriz, tabii nokta
+vektör olarak gösterilebildiðine göre, bir vektör diðerinin saðýnda mý
+solunda mý sorusu.. Ama bunu da açalým, saðda olmak demek, ``saat yönüne
+180 dereceden az gitmek'' demek. Neyse, saðda solda olmanýn fark ettiðini
+biliyoruz, bir, sað el kuralýndan, iki, $A \times B = -B \times A$. Tüm bu
+tanýmlar tabii ki temelde gidip determinant kullanan hesaba
+baðlanýyor. Söylediklerimizin hepsi o taným üzerinde test edilebilir, bkz
+[5].
+
+O zaman çapraz çarpým bize saðda, solda olmayý söylüyorsa, þu hesabý yaparsak ne
+olur? Verili bir $x$ noktasý ve bir kapalý bölge oluþturan $p_1,..,p_N$ var, biz
+her $i = 1,..,N$ için 
+
+$$ (x-p_i) \times (p_{i+1}-p_i) $$
+
+hesabýný yaparýz (not bu hesap dýþbükey bölgeler için iþler). Bu hesap þu
+vektörleri baz alýyor,
+
+\includegraphics[width=8cm]{enc_04.png}
+
+$p_{i+1}-p_i$  kapalý bölgeyi çevreleyen vektörler, $x-p_i$ ise bölge
+noktasýndan içeride (ya da dýþarýda) olan noktaya giden vektör. Eðer bir nokta
+bölge içindeyse 1-a, 2-b çapraz çarpýmlarý hep ayný iþaretli olmalý, yani $x$
+her zaman 1'ýn 2'nin, vs. saðýnda. Ama nokta dýþarýda olsaydý,
+
+\includegraphics[width=8cm]{enc_06.png}
+
+1-a ile 2-b çapraz çarpýmlarýnýn iþareti farklý mesela. Bunu kullanabiliriz, tüm
+çapraz çarpýmlarý alýp sonuç vektöründeki tüm öðelerin ayný iþarette olup
+olmadýðýný kontrol ederiz. Eðer öyle ise nokta içeridedir, yoksa dýþarýda. Örnek
+kod ve bazý veriler üzerinde görelim. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+from math import sqrt, fabs
+
+def plot_line(pt1,pt2,color):
+    plt.plot(np.array([pt1[0],pt2[0]]),np.array([pt1[1],pt2[1]]),color=color)
+    
+def plot_quad(c,color='r'):
+    plot_line(c[1],c[0],color)
+    plot_line(c[2],c[1],color)
+    plot_line(c[3],c[2],color)
+    plot_line(c[0],c[3],color)
+
+rect1 = [[6,8],[12,10],[13,15],[6,14]]
+plot_quad(rect1)
+plt.xlim(0,20); plt.ylim(0,20)
+
+pt1 = np.array([10,10])
+pt2 = np.array([15,5])
+
+plt.plot(pt1[0],pt1[1],'gd')
+plt.plot(pt2[0],pt2[1],'gd')
+
+plt.savefig('enc_07.png')
+\end{minted}
+
+\includegraphics[width=10cm]{enc_07.png}
+
+Ýki nokta seçtik, biri kapalý 4 nokta içinde, diðeri dýþýnda. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def same_sign(arr): return np.all(arr > 0) if arr[0] > 0 else np.all(arr < 0)
+
+def inside_quad(rect, pt):
+    pts = np.array(rect)
+    a =  pts - pt
+    d = np.zeros((4,2))
+    d[0,:] = pts[1,:]-pts[0,:]
+    d[1,:] = pts[2,:]-pts[1,:]
+    d[2,:] = pts[3,:]-pts[2,:]
+    d[3,:] = pts[0,:]-pts[3,:]
+    res = np.cross(a,d)
+    return same_sign(res), res
+
+print inside_quad(rect1, pt1)
+print inside_quad(rect1, pt2)
+\end{minted}
+
+\begin{verbatim}
+(True, array([  4.,  10.,  32.,  24.]))
+(False, array([-36., -20.,  72.,  54.]))
+\end{verbatim}
+
+Sonuç beklenen þekilde geldi. 
+
+Dýþ Geometrik Objenin Ýç Noktalara Uyum Skoru
+
+Bazen önceden bilinen bir çokgenin (dörtgen, beþgen, vs.) onun içinde olan
+noktalarý ne kadar iyi ``kapsadýðýný'' bir skor ile belirtmek
+gerekebilir. Mesela gürültülü bir nokta bulutundan yaklaþýk dýþbükey zarf
+çýkarttýk, ve þimdi eldeki bir hipotez dörtgenin bu veriye ne kadar iyi
+uyduðunu bulmak istiyoruz. 
+
+Þöyle bir yaklaþým düþünülebilir. Her nokta için o noktanýn kapsayan tüm
+kenarlara ne kadar uzak olduðunu ölçeriz, bunlar arasýnda minimum olan
+uzaklýðý alýrýz. Eðer bir kenar bir noktanýn yanýndaysa onu kapsýyor
+demektir, ayrýca bir noktanýn en yakýnýndaki kenar uzakta ise kapsama iyi
+deðil demektir. Kenarlar dýþýna düþmek ne olacak? Bu durum noktanýn içeride
+olup olmadýðý sorusu ile halledilir, dýþarý düþen noktalara cezalandýrma
+amaçlý yapay yüksek bir uzaklýk atanabilir. Ardýndan tüm bu minimum
+uzaklýklar toplanýr ve genel bir skor ortaya çýkartýlýr.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def pdis(a, b, c):
+    t = b[0]-a[0], b[1]-a[1]           # Vektor ab
+    dd = sqrt(t[0]**2+t[1]**2)         # ab uzunlugu
+    t = t[0]/dd, t[1]/dd               # ab birim vektoru
+    n = -t[1], t[0]                    # ab'ye normal birim vektor
+    ac = c[0]-a[0], c[1]-a[1]          # vector ac
+    return fabs(ac[0]*n[0]+ac[1]*n[1]) # ac'nin n'e yansimasi (minimum uzaklik)
+
+def score_quad_fit(c, pt):
+    arr = np.array([pdis(c[1],c[0],pt), pdis(c[2],c[1],pt), \
+                    pdis(c[3],c[2],pt), pdis(c[0],c[3],pt) ])
+    i,tmp = inside_quad(c, pt)
+    if i==False: i=10.
+    return np.min(arr) * i
+
+plt.plot(approx[:,0], approx[:,1], 'o')
+
+rect1 = [[6,8],[12,10],[13,15],[6,14]]
+plot_quad(rect1,'b')
+r1total = np.array([score_quad_fit(rect1,p) for p in points]).sum()
+
+rect2 = [[7,9],[12,10],[11,14],[6,12]]
+plot_quad(rect2,'r')
+r2total = np.array([score_quad_fit(rect2,p) for p in points]).sum()
+
+rect3 = [[7,9],[11,10],[10,14],[6,12]]
+plot_quad(rect3,'k')
+r3total = np.array([score_quad_fit(rect3,p) for p in points]).sum()
+
+print 'mavi',r1total
+print 'kirmizi',r2total
+print 'siyah',r3total
+
+plt.xlim(4,14); plt.ylim(6,17)
+plt.savefig('enc_11.png')
+\end{minted}
+
+\begin{verbatim}
+mavi 65.8765373106
+kirmizi 36.3649774766
+siyah 53.192955306
+\end{verbatim}
+
+\includegraphics[width=10cm]{enc_11.png}
+
+Üstteki çýktýlara göre mavi renkli dörtgenin kapsamasý en kötü, en iyisi
+kýrmýzý olan. Daha küçük siyah dörtgen de fena kapsamýyor fakat bu dörtgen
+saðdaki bazý noktalarý dýþarýda býrakmýþ. Bu noktalar rutinimiz tarafýndan
+10 skor ile cezalandýrýlýyor. 
+
+Kaynaklar 
+
+[1] Barber, {\em The Quickhull Algorithm for Convex Hulls}
+
+[2] The Geometry Center Home Page, {\em QHull}, \url{http://www.qhull.org}
+
+[3] Preparata, {\em Computational Geometry An Introduction}
+
+[4] Mathematics Stack Exchange, {\em Determine If 2D Pixel Inside a Region Without Formula},\url{http://math.stackexchange.com/questions/1956626/determine-if-2d-pixel-inside-a-region-without-formula}
+
+[5] Bayramli, {\em Çok Deðiþkenli Calculus, Ders 3}
+
+\end{document}
+
+
+

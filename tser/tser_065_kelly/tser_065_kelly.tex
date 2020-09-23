@@ -1,0 +1,679 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Kelly Kriteri 
+
+Diyelim ki iki borsacý 100 lira sermaye ile baþlýyor, ve þu oyunu
+oynuyorlar: her elde yazý/tura atýyorlar ve tahmýnlarý tutarsa 1 lira
+kazanýyorlar, tutmazsa 1 lira kaybediyorlar (daha doðrusu koyduklarý para
+kadar kazanýyorlar, yoksa koyduklarý parayý kaybediyorlar) [1, sf. 131].
+
+Peki her elde ne kadar para koyacaklarýný nasýl idare edecekler? Mesela ilk
+borsacý her elde sermayesinin yüzde 5'ini koysun,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+np.random.seed(1)
+data = np.random.binomial(n=1,p=550./1000,size=1001)
+df = pd.DataFrame(data,columns=['dice'])
+# 0/1 zar attir, 0 -> -1, yani -1/+1 zar
+df.loc[df.dice==0,'dice'] = -1
+ret = 0.05*df.dice
+cumret1 = 100.*np.cumprod(1+ret)
+print float(cumret1.tail(1))
+\end{minted}
+
+\begin{verbatim}
+3315.34773076
+\end{verbatim}
+
+Diðeri ise her elde sadece sabit 5 lira koysun,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cumret2 = 100 + (5*df.dice).cumsum()
+print float(cumret2.tail(1))
+\end{minted}
+
+\begin{verbatim}
+575.0
+\end{verbatim}
+
+Arada müthiþ fark var. Her ikisinin grafiðini basalým, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+cumret1.plot(title="Her Elde Sermayenin Yuzde 5'i")
+plt.savefig('tser_kelly_01.png')
+plt.hold(False)
+cumret2.plot(title='Her Elde 5 Lira')
+plt.savefig('tser_kelly_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_kelly_01.png}
+\includegraphics[height=6cm]{tser_kelly_02.png}
+
+Her elde hangi oranda para yatýrdýðýmýzý bulmak bir optimizasyon problemidir.
+Þimdi daha genel bir oyunu düþünelim, bu oyunda kazanýnca yüzde $w$
+kazanýyoruz, kaybedince ise yüzde 1 kaybediyoruz. Baþlangýç sermayemiz
+$W_0$. Her oyunda sermayemizin $f$ oranýnda kýsmýný öne sürüyoruz.
+
+Bir kazanç ardýndan sermayemiz 
+
+$$ W_0(1+fw) $$
+
+olacaktýr. Eðer kaybedersek,
+
+$$ W_0(1-f 1) $$
+
+olacaktýr. Ýki üstteki formül kazanç faktörü, bir üstteki kayýp
+faktörü. Nihai paramýzý bulmak için kazanç ve kayýp faktörlerini kaç kez
+kazanýp kaybettiðimize göre çarparýz, $n$ kazanç $m$ kayýp sonrasý kazanç
+faktörü $G$
+
+$$ G(f) = (1+fw)^n(1-f1)^m $$
+
+$G$, $f$'in bir fonksiyonu - deðiþik $f$'lere göre deðiþik $G$ sonuçlarý
+alýnacaktýr. Bir cebirsel numara ile
+
+$$ G(f)^{\frac{1}{n+m}} \equiv g(f) = (1+fw)^p(1-f1)^q $$
+
+ki $p = n/(n+m)$ ve $q=m/(n+m)$, bu deðerleri kazanç ihtimali, diðerini
+kayýp ihtimali olarak görebiliriz. 
+
+Bu noktada $G$'yi maksimize ederek optimal $f$'i bulmak akla gelebilir, bu
+yanlýþ olur. Her elde elimizdeki tüm sermayeyi koymak bu problemi optimize
+eder, fakat her seferde eldeki tüm sermayeyi koymak matematiksel olarak
+iflas garantisidir. Çünkü ardý ardýna $n$ kere kazanma þansý $p^n$ ise ve
+iflas için bir kere kaybetmek bile yeterli ise, iflas olasýlýðý
+$\lim_{n \to \infty} 1-p^n = 1$, yani kesin.
+
+Demek ki maksimize etmek için üstteki fonksiyondan farklý bir fonksiyon bulmak
+gerekli, tam terminolojiyi kullanmak gerekirse, bize riski gözönüne alan
+bir fayda fonksiyonu (utility function) gerekiyor. Bu fayda fonksiyonu
+$\log$ olabilir, bu fonksiyon çok büyük deðerleri cezalandýracaktýr, ve
+optimizasyon açýsýndan borsacýnýn her elde kazandýðý türden ekstrem
+þartlardan bizi uzak tutacaktýr. 
+
+Optimal $f$ için iki tarafýn log'unu alalým ve $d/df$ ile türev alýp sýfýra
+eþitleyelim. Önce türev,
+
+$$ \log g(f) = p \log (1+fw) + q \log (1-f1) $$
+
+$$ \frac{d}{df}\big[ \log g(f) \big] = 
+\frac{d}{df}\big[ p \log (1+fw) + q \log (1-f1)  \big]
+$$
+
+
+$$ = 
+\frac{pw}{1+fw}  - \frac{q}{1-f}
+$$
+
+Sýfýra eþitleyelim ve çözelim,
+
+$$ 
+\frac{pw}{1+fw} = \frac{q}{1-f}
+$$
+
+$$ pw - pwf = q + fwq $$
+
+$$ pw - q = fwq + pwf $$
+
+$$ \frac{pw - q}{wq + pw} = f$$
+
+$p+q = 1$ olduðu için $wq + pw = w(p+w) = w$ olur, o zaman 
+
+$$ f = \frac{pw - q}{w} $$
+
+Optimal Kelly oraný bu $f$ deðeridir. Ýlk baþtaki örneðimiz için optimal oran
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p=0.55;q=1-p;w=1
+print p-q / w
+\end{minted}
+
+\begin{verbatim}
+0.1
+\end{verbatim}
+
+deðeridir. Yani her elde yüzde 10 koymak en iyisi. 
+
+$N$ el sonra servetin beklentisi, 
+
+$$ W = W_0 (1 + p \ln (1+fw) + q \ln (1-f1) )^N$$
+
+Mesela her elde yüzde 45 kazanma þansý ve kazancýn kayýba göre iki kat daha
+fazla kazandýrdýðý durum için farklý $f$ deðerlerini grafiklersek, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p=0.45;q=1-p;w=2
+f = np.linspace(0,0.9,100)
+W = (1 + p*np.log(1+f*2) + q*np.log(1-f))**10
+plt.plot(f,W)
+plt.xlabel('f')
+plt.ylabel('W')
+plt.savefig('tser_kelly_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_kelly_03.png}
+
+Burada Kelly degeri 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+p=0.45;q=1-p;w=2
+print p-q / w
+\end{minted}
+
+\begin{verbatim}
+0.175
+\end{verbatim}
+
+ki bu deðer üstteki grafikteki tepe noktasýna tekabül ediyor. Yani her elde
+servetin yüzde 17.5'ini koymak en kazançlý, optimal davranýþtýr. 
+
+Sürekli Durum (Continuous Case)
+
+Kelly deðerini sürekli duruma göre genelleyelim. Diyelim ki $n$'inci
+iþlemimizin sonucu $X_n$ içinde, ki bu rasgele deðiþken sürekli bir deðer /
+bir getiri içeriyor, ve kazanç (payoff) $g(X_n)$ ile tanýmlanmýþ. $X_n$'i
+bilmek aslýnda imkansýz deðil, sayýsal borsacýlar olarak geçmiþ veriden
+yaklaþýksal olarak onu kestiriyoruz belki de, ya da baþka yollardan onu
+biliyoruz. Getiri baðýmsýz özdeþçe daðýlmýþ (i.i.d). Her periyotta
+servetimizin $f$ oranýný koyuyoruz,
+
+$$ W_n = W_0 \prod_{i=1}^n (1+fg(X_i)) $$
+
+$$ \ln(W_n) = W_0 \sum_{i=1}^n \ln (1+fg(X_i))  $$
+
+Her iki tarafýn beklentisini alalým,
+
+$$ E[\ln(W_n)] = n W_0 E[\ln (1+fg(X_n))]  $$
+
+Toplam operatörü nereye gitti? Beklenti önce toplam içine nüfuz etti. Sonra
+þu oldu, unutmayalým, $X_i$ i.i.d. bu sebeple toplam içindeki beklenti
+hesabý $n$ kere dýþarý çýkacak, bu beklenti toplamlarýný sadece $n
+E[\cdot]$ olarak belirtmek yeterli oldu, alýnan tek beklenti için $X_n$
+seçildi, herhangi bir diðer indis te olabilirdi.
+
+Yine $d/df$ türevi alýnýrsa, üstteki formülün sað tarafýný maksimize eden
+formülün 
+
+$$ \int \frac{g(x) \Phi(x) \ud x}{1 + fg(x)} = 0$$
+
+olduðu görülecektir. Türev entegral içine nüfuz etti, ve gerisi bilinen
+standart log'un türevi numarasý. Üstteki formülü 
+
+$$ E \bigg( \frac{g(x)}{1+fg(x)} \bigg) = 0$$
+
+olarak tanýmlamak ta mümkündür. Ýki üstteki formülü 
+
+$$ \int g(x) \Phi(x) \big(\frac{1}{1 + fg(x)} \big) \ud x = 0$$
+
+olarak gösterelim, ve parantez içindeki ifadeyi güç serisi ile açalým, 
+
+$$ \int g(x) \Phi(x) (1 - fg(x) + ...)  \ud x \approx 0$$
+
+$$ = \int g(x)\Phi(x) \ud x  - f \int g^2(x)\Phi(x) \ud x + ..  $$
+
+Ýlginç bir durum ortaya çýktý þimdi: üstteki ifadede ilk terim tek birimlik
+yatýrým yapýldýðýnda elde edilecek kazanç (payoff) $g(x)$'in beklentisi,
+diðeri de kazancýn varyansý! O zaman yaklaþýksal olarak, üstteki 3. terimi
+atarak, limite giderken, ve sýfýra eþitlersek,
+
+$$ f^* = \frac{r}{\sigma^2} $$
+
+sonucu çýkar, $r$ bir getirinin beklentisi, diðeri de varyansý, $f$ için
+$f^*$ kullandýk çünkü bu optimal olarak bizim hesapladýðýmýz $f$. Bu alým /
+satým ne kadar çetrefil bir varlýktan, onun getiri modelinden geliyor
+olursa olsun, üstteki ifade hep doðrudur. Dikkat: $f$'in 1 olma zorunluluðu
+yoktur, hatta eksi deðere bile sahip olabilir. 1'den büyük olduðu durumda
+bu kaldýraç / borç (leverage) kullanýmý olarak addedilebilir, eðer negatif
+ise açýða satýþ olarak kullanýlabilir! 
+
+Çok enstrümanlý duruma geçmeden bir not: Alttaki anlatým [2]'nin portföy riskine
+olan yaklaþýmýný temel alýyor, KK enstrüman bazýnda ayarlamalar için
+kullanýlmakta. [4]'te de Kelly var her enstrüman üzerinde deðil tüm oynaklýðý
+(riski) bilinen portföy ve eldeki sermaye arasýnda ayarlama yapmak için, daha
+basit bir Kelly kullanýmý yani, ve bu bölümün baþýnda iþlenenler bu yaklaþým
+için yeterli. [4]'un esas ana risk idaresi sistemi risk eþliðidir (risk parity)
+ve bu alttakine alternatif bir kullaným. 
+
+Çok Enstrüman
+
+Birden fazla varlýða yatýrým yaptýðýmýz ve bir portföy idare etmemiz
+gereken durumda üstteki Kelly formülünü bulan Dr. Thorp alttaki formülün de
+kullanabileceðiniz ispatlamýþtýr,
+
+$$ F = C^{-1}M $$
+
+ki bu formülde $F$ bir kolon vektörü $F = (f_1^*,f_2^*,..,f_n^*)^T$, $C$
+iþe bir kovaryans matrisidir, $C_{ij}$ $i$ ve $j$ getirilerinin
+kovaryansýdýr, ve $M = (m_1,m_2,..,m_n)^T$ ise getirilerin ortalamasýný
+içeren bir kolon vektörüdür. Eðer deðiþik varlýk getirileri istatistiki
+olarak birbirinden baðýmsýz olsaydý o zaman $C$'nin çaprazý hariç diðer
+hücreleri sýfýr olurdu, çaprazdaki her $i$ yatýrýmý için $\sigma_i^2$
+alýnýp, $m_i$ ile beraber bu bizi her varlýk için iki üstteki formüle
+getirecektir. Baðlantý durumunda niye bir üstteki kovaryanslý formülün
+çýktýðýný burada türetmeyeceðiz, detaylar için [1]'e bakýlabilir.
+
+Bir formül daha: Gaussian daðýlým faraziyesinden baþlayarak biriken
+kaldýraçlý büyüme oraný (compounded, levered growth rate) þu þekilde
+türetilmiþtir, yazýnýn sonuda detaylar bulunabilir),
+
+$$ g(f) = r + mf - s^2f^2 / 2 $$
+
+$f$ kaldýraç (leverage), $r$ risksiz getiri (mesela banka faizi, hazine
+bonosu), $m$ basit, tek periyotluk birikmeyen getiri, ve $s$ bu birikmeyen
+getirilerin standart sapmasý. 
+
+Eðer üstteki formülün türevini alýrsak, 
+
+$$ dg / df = m - s^2f = 0 $$
+
+$$ f^* = m/s^2 $$
+
+Yine ayný $f^*$ formülüne eriþtik! 
+
+Bir numara daha, Sharpe oraný $S = m/s$ olduðunu ayrýca $f=m/s^2$ olduðunu
+biliyoruz, o zaman kaldýraçlý büyüme oraný
+
+$$ g(f) = r + mf - s^2f^2 / 2 $$
+
+$$  = r + m(m/s^2) - s^2(m^2/s^4) / 2 $$
+
+$$  = r + m^2/s^2 - m^2/s^2 / 2 $$
+
+$$  = r + S^2 - S^2/2 $$
+
+$$ g = r +  S^2/2 $$
+
+Not: Formülün kaldýraçsýz hali basit, $f=1$ kabul edersek,
+
+$$ g(f) = r + m - s^2/ 2 $$
+
+Çok boyutlu ortamda 
+
+$$ g(F^*) = r + {F^*}^TCF^* / 2 $$
+
+Sharpe oraný için 
+
+$$ S = \sqrt{{F^*}^TCF^*} $$
+
+Örnek
+
+Bu fikirleri S\&P 500 indisini takip eden SPY adlý ETF üzerinde nasýl
+iþlediðini görelim. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('SPY2.csv',parse_dates=True,index_col='Date')
+df = df.sort_index()
+df['ret'] = df['Adj Close'].pct_change()
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+r = 0.04
+ret = df['ret'].mean()*252
+s = df['ret'].std()*np.sqrt(252)
+m = ret-0.04
+sharpe = m / s
+kelly = m / s**2
+comp_levered_g = r + sharpe**2/2
+comp_unlevered_g = r + m -s**2/2
+
+# aslinda ustte m+r yerine direk ret kullanabilirdik, 
+# ama dokumantasyon amacli boyle daha temiz oldu
+
+print 'r', r
+print 's', s
+print 'artik getiri', m
+print 'sharpe orani', sharpe
+print 'kelly orani', kelly
+print 'biriken (kaldiracli) buyume orani', comp_levered_g
+print 'biriken (kaldiracsiz) buyume orani', comp_unlevered_g
+\end{minted}
+
+\begin{verbatim}
+r 0.04
+s 0.169131222871
+artik getiri 0.0723074732694
+sharpe orani 0.427522914113
+kelly orani 2.52775866487
+biriken (kaldiracli) buyume orani 0.131387921046
+biriken (kaldiracsiz) buyume orani 0.0980047879945
+\end{verbatim}
+
+Dikkat, Kelly oraný $f$ zamandan baðýmsýzdýr (kýyasla Sharpe oraný zamana
+baðýmlýdýr). 
+
+Bir diðer örnek: þimdi üç tane sektöre özel ETF arasýnda yatýrýmý nasýl
+bölüþtüreceðimizi düþünelim. Bu ETF'ler OÝH (petrol sektörü), RKH (bölgesel
+bankalar) ve RTH (parakende ticaret). 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+dfoih = pd.read_csv('OIH.csv',index_col='Date')
+dfrkh = pd.read_csv('RKH.csv',index_col='Date')
+dfrth = pd.read_csv('RTH.csv',index_col='Date')
+df = dfoih.join(dfrkh['Adj Close'],rsuffix='_rkh')
+df = df.join(dfrth['Adj Close'],rsuffix='_rth')
+df = df.drop(['Low','Open','High','Close','Volume'],axis=1)
+df = df.dropna()
+df = df.sort_index()
+
+df['oihxret'] = df['Adj Close'].pct_change() - 0.04/252
+df['rkhxret'] = df['Adj Close_rkh'].pct_change() - 0.04/252
+df['rthxret'] = df['Adj Close_rth'].pct_change() - 0.04/252
+
+M = 252*df[['oihxret','rkhxret','rthxret']].mean()
+C = 252*df[['oihxret','rkhxret','rthxret']].cov()
+print 'Yila Uyarlanmis Ortalama Artik Getiriler, M'
+print M
+print 'Yila Uyarlanmis Kovaryans Matrisi, C'
+print C
+\end{minted}
+
+\begin{verbatim}
+Yila Uyarlanmis Ortalama Artik Getiriler, M
+oihxret    0.139568
+rkhxret    0.029400
+rthxret   -0.007346
+dtype: float64
+Yila Uyarlanmis Kovaryans Matrisi, C
+          oihxret   rkhxret   rthxret
+oihxret  0.110901  0.020014  0.018255
+rkhxret  0.020014  0.037165  0.026893
+rthxret  0.018255  0.026893  0.041967
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+F = np.dot(lin.inv(C),M)
+print 'oih, rkh, rth'
+print F
+\end{minted}
+
+\begin{verbatim}
+oih, rkh, rth
+[ 1.2919082   1.17226473 -1.48821285]
+\end{verbatim}
+
+Dikkat edersek RTH için ortalama artýk getiri negatif. Bu durumda Kelly
+formülünün RTH için açýða satýþ tavsiyesi yapmýþ olmasý pek þaþýrtýcý
+deðil.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+F = F.reshape((3,1))
+g = 0.04+np.dot(np.dot(F.T,C),F/2)
+print float(g)
+\end{minted}
+
+\begin{verbatim}
+0.152853578984
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+S = np.sqrt(np.dot(np.dot(F.T,C),F))
+print float(S)
+\end{minted}
+
+\begin{verbatim}
+0.4750864742
+\end{verbatim}
+
+Soru
+
+Pek çok profosyonel borsacýnýn cevabýný bilmediði bir soru soralým: diyelim
+ki bir hisse geometrik rasgele yürüyüþ sergiliyor, 50-50 þans ile hissenin
+her dakika yüzde 1 yukarý ya da aþaðý gitme þansý var. Eðer bu hisseyi
+alýrsanýz, uzun vadede (ve iþlem masraflarýný gözardý ederek) para kazanmak
+mý, kaybetmek mi, ya da nötr kalmak mý daha muhtemel?
+
+Pek çok borsacý ``nötr!'' cevabýný verecektir, fakat bu cevap
+yanlýþtýr. Doðru cevap beklenen büyüme oraný formülünde saklý, 
+
+$$ g = m - s^2/2 $$
+
+Eðer $m=0$ ise, $s=0.01$ ise, 
+
+$$ g = -(0.1)^2/2 = 0.001/2 = 0.005 $$
+
+Yani doðru cevap her dakika yüzde 0.005 oranýyla para kaybedecek
+olacaðýmýzdýr! Çünkü geometrik RY'nin ortalama biriken getiri oraný $m$
+deðildir, üstteki formül $g$'dir. 
+
+Burada alýnacak ders þu: risk her zaman uzun vadeli büyüme oranýný
+azaltýr - risk idaresinin önemi burada ortaya çýkýyor. 
+
+Kaldýraç ve Kayýptan Çýkmak
+
+Kelly formülü $f$'in bazen sýfýrdan büyük sonuç getirdiðini gördük. Ayrýca
+birden çok varlýðý idare ederken de farkedebiliriz ki $f_1,f_2,..,f_n$
+oranlarýnýn 1'e toplanma zorunluluðu yoktur! Bu ilginç bir durum ortaya
+çýkartýyor, aslýnda dolaylý olarak Kelly formülü bize ne kadar kaldýraç
+kullanabileceðimizi, kullanmamýz gerektiðini anlatýyor. Yani Kelly formülü
+hem en iyi kazanç için en optimal sermaye parçasýnýn ne olduðunu söylüyor,
+hem de gerekiyorsa ne kadar borç alýnabileceðini de hesaplýyor.
+
+Önceki SPY örneði için mesela $f$ 2.52 geldi, eðer anaparamýz 100,000 lira
+ise, ve geçmiþ veriden elde ettiðimiz ortalama ve standard sapma hesabýna
+güveniyorsak, para borç alýp 252,000 liralýk SPY almamýz en iyisidir. Bu
+durumda 100,000 liralýk anaparamýzýn yýllýk biriken getirisi yüzde 13.14
+olacaktýr.
+
+Diðer yandan eðer bir strateji para kaybetmeye baþlamýþsa, Kelly bu durum
+için de iyidir, çünkü her iþlem gününün sonunda $f$ deðerlerimizi tekrar
+hesaplayacaðýmýz için (tavsiye edilir!) kaybeden bir stratejinin ortalama
+getirisi yavaþça sýfýra yaklaþacaðý için Kelly'nin tavsiye ettiði
+``kaldýraç'' ta sýfýra yaklaþacaktýr, hatta tam sýfýra da düþülebilir, bu
+durumda o stratejiden tamamen çýkmýþ oluruz demektir. Bu iyidir, bir
+stratejiden bu þekilde sistematik bir þekilde çýkmak, birkaç günlük kayýbý
+görüp ve heyecana kapýlýp o pozisyondan alelacele / tamamen çýkmaktan çok
+daha iyidir. Kelly formülü bu baðlamda bir psikolojik subap görevi
+görebilir. 
+
+Bu otomatik deðiþimin nasýl olduðunu görmek için SPY örneðine
+bakalým. Diyelim ki üstteki SPY için tavsiye edilen kaldýraçý kullandýk,
+100,000 anapara üzerinden 252,000 yatýrým. Ertesi gün diyelim ki felaket
+kapýya dayandý, yüzde 10'lük düþüþ yaþadýk. 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 'portfoy', 252000 * 0.90
+print 'anapara', 100000 * (1. - 0.10*2.52)
+\end{minted}
+
+\begin{verbatim}
+portfoy 226800.0
+anapara 74800.0
+\end{verbatim}
+
+Anaparamýz 74800'e düþtü. Anaparadaki düþüþ tabii ki kaldýracýn etkisiyle daha
+büyüdü, eh, çýkýþta katlama olunca düþüþte de oluyor tabii ki. Peki bu durumda
+Kelly ne der? Formüle göre portföyü küçültmemiz gerekir, çünkü anaparamýz
+küçüldü,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print 74800*2.82
+\end{minted}
+
+\begin{verbatim}
+210936.0
+\end{verbatim}
+
+Yani portföy deðerini 226,800 liradan 210,936 seviyesine indirmemiz lazým,
+bunun için aradaki fark kadar satýþ yapmak gerekli. Bu aslýnda makul bir
+risk idare yöntemi, eðer düþüþ varsa satýþa geçmek. Diðer taraftan yükseliþ
+var ise, Kelly alýþa geçmeyi de tavsiye edecektir. Diðer bazý risk idare
+yöntemleri bunu tavsiye etmeyebilirdi, mesela Martingale denen bir dönem
+kumarcýlarýn sevdiði bir yönteme göre kaybedince bir sonraki oyunda iki
+katý daha fazla para koymalýsýnýz. Pek çok kiþinin bu þekilde iflas ettiði
+þaþýrtýcý olmasa gerek. 
+
+Kaldýraç ve Ýmkanlar
+
+Kelly formülü 10 kaldýraç tavsiyesi veriyor diyelim; peki eldeki imkanlar
+nedir? Eldeki sermayenin 10 katý kadar borç alabiliyor muyuz? Bu borsa
+aracý kurumunuza göre deðiþir. Aslýnda kaldýraç imkanlarý aracý kurumlarýn
+müþterilerine saðladýðý servisin bir parçasýdýr, normal bir hesap için
+mesela kaldýraç 2 ve 4 arasýnda olabilir. Döviz piyasalarýnda daha fazla
+kaldýraca izin verildiðini biliyoruz. Bu durumda Kelly tavsiyesini eldeki
+imkanlara göre ayarlamak gerekir. Müsade edilen kaldýraç $l$ seviyesi için
+hesapladýðýmýz her $f_i$ tavsiyesi $l / (|f_1| + |f_2| + .. + |f_n|)$ ile
+bölünerek azaltýlmalýdýr. Eðer elde hiç kaldýraç imkaný yoksa $l=1$
+olacaktýr, ve bu durumda $f_i$'lar üstteki toplamlara bölünürse yeni
+$f_i$'larýn toplamý 1 olur! Bu mantýklý herhalde, çünkü hiç borç
+alamýyorsak, hiç bir strateji $i$'ye eldekinden daha fazlasýný veremeyiz,
+bunu yapmak parayý bir diðer stratejiden eksiltmek olurdu. 
+
+Tam Kelly, Yarým Kelly
+
+$f$ azaltmaktan bahsetmiþken þunu da ekleyelim, $f$ için kullanýlan
+parametrelerin hesabýndaki belirsizlikler, ve getirilerin tamamen Gaussian
+olmamasý sebebiyle bazý borsacýlar tavsiye edilen Kelly sayýsýnýn yarýsýný
+kullanmayý tercih ediyorlar. Buna ``yarým Kelly oynamak (half-Kelly
+betting)'' ismi veriliyor. 
+
+Maksimum düþüþ sürekliliði (drawdown) ile Kelly ya da yarým Kelly arasýnda
+þöyle bir iliþki düþünülebilir, ki bu iliþki yatýrýmda ne kadar muhafazakar
+olup olmayacaðýmýzda bize yol gösterebilir, bir varlýðýn geçmiþ verisine
+bakarýz, ve tek periyotluk (mesela tek gün) düþüþ yüzdesi nedir. SPY
+örneðinde mesela bu 19 Ekim 1987'deki ``Kara Pazartesi'' adý verilen yüzde
+20.47'lik düþüþtür. Eðer bu düþüþü tolere edecek durumda deðilsek, o zaman
+üstteki SPY örneði için yarým Kelly bile çok yüksektir (2.52 / 2 =
+1.26). Eðer en fazla tolere edebileceðimiz düþüþ yüzde 20 ise, o zaman
+uygulayabileceðimiz kaldýraç 1'den yüksek olamaz. 
+
+Ekler
+
+Turetelim: $g(f) = r + fm - s^2f^2 / 2$
+
+$X$'i herhangi bir zaman diliminin getirisini temsil eden bir rasgele
+deðiþken olarak düþünelim [3, sf. 22]. Ayrýca
+
+$$ P(X = m+s) = P(X = m-s) = 0.5$$
+
+olsun, yani getirinin bir ortalama $m$ üzerinde ya da altýnda olma
+olasýlýðý eþit, 0.5. Bu rasgele yürüyüþ, yani getirilerin normal olma
+faraziyesi ile uyumlu. 
+
+Baþlangýç sermayesi $V_0$, sermaye yatýrým oraný $f$, risksiz (herhangi)
+bir varlýðýn getirisi $r$ üzerinden,
+
+$$ V(f) = V_0 (1 + (1-f)r + fX)  $$
+
+Riskli sermaye oraný $X$ getirisine baðlý, onu $f$ ile çarpýyoruz, geri
+kalaný risksiz üzerinde $(1-f)r$, tüm bunlar 1'e ekleniyor, ki çarpým bir
+sonraki sermaye miktarýmýzý $V$'yi versin. $V$ tabii ki $f$'in bir
+fonksiyonu. Tekrar düzenleyelim,
+
+$$ V(f) = V_0 (1 + r + f(X - r))  $$
+
+Þimdi zamaný $n$ parçaya bölelim, toplam kaymayý (drift) toplam varyansý
+ayný olacak þekilde ayarlayalým, yani $m$ yerine $m / n$, $s^2$ yerine
+$s^2/n$, ve $r/n$, vs, yani
+
+$$ P(X_i = m/n + s/\sqrt{n}) = P(X_i = m/n - m/\sqrt{n}) = 0.5$$
+
+$n$ adým sonraki $V_n(f)$ tüm $(1 + r + f(X_i - r))$'larýn $V_0$ ile
+çarpýmý, ayrýca kolaylýk için $V_0$'i sola alalým,
+
+$$ V_n(f)/V_0 = \prod _{i=1}^{n} (1 + r/n + f(X_i - r/n))  $$
+
+Maksimize etmek istediðimiz log'u alýnmýþ beklenti, ki buna $g(f)$ diyelim,
+
+$$ E[\log V_n(f)/V_0] = g(f) = n E[\log (1 + (r/n) + f(X_n - (r/n)))]  $$
+
+Log'dan kurtulmak için güç serisi açýlýmý yapacaðýz, 
+
+$$ \log(1+u) = u - \frac{u^2}{2} + \frac{u^3}{3} + .. $$
+
+Bu serinin ilk iki terimini kullanmak yaklaþýksal açýdan yeterli. Ayrýca
+$X_n$ yerine $U$ kullanacaðýz, ki $U = \pm 1 $ bir simetrik Bernoulli
+daðýlýmý olsun, o zaman $X = m/n + U s/\sqrt{n}$ diyebiliriz, çünkü $m/n$
+etrafýnda belli bir standart sapmaya göre her iki tarafa da savrulabilecek
+bir rasgele deðiþkenden bahsediyoruz. Matematik burada biraz arap saçýna
+dönebilir, sadece log içine bakalým,
+
+$$ \log \bigg( 
+1 + \frac{r}{n} + f \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big) 
+\bigg)  $$
+
+Bu formülde $1+$ ifadesinden sonra gelen terimler güç serisi açýlýmýna
+gidecek, yani 
+
+$$ u = \frac{r}{n} + f \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big)  $$
+
+``Eyvah $u^2$ açýlýmý ne kadar karmaþýk olacak'' diye düþünülebilir, fakat
+þunu unutmayalým, nihayetinde formülün sonuþur (asymptotic) davranýþýný
+anlamaya uðraþýyoruz, yani $n \to \infty$ olacaðý bir durumu inceliyoruz,
+ve mesela $O(1/n \sqrt{n})$ ifadelerini, yani $1/n \sqrt{n}$ ve daha küçük
+olan ifadeleri içeren terimleri tek bir grupta toplayýp formülden
+çýkartabiliriz. 
+
+Eðer $u^2$'e bakarsak, 
+
+$$ u^2 = \frac{r^2}{n^2} + f^2(..)^2 + 2 \frac{2}{n}f(...) $$
+
+Ya da $f$'in çarptýðý, o parantez içindeki üç terimin karesi mesela
+
+$$ \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big)^2 
+= \frac{m^2}{n^2} + \frac{Usm}{\sqrt{n}n} - ...
+$$
+
+Bu sonuçlarýn hepsinin bölenine bakýnca $n\sqrt{n}$ ve ondan daha büyük
+deðerleri var, mesela $n^2$. Bu terimlerin hepsi $O(1/n \sqrt{n})$ altýnda
+gruplanacak. ``Sað kalan'' tek terim $\frac{f^2U^2s^2}{n}$. 
+
+$$ 
+g(f)/n = 
+E\big[
+\frac{r}{n} + f \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big) + 
+\frac{f^2U^2s^2}{2n} + 
+O(1/n \sqrt{n})
+\big]
+$$
+
+Ve beklentiyi uygularýz, rasgele deðiþken içermeyen tüm terimler olduðu
+gibi kalýr, 
+
+$$ 
+= \frac{r}{n} + f \big( \frac{m}{n} + \frac{E[U]s}{\sqrt{n}} - \frac{r}{n} \big) + 
+\frac{f^2E[U^2]s^2}{2n} + 
+O(1/n \sqrt{n})
+\big]
+$$
+
+$E[U] = 0, E[U^2] = 1$ olduðuna göre (çünkü $U^2$ her zaman 1 deðerini verir), 
+
+$$ 
+= \frac{r}{n} + f \big( \frac{m}{n} - \frac{r}{n} \big) + 
+\frac{f^2s^2}{2n} + 
+O(1/n \sqrt{n})
+$$
+
+$$ g(f) = r + f(m-r) + f^2s^2/2 + O(1/n \sqrt{n}) $$
+
+Ve $n \to \infty$ durumunda ufak terimleri atarýz, ve 
+
+$$ g(f) = r + f(m-r) + f^2s^2/2 $$
+
+ifadesine eriþiriz. 
+
+Not: Bu dokümanýn diðer bölümünde $m-r$ yerine $m$ kullanýldý, bu ufak bir
+notasyon farký, burada $m$ getiri beklentisi, orada $m$ aslýnda $m-r$, yani
+``artýk getiri (excess return)''. Karýþýklýk olmasýn.
+
+
+Kaynaklar
+
+[1] Sinclair, {\em Volatility Trading}
+
+[2] Chan, {\em Algorithmic Trading}
+
+[3] Thorp, {\em The Kelly Criterion}
+
+[4] Brandimarte, {\em Numerical Methods in Finance and Economics with Matlab}
+
+\end{document}
+
+
+
+
