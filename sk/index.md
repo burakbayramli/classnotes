@@ -3,19 +3,36 @@
 
 ## En Son
 
-20/7 - [3D Fizik Simulasyonu, Chrono](2020/07/chrono-fizik-simulasyon-rigid-body-physics.md)
+6/9 - [Elastik Çarpışma (Elastic Collision)](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donusler_basinc_carpisma.html)
 
-16/7 - [Ubuntu 18, Acer Swift](2020/07/ubuntu-18-acer-swift.md)
+1/9 - [Elektronik, Ölçüm, Temel Parçalar](2020/08/elektronik-temel-parcalar-aletler.md)
 
-10/7 - [2 Boyutlu Fiziksel Simulasyon (Rigid Body 2d Physics Simulation), pymunk](2020/07/kati-govde-fizik-simulasyon-rigid-body-physics-pymunk.md)
+1/9 - [Piller](2020/08/elektronik-piller.md)
 
-1/6 - [Grafiklemek](2020/02/grafiklemek.md)
+1/9 - [SPH](2020/08/sph.md)
 
-1/4 - [Lessard, Optimizasyon](2020/04/lessard.md)
+26/8 - [OpenGL, PyOpenGL](2020/08/pyopengl.md)
+
+31/7 - [SQL](2012/03/sql.md)
+
+30/7 - [Raspberry Pi](2020/07/raspberrypi.md)
+
 
 ## Konular, Referans
 
 [Python](2016/01/python-dil-ogrenimi.md)
+
+[Unix](2020/07/unix.md)
+
+[SQL](2012/03/sql.md)
+
+[Proje İdaresi](2020/07/proje-idaresi.md)
+
+[Network, TCP/IP, Internet](2000/10/network.md)
+
+[Elektrik, Elektronik](2020/08/elektronik.md)
+
+[Nereden Başlarım](2019/01/nereden.md)
 
 [Youtube Kanalım](https://www.youtube.com/channel/UCMAUsgUq5ODy8kMnJlUBUdQ)
 

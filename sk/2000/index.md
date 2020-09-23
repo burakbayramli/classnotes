@@ -12,10 +12,6 @@
 
 [Extreme Programming Nedir?](10/extreme-programming-nedir.md)
 
-[Genel Yazılım Teknikleri](10/genel-yazlm-teknikleri.md)
-
-[Instanceof, Çokyüzlülük (Polymorphism)](10/instanceof-cokyuzluluk-polymorphism.md)
-
 [İnternet Sayfası İstenince Ne Olur](10/internet-sayfas-istenince-ne-olur.md)
 
 [IP Yönlendirme](10/ip-yonlendirme.md)
@@ -26,9 +22,11 @@
 
 [Java İle Toptan İşlem Kalıbı](10/java-ile-toptan-islem-kalb.md)
 
-[Organizasyonlarda Teknik Bilgi İletişimi](10/organizasyonlarda-teknik-bilgi.md)
+[Nesnesel Programlama (Object-Oriented Programming)](10/nesnesel-programlama.md)
 
-[Program Nasıl Test Edilir](10/program-nasl-test-edilir.md)
+[Network, TCP/IP, Internet](10/network.md)
+
+[Organizasyonlarda Teknik Bilgi İletişimi](10/organizasyonlarda-teknik-bilgi.md)
 
 [Projelerde İşbölümü](10/projelerde-isbolumu.md)
 
@@ -45,8 +43,6 @@
 [Tekil Nesne Kalıbı (Singleton Pattern)](10/tekil-nesne-kalb-singleton-pattern.md)
 
 [Tomcat ile Dağıtık (Distributed) Sistem İnşâsı](10/tomcat-ile-dagtk-distributed-sistem.md)
-
-[Veri Modelini Normâlleştirmek](10/veri-modelini-normallestirmek.md)
 
 [Yazıcıdan Güzel Java Basmak (Pretty Print)](10/yazcdan-guzel-java-basmak-pretty-print.md)
 

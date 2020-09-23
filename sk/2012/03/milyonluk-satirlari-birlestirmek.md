@@ -1,11 +1,33 @@
 # Milyonluk Satirlari Birlestirmek
 
+Veri ambarı projelerinde bazen duyulur "bu birleşimin iki tarafında
+milyon satırdan fazlası var, bu birleşim (join) komutu geri
+gelmeyebilir". Hakikaten de iki tarafın da çok sayıda veri içerdiği
+durumda birleşimin çok zaman alacağı durumlar vardır. Fakat şunu
+sormak lazım, birleşim sonrası ne yapıyoruz?Diyelim ki A,B üzerinde
+milyon satırlık veri var, A'da bir kolonu güncelleyeceğiz, onun için
+B'yi birleştiriyoruz, ve ek bilgiyi oradan alıyoruz.
 
-Milyonluk Satirlari Birlestirmek
+Eğer A üzerinde indeks var ise, güncelleme tabii ki yavaş olacaktır,
+bunun birleşim ile alakası yok, çünkü indeksler genel olarak erişimi
+hızlandırır, veri eklemeyi, güncellemeyi yavaşlatır (yine bir
+mühendislik al/ver -trade off- durumu). Eğer A ve B arasında birebir
+ilişki var ise, mesela bir id kolonu iki tarafta da tekil, o zaman her
+kullanım için birleşim yavaş olmayabilir.Evet ilişkisel teoriye
+(relational theory) göre A,B birleşimi önce bir kartezyen kümesi
+yaratır, yani teorik olarak A ve B'deki tüm satırların kombinasyonu
+önce hazırlanır, bu örneğimizde 1 milyon x 1 milyon satır eder, sonra
+bu koca küme içinde birbirine uyanlar (ortak id üzerinden)
+elenir.Fakat veri tabanları, pratikte, bu tür işlemleri hissederek
+hızlandırıcı önlemleri alırlar.
 
-
-
-Veri ambari projelerinde bazen duyulur "bu birlesimin iki tarafinda milyon satirdan fazlasi var, bu birlesim (join) komutu geri gelmeyebilir". Hakikaten de iki tarafin da cok sayida veri icerdigi durumda birlesimin cok zaman alacagi durumlar vardir. Fakat sunu sormak lazim, birlesim sonrasi ne yapiyoruz?Diyelim ki A,B uzerinde milyon satirlik veri var, A'da bir kolonu guncelleyecegiz, onun icin B'yi  birlestiriyoruz, ve ek bilgiyi oradan aliyoruz. Eger A uzerinde indeks var ise, guncelleme tabii ki yavas olacaktir, bunun birlesim ile alakasi yok, cunku indeksler genel olarak erisimi hizlandirir, veri eklemeyi, guncellemeyi yavaslatir (yine bir muhendislik al/ver -trade off- durumu). Eger A ve B arasinda birebir iliski var ise, mesela bir id kolonu iki tarafta da tekil, o zaman her kullanim icin birlesim yavas olmayabilir.Evet iliskisel teoriye (relational theory) gore A,B birlesimi once bir kartezyen kumesi yaratir, yani teorik olarak A ve B'deki tum satirlarin kombinasyonu once hazirlanir, bu ornegimizde 1 milyon x 1 milyon satir eder, sonra bu koca kume icinde birbirine uyanlar (ortak id uzerinden) elenir.Fakat veri tabanlari, pratikte, bu tur islemleri hissederek hizlandirici onlemleri alirlar. Iki tarafta tekil olan id ile birlesim var ise, tek satirdan tek satira ziplayarak gereken veri alinabilir.Yani sartlara iyi bakmak lazim. Veri ambar projelerinde gecici tablolar yaratmak her zaman iyi tekniktir, gereken veriler birbirine uyan id tasiyacak sekilde burada parca parca hazirlanabilir, sonra tum parcalar birlestirilerek baska bir bos, ya da indeksleri kapatilmis bir (nihai)  tabloya toptan olarak eklenebilir. Bu durumda birlesimlerin hizli isledigi gorulecektir.
+İki tarafta tekil olan id ile birleşim var ise, tek satırdan tek
+satıra zıplayarak gereken veri alınabilir.Yani şartlara iyi bakmak
+lazım. Veri ambar projelerinde geçici tablolar yaratmak her zaman iyi
+tekniktir, gereken veriler birbirine uyan id taşıyacak şekilde burada
+parça parça hazırlanabilir, sonra tüm parçalar birleştirilerek başka
+bir boş, ya da indeksleri kapatılmış bir (nihai) tabloya toptan olarak
+eklenebilir. Bu durumda birleşimlerin hızlı işlediği görülecektir.
 
 
 

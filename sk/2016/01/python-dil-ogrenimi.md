@@ -45,11 +45,27 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [izip](../../2010/06/izip.md)
 
-[Tarih Zaman Icin datetime](../../2016/06/datetime.md)
+[Tarih Zaman İçin datetime](../../2016/06/datetime.md)
 
-[Objeleri Yazip Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)
+[Objeleri Yazıp Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)
 
+[Düzenli İfadeler, Python, Regex (Regular Expressions)](../.././2016/02/duzenli-ifadeler-python-regex-regular.md)
 
+[Python Profilleme (Profiling)](../../2014/09/python-profilleme-profiling.md)
+
+[Python ve Komut Satırına Erişmek, Popen](../../2014/12/popen-python-ve-komut-satirina-erismek.md)
+
+[Esnek Parametre Listesi](../../2011/02/esnek-parametre-listesi.md)
+
+[Operatorler](../../2011/02/operatorler.md)
+
+[Liste Gezerken Eleman Silmek](../../2011/03/liste-gezerken-eleman-silmek.md)
+
+[Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek](../../2013/07/onbelleklemeyi-dekorator-ile-yapmak.md)
+
+[Python Paketleme](../../2012/04/python-paketleme.md)
+
+[Cython](../../2010/11/cython.md)
 
 
 

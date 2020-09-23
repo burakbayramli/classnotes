@@ -18,37 +18,11 @@
 
 [Vagrant](04/vagrant.md)
 
-[Komut Satirindan Haber Basliklari](06/komut-satirindan-haber-basliklari.md)
-
 [Algorithmic Trading Kitabi, Python](09/algorithmic-trading-kitabi-python.md)
 
-[ffmpeg, avconv, moviepy](10/ffmpeg-yerine-avconv.md)
+[ffmpeg, avconv, moviepy](10/ffmpeg-avconv-moviepy.md)
 
-[Histogram Numaralari](10/histogram-numaralari.md)
-
-[Bilgisayar Bilim, Yapay Zeka](12/bilgisayar-bilim-yapay-zeka.md)
-
-[Çok Değişkenli Calculus (Multivariable Calculus)](12/cok-degiskenli-calculus-multivariable.md)
-
-[Yapay Görüş ve Robotik (Computer Vision)](12/coklu-baks-ac-geometrisi-multiple-view.md)
-
-[Diferansiyel Denklemler](12/diferansiyel-denklemler.md)
-
-[Fonsiyonel Analiz (Functional Analysis)](12/fonsiyonel-analiz-functional-analysis.md)
-
-[Gayrı Lineer Dinamik ve Kaos (Chaos, Non-Linear Dynamics)](12/gayr-lineer-dinamik-ve-kaos-chaos-non.md)
-
-[Hesapsal Bilim (Computational Science)](12/hesapsal-bilim-computational-science.md)
+[Histogram Numaraları](10/histogram-numaralari.md)
 
 [htlatex ve minted, make4ht](12/htlatex-ve-minted.md)
-
-[İstatistik ve Veri Analizi](12/istatistik-ve-veri-analizi.md)
-
-[Kismi Diferansiyel Denklemler (Partial Differential Equations -PDE-)](12/kismi-diferansiyel-denklemler-partial.md)
-
-[Lineer Cebir](12/lineer-cebir-linear-algebra.md)
-
-[Matematik Ders Notlari](12/matematik-ders-notlari.md)
-
-[Zaman Serileri ve Finans](12/zaman-serileri-ve-finans.md)
 

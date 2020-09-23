@@ -14,15 +14,11 @@
 
 [TunesViewer, iTunesU](02/tunesviewer-itunesu.md)
 
-[Almanya'da Calisma Vizesi - Gecici](03/almanyada-calisma-vizesi.md)
-
 [Bulut](03/bulut.md)
 
 [Iklim Verisi](03/iklim-verisi.md)
 
 [Milyonluk Satirlari Birlestirmek](03/milyonluk-satirlari-birlestirmek.md)
-
-[Pentaho](03/pentaho.md)
 
 [PostgreSql](03/postgresql.md)
 
@@ -40,7 +36,7 @@
 
 [Clicktale](04/clicktale.md)
 
-[Faydali Unix Komutlari](04/faydali-unix-komutlari.md)
+[Faydalı Unix Komutları](04/faydali-unix-komutlari.md)
 
 [Meta, Sema ve Postgresql](04/meta-sema-ve-postgresql.md)
 
@@ -48,25 +44,11 @@
 
 [Ne Zaman Ambar, Ne Zaman Gelisiguzel Sorgu](04/ne-zaman-ambar-ne-zaman-gelisiguzel.md)
 
-[Olcutler (Measures)](04/olcutler.md)
-
-[Parametreli Pentaho Raporlari](04/onceki-yazida-nasil-rapor-tanimlanip.md)
-
 [OpenCV Ubuntu](04/opencv-ubuntu.md)
 
 [Pandas ile Birlesim (Join)](04/pandas-ile-birlesim-join.md)
 
-[Pentaho Community Server ve Raporlama](04/pentaho-community-server-ve-raporlama.md)
-
-[Pentaho Community ve Ticari Urun Farklari](04/pentaho-community-ve-ticari-urun.md)
-
-[Pentaho ile Ambar Tasarimi](04/pentaho-ile-ambar-tasarimi.md)
-
-[Pentaho ile Pivotlama (Crosstabs)](04/pentaho-ile-pivotlama-crosstabs.md)
-
-[Pentaho ve Rapor Sonuclarini Zamanli Olarak Email ile Postalama](04/pentaho-ve-raport-sonuclarini-zamanli.md)
-
-[plpython](04/plpython.md)
+[Python ile Kayıtlı Prosedürler (Stored Procedures) - plpython](04/plpython.md)
 
 [Postgres Min, Partition](04/postgres-min-partition.md)
 
@@ -76,19 +58,11 @@
 
 [Python Profiler](04/python-profiler.md)
 
-[Almanya'da Calisma - Ikamet Kaydi (Anmeldung)](05/almanyada-calisma-oturma-anmeldung.md)
-
-[Almanya'da Calisma - Oturma Izni (Residence Permit, Aufenthaltstitels)](05/almanyada-calisma-oturma-izni-residence.md)
-
-[Almanya'da Calisma](05/almanyada-calisma.md)
-
 [Box ve Whisker Grafikleri](05/box-ve-whisker-grafikleri.md)
 
 [Dropdown Secimi Ile Ayri DIV Gostermek](05/dropdown-secimi-ile-ayri-div-gostermek.md)
 
 [Gaussian Kontrolu](05/gaussian-kontrolu.md)
-
-[Pentaho ve Hesaplanmis Olcutler, Yuzdeler](05/pentaho-ve-hesaplanmis-olcutler.md)
 
 [Postgres First_Value, Sum, Partition](05/postgres-firstvalue-sum-partition.md)
 
@@ -110,9 +84,9 @@
 
 [Numpy Temelli 2 Kolon Icin Basit Gruplama (Group By)](06/numpy-temelli-2-kolon-icin-basit.md)
 
-[PyMC](06/pymc.md)
+[pyscopg2](06/psycopg2.md)
 
-[Python ile API Bazli Postgresql Erisimi](06/python-ile-api-bazli-postgresql-erisimi.md)
+[PyMC](06/pymc.md)
 
 [Python ile Mail Göndermek, SMTP, GMail](06/python-ile-mail-gondermek-smtp-gmail.md)
 
@@ -126,10 +100,6 @@
 
 [Kelime Benzerligi - Levenshtein Mesafesi](07/kelime-benzerligi-levenshtein-mesafesi.md)
 
-[Pentaho ile Tablolari Senkronize Etmek](07/pentaho-ile-tablolari-senkronize-etmek.md)
-
-[Pur PDI ile Takvimleme](07/pur-pdi-ile-takvimleme.md)
-
 [supervisord](07/supervisord.md)
 
 [Veri Transferi Tasarimi, Pentaho, Spoon, ETL](07/veri-transferi-tasarimi-pentaho-spoo-etl.md)
@@ -138,7 +108,7 @@
 
 [Klavye Tusunu Mouse Tiklamasi Haline Getirmek](08/klavye-tusunu-mouse-tiklamasi-haline.md)
 
-[Kolon Degerleri Arasinda Harfleme (Spelling) Hata Farki Var mi?](08/kolon-degerleri-arasinda-harfleme.md)
+[Postgresql ve Levenhstein](08/kolon-degerleri-arasinda-harfleme.md)
 
 [Matriste Bos Degerleri Yakin Degerle Doldurmak (Interpolation)](08/matriste-bos-degerleri-yakin-degerle.md)
 
@@ -159,8 +129,6 @@
 [Postgis ve Mesafe Hesabi](09/postgis-ve-mesafe-hesabi.md)
 
 [Postgresql ile Yuzdelik (Percentile) Hesabi](09/postgresql-ile-yuzdelik-percentile.md)
-
-[SVD ile Kumeleme](09/svd-ile-kumeleme.md)
 
 [Bir Vektorun Kismi Toplamini Almak](10/bir-vektorun-kismi-toplamini-almak.md)
 

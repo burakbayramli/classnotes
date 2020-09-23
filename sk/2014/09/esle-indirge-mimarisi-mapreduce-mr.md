@@ -1,24 +1,32 @@
 # Eşle-İndirge Mimarisi (Map/Reduce -MR- Architecture)
 
-
-
-
 Eşle-İndirge Mimarisi (Map/Reduce -MR- Architecture)
 
+MR bir veri analiz sürecini iki evreye ayırır. Bunlardan birincisi
+eşleme evresidir, ki bu evrede eline geçen veri parçasını alan her
+analiz servisi (bunlardan pek çok var, farklı makinalarda), süreçler
+kendilerine verilen dosyaya bakarak anahtar-değer ikilileri
+üretirler. Kelime sayma örneği için bu anahtarlar kelimeler, sayılar
+ise hep 1. Mesela "A A B" için tek bir eşleyici A: 1, A: 1, B: 1
+üretir.
 
+Diğer evre, indirgeme sırasında her servisten alınan anahtarlardaki
+değerler "birleştirilir" yani daha aza "indirgenir". Fakat dikkat:
+birleştirme denince tek bir nihai servisin her şeyi tek başına
+indirgediği zannedilmesin; bu evre de birden fazla makinada
+işleyebilir.
 
-
-Eşle-İndirge Mimarisi (Map/Reduce -MR- Architecture)
-
-MR bir veri analiz sürecini iki evreye ayırır. Bunlardan birincisi eşleme evresidir, ki bu evrede eline geçen veri parçasını alan her analiz servisi (bunlardan pek çok var, farklı makinalarda), süreçler kendilerine verilen dosyaya bakarak anahtar-değer ikilileri üretirler. Kelime sayma örneği için
-bu anahtarlar kelimeler, sayılar ise hep 1. Mesela "A A B" için tek bir eşleyici A: 1, A: 1, B: 1 üretir.
-
-Diğer evre, indirgeme sırasında her servisten alınan anahtarlardaki değerler "birleştirilir" yani daha aza "indirgenir". Fakat dikkat: birleştirme denince tek bir nihai servisin her şeyi tek başına indirgediği
-zannedilmesin; bu evre de birden fazla makinada işleyebilir.
-
-Anahtarlar birleştirme "birimini" oluştururlar [1]. İndirgeme işlemi ise iki, üç hatta birden fazla girdiyi işleyebilecek türden bir kod olmalıdır. Fakat zaten kelime sayma problemin özünde zaten bu vardır, herşey ayrı ayrı, parça parça toplanabilir, bir İndirgeyici iki eşlenmiş dosya alıyor diyelim, biri A: 1, A: 1, B: 1, diğeri A: 1, B:1; bunları A: 3, B: 2 olarak indirgeyebilir / birleştirebiliriz.  Diğer makinalarda başkaları başka veriler almıştır, onlar kendi çaplarında kendi birleştirimlerini yapmaktadırlar. İndirgeme ve yük dağıtım birimi anahtardır, indirgeme safhasında mesela A anahtarı tek bir makinaya gönderilecektir, o anahtarın birleşiminden o makina sorumlu olacaktır.
-
-
+Anahtarlar birleştirme "birimini" oluştururlar [1]. İndirgeme işlemi
+ise iki, üç hatta birden fazla girdiyi işleyebilecek türden bir kod
+olmalıdır. Fakat zaten kelime sayma problemin özünde zaten bu vardır,
+herşey ayrı ayrı, parça parça toplanabilir, bir İndirgeyici iki
+eşlenmiş dosya alıyor diyelim, biri A: 1, A: 1, B: 1, diğeri A: 1,
+B:1; bunları A: 3, B: 2 olarak indirgeyebilir / birleştirebiliriz. 
+Diğer makinalarda başkaları başka veriler almıştır, onlar kendi
+çaplarında kendi birleştirimlerini yapmaktadırlar. İndirgeme ve yük
+dağıtım birimi anahtardır, indirgeme safhasında mesela A anahtarı tek
+bir makinaya gönderilecektir, o anahtarın birleşiminden o makina
+sorumlu olacaktır.
 
 
 İşin mekaniğine bakınca oldukça basit gibi gelebilir. Fakat şaşırtıcı kadar çok analiz işlemi üstteki şekilde temsil edilebilmektedir ve sonuç olarak paralelize edilebilmektedir. Tabii işin mekanığı derken sadece anahtarlara ayırmaktan bahsetmiyoruz, analiz işleminin, her ne ise, "azar azar, ayrı

@@ -1,6 +1,10 @@
 # Google ile Dunya Kupasi Tahmini
 
-Dunya Kupasi maclarini tahmin eden yapay ogrenim teknikleri, Google muhendisleri tarafindan paylasilmis. Veriyi toplamak icin Google Big Query (Google burada kendi teknolojilerinin reklamini da yapiyor tabii) islemek ve analiz icin Pandas ve diger Python bazli araclari kullanmislar. Basari orani 8 macta 8. Onumuzdeki maclardan tahminler,
+Dunya Kupasi maclarini tahmin eden yapay ogrenim teknikleri, Google
+muhendisleri tarafindan paylasilmis. Veriyi toplamak icin Google Big
+Query (Google burada kendi teknolojilerinin reklamini da yapiyor
+tabii) islemek ve analiz icin Pandas ve diger Python bazli araclari
+kullanmislar. Basari orani 8 macta 8. Onumuzdeki maclardan tahminler,
 
 ```
 Brezilya - Sili (Brezilya, 72%)

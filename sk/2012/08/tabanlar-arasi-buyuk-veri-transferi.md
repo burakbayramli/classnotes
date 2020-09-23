@@ -1,11 +1,5 @@
 # Tabanlar Arasi Buyuk Veri Transferi, pg_dump
 
-
-Tabanlar Arasi Buyuk Veri Transferi, pg_dump
-
-
-
-
 Bir projemiz icin birkac tabanin icindeki (ayni semaya sahip) tablolarin icerigini nihai, bir baska taban icinde birbirine ekleyerek yeni, birlesmis tablolar olarak yaratmamiz gerekti. Bunun icin basta dblink kullandik fakat hafiza kullanimiyla alakali bazi hatalar ortaya cikti.
 
 Biz de dblink yerine pg_dump kullanmaya karar verdik.

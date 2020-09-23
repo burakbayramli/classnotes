@@ -10,8 +10,6 @@
 
 [Elisp](10/elisp.md)
 
-[Emacs Kurmak](10/emacs-kurmak.md)
-
 [Etiket Yazmak: JSP, JSTL](10/etiket-yazmak-jsp-jstl.md)
 
 [Hangi Verileri Ambara Alalım?](10/hangi-verileri-ambara-alalm.md)

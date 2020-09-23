@@ -65,10 +65,10 @@ Geri Surum Paket
 Termux kendi izole alanında işliyor. Eğer Android ana dizinlerine
 Termux komut satırından erişmek istersek,  `termux-setup-storage`
 deriz, izin isteyen diyalog kutusu gelince ona 'allow (izin ver)'
-deriz. Artık ana dizinde bir storage adlı bir alt dizin olacak, bu alt
-dizine bakınca içinde downloads, movies, music gibi Anroid'in bilinen
-dizinlerini göreceğiz. Bu dizinlere yazılan her dosya dışarıda da
-gözükecektir. Ya da ters yönde oraya yazılan Termux'da okunur.
+deriz. Artık ana dizinde bir `storage` adlı bir alt dizin olacak, bu
+alt dizine bakınca içinde downloads, movies, music gibi Anroid'in
+bilinen dizinlerini göreceğiz. Bu dizinlere yazılan her dosya dışarıda
+da gözükecektir. Ya da ters yönde oraya yazılan Termux'da okunur.
 
 `ssh` var, dışarı bağlanılıp envai türden iş yapılabilir. Kimisi web
 geliştirmeyi DevX üzerinden direk telefonda yapıyor, flask, django
@@ -165,4 +165,17 @@ Linux işletmek için Samsung kolları sıvadı ve Linux on Galaxy adlı bir
 proje üzerinde çalışıyorlar. Bu şekilde telefon, tablet sahibi
 geliştiricileri kendilerine çekmeye uğraşıyorlar, ekonomik kısmı
 mantıklı.
+
+Ekler
+
+İki sene bu ortamda yoğun şekilde çalıştıktan sonra şunu
+söyleyebilirim, Termux'u servis bazlı bile olarak tamamen Linux yerine
+geçirmek çok zor. Bu tür ihtiyaçlara (tamamen mobil, hafif bilgisayar)
+en iyi seçenek [Raspberry Pi](../../2020/07/raspberrypi.md). Pi tam
+tekmilli bir Ubuntu Linux'tur, hafiftir, Wifi'ni otomatik bağlanacak
+şekilde hep açık tutarsak ve cep telefonu Wifi paylaşımı hotspot
+üzerinden İnternet erişimi sağlarsak, yerel ağ da oluşturabiliriz, ve
+telefondan ssh, scp ile bağlanıp 'servis' olarak RPi kullanabiliriz.
+Bluetooth klavye + Telefon + Pi tasinabilir bir Linux ortami saglar. 
+
 

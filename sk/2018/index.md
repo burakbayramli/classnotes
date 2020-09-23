@@ -8,17 +8,13 @@
 
 [Go Oyunu, GnuGo](02/go-gnugo.md)
 
-[Basit, Hızlı Diske Değer Yazma Okuma](03/basit-sekilde-hzl-diske-deger-yazma.md)
-
-[Veri Taban İçeriğini Gezmek](03/veri-taban-icerigini-gezmek.md)
+[sqlite, Basit, Hızlı Diske Değer Yazma Okuma](03/sqlite-basit-sekilde-hzl-diske-deger-yazma.md)
 
 [basemap](06/basemap.md)
 
 [Genel GPS: HTML5, Javascript, Python, Kodlari, Tavsiyeleri](06/genel-gps-html5-javascript-python.md)
 
 [Keras](06/keras.md)
-
-[Bitcoin, Electrum Cuzdani](07/bitcoin-electrum-cuzdani.md)
 
 [Unicode, Ascii, Deascii, Python, Emacs](07/unicode-ascii-deascii-python-emacs.md)
 

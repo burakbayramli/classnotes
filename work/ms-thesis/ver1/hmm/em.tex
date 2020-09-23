@@ -1,0 +1,170 @@
+\section{Parameter Estimation Using EM}
+
+We need to find optimal $\theta$ that maximizes $log (p(y,q|\theta))$ where
+$\theta = (\pi,A,\eta)$. We know $\pi$ and $A$. $\eta$ represents parameters
+necessary for $p(y_t|q_t)$, the output distribution.
+
+Let's write the full $p(y,q)$ distribution;
+
+\begin{eqnarray*}
+p(q,y) &=& \pi_{q_0} \prod_{t=0}^{T-1} a_{q_t,q_{t+1}} \prod_{t=0}' p(y_t|q_t,\eta)
+\end{eqnarray*}
+
+
+\begin{proof}
+\begin{eqnarray*}
+\prod_{t=0}^{T-1} a_{q_t,q_{t+1}} &=& p(q_0)p(q_1|q_0)p(q_2|q_1)...\\
+&=& p(q_1,q_0)p(q_2|q_1)..\\
+&=& p(...,q_2,q_1,q_0) \\
+&=& p(q)
+\end{eqnarray*}
+
+Due to conditional independence,
+
+\begin{eqnarray*}
+p(y_0,y_1,y_2,...|q_0,q_1,q_2,..) &=& p(y_0|q_0)p(y_1|q_1)p(y_2|q_2)...\\
+&=& \prod_{t=0}' p(y_t|q_t)
+\end{eqnarray*}
+
+Finally
+
+\begin{eqnarray*}
+p(y_0,y_1,y_2,...|q_0,q_1,q_2,..)p(q)  &=& p(y,q)
+\end{eqnarray*}
+\end{proof}
+
+We need to bring $a_{ij}$ in to the joint distribution.
+
+Trick: Let's write $a_{q_t,q_{t+1}}$ as
+
+\begin{eqnarray*}
+a_{q_t,q_{t+1}} &=& \prod_{i,j=1}^M[a_{ij}]^{q_t^i q_{t+1}^j}
+\end{eqnarray*}
+Why does this work? Remember: $[a_{ij}]$ is a scalar, $[a_{ij}]^1 = a_{ij}$ and
+$[a_{ij}]^0 = 1$. $q_t^i q_{t+1}^j$ can only be $1$ if they are both $1$ at the
+same time, that is, $q_t^i$ and $q_{t+1}^j$ are selecting the correct state.
+
+We use the same technique for $p(y_t|q_t)$ which is represented by matrix
+$\eta$, then
+
+\begin{eqnarray*}
+p(y_t|q_t) &=& \prod_{i,j=1}^M [\eta_{ij}]^{q_t^i y_{t+1}^j}
+\end{eqnarray*}
+
+Then log likelihood $\log p(q,y)$ is;
+
+{\small
+\begin{eqnarray*}
+ &=& \log
+ \bigg\{
+ \prod_{i=1}^{T-1}[\pi]^{q_0^i}
+ \prod_{t=1}^{T-1} \prod_{i,j=1}^M[a_{ij}]^{q_t^i q_{t+1}^j}
+ \prod_{t=1}^{T-1} \prod_{i,j=1}^M[\eta_{ij}]^{q_t^i y_{t+1}^j}
+ \bigg\} \\
+ &=& 
+ \sum_{i=1}^{T-1}q_0^i\log \pi +
+ \sum_{t=0}^{T-1} \sum_{i,j=1}^M q_t^i q_{t+1}^j \log a_{ij} +
+ \sum_{t=0}^{T-1} \sum_{i,j=1}^M q_t^i y_{t+1}^j \log \eta_{ij}
+\end{eqnarray*}}
+
+For estimating $\hat{a}_{ij}$ we need to take derivative using Lagrange
+multiplier, set to zero and solve.
+
+{\small
+\begin{eqnarray*}
+\frac{\partial}{\partial a_{ij}} \log p(y,q)
+&=&
+\frac{\partial}{\partial a_{ij}}
+\bigg(
+\sum_{t=0}^{T-1} \sum_{i,j=1}^M q_t^i q_{t+1}^j \log a_{ij} -
+\lambda (M-\sum_{i,j=1}^M a_{ij})
+\bigg)
+\end{eqnarray*}
+}
+As we see, other terms which did not contain $a_{ij}$ simply dropped out.
+
+{\small
+\begin{eqnarray*}
+\frac{\partial}{\partial a_{ij}} \log p(y,q)
+&=& \sum_{t=0}^{T-1} \sum_{i,j=1}^M \frac{q_t^i q_{t+1}^j}{a_{ij}} -
+\lambda \sum_{i,j=1}^M 1 \\
+&=&  \sum_{i,j=1}^M ( \sum_{t=0}^{T-1} \frac{q_t^i q_{t+1}^j}{a_{ij}} -
+\lambda) = 0 \\
+&=&  \sum_{t=0}^{T-1} \frac{q_t^i q_{t+1}^j}{a_{ij}} - \lambda = 0 \\
+\lambda &=&  \sum_{t=0}^{T-1} \frac{q_t^i q_{t+1}^j}{a_{ij}} \\
+\lambda a_{ij} &=&  \sum_{t=0}^{T-1} q_t^i q_{t+1}^j\\
+\lambda \sum_{j=1}^M a_{ij} &=&  \sum_{j=1}^M \sum_{t=0}^{T-1} q_t^i q_{t+1}^j\\
+\lambda &=&  \sum_{j=1}^M \sum_{t=0}^{T-1} q_t^i q_{t+1}^j\\
+a_{ij} &=& \frac{\sum_{t=0}^{T-1} q_t^i q_{t+1}^j}{\lambda} \\
+\hat{a}_{ij}  &=& \frac{\sum_{t=0}^{T-1} q_t^i q_{t+1}^j}{\sum_{j=1}^M \sum_{t=0}^{T-1} q_t^i q_{t+1}^j} 
+\end{eqnarray*}}
+
+Similarly for $\eta_{ij}$ and $\pi_i$,
+
+\begin{eqnarray*}
+\hat{\eta}_{ij} &=& \frac{\sum_{t=0}^{T-1} q_t^i y_t^j}{\sum_{k=1}^N
+\sum_{t=0}^{T-1} q_t^i y_t^k} \\
+\hat{\pi}_i &=& q_0^i
+\end{eqnarray*}
+
+If we define $m_{ij} \triangleq \sum_{t=0}^{T-1} q_t^i q_{t+1}^j$ and $n_{ij}
+\triangleq \sum_{t=0}^{T-1} q_t^i y_t^j$ then,
+
+\begin{eqnarray*}
+\hat{a}_{ij}  &=& \frac{m_{ij}}{\sum_{j=1}^M m_{ij}}  \\
+\hat{\eta}_{ij} &=& \frac{n_{ij}}{\sum_{k=1}^Nn_{ik}}\\
+\hat{\pi}_i &=& q_0^i
+\end{eqnarray*}
+
+For the E-step we use expectations instead of the random variables themselves:
+
+\begin{eqnarray*}
+E(m_{ij}|y,\theta^{(p)}) = \sum_{t=0}^{T-1}E(q_t^i q_{t+1}^j|y,\theta^{(p)})
+\end{eqnarray*}
+
+Since random variable $q_t^i q_{t+1}^j$ is either 1 or 0, the expectation of
+this random variable is equal to its probability
+
+\begin{eqnarray*}
+E(m_{ij}|y,\theta^{(p)}) &=& \sum_{t=0}^{T-1}p(q_t^i q_{t+1}^j|y,\theta^{(p)})\\
+&=& \sum_{t=0}^{T-1} \xi_{t,t+1}^{ij}
+\end{eqnarray*}
+We plug this back into formula for $\hat{a}_{ij}$
+
+\begin{eqnarray*}
+\hat{a}_{ij}^{(p+1)}  &=& \frac{\sum_{t=0}^{T-1} \xi_{t,t+1}^{ij}}
+    {\sum_{k=1}^M \sum_{t=0}^{T-1} \xi_{t,t+1}^{ik}}  \\
+\end{eqnarray*}
+
+Since $\xi(q_t,q_{t+1})=\xi_{t,t+1}=p(q_t,q_{t+1}|y)$ and $\sum_{k=1}^M \sum_{t=0}^{T-1}
+\xi_{t,t+1}^{ik} = \gamma_t^i$,
+
+\begin{eqnarray*}
+\hat{a}_{ij}^{(p+1)}  &=& \frac{\sum_{t=0}^{T-1} \xi_{t,t+1}^{ij}}{\sum_{t=0}^{T-1} \gamma_t^i} 
+\end{eqnarray*}
+
+Using similar procedure we can also derive the following;
+
+\begin{eqnarray*}
+\hat{\pi}^{(p+1)} &=& \gamma_0^i\\
+\hat{\eta}_{ij}^{(p+1)} &=& \frac{\sum_{t=0}^T\gamma_{t}^i y_t^j}{\sum_{t=0}^T\gamma_{t}^i}
+\end{eqnarray*}
+
+$\hat{\eta}_{ij}$ assumes a multinomial output distribution $y_t$. For stock
+prediction purposes, we will be using a Gaussian distribution to represent
+each stock price at time $t$. Therefore, we can simply use $y_t$ itself as the
+output instead of the $y_t^j$, hence $\hat{\eta}$ changes to being the mean of
+the estimated Gaussian.
+
+\begin{eqnarray*}
+\hat{C}_{i}^{(p+1)} &=& \frac{\sum_{t=0}^T\gamma_{t}^i y_t}{\sum_{t=0}^T\gamma_{t}^i}
+\end{eqnarray*}
+
+In each iteration
+
+\begin{itemize}
+   \item We calculate $\hat{a}$, $\hat{C}$, $\hat{R}$, $\hat{\pi}$ using given
+     $q$ and $y$.
+   \item We calculate $p(q_t|y)$ for each $q_t$ using $A$, $\eta$ and $\pi$ using
+   forward backward recursion.
+\end{itemize}

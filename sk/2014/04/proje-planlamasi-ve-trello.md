@@ -1,21 +1,30 @@
 # Proje Planlamasi ve Trello
 
+XP, Scrum gibi çevik yöntemlerin yaygınlaşması ile bu süreçlerde rahat
+kullanabilecek araçlar gerekiyor. İhtiyaç olan, yapılacakları iş
+birimleri (taşk) olarak tanımlanabilmesi ve kişilere verilmesini
+sağlayan görsel bir araç. Scrum, genel olarak çevik yöntemler sadece 1
+ay öne bakarak o süre içinde yapılacakları listeleyip, programcılığa
+fonksiyonel bakan planlama yöntemleri.
+
+Projemizde JİRA'nın yapılacaklar listesi araçıni kullanmayı düşündük,
+fakat kullanımı pek rahat bulmadık. Daha kullanışlı bir yazılım Trello
+olabilir; Trello Web üzerinden kullanılabilen bir planlama araçıdır,
+ve giriş yapmak için Gmail isim ve şifrenizi kullanabilirsiniz.
+
+Her türlü gruplama için yeni bir liste yaratılabilir, ve yapılacak
+işleri temsil eden kartlar -ki bu kartların ismi, detayı vardır, ve
+kartların altında istenildiği kadar yorum girilebilir- herhangi bir
+listenin altına koyulabilir, kartlar bir listeden diğerine tut-sürükle
+(drag-and-drop) ile geçirilebilir. Trello "sosyal" yapılmaya
+uğraşılmış, kartlara girilen yorumlar ana ekranda sağ taraftan
+akarlar, Twitter gibi bir haber / mesaj akışı orada görülebilmiş
+olur. Kartlara renk ataması da yapılabiliyor, böylece gruplama, kişi
+atanması haricinde bir kategorizasyon yöntemi daha elde edilmiş
+oluyor.
 
 
 
-Proje Planlamasi ve Trello
-
-
-
-
-XP, Scrum gibi cevik yontemlerin yayginlasmasi ile bu sureclerde rahat kullanabilecek araclar gerekiyor. Ihtiyac olan, yapilacaklari is birimleri (task) olarak tanimlanabilmesi ve kisilere verilmesini saglayan gorsel bir arac. Scrum, genel olarak cevik yontemler sadece 1 ay one bakarak o sure icinde yapilacaklari listeleyip, programciliga fonksiyonel bakan planlama yontemleri.
-
-Projemizde JIRA'nin yapilacaklar listesi aracini kullanmayi dusunduk, fakat kullanimi pek rahat bulmadik. Daha kullanisli bir yazilim Trello olabilir; Trello Web uzerinden kullanilabilen bir planlama aracidir, ve giris yapmak icin Gmail isim ve sifrenizi kullanabilirsiniz. 
-
-
-
-
-Her turlu gruplama icin yeni bir liste yaratilabilir, ve yapilacak isleri temsil eden kartlar -ki bu kartlarin ismi, detayi vardir, ve kartlarin  altinda istenildigi kadar yorum girilebilir- herhangi bir listenin altina koyulabilir, kartlar bir listeden digerine tut-surukle (drag-and-drop) ile gecirilebilir. Trello "sosyal" yapilmaya ugrasilmis, kartlara girilen yorumlar ana ekranda sag taraftan akarlar, Twitter gibi bir haber / mesaj akisi orada gorulebilmis olur. Kartlara renk atamasi da yapilabiliyor, boylece gruplama, kisi atanmasi haricinde bir kategorizasyon yontemi daha elde edilmis oluyor. 
 
 
 

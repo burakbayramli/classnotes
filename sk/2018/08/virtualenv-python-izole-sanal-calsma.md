@@ -13,7 +13,7 @@ mesela).
 Biz daha az iddialı ama bir o kadar faydalı, sadece sanal, izole ortam
 yaratan virtualenv'i anlatalım.
 
-Ubuntu'da mesela python kurduğumuzda, bu sudo apt-get ile olabilir,
+Ubuntu'da mesela python kurduğumuzda, bu `sudo apt-get` ile olabilir,
 komut satırında çağırdığımız python global, makinanın tümü için
 geçerli bir çağrıdır. Ardından pip install ile paket kurduğumuzda bu
 global python için yine global paket kurulumu yapmış oluruz. Kurulan

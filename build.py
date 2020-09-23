@@ -3,7 +3,7 @@
 #
 # __TODO__: for html, put article title inside <title></title>
 #
-import os, sys, re, codecs, shutil, markdown
+import os, sys, re, codecs, shutil, markdown, json
 
 topdirs = ['algs','calc_multi','chaos','compscieng',
            'func_analysis','linear','ode','pde','stat',
@@ -58,6 +58,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
 
    fin.readline()
    fin.readline()
+   fout.write("[Yukarı](..)\n\n")
    title = "# " + fin.readline()
    fout.write(title)
 
@@ -98,6 +99,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
       line = line.replace("\\big\{","\\big\\\\{")
       line = line.replace("\\big\}","\\big\\\\}")
       line = re.sub(r'\\hspace\{(.*?)\}', r'\n', line)
+      line = line.replace("\\begin{center}","")
+      line = line.replace("\\end{center}","")
       line = line.replace("\\begin{itemize}","")
       line = line.replace("\\end{itemize}","")
       line = line.replace("\\begin{enumerate}","")
@@ -196,13 +199,14 @@ if __name__ == "__main__":
     if sys.argv[1] == 'html':
         
         fr = os.getcwd()
-        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s' --ignore-list=.md,.git,.zip,.pdf" % (fr, TARGET_DIR)
+        cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s' --ignore-list=.md,.git,.zip,.pdf,.apk,.exe,.stl" % (fr, TARGET_DIR)
         print (cmd)
         os.system(cmd)
         shutil.copy(".gitignore", TARGET_DIR)
-        
+        lecs = json.loads(open("lecs.conf").read())
         for topdir in topdirs:
             print ('main',topdir)
+            print ('pdf', lecs['pdfs'][topdir])
             dir = TARGET_DIR + "/" + topdir
             print ('dir',dir)
             fout = codecs.open(dir + "/index.html",mode="w",encoding="utf-8")
@@ -211,12 +215,19 @@ if __name__ == "__main__":
             <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <title>%s</title>
             </head>  
             <body>                    
             <p>
             <a href='..'>Ana Menü</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href='%s'>PDF</a>
             </p>
-            """)
+            <p>
+            <h4>%s</h4>
+            </p>
+            """ % (lecs['titles'][topdir],lecs['pdfs'][topdir],lecs['titles'][topdir]) )
+            
             for subdir in sorted(os.listdir(dir)):
                 if not os.path.isdir(dir + "/" + subdir): continue
                 print ('subdir',subdir)

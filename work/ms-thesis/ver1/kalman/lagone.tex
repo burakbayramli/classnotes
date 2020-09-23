@@ -1,0 +1,356 @@
+\documentclass[12pt]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphics}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lag-One Covariance Smoother}
+
+In order to estimate $A$ and $Q$, we need to calculate $P_{t,t-1}^t$. Let's
+define $\tilde{x_t^s} = x_t - \hat{x}_t^s$. Then,
+
+\begin{eqnarray*}
+P_{t,t-1}^t &=& E ( \tilde{x}_t^t \tilde{x}{_{t-1}^t}'  ) \\
+&=& E[ (x_t - \hat{x}_t^t) (x_{t-1} - \hat{x}_{t-1}^t)' ]
+\end{eqnarray*}
+
+\begin{eqnarray*}
+x_{t-1}' = x_{t-1}^{t-1} + L_{t-1} (x' - x_t ^ {t-1}) \\
+x_{t-1}^t = x_{t-1}^{t-1} + L_{t-1} (x^t - x_t ^ {t-1}) 
+\end{eqnarray*}
+
+\begin{eqnarray*}
+x_t^t = x_t^{t-1} + K_t(y_t - Cx_t^{t-1}) \\
+x_t^t - x_t^{t-1} = K_t(y_t - Cx_t^{t-1})
+\end{eqnarray*}
+
+\begin{eqnarray*}
+P_{t,t-1} &=& E\bigg[
+  (x_t - x_t^{t-1} - K_t(y_t - Cx_t^{t-1}) )
+  (x_{t-1} - x_{t-1}^{t-1} - J_{t-1}(x_t^t - x_t^{t-1}))'
+  \bigg]\\
+&=& E\bigg[
+  (x_t - x_t^{t-1} - K_t(y_t - Cx_t^{t-1}))
+  (x_{t-1} - x_{t-1}^{t-1} - J_{t-1}K_t(y_t - Cx_t^{t-1}))'
+  \bigg]\\
+&=& E\bigg[
+  (\tilde{x}_t^{t-1} - K_t(y_t - Cx_t^{t-1}))
+  (\tilde{x}_{t-1}^{t-1} - J_{t-1}K_t(y_t - Cx_t^{t-1}))'
+  \bigg]
+\end{eqnarray*}
+
+\begin{eqnarray*}
+y_t &=& Cx_t + v_t \\
+&=& Cx_t - Cx_t^{t-1} - v_t \\
+&=& C(x_t - x_t^{t-1})+v_t \\
+&=& C\tilde{x}_t^{t-1}+v_t
+\end{eqnarray*}
+
+\begin{eqnarray*}
+P_{t,t-1}^t &=& E\bigg[
+  (\tilde{x}_t^{t-1} - K_t( C\tilde{x}_t^{t-1}+v_t ))
+  (\tilde{x}_{t-1}^{t-1} - J_{t-1}K_t( C\tilde{x}_t^{t-1}+v_t ))' 
+  \bigg]
+\end{eqnarray*}
+
+\begin{eqnarray}
+&=& E\bigg[
+  \tilde{x}_t^{t-1}\tilde{x}{_{t-1}^{t-1}}' \label{exp1} \\
+&& -
+  \tilde{x}_t^{t-1}(L_{t-1}K_t(Cx_t^{t-1}+v_t))' \label{exp2} \\
+&& -
+  K_t(C\tilde{x}_t^{t-1}+v_t)\tilde{x}{_{t-1}^{t-1}}' \label{exp3}  \\
+&& +
+  K_t(C\tilde{x}_t^{t-1}+v_t)(L_{t-1}K_t(C\tilde{x}_t^{t-1}+ v_t))' \label{exp4} \bigg]
+\end{eqnarray}
+
+\begin{eqnarray*}
+E[\tilde{x}_t^{t-1}\tilde{x}{_{t-1}^{t-1}}'] &=& P_{t,t-1}^{t-1}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+  &=& -E[ \tilde{x}_t^{t-1}(L_{t-1}K_t(Cx_t^{t-1}+v_t))' ] \\
+  &=& -E[\tilde{x}_t^{t-1}(\tilde{x}{_t^{t-1}}'C' + v_t') L_{t-1}' K_t'] \\
+  &=& -E[\tilde{x}_t^{t-1}\tilde{x}{_t^{t-1}}'C' + \tilde{x}_t^{t-1}v_t'] \\
+  &=& -P_t^{t-1}C'K_t'L_{t-1}'
+\end{eqnarray*}
+
+\begin{eqnarray*}
+  &=& -E[K_t(C\tilde{x}_t^{t-1}+v_t)\tilde{x}{_{t-1}^{t-1}}' ] \\
+  &=& -E[K_tC\tilde{x}_t^{t-1}\tilde{x}{_{t-1}^{t-1}}' + K_tv_t\tilde{x}{_{t-1}^{t-1}}']\\
+  &=& -E[K_tC\tilde{x}_t^{t-1}\tilde{x}{_{t-1}^{t-1}}']\\
+  &=& -K_tCP_{t,t-1}^{t-1}
+\end{eqnarray*}
+
+
+\begin{eqnarray*}
+  &=& E[(K_t C \tilde{x}_t^{t-1} + v_t)(L_{t-1}K_t(C\tilde{x}_t^{t-1}+ v_t))']\\
+  &=& E[(K_tC\tilde{x}_t^{t-1} + K_tv_t) 
+    [ \tilde{x}{_t^{t-1}}' C' K_t' L_{t-1}' + v_t' K_t'L_{t-1}'] ] \\
+  &=& E[K_t C \tilde{x}_t^{t-1} \tilde{x}{_t^{t-1}}' C' K_t' L_{t-1}' +
+    K_tv_t v_t' K_t'L_{t-1}' + ... ]\\
+  &=& K_tCP_t^{t-1}C'Kt'L_{t-1}' + K_t\Sigma_wK_t'L_{t-1}T\\
+  &=& K_t(CP_t^{t-1}C' + \Sigma_w)K_t'L_{t-1}'
+\end{eqnarray*}
+
+Based on the definition of $K_t$ 
+\begin{eqnarray*}
+K_t &=& P_{t}^{t-1}C' (CP_{t}^tC'+ \Sigma_{w})^{-1}\\
+K_t (CP_{t}^tC'+ \Sigma_{w}) &=& P_{t}^{t-1} C'
+\end{eqnarray*}
+
+Hence we can continue with previous Equation as
+
+\begin{eqnarray*}
+  &=& P_{t}^{t-1} C' K_t'L_{t-1}'
+\end{eqnarray*}
+
+The full equation is
+
+\begin{eqnarray*}
+P_{t,t-1}^t = P_{t,t-1}^{t-1} - P_t^{t-1}C'K_t'L_{t-1}' - K_tCP_{t,t-1}^{t-1} + P_{t}^{t-1} C' K_t'L_{t-1}'
+\end{eqnarray*}
+
+If we remember the joint covariance of joint distribution $(x_{t},x_{t-1})$ is
+$AP_{t-1}^{t-1}$ (we simply look at the lower left cell of covariance matrix for
+$(x_{t-1},x_{t})$), this means $P_{t,t-1}^{t-1} = AP_{t-1}^{t-1}$, then
+
+\begin{eqnarray*}
+  P_{t,t-1}^t &=& AP_{t-1}^{t-1} - P_t^{t-1}C'K_t'L_{t-1}' - K_t C AP_{t-1}^{t-1} + P_{t}^{t-1} C' K_t'L_{t-1}'\\
+  &=& AP_{t-1}^{t-1}  - K_t C AP_{t-1}^{t-1} \\
+  &=& (I  - K_t C)AP_{t-1}^{t-1}\\
+  P_{T,T-1}^T &=& (I  - K_T C)AP_{T-1}^{T-1}
+\end{eqnarray*}
+
+The equation above is the start-up formula for the recursive equation. In order
+to derive the recursion,
+
+\begin{eqnarray*}
+x_{t-1}^T &=& x_{t-1}^{t-1} + L_{t-1}(x_t^T - Ax_t^{t-1}) \\
+-x_{t-1} + x_{t-1}^T - L_{t-1}x_t^T &=& -x_{t-1} + x_{t-1}^{t-1} - L_{t-1}Ax_{t-1}^{t-1}\\
+x_{t-1} - x_{t-1}^T + L_{t-1}x_t^T &=& x_{t-1} - x_{t-1}^{t-1} + L_{t-1}Ax_{t-1}^{t-1}\\
+\tilde{x}_{t-1}^T + L_{t-1}x_t^T &=& \tilde{x}_{t-1}^{t-1} + L_{t-1}Ax_{t-1}^{t-1}
+\end{eqnarray*}
+
+Let's take the last line, subtract 1 from t, take transpose, multiply LHS of the
+new equation with LHS of last line above and same with RHS and take expectation
+of the final equation.
+
+\begin{eqnarray*}
+\tilde{x}_{t-2}^T + L_{t-2}x_{t-1}^T &=& \tilde{x}_{t-2}^{t-2} + L_{t-2}Ax_{t-2}^{t-2}
+\end{eqnarray*}
+
+Multiply and take expectation
+
+\begin{eqnarray*}
+&& E[ \tilde{x}_{t-1}^T \tilde{x}{_{t-2}^T}' + L_{t-1}x_t^Tx{_{t-1}^T}'L_{t-2}' ] = \\
+&& E[ 
+  \tilde{x}_{t-1}^{t-1}\tilde{x}{_{t-2}^{t-2}}' + 
+  \tilde{x}_{t-1}^{t-1}x{_{t-2}^{t-2}}'A'L_{t-2}' +
+  L_{t-1}Ax_{t-1}^{t-1}\tilde{x}{_{t-2}^{t-2}}' +
+  L_{t-1}Ax_{t-1}^{t-1}x{_{t-2}^{t-2}}'A'L_{t-2}'
+  ]
+\end{eqnarray*}
+
+The left-hand side of the equation is
+\begin{eqnarray*}
+P_{t-1,t-2}^T + L_{t-1}E[x_t^Tx{_{t-1}^T}']L_{t-2}'
+\end{eqnarray*}
+For RHS's first term, we need definition for $\tilde{x}_{t-1}^{t-1}$. We can
+start with $x_t^t$.
+
+\begin{eqnarray*}
+x_t^t &=& x_t^{t-1} + K_t(y_t - Cx_t^{t-1})\\
+x_t - x_t^t &=& x_t - x_t^{t-1} - K_t(y_t - Cx_t^{t-1})\\
+\tilde{x}_t^t  &=& \tilde{x}_t^{t-1} - K_t(Cx_t + \Sigma_w - Cx_t^{t-1})\\
+&=& \tilde{x}_t^{t-1} - K_t(C(x_t-x_t^{t-1}) + \Sigma_w)\\
+&=& \tilde{x}_t^{t-1} - K_t(C\tilde{x}_t^{t-1} + \Sigma_w)
+\end{eqnarray*}
+
+Subtract 1 from t
+
+\begin{eqnarray*}
+\tilde{x}_{t-1}^{t-1} &=& \tilde{x}_{t-1}^{t-2} - K_{t-1}(C\tilde{x}_{t-1}^{t-2} + \Sigma_w)
+\end{eqnarray*}
+
+We finally have
+
+\begin{eqnarray*}
+E[\tilde{x}_{t-1}^{t-1}\tilde{x}{_{t-2}^{t-2}}'] &=&
+E[ (\tilde{x}_{t-1}^{t-2} - K_{t-1}(C\tilde{x}_{t-1}^{t-2} + \Sigma_w ))
+  \tilde{x}{_{t-2}^{t-2}}'] \\
+&=& 
+E[ \tilde{x}_{t-1}^{t-2}\tilde{x}{_{t-2}^{t-2}}' - 
+  K_{t-1}C\tilde{x}_{t-1}^{t-2}\tilde{x}{_{t-2}^{t-2}}'
+]\\
+&=& P_{t-1,t-2}^{t-2} - K_{t-1} C P_{t-1,t-2}^{t-2}
+\end{eqnarray*}
+
+For RHS's third term, let's define $x_{t-1}^{t-1}$ based on definition of
+$\tilde{x}_{t-1}^{t-1}$. 
+
+\begin{eqnarray*}
+\tilde{x}_{t-1}^{t-1} = x_{t-1} - x_{t-1}^{t-1}\\
+x_{t-1}^{t-1} = x_{t-1}^{t-1} - \tilde{x}_{t-1}^{t-1} 
+\end{eqnarray*}
+
+We can use this as
+
+\begin{eqnarray*}
+&& E[L_{t-1}Ax_{t-1}^{t-1}\tilde{x}{_{t-2}^{t-2}}'] = \\
+&& E[L_{t-1}A(x_{t-1}^{t-1} - \tilde{x}_{t-1}^{t-1} )\tilde{x}{_{t-2}^{t-2}}'] = \\
+&& E[L_{t-1}A(x_{t-1} - (\tilde{x}_{t-1}^{t-2} - K_{t-1}(C\tilde{x}_{t-1}^{t-2}
+    + \Sigma_w ))) \tilde{x}{_{t-2}^{t-2}}'] = \\
+&& E[L_{t-1}Ax_{t-1}\tilde{x}{_{t-2}^{t-2}}' - 
+    L_{t-1}A\tilde{x}_{t-1}^{t-2}\tilde{x}{_{t-2}^{t-2}}' +
+    L_{t-1}A K_{t-1} C \tilde{x}_{t-1}^{t-2} \tilde{x}{_{t-1}^{t-2}}' +
+    L_{t-1}A x_{t-1} \Sigma_w \tilde{x}_{t-2}^{t-2} ] \\
+&& = -L_{t-1}AP_{t-1,t-2}^{t-2} + L_{t-1}A K_{t-1}CP_{t-1,t-2}^{t-2}
+\end{eqnarray*}
+
+And finally, RHS's fourth term is simply as below;
+
+\begin{eqnarray*}
+L_{t-1}A E[x_{t-1}^{t-1}x{_{t-2}^{t-2}}']A'L_{t-2}'
+\end{eqnarray*}
+
+Putting all this together, we have
+
+\begin{eqnarray*}
+&& P_{t-1,t-2}^T + L_{t-1}E[x_t^Tx{_{t-1}^T}']L_{t-2}' = \\
+&& P_{t-1,t-2}^{t-2} - K_{t-1} C P_{t-1,t-2}^{t-2} -
+L_{t-1}AP_{t-1,t-2}^{t-2} + 
+L_{t-1}A K_{t-1}CP_{t-1,t-2}^{t-2} +\\
+&& L_{t-1}A E[x_{t-1}^{t-1}x{_{t-2}^{t-2}}']A'L_{t-2}'
+\end{eqnarray*}
+
+We can further simplify this equation. In order to do that, let's remember the
+definition of $E[x_t^tx{_{t-1}^t}']$ and $E[x_t^Tx{_{t-1}^T}']$
+
+\begin{eqnarray*}
+E[x_t^tx{_{t-1}^t}'] = P_{t,t-1}^t - E[x_tx_{t-1}]
+\end{eqnarray*}
+and
+\begin{eqnarray*}
+E[x_t^Tx{_{t-1}^T}'] = AE(x_{t-1}x_{t-2}')A' + A\Sigma_v - P_{t,t-1}^T
+\end{eqnarray*}
+
+Let's use this for substitution
+
+\begin{eqnarray*}
+&& P_{t-1,t-2}^T + L_{t-1}(A E(x_{t-1}x_{t-2})A' + A\Sigma_v - P_{t,t-1}^T ) L_{t-2}' = \\
+&& P_{t-1,t-2}^{t-2} - K_{t-1} C P_{t-1,t-2}^{t-2} -
+L_{t-1}AP_{t-1,t-2}^{t-2} + 
+L_{t-1}A K_{t-1}CP_{t-1,t-2}^{t-2} + \\
+&& L_{t-1}A (P_{t-1,t-2}^{t-2} - E[x_{t-1},x_{t-2}])A'L_{t-2}' 
+\end{eqnarray*}
+
+Let's focus on expanding of one term in LHS of above equation
+
+\begin{eqnarray*}
+&& L_{t-1}(A E(x_{t-1}x_{t-2})A' + A\Sigma_v - P_{t,t-1}^T ) L_{t-2}' = \\
+&&  L_{t-1}A E(x_{t-1}x_{t-2})A' L_{t-2}' + L_{t-1}A\Sigma_vL_{t-2}' 
+  - L_{t-1}P_{t,t-1}^TL_{t-2}'
+\end{eqnarray*}
+
+Let's expand the last term in RHS 
+
+\begin{eqnarray*}
+&& L_{t-1}A (E[x_{t-1},x_{t-2}] - P_{t-1,t-2}^{t-2})A'L_{t-2}' = \\
+&& L_{t-1}AE[x_{t-1},x_{t-2}]A'L_{t-2}' - L_{t-1}A P_{t-1,t-2}^{t-2}A'L_{t-2}' 
+\end{eqnarray*}
+
+We can see first terms of both LHS and RHS are the same, hence can be
+dropped. The simplified equation is
+
+\begin{eqnarray*}
+&& P_{t-1,t-2}^T + L_{t-1}A\Sigma_vL_{t-2}' - L_{t-1}P_{t,t-1}^TL_{t-2}' = \\
+&& P_{t-1,t-2}^{t-2} - K_{t-1}AP_{t-1,t-2}^{t-2} + L_{t-1}AK_{t-1}CP_{t-1,t-2}^{t-2} - \\
+&& L_{t-1}AP_{t-1,t-2}^{t-2}A'L_{t-2}
+\end{eqnarray*}
+
+Rearranging
+
+\begin{eqnarray}
+&& P_{t-1,t-2}^T = \label{eq10} \\
+&& P_{t-1,t-2}^{t-2} - K_{t-1}CP_{t-1,t-2}^{t-2} + \nonumber \\
+&& L_{t-1}AK_{t-1}CP_{t-1,t-2}^{t-2} - L_{t-1}AP_{t-1,t-2}^{t-2}A'L_{t-2}' - L_{t-1}A\Sigma_vL_{t-2}'+\nonumber\\
+&& L_{t-1}P_{t,t-1}^TL_{t-2}'\nonumber
+\end{eqnarray}
+
+Let us simpify this equation further. We will use two shortcuts to do
+this. Remember our starting equation for lag-one covariance smoother was
+
+\begin{eqnarray*}
+P_{T,T-1}^T &=& (I  - K_T C)AP_{T-1}^{T-1}
+\end{eqnarray*}
+Then,
+\begin{eqnarray*}
+P_{t,t-1}^t &=& (I  - K_t C)AP_{t-1}^{t-1}\\
+AP_{t-1}^t &=& (I  - K_t C)AP_{t-1}^{t-1}\\
+P_{t-1}^t &=& (I  - K_t C)P_{t-1}^{t-1}
+\end{eqnarray*}
+
+Another equation we will use is
+
+\begin{eqnarray*}
+L_{t-1} = P_{t-1}^{t-1}A'(P_t^{t-1})^{-1}
+\end{eqnarray*}
+
+The second line of the Equation \eqref{eq10} can be rewritten as
+
+\begin{eqnarray*}
+&& P_{t-1,t-2}^{t-2} - K_{t-1}CP_{t-1,t-2}^{t-2} = \\
+&& (I - K_{t-1}C)P_{t-1,t-2}^{t-2} = \\
+&& (I - K_{t-1}C) AP_{t-2}^{t-2} = \\
+&& (I - K_{t-1}C)P_{t-1}^{t-2}(P_{t-1}^{t-2})^{-1}AP_{t-2}^{t-2} =\\
+&& (I - K_{t-1}C)P_{t-1}^{t-2}L_{t-1}' = \\
+&& P_{t-1}^{t-1}L_{t-1}'
+\end{eqnarray*}
+
+The third line of the Equation \eqref{eq10} can be rewritten as
+
+\begin{eqnarray*}
+&& L_{t-1}AK_{t-1}CP_{t-1,t-2}^{t-2} - L_{t-1}AP_{t-1,t-2}^{t-2}A'L_{t-2}' - L_{t-1}A\Sigma_vL_{t-2}'=\\
+&& L_{t-1}A(K_{t-1}CP_{t-1,t-2}^{t-2} - P_{t-1,t-2}^{t-2}A'L_{t-2}' - \Sigma_vL_{t-2}')
+\end{eqnarray*}
+
+Here we will need 
+
+\begin{eqnarray*}
+&& P_{t+1}^t = AP_{t}^tA' + \Sigma_v =\\
+&& P_{t+1}^t = P_{t+1,t}^tA' + \Sigma_v
+\end{eqnarray*}
+
+which also means
+
+\begin{eqnarray*}
+&& P_{t-1}^{t-2} = P_{t-1,t-2}^{t-2}A' + \Sigma_v
+\end{eqnarray*}
+
+continuing on the simplification
+
+\begin{eqnarray*}
+&& L_{t-1}A(K_{t-1}CP_{t-1,t-2}^{t-2} - (P_{t-1,t-2}^{t-2}A' + \Sigma_v)L_{t-2}')=\\
+&& L_{t-1}A(K_{t-1}CP_{t-1,t-2}^{t-2} - P_{t-1}^{t-2}L_{t-2}')=\\
+&& L_{t-1}A(K_{t-1}C P_{t-1}^{t-2}(P_{t-1}^{t-2})^{-1} A P_{t-2}^{t-2} - P_{t-1}^{t-2}L_{t-2}')=\\
+&& L_{t-1}A(K_{t-1}C P_{t-1}^{t-2}L_{t-2}' - P_{t-1}^{t-2}L_{t-2}')=\\
+&& L_{t-1}A(K_{t-1}C P_{t-1}^{t-2} - P_{t-1}^{t-2})L_{t-2}'
+\end{eqnarray*}
+
+Putting all the simplified terms together
+
+\begin{eqnarray*}
+P_{t-1,t-2}^T &=& P_{t-1}^{t-1}L_{t-2}' + L_{t-1}P_{t,t-1}^TL_{t-2}'
+- L_{t-1}AP_{t-1}^{t-1}L_{t-2}'\\
+ &=& P_{t-1}^{t-1}L_{t-2}' + L_{t-1}(P_{t,t-1}^T - AP_{t-1}^{t-1})L_{t-2}'
+\end{eqnarray*}
+which is the final lag-one covariance smoother recursive equation
+
+\end{document}

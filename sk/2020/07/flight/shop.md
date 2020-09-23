@@ -3,20 +3,25 @@
 
 Direnc
 
-raspberry pi 3
-https://www.direnc.net/raspberry-pi-3
-https://www.direnc.net/raspberry-pi-uyumlu-kablosuz-usb-klavye-siyah
-https://www.direnc.net/10-metre-hdmi-kablosu
+pil
+https://www.direnc.net/111v-2500mah-25c-3s-lipo-pil-gens-ace
 
 breadboard
-https://www.direnc.net/guc-kaynagi-girisli-metal-yuzey-breadboard
+3 x https://www.direnc.net/mini-yapiskanli-breadboard-kirmizi
 
-multimetre
-https://www.direnc.net/mas-830l-digital-multimetre
+usb soket
+2 x https://www.matiot.com/ms101-mini-usb-socket
 
-led
-3 x https://www.direnc.net/5mm-led-yesil
-3 x https://www.direnc.net/5mm-led-kirmizi
+pi kutusu
+https://www.direnc.net/raspberry-pi-3-model-b-icin-seffaf-kutu
+
+led isik
+https://www.direnc.net/350ma-dogal-beyaz-power-led-cw-4000k-cree
+
+tornavida, pense, vs
+https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
+https://www.direnc.net/jm-s214-yildiz-tornavida-150mm-6mm
+https://www.direnc.net/elektronikci-kargaburun-pense-140mm
 
 motor
 https://www.direnc.net/cf2822-1200kvdc-fircasiz-motor-emax
@@ -27,41 +32,53 @@ https://www.direnc.net/skywalker-20a-esc-fircasiz-motor-hiz-kontrol-surucu-devre
 pervane
 https://www.direnc.net/drone-quadcopter-ve-multikopter-pervanesi-karbon-9047-pervane-seti-4-adet
 
-pil
-https://www.direnc.net/111v-3s1p-2200-mah-30c-li-polymer-pil-soketli
+pil yuvasi
+https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
 
 sarj
 https://www.direnc.net/px400-li-ion/li-po-1-4-cell-sarj-cihazi
 
+
+------------------------------------------------------------------------
+
+ALINDI 1
+
+x raspberry pi 3
+x https://www.direnc.net/raspberry-pi-3
+
+x breadboard
+x https://www.direnc.net/guc-kaynagi-girisli-metal-yuzey-breadboard
+
+x led
+x 3 x https://www.direnc.net/5mm-led-yesil
+x 3 x https://www.direnc.net/5mm-led-kirmizi
+
+x kablo
+x disi-erkek
+x https://www.direnc.net/40-adet-disi-erkek-jumper-20cm
+x disi-disi
+x https://www.direnc.net/40-adet-disi-disi-jumper-kablo-20cm
+x erkek-erkek
+x https://www.direnc.net/40-adet-erkek-erkek-jumper-20cm
+x krokodil
+x https://www.direnc.net/krokodil-kablo-kucuk-boy
+
+x direnc
+x https://www.direnc.net/2512-kilif-smd-direnc-paketi-33x10330-adet
+
+ALINDI 2
+
+potansiyometre
+2 x https://www.direnc.net/10k-uzun-mil-pot
+
+krokodil
+3 x https://www.direnc.net/krokodil-kablo-kucuk-boy
+
 servo
 https://www.direnc.net/sg90-9g-servo-motor
-
-kablo
-disi-erkek
-https://www.direnc.net/40-adet-disi-erkek-jumper-20cm
-disi-disi
-https://www.direnc.net/40-adet-disi-disi-jumper-kablo-20cm
-erkek-erkek
-https://www.direnc.net/40-adet-erkek-erkek-jumper-20cm
-krokodil
-https://www.direnc.net/krokodil-kablo-kucuk-boy
-
-tornavida, pense, vs
-https://www.direnc.net/jm-s204-duz-tornavida-150mm-6mm
-https://www.direnc.net/jm-s214-yildiz-tornavida-150mm-6mm
-https://www.direnc.net/elektronikci-kargaburun-pense-140mm
-
-direnc
-https://www.direnc.net/2512-kilif-smd-direnc-paketi-33x10330-adet
 
 gyro, accel sensor
 MPU 6050
 https://www.direnc.net/mpu6050-3-axis-gyro-ve-egim-sensoru
-
-pil yuvasi
-https://www.direnc.net/aa-tipi-icin-3lu-pil-yuvasi
-
-
-------------------------------------------------------------------------
 
 

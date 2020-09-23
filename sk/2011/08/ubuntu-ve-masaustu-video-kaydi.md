@@ -10,7 +10,7 @@ ffmpeg -video_size 1024x768 -framerate 25 -f x11grab -i :0.0+0,0 -f \
 
 Bir başkası `vokoscreen`, `apt-get` ile kurulur.
 
-Bir diğeri (bu eski)  xwininfo programını başlatın. Bu program ok
+Bir diğeri (bu eski) `xwininfo` programını başlatın. Bu program ok
 işaretini bir artı haline dönüştürecek, ve bu artı işareti hangi diğer
 pencere üzerine getirilirse o pencerenin bilgileri dökülecek. Bizim
 ihtiyacımız olan "Window id" satırının ne söylediği. Burada mesela

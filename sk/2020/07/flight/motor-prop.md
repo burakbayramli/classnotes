@@ -40,37 +40,6 @@ DC (PMDC) motor
 
 https://www.motioncontroltips.com/faq-different-ways-industry-classifies-servo-motors/#:~:text=Brushed%20vs%20Brushless&text=While%20the%20majority%20of%20motors,magnet%20DC%20(PMDC)%20motor.
 
------------------------------------------------------------------
-
-Lipo Battery, Capacity, Amps
-
-https://www.tested.com/art/makers/846909-hobby-rc-analyzing-lipo-battery-discharge-rates/
-
-Going back to our example of a 4S-2200 battery (2200 mAh), let's say
-it is rated for 20C discharge. To calculate the maximum discharge
-capability of the battery, we multiply 20 by the second number: 20 x
-2200 = 44000 milliamps = 44 amps
-
-The calculation tells us that this battery can safely be used in a
-system that is expected to continuously pull 44 amps or less. It also
-means that a fully-charged battery will last about three minutes at
-that current draw. Using the same logic, a 4S-2200 30C battery would
-be valid for applications requiring up to 66 amps of current.
-
-```python
-print ((2200 * 60) / (20 * 2200))
-print ((2200 * 60) / (30 * 2200))
-print ((2200 * 60) / 15000.0 )
-print ((2200 * 60) / 15000.0 )
-```
-
-```text
-3.0
-2.0
-8.8
-8.8
-```
-
 ------------------------------------------------------------------------
 
 emax + pervane 
@@ -137,22 +106,7 @@ https://i.pinimg.com/736x/31/d6/5a/31d65abb55e72689ed7051611c3b3067.jpg
 http://www.yinyanmodel.com/En/ProductView.asp?ID=58
 
 
+Big motor
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+https://turkish.alibaba.com/product-detail/310v-48v-2000-rpm-2000-watt-brushless-dc-motor-48v-worm-gear-reducer-60754085106.html?spm=a2700.md_tr_TR.maylikeexp.2.3fc3d248Z5V6EJ
 

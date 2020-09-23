@@ -1,7 +1,5 @@
 # 2014
 
-[Euler Fontlari](01/euler-fontlari.md)
-
 [Netflix Veri Analiz, Tahmin Altyapisi](01/netflix-veri-analiz-tahmin-altyapisi.md)
 
 [Projelerde Git](03/projelerde-git.md)
@@ -28,8 +26,6 @@
 
 [Lindley'in Paradoksu](08/lindleyin-paradoksu.md)
 
-[Esle / Indirge Anlatimi (Map / Reduce)](09/esle-indirge-anlatimi.md)
-
 [Eşle-İndirge Mimarisi (Map/Reduce -MR- Architecture)](09/esle-indirge-mimarisi-mapreduce-mr.md)
 
 [Gradyan Destekli Regresyon Agaclari (Gradient Boosted Regression Trees -GBRT-)](09/gradient-boosted-regression-trees-gbrt.md)
@@ -52,7 +48,7 @@
 
 [Movielens, Funk SVD, Numba](11/movielens-funk-svd-numba.md)
 
-[Popen, Python ve Komut Satirina Erismek](12/popen-python-ve-komut-satirina-erismek.md)
+[Python ve Komut Satırına Erişmek, Popen](12/popen-python-ve-komut-satirina-erismek.md)
 
 [Proje: Adam](12/proje-adam.md)
 

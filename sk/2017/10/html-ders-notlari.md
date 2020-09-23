@@ -10,7 +10,7 @@ https://burakbayramli.github.io/dersblog
 HTML sayfalarını Github Pages ile servis ediyoruz. Github bilindiği
 gibi kaynak kod deposu Git üzerine kurulu, Pages servisi ile GH'da bir
 depoyu "servis edilebilir" olarak işaretleyince bu depo içindeki kod /
-sayfa [kullanıcı].github.iö/[depo] üzerinden yayınlanabiliyor, yani
+sayfa [kullanıcı].github.io/[depo] üzerinden yayınlanabiliyor, yani
 depoya konan bir html dosyası bu adres üzerinden erişilebilir hale
 geliyor. Bu işaretleme işlemi depo | settings ve en alttaki kısımda
 sayfaların hangi kod dalından (branch) geldiğini seçince tamamlanıyor.
