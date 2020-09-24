@@ -25,7 +25,3 @@ Eger DHCP ile bir network'e dahil olduysak bize dinamik olarak bir IP
 adresi verilecektir. Bazen admin statik olarak bir IP vermeyi de
 secebilir. 
 
-
-
-
-
