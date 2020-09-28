@@ -12,12 +12,15 @@ p1,p2,p3 = 73856093, 19349663, 83492791
 G = np.array([0.0, 0.0, -0.8])
 
 m = 0.1
-B = 10 # balls
-l = 0.2 # hash box size
-n = B*20 # size of hash table
+B = 10 # top
+l = 0.2 # bolec kutu buyuklugu
+n = B*20 # bolec sozluk buyuklugu
 img = True
 
 def spatial_hash(x):
+    """
+    x = [x0,x1,x2] uc boyutlu kordinatlari icin bir bolec (hash) degeri uret
+    """
     ix,iy,iz = np.floor((x[0]+2.0)/l), np.floor((x[1]+2.0)/l), np.floor((x[2]+2.0)/l)
     return (int(ix*p1) ^ int(iy*p2) ^ int(iz*p3)) % n
 
