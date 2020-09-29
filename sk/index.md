@@ -3,6 +3,8 @@
 
 ## En Son
 
+29/9 - [Materyel Türev, Euler ve Lagrange Bakış Açısı](https://youtu.be/XDrt-uATAY8)
+
 28/9 - [Simulasyon](https://burakbayramli.github.io/dersblog/phy/phy_007_sim/simulasyon.html)
 
 23/9 - [Div, Curl, Laplasyan (Laplacian)](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_70_div_curl_lap/div_curl_laplasyan__laplacian_.html)

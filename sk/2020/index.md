@@ -44,5 +44,5 @@
 
 [Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Particle Hydrodynamics -SPH-)](08/sph.md)
 
-[Octave ile Ruzgar Verisi - wind.dat](09/octave-3d-wind.md)
+[Octave ile Ruzgar Verisi, wind.dat, Curl Ornekleri](09/octave-3d-wind.md)
 

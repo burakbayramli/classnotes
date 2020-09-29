@@ -1,4 +1,4 @@
-# ffmpeg, avconv, moviepy
+# ffmpeg, moviepy
 
 Video birlestirmek icin en rahat arac Python `moviepy` paketi ile,
 
@@ -10,12 +10,13 @@ final_clip = concatenate_videoclips([clip1,clip2])
 final_clip.write_videofile("out.mp4")
 ```
 
-Bazi ffmpeg, avconv komutlari
+Bazi ffmpeg, komutlari
 
 Bir video dosyasinin belli zaman araligindaki parcasini cikartmak icin
+(baslangictan 4 saniyelik kisim)
 
 ```
-avconv -i girdi.mkv -ss [saniye] -t [saniye suresi] -codec copy cikti.mkv
+ffmpeg -ss 00:00:00 -i girdi.mp4 -t 00:00:04 -c copy cikti.mp4
 ```
 
 Bir video'nun belli bir parcasini nasil animasyon gif dosyasi haline
@@ -46,8 +47,6 @@ GIF icinde yazi yazmak istersek,
 ffmpeg -ss 30 -t 3 -i [DOSYA] -filter_complex "fps=10,scale=720:-1:flags=lanczos,drawtext=enable='between(t,0,1)':fontfile=font3.ttf:text='word':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,drawtext=enable='between(t,1,2)':fontfile=font3.ttf:text='word what':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,split[x1][x2];[x1]palettegen[p];[x2][p]paletteuse" output.gif
 ```
 
-
-
 Format degisimi, kucultmek, mumkun oldugu kadar kaliteyi istenen
 sekilde tutmak, 440 yuksekliginde, genislik izafi, kalite 23 (en
 kaliteli 0)
@@ -72,21 +71,6 @@ Video'yu numarali JPG imaj dosyalari haline getirmek
 
 ```
 ffmpeg -i vid.avi -vcodec mjpeg %05d.jpg
-```
-
-Ses ve goruntu dosyalarini islemek icin ffmpeg kullananlar icin Ubuntu
-14'da surpriz: ffmpeg programi apt-get ile kurulamiyor. Dolambacli
-yollardan kurmak mumkun fakat yeni one surulen program avconv. Kurmak
-icin
-
-```
-sudo apt-get install libav-tools
-```
-
-Bir ses dosyasinin belli zaman araliklarindaki kismini cikartmak icin
-
-```
-avconv -i dosya.mp3 -ss 0:0:6 -t 0:0:8 -acodec copy parca.mp3
 ```
 
 Bu komut dosyanin 6. saniyesinden baslayakara 8 saniyelik bir kismi cikartiyor. 
@@ -120,7 +104,6 @@ ffmpeg -i dosya1.mp4 -q:v 1 -filter:v scale=500:-1 -f mpegts dosya1.ts
 ffmpeg -i dosya2.mp4 -q:v 1 -filter:v scale=500:-1 -f mpegts dosya2.ts
 ..
 ```
-
 
 Sonra birlestirmek icin
 

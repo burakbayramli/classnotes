@@ -39,14 +39,14 @@ diye mp3 formatina ceviririz. Bu dosyalari birlestirip tek bir dosya
 yaratalim,
 
 ```
-cat v*.mp3 > voice.mp3
+ffmpeg -i "concat:v1.mp3|v2.mp3|v3.mp3" -acodec copy voice.mp3
 ```
 
 Simdi nihai seslendirme icin video'nun ses kismini bizim kaydettigimiz
 mp3 yapalim,
 
 ```
-ffmpeg -i video_en.webm -i voice.mp3  -map 0:v -map 1:a -c:v copy -c:a libvorbis -ac 2 -shortest video_tr.webm
+ffmpeg -i video_en.webm -i voice.mp3 -map 0:v -map 1:a -c:v copy -c:a libvorbis -ac 2 -shortest video_tr.webm
 ```
 
 Artik video_tr.webm icinde seslendirilmis video var.
