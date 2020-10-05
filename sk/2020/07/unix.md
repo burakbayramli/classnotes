@@ -184,6 +184,14 @@ görürüm. Eğer bu bloklamanın olmasını istemiyorsak, en başta `xclock
 döner, bekleme olmaz, böylece ana kabukta hala başka komutlar
 işletebilir halde oluruz.
 
+Ama dikkat, her süreç başlattığı sürecin ebeveyni haline gelir, `&`
+ile başlatsak bile başlatan ebeveyn durumundadır, eğer başlatan süreç
+ölürse, başlatılan da ölür. Mesela bir konsol komut satırı başlattım,
+oradan `emacs &` ile editörü başlattım, konsolu kapatırsam, emacs
+programı da kapanacaktır. O zaman başlatanda "evlatlık reddi" yapmak
+lazım, yani `emacs & disown`. O zaman aradaki bağlantı kopar, başlatan
+ölürse başlatılan ölmez.
+
 Referans
 
 [Faydalı Unix Komutları](../../2012/04/faydali-unix-komutlari.md)

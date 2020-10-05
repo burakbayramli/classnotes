@@ -50,13 +50,3 @@ Eğer LaTeX kullanıyorsak, onun da kodlamayı bilmesi gerekir. Dosya başında,
 
 gerekli.
 
-
-
-
-
-
-
-
-
-
-
