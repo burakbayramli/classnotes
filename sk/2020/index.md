@@ -46,3 +46,5 @@
 
 [Octave ile Ruzgar Verisi, wind.dat, Curl Ornekleri](09/octave-3d-wind.md)
 
+[Dosya Kodlamasi (File Encoding)](10/dosya-kodlamasi-encoding.md)
+

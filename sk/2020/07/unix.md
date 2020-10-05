@@ -212,6 +212,4 @@ Referans
 
 [supervisord](../../2012/07/supervisord.md)
 
-
-
-
+[Dosya Kodlamasi (File Encoding)](../../2020/10/dosya-kodlamasi-encoding.md)

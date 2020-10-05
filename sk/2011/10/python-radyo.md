@@ -8,46 +8,21 @@ icinden istediginiz seciyorsunuz, alet arka planda o kanaldaki muzigi
 calan HTML sayfalarina baglanip oradan gelen muzigi canli olarak
 aktariyor (streaming).
 
-Cep ortaminda (Termux ile) bu radyo ile calan muzik baska bir program
-ses verdiginde de calismaya devam ediyor, yani radyo programi arka
-plan muzigi olarak bir dersi seyrederken kullanilabilir.
+En iyi bilinen program `pyradio`. Normal `pip` ile kurulur, `pyradı`
+ile başlatınca bir radya listesi görülür.
 
-Kodlar
+Güzel bir özellik kendi bir .pls adresi vererek yeni kanallar
+ekleyebilmek. Mesela
 
-https://github.com/coderholic/pyradio
+https://somafm.com/listen/
 
-Bu program arka planda islemek icin `mplayer`, `mpv` gibi kodlar
-gerektiriyor.
+adresinde programın ilk listesinde gösterilmeyen bazı seçenekler
+var. Eğer daha düşük hızda dinlemek istiyorsam 32 Kbit/s için bir ÜRL var,
 
-Termux icin not: `mpv` Termux'ta var. Radyonun ses acip kapamasi
-islemezse, `mpv` nin olagan ses ayarlarina sistem seviyesinden girebilirsiniz.
-Mesela, `$HOME/.config/mpv/mpv.conf` icinde
+https://somafm.com/secretagent32.pls
 
-```
-volume=50
-```
-
-tanimlarsak sesi yarisina indirmis oluruz.
-
-Eski (alttakiler eski usul)
-
-Kodlar surada:
-
-https://github.com/jspricke/radio
-
-Bazi puf noktalar: Radyoyu baslatabilmek icin komut satiri tam ekran
-(fullscreen) olmali, biz o isi otomatik yapmak icin Ubuntu'da bir ikon
-yarattik, ve ikon gerekli xterm penceresini gerektigi sekilde
-baslatiyor.
-
-```
-xterm -fn *-fixed-*-*-*-20-* -maximize -e "python [DIZIN]/jspricke-radio-6956368/radio.py"
-```
-
-Ayrica, birkac kez kanal degistirince program takilabiliyor, ama bu
-pek onemli degil, 24/7 islemesi gereken bir program degil zaten,
-kapatip acinca buyuk bir ihtimalle tekrar islemeye baslayacaktir.
-
-
+Bu adresi radyoya ekleyebilirim. `pyradio -a` deriz, ve kanal ismi
+(herhangi bir isim) ve üstteki adres girilirse `pyradio` ya bir dahaki
+girişte bu kanal listede gözükecektir.
 
 

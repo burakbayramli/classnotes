@@ -64,6 +64,12 @@ Böylece Alt-Tab sadece aynı iş alanındaki programlara geçiş yapar.
 `Activities` seçilir, ekranın sağında bir seçim alanı çıkıyor, buradan
 alan değişimi olabiliyor.
 
+Soldaki program listesi hem hızla tek tıklama ile başlatmak için hem
+de işleyen programları görmek için kullanılıyor. Bu karışıklığa sebep
+olabilir, eğer bir programdan bir tane işleyen varsa, ikinci başlatmak
+için ne yapacağız? Eğer CTRL basılı tutup tıklarsak ikinci (ya da 3.,
+vs) program başlatılır. 
+
 Tuş üzerinden mouse tıklaması yapmak için bu makinada bazı kodlar
 farklı, bizde CAPS => Ctrl, sağ tıklama => Ctrl, sol tıklama => Alt
 Gr, ve Windows tuşu olur, bunun için `.bashrc` içinde
@@ -145,14 +151,11 @@ Devices | Keyboard`, ve `Keyboard shortcuts` listesinde `Switch
 applications` iptal edilir (tıkla, sil düğmesi ve set butonu),
 ardından `Switch windows` tıklanır ve ona Alt-Tab ataması yapılır.
 
+Tuşlar ile program kapatmak için ALt-F4 alışkanlık oldu, yine üstteki
+listeden Alt-F4 için başka bir program var, onu iptal ederiz, onun
+yerine program bitirme için Alt-F4 atamasını yaparız (tüslama seçimi
+üzerine tıklanır, Alt-F4 tıklanır bu kaydedilmiş olur).
 
-Android Dosya Transferi
-
-```
-sudo add-apt-repository "deb http://ppa.launchpad.net/samoilov-lex/aftl-stable/ubuntu artful main"
-Make sure to run a sudo apt update 
-sudo apt install android-file-transfer
-```
 
 Evince
 
@@ -161,6 +164,15 @@ bir menü ortaya ciakrtiyor, kapatılsa bile bir sonraki dosya için
 aynısını yapıyor. Her PDF aynı şekilde çıksın istiyorsanız bir PDF'i o
 hale getirin, boyut vs ayarlayın, sonra sağ üst köşeden `File Options |
 Save Current State Aş Default` seçin
+
+Ubuntu Paket Problemleri
+
+Eğer kuruluş sırasında coğrafik yer TR olarak seçildiyse yazılım
+paketlerin alınacağı yer olarak `tr.archive.ubuntu.com` adresi
+seçilmiş olabilir. Eğer bu servise bağlanmakta problem çıkarsa
+Software Updater programına girip ilk tab'deki servislerin hangi
+ülkeden olduğu değitirilebilir. Yakın olarak Netherlands, Germany, vs
+bazı seçenekler.
 
 Kaynaklar
 
