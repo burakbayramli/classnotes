@@ -13,7 +13,7 @@ uluslararası karakterler gösterilmek isteniyorsa.
 En basit farklılık mesela Windows (DOS) ve Ünix metin dosyaları
 arasındaydı, Windows ile her satır hem yeni satır karakteri hem de
 CRLF denen bir veri ile biter. Linux üzerinde iki format arasında
-gidip gelmek için `ünix2dos`, `dos2ünix` kullandık uzun zaman, şimdi
+gidip gelmek için `unix2dos`, `dos2unix` kullandık uzun zaman, şimdi
 `tofrodos` var.
 
 Diğer farklılık kodlama (encoding) olabilir. Mesela yaygın olan UTF8,
@@ -33,7 +33,7 @@ bilmesi gerekir. Emacs e bunu sonek bağlamında söylemek  için
 (modify-coding-system-alist 'file "\\.tex\\'" 'utf-8)
 ```
 
-diyebiliriz. Eğer `İSO8859-9` istersek
+diyebiliriz. Eğer `ISO8859-9` istersek
 
 ```
 (modify-coding-system-alist 'file "\\.tex\\'" 'latin-5)
@@ -49,4 +49,5 @@ Eğer LaTeX kullanıyorsak, onun da kodlamayı bilmesi gerekir. Dosya başında,
 ```
 
 gerekli.
+
 
