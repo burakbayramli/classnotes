@@ -96,7 +96,7 @@ paketler ilk işlettiğimiz `apt-get install` listesi,
 git chromium-browser emacs xkbset virtualenv texlive-latex-extra
 texlive-latex-recommended texlive-base pygmentize vlc mplayer xvkbd
 htop make libportaudio2 portaudio19-dev python3-dev cmake calibre
-fbreader evince net-tools openssh-server
+fbreader evince net-tools openssh-server build-essentials
 ```
 
 Emacs ile F tuşlarını kullananlar için, bu tuşlar Acer tarafından
