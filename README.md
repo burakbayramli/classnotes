@@ -151,6 +151,7 @@ slycot
 control
 pyglet
 pymunk
+PyOpenGL==3.1.0
 ```
 
 Python paket kurulumu Ubuntu Linux üzerinde `pip install [paket ismi]`
