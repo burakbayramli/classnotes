@@ -41,7 +41,16 @@ Eger direk gif yaratmak istersek,
 ffmpeg -ss 61.0 -t 2.5 -i vid/dosya.mp4 -f gif dosya.gif
 ```
 
-GIF icinde yazi yazmak istersek,
+Her saniyede kaç kare (frame rate) olduğunu kontrol etmek için
+
+```
+ffmpeg  -ss 10.0 -t 5.0 -i girdi.mp4 -vf "fps=10,scale=320:-1" -f gif cikti.gif
+```
+
+10. saniyeden başlayıp 5 saniyelik bir videoyu saniyede 10 kare
+üzerinden ve 320 piksel genişliğinde animasyonlu GİF yapmış olduk.
+
+GİF içinde yazı yazmak istersek,
 
 ```
 ffmpeg -ss 30 -t 3 -i [DOSYA] -filter_complex "fps=10,scale=720:-1:flags=lanczos,drawtext=enable='between(t,0,1)':fontfile=font3.ttf:text='word':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,drawtext=enable='between(t,1,2)':fontfile=font3.ttf:text='word what':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,split[x1][x2];[x1]palettegen[p];[x2][p]paletteuse" output.gif
@@ -61,27 +70,25 @@ Format degisimi (ornekte mp4'den avi), video'nun bir kismini cekip cikartmak, me
 ffmpeg -i vid1.mp4 -ss 100 -t 20 -acodec copy -vcodec copy vid2.avi
 ```
 
-Ustteki islemi daha hizli yapmak icin mp4 formatina degisim ve alttaki ekler gerekebilir
+Üstteki işlemi daha hızlı yapmak için mp4 formatına değişim ve alttaki ekler gerekebilir
 
 ```
  ... -b:v 2500 -c:v mpeg4 ....
 ```
 
-Video'yu numarali JPG imaj dosyalari haline getirmek
+Video'yu numaralı JPG imaj dosyaları haline getirmek
 
 ```
 ffmpeg -i vid.avi -vcodec mjpeg %05d.jpg
 ```
 
-Bu komut dosyanin 6. saniyesinden baslayakara 8 saniyelik bir kismi cikartiyor. 
-
-Diger bazli ffmpeg komutlari.. Mesela bir gorutuyu  cevirmek icin
+Diğer bazlı ffmpeg komutları.. Mesela bir görüntüyü  çevirmek için
 
 ```
 ffmpeg.exe -i dosya.mp4 -vf "transpose=2" sonuc.mp4
 ```
 
-transpose parametresine verilen degerlerin anlami var, 1 saat yonu, 2 saat yonu tersi.
+transpose parametresine verilen değerlerin anlamı var, 1 saat yönü, 2 saat yönü tersi.
 
 Video ufaltmak icin
 

@@ -3,6 +3,8 @@
 
 ## En Son
 
+12/10 - [Ek - Böleç (Hash) ile Geometrik Anahtarlama](https://burakbayramli.github.io/dersblog/algs/algs_070_knn/en_yakin_kkomsu__knearest_neighbor__geometrik_yakinlik_hesabi.html)
+
 29/9 - [Materyel Türev, Euler ve Lagrange Bakış Açısı](https://youtu.be/XDrt-uATAY8)
 
 28/9 - [Simulasyon](https://burakbayramli.github.io/dersblog/phy/phy_007_sim/simulasyon.html)
@@ -10,10 +12,6 @@
 23/9 - [Div, Curl, Laplasyan (Laplacian)](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_70_div_curl_lap/div_curl_laplasyan__laplacian_.html)
 
 6/9 - [Elastik Çarpışma (Elastic Collision)](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donusler_basinc_carpisma.html)
-
-1/9 - [Elektronik, Ölçüm, Temel Parçalar](2020/08/elektronik-temel-parcalar-aletler.md)
-
-1/9 - [Piller](2020/08/elektronik-piller.md)
 
 
 ## Konular, Referans
