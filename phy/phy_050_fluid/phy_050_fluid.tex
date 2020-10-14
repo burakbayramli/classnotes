@@ -178,35 +178,36 @@ $$
 
 ile önceki formüle eriþtik.
 
-Þimdi ilginç bir noktaya geldik, süreklilik denklemi (1)'in $\rho$ ölçümu
-üzerinde materyel türev uygulanmýþ form olarak görmek mümkün,
+Þimdi ilginç bir noktaya geldik, süreklilik denklemi (1)'i, $\rho$ ölçümü
+üzerinde materyel türev uygulanmýþ formu olarak görmek mümkün,
 
 $$
 \frac{D \rho}{D t} + \rho \nabla \cdot \bar{u} = 0
 $$
 
-Pürüzsüz Parcaçýk Dinamiði (Smoothed Partýcle Dynamics -SPH-)
+Pürüzsüz Parcaçýk Dinamiði (Smoothed Particle Dynamics -SPH-)
 
-Sývýnýn akýþýný simüle etmek farklý alanlarda faydalý olabilecek bir
+Sývýnýn akýþýný simüle etmek pek çok alanda faydalý olabilecek bir
 tekniktir. Sývýlarýn kendisine ek olarak gazlarý yoðunluðu daha az olan sývý
 olarak görebiliriz, hatta katý maddeler de akýþkanlýðý çok az sývý gibi
 düþünülebilirse, böylece aerodinamikten baþlayýp, gemi tasarlamaya, oradan
-oyunlarda duman simülasyonu, ve tabii ki sývýnýn kendisinin simülasyonuna kadar
-giden geniþ yelpazede bu simülasyon teknikleri kullaným bulabilir.
+oyunlarda duman simülasyonuna kadar giden geniþ yelpazede teknikler kullaným
+bulabilir.
 
-SPH tekniði sývý simülasyon yöntemlerinden birisidir. Navier-Stokes denklemleri
-bir sývýnýn akýþýný tanýmlar, bu denklem simülasyon ortamýnda yaklaþýk olarak
-çözülmelidir [5], bunu yapmanýn iki yolu vardýr. Önceki anlatýmdan hareketle
-herhalde cevabý tahmin edebiliriz, birisi Lagrange usulü diðeri Euler usulü. SPH
-yöntemi Lagrange yaklaþýmýný takip eder, yani bir sývý paketini alýp onun zaman
-ve uzayda gidiþini izler. Tek bir yere mýhlanmýþ olmamanýn (Euler usulü) pek çok
-avantajlarý var, mesela oyun grafiklerini çizerken daha geniþ bir alanda iþ
-yapabilmek mümkün, farklý maddeler arasýndaki iletiþim daha rahat
-halledilebiliyor, vs.
+SPH tekniði bu sývý simülasyon yöntemlerinden birisidir. Navier-Stokes
+denklemleri bir sývýnýn akýþýný tanýmlar, bu denklem simülasyon ortamýnda
+yaklaþýk olarak çözülmelidir [5], bunu yapmanýn iki yolu vardýr. Önceki
+anlatýmdan hareketle herhalde cevabý tahmin edebiliriz, birisi Lagrange usulü
+diðeri Euler usulü. SPH yöntemi Lagrange yaklaþýmýný takip eder, yani bir sývý
+paketini alýp onun zaman ve uzayda gidiþini izler. Tek bir yere mýhlanmýþ
+olmamanýn (Euler usulü) pek çok avantajlarý var, mesela oyun grafiklerini
+çizerken daha geniþ bir alanda iþ yapabilmek mümkün, farklý maddeler arasýndaki
+iletiþim daha rahat halledilebiliyor, vs.
 
 Formülasyon için temel fizikle baþlayalým. Simüle ettiðimiz bir sývý paketidir
 demiþtik, bu paketin ivmesini takip edelim mesela, bunun önemli olacagini tahmin
-edebiliriz, oradan kuvvet, enerji baðlantýlarý var, materyel türev ile
+edebiliriz, oradan kuvvet, enerji baðlantýlarý var, $F=ma$ formülünden
+hareketle, ve materyel türev ile
 
 $$
 m \frac{D \bar{u}}{D t} = F^{toplam}
@@ -222,38 +223,39 @@ bir sývý akýþý sýrasýnda sývý paketi / parçacýk üzerinde etki ediyor? Bunlar
 sýrasýyla basýnç, aðdalýk, ve yerçekim olurdu herhalde, bal gibi aðdalý bir
 sývýda parçalar birbirlerine yapýþkandýr, þu için daha az, bu bir
 kuvvettir. Yerçekimi bir kuvvettir doðal olarak. Basýnç ta öyle, biraz derine
-dalan herkes etrafýndaki suyun basýncýný bir kuvvet olarak hisseder. 
+dalan herkes etrafýndaki suyun basýncýný bir kuvvet olarak hisseder. O zaman,
 
 $$
 m \frac{D \bar{u}}{D t} = F^{\textrm{basýnç}} + F^{\textrm{aðdalýk}} + F^{\textrm{yerçekim}} 
 $$
 
-Kuvvetlerden en basiti yerçekimi. Onun $F^{\textrm{yerçekim}} = m \bar{g}$
-olduðunu biliyoruz. Ývme $\bar{g}$ bir vektör olarak gösterildi, bu $\bar{g} =
-(0, 0, 0.98)$ gibi sadece z ekseni üzerinde etki eden bir etki olacak.
+diyebiliriz. Kuvvetlerden en basiti yerçekimi, $F^{\textrm{yerçekim}} = m
+\bar{g}$. Ývme $\bar{g}$ bir vektör olarak gösterildi, bu $\bar{g} = (0, 0,
+0.98)$ olurdu, sadece z ekseni üzerinde etki eden bir ivmelenme yani.
 
 Diðer kuvvet basýnç. Yüksek basýnç bölgeleri alçak basýnç bölgelerinde doðru bir
 kuvvet uygular. Basýncýn tüm sývý için $p(\bar{x})$ deðiþkeninde olduðunu
 düþünelim, peki basýnç dengesizliðini matematiksel olarak göstermenin en basit
-yolu nedir? Basýncýn negatif gradyanýný almak, $-\nabla p$ olur mu acaba?  Bu
-iþler. Temel Calculus'tan hatýrlarsak gradyan en dik iniþ yönünü gösterir, o
-zaman gradyanin negatifi yüksek basýnç bölgesinden dýþarý alçak basýnç bölgesine
-doðru gösterecektir. Tabii ki bu etkiyi üzerinde olduðumüz sývý paketinin hacmi
-üzerinden entegre etmemiz gerekir, ama basit bir yaklaþýklama olarak onu hacim
-$V$ ile çarpabiliriz. Tümü $F^{\textrm{basýnç}} = - V \nabla p$.
+yolu nedir? Basýncýn negatif gradyanýný almak, $-\nabla p$ olur mu acaba?
+Evet. Temel Calculus'tan hatýrlarsak gradyan en dik iniþ yönünü gösterir, o
+zaman gradyanýn negatifi yüksek basýnç bölgesinden dýþarý, alçak basýnç
+bölgesine doðru gösterecektir. Tabii ki bu etkiyi üzerinde olduðumuz sývý
+paketinin hacmi üzerinden entegre etmemiz gerekir, ama basit bir yaklaþýklama
+olarak onu direk hacim $V$ ile çarpabiliriz. Tümü $F^{\textrm{basýnç}} = - V
+\nabla p$.
 
 Üçüncü kuvvet aðdalýk. Aðdalý bir sývý deforme edilmeye karþý direnir. Bu
-kuvveti kabaca ``her parçacýðýn yanindaki diðer parçacýklarýn ortalama hýzýnda
+kuvveti kabaca ``her parçacýðý yanýndaki diðer parçacýklarýn ortalama hýzýnda
 hareket etmesini zorlayan kuvvet'' olarak görebiliriz, bir diðer deyiþle
 birbirine yakýn olan parçacýklarýn arasýndaki hýz farklarýný minimize etmeye
 uðraþan kuvvet. Þimdi, mesela görüntü iþleme literatürünü düþünürsek, o alanda
-çalýþanlarýn bir ölçünün etrafýndaki ortalamadan ne kadar saptýðýný hesaplayan
-bir diferansiyel operatör var, bu operatör Laplasyan $\nabla \cdot \nabla$.  Bu
-operatör, ayný þekilde hacim üzerinden entegre edilince bize aðdalýk kuvvetini
-verebilir, burada bir ek her sývýnýn farklý aðdalýðýný formüle dahil edebilmek
-için bir de bir dinamik aðdalýk sabiti (dynamic viscosity coefficient) $\mu$ ile
-herþeyi çarpmak, o zaman $F^{\textrm{aðdalýk}} = V \mu \nabla \cdot \nabla
-\bar{u}$.
+çalýþanlar bir ölçünün etrafýndaki ortalamadan ne kadar saptýðýný hesaplamalak
+için bir diferansiyel operatör kullanýr, bu operatör Laplasyan $\nabla \cdot
+\nabla$.  Bu operatör, ayný þekilde hacim üzerinden entegre edilince bize
+aðdalýk kuvvetini verebilir, burada bir ek her sývýnýn farklý aðdalýðýný formüle
+dahil edebilmek için bir de bir dinamik aðdalýk sabiti (dynamic viscosity
+coefficient) $\mu$ ile herþeyi çarpmak gerektiði, o zaman $F^{\textrm{aðdalýk}}
+= V \mu \nabla \cdot \nabla \bar{u}$ formülünü elde ediyoruz.
 
 Hepsini bir araya koyunca,
 
@@ -272,7 +274,7 @@ $$
 $$
 
 Bu denklem bazýlarý için tanýdýk gelebilir.. Navier-Stokes denklemine benzemiyor
-mu? Bu ünlü denklem,
+mu? Navier-Stokes ünlü denklemi,
 
 $$
 \frac{\partial \bar{u}}{\partial t} + \bar{u} + \frac{1}{\rho} \nabla p =
