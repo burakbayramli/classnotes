@@ -1,0 +1,520 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Ders 4, Soru, Cevap
+
+
+Sorular
+
+Soru 1.2.2
+
+$u''(x) = \delta(x)$, $u(-2) = 0$ ve $u(3) = 0$ problemini çöz. Parçalar
+$u = A(x+2)$ ve $u=B(x-3)$ $x=0$ noktasýnda birleþiyor.
+$U = (u(-1), u(0), u(1), u(2))$ vektörünün $KU=F=(0,1,0,0)$ problemini
+çözdüðünü göster.
+
+Çözüm
+
+Yukarýda çözümün hangi formda olacaðý $A$ ve $B$ üzerinden verilmiþ, burada
+güzel bir numara var (alternatif çözümde bunu anlattýk), fakat biz önce
+derste daha gösterilen yöntem üzerinden çözümü kendimiz bulalým.
+
+Özel (particular) çözüm nedir? 
+
+$$ u(x) = -R(x) + C + Dx$$
+
+Bildiðimiz gibi $R(x)$ rampa fonksiyonu þöyle:
+
+$$ 
+R(x) = \left\{ \begin{array}{ll}
+0 & x \le 0 \\
+x & x \ge 0 
+\end{array} \right.
+ $$
+
+Þimdi sýnýr þartlarýný kullanarak $u(x)$ içinde yerine koyalým:
+
+$$ u(-2) = -R(x) + C - 2D = 0 $$
+
+$$ u(-2) = C - 2D = 0 $$
+
+$x=-2$ yani sýfýrdan küçük olduðu için $-R(x)=0$ oldu ve onu formülden attýk.
+
+$$ u(3) = -3 + 3D + C = 0 $$
+
+Burada $x=3$, o yüzden $-R(3) = -3$ kullanýldý. Sonuç
+
+$$ C = 2D $$
+
+$$ 3 + 3D + 2D = 0 $$
+
+$$ 5D - 3 = 0 $$
+
+$$ D = \frac{3}{5} $$
+
+O zaman
+
+$$ C - 2(\frac{3}{5}) = 0 $$
+
+$$ C = \frac{6}{5} $$
+
+Sýfýrdan öncesi ve sonrasý için (deðiþik $R(x)$ durumlarýna göre)
+fonksiyonu parçalý bir þekilde yazarsak
+
+$$ u(x) =
+\left\{ \begin{array}{ll}
+& \\
+\frac{6}{5} + \frac{3}{5}x & x \le 0 \\
+& \\
+-x + \frac{6}{5} + \frac{3}{5}x = \frac{6}{5} - \frac{2}{5}x & x \ge 0 \\
+& 
+\end{array} \right.
+ $$
+
+Birinci kýsmý sadeleþtirirsek
+
+$$ \frac{6}{5} + \frac{3}{5}x  = \frac{3}{5}(x + 2)  $$
+
+Ýkinci kýsmý sadeleþtirirsek
+
+$$ \frac{6}{5} - \frac{2}{5}x =  -\frac{2}{5}(x - 3)$$
+
+Problemin hazýr verdiði forma, ve sonuca eriþtik.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+def ktbc(n):
+    vec = np.zeros((1,n))
+    vec[0,0] = 2
+    vec[0,1] = -1
+    K = lin.toeplitz(vec)
+    T = np.copy(K)
+    T[0,0] = 1
+    B = np.copy(K)
+    B[0,0] = 1
+    B[n-1,n-1] = 1
+    C = np.copy(K)
+    C[n-1,n-1] = 1
+    
+    return K, T, B, C
+
+K,T,B,C = ktbc(4)
+
+print lin.inv(K) 
+\end{minted}
+
+\begin{verbatim}
+[[ 0.8  0.6  0.4  0.2]
+ [ 0.6  1.2  0.8  0.4]
+ [ 0.4  0.8  1.2  0.6]
+ [ 0.2  0.4  0.6  0.8]]
+\end{verbatim}
+
+Bir sonraki derste göreceðimiz gibi üstteki sonucun 2. kolonu aradýðýmýz
+sonuç (çünkü delta aðýrlýðý 2. hücre üzerinde). Bu kolondaki deðerleri
+teker teker $x=-1,0,1,2$ deðerlerini $u(x)$'i hesaplayarak kontrol edelim.
+
+$$ 6/5 + 3/5(-1) = 3/5 = 0.6 $$
+
+$$ 6/5 + 3/5(0) = 6/5 = 1.2 $$
+
+$$ 6/5 -2/5(1) = 4/5 = 0.8 $$
+
+$$ 6/5 -2/5(2) = 2/5 = 0.4 $$
+
+Sonuçlar birebir uyuyor. 
+
+Alternatif Çözüm
+
+Problemin cebirsel çözümü için bir yöntem daha var, hatta ders notlarýndaki
+1.2.2 çözümü bu yöntemi kullanýyor. 
+
+$u(x)$'in formunun lineer olacaðýný bildiðimizden, ve bu formül içinde bir
+rampa fonksiyonu olmasýndan hareketle, çözümün iki lineer parça içerdiðini
+ve bu parçalarýn 0 noktasýnda birleþtiðini farzedebiliriz. Þöyle iki
+fonksiyon buluruz: $A(x+2)$ ve $B(x-3)$. Bu her iki fonksiyonun -2 ve +3
+noktalarýnda sýfýr olduðuna dikkat, ki bu diferansiyel denklemin sýnýr
+þartlarý ile uyumlu.
+
+Þimdi alttaki numaralara bakalým, tek bir integral, ve tek bir türev alarak
+çok daha basit cebirsel ifadelerle çalýþma imkaný var. Ýki tarafýn
+entegrali:
+
+$$ -\int u''(x) = \int \delta(x) $$
+
+$$ -[u'(x)]_L^R = 1 $$
+
+R ve L sað (right) ve sol (left) ibareleri, delta fonksiyonunun yoðunluk
+yarattýðý noktanýn saðýndaki ve solundaki herhangi birer nokta için
+kullanýlýyor, delta fonksiyonunun entegralini alýrken bu noktanýn
+``üzerinden geçersek'' sonuç her zaman 1 verecektir. O noktalarýn tam
+olarak ne olduðu önemli deðil, çünkü $x=0$ solunda ve solunda eðim her
+noktada ayný.
+
+$$ u_R'(x) - u_L'(x) = -1 $$
+
+Üstteki türevleri formlara uygularýz
+
+$$ B - A = -1 $$
+
+Ýki parça $x=0$ noktasýnda birleþiyor, o zaman
+
+$$ A(0+2) = B(0-3) $$
+
+$$ A = -\frac{3}{2}B $$
+
+Birleþtirince
+
+$$ B - (-3/2 B ) = -1 $$
+
+$$ B = -0.4 $$
+
+$$ A = 0.6 $$
+
+Soru 1.2.4
+
+$$
+T_n = (geri)(-ileri) =
+\left[\begin{array}{rrrr}
+1  &   0        &    &   \\
+-1 &   1        & 0  &   \\
+   & \ddots & \ddots & 0 \\
+   &        &    -1  & 1 
+\end{array}\right]
+\left[\begin{array}{rrrr}
+1  &  -1        &    &   \\
+0  &   1        & -1 &   \\
+   & \ddots & \ddots & -1 \\
+   &        &    0  & 1 
+\end{array}\right]
+\mlabel{1}
+$$
+
+$$
+T_n^{-1} =
+\left[\begin{array}{rrrr}
+1  &  1     & \ddots   & 1       \\
+   &  1     &  1       & \ddots  \\
+   &        & 1        & 1       \\
+   &        &          & 1 
+\end{array}\right]
+\left[\begin{array}{rrrr}
+1        &        &         &   \\
+1        &  1     &         &   \\
+\ddots   &  1     & 1       &   \\
+1        &  \ddots & 1       & 1 
+\end{array}\right]
+\left[\begin{array}{r}
+1 \\ 1 \\ \vdots \\ 1
+\end{array}\right]
+\mlabel{2}
+$$
+
+(1)'deki geriye doðru farklar matrisi $\Delta_{-}$ tersinin (2)'deki
+toplamlar matrisi olduðunu kontrol edin. Dikkat: $\Delta_0 = (\Delta_{+} +
+\Delta_{-}) / 2$ ifadesinin tersi olmayabilir! $\Delta_0 u = 0$ denklemini
+$n=3$ ve $n=5$ için çözün.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+DB = lin.toeplitz([1, -1, 0], [1, 0, 0])
+print DB; print lin.inv(DB)
+
+DF = lin.toeplitz([-1, 0, 0], [-1, 1, 0])
+
+D_0 = (DF + DB) / 2
+print D_0
+\end{minted}
+
+\begin{verbatim}
+[[ 1  0  0]
+ [-1  1  0]
+ [ 0 -1  1]]
+[[ 1.  0.  0.]
+ [ 1.  1.  0.]
+ [ 1.  1.  1.]]
+[[ 0  0  0]
+ [-1  0  0]
+ [ 0 -1  0]]
+\end{verbatim}
+
+\verb!D_0! matrisini soruda istendiði þekilde yarattýk. Bu matrisin sýfýr
+uzayý, yani \verb!D_0 u = 0! denklemindeki $u$ sýfýr olmadýðý için, bu
+matris tersine çevirilemez demektir, yani matris eþsiz (singular)
+demektir. 
+
+Soru 1.2.10
+
+27. denklemden bahsediliyor, bu yanlýþ. Sorunun istediðini kodlamak daha
+iyi: $\Delta_+$ için \verb!DF! ve $\Delta_-$ yerine \verb!DB! kullanýp,
+çarpýmýný alýrsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+DB = lin.toeplitz([1, -1, 0], [1, 0, 0])
+print "backward"
+print DB
+
+DF = lin.toeplitz([-1, 0, 0], [-1, 1, 0])
+print "forward"
+print DF
+print 'product'
+print np.dot(DF, DB)
+\end{minted}
+
+\begin{verbatim}
+backward
+[[ 1  0  0]
+ [-1  1  0]
+ [ 0 -1  1]]
+forward
+[[-1  1  0]
+ [ 0 -1  1]
+ [ 0  0 -1]]
+product
+[[-2  1  0]
+ [ 1 -2  1]
+ [ 0  1 -1]]
+\end{verbatim}
+
+Bu matriste $u = 0$ sýnýr þartýnýn hangi satýr ile temsil edildiði
+soruluyor, yani $u(..) = 0$ þartýnda '..' neresi? Bu þart için sol taraftaki
+kolonun atýldýðýný hayal edelim, geriye kalanlar üst 1. satýrý [-2 1]
+üzerinden $u(0)=0$ þartýný zorlar. Doðru cevap 1. satýr.
+
+Peki $u'(..) = 0$ þartý hangi satýrla, yani hangi '..' deðeriyle zorlanýr?
+En alt satýr gibi duruyor, kontrol edelim, 
+
+$$ \frac{u_4-u_3}{h} = 0$$
+
+o zaman
+
+$$ u_4 = u_3 $$
+
+Matrisin en son satýrýný cebirsel þekilde yazalým
+
+$$ \frac{u_4 - 2u_3 + u_2}{h} $$
+
+$u_4 = u_3$ olduðu için
+
+$$ = \frac{u_3 - 2u_3 + u_2}{h} $$
+
+$$ = \frac{-u_3 + u_2}{h} $$
+
+Son ifade matrisin sonuncu satýrýný aynen tarif ediyor.
+
+Soru 1.2.19
+
+Bir merkezi farksal yaklaþýksallama (difference approximation) kur, bunu
+yaparken $K/h^2$ ve $\Delta_0 / 2h$ kullan, tüm bunlarý 
+
+$$ -u'' + u' = 0. $$
+
+çözmek için kullan, ki $u(0) = 0$ ve $u(1) = 0$. Ayrý olarak $du/dx$ için
+öne doðru farksal (forward difference) $\Delta_{+}U/h$ kullan. Dikkat
+edelim $\Delta_0 = (\Delta_{+} + \Delta_{-}) / 2$. Ortalanmýþ $u$ ve
+ortalanmamýþ $U$'yu çözelim, ki $h = 1/5$ olsun. Gerçek $u(x)$ $u=x$ özel
+çözümüdür ve bu çözüme $A+Be^x$ eklenir. Hangi $A$ ve $B$ sýnýr þartlarýný
+tatmin eder? $u$ ve $U$ ne kadar $u(x)$'e yakýndýr? 
+
+Cebirsel olarak bu denklemi çözmek için onun sabit katsayýlý, 2. seviye
+(homojen olmayan -sýfýra eþit deðil-) denklem olduðunu görmek yeterli. Önce
+ana denklemle baðlantýlý homojen denklemi (sýfýra eþitlenmiþ halini yani)
+çözeriz.
+
+$$ -u'' + u' = 0. $$
+
+Bu denklemi çözmek için karakteristik denklemini buluruz, bkz [2]. Bu
+denklem $-r^2 + r = 0$ olacaktýr, kökleri $0$ ve $1$, o zaman homojen
+denklemin çözüm yelpazesini $e^{0x}=1$ ve $e^{x}$ tanýmlar. Genel çözüm
+demek ki
+
+$$ \mathbf{s} + A + Be^x $$
+
+olur, ki $A$ ve $B$ rasgele sabitlerdir, ve $\mathbf{s}$, $-u''+u'=1$ denkleminin
+özel (particular) bir çözümüdür. $u(x)=x$'in bu özel çözüm olduðunu bulmak
+zor deðildir, o zaman çözümün tamamý
+
+$$ u(x) = x + A + Be^x $$
+
+olacaktýr. 
+
+$$ u(0) = A + B = 0 $$
+
+$$ A = -B $$
+
+$$ u(1) = 1 + -B + Be^1 = 0$$
+
+$$ B = \frac{1}{1-e} $$
+
+$$ A = \frac{-1}{1-e} $$
+
+Denklemin tam çözümü
+
+$$ u(x) = x - \frac{1}{1-e} + \frac{1}{1-e}e^x $$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import scipy.linalg as lin
+
+K,T,B,C = ktbc(4); print K
+
+C = lin.toeplitz([0, -1, 0, 0], [0, 1, 0, 0]); print C
+
+print "ortalanmis",  lin.solve((25*K + 2.5*C), [1.,1.,1.,1.])
+
+F = lin.toeplitz([-1, 0, 0, 0], [-1, 1, 0, 0]); print F
+
+print "ileri farklilik", lin.solve((25*K + 2.5*F), [1.,1.,1.,1.])
+
+def ux(x): return x - 1/(1-np.e) + np.e**x/(1-np.e)
+
+print ux(0.2), ux(0.4), ux(0.6), ux(0.8)
+\end{minted}
+
+\begin{verbatim}
+[[ 2. -1.  0.  0.]
+ [-1.  2. -1.  0.]
+ [ 0. -1.  2. -1.]
+ [ 0.  0. -1.  2.]]
+[[ 0  1  0  0]
+ [-1  0  1  0]
+ [ 0 -1  0  1]
+ [ 0  0 -1  0]]
+ortalanmis [ 0.07135546  0.11412325  0.12195055  0.0870728 ]
+[[-1  1  0  0]
+ [ 0 -1  1  0]
+ [ 0  0 -1  1]
+ [ 0  0  0 -1]]
+ileri farklilik [ 0.07956826  0.123533    0.12793827  0.08838856]
+0.0711487519142 0.11376948211 0.121546007893 0.0867637263024
+\end{verbatim}
+
+Bu çözümlerden ortalanmýþ olanýn daha iyi olduðunu görebiliriz. 
+
+Soru 1.2.21
+
+$u(h) = u(0) + hu'(0) + \frac{1}{2}h^2u''(0)+..$ açýlýmýný ve ``sýfýr eðim
+koþulu'' yani $u'(0) = 0$ olarak belirtilen sýnýr þartýný ve $-u'' = f(x)$
+ifadesini kullanarak $u_0 - u_1 = \frac{1}{2}h^2f(0)$ þeklinde üst sýnýr
+þartýný türet. $\frac{1}{2}$ faktörü $O(h)$ hatasýndan kurtulmamýza
+yarayacak. 
+
+Öncelikle türetmemiz istenen þeyin 2. Ders Problem 1.2 A'da kullanýlan
+ifade ile ayný olduðunu görelim. O problemde $u_0 - u_1 =  \frac{1}{2}h^2f(0)$ 
+ifadesine farklý bir yönden eriþmiþtik, orada ortalama farklýlýk tekniðini 
+kullanmýþtýk. Burada Taylor açýlýmýný kullanýyoruz, ve ayný noktaya geliyoruz! 
+
+$u(0)$ noktasýndayýz, ve ileri doðru $h$ adýmý atýyoruz, bu adýmý Taylor
+açýlýmý ile nasýl gösteririz?
+
+$$ u(h) = u(0) + h \cdot u'(0) + \frac{1}{2}h^2u''(0) + ... $$
+
+Deðil mi? Þimdi, elimizde diferansiyel denklemin tanýmýndan gelen bazý
+tanýmlarý kullanarak üstteki denklemi deðiþtirelim. $-u''(x) = f(x)$ ise,
+$u''(0) = -f(0)$ demektir. Ayrýca $u'(0) = 0$ ise $h \cdot u'(0)$
+denklemden atýlabilir. Noktadan sonrasýný biz atýyoruz, yaklaþýksal olarak
+temsil ettiðimiz için, o zaman
+
+$$ u(h) = u(0) - \frac{1}{2}h^2f(0) $$
+
+$$ u_1 - u_0 = -\frac{1}{2}h^2f(0)$$
+
+$$ u_0 - u_1 = \frac{1}{2}h^2f(0) $$
+
+Ve Çözülmüþ Problem 1.2 A'daki tanýmýn aynýsýna eriþtik. 
+
+Problem 1.4.5
+
+$-u''= \delta(x-a)$ denkleminin serbest-serbest þartlarý, yani $u'(0) = 0$
+ve $u'(1) = 0$ üzerinden çözümü {\em olamayacaðýný} göster, bu durumda $C$
+ve $D$ sabitleri bulunamayacak. 
+
+Çözüm
+
+Tam çözüm neydi? 
+
+$$ u(x) = R(x-a) + Cx + D $$
+
+Eldeki þartlar sadece $u'(x)$ için olduðuna göre üstteki denklemin türevini
+alalým, ve 0 ve 1 deðerlerini yerine koyarak ele geçen sonuca bakalým. 
+
+$$ u'(0) = 0 + C = 0 $$
+
+Rampa fonksiyonunun türevi basamak fonksiyonu, fakat o noktada daha basamak
+baþlamamýþ (yani sýfýr seviyesinde). Aslýnda soruda $a > 0$ bilgisini
+verseler iyi olurdu, her neyse, bu sebeple ilk terim 0. $Cx$'den geriye $C$
+kalýr, $D$ yokolur.
+
+$$ C = 0 $$
+
+Diðer koþulla
+
+$$ u'(1) = -1 + C + 0 = 0 $$
+
+Bu noktada basamak baþlamýþ, çünkü $a$ noktasý ilerisindeyiz, 
+basamak fonksiyonu 1 deðerinde, negatifi alýndýðý için sonuç -1. Devam
+edersek: 
+
+$$ C = 1 $$
+
+Bu bir absürtluk ortaya çýkartý, $C$'nin hem 0 hem 1 olmasý mümkün
+deðildir. Demek ki serbest-serbest probleminin çözümü yoktur. 
+
+Teori
+
+$$ \int_{-\infty}^{\infty} \delta(x)g(x) \ud x = g(0)$$
+
+Ýspat
+
+$\delta(x)=0$ $x \ne 0$ için sýfýr olduðuna göre, entegrasyon operasyonunun
+tek kullanabileceði deðer $g(0)$ deðeridir (çünkü diðer her yerde iç çarpým
+sýfýr), ki bu deðer de bir sabit olarak addedilebilir ve entegralin dýþýna
+çýkartýlýr [1, sf. 416]. Yani
+
+$$
+\int_{-\infty}^{\infty} \delta(x)g(x) \ud x = 
+\int_{-\infty}^{\infty} \delta(x)g(a) \ud x = 
+g(a) \int_{-\infty}^{\infty} \delta(x) \ud x = 
+g(a) \cdot 1 = g(a)
+$$
+
+
+Alternatif Ýspat
+
+Parçalý entegral yöntemini uygularsak,
+
+$$ \int u \ud v = uv - \int v \ud u $$
+
+$$ u = g(x), \quad \ud v = \delta(x) \ud x $$
+
+$$
+\int_{-A}^{A} g(x)\delta(x) \ud x = g(x)u(x) \bigg]_{-A}^{A} -
+\int_{-A}^{A} u(x) \frac{\ud g(x)}{\ud x}\ud x
+$$
+
+$-A$ ve $A$ entegral sýnýrlarý sýfýrý ortalayacak þekilde seçilmiþ iki
+deðerdir, $A$ herhangi bir sayý olabilir. $u(x)$ $\delta(x)$ fonksiyonunun
+entegrali olduðuna göre $x=0$ öncesi sýfýr, sonrasý 1 olacak. O zaman
+birinci kýsým
+
+$$ g(x)u(x) \bigg]_{-A}^{A} = g(x)u(x) \bigg]_{0}^{A} = g(A)\cdot 1 = g(A)$$
+
+$x=0$ öncesi önemli deðil çünkü orada $u(x) = 0$. 
+
+Ýkinci kýsým
+
+$$ \int_0^A 1\cdot \frac{\ud g(x)}{\ud x}\ud x = g(A) - g(0) $$
+
+Biraraya koyarsak
+
+$$  g(A) - (g(A) - g(0)) = g(A) - g(A) + g(0) = g(0) $$
+
+Ýspat böylece tamamlanýyor.
+
+Kaynaklar 
+
+[2] Bayramli, Diferansiyel Denklemler, {\em Ders 9}
+
+\end{document}
