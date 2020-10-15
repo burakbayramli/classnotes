@@ -3,6 +3,8 @@
 
 ## En Son
 
+14/10 - [Akış Dinamiği - Giriş (Fluid Dynamics)](https://burakbayramli.github.io/dersblog/phy/phy_050_fluid/akis_dinamigi.html)
+
 12/10 - [Ek - Böleç (Hash) ile Geometrik Anahtarlama](https://burakbayramli.github.io/dersblog/algs/algs_070_knn/en_yakin_kkomsu__knearest_neighbor__geometrik_yakinlik_hesabi.html)
 
 29/9 - [Materyel Türev, Euler ve Lagrange Bakış Açısı](https://youtu.be/XDrt-uATAY8)
