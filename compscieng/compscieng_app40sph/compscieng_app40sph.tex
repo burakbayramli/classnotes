@@ -3,22 +3,57 @@
 Pürüzleþtirilmiþ Parcaçýk Hidrodinamiði (Smoothed Particle Hydrodynamics -SPH-)
 
 SPH sývýlarýn dinamik hareketini görmemizi saðlayan bir simülasyon
-tekniði. Lagrangian bakýþ açýsýný temel alýr, yani Euler aksine, bir sývý
-paketini takip edip nereye gittiðine, hangi deðiþimlere uðradýðýna bakarýz.
+tekniðidir. Lagrangian bakýþ açýsýný temel alýr, yani Euler aksine, bir sývý
+paketini takip edip nereye gittiðine, hangi deðiþimlere uðradýðýna
+bakarýz.
+
+Akýþ dinamiðini anlatan [5]'te
+
+$$
+\rho \frac{D \bar{u}}{D t} = F^{toplam} 
+$$
+
+denklemini gördük. Bu Newton'un $F=ma$ formülasyonun bir karþýlýðý. Bu denklemde
+basýnç, aðdalýk gibi kuvvetler için terimler vardý. Toplam kuvvetleri açarsak,
+
+$$
+F^{toplam}  = F^{\textrm{basýnç}} + F^{\textrm{aðdalýk}} + F^{\textrm{yerçekim}} 
+$$
+
+Daha detaylý hali,
+
+$$
+\rho \frac{D \bar{u}}{D t} = 
+- \nabla p + \mu \nabla \cdot \nabla \bar{u} + \rho \bar{g}
+$$
+
+Simulasyon için bize ivme gerekli. Kütle ve kuvvetten ivme, oradan sayýsal
+entegrasyon ile yer deðiþimi elde edilebilir, katý-gövde simulasyonunu kodlarken
+[6]'da bu anlatýlmýþtý. O zaman eldeki $i$'inci parçacýk için toplam kuvvet
+$F_i$ hesaplarsak
+
+$$
+a_i = \frac{\ud u_i}{\ud t} = \frac{F_i}{\rho_i}
+$$
+
+
+ile ivmeyi buluruz, ve oradan devam ederiz.
+
+Þimdi bize gereken $\nabla p(r_i)$ ve $\nabla^2 u(r_i)$ hesaplarýný yaklaþýk
+yapabilmemizi saðlayacak bir yaklaþým kullanmak. SPH teknikleri bunu saðlýyor.
 
 Bir fonksiyon $A$'yi aradeðerleme (interpolation), yaklaþýklama üzerinden temsil
-etmek istersek [1],
+edilebilir [1],
 
 $$
-A_I(r) = \int f(r') W(r-r',h) \ud r'
+A_I(r) = \int A(r') W(r-r',h) \ud r'
 $$
 
-[4]'te bu tekniðin Dirac fonksiyonu ile baðlantýlarý anlatýldý. 
-
-$\bar{r}=r$ bir vektör, $A_I$ aradeðerlenmiþ fonksiyon, $A$ yaklaþýk göstermeye
-uðraþtýðýmýz fonksiyon. $A$ simülasyon ortamýnda hesaplanan herhangi bir ölçüt
-olabilir, mesela herhangi bir $r=(x,y,z)$ noktasýndaki basýnç, sýcaklýk,
-yoðunluk, vs. $W$ agirlik fonksiyonudur, bir sart,
+$\bar{r}=r$ bir vektör, $\ud r'$ diferansiyel hacim öðesi. $A_I$ aradeðerlenmiþ
+fonksiyon, $A$ yaklaþýk göstermeye uðraþtýðýmýz fonksiyon. $A$ simulasyon
+ortamýnda hesaplanan herhangi bir ölçüt olabilir, mesela herhangi bir
+$r=(x,y,z)$ noktasýndaki basýnç, sýcaklýk, yoðunluk, vs. $W$ aðýrlýk
+fonksiyonudur, ya da çekirdek (kernel) fonksiyonu, sahip olmasý gereken bir þart,
 
 $$
 \int_\Omega  W(r-r',h) \ud r' = 1
@@ -30,7 +65,46 @@ $$
 \lim_{h \to 0} W(r,h) = \delta(r)
 $$
 
-olmasidir [4, sf. 11].
+olmasýdýr [4, sf. 11]. [4]'te bu tekniðin Dirac fonksiyonu ile baðlantýlarý
+anlatýldý. Eðer $W = \delta$ dersek, yani çekirdek için Dirac fonksiyonu
+kullanýrsak, direk aradeðerlenen fonksiyonun kendisini elde ederiz. 
+
+Aradeðerlemeyi sývýya uygulamak için sývýyý önce kütle öðelerine bölmemiz
+gerekli. $i$'inci öðe $m_i$ kütlesine, $\rho_i$ yoðunluðuna, ve $\bar{r}_i$
+pozisyonuna sahip olacak. $A$'nin $i$ parçacýðýndaki deðeri $A_i$ ile
+gösterilsin. Her parcacik icin,
+
+$$
+A(r) = \int A(r') W(r-r',h) \ud r'
+$$
+
+$$
+ = \int \frac{A(r')}{\rho(r')} W(r-r',h) \rho(r') \ud r'
+$$
+
+Yaklaþýklýk için $A_I(r)$ da diyebilirdik, ya da $\approx$
+kullanabilirdik. Devam edelim, $\rho(r')$'i hem bölen hem bölünene ekleyerek
+hiçbir deðiþim yaratmamýþ olduk, ama böylece $\rho(r') \ud r'$ ifadesi elde
+ettik ki ona parçacýk kütlesi diyebiliriz. Böylece parçacýklarýn kütleleri
+üzerinden bir toplam alabiliriz,
+
+$$
+A_s(r) = \sum_b m_b \frac{A_b}{\rho_b} W(r-r_b, h)
+$$
+
+Bu toplam teoride tüm parçacýklar üzerindendir, fakat pratikte $r$'ye yakýn olan
+diðer parçacýklar üzerinden alýnýr, çoðunlukla çekirdek $2h$ gibi bir uzaklýkta
+zaten hýzla sýfýra düþer, bu sebeple, ayrýca performans açýsýndan, çok uzaktaki
+parçacýklarý göz önüne almaya da gerek yoktur.
+
+Üstteki formül bana herhangi bir $r$ noktasýnda hesaplayabileceðim bir kestirme
+hesap (estimation) vermiþ oldu. Parcaçýk bazlý simülasyon yaptýðýmýz için her
+$i$ parçacýðý çevresindeki $b$ parçacýklarý üzerinden bu kestirme hesabýný
+yapabileceðiz.
+
+
+
+
 
 
 [devam edecek]
@@ -42,20 +116,16 @@ Kaynaklar
 [2] Schuermann, {\em Particle-Based Fluid Simulation with SPH},
     \url{https://lucasschuermann.com/writing/particle-based-fluid-simulation}
 
-[3] Bayramli, {\em Hesapsal Bilim, Ders 4}
+[3] Bayramlý, {\em Hesapsal Bilim, Ders 4}
 
 [4] Kelager, {\em Lagrangian Fluid Dynamics Using Smoothed Particle Hydrodynamics}
-    
+
+[5] Bayramlý, {\em Fizik, Akýþ Dinamiði}
+
+[6] Bayramlý, {\em Fizik, Simulasyon}
+
+[7] Monaghan, {\em Introduction to SPH Part I},
+    \url{https://www.youtu.be/tAXHCAEgSuE}
+
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
 
