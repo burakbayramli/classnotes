@@ -2,7 +2,7 @@
 \begin{document}
 Pürüzleþtirilmiþ Parcaçýk Hidrodinamiði (Smoothed Particle Hydrodynamics -SPH-)
 
-SPH sývýlarýn dinamik hareketini görmemizi saðlayan bir simülasyon
+SPH sývýlarýn dinamik hareketini görmemizi saðlayan bir simulasyon
 tekniðidir. Lagrangian bakýþ açýsýný temel alýr, yani Euler aksine, bir sývý
 paketini takip edip nereye gittiðine, hangi deðiþimlere uðradýðýna
 bakarýz.
@@ -25,6 +25,7 @@ Daha detaylý hali,
 $$
 \rho \frac{D \bar{u}}{D t} = 
 - \nabla p + \mu \nabla \cdot \nabla \bar{u} + \rho \bar{g}
+\mlabel{1}
 $$
 
 Simulasyon için bize ivme gerekli. Kütle ve kuvvetten ivme, oradan sayýsal
@@ -36,13 +37,12 @@ $$
 a_i = \frac{\ud u_i}{\ud t} = \frac{F_i}{\rho_i}
 $$
 
-
 ile ivmeyi buluruz, ve oradan devam ederiz.
 
 Þimdi bize gereken $\nabla p(r_i)$ ve $\nabla^2 u(r_i)$ hesaplarýný yaklaþýk
 yapabilmemizi saðlayacak bir yaklaþým kullanmak. SPH teknikleri bunu saðlýyor.
 
-Bir fonksiyon $A$'yi aradeðerleme (interpolation), yaklaþýklama üzerinden temsil
+Bir fonksiyon $A$ aradeðerleme (interpolation), yaklaþýklama üzerinden temsil
 edilebilir [1],
 
 $$
@@ -52,8 +52,10 @@ $$
 $\bar{r}=r$ bir vektör, $\ud r'$ diferansiyel hacim öðesi. $A_I$ aradeðerlenmiþ
 fonksiyon, $A$ yaklaþýk göstermeye uðraþtýðýmýz fonksiyon. $A$ simulasyon
 ortamýnda hesaplanan herhangi bir ölçüt olabilir, mesela herhangi bir
-$r=(x,y,z)$ noktasýndaki basýnç, sýcaklýk, yoðunluk, vs. $W$ aðýrlýk
-fonksiyonudur, ya da çekirdek (kernel) fonksiyonu, sahip olmasý gereken bir þart,
+$r=(x,y,z)$ noktasýndaki basýnç, sýcaklýk, yoðunluk, vs.
+
+$W$ aðýrlýk fonksiyonudur, ya da çekirdek (kernel) fonksiyonu, sahip olmasý
+gereken bir þart,
 
 $$
 \int_\Omega  W(r-r',h) \ud r' = 1
@@ -65,14 +67,14 @@ $$
 \lim_{h \to 0} W(r,h) = \delta(r)
 $$
 
-olmasýdýr [4, sf. 11]. [4]'te bu tekniðin Dirac fonksiyonu ile baðlantýlarý
+[4, sf. 11]. [4]'te bu tekniðin Dirac fonksiyonu ile baðlantýlarý
 anlatýldý. Eðer $W = \delta$ dersek, yani çekirdek için Dirac fonksiyonu
-kullanýrsak, direk aradeðerlenen fonksiyonun kendisini elde ederiz. 
+kullanýrsak, orijinal fonksiyonun kendisini elde ederiz.
 
-Aradeðerlemeyi sývýya uygulamak için sývýyý önce kütle öðelerine bölmemiz
-gerekli. $i$'inci öðe $m_i$ kütlesine, $\rho_i$ yoðunluðuna, ve $\bar{r}_i$
-pozisyonuna sahip olacak. $A$'nin $i$ parçacýðýndaki deðeri $A_i$ ile
-gösterilsin. Her parcacik icin,
+Yaklaþýklamayý sývýya uygulamak için onu kütle öðelerine bölmemiz gerekli,
+$i$'inci öðe $m_i$ kütlesine, $\rho_i$ yoðunluðuna, ve $\bar{r}_i$ pozisyonuna
+sahip olacak. $A$'nýn $i$ parçacýðýndaki deðeri $A_i$ ile gösterilsin. Her
+parçacýk için,
 
 $$
 A(r) = \int A(r') W(r-r',h) \ud r'
@@ -83,10 +85,11 @@ $$
 $$
 
 Yaklaþýklýk için $A_I(r)$ da diyebilirdik, ya da $\approx$
-kullanabilirdik. Devam edelim, $\rho(r')$'i hem bölen hem bölünene ekleyerek
-hiçbir deðiþim yaratmamýþ olduk, ama böylece $\rho(r') \ud r'$ ifadesi elde
-ettik ki ona parçacýk kütlesi diyebiliriz. Böylece parçacýklarýn kütleleri
-üzerinden bir toplam alabiliriz,
+kullanabilirdik.
+
+$\rho(r')$'i hem bölen hem bölünene eklediðimiz için hiçbir deðiþim yaratmamýþ
+olduk, ama böylece $\rho(r') \ud r'$ ifadesi elde ettik ki ona parçacýk kütlesi
+diyebiliriz. Böylece parçacýklarýn kütleleri üzerinden bir toplam alabiliriz,
 
 $$
 A_s(r) = \sum_b m_b \frac{A_b}{\rho_b} W(r-r_b, h)
@@ -94,17 +97,52 @@ $$
 
 Bu toplam teoride tüm parçacýklar üzerindendir, fakat pratikte $r$'ye yakýn olan
 diðer parçacýklar üzerinden alýnýr, çoðunlukla çekirdek $2h$ gibi bir uzaklýkta
-zaten hýzla sýfýra düþer, bu sebeple, ayrýca performans açýsýndan, çok uzaktaki
-parçacýklarý göz önüne almaya da gerek yoktur.
+zaten hýzla sýfýra düþtüðü için, ayrýca performans açýsýndan, çok uzaktaki
+parçacýklarý göz önüne almaya gerek yoktur.
 
 Üstteki formül bana herhangi bir $r$ noktasýnda hesaplayabileceðim bir kestirme
-hesap (estimation) vermiþ oldu. Parcaçýk bazlý simülasyon yaptýðýmýz için her
-$i$ parçacýðý çevresindeki $b$ parçacýklarý üzerinden bu kestirme hesabýný
+hesap (estimation) vermiþ oldu. Parcaçýk bazlý simulasyon yaptýðýmýz için her
+$i$ parçacýðý çevresindeki $j$ parçacýklarý üzerinden bu kestirme hesabý
 yapabileceðiz.
 
+Aradeðerlemenin bize saðladýðý güzel bir özellik onun üzerinden mesela gradyan
+alabilmem. Diyelim ki $A$ ölçümü basýnç, yani $p$. O zaman (1)'de görülen
+$-\nabla p$ formülünü üstteki entegral üzerinden açabilmem gerekir. $r$'de olan
+her $i$ parçacýðý için $p(r_i)$ diyelim,
 
+$$
+p(r_i) = \sum_j \frac{m_j p_j}{\rho_j} W(r_i-r_j,h)
+$$
 
+Bu denklemin gradyanýný alabiliriz þimdi,
 
+$$
+\nabla p(r_i) = \sum \frac{m_j p_j}{\rho_j} \nabla W(r_i-r_j,h)
+$$
+
+Gradyan direk $W$ üzerinde uygulanmýþ oldu. Burada modellemeyi yapan kiþi tabii
+ki $W$'yi ``gradyaný rahat alýnan'' fonksiyonlar arasýndan da seçecektir,
+böylece iþler daha da kolaylaþacaktýr.
+
+O zaman üstteki sonuç ile $-\nabla p$ yazarsak,
+
+$$
+F_i^{\textrm{basýnç}} = - \sum_j \frac{m_j p_j}{\rho_j} \nabla W(r_i-r_j,h)
+$$
+
+elde ederiz.
+
+Fakat burada bir problem var, $j$ bölgesindeki basýncý kullanarak o fark
+üzerinden $i$ üzerindeki kuvveti hesapladýk, fakat basýnç farký dolayýsýyla
+$i$'nin $j$ üzerinde uyguladýðý kuvvet ayný olmayabilir. Yani kuvvet simetrik
+olmaz, fakat fizik kanunlarýna göre etki-tepki ayný olmalýdýr. Simulasyon
+amacýyla çoðunlukla yapýlan dýþarýdan müdahele ile kuvveti simetrik hale
+getirmektir, mesela bir yöntem basit aritmetik ortalama almak,
+
+$$
+F_i^{\textrm{basýnç}} = - \nabla p(r_i) =
+- \sum_j m_j \frac{p_i + p_j}{2 \rho_j} \nabla W(r_i-r_j,h)
+$$
 
 
 [devam edecek]
