@@ -20,7 +20,7 @@ Alttaki iki kod, C++ üzerinden 2 boyutta bu tür sistemlerin
 modellemesi. Derleyebilmek için
 
 ```
-sudo apt-get install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev
+sudo apt-get install libeigen3-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev
 ```
 
 Ardindan

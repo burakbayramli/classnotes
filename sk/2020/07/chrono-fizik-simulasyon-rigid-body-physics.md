@@ -8,18 +8,8 @@ http://api.projectchrono.org/4.0.0/tutorial_install_chrono.html
 
 Kurmak için önce
 
-https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz
-
-Açıp dizine girilir, ve
-
 ```
-mkdir build_dir
-
-cd build_dir
-
-cmake ..
-
-sudo make install
+sudo apt-get install libeigen3-dev
 ```
 
 Eigen sadece header .h dosyaları, derlenen bir şey yok.

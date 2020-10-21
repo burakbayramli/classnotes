@@ -49,10 +49,11 @@ $$
 A_I(r) = \int A(r') W(r-r',h) \ud r'
 $$
 
-$\bar{r}=r$ bir vektör, $\ud r'$ diferansiyel hacim öðesi. $A_I$ aradeðerlenmiþ
-fonksiyon, $A$ yaklaþýk göstermeye uðraþtýðýmýz fonksiyon. $A$ simulasyon
-ortamýnda hesaplanan herhangi bir ölçüt olabilir, mesela herhangi bir
-$r=(x,y,z)$ noktasýndaki basýnç, sýcaklýk, yoðunluk, vs.
+Belirtilmediði yerlerde $r = \bar{r}$, $u = \bar{u}$ kabul edilebilir, bunlar
+vektör, $\ud r'$ diferansiyel hacim öðesi. $A_I$ aradeðerlenmiþ fonksiyon, $A$
+yaklaþýk göstermeye uðraþtýðýmýz fonksiyon. $A$ simulasyon ortamýnda hesaplanan
+herhangi bir ölçüt olabilir, mesela herhangi bir $r=(x,y,z)$ noktasýndaki
+basýnç, sýcaklýk, yoðunluk, vs.
 
 $W$ aðýrlýk fonksiyonudur, ya da çekirdek (kernel) fonksiyonu, sahip olmasý
 gereken bir þart,
@@ -151,15 +152,91 @@ F_i^{\textrm{aðdalýk}} = \mu \sum_j m_j \frac{u_j}{\rho_j} \nabla^2 W (r_i-r_j, 
 $$
 
 olarak yazýlabilirdi, fakat simetriklik problemi burada da var. Bu problem de
-hiza olan baðlantýyý izafi hiza çevirerek çözülebilir, çünkü fiziksel olarak
-düþünülürse de esas önemli olan mutlak hýzlar deðil iki parçacýðýn hýzlarýnýn
-farký, o zaman 
+hýza olan baðlantýyý izafi hýza çevirerek çözülebilir, çünkü fiziksel olarak
+düþünülürse esas önemli olan mutlak hýzlar deðil iki parçacýðýn hýzlarýnýn
+farký, ya da bir parçacýðýn diðerine baktýðýnda gördüðü hýz (ki bu izafi demek)
+o zaman
 
 $$
 F_i^{\textrm{aðdalýk}} = \mu \sum_j m_j \frac{u_j-u_i}{\rho_j} \nabla^2 W (r_i-r_j, h)
 $$
 
 daha uygun olur.
+
+Çekirdek Fonksiyon Seçimi
+
+SPH'in stabilitesi, doðruluðu ve hesap hýzý pürüzleþtirme çekirdeðinin doðru
+seçilmiþ olmasýna baðlý [2]. Çekirdek fonksiyonlarýný hangisinin, hangi
+durumlarda iyi olacaðý aktif bir araþtýrma alanýdýr. Yaygýn kullanýlan bir
+çekirdek \verb!poly6! ismiyle bilinen 6. derece polinom çekirdeði. Bu fonksiyon,
+
+$$
+W_{poly6} (r, h) = \frac{315}{64 \pi h^9}
+\left\{ \begin{array}{ll}
+(h^2 - ||r||^2)^3 & 0 \le ||r|| \le h \\
+0 & ||r|| > h
+\end{array} \right.
+$$
+
+Gradyaný,
+
+$$
+\nabla W (r, h) =
+- \frac{945}{32 \pi h^9} r ( h^2 - ||r||^2)^2
+$$
+
+Laplasyaný ise,
+
+$$
+\nabla^2 W (r, h) =
+- \frac{945}{32\pi h^9} (h^2 - ||r||^2)(3 h^2 - 7||r||^2)
+$$
+
+Tek boyutta ve $h=1$ üzerinden her üç fonksiyonu grafikleyebiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+r = np.linspace(-1,1,100)
+h = 1
+import pandas as pd
+df = pd.DataFrame(r)
+df.columns = ['r']
+df['W'] = (315./(64*np.pi*h**9)) * (h**2 - np.abs(r)**2)**3
+df = df.set_index('r')
+df.plot()
+plt.savefig('compscieng_app40sph_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{compscieng_app40sph_01.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.DataFrame(r)
+df.columns = ['r']
+df['W'] = (315./(64*np.pi*h**9)) * (h**2 - np.abs(r)**2)**3
+df['Gradyan W'] = -945./(32*np.pi*h**9) * r * (h**2 - np.abs(r)**2)**2
+df = df.set_index('r')
+df.plot()
+plt.savefig('compscieng_app40sph_02.png')
+\end{minted}
+
+\includegraphics[height=6cm]{compscieng_app40sph_02.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.DataFrame(r)
+df.columns = ['r']
+df['W'] = (315./(64*np.pi*h**9)) * (h**2 - np.abs(r)**2)**3
+df['Gradyan W'] = -945./(32*np.pi*h**9) * r * (h**2 - np.abs(r)**2)**2
+df['Laplasyan W'] = -945./(32*np.pi*h**9) * \
+                   (h**2-np.abs(r)**2) * \
+                   (3*h**2 - 7**np.abs(r)**2)
+df = df.set_index('r')
+df.plot()
+plt.savefig('compscieng_app40sph_03.png')
+\end{minted}
+
+\includegraphics[height=6cm]{compscieng_app40sph_03.png}
+
+
+
 
 
 [devam edecek]
