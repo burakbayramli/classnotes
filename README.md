@@ -103,7 +103,7 @@ ortamı içinden işletilebilir, kurmak icin `pip install jupyter` ve
 
 Diger temel kurulus bilgileri
 
-http://sayilarvekuramlar.blogspot.com/2016/01/python-dil-ogrenimi.html
+https://burakbayramli.github.io/dersblog/sk/2016/01/python-dil-ogrenimi.html
 
 Belgelerde görülen her bölümdeki kodlar kendi başına (bölümün dizini
 içinden) işleyebilecek şekilde ayarlanmıştır. Bu kodlar notların
