@@ -13,8 +13,6 @@
 
 23/9 - [Div, Curl, Laplasyan (Laplacian)](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_70_div_curl_lap/div_curl_laplasyan__laplacian_.html)
 
-6/9 - [Elastik Çarpışma (Elastic Collision)](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donusler_basinc_carpisma.html)
-
 
 ## Konular, Referans
 
