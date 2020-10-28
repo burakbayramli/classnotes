@@ -42,7 +42,7 @@ class Simulation:
         self.cor = 1.0
         self.balls = []
         self.tm  = 0.0
-        self.th  = 0.0
+        self.th  = 200.0
         self.mmax =  1.0-self.r
         self.mmin = -1.0+self.r
         self.right = False
@@ -50,9 +50,9 @@ class Simulation:
         
     def init(self):
         bi = 0
-        for xs in np.linspace(-0.8, 0.8, 10):
-            for ys in np.linspace(-0.8, 0.8, 10):
-                for zs in np.linspace(0.7, 0.9, 3):
+        for xs in np.linspace(-0.4, 0.4, 10):
+            for ys in np.linspace(-0.4, 0.4, 10):
+                for zs in np.linspace(0.0, 0.2, 4):
                     v = np.array([0.0, 0.0, 0.0])
                     f = 5*np.array([0,0,0])
                     p = np.array([xs, ys, zs])
@@ -134,9 +134,9 @@ class Simulation:
         self.computeForces()
         self.integrate()
 
-        self.th += 0.2
-        if self.th>360.0:
-            self.th -= 360.0
+#        self.th += 0.2
+#        if self.th>360.0:
+#            self.th -= 360.0
             
         if self.i > 800: exit()
         
@@ -157,16 +157,16 @@ class Simulation:
         glPopMatrix()
         glutSwapBuffers()
         
-
-        '''
+'''
         if img and self.i % 10 == 0: 
             width,height = 480,480
             data = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
             image = Image.frombytes("RGBA", (width, height), data)
             image = ImageOps.flip(image)
-            image.save('/tmp/glutout-%03d.png' % self.i, 'PNG')
-        '''
+            image.save('/tmp/glut/glutout-%03d.png' % self.i, 'PNG')
+            
         self.i += 1
+'''
 
 if __name__ == '__main__':
     s = Simulation()
