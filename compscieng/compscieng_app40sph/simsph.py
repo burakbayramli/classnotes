@@ -56,7 +56,8 @@ class Simulation:
                     v = np.array([0.0, 0.0, 0.0])
                     f = 5*np.array([0,0,0])
                     x = np.array([xs, ys, zs])
-                    self.balls.append({'x': x, 'f':f, 'v': v, 'i': bi})
+                    d = {'x': x, 'f':f, 'v': v, 'i': bi, 'rho': 0.0, 'p': 0.0}
+                    self.balls.append(d)
                     bi += 1
 
                         
