@@ -9,12 +9,20 @@ import numpy as np, datetime
 import sys, numpy.linalg as lin
 
 p1,p2,p3 = 73856093, 19349663, 83492791
-G = np.array([0.0, 0.0, -0.8])
+#G = np.array([0.0, 0.0, -0.8])
+G = np.array([0.0, 0.0, -9.8])
 
 m = 0.1
 B = 10 # top
 l = 0.2 # bolec kutu buyuklugu
 n = B*20 # bolec sozluk buyuklugu
+
+GAS_CONST = 2000.
+REST_DENS = 1000.
+MASS = 65.0
+VISC = 250.0
+DT = 0.0008
+
 img = True
 
 def spatial_hash(x):
