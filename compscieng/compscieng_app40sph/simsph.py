@@ -36,8 +36,7 @@ class Simulation:
     def __init__(self):
         self.geo_hash_list = None
         self.i = 0
-        self.r   = 0.1
-        self.g   = 9.8
+        self.r   = 0.05
         self.dt  = 0.01
         #self.cor = 0.6        
         self.cor = 1.0
@@ -50,11 +49,16 @@ class Simulation:
         self.left = False
         
     def init(self):
-        for b in range(B):
-            v = np.array([0.0, 0.0, 0.0])
-            p = np.array([np.random.rand(), np.random.rand(), np.random.rand()])
-            f = 5*np.array([np.random.rand(), np.random.rand(), np.random.rand()])
-            self.balls.append({'pos':p, 'f':f, 'v': v, 'i': b})
+        bi = 0
+        for xs in np.linspace(-0.8, 0.8, 10):
+            for ys in np.linspace(-0.8, 0.8, 10):
+                for zs in np.linspace(0.7, 0.9, 3):
+                    v = np.array([0.0, 0.0, 0.0])
+                    f = 5*np.array([0,0,0])
+                    p = np.array([xs, ys, zs])
+                    self.balls.append({'pos':p, 'f':f, 'v': v, 'i': bi})
+                    bi += 1
+
                         
         tm = 0.0
 
