@@ -1,3 +1,4 @@
+# convert  -delay 20 /tmp/glut/glutout-*.png /tmp/balls2.gif
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -157,8 +158,7 @@ class Simulation:
             glPopMatrix()
         glPopMatrix()
         glutSwapBuffers()
-        
-'''
+
         if img and self.i % 10 == 0: 
             width,height = 480,480
             data = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
@@ -167,9 +167,9 @@ class Simulation:
             image.save('/tmp/glut/glutout-%03d.png' % self.i, 'PNG')
             
         self.i += 1
-'''
 
 if __name__ == '__main__':
+    if (os.path.exists("/tmp/glut") == False): os.mkdir("/tmp/glut")
     s = Simulation()
     glutInit(())    
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)

@@ -48,3 +48,5 @@
 
 [Dosya Kodlamasi (File Encoding)](10/dosya-kodlamasi-encoding.md)
 
+[Dosya İşlemleri, Unix, Python](10/python-unix-dosya-islemleri.md)
+
