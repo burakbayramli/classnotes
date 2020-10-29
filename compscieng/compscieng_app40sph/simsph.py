@@ -24,6 +24,7 @@ MASS = 65.0
 VISC = 250.0
 DT = 0.0008
 H = 16.0 # kernel radius
+HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
 SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
 VISC_LAP = 45.0/(np.pi*np.power(H, 6.));
@@ -81,75 +82,33 @@ class Simulation:
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-    def computeForces(self):
-        print (VISC_LAP*10.0)
-        exit()
-#        if (self.i==1):
-#            for j,b in enumerate(self.balls):
-#                b['f'] = b['f'] + (G * m)
-#        else: 
-#            for b in self.balls:
-#                b['f'] = G * m
 
-                        
-    def integrate(self):
-        self.geo_hash_list = defaultdict(list)
+    def computeDensityPressure(self):
+        for i,bi in enumerate(self.balls):
+            if (len(self.geo_hash_list[spatial_hash(self.balls[i]['x'])])>1):
+                otherList = self.geo_hash_list[spatial_hash(self.balls[i]['x'])]
+                bi['rho'] = 0.0                
+                for j,bj in enumerate(otherList):
+                    r2 = lin.norm(bi['x']-bj['x'])
+                    if  r2 < HSQ:
+                        bi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
+                bi['p'] = GAS_CONST*(bi['rho'] - REST_DENS)
+       
+                
         
-        for j,b in enumerate(self.balls):
-            b['v'] += self.dt*(b['f']/m)
-            b['x'] += self.dt*b['v']
-            
-            if (abs(b['x'][0]) >= self.mmax):
-                #print (b['i'], 'wall 1')
-                b['v'][0] *= -self.cor
-                if b['x'][0] < 0:
-                    b['x'][0] = self.mmin
-
-            if (abs(b['x'][1]) >= self.mmax):
-                #print (b['i'], 'wall 2')
-                b['v'][1] *= -self.cor
-                if b['x'][1] < 0:
-                    b['x'][1] = self.mmin
-                    
-            if (abs(b['x'][2]) >= self.mmax):
-                #print (b['i'], 'wall 3')
-                b['v'][2] *= -self.cor
-                if b['x'][2] < 0:
-                    b['x'][2] = self.mmin
-
+    def hash_balls(self):
+        self.geo_hash_list = defaultdict(list)        
         for j,b in enumerate(self.balls):
             self.geo_hash_list[spatial_hash(self.balls[j]['x'])].append(self.balls[j])
 
-        vDone = {}
-        for j,b in enumerate(self.balls):
-            if (len(self.geo_hash_list[spatial_hash(self.balls[j]['x'])])>1):
-                otherList = self.geo_hash_list[spatial_hash(self.balls[j]['x'])]
-                for other in otherList:
-                    if (other['i'] != b['i'] and b['i'] not in vDone and other['i'] not in vDone):
-                        dist = lin.norm(other['x']-b['x'])
-                        if (dist < (2*self.r)):
-                            #print ('collision')
-                            vrel = b['v']-other['v']
-                            n = (other['x']-b['x']) / dist
-                            vnorm = np.dot(vrel,n)*n
-                            #print (vnorm)
-                            b['v'] = b['v'] - vnorm
-                            other['v'] = other['v'] + vnorm                            
-                            vDone[b['i']] = 1
-                            vDone[other['i']] = 1
-                            
+
             
             
     def update(self):
-        self.computeForces()
-        self.integrate()
-
-#        self.th += 0.2
-#        if self.th>360.0:
-#            self.th -= 360.0
-            
-        if self.i > 800: exit()
-        
+        self.hash_balls()
+        self.computeDensityPressure()
+        exit()
+                    
         glutPostRedisplay()
 
     def display(self):
