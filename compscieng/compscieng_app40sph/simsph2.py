@@ -13,7 +13,6 @@ p1,p2,p3 = 73856093, 19349663, 83492791
 #G = np.array([0.0, 0.0, -0.8])
 G = np.array([0.0, 0.0, -9.8])
 
-m = 0.1
 B = 10 # top
 l = 0.2 # bolec kutu buyuklugu
 n = B*20 # bolec sozluk buyuklugu
@@ -121,7 +120,7 @@ class Simulation:
     def integrate(self):
         
         for j,b in enumerate(self.balls):
-            b['v'] += self.dt*(b['f']/m)
+            b['v'] += self.dt*(b['f']/MASS)
             b['x'] += self.dt*b['v']
             
             if (abs(b['x'][0]) >= self.mmax):
