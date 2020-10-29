@@ -21,7 +21,7 @@ REST_DENS = 1000.0
 GAS_CONST = 2000.0
 MASS = 65.0
 VISC = 250.0
-DT = 0.0008
+DT = 0.2
 H = 0.2 # kernel radius
 HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
@@ -40,7 +40,6 @@ class Simulation:
         self.geo_hash_list = None
         self.i = 0
         self.r   = 0.05
-        self.dt  = 0.01
         #self.cor = 0.6        
         self.cor = 1.0
         self.balls = []
@@ -120,8 +119,8 @@ class Simulation:
         
         for j,b in enumerate(self.balls):
             if b['rho'] > 0.0: 
-                b['v'] += self.dt*(b['f']/b['rho'])
-            b['x'] += self.dt*b['v']
+                b['v'] += DT*(b['f']/b['rho'])
+            b['x'] += DT*b['v']
             
             if (abs(b['x'][0]) >= self.mmax):
                 #print (b['i'], 'wall 1')
