@@ -23,6 +23,11 @@ REST_DENS = 1000.
 MASS = 65.0
 VISC = 250.0
 DT = 0.0008
+H = 16.0 # kernel radius
+POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
+SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
+VISC_LAP = 45.0/(np.pi*np.power(H, 6.));
+
 
 img = True
 
@@ -77,12 +82,15 @@ class Simulation:
         glLoadIdentity()
 
     def computeForces(self):
-        if (self.i==1):
-            for j,b in enumerate(self.balls):
-                b['f'] = b['f'] + (G * m)
-        else: 
-            for b in self.balls:
-                b['f'] = G * m
+        print (VISC_LAP*10.0)
+        exit()
+#        if (self.i==1):
+#            for j,b in enumerate(self.balls):
+#                b['f'] = b['f'] + (G * m)
+#        else: 
+#            for b in self.balls:
+#                b['f'] = G * m
+
                         
     def integrate(self):
         self.geo_hash_list = defaultdict(list)
