@@ -11,25 +11,22 @@ import sys, numpy.linalg as lin
 
 p1,p2,p3 = 73856093, 19349663, 83492791
 #G = np.array([0.0, 0.0, -0.8])
-G = np.array([0.0, 0.0, -9.8])
+G = np.array([0.0, 0.0, -0.8])
 
 B = 10 # top
 l = 0.2 # bolec kutu buyuklugu
 n = B*20 # bolec sozluk buyuklugu
 
-GAS_CONST = 2.
-REST_DENS = 2.
-MASS = 0.1
-VISC = 0.5
+GAS_CONST = 0.4
+REST_DENS = 0.1
+MASS = 10.0
+VISC = 0.1
 DT = 0.0008
 H = 0.2 # kernel radius
 HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
 SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
 VISC_LAP = 45.0/(np.pi*np.power(H, 6.));
-
-
-img = True
 
 def spatial_hash(x):
     """
@@ -166,13 +163,6 @@ class Simulation:
             glPopMatrix()
         glPopMatrix()
         glutSwapBuffers()
-
-        if img and self.i % 10 == 0: 
-            width,height = 480,480
-            data = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
-            image = Image.frombytes("RGBA", (width, height), data)
-            image = ImageOps.flip(image)
-            image.save('/tmp/glut/glutout-%03d.png' % self.i, 'PNG')
             
         self.i += 1
 
