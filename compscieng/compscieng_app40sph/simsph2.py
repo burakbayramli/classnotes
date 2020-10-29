@@ -20,10 +20,10 @@ n = B*20 # bolec sozluk buyuklugu
 
 GAS_CONST = 2000.
 REST_DENS = 1000.
-MASS = 65.0
+MASS = 1.0
 VISC = 250.0
 DT = 0.0008
-H = 16.0 # kernel radius
+H = 0.2 # kernel radius
 HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
 SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
@@ -99,7 +99,7 @@ class Simulation:
                         bi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
                 bi['p'] = GAS_CONST*(bi['rho'] - REST_DENS)
        
-
+                
     def computeForces(self):
         for i,bi in enumerate(self.balls):
             fpress = np.array([0.0, 0.0, 0.0])
@@ -111,21 +111,46 @@ class Simulation:
                     if bj['i'] == bi['i']: continue
                     rij = bi['x']-bj['x']
                     r = lin.norm(rij)
-                    if r < H:
-                        rij_normalized = rij / lin.norm(rij)
+                    if np.sum(rij)>0.0: rij = rij / r
+                    if r < H:                        
                         tmp = (2.0 * bj['rho']) * SPIKY_GRAD*np.power(H-r,2.0)
-                        fpress += rij_normalized*MASS*(bi['p'] + bj['p']) / tmp
+                        fpress += -rij*MASS*(bi['p'] + bj['p']) / tmp
+                fgrav = G * bi['rho']
+                bi['f'] = fpress + fvisc + fgrav
                         
-                        
+    def integrate(self):
+        
+        for j,b in enumerate(self.balls):
+            b['v'] += self.dt*(b['f']/m)
+            b['x'] += self.dt*b['v']
+            
+            if (abs(b['x'][0]) >= self.mmax):
+                #print (b['i'], 'wall 1')
+                b['v'][0] *= -self.cor
+                if b['x'][0] < 0:
+                    b['x'][0] = self.mmin
+
+            if (abs(b['x'][1]) >= self.mmax):
+                #print (b['i'], 'wall 2')
+                b['v'][1] *= -self.cor
+                if b['x'][1] < 0:
+                    b['x'][1] = self.mmin
                     
+            if (abs(b['x'][2]) >= self.mmax):
+                #print (b['i'], 'wall 3')
+                b['v'][2] *= -self.cor
+                if b['x'][2] < 0:
+                    b['x'][2] = self.mmin
+        
+        self.hash_balls()
+                
                     
             
     def update(self):
         self.hash_balls()
         self.computeDensityPressure()
         self.computeForces()
-        exit()
-                    
+        self.integrate()                    
         glutPostRedisplay()
 
     def display(self):
