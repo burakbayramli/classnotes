@@ -18,10 +18,10 @@ l = 0.2 # bolec kutu buyuklugu
 n = B*20 # bolec sozluk buyuklugu
 
 REST_DENS = 1000.0
-GAS_CONST = 2000.0
+GAS_CONST = 100.0
 MASS = 65.0
-VISC = 250.0
-DT = 0.2
+VISC = 1000.0
+DT = 0.1
 H = 0.2 # kernel radius
 HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
@@ -89,7 +89,7 @@ class Simulation:
             if (len(self.geo_hash_list[h])>1): # yakinda top var mi
                 otherList = self.geo_hash_list[h] # varsa isle
                 for j,bj in enumerate(otherList):
-                    r2 = lin.norm(bi['x']-bj['x'])**2
+                    r2 = lin.norm(bj['x']-bi['x'])**2
                     if  r2 < HSQ:
                         bi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
                 bi['p'] = GAS_CONST*(bi['rho'] - REST_DENS)
