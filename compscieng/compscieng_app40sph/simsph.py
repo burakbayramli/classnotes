@@ -85,8 +85,9 @@ class Simulation:
 
     def computeDensityPressure(self):
         for i,bi in enumerate(self.balls):
-            if (len(self.geo_hash_list[spatial_hash(self.balls[i]['x'])])>1):
-                otherList = self.geo_hash_list[spatial_hash(self.balls[i]['x'])]
+            h = spatial_hash(self.balls[i]['x']) # su anki topun boleci
+            if (len(self.geo_hash_list[h])>1): # yakinda top var mi
+                otherList = self.geo_hash_list[h] # varsa isle
                 bi['rho'] = 0.0                
                 for j,bj in enumerate(otherList):
                     r2 = lin.norm(bi['x']-bj['x'])
