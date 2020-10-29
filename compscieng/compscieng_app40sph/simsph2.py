@@ -18,10 +18,10 @@ B = 10 # top
 l = 0.2 # bolec kutu buyuklugu
 n = B*20 # bolec sozluk buyuklugu
 
-GAS_CONST = 2000.
-REST_DENS = 1000.
-MASS = 1.0
-VISC = 250.0
+GAS_CONST = 2.
+REST_DENS = 2.
+MASS = 0.1
+VISC = 0.5
 DT = 0.0008
 H = 0.2 # kernel radius
 HSQ = H*H # radius^2 for optimization
