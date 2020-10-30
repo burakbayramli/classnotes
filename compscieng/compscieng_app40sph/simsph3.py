@@ -20,7 +20,7 @@ n = B*20 # bolec sozluk buyuklugu
 REST_DENS = 1000.0
 GAS_CONST = 100.0
 MASS = 65.0
-VISC = 1000.0
+VISC = 2000.0
 DT = 0.1
 H = 0.2 # kernel radius
 HSQ = H*H # radius^2 for optimization
@@ -93,7 +93,7 @@ class Simulation:
                     r2 = lin.norm(pj['x']-pi['x'])**2
                     if  r2 < HSQ:
                         pi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
-                pi['p'] = GAS_CONST*(pi['rho'] - REST_DENS)
+            pi['p'] = GAS_CONST*(pi['rho'] - REST_DENS)
        
                 
     def computeForces(self):
