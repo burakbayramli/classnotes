@@ -1,7 +1,6 @@
 # Dosya İşlemleri, Unix, Python
 
-Genel ihtiyaca dönük Python'da yapılabilecek dosya işlemlerini altta
-listeliyoruz.
+Genel ihtiyaca dönük Python'da yapılabilecek dosya işlemleri;
 
 Bir dosya, dizin mevcut mu?
 
@@ -26,7 +25,7 @@ print (os.path.exists("/tmp/filan1"))
 True
 ```
 
-Dizin altındaki tüm dosyalarla beraber silmek
+Dizini altındaki tüm dosyalarla beraber silmek
 
 ```python
 import shutil
@@ -65,8 +64,8 @@ Out[1]: ['/usr/sbin', '/usr/bin']
 Eğer daha alt seviye dizinleri göstermek istersek, mesela iki seviye
 aşağısı için, `/*/*` diyebilirdik.
 
-Fakat istteki ifade özyineli bir şekilde en üst seviye dizinden tüm
-altdızinleri göstermez. Bunun için bir kod yazdık, 
+Fakat üstteki ifade özyineli bir şekilde en üst seviye dizinden tüm
+altdızinleri göstermez. Bunun için bir kod yazdık,
 
 ```python
 def ls(d,ignore_list=[]):
