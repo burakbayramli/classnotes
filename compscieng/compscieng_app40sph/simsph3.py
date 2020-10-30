@@ -27,6 +27,8 @@ HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
 SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
 VISC_LAP = 45.0/(np.pi*np.power(H, 6.));
+EPS = 0.05
+BOUND_DAMPING = -0.5
 img = True
 
 def spatial_hash(x):
@@ -114,30 +116,36 @@ class Simulation:
                 pi['f'] = fpress + fvisc + fgrav
                         
     def integrate(self):
-        
         for j,p in enumerate(self.balls):
             if p['rho'] > 0.0: 
                 p['v'] += DT*p['f']/p['rho']
             p['x'] += DT*p['v']
-            
-            if (abs(p['x'][0]) >= self.mmax):
-                p['v'][0] *= -self.cor
-                if p['x'][0] < 0:
-                    p['x'][0] = self.mmin
 
-            if (abs(p['x'][1]) >= self.mmax):
-                p['v'][1] *= -self.cor
-                if p['x'][1] < 0:
-                    p['x'][1] = self.mmin
-                    
-            if (abs(p['x'][2]) >= self.mmax):
-                p['v'][2] *= -self.cor
-                if p['x'][2] < 0:
-                    p['x'][2] = self.mmin
-        
+
+            if p['x'][0]-EPS < -1.0:
+                p['v'][0] *= BOUND_DAMPING
+                p['x'][0] = -1.0
+            if p['x'][0]+EPS > 1.0:
+                p['v'][0] *= BOUND_DAMPING
+                p['x'][0] = 1.0-EPS
+
+            if p['x'][1]-EPS < -1.0:
+                p['v'][1] *= BOUND_DAMPING
+                p['x'][1] = -1.0
+            if p['x'][1]+EPS > 1.0:
+                p['v'][1] *= BOUND_DAMPING
+                p['x'][1] = 1.0-EPS
+
+            if p['x'][2]-EPS < -1.0:
+                p['v'][2] *= BOUND_DAMPING
+                p['x'][2] = -1.0
+            if p['x'][2]+EPS > 1.0:
+                p['v'][2] *= BOUND_DAMPING
+                p['x'][2] = 1.0-EPS
+
+
         self.hash_balls()
                 
-                    
             
     def update(self):
         self.hash_balls()
