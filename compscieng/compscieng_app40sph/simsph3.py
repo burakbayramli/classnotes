@@ -52,16 +52,16 @@ class Simulation:
         self.left = False
         
     def init(self):
-        bi = 0
+        i = 0
         for xs in np.linspace(-0.4, 0.4, 10):
             for ys in np.linspace(-0.4, 0.4, 10):
                 for zs in np.linspace(0.0, 0.2, 4):
                     v = np.array([0.0, 0.0, 0.0])
                     f = np.array([0,0,0])
                     x = np.array([xs, ys, zs])
-                    d = {'x': x, 'f':f, 'v': v, 'i': bi, 'rho': 0.0, 'p': 0.0}
+                    d = {'x': x, 'f':f, 'v': v, 'i': i, 'rho': 0.0, 'p': 0.0}
                     self.balls.append(d)
-                    bi += 1
+                    i += 1
 
                         
         tm = 0.0
@@ -93,7 +93,7 @@ class Simulation:
                     r2 = lin.norm(pj['x']-pi['x'])**2
                     if  r2 < HSQ:
                         pi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
-            pi['p'] = GAS_CONST*(pi['rho'] - REST_DENS)
+                pi['p'] = GAS_CONST*(pi['rho'] - REST_DENS)
        
                 
     def computeForces(self):
