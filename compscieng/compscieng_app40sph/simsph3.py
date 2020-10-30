@@ -11,13 +11,13 @@ import sys, numpy.linalg as lin
 
 p1,p2,p3 = 73856093, 19349663, 83492791
 #G = np.array([0.0, 0.0, -9.8*12000.0])
-G = np.array([0.0, 0.0, -9.8])
+G = np.array([0.0, 0.0, -9.8*2])
 
 B = 10 # top
 l = 0.2 # bolec kutu buyuklugu
 n = B*20 # bolec sozluk buyuklugu
 
-REST_DENS = 0.5
+REST_DENS = 5.0
 GAS_CONST = 0.5
 MASS = 65.0
 VISC = 10.0
