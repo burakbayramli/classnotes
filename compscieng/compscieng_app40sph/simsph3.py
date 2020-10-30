@@ -116,28 +116,25 @@ class Simulation:
                         
     def integrate(self):
         
-        for j,b in enumerate(self.balls):
-            if b['rho'] > 0.0: 
-                b['v'] += DT*(b['f']/b['rho'])
-            b['x'] += DT*b['v']
+        for j,p in enumerate(self.balls):
+            if p['rho'] > 0.0: 
+                p['v'] += DT*p['f']/p['rho']
+            p['x'] += DT*p['v']
             
-            if (abs(b['x'][0]) >= self.mmax):
-                #print (b['i'], 'wall 1')
-                b['v'][0] *= -self.cor
-                if b['x'][0] < 0:
-                    b['x'][0] = self.mmin
+            if (abs(p['x'][0]) >= self.mmax):
+                p['v'][0] *= -self.cor
+                if p['x'][0] < 0:
+                    p['x'][0] = self.mmin
 
-            if (abs(b['x'][1]) >= self.mmax):
-                #print (b['i'], 'wall 2')
-                b['v'][1] *= -self.cor
-                if b['x'][1] < 0:
-                    b['x'][1] = self.mmin
+            if (abs(p['x'][1]) >= self.mmax):
+                p['v'][1] *= -self.cor
+                if p['x'][1] < 0:
+                    p['x'][1] = self.mmin
                     
-            if (abs(b['x'][2]) >= self.mmax):
-                #print (b['i'], 'wall 3')
-                b['v'][2] *= -self.cor
-                if b['x'][2] < 0:
-                    b['x'][2] = self.mmin
+            if (abs(p['x'][2]) >= self.mmax):
+                p['v'][2] *= -self.cor
+                if p['x'][2] < 0:
+                    p['x'][2] = self.mmin
         
         self.hash_balls()
                 
