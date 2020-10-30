@@ -17,10 +17,10 @@ B = 10 # top
 l = 0.2 # bolec kutu buyuklugu
 n = B*20 # bolec sozluk buyuklugu
 
-REST_DENS = 1000.0
-GAS_CONST = 100.0
+REST_DENS = 0.5
+GAS_CONST = 0.5
 MASS = 65.0
-VISC = 2000.0
+VISC = 10.0
 DT = 0.1
 H = 0.2 # kernel radius
 HSQ = H*H # radius^2 for optimization
@@ -107,11 +107,9 @@ class Simulation:
                     if pj['i'] == pi['i']: continue
                     rij = pi['x']-pj['x']
                     r = lin.norm(rij)
-                    if np.sum(rij)>0.0: rij = rij / r
                     if r < H:
-                        tmp1 = -rij*MASS*(pi['p'] + pj['p'])
-                        tmp2 = (2.0 * pj['rho']) * SPIKY_GRAD*np.power(H-r,2.0)
-                        fpress += tmp1 / tmp2
+                        if np.sum(rij)>0.0: rij = rij / r
+                        fpress += -rij*MASS*(pi['p'] + pj['p']) / (2.0 * pj['rho'])*SPIKY_GRAD*np.power(H-r,2.0)
                         fvisc += VISC*MASS*(pj['v'] - pi['v'])/pj['rho'] * VISC_LAP*(H-r)
                 fgrav = G * pi['rho']
                 pi['f'] = fpress + fvisc + fgrav
