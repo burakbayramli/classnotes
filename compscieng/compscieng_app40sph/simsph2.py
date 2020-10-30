@@ -27,6 +27,7 @@ HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
 SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
 VISC_LAP = 45.0/(np.pi*np.power(H, 6.));
+img = True
 
 def spatial_hash(x):
     """
@@ -83,37 +84,37 @@ class Simulation:
             self.geo_hash_list[spatial_hash(self.balls[i]['x'])].append(self.balls[i])
           
     def computeDensityPressure(self):
-        for i,bi in enumerate(self.balls):            
-            bi['rho'] = 0.0                
+        for i,pi in enumerate(self.balls):            
+            pi['rho'] = 0.0                
             h = spatial_hash(self.balls[i]['x']) # su anki topun boleci
             if (len(self.geo_hash_list[h])>1): # yakinda top var mi
                 otherList = self.geo_hash_list[h] # varsa isle
-                for j,bj in enumerate(otherList):
-                    r2 = lin.norm(bj['x']-bi['x'])**2
+                for j,pj in enumerate(otherList):
+                    r2 = lin.norm(pj['x']-pi['x'])**2
                     if  r2 < HSQ:
-                        bi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
-                bi['p'] = GAS_CONST*(bi['rho'] - REST_DENS)
+                        pi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
+                pi['p'] = GAS_CONST*(pi['rho'] - REST_DENS)
        
                 
     def computeForces(self):
-        for i,bi in enumerate(self.balls):
+        for i,pi in enumerate(self.balls):
             fpress = np.array([0.0, 0.0, 0.0])
             fvisc = np.array([0.0, 0.0, 0.0])                
             h = spatial_hash(self.balls[i]['x']) # su anki topun boleci
             if (len(self.geo_hash_list[h])>1): # yakinda top var mi
                 otherList = self.geo_hash_list[h] # varsa isle
-                for j,bj in enumerate(otherList):
-                    if bj['i'] == bi['i']: continue
-                    rij = bi['x']-bj['x']
+                for j,pj in enumerate(otherList):
+                    if pj['i'] == pi['i']: continue
+                    rij = pi['x']-pj['x']
                     r = lin.norm(rij)
                     if np.sum(rij)>0.0: rij = rij / r
                     if r < H:
-                        tmp1 = -rij*MASS*(bi['p'] + bj['p'])
-                        tmp2 = (2.0 * bj['rho']) * SPIKY_GRAD*np.power(H-r,2.0)
+                        tmp1 = -rij*MASS*(pi['p'] + pj['p'])
+                        tmp2 = (2.0 * pj['rho']) * SPIKY_GRAD*np.power(H-r,2.0)
                         fpress += tmp1 / tmp2
-                        fvisc += VISC*MASS*(bj['v'] - bi['v'])/bj['rho'] * VISC_LAP*(H-r)
-                fgrav = G * bi['rho']
-                bi['f'] = fpress + fvisc + fgrav
+                        fvisc += VISC*MASS*(pj['v'] - pi['v'])/pj['rho'] * VISC_LAP*(H-r)
+                fgrav = G * pi['rho']
+                pi['f'] = fpress + fvisc + fgrav
                         
     def integrate(self):
         
@@ -149,6 +150,7 @@ class Simulation:
         self.computeDensityPressure()
         self.computeForces()
         self.integrate()                    
+        if self.i > 40: exit()
         glutPostRedisplay()
 
     def display(self):
@@ -165,7 +167,14 @@ class Simulation:
             glPopMatrix()
         glPopMatrix()
         glutSwapBuffers()
-            
+
+        if img and self.i % 2 == 0: 
+            width,height = 480,480
+            data = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
+            image = Image.frombytes("RGBA", (width, height), data)
+            image = ImageOps.flip(image)
+            image.save('/tmp/glut/glutout-%03d.png' % self.i, 'PNG')
+                               
         self.i += 1
 
 if __name__ == '__main__':
