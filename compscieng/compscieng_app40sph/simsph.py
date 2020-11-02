@@ -1,4 +1,3 @@
-# convert  -delay 20 /tmp/glut/glutout-*.png $HOME/Downloads/balls4.gif
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
