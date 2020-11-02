@@ -170,7 +170,7 @@ void InitGL(void)
 void Render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-        
+    
     glLoadIdentity();
     glOrtho(0, VIEW_WIDTH, 0, VIEW_HEIGHT, 0, 1);
 
