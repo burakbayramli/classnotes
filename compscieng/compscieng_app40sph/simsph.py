@@ -41,7 +41,6 @@ class Simulation:
         self.geo_hash_list = None
         self.i = 0
         self.r   = 0.05
-        self.cor = 0.5
         self.balls = []
         self.tm  = 0.0
         self.th  = 200.0
