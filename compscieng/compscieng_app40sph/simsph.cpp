@@ -12,8 +12,8 @@ using namespace Eigen;
 // "Particle-Based Fluid Simulation for Interactive Applications"
 // solver parameters
 const static Vector3d G(0.f, 0.f, 2.0f*-9.8f); // external (gravitational) forces
-const static float REST_DENS = 2.f; // rest density
-const static float GAS_CONST = 1.f; // const for equation of state
+const static float REST_DENS = 8.f; // rest density
+const static float GAS_CONST = 8.f; // const for equation of state
 const static float H = 0.3f; // kernel radius
 const static float DIST = 0.3f; // kernel radius
 const static float HSQ = 0.1f; // radius^2 for optimization
