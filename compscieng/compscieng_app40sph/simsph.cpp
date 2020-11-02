@@ -50,7 +50,7 @@ static vector<Particle> particles;
 void InitSPH(void)
 {
     for(float x = -1.f; x < -0.7f; x += 0.03f)	    
-	for(float y = -1.f; y < -0.7f; y += 0.03f)	
+	for(float y = 0.7f; y < 1.f; y += 0.03f)	
 	    for(float z = -1.f; z < -0.7f; z += 0.03f)	    
 		particles.push_back(Particle(x,y,z));
 }
