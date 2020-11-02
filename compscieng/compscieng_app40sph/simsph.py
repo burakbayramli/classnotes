@@ -21,10 +21,11 @@ MASS = 100.0
 VISC = 20.0
 DT = 0.1
 H = 0.1 # kernel radius
+PI = 3.14159
 HSQ = H*H # radius^2 for optimization
-POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
-SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
-VISC_LAP = 45.0/(np.pi*np.power(H, 6.));
+POLY6 = 315.0/(65.0*PI*np.power(H, 9.));
+SPIKY_GRAD = -45.0/(PI*np.power(H, 6.));
+VISC_LAP = 45.0/(PI*np.power(H, 6.));
 EPS = 0.05
 BOUND_DAMPING = -0.5
 img = True
@@ -50,9 +51,12 @@ class Simulation:
 #        for xs in np.linspace(-0.3, 0.3, 10):
 #            for ys in np.linspace(-0.3, 0.3, 10):
 #                for zs in np.linspace(0.0, 0.2, 4):
-        for xs in np.linspace(-1.0, -0.7, 10):
-            for ys in np.linspace(0.7, 1.0, 10):
-                for zs in np.linspace(-1.0, -0.8, 4):
+#        for xs in np.linspace(-1.0, -0.7, 10):
+#            for ys in np.linspace(0.7, 1.0, 10):
+#                for zs in np.linspace(-1.0, -0.8, 4):
+        for xs in np.linspace(0.0, 0.3, 10):
+            for ys in np.linspace(0.0, 0.3, 10):
+                for zs in np.linspace(0.0, 0.3, 4):
                     v = np.array([0.0, 0.0, 0.0])
                     f = np.array([0,0,0])
                     x = np.array([xs, ys, zs])
