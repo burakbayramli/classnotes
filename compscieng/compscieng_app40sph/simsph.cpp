@@ -1,4 +1,4 @@
-// g++ simsph.cpp -lX11 -lGL -lGLU -lglut -g -Wall -O2 -o islet.exe
+// g++ simsph.cpp -lX11 -lGL -lGLU -lglut -g -Wall -O2 -o /tmp/a.exe; /tmp/a.exe
 // https://github.com/cerrno/mueller-sph
 #include <GL/glut.h>
 #include <iostream>
