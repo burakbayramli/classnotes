@@ -11,14 +11,14 @@ using namespace Eigen;
 
 // "Particle-Based Fluid Simulation for Interactive Applications"
 // solver parameters
-const static Vector3d G(0.f, 0.f, 12000*-9.8f); // external (gravitational) forces
-const static float REST_DENS = 1000.f; // rest density
-const static float GAS_CONST = 2000.f; // const for equation of state
-const static float H = 16.f; // kernel radius
+const static Vector3d G(0.f, 0.f, -9.8f); // external (gravitational) forces
+const static float REST_DENS = 10.f; // rest density
+const static float GAS_CONST = 0.5f; // const for equation of state
+const static float H = 0.15f; // kernel radius
 const static float HSQ = H*H; // radius^2 for optimization
-const static float MASS = 65.f; // assume all particles have the same mass
-const static float VISC = 250.f; // viscosity constant
-const static float DT = 0.0008f; // integration timestep
+const static float MASS = 100.f; // assume all particles have the same mass
+const static float VISC = 20.f; // viscosity constant
+const static float DT = 0.01f; // integration timestep
 
 // smoothing kernels defined in Müller and their gradients
 const static float POLY6 = 315.f/(65.f*M_PI*pow(H, 9.f));
@@ -26,17 +26,18 @@ const static float SPIKY_GRAD = -45.f/(M_PI*pow(H, 6.f));
 const static float VISC_LAP = 45.f/(M_PI*pow(H, 6.f));
 
 // simulation parameters
-const static float EPS = 0.05; // boundary epsilon
+const static float R = 0.05f;
+const static float EPS = 0.05f; // boundary epsilon
 const static float BOUND_DAMPING = -0.5f;
 
 // particle data structure
 // stores position, velocity, and force for integration
 // stores density (rho) and pressure values for SPH
 struct Particle {
-    Particle(float _x, float _y, float _z) : x(_x,_y,_z),
-				   v(0.f,0.f, 0.f),
-				   f(0.f,0.f, 0.f),
-				   rho(0),
+    Particle(float _x, float _y, float _z) : x(_x, _y, _z),
+				   v(0.f, 0.f, 0.f),
+				   f(0.f, 0.f, 0.f),
+				   rho(0.f),
 				   p(0.f) {}
     Vector3d x, v, f;
     float rho, p;
@@ -45,28 +46,19 @@ struct Particle {
 // solver data
 static vector<Particle> particles;
 
-// interaction
-const static int MAX_PARTICLES = 2500;
-const static int DAM_PARTICLES = 500;
-const static int BLOCK_PARTICLES = 250;
-
-// rendering projection parameters
-const static int WINDOW_WIDTH = 800;
-const static int WINDOW_HEIGHT = 600;
 //const static double VIEW_WIDTH = 1.5*800.f;
 //const static double VIEW_HEIGHT = 1.5*600.f;
 
 void InitSPH(void)
 {
-    for(float y = 0; y < 0.2; y += 0.05)	
-	for(float x = 0; x <= 0.2; x += 0.05)	    
-	    for(float z = 0; z <= 0.2; z += 0.05)	    
+    for(float x = 0.0f; x <= 0.3f; x += 0.03f)	    
+	for(float y = 0.0f; y < 0.3f; y += 0.03f)	
+	    for(float z = 0.0f; z <= 0.3f; z += 0.025f)	    
 		particles.push_back(Particle(x,y,z));
 }
 
 void Integrate(void)
 {
-    cout << "integrating" << endl;
     for(auto &p : particles)
     {
 	// forward Euler integration
@@ -77,7 +69,7 @@ void Integrate(void)
 	if(p.x(0)-EPS < -1.0f)
         {
 	    p.v(0) *= BOUND_DAMPING;
-	    p.x(0) = EPS;
+	    p.x(0) = -1.0f;
         }
 	if(p.x(0)+EPS > 1.0f) 
         {
@@ -88,7 +80,7 @@ void Integrate(void)
 	if(p.x(1)-EPS < -1.0f)
         {
 	    p.v(1) *= BOUND_DAMPING;
-	    p.x(1) = EPS;
+	    p.x(1) = -1.0f;
         }
 	if(p.x(1)+EPS > 1.0f)
         {
@@ -99,7 +91,7 @@ void Integrate(void)
 	if(p.x(2)-EPS < -1.0f)
         {
 	    p.v(2) *= BOUND_DAMPING;
-	    p.x(2) = EPS;
+	    p.x(2) = -1.0f;
         }
 	if(p.x(2)+EPS > 1.0f)
         {
@@ -168,10 +160,6 @@ void Update(void)
 
 void InitGL(void)
 {
-//    glClearColor(0.9f,0.9f,0.9f,1);
-//    glEnable(GL_POINT_SMOOTH);
-//    glPointSize(H/2.f);
-//    glMatrixMode(GL_PROJECTION);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
@@ -190,23 +178,18 @@ void Render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
-    glRotatef(0,0.0,1.0,0.0);
+    glRotatef(200.0f,0.0,1.0,0.0);
     glRotatef(90.0,-1.0,0.0,0.0);
     glutWireCube(2.0);
-
-    glBegin(GL_POINTS);
     for(auto &p : particles){
 	glPushMatrix();
 	glTranslatef(p.x(0), p.x(1), p.x(2));
 	GLfloat mat_ambient[] ={0.0, 0.0, 1.0, 1.0};
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_ambient);
-	glutSolidSphere(0.05,50,50);
+	glutSolidSphere(R,50,50);
 	glPopMatrix();
     }
-    glPopMatrix();
-    
-    glEnd();
-
+    glPopMatrix();    
     glutSwapBuffers();
 
 }
@@ -216,8 +199,7 @@ int main(int argc, char** argv)
     InitSPH();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    //glutInitWindowSize(500,500);
-    glutInitWindowSize(WINDOW_WIDTH,WINDOW_HEIGHT);
+    glutInitWindowSize(500,500);
     glutCreateWindow("SPH");
     glutDisplayFunc(Render);
     glutIdleFunc(Update);

@@ -20,7 +20,7 @@ GAS_CONST = 0.5
 MASS = 100.0
 VISC = 20.0
 DT = 0.1
-H = 0.2 # kernel radius
+H = 0.1 # kernel radius
 HSQ = H*H # radius^2 for optimization
 POLY6 = 315.0/(65.0*np.pi*np.power(H, 9.));
 SPIKY_GRAD = -45.0/(np.pi*np.power(H, 6.));
@@ -44,10 +44,6 @@ class Simulation:
         self.balls = []
         self.tm  = 0.0
         self.th  = 200.0
-        self.mmax =  1.0-self.r
-        self.mmin = -1.0+self.r
-        self.right = False
-        self.left = False
         
     def init(self):
         i = 0
