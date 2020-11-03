@@ -1,3 +1,5 @@
+// How to compile, and other info
+// https://burakbayramli.github.io/dersblog/sk/2020/08/sph.html
 // g++ simsph.cpp -lX11 -lGL -lGLU -lglut -g -Wall -O2 -o /tmp/a.exe; /tmp/a.exe
 // https://github.com/cerrno/mueller-sph
 #include <GL/glut.h>
