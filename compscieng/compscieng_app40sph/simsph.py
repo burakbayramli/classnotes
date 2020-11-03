@@ -48,15 +48,9 @@ class Simulation:
         
     def init(self):
         i = 0
-#        for xs in np.linspace(-0.3, 0.3, 10):
-#            for ys in np.linspace(-0.3, 0.3, 10):
-#                for zs in np.linspace(0.0, 0.2, 4):
-#        for xs in np.linspace(-1.0, -0.7, 10):
-#            for ys in np.linspace(0.7, 1.0, 10):
-#                for zs in np.linspace(-1.0, -0.8, 4):
-        for xs in np.linspace(0.0, 0.3, 10):
-            for ys in np.linspace(0.0, 0.3, 10):
-                for zs in np.linspace(0.0, 0.3, 4):
+        for xs in np.linspace(-0.3, 0.3, 10):
+            for ys in np.linspace(-0.3, 0.3, 10):
+                for zs in np.linspace(0.0, 0.2, 4):
                     v = np.array([0.0, 0.0, 0.0])
                     f = np.array([0,0,0])
                     x = np.array([xs, ys, zs])
