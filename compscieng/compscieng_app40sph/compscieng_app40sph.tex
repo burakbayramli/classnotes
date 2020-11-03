@@ -40,9 +40,9 @@ $$
 ile ivmeyi buluruz, ve oradan devam ederiz.
 
 Þimdi bize gereken $\nabla p(r_i)$ ve $\nabla^2 u(r_i)$ hesaplarýný yaklaþýk
-yapabilmemizi saðlayacak bir yaklaþým kullanmak. SPH teknikleri bunu saðlýyor.
+yapabilmemizi saðlayacak bir metot kullanmak. SPH tekniði bunu saðlýyor.
 
-Bir fonksiyon $A$ aradeðerleme (interpolation), yaklaþýklama üzerinden temsil
+Bir fonksiyon $A$ aradeðerleme (interpolation) / yaklaþýklama üzerinden temsil
 edilebilir [1],
 
 $$
@@ -90,12 +90,12 @@ $$
 A(r) = \int A(r') W(r-r',h) \ud r'
 $$
 
+Yaklaþýklýk için $A_I(r)$ da diyebilirdik, ya da $\approx$
+kullanabilirdik. Þimdi,
+
 $$
  = \int \frac{A(r')}{\rho(r')} W(r-r',h) \rho(r') \ud r'
 $$
-
-Yaklaþýklýk için $A_I(r)$ da diyebilirdik, ya da $\approx$
-kullanabilirdik.
 
 $\rho(r')$'i hem bölen hem bölünene eklediðimiz için hiçbir deðiþim yaratmamýþ
 olduk, ama böylece $\rho(r') \ud r'$ ifadesi elde ettik ki ona parçacýk kütlesi
@@ -108,15 +108,15 @@ $$
 Formülde kütle kullanýmý daha faydalý çünkü kütle simülasyona baþlamadan önce
 bilinir, hatta çoðu parçacýk için birbirinin aynýsýdýr. 
 
-Ayrýca üstteki toplamýn teoride tüm parçacýklar üzerinden alýndýðý gösterildi,
-fakat pratikte $r$'ye yakýn olan diðer parçacýklar üzerinden alýnýr, çoðunlukla
+Üstteki toplamýn teoride tüm parçacýklar üzerinden alýndýðý gösterildi, fakat
+pratikte $r$'ye yakýn olan diðer parçacýklar üzerinden alýnýr, çoðunlukla
 çekirdek $2h$ gibi bir uzaklýkta zaten hýzla sýfýra düþtüðü için, ayrýca
 performans açýsýndan, çok uzaktaki parçacýklarý göz önüne almaya gerek yoktur.
 
-Üstteki formül bana herhangi bir $r$ noktasýnda hesaplayabileceðim bir $A$
-kestirme hesabý (estimation) vermiþ oldu. Parcaçýk bazlý simulasyon yaptýðýmýz
-için her $i$ parçacýðý çevresindeki $j$ parçacýklarý üzerinden bu kestirme
-hesabý yapabileceðiz.
+Bu formül bana herhangi bir $r$ noktasýnda hesaplayabileceðim bir $A$ kestirme
+hesabý (estimation) vermiþ oldu. Parcaçýk bazlý simulasyon yaptýðýmýz için her
+$i$ parçacýðý çevresindeki $j$ parçacýklarý üzerinden bu kestirme hesabý
+yapabileceðiz.
 
 Bazý hesaplar formülün basit yan ürünü, mesela yoðunluk
 
@@ -125,9 +125,12 @@ $$
 \sum_j m_j  W(r_i-r_j, h)
 $$
 
-Aradeðerlemenin bize saðladýðý güzel bir özellik onun üzerinden mesela gradyan
-alabilmem. Diyelim ki $A$ ölçümü basýnç, yani $p$. O zaman (1)'de görülen
-$-\nabla p$ formülünü üstteki entegral üzerinden açabilmem gerekir ($p$
+Yani etraftaki parçacýklarýn kütlesi üzerinden alýnan bir aðýrlýklý ortalama
+baný parçacýðýn yoðunluðunu veriyor.
+
+Aradeðerlemenin bize saðladýðý güzel bir özellik onun üzerinden mesela kolayca
+gradyan alabilmem. Diyelim ki $A$ ölçümü basýnç, yani $p$. O zaman (1)'de
+görülen $-\nabla p$ formülünü üstteki entegral üzerinden açabilmem gerekir ($p$
 ölçümünün ya da hesabýnýn nereden geldiði ileride anlatýlacak). $r$'de olan her
 $i$ parçacýðý için $p(r_i)$ diyelim,
 
@@ -268,7 +271,7 @@ ki $V = 1 / \rho$, yani birim kütleye düþen hacim, $n$ mol üzerinden kaç tane
 gaz parçacýðý olduðu, $R$ evrensel gaz sabiti, $T$ ise sýcaklýk. SPH için sývýda
 eþsýcaklýk (isothermal), ve parçacýklarýn sayýsý simulasyon sýrasýnda deðiþmez
 kabul edilir, o zaman üstteki formülün sað tarafýnda bir gaz sertlik (stiffness)
-sabiti $k$ kullanýlabilir [4, sf. 18],
+sabiti $k$ kullanýlabilir [4, sf. 18], 
 
 $$
 p V = k
@@ -296,7 +299,7 @@ düþmeye baþlayacaklar, ama normal sadece elastik çarpýþma içeren simülasyondan
 farklý olarak þimdi sývý parçacýklarý arasýnda aðdalýk var, yani birbirlerine
 yakýn durmaya meyilliler. Ayrýca basýnç var, tüm bunlarýn etkisini simüle eden
 program acaba sývýsal bir davranýþ gösterecek mi? Simülasyon animasyon / video
-olarak [10]'da bulunabilir, C++ versiyonu [11]'de.
+olarak [10]'da bulunabilir, C++ versiyonu [11]'de, derleme bilgileri [12].
 
 \inputminted[fontsize=\footnotesize]{python}{simsph.py}
 
@@ -334,6 +337,10 @@ Kaynaklar
 
 [11] Bayramli, {\em 3D SPH C++ Versiyonu},
     \url{https://raw.githubusercontent.com/burakbayramli/classnotes/master/compscieng/compscieng_app40sph/simsph.cpp}
+
+[12] Bayramli, {\em SPH Pürüzleþtirilmiþ Parcaçýk Hidrodinamiði (Smoothed Particle Hydrodynamics -SPH-)
+     \url{https://burakbayramli.github.io/dersblog/sk/2020/08/sph.html}
+
     
 \end{document}
 
