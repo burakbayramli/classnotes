@@ -3,6 +3,8 @@
 
 ## En Son
 
+4/11 - [C++ Dili](2020/11/cpp.md)
+
 30/10 - [SPH Teorisi, Simulasyon](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app40sph/puruzlestirilmis_parcacik_hidrodinamigi__smoothed_particle_hydrodynamics_sph_.html)
 
 29/10 - [Dosya İşlemleri, Unix, Python](2020/10/python-unix-dosya-islemleri.md)

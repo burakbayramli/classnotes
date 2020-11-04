@@ -2,7 +2,7 @@
 
 Python dilini Türkçe öğrenmek için bir kaynak alttadır.
 
-[Baglanti](https://belgeler.yazbel.com/python-istihza.pdf)
+[Baglanti](https://drive.google.com/uc?export=view&id=1uyPlvdEVlqrzM6eQwGKh7WmkHFqT1ku_)
 
 Python öğreten bazı video dersleri
 
