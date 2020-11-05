@@ -235,9 +235,3 @@ bırakalım.
 Referans
 
 Nesnesel Tasarim, Kurumsal Java Kitabindan, [PDF](https://github.com/burakbayramli/classnotes/raw/master/sk/2000/10/oo-kj.pdf)
-
-
-
-
-
-

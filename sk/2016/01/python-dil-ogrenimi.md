@@ -47,6 +47,8 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Closure](../../2009/05/closure.md)
 
+[String Birlestirmek](../../2011/03/string-birlestirmek.md)
+
 [Tarih Zaman İçin datetime](../../2016/06/datetime.md)
 
 [Objeleri Yazıp Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)

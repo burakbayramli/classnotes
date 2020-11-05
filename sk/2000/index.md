@@ -50,8 +50,6 @@
 
 [Yeniden Düzenleme (Refactoring)](10/yeniden-duzenleme-refactoring.md)
 
-[Veri Madenciliği](11/veri-madenciligi.md)
-
 [XP İşletimi](11/xp-isletimi.md)
 
 [XP Planlaması](11/xp-planlamas.md)

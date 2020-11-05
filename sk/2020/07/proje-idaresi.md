@@ -24,6 +24,8 @@
 
 [XP ve İdeal Gün](../../2000/11/xp-ve-ideal-gun.md)
 
+[XP ve Özellikler](../../2000/11/xp-ve-ozellikler.md)
+
 [Yazılım Şirket Çeşitleri](../../2000/11/yazlm-sirket-cesitleri.md)
 
 [XP Planlaması](../../2000/11/xp-planlamas.md)

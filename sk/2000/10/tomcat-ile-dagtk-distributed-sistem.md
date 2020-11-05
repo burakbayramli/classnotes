@@ -124,35 +124,50 @@ için şunları yapmamız gerekiyor.
 mod_jk'nin kurulmuş olduğunu farzedelim, ayartanım için
 apache2/conf/workers2.properties dosyasına şunları yazmamız gerekecek.
 # Birinci Tomcat sunucusu için TCP soket iletişimini
-tanimla[channel.socket:tomcat_makinasi_1:8009]info=Ajp13 forwarding
-over to TCP sockettomcatId=tomcat1debug=0lb_factor=1# İkinci Tomcat
-sunucusu için TCP soket iletişimini
-tanimla[channel.socket:tomcat_makinasi_2:8009]info=Ajp13 forwarding
-over to TCP sockettomcatId=tomcat2debug=0lb_factor=1[status:]info=Islem bilgisini
-gösterir[uri:/jkstatus/*]info=Durum bilgisini gosterir, ve ayartanim
-degisiklikleri kontrol edergroup=status:# examples/ olarak bilinen
-paketten cikan Tomcat orneklerini# uri uzayinda
-tanimla[uri:/examples/*]info=Butun examples orneklerini
-tanimladebug=0# Paylasilan bellek dosya degerini (shared memory file)
-tanimlafile=/usr/local/apache2/logs/shm.filedebug=0 Lb_factor değeri
-hangi sunucu için daha büyükse, o sunucu, dönüşümlü sıra verilme
-esnasında daha çok tercih edilir. Kapasite açısından daha güçsüz
-bilgisayarların lb_factor'unu idareciler daha aşağı çekebilirler.  Her
-Tomcat sunucu için, $CATALINA_HOME/conf/server.xml dosyasındaki
-jvmRoute değerinin, Apaçe makinasındaki workers2.properties
-dosyasındaki Tomcat değeri ile aynı olması gerekiyor. İkinci Tomcat
-makinası için örnek: ..<Engine name="Standalone"
-defaultHost="localhost" debug="0" jvmRoute="tomcat2">..
-.. gibi. Ayrıca her tomcat kimliğinden sadece bir tane olmalı. Devam
+tanimla
+
+[channel.socket:tomcat_makinasi_1:8009]
+info=Ajp13 forwarding over to TCP socket
+tomcatId=tomcat1
+debug=0lb_factor=1# İkinci Tomcat sunucusu için TCP soket iletişimini tanimla
+
+[channel.socket:tomcat_makinasi_2:8009]
+info=Ajp13 forwarding over to TCP sockettomcatId=tomcat2
+debug=0lb_factor=1
+[status:]info=Islem bilgisini gösterir
+[uri:/jkstatus/*]
+
+info=Durum bilgisini gosterir, ve ayartanim degisiklikleri kontrol
+edergroup=status:# examples/ olarak bilinen paketten cikan Tomcat
+orneklerini# uri uzayinda tanimla[uri:/examples/*]info=Butun examples
+orneklerini tanimladebug=0# Paylasilan bellek dosya degerini (shared
+memory file) tanimlafile=/usr/local/apache2/logs/shm.filedebug=0
+Lb_factor değeri hangi sunucu için daha büyükse, o sunucu, dönüşümlü
+sıra verilme esnasında daha çok tercih edilir. Kapasite açısından daha
+güçsüz bilgisayarların lb_factor'unu idareciler daha aşağı
+çekebilirler.  Her Tomcat sunucu için, $CATALINA_HOME/conf/server.xml
+dosyasındaki jvmRoute değerinin, Apaçe makinasındaki
+workers2.properties dosyasındaki Tomcat değeri ile aynı olması
+gerekiyor. İkinci Tomcat makinası için örnek: ..
+
+```
+<Engine name="Standalone" defaultHost="localhost" debug="0" jvmRoute="tomcat2">
+```
+
+gibi. Ayrıca her tomcat kimliğinden sadece bir tane olmalı. Devam
 edelim, şimdi Tomcat sunucusu ayarını tamamlamak için, Tomcat makinası
-server.xml üzerinde <Connector
-classname="org.apache.coyote.tomcat4.CoyoteConnector" port="8009"
-minProcessors="5" maxProcessors="75" enableLookups="true"
+server.xml üzerinde
+
+```
+<Connector classname="org.apache.coyote.tomcat4.CoyoteConnector"
+port="8009" minProcessors="5" maxProcessors="75" enableLookups="true"
 redirectPort="8443" acceptCount-"10" debug="0" connectionTimeout="0"
 useURIValicationHack="false"
 protocolHandlerClassname="org.apache.jk.server.server.JkCoyoteHandler"/>
-.. tanımını yapmamız yeterli olacak.  En Son - Güvenilirlik Bir
-gerekli kavram daha kaldı. Tomcat katmanı içinde Oturumun Kopyalayarak
+```
+
+tanımını yapmamız yeterli olacak.  En Son - Güvenilirlik Bir gerekli
+kavram daha kaldı. Tomcat katmanı içinde Oturumun Kopyalayarak
 Çoğaltılması (Session Replication).  Genel olarak ne zaman ki, bir iş
 türünü yüklenmiş olan "tek bir makina" görüyor isek, bu makina,
 sistemimizin geneli için bir risk noktası ihtiva eder. Bütün kritik
@@ -168,11 +183,17 @@ Oturum kopyalamak derken, JSP/Servlet standartına göre programcı için
 her sayfada ve Servlet içinde hazır tutulan HttpSession nesnesinin
 üzerindeki bilgilerin kopyalanmasından bahsediyoruz. Aşağıda oturum
 nesnesinin kullanım örneğini görebiliriz (istek.getSession()
-kullanarak oturuma erişiliyor).  ...// herhangi bir Servlet...public
-void doGet(HttpServletRequest istek, HttpServletResponse cevap) { //
-bir ornek kullanim istek.getSession().setAttribute("degisken1", new
-FilancaNesne()); ...  ...  // bir ornek kullanim daha Nesne123 n =
-(Nesne123)istek.getSession().getAttribute("degisken2"); ...  ...}...
+kullanarak oturuma erişiliyor).  ...
+
+```
+// herhangi bir Servlet...
+public void doGet(HttpServletRequest istek, HttpServletResponse cevap) {
+// bir ornek kullanim
+istek.getSession().setAttribute("degisken1", new FilancaNesne()); ...  ...
+// bir ornek kullanim daha
+Nesne123 n = (Nesne123)istek.getSession().getAttribute("degisken2");
+}
+```
 
 HttpSession (Oturum) nesnesinin kullanıcı bir siteyi terketmedikçe
 hazır halde tutulduğunu daha önce işlemiştik. HttpSession hafızada
@@ -195,8 +216,6 @@ bu mimariyi denemek için, çok Tomcat'li bir ortamda, ziyaret ettiğiniz
 ve yapıştığınız Tomcat sunucusunu bilerek durdurun, ve bakmakta
 olduğunuz sayfaya yenileyin. Oturum değerlerinin kaybolmadığını
 göreceksiniz.  Serbest yazılım ile bol ölçekli günler sizin olsun.
-
-
 
 
 ![](distributed.jpg)
