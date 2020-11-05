@@ -18,8 +18,6 @@
 
 [Vagrant](04/vagrant.md)
 
-[Algorithmic Trading Kitabi, Python](09/algorithmic-trading-kitabi-python.md)
-
 [ffmpeg, moviepy](10/ffmpeg-avconv-moviepy.md)
 
 [Histogram Numaraları](10/histogram-numaralari.md)
