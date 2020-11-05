@@ -45,6 +45,8 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [izip](../../2010/06/izip.md)
 
+[Closure](../../2009/05/closure.md)
+
 [Tarih Zaman İçin datetime](../../2016/06/datetime.md)
 
 [Objeleri Yazıp Okumak - Pickle, zlib](../../2010/10/objeleri-yazip-okumak-pickle.md)

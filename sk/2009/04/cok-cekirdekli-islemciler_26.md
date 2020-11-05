@@ -1,6 +1,6 @@
 # Çok Çekirdekli İşlemciler
 
-Mahout sitesinde bir makalenin islemciler ile alakali bolumunde guzel
+Mahout sitesinde bir makalenin işlemciler ile alakalı bölümünde güzel
 bir saptama:
 
 "Mikroişlemcilerde frekans bazlı ölçekleme yapmak, yani işlemcinin

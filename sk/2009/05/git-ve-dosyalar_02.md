@@ -1,37 +1,39 @@
 # Git ve Dosyalar
 
-Git sistemi icinde dosyalar nasil idare ediliyor? Git'in onemli
-avantajlarindan bir tanesi dosyalari kontrol edisinde; oncelikle her
-commit edisinizde o commit noktasi tekil bir hash kimligi ediniyor; bu
-oldukca uzun bir kimlik ve git log komutundan alinabiliyor. Sonra
-herhangi bir anda git checkout HASH ile o commit noktasina
-gidebiliyorsunuz (eger son eklerinize geri donmek istiyorsaniz onlari
-da commit etmeyi unutmayin, ki sonra git checkout master ile geri
-donebilesiniz).Bir commit noktasina gidince ne oluyor?Git, idare
-ettigi dizin altindaki dosyalari tamamen degistirerek o commit
-anindaki hallerine donusturuyor. Bu, mesela, ClearCase sisteminden
-farkli. O sistemde, aslinda ici normalde bos olan bir dizinde "set
-view" gibi bir komutu isletince "network uzerinden" dizinin ici
-birdenbire doluyordu, daha dogrusu network uzerinden baska bir
-makinadaki bir icerige "isaret etmeye" basliyordunuz. Git gunluk
-isleriniz icin network'ten bagimsiz olmayi amacladigi icin bu yolu
-takip etmiyor. Checkout komutu sonrasi gercek, fiziki dosyalarinizi
-degistiriyor.Nokta git (.git) dizini icinde bunu yapmasi icin gerekli
-tum bilgiye sahip. O dizin bir nevi sIkIstirilmis bir database
-gorevini gormekte. Isterseniz butun dosyalarinizi silin; nokta git
-dizini icindeki veriler ile iceriginizi sifirdan tekrar
-yaratabilirsiniz.Git bu baglamda CVS, Subversion sistemlerinden de
-farklidir; CVS'te bir branch yaratip onun icerigine bakmak ayri bir
-dizin gerektirir. Git, branch'ler arasinda gidip gelmeyi hep ayni
-dizin icinde halleder. Dosya iceriginizi pat diye degistirir. Peki
-commit noktalari, branch arasinda gidip gelmek performansi etkileyen
-bir faktor olmaz mi?Cogunlukla olmaz; cunku commit noktalari arasinda
-degisik olan genellikle birkac dosyadir, ve Git sadece bu dosyalari
-degistirmekle ugrastigi icin fazla performans bedeli odemez. Aslinda
-bir branch icin koca bir yeni dizin yapisi yaratmak daha
-pahalidir. Clearcase orneginde ise network uzerinden zaten bir bedel
-odenmekteydi, ve her an network'e bagli olma zorunlulugu ortaya
-ciktigi icin isin aksama olasiligi vardi.
+Git sistemi içinde dosyalar nasıl idare ediliyor? Git'in önemli
+avantajlarından bir tanesi dosyaları kontrol edişinde; öncelikle her
+commit edişinizde o commit noktası tekil bir hash kimliği ediniyor; bu
+oldukca uzun bir kimlik ve git log komutundan alınabiliyor. Sonra
+herhangi bir anda git checkout HASH ile o commit noktasına
+gidebiliyorsunuz (eğer son eklerinize geri dönmek istiyorsanız onları
+da commit etmeyi unutmayın, ki sonra git checkout master ile geri
+dönebilesiniz).Bir commit noktasına gidince ne oluyor?Git, idare
+ettiği dizin altındaki dosyaları tamamen değiştirerek o commit
+anındaki hallerine dönüştürüyor. Bu, mesela, ClearÇase sisteminden
+farklı. O sistemde, aslında içi normalde boş olan bir dizinde "set
+view" gibi bir komutu işletince "network üzerinden" dizinin içi
+birdenbire doluyordu, daha doğrusu network üzerinden başka bir
+makinadaki bir içeriğe "ısaret etmeye" başlıyordunuz. Git günlük
+işleriniz için network'ten bağımsız olmayı amaçladığı için bu yolu
+takip etmiyor.
+
+Checkout komutu sonrası gerçek, fiziki dosyalarınızı
+değiştiriyor.Nokta git (.git) dizini içinde bunu yapması için gerekli
+tüm bilgiye sahip. O dizin bir nevi sIkİştirilmiş bir database
+görevini görmekte. İsterseniz bütün dosyalarınızı silin; nokta git
+dizini içindeki veriler ile içeriğinizi sıfırdan tekrar
+yaratabilirsiniz.Git bu bağlamda CVS, Sübversion sistemlerinden de
+farklıdır; CVS'te bir branch yaratıp onun içeriğine bakmak ayrı bir
+dizin gerektirir. Git, branch'ler arasında gidip gelmeyi hep aynı
+dizin içinde halleder. Dosya içeriğinizi pat diye değiştirir. Peki
+commit noktaları, branch arasında gidip gelmek performansı etkileyen
+bir faktör olmaz mı?Çoğunlukla olmaz; çünkü commit noktaları arasında
+değişik olan genellikle birkaç dosyadır, ve Git sadece bu dosyaları
+değiştirmekle uğraştığı için fazla performans bedeli ödemez. Aslında
+bir branch için koca bir yeni dizin yapısı yaratmak daha
+pahalıdır. Clearçase örneğinde ise network üzerinden zaten bir bedel
+ödenmekteydi, ve her an network'e bağlı olma zorunluluğu ortaya
+çıktığı için işin akşama olasılığı vardı.
 
 
 

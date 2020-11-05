@@ -42,23 +42,15 @@
 
 [Oracle, Pandas, HDF5](07/oracle-pandas-hdf5.md)
 
-[Veriyi Ayriksallastirmak (Discretization)](07/veriyi-ayriksallastirmak-discretization.md)
-
 [MrJob](08/mrjob.md)
 
 [Bir Veri Akış Dili: Pig](09/bir-veri-aks-dili-pig.md)
-
-[MariaDB](09/mariadb.md)
 
 [MySQL Kurulus](09/mysql-kurulus.md)
 
 [MySQLdb, Pandas](09/mysqldb.md)
 
 [Python ile SQL Tabandan CSV Uretmek](09/python-ile-sql-tabandan-csv-uretmek.md)
-
-[Rasgele Izdusumu (Random Projection) ile SVD](09/rasgele-izdusumu-random-projection-ile.md)
-
-[Storm, Python, Gercek Zamanda Veri Islemek](09/storm-python-gercek-zamanda-veri-islemek.md)
 
 [Yerel Ağ (Network) Kurmak - Ubuntu](09/yerel-ag-kurmak-ubuntu.md)
 

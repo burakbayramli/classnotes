@@ -4,15 +4,7 @@
 
 [Amazon EC2 ile Barindirma](02/amazon-ec2-ile-barindirma_15.md)
 
-[Cozunurluluk Ayari](02/cozunurluluk-ayari_24.md)
-
-[Arama Mimarisi](03/arama-mimarisi_29.md)
-
-[FriendFeed ve MySQL](03/friendfeed-ve-mysql_03.md)
-
 [Git](03/git_18.md)
-
-[Mysql Proxy](03/mysql-proxy_20.md)
 
 [Proje Voldemort - II](03/proje-voldemort-ii_25.md)
 
@@ -22,21 +14,13 @@
 
 [Git ile Baslangic](04/git-ile-baslangic_21.md)
 
-[Google AppEngine ve Java](04/google-appengine-ve-java_29.md)
-
-[Hadoop](04/hadoop_11.md)
-
-[Kimlik Uzerinden Db Yuk Dagilimi](04/kimlik-uzerinden-db-yuk-dagilimi_22.md)
-
-[Matplotlib](04/matplotlib_28.md)
-
 [Oracle Gunesi Gorunce](04/oracle-gunesi-gorunce_21.md)
 
 [Pymacs](04/pymacs.md)
 
 [Stallman ve Tasarim](04/stallman-ve-tasarim_20.md)
 
-[Closure](05/closure_30.md)
+[Closure](05/closure.md)
 
 [Git ve Dosyalar](05/git-ve-dosyalar_02.md)
 

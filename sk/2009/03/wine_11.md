@@ -1,21 +1,21 @@
 # Wine
 
-Ubuntu uzerinde Windows emulasyonu yapan Wine gayet guzel isliyor;
-Simdiye kadar hic bir Windows programimi isletmemezlik etmedi. Zaten
-cok fazla "Windows'a ozel" programim kalmamisti, tek tuk olanlarin
-hepsi Wine ile isler halde.Hangi programlar bunlar? Bir tanesi favori
-SQL onyuzu programim SQLyog. Ne kadar aradiysam da bir turlu bu
-programin yanina yaklasan bir Linux varyantini bulamadim. Diger
-program ise Unreal Tournament. Evet! O koca, diskten haldir huldur
-kurulan, bir suru grafik iceren Birinci Sahis Ates Etme
-oyunlarindan. Bu programa ihtiyacim var cunku yazdigim robot simulator
-Ardabot UT'ye baglanarak calisiyor. Unreal Tournament Ardabot'un
-"Matrix'i" oluyor. Iceri girip etrafta geziniyor bizim ufaklik. Neyse;
-Wine UT'yi bile kurabildi, yanliz grafik arabirimini degistirerek
-grafik kartindan "software" secimini yapmaniz lazim. Grafik icin
-yazilim kullanmak demek, video kartinin yaptigi bazi isleri yazilimin
-ustlenmesi demektir. Eger hizli bir islemciniz var ise, bu degisiklik
-problem olmayacaktir.
+Ubuntu üzerinde Windows emülasyonu yapan Wine gayet güzel işliyor;
+Şimdiye kadar hiç bir Windows programımı işletmemezlik etmedi. Zaten
+çok fazla "Windows'a özel" programım kalmamıştı, tek tük olanların
+hepsi Wine ile işler halde.Hangi programlar bunlar? Bir tanesi favori
+SQL önyüzü programım SQLyog. Ne kadar aradıysam da bir türlü bu
+programın yanina yaklaşan bir Linux varyantını bulamadım. Diğer
+program ise Unreal Tournament. Evet! O koca, diskten haldir huldür
+kurulan, bir sürü grafik içeren Birinci Şahıs Ateş Etme
+oyunlarından. Bu programa ihtiyacım var çünkü yazdığım robot simülatör
+Ardabot UT'ye bağlanarak çalışıyor. Unreal Tournament Ardabot'un
+"Matrix'i" oluyor. İçeri girip etrafta geziniyor bizim ufaklık. Neyse;
+Wine UT'yi bile kurabildi, yanlız grafik arabirimini değiştirerek
+grafik kartından "software" seçimini yapmanız lazım. Grafik için
+yazılım kullanmak demek, video kartının yaptığı bazı işleri yazılımın
+üstlenmesi demektir. Eğer hızlı bir işlemciniz var ise, bu değişiklik
+problem olmayacaktır.
 
 
 
