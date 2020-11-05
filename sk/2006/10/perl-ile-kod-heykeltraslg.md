@@ -21,18 +21,22 @@ Bu projede, kalıcılık (persistence) eşlemede kullandıgımız XML
 dosyaları içinde, seri no (sequence) üreten SQL ibaresi, DB2 üzerinde
 çalışmamıştı... Eskiden kullanılan ...
 
+```
 <sql-text>select max(foo.col) from (select max(id)+1 as col
 from TABLOISMI union select 1 as col) as foo
 </sql-text>
-
+```
 
 şu halde değişecekti.  ...
 
+```
 <sql-text>select (nextval for s_TABLOISMI from sysibm.sysdummy1 </sql-text>...
+```
 
 Bu değişimi elle yapmak çok vaktimizi alacaktı. O yüzden şu Perl
 kodunu yazdık.
 
+```
 chdir ("/test/dizin/conf");
 foreach $file(<*.xml>) {
   print ".. " . $file . "\n";
@@ -49,6 +53,7 @@ close OUT;
 close IN;}
 print
 "Tamam. Dosyalar Degistirildi.";
+```
 
 Satır Satır Açıklama
 

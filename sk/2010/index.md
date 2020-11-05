@@ -4,8 +4,6 @@
 
 [Cok Fazla Meta Data](02/cok-fazla-meta-data.md)
 
-[3d Nokta Ilerletmek (translation)](03/3d-nokta-ilerletmek-translation.md)
-
 [Android ve Liste Secimi (Dropdown List)](03/android-ve-liste-secimi-dropdown-list.md)
 
 [Bekleme Isareti (ProgressDialog)](03/bekleme-isareti-progressdialog.md)
@@ -13,8 +11,6 @@
 [GAE Tabanina Veri Yuklemek](03/gae-tabanina-veri-yuklemek.md)
 
 [Google App Engine](03/google-app-engine.md)
-
-[Mysql Veri Ihraci (Export)](03/mysql-veri-ihraci-export.md)
 
 [Obje Yansitmak](03/obje-yansitmak.md)
 
@@ -35,8 +31,6 @@
 [Şirketlerin 'Bulut'una Karşı Diaspora](05/sirketlerin-bulutuna-karsi-diaspora.md)
 
 [Bogazici, Fen Bolumu, Tez, Latex](06/bogazici-fen-bolumu-tez-latex.md)
-
-[Cok Boyutlu Gaussian'dan Orneklemek](06/cok-boyutlu-gaussiandan-orneklemek.md)
 
 [Cok Cekirdekli Islemciler, Python](06/cok-cekirdekli-islemciler-python.md)
 
@@ -78,8 +72,6 @@
 
 [Scikits Statsmodels](09/scikits-statsmodels.md)
 
-[Deprem Verisi ve Python (Earthquake Data)](10/deprem-verisi-ve-python-earthquake-data.md)
-
 [Dizin Karsilastirmak, Uyan Elementleri Bulmak](10/dizin-karsilastirmak-uyan-elementleri.md)
 
 [Iki Listeyi Her Turlu Eslesmeye Gore Gezmek](10/iki-listeyi-her-turlu-eslesmeye-gore.md)
@@ -98,19 +90,9 @@
 
 [Ubuntu Server ve Matplotlib](11/ubuntu-server-ve-matplotlib.md)
 
-[2 Boyutlu 2 Gaussian Karisimi, 3D](12/2-boyutlu-2-gaussian-karisimi-3d.md)
-
-[3 Boyutlu Normal Dagilim, 3D](12/3d-normal-dagilim.md)
-
-[Bilinen Varyasyonlar ve EM Algoritmasi](12/bilinen-varyasyonlar-ve-em-algoritmasi.md)
-
 [DJVU Numaralari](12/djvu-numaralari.md)
-
-[Fourier Serileri, Transformu ve DFT](12/fourier-transformu-ve-dft.md)
 
 [Google Earth 6](12/google-earth-6.md)
 
 [Scan Etmek icin Script](12/scan-etmek-icin-script.md)
-
-[Sınırlı Elementler Metodu (Finite Elements Method)](12/snrl-elementler-metodu-finite-elements.md)
 

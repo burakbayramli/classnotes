@@ -1,21 +1,17 @@
 # Otomatik Seçim Kutusu Üretmek, Seçmek ve İşlemek
 
+JSP/Struts bazlı projelerde bazı sayfalarda dinamik olarak seçim
+kutusu (checkbox) üretmek gerekiyor. Veri tabanında kayıtlı olan
+müşterileri bir ekranda gösterip, seçim kutusu ile seçilen isimleri
+veri tabanından silmek gibi bir özellik için bu lazım olabilir. Bu
+seçim kutularına programatik olarak isim1, isim2, vs... gibi tekil
+no'lar da atanması gerekecektir. Kullanıcı tarafından seçim yapılıp
+sayfa form olarak servis'e gönderildiğinde, arka planda id'leri
+tanımak için, şöyle bir kod kullanmak gerekir.
 
-Otomatik Seçim Kutusu Üretmek, Seçmek ve İşlemek
 
-
-
-
-
-
-
-JSP/Struts bazlı projelerde bazı sayfalarda dinamik olarak seçim kutusu (checkbox) üretmek gerekiyor. Veri tabanında kayıtlı olan müşterileri bir ekranda gösterip, seçim kutusu ile seçilen isimleri veri tabanından silmek gibi bir özellik için bu lazım olabilir. Bu seçim kutularına programatik olarak isim1, isim2, vs... gibi tekil no'lar da atanması gerekecektir. Kullanıcı tarafından seçim yapılıp sayfa form olarak servis'e gönderildiğinde, arka planda id'leri tanımak için, şöyle bir kod kullanmak gerekir.  
-
- 
-  
-  
-  
-  public void doGet(HttpServletRequest request,
+```
+public void doGet(HttpServletRequest request,
                 HttpServletResponse response)
 ...
 ...
@@ -29,20 +25,21 @@ for (Enumeration e = request.getParameterNames(); e.hasMoreElements() ;) {
   }
 }
 ...
-
+```
  
+Hepsini Seç Özelliği 
+    
+Bazen müşterileriniz, eğer ekranda çok fazla seçim kutusu olması
+muhtemel ise, "hepsini seç" gibi tek bir seçim kutusu ile bütün seçim
+kutularını seçmeyi isteyebilirler. Bunu yapmak için Javascript
+kullanmamamız gerekiyor. Aşağıdaki Javascript işlevi, parametre olarak
+gönderdiğiniz herhangi bir isim "ile başlayan" bütün seçim kutularını
+otomatik olarak seçebiliyor. Bu kodu, lâzım olan JSP sayfalarının
+başına koyarak, sayfanın istediğiniz yerinden rahatça
+çağırabilirsiniz.
 
- 
   
- Hepsini Seç Özelliği 
-  
-  
- Bazen müşterileriniz, eğer ekranda çok fazla seçim kutusu olması muhtemel ise, "hepsini seç" gibi tek bir seçim kutusu ile bütün seçim kutularını seçmeyi isteyebilirler. Bunu yapmak için Javascript kullanmamamız gerekiyor. Aşağıdaki Javascript işlevi, parametre olarak gönderdiğiniz herhangi bir isim "ile başlayan" bütün seçim kutularını otomatik olarak seçebiliyor. Bu kodu, lâzım olan JSP sayfalarının başına koyarak, sayfanın istediğiniz yerinden rahatça çağırabilirsiniz.   
-
- 
-  
-  
-  
+```  
 <script type="text/javascript" language="javascript">
 function check_uncheck_all(grpStr, button) {
 var form, el, e, f = 0;
@@ -56,31 +53,16 @@ if (el.type == 'checkbox' && el.name.indexOf(grpStr) != -1)
 button.value = unbuttoned ? button.value.substring(2) : 'un' + button.value;
 }
 </script>
+```
+   
+Çağırmak için...   
 
- 
-
- 
-  
-  
- Çağırmak için...   
-
- 
-  
-  
-  
-       <INPUT type=checkbox name=list value="Tumunu Sec"
+``` 
+   <INPUT type=checkbox name=list value="Tumunu Sec"
    onClick="check_uncheck_all('isim',this)">Tumunu Sec
+```
 
- 
-
- 
-  
- Kaynaklar 
-  
- 
-
-
-
+``` 
 </font></p>
 <p>
 <font face="Courier New, Courier, monospace">function check_uncheck_all(grpStr, button) {</font></p>
@@ -116,11 +98,8 @@ Isim 3
 
 Isim 4
 
-
-
-
 onClick="check_uncheck_all('isim',this)">Tumunu Sec
-
+```
 
 
 

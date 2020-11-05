@@ -1,11 +1,5 @@
 # JAGS
 
-
-JAGS
-
-
-
-
 Not: MCMC icin en iyi secenek Gelman'in Stan paketi.
 
 R dilinde MCMC hesaplari yapmak icin WinBUGS'a alternatif bir paket JAGS. Once jags, sonra rjags, sonra R2jags paketlerinin kurulmasi tavsiye edilir. jags kaynaklardan kurulur, suradan.

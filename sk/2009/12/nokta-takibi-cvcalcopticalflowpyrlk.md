@@ -1,16 +1,10 @@
 # Piksel Takibi, OpenCV, cvCalcOpticalFlowPyrLK, optflow
 
 
-
-
-Piksel Takibi, OpenCV, cvCalcOpticalFlowPyrLK, optflow
-
-
-
-
 Iki imaj arasinda, birinci imajda secilen piksellerin ikinci imajda nereye gitmis oldugu, yani piksel eslestirme problemi (image registration) genelde Lukas-Kanade adli matematiksel yontem, ve OpenCV ozelinde CalcOpticalFlowPyrLK cagrisi ile cozuluyor. Alttaki ornekte arka arkaya iki imaj gosteriliyor, ve bu imajlarin ilkinde eslestirilmesini istedigimiz 3 tane pikseli biz rasgele sectik. Bu piksel noktalari sonra bir sonraki imajda buluyoruz, ve onlari da isaretleyerek gosteriyoruz.
 import cv
 
+```
 seq = [cv.LoadImage("flow%d.png" % (i+1), 0) for i in range(2)]
 crit = (cv.CV_TERMCRIT_ITER, 100, 0.1)
 crit = (cv.CV_TERMCRIT_EPS, 0, 0.001)
@@ -37,15 +31,18 @@ cv.Resize(seq[1], b, cv.CV_INTER_NN)
 cv.ShowImage('Second', b)
 cv.WaitKey()
 cv.DestroyAllWindows()
-Alternatif bir paket optflow paketi. CImg kutuphanesi kullanilarak yazilmis, once Ubuntu uzerinde apt-get ile libboost-program-options-dev kurulmasi lazim. Sonra program indirilir, ana dizinde "cmake ." isletilir, ve make komutu verilir. Simdi bin altinda cikti gorulecek. Dizin examples altina gidin ve
+```
 
+Alternatif bir paket optflow paketi. CImg kutuphanesi kullanilarak
+yazilmis, once Ubuntu uzerinde apt-get ile
+libboost-program-options-dev kurulmasi lazim. Sonra program indirilir,
+ana dizinde "cmake ." isletilir, ve make komutu verilir. Simdi bin
+altinda cikti gorulecek. Dizin examples altina gidin ve
+
+```
 ../bin/extractmotion --image1 complex1.png --image2 complex2.png --algorithm lucaskanade --outprefix out
-
+```
 isletin.
-
-Baglanti
-
-
 
 
 ![](flow1.png)

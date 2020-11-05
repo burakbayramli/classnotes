@@ -9,9 +9,11 @@ bitince (CTRL-C, kill -9 ile durdurulunca) size java.hprof.txt adli
 bir dosya uretiliyor. Bu dosya icinde uygulamamizin kullanimi ile
 alakali bir suru istatistik mevcut.Kullanmak icin JBoss bin/run.sh
 dosyasini bin/run_with_hprof.sh diye kopyalayalim. Sonra satir #60'a
-gidip JAVA_OPTS diyen
-satiriJAVA_OPTS="-agentlib:hprof=cpu=samples,depth=7 ... "olarak diye
-degistirelim. Bu sekilde JBoss'u run_with_hprof.sh script'i ile
+gidip JAVA_OPTS diyen satiri
+
+JAVA_OPTS="-agentlib:hprof=cpu=samples,depth=7 ... "
+
+olarak degistirelim. Bu sekilde JBoss'u run_with_hprof.sh script'i ile
 baslatinca, kullanildigi anda profile edilen bir uygulamamiz
 olacak. Secenekler ne diyor? CPU kullanimina bak, sadece orneklem
 yaparak olc (her seyi olcme) ve metot cagrilari zincirini 7 seviye
@@ -23,9 +25,10 @@ daha once Selenium ve Python temelli bir aractan bahsettik. Cok basit
 yuk ihtiyaclari icin Apache ab adli arac kullanilabilir. Diyelim ki
 uygulamamiz URL uzerinden parametre kabul edebiliyor, bu durumda bu
 parametreleri /tmp/params adli bir dosyaya yazariz,
-"anahtar1=deger1&anahtar2=deger2" gibi.. Bu parametreleri ab ile
-uygulamaya gondermek icinab -kc [KAC PARALEL] -n [KAC TANE] -p
-/tmp/params -T application/x-www-form-urlencoded
+"anahtar1=deger1&anahtar2=deger2" gibi..
+
+Bu parametreleri ab ile uygulamaya gondermek icinab -kc [KAC PARALEL]
+-n [KAC TANE] -p /tmp/params -T application/x-www-form-urlencoded
 http://www.bizimsite.com/sayfa.seamUstteki komut [KAC PARALEL] tane
 sanal kullanici (thread) yaratacak, ve bu kullanicilari [KAC TANE]
 kadar en sonda verilen URL adresine saldirtacak. Bu sekilde

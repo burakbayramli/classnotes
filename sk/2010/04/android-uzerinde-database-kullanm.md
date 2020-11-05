@@ -1,24 +1,55 @@
 # Android Üzerinde Veri Tabani Kullanımı - sqllite
 
+Mobil uygulamalarımızda hafızaya sığmayacak kadar büyük, anahtar bazlı
+hızlı erişim, çetrefil sorgulama gerektiren veri depolaması için
+ilişkisel bir taban kullanmak gerekebilir. Her Android sürümüne dahil
+edilen Sqlite veri tabanı bu ihtiyacı rahatça karşılar. Sqlite ufak
+boyutlu tabanlar kategorisinde oldukça popüler bir ürün. Firefox,
+Skype, Python, Mac OS-X kullanıyorsanız, zaten Sqlite kullanıyorsunuz
+demektir [1]; bu ürünlerin hepsinin içinde Sqlite var, onu kendi iç
+veri yapılarını depolamak, ona hızla erişmek için kullanıyorlar.
 
-Android Üzerinde Veri Tabani Kullanımı - sqllite
-
-
-
-
-Mobil uygulamalarımızda hafızaya sığmayacak kadar büyük, anahtar bazlı hızlı erişim, çetrefil sorgulama gerektiren veri depolaması için ilişkisel bir taban kullanmak gerekebilir. Her Android sürümüne dahil edilen Sqlite veri tabanı bu ihtiyacı rahatça karşılar. Sqlite ufak boyutlu tabanlar kategorisinde oldukça popüler bir ürün. Firefox, Skype, Python, Mac OS-X kullanıyorsanız, zaten Sqlite kullanıyorsunuz demektir [1]; bu ürünlerin hepsinin içinde Sqlite var, onu kendi iç veri yapılarını depolamak, ona hızla erişmek için kullanıyorlar. 
-
-Başlamadan önce önemli bir nokta: Sqlite'ın Android içindeki kullanımı JDBC üzerinden değil. Bu erisim mobil ortam içinde JDBC ile yapılabilir, fakat biz bunu tavsiye etmeyeceğiz; tabana erişimin Google'ın kendi API'ı üzerinden yapılmasını tavsiye edeceğiz. Bu Google tarafından açılmış bir "yol", ve bu yolun güç kullanımı (power consumption), performans gibi konular açısından en optimal yol olması gerekiyor. Gücü, işlemci hızı sınırlı bir platformda kodlama yaptığımızı hatırlarsak, o zaman bütün çözümler buna göre şekillenmeli. Test etme bölümüne gelince ve geliştirme ortamımız içinden Android DB API çağrılarını taklit etmek gerekli olunca, bunun arka plan kodlarını JDBC ile kodlayacağız, bunlar nasıl olsa dışarıda işleyen kodlar.
+Başlamadan önce önemli bir nokta: Sqlite'ın Android içindeki kullanımı
+JDBC üzerinden değil. Bu erisim mobil ortam içinde JDBC ile
+yapılabilir, fakat biz bunu tavsiye etmeyeceğiz; tabana erişimin
+Google'ın kendi API'ı üzerinden yapılmasını tavsiye edeceğiz. Bu
+Google tarafından açılmış bir "yol", ve bu yolun güç kullanımı (power
+consumption), performans gibi konular açısından en optimal yol olması
+gerekiyor. Gücü, işlemci hızı sınırlı bir platformda kodlama
+yaptığımızı hatırlarsak, o zaman bütün çözümler buna göre
+şekillenmeli. Test etme bölümüne gelince ve geliştirme ortamımız
+içinden Android DB API çağrılarını taklit etmek gerekli olunca, bunun
+arka plan kodlarını JDBC ile kodlayacağız, bunlar nasıl olsa dışarıda
+işleyen kodlar.
 
 Dosyalar ve Erişim
 
-Android geliştirme ortamından, emulatöründen blogumuzdaki su yazıda [2] bahsetmiştik. Sqlite veri tabanı kendi dosyalarını telefon üzerindeki mevcut dosya sistemine yazıyor. Bu dosyalara emulatörü başlattıktan sonra [ANDROID_SDK]/tools altından "adb shell" komutunu vererek göz atabiliriz [3]. IDE makinamıza tek bir telefon bağlı ise (emulatör de bir telefon olarak addediliyor) o zaman "adb shell" bizi direk emulatöre götürecek. Bu ortam aynen bir Unix shell ortamıdır, dosyaları, dizin yapısı var. Sqlite dosyaları /data/data altında bulacağız; "cd /data/data/[UYGULAMAMIZIN PAKETI]/databases altında uygulamamızın veri tabanını görebiliriz. Bu tabana daha yakından göz atmak için ise telefon shell'i üzerinde "sqlite3 /data/data/.../[TABAN ISMI] komutu yeterli. Bu ikinci ortam herhangi bir SQL shell'ine benziyor. SELECT, INSERT gibi sql komutları burada işletilebiliyor. 
+Android geliştirme ortamından, emulatöründen blogumuzdaki su yazıda
+[2] bahsetmiştik. Sqlite veri tabanı kendi dosyalarını telefon
+üzerindeki mevcut dosya sistemine yazıyor. Bu dosyalara emulatörü
+başlattıktan sonra [ANDROID_SDK]/tools altından "adb shell" komutunu
+vererek göz atabiliriz [3]. IDE makinamıza tek bir telefon bağlı ise
+(emulatör de bir telefon olarak addediliyor) o zaman "adb shell" bizi
+direk emulatöre götürecek. Bu ortam aynen bir Unix shell ortamıdır,
+dosyaları, dizin yapısı var. Sqlite dosyaları /data/data altında
+bulacağız; "cd /data/data/[UYGULAMAMIZIN PAKETI]/databases altında
+uygulamamızın veri tabanını görebiliriz. Bu tabana daha yakından göz
+atmak için ise telefon shell'i üzerinde "sqlite3 /data/data/.../[TABAN
+ISMI] komutu yeterli. Bu ikinci ortam herhangi bir SQL shell'ine
+benziyor. SELECT, INSERT gibi sql komutları burada işletilebiliyor.
 
-Eğer veriyi telefondan geliştirme makınamıza çıkartmak istiyorsak, bu makina shell'i üzerinden "adb pull" komutu kullanılabilir, diğer yöne gitmek için "adb push" gerekiyor.
+Eğer veriyi telefondan geliştirme makınamıza çıkartmak istiyorsak, bu
+makina shell'i üzerinden "adb pull" komutu kullanılabilir, diğer yöne
+gitmek için "adb push" gerekiyor.
 
 Veri Tabanı Yaratmak - Genel Kullanım
 
-Bir tabanının şemasını yaratmak ve kullanmaya başlamak için yöntemlerden biri Android uygulama kodları içinde SQLiteOpenHelper class'ından miras alan bir yardımcı class yaratmak ve bu objeyi bir Activity içinden işleme sokmak. Bu noktadan sonra helper objesi bizim veri tabanına olan bağlantımızdır, bu referans üzerinden istediğimiz DB çağrılarını yapabiliriz. 
+Bir tabanının şemasını yaratmak ve kullanmaya başlamak için
+yöntemlerden biri Android uygulama kodları içinde SQLiteOpenHelper
+class'ından miras alan bir yardımcı class yaratmak ve bu objeyi bir
+Activity içinden işleme sokmak. Bu noktadan sonra helper objesi bizim
+veri tabanına olan bağlantımızdır, bu referans üzerinden istediğimiz
+DB çağrılarını yapabiliriz.
 
 public class DataSQLHelper extends SQLiteOpenHelper {
 

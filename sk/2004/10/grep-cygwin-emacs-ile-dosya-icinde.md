@@ -1,6 +1,5 @@
 # Grep + Cygwin + Emacs ile Dosya İçinde Kelime Arama
 
-
 Birçok dosya içinde, belli bir metni aramak için, Unix üzerinde   
   
 find . -name '*.java' -exec grep -n 'aranankelime' \;
@@ -44,17 +43,5 @@ Evet. Artık Emacs'i tekrar başlattıktan sonra, metinyazar programını
 terketmeden istediğiniz arama işlemini yapabilirsiniz. Ikidebir fare
 ile oraya buraya tıklamaya gerek yok! Örnek bir çıktıyı aşağıda
 görüyoruz.
-
- 
-  
-  
- 
-
-
-
-
-
-
-
 
 ![](emacs_cygwin_find.jpg)

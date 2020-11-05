@@ -1,12 +1,10 @@
 # Scikits Statsmodels
 
-
-Scikits Statsmodels
-
-
-
-
-R dilinin istatistik hesaplamalarinin Python karsiliklari Scikits Statsmodels paketinde bulunabilir. Biz bu paketin kadar genel lineer modelleme ve lojistik regresyon fonksiyonlarina baktik, sonuclar iyi; benzer R kodlarindan gelen sonuclar birbiriyle uyusuyor. Github uzerinde bu eforun kodlari bulunabilir.
+R dilinin istatistik hesaplamalarinin Python karsiliklari Scikits
+Statsmodels paketinde bulunabilir. Biz bu paketin kadar genel lineer
+modelleme ve lojistik regresyon fonksiyonlarina baktik, sonuclar iyi;
+benzer R kodlarindan gelen sonuclar birbiriyle uyusuyor. Github
+uzerinde bu eforun kodlari bulunabilir.
 
 Statsmodels sorularli icin Google Groups -- cevaplar hizli geliyor
 

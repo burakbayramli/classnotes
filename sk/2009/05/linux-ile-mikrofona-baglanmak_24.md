@@ -8,7 +8,9 @@ dosyasina aktarabiliriz, ama bu kaydi ek araclar ile islemden gecirmek
 istiyorsak (mesela ses tanima uygulamalari icin) o zaman bir Python
 scripti ile isletebiliriz.
 
+```
 import osoutput = os.popen('arecord -d 2 -f dat').read()
+```
 
 Su anda output String tipindedir ve bu String icindeki her karakter
 ses kaydinin bir parcasini tasimaktadir.print len(output)print
@@ -16,8 +18,10 @@ type(output)print output[1:10]komutlari sirasiyla bu verinin
 uzunlugunu, tipini ve ilk 10 karakteri ekrana basar. Eger dosyaya
 yazmak istiyorsak
 
+```
 outfile = open("/tmp/out.wav", "w")
 outfile.write(output)
+```
 
 Simdi aplay /tmp/out.wav komutu ile bu ses kaydinin dinlememiz
 mumkun. Degisken output icindeki veriyi Numpy, Scipy ile islemden
