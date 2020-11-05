@@ -18,7 +18,7 @@ sudo apt install build-essential
 C++, aynen ondan önceki C gibi, tanım (header) .h dosyası ve .cpp
 dosyaları üzerinden kodlanır. Tanımlara erişmek isteyenler .h
 dosyalarını `#include` ile "dahil eder". Dahil etmek için dahil edilen
-programların arandığı dizinleri `g++` bildirmek gerekir, bunun için
+programların arandığı dizinleri `g++`a bildirmek gerekir, bunun için
 `-I` kullanılır, `-I /vs/vs/dizin1` gibi.
 
 Derlerken bir cpp dosyasını derleriz, eğer içinde bir `main()` ifadesi
@@ -30,7 +30,7 @@ kütüphane (library) haline getirmek te mümkün, bu dosyalar mesela XX
 kütüphanesi için libXX.a ya da libXX.so dosyalarında olablir, onlar
 `-lXX` ile bağlantılanır.
 
-Kütüphanelerden .a kalıcı (statik) .sö dinamik kütüphaneler
+Kütüphanelerden .a kalıcı (statik) .so dinamik kütüphaneler
 içindir. Aradaki fark kalıcı kütüphane kodu işler kodun parçası haline
 gelir, işler kod dosyasının bu durumda daha büyük olduğunu
 farkedersiniz zaten, dinamik ise işleme anında bu dosya otomatik
@@ -112,7 +112,7 @@ using namespace std;
 Cat::Cat(const string & name):_name(name){}
 void Cat::speak()
 {
-    cout << "Meow! I'm " << _name << endl;
+    cout << "Miyav " << _name << endl;
 }
 ```
 
@@ -149,8 +149,9 @@ print ('')
 -rw-r--r-- 1 burak burak 4392 Nov  4 11:58 /tmp/cat.o
 ```
 
-Yani bir .o dosyasının yaratıldığını görüyoruz, `-c` sayesinde. Bazı
-ek seçenekler de kullandık, bunlar
+Bir .o dosyasının yaratıldığını görüyoruz, `-c` sayesinde.
+
+Bazı ek seçenekler de kullandık, bunlar
 
 `-Wall` tüm uyarıları (hatalardan daha zayıf, uyarı gelse bile
 derlemek, işletmek mümkün) göster.
@@ -175,22 +176,46 @@ Miyav Ali
 Hiç `-I` seçeneği gerekmedi, çünkü tüm dosyalar aynı dizinde, bu
 durumda `#include` çift tırnak içinde aynı dosya içinden dahil
 edebilir. Ama farklı dosyalar varsa `#include <..>` komutunun işlemesi
-için `-I` gerekli olur.
+için `-I` gerekli olacaktı.
 
 Bir diğer bilgi, çoğu yaygın kullanılan kütüphane Ubuntu'da `apt-get`
 ile kurulunca header dosyalarını ve kütüphane dosyalarını yaygın /
-bilinen ana dizinler altına koyar. Bu durumda o yerleri belirtmeye
-gerek yoktur çünkü `g++` bu iyi bilinen yerler altında arama yapmayı
-bilir. Fakat kütüphane ismini hala belirtmek gerekir, mesela OpenGL
-kullanıyorsak, [şu yazıda](../08/pyopengl.md) gördük, `apt-get install
-libgl1-mesa-dev ..` vs ardından `-lGL -lGLU -lglut` gibi o kurulmuş
-kütüphaneleri bağlantılamak istediğimizi özellikle belirtmek lazım.
+bilinen ana dizinler altına koyduğudur. Bu durumda o yerleri ayrıca
+derleyiciye belirtmeye gerek yoktur çünkü `g++` bu iyi bilinen yerler
+altında arama yapmayı bilir. Fakat kütüphane ismini hala belirtmek
+gerekir, mesela OpenGL kullanıyorsak, [şu yazıda](../08/pyopengl.md)
+gördük, `apt-get install libgl1-mesa-dev ..` vs ardından `-lGL -lGLU
+-lglut` gibi o kurulmuş kütüphaneleri bağlantılamak istediğimizi
+özellikle belirtmek lazım.
+
+Dosyalar [ex1.cpp](ex1.cpp), [ex2.cpp](ex2.cpp), [cat.h](cat.h), [cat.cpp](cat.cpp)
+
+
+Niye C++
+
+C++'in hızlı işlediği herkes tarafından bilinir. Ama mesela Java'ya
+yapılan optimize edici ekler ile Java C++ hızına yaklaşmadı mı?
+
+Çoğu bakımdan bu doğru fakat C++ hala bazı şeyleri yapmamıza izin
+veriyor; mesela paketten çıktığı haliyle Java'da çöp toplayıcı
+(garbage collector) açık, C++ da hiç yok. Çöp toplayıcı belli
+aralıklarla bir arka plan kodunun işleyip hafızayı temizlemesi
+anlamına geliyor, ve programcının direk tanımlamadığı bu işlem kontrol
+bağlamında rahatsız edici olabiliyor, ne zaman işliyor, ne hızda,
+vs. bu "bilinmezlik" performansta düşüş, en azından sürpriz yaratabiliyor.
+
+Diğer cevap kültürle alakalı; C'nin devamı C++ uzun yıllardır ortada,
+ve C ile beraber "performans için gidilen dil" olarak ün yaptı, hızlı
+hesap isteyen bilimciler yıllardır ona geçiş yaptı, ve bir sürü
+kütüphane, yardımcı kod bu dil etrafında şekillendi. Mesela geçende
+OpenGL konusuna baktığımızda C++'ın bu alanda hala son derece yaygın
+olduğunu gördük. Bilim simülasyonları hala direk bu dile gidiyorlar,
+Fortran'dan buraya geçiş yapılmış, öteki seçeneklere bakan yok.
 
 Kaynaklar
 
-[1] [C++ ile Programlama Ders Notlari](https://drive.google.com/uc?export=view&id=1QXYMbZkgVj6xM0ePCqL4wYKi-O3yE2l-)
+[1] [C++ ile Programlama Ders Notları](https://drive.google.com/uc?export=view&id=1QXYMbZkgVj6xM0ePCqL4wYKi-O3yE2l-)
 
 [2] https://linuxconfig.org/how-to-install-g-the-c-compiler-on-ubuntu-18-04-bionic-beaver-linux
 
 [3] https://stackoverflow.com/questions/58058/using-c-classes-in-so-libraries
-

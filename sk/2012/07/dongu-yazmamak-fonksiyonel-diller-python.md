@@ -1,41 +1,72 @@
 # Dongu Yazmamak, Fonksiyonel Diller, Python
 
+Büyük miktarda veri işlerken "for" komutunu kullanan döngülerden
+kaçınmak iyi olur. Python'un fonksiyonel formatı ve kütüphanelerin
+sağladığı hizmet zaten daha kısa / temiz sekilde listeler, numpy
+vektörleri, matrisleri üzerinde işlem yapılmasını sağlar. Ama daha
+önemlisi, bu tek çağrılık fonksiyonel kullanımların arka planda Ç ile
+işleyen kodlara direk gitmesidir. Yani hızlı işleyeceklerdir.
 
-Dongu Yazmamak, Fonksiyonel Diller, Python
+Mesela elimizde bir kelime listesi olsun, bu listenin her elemanının
+her diğer elemanına olan Levenshtein uzaklığını hesaplayıp bir matrise
+yazacağız. İlk yaklaşım hemen
 
-
-
-
-Buyuk miktarda veri islerken "for" komutunu kullanan dongulerden kacinmak iyi olur. Python'un fonksiyonel formati ve kutuphanelerin sagladigi hizmet zaten daha kisa / temiz sekilde listeler, numpy vektorleri, matrisleri uzerinde islem yapilmasini saglar. Ama daha onemlisi, bu tek cagrilik fonksiyonel kullanimlarin arka planda C ile isleyen kodlara direk gitmesidir. Yani hizli isleyeceklerdir.
-
-Mesela elimizde bir kelime listesi olsun, bu listenin her elemaninin her diger elemanina olan Levenshtein uzakligini hesaplayip bir matrise yazacagiz. Ilk yaklasim hemen
-
-
+```
 for w1 in words:
-
    for  w2 in words:
+```
 
-diye bir dongu yazar. Bu cok yavas isler cunku dongulerin kendisi Python icindedir. Daha iyisi itertools.product(words, words) ile kelimelerin tum kombinasyonunu hesaplatmaktir. Avantaj bir, itertools.product C ile kodlanmis ve hizli. Iki, geriye dondurulen bir oge gezici (iterator) ve her istek icin tek eleman uretiyor, tum hafizayi tum sonuc ile bir anda doldurmuyor.
+diye bir döngü yazar. Bu çok yavaş işler çünkü döngülerin kendisi
+Python içindedir. Daha iyisi itertools.product(words, words) ile
+kelimelerin tüm kombinasyonunu hesaplatmaktır. Avantaj bir,
+itertools.product C ile kodlanmış ve hızlı. İki, geriye döndürülen bir
+öğe gezici (iteratör) ve her istek için tek eleman üretiyor, tüm
+hafızayı tüm sonuç ile bir anda doldurmuyor.
 
-Simdi bu kombinasyon uzerinde uzaklik hesabini itertools.imap(f, ...)  ile isletiriz. f fonksiyonu
+Şimdi bu kombinasyon üzerinde uzaklık hesabını `itertools.imap(f, ...)`
+ile işletiriz. f fonksiyonu
 
+```
 f = lambda (x,y): leven.distance(x,y)
+```
 
-olarak tanimlanir, distance daha once bahsettigimiz mesafe hesabi, o da C ile isleyen bir kodda. Bakis acisindaki degisime dikkat: dongu her seyi kontrol etmiyor, imap fonksiyonu, dongu ve veriyi "eslestiriyor", birini alip otekine uyguluyor.  Bu isleyince  elimizde mesafeler var, ve oge gezici uzerinden bu hesaplar isteyene veriliyor. Peki geziciden Numpy matrisi nasil olustururuz? np.fromiter ile.
+olarak tanımlanır, distance daha önce bahsettiğimiz mesafe hesabı, o
+da C ıle işleyen bir kodda. Bakış açısındaki değişime dikkat: döngü
+her şeyi kontrol etmiyor, imap fonksiyonu, döngü ve veriyi
+"eşleştiriyor", birini alıp ötekine uyguluyor.  Bu işleyince elimizde
+mesafeler var, ve öğe gezici üzerinden bu hesaplar isteyene
+veriliyor. Peki geziciden Numpy matrisi nasıl oluştururuz? np.fromiter
+ile.
 
+```
 words = np.array(['filan', 'fisman', 'sisman', 'paspas']) 
 (dim,) = words.shape
 f = lambda (x,y): leven.distance(x,y)
 res=np.fromiter(itertools.imap(f, itertools.product(words, words)),
                 dtype=np.uint8)
 A = np.reshape(res,(dim,dim))
+```
 
-Koda tekrar bakarsak, product, imap, fromiter ve leven.distance cagrilarinin hepsi C icinde isliyor. Yani hesap oldukca hizli olacak. Genel olarak kodlama felsefesi de soyle (degismeye basladi). Python, Ruby gibi diller fonksiyonel kodlamaya izin veren, onu ozendiren diller, dongunun veri isledigi degil, fonksiyonlarin dongulere parametre olarak verildigi bir yaklasim bu. Aslina bakilirsa modularite acisindan mantikli. Donguler de cogunlukla birbirine benzeyen ve bir kere kodlayip bir daha kodlamak istemeyecegiz seyler.
+Koda tekrar bakarsak, product, imap, fromiter ve leven.distance
+çağrılarının hepsi C içinde işliyor. Yani hesap oldukca hızlı
+olacak. Genel olarak kodlama felsefesi de şöyle (değişmeye
+başladı). Python, Ruby gibi diller fonksiyonel kodlamaya izin veren,
+onu özendiren diller, döngünün veri işlediği değil, fonksiyonların
+döngülere parametre olarak verildiği bir yaklaşım bu. Aslına bakılırsa
+modülarite açısından mantıklı. Döngüler de çoğunlukla birbirine
+benzeyen ve bir kere kodlayıp bir daha kodlamak istemeyeceğiz şeyler.
 
-Ayrica performans acisindan da veri analiz kodlarini hep "C icinde tutmak" icin, ustte gordugumuz gibi, fonksiyonel tarz daha one cikiyor. 
+Ayrıca performans açısından da veri analiz kodlarını hep "Ç içinde
+tutmak" için, üstte gördüğümüz gibi, fonksiyonel tarz daha öne
+çıkıyor.
 
-Not: Gezicilere bir daha deginelim. Ustteki cagri zincirinde surekli gezicilerin dondurdugu tek eleman uzerinde islem yapiliyor, ve gezicilerin kodlari C icinde. Eger tek bir gezici, ufak veri olsaydi gezici kullanimi pek bir fark yaratmayabilirdi. Ama onbinlerce ogeli bir vektor uzerinde arka akraya bir suru islem uyguluyor olsaydik, gezici olmadigi durumda her basamakta 10,000 uyeli bir vektor daha yaratiyor olurduk. Bu hem hafiza hem CPU israfi demek olurdu. 
-
+Not: Gezicilere bir daha değinelim. Üstteki çağrı zincirinde sürekli
+gezicilerin döndürdüğü tek eleman üzerinde işlem yapılıyor, ve
+gezicilerin kodları C içinde. Eğer tek bir gezici, ufak veri olsaydı
+gezici kullanımı pek bir fark yaratmayabilirdi. Ama onbinlerce öğeli
+bir vektör üzerinde arka akraya bir sürü işlem uyguluyor olsaydık,
+gezici olmadığı durumda her basamakta 10,000 üyeli bir vektör daha
+yaratıyor olurduk. Bu hem hafıza hem CPU israfı demek olurdu.
 
 
 

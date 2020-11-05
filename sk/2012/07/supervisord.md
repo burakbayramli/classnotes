@@ -1,6 +1,6 @@
 # supervisord
 
-Ünix'te süreç (process) isletimi, onların takibi için faydalı bir
+Unix'te süreç (process) isletimi, onların takibi için faydalı bir
 program, süpervisord. Bu tür programların en çok aranan
 özelliklerinden biri eğer takip ettikleri program çökmüş ise onu
 tekrar başlatabilmeleri. Çok uzun süren bir toptan işleyici (batch)
@@ -32,12 +32,12 @@ Bir ornek
 [supervisord]logfile=/tmp/supervisord.log ; (main log file;default $CWD/supervisord.log)logfile_maxbytes=50MB        ; (max main logfile bytes b4 rotation;default 50MB)logfile_backups=10           ; (num of main logfile rotation backups;default 10)loglevel=info                ; (log level;default info; others: debug,warn,trace)pidfile=/tmp/supervisord.pid ; (supervisord pidfile;default supervisord.pid)nodaemon=false[program:mytest]command=python -u /home/burak/data/scripts/test_supervisord.pyautorestart=trueuser=postgresredirect_stderr=truestdout_logfile=/tmp/test_supervisord.log
 ```
 
-Bir mytest adinda programi baslatip kontrol ettiriyoruz, log dosyasini
-tanimliyoruz, autorestart=true ile hatali sekilde surec cokerse tekrar
-baslat diyoruz, ve "hangi kullanici uzerinden" alt programin
-baslatilmasini gerektigini bile tanimlayabiliyoruz. Bu durumda
-supervisord root olarak baslatilmali tabii, yoksa istedigi diger
-kullaniciya gecis yapamaz.
+Bir mytest adında programı başlatıp kontrol ettiriyoruz, log dosyasını
+tanımlıyoruz, autorestart=true ile hatalı şekilde süreç çökerse tekrar
+başlat diyoruz, ve "hangi kullanıcı üzerinden" alt programın
+başlatılmasını gerektiğini bile tanımlayabiliyoruz. Bu durumda
+süpervisord root olarak başlatılmalı tabii, yoksa istediği diğer
+kullanıcıya geçiş yapamaz.
 
 Baslatmak icin 
 
@@ -63,6 +63,3 @@ Ekler
 
 Bizim yazdığımız [dand](https://github.com/burakbayramlı/kod/tree/master/dand) adlı
 program benzer işlevi gerçekleştiriyor.
-
-
-

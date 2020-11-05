@@ -102,19 +102,11 @@
 
 [supervisord](07/supervisord.md)
 
-[Veri Transferi Tasarimi, Pentaho, Spoon, ETL](07/veri-transferi-tasarimi-pentaho-spoo-etl.md)
-
-[Gaussian Dagilimi, Contour Plot](08/gaussian-dagilimi-contour-plot.md)
-
 [Klavye Tusunu Mouse Tiklamasi Haline Getirmek](08/klavye-tusunu-mouse-tiklamasi-haline.md)
 
 [Postgresql ve Levenhstein](08/kolon-degerleri-arasinda-harfleme.md)
 
 [Matriste Bos Degerleri Yakin Degerle Doldurmak (Interpolation)](08/matriste-bos-degerleri-yakin-degerle.md)
-
-[OpenCV 2.4](08/opencv-24.md)
-
-[OpenCV 2.4.1 Hareket Vektorleri, Kenarlar](08/opencv-241-hareket-vektorleri-kenarlar.md)
 
 [Tabanlar Arasi Buyuk Veri Transferi, pg_dump](08/tabanlar-arasi-buyuk-veri-transferi.md)
 
