@@ -10,7 +10,3 @@
 
 [Gavin King İle Mülâkat](10/gavin-king-ile-mulakat.md)
 
-[Java İle Eposta (JavaMail)](10/java-ile-eposta-javamail.md)
-
-[Java İle Nasıl Dosya Kopyalanır?](10/java-ile-nasl-dosya-kopyalanr.md)
-

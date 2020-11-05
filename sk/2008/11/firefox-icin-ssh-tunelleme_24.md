@@ -11,7 +11,9 @@ gerektirmesi. Ama sadece Internet'i guvenli gezmek istiyorsaniz, ulke
 icinde bir makina da olabilir.SSH tunelleme teknigi icin once Unix
 makinaniza baglaniyorsunuz:
 
+```
 ssh -D 8080 -f -C -q -N kullanici@makina
+```
 
 Bunu islettikten sonra komut satiri hemen geri donecek, ama
 baglantiniz arka planda yapilmis olacak. Ustte lokal makinanin 8080

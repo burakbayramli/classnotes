@@ -1,4 +1,6 @@
 # Kurumsal Java
 
-[eKitap Indir](https://www.dropbox.com/s/s5n7dzdhxbrwlh0/kurumsaljava8.pdf?dl=1)
+[eKitap Indir](https://drive.google.com/uc?export=view&id=1yh308FA6En-FzU-ehNaSm4zAqr9m-GgQ)
+
+
 
