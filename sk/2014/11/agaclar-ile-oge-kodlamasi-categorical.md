@@ -1,13 +1,6 @@
 # Agaclar Ile Oge Kodlamasi (Categorical Embedding)
 
 
-
-
-Agaclar Ile Oge Kodlamasi (Categorical Embedding)
-
-
-
-
 Ilginc bir fikir bir Facebook arastirma grubundan gelen makalede paylasilmis.
 
 Bu fikri alarak scikit-learn kutuphanesi programcilarindan biri onu kodlamis
@@ -15,8 +8,6 @@ Bu fikri alarak scikit-learn kutuphanesi programcilarindan biri onu kodlamis
 Amac ikisel siniflama (binary classification) yapmaktir. Bu alanda bilindigi gibi SVM, lojistik regresyon gibi yontemler bulunur. Ustteki fikir sudur: gradient boosted trees kullanarak egitim verisini normal oldugu gibi GB agacina teker teker verirsiniz. Bilindigi gibi GB icinde birden fazla agac vardir, ve her agac icin, her  egitim veri noktasi farkli dip noktalara gidebilir, cunku yukaridan baslayip her karar noktasinda bir saga bir sola vs. gidersiniz ve o veri noktasi icin belli (ve tek) bir noktaya varirsiniz. Her veri noktasi icin, GB icindeki her agac, ayni veri noktasina bakar ve kendi icinde bir nihai dip noktaya varir (cunku her agac farkli bir agactir).
 
 Ustteki makalede bu ozellikten istifade etmek istemisler, ve GB'nin tum agaclarinin tum  dip noktalarini bir indis (sayi) ile isaretlemisler, sonra icinde tamamen 0 olan (yani bos sayilabilir) bir  vektoru aliyorlar, ve her egitim noktasinin, her agacta dustugu dip noktaya bakiyorlar, o noktanin indisini alip bos vektorde oraya 1 degeri yaziyorlar. Bunu tum agaclar icin yapiyorlar, ve nihai olarak elimize gecen vektor o verinin GB agaclari uzerinden "kodlanmis" ve hatta kisaltilmis / ozetlenmis halidir!
-
-
 
 
 Hakikaten akillica bir fikir, cunku GB'nin dogal ozelligi olarak icindeki her agac verinin potansiyel olarak farkli bir tarafina odaklanir, yani her agac diger agaclara nazaran farkli bir sekilde ogrenim yapar. Ve farklilik iyidir! Ustteki teknik bu dogal ozelligin uzerinde bir nevi "sorf yapiyor" ve onu kullanarak bir temsili ikisel vektor yaratiyor.
@@ -27,6 +18,7 @@ Altta scikit learn'cu arkadasin kodu (temizlenmis haliyle) var. FAKAT, ilginc bi
 
 Bu kutuphaneyi ayrica tavsiye ediyoruz, cunku scikit-learn'un tum birimleri hala seyrekligi (sparsity) desteklemiyorlar. Bu islem hizinda muthis fark yaratiyor. Bazi acilardan scikit-learn hala oyuncak seviyesinde denebilir, prototipleme icin iyi fikirleri gormek icin iyi fakat nihai kod icin bazen baska paketler gerekiyor. 
 
+```
 # Requiers sklearn 0.15.2 and xgboost
 # Install from https://github.com/tqchen/xgboost
 # data from from https://archive.ics.uci.edu/ml/machine-learning-databases//adult/adult.data
@@ -136,7 +128,7 @@ print 'Tree AUC', roc_auc
  
  
 
-
+```
 
 
 

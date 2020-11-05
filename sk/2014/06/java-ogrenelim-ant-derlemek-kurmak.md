@@ -1,63 +1,37 @@
 # Java Öğrenelim, Ant, Derlemek, Kurmak
 
-
-Java Öğrenelim, Ant, Derlemek, Kurmak
-
-
-
-
-Blog'da Java'yı dil seviyesinde işlemiyoruz, bunun için çok iyi kaynaklar var, mesela Altuğ Altıntaş'ın kitabı,
-
-
-
+Blog'da Java'yı dil seviyesinde işlemiyoruz, bunun için çok iyi
+kaynaklar var, mesela Altuğ Altıntaş'ın kitabı,
 
 http://www.kitapyurdu.com/kitap/java-programlama-dili-ve-yazilim-tasarimi/53209.html
 
-
-
 İki tane bedava PDF temelli kitap, ki kuruluşu, temel dili Windows seviyesinde gösteriyorlar, 
-
-
 
 http://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf
 
-
-
 http://turhancoban.com/kitap/JAVA%20B%C4%B0LG%C4%B0SAYAR%20D%C4%B0L%C4%B0YLE%20PROGRAMLAMA.pdf
-
-
-
 
 Bizim tavsiyemiz her türlü geliştirmenin Ubuntu Linux üzerinde yapılması. Java kurmak için 
 
-
-
 sudo apt-get install openjdk-8-jre
-
-
 
 En basit derleme şekli komut satırında, bir script içinden javac kullanmak. Aynı dizinde olan bir Test.java için
 
-
-
-
+```
 export CP=/bir/dizin/lib1.jar:.
 
 javac -classpath $CP Test.java 
 
 java -classpath $CP Test
+```
 
+CP içinde nokta kullanımına dikkat, nokta Unix'te mevcut dizine işaret
+eder. /bir/dizin/lib1.jar herhangi bir dizindeki jar dosyasına
+referans için, daha fazla varsa onları iki nokta üst üste ardından
+listeye ekleriz. Test.java içinde
 
-
-
-CP içinde nokta kullanımına dikkat, nokta Unix'te mevcut dizine işaret eder. /bir/dizin/lib1.jar herhangi bir dizindeki jar dosyasına referans için, daha fazla varsa onları iki nokta üst üste ardından listeye ekleriz. Test.java içinde
-
-
-
-
+```
 import java.util.ArrayList;
-
-
 
 public class Test 
 
@@ -78,39 +52,37 @@ public class Test 
     }
 
 }
+```
 
+yeterli. İki üstteki üç satırı ayrı ayrı komut satırında ya da bir
+script içinde işletince derleme ve işletim sonuçlarını görürüz. Aynı
+dizinde bir .class dosyası da yaratılmış olmalı.
 
+Eğer paket sistemi kullanıyor olsaydık, mesela üstteki kod
+sample/src/com/vs/Test.java içinde olsaydı ve ilk satırında package
+com.vs; ibaresi olsaydı, o zaman kod bir com.vs paketinde demektir,
+derlemek ve işletmek için 
 
-
-yeterli. İki üstteki üç satırı ayrı ayrı komut satırında ya da bir script içinde işletince derleme ve işletim sonuçlarını görürüz. Aynı dizinde bir .class dosyası da yaratılmış olmalı.
-
-Eğer paket sistemi kullanıyor olsaydık, mesela üstteki kod sample/src/com/vs/Test.java içinde olsaydı ve ilk satırında package com.vs; ibaresi olsaydı, o zaman kod bir com.vs paketinde demektir, derlemek ve işletmek için 
-
-
-
-
+```
 export CP=/bir/dizin/lib1.jar:./sample/src
 
 javac -classpath $CP ./sample/src/com/vs/Test.java 
 
 java -classpath $CP com.vs.Test
+```
 
+gerekirdi. Üsttekiler çok basit derlemeler için (ama bilmek faydalı),
+daha çetrefil derlemeler için Ant var. 
 
-
-
-gerekirdi. Üsttekiler çok basit derlemeler için (ama bilmek faydalı), daha çetrefil derlemeler için Ant var. 
-
-
-
+```
 sudo apt-get install ant
+```
 
+ile kurulur. Proje dizini sample altında yine src olsun ve bir de lib
+dizini var. Üstteki proje yapısını derlemek için bir build.xml
+projenin en üst seviyesine konur ve icinde, 
 
-
-ile kurulur. Proje dizini sample altında yine src olsun ve bir de lib dizini var. Üstteki proje yapısını derlemek için bir build.xml projenin en üst seviyesine konur ve icinde, 
-
-
-
-
+```
 <project name="sample" default="dist" basedir=".">
 
   <property name="src" location="src"/>
@@ -192,13 +164,16 @@ ile kurulur. Proje dizini sample altında yine src olsun ve bir de lib dizini va
   </target>
 
 </project>
+```
 
+olabilir. Script ant komutu ile derlenir, testi işletmek için ant
+test. İşlem ardından mesela bin altında projemizin class kodları
+jar'lanmış halde olacak (böylece dışarıdan başka projeler bizim
+jar'imizi kendi projelerine dahil edebilirler). Ayrıca pek çok
+CLASSPATH ayarı Ant tarafında otomatik olarak yapıldı.
 
-
-
-olabilir. Script ant komutu ile derlenir, testi işletmek için ant test. İşlem ardından mesela bin altında projemizin class kodları jar'lanmış halde olacak (böylece dışarıdan başka projeler bizim jar'imizi kendi projelerine dahil edebilirler). Ayrıca pek çok CLASSPATH ayarı Ant tarafında otomatik olarak yapıldı.
-
-Ant, derleme, vs. ile ilgili bazı ek bilgiler bizim kitabın ek bölümünde bulunabilir. 
+Ant, derleme, vs. ile ilgili bazı ek bilgiler bizim kitabın ek
+bölümünde bulunabilir. 
 
 
 

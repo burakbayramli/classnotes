@@ -14,9 +14,11 @@ ile kurun.
 
 Kullanmak icin main.py olan dizinden,
 
+```
 nohup sudo uwsgi --processes 4 --http :8080 -s /tmp/mysock.sock \ --module main --callable app  --py-autoreload 1 \
 --logto /tmp/main.log  --pidfile /tmp/main.pid \
-> /tmp/cour.log 2> /tmp/cour.err < /dev/null & 
+> /tmp/cour.log 2> /tmp/cour.err < /dev/null &
+```
 
 Ustteki cagri birden fazla surec icinde kodunuzu isletime
 sunar. Erisim noktasi 8080 port'u uzerinden her istek baska bir surece
@@ -32,9 +34,11 @@ gerekebilir.
 
 Durdurmak icin
 
+```
 uwsgi --stop=/tmp/main.pid 
 
 uwsgitop
+```
 
 Unlu Unix top gibi sadece uwwsgi sureclerini izlemek icin bir arac yazilmis,
 

@@ -1,11 +1,5 @@
 # Felzenswalb Gruplama (Clustering) Algoritmasi
 
-
-Felzenswalb Gruplama (Clustering) Algoritmasi 
-
-
-
-
 Imaji bolumlere ayirma (segmentation) baglaminda en iyi algoritmalardan biri Felzenswalb algoritmasidir. Altta makalesi ve isleyen C++ kodu paylasilmis,
 
 http://cs.brown.edu/~pff/segment/ 
