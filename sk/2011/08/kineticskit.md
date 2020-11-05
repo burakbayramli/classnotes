@@ -1,23 +1,28 @@
 # KineticsKit
 
+VPython uzerine kurulu bir paket: KineticsKit. Bu paket kutleler ve
+yaylardan olusan sistemleri kurmayi iyice rahatlastiriyor, hatta
+kutlelerin uzerine mouse ile tiklanip hareket edilebilmelerine bile
+izin veriyor. Biz bu sistemi MIT OCW Hesapsal Bilim problemlerinden
+biri icin kullandik.
 
+Iki ucu sabitlenmis du^2/dx^2 = 1 sisteminin ayriksal cozulmesi u(x)
+icin bir parabol ortaya cikartti (sistemin matematiksel detaylari MIT
+OCW Hesapsal Bilim Ders 1 sonunda). Bu parabol zincir halindeki bir
+kutle, yay sisteminde ortadaki kutlelerin daha fazla yer degistirmesi
+anlamina geliyordu. Bunun fiziksel olarak nasil gozukebilecegini
+gormek icin alttaki simulasyonu yaptik. Resmin sol tarafi once, sag
+tarafi yercekim etkisi sonrasi.
 
-
-KineticsKit
-
-
-
-
-VPython uzerine kurulu bir paket: KineticsKit. Bu paket kutleler ve yaylardan olusan sistemleri kurmayi iyice rahatlastiriyor, hatta kutlelerin uzerine mouse ile tiklanip hareket edilebilmelerine bile izin veriyor. Biz bu sistemi MIT OCW Hesapsal Bilim problemlerinden biri icin kullandik.
-
-Iki ucu sabitlenmis du^2/dx^2 = 1 sisteminin ayriksal cozulmesi u(x) icin bir parabol ortaya cikartti (sistemin matematiksel detaylari MIT OCW Hesapsal Bilim Ders 1 sonunda). Bu parabol zincir halindeki bir kutle, yay sisteminde ortadaki kutlelerin daha fazla yer degistirmesi anlamina geliyordu. Bunun fiziksel olarak nasil gozukebilecegini gormek icin alttaki simulasyonu yaptik. Resmin sol tarafi once, sag tarafi yercekim etkisi sonrasi.
-
-KineticsKit kurmak icin baglanti: http://kineticskit.sourceforge.net. Buradan  zip indirilir, acilir ve
+KineticsKit kurmak icin baglanti:
+http://kineticskit.sourceforge.net. Buradan zip indirilir, acilir ve
 
 sudo mv  KineticsKit /usr/lib/python2.7/dist-packages/
 
-ile gereken yere kopyalanir, setup.py secenegi vermemisler, yani kurulumu elle yapmak gerekiyor. Ustteki simulasyon icin
+ile gereken yere kopyalanir, setup.py secenegi vermemisler, yani
+kurulumu elle yapmak gerekiyor. Ustteki simulasyon icin
 
+```
 from KineticsKit import *
 from visual import vector
 
@@ -70,9 +75,12 @@ loc_2 = [mass2.sphere.pos.y, mass3.sphere.pos.y,
 from itertools import izip
 for x,y in izip(loc_1, loc_2):
    print x-y
-SingleHelixSpring yay cesitlerinden bir tanesi, bir sure sonra sistemin durmasini istiyorsak surtunme eklemek gerekli, damping=0.5 bunun icin verildi. System olustururken gravity secenegi verilmezse sistem baslangic halinde kalir, tabii kullanici mouse ile kutleleri cekip cevirirse sistem buna gore kendini duzenliyor.
+```
 
-
-
+SingleHelixSpring yay cesitlerinden bir tanesi, bir sure sonra
+sistemin durmasini istiyorsak surtunme eklemek gerekli, damping=0.5
+bunun icin verildi. System olustururken gravity secenegi verilmezse
+sistem baslangic halinde kalir, tabii kullanici mouse ile kutleleri
+cekip cevirirse sistem buna gore kendini duzenliyor.
 
 ![](elastic_uniform_load.png)

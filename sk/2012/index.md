@@ -22,8 +22,6 @@
 
 [Regex ve Postgresql](03/regex-ve-postgresql.md)
 
-[Skillicorn Veri Madenciligi Kitabi](03/skillicorn-veri-madenciligi-kitabi.md)
-
 [SQL](03/sql.md)
 
 [Tarih Boyutu](03/tarih-boyutu.md)

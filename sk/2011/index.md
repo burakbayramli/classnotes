@@ -32,8 +32,6 @@
 
 [Web Sayfalarindan Gorunen Metni Kazimak (Scraping)](06/web-sayfalarindan-gorunen-metni-kazimak.md)
 
-[OCR, Data Science Toolkit](07/datascience-toolkit.md)
-
 [KineticsKit](08/kineticskit.md)
 
 [Lokal Dosya Arama - recoll](08/lokal-dosya-arama-recoll.md)
@@ -44,8 +42,6 @@
 
 [PDF Formlarin Uzerine Yazi Yazmak](09/pdf-formlari-otomatik-olarak-doldurmak.md)
 
-[EPUB -> PDF](10/epub-pdf.md)
-
 [LD_PRELOAD ile Fonksiyon Yakalamak](10/ldpreload-ile-fonksiyon-yakalamak.md)
 
 [OpenCV Imajlarinin Boyutunu Degistirmek (Resize)](10/opencv-imajlarinin-boyutunu-degistirmek.md)
@@ -53,8 +49,6 @@
 [Otonom Arabalar](10/otonom-arabalar.md)
 
 [Oyun Programini Oynayan Program - FPS Play](10/oyun-programini-oynayan-program-fps.md)
-
-[Piksel Takibi, Optik Akış (Optical Flow), Lucas Kanade](10/piksel-takibi-optik-akis-lucas-kanade.md)
 
 [Python Radyo](10/python-radyo.md)
 
@@ -67,8 +61,6 @@
 [PDF Formlari Otomatik Olarak Doldurmak](12/pdf-formlari-otomatik-olarak-doldurmak.md)
 
 [PDF Numaralari, pdftk, pdfjam](12/pdftk.md)
-
-[Polinom Bolmek](12/polinom-bolmek.md)
 
 [YouTube Video'larini Kaydetmek](12/youtube-videolarini-kaydetmek.md)
 

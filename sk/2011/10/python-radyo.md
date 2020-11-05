@@ -25,4 +25,6 @@ Bu adresi radyoya ekleyebilirim. `pyradio -a` deriz, ve kanal ismi
 (herhangi bir isim) ve üstteki adres girilirse `pyradio` ya bir dahaki
 girişte bu kanal listede gözükecektir.
 
+Belki daha da kolay bir yaklaşım `mpv` komutu pls ÜRL'e bağlanacaktır.
+
 

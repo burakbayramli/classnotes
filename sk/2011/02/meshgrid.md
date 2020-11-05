@@ -12,10 +12,12 @@ matrislerinde `X[1]` ve `Y[1]`'e baktığımızda (her iki tarafta aynı
 indisi kullandığımızda yani) kombinasyonlardan birini anında
 alabileceğiz. Örnek
 
+```
 x = np.arange(-5, 5, 0.1)
 y = np.arange(-3, 3, 0.1)
 xx, yy = np.meshgrid(x, y)
 z = np.sin(xx**2+yy**2)/(xx**2+yy**2)
+```
 
 Not: Bu kodda meşhgrid'den gelen xx ve yy üzerinde direk indis
 kullanılıyormuş gibi gözükmüyor, fakat arka planda aslında

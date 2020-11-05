@@ -42,37 +42,51 @@ sekillerinde gereksiz iki ikon var. Bunlar silmek uzerine tiklayarak
 mumkun olmadi. Suraya gore apt-get kullanmak lazim:sudo apt-get remove
 indicator-me indicator-messagesMatplotlibshow() komutu en son
 kurulumda problem cikardi. Cizim yaptirilan arka plandaki motorun
-(backend) secilmesi gerekiyor. WX iyi bir secenek, kurmak icinsudo
-apt-get install wxgtk2.8Matplotlib'in bundan haberdar olmasi icinsudo
-gedit
+(backend) secilmesi gerekiyor. WX iyi bir secenek, kurmak icin
+
+sudo apt-get install wxgtk2.8Matplotlib'in bundan haberdar olmasi icin
+
+sudo gedit
+
 /usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/matplotlibrcDosyadabackend
 : WXAggyazilmasi yeterli. Bu satir buyuk bir ihtimalle sadece Agg
-iceriyor olacakti.AnimasyonlarMasaustunde pencere acma, kapama
-hareketlerinin animasyon yapmasini durdurmak istiyorsaksudo apt-get
-install compizconfig-settings-managerSonra menuden System | Settings |
-Compbiz Settings Manager secilir ve "Effects" bolumunde Effects icin
-secim kutusu iptal edilir.Torsudo apt-get install tor tor-geoipdbsudo
+iceriyor olacakti.
+
+Animasyonlar
+
+Masaustunde pencere acma, kapama hareketlerinin animasyon yapmasini
+durdurmak istiyorsaksudo apt-get install
+compizconfig-settings-managerSonra menuden System | Settings | Compbiz
+Settings Manager secilir ve "Effects" bolumunde Effects icin secim
+kutusu iptal edilir.Torsudo apt-get install tor tor-geoipdbsudo
 apt-get install privoxyile kurulur. Privoxy ayari icin sudo gedit
 /etc/privoxy/config ile dosyayi edit edin, ve icerik
-olarakforward-socks4a / localhost:9050 .Firefox 4 uzerinde TorButton
-icin https://www.torproject.org/torbutton/Install Alpha baglantisindan
-xpi dosyasi isletilebilir. YouTube video'larini ve flash icerik
-gorebilmek icin eklenti kurulduktan sonra Firefox sol ustte Tor
-statusunu gosteren bir isaret cikacak. Bu isaret uzerinde mouse sag
-dugme click yaparak "preferences" secenegine girin. Security
-Preferences tab'inden "disable plugins during Tor usage" secenegini
-de-aktive edin.Simdi kirmizi xarpi isareti uzerine tiklayin, bu isaret
-yesile donusecek. Bu kadar. Artik istediginiz siteye
-baglanabilirsiniz.Alt-TabMasaustu uzerinde klavye kisayolu kullanarak
-programlar arasinda gecis yapmak, Ubuntu 11 olagan ayarlarinda ayvayi
-yemis. Genelde en son kullanilan ilk geri gelir kurali
-islemiyor. Duzeltmek icin Sytem | Preferences | CompizConfig Settings
-Manager uzerinde Window Management secilir ve Static Application
-Switcher yerine Application Manager secilir.Ses EfektleriEger konsol
-icine mesela gidilemeyecek durumda bile backspace yapilinca cikan bip,
-tan, tun seslerini kapatmak istiyorsak System Tools | System Settings,
-oradan Sound ve Sound Effects. Bir ses kontrol ayari var, onun yaninda
-Mute secilirse artik uyarici sesleri cikmaz.SifreEger kullanicinizin
+olarak
+
+forward-socks4a / localhost:9050 .
+
+Firefox 4 uzerinde TorButton icin
+
+https://www.torproject.org/torbutton/Install Alpha baglantisindan xpi
+
+dosyasi isletilebilir. YouTube video'larini ve flash icerik gorebilmek
+icin eklenti kurulduktan sonra Firefox sol ustte Tor statusunu
+gosteren bir isaret cikacak. Bu isaret uzerinde mouse sag dugme click
+yaparak "preferences" secenegine girin. Security Preferences tab'inden
+"disable plugins during Tor usage" secenegini de-aktive edin.Simdi
+kirmizi xarpi isareti uzerine tiklayin, bu isaret yesile donusecek. Bu
+kadar. Artik istediginiz siteye baglanabilirsiniz.Alt-TabMasaustu
+uzerinde klavye kisayolu kullanarak programlar arasinda gecis yapmak,
+Ubuntu 11 olagan ayarlarinda ayvayi yemis.
+
+Genelde en son kullanilan ilk geri gelir kurali islemiyor. Duzeltmek
+icin Sytem | Preferences | CompizConfig Settings Manager uzerinde
+Window Management secilir ve Static Application Switcher yerine
+Application Manager secilir.Ses EfektleriEger konsol icine mesela
+gidilemeyecek durumda bile backspace yapilinca cikan bip, tan, tun
+seslerini kapatmak istiyorsak System Tools | System Settings, oradan
+Sound ve Sound Effects. Bir ses kontrol ayari var, onun yaninda Mute
+secilirse artik uyarici sesleri cikmaz.SifreEger kullanicinizin
 sifresini kisa yapmak isterseniz, passwd uzerinden gireceginiz sifre
 Ubuntu tarafindan begenilmeyebilir (kisa, cetrefil olmayan sifreyi
 guvensiz buluyor). Ama illa ki kisa / basit bir sifre vermek

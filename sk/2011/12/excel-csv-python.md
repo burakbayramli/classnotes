@@ -12,6 +12,3 @@ python xlsx2csv.py dosya.xlsx dosya.csv
 
 seklinde.
 
-
-
-

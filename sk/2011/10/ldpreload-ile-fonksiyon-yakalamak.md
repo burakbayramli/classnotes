@@ -23,6 +23,7 @@ olarak /tmp altinda yazilacak.
 
 make.sh
 
+```
 # sudo apt-get install freeglut3 freeglut3-dev libglew1.5 libglew1.5-dev libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev
 g++ -o demo.exe demo.cpp -lglut -lGL -lGLU -lGLEW
 gcc -shared -fPIC -o glcapture.so glcapture.c -ldl
@@ -34,15 +35,13 @@ rm /tmp/*.tga
 rm /tmp/*.jpg
 
 LD_PRELOAD=`pwd`/glcapture.so ./demo.exe 
-
-
-
+```
 
 glcapture.c
 
 
 
-
+```
 /*
 
  * Use something like this:
@@ -174,15 +173,13 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
   return 0;
 
 }
-
+```
 
 
 demo.cpp
 
 
-
-
-
+```
 #include 
 
 #include 
@@ -1501,7 +1498,7 @@ main(int argc, char **argv)
 
 }
 
-
+```
 
 
 
