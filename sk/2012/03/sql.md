@@ -734,7 +734,9 @@ Referans
 
 [14] [MongoDB](../../2014/05/mongodb.md)
 
+[15] [SQL Nasıl Kullanılmalı](../../2001/10/sql-nasl-kullanlmal.md)
 
+[16] [SQL veri analizi nasıl hızlandırılır](../../2001/10/sql-veri-analizi-nasl-hzlandrlr.md)
 
 
 

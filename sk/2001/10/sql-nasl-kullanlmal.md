@@ -1,11 +1,73 @@
 # SQL Nasıl Kullanılmalı
 
+Küme kavramı (ilkokuldan hatırladınız mı?)  Veri tabanı programları,
+büyük miktarda veriyi işlemek için yazılmıştır. Yaptıkları bütün
+işlem, kaybedilmez türden veriyi saklamak, hızlı şekilde geri getirmek
+ve geriği olduğu zaman filterden geçirip sadece bir bölümünü
+kullanıcıya sunmaktır.  Mesela aşağıdaki komut,
 
-SQL Nasıl Kullanılmalı
+INSERT INTO MUSTERI VALUES ('Murat', 'Bilisim', 'Adres', 111);
 
+veri tabanınıza VALUES kısmından sonra gelen bölümü, MÜŞTERİ kayıtına
+yazmanızı sağlar. Elektrik kesilse de, ekranınız patlasa da, bu veri
+bir yere gitmeyecektir. (Hard dışkınız bozulmadığı sürece tabii). Eğer
+bu veriyi geri istese idiniz,
 
+SELECT * from MUSTERI WHERE ISIM = 'Murat';
 
-Kume kavrami (ilkokuldan hatirladiniz mi?)           Veri tabani programlari, buyuk miktarda veriyi islemek icin yazilmistir. Yaptiklari butun islem, kaybedilmez turden veriyi saklamak, hizli sekilde geri getirmek ve gerigi oldugu zaman filterden gecirip sadece bir bolumunu kullaniciya sunmaktir.               Mesela asagidaki komut,   INSERT INTO MUSTERI VALUES ('Murat', 'Bilisim', 'Adres', 111);   veri tabaniniza VALUES kismindan sonra gelen bolumu, MUSTERI kayitina yazmanizi saglar. Elektrik kesilse de, ekraniniz patlasa da, bu veri bir yere gitmeyecektir. (Hard diskiniz bozulmadigi surece tabii). Eger bu veriyi geri istese idiniz,   SELECT * from MUSTERI WHERE ISIM = 'Murat';   komutunu uygulardiniz.               Simdi size ilginc bir sey aciklayacagim. SQL Veri tabanlari ilkokulda ogrendiginiz kume kavrami ile calisirlar. Hani kesisen kumeler, ek kumeler, vs.. hatirlarsiniz.               Sonucta veri bulmanin en rahat yolu, veriyi bir kume gibi gormek, ve istediginiz elemanlari istenen kume icinde, otekileri disinda gormek uygun olur.               Ve en can alici yere geliyoruz. Veri tabanlari, kume teorisi ile en hizli halde calisirlar. Bundan baska yol varmi ki? diyebilirsiniz. Elbette var. SQL diline sonradan eklenen bu uzatmalar, bazen gerekli olsa bile, genelde kacinilmasi gereken kullanim bicimleri. Bu alternatif metoda 'tekerleme metodu' diyecegiz, otekine kume metodu.            Tekerleme Metodu           Elinizde 1 milyon musteri kayidinin oldugunu dusunun. Diyelim ki, bir program yazmaniz istendi, bu programa gore, her musterinin size masrafi, getirdigi parayi birbirinden cikarip, musterinin size net maliyetini bulup, ayni musteri kayidi uzerinde 'net maliyet' adli yere geri yazmaniz istendi. Bu programi iki sekilde yazabilirsiniz.     --- Tarif kod yaziyoruzBASLA;HER KAYIT ICIN   EGER MUSTERI SEHIR = 'ANKARA' ISE     KAYIDI AC;     NET_MALIYET = MASRAF - MUSTERI_KAR;     MUSTERI.NET_MASRAF = NET_MALIYET.   EGER SON;SONRAKI KAYIDA GEC;               Yukaridaki koda gore, her kayidi teker teker acip, isleyip, tekrar geri yazmaniz gerekecek. Yani her islemi, teker teker yapacaksiniz, teker teker nasil isleyecegini dusuneceksiniz demektir. Yani veri tabanina, isini 'nasil' yapacagini ogretmeye ugrasacaksiniz demektir.               Fakat veri tabanlari, buyuk veri kumeleri uzerinde calismaya alisik degiller mi? Niye nasil yapacagimizi tarif edelim? Ne istedigimizi istesek, gerisini veri tabani yapsa olmaz mi? Iste alternatif yontem:          Kume Metodu          UPDATE MUSTERI SET NET_MASRAF = MASRAF - MUSTERI_KAR WHERE SEHIR = 'ANKARA';              Vay canina, bu daha kisa oldu. Hem de sonucta daha hizli isleyecektir goreceksiniz. Bunun sebebi nedir? Cunku kume teorisini kullandik. Veri tabanlari kumeler ile calismayi severler. Biz yukarida, bir kume tanimladik, 'ne' istedigimizi soyledik, ama nasil yapilacagini soylemedik. Kumemiz, Ankara sehrinde calisan musteriler idi. Bunu yaptiktan sonra, veri tabani arkasina donup veriye bakti, en hizli erisim ve degistirme algoritmasini kendi hesapladi, ve uygun olan en hizli metodu kullanima koydu. Biz veri tabaninin onune engel koymadigimiz icin, bu metod en hizlisi oldu.               Her teknolojinin kullanilmayi sevdigi bir sekil vardir. Bu sekli bulun, boylece teknolojinin cevapladigi sorun tiplerini de bulacaksiniz. Boylece cekic gereken yerde testere kullanmazsiniz, daha tecrubeli, gereken yerde gereken malzemeyi kullanan usta muhendis haline gelirsiniz.
+komutunu uygulardınız.  Şimdi size ilginç bir şey açıklayacağım. SQL
+Veri tabanları ilkokulda öğrendiğiniz küme kavramı ile
+çalışırlar. Hani kesisen kümeler, ek kümeler, vs.. hatırlarsınız.
+Sonuçta veri bulmanın en rahat yolu, veriyi bir küme gibi görmek, ve
+istediğiniz elemanları istenen küme içinde, ötekileri dışında görmek
+uygun olur.  Ve en can alıcı yere geliyoruz. Veri tabanları, küme
+teorisi ile en hızlı halde çalışırlar. Bundan başka yol varmı ki?
+diyebilirsiniz. Elbette var. SQL diline sonradan eklenen bu uzatmalar,
+bazen gerekli olsa bile, genelde kaçınilmasi gereken kullanım
+biçimleri. Bu alternatif metoda 'tekci metod' diyeceğiz, ötekine
+küme metodu.
+
+Tekci Metot
+
+Elinizde 1 milyon müşteri kayıdının olduğunu düşünün. Diyelim ki, bir
+program yazmanız istendi, bu programa göre, her müşterinin size
+masrafı, getirdiği parayı birbirinden çıkarıp, müşterinin size net
+maliyetini bulup, aynı müşteri kayıdı üzerinde 'net maliyet' adlı yere
+geri yazmanız istendi. Bu programı iki şekilde yazabilirsiniz.  ---
+Tarif kod yazıyoruz
+
+BASLA;HER KAYIT ICIN EGER MUSTERI SEHIR = 'ANKARA'
+ISE KAYIDI AC; NET_MALIYET = MASRAF - MUSTERI_KAR; MUSTERI.NET_MASRAF
+= NET_MALIYET.  EGER SON;SONRAKI KAYIDA GEC;
+
+Yukarıdaki koda göre, her kayıdı teker teker açıp, işleyip, tekrar
+geri yazmanız gerekecek. Yani her işlemi, teker teker yapacaksınız,
+teker teker nasıl işleyeceğini düşüneceksiniz demektir. Yani veri
+tabanına, işini 'nasıl' yapacağını öğretmeye uğraşacaksınız demektir.
+Fakat veri tabanları, büyük veri kümeleri üzerinde çalışmaya alışık
+değiller mi? Niye nasıl yapacağımızı tarif edelim? Ne istediğimizi
+istesek, gerisini veri tabanı yapsa olmaz mı?
+
+Iste alternatif yontem:
+
+Kume Metodu
+
+UPDATE MUSTERI SET NET_MASRAF = MASRAF - MUSTERI_KAR WHERE
+SEHIR = 'ANKARA';
+
+Vay canına, bu daha kısa oldu. Hem de sonuçta daha hızlı işleyecektir
+göreceksiniz. Bunun sebebi nedir? Çünkü küme teorisini kullandık. Veri
+tabanları kümeler ile çalışmayı severler. Biz yukarıda, bir küme
+tanımladık, 'ne' istediğimizi söyledik, ama nasıl yapılacağını
+söylemedik. Kümemiz, Ankara şehrinde çalışan müşteriler idi. Bunu
+yaptıktan sonra, veri tabanı arkasına dönüp veriye baktı, en hızlı
+erişim ve değiştirme algoritmasini kendi hesapladı, ve uygun olan en
+hızlı metodu kullanıma koydu. Biz veri tabanının önüne engel
+koymadığımız için, bu metod en hızlısı oldu.  Her teknolojinin
+kullanılmayı sevdiği bir şekil vardır. Bu şekli bulun, böylece
+teknolojinin cevapladığı sorun tiplerini de bulacaksınız. Böylece
+çekiç gereken yerde testere kullanmazsınız, daha tecrübeli, gereken
+yerde gereken malzemeyi kullanan usta mühendis haline gelirsiniz.
 
 
 

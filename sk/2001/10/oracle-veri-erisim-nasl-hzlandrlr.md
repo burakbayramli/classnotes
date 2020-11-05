@@ -1,11 +1,46 @@
 # Oracle Veri Erişim nasıl hızlandırılır
 
+Eğer çok büyük veri tabanı üzerinde, veri işlemi yapıyorsanız, bu
+yazımız işinize yarayabilir. Genelde CRM sistemleri için veriler
+ambara alınmadan önce, bir ön-temizlikten geçirilir. Mesela eğer
+"bütün isim" hanesi, ilk isim, soyisim diye ayrılmamışsa, bir ufak
+program bu işi ambardan önce yapabilir. Fakat bu işlemi 4 milyon kayıt
+üzerinde yapıyorsanız, uzun zaman bekleyeceksiniz! Buradaki teknikler
+size yardımcı olabilir.  Oracle veri erişim, daha önce dediğimiz gibi,
+SQL kodu ile yapılır. Oracle bu dil üzerinde bazı uzatmalar yapmıştır;
+Eğer gerekirse, SQL veri erişim komutları 'aynı anda birden-fazla'
+(paralel) şekilde işletilebilir. Bu özellik için tabii ki programcı bu
+özel SQL komutlarını bir şekilde Oracle veri tabanına iletmeli.
+Genelde en çok kullanılan metod, bu paralel değişikliğini 'çizelge
+bazında' belirtmektir. Mesela MÜŞTERİ çizelgesini paralel seviye = 4
+diye tanımladıysanız, bu kayıda erisen her kod, 4 kopya halinde
+işletilir, ve bu kopyalar aynı anda işletilirler.
 
-Oracle Veri Erişim nasıl hızlandırılır
+```
+CREATE TABLE MUSTER PARALLEL DEGREE 4(HANE1 VARCHAR2(10),HANE2
+VARCHAR2(30))SELECT * from MUSTERI; --
+```
 
+işte bu erişim, 4 kopya ile, daha hızlı geri döner.  Bunun işletim
+sistemi seviyesindeki etkilerini görmek için Ünix seviyesinde ps -eaf
+komutunu işletin. Sonuçları mesela şuradaki gibi olsun.
 
+```
+oraclesi 18578 1 0 Feb 06 ?  0:01 ora_p001_ESIPROD
+oraclepi 18667 1 0 Feb 06 ?  158:59 ora_dbw0_ESIPROD
+oraclesi 18578 1 0 Feb 06 ?  0:01 ora_p002_ESIPROD
+oraclesi 18578 1 0 Feb 06 ?  0:01 ora_p003_ESIPROD
+oraclesi 18578 1 0 Feb 06 ?  0:01 ora_p004_ESIPROD
+oraclepi 18683 1 0 Feb 06 ?  9:47 ora_snp0_EPIPROD
+```
 
- Eger cok buyuk veri tabani uzerinde, veri islemi yapiyorsaniz,  bu yazimiz isinize yarayabilir. Genelde CRM sistemleri icin veriler ambara alinmadan once, bir on-temizlikten gecirilir. Mesela eger "butun isim" hanesi, ilk isim, soyisim diye ayrilmamissa, bir ufak program bu isi ambardan once yapabilir. Fakat bu islemi 4 milyon kayit uzerinde yapiyorsaniz, uzun zaman bekleyeceksiniz! Buradaki teknikler size yardimci olabilir.              Oracle veri erisim, daha once dedigimiz gibi, SQL kodu ile yapilir. Oracle bu dil uzerinde bazi uzatmalar yapmistir; Eger gerekirse, SQL veri erisim komutlari 'ayni anda birden-fazla' (paralel) sekilde isletilebilir. Bu ozellik icin tabii ki programci bu ozel SQL komutlarini bir sekilde Oracle veri tabanina iletmeli.               Genelde en cok kullanilan metod, bu paralel degisikligini 'cizelge bazinda' belirtmektir. Mesela MUSTERI cizelgesini paralel seviye = 4 diye tanimladiysaniz, bu kayida erisen her kod, 4 kopya halinde isletilir, ve bu kopyalar ayni anda isletilirler.   CREATE TABLE MUSTER PARALLEL DEGREE 4(HANE1    VARCHAR2(10),HANE2    VARCHAR2(30))SELECT * from MUSTERI; -- iste bu erisim, 4 kopya ile, daha hizli geri doner.              Bunun isletim sistemi seviyesindeki etkilerini gormek icin Unix seviyesinde  ps -eaf   komutunu isletin. Sonuclari mesela suradaki gibi olsun.  oraclesi 18578     1  0   Feb 06 ?        0:01 ora_p001_ESIPRODoraclepi 18667     1  0   Feb 06 ?       158:59 ora_dbw0_ESIPRODoraclesi 18578     1  0   Feb 06 ?        0:01 ora_p002_ESIPRODoraclesi 18578     1  0   Feb 06 ?        0:01 ora_p003_ESIPRODoraclesi 18578     1  0   Feb 06 ?        0:01 ora_p004_ESIPRODoraclepi 18683     1  0   Feb 06 ?        9:47 ora_snp0_EPIPROD              Yukaridaki listede gordugunuz gibi, parelel komutunun isletim sistemi seviyesinde etkisi oldu. Isletim sistemi 4 tane 'islem' (process) gosteriyor.               Simdi butun cizelgelerinizin paralel seviyesini ikiye katlamadan once iyi dusunun. Paralel islemin en buyuk yararlari gunluk programlar icindir. Servis programlarinin arkasinda olan veri tabanini degistirmeden once tartmak lazim; 30, 40 bin kayit isleyen kod icin, bu degisiklik bir yarar saglarmi?
+Yukarıdaki listede gördüğünüz gibi, parelel komutunun işletim sistemi
+seviyesinde etkisi oldu. İşletim sistemi 4 tane 'işlem' (process)
+gösteriyor.  Şimdi bütün çizelgelerinizin paralel seviyesini ikiye
+katlamadan önce iyi düşünün. Paralel işlemin en büyük yararları günlük
+programlar içindir. Servis programlarının arkasında olan veri tabanını
+değiştirmeden önce tartmak lazım; 30, 40 bin kayıt işleyen kod için,
+bu değişiklik bir yarar sağlarmı?
 
 
 

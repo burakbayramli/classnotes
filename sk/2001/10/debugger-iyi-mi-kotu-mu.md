@@ -24,28 +24,35 @@ program çalışmasını anında izleyerek hata bulma işlemini
 desteklemiyorum. Çekirdek içini en ince detayda görebilmemiz (debugger
 sayesinde) bence o kadar da iyi bir şey değil.  Güya, karşı
 destekçilere göre, eğer debugger yazılımı yoksa başımıza şunlar
-gelecekmiş.  * Bir hata olunca her sey çöküyor, fsck programını
-kullanıyorsunuz ve cok uzun zaman alıyor, bu da programcının moralini
-bozuyor.  * Debugger olmayınca, programcılar Linux çekirdek
-projesinden vageçiyorlar, çünkü işleri zorlaşıyor ve zaman alıyor.  *
-Yeni özellikler eklemek zaman alıyor.  Fakat bütün bunların nesi kötü?
-Bana göre, durum hata değil, istenen özellik. Hem belgelenmiş, hem de
-boyle olması iyi, o zaman duruma hata diyemeyiz.  Özellikle, "yeni
-özellik eklemek zaman alıyor" düşüncesi, debugger kullanmak için hiç
-geçerli değil. Sanki özellik azalsa, bu Linux icin (ya da bütün
-yazılım sektörü için) bir problem olacak. Tam tersi. Benim en büyük
-işlerimden biri Linux icin yazılan yeni özelliklere 'hayır' demek,
-arayıpda bulmak değil.  Oh tabii, "ama her şey çöktü ve fsck komutunu
-kullandım, ve sonuç olarak hic yardım edecek bir ipucu vermedi,
-moralim bozuldu". Ne yapayım? Bu olana iki turlu karşılık verirsin. Ya
-daha dikkatli olmaya başlarsın, ya da çekirdek debugger programı
-istiyorum diye ağlarsın.  Açıkcası, dikkatli olmayanları bu şekilde
-önceden elemek bence iyi. Bu kulağa hissiz gelebilir, ne yazık ki
-öyle. Ve hani, 'Eğer sıcağa gelemiyorsan mutfaktan çıkarsın'
-seviyesinde bile değil. Daha da derin. Yazılım dünyasinda Darwin
-Kanunu'ndan bahsediyorum.  "Dünyada iki türlü programcı var" demek cok
-soğuk ve hissiz. Ama öyle ve ben ikinci tür ile çalışmayı tercih
-ederim. Alışın.  Ben kötü bir adamım. Linux dünyasi niye bazen tersini
+gelecekmiş.
+
+* Bir hata olunca her sey çöküyor, fsck programını kullanıyorsunuz ve
+cok uzun zaman alıyor, bu da programcının moralini bozuyor.
+
+* Debugger olmayınca, programcılar Linux çekirdek projesinden
+vageçiyorlar, çünkü işleri zorlaşıyor ve zaman alıyor.
+
+* Yeni özellikler eklemek zaman alıyor.  Fakat bütün bunların nesi
+kötü?  Bana göre, durum hata değil, istenen özellik. Hem belgelenmiş,
+hem de boyle olması iyi, o zaman duruma hata diyemeyiz.
+
+Özellikle, "yeni özellik eklemek zaman alıyor" düşüncesi, debugger
+kullanmak için hiç geçerli değil. Sanki özellik azalsa, bu Linux icin
+(ya da bütün yazılım sektörü için) bir problem olacak. Tam
+tersi. Benim en büyük işlerimden biri Linux icin yazılan yeni
+özelliklere 'hayır' demek, arayıpda bulmak değil.  Oh tabii, "ama her
+şey çöktü ve fsck komutunu kullandım, ve sonuç olarak hic yardım
+edecek bir ipucu vermedi, moralim bozuldu". Ne yapayım? Bu olana iki
+turlu karşılık verirsin. Ya daha dikkatli olmaya başlarsın, ya da
+çekirdek debugger programı istiyorum diye ağlarsın.  Açıkcası,
+dikkatli olmayanları bu şekilde önceden elemek bence iyi. Bu kulağa
+hissiz gelebilir, ne yazık ki öyle. Ve hani, 'Eğer sıcağa gelemiyorsan
+mutfaktan çıkarsın' seviyesinde bile değil. Daha da derin. Yazılım
+dünyasinda Darwin Kanunu'ndan bahsediyorum.  "Dünyada iki türlü
+programcı var" demek cok soğuk ve hissiz. Ama öyle ve ben ikinci tür
+ile çalışmayı tercih ederim.
+
+Alışın.  Ben kötü bir adamım. Linux dünyasi niye bazen tersini
 düşünüyor anlamıyorum. İnsanlar beni iyi zannediyor, fakat ben, sinsi
 ve plancı bir adamım; Eğer bana göre daha güzel bir Linux ortaya
 çıkacaksa, kaybedilen ve kırılmış kalpler beni zerre kadar
@@ -57,10 +64,11 @@ görmeye sevkedecek. Debugger yoksa, "nasıl çalıştığını anlayım, sonra
 tamir etmeye baslarım" düşüncesine girmezsiniz. Daha değisik şekilde
 düşünmelisiniz. Herşeyi daha başka seviyede görmek isteyeceksiniz.
 Bir bakıma "kaynak kod, işler kod" ayırımı bu, daha bile
-fazlası... Kaynak koda bakmak değil, (tabii ki arada bakacaksınız,
-bütün en basit debugger bunu sağlardı zaten), ama kaynak kodun üst
-seviyesine bakacaksınız. Kavramların "anlamına" geleceksiniz. Yani,
-debugger olmazsa, üst seviyeye atlayıp programin genel olarak ne
+fazlası... Kaynak koda bakmak değil, (tabii ki arada bakacaksınız, bütün en basit
+debugger bunu sağlardı zaten), ama kaynak kodun üst seviyesine
+bakacaksınız. Kavramların "anlamına" geleceksiniz.
+
+Yani, debugger olmazsa, üst seviyeye atlayıp programin genel olarak ne
 yapmaya uğraştığını anlamak isteyeceksiniz, tek bir satırın ne
 yaptığını değil.  Zaten 'önemli' hataların coğunda debugger
 programlarının faydası olması çok zor. Önemsiz aptalca hatalar da var

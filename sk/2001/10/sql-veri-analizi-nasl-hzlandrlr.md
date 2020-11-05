@@ -1,11 +1,84 @@
 # SQL veri analizi nasıl hızlandırılır
 
+Veri inçlemek için SQL dilini kullanan programcılar için
+yazıyoruz. Özellikle CRM, yani veri ambarı olan programlarda, SQL
+dilini çok kullanacaksınız. Servis programlarında genelde SQL veri
+analizi 30,000 satırlık veriyi geçmez.  Veri ambarları daha çok veri
+işler, o yüzden daha değişik tekniklere ihtiyaç duyarlar.  Eğer ambar
+SQL kodunu, internet sitelerinde kullanılan SQL kodu gibi yazarsanız,
+saatlerce ekran başında beklersiniz, SQL kodu katiyen işini bitirip
+geri gelmez.  Bu yüzden, SQL kodunuzu hızlandırmanın yolunu bulmanız
+lazım. Kullanılan metodlar arasında
 
-SQL veri analizi nasıl hızlandırılır
+* Tablo uzerinde dizin yaratma
 
+* SQL koduna 'dizin' kullandirtma
 
+* 'Geçici' tablo olurturma İndeks nedir, acele işleyelim. Bildiğiniz
+gibi veri tabanı kayıt tutar. Bu kayıtlar tablolar içinde
+tutulur. Tablo ne olduğunu anlamak için, diğer yazılarımıza
+bakabilirsiniz.
 
- Veri inclemek icin SQL dilini kullanan programcilar icin yaziyoruz. Ozellikle CRM, yani veri ambari olan programlarda, SQL dilini cok kullanacaksiniz. Servis programlarinda genelde SQL veri analizi 30,000 satirlik veriyi gecmez.               Veri ambarlari daha cok veri isler, o yuzden daha degisik tekniklere ihtiyac duyarlar.              Eger ambar SQL kodunu, internet sitelerinde kullanilan SQL kodu gibi yazarsaniz, saatlerce ekran basinda beklersiniz, SQL kodu katiyen isini bitirip geri gelmez.              Bu yuzden, SQL kodunuzu hizlandirmanin yolunu bulmaniz lazim. Kullanilan metodlar arasinda               * Tablo uzerinde dizin yaratma   * SQL koduna 'dizin' kullandirtma   * 'Gecici' tablo olurturma             Dizin nedir, acele isleyelim. Bildiginiz gibi veri tabani kayit tutar. Bu kayitlar tablolar icinde tutulur. Tablo ne oldugunu anlamak icin, diger yazilarimiza bakabilirsiniz. Hemen ornek bir veri tabani tablosu gosterelim.  MUSTERI(ISIM   VARCHAR2(100),SOYAD  VARCHAR2(100),EMAIL  VARCHAR2(100))              Tablo veri turudur. Yani veri tabanina diyorsunuzki "Bu sekilde verileri bu tablo adi altinda girecegim, hazir ol". Bundan sonra veri tabanina SQL dilini kullanarak veri girebilirsiniz. Mesela  INSERT INTO MUSTERI ('Burak', 'Bayramli', 'burakbayramli@sk.com');              Eger veriye erismek istiyorsaniz, (mesela butun verileri ekranda gosterelim), o zaman tekrar SQL dilinde  SELECT * from MUSTERI;  .. diye bir kod isletmeniz yeterlidir.               Fakat, sadece belli kayitlara erismek istiyorsaniz, o zaman 'secici' SQL kodu kullanmaniz lazim. Mesela sadece ismi 'burak' olan kayitlari bulalim.  SELECT * from MUSTERI WHERE ISIM = 'Burak';              Iste dizinler, bu gibi SQL kodu hizlandirmak icin isinize yarar. dizinler kutuphanelerde olan kitap kartlari gibidir, hani bir kitabi bulmak icin once o kartlara bakip, nerede oldugunu ogrenirsiniz, ve direk o bolume gidersiniz. Veri tabani dizinleri ayni sekilde isler. Her tablo uzerinde dizin yaratabilirsiniz. Bir tabloda birden fazla dizin olabilir. Dizin yaratmak icin bir ornek verelim.  CREATE INDEX MUSTERI_DIZIN ON MUSTERI(ISIM)              Bu komutu isleterek veri tabanina dedinizki "Eger isim hanesini kullanara musteri tablosuna erisenler olursa, islemi dizin kullanarak yap". Dizin kullanan SQL kodu daha cabuk isler. Genelde dizinler otomatik olarak bulunur ve kullanilir veri tabani tarafindan. SQL programinizin degismesi gerekmez.              Not: Veri tabanlarinda tabii ki hicbir sey bir baska sey kaybetmeden kazanilmaz. Dizinlerin surekli guncel tutulmasi gereklidir, buda zaman alir. O yuzden her INSERT kodu artik daha yavas olacaktir. Alin size muazzam bir muhendislik problemi: "Programiniz daha cok analizmi yapiyor, yoksa verimi ekliyor". Eger analiz yapiyorsaniz, cok dizin eklemenin pek zarari olmaz. Ekleme yapiyorsa, dizinleri azaltin.              Gelelim ikinci metoda: Dizin kullandirma. Biraz once bahsettik, dizinlerin kullanilmasi otomatik olarak veri tabani tarafindan yapilir. Fakat bazen Oracle gibi gelismis veri tabanlari bile, hangi dizini kullancagini karistirabilir. Bu aslinda cok normal, sonucta milyonlarca kodluk programlar olsada, SQL programcilarinin beynini okuyacak seviyede degiller. Bazen Oracle cok kotu analiz karari alabilir.               Iste bu gibi vahim zamanlarda, SQL kodunuza "tiyo" vermeniz gerekir. Yani diyeceksinizki "Sayin oracle, biraz kafan karisti galiba, hangi dizin kullanacagini unuttun, al bunu kullan". Bunun kod olarak sekli:  SELECT /*+ INDEX (MUSTERI_DIZIN) */ ISIM FROM MUSTERI WHERE ISIM = 'burak';              Boylece Oracle, dogru dizini bularak veriye hizli sekilde erisebilir.              Ucuncu teknik, gecici tablo olusturma. Gecici tablolari, cok zor gorunuslu SQL kodunu parcalamak icin kullanin. Unutmayin, eger 3~4 sayfalik SQL kodu yazmissaniz, Oracle perde arkasinda komik seyler yapabilir. Veri tabanini belli sekilde isleme 'zorlamak' icin, SQL kodunuz parcalara ayirin, ve gecici tablolar olusturun, o tablolari alip sonraki tabloya koyun, vs. Unutmayin, eger gecici tabloyu siz olusturduysaniz kontrol sizde, eger Oracle olusturursa, sistemin vefasina kaldiniz demektir. Kontrolun elde olmasi her zaman daha iyidir.
+Hemen örnek bir veri tabanı tablosu gösterelim.
+
+MUSTERI(ISIM VARCHAR2(100),SOYAD VARCHAR2(100),EMAIL VARCHAR2(100))
+
+Tablo veri türüdür. Yani veri tabanına diyorsunuzki "Bu şekilde
+verileri bu tablo adı altında gireceğim, hazır ol". Bundan sonra veri
+tabanına SQL dilini kullanarak veri girebilirsiniz. Mesela
+
+INSERT INTO MUSTERI ('Burak', 'Bayramli', 'burakbayramli@sk.com');
+
+Eğer veriye erişmek istiyorsanız, (mesela bütün verileri ekranda
+gösterelim), o zaman tekrar SQL dilinde SELECT * from MÜŞTERİ; .. diye
+bir kod işletmeniz yeterlidir.
+
+Fakat, sadece belli kayıtlara erişmek istiyorsanız, o zaman 'seçici'
+SQL kodu kullanmanız lazım. Mesela sadece ismi 'burak' olan kayıtları
+bulalım.  SELECT * from MÜŞTERİ WHERE ISİM = 'Burak';
+
+İşte dizinler, bu gibi SQL kodu hızlandırmak için işinize
+yarar. dizinler kütüphanelerde olan kitap kartları gibidir, hani bir
+kitabı bulmak için önce o kartlara bakıp, nerede olduğunu
+öğrenirsiniz, ve direk o bölüme gidersiniz. Veri tabanı dizinleri aynı
+şekilde işler. Her tablo üzerinde dizin yaratabilirsiniz. Bir tabloda
+birden fazla dizin olabilir.
+
+İndeks yaratmak için bir örnek verelim.  CREATE INDEX MÜŞTERİ_DİZİN ÖN
+MÜŞTERİ(İSİM) Bu komutu işleterek veri tabanına dedinizki "Eğer isim
+hanesini kullanara müşteri tablosuna erisenler olursa, işlemi dizin
+kullanarak yap".
+
+İndeks kullanan SQL kodu daha çabuk işler. Genelde dizinler otomatik
+olarak bulunur ve kullanılır veri tabanı tarafından. SQL programınızın
+değişmesi gerekmez.  Not: Veri tabanlarında tabii ki hiçbir şey bir
+başka şey kaybetmeden kazanılmaz. İndekslerin sürekli güncel tutulması
+gereklidir, buda zaman alır. O yüzden her İNSERT kodu artık daha yavaş
+olacaktır.
+
+Alın size muazzam bir mühendislik problemi: "Programınız daha çok
+analizmi yapıyor, yoksa verimi ekliyor". Eğer analiz yapıyorsanız, çok
+dizin eklemenin pek zararı olmaz. Ekleme yapıyorsa, dizinleri azaltın.
+Gelelim ikinci metoda: İndeks kullandırma. Biraz önce bahsettik,
+dizinlerin kullanılması otomatik olarak veri tabanı tarafından
+yapılır. Fakat bazen Oracle gibi gelişmiş veri tabanları bile, hangi
+dizini kullancağını karıştırabilir. Bu aslında çok normal, sonuçta
+milyonlarca kodluk programlar olsada, SQL programcılarının beynini
+okuyacak seviyede değiller. Bazen Oracle çok kötü analiz kararı
+alabilir.  İşte bu gibi vahim zamanlarda, SQL kodunuza "tiyo" vermeniz
+gerekir. Yani diyeceksinizki "Sayın oracle, biraz kafan karıştı
+galiba, hangi dizin kullanacağını unuttun, al bunu kullan". Bunun kod
+olarak şekli: SELECT /*+ INDEX (MÜŞTERİ_DİZİN) */ İSİM FROM MÜŞTERİ
+WHERE ISİM = 'burak'; Böylece Oracle, doğru dizini bularak veriye
+hızlı şekilde erisebilir.  Üçüncü teknik, geçici tablo
+oluşturma. Geçici tabloları, çok zor görünüşlü SQL kodunu parçalamak
+için kullanın. Unutmayın, eğer 3~4 sayfalık SQL kodu yazmışsanız,
+Oracle perde arkasında komik şeyler yapabilir. Veri tabanını belli
+şekilde işleme 'zorlamak' için, SQL kodunuz parçalara ayırın, ve
+geçici tablolar oluşturun, o tabloları alıp sonraki tabloya koyun,
+vs. Unutmayın, eğer geçici tabloyu siz oluşturduysanız kontrol sizde,
+eğer Oracle oluşturursa, sistemin vefasına kaldınız
+demektir. Kontrolün elde olması her zaman daha iyidir.
 
 
 
