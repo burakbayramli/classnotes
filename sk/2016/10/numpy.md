@@ -277,6 +277,45 @@ print (np.einsum('ij,ji->i',np.dot(rs.T,R),rs))
 [[ 18  128]]
 ```
 
+Iki Dizini Ust Uste Dizmek
+
+İki dizini üst üste dizmek (staçking) için `vstack` (dikey) ve `hstack`
+(yatay) fonksiyonları var. Bu fonksiyonlar ilginç şekillerde
+kullanılabiliyor: Mesela [100,100] 2 boyutlu başlangıç noktasından
+x-kord. ikiser ikiser, y-kord. üçer üçer büyüyecek şekilde 5 tane veri
+noktası üretmek istesek:
+
+```
+x0 = array([100, 100])
+xs = vstack((arange(5)*3, arange(5)*2)).T + x0
+```
+
+yeterli. arange(N) O..N-1 arasında sayıları üretir. Bu sayıların
+hepsini 3 ile çarpıyoruz. Sonra aynısını yapıp 2 ile çarpıyoruz. Bu
+iki dizini üst üste "yiğiyoruz", ve .T çağrısı ile devriğini
+(transpose) alıyoruz, böylece [5,2] boyutlu veri noktalarını elde
+ediyoruz. Tüm bunlara x0 başlangıç değerini ekleyince istediğimiz sonuç
+geliyor.
+
+```
+[[100 100][103 102][106 104][109 106][112 108]]
+```
+
+Bir dizini "kesmek" icin slice() fonksiyonu var.
+
+```
+a = [1,2,3,4,5,6,7,8,9]
+sl = slice(2,8,2)
+```
+
+Üstteki slice tanımı 2. öğe ile 8. öğe (hariç olmak üzere) arasındaki
+tüm elemanları geri getirir. Eğer son 3. parametre "2" verilirsek, bu
+"ikiser ikiser git" anlamına geliyor, yani bir öğe sürekli
+atlanır. print a[sl] çağrısı bize [3, 5, 7] sonucunu döndürecek.Aynı
+çağrı print a[2:8:2] şeklinde de gerçekleştirilebilir. Bazen
+değişkenler kullanılarak slice() objeleri yaratmak gerekebiliyor, bu
+durumlarda slice() çağrısı tercih edilmekte.
+
 Ekler
 
 [meshgrid](../../2011/02/meshgrid.md)

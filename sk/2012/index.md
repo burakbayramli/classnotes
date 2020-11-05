@@ -2,8 +2,6 @@
 
 [Soru & Cevap Siteleri](01/soru-cevap-siteleri.md)
 
-[BTSoru](02/btsoru.md)
-
 [Enerji Hatalari - ebugs](02/enerji-hatalari-ebugs.md)
 
 [LaTeX ile Sozde Program (Pseudocode) ve Matematik Sembolleri](02/latex-ile-sozde-program-pseudocode-ve.md)

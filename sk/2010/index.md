@@ -32,11 +32,7 @@
 
 [Tor](04/tor.md)
 
-[Ajax ve Geri Don Dugmesi](05/ajax-ve-geri-don-dugmesi.md)
-
-[JTPD Semineri](05/jtpd-semineri.md)
-
-[Sirketlerin 'Bulut'una Karsi Diaspora](05/sirketlerin-bulutuna-karsi-diaspora.md)
+[Şirketlerin 'Bulut'una Karşı Diaspora](05/sirketlerin-bulutuna-karsi-diaspora.md)
 
 [Bogazici, Fen Bolumu, Tez, Latex](06/bogazici-fen-bolumu-tez-latex.md)
 
@@ -46,35 +42,19 @@
 
 [Disco Project](06/disco-project.md)
 
-[Dizine Eklemek, Bolmek](06/dizine-eklemek-bolmek.md)
-
 [Imaj Uzerine Text](06/imaj-uzerine-text.md)
 
 [izip](06/izip.md)
 
-[John Resig Roportaji](06/john-resig-roportaj.md)
-
 [jQuery ile Girdi Tamamlamak (Auto Complete)](06/jquery-girdi-tamamlamak-auto-complete.md)
 
-[jQuery Grafikleme Eklentisi - Flot](06/jquery-grafikleme-eklentisi-flot.md)
-
 [kdtree](06/kdtree.md)
-
-[OpenCV ve Ubuntu 9.x](06/opencv-ve-ubuntu-90x.md)
-
-[Pur Javascript ile Flash Dosyalarini Gostermek](06/pur-javascript-ile-flash-dosyalarini.md)
 
 [Python -> C Dizin (Sequence) Gonderimi](06/python-c-dizin-sequence-gonderimi.md)
 
 [Python'dan C Fonksiyonu Cagirmak](06/pythondan-c-fonksiyonu-cagirmak.md)
 
-[Scipy.org Parcacik Filtreleri - Particle Filters](06/scipyorg-parcacik-filtreleri-particle.md)
-
 [Ubuntu 9.x](06/ubuntu-904.md)
-
-[Ubuntu ile CD Yakmak](06/ubuntu-ile-cd-yakmak.md)
-
-[Yaklasim](06/yaklasim.md)
 
 [Bulutta Python - PiCloud](08/bulutta-python-picloud.md)
 
