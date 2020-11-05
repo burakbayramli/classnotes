@@ -40,6 +40,7 @@ cite75_99.txt ve apat63_99.txt (baglantilar altta) Bu dosyaları açıp biz diye
 
 Referans verisine bakarsak,
 
+```
 head -10 /data/cite75_99.txt
 
 "CITING","CITED"
@@ -52,9 +53,12 @@ head -10 /data/cite75_99.txt
 3858242,3319261
 3858242,3668705
 3858242,3707004
+```
 
-Bu veri, hangi patentin hangi diğer patenti kullandığını "tek" patent bazında göstermekte. Detaylı patent verisine bakalım
+Bu veri, hangi patentin hangi diğer patenti kullandığını "tek" patent
+bazında göstermekte. Detaylı patent verisine bakalım
 
+```
 head -10 /data/apat63_99.txt
 
 "PATENT","GYEAR","GDATE","APPYEAR","COUNTRY","POSTATE","ASSIGNEE","ASSCODE","CLAIMS","NCLASS","CAT","SUBCAT","CMADE","CRECEIVE","RATIOCIT","GENERAL","ORIGINAL","FWDAPLAG","BCKGTLAG","SELFCTUB","SELFCTLB","SECDUPBD","SECDLWBD"
@@ -68,34 +72,27 @@ head -10 /data/apat63_99.txt
 3070807,1963,1096,,"US","OH",,1,,623,3,39,,3,,0.4444,,,,,,,
 3070808,1963,1096,,"US","IA",,1,,623,3,39,,4,,0.375,,,,,,,
 3070809,1963,1096,,"US","AZ",,1,,4,6,65,,0,,,,,,,,,
+```
 
+Şimdi patent detay verisinden bir örneklem (sample) alalım. Daha ufak
+bir veri kümesiyle çalışmak ilk başta faydalı olabilir, geliştirme
+test etme sürecini hızlandırır.
 
-
-
-Şimdi patent detay verisinden bir örneklem (sample) alalım. Daha ufak bir veri kümesiyle çalışmak ilk başta faydalı olabilir, geliştirme test etme sürecini hızlandırır.
-
-
+```
 chmod a+r /data/apat63_99.txt
 head -1 /data/apat63_99.txt > /data/apat63_99_sampled.txt
 cat /data/apat63_99.txt | perl -n -e 'print if (rand() < .05)' >> /data/apat63_99_sampled.txt
-
-
-
+```
 
 Hadoop başlatalım
 
-
-
-
-
+```
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/stop-all.sh
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/start-all.sh
+```
 
-
-
-
-
+```
 no jobtracker to stop
 
 localhost: no tasktracker to stop
@@ -116,54 +113,37 @@ starting jobtracker, logging to /home/hduser/Downloads/hadoop-1.0.4/libexec/../l
 
 localhost: starting tasktracker, logging to /home/hduser/Downloads/hadoop-1.0.4/libexec/../logs/hadoop-hduser-tasktracker-burak-Aspire-S3.out
 
-
-
-
-
 /home/hduser/Downloads/hadoop*/bin/hadoop dfs -mkdir /user/hduser/patent
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
 
 dfs -ls /user/hduser/patent
+```
 
-
-
-
-
+```
 Found 2 items
 
 -rw-r--r--   1 hduser supergroup ...  /user/hduser/patent/apat63_99.txt
 
 -rw-r--r--   1 hduser supergroup ...   /user/hduser/patent/apat63_99_sampled.txt
+```
 
-
-
-
-
-
-
+```
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
 
 dfs -copyFromLocal /data/apat63_99_sampled.txt \
 
 /user/hduser/patent/apat63_99_sampled.txt
 
-
-
-
-
 copyFromLocal: Target /user/hduser/patent/apat63_99_sampled.txt already exists
+```
 
+Amacımız patent verisindeki ülke (country) kodunu kullanarak her ülke
+basına ortalama ne kadar patent üretildiğini
+hesaplamak. Eşleme-İndirgeme (Map-Reduce) döngüsünde eşleme kısmını
+yapacak program aşağıda.
 
-
-
-
-Amacımız patent verisindeki ülke (country) kodunu kullanarak her ülke basına ortalama ne kadar patent üretildiğini hesaplamak. Eşleme-İndirgeme (Map-Reduce) döngüsünde eşleme kısmını yapacak program aşağıda.
-
-
-
-
-
+```
 #!/usr/bin/python
 
 import os,sys
@@ -177,25 +157,22 @@ data = pd.read_csv(sys.stdin,sep=",",index_col=0,usecols=[0,4,8])
 df = data[pd.notnull(data.ix[:,0]) \& pd.notnull(data.ix[:,1])].ix[:,0:2]
 
 df.to_csv(sys.stdout,sep="\t",index=False,header=False)
+```
+
+İndirgeyici yazmadan önce programımızı iki şekilde test edelim. Bu
+şekillerden birisi hiç indirgeyici olmadan, ikincisi IdentityReducer
+denen kendisine geçilen veriyi olduğu gibi dışarı atan (ama yine de
+ortada bir indirgeyici olduğu için sonradan bazı işlemlerin yine de
+yapıldığı) şeklinde. Bu iki kullanım Hadoop kodlarında hata bulma /
+temizleme için faydalı olabiliyor.
 
 
-
-
-
-İndirgeyici yazmadan önce programımızı iki şekilde test edelim. Bu şekillerden birisi hiç indirgeyici olmadan, ikincisi IdentityReducer denen kendisine geçilen veriyi olduğu gibi dışarı atan (ama yine de ortada bir indirgeyici olduğu için sonradan bazı işlemlerin yine de yapıldığı) şeklinde. Bu iki kullanım Hadoop kodlarında hata bulma / temizleme için faydalı olabiliyor.
-
-
-
-
-
+```
 cp mapper.py /tmp/
 
 chmod a+r /tmp/mapper.py
 
 chmod a+x /tmp/mapper.py
-
-
-
 
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
@@ -209,9 +186,6 @@ jar \$HOME/Downloads/hadoop*/contrib/streaming/hadoop-*streaming*.jar\
 -input patent/apat63_99_sampled.txt  -output output  \
 
 -mapper /tmp/mapper.py -numReduceTasks 0 
-
-
-
 
 
 Deleted hdfs://localhost:54310/user/hduser/output
@@ -244,17 +218,9 @@ packageJobJar: [/app/hadoop/tmp/hadoop-unjar2555196345671652661/] [] /tmp/stream
 
 13/02/24 16:30:49 INFO streaming.StreamJob: Output: output
 
-
-
-
-
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop dfs  -copyToLocal output /tmp/
 
 head -20 /tmp/output/part-00000
-
-
-
-
 
 AD 14.0
 
@@ -295,17 +261,13 @@ BO 11.75
 BR 9.358426966292134
 
 BS 15.778846153846153
+```
 
+Üstteki sonuçta görüyoruz ki anahtarlar üretilmiş, ama çıktılar
+anahtara göre sıralanmamışlar. Hatta üstteki sıra girdi sırasıyla
+tıpatıp aynı. Şimdi IdentityReducer üzerinden.
 
-
-
-
-Üstteki sonuçta görüyoruz ki anahtarlar üretilmiş, ama çıktılar anahtara göre sıralanmamışlar. Hatta üstteki sıra girdi sırasıyla tıpatıp aynı. Şimdi IdentityReducer üzerinden.
-
-
-
-
-
+```
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
 
 dfs -rmr /user/hduser/output
@@ -319,10 +281,6 @@ dfs -rmr /user/hduser/output
  -mapper /tmp/mapper.py -reducer org.apache.hadoop.mapred.lib.IdentityReducer \
 
 -numReduceTasks 1 
-
-
-
-
 
 Deleted hdfs://localhost:54310/user/hduser/output
 
@@ -356,10 +314,6 @@ packageJobJar: [/app/hadoop/tmp/hadoop-unjar2314287838929839696/] [] /tmp/stream
 
 13/02/24 18:03:46 INFO streaming.StreamJob: Output: output
 
-
-
-
-
 ssh localhost -l hduser rm -rf /tmp/output
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
@@ -367,10 +321,6 @@ ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
 dfs  -copyToLocal output /tmp/
 
 head -10 /tmp/output/part-00000
-
-
-
-
 
 FR 12.0
 
@@ -391,21 +341,14 @@ US 8.0
 US 7.0
 
 US 11.0
-
-
-
-
+```
 
 Üstteki sonuçta anahtarların sıralanmış olduğunu görüyoruz.
 
+Şimdi bir indirgeyici (reducer) ekleyelim. Bu indirgeyici ülke
+bazındaki veriler üzerinen ortalama alacak. 
 
-
-Şimdi bir indirgeyici (reducer) ekleyelim. Bu indirgeyici ülke bazındaki veriler üzerinen ortalama alacak. 
-
-
-
-
-
+```
 #!/usr/bin/python
 
 import os,sys
@@ -419,22 +362,12 @@ data = pd.read_csv(sys.stdin,sep="\t",names=['country','count'])
 grouped = data.groupby('country').mean()
 
 grouped.to_csv(sys.stdout,sep="\t",header=False)
-
-
-
-
+```
 
 Eğer indirgeyiciyi direk işletirsek (Hadoop dışından)
 
-
-
-
-
+```
 cat /tmp/output/part-00000 | ./reducer.py | tail -10
-
-
-
-
 
 SE 9.0021739130434781
 
@@ -455,26 +388,16 @@ VE 9.3333333333333339
 YU 5.75
 
 ZA 11.170212765957446
-
-
-
-
+```
 
 Bu kodu hduser'in bulabileceği bir yere koyuyoruz. 
 
-
-
-
-
+```
 cp reducer.py /tmp/
 
 chmod a+r /tmp/reducer.py
 
 chmod a+x /tmp/reducer.py
-
-
-
-
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
 
@@ -487,8 +410,6 @@ jar \$HOME/Downloads/hadoop*/contrib/streaming/hadoop-*streaming*.jar\
 -input patent/apat63_99_sampled.txt  -output output \
 
  -mapper /tmp/mapper.py -reducer /tmp/reducer.py -numReduceTasks 1 
-
-
 
 Deleted hdfs://localhost:54310/user/hduser/output
 
@@ -522,31 +443,17 @@ packageJobJar: [/app/hadoop/tmp/hadoop-unjar3358838375062006941/] [] /tmp/stream
 
 13/02/24 20:33:42 INFO streaming.StreamJob: Output: output
 
-
-
-
-
 ssh localhost -l hduser rm -rf /tmp/output
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
 
 dfs  -copyToLocal output /tmp/
-
-
-
-
+```
 
 Ve sonuç altta olduğu gibi
 
-
-
-
-
+```
 head -10 /tmp/output/part-00000
-
-
-
-
 
 AE 12.0
 
@@ -567,30 +474,18 @@ BG 4.5
 BM 8.0
 
 BO 25.0
-
-
-
-
+```
 
 Tabii bu sonuçlar bir örneklem üzerinden alındı. Tüm veriyi işlemek için
 
-
-
-
-
+```
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop dfs \
 
 -copyFromLocal /data/apat63_99.txt /user/hduser/patent/apat63_99.txt
 
-
-
-
-
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop \
 
 dfs -rmr /user/hduser/output
-
-
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop  jar \
 
@@ -599,10 +494,6 @@ ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop  jar \
 -input patent/apat63_99.txt  -output output  -mapper /tmp/mapper.py \
 
 -reducer /tmp/reducer.py -numReduceTasks 1 
-
-
-
-
 
 Deleted hdfs://localhost:54310/user/hduser/output
 
@@ -640,24 +531,13 @@ packageJobJar: [/app/hadoop/tmp/hadoop-unjar938213738183646678/] [] /tmp/streamj
 
 13/02/24 23:51:17 INFO streaming.StreamJob: Output: output
 
-
-
-
-
 ssh localhost -l hduser rm -rf /tmp/output
 
 ssh localhost -l hduser /home/hduser/Downloads/hadoop*/bin/hadoop dfs  \
 
 -copyToLocal output /tmp/
 
-
-
-
-
 head -7 /tmp/output/part-00000
-
-
-
 
 
 AD 14.0
@@ -673,19 +553,8 @@ AM 18.0
 AN 9.625
 
 AR 9.188990825688073
-
-
+```
 
 www.nber.org/patents/
-
-https://www.dropbox.com/s/k5c9z2v4db01dmr/apat63_99.txt.gz?dl=1
-
-https://www.dropbox.com/s/rat5yusxu7jjs9z/cite75_99.txt.gz?dl=1
-
-
-
-
-
-
 
 ![](mr.png)

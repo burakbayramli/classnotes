@@ -507,5 +507,5 @@ http://sayilarvekuramlar.blogspot.com/2014/09/esle-indirge-mimarisi-mapreduce-mr
 
 https://dzone.com/articles/apache-spark-introduction-and-its-comparison-to-ma
 
-https://www.dropbox.com/s/8y54vdsevmj4syv/nietzsche.txt?dl=1
+https://s3.amazonaws.com/text-datasets/nietzsche.txt
 
