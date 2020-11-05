@@ -8,7 +8,9 @@ kavrami burada devreye girer, medyan 50. yuzdeliktir.
 
 Postgresql ile bu hesabi yapmak icin, mesela dellstore2 verisinde
 
+```
 select totalamount, ntile(20) over (order by totalamount) as cume from orders
+```
 
 kullanilabilir. Bu ilk basamak, PG analitik ntile .. over komutunu
 kullandi. Bu komut tum satirlari totalamount'a gore siralayarak onlari
@@ -19,13 +21,19 @@ degeri bir uc nokta olarak kabul etmeyi secebiliriz, ve bu degerden
 buyuk her degeri gurultu, asiri buyuk deger, vs. gibi kabul
 edebiliriz), o zaman
 
-select max(totalamount) AS max_var from(  select totalamount, ntile(20) over (order by totalamount) as cume from orders) as tmp where cume = 19
+```
+select max(totalamount) AS max_var
+from(  select totalamount, ntile(20) over (order by totalamount)
+as cume from orders) as tmp where cume = 19
+```
 
 kullanilabilir. Ustteki sorgu 410.41 dondurur. Eger "ortalamadan iki
 standart sapma uzagi" hesabini yaparsak (ki bu hesabinda uc nokta
 hesabi oldugu kabul edilir), o zaman
 
+```
 select avg(totalamount)+2*stddev(totalamount) from orders
+```
 
 ve
 

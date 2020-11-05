@@ -66,8 +66,6 @@
 
 [Veri Zenginlestirmek](05/veri-zenginlestirmek.md)
 
-[add_subplot(222)?](06/addsubplot222.md)
-
 [Birikmeli (Cumulatif) Toplamlar ve SQL](06/birikmeli-cumulatif-toplamlar-ve-sql.md)
 
 [Enlemler, Boylamlar ve PostgreSql PostGis](06/enlemler-boylamlar-ve-postgresql.md)
@@ -133,8 +131,4 @@
 [Kategorik Veri, 1-in-n, Faktorler, R ve Patsy](12/kategorik-veri-1-in-n-faktorler-ve-r.md)
 
 [Mahout, Jython ve Yapay Ogrenim](12/mahout-jython-ve-yapay-ogrenim.md)
-
-[Siparisler Uzerinde Veri Madenciligi - kNN](12/siparisler-uzerinde-veri-madenciligi-knn.md)
-
-[Weka, Jython ve Yapay Ogrenim](12/weka-jython-ve-yapay-ogrenim.md)
 

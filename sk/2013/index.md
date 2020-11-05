@@ -2,13 +2,9 @@
 
 [Hadoop - Ilk Ornek (Python), Esleme-Indirgeme](01/hadoop-ilk-ornek-python-esleme-indirgeme.md)
 
-[Hadoop - Ilk Ornek (Java)](01/hadoop-ilk-ornek.md)
-
 [Hadoop (Tek Makina Kurulusu)](01/hadoop-tek-makina-kurulusu.md)
 
 [ipython](01/ipython.md)
-
-[Kod: Kısıtlı Boltzman Makinaları (Restriced Boltzman Machines -RBM-)](01/kisitli-boltzman-makinalari-restriced.md)
 
 [NbViewer, Github ve Not Defteri](01/nbviewer-github-ve-not-defteri.md)
 

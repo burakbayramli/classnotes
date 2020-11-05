@@ -1,6 +1,6 @@
 # htop
 
-Ünix eski "top" komutu sistemdeki süreçleri, ne kadar mikroişlemci
+Unix eski "top" komutu sistemdeki süreçleri, ne kadar mikroişlemci
 zamanı kullanıldığı gibi raporları ekranda sabitleyip gösteren (akışlı
 değil, mesela `tail -f` gibi -text bazlı ortamda bu iş için curses
 gerekiyor doğal olarak-) bir programdı. Fakat biraz renksizdi, ve çok
@@ -15,3 +15,5 @@ sudo apt-get install htop
 ```
 
 ![](htop.png)
+
+

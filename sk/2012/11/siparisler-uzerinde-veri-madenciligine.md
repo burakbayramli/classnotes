@@ -1,11 +1,5 @@
 # Siparisler Uzerinde Veri Madenciligi, Regresyon
 
-
-Siparisler Uzerinde Veri Madenciligi, Regresyon
-
-
-
-
 Regresyon, veri zenginlestirme, yapay ogrenim tekniklerinden  bahsettik. Bu yazida bu tekniklerden bazilarini ornek uzerinde isleyecegiz.
 
 Ornek olarak dellstore2 adli tabandaki siparisleri kullanarak bir musterinin ne kadar bize "ugramayacagini", yani atil kalacagini tahmin etmek istiyoruz. Bunun icin siparis ve baglantili tablodaki verileri genisletilmis bir tabloya alarak, bu tablo uzerinde yapay ogrenim tekniklerini uygulayabiliriz. Regresyon hedef degiskeni musterinin ne kadar atil kaldigi, diger degiskenler ise siparis ve baglantili diger kolonlar. Once veriyi olusturalim,  SQL soyle olabilir

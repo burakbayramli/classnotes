@@ -7,6 +7,7 @@ makinada bir SMTP servisi oldugunu farz ediyor. Bu servisin yeri
 degistirilebilir, mesela bir GMail hesabi ve SMTP servisi de
 kullanilabilir.
 
+```
 import smtplib, os
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
@@ -31,9 +32,11 @@ def send_mail(send_from, send_to, subject, text, files=[], server="localhost"):
            msg.attach(part)    smtp = smtplib.SMTP(server)
        smtp.sendmail(send_from, send_to, msg.as_string())
        smtp.close()
+```
 
 Kullanimi
 
+```
 import datetime
 import mail
 import sys
@@ -45,7 +48,7 @@ mail.send_mail('nereden@filan.com',
                '%s tarihinde gonderilen mesaj' % date,
                'Mesaj basligi .. ',
                ['dosya1.csv','dosya2,csv'])
-
+```
 
 
 
