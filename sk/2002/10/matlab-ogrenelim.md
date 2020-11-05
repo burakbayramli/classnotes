@@ -2,17 +2,35 @@
 
 Bkz Python Öğrenelim yazısı. 
 
-Artık Matlab yerine Python tavsiye ediyoruz; tüm matematik icerigimiz bu yeni dile geçirildi. Python açık kaynak, bedava, ve hesapsal bilimde artık daha çok kullanılıyor, öğrenciler için üniversite sonrası iş bulmak için daha isabetli olur.
+Artık Matlab yerine Python tavsiye ediyoruz; tüm matematik
+icerigimiz bu yeni dile geçirildi. Python açık kaynak, bedava, ve
+hesapsal bilimde artık daha çok kullanılıyor, öğrenciler için
+üniversite sonrası iş bulmak için daha isabetli olur.
 
-Ama illa Matlab kullanılacaksa, onun yerine aynı dili, komutları, hatta çoğu zaman paketleri içeren açık yazılım Octave faydalı olabilir.
+Ama illa Matlab kullanılacaksa, onun yerine aynı dili, komutları,
+hatta çoğu zaman paketleri içeren açık yazılım Octave faydalı
+olabilir.
 
 Üç Boyutlu Çizimler 
   
-Üç boyutlu çizim yapmak için, meshgrid fonksiyonunu kullanmamız gerekiyor.  
+Üç boyutlu çizim yapmak için, meshgrid fonksiyonunu kullanmamız
+gerekiyor.
   
-Herhangi boyutta fonksiyonu çizmek için, fonksiyona "verilen" değerler gerekir. Eğer bir fonksiyonu soyut hâliyle çizmek istiyorsak, yâni elimizde test verileri o anda yok ise, belli aralıklarla olan girdi X değerlerini "üretmemiz" gerekecektir. 2 boyutlu fonksiyonda, tek x vektörü yeterli olacaktır, fakat üç boyutlu çizimler için "iki" tâne "iki" boyutlu matris gerekir. Bu matrisleri Matlab'de meshgrid fonksiyonu ile otomatik olarak üretebiliyoruz.  
+Herhangi boyutta fonksiyonu çizmek için, fonksiyona "verilen" değerler
+gerekir. Eğer bir fonksiyonu soyut hâliyle çizmek istiyorsak, yâni
+elimizde test verileri o anda yok ise, belli aralıklarla olan girdi X
+değerlerini "üretmemiz" gerekecektir. 2 boyutlu fonksiyonda, tek x
+vektörü yeterli olacaktır, fakat üç boyutlu çizimler için "iki" tâne
+"iki" boyutlu matris gerekir. Bu matrisleri Matlab'de meshgrid
+fonksiyonu ile otomatik olarak üretebiliyoruz.
   
-Bu matrisler kurulduktan sonra, mesh çizim fonksiyonu ile X, Y ve hesaplanmış fonksiyon değeri olan meselâ R, bir küpe dönüştürülür, öyle ki, girdi x matrisi küpün X tarafından bakılınca görülen değerler, y matrisi Y tarafından bakınca görülen değerler olacaktır. Mesh fonksiyonu bu iki matris değerlerinin tüm kombinasyonlarını üçüncü hesap sonucu matrise bakarak (lookup) üç boyutlu uzayda bir çizim yaratabilecektir.  
+Bu matrisler kurulduktan sonra, mesh çizim fonksiyonu ile X, Y ve
+hesaplanmış fonksiyon değeri olan meselâ R, bir küpe dönüştürülür,
+öyle ki, girdi x matrisi küpün X tarafından bakılınca görülen
+değerler, y matrisi Y tarafından bakınca görülen değerler
+olacaktır. Mesh fonksiyonu bu iki matris değerlerinin tüm
+kombinasyonlarını üçüncü hesap sonucu matrise bakarak (lookup) üç
+boyutlu uzayda bir çizim yaratabilecektir.
 
 ```  
 01:   [X,Y] = meshgrid(-4:2:4);
