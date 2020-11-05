@@ -10,8 +10,6 @@
 
 [Geliştirme, Deneme, Sonuç](10/gelistirme-deneme-sonuc.md)
 
-[JDBC ile Tablo Karşılaştırmak](10/jdbc-ile-tablo-karslastrmak.md)
-
 [JStamp - Elde Taşınan Java](10/jstamp-elde-tasnan-java.md)
 
 [JSTL Yaratıcısı İle Mülakat](10/jstl-yaratcs-ile-mulakat.md)
@@ -33,6 +31,4 @@
 [JDOM yardımı ile daha kolay XML işlemek](11/jdom-yardm-ile-daha-kolay-xml-islemek.md)
 
 [Tomcat ve Güvenlik](11/tomcat-ve-guvenlik.md)
-
-[XML Nasıl İşlenir](11/xml-nasl-islenir.md)
 
