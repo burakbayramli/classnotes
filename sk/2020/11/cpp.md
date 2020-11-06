@@ -117,27 +117,7 @@ void Cat::speak()
 ```
 
 Dikkat edilirse .cpp dosyası da kendi .h dosyasını dahil ediyor, ona
-bir kod sağlıyor. Onu kullanmak için bir `main()` yazalım,
-
-```python
-print (open("ex2.cpp").read().strip())
-```
-
-```text
-#include <iostream>
-#include <string>
-#include "cat.h"
-
-using std::cout;using std::endl;using std::string;
-int main()
-{
-    string name = "Ali";
-    cout<< "Kedim burada, " << name << "!" <<endl;
-    Cat kitty(name);
-    kitty.speak();
-    return 0;
-}
-```
+bir kod sağlıyor. Derleyelim,
 
 ```python
 ! g++ -c cat.cpp  -o /tmp/cat.o  -Wall -O2
@@ -159,7 +139,29 @@ derlemek, işletmek mümkün) göster.
 `-O2`, ikinci derece optimizasyon yap (oldukca kuuvetli), işler kod seviyesinde
 bazı hızlandırma adımları böyle atılıyor.
 
-Şimdi bağlantılama ile işler kodu üretelim,
+Kedi kodunu kullanmak için bir `main()` yazalım,
+
+```python
+print (open("ex2.cpp").read().strip())
+```
+
+```text
+#include <iostream>
+#include <string>
+#include "cat.h"
+
+using std::cout;using std::endl;using std::string;
+int main()
+{
+    string name = "Ali";
+    cout<< "Kedim burada, " << name << "!" <<endl;
+    Cat kitty(name);
+    kitty.speak();
+    return 0;
+}
+```
+
+Şimdi `main` içeren kodu derleyelim ve bağlantılama ile işler kodu üretelim,
 
 
 ```python
