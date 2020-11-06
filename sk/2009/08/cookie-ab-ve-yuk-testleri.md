@@ -1,6 +1,5 @@
 # Cookie, ab ve Yuk Testleri
 
-
 Apache ab ile bir kullaniciyi taklit etmek icin URL uzerinden bilgi
 gonderilebilecegi gibi cookie uzerinden de uygulamaya bilgi
 gonderebilir.ab -kc 1 -n 1 -C [COOKIE ISMI]=[COOKIE DEGERI]
@@ -15,14 +14,27 @@ kadar Thread baslatip (cunku kullanicilarin sisteme eszamanli
 girmesini simule ediyoruz) kullanici basina bir sayga istegini N kadar
 arka arkaya isletebilir.Script cookied_page_load.py suna benzer:
 
-import threading, re, os, systimes = int(sys.argv[1])class
-Caller(threading.Thread):def __init__(self, userId):
-threading.Thread.__init__(self) self.userId = userIddef run(self): url
-= "http://www.site.com/sayfa.seam" cmd = "ab -kc 1 -n " + str(times) +
-" -C userId=" + self.userId + " " + url print cmd os.system(cmd) ts =
-[]f = open ("[ID DOSYASI]")for id in f.readlines():id =
-id.replace("\n","")a = Caller(id)a.start()ts.append(a)for t in
-ts:t.join()
+
+```
+import threading, re, os, sys
+
+times = int(sys.argv[1])
+
+class Caller(threading.Thread):
+def __init__(self, userId):
+   threading.Thread.__init__(self)
+   self.userId = userId
+   def run(self): url = "http://www.site.com/sayfa.seam"
+   cmd = "ab -kc 1 -n " + str(times) + " -C userId=" + self.userId + " " + url
+   print cmd
+   os.system(cmd)
+   ts = []
+   f = open ("[ID DOSYASI]")
+   for id in f.readlines():
+   id = id.replace("\n","")
+   a = Caller(id)a.start()ts.append(a)
+   for t in ts:t.join()
+```
 
 Bu script
 
