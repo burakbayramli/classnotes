@@ -1,110 +1,110 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Derin Öğrenme ile Go Oyununu Oynamak, DeepMind AlphaGo Zero
+Derin Ã–ÄŸrenme ile Go Oyununu Oynamak, DeepMind AlphaGo Zero
 
-Yapay Zeka alanındaki heyecan verici ilerlemelerden biri Google DeepMind
-şirketinin AlphaGo programının 17 kez Go şampiyonu olmuş Lee Sedol'u
-yenmesiydi. Fakat DeepMind orada durmadı, mimariyi geliştirerek AlphaGo'yu
-100-0 yenecek AlphaGo Zero'yu geliştirdi! Yeni mimarinin ilginç tarafı
-YZ'nin hiç dış veriye ihtiyaç duymadan eğitilmiş olması. AGZ sıfır
-kabiliyet ile başlıyor (clean slate), ve kendisiyle oynaya oynaya Go
-şampiyonlarını yenecek hale geliyor.  Bu ve ek ilerlemeleri bu yazıda
-paylaşıyoruz.
+Yapay Zeka alanÄ±ndaki heyecan verici ilerlemelerden biri Google DeepMind
+ÅŸirketinin AlphaGo programÄ±nÄ±n 17 kez Go ÅŸampiyonu olmuÅŸ Lee Sedol'u
+yenmesiydi. Fakat DeepMind orada durmadÄ±, mimariyi geliÅŸtirerek AlphaGo'yu
+100-0 yenecek AlphaGo Zero'yu geliÅŸtirdi! Yeni mimarinin ilginÃ§ tarafÄ±
+YZ'nin hiÃ§ dÄ±ÅŸ veriye ihtiyaÃ§ duymadan eÄŸitilmiÅŸ olmasÄ±. AGZ sÄ±fÄ±r
+kabiliyet ile baÅŸlÄ±yor (clean slate), ve kendisiyle oynaya oynaya Go
+ÅŸampiyonlarÄ±nÄ± yenecek hale geliyor.  Bu ve ek ilerlemeleri bu yazÄ±da
+paylaÅŸÄ±yoruz.
 
 Mimari
 
-Genel olarak AG ve AGZ'nin benzer bazı özellikleri var. Bunlardan ilki
-Monte Carlo Ağaç Aramasının (Monte Carlo Tree Search -MCTS-) bir derin YSA
-ile genişletilerek kabiliyetinin ilerletilmiş olması. MCTS konusunu
-işledik, herhangi bir tahta pozisyonundan başlayarak simülasyon yapılır, ve
-kazanç / kayıp verisi yukarı alınarak karar mekanizması için
-kullanılır. Fakat simülasyon yapılırken ve her tahta pozisyonundan hamle
-seçenekleri üretilirken ne kadar derine inilecek? Oyun bitene kadar
-inilirse bu özellikle Go gibi bir oyunda çok derin ve geniş bir ağaç ortaya
-çıkartabilir, bilgisayarlar performans açısından böyle bir ağaçla
-zorlanırlar. Çözüm belli bir tahtaya bakarak o oyunun kazanılıp
-kazanılmayacağı hakkında ``sezgisel'' bir karar verebilmek. Bu işi örüntü
-tanıma üzerinden YSA çok güzel yapabilir. Önceden (kendisiyle oynarken)
-elde edilen oyun verisine bakarak, tahta pozisyonları ve o oyunun kazanılıp
-kazanılmadığı verisiyle eğitilen ``değer YSA'sı'' artık yeni bir tahtayı
-görünce o durumun kazanç şansının olup olmadığını -1,+1 arasında bir değer
+Genel olarak AG ve AGZ'nin benzer bazÄ± Ã¶zellikleri var. Bunlardan ilki
+Monte Carlo AÄŸaÃ§ AramasÄ±nÄ±n (Monte Carlo Tree Search -MCTS-) bir derin YSA
+ile geniÅŸletilerek kabiliyetinin ilerletilmiÅŸ olmasÄ±. MCTS konusunu
+iÅŸledik, herhangi bir tahta pozisyonundan baÅŸlayarak simÃ¼lasyon yapÄ±lÄ±r, ve
+kazanÃ§ / kayÄ±p verisi yukarÄ± alÄ±narak karar mekanizmasÄ± iÃ§in
+kullanÄ±lÄ±r. Fakat simÃ¼lasyon yapÄ±lÄ±rken ve her tahta pozisyonundan hamle
+seÃ§enekleri Ã¼retilirken ne kadar derine inilecek? Oyun bitene kadar
+inilirse bu Ã¶zellikle Go gibi bir oyunda Ã§ok derin ve geniÅŸ bir aÄŸaÃ§ ortaya
+Ã§Ä±kartabilir, bilgisayarlar performans aÃ§Ä±sÄ±ndan bÃ¶yle bir aÄŸaÃ§la
+zorlanÄ±rlar. Ã‡Ã¶zÃ¼m belli bir tahtaya bakarak o oyunun kazanÄ±lÄ±p
+kazanÄ±lmayacaÄŸÄ± hakkÄ±nda ``sezgisel'' bir karar verebilmek. Bu iÅŸi Ã¶rÃ¼ntÃ¼
+tanÄ±ma Ã¼zerinden YSA Ã§ok gÃ¼zel yapabilir. Ã–nceden (kendisiyle oynarken)
+elde edilen oyun verisine bakarak, tahta pozisyonlarÄ± ve o oyunun kazanÄ±lÄ±p
+kazanÄ±lmadÄ±ÄŸÄ± verisiyle eÄŸitilen ``deÄŸer YSA'sÄ±'' artÄ±k yeni bir tahtayÄ±
+gÃ¶rÃ¼nce o durumun kazanÃ§ ÅŸansÄ±nÄ±n olup olmadÄ±ÄŸÄ±nÄ± -1,+1 arasÄ±nda bir deÄŸer
 ile hesaplayabilir. Bu durumda MCTS'in herhangi bir dalda oyunu sonuna
-kadar simüle etmesine gerek yoktur, belli bir seviye sonra durup YSA'ya
-kazanç şansını sorar, bu değeri kullanır.
+kadar simÃ¼le etmesine gerek yoktur, belli bir seviye sonra durup YSA'ya
+kazanÃ§ ÅŸansÄ±nÄ± sorar, bu deÄŸeri kullanÄ±r.
 
-İkinci özellik bir ilke / siyaset / strateji YSA'sı kullanmak, ilke YSA'sı
-bir tahtayı girdi olarak alıp, yapılabilecek tüm hamleler için bir kazanç
-olasılığı üretebilir, ilke YSA'sin çıktısı potansiyel olarak tüm tahta
-hücreleri olabilir [1,3]. MCTS bu çıktıları kazanma olasılığı daha yüksek
-olan hamle ağaç dallarını simüle etmek için kullanacaktır.
+Ä°kinci Ã¶zellik bir ilke / siyaset / strateji YSA'sÄ± kullanmak, ilke YSA'sÄ±
+bir tahtayÄ± girdi olarak alÄ±p, yapÄ±labilecek tÃ¼m hamleler iÃ§in bir kazanÃ§
+olasÄ±lÄ±ÄŸÄ± Ã¼retebilir, ilke YSA'sin Ã§Ä±ktÄ±sÄ± potansiyel olarak tÃ¼m tahta
+hÃ¼creleri olabilir [1,3]. MCTS bu Ã§Ä±ktÄ±larÄ± kazanma olasÄ±lÄ±ÄŸÄ± daha yÃ¼ksek
+olan hamle aÄŸaÃ§ dallarÄ±nÄ± simÃ¼le etmek iÃ§in kullanacaktÄ±r.
 
-Yazının geri kalanında 9x9 Go boyutlarını referans alacağız, AG ve AGZ
-19x19 oyunu üzerinde işliyor. 
+YazÄ±nÄ±n geri kalanÄ±nda 9x9 Go boyutlarÄ±nÄ± referans alacaÄŸÄ±z, AG ve AGZ
+19x19 oyunu Ã¼zerinde iÅŸliyor. 
 
 \includegraphics[width=20em]{go_02.jpg}
 
-Bir not düşelim, YSA ``bir tahtayı girdi alıyor'' dedik ama girdi verisi
-oldukca zenginleştirilmiş halde, sadece (9,9) boyutunda tek bir tahta
-değil, (9,9,17) boyutunda yani 17 katmanlı bir veri ``balyası''. Bu balyayı
-hazırlamak için herhangi bir oyun anında tahtaya bakılır, her renk için
-(siyah/beyaz) 8 katman yaratılır, bu katmanlardan biri o rengin o andaki
-tahtadaki pozisyonu, diğer 7'si hemen önceki 7 adımdaki aynı rengin
-pozisyonları, aynı şekilde diğer renk için 8 katman, ve ek bir katman
-sıranın kimde olduğu. Tüm bunlar istiflenerek toplam 17 katman
-yaratılır. Herhangi bir anda oyunun durumu bu tensor üzerinden
-belirtilir. Verinin bu şekilde zenginleştirilmesinin sebebi herhalde
-zamansal bağlantıları yakalamaya uğraşmak. 
+Bir not dÃ¼ÅŸelim, YSA ``bir tahtayÄ± girdi alÄ±yor'' dedik ama girdi verisi
+oldukca zenginleÅŸtirilmiÅŸ halde, sadece (9,9) boyutunda tek bir tahta
+deÄŸil, (9,9,17) boyutunda yani 17 katmanlÄ± bir veri ``balyasÄ±''. Bu balyayÄ±
+hazÄ±rlamak iÃ§in herhangi bir oyun anÄ±nda tahtaya bakÄ±lÄ±r, her renk iÃ§in
+(siyah/beyaz) 8 katman yaratÄ±lÄ±r, bu katmanlardan biri o rengin o andaki
+tahtadaki pozisyonu, diÄŸer 7'si hemen Ã¶nceki 7 adÄ±mdaki aynÄ± rengin
+pozisyonlarÄ±, aynÄ± ÅŸekilde diÄŸer renk iÃ§in 8 katman, ve ek bir katman
+sÄ±ranÄ±n kimde olduÄŸu. TÃ¼m bunlar istiflenerek toplam 17 katman
+yaratÄ±lÄ±r. Herhangi bir anda oyunun durumu bu tensor Ã¼zerinden
+belirtilir. Verinin bu ÅŸekilde zenginleÅŸtirilmesinin sebebi herhalde
+zamansal baÄŸlantÄ±larÄ± yakalamaya uÄŸraÅŸmak. 
 
 \includegraphics[width=30em]{go_01.png}
 
 AlphaGo Zero
 
-AGZ'nin yaptığı ilerlemeler ise şunlar [3]: AlphaGo değer ve ilke için iki
-ayrı ağ kullanıyordu. AGZ'de değer ve ilke YZ'leri birleştirilerek tek bir
-YSA ile iki çıktı üretilmesi sağlanıyor, bu yapıya esprili bir şekilde
-``iki başlı canavar (two-headed monster)'' ismi de veriliyor. Bu mimari
-biraz garip gelebilir, çünkü çoğu uygulamada genellikle tek bir çıktı
-kullanılır, mesela bir resimde kedi olup olmadığını tahmin edecek bir YZ
-tek bir ikisel çıktı ile bunu yapabilir, ya da resmin belli kategorilere
-ait olup olmadığı tek bir vektör çıktısı ile, bu vektörde obje olasılıkları
-vardır. Fakat biraz düşününce iki farklı çıktılı yapının niye işlediğini
-anlayabiliriz, sonuçta YZ bir fonksiyonu yaklaşık olarak temsil etmeye
-çabalar, eğitim sırasında kafa \#1 fonksiyonu bir tahmin üretir, ve eğitim
-o kafanın yaptığı tahmine sonuç veren parametreleri günceller, aynı şekilde
-kafa \#2 için düzeltme yapılır.
+AGZ'nin yaptÄ±ÄŸÄ± ilerlemeler ise ÅŸunlar [3]: AlphaGo deÄŸer ve ilke iÃ§in iki
+ayrÄ± aÄŸ kullanÄ±yordu. AGZ'de deÄŸer ve ilke YZ'leri birleÅŸtirilerek tek bir
+YSA ile iki Ã§Ä±ktÄ± Ã¼retilmesi saÄŸlanÄ±yor, bu yapÄ±ya esprili bir ÅŸekilde
+``iki baÅŸlÄ± canavar (two-headed monster)'' ismi de veriliyor. Bu mimari
+biraz garip gelebilir, Ã§Ã¼nkÃ¼ Ã§oÄŸu uygulamada genellikle tek bir Ã§Ä±ktÄ±
+kullanÄ±lÄ±r, mesela bir resimde kedi olup olmadÄ±ÄŸÄ±nÄ± tahmin edecek bir YZ
+tek bir ikisel Ã§Ä±ktÄ± ile bunu yapabilir, ya da resmin belli kategorilere
+ait olup olmadÄ±ÄŸÄ± tek bir vektÃ¶r Ã§Ä±ktÄ±sÄ± ile, bu vektÃ¶rde obje olasÄ±lÄ±klarÄ±
+vardÄ±r. Fakat biraz dÃ¼ÅŸÃ¼nÃ¼nce iki farklÄ± Ã§Ä±ktÄ±lÄ± yapÄ±nÄ±n niye iÅŸlediÄŸini
+anlayabiliriz, sonuÃ§ta YZ bir fonksiyonu yaklaÅŸÄ±k olarak temsil etmeye
+Ã§abalar, eÄŸitim sÄ±rasÄ±nda kafa \#1 fonksiyonu bir tahmin Ã¼retir, ve eÄŸitim
+o kafanÄ±n yaptÄ±ÄŸÄ± tahmine sonuÃ§ veren parametreleri gÃ¼nceller, aynÄ± ÅŸekilde
+kafa \#2 iÃ§in dÃ¼zeltme yapÄ±lÄ±r.
 
 \includegraphics[width=15em]{go_03.png}
 
-İkinci bir AGZ ilerlemesi artıksal ağ (residual network) adı verilen bir
-derin YSA yapısı kullanmak. Artıksal ağlar pür evrişimsel ağların daha
-gelişmiş hali, bu yapılarda evrişimsel ağda bölge atlaması yapılarak
-sonraki bölgelere direk / kısayol bağlantıları koyuluyor [6]. Örnek bir
-yapı altta,
+Ä°kinci bir AGZ ilerlemesi artÄ±ksal aÄŸ (residual network) adÄ± verilen bir
+derin YSA yapÄ±sÄ± kullanmak. ArtÄ±ksal aÄŸlar pÃ¼r evriÅŸimsel aÄŸlarÄ±n daha
+geliÅŸmiÅŸ hali, bu yapÄ±larda evriÅŸimsel aÄŸda bÃ¶lge atlamasÄ± yapÄ±larak
+sonraki bÃ¶lgelere direk / kÄ±sayol baÄŸlantÄ±larÄ± koyuluyor [6]. Ã–rnek bir
+yapÄ± altta,
 
 \includegraphics[width=10em]{resnet34.png}
 
-Üçüncü ilerleme ise AGZ'nin kendisine karşı oynayarak kendini eğitmesi (AG
-için başkaların oynadığı oyunların kayıtları kullanıldı). DeepMind
-bilimcileri araştırmaları sırasında şunu anladılar: hangi baz mimariyle
-başlarsak başlayalım, MCTS onu daha iyileştirir. Bu durumda herhangi bir YZ
-alınır ki başta ağırlık değerleri rasgele yani hiç bir doğru karar vermez,
-ama bu YZ, MCTS ile daha iyi performans gösterecektir, bu sırada oyundan
-eğitim verisi toplanır ve bu veri YZ'yi iyileştirmek için ağa uygulanır, ve
-işlem başa dönerek devam edilir. Bu sayede en kötü performanstan en iyisine
-doğru ilerlemek mümkündür.
+ÃœÃ§Ã¼ncÃ¼ ilerleme ise AGZ'nin kendisine karÅŸÄ± oynayarak kendini eÄŸitmesi (AG
+iÃ§in baÅŸkalarÄ±n oynadÄ±ÄŸÄ± oyunlarÄ±n kayÄ±tlarÄ± kullanÄ±ldÄ±). DeepMind
+bilimcileri araÅŸtÄ±rmalarÄ± sÄ±rasÄ±nda ÅŸunu anladÄ±lar: hangi baz mimariyle
+baÅŸlarsak baÅŸlayalÄ±m, MCTS onu daha iyileÅŸtirir. Bu durumda herhangi bir YZ
+alÄ±nÄ±r ki baÅŸta aÄŸÄ±rlÄ±k deÄŸerleri rasgele yani hiÃ§ bir doÄŸru karar vermez,
+ama bu YZ, MCTS ile daha iyi performans gÃ¶sterecektir, bu sÄ±rada oyundan
+eÄŸitim verisi toplanÄ±r ve bu veri YZ'yi iyileÅŸtirmek iÃ§in aÄŸa uygulanÄ±r, ve
+iÅŸlem baÅŸa dÃ¶nerek devam edilir. Bu sayede en kÃ¶tÃ¼ performanstan en iyisine
+doÄŸru ilerlemek mÃ¼mkÃ¼ndÃ¼r.
 
-Eğitim verisinde hedefin ne olduğunu daha iyi vurgulamak gerekirse, değer
-kafası için bu tek bir değer, ilke kafası için tüm 9x9 tahta
-pozisyonlarında hangi hamlenin yapılmış olduğu, o hücre 1 diğerleri 0
-değerinde olacak. Bu şekilde eğitilen YSA, ilke tahmini üreteceği zaman tüm
-hücrelerde olasılık değerleri üretecektir.
+EÄŸitim verisinde hedefin ne olduÄŸunu daha iyi vurgulamak gerekirse, deÄŸer
+kafasÄ± iÃ§in bu tek bir deÄŸer, ilke kafasÄ± iÃ§in tÃ¼m 9x9 tahta
+pozisyonlarÄ±nda hangi hamlenin yapÄ±lmÄ±ÅŸ olduÄŸu, o hÃ¼cre 1 diÄŸerleri 0
+deÄŸerinde olacak. Bu ÅŸekilde eÄŸitilen YSA, ilke tahmini Ã¼reteceÄŸi zaman tÃ¼m
+hÃ¼crelerde olasÄ±lÄ±k deÄŸerleri Ã¼retecektir.
 
-Alttaki kod [4]'u baz almıştır. Eğitmek için \verb!train.py! kullanılır,
-eğitim sırasında en son YSA belli aralıklarla sürekli kaydedilecektir,
-eğitim sonunda ya da yeterince eğitilince işlem durulabilir, ve
-\verb!gnugo_play.py! kaydedilen aynı modeli kullanarak GnuGo [1] programına
-karşı oynatılabilir. YSA olarak biz ResNet yerine daha basit bir yapı
-kullandık,
+Alttaki kod [4]'u baz almÄ±ÅŸtÄ±r. EÄŸitmek iÃ§in \verb!train.py! kullanÄ±lÄ±r,
+eÄŸitim sÄ±rasÄ±nda en son YSA belli aralÄ±klarla sÃ¼rekli kaydedilecektir,
+eÄŸitim sonunda ya da yeterince eÄŸitilince iÅŸlem durulabilir, ve
+\verb!gnugo_play.py! kaydedilen aynÄ± modeli kullanarak GnuGo [1] programÄ±na
+karÅŸÄ± oynatÄ±labilir. YSA olarak biz ResNet yerine daha basit bir yapÄ±
+kullandÄ±k,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import simplenet
@@ -139,22 +139,22 @@ Out[1]: <tensorflow.python.keras._impl.keras.engine.training.Model at 0x7fa2dd30
 
 \inputminted[fontsize=\footnotesize]{python}{simplenet.py}
 
-İki YSA kendisine karşı oynarken aynı ağırlıklara sahip iki farklı YSA ile
-başlıyoruz, ve oyun sonuçlarını kullanarak sadece birini
-güncelliyoruz. Eğer her toptan demeti (minibatch) ile her iki YSA'yı
-güncelleseydik birbirlerinden farklılaşmaları zorlaşabilirdi. Ama döngünün
-daha ileri bir noktasında esitleme yapariz yine de, ilk YSA'yı
-güncellenenin ağırlıklarını diskten okuyarak güncelliyoruz, ve böyle devam
-ediyor. AGZ tasarımcıları ``en iyi'' olan ağırlıklara geçmeden yeni YSA'nın
-diğerini yüzde 55'ten fazla yenmesi şartını koymuşlar, tam donanımla
+Ä°ki YSA kendisine karÅŸÄ± oynarken aynÄ± aÄŸÄ±rlÄ±klara sahip iki farklÄ± YSA ile
+baÅŸlÄ±yoruz, ve oyun sonuÃ§larÄ±nÄ± kullanarak sadece birini
+gÃ¼ncelliyoruz. EÄŸer her toptan demeti (minibatch) ile her iki YSA'yÄ±
+gÃ¼ncelleseydik birbirlerinden farklÄ±laÅŸmalarÄ± zorlaÅŸabilirdi. Ama dÃ¶ngÃ¼nÃ¼n
+daha ileri bir noktasÄ±nda esitleme yapariz yine de, ilk YSA'yÄ±
+gÃ¼ncellenenin aÄŸÄ±rlÄ±klarÄ±nÄ± diskten okuyarak gÃ¼ncelliyoruz, ve bÃ¶yle devam
+ediyor. AGZ tasarÄ±mcÄ±larÄ± ``en iyi'' olan aÄŸÄ±rlÄ±klara geÃ§meden yeni YSA'nÄ±n
+diÄŸerini yÃ¼zde 55'ten fazla yenmesi ÅŸartÄ±nÄ± koymuÅŸlar, tam donanÄ±mla
 testleri yapanlar bunu takip ederse iyi olur.
 
-Üstteki mimari birkaç saat eğitim sonrası GnuGo (kendi YZ'si olan bir dış
-Go programı) başlangıç, orta seviyelerini yenebiliyor. Okuyucular, grafik
-kartlı güçlü bir mimaride, ya üstteki YSA'yı derinleştirerek (daha fazla
-evrişim filtresi ekleyerek), ya da \verb!resnet.py! ile, ve \verb!n_play!'i
-arttırarak daha fazla simülasyonla sonuçları daha da iyileştirmeye
-uğraşabilirler.
+Ãœstteki mimari birkaÃ§ saat eÄŸitim sonrasÄ± GnuGo (kendi YZ'si olan bir dÄ±ÅŸ
+Go programÄ±) baÅŸlangÄ±Ã§, orta seviyelerini yenebiliyor. Okuyucular, grafik
+kartlÄ± gÃ¼Ã§lÃ¼ bir mimaride, ya Ã¼stteki YSA'yÄ± derinleÅŸtirerek (daha fazla
+evriÅŸim filtresi ekleyerek), ya da \verb!resnet.py! ile, ve \verb!n_play!'i
+arttÄ±rarak daha fazla simÃ¼lasyonla sonuÃ§larÄ± daha da iyileÅŸtirmeye
+uÄŸraÅŸabilirler.
 
 Kaynaklar
 

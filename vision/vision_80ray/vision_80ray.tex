@@ -1,15 +1,15 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Geri-Yansıtmayla 3D Işın Hesabı (Back-projecting a 3D Ray), ve Düzlem Mesafesi
+Geri-YansÄ±tmayla 3D IÅŸÄ±n HesabÄ± (Back-projecting a 3D Ray), ve DÃ¼zlem Mesafesi
 
-Üç boyutlu bir noktanın iki boyuta yansımasında derinlik bilgisinin
-kaybolduğunu gördük, birden fazla üç boyutlu nokta aynı piksele tekabül
-edebiliyor. Bu durumda sadece piksel kullanarak obje mesafe ölçümünü tek
-bir görüntü üzerinden nasıl yapabiliriz? 
+ÃœÃ§ boyutlu bir noktanÄ±n iki boyuta yansÄ±masÄ±nda derinlik bilgisinin
+kaybolduÄŸunu gÃ¶rdÃ¼k, birden fazla Ã¼Ã§ boyutlu nokta aynÄ± piksele tekabÃ¼l
+edebiliyor. Bu durumda sadece piksel kullanarak obje mesafe Ã¶lÃ§Ã¼mÃ¼nÃ¼ tek
+bir gÃ¶rÃ¼ntÃ¼ Ã¼zerinden nasÄ±l yapabiliriz? 
 
-Eğer derinlik bilgisini kaybettiysek o zaman resimde bilinen diğer bazı
-faktörleri yanyana koyarak bir uzaklık hesaplayabiliriz belki. Mesela
-alttaki resimdeki kırmızı piksellerin mesafesini bulmak istiyorum.
+EÄŸer derinlik bilgisini kaybettiysek o zaman resimde bilinen diÄŸer bazÄ±
+faktÃ¶rleri yanyana koyarak bir uzaklÄ±k hesaplayabiliriz belki. Mesela
+alttaki resimdeki kÄ±rmÄ±zÄ± piksellerin mesafesini bulmak istiyorum.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from PIL import Image
@@ -36,39 +36,39 @@ plt.savefig('vision_80ray_02.png')
 
 \includegraphics[width=20em]{vision_80ray_02.png}
 
-Problem öyle ki bu piksellerin yolu temsil eden pikseller olduğunu
-biliyorum. Bu bilgiyi nasıl elde ettim? Renksel bazlı, ya da iki boyutta
-imajı parçalara bölmeyi çok iyi yapan bir algoritmam var belki, vs. ve bu
+Problem Ã¶yle ki bu piksellerin yolu temsil eden pikseller olduÄŸunu
+biliyorum. Bu bilgiyi nasÄ±l elde ettim? Renksel bazlÄ±, ya da iki boyutta
+imajÄ± parÃ§alara bÃ¶lmeyi Ã§ok iyi yapan bir algoritmam var belki, vs. ve bu
 sayede o piksellerin caddeye ait oldugunu biliyorum. O zaman, bu bilgi elde
-varsa, bu bana bir şey kazandırdı: üç boyutta bu piksellerin {\em hangi
-  düzlemden} geldiğini biliyorum artık. Bu düzlem $xy$ düzlemidir, orada
+varsa, bu bana bir ÅŸey kazandÄ±rdÄ±: Ã¼Ã§ boyutta bu piksellerin {\em hangi
+  dÃ¼zlemden} geldiÄŸini biliyorum artÄ±k. Bu dÃ¼zlem $xy$ dÃ¼zlemidir, orada
 $z=0$.
 
-Bir numara daha: bir piksele bakarak onun kesin üç boyutlu yerini
-hesaplayamayabilirim. Ama bir piksele tekabül eden, onu oluşturan kamera
-merkezinden dünyaya doğru fırlayan bir ışının (ray) kesin formülünü
+Bir numara daha: bir piksele bakarak onun kesin Ã¼Ã§ boyutlu yerini
+hesaplayamayabilirim. Ama bir piksele tekabÃ¼l eden, onu oluÅŸturan kamera
+merkezinden dÃ¼nyaya doÄŸru fÄ±rlayan bir Ä±ÅŸÄ±nÄ±n (ray) kesin formÃ¼lÃ¼nÃ¼
 hesaplayabilirim.
 
 \includegraphics[width=20em]{vision_80ray_01.png}
 
-Mesela örnek kırmızı piksellerden biri $p_1$ noktası olabilir, kamera
-merkezi $C$'den bir ışın fırlatıyoruz, bu ışın $p_1$'i oluşturuyor ve dış
-dünyadaki bir $X$ noktasına doğru gidiyor.  Şimdi bu iki fikri biraraya
-koyarsak, elde bir düzlem, bir çizgi var; üç boyutlu yer nasıl bulunur?
-İkisinin kesiştiği yer ile! Bu nokta yol noktasının üç boyutlu
-kordinatıdır.
+Mesela Ã¶rnek kÄ±rmÄ±zÄ± piksellerden biri $p_1$ noktasÄ± olabilir, kamera
+merkezi $C$'den bir Ä±ÅŸÄ±n fÄ±rlatÄ±yoruz, bu Ä±ÅŸÄ±n $p_1$'i oluÅŸturuyor ve dÄ±ÅŸ
+dÃ¼nyadaki bir $X$ noktasÄ±na doÄŸru gidiyor.  Åimdi bu iki fikri biraraya
+koyarsak, elde bir dÃ¼zlem, bir Ã§izgi var; Ã¼Ã§ boyutlu yer nasÄ±l bulunur?
+Ä°kisinin kesiÅŸtiÄŸi yer ile! Bu nokta yol noktasÄ±nÄ±n Ã¼Ã§ boyutlu
+kordinatÄ±dÄ±r.
 
 Kamera Merkezi
 
-Bu yazıda kamera merkezinin bilindiğini varsaydık. Ama eğer bilmeseydi, ve
-elde sadece $P$ matrisi olsa, kamera merkezini nasıl hesaplarız onu
-görelim. Biraz önceki resmi işlerken kameranın yerden 1 metre yükseltilmiş
-olduğunu farzedeceğiz (bunu biliyoruz), fakat bazen bu bilgi verilmemiş
-olabilir. Bu durumda dışsal matristen başlayabiliriz.
+Bu yazÄ±da kamera merkezinin bilindiÄŸini varsaydÄ±k. Ama eÄŸer bilmeseydi, ve
+elde sadece $P$ matrisi olsa, kamera merkezini nasÄ±l hesaplarÄ±z onu
+gÃ¶relim. Biraz Ã¶nceki resmi iÅŸlerken kameranÄ±n yerden 1 metre yÃ¼kseltilmiÅŸ
+olduÄŸunu farzedeceÄŸiz (bunu biliyoruz), fakat bazen bu bilgi verilmemiÅŸ
+olabilir. Bu durumda dÄ±ÅŸsal matristen baÅŸlayabiliriz.
 
-Dışsal (exintrinsic) matrisler dış dünya kordinatlarının kamera
-kordindatlarına nasıl transform edildiğini tarif ederler. Bunun yerine
-kamera duruşunu modelleyip oradan geriye gidersek aynı noktaya gelmiş
+DÄ±ÅŸsal (exintrinsic) matrisler dÄ±ÅŸ dÃ¼nya kordinatlarÄ±nÄ±n kamera
+kordindatlarÄ±na nasÄ±l transform edildiÄŸini tarif ederler. Bunun yerine
+kamera duruÅŸunu modelleyip oradan geriye gidersek aynÄ± noktaya gelmiÅŸ
 oluruz [1].
 
 $$ 
@@ -123,7 +123,7 @@ $$
 \right]
 $$
 
-Birbirine tekabül eden hücrelere bakınca 
+Birbirine tekabÃ¼l eden hÃ¼crelere bakÄ±nca 
 
 $$ t = -R_c^TC$$
 
@@ -131,38 +131,38 @@ O zaman
 
 $$ C = -R_c^T t$$
 
-Burada $R_c$ $P$ yansıtma matrisinin ilk üç kolonundan oluşan
-matristir. Ayrıca kamera merkezinin içsel matris $K$'ye bağlı olmadığına
+Burada $R_c$ $P$ yansÄ±tma matrisinin ilk Ã¼Ã§ kolonundan oluÅŸan
+matristir. AyrÄ±ca kamera merkezinin iÃ§sel matris $K$'ye baÄŸlÄ± olmadÄ±ÄŸÄ±na
 dikkat. 
 
-Sözde Ters ile $X$
+SÃ¶zde Ters ile $X$
 
-Şimdi $X$ bulmak lazım. Bir fikir akla geliyor, $PX = x$ olduğuna göre,
-$P$'nin tersini alıp bu tersi soldan iki tarafla çarpsak olmaz mı (solda
-$P$ yokolur, $X$ kalır)? Burada bir problem var, $P$ matrisi $3 \times 4$
-matrisi, kare matris olmadığı için tersi alınamıyor. Bu hesap için
-2. derste işlenen sözde ters (pseudoinverse) işlemini
-kullanacağız. Hatırlatarsak, $P$'nin sözde tersi $P^{+}$
+Åimdi $X$ bulmak lazÄ±m. Bir fikir akla geliyor, $PX = x$ olduÄŸuna gÃ¶re,
+$P$'nin tersini alÄ±p bu tersi soldan iki tarafla Ã§arpsak olmaz mÄ± (solda
+$P$ yokolur, $X$ kalÄ±r)? Burada bir problem var, $P$ matrisi $3 \times 4$
+matrisi, kare matris olmadÄ±ÄŸÄ± iÃ§in tersi alÄ±namÄ±yor. Bu hesap iÃ§in
+2. derste iÅŸlenen sÃ¶zde ters (pseudoinverse) iÅŸlemini
+kullanacaÄŸÄ±z. HatÄ±rlatarsak, $P$'nin sÃ¶zde tersi $P^{+}$
 
 $$ P^{+} = P^T(PP^T)^{-1}$$
 
-işlemidir, ki $PP^{+} = I$. Ama $PP^T$ çarpımı sayısal iyi sonuçlar
-vermeyebilir (çarpımlar çok büyür), endişeye gerek yok, sayısal
-kütüphaneler sözde ters işlemini SVD üzerinden çözüyor (çok hızlı),
+iÅŸlemidir, ki $PP^{+} = I$. Ama $PP^T$ Ã§arpÄ±mÄ± sayÄ±sal iyi sonuÃ§lar
+vermeyebilir (Ã§arpÄ±mlar Ã§ok bÃ¼yÃ¼r), endiÅŸeye gerek yok, sayÄ±sal
+kÃ¼tÃ¼phaneler sÃ¶zde ters iÅŸlemini SVD Ã¼zerinden Ã§Ã¶zÃ¼yor (Ã§ok hÄ±zlÄ±),
 bkz. 2. ders.
 
-O zaman $P^{+}x$ ile bahsettiğimiz ışındaki bir noktayı buluruz. Dikkat,
-sadece birini buluruz, diğer noktalar da mümkündür. Ama o noktalar bizi
-ilgilendirmiyor (şimdilik) elimizde iki nokta olacak, biri kamera merkezi
-diğeri bu hesaplanacak olan, bu ikisi yeterli. Ondan önce üstteki hesabın
-gerçekten bir $X$ verip vermediğini kontrol edelim, hesaplanan noktayı
-tekrar geri kameraya yansıtırsak ne olur?
+O zaman $P^{+}x$ ile bahsettiÄŸimiz Ä±ÅŸÄ±ndaki bir noktayÄ± buluruz. Dikkat,
+sadece birini buluruz, diÄŸer noktalar da mÃ¼mkÃ¼ndÃ¼r. Ama o noktalar bizi
+ilgilendirmiyor (ÅŸimdilik) elimizde iki nokta olacak, biri kamera merkezi
+diÄŸeri bu hesaplanacak olan, bu ikisi yeterli. Ondan Ã¶nce Ã¼stteki hesabÄ±n
+gerÃ§ekten bir $X$ verip vermediÄŸini kontrol edelim, hesaplanan noktayÄ±
+tekrar geri kameraya yansÄ±tÄ±rsak ne olur?
 
 $$ P (P^{+}x) = Ix = x$$
 
-Hesap doğruymuş demek ki. Işın hesabı yapalım. Bir önceki resimde $p_1$'e
-benzeyen bir nokta iki üstteki resimde mavi renkli gösterildi. Bu piksele
-doğru giden bir çizgi neye benzer?
+Hesap doÄŸruymuÅŸ demek ki. IÅŸÄ±n hesabÄ± yapalÄ±m. Bir Ã¶nceki resimde $p_1$'e
+benzeyen bir nokta iki Ã¼stteki resimde mavi renkli gÃ¶sterildi. Bu piksele
+doÄŸru giden bir Ã§izgi neye benzer?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from mpl_toolkits.mplot3d import Axes3D
@@ -205,17 +205,17 @@ plt.savefig('vision_80ray_05.png')
 \includegraphics[width=15em]{vision_80ray_04.png}
 \includegraphics[width=15em]{vision_80ray_05.png}
 
-Mavi renkli ok kameranın imaj düzlemine dik (normal) olan vektör. Kırmızı
-olan ok $p_1$'e işaret eden üç boyutlu çizgi. 
+Mavi renkli ok kameranÄ±n imaj dÃ¼zlemine dik (normal) olan vektÃ¶r. KÄ±rmÄ±zÄ±
+olan ok $p_1$'e iÅŸaret eden Ã¼Ã§ boyutlu Ã§izgi. 
 
-Şimdi tüm noktaları yapalım. Altta ilk gösterilen kod iki noktayı baz alan
-sonsuza giden çizgi ile bir düzlem (bir nokta, bir normal ile tanımlı)
-arasında kesişmeyi hesaplayan çağrıdır, bkz [3]. Üstteki gördüğümüz kırmızı renkli pikselleri alıp teker teker onların
-ışınını bulacağız, sonra bu çizginin $xy$ düzlemi ile kesişmesini
-bulacağız. $xy$ düzlemini tanımlamak için bir nokta, bir de normal vektör
-lazım; en basit nokta orijin, yani $(0,0,0)$, normal ise dik yukarı giden
-birim vektör $\left[\begin{array}{ccc} 0&0&1 \end{array}\right]^T$.  Kamera
-matrisi $K$'yi biliyoruz, çünkü kamerayı biz kalibre ettik, detaylar için
+Åimdi tÃ¼m noktalarÄ± yapalÄ±m. Altta ilk gÃ¶sterilen kod iki noktayÄ± baz alan
+sonsuza giden Ã§izgi ile bir dÃ¼zlem (bir nokta, bir normal ile tanÄ±mlÄ±)
+arasÄ±nda kesiÅŸmeyi hesaplayan Ã§aÄŸrÄ±dÄ±r, bkz [3]. Ãœstteki gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z kÄ±rmÄ±zÄ± renkli pikselleri alÄ±p teker teker onlarÄ±n
+Ä±ÅŸÄ±nÄ±nÄ± bulacaÄŸÄ±z, sonra bu Ã§izginin $xy$ dÃ¼zlemi ile kesiÅŸmesini
+bulacaÄŸÄ±z. $xy$ dÃ¼zlemini tanÄ±mlamak iÃ§in bir nokta, bir de normal vektÃ¶r
+lazÄ±m; en basit nokta orijin, yani $(0,0,0)$, normal ise dik yukarÄ± giden
+birim vektÃ¶r $\left[\begin{array}{ccc} 0&0&1 \end{array}\right]^T$.  Kamera
+matrisi $K$'yi biliyoruz, Ã§Ã¼nkÃ¼ kamerayÄ± biz kalibre ettik, detaylar iÃ§in
 [2].
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -259,37 +259,37 @@ plt.savefig('vision_80ray_03.png')
 
 \includegraphics[width=20em]{vision_80ray_03.png}
 
-Üstteki görüntü kırmızı piksellerin 3 boyutta, caddedeki kuşbakışı
-görüntüsü. Noktalar mantıklı, bir sağa kayış var, bu doğru çünkü her ne
-kadar iki boyutlu görüntüde noktalar yukarı gidiyor gibi dursa da, aslında
-kesişme noktasına giden çizginin sağına doğru akmışlar. Bir diğer durum en
-altta birkaç metrelik bir kısmın boş olması. Bu da mantıklı çünkü kamera
-direk altını göremiyor, en yakın görebildiği noktalar biraz daha önde
+Ãœstteki gÃ¶rÃ¼ntÃ¼ kÄ±rmÄ±zÄ± piksellerin 3 boyutta, caddedeki kuÅŸbakÄ±ÅŸÄ±
+gÃ¶rÃ¼ntÃ¼sÃ¼. Noktalar mantÄ±klÄ±, bir saÄŸa kayÄ±ÅŸ var, bu doÄŸru Ã§Ã¼nkÃ¼ her ne
+kadar iki boyutlu gÃ¶rÃ¼ntÃ¼de noktalar yukarÄ± gidiyor gibi dursa da, aslÄ±nda
+kesiÅŸme noktasÄ±na giden Ã§izginin saÄŸÄ±na doÄŸru akmÄ±ÅŸlar. Bir diÄŸer durum en
+altta birkaÃ§ metrelik bir kÄ±smÄ±n boÅŸ olmasÄ±. Bu da mantÄ±klÄ± Ã§Ã¼nkÃ¼ kamera
+direk altÄ±nÄ± gÃ¶remiyor, en yakÄ±n gÃ¶rebildiÄŸi noktalar biraz daha Ã¶nde
 olanlar.
 
-Peki kameranın duruşunu biliyorum, yere paralel, 1 metre yukarıda, direk
-düz ileri bakıyor. Bu bilgiyi kullanarak bir üçgen oluşturup, açılarla ve
-benzeri şekillerle daha basit şekilde mesafeyi hesaplayabilirdim, niye bunu
-yapmadım? Özellikle $P$ matrisini kullanmamızın sebebi eğer yer
-değiştirmeyle beraber kamerada dönüş (rotation) durumu da varsa (bu örnekte
-yoktu) bu bilginin de $P$ içinde olacağıdır. Bu durumda üstteki sözde ters
-ile yine direk bir ışını basit bir şekilde elde edebilirdik. Öteki türlü
-çetrefil bir sürü ek hesaplara girmek gerekecekti. Yani tarif ettiğimiz
-yaklaşımla her türlü kamera duruşunu idare edebiliriz.
+Peki kameranÄ±n duruÅŸunu biliyorum, yere paralel, 1 metre yukarÄ±da, direk
+dÃ¼z ileri bakÄ±yor. Bu bilgiyi kullanarak bir Ã¼Ã§gen oluÅŸturup, aÃ§Ä±larla ve
+benzeri ÅŸekillerle daha basit ÅŸekilde mesafeyi hesaplayabilirdim, niye bunu
+yapmadÄ±m? Ã–zellikle $P$ matrisini kullanmamÄ±zÄ±n sebebi eÄŸer yer
+deÄŸiÅŸtirmeyle beraber kamerada dÃ¶nÃ¼ÅŸ (rotation) durumu da varsa (bu Ã¶rnekte
+yoktu) bu bilginin de $P$ iÃ§inde olacaÄŸÄ±dÄ±r. Bu durumda Ã¼stteki sÃ¶zde ters
+ile yine direk bir Ä±ÅŸÄ±nÄ± basit bir ÅŸekilde elde edebilirdik. Ã–teki tÃ¼rlÃ¼
+Ã§etrefil bir sÃ¼rÃ¼ ek hesaplara girmek gerekecekti. Yani tarif ettiÄŸimiz
+yaklaÅŸÄ±mla her tÃ¼rlÃ¼ kamera duruÅŸunu idare edebiliriz.
 
-Hesapların metrik olarak bir anlamının olduğuna dikkat. Çünkü yerden 1
-metre yüksekte olmayı hesabın içine direk dahil ettik, bu sebeple mesela
-uzaklık sonuçları, 2.5 metre, 5 metre gibi anlamlı çıktı. 
+HesaplarÄ±n metrik olarak bir anlamÄ±nÄ±n olduÄŸuna dikkat. Ã‡Ã¼nkÃ¼ yerden 1
+metre yÃ¼ksekte olmayÄ± hesabÄ±n iÃ§ine direk dahil ettik, bu sebeple mesela
+uzaklÄ±k sonuÃ§larÄ±, 2.5 metre, 5 metre gibi anlamlÄ± Ã§Ä±ktÄ±. 
 
 Kaynaklar
 
 [1] Kyle Simek, Dissecting the Camera Matrix, Part 2: The Extrinsic Matrix,
 \url{http://ksimek.github.io/2012/08/22/extrinsic/}
 
-[2] Bayramlı, 
-    {\em Algılayıcı Ölçümleri, Video, Android}, 
+[2] BayramlÄ±, 
+    {\em AlgÄ±layÄ±cÄ± Ã–lÃ§Ã¼mleri, Video, Android}, 
      \url{https://burakbayramli.github.io/dersblog/sk/2017/02/algilayici-olcumleri-video-android.html}
 
-[3] Bayramlı, {\em Çok Boyutlu Calculus, Ders 5}
+[3] BayramlÄ±, {\em Ã‡ok Boyutlu Calculus, Ders 5}
 
 \end{document}

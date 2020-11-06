@@ -1,169 +1,169 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Uzun Kısa-Vade Hafıza Ağları (Long Short-Term Memory Networks, LSTM)
+Uzun KÄ±sa-Vade HafÄ±za AÄŸlarÄ± (Long Short-Term Memory Networks, LSTM)
 
-Kendini tekrarlayan YSA (RNN) yapılarının içindeki gizli konum $h_t$
-(önceki yazıda $s_t$) olarak bir zaman diliminden bir diğerine
-aktarılabiliyordu, ve bu sırada bir matris çarpımı üzerinden değişime
-uğrayabiliyordu. Böylece her zaman diliminde yeni görülen verinin
-``hafıza'' olarak ta tanımlanabilen $h_t$'ye etkisi olabiliyordu. RNN dış
-dünya hakkındaki iç modelini böyle güncelliyordu.
+Kendini tekrarlayan YSA (RNN) yapÄ±larÄ±nÄ±n iÃ§indeki gizli konum $h_t$
+(Ã¶nceki yazÄ±da $s_t$) olarak bir zaman diliminden bir diÄŸerine
+aktarÄ±labiliyordu, ve bu sÄ±rada bir matris Ã§arpÄ±mÄ± Ã¼zerinden deÄŸiÅŸime
+uÄŸrayabiliyordu. BÃ¶ylece her zaman diliminde yeni gÃ¶rÃ¼len verinin
+``hafÄ±za'' olarak ta tanÄ±mlanabilen $h_t$'ye etkisi olabiliyordu. RNN dÄ±ÅŸ
+dÃ¼nya hakkÄ±ndaki iÃ§ modelini bÃ¶yle gÃ¼ncelliyordu.
 
-Fakat RNN ile tarif edilen bu güncellemeye hiç bir sınır getirmedik. Biraz
-düşünürsek bu güncellemenin biraz kaotik bir hal alabileceğini görebiliriz
-[1]. Mesela bir filmi kare kare izleyerek filmde neler olduğunu tarif
-etmeye uğraşan bir RNN düşünelim. Bir karede bir karakterin ABD'de olduğunu
-düşünebilir, ama sonraki karede karakterin suşi yediğini görüyor ve
-Japonya'da olduğuna karar verebilir, sonra Panda ayısı görüyor ve karakteri
+Fakat RNN ile tarif edilen bu gÃ¼ncellemeye hiÃ§ bir sÄ±nÄ±r getirmedik. Biraz
+dÃ¼ÅŸÃ¼nÃ¼rsek bu gÃ¼ncellemenin biraz kaotik bir hal alabileceÄŸini gÃ¶rebiliriz
+[1]. Mesela bir filmi kare kare izleyerek filmde neler olduÄŸunu tarif
+etmeye uÄŸraÅŸan bir RNN dÃ¼ÅŸÃ¼nelim. Bir karede bir karakterin ABD'de olduÄŸunu
+dÃ¼ÅŸÃ¼nebilir, ama sonraki karede karakterin suÅŸi yediÄŸini gÃ¶rÃ¼yor ve
+Japonya'da olduÄŸuna karar verebilir, sonra Panda ayÄ±sÄ± gÃ¶rÃ¼yor ve karakteri
 kuzey kutbunda zannediyor.
 
-Bu tarif edilen kaos enformasyonun çok hızlı etki ettiğini ve aynı hızda
-yokolduğuna işaret. Bu tür bir yapıda modelin uzun vadeli hafıza tutması
-oldukça zor. Bize gereken modelin sadece güncelleme yapması değil,
-güncelleme yapmayı da öğrenmesi. Ali adlı bir karakter film karesinde yoksa
-o kareler Ali hakkındaki bilgiyi güncellemek için kullanılmamalı, aynı
-şekilde Ayşe'nin içinde olmadığı kareler onun hakkındaki bilgiyi
-güncellemek için kullanılmamalı. 
+Bu tarif edilen kaos enformasyonun Ã§ok hÄ±zlÄ± etki ettiÄŸini ve aynÄ± hÄ±zda
+yokolduÄŸuna iÅŸaret. Bu tÃ¼r bir yapÄ±da modelin uzun vadeli hafÄ±za tutmasÄ±
+oldukÃ§a zor. Bize gereken modelin sadece gÃ¼ncelleme yapmasÄ± deÄŸil,
+gÃ¼ncelleme yapmayÄ± da Ã¶ÄŸrenmesi. Ali adlÄ± bir karakter film karesinde yoksa
+o kareler Ali hakkÄ±ndaki bilgiyi gÃ¼ncellemek iÃ§in kullanÄ±lmamalÄ±, aynÄ±
+ÅŸekilde AyÅŸe'nin iÃ§inde olmadÄ±ÄŸÄ± kareler onun hakkÄ±ndaki bilgiyi
+gÃ¼ncellemek iÃ§in kullanÄ±lmamalÄ±. 
 
-Çözüm için şöyle bir yaklaşım kullanabiliriz. 
+Ã‡Ã¶zÃ¼m iÃ§in ÅŸÃ¶yle bir yaklaÅŸÄ±m kullanabiliriz. 
 
-1) Bir ``unutma'' mekanizması ekle. Film seyrediyoruz, bir sahne bitiyor, o
-sahnenin hangi gün, saat kaçta, nerede olduğunu unutuyoruz. Fakat bir
-karakter o sahnede ölmüşse, bunu hatırlıyoruz. Modelin ne zaman
-hatırlayacağını, ne zaman unutacağını öğrenmesini istiyoruz (dikkat sadece
-belli bir şekilde unutması, hatırlaması değil, tüm bunları nasıl, ne zaman
-yapacağını öğrenmesi).
+1) Bir ``unutma'' mekanizmasÄ± ekle. Film seyrediyoruz, bir sahne bitiyor, o
+sahnenin hangi gÃ¼n, saat kaÃ§ta, nerede olduÄŸunu unutuyoruz. Fakat bir
+karakter o sahnede Ã¶lmÃ¼ÅŸse, bunu hatÄ±rlÄ±yoruz. Modelin ne zaman
+hatÄ±rlayacaÄŸÄ±nÄ±, ne zaman unutacaÄŸÄ±nÄ± Ã¶ÄŸrenmesini istiyoruz (dikkat sadece
+belli bir ÅŸekilde unutmasÄ±, hatÄ±rlamasÄ± deÄŸil, tÃ¼m bunlarÄ± nasÄ±l, ne zaman
+yapacaÄŸÄ±nÄ± Ã¶ÄŸrenmesi).
 
-2) Bir belleğe yazma (zulaya atma?) mekanizması. Modelin yeni bir kare
-gördüğünde o karedeki bilginin kaydetmeye değer olup olmadığına karar
-vermesi lazım, ve bu öğrenilse iyi olur.
+2) Bir belleÄŸe yazma (zulaya atma?) mekanizmasÄ±. Modelin yeni bir kare
+gÃ¶rdÃ¼ÄŸÃ¼nde o karedeki bilginin kaydetmeye deÄŸer olup olmadÄ±ÄŸÄ±na karar
+vermesi lazÄ±m, ve bu Ã¶ÄŸrenilse iyi olur.
 
-3) .. ki yeni bir girdi gelince model ihtiyacı olmadığı bilgiyi
-unutacak. Sonra girdinin hangi kısmının faydalı olduğuna karar verecek ve o
-kısmı uzun-vadeli hafızasına kaydedecek.
+3) .. ki yeni bir girdi gelince model ihtiyacÄ± olmadÄ±ÄŸÄ± bilgiyi
+unutacak. Sonra girdinin hangi kÄ±smÄ±nÄ±n faydalÄ± olduÄŸuna karar verecek ve o
+kÄ±smÄ± uzun-vadeli hafÄ±zasÄ±na kaydedecek.
 
-4) Bir odaklanma mekanizması. Uzun-vadeli hafızanın hangi kısmı sık
-kullanım gerekiriyor, işlem hafızası (working memory) hangisi, buna karar
+4) Bir odaklanma mekanizmasÄ±. Uzun-vadeli hafÄ±zanÄ±n hangi kÄ±smÄ± sÄ±k
+kullanÄ±m gerekiriyor, iÅŸlem hafÄ±zasÄ± (working memory) hangisi, buna karar
 vermek.
 
-Bize gereken bir uzun kısa-vade hafıza ağıdır, teknik ismiyle LSTM. RNN her
-zaman adımında hafızasını kontrolsüz bir şekilde güncelleyebiliyorken, bir
-LSTM hafızasını çok daha seçici, kararlı bir şekilde günceller, bunu
-yaparken spesifik öğrenme mekanizmaları kullanır ki bu mekanizma ona
-görülen bilginin hangi kısmının hatırlanmaya değer, hangisinin
-güncellenmesinin gerekli olduğunu, ve hangisinin daha fazla odaklanılmaya
-ihtiyaç duyduğunu belirler.
+Bize gereken bir uzun kÄ±sa-vade hafÄ±za aÄŸÄ±dÄ±r, teknik ismiyle LSTM. RNN her
+zaman adÄ±mÄ±nda hafÄ±zasÄ±nÄ± kontrolsÃ¼z bir ÅŸekilde gÃ¼ncelleyebiliyorken, bir
+LSTM hafÄ±zasÄ±nÄ± Ã§ok daha seÃ§ici, kararlÄ± bir ÅŸekilde gÃ¼nceller, bunu
+yaparken spesifik Ã¶ÄŸrenme mekanizmalarÄ± kullanÄ±r ki bu mekanizma ona
+gÃ¶rÃ¼len bilginin hangi kÄ±smÄ±nÄ±n hatÄ±rlanmaya deÄŸer, hangisinin
+gÃ¼ncellenmesinin gerekli olduÄŸunu, ve hangisinin daha fazla odaklanÄ±lmaya
+ihtiyaÃ§ duyduÄŸunu belirler.
 
-Matematiksel olarak $t$ anında bir $x_t$ girdisi alıyoruz, uzun-vadeli ve
-işlem hafızası $C_{t-1}$ ve $h_{t-1}$ bir önceki zaman diliminden bir
-önceki bu zamana aktarılıyor ve onları bir şekilde güncellemek
-istiyoruz. Bize gereken bir tür hatırlama geçidi (remember gate), bu
-elektronik devrelerdeki gibi bir geçit, 0 ile 1 arasında olacak $n$ tane
-sayı, bu sayı $n$ hafıza ögesinin ne kadar hatırlanacağını, yani ne kadar
-uzun-vadeli olup olmayacağını belirleyecek. 1 tut, 0 unut demek olacak.
+Matematiksel olarak $t$ anÄ±nda bir $x_t$ girdisi alÄ±yoruz, uzun-vadeli ve
+iÅŸlem hafÄ±zasÄ± $C_{t-1}$ ve $h_{t-1}$ bir Ã¶nceki zaman diliminden bir
+Ã¶nceki bu zamana aktarÄ±lÄ±yor ve onlarÄ± bir ÅŸekilde gÃ¼ncellemek
+istiyoruz. Bize gereken bir tÃ¼r hatÄ±rlama geÃ§idi (remember gate), bu
+elektronik devrelerdeki gibi bir geÃ§it, 0 ile 1 arasÄ±nda olacak $n$ tane
+sayÄ±, bu sayÄ± $n$ hafÄ±za Ã¶gesinin ne kadar hatÄ±rlanacaÄŸÄ±nÄ±, yani ne kadar
+uzun-vadeli olup olmayacaÄŸÄ±nÄ± belirleyecek. 1 tut, 0 unut demek olacak.
 
-Ufak bir YSA kullanarak bu geçidi öğrenebiliriz,
+Ufak bir YSA kullanarak bu geÃ§idi Ã¶ÄŸrenebiliriz,
 
 $$ f_t = \sigma (W_r x_t + U_r h_{t-1}) $$
 
-Bu basit, sığ (derin olmayan) bir YSA, $\sigma$ sigmoid aktivasyonu. Sigmoid
-kullandık çünkü 0 ile 1 arasında çıktıya ihtiyacımız var. Şimdi girdiden
-öğreneceğimiz bilgiyi hesaplamamız lazım, bu bilgi uzun-vadeli hafızamız
-için bir aday olacak. 
+Bu basit, sÄ±ÄŸ (derin olmayan) bir YSA, $\sigma$ sigmoid aktivasyonu. Sigmoid
+kullandÄ±k Ã§Ã¼nkÃ¼ 0 ile 1 arasÄ±nda Ã§Ä±ktÄ±ya ihtiyacÄ±mÄ±z var. Åimdi girdiden
+Ã¶ÄŸreneceÄŸimiz bilgiyi hesaplamamÄ±z lazÄ±m, bu bilgi uzun-vadeli hafÄ±zamÄ±z
+iÃ§in bir aday olacak. 
 
 $$ C_t' = \phi(W_l x_t + U_l h_{t-1})$$
 
-$\phi$ bir aktivasyon fonksiyonu, çoğunlukla $\tanh$ olarak seçilir. 
+$\phi$ bir aktivasyon fonksiyonu, Ã§oÄŸunlukla $\tanh$ olarak seÃ§ilir. 
 
-Fakat bir adayı hafızamıza eklemeden önce hangi bölümlerinin kullanıma,
-kaydetmeye değer olduğunu öğrenmemiz gerekir. Web'de bir şey okurken kendi
-zihnimizde neler olduğunu düşünelim. Bir haber makalesi okuyoruz mesela,
-Trabzonspor'un hep kötüye gittiğini, hep yanlış tranferler yaptığını
+Fakat bir adayÄ± hafÄ±zamÄ±za eklemeden Ã¶nce hangi bÃ¶lÃ¼mlerinin kullanÄ±ma,
+kaydetmeye deÄŸer olduÄŸunu Ã¶ÄŸrenmemiz gerekir. Web'de bir ÅŸey okurken kendi
+zihnimizde neler olduÄŸunu dÃ¼ÅŸÃ¼nelim. Bir haber makalesi okuyoruz mesela,
+Trabzonspor'un hep kÃ¶tÃ¼ye gittiÄŸini, hep yanlÄ±ÅŸ tranferler yaptÄ±ÄŸÄ±nÄ±
 anlatan bir haber okuyoruz, ama bu haberi fenerbahce.org sitesinde
-okuyorsak o habere daha az önem verebiliriz.
+okuyorsak o habere daha az Ã¶nem verebiliriz.
 
 $$ i_t = \sigma (W_s x_t + U_s h_{t-1}) $$
 
-Şimdi tüm bu basamakları birleştirelim. İhtiyacımız olmayan hafızaları
-unuttuktan ve bilgilerin faydalı olabilecek kısımlarını sakladıktan sonra,
-elimize bir güncellenmiş uzun-vadeli bellek geçer, 
+Åimdi tÃ¼m bu basamaklarÄ± birleÅŸtirelim. Ä°htiyacÄ±mÄ±z olmayan hafÄ±zalarÄ±
+unuttuktan ve bilgilerin faydalÄ± olabilecek kÄ±sÄ±mlarÄ±nÄ± sakladÄ±ktan sonra,
+elimize bir gÃ¼ncellenmiÅŸ uzun-vadeli bellek geÃ§er, 
 
 $$ C_t = f_t \circ c_{t-1} \circ i_t \circ \tilde{C}_t $$
 
-ki $\circ$ operasyonu her iki taraftaki değişkenin içindeki her ögenin
-birer birer çarpılması (element-wise multiplication) demek.
+ki $\circ$ operasyonu her iki taraftaki deÄŸiÅŸkenin iÃ§indeki her Ã¶genin
+birer birer Ã§arpÄ±lmasÄ± (element-wise multiplication) demek.
 
-Sonra işlem hafızasını güncellememiz lazım, uzun-vade belleğimizi anlık
-işlem için faydalı olabilecek şekilde nasıl odaklarız, onu öğrenmek
-istiyoruz. O zaman bir odaklanma vektörü öğreniriz,
+Sonra iÅŸlem hafÄ±zasÄ±nÄ± gÃ¼ncellememiz lazÄ±m, uzun-vade belleÄŸimizi anlÄ±k
+iÅŸlem iÃ§in faydalÄ± olabilecek ÅŸekilde nasÄ±l odaklarÄ±z, onu Ã¶ÄŸrenmek
+istiyoruz. O zaman bir odaklanma vektÃ¶rÃ¼ Ã¶ÄŸreniriz,
 
 $$ o_t = \sigma (W_f x_t + U_f h_{t-1}) $$
 
-O zaman işlem hafızamız
+O zaman iÅŸlem hafÄ±zamÄ±z
 
 $$ h_t = o_t \circ \phi (C_t)$$
 
-Yani odak değeri 1 olan öğelere tam dikkatimizi veriyoruz, 0 olanlara hiç
+Yani odak deÄŸeri 1 olan Ã¶ÄŸelere tam dikkatimizi veriyoruz, 0 olanlara hiÃ§
 dikkat etmiyoruz. 
 
-Kuşbakışı ile tüm resmi görelim, kendini tekrar eden LSTM yapısı alttaki gibi,
+KuÅŸbakÄ±ÅŸÄ± ile tÃ¼m resmi gÃ¶relim, kendini tekrar eden LSTM yapÄ±sÄ± alttaki gibi,
 
 \includegraphics[width=35em]{lstm_02.png}
 
-Sol ve sağdaki hücreler ortadakinin kopyası. 
+Sol ve saÄŸdaki hÃ¼creler ortadakinin kopyasÄ±. 
 
-Kıyasla bir RNN'nin iç yapısı çok daha basittir, 
+KÄ±yasla bir RNN'nin iÃ§ yapÄ±sÄ± Ã§ok daha basittir, 
 
 \includegraphics[width=35em]{lstm_03.png}
 
-LSTM resmindeki her birimin formülleriyle beraber teker teker tekrar
-üzerinden geçmek gerekirse [2] - ilk adım hücre bilgisinden neleri
-atacağımıza karar vermek. Bu karar unutma karar tabakası adı verilen bir
-sigmoid tabakasında veriliyor, tabaka $h_{t-1}$ ve $x_t$'ye bakıyor ve
-$C_{t-1}$ hücre konumundaki her değer için 0 ile 1 arasında bir sayı
-üretiyor. 1 değeri tamamen tut, 0 değeri tamamen unut anlamına geliyor (tüm
-$b$ değerleri yanlılık -bias- için).
+LSTM resmindeki her birimin formÃ¼lleriyle beraber teker teker tekrar
+Ã¼zerinden geÃ§mek gerekirse [2] - ilk adÄ±m hÃ¼cre bilgisinden neleri
+atacaÄŸÄ±mÄ±za karar vermek. Bu karar unutma karar tabakasÄ± adÄ± verilen bir
+sigmoid tabakasÄ±nda veriliyor, tabaka $h_{t-1}$ ve $x_t$'ye bakÄ±yor ve
+$C_{t-1}$ hÃ¼cre konumundaki her deÄŸer iÃ§in 0 ile 1 arasÄ±nda bir sayÄ±
+Ã¼retiyor. 1 deÄŸeri tamamen tut, 0 deÄŸeri tamamen unut anlamÄ±na geliyor (tÃ¼m
+$b$ deÄŸerleri yanlÄ±lÄ±k -bias- iÃ§in).
 
 \includegraphics[width=35em]{lstm_04.png}
 
-Bir sonraki adım hücrede hangi yeni bilgiyi depolayacağımıza karar
-vermek. Bu kararın iki parçası var, önce girdi geçit tabakası (input gate
-layer) hangi değerleri güncelleyeceğimize karar veriyor, ardından bir
-$\tanh$ tabakası bir ``aday vektörü'' $\tilde{C}_t$ üretiyor, bu vektör,
-adı üzerinde, hücre konumuna eklenmeye aday bilgiler. Ardından bu iki
-vektör birleştirilip konumu güncellemek için yeni bir vektör yaratılıyor.
+Bir sonraki adÄ±m hÃ¼crede hangi yeni bilgiyi depolayacaÄŸÄ±mÄ±za karar
+vermek. Bu kararÄ±n iki parÃ§asÄ± var, Ã¶nce girdi geÃ§it tabakasÄ± (input gate
+layer) hangi deÄŸerleri gÃ¼ncelleyeceÄŸimize karar veriyor, ardÄ±ndan bir
+$\tanh$ tabakasÄ± bir ``aday vektÃ¶rÃ¼'' $\tilde{C}_t$ Ã¼retiyor, bu vektÃ¶r,
+adÄ± Ã¼zerinde, hÃ¼cre konumuna eklenmeye aday bilgiler. ArdÄ±ndan bu iki
+vektÃ¶r birleÅŸtirilip konumu gÃ¼ncellemek iÃ§in yeni bir vektÃ¶r yaratÄ±lÄ±yor.
 
 \includegraphics[width=35em]{lstm_05.png}
 
-Sıra güncelleme iş bantına (update conveyor) geldi. Herhalde bu isim
-verilmiş çünkü hücrenin en üstünde direk soldan sağa giden bu ok bir tür
-fabrika iş bantı gibi, bir ana akım hattı. Bir kaç bilgi akımı bu ana kola
-giriyor. Bu iş bantının görevi hücrenin eski konum bilgisini güncellemek,
-$C_{t-1}$'i $C_t$ haline getirmek. Önceki adımlar ne yapılması gerektiğine
-karar vermişti, şimdi bu kararları eyleme geçirme zamanı. Eski konum
-bilgisini $f_t$ ile çarpıyoruz, böylece unutmak istediklerimizi
+SÄ±ra gÃ¼ncelleme iÅŸ bantÄ±na (update conveyor) geldi. Herhalde bu isim
+verilmiÅŸ Ã§Ã¼nkÃ¼ hÃ¼crenin en Ã¼stÃ¼nde direk soldan saÄŸa giden bu ok bir tÃ¼r
+fabrika iÅŸ bantÄ± gibi, bir ana akÄ±m hattÄ±. Bir kaÃ§ bilgi akÄ±mÄ± bu ana kola
+giriyor. Bu iÅŸ bantÄ±nÄ±n gÃ¶revi hÃ¼crenin eski konum bilgisini gÃ¼ncellemek,
+$C_{t-1}$'i $C_t$ haline getirmek. Ã–nceki adÄ±mlar ne yapÄ±lmasÄ± gerektiÄŸine
+karar vermiÅŸti, ÅŸimdi bu kararlarÄ± eyleme geÃ§irme zamanÄ±. Eski konum
+bilgisini $f_t$ ile Ã§arpÄ±yoruz, bÃ¶ylece unutmak istediklerimizi
 unutuyoruz. Sonra $i_t * C_t'$'yi ekliyoruz, bunlar yeni konumu ne kadar
-güncellemek istediğimizi belirleyen ağırlıklarla ölçeklenmiş yeni aday
-değerler.
+gÃ¼ncellemek istediÄŸimizi belirleyen aÄŸÄ±rlÄ±klarla Ã¶lÃ§eklenmiÅŸ yeni aday
+deÄŸerler.
 
 \includegraphics[width=35em]{lstm_06.png}
 
-En son adım tahmin adımı, bu adımda artık çıktının ne olacağına karar
-veriyoruz. Çıktı mevcut hücre konumunu baz alacak, ama onun filtrelenmiş
-bir hali olacak. İlk önce bir sigmoid işleterek konumun hangi kısmının
-çıktıya verileceğini kararlaştırıyoruz. Ardından mevcut konum bilgisini bir
-$\tanh$'e veriyoruz, ki bu değerlerin $-1,+1$ arasında gelmesini
-sağlıyoruz, ve bu sonucu sigmoid'den gelen değer ile çarpıyoruz, ki sadece
-istediğimiz kısmın dışarı verilmesini sağlayalım. 
+En son adÄ±m tahmin adÄ±mÄ±, bu adÄ±mda artÄ±k Ã§Ä±ktÄ±nÄ±n ne olacaÄŸÄ±na karar
+veriyoruz. Ã‡Ä±ktÄ± mevcut hÃ¼cre konumunu baz alacak, ama onun filtrelenmiÅŸ
+bir hali olacak. Ä°lk Ã¶nce bir sigmoid iÅŸleterek konumun hangi kÄ±smÄ±nÄ±n
+Ã§Ä±ktÄ±ya verileceÄŸini kararlaÅŸtÄ±rÄ±yoruz. ArdÄ±ndan mevcut konum bilgisini bir
+$\tanh$'e veriyoruz, ki bu deÄŸerlerin $-1,+1$ arasÄ±nda gelmesini
+saÄŸlÄ±yoruz, ve bu sonucu sigmoid'den gelen deÄŸer ile Ã§arpÄ±yoruz, ki sadece
+istediÄŸimiz kÄ±smÄ±n dÄ±ÅŸarÄ± verilmesini saÄŸlayalÄ±m. 
 
 \includegraphics[width=35em]{lstm_07.png}
 
-Şimdi üstteki formülleri kullanarak TensorFlow ile sıfırdan bir LSTM
-kodlayalım. Amacımız daha önce RNN için gördüğümüz zaman serisini öğrenmek,
-bu seriyi 5'er 5'er okuyacağız, yani yanyana 5 seri öğesini okuyacağız, ve
-6. seri değeri hedef değeri olacak, seri içinden bu şekilde örneklem
-yaparak bir ufak toptan eğitim seti yaratacağız. Sonra serinin hiç
-görmediğimiz ``geleceğini'' tahmin etmeye uğraşacağız.
+Åimdi Ã¼stteki formÃ¼lleri kullanarak TensorFlow ile sÄ±fÄ±rdan bir LSTM
+kodlayalÄ±m. AmacÄ±mÄ±z daha Ã¶nce RNN iÃ§in gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z zaman serisini Ã¶ÄŸrenmek,
+bu seriyi 5'er 5'er okuyacaÄŸÄ±z, yani yanyana 5 seri Ã¶ÄŸesini okuyacaÄŸÄ±z, ve
+6. seri deÄŸeri hedef deÄŸeri olacak, seri iÃ§inden bu ÅŸekilde Ã¶rneklem
+yaparak bir ufak toptan eÄŸitim seti yaratacaÄŸÄ±z. Sonra serinin hiÃ§
+gÃ¶rmediÄŸimiz ``geleceÄŸini'' tahmin etmeye uÄŸraÅŸacaÄŸÄ±z.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import tensorflow as tf
@@ -359,12 +359,12 @@ Epoch  480 | mean squ error  70.1
 Epoch  500 | mean squ error  64.9
 \end{verbatim}
 
-Tahminleri üretirken eğitim verisinin en sonundaki \verb!sequence_length!
-kadar öğeyi alıp sonraki 1 değeri üretiyoruz, bu değeri alıp tahmin için
-kullanılan biraz önce kullandığımız \verb!sequence_length! kadar değerin
-sonuna ekleyip son \verb!sequence_length! değer üzerinden tekrar bir
-tahmin üretiyoruz, böyle gidiyor, ve bu şekilde serinin hiç görmediğimiz
-kısmını tahmin ediyoruz.
+Tahminleri Ã¼retirken eÄŸitim verisinin en sonundaki \verb!sequence_length!
+kadar Ã¶ÄŸeyi alÄ±p sonraki 1 deÄŸeri Ã¼retiyoruz, bu deÄŸeri alÄ±p tahmin iÃ§in
+kullanÄ±lan biraz Ã¶nce kullandÄ±ÄŸÄ±mÄ±z \verb!sequence_length! kadar deÄŸerin
+sonuna ekleyip son \verb!sequence_length! deÄŸer Ã¼zerinden tekrar bir
+tahmin Ã¼retiyoruz, bÃ¶yle gidiyor, ve bu ÅŸekilde serinin hiÃ§ gÃ¶rmediÄŸimiz
+kÄ±smÄ±nÄ± tahmin ediyoruz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def f(t):
@@ -389,15 +389,15 @@ plt.savefig('lstm_01.png')
 
 \includegraphics[width=20em]{lstm_01.png}
 
-Yeşil renkli kısım tahmin. Fena değil.
+YeÅŸil renkli kÄ±sÄ±m tahmin. Fena deÄŸil.
 
-Zaman Serisi Sınıflandırmak
+Zaman Serisi SÄ±nÄ±flandÄ±rmak
 
-Şimdi TF'in kendi LSTM çağrısını kullanarak zaman serisi sınıflandırması
-yapalım. İki farklı sınıfa ait olan zaman serisi verimiz var [3],
-mikroelektronik yarı-iletken üretiminden gelen bir veri, fabrikasyon
-sırasında algılayıcılar bu iki türlü seriyi kaydediyor, onları ayırtetmek
-bizim görevimiz. Okuma yöntemi kodlayalım,
+Åimdi TF'in kendi LSTM Ã§aÄŸrÄ±sÄ±nÄ± kullanarak zaman serisi sÄ±nÄ±flandÄ±rmasÄ±
+yapalÄ±m. Ä°ki farklÄ± sÄ±nÄ±fa ait olan zaman serisi verimiz var [3],
+mikroelektronik yarÄ±-iletken Ã¼retiminden gelen bir veri, fabrikasyon
+sÄ±rasÄ±nda algÄ±layÄ±cÄ±lar bu iki tÃ¼rlÃ¼ seriyi kaydediyor, onlarÄ± ayÄ±rtetmek
+bizim gÃ¶revimiz. Okuma yÃ¶ntemi kodlayalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd, zipfile
@@ -434,7 +434,7 @@ def minibatches(batch_size,input="train"):
 
 \end{minted}
 
-TF hesap çizitini kodlayalım ve eğitelim,
+TF hesap Ã§izitini kodlayalÄ±m ve eÄŸitelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def reset_graph(seed=42):
@@ -522,7 +522,7 @@ with tf.Session() as sess:
 AUC 1.0
 \end{verbatim}
 
-Sonuç yüzde 100. 
+SonuÃ§ yÃ¼zde 100. 
 
 Kaynaklar
 

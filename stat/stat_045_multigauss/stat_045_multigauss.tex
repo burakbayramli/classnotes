@@ -1,56 +1,56 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Çok Değişkenli Gaussian Dağılımlar
+Ã‡ok DeÄŸiÅŸkenli Gaussian DaÄŸÄ±lÄ±mlar
 
-Çok değişkenli normal dağılımlarla iş yaparken, mesela Gaussian karışımları
-kullanırken, bazı numaraları bilmek faydalı olabiliyor. Bunlardan birincisi
-$(x-\mu)^T\Sigma^{-1}(x-\mu)$ hesabını yapmaktır, diğer log-toplam-exp
-numarası (logsumexp trick) diye bilinen hesaptır.
+Ã‡ok deÄŸiÅŸkenli normal daÄŸÄ±lÄ±mlarla iÅŸ yaparken, mesela Gaussian karÄ±ÅŸÄ±mlarÄ±
+kullanÄ±rken, bazÄ± numaralarÄ± bilmek faydalÄ± olabiliyor. Bunlardan birincisi
+$(x-\mu)^T\Sigma^{-1}(x-\mu)$ hesabÄ±nÄ± yapmaktÄ±r, diÄŸer log-toplam-exp
+numarasÄ± (logsumexp trick) diye bilinen hesaptÄ±r.
 
-Birinciden başlayalım, daha kısalaştırmak için $y=x-\mu$ diyelim, yani
-$y^T\Sigma^{-1}y$ olsun. Şimdi bu formülde bir ters alma (inversion)
-işleminin olduğunu görüyoruz. Fakat bu işlem oldukça pahalı bir işlem
-olarak bilinir, hele hele boyutların yükseldiği durumlardan (binler,
-onbinler), kovaryansı temsil eden $\Sigma$, $n \times n$ olacaktır. Acaba
-tersini almayı başka bir şekilde gerçekleştiremez miyiz?
+Birinciden baÅŸlayalÄ±m, daha kÄ±salaÅŸtÄ±rmak iÃ§in $y=x-\mu$ diyelim, yani
+$y^T\Sigma^{-1}y$ olsun. Åimdi bu formÃ¼lde bir ters alma (inversion)
+iÅŸleminin olduÄŸunu gÃ¶rÃ¼yoruz. Fakat bu iÅŸlem oldukÃ§a pahalÄ± bir iÅŸlem
+olarak bilinir, hele hele boyutlarÄ±n yÃ¼kseldiÄŸi durumlardan (binler,
+onbinler), kovaryansÄ± temsil eden $\Sigma$, $n \times n$ olacaktÄ±r. Acaba
+tersini almayÄ± baÅŸka bir ÅŸekilde gerÃ§ekleÅŸtiremez miyiz?
 
-$\Sigma$ matrisi bir kovaryans matrisi olduğu için simetrik, pozitif yarı
-kesin bir matristir. Bu tür matrislerin Cholesky ayrıştırmasının olduğunu
-biliyoruz ve bu işlem çok hızlı yapılabiliyor. O zaman 
+$\Sigma$ matrisi bir kovaryans matrisi olduÄŸu iÃ§in simetrik, pozitif yarÄ±
+kesin bir matristir. Bu tÃ¼r matrislerin Cholesky ayrÄ±ÅŸtÄ±rmasÄ±nÄ±n olduÄŸunu
+biliyoruz ve bu iÅŸlem Ã§ok hÄ±zlÄ± yapÄ±labiliyor. O zaman 
 
 $$ \Sigma = LL^T $$
 
-ki $L$ matrisi alt-üçgensel (lower triangular) bir matristir,
+ki $L$ matrisi alt-Ã¼Ã§gensel (lower triangular) bir matristir,
 
 $$ \Sigma^{-1} = (LL^T)^{-1} $$
 
 $$ = L^{-T}L^{-1} $$
 
-Bunu temel alarak iki taraftan $y$'leri geri koyalım,
+Bunu temel alarak iki taraftan $y$'leri geri koyalÄ±m,
 
 $$ y^T\Sigma^{-1}y= y^TL^{-T}L^{-1}y $$
 
-Bilindiği gibi lineer cebirde istediğimiz yere parantez koyabiliriz,
+BilindiÄŸi gibi lineer cebirde istediÄŸimiz yere parantez koyabiliriz,
 
 $$ = (y^TL^{-T})L^{-1}y $$
 
-Parantezden bir şeyin devriği gibi temsil edersek, parantez içindekilerin
-sırası değişir ve tek tek devriği alınır,
+Parantezden bir ÅŸeyin devriÄŸi gibi temsil edersek, parantez iÃ§indekilerin
+sÄ±rasÄ± deÄŸiÅŸir ve tek tek devriÄŸi alÄ±nÄ±r,
 
 $$ = (L^{-1}y)^TL^{-1}y $$
 
 $$  = |L^{-1}y|^2 $$
 
-Üstteki ifadede $|\cdot|$ içindeki kısım $Ax=b$ durumundaki $x$'in en az
-kareler çözümü olan $A^{-1}b$'ye benzemiyor mu? Evet. Gerçi $n \times n$
-boyutunda bir matris olduğu için elimizde ``bilinmeyenden fazla denklem''
-yok, yani bu sistem artık belirtilmiş (overdetermined) değil, yani en az
-kareler değil direk lineer sistem çözümü yapıyoruz. Bu durumda her standart
-lineer cebir kütüphanesinde mevcut bir çağrı kullanacağız, mesela
-\verb!solve_triangular! (ve lower -alt- doğru seçeneğini kullanacağız), ki
-bu çağrı özellikle alt üçgensel matris üzerinden çözüm yapmaktadır, çünkü
-$L$ alt-üçgensel olduğu için çözüm geriye değer koymak (back substitution)
-ile anında bulunabilir. Geriye değer koymayı hatırlarsak, mesela
+Ãœstteki ifadede $|\cdot|$ iÃ§indeki kÄ±sÄ±m $Ax=b$ durumundaki $x$'in en az
+kareler Ã§Ã¶zÃ¼mÃ¼ olan $A^{-1}b$'ye benzemiyor mu? Evet. GerÃ§i $n \times n$
+boyutunda bir matris olduÄŸu iÃ§in elimizde ``bilinmeyenden fazla denklem''
+yok, yani bu sistem artÄ±k belirtilmiÅŸ (overdetermined) deÄŸil, yani en az
+kareler deÄŸil direk lineer sistem Ã§Ã¶zÃ¼mÃ¼ yapÄ±yoruz. Bu durumda her standart
+lineer cebir kÃ¼tÃ¼phanesinde mevcut bir Ã§aÄŸrÄ± kullanacaÄŸÄ±z, mesela
+\verb!solve_triangular! (ve lower -alt- doÄŸru seÃ§eneÄŸini kullanacaÄŸÄ±z), ki
+bu Ã§aÄŸrÄ± Ã¶zellikle alt Ã¼Ã§gensel matris Ã¼zerinden Ã§Ã¶zÃ¼m yapmaktadÄ±r, Ã§Ã¼nkÃ¼
+$L$ alt-Ã¼Ã§gensel olduÄŸu iÃ§in Ã§Ã¶zÃ¼m geriye deÄŸer koymak (back substitution)
+ile anÄ±nda bulunabilir. Geriye deÄŸer koymayÄ± hatÄ±rlarsak, mesela
 
 $$ 
 \left[\begin{array}{cc}
@@ -68,20 +68,20 @@ x_2
 \end{array}\right]
  $$
 
-En üst satırda her zaman tek bir bilinmeyen olacak, çünkü matris alt üçgensel,
-en üst satır her zaman en boş satırdır. Bu tek bir eşitlik
-demektir, yani $2x_1 = 6$, ki $x_1 = 3$. Bunu alıp bir sonraki satıra gideriz,
-artık $x_1$'i biliyoruz, sonraki satırda sadece $x_2$ bilinmeyen
-kalıyor, $3\cdot x_1 + 4 \cdot x_2 = 8$, yani $x_2 = -1/4$. Sonuca
-ulaştık. Daha fazla boyut olsaydı durum değişmezdi, aynı işlem daha fazla
-tekrarlanırdı. Bu arada bu türden bir çözümün ne kadar hızlı olacağını
+En Ã¼st satÄ±rda her zaman tek bir bilinmeyen olacak, Ã§Ã¼nkÃ¼ matris alt Ã¼Ã§gensel,
+en Ã¼st satÄ±r her zaman en boÅŸ satÄ±rdÄ±r. Bu tek bir eÅŸitlik
+demektir, yani $2x_1 = 6$, ki $x_1 = 3$. Bunu alÄ±p bir sonraki satÄ±ra gideriz,
+artÄ±k $x_1$'i biliyoruz, sonraki satÄ±rda sadece $x_2$ bilinmeyen
+kalÄ±yor, $3\cdot x_1 + 4 \cdot x_2 = 8$, yani $x_2 = -1/4$. Sonuca
+ulaÅŸtÄ±k. Daha fazla boyut olsaydÄ± durum deÄŸiÅŸmezdi, aynÄ± iÅŸlem daha fazla
+tekrarlanÄ±rdÄ±. Bu arada bu tÃ¼rden bir Ã§Ã¶zÃ¼mÃ¼n ne kadar hÄ±zlÄ± olacaÄŸÄ±nÄ±
 belirtmemize gerek yok herhalde.
 
-Demek ki $y^T\Sigma^{-1}y$ hesabı için önce $\Sigma$ üzerinde Cholesky
-alıyoruz, sonra $L^{-1}y$ çözdürüyoruz. Elde edilen değerin noktasal
-çarpımını alınca $\Sigma$'nin tersini elde etmiş olacağız. 
+Demek ki $y^T\Sigma^{-1}y$ hesabÄ± iÃ§in Ã¶nce $\Sigma$ Ã¼zerinde Cholesky
+alÄ±yoruz, sonra $L^{-1}y$ Ã§Ã¶zdÃ¼rÃ¼yoruz. Elde edilen deÄŸerin noktasal
+Ã§arpÄ±mÄ±nÄ± alÄ±nca $\Sigma$'nin tersini elde etmiÅŸ olacaÄŸÄ±z. 
 
-Örnek (önce uzun yoldan),
+Ã–rnek (Ã¶nce uzun yoldan),
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy.linalg as lin
@@ -94,7 +94,7 @@ print np.dot(np.dot(y.T,lin.inv(Sigma)),y)
 [[ 0.80434783]]
 \end{verbatim}
 
-Şimdi Cholesky ve \verb!solve_triangular! üzerinden
+Åimdi Cholesky ve \verb!solve_triangular! Ã¼zerinden
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.linalg as slin
@@ -107,15 +107,15 @@ print np.dot(x.T,x)
 [[ 0.80434783]]
 \end{verbatim}
 
-Aynı sonuca eriştik.
+AynÄ± sonuca eriÅŸtik.
 
 
 
-Çok Boyutlu Gaussian'ı Parçalamak (Partitioning)
+Ã‡ok Boyutlu Gaussian'Ä± ParÃ§alamak (Partitioning)
 
-Diyelim ki Normal bir vektör $X$'i $X = (X_1,X_2)$ olarak parçaladık. Bunu
-Gaussian'a etkileri ne olur? Aynı şekilde $\mu = (\mu_1,\mu_2)$ olarak
-parçalayabiliriz. $\Sigma$ ise
+Diyelim ki Normal bir vektÃ¶r $X$'i $X = (X_1,X_2)$ olarak parÃ§aladÄ±k. Bunu
+Gaussian'a etkileri ne olur? AynÄ± ÅŸekilde $\mu = (\mu_1,\mu_2)$ olarak
+parÃ§alayabiliriz. $\Sigma$ ise
 
 $$ \Sigma = 
 \left[\begin{array}{rr}
@@ -124,9 +124,9 @@ $$ \Sigma =
 \end{array}\right]
  $$
 
-olarak parçalanabilir. $a,b$'nin parçalarının boyutları $p,q$ olsun, $n = p+q$.
+olarak parÃ§alanabilir. $a,b$'nin parÃ§alarÄ±nÄ±n boyutlarÄ± $p,q$ olsun, $n = p+q$.
 
-Şimdi birleşik Gaussian'ı 
+Åimdi birleÅŸik Gaussian'Ä± 
 
 $$ f(x;\mu,\Sigma) = 
 \frac{ 1}{(2\pi)^{(p+q)/2} \det(\Sigma)^{1/2}} 
@@ -148,16 +148,16 @@ x_2 - \mu_2
 \bigg\}
  $$
 
-Birleşik yoğunluğu parçalar üzerinden belirtirsek, bu yoğunluğu $X_2$ için
-bileşen yoğunluğa ve $X_1$ için bir koşullu yoğunluğa ayırabiliriz. Yani 
+BirleÅŸik yoÄŸunluÄŸu parÃ§alar Ã¼zerinden belirtirsek, bu yoÄŸunluÄŸu $X_2$ iÃ§in
+bileÅŸen yoÄŸunluÄŸa ve $X_1$ iÃ§in bir koÅŸullu yoÄŸunluÄŸa ayÄ±rabiliriz. Yani 
 
 $$ f(x_1,x_2) = f(x_1|x_2) f(x_2) $$
 
-tanımındaki parçaları elde etmeye çalışacağız.  Ama bundan önce
-bölüntülenmiş matrislere yakından bakalım. 
+tanÄ±mÄ±ndaki parÃ§alarÄ± elde etmeye Ã§alÄ±ÅŸacaÄŸÄ±z.  Ama bundan Ã¶nce
+bÃ¶lÃ¼ntÃ¼lenmiÅŸ matrislere yakÄ±ndan bakalÄ±m. 
 
-Bir bölüntülenmiş (partitioned) matrisin tersini almak için, o matrisin
-parçalarının tersini almak doğru değildir, yani
+Bir bÃ¶lÃ¼ntÃ¼lenmiÅŸ (partitioned) matrisin tersini almak iÃ§in, o matrisin
+parÃ§alarÄ±nÄ±n tersini almak doÄŸru deÄŸildir, yani
 
 $$ 
 \left[\begin{array}{rr}
@@ -170,16 +170,16 @@ G^{-1} & H^{-1}
 \end{array}\right]  
  $$
 
-Tersini alma işlemi için bazı numaralar lazım. Ana numara bölüntülenmiş matrisi 
-köşegen bir matris haline getirmek, çünkü köşegen matrislerin tersi,
-köşegendeki elemanların tersidir, yani ters alma operasyonu bu tür
-matrislerin ``içine işler'', o yüzden bir şekilde bir köşegen matris
-elde etmeye uğraşacağız. Bunun için bölüntülenmiş matrisimizi sağdan ve
-soldan bazı matrislerle çarpacağız. Ayrıca şunu da bilelim, 
+Tersini alma iÅŸlemi iÃ§in bazÄ± numaralar lazÄ±m. Ana numara bÃ¶lÃ¼ntÃ¼lenmiÅŸ matrisi 
+kÃ¶ÅŸegen bir matris haline getirmek, Ã§Ã¼nkÃ¼ kÃ¶ÅŸegen matrislerin tersi,
+kÃ¶ÅŸegendeki elemanlarÄ±n tersidir, yani ters alma operasyonu bu tÃ¼r
+matrislerin ``iÃ§ine iÅŸler'', o yÃ¼zden bir ÅŸekilde bir kÃ¶ÅŸegen matris
+elde etmeye uÄŸraÅŸacaÄŸÄ±z. Bunun iÃ§in bÃ¶lÃ¼ntÃ¼lenmiÅŸ matrisimizi saÄŸdan ve
+soldan bazÄ± matrislerle Ã§arpacaÄŸÄ±z. AyrÄ±ca ÅŸunu da bilelim, 
 
 $$ XYZ = W $$
 
-durumunda $Y$'nin tersini almak istersek, sağ ve soldaki $X,Z$
+durumunda $Y$'nin tersini almak istersek, saÄŸ ve soldaki $X,Z$
 matrislerinin tersini almak gerekmez, niye?
 
 $$ X^{-1}XYZ = X^{-1}W $$
@@ -188,11 +188,11 @@ $$ YZZ^{-1} = X^{-1}WZ^{-1} $$
 
 $$ Y = X^{-1}WZ^{-1} $$
 
-Şimdi iki tarafın da tersini alalım, 
+Åimdi iki tarafÄ±n da tersini alalÄ±m, 
 
 $$ Y^{-1} = ZW^{-1}X $$
 
-Tamam, başlayalım. 
+Tamam, baÅŸlayalÄ±m. 
 
 $$ M = 
 \left[\begin{array}{rr}
@@ -201,8 +201,8 @@ G & H
 \end{array}\right] 
  $$
 
-matrisini köşegen yapacağız. Eğer sadece alt sol köşeyi sıfırlayasaydık, 
-bunu yapacak özel bir matrisle soldan çarpardık,
+matrisini kÃ¶ÅŸegen yapacaÄŸÄ±z. EÄŸer sadece alt sol kÃ¶ÅŸeyi sÄ±fÄ±rlayasaydÄ±k, 
+bunu yapacak Ã¶zel bir matrisle soldan Ã§arpardÄ±k,
 
 $$ 
 \left[\begin{array}{rr}
@@ -219,7 +219,7 @@ E & F \\
 \end{array}\right] 
  $$
 
-Sadece üst sağ köşeyi sıfırlamak isteseydik, sağdan çarpardık
+Sadece Ã¼st saÄŸ kÃ¶ÅŸeyi sÄ±fÄ±rlamak isteseydik, saÄŸdan Ã§arpardÄ±k
 
 $$ 
 \left[\begin{array}{rr}
@@ -237,7 +237,7 @@ G & H
 \end{array}\right] 
  $$
 
-Hepsini biraraya koyalım, 
+Hepsini biraraya koyalÄ±m, 
 
 $$ 
 \left[\begin{array}{rr}
@@ -260,9 +260,9 @@ E-FH^{-1}G & 0 \\
 \mlabel{2}
  $$
 
-Bu çarpımın doğruluğu çarpım elle yapılarak kontrol edilebilir.
+Bu Ã§arpÄ±mÄ±n doÄŸruluÄŸu Ã§arpÄ±m elle yapÄ±larak kontrol edilebilir.
 
-Üstte gördüğümüz gibi 
+Ãœstte gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z gibi 
 
 $$ XYZ = W $$
 
@@ -322,9 +322,9 @@ I & -FH^{-1} \\
 \end{array}\right] 
  $$
 
-Daha kısa olması eşitliğin sağ tarafında, ortadaki matris için
-$E-FH^{-1}G$ yerine $M/H$ kullanalım (bu arada $M/H$ lineer cebirde ``$M$'in
-$H$'e göre Schur tamamlayıcısı (complement)'' olarak bilinir),
+Daha kÄ±sa olmasÄ± eÅŸitliÄŸin saÄŸ tarafÄ±nda, ortadaki matris iÃ§in
+$E-FH^{-1}G$ yerine $M/H$ kullanalÄ±m (bu arada $M/H$ lineer cebirde ``$M$'in
+$H$'e gÃ¶re Schur tamamlayÄ±cÄ±sÄ± (complement)'' olarak bilinir),
 
 $$ 
 \left[\begin{array}{rr}
@@ -347,7 +347,7 @@ I & -FH^{-1} \\
 \mlabel{3}
  $$
 
-Eşitliğin sağ tarafındaki çarpımı gerçekleştirirsek, 
+EÅŸitliÄŸin saÄŸ tarafÄ±ndaki Ã§arpÄ±mÄ± gerÃ§ekleÅŸtirirsek, 
 
 $$ =
 \left[\begin{array}{rr}
@@ -356,11 +356,11 @@ $$ =
 \end{array}\right]
  $$
 
-Bu final ifade bölüntülenmiş bir matrisin tersini o matrisin içindeki parçalar
-üzerinden temsil eden bir ifadedir. 
+Bu final ifade bÃ¶lÃ¼ntÃ¼lenmiÅŸ bir matrisin tersini o matrisin iÃ§indeki parÃ§alar
+Ã¼zerinden temsil eden bir ifadedir. 
 
-İçinde bir köşesi sıfır olan bölüntülenmiş matrislerde determinantlar şöyle
-işler,
+Ä°Ã§inde bir kÃ¶ÅŸesi sÄ±fÄ±r olan bÃ¶lÃ¼ntÃ¼lenmiÅŸ matrislerde determinantlar ÅŸÃ¶yle
+iÅŸler,
 
 $$ 
 \det \bigg(
@@ -379,21 +379,21 @@ E & F \\
 \det(E)\det(H)
  $$
 
-Ayrıca 
+AyrÄ±ca 
 
 $$ \det(AB) = \det(A)\det(B) $$
 
-O zaman (2)'nin determinantını alırsak, $\det$ yerine $||$ kullandık, 
+O zaman (2)'nin determinantÄ±nÄ± alÄ±rsak, $\det$ yerine $||$ kullandÄ±k, 
 
 $$ |M| = |M/H||H| 
 \mlabel{4}
 $$
 
-Bu ifade gayet doğal duruyor (bir raslantı herhalde, ya da Schur tamamlayıcısı 
-işareti özellikle böyle seçilmiş),
+Bu ifade gayet doÄŸal duruyor (bir raslantÄ± herhalde, ya da Schur tamamlayÄ±cÄ±sÄ± 
+iÅŸareti Ã¶zellikle bÃ¶yle seÃ§ilmiÅŸ),
 
-Bölüntülenmiş bir matrisin devriğini almak için her bloğunun ayrı ayrı devriği
-alınır, ve tüm blokların yanı bölüntülenmiş tamamının bir daha devriği alınır,
+BÃ¶lÃ¼ntÃ¼lenmiÅŸ bir matrisin devriÄŸini almak iÃ§in her bloÄŸunun ayrÄ± ayrÄ± devriÄŸi
+alÄ±nÄ±r, ve tÃ¼m bloklarÄ±n yanÄ± bÃ¶lÃ¼ntÃ¼lenmiÅŸ tamamÄ±nÄ±n bir daha devriÄŸi alÄ±nÄ±r,
 yani
 
 $$ 
@@ -405,8 +405,8 @@ A^T & C^T \\ B^T & D^T
 \end{array}\right]
  $$
 
-Şimdi çok değişkenli Normal için bileşen ve koşullu yoğunluk hesaplarına
-gelelim. Gaussian formülünün $\exp$ kısmını alırsak, 
+Åimdi Ã§ok deÄŸiÅŸkenli Normal iÃ§in bileÅŸen ve koÅŸullu yoÄŸunluk hesaplarÄ±na
+gelelim. Gaussian formÃ¼lÃ¼nÃ¼n $\exp$ kÄ±smÄ±nÄ± alÄ±rsak, 
 
 $$ \exp 
 \bigg\{ 
@@ -426,7 +426,7 @@ x_2 - \mu_2
 \bigg\}
  $$
 
-(3)'teki açılımı kullanırsak, ve $E = \Sigma_{11},F=\Sigma_{12},..$ olacak şekilde,
+(3)'teki aÃ§Ä±lÄ±mÄ± kullanÄ±rsak, ve $E = \Sigma_{11},F=\Sigma_{12},..$ olacak ÅŸekilde,
 
 $$ \exp 
 \bigg\{ 
@@ -454,7 +454,7 @@ x_2 - \mu_2
 \bigg\}
  $$
 
-Açılımı tamamen yaparsak, 
+AÃ§Ä±lÄ±mÄ± tamamen yaparsak, 
 
 $$ 
  \begin{array}{lll}
@@ -470,16 +470,16 @@ $$
 \end{array}
  $$
 
-Not: $\Sigma_{12}^T = \Sigma_{21}$. Üstte birinci $\exp$ içinde sol bölümde devriğin içindeki ifadelerden,
-mesela $x_1^T,\mu_1^T$'den ve $\Sigma_{21}$'li ifadeden devrik işlemini çekip, büyük paranteze 
-alınınca bu değişim oldu. 
+Not: $\Sigma_{12}^T = \Sigma_{21}$. Ãœstte birinci $\exp$ iÃ§inde sol bÃ¶lÃ¼mde devriÄŸin iÃ§indeki ifadelerden,
+mesela $x_1^T,\mu_1^T$'den ve $\Sigma_{21}$'li ifadeden devrik iÅŸlemini Ã§ekip, bÃ¼yÃ¼k paranteze 
+alÄ±nÄ±nca bu deÄŸiÅŸim oldu. 
 
-Şimdi mesela 1. $\exp$'ye dikkat edersek, ortada $(\Sigma/\Sigma_{22})^{-1} $ var, ve bu ifadenin solunda ve sağında 
-birbirinin devriği olan aynı terimler duruyor. İfadenin tamamı bir Normal
-dağılım. Aynı şey 2. $\exp$ için geçerli. 
+Åimdi mesela 1. $\exp$'ye dikkat edersek, ortada $(\Sigma/\Sigma_{22})^{-1} $ var, ve bu ifadenin solunda ve saÄŸÄ±nda 
+birbirinin devriÄŸi olan aynÄ± terimler duruyor. Ä°fadenin tamamÄ± bir Normal
+daÄŸÄ±lÄ±m. AynÄ± ÅŸey 2. $\exp$ iÃ§in geÃ§erli. 
 
-İşin $\exp$ tarafını halletik. Şimdi $\exp$ öncesindeki kesiri (4) kullanarak
-parçalayalım, 
+Ä°ÅŸin $\exp$ tarafÄ±nÄ± halletik. Åimdi $\exp$ Ã¶ncesindeki kesiri (4) kullanarak
+parÃ§alayalÄ±m, 
 
 $$ 
 \frac{ 1}{(2\pi)^{(p+q)/2} \det(\Sigma)^{1/2}}  = 
@@ -491,7 +491,7 @@ $$ =
 \bigg( \frac{ 1}{(2\pi)^{q/2} \det(\Sigma_{22})^{1/2}} \bigg)
  $$
 
-Bu parçaların her birini ayrı bir $\exp$ önünde kullanabiliriz, ve ikinci $\exp$
+Bu parÃ§alarÄ±n her birini ayrÄ± bir $\exp$ Ã¶nÃ¼nde kullanabiliriz, ve ikinci $\exp$
 ifadesinin 
 
 $$ 
@@ -502,9 +502,9 @@ $$
  $$
 
 
-olduğunu görüyoruz. Bu ifade $f(x_2)$ bileşen yoğunluğudur! O zaman geri
-kalanlar, yani diğer kesir ve birinci $\exp$ hep beraber $f(x_1|x_2)$
-yoğunluğu olmalıdır. Yani,
+olduÄŸunu gÃ¶rÃ¼yoruz. Bu ifade $f(x_2)$ bileÅŸen yoÄŸunluÄŸudur! O zaman geri
+kalanlar, yani diÄŸer kesir ve birinci $\exp$ hep beraber $f(x_1|x_2)$
+yoÄŸunluÄŸu olmalÄ±dÄ±r. Yani,
 
 $$ 
 \frac{ 1}{(2\pi)^{p/2} \det(\Sigma/\Sigma_{22})^{1/2}} \cdot
@@ -518,18 +518,18 @@ $$
 \bigg\}
  $$
 
-Buradan genel bir kural çıkartabiliriz, 
+Buradan genel bir kural Ã§Ä±kartabiliriz, 
 
-1) $X_2$'nin bileşen yoğunluğu $X_2 \sim N(\mu_2, \Sigma_{22})$
+1) $X_2$'nin bileÅŸen yoÄŸunluÄŸu $X_2 \sim N(\mu_2, \Sigma_{22})$
 
-2) $X_2 = x_2$ olmak üzere $X_1$'in koşullu dağılımı 
+2) $X_2 = x_2$ olmak Ã¼zere $X_1$'in koÅŸullu daÄŸÄ±lÄ±mÄ± 
 
 $$ X_1 | X_2 = x_2 \sim 
 N\bigg(\mu_1 + \Sigma_{12}\Sigma_{22}^{-1} (x_2 -\mu_2) \ , \
 \Sigma/\Sigma_{22} \bigg)
  $$
 
-$\Sigma/\Sigma_{22}$ nedir? Hatırlarsak, $M/H = E-FH^{-1}G$, ve 
+$\Sigma/\Sigma_{22}$ nedir? HatÄ±rlarsak, $M/H = E-FH^{-1}G$, ve 
 $E = \Sigma_{11},F=\Sigma_{12},..$ o zaman 
 
 $$ \Sigma/\Sigma_{22} = \Sigma_{11}-\Sigma_{12} \Sigma_{22}^{-1} \Sigma_{21} $$
@@ -549,25 +549,25 @@ N\bigg(\mu_1 + \Sigma_{12}\Sigma_{22}^{-1} (x_2 -\mu_2) \ , \
 
 log-toplam-exp (log-sum-exp trick)
 
-Bu numaranın ilk kısmı nisbeten basit. Bazı yapay öğrenim algoritmaları için
-olasılık değerlerinin birbiriyle çarpılması gerekiyor, mesela 
+Bu numaranÄ±n ilk kÄ±smÄ± nisbeten basit. BazÄ± yapay Ã¶ÄŸrenim algoritmalarÄ± iÃ§in
+olasÄ±lÄ±k deÄŸerlerinin birbiriyle Ã§arpÄ±lmasÄ± gerekiyor, mesela 
 
 $$ r = p_1 \cdot p_2 \dots p_n $$
 
-Olasılıklar 1'den küçük olduğu için 1'den küçük değerlerin çarpımı aşırı
-küçülebilir, ve küçüklüğün taşması (underflow) ortaya çıkabilir. Eğer
-çarpım yerine $\log$ alırsak, çarpımlar toplama dönüşür, sonra sonucu
-$\exp$ ile tersine çeviririz, ve $\log$'u alınan değerler çok küçülmez,
-çarpma yernie toplama işlemi kullanıldığı için de nihai değer de küçüklüğe
-doğru taşmaz.
+OlasÄ±lÄ±klar 1'den kÃ¼Ã§Ã¼k olduÄŸu iÃ§in 1'den kÃ¼Ã§Ã¼k deÄŸerlerin Ã§arpÄ±mÄ± aÅŸÄ±rÄ±
+kÃ¼Ã§Ã¼lebilir, ve kÃ¼Ã§Ã¼klÃ¼ÄŸÃ¼n taÅŸmasÄ± (underflow) ortaya Ã§Ä±kabilir. EÄŸer
+Ã§arpÄ±m yerine $\log$ alÄ±rsak, Ã§arpÄ±mlar toplama dÃ¶nÃ¼ÅŸÃ¼r, sonra sonucu
+$\exp$ ile tersine Ã§eviririz, ve $\log$'u alÄ±nan deÄŸerler Ã§ok kÃ¼Ã§Ã¼lmez,
+Ã§arpma yernie toplama iÅŸlemi kullanÄ±ldÄ±ÄŸÄ± iÃ§in de nihai deÄŸer de kÃ¼Ã§Ã¼klÃ¼ÄŸe
+doÄŸru taÅŸmaz.
 
 $$ \log r = \log p_1 + \log p_2 + \dots + \log p_n $$
 
 $$ r = \exp(\log p_1 + \log p_2 + \dots + \log p_n )$$
 
-Bir diğer durum içinde $exp$ ifadesi taşıyan bir olasılık değerinin çok
-küçük değerler taşıyabilmesidir. Mesela çok değişkenli Gaussian karışımları
-için alttaki gibi bir hesap sürekli yapılır, 
+Bir diÄŸer durum iÃ§inde $exp$ ifadesi taÅŸÄ±yan bir olasÄ±lÄ±k deÄŸerinin Ã§ok
+kÃ¼Ã§Ã¼k deÄŸerler taÅŸÄ±yabilmesidir. Mesela Ã§ok deÄŸiÅŸkenli Gaussian karÄ±ÅŸÄ±mlarÄ±
+iÃ§in alttaki gibi bir hesap sÃ¼rekli yapÄ±lÄ±r, 
 
 $$ = \sum_i w_i
 \frac{ 1}{(2\pi)^{k/2} \det(\Sigma)^{1/2}} \exp 
@@ -576,15 +576,15 @@ $$ = \sum_i w_i
 \bigg\}
  $$
 
-ki $0 \le w_i \le 1$ şeklinde bir ağırlık değeridir. Üstteki formülün
-çoğunlukla $\log$'u alınır, ve, mesela bir örnek üzerinde görürsek (ve
-ağırlıkları bir kenara bırakırsak), 
+ki $0 \le w_i \le 1$ ÅŸeklinde bir aÄŸÄ±rlÄ±k deÄŸeridir. Ãœstteki formÃ¼lÃ¼n
+Ã§oÄŸunlukla $\log$'u alÄ±nÄ±r, ve, mesela bir Ã¶rnek Ã¼zerinde gÃ¶rÃ¼rsek (ve
+aÄŸÄ±rlÄ±klarÄ± bir kenara bÄ±rakÄ±rsak), 
 
 $$ \log(e^{-1000} + e^{-1001}) $$ 
 
-gibi hesaplar olabilir. Üstteki değerler tamamen uyduruk denemez,
-uygulamalarda pek çok kez karşımıza çıkan değerler bunlar. Her neyse, eğer
-üstteki ifadeyi kodla hesaplarsak, 
+gibi hesaplar olabilir. Ãœstteki deÄŸerler tamamen uyduruk denemez,
+uygulamalarda pek Ã§ok kez karÅŸÄ±mÄ±za Ã§Ä±kan deÄŸerler bunlar. Her neyse, eÄŸer
+Ã¼stteki ifadeyi kodla hesaplarsak, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print np.log(np.exp(-1000) + np.exp(-1001))
@@ -594,8 +594,8 @@ print np.log(np.exp(-1000) + np.exp(-1001))
 -inf
 \end{verbatim}
 
-Bu durumdan kurtulmak için bir numara şudur; $\exp$ ifadeleri arasında en
-büyük olanını dışarı çekeriz, ve $\log$'lar çarpımı toplam yapar,
+Bu durumdan kurtulmak iÃ§in bir numara ÅŸudur; $\exp$ ifadeleri arasÄ±nda en
+bÃ¼yÃ¼k olanÄ±nÄ± dÄ±ÅŸarÄ± Ã§ekeriz, ve $\log$'lar Ã§arpÄ±mÄ± toplam yapar,
 
 $$ \log(e^{-1000}(e^{0} + e^{-1} ))$$
 
@@ -611,9 +611,9 @@ print -1000 + np.log(1+np.exp(-1))
 -999.686738312
 \end{verbatim}
 
-Bu numaranın yaptığı nedir? Maksimumu dışarı çekerek en az bir değerin
-küçüklüğü taşmamasını garantilemiş oluyoruz. Ayrıca, bu şekilde, geri kalan
-terimlerde de aşırı ufalanlar terimler kalma şansı azalıyor. 
+Bu numaranÄ±n yaptÄ±ÄŸÄ± nedir? Maksimumu dÄ±ÅŸarÄ± Ã§ekerek en az bir deÄŸerin
+kÃ¼Ã§Ã¼klÃ¼ÄŸÃ¼ taÅŸmamasÄ±nÄ± garantilemiÅŸ oluyoruz. AyrÄ±ca, bu ÅŸekilde, geri kalan
+terimlerde de aÅŸÄ±rÄ± ufalanlar terimler kalma ÅŸansÄ± azalÄ±yor. 
 
 Kaynaklar
 

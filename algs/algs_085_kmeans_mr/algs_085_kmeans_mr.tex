@@ -2,54 +2,54 @@
 \begin{document}
 Paralel KMeans, Hadoop
 
-K-Means algoritmasını nasıl paralel şekilde işletiriz? Özellikle Hadoop gibi bir
-Eşle-İndirge (Map-Reduce) ortamını düşünelim. Veri çok büyük ölçekte olabilir ve
-bu veriler birden fazla makinaya bölünecektir. Eşle-İndirge kavramında eşleme
-safhasında "anahtar üretiriz", ve sonra indirgeme safhasında Hadoop sistemi öyle
-kurmuştur ki aynı anahtarlarlar tek bir makinaya gönderilir, ve bu nihai aşamada
-artık anahtar bazında indirgeme (özetleme) yapılır.
+K-Means algoritmasÄ±nÄ± nasÄ±l paralel ÅŸekilde iÅŸletiriz? Ã–zellikle Hadoop gibi bir
+EÅŸle-Ä°ndirge (Map-Reduce) ortamÄ±nÄ± dÃ¼ÅŸÃ¼nelim. Veri Ã§ok bÃ¼yÃ¼k Ã¶lÃ§ekte olabilir ve
+bu veriler birden fazla makinaya bÃ¶lÃ¼necektir. EÅŸle-Ä°ndirge kavramÄ±nda eÅŸleme
+safhasÄ±nda "anahtar Ã¼retiriz", ve sonra indirgeme safhasÄ±nda Hadoop sistemi Ã¶yle
+kurmuÅŸtur ki aynÄ± anahtarlarlar tek bir makinaya gÃ¶nderilir, ve bu nihai aÅŸamada
+artÄ±k anahtar bazÄ±nda indirgeme (Ã¶zetleme) yapÄ±lÄ±r.
 
-Paralel K-Means için anahtar nedir? Anahtar, mesela küme olabilir. Yani
-küme 1, küme 2 gibi küme işaretleri / sayıları anahtar olarak
-kullanılabilirler.
+Paralel K-Means iÃ§in anahtar nedir? Anahtar, mesela kÃ¼me olabilir. Yani
+kÃ¼me 1, kÃ¼me 2 gibi kÃ¼me iÅŸaretleri / sayÄ±larÄ± anahtar olarak
+kullanÄ±labilirler.
 
-Peki anahtar ile eşlenecek "değer" nedir?
+Peki anahtar ile eÅŸlenecek "deÄŸer" nedir?
 
-Öyle bir değer arıyoruz ki üst üste konulabilecek bir şey olmalı, Eİ sisteminin
-kuvveti burada, anahtarlar farklı noktalarda üretilebiliyor, sonra tek noktada
-üst üste konuyor, o zaman değerler öyle üretilmeli ki bu üst üste koyma,
-özetleme işlemi yapılabilsin. Üst üste konabilecek şey, her veri noktası için, o
-veri noktasının ait olduğu küme üzerinden toplama işlemidir. 10.20, 20.5 veri
-noktasına bakıyorum, bu nokta o anda elde olan küme merkezlerinden 6'ya en
-yakın, 10.20, 20.5 verisi ile bir 6 anahtarı yayınlarım.
+Ã–yle bir deÄŸer arÄ±yoruz ki Ã¼st Ã¼ste konulabilecek bir ÅŸey olmalÄ±, EÄ° sisteminin
+kuvveti burada, anahtarlar farklÄ± noktalarda Ã¼retilebiliyor, sonra tek noktada
+Ã¼st Ã¼ste konuyor, o zaman deÄŸerler Ã¶yle Ã¼retilmeli ki bu Ã¼st Ã¼ste koyma,
+Ã¶zetleme iÅŸlemi yapÄ±labilsin. Ãœst Ã¼ste konabilecek ÅŸey, her veri noktasÄ± iÃ§in, o
+veri noktasÄ±nÄ±n ait olduÄŸu kÃ¼me Ã¼zerinden toplama iÅŸlemidir. 10.20, 20.5 veri
+noktasÄ±na bakÄ±yorum, bu nokta o anda elde olan kÃ¼me merkezlerinden 6'ya en
+yakÄ±n, 10.20, 20.5 verisi ile bir 6 anahtarÄ± yayÄ±nlarÄ±m.
 
-Tabii burada tavuk/yumurta problemi var, küme merkezlerini arıyorum, ama
-anahtar üretimi için küme merkezi lazım. Bu nasıl olacak?  O zaman (ilk
-başta rasgele bile olsa) küme merkezlerinin bilgisi tüm makinaların
-erişebileceği bir yerde olmalı. Biz bu veriyi \verb!centers.csv!  adlı bir
-dosyaya koymaya karar verdik, bu dosya tek makina ortamında bilinen bir
-dizinde (mesela /tmp), çok makinalı ortamda ise HDFS üzerinde herkesin
-erişebileceği bir yerde olmalı.
+Tabii burada tavuk/yumurta problemi var, kÃ¼me merkezlerini arÄ±yorum, ama
+anahtar Ã¼retimi iÃ§in kÃ¼me merkezi lazÄ±m. Bu nasÄ±l olacak?  O zaman (ilk
+baÅŸta rasgele bile olsa) kÃ¼me merkezlerinin bilgisi tÃ¼m makinalarÄ±n
+eriÅŸebileceÄŸi bir yerde olmalÄ±. Biz bu veriyi \verb!centers.csv!  adlÄ± bir
+dosyaya koymaya karar verdik, bu dosya tek makina ortamÄ±nda bilinen bir
+dizinde (mesela /tmp), Ã§ok makinalÄ± ortamda ise HDFS Ã¼zerinde herkesin
+eriÅŸebileceÄŸi bir yerde olmalÄ±.
 
-Toplamaya gelelim: Normal K-Means'i hatırlarsak, her nokta için o noktaya
-en yakın kümeyi buluyordu ve sonra, atama işlemi bitince, her kümenin
-altındaki noktaları toparlayıp onların ortalamasını alarak yeni küme
-merkezini hesaplıyordu. Paralel ortamda ortalama işlemi üst üste
-konabilecek bir şey, çünkü toplama üst üste konabilecek bir işlem, ve /
-yani farklı makinalarda küme-nokta, eşlemelerini üretirsek, indirgeme
-aşamasında o anahtar için tüm değerleri toplayıp nokta sayısına böleriz ve
-yeni küme merkezini elde ederiz.
+Toplamaya gelelim: Normal K-Means'i hatÄ±rlarsak, her nokta iÃ§in o noktaya
+en yakÄ±n kÃ¼meyi buluyordu ve sonra, atama iÅŸlemi bitince, her kÃ¼menin
+altÄ±ndaki noktalarÄ± toparlayÄ±p onlarÄ±n ortalamasÄ±nÄ± alarak yeni kÃ¼me
+merkezini hesaplÄ±yordu. Paralel ortamda ortalama iÅŸlemi Ã¼st Ã¼ste
+konabilecek bir ÅŸey, Ã§Ã¼nkÃ¼ toplama Ã¼st Ã¼ste konabilecek bir iÅŸlem, ve /
+yani farklÄ± makinalarda kÃ¼me-nokta, eÅŸlemelerini Ã¼retirsek, indirgeme
+aÅŸamasÄ±nda o anahtar iÃ§in tÃ¼m deÄŸerleri toplayÄ±p nokta sayÄ±sÄ±na bÃ¶leriz ve
+yeni kÃ¼me merkezini elde ederiz.
 
 \includegraphics[height=8cm]{kmeans-diag.png}
 
-Şimdi Hadoop ile ilgili bazı lojistik konulara gelelim:
+Åimdi Hadoop ile ilgili bazÄ± lojistik konulara gelelim:
 
-Paralel K-Means için tek bir eşle-indirge işletimi yeterli değil, bu algoritma
-döngülü / özyineli (iterative) bir algoritma, 5,10,20 kez işlemesi gerekebilir.
-Her döngü (indirgeme) sonunda yeni küme merkezleri hesaplanacak, bu merkezler
-eski \verb!centers.csv!  yerini alacak ve işlem tekrar başlayacak.
+Paralel K-Means iÃ§in tek bir eÅŸle-indirge iÅŸletimi yeterli deÄŸil, bu algoritma
+dÃ¶ngÃ¼lÃ¼ / Ã¶zyineli (iterative) bir algoritma, 5,10,20 kez iÅŸlemesi gerekebilir.
+Her dÃ¶ngÃ¼ (indirgeme) sonunda yeni kÃ¼me merkezleri hesaplanacak, bu merkezler
+eski \verb!centers.csv!  yerini alacak ve iÅŸlem tekrar baÅŸlayacak.
 
-Şimdi ham veriyi gösterelim,
+Åimdi ham veriyi gÃ¶sterelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from pandas import *
@@ -62,11 +62,11 @@ plt.savefig('kmeans_1.png')
 
 \inputminted[fontsize=\footnotesize]{python}{kmeans.py}
 
-\verb!reduce_all_centers! çağrısı tüm indirgeyiciler her küme için yeni
-orta noktayı hesaplayıp onu yayınladıktan (emit) sonra, tüm yeni
-merkezlerin geleceği yer.
+\verb!reduce_all_centers! Ã§aÄŸrÄ±sÄ± tÃ¼m indirgeyiciler her kÃ¼me iÃ§in yeni
+orta noktayÄ± hesaplayÄ±p onu yayÄ±nladÄ±ktan (emit) sonra, tÃ¼m yeni
+merkezlerin geleceÄŸi yer.
 
-Komut satırından tek makina için Hadoop'suz işletelim,
+Komut satÄ±rÄ±ndan tek makina iÃ§in Hadoop'suz iÅŸletelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 !sort --random-sort synthetic.txt > /tmp/synthetic.txt
@@ -175,19 +175,19 @@ plt.savefig('kmeans_2.png')
 
 \includegraphics[height=4cm]{kmeans_2.png}
 
-K-Means'i 20 kere işlettik. Eğer istenirse (hatta daha iyi olur) döngü bir
-\verb!while! içine konur ve bitiş için "stabilite şartı"
-aranır. Stabilite yeni küme merkezinin eskisinden "çok fazla değişik olup
-olmadığı" şartıdır, değişim yoksa artık sonucu bulmuşuz demektir, daha
-fazla döngüye gerek kalmayacaktır. Biz döngüyü 20 kere döngüyü işlettik,
-bu problem için yeterli oldu.
+K-Means'i 20 kere iÅŸlettik. EÄŸer istenirse (hatta daha iyi olur) dÃ¶ngÃ¼ bir
+\verb!while! iÃ§ine konur ve bitiÅŸ iÃ§in "stabilite ÅŸartÄ±"
+aranÄ±r. Stabilite yeni kÃ¼me merkezinin eskisinden "Ã§ok fazla deÄŸiÅŸik olup
+olmadÄ±ÄŸÄ±" ÅŸartÄ±dÄ±r, deÄŸiÅŸim yoksa artÄ±k sonucu bulmuÅŸuz demektir, daha
+fazla dÃ¶ngÃ¼ye gerek kalmayacaktÄ±r. Biz dÃ¶ngÃ¼yÃ¼ 20 kere dÃ¶ngÃ¼yÃ¼ iÅŸlettik,
+bu problem iÃ§in yeterli oldu.
 
-K-Means işini bitirdikten sonra elde edilen sonuçları okuyabiliriz. Nihai
-küme merkezleri \verb!/tmp/centers.csv! içinde. Bu merkezleri alıp,
-ham veri üzerinde kırmızı nokta olarak gösteriyoruz.
+K-Means iÅŸini bitirdikten sonra elde edilen sonuÃ§larÄ± okuyabiliriz. Nihai
+kÃ¼me merkezleri \verb!/tmp/centers.csv! iÃ§inde. Bu merkezleri alÄ±p,
+ham veri Ã¼zerinde kÄ±rmÄ±zÄ± nokta olarak gÃ¶steriyoruz.
 
-veriyi 20-30 makinaya dağıtarak parça parça işleyip kümelemeniz
-mümkündür. Endüstride son zamanlarda habire duyulan Büyük Veri (Big Data)
-olayı işte bu.
+veriyi 20-30 makinaya daÄŸÄ±tarak parÃ§a parÃ§a iÅŸleyip kÃ¼melemeniz
+mÃ¼mkÃ¼ndÃ¼r. EndÃ¼stride son zamanlarda habire duyulan BÃ¼yÃ¼k Veri (Big Data)
+olayÄ± iÅŸte bu.
 
 \end{document}

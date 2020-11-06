@@ -2,79 +2,79 @@
 \begin{document}
 Ders 18
 
-[bazı multigrid yorumları atlandı]
+[bazÄ± multigrid yorumlarÄ± atlandÄ±]
 
 Krylov Matrisleri 
 
-Bu matrislerden $K$ olarak bahsedeceğiz ve bu yöntem bağlamında 
+Bu matrislerden $K$ olarak bahsedeceÄŸiz ve bu yÃ¶ntem baÄŸlamÄ±nda 
 
 $$ Ax = b $$
 
-sistemini çözüyor olacağız. Krylov matrisleri şöyle yaratılır
+sistemini Ã§Ã¶zÃ¼yor olacaÄŸÄ±z. Krylov matrisleri ÅŸÃ¶yle yaratÄ±lÄ±r
 
 $$ K_j = \left[\begin{array}{rrrrr}
 b & Ab & A^2b & .. & A^{j-1}b
 \end{array}\right] $$
 
-Krylov altuzayı $\mathscr{K}$ ise üstteki kolonların lineer kombinasyonudur
-(span), ya da üstteki matrisin kolon uzayıdır da denebilir. Bu tür bir
-matrisle niye ilgilenirim? Jacobi işlemi aslında bu kolonların
-kombinasyonlarından birini her adımda yavaş yavaş seçer, yani aslında
-Krylov altuzayının bir parçasında çalışır. Daha doğrusu ufak ufak başlar, o
-altuzayda yavaş yavaş büyür.
+Krylov altuzayÄ± $\mathscr{K}$ ise Ã¼stteki kolonlarÄ±n lineer kombinasyonudur
+(span), ya da Ã¼stteki matrisin kolon uzayÄ±dÄ±r da denebilir. Bu tÃ¼r bir
+matrisle niye ilgilenirim? Jacobi iÅŸlemi aslÄ±nda bu kolonlarÄ±n
+kombinasyonlarÄ±ndan birini her adÄ±mda yavaÅŸ yavaÅŸ seÃ§er, yani aslÄ±nda
+Krylov altuzayÄ±nÄ±n bir parÃ§asÄ±nda Ã§alÄ±ÅŸÄ±r. Daha doÄŸrusu ufak ufak baÅŸlar, o
+altuzayda yavaÅŸ yavaÅŸ bÃ¼yÃ¼r.
 
-Jacobi sürekli bir kombinasyon seçimi yapar, tabii bu seçimin en iyi seçim
-olduğu söylenemez. Seçimin en iyisini yapsak daha iyi olmaz mı? 
+Jacobi sÃ¼rekli bir kombinasyon seÃ§imi yapar, tabii bu seÃ§imin en iyi seÃ§im
+olduÄŸu sÃ¶ylenemez. SeÃ§imin en iyisini yapsak daha iyi olmaz mÄ±? 
 
-En iyiyi seçmek için kullanılacak metot eşlenik gradyan (conjugate
-gradient) olacak. Bu metot $K$ içinde $x_j$'yi seçer. 
+En iyiyi seÃ§mek iÃ§in kullanÄ±lacak metot eÅŸlenik gradyan (conjugate
+gradient) olacak. Bu metot $K$ iÃ§inde $x_j$'yi seÃ§er. 
 
-$\mathscr{K}$ uzayı yaklaşıksal çözümümüzü aradığımız yer tabii ki. Bu arada üstteki
-$K$ matrisinin elemanlarını yaratmak çok kolay, matris çarpımı yapıyoruz, ve
-bir sonraki eleman bir öncekinin $A$ katıdır, ve $A$ çoğunlukla seyrektir
-(sparse), bazen de simetriktir (eşlenik gradyan metotu için $A$ simetrik,
-pozitif kesin olmalı).
+$\mathscr{K}$ uzayÄ± yaklaÅŸÄ±ksal Ã§Ã¶zÃ¼mÃ¼mÃ¼zÃ¼ aradÄ±ÄŸÄ±mÄ±z yer tabii ki. Bu arada Ã¼stteki
+$K$ matrisinin elemanlarÄ±nÄ± yaratmak Ã§ok kolay, matris Ã§arpÄ±mÄ± yapÄ±yoruz, ve
+bir sonraki eleman bir Ã¶ncekinin $A$ katÄ±dÄ±r, ve $A$ Ã§oÄŸunlukla seyrektir
+(sparse), bazen de simetriktir (eÅŸlenik gradyan metotu iÃ§in $A$ simetrik,
+pozitif kesin olmalÄ±).
 
-Ama EG metotundan önce Arnoldi kavramını görmemiz lazım. 
+Ama EG metotundan Ã¶nce Arnoldi kavramÄ±nÄ± gÃ¶rmemiz lazÄ±m. 
 
-Uygulamalı Matematikte sürekli bir şeyler ``seçeriz'', ve çoğunlukla baz
-vektörleri seçeriz ve birkaç özellik ararız. Aradığımız özellikler
-öncelikle hızdır, yukarıda gördüğümüz gibi, matris çarpımı var, bu çok
-hızlı. Bir diğer özellik bağımsızlık. Bir diğeri baz vektörlerinin birimdik
-(orthonormal) olması. Bu son özellik elde edilebilirse en iyisidir. Üstteki
-$K$ pek iyi bir baz değildir. Arnoldi'nin amacı Krylov bazını
-dikgenleştirmektir. $b,Ab,..$'yi alıp $q_1,q_2,..,q_j$ oluşturmaktır. Koda
-bakalım,
+UygulamalÄ± Matematikte sÃ¼rekli bir ÅŸeyler ``seÃ§eriz'', ve Ã§oÄŸunlukla baz
+vektÃ¶rleri seÃ§eriz ve birkaÃ§ Ã¶zellik ararÄ±z. AradÄ±ÄŸÄ±mÄ±z Ã¶zellikler
+Ã¶ncelikle hÄ±zdÄ±r, yukarÄ±da gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z gibi, matris Ã§arpÄ±mÄ± var, bu Ã§ok
+hÄ±zlÄ±. Bir diÄŸer Ã¶zellik baÄŸÄ±msÄ±zlÄ±k. Bir diÄŸeri baz vektÃ¶rlerinin birimdik
+(orthonormal) olmasÄ±. Bu son Ã¶zellik elde edilebilirse en iyisidir. Ãœstteki
+$K$ pek iyi bir baz deÄŸildir. Arnoldi'nin amacÄ± Krylov bazÄ±nÄ±
+dikgenleÅŸtirmektir. $b,Ab,..$'yi alÄ±p $q_1,q_2,..,q_j$ oluÅŸturmaktÄ±r. Koda
+bakalÄ±m,
 
 Algoritma \verb!arnoldi!
 \begin{enumerate}
   \item $q_1 = b / ||b||$, normalize et
-  \item  Her $j = 1,..,n-1$ için $q_{j+1}$'i hesaplamaya başla
+  \item  Her $j = 1,..,n-1$ iÃ§in $q_{j+1}$'i hesaplamaya baÅŸla
   \begin{itemize}
      \item $t = A * q_j$
-     \item Her $i = 1,..,j $ için $t$, $\mathscr{K}_{j+1}$ uzayında
+     \item Her $i = 1,..,j $ iÃ§in $t$, $\mathscr{K}_{j+1}$ uzayÄ±nda
      \begin{itemize}
-       \item $h_{ij} = q_i^T t$,  $h_{ij}q_i$, $t$'nin $q_i$'ye yansıması
-       \item $t = t - h_{ij}q_i$, yansımayı çıkart
+       \item $h_{ij} = q_i^T t$,  $h_{ij}q_i$, $t$'nin $q_i$'ye yansÄ±masÄ±
+       \item $t = t - h_{ij}q_i$, yansÄ±mayÄ± Ã§Ä±kart
      \end{itemize}
   \end{itemize}
   \item // $t$, $q_1,..,q_j$'ye dikgen oldu
-  \item $h_{j+1,j} = ||t||$, $t$'nin büyüklüğünü hesapla
+  \item $h_{j+1,j} = ||t||$, $t$'nin bÃ¼yÃ¼klÃ¼ÄŸÃ¼nÃ¼ hesapla
   \item // $q_{j+1} = t / h_{j+1,j}$
   $q_1,..,q_j$ birimdik
 \end{enumerate}
 
-Fikir Gram-Schmidt fikriyle çok benzer. 1. satırda ilk vektörü olduğu gibi
-alıyoruz, sadece normalize ediyoruz. Sonra 3. satırda bir deneme
-amaçlı bir vektör $t$'ye  bakıyoruz. Bu vektör ilk baştaki $b$'ye dikgen
-olmayacak muhakkak. O zaman 5. satırda bir iç çarpım (inner product)
-sonrası, 6. satırda $t$'den çıkartıyoruz. 8 ve 9. satırlarda bu
-vektörü normalize ediyoruz. 
+Fikir Gram-Schmidt fikriyle Ã§ok benzer. 1. satÄ±rda ilk vektÃ¶rÃ¼ olduÄŸu gibi
+alÄ±yoruz, sadece normalize ediyoruz. Sonra 3. satÄ±rda bir deneme
+amaÃ§lÄ± bir vektÃ¶r $t$'ye  bakÄ±yoruz. Bu vektÃ¶r ilk baÅŸtaki $b$'ye dikgen
+olmayacak muhakkak. O zaman 5. satÄ±rda bir iÃ§ Ã§arpÄ±m (inner product)
+sonrasÄ±, 6. satÄ±rda $t$'den Ã§Ä±kartÄ±yoruz. 8 ve 9. satÄ±rlarda bu
+vektÃ¶rÃ¼ normalize ediyoruz. 
 
-Eğer $A$ simetrik ise, $h_{ij}h_{ij-1}$ çarpımını birkaç kere çıkartmam
+EÄŸer $A$ simetrik ise, $h_{ij}h_{ij-1}$ Ã§arpÄ±mÄ±nÄ± birkaÃ§ kere Ã§Ä±kartmam
 yeterlidir. 
 
-Örnek 
+Ã–rnek 
 
 $$  
 A = 
@@ -98,52 +98,52 @@ K_4 =
 \end{array}\right]
 $$
 
-$A$ hem simetrik, onun ötesinde köşegen, ayrıca oldukça seyrek. Krylov
-matrisi de üstte. İlk kolonu $b$ ile aynı. 2. kolon için $A$ ile
-çarpmışız. 3. için bir daha $A$ ile çarpmışsız, 4. için bir daha.
+$A$ hem simetrik, onun Ã¶tesinde kÃ¶ÅŸegen, ayrÄ±ca oldukÃ§a seyrek. Krylov
+matrisi de Ã¼stte. Ä°lk kolonu $b$ ile aynÄ±. 2. kolon iÃ§in $A$ ile
+Ã§arpmÄ±ÅŸÄ±z. 3. iÃ§in bir daha $A$ ile Ã§arpmÄ±ÅŸsÄ±z, 4. iÃ§in bir daha.
 
-$K$ eğer bir baz ise, temsil ettiği uzay tüm $\mathbb{R}^4$'tür. Üstteki
-örnekte $j = n = 4$, tüm değerleri işledik. Eğer $n$ çok büyük bir sayi ise
-mesela $10^5$ gibi, $j << n$ yani sona gelmeden çok önce durmak
-isteriz. Eşlenik gradyan bunu başarıyor. 
+$K$ eÄŸer bir baz ise, temsil ettiÄŸi uzay tÃ¼m $\mathbb{R}^4$'tÃ¼r. Ãœstteki
+Ã¶rnekte $j = n = 4$, tÃ¼m deÄŸerleri iÅŸledik. EÄŸer $n$ Ã§ok bÃ¼yÃ¼k bir sayi ise
+mesela $10^5$ gibi, $j << n$ yani sona gelmeden Ã§ok Ã¶nce durmak
+isteriz. EÅŸlenik gradyan bunu baÅŸarÄ±yor. 
 
-$K$ formatındaki bir matrise Vondermonde matrisi de denir, bu tür
-matrislerde ilk kolon sabit, 3., 4., .. kolonlar ikincinin üstel 
+$K$ formatÄ±ndaki bir matrise Vondermonde matrisi de denir, bu tÃ¼r
+matrislerde ilk kolon sabit, 3., 4., .. kolonlar ikincinin Ã¼stel 
 halidir. 
 
-Vondermond matrisleri pek iyi koşullandırılmış (conditioned) matrisler
-değildir. Alakalı bir soru: iyi, kötü koşullandırılmış matrisi nasıl
-anlarız? Matris eşsiz (singular) değil. Determinanti hesaplasak sıfır
-çıkmaz. Ama neredeyse ``eşsiz olmaya yakın''. Bunun testini nasıl yaparız? 
+Vondermond matrisleri pek iyi koÅŸullandÄ±rÄ±lmÄ±ÅŸ (conditioned) matrisler
+deÄŸildir. AlakalÄ± bir soru: iyi, kÃ¶tÃ¼ koÅŸullandÄ±rÄ±lmÄ±ÅŸ matrisi nasÄ±l
+anlarÄ±z? Matris eÅŸsiz (singular) deÄŸil. Determinanti hesaplasak sÄ±fÄ±r
+Ã§Ä±kmaz. Ama neredeyse ``eÅŸsiz olmaya yakÄ±n''. Bunun testini nasÄ±l yaparÄ±z? 
 
-Matris eşsiz değil, o zaman özdeğerleri hesaplamak akla gelebilir,
+Matris eÅŸsiz deÄŸil, o zaman Ã¶zdeÄŸerleri hesaplamak akla gelebilir,
 oradan $\lambda_{min}$, $\lambda_{maks}$'i kontrol etmek.. Fakat simetrik
-olmayan matrislerin özdeğerlerini hesaplamak hoş değildir, ``güvenilir''
-hesaplar değildirler. Çok kötü koşullandırılmış ama tüm özdeğerleri 1 olan
-matrisler olabilir mesela, çaprazında 1'ler olur, çaprazın üstünden
+olmayan matrislerin Ã¶zdeÄŸerlerini hesaplamak hoÅŸ deÄŸildir, ``gÃ¼venilir''
+hesaplar deÄŸildirler. Ã‡ok kÃ¶tÃ¼ koÅŸullandÄ±rÄ±lmÄ±ÅŸ ama tÃ¼m Ã¶zdeÄŸerleri 1 olan
+matrisler olabilir mesela, Ã§aprazÄ±nda 1'ler olur, Ã§aprazÄ±n Ã¼stÃ¼nden
 katrilyonlar olabilir.. 
 
-Bu işi doğru yapmanın yolu $V^TV$'ye bakmak. Yani genel kural, matris
-simetrik değilse, devriği ile kendisini çarp, sonucun özdeğerleri hep
-pozitif olur. $V^TV$'nin $i$'inci özdeğeri, $V$'nin $i$'inci özdeğerinin
-karesi olacaktır. 
+Bu iÅŸi doÄŸru yapmanÄ±n yolu $V^TV$'ye bakmak. Yani genel kural, matris
+simetrik deÄŸilse, devriÄŸi ile kendisini Ã§arp, sonucun Ã¶zdeÄŸerleri hep
+pozitif olur. $V^TV$'nin $i$'inci Ã¶zdeÄŸeri, $V$'nin $i$'inci Ã¶zdeÄŸerinin
+karesi olacaktÄ±r. 
 
 Bu arada $V^TV$ matrisine Gram matrisi denir. 
 
-Eğer $Q^TQ$ olsaydı koşullandırma sayısı (condition number), yani en büyük /
-en küçük özdeğer ne olurdu? $Q^TQ = I$  o zaman çaprazda hep 1 var, $1/1 =
-1$. Bu en iyi koşullandırma sayısıdır. 
+EÄŸer $Q^TQ$ olsaydÄ± koÅŸullandÄ±rma sayÄ±sÄ± (condition number), yani en bÃ¼yÃ¼k /
+en kÃ¼Ã§Ã¼k Ã¶zdeÄŸer ne olurdu? $Q^TQ = I$  o zaman Ã§aprazda hep 1 var, $1/1 =
+1$. Bu en iyi koÅŸullandÄ±rma sayÄ±sÄ±dÄ±r. 
 
-Şimdi şu çok önemli formül için gerekli her bileşene sahibiz. 
+Åimdi ÅŸu Ã§ok Ã¶nemli formÃ¼l iÃ§in gerekli her bileÅŸene sahibiz. 
 
 $$ AQ = QH $$
 
 $A$ bize verilen -diyelim ki- simetrik matris. $Q$ Arnoldi'den gelen
-baz. $H$ ise kodda görülen çarpan değerleri. Yani $QH$ bir nevi
-Gram-Schmidt'teki gibi, hatırlarsak Gram-Schmidt $QR$ ile temsil
-ediliyordu. $Q$ yine birimdik, Gram-Schmidt'te $R$ üst köşegen. 
+baz. $H$ ise kodda gÃ¶rÃ¼len Ã§arpan deÄŸerleri. Yani $QH$ bir nevi
+Gram-Schmidt'teki gibi, hatÄ±rlarsak Gram-Schmidt $QR$ ile temsil
+ediliyordu. $Q$ yine birimdik, Gram-Schmidt'te $R$ Ã¼st kÃ¶ÅŸegen. 
 
-$H$ hesaplanırsa
+$H$ hesaplanÄ±rsa
 
 $$  H = 
 \left[\begin{array}{rrrr}
@@ -154,32 +154,32 @@ $$  H =
 \end{array}\right]
 $$
 
-$H$ simetrik ve üçlü köşegen (tridiagonal). Üçlü köşegenlik bize ne
-söyler?  Tekrarın (recurrence) kısa olduğunu.
+$H$ simetrik ve Ã¼Ã§lÃ¼ kÃ¶ÅŸegen (tridiagonal). ÃœÃ§lÃ¼ kÃ¶ÅŸegenlik bize ne
+sÃ¶yler?  TekrarÄ±n (recurrence) kÄ±sa olduÄŸunu.
 
 $$ AQ = QH $$
 
-formülüne dönelim, kolonsal olarak üstteki çarpımı nasıl gösteririz? 
+formÃ¼lÃ¼ne dÃ¶nelim, kolonsal olarak Ã¼stteki Ã§arpÄ±mÄ± nasÄ±l gÃ¶steririz? 
 
 $$ Aq_1  = \frac{ 5}{2}q_1  + \frac{ \sqrt{ 5}}{2} q_2 $$
 
-Tek bir kalemde eğer $A$ simetrik ise $H$'in de simetrik olduğunu nasıl
-gösteririm? $H$'nin formülü lazım, 
+Tek bir kalemde eÄŸer $A$ simetrik ise $H$'in de simetrik olduÄŸunu nasÄ±l
+gÃ¶steririm? $H$'nin formÃ¼lÃ¼ lazÄ±m, 
 
 $$ H = Q^{-1}AQ $$
 
-$Q^{-1}$ nedir? $Q$'nun dikgen olduğunu hatırlayalım, o zaman 
-$Q^{-1} = Q^T$. Üstte yerine koyalım,
+$Q^{-1}$ nedir? $Q$'nun dikgen olduÄŸunu hatÄ±rlayalÄ±m, o zaman 
+$Q^{-1} = Q^T$. Ãœstte yerine koyalÄ±m,
 
 $$ H = Q^{T}AQ $$ 
 
 Buna bakarak $H$ kesin simetriktir diyebiliriz, simetrik matrisler aynen
-üstteki gibi yaratılır zaten, ortaya bir simetrik matris koyarsın, sağdan
-herhangi bir matris, soldan onun devriği ile çarparsın, ve yeni bir
-simetrik matris ortaya çıkar. 
+Ã¼stteki gibi yaratÄ±lÄ±r zaten, ortaya bir simetrik matris koyarsÄ±n, saÄŸdan
+herhangi bir matris, soldan onun devriÄŸi ile Ã§arparsÄ±n, ve yeni bir
+simetrik matris ortaya Ã§Ä±kar. 
 
-Yani vardığımız sonuç Krylov bazının hızlı, basit şekilde dikgen hale
-getirilebileceğidir.
+Yani vardÄ±ÄŸÄ±mÄ±z sonuÃ§ Krylov bazÄ±nÄ±n hÄ±zlÄ±, basit ÅŸekilde dikgen hale
+getirilebileceÄŸidir.
 
 
 

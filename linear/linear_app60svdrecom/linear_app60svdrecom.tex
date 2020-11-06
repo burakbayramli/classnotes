@@ -2,9 +2,9 @@
 \begin{document}
 SVD, Toplu Tavsiye (Collaborative Filtering) 
 
-Diyelim ki Star Trek (ST) dizisini ne kadar beğendiğini 4 tane
-kullanıcı sezonlara göre işaretlemiş. Bu örnek veriyi alttaki gibi
-gösterelim.
+Diyelim ki Star Trek (ST) dizisini ne kadar beÄŸendiÄŸini 4 tane
+kullanÄ±cÄ± sezonlara gÃ¶re iÅŸaretlemiÅŸ. Bu Ã¶rnek veriyi alttaki gibi
+gÃ¶sterelim.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from pandas import *
@@ -31,53 +31,53 @@ John   0   3   0   5   4   5
 Fred   5   4   3   3   5   5
 \end{verbatim}
 
-Veriye göre Tom, ST dizisinin 3. sezonunu 4 seviyesinde sevmiş. 0
-değeri o sezonun seyredilmediğini gösteriyor.
+Veriye gÃ¶re Tom, ST dizisinin 3. sezonunu 4 seviyesinde sevmiÅŸ. 0
+deÄŸeri o sezonun seyredilmediÄŸini gÃ¶steriyor.
 
-Toplu Tavsiye algoritmaları verideki diğer kişilerin bir ürünü, diziyi, vs. ne
-kadar beğendiğinin verisinin diğer "benzer" kişilere tavsiye olarak sunabilir,
-ya da ondan önce, bir kişinin daha almadığı ürünü, seyretmediği sezonu,
-dinlemediği müziği ne kadar beğeneceğini tahmin eder. 2006 yılında yapılan ünlü
-Netflix yarışmasının amacı buydu mesela.
+Toplu Tavsiye algoritmalarÄ± verideki diÄŸer kiÅŸilerin bir Ã¼rÃ¼nÃ¼, diziyi, vs. ne
+kadar beÄŸendiÄŸinin verisinin diÄŸer "benzer" kiÅŸilere tavsiye olarak sunabilir,
+ya da ondan Ã¶nce, bir kiÅŸinin daha almadÄ±ÄŸÄ± Ã¼rÃ¼nÃ¼, seyretmediÄŸi sezonu,
+dinlemediÄŸi mÃ¼ziÄŸi ne kadar beÄŸeneceÄŸini tahmin eder. 2006 yÄ±lÄ±nda yapÄ±lan Ã¼nlÃ¼
+Netflix yarÄ±ÅŸmasÄ±nÄ±n amacÄ± buydu mesela.
 
-Peki benzerliğin kriteri nedir, ve benzerlik nelerin arasında ölçülür?
+Peki benzerliÄŸin kriteri nedir, ve benzerlik nelerin arasÄ±nda Ã¶lÃ§Ã¼lÃ¼r?
 
-Benzerlik, ürün seviyesinde, ya da kişi seviyesinde yapılabilir. Eğer ürün
-seviyesinde ise, tek bir ürün için tüm kullanıcıların verdiği nota
-bakılır. Eğer kullanıcı seviyesinde ise, tek kullanıcının tüm ürünlere
-verdiği beğeni notları vektörü kullanılır. 1. sezonu örnek kullanalım,o
-sezonu beğenen kişilere o sezona benzer diğer sezonlar tavsiye
-edilebilir. Kişiden hareketle, mesela John'a benzeyen diğer kişiler
-bulunarak onların beğendiği ürünler John'a tavsiye edilebilir.
+Benzerlik, Ã¼rÃ¼n seviyesinde, ya da kiÅŸi seviyesinde yapÄ±labilir. EÄŸer Ã¼rÃ¼n
+seviyesinde ise, tek bir Ã¼rÃ¼n iÃ§in tÃ¼m kullanÄ±cÄ±larÄ±n verdiÄŸi nota
+bakÄ±lÄ±r. EÄŸer kullanÄ±cÄ± seviyesinde ise, tek kullanÄ±cÄ±nÄ±n tÃ¼m Ã¼rÃ¼nlere
+verdiÄŸi beÄŸeni notlarÄ± vektÃ¶rÃ¼ kullanÄ±lÄ±r. 1. sezonu Ã¶rnek kullanalÄ±m,o
+sezonu beÄŸenen kiÅŸilere o sezona benzer diÄŸer sezonlar tavsiye
+edilebilir. KiÅŸiden hareketle, mesela John'a benzeyen diÄŸer kiÅŸiler
+bulunarak onlarÄ±n beÄŸendiÄŸi Ã¼rÃ¼nler John'a tavsiye edilebilir.
 
-Ürün ya da kişi bazında olsun, benzerliği hesaplamak için bir benzerlik
-ölçütü oluşturmalıyız. Genel olarak bu benzerlik ölçütünün 0 ile 1 arasında
-değişen bir sayı olmasını tercih edilir ve tavsiye mantığının geri kalanı
-bu ölçütü baz alacaktır. Elimizde beğeni notlarını taşıyan $A,B$ vektörleri
-olabilir, ve bu vektörlerin içinde beğeni notları olacaktır. Vektör
-içindeki sayıları baz alan benzerlik çeşitleri şöyledir:
+ÃœrÃ¼n ya da kiÅŸi bazÄ±nda olsun, benzerliÄŸi hesaplamak iÃ§in bir benzerlik
+Ã¶lÃ§Ã¼tÃ¼ oluÅŸturmalÄ±yÄ±z. Genel olarak bu benzerlik Ã¶lÃ§Ã¼tÃ¼nÃ¼n 0 ile 1 arasÄ±nda
+deÄŸiÅŸen bir sayÄ± olmasÄ±nÄ± tercih edilir ve tavsiye mantÄ±ÄŸÄ±nÄ±n geri kalanÄ±
+bu Ã¶lÃ§Ã¼tÃ¼ baz alacaktÄ±r. Elimizde beÄŸeni notlarÄ±nÄ± taÅŸÄ±yan $A,B$ vektÃ¶rleri
+olabilir, ve bu vektÃ¶rlerin iÃ§inde beÄŸeni notlarÄ± olacaktÄ±r. VektÃ¶r
+iÃ§indeki sayÄ±larÄ± baz alan benzerlik Ã§eÅŸitleri ÅŸÃ¶yledir:
 
-Öklit Benzerliği (Euclidian Similarity)
+Ã–klit BenzerliÄŸi (Euclidian Similarity)
 
-Bu benzerlik $1 / (1+mesafe)$ olarak hesaplanır. Mesafe karelerin
-toplamının karekökü (yani Öklitsel mesafe, ki isim buradan
-geliyor). Bu yüzden mesafe 0 ise (yani iki "şey" arasında hiç mesafe
-yok, birbirlerine çok yakınlar), o zaman hesap 1 döndürür (mükemmel
-benzerlik). Mesafe arttıkça bölen büyüdüğü için benzerlik sıfıra yaklaşır. 
+Bu benzerlik $1 / (1+mesafe)$ olarak hesaplanÄ±r. Mesafe karelerin
+toplamÄ±nÄ±n karekÃ¶kÃ¼ (yani Ã–klitsel mesafe, ki isim buradan
+geliyor). Bu yÃ¼zden mesafe 0 ise (yani iki "ÅŸey" arasÄ±nda hiÃ§ mesafe
+yok, birbirlerine Ã§ok yakÄ±nlar), o zaman hesap 1 dÃ¶ndÃ¼rÃ¼r (mÃ¼kemmel
+benzerlik). Mesafe arttÄ±kÃ§a bÃ¶len bÃ¼yÃ¼dÃ¼ÄŸÃ¼ iÃ§in benzerlik sÄ±fÄ±ra yaklaÅŸÄ±r. 
 
-Pearson Benzerliği
+Pearson BenzerliÄŸi
 
-Bu benzerliğin Öklit'ten farklılığı, sayı büyüklüğüne hassas olmamasıdır.
-Diyelim ki birisi her sezonu 1 ile beğenmiş, diğeri 5 ile beğenmiş, bu iki
-vektörün Pearson benzerliğine göre birbirine eşit çıkar. Pearson -1 ile +1
-arasında bir değer döndürür, alttaki hesap onu normalize ederek 0 ile 1 arasına
-çeker.
+Bu benzerliÄŸin Ã–klit'ten farklÄ±lÄ±ÄŸÄ±, sayÄ± bÃ¼yÃ¼klÃ¼ÄŸÃ¼ne hassas olmamasÄ±dÄ±r.
+Diyelim ki birisi her sezonu 1 ile beÄŸenmiÅŸ, diÄŸeri 5 ile beÄŸenmiÅŸ, bu iki
+vektÃ¶rÃ¼n Pearson benzerliÄŸine gÃ¶re birbirine eÅŸit Ã§Ä±kar. Pearson -1 ile +1
+arasÄ±nda bir deÄŸer dÃ¶ndÃ¼rÃ¼r, alttaki hesap onu normalize ederek 0 ile 1 arasÄ±na
+Ã§eker.
 
-Kosinüs Benzerliği (Cosine Similarity)
+KosinÃ¼s BenzerliÄŸi (Cosine Similarity)
 
-İki vektörü geometrik vektör olarak görür ve bu vektörlerin arasında
-oluşan açıyı (daha doğrusu onun kosinüsünü) farklılık ölçütü olarak
-kullanır.
+Ä°ki vektÃ¶rÃ¼ geometrik vektÃ¶r olarak gÃ¶rÃ¼r ve bu vektÃ¶rlerin arasÄ±nda
+oluÅŸan aÃ§Ä±yÄ± (daha doÄŸrusu onun kosinÃ¼sÃ¼nÃ¼) farklÄ±lÄ±k Ã¶lÃ§Ã¼tÃ¼ olarak
+kullanÄ±r.
 
 $$
 \cos\theta = \frac{A \cdot B}{||A||||B||}
@@ -124,28 +124,28 @@ print cos_sim(data.ix['Fred'],data.ix['Ben'])
 0.977064220183
 \end{verbatim}
 
-Şimdi tavsiye mekanığine gelelim. En basit tavsiye yöntemi, mesela
-kişi bazlı olarak, bir kişiye en yakın diğer kişileri bulmak (matrisin
-tamamına bakarak) ve onların beğendikleri ürünü istenilen kişiye
-tavsiye etmek. Benzerlik için üstteki ölçütlerden birini kullanmak.
+Åimdi tavsiye mekanÄ±ÄŸine gelelim. En basit tavsiye yÃ¶ntemi, mesela
+kiÅŸi bazlÄ± olarak, bir kiÅŸiye en yakÄ±n diÄŸer kiÅŸileri bulmak (matrisin
+tamamÄ±na bakarak) ve onlarÄ±n beÄŸendikleri Ã¼rÃ¼nÃ¼ istenilen kiÅŸiye
+tavsiye etmek. Benzerlik iÃ§in Ã¼stteki Ã¶lÃ§Ã¼tlerden birini kullanmak.
 
-Fakat belki de elimizde çok fazla ürün, ya da kullanıcı var. Bir boyut
-azaltma işlemi yapamaz mıyız?
+Fakat belki de elimizde Ã§ok fazla Ã¼rÃ¼n, ya da kullanÄ±cÄ± var. Bir boyut
+azaltma iÅŸlemi yapamaz mÄ±yÄ±z?
 
-Evet. SVD yöntemi burada da işimize yarar. 
+Evet. SVD yÃ¶ntemi burada da iÅŸimize yarar. 
 
 $$ A = USV  $$
 
-elde edeceğimiz için, ve $S$ içindeki en büyük değerlere tekabül eden
-$U,V$ değerleri sıralanmış olarak geldiği için $U,V$'nin en baştaki
-değerlerini almak bize "en önemli" blokları verir. Bu en önemli kolon
-ya da satırları alarak azaltılmış bir boyut içinde benzerlik hesabı
-yapmak işlemlerimizi hızlandırır. Bu azaltılmış boyutta kümeleme
-algoritmalarını devreye sokabiliriz; $U$'nun mesela en önemli iki
-kolonu bize iki boyuttaki sezon kümelerini verebilir, $V$'nin en
-önemli iki (en üst) satırı bize iki boyutta bir kişi kümesi verebilir.
+elde edeceÄŸimiz iÃ§in, ve $S$ iÃ§indeki en bÃ¼yÃ¼k deÄŸerlere tekabÃ¼l eden
+$U,V$ deÄŸerleri sÄ±ralanmÄ±ÅŸ olarak geldiÄŸi iÃ§in $U,V$'nin en baÅŸtaki
+deÄŸerlerini almak bize "en Ã¶nemli" bloklarÄ± verir. Bu en Ã¶nemli kolon
+ya da satÄ±rlarÄ± alarak azaltÄ±lmÄ±ÅŸ bir boyut iÃ§inde benzerlik hesabÄ±
+yapmak iÅŸlemlerimizi hÄ±zlandÄ±rÄ±r. Bu azaltÄ±lmÄ±ÅŸ boyutta kÃ¼meleme
+algoritmalarÄ±nÄ± devreye sokabiliriz; $U$'nun mesela en Ã¶nemli iki
+kolonu bize iki boyuttaki sezon kÃ¼melerini verebilir, $V$'nin en
+Ã¶nemli iki (en Ã¼st) satÄ±rÄ± bize iki boyutta bir kiÅŸi kÃ¼mesi verebilir.
 
-O zaman beğeni matrisi üzerinde SVD uygulayalım,
+O zaman beÄŸeni matrisi Ã¼zerinde SVD uygulayalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy.linalg import linalg as la
@@ -196,15 +196,15 @@ plt.savefig('svdrecom_1.png')
 
 \includegraphics[height=6cm]{svdrecom_1.png}
 
-Çok güzel! SVD bize ürün bazında sezon 5 ve 6'nin bir küme
-oluşturduğunu, Ben ve Fred'in de kişi bazında ayrı bir küme olduğunu
-gösterdi.
+Ã‡ok gÃ¼zel! SVD bize Ã¼rÃ¼n bazÄ±nda sezon 5 ve 6'nin bir kÃ¼me
+oluÅŸturduÄŸunu, Ben ve Fred'in de kiÅŸi bazÄ±nda ayrÄ± bir kÃ¼me olduÄŸunu
+gÃ¶sterdi.
 
-Azaltılmış boyutları nasıl kullanırız? Yeni bir kişiyi (mesela Bob)
-ele alınca, bu kişinin verisini öncelikle aynen diğer verilerin
-indirgendiği gibi azaltılmış boyuta "indirgememiz" gerekiyor. Çünkü
-artık işlem yaptığımız boyut orası. Peki bu indirgemeyi nasıl yaparız?
-SVD genel formülünü hatırlarsak,
+AzaltÄ±lmÄ±ÅŸ boyutlarÄ± nasÄ±l kullanÄ±rÄ±z? Yeni bir kiÅŸiyi (mesela Bob)
+ele alÄ±nca, bu kiÅŸinin verisini Ã¶ncelikle aynen diÄŸer verilerin
+indirgendiÄŸi gibi azaltÄ±lmÄ±ÅŸ boyuta "indirgememiz" gerekiyor. Ã‡Ã¼nkÃ¼
+artÄ±k iÅŸlem yaptÄ±ÄŸÄ±mÄ±z boyut orasÄ±. Peki bu indirgemeyi nasÄ±l yaparÄ±z?
+SVD genel formÃ¼lÃ¼nÃ¼ hatÄ±rlarsak,
 
 $$ A = USV $$
 
@@ -212,11 +212,11 @@ Azaltilmis ortamda
 
 $$ A = U_k S_k V_k $$
 
-Diyelim ki gitmek istediğimiz nokta azaltılmış $U$, o zaman $U_k$'yi tek
-başına bırakalım (dikkat, mesela $V$'nin tersini aldık, fakat bir matrisin
-tersini almak için o matrisin kare matris olması gerekir, eğer kare
-değilse, ters alma işlemi taklit ters alma işlemi -pseudoinverse- ile
-gerçekleştirilir, daha fazla detay için [6])
+Diyelim ki gitmek istediÄŸimiz nokta azaltÄ±lmÄ±ÅŸ $U$, o zaman $U_k$'yi tek
+baÅŸÄ±na bÄ±rakalÄ±m (dikkat, mesela $V$'nin tersini aldÄ±k, fakat bir matrisin
+tersini almak iÃ§in o matrisin kare matris olmasÄ± gerekir, eÄŸer kare
+deÄŸilse, ters alma iÅŸlemi taklit ters alma iÅŸlemi -pseudoinverse- ile
+gerÃ§ekleÅŸtirilir, daha fazla detay iÃ§in [6])
 
 $$ A V_k^{-1} = U_k S V_k V_k^{-1} $$
 
@@ -225,29 +225,29 @@ olacak, yani yokolacak
 
 $$ A V_k^{-1} = U_k S  $$
 
-Benzer şekilde
+Benzer ÅŸekilde
 
 $$  A V_k^{-1} S^{-1} = U_k $$
 
-Çok fazla ters alma işlemi var, her iki tarafın devriğini alalım
+Ã‡ok fazla ters alma iÅŸlemi var, her iki tarafÄ±n devriÄŸini alalÄ±m
 
 $$ (S^{-1})^T (V_k^{-1})^T A^T = U_k^T $$
 
-$V_k^{-1} = V_k^T$ olduğunu biliyoruz. Nasıl? Çünkü $ V_k^TV_k = I $, aynı
-şekilde $ V_k^{-1}V_k = I $. Ters alma işleminin özgünlüğü (üniqueness)
-sebebiyle $V_k^{-1} = V_k^T$ olmak zorundadır $\Box$
+$V_k^{-1} = V_k^T$ olduÄŸunu biliyoruz. NasÄ±l? Ã‡Ã¼nkÃ¼ $ V_k^TV_k = I $, aynÄ±
+ÅŸekilde $ V_k^{-1}V_k = I $. Ters alma iÅŸleminin Ã¶zgÃ¼nlÃ¼ÄŸÃ¼ (Ã¼niqueness)
+sebebiyle $V_k^{-1} = V_k^T$ olmak zorundadÄ±r $\Box$
 
-Demek ki üstteki formül devriğin devriğini almak demektir, yani tekrar başa
-dönmüş oluyoruz, demek ki $V_k$ değişmeden kalıyor
+Demek ki Ã¼stteki formÃ¼l devriÄŸin devriÄŸini almak demektir, yani tekrar baÅŸa
+dÃ¶nmÃ¼ÅŸ oluyoruz, demek ki $V_k$ deÄŸiÅŸmeden kalÄ±yor
 
 $$ (S^{-1})^T V_k A^T = U_k^T $$
 
-$S$ ise köşegen matris, onun tersi yine köşegen, köşegen matrisin devriği
+$S$ ise kÃ¶ÅŸegen matris, onun tersi yine kÃ¶ÅŸegen, kÃ¶ÅŸegen matrisin devriÄŸi
 yine kendisi
 
 $$ S^{-1} V_k A^T = U_k^T $$
 
-Bazı kod ispatları, $u$'nun birimdik olması:
+BazÄ± kod ispatlarÄ±, $u$'nun birimdik olmasÄ±:
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print np.dot(u.T,u)
@@ -258,10 +258,10 @@ print np.dot(u.T,u)
  [  4.83147593e-18   1.00000000e+00]]
 \end{verbatim}
 
-Doğal olarak \verb!1e-17! gibi bir sayı sıfıra çok yakın, yani sıfır kabul
-edilebilir. Devrik ve tersin aynı olduğunu gösterelim: İki matrisi birbirinden
-çıkartıp, çok küçük bir sayıdan büyüklüğe göre filtreleme yapalım, ve sonuç
-içinde bir tane bile True olup olmadığını kontrol edelim,
+DoÄŸal olarak \verb!1e-17! gibi bir sayÄ± sÄ±fÄ±ra Ã§ok yakÄ±n, yani sÄ±fÄ±r kabul
+edilebilir. Devrik ve tersin aynÄ± olduÄŸunu gÃ¶sterelim: Ä°ki matrisi birbirinden
+Ã§Ä±kartÄ±p, Ã§ok kÃ¼Ã§Ã¼k bir sayÄ±dan bÃ¼yÃ¼klÃ¼ÄŸe gÃ¶re filtreleme yapalÄ±m, ve sonuÃ§
+iÃ§inde bir tane bile True olup olmadÄ±ÄŸÄ±nÄ± kontrol edelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print not any(U.T-la.inv(U) > 1e-15)
@@ -293,19 +293,19 @@ print bob_2d
 [-0.37752201 -0.08020351]
 \end{verbatim}
 
-Not: \verb!bob.T! üstteki formüldeki $A^T$ yerine geçecek; formülü tekrar
-düzenlerken $A$ üzerinden işlem yaptık, fakat formülü ``$A$'ya eklenen
-herhangi bir yeni satır'' olarak ta görebiliriz, ki bu örneğimizde Bob'un
+Not: \verb!bob.T! Ã¼stteki formÃ¼ldeki $A^T$ yerine geÃ§ecek; formÃ¼lÃ¼ tekrar
+dÃ¼zenlerken $A$ Ã¼zerinden iÅŸlem yaptÄ±k, fakat formÃ¼lÃ¼ ``$A$'ya eklenen
+herhangi bir yeni satÄ±r'' olarak ta gÃ¶rebiliriz, ki bu Ã¶rneÄŸimizde Bob'un
 verisi olurdu. 
 
-Üstte \verb!eye! ve \verb!Sigma! ile ufak bir takla attık, bunun sebebi
-\verb!svd! çağrısından gelen \verb!Sigma!  sonucunun bir vektör olması ama
-üstteki işlem için köşegen bir "matrise" ihtiyacımız olması. Eğer birim
-(identity) matrisini alıp onu \verb!Sigma! ile çarparsak, bu köşegen
+Ãœstte \verb!eye! ve \verb!Sigma! ile ufak bir takla attÄ±k, bunun sebebi
+\verb!svd! Ã§aÄŸrÄ±sÄ±ndan gelen \verb!Sigma!  sonucunun bir vektÃ¶r olmasÄ± ama
+Ã¼stteki iÅŸlem iÃ§in kÃ¶ÅŸegen bir "matrise" ihtiyacÄ±mÄ±z olmasÄ±. EÄŸer birim
+(identity) matrisini alÄ±p onu \verb!Sigma! ile Ã§arparsak, bu kÃ¶ÅŸegen
 matrisi elde ederiz.
 
-Şimdi mesela kosinüs benzerliği kullanarak bu izdüşümlenmiş yeni
-vektörün hangi diğer vektörlere benzediğini bulalım.
+Åimdi mesela kosinÃ¼s benzerliÄŸi kullanarak bu izdÃ¼ÅŸÃ¼mlenmiÅŸ yeni
+vektÃ¶rÃ¼n hangi diÄŸer vektÃ¶rlere benzediÄŸini bulalÄ±m.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 for i,user in enumerate(u):
@@ -319,11 +319,11 @@ John 0.612561691287
 Fred 0.977685793579
 \end{verbatim}
 
-Sonuca göre yeni kullanıcı Bob, en çok Ben ve Fred'e benziyor. Sonuca
-eriştik! Artık bu iki kullanıcının yüksek not verdiği ama Bob'un hiç
-not vermediği sezonları alıp Bob'a tavsiye olarak sunabiliriz.
+Sonuca gÃ¶re yeni kullanÄ±cÄ± Bob, en Ã§ok Ben ve Fred'e benziyor. Sonuca
+eriÅŸtik! ArtÄ±k bu iki kullanÄ±cÄ±nÄ±n yÃ¼ksek not verdiÄŸi ama Bob'un hiÃ§
+not vermediÄŸi sezonlarÄ± alÄ±p Bob'a tavsiye olarak sunabiliriz.
 
-SVD ile Veriyi Oluşturmak
+SVD ile Veriyi OluÅŸturmak
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -375,26 +375,26 @@ Bob (3.3115641365499888, -0.021769196783344661)
 Tom (4.295419370813935, 0.045419370813934629)
 \end{verbatim}
 
-Alternatif Yöntem
+Alternatif YÃ¶ntem
 
-Bir diğer yöntem [1] yeni Bob verisi $y$'yi alıp
+Bir diÄŸer yÃ¶ntem [1] yeni Bob verisi $y$'yi alÄ±p
 
 $$ z = VV^Ty $$
 
-olarak $z$'ye çevirmek. Bu durumda aslında cebirsel olarak hiçbir şey
-yapmamış oluyoruz,
+olarak $z$'ye Ã§evirmek. Bu durumda aslÄ±nda cebirsel olarak hiÃ§bir ÅŸey
+yapmamÄ±ÅŸ oluyoruz,
 
 $$ z = VV^Ty = Iy = y$$
 
-ve iteratif sayısal çoğu algoritmanın temelini de bu oluşturuyor. Kavramsal
-olarak $y$'yi alıp $V$ uzayına ``yansıtıyoruz''. Daha kavramsal olarak kullanıcı
-seçimlerini temsil eden veri için $V$ bir ``kordinat sistemi'' oluşturmuştur
-(SVD'nin doğal sonucu olarak) ve her veri noktası bu kordinat sistemi, bu bazın
-vektörlerinin bir kombinasyonu olarak temsil edilebilir durumdadır (SVD için
-kullanılan veriden bahsediyoruz). Bu durumda yeni veriyi oraya yansıtmak doğal
-bir işlemdir. Tabii yansıtıp sonra geri geliyoruz, yani başlangıçtaki boyutlara
-/ hale dönüyoruz, bu olurken aynı zamanda Bob verisinin boş noktaları en makul
-tahminlerle ``doldurulmuş'' oluyor.
+ve iteratif sayÄ±sal Ã§oÄŸu algoritmanÄ±n temelini de bu oluÅŸturuyor. Kavramsal
+olarak $y$'yi alÄ±p $V$ uzayÄ±na ``yansÄ±tÄ±yoruz''. Daha kavramsal olarak kullanÄ±cÄ±
+seÃ§imlerini temsil eden veri iÃ§in $V$ bir ``kordinat sistemi'' oluÅŸturmuÅŸtur
+(SVD'nin doÄŸal sonucu olarak) ve her veri noktasÄ± bu kordinat sistemi, bu bazÄ±n
+vektÃ¶rlerinin bir kombinasyonu olarak temsil edilebilir durumdadÄ±r (SVD iÃ§in
+kullanÄ±lan veriden bahsediyoruz). Bu durumda yeni veriyi oraya yansÄ±tmak doÄŸal
+bir iÅŸlemdir. Tabii yansÄ±tÄ±p sonra geri geliyoruz, yani baÅŸlangÄ±Ã§taki boyutlara
+/ hale dÃ¶nÃ¼yoruz, bu olurken aynÄ± zamanda Bob verisinin boÅŸ noktalarÄ± en makul
+tahminlerle ``doldurulmuÅŸ'' oluyor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy.linalg import linalg as la
@@ -428,74 +428,74 @@ bob [5 5 0 0 0 5]
 [ 5.          5.          2.16256132  1.04609626  3.37952362  5.        ]
 \end{verbatim}
 
-Sonuca göre Bob büyük ihtimalle S5'i sevecektir, not tahminleri arasında en
-yüksek puan orada tahmin edilmiş, ki bu daha önceki Ben ve Fred benzerlik
+Sonuca gÃ¶re Bob bÃ¼yÃ¼k ihtimalle S5'i sevecektir, not tahminleri arasÄ±nda en
+yÃ¼ksek puan orada tahmin edilmiÅŸ, ki bu daha Ã¶nceki Ben ve Fred benzerlik
 tahminleri ile uyumlu. 
 
-Not: Döngüde $z$'nin hep aynı satır olması kafa karışıklığı yaratmasın, bu
-çok ufak bir veri seti, daha büyük veri setlerdinde bu değişim
-görülecektir. 
+Not: DÃ¶ngÃ¼de $z$'nin hep aynÄ± satÄ±r olmasÄ± kafa karÄ±ÅŸÄ±klÄ±ÄŸÄ± yaratmasÄ±n, bu
+Ã§ok ufak bir veri seti, daha bÃ¼yÃ¼k veri setlerdinde bu deÄŸiÅŸim
+gÃ¶rÃ¼lecektir. 
 
-İteratif işlem sözde kod (pseudocode) olarak,
+Ä°teratif iÅŸlem sÃ¶zde kod (pseudocode) olarak,
 
 Algoritma \verb!imputed_svd!
 \begin{enumerate}
-  \item $\code{while }$ $z$'deki değişim azalıncaya kadar (convergence)
+  \item \verb!while! $z$'deki deÄŸiÅŸim azalÄ±ncaya kadar (convergence)
   \item $z = VV^Ty$ 
-  \item  $y$'nin ilk halindeki bilinen noktaları alıp $z$'ye kopyala
+  \item  $y$'nin ilk halindeki bilinen noktalarÄ± alÄ±p $z$'ye kopyala
 \end{enumerate}
 
-En son projemizde üstteki işlemin en iyi sonuçlar verdiğini gözlemledik. 
+En son projemizde Ã¼stteki iÅŸlemin en iyi sonuÃ§lar verdiÄŸini gÃ¶zlemledik. 
 
 Movielens 1M Verisi
 
-Bu veri seti 6000 kullanıcı tarafından yaklaşık 4000 tane filme
-verilen not / derece (rating) verisini içeriyor, 1 milyon tane not
-verilmiş, yani 4000 * 6000 = 24 milyon olasılık içinde sadece 1 milyon
-veri noktası dolu. Bu oldukça seyrek bir matris demektir.
+Bu veri seti 6000 kullanÄ±cÄ± tarafÄ±ndan yaklaÅŸÄ±k 4000 tane filme
+verilen not / derece (rating) verisini iÃ§eriyor, 1 milyon tane not
+verilmiÅŸ, yani 4000 * 6000 = 24 milyon olasÄ±lÄ±k iÃ§inde sadece 1 milyon
+veri noktasÄ± dolu. Bu oldukÃ§a seyrek bir matris demektir.
 
-Verinin ham hali diğer ders notlarımızı içeren üst dizinlerde var, veriyi
-SVD ile kullanılır hale getirmek için bu dizindeki \verb!movielens_prep.py!
-adlı script kullanılır. İşlem bitince \verb!movielens.csv! adlı bir dosya
-script'te görülen yere yazılacak. Bu dosyada olmayan derecelendirmeler,
-verilmemiş notlar boş olacaktır. Bu boşlukları sıfırlarsak, seyrek matrisi
-o noktaları atlar. Ardından bu seyrek matris üzerinde seyrek SVD
-işletilebilir. Bu normal SVD'den daha hızlı işleyecektir.
+Verinin ham hali diÄŸer ders notlarÄ±mÄ±zÄ± iÃ§eren Ã¼st dizinlerde var, veriyi
+SVD ile kullanÄ±lÄ±r hale getirmek iÃ§in bu dizindeki \verb!movielens_prep.py!
+adlÄ± script kullanÄ±lÄ±r. Ä°ÅŸlem bitince \verb!movielens.csv! adlÄ± bir dosya
+script'te gÃ¶rÃ¼len yere yazÄ±lacak. Bu dosyada olmayan derecelendirmeler,
+verilmemiÅŸ notlar boÅŸ olacaktÄ±r. Bu boÅŸluklarÄ± sÄ±fÄ±rlarsak, seyrek matrisi
+o noktalarÄ± atlar. ArdÄ±ndan bu seyrek matris Ã¼zerinde seyrek SVD
+iÅŸletilebilir. Bu normal SVD'den daha hÄ±zlÄ± iÅŸleyecektir.
 
-Tavsiye kodlamamız için yazının başında anlatılan tekniği kullanacağız, film
-verisi üzerinde boyut azaltılması yapılacak, benzer kullanıcı bulunacak, ve
-herhangi bir yeni kullanıcı / film kombinasyonu için bu diğer benzer
-kullanıcının o filme verdiği not baz alınacak.
+Tavsiye kodlamamÄ±z iÃ§in yazÄ±nÄ±n baÅŸÄ±nda anlatÄ±lan tekniÄŸi kullanacaÄŸÄ±z, film
+verisi Ã¼zerinde boyut azaltÄ±lmasÄ± yapÄ±lacak, benzer kullanÄ±cÄ± bulunacak, ve
+herhangi bir yeni kullanÄ±cÄ± / film kombinasyonu iÃ§in bu diÄŸer benzer
+kullanÄ±cÄ±nÄ±n o filme verdiÄŸi not baz alÄ±nacak.
 
-Veriyi eğitim ve test olarak iki parçaya böleceğiz. SVD eğitim bölümü
-üzerinde işletilecek.
+Veriyi eÄŸitim ve test olarak iki parÃ§aya bÃ¶leceÄŸiz. SVD eÄŸitim bÃ¶lÃ¼mÃ¼
+Ã¼zerinde iÅŸletilecek.
 
-Bu bağlamda, önemli bir diğer konu eksik veri noktalarının SVD
-sonuçlarını nasıl etkileyeceği. Sonuçta eksik yerler \verb!nan!,
-oradan sıfır yapılıp ardından seyrek matris kodlaması üzerinden
-"atlanıyor" olabilir, fakat bu değerler atlanıyor (yani hızlı
-işleniyor, depolanıyor) olsa bile, onların sıfır olmasının bir anlamı
-yok mudur? Evet vardır. Not bakımından sıfır da bir not'tur, ve bu
-sebeple sonuçları istenmeyen biçimde etkileyebilir.
+Bu baÄŸlamda, Ã¶nemli bir diÄŸer konu eksik veri noktalarÄ±nÄ±n SVD
+sonuÃ§larÄ±nÄ± nasÄ±l etkileyeceÄŸi. SonuÃ§ta eksik yerler \verb!nan!,
+oradan sÄ±fÄ±r yapÄ±lÄ±p ardÄ±ndan seyrek matris kodlamasÄ± Ã¼zerinden
+"atlanÄ±yor" olabilir, fakat bu deÄŸerler atlanÄ±yor (yani hÄ±zlÄ±
+iÅŸleniyor, depolanÄ±yor) olsa bile, onlarÄ±n sÄ±fÄ±r olmasÄ±nÄ±n bir anlamÄ±
+yok mudur? Evet vardÄ±r. Not bakÄ±mÄ±ndan sÄ±fÄ±r da bir not'tur, ve bu
+sebeple sonuÃ§larÄ± istenmeyen biÃ§imde etkileyebilir.
 
-O zaman mevcut veriyi öyle bir değiştirelim ki verilmemiş notlar, yani
-sıfır değerleri sonucu fazla değiştirmesin.
+O zaman mevcut veriyi Ã¶yle bir deÄŸiÅŸtirelim ki verilmemiÅŸ notlar, yani
+sÄ±fÄ±r deÄŸerleri sonucu fazla deÄŸiÅŸtirmesin.
 
-Bunu yapmanın yollarından biri her film için bir ortalama not değeri
-hesaplamak, ve bu ortalama değeri o filme verilen tüm not
-değerlerinden çıkartmaktır. Bu işleme "sıfır çevresinde merkezlemek"
-ismi de verilir, hakikaten mesela film j için ortalama 3 ise, 5 değeri
-2, 3 değeri sıfır, 2 değeri -1 haline gelecektir. Bu bir ilerlemedir
-çünkü ortalama 3 değeri zaten bizim için "önemsiz" bir değerdir,
-tavsiye problemi bağlamında bizim en çok ilgilendiğimiz sevilen
-filmler, ve sevilmeyen filmler. Bu değerler sırasıyla artı ve eksi
-değerlere dönüşecekler, ve SVD bu farklılığı matematiksel olarak
-kullanabilme yeteneğine sahip.
+Bunu yapmanÄ±n yollarÄ±ndan biri her film iÃ§in bir ortalama not deÄŸeri
+hesaplamak, ve bu ortalama deÄŸeri o filme verilen tÃ¼m not
+deÄŸerlerinden Ã§Ä±kartmaktÄ±r. Bu iÅŸleme "sÄ±fÄ±r Ã§evresinde merkezlemek"
+ismi de verilir, hakikaten mesela film j iÃ§in ortalama 3 ise, 5 deÄŸeri
+2, 3 deÄŸeri sÄ±fÄ±r, 2 deÄŸeri -1 haline gelecektir. Bu bir ilerlemedir
+Ã§Ã¼nkÃ¼ ortalama 3 deÄŸeri zaten bizim iÃ§in "Ã¶nemsiz" bir deÄŸerdir,
+tavsiye problemi baÄŸlamÄ±nda bizim en Ã§ok ilgilendiÄŸimiz sevilen
+filmler, ve sevilmeyen filmler. Bu deÄŸerler sÄ±rasÄ±yla artÄ± ve eksi
+deÄŸerlere dÃ¶nÃ¼ÅŸecekler, ve SVD bu farklÄ±lÄ±ÄŸÄ± matematiksel olarak
+kullanabilme yeteneÄŸine sahip.
 
-Altta Pandas \verb!mean! çağrısı ile bu işlemin yapıldığını görüyoruz, dikkat,
-Pandas dataframe içinde \verb!nan! değerleri olacaktır, ve Pandas bu değerleri
-atlaması gerektiğini bilir, yani bu değerler ortalamaya etki etmez. Ardından
-merkezleme işlemi eğitim verisi üzerinde uygulanıyor.
+Altta Pandas \verb!mean! Ã§aÄŸrÄ±sÄ± ile bu iÅŸlemin yapÄ±ldÄ±ÄŸÄ±nÄ± gÃ¶rÃ¼yoruz, dikkat,
+Pandas dataframe iÃ§inde \verb!nan! deÄŸerleri olacaktÄ±r, ve Pandas bu deÄŸerleri
+atlamasÄ± gerektiÄŸini bilir, yani bu deÄŸerler ortalamaya etki etmez. ArdÄ±ndan
+merkezleme iÅŸlemi eÄŸitim verisi Ã¼zerinde uygulanÄ±yor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd, os
@@ -532,20 +532,20 @@ Sigma = np.diag(Sigma)
 (5001, 10) (10,) (10, 3700)
 \end{verbatim}
 
-Altta test verisi üzerinde satır satır ilerliyoruz, ve her satır (test
-kullanıcısı) içinde film film ilerliyoruz. "Verilmiş bir not" arıyoruz
-(çoğunlukla not verilmemiş oluyor çünkü), ve bulduğumuz zaman artık
-elimizde test edebileceğimiz bir şey var, o notu "sıfırlayıp" vektörün
-geri kalanını azaltılmış boyuta yansıtıyoruz, ve sonra o boyuttaki tüm
-diğer $U$ vektörleri içinde arama yapıyoruz, en yakın diğer
-kullanıcıyı buluyoruz ve onun bu filme verdiği notu tahminimiz olarak
-kullanıyoruz.
+Altta test verisi Ã¼zerinde satÄ±r satÄ±r ilerliyoruz, ve her satÄ±r (test
+kullanÄ±cÄ±sÄ±) iÃ§inde film film ilerliyoruz. "VerilmiÅŸ bir not" arÄ±yoruz
+(Ã§oÄŸunlukla not verilmemiÅŸ oluyor Ã§Ã¼nkÃ¼), ve bulduÄŸumuz zaman artÄ±k
+elimizde test edebileceÄŸimiz bir ÅŸey var, o notu "sÄ±fÄ±rlayÄ±p" vektÃ¶rÃ¼n
+geri kalanÄ±nÄ± azaltÄ±lmÄ±ÅŸ boyuta yansÄ±tÄ±yoruz, ve sonra o boyuttaki tÃ¼m
+diÄŸer $U$ vektÃ¶rleri iÃ§inde arama yapÄ±yoruz, en yakÄ±n diÄŸer
+kullanÄ±cÄ±yÄ± buluyoruz ve onun bu filme verdiÄŸi notu tahminimiz olarak
+kullanÄ±yoruz.
 
-Altta eğer bulunan diğer kullanıcı o filme not vermemişse, basitleştirme
-amaçlı olarak, o filmi atladık. Gerçek dünya şartlarında filme not vermiş
-ve yakın olan (en yakın olmasa da) ikinci, üçüncü kullanıcılar bulunup
-onların notu kullanılabilir. Hatta en yakın k tane kullanıcının ortalaması
-alınabilir (o kullanıcılar kNN gibi bir metotla bulunur belki), vs.
+Altta eÄŸer bulunan diÄŸer kullanÄ±cÄ± o filme not vermemiÅŸse, basitleÅŸtirme
+amaÃ§lÄ± olarak, o filmi atladÄ±k. GerÃ§ek dÃ¼nya ÅŸartlarÄ±nda filme not vermiÅŸ
+ve yakÄ±n olan (en yakÄ±n olmasa da) ikinci, Ã¼Ã§Ã¼ncÃ¼ kullanÄ±cÄ±lar bulunup
+onlarÄ±n notu kullanÄ±labilir. Hatta en yakÄ±n k tane kullanÄ±cÄ±nÄ±n ortalamasÄ±
+alÄ±nabilir (o kullanÄ±cÄ±lar kNN gibi bir metotla bulunur belki), vs.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def euclid(inA,inB):
@@ -612,9 +612,9 @@ print "rmse", np.sqrt(rmse / n)
 rmse 0.975900072949
 \end{verbatim}
 
-Sonuç fena değil. Tavsiye programlarında RMSE 0.9 civarı iyi olarak
-bilinir, Netflix yarışmasında [3] mesela kazanan algoritma RMSE 0.85'e
-erişmiştir.
+SonuÃ§ fena deÄŸil. Tavsiye programlarÄ±nda RMSE 0.9 civarÄ± iyi olarak
+bilinir, Netflix yarÄ±ÅŸmasÄ±nda [3] mesela kazanan algoritma RMSE 0.85'e
+eriÅŸmiÅŸtir.
 
 Kaynaklar
 

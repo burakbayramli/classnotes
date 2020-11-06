@@ -2,26 +2,26 @@
 \begin{document}
 Yol Bulmak, Takip Etmek (Road Detection)
 
-Bir arabanın önünde ya da elde tutulan tek bir kamera görüntüsü ile
-(monocular vision) önümüzdeki açık yolu nasıl buluruz? Sürücüsüz arabalar
-için bu önemli bir konu, çözüm için farklı teknikler var. 
+Bir arabanÄ±n Ã¶nÃ¼nde ya da elde tutulan tek bir kamera gÃ¶rÃ¼ntÃ¼sÃ¼ ile
+(monocular vision) Ã¶nÃ¼mÃ¼zdeki aÃ§Ä±k yolu nasÄ±l buluruz? SÃ¼rÃ¼cÃ¼sÃ¼z arabalar
+iÃ§in bu Ã¶nemli bir konu, Ã§Ã¶zÃ¼m iÃ§in farklÄ± teknikler var. 
 
-[1]'deki çözüm şöyledir: yolu kameranın görüntüsünün alt ortasından çıkan
-bir eğri olarak modelle, sonra ``yol piksellerini'' bul; bunun icin
-görüntünün alt ortasındaki (yani hemen önümüzdeki) ufak bir kutudaki
-pikseller ile yol piksellerinin aşağı yukarı aynı renkte olacağından
-hareket et, sonra yolu temsil eden eğrinin o piksellere en iyi uyumlu
-formunu bulmak için filtreleme işlemi kullan.
+[1]'deki Ã§Ã¶zÃ¼m ÅŸÃ¶yledir: yolu kameranÄ±n gÃ¶rÃ¼ntÃ¼sÃ¼nÃ¼n alt ortasÄ±ndan Ã§Ä±kan
+bir eÄŸri olarak modelle, sonra ``yol piksellerini'' bul; bunun icin
+gÃ¶rÃ¼ntÃ¼nÃ¼n alt ortasÄ±ndaki (yani hemen Ã¶nÃ¼mÃ¼zdeki) ufak bir kutudaki
+pikseller ile yol piksellerinin aÅŸaÄŸÄ± yukarÄ± aynÄ± renkte olacaÄŸÄ±ndan
+hareket et, sonra yolu temsil eden eÄŸrinin o piksellere en iyi uyumlu
+formunu bulmak iÃ§in filtreleme iÅŸlemi kullan.
 
 \includegraphics[width=15em]{vision_70road_03.png}
 
-Üstteki figürde yol modelinin kuşbakışı görünümü var. Eğri karesel bir
-formül olarak seçilmiş, biz küpsel form kullanacağız, ve $z$ yerine $y$
-kullanacağız, çünkü [1]'deki yaklaşım $z$ derinliğine göre eğrinin $y$
-noktalarını yansıtma ile ayarlıyor, biz basitlik amaçlı olarak önceden
-seçilmiş bir yansıtmaya göre bilinen $y$ seviyelerini baz alacağız. Dikkat:
-İmajın alt ortasından çıkan bir eğriyi temsil etmek için $y$ bazlı formül
-kullanıyoruz, yani
+Ãœstteki figÃ¼rde yol modelinin kuÅŸbakÄ±ÅŸÄ± gÃ¶rÃ¼nÃ¼mÃ¼ var. EÄŸri karesel bir
+formÃ¼l olarak seÃ§ilmiÅŸ, biz kÃ¼psel form kullanacaÄŸÄ±z, ve $z$ yerine $y$
+kullanacaÄŸÄ±z, Ã§Ã¼nkÃ¼ [1]'deki yaklaÅŸÄ±m $z$ derinliÄŸine gÃ¶re eÄŸrinin $y$
+noktalarÄ±nÄ± yansÄ±tma ile ayarlÄ±yor, biz basitlik amaÃ§lÄ± olarak Ã¶nceden
+seÃ§ilmiÅŸ bir yansÄ±tmaya gÃ¶re bilinen $y$ seviyelerini baz alacaÄŸÄ±z. Dikkat:
+Ä°majÄ±n alt ortasÄ±ndan Ã§Ä±kan bir eÄŸriyi temsil etmek iÃ§in $y$ bazlÄ± formÃ¼l
+kullanÄ±yoruz, yani
 
 $$ y = ax^3 + bx^2 + cx + d$$
 
@@ -29,15 +29,15 @@ yerine
 
 $$ x = ay^3 + by^2 + cy + d$$
 
-Bunun sebebi belli bir $x$ noktasından çıkan küpsel eğriyi $x$ temelli
-temsilin zor olması. Fakat eksenleri değiş/tokuş yapınca çıkış noktasını kesi
-(intercept) üzerinden basit bir şekilde temsil edebiliriz. Mesela (320,240)
-boyutlarındaki bir resmin alt ortasından çıkan eğri
+Bunun sebebi belli bir $x$ noktasÄ±ndan Ã§Ä±kan kÃ¼psel eÄŸriyi $x$ temelli
+temsilin zor olmasÄ±. Fakat eksenleri deÄŸiÅŸ/tokuÅŸ yapÄ±nca Ã§Ä±kÄ±ÅŸ noktasÄ±nÄ± kesi
+(intercept) Ã¼zerinden basit bir ÅŸekilde temsil edebiliriz. Mesela (320,240)
+boyutlarÄ±ndaki bir resmin alt ortasÄ±ndan Ã§Ä±kan eÄŸri
 
 $$ x = ay^3 + by^2 + cy + 160 $$
 
-ile gösterilir. İki tane eğri örneği görelim ($a,b,c,d$ sabitleri
-\verb!pols! içinde),
+ile gÃ¶sterilir. Ä°ki tane eÄŸri Ã¶rneÄŸi gÃ¶relim ($a,b,c,d$ sabitleri
+\verb!pols! iÃ§inde),
 
 \begin{minted}[fontsize=\footnotesize]{python}
 yy = np.linspace(0,320,200)
@@ -56,11 +56,11 @@ plt.savefig('vision_70road_05.png')
 
 Yol Pikselleri 
 
-Bu pikselleri bulmak için önce alt ortadaki bir kutu içine düşen HSV
-piksellerinin üç boyutlu histogramını hesaplıyoruz. Bu bize bir ayrıksal
-dağılım veriyor. Sonra bu dağılımı kullanarak imajdaki tüm piksellerin o
-dağılıma ait olma olasılığını hesaplıyoruz. Belli bir eşik değerini geçen
-pikselleri yol pikseli olarak işaretliyoruz. 
+Bu pikselleri bulmak iÃ§in Ã¶nce alt ortadaki bir kutu iÃ§ine dÃ¼ÅŸen HSV
+piksellerinin Ã¼Ã§ boyutlu histogramÄ±nÄ± hesaplÄ±yoruz. Bu bize bir ayrÄ±ksal
+daÄŸÄ±lÄ±m veriyor. Sonra bu daÄŸÄ±lÄ±mÄ± kullanarak imajdaki tÃ¼m piksellerin o
+daÄŸÄ±lÄ±ma ait olma olasÄ±lÄ±ÄŸÄ±nÄ± hesaplÄ±yoruz. Belli bir eÅŸik deÄŸerini geÃ§en
+pikselleri yol pikseli olarak iÅŸaretliyoruz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from PIL import Image, ImageDraw, ImageFilter
@@ -124,49 +124,49 @@ plt.savefig('vision_70road_07.png')
 \includegraphics[height=6cm]{vision_70road_07.png}
 \includegraphics[height=6cm]{vision_70road_06.png}
 
-Fena değil; yol ortasındaki direkler yol sayılmadı, ve genel olarak yolun
-gidişini görebiliyoruz. 
+Fena deÄŸil; yol ortasÄ±ndaki direkler yol sayÄ±lmadÄ±, ve genel olarak yolun
+gidiÅŸini gÃ¶rebiliyoruz. 
 
 Filtreleme
 
-Elimizde yol pikselleri var. Bir eğri modeli var. Şimdi herhangi bir yol
-hipotezinden başladık diyelim, yol piksellerinin bu model üzerinde
-düzeltme yapmasını nasıl sağlayacağız? Eğer Kalman Filtresi (KF)
-kullanacaksak sonuç bir ya da daha fazla boyutlu reel sayılar olacak, o
-zaman ölçüm ne olacak, hata ne olacak? [1]'in kullandığı dahiyane fikir
-şudur: Yol hipotezi / modeli üzerinde eşit büyüklükte, belli aralıklarda,
-belli sayıda (bu çok önemli) şerit olduğunu düşünürüz,
+Elimizde yol pikselleri var. Bir eÄŸri modeli var. Åimdi herhangi bir yol
+hipotezinden baÅŸladÄ±k diyelim, yol piksellerinin bu model Ã¼zerinde
+dÃ¼zeltme yapmasÄ±nÄ± nasÄ±l saÄŸlayacaÄŸÄ±z? EÄŸer Kalman Filtresi (KF)
+kullanacaksak sonuÃ§ bir ya da daha fazla boyutlu reel sayÄ±lar olacak, o
+zaman Ã¶lÃ§Ã¼m ne olacak, hata ne olacak? [1]'in kullandÄ±ÄŸÄ± dahiyane fikir
+ÅŸudur: Yol hipotezi / modeli Ã¼zerinde eÅŸit bÃ¼yÃ¼klÃ¼kte, belli aralÄ±klarda,
+belli sayÄ±da (bu Ã§ok Ã¶nemli) ÅŸerit olduÄŸunu dÃ¼ÅŸÃ¼nÃ¼rÃ¼z,
 
 \includegraphics[width=20em]{vision_70road_04.png}
 
-İki boyuttaki yansıması
+Ä°ki boyuttaki yansÄ±masÄ±
 
 \includegraphics[width=15em]{vision_70road_01.png}
 
-Filtreleme için tüm bu şeritler içine düşen yol piksellerini buluruz. Bu
-piksellerin kordinatlarının ortalamasını alırız, bu bize bir $x$ kordinatı
-verir. İşte ölçüm budur, çünkü eğer yol hipotezi mükemmel olsaydı kutu
-içindeki tüm pikseller yol olurdu, onların ortalaması yine modelin
-hesapladığı $x$ olurdu. Eğer böyle değilse, mesela soldan bir dışarı taşma
-var ise ortalama modelin sağına düşer, sağdan taşma var ise, modelin soluna
-düşer. Bu bize düzeltme için gerekli ölçümü sağlar. 
+Filtreleme iÃ§in tÃ¼m bu ÅŸeritler iÃ§ine dÃ¼ÅŸen yol piksellerini buluruz. Bu
+piksellerin kordinatlarÄ±nÄ±n ortalamasÄ±nÄ± alÄ±rÄ±z, bu bize bir $x$ kordinatÄ±
+verir. Ä°ÅŸte Ã¶lÃ§Ã¼m budur, Ã§Ã¼nkÃ¼ eÄŸer yol hipotezi mÃ¼kemmel olsaydÄ± kutu
+iÃ§indeki tÃ¼m pikseller yol olurdu, onlarÄ±n ortalamasÄ± yine modelin
+hesapladÄ±ÄŸÄ± $x$ olurdu. EÄŸer bÃ¶yle deÄŸilse, mesela soldan bir dÄ±ÅŸarÄ± taÅŸma
+var ise ortalama modelin saÄŸÄ±na dÃ¼ÅŸer, saÄŸdan taÅŸma var ise, modelin soluna
+dÃ¼ÅŸer. Bu bize dÃ¼zeltme iÃ§in gerekli Ã¶lÃ§Ã¼mÃ¼ saÄŸlar. 
 
 \includegraphics[width=30em]{vision_70road_02.png}
 
-Sonlu sayıda kutu var demiştik, mesela 5 (iki üstteki figürdeki gibi), o
-zaman ölçümümüz 5 boyutlu olacaktır. 
+Sonlu sayÄ±da kutu var demiÅŸtik, mesela 5 (iki Ã¼stteki figÃ¼rdeki gibi), o
+zaman Ã¶lÃ§Ã¼mÃ¼mÃ¼z 5 boyutlu olacaktÄ±r. 
 
-Ayrıca KF modeli için $F,H$ matrisleri gerekiyordu. Kalman sistemini
-hatırlarsak,
+AyrÄ±ca KF modeli iÃ§in $F,H$ matrisleri gerekiyordu. Kalman sistemini
+hatÄ±rlarsak,
 
 $$ x_k = Fx_{k-1} + Q $$
 
 $$ z_k = Hx_k + R $$
 
-$H$ bize konum bilgisini dışa dönük bir tahmine çevirme imkanı verir. Konum
-bilgisi yol eğrisinin son halidir, o zaman $a,b,c,d$ katsayılarını
-içerecek.  Ölçüm ve model için önceden seçilmiş $y$ noktaları
-kullanılacağız, bunlar $y_1,y_2,..,y_5$ olsun, o zaman $H$ ve $H x$ çarpımı
+$H$ bize konum bilgisini dÄ±ÅŸa dÃ¶nÃ¼k bir tahmine Ã§evirme imkanÄ± verir. Konum
+bilgisi yol eÄŸrisinin son halidir, o zaman $a,b,c,d$ katsayÄ±larÄ±nÄ±
+iÃ§erecek.  Ã–lÃ§Ã¼m ve model iÃ§in Ã¶nceden seÃ§ilmiÅŸ $y$ noktalarÄ±
+kullanÄ±lacaÄŸÄ±z, bunlar $y_1,y_2,..,y_5$ olsun, o zaman $H$ ve $H x$ Ã§arpÄ±mÄ±
 suna benzer,
 
 $$ 
@@ -189,10 +189,10 @@ a y_5^3 + b y_5^2 + c y_5 + d
 \end{array}\right]
 $$
 
-ki $d = 160$ ve $F = I$, yani birim matrisi. $H$ matrisi eğri modelini alıp
-bize ölçüm ile karşılaştırılabilecek bir sonuç veriyor. Tüm bu tahmin,
-düzeltme işlemleri KF matematiğinin içinde oluyor tabii. Şimdi ardı ardına
-üç resim üzerinde KF güncelleme kodunu görelim,
+ki $d = 160$ ve $F = I$, yani birim matrisi. $H$ matrisi eÄŸri modelini alÄ±p
+bize Ã¶lÃ§Ã¼m ile karÅŸÄ±laÅŸtÄ±rÄ±labilecek bir sonuÃ§ veriyor. TÃ¼m bu tahmin,
+dÃ¼zeltme iÅŸlemleri KF matematiÄŸinin iÃ§inde oluyor tabii. Åimdi ardÄ± ardÄ±na
+Ã¼Ã§ resim Ã¼zerinde KF gÃ¼ncelleme kodunu gÃ¶relim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sys; sys.path.append('../../tser/tser_kf')
@@ -274,13 +274,13 @@ with zipfile.ZipFile('mitte.zip', 'r') as zz:
 
 \includegraphics[width=30em]{out-107.png}
 
-Görülüyor ki ilk başta kutulardan bazıları bir direk üzerindeydi, bu
-sebeple ölçüm modelin sağına düştü. Düzeltme yapıldı, ve birkaç döngü
-sonrası son resimdeyiz, ve direkler arasındaki yolu gösteriyoruz. 
+GÃ¶rÃ¼lÃ¼yor ki ilk baÅŸta kutulardan bazÄ±larÄ± bir direk Ã¼zerindeydi, bu
+sebeple Ã¶lÃ§Ã¼m modelin saÄŸÄ±na dÃ¼ÅŸtÃ¼. DÃ¼zeltme yapÄ±ldÄ±, ve birkaÃ§ dÃ¶ngÃ¼
+sonrasÄ± son resimdeyiz, ve direkler arasÄ±ndaki yolu gÃ¶steriyoruz. 
 
 Kaynaklar
 
-[1] Procházka, {\em Road Tracking Method Suitable for Both Unstructured and Structured Roads}
+[1] ProchÃ¡zka, {\em Road Tracking Method Suitable for Both Unstructured and Structured Roads}
 
 
 \end{document}

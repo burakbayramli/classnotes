@@ -2,17 +2,17 @@
 \begin{document}
 Genel Optimizasyon, Paketler, Autograd
 
-Otomatik türevin nasıl işlediğini [1] yazısında gördük. Programlama dilinde
-yazılmış, içinde \verb!if!, \verb!case!, hatta döngüler bile içerebilen
-herhangi bir kod parçasının türevini alabilmemizi sağlayan otomatik türev
-almak pek çok alanda işimize yarar. Optimizasyon alanı bunların başında
-geliyor. Düşünürsek, eğer sembolik olarak türev alması çok çetrefil bir
-durum varsa, tasaya gerek yok; bir fonksiyonu kodlayabildiğimiz anda onun
-türevini de alabiliriz demektir.
+Otomatik tÃ¼revin nasÄ±l iÅŸlediÄŸini [1] yazÄ±sÄ±nda gÃ¶rdÃ¼k. Programlama dilinde
+yazÄ±lmÄ±ÅŸ, iÃ§inde \verb!if!, \verb!case!, hatta dÃ¶ngÃ¼ler bile iÃ§erebilen
+herhangi bir kod parÃ§asÄ±nÄ±n tÃ¼revini alabilmemizi saÄŸlayan otomatik tÃ¼rev
+almak pek Ã§ok alanda iÅŸimize yarar. Optimizasyon alanÄ± bunlarÄ±n baÅŸÄ±nda
+geliyor. DÃ¼ÅŸÃ¼nÃ¼rsek, eÄŸer sembolik olarak tÃ¼rev almasÄ± Ã§ok Ã§etrefil bir
+durum varsa, tasaya gerek yok; bir fonksiyonu kodlayabildiÄŸimiz anda onun
+tÃ¼revini de alabiliriz demektir.
 
 Autograd
 
-Çok boyutlu bir fonksiyonun gradyani ve Hessian'ı,
+Ã‡ok boyutlu bir fonksiyonun gradyani ve Hessian'Ä±,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from autograd import grad, hessian
@@ -53,7 +53,7 @@ H = \left[\begin{array}{rr}
 \end{array}\right]
 $$
 
-hesaplatmak için \verb!autograd.hessian! kullanırız,
+hesaplatmak iÃ§in \verb!autograd.hessian! kullanÄ±rÄ±z,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import autograd 
@@ -73,43 +73,43 @@ print (h(xx))
  [4. 8.]]
 \end{verbatim}
 
-Şimdi bazı genel optimizasyon konularını işleyelim. 
+Åimdi bazÄ± genel optimizasyon konularÄ±nÄ± iÅŸleyelim. 
 
-Sınırlanmamış optimizasyonda (unconstrained optimization) $f(x)$
-fonksiyonunu minimum değerde tutacak $x$ değerini bulmaya uğraşıyoruz, ki
-$x$ tek boyutlu skalar, ya da çok boyutlu $x \in \mathbb{R}^n$
-olabilir. Yani yapmaya uğraştığımız
+SÄ±nÄ±rlanmamÄ±ÅŸ optimizasyonda (unconstrained optimization) $f(x)$
+fonksiyonunu minimum deÄŸerde tutacak $x$ deÄŸerini bulmaya uÄŸraÅŸÄ±yoruz, ki
+$x$ tek boyutlu skalar, ya da Ã§ok boyutlu $x \in \mathbb{R}^n$
+olabilir. Yani yapmaya uÄŸraÅŸtÄ±ÄŸÄ±mÄ±z
 
 $$
 \min_x f(x)
 $$
 
-işlemi. Peki minimumu nasıl tanımlarız? Bir nokta $x^*$ global minimize
-edicidir eğer tüm $x$'ler için $f(x^*) \le f(x)$ ise, ki
-$x \in \mathbb{R}^n$, en azından $x$ modelleyeni ilgilendiren tüm küme
-öğeleri için.
+iÅŸlemi. Peki minimumu nasÄ±l tanÄ±mlarÄ±z? Bir nokta $x^*$ global minimize
+edicidir eÄŸer tÃ¼m $x$'ler iÃ§in $f(x^*) \le f(x)$ ise, ki
+$x \in \mathbb{R}^n$, en azÄ±ndan $x$ modelleyeni ilgilendiren tÃ¼m kÃ¼me
+Ã¶ÄŸeleri iÃ§in.
 
-Fakat çoğu zaman bir global $f$'i kullanmak mümkün olmayabilir, fonksiyon
-çok çetrefil, çok boyutlu, bilinmez durumdadır, ve elimizde sadece yerel
-bilgi vardır. Bu durumda üstteki tanımı ``bir $N$ bölgesi içinde'' olacak
-şekilde değiştiririz ki bölge, $x^*$ etrafındaki, yakınındaki bölgedir.
+Fakat Ã§oÄŸu zaman bir global $f$'i kullanmak mÃ¼mkÃ¼n olmayabilir, fonksiyon
+Ã§ok Ã§etrefil, Ã§ok boyutlu, bilinmez durumdadÄ±r, ve elimizde sadece yerel
+bilgi vardÄ±r. Bu durumda Ã¼stteki tanÄ±mÄ± ``bir $N$ bÃ¶lgesi iÃ§inde'' olacak
+ÅŸekilde deÄŸiÅŸtiririz ki bÃ¶lge, $x^*$ etrafÄ±ndaki, yakÄ±nÄ±ndaki bÃ¶lgedir.
 
-Üstteki tanımı okuyunca  $x^*$'in yerel minimum olup olmadığını anlamanın
-tek yolunun yakındaki diğer tüm noktalara teker teker bakmak olduğu anlamı
-çıkabilir, fakat eğer $f$ pürüzsüz bir fonksiyon ise yerel minimumu
-doğrulamanın çok daha hızlı bir yöntemi vardır. Hatta ve hatta eğer
-fonksiyon $f$ iki kez türevi alınabilir haldeyse $x^*$'in yerel minimum
-olduğunu ispatlamak daha kolaylaşır, $\nabla f(x^*)$ ve Hessian $\nabla^2
+Ãœstteki tanÄ±mÄ± okuyunca  $x^*$'in yerel minimum olup olmadÄ±ÄŸÄ±nÄ± anlamanÄ±n
+tek yolunun yakÄ±ndaki diÄŸer tÃ¼m noktalara teker teker bakmak olduÄŸu anlamÄ±
+Ã§Ä±kabilir, fakat eÄŸer $f$ pÃ¼rÃ¼zsÃ¼z bir fonksiyon ise yerel minimumu
+doÄŸrulamanÄ±n Ã§ok daha hÄ±zlÄ± bir yÃ¶ntemi vardÄ±r. Hatta ve hatta eÄŸer
+fonksiyon $f$ iki kez tÃ¼revi alÄ±nabilir haldeyse $x^*$'in yerel minimum
+olduÄŸunu ispatlamak daha kolaylaÅŸÄ±r, $\nabla f(x^*)$ ve Hessian $\nabla^2
 f(x^*)$'e bakarak bunu yapabiliriz.
 
-Minimallik için 1. ve 2. derece şartlar var. 1. derece gerekli şart (ama
-yeterli değil) $\nabla f = 0$ olması. Bu standard Calculus'tan bildiğimiz
-bir şey, minimum ya da maksimumda birinci türev sıfırdır. Ama türevin sıfır
-olup minimum ya da maksimum olmadığı durum da olabilir, mesela
+Minimallik iÃ§in 1. ve 2. derece ÅŸartlar var. 1. derece gerekli ÅŸart (ama
+yeterli deÄŸil) $\nabla f = 0$ olmasÄ±. Bu standard Calculus'tan bildiÄŸimiz
+bir ÅŸey, minimum ya da maksimumda birinci tÃ¼rev sÄ±fÄ±rdÄ±r. Ama tÃ¼revin sÄ±fÄ±r
+olup minimum ya da maksimum olmadÄ±ÄŸÄ± durum da olabilir, mesela
 $f(x) = x^3$. $f'(0) = 0$'dir fakat $x=0$ ne maksimum ne de
-minimumdur. Daha iyi bir termioloji $\nabla f = 0$ noktalarını {\em kritik
-  nokta} olarak tanımlamaktır. $x=0$ noktasında bir değişim oluyor, bu
-değişim kritik bir değişim, her ne kadar minimum ya da maksimum olmasa da.
+minimumdur. Daha iyi bir termioloji $\nabla f = 0$ noktalarÄ±nÄ± {\em kritik
+  nokta} olarak tanÄ±mlamaktÄ±r. $x=0$ noktasÄ±nda bir deÄŸiÅŸim oluyor, bu
+deÄŸiÅŸim kritik bir deÄŸiÅŸim, her ne kadar minimum ya da maksimum olmasa da.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 x = np.linspace(-3,3,100)
@@ -120,11 +120,11 @@ plt.savefig('func_40_autograd_01.png')
 
 \includegraphics[height=6cm]{func_40_autograd_01.png}
 
-Bir kritik noktanın yerel maksimum ya da yerel minimum olup olmadığını
-anlamak için fonksiyonun ikinci türevine bakabiliriz. Bir
-$f: \mathbb{R}^n \to \mathbb{R}$ var ve $x^*$ noktasının kritik nokta
-olduğunu düşünelim, yani $\nabla f(x^*) = 0$. Şimdi çok ufak bir $h$ adımı
-için $f(x^* + h)$'a ne olduğuna bakalım. Burada Taylor açılımı
+Bir kritik noktanÄ±n yerel maksimum ya da yerel minimum olup olmadÄ±ÄŸÄ±nÄ±
+anlamak iÃ§in fonksiyonun ikinci tÃ¼revine bakabiliriz. Bir
+$f: \mathbb{R}^n \to \mathbb{R}$ var ve $x^*$ noktasÄ±nÄ±n kritik nokta
+olduÄŸunu dÃ¼ÅŸÃ¼nelim, yani $\nabla f(x^*) = 0$. Åimdi Ã§ok ufak bir $h$ adÄ±mÄ±
+iÃ§in $f(x^* + h)$'a ne olduÄŸuna bakalÄ±m. Burada Taylor aÃ§Ä±lÄ±mÄ±
 kullanabiliriz [2], 
 
 $$
@@ -134,48 +134,48 @@ f(x^*) + \nabla f(x^*) h +
 O(3)
 $$
 
-$\nabla^2 (x^*)$ bir matristır içinde $f$'nin ikinci derece türevleri
-vardır [6]. Şimdi, kritik noktada olduğumuz için $\nabla f(x^*) = 0$, ve
-$O(3)$ terimlerini iptal edersek, üstteki
+$\nabla^2 (x^*)$ bir matristÄ±r iÃ§inde $f$'nin ikinci derece tÃ¼revleri
+vardÄ±r [6]. Åimdi, kritik noktada olduÄŸumuz iÃ§in $\nabla f(x^*) = 0$, ve
+$O(3)$ terimlerini iptal edersek, Ã¼stteki
 
 $$
 f(x^* + h^*) - f(x^*) = \frac{1}{2} h^T \nabla^2 (x^*)  h + O(3)
 $$
 
-haline gelir. Simdi ``bir noktanın mesela yerel maksimum olması'' sözünü
-$f(x^* + h^*) - f(x^*) < 0$ ile ifade edebiliriz, çünkü $x^*$ etrafındaki
-tüm $x$'lerin $f$'in daha az değerlerinden olma şartını aramış oluyoruz
-(adım atılıyor, çıkartma yapılıyor, sonuç sıfırdan küçük). Tabii bu ``tüm''
-söylemi yaklaşıksal, o sebeple minimumluk ifadesi {\em yerel}.
+haline gelir. Simdi ``bir noktanÄ±n mesela yerel maksimum olmasÄ±'' sÃ¶zÃ¼nÃ¼
+$f(x^* + h^*) - f(x^*) < 0$ ile ifade edebiliriz, Ã§Ã¼nkÃ¼ $x^*$ etrafÄ±ndaki
+tÃ¼m $x$'lerin $f$'in daha az deÄŸerlerinden olma ÅŸartÄ±nÄ± aramÄ±ÅŸ oluyoruz
+(adÄ±m atÄ±lÄ±yor, Ã§Ä±kartma yapÄ±lÄ±yor, sonuÃ§ sÄ±fÄ±rdan kÃ¼Ã§Ã¼k). Tabii bu ``tÃ¼m''
+sÃ¶ylemi yaklaÅŸÄ±ksal, o sebeple minimumluk ifadesi {\em yerel}.
 
-Devam edersek $f(x^* + h^*) - f(x^*) < 0$ olması şartı aynı zamanda
-$\frac{1}{2} h^T \nabla^2 (x^*) h < 0$ anlamına gelir, bu da
-$\nabla^2 (x^*)$ negatif kesin demektir. Çünkü $A$ simetrik bir matris
-olduğu zaman
+Devam edersek $f(x^* + h^*) - f(x^*) < 0$ olmasÄ± ÅŸartÄ± aynÄ± zamanda
+$\frac{1}{2} h^T \nabla^2 (x^*) h < 0$ anlamÄ±na gelir, bu da
+$\nabla^2 (x^*)$ negatif kesin demektir. Ã‡Ã¼nkÃ¼ $A$ simetrik bir matris
+olduÄŸu zaman
 
 $x^TAx < 0$ ise matris negatif kesin
 
-$x^TAx \le 0$ ise matris negatif yarı-kesin (negatif semi-definite)
+$x^TAx \le 0$ ise matris negatif yarÄ±-kesin (negatif semi-definite)
 
 $x^TAx > 0$ ise matris pozitif kesin
 
-$x^TAx \ge 0$ ise matris pozitif yarı-kesin (positive semi-definite)
+$x^TAx \ge 0$ ise matris pozitif yarÄ±-kesin (positive semi-definite)
 
 Gradyan Inisi
 
-Optimizasyonun mekaniğine gelelim. Diyelim ki basit, tek boyutlu bir $f(x)
-= x^2$ fonksiyonumuz var. Tek boyutlu bu ortamda bir noktadan başlayıp
-gradyanın (1. türev) işaret ettiği yönde ufak bir adım atmak bizi minimuma
-daha yaklaştırır, ve bunu ardı ardına yaparak yerel bir minimuma
-erisebiliriz. Örnek $f(x)$ dışbükey (convex) olduğu için bu bizi global
-minimuma götürür [3]. Formül
+Optimizasyonun mekaniÄŸine gelelim. Diyelim ki basit, tek boyutlu bir $f(x)
+= x^2$ fonksiyonumuz var. Tek boyutlu bu ortamda bir noktadan baÅŸlayÄ±p
+gradyanÄ±n (1. tÃ¼rev) iÅŸaret ettiÄŸi yÃ¶nde ufak bir adÄ±m atmak bizi minimuma
+daha yaklaÅŸtÄ±rÄ±r, ve bunu ardÄ± ardÄ±na yaparak yerel bir minimuma
+erisebiliriz. Ã–rnek $f(x)$ dÄ±ÅŸbÃ¼key (convex) olduÄŸu iÃ§in bu bizi global
+minimuma gÃ¶tÃ¼rÃ¼r [3]. FormÃ¼l
 
 $$
 x_{i+1} = x_i + \alpha \nabla f(x_i)
 $$
 
-Başlangıç $x_0$ herhangi bir nokta, üstteki formülle adım ata ata
-ilerliyoruz, adım boyutunu bizim tanımladığımız bir $\alpha$ sabitiyle
+BaÅŸlangÄ±Ã§ $x_0$ herhangi bir nokta, Ã¼stteki formÃ¼lle adÄ±m ata ata
+ilerliyoruz, adÄ±m boyutunu bizim tanÄ±mladÄ±ÄŸÄ±mÄ±z bir $\alpha$ sabitiyle
 ayarlayabiliyoruz. 
 
 
@@ -218,19 +218,19 @@ plt.show()
 
 \includegraphics[height=6cm]{func_40_autograd_02.png}
 
-Türevi \verb!autograd! ile aldık, bu örnekte sembolik türev kolaydı, elle
-$f'(x)=2x$ diyebilirdik ama gösterim amaçlı direk yazılımla türevi aldık.
+TÃ¼revi \verb!autograd! ile aldÄ±k, bu Ã¶rnekte sembolik tÃ¼rev kolaydÄ±, elle
+$f'(x)=2x$ diyebilirdik ama gÃ¶sterim amaÃ§lÄ± direk yazÄ±lÄ±mla tÃ¼revi aldÄ±k.
 
-Kısıtlanmış Optimizasyon
+KÄ±sÄ±tlanmÄ±ÅŸ Optimizasyon
 
-Mühendislik problemlerinde kısıtlanmış optimizasyon çok ortaya
-çıkar. Prototipik örnek bir düzlem üzerindeki orijine en yakın noktayı
-bulmak. Mesela düzlem $2x - y + z = 3$ olsun, ve mesafeyi minimize etmek
+MÃ¼hendislik problemlerinde kÄ±sÄ±tlanmÄ±ÅŸ optimizasyon Ã§ok ortaya
+Ã§Ä±kar. Prototipik Ã¶rnek bir dÃ¼zlem Ã¼zerindeki orijine en yakÄ±n noktayÄ±
+bulmak. Mesela dÃ¼zlem $2x - y + z = 3$ olsun, ve mesafeyi minimize etmek
 istiyoruz, bunu $x^2+y^2+z^2$ ile hesaplayabiliriz. Yani optimizasyon
-problemi düzlem denklemi ile sınırlanan mesafe formülünün minimal noktasını
+problemi dÃ¼zlem denklemi ile sÄ±nÄ±rlanan mesafe formÃ¼lÃ¼nÃ¼n minimal noktasÄ±nÄ±
 bulmak [5]. 
 
-Problemi direk \verb!scipy.optimize.minimize! ile çözelim. 
+Problemi direk \verb!scipy.optimize.minimize! ile Ã§Ã¶zelim. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.optimize import minimize
@@ -260,9 +260,9 @@ print (sol)
        x: array([ 0.99998696, -0.50005221,  0.49997386])
 \end{verbatim}
 
-Fonksiyon \verb!minimize! için kısıtlamalar \verb!eq! ile sıfıra eşit olma
-üzerinden tanımlanır. Eğer \verb!ineq! kullanılırsa sıfırdan büyük olma
-tanımlanıyor o zaman mesela $x>0$ ve $x<5$ kısıtlamalarını getirmek
+Fonksiyon \verb!minimize! iÃ§in kÄ±sÄ±tlamalar \verb!eq! ile sÄ±fÄ±ra eÅŸit olma
+Ã¼zerinden tanÄ±mlanÄ±r. EÄŸer \verb!ineq! kullanÄ±lÄ±rsa sÄ±fÄ±rdan bÃ¼yÃ¼k olma
+tanÄ±mlanÄ±yor o zaman mesela $x>0$ ve $x<5$ kÄ±sÄ±tlamalarÄ±nÄ± getirmek
 istersek, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -272,7 +272,7 @@ sol = minimize(objective, x0, method = 'SLSQP', constraints=cons)
 print (sol)
 \end{minted}
 
-Not: \verb!SLSQP! metotu gradyana ihtiyaç duymuyor. 
+Not: \verb!SLSQP! metotu gradyana ihtiyaÃ§ duymuyor. 
 
 \begin{verbatim}
      fun: 1.1090612774580318e-16
@@ -286,12 +286,12 @@ Not: \verb!SLSQP! metotu gradyana ihtiyaç duymuyor.
        x: array([-7.44668151e-09,  2.73897702e-24, -7.44668129e-09])
 \end{verbatim}
 
-Bazen her şeyi kendimiz yaparak tüm adımların ne yaptığından emin olmak
-isteyebiliriz. Mesela kısıtlama şartlarını kendimiz bir Lagrange çarpanı
-$f(x) f(x) - \lambda g(x)$ ifadesi üzerinden tanımlayıp, türevi alıp sıfıra
-eşitleyip, $f_x(x)=f_y(x)=f_z(x)=g(x)=0$ ile, elde edilen kısıtsız
-optimizasyonu çözmeyi tercih edebiliriz. Türevin alınmasını direk
-\verb!autograd!'a yaptırırız.
+Bazen her ÅŸeyi kendimiz yaparak tÃ¼m adÄ±mlarÄ±n ne yaptÄ±ÄŸÄ±ndan emin olmak
+isteyebiliriz. Mesela kÄ±sÄ±tlama ÅŸartlarÄ±nÄ± kendimiz bir Lagrange Ã§arpanÄ±
+$f(x) f(x) - \lambda g(x)$ ifadesi Ã¼zerinden tanÄ±mlayÄ±p, tÃ¼revi alÄ±p sÄ±fÄ±ra
+eÅŸitleyip, $f_x(x)=f_y(x)=f_z(x)=g(x)=0$ ile, elde edilen kÄ±sÄ±tsÄ±z
+optimizasyonu Ã§Ã¶zmeyi tercih edebiliriz. TÃ¼revin alÄ±nmasÄ±nÄ± direk
+\verb!autograd!'a yaptÄ±rÄ±rÄ±z.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import autograd.numpy as np
@@ -318,9 +318,9 @@ print (x,y,z)
 1.0 -0.5 0.5
 \end{verbatim}
 
-Aynı sonuç bulundu. Şimdi merak ediyoruz, bu sonuç gerçekten minimum mu?
-Üstteki noktada Hessian'ın pozitif kesin olup olmadığını kontrol
-edebiliriz. Hessian'ı da \verb!autograd! hesaplar! Once gradyan,
+AynÄ± sonuÃ§ bulundu. Åimdi merak ediyoruz, bu sonuÃ§ gerÃ§ekten minimum mu?
+Ãœstteki noktada Hessian'Ä±n pozitif kesin olup olmadÄ±ÄŸÄ±nÄ± kontrol
+edebiliriz. Hessian'Ä± da \verb!autograd! hesaplar! Once gradyan,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from autograd import hessian
@@ -335,8 +335,8 @@ print (res)
  [0. 0. 2.]]
 \end{verbatim}
 
-Bu matris pozitif kesin, ama çıplak gözle bariz değilse, tüm özdeğerleri
-pozitif olup olmadığına bakabiliriz, 
+Bu matris pozitif kesin, ama Ã§Ä±plak gÃ¶zle bariz deÄŸilse, tÃ¼m Ã¶zdeÄŸerleri
+pozitif olup olmadÄ±ÄŸÄ±na bakabiliriz, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print (np.linalg.eig(h(np.array([x, y, z])))[0])
@@ -346,7 +346,7 @@ print (np.linalg.eig(h(np.array([x, y, z])))[0])
 [2. 2. 2.]
 \end{verbatim}
 
-Birden Fazla Gradyan Değişkeni
+Birden Fazla Gradyan DeÄŸiÅŸkeni
 
 Diyelim ki elimizde 
 
@@ -354,8 +354,8 @@ $$
 g(w_1,w_2) = \tanh (w_1w_2)
 $$
 
-fonksiyonu var, bu üç boyutlu bir fonksiyon, ve optimizasyon amaçlı gradyan
-gerekiyor, gradyanın iki değişken üzerinden alınması gerekli [7]. 
+fonksiyonu var, bu Ã¼Ã§ boyutlu bir fonksiyon, ve optimizasyon amaÃ§lÄ± gradyan
+gerekiyor, gradyanÄ±n iki deÄŸiÅŸken Ã¼zerinden alÄ±nmasÄ± gerekli [7]. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import autograd
@@ -378,7 +378,7 @@ plt.savefig('func_40_autograd_03.png')
 
 \includegraphics[width=20em]{func_40_autograd_03.png}
 
-$g$'nin her iki kısmi türevini ve gradyanını, 
+$g$'nin her iki kÄ±smi tÃ¼revini ve gradyanÄ±nÄ±, 
 
 $$
 \nabla g(w_1,w_2) = \left[\begin{array}{r}
@@ -387,16 +387,16 @@ $$
 \end{array}\right]
 $$
 
-\verb!autograd! ile hesaplamak için 
+\verb!autograd! ile hesaplamak iÃ§in 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 dgdw1 = autograd.grad(g,0)
 dgdw2 = autograd.grad(g,1)
 \end{minted}
 
-Dikkat edersek, 0 ve 1 parametreleri geçildi, bunlar sırasıyla $w_1$ ve
-$w_2$ değişkenlerine tekabül ediyorlar (\verb!g! tanımındaki sıralarına
-göre, 0. ve 1. parametreler). Şimdi mesela (1.0,2.0) noktasındaki gradyanı
+Dikkat edersek, 0 ve 1 parametreleri geÃ§ildi, bunlar sÄ±rasÄ±yla $w_1$ ve
+$w_2$ deÄŸiÅŸkenlerine tekabÃ¼l ediyorlar (\verb!g! tanÄ±mÄ±ndaki sÄ±ralarÄ±na
+gÃ¶re, 0. ve 1. parametreler). Åimdi mesela (1.0,2.0) noktasÄ±ndaki gradyanÄ±
 hesaplayabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -408,12 +408,12 @@ print (gradg)
 [0.14130164970632894, 0.07065082485316447]
 \end{verbatim}
 
-Tabii çok boyutlu ortamda yazının başındaki teknikleri kullanmak daha iyi,
-üstteki bir seçenek.
+Tabii Ã§ok boyutlu ortamda yazÄ±nÄ±n baÅŸÄ±ndaki teknikleri kullanmak daha iyi,
+Ã¼stteki bir seÃ§enek.
 
 Kaynaklar 
 
-[1] Bayramlı, Ders Notları, {\em Otomatik Türev Almak (Automatic Differentiation -AD-)}
+[1] BayramlÄ±, Ders NotlarÄ±, {\em Otomatik TÃ¼rev Almak (Automatic Differentiation -AD-)}
 
 [2] Schrimpf, \url{http://faculty.arts.ubc.ca/pschrimpf/526/526.html}
 
@@ -421,7 +421,7 @@ Kaynaklar
 
 [5] Kitchin, \url{http://kitchingroup.cheme.cmu.edu/blog/2018/11/03/Constrained-optimization-with-Lagrange-multipliers-and-autograd/}
 
-[6] Bayramli, Cok Boyutlu Calculus, {\em Vektör Calculus, Kurallar, Matris Türevleri}
+[6] Bayramli, Cok Boyutlu Calculus, {\em VektÃ¶r Calculus, Kurallar, Matris TÃ¼revleri}
 
 [7] Watt, {\em Automatic Differentiation}, 
     \url{https://jermwatt.github.io/machine_learning_refined/notes/3_First_order_methods/3_5_Automatic.html}

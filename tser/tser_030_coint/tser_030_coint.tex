@@ -2,25 +2,25 @@
 \begin{document}
 Koentegrasyon (Cointegration)
 
-Daha önce bahsettiğimiz gibi çoğu finansal zaman serisi durağan ya da
-ortalamaya dönüşlü değildir. Neyse ki sadece o tür varlıklara bağlı
-değiliz. Kendimiz proaktif olarak içinde birden fazla fiyat serisi içeren
-bir paket / portföy / enstrüman yaratabiliriz ki bu porföyün bütününün
-zaman serisi durağan olur. Koentegrasyon işte budur: durağan olmayan zaman
-serilerinin lineer kombinasyonunu yaratıp durağan olan bir seri yaratmak,
-ki bu durumda birleştirilen serilerin {\em koentegre edilmiş} olduğu
-söylenir. Çoğunlukla bu iki zaman serisi ile yapılır, belli yüzdeler
-üzerinden bir varlığı alıp, diğerini açığa satarız; bu strateji iyi bilinen
-``eşli oynama (pairs trading)'' stratejisidir. Fakat koentegrasyon tekniği
-kolaylıkla üç ve daha fazla fiyat serisi için de kullanılabilir. Bu bölümde
-CADF ve Johansen testini göreceğiz, bunlar iki yaygın koentegrasyon
-testidir. CADF sadece iki seri için kullanılabilir, Johansen ikiden fazla
-seri ile işleyebilir.
+Daha Ã¶nce bahsettiÄŸimiz gibi Ã§oÄŸu finansal zaman serisi duraÄŸan ya da
+ortalamaya dÃ¶nÃ¼ÅŸlÃ¼ deÄŸildir. Neyse ki sadece o tÃ¼r varlÄ±klara baÄŸlÄ±
+deÄŸiliz. Kendimiz proaktif olarak iÃ§inde birden fazla fiyat serisi iÃ§eren
+bir paket / portfÃ¶y / enstrÃ¼man yaratabiliriz ki bu porfÃ¶yÃ¼n bÃ¼tÃ¼nÃ¼nÃ¼n
+zaman serisi duraÄŸan olur. Koentegrasyon iÅŸte budur: duraÄŸan olmayan zaman
+serilerinin lineer kombinasyonunu yaratÄ±p duraÄŸan olan bir seri yaratmak,
+ki bu durumda birleÅŸtirilen serilerin {\em koentegre edilmiÅŸ} olduÄŸu
+sÃ¶ylenir. Ã‡oÄŸunlukla bu iki zaman serisi ile yapÄ±lÄ±r, belli yÃ¼zdeler
+Ã¼zerinden bir varlÄ±ÄŸÄ± alÄ±p, diÄŸerini aÃ§Ä±ÄŸa satarÄ±z; bu strateji iyi bilinen
+``eÅŸli oynama (pairs trading)'' stratejisidir. Fakat koentegrasyon tekniÄŸi
+kolaylÄ±kla Ã¼Ã§ ve daha fazla fiyat serisi iÃ§in de kullanÄ±labilir. Bu bÃ¶lÃ¼mde
+CADF ve Johansen testini gÃ¶receÄŸiz, bunlar iki yaygÄ±n koentegrasyon
+testidir. CADF sadece iki seri iÃ§in kullanÄ±labilir, Johansen ikiden fazla
+seri ile iÅŸleyebilir.
 
-İki zaman serisi olduğu durumda aslında olan şudur: iki serinin lineer
-kombinasyonu demek aslında bu iki serinin arasında lineer regresyon
-işletmekten ibarettir. Regresyonun sonucu olan düz çizginin katsayısı iki
-değişkenin nasıl birleştirilebileceğini gösterir,
+Ä°ki zaman serisi olduÄŸu durumda aslÄ±nda olan ÅŸudur: iki serinin lineer
+kombinasyonu demek aslÄ±nda bu iki serinin arasÄ±nda lineer regresyon
+iÅŸletmekten ibarettir. Regresyonun sonucu olan dÃ¼z Ã§izginin katsayÄ±sÄ± iki
+deÄŸiÅŸkenin nasÄ±l birleÅŸtirilebileceÄŸini gÃ¶sterir,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -50,67 +50,67 @@ print hedgeRatio
 0.962429398685
 \end{verbatim}
 
-Birleştirince 
+BirleÅŸtirince 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 df['coint'] = df['ewc']-hedgeRatio*df['ewa']
 df['coint'].plot()
-plt.title(u'Koentegrasyon Üzerinden Birleşim')
+plt.title(u'Koentegrasyon Ãœzerinden BirleÅŸim')
 plt.savefig('tser_coint_03.png')
 \end{minted}
 
 \includegraphics[height=6cm]{tser_coint_03.png}
 
-Aslında ``birleştirmek'' tam doğru bir kelime değil. Bir regresyon
-işlettik, ve $y$ içinden $x$'i {\em çıkarttık}. Arada lineer bağlantı
-vardı, ve bu durumda (eğer model iyi ise) geri kalan nedir? Gürültüdür!
-Gürültü, yani verili bir ortalama (mean) etrafında salınım Gaussian /
-Normal dağılım değil midir?  Evet! Aslında zamana yayılmış Gaussian gürültü
-durağandır. Yani gürültü üzerinde borsa işlemi karlı bir şeydir! İlginç
-değil mi? Örnek olarak 100 tane standart normal dağılımdan gelen veri
-noktası üretelim,
+AslÄ±nda ``birleÅŸtirmek'' tam doÄŸru bir kelime deÄŸil. Bir regresyon
+iÅŸlettik, ve $y$ iÃ§inden $x$'i {\em Ã§Ä±karttÄ±k}. Arada lineer baÄŸlantÄ±
+vardÄ±, ve bu durumda (eÄŸer model iyi ise) geri kalan nedir? GÃ¼rÃ¼ltÃ¼dÃ¼r!
+GÃ¼rÃ¼ltÃ¼, yani verili bir ortalama (mean) etrafÄ±nda salÄ±nÄ±m Gaussian /
+Normal daÄŸÄ±lÄ±m deÄŸil midir?  Evet! AslÄ±nda zamana yayÄ±lmÄ±ÅŸ Gaussian gÃ¼rÃ¼ltÃ¼
+duraÄŸandÄ±r. Yani gÃ¼rÃ¼ltÃ¼ Ã¼zerinde borsa iÅŸlemi karlÄ± bir ÅŸeydir! Ä°lginÃ§
+deÄŸil mi? Ã–rnek olarak 100 tane standart normal daÄŸÄ±lÄ±mdan gelen veri
+noktasÄ± Ã¼retelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 plt.plot(np.random.normal(loc=0,scale=1.0,size=100))
-plt.title(u'Standard Normal Yapay Veri Noktaları')
+plt.title(u'Standard Normal Yapay Veri NoktalarÄ±')
 plt.savefig('tser_coint_04.png')
 \end{minted}
 
 \includegraphics[height=6cm]{tser_coint_04.png}
 
-Görüldüğü gibi üstteki sonuca oldukça benziyor. Yazının geri kalanında
-koentegrasyon sonrası ortaya yeni seri çıkartmaya birleşim diyeceğiz.
+GÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi Ã¼stteki sonuca oldukÃ§a benziyor. YazÄ±nÄ±n geri kalanÄ±nda
+koentegrasyon sonrasÄ± ortaya yeni seri Ã§Ä±kartmaya birleÅŸim diyeceÄŸiz.
 
-Bir diğer bakış açısından daha bahsedelim; bir seneti $x$ diğerini $y$
-ekseni üzerinden ve zaman serisi noktalarını $x,y$ kordinatları gibi
-eşleyip kullanınca, 3 üstteki grafiği elde ettik. Bu grafikte lineer ilişki
-görülüyordu, bu veriye çizgi uydurarak geri kalan gürültü üzerinde
-ortalamaya dönüş yapabiliyoruz. Bunu söylemek, aslında 4 üstte her iki
-zaman serisinin $y$ ekseni grafiklenmiş halindeki serilerin birbiriyle olan
-``farkının'' bir ortalamaya dönüyor olması ile aynıdır. Dikkat edersek iki
-seri birbiri ile yakından alakalı, ve aralarındaki fark bazen çoğalsa bile,
-çoğunlukla belli bir seviyeye düşüyor. İşte bu aralık, fark (spread), ya da
-marj üzerinde de ortalamaya dönüş teknikleri uygulanabiliyor. Düşünülürse
-bu ilişki bariz gelecektir; iki seri $x,y$ arasında ilişki ortalamadan
-uzaklaştığında bu noktalarda gürültü artmış olacaktır, aynı noktalarda
-ikili $y$ grafiğinde aradaki fark fazlalaşmış demektir.
+Bir diÄŸer bakÄ±ÅŸ aÃ§Ä±sÄ±ndan daha bahsedelim; bir seneti $x$ diÄŸerini $y$
+ekseni Ã¼zerinden ve zaman serisi noktalarÄ±nÄ± $x,y$ kordinatlarÄ± gibi
+eÅŸleyip kullanÄ±nca, 3 Ã¼stteki grafiÄŸi elde ettik. Bu grafikte lineer iliÅŸki
+gÃ¶rÃ¼lÃ¼yordu, bu veriye Ã§izgi uydurarak geri kalan gÃ¼rÃ¼ltÃ¼ Ã¼zerinde
+ortalamaya dÃ¶nÃ¼ÅŸ yapabiliyoruz. Bunu sÃ¶ylemek, aslÄ±nda 4 Ã¼stte her iki
+zaman serisinin $y$ ekseni grafiklenmiÅŸ halindeki serilerin birbiriyle olan
+``farkÄ±nÄ±n'' bir ortalamaya dÃ¶nÃ¼yor olmasÄ± ile aynÄ±dÄ±r. Dikkat edersek iki
+seri birbiri ile yakÄ±ndan alakalÄ±, ve aralarÄ±ndaki fark bazen Ã§oÄŸalsa bile,
+Ã§oÄŸunlukla belli bir seviyeye dÃ¼ÅŸÃ¼yor. Ä°ÅŸte bu aralÄ±k, fark (spread), ya da
+marj Ã¼zerinde de ortalamaya dÃ¶nÃ¼ÅŸ teknikleri uygulanabiliyor. DÃ¼ÅŸÃ¼nÃ¼lÃ¼rse
+bu iliÅŸki bariz gelecektir; iki seri $x,y$ arasÄ±nda iliÅŸki ortalamadan
+uzaklaÅŸtÄ±ÄŸÄ±nda bu noktalarda gÃ¼rÃ¼ltÃ¼ artmÄ±ÅŸ olacaktÄ±r, aynÄ± noktalarda
+ikili $y$ grafiÄŸinde aradaki fark fazlalaÅŸmÄ±ÅŸ demektir.
 
-Bu arada, ortalamaya dönüş tekniği çoğunlukla ikinci yaklaşım üzerinden tarif
-edilir, farkın olup olmadığı, artıp artmadığı anlatılır.
+Bu arada, ortalamaya dÃ¶nÃ¼ÅŸ tekniÄŸi Ã§oÄŸunlukla ikinci yaklaÅŸÄ±m Ã¼zerinden tarif
+edilir, farkÄ±n olup olmadÄ±ÄŸÄ±, artÄ±p artmadÄ±ÄŸÄ± anlatÄ±lÄ±r.
 
-Şimdi daha ilerlemeden önce ortaya çıkan birleşimin gerçekten durağan olup
-olmadığını anlamak için yapılan testi görelim.
+Åimdi daha ilerlemeden Ã¶nce ortaya Ã§Ä±kan birleÅŸimin gerÃ§ekten duraÄŸan olup
+olmadÄ±ÄŸÄ±nÄ± anlamak iÃ§in yapÄ±lan testi gÃ¶relim.
 
-CADF (Koentegreli Genişletilmiş Dickey-Fuller Testi)
+CADF (Koentegreli GeniÅŸletilmiÅŸ Dickey-Fuller Testi)
 
-Akla bir soru gelebilir: eğer serileri birleştirip durağanlık
-yaratabiliyorsak elimizde zaten durağanlık testi var, niye yeni bir testi
-kullanalım? Lineer regresyon yapıp birleştiririz, sonra sonuç üzerinde eski
-ADF testini yaparız. Aslında Engle ve Granger adlı araştırmacıların 
-yaptığı tam da bu, alttaki çıktıda durağanlığı test etmek mümkün. Not:
-hangi değişkenin $y$ hangisinin $x$ olduğu önemli (lineer regresyon
-yapıldığında da önemli tabii ki). Ayrıca bu test sadece iki değişken için
-işliyor. Daha çok değişken için başka bir yöntem gerekecek.
+Akla bir soru gelebilir: eÄŸer serileri birleÅŸtirip duraÄŸanlÄ±k
+yaratabiliyorsak elimizde zaten duraÄŸanlÄ±k testi var, niye yeni bir testi
+kullanalÄ±m? Lineer regresyon yapÄ±p birleÅŸtiririz, sonra sonuÃ§ Ã¼zerinde eski
+ADF testini yaparÄ±z. AslÄ±nda Engle ve Granger adlÄ± araÅŸtÄ±rmacÄ±larÄ±n 
+yaptÄ±ÄŸÄ± tam da bu, alttaki Ã§Ä±ktÄ±da duraÄŸanlÄ±ÄŸÄ± test etmek mÃ¼mkÃ¼n. Not:
+hangi deÄŸiÅŸkenin $y$ hangisinin $x$ olduÄŸu Ã¶nemli (lineer regresyon
+yapÄ±ldÄ±ÄŸÄ±nda da Ã¶nemli tabii ki). AyrÄ±ca bu test sadece iki deÄŸiÅŸken iÃ§in
+iÅŸliyor. Daha Ã§ok deÄŸiÅŸken iÃ§in baÅŸka bir yÃ¶ntem gerekecek.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pyconometrics
@@ -124,12 +124,12 @@ print pyconometrics.cadf(np.matrix(df['ewa']).H,
 0.15312]]), 'nvar': 1} 
 \end{verbatim}
 
-Bu sonuçları şu şekilde okuyabiliriz; -3.64 değeri \%95 seviyesindeki değer
--3.35'den daha negatiftir (eşik değerleri sırasıyla \%99,\%95,\%90). O
-zaman sıfır hipotezini (null hypothesis) reddederiz, yani yani EWA ve
-EWC'nin \%95 kesinlikle koentegre olduğunu söyleyebiliriz.
+Bu sonuÃ§larÄ± ÅŸu ÅŸekilde okuyabiliriz; -3.64 deÄŸeri \%95 seviyesindeki deÄŸer
+-3.35'den daha negatiftir (eÅŸik deÄŸerleri sÄ±rasÄ±yla \%99,\%95,\%90). O
+zaman sÄ±fÄ±r hipotezini (null hypothesis) reddederiz, yani yani EWA ve
+EWC'nin \%95 kesinlikle koentegre olduÄŸunu sÃ¶yleyebiliriz.
 
-Sonuç zaman serisi üzerinde Hurst hesabını yaparsak,
+SonuÃ§ zaman serisi Ã¼zerinde Hurst hesabÄ±nÄ± yaparsak,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import statsmodels.tsa.stattools as st
@@ -149,13 +149,13 @@ hurst 0.418507486699
 
 Johansen Testi
 
-Eğer birden fazla zaman serisi arasında koentegrasyon arıyorsak, başka bir
-yöntem gerekli. Bu konuda ilk akla şu gelebilir: regresyon sonrası artıklar
-ortalamaya-dönüş ise, çok boyutta regresyon yaparım ve artıkları
-kullanırım. Burada problem şudur: hangi değişken $y$ hangisi $x$ (vektörü)
-olacak? Tüm seçenekleri denemek zaman alabilir. Johansen testi aslında
-akıllıca bir özvektör hesabı ile tam da bunu gerçekleştiriyor (detaylar
-için [1]). 
+EÄŸer birden fazla zaman serisi arasÄ±nda koentegrasyon arÄ±yorsak, baÅŸka bir
+yÃ¶ntem gerekli. Bu konuda ilk akla ÅŸu gelebilir: regresyon sonrasÄ± artÄ±klar
+ortalamaya-dÃ¶nÃ¼ÅŸ ise, Ã§ok boyutta regresyon yaparÄ±m ve artÄ±klarÄ±
+kullanÄ±rÄ±m. Burada problem ÅŸudur: hangi deÄŸiÅŸken $y$ hangisi $x$ (vektÃ¶rÃ¼)
+olacak? TÃ¼m seÃ§enekleri denemek zaman alabilir. Johansen testi aslÄ±nda
+akÄ±llÄ±ca bir Ã¶zvektÃ¶r hesabÄ± ile tam da bunu gerÃ§ekleÅŸtiriyor (detaylar
+iÃ§in [1]). 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from johansen import coint_johansen, print_johan_stats
@@ -182,8 +182,8 @@ ozvektorler
  [-0.74218753 -0.08957951]]
 \end{verbatim}
 
-Şimdi üçüncü bir varlık, IGE ekleyelim, ve üçü arasında koentegrasyon testi
-yapalım,
+Åimdi Ã¼Ã§Ã¼ncÃ¼ bir varlÄ±k, IGE ekleyelim, ve Ã¼Ã§Ã¼ arasÄ±nda koentegrasyon testi
+yapalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 cols = ['ewc','ewa','ige']
@@ -213,13 +213,13 @@ ozvektorler
  [ 0.22330592  0.53159644  0.09515547]]
 \end{verbatim}
 
-Johansen testi iki türlü hesap yapar, biri iz istatistiği (trace statistic)
-diğeri öz istatistiği (eigen statistic). Bu sonucu irdelemek için, herhangi
-bir metot için, o metotun raporladığı istatistik değere bakarız, ve bu
-değerlerin kritik aralıklara düşüp düşmediğini kontrol ederiz. Eğer
-düşüyorsa, $r \le 0, r \le 1, ..$ için kontrol ederiz, o kadar fiyat serisi
-arasında koentegrasyon var demektir. Üstteki örnekte iz istatistiği her üç
-senet için \%95-\%99 aralığına düşüyor, demek ki \%95 seviyesinde
+Johansen testi iki tÃ¼rlÃ¼ hesap yapar, biri iz istatistiÄŸi (trace statistic)
+diÄŸeri Ã¶z istatistiÄŸi (eigen statistic). Bu sonucu irdelemek iÃ§in, herhangi
+bir metot iÃ§in, o metotun raporladÄ±ÄŸÄ± istatistik deÄŸere bakarÄ±z, ve bu
+deÄŸerlerin kritik aralÄ±klara dÃ¼ÅŸÃ¼p dÃ¼ÅŸmediÄŸini kontrol ederiz. EÄŸer
+dÃ¼ÅŸÃ¼yorsa, $r \le 0, r \le 1, ..$ iÃ§in kontrol ederiz, o kadar fiyat serisi
+arasÄ±nda koentegrasyon var demektir. Ãœstteki Ã¶rnekte iz istatistiÄŸi her Ã¼Ã§
+senet iÃ§in \%95-\%99 aralÄ±ÄŸÄ±na dÃ¼ÅŸÃ¼yor, demek ki \%95 seviyesinde
 hipotezleri reddediyoruz, ve koentegrasyonu kabul ediyoruz. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -272,27 +272,27 @@ APR 0.123570040726
 Sharpe 1.37987492827
 \end{verbatim}
 
-Ne kadar para kazanabileceğimizi ölçmek için yine Z skoru yarattık, ve bu
-skora ters oranda alım ve satım farz ediyoruz. Tabii özvektör üzerinden
-birleştirilmiş yeni seri üzerinden Z skoru yarattık, sonra bu alım/satım
-kararlarını tekrar özvektör üzerinden ``geriye'' tercüme etmemiz gerekiyor,
-ki böylece 3 varlık üzerinde ne kadar alım / satım yaptığımızı
-görebilelim. Ek anlatımları üstteki kodun içindeki yorumlarda
+Ne kadar para kazanabileceÄŸimizi Ã¶lÃ§mek iÃ§in yine Z skoru yarattÄ±k, ve bu
+skora ters oranda alÄ±m ve satÄ±m farz ediyoruz. Tabii Ã¶zvektÃ¶r Ã¼zerinden
+birleÅŸtirilmiÅŸ yeni seri Ã¼zerinden Z skoru yarattÄ±k, sonra bu alÄ±m/satÄ±m
+kararlarÄ±nÄ± tekrar Ã¶zvektÃ¶r Ã¼zerinden ``geriye'' tercÃ¼me etmemiz gerekiyor,
+ki bÃ¶ylece 3 varlÄ±k Ã¼zerinde ne kadar alÄ±m / satÄ±m yaptÄ±ÄŸÄ±mÄ±zÄ±
+gÃ¶rebilelim. Ek anlatÄ±mlarÄ± Ã¼stteki kodun iÃ§indeki yorumlarda
 bulabilirsiniz. 
 
 Koentegrasyson ve Korelasyon
 
-Koentegrasyon kavramı pek çok borsacı tarafından bilinmez, ama korelasyonu
-çoğu kişi iyi biliyor. Bu iki kavram pek çok kişinin kulağına sanki aynı
-şey imiş gibi gelebilir; fakat matematiksel olarak koentegrasyon ve
-korelasyon birbirinden oldukça farklıdır. İki fiyat serisinin korelasyon
-halinde olması bu iki serinin belli zaman aralıklarındaki (mesela günlük)
-getirisiyle alakalıdır, korelasyon var ise bu iki fiyatın çoğu günde aynı
-yönde hareket edeceği tahmin edilebilir. Fakat pozitif korelasyon iki
-senedin uzun vadeli davranışı hakkında hiçbir şey söylemez. Mesela iki
-senet birbirinden çok ayrılmış bile olabilir, ama çoğu günde kabaca aynı
-yönde hareket ediyorlar ise korelasyon bunu pozitif olarak
-gösterir. Alttaki örnekte görelim, senetler Pepsi (PEP) ve Coca-Cola (KO) 
+Koentegrasyon kavramÄ± pek Ã§ok borsacÄ± tarafÄ±ndan bilinmez, ama korelasyonu
+Ã§oÄŸu kiÅŸi iyi biliyor. Bu iki kavram pek Ã§ok kiÅŸinin kulaÄŸÄ±na sanki aynÄ±
+ÅŸey imiÅŸ gibi gelebilir; fakat matematiksel olarak koentegrasyon ve
+korelasyon birbirinden oldukÃ§a farklÄ±dÄ±r. Ä°ki fiyat serisinin korelasyon
+halinde olmasÄ± bu iki serinin belli zaman aralÄ±klarÄ±ndaki (mesela gÃ¼nlÃ¼k)
+getirisiyle alakalÄ±dÄ±r, korelasyon var ise bu iki fiyatÄ±n Ã§oÄŸu gÃ¼nde aynÄ±
+yÃ¶nde hareket edeceÄŸi tahmin edilebilir. Fakat pozitif korelasyon iki
+senedin uzun vadeli davranÄ±ÅŸÄ± hakkÄ±nda hiÃ§bir ÅŸey sÃ¶ylemez. Mesela iki
+senet birbirinden Ã§ok ayrÄ±lmÄ±ÅŸ bile olabilir, ama Ã§oÄŸu gÃ¼nde kabaca aynÄ±
+yÃ¶nde hareket ediyorlar ise korelasyon bunu pozitif olarak
+gÃ¶sterir. Alttaki Ã¶rnekte gÃ¶relim, senetler Pepsi (PEP) ve Coca-Cola (KO) 
 senetleri,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -320,8 +320,8 @@ print c, 'p degeri', pval
 0.484740095488 p degeri 0.0
 \end{verbatim}
 
-0 seviyesinde p-değeri senetlerin yüksek korelasyona sahip olduğunu
-söylüyor. 
+0 seviyesinde p-deÄŸeri senetlerin yÃ¼ksek korelasyona sahip olduÄŸunu
+sÃ¶ylÃ¼yor. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pyconometrics
@@ -335,16 +335,16 @@ print pyconometrics.cadf(np.matrix(dfpepko.ko).H,
 0.15312]]), 'nvar': 1} 
 \end{verbatim}
 
-Koentegrasyon ise -2.62 değeri vermiş, kritik değerler \%99,\%95,\%90 için
-gösteriliyor, ve bu değer \%90 için olan kritik değerden bile daha büyük,
-yani koentegrasyon ihtimali yüzde 90'dan düşük. Demek ki PEP ve KO arasında
+Koentegrasyon ise -2.62 deÄŸeri vermiÅŸ, kritik deÄŸerler \%99,\%95,\%90 iÃ§in
+gÃ¶steriliyor, ve bu deÄŸer \%90 iÃ§in olan kritik deÄŸerden bile daha bÃ¼yÃ¼k,
+yani koentegrasyon ihtimali yÃ¼zde 90'dan dÃ¼ÅŸÃ¼k. Demek ki PEP ve KO arasÄ±nda
 korelasyon var ama koentegrasyon yok.
 
-Matematiksel olarak düşünürsek bu aslında mantıklı, koentegrason bir
-regresyondur, serilerden birinin diğerini ``açıklaması'' üzerine
-kurulmuştur. Korelasyon ise aynı tek tek, atomik noktalardaki değişimlerin
-aynı yönde olup olmadığının istatistiği bir anlamda. Bu iki hesap çok
-farklı şeyleri anlatıyorlar.
+Matematiksel olarak dÃ¼ÅŸÃ¼nÃ¼rsek bu aslÄ±nda mantÄ±klÄ±, koentegrason bir
+regresyondur, serilerden birinin diÄŸerini ``aÃ§Ä±klamasÄ±'' Ã¼zerine
+kurulmuÅŸtur. Korelasyon ise aynÄ± tek tek, atomik noktalardaki deÄŸiÅŸimlerin
+aynÄ± yÃ¶nde olup olmadÄ±ÄŸÄ±nÄ±n istatistiÄŸi bir anlamda. Bu iki hesap Ã§ok
+farklÄ± ÅŸeyleri anlatÄ±yorlar.
 
 Kaynaklar 
 

@@ -1,63 +1,63 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Tavsiye Sistemleri, Derin Öğrenme (Deep Recommender Systems)
+Tavsiye Sistemleri, Derin Ã–ÄŸrenme (Deep Recommender Systems)
 
-Kullanıcı $i$ için film $j$ tavsiye problemi için bir yaklaşım, eğitim
-verisinde filmlere verilen beğeni notlarını (ratings) bir $i,j$ matrisinde
-tutmak, SVD ile bu matris üzerinde ayrıştırma yaparak hem kullanıcı hem
-film boyutlarında azaltılmış temsili vektörler elde etmek, ardından bu
-vektörleri mesela kullanıcı $i$ vektörü ile tüm filmlerin azaltılmış
-temsildeki vektörleri ile çarpmak suretiyle o filmlere (çoğunlukla daha
-verilmemiş) notun ne olacağını tahmin etmeye uğraşmaktı.
+KullanÄ±cÄ± $i$ iÃ§in film $j$ tavsiye problemi iÃ§in bir yaklaÅŸÄ±m, eÄŸitim
+verisinde filmlere verilen beÄŸeni notlarÄ±nÄ± (ratings) bir $i,j$ matrisinde
+tutmak, SVD ile bu matris Ã¼zerinde ayrÄ±ÅŸtÄ±rma yaparak hem kullanÄ±cÄ± hem
+film boyutlarÄ±nda azaltÄ±lmÄ±ÅŸ temsili vektÃ¶rler elde etmek, ardÄ±ndan bu
+vektÃ¶rleri mesela kullanÄ±cÄ± $i$ vektÃ¶rÃ¼ ile tÃ¼m filmlerin azaltÄ±lmÄ±ÅŸ
+temsildeki vektÃ¶rleri ile Ã§arpmak suretiyle o filmlere (Ã§oÄŸunlukla daha
+verilmemiÅŸ) notun ne olacaÄŸÄ±nÄ± tahmin etmeye uÄŸraÅŸmaktÄ±.
 
-Derin öğrenme, TensorFlow ile çözüm ne olabilir?  Aslında üstteki
-ayrıştırma problemini TF ile çözmek mümkün, çünkü elde bir çarpım var,
-eğitim verisi var, çarpımın (tahmin) gerçek veriden olan farkı bir hata
-fonksiyonu olarak görülebilir, ve bu hatanın TF ile otomatik türevi
-alınarak minimizasyon noktası aranabilir.
+Derin Ã¶ÄŸrenme, TensorFlow ile Ã§Ã¶zÃ¼m ne olabilir?  AslÄ±nda Ã¼stteki
+ayrÄ±ÅŸtÄ±rma problemini TF ile Ã§Ã¶zmek mÃ¼mkÃ¼n, Ã§Ã¼nkÃ¼ elde bir Ã§arpÄ±m var,
+eÄŸitim verisi var, Ã§arpÄ±mÄ±n (tahmin) gerÃ§ek veriden olan farkÄ± bir hata
+fonksiyonu olarak gÃ¶rÃ¼lebilir, ve bu hatanÄ±n TF ile otomatik tÃ¼revi
+alÄ±narak minimizasyon noktasÄ± aranabilir.
 
-Fakat tavsiye üretme mekanizmasını pür derin YSA bakışıyla çözmek belki
-daha iyi. Doğal dil işlemede (NLP) görülen kelime gömme (word embedding)
-kavramını bu problemde de kullanabiliriz. NLP problemlerinde elde bir
-doküman vardır, bir sözlükten gelen kelimeler bu belgelerde
-görülebilir. Kullanıcı / film, ya da müşteri / ürün bağlamında da sanki bir
-doküman vardır, ama bu dokümanda sadece tek bir beğeni için olan tek bir
-müşteri / ürün ikilisi vardır. NLP'de bir belge `` kedi paspasta
-oturuyor'', kimlik verisi üzerinden [200, 201, 565] olabiliyordu, kullanıcı
-/ film için ``belgede'' mesela sadece [100, 4500] olur; kullanıcı 100 film
-4500'i beğenmiş. Beğeni notunun nereye gittiğinin birazdan göreceğiz.
+Fakat tavsiye Ã¼retme mekanizmasÄ±nÄ± pÃ¼r derin YSA bakÄ±ÅŸÄ±yla Ã§Ã¶zmek belki
+daha iyi. DoÄŸal dil iÅŸlemede (NLP) gÃ¶rÃ¼len kelime gÃ¶mme (word embedding)
+kavramÄ±nÄ± bu problemde de kullanabiliriz. NLP problemlerinde elde bir
+dokÃ¼man vardÄ±r, bir sÃ¶zlÃ¼kten gelen kelimeler bu belgelerde
+gÃ¶rÃ¼lebilir. KullanÄ±cÄ± / film, ya da mÃ¼ÅŸteri / Ã¼rÃ¼n baÄŸlamÄ±nda da sanki bir
+dokÃ¼man vardÄ±r, ama bu dokÃ¼manda sadece tek bir beÄŸeni iÃ§in olan tek bir
+mÃ¼ÅŸteri / Ã¼rÃ¼n ikilisi vardÄ±r. NLP'de bir belge `` kedi paspasta
+oturuyor'', kimlik verisi Ã¼zerinden [200, 201, 565] olabiliyordu, kullanÄ±cÄ±
+/ film iÃ§in ``belgede'' mesela sadece [100, 4500] olur; kullanÄ±cÄ± 100 film
+4500'i beÄŸenmiÅŸ. BeÄŸeni notunun nereye gittiÄŸinin birazdan gÃ¶receÄŸiz.
 
-O zaman alttaki gibi bir ağ yapısı düşünülebilir; kullanıcı / film ikilisi
-kimlik verilerine gömme transformasyonu uygulanır, ve sonuç gömme
-vektörleri bu tabakada yanyana yer alırlar. Ardından gömme tabakasındaki
-tüm bilgi tam bağlanmış (fully connected) iki ayrı tabaka üzerinden tahmin
-üretmek için kullanılır, bu tahmin ise beğeni notunun ta kendisidir. Eldeki
-eğitim verisinde gerçek verilen not olacaktır, ve bir kayıp fonksiyonu
-üzerinden optimizasyon yapılır.
+O zaman alttaki gibi bir aÄŸ yapÄ±sÄ± dÃ¼ÅŸÃ¼nÃ¼lebilir; kullanÄ±cÄ± / film ikilisi
+kimlik verilerine gÃ¶mme transformasyonu uygulanÄ±r, ve sonuÃ§ gÃ¶mme
+vektÃ¶rleri bu tabakada yanyana yer alÄ±rlar. ArdÄ±ndan gÃ¶mme tabakasÄ±ndaki
+tÃ¼m bilgi tam baÄŸlanmÄ±ÅŸ (fully connected) iki ayrÄ± tabaka Ã¼zerinden tahmin
+Ã¼retmek iÃ§in kullanÄ±lÄ±r, bu tahmin ise beÄŸeni notunun ta kendisidir. Eldeki
+eÄŸitim verisinde gerÃ§ek verilen not olacaktÄ±r, ve bir kayÄ±p fonksiyonu
+Ã¼zerinden optimizasyon yapÄ±lÄ±r.
 
 \includegraphics[width=25em]{recom_01.png}
 
 Meta Veri
 
-Bu mimariye bazı ekler yapabiliriz. Mesela eğer müşteri, ürün hakkında
-``meta'' bilgiler var ise, diyelim kullanıcıların yaşı, mesleği gibi, bu
-bilgiler de eğitim sırasında kullanılabilir.  Kullanıcı meta bilgisi aynı
-kullanıcı için bir beğeniden diğerine değişmezler, o sebeple ürünler için
-ürünün hangi tarihte üretildiği, fiyatı, vs. gibi detaylar meta
-olabilir. Peki bu bilgileri nasıl DYSA'ya dahil ederiz?
+Bu mimariye bazÄ± ekler yapabiliriz. Mesela eÄŸer mÃ¼ÅŸteri, Ã¼rÃ¼n hakkÄ±nda
+``meta'' bilgiler var ise, diyelim kullanÄ±cÄ±larÄ±n yaÅŸÄ±, mesleÄŸi gibi, bu
+bilgiler de eÄŸitim sÄ±rasÄ±nda kullanÄ±labilir.  KullanÄ±cÄ± meta bilgisi aynÄ±
+kullanÄ±cÄ± iÃ§in bir beÄŸeniden diÄŸerine deÄŸiÅŸmezler, o sebeple Ã¼rÃ¼nler iÃ§in
+Ã¼rÃ¼nÃ¼n hangi tarihte Ã¼retildiÄŸi, fiyatÄ±, vs. gibi detaylar meta
+olabilir. Peki bu bilgileri nasÄ±l DYSA'ya dahil ederiz?
 
-Meta bilgisini direk gömme tabakasında sayısal kolonların hemen yanına
-koyabiliriz, mesela ürünün yapılış tarihi tek bir sayısal kolon olarak bu
-tabakada yer alabilir, yaş, vs. aynı şekilde. Mimari olarak, müşteri $i$ ve
-ürün $j$ için meta veri $m_i,n_j$ olsun,
+Meta bilgisini direk gÃ¶mme tabakasÄ±nda sayÄ±sal kolonlarÄ±n hemen yanÄ±na
+koyabiliriz, mesela Ã¼rÃ¼nÃ¼n yapÄ±lÄ±ÅŸ tarihi tek bir sayÄ±sal kolon olarak bu
+tabakada yer alabilir, yaÅŸ, vs. aynÄ± ÅŸekilde. Mimari olarak, mÃ¼ÅŸteri $i$ ve
+Ã¼rÃ¼n $j$ iÃ§in meta veri $m_i,n_j$ olsun,
 
 \includegraphics[width=25em]{recom_02.png}
 
-şeklinde olur. 
+ÅŸeklinde olur. 
 
-Kodlamaya başlayabiliriz. Önce verileri okuyalım, eğitim test verisi
-yaratalım (DYSA paketi olarak TensorFlow üzerinde yazılmış onu biraz daha
-kolaylaştıran Keras paketi kullanıldı [1])
+Kodlamaya baÅŸlayabiliriz. Ã–nce verileri okuyalÄ±m, eÄŸitim test verisi
+yaratalÄ±m (DYSA paketi olarak TensorFlow Ã¼zerinde yazÄ±lmÄ±ÅŸ onu biraz daha
+kolaylaÅŸtÄ±ran Keras paketi kullanÄ±ldÄ± [1])
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import matplotlib.pyplot as plt
@@ -91,8 +91,8 @@ print ratings_train.shape
 (80000, 4)
 \end{verbatim}
 
-Şimdi gömme tabakası kurulur, kullanıcı, film için bu 32'şer boyutlu olsun,
-yani yanyana 64 öğeli bir vektör. 
+Åimdi gÃ¶mme tabakasÄ± kurulur, kullanÄ±cÄ±, film iÃ§in bu 32'ÅŸer boyutlu olsun,
+yani yanyana 64 Ã¶ÄŸeli bir vektÃ¶r. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 user_id_input = Input(shape=[1])
@@ -121,8 +121,8 @@ user_vecs = Flatten()(user_embedding)
 item_vecs = Flatten()(item_embedding)
 \end{minted}
 
-Şimdi bir meta kolonu ekleyelim, bunu sadece filmin üretim tarihi için
-yapacağız, fakat diğerleri için de yapılacak ek aynen bu şekilde olurdu,
+Åimdi bir meta kolonu ekleyelim, bunu sadece filmin Ã¼retim tarihi iÃ§in
+yapacaÄŸÄ±z, fakat diÄŸerleri iÃ§in de yapÄ±lacak ek aynen bu ÅŸekilde olurdu,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 
@@ -142,13 +142,13 @@ item_meta_test = items["scaled_date"][item_id_test]
 input_vecs = merge([user_vecs, item_vecs, meta_input], mode='concat')
 \end{minted}
 
-Şimdi tam bağlanmış tabakaları ekleyelim, arada bir de veri atma (dropout)
-tabakası olsun, bu tabaka içinden geçen verilerin bazılarını / rasgele bir
-şekilde yoksayıyor (eğitim döngüsünün o aşaması yapılmıyor yani), bu
-tekniğin aşırı uygunluk (overfitting) problemleri için faydalı olduğu
-keşfedildi. 
+Åimdi tam baÄŸlanmÄ±ÅŸ tabakalarÄ± ekleyelim, arada bir de veri atma (dropout)
+tabakasÄ± olsun, bu tabaka iÃ§inden geÃ§en verilerin bazÄ±larÄ±nÄ± / rasgele bir
+ÅŸekilde yoksayÄ±yor (eÄŸitim dÃ¶ngÃ¼sÃ¼nÃ¼n o aÅŸamasÄ± yapÄ±lmÄ±yor yani), bu
+tekniÄŸin aÅŸÄ±rÄ± uygunluk (overfitting) problemleri iÃ§in faydalÄ± olduÄŸu
+keÅŸfedildi. 
 
-Tabakalar hazırlanınca eğitime başlayabiliriz,
+Tabakalar hazÄ±rlanÄ±nca eÄŸitime baÅŸlayabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 x = Dense(64, activation='relu')(input_vecs)
@@ -206,20 +206,20 @@ Final test Loss: 0.968
 Final test Loss: 0.719
 \end{verbatim}
 
-Test verisi üzerinde hata karelerinin ortalaması (mean squared error) ve
-hata mutlak değer ortalaması (mean absolute error) görülüyor. Notların 1
-ile 5 arasında olduğunu düşünürsek sonuçlar fena değil diyebiliriz.
+Test verisi Ã¼zerinde hata karelerinin ortalamasÄ± (mean squared error) ve
+hata mutlak deÄŸer ortalamasÄ± (mean absolute error) gÃ¶rÃ¼lÃ¼yor. NotlarÄ±n 1
+ile 5 arasÄ±nda olduÄŸunu dÃ¼ÅŸÃ¼nÃ¼rsek sonuÃ§lar fena deÄŸil diyebiliriz.
 
-Tavsiye Üretmek
+Tavsiye Ãœretmek
 
-Eğitilmiş model sayesinde artık kullanıcının hiç seyretmediği filmler için
-beğeni notu üretmek mümkün, herhangi bir kullanıcı / film kimliğini DYSA'ya
-soldan veriyoruz, sağdan tahmin notu çıkıyor, DYSA'nın her kullanıcı ve her
-film için elinde gömme temsili vektörleri var. O zaman tavsiye üretme
-amacıyla herhangi bir kullanıcı için tüm filmlerin tahmini notlarını
-hesaplarsak, ve sonuç beğeni notları içinde en üst 10 filmi seçersek bu
-filmler bu kullanıcının görüp beğenebileceği filmler olacaktır. Kullanıcı
-100 için bu tahminleri üretelim,
+EÄŸitilmiÅŸ model sayesinde artÄ±k kullanÄ±cÄ±nÄ±n hiÃ§ seyretmediÄŸi filmler iÃ§in
+beÄŸeni notu Ã¼retmek mÃ¼mkÃ¼n, herhangi bir kullanÄ±cÄ± / film kimliÄŸini DYSA'ya
+soldan veriyoruz, saÄŸdan tahmin notu Ã§Ä±kÄ±yor, DYSA'nÄ±n her kullanÄ±cÄ± ve her
+film iÃ§in elinde gÃ¶mme temsili vektÃ¶rleri var. O zaman tavsiye Ã¼retme
+amacÄ±yla herhangi bir kullanÄ±cÄ± iÃ§in tÃ¼m filmlerin tahmini notlarÄ±nÄ±
+hesaplarsak, ve sonuÃ§ beÄŸeni notlarÄ± iÃ§inde en Ã¼st 10 filmi seÃ§ersek bu
+filmler bu kullanÄ±cÄ±nÄ±n gÃ¶rÃ¼p beÄŸenebileceÄŸi filmler olacaktÄ±r. KullanÄ±cÄ±
+100 iÃ§in bu tahminleri Ã¼retelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def recommend(user_id, top_n=10):
@@ -255,12 +255,12 @@ for x in recommend(100):
 (u'Mondo (1996)', 4.3473449)
 \end{verbatim}
 
-Bu arkadaş üstteki filmleri sevebilirmiş. 
+Bu arkadaÅŸ Ã¼stteki filmleri sevebilirmiÅŸ. 
 
-Yakınlık
+YakÄ±nlÄ±k
 
-Gömme tabakasında her kullanıcı, film daha az boyutta, sayısal değerlerle
-temsil edilir dedik, mesela {\em Toy Story} filmi için 
+GÃ¶mme tabakasÄ±nda her kullanÄ±cÄ±, film daha az boyutta, sayÄ±sal deÄŸerlerle
+temsil edilir dedik, mesela {\em Toy Story} filmi iÃ§in 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 weights = model.get_weights()
@@ -286,9 +286,9 @@ Embedding vector for the first item:
 ('shape:', (32,))
 \end{verbatim}
 
-Bu sayıların yakınlık bağlamında anlamı olduğundan bahsettik. O zaman bir
-filmin diğerlerine olan yakınlığını Öklitsel uzaklık ile hesaplayabiliriz,
-mesela {\em Groundhog Day} filmine yakın filmler hangileridir?
+Bu sayÄ±larÄ±n yakÄ±nlÄ±k baÄŸlamÄ±nda anlamÄ± olduÄŸundan bahsettik. O zaman bir
+filmin diÄŸerlerine olan yakÄ±nlÄ±ÄŸÄ±nÄ± Ã–klitsel uzaklÄ±k ile hesaplayabiliriz,
+mesela {\em Groundhog Day} filmine yakÄ±n filmler hangileridir?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def euclidean_distances(x):
@@ -328,13 +328,13 @@ Groundhog Day filmine yakin filmler:
 (u'Time to Kill, A (1996)', 0.39465994)
 \end{verbatim}
 
-Pek anlamsız değil. Tabii girdi verisi ne kadar fazla olursa sonuçlar o
-kadar iyi olur, kullandığımız veri Movielens 100K verisi, 100,000 tane not
-var. MovieLens 1M (1 milyon not) ile daha iyi sonuçlar alınabilir (bu veri
-{\em İstatistik, Pivotlama} yazısının dizininde). Okur için ödev olsun.
+Pek anlamsÄ±z deÄŸil. Tabii girdi verisi ne kadar fazla olursa sonuÃ§lar o
+kadar iyi olur, kullandÄ±ÄŸÄ±mÄ±z veri Movielens 100K verisi, 100,000 tane not
+var. MovieLens 1M (1 milyon not) ile daha iyi sonuÃ§lar alÄ±nabilir (bu veri
+{\em Ä°statistik, Pivotlama} yazÄ±sÄ±nÄ±n dizininde). Okur iÃ§in Ã¶dev olsun.
 
 Kaynaklar
 
-[1] Grisel, {\em Deep Learning, course @ Télécom ParisTech}, \url{https://github.com/petermartigny/Deep-Learning}
+[1] Grisel, {\em Deep Learning, course @ TÃ©lÃ©com ParisTech}, \url{https://github.com/petermartigny/Deep-Learning}
 
 \end{document}

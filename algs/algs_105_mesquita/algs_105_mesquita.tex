@@ -1,9 +1,9 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Oyun Teorisi ile Grup Kararları Tahmini
+Oyun Teorisi ile Grup KararlarÄ± Tahmini
 
-Bruce de Mesquita mutabakata / anlaşmaya varma / savaş konularında tahminler
-yapabilen bir araştırmacı. Girdi olarak alttaki gibi bir veriyi alıp,
+Bruce de Mesquita mutabakata / anlaÅŸmaya varma / savaÅŸ konularÄ±nda tahminler
+yapabilen bir araÅŸtÄ±rmacÄ±. Girdi olarak alttaki gibi bir veriyi alÄ±p,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -24,45 +24,45 @@ dfemis = pd.read_csv('emission.csv'); print dfemis
 9       Greece        0.08         7        70
 \end{verbatim}
 
-onu hangi mutabakatın olacağı tahmini için kullanabiliyor. Üstteki veri bazı
-ülkeler arasında orta boy arabalarda emisyon kontrolünü kaç sene sonra devreye
-sokulacağı hakkında bir grup kararı. BDM'nin bu hesabı yapmak için iki yöntemi
-var, birincisi yarı-Oyun Teorisel (quasi Game Theoretic), ikincisi tam Oyun
-Teorik (ve daha kuvvetli bazı özellikleri var). Birinci model hakkında daha çok
-dokümantasyon var, bu model ile BDM pek çok başarılı tahmine de imza attı bu
-arada. Bu yazıda paylaşacağımız birinci model ve onun kodlaması.
+onu hangi mutabakatÄ±n olacaÄŸÄ± tahmini iÃ§in kullanabiliyor. Ãœstteki veri bazÄ±
+Ã¼lkeler arasÄ±nda orta boy arabalarda emisyon kontrolÃ¼nÃ¼ kaÃ§ sene sonra devreye
+sokulacaÄŸÄ± hakkÄ±nda bir grup kararÄ±. BDM'nin bu hesabÄ± yapmak iÃ§in iki yÃ¶ntemi
+var, birincisi yarÄ±-Oyun Teorisel (quasi Game Theoretic), ikincisi tam Oyun
+Teorik (ve daha kuvvetli bazÄ± Ã¶zellikleri var). Birinci model hakkÄ±nda daha Ã§ok
+dokÃ¼mantasyon var, bu model ile BDM pek Ã§ok baÅŸarÄ±lÄ± tahmine de imza attÄ± bu
+arada. Bu yazÄ±da paylaÅŸacaÄŸÄ±mÄ±z birinci model ve onun kodlamasÄ±.
 
-Veride güç / beceri (capability), ve ilgi (salience) parametreleri var. Bunların
-ne olduğu belli. Pozisyon üzerinde anlaşmazlık olan şeydir, her türlü karar
-ilginç bir şekilde tek boyutlu bir skala üzerinden temsil edilebiliyor, yani bir
-şey hiç istememek 0, çok istemek 100, ve arada tüm seçimler aradaki değerler
-olabilir. Çok / az istemek arasındaki her nokta belli seçenek kombinasyonlarını
-bile barındırıyor olabilir.
+Veride gÃ¼Ã§ / beceri (capability), ve ilgi (salience) parametreleri var. BunlarÄ±n
+ne olduÄŸu belli. Pozisyon Ã¼zerinde anlaÅŸmazlÄ±k olan ÅŸeydir, her tÃ¼rlÃ¼ karar
+ilginÃ§ bir ÅŸekilde tek boyutlu bir skala Ã¼zerinden temsil edilebiliyor, yani bir
+ÅŸey hiÃ§ istememek 0, Ã§ok istemek 100, ve arada tÃ¼m seÃ§imler aradaki deÄŸerler
+olabilir. Ã‡ok / az istemek arasÄ±ndaki her nokta belli seÃ§enek kombinasyonlarÄ±nÄ±
+bile barÄ±ndÄ±rÄ±yor olabilir.
 
-Oyunun sonucu ``evreler'' üzerinden işlenir. Her evrede aktörler güçleri
-oranında diğer aktörleri kendi pozisyonlarına davet ediyorlar, ya da
-etmiyorlar. Bir evrede her aktör pek çok diğer aktörden ``benim yanıma gel''
-isteği almış olabilir, evre sonunda aktör bu tekliflerden (offer) kendisi için
-en az değişim gerektirecek seçeneğe gidiyor (ilk başlangıç noktasına göre, bir
-öncekine göre değil). Hoca bunu bu şekilde seçmiş ve iyi bir seçim bizce çünkü
-doğa enerji israfını sevmez. İnsanlar da öyle!
+Oyunun sonucu ``evreler'' Ã¼zerinden iÅŸlenir. Her evrede aktÃ¶rler gÃ¼Ã§leri
+oranÄ±nda diÄŸer aktÃ¶rleri kendi pozisyonlarÄ±na davet ediyorlar, ya da
+etmiyorlar. Bir evrede her aktÃ¶r pek Ã§ok diÄŸer aktÃ¶rden ``benim yanÄ±ma gel''
+isteÄŸi almÄ±ÅŸ olabilir, evre sonunda aktÃ¶r bu tekliflerden (offer) kendisi iÃ§in
+en az deÄŸiÅŸim gerektirecek seÃ§eneÄŸe gidiyor (ilk baÅŸlangÄ±Ã§ noktasÄ±na gÃ¶re, bir
+Ã¶ncekine gÃ¶re deÄŸil). Hoca bunu bu ÅŸekilde seÃ§miÅŸ ve iyi bir seÃ§im bizce Ã§Ã¼nkÃ¼
+doÄŸa enerji israfÄ±nÄ± sevmez. Ä°nsanlar da Ã¶yle!
 
 Ortalamalar
 
-Bir oyunun, herhangi bir evresi için, ağırlıklı ortalama ve ağırlıklı doruğu
-(mode) hesaplanabilir. Ağırlıklı çünkü herkesin pozisyonunun basit ortalaması
-değil, kişilerin ilgi ve gücü ile orantılı bir ortalama. Ağırlıklı ortalama için
-formül
+Bir oyunun, herhangi bir evresi iÃ§in, aÄŸÄ±rlÄ±klÄ± ortalama ve aÄŸÄ±rlÄ±klÄ± doruÄŸu
+(mode) hesaplanabilir. AÄŸÄ±rlÄ±klÄ± Ã§Ã¼nkÃ¼ herkesin pozisyonunun basit ortalamasÄ±
+deÄŸil, kiÅŸilerin ilgi ve gÃ¼cÃ¼ ile orantÄ±lÄ± bir ortalama. AÄŸÄ±rlÄ±klÄ± ortalama iÃ§in
+formÃ¼l
 
 $$ \frac{\sum_{i=1}^{n} c_i s_i x_i}{\sum_{i=1}^{n} c_i s_i} $$
 
-Ağırlıklı doruk için biraz takla lazım, önce tüm veriyi pozisyonlara göre
-sıralarız, herkesin $c_is_i$ çarpımını hesaplayıp normalize ederiz, ve kümülatif
-olarak bu rakamları toplarız. Hangi noktada 0.5'e erişilmiş ise o nokta
-``ağırlıklı orta'' oluyor, ve o noktanın pozisyonu doruk olarak kabul
-ediliyor. Hatırlanabileceği üzere basit doruk hesabı için, yani düz bir liste
-sayı için, o sayılar sıralanıyordu, ve ortadaki sayı mode olarak
-seçiliyordu. Burada aynı kavram sadece $c_i,s_i$ işin içinde.
+AÄŸÄ±rlÄ±klÄ± doruk iÃ§in biraz takla lazÄ±m, Ã¶nce tÃ¼m veriyi pozisyonlara gÃ¶re
+sÄ±ralarÄ±z, herkesin $c_is_i$ Ã§arpÄ±mÄ±nÄ± hesaplayÄ±p normalize ederiz, ve kÃ¼mÃ¼latif
+olarak bu rakamlarÄ± toplarÄ±z. Hangi noktada 0.5'e eriÅŸilmiÅŸ ise o nokta
+``aÄŸÄ±rlÄ±klÄ± orta'' oluyor, ve o noktanÄ±n pozisyonu doruk olarak kabul
+ediliyor. HatÄ±rlanabileceÄŸi Ã¼zere basit doruk hesabÄ± iÃ§in, yani dÃ¼z bir liste
+sayÄ± iÃ§in, o sayÄ±lar sÄ±ralanÄ±yordu, ve ortadaki sayÄ± mode olarak
+seÃ§iliyordu. Burada aynÄ± kavram sadece $c_i,s_i$ iÅŸin iÃ§inde.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scholz
@@ -77,7 +77,7 @@ ortalama 54.3833734112
 mode 50.0
 \end{verbatim}
 
-Her evrede hesaplanan ana formüller şunlar,
+Her evrede hesaplanan ana formÃ¼ller ÅŸunlar,
 
 $$ E(U_{ij}|\textrm{teklif et}) = (1-s_j)U_{si} + s_jP_i^i U_{si} + s_j(1-P_i^i)U_{fi} $$
 
@@ -85,36 +85,36 @@ $$ E(U_{ij}|\textrm{teklif etme}) = QU_{sq} + (1-Q) \big( T U_{bi}) + (1-T)U_{wi
 
 $$ E(U_{ij}) = E(U_{ij}|\textrm{teklif et}) - E(U_{ij}|\textrm{teklif etme}) $$
 
-Teklif etmek bir diğer oyuncuyu pozisyonunu değiştirmesi için iknaya uğraşmak /
-ona ``sormak'' (challange).  Formülerin bileşenlerini altta açacağız. Önce genel
-faydadan başlayalım. Fayda (utility) $U_{ij}^i$ aktör $i$'nin kendi pozisyonuna
-benzerliğe verdiği değerdir, diğer aktör $j$ uzaksa buna atanan fayda az,
-yakınsa çoktur.
+Teklif etmek bir diÄŸer oyuncuyu pozisyonunu deÄŸiÅŸtirmesi iÃ§in iknaya uÄŸraÅŸmak /
+ona ``sormak'' (challange).  FormÃ¼lerin bileÅŸenlerini altta aÃ§acaÄŸÄ±z. Ã–nce genel
+faydadan baÅŸlayalÄ±m. Fayda (utility) $U_{ij}^i$ aktÃ¶r $i$'nin kendi pozisyonuna
+benzerliÄŸe verdiÄŸi deÄŸerdir, diÄŸer aktÃ¶r $j$ uzaksa buna atanan fayda az,
+yakÄ±nsa Ã§oktur.
 
 $$ U_{ij}^i = 1-2 \bigg| \frac{x_i - x_j}{x_{max}-x_{min}}\bigg|   $$
 
-$U_{ii}^i$ doğal olarak 1 değerinde, aktör kendi pozisyonunda en çok
-faydayı görüyor. 
+$U_{ii}^i$ doÄŸal olarak 1 deÄŸerinde, aktÃ¶r kendi pozisyonunda en Ã§ok
+faydayÄ± gÃ¶rÃ¼yor. 
 
-Bir aktör bir diğer aktörü iknaya uğraşabilir. Bu durumda elde edeceği
-fayda -başarılı olursa- aktörün kendi pozisyon faydası ve diğerinin
-arasındaki uzaklığa oranlı görülebilir. Yani bana en uzak pozisiyondaki
-birini ikna etmek bana en çok fayda getirir, daha yakın, daha az. Her
-aktörün içinde olduğu risk $ 0 \le r_i \le 1$ olacak şekilde (ki risk ile
-ne denmek istediğini ileride anlatacağız),
+Bir aktÃ¶r bir diÄŸer aktÃ¶rÃ¼ iknaya uÄŸraÅŸabilir. Bu durumda elde edeceÄŸi
+fayda -baÅŸarÄ±lÄ± olursa- aktÃ¶rÃ¼n kendi pozisyon faydasÄ± ve diÄŸerinin
+arasÄ±ndaki uzaklÄ±ÄŸa oranlÄ± gÃ¶rÃ¼lebilir. Yani bana en uzak pozisiyondaki
+birini ikna etmek bana en Ã§ok fayda getirir, daha yakÄ±n, daha az. Her
+aktÃ¶rÃ¼n iÃ§inde olduÄŸu risk $ 0 \le r_i \le 1$ olacak ÅŸekilde (ki risk ile
+ne denmek istediÄŸini ileride anlatacaÄŸÄ±z),
 
 $$ U_{si}^i = 2 - 4 \bigg[ \frac{2-(U_{ii}^i - U_{ij}^i)}{4}  \bigg]^{r_i}$$
 
-Kaybetme durumunda kaybedilen fayda $U_{fi}^i$ ise üstteki faydalar
-çıkartmalarının ters çevirilmiş hali olarak düşünebilirim, bir anlamda ikna
-edilmiş olma durumu olabilir bu, ikna ettiğimde kazandığıma göre
-edildiğimde kaybederim, ve bu çıkarma işleminin ters çevirilmiş hali gibi
-görülebilir, yani $ U_{ij}^i - U_{ii}^i$, o zaman
+Kaybetme durumunda kaybedilen fayda $U_{fi}^i$ ise Ã¼stteki faydalar
+Ã§Ä±kartmalarÄ±nÄ±n ters Ã§evirilmiÅŸ hali olarak dÃ¼ÅŸÃ¼nebilirim, bir anlamda ikna
+edilmiÅŸ olma durumu olabilir bu, ikna ettiÄŸimde kazandÄ±ÄŸÄ±ma gÃ¶re
+edildiÄŸimde kaybederim, ve bu Ã§Ä±karma iÅŸleminin ters Ã§evirilmiÅŸ hali gibi
+gÃ¶rÃ¼lebilir, yani $ U_{ij}^i - U_{ii}^i$, o zaman
 
 $$ U_{fi}^i = 2 - 4 \bigg[ \frac{2-(U_{ij}^i - U_{ii}^i)}{4}  \bigg]^{r_i}$$
 
-$U_{ij}^i$ formülünü üstteki iki formüle sokarsak, ve $U_{ii}^i=1$ olduğuna
-göre, basitleştirdikten sonra,
+$U_{ij}^i$ formÃ¼lÃ¼nÃ¼ Ã¼stteki iki formÃ¼le sokarsak, ve $U_{ii}^i=1$ olduÄŸuna
+gÃ¶re, basitleÅŸtirdikten sonra,
 
 $$ U_{si}^i = 2 - 4 
 \bigg[ 
@@ -130,16 +130,16 @@ $$
 
 elde ederim.
 
-Yarışma
+YarÄ±ÅŸma
 
-Nihai hesap için aktörler arasındaki muhtemel bir yarışta kim üstte kalır,
-bunu hesaplamamız gerekiyor. Bu ölçütü $v_i^{jk}$ ile gösterebilirim, yani
-aktör $i$ eğer aktörler $j,k$ arasında seçim yapması gerekirse kimi tercih
-eder? Daha doğrusu, $i$'nin oyu (vote) ne olur? Bunun formülü,
+Nihai hesap iÃ§in aktÃ¶rler arasÄ±ndaki muhtemel bir yarÄ±ÅŸta kim Ã¼stte kalÄ±r,
+bunu hesaplamamÄ±z gerekiyor. Bu Ã¶lÃ§Ã¼tÃ¼ $v_i^{jk}$ ile gÃ¶sterebilirim, yani
+aktÃ¶r $i$ eÄŸer aktÃ¶rler $j,k$ arasÄ±nda seÃ§im yapmasÄ± gerekirse kimi tercih
+eder? Daha doÄŸrusu, $i$'nin oyu (vote) ne olur? Bunun formÃ¼lÃ¼,
 
 $$ v_i^{jk} = c_is_i (U_{ij} - U_{ik}) $$
 
-olarak gösterilebilir. 
+olarak gÃ¶sterilebilir. 
 
 \inputminted[fontsize=\footnotesize]{python}{scholz.py}
 
@@ -157,13 +157,13 @@ v
 94.7368421053
 \end{verbatim}
 
-Kabiliyet ve ilgi ile çarpmak mantıklı herhalde, çünkü aktörün oyunu
-hesaplıyoruz, bu oy aktörün gücüne oranlı olmalı. Hesapta $i$ aktörünün $j$'den
-elde edeceği faydayı $j$ faydasından çıkartıyoruz. $j$ solda olduğu için bu
-hesap, artı sayılar bağlamında, $i$'nin $j$'yi tercihi olarak ta görülebilir,
-eğer $j$'ye verilen tüm oyları hesaplamak istersek, o zaman her $i$ için yapılan
-$v_i^{jk}$'leri toplayıp bölümde kullanmalıyız, ve bölümde ise $j$'den gelen
-faydanın daha fazla olduğu oyları kullanmalıyız,
+Kabiliyet ve ilgi ile Ã§arpmak mantÄ±klÄ± herhalde, Ã§Ã¼nkÃ¼ aktÃ¶rÃ¼n oyunu
+hesaplÄ±yoruz, bu oy aktÃ¶rÃ¼n gÃ¼cÃ¼ne oranlÄ± olmalÄ±. Hesapta $i$ aktÃ¶rÃ¼nÃ¼n $j$'den
+elde edeceÄŸi faydayÄ± $j$ faydasÄ±ndan Ã§Ä±kartÄ±yoruz. $j$ solda olduÄŸu iÃ§in bu
+hesap, artÄ± sayÄ±lar baÄŸlamÄ±nda, $i$'nin $j$'yi tercihi olarak ta gÃ¶rÃ¼lebilir,
+eÄŸer $j$'ye verilen tÃ¼m oylarÄ± hesaplamak istersek, o zaman her $i$ iÃ§in yapÄ±lan
+$v_i^{jk}$'leri toplayÄ±p bÃ¶lÃ¼mde kullanmalÄ±yÄ±z, ve bÃ¶lÃ¼mde ise $j$'den gelen
+faydanÄ±n daha fazla olduÄŸu oylarÄ± kullanmalÄ±yÄ±z,
 
 $$
 P^j = 
@@ -171,8 +171,8 @@ P^j =
 \sum_i \big| v_i^{jk} \big|
 $$
 
-İndiste $j$ kullanımı biraz garip oldu, genellikle eşitliğin sol tarafında
-$i$ kullanmaya alıştık, ufak bir indis değişimi yapalım,
+Ä°ndiste $j$ kullanÄ±mÄ± biraz garip oldu, genellikle eÅŸitliÄŸin sol tarafÄ±nda
+$i$ kullanmaya alÄ±ÅŸtÄ±k, ufak bir indis deÄŸiÅŸimi yapalÄ±m,
 
 $$
 P^i = 
@@ -180,25 +180,25 @@ P^i =
 \sum_j \big| v_j^{ik} \big|
 $$
 
-Üstteki hesap ``kim benimle beraber'' hesabı olarak ta görülebilir. Eğer daha
-fazla aktör bu kişiyle beraber ise (bölümdeki kısım), bu durum herhangi bir
-ikili çarpışmada üstte kalınabileceği anlamına gelir. 
+Ãœstteki hesap ``kim benimle beraber'' hesabÄ± olarak ta gÃ¶rÃ¼lebilir. EÄŸer daha
+fazla aktÃ¶r bu kiÅŸiyle beraber ise (bÃ¶lÃ¼mdeki kÄ±sÄ±m), bu durum herhangi bir
+ikili Ã§arpÄ±ÅŸmada Ã¼stte kalÄ±nabileceÄŸi anlamÄ±na gelir. 
 
-Alttaki ``oyun ağacı (game tree)'' şöyle okunabilir, ana beklenti formülleri bu
-ağacın ``düzleştirilmiş'' hali bir bakıma. Her seçenek, seçilebilecek her yol o
-yolun olasılığı ve nihai uç değeri ile çarpılıp toplanıyor.
+Alttaki ``oyun aÄŸacÄ± (game tree)'' ÅŸÃ¶yle okunabilir, ana beklenti formÃ¼lleri bu
+aÄŸacÄ±n ``dÃ¼zleÅŸtirilmiÅŸ'' hali bir bakÄ±ma. Her seÃ§enek, seÃ§ilebilecek her yol o
+yolun olasÄ±lÄ±ÄŸÄ± ve nihai uÃ§ deÄŸeri ile Ã§arpÄ±lÄ±p toplanÄ±yor.
 
 \includegraphics[height=9cm]{gametree.png}
 
-Kodlama açısından bir yaklaşım [10]'da.
+Kodlama aÃ§Ä±sÄ±ndan bir yaklaÅŸÄ±m [10]'da.
 
 \inputminted[fontsize=\footnotesize]{python}{bdm.py}
 
-Bu yaklaşımı örnek olarak 1998'de Britanya'nın Avro para birliğine girip
-girmeyeceği kararı üzerinde uygulayalım [6]. Alttaki değerler İşçi Partisinin
-iktidarda olduğu senaryosuna göre seçilmiş, Muhafazakar iktidarı seçeneğinde
-sadece aktörlerin gücü / etkileri değişiyor, pozisyonlar her iki durumda da
-aynı. Skalada güç 0-1 arası, pozisyon 0-10.
+Bu yaklaÅŸÄ±mÄ± Ã¶rnek olarak 1998'de Britanya'nÄ±n Avro para birliÄŸine girip
+girmeyeceÄŸi kararÄ± Ã¼zerinde uygulayalÄ±m [6]. Alttaki deÄŸerler Ä°ÅŸÃ§i Partisinin
+iktidarda olduÄŸu senaryosuna gÃ¶re seÃ§ilmiÅŸ, Muhafazakar iktidarÄ± seÃ§eneÄŸinde
+sadece aktÃ¶rlerin gÃ¼cÃ¼ / etkileri deÄŸiÅŸiyor, pozisyonlar her iki durumda da
+aynÄ±. Skalada gÃ¼Ã§ 0-1 arasÄ±, pozisyon 0-10.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -241,8 +241,8 @@ Direktorler Enstitusu tarafina geciyor Isci Partisi (Avrocu)
 5.0
 \end{verbatim}
 
-5 değeri çıktı, ki bu [6]'daki sonuca yakın. Eğer Muhafazakar Parti iktidarına
-göre işletirsek,
+5 deÄŸeri Ã§Ä±ktÄ±, ki bu [6]'daki sonuca yakÄ±n. EÄŸer Muhafazakar Parti iktidarÄ±na
+gÃ¶re iÅŸletirsek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import bdm
@@ -271,17 +271,17 @@ Muhafazakar AB Taraftari tarafina geciyor Muhafazakar AB Karsiti
 1.0
 \end{verbatim}
 
-Sonuç 1, yani Avro'ya hiç destek yok. Bu pek beklenmez bir durum değil, çünkü
-İngiltere'de Muhafazakarlar AB'ye zaten soğuk dururlar. Tarihten biliyoruz ki
-Britanya Avro'ya girmedi, hatta bilindiği gibi 2016'da referandumda AB'den çıkma
-kararı aldı!
+SonuÃ§ 1, yani Avro'ya hiÃ§ destek yok. Bu pek beklenmez bir durum deÄŸil, Ã§Ã¼nkÃ¼
+Ä°ngiltere'de Muhafazakarlar AB'ye zaten soÄŸuk dururlar. Tarihten biliyoruz ki
+Britanya Avro'ya girmedi, hatta bilindiÄŸi gibi 2016'da referandumda AB'den Ã§Ä±kma
+kararÄ± aldÄ±!
 
-Ödev: Britanya'nın AB'den çıkışını (Brexit) tahmini.  Mesquita'ya göre metotu
-için gereken ham veriyi yeterince haberleri izleyen herhangi biri
-yaratabilir. Aktörler herhalde üstteki örneğe yakın olur, halkın seçiminin bu
-aktörlerin seçimini yansıttığı varsayılabilir. Sonuç ne olur?
+Ã–dev: Britanya'nÄ±n AB'den Ã§Ä±kÄ±ÅŸÄ±nÄ± (Brexit) tahmini.  Mesquita'ya gÃ¶re metotu
+iÃ§in gereken ham veriyi yeterince haberleri izleyen herhangi biri
+yaratabilir. AktÃ¶rler herhalde Ã¼stteki Ã¶rneÄŸe yakÄ±n olur, halkÄ±n seÃ§iminin bu
+aktÃ¶rlerin seÃ§imini yansÄ±ttÄ±ÄŸÄ± varsayÄ±labilir. SonuÃ§ ne olur?
 
-İlk baştaki emisyon örneği,
+Ä°lk baÅŸtaki emisyon Ã¶rneÄŸi,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import bdm
@@ -333,13 +333,13 @@ Ireland tarafina geciyor Netherlands
 
 Yeni Model
 
-BDM'in yeni modeli yeni parametreler kullanıyor, örnek \verb!mugabe-full.csv!
-içinde bulunabilir. Uzun yıllar başta kalan bir diktatör Mugabe'nin nasil o
-noktada kalabildiğini destekcileri uzerinden görmek mümkün, bir türlü gitmek
-bilmeyen liderlerin arkasındaki dinamikleri anlamak için bilgilendirici
+BDM'in yeni modeli yeni parametreler kullanÄ±yor, Ã¶rnek \verb!mugabe-full.csv!
+iÃ§inde bulunabilir. Uzun yÄ±llar baÅŸta kalan bir diktatÃ¶r Mugabe'nin nasil o
+noktada kalabildiÄŸini destekcileri uzerinden gÃ¶rmek mÃ¼mkÃ¼n, bir tÃ¼rlÃ¼ gitmek
+bilmeyen liderlerin arkasÄ±ndaki dinamikleri anlamak iÃ§in bilgilendirici
 herhalde!
 
-Hocanın yeni modeli [4,9]'ta anlatılıyor fakat, kodlamak için hala yeterli bilgi
+HocanÄ±n yeni modeli [4,9]'ta anlatÄ±lÄ±yor fakat, kodlamak iÃ§in hala yeterli bilgi
 yok.
 
 Kaynaklar 

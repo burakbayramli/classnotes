@@ -2,43 +2,43 @@
 \begin{document}
 Obje Takibi
 
-Video görüntülerinde obje takibi için filtreleme kullanmak mümkün, bu
-teknik ile iki boyutlu yansımadan üç boyutlu konum bilgisini takip
-edebiliriz. Kalman Filtreleri (KF) ile görüntüde ilgilendiğimiz objeyi her
-seferinde iki boyutta ``bulmalıyız'', yani bu objenin örüntüsünün ne
-olduğunu önceden biliyor olmamız gerekir, ve onu sonraki resimlerde takip
-etmemiz gerekir. Bulduğumuz, iki boyutlu kordinat değerleridir, yani
-ölçümsel büyüklüklerdir, ardından KF'in en son konumuna göre ürettiği
-tahmin ile aradaki fark KF'i düzeltmek için kullanılır.
+Video gÃ¶rÃ¼ntÃ¼lerinde obje takibi iÃ§in filtreleme kullanmak mÃ¼mkÃ¼n, bu
+teknik ile iki boyutlu yansÄ±madan Ã¼Ã§ boyutlu konum bilgisini takip
+edebiliriz. Kalman Filtreleri (KF) ile gÃ¶rÃ¼ntÃ¼de ilgilendiÄŸimiz objeyi her
+seferinde iki boyutta ``bulmalÄ±yÄ±z'', yani bu objenin Ã¶rÃ¼ntÃ¼sÃ¼nÃ¼n ne
+olduÄŸunu Ã¶nceden biliyor olmamÄ±z gerekir, ve onu sonraki resimlerde takip
+etmemiz gerekir. BulduÄŸumuz, iki boyutlu kordinat deÄŸerleridir, yani
+Ã¶lÃ§Ã¼msel bÃ¼yÃ¼klÃ¼klerdir, ardÄ±ndan KF'in en son konumuna gÃ¶re Ã¼rettiÄŸi
+tahmin ile aradaki fark KF'i dÃ¼zeltmek iÃ§in kullanÄ±lÄ±r.
 
-Parçacık filtreleri (PF) ile yine konum ve ölçüm fonksiyonu ikilisi var,
-fakat ölçüm ile konumdan üretilen tahmin arasındaki uyumu bir olasılık,
-olurluk (likelihood) olarak belirtmemiz gerekiyor, ki böylece PF tahminde
-başarılı olan parçacıklara daha fazla önem verebilsin, ve hipotezler o
-yönde devam etsin. 
+ParÃ§acÄ±k filtreleri (PF) ile yine konum ve Ã¶lÃ§Ã¼m fonksiyonu ikilisi var,
+fakat Ã¶lÃ§Ã¼m ile konumdan Ã¼retilen tahmin arasÄ±ndaki uyumu bir olasÄ±lÄ±k,
+olurluk (likelihood) olarak belirtmemiz gerekiyor, ki bÃ¶ylece PF tahminde
+baÅŸarÄ±lÄ± olan parÃ§acÄ±klara daha fazla Ã¶nem verebilsin, ve hipotezler o
+yÃ¶nde devam etsin. 
 
-Alttaki örnekte OpenCV kütüphanesinden elde ettiğimiz 2 boyutlu değerleri
-ölçüm $y_t$ için kullanacağız. Değerler OpenCV'nin bir satranç tahtası
-şeklinin köşe noktalarını \verb!cvFindChessboardCorners! ile buluyor (ve
-onları \verb!cvDrawChessboardCorners! ile onları resimde gösteriyoruz).
+Alttaki Ã¶rnekte OpenCV kÃ¼tÃ¼phanesinden elde ettiÄŸimiz 2 boyutlu deÄŸerleri
+Ã¶lÃ§Ã¼m $y_t$ iÃ§in kullanacaÄŸÄ±z. DeÄŸerler OpenCV'nin bir satranÃ§ tahtasÄ±
+ÅŸeklinin kÃ¶ÅŸe noktalarÄ±nÄ± \verb!cvFindChessboardCorners! ile buluyor (ve
+onlarÄ± \verb!cvDrawChessboardCorners! ile onlarÄ± resimde gÃ¶steriyoruz).
 
-Elimizdeki ``gürültülü'' ölçümler iki boyutlu noktasal değerler. Gürültülü çünkü
-kamera bize bu imajları aktarırken hata eklemiş olabilir, OpenCV fonksiyonu
-hesabı yaparken hata eklemiş olabilir, bir sürü olasılık var.
+Elimizdeki ``gÃ¼rÃ¼ltÃ¼lÃ¼'' Ã¶lÃ§Ã¼mler iki boyutlu noktasal deÄŸerler. GÃ¼rÃ¼ltÃ¼lÃ¼ Ã§Ã¼nkÃ¼
+kamera bize bu imajlarÄ± aktarÄ±rken hata eklemiÅŸ olabilir, OpenCV fonksiyonu
+hesabÄ± yaparken hata eklemiÅŸ olabilir, bir sÃ¼rÃ¼ olasÄ±lÄ±k var.
 
-Bu örnekte, ayrıca, ilk kez KF ortamında boyut değişikliği olasılığını net bir
-şekilde görebiliyoruz. Gizli konum bilgisi $x_t$ 3 boyutlu bir nokta, ama
-elimizdeki ölçüm 2 boyutlu bir ``yansıma''. Yansıma sırasında kaçınılmaz olarak
-değer kaybediliyor, bir boyutun bilgisi ortadan yokoluyor. Ama tüm bu
-bilinmezlere rağmen Kalman filtresinin bizim için gizli bilgiyi hesaplamasını
+Bu Ã¶rnekte, ayrÄ±ca, ilk kez KF ortamÄ±nda boyut deÄŸiÅŸikliÄŸi olasÄ±lÄ±ÄŸÄ±nÄ± net bir
+ÅŸekilde gÃ¶rebiliyoruz. Gizli konum bilgisi $x_t$ 3 boyutlu bir nokta, ama
+elimizdeki Ã¶lÃ§Ã¼m 2 boyutlu bir ``yansÄ±ma''. YansÄ±ma sÄ±rasÄ±nda kaÃ§Ä±nÄ±lmaz olarak
+deÄŸer kaybediliyor, bir boyutun bilgisi ortadan yokoluyor. Ama tÃ¼m bu
+bilinmezlere raÄŸmen Kalman filtresinin bizim iÃ§in gizli bilgiyi hesaplamasÄ±nÄ±
 istiyoruz.
 
-Bu problemde $\Phi$ matrisi ne olacaktır? Obje takibi konularında $\Phi$'nin ne
-olduğunu hayal etmek daha kolay, $\Phi$ matrisi iki zaman dilimi arasındaki
-``hareketi'' temsil edecek. Bu problemdeki ek bir kolaylık bu hareketi önceden
-bildiğimiz, ve hareketin tek yönde olduğu. Yani resimde benim tuttuğum kartonu
-ne kadar hızla hareket ettirdiğimi ben önceden probleme bildiriyorum. Yer
-değişikliğini $d$ olarak tanımladım, ve $\Phi$ şöyle oldu:
+Bu problemde $\Phi$ matrisi ne olacaktÄ±r? Obje takibi konularÄ±nda $\Phi$'nin ne
+olduÄŸunu hayal etmek daha kolay, $\Phi$ matrisi iki zaman dilimi arasÄ±ndaki
+``hareketi'' temsil edecek. Bu problemdeki ek bir kolaylÄ±k bu hareketi Ã¶nceden
+bildiÄŸimiz, ve hareketin tek yÃ¶nde olduÄŸu. Yani resimde benim tuttuÄŸum kartonu
+ne kadar hÄ±zla hareket ettirdiÄŸimi ben Ã¶nceden probleme bildiriyorum. Yer
+deÄŸiÅŸikliÄŸini $d$ olarak tanÄ±mladÄ±m, ve $\Phi$ ÅŸÃ¶yle oldu:
 
 $$ 
 \Phi = 
@@ -50,109 +50,109 @@ $$
 \end{array}\right]
 $$
 
-Dikkat edersek $\Phi$ 4x4 boyutunda, 3x3 değil. 3 boyutlu kordinatları temsil
-etmek için homojen kordinat sistemini kullandığımız için böyle oldu, o sebeple
-zaten $x_t$ de 4x1 oldu, ona uymak için $\Phi$'nin değişmesi gerekiyordu. $\Phi
-x_t$ çarpımının hakikaten kartonu hareket ettirdiğini göstermek için bu çarpımı
-bir örnek üzerinde yapalım: Diyelim ki $x_t =
+Dikkat edersek $\Phi$ 4x4 boyutunda, 3x3 deÄŸil. 3 boyutlu kordinatlarÄ± temsil
+etmek iÃ§in homojen kordinat sistemini kullandÄ±ÄŸÄ±mÄ±z iÃ§in bÃ¶yle oldu, o sebeple
+zaten $x_t$ de 4x1 oldu, ona uymak iÃ§in $\Phi$'nin deÄŸiÅŸmesi gerekiyordu. $\Phi
+x_t$ Ã§arpÄ±mÄ±nÄ±n hakikaten kartonu hareket ettirdiÄŸini gÃ¶stermek iÃ§in bu Ã§arpÄ±mÄ±
+bir Ã¶rnek Ã¼zerinde yapalÄ±m: Diyelim ki $x_t =
 \left[\begin{array}{cccc}a_1&a_2&a_3&a_4\end{array}\right]$ o zaman $\Phi x_t$
-ya da $x_{t+1}$ şu hale gelir:
+ya da $x_{t+1}$ ÅŸu hale gelir:
 $\left[\begin{array}{cccc}a_1&a_2&a_3+d&a_4\end{array}\right]$.
 
 
-Bakıyoruz, hakikaten de d kadarlık bir yer değişimi z kordinatı, yani
-derinlik üzerinde eklenmiş. Test amaçlarımız için d = -0.5 aldık, yani
-satranç tahta kartonunun her zaman diliminde kameraya doğru 0.5 cm
-ilerlediğini belirttik. Tabii bu da kabaca bir tahmindi (her ne kadar
-hareketi yaptıran ben olsam bile!), ama filrelemenin gücünü burada
-görüyoruz. Benim tahminimde ``gürültü'' yani ``hata payı'' var, ölçümde
-gürültü var, tüm bunlar üst üste konsa bile filtre yine de gizli konumu
+BakÄ±yoruz, hakikaten de d kadarlÄ±k bir yer deÄŸiÅŸimi z kordinatÄ±, yani
+derinlik Ã¼zerinde eklenmiÅŸ. Test amaÃ§larÄ±mÄ±z iÃ§in d = -0.5 aldÄ±k, yani
+satranÃ§ tahta kartonunun her zaman diliminde kameraya doÄŸru 0.5 cm
+ilerlediÄŸini belirttik. Tabii bu da kabaca bir tahmindi (her ne kadar
+hareketi yaptÄ±ran ben olsam bile!), ama filrelemenin gÃ¼cÃ¼nÃ¼ burada
+gÃ¶rÃ¼yoruz. Benim tahminimde ``gÃ¼rÃ¼ltÃ¼'' yani ``hata payÄ±'' var, Ã¶lÃ§Ã¼mde
+gÃ¼rÃ¼ltÃ¼ var, tÃ¼m bunlar Ã¼st Ã¼ste konsa bile filtre yine de gizli konumu
 bulacak.
 
-Ölçümsel dönüşümü temsil eden H'e ben onun temeli olan yansıtma
-(projection) kelimesinden gelen P matrisinden bahsedelim. Yansıma matrisi
-görüntü (vision) literatüründe iğne delik kamerası (pinhole camera)
+Ã–lÃ§Ã¼msel dÃ¶nÃ¼ÅŸÃ¼mÃ¼ temsil eden H'e ben onun temeli olan yansÄ±tma
+(projection) kelimesinden gelen P matrisinden bahsedelim. YansÄ±ma matrisi
+gÃ¶rÃ¼ntÃ¼ (vision) literatÃ¼rÃ¼nde iÄŸne delik kamerasÄ± (pinhole camera)
 modelinden ileri gelen bir matristir ve bu matrisi hesaplamak ayarlama /
-kalibrasyon (calibration) denen apayrı bir işlemin parçasıdır. OpenCV
-içinde kalibrasyon için fonksiyonlar var, biz de bunları denedik,
-kalibrasyon için kullandığımız resimlerle alakalı olmalı, elde edilen
-sonuçlardan memnun kalmadık. Alternatif olarak şunu yaptık; resimde görülen
-yeşil yüzey bizim programın oluşturduğu hayali bir yüzey. Filtrenin o anki
-tahminini P üzerinden görüntüye yansıtarak bu yüzeyi oluşturduk, böylece
-deneme / yanılma yöntemiyle pek çok P değerini deneyerek, yüzeyin resimde
-görülen masanın sonunda çıkacak şekilde olmasını sağladık. Yansıtma için
-kullanılan $K$ matrisi, yansıtma metotu ve başlangıç imajı altta:
+kalibrasyon (calibration) denen apayrÄ± bir iÅŸlemin parÃ§asÄ±dÄ±r. OpenCV
+iÃ§inde kalibrasyon iÃ§in fonksiyonlar var, biz de bunlarÄ± denedik,
+kalibrasyon iÃ§in kullandÄ±ÄŸÄ±mÄ±z resimlerle alakalÄ± olmalÄ±, elde edilen
+sonuÃ§lardan memnun kalmadÄ±k. Alternatif olarak ÅŸunu yaptÄ±k; resimde gÃ¶rÃ¼len
+yeÅŸil yÃ¼zey bizim programÄ±n oluÅŸturduÄŸu hayali bir yÃ¼zey. Filtrenin o anki
+tahminini P Ã¼zerinden gÃ¶rÃ¼ntÃ¼ye yansÄ±tarak bu yÃ¼zeyi oluÅŸturduk, bÃ¶ylece
+deneme / yanÄ±lma yÃ¶ntemiyle pek Ã§ok P deÄŸerini deneyerek, yÃ¼zeyin resimde
+gÃ¶rÃ¼len masanÄ±n sonunda Ã§Ä±kacak ÅŸekilde olmasÄ±nÄ± saÄŸladÄ±k. YansÄ±tma iÃ§in
+kullanÄ±lan $K$ matrisi, yansÄ±tma metotu ve baÅŸlangÄ±Ã§ imajÄ± altta:
 
 \includegraphics[height=6cm]{tser_kf_02.png}
 
 \inputminted[fontsize=\footnotesize]{python}{util.py}
 
-O noktaya gelince istediğimiz P değerini bulmuş oluyorduk. Yansıtma
-matrisleri 3x3 olur, KF buna bir dördüncü [0 0 0] satırı ekleyerek onu 4x3
+O noktaya gelince istediÄŸimiz P deÄŸerini bulmuÅŸ oluyorduk. YansÄ±tma
+matrisleri 3x3 olur, KF buna bir dÃ¶rdÃ¼ncÃ¼ [0 0 0] satÄ±rÄ± ekleyerek onu 4x3
 H haline getiriyor.
 
-KF'in başlangıç noktası olarak P'yi bulmak için kullandığımız masa sonunu
-kullandık. Kararsızlık ölçütü Q için, ki bu değişken bir Gaussian
-kovaryansıdır, $Q = I \cdot 150 cm$ değerini kullandık, yani oldukça büyük bir
-kararsızlık değeri kullandık. Sebep başlangıç değeri olan masa ortasını
-seçtik, ve takip edeceğimiz satranç tahtasının nerede olduğunu bilmiyoruz,
-``emin değiliz''.  Bu kararsızlığı sayısal olarak programa bildirmiş olduk.
+KF'in baÅŸlangÄ±Ã§ noktasÄ± olarak P'yi bulmak iÃ§in kullandÄ±ÄŸÄ±mÄ±z masa sonunu
+kullandÄ±k. KararsÄ±zlÄ±k Ã¶lÃ§Ã¼tÃ¼ Q iÃ§in, ki bu deÄŸiÅŸken bir Gaussian
+kovaryansÄ±dÄ±r, $Q = I \cdot 150 cm$ deÄŸerini kullandÄ±k, yani oldukÃ§a bÃ¼yÃ¼k bir
+kararsÄ±zlÄ±k deÄŸeri kullandÄ±k. Sebep baÅŸlangÄ±Ã§ deÄŸeri olan masa ortasÄ±nÄ±
+seÃ§tik, ve takip edeceÄŸimiz satranÃ§ tahtasÄ±nÄ±n nerede olduÄŸunu bilmiyoruz,
+``emin deÄŸiliz''.  Bu kararsÄ±zlÄ±ÄŸÄ± sayÄ±sal olarak programa bildirmiÅŸ olduk.
 
 \inputminted[fontsize=\footnotesize]{python}{track-chess-kf.py}
 
-Kalman filtreleri (KF), eğer kararsızlık Gaussian olarak gösterilebiliyorsa çok
-faydalı, ve hızlı bir yöntem. Bir KF bellekte çok az yer tutar, 3 boyutlu bir
-Gaussian için 3x1 boyutunda bir ortalama vektörü, ve 3x3 boyutunda bir kovaryans
-matrisi yeterlidir, yani 3 + 9 = 12 sayı.
+Kalman filtreleri (KF), eÄŸer kararsÄ±zlÄ±k Gaussian olarak gÃ¶sterilebiliyorsa Ã§ok
+faydalÄ±, ve hÄ±zlÄ± bir yÃ¶ntem. Bir KF bellekte Ã§ok az yer tutar, 3 boyutlu bir
+Gaussian iÃ§in 3x1 boyutunda bir ortalama vektÃ¶rÃ¼, ve 3x3 boyutunda bir kovaryans
+matrisi yeterlidir, yani 3 + 9 = 12 sayÄ±.
 
-Parçacık filtreleri (PF) bir dağılımı ayrıksal olarak temsil
-edebilirler. Diyelim ki tek boyutlu bir dağılımı 100 öğe içeren bir dizin ile
-temsil edebiliriz, o zaman dağılımın değerlerini 100 tane noktada taşımamız
-gerekir.  Bunun faydaları her türlü dağılım şeklini temsil edebilmemiz. Gaussian
-ile sadece tek bir tepe noktası olabilir, fakat ayrıksal temsil ile 2, 3,
-istediğimiz kadar tepe noktası olan bir dağılımı temsil edebiliriz. Bu sayede
-birden fazla gayrı lineer hipotezi aynı anda işletebiliriz. KF ile tepe noktası
-en iyi tahminimizdir (mesela.. satranç kartonu masa ortasında), PF ile birkaç
-tahmini aynı anda hesaplatmak mümkün olabilir.
+ParÃ§acÄ±k filtreleri (PF) bir daÄŸÄ±lÄ±mÄ± ayrÄ±ksal olarak temsil
+edebilirler. Diyelim ki tek boyutlu bir daÄŸÄ±lÄ±mÄ± 100 Ã¶ÄŸe iÃ§eren bir dizin ile
+temsil edebiliriz, o zaman daÄŸÄ±lÄ±mÄ±n deÄŸerlerini 100 tane noktada taÅŸÄ±mamÄ±z
+gerekir.  Bunun faydalarÄ± her tÃ¼rlÃ¼ daÄŸÄ±lÄ±m ÅŸeklini temsil edebilmemiz. Gaussian
+ile sadece tek bir tepe noktasÄ± olabilir, fakat ayrÄ±ksal temsil ile 2, 3,
+istediÄŸimiz kadar tepe noktasÄ± olan bir daÄŸÄ±lÄ±mÄ± temsil edebiliriz. Bu sayede
+birden fazla gayrÄ± lineer hipotezi aynÄ± anda iÅŸletebiliriz. KF ile tepe noktasÄ±
+en iyi tahminimizdir (mesela.. satranÃ§ kartonu masa ortasÄ±nda), PF ile birkaÃ§
+tahmini aynÄ± anda hesaplatmak mÃ¼mkÃ¼n olabilir.
 
-PF kodlaması $x_t$ için iki tane veri yapısı gerektirir. Biri dağılım
-değerlerini temsil eden parçacıklardır, diğeri dağılımdaki önemini temsil eden
-ağırlıklardır.  Filtreleme mekaniği KF'e benzer, önce bir geçiş uygulanır, ki bu
-geçiş kararsızlığı arttıracaktır, ardından gözlem verisi ve bir hata fonksiyonu
-üzerinden dağılım güncellenir. Bu işlem sırasında hatası yüksek olan parçacıklar
-cezalandırılır, onların ağırlığı azalır, ötekilerinki yükselir. Her parçacık
-için hata fonksiyonu şudur:
+PF kodlamasÄ± $x_t$ iÃ§in iki tane veri yapÄ±sÄ± gerektirir. Biri daÄŸÄ±lÄ±m
+deÄŸerlerini temsil eden parÃ§acÄ±klardÄ±r, diÄŸeri daÄŸÄ±lÄ±mdaki Ã¶nemini temsil eden
+aÄŸÄ±rlÄ±klardÄ±r.  Filtreleme mekaniÄŸi KF'e benzer, Ã¶nce bir geÃ§iÅŸ uygulanÄ±r, ki bu
+geÃ§iÅŸ kararsÄ±zlÄ±ÄŸÄ± arttÄ±racaktÄ±r, ardÄ±ndan gÃ¶zlem verisi ve bir hata fonksiyonu
+Ã¼zerinden daÄŸÄ±lÄ±m gÃ¼ncellenir. Bu iÅŸlem sÄ±rasÄ±nda hatasÄ± yÃ¼ksek olan parÃ§acÄ±klar
+cezalandÄ±rÄ±lÄ±r, onlarÄ±n aÄŸÄ±rlÄ±ÄŸÄ± azalÄ±r, Ã¶tekilerinki yÃ¼kselir. Her parÃ§acÄ±k
+iÃ§in hata fonksiyonu ÅŸudur:
 
 $$
 w^{[i]} = \frac{1}{1 + (y^{[i]} - p^{[i]})^2  )}
 $$
 
-$y^{[i]}$ gözlem değeri, $p^{[i]}$ geçiş uygulandıktan sonra elimizdeki
-tahminimizdir, ki bu KF dünyasındaki $\Phi x_t + Q$'nun karşılığıdır. PF için
-hareket geçişi şöyle hesaplanır: Bir birörnek (uniform) dağılımdan örnekleme
-yapılır, ve bu örneklenen değerler $x$'e eklenir. Örnekleme için z-kordinatı
-için $Unif (-0.1, -1)$'i, x kordinatı için $Unif (-40, 40)$'i kullandık. Yani
-ileri doğru 0.1 ve 1 santimetre arasında bir hareket ekliyoruz, ve sağa ve sola
-dönük olarak 80 santimetrelik bir kararsızlığı hesaplara ekliyoruz.
+$y^{[i]}$ gÃ¶zlem deÄŸeri, $p^{[i]}$ geÃ§iÅŸ uygulandÄ±ktan sonra elimizdeki
+tahminimizdir, ki bu KF dÃ¼nyasÄ±ndaki $\Phi x_t + Q$'nun karÅŸÄ±lÄ±ÄŸÄ±dÄ±r. PF iÃ§in
+hareket geÃ§iÅŸi ÅŸÃ¶yle hesaplanÄ±r: Bir birÃ¶rnek (uniform) daÄŸÄ±lÄ±mdan Ã¶rnekleme
+yapÄ±lÄ±r, ve bu Ã¶rneklenen deÄŸerler $x$'e eklenir. Ã–rnekleme iÃ§in z-kordinatÄ±
+iÃ§in $Unif (-0.1, -1)$'i, x kordinatÄ± iÃ§in $Unif (-40, 40)$'i kullandÄ±k. Yani
+ileri doÄŸru 0.1 ve 1 santimetre arasÄ±nda bir hareket ekliyoruz, ve saÄŸa ve sola
+dÃ¶nÃ¼k olarak 80 santimetrelik bir kararsÄ±zlÄ±ÄŸÄ± hesaplara ekliyoruz.
 
-Üstteki formülde $(y^{[i]} - p^{[i]})^2$ e niye 1 değeri eklediğimiz açıktır
-herhalde, bu sayede hata fonksiyonunun olasılık değerlerini andıran bir sonuç
-döndürmesini istiyoruz. Çok ufak hatalar için $1 + hata$ bölünendeki 1'i
-bölecek, ve 1'e yakın bir değer geri getirecek. İstediğimiz de bu zaten, küçük
-hataların daha büyük ağırlığa, büyük hataların ise tam tersine sebep olmaları.
+Ãœstteki formÃ¼lde $(y^{[i]} - p^{[i]})^2$ e niye 1 deÄŸeri eklediÄŸimiz aÃ§Ä±ktÄ±r
+herhalde, bu sayede hata fonksiyonunun olasÄ±lÄ±k deÄŸerlerini andÄ±ran bir sonuÃ§
+dÃ¶ndÃ¼rmesini istiyoruz. Ã‡ok ufak hatalar iÃ§in $1 + hata$ bÃ¶lÃ¼nendeki 1'i
+bÃ¶lecek, ve 1'e yakÄ±n bir deÄŸer geri getirecek. Ä°stediÄŸimiz de bu zaten, kÃ¼Ã§Ã¼k
+hatalarÄ±n daha bÃ¼yÃ¼k aÄŸÄ±rlÄ±ÄŸa, bÃ¼yÃ¼k hatalarÄ±n ise tam tersine sebep olmalarÄ±.
 
-Tekrar örnekleme (resampling) sürecinde parçacıklar tekrar düzenlenerek ağırlığı
-çok olan parçacıkların ağırlığı az olanlara göre daha fazla tekrarlanmasını
-istiyoruz. Dikkat: tekrar örnekleme süreci yeni parçacık değerleri yaratmıyor,
-sadece mevcut olanları tekrarlıyor ya da onları atlıyor.
+Tekrar Ã¶rnekleme (resampling) sÃ¼recinde parÃ§acÄ±klar tekrar dÃ¼zenlenerek aÄŸÄ±rlÄ±ÄŸÄ±
+Ã§ok olan parÃ§acÄ±klarÄ±n aÄŸÄ±rlÄ±ÄŸÄ± az olanlara gÃ¶re daha fazla tekrarlanmasÄ±nÄ±
+istiyoruz. Dikkat: tekrar Ã¶rnekleme sÃ¼reci yeni parÃ§acÄ±k deÄŸerleri yaratmÄ±yor,
+sadece mevcut olanlarÄ± tekrarlÄ±yor ya da onlarÄ± atlÄ±yor.
 
 \inputminted[fontsize=\footnotesize]{python}{track-chess-pf.py}
 
 Kaynaklar
 
-[1] Bayramlı, Sample Video, \url{https://www.dropbox.com/s/bytm6o34rdxraru/chessb-left.avi?dl=1}
+[1] BayramlÄ±, Sample Video, \url{https://www.dropbox.com/s/bytm6o34rdxraru/chessb-left.avi?dl=1}
 
-[2] Bayramlı, Sample Video, \url{https://www.dropbox.com/s/cmoq0y1rm9g8plb/chessb-right.avi?dl=1}
+[2] BayramlÄ±, Sample Video, \url{https://www.dropbox.com/s/cmoq0y1rm9g8plb/chessb-right.avi?dl=1}
 
 \end{document}
 

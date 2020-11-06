@@ -2,122 +2,122 @@
 \begin{document}
 Naive Bayes
 
-Reel sayılar arasında bağlantı kurmak için istatistikte regresyon
-kullanılır. Eğer reel değerleri, (mesela) iki kategorik grup arasında seçmek
-için kullanmak istenirse, bunun için lojistik regresyon gibi teknikler de
-vardır.
+Reel sayÄ±lar arasÄ±nda baÄŸlantÄ± kurmak iÃ§in istatistikte regresyon
+kullanÄ±lÄ±r. EÄŸer reel deÄŸerleri, (mesela) iki kategorik grup arasÄ±nda seÃ§mek
+iÃ§in kullanmak istenirse, bunun iÃ§in lojistik regresyon gibi teknikler de
+vardÄ±r.
 
-Fakat kategoriler / gruplar ile başka kategorik gruplar arasında
-bağlantılar kurulmak istenirse, standart istatistik yöntemleri faydalı
-olamıyor. Bu gibi ihtiyaçlar için yapay öğrenim (machine learning)
-dünyasından Naive Bayes gibi tekniklere bakmamız lazım.
+Fakat kategoriler / gruplar ile baÅŸka kategorik gruplar arasÄ±nda
+baÄŸlantÄ±lar kurulmak istenirse, standart istatistik yÃ¶ntemleri faydalÄ±
+olamÄ±yor. Bu gibi ihtiyaÃ§lar iÃ§in yapay Ã¶ÄŸrenim (machine learning)
+dÃ¼nyasÄ±ndan Naive Bayes gibi tekniklere bakmamÄ±z lazÄ±m.
 
-Not: Daha ilerlemeden belirtelim, bu tekniğin ismi Naive Bayes ama bu tanım
-tam doğru değil, çünkü NB Olasılık Teorisi'nden bilinen Bayes Teorisini
-kullanmıyor.
+Not: Daha ilerlemeden belirtelim, bu tekniÄŸin ismi Naive Bayes ama bu tanÄ±m
+tam doÄŸru deÄŸil, Ã§Ã¼nkÃ¼ NB OlasÄ±lÄ±k Teorisi'nden bilinen Bayes Teorisini
+kullanmÄ±yor.
 
-Öncelikle kategorik değerler ile ne demek istediğimizi belirtelim. Reel
-sayılar $0.3423, 2.4334$ gibi değerlerdir, kategorik değerler ile ise
-mesela bir belge içinde 'a','x' gibi harflerin mevcut olmasıdır. Ya da, bir
-evin 'beyaz', 'gri' renkli olması.. Burada öyle kategorilerden bahsediyoruz
-ki istesek te onları sayısal bir değere çeviremiyoruz; kıyasla mesela bir
-günün 'az sıcak', 'orta', 'çok sıcak' olduğu verisini kategorik bile olsa
-regresyon amacıyla sayıya çevirip kullanabilirdik. Az sıcak = 0, orta = 1,
-çok sıcak = 2 değerlerini kullanabilirdik, regresyon hala anlamlı olurdu
-(çünkü arka planda bu kategoriler aslında sayısal sıcaklık değerlerine
-tekabül ediyor olurlardı). Fakat 'beyaz', 'gri' değerlere sayı atamanın
-regresyon açısından bir anlamı olmazdı, hatta bunu yapmak yanlış
-olurdu. Eğer elimizde fazla sayıda 'gri' ev verisi olsa, bu durum regresyon
-sırasında beyaz evlerin beyazlığını mı azaltacaktır?
+Ã–ncelikle kategorik deÄŸerler ile ne demek istediÄŸimizi belirtelim. Reel
+sayÄ±lar $0.3423, 2.4334$ gibi deÄŸerlerdir, kategorik deÄŸerler ile ise
+mesela bir belge iÃ§inde 'a','x' gibi harflerin mevcut olmasÄ±dÄ±r. Ya da, bir
+evin 'beyaz', 'gri' renkli olmasÄ±.. Burada Ã¶yle kategorilerden bahsediyoruz
+ki istesek te onlarÄ± sayÄ±sal bir deÄŸere Ã§eviremiyoruz; kÄ±yasla mesela bir
+gÃ¼nÃ¼n 'az sÄ±cak', 'orta', 'Ã§ok sÄ±cak' olduÄŸu verisini kategorik bile olsa
+regresyon amacÄ±yla sayÄ±ya Ã§evirip kullanabilirdik. Az sÄ±cak = 0, orta = 1,
+Ã§ok sÄ±cak = 2 deÄŸerlerini kullanabilirdik, regresyon hala anlamlÄ± olurdu
+(Ã§Ã¼nkÃ¼ arka planda bu kategoriler aslÄ±nda sayÄ±sal sÄ±caklÄ±k deÄŸerlerine
+tekabÃ¼l ediyor olurlardÄ±). Fakat 'beyaz', 'gri' deÄŸerlere sayÄ± atamanÄ±n
+regresyon aÃ§Ä±sÄ±ndan bir anlamÄ± olmazdÄ±, hatta bunu yapmak yanlÄ±ÅŸ
+olurdu. EÄŸer elimizde fazla sayÄ±da 'gri' ev verisi olsa, bu durum regresyon
+sÄ±rasÄ±nda beyaz evlerin beyazlÄ±ÄŸÄ±nÄ± mÄ± azaltacaktÄ±r?
 
-İşte bu gibi durumlarda kategorileri olduğu gibi işleyebilen bir teknik
-gerekiyor. Bu yazıda kullanacağımız örnek, bir belgenin içindeki kelimelere
-göre kategorize edilmesi. Elimizde iki türlü doküman olacak. Bir tanesi
-Stephen Hawking adlı bilim adamının bir kitabından 3 sayfa, diğeri başkan
-Barack Obama'nın bir kitabından 3 sayfa. Bu sayfalar ve içindeki kelimeler
-NB yöntemini "eğitmek" için kullanılacak, sonra NB tarafından hiç
-görülmemiş yeni sayfaları yöntemimize kategorize ettireceğiz.
+Ä°ÅŸte bu gibi durumlarda kategorileri olduÄŸu gibi iÅŸleyebilen bir teknik
+gerekiyor. Bu yazÄ±da kullanacaÄŸÄ±mÄ±z Ã¶rnek, bir belgenin iÃ§indeki kelimelere
+gÃ¶re kategorize edilmesi. Elimizde iki tÃ¼rlÃ¼ dokÃ¼man olacak. Bir tanesi
+Stephen Hawking adlÄ± bilim adamÄ±nÄ±n bir kitabÄ±ndan 3 sayfa, diÄŸeri baÅŸkan
+Barack Obama'nÄ±n bir kitabÄ±ndan 3 sayfa. Bu sayfalar ve iÃ§indeki kelimeler
+NB yÃ¶ntemini "eÄŸitmek" iÃ§in kullanÄ±lacak, sonra NB tarafÄ±ndan hiÃ§
+gÃ¶rÃ¼lmemiÅŸ yeni sayfalarÄ± yÃ¶ntemimize kategorize ettireceÄŸiz.
 
-Çok Boyutlu Bernoulli ve Kelimeler
+Ã‡ok Boyutlu Bernoulli ve Kelimeler
 
 \includegraphics[height=2.5cm]{dims.png}
 
-Bir doküman ile içindeki kelimeler arasında nasıl bağlantı kuracağız?
-Burada olasılık teorisinden Çok Boyutlu Bernoulli (Multivariate Bernoulli)
-dağılımını kullanacağız. Üstteki resimde görüldüğü gibi her doküman bir
-$x^i$ rasgele değişkeniyle temsil edilecek. Tek boyutlu Bernoulli değişkeni
-'1' ya da '0' değerine sahip olabilir, çok boyutlu olanı ise bir vektör
-içinde '1' ve '0' değerlerini taşıyabilir. İşte bu vektörün her hücresi,
-önceden tanımlı bir kelimeye tekabül edecek, ve bu kelimeden bir doküman
-içinde en az bir tane var ise, o hücre '1' değerini taşıyacak, yoksa '0'
-değerini taşıyacak. Üstteki örnekte 2. kelime "hello" ve 4. doküman
-içinde bu kelimeden en az bir tane var, o zaman $x_2^4 = 1$. Tek bir
-dokümanı temsil eden dağılımı matematiksel olarak şöyle yazabiliriz:
+Bir dokÃ¼man ile iÃ§indeki kelimeler arasÄ±nda nasÄ±l baÄŸlantÄ± kuracaÄŸÄ±z?
+Burada olasÄ±lÄ±k teorisinden Ã‡ok Boyutlu Bernoulli (Multivariate Bernoulli)
+daÄŸÄ±lÄ±mÄ±nÄ± kullanacaÄŸÄ±z. Ãœstteki resimde gÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi her dokÃ¼man bir
+$x^i$ rasgele deÄŸiÅŸkeniyle temsil edilecek. Tek boyutlu Bernoulli deÄŸiÅŸkeni
+'1' ya da '0' deÄŸerine sahip olabilir, Ã§ok boyutlu olanÄ± ise bir vektÃ¶r
+iÃ§inde '1' ve '0' deÄŸerlerini taÅŸÄ±yabilir. Ä°ÅŸte bu vektÃ¶rÃ¼n her hÃ¼cresi,
+Ã¶nceden tanÄ±mlÄ± bir kelimeye tekabÃ¼l edecek, ve bu kelimeden bir dokÃ¼man
+iÃ§inde en az bir tane var ise, o hÃ¼cre '1' deÄŸerini taÅŸÄ±yacak, yoksa '0'
+deÄŸerini taÅŸÄ±yacak. Ãœstteki Ã¶rnekte 2. kelime "hello" ve 4. dokÃ¼man
+iÃ§inde bu kelimeden en az bir tane var, o zaman $x_2^4 = 1$. Tek bir
+dokÃ¼manÄ± temsil eden daÄŸÄ±lÄ±mÄ± matematiksel olarak ÅŸÃ¶yle yazabiliriz:
 
 $$ p(x_1,...,x_{D}) = \prod_{d=1}^{D} p(x_d)=\prod_{d=1}^{D}
 \alpha_d^{x_d}(1-\alpha_d)^{1-x_d} 
 $$
 
-Bu formülde her $d$ boyutu bir tek boyutlu Bernoulli, ve bir doküman
-için tüm bu boyutların ortak (joint) dağılımı gerekiyor, çarpımın
-sebebi bu. Formüldeki $\alpha_d$ bir dağılımı "tanımlayan" değer,
-$\alpha$ bir vektör, ve unutmayalım, her "sınıf" için NB ayrı ayrı
-eğitilecek, ve her sınıf için farklı $\alpha$ vektörü olacak. Yani
-Obama'nın kitapları için $\alpha_2 = 0.8$ olabilir, Hawking kitabı
-için $\alpha_2 = 0.3$ olabilir. Birinin kitabında "hello" kelimesi
-olma şansı fazla, diğerinde pek yok. O zaman NB'yi "eğitmek" ne
-demektir? Eğitmek her sınıf için yukarıdaki $\alpha$ değerlerini
+Bu formÃ¼lde her $d$ boyutu bir tek boyutlu Bernoulli, ve bir dokÃ¼man
+iÃ§in tÃ¼m bu boyutlarÄ±n ortak (joint) daÄŸÄ±lÄ±mÄ± gerekiyor, Ã§arpÄ±mÄ±n
+sebebi bu. FormÃ¼ldeki $\alpha_d$ bir daÄŸÄ±lÄ±mÄ± "tanÄ±mlayan" deÄŸer,
+$\alpha$ bir vektÃ¶r, ve unutmayalÄ±m, her "sÄ±nÄ±f" iÃ§in NB ayrÄ± ayrÄ±
+eÄŸitilecek, ve her sÄ±nÄ±f iÃ§in farklÄ± $\alpha$ vektÃ¶rÃ¼ olacak. Yani
+Obama'nÄ±n kitaplarÄ± iÃ§in $\alpha_2 = 0.8$ olabilir, Hawking kitabÄ±
+iÃ§in $\alpha_2 = 0.3$ olabilir. Birinin kitabÄ±nda "hello" kelimesi
+olma ÅŸansÄ± fazla, diÄŸerinde pek yok. O zaman NB'yi "eÄŸitmek" ne
+demektir? EÄŸitmek her sÄ±nÄ±f iÃ§in yukarÄ±daki $\alpha$ deÄŸerlerini
 bulmak demektir.
 
-Bunun için istatistikteki "olurluk (likelihood)" kavramını kullanmak
-yeterli. Olurluk, bir dağılımdan geldiği farzedilen bir veri setini
-alır, tüm veri noktalarını teker teker olasılığa geçerek olasılık
-değerlerini birbirine çarpar. Sonuç ne kadar yüksek çıkarsa, bu
-verinin o dağılımdan gelme olasılığı o kadar yüksek demektir. Bizim
-problemimiz için tek bir sınıfın olurluğu, o sınıf içindeki tüm (N
-tane) belgeyi kapsamalıdır, tek bir "veri noktası" tek bir belgedir,
+Bunun iÃ§in istatistikteki "olurluk (likelihood)" kavramÄ±nÄ± kullanmak
+yeterli. Olurluk, bir daÄŸÄ±lÄ±mdan geldiÄŸi farzedilen bir veri setini
+alÄ±r, tÃ¼m veri noktalarÄ±nÄ± teker teker olasÄ±lÄ±ÄŸa geÃ§erek olasÄ±lÄ±k
+deÄŸerlerini birbirine Ã§arpar. SonuÃ§ ne kadar yÃ¼ksek Ã§Ä±karsa, bu
+verinin o daÄŸÄ±lÄ±mdan gelme olasÄ±lÄ±ÄŸÄ± o kadar yÃ¼ksek demektir. Bizim
+problemimiz iÃ§in tek bir sÄ±nÄ±fÄ±n olurluÄŸu, o sÄ±nÄ±f iÃ§indeki tÃ¼m (N
+tane) belgeyi kapsamalÄ±dÄ±r, tek bir "veri noktasÄ±" tek bir belgedir,
 o zaman:
 
 $$ L(\theta) = \prod_{i=1}^N \prod_{d=1}^{D} p(x_d^i) = 
 \prod_{i=1}^N \prod_{d=1}^{D} \alpha_d^{x_d^i}(1-\alpha_d)^{1-x_d^i}
  $$
 
-$\theta$ bir dağılımı tanımlayan her türlü değişken anlamında kullanıldı, bu
-örnekte içinde sadece $\alpha$ var.
+$\theta$ bir daÄŸÄ±lÄ±mÄ± tanÄ±mlayan her tÃ¼rlÃ¼ deÄŸiÅŸken anlamÄ±nda kullanÄ±ldÄ±, bu
+Ã¶rnekte iÃ§inde sadece $\alpha$ var.
 
-Devam edelim: Eğer $\alpha$'nin ne olduğunu bilmiyorsak (ki bilmiyoruz
--eğitmek zaten bu demek-) o zaman maksimum olurluk (maximum likelihood)
-kavramını resme dahil etmek gerekli. Bunun için üstteki olurluk formülünün
-$\alpha$'ya göre türevini alıp sıfıra eşitlersek, bu formülden bir maksimum
-noktasındaki $\alpha$ elimize geçecektir. İşte bu $\alpha$ bizim aradığımız
-değer. Veriyi en iyi temsil eden $\alpha$ değeri bu demektir. Onu bulunca
-eğitim tamamlanır.
+Devam edelim: EÄŸer $\alpha$'nin ne olduÄŸunu bilmiyorsak (ki bilmiyoruz
+-eÄŸitmek zaten bu demek-) o zaman maksimum olurluk (maximum likelihood)
+kavramÄ±nÄ± resme dahil etmek gerekli. Bunun iÃ§in Ã¼stteki olurluk formÃ¼lÃ¼nÃ¼n
+$\alpha$'ya gÃ¶re tÃ¼revini alÄ±p sÄ±fÄ±ra eÅŸitlersek, bu formÃ¼lden bir maksimum
+noktasÄ±ndaki $\alpha$ elimize geÃ§ecektir. Ä°ÅŸte bu $\alpha$ bizim aradÄ±ÄŸÄ±mÄ±z
+deÄŸer. Veriyi en iyi temsil eden $\alpha$ deÄŸeri bu demektir. Onu bulunca
+eÄŸitim tamamlanÄ±r.
 
-Türev almadan önce iki tarafın log'unu alalım, böylece çarpımlar toplamlara
-dönüşecek ve türevin formülün içine nüfuz etmesi daha kolay olacak.
+TÃ¼rev almadan Ã¶nce iki tarafÄ±n log'unu alalÄ±m, bÃ¶ylece Ã§arpÄ±mlar toplamlara
+dÃ¶nÃ¼ÅŸecek ve tÃ¼revin formÃ¼lÃ¼n iÃ§ine nÃ¼fuz etmesi daha kolay olacak.
 
 $$ \log(L) = \sum_{i=1}^N \sum_{d=1}^{D} {x_d^i}\ log (\alpha_d) + 
 (1-x_d^i)\ log (1-\alpha_d) $$
 
-Türevi alalım:
+TÃ¼revi alalÄ±m:
 
 $$ \frac{dlog(L)}{d\alpha_d} = \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} -
 \frac{1-x_d^i}{1-\alpha_d} \bigg) = 0
  $$
 
-1- $\alpha_d$'ye göre türev alırken $x_d^i$'ler sabit sayı gibi muamele
-görürler. 2- log'un türevi alırken log içindeki değerlerin türev alınmış hali
-bölümün üstüne, kendisini olduğu gibi bölüm altına alınır, örnek 
-$dlog(-x)/dx = -1/x$ olur üstteki eksi işaretinin sebebi bu. 
+1- $\alpha_d$'ye gÃ¶re tÃ¼rev alÄ±rken $x_d^i$'ler sabit sayÄ± gibi muamele
+gÃ¶rÃ¼rler. 2- log'un tÃ¼revi alÄ±rken log iÃ§indeki deÄŸerlerin tÃ¼rev alÄ±nmÄ±ÅŸ hali
+bÃ¶lÃ¼mÃ¼n Ã¼stÃ¼ne, kendisini olduÄŸu gibi bÃ¶lÃ¼m altÄ±na alÄ±nÄ±r, Ã¶rnek 
+$dlog(-x)/dx = -1/x$ olur Ã¼stteki eksi iÅŸaretinin sebebi bu. 
 
-Peki $\sum_{d=1}^{D}$ nereye gitti? Türevi $\alpha_d$'ye göre alıyoruz ve o
-türevi alırken tek bir $\alpha_d$ ile ilgileniyoruz, mesela $\alpha_{22}$,
-bunun haricindeki diğer tüm $\alpha_?$ değerleri türev alma işlemi
-sırasında sabit kabul edilirler, türev sırasında sıfırlanırlar. Bu sebeple
-$\sum_{d=1}^{D}$ içinde sadece bizim ilgilendiğimiz $\alpha_d$ geriye
-kalır. Tabii ki bu aynı zamanda her $d=1,2,..D$, $\alpha_d$ için ayrı bir
-türev var demektir, ama bu türevlerin hepsi birbirine benzerler, yani tek
-bir $\alpha_d$'yi çözmek, hepsini çözmek anlamına gelir.
+Peki $\sum_{d=1}^{D}$ nereye gitti? TÃ¼revi $\alpha_d$'ye gÃ¶re alÄ±yoruz ve o
+tÃ¼revi alÄ±rken tek bir $\alpha_d$ ile ilgileniyoruz, mesela $\alpha_{22}$,
+bunun haricindeki diÄŸer tÃ¼m $\alpha_?$ deÄŸerleri tÃ¼rev alma iÅŸlemi
+sÄ±rasÄ±nda sabit kabul edilirler, tÃ¼rev sÄ±rasÄ±nda sÄ±fÄ±rlanÄ±rlar. Bu sebeple
+$\sum_{d=1}^{D}$ iÃ§inde sadece bizim ilgilendiÄŸimiz $\alpha_d$ geriye
+kalÄ±r. Tabii ki bu aynÄ± zamanda her $d=1,2,..D$, $\alpha_d$ iÃ§in ayrÄ± bir
+tÃ¼rev var demektir, ama bu tÃ¼revlerin hepsi birbirine benzerler, yani tek
+bir $\alpha_d$'yi Ã§Ã¶zmek, hepsini Ã§Ã¶zmek anlamÄ±na gelir.
 
 Devam edelim:
 
@@ -125,10 +125,10 @@ $$ \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} - \frac{1-x_d^i}{1-\alpha_d} \bigg
 \frac{N_d}{\alpha_d} - \frac{N-N_d}{1-\alpha_d} = 0
  $$
 
-$\sum_{i=1}^N x_d^i = N_d$ olarak kabul ediyoruz, $N_d$ tüm veri içinde $d$
-boyutu (kelimesi) '1' kaç tane hücre olduğunu bize söyler. $x_d^i$ ya '1' ya '0'
-olabildiğine göre bir $d$ için, tüm $N$ hücrenin toplamı otomatik olarak bize
-kaç tane '1' olduğunu söyler. Sonra:
+$\sum_{i=1}^N x_d^i = N_d$ olarak kabul ediyoruz, $N_d$ tÃ¼m veri iÃ§inde $d$
+boyutu (kelimesi) '1' kaÃ§ tane hÃ¼cre olduÄŸunu bize sÃ¶yler. $x_d^i$ ya '1' ya '0'
+olabildiÄŸine gÃ¶re bir $d$ iÃ§in, tÃ¼m $N$ hÃ¼crenin toplamÄ± otomatik olarak bize
+kaÃ§ tane '1' olduÄŸunu sÃ¶yler. Sonra:
 
 $$ \frac{N_d}{\alpha_d} - \frac{N-N_d}{1-\alpha_d} = 0  $$
 
@@ -142,11 +142,11 @@ $$ \alpha_d = \frac{N_d}{N}  $$
 
 Python Kodu
 
-$\alpha_d$'nin formülünü buldumuza göre artık kodu yazabiliriz. İlk önce bir
-dokümanı temsil eden çok boyutlu Bernoulli vektörünü ortaya çıkartmamız
-lazım. Bu vektörün her hücresi belli bir kelime olacak, ve o kelimelerin ne
-olduğunu önceden kararlaştırmamız lazım. Bunun için her sınıftaki tüm
-dokümanlardaki tüm kelimeleri içeren bir sözlük yaratırız:
+$\alpha_d$'nin formÃ¼lÃ¼nÃ¼ buldumuza gÃ¶re artÄ±k kodu yazabiliriz. Ä°lk Ã¶nce bir
+dokÃ¼manÄ± temsil eden Ã§ok boyutlu Bernoulli vektÃ¶rÃ¼nÃ¼ ortaya Ã§Ä±kartmamÄ±z
+lazÄ±m. Bu vektÃ¶rÃ¼n her hÃ¼cresi belli bir kelime olacak, ve o kelimelerin ne
+olduÄŸunu Ã¶nceden kararlaÅŸtÄ±rmamÄ±z lazÄ±m. Bunun iÃ§in her sÄ±nÄ±ftaki tÃ¼m
+dokÃ¼manlardaki tÃ¼m kelimeleri iÃ§eren bir sÃ¶zlÃ¼k yaratÄ±rÄ±z:
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import re
@@ -238,36 +238,36 @@ obama test
 obama -32205.4710748 hawking -32549.6924713 obama True hawking False
 \end{verbatim}
 
-Test için yeni dokümanı kelimelerine ayırıyoruz, ve her kelimeye tekabül eden
-alpha vektörlerini kullanarak bir yazar için toplam olasılığı
-hesaplıyoruz. Nasıl? Her kelimeyi $\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}$ formülüne
-soruyoruz, yeni dokümanı temsilen elimizde bir $[1,0,0,1,0,0,...,1]$ şeklinde
-bir vektör olduğunu farz ediyoruz, buna göre mesela $x_1=1$, $x_2=0$. Eğer bir
-$d$ kelimesi yeni belgede "var" ise o kelime için $x_d = 1$ ve bu durumda
-$\alpha_d^{x_d} = \alpha_d^{1} = \alpha_d$ haline gelir, ama formülün öteki
-tarafı yokolur, $(1-\alpha_d)^{1-x_d} = (1-\alpha_d)^0 = 1$, o zaman $\alpha_d
+Test iÃ§in yeni dokÃ¼manÄ± kelimelerine ayÄ±rÄ±yoruz, ve her kelimeye tekabÃ¼l eden
+alpha vektÃ¶rlerini kullanarak bir yazar iÃ§in toplam olasÄ±lÄ±ÄŸÄ±
+hesaplÄ±yoruz. NasÄ±l? Her kelimeyi $\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}$ formÃ¼lÃ¼ne
+soruyoruz, yeni dokÃ¼manÄ± temsilen elimizde bir $[1,0,0,1,0,0,...,1]$ ÅŸeklinde
+bir vektÃ¶r olduÄŸunu farz ediyoruz, buna gÃ¶re mesela $x_1=1$, $x_2=0$. EÄŸer bir
+$d$ kelimesi yeni belgede "var" ise o kelime iÃ§in $x_d = 1$ ve bu durumda
+$\alpha_d^{x_d} = \alpha_d^{1} = \alpha_d$ haline gelir, ama formÃ¼lÃ¼n Ã¶teki
+tarafÄ± yokolur, $(1-\alpha_d)^{1-x_d} = (1-\alpha_d)^0 = 1$, o zaman $\alpha_d
 \cdot 1 = \alpha_d$.
 
-Çarpım diyoruz ama biz aslında sınıflama sırasında
-$\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}$ çarpımı yerine yine log() numarasını
-kullandık; çünkü olasılık değerleri hep 1'e eşit ya da ondan küçük sayılardır,
-ve bu küçük değerlerin birbiriyle sürekli çarpımı nihai sonucu aşırı fazla
-küçültür. Aşırı ufak değerlerle uğraşmamak için olasılıkların log'unu alıp
-birbirleri ile toplamayı seçtik, yani hesapladığımız değer $x_d \cdot
+Ã‡arpÄ±m diyoruz ama biz aslÄ±nda sÄ±nÄ±flama sÄ±rasÄ±nda
+$\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}$ Ã§arpÄ±mÄ± yerine yine log() numarasÄ±nÄ±
+kullandÄ±k; Ã§Ã¼nkÃ¼ olasÄ±lÄ±k deÄŸerleri hep 1'e eÅŸit ya da ondan kÃ¼Ã§Ã¼k sayÄ±lardÄ±r,
+ve bu kÃ¼Ã§Ã¼k deÄŸerlerin birbiriyle sÃ¼rekli Ã§arpÄ±mÄ± nihai sonucu aÅŸÄ±rÄ± fazla
+kÃ¼Ã§Ã¼ltÃ¼r. AÅŸÄ±rÄ± ufak deÄŸerlerle uÄŸraÅŸmamak iÃ§in olasÄ±lÄ±klarÄ±n log'unu alÄ±p
+birbirleri ile toplamayÄ± seÃ§tik, yani hesapladÄ±ÄŸÄ±mÄ±z deÄŸer $x_d \cdot
 log(\alpha_d) + (1-x_d) \cdot \log(1-\alpha_d)$
 
-Fonksiyon \verb!prob! içindeki \verb!1e-7! kullanımı neden? Bu
-kullanım log numarasını yapabilmek için -- sıfır değerinin log değeri
-tanımsızdır, bir kelime olmadığı zaman log'a sıfır geleceği için hata
-olmaması için log içindeki değerlere her seferinde yeterince küçük bir
-sayı ekliyoruz, böylece pür sıfırla uğraşmak zorunda kalmıyoruz. Sıfır
-olmadığı zamanlarda çok eklenen çok küçük bir sayı sonuçta büyük
-farklar (hatalar) yaratmıyor.
+Fonksiyon \verb!prob! iÃ§indeki \verb!1e-7! kullanÄ±mÄ± neden? Bu
+kullanÄ±m log numarasÄ±nÄ± yapabilmek iÃ§in -- sÄ±fÄ±r deÄŸerinin log deÄŸeri
+tanÄ±msÄ±zdÄ±r, bir kelime olmadÄ±ÄŸÄ± zaman log'a sÄ±fÄ±r geleceÄŸi iÃ§in hata
+olmamasÄ± iÃ§in log iÃ§indeki deÄŸerlere her seferinde yeterince kÃ¼Ã§Ã¼k bir
+sayÄ± ekliyoruz, bÃ¶ylece pÃ¼r sÄ±fÄ±rla uÄŸraÅŸmak zorunda kalmÄ±yoruz. SÄ±fÄ±r
+olmadÄ±ÄŸÄ± zamanlarda Ã§ok eklenen Ã§ok kÃ¼Ã§Ã¼k bir sayÄ± sonuÃ§ta bÃ¼yÃ¼k
+farklar (hatalar) yaratmÄ±yor.
 
-Toparlarsak, yeni belge \verb!a4.txt! için iki tür alpha
-değerleri kullanarak iki farklı log toplamını hesaplatıyoruz. Bu iki
-toplamı birbiri ile karşılaştırıyoruz, hangi toplam daha büyükse,
-dokümanın o yazardan gelmesi daha olasıdır, ve o seçimimiz o yazar
+Toparlarsak, yeni belge \verb!a4.txt! iÃ§in iki tÃ¼r alpha
+deÄŸerleri kullanarak iki farklÄ± log toplamÄ±nÄ± hesaplatÄ±yoruz. Bu iki
+toplamÄ± birbiri ile karÅŸÄ±laÅŸtÄ±rÄ±yoruz, hangi toplam daha bÃ¼yÃ¼kse,
+dokÃ¼manÄ±n o yazardan gelmesi daha olasÄ±dÄ±r, ve o seÃ§imimiz o yazar
 olur.
 
 Kaynaklar

@@ -1,173 +1,173 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Felzenswalb Gruplaması (Felzenswalb Clustering)
+Felzenswalb GruplamasÄ± (Felzenswalb Clustering)
 
-Minimum Kapsayan Ağaç (Minimum Spanning Tree -MST-) kavramını kullanan
-Felzenswalb kümelemesini göreceğiz. MST'yi daha önce işledik. Literatürde
-Felzenswalb metotunun imaj gruplaması için kullanıldığı görülebilir, biz
-imaj gruplaması yapan algoritma içinden veri kümelemesi yapan kısmı
-çıkarttık ve ayrı bir şekilde paylaşıyoruz. Bu gruplama algoritmasının daha
-önce paylaştığımız Kruskal'ın MST koduna yapılacak birkaç ekleme sayesinde
-elde edilebilmesi hakikaten ilginç. Normal MST çizitin ayrı bölgelerinde
-ayrı ağaçlar yaratır ve bunları yavaş yavaş büyütür, gerektiği noktalarda
-onları birleştirir. Felzenswalb sadece bu birleştirme mantığını biraz
-değiştirip, ayrı ağaçları bir grup olarak kabul eder, ve bu grupların kendi
-içinde benzerliği maksimal, gruplararası benzerliği minimal olacak hale
-getirir. Bu şekilde bildik Kruskal işletilince çok hızlı işleyen hızlı bir
-gruplama algoritması elde edilmiş olur!
+Minimum Kapsayan AÄŸaÃ§ (Minimum Spanning Tree -MST-) kavramÄ±nÄ± kullanan
+Felzenswalb kÃ¼melemesini gÃ¶receÄŸiz. MST'yi daha Ã¶nce iÅŸledik. LiteratÃ¼rde
+Felzenswalb metotunun imaj gruplamasÄ± iÃ§in kullanÄ±ldÄ±ÄŸÄ± gÃ¶rÃ¼lebilir, biz
+imaj gruplamasÄ± yapan algoritma iÃ§inden veri kÃ¼melemesi yapan kÄ±smÄ±
+Ã§Ä±karttÄ±k ve ayrÄ± bir ÅŸekilde paylaÅŸÄ±yoruz. Bu gruplama algoritmasÄ±nÄ±n daha
+Ã¶nce paylaÅŸtÄ±ÄŸÄ±mÄ±z Kruskal'Ä±n MST koduna yapÄ±lacak birkaÃ§ ekleme sayesinde
+elde edilebilmesi hakikaten ilginÃ§. Normal MST Ã§izitin ayrÄ± bÃ¶lgelerinde
+ayrÄ± aÄŸaÃ§lar yaratÄ±r ve bunlarÄ± yavaÅŸ yavaÅŸ bÃ¼yÃ¼tÃ¼r, gerektiÄŸi noktalarda
+onlarÄ± birleÅŸtirir. Felzenswalb sadece bu birleÅŸtirme mantÄ±ÄŸÄ±nÄ± biraz
+deÄŸiÅŸtirip, ayrÄ± aÄŸaÃ§larÄ± bir grup olarak kabul eder, ve bu gruplarÄ±n kendi
+iÃ§inde benzerliÄŸi maksimal, gruplararasÄ± benzerliÄŸi minimal olacak hale
+getirir. Bu ÅŸekilde bildik Kruskal iÅŸletilince Ã§ok hÄ±zlÄ± iÅŸleyen hÄ±zlÄ± bir
+gruplama algoritmasÄ± elde edilmiÅŸ olur!
 
-Felzenswalb veri olarak, MST gibi, bir çizit alır ve bu çizit veri
-noktalarının arasındaki yakınlık bilgisini içeren bir matris olarak
-verilebilir. Mesela 5 veri noktası var ise, 0. nokta ile 1. nokta
-arasındaki '10' büyüklüğündeki bir mesafe $A(0,1) = 10$ olarak
-kaydedilebilir. Kümeler birbirine yakın öğeler arasından seçilir.
+Felzenswalb veri olarak, MST gibi, bir Ã§izit alÄ±r ve bu Ã§izit veri
+noktalarÄ±nÄ±n arasÄ±ndaki yakÄ±nlÄ±k bilgisini iÃ§eren bir matris olarak
+verilebilir. Mesela 5 veri noktasÄ± var ise, 0. nokta ile 1. nokta
+arasÄ±ndaki '10' bÃ¼yÃ¼klÃ¼ÄŸÃ¼ndeki bir mesafe $A(0,1) = 10$ olarak
+kaydedilebilir. KÃ¼meler birbirine yakÄ±n Ã¶ÄŸeler arasÄ±ndan seÃ§ilir.
 
-Algoritmanın önemli avantajlarından biri küme sayısının (GMM'de olduğu
-gibi) önceden tanımlanmasına gerek olmamasıdır. Belli eşik değerleri
-tanımlanınca küme sayısı kendiliğinden bulunur. Tabii ``dışarıdan verilen
-bir parametreyi başka biriyle değiştirmiş mi olduk?'' sorusu akla
-gelebilir, Felzenswalb'ın aldığı hiperparametreler kabaca ayarlanabilen ve
-veri kaynağı bağlamında akla uygun şeyler, ve belli değerler etrafında
-stabilite ortaya çıkabiliyor. Kıyasla ``küme sayısı'' ciddi bir rakam ve
-değişmesi mümkün değil. 
+AlgoritmanÄ±n Ã¶nemli avantajlarÄ±ndan biri kÃ¼me sayÄ±sÄ±nÄ±n (GMM'de olduÄŸu
+gibi) Ã¶nceden tanÄ±mlanmasÄ±na gerek olmamasÄ±dÄ±r. Belli eÅŸik deÄŸerleri
+tanÄ±mlanÄ±nca kÃ¼me sayÄ±sÄ± kendiliÄŸinden bulunur. Tabii ``dÄ±ÅŸarÄ±dan verilen
+bir parametreyi baÅŸka biriyle deÄŸiÅŸtirmiÅŸ mi olduk?'' sorusu akla
+gelebilir, Felzenswalb'Ä±n aldÄ±ÄŸÄ± hiperparametreler kabaca ayarlanabilen ve
+veri kaynaÄŸÄ± baÄŸlamÄ±nda akla uygun ÅŸeyler, ve belli deÄŸerler etrafÄ±nda
+stabilite ortaya Ã§Ä±kabiliyor. KÄ±yasla ``kÃ¼me sayÄ±sÄ±'' ciddi bir rakam ve
+deÄŸiÅŸmesi mÃ¼mkÃ¼n deÄŸil. 
 
-Felzenswalb'ın matematiğinde önce imaj bölgelerinin (ya da veri kümeleri
-olarak düşünebiliriz) arasında ikili karşılaştırma için bir ölçüt
-gerekir. Bu bölümde bir beyan $D$'yi ortaya koyacağız, ki bu beyan,
-imajdaki iki bileşen (ki imaj gruplamasının doğru olarak bulmaya çalışacağı
-bileşenler) arasında bir sınır olup olmadığına dair kanıtın ölçüsü
-olacak. Beyanın temeli şudur: iki bileşen arasındaki sınırın boyunda yer
-alan her iki tarafın öğelerinin farklılığına bak, ve onu her bileşenin
-kendi içindeki farklılığa göre oranla. Yani bu beyan, bir bileşenin iç
-farklılığını dış farklılığına kıyaslar, ve bu sebeple verinin yerel
-karakteristikleri gözetmiş olur. Kıyaslama mesela, global, verinin her
-yerinde aynen geçerli olacak bir sabit eşik değerine vs. bağlı değildir.
+Felzenswalb'Ä±n matematiÄŸinde Ã¶nce imaj bÃ¶lgelerinin (ya da veri kÃ¼meleri
+olarak dÃ¼ÅŸÃ¼nebiliriz) arasÄ±nda ikili karÅŸÄ±laÅŸtÄ±rma iÃ§in bir Ã¶lÃ§Ã¼t
+gerekir. Bu bÃ¶lÃ¼mde bir beyan $D$'yi ortaya koyacaÄŸÄ±z, ki bu beyan,
+imajdaki iki bileÅŸen (ki imaj gruplamasÄ±nÄ±n doÄŸru olarak bulmaya Ã§alÄ±ÅŸacaÄŸÄ±
+bileÅŸenler) arasÄ±nda bir sÄ±nÄ±r olup olmadÄ±ÄŸÄ±na dair kanÄ±tÄ±n Ã¶lÃ§Ã¼sÃ¼
+olacak. BeyanÄ±n temeli ÅŸudur: iki bileÅŸen arasÄ±ndaki sÄ±nÄ±rÄ±n boyunda yer
+alan her iki tarafÄ±n Ã¶ÄŸelerinin farklÄ±lÄ±ÄŸÄ±na bak, ve onu her bileÅŸenin
+kendi iÃ§indeki farklÄ±lÄ±ÄŸa gÃ¶re oranla. Yani bu beyan, bir bileÅŸenin iÃ§
+farklÄ±lÄ±ÄŸÄ±nÄ± dÄ±ÅŸ farklÄ±lÄ±ÄŸÄ±na kÄ±yaslar, ve bu sebeple verinin yerel
+karakteristikleri gÃ¶zetmiÅŸ olur. KÄ±yaslama mesela, global, verinin her
+yerinde aynen geÃ§erli olacak bir sabit eÅŸik deÄŸerine vs. baÄŸlÄ± deÄŸildir.
 
-Tanım
+TanÄ±m
 
-Bir bileşen $C \subseteq V$, ki $C$ bir bileşendir (component) ve $V$ çizitin tüm
-noktalarıdır, {\em iç farklılığını}, o $C$'nin minimum kapsayan ağacının,
-yani $MST(C)$'sinin en büyük kenar ağırlığı olarak alıyoruz. Bu iç farklılığı
+Bir bileÅŸen $C \subseteq V$, ki $C$ bir bileÅŸendir (component) ve $V$ Ã§izitin tÃ¼m
+noktalarÄ±dÄ±r, {\em iÃ§ farklÄ±lÄ±ÄŸÄ±nÄ±}, o $C$'nin minimum kapsayan aÄŸacÄ±nÄ±n,
+yani $MST(C)$'sinin en bÃ¼yÃ¼k kenar aÄŸÄ±rlÄ±ÄŸÄ± olarak alÄ±yoruz. Bu iÃ§ farklÄ±lÄ±ÄŸÄ±
 $Int(C)$ olarak belirtirsek, 
 
 $$ Int(C) = \max_{e \in MST(C,E)} w(e) $$
 
-ki $w((v_i , v_j))$ bir çizit $G = (V,E)$'yi oluşturan bir kenar $(v_i,v_j)
-\in E$ ağırlığı olarak belirtilir. 
+ki $w((v_i , v_j))$ bir Ã§izit $G = (V,E)$'yi oluÅŸturan bir kenar $(v_i,v_j)
+\in E$ aÄŸÄ±rlÄ±ÄŸÄ± olarak belirtilir. 
 
-Tanım
+TanÄ±m
 
-İki bileşen $C_1,C_2 \subseteq V$ arasındaki farkı o iki bileşeni
-birleştiren kenarlardan en ufağı olarak alıyoruz. İki bileşenin arasında
-birden fazla bağlantı olması mümkündür, tüm bunlara bakıyoruz, ve en
-ufağını alıyoruz.
+Ä°ki bileÅŸen $C_1,C_2 \subseteq V$ arasÄ±ndaki farkÄ± o iki bileÅŸeni
+birleÅŸtiren kenarlardan en ufaÄŸÄ± olarak alÄ±yoruz. Ä°ki bileÅŸenin arasÄ±nda
+birden fazla baÄŸlantÄ± olmasÄ± mÃ¼mkÃ¼ndÃ¼r, tÃ¼m bunlara bakÄ±yoruz, ve en
+ufaÄŸÄ±nÄ± alÄ±yoruz.
 
 $$ Dif(C_1,C_2) = \min_{v_i \in C_1, v_j \in C_2, (v_i,v_j) \in E} w((v_i,v_j))$$
 
-Eğer $C_1,C_2$ arasında bir kenar yok ise $Dif(C_1,C_2) = \infty$ kabul
+EÄŸer $C_1,C_2$ arasÄ±nda bir kenar yok ise $Dif(C_1,C_2) = \infty$ kabul
 ediliyor. 
 
-Prensip olarak iki bileşen arasındaki en minimal bağlantının problem
-çıkartabileceği düşünülebilirdi, niye en az, niye ortalama vs değil?  Pratikte
-bu ölçütün çok iyi işlediği görülmüştür. Hatta iyi olmaktan öte, bu ölçüt
-minimal yerine medyan, ya da diğer yüzdelik dilim (quantile) ölçütle
-değiştirildiği zaman (ki bunu yaparak genel algoritmanın aykırı değerlere
--outlier- karşı daha dayanıklı olması istenmişti), algoritma çetrefilliği NP-Zor
-haline geliyor. Yani gruplama kriterinde ufacık bir değişiklik problemin çözüm
-zorluluğunda müthiş bir değişim ortaya çıkartıyor.
+Prensip olarak iki bileÅŸen arasÄ±ndaki en minimal baÄŸlantÄ±nÄ±n problem
+Ã§Ä±kartabileceÄŸi dÃ¼ÅŸÃ¼nÃ¼lebilirdi, niye en az, niye ortalama vs deÄŸil?  Pratikte
+bu Ã¶lÃ§Ã¼tÃ¼n Ã§ok iyi iÅŸlediÄŸi gÃ¶rÃ¼lmÃ¼ÅŸtÃ¼r. Hatta iyi olmaktan Ã¶te, bu Ã¶lÃ§Ã¼t
+minimal yerine medyan, ya da diÄŸer yÃ¼zdelik dilim (quantile) Ã¶lÃ§Ã¼tle
+deÄŸiÅŸtirildiÄŸi zaman (ki bunu yaparak genel algoritmanÄ±n aykÄ±rÄ± deÄŸerlere
+-outlier- karÅŸÄ± daha dayanÄ±klÄ± olmasÄ± istenmiÅŸti), algoritma Ã§etrefilliÄŸi NP-Zor
+haline geliyor. Yani gruplama kriterinde ufacÄ±k bir deÄŸiÅŸiklik problemin Ã§Ã¶zÃ¼m
+zorluluÄŸunda mÃ¼thiÅŸ bir deÄŸiÅŸim ortaya Ã§Ä±kartÄ±yor.
 
-Şimdi iki bileşenin karşılaştırma beyanı $D$'nin tanımına geldik. $D$ ölçütü,
-$Dif(C_1,C_2)$'nin $Int(C_1)$ ya da $Int(C_2)$'den herhangi birinden daha büyük
-olup olmadığına bakar. Ayrıca bu karşılaştırmayı bir eşik değeri üzerinden pay
-ekleyerek yapar, eğer irdeleme olumlu ise, iki bileşen arasında sınır vardır,
+Åimdi iki bileÅŸenin karÅŸÄ±laÅŸtÄ±rma beyanÄ± $D$'nin tanÄ±mÄ±na geldik. $D$ Ã¶lÃ§Ã¼tÃ¼,
+$Dif(C_1,C_2)$'nin $Int(C_1)$ ya da $Int(C_2)$'den herhangi birinden daha bÃ¼yÃ¼k
+olup olmadÄ±ÄŸÄ±na bakar. AyrÄ±ca bu karÅŸÄ±laÅŸtÄ±rmayÄ± bir eÅŸik deÄŸeri Ã¼zerinden pay
+ekleyerek yapar, eÄŸer irdeleme olumlu ise, iki bileÅŸen arasÄ±nda sÄ±nÄ±r vardÄ±r,
 yoksa yoktur.
 
 $$ 
 D(C_1,C_2) = 
 \left\{ \begin{array}{ll}
-\textrm{Doğru} & \textrm{ Eğer } Dif(C_1,C_2) > MInt(C_1,C_2) \textrm{ ise } \\
-\textrm{Yanlış} & \textrm{ Diğer durumda }
+\textrm{DoÄŸru} & \textrm{ EÄŸer } Dif(C_1,C_2) > MInt(C_1,C_2) \textrm{ ise } \\
+\textrm{YanlÄ±ÅŸ} & \textrm{ DiÄŸer durumda }
 \end{array} \right.
  $$
 
-Minimum iç fark $MInt$ ise şöyle tanımlıdır,
+Minimum iÃ§ fark $MInt$ ise ÅŸÃ¶yle tanÄ±mlÄ±dÄ±r,
 
 $$ 
 MInt(C_1,C_2) = \min (Int(C_1)+\tau(C_1), Int(C_2)+\tau(C_2))
  $$
 
-Eşik fonksiyonu $\tau$ üstteki irdelediğimiz fark hesaplarının belli
-derecelerde dışarıdan etkilemek için koyulmuştur. Eğer bu kullanılmasaydı
-sadece $Int$ fonksiyonu kullanılması gerekecekti, fakat bu ölçüt tek
-başına ufak bir bileşenin yerel karakteristiklerini göstermesi açısından yeterli
-değildir. Aşırı durumda mesela $|C| = 1,Int(C)=0$, yani en küçük $C$
-durumudur bu ($|C|$ bileşenin içindeki öğe sayısı), içinde tek öğe vardır,
-ve hiçbir kenar yoktur, $Int(C) = 0$.  
+EÅŸik fonksiyonu $\tau$ Ã¼stteki irdelediÄŸimiz fark hesaplarÄ±nÄ±n belli
+derecelerde dÄ±ÅŸarÄ±dan etkilemek iÃ§in koyulmuÅŸtur. EÄŸer bu kullanÄ±lmasaydÄ±
+sadece $Int$ fonksiyonu kullanÄ±lmasÄ± gerekecekti, fakat bu Ã¶lÃ§Ã¼t tek
+baÅŸÄ±na ufak bir bileÅŸenin yerel karakteristiklerini gÃ¶stermesi aÃ§Ä±sÄ±ndan yeterli
+deÄŸildir. AÅŸÄ±rÄ± durumda mesela $|C| = 1,Int(C)=0$, yani en kÃ¼Ã§Ã¼k $C$
+durumudur bu ($|C|$ bileÅŸenin iÃ§indeki Ã¶ÄŸe sayÄ±sÄ±), iÃ§inde tek Ã¶ÄŸe vardÄ±r,
+ve hiÃ§bir kenar yoktur, $Int(C) = 0$.  
 
-Bu sebeple iyi bir $\tau$ bileşenin büyüklüğünü hesaba katarak, ona ters
-oranlı bir rakam oluşturursa iyi olur, mesela bir sabit $k$ üzerinden,
+Bu sebeple iyi bir $\tau$ bileÅŸenin bÃ¼yÃ¼klÃ¼ÄŸÃ¼nÃ¼ hesaba katarak, ona ters
+oranlÄ± bir rakam oluÅŸturursa iyi olur, mesela bir sabit $k$ Ã¼zerinden,
 
 $$ \tau(C) = \frac{k}{|C|} $$
 
-Bu demektir ki ufak bileşenler için daha kuvvetli bir ispat arıyoruz, çünkü
-küçük $|C|$, $\tau$'yu büyütecektir, ve $Dif$'in ondan büyük olması daha
-zorlaşacaktır. Tabii dikkat edelim, $k$ bir ``bileşen sayısı'' değildir,
-yani fonksiyona dikkatli bakarsak, eğer bileşenler arasında yeterince büyük
-bir fark var ise ufak bileşenlere hala izin verilmiştir.
+Bu demektir ki ufak bileÅŸenler iÃ§in daha kuvvetli bir ispat arÄ±yoruz, Ã§Ã¼nkÃ¼
+kÃ¼Ã§Ã¼k $|C|$, $\tau$'yu bÃ¼yÃ¼tecektir, ve $Dif$'in ondan bÃ¼yÃ¼k olmasÄ± daha
+zorlaÅŸacaktÄ±r. Tabii dikkat edelim, $k$ bir ``bileÅŸen sayÄ±sÄ±'' deÄŸildir,
+yani fonksiyona dikkatli bakarsak, eÄŸer bileÅŸenler arasÄ±nda yeterince bÃ¼yÃ¼k
+bir fark var ise ufak bileÅŸenlere hala izin verilmiÅŸtir.
 
-Algoritma şöyledir, girdi olarak $G=(V,E)$ alır, ve $V$'yi $S$
-bileşenlerine ayırır ki her $S$ içinde ona ait olan kenarlar vardır, yani
+Algoritma ÅŸÃ¶yledir, girdi olarak $G=(V,E)$ alÄ±r, ve $V$'yi $S$
+bileÅŸenlerine ayÄ±rÄ±r ki her $S$ iÃ§inde ona ait olan kenarlar vardÄ±r, yani
 $S=(C_1,..,C_r)$ 
 
 \verb!felzenswalb!$\left(G\right)$
 \begin{enumerate}
-  \item $E$ kenarlarını $\pi = (o_1,..,o_m)$ şeklinde küçükten büyüğe doğru
-    sırala.
-  \item İlk başta $S^0$ gruplamasını al. Bu durumda her kenar $v_i$
-    kendi bileşeni içindedir.
+  \item $E$ kenarlarÄ±nÄ± $\pi = (o_1,..,o_m)$ ÅŸeklinde kÃ¼Ã§Ã¼kten bÃ¼yÃ¼ÄŸe doÄŸru
+    sÄ±rala.
+  \item Ä°lk baÅŸta $S^0$ gruplamasÄ±nÄ± al. Bu durumda her kenar $v_i$
+    kendi bileÅŸeni iÃ§indedir.
   \item Her $q = 1,..,m$ icin
   \begin{itemize}
-  \item $S^{q-1}$ gruplamasını baz alıp $S^q$ gruplamasını şöyle yarat;
-    $q$'inci sıradaki kenarın birleştirdiği noktaların $v_i,v_j$ olduğunu
+  \item $S^{q-1}$ gruplamasÄ±nÄ± baz alÄ±p $S^q$ gruplamasÄ±nÄ± ÅŸÃ¶yle yarat;
+    $q$'inci sÄ±radaki kenarÄ±n birleÅŸtirdiÄŸi noktalarÄ±n $v_i,v_j$ olduÄŸunu
     farz edelim, yani $o_q = (v_i,v_j)$.
-  \item Eğer $v_i,v_j$ $S^{q-1}$ gruplaması içinde farklı iki bileşen
-    içindeyseler, ve $w(o_q)$ her iki bileşenin içsel farkına kıyasla çok
-    küçük ise, bu iki bileşeni birleştir, yoksa hiçbir şey yapma.
+  \item EÄŸer $v_i,v_j$ $S^{q-1}$ gruplamasÄ± iÃ§inde farklÄ± iki bileÅŸen
+    iÃ§indeyseler, ve $w(o_q)$ her iki bileÅŸenin iÃ§sel farkÄ±na kÄ±yasla Ã§ok
+    kÃ¼Ã§Ã¼k ise, bu iki bileÅŸeni birleÅŸtir, yoksa hiÃ§bir ÅŸey yapma.
   \end{itemize}
   \item \verb!return! $S^m$ 
 \end{enumerate}
 
-Üstteki döngü içindeki en son irdelemede içsel farktan bahsediliyor, bu
-tabii ki $MInt(C_1,C_2)$. Daha formel şekilde $MInt(C_1^{q-1},C_2^{q-1})$
-çünkü bileşenlerin içerikleri hangi adımda olduğumuza göre değişebilir, $q$
-adımında bir önceki $q-1$'den bize ``miras kalan'' gruplamalar ve
-bileşenler üzerinden iş yapıyoruz. Bir sonraki adıma ya birleşmiş, ya da
-birleşmemiş (aynı) gruplamaları aktarıyoruz. 
+Ãœstteki dÃ¶ngÃ¼ iÃ§indeki en son irdelemede iÃ§sel farktan bahsediliyor, bu
+tabii ki $MInt(C_1,C_2)$. Daha formel ÅŸekilde $MInt(C_1^{q-1},C_2^{q-1})$
+Ã§Ã¼nkÃ¼ bileÅŸenlerin iÃ§erikleri hangi adÄ±mda olduÄŸumuza gÃ¶re deÄŸiÅŸebilir, $q$
+adÄ±mÄ±nda bir Ã¶nceki $q-1$'den bize ``miras kalan'' gruplamalar ve
+bileÅŸenler Ã¼zerinden iÅŸ yapÄ±yoruz. Bir sonraki adÄ±ma ya birleÅŸmiÅŸ, ya da
+birleÅŸmemiÅŸ (aynÄ±) gruplamalarÄ± aktarÄ±yoruz. 
 
-Aynı algoritmanın biraz daha fazla formül içeren hali [3]
+AynÄ± algoritmanÄ±n biraz daha fazla formÃ¼l iÃ§eren hali [3]
 
 \verb!felzenswalb!$\left(G\right)$
 \begin{enumerate}
-  \item Bütün kenarları küçükten büyüğe doğru sırala.
-  \item İlk başta kenar $v_i$ kendi bileşeni içinde olsun, buna $S^0$ gruplaması diyelim.
-  \item Her tüm kenarlar $e_i = (v_1,v_2) \in E$ için
+  \item BÃ¼tÃ¼n kenarlarÄ± kÃ¼Ã§Ã¼kten bÃ¼yÃ¼ÄŸe doÄŸru sÄ±rala.
+  \item Ä°lk baÅŸta kenar $v_i$ kendi bileÅŸeni iÃ§inde olsun, buna $S^0$ gruplamasÄ± diyelim.
+  \item Her tÃ¼m kenarlar $e_i = (v_1,v_2) \in E$ iÃ§in
     \begin{itemize}
-    \item $v_1 \in C_1$ ve $v_2 \in C_2$'nin birbirinden ayrı, ayrı
-      bileşenler içinde ama aynı kenarı içeren noktalar olduğunu düşünelim,
+    \item $v_1 \in C_1$ ve $v_2 \in C_2$'nin birbirinden ayrÄ±, ayrÄ±
+      bileÅŸenler iÃ§inde ama aynÄ± kenarÄ± iÃ§eren noktalar olduÄŸunu dÃ¼ÅŸÃ¼nelim,
     \item \verb!if! $w(e_i) \le MInt(C_1,C_2)$ ise, o zaman
-    \item  $C_1$ ve $C_2$'yi birleştir
+    \item  $C_1$ ve $C_2$'yi birleÅŸtir
     \item \verb!else!
     \item $S^i = S^{i-1}$ 
    \end{itemize}
    \verb!return!
 \end{enumerate}
 
-Felzenswalb gruplamasının Python ile yazılmış örneği alttadır, daha hızlı
-işleyen C++ bazlı kodu şurada [2] bulunabilir.
+Felzenswalb gruplamasÄ±nÄ±n Python ile yazÄ±lmÄ±ÅŸ Ã¶rneÄŸi alttadÄ±r, daha hÄ±zlÄ±
+iÅŸleyen C++ bazlÄ± kodu ÅŸurada [2] bulunabilir.
 
 \inputminted[fontsize=\footnotesize]{python}{felz.py}
 
-Basit bir örnek
+Basit bir Ã¶rnek
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.sparse as sps, felz
@@ -183,7 +183,7 @@ print clf.labels_
 [1, 1, 3, 3, 1]
 \end{verbatim}
 
-Biraz daha çetrefil bir örnek
+Biraz daha Ã§etrefil bir Ã¶rnek
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.sparse as sps
@@ -245,8 +245,8 @@ plt.savefig('mstseg_01.png')
 
 \includegraphics[height=6cm]{mstseg_01.png}
 
-Şimdi [4] yazısında gördüğümüz kelime gruplaması örneğini Felzenswalb ile
-gruplayalım.
+Åimdi [4] yazÄ±sÄ±nda gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z kelime gruplamasÄ± Ã¶rneÄŸini Felzenswalb ile
+gruplayalÄ±m.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.linalg as lin
@@ -281,7 +281,7 @@ print A.shape
 (100, 100)
 \end{verbatim}
 
-Kümelemeyi yapalım, \verb!min_size=2! seçtik çünkü ufak kümeler de mümkün.
+KÃ¼melemeyi yapalÄ±m, \verb!min_size=2! seÃ§tik Ã§Ã¼nkÃ¼ ufak kÃ¼meler de mÃ¼mkÃ¼n.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import felz
@@ -352,6 +352,6 @@ Kaynaklar
 [3] Mihai-Cotizo Sima, {\em An extension of Felzenszwalb-Huttenlocher
   segmentation to 3D point clouds}, 2012
 
-[4] Bayramli, Lineer Cebir, {\em SVD ile Kümeleme}
+[4] Bayramli, Lineer Cebir, {\em SVD ile KÃ¼meleme}
 
 \end{document}

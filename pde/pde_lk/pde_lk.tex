@@ -1,51 +1,51 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Piksel Takibi, Optik Akış, Lucas Kanade Algoritması
+Piksel Takibi, Optik AkÄ±ÅŸ, Lucas Kanade AlgoritmasÄ±
 
-Hareket halindeki bir kameranın aldığı görüntülerdeki herhangi bir pikseli
-nasıl takip ederiz? 
+Hareket halindeki bir kameranÄ±n aldÄ±ÄŸÄ± gÃ¶rÃ¼ntÃ¼lerdeki herhangi bir pikseli
+nasÄ±l takip ederiz? 
 
-Matematiksel olarak temsil etmek gerekirse, zamana göre değişen 2 boyutlu
-görüntüyü bir fonksiyon olarak düşünelim, ki bu fonksiyonun değerleri
-ayrıksal olarak, imajın ta kendisi. Bir $I(x(t),y(t),t)$ fonksiyonu piksel
-değerlerini veriyor. Bu fonksiyonda $x,y$ ekran kordinatlarına tekabül
-ediyor, $t$ ise zaman, $1,2,..$ gibi değerleri indeks değerleri var, mesela
-$I(100,200,1)$, bize 1. video karesindeki $x=100,y=200$ kordinatlarındaki
-piksel değerini verecek.
+Matematiksel olarak temsil etmek gerekirse, zamana gÃ¶re deÄŸiÅŸen 2 boyutlu
+gÃ¶rÃ¼ntÃ¼yÃ¼ bir fonksiyon olarak dÃ¼ÅŸÃ¼nelim, ki bu fonksiyonun deÄŸerleri
+ayrÄ±ksal olarak, imajÄ±n ta kendisi. Bir $I(x(t),y(t),t)$ fonksiyonu piksel
+deÄŸerlerini veriyor. Bu fonksiyonda $x,y$ ekran kordinatlarÄ±na tekabÃ¼l
+ediyor, $t$ ise zaman, $1,2,..$ gibi deÄŸerleri indeks deÄŸerleri var, mesela
+$I(100,200,1)$, bize 1. video karesindeki $x=100,y=200$ kordinatlarÄ±ndaki
+piksel deÄŸerini verecek.
 
-$x,y$ değişkenleri parametrize edildi, bir noktayı takip etmek istiyoruz
-çünkü, ve $t$'ye göre bu takip edilen noktanın $x,y$ kordinatları belli bir
-gidişat yönünde değişiyor.
+$x,y$ deÄŸiÅŸkenleri parametrize edildi, bir noktayÄ± takip etmek istiyoruz
+Ã§Ã¼nkÃ¼, ve $t$'ye gÃ¶re bu takip edilen noktanÄ±n $x,y$ kordinatlarÄ± belli bir
+gidiÅŸat yÃ¶nÃ¼nde deÄŸiÅŸiyor.
 
-Şu faraziyeyi yaparak takip problemimizi kolaylaştırabiliriz. Diyelim ki
-takip edilen bir nokta, görüldüğü her karede aynı piksel rengindedir. Bu
-çok sıradışı bir faraziye değil, resim karelerinden bir araba geçiyor
-mesela, ve bu arabanın üzerindeki piksellerin renkleri, en azından iki kare
-arasında değişmiyor. Işık seviyesi, gölgede olma, vs. gibi durumlarda biraz
-değişebilir, fakat basitleştirme amacıyla bu faraziye geçerlidir. 
+Åu faraziyeyi yaparak takip problemimizi kolaylaÅŸtÄ±rabiliriz. Diyelim ki
+takip edilen bir nokta, gÃ¶rÃ¼ldÃ¼ÄŸÃ¼ her karede aynÄ± piksel rengindedir. Bu
+Ã§ok sÄ±radÄ±ÅŸÄ± bir faraziye deÄŸil, resim karelerinden bir araba geÃ§iyor
+mesela, ve bu arabanÄ±n Ã¼zerindeki piksellerin renkleri, en azÄ±ndan iki kare
+arasÄ±nda deÄŸiÅŸmiyor. IÅŸÄ±k seviyesi, gÃ¶lgede olma, vs. gibi durumlarda biraz
+deÄŸiÅŸebilir, fakat basitleÅŸtirme amacÄ±yla bu faraziye geÃ§erlidir. 
 
 \includegraphics[height=4cm]{disp2.png}
 
-Bir diğer faraziye, kameralar hareket ettiklerinde alınan iki görüntü
-arasındaki tüm piksellerin yer değişimi genellikle aynı yönde olmasıdır. Bu
-değişim yönünü $<u,v>$ vektörü olarak görebiliriz, ve bu değişkenler iki
-görüntü arasındaki değişimde tüm pikseller için aynı olacaktır. Bu da
-normal, kamerayı alıp mesela sağa doğru hareket ettiriyoruz, ve görüntüdeki
-tüm pikseller sola doğru gidiyorlar.
+Bir diÄŸer faraziye, kameralar hareket ettiklerinde alÄ±nan iki gÃ¶rÃ¼ntÃ¼
+arasÄ±ndaki tÃ¼m piksellerin yer deÄŸiÅŸimi genellikle aynÄ± yÃ¶nde olmasÄ±dÄ±r. Bu
+deÄŸiÅŸim yÃ¶nÃ¼nÃ¼ $<u,v>$ vektÃ¶rÃ¼ olarak gÃ¶rebiliriz, ve bu deÄŸiÅŸkenler iki
+gÃ¶rÃ¼ntÃ¼ arasÄ±ndaki deÄŸiÅŸimde tÃ¼m pikseller iÃ§in aynÄ± olacaktÄ±r. Bu da
+normal, kamerayÄ± alÄ±p mesela saÄŸa doÄŸru hareket ettiriyoruz, ve gÃ¶rÃ¼ntÃ¼deki
+tÃ¼m pikseller sola doÄŸru gidiyorlar.
 
 \includegraphics[height=4cm]{disp1.png}
 
-Tüm bunları modelimizde nasıl kullanırız? 
+TÃ¼m bunlarÄ± modelimizde nasÄ±l kullanÄ±rÄ±z? 
 
-Takip edilen nokta her karede aynı renkte ise, şu ifade doğru demektir 
+Takip edilen nokta her karede aynÄ± renkte ise, ÅŸu ifade doÄŸru demektir 
 
 $$ I(x(t),y(t),t) = \textrm{ sabit } $$
 
-Eğer bu fonksiyonun zamana göre türevini alırsak
+EÄŸer bu fonksiyonun zamana gÃ¶re tÃ¼revini alÄ±rsak
 
 $$ \frac{d \ I(x(t),y(t),t)}{dt} = 0$$
 
-sonucu gelir. Eşitliğin sağı sıfır, çünkü bir sabitin türevini aldık. Sol
+sonucu gelir. EÅŸitliÄŸin saÄŸÄ± sÄ±fÄ±r, Ã§Ã¼nkÃ¼ bir sabitin tÃ¼revini aldÄ±k. Sol
 tarafa Zincirleme Kanununu uygularsak, 
 
 $$ \frac{\partial I}{\partial x}\frac{dx}{dt} +
@@ -53,26 +53,26 @@ $$ \frac{\partial I}{\partial x}\frac{dx}{dt} +
 \frac{\partial I}{\partial t} = 0
 $$
 
-Bu formülde $dx/dt$ ve $dy/dt$, hareket halindeki (zaman geçerken) noktanın
-sonsuz küçüklükteki yer değimi. Ayrıksal bağlamda arka arkaya iki kare
-içindeki yer değişimi. O zaman,
+Bu formÃ¼lde $dx/dt$ ve $dy/dt$, hareket halindeki (zaman geÃ§erken) noktanÄ±n
+sonsuz kÃ¼Ã§Ã¼klÃ¼kteki yer deÄŸimi. AyrÄ±ksal baÄŸlamda arka arkaya iki kare
+iÃ§indeki yer deÄŸiÅŸimi. O zaman,
 
 $$ \frac{dx}{dt}, \frac{dy}{dt} = u, v $$
 
-Alttakiler ise mesafesel (spatial) gradyanlardır, bunların nasıl
-hesaplanacağını çok iyi biliyoruz! 
+Alttakiler ise mesafesel (spatial) gradyanlardÄ±r, bunlarÄ±n nasÄ±l
+hesaplanacaÄŸÄ±nÄ± Ã§ok iyi biliyoruz! 
 
 $$ 
 \frac{\partial I}{\partial x}, \frac{\partial I}{\partial y}
  $$
 
-Alttaki ise resim karelerinin zamana göre türevidir.
+Alttaki ise resim karelerinin zamana gÃ¶re tÃ¼revidir.
 
 $$ 
 \frac{\partial I}{\partial t}
  $$
 
-Daha derli toplu olarak göstermek gerekirse ana formül nihai olarak şöyle
+Daha derli toplu olarak gÃ¶stermek gerekirse ana formÃ¼l nihai olarak ÅŸÃ¶yle
 
 $$ I_x u + I_y v + I_t = 0 $$
 
@@ -82,16 +82,16 @@ $$
 \nabla I \cdot <u, v> = -I_t
  $$
 
-Şimdi $u,v$'nin hesaplanmasına gelelim. Üstteki formülü bir veri noktası
-için yazmak yeterli değil. Ama bu formülü hem takip ettiğimiz, hem de onun
-etrafındaki pikseller için yazarsak (onların yer değişimi de aynı değil
-mi?), ve bu sistemi çözersek, sonuca varabiliriz. 
+Åimdi $u,v$'nin hesaplanmasÄ±na gelelim. Ãœstteki formÃ¼lÃ¼ bir veri noktasÄ±
+iÃ§in yazmak yeterli deÄŸil. Ama bu formÃ¼lÃ¼ hem takip ettiÄŸimiz, hem de onun
+etrafÄ±ndaki pikseller iÃ§in yazarsak (onlarÄ±n yer deÄŸiÅŸimi de aynÄ± deÄŸil
+mi?), ve bu sistemi Ã§Ã¶zersek, sonuca varabiliriz. 
 
-İki tane bilinmeyenimiz var, ama böylece pek çok formül elde
-ediyoruz. Veriler gürültülü olduğu için, aslında bilinmeyenden "daha
-fazla" formül elde etmek iyi, bu tür denklem sistemlerine "çok eşitliğe
-sahip (overdetermined)" denir, ve böyle tür sistemler En Az Kareler (Least
-Squares) ile çözülür. Tüm bunları biraraya koyunca şu ortaya çıkar.
+Ä°ki tane bilinmeyenimiz var, ama bÃ¶ylece pek Ã§ok formÃ¼l elde
+ediyoruz. Veriler gÃ¼rÃ¼ltÃ¼lÃ¼ olduÄŸu iÃ§in, aslÄ±nda bilinmeyenden "daha
+fazla" formÃ¼l elde etmek iyi, bu tÃ¼r denklem sistemlerine "Ã§ok eÅŸitliÄŸe
+sahip (overdetermined)" denir, ve bÃ¶yle tÃ¼r sistemler En Az Kareler (Least
+Squares) ile Ã§Ã¶zÃ¼lÃ¼r. TÃ¼m bunlarÄ± biraraya koyunca ÅŸu ortaya Ã§Ä±kar.
 
 $$ 
 \left[\begin{array}{cc}
@@ -113,28 +113,28 @@ I_t(p_k)
 \end{array}\right]
  $$
 
-Gradyanların belli noktalarda hesaplandığını unutmayalım, o sebeple $p_1,
-p_2$ gibi piksel noktalarını bu fonksiyonlara geçiyoruz. 
+GradyanlarÄ±n belli noktalarda hesaplandÄ±ÄŸÄ±nÄ± unutmayalÄ±m, o sebeple $p_1,
+p_2$ gibi piksel noktalarÄ±nÄ± bu fonksiyonlara geÃ§iyoruz. 
 
 Bu sistemi
 
 $$ A \ d = b $$
 
-olarak gösterebiliriz, ki $d = <u,v>$. Sol tarafı $A^T$ ile çarpalım
+olarak gÃ¶sterebiliriz, ki $d = <u,v>$. Sol tarafÄ± $A^T$ ile Ã§arpalÄ±m
 
 $$ A^TA \ d = A^Tb $$
 
-Eğer $A^TA$'nin matris tersini iki tarafla çarparsak, $d$ yanlız kalır, ve
-sonuç elde edilir. 
+EÄŸer $A^TA$'nin matris tersini iki tarafla Ã§arparsak, $d$ yanlÄ±z kalÄ±r, ve
+sonuÃ§ elde edilir. 
 
-Bu denklemi Python Numpy'da \verb!pinv! kullanarak çözeriz.
+Bu denklemi Python Numpy'da \verb!pinv! kullanarak Ã§Ã¶zeriz.
 
-Test için üç tane resim kullandık, bu resimlerden \verb!flow1-bw-0.png!
-başlangıç resmi, bu resmin ortasındaki objeleri GIMP kullanarak elle kopyaladık,
-bir üst sağ çapraza doğru, bir alt sol çapraza doğru, ve iki yeni resim elde
-ettik (\verb!upright.png!, \verb!dleft.png!). Takip edilen nokta gri dörtgenin
-alt sol köşesinde. Lucas Kanade algoritması bu noktayı takip ederek, yeşil ile
-işaretledi.
+Test iÃ§in Ã¼Ã§ tane resim kullandÄ±k, bu resimlerden \verb!flow1-bw-0.png!
+baÅŸlangÄ±Ã§ resmi, bu resmin ortasÄ±ndaki objeleri GIMP kullanarak elle kopyaladÄ±k,
+bir Ã¼st saÄŸ Ã§apraza doÄŸru, bir alt sol Ã§apraza doÄŸru, ve iki yeni resim elde
+ettik (\verb!upright.png!, \verb!dleft.png!). Takip edilen nokta gri dÃ¶rtgenin
+alt sol kÃ¶ÅŸesinde. Lucas Kanade algoritmasÄ± bu noktayÄ± takip ederek, yeÅŸil ile
+iÅŸaretledi.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import scipy.signal as si
@@ -237,12 +237,12 @@ test('flow1-bw-0.png','upright.png', 'lk_2.png')
 
 \includegraphics[height=6cm]{lk_2.png}
 
-Bu matematiksel modele alternatif bir bakış şöyle olabilir. İki imaj karesi
-içinde birincisine $I(x,y)$ ikincisine $H(x,y)$ diyelim, burada $t$
-üzerinden parametrizasyon olmasın; $x,y$ pikselinin $H$ içinde $u,v$ kadar
-yer değişiminden sonra, bu noktaların $I$'de geldiği yerdeki grilik değerinin
-aynı olduğunu (yine) farzediyoruz. Sonra $I(x+u,y+v)$'nin birinci
-dereceden Taylor Açılımını yapıyoruz, 
+Bu matematiksel modele alternatif bir bakÄ±ÅŸ ÅŸÃ¶yle olabilir. Ä°ki imaj karesi
+iÃ§inde birincisine $I(x,y)$ ikincisine $H(x,y)$ diyelim, burada $t$
+Ã¼zerinden parametrizasyon olmasÄ±n; $x,y$ pikselinin $H$ iÃ§inde $u,v$ kadar
+yer deÄŸiÅŸiminden sonra, bu noktalarÄ±n $I$'de geldiÄŸi yerdeki grilik deÄŸerinin
+aynÄ± olduÄŸunu (yine) farzediyoruz. Sonra $I(x+u,y+v)$'nin birinci
+dereceden Taylor AÃ§Ä±lÄ±mÄ±nÄ± yapÄ±yoruz, 
 
 $$ I(x+u,y+v) = I(x,y) + \frac{\partial I}{\partial x}u + 
 \frac{\partial I}{\partial y}v + ...
@@ -254,43 +254,43 @@ $$ I(x+u,y+v) \approx I(x,y) + \frac{\partial I}{\partial x}u +
 \frac{\partial I}{\partial y}v 
 $$
 
-Grilik aynılığını ise şöyle belirtebiliriz
+Grilik aynÄ±lÄ±ÄŸÄ±nÄ± ise ÅŸÃ¶yle belirtebiliriz
 
 $$  I(x+u,y+v) - H(x,y) = 0$$
 
-Taylor açılımını üstteki formülde $I$ yerine geçirelim
+Taylor aÃ§Ä±lÄ±mÄ±nÄ± Ã¼stteki formÃ¼lde $I$ yerine geÃ§irelim
 
 $$ I(x,y) + 
 \frac{\partial I}{\partial x}u + 
 \frac{\partial I}{\partial y}v - H(x,y) = 0
 $$
 
-$H$'in yerini değiştirelim
+$H$'in yerini deÄŸiÅŸtirelim
 
 $$ I(x,y)  - H(x,y) + I_xu + I_yv = 0$$
 
-Şu ifade $I(x,y) - H(x,y)$ nedir? Bunlar iki imajın, sonrası ve öncesi
-arasındaki fark değil midir?  O zaman bu hesabı imajın zamana göre alınmış
-türevi olarak görebiliriz, yani $I_t = I(x,y) - H(x,y)$. Yerine koyalım
+Åu ifade $I(x,y) - H(x,y)$ nedir? Bunlar iki imajÄ±n, sonrasÄ± ve Ã¶ncesi
+arasÄ±ndaki fark deÄŸil midir?  O zaman bu hesabÄ± imajÄ±n zamana gÃ¶re alÄ±nmÄ±ÅŸ
+tÃ¼revi olarak gÃ¶rebiliriz, yani $I_t = I(x,y) - H(x,y)$. Yerine koyalÄ±m
 
 $$ I_t + I_xu + I_yv = 0$$
 
 $$ I_xu + I_yv = -I_t $$
 
-Böylece aynı denkleme erişmiş olduk. Bu aslında normal, birinci
-dereceden Taylor açılımı ile tam diferansiyel denklemi (ve Zincirleme
-Kanununu) birbiriyle çok yakından alakalı.
+BÃ¶ylece aynÄ± denkleme eriÅŸmiÅŸ olduk. Bu aslÄ±nda normal, birinci
+dereceden Taylor aÃ§Ä±lÄ±mÄ± ile tam diferansiyel denklemi (ve Zincirleme
+Kanununu) birbiriyle Ã§ok yakÄ±ndan alakalÄ±.
 
-Ufak Piksel Değişimleri
+Ufak Piksel DeÄŸiÅŸimleri
 
-Konu hakkında bir nokta daha şu; Lucas-Kanade yöntemi 1. derece Taylor
-açılımı kulladığı için ufak piksel değişimleri için geçerlidir, çünkü
-Taylor açılımı yerel bir noktaya çok yakın bölgelerde bir fonksiyona
-yakın sonuçlar verir. Bu da aklımızda bulunsun.e
+Konu hakkÄ±nda bir nokta daha ÅŸu; Lucas-Kanade yÃ¶ntemi 1. derece Taylor
+aÃ§Ä±lÄ±mÄ± kulladÄ±ÄŸÄ± iÃ§in ufak piksel deÄŸiÅŸimleri iÃ§in geÃ§erlidir, Ã§Ã¼nkÃ¼
+Taylor aÃ§Ä±lÄ±mÄ± yerel bir noktaya Ã§ok yakÄ±n bÃ¶lgelerde bir fonksiyona
+yakÄ±n sonuÃ§lar verir. Bu da aklÄ±mÄ±zda bulunsun.e
 
 OpenCV
 
-OpenCV ile optik akış kullanımı altta görülüyor. 
+OpenCV ile optik akÄ±ÅŸ kullanÄ±mÄ± altta gÃ¶rÃ¼lÃ¼yor. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd, zipfile

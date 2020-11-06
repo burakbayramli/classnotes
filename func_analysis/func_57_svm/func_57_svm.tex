@@ -1,34 +1,34 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Destek Vektor Makinaları (Support Vector Machines)
+Destek Vektor MakinalarÄ± (Support Vector Machines)
 
-En basit halleriyle SVM'ler risk minimize eden lineer sınıflayıcısıdırlar. 
+En basit halleriyle SVM'ler risk minimize eden lineer sÄ±nÄ±flayÄ±cÄ±sÄ±dÄ±rlar. 
 
 $$
 R(\Theta) \leq J(\Theta) = R_{emp}(\Theta) +
 \sqrt{ \frac{h \times (\log(\frac{2N}{h}) + 1) - \log(\frac{\eta}{4})}{N}}
 $$
 
-h: sınıflayıcının kapasitesi 
+h: sÄ±nÄ±flayÄ±cÄ±nÄ±n kapasitesi 
 
-N: eğitim verisinde kaç veri noktası olduğu
+N: eÄŸitim verisinde kaÃ§ veri noktasÄ± olduÄŸu
 
-Vapnik ve Chernovenkis $1-\eta$ olasılıkla ispaladı ki üstteki denklem doğrudur. 
-SVM algoritması hem $h$ değerini hem de sayısal, ölçümsel riski aynı
-anda minimize etmektedir, ve bunu sınır noktalarını noktalarını
-ayırmakla yapmaktadır. Türetelim, 
+Vapnik ve Chernovenkis $1-\eta$ olasÄ±lÄ±kla ispaladÄ± ki Ã¼stteki denklem doÄŸrudur. 
+SVM algoritmasÄ± hem $h$ deÄŸerini hem de sayÄ±sal, Ã¶lÃ§Ã¼msel riski aynÄ±
+anda minimize etmektedir, ve bunu sÄ±nÄ±r noktalarÄ±nÄ± noktalarÄ±nÄ±
+ayÄ±rmakla yapmaktadÄ±r. TÃ¼retelim, 
 
 \includegraphics[height=6cm]{svm-planes.png}
 
-Karar düzlemi: $w^{T}x + b=0$ 
+Karar dÃ¼zlemi: $w^{T}x + b=0$ 
 
-Şöyle bir tanım yapalım:
+ÅÃ¶yle bir tanÄ±m yapalÄ±m:
 
 $$
 q = \min_{x}\big\|x - 0\big\|, \quad w^T x+b=0 \textrm { sartina gore }
 $$
 
-$q$, $H^{+}$ ve $H^{-}$ formüllerini ileride kullanacağız.
+$q$, $H^{+}$ ve $H^{-}$ formÃ¼llerini ileride kullanacaÄŸÄ±z.
 
 Lagrange:
 
@@ -36,7 +36,7 @@ $$
 \min_{x}\frac{1}{2} \big\|x - 0\big\|^2+\lambda(w^{T}x+b)
 $$
 
-Gradyanı alalım ve 0 değerine eşitleyelim,
+GradyanÄ± alalÄ±m ve 0 deÄŸerine eÅŸitleyelim,
 
 $$
 \frac{\partial}{\partial x} ( \frac{1}{2} x^T x + \lambda( w^T x + b ) ) = 0
@@ -46,13 +46,13 @@ $$ x + \lambda w = 0 $$
 
 $$ x = -\lambda w $$
 
-Üsteki sonucu $w^T x+b=0$ şartına sokalım,
+Ãœsteki sonucu $w^T x+b=0$ ÅŸartÄ±na sokalÄ±m,
 
 $$ w^T(-\lambda w) + b = 0 $$
 
 $$ \lambda = \frac{b}{w^Tw} $$
 
-Yani çözüm
+Yani Ã§Ã¶zÃ¼m
 
 $$ \hat{x} = - \bigg( \frac{b}{w^Tw}  \bigg) w $$
 
@@ -64,69 +64,69 @@ $$ \big|\frac{b}{w^Tw}\big| \times \sqrt{w^Tw}  $$
 
 $$ q = \frac{|b|}{||w||} $$
 
-Tanım:
+TanÄ±m:
 
 $$ H^{+} = w^{T}x + b=+1 $$
 
 $$ H^{-} = w^{T}x + b=-1 $$
 
-grafikte görüldüğü gibi yani. Üstteki şekilde tanımın bir zararı yok (çünkü
-+1,-1 sabit durunca ayraç genişlemesi nasıl olacak diye düşünülebilir, ama bu
-tanım genelliği kaybetmeden yapabilabiliyor çünkü $b,w$ değerlerinde hala
+grafikte gÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi yani. Ãœstteki ÅŸekilde tanÄ±mÄ±n bir zararÄ± yok (Ã§Ã¼nkÃ¼
++1,-1 sabit durunca ayraÃ§ geniÅŸlemesi nasÄ±l olacak diye dÃ¼ÅŸÃ¼nÃ¼lebilir, ama bu
+tanÄ±m genelliÄŸi kaybetmeden yapabilabiliyor Ã§Ã¼nkÃ¼ $b,w$ deÄŸerlerinde hala
 oynanabilir.
 
-$q^{+}$ ve $q^{-}$ değerlerini hesapla
+$q^{+}$ ve $q^{-}$ deÄŸerlerini hesapla
 
 $$ q^{+} = \frac{|b-1|}{||w||} $$
 
 $$ q^{-} = \frac{|-b-1|}{||w||} $$
 
-Ayraç o zaman şöyle 
+AyraÃ§ o zaman ÅŸÃ¶yle 
 
 $$ m=q^{+}+q^{-} =
 \frac{|b-1-b-1|}{||w||} = \frac{|-2|}{||w||} = \frac{2}{||w||} $$
 
-Ayraçların olabildiğince ayırmasını istiyorsak $m$'i arttırız (yani
-$\frac{2}{||w||}$'i maksimize ederiz), ya da $||w||$ değerini minimize
+AyraÃ§larÄ±n olabildiÄŸince ayÄ±rmasÄ±nÄ± istiyorsak $m$'i arttÄ±rÄ±z (yani
+$\frac{2}{||w||}$'i maksimize ederiz), ya da $||w||$ deÄŸerini minimize
 ederiz. 
 
-Sınırlar
+SÄ±nÄ±rlar
 
-Veri noktalarını öyle sınıflamak istiyoruz ki + ve - noktalar
-hiperdüzlemlerin doğru noktalarında kalsınlar. 
+Veri noktalarÄ±nÄ± Ã¶yle sÄ±nÄ±flamak istiyoruz ki + ve - noktalar
+hiperdÃ¼zlemlerin doÄŸru noktalarÄ±nda kalsÄ±nlar. 
 
 $$ w^{T}x+b \geq +1, \quad \forall y_{i}=+1   $$
 
 $$ w^{T}x+b \leq -1, \quad \forall y_{i}=-1  $$
 
-Bu iki denklemi birleştirelim
+Bu iki denklemi birleÅŸtirelim
 
 $$ y_{i}(w^{T}x+b)-1 \geq 0  $$
 
-Her şeyi biraraya koyalım
+Her ÅŸeyi biraraya koyalÄ±m
 
 $$ \min_w \frac{1}{2}{||w||^2}, \quad y_{i}(w^Tx_{i}+b)-1 \ge 0
 \textrm{ olsun. }$$
 
 
-Bu form tanıdık geliyor mu? Bu qp ile çözülebilecek karesel (quadratic)
-bir formül, programdır!
+Bu form tanÄ±dÄ±k geliyor mu? Bu qp ile Ã§Ã¶zÃ¼lebilecek karesel (quadratic)
+bir formÃ¼l, programdÄ±r!
 
 qp
 
-Python dilinde cvxopt paketi vardır Matlab Optimization Toolbox'da qp() var. QP
-fonksiyonları problemleri genelde
+Python dilinde cvxopt paketi vardÄ±r Matlab Optimization Toolbox'da qp() var. QP
+fonksiyonlarÄ± problemleri genelde
 
 $$\frac{1}{2}x^{T}Px+q^{T}x$$
 
-formunda görmek isterler. Biraz önce elde ettiğimiz denklemi bu istenen formata
-doğru ``masajlayabiliriz''
+formunda gÃ¶rmek isterler. Biraz Ã¶nce elde ettiÄŸimiz denklemi bu istenen formata
+doÄŸru ``masajlayabiliriz''
 
-İkiz (dual)
+Ä°kiz (dual)
 
-SVM ihtiyaçları için ikiz formül (dual) ile çalışmak daha rahattır
-Lagrange (tekrar) oluşturalım, türevi alalım, ve sıfıra eşitleyelim.
-Bunun sonucunda elimize KKT noktaları geçecektir
+SVM ihtiyaÃ§larÄ± iÃ§in ikiz formÃ¼l (dual) ile Ã§alÄ±ÅŸmak daha rahattÄ±r
+Lagrange (tekrar) oluÅŸturalÄ±m, tÃ¼revi alalÄ±m, ve sÄ±fÄ±ra eÅŸitleyelim.
+Bunun sonucunda elimize KKT noktalarÄ± geÃ§ecektir
 
 $$
 L_{p} = \frac{1}{2}||w||^{2}-\sum_{i}\alpha_{i}(y_{i}(w^{T}x_{i}+b)-1)  
@@ -143,14 +143,14 @@ $$
 \frac{\partial}{\partial b} L_{p} = -\sum_{i}\alpha_{i}y_{i}=0  
 $$
 
-Üstteki iki denklemi asal (primal) denkleme koyduğumuz zaman
+Ãœstteki iki denklemi asal (primal) denkleme koyduÄŸumuz zaman
 
 $$
 \textrm{ Maksimize et } L_{D}= \sum_{i}\alpha_{i}-\frac{1}{2}
 \sum_{i} \sum_{j} \alpha_{i} \alpha_{j} y_{i}y_{j}x_{i}^{T}x_{j} 
 $$
 
-sınırlar
+sÄ±nÄ±rlar
 
 $$ \sum_{i}\alpha_{i}y_{i}=0  $$
 
@@ -158,49 +158,49 @@ $$ \alpha_{i} \geq 0  $$
 
 qp
 
-Bu yine qp() formunda bir problem! Sadece bu sefer çözeceğimiz değişkenler
-$\alpha_i$'lar, $x$'lar değil.  Üstteki denklem şu forma
-$\frac{1}{2}x^{T}Px+q^{T}x$ masajlanabilir Bunun yapmak için $P_{i,j}$'ye
-$-y_{i}y_{j}x_{i}^{T}x_{j}$ değerini atarız.  Ve qp'yi çağırırız Sonuç bir
-$\alpha$'lar listesi olacaktır.
+Bu yine qp() formunda bir problem! Sadece bu sefer Ã§Ã¶zeceÄŸimiz deÄŸiÅŸkenler
+$\alpha_i$'lar, $x$'lar deÄŸil.  Ãœstteki denklem ÅŸu forma
+$\frac{1}{2}x^{T}Px+q^{T}x$ masajlanabilir Bunun yapmak iÃ§in $P_{i,j}$'ye
+$-y_{i}y_{j}x_{i}^{T}x_{j}$ deÄŸerini atarÄ±z.  Ve qp'yi Ã§aÄŸÄ±rÄ±rÄ±z SonuÃ§ bir
+$\alpha$'lar listesi olacaktÄ±r.
 
-$b$ değerini hesaplamak
+$b$ deÄŸerini hesaplamak
 
-KKT koşulunun sebebiyle sıfır olmayan her $\alpha_{i}$ için ana problemde ona
-tekabül eden kısıtlayıcı şart şıkıdır (tight), yani bir eşitliktir.  O zaman
-sıfır olmayan her $\alpha_{i}$ için $b$'yi $w^{T}x_{i}+b = y_{i}$ ifadesini
-kullanarak hesaplarız.  Sıfır olmayan her $\alpha_{i}$'dan gelen $b$ yaklaşık
-olarak diğer other $b$'lere eşit olacaktır. Final $b$'yi hesaplamak için tüm
-$b$'lerin ortalamasını almak sayısal (numeric) olarak daha garantidir.
+KKT koÅŸulunun sebebiyle sÄ±fÄ±r olmayan her $\alpha_{i}$ iÃ§in ana problemde ona
+tekabÃ¼l eden kÄ±sÄ±tlayÄ±cÄ± ÅŸart ÅŸÄ±kÄ±dÄ±r (tight), yani bir eÅŸitliktir.  O zaman
+sÄ±fÄ±r olmayan her $\alpha_{i}$ iÃ§in $b$'yi $w^{T}x_{i}+b = y_{i}$ ifadesini
+kullanarak hesaplarÄ±z.  SÄ±fÄ±r olmayan her $\alpha_{i}$'dan gelen $b$ yaklaÅŸÄ±k
+olarak diÄŸer other $b$'lere eÅŸit olacaktÄ±r. Final $b$'yi hesaplamak iÃ§in tÃ¼m
+$b$'lerin ortalamasÄ±nÄ± almak sayÄ±sal (numeric) olarak daha garantidir.
 
-Sınıflayıcı Tamamlandı
+SÄ±nÄ±flayÄ±cÄ± TamamlandÄ±
 
-Her yeni $x$ noktası için artık $sign(x^{T}w+b)$ ibaresini sınıflayıcımız olarak
-kullanabiliriz. $-1$ ya da $+1$ olarak geri gelecek sonuç bize yeni noktanın
-hangi sınıfa ait olduğunu söyleyecektir.
+Her yeni $x$ noktasÄ± iÃ§in artÄ±k $sign(x^{T}w+b)$ ibaresini sÄ±nÄ±flayÄ±cÄ±mÄ±z olarak
+kullanabiliriz. $-1$ ya da $+1$ olarak geri gelecek sonuÃ§ bize yeni noktanÄ±n
+hangi sÄ±nÄ±fa ait olduÄŸunu sÃ¶yleyecektir.
 
-Örnek Çıktı
+Ã–rnek Ã‡Ä±ktÄ±
 
 \includegraphics[height=4cm]{svmlinear.png}
 
-Çekirdekler (Kernels)
+Ã‡ekirdekler (Kernels)
 
-Şimdiye kadar lineer ayraçlardan bahsettik.  SVM'ler lineer olmayan
-ayraçlarla da çalışabilir.  Çok basit: Bir temel fonksiyon kullanarak
-girdiyi daha yüksek boyuta doğru bir önişlemden geçirirsek bunu
-başarabiliriz.  Algoritmanın geri kalanı değişmeden kalacaktır.
+Åimdiye kadar lineer ayraÃ§lardan bahsettik.  SVM'ler lineer olmayan
+ayraÃ§larla da Ã§alÄ±ÅŸabilir.  Ã‡ok basit: Bir temel fonksiyon kullanarak
+girdiyi daha yÃ¼ksek boyuta doÄŸru bir Ã¶niÅŸlemden geÃ§irirsek bunu
+baÅŸarabiliriz.  AlgoritmanÄ±n geri kalanÄ± deÄŸiÅŸmeden kalacaktÄ±r.
 
-Gayri Lineer Çekirdek
+Gayri Lineer Ã‡ekirdek
 
 \includegraphics[height=4cm]{svmpoly.png}
 
-Esneme Payı Bazen bir problem ayrılmaya müsait olmayabilir.  Çok üç
-noktalardaki bazı noktalar sınıflayıcının çalışmasını imkansız hale
-getirebilir Bunun çözümü için sınıflayıcıya "esneme payı" dahil
-edebiliriz.  Mesela $y_{i}=+1$ için verinin yanlış tarafa düşmesini şu
+Esneme PayÄ± Bazen bir problem ayrÄ±lmaya mÃ¼sait olmayabilir.  Ã‡ok Ã¼Ã§
+noktalardaki bazÄ± noktalar sÄ±nÄ±flayÄ±cÄ±nÄ±n Ã§alÄ±ÅŸmasÄ±nÄ± imkansÄ±z hale
+getirebilir Bunun Ã§Ã¶zÃ¼mÃ¼ iÃ§in sÄ±nÄ±flayÄ±cÄ±ya "esneme payÄ±" dahil
+edebiliriz.  Mesela $y_{i}=+1$ iÃ§in verinin yanlÄ±ÅŸ tarafa dÃ¼ÅŸmesini ÅŸu
 durumda izin verebiliriz: $w^{T}+b \geq -0.03$ Fakat eklemek gerekir
-ki bu tür noktaların ``çok fazla'' olmasını da istemiyoruz, bu sebeple
-bu "yanlış" noktaların sayısına da bir ceza getirebiliriz.
+ki bu tÃ¼r noktalarÄ±n ``Ã§ok fazla'' olmasÄ±nÄ± da istemiyoruz, bu sebeple
+bu "yanlÄ±ÅŸ" noktalarÄ±n sayÄ±sÄ±na da bir ceza getirebiliriz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy import linalg
@@ -292,64 +292,64 @@ test points
 -2.33333253877
 \end{verbatim}
 
-Not: İkizdeki $L_d$'yi maksimize ediyoruz, fakat hala \verb!qp()!'deki
-minimize ediciyi çağırıyoruz. Bu sebeple tüm $\alpha$'ların toplamını
-temsil eden $q$'ların negatifini alıyoruz, \verb!np.ones(n_samples) *-1!
-işleminde görüldüğü gibi. Formüldeki karesel kısım içinde zaten
-$-\frac{1}{2}$ negatif ibaresi var, böylece geri kalan formülün değişmesine
+Not: Ä°kizdeki $L_d$'yi maksimize ediyoruz, fakat hala \verb!qp()!'deki
+minimize ediciyi Ã§aÄŸÄ±rÄ±yoruz. Bu sebeple tÃ¼m $\alpha$'larÄ±n toplamÄ±nÄ±
+temsil eden $q$'larÄ±n negatifini alÄ±yoruz, \verb!np.ones(n_samples) *-1!
+iÅŸleminde gÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi. FormÃ¼ldeki karesel kÄ±sÄ±m iÃ§inde zaten
+$-\frac{1}{2}$ negatif ibaresi var, bÃ¶ylece geri kalan formÃ¼lÃ¼n deÄŸiÅŸmesine
 gerek yok.
 
-Dayanaklı Kayıp Fonksiyonu ile SVM, Pegasos
+DayanaklÄ± KayÄ±p Fonksiyonu ile SVM, Pegasos
 
-SVM problemi alttaki fonksiyonu çözmek anlamına geliyordu,
+SVM problemi alttaki fonksiyonu Ã§Ã¶zmek anlamÄ±na geliyordu,
 
 $$ \min_w \frac{1}{2}{||w||^2}, \textrm{ s.t. } \quad y_{i}(w^Tx_{i}+b)-1 \ge 0 $$
 
 ki bu bir karesel program idi ve \verb!cvxopt! paketindeki \verb!qp! ile
-çözülebiliyordu. Bazıları $b$ terimini de atıyorlar, ve 
+Ã§Ã¶zÃ¼lebiliyordu. BazÄ±larÄ± $b$ terimini de atÄ±yorlar, ve 
 
 $$  \min_w \frac{1}{2}{||w||^2} + \sum \max \{ 0, 1-y_i (w^T x_i) \}  $$
 
-olarak yazıyorlar. Ayrıca regülarizasyonu kontrol etmek için bir $\lambda$
-sabiti de ekleniyor, yani üstte $\lambda ||w||^2 / 2$ kullanılması
-lazım. Regülarize işlemi $w$'nin norm'unun küçük olmasını tercih eder, ki bu
-bazı $w$ değerlerinin sıfıra gitmesini zorlar, yani bir tür özellik seçme işi bu
-şekilde gerçekleşmiş olur. Toplam işleminin içindeki fonksiyona ``kayıp
-fonksiyonu (loss function)'' ismi de verilir, eğer bu kayıp fonksiyonu tam
-üstteki gibi ise ona dayanaklı kayıp (hinge loss) denir. Üstte görülen $\max$
-ifadesi suna eşittir,
+olarak yazÄ±yorlar. AyrÄ±ca regÃ¼larizasyonu kontrol etmek iÃ§in bir $\lambda$
+sabiti de ekleniyor, yani Ã¼stte $\lambda ||w||^2 / 2$ kullanÄ±lmasÄ±
+lazÄ±m. RegÃ¼larize iÅŸlemi $w$'nin norm'unun kÃ¼Ã§Ã¼k olmasÄ±nÄ± tercih eder, ki bu
+bazÄ± $w$ deÄŸerlerinin sÄ±fÄ±ra gitmesini zorlar, yani bir tÃ¼r Ã¶zellik seÃ§me iÅŸi bu
+ÅŸekilde gerÃ§ekleÅŸmiÅŸ olur. Toplam iÅŸleminin iÃ§indeki fonksiyona ``kayÄ±p
+fonksiyonu (loss function)'' ismi de verilir, eÄŸer bu kayÄ±p fonksiyonu tam
+Ã¼stteki gibi ise ona dayanaklÄ± kayÄ±p (hinge loss) denir. Ãœstte gÃ¶rÃ¼len $\max$
+ifadesi suna eÅŸittir,
 
 $$
 Loss(w,x_i,y_i) = 
 \left\{ \begin{array}{ll}
-1-y_i \cdot (w \cdot x_i) & \textrm{ eğer } y_i \cdot (w \cdot x_i) < 1 \\
-0 & \textrm { diğer }
+1-y_i \cdot (w \cdot x_i) & \textrm{ eÄŸer } y_i \cdot (w \cdot x_i) < 1 \\
+0 & \textrm { diÄŸer }
 \end{array} \right.
 $$
 
-Eğer kayıp fonksiyonunun gradyanını alırsak,
+EÄŸer kayÄ±p fonksiyonunun gradyanÄ±nÄ± alÄ±rsak,
 
 $$
 \nabla L = \frac{\partial Loss(w,x_i,y_i)}{\partial w} =
 \left\{ \begin{array}{ll}
--y_i  x_i & \textrm{ eğer } y_i \cdot (w \cdot x_i) < 1 \\
-0 & \textrm { diğer }
+-y_i  x_i & \textrm{ eÄŸer } y_i \cdot (w \cdot x_i) < 1 \\
+0 & \textrm { diÄŸer }
 \end{array} \right.
 $$
 
-Böylece bir rasgele gradyan iniş (stochastic gradient descent) yaklaşımını
+BÃ¶ylece bir rasgele gradyan iniÅŸ (stochastic gradient descent) yaklaÅŸÄ±mÄ±nÄ±
 kodlayabiliriz. 
 
 $$ w_{t+1} = w_t - \eta (\lambda w_t + \nabla L )$$
 
-ki $\eta$ gradyanın ne kadar güncellenme yapacağını kontrol eden bir sabittir.
+ki $\eta$ gradyanÄ±n ne kadar gÃ¼ncellenme yapacaÄŸÄ±nÄ± kontrol eden bir sabittir.
 
-Ufak Toptan Parçalar (Minibatching)
+Ufak Toptan ParÃ§alar (Minibatching)
 
-Güncelleme işlemi tüm veri üzerinde, her veri noktası için yapılabilir, ya da
-gradyan güncellemeleri toparlanarak belli sayıda adım sonrası bir toplam
-güncelleme yapılır. $b$ büyüklüğündeki ufak parça $B_t$ de rasgele seçilir, ve
-$w$'ye uygulanır [3].
+GÃ¼ncelleme iÅŸlemi tÃ¼m veri Ã¼zerinde, her veri noktasÄ± iÃ§in yapÄ±labilir, ya da
+gradyan gÃ¼ncellemeleri toparlanarak belli sayÄ±da adÄ±m sonrasÄ± bir toplam
+gÃ¼ncelleme yapÄ±lÄ±r. $b$ bÃ¼yÃ¼klÃ¼ÄŸÃ¼ndeki ufak parÃ§a $B_t$ de rasgele seÃ§ilir, ve
+$w$'ye uygulanÄ±r [3].
 
 $$
 w_{t+1} = w_t - \eta \bigg(
@@ -428,7 +428,7 @@ iter 200 batch 100 egitim ('AUC', 0.75917270896628253)
 iter 200 batch 100 test ('AUC', 0.75757600000000003)
 \end{verbatim}
 
-Hazır bir SVM kodu scikit-learn kütüphanesi karşılaştıralım, 
+HazÄ±r bir SVM kodu scikit-learn kÃ¼tÃ¼phanesi karÅŸÄ±laÅŸtÄ±ralÄ±m, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sklearn.svm import SVC

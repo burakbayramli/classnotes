@@ -1,167 +1,167 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Ağ Akış Problemleri (Network flow problems)
+AÄŸ AkÄ±ÅŸ Problemleri (Network flow problems)
 
-Daha önce işlediğimiz [3] ağ akış konusunu biraz daha genişletelim. Sailco
-adlı hayali bir şirket düşünelim, bu şirket yelkenli tekne (sailbot)
-üretiyor. Problem şöyle, önümüzdeki 4 ay içinde alttaki üretim sayısını
-gerçekleştirmesi gerekiyor (müşteri talebi)
+Daha Ã¶nce iÅŸlediÄŸimiz [3] aÄŸ akÄ±ÅŸ konusunu biraz daha geniÅŸletelim. Sailco
+adlÄ± hayali bir ÅŸirket dÃ¼ÅŸÃ¼nelim, bu ÅŸirket yelkenli tekne (sailbot)
+Ã¼retiyor. Problem ÅŸÃ¶yle, Ã¶nÃ¼mÃ¼zdeki 4 ay iÃ§inde alttaki Ã¼retim sayÄ±sÄ±nÄ±
+gerÃ§ekleÅŸtirmesi gerekiyor (mÃ¼ÅŸteri talebi)
 
 $$ 
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 \textrm{Ay} & 1 & 2 & 3 & 4 \\
 \hline
-\textrm{Üretilen tekne sayısı} & 40 & 60 & 70 & 25 \\
+\textrm{Ãœretilen tekne sayÄ±sÄ±} & 40 & 60 & 70 & 25 \\
 \hline
 \end{tabular}
 $$
 
-Birinci ayda 40, ikinci ayda 60, vs.. Şirketin bir deposu da var, bitmiş
-teknelerin teslim etmeden önce tutuldukları yer burası. 1. ayın başında bu
-depoda 10 tane tekne var. Her ay kaç tane tekne (ve nasıl) üretileceğini
-hesaplamam lazım, burada işçi türü ve depoda olanlar sayıyı etkiler tabii,
-mesela bir ayda 10 tane üretmem gerekiyorsa ve depoda zaten 10 tane varsa,
-hiç üretim yapmama gerek yok. Ama gelecekte çok fazla üretmem gerektiğini
-biliyorsam ekstra yapıp onları depoda tutabilirim, ki sonra gönderebileyim.
+Birinci ayda 40, ikinci ayda 60, vs.. Åirketin bir deposu da var, bitmiÅŸ
+teknelerin teslim etmeden Ã¶nce tutulduklarÄ± yer burasÄ±. 1. ayÄ±n baÅŸÄ±nda bu
+depoda 10 tane tekne var. Her ay kaÃ§ tane tekne (ve nasÄ±l) Ã¼retileceÄŸini
+hesaplamam lazÄ±m, burada iÅŸÃ§i tÃ¼rÃ¼ ve depoda olanlar sayÄ±yÄ± etkiler tabii,
+mesela bir ayda 10 tane Ã¼retmem gerekiyorsa ve depoda zaten 10 tane varsa,
+hiÃ§ Ã¼retim yapmama gerek yok. Ama gelecekte Ã§ok fazla Ã¼retmem gerektiÄŸini
+biliyorsam ekstra yapÄ±p onlarÄ± depoda tutabilirim, ki sonra gÃ¶nderebileyim.
 
-İşçi kısıtlaması şöyle, normal işçiyle 400 lira / tekne üzerinden fazla
-mesai ile 450 lira / tekne üzerinden üretim yapabilirim. Tek bir tekneyi
-depoda tutmak 20 lira. Ayrıca normal işçi ile ayda sadece 40 tekne
-yapabiliyorum, eğer o ayda daha fazla tekne yapmam gerekiyorsa fazla mesai
-kullanmam şart.
+Ä°ÅŸÃ§i kÄ±sÄ±tlamasÄ± ÅŸÃ¶yle, normal iÅŸÃ§iyle 400 lira / tekne Ã¼zerinden fazla
+mesai ile 450 lira / tekne Ã¼zerinden Ã¼retim yapabilirim. Tek bir tekneyi
+depoda tutmak 20 lira. AyrÄ±ca normal iÅŸÃ§i ile ayda sadece 40 tekne
+yapabiliyorum, eÄŸer o ayda daha fazla tekne yapmam gerekiyorsa fazla mesai
+kullanmam ÅŸart.
 
-Problem şöyle, öyle bir üretim ve depolama takvimi planla ki önümüzdeki 4
-aydaki üretimi minimum masrafla yapabileyim. 
+Problem ÅŸÃ¶yle, Ã¶yle bir Ã¼retim ve depolama takvimi planla ki Ã¶nÃ¼mÃ¼zdeki 4
+aydaki Ã¼retimi minimum masrafla yapabileyim. 
 
-Karar değişkenleri neler olacak? Görüyorum ki bu tür problemlerle uğraşan
-bazı öğrenciler genelde az sayıda değişken kullanmaya meyilli, mesela ``X
-ayında üretilecek tekne sayısı'' gibi, ve beklenti o ki formüller işin
+Karar deÄŸiÅŸkenleri neler olacak? GÃ¶rÃ¼yorum ki bu tÃ¼r problemlerle uÄŸraÅŸan
+bazÄ± Ã¶ÄŸrenciler genelde az sayÄ±da deÄŸiÅŸken kullanmaya meyilli, mesela ``X
+ayÄ±nda Ã¼retilecek tekne sayÄ±sÄ±'' gibi, ve beklenti o ki formÃ¼ller iÅŸin
 gerisini halletsin. Yani mesela ilk ay bariz zaten, depoda 10 tane tekne
-var, geri kalanını ilk ayda normal işçilere yaptırırım çünkü bu en ucuzu. O
-zaman o ayda üretilen tekne sayısı değişkeni yeter, vs. Fakat göreceğiz ki
-bu tür yaklaşımlar aslında işi daha zorlaştırıyor. İşimize yaramayabilecek
-ekstra değişkenler tanımlamak, sonra o değişkenleri kısıtlayıp probleme
-uygun şekilde dahil etmek daha kolay.
+var, geri kalanÄ±nÄ± ilk ayda normal iÅŸÃ§ilere yaptÄ±rÄ±rÄ±m Ã§Ã¼nkÃ¼ bu en ucuzu. O
+zaman o ayda Ã¼retilen tekne sayÄ±sÄ± deÄŸiÅŸkeni yeter, vs. Fakat gÃ¶receÄŸiz ki
+bu tÃ¼r yaklaÅŸÄ±mlar aslÄ±nda iÅŸi daha zorlaÅŸtÄ±rÄ±yor. Ä°ÅŸimize yaramayabilecek
+ekstra deÄŸiÅŸkenler tanÄ±mlamak, sonra o deÄŸiÅŸkenleri kÄ±sÄ±tlayÄ±p probleme
+uygun ÅŸekilde dahil etmek daha kolay.
 
-Biz de böyle yapacağız. Bir sürü değişken; mesela X ayı için kaç tane
-``normal işçi teknesi'' üretilmesi gerektiği, yani bu sayı sadece normal
-işçiler tarafından üretilecek tekneleri kontrol edecek, fazla mesai için
-farklı olacak.. Her ay depoda kaç tekne tutulduğu ayrı sayılacak, her şey
-bir değişken olacak. Belki bu değişkenlerden bazıları fuzuli, hatta başka
-bir şeyi tekrar ediyor sanki, başka değişkenlerden türetilebilir gibi
-geliyor, olsun, yine de ekstra değişkeni koyun, ama diğer yandan
-aklınızdaki o kuralı probleme sınırlama olarak dahil edin. Literatürde bu
-değiskenlere karar değiskenleri deniyor ama aslında onlarin direk karar
-verdiğimiz şeyler olmasına gerek yok.
+Biz de bÃ¶yle yapacaÄŸÄ±z. Bir sÃ¼rÃ¼ deÄŸiÅŸken; mesela X ayÄ± iÃ§in kaÃ§ tane
+``normal iÅŸÃ§i teknesi'' Ã¼retilmesi gerektiÄŸi, yani bu sayÄ± sadece normal
+iÅŸÃ§iler tarafÄ±ndan Ã¼retilecek tekneleri kontrol edecek, fazla mesai iÃ§in
+farklÄ± olacak.. Her ay depoda kaÃ§ tekne tutulduÄŸu ayrÄ± sayÄ±lacak, her ÅŸey
+bir deÄŸiÅŸken olacak. Belki bu deÄŸiÅŸkenlerden bazÄ±larÄ± fuzuli, hatta baÅŸka
+bir ÅŸeyi tekrar ediyor sanki, baÅŸka deÄŸiÅŸkenlerden tÃ¼retilebilir gibi
+geliyor, olsun, yine de ekstra deÄŸiÅŸkeni koyun, ama diÄŸer yandan
+aklÄ±nÄ±zdaki o kuralÄ± probleme sÄ±nÄ±rlama olarak dahil edin. LiteratÃ¼rde bu
+deÄŸiskenlere karar deÄŸiskenleri deniyor ama aslÄ±nda onlarin direk karar
+verdiÄŸimiz ÅŸeyler olmasÄ±na gerek yok.
 
-Değişkenler şöyle,
+DeÄŸiÅŸkenler ÅŸÃ¶yle,
 
-$x_1,x_2,x_3,x_4$: her ayda normal işçilik ile üretilen tekne sayısı
+$x_1,x_2,x_3,x_4$: her ayda normal iÅŸÃ§ilik ile Ã¼retilen tekne sayÄ±sÄ±
 
-$y_1,y_2,y_3,y_4$: her ayda fazla mesai ile üretilen tekne sayısı
+$y_1,y_2,y_3,y_4$: her ayda fazla mesai ile Ã¼retilen tekne sayÄ±sÄ±
 
-$h_1,h_2,h_3,h_4,h_5$: her ay başında depoda olan tekne sayısı. 5 ay var
-çünkü ay sonundaki sayıyı $h_5$ değişkeninde tutuyoruz. Tabii problemi iyi
-anlayanlarımız farketmiştir ki bu değişkende sıfır değeri olmalı, tüm
-tekneler gönderilmiş olmalı.
+$h_1,h_2,h_3,h_4,h_5$: her ay baÅŸÄ±nda depoda olan tekne sayÄ±sÄ±. 5 ay var
+Ã§Ã¼nkÃ¼ ay sonundaki sayÄ±yÄ± $h_5$ deÄŸiÅŸkeninde tutuyoruz. Tabii problemi iyi
+anlayanlarÄ±mÄ±z farketmiÅŸtir ki bu deÄŸiÅŸkende sÄ±fÄ±r deÄŸeri olmalÄ±, tÃ¼m
+tekneler gÃ¶nderilmiÅŸ olmalÄ±.
 
 Parametreler
 
-Bunlar değişken değil dikkat, dışarıdan tanımlanan parametreler. Başta
-gördüğümüz sayılar bunlar, her ay müşteriden gelen talep, 
+Bunlar deÄŸiÅŸken deÄŸil dikkat, dÄ±ÅŸarÄ±dan tanÄ±mlanan parametreler. BaÅŸta
+gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z sayÄ±lar bunlar, her ay mÃ¼ÅŸteriden gelen talep, 
 
-$d_1,d_2,d_3,d_4$: her ay için talep (demand). 
+$d_1,d_2,d_3,d_4$: her ay iÃ§in talep (demand). 
 
-Kısıtlamalar
+KÄ±sÄ±tlamalar
 
-$0 \le x_i \le 40$, ki $i=1,2,3,4$: normal işçilikle üretilebilecek tekne
-sayısı, çünkü üstte belirttik, o tür üretimin sınırı bu
+$0 \le x_i \le 40$, ki $i=1,2,3,4$: normal iÅŸÃ§ilikle Ã¼retilebilecek tekne
+sayÄ±sÄ±, Ã§Ã¼nkÃ¼ Ã¼stte belirttik, o tÃ¼r Ã¼retimin sÄ±nÄ±rÄ± bu
 
-$y_i \ge 0$: fazla mesai ile üretilebilecek tekne sayısı sınırsız. Tabii ki
-negatif tekne üretilemez, o sebeple sıfırdan büyüklük var. 
+$y_i \ge 0$: fazla mesai ile Ã¼retilebilecek tekne sayÄ±sÄ± sÄ±nÄ±rsÄ±z. Tabii ki
+negatif tekne Ã¼retilemez, o sebeple sÄ±fÄ±rdan bÃ¼yÃ¼klÃ¼k var. 
 
-$h_i + x_i + y_i = d_i + h_{i+1}$: teknelerin muhafazası denklemi. Burada
-diyoruz ki her ay başında depodaki tekneler artı normal ve fazla mesai
-işçilik ile ürettiğim teknelerin toplamı, o aydaki talep ve sonraki aya
-kalacak depodaki teknelerin toplamı ile aynı olmalı. 
+$h_i + x_i + y_i = d_i + h_{i+1}$: teknelerin muhafazasÄ± denklemi. Burada
+diyoruz ki her ay baÅŸÄ±nda depodaki tekneler artÄ± normal ve fazla mesai
+iÅŸÃ§ilik ile Ã¼rettiÄŸim teknelerin toplamÄ±, o aydaki talep ve sonraki aya
+kalacak depodaki teknelerin toplamÄ± ile aynÄ± olmalÄ±. 
 
-Ayrıca $h_1=10$ olduğunu biliyoruz.
+AyrÄ±ca $h_1=10$ olduÄŸunu biliyoruz.
 
-Önceki noktayı tekrar vurgulamak gerekirse üstteki $h$ değişkenlerini belki
-tanımlamam fuzuli, onları $h,d$'ler üzerinden de tanımlayabilirdim. Ama bu
-şekilde yapmak çok daha açık. 
+Ã–nceki noktayÄ± tekrar vurgulamak gerekirse Ã¼stteki $h$ deÄŸiÅŸkenlerini belki
+tanÄ±mlamam fuzuli, onlarÄ± $h,d$'ler Ã¼zerinden de tanÄ±mlayabilirdim. Ama bu
+ÅŸekilde yapmak Ã§ok daha aÃ§Ä±k. 
 
 [atlandi]
 
-Bu problemin lineer program olduğunu görebiliyoruz, ama hiçbir ağ akışı
-filan göstermedim. O zaman dersimizin başlığı niye ağ akışı? Çünkü bu
-problemi bir ağ yapısı içinden akış olarak görmek te oldukça doğal. 
-Ağdaki 1,2,3,4 düğümleri aylar olacak, ve tekneler o aylar içinden
-``akıyorlar'', eğer bir ay sonrasında depoya bir tekne koyuyorsak sanki o
-tekne geleceğe doğru gönderiliyor, sonraki aya veriliyor, o sebeple aylar
-arasındaki oklar $h_i$. 
+Bu problemin lineer program olduÄŸunu gÃ¶rebiliyoruz, ama hiÃ§bir aÄŸ akÄ±ÅŸÄ±
+filan gÃ¶stermedim. O zaman dersimizin baÅŸlÄ±ÄŸÄ± niye aÄŸ akÄ±ÅŸÄ±? Ã‡Ã¼nkÃ¼ bu
+problemi bir aÄŸ yapÄ±sÄ± iÃ§inden akÄ±ÅŸ olarak gÃ¶rmek te oldukÃ§a doÄŸal. 
+AÄŸdaki 1,2,3,4 dÃ¼ÄŸÃ¼mleri aylar olacak, ve tekneler o aylar iÃ§inden
+``akÄ±yorlar'', eÄŸer bir ay sonrasÄ±nda depoya bir tekne koyuyorsak sanki o
+tekne geleceÄŸe doÄŸru gÃ¶nderiliyor, sonraki aya veriliyor, o sebeple aylar
+arasÄ±ndaki oklar $h_i$. 
 
 \includegraphics[width=25em]{func_90_nflow_01.png}
 
-Tabii tüm tekneler bir aydan ötekine akmıyor, müşterilerin (customers)
-talebine göre o aydan onlara da belli sayıda tekne ``akıyor'', $d_i$ ile
-gösterilenler. Her aya giren akış üretim, R ile gösterilen normal
-işçilikle, OT ile gösterilen fazla mesai ile.  Bu resimle problemi bir ağ
-akışı olarak göstermiş olduk.
+Tabii tÃ¼m tekneler bir aydan Ã¶tekine akmÄ±yor, mÃ¼ÅŸterilerin (customers)
+talebine gÃ¶re o aydan onlara da belli sayÄ±da tekne ``akÄ±yor'', $d_i$ ile
+gÃ¶sterilenler. Her aya giren akÄ±ÅŸ Ã¼retim, R ile gÃ¶sterilen normal
+iÅŸÃ§ilikle, OT ile gÃ¶sterilen fazla mesai ile.  Bu resimle problemi bir aÄŸ
+akÄ±ÅŸÄ± olarak gÃ¶stermiÅŸ olduk.
 
-Daha önce gördüğümüz muhafaza denklemi bu resimde daha bariz hale geldi,
-çünkü bu resimle aslında şunu söylüyoruz, her ay düğümüne giren akışlar
-çıkış akışlarına eşit olmalı. Bu hem kuvvetli bir ifade ama aynı anda
-bariz. Düğümler içinde bir şey tutmamalı, oradan sadece akış var. 
+Daha Ã¶nce gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z muhafaza denklemi bu resimde daha bariz hale geldi,
+Ã§Ã¼nkÃ¼ bu resimle aslÄ±nda ÅŸunu sÃ¶ylÃ¼yoruz, her ay dÃ¼ÄŸÃ¼mÃ¼ne giren akÄ±ÅŸlar
+Ã§Ä±kÄ±ÅŸ akÄ±ÅŸlarÄ±na eÅŸit olmalÄ±. Bu hem kuvvetli bir ifade ama aynÄ± anda
+bariz. DÃ¼ÄŸÃ¼mler iÃ§inde bir ÅŸey tutmamalÄ±, oradan sadece akÄ±ÅŸ var. 
 
-Bugün genel olarak göreceğimiz konu minimum bedel akış problemleri olacak,
-ki üstteki problem bunun bir örneği. Pek çok optimizasyon problemi yönlü
-bir ağ üzerindeki akış olarak görülebiliyor. 
+BugÃ¼n genel olarak gÃ¶receÄŸimiz konu minimum bedel akÄ±ÅŸ problemleri olacak,
+ki Ã¼stteki problem bunun bir Ã¶rneÄŸi. Pek Ã§ok optimizasyon problemi yÃ¶nlÃ¼
+bir aÄŸ Ã¼zerindeki akÄ±ÅŸ olarak gÃ¶rÃ¼lebiliyor. 
 
-Alttaki gibi bir ağ düşünelim,
+Alttaki gibi bir aÄŸ dÃ¼ÅŸÃ¼nelim,
 
 \includegraphics[width=20em]{func_90_nflow_02.png}
 
-8 tane düğümü var, bazı kenarları var. Bu ağdaki karar değişkenleri her
-kenardaki akış. Dikkat, karar değişkeni düğümde değil, kenarda. Bulmak
-istediğimiz bu akış çünkü, bilahere karar değişkenleri. Bu kenarların her
-birinde ne kadar akış var? 
+8 tane dÃ¼ÄŸÃ¼mÃ¼ var, bazÄ± kenarlarÄ± var. Bu aÄŸdaki karar deÄŸiÅŸkenleri her
+kenardaki akÄ±ÅŸ. Dikkat, karar deÄŸiÅŸkeni dÃ¼ÄŸÃ¼mde deÄŸil, kenarda. Bulmak
+istediÄŸimiz bu akÄ±ÅŸ Ã§Ã¼nkÃ¼, bilahere karar deÄŸiÅŸkenleri. Bu kenarlarÄ±n her
+birinde ne kadar akÄ±ÅŸ var? 
 
-Her kenardaki akışın bir bedeli olabilir, ayrıca her kenarın bir kapasite
-sınırlaması olabilir (bedeli ne olursa olsun üzerine çıkılamayacak bir eşik
-değeri). Bedel örneği olarak mesela bir kenar 2 lira/birimlik olabilir
-diğeri 10 lira/birim bedelinde olabilir. O zaman ilk kenardan 5 birim
-göndermek istersem bunun bana bedeli 10 lira ikincisinden gondermek
-istersem 50 lira olacak. Her kenarın akış bedeli, kapasitesi bizim
-dışarıdan bir parametre ile tanımladığımız bir şey olacak tabii
-ki. Kapasitenin illa sınırlanmış olması gerekmez, sınırsız da olabilir.
+Her kenardaki akÄ±ÅŸÄ±n bir bedeli olabilir, ayrÄ±ca her kenarÄ±n bir kapasite
+sÄ±nÄ±rlamasÄ± olabilir (bedeli ne olursa olsun Ã¼zerine Ã§Ä±kÄ±lamayacak bir eÅŸik
+deÄŸeri). Bedel Ã¶rneÄŸi olarak mesela bir kenar 2 lira/birimlik olabilir
+diÄŸeri 10 lira/birim bedelinde olabilir. O zaman ilk kenardan 5 birim
+gÃ¶ndermek istersem bunun bana bedeli 10 lira ikincisinden gondermek
+istersem 50 lira olacak. Her kenarÄ±n akÄ±ÅŸ bedeli, kapasitesi bizim
+dÄ±ÅŸarÄ±dan bir parametre ile tanÄ±mladÄ±ÄŸÄ±mÄ±z bir ÅŸey olacak tabii
+ki. Kapasitenin illa sÄ±nÄ±rlanmÄ±ÅŸ olmasÄ± gerekmez, sÄ±nÄ±rsÄ±z da olabilir.
 
-Her düğüm bir akış kaynağı (source) da olabilir, yani akışı kendi içinden
-``doğuruyor'' olabilir. Bazı düğümler akışı yutuyor olabilir, onlara akış
-gelir ve yokolur, bu düğümlere alıcı (sink) diyebiliriz. O zaman önceki
-gördüğümüz sadece aktarıcı düğümlere ek olarak bu iki tip düğümü de
-kullanabiliriz. Üstteki resimde en soldaki iki düğüm kaynak gibi duruyor,
-oradan sadece çıkan akış görüyoruz. En sağdaki ise alıcı, ona akış sadece
+Her dÃ¼ÄŸÃ¼m bir akÄ±ÅŸ kaynaÄŸÄ± (source) da olabilir, yani akÄ±ÅŸÄ± kendi iÃ§inden
+``doÄŸuruyor'' olabilir. BazÄ± dÃ¼ÄŸÃ¼mler akÄ±ÅŸÄ± yutuyor olabilir, onlara akÄ±ÅŸ
+gelir ve yokolur, bu dÃ¼ÄŸÃ¼mlere alÄ±cÄ± (sink) diyebiliriz. O zaman Ã¶nceki
+gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z sadece aktarÄ±cÄ± dÃ¼ÄŸÃ¼mlere ek olarak bu iki tip dÃ¼ÄŸÃ¼mÃ¼ de
+kullanabiliriz. Ãœstteki resimde en soldaki iki dÃ¼ÄŸÃ¼m kaynak gibi duruyor,
+oradan sadece Ã§Ä±kan akÄ±ÅŸ gÃ¶rÃ¼yoruz. En saÄŸdaki ise alÄ±cÄ±, ona akÄ±ÅŸ sadece
 giriyor. 
 
-Optimizasyon probleminin sorduğu soru şu olacak, ``en minimum bedelli akış
-hangisi?''. Pek çok türlü akış olabilir, bizim aradığımız bedeli en az
-olan. Bugün göreceğimiz tüm problemler birer minimum bedelli akış problemi
-olarak formülize edilebilir. İlk önce en başta gördüğümüz problemi ağ
-yapısına tercüme edeceğiz, sonra diğer göreceğimiz problemlerin birer LP
-olup olmadığına bakacağız. 
+Optimizasyon probleminin sorduÄŸu soru ÅŸu olacak, ``en minimum bedelli akÄ±ÅŸ
+hangisi?''. Pek Ã§ok tÃ¼rlÃ¼ akÄ±ÅŸ olabilir, bizim aradÄ±ÄŸÄ±mÄ±z bedeli en az
+olan. BugÃ¼n gÃ¶receÄŸimiz tÃ¼m problemler birer minimum bedelli akÄ±ÅŸ problemi
+olarak formÃ¼lize edilebilir. Ä°lk Ã¶nce en baÅŸta gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z problemi aÄŸ
+yapÄ±sÄ±na tercÃ¼me edeceÄŸiz, sonra diÄŸer gÃ¶receÄŸimiz problemlerin birer LP
+olup olmadÄ±ÄŸÄ±na bakacaÄŸÄ±z. 
 
-Düğümleri numaralandıralım,
+DÃ¼ÄŸÃ¼mleri numaralandÄ±ralÄ±m,
 
 \includegraphics[width=20em]{func_90_nflow_03.png}
 
-Her akışı, karar değişkenini $x_{ij}$ olarak gösterebiliriz, ki
-$(i,j) \in \varepsilon$, 1'den 3'e akış $x_{13}$ olacak. Akış bedeli
-$c_{ij}$. Toplam bedel her akış çarpı o akışın bedeli toplanmış
-hali. Kapasite sınırları $p_{ij} \le x_{ij} \le q_{ij}$ ile gösterilebilir,
-her kenarın bir alt bir de üst sınırı olabilir ($p_{ij}$ çoğu problem için
-sıfırdır). Muhafaza denklemi, her düğüm $k$ için [1, 26:22]
+Her akÄ±ÅŸÄ±, karar deÄŸiÅŸkenini $x_{ij}$ olarak gÃ¶sterebiliriz, ki
+$(i,j) \in \varepsilon$, 1'den 3'e akÄ±ÅŸ $x_{13}$ olacak. AkÄ±ÅŸ bedeli
+$c_{ij}$. Toplam bedel her akÄ±ÅŸ Ã§arpÄ± o akÄ±ÅŸÄ±n bedeli toplanmÄ±ÅŸ
+hali. Kapasite sÄ±nÄ±rlarÄ± $p_{ij} \le x_{ij} \le q_{ij}$ ile gÃ¶sterilebilir,
+her kenarÄ±n bir alt bir de Ã¼st sÄ±nÄ±rÄ± olabilir ($p_{ij}$ Ã§oÄŸu problem iÃ§in
+sÄ±fÄ±rdÄ±r). Muhafaza denklemi, her dÃ¼ÄŸÃ¼m $k$ iÃ§in [1, 26:22]
 
 $$
 \sum_{j \in N} x_{kj} - \sum_{i \in N} x_{ik} = b_k, \quad \forall k \in N
@@ -173,16 +173,16 @@ $$
 \sum_{(i,j) \in \varepsilon } c_{ij} x_{ij}
 $$
 
-Üstteki ifade üzerinden toplam bedeli minimize eden akışı bulabiliriz. 
+Ãœstteki ifade Ã¼zerinden toplam bedeli minimize eden akÄ±ÅŸÄ± bulabiliriz. 
 
-Bu bir lineer program değil mi? Bedel lineer, lineer eşitlik, eşitsizlik
-sınırlamaları. Evet bu bir LP. 
+Bu bir lineer program deÄŸil mi? Bedel lineer, lineer eÅŸitlik, eÅŸitsizlik
+sÄ±nÄ±rlamalarÄ±. Evet bu bir LP. 
 
-Formel ve öz bir şekilde yazmak gerekirse, 
+Formel ve Ã¶z bir ÅŸekilde yazmak gerekirse, 
 
 $$
 \min_{x_{ij} \in \mathbb{R}} \sum_{(i,j) \in \varepsilon } c_{ij} x_{ij}
-\quad \textrm{öyle ki}
+\quad \textrm{Ã¶yle ki}
 $$
 $$
 \sum_{j \in N} x_{kj} - \sum_{i \in N} x_{ik} = b_k, \quad \forall k \in N
@@ -191,25 +191,25 @@ $$
 p_{ij} \le x_{ij} \le q_{ij}
 $$
 
-Şimdi muhafaza kısıtlamasına dönmek istiyorum, aslında bu formülü matris
-formunda yazmanın çok güzel bir yolu var. 
+Åimdi muhafaza kÄ±sÄ±tlamasÄ±na dÃ¶nmek istiyorum, aslÄ±nda bu formÃ¼lÃ¼ matris
+formunda yazmanÄ±n Ã§ok gÃ¼zel bir yolu var. 
 
 \includegraphics[width=22em]{func_90_nflow_04.png}
 
-Matrise $A$ sembolü verilir çoğunlukla ve ona oluş, geliş (incidence)
-matrisi denir.  Örnek olarak sonuncu satıra bakalım, bu satır 8'inci düğüme
-olanları gösteriyor, $-x_{68}-x_{78}$ hesabı var, eksi işareti düğüme giriş
-göstergesi, ve sonuç $b_8$'e eşit. 
+Matrise $A$ sembolÃ¼ verilir Ã§oÄŸunlukla ve ona oluÅŸ, geliÅŸ (incidence)
+matrisi denir.  Ã–rnek olarak sonuncu satÄ±ra bakalÄ±m, bu satÄ±r 8'inci dÃ¼ÄŸÃ¼me
+olanlarÄ± gÃ¶steriyor, $-x_{68}-x_{78}$ hesabÄ± var, eksi iÅŸareti dÃ¼ÄŸÃ¼me giriÅŸ
+gÃ¶stergesi, ve sonuÃ§ $b_8$'e eÅŸit. 
 
-$A$'da sadece 0, -1 ve +1 değerleri vardır ve eldeki düğüm kadar satırı
-vardır, ve eldeki kenar kadar kolonu vardır. Dikkat geliş matrisi sadece ağ
-yapısını kodlar, kenarlardan giden akış miktarı hala $x_{ij}$ değerlerinin
+$A$'da sadece 0, -1 ve +1 deÄŸerleri vardÄ±r ve eldeki dÃ¼ÄŸÃ¼m kadar satÄ±rÄ±
+vardÄ±r, ve eldeki kenar kadar kolonu vardÄ±r. Dikkat geliÅŸ matrisi sadece aÄŸ
+yapÄ±sÄ±nÄ± kodlar, kenarlardan giden akÄ±ÅŸ miktarÄ± hala $x_{ij}$ deÄŸerlerinin
 kendisinde. 
 
-Eğer gereken yerde vektörler de kullanırsak en öz haliyle model şöyle,
+EÄŸer gereken yerde vektÃ¶rler de kullanÄ±rsak en Ã¶z haliyle model ÅŸÃ¶yle,
 
 $$
-\min_{x \in \mathbb{R}^{|\varepsilon|}} c^T x, \quad \textrm{öyle ki}
+\min_{x \in \mathbb{R}^{|\varepsilon|}} c^T x, \quad \textrm{Ã¶yle ki}
 $$
 $$
 Ax = b
@@ -218,68 +218,68 @@ $$
 p \le x \le q
 $$
 
-Denge konusundan bahsedelim, minimum bedelli akış probleminin ``dengeli''
-olması durumu var. Üstteki örnekteki gibi bir problemi düşünürsek, bazı
-düğümle kaynak, bazıları alıcı, tüm düğümlerdeki girenler çıkanlar sıfıra
-toplanır, o zaman tüm kaynakların toplamının da tüm talebin toplamına eşit
-olması beklenir. Çünkü ekstra kaynak varsa mesela tüm denklemleri tatmin
-etmek mümkün olmaz. Bunu ispatlayabiliriz, geliş matrisinin bir özelliği
-tüm kolonlarının toplamının sıfır olması, yani $1^T A = 0$. Ayrıca $Ax =
-b$'nin de doğru olduğunu biliyoruz çünkü çözeceğimiz sistemin bir
-kısıtlaması bu formül. O zaman alttaki de doğru olmalı, 
+Denge konusundan bahsedelim, minimum bedelli akÄ±ÅŸ probleminin ``dengeli''
+olmasÄ± durumu var. Ãœstteki Ã¶rnekteki gibi bir problemi dÃ¼ÅŸÃ¼nÃ¼rsek, bazÄ±
+dÃ¼ÄŸÃ¼mle kaynak, bazÄ±larÄ± alÄ±cÄ±, tÃ¼m dÃ¼ÄŸÃ¼mlerdeki girenler Ã§Ä±kanlar sÄ±fÄ±ra
+toplanÄ±r, o zaman tÃ¼m kaynaklarÄ±n toplamÄ±nÄ±n da tÃ¼m talebin toplamÄ±na eÅŸit
+olmasÄ± beklenir. Ã‡Ã¼nkÃ¼ ekstra kaynak varsa mesela tÃ¼m denklemleri tatmin
+etmek mÃ¼mkÃ¼n olmaz. Bunu ispatlayabiliriz, geliÅŸ matrisinin bir Ã¶zelliÄŸi
+tÃ¼m kolonlarÄ±nÄ±n toplamÄ±nÄ±n sÄ±fÄ±r olmasÄ±, yani $1^T A = 0$. AyrÄ±ca $Ax =
+b$'nin de doÄŸru olduÄŸunu biliyoruz Ã§Ã¼nkÃ¼ Ã§Ã¶zeceÄŸimiz sistemin bir
+kÄ±sÄ±tlamasÄ± bu formÃ¼l. O zaman alttaki de doÄŸru olmalÄ±, 
 
 $$
 1^T A x = 1^T b = 0
 $$
 
-Eşitliğin sağındaki $1^T b$ tüm $b$ öğelerinin toplamı demek, yani
+EÅŸitliÄŸin saÄŸÄ±ndaki $1^T b$ tÃ¼m $b$ Ã¶ÄŸelerinin toplamÄ± demek, yani
 
 $$
 \sum _{i \in N} b_i = 0
 $$
 
-olmalı. Demek ki tüm arz tüm talebe eşit olacak. O zaman size $b$'sı sıfıra
-toplanmayan bir minimum bedel akış problemi verirsem bu problem olurlu
-olmayacaktır. Toplam sıfır ise bu probleme ``dengeli problem''
-deniyor. Tabii dengeli bir modelin de illa olurlu olması şart değil, mesela
-öyle kapasite sınırlamaları getirebilirsiniz ki olurluluk mümkün olmaz, ama
-denge yoksa problem kesinlikle olurlu değildir.
+olmalÄ±. Demek ki tÃ¼m arz tÃ¼m talebe eÅŸit olacak. O zaman size $b$'sÄ± sÄ±fÄ±ra
+toplanmayan bir minimum bedel akÄ±ÅŸ problemi verirsem bu problem olurlu
+olmayacaktÄ±r. Toplam sÄ±fÄ±r ise bu probleme ``dengeli problem''
+deniyor. Tabii dengeli bir modelin de illa olurlu olmasÄ± ÅŸart deÄŸil, mesela
+Ã¶yle kapasite sÄ±nÄ±rlamalarÄ± getirebilirsiniz ki olurluluk mÃ¼mkÃ¼n olmaz, ama
+denge yoksa problem kesinlikle olurlu deÄŸildir.
 
-Ama bazen dengesiz problemleri de ufak değişiklikler ile çözmek mümkün
-oluyor, mesela bazı $=$'leri $\le$ yaparak, ki bunun karşılığı ağa bir
-kukla (dummy) düğüm eklemek olabilir .. Ya da pay bırakma (slack)
-değişkenleri ekleyip bazı eşitsizlikleri eşitlikge çevirerek..
+Ama bazen dengesiz problemleri de ufak deÄŸiÅŸiklikler ile Ã§Ã¶zmek mÃ¼mkÃ¼n
+oluyor, mesela bazÄ± $=$'leri $\le$ yaparak, ki bunun karÅŸÄ±lÄ±ÄŸÄ± aÄŸa bir
+kukla (dummy) dÃ¼ÄŸÃ¼m eklemek olabilir .. Ya da pay bÄ±rakma (slack)
+deÄŸiÅŸkenleri ekleyip bazÄ± eÅŸitsizlikleri eÅŸitlikge Ã§evirerek..
 
-Örnek Alanlar 
+Ã–rnek Alanlar 
 
-Ne kadar çok problemin minimum akış problemi olabildiği şaşırtıcı
+Ne kadar Ã§ok problemin minimum akÄ±ÅŸ problemi olabildiÄŸi ÅŸaÅŸÄ±rtÄ±cÄ±
 olabilir. 
 
 \begin{itemize}
 \item nakliyat problemleri  (transportation)
-\item görev verme / atama problemleri (assignment)
-\item aktarmalı gemi nakliyatı (transshipment)
-\item en kısa yol problemleri (shortest path)
-\item maksimum akış problemleri (max-flow)
+\item gÃ¶rev verme / atama problemleri (assignment)
+\item aktarmalÄ± gemi nakliyatÄ± (transshipment)
+\item en kÄ±sa yol problemleri (shortest path)
+\item maksimum akÄ±ÅŸ problemleri (max-flow)
 \end{itemize}
 
 Nakliyat
 
-Hedef belli bir mali birkaç kaynak noktasından farklı varış noktalarına
-ulaştırmak. Kaynaklar bir sürü depo, ambar olabilir, varış noktası farklı
-müşteriler olabilir, ürünlerin depodan müşterilere gitmesi gerekiyor. Ama
-mesela ambar 1'den müşteri 2'ye gönderim olabilir, ya da ambar 4'ten aynı
-müşteriye.. ? Karar verilmesi gerekiyor, her müşterinin kendine göre talebi
-var, her nakliyat yolunun farklı bedeli var, yolların kapasite limitleri
-var, depoların arz limitleri var, bu problem en az bedelli talebi tatmin
-eden nakliyat kararını verecek.
+Hedef belli bir mali birkaÃ§ kaynak noktasÄ±ndan farklÄ± varÄ±ÅŸ noktalarÄ±na
+ulaÅŸtÄ±rmak. Kaynaklar bir sÃ¼rÃ¼ depo, ambar olabilir, varÄ±ÅŸ noktasÄ± farklÄ±
+mÃ¼ÅŸteriler olabilir, Ã¼rÃ¼nlerin depodan mÃ¼ÅŸterilere gitmesi gerekiyor. Ama
+mesela ambar 1'den mÃ¼ÅŸteri 2'ye gÃ¶nderim olabilir, ya da ambar 4'ten aynÄ±
+mÃ¼ÅŸteriye.. ? Karar verilmesi gerekiyor, her mÃ¼ÅŸterinin kendine gÃ¶re talebi
+var, her nakliyat yolunun farklÄ± bedeli var, yollarÄ±n kapasite limitleri
+var, depolarÄ±n arz limitleri var, bu problem en az bedelli talebi tatmin
+eden nakliyat kararÄ±nÄ± verecek.
 
 \includegraphics[width=10em]{func_90_nflow_05.png}
 
-Örnek şöyle olabilir, Millco'nun (hayali bir şirket) üç tane bakır işleme
-fabrikası var, üç tane de maden bölgesi var. Nakliyatın bedeli km başına 2
-lira. Madenler ve fabrikalar arası mesafeler alttaki gibi, o zaman her
-talebi tatmin edip en az nakliyat masrafı için hangi nakliyat planı takip
+Ã–rnek ÅŸÃ¶yle olabilir, Millco'nun (hayali bir ÅŸirket) Ã¼Ã§ tane bakÄ±r iÅŸleme
+fabrikasÄ± var, Ã¼Ã§ tane de maden bÃ¶lgesi var. NakliyatÄ±n bedeli km baÅŸÄ±na 2
+lira. Madenler ve fabrikalar arasÄ± mesafeler alttaki gibi, o zaman her
+talebi tatmin edip en az nakliyat masrafÄ± iÃ§in hangi nakliyat planÄ± takip
 edilmeli?
 
 
@@ -289,7 +289,7 @@ $$
 Maden & \textrm{Fabrika 1} & 
 \textrm{Fabrika 2} & 
 \textrm{Fabrika 3} & 
-\textrm{Maden başına günlük maksimum kamyon sevkiyatı}\\
+\textrm{Maden baÅŸÄ±na gÃ¼nlÃ¼k maksimum kamyon sevkiyatÄ±}\\
 \hline
 1 & 8 & 15 & 50 & 20 \\
 \hline
@@ -302,15 +302,15 @@ Maden & \textrm{Fabrika 1} &
 \end{tabular}
 $$
 
-İlk kontrol edebileceğimiz faktör acaba ağ dengeli mi? Tüm arz toplamı tüm
-talep toplamı ile aynı mı? Evet. O zaman üstteki çözülebilecek bir
-problem olabilir. Düğümleri $\left[\begin{array}{cccccc} 1&2&3&A&B&C \end{array}\right]$
-olarak düzenleyeyim, kaynaklar bir blok olarak önce, alıcılar sonra. Geliş
+Ä°lk kontrol edebileceÄŸimiz faktÃ¶r acaba aÄŸ dengeli mi? TÃ¼m arz toplamÄ± tÃ¼m
+talep toplamÄ± ile aynÄ± mÄ±? Evet. O zaman Ã¼stteki Ã§Ã¶zÃ¼lebilecek bir
+problem olabilir. DÃ¼ÄŸÃ¼mleri $\left[\begin{array}{cccccc} 1&2&3&A&B&C \end{array}\right]$
+olarak dÃ¼zenleyeyim, kaynaklar bir blok olarak Ã¶nce, alÄ±cÄ±lar sonra. GeliÅŸ
 matrisi altta [1, 43:55],
 
-Bu tamamen bağlantılı (full connected) bir çiziti temsil ediyor, yani
-herhangi bir maden düğümünden herhangi bir fabrika düğümüne gitmenin yolu
-var. Çözüm
+Bu tamamen baÄŸlantÄ±lÄ± (full connected) bir Ã§iziti temsil ediyor, yani
+herhangi bir maden dÃ¼ÄŸÃ¼mÃ¼nden herhangi bir fabrika dÃ¼ÄŸÃ¼mÃ¼ne gitmenin yolu
+var. Ã‡Ã¶zÃ¼m
 
 \begin{verbatim}
    A  B  C
@@ -345,135 +345,135 @@ print (np.round(res.x))
 [ 0.  0. 20.  0. 20. 10. 30. 15.  0.]
 \end{verbatim}
 
-Bu örnekteki $b$'de hiç sıfır öğesi yok, niye? Çünkü bu ağ yapısında talep
-ve arz tüm düğümlerde tanımlı, yani her düğüm ya bir kaynak ya da
-alıcı. Böyle olmayabilirdi, arada geçiş düğümleri olsaydı onlar üzerinde
-muhafaza mantığı sebebiyle sıfır tanımı yapmak gerekebilirdi. 
+Bu Ã¶rnekteki $b$'de hiÃ§ sÄ±fÄ±r Ã¶ÄŸesi yok, niye? Ã‡Ã¼nkÃ¼ bu aÄŸ yapÄ±sÄ±nda talep
+ve arz tÃ¼m dÃ¼ÄŸÃ¼mlerde tanÄ±mlÄ±, yani her dÃ¼ÄŸÃ¼m ya bir kaynak ya da
+alÄ±cÄ±. BÃ¶yle olmayabilirdi, arada geÃ§iÅŸ dÃ¼ÄŸÃ¼mleri olsaydÄ± onlar Ã¼zerinde
+muhafaza mantÄ±ÄŸÄ± sebebiyle sÄ±fÄ±r tanÄ±mÄ± yapmak gerekebilirdi. 
 
 Atama (Assignment Problems)
 
-Bu tür problemler nakliyat problemine benzer, ama n tane çalışanım n tane
-yapılacak işim var. Amaç her n kişiye birer görev vermek. Diyelim ki her
-çalışanın her görev için farklı tercihi var, mesela ev işlerinde bulaşık,
-çöp atmak, duvar boyamak için A, B kişileri 1 ile 10 arasında tercih
-belirtmiş olabilir. Amaç her işi bir kişiye atamak, öyle ki tüm işler
-yapılsın aynı anda herkes olabildiği kadar mutlu olsun. 
+Bu tÃ¼r problemler nakliyat problemine benzer, ama n tane Ã§alÄ±ÅŸanÄ±m n tane
+yapÄ±lacak iÅŸim var. AmaÃ§ her n kiÅŸiye birer gÃ¶rev vermek. Diyelim ki her
+Ã§alÄ±ÅŸanÄ±n her gÃ¶rev iÃ§in farklÄ± tercihi var, mesela ev iÅŸlerinde bulaÅŸÄ±k,
+Ã§Ã¶p atmak, duvar boyamak iÃ§in A, B kiÅŸileri 1 ile 10 arasÄ±nda tercih
+belirtmiÅŸ olabilir. AmaÃ§ her iÅŸi bir kiÅŸiye atamak, Ã¶yle ki tÃ¼m iÅŸler
+yapÄ±lsÄ±n aynÄ± anda herkes olabildiÄŸi kadar mutlu olsun. 
 
-Bu problem de nakliyat problemi gibi! Ama şimdi akış 1 ya da 0. Her kaynağa
-1 giriyor, her alıcıdan 1 çıkıyor. Kenarlar üzerinde hiç kısıtlama yok. 
+Bu problem de nakliyat problemi gibi! Ama ÅŸimdi akÄ±ÅŸ 1 ya da 0. Her kaynaÄŸa
+1 giriyor, her alÄ±cÄ±dan 1 Ã§Ä±kÄ±yor. Kenarlar Ã¼zerinde hiÃ§ kÄ±sÄ±tlama yok. 
 
-Ama bazılarımız sorabilir, 0.2 insanı bir göreve, 0.8 insani diğerine
-gönderme gibi bir sonuç ta istemem, bir tür tam sayı kısıtlaması da olmalı
-bu problemde, yani her kenardaki akış ya 0 ya da 1 olmalı. Bu tür
-kısıtlamaları ileride işleyeceğiz. 
+Ama bazÄ±larÄ±mÄ±z sorabilir, 0.2 insanÄ± bir gÃ¶reve, 0.8 insani diÄŸerine
+gÃ¶nderme gibi bir sonuÃ§ ta istemem, bir tÃ¼r tam sayÄ± kÄ±sÄ±tlamasÄ± da olmalÄ±
+bu problemde, yani her kenardaki akÄ±ÅŸ ya 0 ya da 1 olmalÄ±. Bu tÃ¼r
+kÄ±sÄ±tlamalarÄ± ileride iÅŸleyeceÄŸiz. 
 
-Örnek görelim, bir yüzücü antrenörüyüz diyelim, eğittiğimiz 5 yüzücü
-arasından bayrak yarışı için seçme yapmamiz gerekiyor. Bayrak yarışında her
-gidiş gelişte ardı ardına dört ayrı stil gerekiyor, dört farklı yüzücü bu
-stillerde yarışabiliyor, bir gidip geliş sonrası bir yüzücü diğerine
-bayrağı aktarıyor. Stiller sırtüstü (backstroke), kurbağalama
+Ã–rnek gÃ¶relim, bir yÃ¼zÃ¼cÃ¼ antrenÃ¶rÃ¼yÃ¼z diyelim, eÄŸittiÄŸimiz 5 yÃ¼zÃ¼cÃ¼
+arasÄ±ndan bayrak yarÄ±ÅŸÄ± iÃ§in seÃ§me yapmamiz gerekiyor. Bayrak yarÄ±ÅŸÄ±nda her
+gidiÅŸ geliÅŸte ardÄ± ardÄ±na dÃ¶rt ayrÄ± stil gerekiyor, dÃ¶rt farklÄ± yÃ¼zÃ¼cÃ¼ bu
+stillerde yarÄ±ÅŸabiliyor, bir gidip geliÅŸ sonrasÄ± bir yÃ¼zÃ¼cÃ¼ diÄŸerine
+bayraÄŸÄ± aktarÄ±yor. Stiller sÄ±rtÃ¼stÃ¼ (backstroke), kurbaÄŸalama
 (breaststroke), kelebek (butterfly), serbest stil (freestyle). Her stil bir
-turda kullanılınca toplam tüm stilleri en çabuk kullanmış olan takım
-kazanıyor. Elimizdeki yüzücülerin bu her alandaki geçmişteki zamanlarını
-biliyoruz, bu o yüzücülerin her stildeki kuvvetleri bir bakıma,
+turda kullanÄ±lÄ±nca toplam tÃ¼m stilleri en Ã§abuk kullanmÄ±ÅŸ olan takÄ±m
+kazanÄ±yor. Elimizdeki yÃ¼zÃ¼cÃ¼lerin bu her alandaki geÃ§miÅŸteki zamanlarÄ±nÄ±
+biliyoruz, bu o yÃ¼zÃ¼cÃ¼lerin her stildeki kuvvetleri bir bakÄ±ma,
 
 \includegraphics[width=20em]{func_90_nflow_07.png}
 
-Şu mümkün; bir süper yüzücümüz olabilir her stilde en iyi o'dur. Ama bu tek
-adamı 4 kez, her stilde kullanamayız, her stil için farklı birini seçmemiz
-lazım. Bu iyi yüzücüyü tabii ki bir stil için kullanmak isteriz, ama
-hangisi için?  Optimal sonuç için bir dengeleme yapmak lazım.
+Åu mÃ¼mkÃ¼n; bir sÃ¼per yÃ¼zÃ¼cÃ¼mÃ¼z olabilir her stilde en iyi o'dur. Ama bu tek
+adamÄ± 4 kez, her stilde kullanamayÄ±z, her stil iÃ§in farklÄ± birini seÃ§memiz
+lazÄ±m. Bu iyi yÃ¼zÃ¼cÃ¼yÃ¼ tabii ki bir stil iÃ§in kullanmak isteriz, ama
+hangisi iÃ§in?  Optimal sonuÃ§ iÃ§in bir dengeleme yapmak lazÄ±m.
 
-Bu bir atama / görevlendirme problemi işte, her yüzüş stilini birine
-``atıyorum''. Bu arada elimizde 4 stil ama 5 yüzücü var, yani bir yüzücü
-görevsiz kalacak. Bir kısıtlama var, o da bir yüzücü birden fazla stilde
-yarışamaz.
+Bu bir atama / gÃ¶revlendirme problemi iÅŸte, her yÃ¼zÃ¼ÅŸ stilini birine
+``atÄ±yorum''. Bu arada elimizde 4 stil ama 5 yÃ¼zÃ¼cÃ¼ var, yani bir yÃ¼zÃ¼cÃ¼
+gÃ¶revsiz kalacak. Bir kÄ±sÄ±tlama var, o da bir yÃ¼zÃ¼cÃ¼ birden fazla stilde
+yarÄ±ÅŸamaz.
 
-Üstteki resimde kırmızı renk yapılan tercihi belirtiyor [1, 54:08]. 
+Ãœstteki resimde kÄ±rmÄ±zÄ± renk yapÄ±lan tercihi belirtiyor [1, 54:08]. 
 
-Bu konu kodlaması hakkında daha fazla detay ekler bölümünde. 
+Bu konu kodlamasÄ± hakkÄ±nda daha fazla detay ekler bÃ¶lÃ¼mÃ¼nde. 
 
-Aktarmalı gemi nakliyatı
+AktarmalÄ± gemi nakliyatÄ±
 
-Bu tür nakliyat problemlerinde bir mali kaynaktan alıcıya direk göndermeye
-ek olarak arada bir depoda da tutmamız mümkün, bu durum tabii ki lojistik
-planlamada değişiklikler getirebilir. Amazon gibi şirketler bunu sürekli
-yapıyor mesela, bir ürünü önce büyük bir antrepoya gönderiyorlar, oradan
-başka bir yere aktarma yapıyorlar. 
+Bu tÃ¼r nakliyat problemlerinde bir mali kaynaktan alÄ±cÄ±ya direk gÃ¶ndermeye
+ek olarak arada bir depoda da tutmamÄ±z mÃ¼mkÃ¼n, bu durum tabii ki lojistik
+planlamada deÄŸiÅŸiklikler getirebilir. Amazon gibi ÅŸirketler bunu sÃ¼rekli
+yapÄ±yor mesela, bir Ã¼rÃ¼nÃ¼ Ã¶nce bÃ¼yÃ¼k bir antrepoya gÃ¶nderiyorlar, oradan
+baÅŸka bir yere aktarma yapÄ±yorlar. 
 
 \includegraphics[width=10em]{func_90_nflow_08.png}
 
-Orta kısımda sarımsı renkle görülen aktarma noktaları. Normal aktarma
-problemlerinde olduğu gibi kaynak, alıcı var, arz ve talep sınırları var,
-kenarlarda sınırlar olabilir, aktarma noktaları için giren ve çıkan
-birbirini dengelemeli, yani muhafaza denklemi onlar için geçerli [1,
-56:00]. Aslında başta gördüğümüz Sailco problemi bir aktarmalı nakliyat
-problemi.. Depo var, üretici, alıcı var..
+Orta kÄ±sÄ±mda sarÄ±msÄ± renkle gÃ¶rÃ¼len aktarma noktalarÄ±. Normal aktarma
+problemlerinde olduÄŸu gibi kaynak, alÄ±cÄ± var, arz ve talep sÄ±nÄ±rlarÄ± var,
+kenarlarda sÄ±nÄ±rlar olabilir, aktarma noktalarÄ± iÃ§in giren ve Ã§Ä±kan
+birbirini dengelemeli, yani muhafaza denklemi onlar iÃ§in geÃ§erli [1,
+56:00]. AslÄ±nda baÅŸta gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z Sailco problemi bir aktarmalÄ± nakliyat
+problemi.. Depo var, Ã¼retici, alÄ±cÄ± var..
 
-En kısa / en uzun yol problemleri
+En kÄ±sa / en uzun yol problemleri
 
-En kısa yol problemleri de minimum bedel akış problemleridir. Size alttaki
-gibi bir çizit veriyorum mesela, her kenar, ``yol'' uzunluğu / zorluğu /
-bedeli çizitte veriliyor ve mavi düğümden kırmızı düğüme en kısa bedelle,
-en kısa şekilde ulaşmak istiyorum. Bu problemi minimum bedel akış olarak
-çözmek için elimizde sadece tek birimlik akış olduğunu hayal
+En kÄ±sa yol problemleri de minimum bedel akÄ±ÅŸ problemleridir. Size alttaki
+gibi bir Ã§izit veriyorum mesela, her kenar, ``yol'' uzunluÄŸu / zorluÄŸu /
+bedeli Ã§izitte veriliyor ve mavi dÃ¼ÄŸÃ¼mden kÄ±rmÄ±zÄ± dÃ¼ÄŸÃ¼me en kÄ±sa bedelle,
+en kÄ±sa ÅŸekilde ulaÅŸmak istiyorum. Bu problemi minimum bedel akÄ±ÅŸ olarak
+Ã§Ã¶zmek iÃ§in elimizde sadece tek birimlik akÄ±ÅŸ olduÄŸunu hayal
 edebiliriz. 
 
 \includegraphics[width=10em]{func_90_nflow_09.png}
 
-Yani mavi düğümün tek birimlik arzı var, kırmızı düğümün tek birimlik
-talebi var, ve geri kalan her düğüm aktarıcı, yani girişi, çıkışı muhafaza
-etmesi gerekiyor. Kenarların bedeli tabii ki o yolun uzunluğu, kısalığı
-olarak yorumlanabilir. O zaman, bu akış problemini çözünce, elde ettiğim
-akış bana hangi yolun en kısa olduğunu söyleyecektir. Tabii 1 birimlik
-arzın bölünüp farklı yönlere gitmesini istemem ve yine bir tam sayı
-kısıtlaması gerektiği akla gelebilir. Bu konuya değineceğiz. Fakat bu
-problemi bir LP olarak çözünce tam sayı kısıtlaması olmasa bile 1/0 bazlı
-sonuçlar alıyorsunuz. Sihirli bir şey sanki.
+Yani mavi dÃ¼ÄŸÃ¼mÃ¼n tek birimlik arzÄ± var, kÄ±rmÄ±zÄ± dÃ¼ÄŸÃ¼mÃ¼n tek birimlik
+talebi var, ve geri kalan her dÃ¼ÄŸÃ¼m aktarÄ±cÄ±, yani giriÅŸi, Ã§Ä±kÄ±ÅŸÄ± muhafaza
+etmesi gerekiyor. KenarlarÄ±n bedeli tabii ki o yolun uzunluÄŸu, kÄ±salÄ±ÄŸÄ±
+olarak yorumlanabilir. O zaman, bu akÄ±ÅŸ problemini Ã§Ã¶zÃ¼nce, elde ettiÄŸim
+akÄ±ÅŸ bana hangi yolun en kÄ±sa olduÄŸunu sÃ¶yleyecektir. Tabii 1 birimlik
+arzÄ±n bÃ¶lÃ¼nÃ¼p farklÄ± yÃ¶nlere gitmesini istemem ve yine bir tam sayÄ±
+kÄ±sÄ±tlamasÄ± gerektiÄŸi akla gelebilir. Bu konuya deÄŸineceÄŸiz. Fakat bu
+problemi bir LP olarak Ã§Ã¶zÃ¼nce tam sayÄ± kÄ±sÄ±tlamasÄ± olmasa bile 1/0 bazlÄ±
+sonuÃ§lar alÄ±yorsunuz. Sihirli bir ÅŸey sanki.
 
 [uzun yol atlandi]
 
-Maksimum flow problemi de olabilirdi, bir çizit alalım mesela,
+Maksimum flow problemi de olabilirdi, bir Ã§izit alalÄ±m mesela,
 
 \includegraphics[width=10em]{func_90_nflow_10.png}
 
-Bu çizitteki kenarları kapasite olarak görebiliriz, yani her kenardan ne
-kadar akış olabileceği hakkında bir sınır var, mesela üstteki bir su boru
-hattı ağı olsaydı, her kenar bir boru olabilirdi ve bu boruların çapına
-göre, kimisi küçük kimisi büyük, o borudan ne kadar şu
-pompalayabileceğimizle alakalı bir kısıtlama var. Amaçım mavi düğümden
-kırmızı düğüme mümkün olduğunca fazla şu pompalamak. 
+Bu Ã§izitteki kenarlarÄ± kapasite olarak gÃ¶rebiliriz, yani her kenardan ne
+kadar akÄ±ÅŸ olabileceÄŸi hakkÄ±nda bir sÄ±nÄ±r var, mesela Ã¼stteki bir su boru
+hattÄ± aÄŸÄ± olsaydÄ±, her kenar bir boru olabilirdi ve bu borularÄ±n Ã§apÄ±na
+gÃ¶re, kimisi kÃ¼Ã§Ã¼k kimisi bÃ¼yÃ¼k, o borudan ne kadar ÅŸu
+pompalayabileceÄŸimizle alakalÄ± bir kÄ±sÄ±tlama var. AmaÃ§Ä±m mavi dÃ¼ÄŸÃ¼mden
+kÄ±rmÄ±zÄ± dÃ¼ÄŸÃ¼me mÃ¼mkÃ¼n olduÄŸunca fazla ÅŸu pompalamak. 
 
-Peki çıplak gözle bakınca en fazla ne kadar akış gönderebileceğimizi
-görebilir miyiz? Evet. Alıcıya bakarsak en fazla 1+2=3 alabilir, o zaman
-3'ten fazla göndermeyiz. Bu 3 nasıl gönderilecek? 2 hattından 1, 3
-hattından 2 birimle belki.. Dikkat bu problemde yine kaynaktaki akışı
-bölebiliyoruz. 
+Peki Ã§Ä±plak gÃ¶zle bakÄ±nca en fazla ne kadar akÄ±ÅŸ gÃ¶nderebileceÄŸimizi
+gÃ¶rebilir miyiz? Evet. AlÄ±cÄ±ya bakarsak en fazla 1+2=3 alabilir, o zaman
+3'ten fazla gÃ¶ndermeyiz. Bu 3 nasÄ±l gÃ¶nderilecek? 2 hattÄ±ndan 1, 3
+hattÄ±ndan 2 birimle belki.. Dikkat bu problemde yine kaynaktaki akÄ±ÅŸÄ±
+bÃ¶lebiliyoruz. 
 
-[maks akışı min akışa çeviren numara atlandı]
+[maks akÄ±ÅŸÄ± min akÄ±ÅŸa Ã§eviren numara atlandÄ±]
 
-Tam sayı çözümleri
+Tam sayÄ± Ã§Ã¶zÃ¼mleri
 
-Nihayet ``sonra değineceğiz'' dediğimiz konuya geldik [1, 1:09:21]. Atama
-problemi, en kısa yol gibi problemlerde tam sayı sonuçlara ihtiyacımız
-vardı. Tam sayı kısıtlama getirmeden tam sayı sonuç elde etmenin bir yolu
-var. Yani normal bir LP çözüyorsunuz ve tam sayı bazlı sonuçlar elde
-ediyorsunuz. Bu nasıl oluyor? Anlatmadan önce biraz lineer cebire dalmak
+Nihayet ``sonra deÄŸineceÄŸiz'' dediÄŸimiz konuya geldik [1, 1:09:21]. Atama
+problemi, en kÄ±sa yol gibi problemlerde tam sayÄ± sonuÃ§lara ihtiyacÄ±mÄ±z
+vardÄ±. Tam sayÄ± kÄ±sÄ±tlama getirmeden tam sayÄ± sonuÃ§ elde etmenin bir yolu
+var. Yani normal bir LP Ã§Ã¶zÃ¼yorsunuz ve tam sayÄ± bazlÄ± sonuÃ§lar elde
+ediyorsunuz. Bu nasÄ±l oluyor? Anlatmadan Ã¶nce biraz lineer cebire dalmak
 gerekiyor. 
 
-Tanım
+TanÄ±m
 
-Bir matris $A$ tamamen tekbirimseldir (totally unimodular -TU-) eğer
-$A$'nin her mümkün kare altmatrisinin determinantı 0, 1 ya da -1
-ise. Hatırlarsak determinantlar kare matrisler üzerinde hesaplanan şeyler,
-burada tüm karesel altmatrislerden bahsediyoruz, ve onların determinanti
-belirttiğimiz gibi ise matris TU diyoruz. 
+Bir matris $A$ tamamen tekbirimseldir (totally unimodular -TU-) eÄŸer
+$A$'nin her mÃ¼mkÃ¼n kare altmatrisinin determinantÄ± 0, 1 ya da -1
+ise. HatÄ±rlarsak determinantlar kare matrisler Ã¼zerinde hesaplanan ÅŸeyler,
+burada tÃ¼m karesel altmatrislerden bahsediyoruz, ve onlarÄ±n determinanti
+belirttiÄŸimiz gibi ise matris TU diyoruz. 
 
-Aslında TU'luğun kontrolü biraz çetrefil olabilir, düşünürsek bir matris ne
-kadar buyurse o kadar mümkün altmatrisi olur. Ama bir matris tamamen 0,1,-1
-öğelerinden oluşuyorsa bu kontrol belki daha kolay olur..? 
+AslÄ±nda TU'luÄŸun kontrolÃ¼ biraz Ã§etrefil olabilir, dÃ¼ÅŸÃ¼nÃ¼rsek bir matris ne
+kadar buyurse o kadar mÃ¼mkÃ¼n altmatrisi olur. Ama bir matris tamamen 0,1,-1
+Ã¶ÄŸelerinden oluÅŸuyorsa bu kontrol belki daha kolay olur..? 
 
-Alttaki matrislerde mesela soldaki TU, ama sağdaki değil. 
+Alttaki matrislerde mesela soldaki TU, ama saÄŸdaki deÄŸil. 
 
 $$
 \left[\begin{array}{ccc}
@@ -484,44 +484,44 @@ $$
 \end{array}\right]
 $$
 
-Tamam. Şimdi bir teori daha göreceğiz, resim iyice ortaya çıkacak. 
+Tamam. Åimdi bir teori daha gÃ¶receÄŸiz, resim iyice ortaya Ã§Ä±kacak. 
 
 Teori
 
-Eğer bir matris $A$ TU ise ve $b$ bir tam sayı vektör ise, o zaman
-$\{ x : Ax \le b\}$ çözümündeki $x$ tam sayı kordinatlarında olacaktır.
-Yani üstteki şartlar yerindeyse $Ax \le b$ çokyüzlüsünün (polyhedron) tüm
-köşeleri tam sayı noktalarındadır. Bu teoriyi ispatsız veriyoruz. Ve, bir LP
-için eğer elimizde tüm köşeleri tam sayı kordinatlar olan bir çokyüzlü var
-ise, o LP'nin çözümünün tam sayılar olacağını biliyoruz.
+EÄŸer bir matris $A$ TU ise ve $b$ bir tam sayÄ± vektÃ¶r ise, o zaman
+$\{ x : Ax \le b\}$ Ã§Ã¶zÃ¼mÃ¼ndeki $x$ tam sayÄ± kordinatlarÄ±nda olacaktÄ±r.
+Yani Ã¼stteki ÅŸartlar yerindeyse $Ax \le b$ Ã§okyÃ¼zlÃ¼sÃ¼nÃ¼n (polyhedron) tÃ¼m
+kÃ¶ÅŸeleri tam sayÄ± noktalarÄ±ndadÄ±r. Bu teoriyi ispatsÄ±z veriyoruz. Ve, bir LP
+iÃ§in eÄŸer elimizde tÃ¼m kÃ¶ÅŸeleri tam sayÄ± kordinatlar olan bir Ã§okyÃ¼zlÃ¼ var
+ise, o LP'nin Ã§Ã¶zÃ¼mÃ¼nÃ¼n tam sayÄ±lar olacaÄŸÄ±nÄ± biliyoruz.
 
-O zaman, eğer elimde matris $A$'sı tamamen tekbirimsel olan bir LP var ise,
-o zaman tam sayı çözümler elde etmem garanti, tabii $b$ de tamamen tam
-sayılar içeriyorsa. 
+O zaman, eÄŸer elimde matris $A$'sÄ± tamamen tekbirimsel olan bir LP var ise,
+o zaman tam sayÄ± Ã§Ã¶zÃ¼mler elde etmem garanti, tabii $b$ de tamamen tam
+sayÄ±lar iÃ§eriyorsa. 
 
-Ve nihai zirveye geldik: tüm geliş matrisleri tamamen tekbirimseldir. 
+Ve nihai zirveye geldik: tÃ¼m geliÅŸ matrisleri tamamen tekbirimseldir. 
 
-Yani bir ağ akış problemindeki geliş matrisi tamamen tekbirimsel. Ayrıca
-eğer o problemin $b$ vektörü de tam sayı ise sonuç muhakkak tam sayılar
-içerecek. 
+Yani bir aÄŸ akÄ±ÅŸ problemindeki geliÅŸ matrisi tamamen tekbirimsel. AyrÄ±ca
+eÄŸer o problemin $b$ vektÃ¶rÃ¼ de tam sayÄ± ise sonuÃ§ muhakkak tam sayÄ±lar
+iÃ§erecek. 
 
-Bu çok önemli bir sonuç. 
+Bu Ã§ok Ã¶nemli bir sonuÃ§. 
 
-O zaman bir minimum bedel akış problemindeki arzlar tam sayı ise, talepler
-tam sayı ise, ve tam sayı kenar kapasiteleri içeriyorsa, bu bir minimum
-bedel tam sayı akışıdır. 
+O zaman bir minimum bedel akÄ±ÅŸ problemindeki arzlar tam sayÄ± ise, talepler
+tam sayÄ± ise, ve tam sayÄ± kenar kapasiteleri iÃ§eriyorsa, bu bir minimum
+bedel tam sayÄ± akÄ±ÅŸÄ±dÄ±r. 
 
 Ekler
 
-Kısayol problemine örnek olarak [2]'deki probleme bakalım.
+KÄ±sayol problemine Ã¶rnek olarak [2]'deki probleme bakalÄ±m.
 
 \includegraphics[width=20em]{dijks_03.png}
 
-Başlangıç \verb!'s!'den bitiş \verb!x!'e en kısa yol hangisi?  Düğümlere
+BaÅŸlangÄ±Ã§ \verb!'s!'den bitiÅŸ \verb!x!'e en kÄ±sa yol hangisi?  DÃ¼ÄŸÃ¼mlere
 $s=1$,$t=2$,$y=3$,$x=4$,$z=5$ olarak birer indis verelim, ve
 $x = [x_{12}, x_{13}, x_{23}, x_{24}, x_{32}, x_{34}, x_{35}, x_{45},
-x_{51}, x_{54}]$ vektörünü tanımlayalım. Geliş matrisini ağdaki
-bağlantılara göre yapıp çözersek,
+x_{51}, x_{54}]$ vektÃ¶rÃ¼nÃ¼ tanÄ±mlayalÄ±m. GeliÅŸ matrisini aÄŸdaki
+baÄŸlantÄ±lara gÃ¶re yapÄ±p Ã§Ã¶zersek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 A = [
@@ -549,28 +549,28 @@ print (res)
 [0. 1. 0. 1. 1. 0. 0. 0. 0. 0.]
 \end{verbatim}
 
-Sonuçta $x_{13}$, $x_{24}$, $x_{32}$ kenarlarının 1 değerini aldığını
-görüyoruz, bu yollar en kısa yolun parçalarıdır, demek ki 1-3, 3-2, ve 2-4
-yolu en kısa yoldur. Orijinal problem çözümünde [2] sonucun ['s', 'y', 't',
-'x'] olduğunu görmüştük. Yani aynı sonuca varmış olduk. Dijkstra
-algoritmasının bir ayrıksal algoritma olduğunu unutmayalım, ama üstteki LP
-bazlı yaklaşım sürekli (continuous) alanda optimizasyon araçları ile aynı
-sonuca varıyor!
+SonuÃ§ta $x_{13}$, $x_{24}$, $x_{32}$ kenarlarÄ±nÄ±n 1 deÄŸerini aldÄ±ÄŸÄ±nÄ±
+gÃ¶rÃ¼yoruz, bu yollar en kÄ±sa yolun parÃ§alarÄ±dÄ±r, demek ki 1-3, 3-2, ve 2-4
+yolu en kÄ±sa yoldur. Orijinal problem Ã§Ã¶zÃ¼mÃ¼nde [2] sonucun ['s', 'y', 't',
+'x'] olduÄŸunu gÃ¶rmÃ¼ÅŸtÃ¼k. Yani aynÄ± sonuca varmÄ±ÅŸ olduk. Dijkstra
+algoritmasÄ±nÄ±n bir ayrÄ±ksal algoritma olduÄŸunu unutmayalÄ±m, ama Ã¼stteki LP
+bazlÄ± yaklaÅŸÄ±m sÃ¼rekli (continuous) alanda optimizasyon araÃ§larÄ± ile aynÄ±
+sonuca varÄ±yor!
 
-Yüzücüler
+YÃ¼zÃ¼cÃ¼ler
 
-Daha önceki problemi yazılımla çözelim. Atama problemleri aslında oldukca
-standart, çünkü iş-işçi ağ yapısı hep aynı, arada aktarma olmayan bir
-ağ yapısı. Bu yapıyı $n$ tane iş $n$ tane işçi için mekanik bir şekilde
-yaratabiliyoruz. Bu sebeple çözüm yapan \verb!linear_sum_assignment!
-çağrısı sadece bir bedel matrisi alıyor, gerisini kendi hallediyor. 
+Daha Ã¶nceki problemi yazÄ±lÄ±mla Ã§Ã¶zelim. Atama problemleri aslÄ±nda oldukca
+standart, Ã§Ã¼nkÃ¼ iÅŸ-iÅŸÃ§i aÄŸ yapÄ±sÄ± hep aynÄ±, arada aktarma olmayan bir
+aÄŸ yapÄ±sÄ±. Bu yapÄ±yÄ± $n$ tane iÅŸ $n$ tane iÅŸÃ§i iÃ§in mekanik bir ÅŸekilde
+yaratabiliyoruz. Bu sebeple Ã§Ã¶zÃ¼m yapan \verb!linear_sum_assignment!
+Ã§aÄŸrÄ±sÄ± sadece bir bedel matrisi alÄ±yor, gerisini kendi hallediyor. 
 
-Bir pürüz nokta, elde işten fazla işçi varsa, mesela yüzme örneğinde olduğu
-gibi, 5 tane yüzücü, 4 tane stil varsa ortaya çıkar. O zaman numara şudur,
-bedel matrisine bir 'boş stil' satırı ekleriz [4, sf. 40], oradaki tüm
-bedeller sıfır olur, yani diğer işler için optimal olmayan bir kişiyi
-buraya atamak için algoritmayi yönlendirmiş oluruz bir bakıma ve yine
-problemi standart bir şekilde çözeriz.
+Bir pÃ¼rÃ¼z nokta, elde iÅŸten fazla iÅŸÃ§i varsa, mesela yÃ¼zme Ã¶rneÄŸinde olduÄŸu
+gibi, 5 tane yÃ¼zÃ¼cÃ¼, 4 tane stil varsa ortaya Ã§Ä±kar. O zaman numara ÅŸudur,
+bedel matrisine bir 'boÅŸ stil' satÄ±rÄ± ekleriz [4, sf. 40], oradaki tÃ¼m
+bedeller sÄ±fÄ±r olur, yani diÄŸer iÅŸler iÃ§in optimal olmayan bir kiÅŸiyi
+buraya atamak iÃ§in algoritmayi yÃ¶nlendirmiÅŸ oluruz bir bakÄ±ma ve yine
+problemi standart bir ÅŸekilde Ã§Ã¶zeriz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.optimize import linear_sum_assignment
@@ -599,18 +599,18 @@ print (raw[row_ind, col_ind].sum())
 126.2
 \end{verbatim}
 
-Sonuca bakarsak David sırtüstü stiline atanmış, Tony kurbağalamaya
-atanmış.. ve Ken hiçbir şeye atanmamış. Bu sonuçların daha önceki tablodaki
-kırmızı seçimler aynı olduğunu görebiliriz.
+Sonuca bakarsak David sÄ±rtÃ¼stÃ¼ stiline atanmÄ±ÅŸ, Tony kurbaÄŸalamaya
+atanmÄ±ÅŸ.. ve Ken hiÃ§bir ÅŸeye atanmamÄ±ÅŸ. Bu sonuÃ§larÄ±n daha Ã¶nceki tablodaki
+kÄ±rmÄ±zÄ± seÃ§imler aynÄ± olduÄŸunu gÃ¶rebiliriz.
 
-Problemin matematik yapısına gelelim, ufak bir örnek, elde
-$c_1,c_2,p_1,p_2$ şeklinde $c$ ile müşteriler $p$ ile ürünleri eşlediğimizi
-düşünürsek, ağ yapısında düğümler tüm müşteriler, tüm ürünler, yani
-$c_1,c_2,p_1,p_2$ ve tüm kenarlar ise $(c_1,p_1)$, $(c_1,p_2)$,
+Problemin matematik yapÄ±sÄ±na gelelim, ufak bir Ã¶rnek, elde
+$c_1,c_2,p_1,p_2$ ÅŸeklinde $c$ ile mÃ¼ÅŸteriler $p$ ile Ã¼rÃ¼nleri eÅŸlediÄŸimizi
+dÃ¼ÅŸÃ¼nÃ¼rsek, aÄŸ yapÄ±sÄ±nda dÃ¼ÄŸÃ¼mler tÃ¼m mÃ¼ÅŸteriler, tÃ¼m Ã¼rÃ¼nler, yani
+$c_1,c_2,p_1,p_2$ ve tÃ¼m kenarlar ise $(c_1,p_1)$, $(c_1,p_2)$,
 $(c_2,p_1)$, $(c_2,p_2)$ gibi olurdu. Burada yine tek birim kaynaktan,
-müşterilerden gönderilen tek birimlik yükün bir alıcı ürün tarafından
-alındığını düşünüyoruz, o zaman geliş matrisi satırlar düğümler, kolonlar
-kenarlar olacak şekilde,
+mÃ¼ÅŸterilerden gÃ¶nderilen tek birimlik yÃ¼kÃ¼n bir alÄ±cÄ± Ã¼rÃ¼n tarafÄ±ndan
+alÄ±ndÄ±ÄŸÄ±nÄ± dÃ¼ÅŸÃ¼nÃ¼yoruz, o zaman geliÅŸ matrisi satÄ±rlar dÃ¼ÄŸÃ¼mler, kolonlar
+kenarlar olacak ÅŸekilde,
 
 $$
 \left[\begin{array}{rrrr}
@@ -621,11 +621,11 @@ $$
 \end{array}\right]
 $$
 
-olurdu, tabii ki $b = [1,1,-1,-1]$. Üstteki matriste kalıp belli oluyor
-herhalde, satırların müşteri kısmında her ürün başına tamamen birler var,
-ürünler kısmında blok blok yanyana birim matrisleri.. Üstteki matrisi
-ötomatik olarak yaratmak mümkün. Hatta şimdi {\em Lineer Programlar,
- Örnekler} yazısındaki problemi ağ mantığı çözelim, 
+olurdu, tabii ki $b = [1,1,-1,-1]$. Ãœstteki matriste kalÄ±p belli oluyor
+herhalde, satÄ±rlarÄ±n mÃ¼ÅŸteri kÄ±smÄ±nda her Ã¼rÃ¼n baÅŸÄ±na tamamen birler var,
+Ã¼rÃ¼nler kÄ±smÄ±nda blok blok yanyana birim matrisleri.. Ãœstteki matrisi
+Ã¶tomatik olarak yaratmak mÃ¼mkÃ¼n. Hatta ÅŸimdi {\em Lineer Programlar,
+ Ã–rnekler} yazÄ±sÄ±ndaki problemi aÄŸ mantÄ±ÄŸÄ± Ã§Ã¶zelim, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 C = [[17,10,12],[9,8,10], [14,4,7]]
@@ -663,12 +663,12 @@ print (res)
 [0. 0. 1. 1. 0. 0. 0. 1. 0.]
 \end{verbatim}
 
-Aynı sonuca eriştiğimizi görüyoruz. Not: hem üstteki geliş matrisi hem de
-diğer LP yazısındaki problemin tamamen tekbirimsel olduğuna dikkat, bu
-sebeple her iki problem de tamsayı çözümü veriyor. 
+AynÄ± sonuca eriÅŸtiÄŸimizi gÃ¶rÃ¼yoruz. Not: hem Ã¼stteki geliÅŸ matrisi hem de
+diÄŸer LP yazÄ±sÄ±ndaki problemin tamamen tekbirimsel olduÄŸuna dikkat, bu
+sebeple her iki problem de tamsayÄ± Ã§Ã¶zÃ¼mÃ¼ veriyor. 
 
-5 yüzücü için ve yine sıfırlı satırı ekleyip, yüzücü problemini de aynı
-şekilde çözebilirdik. 
+5 yÃ¼zÃ¼cÃ¼ iÃ§in ve yine sÄ±fÄ±rlÄ± satÄ±rÄ± ekleyip, yÃ¼zÃ¼cÃ¼ problemini de aynÄ±
+ÅŸekilde Ã§Ã¶zebilirdik. 
 
 Kaynaklar
 
@@ -676,9 +676,9 @@ Kaynaklar
     University of Wisconsin-Madison,
     \url{https://laurentlessard.com/teaching/524-intro-to-optimization}
 
-[2] Bayramli, {\em Bilgisayar Bilim, Dijkstra Algoritması ile En Kısa Yol}
+[2] Bayramli, {\em Bilgisayar Bilim, Dijkstra AlgoritmasÄ± ile En KÄ±sa Yol}
 
-[3] Bayramli, {\em Fonksiyonel Analiz ve Optimizasyon, Çifteşlik, İkizlik (Duality)}
+[3] Bayramli, {\em Fonksiyonel Analiz ve Optimizasyon, Ã‡ifteÅŸlik, Ä°kizlik (Duality)}
 
 \end{document}
 

@@ -1,38 +1,38 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Sigma Bazlı Kalman Filtreleri (Unscented Kalman Filters -UKF-)
+Sigma BazlÄ± Kalman Filtreleri (Unscented Kalman Filters -UKF-)
 
-{\em Kalman Filtereleri} yazısında dış ölçümlerin bir iç konumu anlamak
-için nasıl kullanıldığını gördük, fakat KF'ler gayrı lineerliği iyi idare
-edemiyorlar. Mesela havaya atılan bir topu gürültülü ölçümlerden takip
-ettiğimizi düşünelim, top çıkıp inecek, değişim (state transition) /
-hareket parabol şeklinde (parabol gayrı lineer). Bu basit hareket bile KF
-ile takip edilemiyor. Gayri lineerlik ölçüm sırasında da ortaya çıkabilir,
-mesela bir objenin uzaklığını radardan alıyorsak ölçüm bize yerden
-yükseklik ve eğim olarak gelebilir, bu ölçümleri direk mesafeye çevirmek
-için karelerin toplamının karekökü gerekir ve bu yine bir gayrı lineerliği
-probleme sokmuş olur.
+{\em Kalman Filtereleri} yazÄ±sÄ±nda dÄ±ÅŸ Ã¶lÃ§Ã¼mlerin bir iÃ§ konumu anlamak
+iÃ§in nasÄ±l kullanÄ±ldÄ±ÄŸÄ±nÄ± gÃ¶rdÃ¼k, fakat KF'ler gayrÄ± lineerliÄŸi iyi idare
+edemiyorlar. Mesela havaya atÄ±lan bir topu gÃ¼rÃ¼ltÃ¼lÃ¼ Ã¶lÃ§Ã¼mlerden takip
+ettiÄŸimizi dÃ¼ÅŸÃ¼nelim, top Ã§Ä±kÄ±p inecek, deÄŸiÅŸim (state transition) /
+hareket parabol ÅŸeklinde (parabol gayrÄ± lineer). Bu basit hareket bile KF
+ile takip edilemiyor. Gayri lineerlik Ã¶lÃ§Ã¼m sÄ±rasÄ±nda da ortaya Ã§Ä±kabilir,
+mesela bir objenin uzaklÄ±ÄŸÄ±nÄ± radardan alÄ±yorsak Ã¶lÃ§Ã¼m bize yerden
+yÃ¼kseklik ve eÄŸim olarak gelebilir, bu Ã¶lÃ§Ã¼mleri direk mesafeye Ã§evirmek
+iÃ§in karelerin toplamÄ±nÄ±n karekÃ¶kÃ¼ gerekir ve bu yine bir gayrÄ± lineerliÄŸi
+probleme sokmuÅŸ olur.
 
-Çözüm için farklı yaklaşımlar var; genişletilmiş KF (EKF) lokal bir nokta
-etrafında Taylor açılımı kullanarak gayrı lineerliği yakalamaya
-uğraşıyor. Fakat hem performans hem doğruluk açısından daha verimli bir
-yaklaşım sigma bazlı Kalman filtreleri (UKF).
+Ã‡Ã¶zÃ¼m iÃ§in farklÄ± yaklaÅŸÄ±mlar var; geniÅŸletilmiÅŸ KF (EKF) lokal bir nokta
+etrafÄ±nda Taylor aÃ§Ä±lÄ±mÄ± kullanarak gayrÄ± lineerliÄŸi yakalamaya
+uÄŸraÅŸÄ±yor. Fakat hem performans hem doÄŸruluk aÃ§Ä±sÄ±ndan daha verimli bir
+yaklaÅŸÄ±m sigma bazlÄ± Kalman filtreleri (UKF).
 
-UKF'in yaptığı nedir? Normal KF'in işleyişi sırasında geçiş ya da gözlem
-fonsiyonlarının içinden Gaussian'lar geçirdiği söylenebilir.  Gaussian'lar
-(yani onların $\mu,\sigma$ parametreleri) lineerlige tabi olduklarında
-bozulmazlar, iki Guassian toplamı yine bir Gaussian'dır, vs. Fakat gayrı
-lineer fonksiyonlar işleri bozar.
+UKF'in yaptÄ±ÄŸÄ± nedir? Normal KF'in iÅŸleyiÅŸi sÄ±rasÄ±nda geÃ§iÅŸ ya da gÃ¶zlem
+fonsiyonlarÄ±nÄ±n iÃ§inden Gaussian'lar geÃ§irdiÄŸi sÃ¶ylenebilir.  Gaussian'lar
+(yani onlarÄ±n $\mu,\sigma$ parametreleri) lineerlige tabi olduklarÄ±nda
+bozulmazlar, iki Guassian toplamÄ± yine bir Gaussian'dÄ±r, vs. Fakat gayrÄ±
+lineer fonksiyonlar iÅŸleri bozar.
 
-UKF'in püf noktası o an eldeki Gaussian'ın standart sapma $\sigma$'sına
-oranlı seçilmiş birkaç noktanın değişim yapan fonksiyona verilmesi; normal
-KF'i o zaman sadece merkez nokta $\mu$'yu işlemden geçiriyor olarak
-görebiliriz, fakat UKF ile seçenekleri arttırıyoruz [1]. Bu noktalar
-seçildiğinde onları değişim fonksiyonuna tabi tutuyoruz, böylece ele geçen
-sonuç Gaussian'ı daha gerçeğe yakın oluyor. UKF yaklaşımında ayrıca seçilen
-her nokta için bir ağırlık gerekiyor, ve bu ağırlıklar da önceden
-kararlaştırılır, bazı uygulamalarda merkez noktaya daha fazla ağırlık
-vermek istenebilir, diğerleri dış noktaları tercih edebilir.
+UKF'in pÃ¼f noktasÄ± o an eldeki Gaussian'Ä±n standart sapma $\sigma$'sÄ±na
+oranlÄ± seÃ§ilmiÅŸ birkaÃ§ noktanÄ±n deÄŸiÅŸim yapan fonksiyona verilmesi; normal
+KF'i o zaman sadece merkez nokta $\mu$'yu iÅŸlemden geÃ§iriyor olarak
+gÃ¶rebiliriz, fakat UKF ile seÃ§enekleri arttÄ±rÄ±yoruz [1]. Bu noktalar
+seÃ§ildiÄŸinde onlarÄ± deÄŸiÅŸim fonksiyonuna tabi tutuyoruz, bÃ¶ylece ele geÃ§en
+sonuÃ§ Gaussian'Ä± daha gerÃ§eÄŸe yakÄ±n oluyor. UKF yaklaÅŸÄ±mÄ±nda ayrÄ±ca seÃ§ilen
+her nokta iÃ§in bir aÄŸÄ±rlÄ±k gerekiyor, ve bu aÄŸÄ±rlÄ±klar da Ã¶nceden
+kararlaÅŸtÄ±rÄ±lÄ±r, bazÄ± uygulamalarda merkez noktaya daha fazla aÄŸÄ±rlÄ±k
+vermek istenebilir, diÄŸerleri dÄ±ÅŸ noktalarÄ± tercih edebilir.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from __future__ import (absolute_import, division, print_function,
@@ -73,27 +73,27 @@ plt.savefig('tser_ukf_02.png')
 
 \includegraphics[height=6cm]{tser_ukf_02.png}
 
-``Sigma bazlı transform edilmiş'' (unscented transform) yeni Gaussian
-hesabı şöyle olur,
+``Sigma bazlÄ± transform edilmiÅŸ'' (unscented transform) yeni Gaussian
+hesabÄ± ÅŸÃ¶yle olur,
 
 $$ \mu = \sum_i w_i^m y_i $$
 
 $$ \Sigma = \sum_i w_i^c (y_i-\mu)(y_i-\mu)^T $$
 
-Dikkat, bu yaptığımız parçacık filtrelerindeki gibi örneklemek, ya da her
-değişik hipotezi temsil eden ``parçacıklar'' yaratmak değil, bir
-Gaussian'ın hep belli yerlerindeki belli noktalara bakmak. Bu seçim tamamen
-{\em deterministik}, hiçbir rasgelelik yok. Seçim nasıl yapılır?  Her
-uygulama için tasarımcı buna karar verir, altta bazı örnekler görülüyor,
+Dikkat, bu yaptÄ±ÄŸÄ±mÄ±z parÃ§acÄ±k filtrelerindeki gibi Ã¶rneklemek, ya da her
+deÄŸiÅŸik hipotezi temsil eden ``parÃ§acÄ±klar'' yaratmak deÄŸil, bir
+Gaussian'Ä±n hep belli yerlerindeki belli noktalara bakmak. Bu seÃ§im tamamen
+{\em deterministik}, hiÃ§bir rasgelelik yok. SeÃ§im nasÄ±l yapÄ±lÄ±r?  Her
+uygulama iÃ§in tasarÄ±mcÄ± buna karar verir, altta bazÄ± Ã¶rnekler gÃ¶rÃ¼lÃ¼yor,
 
 \includegraphics[height=2.5cm]{tser_ukf_03.png}
 
-Fakat endüstri sigmayı ve ağırlıklarını seçmek için 2005'ten itibaren
-[2]'deki yöntemi kabul etmiş görünüyor.
+Fakat endÃ¼stri sigmayÄ± ve aÄŸÄ±rlÄ±klarÄ±nÄ± seÃ§mek iÃ§in 2005'ten itibaren
+[2]'deki yÃ¶ntemi kabul etmiÅŸ gÃ¶rÃ¼nÃ¼yor.
 
-Trasform Örneği
+Trasform Ã–rneÄŸi
 
-Alttaki gibi bir gayrı-lineer fonksiyon
+Alttaki gibi bir gayrÄ±-lineer fonksiyon
 
 $$ 
 \left\{ \begin{array}{ll}
@@ -102,8 +102,8 @@ y = 0.1 x^2 + y^2
 \end{array} \right.
 $$
 
-olsun, bu fonksiyona  alttaki çok boyutlu Gaussian'dan örneklenmiş
-noktaları geçeceğiz, 
+olsun, bu fonksiyona  alttaki Ã§ok boyutlu Gaussian'dan Ã¶rneklenmiÅŸ
+noktalarÄ± geÃ§eceÄŸiz, 
 
 $$ 
 \mu = \left[\begin{array}{r} 0 \\ 0 \end{array}\right],
@@ -132,13 +132,13 @@ Ortalamalardaki fark x=-0.471, y=43.237
 
 \includegraphics[height=8cm]{tser_ukf_13.png}
 
-Görülüyor ki eğer EKF ile olduğu gibi bir lineerizasyon yapılsa ortaya çok
-büyük bir hata çıkacak. Tekrar vurgulamak gerekirse figürde görülen
-``lineerize edilmiş ortalama'' Gaussian $\mu$'sunun gayrı lineer fonksiyona
-geçilmiş hali, ki EKF bu şekilde işlem yapar, diğeri Gaussian'dan alınan
-noktaların gayrı-lineer fonksiyona geçildikten sonra alınan ortalama. 
+GÃ¶rÃ¼lÃ¼yor ki eÄŸer EKF ile olduÄŸu gibi bir lineerizasyon yapÄ±lsa ortaya Ã§ok
+bÃ¼yÃ¼k bir hata Ã§Ä±kacak. Tekrar vurgulamak gerekirse figÃ¼rde gÃ¶rÃ¼len
+``lineerize edilmiÅŸ ortalama'' Gaussian $\mu$'sunun gayrÄ± lineer fonksiyona
+geÃ§ilmiÅŸ hali, ki EKF bu ÅŸekilde iÅŸlem yapar, diÄŸeri Gaussian'dan alÄ±nan
+noktalarÄ±n gayrÄ±-lineer fonksiyona geÃ§ildikten sonra alÄ±nan ortalama. 
 
-Fakat sigma bazlı transform kullanırsak,
+Fakat sigma bazlÄ± transform kullanÄ±rsak,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy.random import multivariate_normal
@@ -177,62 +177,62 @@ Ortalamalardaki fark x=-0.097, y=0.549
 
 \includegraphics[height=8cm]{tser_ukf_12.png}
 
-Bu sonuç bana müthiş geliyor; sadece 5 nokta kullanarak ortalamaya çok
-yakın bir sonucu hesaplayabildik, ayrıca bunu gayrı lineerliğin ne
-olduğundan tamamen bağımsız olarak yaptık; eğer sigma noktalarını üreten
-koda bakarsak göreceğiz ki bu kod gayrı-lineer fonksiyondan habersiz.
+Bu sonuÃ§ bana mÃ¼thiÅŸ geliyor; sadece 5 nokta kullanarak ortalamaya Ã§ok
+yakÄ±n bir sonucu hesaplayabildik, ayrÄ±ca bunu gayrÄ± lineerliÄŸin ne
+olduÄŸundan tamamen baÄŸÄ±msÄ±z olarak yaptÄ±k; eÄŸer sigma noktalarÄ±nÄ± Ã¼reten
+koda bakarsak gÃ¶receÄŸiz ki bu kod gayrÄ±-lineer fonksiyondan habersiz.
 
 Filtre
 
-UKF formüllerine bakalım. Geçiş ve gözlemin $f,h$ olduğunu
-düşünelim, matris formunda $F,H$. O anda elde olan $\mu,\Sigma$'yı alıp,
-önceden seçilmiş sigma noktaları üzerinden bir $X$ elde ediyoruz. Bir
+UKF formÃ¼llerine bakalÄ±m. GeÃ§iÅŸ ve gÃ¶zlemin $f,h$ olduÄŸunu
+dÃ¼ÅŸÃ¼nelim, matris formunda $F,H$. O anda elde olan $\mu,\Sigma$'yÄ± alÄ±p,
+Ã¶nceden seÃ§ilmiÅŸ sigma noktalarÄ± Ã¼zerinden bir $X$ elde ediyoruz. Bir
 sonraki zaman dilimine
 
 $$ Y = f(X) $$
 
-ile geçiyoruz. Şimdi sigma bazlı transform ile tahmini ortalama kovaryans
-hesaplarız,
+ile geÃ§iyoruz. Åimdi sigma bazlÄ± transform ile tahmini ortalama kovaryans
+hesaplarÄ±z,
 
 $$ \bar{\mu} = \sum w^m Y $$ 
 
 $$ \bar{\Sigma} = \sum w^c (Y-\hat{\mu})(Y-\hat{\mu})^T + Q $$
 
-KF ile geçiş ortalama için $\bar{x} = Fx$ ve kovaryans $\bar{P} = FPF^T + Q$ 
+KF ile geÃ§iÅŸ ortalama iÃ§in $\bar{x} = Fx$ ve kovaryans $\bar{P} = FPF^T + Q$ 
 ile olurdu. 
 
-Güncelleme adımında eldeki sigma noktalarını bir tahmine çeviriyoruz,
+GÃ¼ncelleme adÄ±mÄ±nda eldeki sigma noktalarÄ±nÄ± bir tahmine Ã§eviriyoruz,
 
 $$ Z = h(Y) $$
 
-Sonra bu noktaların ortalama ve kovaryansını sigma bazlı transformu
+Sonra bu noktalarÄ±n ortalama ve kovaryansÄ±nÄ± sigma bazlÄ± transformu
 kullanarak hesaplayabiliriz, 
 
 $$ \mu_z = \sum w^m Z $$
 
 $$ P_z = \sum w^c (Z-\bar{\mu}) (Z-\bar{\mu})^T + R$$
 
-Şimdi Kalman kazancı (gain) ve artıkları hesaplanabilir. Artıklar basit
+Åimdi Kalman kazancÄ± (gain) ve artÄ±klarÄ± hesaplanabilir. ArtÄ±klar basit
 
 $$ y = z - \mu_z$$
 
-Kazanç için önce konum ve ölçümlerin çapraz kovaryansını hesaplarız, 
+KazanÃ§ iÃ§in Ã¶nce konum ve Ã¶lÃ§Ã¼mlerin Ã§apraz kovaryansÄ±nÄ± hesaplarÄ±z, 
 
 $$ P_{xz} = \sum w^c (X-\mu)(Z-\mu_z)^T    $$
 
-sonra kazancı hesaplarız, 
+sonra kazancÄ± hesaplarÄ±z, 
 
 $$ K = P_{xz}P_z^{-1} $$
 
-Üstteki matris tersi işlemi bir nevi oran hesabı gibi görebiliriz, o zaman
-Kalman kazancı
+Ãœstteki matris tersi iÅŸlemi bir nevi oran hesabÄ± gibi gÃ¶rebiliriz, o zaman
+Kalman kazancÄ±
 
 $$ 
 K \approx \frac{P_{xz}}{P_z^{-1}} \approx 
-\frac{\textrm{mevcut konuma inanç}}{\textrm{ölçüme olan inanç}}
+\frac{\textrm{mevcut konuma inanÃ§}}{\textrm{Ã¶lÃ§Ã¼me olan inanÃ§}}
 $$
 
-oranından ibarettir. Nihayet yeni kestirme hesabı artık ve kazanç
+oranÄ±ndan ibarettir. Nihayet yeni kestirme hesabÄ± artÄ±k ve kazanÃ§
 kullanarak hesaplanabilir,
 
 $$ x = \bar{x} + Ky $$
@@ -241,34 +241,34 @@ yeni kovaryans
 
 $$ P = \bar{P} - KP_zK^T $$
 
-Filtrenin iç kodlaması hakkında diğer matematiksel detaylar için [1, sf. 382].
+Filtrenin iÃ§ kodlamasÄ± hakkÄ±nda diÄŸer matematiksel detaylar iÃ§in [1, sf. 382].
 
-Dikkat çekilmesi gereken püf nokta KF'te olduğu gibi ölçümleri üretenin
-artık bir matris olmadığıdır. Normal Kalman filtreleri ile elde bir ölçüm
-``fonksiyonu'' vardır fakat bu fonksiyonu bir $H$ matrisi olarak temsil
-etmek zorundayız. Efendim boyutları düzgün olmalı, ki konum $x$'i
-çarpabilsin, vs. UKF ile bir $h$ {\em fonksiyonu} var, bu fonksiyonlar ek
-işlemler yapılmadan önce verinin kendisini transforme ediyorlar, ve
-``yeni'' veri üzerinde ek filtreleme işlemleri yapıyoruz, mesela Kalman
-kazancını bu transform edilmiş veri üzerinden hesaplıyoruz. Kıyasla KF ile
-$H$ matrisi matris olarak direk kazanç hesabında kullanılıyor. Ardından UKF
-ile veriye öyle noktalarda (sigma noktaları) bakıyoruz ki $h$ ne kadar
-gayrı-lineer olursa olsun onun temel özelliklerini yakalayabilmiş
-oluyoruz. Bu geçiş fonksiyonu $f$ için de geçerli tabii, artık onun da bir
-matris olması gerekmiyor. Ama hala $F,H$ matrislerini tasarlayıp onları
-$f,h$ fonksiyonları içinde $x$'i çarpmak için kullanabiliriz tabii, ama bu
-şart değil. 
+Dikkat Ã§ekilmesi gereken pÃ¼f nokta KF'te olduÄŸu gibi Ã¶lÃ§Ã¼mleri Ã¼retenin
+artÄ±k bir matris olmadÄ±ÄŸÄ±dÄ±r. Normal Kalman filtreleri ile elde bir Ã¶lÃ§Ã¼m
+``fonksiyonu'' vardÄ±r fakat bu fonksiyonu bir $H$ matrisi olarak temsil
+etmek zorundayÄ±z. Efendim boyutlarÄ± dÃ¼zgÃ¼n olmalÄ±, ki konum $x$'i
+Ã§arpabilsin, vs. UKF ile bir $h$ {\em fonksiyonu} var, bu fonksiyonlar ek
+iÅŸlemler yapÄ±lmadan Ã¶nce verinin kendisini transforme ediyorlar, ve
+``yeni'' veri Ã¼zerinde ek filtreleme iÅŸlemleri yapÄ±yoruz, mesela Kalman
+kazancÄ±nÄ± bu transform edilmiÅŸ veri Ã¼zerinden hesaplÄ±yoruz. KÄ±yasla KF ile
+$H$ matrisi matris olarak direk kazanÃ§ hesabÄ±nda kullanÄ±lÄ±yor. ArdÄ±ndan UKF
+ile veriye Ã¶yle noktalarda (sigma noktalarÄ±) bakÄ±yoruz ki $h$ ne kadar
+gayrÄ±-lineer olursa olsun onun temel Ã¶zelliklerini yakalayabilmiÅŸ
+oluyoruz. Bu geÃ§iÅŸ fonksiyonu $f$ iÃ§in de geÃ§erli tabii, artÄ±k onun da bir
+matris olmasÄ± gerekmiyor. Ama hala $F,H$ matrislerini tasarlayÄ±p onlarÄ±
+$f,h$ fonksiyonlarÄ± iÃ§inde $x$'i Ã§arpmak iÃ§in kullanabiliriz tabii, ama bu
+ÅŸart deÄŸil. 
 
-Örnek
+Ã–rnek
 
-Bir KF tasarlamak için $x,F,H,R$ matrislerinin ne olduğunu kararlaştırmak
-gerekiyor demiştik, bu durum daha önce KF yazısında işlendi. Konum bilgisi
-nedir, geçiş nedir, ölçüm nedir? Hareket halindeki bir objeyi takip
-ettiğimizi düşünelim, konum
+Bir KF tasarlamak iÃ§in $x,F,H,R$ matrislerinin ne olduÄŸunu kararlaÅŸtÄ±rmak
+gerekiyor demiÅŸtik, bu durum daha Ã¶nce KF yazÄ±sÄ±nda iÅŸlendi. Konum bilgisi
+nedir, geÃ§iÅŸ nedir, Ã¶lÃ§Ã¼m nedir? Hareket halindeki bir objeyi takip
+ettiÄŸimizi dÃ¼ÅŸÃ¼nelim, konum
 
 $$ x=\left[\begin{array}{cccc} x&\dot{x}&y&\dot{y} \end{array}\right]^T $$
 
-olabilir. Konum geçişi 
+olabilir. Konum geÃ§iÅŸi 
 
 $$ F = 
 \left[\begin{array}{rrrr}
@@ -279,11 +279,11 @@ $$ F =
 \end{array}\right]
 $$
 
-Üstteki denklemle bir Newton formülünü kodlamış oluyoruz, 
+Ãœstteki denklemle bir Newton formÃ¼lÃ¼nÃ¼ kodlamÄ±ÅŸ oluyoruz, 
 
 $$ x_k = x_{k-1} + \dot{x}_{k-1}\Delta t $$
 
-Algılayıcılar hareketli aracın yerini bildiriyor ama hızını bildiremiyor, o
+AlgÄ±layÄ±cÄ±lar hareketli aracÄ±n yerini bildiriyor ama hÄ±zÄ±nÄ± bildiremiyor, o
 zaman 
 
 $$ H = \left[\begin{array}{rrrr}
@@ -291,23 +291,23 @@ $$ H = \left[\begin{array}{rrrr}
 0 & 0 & 1 & 0 
 \end{array}\right]$$
 
-Diyelim ki algılayıcının pozisyonu belirleme hatası hem $x$ hem $y$
-kordinatları için $1\sigma = 0.3$ metre, bu bize alttaki ölçüm gürültü
+Diyelim ki algÄ±layÄ±cÄ±nÄ±n pozisyonu belirleme hatasÄ± hem $x$ hem $y$
+kordinatlarÄ± iÃ§in $1\sigma = 0.3$ metre, bu bize alttaki Ã¶lÃ§Ã¼m gÃ¼rÃ¼ltÃ¼
 matrisini veriyor, 
 
 $$ R = \left[\begin{array}{cc}
 0.3^2  & 0 \\ 0 & 0.3^2
 \end{array}\right]$$
 
-Konum geçişinde  de gürültü var, o da 
+Konum geÃ§iÅŸinde  de gÃ¼rÃ¼ltÃ¼ var, o da 
 
 $$ Q = \left[\begin{array}{cc}
 \frac{1}{4} \Delta t^4 & \frac{1}{2} \Delta t^3 \\
 \frac{1}{2} \Delta t^3 & \Delta t^2 
 \end{array}\right] \sigma^2  $$
 
-Tabii biz simülasyon amaçlı veri üretirken de üstteki matrisi
-kullanacağız. 
+Tabii biz simÃ¼lasyon amaÃ§lÄ± veri Ã¼retirken de Ã¼stteki matrisi
+kullanacaÄŸÄ±z. 
 
 Kodlar altta,
 
@@ -348,24 +348,24 @@ plt.savefig('tser_ukf_01.png')
 
 \includegraphics[height=6cm]{tser_ukf_01.png}
 
-Bir Uçağı Radar ile Takip Etmek
+Bir UÃ§aÄŸÄ± Radar ile Takip Etmek
 
-Şimdi ilk gayrı lineer problemimize gelelim. Yeryüzündeki sabit bir radarı
-algılayıcı olarak kullanarak bir uçağı takip edeceğiz. Basitlik amaçlı
-olarak radar sinyalleri ve takip iki boyutta olacak. Radarlar bilindiği
+Åimdi ilk gayrÄ± lineer problemimize gelelim. YeryÃ¼zÃ¼ndeki sabit bir radarÄ±
+algÄ±layÄ±cÄ± olarak kullanarak bir uÃ§aÄŸÄ± takip edeceÄŸiz. Basitlik amaÃ§lÄ±
+olarak radar sinyalleri ve takip iki boyutta olacak. Radarlar bilindiÄŸi
 gibi radyo sinyallerini etrafa yayarlar, ve etraftaki cisimlerden geri
-gelen yansımalara bakarak bir mesafe hesaplarlar. Bu problemdeki radar bize
-bir uzaklık ve cismin yerle olan açısını (slant) raporlayacak. Biz bu eğimi
-ve mesafeyi alıp bir uzaklık ve irtifa / yükseklik (altitude) hesabına
-çevireceğiz.
+gelen yansÄ±malara bakarak bir mesafe hesaplarlar. Bu problemdeki radar bize
+bir uzaklÄ±k ve cismin yerle olan aÃ§Ä±sÄ±nÄ± (slant) raporlayacak. Biz bu eÄŸimi
+ve mesafeyi alÄ±p bir uzaklÄ±k ve irtifa / yÃ¼kseklik (altitude) hesabÄ±na
+Ã§evireceÄŸiz.
 
 \includegraphics[height=4cm]{tser_ukf_07.png}
 
-Uçağın sabit irtifada uçtuğunu farz edelim, 
+UÃ§aÄŸÄ±n sabit irtifada uÃ§tuÄŸunu farz edelim, 
 
 $$ \vec{x} = 
 \left[\begin{array}{c}  
-\textrm{uzaklık} \\ \textrm{hız} \\ \textrm{irtifa}
+\textrm{uzaklÄ±k} \\ \textrm{hÄ±z} \\ \textrm{irtifa}
 \end{array}\right] = 
 \left[\begin{array}{c}  
 x_{pos} \\ x_{vel} \\ x_{alt}
@@ -375,7 +375,7 @@ x \\ \dot{x} \\ y
 \end{array}\right]
 $$
 
-Geçiş fonksiyonu lineer
+GeÃ§iÅŸ fonksiyonu lineer
 
 $$ F = 
 \left[\begin{array}{ccc}
@@ -384,14 +384,14 @@ $$ F =
 \left[\begin{array}{c} x \\ \dot{x} \\ y \end{array}\right]
 $$
 
-Şimdi ölçüm fonksiyonunu tasarlamak lazım, probleme tersten bakıyoruz
-şimdi, yani ``eğer yer seviyesindeki uzaklığı ve irtifayı biliyor
-olsaydık açıyı (bearing) ve sinyal uzaklığını (range) nasıl ölçüyor
-olurduk?'' sorusunu cevaplıyoruz. Pitagor denklemini kullanabiliriz,
+Åimdi Ã¶lÃ§Ã¼m fonksiyonunu tasarlamak lazÄ±m, probleme tersten bakÄ±yoruz
+ÅŸimdi, yani ``eÄŸer yer seviyesindeki uzaklÄ±ÄŸÄ± ve irtifayÄ± biliyor
+olsaydÄ±k aÃ§Ä±yÄ± (bearing) ve sinyal uzaklÄ±ÄŸÄ±nÄ± (range) nasÄ±l Ã¶lÃ§Ã¼yor
+olurduk?'' sorusunu cevaplÄ±yoruz. Pitagor denklemini kullanabiliriz,
 
 $$ range = \sqrt{(x_{ac} - x_{radar})^2 + (z_{ac}-z_{radar})^2 } $$
 
-Yer ile açı için 
+Yer ile aÃ§Ä± iÃ§in 
 
 $$ bearing = \tan^{-1} \frac{z_{ac}-z_{radar}}{x_{ac}-x_{radar}}$$
 
@@ -494,7 +494,7 @@ plt.savefig('tser_ukf_04.png')
 plt.figure()
 plt.plot(time, xs[:, 1])
 plt.xlabel('zaman(saniye)')
-plt.ylabel(u'hız')
+plt.ylabel(u'hÄ±z')
 plt.tight_layout()
 plt.savefig('tser_ukf_05.png')
 
@@ -512,23 +512,23 @@ plt.savefig('tser_ukf_06.png')
 
 \includegraphics[width=10cm]{tser_ukf_06.png}
 
-Sonuçlar iyi, fakat uçağın hiç irtifa değiştirmediğini farzettik. Şimdi
-uçağın bir dakika sonra daha yükseğe tırmanmaya başladığını düşünelim, ve
-simülasyon verisini ona göre üretelim. O zaman tırmanma oranını da konum
+SonuÃ§lar iyi, fakat uÃ§aÄŸÄ±n hiÃ§ irtifa deÄŸiÅŸtirmediÄŸini farzettik. Åimdi
+uÃ§aÄŸÄ±n bir dakika sonra daha yÃ¼kseÄŸe tÄ±rmanmaya baÅŸladÄ±ÄŸÄ±nÄ± dÃ¼ÅŸÃ¼nelim, ve
+simÃ¼lasyon verisini ona gÃ¶re Ã¼retelim. O zaman tÄ±rmanma oranÄ±nÄ± da konum
 matrisine eklememiz gerekir, 
 
 $$ \vec{x} = 
 \left[\begin{array}{c}  
-\textrm{uzaklık} \\ \textrm{hız} \\ \textrm{irtifa} \\ \textrm{tırmanma oranı}
+\textrm{uzaklÄ±k} \\ \textrm{hÄ±z} \\ \textrm{irtifa} \\ \textrm{tÄ±rmanma oranÄ±}
 \end{array}\right] = 
 \left[\begin{array}{c}  
 x \\ \dot{x} \\ y \\ \dot{y}
 \end{array}\right]
 $$
 
-Konum geçiş matrisi de değişir, 
+Konum geÃ§iÅŸ matrisi de deÄŸiÅŸir, 
 
-$$ \vec{x}_{\textrm{geçiş sonrası}} = 
+$$ \vec{x}_{\textrm{geÃ§iÅŸ sonrasÄ±}} = 
 \left[\begin{array}{cccc}
 1 & \Delta t & 0 & 0 \\ 
 0 & 1 & 0 & 0 \\ 
@@ -538,8 +538,8 @@ $$ \vec{x}_{\textrm{geçiş sonrası}} =
 \left[\begin{array}{c}  x \\ \dot{x} \\ y \\ \dot{y} \end{array}\right]
 $$
 
-ki geçiş hala lineer. Ölçüm fonksiyonu aynı kalıyor, sadece boyutlar
-değiştiği için $Q$'yi buna göre uyarlamak gerekiyor. Bu kadar. 
+ki geÃ§iÅŸ hala lineer. Ã–lÃ§Ã¼m fonksiyonu aynÄ± kalÄ±yor, sadece boyutlar
+deÄŸiÅŸtiÄŸi iÃ§in $Q$'yi buna gÃ¶re uyarlamak gerekiyor. Bu kadar. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def f_cv_radar(x, dt):
@@ -578,46 +578,46 @@ xs = np.array(xs)
 plt.figure()
 plt.plot(time, xs[:,2])
 plt.xlabel('zaman(saniye)')
-plt.ylabel('yükseklik')
+plt.ylabel('yÃ¼kseklik')
 plt.tight_layout()
 plt.savefig('tser_ukf_08.png')
     
-print(u'Gerçek irtifa: {:.1f}'.format(ac.pos[1]))
+print(u'GerÃ§ek irtifa: {:.1f}'.format(ac.pos[1]))
 print(u'UKF ile hesaplanan irtifa: {:.1f}'.format(xs[-1][2]))
 \end{minted}
 
 \begin{verbatim}
-Gerçek irtifa: 2561.9
+GerÃ§ek irtifa: 2561.9
 UKF ile hesaplanan irtifa: 2432.9
 \end{verbatim}
 
 \includegraphics[width=10cm]{tser_ukf_08.png}
 
-Görüldüğü gibi irtifa tahmini daha zor hale geldi, bolca gürültü var, fakat
-takip başarılı. 
+GÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi irtifa tahmini daha zor hale geldi, bolca gÃ¼rÃ¼ltÃ¼ var, fakat
+takip baÅŸarÄ±lÄ±. 
 
-Birden Fazla Pozisyon Verisini Birleştirmek 
+Birden Fazla Pozisyon Verisini BirleÅŸtirmek 
 
-GPS icat edilmeden önce gemiler ve uçaklar uzaklık ve açı üzerinden konum
-bulma sistemleri kullanırlardı, VOR sistemi bunlardan biriydi. Mesela bir
-uçakta iki tane VOR alıcısı olabilirdi, pilot bu alıcılardan her birini
-farklı bir istasyona ayarlardı (radyoda doğru frekans ile kanal bulmak gibi
-herhalde), ve her VOR alıcısı ``radyal (radial)'' denen bir bilgiyi
-verirdi, bu bilgi VOR istasyonunun alıcıya olan açısıydı. Bu iki radyalı,
-istasyon sinyal uzaklık kapasitesini kullanıp onun etrafında bir çember
-çizerek, istasyonların bilinen yerlerini kullanarak, ve çemberlerin kesişme
-noktasında uçağın olduğu yeri bulabilirdiniz. 
+GPS icat edilmeden Ã¶nce gemiler ve uÃ§aklar uzaklÄ±k ve aÃ§Ä± Ã¼zerinden konum
+bulma sistemleri kullanÄ±rlardÄ±, VOR sistemi bunlardan biriydi. Mesela bir
+uÃ§akta iki tane VOR alÄ±cÄ±sÄ± olabilirdi, pilot bu alÄ±cÄ±lardan her birini
+farklÄ± bir istasyona ayarlardÄ± (radyoda doÄŸru frekans ile kanal bulmak gibi
+herhalde), ve her VOR alÄ±cÄ±sÄ± ``radyal (radial)'' denen bir bilgiyi
+verirdi, bu bilgi VOR istasyonunun alÄ±cÄ±ya olan aÃ§Ä±sÄ±ydÄ±. Bu iki radyalÄ±,
+istasyon sinyal uzaklÄ±k kapasitesini kullanÄ±p onun etrafÄ±nda bir Ã§ember
+Ã§izerek, istasyonlarÄ±n bilinen yerlerini kullanarak, ve Ã§emberlerin kesiÅŸme
+noktasÄ±nda uÃ§aÄŸÄ±n olduÄŸu yeri bulabilirdiniz. 
 
-Ama tek bir kerelik kesişme bulmak, elle bu hesapları yapmak çok hataya
-açık bir yaklaşım. Kalman filtrelemesi ile, ardı ardına, özyineli olarak
-çok daha iyi hesap yapabiliriz. Problemi tarif edelim, elde iki tane
-algılayıcı var, ve bilinen A, B istasyonlarına olan açıyı elde ediyoruz,
+Ama tek bir kerelik kesiÅŸme bulmak, elle bu hesaplarÄ± yapmak Ã§ok hataya
+aÃ§Ä±k bir yaklaÅŸÄ±m. Kalman filtrelemesi ile, ardÄ± ardÄ±na, Ã¶zyineli olarak
+Ã§ok daha iyi hesap yapabiliriz. Problemi tarif edelim, elde iki tane
+algÄ±layÄ±cÄ± var, ve bilinen A, B istasyonlarÄ±na olan aÃ§Ä±yÄ± elde ediyoruz,
 
 \includegraphics[width=25em]{tser_ukf_09.png}
 
-Çemberler katlı çizildi, eğer algılayıcıda gürültü varsa çember çizgisi
-daha kalın oluyor. İstasyon ile algılayıcı arasındaki açı (bearing) şöyle
-hesaplanıyor,
+Ã‡emberler katlÄ± Ã§izildi, eÄŸer algÄ±layÄ±cÄ±da gÃ¼rÃ¼ltÃ¼ varsa Ã§ember Ã§izgisi
+daha kalÄ±n oluyor. Ä°stasyon ile algÄ±layÄ±cÄ± arasÄ±ndaki aÃ§Ä± (bearing) ÅŸÃ¶yle
+hesaplanÄ±yor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def bearing(sensor, target_pos):
@@ -626,8 +626,8 @@ def bearing(sensor, target_pos):
 
 \end{minted}
 
-Filtre her güncelleme için bir vektör içinde farklı iki algılayıcıdan gelen
-iki tane ölçüm alıyor,
+Filtre her gÃ¼ncelleme iÃ§in bir vektÃ¶r iÃ§inde farklÄ± iki algÄ±layÄ±cÄ±dan gelen
+iki tane Ã¶lÃ§Ã¼m alÄ±yor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def measurement(A_pos, B_pos, pos):
@@ -636,7 +636,7 @@ def measurement(A_pos, B_pos, pos):
     return [angle_a, angle_b]
 \end{minted}
 
-Şimdi filtrelemeyi yapalım,
+Åimdi filtrelemeyi yapalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from numpy.random import randn
@@ -695,14 +695,14 @@ plt.savefig('tser_ukf_10.png')
 
 \includegraphics[width=25em]{tser_ukf_10.png}
 
-Sonuç oldukca iyi. Başlangıçta biraz hata var ama hata hemen düzeliyor, ve
-gerçeğe oldukca yakın hesabı elde etmeye başlıyoruz. Şimdi, problemin
-gayrı-lineerliğini iyi gözlemlemek için hedefi iki istasyon arasına, aynı
-y-ekseninde olacak şekilde koyacağım, bu sigma ortalamalarındaki
-gayrı-lineerliği daha çok ortaya çıkartacak, çünkü açı sıfır derece
-etrafında olacak, ama açı sıfır altına inmeye başlayınca birdenbire çok
-büyük bir açı hesaplanıyor olacak tabii, çünkü orada $2\pi$ açısı var. Bu
-tabii ki filtrenin işleyişini oldukca bozuyor,
+SonuÃ§ oldukca iyi. BaÅŸlangÄ±Ã§ta biraz hata var ama hata hemen dÃ¼zeliyor, ve
+gerÃ§eÄŸe oldukca yakÄ±n hesabÄ± elde etmeye baÅŸlÄ±yoruz. Åimdi, problemin
+gayrÄ±-lineerliÄŸini iyi gÃ¶zlemlemek iÃ§in hedefi iki istasyon arasÄ±na, aynÄ±
+y-ekseninde olacak ÅŸekilde koyacaÄŸÄ±m, bu sigma ortalamalarÄ±ndaki
+gayrÄ±-lineerliÄŸi daha Ã§ok ortaya Ã§Ä±kartacak, Ã§Ã¼nkÃ¼ aÃ§Ä± sÄ±fÄ±r derece
+etrafÄ±nda olacak, ama aÃ§Ä± sÄ±fÄ±r altÄ±na inmeye baÅŸlayÄ±nca birdenbire Ã§ok
+bÃ¼yÃ¼k bir aÃ§Ä± hesaplanÄ±yor olacak tabii, Ã§Ã¼nkÃ¼ orada $2\pi$ aÃ§Ä±sÄ± var. Bu
+tabii ki filtrenin iÅŸleyiÅŸini oldukca bozuyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 run_vor_filter(target_pos = [100, 0])
@@ -714,13 +714,13 @@ plt.savefig('tser_ukf_11.png')
 Not: 
 
 Filtrenin ismindeki ``unscented'' kelimesi nereden geliyor? Bu kelime ilk
-kez ``unscented transform'' bağlamında bu kavramı icat eden kişi tarafından
-kullanılmış, fakat yazar o makalede niye kelimeyi kullandığını
-anlatmamış. Anlamsal olarak terimin çok uyduğu söylenemez, belki ``scent''
-kullanımı İngilizce ``iz takibi'', ``iz sürme'' çağrışımı yaptığı için, bu
-filtre, örneklem bazlı parçacık filtreleri gibi, bir hipotez peşinden
-gitmiyor (o alandaki parçacıkları arttırıp), hep deterministik seçilen
-belli noktaları kullanıyor. İsmin belki buradan geldiği düşünülebilir.
+kez ``unscented transform'' baÄŸlamÄ±nda bu kavramÄ± icat eden kiÅŸi tarafÄ±ndan
+kullanÄ±lmÄ±ÅŸ, fakat yazar o makalede niye kelimeyi kullandÄ±ÄŸÄ±nÄ±
+anlatmamÄ±ÅŸ. Anlamsal olarak terimin Ã§ok uyduÄŸu sÃ¶ylenemez, belki ``scent''
+kullanÄ±mÄ± Ä°ngilizce ``iz takibi'', ``iz sÃ¼rme'' Ã§aÄŸrÄ±ÅŸÄ±mÄ± yaptÄ±ÄŸÄ± iÃ§in, bu
+filtre, Ã¶rneklem bazlÄ± parÃ§acÄ±k filtreleri gibi, bir hipotez peÅŸinden
+gitmiyor (o alandaki parÃ§acÄ±klarÄ± arttÄ±rÄ±p), hep deterministik seÃ§ilen
+belli noktalarÄ± kullanÄ±yor. Ä°smin belki buradan geldiÄŸi dÃ¼ÅŸÃ¼nÃ¼lebilir.
 
 Kaynaklar
 

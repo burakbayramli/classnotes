@@ -1,81 +1,81 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Monte-Carlo Ağaç Araması (Monte Carlo Tree Search -MCTS-), Oyun Oynayan Yapay Zeka
+Monte-Carlo AÄŸaÃ§ AramasÄ± (Monte Carlo Tree Search -MCTS-), Oyun Oynayan Yapay Zeka
 
-Otomatik oyun oynayan yapay zeka öğreten derslerdeki kilometre taşlarından
-biri altüst / minimaks algoritmasiydi. Notlarımızda anlattığımız bu
-algoritma, bir oyunda bizim yaptığımız, rakibin yaptığı tüm hamle
-seçeneklerine göre oluşan tahta konfigürasyonlarına bakarak ve bu tahtalara
-değer atayabilen bir değer fonksiyonuyla onları irdeleyerek rakip için en
-kötü bizim için en iyi olacak şekilde bir arama ile optimal oyun
+Otomatik oyun oynayan yapay zeka Ã¶ÄŸreten derslerdeki kilometre taÅŸlarÄ±ndan
+biri altÃ¼st / minimaks algoritmasiydi. NotlarÄ±mÄ±zda anlattÄ±ÄŸÄ±mÄ±z bu
+algoritma, bir oyunda bizim yaptÄ±ÄŸÄ±mÄ±z, rakibin yaptÄ±ÄŸÄ± tÃ¼m hamle
+seÃ§eneklerine gÃ¶re oluÅŸan tahta konfigÃ¼rasyonlarÄ±na bakarak ve bu tahtalara
+deÄŸer atayabilen bir deÄŸer fonksiyonuyla onlarÄ± irdeleyerek rakip iÃ§in en
+kÃ¶tÃ¼ bizim iÃ§in en iyi olacak ÅŸekilde bir arama ile optimal oyun
 hamlelerini buluyordu. 
 
-Fakat minimaksın bir problemi şudur: birkaç hamle sonrasına bakmak için tüm
-mümkün hamlelere göre kurulan ağaç müthiş büyük olabilir. Özellikle Go
-oyunu [1] gibi dallanma faktörü çok büyük olan oyunlarda minimaks zorluk
-yaşayabiliyor. Bu gibi durumlarda MCTS yaklaşımının daha başarılı olduğu
-bulunmuştur. 
+Fakat minimaksÄ±n bir problemi ÅŸudur: birkaÃ§ hamle sonrasÄ±na bakmak iÃ§in tÃ¼m
+mÃ¼mkÃ¼n hamlelere gÃ¶re kurulan aÄŸaÃ§ mÃ¼thiÅŸ bÃ¼yÃ¼k olabilir. Ã–zellikle Go
+oyunu [1] gibi dallanma faktÃ¶rÃ¼ Ã§ok bÃ¼yÃ¼k olan oyunlarda minimaks zorluk
+yaÅŸayabiliyor. Bu gibi durumlarda MCTS yaklaÅŸÄ±mÄ±nÄ±n daha baÅŸarÄ±lÄ± olduÄŸu
+bulunmuÅŸtur. 
 
-Şimdi MCTS'i anlatalım, özelde UCT adı verilen üst güven aralığının
-ağaçlara uygulanması (upper-confidence applied to trees) adlı çeşidini
-gösterelim. Bunun için tabii önce UCT'yi ve onun baz çeşidi UCB1'i anlamak
-lazım.
+Åimdi MCTS'i anlatalÄ±m, Ã¶zelde UCT adÄ± verilen Ã¼st gÃ¼ven aralÄ±ÄŸÄ±nÄ±n
+aÄŸaÃ§lara uygulanmasÄ± (upper-confidence applied to trees) adlÄ± Ã§eÅŸidini
+gÃ¶sterelim. Bunun iÃ§in tabii Ã¶nce UCT'yi ve onun baz Ã§eÅŸidi UCB1'i anlamak
+lazÄ±m.
 
-Kumarhanelerdeki o kollu oyun makinalarını düşünelim, oyuncunun önünde
-bunlardan birkaç tane olsun, ve bu makinalardan her birinin farklı ve
-bilinmeyen bir getiri dağılımı var. Tek kollu makinalara argoda ``tek kollu
-soyguncu (one-armed bandit)'' de denilir, bilgisayarcılar üstteki üstteki
-probleme ``çok kollu soyguncu (multi-armed bandit)'' ismi veriyorlar. Biraz
-esprili bir şekilde bu makinaları çok kollu bir ahtapotun hayal ediliyor
-bazen, ki ahtapot akıllı, yani oyunu optimal oynayacak bilgisayar programı.
+Kumarhanelerdeki o kollu oyun makinalarÄ±nÄ± dÃ¼ÅŸÃ¼nelim, oyuncunun Ã¶nÃ¼nde
+bunlardan birkaÃ§ tane olsun, ve bu makinalardan her birinin farklÄ± ve
+bilinmeyen bir getiri daÄŸÄ±lÄ±mÄ± var. Tek kollu makinalara argoda ``tek kollu
+soyguncu (one-armed bandit)'' de denilir, bilgisayarcÄ±lar Ã¼stteki Ã¼stteki
+probleme ``Ã§ok kollu soyguncu (multi-armed bandit)'' ismi veriyorlar. Biraz
+esprili bir ÅŸekilde bu makinalarÄ± Ã§ok kollu bir ahtapotun hayal ediliyor
+bazen, ki ahtapot akÄ±llÄ±, yani oyunu optimal oynayacak bilgisayar programÄ±.
 
 \includegraphics[width=13em]{mcts_01.png}
 
-Aklımızdaki soru şu; Getirisi en iyi olacak makina acaba hangisi? Bilsek
-hemen onu oynardık. Bunu başta bilmiyoruz, oturup başkasını seyredecek
-durumda değiliz, o zaman hem seçenekleri bir şekilde deneyecek ama bu
-sırada çok getiri kaybı yaşamayacak aynı zamanda uzun vadede kazançta
-kalacak şekilde bu oyunu oynamak istiyoruz. UCB1 adlı bir strateji bunu
-yapabiliyor, bu stratejiye göre her makina $i$ için bir istatistiki güven
-aralığı yaratılır, 
+AklÄ±mÄ±zdaki soru ÅŸu; Getirisi en iyi olacak makina acaba hangisi? Bilsek
+hemen onu oynardÄ±k. Bunu baÅŸta bilmiyoruz, oturup baÅŸkasÄ±nÄ± seyredecek
+durumda deÄŸiliz, o zaman hem seÃ§enekleri bir ÅŸekilde deneyecek ama bu
+sÄ±rada Ã§ok getiri kaybÄ± yaÅŸamayacak aynÄ± zamanda uzun vadede kazanÃ§ta
+kalacak ÅŸekilde bu oyunu oynamak istiyoruz. UCB1 adlÄ± bir strateji bunu
+yapabiliyor, bu stratejiye gÃ¶re her makina $i$ iÃ§in bir istatistiki gÃ¼ven
+aralÄ±ÄŸÄ± yaratÄ±lÄ±r, 
 
 $$ \overline{x}_i \pm \sqrt{\frac{2 \ln n}{n_i}} $$
 
 $\overline{x}_i$: Makine $i$'nin ortalama getirisi
 
-$n_i$: Makine $i$'nin kaç kere oynandığı
+$n_i$: Makine $i$'nin kaÃ§ kere oynandÄ±ÄŸÄ±
 
-$n$: Tüm oyunlar (tüm makinelerde kaç kere oynandığı)
+$n$: TÃ¼m oyunlar (tÃ¼m makinelerde kaÃ§ kere oynandÄ±ÄŸÄ±)
 
-Ve stratejimiz her adımda üst sınırı en yüksek olan makinayı
-oynamaktır. Bunu yaptıkça o makinanın gözlenen ortalaması kazanca / kayıba
-göre kayacak, ve güven aralığı ufalacak (elimizde daha fazla veri var
-çünkü, daha fazla veri daha fazla kesinlik demek), ve diğer makinaların
-aralığı genişleyecek. Bir noktada başka bir makinanın üst sınırı o anda
-oynadığımızı geçecek, o zaman biz bu öteki makinaya geçeceğiz. Uzun vadede
-bu strateji optimal olarak sonuç vermektedir.
+Ve stratejimiz her adÄ±mda Ã¼st sÄ±nÄ±rÄ± en yÃ¼ksek olan makinayÄ±
+oynamaktÄ±r. Bunu yaptÄ±kÃ§a o makinanÄ±n gÃ¶zlenen ortalamasÄ± kazanca / kayÄ±ba
+gÃ¶re kayacak, ve gÃ¼ven aralÄ±ÄŸÄ± ufalacak (elimizde daha fazla veri var
+Ã§Ã¼nkÃ¼, daha fazla veri daha fazla kesinlik demek), ve diÄŸer makinalarÄ±n
+aralÄ±ÄŸÄ± geniÅŸleyecek. Bir noktada baÅŸka bir makinanÄ±n Ã¼st sÄ±nÄ±rÄ± o anda
+oynadÄ±ÄŸÄ±mÄ±zÄ± geÃ§ecek, o zaman biz bu Ã¶teki makinaya geÃ§eceÄŸiz. Uzun vadede
+bu strateji optimal olarak sonuÃ§ vermektedir.
 
-Türetmek için notasyonu biraz değiştirelim [3], $a$ bir aksiyon (ya da
-makina seçimi), $Q(a) = E(r|a)$, bir aksiyon için ortalama getiri, $U_t(a)$
-adım $t$'de bir aksiyonun üst sınırı, $\hat{Q}, \hat{U}$ kestirme değerler,
-$N(a)$ bir aksiyonun kaç kez seçildiği. Hem $\hat{U}$ kestirme değerini
-sürekli hesaplayacağız, hem de güven aralığını maksimize eden aksiyonu
-seçeceğiz, yani.
+TÃ¼retmek iÃ§in notasyonu biraz deÄŸiÅŸtirelim [3], $a$ bir aksiyon (ya da
+makina seÃ§imi), $Q(a) = E(r|a)$, bir aksiyon iÃ§in ortalama getiri, $U_t(a)$
+adÄ±m $t$'de bir aksiyonun Ã¼st sÄ±nÄ±rÄ±, $\hat{Q}, \hat{U}$ kestirme deÄŸerler,
+$N(a)$ bir aksiyonun kaÃ§ kez seÃ§ildiÄŸi. Hem $\hat{U}$ kestirme deÄŸerini
+sÃ¼rekli hesaplayacaÄŸÄ±z, hem de gÃ¼ven aralÄ±ÄŸÄ±nÄ± maksimize eden aksiyonu
+seÃ§eceÄŸiz, yani.
 
 $$ a_t = \arg \max_{a \in A} \hat{Q}_t(a) + \hat{U}_t(a) $$
 
-Bu seçimi yaparken yüksek olasılıkla (with high probability)
-$Q(a) \le \hat{Q}_t(a) + \hat{U}_t(a)$ olmasını sağlayacağız. Bu şart için
-Hoeffding eşitsizliğinden başlayabiliriz (bkz [5]).
+Bu seÃ§imi yaparken yÃ¼ksek olasÄ±lÄ±kla (with high probability)
+$Q(a) \le \hat{Q}_t(a) + \hat{U}_t(a)$ olmasÄ±nÄ± saÄŸlayacaÄŸÄ±z. Bu ÅŸart iÃ§in
+Hoeffding eÅŸitsizliÄŸinden baÅŸlayabiliriz (bkz [5]).
 
-$X_1,...X_n$ $[0,1]$ aralığında bağımsız özdeşçe dağılmış (i.i.d.)
-değerlere sahip rasgele değişkenler olsunlar, ve
-$\overline{X}_t = \frac{1}{\tau} \sum_{\tau=1}^{t} X_\tau$ örneklem
-ortalaması olsun. O zaman
+$X_1,...X_n$ $[0,1]$ aralÄ±ÄŸÄ±nda baÄŸÄ±msÄ±z Ã¶zdeÅŸÃ§e daÄŸÄ±lmÄ±ÅŸ (i.i.d.)
+deÄŸerlere sahip rasgele deÄŸiÅŸkenler olsunlar, ve
+$\overline{X}_t = \frac{1}{\tau} \sum_{\tau=1}^{t} X_\tau$ Ã¶rneklem
+ortalamasÄ± olsun. O zaman
 
 $$ P(E(X) > \overline{X}_t + u ) \le e^{-2 t u^2}$$
 
-olduğunu biliyoruz, soyguncu problemindeki getiri rasgele değişkenleri için
+olduÄŸunu biliyoruz, soyguncu problemindeki getiri rasgele deÄŸiÅŸkenleri iÃ§in
 uyarlarsak,
 
 $$ 
@@ -83,12 +83,12 @@ P \big( Q(a) > \hat{Q}_t(a) + U_t(a)  \big) \le
 e^{-2 N_t(a)U_t(a)^2 }
 $$
 
-İstediğimiz şartların oluşması için üstteki formülün doğruluğu yeterli,
-şimdi bu formülü baz alarak bir $U_t(a)$ hesaplayabiliriz, formülü $U_t(a)$
-tek başına kalacak şekilde tekrar düzenleyebiliriz. Eşitliğin sol tarafına
-$p$ diyelim, burada sanki istenilen bir güven aralık büyüklüğünü baz almış
-oluyoruz, 95\% (yani 0.95) gibi, ama burada sembolik bir değer kulladık,
-ilk amacımız $u$ değerine erişmek,
+Ä°stediÄŸimiz ÅŸartlarÄ±n oluÅŸmasÄ± iÃ§in Ã¼stteki formÃ¼lÃ¼n doÄŸruluÄŸu yeterli,
+ÅŸimdi bu formÃ¼lÃ¼ baz alarak bir $U_t(a)$ hesaplayabiliriz, formÃ¼lÃ¼ $U_t(a)$
+tek baÅŸÄ±na kalacak ÅŸekilde tekrar dÃ¼zenleyebiliriz. EÅŸitliÄŸin sol tarafÄ±na
+$p$ diyelim, burada sanki istenilen bir gÃ¼ven aralÄ±k bÃ¼yÃ¼klÃ¼ÄŸÃ¼nÃ¼ baz almÄ±ÅŸ
+oluyoruz, 95\% (yani 0.95) gibi, ama burada sembolik bir deÄŸer kulladÄ±k,
+ilk amacÄ±mÄ±z $u$ deÄŸerine eriÅŸmek,
 
 $$ e^{-2 N_t(a)U_t(a)^2 } = p $$ 
 
@@ -98,12 +98,12 @@ $$ \frac{-\ln p}{2 N_t(a)} = U_t(a)^2 $$
 
 $$ U_t(a) = \sqrt{\frac{-\ln p}{2 N_t(a)}} $$
 
-$t$ büyüdükçe $p$ azalsın istiyoruz, o zaman $p = t^{-4}$ seçebiliriz, bu
-spesifik değer formülü de basitleştirmek için seçildi bir yandan,
+$t$ bÃ¼yÃ¼dÃ¼kÃ§e $p$ azalsÄ±n istiyoruz, o zaman $p = t^{-4}$ seÃ§ebiliriz, bu
+spesifik deÄŸer formÃ¼lÃ¼ de basitleÅŸtirmek iÃ§in seÃ§ildi bir yandan,
 
 $$ U_t(a) = \sqrt{\frac{\log t}{N_t(a)}} $$
 
-Böylece UCB1 algoritmasına erişmiş olduk, 
+BÃ¶ylece UCB1 algoritmasÄ±na eriÅŸmiÅŸ olduk, 
 
 $$ 
 a_t = \arg \max_{a \in A} Q(a) + \sqrt{\frac{\log t}{N_t(a)}}
@@ -111,42 +111,42 @@ $$
 
 UCT ve Tic-Tac-Toe
 
-Oyunlar ve Monte Carlo işin için nasıl dahil oluyor? Mesela her adımda bir
-sonraki en iyi adımı bulmak istiyoruz, MC ile bu geçişi simüle ederiz, yani
-rasgele tahta hamlelerini deneyerek iyi olan bitişleri bulmaya
-uğraşırız. Bu yöntemin bir kötü tarafı, minimaks durumunda olduğu gibi, çok
-fazla hamle seçeneği olduğu zaman ortaya çıkar, rasgele seçim de,
-tüm seçenekleri deneyen deterministik seçim gibi yetersiz kalabilir.
+Oyunlar ve Monte Carlo iÅŸin iÃ§in nasÄ±l dahil oluyor? Mesela her adÄ±mda bir
+sonraki en iyi adÄ±mÄ± bulmak istiyoruz, MC ile bu geÃ§iÅŸi simÃ¼le ederiz, yani
+rasgele tahta hamlelerini deneyerek iyi olan bitiÅŸleri bulmaya
+uÄŸraÅŸÄ±rÄ±z. Bu yÃ¶ntemin bir kÃ¶tÃ¼ tarafÄ±, minimaks durumunda olduÄŸu gibi, Ã§ok
+fazla hamle seÃ§eneÄŸi olduÄŸu zaman ortaya Ã§Ä±kar, rasgele seÃ§im de,
+tÃ¼m seÃ§enekleri deneyen deterministik seÃ§im gibi yetersiz kalabilir.
 
-UCT burada bir çözüm olarak görülebilir. Fikir şu: verili bir tahta
-konumundan atılacak bir adım ötesi bir çok-kollu soyguncu problemi olarak
-görülebilir. 
+UCT burada bir Ã§Ã¶zÃ¼m olarak gÃ¶rÃ¼lebilir. Fikir ÅŸu: verili bir tahta
+konumundan atÄ±lacak bir adÄ±m Ã¶tesi bir Ã§ok-kollu soyguncu problemi olarak
+gÃ¶rÃ¼lebilir. 
 
-İlk faz seçim fazıdır, başlangıç konumundan aşağı inmeye başlarız, ve eğer
-baktığımız tüm düğümlerde çok-kollu soyguncu seçimi için gerekli
-istatistikler var ise seçim UCB1 ile yapılır, ve devam edilir. Bu ta ki
-üzerinde istatistik olmayan (yani hiç ziyaret edilmemiş) bir düğüme
-gelinceye kadar devam eder. Eğer böyle bir düğüm(ler) var ise onlar
-arasından rasgele seçim yapılır, böylece o düğüm ve altındakiler ziyaret
-edilmiş olur ve kayıp / kazanç sonrası onların da artık istatistikleri olur
-ve bir sonraki adımda onlar da UCB1 ile seçiliyor (ya da seçilmiyor)
-olacaktır.
+Ä°lk faz seÃ§im fazÄ±dÄ±r, baÅŸlangÄ±Ã§ konumundan aÅŸaÄŸÄ± inmeye baÅŸlarÄ±z, ve eÄŸer
+baktÄ±ÄŸÄ±mÄ±z tÃ¼m dÃ¼ÄŸÃ¼mlerde Ã§ok-kollu soyguncu seÃ§imi iÃ§in gerekli
+istatistikler var ise seÃ§im UCB1 ile yapÄ±lÄ±r, ve devam edilir. Bu ta ki
+Ã¼zerinde istatistik olmayan (yani hiÃ§ ziyaret edilmemiÅŸ) bir dÃ¼ÄŸÃ¼me
+gelinceye kadar devam eder. EÄŸer bÃ¶yle bir dÃ¼ÄŸÃ¼m(ler) var ise onlar
+arasÄ±ndan rasgele seÃ§im yapÄ±lÄ±r, bÃ¶ylece o dÃ¼ÄŸÃ¼m ve altÄ±ndakiler ziyaret
+edilmiÅŸ olur ve kayÄ±p / kazanÃ§ sonrasÄ± onlarÄ±n da artÄ±k istatistikleri olur
+ve bir sonraki adÄ±mda onlar da UCB1 ile seÃ§iliyor (ya da seÃ§ilmiyor)
+olacaktÄ±r.
 
-Örnek olarak bir Tic-Tac-Toe oyunu için bir örnek görelim. X ve O taşları
-var, biz O için hesap yapıyoruz diyelim. A pozisyonunda (en üst) tüm alt
-pozisyonlar hakkında istatistik var. Mesela 1/2 görüyoruz, bu o pozisyondan
-iki kere geçilmiş bu geçişlerden birisi oyunun kazanılması ile bitmiş (bu
-bir kazanç en sol alttaki bitiş). Şimdi bir A'dan bir kez daha geliyoruz,
-UCB1 bize pozisyon B'ye git diyor, o seviyede en sağdaki düğüm için hiç
-bilgi yok, o zaman rasgele olarak o seçiliyor, oradan tek seçenek var, ve O
-kazanıyor. Böylece B pozisyonundaki istatistik 2/3 haline
-geliyor. Başlangıçtan oyun bitişine kadar her gidiş simulasyonda bir döngü,
-eğer 100 kere simüle et dersek bu döngü 100 kere döner.
+Ã–rnek olarak bir Tic-Tac-Toe oyunu iÃ§in bir Ã¶rnek gÃ¶relim. X ve O taÅŸlarÄ±
+var, biz O iÃ§in hesap yapÄ±yoruz diyelim. A pozisyonunda (en Ã¼st) tÃ¼m alt
+pozisyonlar hakkÄ±nda istatistik var. Mesela 1/2 gÃ¶rÃ¼yoruz, bu o pozisyondan
+iki kere geÃ§ilmiÅŸ bu geÃ§iÅŸlerden birisi oyunun kazanÄ±lmasÄ± ile bitmiÅŸ (bu
+bir kazanÃ§ en sol alttaki bitiÅŸ). Åimdi bir A'dan bir kez daha geliyoruz,
+UCB1 bize pozisyon B'ye git diyor, o seviyede en saÄŸdaki dÃ¼ÄŸÃ¼m iÃ§in hiÃ§
+bilgi yok, o zaman rasgele olarak o seÃ§iliyor, oradan tek seÃ§enek var, ve O
+kazanÄ±yor. BÃ¶ylece B pozisyonundaki istatistik 2/3 haline
+geliyor. BaÅŸlangÄ±Ã§tan oyun bitiÅŸine kadar her gidiÅŸ simulasyonda bir dÃ¶ngÃ¼,
+eÄŸer 100 kere simÃ¼le et dersek bu dÃ¶ngÃ¼ 100 kere dÃ¶ner.
 
 \includegraphics[width=30em]{mcts_02.png} 
 
-Kod üzerinde görelim, üstteki başlangıç pozisyonundan X için (oyuncu 1,
-öteki oyuncu -1) simulasyon yapalım, 1000 kere,
+Kod Ã¼zerinde gÃ¶relim, Ã¼stteki baÅŸlangÄ±Ã§ pozisyonundan X iÃ§in (oyuncu 1,
+Ã¶teki oyuncu -1) simulasyon yapalÄ±m, 1000 kere,
 
 \inputminted[fontsize=\footnotesize]{python}{tictac_uct.py}
 
@@ -164,8 +164,8 @@ print move
 (1, 0)
 \end{verbatim}
 
-X taşını üstten 2. satır ve 1. kolona koymamız isteniyor (Python 0 indisli
-hatırlarsak), bu hareketi yapıyoruz,
+X taÅŸÄ±nÄ± Ã¼stten 2. satÄ±r ve 1. kolona koymamÄ±z isteniyor (Python 0 indisli
+hatÄ±rlarsak), bu hareketi yapÄ±yoruz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 b = np.array(board_state)
@@ -173,13 +173,13 @@ b[move] = 1.0
 print b
 \end{minted}
 
-Ve bu kazanan hareket, resimde ikinci seviyede en sağdaki hamle
-oluyor. UCB1 doğru tavsiyeyi vermiş gibi duruyor.
+Ve bu kazanan hareket, resimde ikinci seviyede en saÄŸdaki hamle
+oluyor. UCB1 doÄŸru tavsiyeyi vermiÅŸ gibi duruyor.
 
-Not: MCTS algoritmasinin bol kullanım alanı var, A/B testlerinin
-istatistiksel hesabı yerine MCTS kullanmak mümkün, yani iki sayfa versiyonu
-arasında hangisinin daha iyi olduğu da bir tür çok-kollu soyguncu problemi
-olarak görülebiliyor. 
+Not: MCTS algoritmasinin bol kullanÄ±m alanÄ± var, A/B testlerinin
+istatistiksel hesabÄ± yerine MCTS kullanmak mÃ¼mkÃ¼n, yani iki sayfa versiyonu
+arasÄ±nda hangisinin daha iyi olduÄŸu da bir tÃ¼r Ã§ok-kollu soyguncu problemi
+olarak gÃ¶rÃ¼lebiliyor. 
 
 
 Kaynaklar
@@ -196,6 +196,6 @@ Kaynaklar
 
 [4] Zocca, {\em Python Deep Learning}
 
-[5] Bayramli, İstatistik, {\em Ekler}
+[5] Bayramli, Ä°statistik, {\em Ekler}
 
 \end{document}

@@ -1,146 +1,146 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Minimum Kapsamlı Ağaç (Minimum Spanning Tree -MST-)
+Minimum KapsamlÄ± AÄŸaÃ§ (Minimum Spanning Tree -MST-)
 
-MST algoritması kenar ağırlıklarına (weights) sahip olan bir çizit (graph)
-yapısı içinde minimal ve kapsayan ağacı (MST) bulan algoritmaya verilen
-isimdir. Mesela alttaki çizit içinde
+MST algoritmasÄ± kenar aÄŸÄ±rlÄ±klarÄ±na (weights) sahip olan bir Ã§izit (graph)
+yapÄ±sÄ± iÃ§inde minimal ve kapsayan aÄŸacÄ± (MST) bulan algoritmaya verilen
+isimdir. Mesela alttaki Ã§izit iÃ§inde
 
 \includegraphics[height=4cm]{minspan_0.png}
 
-MST öyle bir bağlantı yapısıdır ki baştan sona, herhangi bir noktadan
-(node) bir diğerine geçiş yapılabilsin, ve bu tüm yolların toplamı en
-minimal olsun. Dikkat, herhangi bir noktadan diğerine giden yol en az olsun
-demiyoruz, bu durumda problem en kısa yol (shortest path) problemi
-olurdu, ki bu problemi {\em Dinamik Programlama} yazısında gördük. Burada
-göreceğimiz kapsayan ağacın {\em toplamının} minimal olmasıdır. 
+MST Ã¶yle bir baÄŸlantÄ± yapÄ±sÄ±dÄ±r ki baÅŸtan sona, herhangi bir noktadan
+(node) bir diÄŸerine geÃ§iÅŸ yapÄ±labilsin, ve bu tÃ¼m yollarÄ±n toplamÄ± en
+minimal olsun. Dikkat, herhangi bir noktadan diÄŸerine giden yol en az olsun
+demiyoruz, bu durumda problem en kÄ±sa yol (shortest path) problemi
+olurdu, ki bu problemi {\em Dinamik Programlama} yazÄ±sÄ±nda gÃ¶rdÃ¼k. Burada
+gÃ¶receÄŸimiz kapsayan aÄŸacÄ±n {\em toplamÄ±nÄ±n} minimal olmasÄ±dÄ±r. 
 
-Kapsayan ağaç (spanning tree) kavramını tanımlamak gerekirse, bir çizitin
-kapsayan ağacı orijinal çizitin tüm noktalarına sahip olmalıdır, ağaç
-içinde hiçbir döngü (cycle) olmamalıdır. Döngü derken bir noktadan diğerine
-atlaya atlaya giderken bizi dönüp tekrar aynı yere getirebilecek türden
-``kapalı devre'' tur bir döngüden bahsediyoruz - bu mümkün
-olmamalıdır. Ayrıca çizit bağlantılı olmalıdır, yani bir kısmı diğer
-kısmından kopuk bir çizit üzerinde MST bulunamaz. 
+Kapsayan aÄŸaÃ§ (spanning tree) kavramÄ±nÄ± tanÄ±mlamak gerekirse, bir Ã§izitin
+kapsayan aÄŸacÄ± orijinal Ã§izitin tÃ¼m noktalarÄ±na sahip olmalÄ±dÄ±r, aÄŸaÃ§
+iÃ§inde hiÃ§bir dÃ¶ngÃ¼ (cycle) olmamalÄ±dÄ±r. DÃ¶ngÃ¼ derken bir noktadan diÄŸerine
+atlaya atlaya giderken bizi dÃ¶nÃ¼p tekrar aynÄ± yere getirebilecek tÃ¼rden
+``kapalÄ± devre'' tur bir dÃ¶ngÃ¼den bahsediyoruz - bu mÃ¼mkÃ¼n
+olmamalÄ±dÄ±r. AyrÄ±ca Ã§izit baÄŸlantÄ±lÄ± olmalÄ±dÄ±r, yani bir kÄ±smÄ± diÄŸer
+kÄ±smÄ±ndan kopuk bir Ã§izit Ã¼zerinde MST bulunamaz. 
 
-Minimum kapsayıcı ağaç ise bu tür pek çok alternatif ağaçların içinde en az
-ağırlıklı olanıdır. Not, bir çizitin MST çözümü özgün (unique) olmayabilir, aynı
-ağırlıkta birden fazla değişik ağaç mümkündür. Mesela üstteki çizit için mümkün
-MST'ler altta görülüyor,
+Minimum kapsayÄ±cÄ± aÄŸaÃ§ ise bu tÃ¼r pek Ã§ok alternatif aÄŸaÃ§larÄ±n iÃ§inde en az
+aÄŸÄ±rlÄ±klÄ± olanÄ±dÄ±r. Not, bir Ã§izitin MST Ã§Ã¶zÃ¼mÃ¼ Ã¶zgÃ¼n (unique) olmayabilir, aynÄ±
+aÄŸÄ±rlÄ±kta birden fazla deÄŸiÅŸik aÄŸaÃ§ mÃ¼mkÃ¼ndÃ¼r. Mesela Ã¼stteki Ã§izit iÃ§in mÃ¼mkÃ¼n
+MST'ler altta gÃ¶rÃ¼lÃ¼yor,
 
 \includegraphics[height=4cm]{minspan_1.png}
 
-Kontrol edilebilir, üstteki her ağacın kenar toplamı 8'dır. Bu ağaçların
+Kontrol edilebilir, Ã¼stteki her aÄŸacÄ±n kenar toplamÄ± 8'dÄ±r. Bu aÄŸaÃ§larÄ±n
 her biri bir MST olarak kabul edilebilir.
 
-Uygulama bağlamında MST bulma algoritmasının ne kadar kullanışlı olacağı
-görülüyor herhalde; mesela elektrik hatları, telefon iletişim hatları
-tasarlarken MST kullanılabilir, toplam bağlantısı en az olan bir ağ yapısı
-her iki durumda da kullanışlı olur. Biyolojik, kimyasal ağların analizinde
-bile MST kullanılmaktadır.
+Uygulama baÄŸlamÄ±nda MST bulma algoritmasÄ±nÄ±n ne kadar kullanÄ±ÅŸlÄ± olacaÄŸÄ±
+gÃ¶rÃ¼lÃ¼yor herhalde; mesela elektrik hatlarÄ±, telefon iletiÅŸim hatlarÄ±
+tasarlarken MST kullanÄ±labilir, toplam baÄŸlantÄ±sÄ± en az olan bir aÄŸ yapÄ±sÄ±
+her iki durumda da kullanÄ±ÅŸlÄ± olur. Biyolojik, kimyasal aÄŸlarÄ±n analizinde
+bile MST kullanÄ±lmaktadÄ±r.
 
-Ağaçların Özellikleri (Properties of Trees)
+AÄŸaÃ§larÄ±n Ã–zellikleri (Properties of Trees)
 
-Başlamadan önce bir ağacı ağaç yapan iki önemli özelliği belirtelim
+BaÅŸlamadan Ã¶nce bir aÄŸacÄ± aÄŸaÃ§ yapan iki Ã¶nemli Ã¶zelliÄŸi belirtelim
 
-1) Tanım itibariyle ağaç olan bir şeye, arasında bağlantı olmayan iki
-noktayı birleştiren bir kenar koyarsak bu ağaçta bir döngü yaratmış
+1) TanÄ±m itibariyle aÄŸaÃ§ olan bir ÅŸeye, arasÄ±nda baÄŸlantÄ± olmayan iki
+noktayÄ± birleÅŸtiren bir kenar koyarsak bu aÄŸaÃ§ta bir dÃ¶ngÃ¼ yaratmÄ±ÅŸ
 oluruz.
 
-2) Elde olan bir ağacın herhangi bir kenarını çıkartırsak bu ağacı
-``kopartmış'' oluruz, birbiriyle bağlantısız iki alt-ağaç ortaya çıkar.
+2) Elde olan bir aÄŸacÄ±n herhangi bir kenarÄ±nÄ± Ã§Ä±kartÄ±rsak bu aÄŸacÄ±
+``kopartmÄ±ÅŸ'' oluruz, birbiriyle baÄŸlantÄ±sÄ±z iki alt-aÄŸaÃ§ ortaya Ã§Ä±kar.
 
 \includegraphics[height=8cm]{graph_prop.png}
 
-Resimde her iki durumu görüyoruz. Bu iki özellik çok önemli, çünkü onları
-MST'lerin çok temel özelliklerini ispatlamak için kullanacağız. Ondan önce
-bazı tanımlar,
+Resimde her iki durumu gÃ¶rÃ¼yoruz. Bu iki Ã¶zellik Ã§ok Ã¶nemli, Ã§Ã¼nkÃ¼ onlarÄ±
+MST'lerin Ã§ok temel Ã¶zelliklerini ispatlamak iÃ§in kullanacaÄŸÄ±z. Ondan Ã¶nce
+bazÄ± tanÄ±mlar,
 
-Tanım
+TanÄ±m
 
-Kesik (cut): Bir çizit üzerindeki yapılan kesik, o çiziti birbiriyle
-alakasız, bağlantısız iki parçaya / kümeye böler. {\em Not}: Bir kesik
-birden fazla kenarın üzerinden geçebilir / kapsayabilir, çünkü bir çiziti
-tamamen ikiye ayırmaktan bahsediyoruz. Bir ağaçtan bahsediyor olsaydık,
-yukarıda belirttiğimiz gibi, tek bir kenarı kesmek yeterli olurdu.
+Kesik (cut): Bir Ã§izit Ã¼zerindeki yapÄ±lan kesik, o Ã§iziti birbiriyle
+alakasÄ±z, baÄŸlantÄ±sÄ±z iki parÃ§aya / kÃ¼meye bÃ¶ler. {\em Not}: Bir kesik
+birden fazla kenarÄ±n Ã¼zerinden geÃ§ebilir / kapsayabilir, Ã§Ã¼nkÃ¼ bir Ã§iziti
+tamamen ikiye ayÄ±rmaktan bahsediyoruz. Bir aÄŸaÃ§tan bahsediyor olsaydÄ±k,
+yukarÄ±da belirttiÄŸimiz gibi, tek bir kenarÄ± kesmek yeterli olurdu.
 
-Birleştiren kenar (crossing edge): birbirinden bağlantısız iki kümedeki
-herhangi bir noktayı diğer kümedeki herhangi bir diğer noktayla birleştiren
-bir kenardır.
+BirleÅŸtiren kenar (crossing edge): birbirinden baÄŸlantÄ±sÄ±z iki kÃ¼medeki
+herhangi bir noktayÄ± diÄŸer kÃ¼medeki herhangi bir diÄŸer noktayla birleÅŸtiren
+bir kenardÄ±r.
 
-Önerme (Proposition)
+Ã–nerme (Proposition)
 
-Herhangi bir çiziti alalım, ve bu çizitteki bir kesik içindeki (yani
-kopardığı tüm kenarlar) içindeki minimum birleştiren kenara bakalım. Bu
-kenar o çizitin MST'sinde {\em kesinlikle} olmalıdır.
+Herhangi bir Ã§iziti alalÄ±m, ve bu Ã§izitteki bir kesik iÃ§indeki (yani
+kopardÄ±ÄŸÄ± tÃ¼m kenarlar) iÃ§indeki minimum birleÅŸtiren kenara bakalÄ±m. Bu
+kenar o Ã§izitin MST'sinde {\em kesinlikle} olmalÄ±dÄ±r.
 
-İspat
+Ä°spat
 
-Bu ispat tersini yanlışlama (proof by contradiction) yöntemini
+Bu ispat tersini yanlÄ±ÅŸlama (proof by contradiction) yÃ¶ntemini
 kullanacak. Diyelim ki bir kesik var, ve o kesikteki $e$ minimum
-birleştiren kenar. Bu çizitin MST'si $T$ olsun. Şimdi $e$'nin $T$'nin
-içinde olmadığı durumu düşünelim (yani önermenin dediğinin tersi), ve
-diyelim ki şimdi $e$'yi alıp $T$'ye ekliyoruz. Yeni bir çizit ortaya
-çıkardı, fakat daha önce dediğimiz gibi, $T$'ye bir kenar eklemek ona aynı
-zamanda bir döngü eklemek demektir, ki bu döngünün içinde en az bir diğer
-kenar $f$ olacaktır (çünkü $e$ MST'de olmadığına göre orada başka bir şey
-var), ki bu $f$, $e$'den büyüktür. Fakat o zaman $f$'yi kesip onun yerine
-daha az ağırlıkta olan $e$'yi ekleyince MST'yi, hem de daha az ağırlıkla
-elde etmiş olmaz mıydık? Evet. Demek ki $e$'nin MST içinde olmaması
-imkansızdır çünkü MST tanım itibariyle en minimal ağırlığa sahip olmalıdır.
+birleÅŸtiren kenar. Bu Ã§izitin MST'si $T$ olsun. Åimdi $e$'nin $T$'nin
+iÃ§inde olmadÄ±ÄŸÄ± durumu dÃ¼ÅŸÃ¼nelim (yani Ã¶nermenin dediÄŸinin tersi), ve
+diyelim ki ÅŸimdi $e$'yi alÄ±p $T$'ye ekliyoruz. Yeni bir Ã§izit ortaya
+Ã§Ä±kardÄ±, fakat daha Ã¶nce dediÄŸimiz gibi, $T$'ye bir kenar eklemek ona aynÄ±
+zamanda bir dÃ¶ngÃ¼ eklemek demektir, ki bu dÃ¶ngÃ¼nÃ¼n iÃ§inde en az bir diÄŸer
+kenar $f$ olacaktÄ±r (Ã§Ã¼nkÃ¼ $e$ MST'de olmadÄ±ÄŸÄ±na gÃ¶re orada baÅŸka bir ÅŸey
+var), ki bu $f$, $e$'den bÃ¼yÃ¼ktÃ¼r. Fakat o zaman $f$'yi kesip onun yerine
+daha az aÄŸÄ±rlÄ±kta olan $e$'yi ekleyince MST'yi, hem de daha az aÄŸÄ±rlÄ±kla
+elde etmiÅŸ olmaz mÄ±ydÄ±k? Evet. Demek ki $e$'nin MST iÃ§inde olmamasÄ±
+imkansÄ±zdÄ±r Ã§Ã¼nkÃ¼ MST tanÄ±m itibariyle en minimal aÄŸÄ±rlÄ±ÄŸa sahip olmalÄ±dÄ±r.
 
-Alttaki resimde gri ve beyaz ile gösterilen ayrı kümelerdeki noktaları bir
-kesik ile ayrılmışlar ve bu kümelerin arasındaki birleştiren kenarlar
-kırmızı ile gösteriliyor. Burada $e$ ile gösterilen kenar MST içinde
-olmalıdır. 
+Alttaki resimde gri ve beyaz ile gÃ¶sterilen ayrÄ± kÃ¼melerdeki noktalarÄ± bir
+kesik ile ayrÄ±lmÄ±ÅŸlar ve bu kÃ¼melerin arasÄ±ndaki birleÅŸtiren kenarlar
+kÄ±rmÄ±zÄ± ile gÃ¶steriliyor. Burada $e$ ile gÃ¶sterilen kenar MST iÃ§inde
+olmalÄ±dÄ±r. 
 
 \includegraphics[height=5cm]{cross_edge.png}
 
-Üstteki kavramlar Kruskal'ın MST bulan algoritmasının temelini
-oluşturmaktadır (bu algoritmaya kısaca Kruskal diyeceğiz). Kruskal (ilk
-başta) birbirinden bağımsız ağaçları yavaş yavaş yaratır, onları
-büyütür. Aynı anda sürekli o ağaçları minimal bir kenar ile birleştirip
-onları daha büyük bir ağaç yapma fırsatına bakar. 
+Ãœstteki kavramlar Kruskal'Ä±n MST bulan algoritmasÄ±nÄ±n temelini
+oluÅŸturmaktadÄ±r (bu algoritmaya kÄ±saca Kruskal diyeceÄŸiz). Kruskal (ilk
+baÅŸta) birbirinden baÄŸÄ±msÄ±z aÄŸaÃ§larÄ± yavaÅŸ yavaÅŸ yaratÄ±r, onlarÄ±
+bÃ¼yÃ¼tÃ¼r. AynÄ± anda sÃ¼rekli o aÄŸaÃ§larÄ± minimal bir kenar ile birleÅŸtirip
+onlarÄ± daha bÃ¼yÃ¼k bir aÄŸaÃ§ yapma fÄ±rsatÄ±na bakar. 
 
-Ufak ufak ağaçlar üstteki durumda gri ve beyaz noktaları kapsayan ağaçlar
-gibi görülebilir, bunlar çizitin farklı bölgelerinde ayrı ayrı
-büyürler. Eğer bu ayrı ayrı bölgelerde, onlara ait MST'ler
-oluşturabilmişsek, Onları minimal şekilde birleştirmek (üstte $e$ ile) bize
-daha büyük bir MST sağlar. 
+Ufak ufak aÄŸaÃ§lar Ã¼stteki durumda gri ve beyaz noktalarÄ± kapsayan aÄŸaÃ§lar
+gibi gÃ¶rÃ¼lebilir, bunlar Ã§izitin farklÄ± bÃ¶lgelerinde ayrÄ± ayrÄ±
+bÃ¼yÃ¼rler. EÄŸer bu ayrÄ± ayrÄ± bÃ¶lgelerde, onlara ait MST'ler
+oluÅŸturabilmiÅŸsek, OnlarÄ± minimal ÅŸekilde birleÅŸtirmek (Ã¼stte $e$ ile) bize
+daha bÃ¼yÃ¼k bir MST saÄŸlar. 
 
-Kruskal kenarları teker teker işler, önce onları ağırlıklarına göre
-sıralar, ve en küçük kenarları önce alır. Bu yüzden ağaçları bağlanayan
-``birleştiren kenarın'' minimal kalması, ve önce alınması da sağlanır.
+Kruskal kenarlarÄ± teker teker iÅŸler, Ã¶nce onlarÄ± aÄŸÄ±rlÄ±klarÄ±na gÃ¶re
+sÄ±ralar, ve en kÃ¼Ã§Ã¼k kenarlarÄ± Ã¶nce alÄ±r. Bu yÃ¼zden aÄŸaÃ§larÄ± baÄŸlanayan
+``birleÅŸtiren kenarÄ±n'' minimal kalmasÄ±, ve Ã¶nce alÄ±nmasÄ± da saÄŸlanÄ±r.
 
-Birleşim-Buluş (Union-Find)
+BirleÅŸim-BuluÅŸ (Union-Find)
 
-Kruskal'ın kodlama bağlamında önemli bir püf noktası, sırayla bakılan bir
-kenarın mevcut alt-ağaçlardan birine eklenme durumunda döngü oluşturup
-oluşturmadığını hızlı bir şekilde anlayabilmesidir. Bunun için şu diğer
-soruyu cevaplamak yeterlidir: bir kenara baktığımızda, bu kenarın iki
-ucundaki iki noktayı alırız, ve bu iki noktanın herhangi bir alt-ağaç
-içinde, yani aynı alt-ağaç içinde, olup olmadığına bakarız (hatırlarsak pek
-çok alt-ağaç olabiliyor). Eğer bu iki nokta herhangi bir alt-ağaç içinde
-bulunursa, bu kenarı çöpe atabiliriz, çünkü bu noktalar başka bir şekilde
-bir alt-MST oluşturmuştur, ve bu alt-MST optimaldir (bkz üstteki ispat).
+Kruskal'Ä±n kodlama baÄŸlamÄ±nda Ã¶nemli bir pÃ¼f noktasÄ±, sÄ±rayla bakÄ±lan bir
+kenarÄ±n mevcut alt-aÄŸaÃ§lardan birine eklenme durumunda dÃ¶ngÃ¼ oluÅŸturup
+oluÅŸturmadÄ±ÄŸÄ±nÄ± hÄ±zlÄ± bir ÅŸekilde anlayabilmesidir. Bunun iÃ§in ÅŸu diÄŸer
+soruyu cevaplamak yeterlidir: bir kenara baktÄ±ÄŸÄ±mÄ±zda, bu kenarÄ±n iki
+ucundaki iki noktayÄ± alÄ±rÄ±z, ve bu iki noktanÄ±n herhangi bir alt-aÄŸaÃ§
+iÃ§inde, yani aynÄ± alt-aÄŸaÃ§ iÃ§inde, olup olmadÄ±ÄŸÄ±na bakarÄ±z (hatÄ±rlarsak pek
+Ã§ok alt-aÄŸaÃ§ olabiliyor). EÄŸer bu iki nokta herhangi bir alt-aÄŸaÃ§ iÃ§inde
+bulunursa, bu kenarÄ± Ã§Ã¶pe atabiliriz, Ã§Ã¼nkÃ¼ bu noktalar baÅŸka bir ÅŸekilde
+bir alt-MST oluÅŸturmuÅŸtur, ve bu alt-MST optimaldir (bkz Ã¼stteki ispat).
 
-``İki noktanın aynı alt ağaç içinde olup olmadığını anlamak'' ise şu
-alt-ağaçların sürekli bir ``temsili noktaya'' işaret etmesiyle
-halledilebilir (bu işaret, kenarlardan farklı). Eğer iki nokta, aynı,
-temsili noktaya işaret ediyorsa, onlar aynı ağaç içindedir, vep dolaylı
-olarak bu demektir ki bu noktalar bir şekilde ``bağlanmıştırlar'' çünkü her
-alt-ağaç aynı zamanda ufak bir MST'dir. Bu durumda yeni kenarı eklemek
-tanım itibariyle bir döngü oluşturur, ve gereksizdir. Eğer noktalar farklı
-ağaçlarda iseler, bu ağaçları birleştirmek iki temsili noktadan birinin bir
-diğerine işaret etmesiyle halolabilir. Evet birleştirme sonrası bazı üyeler
-yeni temsili noktaya işaret etmiyor olabilirler, bu durum, noktadan noktaya
-atlanıp temsili noktaya erişmek ile halolur. Bu arada, arama sırasında,
-yeni temsili noktaya olan işaretler değiştirilir, ki bu ``düzeltme'' işlemi
-yol sıkıştırma (path compression) olarak anılıyor.
+``Ä°ki noktanÄ±n aynÄ± alt aÄŸaÃ§ iÃ§inde olup olmadÄ±ÄŸÄ±nÄ± anlamak'' ise ÅŸu
+alt-aÄŸaÃ§larÄ±n sÃ¼rekli bir ``temsili noktaya'' iÅŸaret etmesiyle
+halledilebilir (bu iÅŸaret, kenarlardan farklÄ±). EÄŸer iki nokta, aynÄ±,
+temsili noktaya iÅŸaret ediyorsa, onlar aynÄ± aÄŸaÃ§ iÃ§indedir, vep dolaylÄ±
+olarak bu demektir ki bu noktalar bir ÅŸekilde ``baÄŸlanmÄ±ÅŸtÄ±rlar'' Ã§Ã¼nkÃ¼ her
+alt-aÄŸaÃ§ aynÄ± zamanda ufak bir MST'dir. Bu durumda yeni kenarÄ± eklemek
+tanÄ±m itibariyle bir dÃ¶ngÃ¼ oluÅŸturur, ve gereksizdir. EÄŸer noktalar farklÄ±
+aÄŸaÃ§larda iseler, bu aÄŸaÃ§larÄ± birleÅŸtirmek iki temsili noktadan birinin bir
+diÄŸerine iÅŸaret etmesiyle halolabilir. Evet birleÅŸtirme sonrasÄ± bazÄ± Ã¼yeler
+yeni temsili noktaya iÅŸaret etmiyor olabilirler, bu durum, noktadan noktaya
+atlanÄ±p temsili noktaya eriÅŸmek ile halolur. Bu arada, arama sÄ±rasÄ±nda,
+yeni temsili noktaya olan iÅŸaretler deÄŸiÅŸtirilir, ki bu ``dÃ¼zeltme'' iÅŸlemi
+yol sÄ±kÄ±ÅŸtÄ±rma (path compression) olarak anÄ±lÄ±yor.
 
-Alttaki kod tüm bu numaraları kullanıyor. Örnek olarak yazının başında
-verilen çiziti kodladık ve MST'sini bulduk. Çizit formatı iki yönlü
-kenar bilgisi gerektirmez, iki nokta arasındaki geçişi bir kere belirtmek
+Alttaki kod tÃ¼m bu numaralarÄ± kullanÄ±yor. Ã–rnek olarak yazÄ±nÄ±n baÅŸÄ±nda
+verilen Ã§iziti kodladÄ±k ve MST'sini bulduk. Ã‡izit formatÄ± iki yÃ¶nlÃ¼
+kenar bilgisi gerektirmez, iki nokta arasÄ±ndaki geÃ§iÅŸi bir kere belirtmek
 yeterlidir. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -198,11 +198,11 @@ print 'MST', mst
 MST [('d', 'e'), ('e', 'g'), ('d', 'f'), ('b', 'c'), ('a', 'f'), ('a', 'b')]
 \end{verbatim}
 
-Bu işleyiş (yine başta gösterdiğimiz) alternatif MST'lerden birincisini
-buldu (\verb!a-f! bağlı, \verb!e-f! bağlı değil). Güzel! Kruskal'ın işleyiş
-hızı $O(E \log E)$ seviyesindedir, $E$ kenar sayısıdır. Bu çok iyi bir
-performanstır, bu performansın mesela $O(N^2)$'den farkını göstermek için
-alttaki hesaba bakalım, eğer 100,000 tane kenar olsaydı,
+Bu iÅŸleyiÅŸ (yine baÅŸta gÃ¶sterdiÄŸimiz) alternatif MST'lerden birincisini
+buldu (\verb!a-f! baÄŸlÄ±, \verb!e-f! baÄŸlÄ± deÄŸil). GÃ¼zel! Kruskal'Ä±n iÅŸleyiÅŸ
+hÄ±zÄ± $O(E \log E)$ seviyesindedir, $E$ kenar sayÄ±sÄ±dÄ±r. Bu Ã§ok iyi bir
+performanstÄ±r, bu performansÄ±n mesela $O(N^2)$'den farkÄ±nÄ± gÃ¶stermek iÃ§in
+alttaki hesaba bakalÄ±m, eÄŸer 100,000 tane kenar olsaydÄ±,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 e = 100 * 1000
@@ -217,12 +217,12 @@ log 11.512925465
 kruskal 1151292.5465
 \end{verbatim}
 
-Kruskal 1 milyon kusur operasyona orantılı bir sonuç verirdi, kıyasla
-$O(N^2)$ 10 milyar operasyon ortaya çıkartıyor! 
+Kruskal 1 milyon kusur operasyona orantÄ±lÄ± bir sonuÃ§ verirdi, kÄ±yasla
+$O(N^2)$ 10 milyar operasyon ortaya Ã§Ä±kartÄ±yor! 
 
-Bir diğer örnek: Altta MST'nin adım adım oluşturulmasını da
-göreceğiz. Kırmızı ile işaretlenen kenar o adımda seçilen kenarı
-gösteriyor, siyah olanlar mevcut MST(lerde) olan kenarları.
+Bir diÄŸer Ã¶rnek: Altta MST'nin adÄ±m adÄ±m oluÅŸturulmasÄ±nÄ± da
+gÃ¶receÄŸiz. KÄ±rmÄ±zÄ± ile iÅŸaretlenen kenar o adÄ±mda seÃ§ilen kenarÄ±
+gÃ¶steriyor, siyah olanlar mevcut MST(lerde) olan kenarlarÄ±.
 
 \includegraphics[width=8cm]{sedge_krus_1.png}
 
@@ -256,20 +256,20 @@ print 'MST', mst
 MST [(2, 6), (4, 5), (5, 7), (0, 7), (2, 3), (1, 7), (0, 2)]
 \end{verbatim}
 
-Şekilde \verb!5-7!'yi birbirine bağlayan 6. adım sonrası \verb!1-3!'un
-çözüme dahil edilmediğine dikkat edelim. Bu noktada 1 ve 3 düğümleri artık
-aynı ağaç içindedirler, ve bu kenarı eklemek bir döngü oluşturacaktır. 
+Åekilde \verb!5-7!'yi birbirine baÄŸlayan 6. adÄ±m sonrasÄ± \verb!1-3!'un
+Ã§Ã¶zÃ¼me dahil edilmediÄŸine dikkat edelim. Bu noktada 1 ve 3 dÃ¼ÄŸÃ¼mleri artÄ±k
+aynÄ± aÄŸaÃ§ iÃ§indedirler, ve bu kenarÄ± eklemek bir dÃ¶ngÃ¼ oluÅŸturacaktÄ±r. 
 
-Kruskal algoritması, ve ona benzer Prim, ya da ``bir sonraki adımda hep en
-yakını işleyen'' algoritmalar açgözlü (greedy) algoritmalar olarak
-bilinirler. Mesela {\em Dinamik Programlama} yazısında gördüğümüz üzere,
-açgözlü yöntem en kısa yolu vermeyebiliyordu. MST durumunda açgözlülük
-faydalıdır, açgözlülüğün faydalı olduğu mutlu örneklerden biridir diyelim! 
+Kruskal algoritmasÄ±, ve ona benzer Prim, ya da ``bir sonraki adÄ±mda hep en
+yakÄ±nÄ± iÅŸleyen'' algoritmalar aÃ§gÃ¶zlÃ¼ (greedy) algoritmalar olarak
+bilinirler. Mesela {\em Dinamik Programlama} yazÄ±sÄ±nda gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z Ã¼zere,
+aÃ§gÃ¶zlÃ¼ yÃ¶ntem en kÄ±sa yolu vermeyebiliyordu. MST durumunda aÃ§gÃ¶zlÃ¼lÃ¼k
+faydalÄ±dÄ±r, aÃ§gÃ¶zlÃ¼lÃ¼ÄŸÃ¼n faydalÄ± olduÄŸu mutlu Ã¶rneklerden biridir diyelim! 
 
-Not: Bazılarına tanıdık gelebilecek bilgisayar bilimin demirbaş
-problemlerinden Seyahat Eden Satış Görevlisi (Traveling Salesman Problemi
--TSP-) NP-Tam olarak bilinir. MST, ki çok hızlı işleyen bir algoritma,
-yaklaşıksal olarak TSP'yi çözmekte kullanılabilmektedir. 
+Not: BazÄ±larÄ±na tanÄ±dÄ±k gelebilecek bilgisayar bilimin demirbaÅŸ
+problemlerinden Seyahat Eden SatÄ±ÅŸ GÃ¶revlisi (Traveling Salesman Problemi
+-TSP-) NP-Tam olarak bilinir. MST, ki Ã§ok hÄ±zlÄ± iÅŸleyen bir algoritma,
+yaklaÅŸÄ±ksal olarak TSP'yi Ã§Ã¶zmekte kullanÄ±labilmektedir. 
 
 Kaynaklar
 

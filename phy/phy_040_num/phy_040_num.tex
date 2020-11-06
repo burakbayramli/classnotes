@@ -1,34 +1,34 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Sayısal Kontrol ve Sınır Değer Problemleri (BVP)
+SayÄ±sal Kontrol ve SÄ±nÄ±r DeÄŸer Problemleri (BVP)
 
-Bu bölümde optimal kontrol problemlerini sayısal çözmenin yöntemlerini
-göreceğiz. 
+Bu bÃ¶lÃ¼mde optimal kontrol problemlerini sayÄ±sal Ã§Ã¶zmenin yÃ¶ntemlerini
+gÃ¶receÄŸiz. 
 
 Rayleigh Problemi
 
-Bir elektrik devresi düşünelim, bu devre düz voltajı salınıma çevirebiliyor, 
+Bir elektrik devresi dÃ¼ÅŸÃ¼nelim, bu devre dÃ¼z voltajÄ± salÄ±nÄ±ma Ã§evirebiliyor, 
 
 \includegraphics[width=20em]{phy_num_01.png}
 
-Devreyi sol taraftan verilen $U_0(t)$ ile kontrol etmek mümkün [1,
+Devreyi sol taraftan verilen $U_0(t)$ ile kontrol etmek mÃ¼mkÃ¼n [1,
 sf. 189], [2, sf. 413]. Devreninin denklemi
 
 $$
 \ddot{x} = -x(t) + \dot{x}(t) ( 2.0 - p \dot{x}(t)^2 ) +  u(t)
 $$
 
-ki biz $p = 0.1$ seçeceğiz, ve konum değişkeni $x(t)$ $t$ anındaki elektrik
-akımı $I$'yı temsil ediyor. ODE sistemini çıkartmak için $x_1 = x$,
+ki biz $p = 0.1$ seÃ§eceÄŸiz, ve konum deÄŸiÅŸkeni $x(t)$ $t$ anÄ±ndaki elektrik
+akÄ±mÄ± $I$'yÄ± temsil ediyor. ODE sistemini Ã§Ä±kartmak iÃ§in $x_1 = x$,
 $x_2 = \dot{x}$ dersek,
 
 $$
 \dot{x_2} = -x_1 + (2.0 - 0.1 x_2^2)x_2 + 4 u(t)
 $$
 
-Acaba $x_1(t=0)=-5$ ve $x_2(t=0)=-5$ başlangıç şartları için,
-$t_f=2.5$ anına kadar kontrolü ve salınımı az seviyede tutmaya
-çalışsak nasıl bir kontrol uygulamamız gerekir?
+Acaba $x_1(t=0)=-5$ ve $x_2(t=0)=-5$ baÅŸlangÄ±Ã§ ÅŸartlarÄ± iÃ§in,
+$t_f=2.5$ anÄ±na kadar kontrolÃ¼ ve salÄ±nÄ±mÄ± az seviyede tutmaya
+Ã§alÄ±ÅŸsak nasÄ±l bir kontrol uygulamamÄ±z gerekir?
 
 Yani minimize etmek istedigimiz, 
 
@@ -38,20 +38,20 @@ $$
 
 ki $V = x_1^2 + u^2$.
 
-Not: Üstteki formül tam formül $J(u) = \phi(x(t_f) + \int_{0}^{2.5} V  \ud
-t$ formulunden biraz farklı, $\phi$ yok, yani varılan son konum için bir
-bedel tanımlanmadı. Bunun sonucu $\lambda(t_f)$'in sıfır olmasıdır.
+Not: Ãœstteki formÃ¼l tam formÃ¼l $J(u) = \phi(x(t_f) + \int_{0}^{2.5} V  \ud
+t$ formulunden biraz farklÄ±, $\phi$ yok, yani varÄ±lan son konum iÃ§in bir
+bedel tanÄ±mlanmadÄ±. Bunun sonucu $\lambda(t_f)$'in sÄ±fÄ±r olmasÄ±dÄ±r.
 
-Hamiltonian'ı tanımlarken
+Hamiltonian'Ä± tanÄ±mlarken
 
 $$
 \mathcal{H} = V + \lambda^T f
 $$
 
-formülü verilmişti. $f$ formülü üstte görülen $\dot{x}_1$ ve
-$\dot{x}_2$'den oluşuyor tabii.
+formÃ¼lÃ¼ verilmiÅŸti. $f$ formÃ¼lÃ¼ Ã¼stte gÃ¶rÃ¼len $\dot{x}_1$ ve
+$\dot{x}_2$'den oluÅŸuyor tabii.
 
-Şimdi $\mathcal{H}$'yi sembolik olarak bulalım,
+Åimdi $\mathcal{H}$'yi sembolik olarak bulalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sympy
@@ -77,14 +77,14 @@ $$
 x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}
 $$
 
-Eğer bu formülü biraz masajlarsak, [2]'deki sonucu elde ederiz,
+EÄŸer bu formÃ¼lÃ¼ biraz masajlarsak, [2]'deki sonucu elde ederiz,
 
 $$
 = x_1^2 + u^2 + \lambda_1 x_2 - \lambda_2
 \left( x_1 - 4u + x_2 \left( \frac{x_2^2}{10} - 2 \right)  \right)
 $$
 
-$\dot{\lambda} = -(\partial \mathcal{H} / \partial x)^T$ ve  $\lambda(t_f) = (\partial \phi / \partial x)^T$ üzerinden ,
+$\dot{\lambda} = -(\partial \mathcal{H} / \partial x)^T$ ve  $\lambda(t_f) = (\partial \phi / \partial x)^T$ Ã¼zerinden ,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 lam_dot = -sympy.diff(H, x).T
@@ -113,7 +113,7 @@ $$
 \end{array}\right]
 $$
 
-Optimal kontrol girdisi için $u(t)$'yi için bir çözüm bulmayı gerektiriyor,
+Optimal kontrol girdisi iÃ§in $u(t)$'yi iÃ§in bir Ã§Ã¶zÃ¼m bulmayÄ± gerektiriyor,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 u, x1, x2, lam1, lam2 = sympy.symbols('u x1 x2 lam1 lam2')
@@ -132,7 +132,7 @@ $$
 u^*(t) = -2 \lambda_2(t)
 $$
 
-sonucuna eriştik. Bulduğumuz optimal $u^*$ değerini $f$ denklemindeki
+sonucuna eriÅŸtik. BulduÄŸumuz optimal $u^*$ deÄŸerini $f$ denklemindeki
 $u$'lar yerine koyarsak,
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -144,7 +144,7 @@ print (x_dot)
 Matrix([[x2], [-8*lam2 - x1 + x2*(2.0 - 0.1*x2**2)]])
 \end{verbatim}
 
-Daha önceden bulduğumuz $\dot{\lambda}$ formülünü hatırlayalım,
+Daha Ã¶nceden bulduÄŸumuz $\dot{\lambda}$ formÃ¼lÃ¼nÃ¼ hatÄ±rlayalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print (lam_dot)
@@ -154,8 +154,8 @@ print (lam_dot)
 Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])
 \end{verbatim}
 
-Artık elimizde bir iki noktalı sınır problemi var, bu problemi sayısal
-olarak çözebiliriz. 
+ArtÄ±k elimizde bir iki noktalÄ± sÄ±nÄ±r problemi var, bu problemi sayÄ±sal
+olarak Ã§Ã¶zebiliriz. 
 
 $$
 \left[\begin{array}{c}
@@ -236,7 +236,7 @@ plt.savefig('phy_num_04.png')
 
 \includegraphics[height=6cm]{phy_num_04.png}
 
-Son grafikte optimal kontrol politikasını görüyoruz. 
+Son grafikte optimal kontrol politikasÄ±nÄ± gÃ¶rÃ¼yoruz. 
 
 [devam edecek]
 

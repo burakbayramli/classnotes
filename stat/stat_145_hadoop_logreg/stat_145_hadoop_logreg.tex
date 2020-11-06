@@ -1,29 +1,29 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Paralel Lojistik Regresyon, Eşle/İndirge
+Paralel Lojistik Regresyon, EÅŸle/Ä°ndirge
 
-Lojistik regresyon kodunu eşle-indirge (map-reduce) üzerinden paralelize
-etmek için literatüre [1-7] bakınca, genel yaklaşımın makinalara bölünen
-veri parçaları üzerinde ayrı ayrı gradyan çıkışının (gradient aşçent)
-işletilmesi ve sonuç $\theta$'ların son bir makinada ortalamasının alınması
-olduğunu görürüz.
+Lojistik regresyon kodunu eÅŸle-indirge (map-reduce) Ã¼zerinden paralelize
+etmek iÃ§in literatÃ¼re [1-7] bakÄ±nca, genel yaklaÅŸÄ±mÄ±n makinalara bÃ¶lÃ¼nen
+veri parÃ§alarÄ± Ã¼zerinde ayrÄ± ayrÄ± gradyan Ã§Ä±kÄ±ÅŸÄ±nÄ±n (gradient aÅŸÃ§ent)
+iÅŸletilmesi ve sonuÃ§ $\theta$'larÄ±n son bir makinada ortalamasÄ±nÄ±n alÄ±nmasÄ±
+olduÄŸunu gÃ¶rÃ¼rÃ¼z.
 
-Daha önceki lojistik regresyon yazımızda iki farklı gradyan çıkış
-algoritmasi görmüştük. Bu algoritmalardan kullanacağımız daha basit olanı,
-her döngüde alpha'yı değiştiren versiyon değil tek alpha kullanan, ve kod
-içinde zar atan değil, veriyi sırayla işleyen. Bunun birkaç sebebi var,
-öncelikle altta göreceğimiz üzere veriyi Hadoop'a vermeden önce kendimiz
-karıştıracağız, yani kod içinde zar atmaya gerek kalmayacak. İkincisi pek
-çok makinada işlem yapıldığı için tek bir sabit üzerinden azaltma yapmak
-mümkün değil (fakat her işleyicinin -değişmeyen- kendine has / ayrı bir
-sabiti olabilir, bu konuyu ileride işleyebiliriz), bu sebeple ve basitlik
-amacıyla tek sabitli kod kullanıldı. Ayrıca artık döngü (iterasyon) yok,
-yani veri baştan sona bir kez tarandı mı, o makinanın işlemi bitecek. Fakat
-büyük veri ortamında (ki zaten onun için Hadoop kullanıyoruz herhalde)
-elimizde o kadar çok veri olacak ki bu verinin tamamını işleyince zaten
-100,200 kere döngüyü işletmek ile aynı etkiyi almış oluyoruz.
+Daha Ã¶nceki lojistik regresyon yazÄ±mÄ±zda iki farklÄ± gradyan Ã§Ä±kÄ±ÅŸ
+algoritmasi gÃ¶rmÃ¼ÅŸtÃ¼k. Bu algoritmalardan kullanacaÄŸÄ±mÄ±z daha basit olanÄ±,
+her dÃ¶ngÃ¼de alpha'yÄ± deÄŸiÅŸtiren versiyon deÄŸil tek alpha kullanan, ve kod
+iÃ§inde zar atan deÄŸil, veriyi sÄ±rayla iÅŸleyen. Bunun birkaÃ§ sebebi var,
+Ã¶ncelikle altta gÃ¶receÄŸimiz Ã¼zere veriyi Hadoop'a vermeden Ã¶nce kendimiz
+karÄ±ÅŸtÄ±racaÄŸÄ±z, yani kod iÃ§inde zar atmaya gerek kalmayacak. Ä°kincisi pek
+Ã§ok makinada iÅŸlem yapÄ±ldÄ±ÄŸÄ± iÃ§in tek bir sabit Ã¼zerinden azaltma yapmak
+mÃ¼mkÃ¼n deÄŸil (fakat her iÅŸleyicinin -deÄŸiÅŸmeyen- kendine has / ayrÄ± bir
+sabiti olabilir, bu konuyu ileride iÅŸleyebiliriz), bu sebeple ve basitlik
+amacÄ±yla tek sabitli kod kullanÄ±ldÄ±. AyrÄ±ca artÄ±k dÃ¶ngÃ¼ (iterasyon) yok,
+yani veri baÅŸtan sona bir kez tarandÄ± mÄ±, o makinanÄ±n iÅŸlemi bitecek. Fakat
+bÃ¼yÃ¼k veri ortamÄ±nda (ki zaten onun iÃ§in Hadoop kullanÄ±yoruz herhalde)
+elimizde o kadar Ã§ok veri olacak ki bu verinin tamamÄ±nÄ± iÅŸleyince zaten
+100,200 kere dÃ¶ngÃ¼yÃ¼ iÅŸletmek ile aynÄ± etkiyi almÄ±ÅŸ oluyoruz.
 
-Örnek veri olarak alttakini ürettik,
+Ã–rnek veri olarak alttakini Ã¼rettik,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from pandas import *
@@ -57,7 +57,7 @@ plt.savefig('logreg1.png')
 
 \includegraphics[height=6cm]{logreg1.png}
 
-Altta veriyi işletmeden önce kendimiz karıştırıyoruz,
+Altta veriyi iÅŸletmeden Ã¶nce kendimiz karÄ±ÅŸtÄ±rÄ±yoruz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 !sort --random-sort testSet.txt > /tmp/testSet1.txt
@@ -65,33 +65,33 @@ Altta veriyi işletmeden önce kendimiz karıştırıyoruz,
 
 \inputminted[fontsize=\footnotesize]{python}{logreg.py}
 
-Üstte eşleyici içinde tek bir tane anahtar üretiyoruz, tüm makinalarda tüm
-eşleyiciler aynı anahtarı, bir kez üretiyor olacaklar. Bunun sebebi nedir?
-Ne yapmaya çalıştığımızı hatırlayalım, tüm makinalarda lojistik regresyon
-işletiyoruz, gradyan çıkışı yapıyoruz, ve sonuçta o makinanın işi bitince
-elimizde tek bir tane ağırlık vektörü yani theta olacak. İlgilendiğimiz
-sonuç bu, o yüzden çıktı stdout'a tek bir satır yazılıyor. Peki niye aynı
-anahtar? Çünkü her makinadaki tüm ağırlık vektörlerinin "hep beraber" bir
-noktada ortalamasının alınmasını istiyoruz, bunu Hadoop'a yaptırmanın bir
-yolu herkese aynı anahtarı kullandırtmak, böylece bu anahtarlar tek bir
-indirgeyiciye (ve makinaya) gidecek, ve orada ortalamaları alınacak. Tüm
-eşleyicilerin sonucunun tek bir indirgeçiye gitmesi performans problemi
-çıkartmaz mı? Çıkmaz, çünkü 1000 tane, 10000 tane eşleyici paralel iş
-yapmış olabilir, ama işleri bitince elimizde 1000,10000 tane ağırlık
-vektörü olacak, ve bu zaten tek makinanın rahatlıkla başa çıkabileceği bir
-yüktür.
+Ãœstte eÅŸleyici iÃ§inde tek bir tane anahtar Ã¼retiyoruz, tÃ¼m makinalarda tÃ¼m
+eÅŸleyiciler aynÄ± anahtarÄ±, bir kez Ã¼retiyor olacaklar. Bunun sebebi nedir?
+Ne yapmaya Ã§alÄ±ÅŸtÄ±ÄŸÄ±mÄ±zÄ± hatÄ±rlayalÄ±m, tÃ¼m makinalarda lojistik regresyon
+iÅŸletiyoruz, gradyan Ã§Ä±kÄ±ÅŸÄ± yapÄ±yoruz, ve sonuÃ§ta o makinanÄ±n iÅŸi bitince
+elimizde tek bir tane aÄŸÄ±rlÄ±k vektÃ¶rÃ¼ yani theta olacak. Ä°lgilendiÄŸimiz
+sonuÃ§ bu, o yÃ¼zden Ã§Ä±ktÄ± stdout'a tek bir satÄ±r yazÄ±lÄ±yor. Peki niye aynÄ±
+anahtar? Ã‡Ã¼nkÃ¼ her makinadaki tÃ¼m aÄŸÄ±rlÄ±k vektÃ¶rlerinin "hep beraber" bir
+noktada ortalamasÄ±nÄ±n alÄ±nmasÄ±nÄ± istiyoruz, bunu Hadoop'a yaptÄ±rmanÄ±n bir
+yolu herkese aynÄ± anahtarÄ± kullandÄ±rtmak, bÃ¶ylece bu anahtarlar tek bir
+indirgeyiciye (ve makinaya) gidecek, ve orada ortalamalarÄ± alÄ±nacak. TÃ¼m
+eÅŸleyicilerin sonucunun tek bir indirgeÃ§iye gitmesi performans problemi
+Ã§Ä±kartmaz mÄ±? Ã‡Ä±kmaz, Ã§Ã¼nkÃ¼ 1000 tane, 10000 tane eÅŸleyici paralel iÅŸ
+yapmÄ±ÅŸ olabilir, ama iÅŸleri bitince elimizde 1000,10000 tane aÄŸÄ±rlÄ±k
+vektÃ¶rÃ¼ olacak, ve bu zaten tek makinanÄ±n rahatlÄ±kla baÅŸa Ã§Ä±kabileceÄŸi bir
+yÃ¼ktÃ¼r.
 
-Bu yaklaşım, eşleyicinin her veri satırı başına bir ya da daha fazla
-anahtar-değer satırı ürettiği yaklaşımdan (mesela klasik kelime sayma
-problemi) biraz farklı, o sebeple bu farklılığı belirtmek istedik.
+Bu yaklaÅŸÄ±m, eÅŸleyicinin her veri satÄ±rÄ± baÅŸÄ±na bir ya da daha fazla
+anahtar-deÄŸer satÄ±rÄ± Ã¼rettiÄŸi yaklaÅŸÄ±mdan (mesela klasik kelime sayma
+problemi) biraz farklÄ±, o sebeple bu farklÄ±lÄ±ÄŸÄ± belirtmek istedik.
 
-Bir püf nokta, her veri satırı için işletilen map'e de aslında anahtar
-ürettirmiyoruz, tüm map çağrıları bittikten sonra son bir kez çağırılacak
-map\_final'a bu işi yaptırıyoruz. Oraya gelinceye kadar (map içinde) değişen
-theta'yı sürekli hafızada tutmuşuz, son noktaya gelince o sonucu aynı
-anahtar ile eşleyerek üretiyoruz ve iş bitiyor.
+Bir pÃ¼f nokta, her veri satÄ±rÄ± iÃ§in iÅŸletilen map'e de aslÄ±nda anahtar
+Ã¼rettirmiyoruz, tÃ¼m map Ã§aÄŸrÄ±larÄ± bittikten sonra son bir kez Ã§aÄŸÄ±rÄ±lacak
+map\_final'a bu iÅŸi yaptÄ±rÄ±yoruz. Oraya gelinceye kadar (map iÃ§inde) deÄŸiÅŸen
+theta'yÄ± sÃ¼rekli hafÄ±zada tutmuÅŸuz, son noktaya gelince o sonucu aynÄ±
+anahtar ile eÅŸleyerek Ã¼retiyoruz ve iÅŸ bitiyor.
 
-Komut satırından işletelim:
+Komut satÄ±rÄ±ndan iÅŸletelim:
 
 \begin{minted}[fontsize=\footnotesize]{python}
 !python logreg.py /tmp/testSet1.txt 

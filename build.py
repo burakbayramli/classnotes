@@ -24,7 +24,7 @@ ad = '''
 <br/>
 '''
 
-TARGET_DIR = "/home/burak/Documents/dersblog"
+TARGET_DIR = "/home/burak/Documents/dersblog2"
 
 html_head = '''
 <!DOCTYPE html>
@@ -53,7 +53,7 @@ html_head = '''
 
 def tex_mathjax_html(texfile, htmlfile, title):
 
-   fin = codecs.open(texfile, encoding='iso-8859-9')
+   fin = codecs.open(texfile, encoding='utf-8')
    fout = codecs.open("/tmp/out.md",mode="w",encoding="utf-8")
 
    fin.readline()
@@ -235,7 +235,7 @@ if __name__ == "__main__":
                 print (dir + "/" + subdir)
                 # read tex file, get header
                 ff = dir + "/" + subdir + "/" + subdir + ".tex"                
-                fin = codecs.open(ff, encoding='iso-8859-9')
+                fin = codecs.open(ff, encoding='utf8')
                 content = fin.read()
                 title = re.findall(u"begin.*?document.*?\n(.*?)\n",content,re.DOTALL)[0]
                 url = translit_low(title)

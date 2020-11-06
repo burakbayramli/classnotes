@@ -1,63 +1,63 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Yansıtma Matrisini Bilinen 3D-2D Eşlemelerinden Hesaplamak
+YansÄ±tma Matrisini Bilinen 3D-2D EÅŸlemelerinden Hesaplamak
 
-Çoğu kaynakta ve bu ders anlatımlarında kameraya yansıtılan görüntü, dünya
-kordinatları kavramları birbirine karışık şekilde gösterildi.
+Ã‡oÄŸu kaynakta ve bu ders anlatÄ±mlarÄ±nda kameraya yansÄ±tÄ±lan gÃ¶rÃ¼ntÃ¼, dÃ¼nya
+kordinatlarÄ± kavramlarÄ± birbirine karÄ±ÅŸÄ±k ÅŸekilde gÃ¶sterildi.
 
 \includegraphics[width=25em]{vision_055_02.png}
 
-Fakat dünya kordinat sistemi, kamera merkezi gibi kavramları birbirinden
-ayırmamız gerekiyor. Çünkü uygulamalarda kamera z kordinatı üzerinde
-durmuyor ve kamera merkezi ile dünya merkezi birbirinden farklı, ayrıca
-çoğunlukla ne $P$'nin ne de onu oluşturan içsel parametre matrisi
+Fakat dÃ¼nya kordinat sistemi, kamera merkezi gibi kavramlarÄ± birbirinden
+ayÄ±rmamÄ±z gerekiyor. Ã‡Ã¼nkÃ¼ uygulamalarda kamera z kordinatÄ± Ã¼zerinde
+durmuyor ve kamera merkezi ile dÃ¼nya merkezi birbirinden farklÄ±, ayrÄ±ca
+Ã§oÄŸunlukla ne $P$'nin ne de onu oluÅŸturan iÃ§sel parametre matrisi
 (intrinsic parameter matrix) $K$ biliniyor.
 
-Önce kameranın nerede olduğuna bakalım. Kamera çoğunlukla dünya merkezinden
-değişik bir yerdedir, mesela elle tutulan bir cep telefonu durumunda boy
-yüksekliğinde ve $z$ kordinatına yönünde (ama üzerinde olmayabilir) doğru
-tutulmaktadır. Önündeki objelerin yerleri dünya (world) kordinatlarına
-göredir, ayrıca kameranın kendisi dünya merkezinden o noktaya bir
-döndürülme ve taşınma (rotation and translation) sonucu gelmiştir.
+Ã–nce kameranÄ±n nerede olduÄŸuna bakalÄ±m. Kamera Ã§oÄŸunlukla dÃ¼nya merkezinden
+deÄŸiÅŸik bir yerdedir, mesela elle tutulan bir cep telefonu durumunda boy
+yÃ¼ksekliÄŸinde ve $z$ kordinatÄ±na yÃ¶nÃ¼nde (ama Ã¼zerinde olmayabilir) doÄŸru
+tutulmaktadÄ±r. Ã–nÃ¼ndeki objelerin yerleri dÃ¼nya (world) kordinatlarÄ±na
+gÃ¶redir, ayrÄ±ca kameranÄ±n kendisi dÃ¼nya merkezinden o noktaya bir
+dÃ¶ndÃ¼rÃ¼lme ve taÅŸÄ±nma (rotation and translation) sonucu gelmiÅŸtir.
 
 \includegraphics[width=25em]{vision_055_01.png}
 
-Bu döndürülme ve taşınma matrislerini $R,T$ olarak tanımlarsak,
+Bu dÃ¶ndÃ¼rÃ¼lme ve taÅŸÄ±nma matrislerini $R,T$ olarak tanÄ±mlarsak,
 
 $$ P = K \left[\begin{array}{c|c} R & t \end{array}\right]$$
 
-olduğunu görmüştük, ve bu matris 3 x 4 boyutundadır, ki $K$ içsel parametre
-matrisi idi. Ayrıca biliyoruz ki $P$'yi baz alarak bir $X_i$ üç boyutlu
-noktasının iki boyutlu noktaya yansıması
+olduÄŸunu gÃ¶rmÃ¼ÅŸtÃ¼k, ve bu matris 3 x 4 boyutundadÄ±r, ki $K$ iÃ§sel parametre
+matrisi idi. AyrÄ±ca biliyoruz ki $P$'yi baz alarak bir $X_i$ Ã¼Ã§ boyutlu
+noktasÄ±nÄ±n iki boyutlu noktaya yansÄ±masÄ±
 
 $$ \lambda_i x_i = PX_i$$
 
-olarak hesaplanıyor. Kordinatlar homojen kordinatlar, yani (vektörleri bir
-kerelik net olması için koyu renkle gösterirsek)
+olarak hesaplanÄ±yor. Kordinatlar homojen kordinatlar, yani (vektÃ¶rleri bir
+kerelik net olmasÄ± iÃ§in koyu renkle gÃ¶sterirsek)
 $\mathbf{x}_i = \left[\begin{array}{ccc}x_i&y_i&1\end{array}\right]^T$,
-aynı şekilde
+aynÄ± ÅŸekilde
 $\mathbf{X}_i=\left[\begin{array}{cccc}X_i&Y_i&Z_i&1\end{array}\right]^T$.
 
-$P$'yi nasıl hesaplarız? Bu hesap için elimizde belli sayıda dış dünyada üç
-boyutlu ve onun iki boyutlu yansımalarını içeren, birbiri ile eşlenmiş bir
-veri seti olduğunu varsayacağız. Bu veriyi elde etmek zor değil,
-profosyonel ölçümler için kamera önüne belli uzaklıkta, gerçek boyutları
-kesin bilinen bir obje konur, ve kamera görüntüsünde bu cismin bilinen
-noktalarının nereye tekabül ettiğine bakılır, vs. Ya da kabaca yeri bilinen
-objelerin piksel yerleri kaydedilir. Dış dünyada şöyle bir resim olduğunu
-düşünelim,
+$P$'yi nasÄ±l hesaplarÄ±z? Bu hesap iÃ§in elimizde belli sayÄ±da dÄ±ÅŸ dÃ¼nyada Ã¼Ã§
+boyutlu ve onun iki boyutlu yansÄ±malarÄ±nÄ± iÃ§eren, birbiri ile eÅŸlenmiÅŸ bir
+veri seti olduÄŸunu varsayacaÄŸÄ±z. Bu veriyi elde etmek zor deÄŸil,
+profosyonel Ã¶lÃ§Ã¼mler iÃ§in kamera Ã¶nÃ¼ne belli uzaklÄ±kta, gerÃ§ek boyutlarÄ±
+kesin bilinen bir obje konur, ve kamera gÃ¶rÃ¼ntÃ¼sÃ¼nde bu cismin bilinen
+noktalarÄ±nÄ±n nereye tekabÃ¼l ettiÄŸine bakÄ±lÄ±r, vs. Ya da kabaca yeri bilinen
+objelerin piksel yerleri kaydedilir. DÄ±ÅŸ dÃ¼nyada ÅŸÃ¶yle bir resim olduÄŸunu
+dÃ¼ÅŸÃ¼nelim,
 
 \includegraphics[width=25em]{out-cam.png}
 
-Bu resimde ölçümleri bir dünya merkezine göre almak lazım. Resimde kamerayı
-ben tutuyorum, ve şimdi ölçümler için merkezin 20 metre arkamda ve 20 metre
-solumda olduğunu farzediyorum ve kameranın yerden yüksekliğini 2 metre
-kabul ediyorum. Şimdi bu merkeze göre resimde görülen bazı noktaları elle
-kendim seçerim, ve kabaca onların uzaklıklarını biliyordum, ona göre üç
-boyutlu uzaklık atayıp, ayrıca bu noktaların hangi piksel kordinatında
-olduğunu bir imaj programı üzerinden yine kendim bulup bu eşlemeyi bir yere
-kaydederim. Görsel olarak irdeleme kolay olsun diye bunları aynı resim
-üzerinde ekrana basarsak,
+Bu resimde Ã¶lÃ§Ã¼mleri bir dÃ¼nya merkezine gÃ¶re almak lazÄ±m. Resimde kamerayÄ±
+ben tutuyorum, ve ÅŸimdi Ã¶lÃ§Ã¼mler iÃ§in merkezin 20 metre arkamda ve 20 metre
+solumda olduÄŸunu farzediyorum ve kameranÄ±n yerden yÃ¼ksekliÄŸini 2 metre
+kabul ediyorum. Åimdi bu merkeze gÃ¶re resimde gÃ¶rÃ¼len bazÄ± noktalarÄ± elle
+kendim seÃ§erim, ve kabaca onlarÄ±n uzaklÄ±klarÄ±nÄ± biliyordum, ona gÃ¶re Ã¼Ã§
+boyutlu uzaklÄ±k atayÄ±p, ayrÄ±ca bu noktalarÄ±n hangi piksel kordinatÄ±nda
+olduÄŸunu bir imaj programÄ± Ã¼zerinden yine kendim bulup bu eÅŸlemeyi bir yere
+kaydederim. GÃ¶rsel olarak irdeleme kolay olsun diye bunlarÄ± aynÄ± resim
+Ã¼zerinde ekrana basarsak,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 w = 620; h = 465
@@ -95,12 +95,12 @@ plt.savefig('out-cam2.png')
 
 \includegraphics[width=35em]{out-cam2.png}
 
-Bunlar çok mantıksız üç boyutlu değerler değiller herhalde. 
+Bunlar Ã§ok mantÄ±ksÄ±z Ã¼Ã§ boyutlu deÄŸerler deÄŸiller herhalde. 
 
-$P$'nin hesabına gelelim. Her veri noktası $i$ için elimizde bir
-$\lambda_i x_i = PX_i$ denklemi olduğuna göre, önce her bu tür denklemi
-$PX_i-\lambda_ix_i=0$ olarak düzenlersek ve bu denklemleri üst üste gelecek
-şekilde koyarsak,
+$P$'nin hesabÄ±na gelelim. Her veri noktasÄ± $i$ iÃ§in elimizde bir
+$\lambda_i x_i = PX_i$ denklemi olduÄŸuna gÃ¶re, Ã¶nce her bu tÃ¼r denklemi
+$PX_i-\lambda_ix_i=0$ olarak dÃ¼zenlersek ve bu denklemleri Ã¼st Ã¼ste gelecek
+ÅŸekilde koyarsak,
 
 $$ 
 \left[\begin{array}{ccccccc}
@@ -118,30 +118,30 @@ p_1^T \\ p_2^T \\ p_3^T \\ \lambda_1 \\ \lambda_2 \\ \vdots
 $$
 
 sistemini elde ederiz. $p_1,p_2,p_3$ degiskenleri $P$ matrisinin
-satırlarıdır. Üstteki matris daha fazla veri noktası için sağa ve aşağı
-doğru uzayacaktır tabii.
+satÄ±rlarÄ±dÄ±r. Ãœstteki matris daha fazla veri noktasÄ± iÃ§in saÄŸa ve aÅŸaÄŸÄ±
+doÄŸru uzayacaktÄ±r tabii.
 
-Üstteki matrisi, $M$ diyelim, görüldüğü gibi hazırladıktan sonra, ve
-çarpılan kolon vektörüne $v$ dersek artık,
+Ãœstteki matrisi, $M$ diyelim, gÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi hazÄ±rladÄ±ktan sonra, ve
+Ã§arpÄ±lan kolon vektÃ¶rÃ¼ne $v$ dersek artÄ±k,
 
 $$ Mv = 0$$ 
 
-denklemini çözebiliriz. Bu denklemi yaklaşıksal olarak çözmek için problemi
-bir $||v||=1$ şartına bağlı olmak üzere $||Mv||$ minimizasyon problemi
-olarak görebiliriz, yani ``sıfıra olabildiğince yaklaşma problemi'' olarak,
-ki bu problem çözümü için SVD kullanılabilir, daha fazla detaylar [3]
-yazısında. Peki $||v||=1$ şartını nasıl getirebiliyoruz? Bunun sebebi
-homojen kordinat sisteminin getirdiği bir avantajla alakalı; homojen
-kordinat sistemindeki noktalar ``belli bir ölçek (up to scale)'' içinde
-tanımlıdır, ve mesela 2 boyutlu bir nokta ve herhangi bir sabit $\alpha$
-için
+denklemini Ã§Ã¶zebiliriz. Bu denklemi yaklaÅŸÄ±ksal olarak Ã§Ã¶zmek iÃ§in problemi
+bir $||v||=1$ ÅŸartÄ±na baÄŸlÄ± olmak Ã¼zere $||Mv||$ minimizasyon problemi
+olarak gÃ¶rebiliriz, yani ``sÄ±fÄ±ra olabildiÄŸince yaklaÅŸma problemi'' olarak,
+ki bu problem Ã§Ã¶zÃ¼mÃ¼ iÃ§in SVD kullanÄ±labilir, daha fazla detaylar [3]
+yazÄ±sÄ±nda. Peki $||v||=1$ ÅŸartÄ±nÄ± nasÄ±l getirebiliyoruz? Bunun sebebi
+homojen kordinat sisteminin getirdiÄŸi bir avantajla alakalÄ±; homojen
+kordinat sistemindeki noktalar ``belli bir Ã¶lÃ§ek (up to scale)'' iÃ§inde
+tanÄ±mlÄ±dÄ±r, ve mesela 2 boyutlu bir nokta ve herhangi bir sabit $\alpha$
+iÃ§in
 $\mathbf{x} = \left[\begin{array}{ccc}x&y&w\end{array}\right] =
 \left[\begin{array}{ccc}\alpha x& \alpha y& \alpha w\end{array}\right] =
 \left[\begin{array}{ccc}x/w&y/w&1\end{array}\right]$
-noktalarının hepsi aslında aynı 2 boyutlu noktadır. Bunun sonucu olarak $M$
-de belli bir ölçek içinde tanımlı olacaktır, ve o zaman $||v|| = 1$ farz
-edebiliriz. Bu tabii ki hesabımız için faydalı oldu yoksa SVD bazlı
-minimizasyon kullanamazdık.
+noktalarÄ±nÄ±n hepsi aslÄ±nda aynÄ± 2 boyutlu noktadÄ±r. Bunun sonucu olarak $M$
+de belli bir Ã¶lÃ§ek iÃ§inde tanÄ±mlÄ± olacaktÄ±r, ve o zaman $||v|| = 1$ farz
+edebiliriz. Bu tabii ki hesabÄ±mÄ±z iÃ§in faydalÄ± oldu yoksa SVD bazlÄ±
+minimizasyon kullanamazdÄ±k.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy import linalg
@@ -181,9 +181,9 @@ print P
  [ -1.80165364e-05   5.44992018e-06  -3.40782252e-05   8.40827305e-04]]
 \end{verbatim}
 
-$P$'yi hesapladık. Bu $P$'yi şimdi resme bir üç boyutlu şekil yansıtmak
-için kullanalım. Mesela iki metre solumdan bir metre sağımdan çıkan yerden
-uzağa doğru yol üzerinde giten iki tane çizgiyi iki boyuta yansıtalım.
+$P$'yi hesapladÄ±k. Bu $P$'yi ÅŸimdi resme bir Ã¼Ã§ boyutlu ÅŸekil yansÄ±tmak
+iÃ§in kullanalÄ±m. Mesela iki metre solumdan bir metre saÄŸÄ±mdan Ã§Ä±kan yerden
+uzaÄŸa doÄŸru yol Ã¼zerinde giten iki tane Ã§izgiyi iki boyuta yansÄ±talÄ±m.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 res1 = np.array([[18, 0, 20+i, 1.] for i in np.linspace(0,30,100)])
@@ -215,11 +215,11 @@ plt.savefig('out-cam4.png')
 
 \includegraphics[width=20em]{out-cam4.png}
 
-$R,T$ Hesabı
+$R,T$ HesabÄ±
 
-Bilinen $P$ ve $R,T$ üzerinden $K$'yi hesaplamak için
+Bilinen $P$ ve $R,T$ Ã¼zerinden $K$'yi hesaplamak iÃ§in
 $\left[\begin{array}{c|c}R&t\end{array}\right]$'nin cebirsel olarak neyi
-ifade ettigini hatırlayalım,
+ifade ettigini hatÄ±rlayalÄ±m,
 
 $$ 
 \left[\begin{array}{c|c}
@@ -232,10 +232,10 @@ r_{3,1} & r_{3,2} & r_{3,3} & t_3
 \end{array}\right]
 $$
 
-Çoğunlukla üstteki matrise bir ekstra
-$\left[\begin{array}{cccc}0&0&0&1\end{array}\right]$ satırı eklenir, 
-böylece matris kare haline gelir, ve böylece dönüş ve taşınmanın basit
-çarpım olarak ayrıştırılabilmesi sağlanır. 
+Ã‡oÄŸunlukla Ã¼stteki matrise bir ekstra
+$\left[\begin{array}{cccc}0&0&0&1\end{array}\right]$ satÄ±rÄ± eklenir, 
+bÃ¶ylece matris kare haline gelir, ve bÃ¶ylece dÃ¶nÃ¼ÅŸ ve taÅŸÄ±nmanÄ±n basit
+Ã§arpÄ±m olarak ayrÄ±ÅŸtÄ±rÄ±labilmesi saÄŸlanÄ±r. 
 
 $$ 
 \left[\begin{array}{c|c} 
@@ -266,11 +266,11 @@ r_{3,1} & r_{3,2} & r_{3,3} & 0 \\
 \end{array}\right]
 $$
 
-$P$ Üzerinden $K,R,T$
+$P$ Ãœzerinden $K,R,T$
 
-$K$'yi hesabı için şunu hatırlarız: Her matrisin bir QR ayrıştırmasının
-olduğunu biliyoruz. O zaman eldeki $P$'yi ayrıştırarak $R,t$'yi bilmeden
-direk $K,R,t$ hesaplarını yapabiliriz.
+$K$'yi hesabÄ± iÃ§in ÅŸunu hatÄ±rlarÄ±z: Her matrisin bir QR ayrÄ±ÅŸtÄ±rmasÄ±nÄ±n
+olduÄŸunu biliyoruz. O zaman eldeki $P$'yi ayrÄ±ÅŸtÄ±rarak $R,t$'yi bilmeden
+direk $K,R,t$ hesaplarÄ±nÄ± yapabiliriz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 K,R = linalg.rq(P[:,:3])
@@ -294,15 +294,15 @@ print t
 [ 12.47297147  -3.41799407  21.59788692]
 \end{verbatim}
 
-Gerçi ayrıştırma özgün (unique) değil, bir işaret belirsizliği olabiliyor,
-ama bunun çaresi var, detaylar için [1, sf. 108]. Bu hesabın bize ne
-verdiğini tekrar vurgulamak lazım - sadece $P$'ye bakarak hem $K$'yi hem de
-kameranın ne kadar hareket ettiğini bulmuş olduk. Bu kuvvetli bir özellik.
+GerÃ§i ayrÄ±ÅŸtÄ±rma Ã¶zgÃ¼n (unique) deÄŸil, bir iÅŸaret belirsizliÄŸi olabiliyor,
+ama bunun Ã§aresi var, detaylar iÃ§in [1, sf. 108]. Bu hesabÄ±n bize ne
+verdiÄŸini tekrar vurgulamak lazÄ±m - sadece $P$'ye bakarak hem $K$'yi hem de
+kameranÄ±n ne kadar hareket ettiÄŸini bulmuÅŸ olduk. Bu kuvvetli bir Ã¶zellik.
 
-Bu şekilde bulunan $R,t$ belki ölçümlerin kalite kontrolu için
-kullanılabilir. Mesela $R,t$'nin ne olduğunu kesin biliyorduk, ama $P$
-ayrıştırması bize beklediğimizden farklı bir $R,t$ verdi. O zaman belki
-2D-3D eşleştirmesi daha iyi olabilirdi.
+Bu ÅŸekilde bulunan $R,t$ belki Ã¶lÃ§Ã¼mlerin kalite kontrolu iÃ§in
+kullanÄ±labilir. Mesela $R,t$'nin ne olduÄŸunu kesin biliyorduk, ama $P$
+ayrÄ±ÅŸtÄ±rmasÄ± bize beklediÄŸimizden farklÄ± bir $R,t$ verdi. O zaman belki
+2D-3D eÅŸleÅŸtirmesi daha iyi olabilirdi.
 
 
 Kaynaklar

@@ -2,11 +2,11 @@
 \begin{document}
 Lojistik Regresyon (Logistic Regression)
 
-Lojistik regresyon normal regresyonun $\theta^T x$ olarak kullandığı ağırlıklar
-(katsayılar) ile verinin çarpımını alır ve ek bir filtre fonksiyonundan
-geçirerek onları 0/1 değerleri bağlamında bir olasılığa eşler. Yani elimizdeki
-veri çok boyutta veri noktaları ve o noktaların 0 ya da 1 olarak bir
-"etiketi" olacaktır. Mesela
+Lojistik regresyon normal regresyonun $\theta^T x$ olarak kullandÄ±ÄŸÄ± aÄŸÄ±rlÄ±klar
+(katsayÄ±lar) ile verinin Ã§arpÄ±mÄ±nÄ± alÄ±r ve ek bir filtre fonksiyonundan
+geÃ§irerek onlarÄ± 0/1 deÄŸerleri baÄŸlamÄ±nda bir olasÄ±lÄ±ÄŸa eÅŸler. Yani elimizdeki
+veri Ã§ok boyutta veri noktalarÄ± ve o noktalarÄ±n 0 ya da 1 olarak bir
+"etiketi" olacaktÄ±r. Mesela
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from pandas import *
@@ -31,31 +31,31 @@ print df[['x','y','labels']][:10]
 9 -0.026632  10.427743       0
 \end{verbatim}
 
-Görüldüğü gibi veride $x,y$ boyutları için etiketler (labels) verilmiş. Lojistik
-regresyon bu veriyi kullanarak eğitim sonrası $\theta$'ları elde eder, bunlar
-katsayılarımızdır, artık bu katsayıları hiç görmediğimiz yeni bir veri üzerinde
-0/1 etiketlerinin tahminini yapmak için kullanabiliriz.
+GÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi veride $x,y$ boyutlarÄ± iÃ§in etiketler (labels) verilmiÅŸ. Lojistik
+regresyon bu veriyi kullanarak eÄŸitim sonrasÄ± $\theta$'larÄ± elde eder, bunlar
+katsayÄ±larÄ±mÄ±zdÄ±r, artÄ±k bu katsayÄ±larÄ± hiÃ§ gÃ¶rmediÄŸimiz yeni bir veri Ã¼zerinde
+0/1 etiketlerinin tahminini yapmak iÃ§in kullanabiliriz.
 
-Filtre fonksiyonu için kullanılan bir fonksiyon sigmoid fonksiyonudur,
+Filtre fonksiyonu iÃ§in kullanÄ±lan bir fonksiyon sigmoid fonksiyonudur,
 $g(x)$ ismini verelim,
 
 $$ g(x) = \frac{e^{x}}{1+e^{x}} $$
 
-Bu nasıl bir fonksiyondur, kabaca davranışını nasıl tarif ederiz?  Cebirsel
-olarak bakarsak, fonksiyon öyle bir durumda ki ne zaman bir $x$ değeri geçersek,
-bu değer ne kadar büyük olursa olsun, bölendeki değer her zaman bölünenden 1
-daha fazla olacaktır bu da fonksiyonun sonucunun 1'den her zaman küçük olmasını
-garantiler. Çok küçük $x$ değerleri için bölüm sonucu biraz daha büyük olacaktır
+Bu nasÄ±l bir fonksiyondur, kabaca davranÄ±ÅŸÄ±nÄ± nasÄ±l tarif ederiz?  Cebirsel
+olarak bakarsak, fonksiyon Ã¶yle bir durumda ki ne zaman bir $x$ deÄŸeri geÃ§ersek,
+bu deÄŸer ne kadar bÃ¼yÃ¼k olursa olsun, bÃ¶lendeki deÄŸer her zaman bÃ¶lÃ¼nenden 1
+daha fazla olacaktÄ±r bu da fonksiyonun sonucunun 1'den her zaman kÃ¼Ã§Ã¼k olmasÄ±nÄ±
+garantiler. Ã‡ok kÃ¼Ã§Ã¼k $x$ deÄŸerleri iÃ§in bÃ¶lÃ¼m sonucu biraz daha bÃ¼yÃ¼k olacaktÄ±r
 tabii, vs.
 
-Daha temiz bir ifade için bölen ve bölüneni $e^{-x}$ ile çarpalım,
+Daha temiz bir ifade iÃ§in bÃ¶len ve bÃ¶lÃ¼neni $e^{-x}$ ile Ã§arpalÄ±m,
 
 $$ g(x) = \frac{e^{x}e^{-x}}{e^{-x}+e^{x}e^{-x}} $$
 
 $$ g(x) = \frac{1}{1+e^{-x}} $$
 
-Sigmoid fonksiyonun "-sonsuzluk ile +sonsuzluk arasındaki değerleri 0 ve 1
-arasına eşlediği / indirgediği (map)" ifadesi de litaratürde mevcuttur.
+Sigmoid fonksiyonun "-sonsuzluk ile +sonsuzluk arasÄ±ndaki deÄŸerleri 0 ve 1
+arasÄ±na eÅŸlediÄŸi / indirgediÄŸi (map)" ifadesi de litaratÃ¼rde mevcuttur.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def sigmoid(arr):
@@ -68,18 +68,18 @@ plt.savefig('stat_logit_02.png')
 
 \includegraphics[height=6cm]{stat_logit_02.png}
 
-Üstteki grafiğe bakınca katsayılarla çarpım, toplam ardından sonucun niye bu
-fonksiyona verildiğini anlamak mümkün. Sigmoid'in 0 seviyesinden 1 seviyesine
-zıplayısı oldukça hızlı ve $x$ kordinatı bağlamında (ve 0.5'ten küçük $y$'ye
-eşlenen) sıfır öncesi bölgesi, aynı şekilde sıfır sonrası (ve 0.5'ten büyük
-$y$'ye eşlenen) bölgesi oldukça büyük. Yani bu fonksiyonu seçmekle veriye
-katsayılarla çarpılıp 0 ya da 1 bölgesi altına düşmesi için oldukça geniş bir
-şans veriyoruz.  Böylece veriyi iki parçaya ayırmak için şansımızı arttırmış
+Ãœstteki grafiÄŸe bakÄ±nca katsayÄ±larla Ã§arpÄ±m, toplam ardÄ±ndan sonucun niye bu
+fonksiyona verildiÄŸini anlamak mÃ¼mkÃ¼n. Sigmoid'in 0 seviyesinden 1 seviyesine
+zÄ±playÄ±sÄ± oldukÃ§a hÄ±zlÄ± ve $x$ kordinatÄ± baÄŸlamÄ±nda (ve 0.5'ten kÃ¼Ã§Ã¼k $y$'ye
+eÅŸlenen) sÄ±fÄ±r Ã¶ncesi bÃ¶lgesi, aynÄ± ÅŸekilde sÄ±fÄ±r sonrasÄ± (ve 0.5'ten bÃ¼yÃ¼k
+$y$'ye eÅŸlenen) bÃ¶lgesi oldukÃ§a bÃ¼yÃ¼k. Yani bu fonksiyonu seÃ§mekle veriye
+katsayÄ±larla Ã§arpÄ±lÄ±p 0 ya da 1 bÃ¶lgesi altÄ±na dÃ¼ÅŸmesi iÃ§in oldukÃ§a geniÅŸ bir
+ÅŸans veriyoruz.  BÃ¶ylece veriyi iki parÃ§aya ayÄ±rmak iÃ§in ÅŸansÄ±mÄ±zÄ± arttÄ±rmÄ±ÅŸ
 oluyoruz.
 
-Peki sigmoid fonksiyonu bir olasılık fonksiyonu (dağılımı) olarak kullanılabilir
-mi?  Entegralini alalım, ve -/+ sonsuzluklar üzerinden alan hesabı yapalım,
-sonucun 1 çıkması gerekli,
+Peki sigmoid fonksiyonu bir olasÄ±lÄ±k fonksiyonu (daÄŸÄ±lÄ±mÄ±) olarak kullanÄ±labilir
+mi?  Entegralini alalÄ±m, ve -/+ sonsuzluklar Ã¼zerinden alan hesabÄ± yapalÄ±m,
+sonucun 1 Ã§Ä±kmasÄ± gerekli,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sympy
@@ -91,17 +91,17 @@ print sympy.integrate('1/(1+exp(-x))')
 x + log(1 + exp(-x))
 \end{verbatim}
 
-Daha temizlemek için
+Daha temizlemek iÃ§in
 
 $$ x + \ln(1 + e^{-x}) $$
 
-$x$ ifadesi aynı zamanda suna eşittir $x=ln( e^{x} )$. Bu ifade bize
-kolaylık sağlayacak böylece,
+$x$ ifadesi aynÄ± zamanda suna eÅŸittir $x=ln( e^{x} )$. Bu ifade bize
+kolaylÄ±k saÄŸlayacak bÃ¶ylece,
 
 $$ \ln e^{x} + \ln(1+e^{-x})  $$
 
-diyebiliriz. Doğal log'un (ln) çarpımları toplamlara dönüştürdüğünü biliyoruz,
-bunu tersinden uygulayalım,
+diyebiliriz. DoÄŸal log'un (ln) Ã§arpÄ±mlarÄ± toplamlara dÃ¶nÃ¼ÅŸtÃ¼rdÃ¼ÄŸÃ¼nÃ¼ biliyoruz,
+bunu tersinden uygulayalÄ±m,
 
 $$ \ln (e^{x}\cdot 1 + e^{x}e^{-x})  $$
 
@@ -117,56 +117,56 @@ print log(1+exp(inf))
 inf
 \end{verbatim}
 
-Demek ki fonksiyon bir olasılık dağılımı olamaz, çünkü eğri altındaki alan
-sonsuz büyüklüğünde. Aslında bu fonksiyonun kümülatif dağılım fonksiyonu
-(cumulative distribution function -CDF-) özellikleri vardır, yani kendisi değil
-ama türevi bir olasılık fonksiyonu olarak kullanılabilir (bu konumuz
-dışında). Her neyse, sigmoid'in bir CDF gibi hareket ettiğini $g$'nin 0 ile 1
-arasında olmasından da anlıyoruz, sonuçta CDF alan demektir (yoğunluğun
-entegrali) ve en üst değeri 1 demektir, ki bu CDF tanımına uygundur.
+Demek ki fonksiyon bir olasÄ±lÄ±k daÄŸÄ±lÄ±mÄ± olamaz, Ã§Ã¼nkÃ¼ eÄŸri altÄ±ndaki alan
+sonsuz bÃ¼yÃ¼klÃ¼ÄŸÃ¼nde. AslÄ±nda bu fonksiyonun kÃ¼mÃ¼latif daÄŸÄ±lÄ±m fonksiyonu
+(cumulative distribution function -CDF-) Ã¶zellikleri vardÄ±r, yani kendisi deÄŸil
+ama tÃ¼revi bir olasÄ±lÄ±k fonksiyonu olarak kullanÄ±labilir (bu konumuz
+dÄ±ÅŸÄ±nda). Her neyse, sigmoid'in bir CDF gibi hareket ettiÄŸini $g$'nin 0 ile 1
+arasÄ±nda olmasÄ±ndan da anlÄ±yoruz, sonuÃ§ta CDF alan demektir (yoÄŸunluÄŸun
+entegrali) ve en Ã¼st deÄŸeri 1 demektir, ki bu CDF tanÄ±mÄ±na uygundur.
 
-Şimdi elimizde olabilecek $k$ tane değişken ve bu değişkenlerin bilinmeyen
-katsayıları için 0 ve 1'e eşlenecek bir regresyon oluşturalım. Diyelim ki
-katsayılar $\theta_0,..,\theta_k$. Bu katsayıları değişkenler ile çarpıp
-toplayarak $h(x)$'e verelim, (0/1) çıkıp çıkmayacağı katsayılara bağlı
-olacak, verideki etiketler ile $h(x)$ sonucu arasında bir bağlantı
-kurabilirsek, bu bize katsayıları verebilir. Bu modele göre eğer
-$\theta$'yi ne kadar iyi seçersek, eldeki veri etiketlerine o kadar
-yaklaşmış olacağız. Şimdi sigmoid'i katsayılarla beraber yazalım,
+Åimdi elimizde olabilecek $k$ tane deÄŸiÅŸken ve bu deÄŸiÅŸkenlerin bilinmeyen
+katsayÄ±larÄ± iÃ§in 0 ve 1'e eÅŸlenecek bir regresyon oluÅŸturalÄ±m. Diyelim ki
+katsayÄ±lar $\theta_0,..,\theta_k$. Bu katsayÄ±larÄ± deÄŸiÅŸkenler ile Ã§arpÄ±p
+toplayarak $h(x)$'e verelim, (0/1) Ã§Ä±kÄ±p Ã§Ä±kmayacaÄŸÄ± katsayÄ±lara baÄŸlÄ±
+olacak, verideki etiketler ile $h(x)$ sonucu arasÄ±nda bir baÄŸlantÄ±
+kurabilirsek, bu bize katsayÄ±larÄ± verebilir. Bu modele gÃ¶re eÄŸer
+$\theta$'yi ne kadar iyi seÃ§ersek, eldeki veri etiketlerine o kadar
+yaklaÅŸmÄ±ÅŸ olacaÄŸÄ±z. Åimdi sigmoid'i katsayÄ±larla beraber yazalÄ±m,
 
 $$ h_\theta(x) = g(\theta^T x) = \frac{1}{1+e^{-\theta^T x}} $$
 
-"Veriye olabildiğince yaklaşmak için en iyi $\alpha$'yi bulmak" sözü bize
-maksimum olurluk (maximum likelihood) hesabını hatırlatmalı. Bu hesaba göre
-içinde bilinmeyen $\alpha$'yi barındıran formülün üzerinden tüm verinin
-sonuçlarının teker teker birbiri ile çarpımı olabildiğince büyük olmalıdır. Bu
-ifadeyi maksimize edecek $\alpha$ veriye en uygun $\alpha$ olacaktır.
+"Veriye olabildiÄŸince yaklaÅŸmak iÃ§in en iyi $\alpha$'yi bulmak" sÃ¶zÃ¼ bize
+maksimum olurluk (maximum likelihood) hesabÄ±nÄ± hatÄ±rlatmalÄ±. Bu hesaba gÃ¶re
+iÃ§inde bilinmeyen $\alpha$'yi barÄ±ndÄ±ran formÃ¼lÃ¼n Ã¼zerinden tÃ¼m verinin
+sonuÃ§larÄ±nÄ±n teker teker birbiri ile Ã§arpÄ±mÄ± olabildiÄŸince bÃ¼yÃ¼k olmalÄ±dÄ±r. Bu
+ifadeyi maksimize edecek $\alpha$ veriye en uygun $\alpha$ olacaktÄ±r.
 
-Şimdi her iki etiket için ve sigmoid'i kullanarak olasılık hesaplarını
-yapalım,
+Åimdi her iki etiket iÃ§in ve sigmoid'i kullanarak olasÄ±lÄ±k hesaplarÄ±nÄ±
+yapalÄ±m,
 
 $$ P(y=1 | x;\theta) = h_\theta(x) $$
 
 $$ P(y=0 | x;\theta) = 1 - h_\theta(x) $$
 
-Not: Olasılık değerleri (büyük $P(\cdot)$ ile) ve CDF fonksiyonları olurluk
-hesabında kullanılabilir. $P(\cdot)$ ile CDF bağlantısı var, $P(X<x)$ gibi
-kümülatif alansal hesapların CDF üzerinden gerçekleştirilebildiğini
-hatırlayalım.
+Not: OlasÄ±lÄ±k deÄŸerleri (bÃ¼yÃ¼k $P(\cdot)$ ile) ve CDF fonksiyonlarÄ± olurluk
+hesabÄ±nda kullanÄ±labilir. $P(\cdot)$ ile CDF baÄŸlantÄ±sÄ± var, $P(X<x)$ gibi
+kÃ¼mÃ¼latif alansal hesaplarÄ±n CDF Ã¼zerinden gerÃ§ekleÅŸtirilebildiÄŸini
+hatÄ±rlayalÄ±m.
 
-Devam edelim, hepsi bir arada olacak şekilde yanyana koyarsak ve sonuca, $y$'yi
-doğru tahmin edip etmediğimizin ölçümünü de eklersek,
+Devam edelim, hepsi bir arada olacak ÅŸekilde yanyana koyarsak ve sonuca, $y$'yi
+doÄŸru tahmin edip etmediÄŸimizin Ã¶lÃ§Ã¼mÃ¼nÃ¼ de eklersek,
 
 $$p(y | x;\theta) = (h_\theta(x))^y (1-h_\theta(x))^{1-y}$$
 
-Olurluk için tüm veri noktalarını teker teker bu fonksiyona geçip sonuçlarını
-çarpacağız (ve verilerin birinden bağımsız olarak üretildiğini farzediyoruz),
-eğer $m$ tane veri noktası var ise
+Olurluk iÃ§in tÃ¼m veri noktalarÄ±nÄ± teker teker bu fonksiyona geÃ§ip sonuÃ§larÄ±nÄ±
+Ã§arpacaÄŸÄ±z (ve verilerin birinden baÄŸÄ±msÄ±z olarak Ã¼retildiÄŸini farzediyoruz),
+eÄŸer $m$ tane veri noktasÄ± var ise
 
 $$ L(\theta) = \prod_{i=1}^{m} (h_\theta(x^i))^{y^i}
 (1-h_\theta(x^i))^{1-{y^i}}$$
 
-Eğer log'unu alırsak çarpımlar toplama dönüşür, işimiz daha rahatlaşır,
+EÄŸer log'unu alÄ±rsak Ã§arpÄ±mlar toplama dÃ¶nÃ¼ÅŸÃ¼r, iÅŸimiz daha rahatlaÅŸÄ±r,
 
 $$ l(\theta) = \log L(\theta) $$
 
@@ -175,21 +175,21 @@ $$ = \sum_{i=1}^{m}
      (1-{y^i}) \log( (1-h_\theta(x^i)) )
 $$
 
-İşte bu ifadenin maksimize edilmesi gerekiyor.
+Ä°ÅŸte bu ifadenin maksimize edilmesi gerekiyor.
 
-Ama daha fazla ilerlemeden önce bir eşitlik ve bir türev göstermemiz
-gerekiyor.  Önce eşitlik
+Ama daha fazla ilerlemeden Ã¶nce bir eÅŸitlik ve bir tÃ¼rev gÃ¶stermemiz
+gerekiyor.  Ã–nce eÅŸitlik
 
 $$ 1-g(z) = g(-z) $$
 
-İspat
+Ä°spat
 
 $$ 1-\frac{1}{1+e^{-z}}  = \frac{1+e^{-z}-1}{1+e^{-z}}$$
 
 $$ \frac{e^{-z}}{1+e^{-z}} = \frac{1}{1+e^{z}}$$
 
-Hakikaten son eşitliğin sağ tarafına bakarsak, $g(-z)$'yi elde ettiğimizi
-görüyoruz. Şimdi türeve gelelim,
+Hakikaten son eÅŸitliÄŸin saÄŸ tarafÄ±na bakarsak, $g(-z)$'yi elde ettiÄŸimizi
+gÃ¶rÃ¼yoruz. Åimdi tÃ¼reve gelelim,
 
 $$
 g'(z) = \frac{d}{dz} \frac{ 1}{1+ e^{ -z}} 
@@ -201,12 +201,12 @@ $$
 = \frac{1}{(1+ e^{-z})^2} (e^{-z}) 
 $$
 
-$e^{ -z}$ türevinden bir eksi işareti geleceğini beklemiş olabiliriz, fakat
-hatırlanacağı üzere
+$e^{ -z}$ tÃ¼revinden bir eksi iÅŸareti geleceÄŸini beklemiÅŸ olabiliriz, fakat
+hatÄ±rlanacaÄŸÄ± Ã¼zere
 
 $$\frac{d}{dx} \frac{ 1}{1+x}  = \frac{-1}{(1+x)^2}$$
 
-Yani eksiler birbirini yoketti. Şimdi iki üstteki denklemin sağ tarafını açalım
+Yani eksiler birbirini yoketti. Åimdi iki Ã¼stteki denklemin saÄŸ tarafÄ±nÄ± aÃ§alÄ±m
 
 $$
  = \frac{1}{1+e^{-z}} \frac{e^{-z}}{1+e^{-z}}
@@ -216,27 +216,27 @@ $$
  = \frac{1}{1+e^{-z}} \frac{1}{1+e^{z}}
  $$
 
-Çarpımda iki bölüm var, bölümler $g(z)$ ve $g(-z)$ olarak temsil edilebilir, ya
+Ã‡arpÄ±mda iki bÃ¶lÃ¼m var, bÃ¶lÃ¼mler $g(z)$ ve $g(-z)$ olarak temsil edilebilir, ya
 da $g(z)$ ve $1-g(z)$,
 
 $$
  = g(z)(1-g(z))
 $$
 
-Bu bağlamda ilginç bir diğer denklem log şansı (log odds) denklemidir. Eğer ilk
-baştaki denklemi düşünürsek,
+Bu baÄŸlamda ilginÃ§ bir diÄŸer denklem log ÅŸansÄ± (log odds) denklemidir. EÄŸer ilk
+baÅŸtaki denklemi dÃ¼ÅŸÃ¼nÃ¼rsek,
 
 $$ p = P(y=1|x;\theta) = g(z) = \frac{e^{z}}{1+e^{z}}  $$
 
-Bu denklem 1 olma olasılığını hesaplıyor. Temiz bir denklem log şansı olabilir
-ki bu denklem olma olasılığını olmama olasılığına böler ve log alır.
+Bu denklem 1 olma olasÄ±lÄ±ÄŸÄ±nÄ± hesaplÄ±yor. Temiz bir denklem log ÅŸansÄ± olabilir
+ki bu denklem olma olasÄ±lÄ±ÄŸÄ±nÄ± olmama olasÄ±lÄ±ÄŸÄ±na bÃ¶ler ve log alÄ±r.
 
 $$ \log \bigg( \frac{p}{1-p} \bigg)$$
 
-olarak gösterilir. Şimdi biraz daha cambazlık, $1 - g(z) = g(-z)$ demiştik, ve
-$g(-z)$'nin de ne olduğunu biliyoruz $\frac{1}{1+e^{z}}$, log şansını bu şekilde
-yazalım, $\frac{1}{1+e^{z}}$ ile bölelim daha doğrusu $1+e^{z}$ ile çarpalım ve
-log alalım,
+olarak gÃ¶sterilir. Åimdi biraz daha cambazlÄ±k, $1 - g(z) = g(-z)$ demiÅŸtik, ve
+$g(-z)$'nin de ne olduÄŸunu biliyoruz $\frac{1}{1+e^{z}}$, log ÅŸansÄ±nÄ± bu ÅŸekilde
+yazalÄ±m, $\frac{1}{1+e^{z}}$ ile bÃ¶lelim daha doÄŸrusu $1+e^{z}$ ile Ã§arpalÄ±m ve
+log alalÄ±m,
 
 $$ 
 \log \bigg( \frac{e^{z}}{1+e^{z}} (1+e^{z})  \bigg) 
@@ -244,40 +244,40 @@ $$
 = z = \theta^Tx
 $$
 
-Artık olurluk denklemine dönebiliriz. Olurluğu nasıl maksimize ederiz?  Gradyan
-çıkışı (gradient ascent) kullanılabilir. Eğer olurluk $l(\theta)$'nin en
-maksimal olduğu noktadaki $\theta$'yi bulmak istiyorsak (dikkat sadece olurluğun
-en maksimal noktasını aramıyoruz, o noktadaki $\theta$'yi arıyoruz), o zaman bir
-$\theta$ ile başlarız, ve adım adım $\theta$'yi maksimal olana doğru
-yaklaştırırız. Formül
+ArtÄ±k olurluk denklemine dÃ¶nebiliriz. OlurluÄŸu nasÄ±l maksimize ederiz?  Gradyan
+Ã§Ä±kÄ±ÅŸÄ± (gradient ascent) kullanÄ±labilir. EÄŸer olurluk $l(\theta)$'nin en
+maksimal olduÄŸu noktadaki $\theta$'yi bulmak istiyorsak (dikkat sadece olurluÄŸun
+en maksimal noktasÄ±nÄ± aramÄ±yoruz, o noktadaki $\theta$'yi arÄ±yoruz), o zaman bir
+$\theta$ ile baÅŸlarÄ±z, ve adÄ±m adÄ±m $\theta$'yi maksimal olana doÄŸru
+yaklaÅŸtÄ±rÄ±rÄ±z. FormÃ¼l
 
 $$ \theta_{yeni} = \theta_{eski} + \alpha \nabla_\theta l(\theta)$$
 
-Üstteki formül niye işler? Çünkü gradyan $\nabla_\theta l(\theta)$, yani
-$l(\theta)$'nin gradyanı her zaman fonksiyon artışının en fazla olduğu yönü
-gösterir. Demek ki o yöne adım atmak, yani $l(\theta)$'a verilen $\theta$'yi o
-yönde değiştirmek (değişim tabii ki $\theta$ bazında, $\theta$'nin değişimi),
-bizi fonksiyonun bir sonraki noktasına yaklaştıracaktır. Sabit $\alpha$ bir tek
-sayı sadece, atılan adımın (hangi yönde olursa olsun) ölçeğini azaltıp /
-arttırabilmek için dışarıdan eklenir. Adım yönü vektör, bu sabit bir tek
-sayı. Çarpımları vektörü azaltır ya da çoğaltır.
+Ãœstteki formÃ¼l niye iÅŸler? Ã‡Ã¼nkÃ¼ gradyan $\nabla_\theta l(\theta)$, yani
+$l(\theta)$'nin gradyanÄ± her zaman fonksiyon artÄ±ÅŸÄ±nÄ±n en fazla olduÄŸu yÃ¶nÃ¼
+gÃ¶sterir. Demek ki o yÃ¶ne adÄ±m atmak, yani $l(\theta)$'a verilen $\theta$'yi o
+yÃ¶nde deÄŸiÅŸtirmek (deÄŸiÅŸim tabii ki $\theta$ bazÄ±nda, $\theta$'nin deÄŸiÅŸimi),
+bizi fonksiyonun bir sonraki noktasÄ±na yaklaÅŸtÄ±racaktÄ±r. Sabit $\alpha$ bir tek
+sayÄ± sadece, atÄ±lan adÄ±mÄ±n (hangi yÃ¶nde olursa olsun) Ã¶lÃ§eÄŸini azaltÄ±p /
+arttÄ±rabilmek iÃ§in dÄ±ÅŸarÄ±dan eklenir. AdÄ±m yÃ¶nÃ¼ vektÃ¶r, bu sabit bir tek
+sayÄ±. Ã‡arpÄ±mlarÄ± vektÃ¶rÃ¼ azaltÄ±r ya da Ã§oÄŸaltÄ±r.
 
-Not: Bu şekilde azar azar sonuca yaklaşmaya uğraşmak tabii ki her fonksiyon için
-geçerli değildir, çünkü eğer fonksiyonda "yerel maksimumlar" var ise, gradyan
-çıkışı bu noktalarda takılıp kalabilir (o yerel tepelerde de birinci türev
-sıfırlanır, gradyanın kafası karışır). Gradyan metotunun kullanmadan önce
-fonksiyonumuzun tek (global) bir maksimumu olup olmadığını düşünmemiz
-gerekir. Fakat şanlıyız ki olurluk fonksiyonu tam da böyle bir fonksiyondur
-(şans değil tabii, bu özelliği sebebiyle seçildi). Fonksiyon içbükeydir
-(concave), yani tek bir tepe noktası vardır. Bir soru daha: olurluğun içbükey
-olduğunu nasıl anladık?  Fonksiyona bakarak pat diye bunu söylemek mümkün,
-değişkenlerde polinom bağlamında küpsel ve daha üstü seviyesinde üstellik yok,
-ayrıca $\log$, $\exp$ içbükeyliği bozmuyor.
+Not: Bu ÅŸekilde azar azar sonuca yaklaÅŸmaya uÄŸraÅŸmak tabii ki her fonksiyon iÃ§in
+geÃ§erli deÄŸildir, Ã§Ã¼nkÃ¼ eÄŸer fonksiyonda "yerel maksimumlar" var ise, gradyan
+Ã§Ä±kÄ±ÅŸÄ± bu noktalarda takÄ±lÄ±p kalabilir (o yerel tepelerde de birinci tÃ¼rev
+sÄ±fÄ±rlanÄ±r, gradyanÄ±n kafasÄ± karÄ±ÅŸÄ±r). Gradyan metotunun kullanmadan Ã¶nce
+fonksiyonumuzun tek (global) bir maksimumu olup olmadÄ±ÄŸÄ±nÄ± dÃ¼ÅŸÃ¼nmemiz
+gerekir. Fakat ÅŸanlÄ±yÄ±z ki olurluk fonksiyonu tam da bÃ¶yle bir fonksiyondur
+(ÅŸans deÄŸil tabii, bu Ã¶zelliÄŸi sebebiyle seÃ§ildi). Fonksiyon iÃ§bÃ¼keydir
+(concave), yani tek bir tepe noktasÄ± vardÄ±r. Bir soru daha: olurluÄŸun iÃ§bÃ¼key
+olduÄŸunu nasÄ±l anladÄ±k?  Fonksiyona bakarak pat diye bunu sÃ¶ylemek mÃ¼mkÃ¼n,
+deÄŸiÅŸkenlerde polinom baÄŸlamÄ±nda kÃ¼psel ve daha Ã¼stÃ¼ seviyesinde Ã¼stellik yok,
+ayrÄ±ca $\log$, $\exp$ iÃ§bÃ¼keyliÄŸi bozmuyor.
 
 Simdi $\nabla_\theta l(\theta)$ turetmemiz gerekiyor.
 
-Eğer tek bir $\frac{\partial l(\theta)}{\partial \theta_j}$'yi hesaplarsak ve
-bunu her $j$ için yaparsak, bu sonuçları bir vektörde üstüste koyunca
+EÄŸer tek bir $\frac{\partial l(\theta)}{\partial \theta_j}$'yi hesaplarsak ve
+bunu her $j$ iÃ§in yaparsak, bu sonuÃ§larÄ± bir vektÃ¶rde Ã¼stÃ¼ste koyunca
 $\nabla_\theta l(\theta)$'yi elde ederiz.
 
 $$ 
@@ -295,7 +295,7 @@ y  \frac{1}{g(\theta^Tx)}  -
 \frac{\partial }{\partial \theta_j}g(\theta^Tx)
 $$
 
-Şimdi en sağdaki kısmı açalım,
+Åimdi en saÄŸdaki kÄ±smÄ± aÃ§alÄ±m,
 
 $$ 
 \frac{\partial }{\partial \theta_j}g(\theta^Tx) 
@@ -303,21 +303,21 @@ $$
 = g'(\theta^Tx) x_j 
 $$
 
-$\frac{\partial }{\partial \theta_j} \theta^Tx$ nasıl $x_j$ haline geldi?  Çünkü
-tüm $\theta$ vektörünün kısmi türevini alıyoruz fakat o kısmi türev sadece tek
-bir $\theta_j$ için, o zaman vektördeki diğer tüm öğeler sıfır olacaktır, sadece
-$\theta_j$ 1 olacak, ona tekabül eden $x$ öğesi, yani $x_j$ ayakta kalabilecek,
-diğer $x$ öğelerinin hepsi sıfırla çarpılmış olacak.
+$\frac{\partial }{\partial \theta_j} \theta^Tx$ nasÄ±l $x_j$ haline geldi?  Ã‡Ã¼nkÃ¼
+tÃ¼m $\theta$ vektÃ¶rÃ¼nÃ¼n kÄ±smi tÃ¼revini alÄ±yoruz fakat o kÄ±smi tÃ¼rev sadece tek
+bir $\theta_j$ iÃ§in, o zaman vektÃ¶rdeki diÄŸer tÃ¼m Ã¶ÄŸeler sÄ±fÄ±r olacaktÄ±r, sadece
+$\theta_j$ 1 olacak, ona tekabÃ¼l eden $x$ Ã¶ÄŸesi, yani $x_j$ ayakta kalabilecek,
+diÄŸer $x$ Ã¶ÄŸelerinin hepsi sÄ±fÄ±rla Ã§arpÄ±lmÄ±ÅŸ olacak.
 
-Türevin kendisinden de kurtulabiliriz şimdi, daha önce gösterdiğimiz eşitliği
-devreye sokalım,
+TÃ¼revin kendisinden de kurtulabiliriz ÅŸimdi, daha Ã¶nce gÃ¶sterdiÄŸimiz eÅŸitliÄŸi
+devreye sokalÄ±m,
 
 $$ 
 = g(\theta^Tx)(1-g(\theta^Tx)) x_j 
 $$
 
-Bu son formülü 3 üstteki formülün sağ tarafına geri koyarsak, ve
-basitleştirirsek,
+Bu son formÃ¼lÃ¼ 3 Ã¼stteki formÃ¼lÃ¼n saÄŸ tarafÄ±na geri koyarsak, ve
+basitleÅŸtirirsek,
 
 $$
 \big(
@@ -325,7 +325,7 @@ y(1-g(\theta^Tx)) - (1-y)g(\theta^T x)
 \big) x_j
  $$
 
-Çarpımı daha temiz görmek için sadece $y,g$ harflerini kullanırsak,
+Ã‡arpÄ±mÄ± daha temiz gÃ¶rmek iÃ§in sadece $y,g$ harflerini kullanÄ±rsak,
 
 $$
 \big(y(1-g) - (1-y)g \big) x_j =
@@ -342,15 +342,15 @@ $$
 = (y - h_\theta(x))x_j
 $$
 
-İşte $\nabla_\theta l(\theta)$ için ne kullanacağımızı bulduk. O zaman
+Ä°ÅŸte $\nabla_\theta l(\theta)$ iÃ§in ne kullanacaÄŸÄ±mÄ±zÄ± bulduk. O zaman
 
 $$ \theta_{yeni} = \theta_{eski} + \alpha (y - h_\theta(x))x_j $$
 
-Her $i$ veri noktası için
+Her $i$ veri noktasÄ± iÃ§in
 
 $$ \theta_{yeni} = \theta_{eski} + \alpha (y^{i} - h_\theta(x^{i}))x^{i}_j $$
 
-Kodu işletelim,
+Kodu iÅŸletelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def grad_ascent(data_mat, label_mat):
@@ -393,23 +393,23 @@ plt.savefig('stat_logit_03.png')
 
 \includegraphics[height=6cm]{stat_logit_03.png}
 
-Üstteki kod bir döngü içinde belli bir $x$ noktasından başlayarak gradyan inişi
-yaptı ve optimal $\theta$ değerlerini, yani regresyon ağırlıklarını (weights)
-hesapladı. Sonra bu ağırlıkları bir ayraç olarak üstte grafikledi.  Ayracın
-oldukça iyi değerler bulduğu belli oluyor.
+Ãœstteki kod bir dÃ¶ngÃ¼ iÃ§inde belli bir $x$ noktasÄ±ndan baÅŸlayarak gradyan iniÅŸi
+yaptÄ± ve optimal $\theta$ deÄŸerlerini, yani regresyon aÄŸÄ±rlÄ±klarÄ±nÄ± (weights)
+hesapladÄ±. Sonra bu aÄŸÄ±rlÄ±klarÄ± bir ayraÃ§ olarak Ã¼stte grafikledi.  AyracÄ±n
+oldukÃ§a iyi deÄŸerler bulduÄŸu belli oluyor.
 
-Rasgele Gradyan Çıkışı (Stochastic Gradient Ascent)
+Rasgele Gradyan Ã‡Ä±kÄ±ÅŸÄ± (Stochastic Gradient Ascent)
 
-Acaba $\theta$'yi güncellerken daha az veri kullanmak mümkün mü? Yani yön hesabı
-için sürekli tüm veriyi kullanmasak olmaz mı?
+Acaba $\theta$'yi gÃ¼ncellerken daha az veri kullanmak mÃ¼mkÃ¼n mÃ¼? Yani yÃ¶n hesabÄ±
+iÃ§in sÃ¼rekli tÃ¼m veriyi kullanmasak olmaz mÄ±?
 
-Olabilir. Güncellemeyi sadece tek bir veri noktası kullanarak yapabiliriz. Yine
-gradyanı değiştirmiş oluruz, sadece azar azar değişim olur, fakat belki de bu
-şekilde sonuca daha çabuk ulaşmak mümkün olacaktır.
+Olabilir. GÃ¼ncellemeyi sadece tek bir veri noktasÄ± kullanarak yapabiliriz. Yine
+gradyanÄ± deÄŸiÅŸtirmiÅŸ oluruz, sadece azar azar deÄŸiÅŸim olur, fakat belki de bu
+ÅŸekilde sonuca daha Ã§abuk ulaÅŸmak mÃ¼mkÃ¼n olacaktÄ±r.
 
-Kodlama açısından, $\theta$ güncellemesi için bulduğumuz formülü tek nokta
-bazında da vermiştik.  O zaman o tek noktayı sırayla alıp güncellersek, otomatik
-olarak yeni bir şekilde gradyan çıkışı yapmış oluruz.
+Kodlama aÃ§Ä±sÄ±ndan, $\theta$ gÃ¼ncellemesi iÃ§in bulduÄŸumuz formÃ¼lÃ¼ tek nokta
+bazÄ±nda da vermiÅŸtik.  O zaman o tek noktayÄ± sÄ±rayla alÄ±p gÃ¼ncellersek, otomatik
+olarak yeni bir ÅŸekilde gradyan Ã§Ä±kÄ±ÅŸÄ± yapmÄ±ÅŸ oluruz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def stoc_grad_ascent0(data_mat, label_mat):
@@ -439,15 +439,15 @@ plt.savefig('stat_logit_04.png')
 
 \includegraphics[height=6cm]{stat_logit_04.png}
 
-Neredeyse işimiz tamamlandı. Üstteki grafik pek iyi bir ayraç göstermedi.  Niye?
-Problem çok fazla salınım (oscillation) var, yani değerler çok fazla uç noktalar
-arasında gidip geliyor. Ayrıca veri noktalarını sırayla işliyoruz, veri tabii ki
-rasgele bir şekilde sıralanmış olabilir, ama sıralanmamışsa, o zaman algoritmaya
-raslantısal noktaları vermek için kod içinde zar atmamız lazım. Metotun ismi
-"rasgele (stochastic)" gradyan çıkışı, bu rasgelelik önemli. 2. problemi
-düzeltmek için yapılacak belli, 1. problem için $\alpha$ değeri her döngüde
-belli oranda küçültülerek (yani $\alpha$ artık sabit değil) sonuca yaklaşırken
-oradan buraya savrulmasını engellemiş olacağız. Yeni kod altta,
+Neredeyse iÅŸimiz tamamlandÄ±. Ãœstteki grafik pek iyi bir ayraÃ§ gÃ¶stermedi.  Niye?
+Problem Ã§ok fazla salÄ±nÄ±m (oscillation) var, yani deÄŸerler Ã§ok fazla uÃ§ noktalar
+arasÄ±nda gidip geliyor. AyrÄ±ca veri noktalarÄ±nÄ± sÄ±rayla iÅŸliyoruz, veri tabii ki
+rasgele bir ÅŸekilde sÄ±ralanmÄ±ÅŸ olabilir, ama sÄ±ralanmamÄ±ÅŸsa, o zaman algoritmaya
+raslantÄ±sal noktalarÄ± vermek iÃ§in kod iÃ§inde zar atmamÄ±z lazÄ±m. Metotun ismi
+"rasgele (stochastic)" gradyan Ã§Ä±kÄ±ÅŸÄ±, bu rasgelelik Ã¶nemli. 2. problemi
+dÃ¼zeltmek iÃ§in yapÄ±lacak belli, 1. problem iÃ§in $\alpha$ deÄŸeri her dÃ¶ngÃ¼de
+belli oranda kÃ¼Ã§Ã¼ltÃ¼lerek (yani $\alpha$ artÄ±k sabit deÄŸil) sonuca yaklaÅŸÄ±rken
+oradan buraya savrulmasÄ±nÄ± engellemiÅŸ olacaÄŸÄ±z. Yeni kod altta,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def stoc_grad_ascent1(data_mat, label_mat):
@@ -482,15 +482,15 @@ plt.savefig('stat_logit_05.png')
 
 \includegraphics[height=6cm]{stat_logit_05.png}
 
-Sonuç çok iyi, ayrıca daha az işlemle bu noktaya eriştik, yani daha az işlem ve
-daha hızlı bir şekilde sonuca ulaşmış olduk.
+SonuÃ§ Ã§ok iyi, ayrÄ±ca daha az iÅŸlemle bu noktaya eriÅŸtik, yani daha az iÅŸlem ve
+daha hÄ±zlÄ± bir ÅŸekilde sonuca ulaÅŸmÄ±ÅŸ olduk.
 
 Tahmin (Prediction)
 
-Elde edilen ağırlıkları tahmin için nasıl kullanırız? Bu ağırlıkları alıp, yeni
-veri noktası ile çarpıp sonuçları sigmoid'den geçirdiğimiz zaman bu noktanın "1
-etiketi olma olasılığını" hesaplamış olacağız. Örnek (diyelim ki mevcut veri
-noktası içinden bir veriyi, -mesela 15. nokta- sanki yeniymiş gibi seçtik)
+Elde edilen aÄŸÄ±rlÄ±klarÄ± tahmin iÃ§in nasÄ±l kullanÄ±rÄ±z? Bu aÄŸÄ±rlÄ±klarÄ± alÄ±p, yeni
+veri noktasÄ± ile Ã§arpÄ±p sonuÃ§larÄ± sigmoid'den geÃ§irdiÄŸimiz zaman bu noktanÄ±n "1
+etiketi olma olasÄ±lÄ±ÄŸÄ±nÄ±" hesaplamÄ±ÅŸ olacaÄŸÄ±z. Ã–rnek (diyelim ki mevcut veri
+noktasÄ± iÃ§inden bir veriyi, -mesela 15. nokta- sanki yeniymiÅŸ gibi seÃ§tik)
 
 \begin{minted}[fontsize=\footnotesize]{python}
 pt = df.ix[15,['intercept','x','y']]
@@ -502,27 +502,27 @@ print 'label =',labels[15]
 [ 0.99999653] label = 1
 \end{verbatim}
 
-Oldukça yüksek bir olasılık çıktı, ve hakikaten de o noktanın gerçek değeri 1
-imiş.
+OldukÃ§a yÃ¼ksek bir olasÄ±lÄ±k Ã§Ä±ktÄ±, ve hakikaten de o noktanÄ±n gerÃ§ek deÄŸeri 1
+imiÅŸ.
 
 Logit
 
-İstatistik kaynaklarında genellikle ``logit'' adlı bir regresyon türünden
-bahsedildiğini görebilirsiniz, burada aslında lojistik regresyondan
-bahsediliyor, ki bu konuyu [10] yazısında bulabiliriz. Ama istatistik
-literatüründe (yapay öğrenim literatüründen farklı olarak), terminoloji
-biraz kafa karıştırıcı olabiliyor. Lojistik regresyon yazısında odağımız
+Ä°statistik kaynaklarÄ±nda genellikle ``logit'' adlÄ± bir regresyon tÃ¼rÃ¼nden
+bahsedildiÄŸini gÃ¶rebilirsiniz, burada aslÄ±nda lojistik regresyondan
+bahsediliyor, ki bu konuyu [10] yazÄ±sÄ±nda bulabiliriz. Ama istatistik
+literatÃ¼rÃ¼nde (yapay Ã¶ÄŸrenim literatÃ¼rÃ¼nden farklÄ± olarak), terminoloji
+biraz kafa karÄ±ÅŸtÄ±rÄ±cÄ± olabiliyor. Lojistik regresyon yazÄ±sÄ±nda odaÄŸÄ±mÄ±z
 sigmoid fonksiyonuydu, peki logit nereden geliyor?  Logit,
 
 $$ logit(x) = \log ( x/(1-x) ) $$
 
-fonksiyonudur, ve bu fonksiyon (0,1) arasındaki bir sayıyı $-\infty,\infty$
-arasına eşler (map). Fonksiyona verilen $x$ bir olasılık, ve bu olasılık, bir
-olayın (event) olma / olmama {\em oranlarının} $\log$'una dönüşüyor. Ki bu
-fonksiyona ``log ihtimali (log odds)'' ismi de veriliyor. Hatırlamanın kolay bir
-yolu belki de logit, ``bir şeyi logla'' çağrışımı yapıyor, sonra ``neyi
-logluyoruz?'' diye düşünürüz, cevap bir olasılığı, daha detaylı olarak olma /
-olmama oranını.
+fonksiyonudur, ve bu fonksiyon (0,1) arasÄ±ndaki bir sayÄ±yÄ± $-\infty,\infty$
+arasÄ±na eÅŸler (map). Fonksiyona verilen $x$ bir olasÄ±lÄ±k, ve bu olasÄ±lÄ±k, bir
+olayÄ±n (event) olma / olmama {\em oranlarÄ±nÄ±n} $\log$'una dÃ¶nÃ¼ÅŸÃ¼yor. Ki bu
+fonksiyona ``log ihtimali (log odds)'' ismi de veriliyor. HatÄ±rlamanÄ±n kolay bir
+yolu belki de logit, ``bir ÅŸeyi logla'' Ã§aÄŸrÄ±ÅŸÄ±mÄ± yapÄ±yor, sonra ``neyi
+logluyoruz?'' diye dÃ¼ÅŸÃ¼nÃ¼rÃ¼z, cevap bir olasÄ±lÄ±ÄŸÄ±, daha detaylÄ± olarak olma /
+olmama oranÄ±nÄ±.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def logit(p): return np.log(p/(1-p))
@@ -539,10 +539,10 @@ p = 0.99999; print logit(p)
 11.5129154649
 \end{verbatim}
 
-Sigmoid bunun tam tersidir, $-\infty,\infty$ arasındaki bir değeri (0,1) arasına
-eşler, ki lojistik regresyon katsayılarından bir olasılık üretmek istiyorsak,
-sigmoid lazım. Bu ters gidişi ispatlamak kolay, ki bu ``ters yönde'' harekete
-$logit^{-1}$ ismi de veriliyor, ters yöne doğru gidelim,
+Sigmoid bunun tam tersidir, $-\infty,\infty$ arasÄ±ndaki bir deÄŸeri (0,1) arasÄ±na
+eÅŸler, ki lojistik regresyon katsayÄ±larÄ±ndan bir olasÄ±lÄ±k Ã¼retmek istiyorsak,
+sigmoid lazÄ±m. Bu ters gidiÅŸi ispatlamak kolay, ki bu ``ters yÃ¶nde'' harekete
+$logit^{-1}$ ismi de veriliyor, ters yÃ¶ne doÄŸru gidelim,
 
 $$ 
 \mlabel{1}
@@ -565,11 +565,11 @@ Lojistik regresyon modeli
 
 $$ Pr(y_i=1) = logit^{-1}(X_i\beta) $$
 
-ki her $X_i$ bir vektördür, veri noktalarımız $X_i,y_i$ olarak eşli olarak
-gelir. Diyelim ki elimizde 1992'de ABD seçimlerinde oy vermiş insanların gelir
-seviyesi (income) ve kime oy (vote) verdikleri var. Bush'a verilmiş oyu 1
-verilmemişi 0 olarak işaretlersek, bu problemi lojistik regresyon problemine
-çevirebiliriz,
+ki her $X_i$ bir vektÃ¶rdÃ¼r, veri noktalarÄ±mÄ±z $X_i,y_i$ olarak eÅŸli olarak
+gelir. Diyelim ki elimizde 1992'de ABD seÃ§imlerinde oy vermiÅŸ insanlarÄ±n gelir
+seviyesi (income) ve kime oy (vote) verdikleri var. Bush'a verilmiÅŸ oyu 1
+verilmemiÅŸi 0 olarak iÅŸaretlersek, bu problemi lojistik regresyon problemine
+Ã§evirebiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -628,61 +628,61 @@ $$
 \mlabel{2}
 Pr(y_i=1) = logit^{-1}(\alpha + \beta x)  $$
 
-Üstteki katsayı değerlerini baz alarak, 
+Ãœstteki katsayÄ± deÄŸerlerini baz alarak, 
 
 $$ Pr(y_i = 1) = logit^{-1}(-1.38 + 0.32 \cdot income) $$
 
-Katsayıları irdelemenin iyi bir yolu şudur. Logit tersinden kurtulmak
-istiyorsak, (1)'e deki formülü (2)'ye uygularız, iki tarafın logit'ini alırız,
-sağ taraftaki ters logit kaybolur,
+KatsayÄ±larÄ± irdelemenin iyi bir yolu ÅŸudur. Logit tersinden kurtulmak
+istiyorsak, (1)'e deki formÃ¼lÃ¼ (2)'ye uygularÄ±z, iki tarafÄ±n logit'ini alÄ±rÄ±z,
+saÄŸ taraftaki ters logit kaybolur,
 
 $$ \log \bigg( \frac{Pr(y=1)}{Pr(y=0)} \bigg) = \alpha + \beta x$$
 
-Bu formülün sağ tarafına göre, $x$'e 1 eklemek demek, $\beta (1+x) = \beta x +
-\beta \cdot 1 = \beta x + \beta$, formüle bir bakıma $\beta$ eklemek
-demektir. Bunu bir tarafa koyalım, şimdi üstteki formülün iki tarafının
-$\exp$'sini alalım,
+Bu formÃ¼lÃ¼n saÄŸ tarafÄ±na gÃ¶re, $x$'e 1 eklemek demek, $\beta (1+x) = \beta x +
+\beta \cdot 1 = \beta x + \beta$, formÃ¼le bir bakÄ±ma $\beta$ eklemek
+demektir. Bunu bir tarafa koyalÄ±m, ÅŸimdi Ã¼stteki formÃ¼lÃ¼n iki tarafÄ±nÄ±n
+$\exp$'sini alalÄ±m,
 
 $$ \frac{Pr(y=1)}{Pr(y=0)} = \exp(\alpha + \beta x)$$
 
-Şimdi $\exp$ içindeki $x$'e 1 eklersek, $\exp(\alpha + \beta x + \beta)$ olur,
-bu da $\exp(\alpha)\exp(\beta x ) \exp (\beta)$ demektir, o zaman iki tarafı da
-dengelemek için her iki tarafı da $\exp(\beta)$ ile çarpmak lazım,
+Åimdi $\exp$ iÃ§indeki $x$'e 1 eklersek, $\exp(\alpha + \beta x + \beta)$ olur,
+bu da $\exp(\alpha)\exp(\beta x ) \exp (\beta)$ demektir, o zaman iki tarafÄ± da
+dengelemek iÃ§in her iki tarafÄ± da $\exp(\beta)$ ile Ã§arpmak lazÄ±m,
 
 $$ 
 \frac{Pr(y=1)}{Pr(y=0)}\exp(\beta) = \exp(\alpha + \beta x + \beta) = 
 \exp(\alpha)\exp(\beta x ) \exp (\beta)
 $$
 
-O zaman, $x$'deki bir birimlik değişimin, olma / olmama oranı olan ihtimal
-(odds) üzerindeki etkisini hesaplamak istiyorsak, incelediğimiz değişkenin
-katsayısını alıp mesela $\beta = 0.3$, onun $\exp$'sini hesaplarız, $\exp(0.32)
-= 1.37$, ve bu değerin üstteki eşitliğin sol tarafını da çarpacağı bilgisinden
-hareketle, ihtimalin o kadar artacak olduğunu rapor edebiliriz. Yani $\beta =
-0.3$ için bu artış 1.37 katıdır. Yani gelirde 1 birimlik bir artış (ki gelir
-veride 1,2,3,4 gibi sayısal aralıklar olarak gösterilmiş) Bush'a oy verme
-şansının 1.37 kat arttırıyor. Bu aslında mantıklı, ABD'de Cumhuriyetçiler
+O zaman, $x$'deki bir birimlik deÄŸiÅŸimin, olma / olmama oranÄ± olan ihtimal
+(odds) Ã¼zerindeki etkisini hesaplamak istiyorsak, incelediÄŸimiz deÄŸiÅŸkenin
+katsayÄ±sÄ±nÄ± alÄ±p mesela $\beta = 0.3$, onun $\exp$'sini hesaplarÄ±z, $\exp(0.32)
+= 1.37$, ve bu deÄŸerin Ã¼stteki eÅŸitliÄŸin sol tarafÄ±nÄ± da Ã§arpacaÄŸÄ± bilgisinden
+hareketle, ihtimalin o kadar artacak olduÄŸunu rapor edebiliriz. Yani $\beta =
+0.3$ iÃ§in bu artÄ±ÅŸ 1.37 katÄ±dÄ±r. Yani gelirde 1 birimlik bir artÄ±ÅŸ (ki gelir
+veride 1,2,3,4 gibi sayÄ±sal aralÄ±klar olarak gÃ¶sterilmiÅŸ) Bush'a oy verme
+ÅŸansÄ±nÄ±n 1.37 kat arttÄ±rÄ±yor. Bu aslÄ±nda mantÄ±klÄ±, ABD'de CumhuriyetÃ§iler
 ``zenginlerin partisi'' olarak biliniyor.
 
-İhtimal oranları (odds ratio) ile düşünmek için bazı örnekler, ihtimal oranı 1,
-olasılıkların 0.5 olması demektir, yani her iki ihtimal de eşit
-ağırlıktadır. İhtimal oranı 0.5, ya da 2.0 (1/3,2/3) olasılıklarına tekabül
-eder, formülü hatırlayalım, $p / (1-p)$.
+Ä°htimal oranlarÄ± (odds ratio) ile dÃ¼ÅŸÃ¼nmek iÃ§in bazÄ± Ã¶rnekler, ihtimal oranÄ± 1,
+olasÄ±lÄ±klarÄ±n 0.5 olmasÄ± demektir, yani her iki ihtimal de eÅŸit
+aÄŸÄ±rlÄ±ktadÄ±r. Ä°htimal oranÄ± 0.5, ya da 2.0 (1/3,2/3) olasÄ±lÄ±klarÄ±na tekabÃ¼l
+eder, formÃ¼lÃ¼ hatÄ±rlayalÄ±m, $p / (1-p)$.
 
-Katsayıları İrdelemek
+KatsayÄ±larÄ± Ä°rdelemek
 
-Eğer bir katsayı değerinin sıfırdan uzaklığı Std. Hatanın (Error) iki katından
-fazla ise katsayı istatistiki olarak anlamlı / değerli (significant) demektir ve
-kullanılabilir. Tabii burada biraz daha ek irdeleme gerekebilir; mesela
-kişilerin arabalarının beygir gücünü kazandıkları maaşa bağlayan bir regresyon,
-beygir gücü katsayısı için beygir başına 10 Eur ve std. hata 2 Eur vermişse bu
-istatistiki olarak önemli, ama pratikte önemsizdir. Benzer şekilde eğer beygir
-katsayısı için 10,000 Eur ve std. hata 10,000 Eur bulmuşsak, bu istatistiki
-olarak önemsiz, ama pratikte önemlidir.
+EÄŸer bir katsayÄ± deÄŸerinin sÄ±fÄ±rdan uzaklÄ±ÄŸÄ± Std. HatanÄ±n (Error) iki katÄ±ndan
+fazla ise katsayÄ± istatistiki olarak anlamlÄ± / deÄŸerli (significant) demektir ve
+kullanÄ±labilir. Tabii burada biraz daha ek irdeleme gerekebilir; mesela
+kiÅŸilerin arabalarÄ±nÄ±n beygir gÃ¼cÃ¼nÃ¼ kazandÄ±klarÄ± maaÅŸa baÄŸlayan bir regresyon,
+beygir gÃ¼cÃ¼ katsayÄ±sÄ± iÃ§in beygir baÅŸÄ±na 10 Eur ve std. hata 2 Eur vermiÅŸse bu
+istatistiki olarak Ã¶nemli, ama pratikte Ã¶nemsizdir. Benzer ÅŸekilde eÄŸer beygir
+katsayÄ±sÄ± iÃ§in 10,000 Eur ve std. hata 10,000 Eur bulmuÅŸsak, bu istatistiki
+olarak Ã¶nemsiz, ama pratikte Ã¶nemlidir.
 
-İlginç Durum
+Ä°lginÃ§ Durum
 
-Siyahi oyların bazı yıllara göre analizini yapalım,
+Siyahi oylarÄ±n bazÄ± yÄ±llara gÃ¶re analizini yapalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print 'coefs','error'
@@ -728,34 +728,34 @@ Optimization terminated successfully.
  ['income' -0.02613777851523365 0.06740777911367761]]
 \end{verbatim}
 
-1964 yılında siyahi (black) seçmenlerin oylarına ne oldu? Üstteki analizde
-katsayı müthiş alçak (büyük negatif değer), ve standard hata çok büyük. Eğer o
-sene için veriye bakarsak neler olduğunu anlıyoruz; elimizdeki anket verisindeki
-kişilerden siyahi olan kimse 1964 yılında Cumhuriyetçilere oy vermemiş. Bu
-durumda katsayı tabii ki büyük negatif değer (çünkü regresyon hedefimiz
-Cumhuriyetçilere oy verilip verilmeyeceği), siyahi olmak ile Cumhuriyetçilere oy
-vermek arasında negatif bir korelasyon ortaya çıkmış oluyor. Büyük standart hata
-iyi durmuyor tabii, ama bunun sebebi özyineli (iteratif) model uyduran (fitting)
-algoritmanın bir nüansıdır. Daha ufak bir değer elde etmek için [3]'de görülen
-numaralar yapılabilir, fakat pratikte bu büyük değeri görünce analizi yapan kişi
-veriye bakacak, ve neler olduğunu anlayacaktır.
+1964 yÄ±lÄ±nda siyahi (black) seÃ§menlerin oylarÄ±na ne oldu? Ãœstteki analizde
+katsayÄ± mÃ¼thiÅŸ alÃ§ak (bÃ¼yÃ¼k negatif deÄŸer), ve standard hata Ã§ok bÃ¼yÃ¼k. EÄŸer o
+sene iÃ§in veriye bakarsak neler olduÄŸunu anlÄ±yoruz; elimizdeki anket verisindeki
+kiÅŸilerden siyahi olan kimse 1964 yÄ±lÄ±nda CumhuriyetÃ§ilere oy vermemiÅŸ. Bu
+durumda katsayÄ± tabii ki bÃ¼yÃ¼k negatif deÄŸer (Ã§Ã¼nkÃ¼ regresyon hedefimiz
+CumhuriyetÃ§ilere oy verilip verilmeyeceÄŸi), siyahi olmak ile CumhuriyetÃ§ilere oy
+vermek arasÄ±nda negatif bir korelasyon ortaya Ã§Ä±kmÄ±ÅŸ oluyor. BÃ¼yÃ¼k standart hata
+iyi durmuyor tabii, ama bunun sebebi Ã¶zyineli (iteratif) model uyduran (fitting)
+algoritmanÄ±n bir nÃ¼ansÄ±dÄ±r. Daha ufak bir deÄŸer elde etmek iÃ§in [3]'de gÃ¶rÃ¼len
+numaralar yapÄ±labilir, fakat pratikte bu bÃ¼yÃ¼k deÄŸeri gÃ¶rÃ¼nce analizi yapan kiÅŸi
+veriye bakacak, ve neler olduÄŸunu anlayacaktÄ±r.
 
-Bangladeş'te su kuyusu değişiminin lojistik modeli
+BangladeÅŸ'te su kuyusu deÄŸiÅŸiminin lojistik modeli
 
-Verimizde 3,000 haneye gidilerek anketle toplanmış veri var. Veride hanelerin
-yakınlarındaki kuyudaki arsenik seviyesi toplanmış, ve paylaşılan verideki tüm
-hanelerin kuyular sağlıksız seviyede arsenik içeriyor. Verideki diğer bilgiler
-en yakındaki "sağlıklı" bir kuyuya yakınlık, ve o hanenin bu sağlıklı su
-kuyusuna (bir sene sonra yapılan kontrole göre) geçip geçmediği.  Ayrıca hanede
-fikri sorulan kişinin eğitim seviyesi ve bu hanedeki kişilerin herhangi bir
-sosyal topluluğa (community assocation) ait olup olmadıkları.
+Verimizde 3,000 haneye gidilerek anketle toplanmÄ±ÅŸ veri var. Veride hanelerin
+yakÄ±nlarÄ±ndaki kuyudaki arsenik seviyesi toplanmÄ±ÅŸ, ve paylaÅŸÄ±lan verideki tÃ¼m
+hanelerin kuyular saÄŸlÄ±ksÄ±z seviyede arsenik iÃ§eriyor. Verideki diÄŸer bilgiler
+en yakÄ±ndaki "saÄŸlÄ±klÄ±" bir kuyuya yakÄ±nlÄ±k, ve o hanenin bu saÄŸlÄ±klÄ± su
+kuyusuna (bir sene sonra yapÄ±lan kontrole gÃ¶re) geÃ§ip geÃ§mediÄŸi.  AyrÄ±ca hanede
+fikri sorulan kiÅŸinin eÄŸitim seviyesi ve bu hanedeki kiÅŸilerin herhangi bir
+sosyal topluluÄŸa (community assocation) ait olup olmadÄ±klarÄ±.
 
-Amacımız su kuyusunun değişimini modellemek. Bu eylem olup / olmama bağlamında
-evet / hayır şeklinde bir değişken olduğu için ikili (binary) olarak temsil
-edilebilir ve ikili cevaplar / sonuçlar lojistik regresyon ile
+AmacÄ±mÄ±z su kuyusunun deÄŸiÅŸimini modellemek. Bu eylem olup / olmama baÄŸlamÄ±nda
+evet / hayÄ±r ÅŸeklinde bir deÄŸiÅŸken olduÄŸu iÃ§in ikili (binary) olarak temsil
+edilebilir ve ikili cevaplar / sonuÃ§lar lojistik regresyon ile
 modellenebilirler.
 
-Veriye bakalım.
+Veriye bakalÄ±m.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from pandas import *
@@ -773,9 +773,9 @@ print df.head()
 5       1     1.10  40.874001      1    14
 \end{verbatim}
 
-Model 1: Güvenli su kuyusuna uzaklık
+Model 1: GÃ¼venli su kuyusuna uzaklÄ±k
 
-İlk önce modelde kuyu uzaklığını kullanalım. 
+Ä°lk Ã¶nce modelde kuyu uzaklÄ±ÄŸÄ±nÄ± kullanalÄ±m. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 model1 = logit("switch ~ dist", df).fit()
@@ -803,19 +803,19 @@ dist          -0.0062      0.001     -6.383      0.000        -0.008    -0.004
 ==============================================================================
 \end{verbatim}
 
-Uzaklık (dist) için elde edilen katsayı -0.0062, fakat bu sayı kafa karıştırıcı
-olabilir çünkü uzaklık metre olarak ölçülür, o zaman bu katsayı mesela 90 metre
-ile 91 metre uzaklığın değişime olan etkisini ölçmektedir, kısacası pek faydalı
-değildir. Yani uzaklık metre ile ölçüldüğü için 1 metrenin modeldeki etkisi
-ufak, o yüzden bu ölçütü ölçeklersek (scale) belki regresyon katsayılarımız daha
-net çıkar.
+UzaklÄ±k (dist) iÃ§in elde edilen katsayÄ± -0.0062, fakat bu sayÄ± kafa karÄ±ÅŸtÄ±rÄ±cÄ±
+olabilir Ã§Ã¼nkÃ¼ uzaklÄ±k metre olarak Ã¶lÃ§Ã¼lÃ¼r, o zaman bu katsayÄ± mesela 90 metre
+ile 91 metre uzaklÄ±ÄŸÄ±n deÄŸiÅŸime olan etkisini Ã¶lÃ§mektedir, kÄ±sacasÄ± pek faydalÄ±
+deÄŸildir. Yani uzaklÄ±k metre ile Ã¶lÃ§Ã¼ldÃ¼ÄŸÃ¼ iÃ§in 1 metrenin modeldeki etkisi
+ufak, o yÃ¼zden bu Ã¶lÃ§Ã¼tÃ¼ Ã¶lÃ§eklersek (scale) belki regresyon katsayÄ±larÄ±mÄ±z daha
+net Ã§Ä±kar.
 
-Bunu nasıl yapacağız?  Ölçeklenmiş yeni bir değişken yaratmak yerine, onu
-formülün içinde tanımlayabiliriz.  Burada bir ara not: eğer formül içinde +,-
-gibi operasyonları aritmetik işlem olarak kullanmak istiyorsak, o zaman 'I()'
-çağrısını yapmak lazım, çünkü + operasyonu mesela statsmodels formüllerinde
-başka amaçlar için kullanılıyor. 'I' harfi birim (identity) kelimesinden
-geliyor, yani hiçbir şeyin değişmediğini anlatmaya uğraşıyoruz, "içinde ne varsa
+Bunu nasÄ±l yapacaÄŸÄ±z?  Ã–lÃ§eklenmiÅŸ yeni bir deÄŸiÅŸken yaratmak yerine, onu
+formÃ¼lÃ¼n iÃ§inde tanÄ±mlayabiliriz.  Burada bir ara not: eÄŸer formÃ¼l iÃ§inde +,-
+gibi operasyonlarÄ± aritmetik iÅŸlem olarak kullanmak istiyorsak, o zaman 'I()'
+Ã§aÄŸrÄ±sÄ±nÄ± yapmak lazÄ±m, Ã§Ã¼nkÃ¼ + operasyonu mesela statsmodels formÃ¼llerinde
+baÅŸka amaÃ§lar iÃ§in kullanÄ±lÄ±yor. 'I' harfi birim (identity) kelimesinden
+geliyor, yani hiÃ§bir ÅŸeyin deÄŸiÅŸmediÄŸini anlatmaya uÄŸraÅŸÄ±yoruz, "iÃ§inde ne varsa
 onu ver" diyoruz .
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -844,9 +844,9 @@ I(dist / 100.)    -0.6219      0.097     -6.383      0.000        -0.813    -0.4
 ==================================================================================
 \end{verbatim}
 
-Şimdi modelimizi grafikleyelim. Yanlız değişim (switch) verisini suni olarak
-kaydırmamız / seğirtmemiz (jitter) gerekiyor, çünkü değişim 0 ve 1'den başka bir
-şey olamaz ve grafik sürekli aynı iki bölgeye nokta basıp duracak.
+Åimdi modelimizi grafikleyelim. YanlÄ±z deÄŸiÅŸim (switch) verisini suni olarak
+kaydÄ±rmamÄ±z / seÄŸirtmemiz (jitter) gerekiyor, Ã§Ã¼nkÃ¼ deÄŸiÅŸim 0 ve 1'den baÅŸka bir
+ÅŸey olamaz ve grafik sÃ¼rekli aynÄ± iki bÃ¶lgeye nokta basÄ±p duracak.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def binary_jitter(x, jitter_amount = .05):
@@ -866,35 +866,35 @@ plt.savefig('stat_logit_06.png')
 
 \includegraphics[height=5cm]{stat_logit_06.png}
 
-Mavi noktalar gerçek veri, yeşil çizgi ise uzaklık geçilerek modelin oluşturduğu
-"tahmin". Modelin gerçek veriye ne kadar uyduğunu görüyoruz böylece, yeşil
-çizginin yüksek olasılık verdiği bölgelerde üst kısmın daha mavi olmasını
-bekleriz mesela. Üstteki resimde aşağı yukarı bunu gösteriyor.
+Mavi noktalar gerÃ§ek veri, yeÅŸil Ã§izgi ise uzaklÄ±k geÃ§ilerek modelin oluÅŸturduÄŸu
+"tahmin". Modelin gerÃ§ek veriye ne kadar uyduÄŸunu gÃ¶rÃ¼yoruz bÃ¶ylece, yeÅŸil
+Ã§izginin yÃ¼ksek olasÄ±lÄ±k verdiÄŸi bÃ¶lgelerde Ã¼st kÄ±smÄ±n daha mavi olmasÄ±nÄ±
+bekleriz mesela. Ãœstteki resimde aÅŸaÄŸÄ± yukarÄ± bunu gÃ¶steriyor.
 
-Bir problemin grafiklemesine başka bir yönden yaklaşalım, kuyu değiştirenlerin
-değişim uzaklığının yoğunluğu, bir de kuyu değiştirmeyenlerin değişim
-uzaklığının yoğunluğu. Değişimi yapanların dağılımına bakınca, kısa mesafelerde
-daha fazla yoğunluk görmeyi bekliyoruz, değiştirmeyenlerin ise uzun mesafelerde
-daha fazla yoğunluğu olur herhalde.
+Bir problemin grafiklemesine baÅŸka bir yÃ¶nden yaklaÅŸalÄ±m, kuyu deÄŸiÅŸtirenlerin
+deÄŸiÅŸim uzaklÄ±ÄŸÄ±nÄ±n yoÄŸunluÄŸu, bir de kuyu deÄŸiÅŸtirmeyenlerin deÄŸiÅŸim
+uzaklÄ±ÄŸÄ±nÄ±n yoÄŸunluÄŸu. DeÄŸiÅŸimi yapanlarÄ±n daÄŸÄ±lÄ±mÄ±na bakÄ±nca, kÄ±sa mesafelerde
+daha fazla yoÄŸunluk gÃ¶rmeyi bekliyoruz, deÄŸiÅŸtirmeyenlerin ise uzun mesafelerde
+daha fazla yoÄŸunluÄŸu olur herhalde.
 
-Yoğunluğu göstermek için çekirdek yoğunluk hesabı (kernel density estimation)
-tekniğini kullanıyoruz. Bu teknik her veri noktasına Gaussian, kutu (box), ya da
-diğer türden bir "çekirdek" fonksiyonunu koyar (ve veriyi o fonksiyona geçer,
-sonucu kaydeder), ve bu iş bitince tüm çekirdekler üst üste toplanarak genel
-dağılım ortaya çıkartılır. Teknik histogram tekniğiyle aynı işi yapmaya uğraşır,
-bir anlamda verinin dağılımını daha pürüzsüz (smooth) hale getirir.
+YoÄŸunluÄŸu gÃ¶stermek iÃ§in Ã§ekirdek yoÄŸunluk hesabÄ± (kernel density estimation)
+tekniÄŸini kullanÄ±yoruz. Bu teknik her veri noktasÄ±na Gaussian, kutu (box), ya da
+diÄŸer tÃ¼rden bir "Ã§ekirdek" fonksiyonunu koyar (ve veriyi o fonksiyona geÃ§er,
+sonucu kaydeder), ve bu iÅŸ bitince tÃ¼m Ã§ekirdekler Ã¼st Ã¼ste toplanarak genel
+daÄŸÄ±lÄ±m ortaya Ã§Ä±kartÄ±lÄ±r. Teknik histogram tekniÄŸiyle aynÄ± iÅŸi yapmaya uÄŸraÅŸÄ±r,
+bir anlamda verinin daÄŸÄ±lÄ±mÄ±nÄ± daha pÃ¼rÃ¼zsÃ¼z (smooth) hale getirir.
 
-Bu teknik istatistikte oldukça yeni bir teknik sayılır, kullanılması için
-bilgisayar hesabı gerekiyor (kıyasla histogram elle de yapılabilir), yeni
-hesapsal tekniklerde olan ilerlemelerin veri analizine getirdiği bir yenilik
+Bu teknik istatistikte oldukÃ§a yeni bir teknik sayÄ±lÄ±r, kullanÄ±lmasÄ± iÃ§in
+bilgisayar hesabÄ± gerekiyor (kÄ±yasla histogram elle de yapÄ±labilir), yeni
+hesapsal tekniklerde olan ilerlemelerin veri analizine getirdiÄŸi bir yenilik
 yani!
 
-[KDE bölümü atlandı]
+[KDE bÃ¶lÃ¼mÃ¼ atlandÄ±]
 
-Model 2: Güvenli kuyuya olan uzaklık ve kendi kuyusunun arsenik seviyesi
+Model 2: GÃ¼venli kuyuya olan uzaklÄ±k ve kendi kuyusunun arsenik seviyesi
 
-Şimdi arsenik seviyesini modelimize ekleyelim. Bekleriz ki kuyusunda yüksek
-arsenik miktarı olan kimselerin kuyu değiştirmesi daha çok beklenen bir şeydir.
+Åimdi arsenik seviyesini modelimize ekleyelim. Bekleriz ki kuyusunda yÃ¼ksek
+arsenik miktarÄ± olan kimselerin kuyu deÄŸiÅŸtirmesi daha Ã§ok beklenen bir ÅŸeydir.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 model2 = logit('switch ~ I(dist / 100.) + arsenic', df).fit()
@@ -923,14 +923,14 @@ arsenic            0.4608      0.041     11.134      0.000         0.380     0.5
 ==================================================================================
 \end{verbatim}
 
-Ki katsayılar da aynen bunu gösteriyor. Güvenli kuyuya olan uzaklık büyüdükçe
-değişime negatif etki yapıyor ama kendi kuyusundaki arsenik seviyesinin artması
-değişimde pozitif etki yapıyor.
+Ki katsayÄ±lar da aynen bunu gÃ¶steriyor. GÃ¼venli kuyuya olan uzaklÄ±k bÃ¼yÃ¼dÃ¼kÃ§e
+deÄŸiÅŸime negatif etki yapÄ±yor ama kendi kuyusundaki arsenik seviyesinin artmasÄ±
+deÄŸiÅŸimde pozitif etki yapÄ±yor.
 
-Kısmi (marginal) etkiler
+KÄ±smi (marginal) etkiler
 
-Tüm bu değişkenlerin değişim olasılığı üzerindeki etkilerini görmek için verinin
-ortalama noktasında bir kısmi olasılık hesabı yapalım.
+TÃ¼m bu deÄŸiÅŸkenlerin deÄŸiÅŸim olasÄ±lÄ±ÄŸÄ± Ã¼zerindeki etkilerini gÃ¶rmek iÃ§in verinin
+ortalama noktasÄ±nda bir kÄ±smi olasÄ±lÄ±k hesabÄ± yapalÄ±m.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print model2.get_margeff(at = 'mean').summary()
@@ -950,21 +950,21 @@ arsenic            0.1121      0.010     11.217      0.000         0.092     0.1
 ==================================================================================
 \end{verbatim}
 
-Bu sonuca göre, ankette soru sorulan ortalama kişi için en yakın kuyuya olan
-uzaklıkta 100 metrelik bir değişim olasılığında \%22 düşüş anlamına
-gelmektedir. Fakat kendi kuyusundaki arsenikte 1 seviyesinde bir artış değişim
-olasılığını \%11 oranında arttırmaktadır.
+Bu sonuca gÃ¶re, ankette soru sorulan ortalama kiÅŸi iÃ§in en yakÄ±n kuyuya olan
+uzaklÄ±kta 100 metrelik bir deÄŸiÅŸim olasÄ±lÄ±ÄŸÄ±nda \%22 dÃ¼ÅŸÃ¼ÅŸ anlamÄ±na
+gelmektedir. Fakat kendi kuyusundaki arsenikte 1 seviyesinde bir artÄ±ÅŸ deÄŸiÅŸim
+olasÄ±lÄ±ÄŸÄ±nÄ± \%11 oranÄ±nda arttÄ±rmaktadÄ±r.
 
-Sınıfların ayırılabilirliği
+SÄ±nÄ±flarÄ±n ayÄ±rÄ±labilirliÄŸi
 
-Bu modelin kuyu değiştirenler ile değiştirmeyenleri ne kadar iyi
-sınıflayabildiğini anlamak için her sınıftaki kişiyi uzaklık-arsenik uzayında
+Bu modelin kuyu deÄŸiÅŸtirenler ile deÄŸiÅŸtirmeyenleri ne kadar iyi
+sÄ±nÄ±flayabildiÄŸini anlamak iÃ§in her sÄ±nÄ±ftaki kiÅŸiyi uzaklÄ±k-arsenik uzayÄ±nda
 grafikleyebiliriz.
 
-Biz pek bir iyi bir ayırım göremedik, o sebeple modelin oldukça yüksek bir hata
-oranının olmasını bekliyoruz. Fakat başka bir şey farkediyoruz, grafiğin "kısa
-mesafe-yüksek arsenik" bölgesinde çoğunlukla değişimciler var, ve "uzun
-mesafe-düşük arsenik" bölgesinde çoğunlukla değiştirmeyenler var.
+Biz pek bir iyi bir ayÄ±rÄ±m gÃ¶remedik, o sebeple modelin oldukÃ§a yÃ¼ksek bir hata
+oranÄ±nÄ±n olmasÄ±nÄ± bekliyoruz. Fakat baÅŸka bir ÅŸey farkediyoruz, grafiÄŸin "kÄ±sa
+mesafe-yÃ¼ksek arsenik" bÃ¶lgesinde Ã§oÄŸunlukla deÄŸiÅŸimciler var, ve "uzun
+mesafe-dÃ¼ÅŸÃ¼k arsenik" bÃ¶lgesinde Ã§oÄŸunlukla deÄŸiÅŸtirmeyenler var.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 logit_pars = model2.params
@@ -991,19 +991,19 @@ plt.savefig('stat_logit_07.png')
 
 \includegraphics[height=6cm]{stat_logit_07.png}
 
-Model 3: Etkileşim eklemek
+Model 3: EtkileÅŸim eklemek
 
-Arsenik seviyesi ve uzaklık değişkenlerinin modele ayrı ayrı yaptığı etkiler
-yanında, beraber olarak ta bazı etkiler yapacağını düşünebiliriz.  100 metrelik
-mesafenin değişim kararına olan etkisi kuyunuzdaki arsenik seviyesiyle
-bağlantılı olabilmesi.. İnsanların böyle düşünmesini bekleyebiliriz, yani, bu
-problem bağlamında, tipik kişi durup ta "önce arsenik yokmuş gibi düşüneyim,
-sadece mesafeye bakayım", sonra "şimdi arseniği düşüneyim, mesafe yokmuş gibi
-yapayım", ve bunlardan sonra "şimdi bu iki ayrı kararı üst üste koyayım"
-şeklinde düşünmez.
+Arsenik seviyesi ve uzaklÄ±k deÄŸiÅŸkenlerinin modele ayrÄ± ayrÄ± yaptÄ±ÄŸÄ± etkiler
+yanÄ±nda, beraber olarak ta bazÄ± etkiler yapacaÄŸÄ±nÄ± dÃ¼ÅŸÃ¼nebiliriz.  100 metrelik
+mesafenin deÄŸiÅŸim kararÄ±na olan etkisi kuyunuzdaki arsenik seviyesiyle
+baÄŸlantÄ±lÄ± olabilmesi.. Ä°nsanlarÄ±n bÃ¶yle dÃ¼ÅŸÃ¼nmesini bekleyebiliriz, yani, bu
+problem baÄŸlamÄ±nda, tipik kiÅŸi durup ta "Ã¶nce arsenik yokmuÅŸ gibi dÃ¼ÅŸÃ¼neyim,
+sadece mesafeye bakayÄ±m", sonra "ÅŸimdi arseniÄŸi dÃ¼ÅŸÃ¼neyim, mesafe yokmuÅŸ gibi
+yapayÄ±m", ve bunlardan sonra "ÅŸimdi bu iki ayrÄ± kararÄ± Ã¼st Ã¼ste koyayÄ±m"
+ÅŸeklinde dÃ¼ÅŸÃ¼nmez.
 
-Statsmodels'de formül arayüzü ile modele etkileşim eklemenin yolu değişkenler
-arasında `:` operatörünü kullanmak ile olur.
+Statsmodels'de formÃ¼l arayÃ¼zÃ¼ ile modele etkileÅŸim eklemenin yolu deÄŸiÅŸkenler
+arasÄ±nda `:` operatÃ¶rÃ¼nÃ¼ kullanmak ile olur.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 model3 = logit('switch ~ I(dist / 100.) + arsenic + I(dist / 100.):arsenic', df).fit()
@@ -1033,25 +1033,25 @@ I(dist / 100.):arsenic    -0.1789      0.102     -1.748      0.080        -0.379
 ==========================================================================================
 \end{verbatim}
 
-Sonuca göre etkileşimin katsayısı negatif ve istatistiki olarak anlamlı
-(significant). Bu katsayının değişim üzerindeki etkisini nicesel olarak hemen
-bakar bakmaz anlayamıyor olsak bile, niteliksel olarak etkisi sezgilerimiz ile
-uyuşuyor. Uzaklık değişimde negatif etkili, ama bu negatif etki yüksek arsenik
-seviyesi devreye girince azalıyor.  Diğer yandan arsenik seviyesinin değişimde
-pozitif etkisi var, ama o etki en yakın kuyu mesafesi arttıkça azalıyor.
+Sonuca gÃ¶re etkileÅŸimin katsayÄ±sÄ± negatif ve istatistiki olarak anlamlÄ±
+(significant). Bu katsayÄ±nÄ±n deÄŸiÅŸim Ã¼zerindeki etkisini nicesel olarak hemen
+bakar bakmaz anlayamÄ±yor olsak bile, niteliksel olarak etkisi sezgilerimiz ile
+uyuÅŸuyor. UzaklÄ±k deÄŸiÅŸimde negatif etkili, ama bu negatif etki yÃ¼ksek arsenik
+seviyesi devreye girince azalÄ±yor.  DiÄŸer yandan arsenik seviyesinin deÄŸiÅŸimde
+pozitif etkisi var, ama o etki en yakÄ±n kuyu mesafesi arttÄ±kÃ§a azalÄ±yor.
 
-Model 4: Eğitim seviyesi ve ek bazı etkileşimler, ve değişkenleri ortalamak
+Model 4: EÄŸitim seviyesi ve ek bazÄ± etkileÅŸimler, ve deÄŸiÅŸkenleri ortalamak
 
-Eğitim seviyesi kişilerin arseniğin kötü etkilerini anlamasında pozitif etki
-yapması beklenir, ve bu sebeple eğitim seviyesi değişim kararına pozitif etki
-yapmalıdır. Elimizdeki veride eğitim yıl bazında kayıtlanmış, biz bu veri
-noktasını ölçekleyeceğiz (aynen uzaklığa yaptımız gibi, çünkü eğitimde 1 senelik
-değişimin pek bir anlamı yok), bunu için 4'e böleceğiz. Ayrıca bu yeni
-değişkenin diğer değişkenler ile etkileşimini devreye sokacağız.
+EÄŸitim seviyesi kiÅŸilerin arseniÄŸin kÃ¶tÃ¼ etkilerini anlamasÄ±nda pozitif etki
+yapmasÄ± beklenir, ve bu sebeple eÄŸitim seviyesi deÄŸiÅŸim kararÄ±na pozitif etki
+yapmalÄ±dÄ±r. Elimizdeki veride eÄŸitim yÄ±l bazÄ±nda kayÄ±tlanmÄ±ÅŸ, biz bu veri
+noktasÄ±nÄ± Ã¶lÃ§ekleyeceÄŸiz (aynen uzaklÄ±ÄŸa yaptÄ±mÄ±z gibi, Ã§Ã¼nkÃ¼ eÄŸitimde 1 senelik
+deÄŸiÅŸimin pek bir anlamÄ± yok), bunu iÃ§in 4'e bÃ¶leceÄŸiz. AyrÄ±ca bu yeni
+deÄŸiÅŸkenin diÄŸer deÄŸiÅŸkenler ile etkileÅŸimini devreye sokacaÄŸÄ±z.
 
-Ek olarak tüm değişkenleri ortalayacağız ki böylece onları yorumlamamız
-rahatlaşacak. Bir kez daha bu işi tamamen statsmodels sayesinde formül içinde
-halledeceğiz, dışarıdan on hesap yapıp formüle geçmemiz gerekmeyecek.
+Ek olarak tÃ¼m deÄŸiÅŸkenleri ortalayacaÄŸÄ±z ki bÃ¶ylece onlarÄ± yorumlamamÄ±z
+rahatlaÅŸacak. Bir kez daha bu iÅŸi tamamen statsmodels sayesinde formÃ¼l iÃ§inde
+halledeceÄŸiz, dÄ±ÅŸarÄ±dan on hesap yapÄ±p formÃ¼le geÃ§memiz gerekmeyecek.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 model_form = ('switch ~ center(I(dist / 100.)) + center(arsenic) + ' +
@@ -1090,24 +1090,24 @@ center(arsenic):center(I(educ / 4.))            0.0722      0.044      1.647    
 ===============================================================================================================
 \end{verbatim}
 
-Modelin başarısını irdelemek: Kutulanmış Kalıntı grafikleri (Binned Residual plots)
+Modelin baÅŸarÄ±sÄ±nÄ± irdelemek: KutulanmÄ±ÅŸ KalÄ±ntÄ± grafikleri (Binned Residual plots)
 
-Model kalıntısının (yani model ile gerçek veri arasındaki hatalar -residual-)
-ile ayrı ayrı her değişken ile grafikleri, uzaklık-kalıntı, arsenik-kalıntı
-gibi, bizi modelde gayrı lineerlik olup olmadığı hakkında uyarabilir. Çünkü
-kalıntının Gaussian bir dağılımda olmasını bekleriz, model hatası tam anlamıyla
-bir "gürültü" halinde olmalıdır, ki doğada gürültünün tanımı Gaussian dağılımına
-sahip olmaktır. Eğer bu grafikte kabaca her yere eşit şekilde dağılmış bir
-görüntü görmüyorsak, o zaman modelimizde yakalayamadığımız bir gayrı lineerlik
-(nonlinearity) vardır, ya da, birbirinden farklı olan kalıntı grafikleri
-kalıntıları dağılımlarının birbirinden farklı olduğunun işaretidir
-(heteroskedaştıcıty).
+Model kalÄ±ntÄ±sÄ±nÄ±n (yani model ile gerÃ§ek veri arasÄ±ndaki hatalar -residual-)
+ile ayrÄ± ayrÄ± her deÄŸiÅŸken ile grafikleri, uzaklÄ±k-kalÄ±ntÄ±, arsenik-kalÄ±ntÄ±
+gibi, bizi modelde gayrÄ± lineerlik olup olmadÄ±ÄŸÄ± hakkÄ±nda uyarabilir. Ã‡Ã¼nkÃ¼
+kalÄ±ntÄ±nÄ±n Gaussian bir daÄŸÄ±lÄ±mda olmasÄ±nÄ± bekleriz, model hatasÄ± tam anlamÄ±yla
+bir "gÃ¼rÃ¼ltÃ¼" halinde olmalÄ±dÄ±r, ki doÄŸada gÃ¼rÃ¼ltÃ¼nÃ¼n tanÄ±mÄ± Gaussian daÄŸÄ±lÄ±mÄ±na
+sahip olmaktÄ±r. EÄŸer bu grafikte kabaca her yere eÅŸit ÅŸekilde daÄŸÄ±lmÄ±ÅŸ bir
+gÃ¶rÃ¼ntÃ¼ gÃ¶rmÃ¼yorsak, o zaman modelimizde yakalayamadÄ±ÄŸÄ±mÄ±z bir gayrÄ± lineerlik
+(nonlinearity) vardÄ±r, ya da, birbirinden farklÄ± olan kalÄ±ntÄ± grafikleri
+kalÄ±ntÄ±larÄ± daÄŸÄ±lÄ±mlarÄ±nÄ±n birbirinden farklÄ± olduÄŸunun iÅŸaretidir
+(heteroskedaÅŸtÄ±cÄ±ty).
 
-İkili bir modelde kalıntıları ham şekilde grafiklemenin pek anlamı yoktur, o
-sebeple biraz pürüzsüzleştirme uygulayacağız. Altta değişkenler için
-oluşturduğumuz kutucuklar (bins) içine kalıntıların ortalamasını koyacağız ve
-bunları grafikleyeceğiz (lowess ya da hareketli ortalama -moving average-
-tekniği de burada ise yarayabilirdi).
+Ä°kili bir modelde kalÄ±ntÄ±larÄ± ham ÅŸekilde grafiklemenin pek anlamÄ± yoktur, o
+sebeple biraz pÃ¼rÃ¼zsÃ¼zleÅŸtirme uygulayacaÄŸÄ±z. Altta deÄŸiÅŸkenler iÃ§in
+oluÅŸturduÄŸumuz kutucuklar (bins) iÃ§ine kalÄ±ntÄ±larÄ±n ortalamasÄ±nÄ± koyacaÄŸÄ±z ve
+bunlarÄ± grafikleyeceÄŸiz (lowess ya da hareketli ortalama -moving average-
+tekniÄŸi de burada ise yarayabilirdi).
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def bin_residuals(resid, var, bins):
@@ -1155,19 +1155,19 @@ plt.savefig('stat_logit_08.png')
 
 \includegraphics[height=6cm]{stat_logit_08.png}
 
-Üstteki kutulama sırasında kullanılan \verb!qcut! işlemlerin
-için en altta ek bölümüne bakın
+Ãœstteki kutulama sÄ±rasÄ±nda kullanÄ±lan \verb!qcut! iÅŸlemlerin
+iÃ§in en altta ek bÃ¶lÃ¼mÃ¼ne bakÄ±n
 
-Model 5: arseniği log ölçeklemek
+Model 5: arseniÄŸi log Ã¶lÃ§eklemek
 
-Kutulanmış artık grafiklerine bakınca arsenik değişkeninde biraz gayrı lineerlik
-görüyoruz, çünkü noktaların dağılımı çok fazla belli bir bölgede. Dikkat edelim,
-model nasıl düşük arseniği gerçekte olduğundan daha fazla olacağını tahmin etmiş
-(overestimate), ayrıca yüksek arseniği gerçekte olduğundan daha az olacağını
-tahmin etmiş (underestimate). Bu bize arsenik değişkeni üzerinde belki de log
-transformasyonu gibi bir şeyler yapmamızın gerektiğinin işareti.
+KutulanmÄ±ÅŸ artÄ±k grafiklerine bakÄ±nca arsenik deÄŸiÅŸkeninde biraz gayrÄ± lineerlik
+gÃ¶rÃ¼yoruz, Ã§Ã¼nkÃ¼ noktalarÄ±n daÄŸÄ±lÄ±mÄ± Ã§ok fazla belli bir bÃ¶lgede. Dikkat edelim,
+model nasÄ±l dÃ¼ÅŸÃ¼k arseniÄŸi gerÃ§ekte olduÄŸundan daha fazla olacaÄŸÄ±nÄ± tahmin etmiÅŸ
+(overestimate), ayrÄ±ca yÃ¼ksek arseniÄŸi gerÃ§ekte olduÄŸundan daha az olacaÄŸÄ±nÄ±
+tahmin etmiÅŸ (underestimate). Bu bize arsenik deÄŸiÅŸkeni Ã¼zerinde belki de log
+transformasyonu gibi bir ÅŸeyler yapmamÄ±zÄ±n gerektiÄŸinin iÅŸareti.
 
-Bu değişimi de direk formül içinde yapabiliriz.
+Bu deÄŸiÅŸimi de direk formÃ¼l iÃ§inde yapabiliriz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 model_form = ('switch ~ center(I(dist / 100.)) + center(np.log(arsenic)) + ' +
@@ -1207,7 +1207,7 @@ center(np.log(arsenic)):center(I(educ / 4.))       0.0601      0.070      0.855 
 ==================================================================================================================
 \end{verbatim}
 
-Şimdi arsenik için kutulanmış kalıntı grafikleri daha iyi gözüküyor.
+Åimdi arsenik iÃ§in kutulanmÄ±ÅŸ kalÄ±ntÄ± grafikleri daha iyi gÃ¶zÃ¼kÃ¼yor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 arsenic_resids = bin_residuals(model5.resid, df['arsenic'], 40)
@@ -1226,22 +1226,22 @@ plt.savefig('stat_logit_09.png')
 
 \includegraphics[height=6cm]{stat_logit_09.png}
 
-Model hata oranları
+Model hata oranlarÄ±
 
-\verb!pred_table()! çağrısı bize bu modelin "kafa karışıklığı matrisini
-(confusion matrix)" veriyor. Bu matrisi kullanarak modelimizin hata oranını
+\verb!pred_table()! Ã§aÄŸrÄ±sÄ± bize bu modelin "kafa karÄ±ÅŸÄ±klÄ±ÄŸÄ± matrisini
+(confusion matrix)" veriyor. Bu matrisi kullanarak modelimizin hata oranÄ±nÄ±
 hesaplayabiliriz.
 
-Not: Kafa karışıklığı matrisi sınıflandırma hatalarını verir, ve her türlü hata
-kombinasyonunu içerir, mesela iki sınıf için, gerçekte 0 ama 1 tahmin hataları,
-gerçekte 1 ama 0 hataları vs. Bu matrisin satırlar gerçek veri, kolonları
-tahminleri içerir. Tabii ki köşegendeki sayılar doğru tahmin oranlarıdır.
+Not: Kafa karÄ±ÅŸÄ±klÄ±ÄŸÄ± matrisi sÄ±nÄ±flandÄ±rma hatalarÄ±nÄ± verir, ve her tÃ¼rlÃ¼ hata
+kombinasyonunu iÃ§erir, mesela iki sÄ±nÄ±f iÃ§in, gerÃ§ekte 0 ama 1 tahmin hatalarÄ±,
+gerÃ§ekte 1 ama 0 hatalarÄ± vs. Bu matrisin satÄ±rlar gerÃ§ek veri, kolonlarÄ±
+tahminleri iÃ§erir. Tabii ki kÃ¶ÅŸegendeki sayÄ±lar doÄŸru tahmin oranlarÄ±dÄ±r.
 
-Sonra bu sonucu, en fazla verilen cevabı herkesin cevabıymış gibi farzeden daha
-basit bir "sıfır (null) modelinin" hata oranı ile karşılaştırmalıyız. Mesela
-burada kişilerin \%58'i kuyu değiştirmiş, bu durumda sıfır modeli "herkes kuyu
-değiştiriyor" diye modeller, ve bu basit modelin hata payı 42\% olur. Bizim
-model bu modelden daha iyi bir sonuç verecek midir? Sonuç altta.
+Sonra bu sonucu, en fazla verilen cevabÄ± herkesin cevabÄ±ymÄ±ÅŸ gibi farzeden daha
+basit bir "sÄ±fÄ±r (null) modelinin" hata oranÄ± ile karÅŸÄ±laÅŸtÄ±rmalÄ±yÄ±z. Mesela
+burada kiÅŸilerin \%58'i kuyu deÄŸiÅŸtirmiÅŸ, bu durumda sÄ±fÄ±r modeli "herkes kuyu
+deÄŸiÅŸtiriyor" diye modeller, ve bu basit modelin hata payÄ± 42\% olur. Bizim
+model bu modelden daha iyi bir sonuÃ§ verecek midir? SonuÃ§ altta.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print model5.pred_table()
@@ -1260,9 +1260,9 @@ Null Error Rate:  42%
 
 Ek: qcut
 
-Yukarıdaki \verb!qcut! kullanımını özetlemek gerekirse; arsenik değişkeni için
-mesela dağılım bölgeleri (n-tile) üzerinden bir atama yapacağız, önce DataFrame
-yaratalım,
+YukarÄ±daki \verb!qcut! kullanÄ±mÄ±nÄ± Ã¶zetlemek gerekirse; arsenik deÄŸiÅŸkeni iÃ§in
+mesela daÄŸÄ±lÄ±m bÃ¶lgeleri (n-tile) Ã¼zerinden bir atama yapacaÄŸÄ±z, Ã¶nce DataFrame
+yaratalÄ±m,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 resid_df = DataFrame({'var': df['arsenic'], 'resid': model4.df_resid})
@@ -1283,7 +1283,7 @@ print resid_df[:10]
 10   3013  2.52
 \end{verbatim}model4.
 
-Şimdi 40 tane dağılım bölgesi yaratalım
+Åimdi 40 tane daÄŸÄ±lÄ±m bÃ¶lgesi yaratalÄ±m
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print qcut(df['arsenic'], 40)
@@ -1327,8 +1327,8 @@ Categories (40, object): [[0.51, 0.53] < (0.53, 0.56] < (0.56, 0.59] <
                           < (3.42, 3.791] < (3.791, 4.475] < (4.475, 9.65]] 
 \end{verbatim}
 
-Görüldüğü gibi bölgeler bir obje aslında ve içinde levels diye bir değişkeni
-var. Ayrıca labels diye bir değişken de var,
+GÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi bÃ¶lgeler bir obje aslÄ±nda ve iÃ§inde levels diye bir deÄŸiÅŸkeni
+var. AyrÄ±ca labels diye bir deÄŸiÅŸken de var,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print qcut(df['arsenic'], 40).labels
@@ -1338,8 +1338,8 @@ print qcut(df['arsenic'], 40).labels
 [31  6 28 ...,  0  4  5]
 \end{verbatim}
 
-ki bu değişken içinde hangi noktanın hangi olasılık bölgesine ait olduğunun
-ataması var. Mesela 2. nokta 6. bölgeye aitmiş, bu bölge hangisi?
+ki bu deÄŸiÅŸken iÃ§inde hangi noktanÄ±n hangi olasÄ±lÄ±k bÃ¶lgesine ait olduÄŸunun
+atamasÄ± var. Mesela 2. nokta 6. bÃ¶lgeye aitmiÅŸ, bu bÃ¶lge hangisi?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print qcut(df['arsenic'], 40).levels[6]
@@ -1349,10 +1349,10 @@ print qcut(df['arsenic'], 40).levels[6]
 (0.68, 0.71]
 \end{verbatim}
 
-Şimdi şöyle bir atama yaparsak, yani qcut sonucunu direk olduğu gibi
-\verb!resid_df! içine atarsak, \verb!qcut! içindeki \verb!levels!,
-\verb!resid_df!  üzerindeki index (sıra) ile uyumlandırılacaktır, ve her var
-için doğru olan \verb!qcut! sonucu atanmış olacaktır!
+Åimdi ÅŸÃ¶yle bir atama yaparsak, yani qcut sonucunu direk olduÄŸu gibi
+\verb!resid_df! iÃ§ine atarsak, \verb!qcut! iÃ§indeki \verb!levels!,
+\verb!resid_df!  Ã¼zerindeki index (sÄ±ra) ile uyumlandÄ±rÄ±lacaktÄ±r, ve her var
+iÃ§in doÄŸru olan \verb!qcut! sonucu atanmÄ±ÅŸ olacaktÄ±r!
 
 \begin{minted}[fontsize=\footnotesize]{python}
 resid_df['bins'] = qcut(df['arsenic'], 40)
@@ -1373,45 +1373,45 @@ print resid_df[:10]
 10  1.130149  2.52    (2.47, 2.61]
 \end{verbatim}
 
-Üstte hakikaten bakıyoruz ki 2. nokta var=\verb!0.71! doğru aralık olan
-\verb!(0.68, 0.71]! ile eşleşmiş.
+Ãœstte hakikaten bakÄ±yoruz ki 2. nokta var=\verb!0.71! doÄŸru aralÄ±k olan
+\verb!(0.68, 0.71]! ile eÅŸleÅŸmiÅŸ.
 
 Kredi Kart Analizi ve Lojistik Regresyon
 
-Kredi Kart başvurularının kabul edilip edilmediğinin kayıtları üzerinde
-başvurunun kabul edilip edilmeyeceğini tahmin etmek için bir model
-kullanabiliriz. Örnek [1, sf. 390]'dan alındı. Veri
+Kredi Kart baÅŸvurularÄ±nÄ±n kabul edilip edilmediÄŸinin kayÄ±tlarÄ± Ã¼zerinde
+baÅŸvurunun kabul edilip edilmeyeceÄŸini tahmin etmek iÃ§in bir model
+kullanabiliriz. Ã–rnek [1, sf. 390]'dan alÄ±ndÄ±. Veri
 
-\verb!card! = Başvuru kabul edilmiş mi? 
+\verb!card! = BaÅŸvuru kabul edilmiÅŸ mi? 
 
-\verb!reports! = Kişi hakkında kötü bir olay rapor edilmiş mi?
+\verb!reports! = KiÅŸi hakkÄ±nda kÃ¶tÃ¼ bir olay rapor edilmiÅŸ mi?
 
-\verb!income! = Yıllık gelir, birim \$10000
+\verb!income! = YÄ±llÄ±k gelir, birim \$10000
 
-\verb!age! = Yaş
+\verb!age! = YaÅŸ
 
-\verb!owner! = Kişi kendi evinin sahibi mi?
+\verb!owner! = KiÅŸi kendi evinin sahibi mi?
 
-\verb!dependents! = Bakılan / bağımlı kaç kişi var (çocuk, yaşlı kişi, vs)
+\verb!dependents! = BakÄ±lan / baÄŸÄ±mlÄ± kaÃ§ kiÅŸi var (Ã§ocuk, yaÅŸlÄ± kiÅŸi, vs)
 
-\verb!months! = Mevcut adreste kaç aydır yaşanıyor
+\verb!months! = Mevcut adreste kaÃ§ aydÄ±r yaÅŸanÄ±yor
 
-\verb!share! = Aylık kredi kart harcamalarının yıllık kazanca olan oranı
+\verb!share! = AylÄ±k kredi kart harcamalarÄ±nÄ±n yÄ±llÄ±k kazanca olan oranÄ±
 
-\verb!selfemp! = Kişi kendi işinin sahibi mi?
+\verb!selfemp! = KiÅŸi kendi iÅŸinin sahibi mi?
 
-\verb!majorcards! = Büyük kredi kart şirketlerinden kaç tane kartı var
+\verb!majorcards! = BÃ¼yÃ¼k kredi kart ÅŸirketlerinden kaÃ§ tane kartÄ± var
 
-\verb!active! = Kaç tane aktif kredi kart hesabı var
+\verb!active! = KaÃ§ tane aktif kredi kart hesabÄ± var
 
-\verb!expenditure! = Aylık kredi kartı harcaması
+\verb!expenditure! = AylÄ±k kredi kartÄ± harcamasÄ±
 
-Tahmin edeceğimiz ilk değişken \verb!card! olacak, ki bu değişken evet/hayır
-bazında; ona bağlı olarak modellenecek değişkenler geri kalanları, bu
-değişkenlerin kredi kart kabulünde ne kadar etkili olacağını analiz edeceğiz.
+Tahmin edeceÄŸimiz ilk deÄŸiÅŸken \verb!card! olacak, ki bu deÄŸiÅŸken evet/hayÄ±r
+bazÄ±nda; ona baÄŸlÄ± olarak modellenecek deÄŸiÅŸkenler geri kalanlarÄ±, bu
+deÄŸiÅŸkenlerin kredi kart kabulÃ¼nde ne kadar etkili olacaÄŸÄ±nÄ± analiz edeceÄŸiz.
 
-Biraz veri önişlemesi yapalım; 1'den küçük bazı yaş verileri var, onları silelim
-ve değişkenlerin histogramını basalım.
+Biraz veri Ã¶niÅŸlemesi yapalÄ±m; 1'den kÃ¼Ã§Ã¼k bazÄ± yaÅŸ verileri var, onlarÄ± silelim
+ve deÄŸiÅŸkenlerin histogramÄ±nÄ± basalÄ±m.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -1456,15 +1456,15 @@ plt.savefig('stat_logit_01.png')
 
 \includegraphics[height=12cm]{stat_logit_01.png}
 
-Görüldüğü gibi \verb!share! sola doğru çok yamuk (highly skewed) duruyor, bu
-değişkenin bu sebeple log'unu aldık. Değişken \verb!reports! aynı durumda,
-ayrıca bu değişkenin çoğu değeri 0 ya da 1, ama maksimum değeri 14. Bu sebeple
-\verb!log(reports+1)! kullandık ki 0'in logunu almak zorunda olmayalım, ki zaten
-bu tanımsızdır. Bu transformasyonu yapıyoruz çünkü belli noktalarda aşırı yoğun
-olan değişkenler (ki yamukluklarının sebebi bu) çok yüksek katsayı değerlerinin
-çıkmasını tetikleyebiliyor, bu yüzden transformasyon ile onları biraz daha
-yaymaya uğraşıyoruz. Alttaki regresyon transformasyon yapılmış hali, onun
-altında yapılmamış hali de var.
+GÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi \verb!share! sola doÄŸru Ã§ok yamuk (highly skewed) duruyor, bu
+deÄŸiÅŸkenin bu sebeple log'unu aldÄ±k. DeÄŸiÅŸken \verb!reports! aynÄ± durumda,
+ayrÄ±ca bu deÄŸiÅŸkenin Ã§oÄŸu deÄŸeri 0 ya da 1, ama maksimum deÄŸeri 14. Bu sebeple
+\verb!log(reports+1)! kullandÄ±k ki 0'in logunu almak zorunda olmayalÄ±m, ki zaten
+bu tanÄ±msÄ±zdÄ±r. Bu transformasyonu yapÄ±yoruz Ã§Ã¼nkÃ¼ belli noktalarda aÅŸÄ±rÄ± yoÄŸun
+olan deÄŸiÅŸkenler (ki yamukluklarÄ±nÄ±n sebebi bu) Ã§ok yÃ¼ksek katsayÄ± deÄŸerlerinin
+Ã§Ä±kmasÄ±nÄ± tetikleyebiliyor, bu yÃ¼zden transformasyon ile onlarÄ± biraz daha
+yaymaya uÄŸraÅŸÄ±yoruz. Alttaki regresyon transformasyon yapÄ±lmÄ±ÅŸ hali, onun
+altÄ±nda yapÄ±lmamÄ±ÅŸ hali de var.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import statsmodels.formula.api as smf
@@ -1504,7 +1504,7 @@ BIC -9222.02662057
 AIC 155.790971664
 \end{verbatim}
 
-Değişken \verb!reports! ve \verb!share! transforme edilmemiş hali,
+DeÄŸiÅŸken \verb!reports! ve \verb!share! transforme edilmemiÅŸ hali,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import statsmodels.formula.api as smf
@@ -1544,44 +1544,44 @@ BIC -9218.93777391
 AIC nan
 \end{verbatim}
 
-Görüldüğü gibi \verb!share! katsayısı oldukça büyük, ve bu modelde modelin
-veriye uyum kalitesini ölçen BIC değeri aşağı yukarı 3 civarında büyüdü (daha
-küçük BIC daha iyi).
+GÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi \verb!share! katsayÄ±sÄ± oldukÃ§a bÃ¼yÃ¼k, ve bu modelde modelin
+veriye uyum kalitesini Ã¶lÃ§en BIC deÄŸeri aÅŸaÄŸÄ± yukarÄ± 3 civarÄ±nda bÃ¼yÃ¼dÃ¼ (daha
+kÃ¼Ã§Ã¼k BIC daha iyi).
 
-Bir önceki regresyona bakarsak (ki doğru olarak onu kabul ediyoruz artık)
-değişkenlerin p-değerine göre \verb!log_reports1!, \verb!share!, \verb!income!,
-ve \verb!dependents! değişkenlerinin önemli (significant) olduğunu
-görüyoruz. Demek ki bu değişkenlerin kredi kartı başvurusunun kabulü bağlamında
-en önemli değişkenler. Sayısal olarak \verb!income! ve \verb!share! arttıkça
-kabul şansı artıyor, \verb!reports! ve \verb!dependents! arttıkça şans azalıyor.
+Bir Ã¶nceki regresyona bakarsak (ki doÄŸru olarak onu kabul ediyoruz artÄ±k)
+deÄŸiÅŸkenlerin p-deÄŸerine gÃ¶re \verb!log_reports1!, \verb!share!, \verb!income!,
+ve \verb!dependents! deÄŸiÅŸkenlerinin Ã¶nemli (significant) olduÄŸunu
+gÃ¶rÃ¼yoruz. Demek ki bu deÄŸiÅŸkenlerin kredi kartÄ± baÅŸvurusunun kabulÃ¼ baÄŸlamÄ±nda
+en Ã¶nemli deÄŸiÅŸkenler. SayÄ±sal olarak \verb!income! ve \verb!share! arttÄ±kÃ§a
+kabul ÅŸansÄ± artÄ±yor, \verb!reports! ve \verb!dependents! arttÄ±kÃ§a ÅŸans azalÄ±yor.
 
-Not: Üstte AIC değeri niye \verb!nan! oldu? Tabii ondan önce AIC ve BIC
-nedir tanımlayalım. 
+Not: Ãœstte AIC deÄŸeri niye \verb!nan! oldu? Tabii ondan Ã¶nce AIC ve BIC
+nedir tanÄ±mlayalÄ±m. 
 
 $$ AIC = -2\log \{ L(\hat{\theta}_{ML}) \} + 2p $$
 
 $$ BIC = -2\log \{ L(\hat{\theta}_{ML}) \} + \log(n)p $$
 
-AIC ve BIC bir modelin veriye ne kadar iyi uyduğunu gösteren ölçütlerdir. Log
-olurluk, yani verinin bir modele göre kadar ne kadar olası olduğu AIC'in önemli
-bir parçası. Fakat ek olarak modelin parametre sayısı $p$ e $2p$ olarak AIC'e
-dahil edilmiş, yani olurluğu aynı olan iki modelden daha basit olanı tercih
+AIC ve BIC bir modelin veriye ne kadar iyi uyduÄŸunu gÃ¶steren Ã¶lÃ§Ã¼tlerdir. Log
+olurluk, yani verinin bir modele gÃ¶re kadar ne kadar olasÄ± olduÄŸu AIC'in Ã¶nemli
+bir parÃ§asÄ±. Fakat ek olarak modelin parametre sayÄ±sÄ± $p$ e $2p$ olarak AIC'e
+dahil edilmiÅŸ, yani olurluÄŸu aynÄ± olan iki modelden daha basit olanÄ± tercih
 edilecektir [8].
 
-Ayrıca AIC ölçütünün, standart varsayımlar altında, verinin bir parçasını
-dışarıda bırakarak yapılan çapraz sağlamaya (cross-validation) eşdeğer olduğu da
-ispatlanmıştır [9, sf. 90]. Bu çok ciddi bir avantajdır!  Düşünürsek, yeni veri
-üzerinde elde edilecek başarının ölçümü çoğunlukla ana ``eğitim'' verisinin bir
-kısmı dışarıda bırakılarak, yani hakikaten ``yeni veri'' yaratarak hesaplanmaya
-uğraşılır - AIC bu işi verinin kendisine bakarak doğal olarak yapıyor.
+AyrÄ±ca AIC Ã¶lÃ§Ã¼tÃ¼nÃ¼n, standart varsayÄ±mlar altÄ±nda, verinin bir parÃ§asÄ±nÄ±
+dÄ±ÅŸarÄ±da bÄ±rakarak yapÄ±lan Ã§apraz saÄŸlamaya (cross-validation) eÅŸdeÄŸer olduÄŸu da
+ispatlanmÄ±ÅŸtÄ±r [9, sf. 90]. Bu Ã§ok ciddi bir avantajdÄ±r!  DÃ¼ÅŸÃ¼nÃ¼rsek, yeni veri
+Ã¼zerinde elde edilecek baÅŸarÄ±nÄ±n Ã¶lÃ§Ã¼mÃ¼ Ã§oÄŸunlukla ana ``eÄŸitim'' verisinin bir
+kÄ±smÄ± dÄ±ÅŸarÄ±da bÄ±rakÄ±larak, yani hakikaten ``yeni veri'' yaratarak hesaplanmaya
+uÄŸraÅŸÄ±lÄ±r - AIC bu iÅŸi verinin kendisine bakarak doÄŸal olarak yapÄ±yor.
 
-Bozukluğa dönelim: sebep nedir? Burada tahmin yürütmek gerekirse, AIC
-hesabındaki log olurluk (likelihood) hesabı bozukluğa yol açmış olabilir, çünkü
-problem log transform edilmemiş veride ortaya çıktı. Hatırlarsak
-transformasyonda sıfırlara 1 eklenmişti çünkü sıfırın log'u tanımsızdır. Bu
-tanımsızlık AIC hesabındaki log olurluk hesabını da bozmuş olabilir. BIC için de
-aynı şey geçerli olabilirdi, fakat bu modül değişik bir şekilde bu hesabı
-yapıyor herhalde (ayrı kişiler ayrı tekniklerle yazılmış olabilirler).
+BozukluÄŸa dÃ¶nelim: sebep nedir? Burada tahmin yÃ¼rÃ¼tmek gerekirse, AIC
+hesabÄ±ndaki log olurluk (likelihood) hesabÄ± bozukluÄŸa yol aÃ§mÄ±ÅŸ olabilir, Ã§Ã¼nkÃ¼
+problem log transform edilmemiÅŸ veride ortaya Ã§Ä±ktÄ±. HatÄ±rlarsak
+transformasyonda sÄ±fÄ±rlara 1 eklenmiÅŸti Ã§Ã¼nkÃ¼ sÄ±fÄ±rÄ±n log'u tanÄ±msÄ±zdÄ±r. Bu
+tanÄ±msÄ±zlÄ±k AIC hesabÄ±ndaki log olurluk hesabÄ±nÄ± da bozmuÅŸ olabilir. BIC iÃ§in de
+aynÄ± ÅŸey geÃ§erli olabilirdi, fakat bu modÃ¼l deÄŸiÅŸik bir ÅŸekilde bu hesabÄ±
+yapÄ±yor herhalde (ayrÄ± kiÅŸiler ayrÄ± tekniklerle yazÄ±lmÄ±ÅŸ olabilirler).
 
 Kaynaklar
 

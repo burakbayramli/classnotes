@@ -2,93 +2,93 @@
 \begin{document}
 Kalman Filtreleri
 
-Diyelim ki bir video kameradan gelen imajları kullanarak obje takip eden bir
-yazılım istiyoruz. Matematiksel olarak obje nedir? İmajı nedir? obje kendi
-dünyasında bir süreci takip etmektedir, 3 boyutlu uzayda bir yer kaplamaktadır
-ve orada hareket etmektedir. Biz bu hareketi belli bir güven aralığı / hata payı
-üzerinden biliyor olabiliriz. Diğer yandan objenin kameraya yansıttığı imaj
-vardır, bu imaj 2 boyutlu ve kameranın özellikleriyle alakalı parametreler
-sebebiyle belli bir şekilde ``yansıtılmış (project)'' olacaktır. Biz bu yansıtma
-formülünü de, belli bir hata payı üzerinden, biliyor olabiliriz.
+Diyelim ki bir video kameradan gelen imajlarÄ± kullanarak obje takip eden bir
+yazÄ±lÄ±m istiyoruz. Matematiksel olarak obje nedir? Ä°majÄ± nedir? obje kendi
+dÃ¼nyasÄ±nda bir sÃ¼reci takip etmektedir, 3 boyutlu uzayda bir yer kaplamaktadÄ±r
+ve orada hareket etmektedir. Biz bu hareketi belli bir gÃ¼ven aralÄ±ÄŸÄ± / hata payÄ±
+Ã¼zerinden biliyor olabiliriz. DiÄŸer yandan objenin kameraya yansÄ±ttÄ±ÄŸÄ± imaj
+vardÄ±r, bu imaj 2 boyutlu ve kameranÄ±n Ã¶zellikleriyle alakalÄ± parametreler
+sebebiyle belli bir ÅŸekilde ``yansÄ±tÄ±lmÄ±ÅŸ (project)'' olacaktÄ±r. Biz bu yansÄ±tma
+formÃ¼lÃ¼nÃ¼ de, belli bir hata payÄ± Ã¼zerinden, biliyor olabiliriz.
 
-Bu durumu şöyle modelleyebiliriz,
+Bu durumu ÅŸÃ¶yle modelleyebiliriz,
 
 $$ x_k = \Phi_{k-1}x_{k-1} + w_{k-1} $$
 
 $$ z_k = H_k x_k + v_k $$
 
-$x_k = (n \times 1)$ vektörü, $k$ anındaki sürecin durumu (state)
+$x_k = (n \times 1)$ vektÃ¶rÃ¼, $k$ anÄ±ndaki sÃ¼recin durumu (state)
 
 $\Phi_k = (n \times n)$ matrisi, $x_{k-1}$ durumundan $x_{k}$ durumuna
-geçişi tarif eden formül.
+geÃ§iÅŸi tarif eden formÃ¼l.
 
-$w_k = (n \times 1)$ vektörü, sıfır ortalamalı, kovaryansı $Q_k$ olan beyaz
-gürültü.
+$w_k = (n \times 1)$ vektÃ¶rÃ¼, sÄ±fÄ±r ortalamalÄ±, kovaryansÄ± $Q_k$ olan beyaz
+gÃ¼rÃ¼ltÃ¼.
 
-$z_k = (n \times 1)$ vektörü, dışarıdan alınan ölçüm.
+$z_k = (n \times 1)$ vektÃ¶rÃ¼, dÄ±ÅŸarÄ±dan alÄ±nan Ã¶lÃ§Ã¼m.
 
-$H_k = (m \times n)$ matrisi, gizli konum bilgisinin dışarıya nasıl ölçüm olarak
-yansıdığının formülü. Bu dönüşüm ideal, yani gürültüsüz durumu tarif eder.
+$H_k = (m \times n)$ matrisi, gizli konum bilgisinin dÄ±ÅŸarÄ±ya nasÄ±l Ã¶lÃ§Ã¼m olarak
+yansÄ±dÄ±ÄŸÄ±nÄ±n formÃ¼lÃ¼. Bu dÃ¶nÃ¼ÅŸÃ¼m ideal, yani gÃ¼rÃ¼ltÃ¼sÃ¼z durumu tarif eder.
 
-$v_k = (m \times 1)$ vektörü, ölçüm hatası.
+$v_k = (m \times 1)$ vektÃ¶rÃ¼, Ã¶lÃ§Ã¼m hatasÄ±.
 
-Yani formüllerin söylediği şudur: ilk formül bize izlenen her ne ise onun
-hareketini tarif ediyor, $k-1$ anından $k$ anına geçişini tarif ediyor. $z_k$
-ise bu $x_k$'nin dışarıdan alınan ölçümü. Bizim yapmak istediğimiz $z_k$'leri
-kullanarak $x_k$'nin nerede olduğunu kestirebilmek.
+Yani formÃ¼llerin sÃ¶ylediÄŸi ÅŸudur: ilk formÃ¼l bize izlenen her ne ise onun
+hareketini tarif ediyor, $k-1$ anÄ±ndan $k$ anÄ±na geÃ§iÅŸini tarif ediyor. $z_k$
+ise bu $x_k$'nin dÄ±ÅŸarÄ±dan alÄ±nan Ã¶lÃ§Ã¼mÃ¼. Bizim yapmak istediÄŸimiz $z_k$'leri
+kullanarak $x_k$'nin nerede olduÄŸunu kestirebilmek.
 
-Sıfır merkezli gürültü şu demektir,
+SÄ±fÄ±r merkezli gÃ¼rÃ¼ltÃ¼ ÅŸu demektir,
 
 $$ E[v_k] = E[w_k] = 0 $$
 
-Ayrıca,
+AyrÄ±ca,
 
 $$ E[v_kv_k^T] = R_k $$
 
 $$ E[w_kw_k^T] = Q_k $$
 
-Kalman filtreleri (KF) ile yapmak istediğimizin dışarıdan görünen $z_k$'yi
-kullanarak gizli $x_k$'yi kestirmek olduğunu söylemiştik. Ayrıca bu tahminleri
-her gelen veri noktasına göre sürekli güncelliyor olacağız, yani 100 tane veri
-noktasını almak için bekleyip sonra toptan bir analiz yapmaya gerek yok
-(istenirse yöntem toptan işleyecek şekilde de kullanılabilir tabii). Tahmin
-edilebileceği üzere bu tür bir gerçek zamanlı kabiliyetin pek çok mühendislik
-uygulaması olabilir; hakikaten de mesella aya ilk insanlı ınışı yapan Apollo
-modülü bir Kalman filtresi kullanıyordu.
+Kalman filtreleri (KF) ile yapmak istediÄŸimizin dÄ±ÅŸarÄ±dan gÃ¶rÃ¼nen $z_k$'yi
+kullanarak gizli $x_k$'yi kestirmek olduÄŸunu sÃ¶ylemiÅŸtik. AyrÄ±ca bu tahminleri
+her gelen veri noktasÄ±na gÃ¶re sÃ¼rekli gÃ¼ncelliyor olacaÄŸÄ±z, yani 100 tane veri
+noktasÄ±nÄ± almak iÃ§in bekleyip sonra toptan bir analiz yapmaya gerek yok
+(istenirse yÃ¶ntem toptan iÅŸleyecek ÅŸekilde de kullanÄ±labilir tabii). Tahmin
+edilebileceÄŸi Ã¼zere bu tÃ¼r bir gerÃ§ek zamanlÄ± kabiliyetin pek Ã§ok mÃ¼hendislik
+uygulamasÄ± olabilir; hakikaten de mesella aya ilk insanlÄ± Ä±nÄ±ÅŸÄ± yapan Apollo
+modÃ¼lÃ¼ bir Kalman filtresi kullanÄ±yordu.
 
-KF'i türetmek için önce bir lineer tahmin edici (estimator) tanımlamak gerekir,
-ve sonra bu tahmin ediciyi optimize eden şartların ne olduğu incelenir. Şu
-notasyonu kullanalım: Tilde yani $\tilde{x}$ üzerindeki işaret, o değişkenin
-tahmin ile gerçeği arasındaki hatayı temsil etmesi içindir, $\hat{x}$ üzerindeki
-şapka ise istatistik dersinden hatırlayacağımız üzere tahmin edici
-(estimator). Ayrıca bir değişkenin üzerindeki $^-$ ve $^+$ işaretlerini bu
-değişkenin ölçüm dikkate alındıktan önceki ve sonraki (o sırayla) hali olarak
-tanımlayalım.
+KF'i tÃ¼retmek iÃ§in Ã¶nce bir lineer tahmin edici (estimator) tanÄ±mlamak gerekir,
+ve sonra bu tahmin ediciyi optimize eden ÅŸartlarÄ±n ne olduÄŸu incelenir. Åu
+notasyonu kullanalÄ±m: Tilde yani $\tilde{x}$ Ã¼zerindeki iÅŸaret, o deÄŸiÅŸkenin
+tahmin ile gerÃ§eÄŸi arasÄ±ndaki hatayÄ± temsil etmesi iÃ§indir, $\hat{x}$ Ã¼zerindeki
+ÅŸapka ise istatistik dersinden hatÄ±rlayacaÄŸÄ±mÄ±z Ã¼zere tahmin edici
+(estimator). AyrÄ±ca bir deÄŸiÅŸkenin Ã¼zerindeki $^-$ ve $^+$ iÅŸaretlerini bu
+deÄŸiÅŸkenin Ã¶lÃ§Ã¼m dikkate alÄ±ndÄ±ktan Ã¶nceki ve sonraki (o sÄ±rayla) hali olarak
+tanÄ±mlayalÄ±m.
 
-Konum bilgisi ve hata arasındaki ilişkiyi şu şekilde belirtelim,
+Konum bilgisi ve hata arasÄ±ndaki iliÅŸkiyi ÅŸu ÅŸekilde belirtelim,
 
 $$ \hat{x}_k^+ = x_k + \tilde{x_k}^+ $$
 
 $$ \hat{x}_k^- = x_k + \tilde{x_k}^- $$
 
-Elimizdeki en iyi tahmin $\hat{x}_k^-$'i yeni veri / ölçüm elde ettikten sonra
-güncellemek istiyoruz. Bunu yaparken gürültülü ölçümle eldeki en son tahmini
-lineer bir şekilde birleştirmek istiyoruz. Bu birleştirmeyi,
+Elimizdeki en iyi tahmin $\hat{x}_k^-$'i yeni veri / Ã¶lÃ§Ã¼m elde ettikten sonra
+gÃ¼ncellemek istiyoruz. Bunu yaparken gÃ¼rÃ¼ltÃ¼lÃ¼ Ã¶lÃ§Ã¼mle eldeki en son tahmini
+lineer bir ÅŸekilde birleÅŸtirmek istiyoruz. Bu birleÅŸtirmeyi,
 
 $$ \hat{x}_k^+ = \hat{x}_k^- + K_k (z_k - H_k \hat{x}_k^-)   $$
 
-olarak temsil edebiliriz, $\hat{x}_k^+$ güncellenmiş tahmindir, $K_k$ ise
-birleştirme faktörüdür (blending factor), ki bu değerin ne olduğunu şu anda
+olarak temsil edebiliriz, $\hat{x}_k^+$ gÃ¼ncellenmiÅŸ tahmindir, $K_k$ ise
+birleÅŸtirme faktÃ¶rÃ¼dÃ¼r (blending factor), ki bu deÄŸerin ne olduÄŸunu ÅŸu anda
 bilmiyoruz.
 
-Tekrar düzenlersek, 
+Tekrar dÃ¼zenlersek, 
 
 $$= \hat{x}_k^- - K_kH_k\hat{x}_k^- + K_kz_k    $$
 
 $$ \hat{x}_k^+ = \hat{x}_k^- (I - K_kH_k) + K_kz_k $$
 
-Daha temiz olması için $K_k' = I - K_kH_k$ diyelim, ve en baştaki
-formülleri bir daha alta alta yazalım,
+Daha temiz olmasÄ± iÃ§in $K_k' = I - K_kH_k$ diyelim, ve en baÅŸtaki
+formÃ¼lleri bir daha alta alta yazalÄ±m,
 
 $$ 
 \hat{x}_k^+  = K_k' \hat{x}_k^- + K_kz_k  
@@ -110,15 +110,15 @@ $$
 \mlabel{4}
 $$
 
-(1) içine (2)
+(1) iÃ§ine (2)
 
 $$ \hat{x}_k^+ = K_k' \hat{x}_k^- + K_k(H_k x_k + v_k)   $$
 
-Eşitliğin solunu (3) ile açalım,
+EÅŸitliÄŸin solunu (3) ile aÃ§alÄ±m,
 
 $$ x_k + \tilde{x_k}^+ = K_k' \hat{x}_k^- + K_k(H_k x_k + v_k)   $$
 
-ve $x_k$'yi sağa geçirelim,
+ve $x_k$'yi saÄŸa geÃ§irelim,
 
 $$ \tilde{x_k}^+ = K_k' \hat{x}_k^- + K_k(H_k x_k + v_k) - x_k   $$
 
@@ -126,22 +126,22 @@ $\hat{x}_k^-$ yerine (4)
 
 $$  = K_k' (x_k + \tilde{x_k}^-) + K_k(H_k x_k + v_k) - x_k   $$
 
-$x_k$'leri yanyana getirip gruplayalım,
+$x_k$'leri yanyana getirip gruplayalÄ±m,
 
 $$  = K_k' x_k + K_kH_k x_k  - x_k + K_k'\tilde{x_k}^- + K_kv_k   $$
 
 $$ \tilde{x_k}^+ = x_k (K_k' + K_kH_k - I) + K_k'\tilde{x_k}^- + K_kv_k   $$
 
-Üstteki tüm ifadenin beklentisini aldığımız zaman,
+Ãœstteki tÃ¼m ifadenin beklentisini aldÄ±ÄŸÄ±mÄ±z zaman,
 
 $$ E[\tilde{x_k}^+] = E[x_k (K_k' + K_kH_k - I)] + E[K_k'\tilde{x_k}^-] + E[K_kv_k]  $$
 
-olacak değil mi? Burada biraz duralım, ve yansızlık kavramını düşünelim. Eğer
-tahmin edici $\hat{x}^+$ yansız (unbiased) olsun istiyorsak, bu şu anlama gelir,
+olacak deÄŸil mi? Burada biraz duralÄ±m, ve yansÄ±zlÄ±k kavramÄ±nÄ± dÃ¼ÅŸÃ¼nelim. EÄŸer
+tahmin edici $\hat{x}^+$ yansÄ±z (unbiased) olsun istiyorsak, bu ÅŸu anlama gelir,
 
 $$ E[\hat{x_k}^+] = E[x_k] $$
 
-Düzenleyelim,
+DÃ¼zenleyelim,
 
 $$ E[\hat{x_k}^+] - E[x_k] = 0$$
 
@@ -149,18 +149,18 @@ $$ E[\hat{x_k}^+ - x_k] = 0$$
 
 $$ E[ \tilde{x_k}^+] = 0$$
 
-Şimdi, formülü son bıraktığımız yere dönelim, orada eğer $E[\tilde{x_k}^+]=0$
-olsun istiyorsak ve $E[\tilde{x_k}^-] = 0$'in da doğru olduğu durumda geriye tek
-kalan $K_k' + K_kH_k - I$ ifadesinin sıfır olmasıdır (çünkü $E[v_k]=0$ olacak
-zaten), bu durumda herhangi bir $x_k$ için beklentinin sıfır gelmesi
+Åimdi, formÃ¼lÃ¼ son bÄ±raktÄ±ÄŸÄ±mÄ±z yere dÃ¶nelim, orada eÄŸer $E[\tilde{x_k}^+]=0$
+olsun istiyorsak ve $E[\tilde{x_k}^-] = 0$'in da doÄŸru olduÄŸu durumda geriye tek
+kalan $K_k' + K_kH_k - I$ ifadesinin sÄ±fÄ±r olmasÄ±dÄ±r (Ã§Ã¼nkÃ¼ $E[v_k]=0$ olacak
+zaten), bu durumda herhangi bir $x_k$ iÃ§in beklentinin sÄ±fÄ±r gelmesi
 
 $$ K_k' + K_kH_k - I = 0 $$
 
-olmasına bağlıdır. Tabii o doğru ise,
+olmasÄ±na baÄŸlÄ±dÄ±r. Tabii o doÄŸru ise,
 
 $$ K_k' = I - K_kH_k  $$
 
-Bu ifadeyi geriye, (1)'deki tahmin edicinin içine koyarsak
+Bu ifadeyi geriye, (1)'deki tahmin edicinin iÃ§ine koyarsak
 
 $$ \hat{x}_k^+  = (I - K_kH_k ) \hat{x}_k^- + K_kz_k  $$
 
@@ -168,7 +168,7 @@ Ya da
 
 $$ \hat{x}_k^+  = \hat{x}_k^- + K_k(z_k - H_k\hat{x}_k^- )  $$
 
-Eğer $\hat{x}_k^-$ için (4) kullanırsak,
+EÄŸer $\hat{x}_k^-$ iÃ§in (4) kullanÄ±rsak,
 
 $$ \hat{x}_k^+  =  (x_k + \tilde{x_k}^-) + K_k(z_k - H_k( x_k + \tilde{x_k}^-) )  $$
 
@@ -176,22 +176,22 @@ Tekrar gruplama,
 
 $$ \hat{x}_k^+  =  \tilde{x_k}^- (I - K_kH_k) + x_k + K_k(z_k - H_kx_k)   $$
 
-Ve (2)'yi $z_k - H_kx_k$ için kullanalım,
+Ve (2)'yi $z_k - H_kx_k$ iÃ§in kullanalÄ±m,
 
 $$ \hat{x}_k^+ - x_k =  (I - K_kH_k)\tilde{x_k}^- + K_kv_k   $$
 
 $$ \tilde{x}_k^+ = (I - K_kH_k)\tilde{x_k}^- + K_kv_k   $$
 
-Böylece tekabül eden tahmin hatasını hesaplamış olduk. 
+BÃ¶ylece tekabÃ¼l eden tahmin hatasÄ±nÄ± hesaplamÄ±ÅŸ olduk. 
 
-Tanım
+TanÄ±m
 
 $$ P_k^+ = E[ \tilde{x_k}^+\tilde{x_k}^{+T} ]$$
 
 $$ P_k^- = E[ \tilde{x_k}^- \tilde{x_k}^{-T} ]$$
 
-Bu kovaryans hesabının uygulanmasından ibaret aslında. Şimdi üç üstteki formülü
-üstten ikincisine sokarsak,
+Bu kovaryans hesabÄ±nÄ±n uygulanmasÄ±ndan ibaret aslÄ±nda. Åimdi Ã¼Ã§ Ã¼stteki formÃ¼lÃ¼
+Ã¼stten ikincisine sokarsak,
 
 $$ =  E \big[ (I - K_kH_k)\tilde{x_k}^- + K_kv_k \big] \big[\tilde{x_k}^{-T}(I - H_k^TK_k^T) + v_k^TK_k^T \big] $$
 
@@ -205,39 +205,39 @@ $$
 
 $$ K_kv_k \big( \tilde{x_k}^{-T}(I - H_k^TK_k^T) + v_k^TK_k^T  \big) \bigg] $$
 
-Önceden tanımlamıştık,
+Ã–nceden tanÄ±mlamÄ±ÅŸtÄ±k,
 
 $$ P_k^- = E[ \tilde{x_k}^- \tilde{x_k}^{-T} ]$$
 
 $$ E[v_kv_k^T] = R_k $$
 
-Ayrıca ölçüm hataları ve gürültü arasında korelasyon olmadığını farz ettiğimiz
-için,
+AyrÄ±ca Ã¶lÃ§Ã¼m hatalarÄ± ve gÃ¼rÃ¼ltÃ¼ arasÄ±nda korelasyon olmadÄ±ÄŸÄ±nÄ± farz ettiÄŸimiz
+iÃ§in,
 
 $$ E[\tilde{x_k}^-v_k^T] = E[v_k\tilde{x_k}^{-T}] = 0 $$
 
-Tüm bunları (5)'i basitleştirmek için kullanırsak,
+TÃ¼m bunlarÄ± (5)'i basitleÅŸtirmek iÃ§in kullanÄ±rsak,
 
 $$ 
 P_k^{+} =  (I - K_kH_k)P_k^-(I - H_k^TK_k^T) + K_kR_kK_k^T 
 \mlabel{6}
 $$
 
-En optimal $K_k$'yi nasıl buluruz? Amaç $P_k^+$ matrisinin çaprazındaki
-değerleri minimize etmektir, bu durumda optimize etmek istediğimiz bedel (cost)
+En optimal $K_k$'yi nasÄ±l buluruz? AmaÃ§ $P_k^+$ matrisinin Ã§aprazÄ±ndaki
+deÄŸerleri minimize etmektir, bu durumda optimize etmek istediÄŸimiz bedel (cost)
 fonksiyonu
 
 $$ J_k = E[ \tilde{x_k}^{+T}\tilde{x_k} ] $$
 
-olsun, ki bu tek bir sayısal değer verir. Bu aslında 
+olsun, ki bu tek bir sayÄ±sal deÄŸer verir. Bu aslÄ±nda 
 
 $$ J_k = Tr(P_k^+) $$
 
-değerinin optimize edilmesi ile aynı şeydir. Değil mi? Ya iki üstteki gibi
-vektör uzunluğunu minimize ediyoruz, ya da kovaryansın çaprazının izini (trace)
-minimize ediyoruz, çünkü her ikisinde de aynı değerler var. İz operatörü
-hatırlayacağımız üzere bir matrisin çaprazındaki değerleri toplar. İz
-kullanmamızın sebebi bize bazı türevsel numaralar sağlaması,
+deÄŸerinin optimize edilmesi ile aynÄ± ÅŸeydir. DeÄŸil mi? Ya iki Ã¼stteki gibi
+vektÃ¶r uzunluÄŸunu minimize ediyoruz, ya da kovaryansÄ±n Ã§aprazÄ±nÄ±n izini (trace)
+minimize ediyoruz, Ã§Ã¼nkÃ¼ her ikisinde de aynÄ± deÄŸerler var. Ä°z operatÃ¶rÃ¼
+hatÄ±rlayacaÄŸÄ±mÄ±z Ã¼zere bir matrisin Ã§aprazÄ±ndaki deÄŸerleri toplar. Ä°z
+kullanmamÄ±zÄ±n sebebi bize bazÄ± tÃ¼revsel numaralar saÄŸlamasÄ±,
 
 Biliyoruz ki, eger $B$ simetrik ise,
 
@@ -245,15 +245,15 @@ $$ \frac{\partial }{\partial A} Tr(ABA^T) = 2AB $$
 
 $$ Tr(P_k^{+}) =  Tr((I - K_kH_k)P_k^-(I - H_k^TK_k^T)) + Tr(K_kR_kK_k^T) $$
 
-İki tane iz var, bu izler içinde bir $ABA^T$ formu görebiliyoruz herhalde,
-onların $K_k$'ye göre türevini alıyoruz,
+Ä°ki tane iz var, bu izler iÃ§inde bir $ABA^T$ formu gÃ¶rebiliyoruz herhalde,
+onlarÄ±n $K_k$'ye gÃ¶re tÃ¼revini alÄ±yoruz,
 
 $$ 
 \frac{\partial Tr(P_k^{+})}{\partial K_k}  =
 -2(I - K_kH_k)P_k^- H_k^T + 2K_kR_k
 $$
 
-Şimdi sıfıra eşitleyip $K_k$ için çözelim,
+Åimdi sÄ±fÄ±ra eÅŸitleyip $K_k$ iÃ§in Ã§Ã¶zelim,
 
 $$ 0 = -2(I - K_kH_k)P_k^- H_k^T + 2K_kR_k $$
 
@@ -265,8 +265,8 @@ $$  P_k^- H_k^T = K_k(H_kP_k^- H_k^T + R_k)  $$
 
 $$  K_k = P_k^- H_k^T(H_kP_k^- H_k^T + R_k)^{-1} $$
 
-$K_k$ matrisine Kalman kazanç matrisi (Kalman gain matrix) ismi de verilir. Ve
-en son olarak bu sonucu (6) içine koyarsak, ve biraz manipülasyon ardından,
+$K_k$ matrisine Kalman kazanÃ§ matrisi (Kalman gain matrix) ismi de verilir. Ve
+en son olarak bu sonucu (6) iÃ§ine koyarsak, ve biraz manipÃ¼lasyon ardÄ±ndan,
 
 $$ P_k^+ = P_k^- -P_k^- H_k^T (H_kP_k^- H_k^T + R_k)^{-1}H_kP_k^-  $$
 
@@ -274,12 +274,12 @@ $$ = [I - K_kH_k]P_k^-  $$
 
 sonucunu elde ederiz. 
 
-Bu hesaplar ölçüm aldıktan {\em sonra} tahmini güncellemek içindi. Peki ölçüm
-almadan önceki tahmini nasıl yaparız? Bunu yapmamız gerekir çünkü ölçüm gelmeden
-önce yeni bir tahmin yapılmalı ki o tahmini, onun hatasını bir sonraki ölçüm ile
-düzeltilebilelim. Bu geçişin nasıl olacağını en başta belirttiğimiz KF modeli
-gösteriyor zaten, konum geçişi / adımı ona göre atıp, sonucun beklentisini ve
-kovaryansını hesaplıyoruz,
+Bu hesaplar Ã¶lÃ§Ã¼m aldÄ±ktan {\em sonra} tahmini gÃ¼ncellemek iÃ§indi. Peki Ã¶lÃ§Ã¼m
+almadan Ã¶nceki tahmini nasÄ±l yaparÄ±z? Bunu yapmamÄ±z gerekir Ã§Ã¼nkÃ¼ Ã¶lÃ§Ã¼m gelmeden
+Ã¶nce yeni bir tahmin yapÄ±lmalÄ± ki o tahmini, onun hatasÄ±nÄ± bir sonraki Ã¶lÃ§Ã¼m ile
+dÃ¼zeltilebilelim. Bu geÃ§iÅŸin nasÄ±l olacaÄŸÄ±nÄ± en baÅŸta belirttiÄŸimiz KF modeli
+gÃ¶steriyor zaten, konum geÃ§iÅŸi / adÄ±mÄ± ona gÃ¶re atÄ±p, sonucun beklentisini ve
+kovaryansÄ±nÄ± hesaplÄ±yoruz,
 
 $$ \hat{x}_k^- = E[\Phi_{k-1}x_{k-1}^+ + w] = \Phi_{k-1}x_{k-1}^+ $$
 
@@ -287,65 +287,65 @@ $$ P_k^- = Cov(\Phi_{k-1}x_{k-1}^+) = E[(\Phi_{k-1}x_{k-1}^+ + w)(\Phi_{k-1}x_{k
 
 $$ =  \Phi_{k-1}P_{k-1}^+\Phi_{k-1}^T + Q_{k-1}  $$
 
-$P_k^-$ hesabında ne olduğuna dikkat, bir sonraki ölçüm olmadan sadece geçiş
-  formülü üzerinde tahmin etmeye uğraştık, ve bu tabii ki bilinmezliği arttırdı
-  ($Q$ toplanıyor).
+$P_k^-$ hesabÄ±nda ne olduÄŸuna dikkat, bir sonraki Ã¶lÃ§Ã¼m olmadan sadece geÃ§iÅŸ
+  formÃ¼lÃ¼ Ã¼zerinde tahmin etmeye uÄŸraÅŸtÄ±k, ve bu tabii ki bilinmezliÄŸi arttÄ±rdÄ±
+  ($Q$ toplanÄ±yor).
 
-En son adım bu; $\hat{x}_k^-,P_k^-$ artık bir sonraki güncelleme için
-kullanılacak değerlerdir. Bu noktada başa dönüyoruz, ve aynı işlemleri
-tekrarlıyoruz. Eğer verinin alımı, model güncellemesi, ileri tahmin adımında
-olanları bir figürle göstermek gerekirse (indisler resimde bir ileri alınmış,
-bunu aklımızda düzelterek bakalım),
+En son adÄ±m bu; $\hat{x}_k^-,P_k^-$ artÄ±k bir sonraki gÃ¼ncelleme iÃ§in
+kullanÄ±lacak deÄŸerlerdir. Bu noktada baÅŸa dÃ¶nÃ¼yoruz, ve aynÄ± iÅŸlemleri
+tekrarlÄ±yoruz. EÄŸer verinin alÄ±mÄ±, model gÃ¼ncellemesi, ileri tahmin adÄ±mÄ±nda
+olanlarÄ± bir figÃ¼rle gÃ¶stermek gerekirse (indisler resimde bir ileri alÄ±nmÄ±ÅŸ,
+bunu aklÄ±mÄ±zda dÃ¼zelterek bakalÄ±m),
 
 \includegraphics[height=8cm]{tser_kf_01.png}
 
-Aslında tüm bu süreci bir sözde kod (pseudocode) parçası ile göstermeyi
-düşünmüştük, ki ölçüm verisi bir \verb!for! döngüsü ile listeden alınarak teker
-teker işlenecekti, fakat bu üstteki tarifi tam anlatamayacaktı, çünkü KF için
-illa elde belli sayıda ``işlenip bitirilen'' ölçüm olması gerekmez. Güncelleme
-her yeni ölçüm için, o tek ölçüm bazında yapılabildiği için şimdi 1 tane, sonra
-10 tane, sonra bekleyip 2 tane daha, vs. şeklinde veri işlenmesi gayet
-mümkündür. Bu işlem gerçek zamanlı olabilir, ya da bir listeyi gezerek anlık
-olmayan bir şekilde olabilir.  Bu yüzden üstteki döngü resmini tercih ettik.
+AslÄ±nda tÃ¼m bu sÃ¼reci bir sÃ¶zde kod (pseudocode) parÃ§asÄ± ile gÃ¶stermeyi
+dÃ¼ÅŸÃ¼nmÃ¼ÅŸtÃ¼k, ki Ã¶lÃ§Ã¼m verisi bir \verb!for! dÃ¶ngÃ¼sÃ¼ ile listeden alÄ±narak teker
+teker iÅŸlenecekti, fakat bu Ã¼stteki tarifi tam anlatamayacaktÄ±, Ã§Ã¼nkÃ¼ KF iÃ§in
+illa elde belli sayÄ±da ``iÅŸlenip bitirilen'' Ã¶lÃ§Ã¼m olmasÄ± gerekmez. GÃ¼ncelleme
+her yeni Ã¶lÃ§Ã¼m iÃ§in, o tek Ã¶lÃ§Ã¼m bazÄ±nda yapÄ±labildiÄŸi iÃ§in ÅŸimdi 1 tane, sonra
+10 tane, sonra bekleyip 2 tane daha, vs. ÅŸeklinde veri iÅŸlenmesi gayet
+mÃ¼mkÃ¼ndÃ¼r. Bu iÅŸlem gerÃ§ek zamanlÄ± olabilir, ya da bir listeyi gezerek anlÄ±k
+olmayan bir ÅŸekilde olabilir.  Bu yÃ¼zden Ã¼stteki dÃ¶ngÃ¼ resmini tercih ettik.
 
-Not: Bazı kaynaklarda Kalman Filtrelerinin uygun bir model üzerinden en az
-kareler (least square) ile yani çizgi / düzlem uydurması ile aynı sonuca
-varabileceği söylenir, bu tam doğru degil, KF üstel ağırlıklı
-(exponentially weighted) en az kareler ile aynıdır, yani en son veri
-noktalarının daha öncekilere göre daha çok ağırlığı vardır. KF ile
-regresyon örneği için bkz [5] yazısı.
+Not: BazÄ± kaynaklarda Kalman Filtrelerinin uygun bir model Ã¼zerinden en az
+kareler (least square) ile yani Ã§izgi / dÃ¼zlem uydurmasÄ± ile aynÄ± sonuca
+varabileceÄŸi sÃ¶ylenir, bu tam doÄŸru degil, KF Ã¼stel aÄŸÄ±rlÄ±klÄ±
+(exponentially weighted) en az kareler ile aynÄ±dÄ±r, yani en son veri
+noktalarÄ±nÄ±n daha Ã¶ncekilere gÃ¶re daha Ã§ok aÄŸÄ±rlÄ±ÄŸÄ± vardÄ±r. KF ile
+regresyon Ã¶rneÄŸi iÃ§in bkz [5] yazÄ±sÄ±.
 
-Bir not daha: $x_k = \Phi_{k-1}x_{k-1} + w_{k-1}$ geçişinde $\Phi_{k-1}$
-ile çarpım bir lineer konum değişimini modeller, o zaman lineer olmayan
-geçişlerin KF modellenmesi mümkün değildir. Mesela bir topun ileri, havaya
-doğru atıldığı bir örneği düşünelim, ölçümlerde Gaussian gürültü
-olsun. Topun gidişi bir parabolu takip edecektir, oldukca basit bir
-gidiştir, fakat KF'in bu gidişi takip etmesi mümkün değildir. Parçacık
-filtreleri, genişletilmiş KF (EKF), UKF gibi yaklaşımlar bu sebeple
-alternatif haline gelmişlerdir.
+Bir not daha: $x_k = \Phi_{k-1}x_{k-1} + w_{k-1}$ geÃ§iÅŸinde $\Phi_{k-1}$
+ile Ã§arpÄ±m bir lineer konum deÄŸiÅŸimini modeller, o zaman lineer olmayan
+geÃ§iÅŸlerin KF modellenmesi mÃ¼mkÃ¼n deÄŸildir. Mesela bir topun ileri, havaya
+doÄŸru atÄ±ldÄ±ÄŸÄ± bir Ã¶rneÄŸi dÃ¼ÅŸÃ¼nelim, Ã¶lÃ§Ã¼mlerde Gaussian gÃ¼rÃ¼ltÃ¼
+olsun. Topun gidiÅŸi bir parabolu takip edecektir, oldukca basit bir
+gidiÅŸtir, fakat KF'in bu gidiÅŸi takip etmesi mÃ¼mkÃ¼n deÄŸildir. ParÃ§acÄ±k
+filtreleri, geniÅŸletilmiÅŸ KF (EKF), UKF gibi yaklaÅŸÄ±mlar bu sebeple
+alternatif haline gelmiÅŸlerdir.
 
-Bir KF kodlaması alttadır. 
+Bir KF kodlamasÄ± alttadÄ±r. 
 
 \inputminted[fontsize=\footnotesize]{python}{kalman_3d.py}
 
-Örnek
+Ã–rnek
 
-Diyelim ki tek boyutta bir köpeğin gidişini modellemek istiyoruz [4,
-pg. 191]. Köpek sabit bir hızda ilerliyor olsun (bu geçiş modeli), ve biz
-onu sadece havlamaların nereden geldiği ile bulmaya uğraşacağız (bu da
-gürültülü ölçüm). Geçiş
+Diyelim ki tek boyutta bir kÃ¶peÄŸin gidiÅŸini modellemek istiyoruz [4,
+pg. 191]. KÃ¶pek sabit bir hÄ±zda ilerliyor olsun (bu geÃ§iÅŸ modeli), ve biz
+onu sadece havlamalarÄ±n nereden geldiÄŸi ile bulmaya uÄŸraÅŸacaÄŸÄ±z (bu da
+gÃ¼rÃ¼ltÃ¼lÃ¼ Ã¶lÃ§Ã¼m). GeÃ§iÅŸ
 
 $$ x = v \Delta t + x_0$$
 
-Hız $v$ yerine $\dot{x}$ kullanalım, o zaman 
+HÄ±z $v$ yerine $\dot{x}$ kullanalÄ±m, o zaman 
 
 $$\bar x = x + \dot x \Delta t$$
 
-Hız sabit olacağı için onun geçişi şöyle,
+HÄ±z sabit olacaÄŸÄ± iÃ§in onun geÃ§iÅŸi ÅŸÃ¶yle,
 
 $$\bar{\dot x} = \dot x$$
 
-Alt alta yazalım,
+Alt alta yazalÄ±m,
 
 $$\begin{cases}
 \begin{aligned}
@@ -354,7 +354,7 @@ $$\begin{cases}
 \end{aligned}
 \end{cases}$$
 
-Düzenlersek,
+DÃ¼zenlersek,
 
 $$\begin{cases}
 \begin{aligned}
@@ -371,25 +371,25 @@ $$\begin{aligned}
 
 $$ \mathbf{\bar x} = \mathbf{Fx} $$
 
-Yani konumu iki boyutlu olarak modellemiş olduk.
+Yani konumu iki boyutlu olarak modellemiÅŸ olduk.
 
 $$\mathbf x =\begin{bmatrix}x \\ \dot x\end{bmatrix}$$
 
-Peki ölçüm tahminlerini üretecek $H$ nasıl olmalı? 
+Peki Ã¶lÃ§Ã¼m tahminlerini Ã¼retecek $H$ nasÄ±l olmalÄ±? 
 
 $$\mathbf H=\begin{bmatrix}1&0\end{bmatrix}$$
 
-Bunu yaptık çünkü $Hx$ çarpımı yapılınca sadece $x$ çarpıma girecek, hız
-sıfırlanacak, yani ölçümde kullanılmayacak. Bu tam istediğimiz şey
-zaten. Ne kadar ilginç değil mi? Hız konumda yer alan bir şey, tahmin /
-ölçüm / düzeltme döngüsü sırasında KF onu da değiştirecek, düzeltecek,
-ölçümde kullanılmıyor olsa bile! 
+Bunu yaptÄ±k Ã§Ã¼nkÃ¼ $Hx$ Ã§arpÄ±mÄ± yapÄ±lÄ±nca sadece $x$ Ã§arpÄ±ma girecek, hÄ±z
+sÄ±fÄ±rlanacak, yani Ã¶lÃ§Ã¼mde kullanÄ±lmayacak. Bu tam istediÄŸimiz ÅŸey
+zaten. Ne kadar ilginÃ§ deÄŸil mi? HÄ±z konumda yer alan bir ÅŸey, tahmin /
+Ã¶lÃ§Ã¼m / dÃ¼zeltme dÃ¶ngÃ¼sÃ¼ sÄ±rasÄ±nda KF onu da deÄŸiÅŸtirecek, dÃ¼zeltecek,
+Ã¶lÃ§Ã¼mde kullanÄ±lmÄ±yor olsa bile! 
 
-Ölçümdeki belirsizliğe 10 metre diyelim, 
+Ã–lÃ§Ã¼mdeki belirsizliÄŸe 10 metre diyelim, 
 
 $R = \begin{bmatrix}10\end{bmatrix}$
 
-Altta alternatif bir KF kodu ve örneğin kodlamasını görüyoruz,
+Altta alternatif bir KF kodu ve Ã¶rneÄŸin kodlamasÄ±nÄ± gÃ¶rÃ¼yoruz,
 
 \inputminted[fontsize=\footnotesize]{python}{kalman.py}
 
@@ -480,7 +480,7 @@ Kaynaklar
 
 [4] Labbe, {\em Kalman and Bayesian Filters in Python}
 
-[5] Bayramli, Zaman Serileri, {\em Ortalamaya Dönüş ile İşlem}
+[5] Bayramli, Zaman Serileri, {\em Ortalamaya DÃ¶nÃ¼ÅŸ ile Ä°ÅŸlem}
 
 \end{document}
 

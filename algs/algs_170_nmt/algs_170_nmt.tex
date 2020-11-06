@@ -1,105 +1,105 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Otomatik Tercüme, Makine Tercümesi (Machine Translation)
+Otomatik TercÃ¼me, Makine TercÃ¼mesi (Machine Translation)
 
-Dizin-Dizin İlişkisini Öğrenmek (Sequence to Sequence Learning)
+Dizin-Dizin Ä°liÅŸkisini Ã–ÄŸrenmek (Sequence to Sequence Learning)
 
-Dillerarası otomatik tercüme yazılımı Google Translate ile popüler hale
-geldi. Google bu servisi ilk kodladığında parça parça, istatistiki bir
-yaklaşım kullanarak kodlamış, fakat 2017 yılında bu servis tamamen derin
-öğrenme üzerinden işleyecek şekilde değiştirildi, kod satır sayısı
+DillerarasÄ± otomatik tercÃ¼me yazÄ±lÄ±mÄ± Google Translate ile popÃ¼ler hale
+geldi. Google bu servisi ilk kodladÄ±ÄŸÄ±nda parÃ§a parÃ§a, istatistiki bir
+yaklaÅŸÄ±m kullanarak kodlamÄ±ÅŸ, fakat 2017 yÄ±lÄ±nda bu servis tamamen derin
+Ã¶ÄŸrenme Ã¼zerinden iÅŸleyecek ÅŸekilde deÄŸiÅŸtirildi, kod satÄ±r sayÄ±sÄ±
 500,000'den 500'e indi!
 
-DO bazlı tercüme sistemleri nasıl işler? 
+DO bazlÄ± tercÃ¼me sistemleri nasÄ±l iÅŸler? 
 
 \includegraphics[width=30em]{seq_02.png}
 
-Not: kaynak cümlesi ters şekilde girilmiş, bu mimarı ilk teklif edildiğinde
-bu şekilde yapılıyordu, fakat [3]'e göre her eğitim verisi için dinamik
-şekilde yaratılabilen RNN hücreleri durumunda buna gerek yok.
+Not: kaynak cÃ¼mlesi ters ÅŸekilde girilmiÅŸ, bu mimarÄ± ilk teklif edildiÄŸinde
+bu ÅŸekilde yapÄ±lÄ±yordu, fakat [3]'e gÃ¶re her eÄŸitim verisi iÃ§in dinamik
+ÅŸekilde yaratÄ±labilen RNN hÃ¼creleri durumunda buna gerek yok.
 
-Servisin temelinde, üstte görüldüğü gibi bir RNN tabakası var. Fakat bu RNN
-yapısında ilk (soldaki) bölüm kodlayıcı, ikinci (sağdaki) bölüm kod çözücü
-olarak planlanmış.  Eğitim verisinde kaynak ve hedef cümle beraber, yanyana
-olarak hem girdi olarak veriliyor, ayrıca tercüme sonuç cümlesi alınıp bir
-de etiket verisi olarak kullanılıyor, bir farkla, etiketteki cümle zaman
-indisinde eğitimdeki sonuç cümlenin bir geri kaydırılmış hali.
+Servisin temelinde, Ã¼stte gÃ¶rÃ¼ldÃ¼ÄŸÃ¼ gibi bir RNN tabakasÄ± var. Fakat bu RNN
+yapÄ±sÄ±nda ilk (soldaki) bÃ¶lÃ¼m kodlayÄ±cÄ±, ikinci (saÄŸdaki) bÃ¶lÃ¼m kod Ã§Ã¶zÃ¼cÃ¼
+olarak planlanmÄ±ÅŸ.  EÄŸitim verisinde kaynak ve hedef cÃ¼mle beraber, yanyana
+olarak hem girdi olarak veriliyor, ayrÄ±ca tercÃ¼me sonuÃ§ cÃ¼mlesi alÄ±nÄ±p bir
+de etiket verisi olarak kullanÄ±lÄ±yor, bir farkla, etiketteki cÃ¼mle zaman
+indisinde eÄŸitimdeki sonuÃ§ cÃ¼mlenin bir geri kaydÄ±rÄ±lmÄ±ÅŸ hali.
 
-Kaynak, sonuç tercüme cümleleri farklı boylarda olabilir, hem aynı eğitim
-noktası içinde birbirlerinden, hem de değişik eğitim noktalarında
-kendilerinden bile farklı boyutlarda olabilirler, bu sebeple RNN öğe
-sayıları dinamik şekilde, her eğitim verisine göre farklı olacak. Fakat bu
-farklı boyutlar karışıklık yaratmıyor, çünkü tercüme için önemli olan şey
-kodlayıcı bloktan kod çözücü bloğa geçen gizli konum.
+Kaynak, sonuÃ§ tercÃ¼me cÃ¼mleleri farklÄ± boylarda olabilir, hem aynÄ± eÄŸitim
+noktasÄ± iÃ§inde birbirlerinden, hem de deÄŸiÅŸik eÄŸitim noktalarÄ±nda
+kendilerinden bile farklÄ± boyutlarda olabilirler, bu sebeple RNN Ã¶ÄŸe
+sayÄ±larÄ± dinamik ÅŸekilde, her eÄŸitim verisine gÃ¶re farklÄ± olacak. Fakat bu
+farklÄ± boyutlar karÄ±ÅŸÄ±klÄ±k yaratmÄ±yor, Ã§Ã¼nkÃ¼ tercÃ¼me iÃ§in Ã¶nemli olan ÅŸey
+kodlayÄ±cÄ± bloktan kod Ã§Ã¶zÃ¼cÃ¼ bloÄŸa geÃ§en gizli konum.
 
-Bu konuma daha önceki yazılarda $h$ adı vermiştik. Eğitim süreci şöyle, tüm
-cümleler + tüm kelimeler üzerinden bir sözlük oluştururuz, bu sözlüğe göre
-her kelimeye bir tam sayı indis değeri atarız, sonra kelimeleri tam
-sayılara çevirip gömme tabakasına veririz, bu tabaka reel sayı içeren
-vektörlere dönüşür, ve eğitim ilerledikçe referans gömme matrisinde
-kelimelerin temsil değerleri iyileşir. Bunlar otomatik oluyor tabii, biz
-soldan sağa YSA'ya her eğitim veri noktasındaki kelimeleri teker teker
-geçiyoruz, bir eğitim noktası için önce birinci kelimeyi ilk RNN öğesine,
-oradan çıkan $h$'yi ve ikinci kelimeyi ikinci RNN öğesine, böyle devam
+Bu konuma daha Ã¶nceki yazÄ±larda $h$ adÄ± vermiÅŸtik. EÄŸitim sÃ¼reci ÅŸÃ¶yle, tÃ¼m
+cÃ¼mleler + tÃ¼m kelimeler Ã¼zerinden bir sÃ¶zlÃ¼k oluÅŸtururuz, bu sÃ¶zlÃ¼ÄŸe gÃ¶re
+her kelimeye bir tam sayÄ± indis deÄŸeri atarÄ±z, sonra kelimeleri tam
+sayÄ±lara Ã§evirip gÃ¶mme tabakasÄ±na veririz, bu tabaka reel sayÄ± iÃ§eren
+vektÃ¶rlere dÃ¶nÃ¼ÅŸÃ¼r, ve eÄŸitim ilerledikÃ§e referans gÃ¶mme matrisinde
+kelimelerin temsil deÄŸerleri iyileÅŸir. Bunlar otomatik oluyor tabii, biz
+soldan saÄŸa YSA'ya her eÄŸitim veri noktasÄ±ndaki kelimeleri teker teker
+geÃ§iyoruz, bir eÄŸitim noktasÄ± iÃ§in Ã¶nce birinci kelimeyi ilk RNN Ã¶ÄŸesine,
+oradan Ã§Ä±kan $h$'yi ve ikinci kelimeyi ikinci RNN Ã¶ÄŸesine, bÃ¶yle devam
 ediyor.
 
-Kodlayıcıdan çıkış olduğu anda (dikkat hala tek bir eğitim noktasını
-işliyoruz) elimizde olan $h$'nin özel bir anlamı var. Üstteki mimariye göre
-bu gizli katman tüm kaynak cümleyi temsil eden bir $h$'dir. Başta pek
-değildir ama zaman geçtikçe öyle olacaktır. $h$ boyutu önceden planlanan
-şekilde, yani cümleye göre küçülüp büyüyen bir şey değil. Neyse tabii ileri
-besleme orada durmuyor, kod çözücüye devam ediliyor, burada kelimeler sonuç
-tercümeden geliyor, şimdi onun kelimelerini almaya başlıyoruz ve etikette
-bahsettiğimiz şekilde kaydırılan kelimelere tekabül edecek şekilde eğitime
-devam ediyoruz, ve sağa en sona gelince bir eğitim noktası ile işimiz
+KodlayÄ±cÄ±dan Ã§Ä±kÄ±ÅŸ olduÄŸu anda (dikkat hala tek bir eÄŸitim noktasÄ±nÄ±
+iÅŸliyoruz) elimizde olan $h$'nin Ã¶zel bir anlamÄ± var. Ãœstteki mimariye gÃ¶re
+bu gizli katman tÃ¼m kaynak cÃ¼mleyi temsil eden bir $h$'dir. BaÅŸta pek
+deÄŸildir ama zaman geÃ§tikÃ§e Ã¶yle olacaktÄ±r. $h$ boyutu Ã¶nceden planlanan
+ÅŸekilde, yani cÃ¼mleye gÃ¶re kÃ¼Ã§Ã¼lÃ¼p bÃ¼yÃ¼yen bir ÅŸey deÄŸil. Neyse tabii ileri
+besleme orada durmuyor, kod Ã§Ã¶zÃ¼cÃ¼ye devam ediliyor, burada kelimeler sonuÃ§
+tercÃ¼meden geliyor, ÅŸimdi onun kelimelerini almaya baÅŸlÄ±yoruz ve etikette
+bahsettiÄŸimiz ÅŸekilde kaydÄ±rÄ±lan kelimelere tekabÃ¼l edecek ÅŸekilde eÄŸitime
+devam ediyoruz, ve saÄŸa en sona gelince bir eÄŸitim noktasÄ± ile iÅŸimiz
 bitiyor.
 
-Hedef kelimeleri softmax olarak planlanmış, yani kod çözücüdeki RNN öğeleri
-mümkün tüm kelimeler üzerinden bir olasılık vektörü üretiyor. Gerçek dünya
-uygulamalarında bu yaklaşım külfetli olabilir, çünkü sözlük çok büyük ise
-softmax boyutu tek bir kelime çıktısı için olasılıkları temsil etmek için
-çok fazla boyutlu olmalıdır, burada performansı iyileştirebilecek başka
-bazı yaklaşımlar var, ama kavramsal olarak çıktının sanki her mümkün kelime
-üzerinden bir softmax olduğunu düşünebiliriz.
+Hedef kelimeleri softmax olarak planlanmÄ±ÅŸ, yani kod Ã§Ã¶zÃ¼cÃ¼deki RNN Ã¶ÄŸeleri
+mÃ¼mkÃ¼n tÃ¼m kelimeler Ã¼zerinden bir olasÄ±lÄ±k vektÃ¶rÃ¼ Ã¼retiyor. GerÃ§ek dÃ¼nya
+uygulamalarÄ±nda bu yaklaÅŸÄ±m kÃ¼lfetli olabilir, Ã§Ã¼nkÃ¼ sÃ¶zlÃ¼k Ã§ok bÃ¼yÃ¼k ise
+softmax boyutu tek bir kelime Ã§Ä±ktÄ±sÄ± iÃ§in olasÄ±lÄ±klarÄ± temsil etmek iÃ§in
+Ã§ok fazla boyutlu olmalÄ±dÄ±r, burada performansÄ± iyileÅŸtirebilecek baÅŸka
+bazÄ± yaklaÅŸÄ±mlar var, ama kavramsal olarak Ã§Ä±ktÄ±nÄ±n sanki her mÃ¼mkÃ¼n kelime
+Ã¼zerinden bir softmax olduÄŸunu dÃ¼ÅŸÃ¼nebiliriz.
 
-Eğitim bittikten sonra hiç görülmemiş yeni test verisi için tercüme nasıl
-yaparız? Biraz önce gördüğümüz gibi kaynak cümlenin kelimeleri soldan sağa
-YSA'ya verilir, kod çözücüye geldiğimizde $h$ ile beraber Go sembolü
-verilecektir, ve bu sembol sonuç tercümede ilk kelimeyi üretir. Tercümenin
-ilk kelimesini bu şekilde elde etmiş oluruz. Eğer eğitim iyi yapılmışsa
-derin YSA ilk kelimeyi güzel bir şekilde üretecektir (daha doğrusu softmax
-tüm kelimelerin olasılıklarını hesaplar, biz bu olasılıklara göre en olası
-kelimeyi örnekleme yaparak alırız). Sonra bu üretilen kelimeyi alıp alttan
-YSA'ya (artık kod çözücüde tabii) beslemeye devam ederiz, mesela Go sonucu
-``içeri'' kelimesi verilmiş, biz ``içeri'' kelimesini alttan ikinci RNN
-öğesine veririz, bu bize üstten ``girmesine'' kelimesini üretebilir, böyle
+EÄŸitim bittikten sonra hiÃ§ gÃ¶rÃ¼lmemiÅŸ yeni test verisi iÃ§in tercÃ¼me nasÄ±l
+yaparÄ±z? Biraz Ã¶nce gÃ¶rdÃ¼ÄŸÃ¼mÃ¼z gibi kaynak cÃ¼mlenin kelimeleri soldan saÄŸa
+YSA'ya verilir, kod Ã§Ã¶zÃ¼cÃ¼ye geldiÄŸimizde $h$ ile beraber Go sembolÃ¼
+verilecektir, ve bu sembol sonuÃ§ tercÃ¼mede ilk kelimeyi Ã¼retir. TercÃ¼menin
+ilk kelimesini bu ÅŸekilde elde etmiÅŸ oluruz. EÄŸer eÄŸitim iyi yapÄ±lmÄ±ÅŸsa
+derin YSA ilk kelimeyi gÃ¼zel bir ÅŸekilde Ã¼retecektir (daha doÄŸrusu softmax
+tÃ¼m kelimelerin olasÄ±lÄ±klarÄ±nÄ± hesaplar, biz bu olasÄ±lÄ±klara gÃ¶re en olasÄ±
+kelimeyi Ã¶rnekleme yaparak alÄ±rÄ±z). Sonra bu Ã¼retilen kelimeyi alÄ±p alttan
+YSA'ya (artÄ±k kod Ã§Ã¶zÃ¼cÃ¼de tabii) beslemeye devam ederiz, mesela Go sonucu
+``iÃ§eri'' kelimesi verilmiÅŸ, biz ``iÃ§eri'' kelimesini alttan ikinci RNN
+Ã¶ÄŸesine veririz, bu bize Ã¼stten ``girmesine'' kelimesini Ã¼retebilir, bÃ¶yle
 devam ederiz.
 
-Dikkat Etme Vektörü (Attention Vector)
+Dikkat Etme VektÃ¶rÃ¼ (Attention Vector)
 
-Bazı yaklaşımlara göre kodlayıcı bloktan çıkan $h$ bir cümleyi temsil etmek
-için yeterli görülmüyor, kod çözücü bloğundaki RNN öğelerinden kaynak
-cümledeki tüm kelimelere giden bir dikkat etme vektörü üzerinden bağlantı
-koyuluyor. Detaylar [2]'de bulunabilir. Alttaki örnekte İngilizce
-``I am a student'', yani ben bir öğrenciyim cümlesinin Fransızca karşılığı
-``Je suis etuidant'' gösterilmiş. 
+BazÄ± yaklaÅŸÄ±mlara gÃ¶re kodlayÄ±cÄ± bloktan Ã§Ä±kan $h$ bir cÃ¼mleyi temsil etmek
+iÃ§in yeterli gÃ¶rÃ¼lmÃ¼yor, kod Ã§Ã¶zÃ¼cÃ¼ bloÄŸundaki RNN Ã¶ÄŸelerinden kaynak
+cÃ¼mledeki tÃ¼m kelimelere giden bir dikkat etme vektÃ¶rÃ¼ Ã¼zerinden baÄŸlantÄ±
+koyuluyor. Detaylar [2]'de bulunabilir. Alttaki Ã¶rnekte Ä°ngilizce
+``I am a student'', yani ben bir Ã¶ÄŸrenciyim cÃ¼mlesinin FransÄ±zca karÅŸÄ±lÄ±ÄŸÄ±
+``Je suis etuidant'' gÃ¶sterilmiÅŸ. 
 
 \includegraphics[width=30em]{attention.jpg}
 
-Ayrıca RNN katmanı tek bir zincir olmayabilir, üst üste konulmuş birkaç
-katmandan da oluşuyor olabilir. Resimde istiflenmiş iki RNN seviyesi
-görüyoruz mesela.
+AyrÄ±ca RNN katmanÄ± tek bir zincir olmayabilir, Ã¼st Ã¼ste konulmuÅŸ birkaÃ§
+katmandan da oluÅŸuyor olabilir. Resimde istiflenmiÅŸ iki RNN seviyesi
+gÃ¶rÃ¼yoruz mesela.
 
-Not: Bilgisayar ile söyleşi yapılmasını sağlayan chatbot teknolojisi
-aslında üstteki tercüme teknolojisinin değişik bir kullanımı sadece. Eğer
-kaynak ve sonuç cümleler aynı cümlenin iki farklı dildeki karşılığı yerine
-iki kişi arasındaki konuşmalar olsaydı, YSA yapısı gömme tabakası, cümleler
-alakası üzerinden ``bir konuşmayı'' öğrenmeye başlardı. ``Nasılsın''
-cümlesine ``çok iyiyim'' karşılığı veriliyor, bu iki cümle ve onun gibi
-cümleleri üstteki teknikle eğitince yavaş yavaş YSA nasıl karşılık
-vereceğini öğrenebilmeye başlıyor. 
+Not: Bilgisayar ile sÃ¶yleÅŸi yapÄ±lmasÄ±nÄ± saÄŸlayan chatbot teknolojisi
+aslÄ±nda Ã¼stteki tercÃ¼me teknolojisinin deÄŸiÅŸik bir kullanÄ±mÄ± sadece. EÄŸer
+kaynak ve sonuÃ§ cÃ¼mleler aynÄ± cÃ¼mlenin iki farklÄ± dildeki karÅŸÄ±lÄ±ÄŸÄ± yerine
+iki kiÅŸi arasÄ±ndaki konuÅŸmalar olsaydÄ±, YSA yapÄ±sÄ± gÃ¶mme tabakasÄ±, cÃ¼mleler
+alakasÄ± Ã¼zerinden ``bir konuÅŸmayÄ±'' Ã¶ÄŸrenmeye baÅŸlardÄ±. ``NasÄ±lsÄ±n''
+cÃ¼mlesine ``Ã§ok iyiyim'' karÅŸÄ±lÄ±ÄŸÄ± veriliyor, bu iki cÃ¼mle ve onun gibi
+cÃ¼mleleri Ã¼stteki teknikle eÄŸitince yavaÅŸ yavaÅŸ YSA nasÄ±l karÅŸÄ±lÄ±k
+vereceÄŸini Ã¶ÄŸrenebilmeye baÅŸlÄ±yor. 
 
-Örnek kod [1] alttadır, veri [4]'ten.
+Ã–rnek kod [1] alttadÄ±r, veri [4]'ten.
 
 \inputminted[fontsize=\footnotesize]{python}{translate.py}
 
@@ -109,8 +109,8 @@ Kaynaklar
 
 [2] TensorFlow, {\em TensorFlow Neural Machine Translation Tutorial}, \url{https://github.com/tensorflow/nmt}
 
-[3] Géron, {\em Hands-On Machine Learning with Scikit-Learn and TensorFlow}
+[3] GÃ©ron, {\em Hands-On Machine Learning with Scikit-Learn and TensorFlow}
 
-[4] ManyThings Verisi, İngilizce-Türkçe, {\em Tab-delimited Bilingual Sentence Pairs}, \url{https://www.dropbox.com/s/z39xv08541hhmue/tur-eng.zip?dl=1}
+[4] ManyThings Verisi, Ä°ngilizce-TÃ¼rkÃ§e, {\em Tab-delimited Bilingual Sentence Pairs}, \url{https://www.dropbox.com/s/z39xv08541hhmue/tur-eng.zip?dl=1}
 
 \end{document}
