@@ -26,6 +26,12 @@ var. Örnek,
 iconv file.tex -f ISO8859-9 -t UTF-8 -o out.tex
 ```
 
+Not: Eğer bir dosyaya olduğu yerde aynı isimle `iconv` uygulanıyorsa,
+bu bazı dosyalarda `Bus error` hatasına yol açabilir. Hatadan
+kurtulmak için dosyanın çevrilmiş halini bir geçici dosyaya gönderip, sonra
+oradan geri alıp orijinal dosyayı `mv` ezmek daha iyi olur.
+
+
 Editor
 
 Editörümüzün de bir metni gösterirken hangi kodlama ile iş yaptığını
