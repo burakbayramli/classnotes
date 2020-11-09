@@ -13,9 +13,9 @@ using namespace Eigen;
 
 // "Particle-Based Fluid Simulation for Interactive Applications"
 // solver parameters
-const static Vector3d G(0.f, 0.f, 2.0f*-9.8f); // external (gravitational) forces
+const static Vector3d G(0.f, 0.f, 5.0f*-9.8f); // external (gravitational) forces
 const static float REST_DENS = 8.f; // rest density
-const static float GAS_CONST = 8.f; // const for equation of state
+const static float GAS_CONST = 12.f; // const for equation of state
 const static float H = 0.3f; // kernel radius
 const static float DIST = 0.3f; // kernel radius
 const static float HSQ = 0.1f; // radius^2 for optimization
@@ -29,7 +29,7 @@ const static float SPIKY_GRAD = -45.f/(M_PI*pow(H, 6.f));
 const static float VISC_LAP = 45.f/(M_PI*pow(H, 6.f));
 
 // simulation parameters
-const static float R = 0.05f;
+const static float R = 0.02f;
 const static float EPS = 0.05f; // boundary epsilon
 const static float BOUND_DAMPING = -0.5f;
 
@@ -49,12 +49,16 @@ struct Particle {
 // solver data
 static vector<Particle> particles;
 
+static int balls = 0;
 void InitSPH(void)
 {
-    for(float x = -1.f; x < -0.7f; x += 0.03f)	    
-	for(float y = 0.7f; y < 1.f; y += 0.03f)	
-	    for(float z = -1.f; z < -0.7f; z += 0.03f)	    
+    for(float x = -1.f; x < -0.7f; x += 0.02f)	    
+	for(float y = 0.7f; y < 1.f; y += 0.02f)	
+	    for(float z = -1.f; z < -0.7f; z += 0.02f) {
 		particles.push_back(Particle(x,y,z));
+		balls ++;
+	    }
+    cout << "balls " << balls << endl;
 }
 
 void Integrate(void)
