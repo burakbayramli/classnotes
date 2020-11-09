@@ -24,7 +24,7 @@ ad = '''
 <br/>
 '''
 
-TARGET_DIR = "/home/burak/Documents/dersblog2"
+TARGET_DIR = "/home/burak/Documents/dersblog"
 
 html_head = '''
 <!DOCTYPE html>
