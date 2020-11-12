@@ -22,21 +22,39 @@ olurduk.
 Yerelliğe Hassas Böleç (Locality Sensitive Hashing, -LSH-)
 
 Bu alandaki tekniklerden biri LSH tekniği. LSH ile çok boyutlu bir kordinate
-sistemindeki noktaların yaklaşık olarak birbirine yakın olup olmadığını bölec
-üzerinden hesaplayabiliyoruz. Tekniğin temeli rasgele izdüşümdür (random
-projection). [3]'te anlatıldığı gibi rasgele izdüşümün ilginç bir özelliği
-mesafeleri koruması, yani orijinal kordinate sistemindeki noktalar birbirine
-uzaksa yansıtıldıktan sonra da uzak kalmaya meyilliler. 
+sistemindeki noktaların yaklaşık olarak birbirine yakın olup olmadığını böleç
+üzerinden hesaplayabiliyoruz. En yaygın LSH yaklaşımının temeli rasgele
+izdüşümdür (random projection). [3]'te anlatıldığı gibi rasgele izdüşümün ilginç
+bir özelliği mesafeleri koruması, yani orijinal kordinate sistemindeki noktalar
+birbirine uzaksa yansıtıldıktan sonra da uzak kalmaya meyilliler.
 
 Bunu herhangi bir (yani rasgele) 2 boyutlu düzlem üzerinde yansıtılan alttaki
 noktalarda görebiliriz. Uzak olan noktalar duzlem uzerinde hala birbirine uzak.
 
 \includegraphics[width=10em]{algs_073_hash_01.png}
 
-Tabii ki her (rasgele) düzlem her iki nokta arasındaki uzaklığı mükemmel olarak
-göstermeyebilir. Fakat, eğer birkaç tane farklı düzleme yapılan yansımların bir
-birleşimi olan bir ölçüt / bölec yaratabilirsek, o zaman bu ölçüt ile bazı hızlı
-sonuçlara varabiliriz. 
+Tabii ki her (rasgele) düzlem her iki orijinal nokta arasındaki uzaklığı
+mükemmel olarak göstermeyebilir. Fakat, eğer birkaç tane farklı düzleme yapılan
+yansımların bir birleşiminden bir ölçüt / böleç yaratabilirsek, o zaman bu ölçüt
+ile bazı hızlı sonuçlara varabiliriz.
+
+Alttaki yaklaşımda 2 boyuta yansıtma yapılacak. Bu yansıtma yeni reel sayısal
+değerler ortaya çıkartır, bölec için bize ayrıksal ``kutular'' lazım, bu
+kutuları alttaki yöntem 0'dan büyük olma ya da olmama üzerinden tanımlamış.
+
+\includegraphics[width=20em]{algs_073_hash_02.png}
+
+Yani 2. boyuta indirgedikten sonra her eksen üzerinde üstteki irdeleme
+yapılıyor, nokta sıfırdan büyük mü küçük mü? Bu evet / hayır sonuçlar yanyana
+koyuluyor, ve 10, 01, vs şeklinde bitlerden oluşan bir sayı ortaya çıkıyor. Bu
+sayıyı önlüga çevirip artık direk karşılaştırma için kullanabiliriz. 
+
+Altta üç tane örnek vektör görüyoruz. Bu vektörler bir şarkının ses
+seviyelerini, bir müşterinin yer, alışveriş, gezinti bilgilerini temsil ediyor
+olabilir. Acaba bu vektörler birbirine ne kadar yakın? Rasgele bir matris
+\verb!projections! içinde (rasgele izdüşüm için her ögesi $N(0,1)$ dağılımından
+gelen bir matris üretmek yeterlidir, altta bunu kütüphane çağrısı ile yapmadık,
+[2] ile sonuçlar uysun diye direk oradan aldık),
 
 \begin{minted}[fontsize=\footnotesize]{python}
 vec1 = np.array([[-0.99137472, 0.61572851, -0.37733555, 0.0363575, -0.71647706]])
@@ -53,6 +71,8 @@ print (projections)
  [-0.31146359 -1.88214137 -0.37489443 -0.58475914 -1.57121651]]
 \end{verbatim}
 
+Birinci vektörü rasgele düzleme yansıtıyoruz,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 print (vec1.shape)
 print (np.dot(vec1, projections.T))
@@ -63,6 +83,7 @@ print (np.dot(vec1, projections.T))
 [[-2.12704963  0.39583023]]
 \end{verbatim}
 
+Her ögeyi sıfırdan büyük olma / olmama filtresinden geçiriyoruz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print (np.dot(vec1, projections.T) > 0)
@@ -74,6 +95,8 @@ print (  ''.join(((np.dot(vec1, projections.T) > 0)[0]).astype(int).astype(str))
 01
 \end{verbatim}
 
+Diğer vektörler için de aynı işlem,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 print (  ''.join(((np.dot(vec2, projections.T) > 0)[0]).astype(int).astype(str))  )
 print (  ''.join(((np.dot(vec3, projections.T) > 0)[0]).astype(int).astype(str))  )
@@ -84,6 +107,9 @@ print (  ''.join(((np.dot(vec3, projections.T) > 0)[0]).astype(int).astype(str))
 11
 \end{verbatim}
 
+Üstteki sonuçlara bakarak \verb!vec1! ve \verb!vec2!'nin birbirine \verb!vec2! ve
+\verb!vec3!'ün birbirine olduğundan daha yakın olacağını kestirebiliriz. Kosinüs
+yakınlık hesabını bu vektörler üzerinde uygulayınca bunun doğrulandığını görüyoruz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 def cosine_sim(vec1, vec2):
@@ -100,25 +126,18 @@ print (cosine_sim(vec2[0], vec3[0]))
 0.1169500241078299
 \end{verbatim}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Tekniğin sezgisel temeli eğer iki nokta tamamen birbirine yakın ise, yani
+orijine olan konumları mükemmel korelasyon halinde, o zaman bu teknikle aynı
+kutuya düşme olasılıkları artıyor. İşin içinde rasgelelik olduğu için ve bir
+noktayı pek çok farklı düzlemlere yansıttığımız için aynı kutuya düşme ihtimali
+oldukca azalıyor, sadece hakikaten yakın olan noktalar aynı kutuya
+düşüyorlar. Eğer o noktada hatalar ortaya çıkarsa, yaygın bir yaklaşım birden
+yansıtma seçeneklerini gruplar altında toplamak ve en az bir grup aynı kutuya
+düşmeyi bulmuşsa, o iki noktayı yakın olarak kabul etmek.
 
 Asal Sayılar ile Böleç (Hash) Tekniği
 
-Böyle bir tekniği [1]'de görüyoruz. Teknik ile kordinat sistemini $l$
+Bir diğer böleç bazlı teknik [1]'den. Teknik ile kordinat sistemini $l$
 büyüklüğünde kutulara bölüyor, her eksen değerini bu büyüklük ile bölüyoruz,
 bölüm sonrası elde edilen sayıyı taban (floor) tamsayıya indirgiyoruz, ardından
 her eksen için farklı bir asal sayıyla çarpıp sonuçları XOR ile birleştiriyoruz
