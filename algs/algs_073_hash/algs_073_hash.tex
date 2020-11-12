@@ -2,7 +2,6 @@
 \begin{document}
 Geometrik Anahtarlama ile En Yakın Noktaları Bulmak
 
-
 Grafik, fiziksel simülasyonlarda pek çok sayıda obje 3 boyutlu ortamda dünyaya
 salınıp, ayrı ayrı onlara fiziksel kurallar uygulanır ve nereye geldiklerine
 bakılır. Bu hesap sırasında objelerin birbirine çarpıp çarpmadığını hesaplamak
@@ -47,7 +46,7 @@ kutuları alttaki yöntem 0'dan büyük olma ya da olmama üzerinden tanımlamı
 Yani 2. boyuta indirgedikten sonra her eksen üzerinde üstteki irdeleme
 yapılıyor, nokta sıfırdan büyük mü küçük mü? Bu evet / hayır sonuçlar yanyana
 koyuluyor, ve 10, 01, vs şeklinde bitlerden oluşan bir sayı ortaya çıkıyor. Bu
-sayıyı önlüga çevirip artık direk karşılaştırma için kullanabiliriz. 
+sayıyı onluğa çevirip artık direk karşılaştırma için kullanabiliriz.
 
 Altta üç tane örnek vektör görüyoruz. Bu vektörler bir şarkının ses
 seviyelerini, bir müşterinin yer, alışveriş, gezinti bilgilerini temsil ediyor
@@ -135,6 +134,130 @@ düşüyorlar. Eğer o noktada hatalar ortaya çıkarsa, yaygın bir yaklaşım 
 yansıtma seçeneklerini gruplar altında toplamak ve en az bir grup aynı kutuya
 düşmeyi bulmuşsa, o iki noktayı yakın olarak kabul etmek.
 
+Notlar
+
+0'dan küçük ya da büyük irdelemesi bir kutulama yaratıyor, iki tane kutu
+sadece. İlla iki kutu olması şart değil, \verb!numpy.digitize! ile istediğimiz
+büyüklükte kutu yaratabilirdik.
+
+Bir diğer konu bölecin yakın olan bazı noktalar için mükemmel olmayacağı. Bu
+durumda ikinci bir yansıtma matrisi üzerinden ikinci, hatta üçüncü bir bölecleme
+kodu yaratabiliriz, eğer bölec değerleri hem 1'inci hem 2'inci hem de 3'uncu,
+vs. böleclerde aynı değerde ise iki noktayı yakın kabul etmek. Bu yöntem
+yakınlık kontrolüne ek olarak yakın diğer noktaların listesini almak için de
+faydalı, bir sözlük içinde her bölec değeri için bir nokta listesi tutulur, eğer
+birden fazla yansıtma yapılmışsa, bu sözlüklerde iki, üç tane olabilir. Bir
+noktanın komşularını almak istersek her sözlükte bu kordinatın bölec değerine
+bakarız, ve alınan komşuları bir özgünlük filtresinden geçirerek nihai sonucu
+donduruz. Bu yaklaşım parçacık simülasyonları ile uğraşanlar için faydalı
+olabilir.
+
+Test
+
+Altta üç tane farklı rasgele izdüşüm üzerinden bölecleyen bir kod görüyoruz. Bir
+3 boyutlu kordinat sisteminde rasgele yerlerde toplar yarattık, bunların
+bazıları birbirine yakın, bazılar değil, kodda LSH ile geometrik yakınlığı
+gerçek yakınlık ile ne kadar benzediğini kontrol ediyoruz. LSH bölec kontrol üç
+sözlükte kontrol ediliyor.
+
+Tekrarlamak gerekirse, B tane topu rasgele bir şekilde her ekseni 0 ve 200
+arasında olan bir uzaya dağıttık. Topların bazıları yakın düştü tabii, bazılar
+düşmedi. Önce tüm topları böleçledik ve sözlüğe koyduk. Sonra tüm topların
+birbiri ile olan mesafesini ayrı ayrı teker teker külfetli yoldan yaptık, ve
+bölecin bu durum hakkında ne söylediğine baktık. Pozitif böleç(ler) yakın diyor,
+negatif böleç uzak diyor anlamında, tabii yakınlık ve uzaklık böleç anahtar
+değerinin aynı olup olmadığı ile ölçülüyor.
+
+Kontrolün doğru pozitif bulması mesela bölecin yakın dediğinin gerçekten de
+yakın olması. Yanlış negatif tam tersi, bölec uzak diyor ama aslında toplar
+yakın.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from collections import defaultdict 
+import numpy as np, datetime
+import numpy.linalg as lin
+
+np.random.seed(0)
+
+mmin,mmax=0,200
+B = 400; L = (mmax / 10);
+balls = []
+geo_hash_list = defaultdict(list)
+    
+for b in range(B):
+    p = np.array([np.random.uniform(mmin,mmax,1)[0],
+                  np.random.uniform(mmin,mmax,1)[0],
+                  np.random.uniform(mmin,mmax,1)[0] ])
+    balls.append({'pos':p, 'i': b})
+
+k = 9; bnum = 7
+bins = np.linspace(-500.0,500.0,bnum)
+
+P1 = np.random.normal(0,1,3*k).reshape(3,k)
+def spatial_hash1(x):
+    X1 = np.dot(x,P1)
+    h1 = np.digitize(X1, bins)
+    return int("".join([str(x) for x in h1[0]]))
+
+P2 = np.random.normal(0,1,3*k).reshape(3,k)
+def spatial_hash2(x):
+    X2 = np.dot(x,P2)
+    h2 = np.digitize(X2, bins)
+    return int("".join([str(x) for x in h2[0]]))
+
+P3 = np.random.normal(0,1,3*k).reshape(3,k)
+def spatial_hash3(x):
+    X3 = np.dot(x,P3)
+    h3 = np.digitize(X3, bins)
+    return int("".join([str(x) for x in h3[0]]))
+
+tp = 0; tn = 0; fp = 0; fn = 0
+
+for i,b1 in enumerate(balls):
+    for j,b2 in enumerate(balls):
+        if i==j: continue
+        d = lin.norm(b1['pos']-b2['pos'])
+        h11 = spatial_hash1([b1['pos']])
+        h12 = spatial_hash1([b2['pos']])
+        h21 = spatial_hash2([b1['pos']])
+        h22 = spatial_hash2([b2['pos']])
+        h31 = spatial_hash3([b1['pos']])
+        h32 = spatial_hash3([b2['pos']])
+        if d <= L and (h11==h12 or h21==h22 or h31==h32): tp += 1        
+        elif d > L and not (h11==h12 or h21==h22 or h31==h32): tn+=1
+        elif d <= L and not (h11==h12 or h21==h22 or h31==h32): fn+=1
+        elif d > L and (h11==h12 or h21==h22 or h31==h32): fp+=1
+
+print ('dogru pozitif', tp)
+print ('dogru negatif', tn)
+
+print ('yanlis pozitif', fp)
+print ('yanlis negatif', fn)
+
+print (tp+tn+fp+fn)
+print ("Yanlis Negatif Yuzde %0.2f" % (fn / (tp+tn+fp+fn) * 100.0))
+print ("Yanlis Pozitif Yuzde %0.2f" % (fp / (tp+tn+fp+fn) * 100.0))
+print ("Yanlis Negatif / Dogru Pozitif %0.2f" % (fn / tp * 100.0))
+\end{minted}
+
+\begin{verbatim}
+dogru pozitif 564
+dogru negatif 151336
+yanlis pozitif 7656
+yanlis negatif 44
+159600
+Yanlis Negatif Yuzde 0.03
+Yanlis Pozitif Yuzde 4.80
+Yanlis Negatif / Dogru Pozitif 7.80
+\end{verbatim}
+
+Tabii ki istediğimiz doğru olan değerlerin yüksek olması. Ama yanlış pozitifin
+hala çaresi var, bölecin yakın dediklerini bir kontrolden daha geçirirsek bu
+kontrol yanlış pozitifleri eleyecektir, tabii gene de yanlış pozitiflerin de
+toplama kıyasla az olmasını isteriz. Tek problem yanlış negatif, topların çoğu
+birbirinden uzakta olduğu için bu yanlıştan dönmek zor, fakat bu tür topların
+oldukça az olduğunu görüyoruz.
+
 Asal Sayılar ile Böleç (Hash) Tekniği
 
 Bir diğer böleç bazlı teknik [1]'den. Teknik ile kordinat sistemini $l$
@@ -171,14 +294,14 @@ Görüldüğü gibi ilk iki kordinat aynı böleç anahtarına düştü, ki bu i
 birbirine yakın.
 
 Genel algoritma şöyle olabilir. Her görüntü karesi için iki faz düşünebiliriz,
-ilk fazda tüm objelerin kordinat böleci hesaplanır, her böleç değeri altında bir
+ilk fazda tüm objelerin kordinat böleçi hesaplanır, her böleç değeri altında bir
 liste vardır, ve her obje anahtarının değerine tekabül eden o listeye
 eklenir. İkinci fazda bir objeye bakarken onun üzerinde daha detaylı çarpışma
 hesabı gerekip gerekmediğini anlamak için böleç anahtarındaki listeye bakarız,
 listede sadece bir öğe var ise çarpışma yok, birden fazla ise o listedeki her
 diğer obje için detaylı çarpışma hesabına devam edilebilir.
 
-Bazi istatistikleri toplayalim. Acaba yaklasim ne kadar basarili?
+Bazı istatistikleri toplayalım. Acaba yaklaşım ne kadar başarılı?
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from collections import defaultdict 
@@ -237,39 +360,6 @@ yanlis negatif 1364
 249500
 Yanlis Negatif Yuzde 0.55
 \end{verbatim}
-
-500 tane topu rasgele bir şekilde her ekseni 0 ve 500 arasında olan bir uzaya
-dağıttık. Topların bazıları yakın düştü tabii, bazılar düşmedi. Önce tüm topları
-bölecledik ve sözlüğe koyduk. Sonra tüm topların birbiri ile olan mesafesini
-ayrı ayrı teker teker külfetli yoldan yaptık, ve bölecin bu durum hakkında ne
-söylediğine baktık. Pozitif bölec yakın diyor, negatif bölec uzak diyor
-anlamında, tabii yakınlık ve uzaklık bölec anahtar değerinin aynı olup olmadığı
-ile ölçülüyor.
-
-Kontrolün doğru pozitif bulması mesela bölecin yakın dediğinin gerçekten de
-yakın olması. Yanlış negatif tam tersi, bölec uzak diyor ama aslında toplar
-yakın.
-
-Tabii ki istediğimiz doğru hesapların değerlerin yüksek olması. Ayrıca
-tekrarlayalım, bir simülasyonda işletirken yanlış pozitifin hala çaresi var,
-bölecin yakın dediklerini bir kontrolden daha geçirirsek (problem değil o
-noktada bakılan toplar azalmış oluyor, performans kaybı olmaz), bu kontrol
-yanlış pozitifleri eleyecektir. Tek problem yanlış negatif, topların çoğu
-birbirinden uzakta olduğu için bu yanlıştan dönmek zor, fakat bu tür toplar
-yüzde 1'in altında.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
