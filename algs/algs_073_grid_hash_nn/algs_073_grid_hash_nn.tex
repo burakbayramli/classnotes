@@ -8,15 +8,7 @@ bakılır. Bu hesap sırasında objelerin birbirine çarpıp çarpmadığını h
 gerekir fakat böyle bir hesap, eğer mesela $n$ tane obje var ise, her görüntü
 karesinde her $n$ tane objenin her $n-1$ diğer objenin yakınında olup olmadığı
 kontrolü anlamına gelir, ki hesapsal yük $O(n^2)$ olurdu. Eğer $n$ milyonlar ise
-bu ağır bir yük oluştururdu.
-
-Böleç tekniğini burada da kullanabiliriz. Öyle bir sihirli böleç fonksiyonumuz
-olsun ki her kordinat için bir böleç değeri üretsin ve birbirine yakın
-kordinatlar için bu değer aynı olsun. Böylece basit eşitlik kontrolü ile iki
-kordinatın birbirine yakın olup olmadığını hemen anlayabilirdik. Tabii daha
-detaylı kontrol için böleçleri aynı olan kordinatları daha detaylı teste tabi
-tutardık, ama detaylı kontrolün yapılacağı obje sayısını çok daha azaltmış
-olurduk.
+bu ağır bir yüktür.
 
 Izgara (Grid) Bazlı Yöntem
 
@@ -29,7 +21,7 @@ bulunabilsin.
 
 \includegraphics[width=10em]{algs_073_hash_03.png}
 
-Artık bir parçacığın komşularını bulmam gerektiğinde o parçacığın hücre indisini
+Artık bir parçacığın komşularını bulmak gerektiğinde o parçacığın hücre indisini
 alıp bir yukarı, bir sağa, vs. şeklinde üç boyutta tüm 27 tane mümkün komşu
 ızgaraya bakarak oradaki parçacıkları toplamak ve bunların $R$ kadar yakın olanı
 komşularını almak yeterli oluyor.
@@ -96,27 +88,35 @@ yanlis pozitif 672
 yanlis negatif 0
 \end{verbatim}
 
-Komşu değil denilen hiçbir top komşu değil. Bu önemli çünkü onları elemek mümkün
-değil. Komşu denilenler arasında bazı yanlışlar var ama onlar elenebilir. Komşu
-olmayan onbinlerce top komşu olmayacak şekilde etiketlendi, bu güzel.
+Sonuçlara bakınca komşu değil denilen hiçbir top komşu değil, bunu görüyoruz. Bu
+önemli çünkü onları elemek mümkün değil. Komşu denilenler arasında bazı
+yanlışlar var ama onlar elenebilir. Komşu olmayan onbinlerce top komşu olmayacak
+şekilde etiketlendi, bu güzel.
 
 Performans bakımından iyi bir sonuç beklemek gerekir, üstteki kodda her kenarı
 $R=20$ üzerinden 1000 tane hücre yaratıldı ve bunların hepsine bakmak yerine
 sadece en yakın olan 27 tanesine direk sözlük erişimi üzerinden bakıyoruz.
 
-Yanlış pozitif mevcut olması niye mümkün? Çünkü mesela iki boyutta üzerinde
-olduğumuz hücreyi düşünürsek onun en sağ ucunda olsak, üst sağımızdaki komşu
-hücrenin yine en üst sağında olan parçacık kenarları $R$ olan bir üçgenin
-hipotenüsü kadar bizden uzaktır ki bu $R$'den büyüktür. Problem değil az sayıda
-olan bu noktaları kaba kuvvet hesabı ile elemek gayet rahat.
+Yanlış pozitif çıkması mümkün. Niye? Çünkü mesela iki boyutta üzerinde olduğumuz
+hücreyi düşünürsek onun en sağ ucunda olsak, üst sağımızdaki komşu hücrenin yine
+en üst sağında olan parçacık kenarları $R$ olan bir üçgenin hipotenüsü kadar
+bizden uzaktır ki bu $R$'den büyüktür. Problem değil az sayıda olan bu noktaları
+kaba kuvvet hesabı ile elemek gayet rahat.
 
 Yerelliğe Hassas Böleç (Locality Sensitive Hashing, -LSH-)
+
+Böleç tekniğini de kullanabiliriz. Öyle bir sihirli fonksiyonumuz olsun ki her
+kordinat için bir anahtar değer üretsin ve birbirine yakın kordinatlar için bu
+değer aynı olsun. Böylece basit eşitlik kontrolü ile iki kordinatın birbirine
+yakın olup olmadığını hemen anlayabilirdik. Tabii daha detaylı kontrol için
+böleçleri aynı olan kordinatları daha detaylı teste tabi tutardık, ama detaylı
+kontrolün yapılacağı obje sayısını çok daha azaltmış olurduk.
 
 Bu alandaki tekniklerden biri LSH tekniği. LSH ile çok boyutlu bir kordinat
 sistemindeki noktaların yaklaşık olarak birbirine yakın olup olmadığını böleç
 üzerinden hesaplayabiliyoruz. En yaygın LSH yaklaşımının temeli rasgele
 izdüşümdür (random projection). [3]'te anlatıldığı gibi rasgele izdüşümün ilginç
-bir özelliği mesafeleri koruması, yani orijinal kordinate sistemindeki noktalar
+bir özelliği mesafeleri koruması, yani orijinal kordinat sistemindeki noktalar
 birbirine uzaksa yansıtıldıktan sonra da uzak kalmaya meyilliler.
 
 Bunu herhangi bir (yani rasgele) 2 boyutlu düzlem üzerinde yansıtılan alttaki
@@ -126,8 +126,8 @@ noktalarda görebiliriz. Uzak olan noktalar düzlem uzerinde hala birbirine uzak
 
 Tabii ki her (rasgele) düzlem her iki orijinal nokta arasındaki uzaklığı
 mükemmel olarak göstermeyebilir. Fakat, eğer birkaç tane farklı düzleme yapılan
-yansımların bir birleşiminden bir ölçüt / böleç yaratabilirsek, o zaman bu ölçüt
-ile bazı hızlı sonuçlara varabiliriz.
+yansımların bir birleşiminden bir ölçüt / anahtar yaratabilirsek, o zaman bu
+ölçüt ile bazı hızlı sonuçlara varabiliriz.
 
 Alttaki yaklaşımda 2 boyuta yansıtma yapılacak. Bu yansıtma yeni reel sayısal
 değerler ortaya çıkartır, bölec için bize ayrıksal ``kutular'' lazım, bu
@@ -229,8 +229,8 @@ kadar / genişlikte kutular yaratabilirdik.
 
 Bir diğer konu bölecin yakın olan bazı noktalar için mükemmel olmayacağı. Bu
 durumda bir çözüm ikinci, hatta üçüncü yansıtma matrisleri üzerinden ikinci,
-üçüncü böleçleme grupları yaratmak, eğer böleç değerleri hem 1'inci hem 2'inci
-hem de 3'üncü, vs. gruplarda aynı ise iki noktayı yakın kabul etmek. Bu yöntem
+üçüncü böleçleme grupları yaratmak, eğer böleç değerleri 1'inci ya da 2'inci ya
+da 3'üncü, vs. gruplarda aynı ise iki noktayı yakın kabul etmek. Bu yöntem
 yakınlık kontrolüne ek olarak yakın noktaların listesini almak için de faydalı,
 bir sözlük içinde her böleç değeri için bir nokta listesi tutulur, eğer birden
 fazla yansıtma yapılmışsa, bu sözlüklerden iki, hatta üç tane olabilir. Bir
@@ -239,30 +239,28 @@ değerine bakarız, ve alınan komşuları bir özgünlük filtresinden geçirer
 sonucu döndürürüz. Bu yaklaşım parçacık simülasyonları ile uğraşanlar için
 faydalı olabilir.
 
-Ayrıca rasgele izdüşüm çoğunlukla ``boyut küçültme (dimensionality reduction)''
-konusu olarak gösterilir, fakat boyut arttırma da mümkün olabilir. Özellikle üç
-boyutlu durumda iken zaten boyut sayısı azdır, fakat hala pek çok açıdan iki
-noktaya bakabilmek isteriz, bu sebeple izdüşüm matrisi üçten fazla boyut ta
-içerebilir.
+Bir diğer not, rasgele izdüşüm çoğunlukla ``boyut küçültme (dimensionality
+reduction)'' konusu olarak gösterilir, fakat boyut arttırma da mümkün
+olabilir. Özellikle üç boyutlu durumda iken zaten boyut sayısı azdır, fakat hala
+pek çok açıdan iki noktaya bakabilmek isteriz, bu sebeple izdüşüm matrisi üçten
+fazla boyut ta içerebilir.
 
 Test
 
-Altta üç tane farklı rasgele izdüşüm üzerinden bölecleyen bir kod görüyoruz. Bir
-3 boyutlu kordinat sisteminde rasgele yerlerde toplar yarattık, bunların
-bazıları birbirine yakın, bazılar değil, kodda LSH ile geometrik yakınlığı
-gerçek yakınlık ile ne kadar benzediğini kontrol ediyoruz. LSH bölec kontrol üç
-sözlükte kontrol ediliyor.
+Altta üç tane farklı rasgele izdüşüm üzerinden anahtarlayan bir kod
+görüyoruz. Bir 3 boyutlu kordinat sisteminde rasgele yerlerde toplar yarattık,
+bunların bazıları birbirine yakın, bazıları değil, kodda LSH ile geometrik
+yakınlığı gerçek yakınlık ile ne kadar benzediğini kontrol ediyoruz. LSH
+anahtarı üç sözlükte kontrol ediliyor.
 
-Tekrarlamak gerekirse, B tane topu rasgele bir şekilde her ekseni 0 ve 200
-arasında olan bir uzaya dağıttık. Topların bazıları yakın düştü tabii, bazılar
-düşmedi. Önce tüm topları böleçledik ve sözlüğe koyduk. Sonra tüm topların
-birbiri ile olan mesafesini ayrı ayrı teker teker külfetli yoldan yaptık, ve
-bölecin bu durum hakkında ne söylediğine baktık. Pozitif böleç(ler) yakın diyor,
+Önce tüm topları anahtarlıyoruz ve sözlüğe koyuyoruz. Sonra tüm topların birbiri
+ile olan mesafesini ayrı ayrı teker teker külfetli yoldan yapıyoruz, ve bölecin
+bu durum hakkında ne söylediğine bakıyoruz. Pozitif böleç(ler) yakın diyor,
 negatif böleç uzak diyor anlamında, tabii yakınlık ve uzaklık böleç anahtar
 değerinin aynı olup olmadığı ile ölçülüyor.
 
-Kontrolün doğru pozitif bulması mesela bölecin yakın dediğinin gerçekten de
-yakın olması. Yanlış negatif tam tersi, bölec uzak diyor ama aslında toplar
+Kontrolün doğru pozitif bulması mesela geo anahtarın yakın dediğinin gerçekten
+de yakın olması. Yanlış negatif tam tersi, anahtar uzak diyor ama aslında toplar
 yakın.
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -336,7 +334,7 @@ yanlis negatif 20
 \end{verbatim}
 
 Tabii ki istediğimiz doğru olan değerlerin yüksek olması. Ama yanlış pozitifin
-hala çaresi var, bölecin yakın dediklerini bir kontrolden daha geçirirsek bu
+hala çaresi var, anahtarın yakın dediklerini bir kontrolden daha geçirirsek bu
 kontrol yanlış pozitifleri eleyecektir, tabii gene de yanlış pozitiflerin de
 toplama kıyasla az olmasını isteriz. Tek problem yanlış negatif, topların çoğu
 birbirinden uzakta olduğu için bu yanlıştan dönmek zor, fakat bu tür topların
@@ -454,4 +452,5 @@ Kaynaklar
     \url{https://www.slaney.org/malcolm/yahoo/Slaney2008-LSHTutorial.pdf}
     
 \end{document}
+
 

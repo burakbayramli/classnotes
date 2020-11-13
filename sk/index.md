@@ -3,6 +3,8 @@
 
 ## En Son
 
+13/11 [Geometrik Anahtarlama](https://burakbayramli.github.io/dersblog/algs/algs_073_grid_hash_nn/geometrik_anahtarlama__spatial_hashing__ve_izgara__grid__ile_en_yakin_noktalari_bulmak.html)
+
 4/11 - [C++ Dili](2020/11/cpp.md)
 
 30/10 - [SPH Teorisi, Simulasyon](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app40sph/puruzlestirilmis_parcacik_hidrodinamigi__smoothed_particle_hydrodynamics_sph_.html)
@@ -10,10 +12,6 @@
 29/10 - [Dosya İşlemleri, Unix, Python](2020/10/python-unix-dosya-islemleri.md)
 
 14/10 - [Akış Dinamiği - Giriş (Fluid Dynamics)](https://burakbayramli.github.io/dersblog/phy/phy_050_fluid/akis_dinamigi.html)
-
-12/10 - [Ek - Böleç (Hash) ile Geometrik Anahtarlama](https://burakbayramli.github.io/dersblog/algs/algs_070_knn/en_yakin_kkomsu__knearest_neighbor__geometrik_yakinlik_hesabi.html)
-
-29/9 - [Materyel Türev, Euler ve Lagrange Bakış Açısı](https://youtu.be/XDrt-uATAY8)
 
 ## Konular, Referans
 

@@ -13,20 +13,10 @@ G = np.array([0.0, 0.0, -0.8])
 
 m = 0.1
 B = 10 # top
-l = 0.2 # bolec kutu buyuklugu
-n = B*20 # bolec sozluk buyuklugu
 img = True
-
-def spatial_hash(x):
-    """
-    x = [x0,x1,x2] uc boyutlu kordinatlari icin bir bolec (hash) degeri uret
-    """
-    ix,iy,iz = np.floor((x[0]+2.0)/l), np.floor((x[1]+2.0)/l), np.floor((x[2]+2.0)/l)
-    return (int(ix*p1) ^ int(iy*p2) ^ int(iz*p3)) % n
 
 class Simulation:
     def __init__(self):
-        self.geo_hash_list = None
         self.i = 0
         self.r   = 0.1
         self.g   = 9.8
@@ -71,7 +61,6 @@ class Simulation:
                 b['f'] = G * m
                         
     def integrate(self):
-        self.geo_hash_list = defaultdict(list)
         
         for j,b in enumerate(self.balls):
             b['v'] += self.dt*(b['f']/m)
@@ -95,26 +84,21 @@ class Simulation:
                 if b['pos'][2] < 0:
                     b['pos'][2] = self.mmin
 
-        for j,b in enumerate(self.balls):
-            self.geo_hash_list[spatial_hash(self.balls[j]['pos'])].append(self.balls[j])
-
         vDone = {}
         for j,b in enumerate(self.balls):
-            if (len(self.geo_hash_list[spatial_hash(self.balls[j]['pos'])])>1):
-                otherList = self.geo_hash_list[spatial_hash(self.balls[j]['pos'])]
-                for other in otherList:
-                    if (other['i'] != b['i'] and b['i'] not in vDone and other['i'] not in vDone):
-                        dist = lin.norm(other['pos']-b['pos'])
-                        if (dist < (2*self.r)):
-                            #print ('collision')
-                            vrel = b['v']-other['v']
-                            n = (other['pos']-b['pos']) / dist
-                            vnorm = np.dot(vrel,n)*n
-                            #print (vnorm)
-                            b['v'] = b['v'] - vnorm
-                            other['v'] = other['v'] + vnorm                            
-                            vDone[b['i']] = 1
-                            vDone[other['i']] = 1
+            for other in self.balls:
+                if (other['i'] != b['i'] and b['i'] not in vDone and other['i'] not in vDone):
+                    dist = lin.norm(other['pos']-b['pos'])
+                    if (dist < (2*self.r)):
+                        #print ('collision')
+                        vrel = b['v']-other['v']
+                        n = (other['pos']-b['pos']) / dist
+                        vnorm = np.dot(vrel,n)*n
+                        #print (vnorm)
+                        b['v'] = b['v'] - vnorm
+                        other['v'] = other['v'] + vnorm                            
+                        vDone[b['i']] = 1
+                        vDone[other['i']] = 1
                             
             
             
