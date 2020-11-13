@@ -1,21 +1,21 @@
 # Ubuntu'dan Oracle'a Baglanmak
 
-Su sayfadaki tarif takip edilebilir
+Şu sayfadaki tarif takip edilebilir
 
 https://help.ubuntu.com/community/Oracle%20Instant%20Client
 
-Su adrese girilir ve baglanan sisteme tekabul eden baglanti tiklanir
+Şu adrese girilir ve bağlanan sisteme tekabül eden bağlantı tıklanır
 
 http://www.oracle.com/technetwork/database/features/instant-client/index-097480.html
 
-Bizim icin bu Linux x86-64 idi mesela. Buradaki listelenen seyler
-icinde Basic, SQL*Plus, JDBC Supplement icin gosterilen rpm
-indirilir. "Lisans Kabulu" icin en ust soldaki radyo dugmesinin
-secilmis olmasi gerekiyor.
+Bizim için bu Linux x86-64 idi mesela. Buradaki listelenen şeyler
+içinde Basic, SQL*Plus, JDBC Supplement için gösterilen rpm
+indirilir. "Lisans Kabulü" için en üst soldaki radyo düğmesinin
+seçilmiş olması gerekiyor.
 
-Bu noktada Oracle sitesi "uyelik" sartini arar, email, sifre vs verip
-uyelik yapilir, konfirmasyon email'ine cevap verildikten sonra ustteki
-rpm dosyalari indirilecektir.
+Bu noktada Oracle sitesi "üyelik" şartını arar, email, sıfre vs verip
+üyelik yapılır, konfirmasyon email'ine cevap verildikten sonra üstteki
+rpm dosyaları indirilecektir.
 
 Sonra 
 
@@ -29,14 +29,14 @@ kurulur ve
 sudo alien -i oracle-instantclient11.2-*
 ```
 
-ile indirilen dosyalar kurulur. Eger paylasilan kutuphane (shared
-library, so) hatalari var ise, .bashrc icine
+ile indirilen dosyalar kurulur. Eğer paylaşılan kütüphane (shared
+library, so) hataları var ise, .başhrç içine
 
 ```
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/oracle/11.2/client64/lib
 ```
 
-yaziniz. Bir kere sudo ldconfig yapmaniz da gerekebilir. Ayrica
+yazınız. Bir kere `sudo ldconfig` yapmanız da gerekebilir. Ayrıca
 
 ```
 sudo apt-get install libaio1
@@ -61,7 +61,7 @@ Bu dosyada db, makina isimleri, ip adresleri yeralir. En son .bashrc icinde
 export TNS_ADMIN=/etc/oracle
 ```
 
-Artik sqlplus64 user@db gibi bir ifade ile baglanti yapilabilir.
+Artık `sqlplus64 user@db` gibi bir ifade ile bağlantı yapılabilir.
 
 Eger Python icinden baglanmak istersek,
 
@@ -86,7 +86,7 @@ conn = odb.connect("[kullanici]/[sifre]@[taban]")
 df = sql.read_frame("select .. from", conn)
 ```
 
-ile Oracle verisi bir Dataframe icine alinmis olur.
+ile Oracle verisi bir Dataframe içine alınmış olur.
 
 
 

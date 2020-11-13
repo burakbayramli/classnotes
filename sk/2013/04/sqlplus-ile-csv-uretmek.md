@@ -17,17 +17,17 @@ ile isletebiliriz, ve ciktiyi out.csv icinde goruruz. Kolon degerleri
 | ile ayrilmis olacaktir. Okunan tablo ismi goruldugu gibi tablo,
 zaten ciktiyi uretecek SQL ozellikle belirtiliyor.
 
-SQLPlus'un CSV uretmek icin pek iyi bir ortam oldugu soylenemez. Zaten
-bu aracin "sekli olarak veri uretmek" oldugu soyleniyor, tabii
-70-80'li yillarin text bazli ortami icin kolonsal sekiller uretmek
-anlaminda.. Bu sekli egilim sadece veriyi cekip cikartmak isteyenler 
-icin problem olabiliyor. Mesela linesize parametresine dikkat, bu
-parametre bir satirda kac karakter olacagini tanimlar, eger veri
-satirinda o kadar karakter yoksa, o zaman linesize bosluk karakteri
-ile doldurulur (daha fazla veri gelmisse de fazla olan karakterler
-kesip atilir! dikkat). Bu bosluk karakteri satirdaki en son kolonu
-okurken problem cikartabilir, Pandas ile mesela skipinitialspace=True
-ile bu bosluktan kurtulmak gerekiyor.
+SQLPlus'un CSV üretmek için pek iyi bir ortam olduğu söylenemez. Zaten
+bu araçın "şekli olarak veri üretmek" olduğu söyleniyor, tabii
+70-80'li yılların text bazlı ortamı için kolonsal şekiller üretmek
+anlamında.. Bu şekli eğilim sadece veriyi çekip çıkartmak isteyenler 
+için problem olabiliyor. Mesela linesize parametresine dikkat, bu
+parametre bir satırda kaç karakter olacağını tanımlar, eğer veri
+satırında o kadar karakter yoksa, o zaman linesize boşluk karakteri
+ile doldurulur (daha fazla veri gelmişse de fazla olan karakterler
+kesip atılır! dikkat). Bu boşluk karakteri satırdaki en son kolonu
+okurken problem çıkartabilir, Pandas ile mesela skipinitialspace=True
+ile bu boşluktan kurtulmak gerekiyor.
 
 Kolonlari yanyana ve | ile ayrilacak sekilde biz yanyana getiriyoruz,
 cunku baska turlu tum bilgilerin ardi ardina sirilanmasi mumkun
@@ -35,5 +35,4 @@ olmuyor (colsep ile set edilen ayarin pek bir anlami yok yani).
 
 Ayrica SQLPlus kolon isimlerini otomatik olarak vermiyor. Biz bu
 isimleri Pandas ile okurken kendimiz veriyoruz.
-
 

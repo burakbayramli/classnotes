@@ -1,6 +1,6 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Geometrik Anahtarlama ile En Yakın Noktaları Bulmak
+Geometrik Anahtarlama (Spatial Hashing) ve Izgara (Grid) ile En Yakın Noktaları Bulmak
 
 Grafik, fiziksel simülasyonlarda pek çok sayıda obje 3 boyutlu ortamda dünyaya
 salınıp, ayrı ayrı onlara fiziksel kurallar uygulanır ve nereye geldiklerine
@@ -17,6 +17,98 @@ kordinatın birbirine yakın olup olmadığını hemen anlayabilirdik. Tabii dah
 detaylı kontrol için böleçleri aynı olan kordinatları daha detaylı teste tabi
 tutardık, ama detaylı kontrolün yapılacağı obje sayısını çok daha azaltmış
 olurduk.
+
+Izgara (Grid) Bazlı Yöntem
+
+İlk yöntem ızgara bazlı. Etrafta uçuşan parçacıklar var, ve her parçacık için
+$R$ yakınlıktaki tüm diğer parçacıkları bulmak istiyoruz. Bu durumda en basit,
+ve en etkili yollardan biri tüm kordinat sistemini eşit parçalara bölerek her
+parçacığı yeterince büyük bir ızgaraya atamak, öyle ki ızgara indisi i,j,k
+üzerinden o hücrede hangi parçacıkların olduğu çok hızlı bir şekilde
+bulunabilsin.  
+
+\includegraphics[width=10em]{algs_073_hash_03.png}
+
+Artık bir parçacığın komşularını bulmam gerektiğinde o parçacığın hücre indisini
+alıp bir yukarı, bir sağa, vs. şeklinde üç boyutta tüm 27 tane mümkün komşu
+ızgaraya bakarak oradaki parçacıkları toplamak ve bunların $R$ kadar yakın olanı
+komşularını almak yeterli oluyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from collections import defaultdict 
+import numpy.linalg as lin, itertools
+
+np.random.seed(0)
+
+mmin,mmax=0,200; B = 200; R = 20
+BN = int(np.abs(mmax-mmin) / R) + 1
+
+balls = []
+
+bins = np.linspace(mmin, mmax, BN)
+grid_hash = defaultdict(list)
+
+for b in range(B):
+    p = np.array([np.random.uniform(mmin,mmax,1)[0],
+                  np.random.uniform(mmin,mmax,1)[0],
+                  np.random.uniform(mmin,mmax,1)[0] ])    
+    xi = np.digitize(p[0], bins)
+    yi = np.digitize(p[1], bins)
+    zi = np.digitize(p[2], bins)
+    ball = {'pos':p, 'i': b, 'grid': (xi,yi,zi) }
+    balls.append(ball)
+    grid_hash[(xi,yi,zi)].append(ball)
+
+def get_neighbors(ball):
+    tmp = list(itertools.product( [-1,0,1], repeat=3  ))
+    neighbors = {}
+    cx,cy,cz = ball['grid']
+    for (xa,ya,za) in tmp:
+        nx,ny,nz = cx+xa,cy+ya,cz+za
+        if (nx,ny,nz) in grid_hash:
+            tn = grid_hash[(nx,ny,nz)]
+            for n in tn: neighbors[ n['i'] ] = n
+    return neighbors
+
+
+tp = 0; tn = 0; fp = 0; fn = 0
+for b1 in balls:
+    for b2 in balls:
+        if b1['i']==b2['i']: continue
+        d = lin.norm(b1['pos']-b2['pos'],ord=2)
+        neigh = get_neighbors(b1)
+        if d < R and (b2['i'] in neigh): tp+=1        
+        elif d >= R and (b2['i'] not in neigh): tn+=1
+        elif d >= R and (b2['i'] in neigh): fp+=1
+        elif d < R and (b2['i'] not in neigh): fn+=1
+
+print ('dogru pozitif', tp)
+print ('dogru negatif', tn)
+
+print ('yanlis pozitif', fp)
+print ('yanlis negatif', fn)
+\end{minted}
+
+\begin{verbatim}
+dogru pozitif 148
+dogru negatif 38980
+yanlis pozitif 672
+yanlis negatif 0
+\end{verbatim}
+
+Komşu değil denilen hiçbir top komşu değil. Bu önemli çünkü onları elemek mümkün
+değil. Komşu denilenler arasında bazı yanlışlar var ama onlar elenebilir. Komşu
+olmayan onbinlerce top komşu olmayacak şekilde etiketlendi, bu güzel.
+
+Performans bakımından iyi bir sonuç beklemek gerekir, üstteki kodda her kenarı
+$R=20$ üzerinden 1000 tane hücre yaratıldı ve bunların hepsine bakmak yerine
+sadece en yakın olan 27 tanesine direk sözlük erişimi üzerinden bakıyoruz.
+
+Yanlış pozitif mevcut olması niye mümkün? Çünkü mesela iki boyutta üzerinde
+olduğumuz hücreyi düşünürsek onun en sağ ucunda olsak, üst sağımızdaki komşu
+hücrenin yine en üst sağında olan parçacık kenarları $R$ olan bir üçgenin
+hipotenüsü kadar bizden uzaktır ki bu $R$'den büyüktür. Problem değil az sayıda
+olan bu noktaları kaba kuvvet hesabı ile elemek gayet rahat.
 
 Yerelliğe Hassas Böleç (Locality Sensitive Hashing, -LSH-)
 
@@ -181,7 +273,7 @@ import numpy.linalg as lin
 np.random.seed(0)
 
 mmin,mmax=0,200
-B = 400; L = (mmax / 10);
+B = 200; R = (mmax / 10);
 balls = []
 geo_hash_list = defaultdict(list)
     
@@ -224,32 +316,23 @@ for i,b1 in enumerate(balls):
         h22 = spatial_hash2([b2['pos']])
         h31 = spatial_hash3([b1['pos']])
         h32 = spatial_hash3([b2['pos']])
-        if d <= L and (h11==h12 or h21==h22 or h31==h32): tp += 1        
-        elif d > L and not (h11==h12 or h21==h22 or h31==h32): tn+=1
-        elif d <= L and not (h11==h12 or h21==h22 or h31==h32): fn+=1
-        elif d > L and (h11==h12 or h21==h22 or h31==h32): fp+=1
+        if d <= R and (h11==h12 or h21==h22 or h31==h32): tp += 1        
+        elif d > R and not (h11==h12 or h21==h22 or h31==h32): tn+=1
+        elif d <= R and not (h11==h12 or h21==h22 or h31==h32): fn+=1
+        elif d > R and (h11==h12 or h21==h22 or h31==h32): fp+=1
 
 print ('dogru pozitif', tp)
 print ('dogru negatif', tn)
 
 print ('yanlis pozitif', fp)
 print ('yanlis negatif', fn)
-
-print (tp+tn+fp+fn)
-print ("Yanlis Negatif Yuzde %0.2f" % (fn / (tp+tn+fp+fn) * 100.0))
-print ("Yanlis Pozitif Yuzde %0.2f" % (fp / (tp+tn+fp+fn) * 100.0))
-print ("Yanlis Negatif / Dogru Pozitif %0.2f" % (fn / tp * 100.0))
 \end{minted}
 
 \begin{verbatim}
-dogru pozitif 564
-dogru negatif 151336
-yanlis pozitif 7656
-yanlis negatif 44
-159600
-Yanlis Negatif Yuzde 0.03
-Yanlis Pozitif Yuzde 4.80
-Yanlis Negatif / Dogru Pozitif 7.80
+dogru pozitif 128
+dogru negatif 38374
+yanlis pozitif 1278
+yanlis negatif 20
 \end{verbatim}
 
 Tabii ki istediğimiz doğru olan değerlerin yüksek olması. Ama yanlış pozitifin
@@ -309,12 +392,12 @@ from collections import defaultdict
 import numpy as np, datetime
 import numpy.linalg as lin
 
-mmin,mmax=0,400
+mmin,mmax=0,200
 p1,p2,p3 = 73856093, 19349663, 83492791
-B = 500; L = 50; n = int(B/3)
+B = 200; R = 20; n = B*20
 
 def spatial_hash(x):
-    ix,iy,iz = int(x[0]/L), int(x[1]/L), int(x[2]/L)
+    ix,iy,iz = int(x[0]/R), int(x[1]/R), int(x[2]/R)
     tmp = (ix*p1) ^ (iy*p2) ^ (iz*p3)
     return tmp % n
     
@@ -338,28 +421,23 @@ for i,b1 in enumerate(balls):
         h1 = spatial_hash(b1['pos'])
         h2 = spatial_hash(b2['pos'])
         
-        if d <= L and h1 == h2: tp += 1        
-        elif d > L and h1 != h2: tn+=1
-        elif d > L and h1 == h2: fp+=1
-        elif d <= L and h1 != h2: fn+=1
+        if d <= R and h1 == h2: tp += 1        
+        elif d > R and h1 != h2: tn+=1
+        elif d > R and h1 == h2: fp+=1
+        elif d <= R and h1 != h2: fn+=1
 
 print ('dogru pozitif', tp)
 print ('dogru negatif', tn)
 
 print ('yanlis pozitif', fp)
 print ('yanlis negatif', fn)
-
-print (tp+tn+fp+fn)
-print ("Yanlis Negatif Yuzde %0.2f" % (fn / (tp+tn+fp+fn) * 100.0))
 \end{minted}
 
 \begin{verbatim}
-dogru pozitif 456
-dogru negatif 246340
-yanlis pozitif 1340
-yanlis negatif 1364
-249500
-Yanlis Negatif Yuzde 0.55
+dogru pozitif 38
+dogru negatif 39634
+yanlis pozitif 14
+yanlis negatif 114
 \end{verbatim}
 
 Kaynaklar

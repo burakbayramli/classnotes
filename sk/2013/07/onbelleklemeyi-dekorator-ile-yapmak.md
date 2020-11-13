@@ -1,9 +1,9 @@
 # Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek
 
-Bir fonksiyona ya da kod parcasina onbellek kullanimi eklemek kolaydir
-fakat bu tur ekler kodun okunabilirligini de azaltabilirler. Mesela
-kare almakla yukumlu bir fonksiyonumuz var diyelim (altta ise yaramaz
-bir degisken dummy ekledik, bazi puf noktalari gosterebilmek icin),
+Bir fonksiyona ya da kod parçasına onbellek kullanımı eklemek kolaydır
+fakat bu tür ekler kodun okunabilirliğini de azaltabilirler. Mesela
+kare almakla yükümlü bir fonksiyonumuz var diyelim (altta ise yaramaz
+bir değişken dummy ekledik, bazı püf noktaları gösterebilmek için),
 
 ```
 def kare(dummy, a):    return a*a
@@ -15,12 +15,12 @@ Bu fonksiyonu
 kare("filan", 3)
 ```
 
-diye cagiriyoruz ve sonuc olarak 9 gelmesini bekliyoruz. 
+diye çağırıyoruz ve sonuç olarak 9 gelmesini bekliyoruz. 
 
-Onbellekleme icin, diyelim ki, eger a degeri onceden gorulmusse, kare
-islemi sonucunun tekrar hesaplanmasini istemiyoruz, onu onbellekten
-bulup hizli bir sekilde geri dondurmek tercihimiz (tabii carpim islemi
-de cok hizli isler, ama bu ornek icin yavas olabilecegini hayal
+Onbellekleme için, diyelim ki, eğer a değeri önceden görülmüşse, kare
+işlemi sonucunun tekrar hesaplanmasını istemiyoruz, onu onbellekten
+bulup hızlı bir şekilde geri döndürmek tercihimiz (tabii çarpım işlemi
+de çok hızlı işler, ama bu örnek için yavaş olabileceğini hayal
 edelim).
 
 Bu kod uzerinde onbelleklemeyi eski usulle yapsaydik, kod suna
@@ -32,22 +32,22 @@ cache = {}def kare(dummy, a):
     return cache[a]
 ```
 
-Degisken cache bir Python dictionary'dir ve onbellegimiz onun
-uzerinde  duruyor. Goruldugu gibi kod biraz kalabaliklasti. Onbellek
-objesi alanen ortada, ayrica if gibi cok ciddi bir ibareyi koda
-sokusturmak zorunda kaldik :) Genellikle bu ifade onemli bir islem
-mantigi var ise kullanilir - en azindan kod okunabilirligi acisindan
-boyle olmasi daha iyidir.
+Değişken cache bir Python dictionary'dir ve onbelleğimiz onun
+üzerinde  duruyor. Görüldüğü gibi kod biraz kalabalıklaştı. Onbellek
+objesi alanen ortada, ayrıca ıf gibi çok ciddi bir ibareyi koda
+sokuşturmak zorunda kaldık :) Genellikle bu ifade önemli bir işlem
+mantığı var ise kullanılır - en azından kod okunabilirliği açısından
+böyle olması daha iyidir.
 
 Peki bu isi daha temiz bir sekilde yapamaz miydik?
 
-Python dekorator fonksiyonlari iste tam burada ise yarar. Bir
-dekorator bir fonsiyonu "sarmalayabilir (wrap)", ve o fonksiyona giren
-cikan tum degerler uzerinde islem yapabilir, ve onlari istedigi gibi
-degistirebilir, bu sayede o fonksiyona "caktirmadan" ek ozellikler
-verebilir. Sozdizim acisindan da temiz dururlar, cunku dekorator
-fonksiyon uzerinde '@' ile tanimlanan bir seydir, baska bir eke
-ihtiyac yoktur. O zaman (once dekoratorun kendisi)
+Python dekoratör fonksiyonları işte tam burada ise yarar. Bir
+dekoratör bir fonsiyonu "sarmalayabilir (wrap)", ve o fonksiyona giren
+çıkan tüm değerler üzerinde işlem yapabilir, ve onları istediği gibi
+değiştirebilir, bu sayede o fonksiyona "çaktırmadan" ek özellikler
+verebilir. Sözdizim açısından da temiz dururlar, çünkü dekoratör
+fonksiyon üzerinde '@' ile tanımlanan bir şeydir, başka bir eke
+ihtiyaç yoktur. O zaman (önce dekoratörün kendisi)
 
 ```
 def cache(function):  memo = {}
@@ -62,23 +62,23 @@ def cache(function):  memo = {}
       return rv  return wrapper
 ```
 
-Ustteki kod ana kodunuzdan ayri bir yerde, bir dosyada durabilir
-mesela, sadece bir kere yazilir zaten, ve kullanilmasi gerektigi zaman
-su ibare yeterlidir,
+Üstteki kod ana kodunuzdan ayrı bir yerde, bir dosyada durabilir
+mesela, sadece bir kere yazılır zaten, ve kullanılması gerektiği zaman
+şu ibare yeterlidir,
 
 ```
 @cachedef kare(dummy, a):    return a*a
 ```
 
-Goruldugu gibi gayet temiz. Onbellek kodu hic etrafta gozukmuyor, bu
-da kod bakimini daha rahatlastiran bir ozellik. Boylece kare
-fonksiyonunu normalde olmasi gerektigi gibi yaziyoruz, kod onbellek
-olsa da olmasa da ayni sekilde yaziliyor, sadece carpim icin gereken
-islem mantigini iceriyor.
+Görüldüğü gibi gayet temiz. Onbellek kodu hiç etrafta gözükmüyor, bu
+da kod bakımını daha rahatlaştıran bir özellik. Böylece kare
+fonksiyonunu normalde olması gerektiği gibi yazıyoruz, kod onbellek
+olsa da olmasa da aynı şekilde yazılıyor, sadece çarpım için gereken
+işlem mantığını içeriyor.
 
-Not: dummy degiskenini dekorator icinde istedigimiz herhangi fonksiyon
-argumani ile is yapabilecegimizi gostermek icin kullandik, args[1] ile
-sadece ikinci argumana baktik mesela.
+Not: dummy değişkenini dekoratör içinde istediğimiz herhangi fonksiyon
+argümanı ile iş yapabileceğimizi göstermek için kullandık, args[1] ile
+sadece ikinci argümana baktık mesela.
 
 Koda Ekler Enjekte Etmek
 
@@ -92,12 +92,12 @@ import randomclass Foo:
     
 ```
 
-Biz bu kodun f() cagrisini "yakalayip" ona ek bir seyler yaptirtmak
-istiyoruz, ve mevcut koda hic dokunmadan bunu yapmak istiyoruz. Belki
-f() cagrisi bir baska yazilim paketi icinde, vs. Bu fonsiyonu dekore
+Biz bu kodun `f()` çağrısını "yakalayıp" ona ek bir şeyler yaptırtmak
+istiyoruz, ve mevcut koda hiç dokunmadan bunu yapmak istiyoruz. Belki
+f() çağrısı bir başka yazılım paketi içinde, vs. Bu fonsiyonu dekore
 ederek bunu yapabiliriz, fakat mevcut fonksiyon koduna dokunmak
-istemedigimiz icin metot ustunde @birdekorator gibi bir kullanim
-yapamayiz. Bu durumda baska bir secenek sudur,
+istemediğimiz için metot üstünde @birdekoratör gibi bir kullanım
+yapamayız. Bu durumda başka bir seçenek sudur,
 
 ```
 def decorated_f(fn):
@@ -116,10 +116,8 @@ print "o", o.f(0)
 print "was", o.was
 ```
 
-Yeni ekleri de isletecek, bu ek Foo uzerinde yeni bir oge yaratti, ve
-bu ogeye o.was diye erisiyoruz.
-
-
+Yeni ekleri de işletecek, bu ek Foo üzerinde yeni bir öğe yarattı, ve
+bu öğeye `o.was` diye erişiyoruz.
 
 
 

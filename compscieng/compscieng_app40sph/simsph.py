@@ -5,15 +5,19 @@ from random import random
 from PIL import Image
 from PIL import ImageOps
 from collections import defaultdict 
-import numpy as np, datetime
+import numpy as np, datetime, itertools
 import sys, numpy.linalg as lin
 
 p1,p2,p3 = 73856093, 19349663, 83492791
 G = np.array([0.0, 0.0, -9.8*2])
 
 B = 10 # top
-l = 0.2 # bolec kutu buyuklugu
-n = B*20 # bolec sozluk buyuklugu
+R = 0.1
+mmin,mmax=-1.0,+1.0
+BN = int(np.abs(mmax-mmin) / R) + 1
+bins = np.linspace(mmin, mmax, BN)
+
+idx27 = list(itertools.product( [-1,0,1], repeat=3  ))
 
 REST_DENS = 10.0
 GAS_CONST = 0.5
@@ -30,16 +34,10 @@ EPS = 0.05
 BOUND_DAMPING = -0.5
 img = True
 
-def spatial_hash(x):
-    """
-    x = [x0,x1,x2] uc boyutlu kordinatlari icin bir bolec (hash) degeri uret
-    """
-    ix,iy,iz = np.floor((x[0]+2.0)/l), np.floor((x[1]+2.0)/l), np.floor((x[2]+2.0)/l)
-    return (int(ix*p1) ^ int(iy*p2) ^ int(iz*p3)) % n
 
 class Simulation:
     def __init__(self):
-        self.geo_hash_list = None
+        self.grid_hash = None
         self.i = 0
         self.r   = 0.05
         self.balls = []
@@ -54,7 +52,10 @@ class Simulation:
                     v = np.array([0.0, 0.0, 0.0])
                     f = np.array([0,0,0])
                     x = np.array([xs, ys, zs])
-                    d = {'x': x, 'f':f, 'v': v, 'i': i, 'rho': 0.0, 'p': 0.0}
+                    xi = np.digitize(xs, bins)
+                    yi = np.digitize(ys, bins)
+                    zi = np.digitize(zs, bins)                    
+                    d = {'x': x, 'f':f, 'v': v, 'i': i, 'rho': 0.0, 'p': 0.0, 'grid': (xi,yi,zi)}
                     self.balls.append(d)
                     i += 1
 
@@ -73,52 +74,61 @@ class Simulation:
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
+    def get_neighbors(self, ball):
+        neighbors = {}
+        cx,cy,cz = ball['grid']
+        for (xa,ya,za) in idx27:
+            nx,ny,nz = cx+xa,cy+ya,cz+za
+            if (nx,ny,nz) in self.grid_hash:
+                tn = self.grid_hash[(nx,ny,nz)]
+                for n in tn: neighbors[ n['i'] ] = n
+        return neighbors
+        
     def hash_balls(self):
-        self.geo_hash_list = defaultdict(list)        
+        self.grid_hash = defaultdict(list)
         for i,b in enumerate(self.balls):
-            self.geo_hash_list[spatial_hash(self.balls[i]['x'])].append(self.balls[i])
-          
+            xi = np.digitize(b['x'][0], bins)
+            yi = np.digitize(b['x'][1], bins)
+            zi = np.digitize(b['x'][2], bins)
+            b['grid'] = (xi,yi,zi)
+            self.grid_hash[(xi,yi,zi)].append(b)
+            
     def computeDensityPressure(self):
         for i,pi in enumerate(self.balls):            
             pi['rho'] = 0.0                
-            h = spatial_hash(self.balls[i]['x']) # su anki topun boleci
-            if (len(self.geo_hash_list[h])>1): # yakinda top var mi
-                otherList = self.geo_hash_list[h] # varsa isle
-                for j,pj in enumerate(otherList):
-                    r2 = lin.norm(pj['x']-pi['x'])**2
-                    if  r2 < HSQ:
-                        pi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
-                pi['p'] = GAS_CONST*(pi['rho'] - REST_DENS)
+            otherList = self.get_neighbors(pi)
+            for (k,pj) in otherList.items():
+                r2 = lin.norm(pj['x']-pi['x'])**2
+                if  r2 < HSQ:
+                    pi['rho'] += MASS*POLY6*np.power(HSQ-r2, 3.0)
+            pi['p'] = GAS_CONST*(pi['rho'] - REST_DENS)
        
                 
     def computeForces(self):
         for i,pi in enumerate(self.balls):
             fpress = np.array([0.0, 0.0, 0.0])
             fvisc = np.array([0.0, 0.0, 0.0])                
-            h = spatial_hash(self.balls[i]['x']) # su anki topun boleci
-            if (len(self.geo_hash_list[h])>1): # yakinda top var mi
-                otherList = self.geo_hash_list[h] # varsa isle
-                for j,pj in enumerate(otherList):
-                    if pj['i'] == pi['i']: continue
-                    rij = pi['x']-pj['x']
-                    r = lin.norm(rij)
-                    if r < H:
-                        if np.sum(rij)>0.0: rij = rij / r
-                        tmp1 = -rij*MASS*(pi['p'] + pj['p']) / (2.0 * pj['rho'])
-                        tmp2 = SPIKY_GRAD*np.power(H-r,2.0)
-                        fpress += (tmp1 * tmp2)
-                        tmp1 = VISC*MASS*(pj['v'] - pi['v'])
-                        tmp2 = pj['rho'] * VISC_LAP*(H-r)
-                        fvisc += (tmp1 / tmp2)
-                fgrav = G * pi['rho']
-                pi['f'] = fpress + fvisc + fgrav
+            otherList = self.get_neighbors(pi)
+            for k,pj in otherList.items():
+                if pj['i'] == pi['i']: continue
+                rij = pi['x']-pj['x']
+                r = lin.norm(rij)
+                if r < H:
+                    if np.sum(rij)>0.0: rij = rij / r
+                    tmp1 = -rij*MASS*(pi['p'] + pj['p']) / (2.0 * pj['rho'])
+                    tmp2 = SPIKY_GRAD*np.power(H-r,2.0)
+                    fpress += (tmp1 * tmp2)
+                    tmp1 = VISC*MASS*(pj['v'] - pi['v'])
+                    tmp2 = pj['rho'] * VISC_LAP*(H-r)
+                    fvisc += (tmp1 / tmp2)
+            fgrav = G * pi['rho']
+            pi['f'] = fpress + fvisc + fgrav
                         
     def integrate(self):
         for j,p in enumerate(self.balls):
             if p['rho'] > 0.0: 
                 p['v'] += DT*p['f']/p['rho']
             p['x'] += DT*p['v']
-
 
             if p['x'][0]-EPS < -1.0:
                 p['v'][0] *= BOUND_DAMPING
