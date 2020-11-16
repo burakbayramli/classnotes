@@ -1,5 +1,9 @@
+// 
+// Geometrik izgara yontemi ile komsu kordinatlari bulmak
+// Keywords: Grid based nearest neighbor finding within a radius
 //
-// g++ geogrid.cpp -g -O2 -o /tmp/a.exe; /tmp/a.exe
+// Derlemek icin: g++ geogrid.cpp -g -O2 -o /tmp/a.exe; /tmp/a.exe
+// 
 //
 #include <map>
 #include <iostream>
