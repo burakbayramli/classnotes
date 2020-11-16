@@ -9,10 +9,9 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <eigen3/Eigen/Dense>
 
 using namespace std;
-
-#include <eigen3/Eigen/Dense>
 using namespace Eigen;
 
 static int B = 200;
