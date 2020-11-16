@@ -25,7 +25,7 @@ struct int3{
 };
 
 
-/*
+
 struct int3compare
 {
    bool operator() (const int3& lhs, const int3& rhs) const
@@ -33,12 +33,14 @@ struct int3compare
        return (lhs.i != rhs.i) || (lhs.j != rhs.j) || (lhs.k != rhs.k);
    }
 };
-*/
+
 
 bool operator<(int3 const& lhs, int3 const& rhs)
 {  
-   return lhs.i < rhs.i || lhs.j < rhs.j ||
-				   lhs.k < rhs.k ;
+   return lhs.i < rhs.i
+		  || ( lhs.i == rhs.i && lhs.j < rhs.j ) 
+		  || ( lhs.i == rhs.i && lhs.j == rhs.j  && lhs.k < rhs.k ) ;
+
 }
 
 static int calcBin(float x) {
