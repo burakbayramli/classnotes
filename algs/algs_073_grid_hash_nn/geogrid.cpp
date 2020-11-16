@@ -15,11 +15,16 @@ using namespace Eigen;
 
 const static Vector3d G(0.f, 0.f, 0.f);
 
+struct int3{
+    int i, j, k;
+};
+
 struct Particle {
     Particle() : x(0.f,0.f,0.f) {}
     Particle(float _x, float _y, float _z) : x(_x, _y, _z) {}
     Vector3d x;
-    Vector3d bin;
+    //Vector3d bin;
+    int3 bin;
 };
 
 static vector<Particle> particles;
@@ -36,10 +41,7 @@ static int bin(float x) {
     return res;
 }
 
-class int3{
-    int i, j,k;
-};
-
+//std::map<Vector3d,  std::vector<Particle>> m_bins; 
 std::map<int3,  std::vector<Particle>> m_bins; 
 
 void InitSPH(void)
@@ -49,12 +51,12 @@ void InitSPH(void)
 	float y = rand() % COORD_MAX;
 	float z = rand() % COORD_MAX;
 	Particle p(x,y,z);
-	p.bin[0] = (float)bin(p.x[0]);
-	p.bin[1] = (float)bin(p.x[1]);
-	p.bin[2] = (float)bin(p.x[2]);
+	p.bin.i = bin(p.x[0]);
+	p.bin.j = bin(p.x[1]);
+	p.bin.k = bin(p.x[2]);
 	std::cout        
 	    << "[" << p.x.transpose() << "]"
-	    << " " << p.bin.transpose() << std::endl;
+	    << " " << p.bin.i << std::endl;
 	particles.push_back(Particle(x,y,z));
     }
     std::cout << particles.size() << std::endl;
