@@ -1,5 +1,5 @@
 //
-// g++ geogrid.cpp -g -Wall -O2 -o /tmp/a.exe; /tmp/a.exe
+// g++ geogrid.cpp -g -O2 -o /tmp/a.exe; /tmp/a.exe
 //
 #include <map>
 #include <iostream>
@@ -13,10 +13,13 @@ using namespace std;
 #include <eigen3/Eigen/Dense>
 using namespace Eigen;
 
-const static Vector3d G(0.f, 0.f, 0.f);
+static int B = 100;
+static int BIN_WIDTH = 10.f;
+static int BIN_NUM = 20;
+static int COORD_MAX = 200;
 
 struct int3{
-    int3() {} 
+    int3() { i=-1; j=-1; k=-1;} 
     int3(int _i, int _j, int _k) { i=_i; j=_j; k=_k;}
     int i, j, k;
 };
@@ -37,12 +40,6 @@ struct Particle {
 };
 
 static vector<Particle> particles;
-
-static int B = 40;
-static int BIN_WIDTH = 10.f;
-static int BIN_NUM = 20;
-
-static int COORD_MAX = 200;
 
 static int bin(float x) {
     int res = (int)(x / BIN_WIDTH) + 1;
@@ -65,9 +62,12 @@ void InitSPH(void)
 
 	std::cout        
 	    << "[" << p.x.transpose() << "]"
-	    << " " << p.bin.i << std::endl;
+	    << " " << p.bin.i
+	    << " " << p.bin.j
+	    << " " << p.bin.k
+	    << std::endl;
 	
-	particles.push_back(Particle(x,y,z));
+	particles.push_back(p);
 
 	int3 k(p.bin.i, p.bin.j, p.bin.k);
 	grid_hash[k].push_back(p);
@@ -77,11 +77,36 @@ void InitSPH(void)
 }
 
 
+std::vector<Particle> getNeighbors(Particle particle){
+
+    std::vector<Particle> result;
+    
+    for (auto & i : {-1,0,1}) {
+	for (auto & j : {-1,0,1}) {
+	    for (auto & k : {-1,0,1}) {
+		int ni = particle.bin.i + i;
+		int nj = particle.bin.j + j;
+		int nk = particle.bin.k + k;
+		int3 newk(ni,nj,nk);
+		std::cout << "size " << ni << " " << ni << " " << nk 
+			  << grid_hash[newk].size() << std::endl;
+	    }
+	}
+    }
+    
+    return result;
+}
+
 
 int main(int argc, char** argv)
 {
-
+    
     InitSPH();
+
+    std::cout << "neighbors " << particles[10].x << std::endl;
+    
+    std::vector<Particle> res = getNeighbors(particles[60]);
+    
     
     return 0;
 }
