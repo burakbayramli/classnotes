@@ -214,9 +214,17 @@ OpenGL konusuna baktığımızda C++'ın bu alanda hala son derece yaygın
 olduğunu gördük. Bilim simülasyonları hala direk bu dile gidiyorlar,
 Fortran'dan buraya geçiş yapılmış, öteki seçeneklere bakan yok.
 
+Bağlantılar
+
+Faydalı bazı Türkçe kaynaklar altta bulunabilir
+
+[C++ ile Programlama Ders Notları](https://drive.google.com/uc?export=view&id=1QXYMbZkgVj6xM0ePCqL4wYKi-O3yE2l-)
+
+[C++ Programlama Youtube Dersleri](https://www.youtube.com/watch?v=BOoPd7SJvuk&list=PLoPK1OnMH5178ZBJNAVBA2FXcBMOYmv_n)
+
+
 Kaynaklar
 
-[1] [C++ ile Programlama Ders Notları](https://drive.google.com/uc?export=view&id=1QXYMbZkgVj6xM0ePCqL4wYKi-O3yE2l-)
 
 [2] https://linuxconfig.org/how-to-install-g-the-c-compiler-on-ubuntu-18-04-bionic-beaver-linux
 

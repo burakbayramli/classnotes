@@ -1,6 +1,7 @@
 // 
 // Geometrik izgara yontemi ile komsu kordinatlari bulmak
 // Keywords: Grid based nearest neighbor finding within a radius
+// Referans yazi https://burakbayramli.github.io/dersblog/algs/algs_073_grid_hash_nn/geometrik_anahtarlama__spatial_hashing__ve_izgara__grid__ile_en_yakin_noktalari_bulmak.html
 //
 // Derlemek icin: g++ geogrid.cpp -g -O2 -o /tmp/a.exe; /tmp/a.exe
 // 
