@@ -45,6 +45,8 @@ struct int3 {
 };
 
 
+// bir kordinatin hangi izgara hucresine dustugunu hesapla bunu hucre
+// genisligine bolerek ve birkac indis oynamasi uzerinden yapiyoruz
 static int calcBin(float x) {
     int res = (int)(x / BIN_WIDTH) + 1;
     if (res >= BIN_NUM) return BIN_NUM;
