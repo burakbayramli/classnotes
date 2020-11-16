@@ -24,11 +24,7 @@ static int COORD_MAX = 200;
 struct int3 {
 
     int i, j, k;
-
-    int3()
-    {
-	i=-1; j=-1; k=-1;
-    }
+    int3(){}
     int3(int _i, int _j, int _k)
     {
 	i=_i; j=_j; k=_k;
