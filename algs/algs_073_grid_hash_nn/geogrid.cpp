@@ -82,13 +82,6 @@ int main(int argc, char** argv)
 {
 
     InitSPH();
-   
-    int3 i1(3,4,4);
-    int3 i2(3,49,4);
-
-    //grid_hash[i1] = particles;
-
-    std::cout << grid_hash[i1].size() << std::endl;
     
     return 0;
 }
