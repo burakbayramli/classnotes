@@ -13,28 +13,30 @@ using namespace std;
 #include <eigen3/Eigen/Dense>
 using namespace Eigen;
 
-static int B = 3000;
+static int B = 200;
 static int BIN_WIDTH = 10.f;
 static int BIN_NUM = 20;
 static int COORD_MAX = 200;
 
 struct int3{
-    int3() { i=-1; j=-1; k=-1;} 
-    int3(int _i, int _j, int _k) { i=_i; j=_j; k=_k;}
     int i, j, k;
-    
-    bool operator==(const int3 &rhs) const {
-        return i == rhs.i && j == rhs.j && k == rhs.k;
+    int3()
+    {
+	i=-1; j=-1; k=-1;
     }
-    
-    
+    int3(int _i, int _j, int _k)
+    {
+	i=_i; j=_j; k=_k;
+    }    
+    bool operator==(const int3 &rhs) const
+    {
+        return i == rhs.i && j == rhs.j && k == rhs.k;
+    }        
     bool operator<(int3 const& rhs) const
     {	
 	return i < rhs.i || ( i == rhs.i && j < rhs.j ) 
 	    || ( i == rhs.i && j == rhs.j  && k < rhs.k ) ;
-
-    }
-    
+    }    
 };
 
 
@@ -113,13 +115,25 @@ int main(int argc, char** argv)
     
     InitSPH();
 
+    /*
     int idx = 111;
     std::cout << "neighbors of " << particles[idx].x << std::endl;
-
     std::cout << "at " << particles[idx].bin.i << " " << particles[idx].bin.j << " " << particles[idx].bin.k << " "
 	      << std::endl;
-
     std::vector<Particle> res = getNeighbors(particles[idx]);
+    */
+
+    for(auto &pi : particles)
+    {
+	for(auto &pj : particles)
+	{
+	    Vector3d rij = pj.x - pi.x;
+	    float r2 = rij.norm();
+	    std::cout << r2 << std::endl;
+	}
+	
+    }
+
     
     
     return 0;
