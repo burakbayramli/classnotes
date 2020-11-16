@@ -171,6 +171,12 @@ int main(int argc, char** argv)
 	
     }
 
+    //Sonuc alttaki gibi cikmali, tum dogru pozitif bulundu
+    //ve hicbir yanlis negatif yok. 
+    //tp:200
+    //tn:38948
+    //fp:852
+    //fn:0    
     std::cout << "tp:" << tp << std::endl;
     std::cout << "tn:" << tn << std::endl;
     std::cout << "fp:" << fp << std::endl;
