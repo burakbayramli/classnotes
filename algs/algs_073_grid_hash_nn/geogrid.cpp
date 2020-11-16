@@ -22,6 +22,8 @@ static int BIN_WIDTH = 20.f;
 static int BIN_NUM = 10;
 static int COORD_MAX = 200;
 
+
+// bir izgara hucresini temsil eden uc tane tam sayi bu struct icinde
 struct int3 {
 
     int i, j, k;
@@ -52,6 +54,8 @@ static int calcBin(float x) {
     return res;
 }
 
+// parcaciklar bu sinifta, her parcacik indisini, hangi izgara
+// hucresinde oldugunu, ve kordinatlarini bilir
 struct Particle {
     Particle() : x(0.f,0.f,0.f) {}
     Particle(float _x, float _y, float _z, int _i) : x(_x, _y, _z) {
@@ -65,11 +69,14 @@ struct Particle {
     int i;
 };
 
+
+// tum parcaciklar
 static vector<Particle> particles;
 
+// her izgara hucresindeki parcaciklari tuttugumuz yer
 std::map<int3,  std::vector<Particle>> grid_hash; 
 
-void InitSPH(void)
+void Init(void)
 {
     for(int i = 0; i<B; i++) {
 	float x = rand() % COORD_MAX;
@@ -96,11 +103,18 @@ void InitSPH(void)
 }
 
 
+// bir parcacigin tum komsularini bul, anahtari parcacik indisi degeri
+// parcacik objesi olan bir esleme / sozluk icinde donduruyoruz ki
+// boylece "bu komsu var mi yok mu?" sorusu hizla sorulabiliyor
+// (anahtar varligini kontrol cok hizlidir)
 std::map<int,  Particle>
 getNeighbors(Particle particle){
 
     std::map<int,  Particle> result;
-    
+
+    // 3d izgara hucresinin etrafindaki tum hucrelere bak, bunlar
+    // icinde oldugumuz dahil 27 tane, sag, sol, alt, ust, vs, tum
+    // yonlere bakiyoruz
     for (auto & i : {-1,0,1}) {
 	for (auto & j : {-1,0,1}) {
 	    for (auto & k : {-1,0,1}) {
@@ -108,6 +122,7 @@ getNeighbors(Particle particle){
 		int nj = particle.bin.j + j;
 		int nk = particle.bin.k + k;
 		int3 newk(ni,nj,nk);
+		// bulduklarini sonuca ekle
 		std::vector<Particle> grid_particles = grid_hash[newk];
 		for (Particle & pn : grid_particles) {
 		    result[pn.i] = pn;
@@ -124,12 +139,7 @@ int main(int argc, char** argv)
 {
     srand (0);
     
-    InitSPH();
-
-    int idx = 111;
-    std::cout << "neighbors of " << particles[idx].x << std::endl;
-    std::cout << "at " << particles[idx].bin.i << " " << particles[idx].bin.j << " " << particles[idx].bin.k << " "
-	      << std::endl;
+    Init();
 
     int tp = 0; int tn = 0; int fp = 0; int fn = 0;
     for(auto &pi : particles)

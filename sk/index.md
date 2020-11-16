@@ -3,7 +3,9 @@
 
 ## En Son
 
-13/11 [Geometrik Anahtarlama](https://burakbayramli.github.io/dersblog/algs/algs_073_grid_hash_nn/geometrik_anahtarlama__spatial_hashing__ve_izgara__grid__ile_en_yakin_noktalari_bulmak.html)
+16/11 [C++ Kodu, Geometrik Komşu Kordinatlar](https://github.com/burakbayramli/classnotes/blob/master/algs/algs_073_grid_hash_nn/geogrid.cpp)
+
+13/11 [Geometrik Anahtarlama, Komşu Kordinatlar](https://burakbayramli.github.io/dersblog/algs/algs_073_grid_hash_nn/geometrik_anahtarlama__spatial_hashing__ve_izgara__grid__ile_en_yakin_noktalari_bulmak.html)
 
 4/11 - [C++ Dili](2020/11/cpp.md)
 
