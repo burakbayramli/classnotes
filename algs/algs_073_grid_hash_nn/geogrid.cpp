@@ -171,8 +171,7 @@ int main(int argc, char** argv)
 	
     }
 
-    //Sonuc alttaki gibi cikmali, tum dogru pozitif bulundu
-    //ve hicbir yanlis negatif yok. 
+    //Sonuc alttaki gibi cikmali, hicbir yanlis negatif yok. 
     //tp:200
     //tn:38948
     //fp:852
