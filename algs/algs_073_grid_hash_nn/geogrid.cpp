@@ -93,11 +93,9 @@ void InitSPH(void)
 
 
 std::map<int,  Particle>
-//std::vector<Particle>
 getNeighbors(Particle particle){
 
     std::map<int,  Particle> result;
-    //std::vector<Particle> result;
     
     for (auto & i : {-1,0,1}) {
 	for (auto & j : {-1,0,1}) {
@@ -106,8 +104,6 @@ getNeighbors(Particle particle){
 		int nj = particle.bin.j + j;
 		int nk = particle.bin.k + k;
 		int3 newk(ni,nj,nk);
-//		std::cout << "neigh " << ni << " " << ni << " " << nk << " "
-//			  << grid_hash[newk].size() << std::endl;
 		std::vector<Particle> grid_particles = grid_hash[newk];
 		for (Particle & pn : grid_particles) {
 		    result[pn.i] = pn;
@@ -130,17 +126,18 @@ int main(int argc, char** argv)
     std::cout << "neighbors of " << particles[idx].x << std::endl;
     std::cout << "at " << particles[idx].bin.i << " " << particles[idx].bin.j << " " << particles[idx].bin.k << " "
 	      << std::endl;
-    std::map<int,  Particle> res = getNeighbors(particles[idx]);
 
     int tp = 0; int tn = 0; int fp = 0; int fn = 0;
     for(auto &pi : particles)
     {
 	for(auto &pj : particles)
-	{	    
+	{
+	    std::map<int,  Particle> res = getNeighbors(pi);
+	    
 	    Vector3d rij = pj.x - pi.x;
 	    float d = rij.squaredNorm();
 	    
-	    if (res.count(pi.i) == 1 && d <= BIN_WIDTH) {
+	    if (res.count(pj.i) == 1 && d <= BIN_WIDTH) {
 		tp++;
 	    }
 	    else if (res.count(pi.i) != 1 && d > BIN_WIDTH) {
