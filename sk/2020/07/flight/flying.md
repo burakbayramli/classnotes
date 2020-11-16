@@ -139,15 +139,3 @@ print ( w / 750, 'hp' )
 
 https://www.irhaltarim.com.tr/urun/honda-gx200-yatay-milli-motor-6-5-hp/4810
 
-
-
-
-
-
-
-
-
-
-
-
-
