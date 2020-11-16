@@ -22,26 +22,21 @@ struct int3{
     int3() { i=-1; j=-1; k=-1;} 
     int3(int _i, int _j, int _k) { i=_i; j=_j; k=_k;}
     int i, j, k;
+    
+    bool operator==(const int3 &rhs) const {
+        return i == rhs.i && j == rhs.j && k == rhs.k;
+    }
+    
+    
+    bool operator<(int3 const& rhs) const
+    {	
+	return i < rhs.i || ( i == rhs.i && j < rhs.j ) 
+	    || ( i == rhs.i && j == rhs.j  && k < rhs.k ) ;
+
+    }
+    
 };
 
-
-
-struct int3compare
-{
-   bool operator() (const int3& lhs, const int3& rhs) const
-   {
-       return (lhs.i != rhs.i) || (lhs.j != rhs.j) || (lhs.k != rhs.k);
-   }
-};
-
-
-bool operator<(int3 const& lhs, int3 const& rhs)
-{  
-   return lhs.i < rhs.i
-		  || ( lhs.i == rhs.i && lhs.j < rhs.j ) 
-		  || ( lhs.i == rhs.i && lhs.j == rhs.j  && lhs.k < rhs.k ) ;
-
-}
 
 static int calcBin(float x) {
     int res = (int)(x / BIN_WIDTH) + 1;
@@ -62,7 +57,6 @@ struct Particle {
 
 static vector<Particle> particles;
 
-//std::map<int3,  std::vector<Particle>, int3compare> grid_hash; 
 std::map<int3,  std::vector<Particle>> grid_hash; 
 
 void InitSPH(void)
