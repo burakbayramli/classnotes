@@ -149,16 +149,20 @@ int main(int argc, char** argv)
 	    
 	    Vector3d rij = pj.x - pi.x;
 	    float d = rij.squaredNorm();
-	    
+
+	    // izgara yontemi komsu diyor ve oyle
 	    if (res.count(pj.i) == 1 && d <= BIN_WIDTH) {
 		tp++;
 	    }
+	    // yontem komsu degil diyor ve oyle
 	    else if (res.count(pi.i) != 1 && d > BIN_WIDTH) {
 		tn++;
 	    }
+	    // yontem komsu diyor ve ama oyle degil
 	    else if (res.count(pi.i) == 1 && d > BIN_WIDTH) {
 		fp++;
 	    }
+	    // yontem komsu degil diyor ve oyle degil
 	    else if (res.count(pi.i) != 1 && d <= BIN_WIDTH) {
 		fn++;
 	    }
