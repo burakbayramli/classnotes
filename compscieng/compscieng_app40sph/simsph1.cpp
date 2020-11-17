@@ -54,9 +54,9 @@ float glc(float x) {
 void InitSPH(void)
 {
     int balls = 0;
-    for(float x = 0.f; x < 60.f; x += 4.f) { 
-	for(float y = 440.f; y < 500.f; y += 4.f) {	
-	    for(float z = 0.f; z < 60.7f; z += 4.f) {
+    for(float x = 0.f; x < 60.f; x += 5.f) { 
+	for(float y = 440.f; y < 500.f; y += 5.f) {	
+	    for(float z = 0.f; z < 60.7f; z += 5.f) {
 		particles.push_back(Particle(x,y,z));
 		balls ++;
 		glParticles.push_back(Particle(glc(x),glc(y),glc(z)));
