@@ -1,15 +1,16 @@
 // How to compile, and other info
 // https://burakbayramli.github.io/dersblog/sk/2020/08/sph.html
-// g++ simsph2.cpp -lX11 -lGL -lGLU -lglut -g -O2 -o /tmp/a.exe; /tmp/a.exe
+// g++ simsph2.cpp  -std=c++1z -lX11 -lGL -lGLU -lglut -g -O2 -o /tmp/a.exe; /tmp/a.exe
 // https://github.com/cerrno/mueller-sph
 #include <map>
 #include <GL/glut.h>
 #include <iostream>
 #include <fstream> 
 #include <vector>
-using namespace std;
-
+#include <iterator>
 #include <eigen3/Eigen/Dense>
+
+using namespace std;
 using namespace Eigen;
 
 // kordinate sistemi 0,500 arasinda, grafikleme icin -1,+1 ile
@@ -34,6 +35,9 @@ const static float VISC_LAP = 45.f/(M_PI*pow(H, 6.f));
 
 const static float EPS = H;
 const static float BOUND_DAMPING = -0.5f;
+
+static float MAX_COORD = 500;
+static int WINDOW_WIDTH = 500;
 
 struct int3 {
 
@@ -61,6 +65,7 @@ static int calcBin(float x) {
 }
 
 struct Particle {
+    Particle() {}
     Particle(float _x, float _y, float _z, int _i) : x(_x, _y, _z),
 				   v(0.f, 0.f, 0.f),
 				   f(0.f, 0.f, 0.f),
@@ -77,18 +82,42 @@ struct Particle {
     float rho, p;
 };
 
-static vector<Particle> particles;
-static vector<Particle> glParticles;
-std::map<int3,  std::vector<Particle>> grid_hash; 
-
-
-static float MAX_COORD = 500;
-static int WINDOW_WIDTH = 500;
-
 float glc(float x) {
     float res = x*(2.f/MAX_COORD) -1.f;
     return res;
 }
+
+static vector<Particle> particles;
+static vector<Particle> glParticles;
+std::map<int3,  std::vector<Particle>> grid_hash; 
+
+std::map<int,  Particle>
+getNeighbors(Particle particle){
+
+    std::map<int,  Particle> result;
+
+    // 3d izgara hucresinin etrafindaki tum hucrelere bak, bunlar
+    // icinde oldugumuz dahil 27 tane, sag, sol, alt, ust, vs, tum
+    // yonlere bakiyoruz
+    for (auto & i : {-1,0,1}) {
+	for (auto & j : {-1,0,1}) {
+	    for (auto & k : {-1,0,1}) {
+		int ni = particle.bin.i + i;
+		int nj = particle.bin.j + j;
+		int nk = particle.bin.k + k;
+		int3 newk(ni,nj,nk);
+		// bulduklarini sonuca ekle
+		std::vector<Particle> grid_particles = grid_hash[newk];
+		for (Particle & pn : grid_particles) {
+		    result[pn.i] = pn;
+		}
+	    }
+	}
+    }
+    
+    return result;
+}
+
 
 void InitSPH(void)
 {
@@ -203,7 +232,22 @@ void Update(void)
     ComputeDensityPressure();
     ComputeForces();
     Integrate();
-
+    // sozlugu sil
+    for(auto const& [key, value]: grid_hash)
+    {
+	grid_hash[key] = std::vector<Particle>();
+    }
+    // parcacik uzerindeki hucre indisini guncelle, sonra izgara
+    // sozlugune her seyi tekrar ekle
+    for(auto &p : particles)
+    {
+	p.bin.i = calcBin(p.x[0]);
+	p.bin.j = calcBin(p.x[1]);
+	p.bin.k = calcBin(p.x[2]);	
+	int3 k(p.bin.i, p.bin.j, p.bin.k);
+	grid_hash[k].push_back(p);
+    }
+    
     glutPostRedisplay();
 }
 
