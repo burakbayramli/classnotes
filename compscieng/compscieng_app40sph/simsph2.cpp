@@ -222,7 +222,6 @@ void ComputeDensityPressure(void)
 	//for(auto &pj : particles)
 	for(auto & [key, pj]: getNeighbors(pi)) 
         {
-	    if(pi.i == pj.i) continue;
 	    Vector3d rij = pj.x - pi.x;
 	    float r2 = rij.squaredNorm();
 
