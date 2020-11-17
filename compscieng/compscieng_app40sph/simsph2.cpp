@@ -16,14 +16,14 @@ using namespace Eigen;
 // kordinate sistemi 0,500 arasinda, grafikleme icin -1,+1 ile
 // surekli tercume yapiyoruz.
 
-const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
+const static Vector3d G(0.f, 0.f, 1000*-9.8f); 
 const static float REST_DENS = 1000.f; // rest density
 const static float GAS_CONST = 2000.f; // const for equation of state
 const static float H = 16.f; 
 const static float DIST = 5.f;
 const static float HSQ = H*H; 
 const static float MASS = 65.f;
-const static float VISC = 250.f;
+const static float VISC = 300.f;
 const static float DT = 0.001f; 
 static int BIN_WIDTH = 5.f;
 static int BIN_NUM = 100;
@@ -69,13 +69,6 @@ struct Particle {
 	//std::cout << "empty" << std::endl;
 	//exit(0);
     }
-    Particle(const Particle& o) {
-	x = o.x;
-	bin = o.bin;
-	i = o.i;
-	rho = o.rho;
-	p = o.rho;
-    }
     Particle(float _x, float _y, float _z, int _i) : x(_x, _y, _z),
 				   v(0.f, 0.f, 0.f),
 				   f(0.f, 0.f, 0.f),
@@ -118,8 +111,7 @@ getNeighbors(Particle particle){
 		int3 newk(ni,nj,nk);
 		// bulduklarini sonuca ekle
 		for (Particle & pn : grid_hash[newk]) {
-		    Particle tmp(pn);
-		    result[pn.i] = tmp;
+		    result[pn.i] = pn;
 		}
 	    }
 	}
