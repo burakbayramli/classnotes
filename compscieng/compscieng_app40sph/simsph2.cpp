@@ -17,8 +17,8 @@ using namespace Eigen;
 // surekli tercume yapiyoruz.
 
 const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
-const static float REST_DENS = 500.f; // rest density
-const static float GAS_CONST = 500.f; // const for equation of state
+const static float REST_DENS = 1000.f; // rest density
+const static float GAS_CONST = 2000.f; // const for equation of state
 const static float H = 16.f; 
 const static float DIST = 5.f;
 const static float HSQ = H*H; 
