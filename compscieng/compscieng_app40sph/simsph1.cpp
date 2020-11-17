@@ -12,9 +12,9 @@ using namespace std;
 using namespace Eigen;
 
 
-const static Vector3d G(0.f, 0.f, 10*-9.8f); 
-const static float REST_DENS = 1000.f; // rest density
-const static float GAS_CONST = 2000.f; // const for equation of state
+const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
+const static float REST_DENS = 500.f; // rest density
+const static float GAS_CONST = 500.f; // const for equation of state
 const static float H = 16.f; 
 const static float DIST = 10.f;
 const static float HSQ = H*H; 
@@ -54,13 +54,18 @@ float glc(float x) {
 
 void InitSPH(void)
 {
-    for(float x = 0.f; x < 80.f; x += 4.f)	    
-	for(float y = 420.f; y < 500.f; y += 4.f)	
-	    for(float z = 0.f; z < 80.7f; z += 4.f) {
+    int balls = 0;
+    for(float x = 0.f; x < 60.f; x += 4.f) { 
+	for(float y = 440.f; y < 500.f; y += 4.f) {	
+	    for(float z = 0.f; z < 60.7f; z += 4.f) {
 		particles.push_back(Particle(x,y,z));
+		balls ++;
 		glParticles.push_back(Particle(glc(x),glc(y),glc(z)));
 	    }
+	}
+    }
 
+    std::cout << "balls:" << balls << std::endl;
 }
 
 void Integrate(void)
@@ -228,7 +233,6 @@ int main(int argc, char** argv)
     glutDisplayFunc(Render);
     glutIdleFunc(Update);
     InitGL();
-
     glutMainLoop();
     return 0;
 }
