@@ -12,15 +12,15 @@ using namespace std;
 using namespace Eigen;
 
 
-const static Vector3d G(0.f, 0.f, 5.0f*-9.8f); 
-const static float REST_DENS = 8.f; 
-const static float GAS_CONST = 12.f; 
-const static float H = 0.3f; 
-const static float DIST = 0.3f;
-const static float HSQ = 0.1f; 
-const static float MASS = 10.f;
-const static float VISC = 20.f;
-const static float DT = 0.1f; 
+const static Vector3d G(0.f, 0.f, 10*-9.8f); 
+const static float REST_DENS = 1000.f; // rest density
+const static float GAS_CONST = 2000.f; // const for equation of state
+const static float H = 16.f; 
+const static float DIST = 10.f;
+const static float HSQ = H*H; 
+const static float MASS = 65.f;
+const static float VISC = 250.f;
+const static float DT = 0.001f; 
 
 // puruzsuzlestirici cekirdek ve turevleri
 const static float POLY6 = 315.f/(65.f*M_PI*pow(H, 9.f));
@@ -28,7 +28,7 @@ const static float SPIKY_GRAD = -45.f/(M_PI*pow(H, 6.f));
 const static float VISC_LAP = 45.f/(M_PI*pow(H, 6.f));
 
 const static float R = 0.02f;
-const static float EPS = 0.05f;
+const static float EPS = H;
 const static float BOUND_DAMPING = -0.5f;
 
 struct Particle {
@@ -45,6 +45,7 @@ static vector<Particle> particles;
 static vector<Particle> glParticles;
 
 static float MAX_COORD = 500;
+static int WINDOW_WIDTH = 500;
 
 float glc(float x) {
     float res = x*(2.f/MAX_COORD) -1.f;
@@ -53,9 +54,9 @@ float glc(float x) {
 
 void InitSPH(void)
 {
-    for(float x = 0.f; x < 80.f; x += 3.f)	    
-	for(float y = 420.f; y < 500.f; y += 3.f)	
-	    for(float z = 0.f; z < 80.7f; z += 3.f) {
+    for(float x = 0.f; x < 80.f; x += 4.f)	    
+	for(float y = 420.f; y < 500.f; y += 4.f)	
+	    for(float z = 0.f; z < 80.7f; z += 4.f) {
 		particles.push_back(Particle(x,y,z));
 		glParticles.push_back(Particle(glc(x),glc(y),glc(z)));
 	    }
@@ -176,6 +177,8 @@ void InitGL(void)
     
 }
 
+int renderCount = 0;
+
 void Render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -199,6 +202,20 @@ void Render(void)
     glPopMatrix();    
     glutSwapBuffers();
 
+    // her 40'inci goruntuyu diske yazmak
+    if (renderCount % 2 == 0) {
+	int* buffer = new int[ WINDOW_WIDTH * WINDOW_WIDTH * 3 ];
+	glReadPixels( 0, 0, WINDOW_WIDTH, WINDOW_WIDTH, GL_BGR, GL_UNSIGNED_BYTE, buffer );
+	std::string fname = "/tmp/glut/gl2-out-" + std::to_string(renderCount) + ".tga";
+	FILE   *out = fopen(fname.c_str(), "w");
+	short  TGAhead[] = {0, 2, 0, 0, 0, 0, WINDOW_WIDTH, WINDOW_WIDTH, 24};
+	fwrite(&TGAhead, sizeof(TGAhead), 1, out);
+	fwrite(buffer, 3 * WINDOW_WIDTH*WINDOW_WIDTH, 1, out);
+	fclose(out);
+    }
+    renderCount++;
+    std::cout << renderCount << std::endl;
+
 }
 
 int main(int argc, char** argv)
@@ -206,7 +223,7 @@ int main(int argc, char** argv)
     InitSPH();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(500,500);
+    glutInitWindowSize(WINDOW_WIDTH,WINDOW_WIDTH);
     glutCreateWindow("SPH");
     glutDisplayFunc(Render);
     glutIdleFunc(Update);
