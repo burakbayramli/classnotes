@@ -1,6 +1,6 @@
 // How to compile, and other info
 // https://burakbayramli.github.io/dersblog/sk/2020/08/sph.html
-// g++ simsph.cpp -lX11 -lGL -lGLU -lglut -g -Wall -O2 -o /tmp/a.exe; /tmp/a.exe
+// g++ simsph1.cpp -lX11 -lGL -lGLU -lglut -g -O2 -o /tmp/a.exe; /tmp/a.exe
 // https://github.com/cerrno/mueller-sph
 #include <GL/glut.h>
 #include <iostream>
@@ -11,31 +11,25 @@ using namespace std;
 #include <eigen3/Eigen/Dense>
 using namespace Eigen;
 
-// "Particle-Based Fluid Simulation for Interactive Applications"
-// solver parameters
-const static Vector3d G(0.f, 0.f, 5.0f*-9.8f); // external (gravitational) forces
-const static float REST_DENS = 8.f; // rest density
-const static float GAS_CONST = 12.f; // const for equation of state
-const static float H = 0.3f; // kernel radius
-const static float DIST = 0.3f; // kernel radius
-const static float HSQ = 0.1f; // radius^2 for optimization
-const static float MASS = 10.f; // assume all particles have the same mass
-const static float VISC = 20.f; // viscosity constant
-const static float DT = 0.1f; // integration timestep
 
-// smoothing kernels defined in Müller and their gradients
+const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
+const static float REST_DENS = 500.f; // rest density
+const static float GAS_CONST = 500.f; // const for equation of state
+const static float H = 16.f; 
+const static float DIST = 10.f;
+const static float HSQ = H*H; 
+const static float MASS = 65.f;
+const static float VISC = 250.f;
+const static float DT = 0.001f; 
+
+// puruzsuzlestirici cekirdek ve turevleri
 const static float POLY6 = 315.f/(65.f*M_PI*pow(H, 9.f));
 const static float SPIKY_GRAD = -45.f/(M_PI*pow(H, 6.f));
 const static float VISC_LAP = 45.f/(M_PI*pow(H, 6.f));
 
-// simulation parameters
-const static float R = 0.02f;
-const static float EPS = 0.05f; // boundary epsilon
+const static float EPS = H;
 const static float BOUND_DAMPING = -0.5f;
 
-// particle data structure
-// stores position, velocity, and force for integration
-// stores density (rho) and pressure values for SPH
 struct Particle {
     Particle(float _x, float _y, float _z) : x(_x, _y, _z),
 				   v(0.f, 0.f, 0.f),
@@ -46,61 +40,73 @@ struct Particle {
     float rho, p;
 };
 
-// solver data
 static vector<Particle> particles;
+static vector<Particle> glParticles;
 
-static int balls = 0;
+static float MAX_COORD = 500;
+static int WINDOW_WIDTH = 500;
+
+float glc(float x) {
+    float res = x*(2.f/MAX_COORD) -1.f;
+    return res;
+}
+
 void InitSPH(void)
 {
-    for(float x = -1.f; x < -0.7f; x += 0.02f)	    
-	for(float y = 0.7f; y < 1.f; y += 0.02f)	
-	    for(float z = -1.f; z < -0.7f; z += 0.02f) {
+    int balls = 0;
+    for(float x = 0.f; x < 60.f; x += 5.f) { 
+	for(float y = 440.f; y < 500.f; y += 5.f) {	
+	    for(float z = 0.f; z < 60.7f; z += 5.f) {
 		particles.push_back(Particle(x,y,z));
 		balls ++;
+		glParticles.push_back(Particle(glc(x),glc(y),glc(z)));
 	    }
-    cout << "balls " << balls << endl;
+	}
+    }
+
+    std::cout << "balls:" << balls << std::endl;
 }
 
 void Integrate(void)
 {
     for(auto &p : particles)
     {
-	// forward Euler integration
+	// ileri Euler entegrasyonu
 	if (p.rho > 0.0f) p.v += DT*p.f/p.rho;
 	p.x += DT*p.v;
 
-	// enforce boundary conditions
-	if(p.x(0)-EPS < -1.0f)
+	// sinir sartlarini kontrol et
+	if(p.x(0)-EPS < 0.0f)
         {
 	    p.v(0) *= BOUND_DAMPING;
-	    p.x(0) = -1.0f;
+	    p.x(0) = 0.0f;
         }
-	if(p.x(0)+EPS > 1.0f) 
+	if(p.x(0)+EPS > 500.0f) 
         {
 	    p.v(0) *= BOUND_DAMPING;
-	    p.x(0) = 1.0f-EPS;
+	    p.x(0) = 500.0f-EPS;
         }
 	
-	if(p.x(1)-EPS < -1.0f)
+	if(p.x(1)-EPS < 0.0f)
         {
 	    p.v(1) *= BOUND_DAMPING;
-	    p.x(1) = -1.0f;
+	    p.x(1) = 0.0f;
         }
-	if(p.x(1)+EPS > 1.0f)
+	if(p.x(1)+EPS > 500.0f)
         {
 	    p.v(1) *= BOUND_DAMPING;
-	    p.x(1) = 1.0f-EPS;
+	    p.x(1) = 500.0f-EPS;
         }
 
-	if(p.x(2)-EPS < -1.0f)
+	if(p.x(2)-EPS < 0.0f)
         {
 	    p.v(2) *= BOUND_DAMPING;
-	    p.x(2) = -1.0f;
+	    p.x(2) = 0.0f;
         }
-	if(p.x(2)+EPS > 1.0f)
+	if(p.x(2)+EPS > 500.0f)
         {
 	    p.v(2) *= BOUND_DAMPING;
-	    p.x(2) = 1.0f-EPS;
+	    p.x(2) = 500.0f-EPS;
         }
 	
     }
@@ -118,7 +124,6 @@ void ComputeDensityPressure(void)
 
 	    if(r2 < HSQ)
             {
-		// this computation is symmetric
 		pi.rho += MASS*POLY6*pow(HSQ-r2, 3.f);
             }
         }
@@ -142,9 +147,7 @@ void ComputeForces(void)
 
 	    if(r < DIST)
             {
-		// compute pressure force contribution
 		fpress += -rij.normalized()*MASS*(pi.p + pj.p)/(2.f * pj.rho) * SPIKY_GRAD*pow(H-r,2.f);
-		// compute viscosity force contribution
 		fvisc += VISC*MASS*(pj.v - pi.v)/pj.rho * VISC_LAP*(H-r);
             }
         }
@@ -178,6 +181,8 @@ void InitGL(void)
     
 }
 
+int renderCount = 0;
+
 void Render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -185,16 +190,35 @@ void Render(void)
     glRotatef(200.0f,0.0,1.0,0.0);
     glRotatef(90.0,-1.0,0.0,0.0);
     glutWireCube(2.0);
-    for(auto &p : particles){
+    for(int i=0; i < particles.size(); i++){
+	glParticles[i].x[0] = glc(particles[i].x[0]);
+	glParticles[i].x[1] = glc(particles[i].x[1]);
+	glParticles[i].x[2] = glc(particles[i].x[2]);
+    }
+    for(auto &p : glParticles){
 	glPushMatrix();
 	glTranslatef(p.x(0), p.x(1), p.x(2));
 	GLfloat mat_ambient[] ={0.f, 0.f, 1.f, 1.f};
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_ambient);
-	glutSolidSphere(R,50.f,50.f);
+	glutSolidSphere(0.05f,50.f,50.f);
 	glPopMatrix();
     }
     glPopMatrix();    
     glutSwapBuffers();
+
+    // her 40'inci goruntuyu diske yazmak
+    if (renderCount % 2 == 0) {
+	int* buffer = new int[ WINDOW_WIDTH * WINDOW_WIDTH * 3 ];
+	glReadPixels( 0, 0, WINDOW_WIDTH, WINDOW_WIDTH, GL_BGR, GL_UNSIGNED_BYTE, buffer );
+	std::string fname = "/tmp/glut/gl2-out-" + std::to_string(renderCount) + ".tga";
+	FILE   *out = fopen(fname.c_str(), "w");
+	short  TGAhead[] = {0, 2, 0, 0, 0, 0, WINDOW_WIDTH, WINDOW_WIDTH, 24};
+	fwrite(&TGAhead, sizeof(TGAhead), 1, out);
+	fwrite(buffer, 3 * WINDOW_WIDTH*WINDOW_WIDTH, 1, out);
+	fclose(out);
+    }
+    renderCount++;
+    std::cout << renderCount << std::endl;
 
 }
 
@@ -203,12 +227,11 @@ int main(int argc, char** argv)
     InitSPH();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(500,500);
+    glutInitWindowSize(WINDOW_WIDTH,WINDOW_WIDTH);
     glutCreateWindow("SPH");
     glutDisplayFunc(Render);
     glutIdleFunc(Update);
     InitGL();
-
     glutMainLoop();
     return 0;
 }
