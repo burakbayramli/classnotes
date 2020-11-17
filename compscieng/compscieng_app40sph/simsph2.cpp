@@ -96,8 +96,11 @@ void InitSPH(void)
     for(float x = 0.f; x < 60.f; x += 5.f) { 
 	for(float y = 440.f; y < 500.f; y += 5.f) {	
 	    for(float z = 0.f; z < 60.7f; z += 5.f) {
-		particles.push_back(Particle(x,y,z,balls));
+		Particle p(x,y,z,balls);
+		particles.push_back(p);
 		glParticles.push_back(Particle(glc(x),glc(y),glc(z),balls));
+		int3 k(p.bin.i, p.bin.j, p.bin.k);
+		grid_hash[k].push_back(p);
 		balls ++;
 	    }
 	}
@@ -245,7 +248,7 @@ void Render(void)
     glPopMatrix();    
     glutSwapBuffers();
 
-    // her 40'inci goruntuyu diske yazmak
+/*
     if (renderCount % 2 == 0) {
 	int* buffer = new int[ WINDOW_WIDTH * WINDOW_WIDTH * 3 ];
 	glReadPixels( 0, 0, WINDOW_WIDTH, WINDOW_WIDTH, GL_BGR, GL_UNSIGNED_BYTE, buffer );
@@ -258,7 +261,7 @@ void Render(void)
     }
     renderCount++;
     std::cout << renderCount << std::endl;
-
+*/
 }
 
 int main(int argc, char** argv)
