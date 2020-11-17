@@ -1,6 +1,6 @@
 // How to compile, and other info
 // https://burakbayramli.github.io/dersblog/sk/2020/08/sph.html
-// g++ simsph2.cpp  -std=c++1z -lX11 -lGL -lGLU -lglut -g -O2 -o /tmp/a.exe; /tmp/a.exe
+// g++ simsph3.cpp  -std=c++1z -lX11 -lGL -lGLU -lglut -g -O2 -o /tmp/a.exe; /tmp/a.exe
 // https://github.com/cerrno/mueller-sph
 #include <map>
 #include <GL/glut.h>
@@ -17,8 +17,8 @@ using namespace Eigen;
 // surekli tercume yapiyoruz.
 
 const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
-const static float REST_DENS = 1000.f; // rest density
-const static float GAS_CONST = 2000.f; // const for equation of state
+const static float REST_DENS = 100.f; // rest density
+const static float GAS_CONST = 200.f; // const for equation of state
 const static float H = 16.f; 
 const static float DIST = 5.f;
 const static float HSQ = H*H; 
@@ -102,7 +102,7 @@ static vector<Particle> glParticles;
 std::map<int3,  std::vector<Particle>> grid_hash; 
 
 std::map<int,  Particle>
-getNeighbors(Particle particle){
+getNeighborGridElements(Particle particle){
 
     std::map<int,  Particle> result;
 
@@ -220,12 +220,12 @@ void ComputeDensityPressure(void)
     {
 	pi.rho = 0.f;
 	//for(auto &pj : particles)
-	for(auto & [key, pj]: getNeighbors(pi)) 
+	for(auto & [key, pj]: getNeighborGridElements(pi)) 
         {
 	    Vector3d rij = pj.x - pi.x;
 	    float r2 = rij.squaredNorm();
 
-	    if(r2 < HSQ)
+	    if(r2 < BIN_WIDTH)
             {
 		pi.rho += MASS*POLY6*pow(HSQ-r2, 3.f);
             }
@@ -243,14 +243,14 @@ void ComputeForces(void)
 
 	//std::cout <<  "neigh " << neigh.size() << std::endl;
 	//for(auto &pj : particles)	    
-	for(auto & [key, pj]: getNeighbors(pi)) 
+	for(auto & [key, pj]: getNeighborGridElements(pi)) 
         {	    
 	    if(pi.i == pj.i) continue;
 
 	    Vector3d rij = pj.x - pi.x;
 	    float r = rij.norm();
 
-	    if(r < DIST)
+	    if(r < BIN_WIDTH)
             {
 		fpress += -rij.normalized()*MASS*(pi.p + pj.p)/(2.f * pj.rho) * SPIKY_GRAD*pow(H-r,2.f);
 		fvisc += VISC*MASS*(pj.v - pi.v)/pj.rho * VISC_LAP*(H-r);
