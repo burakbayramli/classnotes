@@ -20,7 +20,6 @@ const static Vector3d G(0.f, 0.f, 12000*-9.8f);
 const static float REST_DENS = 100.f; // rest density
 const static float GAS_CONST = 200.f; // const for equation of state
 const static float H = 16.f; 
-const static float DIST = 5.f;
 const static float HSQ = H*H; 
 const static float MASS = 65.f;
 const static float VISC = 250.f;
@@ -147,9 +146,9 @@ void initGridHash(void)
 void InitSPH(void)
 {
     int balls = 0;
-    for(float x = 0.f; x < 80.f; x += 5.f) { 
-	for(float y = 420.f; y < 500.f; y += 5.f) {	
-	    for(float z = 0.f; z < 80.7f; z += 5.f) {
+    for(float x = 0.f; x < 60.f; x += 5.f) { 
+	for(float y = 440.f; y < 500.f; y += 5.f) {	
+	    for(float z = 0.f; z < 60.7f; z += 5.f) {
 		Particle p(x,y,z,balls);
 		p.bin.i = calcBin(p.x[0]);
 		p.bin.j = calcBin(p.x[1]);
