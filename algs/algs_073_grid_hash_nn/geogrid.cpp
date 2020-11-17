@@ -20,7 +20,6 @@ static int BIN_WIDTH = 20.f;
 static int BIN_NUM = 10;
 static int COORD_MAX = 200;
 
-
 // bir izgara hucresini temsil eden uc tane tam sayi bu struct icinde
 struct int3 {
 
