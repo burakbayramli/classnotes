@@ -27,7 +27,6 @@ const static float POLY6 = 315.f/(65.f*M_PI*pow(H, 9.f));
 const static float SPIKY_GRAD = -45.f/(M_PI*pow(H, 6.f));
 const static float VISC_LAP = 45.f/(M_PI*pow(H, 6.f));
 
-const static float R = 0.02f;
 const static float EPS = H;
 const static float BOUND_DAMPING = -0.5f;
 
@@ -201,7 +200,7 @@ void Render(void)
 	glTranslatef(p.x(0), p.x(1), p.x(2));
 	GLfloat mat_ambient[] ={0.f, 0.f, 1.f, 1.f};
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_ambient);
-	glutSolidSphere(R,50.f,50.f);
+	glutSolidSphere(0.05f,50.f,50.f);
 	glPopMatrix();
     }
     glPopMatrix();    
