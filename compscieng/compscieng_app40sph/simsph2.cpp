@@ -20,13 +20,13 @@ const static Vector3d G(0.f, 0.f, 12000*-9.8f);
 const static float REST_DENS = 500.f; // rest density
 const static float GAS_CONST = 500.f; // const for equation of state
 const static float H = 16.f; 
-const static float DIST = 10.f;
+const static float DIST = 5.f;
 const static float HSQ = H*H; 
 const static float MASS = 65.f;
 const static float VISC = 250.f;
 const static float DT = 0.001f; 
-static int BIN_WIDTH = 20.f;
-static int BIN_NUM = 25;
+static int BIN_WIDTH = 5.f;
+static int BIN_NUM = 100;
 
 // puruzsuzlestirici cekirdek ve turevleri
 const static float POLY6 = 315.f/(65.f*M_PI*pow(H, 9.f));
@@ -65,7 +65,17 @@ static int calcBin(float x) {
 }
 
 struct Particle {
-    Particle() { std::cout << "empty" << std::endl;}
+    Particle() {
+	//std::cout << "empty" << std::endl;
+	//exit(0);
+    }
+    Particle(const Particle& o) {
+	x = o.x;
+	bin = o.bin;
+	i = o.i;
+	rho = o.rho;
+	p = o.rho;
+    }
     Particle(float _x, float _y, float _z, int _i) : x(_x, _y, _z),
 				   v(0.f, 0.f, 0.f),
 				   f(0.f, 0.f, 0.f),
@@ -107,15 +117,30 @@ getNeighbors(Particle particle){
 		int nk = particle.bin.k + k;
 		int3 newk(ni,nj,nk);
 		// bulduklarini sonuca ekle
-		std::vector<Particle> grid_particles = grid_hash[newk];
-		for (Particle & pn : grid_particles) {
-		    result[pn.i] = pn;
+		for (Particle & pn : grid_hash[newk]) {
+		    Particle tmp(pn);
+		    result[pn.i] = tmp;
 		}
 	    }
 	}
     }
     
     return result;
+}
+
+void initGridHash(void)
+{
+    // sozlugu sil parcacik uzerindeki hucre indisini guncelle, sonra
+    // izgara sozlugune her seyi tekrar ekle
+    for(auto const& [key, value]: grid_hash)
+    {
+	grid_hash[key].clear();
+    }
+    for(auto &p : particles)
+    {
+	int3 k(p.bin.i, p.bin.j, p.bin.k);
+	grid_hash[k].push_back(p);
+    }
 }
 
 
@@ -126,14 +151,17 @@ void InitSPH(void)
 	for(float y = 440.f; y < 500.f; y += 5.f) {	
 	    for(float z = 0.f; z < 60.7f; z += 5.f) {
 		Particle p(x,y,z,balls);
+		p.bin.i = calcBin(p.x[0]);
+		p.bin.j = calcBin(p.x[1]);
+		p.bin.k = calcBin(p.x[2]);	
 		particles.push_back(p);
 		glParticles.push_back(Particle(glc(x),glc(y),glc(z),balls));
-		int3 k(p.bin.i, p.bin.j, p.bin.k);
-		grid_hash[k].push_back(p);
 		balls ++;
 	    }
 	}
     }
+    
+    initGridHash();
 
     std::cout << "balls:" << balls << std::endl;
 }
@@ -179,7 +207,10 @@ void Integrate(void)
 	    p.v(2) *= BOUND_DAMPING;
 	    p.x(2) = 500.0f-EPS;
         }
-	
+
+	p.bin.i = calcBin(p.x[0]);
+	p.bin.j = calcBin(p.x[1]);
+	p.bin.k = calcBin(p.x[2]);			
     }
 }
 
@@ -208,10 +239,13 @@ void ComputeForces(void)
     {
 	Vector3d fpress(0.f, 0.f, 0.f);
 	Vector3d fvisc(0.f, 0.f, 0.f);
-	for(auto &pj : particles)
-        {
-	    if(&pi == &pj)
-		continue;
+
+	std::map<int,  Particle> neigh = getNeighbors(pi);
+	//std::cout <<  "neigh " << neigh.size() << std::endl;
+	//for(auto &pj : particles)	    
+	for(auto & [key, pj]: neigh) 
+        {	    
+	    if(pi.i == pj.i) continue;
 
 	    Vector3d rij = pj.x - pi.x;
 	    float r = rij.norm();
@@ -232,21 +266,7 @@ void Update(void)
     ComputeDensityPressure();
     ComputeForces();
     Integrate();
-    // sozlugu sil parcacik uzerindeki hucre indisini guncelle, sonra
-    // izgara sozlugune her seyi tekrar ekle
-    for(auto const& [key, value]: grid_hash)
-    {
-	grid_hash[key].clear();
-    }
-    for(auto &p : particles)
-    {
-	p.bin.i = calcBin(p.x[0]);
-	p.bin.j = calcBin(p.x[1]);
-	p.bin.k = calcBin(p.x[2]);	
-	int3 k(p.bin.i, p.bin.j, p.bin.k);
-	grid_hash[k].push_back(p);
-    }
-    
+    initGridHash();
     glutPostRedisplay();
 }
 
