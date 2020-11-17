@@ -219,8 +219,10 @@ void ComputeDensityPressure(void)
     for(auto &pi : particles)
     {
 	pi.rho = 0.f;
-	for(auto &pj : particles)
+	//for(auto &pj : particles)
+	for(auto & [key, pj]: getNeighbors(pi)) 
         {
+	    if(pi.i == pj.i) continue;
 	    Vector3d rij = pj.x - pi.x;
 	    float r2 = rij.squaredNorm();
 
@@ -240,10 +242,9 @@ void ComputeForces(void)
 	Vector3d fpress(0.f, 0.f, 0.f);
 	Vector3d fvisc(0.f, 0.f, 0.f);
 
-	std::map<int,  Particle> neigh = getNeighbors(pi);
 	//std::cout <<  "neigh " << neigh.size() << std::endl;
 	//for(auto &pj : particles)	    
-	for(auto & [key, pj]: neigh) 
+	for(auto & [key, pj]: getNeighbors(pi)) 
         {	    
 	    if(pi.i == pj.i) continue;
 
