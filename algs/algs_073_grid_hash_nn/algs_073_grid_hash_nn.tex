@@ -42,15 +42,20 @@ np.random.seed(0)
 mmin,mmax=0,200; B = 200; R = 20
 BN = int(np.abs(mmax-mmin) / R) + 1
 
-balls = []
+# tum parcaciklar her parcacik indisini, hangi izgara hucresinde oldugunu, ve
+# kordinatlarini bilir balls = []
 
 bins = np.linspace(mmin, mmax, BN)
+
+# her izgara hucresindeki parcaciklari tuttugumuz yer, anahtar
+# [i,j,k] seklinde izgara indisi, deger liste
 grid_hash = defaultdict(list)
 
 for b in range(B):
     p = np.array([np.random.uniform(mmin,mmax,1)[0],
                   np.random.uniform(mmin,mmax,1)[0],
-                  np.random.uniform(mmin,mmax,1)[0] ])    
+                  np.random.uniform(mmin,mmax,1)[0] ])
+    # bir kordinatin hangi izgara hucresine dustugunu hesapla 
     xi = np.digitize(p[0], bins)
     yi = np.digitize(p[1], bins)
     zi = np.digitize(p[2], bins)
@@ -58,16 +63,24 @@ for b in range(B):
     balls.append(ball)
     grid_hash[(xi,yi,zi)].append(ball)
 
+# bir parcacigin tum komsularini bul, anahtari parcacik indisi degeri
+# parcacik objesi olan bir esleme / sozluk icinde donduruyoruz ki
+# boylece "bu komsu var mi yok mu?" sorusu hizla sorulabiliyor
+# (anahtar varligini kontrol cok hizlidir)
 def get_neighbors(ball):
     tmp = list(itertools.product( [-1,0,1], repeat=3  ))
     # komsulari sozluk olarak dondur alan hizli sekilde kontrol
     # edebilir, anahtar komsu kimligi
     neighbors = {}
     cx,cy,cz = ball['grid']
+    # 3d izgara hucresinin etrafindaki tum hucrelere bak, bunlar
+    # icinde oldugumuz dahil 27 tane, sag, sol, alt, ust, vs, tum
+    # yonlere bakiyoruz
     for (xa,ya,za) in tmp:
         nx,ny,nz = cx+xa,cy+ya,cz+za
         if (nx,ny,nz) in grid_hash:
             tn = grid_hash[(nx,ny,nz)]
+	    # bulduklarini sonuca ekle
             for n in tn: neighbors[ n['i'] ] = n
     return neighbors
 
@@ -78,9 +91,13 @@ for b1 in balls:
         if b1['i']==b2['i']: continue
         d = lin.norm(b1['pos']-b2['pos'],ord=2)
         neigh = get_neighbors(b1)
+	# izgara yontemi komsu diyor ve oyle
         if d < R and (b2['i'] in neigh): tp+=1        
+	# yontem komsu degil diyor ve oyle
         elif d >= R and (b2['i'] not in neigh): tn+=1
+	# yontem komsu diyor ve ama oyle degil
         elif d >= R and (b2['i'] in neigh): fp+=1
+	# yontem komsu degil diyor ve oyle degil
         elif d < R and (b2['i'] not in neigh): fn+=1
 
 print ('dogru pozitif', tp)
@@ -284,6 +301,7 @@ np.random.seed(0)
 mmin,mmax=0,200
 B = 200; R = (mmax / 10);
 balls = []
+
 geo_hash_list = defaultdict(list)
     
 for b in range(B):
