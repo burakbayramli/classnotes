@@ -65,7 +65,7 @@ static int calcBin(float x) {
 }
 
 struct Particle {
-    Particle() {}
+    Particle() { std::cout << "empty" << std::endl;}
     Particle(float _x, float _y, float _z, int _i) : x(_x, _y, _z),
 				   v(0.f, 0.f, 0.f),
 				   f(0.f, 0.f, 0.f),
@@ -232,13 +232,12 @@ void Update(void)
     ComputeDensityPressure();
     ComputeForces();
     Integrate();
-    // sozlugu sil
+    // sozlugu sil parcacik uzerindeki hucre indisini guncelle, sonra
+    // izgara sozlugune her seyi tekrar ekle
     for(auto const& [key, value]: grid_hash)
     {
-	grid_hash[key] = std::vector<Particle>();
+	grid_hash[key].clear();
     }
-    // parcacik uzerindeki hucre indisini guncelle, sonra izgara
-    // sozlugune her seyi tekrar ekle
     for(auto &p : particles)
     {
 	p.bin.i = calcBin(p.x[0]);
@@ -291,21 +290,6 @@ void Render(void)
     }
     glPopMatrix();    
     glutSwapBuffers();
-
-/*
-    if (renderCount % 2 == 0) {
-	int* buffer = new int[ WINDOW_WIDTH * WINDOW_WIDTH * 3 ];
-	glReadPixels( 0, 0, WINDOW_WIDTH, WINDOW_WIDTH, GL_BGR, GL_UNSIGNED_BYTE, buffer );
-	std::string fname = "/tmp/glut/gl2-out-" + std::to_string(renderCount) + ".tga";
-	FILE   *out = fopen(fname.c_str(), "w");
-	short  TGAhead[] = {0, 2, 0, 0, 0, 0, WINDOW_WIDTH, WINDOW_WIDTH, 24};
-	fwrite(&TGAhead, sizeof(TGAhead), 1, out);
-	fwrite(buffer, 3 * WINDOW_WIDTH*WINDOW_WIDTH, 1, out);
-	fclose(out);
-    }
-    renderCount++;
-    std::cout << renderCount << std::endl;
-*/
 }
 
 int main(int argc, char** argv)
