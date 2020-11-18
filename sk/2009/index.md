@@ -42,8 +42,6 @@
 
 [Detexify](07/detexify.md)
 
-[Facebook Import](07/facebook-import.md)
-
 [Lineer Cebir Karikaturu](07/lineer-cebir-karikaturu_18.md)
 
 [Apache 2, mod_jk, Ubuntu ve Seam](08/apache-2-modjk-ubuntu-ve-seam.md)

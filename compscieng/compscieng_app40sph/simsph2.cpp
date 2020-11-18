@@ -122,8 +122,9 @@ getNeighbors(Particle particle){
 
 void initGridHash(void)
 {
-    // sozlugu sil parcacik uzerindeki hucre indisini guncelle, sonra
-    // izgara sozlugune her seyi tekrar ekle
+    // sozlugu sil parcacik uzerindeki hucre indislerinin onceden
+    // guncellenmis oldugunu farzet, o degerleri kullanip izgara
+    // sozlugune her seyi tekrar ekle
     for(auto const& [key, value]: grid_hash)
     {
 	grid_hash[key].clear();
@@ -141,7 +142,7 @@ void InitSPH(void)
     int balls = 0;
     for(float x = 0.f; x < 60.f; x += 5.f) { 
 	for(float y = 440.f; y < 500.f; y += 5.f) {	
-	    for(float z = 0.f; z < 60.7f; z += 5.f) {
+	    for(float z = 0.f; z < 60.f; z += 5.f) {
 		Particle p(x,y,z,balls);
 		p.bin.i = calcBin(p.x[0]);
 		p.bin.j = calcBin(p.x[1]);
@@ -284,7 +285,7 @@ void Render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
-    glRotatef(200.0f,0.0,1.0,0.0);
+    glRotatef(200.f,0.0,1.0,0.0);
     glRotatef(90.0,-1.0,0.0,0.0);
     glutWireCube(2.0);
     for(int i=0; i < particles.size(); i++){
