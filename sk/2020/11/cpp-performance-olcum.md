@@ -59,6 +59,7 @@ public:
 
 ```
 
+```clike
 #include "cronometer.h"
 
 long fibonacci(unsigned n)
@@ -84,7 +85,7 @@ int main()
     
     std::cout << "Milliseconds: " << timer.elapsedMilliseconds() << std::endl;
 }
-
+```
 
 ```
 g++ test.cpp  -o /tmp/a.exe; /tmp/a.exe
