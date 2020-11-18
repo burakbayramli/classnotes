@@ -2,8 +2,8 @@
 
 Kodun içinde hangi bloğun ne kadar zaman aldığını ölçmek kodu optimize
 etmek için gündeme gelir. Altta bir kronometre kodu var, [1]'de
-görülen hali alttaki sınıfla bir kronometre objesi yaratmak ve onu
-başlatıp durdurduktan sonra ne kadar zaman geçtiğini raporlamak.
+görülen bir kronometre objesi yaratmak ve onu başlatıp durdurduktan
+sonra ne kadar zaman geçtiğini raporlamak.
 
 Bizim yaptığımız ek birden fazla başlatıp durdurabilmek, böylece bir
 fonksiyon pek çok kez çağrılıyorsa mesela o fonksiyon başında sonunda
@@ -29,19 +29,16 @@ class Timer
 private:
     std::chrono::time_point<std::chrono::system_clock> m_StartTime;
     std::chrono::time_point<std::chrono::system_clock> m_EndTime;
-    bool                                               m_bRunning = false;
     
 public:
     void start()
     {
         m_StartTime = std::chrono::system_clock::now();
-        m_bRunning = true;
     }
     
     void stop()
     {
         m_EndTime = std::chrono::system_clock::now();
-        m_bRunning = false;
 	totalElapsed = totalElapsed + std::chrono::duration_cast<std::chrono::milliseconds>(m_EndTime - m_StartTime).count();
     }
     
@@ -71,12 +68,16 @@ long fibonacci(unsigned n)
 int main()
 {    
     Timer timer;
+
+    // ilk kez baslat
     timer.start();
     for (int i=0;i<100;i++){
 	fibonacci(30);
     }
-    timer.stop();
+    timer.stop();    
     std::cout << "Milliseconds: " << timer.elapsedMilliseconds() << std::endl;
+
+    // ikinci kez baslat, onceki zamanin ustune eklenmesi lazim
     timer.start();
     for (int i=0;i<100;i++){
 	fibonacci(30);
