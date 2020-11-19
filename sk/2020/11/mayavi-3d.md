@@ -8,12 +8,12 @@ olmayabilir. Belki arka planda, gözükmeyecek toplar vardır, bunları
 göstermeye gerek var mı?
 
 Bilgisayar grafikleme algoritmalarından (ki bilgisayar oyunlarında
-yaygın şekilde kullanılır) işin takip etme (ray traçıng) burada
-gerekli olabilir, görüntüye bakılma açısından sanal ışınlar hayal edip
+yaygın şekilde kullanılır) işin takip etme (ray tracing) burada gerekli
+olabilir, görüntüye bakılma açısından sanal ışınlar hayal edip
 bunların sadece ilk çarpıklarını çizmek, arka plana kalanları çizmemek
-bir hızlandırıcı ilerleme olurdu. 
+bir hızlandırıcı ilerleme olurdu.
 
-![](mayavi4.md)
+![](mayavi4.png)
 
 O zaman teker teker top ciz demek yerine tüm topların kordinatlarını
 bir seferde verip özel bir kütüphanenin görünecek olan objelere karar
@@ -70,6 +70,11 @@ mlab.savefig(filename='mayavi3.png')
 ![](mayavi2.png)
 ![](mayavi3.png)
 
+Bu iki grafikleme oldukca hızlı şekilde geri döndü. Eğer bir sıvı
+dinamiğini simüle ediyorsak ve milyonlarca parçacık varsa bu perfomans
+belki anlık ekranda göstermek için yeterli olmayabilir, fakat arka
+planda birkaç dakika beklenerek tüm simülasyonun gidişatı belli birkaç
+kare yanyana koyularak kabul edilir bir zaman içinde yaratılabilir.
 
 
 Kaynaklar
@@ -77,4 +82,7 @@ Kaynaklar
 [1] https://docs.enthought.com/mayavi/mayavi/mlab.html
 
 [2] https://www.toptal.com/data-science/3d-data-visualization-with-open-source-tools-an-example-using-vtk
+
+
+
 
