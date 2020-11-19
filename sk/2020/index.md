@@ -54,3 +54,5 @@
 
 [C++ Dili, Derleme, Kodlama](11/cpp.md)
 
+[Üç Boyutlu Grafikler İçin Mayavi](11/mayavi-3d.md)
+

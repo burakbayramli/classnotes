@@ -34,8 +34,6 @@
 
 [Logger ve Serilestirme](06/logger-ve-serilestirme_08.md)
 
-[MayaVi](06/mayavi_11.md)
-
 [Mikrofon Verisi, Grafiklemek, FFT](06/mikrofon-verisi-grafiklemek-fft_01.md)
 
 [OpenCV, Python ile Yuz Takip Etme](06/opencv-python-ile-yuz-takip-etme_09.md)
