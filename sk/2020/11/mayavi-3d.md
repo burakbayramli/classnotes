@@ -8,17 +8,17 @@ olmayabilir. Belki arka planda, gözükmeyecek toplar vardır, bunları
 göstermeye gerek var mı?
 
 Bilgisayar grafikleme algoritmalarından (ki bilgisayar oyunlarında
-yaygın şekilde kullanılır) işin takip etme (ray tracing) burada gerekli
-olabilir, görüntüye bakılma açısından sanal ışınlar hayal edip
-bunların sadece ilk çarpıklarını çizmek, arka plana kalanları çizmemek
-bir hızlandırıcı ilerleme olurdu.
+yaygın şekilde kullanılır) ışın takip etme (ray tracing) burada
+gerekli olabilir, görüntüye bakılma açısından sanal ışınlar hayal edip
+bunların sadece ilk çarpıktıklarını çizmek, arka plana kalanları
+çizmemek bir hızlandırıcı ilerleme olurdu.
 
 ![](mayavi4.png)
 
-O zaman teker teker top ciz demek yerine tüm topların kordinatlarını
+O zaman teker teker top çiz demek yerine tüm topların kordinatlarını
 bir seferde verip özel bir kütüphanenin görünecek olan objelere karar
-vermesi daha mantıklı olabilir. MayaVi ve onun arka planda kullandigi
-VTK isti bu isi basariyor.
+vermesi daha mantıklı olabilir. MayaVi ve onun arka planda kullandığı
+VTK işte bu işi başarıyor.
 
 Kurmak icin
 
@@ -76,13 +76,8 @@ belki anlık ekranda göstermek için yeterli olmayabilir, fakat arka
 planda birkaç dakika beklenerek tüm simülasyonun gidişatı belli birkaç
 kare yanyana koyularak kabul edilir bir zaman içinde yaratılabilir.
 
-
 Kaynaklar
 
 [1] https://docs.enthought.com/mayavi/mayavi/mlab.html
 
 [2] https://www.toptal.com/data-science/3d-data-visualization-with-open-source-tools-an-example-using-vtk
-
-
-
-

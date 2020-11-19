@@ -3,6 +3,8 @@
 
 ## En Son
 
+19/11 - [Üç Boyutlu Grafikler İçin Mayavi](https://burakbayramli.github.io/dersblog/sk/2020/11/mayavi-3d.html)
+
 18/11 - [C++ Programlarının Performansını Ölçmek](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp-performance-olcum.html)
 
 16/11 - [C++ Kodu, Geometrik Komşu Kordinatlar](https://github.com/burakbayramli/classnotes/blob/master/algs/algs_073_grid_hash_nn/geogrid.cpp)
@@ -13,7 +15,6 @@
 
 30/10 - [SPH Teorisi, Simulasyon](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app40sph/puruzlestirilmis_parcacik_hidrodinamigi__smoothed_particle_hydrodynamics_sph_.html)
 
-29/10 - [Dosya İşlemleri, Unix, Python](2020/10/python-unix-dosya-islemleri.md)
 
 ## Konular, Referans
 
