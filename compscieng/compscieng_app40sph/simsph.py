@@ -1,23 +1,18 @@
-from OpenGL.GL import *
-from OpenGL.GLU import *
-from OpenGL.GLUT import *
 from random import random
-from PIL import Image
-from PIL import ImageOps
 from collections import defaultdict 
-import numpy as np, datetime, itertools
+import numpy as np, datetime
 import sys, numpy.linalg as lin
+from mayavi import mlab
+import itertools
 
-p1,p2,p3 = 73856093, 19349663, 83492791
-G = np.array([0.0, 0.0, -9.8*2])
-
-B = 10 # top
+m = 0.1
 R = 0.1
-mmin,mmax=-1.0,+1.0
+EPS = 0.1
+BOUND_DAMPING = -0.6
+mmin,mmax=0.0,2.0
 BN = int(np.abs(mmax-mmin) / R) + 1
 bins = np.linspace(mmin, mmax, BN)
-
-idx27 = list(itertools.product( [-1,0,1], repeat=3  ))
+G = np.array([0.0, 0.0, -9.8*2])
 
 REST_DENS = 10.0
 GAS_CONST = 0.5
@@ -32,23 +27,20 @@ SPIKY_GRAD = -45.0/(PI*np.power(H, 6.));
 VISC_LAP = 45.0/(PI*np.power(H, 6.));
 EPS = 0.05
 BOUND_DAMPING = -0.5
-img = True
 
+
+idx27 = list(itertools.product( [-1,0,1], repeat=3  ))
 
 class Simulation:
     def __init__(self):
-        self.grid_hash = None
-        self.i = 0
-        self.r   = 0.05
+        self.r   = R
         self.balls = []
-        self.tm  = 0.0
-        self.th  = 200.0
         
     def init(self):
         i = 0
-        for xs in np.linspace(-0.3, 0.3, 10):
-            for ys in np.linspace(-0.3, 0.3, 10):
-                for zs in np.linspace(0.0, 0.2, 4):
+        for xs in np.linspace(0, 0.4, 10):
+            for ys in np.linspace(0, 0.4, 10):
+                for zs in np.linspace(0, 0.4, 10):
                     v = np.array([0.0, 0.0, 0.0])
                     f = np.array([0,0,0])
                     x = np.array([xs, ys, zs])
@@ -58,21 +50,7 @@ class Simulation:
                     d = {'x': x, 'f':f, 'v': v, 'i': i, 'rho': 0.0, 'p': 0.0, 'grid': (xi,yi,zi)}
                     self.balls.append(d)
                     i += 1
-
-                        
-        tm = 0.0
-
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
-        glEnable(GL_DEPTH_TEST)
-        glClearColor(1.0,1.0,1.0,1.0)
-
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(60.0,1.0,1.0,50.0)
-        glTranslatef(0.0,0.0,-3.5)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
+        self.rvec   = np.ones(i) * self.r
 
     def get_neighbors(self, ball):
         neighbors = {}
@@ -130,72 +108,70 @@ class Simulation:
                 p['v'] += DT*p['f']/p['rho']
             p['x'] += DT*p['v']
 
-            if p['x'][0]-EPS < -1.0:
+            if p['x'][0]-EPS < 0.0:
                 p['v'][0] *= BOUND_DAMPING
-                p['x'][0] = -1.0
-            if p['x'][0]+EPS > 1.0:
+                p['x'][0] = 0.0
+            if p['x'][0]+EPS > 2.0:
                 p['v'][0] *= BOUND_DAMPING
-                p['x'][0] = 1.0-EPS
+                p['x'][0] = 2.0-EPS
 
-            if p['x'][1]-EPS < -1.0:
+            if p['x'][1]-EPS < 0.0:
                 p['v'][1] *= BOUND_DAMPING
-                p['x'][1] = -1.0
-            if p['x'][1]+EPS > 1.0:
+                p['x'][1] = 0.0
+            if p['x'][1]+EPS > 2.0:
                 p['v'][1] *= BOUND_DAMPING
-                p['x'][1] = 1.0-EPS
+                p['x'][1] = 2.0-EPS
 
-            if p['x'][2]-EPS < -1.0:
+            if p['x'][2]-EPS < 0.0:
                 p['v'][2] *= BOUND_DAMPING
-                p['x'][2] = -1.0
-            if p['x'][2]+EPS > 1.0:
+                p['x'][2] = 0.0
+            if p['x'][2]+EPS > 2.0:
                 p['v'][2] *= BOUND_DAMPING
-                p['x'][2] = 1.0-EPS
+                p['x'][2] = 2.0-EPS
 
 
         self.hash_balls()
                 
-            
+
     def update(self):
         self.hash_balls()
         self.computeDensityPressure()
         self.computeForces()
         self.integrate()                    
-        if self.i > 40: exit()
-        glutPostRedisplay()
+        
+    def display(self, i):
+        mlab.options.offscreen = True
+        ball_vect = [[b['x'][0],b['x'][1],b['x'][2]] for b in self.balls]
+        ball_vect = np.array(ball_vect)
 
-    def display(self):
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glPushMatrix()
-        glRotatef(self.th,0.0,1.0,0.0)
-        glRotatef(90.0,-1.0,0.0,0.0)
-        glutWireCube(2.0)
-        for j,b in enumerate(self.balls):
-            glPushMatrix()
-            glTranslatef(b['x'][0],b['x'][1],b['x'][2])
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.0, 0.0, 1.0, 1.0])
-            glutSolidSphere(self.r,50,50)
-            glPopMatrix()
-        glPopMatrix()
-        glutSwapBuffers()
+        fig = mlab.figure(figure=None, fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1), engine=None)
+        color=(0.2, 0.4, 0.5)
+        mlab.points3d(ball_vect[:,0], ball_vect[:,1], ball_vect[:,2], self.rvec, color=color, colormap = 'gnuplot', scale_factor=1, figure=fig)
+        mlab.points3d(0, 0, 0, 0.1, color=(1,0,0), scale_factor=1.0)
+        
+        BS = 2.0
+        mlab.plot3d([0.0,0.0],[0.0, 0.0],[0.0, BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,BS],[0.0, 0.0],[0.0, 0.0], color=(1,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,0.0],[0.0, BS],[0.0, 0.0], color=(0,1,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,0.0],[0.0, BS],[BS, BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,BS],[0.0,0.0],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([BS,BS],[0.0,BS],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([BS,0],[BS,BS],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0,0],[BS,BS],[BS,0], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([BS,BS],[0.0,0.0],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([BS,BS],[0.0,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([BS,0.0],[BS,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([BS,BS],[BS,BS],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
 
-        if img and self.i % 2 == 0: 
-            width,height = 480,480
-            data = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
-            image = Image.frombytes("RGBA", (width, height), data)
-            image = ImageOps.flip(image)
-            image.save('/tmp/glut/glutout-%03d.png' % self.i, 'PNG')
-                               
-        self.i += 1
+        mlab.view(azimuth=50, elevation=80, focalpoint=[1, 1, 1], distance=8.0, figure=fig)
+        
+        mlab.savefig(filename='/tmp/sim/out-%02d.png' % i)
 
 if __name__ == '__main__':
-    if (os.path.exists("/tmp/glut") == False): os.mkdir("/tmp/glut")
     s = Simulation()
-    glutInit(())    
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-    glutInitWindowSize(500,500)
-    glutCreateWindow("GLUT Bouncing Ball in Python")
-    glutDisplayFunc(s.display)
-    glutIdleFunc(s.update)
     s.init()
-    glutMainLoop()
-
+    for i in range(20):
+        print (i)
+        s.update()
+        s.display(i)
+        #exit()
