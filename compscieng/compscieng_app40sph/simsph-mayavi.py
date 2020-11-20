@@ -33,15 +33,14 @@ idx27 = list(itertools.product( [-1,0,1], repeat=3  ))
 
 class Simulation:
     def __init__(self):
-        self.r   = 0.05
+        self.r   = R
         self.balls = []
-
         
     def init(self):
         i = 0
-        for xs in np.linspace(0, 0.4, 20):
-            for ys in np.linspace(0, 0.4, 20):
-                for zs in np.linspace(0.0, 0.4, 10):
+        for xs in np.linspace(0, 0.4, 10):
+            for ys in np.linspace(0, 0.4, 10):
+                for zs in np.linspace(0, 0.4, 10):
                     v = np.array([0.0, 0.0, 0.0])
                     f = np.array([0,0,0])
                     x = np.array([xs, ys, zs])
@@ -109,26 +108,26 @@ class Simulation:
                 p['v'] += DT*p['f']/p['rho']
             p['x'] += DT*p['v']
 
-            if p['x'][0]-EPS < -1.0:
+            if p['x'][0]-EPS < 0.0:
                 p['v'][0] *= BOUND_DAMPING
-                p['x'][0] = -1.0
-            if p['x'][0]+EPS > 1.0:
+                p['x'][0] = 0.0
+            if p['x'][0]+EPS > 2.0:
                 p['v'][0] *= BOUND_DAMPING
-                p['x'][0] = 1.0-EPS
+                p['x'][0] = 2.0-EPS
 
-            if p['x'][1]-EPS < -1.0:
+            if p['x'][1]-EPS < 0.0:
                 p['v'][1] *= BOUND_DAMPING
-                p['x'][1] = -1.0
-            if p['x'][1]+EPS > 1.0:
+                p['x'][1] = 0.0
+            if p['x'][1]+EPS > 2.0:
                 p['v'][1] *= BOUND_DAMPING
-                p['x'][1] = 1.0-EPS
+                p['x'][1] = 2.0-EPS
 
-            if p['x'][2]-EPS < -1.0:
+            if p['x'][2]-EPS < 0.0:
                 p['v'][2] *= BOUND_DAMPING
-                p['x'][2] = -1.0
-            if p['x'][2]+EPS > 1.0:
+                p['x'][2] = 0.0
+            if p['x'][2]+EPS > 2.0:
                 p['v'][2] *= BOUND_DAMPING
-                p['x'][2] = 1.0-EPS
+                p['x'][2] = 2.0-EPS
 
 
         self.hash_balls()
@@ -171,7 +170,8 @@ class Simulation:
 if __name__ == '__main__':
     s = Simulation()
     s.init()
-    for i in range(40):
+    for i in range(20):
+        print (i)
         s.update()
         s.display(i)
         #exit()

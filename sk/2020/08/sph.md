@@ -50,6 +50,13 @@ işletilebilir, mesela `damBreak`. Yanlız dikkat bu kodda `write_frame`
 işleyip hiç çıktı göstermez. Diğer örnek kodlardan bu çağrının nasıl
 yapıldığı görülebilir, mesela `cube.cpp`. 
 
+Ekler
+
+OpenGL ile [2] temelli bizim geliştirdiğimiz bazı OpenGL kodları
+[simsph1.cpp](simsph1.cpp), [simsph2.cpp](simsph2.cpp),
+[simsph2.cpp](simsph3.cpp). Sözlük kullanmma gibi bazı teknikleri
+görmek için faydalı olabilir, fakat dikkat, çok fazla sayıda parçacık
+performansı OpenGL sebebiyle pek iyi olmayacaktır.
 
 Kaynaklar
 
