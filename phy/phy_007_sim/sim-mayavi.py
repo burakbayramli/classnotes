@@ -1,3 +1,4 @@
+# convert -scale 30% /tmp/sim/*.png /tmp/balls6.gif
 from random import random
 from collections import defaultdict 
 import numpy as np, datetime
@@ -91,15 +92,32 @@ class Simulation:
     def display(self, i):
         outp = np.array([[0.,0.,0.],[1.,1.,1.]])
         mlab.options.offscreen = True
-        self.r = np.ones(len(self.balls)) * 0.03
-        mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
+        self.r = np.ones(len(self.balls)) * 0.2
+        #mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
+        #fig = mlab.figure(figure=None, bgcolor=(0,0,0), fgcolor=None, engine=None, size=(1600, 1000))
         ball_vect = [[b['pos'][0],b['pos'][1],b['pos'][2]] for b in self.balls]
         ball_vect = np.array(ball_vect)
         #print (ball_vect)
         #print ('\n')
-        mlab.points3d(ball_vect[:, 0], ball_vect[:, 1], ball_vect[:, 2], self.r, scale_mode='none', color=(0.2, 0.4, 0.5))
-        mlab.points3d(outp[:, 0], outp[:, 1], outp[:, 2], [0.0001,0.00001], scale_mode='none', color=(1,1,1))
-        mlab.outline()
+        #mlab.points3d(ball_vect[:, 0], ball_vect[:, 1], ball_vect[:, 2], self.r, mode='point', scale_factor=1, color=(0.2, 0.4, 0.5))
+        #mlab.points3d(outp[:, 0], outp[:, 1], outp[:, 2], [0.0001,0.00001], scale_mode='none', color=(1,1,1))
+        #mlab.outline()
+        #mlab.axes(color=(0.9,0.9,0.9))
+
+        fig = mlab.figure(figure=None, fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1), engine=None)
+        color=(0.2, 0.4, 0.5)
+        mlab.points3d(ball_vect[:,0], ball_vect[:,1], ball_vect[:,2], self.r, color=color, colormap = 'gnuplot', scale_factor=1, figure=fig)
+        mlab.points3d(0, 0, 0, color=(1,1,1), mode='sphere', scale_factor=0.2)
+        axes=np.array([
+            [2.,0.,0.,0.],
+            [0.,2.,0.,0.],
+            [0.,0.,2.,0.],
+        ],dtype=np.float64)
+        mlab.plot3d([0, axes[0,0]], [0, axes[0,1]], [0, axes[0,2]], color=(1,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0, axes[1,0]], [0, axes[1,1]], [0, axes[1,2]], color=(0,1,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0, axes[2,0]], [0, axes[2,1]], [0, axes[2,2]], color=(0,0,1), tube_radius=None, figure=fig)
+        mlab.view(azimuth=180, elevation=70, focalpoint=[ 0.5 , 0.4, 0.4], distance=5.0, figure=fig)
+        
         mlab.savefig(filename='/tmp/sim/out-%02d.png' % i) 
 
 if __name__ == '__main__':
