@@ -10,12 +10,12 @@ G = np.array([0.0, 0.0, -0.8])
 m = 0.1
 B = 10 # top
 
+
 class Simulation:
     def __init__(self):
         self.i = 0
         #self.r   = 0.1
-        self.g   = 9.8
-        self.dt  = 0.3
+        self.dt  = 0.1
         #self.cor = 0.6        
         self.cor = 1.0
         self.balls = []
@@ -35,8 +35,8 @@ class Simulation:
             self.balls.append({'pos':p, 'f':f, 'v': v, 'i': b})
                         
 
-    def computeForces(self):
-        if (self.i==1):
+    def computeForces(self, i):
+        if (i==0):
             for j,b in enumerate(self.balls):
                 b['f'] = b['f'] + (G * m)
         else: 
@@ -85,45 +85,41 @@ class Simulation:
                             
             
             
-    def update(self):
-        self.computeForces()
+    def update(self,i):
+        self.computeForces(i)
         self.integrate()
             
     def display(self, i):
         outp = np.array([[0.,0.,0.],[1.,1.,1.]])
         mlab.options.offscreen = True
-        self.r = np.ones(len(self.balls)) * 0.2
-        #mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
-        #fig = mlab.figure(figure=None, bgcolor=(0,0,0), fgcolor=None, engine=None, size=(1600, 1000))
+        self.r = np.ones(len(self.balls)) * 0.3
         ball_vect = [[b['pos'][0],b['pos'][1],b['pos'][2]] for b in self.balls]
         ball_vect = np.array(ball_vect)
-        #print (ball_vect)
-        #print ('\n')
-        #mlab.points3d(ball_vect[:, 0], ball_vect[:, 1], ball_vect[:, 2], self.r, mode='point', scale_factor=1, color=(0.2, 0.4, 0.5))
-        #mlab.points3d(outp[:, 0], outp[:, 1], outp[:, 2], [0.0001,0.00001], scale_mode='none', color=(1,1,1))
-        #mlab.outline()
-        #mlab.axes(color=(0.9,0.9,0.9))
 
         fig = mlab.figure(figure=None, fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1), engine=None)
         color=(0.2, 0.4, 0.5)
         mlab.points3d(ball_vect[:,0], ball_vect[:,1], ball_vect[:,2], self.r, color=color, colormap = 'gnuplot', scale_factor=1, figure=fig)
-        mlab.points3d(0, 0, 0, color=(1,1,1), mode='point', scale_factor=0.2)
-        axes=np.array([
-            [5.,0.,0.,0.],
-            [0.,5.,0.,0.],
-            [0.,0.,5.,0.],
-        ],dtype=np.float64)
-        mlab.plot3d([0, axes[0,0]], [0, axes[0,1]], [0, axes[0,2]], color=(1,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([0, axes[1,0]], [0, axes[1,1]], [0, axes[1,2]], color=(0,1,0), tube_radius=None, figure=fig)
-        mlab.plot3d([0, axes[2,0]], [0, axes[2,1]], [0, axes[2,2]], color=(0,0,1), tube_radius=None, figure=fig)
-        mlab.view(azimuth=10, elevation=70, focalpoint=[ 0.5 , 0.4, 0.4], distance=10.0, figure=fig)
+        mlab.points3d(0, 0, 0, 0.1, color=(1,0,0), scale_factor=1.0)
         
-        mlab.savefig(filename='/tmp/sim/out-%02d.png' % i) 
+        BS = 2.0
+        mlab.plot3d([0.0,0.0],[0.0, 0.0],[0.0, BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,0.0],[0.0, BS],[0.0, 0.0], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,BS],[0.0, 0.0],[0.0, 0.0], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,0.0],[0.0, BS],[BS, BS], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.plot3d([0.0,BS],[0.0,0.0],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
+        
+        #mlab.plot3d([0, axes[0,0]], [0, axes[0,1]], [0, axes[0,2]], color=(0,0,0), tube_radius=None, figure=fig)
+        #mlab.plot3d([0, axes[1,0]], [0, axes[1,1]], [0, axes[1,2]], color=(0,0,0), tube_radius=None, figure=fig)
+        #mlab.plot3d([0, axes[2,0]], [0, axes[2,1]], [0, axes[2,2]], color=(0,0,0), tube_radius=None, figure=fig)
+        mlab.view(azimuth=80, elevation=80, focalpoint=[1, 1, 1], distance=10.0, figure=fig)
+        
+        mlab.savefig(filename='/tmp/sim/out-%02d.png' % i)
+        exit()
 
 if __name__ == '__main__':
     s = Simulation()
     s.init()
     for i in range(40):
-        s.update()
+        s.update(i)
         s.display(i)
         #exit()
