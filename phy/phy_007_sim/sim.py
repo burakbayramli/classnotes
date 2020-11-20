@@ -90,7 +90,6 @@ class Simulation:
         self.integrate()
             
     def display(self, i):
-        outp = np.array([[0.,0.,0.],[1.,1.,1.]])
         mlab.options.offscreen = True
         ball_vect = [[b['x'][0],b['x'][1],b['x'][2]] for b in self.balls]
         ball_vect = np.array(ball_vect)
@@ -113,10 +112,7 @@ class Simulation:
         mlab.plot3d([BS,BS],[0.0,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
         mlab.plot3d([BS,0.0],[BS,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
         mlab.plot3d([BS,BS],[BS,BS],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
-        
-        #mlab.plot3d([0, axes[0,0]], [0, axes[0,1]], [0, axes[0,2]], color=(0,0,0), tube_radius=None, figure=fig)
-        #mlab.plot3d([0, axes[1,0]], [0, axes[1,1]], [0, axes[1,2]], color=(0,0,0), tube_radius=None, figure=fig)
-        #mlab.plot3d([0, axes[2,0]], [0, axes[2,1]], [0, axes[2,2]], color=(0,0,0), tube_radius=None, figure=fig)
+
         mlab.view(azimuth=50, elevation=80, focalpoint=[1, 1, 1], distance=8.0, figure=fig)
         
         mlab.savefig(filename='/tmp/sim/out-%02d.png' % i)
