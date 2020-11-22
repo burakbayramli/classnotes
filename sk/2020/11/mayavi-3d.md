@@ -76,6 +76,46 @@ belki anlık ekranda göstermek için yeterli olmayabilir, fakat arka
 planda birkaç dakika beklenerek tüm simülasyonun gidişatı belli birkaç
 kare yanyana koyularak kabul edilir bir zaman içinde yaratılabilir.
 
+Kordinat Eksenleri
+
+Eger `outline` kullanmak yerine sabit buyuklukte, x,y,z kordinat
+eksenlerini gostermek istersek, bunu teker teker kendimizin yapmasi
+lazim. Altta orijinde duran her kenari 2 birim buyuklukte bir kup
+gosteriyoruz,
+
+```python
+BS = 2.0
+N = 100
+c = np.random.rand(N, 3)*2.0
+r = np.ones(N)*0.1
+
+fig = mlab.figure(figure=None, fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1), engine=None)
+color=(0.2, 0.4, 0.5)
+mlab.points3d(c[:, 0], c[:, 1], c[:, 2], r, color=color, colormap = 'gnuplot', scale_factor=1, figure=fig)
+mlab.points3d(0, 0, 0, 0.1, color=(1,0,0), scale_factor=1.0, figure=fig)
+
+mlab.plot3d([0.0,0.0],[0.0, 0.0],[0.0, BS], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([0.0,BS],[0.0, 0.0],[0.0, 0.0], color=(1,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([0.0,0.0],[0.0, BS],[0.0, 0.0], color=(0,1,0), tube_radius=None, figure=fig)
+mlab.plot3d([0.0,0.0],[0.0, BS],[BS, BS], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([0.0,BS],[0.0,0.0],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([BS,BS],[0.0,BS],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([BS,0],[BS,BS],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([0,0],[BS,BS],[BS,0], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([BS,BS],[0.0,0.0],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([BS,BS],[0.0,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([BS,0.0],[BS,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
+mlab.plot3d([BS,BS],[BS,BS],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
+
+mlab.view(azimuth=50, elevation=80, focalpoint=[1, 1, 1], distance=8.0, figure=fig)
+
+mlab.savefig(filename='mayavi5.png')
+```
+
+![](mayavi5.png)
+
+
+
 Kaynaklar
 
 [1] https://docs.enthought.com/mayavi/mayavi/mlab.html
