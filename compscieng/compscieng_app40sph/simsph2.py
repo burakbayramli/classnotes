@@ -4,7 +4,7 @@ mlab.options.offscreen = True
 
 BS = 500.0
 cols = 1729
-r = np.ones(1729)*0.1
+r = np.ones(1729)*10.0
 
 csvx = open('/tmp/simsph-x.csv')
 rdx = csv.reader(csvx,delimiter=';')
@@ -18,7 +18,7 @@ csvz = open('/tmp/simsph-z.csv')
 rdz = csv.reader(csvz,delimiter=';')
 itz = iter(rdz)
 
-for i in range(20):
+for i in range(40):
     rowx = next(itx)
     rowx = [float(x) if re.search('[0-9]*\.?[0-9]', x) else 0 for x in rowx]
     x = np.array(rowx)
@@ -31,10 +31,10 @@ for i in range(20):
     rowz = [float(x) if re.search('[0-9]*\.?[0-9]', x) else 0 for x in rowz]
     z = np.array(rowz)
 
+
     fig = mlab.figure(figure=None, fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1), engine=None)
     color=(0.2, 0.4, 0.5)
     mlab.points3d(x, y, z, r, color=color, colormap = 'gnuplot', scale_factor=1, figure=fig)
-    mlab.points3d(0, 0, 0, 0.1, color=(1,0,0), scale_factor=1.0, figure=fig)
             
     mlab.plot3d([0.0,0.0],[0.0, 0.0],[0.0, BS], color=(0,0,0), tube_radius=None, figure=fig)
     mlab.plot3d([0.0,BS],[0.0, 0.0],[0.0, 0.0], color=(1,0,0), tube_radius=None, figure=fig)
@@ -49,6 +49,6 @@ for i in range(20):
     mlab.plot3d([BS,0.0],[BS,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
     mlab.plot3d([BS,BS],[BS,BS],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
 
-    mlab.view(azimuth=50, elevation=80, focalpoint=[1, 1, 1], distance=8.0, figure=fig)
+    mlab.view(azimuth=50, elevation=80, focalpoint=[50, 40, 60], distance=1200.0, figure=fig)
     mlab.savefig(filename='/tmp/simsph/out-%02d.png' % i)
 
