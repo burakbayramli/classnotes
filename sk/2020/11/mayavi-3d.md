@@ -78,10 +78,10 @@ kare yanyana koyularak kabul edilir bir zaman içinde yaratılabilir.
 
 Kordinat Eksenleri
 
-Eger `outline` kullanmak yerine sabit buyuklukte, x,y,z kordinat
-eksenlerini gostermek istersek, bunu teker teker kendimizin yapmasi
-lazim. Altta orijinde duran her kenari 2 birim buyuklukte bir kup
-gosteriyoruz,
+Eğer `outline` kullanmak yerine sabit büyüklükte, x,y,z kordinat
+eksenlerini göstermek istersek, bunu teker teker kendimizin yapması
+lazım. Altta orijinde duran her kenarı 2 birim büyüklükte bir küp
+gösteriyoruz,
 
 ```python
 BS = 2.0
@@ -121,3 +121,5 @@ Kaynaklar
 [1] https://docs.enthought.com/mayavi/mayavi/mlab.html
 
 [2] https://www.toptal.com/data-science/3d-data-visualization-with-open-source-tools-an-example-using-vtk
+
+
