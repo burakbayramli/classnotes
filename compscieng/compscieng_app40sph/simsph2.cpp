@@ -6,23 +6,21 @@
 #include <iostream>
 #include <fstream> 
 #include <vector>
-using namespace std;
-
 #include <eigen3/Eigen/Dense>
+
+using namespace std;
 using namespace Eigen;
 
-// kordinat sistemi 0,500 arasinda, grafikleme icin -1,+1 ile
-// surekli tercume yapiyoruz.
-
-const static Vector3d G(0.f, 0.f, 10000*-9.8f); 
+const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
 const static float REST_DENS = 100.f; // rest density
-const static float GAS_CONST = 500.f; // const for equation of state
+const static float GAS_CONST = 200.f; // const for equation of state
 const static float H = 16.f; 
 const static float DIST = 10.f;
 const static float HSQ = H*H; 
 const static float MASS = 100.f;
-const static float VISC = 2000.f;
+const static float VISC = 200.f; 
 const static float DT = 0.01f; 
+static int LOOP = 40;
 static int BIN_WIDTH = 5.f;
 static int BIN_NUM = 100;
 static float MAX_COORD = 500;
@@ -140,9 +138,9 @@ void InitSPH(void)
     foutz.open ("/tmp/simsph-z.csv");
     
     int balls = 0;
-    for(float x = 0.f; x < 60.f; x += 5.f) { 
-	for(float y = 440.f; y < 500.f; y += 5.f) {	
-	    for(float z = 0.f; z < 60.f; z += 5.f) {
+    for(float x = 0.f; x < 100.f; x += 5.f) { 
+	for(float y = 400.f; y < 500.f; y += 5.f) {	
+	    for(float z = 0.f; z < 100.f; z += 5.f) {
 		Particle p(x,y,z,balls);
 		p.bin.i = calcBin(p.x[0]);
 		p.bin.j = calcBin(p.x[1]);
@@ -274,7 +272,7 @@ int main(int argc, char** argv)
 {
     InitSPH();
 
-    for (int i=0;i<40;i++) {
+    for (int i=0;i<LOOP;i++) {
 	Update();	
     }
     
