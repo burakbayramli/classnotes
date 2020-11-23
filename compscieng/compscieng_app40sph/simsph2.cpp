@@ -264,9 +264,9 @@ void Update(void)
 	fouty << pi.x[1] << ";";
 	foutz << pi.x[2] << ";";
     }
-    foutx << '\n' << ";";
-    fouty << '\n' << ";";
-    foutz << '\n' << ";";    
+    foutx << '\n';
+    fouty << '\n';
+    foutz << '\n';
 }
 
 
