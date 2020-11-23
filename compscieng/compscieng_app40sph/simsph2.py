@@ -49,6 +49,6 @@ for i in range(40):
     mlab.plot3d([BS,0.0],[BS,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
     mlab.plot3d([BS,BS],[BS,BS],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
 
-    mlab.view(azimuth=50, elevation=80, focalpoint=[50, 40, 60], distance=1200.0, figure=fig)
+    mlab.view(azimuth=50, elevation=80, focalpoint=[200, 200, 200], distance=1600.0, figure=fig)
     mlab.savefig(filename='/tmp/simsph/out-%02d.png' % i)
 
