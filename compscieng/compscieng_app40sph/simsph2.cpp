@@ -257,6 +257,16 @@ void Update(void)
     ComputeDensityPressure();
     ComputeForces();
     Integrate();
+    
+    for(auto &pi : particles)
+    {
+	foutx << pi.x[0] << ";";
+	fouty << pi.x[1] << ";";
+	foutz << pi.x[2] << ";";
+    }
+    foutx << '\n' << ";";
+    fouty << '\n' << ";";
+    foutz << '\n' << ";";    
 }
 
 
