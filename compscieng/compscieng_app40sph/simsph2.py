@@ -3,8 +3,6 @@ from mayavi import mlab
 mlab.options.offscreen = True
 
 BS = 500.0
-cols = 1729
-r = np.ones(1729)*10.0
 
 csvx = open('/tmp/simsph-x.csv')
 rdx = csv.reader(csvx,delimiter=';')
@@ -19,6 +17,8 @@ rdz = csv.reader(csvz,delimiter=';')
 itz = iter(rdz)
 
 for i in range(40):
+    print (i)
+    
     rowx = next(itx)
     rowx = [float(x) if re.search('[0-9]*\.?[0-9]', x) else 0 for x in rowx]
     x = np.array(rowx)
@@ -31,7 +31,8 @@ for i in range(40):
     rowz = [float(x) if re.search('[0-9]*\.?[0-9]', x) else 0 for x in rowz]
     z = np.array(rowz)
 
-
+    r = np.ones(len(rowx))*10.0
+    
     fig = mlab.figure(figure=None, fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1), engine=None)
     color=(0.2, 0.4, 0.5)
     mlab.points3d(x, y, z, r, color=color, colormap = 'gnuplot', scale_factor=1, figure=fig)

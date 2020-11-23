@@ -11,18 +11,18 @@ using namespace std;
 #include <eigen3/Eigen/Dense>
 using namespace Eigen;
 
-// kordinate sistemi 0,500 arasinda, grafikleme icin -1,+1 ile
+// kordinat sistemi 0,500 arasinda, grafikleme icin -1,+1 ile
 // surekli tercume yapiyoruz.
 
-const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
-const static float REST_DENS = 500.f; // rest density
+const static Vector3d G(0.f, 0.f, 10000*-9.8f); 
+const static float REST_DENS = 100.f; // rest density
 const static float GAS_CONST = 500.f; // const for equation of state
 const static float H = 16.f; 
 const static float DIST = 10.f;
 const static float HSQ = H*H; 
-const static float MASS = 65.f;
-const static float VISC = 250.f;
-const static float DT = 0.001f; 
+const static float MASS = 100.f;
+const static float VISC = 2000.f;
+const static float DT = 0.01f; 
 static int BIN_WIDTH = 5.f;
 static int BIN_NUM = 100;
 static float MAX_COORD = 500;
