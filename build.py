@@ -127,7 +127,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
       elif '\end{document}' in line:
           fout.write("\n")
       elif '\\inputminted' in line:
-         pf = re.findall("inputminted.*?python\}\{(.*?)\}",line,re.DOTALL)[0]
+         pf = re.findall("inputminted.*?\}\{(.*?)\}",line,re.DOTALL)[0]
          pfcontent = codecs.open(pf).read()
          fout.write("```python\n")
          fout.write(pfcontent)
