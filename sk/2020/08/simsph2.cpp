@@ -11,7 +11,7 @@ using namespace std;
 #include <eigen3/Eigen/Dense>
 using namespace Eigen;
 
-// kordinate sistemi 0,500 arasinda, grafikleme icin -1,+1 ile
+// kordinat sistemi 0,500 arasinda, grafikleme icin -1,+1 ile
 // surekli tercume yapiyoruz.
 
 const static Vector3d G(0.f, 0.f, 12000*-9.8f); 
