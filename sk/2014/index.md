@@ -32,8 +32,6 @@
 
 [Felzenswalb Gruplama (Clustering) Algoritmasi](10/felzenswalb-gruplama-clustering.md)
 
-[NVidia, GPU, (Derin Öğrenim) Deep Learning](10/nvidia-gpu-deep-learning.md)
-
 [Agaclar Ile Oge Kodlamasi (Categorical Embedding)](11/agaclar-ile-oge-kodlamasi-categorical.md)
 
 [Python ve Komut Satırına Erişmek, Popen](12/popen-python-ve-komut-satirina-erismek.md)

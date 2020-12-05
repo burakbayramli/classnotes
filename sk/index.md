@@ -3,6 +3,10 @@
 
 ## En Son
 
+5/12 - [GPU, CUDA, PyCuda](https://burakbayramli.github.io/dersblog/sk/2020/12/gpu-cuda-pycuda.html)
+
+2/12 - [SPHSim Github](https://github.com/burakbayramli/simsph)
+
 19/11 - [Üç Boyutlu Grafikler İçin Mayavi](https://burakbayramli.github.io/dersblog/sk/2020/11/mayavi-3d.html)
 
 18/11 - [C++ Programlarının Performansını Ölçmek](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp-performance-olcum.html)
@@ -10,10 +14,6 @@
 16/11 - [C++ Kodu, Geometrik Komşu Kordinatlar](https://github.com/burakbayramli/classnotes/blob/master/algs/algs_073_grid_hash_nn/geogrid.cpp)
 
 13/11 - [Geometrik Anahtarlama, Komşu Kordinatlar](https://burakbayramli.github.io/dersblog/algs/algs_073_grid_hash_nn/geometrik_anahtarlama__spatial_hashing__ve_izgara__grid__ile_en_yakin_noktalari_bulmak.html)
-
-4/11 - [C++ Dili](2020/11/cpp.md)
-
-30/10 - [SPH Teorisi, Simulasyon](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app40sph/puruzlestirilmis_parcacik_hidrodinamigi__smoothed_particle_hydrodynamics_sph_.html)
 
 
 ## Konular, Referans

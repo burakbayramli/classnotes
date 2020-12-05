@@ -142,6 +142,36 @@ tanım vs girildikten sonra masaüstünde ikon yaratılır. Dikkat masaüstü
 ikonları çift tıklama gerektirir, Unity hızlı erişim barındakiler tek
 tıklama ile başlıyor.
 
+Tıklama ile Masaüstünü Göster (Show Desktop)
+
+Bazen pencereler çok birikir, tek bir tuşa basıp hepsini minimize
+etmek isteyebiliriz. Önce
+
+```
+sudo apt install wmctrl
+```
+
+Bu program komutu satırından herşeyi `wmctrl -k on` ile minimize edebilir.
+Şimdi bir ikon yaratalım,
+
+```
+gedit ~/.local/share/applications/show-desktop.desktop
+```
+
+Dosya icine
+
+```
+[Desktop Entry]
+Type=Application
+Name=Show Desktop
+Icon=desktop
+Exec=wmctrl -k on
+```
+
+Bir uygulama yaratmış olduk, artık uygulamalar içinde "Show Desktop"
+kelimesini ararsak ikonumuzu bulabiliriz, ve sürekle-bırak ile sol
+taraftaki erişim bölgesine ekleyebileceğiz.
+
 Pencereler Arası Geçiş (Uygulamalar Değil)
 
 Bu Ubuntu sürümünde Unity masaüstü programı her nedense Alt-Tab ile
@@ -156,7 +186,6 @@ Tuşlar ile program kapatmak için ALt-F4 alışkanlık oldu, yine üstteki
 listeden Alt-F4 için başka bir program var, onu iptal ederiz, onun
 yerine program bitirme için Alt-F4 atamasını yaparız (tüslama seçimi
 üzerine tıklanır, Alt-F4 tıklanır bu kaydedilmiş olur).
-
 
 Evince
 
@@ -174,6 +203,55 @@ seçilmiş olabilir. Eğer bu servise bağlanmakta problem çıkarsa
 Software Updater programına girip ilk tab'deki servislerin hangi
 ülkeden olduğu değitirilebilir. Yakın olarak Netherlands, Germany, vs
 bazı seçenekler.
+
+Renkler
+
+Chrome tarayıcıyı siyah üzeri beyaz göstermek istiyorsak arama
+çubuğundan `chrome://flags/` adresine gidiyoruz, orada `Force Dark
+Mode for Web Contents` seçeneğine gidiyoruz ve `Enabled` konumuna
+çekiyoruz. Emacs için
+
+```
+(custom-set-faces
+ ...
+ '(default ((t (:background "#141414" :foreground "#F8F8F8"))))
+ '(cursor ((t (:background "#CDA869"))))
+ '(blue ((t (:foreground "blue"))))
+ '(border-glyph ((t (nil))))
+ '(buffers-tab ((t (:background "#141414" :foreground "#CACACA"))))
+ '(font-lock-warning-face ((t (:background "#EE799F" :foreground "black"))))
+ '(font-lock-builtin-face ((t (:foreground "#CACACA"))))
+ '(font-lock-comment-face ((t (:foreground "#5F5A60"))))
+ '(font-lock-constant-face ((t (:foreground "#CF6A4C"))))
+ '(font-lock-doc-string-face ((t (:foreground "DarkOrange"))))
+ '(font-lock-function-name-face ((t (:foreground "#9B703F"))))
+ '(font-lock-keyword-face ((t (:foreground "#CDA869"))))
+ '(font-lock-preprocessor-face ((t (:foreground "#CF6A4C"))))
+ '(font-lock-reference-face ((t (:foreground "SlateBlue"))))
+ '(font-lock-string-face ((t (:foreground "Orange"))))
+ '(font-lock-type-face ((t (:foreground "#89788a"))))
+ '(font-lock-variable-name-face ((t (:foreground "#7587A6"))))
+ '(font-lock-warning-face ((t (:background "#EE799F" :foreground "red"))))
+ '(font-lock-regexp-grouping-backslash ((t (:foreground "#E9C062"))))
+ '(font-lock-regexp-grouping-construct ((t (:foreground "red"))))
+ '(minibuffer-prompt ((t (:foreground "#5F5A60"))))
+ '(fringe ((t (:background "black" :foreground "grey55"))))
+ '(linum ((t (:background "#141314" :foreground "#2D2B2E"))))
+ '(hl-line ((t (:background "#212121"))))
+ '(mode-line ((t (:background "grey75" :foreground "black" :height 0.8))))
+ '(mode-line-inactive ((t (:background "grey10" :foreground "grey40" :box (:line-width -1 :color "grey20") :height 0.8))))
+ '(gui-element ((t (:background "#D4D0C8" :foreground "black"))))
+ '(region ((t (:background "#27292A"))))
+ '(shadow ((t (:foreground "#4b474c"))))
+ '(highline-face ((t (:background "SeaGreen"))))
+ '(left-margin ((t (nil))))
+ '(text-cursor ((t (:background "yellow" :foreground "black"))))
+ '(toolbar ((t (nil))))
+ '(underline ((nil (:underline nil))))
+ '(mumamo-background-chunk-submode ((t (:background "#222222"))))
+ '(zmacs-region ((t (:background "snow" :foreground "blue"))))
+```
+
 
 Kaynaklar
 

@@ -56,3 +56,5 @@
 
 [Üç Boyutlu Grafikler İçin Mayavi](11/mayavi-3d.md)
 
+[GPU, CUDA, PyCuda](12/gpu-cuda-pycuda.md)
+

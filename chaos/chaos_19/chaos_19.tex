@@ -455,11 +455,62 @@ Bunu yapınca $r_2 = 1+\sqrt{6}$ çıkıyor, ki bu daha önce gördüğümüz
 
 Bu $r$ analitik olarak hesaplanabilen son $r$. 
 
+Mandelbrot, Fraktallar
+
+Bu alanda Mandelbrot kümesi bahsini duyariz [3]. Bu tür kümeler bir özyineleme
+üzerinden hesaplanır ve bu döngü bir eşleme / fonksiyon olarak görülebilir, bir
+onceki bir sonrakini etkiler. Mandelbrot kümeleri en basit baz fonksiyonları
+kullanır, mesela $f(x) = x^2 + c$ ki $c$ bir sabit sayıdır.
+
+Kaynaklarda görülen fraktal resimler şöyle üretilir; sabit $c$'nin kompleks sayı
+olmasına izin verilir, ve bir $x,y$ kordinatındaki, izgaradaki her $x,y$ farklı
+bir sabittir, $c = x + y i$. Tüm bu sabitler üzerinde Mandelbrot özyineli hesabı
+ayrı ayrı işletilir. O zaman $x$ ve $y$ için $[-2,+2]$ arasında 5 tane ızgara
+değeri olsa, şöyle bir matris ortaya çıkar,
+
+$$
+\left[\begin{array}{ccccc}
+-2+2i & -1+2i & 2i  & 1+2i & 2+2i \\
+-2+i  & -1+i  & i   & 1+i  & 2+i  \\
+-2    &  -1   & 0   &  1   &  2   \\
+-2-i  & -1-i  & -i  & 1-i  &  2-i \\
+-2-2i & -1-2i & -2i & 1-2i &  2-2i  
+\end{array}\right]
+$$
+
+Bu matrisin her hücresi üzerinde belli sayıda özyineleme yapılır, arada eğer bir
+eşik değeri geçildiyse o değer sıfır yapılır, döngü bitince matris bir
+Mandelbrot fraktalı ortaya çıkartmıştır.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+m = 480
+n = 320
+ 
+x = np.linspace(-2, 1, num=m).reshape((1, m))
+y = np.linspace(-1, 1, num=n).reshape((n, 1))
+C = np.tile(x, (n, 1)) + 1j * np.tile(y, (1, m))
+ 
+Z = np.zeros((n, m), dtype=complex)
+M = np.full((n, m), True, dtype=bool)
+for i in range(100):
+    Z[M] = Z[M] * Z[M] + C[M]
+    M[np.abs(Z) > 2] = 0
+
+plt.imshow(M,cmap=cmap,origin='lower')
+plt.savefig("mandel.png")
+\end{minted}
+
+\includegraphics[width=20em]{mandel.png}
+
+
 Kaynaklar
 
 [1] May, {\em Simple mathematical models with very complicated dynamics, Nature}, 1976, Vol 261, pg. 459
 
 [2] Gleick, {\em Chaos: Making a New Science}
+
+[3] Roelandts, {\em How to Compute the Mandelbrot Set using NumPy Array Operations},
+    \url{https://tomroelandts.com/articles/how-to-compute-the-mandelbrot-set-using-numpy-array-operations}
 
 \end{document}
 

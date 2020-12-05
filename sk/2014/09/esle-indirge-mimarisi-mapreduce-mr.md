@@ -1,7 +1,5 @@
 # Eşle-İndirge Mimarisi (Map/Reduce -MR- Architecture)
 
-Eşle-İndirge Mimarisi (Map/Reduce -MR- Architecture)
-
 MR bir veri analiz sürecini iki evreye ayırır. Bunlardan birincisi
 eşleme evresidir, ki bu evrede eline geçen veri parçasını alan her
 analiz servisi (bunlardan pek çok var, farklı makinalarda), süreçler
@@ -29,14 +27,25 @@ bir makinaya gönderilecektir, o anahtarın birleşiminden o makina
 sorumlu olacaktır.
 
 
-İşin mekaniğine bakınca oldukça basit gibi gelebilir. Fakat şaşırtıcı kadar çok analiz işlemi üstteki şekilde temsil edilebilmektedir ve sonuç olarak paralelize edilebilmektedir. Tabii işin mekanığı derken sadece anahtarlara ayırmaktan bahsetmiyoruz, analiz işleminin, her ne ise, "azar azar, ayrı
-ayrı üst üste koya koya sonuca ilerleyebilecek" şekilde tekrar tasarlanması gerekiyor. Kelime toplama, hatta toplamanın niye MR ile doğal bir uyumunun olduğunu görüyoruz herhalde, 2,3,4,5 eklerlerken 2+3=5,4+5=9 ardından 5+9=14 elde edebiliriz, ama diğer bir şekilde 3+4=7,2+5=7 arkasından tekrar 7+7=14 yani aynı sonucu elde edebiliyoruz. Toplama işleminin ruhunda
-"sıradan bağımsız olmak" var, ve bu bağımsızlık paralelize etmekte işimize yarıyor.
+İşin mekaniğine bakınca oldukça basit gibi gelebilir. Fakat şaşırtıcı
+kadar çok analiz işlemi üstteki şekilde temsil edilebilmektedir ve
+sonuç olarak paralelize edilebilmektedir. Tabii işin mekanığı derken
+sadece anahtarlara ayırmaktan bahsetmiyoruz, analiz işleminin, her ne
+ise, "azar azar, ayrı ayrı üst üste koya koya sonuca ilerleyebilecek"
+şekilde tekrar tasarlanması gerekiyor. Kelime toplama, hatta
+toplamanın niye MR ile doğal bir uyumunun olduğunu görüyoruz herhalde,
+2,3,4,5 eklerlerken 2+3=5,4+5=9 ardından 5+9=14 elde edebiliriz, ama
+diğer bir şekilde 3+4=7,2+5=7 arkasından tekrar 7+7=14 yani aynı
+sonucu elde edebiliyoruz. Toplama işleminin ruhunda "sıradan bağımsız
+olmak" var, ve bu bağımsızlık paralelize etmekte işimize yarıyor.
 
 Hadoop ile Patent Verisi İşlemek
 
-75-99 yılları arasında hangi patentin hangi hangi patentlere referans verdiği ve patentler hakkında detaylı verileri Hadoop ile işleyeceğiz. Veriler alttaki bağlantıdan alınabilir, gerekli dosyalar
-cite75_99.txt ve apat63_99.txt (baglantilar altta) Bu dosyaları açıp biz diyelim ki /data altına koyduk.
+75-99 yılları arasında hangi patentin hangi hangi patentlere referans
+verdiği ve patentler hakkında detaylı verileri Hadoop ile
+işleyeceğiz. Veriler alttaki bağlantıdan alınabilir, gerekli dosyalar
+cite75_99.txt ve apat63_99.txt (baglantilar altta) Bu dosyaları açıp
+biz diyelim ki /data altına koyduk.
 
 Referans verisine bakarsak,
 
@@ -558,3 +567,12 @@ AR 9.188990825688073
 www.nber.org/patents/
 
 ![](mr.png)
+
+Referans, Kaynaklar
+
+[Hadoop - Ilk Ornek (Python), Esleme-Indirgeme](../../2013/01/hadoop-ilk-ornek-python-esleme-indirgeme.md)
+
+[MrJob](../../2013/08/mrjob.md)
+
+[Paralel KMeans, Hadoop](https://burakbayramli.github.io/dersblog/algs/algs_085_kmeans_mr/paralel_kmeans_hadoop.html)
+

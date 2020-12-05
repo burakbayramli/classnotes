@@ -114,7 +114,11 @@ mlab.savefig(filename='mayavi5.png')
 
 ![](mayavi5.png)
 
+Problemler
 
+Eğer ardı ardına grafik basıyorsak, döngü dışında `fig = mlab.figure`
+komutu kullanıp, her döngü sonunda `mlab.savefiğ` ardından
+`mlab.clf()` uygulamak hafıza problemlerini çözecektir. 
 
 Kaynaklar
 
