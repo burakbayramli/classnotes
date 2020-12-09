@@ -192,7 +192,6 @@ gördük, `apt-get install libgl1-mesa-dev ..` vs ardından `-lGL -lGLU
 
 Dosyalar [ex1.cpp](ex1.cpp), [ex2.cpp](ex2.cpp), [cat.h](cat.h), [cat.cpp](cat.cpp)
 
-
 Niye C++
 
 C++'in hızlı işlediği herkes tarafından bilinir. Ama mesela Java'ya
@@ -209,10 +208,70 @@ vs. bu "bilinmezlik" performansta düşüş, en azından sürpriz yaratabiliyor.
 Diğer cevap kültürle alakalı; C'nin devamı C++ uzun yıllardır ortada,
 ve C ile beraber "performans için gidilen dil" olarak ün yaptı, hızlı
 hesap isteyen bilimciler yıllardır ona geçiş yaptı, ve bir sürü
-kütüphane, yardımcı kod bu dil etrafında şekillendi. Mesela geçende
-OpenGL konusuna baktığımızda C++'ın bu alanda hala son derece yaygın
-olduğunu gördük. Bilim simülasyonları hala direk bu dile gidiyorlar,
-Fortran'dan buraya geçiş yapılmış, öteki seçeneklere bakan yok.
+kütüphane, yardımcı kod bu dil etrafında şekillendi. 
+
+Make
+
+Derleme yapmak için teker teker her dosya üzerinde `g++` işletmek
+külfetli olur. Acaba daha kolay bir yol bulabilir miyiz?
+
+Make programı ile dosya sonekleri arasında "gidiş kuralları"
+tanılanabilir, mesela bir `.cpp` den `.o`'ya gitmenin yolu "vsvs
+komutudur" denebilir, böylece iki dosya tipi arasında bir bağ yaratmış
+oluruz, hatta bu bağ dosya değişimlerini, zamanları bile kontrol
+edebilir, mesela bir kere A.o ürettiysek, sadece ve sadece onun temel
+aldığı A.cpp değişmiş ise tekrar kuralı / derlemek.
+
+Make programını işletmek için komut satırında `make` yazmak yeterli,
+olağan durumda program aynı dizinde olan `Makefile` adlı bir dosya
+arar. Bu dosyanın içeriği (üstteki örnek için) şuna benzeyebilir,
+
+```
+CC=g++
+CFLAGS=
+LIBS=-lm
+OBJ = cat.o ex2.o
+     
+%.o: %.cpp
+	$(CC) -c -o $@ $< 
+
+kedi.exe: $(OBJ)
+	$(CC) -o $@ $^ $(LIBS) 
+
+clean:
+	rm -f *.o 
+	rm -f *.exe
+```
+
+Makefile içinde hedefler vardır, `make hedef` ile bu hedefler ayrı
+ayrı da işletilebilir, ama tanımlanmamışsa olağan hedef ilk hedeftir,
+üstteki örnekte bu `kedi.exe`. Hedefin sağında onun bağlı olduğu başka
+hedefler / dosyalar olabilir, bizde `kedi.exe` için `$(OBJ)`
+gerekiyor, bu bir değişken sadece, tekrarlamamak için böyle yaptık,
+içinde `cat.o ex2.o` var, yani nihai isler kod icin bu iki `.o`
+dosyasi gerekiyor. Bu dosyaları da ayrı birer hedef yapabilirdik, ama
+daha hızlı kodlamak için bu hedefleri bir genel sonek kuralı üzerinden
+tanımladık, `%.o: %.cpp` tanımı bu işte. Bu kural herhangi bir `o`
+dosyası için hangi komutu işleteceğini biliyor, `$(CC) -c -o ...` diye
+giden komut ile..  Ve `make` böyle geriye geriye gide gide bize
+gereken tüm dosyaları ortaya çıkartacak ve en sonunda `kedi.exe` ile
+nihai `g++` komutunu işletip işler kodu ortaya çıkartacak. İlk
+işlettiğimizde
+
+```
+g++ -c -o cat.o cat.cpp 
+g++ -c -o ex2.o ex2.cpp 
+g++ -o kedi.exe cat.o ex2.o -lm 
+```
+
+görürüz, ve `kedi.exe` ortaya yaratılmış olur. Eğer tekrar işletsek,
+
+```
+make: 'kedi.exe' is up to date.
+```
+
+mesajını görürdük. Eğer `.o`, `.exe` dosyalarini silmek istersek,
+`make clean` işletebiliriz.
 
 Bağlantılar
 
