@@ -15,7 +15,7 @@ blok için ayrı obje yaratabiliriz böylece o her bloğun zaman kaydı
 ayrı tutulur.
 
 
-```clike
+```cpp
 #include <iostream>
 #include <chrono>
 #include <ctime>
@@ -56,7 +56,7 @@ public:
 
 ```
 
-```clike
+```cpp
 #include "cronometer.h"
 
 long fibonacci(unsigned n)

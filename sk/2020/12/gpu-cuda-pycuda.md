@@ -63,6 +63,22 @@ arayüzdür. Python üzerinde PyCuda üzerinden erişilebilir. NVidia'nın
 `nvcc` adlı genişletilmiş C++ derleyicisi aynı şekilde CUDA
 kodlamasına C++ üzerinden izin verir.
 
+Turkiye'de Alım
+
+NVidia grafik kartına sahip bir makina fazla pahalı değil, özellikle
+yıllarca önce bir süperbilgisayar seviyesinde işletim gücüne
+eriştiğimizi düşünürsek. Bir oyun makinası PC ile beraber alınabilir,
+ya da, mesela harici Jetson kartı 70-100 dolar arasında.
+
+GPU Var mı Kontrol
+
+Dizüstü ya da masaüstü bilgisayarında acaba dışarıdan kodlanabilen GPU
+var mı? Kontrol etmenin en kolay yolu Chromium tarayıcısına
+sormak. Tarayıcı bu tür bilgilere sahip çünkü kendisi de mümkün olan
+tüm hızlandırıcıları kullanmak istiyor, neyse tarayıcıya gidip adres
+çubuğunda `chrome://gpu` yazarsak gösterilen raporda eğer varsa CUDA
+yetenekli kart gösterilecektir.
+
 CUDA ve Collab
 
 Geliştiriciler için bir diğer seçenek Google bulutu üzerinde
@@ -218,6 +234,34 @@ kodlanıyor. İndis `i` ile vektör öğesine erişiliyor, kod işlediğinde
 her çekirdek eşzamanlı olarak tek bir öğe üzerinde işlem yapacak, buna
 dikkat. GPU parallelliğinin temeli bu.
 
+Bu [1]'den alınan bir giriş kodu tabii, parallelliğin bazı detayları
+arka planda saklanmış, Python için en azından. Mesela kod içinde
+referans edilen `i` bir iş parçacığı (thread) indisidir, bu indislerin
+eldeki N vektör öğesi için 0 ila N arası değerler olacağına emin
+miyiz? Kodun işleyişi buna bağlı çünkü. Ayrıca N tane ayrı iş
+parçacığı oluşturulacağını biliyor muyuz?
+
+C ile iki vektörü toplayan bir kod suna benzer,
+
+```cpp
+__global__ void VecAdd(float* A, float* B, float* C)
+{
+   int i = threadIdx.x;
+   C[i] = A[i] + B[i];
+}
+int main()
+{
+   ...
+   VecAdd<<<1, N>>>(A, B, C);
+   ...
+}
+```
+
+Burada `<<<1, N>>>` tanımındaki `N` ile kaç iş parçacığı olacağı
+önceden tanımlandı. Üstteki gibi basit bir Python çağrısı var ise, bu
+tanım arka planda yapılıyor olmalı. Indis 0-N de aynı şekilde
+garantileniyor muhakkak. 
+
 Mandelbrot Kümesi
 
 Fraktal resimleri üretmek için Mandelbrot yaklaşımı kullanılabilir,
@@ -288,23 +332,57 @@ fakat her x,y hücresinin paralel işlenmesi çok büyük bir ilerleme ve
 hakikaten de Mandelbrot GPU kodu hızlı işliyor.
 
 Üstteki kodda tam tekmilli program ifadeleri kullanabildiğimizi
-görüyoruz, mesela for `for` döngüsü. Sözdizim Ç temelli ve hata
+görüyoruz, mesela for `for` döngüsü. Sözdizim C temelli ve hata
 ayıklama süreci biraz uğraştırabilir çok çetrefil denemez.
 
-Turkiye'de Alım
+Bir çekirdek çağrısı işletmenin tek yolu `ElementwiseKernel` değil,
+aslında o yöntem en kolay olanı. Şimdi işleri biraz daha
+zorlaştıralım, bir çekirdek fonksiyonu yazalım.
 
-NVidia grafik kartına sahip bir makina fazla pahalı değil, özellikle
-yıllarca önce bir süperbilgisayar seviyesinde işletim gücüne
-eriştiğimizi düşünürsek. Bir oyun makinası PC ile beraber alınabilir,
-ya da, mesela harici Jetson kartı 70-100 dolar arasında.
+Ne zaman bu tür bir fonksiyon yazarsak ondan önce `__global__`
+kelimesini kullanmamız gerekir. Dönüş tipi hep `void` olur çünkü
+döndürelecek veriyi zaten çıkış parametresi olarak
+tanımlayacağız. Kodlayacağımız yine vektörü skalar ile çarpmak olacak
+ama bu sefer skaların kendisi bir parametre. 
 
-GPU Var mı Kontrol
 
-Dizüstü ya da masaüstü bilgisayarında acaba dışarıdan kodlanabilen GPU
-var mı? Kontrol etmenin en kolay yolu Chromium tarayıcıya
-sormak. Tarayıcıya gidip adres çubuğunda `chrome://gpu/` yazarsak
-gösterilen raporda eğer varsa CUDA yetenekli kart gösterilecektir.
+```python
+import pycuda.autoinit, time
+import pycuda.driver as drv
+import numpy as np
+from pycuda import gpuarray
+from pycuda.compiler import SourceModule
 
+ker = SourceModule("""
+__global__ void scalar_multiply_kernel(float *outvec, float scalar, float *vec)
+{
+     int i = threadIdx.x;
+     outvec[i] = scalar*vec[i];
+}
+""")
+
+scalar_multiply_gpu = ker.get_function("scalar_multiply_kernel")
+
+testvec = np.random.randn(512).astype(np.float32)
+testvec_gpu = gpuarray.to_gpu(testvec)
+outvec_gpu = gpuarray.empty_like(testvec_gpu)
+
+t1 = time.time()
+scalar_multiply_gpu( outvec_gpu, np.float32(2), \
+                     testvec_gpu, block=(512,1,1),
+		     grid=(1,1,1))
+t2 = time.time()
+outvec_gpu.get()
+print ('total time to compute on GPU: %f' % (t2 - t1))
+```
+
+Bu kodda bir diğer fark `threadIdx.x` ile eşzamanlı iş parçacığı
+(thread) kimlik no'sunu çağrı yaparak kendimizin almış olmamız. Burada
+bir soru acaba her ögeye yetecek kadar iş parçacığı (ki onların özgün
+kimlik no'su) mevcut olacak mıdır, çünkü bu kimlik indeks olarak
+vektör öğelerine erişmek için kullanılıyor? Cevap evet,
+`scalar_multiply_gpu` çağrısına bakarsak orada 512 tane iş parçacığı
+tanımlandı, vektörün büyüklüğü de aynı.
 
 Kaynaklar
 

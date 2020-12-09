@@ -35,3 +35,5 @@ pdftk
 texlive
 ```
 
+Dosyaların kodlamasına dikkat, utf8 olmalı.
+

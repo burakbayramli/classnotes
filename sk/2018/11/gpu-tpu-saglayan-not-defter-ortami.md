@@ -21,9 +21,8 @@ Girilince bu ortamda keras, tensorflow'un zaten kurulu olduğunu
 görürüz. Yeni paket kurmak ta mümkün, bir hücre içinde ünlem sonrası
 pip install ile (ünlem ile komut satırına çıkılıyor bilindiği gibi)
 bunu yapınca pip çıktısını verdi, ama paket zaten kurulu dedi. Hiç
-kurulmamış pakette nasıl olur, büyük bir ihtimalle isler. Ama kurulum
-geçicidir herhalde, yarın GC'de aynı not defterine girince tekrar aynı
-kurumu yapmak gerekebilir.
+kurulmamış paketi kurar. Tabii kurulum geçicidir, yarın GC'de aynı not
+defterine girince tekrar aynı kurumu yapmak gerekir.
 
 Peki GC benim özel Google Drive'imda duran dosyalarıma erisebilir
 mi? Bu mumkun. Bir hücrede

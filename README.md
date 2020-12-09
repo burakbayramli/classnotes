@@ -15,33 +15,7 @@ Bu notlarda yazılanları takip etmek için önkoşul bilgiler şunlar:
 Yani üniversite sınavına hazırlık için gereken konular (gerçi artık
 Calculus gerekiyor mu bilmiyorum, benim zamanımda gerekiyordu).
 
-### Kodlar, TeX
-
-[Linear Algebra](linear)
-
-[Diferansiyel Denklemler](ode)
-
-[Çok Değişkenli Calculus](calc_multi)
-
-[Hesapsal Bilim](compscieng)
-
-[İstatistik, Yapay Öğrenim, Veri Analizi](stat)
-
-[Zaman Serileri ve Finans](tser)
-
-[Kısmi Diferansiyel Denklemler](pde)
-
-[Fonksiyonel Analiz](func_analysis)
-
-[Yapay Zeka, Çetrefillik](app_math)
-
-[Gayri Lineer Dinamik ve Kaos](chaos)
-
-[Çoklu Bakış Açı Geometrisi](vision)
-
-[Fizik](phy)
-
-### PDF
+### Web, PDF
 
 Lineer Cebir (Linear Algebra)
 
@@ -95,6 +69,33 @@ IT, Bilisim
 
 https://burakbayramli.github.io/dersblog/sk/index.html
 
+### Kodlar, TeX
+
+[Linear Algebra](linear)
+
+[Diferansiyel Denklemler](ode)
+
+[Çok Değişkenli Calculus](calc_multi)
+
+[Hesapsal Bilim](compscieng)
+
+[İstatistik, Yapay Öğrenim, Veri Analizi](stat)
+
+[Zaman Serileri ve Finans](tser)
+
+[Kısmi Diferansiyel Denklemler](pde)
+
+[Fonksiyonel Analiz](func_analysis)
+
+[Yapay Zeka, Çetrefillik](app_math)
+
+[Gayri Lineer Dinamik ve Kaos](chaos)
+
+[Çoklu Bakış Açı Geometrisi](vision)
+
+[Fizik](phy)
+
+
 İçeriğe ek yapmak isteyenler [için](CONTRIBUTING.md).
 
 Dokümanların içinde görülen kod Jupyter not defteri ya da ipython
@@ -147,7 +148,6 @@ keras==2.0.8
 librosa
 python_speech_features
 gym==0.9.4
-slycot
 control
 pyglet
 pymunk
