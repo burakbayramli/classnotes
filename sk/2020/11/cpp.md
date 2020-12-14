@@ -210,17 +210,18 @@ ve C ile beraber "performans için gidilen dil" olarak ün yaptı, hızlı
 hesap isteyen bilimciler yıllardır ona geçiş yaptı, ve bir sürü
 kütüphane, yardımcı kod bu dil etrafında şekillendi. 
 
+<a name='make'/>
+
 Make
 
 Derleme yapmak için teker teker her dosya üzerinde `g++` işletmek
-külfetli olur. Acaba daha kolay bir yol bulabilir miyiz?
-
-Make programı ile dosya sonekleri arasında "gidiş kuralları"
-tanılanabilir, mesela bir `.cpp` den `.o`'ya gitmenin yolu "vsvs
-komutudur" denebilir, böylece iki dosya tipi arasında bir bağ yaratmış
-oluruz, hatta bu bağ dosya değişimlerini, zamanları bile kontrol
-edebilir, mesela bir kere A.o ürettiysek, sadece ve sadece onun temel
-aldığı A.cpp değişmiş ise tekrar kuralı / derlemek.
+külfetli olabilir. Make programı ile dosya sonekleri arasında "gidiş
+kuralları" tanılanabiliyor, ve birçok derleme ile alakali komutlar tek
+bir dosyada toplanabiliyor. Mesela bir `.cpp` den `.o`'ya gitmenin
+yolu "vsvs komutudur" denebilir, böylece iki dosya tipi arasında bir
+bağ yaratmış oluruz, hatta bu bağ dosya değişimlerini, zamanları bile
+kontrol edebilir, mesela bir kere A.o ürettiysek, sadece ve sadece
+onun temel aldığı A.cpp değişmiş ise tekrar derlemek.
 
 Make programını işletmek için komut satırında `make` yazmak yeterli,
 olağan durumda program aynı dizinde olan `Makefile` adlı bir dosya
@@ -264,14 +265,14 @@ g++ -c -o ex2.o ex2.cpp
 g++ -o kedi.exe cat.o ex2.o -lm 
 ```
 
-görürüz, ve `kedi.exe` ortaya yaratılmış olur. Eğer tekrar işletsek,
+görürüz, ve `kedi.exe` yaratılmış olur. Eğer tekrar işletsek,
 
 ```
 make: 'kedi.exe' is up to date.
 ```
 
-mesajını görürdük. Eğer `.o`, `.exe` dosyalarini silmek istersek,
-`make clean` işletebiliriz.
+mesajını görürdük. Temizlik yapmak istersek, `.o`, `.exe` dosyalarını
+silmek için, `make clean` işletebiliriz.
 
 Bağlantılar
 
