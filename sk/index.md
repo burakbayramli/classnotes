@@ -3,6 +3,8 @@
 
 ## En Son
 
+15/12 - [Jetson Nano](https://burakbayramli.github.io/dersblog/sk/2020/12/jetson-nano-2GB.html)
+
 9/12 - [Make](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp.html#make)
 
 5/12 - [GPU, CUDA, PyCuda](https://burakbayramli.github.io/dersblog/sk/2020/12/gpu-cuda-pycuda.html)
@@ -10,10 +12,6 @@
 2/12 - [SPHSim Github](https://github.com/burakbayramli/simsph)
 
 19/11 - [Üç Boyutlu Grafikler İçin Mayavi](https://burakbayramli.github.io/dersblog/sk/2020/11/mayavi-3d.html)
-
-18/11 - [C++ Programlarının Performansını Ölçmek](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp-performance-olcum.html)
-
-16/11 - [C++ Kodu, Geometrik Komşu Kordinatlar](https://github.com/burakbayramli/classnotes/blob/master/algs/algs_073_grid_hash_nn/geogrid.cpp)
 
 
 ## Konular, Referans

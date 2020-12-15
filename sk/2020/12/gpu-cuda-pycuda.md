@@ -384,6 +384,10 @@ vektör öğelerine erişmek için kullanılıyor? Cevap evet,
 `scalar_multiply_gpu` çağrısına bakarsak orada 512 tane iş parçacığı
 tanımlandı, vektörün büyüklüğü de aynı.
 
+Ilgili
+
+[Jetson Nano](jetson-nano-2GB.md)
+
 Kaynaklar
 
 [1] Tuomanen, *Hands-On GPU Programming with Python and CUDA*

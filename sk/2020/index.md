@@ -58,3 +58,5 @@
 
 [GPU, CUDA, PyCuda](12/gpu-cuda-pycuda.md)
 
+[Jetson Nano](12/jetson-nano-2GB.md)
+
