@@ -135,12 +135,13 @@ pip3 install cython
 pip3 install pycuda
 ```
 
-[Şuradaki](../../2005/10/bir-makinaya-ssh-ile-sifresiz-giris.md) `ssh`
-şifresiz giriş numarasını yaptıktan sonra,
+Acaba dizüstünde geliştirip Nano'ya işletmek için sürekli gönderme
+yapabilir miyiz? Evet. [Şuradaki](../../2005/10/bir-makinaya-ssh-ile-sifresiz-giris.md)
+`ssh` şifresiz giriş numarasını yaptıktan sonra,
 [PyCuda](gpu-cuda-pycuda.md) yazısındaki herhangi bir örneği alırız,
-mesela GPU tipini gösteren örnek, onu `tst.py` diye kaydedlim, sonra
-mesela tüm kodların Nano üzerinde `/home/user/Documents` dizinine
-gönderilecek şekilde ayarlarsak, 
+mesela GPU tipini gösteren örnek, onu `tst.py` diye dizüstünde
+kaydedelim, sonra mesela tüm kodların Nano üzerinde
+`/home/user/Documents` dizinine gönderilecek şekilde ayarlarsak,
 
 ```
 scp $1  user@192.168.43.34:/home/user/Documents/
