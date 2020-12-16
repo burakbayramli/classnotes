@@ -58,5 +58,5 @@
 
 [GPU, CUDA, PyCuda](12/gpu-cuda-pycuda.md)
 
-[Jetson Nano](12/jetson-nano-2GB.md)
+[NVidia Jetson Nano Wifi](12/nvidia-jetson-nano-2GB-wifi.md)
 

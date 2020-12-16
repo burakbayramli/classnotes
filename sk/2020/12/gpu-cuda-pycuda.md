@@ -134,6 +134,7 @@ En basit işlemle başlayalım. Bir vektör üzerindeki sayıları 2 ile çarpal
 
 ```python
 from time import time
+import pycuda.autoinit
 from pycuda import gpuarray
 
 host_data = np.array(range(10**7),dtype=np.float32)
