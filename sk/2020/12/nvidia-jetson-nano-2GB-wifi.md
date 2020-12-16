@@ -150,15 +150,16 @@ mesela GPU tipini gösteren örnek, onu `tst.py` diye dizüstünde
 kaydedelim, sonra mesela tüm kodların Nano üzerinde
 `/home/user/Documents` dizinine gönderilecek şekilde ayarlarsak,
 
-```
+```bash
 scp $1  burak@nano1:/home/user/Documents/
 ssh burak@nano1 "/bin/bash /home/user/Documents/pygpu.sh $1"
 ```
 
-Nano uzerinde `/home/user/Documents/pygpu.sh` dosyasi lazim, uzaktan o
-cagriliyor, onun icerigi
+Nano üzerinde `/home/user/Documents/pygpu.sh` dosyası lazım, uzaktan o
+çağrılıyor (direk `python3` çağırmak ise yaramayabilir çünkü bazı
+çevre değişkenlerinin set edilmesi lazım), onun içeriği
 
-```
+```bash
 export PATH=${PATH}:/usr/local/cuda/bin
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
 /usr/bin/python3 /home/user/Documents/$1
