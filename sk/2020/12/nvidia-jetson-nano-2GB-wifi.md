@@ -243,7 +243,7 @@ VNC
 
 `ssh -X` ile bağlanınca Nano'da X programlarının çıktısını direk
 bağlandığımız diğer bir makinaya aktarabiliriz, fakat ne yazık ki
-ÖpenGL görüntüleri bu şekilde aktarılamıyor. Acaip hatalar
+OpenGL görüntüleri bu şekilde aktarılamıyor. Acaip hatalar
 görüyorsunuz, fakat monitörle Nano'ya bağlanınca herşey iyi
 işliyor. Burada çözüm VNC kullanmak.
 
@@ -251,7 +251,7 @@ VNC programlarını kullanmışızdır, bu programlar ile bir bilgisayarın
 tüm masaüstünü kendi makinamızda görebiliriz. Nano'da bunu yapmak için
 birkaç adımı uygulamak lazım, [6,7,8] kaynaklarına bakabiliriz. Yanlız
 dikkat, sadece [8] yöntemi vino servisi eğer monitör bağlı değilse
-işlemiyor (VNC'nin tüm faydaları sıfırlanmış oluyor yani). VNC düzgü
+işlemiyor (VNC'nin tüm faydaları sıfırlanmış oluyor yani). VNC düzgün
 işlemesi için Nano Unix kullanıcınızın otomatik olarak sistem
 başlayınca login olmasını sağlamak lazım, bkz [6,7]. Ubuntu `User
 Accounts` penceresinden `Automatic Login` aktif edilmeli. Tabii bu
@@ -285,4 +285,6 @@ Kaynaklar
 [7] https://www.hackster.io/SaadTiwana/embedded-diaries-simple-remote-desktop-access-for-jetson-c1300a
 
 [8] https://developer.nvidia.com/embedded/learn/tutorials/vnc-setup
+
+
 
