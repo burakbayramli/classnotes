@@ -166,7 +166,17 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
 
 Script'i `run.sh` olarak kaydetsek, `sh run.sh tst.py` ile cağrınca bu
 uzaktan `ssh` ile o dosya üzerinde `python3` işletilmesini
-sağlar. İşletince bizde
+sağlar.
+
+Tabii tüm bu numaralar bir yana Nano'ya login edip komutu direk orada
+da işletebiliriz. O komut satırının ayrı durması için o pencereye
+farklı bir renk vermek iyi olur, benim Nano `.başhrç` de şu satır ekli,
+
+```
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;35m\]\u\[\033[01;30m\]@\[\033[01;32m\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+```
+
+İşletince bizde
 
 ```
 Device 0: NVIDIA Tegra X1

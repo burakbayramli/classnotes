@@ -85,9 +85,7 @@ fazla .pub dosyasına tek bir authorized_keys dosyasına ekleyebiliriz
 (ve birden fazla kullanıcıyı desteklebilmek için bunu yapmamız
 gerekir). Böylece aynı makinaya erişen birden fazla erişen kişi, aynı
 servis makinasına ve aynı kullanıcıya değişik açık anahtarlar ile
-erişebilir.
-
-[Youtube Video](https://www.youtube.com/watch?v=V_ukbRUdcGU)
+erişebilir. Bkz [2] 
 
 Uzak Dosya Erişimi
 
@@ -115,7 +113,11 @@ Artık kendi `/home/user1/Downloads/uzak` dizinime gittiğimde, uzaktaki
 `/home/ahmet/Documents` dizinini görürüm, hangi programı kullanırsam
 kullanayım bu işler.
 
+Kaynaklar
 
+[1] https://www.digitalocean.com/community/tutorials/how-to-use-sshfs-to-mount-remote-file-systems-over-ssh
+
+[2] [Youtube Video](https://www.youtube.com/watch?v=V_ukbRUdcGU)
 
 Eski Anlatım
 
