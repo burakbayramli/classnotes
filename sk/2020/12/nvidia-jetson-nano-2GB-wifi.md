@@ -143,15 +143,14 @@ pip3 install pycuda
 ```
 
 Acaba dizüstünde geliştirip Nano'ya işletmek için sürekli gönderme
-yapabilir miyiz? Evet. [Şuradaki](../../2005/10/bir-makinaya-ssh-ile-sifresiz-giris.md)
-`ssh` şifresiz giriş numarasını yaptıktan sonra,
-[PyCuda](gpu-cuda-pycuda.md) yazısındaki herhangi bir örneği alırız,
-mesela GPU tipini gösteren örnek, onu `tst.py` diye dizüstünde
+yapabilir miyiz? Evet. Hatta uzaktaki bir dizini `sshfs` ile
+monteleyebiliriz, bkz [şuradaki](../../2005/10/bir-makinaya-ssh-ile-sifresiz-giris.md) `ssh`
+yazı. Sonra [PyCuda](gpu-cuda-pycuda.md) yazısındaki herhangi bir örneği alırız,
+GPU tipini gösteren örnek mesela, onu `tst.py` diye dizüstünde
 kaydedelim, sonra mesela tüm kodların Nano üzerinde
-`/home/user/Documents` dizinine gönderilecek şekilde ayarlarsak,
+`/home/user/Documents` dizininde olacak şekilde
 
 ```bash
-scp $1  burak@nano1:/home/user/Documents/
 ssh burak@nano1 "/bin/bash /home/user/Documents/pygpu.sh $1"
 ```
 
@@ -166,9 +165,8 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
 ```
 
 Script'i `run.sh` olarak kaydetsek, `sh run.sh tst.py` ile cağrınca bu
-script `tst.py` dosyasını Nano üzerinde `/home/user/Documents/`
-dizinine gönderir ve uzaktan `ssh` ile o dosya üzerinde `python3`
-işletilmesini sağlar. İşletince bizde
+uzaktan `ssh` ile o dosya üzerinde `python3` işletilmesini
+sağlar. İşletince bizde
 
 ```
 Device 0: NVIDIA Tegra X1

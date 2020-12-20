@@ -107,6 +107,10 @@ sudo apt-get install sshfs
 sudo sshfs -o allow_other,default_permissions burak@192.168.1.1:/home/ahmet/Documents /home/user1/Downloads/uzak
 ```
 
+Önce kendi (root kabüllü) şifreniz, sonra uzaktaki makinanın şifresi
+sorulacak. Girince işlem tamamlanır, `mount` komutuyla montelenen
+dizinler listesinde uzaktaki makina artık görülmelidir
+
 Artık kendi `/home/user1/Downloads/uzak` dizinime gittiğimde, uzaktaki
 `/home/ahmet/Documents` dizinini görürüm, hangi programı kullanırsam
 kullanayım bu işler.
