@@ -239,6 +239,34 @@ GPU: 0.000274
 GPU'nun 115 kat daha hızlı olduğunu görüyoruz. İlginç Nano üzerindeki
 çekirdek sayısı da 128 değil mi?
 
+VNC
+
+`ssh -X` ile bağlanınca Nano'da X programlarının çıktısını direk
+bağlandığımız diğer bir makinaya aktarabiliriz, fakat ne yazık ki
+ÖpenGL görüntüleri bu şekilde aktarılamıyor. Acaip hatalar
+görüyorsunuz, fakat monitörle Nano'ya bağlanınca herşey iyi
+işliyor. Burada çözüm VNC kullanmak.
+
+VNC programlarını kullanmışızdır, bu programlar ile bir bilgisayarın
+tüm masaüstünü kendi makinamızda görebiliriz. Nano'da bunu yapmak için
+birkaç adımı uygulamak lazım, [6,7,8] kaynaklarına bakabiliriz. Yanlız
+dikkat, sadece [8] yöntemi vino servisi eğer monitör bağlı değilse
+işlemiyor (VNC'nin tüm faydaları sıfırlanmış oluyor yani). VNC düzgü
+işlemesi için Nano Unix kullanıcınızın otomatik olarak sistem
+başlayınca login olmasını sağlamak lazım, bkz [6,7]. Ubuntu `User
+Accounts` penceresinden `Automatic Login` aktif edilmeli. Tabii bu
+ekrana gelebilmek için de masaüstü idarecisi Unity olmalı, diğer
+idarecilerle buraya ulaşamadık. Eğer o değilse Unity'ye geçmek için
+monitorle bağlandığımız Nano Ubuntu'dan kullanıcı çıkışı (logout)
+yaparız, sonra tekrar giriş sırasında şifre girilen kutunun yanında
+ayak izi ikonu var, ona tıklayınca orada idareci seçenekleri çıkacak,
+burada Unity seçeriz, ve sisteme böyle gireriz. Servis tarafı böyle
+ayarlanır.
+
+Nihayet müşteri tarafı bağlanmasına geldik, dizüstü bilgisayarında
+benim Ubuntu 18'de `remmina` programı var, bu programa İP adresini
+verip bağlanma metotu olarak VNC seçersek, artık Nano'ya görsel olarak
+bağlanabiliriz.
 
 Kaynaklar
 
@@ -251,4 +279,10 @@ Kaynaklar
 [4] https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-2gb-devkit#write
 
 [5] https://youtu.be/Ch1NKfER0oM
+
+[6] https://medium.com/@bharathsudharsan023/jetson-nano-remote-vnc-access-d1e71c82492b
+
+[7] https://www.hackster.io/SaadTiwana/embedded-diaries-simple-remote-desktop-access-for-jetson-c1300a
+
+[8] https://developer.nvidia.com/embedded/learn/tutorials/vnc-setup
 
