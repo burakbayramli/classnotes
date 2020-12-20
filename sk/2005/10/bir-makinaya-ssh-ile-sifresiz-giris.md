@@ -1,17 +1,17 @@
 # Bir Makinaya SSH ile Şifresiz Giriş
 
-Bir makinadan diğerine hem şifresiz hem de güvenli bir şekilde girip, orada
-komut işletmek, ya da oraya dosya kopyalamak için iki program vardır: ssh ve
-scp. Kullanmak için komut satırından (ssh için)
+Bir makinadan diğerine hem şifresiz hem de güvenli bir şekilde girip,
+orada komut işletmek, ya da oraya dosya kopyalamak için iki program
+vardır: ssh ve scp. Kullanmak için komut satırından (`ssh` için)
 
 ```
 ssh host1 -l remoteuser
 ```
 
-komutunu kullandığınızda host1 adlı makinaya remoteuser kullanıcısı
-üzerinden login etmiş olursunuz. Ya da uzak makinada bir komut işletip
-sonucunu kendi makinanıza almak isterseniz (meselâ ikinci makinada
-listeleme komutu olan ls işletelim), şunu yaparız
+komutunu kullandığınızda `host1` adlı makinaya `remoteuser`
+kullanıcısı üzerinden login etmiş olurzzzz. Ya da uzak makinada bir
+komut işletip sonucunu kendi makinanıza almak isterseniz (meselâ
+ikinci makinada listeleme komutu olan ls işletelim), şunu yaparız
 
 ```
 ssh host1 -l remoteuser ls
@@ -88,6 +88,30 @@ servis makinasına ve aynı kullanıcıya değişik açık anahtarlar ile
 erişebilir.
 
 [Youtube Video](https://www.youtube.com/watch?v=V_ukbRUdcGU)
+
+Uzak Dosya Erişimi
+
+Uzaktaki makinanın herhangi bir dizin hiyerarşisini belli bir
+noktasından alıp, `ssh` üzerinden bizim yerel makinadaki bir boş
+dizine "montelemek (mount)" mümkün, `sshfs` ile. Kurmak için
+
+```
+sudo apt-get install sshfs
+```
+
+Şimdi mesela ben yerel `user1` kullanıcısı olayım,
+`/home/user1/Downloads/uzak` boş dizinine (yoksa yaratırım)
+192.168.1.1 makinasındaki `/home/ahmet/Documents` dizinini monteleyelim,
+
+```
+sudo sshfs -o allow_other,default_permissions burak@192.168.1.1:/home/ahmet/Documents /home/user1/Downloads/uzak
+```
+
+Artık kendi `/home/user1/Downloads/uzak` dizinime gittiğimde, uzaktaki
+`/home/ahmet/Documents` dizinini görürüm, hangi programı kullanırsam
+kullanayım bu işler.
+
+
 
 Eski Anlatım
 
