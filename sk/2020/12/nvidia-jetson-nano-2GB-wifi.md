@@ -268,20 +268,21 @@ benim Ubuntu 18'de `remmina` programı var, bu programa İP adresini
 verip bağlanma metotu olarak VNC seçersek, artık Nano'ya görsel olarak
 bağlanabiliriz.
 
-Ornekler
+Örnek Cuda Kodları
 
 C++ üzerinden CUDA kodlamak için Nano üzerinde bolca örnek var. Bu
 örnekler SD yakma işlemi sırasında Nano'ya tranfer edilmiş oldu,
 örnekler `/usr/local/cuda-[versiyon]/samples` altında
 bulunabilir. Derlemek için bu dizini tamamen kopyalayıp `user` için
-kendi `/home/user` altında bir yerlere koymak en iyisi, yoksa
-`/usr/local` için izin hataları verilebilir, bu kopyada `make`
-uygularız, o komut tüm örnekleri derler. `nvcc` ayarlarını üstte
-anlattık, derlemek işlemi bu şekilde yapılacaktır. Bu işlem biraz uzun
-sürecek, ama bitince her örnek işletilir halde olur. Mesela
-`samples/5_Simulations/oceanFFT` altında `./oceanFFT` örneğini
-işletebiliriz, Nano monitöründen ya da VNC üzerinden su simulasyonu
-gayet güzel görülüyor.
+mesela `/home/user` altında bir yerlere koymak en iyisi, yoksa
+`/usr/local` için izin hataları verilebilir.
+
+Bu kopyada `make` uygularız, o komut tüm örnekleri derler. `nvcc`
+ayarlarını üstte anlattık, derleme işlemi onu kullanıyor. Tüm derleme
+işlemi biraz uzun sürecek, ama bitince her örnek işletilir halde hazır
+olacaktır. Mesela `samples/5_Simulations/oceanFFT` altında
+`./oceanFFT` örneğini işletebiliriz, Nano monitöründen ya da VNC
+üzerinden görebiliriz, su simulasyonu gayet güzel görülüyor.
 
 Kaynaklar
 
