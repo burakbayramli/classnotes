@@ -71,14 +71,13 @@ sistemi USB'ye takılan klavye, fare gibi araçları tanır. Fakat
 başta, RPi ilk kez yüklenirken, başlarken bazı girişlerin olması
 lazım. Ne yapacağız?
 
-Burada çözüm en minimal kablolu gereci almak, mesela uzerinde touchpad
-olan (yani sanal fare) kablosuz klavye ama kablosuz baglanti dongle
-ile, yani RPi'nin USB soketine baglanan bir ufak ozel alici var,
-klavye direk bu alici ile iletisime geciyor, boylece Bluetooth vs
-isleriyle Rpi uzerinden kurcalamaya gerek kalmiyor. Aliciyi
-takiyorsunuz, pat diye klavye ve uzerindeki fare taniniyor.  Bu
-olduktan sonra artık klavyeden giriş yapıp daha çetrefil işleri
-yapabiliriz.
+Burada çözüm en minimal gereci almak, mesela üzerinde touchpad olan
+(yani sanal fare) kablosuz klavye ama kablosuz bağlantı dongle ile,
+yani RPi'nin USB soketine bağlanan bir ufak özel alıcı var, klavye
+direk bu alıcı ile iletişime geçiyor, böylece Bluetooth vs işleriyle
+Rpi üzerinden kurcalamaya gerek kalmıyor. Alıcıyı takıyorsunuz, pat
+diye klavye ve üzerindeki fare tanınıyor.  Bu olduktan sonra artık
+klavyeden giriş yapıp daha çetrefil işleri yapabiliriz.
 
 Bundan sonrası / daha da iyisi, SSH ile erişim.  Eğer sisteme
 girebildiysek ve ekranda Pi gözüküyorsa şimdi SSH ile başka

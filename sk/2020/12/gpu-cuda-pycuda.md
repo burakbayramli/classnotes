@@ -385,6 +385,53 @@ vektör öğelerine erişmek için kullanılıyor? Cevap evet,
 `scalar_multiply_gpu` çağrısına bakarsak orada 512 tane iş parçacığı
 tanımlandı, vektörün büyüklüğü de aynı.
 
+NVCC
+
+Eğer Çollab içinde `nvcc` işletmek istersek, bunu ünlem ile yapabiliriz,
+
+```
+!nvcc --version
+
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2019 NVIDIA Corporation
+Built on Sun_Jul_28_19:07:16_PDT_2019
+Cuda compilation tools, release 10.1, V10.1.243
+```
+
+C++ kodu yazıp derlemek
+
+```cpp
+%%writefile test.cpp
+#include <stdio.h>
+//Main function
+int main(int Argc,char* Args[]){
+   printf("hello collab");
+   return 0;
+}
+
+Writing test.cpp
+```
+
+
+```
+%%script bash
+
+g++ -std=gnu++17 test.cpp -o test
+ls -laX
+./test
+
+total 32
+drwxr-xr-x 1 root root 4096 Dec 21 17:29 sample_data
+-rwxr-xr-x 1 root root 8304 Dec 25 10:05 test
+drwxr-xr-x 1 root root 4096 Dec 25 10:05 .
+drwxr-xr-x 1 root root 4096 Dec 25 10:04 ..
+drwxr-xr-x 1 root root 4096 Dec 21 17:29 .config
+-rw-r--r-- 1 root root  109 Dec 25 10:05 test.cpp
+hello collab
+```
+
+Bu derlemek işlemini `nvcc` ile de yapabilirdik.
+
 Ilgili
 
 [Jetson Nano](jetson-nano-2GB.md)

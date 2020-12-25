@@ -234,7 +234,7 @@ LIBS=-lm
 OBJ = cat.o ex2.o
      
 %.o: %.cpp
-	$(CC) -c -o $@ $< 
+	$(CC)-c -o $@ $< $(CFLAGS)
 
 kedi.exe: $(OBJ)
 	$(CC) -o $@ $^ $(LIBS) 
@@ -256,8 +256,14 @@ tanımladık, `%.o: %.cpp` tanımı bu işte. Bu kural herhangi bir `o`
 dosyası için hangi komutu işleteceğini biliyor, `$(CC) -c -o ...` diye
 giden komut ile..  Ve `make` böyle geriye geriye gide gide bize
 gereken tüm dosyaları ortaya çıkartacak ve en sonunda `kedi.exe` ile
-nihai `g++` komutunu işletip işler kodu ortaya çıkartacak. İlk
-işlettiğimizde
+nihai `g++` komutunu işletip işler kodu ortaya çıkartacak.
+
+`$(CFLAGS)` su anda bos ama `-I` kullanımı gerekseydi onu `$(CFLAGS)`
+içine koyabilirdik, böylece otomatik olarak derleme işleminin parçası
+haline gelirdi.
+
+
+İlk işlettiğimizde
 
 ```
 g++ -c -o cat.o cat.cpp 
