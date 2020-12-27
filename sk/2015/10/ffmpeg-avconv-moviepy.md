@@ -50,6 +50,12 @@ ffmpeg  -ss 10.0 -t 5.0 -i girdi.mp4 -vf "fps=10,scale=320:-1" -f gif cikti.gif
 10. saniyeden başlayıp 5 saniyelik bir videoyu saniyede 10 kare
 üzerinden ve 320 piksel genişliğinde animasyonlu GİF yapmış olduk.
 
+Ya da
+
+```
+ffmpeg -y  -filter_complex 'fps=10,scale=460:-1:flags=lanczos' -i girdi.mp4 -f gif cikti.gif
+```
+
 GİF içinde yazı yazmak istersek,
 
 ```

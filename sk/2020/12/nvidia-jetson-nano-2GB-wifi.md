@@ -244,9 +244,15 @@ VNC
 
 `ssh -X` ile bağlanınca Nano'da X programlarının çıktısını direk
 bağlandığımız diğer bir makinaya aktarabiliriz, fakat ne yazık ki
-OpenGL görüntüleri bu şekilde aktarılamıyor. Acaip hatalar
-görüyorsunuz, fakat monitörle Nano'ya bağlanınca herşey iyi
-işliyor. Burada çözüm VNC kullanmak.
+ÖpenGL görüntüleri bu şekilde aktarılamıyor. Acaip hatalar
+görüyorsunuz (alttaki paragrafta bir uyarı daha var), fakat monitörle
+Nano'ya bağlanınca herşey iyi işliyor. Burada çözüm VNÇ kullanmak.
+
+Not: OpenGL içeren kodları arka plandaki çıktısını `ssh` üzerinden
+görmek istersek, ve `ssh -X` ile girdiysek grafik çağrıları
+patlar. Grafik çağrıların yok sayılmasını sağlamak için (ki böylece
+`cout` ile eklenen log mesajlarını görebilelim) pür `ssh` ile girmek
+lazım. 
 
 VNC programlarını kullanmışızdır, bu programlar ile bir bilgisayarın
 tüm masaüstünü kendi makinamızda görebiliriz. Nano'da bunu yapmak için
