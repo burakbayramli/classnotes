@@ -275,6 +275,13 @@ benim Ubuntu 18'de `remmina` programı var, bu programa İP adresini
 verip bağlanma metotu olarak VNC seçersek, artık Nano'ya görsel olarak
 bağlanabiliriz.
 
+Bir diğer seçenek, aynen Raspberry Pi durumunda olduğu gibi, ufak bir
+elle tutulan HDMI monitör ve dongle'li klavye/mouse donanımı almak, bu
+ikisini direk Nano'ya bağlayınca her şeyi, hiç dizüstünden geçmeden,
+Nano üzerinde yapabiliriz. Nano tek başına oldukca kuvvetli bir
+bilgisayar, eh kendi Ubuntu'su var, tam tekmilli bir bilgisayar olarak
+kullanılabilir.
+
 Örnek Cuda Kodları
 
 C++ üzerinden CUDA kodlamak için Nano üzerinde bolca örnek var. Bu
