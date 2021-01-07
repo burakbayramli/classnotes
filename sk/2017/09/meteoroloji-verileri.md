@@ -5,16 +5,16 @@ OpenWeatherMap
 Bu Web servisi kayıt olanlara bir APİ anahtarı verir ve belli sayıda
 APİ çağrısı için kullanım bedavadır. Servisten o andaki sıcaklık,
 rüzgar, nem vs gibi verileri alabiliriz, ayrıca bu veriler için
-tahminler de aynı APİ üzerinden paylaşılıyor. 
+tahminler de aynı API üzerinden paylaşılıyor. 
 
 https://openweathermap.org
 
 https://openweathermap.org/api
 
 Yazının geri kalanında bu anahtarı aldığınızı, ve anahtarın `.owmkey`
-adlı bir dosyada olduğunu farzediyoruz.
-
-Altta şu anda `lat,lon` enlem ve boylamlarındaki rüzgar hızı ve yönünü alıyoruz,
+adlı bir dosyada olduğunu farzediyoruz (dikkat, bu anahtar içinde
+key='ASDFASDF' gibi gözükecek bir şey, eğer dosya içine koyarsak son
+satır -newline- olmadan dosyaya yazmak gerekir),
 
 ```python
 import requests, json
@@ -40,14 +40,62 @@ hiz 8.92
 yon 214
 ```
 
+Üstte `lat,lon` enlem ve boylamlarındaki o andaki rüzgar hızı ve
+yönünü aldık.
 
+Daha fazla bilgi `'main'` anahtarı içinde,
 
+```python
+r = requests.get(base_url, params=payload) 
+res = []
+for x in r.iter_lines():
+    x = json.loads(x.decode())
+    res.append (x['main'])
 
+for x in res: print (x)
+```
 
+```text
+{'temp': 12.36, 'feels_like': 5.71, 'temp_min': 12.36, 'temp_max': 12.36, 'pressure': 1015, 'humidity': 76, 'sea_level': 1015, 'grnd_level': 1015}
+```
 
+Tahminler için farklı bir ÜRL / APİ gerekiyor, mesela rüzgar yönü ve yağmur için
 
+```python
+base_url = 'http://api.openweathermap.org/data/2.5/forecast?'
+payload = { 'lat': str(lat), 'lon': str(lon), 'units': 'metric', 'APPID': weatherapi }
+r = requests.get(base_url, params=payload)
+wind = []
+rain = []
+for x in r.iter_lines():
+    x = json.loads(x.decode())
+    for i,xx in enumerate(x['list']):
+        wind.append((xx['dt_txt'], xx.get('wind') ))
+        rain.append((xx['dt_txt'], xx.get('rain') ))
 
+print ('ruzgar')
+for i in range(5): 	
+    print (wind[i])
 
+print ('yagmur')
+for i in range(5): 	
+    print (rain[i])
+```
+
+```text
+ruzgar
+('2021-01-07 12:00:00', {'speed': 10.21, 'deg': 211})
+('2021-01-07 15:00:00', {'speed': 9.37, 'deg': 213})
+('2021-01-07 18:00:00', {'speed': 5.15, 'deg': 250})
+('2021-01-07 21:00:00', {'speed': 2.69, 'deg': 25})
+('2021-01-08 00:00:00', {'speed': 4.66, 'deg': 55})
+yagmur
+('2021-01-07 12:00:00', None)
+('2021-01-07 15:00:00', None)
+('2021-01-07 18:00:00', None)
+('2021-01-07 21:00:00', {'3h': 0.17})
+('2021-01-08 00:00:00', {'3h': 1.08})
+```
 
 ECMWF
 

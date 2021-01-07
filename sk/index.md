@@ -3,6 +3,10 @@
 
 ## En Son
 
+7/1 - [OpenWeatherMap](https://burakbayramli.github.io/dersblog/sk/2017/09/meteoroloji-verileri.html)
+
+7/1 - [Ekler - Haritalama, Izgara, Quiver](https://burakbayramli.github.io/dersblog/sk/2020/02/haritalamak.html)
+
 15/12 - [NVidia Jetson Nano Wifi](https://burakbayramli.github.io/dersblog/sk/2020/12/nvidia-jetson-nano-2GB-wifi.html)
 
 9/12 - [Make](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp.html#make)
