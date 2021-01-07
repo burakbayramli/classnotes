@@ -176,6 +176,22 @@ farklı bir renk vermek iyi olur, benim Nano `.bashrc` de şu satır ekli,
 PS1='${debian_chroot:+($debian_chroot)}\[\033[01;35m\]\u\[\033[01;30m\]@\[\033[01;32m\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 ```
 
+Eğer mesela `matplotlib` kurmak istersek, 
+
+```
+sudo apt install libfreetype6-dev
+
+pip3 install matplotlib==2.0
+```
+
+gerekli. En son matplotlib hata verdi. Kod icinde goruntusuz isletmek icin
+
+```
+import matplotlib; matplotlib.use('Agg')
+```
+
+gerekebilir.
+
 Devam edelim, `tst.py` işletince bizde
 
 ```

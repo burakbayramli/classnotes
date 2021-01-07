@@ -10,7 +10,9 @@ Emacs'te LaTeX modundan direk iPython kodu isletip sonucu metin / grafik olarak 
 
 Kurmak icin once bir sanal ortam yaratin, Python 2, 3 farketmez.
 
-pip ile mock, ipython, matplotlib kurulmali. Matplotlib icin ~/.config/matplotlib/matplotlibrc icinde backend : TxAgg, ya da agg, ya da GTKAgg ya da TkAgg yazmak gerekebilir.
+pip ile mock, ipython, matplotlib kurulmali. Matplotlib icin
+~/.config/matplotlib/matplotlibrc icinde backend : TxAgg, ya da agg,
+ya da GTKAgg ya da TkAgg yazmak gerekebilir.
 
 http://sayilarvekuramlar.blogspot.com/2018/08/virtualenv-python-izole-sanal-calsma.html
 

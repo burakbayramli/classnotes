@@ -1,9 +1,17 @@
 # Haritalamak
 
 Harita grafiklemek için eski `basemap` artık kullanılmıyor, yeni paket
-`cartopy`. Kurmak,
+`cartopy`. Kurmak icin 
 
-`pip install cartopy`
+```
+sudo apt install libproj-dev proj-data proj-bin libgeos-dev
+
+pip install cartopy
+
+pip uninstall shapely
+
+pip install shapely --no-binary shapely
+```
 
 Dünya haritası üzerinde bir nokta
 
@@ -21,7 +29,26 @@ plt.savefig('har1.png')
 ```
 
 ![](har1.png)
-![](https://4.bp.blogspot.com/-ewYmsqMhLBA/XlOhT0jOQLI/AAAAAAAAB6c/eASAITC5i_YdiYXLDoBBpFC6LzuE5JOhgCLcBGAsYHQ/s320/har1.png)
+
+Eger daha yakindan gostermek istersek, ilgilendigimiz bolge uzerinden
+bir kutu yaratabiliriz,
+
+```python
+import cartopy.crs as ccrs
+import cartopy
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+ax.set_global()
+ax.stock_img()
+ax.coastlines()
+ax.plot(42.0, 21.53, 'ro', transform=ccrs.PlateCarree())
+ax.set_extent([30, 50, 10, 30])
+plt.savefig('har3.png')
+```
+
+![](har3.png)
+
 
 Ülke ismi bazlı tüm ülkeyi renklendirmek,
 
@@ -50,7 +77,60 @@ plt.savefig('har2.png')
 ```
 
 ![](har2.png)
-![](https://2.bp.blogspot.com/-0uavwSkj25c/XlOhWkqxoqI/AAAAAAAAB6g/UeutLAQFUwo0AUcGzZ-Th6fIEbiqthv6ACLcBGAsYHQ/s320/har2.png)
+
+Bir kordinate etrafında belli büyüklükte bir alan üzerinde ızgara
+yaratmak ve bu izgaradaki kordinat noktalarını haritada
+göstermek. Paket `geopy` kurulmuş olmalı.
+
+
+```
+import geopy.distance
+import numpy as np
+
+def goto_from_coord(start, distance, bearing):
+    s = geopy.Point(start[0],start[1])
+    d = geopy.distance.geodesic(kilometers = distance)
+    reached = d.destination(point=s, bearing=bearing)
+    return [reached.latitude, reached.longitude]
+
+#lat,lon=40.969901,29.070148
+lat,lon=40.84343206497589, 29.926342357515754
+
+dist = 60
+res1 = goto_from_coord((lat,lon),dist,45)
+print (res1)
+res2 = goto_from_coord((lat,lon),dist,225)
+print (res2)
+
+lowlat = np.min([res1[0],res2[0]])
+lowlon = np.min([res1[1],res2[1]])
+hilat = np.max([res1[0],res2[0]])
+hilon = np.max([res1[1],res2[1]])
+
+x = np.linspace(lowlon,hilon,7)
+y = np.linspace(lowlat,hilat,7)
+
+xx,yy = np.meshgrid(x,y)
+print (xx.flatten())
+
+import cartopy.crs as ccrs
+import cartopy
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+ax.set_global()
+ax.stock_img()
+ax.coastlines()
+ax.plot(lon, lat, 'r.', transform=ccrs.PlateCarree())
+ax.plot(xx.flatten(), yy.flatten(), 'ro', transform=ccrs.PlateCarree())
+ax.set_extent([28, 31, 40, 42])
+plt.savefig('har4.png')
+```
+
+![](har4.png)
+
+
+
 
 
 Kaynaklar
