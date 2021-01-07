@@ -121,16 +121,35 @@ ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 ax.set_global()
 ax.stock_img()
 ax.coastlines()
-ax.plot(lon, lat, 'r.', transform=ccrs.PlateCarree())
-ax.plot(xx.flatten(), yy.flatten(), 'ro', transform=ccrs.PlateCarree())
+ax.plot(xx.flatten(), yy.flatten(), 'r.', transform=ccrs.PlateCarree())
 ax.set_extent([28, 31, 40, 42])
 plt.savefig('har4.png')
 ```
 
 ![](har4.png)
 
+Cartopy haritalari uzerinde klasik matplotlib komutlarini hala
+kullanabiliriz, enlem, boylem kordinatlari y ve x eksenleri haline
+geliyor, ve gerisi bildigimiz gibi. Mesela ok cizmek icin kullanilan
+`quiver` hala gecerli, mesela o izgara noktalarindaki ruzgar yonu
+verisi elimizde olsaydi, bunu harita uzerinde
+grafikleyebilirdik. Altta bu veri `sin` ve `cos` uzerinden uyduruk
+sekilde yaratildi,
 
+```python
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+ax.set_global()
+ax.stock_img()
+ax.coastlines()
+u = np.sin(xx.flatten()*2)
+v = np.cos(yy.flatten()*3)
+ax.quiver(xx.flatten(), yy.flatten(), u, v)
+ax.set_extent([28, 31, 40, 42])
+plt.savefig('har5.png')
+```
 
+![](har5.png)
 
 
 Kaynaklar
