@@ -79,8 +79,8 @@ plt.savefig('har2.png')
 ![](har2.png)
 
 Bir kordinat etrafında belli büyüklükte bir alan üzerinde ızgara
-yaratmak ve bu izgaradaki kordinat noktalarını haritada
-göstermek. Paket `geopy` kurulmuş olmalı.
+yaratmak ve bu izgaradaki kordinat noktalarını haritada göstermek için
+ne yaparız? Paket `geopy` kurulmuş olmalı,
 
 
 ```
@@ -93,7 +93,6 @@ def goto_from_coord(start, distance, bearing):
     reached = d.destination(point=s, bearing=bearing)
     return [reached.latitude, reached.longitude]
 
-#lat,lon=40.969901,29.070148
 lat,lon=40.84343206497589, 29.926342357515754
 
 dist = 60
@@ -131,15 +130,15 @@ plt.savefig('har4.png')
 Nasıl kodladığımızı açıklayalım, önce merkez noktadan sağ üste (45
 derece yönde) 60 km, ve sol alt yönde (225 derece) aynı uzaklıkta
 birer adım atıyoruz, bu dörtgenin iki ucu. Bu üç noktalardan `lingrid`
-sonra `meşhgrid` ile ızgarayı oluşturuyoruz. 
+sonra `meshgrid` ile ızgarayı oluşturuyoruz. 
 
-Cartopy haritalari uzerinde klasik matplotlib komutlarini hala
-kullanabiliriz, enlem, boylem kordinatlari y ve x eksenleri haline
-geliyor, ve gerisi bildigimiz gibi. Mesela ok cizmek icin kullanilan
-`quiver` hala gecerli, mesela o izgara noktalarindaki ruzgar yonu
-verisi elimizde olsaydi, bunu harita uzerinde
-grafikleyebilirdik. Altta bu veri `sin` ve `cos` uzerinden uyduruk
-sekilde yaratildi,
+Cartopy haritaları üzerinde klasik matplotlib komutlarını hala
+kullanabiliriz, enlem, boylam kordinatları y ve x eksenleri haline
+geliyor, ve gerisi bildiğimiz gibi. Mesela ok çizmek için kullanılan
+`quiver` hala geçerli, mesela o ızgara noktalarındaki rüzgar yönü
+verisi elimizde olsaydı, bunu harita üzerinde
+grafikleyebilirdik. Altta bu veri `sin` ve `cos` üzerinden uyduruk
+şekilde yaratıldı,
 
 ```python
 fig = plt.figure()
