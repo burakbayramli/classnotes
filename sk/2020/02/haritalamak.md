@@ -78,7 +78,7 @@ plt.savefig('har2.png')
 
 ![](har2.png)
 
-Bir kordinate etrafında belli büyüklükte bir alan üzerinde ızgara
+Bir kordinat etrafında belli büyüklükte bir alan üzerinde ızgara
 yaratmak ve bu izgaradaki kordinat noktalarını haritada
 göstermek. Paket `geopy` kurulmuş olmalı.
 
@@ -127,6 +127,11 @@ plt.savefig('har4.png')
 ```
 
 ![](har4.png)
+
+Nasıl kodladığımızı açıklayalım, önce merkez noktadan sağ üste (45
+derece yönde) 60 km, ve sol alt yönde (225 derece) aynı uzaklıkta
+birer adım atıyoruz, bu dörtgenin iki ucu. Bu üç noktalardan `lingrid`
+sonra `meşhgrid` ile ızgarayı oluşturuyoruz. 
 
 Cartopy haritalari uzerinde klasik matplotlib komutlarini hala
 kullanabiliriz, enlem, boylem kordinatlari y ve x eksenleri haline

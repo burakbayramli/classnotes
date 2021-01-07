@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
         shutil.copy("_config.yml","/home/burak/Documents/dersblog")
 
-        ignore = " --ignore-list=.git,.zip,.pdf,out.html,.apk,.stl"
+        ignore = " --ignore-list=.git,.zip,.pdf,out.html,.apk,.stl,.key"
         fr = os.getcwd()
         cmd = "python /home/burak/Documents/kod/rsync.py '%s' '%s'  --delete 1" % (fr, TARGET_DIR)
         cmd += ignore
@@ -19,7 +19,7 @@ if __name__ == "__main__":
         os.system(cmd)
 
     if sys.argv[1] == 'years':
-        for year in range(2000,2021):
+        for year in range(2000,2022):
             if year == 2007: continue
             os.system("echo '# %d\n' > %d/index.md" % (year,year))
             os.system("python -u gen.py %d >> %d/index.md" % (year,year))
