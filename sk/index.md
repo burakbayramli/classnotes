@@ -3,7 +3,7 @@
 
 ## En Son
 
-7/1 - [OpenWeatherMap](https://burakbayramli.github.io/dersblog/sk/2017/09/meteoroloji-verileri.html)
+7/1 - [OpenWeatherMap](https://burakbayramli.github.io/dersblog/sk/2017/09/meteoroloji-verileri.md-ecmwf-noaa-openweathermap.html)
 
 7/1 - [Ekler - Haritalama, Izgara, Quiver](https://burakbayramli.github.io/dersblog/sk/2020/02/haritalamak.html)
 

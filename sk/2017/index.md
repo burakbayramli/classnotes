@@ -30,7 +30,7 @@
 
 [Derin Öğrenme, YSA, Teori](09/derin-ogrenme-ysa-teori.md)
 
-[Meteoroloji Verileri - ECMWF, NOAA, OpenWeatherMap](09/meteoroloji-verileri.md)
+[Meteoroloji Verileri - ECMWF, NOAA, OpenWeatherMap](09/meteoroloji-verileri.md-ecmwf-noaa-openweathermap.md)
 
 [OpenAI, Çubuklu Araba, CartPole](09/openai-cubuklu-araba-cartpole.md)
 
