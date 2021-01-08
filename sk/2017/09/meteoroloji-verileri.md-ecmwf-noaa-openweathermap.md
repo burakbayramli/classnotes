@@ -58,7 +58,36 @@ yon 214
 Üstte `lat,lon` enlem ve boylamlarındaki o andaki rüzgar hızı ve
 yönünü aldık.
 
-Daha fazla bilgi `'main'` anahtarı içinde,
+Not: Rüzgar açısı meterolojik, ya da coğrafik açı denen şekilde,
+meteroloji dünyasında kuzeye göre rüzgarın nereden geldiği
+raporlanıyor onların işkolunda, açılar kuzeye göre ayarlanıyor ve saat
+yönüne doğru artıyor. Aritmetik açılar farklı tabii, orada saat yönü
+tersinde artış ve tam sağ / doğu yönde sıfır. Aradaki değişim için
+[7]'yi baz alarak, 
+
+```python
+def geo2arit(geo):
+    if (geo>=0.0) & (geo <90.0): return 270.0-geo
+    elif (geo>=90.0) & (geo<180.0): return 180.0-(geo-90)
+    elif (geo>=180.0) & (geo<270.0): return 90.0-(geo-180)
+    elif (geo>=270.0) & (geo<360.0): return 360.0-(geo-270)
+```
+
+şeklinde bir çevirici kod yazılabilir.
+
+```python
+print (geo2arit(90))
+print (geo2arit(0))
+print (geo2arit(80))
+```
+
+```text
+180.0
+270.0
+190.0
+```
+
+Daha fazla meteorolojik bilgi `'main'` anahtarı içinde,
 
 ```python
 r = requests.get(base_url, params=payload) 
@@ -205,4 +234,6 @@ Kaynaklar
 [5] http://apps.ecmwf.int/datasets/licences/tigge/
 
 [6] http://apps.ecmwf.int/datasets/licences/general
+
+[7] https://www.mathworks.com/help/thingspeak/Visualize-Directional-Data-with-Compass-Plot.html
 
