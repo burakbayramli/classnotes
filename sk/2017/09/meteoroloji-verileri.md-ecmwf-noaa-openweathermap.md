@@ -58,12 +58,12 @@ yon 214
 Üstte `lat,lon` enlem ve boylamlarındaki o andaki rüzgar hızı ve
 yönünü aldık.
 
-Not: Rüzgar açısı meterolojik, ya da coğrafik açı denen şekilde,
+Not: Rüzgar acısı meterolojik, ya da coğrafik acı denen şekilde,
 meteroloji dünyasında kuzeye göre rüzgarın nereden geldiği
-raporlanıyor onların işkolunda, açılar kuzeye göre ayarlanıyor ve saat
-yönüne doğru artıyor. Aritmetik açılar farklı tabii, orada saat yönü
-tersinde artış ve tam sağ / doğu yönde sıfır. Aradaki değişim için
-[7]'yi baz alarak, 
+raporlanıyor, acılar ona göre ayarlanıyor, kuzeyden güneye doğru esen,
+yani tam güneyi gösteren açı sıfır, saat yönüne doğru
+artıyor. Aritmetik acılar farklı tabii, orada saat yönü tersinde artış
+ve tam sağ / doğu yönde sıfır. Aradaki değişim için,
 
 ```python
 def geo2arit(geo):
@@ -235,5 +235,4 @@ Kaynaklar
 
 [6] http://apps.ecmwf.int/datasets/licences/general
 
-[7] https://www.mathworks.com/help/thingspeak/Visualize-Directional-Data-with-Compass-Plot.html
 

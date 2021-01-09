@@ -155,6 +155,15 @@ plt.savefig('har5.png')
 
 ![](har5.png)
 
+Eğer ana enlem, boylamları kordinate eksenleri üzerinde görmek
+istersek, basmadan önce
+
+```
+gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0)
+```
+
+uygulayabiliriz.
+
 
 Kaynaklar
 
