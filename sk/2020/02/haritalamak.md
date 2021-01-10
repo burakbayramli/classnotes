@@ -164,6 +164,31 @@ gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0)
 
 uygulayabiliriz.
 
+Katmanlar
+
+Ustteki karayi ve denizleri gosteren renklendirme sonradan uygulanan
+bir katmandir. Cartopy bu sekilde pek cok farkli bilgiyi katman olarak
+haritalara uygulayabilir. Mesela yol, sehir bilgileri de birer katman
+olarak alinabilir,
+
+```python
+import cartopy.crs as ccrs
+import cartopy
+import cartopy.io.img_tiles
+lat,lon=40.84343206497589, 29.926342357515754
+fig = plt.figure()
+imagery = cartopy.io.img_tiles.OSM()
+ax = fig.add_subplot(projection=imagery.crs)
+zoom = 10
+ax.add_image(imagery, zoom)
+ax.plot(lon, lat, 'ro', transform=ccrs.PlateCarree())
+EXT = 0.1
+ax.set_extent([lon-EXT, lon+EXT, lat-EXT, lat+EXT])
+gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0)
+plt.savefig('har6.png')
+```
+
+![](har6.png)
 
 Kaynaklar
 
