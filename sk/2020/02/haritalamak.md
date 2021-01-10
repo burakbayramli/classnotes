@@ -166,10 +166,10 @@ uygulayabiliriz.
 
 Katmanlar
 
-Ustteki karayi ve denizleri gosteren renklendirme sonradan uygulanan
-bir katmandir. Cartopy bu sekilde pek cok farkli bilgiyi katman olarak
+Üstteki karayı ve denizleri gösteren renklendirme sonradan uygulanan
+bir katmandır. Cartopy bu şekilde pek çok farklı bilgiyi katman olarak
 haritalara uygulayabilir. Mesela yol, sehir bilgileri de birer katman
-olarak alinabilir,
+olarak alttaki gibi alınabilir,
 
 ```python
 import cartopy.crs as ccrs
