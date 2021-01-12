@@ -314,6 +314,23 @@ olacaktır. Mesela `samples/5_Simulations/oceanFFT` altında
 `./oceanFFT` örneğini işletebiliriz, Nano monitöründen ya da VNC
 üzerinden görebiliriz, su simulasyonu gayet güzel görülüyor.
 
+Particles
+
+Bu örnek kodlardan partıcles adlı projenin görsel kodları mümkün
+olduğu kadar çıkartılmış hali altta bulunabilir,
+
+[Makefile](particles/Makefile),
+[particles.cpp](particles/particles.cpp)
+[particles_kernel.cuh](particles/particles_kernel.cuh),
+[particles_kernel_impl.cuh](particles/particles_kernel_impl.cuh),
+[particleSystem.cpp](particles/particleSystem.cpp),
+[particleSystem_cuda.cu](particles/particleSystem_cuda.cu),
+[particleSystem.cuh](particles/particleSystem.cuh),
+[particleSystem.h](particles/particleSystem.h),
+[view.py](view.py)
+
+
+
 Kaynaklar
 
 [1] https://imadelhanafi.com/posts/jetson_nano_setup/

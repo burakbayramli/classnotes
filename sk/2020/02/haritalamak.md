@@ -129,7 +129,7 @@ plt.savefig('har4.png')
 
 Nasıl kodladığımızı açıklayalım, önce merkez noktadan sağ üste (45
 derece yönde) 60 km, ve sol alt yönde (225 derece) aynı uzaklıkta
-birer adım atıyoruz, bu dörtgenin iki ucu. Bu üç noktalardan `lingrid`
+birer adım atıyoruz, bu dörtgenin iki ucu. Bu uç noktalardan `lingrid`
 sonra `meshgrid` ile ızgarayı oluşturuyoruz. 
 
 Cartopy haritaları üzerinde klasik matplotlib komutlarını hala
@@ -199,6 +199,3 @@ https://scitools.org.uk/cartopy/docs/latest/gallery/global_map.html#sphx-glr-gal
 https://github.com/SciTools/cartopy/issues/1303
 
 Renk isimleri - https://matplotlib.org/3.1.0/gallery/color/named_colors.html
-
-
-
