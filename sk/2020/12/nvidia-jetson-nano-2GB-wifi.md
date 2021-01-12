@@ -327,7 +327,7 @@ olduğu kadar çıkartılmış hali altta bulunabilir,
 [particleSystem_cuda.cu](particles/particleSystem_cuda.cu),
 [particleSystem.cuh](particles/particleSystem.cuh),
 [particleSystem.h](particles/particleSystem.h),
-[view.py](view.py)
+[view.py](particles/view.py)
 
 
 
