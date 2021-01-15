@@ -67,6 +67,7 @@ ve tam sağ / doğu yönde sıfır. Aradaki değişim için,
 
 ```python
 def geo2arit(geo):
+    if geo==360: geo=0
     if (geo>=0.0) & (geo <90.0): return 270.0-geo
     elif (geo>=90.0) & (geo<180.0): return 180.0-(geo-90)
     elif (geo>=180.0) & (geo<270.0): return 90.0-(geo-180)
