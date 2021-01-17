@@ -183,7 +183,7 @@ cbb = {
 grids = {}
 for k in cbb.keys():
     boxlon1,boxlat1,boxlon2,boxlat2 = cbb[k][1]
-    print (boxlon1,boxlat1,boxlon2,boxlat2)
+    #print (boxlon1,boxlat1,boxlon2,boxlat2)
     latlow = int(np.min([boxlat1,boxlat2]))
     lonlow = int(np.min([boxlon1,boxlon2]))
     lathigh = int(np.max([boxlat1,boxlat2])+1)
@@ -195,3 +195,20 @@ for k in cbb.keys():
     
 print (len(grids))
 ```
+
+```text
+41171
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
