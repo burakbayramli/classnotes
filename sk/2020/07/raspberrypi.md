@@ -111,32 +111,17 @@ birbirlerini bulabilirler.
 
 Taşınabilir RPi 
 
-Çok az miktarda elektronik aletle, mesela kampta vs, seyahat etmek
+Çok az mıktarda elektronik aletle, mesela kampta vs, seyahat etmek
 isteyenler, cep telefonuna bir SSH müşteri programı kurup onun
 üzerinden RPi'ye komut satırından bağlanabilir. RPi tam tekmilli bir
-Linux olduğu için istenen her ağır işlem burada gerçekleştirilir, pür
-metin bazlı Emacs kullanmak mümkün, `emacs -nw` ile. SSH programı
-olarak Android'da Juice SSH tavsiye edilir. Böylece yanımızda
-taşınabilen hafif bir Linux'a kavuşmuş oluyoruz. Pi uzerindeki SSD 64,
-256 GB bile olabilir, disk problemi olmaz. Ayrica Pi cok rahat sekilde
-(Ubuntu oldugu icin) her turlu harici diske erisebilir.
-
-Fakat SSH'den daha iyi bir erişim yine kablosuz klavye ile RPi'ye
-baglanmak, ve onun ekran görüntüsünü sanal ekran ile tamamen Android'e
-taşımak. Kurulum için RPi'a girip [5]'te anlatılan adımları atarız,
-
-```
-sudo apt update
-sudo apt install realvnc-vnc-server realvnc-vnc-viewer
-```
-
-Şimdi Menü | Preferences | Raspberry Pi Configuration | İnterfaces
-seçiminden VNC'ye gideriz ve onu Enabled haline getiririz.
-
-Artık Android'de müşteri programını kurabiliriz. Google Play'den
-RealVNC şirketinin VNC Viewer programı kurulur. Bağlantı için
-RPi'mizin IP adresini veririz, ve bağlantıyı kurarız. Kullanıcı /
-şifre için RPi Unix kullanıcı ve şifresi yeterli.
+Linux olduğu için istenen her ağır işlem burada gerçekleştirilir, HDMİ
+özellikli taşınabilir ufak monitörler var, bu bağlanır, enerji kaynağı
+olarak herhangi bir taşınabilir pil, powerbank, RPi işletebiliyor. Pi
+üzerindeki SSD 64, 256 GB bile olabilir, disk problemi olmaz. Ayrıca
+Pi çok rahat şekilde (Ubuntu olduğu için) her türlü harici diske
+erisebilir. Kablosuz klavye ile RPi'ye bağlanabiliyoruz, bu durumda
+neredeyse dizüstü bilgisayara eşdeğer bir sistem elde edebilmiş
+oluruz.
 
 Pin Kontrolu, Ilk Program
 
@@ -226,4 +211,3 @@ Kaynaklar
 
 [4] https://www.raspberrypi.org/documentation/hardware/raspberrypi/power/README.md
 
-[5] VNC (Virtual Network Computing), https://www.raspberrypi.org/documentation/remote-access/vnc/README.md

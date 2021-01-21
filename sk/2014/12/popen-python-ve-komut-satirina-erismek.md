@@ -16,7 +16,9 @@ tavsiye ediliyor,
 
 ```
 import subprocess 
-p = subprocess.Popen(['ls','-al'], stdout=subprocess.PIPE)res = p.stdout.read()print res
+p = subprocess.Popen(['ls','-al'], stdout=subprocess.PIPE)
+res = p.stdout.read()
+print (res)
 ```
 
 İş biraz daha zorlaştı ama kullana kullana alışılabilir. 
