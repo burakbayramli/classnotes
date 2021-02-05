@@ -36,10 +36,3 @@ for line in p.stdout:
 
 Üstteki komut  her satırı ayrı ayrı, Python döngüsü içinde basacak. 
 
-
-
-
-
-
-
-

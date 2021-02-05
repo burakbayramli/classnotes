@@ -28,6 +28,3 @@ iPython ortami hakikaten bilim, veri analizi, vb. kullanimlar icin
 ideal bir ortam haline geliyor.
 
 
-
-
-
