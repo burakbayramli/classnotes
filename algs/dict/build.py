@@ -1,3 +1,3 @@
 import os
 
-os.system("pdflatex -shell-escape dict.tex -output-directory /tmp")
+os.system("pdflatex -output-directory=/tmp -shell-escape dict.tex ")
