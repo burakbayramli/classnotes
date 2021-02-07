@@ -2,9 +2,11 @@
 \begin{document}
 Hesapsal Sıvı Dinamiği (Computational Fluid Dynamics -CFD-) - 1
 
-Tek boyutlu lineer taşınım akımı (convection), ya da tek boyutlu lineer yatay
-iletim (advection), CFD hakkında bir şeyler öğrenmek için güzel fırsatlar
-içeriyor. Bu ufak denklemin bize ne kadar çok şey öğreteceğini görmek bizi
+Tek Boyutlu Lineer Taşınım Akımı (Convection)
+
+Tek boyutlu lineer taşınım akımı, ya da tek boyutlu lineer yatay iletim
+(advection), CFD hakkında bir şeyler öğrenmek için güzel fırsatlar içeriyor. Bu
+ufak denklemin bize ne kadar çok şey öğreteceğini görmek bizi
 şaşırtabilir. Denklem,
 
 $$
@@ -83,19 +85,22 @@ plt.savefig('compscieng_app45cfd1_01.png')
 Üstteki bir fonksiyon türü aslında, ona görüntüsü sebebiyle ``şapka fonksiyonu''
 ismi de veriliyor.
 
-Şimdi tasinim akımı denkleminin ayrıksal kodlamasına gelelim, burada sonlu
+Şimdi taşınım akımı denkleminin ayrıksal kodlamasına gelelim, burada sonlu
 farklılık (finite difference) yaklaşımı kullanıyoruz, $u$ vektörü içindeki her
 öge için (1) formülünü işleteceğiz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-un = np.ones(nx)
-for n in range(nt):
-    un = u.copy() 
-    for i in range(1, nx):
-        u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])
+def advect1d(nx,nt,u,dt,dx):
+  un = np.ones(nx)
+  for n in range(nt):
+      un = u.copy() 
+      for i in range(1, nx):
+          u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])
+          
+advect1d(nx,nt,u,dt,dx)
 \end{minted}
 
-Ustteki islemle zamani ileri sardik ve fonksiyon belli bir noktaya geldi. Nereye
+Üstteki işlemle zamanı ileri sardık ve fonksiyon belli bir noktaya geldi. Nereye
 geldi?
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -110,16 +115,51 @@ bir şapka değil. Ne oldu? Sonuç yaklaşık temsilin kalitesiyle alakalı, \ve
 ve \verb!dt! küçültüldükçe kalite artacaktır, ve şapkaya daha çok benzeyen
 sonuçlar görülecektir. 
 
+Gayrı Lineer Taşınım Akımı (Nonlinear Convection)
 
+Şimdi biraz önceki teknikleri kullanarak gayrı lineer taşınım akımı
+kodlayacağız, tek boyutta denklem,
 
+$$
+\frac{\partial u}{\partial t} +
+u  \frac{\partial u}{\partial c}  = 0
+$$
 
+Dikkat edersek önceki denklemdeki $c$ ile çarpım yerine şimdi $u$ ile çarpım
+var, bu sebeple formülün ikinci terimi gayrı lineer hale geldi. Eğer
+ayrıksallaştırma işlemini tekrar uygularsak, alttaki sonuca erişiriz,
 
+$$
+u_i^{n+1} = u_i^n -  u_i^n \frac{\Delta t}{\Delta x} ( u_i^n - u_{i-1}^n )
+$$
 
+\begin{minted}[fontsize=\footnotesize]{python}
+nx = 41
+dx = 2 / (nx - 1)
+nt = 20
+dt = .025 
+u = np.ones(nx)
+u[int(.5 / dx) : int(1 / dx + 1)] = 2  
+un = np.ones(nx)
+\end{minted}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+def advectnl(nx,nt,u,dt,dx):
+  un = np.ones(nx)
+  for n in range(nt):
+      un = u.copy() 
+      for i in range(1, nx):
+          u[i] = un[i] - un[i] * dt / dx * (un[i] - un[i-1])
+          
+advectnl(nx,nt,u,dt,dx)
+\end{minted}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(np.linspace(0, 2, nx), u);
+plt.savefig('compscieng_app45cfd1_03.png')
+\end{minted}
 
-
-
+\includegraphics[width=20em]{compscieng_app45cfd1_03.png}
 
 
 [devam edecek]
