@@ -90,14 +90,11 @@ farklılık (finite difference) yaklaşımı kullanıyoruz, $u$ vektörü içind
 öge için (1) formülünü işleteceğiz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-def advect1d(nx,nt,u,dt,dx):
-  un = np.ones(nx)
-  for n in range(nt):
-      un = u.copy() 
-      for i in range(1, nx):
-          u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])
-          
-advect1d(nx,nt,u,dt,dx)
+un = np.ones(nx)
+for n in range(nt):
+    un = u.copy() 
+    for i in range(1, nx):
+        u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])        
 \end{minted}
 
 Üstteki işlemle zamanı ileri sardık ve fonksiyon belli bir noktaya geldi. Nereye
@@ -144,14 +141,11 @@ un = np.ones(nx)
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-def advectnl(nx,nt,u,dt,dx):
-  un = np.ones(nx)
-  for n in range(nt):
-      un = u.copy() 
-      for i in range(1, nx):
-          u[i] = un[i] - un[i] * dt / dx * (un[i] - un[i-1])
-          
-advectnl(nx,nt,u,dt,dx)
+un = np.ones(nx)
+for n in range(nt):
+    un = u.copy() 
+    for i in range(1, nx):
+        u[i] = un[i] - un[i] * dt / dx * (un[i] - un[i-1])        
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -160,6 +154,74 @@ plt.savefig('compscieng_app45cfd1_03.png')
 \end{minted}
 
 \includegraphics[width=20em]{compscieng_app45cfd1_03.png}
+
+Yakınsama (Convergence)
+
+Lineer tasinim hesabında ortaya çıkan tepe şeklinin izgara çözünülürlüğü ile
+alakalı olduğunu söylemiştik. Bunu birkaç farklı çözünürlük ile deneyerek
+görelim. İlk gördüğümüz sonuç \verb!nx=41! kullandı. Arttıralım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def linearconv(nx):
+    dx = 2 / (nx - 1)
+    nt = 20    
+    dt = .025  
+    c = 1
+
+    u = np.ones(nx)
+    u[int(.5/dx):int(1 / dx + 1)] = 2  
+
+    un = np.ones(nx)
+
+    for n in range(nt):
+        un = u.copy() 
+        for i in range(1, nx):
+            u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])
+        
+    plt.plot(np.linspace(0, 2, nx), u);
+
+linearconv(61)
+plt.savefig('compscieng_app45cfd1_04.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app45cfd1_04.png}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+linearconv(71)
+plt.savefig('compscieng_app45cfd1_05.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app45cfd1_05.png}
+
+Gittikçe daha fazla şapka fonsiyonuna benzer sonuçlar alıyoruz. Şimdi dikkat,
+bir kez daha arttıralım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+linearconv(85)
+plt.savefig('compscieng_app45cfd1_06.png')
+\end{minted}
+
+\includegraphics[width=20em]{compscieng_app45cfd1_06.png}
+
+Bu sonuc sapka fonksiyonuna benzemiyor. Ne oldu?
+
+Hesaplananları düşünürsek, yer ekseni üzerinde dalganın hareketini hesaplıyoruz,
+fakat her adımda $\Delta t = 0.025$ farzederk bu hesapları yapıyoruz. Üstteki
+yanlış sonuçta $\Delta t$ zaman aralığında öyle bir adım attık ki bu adım
+\verb!dx!'in büyüklüğünden daha fazla. Bu durum ilk denemelerde ortaya çıkmadı
+çünkü \verb!dx! yeterince büyük tutulmuştu. Fakat onu küçültükçe bir noktada
+hesap patladı. 
+
+
+
+
+
+
+
+
+
+
+
 
 
 [devam edecek]
