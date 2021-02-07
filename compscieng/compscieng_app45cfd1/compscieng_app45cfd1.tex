@@ -42,6 +42,7 @@ düzenlersek bilinmeyen için yeni bir formül elde edebiliriz,
 
 $$
 u_i^{n+1} = u_i^n - c \frac{\Delta t}{\Delta x} ( u_i^n - u_{i-1}^n )
+\mlabel{1}
 $$
 
 Yeri temsil eden $x$ eksenini Eşit aralıklı parçalara böleceğiz, bir tek boyutlu
@@ -50,7 +51,7 @@ noktası olduğunu tanımlayacak, \verb!dx! iki nokta arasındaki uzaklık.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import time, sys
-nx = 41  
+nx = 41
 dx = 2 / (nx-1)
 nt = 25  
 dt = .025
@@ -72,14 +73,42 @@ print(u)
  1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
 \end{verbatim}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(np.linspace(0, 2, nx), u);
+plt.savefig('compscieng_app45cfd1_01.png')
+\end{minted}
 
+\includegraphics[width=20em]{compscieng_app45cfd1_01.png}
 
+Üstteki bir fonksiyon türü aslında, ona görüntüsü sebebiyle ``şapka fonksiyonu''
+ismi de veriliyor.
 
+Şimdi tasinim akımı denkleminin ayrıksal kodlamasına gelelim, burada sonlu
+farklılık (finite difference) yaklaşımı kullanıyoruz, $u$ vektörü içindeki her
+öge için (1) formülünü işleteceğiz.
 
+\begin{minted}[fontsize=\footnotesize]{python}
+un = np.ones(nx)
+for n in range(nt):
+    un = u.copy() 
+    for i in range(1, nx):
+        u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])
+\end{minted}
 
+Ustteki islemle zamani ileri sardik ve fonksiyon belli bir noktaya geldi. Nereye
+geldi?
 
+\begin{minted}[fontsize=\footnotesize]{python}
+plt.plot(np.linspace(0, 2, nx), u);
+plt.savefig('compscieng_app45cfd1_02.png')
+\end{minted}
 
+\includegraphics[width=20em]{compscieng_app45cfd1_02.png}
 
+Evet, başlangıç fonksiyonu hakikaten sağa doğru taşındı. Fakat artık fonksiyon
+bir şapka değil. Ne oldu? Sonuç yaklaşık temsilin kalitesiyle alakalı, \verb!dx!
+ve \verb!dt! küçültüldükçe kalite artacaktır, ve şapkaya daha çok benzeyen
+sonuçlar görülecektir. 
 
 
 
