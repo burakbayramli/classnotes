@@ -3,6 +3,8 @@
 
 ## En Son
 
+8/2 - [Hesapsal Sıvı Dinamiği, Giriş](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfd1/hesapsal_sivi_dinamigi__computational_fluid_dynamics_cfd___1.html)
+
 7/1 - [OpenWeatherMap](https://burakbayramli.github.io/dersblog/sk/2017/09/meteoroloji-verileri.md-ecmwf-noaa-openweathermap.html)
 
 7/1 - [Ekler - Haritalama, Izgara, Quiver](https://burakbayramli.github.io/dersblog/sk/2020/02/haritalamak.html)
@@ -12,10 +14,6 @@
 9/12 - [Make](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp.html#make)
 
 5/12 - [GPU, CUDA, PyCuda](https://burakbayramli.github.io/dersblog/sk/2020/12/gpu-cuda-pycuda.html)
-
-2/12 - [SPHSim Github](https://github.com/burakbayramli/simsph)
-
-19/11 - [Üç Boyutlu Grafikler İçin Mayavi](https://burakbayramli.github.io/dersblog/sk/2020/11/mayavi-3d.html)
 
 
 ## Konular, Referans
