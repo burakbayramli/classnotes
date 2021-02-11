@@ -3,7 +3,9 @@
 
 ## En Son
 
-8/2 - [Hesapsal Sıvı Dinamiği, Giriş](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfd1/hesapsal_sivi_dinamigi__computational_fluid_dynamics_cfd___1.html)
+11/2 - [Hesapsal Sıvı Dinamiği, 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfd2/hesapsal_sivi_dinamigi__computational_fluid_dynamics_cfd___2.html)
+
+8/2 - [Hesapsal Sıvı Dinamiği, 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfd1/hesapsal_sivi_dinamigi__computational_fluid_dynamics_cfd___1.html)
 
 7/1 - [OpenWeatherMap](https://burakbayramli.github.io/dersblog/sk/2017/09/meteoroloji-verileri.md-ecmwf-noaa-openweathermap.html)
 
@@ -12,8 +14,6 @@
 15/12 - [NVidia Jetson Nano Wifi](https://burakbayramli.github.io/dersblog/sk/2020/12/nvidia-jetson-nano-2GB-wifi.html)
 
 9/12 - [Make](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp.html#make)
-
-5/12 - [GPU, CUDA, PyCuda](https://burakbayramli.github.io/dersblog/sk/2020/12/gpu-cuda-pycuda.html)
 
 
 ## Konular, Referans
