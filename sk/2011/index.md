@@ -16,7 +16,7 @@
 
 [String Birlestirmek](03/string-birlestirmek.md)
 
-[USGS Deprem Verileri - pyearthquake](03/usgs-deprem-verileri-pyearthquake.md)
+[USGS Deprem Verileri](03/usgs-deprem-verileri.md)
 
 [$.getJSON Hata Durumlari](04/getjson-hata-durumlari.md)
 

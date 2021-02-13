@@ -3,9 +3,9 @@
 
 ## En Son
 
-11/2 - [Hesapsal Sıvı Dinamiği, 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfd2/hesapsal_sivi_dinamigi__computational_fluid_dynamics_cfd___2.html)
+13/2 - [Deprem Verileri USGS](https://burakbayramli.github.io/dersblog/sk/2011/01/usgs-deprem-verileri.html)
 
-8/2 - [Hesapsal Sıvı Dinamiği, 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfd1/hesapsal_sivi_dinamigi__computational_fluid_dynamics_cfd___1.html)
+11/2 - [Hesapsal Sıvı Dinamiği](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfdintro/hesapsal_sivi_dinamigine__computational_fluid_dynamics_cfd__giris_.html)
 
 7/1 - [OpenWeatherMap](https://burakbayramli.github.io/dersblog/sk/2017/09/meteoroloji-verileri.md-ecmwf-noaa-openweathermap.html)
 
