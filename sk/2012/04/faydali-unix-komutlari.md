@@ -183,7 +183,16 @@ Programın sonuçlarını hem ekrana basmak aynı anda bir log dosyasına yazmak
 sh script.sh  2>&1 | tee out.log
 ```
 
+Buyuk Dosyalar
 
+```
+sudo du -hx --max-depth=1 .
+```
 
+Dizin bazında kullanım raporu verir.
 
+Eğer dosya büyüklüğüne göre sıralı liste istersek (içinde olduğumuz dizinde)
 
+```
+sudo du -hb --max-depth=2 . | sort -n
+```
