@@ -81,11 +81,11 @@ kordinatı, vs. gibi ek detaylar var, bunlar alınıp farklı şekillerde
 kullanılabilir.
 
 İlginç bir deprem haritalama denemesi şöyle olabilir; son 90 gündeki
-depremleri al haritada gösterelim, renkleme en eski daha açık en yakın
-daha köyü olacak şekilde, ve şiddeti çember büyüklüğü üzerinden
-gösterelim göstermek. Böylece renklerin nereye doğru koyulaştığına
-bakarak bir zamansal ilinti yakalamayı umuyoruz, aynı şekilde şiddete
-bakarak burada da yersel zamansal bir kalıp görebilmeyi umuyoruz.
+depremleri alıp haritada gösterelim; renkleme en eski daha açık, en
+yakın daha koyu olacak şekilde, ve şiddeti çember büyüklüğü üzerinden
+gösterelsin. Böylece renklerin nereye doğru koyulaştığına bakarak bir
+zamansal ilinti yakalamayı umuyoruz, aynı şekilde şiddete bakarak
+burada da yersel zamansal bir kalıp görebilmeyi umuyoruz.
 
 Önce veriyi al, kaydet, 
 
