@@ -19,10 +19,5 @@ elif sys.argv[1] == 'clean':
 
 elif sys.argv[1] == 'tex':
     file = glob.glob('compscieng_*.tex')
-    os.system("pdflatex -shell-escape %s" % file[0])
-    d = "/data/data/com.termux/files/home/storage/downloads"
-    if os.path.isdir(d):
-        ff = file[0].replace(".tex",".pdf")
-        shutil.copy(ff,d)
     
     

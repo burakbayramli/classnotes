@@ -6,7 +6,7 @@ d = os.environ['HOME']
 if len(sys.argv) == 1:
     cmd = "pdfunite " + pdfs + " " + d + "/Downloads/phy.pdf"
     os.system(cmd)
-    exit()    
+
 elif sys.argv[1] == 'all':
     for a in sorted(glob.glob("phy*")):
         os.chdir(a)
