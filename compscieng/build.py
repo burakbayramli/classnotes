@@ -19,5 +19,6 @@ elif sys.argv[1] == 'clean':
 
 elif sys.argv[1] == 'tex':
     file = glob.glob('compscieng_*.tex')
+    os.system("pdflatex -shell-escape %s" % file[0])
     
     
