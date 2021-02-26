@@ -3,6 +3,8 @@
 
 ## En Son
 
+26/2 - [Trigonometri](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_98_app/ekler.html#trig)
+
 13/2 - [Deprem Verileri USGS](https://burakbayramli.github.io/dersblog/sk/2011/03/usgs-deprem-verileri.html)
 
 11/2 - [Hesapsal Sıvı Dinamiği](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfdintro/hesapsal_sivi_dinamigine__computational_fluid_dynamics_cfd__giris_.html)
@@ -12,8 +14,6 @@
 7/1 - [Ekler - Haritalama, Izgara, Quiver](https://burakbayramli.github.io/dersblog/sk/2020/02/haritalamak.html)
 
 15/12 - [NVidia Jetson Nano Wifi](https://burakbayramli.github.io/dersblog/sk/2020/12/nvidia-jetson-nano-2GB-wifi.html)
-
-9/12 - [Make](https://burakbayramli.github.io/dersblog/sk/2020/11/cpp.html#make)
 
 
 ## Konular, Referans
