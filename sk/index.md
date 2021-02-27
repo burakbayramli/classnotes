@@ -34,6 +34,8 @@
 
 [Youtube Kanalım](https://www.youtube.com/channel/UCMAUsgUq5ODy8kMnJlUBUdQ)
 
+[Github Depoları](https://github.com/burakbayramli)
+
 [Animasyonlu Matematik](https://www.youtube.com/channel/UCx64ou5qw0Q9LLkwE8xSNEg)
 
 [Tüm Matematik Içeriği](https://burakbayramli.github.io/dersblog/)
