@@ -125,17 +125,69 @@ $$
 \frac{\partial y} {\partial t}(x,t=0) =0
 $$
 
-Cozume bu sartlarla baslayabilirdik ama bastaki problem tanimini hatirlarsak ek
-bazi sartlar daha koymustuk, bu sartlar, kisitlamalar her an icin gecerli,
-ipler iki ucundan (hareket etmeyen) duvarlara bagli.
+Çözüme bu şartlarla başlayabilirdik ama baştaki problem tanımını hatırlarsak ek
+bazı şartlar daha koymuştuk, bu şartlar, kısıtlamalar her an için geçerli,
+ipler iki ucundan (hareket etmeyen) duvarlara bağlı.
 
 $$
 y(0,t) \equiv 0, \quad y(L,t) \equiv 0
 $$
 
-[analitik çözüm atlandi]
+[analitik çözüm atlandı]
+
+Yaklaşıksal hesap için $x,t$ eksenleri düşünebiliriz, ve bu eksenlerde
+sadece belli noktalardaki hesaplar yapılacak, $x$ için aralıklar $\Delta x$
+genişliğinde, $t$ için $\Delta t$ genişliğinde, aralık büyüklüğünü biz
+tanımlayacağız. Yani hesap noktaları $i=1,2,3,...$ için $i \Delta t$'de,
+$x$ için $j=1,2,..$ ile $j \Delta t$'de.
 
 \includegraphics[width=20em]{compscieng_app17wave_03.png}
+
+Yaklaşıksallıkta bir diğer kullanılacak teknik merkezi farklılıklar, burada $x$
+için sola/sağa, $t$ için yukarı/aşağı olacak şekilde iki Taylor açılımı
+yapıyoruz,
+
+
+$$
+y(x +\Delta x, t)  = y(x,t) +
+\frac{\partial U}{\partial x}\Delta x + \frac{1}{2}
+\frac{\partial^2 U}{\partial x^2}(\Delta x)^2 + \cdots
+$$
+
+$$
+y(x -\Delta x, t)  = y(x,t) -
+\frac{\partial U}{\partial x} \Delta x + \frac{1} {2}
+\frac{\partial^2 U}{\partial x^2} (\Delta x)^2 - \cdots
+$$
+
+$$
+y(x, y +\Delta t)  = y(x,t) +
+\frac{\partial U}{\partial t}\Delta y + \frac{1}{2}
+\frac{\partial^2 U}{\partial t^2}(\Delta t)^2 + \cdots
+$$
+
+$$
+y(x, y -\Delta t) = y(x,t) -
+\frac{\partial U}{\partial t} \Delta t + \frac{1} {2}
+\frac{\partial^2 U}{\partial t^2} (\Delta t)^2 - \cdots
+$$
+
+Noktalı yerlerdeki terimleri yok sayıyoruz (2. derece yaklaşıklama yapmış olduk
+yani, bu önelmi, yaklaşı temsilin kuvvetini gösteriyor bir anlamda), sonra her
+değişkenin iki açılımını birbiri ile topluyoruz. Toplama sonrası tek sayı
+terimlerinin iptal olduğunu görürüz, ve kalanlar,
+
+$$
+\frac{\partial^2 y(x,t)}{\partial x^2} \simeq
+\frac{y(x+\Delta x,t)+y(x-\Delta x,t)-2 y(x,t)}{(\Delta x)^2}
+$$
+
+$$
+\frac{\partial^2 y(x,t)}{\partial t^2} \simeq
+\frac{y(x,t+\Delta t) +y(x, y-\Delta t)-2 y(x,t)}{(\Delta t)^2}
+$$
+
+olacaktır. İndisler üzerinden belirtirsek,
 
 $$
 \frac{\partial^2 y }{\partial t^2} \simeq
@@ -144,12 +196,57 @@ $$
 \frac{y_{i+1,j}+y_{i-1,j}-2 y_{i,j}} {(\Delta x)^2}.
 $$
 
+Üstteki formülleri dalga denklemindeki yerlerine koyarsak,
+
 $$
 \frac{y_{i,j+1}+y_{i,j-1}-2 y_{i,j}} {c^2 (\Delta t)^2}  =
 \frac{y_{i+1,j}+y_{i-1,j}-2 y_{i,j}} {(\Delta x)^2}
 $$
 
+Tabii dikkat edersek geçmiş $j-1$ ve gelecek $j+1$ birbirine karışmış durumda,
+bize lazım olan geleceğin hesabının eşitliğin sol tarafında olması geri kalan
+her şey sağda olacak şekilde tekrar düzenlersek,
 
+$$
+y_{i,j+1}  = 2 y_{i,j}-y_{i,j-1}+ \frac{c^2 } {c'^{2}}
+\left [ y_{i+1,j}+y_{i-1,j}-2 y_{i,j}\right], \quad c' { = }
+\frac {\Delta x}{\Delta t}
+\mlabel{1}
+$$
+
+Hesap için üstteki resmi hatırlayalım, $i,j+1$ hücresine dört diğer hücreden ok
+çizilmiş, aslında bu oklar üstteki formülün hesabını anlatıyor, o anki $t$
+zamanından üç hesap ve geçmişten $i,j-1$ hesabına bakarak gelecekteki değeri
+hesaplıyoruz. Bu hesaplama çok verimli olacak çünkü herhangi bir anda hafızada
+tutulması gereken $y(i,j)$ haricinde sadece üç tane değer var. 
+
+Son bir problem başlangıç değerleriyle alakalı, resimdeki bilinmesi gereken o üç
+hücrenin başlangıç $j=1$ anında olduğunu düşünürsek, ve $j=2$'yi hesaplamamız
+gerekiyor, eksi zamana doğru bir gidişat lazım, yani $j=-1$ zamanı. Başlangıç
+bilgisi $j=1$ var, ama $j=-1$ yok. Buradaki bilgiyi nasıl alacağız?
+
+Denklemsel olarak bir ek koşul daha ekleyerek, ilk başta hem teli çekip üçgen
+haline getirmiştik, bir de başlangıç anında telin hızı sıfırdır diyeceğiz. Bu
+mantıksız değil, tel çekildi, tutuluyor.. hareket yok. Denklem olarak
+$\partial y / \partial t(x,0)$ sıfır diyeceğiz. Sonra bu denklemin merkezi
+farklılık açılımını yapacağız ve oradan gelen eşitlikleri ana (1)'e sokarak
+sadece $j=2$ için özel bir formül elde etmeyi umuyoruz.
+
+$$
+\frac{\partial y}{\partial t}(x,0) \simeq
+\frac{y(x, \Delta t)- y(x, -\Delta t)}{2\Delta t}=0, \
+\Rightarrow \ y_{i, 0} = y_{i,2}
+$$
+
+(1)'e sokunca
+
+$$
+y_{i,2} = y_{i,1}+ \frac{c^2} {2c'^2}
+\left [ y_{i+1,1}+y_{i-1,1}-2 y_{i,1}\right]
+$$
+
+Dikkat bu denklem sadece $j=2$ için. Bundan sonraki her $j$ için ana (1) formülü
+işleyecektir.
 
 
 
@@ -174,8 +271,6 @@ Kaynaklar
 [4] Feldman, {\em Math 256, Differential Equations, Lecture Notes}
     \url{http://www.math.ubc.ca/~feldman/m256/}
 
-[5] Bayramli, {\em Normal Diferansiyel Denklemler Ders Notlari, Ekler, Trigonometri}
+[5] Bayramlı, {\em Normal Diferansiyel Denklemler Ders Notlari, Ekler, Trigonometri}
     
 \end{document}
-
-
