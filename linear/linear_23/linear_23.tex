@@ -416,9 +416,155 @@ $$
 \end{array}\right]
  $$
 
+Alternatif Anlatım
+
+$y(0)$ başlangıç şartına uygun $y' = Ay$ diferansiyel denklemini çözmek için
+$A$'nin özvektör/değerleri kullanılabilir. Çözümler $y = e^{\lambda t} x$ ile
+elde edilir ki $\lambda$ ve $x$, $A$'nin bir özdeğer/vektörüdür [2, sf. 349].
+
+Burada temel gözlem bağımsız özvektörlerin bir baz oluşturabildiği ve bu
+sebeple başlangıç değeri $y(0)$'i bu baz üzerinden temsil edebileceğimiz,
+
+$$
+y(0) = c_1 x_1 + ... + c_n x_n
+\mlabel{1}
+$$
+
+ki $c_1,..,c_n$ bilmediğimiz katsayılar.
+
+$y = e^{\lambda t} x$ bir çözümdür, kontrol edelim,
+
+$$
+\frac{\ud y}{\ud t} = A y
+$$
+
+icine $y = e^{\lambda t} x$ sokarsak,
+
+$$
+\frac{\ud }{\ud t} ( e^{\lambda t} x) =
+\lambda e^{\lambda t} x =
+A (e^{\lambda  t} x)
+$$
+
+$e^{\lambda  t}$  iptal olunca,
+
+$$
+Ax = \lambda x 
+$$
+
+ki üstteki özvektör/değer denklemi. Şimdi çözümü
+
+$$
+y(t) = c_1 e^{\lambda_1 t} x_1 + ... + e^{\lambda_n t} x_n
+$$
+
+olarak gösteririz, dikkat edersek $t=0$ anında üstteki denklem (1) ile aynı.
+Özvektör ve değerleri bulduktan sonra bu başlangıç şartını kullanarak
+$c_1,..,c_n$ değerlerini bulmak mümkün olacak.
+
+Şimdi bir örnek problemde görelim.
+
+Örnek
+
+$$
+y' = \left[\begin{array}{rrr}
+-2 & 1 \\ 1 & -2
+\end{array}\right]
+y, \qquad
+y(0) = \left[\begin{array}{c} 6 \\ 2 \end{array}\right]
+$$
+
+denkleminin çözümlerini bul, hangi çözüm $y(0)$'a karşılık geliyor?
+
+Çözüm
+
+$A$'nin özdeğerlerini bulalım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+A = np.array([[-2,1],[1,-2]])
+evals,evec = lin.eig(A)
+print (evals[0], evec[:,0])
+print (evals[1], evec[:,1])
+\end{minted}
+
+\begin{verbatim}
+-1.0 [0.70710678 0.70710678]
+-3.0 [-0.70710678  0.70710678]
+\end{verbatim}
+
+Bunlar normalize edilmiş özvektörler bu arada, aslında
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (evec / 0.70710678)
+\end{minted}
+
+\begin{verbatim}
+[[ 1. -1.]
+ [ 1.  1.]]
+\end{verbatim}
+
+ile kitap sonucunu elde edebiliriz. 
+
+$c_1,c_2$ değerlerini bulmak için $c$ vektörü yaratalım, özvektörler $x_1,x_2$'i
+bir $V$ matrisinin kolonlarına koyalım, böylece $y(0) = c_1 x_1 + ... + c_n x_n$
+yerine $y(0) = Vc$ demek mümkün olacak, ve bilinmeyen $c$ için çözebiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+V = evec / 0.70710678 
+print (V.T) # kolonlarda ozvektorler icin devrik aldik
+soln = lin.solve(V.T, np.array([[6,2]]).T)
+print (soln)
+\end{minted}
+
+\begin{verbatim}
+[[ 1.  1.]
+ [-1.  1.]]
+[[2.        ]
+ [3.99999999]]
+\end{verbatim}
+
+$y(0)$ icin kontrol edersek,
+
+$$
+\left[\begin{array}{r}
+6 \\ 2
+\end{array}\right] =
+2 
+\left[\begin{array}{r}
+1 \\ -1
+\end{array}\right] +
+4 
+\left[\begin{array}{r}
+1 \\ 1
+\end{array}\right] 
+$$
+
+eşitliği doğru. 
+
+O zaman nihai sonuc
+
+$$
+y(t) =
+4 e^{-t}
+\left[\begin{array}{r}
+1 \\ 1
+\end{array}\right]  +
+2 e^{-3t}
+\left[\begin{array}{r}
+1 \\ 1
+\end{array}\right] =
+\left[\begin{array}{r}
+4 e^{-t} + 2 e^{-3t} \\
+4 e^{-t} + 2 e^{-3t}
+\end{array}\right]
+$$
+
 Kaynaklar
 
 [1] Bayramlı, Hesapsal Bilim, {\em Ders 6}
+
+[2] Strang, {\em Differential Equations and Linear Algebra}
 
 \end{document}
 

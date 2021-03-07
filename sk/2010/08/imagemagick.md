@@ -30,7 +30,7 @@ png dosyalarının numaralandırması kontrol edilebilir, Dikkat: tüm
 imajın animasyondan çıkartılması için -coalesçe seçeneği gerekebilir.
 
 ```
-convert -coalesce dosya.gif dosya-%3d.png 
+convert -coalesce dosya.gif dosya-%3d.png
 ```
 
 Birkaç png dosyasını animasyona çevirmek
