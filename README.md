@@ -41,10 +41,6 @@ Zaman Serileri ve Finans (Time Series and Finance)
 
 https://burakbayramli.github.io/dersblog/tser
 
-Kısmi Diferansiyel Denklemler (Partial Differential Equations)
-
-https://burakbayramli.github.io/dersblog/pde
-
 Fonksiyonel Analiz (Functional Analysis)
 
 https://burakbayramli.github.io/dersblog/func_analysis

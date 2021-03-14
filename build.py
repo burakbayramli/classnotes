@@ -6,7 +6,7 @@
 import os, sys, re, codecs, shutil, markdown, json
 
 topdirs = ['algs','calc_multi','chaos','compscieng',
-           'func_analysis','linear','ode','pde','stat',
+           'func_analysis','linear','ode', 'stat',
            'tser','vision','phy']
 
 cfg = """
