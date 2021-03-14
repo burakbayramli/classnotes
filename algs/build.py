@@ -1,6 +1,6 @@
 import os, sys, glob
 
-pdfs = " ".join(sorted(list(glob.glob('./*/*.pdf'))))
+pdfs = " ".join(sorted(list(glob.glob('./algs*/*.pdf'))))
 d = os.environ['HOME']
 
 if len(sys.argv) == 1:
