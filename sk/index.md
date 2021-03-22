@@ -3,7 +3,7 @@
 
 ## En Son
 
-22/3 - [Modern Bilim Öncesi Bilimsel, Astronomik Buluşlar, Gezegenler, Yörüngeler](https://burakbayramli.github.io/dersblog/phy/phy_077_anc/modern_bilim_oncesi_bilimsel_astronomik_buluslar_gezegenler_yorungeler.html)
+22/3 - [Modern Bilim Öncesi Astronomi, Gezegenler, Yörüngeler](https://burakbayramli.github.io/dersblog/phy/phy_077_anc/modern_bilim_oncesi_bilimsel_astronomik_buluslar_gezegenler_yorungeler.html)
 
 18/3 - [Taşınan Fonksiyon, Dalgalanma, Türetim](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_07/isi_ve_dalga_denklemleri.html)
 
