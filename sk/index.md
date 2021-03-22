@@ -3,6 +3,8 @@
 
 ## En Son
 
+22/3 - [Modern Bilim Öncesi Bilimsel, Astronomik Buluşlar, Gezegenler, Yörüngeler](https://burakbayramli.github.io/dersblog/phy/phy_077_anc/modern_bilim_oncesi_bilimsel_astronomik_buluslar_gezegenler_yorungeler.html)
+
 18/3 - [Taşınan Fonksiyon, Dalgalanma, Türetim](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_07/isi_ve_dalga_denklemleri.html)
 
 10/3 - [Lineer Cebir, Diferansiyel Denklemler](https://burakbayramli.github.io/dersblog/linear/linear_23/ders_23.html#alt1)
@@ -10,8 +12,6 @@
 26/2 - [Trigonometri](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_98_app/ekler.html#trig)
 
 13/2 - [Deprem Verileri USGS](https://burakbayramli.github.io/dersblog/sk/2011/03/usgs-deprem-verileri.html)
-
-11/2 - [Hesapsal Sıvı Dinamiği](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45cfdintro/hesapsal_sivi_dinamigine__computational_fluid_dynamics_cfd__giris_.html)
 
 ## Konular, Referans
 
