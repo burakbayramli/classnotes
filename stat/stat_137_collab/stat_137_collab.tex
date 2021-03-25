@@ -297,19 +297,111 @@ kişi bazlı olarak, bir kişiye en yakın diğer kişileri bulmak (matrisin
 tamamına bakarak) ve onların beğendikleri ürünü istenilen kişiye
 tavsiye etmek. Benzerlik için üstteki ölçütlerden birini kullanmak.
 
+Kosinüs Benzerliği ile Tavsiye Örneği
 
+Büyük ölçekte basit kosinüs benzerliği üzerinden tavsiyeleri alttaki gibi
+hesaplayabiliriz. Önce [8]'den en son tam dosyayı indirelim, ve zip dosyasını
+açalım, \verb!base_dir! içinde açılmış olsun. Veride kaç kullanıcı, kaç film
+olduğu altta raporlandı,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+base_dir = "/tmp/ml-latest"
+ratings = pd.read_csv(base_dir + "/ratings.csv")
+print (ratings.userId.nunique(), ratings.movieId.nunique())
+\end{minted}
 
+\begin{verbatim}
+283228 53889
+\end{verbatim}
 
+Büyük bir veri dosyası bu. Şimdi beğenilerden kullanıcı-film şeklinde olacak
+şekilde bir matris yaratacağız. Çoğu kişi çoğu filmi seyretmediği için matris
+seyrek olacak, bu sebeple seyrek matris kodu \verb!csr_matris! kullanacağız, 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.sparse import csr_matrix
+sps = csr_matrix((ratings.rating, (ratings.userId , ratings.movieId)))
+\end{minted}
 
+Artık \verb!sps! içinde kullanıcı-film kordinatlarından oluşan bilgiler
+var. Mesela 1'inci kullanıcının 307 film beğenisi için
 
+\begin{minted}[fontsize=\footnotesize]{python}
+print (sps[1,307])
+\end{minted}
 
+\begin{verbatim}
+3.5
+\end{verbatim}
 
+Şimdi kendi beğenilerimi bir vektör üzerine kodlamanın zamanı geldi, böylece
+bu vektör ile tüm kullanıcı-film matrisi üzerinde bir kosinüs benzerliği
+hesaplayınca benim beğenilere en yakın olan diğer kullanıcıların mesafesini
+bir diğer vektör içinde elde edebileceğim.
 
+\begin{minted}[fontsize=\footnotesize]{python}
+mov = pd.read_csv(base_dir + "/movies.csv",index_col="title")['movieId'].to_dict()
+picks = {"Swordfish (2001)": 5.0, "Every Which Way But Loose (1978)": 5.0,
+         "Sideways (2004)": 5.0}
+tst = np.zeros((1,sps.shape[1]))
+for p in picks: tst[0,mov[p]] = picks[p]
+\end{minted}
 
+Benzerlik hesabını işletelim,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+from sklearn.metrics.pairwise import cosine_similarity
+similarities = cosine_similarity(sps, tst)
+print (similarities.shape)
+\end{minted}
 
+\begin{verbatim}
+(283229, 1)
+\end{verbatim}
+
+Bu vektörün büyüklüğü verideki kullanıcı sayısı kadar, bu mantıklı.
+
+Artık tavsiye vermek için bu kullanıcılara olan uzaklığa göre yakından uzağa
+göre vektörü sıralayacağım, \verb!argsort! ile sıralama yapınca bana sonuçlar
+indis vektörü olarak verilecek (yani en yakın öğenin indisi, indis vektöründe en
+sonda) böylece ben bu vektörü gezip en yakın kullanıcıları bulacağım, ve onların
+en çok beğendiği filmleri toplayıp kendim için bir tavsiye listesi
+oluşturacağım.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+m = np.argsort(similarities[:,0])
+print (sps[m[-10],:])
+\end{minted}
+
+\begin{verbatim}
+  (0, 145)	3.5
+  (0, 805)	4.0
+  (0, 1061)	4.0
+  (0, 2013)	3.0
+  (0, 3173)	4.0
+  (0, 4344)	4.0
+\end{verbatim}
+
+Üstte en yakın 10'uncu kullanıcının beğenilerini görüyoruz. Kodları film ismine 
+çevirmek için alttakini işletelim, ve filmlerden birine bakalım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+movi = pd.read_csv(base_dir + "/movies.csv",index_col="movieId")['title'].to_dict()
+print (movi[145])
+\end{minted}
+
+\begin{verbatim}
+Bad Boys (1995)
+\end{verbatim}
+
+Bu iyi bir tavsiye; ben beğeni listeme koymamıştım ama filmi biliyorum,
+ve aksiyon filmi olarak güzeldi.
+
+Nihai listeyi oluşturma, tekrarlananları, zaten seyredilmiş olanları filtreleme
+kodlarını ödev olarak okuyucuya bırakıyorum.
+
+SVD
 
 Eğer boyut azaltma tekniği kullanmak istiyorsak SVD yöntemi burada da işimize
 yarar.
