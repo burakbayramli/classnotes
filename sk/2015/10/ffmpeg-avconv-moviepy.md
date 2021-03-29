@@ -145,6 +145,12 @@ parca cikartip parca.avi dosyasina kaydediyor. Dikkat: Ustteki
 seceneklerde "endpos" ibaresinin tercumesi "bitis noktasi" olmasina
 ragmen komut "reklam edildigi gibi" islemiyor.
 
+Video'dan Ses Cikartmak
+
+```
+ffmpeg -y -ss 00:02:10 -i vid.mp4 -t 00:00:04 -q:a 0 -map a out.mp3
+```
+
 
 Kaynaklar
 
