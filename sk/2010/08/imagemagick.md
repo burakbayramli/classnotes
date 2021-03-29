@@ -16,8 +16,8 @@ convert dosya.jpg dosya.png
 Bir imajı yarısına indirmek / küçültmek için `-scale 50` denir, 50
 yüzde 50'den geliyor. Eğer Web'de yayın için fotoğraf boyutu indirmek
 istiyorsak çoğunlukla ufak bir dosya isteriz ve biraz kalite kaybetmek
-bizi endiselendirmez, o zaman kalitede indirim de yapılabilir, `-strip
--qualıty 90` ile,
+bizi endiselendirmez, o zaman kalitede indirim de yapılabilir,
+`-strip-quality 90` ile,
 
 ```
 convert buyuk_resim.jpg  -strip -quality 90  -scale 50% yeni_resim.jpg
@@ -94,10 +94,15 @@ Bir video dosyasını numaralanmış görüntü dosyalarına çevirmek için,
 convert video.avi chessb-right/video%03d.png
 ```
 
-Iki resmi yanyana eklemek icin
+İki resmi yanyana eklemek için
 
 ```
 convert resim1.jpg resim2.jpg +append output.jpg
 ```
 
+GİF resmi optimize etmek için
+
+```
+convert -scale 70% -fuzz 6% +dither -layers Optimize +map in.gif out.gif
+```
 
