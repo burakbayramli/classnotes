@@ -25,6 +25,8 @@
 
 [Network, TCP/IP, Internet](2000/10/network.md)
 
+[Animasyonlu Matematik](https://www.youtube.com/channel/UCx64ou5qw0Q9LLkwE8xSNEg)
+
 [Elektrik, Elektronik](2020/08/elektronik.md)
 
 [Nereden Başlarım](2019/01/nereden.md)
@@ -32,8 +34,6 @@
 [Youtube Kanalım](https://www.youtube.com/channel/UCMAUsgUq5ODy8kMnJlUBUdQ)
 
 [Github Depoları](https://github.com/burakbayramli)
-
-[Animasyonlu Matematik](https://www.youtube.com/channel/UCx64ou5qw0Q9LLkwE8xSNEg)
 
 [Tüm Matematik Içeriği](https://burakbayramli.github.io/dersblog/)
 
