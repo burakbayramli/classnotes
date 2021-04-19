@@ -21,7 +21,7 @@ pickle.dump(dict, open('dict.pkl', 'wb'))
 Geri okumak icin
 
 ```python
-dict= pickle.load(open("dict.pkl"))
+dict= pickle.load(open("dict.pkl","rb"))
 f.close()
 ```
 

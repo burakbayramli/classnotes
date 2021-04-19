@@ -1,7 +1,57 @@
 # Haritalamak
 
-Harita grafiklemek için eski `basemap` artık kullanılmıyor, yeni paket
-`cartopy`. Kurmak icin 
+Folium
+
+Bu haritalama sistemi ile dünyanın herhangi bir yerini alıp, istenen
+odaklama seviyesinde göstermek, üzerini işaretlemek mümkün, ayrıca
+haritanın üzerinde isteğe göre çizgiler, çemberler vs çizilmesine izin
+veren çağrılar var. Folium arka planda bir Javascript kütüphanesi
+Leaflet kullanır, bu sebeple haritaları HTML olarak kaydediyorsunuz,
+bu HTML içine bakıldığında Leaflet çağrıları orada görülüyor.  Leaflet
+son derece basit, hızlı işleyecek şekilde yazılmış, verisini arka
+planda direk OpenStreetMap dosyalarını okuyarak alıyor, onların
+gerekli yerlerini, hangisini alacağını arka planda
+hallediyor. Programcıya tek kalan harita merkezini, ek bazı görsel
+ayarları yapmak.
+
+Not: Elde edilen HTML haritası etkileşimli (interactive) çalışıyor.
+Büyütme, küçültme, haritayı sağa sola kaydırma bu HTML sayfasında
+kullanıcı tarafından yapılabilir hala. Yani tek ölü bir görüntü dosyası
+almıyorsunuz.
+
+Kurmak icin `pip install folium`
+
+```python
+import folium
+
+lat1,lon1 = 43.4521793912598, 25.597125946810632
+lat2,lon2 = 44.572754823623114, 27.250000972553345
+m = folium.Map(location=[lat1,lon1], tiles='Stamen Terrain', zoom_start=7)
+coordinates=[(lat1,lon1),(lat2,lon2)]
+folium.PolyLine(locations=coordinates,weight=2,color = 'blue').add_to(m)
+folium.CircleMarker(location=(lat2,lon2),
+                            fill_color='blue', radius=10, rotation=1.5).add_to(m)
+
+title_html = "<h3>Title</h3>"
+m.get_root().html.add_child(folium.Element(title_html))
+m.save("index.html")
+
+```
+
+![](har7.jpg)
+
+`lat1,lon1` merkezli bir harita çizdik, odak seviyesi 7, ve `lat1,lon1` den
+başlayıp `lat2,lon2` de biten bir çizgi çektik, ve çizgi sonuna ufak bir daire
+koyduk.
+
+Ek bilgiler [5],[6],[7] de bulunabilir,
+
+Cartopy
+
+Kullanisli bir paket; fakat isletim sistemi seviyesinde GEOS paketinin
+kurulmasi gerekli, bu bazi barindirilan, idareli bulut sistemlerinde
+problem cikartabilir, cunku bu tur servislerde direk isletim sistemine
+erisim her zaman mumkun olmayabiliyor.
 
 ```
 sudo apt install libproj-dev proj-data proj-bin libgeos-dev
@@ -192,10 +242,18 @@ plt.savefig('har6.png')
 
 Kaynaklar
 
-https://rabernat.github.io/research_computing_2018/maps-with-cartopy.html
+[1] https://rabernat.github.io/research_computing_2018/maps-with-cartopy.html
 
-https://scitools.org.uk/cartopy/docs/latest/gallery/global_map.html#sphx-glr-gallery-global-map-py
+[2] https://scitools.org.uk/cartopy/docs/latest/gallery/global_map.html#sphx-glr-gallery-global-map-py
 
-https://github.com/SciTools/cartopy/issues/1303
+[3] https://github.com/SciTools/cartopy/issues/1303
 
-Renk isimleri - https://matplotlib.org/3.1.0/gallery/color/named_colors.html
+[4] Renk isimleri - https://matplotlib.org/3.1.0/gallery/color/named_colors.html
+
+[5] https://python-visualization.github.io/folium/quickstart.html
+
+[6] https://stackoverflow.com/questions/39093250/is-it-possible-to-draw-lines-with-arrowheads-in-a-folium-map
+
+[7] https://www.geeksforgeeks.org/stamen-toner-stamen-terrain-and-mapbox-bright-maps-in-python-folium/
+
+
