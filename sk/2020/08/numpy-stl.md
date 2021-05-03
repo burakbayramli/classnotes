@@ -126,6 +126,12 @@ plt.savefig('prop2.png')
 ![](prop2.png)
 
 
+İki tane üçgeni gösterdik, yön oklarında okun başlangıcı için üçgenin üç
+noktasının ortalamasını aldık, böylece kabaca bir orta noktadan çıkan
+`SCALE` ile ölçeklediğimiz normal yönde bir ok çizebilmiş olduk.
+
+
+
 Kaynaklar
 
 [1] https://www.tinkercad.com/things/h3gtFbihOx3-helice-2-pales-arrondies-propeller-2-rounded-blades
