@@ -73,7 +73,7 @@ olana baktık ve üstteki 3x3 matris geldi, bu matrislerden ilk satır üçgenin
 bir köşesi, böyle gidiyor. Aynı üçgene tekabül eden normal vektör yine aynı
 indiste, onu `your_mesh.get_ünit_normals()[0]` ile alabilirdik.
 
-Ucgenler hakkinda bir fikir olmasi icin iki tanesini, normalleriyle beraber
+Üçgenler hakkında bir fikir olması için iki tanesini, normalleriyle beraber
 grafikleyelim,
 
 
@@ -125,11 +125,36 @@ plt.savefig('prop2.png')
 
 ![](prop2.png)
 
-
 İki tane üçgeni gösterdik, yön oklarında okun başlangıcı için üçgenin üç
 noktasının ortalamasını aldık, böylece kabaca bir orta noktadan çıkan
 `SCALE` ile ölçeklediğimiz normal yönde bir ok çizebilmiş olduk.
 
+Hacim
+
+Elimizde etrafı çevrili bir obje var, küre, kare gibi basit objelerin
+analitik hacim formülü bilinir. Fakat elimizde çetrefil bir şekilde ve
+ayrıksal olarak yüzeyi tanımlanmış bir nesne var, onun hacmi için
+ayrıksal, hesapsal bazı teknikler gerekebilirdi, neyse ki `numpy-ştl`
+içinde bu fonksiyonlar var,
+
+```python
+prop = your_mesh.get_mass_properties()
+print ('\nhacim',prop[0])
+print ('\nyercekim merkezi (COG)',prop[1])
+print ('\nCOG noktasinda atalet matrisi')
+print (prop[2])
+```
+
+```text
+hacim 508.81107187133966
+
+yercekim merkezi (COG) [ 14.99940119 -14.99999338   1.13988199]
+
+COG noktasinda atalet matrisi
+[[ 2.14550670e+03 -2.23269194e-03 -2.31301332e-02]
+ [-2.23269194e-03  1.01219910e+05  6.33494132e+01]
+ [-2.31301332e-02  6.33494132e+01  1.02767050e+05]]
+```
 
 
 Kaynaklar
