@@ -1,8 +1,9 @@
 # 3D Baskıya Hazır CAD Tasarımlarına Erişmek, Numpy-STL
 
-3 boyutlu baskı (3d printing) için tasarım dosyaları için STL formatı
-var. Bir objeyi mesela Tinkercad ile tasarlayıp objeyi STL formatında
-kaydedebiliriz, bu dosya 3 boyutlu baskıya hazırdır.
+3 boyutlu baskı (3d printing) için tasarım dosyaları hazırlamaya
+yardım eden STL formatı var. Bir objeyi mesela Tinkercad ile
+tasarlayıp objeyi STL formatında kaydedebiliriz, bu dosya 3 boyutlu
+baskıya hazırdır.
 
 Örnek bir objeye bakalım [1], bir pervane bu, `propeller1.stl`
 olarak kaydedelim,
