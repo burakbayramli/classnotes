@@ -5,10 +5,9 @@ yardım eden STL formatı var. Bir objeyi mesela Tinkercad ile
 tasarlayıp objeyi STL formatında kaydedebiliriz, bu dosya 3 boyutlu
 baskıya hazırdır.
 
-Örnek bir objeye bakalım [1], bir pervane bu, `propeller1.stl`
-olarak kaydedelim,
-
-Bu objeye Python'dan erişmek istersek, `numpy-stl` kullanılabilir.
+Örnek bir objeye bakalım [1], bir pervane bu, `propeller1.stl` olarak
+kaydedelim. Obje tasarımına, verisine Python'dan erişmek istersek,
+`numpy-stl` kullanılabilir.
 
 ```
 pip install numpy-stl
@@ -40,14 +39,12 @@ plt.savefig('prop.png')
 
 Daha detaylı işlemler için dokümana [2] bakılabilir,
 
-STL Veri Yapisi
+STL Veri Yapısı
 
-Şekil dosyaları bir objeyi kapsayan ve birbirini tamamlayan üçgenler
-üzerinden tanımlanıyor. Bu yassı iki boyutlu üçgenleri temsil etmek için
-üç tane 3D nokta bir de yüzeyin hangi yöne işaret ettiği (bir normal vektör
-üzerinden) yeterli oluyor.
-
-Mesela biraz önceki şekilde üzerinden
+Şekil dosyaları bir objenin yüzeyini kapsayan ve birbirini tamamlayan
+üçgenler üzerinden tanımlanıyor. Bu yassı iki boyutlu üçgenleri temsil
+etmek için üç tane 3D nokta bir de yüzeyin hangi yöne işaret ettiği
+(bir normal vektör üzerinden). Mesela biraz önceki şekil için,
 
 ```python
 from stl import mesh
@@ -69,10 +66,11 @@ print (your_mesh.vectors[0])
  [ 41.793 -14.443   0.463]]
 ```
 
-Görüldüğü gibi 7668 tane üçgen ve normal vektör var. Üçgenlerden sıfırıncı
-olana baktık ve üstteki 3x3 matris geldi, bu matrislerden ilk satır üçgenin
-bir köşesi, böyle gidiyor. Aynı üçgene tekabül eden normal vektör yine aynı
-indiste, onu `your_mesh.get_unit_normals()[0]` ile alabilirdik.
+Görüldüğü gibi 7668 tane üçgen ve normal vektör var. Üçgenlerden
+sıfırıncı olana baktık ve üstteki 3x3 matris geldi, bu matrislerden
+ilk satır üçgenin bir köşesi, ikinci satır ikinci köşesi, vs. Aynı
+üçgene tekabül eden normal vektör yine aynı indiste, onu
+`your_mesh.get_unit_normals()[0]` ile alabilirdik.
 
 Üçgenler hakkında bir fikir olması için iki tanesini, normalleriyle beraber
 grafikleyelim,
@@ -130,12 +128,12 @@ plt.savefig('prop2.png')
 noktasının ortalamasını aldık, böylece kabaca bir orta noktadan çıkan
 `SCALE` ile ölçeklediğimiz normal yönde bir ok çizebilmiş olduk.
 
-Hacim
+Özet Verileri
 
-Elimizde etrafı çevrili bir obje var, küre, kare gibi basit objelerin
+Elimizde etrafı çevrili bir obje, küre, kare gibi basit objelerin
 analitik hacim formülü bilinir. Fakat elimizde çetrefil bir şekilde ve
 ayrıksal olarak yüzeyi tanımlanmış bir nesne var, onun hacmi için
-ayrıksal, hesapsal bazı teknikler gerekebilirdi, neyse ki `numpy-ştl`
+ayrıksal, hesapsal bazı teknikler gerekebilirdi, neyse ki `numpy-stl`
 içinde bu fonksiyonlar var,
 
 ```python
