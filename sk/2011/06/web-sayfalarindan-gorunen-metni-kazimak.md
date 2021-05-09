@@ -1,4 +1,4 @@
-# Web Sayfalarindan Gorunen Metni Kazimak (Scraping)
+# Web Sayfalarından Görünen Metni Kazımak (Scraping)
 
 Bir web sayfasindaki Turkce, Ingilizce kelimeleri almak icin Python
 uzerinde Beautiful Soup adinda bir paket var. "Gorunen metin" derken
@@ -39,11 +39,11 @@ if __name__ == "__main__":
    
 ```
 
-Python kutuphanelerinden urllib bu is icin kullanilir. Alttaki ornekte
-Google Insights for Search sayfalarindan Google'da son 7 gun icinde en
-cok aranan kelimelerin listesini almak icin kullandigimiz kodlar
-bulunabilir. Ayni sayfalar uzerinde wget ise yaramadi, urllib
-FancyURLopener calisti.
+Python kütüphanelerinden urllib bu iş için kullanılır. Alttaki örnekte
+Google İnsights for Search sayfalarından Google'da son 7 gün içinde en
+çok aranan kelimelerin listesini almak için kullandığımız kodlar
+bulunabilir. Aynı sayfalar üzerinde `wget` ise yaramadı, ürllib
+FançyÜRLopener çalıştı.
 
 
 ```python
@@ -154,189 +154,53 @@ if __name__ == "__main__":
             print ("cannot get article", x, repr(e))    
 ```
 
+Twitter
+
+Hangi tarayıcı tipinin taklit edildiği bağlanılan her siteye göre
+değisebiliyor. Mesela Twitter'den bir kullanıcının mesajlarını kazımak
+istediğimizde "Javascript'e sahip tarayıcı lazım", ya da "desteklenen
+tarayıcıyı kullanın" gibi mesajlar alabiliyoruz, tüm bu hataların
+üstesinden gelmek ve veriyi almak için alttaki gibi bir tarayıcı
+beyani gerekti,
+
+
+```python
+import re, requests
+
+headers = { 'User-Agent': 'UCWEB/2.0 (compatible; Googlebot/2.1; +google.com/bot.html)'}
+
+def cleanhtml(raw_html):
+  cleanr = re.compile('<.*?>')
+  cleantext = re.sub(cleanr, '', raw_html)
+  return cleantext
+
+content = ""
+for user in ['bbc','dw_turkce']:
+    content += user + "\n\n"
+    url_twitter = 'https://twitter.com/%s' % user
+    resp = requests.get(url_twitter, headers=headers)  # Send request
+    res = re.findall(r'<p class="TweetTextSize.*?tweet-text.*?>(.*?)</p>',resp.text)
+    for x in res:
+        x = cleanhtml(x)
+        x = x.replace("&#39;","'")
+        x = x.replace('&quot;','"')
+        x = x.replace("&nbsp;"," ")
+        content += x 
+        content += "\n\n"
+        content += "---"
+        content += "\n\n"
+
+print (content)
+```
 
 Imaj
 
 Eger imaj  toplamak istiyorsak, mesela Bing'den alttaki kod faydali,
 
-console.py
+[console.py](console.py)
 
+[ping.py](ping.py)
 
-```python
-from pip import __main__
-
-import sys, os, argparse, _bing
-def main():
-    # Parser
-    parser = argparse.ArgumentParser(
-        description="Scrape images from the internet.")
-    parser.add_argument(
-        "engine", help="Which search engine should be used? (Bing/Google)")
-    parser.add_argument(
-        "query", help="Query that should be used to scrape images.")
-    parser.add_argument(
-        "--limit", help="Amount of images to be scraped.", default=1000, required=False)
-    parser.add_argument("--json", help="Should image metadata be downloaded?",
-                        action='store_true', required=False)
-    parser.add_argument(
-        "--url", help="Google: Scrape images from a google image search link", required=False)  # Google Specific
-    parser.add_argument("--adult-filter-off", help="Disable adult filter",
-                        action='store_true', required=False)  # Bing Specific
-
-    args = parser.parse_args()
-    # Variables
-    engine = args.engine.lower() if args.engine.lower() is not None else "google"
-    query = urlparse.parse_qs(urlparse.urlparse(args.url).query)[
-        'q'][0] if args.url is not None else args.query
-
-    limit = args.limit
-    metadata = args.json if args.json is not None else False
-    adult = "off" if args.adult_filter_off else "on"
-    if engine == "google" or engine == "g":
-        engine = "google"
-        url = args.url if args.url is not None else "https://www.google.com/search?q={}&source=lnms&tbm=isch".format(
-            query)
-    elif engine == "bing" or engine == "b":
-        engine = "bing"
-        url = "https://www.bing.com/images/async?q={}&first=0&adlt={}".format(
-        str(query), adult)
-    else:
-    sys.exit("Invalid engine specified.")
-    cwd = os.getcwd()
-    # check directory and create if necessary
-    if not os.path.isdir("{}/dataset/".format(cwd)):
-        os.makedirs("{}/dataset/".format(cwd))
-    if not os.path.isdir("{}/dataset/{}/{}".format(cwd, engine, query)):
-        os.makedirs("{}/dataset/{}/{}".format(cwd, engine, query))
-    if not os.path.isdir("{}/dataset/logs/{}/".format(cwd, engine, query)):
-        os.makedirs("{}/dataset/logs/{}/".format(cwd, engine, query))
- 
-    if engine == "google":
-        _google.google(url, metadata, query, limit)
-    else:
-        _bing.bing(url, metadata, query, limit, adult)
-
-if __name__ == "__main__":
-    main()
-```
-
-```python
-#
-# ping.py
-#
-import requests, time, shutil
-import argparse, json
-from bs4 import BeautifulSoup
-from pathlib import Path
-import lxml.html, os, sys
-from fake_useragent import UserAgent
-import urllib.parse as urlparse
-
-def error(link, query):
-    print("[!] Skipping {}. Can't download or no metadata.\n".format(link))
-    file = Path("{}/dataset/logs/bing/errors.log".format(os.getcwd(), query))
-    if file.is_file():
-        with open("{}/dataset/logs/bing/errors.log".format(os.getcwd(), query), "a") as myfile:
-            myfile.write(link + "\n")
-    else:
-        with open("{}/dataset/logs/bing/errors.log".format(os.getcwd(), query), "w+") as myfile:
-            myfile.write(link + "\n")
-
-
-def save_image(link, file_path):
-    # Use a random user agent header for bot id
-    ua = UserAgent(verify_ssl=False)
-    headers = {"User-Agent": ua.random}
-    r = requests.get(link, stream=True, headers=headers)
-    if r.status_code == 200:
-        with open(file_path, 'wb') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
-    else:
-        raise Exception("Image returned a {} error.".format(r.status_code))
-
-def download_image(link, image_data, metadata, query):
-    download_image.delta += 1
-    try:
-        file_name = link.split("/")[-1]
-        type = file_name.split(".")[-1]
-        type = (type[:3]) if len(type) > 3 else type
-        if type.lower() == "jpe":
-            type = "jpeg"
-        if type.lower() not in ["jpeg", "jfif", "exif", "tiff", "gif", "bmp", "png", "webp", "jpg"]:
-            type = "jpg"
-
-        print("[%] Downloading Image #{} from {}".format(
-            download_image.delta, link))
-        try:
-            save_image(link, "{}/dataset/bing/{}/".format(os.getcwd(), query) +
-                       "Scrapper_{}.{}".format(str(download_image.delta), type))
-            print("[%] Downloaded File")
-            if metadata:
-                with open("{}/dataset/bing/{}/Scrapper_{}.json".format(os.getcwd(), query, str(download_image.delta)), "w") as outfile:
-                    json.dump(image_data, outfile, indent=4)
-
-        except Exception as e:
-            download_image.delta -= 1
-            print("[!] Issue Downloading: {}\n[!] Error: {}".format(link, e))
-            error(link, query)
-    except Exception as e:
-        download_image.delta -= 1
-        print("[!] Issue getting: {}\n[!] Error:: {}".format(link, e))
-        error(link, query)
-
-
-def bing(url, metadata, query, delta, adult):
-    delta = int(delta)
-    sys.setrecursionlimit(1000000)
-    page_counter = 0
-    link_counter = 0
-    download_image.delta = 0
-    while download_image.delta < delta:
-        ua = UserAgent(verify_ssl=False)
-        headers = {"User-Agent": ua.random}
-        payload = (("q", str(query)), ("first", page_counter), ("adlt", adult))
-        source = requests.get(
-            "https://www.bing.com/images/async", params=payload, headers=headers).content
-        soup = BeautifulSoup(str(source).replace('\r\n', ""), "html.parser")
-        try:
-            os.remove("dataset/logs/bing/errors.log")
-        except OSError:
-            pass
-
-        links = [json.loads(i.get("m").replace('\r\n', ""))["murl"]
-                 for i in soup.find_all("a", class_="iusc")]
-        print("[%] Indexed {} Images on Page {}.".format(
-            len(links), page_counter + 1))
-        print("\n===============================================\n")
-        print("[%] Getting Image Information.")
-        images = {}
-        for a in soup.find_all("a", class_="iusc"):
-            if download_image.delta >= delta:
-                break
-            print("\n------------------------------------------")
-            iusc = json.loads(a.get("m"))
-            link = iusc["murl"]
-            print("\n[%] Getting info on: {}".format(link))
-            try:
-                image_data = "bing", query, link, iusc["purl"], iusc["md5"]
-                images[link] = image_data
-                try:
-                    download_image(link, images[link], metadata, query)
-                except Exception as e:
-                    error(link, query)
-
-            except Exception as e:
-                images[link] = image_data
-                print("[!] Issue getting data: {}\n[!] Error: {}".format(rg_meta, e))
-            link_counter += 1
-
-        page_counter += 1
-
-    print("\n\n[%] Done. Downloaded {} images.".format(download_image.delta))
-    print("\n===============================================\n")
-
-```
 
 ```python
 python -u console.py bing dog --limit 10 --json
