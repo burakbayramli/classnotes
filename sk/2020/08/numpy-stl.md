@@ -44,7 +44,7 @@ STL Veri Yapısı
 Şekil dosyaları bir objenin yüzeyini kapsayan ve birbirini tamamlayan
 üçgenler üzerinden tanımlanıyor. Bu yassı iki boyutlu üçgenleri temsil
 etmek için üç tane 3D nokta bir de yüzeyin hangi yöne işaret ettiği
-(bir normal vektör üzerinden). Mesela biraz önceki şekil için,
+(bir normal vektör üzerinden) yeterli. Mesela biraz önceki şekil için,
 
 ```python
 from stl import mesh
@@ -130,11 +130,10 @@ noktasının ortalamasını aldık, böylece kabaca bir orta noktadan çıkan
 
 Özet Verileri
 
-Elimizde etrafı çevrili bir obje, küre, kare gibi basit objelerin
-analitik hacim formülü bilinir. Fakat elimizde çetrefil bir şekilde ve
-ayrıksal olarak yüzeyi tanımlanmış bir nesne var, onun hacmi için
-ayrıksal, hesapsal bazı teknikler gerekebilirdi, neyse ki `numpy-stl`
-içinde bu fonksiyonlar var,
+Küre, kare gibi basit objelerin analitik hacim formülü bilinir. Fakat
+elimizde çetrefil bir şekilde ve ayrıksal olarak yüzeyi tanımlanmış
+bir nesne var, onun hacmi için ayrıksal, hesapsal bazı teknikler
+gerekebilirdi, neyse ki `numpy-stl` içinde bu fonksiyonlar var,
 
 ```python
 prop = your_mesh.get_mass_properties()
