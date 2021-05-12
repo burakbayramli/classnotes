@@ -30,7 +30,7 @@
 
 [Ubuntu 11](06/ubuntu-11.md)
 
-[Web Sayfalarindan Gorunen Metni Kazimak (Scraping)](06/web-sayfalarindan-gorunen-metni-kazimak.md)
+[Web Sayfalarından Görünen Metni Kazımak (Scraping)](06/web-sayfalarindan-gorunen-metni-kazimak.md)
 
 [KineticsKit](08/kineticskit.md)
 

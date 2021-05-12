@@ -9,7 +9,7 @@ kastediyoruz, istatistiki analiz icin mesela herhangi bir gunun
 ```python
 import re
 import urllib
-import BeautifulSoup
+from bs4 import BeautifulSoup
 
 keywords = ['script', '<b>', '\n']
 
@@ -35,15 +35,14 @@ def tokenize_site(url):
    return res
 
 if __name__ == "__main__":
-   res = tokenize_site('[MEDYA SITE ISMI]')
-   
+   res = tokenize_site('[MEDYA SITE ISMI]')   
 ```
 
 Python kütüphanelerinden urllib bu iş için kullanılır. Alttaki örnekte
 Google İnsights for Search sayfalarından Google'da son 7 gün içinde en
 çok aranan kelimelerin listesini almak için kullandığımız kodlar
 bulunabilir. Aynı sayfalar üzerinde `wget` ise yaramadı, ürllib
-FançyÜRLopener çalıştı.
+FancyURLopener çalıştı.
 
 
 ```python

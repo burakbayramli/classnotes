@@ -74,13 +74,13 @@
 
 [Dizin Karsilastirmak, Uyan Elementleri Bulmak](10/dizin-karsilastirmak-uyan-elementleri.md)
 
+[Kodlama (Encoding), Objeleri Yazip Okumak - Pickle, zlib, base64](10/encoding-objeleri-yazip-okumak-pickle-base64.md)
+
 [Iki Listeyi Her Turlu Eslesmeye Gore Gezmek](10/iki-listeyi-her-turlu-eslesmeye-gore.md)
 
 [JAGS](10/jags.md)
 
 [Lme4 C Koduna Girmek](10/lme4-c-koduna-girmek.md)
-
-[Objeleri Yazip Okumak - Pickle, zlib](10/objeleri-yazip-okumak-pickle.md)
 
 [PyMC Yerine JAGS ve rpy](10/pymc-yerine-jags-ve-rpy.md)
 
