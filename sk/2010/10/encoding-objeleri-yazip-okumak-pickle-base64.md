@@ -127,6 +127,9 @@ print (d)
 b'bubirkelime'
 ```
 
+Birkaç farklı metin üzerinde aynı kodlama çağrısı işletilince sonda
+hep bir `\n` olduğunu farkedebiliriz.. Bu ek aslında gerekli değil,
+onu çıkartsak ta geriye kodlama bize aynı sonucu verecektir. 
 
 
 
