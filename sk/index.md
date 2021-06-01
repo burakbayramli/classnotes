@@ -3,6 +3,8 @@
 
 ## En Son
 
+1/6 - [Parçacıklar, Çok Parçacıklı Sistemler](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_03/temel_fizik_3_basinc_parcaciklar_carpisma_hareket.html#multipart)
+
 26/5 - [Açısal Momentum, Hız](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donussel_kuvvet.html#angular)
 
 7/5 - [Ekler - Numpy-STL](2020/08/numpy-stl.md)
@@ -10,8 +12,6 @@
 20/4 - [Sonlu Öğeler Metotu (Finite Elements Method -FEM-)](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app45fem1/sivi_dinamiginde_sonlu_ogeler_metotu__finite_elements_method_fem___1.html)
 
 1/4 - [Dalgasal Denklem Çözümü (Wave Equation)](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app17wave/dalga_denklemi__wave_equation_.html)
-
-25/3 - [Kosinüs Benzerliği ile Tavsiye Örneği](https://burakbayramli.github.io/dersblog/stat/stat_137_collab/toplu_tavsiye__collaborative_filtering__filmler_svd_ile_boyut_indirgeme.html#cossimex)
 
 ## Konular, Referans
 
