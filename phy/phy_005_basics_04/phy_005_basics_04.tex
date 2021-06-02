@@ -162,12 +162,18 @@ import numpy.linalg as lin
 I = np.array([[8, -3, -3],
               [-3, 8, -3],
               [-3, -3, 8]])
-pe,lam = lin.eig(I)
+e,evec = lin.eig(I)
 print (e)
+print (evec)
+print (evec[:,0])
 \end{minted}
 
 \begin{verbatim}
 [11.  2. 11.]
+[[ 0.81649658 -0.57735027  0.        ]
+ [-0.40824829 -0.57735027 -0.70710678]
+ [-0.40824829 -0.57735027  0.70710678]]
+[ 0.81649658 -0.40824829 -0.40824829]
 \end{verbatim}
 
 Demek ki yeni $I$ matrisi
@@ -181,6 +187,40 @@ I = \left[\begin{array}{rrr}
 $$
 
 olmalı.
+
+Üç tane $\omega$ vektörü elde edildi, bunlar tabii ki birbirine dik, hepsini
+grafikleyelim, yeşil çizgiler $x,y,z$ eksenleri olmak üzere,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from mpl_toolkits import mplot3d
+
+def plot_vector(fig, orig, v, color='blue'):
+   ax = fig.gca(projection='3d')
+   orig = np.array(orig); v=np.array(v)
+   ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
+   ax = fig.gca(projection='3d')  
+   return fig
+
+fig = plt.figure()
+axes = mplot3d.Axes3D(fig)
+SCALE = 0.5
+plot_vector(fig, [0,0,0],evec [:,0]*SCALE)
+plot_vector(fig, [0,0,0],evec [:,1]*SCALE)
+plot_vector(fig, [0,0,0],evec [:,2]*SCALE)
+axes.view_init(elev=10, azim=200)
+axes.set_xlim(-1,1)
+axes.set_ylim(-1,1)
+axes.set_zlim(-1,1)
+axes.plot([0,1],[0,0],[0,0],color = 'g')
+axes.plot([0,0],[0,1],[0,0],color = 'g')
+axes.plot([0,0],[0,0],[0,1],color = 'g')
+axes.locator_params(tight=True, nbins=4)
+plt.savefig('phy_005_basics_04_02.png')
+\end{minted}
+
+
+\includegraphics[width=20em]{phy_005_basics_04_02.png}
+
 
 [devam edecek]
 

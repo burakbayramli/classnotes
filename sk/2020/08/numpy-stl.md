@@ -84,7 +84,6 @@ axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3
 scale = your_mesh.points.flatten()
 axes.auto_scale_xyz(scale, scale, scale)
 
-
 def plot_vector(fig, orig, v, color='blue'):
    ax = fig.gca(projection='3d')
    orig = np.array(orig); v=np.array(v)
@@ -166,6 +165,4 @@ Kaynaklar
 [4] [Cornell, Triangle meshes I, PDF](http://www.cs.cornell.edu/courses/cs4620/2014fa/lectures/02trimesh1.pdf)
 
 [5] [STL File Format, Simply Explained](https://all3dp.com/what-is-stl-file-format-extension-3d-printing/#pointone)
-
-
 
