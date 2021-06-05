@@ -24,8 +24,6 @@
 
 [SQL](03/sql.md)
 
-[Tarih Boyutu](03/tarih-boyutu.md)
-
 [Acik Kaynakli Araclarla Veri Analizi - P. Janert](04/acik-kaynakli-araclarla-veri-analizi-p.md)
 
 [Boyutlar (Dimensions)](04/boyutlar-dimensions.md)

@@ -44,6 +44,27 @@ m.save("index.html")
 başlayıp `lat2,lon2` de biten bir çizgi çektik, ve çizgi sonuna ufak bir daire
 koyduk.
 
+İşaretler
+
+Harita üzerine konan işaretler içine tıklanabilir URL bağlantıları konabilir.
+Ayrıca bu işaretler fare ile üzerinde durunca bir araç ipucu (tooltip)
+gösterebilir.
+
+```python
+m = folium.Map(location=[45.372, -121.6972], zoom_start=12, tiles="Stamen Terrain")
+tooltip = "Click me!"
+folium.Marker(
+    [45.3288, -121.6625], popup="<i>Mt. Hood Meadows</i>", tooltip=tooltip
+).add_to(m)
+```
+
+Üstteki kodda görülen `popup` içine `a href` ifadesi de konulabilir,
+böylece fare üstünde olunca önce ipucu, ona tıklanınca çıkan bölgede
+tıklanabilir bir URL bağlantısı olacaktır. Biz ayrıca bu bağlantıyı
+`target='_blank' rel='noopener noreferrer'` ile yarattık, böylece
+tıklama bizi tarayıcıda ayrı bir tab'e götürüyor.
+
+
 Ek bilgiler [5],[6],[7] de bulunabilir,
 
 Cartopy
