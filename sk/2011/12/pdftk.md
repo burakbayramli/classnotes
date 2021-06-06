@@ -1,4 +1,4 @@
-# PDF Numaralari, pdftk, pdfjam
+# PDF Numaralari, pdftk, pdfjam, gs
 
 PDF dosyalari uzerinden pek cok islem pdftk ile yapilabilir. Kurmak icin
 
@@ -84,9 +84,15 @@ bu komuta iki dökümanı birleştirmesini söylüyoruz, ama tek sayfaları
 bir yerden, çift sayfaları başka bir yerden almasını söylüyoruz
 (shuffle B A seçeneği)
 
+Kalite Azaltmak, Kucultmek
 
+Bazen icinde cok fazla resim olan PDF dosyalarinin daha hizli
+gostermek icin, kucultmek icin kalitesini azaltmak isteyebiliriz. Eger
+`ghostscript` var ise,
 
-
+```
+gs -sDEVICE=pdfwrite -dPDFSETTINGS=/ebook -q -o output.pdf input.pdf
+```
 
 
 
