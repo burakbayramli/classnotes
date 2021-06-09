@@ -374,6 +374,34 @@ B     2   5
 C     3   6
 ```
 
+Dosyalardan Okumak
+
+Üstteki örneklerde `StringİO` kullandık, ama en basit Pandas kullanımı
+aslında `df = pd.read_csv('[dosya]')` ile direk diskten okumak. Burada
+ilginç bazı ek numaralar da yapılabiliyor, mesela zıp içinde olan csv
+direk zıp üzerinden okunabilir! Mesela test.zıp içinde olan test.csv
+okumak için
+
+```pandas
+import pandas as pd, zipfile
+with zipfile.ZipFile('test.zip', 'r') as z:
+      df =  pd.read_csv(z.open('test.csv'))
+      ... 
+```
+
+Bir diğer kullanım İnternet üzerinden bir ZIP bağlantısını hiç diske
+indirmeden direk İnternet üzerinden açıp, içindeki dosyayı Pandas'a
+okutmak!
+
+```pandas
+import pandas as pd, datetime
+import urllib.request as urllib2
+r = urllib2.urlopen("https://www.filanca.com/test.zip").read()
+file = ZipFile(BytesIO(r))
+csv = file.open("test.csv")
+df = pd.read_csv(csv,sep='\t',header=None)
+```
+
 Kaynaklar
 
 http://pandas.pydata.org/pandas-docs/stable/

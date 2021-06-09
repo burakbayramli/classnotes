@@ -58,7 +58,7 @@
 
 [PDF Formlari Otomatik Olarak Doldurmak](12/pdf-formlari-otomatik-olarak-doldurmak.md)
 
-[PDF Numaralari, pdftk, pdfjam](12/pdftk.md)
+[PDF Numaralari, pdftk, pdfjam, gs](12/pdftk.md)
 
 [YouTube Video'larini Kaydetmek](12/youtube-videolarini-kaydetmek.md)
 
