@@ -153,6 +153,49 @@ COG noktasinda atalet matrisi
  [-2.31301332e-02  6.33494132e+01  1.02767050e+05]]
 ```
 
+Dondurme
+
+Bir objeyi döndürmek için gereken matematiği [6]'da görmüştük. Eğer bir simit
+şeklindeki bir objeyi bir eksen, mesela x, etrafında döndürmek istiyorsak,
+gerekli döndürme matris şekli [6]'da işlendi. Bu matris yaratıldıktan sonra
+mesh üzerinde `rotate_using_matrix` çağrısı yapılabilir. Matrisi yaratmanın
+farklı yolları var tabii, bunlar detaylı olarak yazıda işlendi. Ornek gorelim,
+
+```python
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+import pandas as pd, numpy as np
+from stl import mesh
+your_mesh = mesh.Mesh.from_file('../../../phy/phy_005_basics_04/torus.stl')
+theta = np.deg2rad(90) # 90 derece x ekseni etrafinda dondur
+R = np.array(
+  [[1, 0, 0],
+  [0,np.cos(theta),np.sin(theta)],
+  [0,-np.sin(theta),np.cos(theta)]])
+print (R)
+your_mesh.rotate_using_matrix(R)
+fig = plt.figure()
+axes = mplot3d.Axes3D(fig)
+scale = your_mesh.points.flatten()
+axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
+AS = 3
+axes.plot([0,AS],[0,0],[0,0],color = 'r')
+axes.plot([0,0],[0,AS],[0,0],color = 'g')
+axes.plot([0,0],[0,0],[0,AS],color = 'b')
+axes.auto_scale_xyz(scale, scale, scale)
+LIM = 5
+axes.set_xlim(-LIM,LIM);axes.set_ylim(-LIM,LIM);axes.set_zlim(-LIM,LIM)
+axes.view_init(azim=40,elev=10)
+plt.savefig('rotated.png')
+```
+
+```text
+[[ 1.000000e+00  0.000000e+00  0.000000e+00]
+ [ 0.000000e+00  6.123234e-17  1.000000e+00]
+ [ 0.000000e+00 -1.000000e+00  6.123234e-17]]
+```
+
+![](rotated.png)
 
 Kaynaklar
 
@@ -166,3 +209,4 @@ Kaynaklar
 
 [5] [STL File Format, Simply Explained](https://all3dp.com/what-is-stl-file-format-extension-3d-printing/#pointone)
 
+[6] [Döndürme (Rotation)](https://burakbayramli.github.io/dersblog/phy/phy_072_rot/dondurme__rotation_.html)
