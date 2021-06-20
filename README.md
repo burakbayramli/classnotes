@@ -148,6 +148,7 @@ control
 pyglet
 pymunk
 mayavi
+numpy-stl
 ```
 
 Python paket kurulumu Ubuntu Linux üzerinde `pip install [paket ismi]`
