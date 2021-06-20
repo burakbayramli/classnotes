@@ -117,39 +117,7 @@ ibarelerini her script'in başına eklemek lazım. Bu durumda kodlar
 `dosya.py` gibi bir dosya içinde kaydedilir, ve `python dosya.py` ile
 komut satırından işletilir.
 
-Gereken dış paketler
-
-```
-matplotlib==2.0
-pandas
-numpy
-scipy
-ipython
-statsmodels
-arch
-rpy2
-cvxopt
-sympy
-nimfa
-astroML
-mahotas
-pandas-datareader
-scikit-learn
-scikit-image
-lmfit==0.8.3
-autograd==1.1.7
-sounddevice
-tensorflow==1.4.1
-keras==2.0.8
-librosa
-python_speech_features
-gym==0.9.4
-control
-pyglet
-pymunk
-mayavi
-numpy-stl
-```
+Gereken dış paketler [requirements.txt](requirements.txt) içinde.
 
 Python paket kurulumu Ubuntu Linux üzerinde `pip install [paket ismi]`
 ile yapılabiliyor.
