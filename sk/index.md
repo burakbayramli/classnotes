@@ -7,7 +7,7 @@
 
 9/6 - [Eksi Bakışımlı -Skew Symmetric- Matrisler](https://burakbayramli.github.io/dersblog/linear/linear_05/ders_5.html#skew)
 
-1/6 - [Parçacıklar, Çok Parçacıklı Sistemler](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_03/temel_fizik_3_basinc_parcaciklar_carpisma_hareket.html#multipart)
+1/6 - [Parçacıklar, Çok Parçacıklı Sistemler](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_04/temel_fizik_4__kati_govde_atalet_matrisi__inertia_matrix__tork.html)
 
 26/5 - [Açısal Momentum, Hız](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donussel_kuvvet.html#angular)
 
