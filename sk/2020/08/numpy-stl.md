@@ -169,7 +169,7 @@ import numpy as np
 from stl import mesh
 fig = plt.figure()
 axes = mplot3d.Axes3D(fig)
-your_mesh = mesh.Mesh.from_file('../../../phy/phy_005_basics_04/torus.stl')
+your_mesh = mesh.Mesh.from_file('../../../phy/phy_008_sim_rigbod/torus.stl')
 axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
 scale = your_mesh.points.flatten()
 axes.auto_scale_xyz(scale, scale, scale)
