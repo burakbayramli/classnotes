@@ -3,15 +3,15 @@
 
 ## En Son
 
+22/6 - [Atalet Matrisi (Inertia Matrix), Katı Gövde, Tork](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_04/temel_fizik_4__kati_govde_atalet_matrisi__inertia_matrix__tork.html#inertia)
+
+22/6 - [Numpy-STL Matris, Dondurme](2020/08/numpy-stl.md#3drot)
+
 17/6 - [Döndürme (Rotation)](https://burakbayramli.github.io/dersblog/phy/phy_072_rot/dondurme__rotation_.html)
 
 9/6 - [Eksi Bakışımlı -Skew Symmetric- Matrisler](https://burakbayramli.github.io/dersblog/linear/linear_05/ders_5.html#skew)
 
-1/6 - [Parçacıklar, Çok Parçacıklı Sistemler](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_04/temel_fizik_4__kati_govde_atalet_matrisi__inertia_matrix__tork.html)
-
 26/5 - [Açısal Momentum, Hız](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donussel_kuvvet.html#angular)
-
-7/5 - [Ekler - Numpy-STL](2020/08/numpy-stl.md)
 
 ## Konular, Referans
 
