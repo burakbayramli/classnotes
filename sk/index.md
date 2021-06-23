@@ -5,7 +5,7 @@
 
 22/6 - [Atalet Matrisi (Inertia Matrix), Katı Gövde, Tork](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_04/temel_fizik_4__kati_govde_atalet_matrisi__inertia_matrix__tork.html#inertia)
 
-22/6 - [Numpy-STL Matris, Dondurme](2020/08/numpy-stl.md#3drot)
+22/6 - [Numpy-STL Matris, 3D Dönüş](2020/08/numpy-stl.md#3drot)
 
 17/6 - [Döndürme (Rotation)](https://burakbayramli.github.io/dersblog/phy/phy_072_rot/dondurme__rotation_.html)
 
