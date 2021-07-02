@@ -92,25 +92,39 @@ def rhs(u,t):
    res = np.dot(skew_omega, R)
    return list(res.T.flatten())
 
-t=np.linspace(0.0, 1.0, 3)
+t=np.linspace(0.0, 1.0, 10)
 R0 = np.eye(3,3)
 u0 = R0.flatten()
 u1=odeint(rhs,list(u0),t)
-print (u1)
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+
+fig = plt.figure()
+axes = mplot3d.Axes3D(fig)
+your_mesh = mesh.Mesh.from_file('torus.stl')
+
+R = u1[5].reshape((3,3)).T
+print (R)
+
+your_mesh.rotate_using_matrix(R)
+scale = your_mesh.points.flatten()
+axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
+axes.auto_scale_xyz(scale, scale, scale)
+LIM = 5
+axes.set_xlim(-LIM,LIM);axes.set_ylim(-LIM,LIM);axes.set_zlim(-LIM,LIM)
+axes.view_init(azim=84,elev=28)
+plt.savefig('phy_005_basics_04_01.png')  
 \end{minted}
 
 \begin{verbatim}
-[[ 1.          0.          0.          0.          1.          0.
-   0.          0.          1.        ]
- [ 0.76523954  0.55718255 -0.32242209 -0.32242209  0.76523954  0.55718255
-   0.55718255 -0.32242209  0.76523954]
- [ 0.22629566  0.95671225 -0.18300792 -0.18300792  0.22629566  0.95671225
-   0.95671225 -0.18300792  0.22629566]]
+[[ 0.71444998 -0.33092943  0.61647945]
+ [ 0.61647945  0.71444998 -0.33092943]
+ [-0.33092943  0.61647945  0.71444998]]
 \end{verbatim}
-
-
-
-
 
 
 
