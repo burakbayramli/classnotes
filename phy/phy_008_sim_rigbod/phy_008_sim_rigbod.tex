@@ -2,12 +2,32 @@
 \begin{document}
 Katı-Gövde Simülasyonu
 
+Dönüş Animasyonu
+
 Bir örnek gövde üzerinde simülasyon yapmaya uğraşalım. Elimizde bir simit, ya da
 geometride torus denen bir şekil var. Bu dosya STL denen bir format içinde,
-detaylar için [1].
+detaylar için [1]. Kuvvet uygulama sonrası lineer ve açısal momentum içeren
+simülasyon için pek çok değişkeni diferansiyel tanımları üzerinden entegre
+etmemiz gerekiyor, daha basit bir örnek ile, özellikle sabit bir açışal hız
+üzerinden salt döndürme ile başlamak uygun olabilir. Hesapsal baglamda döndürme
+işleminin temsili ilk başta biraz karmaşık olabiliyor zaten, önce onu tek başına
+bir örnek üzerinde görelim. [4]'te tarif edilen döndürme matrisi türevini
+hatırlarsak,
+
+$$
+\frac{\ud R}{\ud t} = \tilde \omega \cdot R
+$$
+
+Döndürmeyi bir $\omega$ etrafında düşünüyorduk, $\omega$'nin büyüklüğü
+açısal dönme hızına tekabül ediyordu, ve $\tilde \omega$ eksi-bakışımlı
+matris idi.
 
 \includegraphics[width=25em]{phy_005_basics_04_01.png}
 
+Tüm bunları entegre edici \verb!odeint! çağrısının kabul edeceği bir formda
+nasıl kullanırız? Bu çağrı düzleştirilmiş bir liste içinde diferansiyel
+sonuçların, ve ana değişkenlerin olmasını bekliyor. O zaman $R$'yi kolon bazlı
+olmak üzere düzleştiririz, ve gerektiği o listeden matris formuna geçeriz, vs.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from scipy.integrate import odeint
@@ -38,6 +58,10 @@ u0 = R0.flatten()
 u1=odeint(rhs,list(u0),t)
 \end{minted}
 
+Üstte görülen mesela \verb!R1x! $R$ matrisinin 1'inci kolonunun $x$ değişkeni
+anlamında.
+
+Simülasyonu hesapladık, tüm sonuç \verb!ü1! içinde, şimdi grafikleyelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import matplotlib.pyplot as plt
@@ -65,17 +89,19 @@ for i in range(STEPS):
     plt.savefig('/tmp/rotate_%02d.png' % i)  
 \end{minted}
 
+\includegraphics[width=20em]{sim1/rotate_00.png}
 
+\includegraphics[width=20em]{sim1/rotate_08.png}
+
+\includegraphics[width=20em]{sim1/rotate_14.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 ! convert -delay 20 -loop 0 /tmp/rotate*.png /tmp/rotate1.gif
 \end{minted}
 
+Animasyon sonucu [4]'te bulunabilir.
 
-
-
-
-
+İttirme Animasyonu
 
 Torus STL şekli içiçe geçmiş üçgenler ile tanımlı, bu
 üçgenlerin herbirine dik olan normal vektörü biliyoruz. O üçgenlerden birinin
@@ -156,6 +182,11 @@ Kaynaklar
 
 [2] Witkin, {\em Physically Based Modeling}
 
+[3] Bayramli, {\em Animasyon 1},
+    \url{https://drive.google.com/uc?export=view&id=17qlJvaucB6_l0eLUfcevu84qNXQocGHO}
+
+[4] Bayramli, {\em Fizik, Temel Fizik 4, Katı Gövde}
+    
 \end{document}
 
 
