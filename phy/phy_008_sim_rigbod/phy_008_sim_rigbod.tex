@@ -4,7 +4,80 @@ Katı-Gövde Simülasyonu
 
 Bir örnek gövde üzerinde simülasyon yapmaya uğraşalım. Elimizde bir simit, ya da
 geometride torus denen bir şekil var. Bu dosya STL denen bir format içinde,
-detaylar için [1]. Torus STL şekli içiçe geçmiş üçgenler ile tanımlı, bu
+detaylar için [1].
+
+\includegraphics[width=25em]{phy_005_basics_04_01.png}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.integrate import odeint
+from stl import mesh
+
+def skew(a):
+   return np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]])
+
+your_mesh = mesh.Mesh.from_file('torus.stl')
+prop = your_mesh.get_mass_properties()
+R0 = np.eye(3,3)
+omega = np.array([1.0,1.0,1.0])
+#omega = np.array([0.0,1.0,0.0])
+skew_omega = skew(omega)
+   
+def rhs(u,t):   
+   R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z = u
+   R = np.array([R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z])
+   R = R.reshape((3,3)).T
+   res = np.dot(skew_omega, R)
+   return list(res.T.flatten())
+
+LIM = 5
+STEPS = 20
+t=np.linspace(0.0, 3.0, STEPS)
+R0 = np.eye(3,3)
+u0 = R0.flatten()
+u1=odeint(rhs,list(u0),t)
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+
+def plot_vector(fig, orig, v, color='blue'):
+   ax = fig.gca(projection='3d')
+   orig = np.array(orig); v=np.array(v)
+   ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
+   ax = fig.gca(projection='3d')  
+   return fig
+
+for i in range(STEPS):
+    fig = plt.figure()
+    axes = mplot3d.Axes3D(fig)
+    your_mesh = mesh.Mesh.from_file('torus.stl')
+    R = u1[i].reshape((3,3)).T
+    your_mesh.rotate_using_matrix(R)
+    scale = your_mesh.points.flatten()
+    axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
+    plot_vector(fig, [0,0,0], omega, color='red')
+    axes.auto_scale_xyz(scale, scale, scale)
+    axes.set_xlim(-LIM,LIM);axes.set_ylim(-LIM,LIM);axes.set_zlim(-LIM,LIM)
+    axes.view_init(azim=20,elev=0)
+    plt.savefig('/tmp/rotate_%02d.png' % i)  
+\end{minted}
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+! convert -delay 20 -loop 0 /tmp/rotate*.png /tmp/rotate1.gif
+\end{minted}
+
+
+
+
+
+
+
+Torus STL şekli içiçe geçmiş üçgenler ile tanımlı, bu
 üçgenlerin herbirine dik olan normal vektörü biliyoruz. O üçgenlerden birinin
 orta noktasından çıkan vektörlerden birini ters çevirirsek, o noktaya o yönde
 bir kuvvet uyguladığımızı hayal edelim, ve simülasyonun geri kalanını bu
@@ -72,68 +145,6 @@ plt.savefig('phy_005_basics_04_05.png')
 \includegraphics[width=20em]{phy_005_basics_04_05.png}
 
 \includegraphics[width=25em]{phy_008_sim_rigbod_01.png}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import numpy.linalg as lin
-from scipy.integrate import odeint
-
-def skew(a):
-   return np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]])
-
-prop = your_mesh.get_mass_properties()
-R0 = np.eye(3,3)
-omega = np.array([1,1,1])
-skew_omega = skew(omega)
-   
-def rhs(u,t):   
-   R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z = u
-   R = np.array([R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z])
-   R = R.reshape((3,3)).T
-   res = np.dot(skew_omega, R)
-   return list(res.T.flatten())
-
-t=np.linspace(0.0, 1.0, 10)
-R0 = np.eye(3,3)
-u0 = R0.flatten()
-u1=odeint(rhs,list(u0),t)
-\end{minted}
-
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
-
-fig = plt.figure()
-axes = mplot3d.Axes3D(fig)
-your_mesh = mesh.Mesh.from_file('torus.stl')
-
-R = u1[5].reshape((3,3)).T
-print (R)
-
-your_mesh.rotate_using_matrix(R)
-scale = your_mesh.points.flatten()
-axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
-axes.auto_scale_xyz(scale, scale, scale)
-LIM = 5
-axes.set_xlim(-LIM,LIM);axes.set_ylim(-LIM,LIM);axes.set_zlim(-LIM,LIM)
-axes.view_init(azim=84,elev=28)
-plt.savefig('phy_005_basics_04_01.png')  
-\end{minted}
-
-\begin{verbatim}
-[[ 0.71444998 -0.33092943  0.61647945]
- [ 0.61647945  0.71444998 -0.33092943]
- [-0.33092943  0.61647945  0.71444998]]
-\end{verbatim}
-
-
-
-
-
-
-
-
-
 
 
 [devam edecek]
