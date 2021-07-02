@@ -24,6 +24,17 @@ STEPS = 2
 t=np.linspace(0.0, 1.0, STEPS)
 R0 = np.eye(3,3)
 u0 = R0.flatten()
-u1=odeint(rhs,list(u0),t)
-print (u1)
+
+
+tidx = 2000
+apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
+f_at = -your_mesh.get_unit_normals()[tidx]
+print (apply_at.shape)
+print (f_at.shape)
+tau_at = np.cross(apply_at, f_at)
+print (tau_at.shape)
+print (tau_at)
+
+#u1=odeint(rhs,list(u0),t)
+#print (u1)
 
