@@ -9,7 +9,7 @@ def skew(a):
 your_mesh = mesh.Mesh.from_file('torus.stl')
 prop = your_mesh.get_mass_properties()
 R0 = np.eye(3,3)
-omega = np.array([0.0,0.0,0.0])
+omega = np.array([1.0,1.0,1.0])
 skew_omega = skew(omega)
    
 def rhs(u,t):   
@@ -20,8 +20,10 @@ def rhs(u,t):
    return list(res.T.flatten())
 
 LIM = 5
-STEPS = 20
-t=np.linspace(0.0, 3.0, STEPS)
+STEPS = 2
+t=np.linspace(0.0, 1.0, STEPS)
 R0 = np.eye(3,3)
 u0 = R0.flatten()
 u1=odeint(rhs,list(u0),t)
+print (u1)
+
