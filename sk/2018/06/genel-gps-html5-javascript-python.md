@@ -13,6 +13,19 @@ print (dist.km)
 
 İkinci ifade float tıpınde mesafeyi verir, kilometre bazlıdır.
 
+Daha az dış kütüphanelere bağımlı bir kod istersek, alttaki kod faydalı,
+
+```python
+from scipy import sin, cos, tan, arctan, arctan2, arccos, pi
+
+def spherical_distance(lat1, long1, lat2, long2):
+    phi1 = 0.5*pi - lat1
+    phi2 = 0.5*pi - lat2
+    r = 0.5*(6378137 + 6356752) # mean radius in meters
+    t = sin(phi1)*sin(phi2)*cos(long1-long2) + cos(phi1)*cos(phi2)
+    return r * arccos(t) / 1000.
+```
+
 İki nokta arasında birinciden ikinciye olan açısal yön (bearing),
 
 ```python
@@ -42,9 +55,10 @@ d = geopy.distance.VincentyDistance(kilometers = 1)
 reached = d.destination(point=start, bearing=0)
 print (reached.latitude)
 print (reached.longitude)
+```
 
-Bir GPS kordinat listesinin orta noktasini bulmak icin noktalari
-toplayip, bolmek yerine, ozel paket kullanmak daha iyi;
+Bir GPS kordinat listesinin orta noktasını bulmak için noktaları
+toplayıp, bölmek yerine, özel paket kullanmak daha iyi;
 
 ```python
 from shapely.geometry import Polygon
@@ -54,9 +68,9 @@ print (p.centroid.x)
 print (p.centroid.y)
 ```
 
-Ustteki shapely kullanimi yerine (bu paketin geos C bazli
-kutuphanesine baglantisi var, ki bu paket her ortamda -mesela Termux-
-derlenemeyebilir) pur Python bazli kod gerekirse alttaki kullanisli.
+Üstteki shapely kullanımı yerine (bu paketin geos C bazlı
+kütüphanesine bağlantısı var, ki bu paket her ortamda
+derlenemeyebilir) pür Python bazlı kod gerekirse alttaki kullanışlı.
 
 ```python
 def get_centroid(poly):
@@ -102,6 +116,50 @@ def get_centroid(poly):
     return centroid_total
 ```
 
+Bir alternatif daha su [baglantidan](https://www.navlab.net/nvector/#example_7),
+enlem, boylam bir uc boyutlu vektor haline getiriliyor, ve Kartezyen bazli bu
+vektorlerin ortalamasi dogru ortalamayi veriyor. Kodun temel aldigi makale [1].
+
+```python
+import numpy as np
+import numpy.linalg as lin
+
+E = np.array([[0, 0, 1],
+              [0, 1, 0],
+              [-1, 0, 0]])
+
+def lat_long2n_E(latitude,longitude):
+    res = [np.sin(np.deg2rad(latitude)),
+           np.sin(np.deg2rad(longitude)) * np.cos(np.deg2rad(latitude)),
+           -np.cos(np.deg2rad(longitude)) * np.cos(np.deg2rad(latitude))]
+    return np.dot(E.T,np.array(res))
+
+def n_E2lat_long(n_E):
+    n_E = np.dot(E, n_E)
+    longitude=np.arctan2(n_E[1],-n_E[2]);
+    equatorial_component = np.sqrt(n_E[1]**2 + n_E[2]**2 );
+    latitude=np.arctan2(n_E[0],equatorial_component);
+    return np.rad2deg(latitude), np.rad2deg(longitude)
+
+def average(coords):
+    res = []
+    for lat,lon in coords:
+        res.append(lat_long2n_E(lat,lon))
+    res = np.array(res)
+    m = np.mean(res,axis=0)
+    m = m / lin.norm(m)
+    return n_E2lat_long(m)
+        
+
+n = lat_long2n_E(30,20)
+print (n)
+print (n_E2lat_long(np.array(n)))
+
+# find middle of france and libya
+coords = [[30,20],[47,3]]
+m = average(coords)
+print (m)
+```
 
 HTML5 ve Javascript ile Yer Bulmak
 
@@ -146,7 +204,10 @@ olarak eklenecek.
 </html>
 ```
 
+Kaynaklar
 
+[1] Kenneth Gade (2010), A Non-singular Horizontal Position Representation,
+    The Journal of Navigation, Volume 63, Issue 03, pp 395-417, July 2010.
 
 
 
