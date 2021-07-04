@@ -57,8 +57,23 @@ print (reached.latitude)
 print (reached.longitude)
 ```
 
-Bir GPS kordinat listesinin orta noktasını bulmak için noktaları
-toplayıp, bölmek yerine, özel paket kullanmak daha iyi;
+Daha duz ve API'siz isleyen bir kod
+
+```python
+def to_bearing(lat,lon,brng,d):
+    R = 6378.1 #Radius of the Earth
+    lat1 = math.radians(lat)
+    lon1 = math.radians(lon)
+    lat2 = math.asin( math.sin(lat1)*math.cos(d/R) +
+         math.cos(lat1)*math.sin(d/R)*math.cos(brng))
+    lon2 = lon1 + math.atan2(math.sin(brng)*math.sin(d/R)*math.cos(lat1),
+                 math.cos(d/R)-math.sin(lat1)*math.sin(lat2))
+    lat2 = math.degrees(lat2)
+    lon2 = math.degrees(lon2)
+    return lat2,lon2
+```
+
+Bir GPS kordinat listesinin orta noktasını bulmak için,
 
 ```python
 from shapely.geometry import Polygon
@@ -68,7 +83,7 @@ print (p.centroid.x)
 print (p.centroid.y)
 ```
 
-Üstteki shapely kullanımı yerine (bu paketin geos C bazlı
+Üstteki `shapely` kullanımı yerine (bu paketin geos C bazlı
 kütüphanesine bağlantısı var, ki bu paket her ortamda
 derlenemeyebilir) pür Python bazlı kod gerekirse alttaki kullanışlı.
 
@@ -116,17 +131,15 @@ def get_centroid(poly):
     return centroid_total
 ```
 
-Bir alternatif daha su [baglantidan](https://www.navlab.net/nvector/#example_7),
-enlem, boylam bir uc boyutlu vektor haline getiriliyor, ve Kartezyen bazli bu
-vektorlerin ortalamasi dogru ortalamayi veriyor. Kodun temel aldigi makale [1].
+Bir alternatif daha su [bağlantıdan](https://www.navlab.net/nvector/#example_7),
+enlem, boylam bir üç boyutlu vektör haline getiriliyor, ve Kartezyen bazlı bu
+vektörlerin ortalaması doğru ortalamayı veriyor. Kodun temel aldığı makale [1].
 
 ```python
 import numpy as np
 import numpy.linalg as lin
 
-E = np.array([[0, 0, 1],
-              [0, 1, 0],
-              [-1, 0, 0]])
+E = np.array([[0, 0, 1],[0, 1, 0],[-1, 0, 0]])
 
 def lat_long2n_E(latitude,longitude):
     res = [np.sin(np.deg2rad(latitude)),
