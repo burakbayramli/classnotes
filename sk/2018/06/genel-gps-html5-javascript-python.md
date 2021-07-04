@@ -1,24 +1,21 @@
 # Genel GPS: HTML5, Javascript, Python, Kodlari, Tavsiyeleri
 
-
-Genel GPS: HTML5, Javascript, Python, Kodlari, Tavsiyeleri
-
-
-
-
 Mesafe hesabi yapmak
 
 Iki enlem, boylam kordinati arasinda mesafe hesabi icin geopy kullanilabilir.
 
+```python
 import geopy.distance
 dist = geopy.distance.vincenty((51.238689, 4.406747),(51.232246, 4.444266))
 print (dist)
 print (dist.km)
+```
 
 İkinci ifade float tıpınde mesafeyi verir, kilometre bazlıdır.
 
 İki nokta arasında birinciden ikinciye olan açısal yön (bearing),
 
+```python
 def get_bearing(lat1,lon1,lat2,lon2):
     dLon = lon2 - lon1;
     y = math.sin(dLon) * math.cos(lat2);
@@ -26,13 +23,15 @@ def get_bearing(lat1,lon1,lat2,lon2):
     brng = np.rad2deg(math.atan2(y, x));
     if brng < 0: brng+= 360
     return brng
+```
 
+Sonuç 0 derece kuzey olmak üzere 0-360 derece arasında saat yönüne
+doğru artacak şekilde açı.
 
+Bir kordinattan "10 km doguya, batiya, vs. adim atinca nereye
+geliriz?" sorusunun cevabi icin
 
-Sonuç 0 derece kuzey olmak üzere 0-360 derece arasında saat yönüne doğru artacak şekilde açı.
-
-Bir kordinattan "10 km doguya, batiya, vs. adim atinca nereye geliriz?" sorusunun cevabi icin
-
+```python
 import geopy
 import geopy.distance
 # baslangic noktasi
@@ -44,16 +43,22 @@ reached = d.destination(point=start, bearing=0)
 print (reached.latitude)
 print (reached.longitude)
 
-Bir GPS kordinat listesinin orta noktasini bulmak icin noktalari toplayip, bolmek yerine, ozel paket kullanmak daha iyi;
+Bir GPS kordinat listesinin orta noktasini bulmak icin noktalari
+toplayip, bolmek yerine, ozel paket kullanmak daha iyi;
 
+```python
 from shapely.geometry import Polygon
 pts = [[51.238689, 4.406747],[51.232246, 4.444266],[51.251485,4.472641],[51.265894, 4.452429]]
 p = Polygon(pts)
 print (p.centroid.x)
 print (p.centroid.y)
+```
 
-Ustteki shapely kullanimi yerine (bu paketin geos C bazli kutuphanesine baglantisi var, ki bu paket her ortamda -mesela Termux- derlenemeyebilir) pur Python bazli kod gerekirse alttaki kullanisli.
+Ustteki shapely kullanimi yerine (bu paketin geos C bazli
+kutuphanesine baglantisi var, ki bu paket her ortamda -mesela Termux-
+derlenemeyebilir) pur Python bazli kod gerekirse alttaki kullanisli.
 
+```python
 def get_centroid(poly):
     """Calculates the centroid of a non-intersecting polygon.
     Args:
@@ -95,123 +100,21 @@ def get_centroid(poly):
                              (area * centroid[1])) / (area_total + area)
         area_total += area
     return centroid_total
+```
 
-Bu kod daha once verilmisti ama tekrar daha temiz verelim. Google Maps'den belli bolgelere arasina dusen tum harita parcalarini, imaj olarak, istenen buyuklukte almak,
-
-import itertools, time
-import pandas as pd, time
-import numpy as np
-import matplotlib.pyplot as plt
-from math import sin, cos, sqrt, atan2, radians
-from io import BytesIO
-from PIL import Image
-import urllib.request, os.path
-
-def get_map(lat, lon, region, zoom):
-    api = open("[GOOGLE MAPS ANAHTAR DEGERININ OLDUGU DOSYA ISMI BURAYA").read()
-    url = "http://maps.googleapis.com/maps/api/staticmap?center=" + \
-       "%f,%f&scale=2&size=800x800&maptype='terrain'&zoom=%d&key=%s" % (lat,lon,zoom,api)
-    print (url)
-    lats = str(lat).replace(".","_")
-    lons = str(lon).replace(".","_")
-    fout = "%s/%s_map_%s_%s.png" % (region,region,lats,lons)
-    if os.path.isfile(fout):
-        print ("Already downloaded...")
-        return False
-    buffer = BytesIO(urllib.request.urlopen(url).read())
-    image = Image.open(buffer)
-    image.save(fout)
-    return True
-    
-def get_maps(c1,c2,px,py,region,zoom=11):
-    """
-    c1: one corner of the region box
-    c2: the opposite corner of the region box
-
-    get_maps will always pick the smallest / largest of each
-    coord and create a box to sweep over. 
-    """
-    a= np.linspace(min(c1[0],c2[0]), max(c1[0],c2[0]), px)
-    b= np.linspace(min(c1[1],c2[1]), max(c1[1],c2[1]), py)
-    aa,bb = np.meshgrid(a,b)
-    for x,y in zip(aa.flatten(),bb.flatten()):
-        if get_map(x,y,region,zoom) == False: continue
-
-
-if __name__ == "__main__":
-    # harita hangi kordinatlar arasinda olmali
-    c1 = (51.450320,2.963884); c2 = (39.460801, 29.786351)
-    get_maps(c1, c2, 80, 80, region="europe2")
-
-
-Imaj dosyalari bir alt dizin region icinde yaziliyor, bu dizin yaratilmis olmali.
-
-Kullanmak icin ustteki dizini zip dosyasi haline getiririz, ve o veri tabani haline gelir. Sonra o zip dosyasini zfile parametresi olarak veririz, ve
-
-import geopy.distance
-import pandas as pd, io
-from PIL import Image
-import os, glob, re, zipfile
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
-# enlem/boylam ve pikseller arasinda gecis icin,
-# her zoom seviyesi icin deneme/yanilma ile kendimiz bulduk
-SCALEX = 2900. 
-SCALEY = -4700.
-
-def plot(points,outfile,zfile):
-    """
-    Birinci noktayi baz alarak gerekli harita inajini bul, ve diger
-    tum noktalari bu harita uzerinde grafikle
-    """
-    plt.figure()
-    center_res = points[0]
-    imgcoord = []
-    with zipfile.ZipFile(zfile, 'r') as z:
-        for f in z.namelist():
-            # the lat/lon middle of the map is encoded in the map's
-            # filename
-            tmp = re.findall("map_(\d+)_(\d+)_(\d+)_(\d+)",f,re.DOTALL)
-            if len(tmp)==0: continue
-            tmp = tmp[0]
-            imgcoord.append([float(tmp[0] + "." + tmp[1]), float(tmp[2] + "." + tmp[3]), f])
-    imgcoord2 = pd.DataFrame(imgcoord,columns=['lat','lon','file'])
-    dists = imgcoord2.apply(lambda x: geopy.distance.vincenty((x['lat'],x['lon']),center_res).km, axis=1)
-    # the closest map is picked
-    found = imgcoord2.ix[dists.idxmin()]
-    print (found.file)
-    mapcenter = np.array(found[['lat','lon']])
-    print (mapcenter)
-    
-    with zipfile.ZipFile(zfile, 'r') as z:
-         im = Image.open(z.open(found.file))
-         nim = np.array(im)
-         c = nim.shape[0] / 2, nim.shape[0] / 2
-         plt.axis('off')
-         fig=plt.imshow(im)
-         fig.axes.get_xaxis().set_visible(False)
-         fig.axes.get_yaxis().set_visible(False)
-         plt.imshow(im)
-         for i,[lat,lon] in enumerate(points):
-             dx,dy=((lon-mapcenter[1])*SCALEX,(lat-mapcenter[0])*SCALEY)             
-             xx = c[0]+dx
-             yy = c[1]+dy
-             if xx > nim.shape[0] or yy > nim.shape[1] or xx<0 continue="" font="" or="" yy="">0>
-             if i==0:
-                 plt.plot(xx,yy,'rx')
-             else:
-                 plt.plot(xx,yy,'r.')
-         plt.savefig(outfile, bbox_inches='tight', pad_inches = 0, dpi = 300)
-Bahsedilen zip dosyalarin ornekleri icin su alt projemize bakilabilir. Ustteki kodlarin en son hali de bu projede olacaktir,
 
 HTML5 ve Javascript ile Yer Bulmak
 
-Javascript icinden yer bulmak mumkun, bu cep telefonunda da isliyor, Google'in Wifi, Telekom, GPS uzerinden yer bulan arayuzu ile baglantili zannederim. Kalitesini kontrol etmedim, ama alttaki kod isler ve yer rapor eder. Isletince tarayici 'yer bilgisine erisim' icin izin isteyecek. Izin verince (allow), bilgi sayfada basilacak ve kullanim ornegi olsun diye bir de URL baglantilardan birine parametre olarak eklenecek.
+Javascript icinden yer bulmak mumkun, bu cep telefonunda da isliyor,
+Google'in Wifi, Telekom, GPS uzerinden yer bulan arayuzu ile
+baglantili zannederim. Kalitesini kontrol etmedim, ama alttaki kod
+isler ve yer rapor eder. Isletince tarayici 'yer bilgisine erisim'
+icin izin isteyecek. Izin verince (allow), bilgi sayfada basilacak ve
+kullanim ornegi olsun diye bir de URL baglantilardan birine parametre
+olarak eklenecek.
 
+```
 <html>
-
   <script>
     var lat = "lat";
     var lon = "lon";
@@ -241,6 +144,7 @@ Javascript icinden yer bulmak mumkun, bu cep telefonunda da isliyor, Google'in W
   </div>
 
 </html>
+```
 
 
 
