@@ -187,69 +187,6 @@ plt.savefig('phy_005_basics_04_05.png')
 \includegraphics[width=25em]{phy_008_sim_rigbod_01.png}
 
 
-\begin{minted}[fontsize=\footnotesize]{python}
-from stl import mesh
-import numpy.linalg as lin
-
-Ibody = np.round(prop[2],3)
-Ibodyinv = lin.inv(Ibody)
-dt = 0.001
-x = np.zeros((3,1))
-R = np.eye(3,3)
-L = np.zeros((3,3))
-v = np.zeros((3,1))
-F = np.zeros((3,1))
-M = 1
-P = M*v
-
-def skew(a):
-   return np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]])
-
-your_mesh = mesh.Mesh.from_file('torus.stl')
-   
-apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
-f_at = -your_mesh.get_unit_normals()[tidx]
-tau0 = np.cross(apply_at, f_at)
-print (tau0)
-
-for i in range(2):
-   print ('iteration=',i)
-   xold,Rold,Pold,Lold = x.copy(),R.copy(),P.copy(),L.copy()
-   v = Pold / M
-   x = x + v*dt
-   Iinv = np.dot(np.dot(Rold, Ibodyinv), Rold.T)   
-   omega = np.dot(Iinv, Lold)
-   print ('---',omega)
-   skew_omega = skew(omega)
-   #print (np.dot(skew_omega, Rold))
-   R = Rold + np.dot(skew_omega, Rold) * dt
-   #F =
-   if i==0:      
-      L = L + tau0*dt
-   print (R.shape)
-   #print (R)
-\end{minted}
-
-\begin{verbatim}
-[-0.1456235  -0.90688956 -0.00537644]
-iteration= 0
---- [[0. 0. 0.]
- [0. 0. 0.]
- [0. 0. 0.]]
-(3, 3)
-iteration= 1
---- [[array([-4.51825996e-05, -4.51825996e-05, -4.51825996e-05])
-  array([-0.00028138, -0.00028138, -0.00028138])
-  array([-1.66814873e-06, -1.66814873e-06, -1.66814873e-06])]
- [array([-4.51825996e-05, -4.51825996e-05, -4.51825996e-05])
-  array([-0.00028138, -0.00028138, -0.00028138])
-  array([-1.66814873e-06, -1.66814873e-06, -1.66814873e-06])]
- [array([-2.49697391e-05, -2.49697391e-05, -2.49697391e-05])
-  array([-0.0001555, -0.0001555, -0.0001555])
-  array([-9.21886723e-07, -9.21886723e-07, -9.21886723e-07])]]
-(3, 3)
-\end{verbatim}
-
 
 
 
