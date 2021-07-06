@@ -12,7 +12,7 @@
 
 [basemap](06/basemap.md)
 
-[Genel GPS: HTML5, Javascript, Python, Kodlari, Tavsiyeleri](06/genel-gps-html5-javascript-python.md)
+[Genel Coğrafi Kordinat Kodları, HTML5, Javascript, Python](06/genel-gps-html5-javascript-python.md)
 
 [Keras](06/keras.md)
 

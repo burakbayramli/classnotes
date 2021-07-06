@@ -9,10 +9,8 @@ geometride torus denen bir şekil var. Bu dosya STL denen bir format içinde,
 detaylar için [1]. Kuvvet uygulama sonrası lineer ve açısal momentum içeren
 simülasyon için pek çok değişkeni diferansiyel tanımları üzerinden entegre
 etmemiz gerekiyor, daha basit bir örnek ile, özellikle sabit bir açışal hız
-üzerinden salt döndürme ile başlamak uygun olabilir. Hesapsal baglamda döndürme
-işleminin temsili ilk başta biraz karmaşık olabiliyor zaten, önce onu tek başına
-bir örnek üzerinde görelim. [4]'te tarif edilen döndürme matrisi türevini
-hatırlarsak,
+üzerinden salt döndürme ile başlamak uygun olabilir. [4]'te tarif edilen
+döndürme matrisi türevini hatırlarsak,
 
 $$
 \frac{\ud R}{\ud t} = \tilde \omega \cdot R
@@ -43,7 +41,7 @@ omega = np.array([1.0,1.0,1.0])
 #omega = np.array([0.0,1.0,0.0])
 skew_omega = skew(omega)
    
-def rhs(u,t):   
+def dRdt(u,t):   
    R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z = u
    R = np.array([R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z])
    R = R.reshape((3,3)).T
@@ -55,7 +53,7 @@ STEPS = 20
 t=np.linspace(0.0, 3.0, STEPS)
 R0 = np.eye(3,3)
 u0 = R0.flatten()
-u1=odeint(rhs,list(u0),t)
+u1=odeint(dRdt,list(u0),t)
 \end{minted}
 
 Üstte görülen mesela \verb!R1x! $R$ matrisinin 1'inci kolonunun $x$ değişkeni
@@ -104,12 +102,25 @@ for i in range(STEPS):
 
 Animasyon sonucu [4]'te bulunabilir.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 İttirme Animasyonu
 
 Bu animasyon için katı gövdeye bir noktada bir kuvvet uyguluyacağız. O noktayı
 seçmek için STL formatında olan üçgenlerden birini kullanabiliriz, çünkü bu
 üçgenlerin gövdenin yüzeyinde bir yerlerde olduğunu biliyoruz, Torus STL şekli
-bu üçgenlerin herbirine dik olan normal vektörü ŞTL formatında zaten, o
+bu üçgenlerin herbirine dik olan normal vektörü STL formatında zaten, o
 üçgenlerden birinin normal vektörünü ters çevirirsek, o noktaya o yönde bir
 kuvvet uyguladığımızı hayal edebililriz, ve simülasyonun geri kalanını bu
 noktadan devam ettiririz.
@@ -121,16 +132,14 @@ your_mesh = mesh.Mesh.from_file('torus.stl')
 
 prop = your_mesh.get_mass_properties()
 print ('hacim',np.round(prop[0],3))
-print ('\nyercekim merkezi (COG)',np.round(prop[1],3))
-print ('\nCOG noktasinda atalet matrisi')
+print ('yercekim merkezi (COG)',np.round(prop[1],3))
+print ('COG noktasinda atalet matrisi')
 print (np.round(prop[2],3))
 \end{minted}
 
 \begin{verbatim}
 hacim 4.918
-
 yercekim merkezi (COG) [-0.  0. -0.]
-
 COG noktasinda atalet matrisi
 [[ 3.223 -0.     0.   ]
  [-0.     3.223  0.   ]
@@ -176,6 +185,72 @@ plt.savefig('phy_005_basics_04_05.png')
 \includegraphics[width=20em]{phy_005_basics_04_05.png}
 
 \includegraphics[width=25em]{phy_008_sim_rigbod_01.png}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from stl import mesh
+import numpy.linalg as lin
+
+Ibody = np.round(prop[2],3)
+Ibodyinv = lin.inv(Ibody)
+dt = 0.001
+x = np.zeros((3,1))
+R = np.eye(3,3)
+L = np.zeros((3,3))
+v = np.zeros((3,1))
+F = np.zeros((3,1))
+M = 1
+P = M*v
+
+def skew(a):
+   return np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]])
+
+your_mesh = mesh.Mesh.from_file('torus.stl')
+   
+apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
+f_at = -your_mesh.get_unit_normals()[tidx]
+tau0 = np.cross(apply_at, f_at)
+print (tau0)
+
+for i in range(2):
+   print ('iteration=',i)
+   xold,Rold,Pold,Lold = x.copy(),R.copy(),P.copy(),L.copy()
+   v = Pold / M
+   x = x + v*dt
+   Iinv = np.dot(np.dot(Rold, Ibodyinv), Rold.T)   
+   omega = np.dot(Iinv, Lold)
+   print ('---',omega)
+   skew_omega = skew(omega)
+   #print (np.dot(skew_omega, Rold))
+   R = Rold + np.dot(skew_omega, Rold) * dt
+   #F =
+   if i==0:      
+      L = L + tau0*dt
+   print (R.shape)
+   #print (R)
+\end{minted}
+
+\begin{verbatim}
+[-0.1456235  -0.90688956 -0.00537644]
+iteration= 0
+--- [[0. 0. 0.]
+ [0. 0. 0.]
+ [0. 0. 0.]]
+(3, 3)
+iteration= 1
+--- [[array([-4.51825996e-05, -4.51825996e-05, -4.51825996e-05])
+  array([-0.00028138, -0.00028138, -0.00028138])
+  array([-1.66814873e-06, -1.66814873e-06, -1.66814873e-06])]
+ [array([-4.51825996e-05, -4.51825996e-05, -4.51825996e-05])
+  array([-0.00028138, -0.00028138, -0.00028138])
+  array([-1.66814873e-06, -1.66814873e-06, -1.66814873e-06])]
+ [array([-2.49697391e-05, -2.49697391e-05, -2.49697391e-05])
+  array([-0.0001555, -0.0001555, -0.0001555])
+  array([-9.21886723e-07, -9.21886723e-07, -9.21886723e-07])]]
+(3, 3)
+\end{verbatim}
+
+
 
 
 [devam edecek]

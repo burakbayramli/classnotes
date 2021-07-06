@@ -1,4 +1,4 @@
-# Genel GPS: HTML5, Javascript, Python, Kodlari, Tavsiyeleri
+# Genel Coğrafi Kordinat Kodları, HTML5, Javascript, Python
 
 Mesafe hesabi yapmak
 
@@ -168,7 +168,7 @@ n = lat_long2n_E(30,20)
 print (n)
 print (n_E2lat_long(np.array(n)))
 
-# find middle of france and libya
+# fransa ve libya ortasi
 coords = [[30,20],[47,3]]
 m = average(coords)
 print (m)
