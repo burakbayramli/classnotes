@@ -21,7 +21,7 @@ def skew(a):
 
 tidx = 2000
 apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
-f_at = -your_mesh.get_unit_normals()[tidx]
+f_at = your_mesh.get_unit_normals()[tidx]
 tau0 = np.cross(apply_at, f_at).reshape(3,1) * 10.0
 
 res = []
