@@ -19,9 +19,7 @@ P = M*v
 def skew(a):
    print ('a',a)
    print (a[2])
-   return np.array([[0,-a[2],a[1]],
-                    [a[2],0,-a[0]],
-                    [-a[1],a[0],0]])
+   return np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]])
 
 tidx = 2000
 apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
@@ -72,7 +70,7 @@ for i, [x,R,P,L] in enumerate(res):
    fig = plt.figure()
    axes = mplot3d.Axes3D(fig)
    your_mesh = mesh.Mesh.from_file('torus.stl')
-   # t-0 aninda uygulanan kuvvet vektorunu goster
+   # t-0 aninda uygulanan kuvvet yonunu goster
    o = np.mean(your_mesh.vectors[tidx],axis=0)
    n = your_mesh.get_unit_normals()[tidx]
    plot_vector(fig, o, -n*SCALE, color='red')
@@ -85,8 +83,7 @@ for i, [x,R,P,L] in enumerate(res):
    axes.auto_scale_xyz(scale, scale, scale)
    axes.set_xlim(-LIM,LIM);axes.set_ylim(-LIM,LIM);axes.set_zlim(-LIM,LIM)
 
-   az = 80-(i*2)
-   print (az)
+   az = 80-(i*2) # kamera dondurmek icin
    axes.view_init(azim=az,elev=28)
    plt.savefig('/tmp/rotate_%02d.png' % i)
    plt.close('all') 
