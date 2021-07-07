@@ -17,12 +17,10 @@ M = 1
 P = M*v
 
 def skew(a):
-   print ('a',a)
-   print (a[2])
    return np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]])
 
 tidx = 2000
-apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
+apply_at = np.mean(your_mesh.vectors[tidx],axis=0) - cog
 f_at = -1 * 5 * your_mesh.get_unit_normals()[tidx]
 tau0 = np.cross(apply_at, f_at).reshape(1,3) * 10.0
 flindir = cog-apply_at
@@ -41,12 +39,12 @@ for i in range(30):
    v = Pold / M
    x = x + v*dt
    P = Pold
-   if i==0:
+   if i==0: # baslangic ani
       L = Lold + tau0*dt
       P = Pold + (flin0*dt)
    else:      
-      L = Lold
-      P = Pold
+      L = Lold # sonraki adimlarda degisim yok
+      P = Pold # momentum ayni kaliyor
    res.append([x,R,P,L])
    print (R)
 
@@ -54,6 +52,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
 LIM = 5
+SCALE = 4
 
 def plot_vector(fig, orig, v, color='blue'):
    ax = fig.gca(projection='3d')
@@ -61,9 +60,6 @@ def plot_vector(fig, orig, v, color='blue'):
    ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
    ax = fig.gca(projection='3d')  
    return fig
-
-SCALE = 4
-
 
 for i, [x,R,P,L] in enumerate(res):
    print (R)
