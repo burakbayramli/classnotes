@@ -8,10 +8,10 @@ prop = your_mesh.get_mass_properties()
 Ibody = np.round(prop[2],3)
 Ibodyinv = lin.inv(Ibody)
 dt = 0.1
-x = np.zeros((3,1))
+x = np.zeros((1,3))
 R = np.eye(3,3)
 L = np.zeros((3,1))
-v = np.zeros((3,1))
+v = np.zeros((1,3))
 F = np.zeros((3,1))
 M = 1
 P = M*v
@@ -21,8 +21,9 @@ def skew(a):
 
 tidx = 2000
 apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
-f_at = your_mesh.get_unit_normals()[tidx]
+f_at = -1 * 5 * your_mesh.get_unit_normals()[tidx]
 tau0 = np.cross(apply_at, f_at).reshape(3,1) * 10.0
+flin0 = np.dot(f_at,apply_at)*(apply_at/lin.norm(apply_at))
 
 res = []
 for i in range(30):
@@ -32,20 +33,21 @@ for i in range(30):
    omega = np.dot(Iinv, Lold)
    skew_omega = skew(omega.reshape(3))
    R = Rold + np.dot(skew_omega, Rold) * dt
-   
+
+   print ('Pold',Pold)
    v = Pold / M
+   print ('x',x)
+   print ('v',v)
    x = x + v*dt
-   #F = ...
    P = Pold
    if i==0:
       L = Lold + tau0*dt
-      print ('first L',L)
+      P = Pold + (flin0*dt)
    else:      
       L = Lold
+      P = Pold
    res.append([x,R,P,L])
    print (R)
-
-#exit()   
 
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -67,15 +69,17 @@ for i, [x,R,P,L] in enumerate(res):
    fig = plt.figure()
    axes = mplot3d.Axes3D(fig)
    your_mesh = mesh.Mesh.from_file('torus.stl')
-   # force application
+   # t-0 aninda uygulanan kuvvet vektorunu goster
    o = np.mean(your_mesh.vectors[tidx],axis=0)
    n = your_mesh.get_unit_normals()[tidx]
    plot_vector(fig, o, -n*SCALE, color='red')
    
    your_mesh.rotate_using_matrix(R)
+   your_mesh.translate(x.reshape(3))
+   print ('x',x.reshape(3))
    scale = your_mesh.points.flatten()
    axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
-   plot_vector(fig, [0,0,0], omega, color='red')
+   #plot_vector(fig, [0,0,0], omega, color='red')
    axes.auto_scale_xyz(scale, scale, scale)
    axes.set_xlim(-LIM,LIM);axes.set_ylim(-LIM,LIM);axes.set_zlim(-LIM,LIM)
    
