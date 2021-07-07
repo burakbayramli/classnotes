@@ -10,19 +10,23 @@ Ibodyinv = lin.inv(Ibody)
 dt = 0.1
 x = np.zeros((1,3))
 R = np.eye(3,3)
-L = np.zeros((3,1))
+L = np.zeros((1,3))
 v = np.zeros((1,3))
 F = np.zeros((3,1))
 M = 1
 P = M*v
 
 def skew(a):
-   return np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]])
+   print ('a',a)
+   print (a[2])
+   return np.array([[0,-a[2],a[1]],
+                    [a[2],0,-a[0]],
+                    [-a[1],a[0],0]])
 
 tidx = 2000
 apply_at = np.mean(your_mesh.vectors[tidx],axis=0)
 f_at = -1 * 5 * your_mesh.get_unit_normals()[tidx]
-tau0 = np.cross(apply_at, f_at).reshape(3,1) * 10.0
+tau0 = np.cross(apply_at, f_at).reshape(1,3) * 10.0
 flindir = cog-apply_at
 flin0 = np.dot(f_at,flindir)*(flindir/np.abs(lin.norm(flindir)))
 
@@ -31,14 +35,12 @@ for i in range(30):
    xold,Rold,Pold,Lold = x.copy(),R.copy(),P.copy(),L.copy()
    
    Iinv = np.dot(np.dot(Rold, Ibodyinv), Rold.T)
-   omega = np.dot(Iinv, Lold)
-   skew_omega = skew(omega.reshape(3))
+   omega = np.dot(Iinv, Lold.T).T
+   omega = omega.reshape(3)
+   skew_omega = skew(omega)
    R = Rold + np.dot(skew_omega, Rold) * dt
 
-   print ('Pold',Pold)
    v = Pold / M
-   print ('x',x)
-   print ('v',v)
    x = x + v*dt
    P = Pold
    if i==0:
