@@ -37,9 +37,7 @@
 
 [Tüm Matematik Içeriği](https://burakbayramli.github.io/dersblog/)
 
-[Matematik İçerik Kodu](https://github.com/burakbayramli/classnotes)
-
-[Teknik Terimler Sozlugu](https://burakbayramli.github.io/dersblog/algs/dict/teknik_terimler_sozlugu.html)
+[Teknik Terimler Sözlüğü](https://burakbayramli.github.io/dersblog/algs/dict/teknik_terimler_sozlugu.html)
 
 ## Arşiv
 
