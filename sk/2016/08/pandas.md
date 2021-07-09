@@ -378,7 +378,7 @@ C     3   6
 
 Dosyalardan Okumak
 
-Üstteki örneklerde `StringİO` kullandık, ama en basit Pandas kullanımı
+Üstteki örneklerde `StringIO` kullandık, ama en basit Pandas kullanımı
 aslında `df = pd.read_csv('[dosya]')` ile direk diskten okumak.
 
 ```python
@@ -388,7 +388,7 @@ df = pd.read_csv('data.csv')
 ```
 
 Burada ilginç bazı ek numaralar da yapılabiliyor, mesela zip içinde
-olan csv direk zıp üzerinden okunabilir! Mesela test.zip içinde olan
+olan csv direk zip üzerinden okunabilir! Mesela test.zip içinde olan
 test.csv okumak için
 
 ```pandas
@@ -447,4 +447,9 @@ df = pd.read_csv(csv,sep='\t',header=None)
 Kaynaklar
 
 http://pandas.pydata.org/pandas-docs/stable/
+
+
+
+
+
 
