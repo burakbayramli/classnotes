@@ -2,7 +2,7 @@
 
 ## quakefeeds
 
-En rahat yontem `quakefeeds` adli paketi kullanmak,
+En rahat yöntem `quakefeeds` adlı paketi kullanmak,
 
 ```python
 import pandas as pd, datetime

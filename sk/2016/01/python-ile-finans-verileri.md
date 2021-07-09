@@ -1,27 +1,34 @@
 # Python ile Finans Verileri
 
-Finans verilerini indirmek, islemek Python uzerinde iyice
-basitlesti. Veri isleme amacli baslatilan Pandas'in yazari zaten
-projesini ilk basta zaman serilerileri / finans verisi islemek icin
-baslattigini soylemisti. Bu yakinlik devam etmis anlasilan, su anda
-Yahoo Finance, Google Finance, hatta makroekonomik veriler icin FRED
-baglantisi var. Hatta birisi opsiyon (option) verisi indirecek kodlari
-bile eklemis - acik yazilimin faydalari. Bazi ornekler altta,
+Finans verilerini indirmek, işlemek Python üzerinde iyice
+basitleşti. Veri işleme amaçlı başlatılan Pandas'ın yazarı zaten
+projesini ilk başta zaman serilerileri / finans verisi işlemek için
+başlattığını söylemişti. Bu yakınlık devam etmiş anlaşılan, şu anda
+Yahoo Finance, Google Finance, hatta makroekonomik veriler için FRED
+bağlantısı var. Hatta birisi opsiyon (option) verisi indirecek kodları
+bile eklemiş - açık yazılımın faydaları.
 
-Senet verisi, mesela MSFT
+Bazi ornekler altta,
+
+İndeks verisi, mesela Nasdaq için `^İXİÇ`, biraz paketsiz, kendi işimizi
+kendimiz yapmamız gerekiyor,
 
 ```
-import pandas as pd, datetime
-import pandas_datareader.data as web
+import pandas as pd, datetime, time
+from io import BytesIO
 
-start=datetime.datetime(2013, 1, 1)
-end=datetime.datetime(2015, 9, 30)
-s = web.DataReader("MSFT", 'yahoo', start, end)
+end = datetime.datetime.now()
+start=end-datetime.timedelta(days=90)
+start = int(timelib.mktime(start.timetuple()))
+end = int(timelib.mktime(end.timetuple()))
+
+url = "https://query1.finance.yahoo.com/v7/finance/download/^IXIC?period1=" + str(start) + "&period2=" + str(end) + "&interval=1d&events=history&includeAdjustedClose=true"
+r = urllib2.urlopen(url).read()
+file = BytesIO(r)
+df = pd.read_csv(file,index_col='Date')3
 ```
 
-Kaynak icin `google` gecilirse veri oradan gelecek.
-
-Ayni sekilde 'fred' ABD merkez bankasi tabanindan veri indirebiliyor.
+Aynı şekilde 'fred' ABD merkez bankası tabanından veri indirebiliyor.
 
 Opsiyon
 
