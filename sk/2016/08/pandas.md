@@ -387,9 +387,9 @@ import pandas as pd
 df = pd.read_csv('data.csv')
 ```
 
-Burada ilginç bazı ek numaralar da yapılabiliyor, mesela zip içinde
-olan csv direk zip üzerinden okunabilir! Mesela test.zip içinde olan
-test.csv okumak için
+Burada ilginç bazı ek numaralar da yapılabiliyor, örnek zip içinde olan csv
+direk zip üzerinden okunabilir! Mesela `test.zip` içinde olan `test.csv`
+dosyasını okumak için
 
 ```pandas
 import pandas as pd, zipfile
@@ -398,18 +398,18 @@ with zipfile.ZipFile('test.zip', 'r') as z:
       ... 
 ```
 
-Eğer CSV dosyası dosyası tamamen ekranda gösterilebilen türden bir
-bağlantıysa, o zaman `https://...` diye giden bağlantıyı `read_csv`
-çağrısına geçmek yeterlidir.
+Eğer CSV dosyası dosyası direk, basit ekranda gösterilebilen türden
+bir bağlantıysa, o zaman `https://...` diye giden bağlantıyı
+`read_csv` çağrısına geçmek yeterlidir.
 
 ```python
 df = pd.read_csv('https://.../data.csv')
 ```
 
-gibi. Fakat bazen URL bağlantısı bir 'dosya indirme' aksiyonu tetikler
-bu durumda o indirilen dosyanın 'yakalanması' ve okunması gerekir. Bu
-durumlar için bazı ek hareketler gerekir, mesela Yahoo Finance
-üzerinde görelim,
+Fakat bazen URL bağlantısı bir 'dosya indirme' aksiyonu tetikler, bu
+durumda o indirilen dosyanın 'yakalanması' ve okunması gerekir. Bu
+durum için ek hareketler gerekir, mesela Yahoo Finance üzerinde
+görelim,
 
 ```python
 import pandas as pd, urllib.request as urllib2, io
@@ -432,8 +432,8 @@ Name: Adj Close, dtype: float64
 ```
 
 Bunun bir ileri noktasi İnternet üzerinden indirme tetikleyen bir ZIP
-bağlantısını hiç diske indirmeden direk İnternet hem yakalamak, hem
-acmak, sonra içindeki dosyayı Pandas'a okutmak!
+bağlantısını hiç diske indirmeden hem yakalamak, hem açmak, sonra
+içindeki dosyayı Pandas'a okutmak!
 
 ```pandas
 import pandas as pd, datetime
@@ -447,9 +447,4 @@ df = pd.read_csv(csv,sep='\t',header=None)
 Kaynaklar
 
 http://pandas.pydata.org/pandas-docs/stable/
-
-
-
-
-
 
