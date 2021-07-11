@@ -391,7 +391,7 @@ Burada ilginç bazı ek numaralar da yapılabiliyor, örnek zip içinde olan csv
 direk zip üzerinden okunabilir! Mesela `test.zip` içinde olan `test.csv`
 dosyasını okumak için
 
-```pandas
+```python
 import pandas as pd, zipfile
 with zipfile.ZipFile('test.zip', 'r') as z:
       df =  pd.read_csv(z.open('test.csv'))
@@ -435,7 +435,7 @@ Bunun bir ileri noktasi İnternet üzerinden indirme tetikleyen bir ZIP
 bağlantısını hiç diske indirmeden hem yakalamak, hem açmak, sonra
 içindeki dosyayı Pandas'a okutmak!
 
-```pandas
+```python
 import pandas as pd, datetime
 import urllib.request as urllib2
 r = urllib2.urlopen("https://www.filanca.com/test.zip").read()
