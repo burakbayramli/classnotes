@@ -47,22 +47,23 @@ pdftk doc.pdf cat 100-110 output out.pdf
 pdftk doc.pdf cat 1-9S 10-end output out.pdf
 ```
 
-20. ve 30. sayfalar arasindaki sayfalari atlayip, geri kalanlari tutmak,
+20. ve 30. sayfalar arasındaki sayfaları atlayıp, geri kalanları tutmak,
 
 ```
 pdftk doc.pdf cat 1-19 30-end output parcalar.pdf
 ```
 
-Bir koca.pdf icine 180. sayfadan sonra ara.pdf dosyasini sokusturmak,
+Bir koca.pdf içine 180. sayfadan sonra ara.pdf dosyasını sokuşturmak,
 
 ```
 pdftk A=koca.pdf B=ara.pdf cat A1-180 B A181-end output output.pdf
 ```
 
-2 sayfa yanyana scan edilmiş PDF dokümanlarını normal hale getirmek
-için alttaki yöntem kullanılabilir.
+2 sayfa yanyana scan edilmiş PDF dokümanlarını normal hale getirmek,
+ortadan bölmek için alttaki yöntem kullanılabilir.
 
-Önce pdfjam adlı program lazım, `apt-get` bunu kurar. Ardından
+Önce pdfjam adlı program lazım, `apt-get` bunu kurar, ya da [suradan](https://github.com/rrthomas/pdfjam)
+indirip `build.sh` ile kurariz, ardından
 
 ```
 pdfjam -o cift.pdf --trim '14cm 0cm 0cm 0cm' --clip true --scale 1.0 dokuman.pdf
