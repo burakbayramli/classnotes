@@ -3,6 +3,8 @@
 
 ## En Son
 
+20/7 - [Fenics](https://burakbayramli.github.io/dersblog/sk/2021/07/fenics-sonlu-ogeler-finite-elements.html)
+
 11/7 - [Pandas, Dosya Okuma](https://burakbayramli.github.io/dersblog/sk/2016/08/pandas.html#read)
 
 7/7 - [Tüm Simulasyon](https://burakbayramli.github.io/dersblog/phy/phy_008_sim_rigbod/katigovde_simulasyonu.html#full)
@@ -10,8 +12,6 @@
 5/7 - [Simulasyon, odeint, Dönüşler](https://burakbayramli.github.io/dersblog/phy/phy_008_sim_rigbod/katigovde_simulasyonu.html)
 
 4/7 - [Coğrafi Kordinat Hesapları](https://burakbayramli.github.io/dersblog/sk/2018/06/genel-gps-html5-javascript-python.html)
-
-22/6 - [Atalet Matrisi (Inertia Matrix), Katı Gövde, Tork](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_04/temel_fizik_4__kati_govde_atalet_matrisi__inertia_matrix__tork.html#inertia)
 
 ## Konular, Referans
 
