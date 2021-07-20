@@ -21,8 +21,8 @@ içinde görülmeyebilir. `/usr/lib/python3/dist-packages` altına
 bakarsak mesela orada `fenics`, `ffc` gibi paketler var, bunlar izole
 ortamımızda yok.
 
-Sembolik bağlantı ile bunları halledebiliriz. Benim
-`$HOME/Documents/env3` ortamı için, ve önce bazı ek hareketler,
+Sembolik bağlantı ile bunları halledebiliriz. Benim `$HOME/Documents/env3/lib/python3.6/site-packages`
+ortamı için mesela, ve önce bazı ek hareketler,
 
 ```
 pip install pkgconfig
@@ -30,7 +30,7 @@ pip install pkgconfig
 pip install mpi4py
 ```
 
-Şimdi sembolik bağlantılar yapılır,
+Şimdi kendi `site-packages` dizinimize gidip orada sembolik bağlantıları yaparız,
 
 ```
 ln -s /usr/lib/python3/dist-packages/fenics .
