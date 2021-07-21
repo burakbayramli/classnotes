@@ -15,11 +15,16 @@ sudo apt-get update
 sudo apt-get install --no-install-recommends fenics
 ```
 
-Simdi, kurulum bittikten sonra, hala bir problem var, Ubuntu
+Şimdi, kurulum bittikten sonra, hala bir problem var, Ubuntu
 seviyesinde yapılan Python Fenics kurulumu sizin izole ortamınız
 içinde görülmeyebilir. `/usr/lib/python3/dist-packages` altına
 bakarsak mesela orada `fenics`, `ffc` gibi paketler var, bunlar izole
-ortamımızda yok.
+ortamımızda yok. Anlaşılır olabilir, `apt-get` kurulumu tüm sistem
+için global bir kurulum, ve bu kurulum gidip global Python için
+paketlerini kuruyor. Fakat izole Python ortamları ayrı dizinlerde,
+kendi paketleri ile çalışıyorlar bildiğimiz gibi, en azından
+daha önce yarattığımız bir izole ortam içinde bu yeni paketleri
+bulamayabiliriz.
 
 Sembolik bağlantı ile bunları halledebiliriz. Benim `$HOME/Documents/env3/lib/python3.6/site-packages`
 ortamı için mesela, ve önce bazı ek hareketler,
@@ -44,8 +49,22 @@ ln -s /usr/lib/python3/dist-packages/fenics_ufl-2019.2.0.dev0.egg-info .
 ln -s /usr/lib/python3/dist-packages/ffc .
 ```
 
-Bu işleyecektir. Alttaki kodun çalışması lazım,
+Bu işleyecektir. Alttaki kodlarin çalışması lazım,
 
+Hızlı bir izgara (mesh) yaratmak,
+
+
+```
+import fenics as fe
+N1 = N2 = 75
+mesh = fe.RectangleMesh(fe.Point(0, 0), fe.Point(1, 1), 10, 10)
+fe.plot(mesh)
+plt.savefig('fenics-mesh.png')
+```
+
+![](fenics-mesh.png)
+
+Daha çetrefil bir örnek,
 
 ```python
 import numpy as np
@@ -131,3 +150,4 @@ Kaynaklar
 [1] https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_17/ders_1.17.html
 
 [2] https://fenics.readthedocs.io/en/latest/installation.html
+
