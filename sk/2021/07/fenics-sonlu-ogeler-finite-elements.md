@@ -71,18 +71,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def comparison_plot2D(
-    u, f,           # Function expressions in x and y
-    value=0.5,      # x or y equals this value
-    variation='y',  # independent variable
-    n=100,          # no of intervals in plot
-    tol=1E-8,       # tolerance for points inside the domain
-    plottitle='',   # heading in plot
-    filename='tmp', # stem of filename
+    u, f,           
+    value=0.5,      
+    variation='y',  
+    n=100,          
+    tol=1E-8,       
+    plottitle='',   
+    filename='tmp', 
     ):
-    """
-    Plot u and f along a line in x or y dir with n intervals
-    and a tolerance of tol for points inside the domain.
-    """
     v = np.linspace(-1+tol, 1-tol, n+1)
     # Compute points along specified line:
     points = np.array([(value, v_)
@@ -105,10 +101,6 @@ import sympy as sym
 x, y = sym.symbols('x[0] x[1]')
 
 def problem(f, nx=8, ny=8, degrees=[1,2]):
-    """
-    Plot u along x=const or y=const for Lagrange elements,
-    of given degrees, on a nx times ny mesh. f is a SymPy expression.
-    """
     f = sym.printing.ccode(f)
     f = fe.Expression(f, degree=2)
     mesh = fe.RectangleMesh(
@@ -133,8 +125,6 @@ def problem(f, nx=8, ny=8, degrees=[1,2]):
         #fe.plot(u, title='Approx by P%d' % degree)
 
 if __name__ == '__main__':
-    # x and y are global SymPy variables
-    f = 2*x*y - x**16
     f = 2*x*y - x**2
     problem(f, nx=2, ny=2, degrees=[0, 1, 2])
 ```
