@@ -45,18 +45,61 @@ kullanmanızı isteyeceğim, daha önce bahsettiğim piramitler bunlar. Ama
 bazılarınız karesel (quadratic) öğeler kullanmak isterse buna hayır demem.
 Bu öğeler daha hassas / doğru sonuçlar verecektir. 
 
-Simdi izgarayi daha detayli sekilde yaratalim. Bir liste yaratacagiz, bu
-listede izgara noktalari olacak, bu liste cozum algoritmasina verilecek
-ve algoritma oradan devam edecek.
+Şimdi ızgarayı daha detaylı şekilde yaratalım. Bir liste yaratacağız, bu listede
+ızgara noktaları olacak, bu liste çözüm algoritmasina verilecek ve algoritma
+oradan devam edecek.
 
 Çember içinde daha önce yarattığımız üçgenlerden iki tanesini yanyana düşünelim,
 en sağ üstteki nokta nerededir? $(\cos \pi/8, \sin \pi/8)$ değil mi? Sonra en
 soldan en sağa $N$ tane (resimde $N=4$) düğüm daha koyarız, her aralık yatay
-eksende $h$ büyüklüğünde olabilir, ve $N h = \cos\pi/8$ tabii ki.
+eksende $h$ büyüklüğünde olabilir, ve $N h = \cos\pi/8$ tabii ki. Sonra
+dörtgenleri ortadan kesen çizgiler de ekliyorum ve alttaki şekil ortaya çıkıyor,
 
-\includegraphics[width=20em]{compscieng_1_27_03.png}
+\includegraphics[width=15em]{compscieng_1_27_03.png}
 
+Izgara düğüm noktalarına indis atamak iyi olur, soldan sağa önce orta çizgi
+üzerinde 1,2,3,4,5 diye gideriz, sonra üst kenar, ardından alt, 13 tane düğüm
+olur. Üçgenlere de indis atarız, 14 tane üçgen var. Düğüm noktalarının listesi
+(0,0), (h,0), (2h,0), .. diye gidecek. Peki üçgenler? Onları köşe indisleriyle
+belirtebiliriz, her üçgen için üç tane.
 
+Bu listeleri alan kod bir $K$ matrisi oluşturur, matris eşsiz (singular) olur
+çünkü sınır şartları daha içinde yok. En sağ üç nokta sıfırlandıktan sonra
+(sınır şartı onları etkiliyor) matris tersi çevrilebilir hale gelir, ve $Ku = f$
+çözülür. Kodun yaptığı $K$ ve $f$'yi oluşturmak.
+
+Üçgen şekilleri hakkında; üçgenlerin açıları ufak olmayacak şekilde seçin dedik
+fakat probleme göre bu değisebilir, mesela bir uçak kanadının aerodinamik
+simülasyonu için FEM kullanıyorsanız, havanın akışı yönünde ince ince üçgenler
+koymak gerekebilir çünkü ilginç olan fiziki fenomen o boyutta vuku bulmaktadır.
+
+Şimdi bir adım geriye atıp resme bir daha bakalım. Matrisi oluştururken temel
+aldığımız formül Poisson / Laplace denklemlerini zayıf formu. Güçlü formdan
+başlayalım,
+
+$$
+-u_{xx} - u_{yy} = f(x,y)
+$$
+
+Zayıf forma geçmek için iki tarafı bir deneme fonksiyonu ile çarpıyorum,
+ve tüm alan üzerinden entegralini alıyorum,
+
+$$
+\int \int (-u_{xx} - u_{yy}) v(x,y) \ud x \ud y =
+\int \int f(x,y) v(x,y)  \ud x \ud y
+$$
+
+Üstteki ``tüm mümkün (admissable)'' $v(x,y)$'ler için yapılır. Ana fikir şu eğer
+üstteki geniş bir $v$ ailesi için doğruysa bunun olmasının tek yolu sol tarafta
+çarpılanların sağ tarafta çarpılanlara eşit olması, çıtlatılan temel yardımcı
+önerim (lemma) bu.. Burada sözel olarak belirttik daha kuramsal şekilde de
+ispatı var ama, ana fikir güçlü formun zayıf forma olan eşitliği.
+
+Sonraki adım nedir? Eşitliğin sağ tarafı iyi ama sol taraf daha iyi olabilir,
+sol tarafta ikinci türev var, ve benim piramid fonksiyonlarımın ikinci türevleri
+yok. O zaman parçalı entegrasyon tekniğini uygularım, böylece türevi $u$'dan
+$v$'ye geçirebilirim, böylece $u$'da tek türev kalır ve böylece piramitlerimi
+kullanabilirim. 
 
 
 
