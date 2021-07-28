@@ -3,15 +3,15 @@
 
 ## En Son
 
+28/7 - [FEM 2D - 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_27/ders_1.27.html)
+
+28/7 - [FEM 2D - 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_26/ders_1.26.html)
+
 20/7 - [Fenics](https://burakbayramli.github.io/dersblog/sk/2021/07/fenics-sonlu-ogeler-finite-elements.html)
 
 11/7 - [Pandas, Dosya Okuma](https://burakbayramli.github.io/dersblog/sk/2016/08/pandas.html#read)
 
 7/7 - [Tüm Simulasyon](https://burakbayramli.github.io/dersblog/phy/phy_008_sim_rigbod/katigovde_simulasyonu.html#full)
-
-5/7 - [Simulasyon, odeint, Dönüşler](https://burakbayramli.github.io/dersblog/phy/phy_008_sim_rigbod/katigovde_simulasyonu.html)
-
-4/7 - [Coğrafi Kordinat Hesapları](https://burakbayramli.github.io/dersblog/sk/2018/06/genel-gps-html5-javascript-python.html)
 
 ## Konular, Referans
 

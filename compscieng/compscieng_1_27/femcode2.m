@@ -1,21 +1,17 @@
 % femcode_P1.m
  
 % [p,t,b] from distmesh tool
-% make sure your matlab path includes the directory where distmesh is installed.
  
 fd=@(p) sqrt(sum(p.^2,2))-1;
 [p,t]=distmesh2d(fd,@huniform,0.20,[-1,-1;1,1],[]);
 be=boundedges(p,t);
 b=unique(be);
- 
- 
+  
 f=vectorize(inline('4','x','y'));
-k=vectorize(inline('1','x','y'));
- 
+k=vectorize(inline('1','x','y')); 
 u=vectorize(inline('1-x^2-y^2','x','y'));
 ux=vectorize(inline('-2*x','x','y'));
-uy=vectorize(inline('-2*y','x','y'));
- 
+uy=vectorize(inline('-2*y','x','y')); 
  
 % [K,F] = assemble(p,t) % K and F for any mesh of triangles: linear phi's
 N=size(p,1);T=size(t,1); % number of nodes, number of triangles
