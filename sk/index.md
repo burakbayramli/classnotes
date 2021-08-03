@@ -3,6 +3,8 @@
 
 ## En Son
 
+3/8 - [Çok Değişkenli Calculus - Ders 27](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_27/ders_27.html)
+
 28/7 - [FEM 2D - 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_27/ders_1.27.html)
 
 28/7 - [FEM 2D - 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_26/ders_1.26.html)
@@ -10,8 +12,6 @@
 20/7 - [Fenics](https://burakbayramli.github.io/dersblog/sk/2021/07/fenics-sonlu-ogeler-finite-elements.html)
 
 11/7 - [Pandas, Dosya Okuma](https://burakbayramli.github.io/dersblog/sk/2016/08/pandas.html#read)
-
-7/7 - [Tüm Simulasyon](https://burakbayramli.github.io/dersblog/phy/phy_008_sim_rigbod/katigovde_simulasyonu.html#full)
 
 ## Konular, Referans
 
