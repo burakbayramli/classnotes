@@ -3,6 +3,8 @@
 
 ## En Son
 
+11/8 - [Hesapsal Bilim - Ders 1-22](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_22/ders_1.22.html)
+
 11/8 - [Çok Değişkenli Calculus - Ders 29](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_29/ders_29.html)
 
 7/8 - [Çok Değişkenli Calculus - Ders 28](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_28/ders_28.html)
@@ -10,8 +12,6 @@
 3/8 - [Çok Değişkenli Calculus - Ders 27](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_27/ders_27.html)
 
 28/7 - [FEM 2D - 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_27/ders_1.27.html)
-
-28/7 - [FEM 2D - 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_26/ders_1.26.html)
 
 ## Konular, Referans
 
