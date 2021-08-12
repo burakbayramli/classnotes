@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
 Ornek
 
-[1, sf. 267]'deki örneği altta görüyoruz,
+[3, sf. 267]'deki örneği altta görüyoruz,
 
 ```python
 import fenics as fe
@@ -196,3 +196,4 @@ Kaynaklar
 
 [2] https://fenics.readthedocs.io/en/latest/installation.html
 
+[3] Johansson, {\em Numerical Python}
