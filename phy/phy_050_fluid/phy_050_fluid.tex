@@ -1,6 +1,6 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Akış Dinamiği
+Muhafaza Kanunları
 
 Kütle Muhafazası, Süreklilik Formülü (Continuity Equation)
 
@@ -193,125 +193,7 @@ $$
 \frac{D \rho}{D t} + \rho \nabla \cdot \bar{u} = 0
 $$
 
-Pürüzsüz Parcaçık Dinamiği (Smoothed Particle Dynamics -SPH-)
 
-Sıvının akışını simüle etmek pek çok alanda faydalı olabilecek bir
-tekniktir. Sıvıların kendisine ek olarak gazları yoğunluğu daha az olan sıvı
-olarak görebiliriz, hatta katı maddeler de akışkanlığı çok az sıvı gibi
-düşünülebilirse, böylece aerodinamikten başlayıp, gemi tasarlamaya, oradan
-oyunlarda duman simülasyonuna kadar giden geniş yelpazede teknikler kullanım
-bulabilir.
-
-SPH tekniği bu sıvı simülasyon yöntemlerinden birisidir. Navier-Stokes
-denklemleri bir sıvının akışını tanımlar, bu denklem simülasyon ortamında
-yaklaşık olarak çözülmelidir [5], bunu yapmanın iki yolu vardır. Önceki
-anlatımdan hareketle herhalde cevabı tahmin edebiliriz, birisi Lagrange usulü
-diğeri Euler usulü. SPH yöntemi Lagrange yaklaşımını takip eder, yani bir sıvı
-paketini alıp onun zaman ve uzayda gidişini izler. Tek bir yere mıhlanmış
-olmamanın (Euler usulü) pek çok avantajları var, mesela oyun grafiklerini
-çizerken daha geniş bir alanda iş yapabilmek mümkün, farklı maddeler arasındaki
-iletişim daha rahat halledilebiliyor, vs.
-
-Formülasyon için temel fizikle başlayalım. Simüle ettiğimiz bir sıvı paketidir
-demiştik, bu paketin ivmesini takip edelim mesela, bunun önemli olacagini tahmin
-edebiliriz, oradan kuvvet, enerji bağlantıları var, $F=ma$ formülünden
-hareketle, ve materyel türev ile
-
-$$
-m \frac{D \bar{u}}{D t} = F^{toplam}
-$$
-
-diyebiliriz. Daha önce materyel türevi yoğunluk üzerinde uygulamıştık, pek çok
-farklı ölçüt üzerinde materyel türev kullanılabilir demiştik, ayrıca hız
-$\bar{u}$ materyel türev içinde kullanılmakta, ama hızın kendisine de gayet
-rahat bir şekilde materyel türev uygulanabilir.
-
-Üstteki eşitliğin sağ tarafını detaylandırabiliriz, düşünelim, hangi kuvvetler
-bir sıvı akışı sırasında sıvı paketi / parçacık üzerinde etki ediyor? Bunlar
-sırasıyla basınç, ağdalık, ve yerçekim olurdu herhalde, bal gibi ağdalı bir
-sıvıda parçalar birbirlerine yapışkandır, şu için daha az, bu bir
-kuvvettir. Yerçekimi bir kuvvettir doğal olarak. Basınç ta öyle, biraz derine
-dalan herkes etrafındaki suyun basıncını bir kuvvet olarak hisseder. O zaman,
-
-$$
-m \frac{D \bar{u}}{D t} = F^{\textrm{basınç}} + F^{\textrm{ağdalık}} + F^{\textrm{yerçekim}} 
-$$
-
-diyebiliriz. Kuvvetlerden en basiti yerçekimi, $F^{\textrm{yerçekim}} = m
-\bar{g}$. İvme $\bar{g}$ bir vektör olarak gösterildi, bu $\bar{g} = (0, 0,
-9.8)$ olurdu, sadece z ekseni üzerinde etki eden bir ivmelenme yani.
-
-Diğer kuvvet basınç. Yüksek basınç bölgeleri alçak basınç bölgelerinde doğru bir
-kuvvet uygular. Basıncın tüm sıvı için $p(\bar{x})$ değişkeninde olduğunu
-düşünelim, peki basınç dengesizliğini matematiksel olarak göstermenin en basit
-yolu nedir? Basıncın negatif gradyanını almak, $-\nabla p$ olur mu acaba?
-Evet. Temel Calculus'tan hatırlarsak gradyan en dik iniş yönünü gösterir, o
-zaman gradyanın negatifi yüksek basınç bölgesinden dışarı, alçak basınç
-bölgesine doğru gösterecektir. Tabii ki bu etkiyi üzerinde olduğumuz sıvı
-paketinin hacmi üzerinden entegre etmemiz gerekir, ama basit bir yaklaşıklama
-olarak onu direk hacim $V$ ile çarpabiliriz. Tümü $F^{\textrm{basınç}} = - V
-\nabla p$.
-
-Üçüncü kuvvet ağdalık. Ağdalı bir sıvı deforme edilmeye karşı direnir. Bu
-kuvveti kabaca ``her parçacığı yanındaki diğer parçacıkların ortalama hızında
-hareket etmesini zorlayan kuvvet'' olarak görebiliriz, bir diğer deyişle
-birbirine yakın olan parçacıkların arasındaki hız farklarını minimize etmeye
-uğraşan kuvvet. Şimdi, mesela görüntü işleme literatürünü düşünürsek, o alanda
-çalışanlar bir ölçünün etrafındaki ortalamadan ne kadar saptığını hesaplamak
-için bir diferansiyel operatör kullanır, bu operatör Laplasyan $\nabla \cdot
-\nabla$.  Bu operatör, aynı şekilde hacim üzerinden entegre edilince bize
-ağdalık kuvvetini verebilir, burada bir ek her sıvının farklı ağdalığını formüle
-dahil edebilmek için bir de bir dinamik ağdalık sabiti (dynamic viscosity
-coefficient) $\mu$ ile herşeyi çarpmak gerektiği, o zaman $F^{\textrm{ağdalık}}
-= V \mu \nabla \cdot \nabla \bar{u}$ formülünü elde ediyoruz.
-
-Hepsini bir araya koyunca,
-
-$$
-m \frac{D \bar{u}}{D t} = m\bar{g} - V \nabla p + V \mu \nabla \cdot \nabla \bar{u}
-$$
-
-Bu denklemi hacim ve kütle limite giderken düşüneceğiz, ama bu haliyle formül
-problem çıkartabilir, o zaman her şeyi $V$ ile bölersek ve sonra limiti
-düşünürsek daha iyi olur, $m/V$'yi sıvı yoğunluğu $\rho$ olarak tanımlayalım,
-
-$$
-\rho \frac{D \bar{u}}{D t} = \rho \bar{g} -
-\nabla p +
-\mu \nabla \cdot \nabla \bar{u}
-$$
-
-Bu denklem bazıları için tanıdık gelebilir.. Navier-Stokes denklemine benzemiyor
-mu? Navier-Stokes ünlü denklemi,
-
-$$
-\frac{\partial \bar{u}}{\partial t} + \bar{u} + \frac{1}{\rho} \nabla p =
-\bar{g} + \nu \nabla \cdot \nabla \bar{u}
-$$
-
-$$
-\nabla \cdot \bar{u} = 0
-$$
-
-olarak gösterilir.
-
-Neyse bizim türetişle devam edersek, her şeyi yoğunluk $\rho$ ile bölelim,
-
-$$
-\frac{D \bar{u}}{D t} + \frac{1}{\rho} \nabla p =
-\bar{g}  + \frac{\mu}{\rho} \nabla \cdot \nabla \bar{u}
-$$
-
-Basitleştirme amacıyla kinematik ağdalık $\nu = \mu / \rho$ tanımlayalım, o
-zaman 
-
-$$
-\frac{D \bar{u}}{D t} + \frac{1}{\rho} \nabla p =
-\bar{g}  + \nu \nabla \cdot \nabla \bar{u}
-$$
-
-Sıkıştırılamazlığın (incompressibility) $\nabla \cdot \bar{u} = 0$ olduğunu daha
-önce (2)'de görmüştük.
 
 Kaynaklar
 
@@ -324,9 +206,6 @@ Kaynaklar
 
 [4] Berloff, {\em Introduction to Geophysical Fluid Dynamics},
     \url{https://wwwf.imperial.ac.uk/~pberloff/gfd_lectures.pdf}
-
-[5] Schuermann, {\em Particle-Based Fluid Simulation with SPH},
-    \url{https://lucasschuermann.com/writing/particle-based-fluid-simulation}
 
 [6] Landau, {\em Computational Physics}
     

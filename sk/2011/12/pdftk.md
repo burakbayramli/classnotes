@@ -1,4 +1,4 @@
-# PDF Numaralari, pdftk, pdfjam, gs
+# PDF Numaralari, pdftk, pdfjam, gs, mutool
 
 PDF dosyalari uzerinden pek cok islem pdftk ile yapilabilir. Kurmak icin
 
@@ -60,7 +60,15 @@ pdftk A=koca.pdf B=ara.pdf cat A1-180 B A181-end output output.pdf
 ```
 
 2 sayfa yanyana scan edilmiş PDF dokümanlarını normal hale getirmek,
-ortadan bölmek için alttaki yöntem kullanılabilir.
+ortadan bölmek için alttaki yöntemler kullanılabilir.
+
+İlk yöntem en kolayı, önce `apt install mupdf-tools` sonra,
+
+```
+mutool  poster -x 2  input.pdf output.pdf
+```
+
+Alttaki yöntem daha eski, ama bazıları için faydalı olabilir,
 
 Önce pdfjam adlı program lazım, `apt-get` bunu kurar, ya da [suradan](https://github.com/rrthomas/pdfjam)
 indirip `build.sh` ile kurariz, ardından
