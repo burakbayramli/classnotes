@@ -220,6 +220,16 @@ plt.savefig('torus-rotated.png')
 
 ![](torus-rotated.png)
 
+Ekler
+
+STL dosyalarını çabuk bir şekilde Ubuntu'da görebilmek için, bir program `meshlab`.
+
+```
+sudo apt-get install meshlab
+
+meshlab dosya.stl
+```
+
 Kaynaklar
 
 [1] [Tinkercad](https://www.tinkercad.com/things/h3gtFbihOx3-helice-2-pales-arrondies-propeller-2-rounded-blades)
