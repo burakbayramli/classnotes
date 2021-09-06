@@ -238,6 +238,65 @@ print inside_quad(rect1, pt2)
 
 Sonuç beklenen şekilde geldi. 
 
+Sargilanan Sayi Algoritmasi (Winding Number Algoritm)
+
+Eğer bir nokta bir polygon içinde ise o noktadan her köşe noktasına birer
+çizgi çeksek ve ortaya çıkan açılara baksak, bu açılar 360'a toplanacaktır.
+Fakat nokta dışarıda ise bu doğru olmazdı, 
+
+\includegraphics[width=20em]{winding.jpg}
+
+Sargılanan sayı algoritması bunu temel alıyor. Surada [6] bahsediliyor,
+ornek kod alttadir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import math
+
+def offsetCoords(polygon, newOrigin):
+    offsetPolygon = []
+    for v in polygon:
+        offsetPolygon.append((v[0]-newOrigin[0], v[1]-newOrigin[1]))
+    return offsetPolygon
+
+def dotProduct(v1, v2):
+    return v1[0]*v2[0]+v1[1]*v2[1]
+
+def vectorLen(v):
+    return (v[0]**2+v[1]**2)**.5
+
+def angleBetweenVectors(v1, v2):
+    cosine = dotProduct(v1, v2) / (vectorLen(v1) * vectorLen(v2))
+    return math.acos(cosine)
+
+def isWithin(point, polygon):
+    if point in polygon:
+        return False
+    sumAngles = 0
+    for i in range(len(polygon) - 1):
+        sumAngles += angleBetweenVectors(polygon[i], polygon[i+1])
+    if math.isclose(sumAngles, math.pi*2):
+        return True
+    else:
+        return False
+
+polygon = [(2,0), (4,1), (4,4), (2,5), (1,2), (2,0)]
+
+coords = (3,3)
+
+point = (float(coords[0]), float(coords[1]))
+
+offsetPolygon = offsetCoords(polygon, point)
+offsetPoint = (0, 0)
+
+result = 'Is POINT {} within POLYGON {}? {}.'.format(point, polygon, isWithin(offsetPoint, offsetPolygon))
+
+print(result) 
+\end{minted}
+
+\begin{verbatim}
+Is POINT (3.0, 3.0) within POLYGON [(2, 0), (4, 1), (4, 4), (2, 5), (1, 2), (2, 0)]? True.
+\end{verbatim}
+
 Dış Geometrik Objenin İç Noktalara Uyum Skoru
 
 Bazen önceden bilinen bir çokgenin (dörtgen, beşgen, vs.) onun içinde olan
@@ -317,6 +376,8 @@ Kaynaklar
 [4] Mathematics Stack Exchange, {\em Determine If 2D Pixel Inside a Region Without Formula},\url{http://math.stackexchange.com/questions/1956626/determine-if-2d-pixel-inside-a-region-without-formula}
 
 [5] Bayramli, {\em Çok Değişkenli Calculus, Ders 3}
+
+[6] Stackoverflow, \url{https://stackoverflow.com/a/43822141/423805}
 
 \end{document}
 

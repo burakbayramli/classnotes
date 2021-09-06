@@ -2,6 +2,84 @@
 \begin{document}
 Sayısal Entegrasyon (Numerical Integration) ve Sonlu Farklılıklar ile Sayısal Türev (Differentiation with Finite Differences)
 
+
+Sayısal Türev
+
+Sonlu farklılıklar (finite differences) ile yaklaşık türev almak için,
+herhangi bir $x$ noktasında
+
+$$
+f'(x) = \frac{f(x + \epsilon) - f(x)}{\epsilon}
+$$
+
+hesabını yapabiliriz. Tek boyutta tek sayı $\epsilon$ ile adım atılıp $f$
+üzerindeki değişiklik üzerinden hesap yapılır, çok boyutlu durumda birer
+birer her kordinatta $\epsilon$ kadar adım atılır, ve bu adım üzerinden $f$
+türevi alınıp o kordinat için kısmı türev olarak kaydedilir, $x =
+\left[\begin{array}{ccc} x_0 & ... & x_n \end{array}\right]$ için
+
+$$
+f'(x) = \left[\begin{array}{c}
+\frac{ f \left( [\begin{array}{ccc} x_0 + \epsilon & ... & x_n \end{array}]\right) - f(x)}{\epsilon} \\
+\vdots \\
+\frac{ f \left( [\begin{array}{ccc} x_0  & ... & x_n+\epsilon \end{array}]\right) - f(x)}{\epsilon} 
+\end{array}\right]
+$$
+
+Alttaki kod [3]'teki \verb!approx_fprime! metotunu
+baz almıştır, 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+eps = np.sqrt(np.finfo(float).eps)
+
+def _approx_fprime_helper(xk, f, epsilon):
+    f0 = f(xk)
+    grad = np.zeros((len(xk),), float)
+    ei = np.zeros((len(xk),), float)
+    for k in range(len(xk)):
+        ei[k] = 1.0
+        d = epsilon * ei
+        df = (f(xk + d) - f0) / d[k]
+        if not np.isscalar(df):
+            try:
+                df = df.item()
+            except (ValueError, AttributeError):
+                raise ValueError("The user-provided "
+                                 "objective function must "
+                                 "return a scalar value.")
+        grad[k] = df
+        ei[k] = 0.0
+    return grad
+\end{minted}
+
+Test olarak optimizasyonda bolca kullanılan Rosenbrock fonksiyonunu
+kullanabiliriz. Altta hem analitik olarak hem de sayısal olarak hesaplanmış
+türev sonuçlarını görebiliyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+rosen = lambda x: (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
+
+def rosen_d(x):
+    return np.array([2*100*(x[1] - x[0]**2)*(-2*x[0]) - 2*(1.-x[0]), 2*100*(x[1]-x[0]**2)])
+
+x = [0.5, 0.5]
+res = _approx_fprime_helper(x, rosen, eps)
+print ('analitik', res, 'sayisal', rosen_d(x))
+
+x = [-0.5, 0.5]
+res = _approx_fprime_helper(x, rosen, eps)
+print ('analitik', res, 'sayisal', rosen_d(x))
+\end{minted}
+
+\begin{verbatim}
+analitik [-50.99999928  50.00000149] sayisal [-51.  50.]
+analitik [47.00000072 50.00000143] sayisal [47. 50.]
+\end{verbatim}
+
+Sayısal Entegrasyon
+
+Trapezoid Bazlı
+
 $F(x)$ fonksiyonunu bazen sembolik olarak entegre etmek zor olabilir. Bu
 durumlarda sayısal çözüm daha kullanışlı olabilir. Mesela $F(x)$'in $x_0$
 ve $x_1$ arasındaki entegrali aslında bir alan hesabıdır, ve bu alanı, $x$
@@ -103,7 +181,7 @@ print (T)
 2.351851851851852
 \end{verbatim}
 
-Ustteki hesap tabii ki analitik sekilde de cok rahat yapilabilir, 
+Üstteki hesap tabii ki analitik şekilde de çok rahat yapılabilir, 
 
 $$
 \int_{1}^{2} x^2 \ud x = \frac{x^3}{3} \biggr|_{1}^{2} = 
@@ -119,78 +197,9 @@ print (7./3)
 2.3333333333333335
 \end{verbatim}
 
-Sayısal Türev
 
-Sonlu farklılıklar (finite differences) ile yaklaşık türev almak için,
-herhangi bir $x$ noktasında
 
-$$
-f'(x) = \frac{f(x + \epsilon) - f(x)}{\epsilon}
-$$
 
-hesabını yapabiliriz. Tek boyutta tek sayı $\epsilon$ ile adım atılıp $f$
-üzerindeki değişiklik üzerinden hesap yapılır, çok boyutlu durumda birer
-birer her kordinatta $\epsilon$ kadar adım atılır, ve bu adım üzerinden $f$
-türevi alinip o kordinat için kısmı türev olarak kaydedilir, $x =
-\left[\begin{array}{ccc} x_0 & ... & x_n \end{array}\right]$ için
-
-$$
-f'(x) = \left[\begin{array}{c}
-\frac{ f \left( [\begin{array}{ccc} x_0 + \epsilon & ... & x_n \end{array}]\right) - f(x)}{\epsilon} \\
-\vdots \\
-\frac{ f \left( [\begin{array}{ccc} x_0  & ... & x_n+\epsilon \end{array}]\right) - f(x)}{\epsilon} 
-\end{array}\right]
-$$
-
-Alttaki kod [3]'teki \verb!approx_fprime! metotunu
-baz almıştır, 
-
-\begin{minted}[fontsize=\footnotesize]{python}
-eps = np.sqrt(np.finfo(float).eps)
-
-def _approx_fprime_helper(xk, f, epsilon):
-    f0 = f(xk)
-    grad = np.zeros((len(xk),), float)
-    ei = np.zeros((len(xk),), float)
-    for k in range(len(xk)):
-        ei[k] = 1.0
-        d = epsilon * ei
-        df = (f(xk + d) - f0) / d[k]
-        if not np.isscalar(df):
-            try:
-                df = df.item()
-            except (ValueError, AttributeError):
-                raise ValueError("The user-provided "
-                                 "objective function must "
-                                 "return a scalar value.")
-        grad[k] = df
-        ei[k] = 0.0
-    return grad
-\end{minted}
-
-Test olarak optimizasyonda bolca kullanılan Rosenbrock fonksiyonunu
-kullanabiliriz. Altta hem analitik olarak hem de sayısal olarak hesaplanmış
-türev sonuçlarını görebiliyoruz,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-rosen = lambda x: (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
-
-def rosen_d(x):
-    return np.array([2*100*(x[1] - x[0]**2)*(-2*x[0]) - 2*(1.-x[0]), 2*100*(x[1]-x[0]**2)])
-
-x = [0.5, 0.5]
-res = _approx_fprime_helper(x, rosen, eps)
-print ('analitik', res, 'sayisal', rosen_d(x))
-
-x = [-0.5, 0.5]
-res = _approx_fprime_helper(x, rosen, eps)
-print ('analitik', res, 'sayisal', rosen_d(x))
-\end{minted}
-
-\begin{verbatim}
-analitik [-50.99999928  50.00000149] sayisal [-51.  50.]
-analitik [47.00000072 50.00000143] sayisal [47. 50.]
-\end{verbatim}
 
 Kaynaklar
 
