@@ -174,6 +174,23 @@ m = average(coords)
 print (m)
 ```
 
+Bir Coğrafi Nokta Bir Alan İçinde mi
+
+Elde köşeleri bilinen bir üçgen, kare ya da dışbükey poligon var
+diyelim, mesela Bermuda Ucgeni! Elimizdeki bir noktanın o alan içine
+düşüp düşmediğini nereden bileceğiz?  Burada iyi bir yaklaşım
+`pygeodesy` paketi, bu paket üstteki n-vektör yaklaşımını kullanıyor,
+yani sağlam. Bir örnek altta, dörk köşesi verilmiş alan içine `45.1,
+1.1` noktasının düşüp düşmediğini soruyoruz,
+
+```python
+from pygeodesy.sphericalNvector import LatLon
+
+p = LatLon(45.1, 1.1)
+b = LatLon(45, 1), LatLon(45, 2), LatLon(46, 2), LatLon(46, 1)
+print (p.isenclosedBy(b))
+```
+
 HTML5 ve Javascript ile Yer Bulmak
 
 Javascript icinden yer bulmak mumkun, bu cep telefonunda da isliyor,
