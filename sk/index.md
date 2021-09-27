@@ -3,9 +3,9 @@
 
 ## En Son
 
-4/9 - [Lagrange Aradeğerleme (Interpolation)](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit1/egri_uydurma_aradegerleme__interpolation___1.html#lagrange)
+27/9 - [Materyel Türev, Ek](https://burakbayramli.github.io/dersblog/phy/phy_030_fluid1/sivilar__1.html)
 
-4/9 - [Sıvılar, Muhafaza](https://burakbayramli.github.io/dersblog/phy/phy_050_cons/muhafaza_kanunlari.html)
+4/9 - [Lagrange Aradeğerleme (Interpolation)](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit1/egri_uydurma_aradegerleme__interpolation___1.html#lagrange)
 
 11/8 - [Hesapsal Bilim - Ders 1-22](https://burakbayramli.github.io/dersblog/compscieng/compscieng_1_22/ders_1.22.html)
 
