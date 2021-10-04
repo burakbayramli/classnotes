@@ -521,175 +521,6 @@ hesap ikilisi üretiyor. Eğer hesap beklenen, normal (sıfır hipotez durumu)
 uymuyorsa, hipotezi reddediyoruz. Ret durumu özellikle seçiliyor çünkü
 kabul edilmezlik daha kesin bir cevap. 
 
-Örnek
-
-Bir paralı otoyolunda geçiş noktasında durulmuş ve her dakika gelen araç
-sayılmış, ve dakika başına bu araç sayısı yazılmış. Bu deney 106 dakika
-süresince yapılmış (elde 106 satırlı bir veri var yani). Bu veri için
-Poisson dağılımının uygun olup olmadığını yüzde 5 önemlilik seviyesinde
-ispatlamamız isteniyor.
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
-df = pd.read_csv('vehicles.csv',header=None)
-\end{minted}
-
-Verinin histogramına bakalım,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-f = plt.figure(); df.hist(bins=13)
-plt.savefig('stat_tests2_01.png')
-\end{minted}
-
-\includegraphics[height=6cm]{stat_tests2_01.png}
-
-Poisson dağılımı muhtemel gözüküyor. Ama şimdi bunu uyum derece testi ile
-daha kararlı şekilde göstermeye uğraşacağız. Verideki sayımları o sayım
-rakamı bazında gruplayalıp gösterelim,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-kt = plt.hist(np.array(df),bins=range(20))
-kt = pd.DataFrame([kt[1],kt[0]]).T
-kt = kt[:-1] # sonuncu satiri at
-kt.columns = ['kac araba','kac kere']
-print kt
-\end{minted}
-
-\begin{verbatim}
-    kac araba  kac kere
-0           0         0
-1           1         0
-2           2         1
-3           3         3
-4           4         5
-5           5         7
-6           6        13
-7           7        12
-8           8         8
-9           9         9
-10         10        13
-11         11        10
-12         12         5
-13         13         6
-14         14         4
-15         15         5
-16         16         4
-17         17         0
-18         18         1
-\end{verbatim}
-
-Yani bir dakikada 6 araba sayımı 13 kere yapılmış (13 değişik dakikada).
-
-Bazı kutucukların boş olduğunu görüyoruz, bu durum özellikle tek tepeli
-(unimodel) dağılımlı verilerde etekleri temsil eden uçlardaki kutucukların
-boş olması sonucunu verebilir. Bu durumda o kutucukların verisi daha dolu
-olanlara aktarabilmek için kutucuk noktalarını tekrar tanımlıyoruz,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-bins = [0] + range(5,15) + [100]
-kt2 = plt.hist(np.array(df),bins=bins)
-kt2 = pd.DataFrame([kt2[1],kt2[0]]).T
-kt2.columns = ['int_low','n_i']
-print kt2
-\end{minted}
-
-\begin{verbatim}
-    int_low  n_i
-0         0    9
-1         5    7
-2         6   13
-3         7   12
-4         8    8
-5         9    9
-6        10   13
-7        11   10
-8        12    5
-9        13    6
-10       14   14
-11      100  NaN
-\end{verbatim}
-
-Şimdi bu değerler üzerinden Pearson $\chi^2$ hesabını yapalım. Ama ondan
-önce, hatırlayalım, bu verinin {\em herhangi bir} Poisson'dan gelip
-gelmediğini kontrol ediyoruz, ama testimiz için parametresi belli olan,
-özel bir Poisson lazım, bunun için bize bir $\lambda$ gerekiyor. Önemli
-değil, $\lambda$'nin tahmin edicisi $\hat{\lambda}$'yi biliyoruz,
-
-$$ \hat{\lambda} = \frac{1}{n} \sum _{j=1}^{n}x_j $$
-
-Bu $\hat{\lambda}$'yi kullanarak Poisson hesaplarını yapabiliriz artık. Bir
-kutucuğa düşen Poisson olasılığının hesabı $P(a \le X < b)$, ki bu basit
-bir $F(b)-F(a)$, yani $a,b$ noktalarındaki kümülatif yoğunluk fonksiyonun
-farkı üzerinden hesaplanabilir, altta kullanılan çağrı \verb!poisson.cdf!.
-
-\begin{minted}[fontsize=\footnotesize]{python}
-from scipy.stats import poisson
-kt2['int_high'] = kt2.shift(-1).int_low
-lam = df.mean() # tahmin edici
-def f(x): 
-   high = poisson.cdf(x.int_high-1,lam)
-   low = poisson.cdf(x.int_low-1,lam)
-   return pd.Series(high-low)
-kt2['p_i'] = kt2.apply(f,axis=1)
-kt2['np_i'] = len(df) * kt2['p_i']
-kt2['chi'] = (kt2['n_i']-kt2['np_i'])**2 / kt2['np_i']
-kt2 = kt2[:-1]
-print kt2
-print '\nchi kare istatistigi', kt2.chi.sum()
-\end{minted}
-
-\begin{verbatim}
-    int_low  n_i  int_high       p_i       np_i       chi
-0         0    9         5  0.051863   5.497487  2.231492
-1         5    7         6  0.058217   6.171048  0.111352
-2         6   13         7  0.088242   9.353602  1.421508
-3         7   12         8  0.114643  12.152118  0.001904
-4         8    8         9  0.130325  13.814437  2.447271
-5         9    9        10  0.131691  13.959242  1.761849
-6        10   13        11  0.119764  12.695009  0.007327
-7        11   10        12  0.099016  10.495702  0.023412
-8        12    5        13  0.075040   7.954290  1.097248
-9        13    6        14  0.052496   5.564539  0.034078
-10       14   14       100  0.078703   8.342527  3.836608
-
-chi kare istatistigi 12.9740502104
-\end{verbatim}
-
-Şimdi üstteki değerin istatistiki önem taşıyıp taşımadığını anlamaya geldi
-sıra. Eşik değerimiz $\chi^2_{9,0.05}$ olacak. Peki niye serbestlik
-derecesi 9 alındı? Elde kaç tane kutucuk var? 
-
-\begin{minted}[fontsize=\footnotesize]{python}
-print len(kt2), 'kutucuk'
-\end{minted}
-
-\begin{verbatim}
-11 kutucuk
-\end{verbatim}
-
-11-1=0 niye olmadı, -1 ile serbestlik derecesi hesaplamıyor muyduk?
-Evet. Fakat bir kavis daha var, tahmin edici ile $\lambda$'yi hesaplayınca
-1 serbestlik derecesi daha kaybettik! $\chi_2$ ile çalışırken hatırlanması
-gereken bilgilerden biri bu. Pearson bu testi keşfettiğinde aslında bu
-eksiltmeye gerek görmüyordu, daha sonraları Fisher adlı istatistikçi bunun
-gerekli olduğunu ispatladı.
-
-\begin{minted}[fontsize=\footnotesize]{python}
-from scipy.stats import chi2
-dof = len(kt2)-1-1 # lambda tahmini 1 derece kaybettirdi
-print 'serbestlik derecesi', dof
-print 'chi kare', chi2.ppf(0.95,dof)
-\end{minted}
-
-\begin{verbatim}
-serbestlik derecesi 9
-chi kare 16.9189776046
-\end{verbatim}
-
-Hesaplanan değer üstteki değerden küçük olduğu için Poisson hipotezi kabul
-edilmiştir (ya da olmadığı reddedilememiştir, eğer p-değeri hesaplasaydık,
-0.05'den az sonuca bakacaktık, aynı şey). 
-
 Chow Testi ve Yapısal Kopma (Structural Break)
 
 Diyelim ki elimizdeki bir modelin bir verinin iki parçasında değişik
@@ -730,9 +561,9 @@ olmasına izin vermedik.
 
 Kullanacağımız veri Amerika'daki benzin tüketimi ile alakalı, bu veri
 içinde aslında iki farklı periyotu kapsıyor [8, sf. 209]. 1973'e kadar
-dünyada petrol böldü ve dünya petrol fiyatları ya stabil ya da düşüş
+dünyada petrol boldu ve dünya petrol fiyatları ya stabil ya da düşüş
 trendinde idi. Fakat 1973'teki ambargo piyasada büyük değişimlere sebep
-oldu, kıtlık başladı, fiyatlar yükseldi, ve karışıklık fazlalaştı.
+oldu, kıtlık başladı, fiyatlar yükseldi. 
 
 Alttaki figürde benzin fiyatı (PG) ile kişi başına tüketim (per capita
 consumption) grafikli, ve görüldüğü gibi 1973 öncesi piyasa oldukça stabil
@@ -919,6 +750,223 @@ Not: \verb!lmfit! hakkında bazı tavsiyeler için bkz [12] yazısı.
 
 Sonucu 1974 olarak bulduk. Fena değil!
 
+%<a name='ek1'/>
+
+Örnek
+
+Bir paralı otoyolunda geçiş noktasında durulmuş ve her dakika gelen araç
+sayılmış, ve dakika başına bu araç sayısı yazılmış. Bu deney 106 dakika
+süresince yapılmış (elde 106 satırlı bir veri var yani). Bu veri için
+Poisson dağılımının uygun olup olmadığını yüzde 5 önemlilik seviyesinde
+ispatlamamız isteniyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('vehicles.csv',header=None)
+\end{minted}
+
+Verinin histogramına bakalım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+f = plt.figure(); df.hist(bins=13)
+plt.savefig('stat_tests2_01.png')
+\end{minted}
+
+\includegraphics[height=6cm]{stat_tests2_01.png}
+
+Poisson dağılımı muhtemel gözüküyor. Ama şimdi bunu uyum derece testi ile
+daha kararlı şekilde göstermeye uğraşacağız. Verideki sayımları o sayım
+rakamı bazında gruplayalıp gösterelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+kt = plt.hist(np.array(df),bins=range(20))
+kt = pd.DataFrame([kt[1],kt[0]]).T
+kt = kt[:-1] # sonuncu satiri at
+kt.columns = ['kac araba','kac kere']
+print kt
+\end{minted}
+
+\begin{verbatim}
+    kac araba  kac kere
+0           0         0
+1           1         0
+2           2         1
+3           3         3
+4           4         5
+5           5         7
+6           6        13
+7           7        12
+8           8         8
+9           9         9
+10         10        13
+11         11        10
+12         12         5
+13         13         6
+14         14         4
+15         15         5
+16         16         4
+17         17         0
+18         18         1
+\end{verbatim}
+
+Yani bir dakikada 6 araba sayımı 13 kere yapılmış (13 değişik dakikada).
+
+Bazı kutucukların boş olduğunu görüyoruz, bu durum özellikle tek tepeli
+(unimodel) dağılımlı verilerde etekleri temsil eden uçlardaki kutucukların
+boş olması sonucunu verebilir. Bu durumda o kutucukların verisi daha dolu
+olanlara aktarabilmek için kutucuk noktalarını tekrar tanımlıyoruz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+bins = [0] + range(5,15) + [100]
+kt2 = plt.hist(np.array(df),bins=bins)
+kt2 = pd.DataFrame([kt2[1],kt2[0]]).T
+kt2.columns = ['int_low','n_i']
+print kt2
+\end{minted}
+
+\begin{verbatim}
+    int_low  n_i
+0         0    9
+1         5    7
+2         6   13
+3         7   12
+4         8    8
+5         9    9
+6        10   13
+7        11   10
+8        12    5
+9        13    6
+10       14   14
+11      100  NaN
+\end{verbatim}
+
+Şimdi bu değerler üzerinden Pearson $\chi^2$ hesabını yapalım. Ama ondan
+önce, hatırlayalım, bu verinin {\em herhangi bir} Poisson'dan gelip
+gelmediğini kontrol ediyoruz, ama testimiz için parametresi belli olan,
+özel bir Poisson lazım, bunun için bize bir $\lambda$ gerekiyor. Önemli
+değil, $\lambda$'nin tahmin edicisi $\hat{\lambda}$'yi biliyoruz,
+
+$$ \hat{\lambda} = \frac{1}{n} \sum _{j=1}^{n}x_j $$
+
+Bu $\hat{\lambda}$'yi kullanarak Poisson hesaplarını yapabiliriz artık. Bir
+kutucuğa düşen Poisson olasılığının hesabı $P(a \le X < b)$, ki bu basit
+bir $F(b)-F(a)$, yani $a,b$ noktalarındaki kümülatif yoğunluk fonksiyonun
+farkı üzerinden hesaplanabilir, altta kullanılan çağrı \verb!poisson.cdf!.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import poisson
+kt2['int_high'] = kt2.shift(-1).int_low
+lam = df.mean() # tahmin edici
+def f(x): 
+   high = poisson.cdf(x.int_high-1,lam)
+   low = poisson.cdf(x.int_low-1,lam)
+   return pd.Series(high-low)
+kt2['p_i'] = kt2.apply(f,axis=1)
+kt2['np_i'] = len(df) * kt2['p_i']
+kt2['chi'] = (kt2['n_i']-kt2['np_i'])**2 / kt2['np_i']
+kt2 = kt2[:-1]
+print kt2
+print '\nchi kare istatistigi', kt2.chi.sum()
+\end{minted}
+
+\begin{verbatim}
+    int_low  n_i  int_high       p_i       np_i       chi
+0         0    9         5  0.051863   5.497487  2.231492
+1         5    7         6  0.058217   6.171048  0.111352
+2         6   13         7  0.088242   9.353602  1.421508
+3         7   12         8  0.114643  12.152118  0.001904
+4         8    8         9  0.130325  13.814437  2.447271
+5         9    9        10  0.131691  13.959242  1.761849
+6        10   13        11  0.119764  12.695009  0.007327
+7        11   10        12  0.099016  10.495702  0.023412
+8        12    5        13  0.075040   7.954290  1.097248
+9        13    6        14  0.052496   5.564539  0.034078
+10       14   14       100  0.078703   8.342527  3.836608
+
+chi kare istatistigi 12.9740502104
+\end{verbatim}
+
+Şimdi üstteki değerin istatistiki önem taşıyıp taşımadığını anlamaya geldi
+sıra. Eşik değerimiz $\chi^2_{9,0.05}$ olacak. Peki niye serbestlik
+derecesi 9 alındı? Elde kaç tane kutucuk var? 
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print len(kt2), 'kutucuk'
+\end{minted}
+
+\begin{verbatim}
+11 kutucuk
+\end{verbatim}
+
+11-1=0 niye olmadı, -1 ile serbestlik derecesi hesaplamıyor muyduk?
+Evet. Fakat bir kavis daha var, tahmin edici ile $\lambda$'yi hesaplayınca
+1 serbestlik derecesi daha kaybettik! $\chi_2$ ile çalışırken hatırlanması
+gereken bilgilerden biri bu. Pearson bu testi keşfettiğinde aslında bu
+eksiltmeye gerek görmüyordu, daha sonraları Fisher adlı istatistikçi bunun
+gerekli olduğunu ispatladı.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.stats import chi2
+dof = len(kt2)-1-1 # lambda tahmini 1 derece kaybettirdi
+print 'serbestlik derecesi', dof
+print 'chi kare', chi2.ppf(0.95,dof)
+\end{minted}
+
+\begin{verbatim}
+serbestlik derecesi 9
+chi kare 16.9189776046
+\end{verbatim}
+
+Hesaplanan değer üstteki değerden küçük olduğu için Poisson hipotezi kabul
+edilmiştir (ya da olmadığı reddedilememiştir, eğer p-değeri hesaplasaydık,
+0.05'den az sonuca bakacaktık, aynı şey). 
+
+Örnek
+
+Gördüğümüz gibi bir dağılım varlığlığını test için o dağılımın analitik yoğunluk
+fonksiyonunu veriden gelen tahmin ediciler üzerinden tanımlayıp, veriyi bu
+fonksiyon ile üretmeyi deneyebiliriz, ve bu sonuç ile veri arasında uyumluluğa
+bakabiliriz.
+
+Mesela olayların coğrafi olarak dağılımına bakalım..  Bu tür olayları nasıl
+modelleriz? Olaylar depremler, yangınlar, ya da bir savaşta bir alana atılan
+bombalar olabilir, ve bu tür sayılar Poisson dağılımı ile modellenir. Bu dağılım
+ilk bölümde gördüğümüz gibi,
+
+$$ f(x) = P(X=x) = e^{-\lambda}\frac{\lambda^{x}}{x!} $$
+
+olay sayısı $x=1$, $x=2$, vs.. olacak şekilde, ki önceden tanımlı belli bir
+zaman aralığında $x$ tane olayın olma olasılığını bu yoğunluk veriyor. Coğrafi
+olay sayılarını ölçmek için biraz farklı düşünmek gerekiyor, mesela 2'inci Dünya
+Savaşı sırasında Almanların Londra'ya attıkları bombaları düşünelim, analizi
+[13]'te var; Merak edilen şuydu, acaba bombalar belli bir yerde kümeleniyor
+muydu (clustering)? Cevap önemli olabilirdi, belki özel bir yer vurulmak
+isteniyordu? Analizde olayların doğal oluş sayısını modelleyen Poisson varlığı
+ispatlanırsa, kümelenme hipotezi reddedilmiş olacaktı. İstatistikçi Clarke
+Londra'yı 536 tane ızgaraya böldü, ve her öğe içine düşen bombaları saydı. Bu
+bittikten sonra 1 tane bomba, 2 tane bomba, vs.. şeklinde olan hücrelerin
+sayısını aldı, ki yoğunluğa $x$ ile geçilecek olan bu sayıydı.
+
+Sonra Clarke yoğunluğu $\lambda$ tahmin edici hücre sayısı bölü bomba sayısı
+üzerinden tanımladı, ve bu yoğunluktan tüm sayılar için bir tahmini bomba
+sayısı ürettirdi, sonuçları gerçek bomba sayıları ile karşılaştırdı.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+N = 576.
+lam = 537/N
+d = N*np.exp(-lam)
+probs = [d*1, d*lam, d*lam**2/2, d*(lam**3)/(3*2), d*(lam**4)/(4*3*2)]
+list(map(lambda x: np.round(x,2), probs))
+\end{minted}
+
+\begin{verbatim}
+Out[1]: [226.74, 211.39, 98.54, 30.62, 7.14]
+\end{verbatim}
+
+Gerçek sayılar 229, 211, 93, 35, 7, .. idi, görüldüğü gibi oldukca yakın
+sayılar. Bir adım daha atılıp bunun üzerinde bir istatistik testi
+uygulanınca Poisson varlığı, ve dolaylı olarak kümelemenin olmadığı ispatlanmış
+oldu.
 
 Kaynaklar
 
@@ -944,6 +992,9 @@ Kaynaklar
 
 [11] Uriel, {\em Introduction to Econometrics}
 
-[12] Bayramli, Istatistik, {\em Gayri Lineer Regresyon, Petrol Tepe Noktası}
+[12] Bayramlı, {\em İstatistik, Gayri Lineer Regresyon, Petrol Tepe Noktası}
+
+[13] Clarke, {\em An application of the Poisson distribution},
+     \url{https://www.actuaries.org.uk/system/files/documents/pdf/0481.pdf}
 
 \end{document}
