@@ -68,15 +68,17 @@ Type=Application
 Icon=/usr/share/icons/Win7-icons/filesystems/folder.png
 Terminal=false
 
-
-
-Bu dosya $HOME/Desktop altina yazilir yazilmaz bir ikonu masaustu uzerinde goreceksiniz. Onun uzerine sag tiklama yapin, Properties | Permissions uzerinden "Allow executing as program"'i secin. Bu kadar.
+Bu dosya $HOME/Desktop altina yazilir yazilmaz bir ikonu masaustu
+uzerinde goreceksiniz. Onun uzerine sag tiklama yapin, Properties |
+Permissions uzerinden "Allow executing as program"'i secin. Bu kadar.
 
 Alt Serit Uzerinde Kisayollar
 
-Alt serit (Taskbar) uzerine masaustunden birakilan herhangi bir program, kisayol alt seritte gosterilir. Alt seritten program cikartmak icin program uzerine gelip Alt + Fare Sol Tiklama, ve Remove secilir. 
+Alt serit (Taskbar) uzerine masaustunden birakilan herhangi bir
+program, kisayol alt seritte gosterilir. Alt seritten program
+cikartmak icin program uzerine gelip Alt + Fare Sol Tiklama, ve Remove
+secilir. 
 
-[devam edecek]
 
 
 

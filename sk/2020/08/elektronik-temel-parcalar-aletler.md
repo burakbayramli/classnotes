@@ -43,5 +43,3 @@ kablo ile bağlayıp kullanıma geçebiliyoruz. Tabii daha ciddi nihai
 devre üretimi için lehimleme daha iyi oluyor fakat hobi ortamı, ciddi
 prototipleme için olabilir.
 
-[devam edecek]
-
