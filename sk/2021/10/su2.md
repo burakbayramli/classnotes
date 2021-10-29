@@ -100,6 +100,11 @@ plt.savefig('su2_02.png')
 
 ![](su2_02.png)
 
+Y ekseninin tersine çevirilmesinin sebebi kesidin üst tarafını
+grafiğin üst kısmında görebilmek, ve bakıyoruz ki orada değerler eksi,
+ki Cp tanımına göre alçak basınç orada. Grafik aynı x değeri için iki
+y değeri gösteriyor normal olarak çünkü kesidin alt kısmı ve üst kısmı
+var.
 
 Paralel isletmek icin
 
