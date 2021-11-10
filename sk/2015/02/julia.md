@@ -1,37 +1,45 @@
 # Julia
 
-Bilimsel hesaplama alaninda yeni bir dil: Julia. C, Fortran gibi
-diller statik tipleme kullanir, kodlamasi zor ve hizlidir, Python, R,
-Matlab gibi diller kullanmasi kolay, dinamik ama yavastir. Julia her
-iki tarafin guclu taraflarini birlestirmeye ugrasiyor. Sahsen
-Python'da gordugumuz bazi eksikleri cevaplandirmasi acisindan bizim
-ilgimizi cekti. Julia LLVM bazli bir JIT kullanir, LLVM'i bir suredir
-takip ediyoruz, saglam bir teknoloji (ve Java VM bazli cozumlere
-alternatif saglamasi acisindan faydali oldu, Scala gibi).
+Bilimsel hesaplama alanında yeni bir dil: Julia. C, Fortran gibi
+diller statik tipleme kullanır, kodlaması zor ve hızlıdır, Python, R,
+Matlab gibi diller kullanması kolay, dinamik ama yavaştır. Julia her
+iki tarafın güçlü taraflarını birleştirmeye uğraşıyor. Şahsen
+Python'da gördüğümüz bazı eksikleri cevaplandırması açısından bizim
+ilgimizi çekti. Julia LLVM bazlı bir JİT kullanır, LLVM'i bir süredir
+takip ediyoruz, sağlam bir teknoloji (ve Java VM bazlı çözümlere
+alternatif sağlaması açısından faydalı oldu, Scala gibi).
 
-Julia yazilan herhangi turden bir kodu "C performansina yakin" hizda
-isletilmesini amacliyor. Python'da ayni performansi elde etmek icin
-cogunlukla Numba ya da C cagrisi kullanmak lazim, bu cetrefil kodlama
-demek, Julia bu isi paketten ciktigi haliyle halleder. Ayrica
-paralelizasyon, hem ayni makinadaki, hem diger makinalardaki birden
-fazla islemciyi (ssh uzerinden) basagrisi yaratmadan hesap surecinin
-parcasi haline getirebiliyor. Python'da programcilar rahatsiz eden bir
-konuyu adreslemisler yani, Python derleyicisinde GIL adli bir kilit
-vardir ve bu sebeple gercek thread kullanimi mumkun olmaz,
-multiprocessing gibi paketlerle arka planda surec yaratan cozumler
-kullanilabilir, fakat bu cozumler dilin dogal bir uzantisi gibi
-durmazlar. Julia bu isi temelden cozuyor.
+Julia yazılan herhangi türden bir kodu "C performansına yakın" hızda
+işletilmesini amaçlıyor. Python'da aynı performansı elde etmek için
+çoğunlukla Numba ya da C çağrısı kullanmak lazım, bu çetrefil kodlama
+demek, Julia bu işi paketten çıktığı haliyle halleder. Ayrıca
+paralelizasyon, hem aynı makinadaki, hem diğer makinalardaki birden
+fazla işlemciyi (ssh üzerinden) başağrısı yaratmadan hesap sürecinin
+parçası haline getirebiliyor. Python'da programcılar rahatsız eden bir
+konuyu adreslemişler yani, Python derleyicisinde GİL adlı bir kilit
+vardır ve bu sebeple gerçek thread kullanımı mümkün olmaz,
+multiprocessing gibi paketlerle arka planda süreç yaratan çözümler
+kullanılabilir, fakat bu çözümler dilin doğal bir uzantısı gibi
+durmazlar. Julia bu işi temelden çözüyor.
 
-Bir baska iyi haber: IPython not defterinin bir varyasyonu Julia icin 
-kodlanmakta: IJulia.
+Bir başka iyi haber: Jupyter notebook ortamında Julia çekirdeği de mevcut.
 
 Ubuntu'da kurmanin en kolay yolu
 
 ```
-sudo add-apt-repository ppa:staticfloat/juliareleases
-sudo add-apt-repository ppa:staticfloat/julia-deps
-sudo apt-get updatesudo apt-get install julia
+sudo snap install julia --classic
 ```
+
+Ek Julia paketleri, Python `pip` gibi, kurmak icin `julia` komut
+satirina girilir, ve orada
+
+```
+julia> using Pkg
+
+julia> Pkg.add("[paket ismi[")
+```
+
+işletilir.
 
 
 
