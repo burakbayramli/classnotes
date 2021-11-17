@@ -570,6 +570,9 @@ consumption) grafikli, ve görüldüğü gibi 1973 öncesi piyasa oldukça stabi
 gidiyor (kırmızı noktalar) ama sonrasında işler karışıyor (mavi noktalar).
 
 \begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('gasoline.csv',sep='\s+')
+
 plt.plot(df[df.Year<=1973].G,df[df.Year<=1973].Pg,'r.')
 plt.xlabel('G'); plt.ylabel('PG')
 plt.plot(df[df.Year>1973].G,df[df.Year>1973].Pg,'b.')
@@ -616,9 +619,9 @@ plt.savefig('stat_tests2_03.png')
 Modeli tüm veri üzerinde işletirsek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import statsmodels.formula.api as smf
-res_r = smf.ols(model, data=df).fit()
-print res_r.summary()
+from statsmodels.formula.api import ols
+res_r = ols(model, data=df).fit()
+print (res_r.summary())
 \end{minted}
 
 \begin{verbatim}
@@ -627,20 +630,20 @@ print res_r.summary()
 Dep. Variable:               Ln_G_Pop   R-squared:                       0.969
 Model:                            OLS   Adj. R-squared:                  0.965
 Method:                 Least Squares   F-statistic:                     243.2
-Date:                Thu, 12 Jan 2017   Prob (F-statistic):           6.25e-23
-Time:                        14:06:38   Log-Likelihood:                 79.913
+Date:                Wed, 17 Nov 2021   Prob (F-statistic):           6.25e-23
+Time:                        10:06:35   Log-Likelihood:                 79.913
 No. Observations:                  36   AIC:                            -149.8
 Df Residuals:                      31   BIC:                            -141.9
 Df Model:                           4                                         
 Covariance Type:            nonrobust                                         
 =================================================================================
-                    coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                    coef    std err          t      P>|t|      [0.025      0.975]
 ---------------------------------------------------------------------------------
-Intercept        -7.7892      0.359    -21.679      0.000        -8.522    -7.056
-Ln_Income_Pop     2.1175      0.099     21.443      0.000         1.916     2.319
-Ln_Pg            -0.0979      0.028     -3.459      0.002        -0.156    -0.040
-Ln_Pnc            0.1224      0.112      1.092      0.283        -0.106     0.351
-Ln_Puc           -0.1022      0.069     -1.475      0.150        -0.243     0.039
+Intercept        -7.7892      0.359    -21.679      0.000      -8.522      -7.056
+Ln_Income_Pop     2.1175      0.099     21.443      0.000       1.916       2.319
+Ln_Pg            -0.0979      0.028     -3.459      0.002      -0.156      -0.040
+Ln_Pnc            0.1224      0.112      1.092      0.283      -0.106       0.351
+Ln_Puc           -0.1022      0.069     -1.475      0.150      -0.243       0.039
 ==============================================================================
 Omnibus:                        2.323   Durbin-Watson:                   0.891
 Prob(Omnibus):                  0.313   Jarque-Bera (JB):                1.281
@@ -648,7 +651,7 @@ Skew:                           0.049   Prob(JB):                        0.527
 Kurtosis:                       2.081   Cond. No.                         319.
 ==============================================================================
 
-Warnings:
+Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 \end{verbatim}
 
@@ -661,35 +664,35 @@ istiyoruz, ve ardından Chow testi için gerekli değerleri hesaplıyoruz,
 df_x = df[['Ln_Income_Pop','Ln_Pg','Ln_Pnc','Ln_Puc']]
 df_y = df['Ln_G_Pop']
 
-print len(df[df.Year<=1973]), len(df[df.Year>1973])
-res1 = smf.ols(model, data=df[df.Year<1974]).fit()
-res2 = smf.ols(model, data=df[df.Year>=1974]).fit()
+print (len(df[df.Year<=1973]), len(df[df.Year>1973]))
+res1 = ols(model, data=df[df.Year<1974]).fit()
+res2 = ols(model, data=df[df.Year>=1974]).fit()
 S_1 = np.sum(res1.resid**2)
 S_2 = np.sum(res2.resid**2)
 S_r = np.sum(res_r.resid**2)
-print 'S 1 =', S_1
-print 'S 2 =', S_2
-print 'S_r =', S_r
-print 'N =', len(df)
+print ('S 1 =', S_1)
+print ('S 2 =', S_2)
+print ('S_r =', S_r)
+print ('N =', len(df))
 k = df_x.shape[1]
 tmp1 = (S_r-(S_1+S_2))/k
 tmp2 = (S_1+S_2)/(len(df)-2*k-1)
 F = tmp1/tmp2
-print 'F =', F
+print ('F =', F)
 
 import scipy.stats as st
 f = st.f(k,len(df)-2*k-1)
-print 'p degeri =', 1-f.cdf(F)
+print ('p degeri =', 1-f.cdf(F))
 \end{minted}
 
 \begin{verbatim}
 14 22
-S 1 = 0.00256733994753
-S 2 = 0.00491175470666
-S_r = 0.024873436262
+S 1 = 0.002567339947532824
+S 2 = 0.0049117547066572
+S_r = 0.02487343626197274
 N = 36
-F = 15.6986655847
-p degeri = 9.40286063456e-07
+F = 15.698665584711588
+p degeri = 9.40286063455531e-07
 \end{verbatim}
 
 Hesaplanan p değeri çok küçük, ve 0.05'ten daha az, demek ki hipotez
@@ -703,26 +706,27 @@ ardına işletebilirdik ve elde edilen en büyük F değeri bize değişim
 noktasını verirdi. Bu kodu işletirsek,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import numpy as np
+from statsmodels.regression.linear_model import OLS
 from numpy.linalg import pinv
+
 def supf(y, x, p):
     N = y.shape[0]
     range = np.floor(np.array([N * p, N * (1 - p)]))
     range = np.arange(range[0], range[1] + 1, dtype=np.int32)
     x = x - np.mean(x)
     y = y - np.mean(y)
-    e = smf.OLS(y,x).fit().resid
+    e = OLS(y,x).fit().resid
     S_r = np.sum(e**2)
     k = x.shape[1]
-    print 'N =',N
-    print 'k =',k
-    print 'N-k =',N-k
+    print ('N =',N)
+    print ('k =',k)
+    print ('N-k =',N-k)
     F_stat = np.zeros(N)
     for t in range:
         X1 = x[:t]
         X2 = x[t:]
-        e[:t] = smf.OLS(y[:t],X1).fit().resid
-        e[t:] = smf.OLS(y[t:],X2).fit().resid
+        e[:t] = OLS(y[:t],X1).fit().resid
+        e[t:] = OLS(y[t:],X2).fit().resid
         R2_u = 1 - e.dot(e) / y.dot(y)
         S_u = np.sum(e**2)
         F_stat[t] = ((S_r - S_u) / k) / (( S_u) / (N-2*k))
@@ -731,15 +735,15 @@ def supf(y, x, p):
 p = 0.2
 
 idx,val = supf(df_y, df_x, p)
-print idx,val
-print 'Sene', df.Year[idx]
+print (idx,val)
+print ('Sene', df.Year[idx])
 \end{minted}
 
 \begin{verbatim}
 N = 36
 k = 4
 N-k = 32
-14 3.9049721931
+14 3.904972193103
 Sene 1974
 \end{verbatim}
 
