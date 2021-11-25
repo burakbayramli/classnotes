@@ -89,8 +89,8 @@ import folium
 
 m = folium.Map(location=[clat, clon], zoom_start=11, tiles="Stamen Terrain")
 for i in range(len(CS.allsegs)):
-    points = []
     for li in range(len(CS.allsegs[i])):
+        points = []
         x = CS.allsegs[i][li][:,0]
         y = CS.allsegs[i][li][:,1]
         for lon,lat in zip(x,y): points.append([lat,lon])
@@ -106,19 +106,6 @@ print (CS.levels)
 ```text
 [   0.  500. 1000. 1500. 2000. 2500. 3000. 3500. 4000.]
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
