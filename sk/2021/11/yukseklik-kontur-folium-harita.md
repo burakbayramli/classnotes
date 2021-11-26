@@ -1,16 +1,20 @@
-# Yukseklik Verisini Kontur ile Folium Haritasinda Gostermek
+# Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek
 
+Matplotlib'de `contour` komutu `x,y` ızgarasında üç boyutta yükseklik
+olarak kabul edilebilecek `z` verisini "kuşbakışı" olarak
+gösterebilen, kesit seviyelerini, bir nevi topografik haritayı
+hesaplabilen bir komuttur. Peki bu seviyeleri alıp Matplotlib ile
+direk bağlantısı olmayan Folium [3] haritalarına taşımak istesek bunu
+nasıl yaparız? Üç boyutlu yükseklik verisini iki boyutlu kesit
+seviyelerine dönüştürmek kolay değil, `contour` içindeki kodu bu iş
+için kullansak tekrar yazmaya gerek kalmazdı. Bunu yapmak mümkün,
+çünkü `contour` bize seviyeleri temsil eden parçaları dondürebiliyor.
 
-```python
-#36.61599, 29.06161
-#36.70624, 29.20870
-clat,clon=36.64653, 29.13920
-```
-
-
-contours matlab
-https://www.tutorialspoint.com/how-to-get-coordinates-from-the-contour-in-matplotlib
-https://stackoverflow.com/questions/19418901/get-coordinates-from-the-contour-in-matplotlib
+Örnek üzerinde görelim. Belli `x,y` değerleri arasında bir ızgara
+yaratalım (bu değerler TR haritasında özel bir yere tekabül edecek
+şekilde seçildi, ki sonra Folium'da gösterim yapabilelim), ve ızgaraya
+bir tane "tepe" koyalım, bunu 2 boyutlu Gaussian fonksiyonu ile
+yapabiliyoruz, ve kesit seviyelerini gösterelim,
 
 
 ```python
@@ -39,21 +43,47 @@ X, Y = np.meshgrid(x, y)
 Z = 10*bivariate_normal(X, Y, 0.02, 0.02, 29.13920, 36.64653)
 
 plt.figure()
-#CS = plt.contour(X, Y, Z, levels=[0.2, 1.0] )
 CS = plt.contour(X, Y, Z )
 plt.clabel(CS, inline=1, fontsize=10)
-plt.title('Simplest default with labels')
 plt.savefig('elev1.png')
+```
+
+![](elev1.png)
+
+Sanki bir "dağa" üstten bakıyoruz, dağın eteklerinde 500 metre
+yükseklik var, sonra giderek yükseliyor, ve en tepede 3000 metreye
+ulaşıyoruz.
+
+Üstteki grafiği oluşturan ham bilgilere erişmek mümkün. Gördüğümüz
+gibi çağrıyı `CS = plt.contour` ile yaptık, döndürülen `CS` içinde
+gerekli bilgiler var. Bu bilgiler bölümler (segments) olarak
+tutulmuş, mesela
+
+```python
+print (CS.levels)
+```
+
+```text
+[   0.  500. 1000. 1500. 2000. 2500. 3000. 3500. 4000.]
 ```
 
 ```python
 print (len(CS.allsegs))
-print (CS.allsegs[1])
 ```
 
 ```text
 9
-[array([[29.16850299, 36.61599   ],
+```
+
+sonucunu verir. 1'inci bölümde 0'inci alt bölümde,
+
+```python
+CS.allsegs[1][0]
+```
+
+```text
+Out[1]: 
+array([[29.16850299, 36.61599   ],
        [29.18289603, 36.64099   ],
        [29.17913935, 36.66599   ],
        [29.16161   , 36.68398265],
@@ -62,16 +92,16 @@ print (CS.allsegs[1])
        [29.0986095 , 36.66599   ],
        [29.09359308, 36.64099   ],
        [29.11161   , 36.61651895],
-       [29.11231435, 36.61599   ]])]
+       [29.11231435, 36.61599   ]])
 ```
+
+görülüyor. İşte bu noktalar kesit seviyelerini oluşturan çizgilerin baş
+ve son noktaları. Eğer o çizgileri ayrı ayrı kendimiz çizmek istesek,
 
 
 ```python
 plt.figure()
-#CS = plt.contour(X, Y, Z, levels=[0.2, 1.0] )
 CS = plt.contour(X, Y, Z)
-#print (CS.allsegs[0][0].shape)
-li = 0
 for i in range(len(CS.allsegs)):
     for li in range(len(CS.allsegs[i])):
         x = CS.allsegs[i][li][:,0]
@@ -80,12 +110,14 @@ for i in range(len(CS.allsegs)):
 plt.savefig('elev3.png')
 ```
 
-```text
-(36, 2)
-```
+![](elev3.png)
+
+Aynı grafiği Folium ile yapmak için,
 
 ```python
 import folium
+
+clat,clon=36.64653, 29.13920
 
 m = folium.Map(location=[clat, clon], zoom_start=11, tiles="Stamen Terrain")
 for i in range(len(CS.allsegs)):
@@ -99,13 +131,14 @@ for i in range(len(CS.allsegs)):
 m.save('elev.html')
 ```
 
-```python
-print (CS.levels)
-```
+Herhangi bir nokta icin yukseklik verilerini alip, 
 
-```text
-[   0.  500. 1000. 1500. 2000. 2500. 3000. 3500. 4000.]
-```
+References
 
+[1] https://www.tutorialspoint.com/how-to-get-coordinates-from-the-contour-in-matplotlib
 
+[2] https://stackoverflow.com/questions/19418901/get-coordinates-from-the-contour-in-matplotlib
 
+[3] 2020/02/haritalamak.md
+
+[4] 2019/04/elevation.md
