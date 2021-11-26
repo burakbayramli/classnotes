@@ -6,5 +6,7 @@
 
 [SU2](10/su2.md)
 
-[Yukseklik Verisini Kontur ile Folium Haritasinda Gostermek](11/yukseklik-kontur-folium-harita.md)
+[Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](11/yukseklik-kontur-folium-harita.md)
+
+
 
