@@ -133,7 +133,10 @@ m.save('elev.html')
 
 Sonuçlar [şurada](elev.html) görülebilir.
 
-Herhangi bir nokta için yükseklik verilerini [4] alıp, 
+Yükseklik verilerini alma tekniklerini [4]'te göstermiştik; bir
+noktayı baz alarak yükseklik verisi, o veri kullanıp daha yüksek
+çözünürlü yükseklik verisi aradeğerleme ile hesaplama teknikleri
+o yazıda bulunabilir.
 
 References
 
