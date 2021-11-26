@@ -75,7 +75,7 @@ print (len(CS.allsegs))
 9
 ```
 
-sonucunu verir. 1'inci bölümde 0'inci alt bölümde,
+sonucunu verir. 1'inci bölümde 0'ıncı alt bölümde,
 
 ```python
 CS.allsegs[1][0]
@@ -133,7 +133,7 @@ m.save('elev.html')
 
 Sonuçlar [şurada](elev.html) görülebilir.
 
-Herhangi bir nokta icin yukseklik verilerini [4] alip, 
+Herhangi bir nokta için yükseklik verilerini [4] alıp, 
 
 References
 
@@ -141,6 +141,7 @@ References
 
 [2] https://stackoverflow.com/questions/19418901/get-coordinates-from-the-contour-in-matplotlib
 
-[3] 2020/02/haritalamak.md
+[3] [Haritalamak](../../2020/02/haritalamak.md)
 
-[4] 2019/04/elevation.md
+[4] [Yükseklik (Elevation) Verileri](../../2019/04/elevation.md)
+

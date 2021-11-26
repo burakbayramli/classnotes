@@ -78,8 +78,87 @@ response = requests.post('https://elevation.racemap.com/api',
 print(response.text)
 ```
 
+Daha Çetrefil Kullanım
+
+Alttaki ornekte bir kordinat alanida 7 x 7 buyuklugunde bir izgara yaratiyoruz,
+o izgara oge kordinatlari icin yukseklik verisini aliyoruz, ve RBF teknigi [1]
+ile aradegerleme (interpolation) yaparak yuksekligi yaklasik sekilde temsil
+ediyoruz. 
 
 
+```python
+import requests
 
+def get_elev_data(coords):
+    chunk = [list(x) for x in coords]
+    data = "["
+    for i,x in enumerate(chunk):
+        data += str(x)
+        if i != len(chunk)-1: data += ","
+    data += "]"
+    response = requests.post('https://elevation.racemap.com/api',
+                             headers={'Content-Type': 'application/json',},
+                             data=data)
+    res = response.text
+    res = res.replace("]","").replace("[","")
+    res = res.split(",")
+    res = [float(x) for x in res]
+    return res
 
+```
+
+Veri alindi, simdi RBF,
+
+```python
+from scipy.interpolate import Rbf
+
+latlow = 36; lathigh = 37
+lonlow = 29; lonhigh = 30
+
+D = 7
+x = np.linspace(lonlow,lonhigh,D)
+y = np.linspace(latlow,lathigh,D)
+xx,yy = np.meshgrid(x,y)
+xxf = xx.reshape(D*D)
+yyf = yy.reshape(D*D)
+sampleCoords = []
+for yyy,xxx in zip(yyf,xxf):
+    sampleCoords.append([yyy,xxx])
+sampleCoords = np.array(sampleCoords)
+print (sampleCoords.shape)
+
+zr =  np.array(get_elev_data(sampleCoords))
+
+yr = sampleCoords[:,0]
+xr = sampleCoords[:,1]
+
+rbfi = Rbf(xr,yr,zr,function='multiquadric')
+```
+
+```text
+(49, 2)
+```
+
+Şimdi RBF kullanarak daha yüksek çözünürlü bir izgara için yüksekliği
+aradeğerleme ile hesaplatabiliriz, altta 15 x 15 büyüklüğünde bir izgara
+için bunu yapıyoruz,
+
+```python
+D = 15
+x = np.linspace(lonlow,lonhigh,D)
+y = np.linspace(latlow,lathigh,D)
+xx,yy = np.meshgrid(x,y)
+yhat = rbfi(xx,yy)
+
+fig, ax = plt.subplots()
+CS = ax.contour(xx,yy,yhat)
+plt.clabel(CS, inline=1, fontsize=10)
+plt.savefig('elev1.png')
+```
+
+![](elev1.png)
+
+Kaynaklar
+
+[1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
 
