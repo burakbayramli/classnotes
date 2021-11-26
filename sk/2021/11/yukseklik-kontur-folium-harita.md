@@ -131,7 +131,9 @@ for i in range(len(CS.allsegs)):
 m.save('elev.html')
 ```
 
-Herhangi bir nokta icin yukseklik verilerini alip, 
+Sonuçlar [şurada](elev.html) görülebilir.
+
+Herhangi bir nokta icin yukseklik verilerini [4] alip, 
 
 References
 
