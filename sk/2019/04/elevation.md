@@ -80,8 +80,8 @@ print(response.text)
 
 Daha Çetrefil Kullanım
 
-Alttaki örnekte bir kordinat alanıda 7 x 7 büyüklüğünde bir izgara yaratıyoruz,
-o izgara öğe kordinatları için yükseklik verisini alıyoruz, ve RBF tekniği [1]
+Alttaki örnekte bir kordinat alanıda 7 x 7 büyüklüğünde bir ızgara yaratıyoruz,
+o ızgara öğe kordinatları için yükseklik verisini alıyoruz, ve RBF tekniği [1]
 ile aradeğerleme (interpolation) yaparak yüksekliği yaklaşık şekilde temsil
 ediyoruz. 
 
@@ -139,7 +139,7 @@ rbfi = Rbf(xr,yr,zr,function='multiquadric')
 (49, 2)
 ```
 
-Şimdi RBF kullanarak daha yüksek çözünürlü bir izgara için yüksekliği
+Şimdi RBF kullanarak daha yüksek çözünürlü bir ızgara için yüksekliği
 aradeğerleme ile hesaplatabiliriz, altta 15 x 15 büyüklüğünde bir ızgara
 için bunu yapıyoruz,
 
@@ -161,6 +161,7 @@ plt.savefig('elev1.png')
 Kaynaklar
 
 [1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
+
 
 
 
