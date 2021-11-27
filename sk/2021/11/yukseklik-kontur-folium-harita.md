@@ -13,8 +13,9 @@ için kullansak tekrar yazmaya gerek kalmazdı. Bunu yapmak mümkün,
 Örnek üzerinde görelim. Belli `x,y` değerleri arasında bir ızgara
 yaratalım (bu değerler TR haritasında özel bir yere tekabül edecek
 şekilde seçildi, ki sonra Folium'da gösterim yapabilelim), ve ızgaraya
-bir tane "tepe" koyalım, bunu 2 boyutlu Gaussian fonksiyonu ile
-yapabiliyoruz, ve kesit seviyelerini gösterelim,
+bir tane "tepe" koyalım, bunu iki degiskenli (bivariate, ve üç
+boyutlu) Gaussian fonksiyonu ile yapabiliyoruz, ve kesit seviyelerini
+gösterelim,
 
 
 ```python
