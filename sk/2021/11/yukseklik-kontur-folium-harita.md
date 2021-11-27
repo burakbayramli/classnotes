@@ -75,7 +75,7 @@ print (len(CS.allsegs))
 9
 ```
 
-sonucunu verir. 1'inci bölümde 0'ıncı alt bölümde,
+sonucunu verir. 1'inci bölümdeki 0'ıncı alt bölümde,
 
 ```python
 CS.allsegs[1][0]

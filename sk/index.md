@@ -3,7 +3,7 @@
 
 ## En Son
 
-27/10 - [SU2](https://burakbayramli.github.io/dersblog/sk/2021/10/su2.html)
+27/11 - [Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](https://burakbayramli.github.io/dersblog/sk/2021/11/yukseklik-kontur-folium-harita.html)
 
 27/10 - [SU2](https://burakbayramli.github.io/dersblog/sk/2021/10/su2.html)
 
