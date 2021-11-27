@@ -134,15 +134,15 @@ m.save('elev.html')
 Sonuçlar [şurada](elev.html) görülebilir.
 
 Yükseklik verilerini alma tekniklerini [4]'te göstermiştik; bir
-noktayı baz alarak yükseklik verisi, o veri kullanıp daha yüksek
-çözünürlü yükseklik verisi aradeğerleme ile hesaplama teknikleri
-o yazıda bulunabilir.
+bölgedeki yükseklik verisini, sonra o veriyi kullanıp daha yüksek
+çözünürlü yükseklik verisini aradeğerleme ile hesaplama teknikleri o
+yazıda bulunabilir.
 
-References
+Kaynaklar
 
-[1] https://www.tutorialspoint.com/how-to-get-coordinates-from-the-contour-in-matplotlib
+[1] [Tutorialspoint](https://www.tutorialspoint.com/how-to-get-coordinates-from-the-contour-in-matplotlib)
 
-[2] https://stackoverflow.com/questions/19418901/get-coordinates-from-the-contour-in-matplotlib
+[2] [Stackoverflow](https://stackoverflow.com/questions/19418901/get-coordinates-from-the-contour-in-matplotlib)
 
 [3] [Haritalamak](../../2020/02/haritalamak.md)
 
