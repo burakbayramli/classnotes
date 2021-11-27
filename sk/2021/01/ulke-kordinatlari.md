@@ -1,4 +1,4 @@
-# Ulke Cografi Kordinatlari
+# Ülke Coğrafi Kordinatları
 
 ```python
 import itertools
