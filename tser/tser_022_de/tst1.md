@@ -1,5 +1,14 @@
 
 
+
+shapiro wilk
+   https://machinelearningmastery.com/time-series-seasonality-with-python/
+   https://ocw.mit.edu/courses/mathematics/18-01sc-single-variable-calculus-fall-2010/unit-5-exploring-the-infinite/part-b-taylor-series/session-99-taylors-series-continued/MIT18_01SCF10_Ses99c.pdf
+   https://github.com/BMClab/BMC/blob/master/functions/detect_cusum.py
+
+
+
+
 ```python
 import pandas as pd
 
