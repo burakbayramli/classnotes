@@ -1,11 +1,11 @@
 
 
 
+
 shapiro wilk
    https://machinelearningmastery.com/time-series-seasonality-with-python/
    https://ocw.mit.edu/courses/mathematics/18-01sc-single-variable-calculus-fall-2010/unit-5-exploring-the-infinite/part-b-taylor-series/session-99-taylors-series-continued/MIT18_01SCF10_Ses99c.pdf
    https://github.com/BMClab/BMC/blob/master/functions/detect_cusum.py
-
 
 
 
@@ -76,17 +76,3 @@ test_change(df, 100)
  -4.93929664e+01]
 ShapiroResult(statistic=nan, pvalue=1.0)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
