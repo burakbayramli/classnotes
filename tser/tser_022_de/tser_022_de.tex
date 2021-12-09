@@ -2,6 +2,34 @@
 \begin{document}
 Sezonsallık, Trend Çıkartmak, Değişim Noktası, CUSUM
 
+Zaman serilerini trendini, sezonşallığını nasıl inceleriz, ve trendde
+değişim varsa bunu nasıl yakalarız? 
+
+Bir örnek üzerinde görelim, bir şirketin şampuan satış kazancı, veri [1]'den,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+def parser(x):
+    return pd.datetime.strptime( '190'+x, '%Y-%m' )
+    
+df = pd.read_csv('shampoo-sales.csv', header=0, index_col=0, \
+     parse_dates=True, date_parser=parser)
+df.Satis.plot()
+plt.savefig('tser_022_de_07.png')
+\end{minted}
+
+\includegraphics[height=6cm]{tser_022_de_07.png}
+
+Yukarı doğru bir trend var. Bu trendi veriye bir düz çizgi uydurarak (fit), yani
+tek değişkenli, ikinci derece lineer regresyon yaparak yakalayabiliriz. Bunu
+yapmayı pek çok diğer derste gösterdik, \verb!statsmodels.regression!
+paketinden, \verb!linear_model.OLS! ile, \verb!statsmodels.formula.api! ile,
+ya da direk Lineer Cebir kullanarak.. Altta \verb!polyfit!  çağrısı
+kullanılacak.
+
+Modelden gelen katsayıları (coefficients) kullanıp tahmini $y$ değerleri üretmek
+için alttaki fonksiyon var,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 def model_compute(X, coef):
    degree = len(coef)-1
@@ -10,15 +38,9 @@ def model_compute(X, coef):
    return curve
 \end{minted}
 
+Uydurmayı yapıp modeli veri üzerinde gösterelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from pandas import datetime
-def parser(x):
-    return datetime.strptime( '190'+x, '%Y-%m' )
-    
-df = pd.read_csv('shampoo-sales.csv', header=0, index_col=0, \
-     parse_dates=True, date_parser=parser)
-
 X = np.array(range(len(df))).reshape(-1)
 y = df.values.reshape(-1)
 degree = 1
@@ -30,6 +52,16 @@ plt.savefig('tser_022_de_01.png')
 
 \includegraphics[height=6cm]{tser_022_de_01.png}
 
+Veriden ``trendi çıkartmabiliriz''. Bunu basit bir şekilde veriden modeli
+çıkartarak, yani eksilterek yapabiliriz. Bu durumda geriye kalan sadece ``trend
+haricinde olan şeyler'' olacaktır. Trend çıkartmanın pek çok sebebi olabilir,
+belki trend haricinde olan kalıpları, eğer varsa, görmek istiyoruz, ya da
+modelin artığına (residual) bakarak onun gürültü olup olmadığını anlamak
+istiyoruz. Bilindiği gibi lineer regresyonun faraziyesi verinin model artı
+gürültü olduğudür, o zaman model veriden çıkartılınca geriye kalan artık,
+``tortu'' sadece gürültü olmalıdır. Gürültünün matematiksel tanımı Gaussian, ya
+da Normal dağılımıdır, demek ki artıklar üzerinde normallik testi bir anlamda
+modelin uyma başaarısını da ölçer. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 detrended = df.Satis-df.Model
@@ -39,7 +71,23 @@ plt.savefig('tser_022_de_03.png')
 
 \includegraphics[height=6cm]{tser_022_de_03.png}
 
+Normallik testini uygulayalım,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy import stats
+val,pval = stats.shapiro(detrended)
+print ('p degeri =', pval)
+\end{minted}
+
+\begin{verbatim}
+p degeri = 0.09782794862985611
+\end{verbatim}
+
+Shapiro-Wilk testinde p-değerinin 0.05'ten küçük olması normalliğin reddedilmesi
+demektir. Üstteki normal olmadığın reddedemedik, demek ki büyük ihtimalle
+elimizde bir Normal dağılım var.
+
+Sezonsallık
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -54,17 +102,16 @@ df.plot()
 plt.savefig('tser_022_de_02.png')
 \end{minted}
 
-
 \includegraphics[height=6cm]{tser_022_de_02.png}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-detrended = df.Temp-df.Model
-detrended.plot()
+deseasoned = df.Temp-df.Model
+deseasoned.plot()
 plt.savefig('tser_022_de_04.png')
 \end{minted}
 
-
 \includegraphics[height=6cm]{tser_022_de_04.png}
+
 
 
 
@@ -138,5 +185,9 @@ Kaynaklar
 
 [3] MIT, {\em OCW Single Variable Calculus, unit 5, Session 99},
          \url{https://ocw.mit.edu/courses/mathematics/18-01sc-single-variable-calculus-fall-2010/index.htm}
+
+[4] Bayramli, {\em Hesapsal Bilim, Ders 1-15}
+         
+[5] Brown, et al, {\em Techniques for Testing the Constancy of Regression Relationships over Time}
 
 \end{document}
