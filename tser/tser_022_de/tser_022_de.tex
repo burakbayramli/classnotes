@@ -89,6 +89,29 @@ elimizde bir Normal dağılım var.
 
 Sezonsallık
 
+Benzer bir sekilde sezonsalligi da modelleyebiliriz. Sezonsallik bir
+periyotsalligi ima eder, o zaman en genel sekilde bir sinus fonksiyonunu veriye
+uydurabiliriz. Fakat bu sinus fonksiyonunun benligini, baslangic noktasini
+bilmiyoruz, bu durumlarda [6]'da sinussel regresyon teknigini gorduk. Fakat
+belki de daha rahati veriye bir 4'uncu derece polinom uydurmaktir.
+
+Bu garip gelebilir, polinom uydurmayı çoğunlukla ikinci, üçüncü derecede
+eğrileri modelleyen çerçevede görmüş olabiliriz, bu yaklaşım fakat periyotsal
+fonksiyonları da çok rahat temsil edebiliyor. Sebebi herhalde sinüs fonsiyonunun
+Taylor açılımında [3] gizli, Taylor açılımında sonsuza kadar giden türevler
+polinom açılımda kullanılır, sinüsün 1'den 4'e kadar olan türevlerine bakarsak,
+
+$\sin^{\prime}(x)=\cos(x),\quad$
+$\sin^{\prime\prime}(x)=-\sin(x),\quad$,
+$\sin^{\prime\prime\prime}(x)=-\cos(x),\quad$,
+$\sin^{(4)}(x)=\sin(x)$.
+
+Dördüncü türevin tekrar $\sin(x)$'a dönüş yaptığını görüyoruz. Demek ki 4'üncü
+derece polinom açılımı periyotsal fonksiyonları temsil etmek için yeterlidir.
+
+Altta bir bölgeden alınmmış günlük, o günün minimum hava sıcaklığı ölçümlerini
+görüyoruz. Ona modeli uyduralım,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
 df = pd.read_csv('daily-min-temperatures.csv', header=0,\
@@ -104,6 +127,8 @@ plt.savefig('tser_022_de_02.png')
 
 \includegraphics[height=6cm]{tser_022_de_02.png}
 
+Periyotsallık yakalanmış gibi duruyor. Sezonsallığı veriden çıkartalım,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 deseasoned = df.Temp-df.Model
 deseasoned.plot()
@@ -112,12 +137,68 @@ plt.savefig('tser_022_de_04.png')
 
 \includegraphics[height=6cm]{tser_022_de_04.png}
 
+Artıklar üzerinde normallik testi,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy import stats
+val,pval = stats.shapiro(deseasoned)
+print ('p degeri =', pval)
+\end{minted}
 
+\begin{verbatim}
+p degeri = 4.155807920014354e-10
+\end{verbatim}
+
+Normal değil. Bunun sebebi veri içinde birden fazla sezonsallık, ya da başka bir
+örüntünün hala mevcut olması olabilir. Bu senaryoları test etmeyi okuyucuya
+bırakıyoruz, üstteki son hale tekrar model uydurup onu da çıkartmak, ve sonuca
+bakmak gibi.
+
+Yapısal Kopuş (Structural Break) Uygulaması
+
+Üstteki teknikleri zaman serisinde ``ciddi'' bir değişim olup olmadığı, varsa
+nerede olduğunun bulunması için kullanmak mümkündür. Yapısal kopuş için Chow
+testini [7]'de ve Poisson bazlı [8]'de görmüştük. 
+
+Üstteki teknikleri kullanarak bir yaklaşım herhangi bir nokta öncesi ve sonrası
+zaman serisi parçalarını almak, ve önceki parçada lineer regresyon, yapıp
+katsayıları alıp gürültünün normalliğini kontrol etmektir. Eğer normallik varsa,
+katsayılar alinip ikinci parçada kullanılır, gürültü yine normalse kopuş yoktur
+(aynı zaman serisi). Birincide gürültü normalliği yoksa kopuş yine yoktur, ilk
+parça doğru tanımlı değil. Sezonşallık benzer şekilde kontrol edilebilir, vs.
 
 Cusum
 
+Cusum yaklaşımı [5] makalesinde araştırılmış, özyineli (recursive), yani teker
+teker her yeni veri noktası üzerinde işlem yapan ve kopuşları o anda yakalamaya
+uğraşan bir yaklaşımdır. Özyineli regresyon konusunu [4]'te gördük. Bir
+regresyon hipotezi ile başlayıp Her veri noktası geldiğinde regresyonu
+güncellemek, iyileştirmek mümkündür. Cusum bunu yapar aynı anda modelin
+gürültüsünü kontrol eder ve zaman serisinin bazı hipotezlere uyup uymadığını
+her defasında kontrol eder, uyum yoksa kopuş yakalanmış demektir.
+
+Faraziye şudur, normal kopuksuz bir zaman serisi her anda $\beta_t$ vektöründe
+katsayılara sahipse, modelden geri kalan gürültünün ortalaması (mean) sıfır
+olacaktır, ve her anda $\sigma_t$ varyasyonu için,
+
+$$
+\beta_1 = \beta_2 = ... = \beta_T = \beta
+$$
+
+$$
+\sigma_1^2 = \sigma_2^2 = ... = \sigma_T^2 = \sigma
+$$
+
+Yani her anda katsayılar ve gürültünün varyasyonu sabit olmalı. Cusum
+$\beta_t$'deki değişimi yakalamak için ayarlanmıştır, bunu yapmak için gürültü
+ortalamasının sıfırdan sapmasını yakalamaya uğraşır. Detayları için Cusum
+makalesine danışılabilir.
+
+Alttaki kod [2]'yi temel alıyor. 
+
 \inputminted[fontsize=\footnotesize]{python}{cusum.py}
+
+Örnek bir zaman serisinde görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -134,10 +215,29 @@ plt.savefig('tser_022_de_05.png')
 
 \includegraphics[height=6cm]{tser_022_de_05.png}
 
+Bu zaman serisinde bariz kopuşlar var, yaklaşık indeks 100 anında, sonra
+200 anında. Cusum ile bunları yakalamaya uğraşalım,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 import cusum
 ta, tai, taf, amp = cusum.detect_cusum(df.y, 2, .02, True, True)
 
+print (len(ta))
+print ('Baslangic =', tai[0], 'Bitis =', taf[0])
+\end{minted}
+
+\begin{verbatim}
+2
+Baslangic = 95 Bitis = 197
+\end{verbatim}
+
+Geri döndürülen \verb!tai!, \verb!taf! birer vektördür, ve sırasıyıla kopuş
+noktasının başlangıç ve bitiş indisini verirler. Yukarıda ilk kopuşun
+indisini görüyoruz.
+
+Grafiklersek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
 fig, ax = plt.subplots(1, 1)
 t = range(df.y.size)
 ax.plot(t, df.y, 'b-', lw=2)
@@ -151,31 +251,9 @@ plt.savefig('tser_022_de_06.png')
 
 \includegraphics[height=6cm]{tser_022_de_06.png}
 
-\begin{minted}[fontsize=\footnotesize]{python}
-print (len(ta))
-print ('Baslangic =', tai[0], 'Bitis =', taf[0])
-\end{minted}
-
-\begin{verbatim}
-2
-Baslangic = 95 Bitis = 197
-\end{verbatim}
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
+Sağa dönük yeşil ok başlangıç, sola dönük bitiş demek. En tepede ikisi
+birbirinin üstüne bindi çünkü orada bir parça bitip diğeri başlıyor, ama olanlar
+gözüküyor herhalde. Kırmızı noktalar ise alarm anları olarak tanımlanmış. 
 
 Kaynaklar
 
@@ -189,5 +267,11 @@ Kaynaklar
 [4] Bayramli, {\em Hesapsal Bilim, Ders 1-15}
          
 [5] Brown, et al, {\em Techniques for Testing the Constancy of Regression Relationships over Time}
+
+[6] Bayramli, {\em Zaman Serileri, Sinüssel Regresyon (Sinusoidal Regression)}
+
+[7] Bayramli, {\em Istatistik, Testlere devam}
+
+[8] Bayramli, {\em Istatistik, Değişim Noktası Analizi}
 
 \end{document}
