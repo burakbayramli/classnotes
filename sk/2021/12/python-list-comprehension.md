@@ -156,11 +156,11 @@ print (curve)
 ```
 
 kullanıyor. Fakat bu kod çok karışık... Yapılmaya uğraşılan basit bir
-şey aslında, `X` içindeki her değer için diyelim, `coef` içindeki
-katsayılar alınıp ona tekabül eden polinom dereceleri `x` ile
-çapılacak ve sonuçlar toplanacak, yani her `x` için 10 + 5*x -3*x^2 +
-6*x^3 hesabı yapılacak. Bir dış döngü var, `X` için, bir de iç döngü
-var `coef` için.
+şey aslında, `X` içindeki her değer için `coef` içindeki katsayılar
+alınıp ona tekabül eden polinom dereceleri `x` ile çapılacak ve
+sonuçlar toplanacak, yani her `x` için 10 + 5*x -3*x^2 + 6*x^3 hesabı
+yapılacak. Bir dış döngü var, `X` için, bir de iç döngü var `coef`
+için.
 
 Arkadaş `coef` gezmek için `range` ile indis yaratıyor, 1'inci ofsayt
 (çünkü o indise `degree-d` yapmak için ihtiyacı var). Diğer yandan
