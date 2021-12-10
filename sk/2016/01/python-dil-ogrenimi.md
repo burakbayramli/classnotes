@@ -21,23 +21,18 @@ Ayrica virtualenv sanal ortamini anlamak icin
 [surada](../../2018/08/virtualenv-python-izole-sanal-calsma.md).
 
 Matematik, veri analizi için çok kullanılan paketler numpy, scipy,
-pandaş paketleridir. Bunlar hakkında yazılarımız altta,
+pandas paketleridir. Bunlar ve ileri dil özellikleri hakkındaki
+yazılarımız altta,
 
-[Numpy](../../2016/10/numpy.md)
-
-[Scipy Sparse (Seyrek Matrisler)](../../2016/04/scipy-seyrek-matrisler-sparse-matrices.md)
-
-[Pandas](../../2016/08/pandas.md)
-
-Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı yazılar,
-
-[Komut Satırı Seçeneklerini İşlemek (Command Line Option Processing), Python](../../2018/08/komut-satr-seceneklerini-islemek.md)
-
-[Yerel, Network Dosyasini Canlı, Anlık, Azar Azar Islemek (Stream, Incremental File Processing)](../../2018/08/canl-aks-anlk-azar-azar-islem-stream.md)
+[Python Liste Kavraması (List Comprehension)](../../2021/12/python-list-comprehension.md)
 
 [Üreticiler (Generators), Yield](../../2011/02/fonksiyon-gezmek-ve-yield.md)
 
 [Birim Testler](../../2016/05/birim-testleri-taklitlemek-mocking-ve.md)
+
+[Komut Satırı Seçeneklerini İşlemek (Command Line Option Processing), Python](../../2018/08/komut-satr-seceneklerini-islemek.md)
+
+[Yerel, Network Dosyasini Canlı, Anlık, Azar Azar Islemek (Stream, Incremental File Processing)](../../2018/08/canl-aks-anlk-azar-azar-islem-stream.md)
 
 [With](../../2013/01/python-with-komutu-contextmanager.md)
 
@@ -71,5 +66,10 @@ Giriş derslerinde çoğunlukla işlenmeyen Pyhon dil konuları hakkında bazı 
 
 [Cython](../../2010/11/cython.md)
 
+[Numpy](../../2016/10/numpy.md)
+
+[Scipy Sparse (Seyrek Matrisler)](../../2016/04/scipy-seyrek-matrisler-sparse-matrices.md)
+
+[Pandas](../../2016/08/pandas.md)
 
 

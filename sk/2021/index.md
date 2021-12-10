@@ -8,3 +8,5 @@
 
 [Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](11/yukseklik-kontur-folium-harita.md)
 
+[Python Liste Kavraması (List Comprehension)](12/python-list-comprehension.md)
+

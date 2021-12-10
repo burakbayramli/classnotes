@@ -3,6 +3,8 @@
 
 ## En Son
 
+10/12 - [Python Liste Kavraması (List Comprehension)](https://burakbayramli.github.io/dersblog/sk/2021/12/python-list-comprehension.html)
+
 10/12 - [Sezonsallık, Trend Çıkartmak, Değişim Noktası, CUSUM](https://burakbayramli.github.io/dersblog/tser/tser_022_de/sezonsallik_trend_cikartmak_degisim_noktasi_cusum.html)
 
 27/11 - [Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](https://burakbayramli.github.io/dersblog/sk/2021/11/yukseklik-kontur-folium-harita.html)
@@ -10,8 +12,6 @@
 27/10 - [SU2](https://burakbayramli.github.io/dersblog/sk/2021/10/su2.html)
 
 4/10 - [Istatistiki Testler - Ek](https://burakbayramli.github.io/dersblog/stat/stat_040_tests2/testlere_devam_.html#ek1)
-
-27/9 - [Materyel Türev, Ek](https://burakbayramli.github.io/dersblog/phy/phy_030_fluid1/sivilar__1.html)
 
 ## Konular, Referans
 
