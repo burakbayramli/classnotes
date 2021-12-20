@@ -24,6 +24,7 @@ bu.
 
 Baglantiyi tekrar verelim,
 
-3Blue1Brown Türk
+[3Blue1Brown TR](https://www.youtube.com/channel/UCx64ou5qw0Q9LLkwE8xSNEg)
 
 Seslendirmeyi Nasıl Yaptık?
+
