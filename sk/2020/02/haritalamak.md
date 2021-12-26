@@ -1,6 +1,6 @@
 # Haritalamak
 
-Folium
+### Folium
 
 Bu haritalama sistemi ile dünyanın herhangi bir yerini alıp, istenen
 odaklama seviyesinde göstermek, üzerini işaretlemek mümkün, ayrıca
@@ -67,7 +67,7 @@ tıklama bizi tarayıcıda ayrı bir tab'e götürüyor.
 
 Ek bilgiler [5],[6],[7] de bulunabilir,
 
-Cartopy
+### Cartopy
 
 Kullanisli bir paket; fakat isletim sistemi seviyesinde GEOS paketinin
 kurulmasi gerekli, bu bazi barindirilan, idareli bulut sistemlerinde
@@ -149,10 +149,12 @@ plt.savefig('har2.png')
 
 ![](har2.png)
 
+
+### Izgara Yaratmak
+
 Bir kordinat etrafında belli büyüklükte bir alan üzerinde ızgara
 yaratmak ve bu izgaradaki kordinat noktalarını haritada göstermek için
 ne yaparız? Paket `geopy` kurulmuş olmalı,
-
 
 ```
 import geopy.distance
@@ -202,6 +204,8 @@ Nasıl kodladığımızı açıklayalım, önce merkez noktadan sağ üste (45
 derece yönde) 60 km, ve sol alt yönde (225 derece) aynı uzaklıkta
 birer adım atıyoruz, bu dörtgenin iki ucu. Bu uç noktalardan `lingrid`
 sonra `meshgrid` ile ızgarayı oluşturuyoruz. 
+
+Oklar, Quiver
 
 Cartopy haritaları üzerinde klasik matplotlib komutlarını hala
 kullanabiliriz, enlem, boylam kordinatları y ve x eksenleri haline
@@ -261,6 +265,125 @@ plt.savefig('har6.png')
 
 ![](har6.png)
 
+### SHP ile Kendimiz Sinir Cizelim
+
+Bazen Cartopy ve hatta Folium bile uygulamamiza biraz yuk
+getirebiliyor, mesela Cartopy kurulumu icin arka planda GDAL
+gerekebilir, bu kutuphane arka planda isletim sistemi ek kurulumu
+gerektirir, ve bulut ortaminda uygun olmayabilir. Folium hafif olsa da
+arka planda baglanti gerektiriyor, cunku zoom yapinca ek bilgiler
+servisten aliniyor.
+
+Eğer bize gayet basit ülke sınırları mesela gerekiyorsa bu tür bilgileri
+taşıyan ufak dosya bazlı veri tabanları kullanabiliriz. PyShp ile SHP bazlı
+bu tabanlara ulaşmak mümkündür. Mesela ülke sınırları [8]'de var,
+`TM_WORLD_BORDERS-0.3.zıp` indirilir, açılir, `/tmp` altında `.shp` ve `.dbf`
+dosyaları olsun (ikisi de lazım),
+
+```python
+import shapefile
+sf = shapefile.Reader("/tmp/TM_WORLD_BORDERS-0.3.shp", encoding = "ISO8859-1")
+```
+
+Kaç ülke var burada,
+
+```python
+r = sf.records()
+countries = sf.shapes()
+print (len(countries))
+```
+
+```text
+246
+```
+
+Bu ülkelerden indis 2'de olana bakalım,
+
+```python
+idx = 2
+country = countries[idx]
+name = r[idx]
+print (name)
+```
+
+```text
+Record #2: ['AJ', 'AZ', 'AZE', 31, 'Azerbaijan', 8260, 8352021, 142, 145, 47.395, 40.43]
+```
+
+Azerbeycan burada.
+
+Peki ülkenin sınırları nerede? 
+
+```python
+print (len(country.points))
+print (country.parts)
+```
+
+```text
+871
+[0, 108, 118, 131, 859]
+```
+
+Ülke sınır noktaları `points` ile alınıyor, bir enlem/boylam
+listesidir, kabaca bir polygonun köşe noktalarıdır.
+
+Fakat ülkeler bazen tek kesintisiz bir parça olmayabiliyor, adalar, ya
+da diğer ülkelerin içinde ufak parçalar vs var ise, bunları farklı
+poligon öbekleri olarak temsil etmek lazım. Üstteki `points` içinde
+tüm parçalar için noktalar var, hangi öbeğin nerede başlayıp bittiğini
+bilmek gerekiyor sadece, `parts` içinde bu bilgi var [9]. Mesela
+1'inci parça 0'dan başlayıp 107 indisine (dahil olmak üzere) uzanıyor,
+108 nokta var. Sonraki 108'den başlayıp 117'ye gidiyor, vs.
+
+Bu mantığı bir fonksiyon içine koyalım,
+
+
+```python
+import shapefile
+sf = shapefile.Reader("TM_WORLD_BORDERS-0.3.shp", encoding = "ISO8859-1")
+r = sf.records()
+countries = sf.shapes()
+
+def plot_country(idx,color='r'):
+   country = countries[idx]
+   name = r[idx]
+   print (name)
+   bounds = list(country.parts) + [len(country.points)]
+   print (bounds)
+   for previous, current in zip(bounds, bounds[1:]):    
+       geo = [[x[0],x[1]] for x in country.points[previous:current]]
+       if len(geo) < 1: continue
+       geo = np.array(geo)
+       if geo.shape[0] > 0:
+           plt.plot(geo[:,0],geo[:,1],color)
+n
+plot_country(2,'r')
+plot_country(4,'b')
+
+plt.savefig('harita-az-arm.png')
+```
+
+```text
+Record #2: ['AJ', 'AZ', 'AZE', 31, 'Azerbaijan', 8260, 8352021, 142, 145, 47.395, 40.43]
+[0, 108, 118, 131, 859, 871]
+Record #4: ['AM', 'AM', 'ARM', 51, 'Armenia', 2820, 3017661, 142, 145, 44.563, 40.534]
+[0, 12, 395, 408, 418]
+```
+
+![](harita-az-arm.png)
+
+Azerbeycan ve Ermenistan'ı grafiklemiş olduk.
+
+Not: Üstte `plot` çağrısının çizgisel kullanımı var, bazılarının bildiği
+gibi `plot(10,20,'.')` x=10,y=20 kordinatlarına bir nokta koyar. Eğer
+bir x kordinat ve y kordinat listesi verirsek `plot` çağrısına, bu verili
+noktaları arasına çizgi çek demektir. 
+
+Ek bazı bilgiler, eğer o çizgilerle çevirdiğimiz bölgelerin içini bir
+renkle doldurmak isteseydik, mesela elimizde bir gol için poligon olsa
+onu `plt.plot` yerine `plt.fill` ile çizebilirdik, bu çağrıya geçilen
+üçüncü parametre renk objenin içini doldurmak için kullanılacaktır.a
+
 Kaynaklar
 
 [1] https://rabernat.github.io/research_computing_2018/maps-with-cartopy.html
@@ -276,5 +399,9 @@ Kaynaklar
 [6] https://stackoverflow.com/questions/39093250/is-it-possible-to-draw-lines-with-arrowheads-in-a-folium-map
 
 [7] https://www.geeksforgeeks.org/stamen-toner-stamen-terrain-and-mapbox-bright-maps-in-python-folium/
+
+[8] https://thematicmapping.org/downloads/world_borders.php
+
+[9] Sileika, Pro Python System Administration
 
 
