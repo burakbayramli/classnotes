@@ -207,6 +207,10 @@ ve o kutu içine düşen yükseklik verisi `read_box` ile alındı.
 yani aşağı yukarı 1 km x 1 km karelerinin yükseklik verisi alınabilir. Dosyanin
 büyüklüğüne dikkat çekmak lazım, 20 MB'dan daha az!
 
+[3] kullanımı önemliydi çünkü bazı alternatif GeoTiff okuma yöntemleri GDAL
+kurulmasının gerektiriyor, [3] kütüphanesi gayet hafif, direk DEM dosyalarının
+içeriğini okuyabiliyor.
+
 Kaynaklar
 
 [1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
