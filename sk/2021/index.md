@@ -8,5 +8,7 @@
 
 [Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](11/yukseklik-kontur-folium-harita.md)
 
+[NetCDF, İklim Verisi İndirmek](12/netcdf-wind-historical-noaa-iklim-veri.md)
+
 [Python Liste Kavraması (List Comprehension)](12/python-list-comprehension.md)
 

@@ -265,7 +265,9 @@ plt.savefig('har6.png')
 
 ![](har6.png)
 
-### SHP ile Kendimiz Sinir Cizelim
+<a name='shp'/>
+
+### SHP ile Kendimiz Sınır Çizelim
 
 Bazen Cartopy ve hatta Folium bile uygulamamıza biraz yük
 getirebiliyor, mesela Cartopy kurulumu için arka planda GDAL
