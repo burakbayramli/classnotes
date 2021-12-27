@@ -247,7 +247,7 @@ Bu arada Pandas aynen SQL tabanları gibi birleştirme operasyonu
 yapabiliyor, yani iki DataFrame'i alıyorum, indis uyumu üzerinden, ya
 da sadece bazı kolonların ismini verip kolon uyumu üzerinden iki
 DataFrame birleştirilebilir. İşlem oldukça hızlı; bir projede her biri
-1 gigabaytlık iki DataFrame' birleştirip üçüncü bir devasa DataFrame
+1 gigabaytlık iki DataFrame'i birleştirip üçüncü bir devasa DataFrame
 yaratmıştım bir kez, tamamen hafızada!
 
 Kordinat bazlı (kordinat derken indeks ve kolon, ki indeks hangi tipte

@@ -267,18 +267,19 @@ plt.savefig('har6.png')
 
 ### SHP ile Kendimiz Sinir Cizelim
 
-Bazen Cartopy ve hatta Folium bile uygulamamiza biraz yuk
-getirebiliyor, mesela Cartopy kurulumu icin arka planda GDAL
-gerekebilir, bu kutuphane arka planda isletim sistemi ek kurulumu
-gerektirir, ve bulut ortaminda uygun olmayabilir. Folium hafif olsa da
-arka planda baglanti gerektiriyor, cunku zoom yapinca ek bilgiler
-servisten aliniyor.
+Bazen Cartopy ve hatta Folium bile uygulamamıza biraz yük
+getirebiliyor, mesela Cartopy kurulumu için arka planda GDAL
+gerekebilir, bu kütüphane arka planda işletim sistemi ek kurulumu
+gerektirir, ve bulut ortamında uygun olmayabilir. Folium hafif olsa da
+arka planda bağlantı gerektiriyor, çünkü zoom yapınca ek bilgiler
+servisten alınıyor.
 
-Eğer bize gayet basit ülke sınırları mesela gerekiyorsa bu tür bilgileri
-taşıyan ufak dosya bazlı veri tabanları kullanabiliriz. PyShp ile SHP bazlı
-bu tabanlara ulaşmak mümkündür. Mesela ülke sınırları [8]'de var,
-`TM_WORLD_BORDERS-0.3.zıp` indirilir, açılir, `/tmp` altında `.shp` ve `.dbf`
-dosyaları olsun (ikisi de lazım),
+Eğer bize gayet basit, ülke sınırlarını bir kerede ağ bağlantısı
+olmadan pat diye çizebilecek bir kod gerekiyorsa, bu bilgileri taşıyan
+dosya bazlı veri tabanları kullanabiliriz. PyShp ile SHP bazlı bu
+tabanlara ulaşmak mümkündür. Mesela ülke sınırları [8]'de var,
+`TM_WORLD_BORDERS-0.3.zip` indirilir, açılır, `/tmp` altında `.shp` ve
+`.dbf` dosyaları olsun (ikisi de lazım),
 
 ```python
 import shapefile
@@ -325,12 +326,11 @@ print (country.parts)
 ```
 
 Ülke sınır noktaları `points` ile alınıyor, bir enlem/boylam
-listesidir, kabaca bir polygonun köşe noktalarıdır.
-
-Fakat ülkeler bazen tek kesintisiz bir parça olmayabiliyor, adalar, ya
-da diğer ülkelerin içinde ufak parçalar vs var ise, bunları farklı
-poligon öbekleri olarak temsil etmek lazım. Üstteki `points` içinde
-tüm parçalar için noktalar var, hangi öbeğin nerede başlayıp bittiğini
+listesidir, kabaca bir polygonun köşe noktalarıdır. Fakat ülkeler
+bazen tek kesintisiz bir parça olmayabiliyor, adalar, ya da diğer
+ülkelerin içinde ufak parçalar vs var ise, bunları farklı poligon
+öbekleri olarak temsil etmek lazım. Üstteki `points` içinde tüm
+parçalar için noktalar var, hangi öbeğin nerede başlayıp bittiğini
 bilmek gerekiyor sadece, `parts` içinde bu bilgi var [9]. Mesela
 1'inci parça 0'dan başlayıp 107 indisine (dahil olmak üzere) uzanıyor,
 108 nokta var. Sonraki 108'den başlayıp 117'ye gidiyor, vs.
@@ -339,11 +339,6 @@ Bu mantığı bir fonksiyon içine koyalım,
 
 
 ```python
-import shapefile
-sf = shapefile.Reader("TM_WORLD_BORDERS-0.3.shp", encoding = "ISO8859-1")
-r = sf.records()
-countries = sf.shapes()
-
 def plot_country(idx,color='r'):
    country = countries[idx]
    name = r[idx]
@@ -374,15 +369,16 @@ Record #4: ['AM', 'AM', 'ARM', 51, 'Armenia', 2820, 3017661, 142, 145, 44.563, 4
 
 Azerbeycan ve Ermenistan'ı grafiklemiş olduk.
 
-Not: Üstte `plot` çağrısının çizgisel kullanımı var, bazılarının bildiği
-gibi `plot(10,20,'.')` x=10,y=20 kordinatlarına bir nokta koyar. Eğer
-bir x kordinat ve y kordinat listesi verirsek `plot` çağrısına, bu verili
-noktaları arasına çizgi çek demektir. 
+Not: Üstte `plot` çağrısının çizgisel kullanımına çağrı yapıldı,
+bazılarımızın bildiği gibi `plot(10,20,'.')` x=10,y=20 kordinatlarına
+bir nokta koyar, ama eğer bir x kordinat ve y kordinat listesi `plot`
+çağrısına geçersek, bu tür çağrı verili noktalar arasına düz çizgiler
+çek demektir.
 
-Ek bazı bilgiler, eğer o çizgilerle çevirdiğimiz bölgelerin içini bir
-renkle doldurmak isteseydik, mesela elimizde bir gol için poligon olsa
-onu `plt.plot` yerine `plt.fill` ile çizebilirdik, bu çağrıya geçilen
-üçüncü parametre renk objenin içini doldurmak için kullanılacaktır.a
+Not: eğer o çizgilerle çevirdiğimiz bölgelerin içini bir renkle
+doldurmak isteseydik, mesela elimizde bir göl için poligon noktaları
+varsa, onu `plt.plot` yerine `plt.fill` ile çizebilirdik, bu çağrıya
+geçilen üçüncü parametre renk ile objenin içi doldurulurdu.
 
 Kaynaklar
 
@@ -403,5 +399,3 @@ Kaynaklar
 [8] https://thematicmapping.org/downloads/world_borders.php
 
 [9] Sileika, Pro Python System Administration
-
-

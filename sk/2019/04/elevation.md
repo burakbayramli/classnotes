@@ -3,8 +3,9 @@
 Hangi servis ile yükseklik verisi alınır? Google Elevation servisi
 var, belli miktarda kullanım için bedava, sonrası için fiyatlı. Google
 Console'dan proje yaratıp projede elevation servisini aktif hale
-getirmek lazım, bundan sonra proje APİ kodunu kullanıp ES çağrılabilir.
+getirmek lazım, bundan sonra proje API kodunu kullanıp ES çağrılabilir.
 
+### Google
 
 ```python
 from urllib.request import urlopen
@@ -27,6 +28,8 @@ print (json_res)
 9.726478576660156}, {'resolution': 610.8129272460938, 'location':
 {'lng': 29.06187, 'lat': 40.99177}, 'elevation': 58.94558334350586}]}
 ```
+
+### Velroutes (Bedava)
 
 Bir diğer seçenek veloroutes.org adresi; burada arkadaş bedava servis
 veriyor; onun sayfalarından "kazıyarak" istenen veriyi alabiliriz,
@@ -158,11 +161,57 @@ plt.savefig('elev1.png')
 
 ![](elev1.png)
 
+### DEM, GeoTiff
+
+Yüksekliği gösteren işi / renk haritaları görmüşüzdür, daha yüksek
+yerler daha kırmızımsı, daha alçaklar daha köyü gibi. Eh piksel
+yükseklik gösteriyorsa ve pikselleri depolayana teknolojimiz de oldukca
+ileriyse, aynı işi yükseklik verisi kodlamak için de kullanabiliriz.
+
+DEM, GeoTiff formatı bunu yapıyor. Dünya verisi [2]'de, Zıpped DEM
+GeoTiff indirilir, okumak için [3]. Örnek (İtalya'da bir yer)
+
+```python
+from geotiff import GeoTiff # type: ignore
+import matplotlib.pyplot as plt
+
+tiff_file = "/tmp/alwdgg.tif"
+
+area_box = ((10, 45), (11, 46))
+
+g = GeoTiff(tiff_file, crs_code=4326, as_crs=4326,  band=0)
+arr = g.read_box(area_box)
+arr = np.flip(arr,axis=0)
+print (arr.shape)
+
+X = np.linspace(area_box[0][0],area_box[1][0],11)
+Y = np.linspace(area_box[0][1],area_box[1][1],11)
+X,Y = np.meshgrid(X,Y)
+
+CS=plt.contour(X,Y,arr)
+plt.clabel(CS, fontsize=10, inline=1)
+plt.savefig('elev2.png')
+```
+
+```text
+(11, 11)
+```
+
+![](elev2.png)
+
+
+`area_box` içinde alt sol köse ve üşe sağ köşe verildi, bu bir kutu oluşturdu,
+ve o kutu içine düşen yükseklik verisi `read_box` ile alındı.
+
+[2] verisinin çözünülürlüğü en yüksek olduğu yerde "1 dakika" olarak verilmiş,
+yani aşağı yukarı 1 km x 1 km karelerinin yükseklik verisi alınabilir. Dosyanin
+büyüklüğüne dikkat çekmak lazım, 20 MB'dan daha az!
+
 Kaynaklar
 
 [1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
 
+[2] World digital elevation model (ETOPO5), https://www.eea.europa.eu/data-and-maps/data/world-digital-elevation-model-etopo5
 
-
-
+[3] https://github.com/KipCrossing/geotiff
 
