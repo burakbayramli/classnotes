@@ -132,12 +132,60 @@ print (uwnd.shape)
 (334, 277, 349)
 ```
 
+## Berkeley
 
+Gridded Data | Monthly Land | Equal Area
 
+```python
+import netCDF4
 
+url='/tmp/Complete_TAVG_EqualArea.nc'
+nc = netCDF4.Dataset(url)
+print (nc)
+```
 
+```text
+<class 'netCDF4._netCDF4.Dataset'>
+root group (NETCDF4 data model, file format HDF5):
+    Conventions: Berkeley Earth Internal Convention (based on CF-1.5)
+    title: Native Format Berkeley Earth Surface Temperature Anomaly Field
+    history: 06-Oct-2021 21:09:04
+    institution: Berkeley Earth Surface Temperature Project
+    source_file: Complete_TAVG.50592s.20211006T205528.mat
+    source_history: 03-Oct-2021 08:32:25
+    source_data_version: eead777c589734c11a431a21725e06d3
+    comment: This file contains Berkeley Earth surface temperature anomaly field in our native equal-area format.
+    dimensions(sizes): map_points(5498), time(3261), month_number(12)
+    variables(dimensions): float32 longitude(map_points), float32 latitude(map_points), float64 time(time), float64 land_mask(map_points), float32 temperature(time, map_points), float32 climatology(month_number, map_points)
+    groups: 
+```
 
+```python
+clim = nc['climatology'][:,:]
+anom =  nc['temperature'][:,:]
+time =  nc['time'][:]
 
+print (clim.shape)
+print (anom.shape)
+print (time.shape)
+```
+
+```text
+(12, 5498)
+(3261, 5498)
+(3261,)
+```
+
+```python
+region = 1000
+print (clim[4, region])
+print (anom[4, region])
+```
+
+```text
+13.517032
+-2.1705952
+```
 
 
 Kaynaklar
@@ -146,6 +194,4 @@ Kaynaklar
 
 [2] THREDDS Data Server, https://psl.noaa.gov/thredds/catalog/Datasets/NARR/Dailies/monolevel/catalog.html?dataset=Datasets/NARR/Dailies/monolevel/uwnd.10m.2021.nc
 
-
-
-
+[3] http://berkeleyearth.org/data/
