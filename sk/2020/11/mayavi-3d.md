@@ -1,6 +1,6 @@
 # Üç Boyutlu Grafikler İçin Mayavi
 
-Simülasyon amaçlı pek çok parçacığı ekranda çizmemiz hareketlerini
+Simulasyon amaçlı pek çok parçacığı ekranda çizmemiz hareketlerini
 takip etmemiz gerekebilir. Fakat çok hızlı olarak bilinen bir dilden,
 mesela C++'dan bile, OpenGL çağırıp ekranda parçacıkları
 `glutSolidSphere` ile çizdirmemiz hızlı bir cevap almamız için yeterli
@@ -125,5 +125,7 @@ Kaynaklar
 [1] https://docs.enthought.com/mayavi/mayavi/mlab.html
 
 [2] https://www.toptal.com/data-science/3d-data-visualization-with-open-source-tools-an-example-using-vtk
+
+
 
 
