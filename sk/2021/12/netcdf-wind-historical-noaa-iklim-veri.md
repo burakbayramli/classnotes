@@ -1,5 +1,107 @@
 # NetCDF, İklim Verisi, NOAA
 
+İklim, mesela Berkeley veri tabanından gelen sıcaklıklar, ya da
+NOAA'dan gelen günlük, saatlik rüzgar verileri çoğunlukla netCDF adlı
+bir formatla paylaşılıyor. Bu yazıda bu formatları işlemenin,
+anlamanın yöntemlerine bakılacak.  İlk önce Berkeley'den gelen
+sıcaklık verisine bakalım.
+
+## Berkeley
+
+Berkeley pek çok iklim verisi paylaşıyor [3] . Bu verilerin bir tanesi
+dünyayı belli bölgelere ayırıp ay bazında sıcaklık verisini
+verir. Veri için [3]'e gidilir ve Gridded Data | Monthly Land | Equal Area
+verisi alınır, `/tmp` altında olduğunu düşünelim,
+
+```python
+import netCDF4
+
+url='/tmp/Complete_TAVG_EqualArea.nc'
+nc = netCDF4.Dataset(url)
+print (nc)
+```
+
+```text
+<class 'netCDF4._netCDF4.Dataset'>
+root group (NETCDF4 data model, file format HDF5):
+    Conventions: Berkeley Earth Internal Convention (based on CF-1.5)
+    title: Native Format Berkeley Earth Surface Temperature Anomaly Field
+    history: 06-Oct-2021 21:09:04
+    institution: Berkeley Earth Surface Temperature Project
+    source_file: Complete_TAVG.50592s.20211006T205528.mat
+    source_history: 03-Oct-2021 08:32:25
+    source_data_version: eead777c589734c11a431a21725e06d3
+    comment: This file contains Berkeley Earth surface temperature anomaly field in our native equal-area format.
+    dimensions(sizes): map_points(5498), time(3261), month_number(12)
+    variables(dimensions): float32 longitude(map_points), float32 latitude(map_points), float64 time(time), float64 land_mask(map_points), float32 temperature(time, map_points), float32 climatology(month_number, map_points)
+    groups: 
+```
+
+Bu ilginç bir format, Pandas ya da numpy stiline benzemiyor. Mesela `climatology`,
+`temperatüre` ve `time` öğelerine bakalım,
+
+```python
+clim = nc['climatology'][:,:]
+anom =  nc['temperature'][:,:]
+time =  nc['time'][:]
+
+print (clim.shape)
+print (anom.shape)
+print (time.shape)
+```
+
+```text
+(12, 5498)
+(3261, 5498)
+(3261,)
+```
+
+Şimdi `clim` içinde bir matris var, `anom` içinde bir tane daha,
+`time` bir vektör. İçeriği şöyle,
+
+```python
+print (time[:10])
+```
+
+```text
+[1750.04166667 1750.125      1750.20833333 1750.29166667 1750.375
+ 1750.45833333 1750.54166667 1750.625      1750.70833333 1750.79166667]
+```
+
+Biraz belge okuma sonrası anlaşılıyor ki zaman bir reel sayı olarak
+temsil edilmiş, yani 1750 senesi ve 1751 senesi ortalarında bir yer,
+aşağı yukarı Haziran ayı, 1750.4583 olarak temsil ediliyor. Bu
+herhalde bazı grafikleme, hesaplama işlerini kolaylaştırmak için
+yapılmış. O zaman mesela üstte 1750.125 anında olanı görmek için indis
+1 kullanmak lazım (ikinci öğe).
+
+Dünya 5498 bölgeye bölünmüş bu bölgelerin nerede olduğunu anlamak için
+Berkeley belgelerine bakılabilir.
+
+Sıcaklık bir baz sıcaklık artı sapma (anormallik) olarak verilmiş.
+Eğer 1000'inci bölge 1750.125 senesindeki sıcaklığı görmek istersek, 
+alttaki erişimi yapmak gerekir (0.125 Şubat ayı olur herhalde indis 1)
+
+
+```python
+region = 1000
+tidx = 1
+month = 1
+print (clim[month, region])
+print (anom[tidx, region])
+```
+
+```text
+-12.628022
+0.026923507
+```
+
+Bu iki değer toplanınca nihai sıcaklık elde edilir.
+
+### NOAA NCEI
+
+
+
 ```python
 from datetime import datetime
 from netCDF4 import Dataset, num2date
@@ -130,61 +232,6 @@ print (uwnd.shape)
 (277, 349)
 (277, 349)
 (334, 277, 349)
-```
-
-## Berkeley
-
-Gridded Data | Monthly Land | Equal Area
-
-```python
-import netCDF4
-
-url='/tmp/Complete_TAVG_EqualArea.nc'
-nc = netCDF4.Dataset(url)
-print (nc)
-```
-
-```text
-<class 'netCDF4._netCDF4.Dataset'>
-root group (NETCDF4 data model, file format HDF5):
-    Conventions: Berkeley Earth Internal Convention (based on CF-1.5)
-    title: Native Format Berkeley Earth Surface Temperature Anomaly Field
-    history: 06-Oct-2021 21:09:04
-    institution: Berkeley Earth Surface Temperature Project
-    source_file: Complete_TAVG.50592s.20211006T205528.mat
-    source_history: 03-Oct-2021 08:32:25
-    source_data_version: eead777c589734c11a431a21725e06d3
-    comment: This file contains Berkeley Earth surface temperature anomaly field in our native equal-area format.
-    dimensions(sizes): map_points(5498), time(3261), month_number(12)
-    variables(dimensions): float32 longitude(map_points), float32 latitude(map_points), float64 time(time), float64 land_mask(map_points), float32 temperature(time, map_points), float32 climatology(month_number, map_points)
-    groups: 
-```
-
-```python
-clim = nc['climatology'][:,:]
-anom =  nc['temperature'][:,:]
-time =  nc['time'][:]
-
-print (clim.shape)
-print (anom.shape)
-print (time.shape)
-```
-
-```text
-(12, 5498)
-(3261, 5498)
-(3261,)
-```
-
-```python
-region = 1000
-print (clim[4, region])
-print (anom[4, region])
-```
-
-```text
-13.517032
--2.1705952
 ```
 
 

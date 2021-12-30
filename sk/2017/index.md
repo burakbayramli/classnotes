@@ -20,7 +20,7 @@
 
 [Derin Öğrenimle 3D Uzaklık Bilgisi, Görüntü Bölümleri Bulmak](04/derin-ogrenimle-3d-uzaklk-bilgisi.md)
 
-[SSH ile Mesaj Şifreleme](04/ssh-ile-mesaj-sifreleme.md)
+[Dosya Şifreleme (File Encryption)](04/dosya-sifreleme-file-encryption.md)
 
 [Disk Temizliği](06/disk-temizligi.md)
 
