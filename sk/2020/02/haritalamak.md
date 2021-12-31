@@ -1,4 +1,4 @@
-# Haritalamak
+f# Haritalamak
 
 ### Folium
 
@@ -337,7 +337,8 @@ bilmek gerekiyor sadece, `parts` içinde bu bilgi var [9]. Mesela
 1'inci parça 0'dan başlayıp 107 indisine (dahil olmak üzere) uzanıyor,
 108 nokta var. Sonraki 108'den başlayıp 117'ye gidiyor, vs.
 
-Bu mantığı bir fonksiyon içine koyalım,
+Bu mantığı bir fonksiyon içine koyalım, ve indis 2 ve indis 4'teki
+ülkeleri grafikleyelim,
 
 
 ```python
@@ -353,7 +354,7 @@ def plot_country(idx,color='r'):
        geo = np.array(geo)
        if geo.shape[0] > 0:
            plt.plot(geo[:,0],geo[:,1],color)
-n
+
 plot_country(2,'r')
 plot_country(4,'b')
 
@@ -373,14 +374,14 @@ Azerbeycan ve Ermenistan'ı grafiklemiş olduk.
 
 Not: Üstte `plot` çağrısının çizgisel kullanımına çağrı yapıldı,
 bazılarımızın bildiği gibi `plot(10,20,'.')` x=10,y=20 kordinatlarına
-bir nokta koyar, ama eğer bir x kordinat ve y kordinat listesi `plot`
-çağrısına geçersek, bu tür çağrı verili noktalar arasına düz çizgiler
+bir nokta koyar, ama bir x kordinat ve y kordinat *listesi* `plot`
+çağrısına geçilirse, bu tür çağrı verili noktalar arasına düz çizgiler
 çek demektir.
 
-Not: eğer o çizgilerle çevirdiğimiz bölgelerin içini bir renkle
-doldurmak isteseydik, mesela elimizde bir göl için poligon noktaları
-varsa, onu `plt.plot` yerine `plt.fill` ile çizebilirdik, bu çağrıya
-geçilen üçüncü parametre renk ile objenin içi doldurulurdu.
+Bir diğer ek, eğer o çizgilerle çevirdiğimiz bölgelerin içini bir
+renkle doldurmak isteseydik, mesela elimizde bir göl için poligon
+noktaları varsa, `plt.plot` yerine `plt.fill` kullanırdık, bu
+çağrıya geçilen üçüncü parametre renk ile objenin içi doldurulur.
 
 Kaynaklar
 
@@ -401,3 +402,6 @@ Kaynaklar
 [8] https://thematicmapping.org/downloads/world_borders.php
 
 [9] Sileika, Pro Python System Administration
+
+
+
