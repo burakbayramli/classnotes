@@ -52,7 +52,27 @@ Ve açmak icin
 cat encryptedMessage.txt | openssl rsautl -verify -pubin -inkey ~/.ssh/id_rsa.pub.pem
 ```
 
+### Ccrypt
+
+Emacs ile iyi entegre olmuş bir program `ccrypt`. Kurma için Ubuntu
+üzerinde `apt install ccrypt` yapılabilir, Emacs için gereken dosya
+[2]'deki zip, tar dosyalarında var, `ps-ccrypt.el`. Bu dosyayı alıp
+diğer Emacs tanım dosyalarının olduğu dizine koyup ana tanım içine
+
+```
+(setq load-path (cons "[DIZIN]" load-path))
+(require 'ps-ccrypt "ps-ccrypt.el")
+```
+
+eklemek yeterli. Artık `.cpt` ile biten dosyalar ccrypt ile
+açılacaktır, sadece ilk seferde bir şifre sorulur, ardından, aynı
+dosya Emacs buffer seviyesinde açık olduğu sürece takip eden kaydetme
+işlemleri için şifre sorulmaz. Üzerinde çalışılan dosyayı sık kaydeden
+kullanıcılar için (benim gibi) bu faydalı bir özellik.
+
 Kaynak
 
-http://krisjordan.com/essays/encrypting-with-rsa-key-pairs
+[1] http://krisjordan.com/essays/encrypting-with-rsa-key-pairs
+
+[2] http://ccrypt.sourceforge.net/
 
