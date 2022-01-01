@@ -165,13 +165,12 @@ plt.savefig('elev1.png')
 
 ### DEM, GeoTiff
 
-Yüksekliği gösteren işi / renk haritaları görmüşüzdür, daha yüksek
-yerler daha kırmızımsı, daha alçaklar daha köyü gibi. Eh piksel
-yükseklik gösteriyorsa ve pikselleri depolayana teknolojimiz de oldukca
-ileriyse, aynı işi yükseklik verisi kodlamak için de kullanabiliriz.
-
-DEM, GeoTiff formatı bunu yapıyor. Dünya verisi [2]'de, Zıpped DEM
-GeoTiff indirilir, okumak için [3]. Örnek (İtalya'da bir yer)
+Yüksekliği gösteren ısı / renk haritaları görmüşüzdür, daha yüksek
+yerler daha kırmızımsı, daha alçaklar daha koyu gibi.. O zaman piksel
+yükseklik gösteriyorsa ve pikselleri depolayan teknoloji iyi durumdaysa,
+aynı işi yükseklik verisi kodlamak için de kullanabiliriz. DEM,
+GeoTiff formatı bunu yapar. Dünya verisi [2]'de, Zipped DEM GeoTiff
+indirilir, okumak için [3]. Örnek (İtalya'da bir yer)
 
 ```python
 from geotiff import GeoTiff 
@@ -205,13 +204,12 @@ plt.savefig('elev2.png')
 `area_box` içinde alt sol köse ve üşe sağ köşe verildi, bu bir kutu oluşturdu,
 ve o kutu içine düşen yükseklik verisi `read_box` ile alındı.
 
-[2] verisinin çözünülürlüğü en yüksek olduğu yerde "1 dakika" olarak verilmiş,
-yani aşağı yukarı 1 km x 1 km karelerinin yükseklik verisi alınabilir. Dosyanin
-büyüklüğüne dikkat çekmak lazım, 20 MB'dan daha az!
-
-[3] kullanımı önemliydi çünkü bazı alternatif GeoTiff okuma yöntemleri GDAL
-kurulmasının gerektiriyor, [3] kütüphanesi gayet hafif, direk DEM dosyalarının
-içeriğini okuyabiliyor.
+[2] verisinin çözünülürlüğü en yüksek olduğu yerde "1 dakika" olarak
+verilmiş, yani aşağı yukarı 1 km x 1 km karelerinin yükseklik verisi
+alınabilir. Dosyanin büyüklüğü 20 MB'dan daha az. [3] kullanımı önemli
+çünkü bazı alternatif GeoTiff okuma yöntemleri GDAL kurulmasının
+gerektirir, [3] kütüphanesi hafif, direk DEM dosyalarının içeriğini
+okuyabilir.
 
 Kaynaklar
 
@@ -220,4 +218,7 @@ Kaynaklar
 [2] World digital elevation model (ETOPO5), https://www.eea.europa.eu/data-and-maps/data/world-digital-elevation-model-etopo5
 
 [3] https://github.com/KipCrossing/geotiff
+
+
+
 
