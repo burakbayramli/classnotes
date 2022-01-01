@@ -201,8 +201,8 @@ plt.savefig('elev2.png')
 ![](elev2.png)
 
 
-`area_box` içinde alt sol köse ve üşe sağ köşe verildi, bu bir kutu oluşturdu,
-ve o kutu içine düşen yükseklik verisi `read_box` ile alındı.
+`area_box` içinde alt sol köse ve üşe sağ köşe verildi, bir kutu oluşturuldu,
+ve kutu içine düşen yükseklik verisi `read_box` ile alındı.
 
 [2] verisinin çözünülürlüğü en yüksek olduğu yerde "1 dakika" olarak
 verilmiş, yani aşağı yukarı 1 km x 1 km karelerinin yükseklik verisi
