@@ -5,7 +5,9 @@ TARGET_DIR = "/home/burak/Documents/dersblog/sk"
 
 if __name__ == "__main__": 
  
-    if len(sys.argv) == 1: exit()
+    if len(sys.argv) < 2:
+        print ("options: html | years ")
+    exit()  
 
     if sys.argv[1] == 'html':
 
