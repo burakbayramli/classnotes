@@ -166,11 +166,10 @@ def translit_low(c):
 
 if __name__ == "__main__": 
  
-   if len(sys.argv) < 2:
+    if len(sys.argv) < 2:
       print ("options: all | clean | html ")
-    exit()  
+      exit()  
     
-
     if sys.argv[1] == 'clean-light':
         os.system("find . -name _region_* | xargs rm -rf ")
         os.system("find . -name '*.log' | xargs rm -rf ")
