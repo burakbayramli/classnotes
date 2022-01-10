@@ -100,7 +100,10 @@ Bu iki değer toplanınca nihai sıcaklık elde edilir.
 
 ### NOAA NCEI
 
-
+Bu veriyi dosyayı elle indirmeden işleyeceğiz, kodun kendisi gerekli
+dosyayı bulup içindeki netCDF bilgisini işleyecek. Mesela 13/3/1993
+için rüzgar esme (hız) verisini alalım, bu bilgi dikey ve yatay
+bileşenler u,v içinde gelecek, 
 
 ```python
 from datetime import datetime
@@ -154,38 +157,49 @@ root group (NETCDF3_CLASSIC data model, file format NETCDF3):
     history: Read using CDM IOSP GribCollection v3
     featureType: GRID
     History: Translated to CF-1.0 Conventions by Netcdf-Java CDM (CFGridWriter2)
-Original Dataset = DatasetScan#narr-a_221_19930313_0000_000.grb; Translation Date = 2021-12-27T11:56:42.984Z
+Original Dataset = DatasetScan#narr-a_221_19930313_0000_000.grb; Translation Date = 2022-01-08T09:37:42.079Z
     geospatial_lat_min: 10.753308882144761
     geospatial_lat_max: 46.8308828962289
     geospatial_lon_min: -153.88242040519995
     geospatial_lon_max: -42.666108129242815
     dimensions(sizes): time1(1), isobaric1(29), y(119), x(268)
-    variables(dimensions): float32 Temperature_isobaric(time1, isobaric1, y, x), float64 time1(time1), float32 isobaric1(isobaric1), float32 y(y), float32 x(x), int32 LambertConformal_Projection(), float64 lat(y, x), float64 lon(y, x), float32 v-component_of_wind_isobaric(time1, isobaric1, y, x), float32 u-component_of_wind_isobaric(time1, isobaric1, y, x), float32 Geopotential_height_isobaric(time1, isobaric1, y, x)
+    variables(dimensions): float32 u-component_of_wind_isobaric(time1, isobaric1, y, x), float64 time1(time1), float32 isobaric1(isobaric1), float32 y(y), float32 x(x), int32 LambertConformal_Projection(), float64 lat(y, x), float64 lon(y, x), float32 Geopotential_height_isobaric(time1, isobaric1, y, x), float32 Temperature_isobaric(time1, isobaric1, y, x), float32 v-component_of_wind_isobaric(time1, isobaric1, y, x)
     groups: 
 ```
 
+Boyutları, ve bazı örnek veriyi, kullanımı altta görüyoruz,
+
 ```python
-#print (data.variables['u-component_of_wind_isobaric'][0])
-print (data.variables['lat'][:])
+u = data.variables['u-component_of_wind_isobaric'][0]
+v = data.variables['v-component_of_wind_isobaric'][0]
+lat = data.variables['lat'][:]
+lon = data.variables['lon'][:]
+print (u.shape)
+print (lat.shape)
+print (lat[:4])
+
+u_wind_var = data.variables['u-component_of_wind_isobaric']
+u_wind = u_wind_var[0, 0, :, :].squeeze()
+print (u_wind.shape)
 ```
 
 ```text
+(29, 119, 268)
+(119, 268)
 [[17.87115668 17.9637901  18.05570545 ... 11.17123674 11.04457979
   10.91753102]
  [18.10795748 18.20108494 18.29349116 ... 11.37401449 11.2467457
   11.11908431]
  [18.34510656 18.4387305  18.53163001 ... 11.57699036 11.44910733
   11.32083096]
- ...
- [46.32311069 46.49107039 46.65795369 ... 34.6918627  34.48046283
-  34.26868522]
- [46.56076006 46.72953969 46.89724095 ... 34.87939382 34.6671838
-  34.45459761]
- [46.79790957 46.9675121  47.13603437 ... 35.06633751 34.85331722
-  34.63992237]]
+ [18.58259681 18.67671966 18.77011491 ... 11.78015756 11.65165792
+  11.52276419]]
+(119, 268)
 ```
 
 ## THREDDS Verisi
+
+Bu veri [1,2]'den geliyor, 
 
 ```python
 import netCDF4
@@ -233,7 +247,6 @@ print (uwnd.shape)
 (277, 349)
 (334, 277, 349)
 ```
-
 
 Kaynaklar
 
