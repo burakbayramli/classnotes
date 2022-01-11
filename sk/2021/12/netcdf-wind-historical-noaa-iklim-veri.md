@@ -2,16 +2,16 @@
 
 İklim, mesela Berkeley veri tabanından gelen sıcaklıklar, ya da
 NOAA'dan gelen günlük, saatlik rüzgar verileri çoğunlukla netCDF adlı
-bir formatla paylaşılıyor. Bu yazıda bu formatları işlemenin,
-anlamanın yöntemlerine bakılacak.  İlk önce Berkeley'den gelen
-sıcaklık verisine bakalım.
+bir formatla paylaşılıyor. Bu formatları işlemenin yöntemlerini, veri
+içeriğine bakalım..
 
 ## Berkeley
 
-Berkeley pek çok iklim verisi paylaşıyor [3] . Bu verilerin bir tanesi
-dünyayı belli bölgelere ayırıp ay bazında sıcaklık verisini
-verir. Veri için [3]'e gidilir ve Gridded Data | Monthly Land | Equal Area
-verisi alınır, `/tmp` altında olduğunu düşünelim,
+Berkeley'den gelen dünya ısı verisi mesela.. Berkeley pek çok iklim
+verisi paylaşır [3] . Bunlardan biri dünyayı belli bölgelere ayırıp ay
+bazında sıcaklık verisini kaydeder. Veri için [3]'e gidilir ve Gridded
+Data | Monthly Land | Equal Area alınır, `/tmp` altında olduğunu
+düşünelim,
 
 ```python
 import netCDF4
@@ -37,8 +37,8 @@ root group (NETCDF4 data model, file format HDF5):
     groups: 
 ```
 
-Bu ilginç bir format, Pandas ya da numpy stiline benzemiyor. Mesela `climatology`,
-`temperatüre` ve `time` öğelerine bakalım,
+NetCDF değişik bir format, Pandas ya da numpy stiline benzemiyor. Mesela
+`climatology`, `temperature` ve `time` öğelerine bakalım,
 
 ```python
 clim = nc['climatology'][:,:]
@@ -71,8 +71,8 @@ print (time[:10])
 Biraz belge okuma sonrası anlaşılıyor ki zaman bir reel sayı olarak
 temsil edilmiş, yani 1750 senesi ve 1751 senesi ortalarında bir yer,
 aşağı yukarı Haziran ayı, 1750.4583 olarak temsil ediliyor. Bu
-herhalde bazı grafikleme, hesaplama işlerini kolaylaştırmak için
-yapılmış. O zaman mesela üstte 1750.125 anında olanı görmek için indis
+tür sene kodlaması genelde bazı grafikleme, hesaplama işlerini kolaylaştırmak
+için yapılır. O zaman mesela üstte 1750.125 anında olanı görmek için indis
 1 kullanmak lazım (ikinci öğe).
 
 Dünya 5498 bölgeye bölünmüş bu bölgelerin nerede olduğunu anlamak için
@@ -101,9 +101,9 @@ Bu iki değer toplanınca nihai sıcaklık elde edilir.
 ### NOAA NCEI
 
 Bu veriyi dosyayı elle indirmeden işleyeceğiz, kodun kendisi gerekli
-dosyayı bulup içindeki netCDF bilgisini işleyecek. Mesela 13/3/1993
-için rüzgar esme (hız) verisini alalım, bu bilgi dikey ve yatay
-bileşenler u,v içinde gelecek, 
+dosyayı Internet'ten alıp içindeki netCDF bilgisini işleyecek. Mesela
+13/3/1993 için rüzgar esme (hız) verisini alalım, bu bilgi dikey ve
+yatay bileşenler u,v içinde gelecek,
 
 ```python
 from datetime import datetime
