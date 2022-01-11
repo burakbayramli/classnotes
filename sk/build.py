@@ -7,7 +7,7 @@ if __name__ == "__main__":
  
     if len(sys.argv) < 2:
         print ("options: html | years ")
-    exit()  
+        exit()  
 
     if sys.argv[1] == 'html':
 
