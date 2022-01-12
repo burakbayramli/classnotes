@@ -2,7 +2,7 @@
 
 İklim, mesela Berkeley veri tabanından gelen sıcaklıklar, ya da
 NOAA'dan gelen günlük, saatlik rüzgar verileri çoğunlukla netCDF adlı
-bir formatla paylaşılıyor. Bu formatları işlemenin yöntemlerini, veri
+bir formatla paylaşılıyor. Bu formatları işlemenin yöntemlerine, veri
 içeriğine bakalım..
 
 ## Berkeley
@@ -38,7 +38,7 @@ root group (NETCDF4 data model, file format HDF5):
 ```
 
 NetCDF değişik bir format, Pandas ya da numpy stiline benzemiyor. Mesela
-`climatology`, `temperature` ve `time` öğelerine bakalım,
+`climatology`, `temperature` ve `time` öğeleri,
 
 ```python
 clim = nc['climatology'][:,:]
@@ -96,7 +96,10 @@ print (anom[tidx, region])
 0.026923507
 ```
 
-Bu iki değer toplanınca nihai sıcaklık elde edilir.
+Bu iki değer toplanınca nihai sıcaklık elde edilir. Yani baz sıcaklık
+bir ay | bölge matrisi içindeydi, sapma bir zaman | bölge matrisi
+içinde. Nihai sıcaklık için belli bir zamanın ayına ve bölgeye göre
+baz, zaman indisi ve yine bölgeye göre sapma almak gerekti.
 
 ### NOAA NCEI
 
@@ -255,3 +258,7 @@ Kaynaklar
 [2] THREDDS Data Server, https://psl.noaa.gov/thredds/catalog/Datasets/NARR/Dailies/monolevel/catalog.html?dataset=Datasets/NARR/Dailies/monolevel/uwnd.10m.2021.nc
 
 [3] http://berkeleyearth.org/data/
+
+
+
+
