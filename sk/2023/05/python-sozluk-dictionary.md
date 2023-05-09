@@ -156,3 +156,6 @@ Kaynaklar
 [2] [NoSQL](../../2022/11/nosql-diy-python.html)
 
 [3] https://github.com/deep-compute/diskdict
+
+
+
