@@ -69,18 +69,19 @@ print (dict2)
 `i:x` ile anahtar/değer ikilisini başka bir listeyi gezerken tanımladık, ve
 bu tanımlar toparlanıp bir yeni sözlük yaratımı için kullanıldı.
 
-### Arka Plana Neler Oluyor?
+### Sözlük İç Yapısı
 
-Sozluklerin ic kodlanmasi nasil yapilmistir acaba? Bundan da bahsedelim, mulakat
-sorusu olabilir, zaten gorunmese de bu tur detaylari bilmek faydalidir.
+Sözlüklerin iç kodlanması nasıl yapılmıştır acaba? Bundan da
+bahsedelim, mülakat sorusu olabilir, zaten görünmese de bu tür
+detayları bilmek faydalıdır. Bir sözlük paketini kodlamak için en baz
+depolama veri yapısı olarak bir dizin (array) kullanabiliriz. Ama
+dizin erişimi tam sayı bazlıdır, üstelik baştan kaç öğe olduğu
+bellidir, anahtarı herhangi bir şey olabilecek sözlükleri bunun üstüne
+nasıl monte edeceğiz?
 
-Bir sözlük paketini kodlamak için en baz depolama veri yapısı olarak bir dizin
-(array) kullanabilirdik. Ama dizin erişimi tam sayı bazlıdır, üstelik baştan
-kaç öğe olduğu bellidir, anahtarı herhangi bir şey olabilecek sözlükleri bunun
-üstüne nasıl monte edeceğiz? 
-
-Bölec (hash) kavramı yardıma yetişir. Harfler, alfanumerik herhangi
-bir veriyi `hash` ile sayısal forma çevirebiliyoruz,
+Böleç (hash) kavramı burada yardıma yetişir. Harfler, alfanumerik
+herhangi bir veriyi `hash` ile sayısal forma çevirebileceğimizi
+biliyoruz,
 
 ```python
 hash("anahtar1")
@@ -98,8 +99,9 @@ hash("anahtar2")
 Out[1]: 1439585439643666777
 ```
 
-Eğer sözlüğün arkasında 10 büyüklüğünde bir listeyi depolama için kullanmak
-istiyorsak üstteki sayıların modülüs hesabını yaparız, 
+Eğer sözlüğün deposu olarak 10 büyüklüğünde bir listeyi depolama için
+kullanmak istiyorsak üstteki sayıların 10 üzerinden modülüs hesabını
+yaparız,
 
 ```python
 hash("anahtar1") % 10
@@ -109,24 +111,26 @@ hash("anahtar1") % 10
 Out[1]: 7
 ```
 
-Eğer dizin büyüklüğüne kıyasla çok fazla anahtar değeri var ise birden fazla
-anahtar aynı dizin öğesine düşebilir, bu "çakışma (collision)" durumu yaratır,
-bu durumda çakışma olan öğede bir liste yaratırız (dizin içinde liste olur ama
-önemli değil), ve erişim için arama önce anahtar bazlı direk sonra liste bazlı
-teker teker gider. 
+İşte bu sayı dizinde erişim için kullanılır.
+
+Eğer dizin büyüklüğüne kıyasla çok fazla anahtar değeri var ise birden
+fazla anahtar aynı dizin öğesine düşebilir, bu "çakışma (collision)"
+durumu yaratır, bu durumda çakışma olan öğede bir liste yaratırız
+(dizin içinde liste), ve erişim için arama önce anahtar bazlı direk
+sonra liste bazlı teker teker gider.
 
 ### DiskDict
 
 Paketten çıkan hali ile Python sözlükleri hafıza bazlıdır. Fakat eğer anahtar
 erişimi bizi bir disk deposuna götürsün istersek? Dikkat tüm işlemler hafızada
 yapıldıktan sonra işi bitmiş sözlüğü diske yazmaktan bahsetmiyorum, her anahtar
-erişimi, her depolama işleme tekil bazlı olarak işini disk bazlı yapmalı diyorum. 
+erişimi, her depolama işleme tekil bazlı olarak diske gitmeli diyorum. 
 
-Bu ihtiyaç için bazı paketler var. Çoğu işin kodlama kısmını Python
-basit sözlük ile benzer tutmuşlar böylece kodlayan yeni bir erişim stili
+Bu ihtiyaç için bazı paketler var. Çoğu dış arayüzünü Python basit
+sözlük ile benzer tutmuş böylece kodlayan yeni bir erişim stili
 öğrenmeye mecbur değil, tüm bildik sözlük işlemleri geçerli.
 
-İyi bir paket `diskdict` [3]. Kurmak için kaynaklar kullanılırsa iyi
+Böyle bir paket `diskdict` [3]. Kurmak için kaynaklar kullanılırsa iyi
 olur, önce alttakiler,
 
 ```
@@ -137,6 +141,7 @@ pip install repoze.lru
 
 Ardından `setup.py` ile kurulum yapılır. Örnek,
 
+```python
 from diskdict import DiskDict
 
 dict3 = DiskDict('/tmp/diskdict')
@@ -144,10 +149,11 @@ dict3 = DiskDict('/tmp/diskdict')
 dict3['anahtar3'] = 'deger3'
 ```
 
-Bu işlemler sonrası `/tmp/diskdict` dizini altında bazı dosyaların yaratılmış
-olduğunu göreceğiz. Sözlüğün disksel erişim işlemleri bu dosyalar üzerinden
-yapılıyor, her erişim her depolama direk bu dosyalara gidiyor (dosyaların formatı
-muhakkak hızlı erişim için ayarlanmış halde).
+Bu işlemler sonrası `/tmp/diskdict` dizini altında bazı dosyaların
+yaratılmış olduğunu göreceğiz. Sözlüğün disksel erişim işlemleri bu
+dosyalar üzerinden yapılıyor, her erişim her depolama direk bu
+dosyalara gidiyor (dosyaların ikisel formatı muhakkak hızlı erişim
+için ayarlanmış halde).
 
 Kaynaklar
 
