@@ -1,0 +1,443 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+import pandas as pd, numpy as np
+from stl import mesh
+your_mesh = mesh.Mesh.from_file('torus.stl')
+\end{minted}
+
+\begin{verbatim}
+[[ 1.          0.          0.        ]
+ [ 0.          0.17364818  0.98480775]
+ [ 0.         -0.98480775  0.17364818]]
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+prop = your_mesh.get_mass_properties()
+print ('vol',prop[0])
+print ('COG',prop[1])
+print ('I',)
+print (prop[2])
+\end{minted}
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (help(mesh))
+\end{minted}
+
+\begin{verbatim}
+Help on module stl.mesh in stl:
+
+NAME
+    stl.mesh
+
+CLASSES
+    stl.stl.BaseStl(stl.base.BaseMesh)
+        Mesh
+    
+    class Mesh(stl.stl.BaseStl)
+     |  Mesh object with easy access to the vectors through v0, v1 and v2.
+     |  The normals, areas, min, max and units are calculated automatically.
+     |  
+     |  :param numpy.array data: The data for this mesh
+     |  :param bool calculate_normals: Whether to calculate the normals
+     |  :param bool remove_empty_areas: Whether to remove triangles with 0 area
+     |          (due to rounding errors for example)
+     |  
+     |  :ivar str name: Name of the solid, only exists in ASCII files
+     |  :ivar numpy.array data: Data as :func:`BaseMesh.dtype`
+     |  :ivar numpy.array points: All points (Nx9)
+     |  :ivar numpy.array normals: Normals for this mesh, calculated automatically
+     |      by default (Nx3)
+     |  :ivar numpy.array vectors: Vectors in the mesh (Nx3x3)
+     |  :ivar numpy.array attr: Attributes per vector (used by binary STL)
+     |  :ivar numpy.array x: Points on the X axis by vertex (Nx3)
+     |  :ivar numpy.array y: Points on the Y axis by vertex (Nx3)
+     |  :ivar numpy.array z: Points on the Z axis by vertex (Nx3)
+     |  :ivar numpy.array v0: Points in vector 0 (Nx3)
+     |  :ivar numpy.array v1: Points in vector 1 (Nx3)
+     |  :ivar numpy.array v2: Points in vector 2 (Nx3)
+     |  
+     |  >>> data = numpy.zeros(10, dtype=BaseMesh.dtype)
+     |  >>> mesh = BaseMesh(data, remove_empty_areas=False)
+     |  >>> # Increment vector 0 item 0
+     |  >>> mesh.v0[0] += 1
+     |  >>> mesh.v1[0] += 2
+     |  
+     |  >>> # Check item 0 (contains v0, v1 and v2)
+     |  >>> assert numpy.array_equal(
+     |  ...     mesh[0],
+     |  ...     numpy.array([1., 1., 1., 2., 2., 2., 0., 0., 0.]))
+     |  >>> assert numpy.array_equal(
+     |  ... mesh.vectors[0],
+     |  ... numpy.array([[1., 1., 1.],
+     |  ...     [2., 2., 2.],
+     |  ...     [0., 0., 0.]]))
+     |  >>> assert numpy.array_equal(
+     |  ...     mesh.v0[0],
+     |  ...     numpy.array([1., 1., 1.]))
+     |  >>> assert numpy.array_equal(
+     |  ...     mesh.points[0],
+     |  ...     numpy.array([1., 1., 1., 2., 2., 2., 0., 0., 0.]))
+     |  >>> assert numpy.array_equal(
+     |  ...     mesh.data[0],
+     |  ...     numpy.array((
+     |  ...             [0., 0., 0.],
+     |  ...             [[1., 1., 1.], [2., 2., 2.], [0., 0., 0.]],
+     |  ...             [0]),
+     |  ...         dtype=BaseMesh.dtype))
+     |  >>> assert numpy.array_equal(mesh.x[0], numpy.array([1., 2., 0.]))
+     |  
+     |  >>> mesh[0] = 3
+     |  >>> assert numpy.array_equal(
+     |  ...     mesh[0],
+     |  ...     numpy.array([3., 3., 3., 3., 3., 3., 3., 3., 3.]))
+     |  
+     |  >>> len(mesh) == len(list(mesh))
+     |  True
+     |  >>> (mesh.min_ < mesh.max_).all()
+     |  True
+     |  >>> mesh.update_normals()
+     |  >>> mesh.units.sum()
+     |  0.0
+     |  >>> mesh.v0[:] = mesh.v1[:] = mesh.v2[:] = 0
+     |  >>> mesh.points.sum()
+     |  0.0
+     |  
+     |  >>> mesh.v0 = mesh.v1 = mesh.v2 = 0
+     |  >>> mesh.x = mesh.y = mesh.z = 0
+     |  
+     |  >>> mesh.attr = 1
+     |  >>> (mesh.attr == 1).all()
+     |  True
+     |  
+     |  >>> mesh.normals = 2
+     |  >>> (mesh.normals == 2).all()
+     |  True
+     |  
+     |  >>> mesh.vectors = 3
+     |  >>> (mesh.vectors == 3).all()
+     |  True
+     |  
+     |  >>> mesh.points = 4
+     |  >>> (mesh.points == 4).all()
+     |  True
+     |  
+     |  Method resolution order:
+     |      Mesh
+     |      stl.stl.BaseStl
+     |      stl.base.BaseMesh
+     |      python_utils.logger.Logged
+     |      collections.abc.Mapping
+     |      collections.abc.Collection
+     |      collections.abc.Sized
+     |      collections.abc.Iterable
+     |      collections.abc.Container
+     |      builtins.object
+     |  
+     |  Data and other attributes defined here:
+     |  
+     |  __abstractmethods__ = frozenset()
+     |  
+     |  logger = <Logger python_utils.logger.ABCMeta (WARNING)>
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from stl.stl.BaseStl:
+     |  
+     |  get_header(self, name)
+     |  
+     |  save(self, filename, fh=None, mode=<Mode.AUTOMATIC: 0>, update_normals=True)
+     |      Save the STL to a (binary) file
+     |      
+     |      If mode is :py:data:`AUTOMATIC` an :py:data:`ASCII` file will be
+     |      written if the output is a TTY and a :py:data:`BINARY` file otherwise.
+     |      
+     |      :param str filename: The file to load
+     |      :param file fh: The file handle to open
+     |      :param int mode: The mode to write, default is :py:data:`AUTOMATIC`.
+     |      :param bool update_normals: Whether to update the normals
+     |  
+     |  ----------------------------------------------------------------------
+     |  Class methods inherited from stl.stl.BaseStl:
+     |  
+     |  from_file(filename, calculate_normals=True, fh=None, mode=<Mode.AUTOMATIC: 0>, speedups=True, **kwargs) from abc.ABCMeta
+     |      Load a mesh from a STL file
+     |      
+     |      :param str filename: The file to load
+     |      :param bool calculate_normals: Whether to update the normals
+     |      :param file fh: The file handle to open
+     |      :param dict kwargs: The same as for :py:class:`stl.mesh.Mesh`
+     |  
+     |  from_files(filenames, calculate_normals=True, mode=<Mode.AUTOMATIC: 0>, speedups=True, **kwargs) from abc.ABCMeta
+     |      Load multiple meshes from a STL file
+     |      
+     |      Note: mode is hardcoded to ascii since binary stl files do not support
+     |      the multi format
+     |      
+     |      :param list(str) filenames: The files to load
+     |      :param bool calculate_normals: Whether to update the normals
+     |      :param file fh: The file handle to open
+     |      :param dict kwargs: The same as for :py:class:`stl.mesh.Mesh`
+     |  
+     |  from_multi_file(filename, calculate_normals=True, fh=None, mode=<Mode.ASCII: 1>, speedups=True, **kwargs) from abc.ABCMeta
+     |      Load multiple meshes from a STL file
+     |      
+     |      Note: mode is hardcoded to ascii since binary stl files do not support
+     |      the multi format
+     |      
+     |      :param str filename: The file to load
+     |      :param bool calculate_normals: Whether to update the normals
+     |      :param file fh: The file handle to open
+     |      :param dict kwargs: The same as for :py:class:`stl.mesh.Mesh`
+     |  
+     |  load(fh, mode=<Mode.AUTOMATIC: 0>, speedups=True) from abc.ABCMeta
+     |      Load Mesh from STL file
+     |      
+     |      Automatically detects binary versus ascii STL files.
+     |      
+     |      :param file fh: The file handle to open
+     |      :param int mode: Automatically detect the filetype or force binary
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from stl.base.BaseMesh:
+     |  
+     |  __getitem__(self, k)
+     |  
+     |  __init__(self, data, calculate_normals=True, remove_empty_areas=False, remove_duplicate_polygons=<RemoveDuplicates.NONE: 0>, name='', speedups=True, **kwargs)
+     |      Initialize self.  See help(type(self)) for accurate signature.
+     |  
+     |  __iter__(self)
+     |  
+     |  __len__(self)
+     |  
+     |  __setitem__(self, k, v)
+     |  
+     |  check(self)
+     |      Check the mesh is valid or not
+     |  
+     |  debug(*args, **kwargs) from abc.ABCMeta
+     |      Log a message with severity 'DEBUG' on the root logger. If the logger has
+     |      no handlers, call basicConfig() to add a console handler with a pre-defined
+     |      format.
+     |  
+     |  error(*args, **kwargs) from abc.ABCMeta
+     |      Log a message with severity 'ERROR' on the root logger. If the logger has
+     |      no handlers, call basicConfig() to add a console handler with a pre-defined
+     |      format.
+     |  
+     |  exception(*args, exc_info=True, **kwargs) from abc.ABCMeta
+     |      Log a message with severity 'ERROR' on the root logger, with exception
+     |      information. If the logger has no handlers, basicConfig() is called to add
+     |      a console handler with a pre-defined format.
+     |  
+     |  get_mass_properties(self)
+     |      Evaluate and return a tuple with the following elements:
+     |        - the volume
+     |        - the position of the center of gravity (COG)
+     |        - the inertia matrix expressed at the COG
+     |      
+     |      Documentation can be found here:
+     |      http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
+     |  
+     |  get_unit_normals(self)
+     |  
+     |  info(*args, **kwargs) from abc.ABCMeta
+     |      Log a message with severity 'INFO' on the root logger. If the logger has
+     |      no handlers, call basicConfig() to add a console handler with a pre-defined
+     |      format.
+     |  
+     |  is_closed(self)
+     |      Check the mesh is closed or not
+     |  
+     |  log(msg, *args, **kwargs) from abc.ABCMeta
+     |      Log 'msg % args' with the integer severity 'level' on the root logger. If
+     |      the logger has no handlers, call basicConfig() to add a console handler
+     |      with a pre-defined format.
+     |  
+     |  rotate(self, axis, theta=0, point=None)
+     |      Rotate the matrix over the given axis by the given theta (angle)
+     |      
+     |      Uses the :py:func:`rotation_matrix` in the background.
+     |      
+     |      .. note:: Note that the `point` was accidentaly inverted with the
+     |         old version of the code. To get the old and incorrect behaviour
+     |         simply pass `-point` instead of `point` or `-numpy.array(point)` if
+     |         you're passing along an array.
+     |      
+     |      :param numpy.array axis: Axis to rotate over (x, y, z)
+     |      :param float theta: Rotation angle in radians, use `math.radians` to
+     |                          convert degrees to radians if needed.
+     |      :param numpy.array point: Rotation point so manual translation is not
+     |                                required
+     |  
+     |  rotate_using_matrix(self, rotation_matrix, point=None)
+     |  
+     |  transform(self, matrix)
+     |      Transform the mesh with a rotation and a translation stored in a
+     |      single 4x4 matrix
+     |      
+     |      :param numpy.array matrix: Transform matrix with shape (4, 4), where
+     |                                 matrix[0:3, 0:3] represents the rotation
+     |                                 part of the transformation
+     |                                 matrix[0:3, 3] represents the translation
+     |                                 part of the transformation
+     |  
+     |  translate(self, translation)
+     |      Translate the mesh in the three directions
+     |      
+     |      :param numpy.array translation: Translation vector (x, y, z)
+     |  
+     |  update_areas(self, normals=None)
+     |  
+     |  update_max(self)
+     |  
+     |  update_min(self)
+     |  
+     |  update_normals(self, update_areas=True)
+     |      Update the normals and areas for all points
+     |  
+     |  update_units(self)
+     |  
+     |  warning(*args, **kwargs) from abc.ABCMeta
+     |      Log a message with severity 'WARNING' on the root logger. If the logger has
+     |      no handlers, call basicConfig() to add a console handler with a pre-defined
+     |      format.
+     |  
+     |  ----------------------------------------------------------------------
+     |  Class methods inherited from stl.base.BaseMesh:
+     |  
+     |  remove_duplicate_polygons(data, value=<RemoveDuplicates.SINGLE: 1>) from abc.ABCMeta
+     |  
+     |  remove_empty_areas(data) from abc.ABCMeta
+     |  
+     |  rotation_matrix(axis, theta) from abc.ABCMeta
+     |      Generate a rotation matrix to Rotate the matrix over the given axis by
+     |      the given theta (angle)
+     |      
+     |      Uses the `Euler-Rodrigues
+     |      <https://en.wikipedia.org/wiki/Euler%E2%80%93Rodrigues_formula>`_
+     |      formula for fast rotations.
+     |      
+     |      :param numpy.array axis: Axis to rotate over (x, y, z)
+     |      :param float theta: Rotation angle in radians, use `math.radians` to
+     |                   convert degrees to radians if needed.
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from stl.base.BaseMesh:
+     |  
+     |  areas
+     |      Mesh areas
+     |  
+     |  attr
+     |  
+     |  max_
+     |      Mesh maximum value
+     |  
+     |  min_
+     |      Mesh minimum value
+     |  
+     |  normals
+     |  
+     |  points
+     |  
+     |  units
+     |      Mesh unit vectors
+     |  
+     |  v0
+     |  
+     |  v1
+     |  
+     |  v2
+     |  
+     |  vectors
+     |  
+     |  x
+     |  
+     |  y
+     |  
+     |  z
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from stl.base.BaseMesh:
+     |  
+     |  dtype = dtype([('normals', '<f4', (3,)), ('vectors', '<f4', (3, 3)), (...
+     |  
+     |  ----------------------------------------------------------------------
+     |  Static methods inherited from python_utils.logger.Logged:
+     |  
+     |  __new__(cls, *args, **kwargs)
+     |      Create and return a new object.  See help(type) for accurate signature.
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from python_utils.logger.Logged:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from collections.abc.Mapping:
+     |  
+     |  __contains__(self, key)
+     |  
+     |  __eq__(self, other)
+     |      Return self==value.
+     |  
+     |  get(self, key, default=None)
+     |      D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None.
+     |  
+     |  items(self)
+     |      D.items() -> a set-like object providing a view on D's items
+     |  
+     |  keys(self)
+     |      D.keys() -> a set-like object providing a view on D's keys
+     |  
+     |  values(self)
+     |      D.values() -> an object providing a view on D's values
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from collections.abc.Mapping:
+     |  
+     |  __hash__ = None
+     |  
+     |  __reversed__ = None
+     |  
+     |  ----------------------------------------------------------------------
+     |  Class methods inherited from collections.abc.Collection:
+     |  
+     |  __subclasshook__(C) from abc.ABCMeta
+     |      Abstract classes can override this to customize issubclass().
+     |      
+     |      This is invoked early on by abc.ABCMeta.__subclasscheck__().
+     |      It should return True, False or NotImplemented.  If it returns
+     |      NotImplemented, the normal algorithm is used.  Otherwise, it
+     |      overrides the normal algorithm (and the outcome is cached).
+
+FILE
+    /home/burak/Documents/env3/lib/python3.6/site-packages/stl/mesh.py
+
+
+None
+\end{verbatim}
+
+
+
+
+\end{document}
