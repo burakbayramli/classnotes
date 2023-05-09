@@ -54,6 +54,42 @@ deger1
 [1 2 3]
 ```
 
+Eğer olmayan değere erişirsek hata gelir,
+
+```python
+dict1['olmayan anahtar']
+```
+
+```text
+
+KeyErrorTraceback (most recent call last)
+<ipython-input-1-90fef2a85d10> in <module>
+      1 plt.figure();
+      2 
+----> 3 dict1['olmayan anahtar']
+
+KeyError: 'olmayan anahtar'
+```
+
+Hata oluşturmadan eğer anahtar varsa değer yoksa `None` gelsin istersek `.get`
+çağrısı var,
+
+```python
+print (dict1.get('olmayan anahtar'))
+```
+
+```text
+None
+```
+
+```python
+print (dict1.get('anahtar1'))
+```
+
+```text
+deger1
+```
+
 Kavrama (comprehension) yani [1] tek satırda hem başka bir listeyi gezip aynı
 anda başka bir liste / sözlük yaratma kabiliyeti sözlükler için de geçerli,
 
@@ -155,11 +191,71 @@ dosyalar üzerinden yapılıyor, her erişim her depolama direk bu
 dosyalara gidiyor (dosyaların ikisel formatı muhakkak hızlı erişim
 için ayarlanmış halde).
 
+### Olagan Degerler, Siralanma
+
+Pek çok ihtiyaca yardım etmeye uğraşan ek sözlük tipleri de
+vardır. Bunlardan biri olmayan bir değere erişildiğinde o anahtar için
+olağan (default) bir değeri otomatik yaratan bir sözlük tipidir,
+`defaultdict`
+
+```python
+from collections import defaultdict
+
+dict4 = defaultdict(int)
+dict4['anahtar4']
+```
+
+```text
+Out[1]: 0
+```
+
+Olağan değer sözlüklerinin en kullanışlı olduğu yer belli anahtar değerlerine
+tekabül eden listelere öğe eklemek istediğimiz zamandır. Pek çok problemde
+belli anahtarlara tekabül eden liste değerleri gezeriz, onları bir listeye
+döngü içinde eklemek isteriz fakat her anahtar için "eğer bu anahtar varsa
+listeye ekle, yoksa boş liste yarat, ondan sonra ekle" mantığı kod fazlalığı
+oluşturabilir, `defaultdıçt(list)` kullanırsak her anahtarın olağan değeri
+boş liste olacağı için bir anahtar var mı yok mu bakmadan direk o anahtarın
+listesine ekleme yapabiliriz çünkü o anahtarın listesi yoksa nasıl olsa
+yaratılacaktır. Örnek,
+
+```python
+from collections import defaultdict
+
+city_list = [('TX','Austin'), ('TX','Houston'), ('NY','Albany'),
+('NY', 'Syracuse'), ('NY', 'Buffalo'), ('NY', 'Rochester'), ('TX',
+'Dallas'), ('CA','Sacramento'), ('CA', 'Palo Alto'), ('GA',
+'Atlanta')]
+
+cities_by_state = defaultdict(list)
+for state, city in city_list:
+    cities_by_state[state].append(city)
+
+cities_by_state
+```
+
+```text
+Out[1]: 
+defaultdict(list,
+            {'TX': ['Austin', 'Houston', 'Dallas'],
+             'NY': ['Albany', 'Syracuse', 'Buffalo', 'Rochester'],
+             'CA': ['Sacramento', 'Palo Alto'],
+             'GA': ['Atlanta']})
+```
+
+Gördüğümüz gibi `cities_by_state[state]` üzerinde direk `.append`
+yapabildik çünkü listenin orada olacağını varsayabiliyoruz.
+
+
+
+
+
+
 Kaynaklar
 
-[1] [Python Liste Kavraması (List Comprehension)](../../2021/12/python-list-comprehension.html)
+[1] <a name="../../2021/12/python-list-comprehension.html">Python Liste Kavraması (List Comprehension)</a>
 
-[2] [NoSQL](../../2022/11/nosql-diy-python.html)
+[2] <a name="../../2022/11/nosql-diy-python.html">NoSQL</a>
 
 [3] https://github.com/deep-compute/diskdict
 
