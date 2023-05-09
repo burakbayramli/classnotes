@@ -27,13 +27,19 @@ Matematik, veri analizi için çok kullanılan paketler numpy, scipy,
 pandas paketleridir. Bunlar ve ileri dil özellikleri hakkındaki
 yazılarımız altta,
 
+[Python Sözlük (Dictionary) Veri Yapısı](../../2023/05/python-sozluk-dictionary.html)
+
+[Komut Satırı Seçeneklerini İşlemek (Command Line Option Processing), Python](../../2018/08/komut-satr-seceneklerini-islemek.html)
+
 [Python Liste Kavraması (List Comprehension)](../../2021/12/python-list-comprehension.html)
 
 [Üreticiler (Generators), Yield](../../2011/02/fonksiyon-gezmek-ve-yield.html)
 
-[Birim Testler](../../2016/05/birim-testleri-taklitlemek-mocking-ve.html)
+[Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek](../../2013/07/onbelleklemeyi-dekorator-ile-yapmak.html)
 
-[Komut Satırı Seçeneklerini İşlemek (Command Line Option Processing), Python](../../2018/08/komut-satr-seceneklerini-islemek.html)
+[Python Paketleme](../../2012/04/python-paketleme.html)
+
+[Birim Testler](../../2016/05/birim-testleri-taklitlemek-mocking-ve.html)
 
 [Yerel, Network Dosyasini Canlı, Anlık, Azar Azar Islemek (Stream, Incremental File Processing)](../../2018/08/canl-aks-anlk-azar-azar-islem-stream.html)
 
@@ -62,10 +68,6 @@ yazılarımız altta,
 [Operatorler](../../2011/02/operatorler.html)
 
 [Liste Gezerken Eleman Silmek](../../2011/03/liste-gezerken-eleman-silmek.html)
-
-[Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek](../../2013/07/onbelleklemeyi-dekorator-ile-yapmak.html)
-
-[Python Paketleme](../../2012/04/python-paketleme.html)
 
 [Cython](../../2010/11/cython.html)
 

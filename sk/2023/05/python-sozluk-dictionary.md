@@ -191,7 +191,19 @@ dosyalar üzerinden yapılıyor, her erişim her depolama direk bu
 dosyalara gidiyor (dosyaların ikisel formatı muhakkak hızlı erişim
 için ayarlanmış halde).
 
-### Olagan Degerler, Siralanma
+Diğer Disk Bazlı Seçenekler
+
+Eğer disk bazlı sözlük erişimini ayrı bir servise ayırıp ona REST APİ
+bazlı erişim sağlasak bir nevi anahtar/değer veri tabanı (key-value
+store) kavramına erişmiş olurduk. MongoDB gibi yazılımlar bir bakıma
+bu servisi sağlıyorlar, daha yüksek ölçekte ek bazı servislerle beraber
+fakat sonuçta yaptıkları disk bazlı bir sözlük servisi sağlamaktır.
+
+Konu hakkında önceki bir yazı şurada [2].
+
+### Olağan Değerler, Sıralanma
+
+Olağan Değerler
 
 Pek çok ihtiyaca yardım etmeye uğraşan ek sözlük tipleri de
 vardır. Bunlardan biri olmayan bir değere erişildiğinde o anahtar için
@@ -214,7 +226,7 @@ tekabül eden listelere öğe eklemek istediğimiz zamandır. Pek çok problemde
 belli anahtarlara tekabül eden liste değerleri gezeriz, onları bir listeye
 döngü içinde eklemek isteriz fakat her anahtar için "eğer bu anahtar varsa
 listeye ekle, yoksa boş liste yarat, ondan sonra ekle" mantığı kod fazlalığı
-oluşturabilir, `defaultdıçt(list)` kullanırsak her anahtarın olağan değeri
+oluşturabilir, `defaultdict(list)` kullanırsak her anahtarın olağan değeri
 boş liste olacağı için bir anahtar var mı yok mu bakmadan direk o anahtarın
 listesine ekleme yapabiliriz çünkü o anahtarın listesi yoksa nasıl olsa
 yaratılacaktır. Örnek,
@@ -246,10 +258,31 @@ defaultdict(list,
 Gördüğümüz gibi `cities_by_state[state]` üzerinde direk `.append`
 yapabildik çünkü listenin orada olacağını varsayabiliyoruz.
 
+Eklenme Sırasını Hatırlayan Sözlük
 
+Anahtarin eklenme sirasini hatirlayip degerler istendiginde ona gore
+listeyi donduren bir diger sozluk tipi `collections.OrderedDict`.
 
+```python
+import collections
 
+dict5 = collections.OrderedDict()
+dict5["A"]=1
+dict5["B"]=2
+dict5["D"]=4
+dict5["C"]=3
+for i in dict5.items(): print(i)
+```
 
+```text
+('A', 1)
+('B', 2)
+('D', 4)
+('C', 3)
+```
+
+Sonuca bakıyoruz, liste aynen eklenme sırasını yansıtıyor. Normal bir
+sözlük bu sonucu garantilemez, sıralama rasgele olabilirdi.
 
 Kaynaklar
 
@@ -258,6 +291,3 @@ Kaynaklar
 [2] <a name="../../2022/11/nosql-diy-python.html">NoSQL</a>
 
 [3] https://github.com/deep-compute/diskdict
-
-
-
