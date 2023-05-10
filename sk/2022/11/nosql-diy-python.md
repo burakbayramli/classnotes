@@ -35,11 +35,11 @@ Basit, dağıtık çalışabilen bir NoSQL taban tasarımı şöyle olabilir.
 
 - Listeleme: bu özellik için ayrı bir SQL tablosu yaratırız, bir
   kolonunda liste ismi, diğerinde obje anahtarı olacak şekilde. Liste
-  ismi satırlarda tekrarlanabilir böylece çoka bir ilişki
-  kuruyoruz. Listeyi istemciden almak için o isim üzerinde `where`
-  işletiliriz. Sayfalama özelliği SQL LIMIT üzerinden sağlanır,
-  çağıran tarafta liste obje anahtarlarını objeye çevirmek için
-  servise tekrar sormak gerekecektir.
+  ismi satırlarda tekrarlanabilir böylece çoka-bir (many to one)
+  ilişki kuruyoruz. Listeyi servisten almak için o isim üzerinde
+  `where` işletiliriz. Sayfalama özelliği SQL LIMIT üzerinden
+  sağlanır, çağıran tarafta liste obje anahtarlarını objeye çevirmek
+  için servise tekrar sormak gerekecektir.
 
 ### Servis
 
@@ -121,6 +121,12 @@ Tabana tek bir bağlantı vardır, o bağlantı `OnlyOne` tekil obje
 (singleton) içinde muhafaza ediliyor. Arkadaki sqlite tabanına
 eşzamanlı erişim olmadığı için birden fazla bağlantıya da gerek yok.
 
+Not: Fakat baz taban daha kuvvetli bir taban seçilirse (bir tablonun
+tamamını kitlemeden ayrı satırlara paralel erişim desteği sağlayan
+türden) birden fazla taban bağlantısı idare edilebilir. Bunun için
+üstteki kodda ufak bir değişim yeterli (tekil obje yerine bir bağlantı
+havuzu kullanımı mesela)
+
 Metot `set` içinde `insert or replace into` komutunu kullandık, bu SQL
 çağrısı bir satır varsa onu günceller yoksa yeni satır ekler,
 İngilizce deyimle insert ve update karışımı olan "upsert" işlemini
@@ -136,7 +142,7 @@ düz SQL komutları üzerinden yapıyoruz. Unutmayalım SQL sadece ekleme,
 silme gibi "CRUD" operasyonlarından ibaret değil, ilişkisel veriler
 literatürü çok daha kapsamlı. NoSQL dışarıya bu tür ilişkisel bir
 arayüz vermiyor, arka planda da SQL basit depolama amaçlı olarak
-kullanılıyor ve onun ilişkisel özelliklerine de dokunulmuyor.
+kullanılıyor ve onun ilişkisel özelliklerine dokunulmuyor.
 
 Servisi başlatırken üstteki script'e komut satırından 0,1,2.. gibi bir
 sayı veririz, bu sayı o servisin no'su olur. Bu no taban ismine
