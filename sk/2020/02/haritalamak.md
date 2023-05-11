@@ -175,58 +175,29 @@ plt.savefig('har2.png')
 
 ### Izgara Yaratmak
 
-Bir kordinat etrafında belli büyüklükte bir alan üzerinde ızgara
-yaratmak ve bu izgaradaki kordinat noktalarını haritada göstermek için
-ne yaparız? Paket `geopy` kurulmuş olmalı,
+İki köşesi tanımlanan bir dikdörtgen üzerinden bir izgara tanımlayabiliriz,
 
 ```
-import geopy.distance
-import numpy as np
+import simplegeomap as sm, numpy as np, matplotlib.pyplot as plt
 
-def goto_from_coord(start, distance, bearing):
-    s = geopy.Point(start[0],start[1])
-    d = geopy.distance.geodesic(kilometers = distance)
-    reached = d.destination(point=s, bearing=bearing)
-    return [reached.latitude, reached.longitude]
+from pygeodesy.sphericalNvector import LatLon
+res1 = LatLon(36.52259447316748, 27.612981046240638) # sol alt
+res2 = LatLon(41.05628025861666, 42.58542464923075) # sag ust
 
-lat,lon=40.84343206497589, 29.926342357515754
+41.40662366577505, 27.255002668187043
 
-dist = 60
-res1 = goto_from_coord((lat,lon),dist,45)
-print (res1)
-res2 = goto_from_coord((lat,lon),dist,225)
-print (res2)
-
-lowlat = np.min([res1[0],res2[0]])
-lowlon = np.min([res1[1],res2[1]])
-hilat = np.max([res1[0],res2[0]])
-hilon = np.max([res1[1],res2[1]])
+lowlat = np.min([res1.lat,res2.lat])
+lowlon = np.min([res1.lon,res2.lon])
+hilat = np.max([res1.lat,res2.lat])
+hilon = np.max([res1.lon,res2.lon])
 
 x = np.linspace(lowlon,hilon,7)
-y = np.linspace(lowlat,hilat,7)
+y = np.linspace(lowlat,hilat,4)
 
 xx,yy = np.meshgrid(x,y)
-print (xx.flatten())
-
-import cartopy.crs as ccrs
-import cartopy
-
-fig = plt.figure()
-ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-ax.set_global()
-ax.stock_img()
-ax.coastlines()
-ax.plot(xx.flatten(), yy.flatten(), 'r.', transform=ccrs.PlateCarree())
-ax.set_extent([28, 31, 40, 42])
-plt.savefig('har4.png')
 ```
 
-![](har4.png)
-
-Nasıl kodladığımızı açıklayalım, önce merkez noktadan sağ üste (45
-derece yönde) 60 km, ve sol alt yönde (225 derece) aynı uzaklıkta
-birer adım atıyoruz, bu dörtgenin iki ucu. Bu uç noktalardan `lingrid`
-sonra `meshgrid` ile ızgarayı oluşturuyoruz. 
+![](har4.jpg)
 
 Oklar, Quiver
 

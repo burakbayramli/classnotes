@@ -1,9 +1,10 @@
 # Python Sözlük (Dictionary) Veri Yapısı
 
-Python sözlük yapısı hafızada anahtar bazlı veriye direk erişim (dizin
-erişimi kadar hızlı) sağlar.  Basit anahtar - değer ikilisini
-depolayabiliriz, fakat değer olarak depolanan şey herhangi bir obje
-olabilir. Bu özellik sözlüklere geniş kullanım alanı sağlar.
+Python sözlük yapısı hafızada anahtar bazlı veriye direk erişim (dizi
+/ vektör / sayı indisli liste erişimi kadar hızlı) sağlar.  Basit
+anahtar - değer ikilisini depolayabiliriz, fakat değer olarak
+depolanan şey herhangi bir obje olabilir. Bu özellik sözlüklere geniş
+kullanım alanı sağlar.
 
 En basit kullanım,
 
@@ -110,10 +111,10 @@ bu tanımlar toparlanıp bir yeni sözlük yaratımı için kullanıldı.
 Sözlüklerin iç kodlanması nasıl yapılmıştır acaba? Bundan da
 bahsedelim, mülakat sorusu olabilir, zaten görünmese de bu tür
 detayları bilmek faydalıdır. Bir sözlük paketini kodlamak için en baz
-depolama veri yapısı olarak bir dizin (array) kullanabiliriz. Ama
-dizin erişimi tam sayı bazlıdır, üstelik baştan kaç öğe olduğu
-bellidir, anahtarı herhangi bir şey olabilecek sözlükleri bunun üstüne
-nasıl monte edeceğiz?
+depolama veri yapısı olarak bir dizi (array) kullanabiliriz. Ama dizi
+erişimi tam sayı bazlıdır, üstelik baştan kaç öğe olduğu bellidir,
+anahtarı herhangi bir şey olabilecek sözlükleri bunun üstüne nasıl
+monte edeceğiz?
 
 Böleç (hash) kavramı burada yardıma yetişir. Harfler, alfanumerik
 herhangi bir veriyi `hash` ile sayısal forma çevirebileceğimizi
@@ -147,12 +148,12 @@ hash("anahtar1") % 10
 Out[1]: 7
 ```
 
-İşte bu sayı dizinde erişim için kullanılır.
+İşte bu sayı dizide erişim için kullanılır.
 
-Eğer dizin büyüklüğüne kıyasla çok fazla anahtar değeri var ise birden
-fazla anahtar aynı dizin öğesine düşebilir, bu "çakışma (collision)"
+Eğer dizi büyüklüğüne kıyasla çok fazla anahtar değeri var ise birden
+fazla anahtar aynı dizi öğesine düşebilir, bu "çakışma (collision)"
 durumu yaratır, bu durumda çakışma olan öğede bir liste yaratırız
-(dizin içinde liste), ve erişim için arama önce anahtar bazlı direk
+(dizi içinde liste), ve erişim için arama önce anahtar bazlı direk
 sonra liste bazlı teker teker gider.
 
 ### DiskDict
@@ -185,7 +186,7 @@ dict3 = DiskDict('/tmp/diskdict')
 dict3['anahtar3'] = 'deger3'
 ```
 
-Bu işlemler sonrası `/tmp/diskdict` dizini altında bazı dosyaların
+Bu işlemler sonrası `/tmp/diskdict` dizi altında bazı dosyaların
 yaratılmış olduğunu göreceğiz. Sözlüğün disksel erişim işlemleri bu
 dosyalar üzerinden yapılıyor, her erişim her depolama direk bu
 dosyalara gidiyor (dosyaların ikisel formatı muhakkak hızlı erişim
@@ -283,6 +284,79 @@ for i in dict5.items(): print(i)
 
 Sonuca bakıyoruz, liste aynen eklenme sırasını yansıtıyor. Normal bir
 sözlük bu sonucu garantilemez, sıralama rasgele olabilirdi.
+
+# Anahtar Çeşitleri
+
+"Depolanan şey herhangi bir obje olabilir" dedik, buna ek olarak,
+belli şartlara uymak kaydıyla anahtar çoğu baz Python objeleri bile
+olabilir. Mesela tüpler (tuples),
+
+```python
+tuple1 = ((2,3),(4,5))
+tuple2 = ((8,1),(9,9))
+dict6 = {}
+dict6[tuple1] = "bazi degerler burada"
+dict6[tuple2] = "baska degerler"
+print (dict6[tuple1])
+print (dict6[tuple2])
+```
+
+```text
+bazi degerler burada
+baska degerler
+```
+
+Anahtar olabilecek temel tipler değiştirilemeyen (ımmutable)
+nesnelerdir, bunlar String, int, tuple tipleri. Fakat daha önce
+bahsettiğimiz gibi bir anahtar sonuçta böleclenen bir şey, o zaman bir
+bölec fonksiyonu sağlayan her nesne, kullanıcı tanımlı bile olsa
+anahtar olabilir.
+
+```python
+class C:
+    def __init__(self, a1, a2):
+        self.a1 = a1
+        self.a2 = a2
+
+    def __hash__(self):
+        return hash((self.a1, self.a2))
+
+    def __eq__(self, other):
+        return (self.a1, self.a2) == (other.a1, other.a2)
+
+object_a = C("a", 1)
+object_b = C("a", 1)
+object_c = C("b", 2)
+
+a_dictionary = {object_a : 3, object_b : 4, object_c : 5}
+
+print(a_dictionary[object_a])
+```
+
+```text
+4
+```
+
+Görüldüğü gibi `object_a` objesinin tamamını bir anahtar olarak kullandık
+ve doğru değere erisebildik çünkü sınıf üzerinde `__hash__` tanımlandı
+perde arkasında Python sözlük kodu bu fonksiyonu çağırarak gerekli değeri
+oradan alabiliyor.
+
+Dikkat edersek `object_b` aynı değerleri taşıdığı için aynı böleci
+üretir, o zaman sözlük açısından aynı anahtar değeridir. `object_c`
+farklı değerleri olduğu için farklı bir anahtardır.
+
+```python
+print(a_dictionary[object_b])
+print(a_dictionary[object_c])
+```
+
+```text
+4
+5
+```
+
+Değer `4` iki üstteki ile aynı, ama `5` farklı.
 
 Kaynaklar
 

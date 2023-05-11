@@ -9,6 +9,7 @@ bir indeks dizini altında gerekli dosyaları yazar. Bu dosyalar
 negatif. Bu dosyaların idare edilmesi gerekli. Ayrıca whoosh ile
 güncelleme işlemleri biraz problemli.
 
+
 Sqlite3 içinde işleyen bir diğer çözüm, fts3 daha
 kullanışlı. İndeksleme için bir kolonu `fts3` tipinde tanımlamak
 yeterli, artık bu kolona konan her veri doküman arama yaklaşımıyla
