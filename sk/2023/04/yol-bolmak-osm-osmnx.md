@@ -203,9 +203,17 @@ ile yapabiliriz. Her düğümün coğrafi kordinatını .osm dosyasını direk
 tarayarak yapabiliriz, okunabilir bir dosya bu, ve `lat`, `lon` değerleri
 her düğüm için var.
 
-Dikkat, eğer .osm dosyası çok büyük ise `graph_from_xml` için yerel
-bilgisayarın hafızası yetmeyebilir, mesela Lüksemburg gibi ufak bir
-harita için bile 4 GB yeterli olmadı.
+### Dezavantajlar
+
+Bu paketin hafıza idare problemi var. Eğer .osm dosyası çok büyük ise
+`graph_from_xml` için yerel bilgisayarın hafızası yetmeyebilir, mesela
+Lüksemburg gibi ufak bir harita için bile 4 GB yeterli olmadı.
+
+Bölge tanımlayıp o bölge için gerekli OSM bilgilerini indirmek, aynı
+anda onu işleyip başka bir formata döndürmek teoride iyi fakat
+pratikte network yavaşlığı, kesilmesi gibi envai türden problemde bizi
+yolda bırakabilir. Bazı kavramları öğrenmek için bu paket faydalı olsa
+da nihai bir uygulama için eksikler olacaktır. 
 
 Kaynaklar
 
