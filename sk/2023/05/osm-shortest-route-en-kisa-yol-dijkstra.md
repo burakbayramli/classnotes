@@ -199,11 +199,132 @@ Tablo `osm_nodes` yaratıldı. Dikkat, indeksler tüm satırlar eklendikten
 *sonra* yaratıldı. Eğer tablo yaratıldığında indeksleri yaratmış olsak
 bu `INSERT` işlemlerini yavaşlatırdı. 
 
-Seçilen köşe ve hesaplanan izgara noktaları altta grafikleniyor,
+Seçilen köşe ve hesaplanan ızgara noktaları altta grafikleniyor,
 
 <img width='300' src='osm1.jpg'/> 
 
+İkinci teknoloji seçimine gelelim, bu bir önceki konu kadar önemli,
+yolları temsil eden çiziti, yani düğümler ve aralarındaki bağlantıları
+nasıl temsil edeceğiz? Bu seçimi yaparken aklımda bazı tercihler ve
+bilgiler var. Mesela [7] yazısında anlatılan kısa yol algoritmasının
+Python sözlüğü bazlı çalıştığını biliyorum, çiziti bir "sözlük içinde
+sözlük" yapısında olmasını bekliyor, yani çizit `G` ise mesela
+`G['a']` ile `G` sözlüğünden ikinci bir sözlük elde ediyoruz, bu
+sözlükte hedef düğümü geçiyoruz, bu bize yolun ağırlığını / uzaklığını
+veriyor, mesela `G['a']['b']` ile `a` düğümünün `b` düğümüne
+uzaklığını elde ediyorum. Bunu biliyoruz.
 
+İkinci tercih daha önceki durumda olduğu gibi herşeyi hafızaya
+almaktan kaçınmak. Mümkün olduğu kadar herşeyi disk bazlı yapmak.  Bu
+bizi nihai teknoloji tercihine götürüyor - disk bazlı bir sözlük!
+Daha önceki bir yazıda [6] bunu görmüştük, `diskdict`.
+
+Algoritmayı yazalım, `edges.csv` dosyasını satır satır gezerken
+her çıkış düğümü `source` ile bitiş noktası `target` arasında `length`
+uzaklığını sözlük içindeki sözlüğe ekliyoruz.
+
+```python
+from diskdict import DiskDict
+
+dictdir = "walkdict"
+
+def diskdict():
+
+    if os.path.exists(dictdir): shutil.rmtree(dictdir)
+    print ('bos hucreleri yarat')
+    dd = DiskDict(dictdir)
+    with open('edges.csv') as csvfile:
+        rd = csv.reader(csvfile,delimiter=',')
+        headers = {k: v for v, k in enumerate(next(rd))}
+        for i,row in enumerate(rd):        
+            if i % 1000 == 0: print ('satir', i)
+            if row[headers['foot']] == 'Allowed':
+                dd[row[headers['source']]] = {}
+                dd[row[headers['target']]] = {}
+
+    dd.close()
+
+    print ('baglantilari ekle')
+    dd = DiskDict(dictdir)
+    with open('edges.csv') as csvfile:
+        rd = csv.reader(csvfile,delimiter=',')
+        headers = {k: v for v, k in enumerate(next(rd))}
+        for i,row in enumerate(rd):        
+            if i % 1000 == 0: print ('satir',i)
+            if row[headers['foot']] == 'Allowed':
+
+                tmp = dd[row[headers['source']]]
+                tmp[row[headers['target']]] = row[headers['length']]
+                dd[row[headers['source']]] = tmp
+
+                tmp = dd[row[headers['target']]]
+                tmp[row[headers['source']]] = row[headers['length']]
+                dd[row[headers['target']]] = tmp
+
+    dd.close()
+
+diskdict()
+```
+
+```text
+bos hucreleri yarat
+satir 0
+satir 1000
+satir 2000
+satir 3000
+satir 4000
+satir 5000
+satir 6000
+satir 7000
+baglantilari ekle
+satir 0
+satir 1000
+satir 2000
+satir 3000
+satir 4000
+satir 5000
+satir 6000
+satir 7000
+```
+
+Oldu mu acaba?
+
+```python
+def find_closest_node(lat,lon):
+    mids = pickle.load(open("centers.pkl","rb"))
+
+    conn = sqlite3.connect(dbfile)
+
+    frvec = np.array([lon,lat]).reshape(1,2)
+    ds = cdist(mids,frvec)
+    fr_closest_mid = list(np.argsort(ds,axis=0).T[0][:2])
+    frres = []
+    sql = "select id,lat,lon from osm_nodes where c1==? or c1==? or c2==? or c2==?"
+    c = conn.cursor()
+    rows = c.execute(sql,(int(fr_closest_mid[0]),
+                          int(fr_closest_mid[1]),
+                          int(fr_closest_mid[0]),
+                          int(fr_closest_mid[1])))
+    for row in rows: frres.append(row)
+
+    df = pd.DataFrame(frres); df.columns = ['id','lat','lon']
+
+    frres = cdist(df[['lon','lat']], frvec)
+    res = df.iloc[np.argmin(frres)][['id','lat','lon']]
+    return list(res)
+```
+
+```python
+fr=(-4.699287820423064, 55.49185927728346)
+to=(-4.6364140603708925, 55.406975784999176)
+
+find_closest_node(fr[0],fr[1])
+```
+
+
+```text
+Out[1]: [5241652028.0, -4.70279, 55.48997]
+```
 
 
 ![](osm2.jpg)
