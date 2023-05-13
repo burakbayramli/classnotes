@@ -171,9 +171,9 @@ Böyle bir paket `diskdict` [3]. Kurmak için kaynaklar kullanılırsa iyi
 olur, önce alttakiler,
 
 ```
-sudo apt install python3-leveldb libleveldb-dev
+sudo apt install python3-leveldb libleveldb-dev libffi-dev
 
-pip install repoze.lru
+pip install repoze.lru structlog pycparser
 ```
 
 Ardından `setup.py` ile kurulum yapılır. Örnek,
