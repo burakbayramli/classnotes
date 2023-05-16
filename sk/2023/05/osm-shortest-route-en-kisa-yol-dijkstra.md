@@ -1,11 +1,11 @@
 # OSM Haritaları, PBF Dosyaları, En Kısa Yol, Djikstra  
 
-Eğer yollar ağını içeren OSM haritasını kendimiz işleyip çıktı
-dosyalarını rahat okunabilir düz CSV formatında tutmak istersek bu
-mümkündür. Sonuçta OSM dosyaları [1] sitesinde bedava paylaşılıyor, ve
-bahsedilen işlemi yapabilecek bir kod Rust [5] ile yazılmış
-`osm4routing` kodudur. Amacımız iki nokta arasında bir kısa yol
-algoritması yazmak olacak.
+Yol ağını içeren OSM haritasını kendimiz işleyip erişimi hızlı
+istediğimiz formata çevirmek istersek bu mümkündür, OSM dosyaları [1]
+sitesinde bedava paylaşılıyor, ve çevrimin ilk aşaması OSM -> düz text
+CSV bazlı dönüşüm Rust [5] ile yazılmış `osm4routing` kodunda var. Bu
+yazıda amaç iki nokta arasında kısa yol algoritması bulan algoritma
+yazmak olacak.
 
 `osm4routing` kurmak için
 
@@ -105,15 +105,15 @@ satırda yakın ızgara noktaları mesela kolonlar `c1` ve `c2` olabilir
 ve yeni tabloyu bu kolonlar bazlı indekslerim, böylece `c1` ve `c2`
 bazlı filtreleme işlemi hızlanır.
 
-Izgara noktalarını bir `pickle` içinde kaydedebilirim, böylece
-sonradan isteyen yükleyebilir, ve artık herhangi bir nokta için aynı
-yakınlık hesabı işletilir, mesela `c1=3`, `c2=5` bulundu diyelim ve
-SQL tabanından ya 3 ya da 5 değerine sahip olan düğümleri `SELECT` ile
-alırım, ve bu noktalar üzerinde detaylı yakınlık hesabı
-işletirim. Böylece gerçek mesafe hesabı yapacağım veri miktarını
-azaltmış oldum.  Bu mantıklı olmalı, haritayı bölgelere ayırıyorum bir
-bakıma, eğer elimde Karadeniz bölgesinden bir nokta varsa Akdeniz
-bölgesindeki noktalara bakmaya ne gerek var?
+Referans ızgara noktalarını (3 x 4 için 12 tane zaten) bir `pickle`
+içinde kaydedebilirim, böylece sonradan isteyen yükleyebilir, ve artık
+herhangi bir nokta için aynı yakınlık hesabı işletilir, mesela `c1=3`,
+`c2=5` bulundu diyelim ve SQL tabanından ya 3 ya da 5 değerine sahip
+olan düğümleri `SELECT` ile alırım, ve bu noktalar üzerinde detaylı
+yakınlık hesabı işletirim. Böylece gerçek mesafe hesabı yapacağım veri
+miktarını azaltmış oldum.  Bu mantıklı olmalı, haritayı bölgelere
+ayırıyorum bir bakıma, eğer elimde Karadeniz bölgesinden bir nokta
+varsa Akdeniz bölgesindeki noktalara bakmaya ne gerek var?
 
 Burada seçilen teknolojilerin özelliklerine, kuvvetlerine dikkat;
 ızgara noktası bazlı filtreleme için SQL kullandık çünkü tam sayı
@@ -206,7 +206,7 @@ mühendislik kar/zarar denge hesabı (trade-off).
 
 Seçilen köşe ve hesaplanan ızgara noktaları altta grafikleniyor,
 
-<img width='300' src='osm1.jpg'/> 
+![](osm1.jpg)
 
 Şimdi bu ızgara noktalarını kullanarak bize "kordinata en yakın olan
 OSM id'sini bul" mantığını kodlayabiliriz.
@@ -264,15 +264,15 @@ verilen OSM kimliğini (listedeki üç sayıdan ilki) kullanabilirim.
 ### Bağlantılar
 
 İkinci teknoloji seçimine gelelim, bu bir önceki konu kadar önemli,
-yolları temsil eden çiziti, yani düğümler ve aralarındaki bağlantıları
+yolları temsil eden çiziti, düğümler ve aralarındaki bağlantıları
 nasıl temsil edeceğiz? Bu seçimi yaparken aklımda bazı tercihler ve
 bilgiler var. Mesela [7] yazısında anlatılan kısa yol algoritmasının
 Python sözlüğü bazlı çalıştığını biliyorum, çiziti bir "sözlük içinde
 sözlük" yapısında olmasını bekliyor, yani çizit `G` ise mesela
 `G['a']` ile `G` sözlüğünden ikinci bir sözlük elde ediyoruz, bu
 sözlükte hedef düğümü geçiyoruz, bu bize yolun ağırlığını / uzaklığını
-veriyor, yani `G['a']['b']` ile `a` düğümünün `b` düğümüne uzaklığını
-elde ediyorum. 
+veriyor, `G['a']['b']` ile `a` düğümünün `b` düğümüne uzaklığını elde
+ediyorum.
 
 İkinci tercih daha önceki durumda olduğu gibi herşeyi hafızaya
 almaktan kaçınmak. Mümkün olduğu kadar herşeyi disk bazlı yapmak.  Bu
@@ -281,9 +281,12 @@ Daha önceki bir yazıda [6] bunu görmüştük, `diskdict` hızlı çalışan
 bir paket. O zaman kenar verilerini bir `diskdict` sözlüğüne ekleyerek
 ikinci veri yapısını elde edebilirim.
 
-Algoritmayı yazalım, `edges.csv` dosyasını satır satır gezerken
-her çıkış düğümü `source` ile bitiş noktası `target` arasında `length`
-uzaklığını sözlük içindeki sözlüğe ekliyoruz.
+Algoritmayı yazalım, `edges.csv` dosyasını satır satır gezerken her
+çıkış düğümü `source` ile bitiş noktası `target` arasında `length`
+uzaklığını sözlük içindeki sözlüğe ekliyoruz. Not: Çizitimizi yürüyüş
+için hazırlayacağız, yani `car`, `bike` gibi seçenekleri olan ama
+yürüyüşe izin vermeyen yollar alınmayacak.
+
 
 ```python
 from diskdict import DiskDict
@@ -350,7 +353,7 @@ satir 6000
 satir 7000
 ```
 
-Oldu mu acaba? Biraz once yukarida buldugumuz iki OSM id icin kontrol edebilirim,
+Oldu mu acaba? Biraz önce yukarıda bulduğumuz iki OSM id için kontrol edebilirim,
 
 ```python
 dd = DiskDict(dictdir)
@@ -453,9 +456,11 @@ m.save("seychelles-route.html")
 
 [Sonuç](seychelles-route.html)
 
+![](osm3.jpg)
+
 Yol üstteki haritada gösteriliyor. Kısa bir yol. Google yol tarifi
 algoritmasinin bulduğu sonuç [şurada](osm2.jpg). İkisi de kullanışlı
-bence.
+duruyor. 
 
 Üstteki teknolojiler, tasarım seçimleri sayesinde açık kaynak verisi
 OSM ile hızlı bir şekilde ürettiğimiz SQL tabanı ve `diskdict` sözlüğü
@@ -469,6 +474,14 @@ haritalar üzerine işletince çıktının çok yer tutmadığını görebiliriz
 mesela TR için `diskdict` tabanı 300 MB'dan daha az. Ayrıca erişim
 disk bazlı olduğu için tüm taban hafızaya taşınmayacak, gerekli yerlerine
 erişim yapılacak.
+
+Not: Üstteki kod yolu sadece bir düğümler serisi olarak gösterdi;
+nihai bir ürün için yol parça kordinatlarını kenar objelerinin
+kendisinden almak daha iyi olur, bu bilgi `nodes.csv` içinde her kenar
+için mevcut zaten, bir `LİNESTRİNG` olarak belirtiliyor. Bu bilgi veri
+hazırlama evresinde `length` ile beraber `diskdict` içine yazılabilir,
+ya da ayrı bir veri tabanında tutulup `id` ile sorgulanabilir. İşin bu
+kısmını okuyucuya bırakıyoruz.
 
 Kaynaklar
 
@@ -487,4 +500,7 @@ Kaynaklar
 [7] <a href="https://burakbayramli.github.io/dersblog/algs/algs_035_dijks/dijkstra_algoritmasi_ile_en_kisa_yol.html">Dijkstra Algoritması ile En Kısa Yol</a>
 
 [8] <a href="https://www.ics.uci.edu/~eppstein/161/python/">University of California Bilgisayar Bilim Kodları</a>
+
+
+
 

@@ -111,18 +111,17 @@ Wifi üzerinden bu bağlantı işliyor çünkü aynı hotspot'a bağlandıysak
 aynı network'un içindeyiz demektir ve aynı network içinde makinalar
 birbirlerini bulabilirler.
 
-Bazı Ayarlar
+Eğer başlangıçta masaüstü başlatılmasın istiyorsak `raspı-config` deriz
+ve alttaki seçimleri yapınca 
 
-Bazi klavye kisayollari iptal etmek isteyebiliriz, mesela biz Alt-Space
-tusunu Emacs uzerinde ozel bir amacla kullaniyoruz, fakat bu RPi
-uzerinde bir pencere menusu acmak icin kisayol yapilmis. Iptal icin
+[ekran 1](https://www.digikey.com/-/media/MakerIO/Images/blogs/2018/How%20to%20Boot%20to%20Command%20Line%20and%20SSH%20on%20Raspberry%20Pi/Fig-3.jpg)
+[ekran 2](https://www.digikey.com/-/media/MakerIO/Images/blogs/2018/How%20to%20Boot%20to%20Command%20Line%20and%20SSH%20on%20Raspberry%20Pi/Fig-4.jpg)
+[ekran 3](https://www.digikey.com/-/media/MakerIO/Images/blogs/2018/How%20to%20Boot%20to%20Command%20Line%20and%20SSH%20on%20Raspberry%20Pi/Fig-5.jpg)
 
-`sudo nano /etc/xdg/openbox/lxde-pi-rc.xml`
-
-ile dosya acilir ve `Keybindings for running applications` bolumune
-gidilir orada her kisayol icin bir `<keybind>.. </keybind>` bolumu
-var, bizi ilgilendiren tanima gidip onu silebiliriz. RPi tekrar
-baslatilir ve degisim devreye girmis olur.
+bir sonraki başlatımda sadece konsol bazlı bir RPi işliyor olacaktır.
+Eğer RPi sadece otomatik kontrol ya da servis bazlı amaçlar için
+kullanılıyorsa, bellek sarfiyetini azaltma bakımından bu seçim faydalı
+olur.
 
 ### Taşınabilir RPi
 
@@ -136,33 +135,18 @@ olarak herhangi bir taşınabilir pil, powerbank, RPi işletebiliyor. Pi
 Pi çok rahat şekilde (Ubuntu olduğu için) her türlü harici diske
 erisebilir. Kablosuz klavye ile RPi'ye bağlanabiliyoruz, bu durumda
 neredeyse dizüstü bilgisayara eşdeğer bir sistem elde edebilmiş
-oluruz. 
+oluruz.
 
-Eğer ufak monitörlerle uğraşılmak istenmezse bir seçenek RPi üzerinde
-masaüstü paylaşımı VNC programını aktif hale getirmek, ve bu servise
-mesela bir Android VNC istemci (client) ile bağlanmak. Böylece tüm
-masaüstünü Android üzerinden görebiliriz. `Pi | Preferences | RPi Configuration | Interfaces`
-menüsünden VNC aktif yapılır, Android üzerinde VNC (RealVNC) programı
-kurulur. Bu programa kullanıcı / şifre gerekli, realvnc.com adresinde
-üye olunur, ve istemciye girildiğinde + işareti ile yeni bir IP
-adresi eklenir. Direk İP ile bağlanmak en iyisi.
+Mobil sistem şöyle olabilir demek ki, Android Hotstpot ile İnternet
+bağlantısını paylaşır, bunu yaparken DHCP üzerinden IP adresi de
+yaratmaktadır, bu adresi `ifconfig -a` ile bulup (192.168.x.x gibi
+olur çoğunlukla) ona ya SSH ile bağlanabiliriz. Powerbank ile RPi
+isletilebilir, bundan bahsettik, zaten telefonun pili de benzer
+sekilde doldurulabilmektedir.
 
-Mobil sistem şöyle olabilir demek ki, Android Hotstpot ile İnternet bağlantısını
-paylaşır, bunu yaparken DHCP üzerinden İP adresi de yaratmaktadır,
-bu adresi `ifconfig -a` ile bulup (192.168.x.x gibi olur çoğunlukla)
-ona ya SSH ya da VNC ile bağlanabiliriz. Powerbank ile RPi isletilebilir,
-bundan bahsettik, zaten telefonun pili de benzer sekilde doldurulabilmektedir.
-
-Eğer tüm VNC masaüstü ekranda görülmüyorsa RPi düşük çözünürlükle
-açılış yapmış olabilir, `/boot/config.txt` içinde
-
-```
-framebuffer_width=1280
-framebuffer_height=720
-```
-
-satırlarını aktif yaparsak RPi başlayınca belli bir çözünürlüğü
-zorlamış oluruz.
+Android uzerinde Termux `ssh` var ise, ve bir X-Server programi [6]
+isliyorsa, Termux'tan `ssh -X` ile RPi'a baglaninca gorsel X
+programlari Android uzerinde gorebiliriz.
 
 
 ### Donanım Programcılığı
@@ -244,7 +228,6 @@ gpio readall
 
 faydalı olabilir.
 
-
 Kaynaklar
 
 [1] https://www.raspberrypi.org/documentation/installation/noobs.md
@@ -257,4 +240,5 @@ Kaynaklar
 
 [5] https://www.thedigitalpictureframe.com/ultimate-guide-systemd-autostart-scripts-raspberry-pi/
 
-[6] 
+[6] https://play.google.com/store/apps/details?id=x.org.server&hl=en_GB
+

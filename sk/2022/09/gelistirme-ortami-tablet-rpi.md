@@ -1,14 +1,15 @@
 # Android, Raspberry Pi Geliştirme Ortamı
 
 Rahat taşınabilir geliştirme ortamı için Bluetooth klavye, Android
-Tablet, SSH, RPi üzerinde Ubuntu olabilir. Çoğu işi editör'de metin
+Tablet, SSH, RPi üzerinde Ubuntu olabilir. Çoğu işi editörde metin
 girerek kodlama yapıyorsak (görsel çıktılar RPi mikro web servisi
-üzerinden alınabilir) bu işler. Powerbank RPi çalıştırır. Tablet ile
-Android üzerinde yazıyoruz, Android hotspot üzerinden Raspberry'ye
-DHCP IP adresi verdiriyoruz (192.168.43.x gibi bir adres bunu
-`ifconfig -a` ile RPi uzerinden ögrenebiliriz, ve RPi üzerinde WiFi
-aktif hale getirmek lazım). Ardından tablet üzerinden Termux [7] `ssh`
-ile RPi'a bağlanırız. Tüm girdi metin bazlı yapılır. Kuruluş böyle.
+üzerinden, ya da X server ile alınabilir) bu işler. Powerbank RPi
+çalıştırır. Tablet ile Android üzerinde yazıyoruz, Android hotspot
+üzerinden Raspberry'ye DHCP IP adresi verdiriyoruz (192.168.43.x gibi
+bir adres bunu `ifconfig -a` ile RPi uzerinden ögrenebiliriz, RPi
+üzerinde WiFi aktif hale getirmek lazım). Ardından tablet üzerinden
+Termux [7] `ssh` ile RPi'a bağlanırız. Tüm girdi metin bazlı
+yapılır. Kuruluş böyle.
 
 [Resim](tablrpi1.jpg)
 
@@ -28,16 +29,16 @@ için `None` seçiyoruz, böylece Assistant artık çıkmıyor.
 Tuş Değişimi
 
 Control tuşu Trust Bluetooth klavyelerinde rahat erişilen yerde değil,
-Vim, Emacs kullanıcıları bu tuşu çok kullanır, ÇAPS tuşunu CTRL
-yapabiliriz, ek olarak benim tercihim SPACE yanindaki Command yazan
+Vim, Emacs kullanıcıları bu tuşu çok kullanır, CAPS tuşunu CTRL
+yapabiliriz, ek olarak benim tercihim SPACE yanındaki Command yazan
 tuşu Left Alt yapmak. Bunun için Android seviyesinde değişiklik
-lazım. Şu [1] uygulama ile yapılan seçimlere göre web üzerinde bir
-.apk ürettiriliyor (arka planda derleme vs işleri yapılıyor), bu .apk
-indirilip kurulunca (Android uyarılarını dikkate almayız) tus değişimi
-olur.
+lazım. Şu [1] uygulama ile web üzerinde isteğe göre üretilen bir .apk
+bu değişimi yapabiliyor. APK üretimi arka planda derleme ile
+üretiliyor muhakkak, bu .apk indirilip kurulunca (Android uyarılarını
+dikkate almayız) tuş değişimi olur.
 
-Tanımları ilk ekrandan liste bazlı seçebiliriz, bahsettiğim Command
-(ki sisteme Meta Left olarak gözüküyor) Alt Left bağlantısı alttaki
+Web sitede tanımları liste bazlı seçebiliriz, bahsettiğim Command (ki
+sisteme Meta Left olarak gözüküyor) Alt Left bağlantısı yapmak alttaki
 şekilde.
 
 ![](tablrpi2.jpg)
@@ -65,13 +66,13 @@ Host *
 yazılır, artık `ssh` komut satırında 4 dakika hiçbir işlem olmasa bile
 bağlantı koparılmayacaktır.
 
-Note: Alternatif Android SSH programı Juice SSH.
+Not: Alternatif Android SSH programı Juice SSH.
 
 Yerel Ağ Baglantısı
 
 Test ettik, Tablet -> RPi arasındaki bağlantı eğer dış İnternet
 bağlantısı olmasa bile işliyor. DHCP sonuçta yerel ağlarda işleyen bir
-teknolojidir, dış İnternet olmasa da Android Wifi hotspot bir İP
+teknolojidir, dış İnternet olmasa da Android Wifi hotspot bir IP
 adresi (çoğunlukla hep aynı) üretip Raspberry Pi'a
 verecektir. Alternatif arayanlar mesela direk kablo ile USB-USB ile
 bağlantı kurmak isteyenler [3,4,5] yazılarına bakabilir. [3] yazısı

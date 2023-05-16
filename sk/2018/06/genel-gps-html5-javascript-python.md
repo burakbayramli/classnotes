@@ -243,7 +243,7 @@ girilince sonuçlar listeleniyor.
 
 Script üzerinden bu bilgiyi nasıl çekeriz? Site URL parametresi olarak
 girdi kabul ediyor, eğer sonuçlardan ilkini çekip çıkartabilirek onu
-kordinat sonucu olarak alabiliriz. Mesela Ağrı Dağları icin
+kordinat sonucu olarak alabiliriz. Mesela Ağrı Dağları için
 
 http://www.geonames.org/search.html?q=Agri+Mountain&country=TR
 
@@ -283,7 +283,7 @@ olarak çıkacak. İlk değer bir statü değeri, eğer veri işlemede problem
 
 Geocoder
 
-Eğer üstteki yaklaşım fazla çetrefil gibi gözüküyorsa, `geoçoder` adlı
+Eğer üstteki yaklaşım fazla çetrefil gibi gözüküyorsa, `geocoder` adlı
 bir paket var,
 
 ```python
@@ -335,12 +335,12 @@ canvas.bind("<Button-1>", callback)
 tkinter.mainloop()
 ```
 
-Gerekli paketi kurmak için `sudo apt ınstall python3-tk` yeterli.
+Gerekli paketi kurmak için `sudo apt install python3-tk` yeterli.
 
 Tabii nihai kordinatlar için ek bir adım daha gerekli, piksel
 değerlerini alıp enlem, boylama çevirmek; bu hesap için enlem
 boylamını bildiğimiz iki piksel değeri yeterli. Alttaki gibi bir kodla
-bu transformasyon yapılabilir. Referans iki kordiate değeri `refc`,
+bu transformasyon yapılabilir. Referans iki kordinat değeri `refc`,
 ona tekabül eden iki piksel x,y değeri `refp` içinde, ve toplanan
 tüm piksel değerleri bir liste olarak `clicks` içinde.
 
