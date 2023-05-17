@@ -83,7 +83,7 @@ Tum veri icin http://download.geofabrik.de
 
 Bu dosya acilir, simdi dosya uzerinde
 
-````
+```
 osrm-extract turkey-latest.osm
 ```
 

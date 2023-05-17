@@ -462,26 +462,26 @@ Yol üstteki haritada gösteriliyor. Kısa bir yol. Google yol tarifi
 algoritmasinin bulduğu sonuç [şurada](osm2.jpg). İkisi de kullanışlı
 duruyor. 
 
-Üstteki teknolojiler, tasarım seçimleri sayesinde açık kaynak verisi
-OSM ile hızlı bir şekilde ürettiğimiz SQL tabanı ve `diskdict` sözlüğü
-ile direk disk bazlı hızlı kısa yol hesabı yapabiliyoruz. İşin en iyi
-tarafı Djikstra kısa yol algoritmasi üzerinde hiçbir değişiklik
+Gösterilen teknolojiler, tasarım seçimleri sayesinde açık kaynak
+verisi OSM ile hızlı bir şekilde ürettiğimiz SQL tabanı ve `diskdict`
+sözlüğü ile direk disk bazlı hızlı kısa yol hesabı yapabiliyoruz. İşin
+en iyi tarafı Djikstra kısa yol algoritması üzerinde hiçbir değişiklik
 yapmadan onu olduğu gibi işletebilmemiz, çünkü onun farzettiği sözlük
 yapısına uygun bir kod sağladık ve algoritma direk çalıştı. Kodlar az
 hafıza gerektiriyor çünkü veri erişimini çoğu yerde noktasal atış,
 direk kimlik bazlı erişime indirgedik. Üstteki tabanları daha büyük
 haritalar üzerine işletince çıktının çok yer tutmadığını görebiliriz,
 mesela TR için `diskdict` tabanı 300 MB'dan daha az. Ayrıca erişim
-disk bazlı olduğu için tüm taban hafızaya taşınmayacak, gerekli yerlerine
-erişim yapılacak.
+disk bazlı olduğu için tüm taban hafızaya taşınmayacak, gerekli
+yerlerine erişim yapılacak.
 
-Not: Üstteki kod yolu sadece bir düğümler serisi olarak gösterdi;
-nihai bir ürün için yol parça kordinatlarını kenar objelerinin
-kendisinden almak daha iyi olur, bu bilgi `nodes.csv` içinde her kenar
-için mevcut zaten, bir `LİNESTRİNG` olarak belirtiliyor. Bu bilgi veri
-hazırlama evresinde `length` ile beraber `diskdict` içine yazılabilir,
-ya da ayrı bir veri tabanında tutulup `id` ile sorgulanabilir. İşin bu
-kısmını okuyucuya bırakıyoruz.
+Not: Yolu sadece bir düğümler serisi olarak gösterdik; nihai bir ürün
+için yol parça kordinatlarını kenar objelerinin kendisinden almak daha
+iyi olur, bu bilgi `nodes.csv` içinde her kenar için mevcut zaten, bir
+`LINESTRING` olarak belirtiliyor. Bu bilgi veri hazırlama evresinde
+`length` ile beraber `diskdict` içine yazılabilir, ya da ayrı bir veri
+tabanında tutulup `id` ile sorgulanabilir. İşin bu kısmını okuyucuya
+bırakıyoruz.
 
 Kaynaklar
 
