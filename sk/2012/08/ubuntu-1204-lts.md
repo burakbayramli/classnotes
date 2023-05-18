@@ -38,7 +38,9 @@ http://www.pendrivelinux.com/universal-usb-installer-easy-as-1-2-3/
 
 Ozellikler
 
-Acer Aspire uzerinde Ubuntu 12, touchpad uzerinde tek dokunus (tap)  sol fare dugmesi, iki parmak ile dokunus sag fare dugmesi tiklamasi anlamina geliyor.
+Acer Aspire uzerinde Ubuntu 12, touchpad uzerinde tek dokunus (tap)
+sol fare dugmesi, iki parmak ile dokunus sag fare dugmesi tiklamasi
+anlamina geliyor.
 
 Programlar
 

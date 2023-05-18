@@ -1,6 +1,6 @@
 # Meta, Sema ve Postgresql
 
-Tablolar hakkinda sema, meta bilgisi almak istiyorsaniz, ve pg_dump
+Tablolar hakkinda sema, meta bilgisi almak istiyorsaniz, ve `pg_dump`
 komutu problem cikartiyorsa, tablo, kolon, tip bilgisi icin
 
 ```
@@ -8,10 +8,10 @@ select column_name,udt_name from information_schema.columns where table_name = '
   order by ordinal_position
 ```
 
-gibi bir sorgu gerekli bilgiyi alir. Siralamayi ordinal_position
+gibi bir sorgu gerekli bilgiyi alir. Siralamayi `ordinal_position`
 uzerinden yapmamiz iyi olur, cunku bu siralama o tablo uzerinde
-"select *" islettigimizde kolonlarin gelecegi sira. Tabandan veri
-cekerken genellikle (basitlik amaciyla) select * kullanildigi icin
+`select *` islettigimizde kolonlarin gelecegi sira. Tabandan veri
+cekerken genellikle (basitlik amaciyla) `select *` kullanildigi icin
 semanin da ayni siralamaya uyacak sekilde alinmasi iyi olur.
 
 Not: information_schema.columns uzerinde baska ilginc kolonlar da var.
