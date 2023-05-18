@@ -21,10 +21,17 @@ paketler /usr/local/lib/python2.7/dist-packages gibi yerlere
 kurulur. İşte çakışma, potansiyel problemler burada ortaya çıkar.
 
 Sanal ortam ile belli izole dizinler altında, ayrı python'u ayrı
-paketleri olan sanal ortamlar yaratabiliriz. Mesela bir Python 2
-ortamı yaratalım,
+paketleri olan sanal ortamlar yaratabiliriz.
 
+```
+sudo apt install python3-virtualenv
+```
+
+kurduktan sonra mesela bir Python 2 ortamı yaratalım,
+
+```
 virtualenv -p /usr/bin/python2 py2a
+```
 
 Sonuc
 
@@ -35,7 +42,7 @@ Also creating executable in /home/burak/py2a/bin/python
 Installing setuptools, pip, wheel...done.
 ```
 
-Simdi ls ile dizine bakalım, bir py2a alt dizini göreceğiz. Simdi
+Şimdi `ls` ile dizine bakalım, bir py2a alt dizini göreceğiz. Şimdi
 
 ```
 source py2a/bin/activate

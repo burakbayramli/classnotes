@@ -79,12 +79,13 @@ yazısında olduğu gibi önce verilen kordinatlara en yakın OSM noktası
 bulunmalı, ve oradan sonra düğüm, kenar, sonraki düğüm vs diye yol
 arama algoritması işleyebilir.
 
-Fakat "en yakın nokta bulmak" performans açısından o kadar kolay bir
-iş değil; örnek olarak burada ufak veri kullandık ama mesela TR
-boyutunda bir haritada milyonlarca nokta ve onların arasında
-bağlantılar olacaktır. Milyonlarca satır içinden en yakın olanını
-bulmak eğer tüm verilere teker teker bakılıyorsa uzun sürebilir. Bize
-bir tür indeksleme (indexing) mekanizması gerekiyor.
+Fakat bir liste içinden bir noktaya en yakın veri noktasını bulmak
+performans açısından o kadar kolay bir iş değil; örnek olarak burada
+ufak veri kullandık ama mesela TR boyutunda bir haritada milyonlarca
+nokta ve onların arasında bağlantılar olacaktır. Milyonlarca satır
+içinden en yakın olanını bulmak eğer tüm verilere teker teker
+bakılıyorsa uzun sürebilir. Bize bir tür indeksleme (indexing)
+mekanizması gerekiyor.
 
 İlk akla gelebilecek çözümler QuadTree, KDTree gibi seçenekler, fakat
 bu çözümlerin çoğu bellek bazlı işler; etrafta bulunabilecek mevcut
@@ -482,6 +483,18 @@ iyi olur, bu bilgi `nodes.csv` içinde her kenar için mevcut zaten, bir
 `length` ile beraber `diskdict` içine yazılabilir, ya da ayrı bir veri
 tabanında tutulup `id` ile sorgulanabilir. İşin bu kısmını okuyucuya
 bırakıyoruz.
+
+Not: Mesafe hesabı olarak `cdist` kullanımı var, bu hesap bilindiği
+gibi Öklitsel mesafe hesaplar, yani $\sqrt{\Delta x^2 - \Delta y^2}$.
+Muhakkak enlem, boylam açısal değerlerdir, tam anlamıyla iki boyutlu
+bir düzlem üzerindeki x,y değerleri değillerdir, fakat kısa
+mesafelerde, aynen boylam=x ve enlem=y deyip kabaca bir grafikleme
+yapabildiğimiz gibi, burada da sınırlı bir alan içinde benzer bir
+yaklaşıksal hesap yapabiliyoruz. Ayrıca dikkat, hiçbir yerde `cdist`
+sonucunu gerçek bir mesafe ile karşılaştırmıyoruz, "acaba 10 km'den
+küçük mü büyük mü" gibi, onu sadece belli bir liste içindeki
+noktalardan en yakınını bulmak için kullandık. 
+
 
 Kaynaklar
 
