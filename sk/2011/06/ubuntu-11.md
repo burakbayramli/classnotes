@@ -1,38 +1,59 @@
 # Ubuntu 11
 
-Ubuntu 11 versiyonunu kurduk, bazi notlar:11.10Her Ubuntu surumunde
-masaustu biraz daha degisiyor. 11.04 ve 11.10 arasinda bazi farklar
-var, once 10'dan bahsedelim, sonra 04 okunabilir. Oncelikle kubuntu
-ortami 04'ten farkli, ve artik bizim kullanabilecegimiz bir halde
-degil. Onun yerine Gnome masaustu kullaniyoruz.sudo apt-get install
-gnome-shellSonra Logout yapilir ve tekrar girmeden once tekerlek
-sembolune tiklanir, ve Gnome secilir.Emacs ile Alt-Space cok
-kullaniyoruz, ama Gnome'da bu kapilmis, iptal etmek icin System Tools
-| System Settings | Keyboard. Oradan Keyboard, Shortcuts,
-Windows. Activate the window menu secenegi Alt-Space
-tanimlamis. Uzerine iki tiklayin, ve alakasiz baska bir tuslama
-tanimlayin (backspace ile disable etmek ise yaramiyor).Sonrasudo
-apt-get install gnome-tweak-toolgnome-tweak-toolBu program ile cop
-sepeti, vs. gibi seyleri geri alabilirsiniz. "Have File Manager Handle
-Desktop" On yapilmali. 11.04Bu versiyon kurulus sirasinda masaustu
-(desktop) secenegi sunmuyor. Kurulum bittikten sonra ilk yuklenen
-desktop, asiri buyuk dugmelerle, habire animasyon yapan Windows
-Vista'ya benzer acaip bir ortam.
+Ubuntu 11 versiyonunu kurduk, bazi notlar:
 
-Buradan hemen kurtulmak icin soldaki program ikonlari (toolbar) icinde
-+ isaretinden uygulamalara girilir, oradan "Ubuntu Software Center"
-bulunur, ve center icinde "kubuntu-desktop" yazilir. Bu paket
-Internet'ten indirilecek, ve kurulacak. Sonra classic desktop secerek
-basit, sade bir desktop ortamina kavusabilirsiniz.Tex / Latex
-icintetex-.. paketleri degil alttaki kullanilmalisudo apt-get install
-texliveUbuntu 11 Emacs 23'u destekliyor, apt-get ile 22 alinamiyor,
-apt-get ile 23 gelecek,sudo apt-get install emacsEmacs uzerindeki
-preview-latex programini tekrar kurarken sunlari kullandiksudo apt-get
-install emacs-extra emacs-goodies-el preview-latex dvipng.emacs
-icindeki tanimlar su hale geldi:
+11.10
 
+Her Ubuntu sürümünde masaüstü biraz daha değişiyor. 11.04 ve 11.10
+arasında bazı farklar var, önce 10'dan bahsedelim, sonra 04
+okunabilir. Öncelikle kubuntu ortamı 04'ten farklı, ve artık bizim
+kullanabileceğimiz bir halde değil. Onun yerine Gnome masaüstü
+kullanıyoruz.sudo apt-get ınstall gnome-shellSonra Logout yapılır ve
+tekrar girmeden önce tekerlek sembölüne tiklanır, ve Gnome
+seçilir.Emacs ıle Alt-Space çok kullanıyoruz, ama Gnome'da bu
+kapılmış, iptal etmek için System Tools | System Settings |
+Keyboard. Oradan Keyboard, Shortçüts, Windows. Activate the window
+menü seçeneği Alt-Space tanımlamış. Üzerine iki tıklayın, ve alakasız
+başka bir tüslama tanımlayın (backspace ile dışable etmek ise
+yaramıyor). Sonra
+
+```
+sudo apt-get install gnome-tweak-toolgnome-tweak-tool
+```
+
+Bu program ile çöp sepeti, vs. gibi şeyleri geri alabilirsiniz. "Have
+File Manager Handle Desktop" On yapılmalı. 11.04Bu versiyon kuruluş
+sırasında masaüstü (desktop) seçeneği sunmuyor. Kurulum bittikten
+sonra ilk yüklenen desktop, aşırı büyük düğmelerle, habire animasyon
+yapan Windows Vista'ya benzer acaip bir ortam.
+
+Buradan hemen kurtulmak için soldaki program ikonları (toolbar) içinde +
+işaretinden uygulamalara girilir, oradan "Ubuntu Software Center"
+bulunur, ve center içinde "kubuntu-desktop" yazılır. Bu paket
+İnternet'ten indirilecek, ve kurulacak. Sonra claşsiç desktop seçerek
+basit, sade bir desktop ortamına kavuşabilirsiniz.Tex / Latex için
+tetex-.. paketleri değil alttaki kullanılmalı
+
+```
+sudo apt-get install texlive
+```
+
+Ubuntu 11 Emacs 23'u destekliyor, apt-get ile 22 alinamiyor, apt-get
+ile 23 gelecek, `sudo apt-get install emacs`
+
+Emacs uzerindeki preview-latex programini tekrar kurarken sunlari
+kullandik
+
+```
+sudo apt-get install emacs-extra emacs-goodies-el preview-latex
+```
+
+dvipng.emacs icindeki tanimlar su hale geldi:
+
+```
 (custom-set-variables..'(preview-scale-function
 1.2)'(preview-image-type (quote dvipng))..)
+```
 
 Eger bunlara ragmen islemediyse, Auctex (preview-latex paketi artik bu
 isimde) paketini kaynak olarak indirin, ve configure, make, sudo make
@@ -41,21 +62,37 @@ yazin ve hersey guzelce islemeye baslayacak.OpenCV 2.0Ubuntu paketleri
 icinde OpenCV 2.1 icin destek var. Kurmak icin apt-get install
 python-opencv. Bu gerekli ek paketleri indirip kuracaktir. Eger
 webcam'e erisilemiyorsa, gstreamer-properties programindan WebCam
-ismini direk secmek gerekebilir.Chat IkonuSag ust kosede bir mektup
-zarfi ve balon sekillerinde gereksiz iki ikon var. Bunlar silmek
-uzerine tiklayarak mumkun olmadi. Suraya gore apt-get kullanmak
-lazim:sudo apt-get remove indicator-me
-indicator-messagesMatplotlibshow() komutu en son kurulumda problem
-cikardi. Cizim yaptirilan arka plandaki motorun (backend) secilmesi
-gerekiyor. WX iyi bir secenek, kurmak icin
+ismini direk secmek gerekebilir.
 
-sudo apt-get install wxgtk2.8Matplotlib'in bundan haberdar olmasi icin
+Chat Ikonu
 
-sudo gedit
+Sag ust kosede bir mektup zarfi ve balon sekillerinde gereksiz iki
+ikon var. Bunlar silmek uzerine tiklayarak mumkun olmadi. Suraya gore
+apt-get kullanmak lazim:
 
-/usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/matplotlibrcDosyadabackend
-: WXAggyazilmasi yeterli. Bu satir buyuk bir ihtimalle sadece Agg
-iceriyor olacakti.
+sudo apt-get remove indicator-me indicator-messages
+
+Matplotlib
+
+show() komutu en son kurulumda problem cikardi. Cizim yaptirilan arka
+plandaki motorun (backend) secilmesi gerekiyor. WX iyi bir secenek,
+kurmak icin
+
+```
+sudo apt-get install wxgtk2.8
+```
+
+Matplotlib'in bundan haberdar olmasi icin `sudo gedit /usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/matplotlibrc`
+
+
+Dosyada
+
+```
+backend : WXAgg
+```
+
+yazilmasi yeterli. Bu satir buyuk bir ihtimalle sadece `Agg` iceriyor
+olacakti.
 
 Animasyonlar
 
@@ -64,11 +101,13 @@ durdurmak istiyorsaksudo apt-get install
 compizconfig-settings-managerSonra menuden System | Settings | Compbiz
 Settings Manager secilir ve "Effects" bolumunde Effects icin secim
 kutusu iptal edilir.Torsudo apt-get install tor tor-geoipdbsudo
-apt-get install privoxyile kurulur. Privoxy ayari icin sudo gedit
-/etc/privoxy/config ile dosyayi edit edin, ve icerik
+apt-get install privoxyile kurulur. Privoxy ayari icin `sudo gedit
+/etc/privoxy/config` ile dosyayi edit edin, ve icerik
 olarak
 
+```
 forward-socks4a / localhost:9050 .
+```
 
 Firefox 4 uzerinde TorButton icin
 

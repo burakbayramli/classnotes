@@ -23,11 +23,18 @@ Caps Control Yapmak
 
 .bashrc icinde
 
+```
 setxkbmap -option ctrl:nocaps
+```
 
 Bazi tuslari sol ve sag fare tiklamasi yapmak icin
 
-xmodmap -e "keycode 133 = Pointer_Button1"xmodmap -e "keycode 108 = Pointer_Button1"xmodmap -e "keycode 135 = Pointer_Button3"xkbset m
+```nd
+xmodmap -e "keycode 133 = Pointer_Button1"
+xmodmap -e "keycode 108 = Pointer_Button1"
+xmodmap -e "keycode 135 = Pointer_Button3"
+xkbset m
+```
 
 ustteki iki blok kodu bir sh dosyasi icine yazip .bashrc icinden de
 cagirabilirsiniz. Eger farkli tuslar kullanmak istenilirse xev ile bu
@@ -47,21 +54,38 @@ cikmaz.
 
 Baslangic Davul Sesini Yokedin
 
+```
 sudo rm /usr/share/sounds/ubuntu/stereo/system-ready.ogg
+```
 
 Balon tavsiyelerini yoketmek icin
 
+```
 sudo mv /usr/share/dbus-1/services/org.freedesktop.Notifications.service
  
 /usr/share/dbus-1/services/org.freedesktop.Notifications.service.disabled  
+```
 
-Uyuma (sleep) ve tekrar geri gelme sonrasi (resume) eger Wifi / network baglanmiyorsa,
+Uyuma (sleep) ve tekrar geri gelme sonrasi (resume) eger Wifi /
+network baglanmiyorsa,
 
-sudo touch /etc/pm/sleep.d/wakenet.shsudo chmod +x /etc/pm/sleep.d/wakenet.shsudo gedit -H /etc/pm/sleep.d/wakenet.sh 
+```
+sudo touch /etc/pm/sleep.d/wakenet.shsudo chmod +x /etc/pm/sleep.d/wakenet.shsudo gedit -H /etc/pm/sleep.d/wakenet.sh
+```
 
 Dosya icine
 
-#!/bin/bashcase "$1" inthaw|resume)nmcli nm sleep false;;*);;esacexit $?
+```
+#!/bin/bash
+
+case "$1" in
+
+    thaw|resume)
+      nmcli nm sleep false;;*);;
+  esac
+
+exit $?
+```
 
 Sag ust kosedeki kisayollar
 
@@ -75,11 +99,3 @@ Bir sistem hatasi ciktiginda surekli "sorry ubuntu has experienced
 internal error ..." gibi bir diyalog kutusu ekrana geliyor. Bunu iptal
 etmek icin sudo gedit /etc/default/apport ile ayar dosyasina girin
 ve enabled=0 haline getirin, bilgisayari tekrar baslatin.
-
-Yaziya ekler olacak
-
-
-
-
-
-
