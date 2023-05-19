@@ -11,7 +11,7 @@ def kare(dummy, a):    return a*a
 
 Bu fonksiyonu
 
-```
+```python
 kare("filan", 3)
 ```
 
@@ -26,8 +26,9 @@ edelim).
 Bu kod uzerinde onbelleklemeyi eski usulle yapsaydik, kod suna
 benzerdi:
 
-```
-cache = {}def kare(dummy, a):
+```python
+cache = {}
+def kare(dummy, a):
     if not a in cache: cache[a] = a*a
     return cache[a]
 ```
@@ -49,7 +50,7 @@ verebilir. Sözdizim açısından da temiz dururlar, çünkü dekoratör
 fonksiyon üzerinde '@' ile tanımlanan bir şeydir, başka bir eke
 ihtiyaç yoktur. O zaman (önce dekoratörün kendisi)
 
-```
+```python
 def cache(function):  memo = {}
   def wrapper(*args):
     if args[1] in memo:
@@ -67,7 +68,9 @@ mesela, sadece bir kere yazılır zaten, ve kullanılması gerektiği zaman
 şu ibare yeterlidir,
 
 ```
-@cachedef kare(dummy, a):    return a*a
+@cache
+def kare(dummy, a):
+   return a*a
 ```
 
 Görüldüğü gibi gayet temiz. Onbellek kodu hiç etrafta gözükmüyor, bu
@@ -84,7 +87,7 @@ Koda Ekler Enjekte Etmek
 
 Diyelim ki mevcut bir kod parcasi var,
 
-```
+```python
 import randomclass Foo:
     def f(self,x):
         x = random.random()
@@ -99,7 +102,7 @@ ederek bunu yapabiliriz, fakat mevcut fonksiyon koduna dokunmak
 istemediğimiz için metot üstünde @birdekoratör gibi bir kullanım
 yapamayız. Bu durumda başka bir seçenek sudur,
 
-```
+```python
 def decorated_f(fn):
     def new_f(*args, **kwargs):
         res = fn(*args, **kwargs)
@@ -111,7 +114,7 @@ Foo.f = decorated_f(Foo.f)
 
 Simdi
 
-```
+```python
 print "o", o.f(0)
 print "was", o.was
 ```

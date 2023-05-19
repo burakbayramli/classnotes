@@ -29,7 +29,3 @@ sorgularında kullanılmayan kolonlar, yarıda kesilmiş Resultset
 döngülerini raporlamak için: useUsageAdvisor=true Bir Theserverside
 yazısından alınmıştır.
 
-
-
-
-
