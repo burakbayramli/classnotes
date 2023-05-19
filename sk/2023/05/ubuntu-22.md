@@ -9,7 +9,7 @@ http://releases.ubuntu.com/22.04/
 Üstteki adresten 64-bit iso ya da iso için torrent indirilir, iso'yu
 USB flash disk'e "yakmak" için [3]. Bios'a bilgisayar başlarken F2'yi
 basılı tutarak girebiliriz, girdikten sonra başlangıç şeklini "Legacy
-Mode" haline getirmek lazım, ve USB diski yükleme sırasında en üste
+Mode" haline getirmek gerekli, ve USB diski yükleme sırasında en üste
 getirmek lazım. F10 ile kaydedilir, tekrar başlatılır ve Ubuntu
 kurulur.
 

@@ -8,13 +8,18 @@ Her Ubuntu sürümünde masaüstü biraz daha değişiyor. 11.04 ve 11.10
 arasında bazı farklar var, önce 10'dan bahsedelim, sonra 04
 okunabilir. Öncelikle kubuntu ortamı 04'ten farklı, ve artık bizim
 kullanabileceğimiz bir halde değil. Onun yerine Gnome masaüstü
-kullanıyoruz.sudo apt-get ınstall gnome-shellSonra Logout yapılır ve
-tekrar girmeden önce tekerlek sembölüne tiklanır, ve Gnome
-seçilir.Emacs ıle Alt-Space çok kullanıyoruz, ama Gnome'da bu
-kapılmış, iptal etmek için System Tools | System Settings |
-Keyboard. Oradan Keyboard, Shortçüts, Windows. Activate the window
+kullanıyoruz.
+
+```
+sudo apt-get install gnome-shell
+```
+
+Sonra Logout yapılır ve tekrar girmeden önce tekerlek sembolüne
+tiklanır, ve Gnome seçilir. Emacs ile Alt-Space çok kullanıyoruz, ama
+Gnome'da bu kapılmış, iptal etmek için System Tools | System Settings
+| Keyboard. Oradan Keyboard, Shortcuts, Windows. Activate the window
 menü seçeneği Alt-Space tanımlamış. Üzerine iki tıklayın, ve alakasız
-başka bir tüslama tanımlayın (backspace ile dışable etmek ise
+başka bir tuşlama tanımlayın (backspace ile disable etmek ise
 yaramıyor). Sonra
 
 ```
@@ -22,10 +27,14 @@ sudo apt-get install gnome-tweak-toolgnome-tweak-tool
 ```
 
 Bu program ile çöp sepeti, vs. gibi şeyleri geri alabilirsiniz. "Have
-File Manager Handle Desktop" On yapılmalı. 11.04Bu versiyon kuruluş
-sırasında masaüstü (desktop) seçeneği sunmuyor. Kurulum bittikten
-sonra ilk yüklenen desktop, aşırı büyük düğmelerle, habire animasyon
-yapan Windows Vista'ya benzer acaip bir ortam.
+File Manager Handle Desktop" On yapılmalı.
+
+11.04
+
+Bu versiyon kuruluş sırasında masaüstü (desktop) seçeneği
+sunmuyor. Kurulum bittikten sonra ilk yüklenen desktop, aşırı büyük
+düğmelerle, habire animasyon yapan Windows Vista'ya benzer acaip bir
+ortam.
 
 Buradan hemen kurtulmak için soldaki program ikonları (toolbar) içinde +
 işaretinden uygulamalara girilir, oradan "Ubuntu Software Center"
@@ -41,8 +50,8 @@ sudo apt-get install texlive
 Ubuntu 11 Emacs 23'u destekliyor, apt-get ile 22 alinamiyor, apt-get
 ile 23 gelecek, `sudo apt-get install emacs`
 
-Emacs uzerindeki preview-latex programini tekrar kurarken sunlari
-kullandik
+Emacs üzerindeki `preview-latex` programını tekrar kurarken şunları
+kullandık
 
 ```
 sudo apt-get install emacs-extra emacs-goodies-el preview-latex
@@ -66,15 +75,15 @@ ismini direk secmek gerekebilir.
 
 Chat Ikonu
 
-Sag ust kosede bir mektup zarfi ve balon sekillerinde gereksiz iki
-ikon var. Bunlar silmek uzerine tiklayarak mumkun olmadi. Suraya gore
-apt-get kullanmak lazim:
+Sağ üst köşede bir mektup zarfı ve balon şekillerinde gereksiz iki
+ikon var. Bunlar silmek üzerine tıklayarak mümkün olmadı. Şuraya göre
+apt-get kullanmak lazım:
 
 sudo apt-get remove indicator-me indicator-messages
 
 Matplotlib
 
-show() komutu en son kurulumda problem cikardi. Cizim yaptirilan arka
+`show()` komutu en son kurulumda problem cikardi. Cizim yaptirilan arka
 plandaki motorun (backend) secilmesi gerekiyor. WX iyi bir secenek,
 kurmak icin
 
@@ -113,30 +122,30 @@ Firefox 4 uzerinde TorButton icin
 
 https://www.torproject.org/torbutton/Install Alpha baglantisindan xpi
 
-dosyasi isletilebilir. YouTube video'larini ve flash icerik gorebilmek
-icin eklenti kurulduktan sonra Firefox sol ustte Tor statusunu
-gosteren bir isaret cikacak. Bu isaret uzerinde mouse sag dugme click
-yaparak "preferences" secenegine girin. Security Preferences tab'inden
-"disable plugins during Tor usage" secenegini de-aktive edin.Simdi
-kirmizi xarpi isareti uzerine tiklayin, bu isaret yesile donusecek. Bu
-kadar. Artik istediginiz siteye baglanabilirsiniz.Alt-TabMasaustu
-uzerinde klavye kisayolu kullanarak programlar arasinda gecis yapmak,
-Ubuntu 11 olagan ayarlarinda ayvayi yemis.
+dosyası işletilebilir. YouTube video'larını ve flash içerik görebilmek
+için eklenti kurulduktan sonra Firefox sol üstte Tor statüsünü
+gösteren bir işaret çıkacak. Bu işaret üzerinde mouse sağ düğme click
+yaparak "preferences" seçeneğine girin. Security Preferences tab'inden
+"dışable plugins during Tor uşage" seçeneğini de-aktıve edin.Şimdi
+kırmızı xarpi işareti üzerine tıklayın, bu işaret yeşile dönüşecek. Bu
+kadar. Artık istediğiniz siteye bağlanabilirsiniz.Alt-TabMasaüstü
+üzerinde klavye kısayolu kullanarak programlar arasında geçiş yapmak,
+Ubuntu 11 olağan ayarlarında ayvayı yemiş.
 
-Genelde en son kullanilan ilk geri gelir kurali islemiyor. Duzeltmek
-icin Sytem | Preferences | CompizConfig Settings Manager uzerinde
-Window Management secilir ve Static Application Switcher yerine
-Application Manager secilir.Ses EfektleriEger konsol icine mesela
-gidilemeyecek durumda bile backspace yapilinca cikan bip, tan, tun
+Genelde en son kullanılan ilk geri gelir kuralı işlemiyor. Düzeltmek
+için Sytem | Preferences | CompizConfig Settings Manager üzerinde
+Window Management seçilir ve Static Application Switcher yerine
+Application Manager seçilir.Ses EfektleriEger konsol içine mesela
+gidilemeyecek durumda bile backspace yapılınca çıkan bip, tan, tun
 seslerini kapatmak istiyorsak System Tools | System Settings, oradan
-Sound ve Sound Effects. Bir ses kontrol ayari var, onun yaninda Mute
-secilirse artik uyarici sesleri cikmaz.SifreEger kullanicinizin
-sifresini kisa yapmak isterseniz, passwd uzerinden gireceginiz sifre
-Ubuntu tarafindan begenilmeyebilir (kisa, cetrefil olmayan sifreyi
-guvensiz buluyor). Ama illa ki kisa / basit bir sifre vermek
-isterseniz, o zaman "sudo passwd [kullanici isminiz]" ile istediginiz
-sifreyi verebilirsiniz. Kendiniz super kullanici olmaniza ragmen sudo
-uzerinden tekrar kendi kullanicinizi referans etmeniz garip olabilir,
-ama kisa sifre bu sekilde memnun oluyor.
+Sound ve Sound Effects. Bir ses kontrol ayarı var, onun yaninda Müte
+seçilirse artık uyarıcı sesleri çıkmaz.ŞifreEğer kullanıcınızın
+şifresini kısa yapmak isterseniz, passwd üzerinden gireceğiniz şifre
+Ubuntu tarafından beğenilmeyebilir (kısa, çetrefil olmayan şifreyi
+güvensiz buluyor). Ama illa ki kısa / basit bir şifre vermek
+isterseniz, o zaman "sudo passwd [kullanıcı isminiz]" ile istediğiniz
+şifreyi verebilirsiniz. Kendiniz süper kullanıcı olmanıza rağmen sudo
+üzerinden tekrar kendi kullanıcınızı referans etmeniz garip olabilir,
+ama kısa şifre bu şekilde memnun oluyor.
 
 
