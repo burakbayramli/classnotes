@@ -7,12 +7,12 @@ deneyelim. Amacımız numpy, scipy, emacs ve flask gibi programları,
 paketleri işletebilmek olacak.
 
 Termux'un Android üzerinde işlemediği hakkında bazı şikayetler var,
-bunlar Android versiyon 12 için. Bizim kullandığımız versiyonların
-hepsi 10 ve altında, bu sürümler için Termux problem çıkartmamalı,
-problem varsa erişilemeyen dosya servisi problemi olabilir, tekrar
-denemek problemi çözebilir, ya da gerektiği yerde `LDFLAGS` kullanımı
-(altta), ve python paketleri sıfırdan derlemek yerine mevcut derlenmiş
-programları kullanmak seçenek olabilir.
+bunlar Android versiyon 12 için. Fakat yaygın kullanımdaki
+versiyonların çoğunluğu 10 ve altında, bu sürümler için Termux problem
+çıkartmamalı, problem varsa erişilemeyen dosya servisi problemi
+olabilir, tekrar denemek problemi çözebilir, ya da gerektiği yerde
+`LDFLAGS` kullanımı (altta), ve python paketleri sıfırdan derlemek
+yerine mevcut derlenmiş programları kullanmak seçenek olabilir.
 
 ### Kuruluş
 
@@ -71,7 +71,7 @@ geçeriz.
 Alttaki paketler üzerinde `pkg install`.
 
 ```
-python3 openssh build-essential python-numpy emacs libxml2 libxslt cmake freetype binutils
+python3 git openssh build-essential python-numpy emacs libxml2 libxslt cmake freetype binutils
 ```
 
 Bazen kurulum patlayabilir, birkaç deneme problemi çözer. Üsttekiler
@@ -163,9 +163,9 @@ alias gp='git push origin master'
 alias ga="git add . "
 ```
 
-Görüldüğü gibi `$HOME/Documents/env3` bir izole Python 3 ortamı var, editör
-başlatmadan önce onu başlatıyoruz, böylece orada kurulmuş tüm paketler
-editör içindeki komutlar tarafından görülebiliyor.
+Görüldüğü gibi `$HOME/Documents/env3` içinde bir izole Python 3 ortamı
+var, editör başlatmadan önce onu başlatıyoruz, böylece orada kurulmuş
+tüm paketler editör içindeki komutlar tarafından görülebiliyor.
 
 Kaynaklar
 

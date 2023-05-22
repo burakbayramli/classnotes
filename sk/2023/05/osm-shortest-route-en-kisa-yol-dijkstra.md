@@ -90,7 +90,7 @@ mekanizması gerekiyor.
 İlk akla gelebilecek çözümler QuadTree, KDTree gibi seçenekler, fakat
 bu çözümlerin çoğu bellek bazlı işler; etrafta bulunabilecek mevcut
 kodlar milyonlarca veri noktasını alıp bir indislenmiş ağaç yapısı
-oluşturabilir ama bunu veri yapısını hafıza tuturak yapar. İdeal
+oluşturabilir ama bunu veri yapısını hafıza tutarak yapar. İdeal
 olarak nokta bulmak, kısa yol hesaplama algoritmasının ufak bilgisayar
 üzerinde işleyebilmesi tercihimiz (bir ağaç yapısını hafızaya diskten
 geri aldığımızda gigabayt seviyesinde olmamalı). Eğer ağır işlem
@@ -460,7 +460,7 @@ m.save("seychelles-route.html")
 ![](osm3.jpg)
 
 Yol üstteki haritada gösteriliyor. Kısa bir yol. Google yol tarifi
-algoritmasinin bulduğu sonuç [şurada](osm2.jpg). İkisi de kullanışlı
+algoritmasının bulduğu sonuç [şurada](osm2.jpg). İkisi de kullanışlı
 duruyor. 
 
 Gösterilen teknolojiler, tasarım seçimleri sayesinde açık kaynak
@@ -513,6 +513,12 @@ Kaynaklar
 [7] <a href="https://burakbayramli.github.io/dersblog/algs/algs_035_dijks/dijkstra_algoritmasi_ile_en_kisa_yol.html">Dijkstra Algoritması ile En Kısa Yol</a>
 
 [8] <a href="https://www.ics.uci.edu/~eppstein/161/python/">University of California Bilgisayar Bilim Kodları</a>
+
+
+
+
+
+
 
 
 

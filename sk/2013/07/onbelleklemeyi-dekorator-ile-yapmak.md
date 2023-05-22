@@ -1,9 +1,37 @@
-# Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek
+# Dekoratörler, Önbellek Kodlaması, Fonksiyon Değiştirmek
 
-Bir fonksiyona ya da kod parçasına önbellek kullanımı eklemek kolaydır
-fakat bu tür ekler kodun okunabilirliğini de azaltabilirler. Mesela
-kare almakla yükümlü bir fonksiyonumuz var diyelim (altta ise yaramaz
-bir değişken dummy ekledik, bazı püf noktaları gösterebilmek için),
+Bir fonksiyonu çağırıyoruz, ona bazı parametreler geçiyoruz, bu
+parametrelerle fonksiyon bir hesap yapıyor, bize sonucu veriyor.
+Mesela verili bir sayıya kadar olan tüm tam sayıları toplayan bir
+fonksiyon olsun,
+
+```python
+def n_topla(N):
+   return np.sum(range(N+1))
+
+n_topla(10)
+```
+
+```text
+Out[1]: 55
+```
+
+Toplam 1,2,3,.. diye 10'a kadar olan sayıları topladı ve döndürdü.
+
+Fakat diyelim ki bu fonksiyon pek çok kez ardı ardına çağrılabiliyor,
+ve çağrıların çoğu benzer parametreleri kullanıyor, mesela `N=10`
+çağrısı pek çok kez yapılabiliyor.. Bu durumda üstteki toplam işlemini
+bir kez yapıp ikinci, üçüncü çağrılarda aynı hesabı döndürsek olmaz
+mı?
+
+### Paket Kullanarak
+
+
+### Kendi Kodumuz İle
+
+Önbellek kullanımını kendi kodumuz ile de ekleyebiliriz. Mesela kare
+almakla yükümlü bir fonksiyonumuz var diyelim (altta ise yaramaz bir
+değişken dummy ekledik, bazı püf noktaları gösterebilmek için),
 
 ```
 def kare(dummy, a):    return a*a

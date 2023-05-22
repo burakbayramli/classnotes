@@ -16,7 +16,7 @@ sırada `recollindex` çağrısı yapıp indeksi güncelliyorum.
 Doküman bulmak için `recoll` GUI'sinde kutuya istenen kelimeler yazılır
 ve sonuçlar altta listelenir.
 
-Komut Satirindan Aramak
+Komut Satırından Aramak
 
 Direk komut satırından arama için `recoll -t` çağrısı ardından anahtar
 kelimeler verilir, ve sonuç listelenebilir. Bu çağrıyı sarmalayan basit bir
