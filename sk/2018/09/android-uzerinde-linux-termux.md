@@ -1,47 +1,48 @@
-# Android Uzerinde Linux - Termux, Samsun J6
+# Android Uzerinde Linux - Termux, Samsung J6
 
 Android işletim sisteminin temeli Linux işletim sistemidir, en azından
 çekirdek seviyesinde bu böyle. Peki madem böyle niye Ubuntu'da, ya da
-diğer Debian bazlı sistemlerde olduğu gibi apt-get, python, ruby,
-komutlari ile ya da Flask gibi uygulamalari kurup, geliştirmeyi direk
-Android telefonu üzerinde yapamıyoruz? Hatta cep telefonları artık
-iyice kuvvetlendi, dizüstü bilgisayarı atsak, sadece cep telefonu
-üzerinde geliştirme yapsak?
+diğer Debian bazlı sistemlerde olduğu gibi `apt-get`, `python`,
+`ruby`, komutlari ile ya da Flask gibi uygulamalari kurup,
+geliştirmeyi direk Android telefonu üzerinde yapamıyoruz? Hatta cep
+telefonları artık iyice kuvvetlendi, dizüstü bilgisayarı atsak, sadece
+cep telefonu üzerinde geliştirme yapsak?
 
 Bunların yapılamamasının sebebi Linux temelli olsa da Android'de her
 şeyi Java bazlı işletebilmek için katman üzerine katman koyarak Linux
-baz sisteminden uzaklaşılmış olması. Fakat bazıları bayağı uğrarak
+baz sisteminden uzaklaşılmış olması. Fakat bazıları bayağı uğraşarak
 Linux temelli geliştirmeyi Android'e taşımışlar. Google Play'den
 indirilebilecek bir uygulama Termux.
 
 Termux'a bir "app" demek basit kaçar aslında, daha çok bir başlangıç
 kabuğu denebilir, Termux bize telefon içinde bir komut satırı verir,
-bu satırda apt install ya da pkg install ile ek uygulamaları Ubuntu'da
-olduğu gibi kurarız. Mesela apt-install python gibi. Termux'u yazanlar
-bir sürü Linux bazlı programı bu şekilde Android için hazır hale
-getirmişler. Liste tüm programları kapsamıyor, ama şaşırtıcı derecede
-faydalı programlar var. C++ icin clang, ya da Tex icin texlive hatta
-emacs! Ben denedim, yeterince buyuk ekran var ise cep telefon üzerinde
-emacs rahatca kullaniliyor. Tabii Samsung bu baglamda DevX sistemi ile
-/ gibi dışarıdan bir Bluetooth klavyesi bağlayıp görüntüyü bir büyük
-ekrana yansıtacak türden kullanım dusunuyor, ki bu tür kullanım başta
-değindiğimiz pür cep telefon bazlı geliştirmedir.
+bu satırda `apt install` ya da `pkg install` ile ek uygulamaları
+Ubuntu'da olduğu gibi kurarız. Mesela apt-install python
+gibi. Termux'u yazanlar bir sürü Linux bazlı programı bu şekilde
+Android için hazır hale getirmişler. Liste tüm programları kapsamıyor,
+ama şaşırtıcı derecede faydalı programlar var. C++ icin clang, ya da
+Tex icin texlive hatta emacs! Ben denedim, yeterince buyuk ekran var
+ise cep telefon üzerinde emacs rahatca kullaniliyor. Tabii Samsung bu
+baglamda DevX sistemi ile / gibi dışarıdan bir Bluetooth klavyesi
+bağlayıp görüntüyü bir büyük ekrana yansıtacak türden kullanım
+dusunuyor, ki bu tür kullanım başta değindiğimiz pür cep telefon bazlı
+geliştirmedir.
 
-Python sistemi daha once bahsedildigi gibi mevcut, pkg install python3
-ardından, pip install virtualenv deriz, ve python3 için bir sanal
-ortam yaratabiliriz. Cep telefonu üzerinde virtualenv'e girmek
-bazılarımızı şaşırtabilir. Fakat işliyor.
+Python sistemı daha önce bahsedildiği gibi mevcut, `pkg install
+python3` ardından, `pip install virtualenv` deriz, ve `python3` için
+bir sanal ortam yaratabiliriz. Cep telefonu üzerinde virtualenv'e
+girmek bazılarımızı şaşırtabilir. Fakat işliyor.
 
 ![](Screenshot_20180924-212304_Termux.jpg)
 ![](https://1.bp.blogspot.com/-1NCOxOn9Sc8/W6k6K1zRZII/AAAAAAAABtU/7UeTrHxFTlArLVr7I_MTOgKDrTglwHcHgCLcBGAs/s400/Screenshot_20180924-212304_Termux.jpg)
 
-Sanal ortama girince burada pip install ile ipython, numpy, scipy
-kurabiliriz. Bazı paketlerde sorun çıkabilir, mesela zmq için bizde
-bir sorun çıktı ki bu sorun jupyter ile de yasanabilir, once pgk
-install libzmq libzmq-dev python-dev libcrypt-dev kurulur. Ardından,
-eğer zmq import edilmesi problem veriyorsa, komut satırına çıkıp ana
-dizinde bir .bash_profile dosyası yaratıp onun içine alttakini
-yazarız,
+Sanal ortama girince burada `pip install` ile `ipython`, `numpy`,
+`scipy` kurabiliriz. Bazı paketlerde sorun çıkabilir, mesela `zmq`
+için bizde bir sorun çıktı ki bu sorun jupyter ile de yasanabilir,
+once `pgk install libzmq libzmq-dev python-dev libcrypt-dev`
+kurulur. Ardından, eğer zmq import edilmesi problem veriyorsa, komut
+satırına çıkıp ana dizinde bir `.bash_profile` dosyası yaratıp onun
+içine alttakini yazarız,
 
 `export LD_PRELOAD=$LD_PRELOAD:"/data/data/com.termux/files/usr/lib/libzmq.so"`
 
@@ -58,7 +59,7 @@ yazmak lazim, komut satirindan cikip tekrar girin, sonra
 
 Eger Python 2 ortami icin kurulum yapiliyorsa ustteki  -lpython2.7 yapilabilir.
 
-Geri Surum Paket
+Geri Sürüm Paket
 
 "Dışarısı" ile Dosya Paylaşmak
 
@@ -80,15 +81,13 @@ Veri tabanlarına bağlanmak için PostgreSql var. `pkg install
 postgresql-dev python-dev make clang`, ve python seviyesinde pip
 install `psycopg2`. Yok yok.
 
-Tüm Termux dizinlerini yedeklemek için
-
-https://wiki.termux.com/wiki/Backing_up_Termux
+Tüm Termux dizinlerini yedeklemek için [1].
 
 Latex
 
-pkg install texlive ile kapsamli bir TeX kurulabilecegini gorduk. Ama
-ekler icin TeX paket sistemi ile kurulus mumkun, tlmgr install
-[paket]. Ama ayri ayri her paket kurmak yerine daha rahati
+`pkg install texlive` ile kapsamlı bir TeX kurulabileceğini
+gördük. Ama ekler için TeX paket sistemi ile kuruluş mümkün, tlmgr
+ınstall [paket]. Ama ayrı ayrı her paket kurmak yerine daha rahatı
 
 ```
 tlmgr install collection-fontsrecommended
@@ -100,10 +99,12 @@ isletmek.
 
 Scipy
 
-Bu paket cok kritik, mesela statsmodels icin lazim. Fakat pip install
-ile kurulumda problem cikiyor. Termux'ta paket
+Bu paket çok kritik, mesela `statsmodels` için lazım. Fakat `pip
+install` ile kurulumda problem çıkıyor. Termux'ta paket
 
+```
 pkg install scipy
+```
 
 ile kurulabilir. Fakat böyle yapınca kurulum global python için
 oluyor, virtualenv ortamlarında nasıl görülecek? Bunu basit bir
@@ -112,12 +113,12 @@ scipy ve print (scipy) derseniz kütüphane yeri gösterilecek. Bu adresi
 alıp mesela `env3/lib/site-packages` altında `ln -s` ile bağlantılarsanız
 (ki scipy dizini orada görülsün) scipy işleyecektir.
 
-Simdi bir puruz ortaya cikabilir; Eger pip install keras ile kurulus
-yapmaya calisirsak bazen bu ve benzeri paketler scipy'in zaten kurulu
-oldugunun farkedemeyebiliyorlar. Bu durumda bu
-paketleri `--no-dependencies` secenegi ile kurmak lazim. Tabii boyle
-olunca gercekten ihtiyac olan paketleri kurmadan atlayacaktir, keras
-durumunda bu paketleri teker teker elle kurmak lazim. Mesela
+Şimdi bir pürüz ortaya çıkabilir; Eğer pip ınstall keras ile kuruluş
+yapmaya çalışırsak bazen bu ve benzeri paketler scipy'in zaten kurulu
+olduğunun farkedemeyebiliyorlar. Bu durumda bu
+paketleri `--no-dependencies` seçeneği ile kurmak lazım. Tabii böyle
+olunca gerçekten ihtiyaç olan paketleri kurmadan atlayacaktır, keras
+durumunda bu paketleri teker teker elle kurmak lazım. Mesela
 
 ```
 pip install theano --no-dependencies
@@ -134,10 +135,10 @@ basinda alttaki kullanilabilir.
 import os; os.environ['KERAS_BACKEND'] = 'theano'
 ```
 
-Arka plan motor Tensorflow da olabilir, ona girmiyorum, cunku Termux
-ile problem cikti. Fakat Keras isliyorsa (theano uzerinden) bu yeterli
-olabilir. Altta basit ornek bir YSA'yi Keras ile telefonum uzerinde
-egitirken goruyoruz.
+Arka plan motor Tensorflow da olabilir, ona girmiyorum, çünkü Termux
+ile problem çıktı. Fakat Keras işliyorsa (theano üzerinden) bu yeterli
+olabilir. Altta basit örnek bir YSA'yı Keras ile telefonum üzerinde
+eğitirken görüyoruz.
 
 ![](https://4.bp.blogspot.com/-iglpG8Gy7Og/W8tA4O_uJ8I/AAAAAAAABuQ/ETLPpmmJ1sAeMX_aD_YsrWm4-isuQm3owCLcBGAs/s400/Dp5x_-wX0AIX6RR.jpg)
 ![](Dp5x_-wX0AIX6RR.jpg)
@@ -171,6 +172,8 @@ içinde `ssh` olan iskelet bir komut satırı kuruluşu yapılabiliyor.
 Alttaki yazının bazı kısımları hala geçerli.
 
 
+Kaynaklar
 
+[1] <a href="https://wiki.termux.com/wiki/Backing_up_Termux">Backing up Termux</a>
 
 
