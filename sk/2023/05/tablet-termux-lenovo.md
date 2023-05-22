@@ -1,51 +1,105 @@
-# Tablet Uzerinde Termux
+# Lenovo Tablet Uzerinde Termux
+
+Daha önce bir Samsung telefon üzerinde Termux nasıl kurulur yazmıştık
+[1]. Şimdi aynı işlemi bir Lenovo tablet için deneyelim. Amacımız
+numpy, scipy, emacs ve flask gibi programları, paketleri işletebilmek
+olacak.
+
+Google Play Store'daki Termux problem cikartabilir. En iyisi [2]
+adresinden apk dosyasini indirip kurmak. Ya dosyaya tiklanir, ya da
+System | About Phone | Build number'a birkac kere tiklandiktan sonra
+gelistirici mod'una gecip Developer Options altinda USB Debugging
+hazir hale getirmek, bundan sonra Ubuntu dizustunde
+
+```
+sudo apt install adb
+```
+
+dersek Android'e ÜSB kablosu üzerinden erisebilen bir ortam kurmuş oluruz.
+Artık
 
 ```
 adb install com.termux_117.apk
 ```
 
-Android uzerinde
+ile apk kurulumu yapabilir. 
+
+Termux kurulduktan sonra Android üzerinde
 
 ```
 termux-setup-storage
 ```
 
-`$HOME` altinda bir `storage` dizini olusur. Bu dizin icinde
-Android'in bildik `downloads` `dcim` gibi dizinlerine sembolik
-baglantilar var.
+yapmak iyi olur. Bu `$HOME` altında bir `storage` dizini
+oluşturur. Dizin içinde Android'in bildik `downloads` `dcim` gibi
+dizinlerine sembolik bağlantılar var.
+
+Artık dizüstünden direk USB kablosu ile dosya gönderebiliriz, mesela
+
+```
+adb push filanca.tar.gz /storage/emulated/0/Download/
+```
+
+Şimdi tablet Termux üzerindeki işlemlere gelelim.
 
 ```
 pkg upgrade
 ```
 
-Arada soru sorar, bunlari ENTER ile geceriz.
+yapmak iyidir, herşey güncellenir. Arada soru sorar, bunları ENTER ile
+geçeriz.
 
-Alttaki paketler uzerinde `pkg install`.
+Alttaki paketler üzerinde `pkg install`.
 
 ```
-emacs python3 openssh build-essential python3-numpy
+python3 openssh build-essential python-numpy emacs libxml2 libxslt cmake freetype binutils
 ```
 
-Bazen kurulum patlayabilir, birkac denemek iyi olabilir.
+Bazen kurulum patlayabilir, birkaç deneme iyi olabilir.
 
-Sonra
+Üsttekiler tamamsa `matplotlib` üzerinde `pkg install` denenmeli. Eğer yardımcı
+paketlerde problem çıkarsa bunları ayrı ayrı başına 
+
+```
+LDFLAGS="-L/system/lib64" CFLAGS="-I/data/data/com.termux/files/usr/include" pip install
+```
+
+ekleyerek `pip` ile kurmayı deneyebiliriz.
+
+Dikkat: Kurulum tüm sistem bazında yapılıyor, hala bir izole [4] ortam yaratmadık.
+Buradaki sebep ``python-numpy` kurulumunun sistem bazlı olması, diğer baz paketler
+de onu izlerse sistem bazlı işler daha rahatlaşıyor.
+
+Fakat bir kez bu temel paketler kurulunca, artık izole ortamlar mevcut
+olan paketler için sistem bazlı olanı kullanabilir, ek yapılan `pip
+ınstall` kurulumları hala izole ortamda kalabilir. Şimdi,
 
 ```
 pip3 install virtualenv
-
-virtualenv -p /data/data/com.termux/files/usr/bin/python3 env3
 ```
 
-Simdi `source env3/bin/activate` ile ortama girilebilir.
+Ve `env3` adlı ilk ortamımızı yaratalım,
 
-### Tus Degisimi
+```
+virtualenv --system-site-packages -p /data/data/com.termux/files/usr/bin/python3 env3
+```
+
+Artık `source env3/bin/activate` ile ortama girilebilir.
+
+Ek kurulumlar ortam icinde `pip` ile,
+
+```
+pip install Pillow bs4 flask folium geopy ipython 
+```
+
+### Tus Değişimi
 
 En alttaki Ctrl, ESC gibi tuslarin ekrandan basilmasini saglayan kismi
 iptal etmek icin Ses Acmak + q tuslari. Control tuşu Trust Bluetooth
 klavyelerinde rahat erişilen yerde değil, Vim, Emacs kullanıcıları bu
 tuşu çok kullanır, CAPS tuşunu CTRL yapabiliriz, ek olarak benim
 tercihim SPACE yanındaki Command yazan tuşu Left Alt yapmak. Bunun
-için Android seviyesinde değişiklik lazım. Şu [1] uygulama ile web
+için Android seviyesinde değişiklik lazım. Şu [3] uygulama ile web
 üzerinde isteğe göre üretilen bir .apk bu değişimi yapabiliyor. APK
 üretimi arka planda derleme ile üretiliyor muhakkak, bu .apk indirilip
 kurulunca (Android uyarılarını dikkate almayız) tuş değişimi olur.
@@ -65,20 +119,16 @@ lazım; Android'de System | Languages & İnput | Physical keyboard (mesela bir
 bluetooth klavye) seçtikten sonra Physical Keyboard altında bir layout seçimi
 var, buraya girip listeden "ExKeyMo Layout" seçmek lazım.
 
+Nihayet Termux ekranından `emacs -nw` ile favori editörümüzü başlatıyoruz,
 
+![](emacs-termux.jpg)
 
+Kaynaklar
 
+[1] [Android Uzerinde Linux - Termux, Samsun J6](../../2018/09/android-uzerinde-linux-termux.html)
 
+[2] [F-Droid Termux](https://f-droid.org/en/packages/com.termux/)
 
+[3] [exkeymo](https://exkeymo.herokuapp.com/)
 
-
-
-
-
-
-
-https://f-droid.org/en/packages/com.termux/
-
-https://f-droid.org/en/packages/de.baumann.browser/
-
-[exkeymo](https://exkeymo.herokuapp.com/)
+[4] [virtualenv, Python İzole, Sanal Çalışma Alanı (Python Virtual Environment)](../../2018/08/virtualenv-python-izole-sanal-calsma.html)

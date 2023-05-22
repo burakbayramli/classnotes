@@ -27,3 +27,6 @@
 <a href="../../2012/06/enlemler-boylamlar-ve-postgresql.html">Enlemler, Boylamlar ve PostgreSql PostGis</a>
 
 <a href="../../2016/12/sqlite-android-jdbc-python.html">SQLite, Android, JDBC, Python</a>
+
+<a href="../../2013/04/ubuntudan-oraclea-baglanmak.html">Ubuntu'dan Oracle'a Baglanmak</a>
+

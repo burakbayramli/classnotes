@@ -1,10 +1,10 @@
 # Unix
 
-[Unix'e Giriş](unix.html)
+[Unix'e Giriş](unix-giris.html)
 
 [Faydalı Unix Komutları](../../2012/04/faydali-unix-komutlari.html)
 
-[Ubuntu 18, Acer Swift](ubuntu-18-acer-swift.html)
+[Ubuntu](../../2023/05/ubuntu.html)
 
 [htop](../../2012/12/htop.html)
 
@@ -17,8 +17,6 @@
 [Serviste İşleyen Komut Satırı - tmux](../../2017/11/serviste-isleyen-komut-satr-tmux.html)
 
 [Bellek Dosyalari - /dev/shm](../../2016/01/bellek-dosyalari-devshm.html)
-
-[Ubuntu SWAP Alanı Nasıl Arttırılır?](../../2013/03/ubuntu-swap-alani-nasil-arttirilir.html)
 
 [Unix Rsync - Makineler Arası Dosya Kopyalamanın Hızlı Yolu](../../2003/10/unix-rsync-makineleraras-dosya.html)
 

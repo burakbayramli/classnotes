@@ -1,6 +1,6 @@
 # Dekoratörler, Onbellek Kodlaması, Fonksiyon Değiştirmek
 
-Bir fonksiyona ya da kod parçasına onbellek kullanımı eklemek kolaydır
+Bir fonksiyona ya da kod parçasına önbellek kullanımı eklemek kolaydır
 fakat bu tür ekler kodun okunabilirliğini de azaltabilirler. Mesela
 kare almakla yükümlü bir fonksiyonumuz var diyelim (altta ise yaramaz
 bir değişken dummy ekledik, bazı püf noktaları gösterebilmek için),

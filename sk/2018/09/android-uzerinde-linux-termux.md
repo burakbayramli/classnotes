@@ -1,8 +1,4 @@
-# Android Uzerinde Linux - Termux
-
-*Not*: Google Playstore'daki Termux artık desteklenmiyor, fakat hala
-içinde `ssh` olan iskelet bir komut satırı kuruluşu yapılabiliyor.
-Alttaki yazının bazı kısımları hala geçerli. 
+# Android Uzerinde Linux - Termux, Samsun J6
 
 Android işletim sisteminin temeli Linux işletim sistemidir, en azından
 çekirdek seviyesinde bu böyle. Peki madem böyle niye Ubuntu'da, ya da
@@ -170,17 +166,11 @@ proje üzerinde çalışıyorlar. Bu şekilde telefon, tablet sahibi
 geliştiricileri kendilerine çekmeye uğraşıyorlar, ekonomik kısmı
 mantıklı.
 
-Ekler
+*Not*: Google Playstore'daki Termux artık desteklenmiyor, fakat hala
+içinde `ssh` olan iskelet bir komut satırı kuruluşu yapılabiliyor.
+Alttaki yazının bazı kısımları hala geçerli.
 
-İki sene bu ortamda yoğun şekilde çalıştıktan sonra şunu
-söyleyebilirim, Termux'u servis bazlı bile olarak tamamen Linux yerine
-geçirmek çok zor. Bu tür ihtiyaçlara (tamamen mobil, hafif bilgisayar)
-en iyi seçenek [Raspberry Pi](../../2020/07/raspberrypi.md). Pi tam
-tekmilli bir Ubuntu Linux'tur, hafiftir, Wifi'ni otomatik bağlanacak
-şekilde hep açık tutarsak ve cep telefonu Wifi paylaşımı hotspot
-üzerinden İnternet erişimi sağlarsak, yerel ağ da oluşturabiliriz, ve
-telefondan ssh, scp ile bağlanıp 'servis' olarak RPi kullanabiliriz.
-Bluetooth klavye + Telefon + Pi tasinabilir bir Linux ortami saglar. 
+
 
 
 
