@@ -34,7 +34,7 @@ adb install com.termux_117.apk
 ```
 
 ile apk kurulumu yapabilir, yani üstteki dizüstünde işletilecek ve
-kurulum Android tablet üzeinde yapılacak.
+kurulum Android tablet üzerinde yapılacak.
 
 Termux kurulduktan sonra Android üzerinde
 
@@ -57,9 +57,8 @@ Bazı durumlarda faydalı olabilir, bunu da paylaşalım.
 Tablet üzerindeki Termux komut satırında ekran klavyesi ile komutlar
 girilebilir. Bluetooth klavyesi olanlar onu da kullanabilir. Ekran
 altındaki Ctrl, ESC gibi tuşların ekrandan basılmasını sağlayan kısmı
-iptal etmek için Ses Açmak + q tuşları yeterli.
-
-Şimdi tablet Termux üzerindeki işlemlere gelelim.
+iptal etmek için Ses Açmak + q tuşları yeterli. Şimdi Termux'a
+kurulabilen ek programlara gelelim.
 
 ```
 pkg upgrade
@@ -133,7 +132,7 @@ tıklayınca apk alınır. Uygulamaya güvenmeyenler aynı sayfadaki
 bağlantıdan kaynak koduna gidip Android kodunu derleyebilir.
 
 Apk kurulduktan sonra tabii klavye seçiminin yeni programı görmesi
-lazım; Android'de System | Languages & İnput | Physical keyboard (mesela bir
+lazım; Android'de System | Languages & Input | Physical keyboard (mesela bir
 bluetooth klavye) seçtikten sonra Physical Keyboard altında bir layout seçimi
 var, buraya girip listeden "ExKeyMo Layout" seçmek lazım.
 
