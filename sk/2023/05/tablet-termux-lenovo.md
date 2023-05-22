@@ -1,22 +1,22 @@
-# Lenovo Tablet Uzerinde Termux
+# Lenovo Tablet Üzerinde Termux
 
 Daha önce bir Samsung telefon üzerinde Termux nasıl kurulur yazmıştık
 [1]. Şimdi aynı işlemi bir Lenovo tablet için deneyelim. Amacımız
 numpy, scipy, emacs ve flask gibi programları, paketleri işletebilmek
 olacak.
 
-Google Play Store'daki Termux problem cikartabilir. En iyisi [2]
-adresinden apk dosyasini indirip kurmak. Ya dosyaya tiklanir, ya da
-System | About Phone | Build number'a birkac kere tiklandiktan sonra
-gelistirici mod'una gecip Developer Options altinda USB Debugging
-hazir hale getirmek, bundan sonra Ubuntu dizustunde
+Google Play Store'daki Termux problem çıkartabilir. En iyisi [2]
+adresinden apk dosyasını indirip kurmak. Ya dosyaya tıklanır, ya da
+System | About Phone | Build number'a birkaç kere tıklandıktan sonra
+geliştirici mod'una geçip Developer Options altında USB Debugging
+hazır hale getirmek, bundan sonra Ubuntu dizüstünde
 
 ```
 sudo apt install adb
 ```
 
-dersek Android'e ÜSB kablosu üzerinden erisebilen bir ortam kurmuş oluruz.
-Artık
+dersek Android'e USB kablosu üzerinden erisebilen bir ortam kurmuş
+oluruz. Artık
 
 ```
 adb install com.termux_117.apk
@@ -70,8 +70,8 @@ Dikkat: Kurulum tüm sistem bazında yapılıyor, hala bir izole [4] ortam yarat
 Buradaki sebep ``python-numpy` kurulumunun sistem bazlı olması, diğer baz paketler
 de onu izlerse sistem bazlı işler daha rahatlaşıyor.
 
-Fakat bir kez bu temel paketler kurulunca, artık izole ortamlar mevcut
-olan paketler için sistem bazlı olanı kullanabilir, ek yapılan `pip
+Bir kez temel paketler kurulunca, artık izole ortamlar mevcut olan
+paketler için sistem bazlı olanı kullanabilir, ek yapılan `pip
 ınstall` kurulumları hala izole ortamda kalabilir. Şimdi,
 
 ```
@@ -92,17 +92,17 @@ Ek kurulumlar ortam icinde `pip` ile,
 pip install Pillow bs4 flask folium geopy ipython 
 ```
 
-### Tus Değişimi
+### Tuş Değişimi
 
-En alttaki Ctrl, ESC gibi tuslarin ekrandan basilmasini saglayan kismi
-iptal etmek icin Ses Acmak + q tuslari. Control tuşu Trust Bluetooth
+En alttaki Ctrl, ESC gibi tuşların ekrandan basılmasını sağlayan kısmı
+iptal etmek için Ses Açmak + q tuşları. Control tuşu Trust Bluetooth
 klavyelerinde rahat erişilen yerde değil, Vim, Emacs kullanıcıları bu
-tuşu çok kullanır, CAPS tuşunu CTRL yapabiliriz, ek olarak benim
+tuşu çok kullanır, ÇAPS tuşunu CTRL yapabiliriz, ek olarak benim
 tercihim SPACE yanındaki Command yazan tuşu Left Alt yapmak. Bunun
 için Android seviyesinde değişiklik lazım. Şu [3] uygulama ile web
 üzerinde isteğe göre üretilen bir .apk bu değişimi yapabiliyor. APK
 üretimi arka planda derleme ile üretiliyor muhakkak, bu .apk indirilip
-kurulunca (Android uyarılarını dikkate almayız) tuş değişimi olur.
+kurulunca (Android uyarılarını dikkate almayız) tus değişimi olur.
 
 Web sitede tanımları liste bazlı seçebiliriz, bahsettiğim Command (ki
 sisteme Meta Left olarak gözüküyor) Alt Left bağlantısı yapmak alttaki
@@ -125,10 +125,11 @@ Nihayet Termux ekranından `emacs -nw` ile favori editörümüzü başlatıyoruz
 
 Kaynaklar
 
-[1] [Android Uzerinde Linux - Termux, Samsun J6](../../2018/09/android-uzerinde-linux-termux.html)
+[1] <a href="../../2018/09/android-uzerinde-linux-termux.html">Android Uzerinde Linux - Termux, Samsun J6</a>
 
-[2] [F-Droid Termux](https://f-droid.org/en/packages/com.termux/)
+[2] <a href="https://f-droid.org/en/packages/com.termux/">F-Droid Termux</a>
 
-[3] [exkeymo](https://exkeymo.herokuapp.com/)
+[3] <a href="https://exkeymo.herokuapp.com/">exkeymo</a>
 
-[4] [virtualenv, Python İzole, Sanal Çalışma Alanı (Python Virtual Environment)](../../2018/08/virtualenv-python-izole-sanal-calsma.html)
+[4] <a href="../../2018/08/virtualenv-python-izole-sanal-calsma.html">virtualenv, Python İzole, Sanal Çalışma Alanı (Python Virtual Environment)</a>
+
