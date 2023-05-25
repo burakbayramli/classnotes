@@ -54,7 +54,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
    tmpdir = '/tmp'
    if 'TMPDIR' in os.environ: tmpdir = os.environ['TMPDIR']
    fin = codecs.open(texfile, encoding='utf-8')
-   fout = codecs.open("/tmp/out.md",mode="w",encoding="utf-8")
+   fout = codecs.open(tmpdir + "/out.md",mode="w",encoding="utf-8")
 
    fin.readline()
    fin.readline()
@@ -145,7 +145,7 @@ def tex_mathjax_html(texfile, htmlfile, title):
           fout.write(line)
       fout.flush()
    fout.close()
-   fin = codecs.open("/tmp/out.md",encoding="utf-8")
+   fin = codecs.open(tmpdir + "/out.md",encoding="utf-8")
    fout = codecs.open(htmlfile, mode="w",encoding="utf-8")
    content=fin.read()
    content = content.replace("@@UUEEE@@","_")
