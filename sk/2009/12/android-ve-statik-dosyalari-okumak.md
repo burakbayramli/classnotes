@@ -1,10 +1,10 @@
-# Android ve Statik Dosyalari Okumak
+# Android ve Statik Dosyaları Okumak
 
 Android uygulamamiz, pek cok diger program gibi, bazi referans verilerine erismek isteyebilir. Android isletim sistemi bir sqllite adinda SQL tabani iceriyor, bu taban uzerinde db, tablolar yaratip o tablolara statik veriler yuklemek mumkun. Fakat ihtiyaclarimiz o kadar sofistike SQL erisimi gerektirmiyorsa, o zaman verileri pur dosyalar olarak cep telefonunda saklayabiliriz.
 
 Daha onceki yazida gelistirme dizininin iskeletini yaratabildigimizi gorduk. Bu dizin ile beraber res/ adli bir dizin yaratiliyor, bu dizin altinda ./raw/[dosya] olarak yaratacagimiz her dosyaya Java kodundan su sekilde erismek mumkun.
 
-```
+```java
 import android.content.res.Resources;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;

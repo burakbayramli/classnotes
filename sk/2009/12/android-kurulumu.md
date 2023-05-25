@@ -1,4 +1,4 @@
-# Android Gelistirme Ortami
+# Android Geliştirme Ortamı
 
 Google'in cep telefonlari icin one surdugu Android etrafinda bayagi
 hareketlenme var. G1 telefonu bir suredir piyasada. Simdi de HTC Hero
@@ -46,7 +46,7 @@ http://developer.android.com/guide/developing/other-ide.html
 
 Uretilen HelloWorld.java koduna gidip sunlari yazabilirsiniz:
 
-```
+```java
 package com.android.helloandroid;
 
 import android.app.Activity;

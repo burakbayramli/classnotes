@@ -1,4 +1,4 @@
-# Android Üzerinde Veri Tabani Kullanımı - sqllite
+# Android Üzerinde Veri Tabanı Kullanımı - sqllite
 
 Mobil uygulamalarımızda hafızaya sığmayacak kadar büyük, anahtar bazlı
 hızlı erişim, çetrefil sorgulama gerektiren veri depolaması için
@@ -307,4 +307,6 @@ Kaynaklar
 [11] Catalina Creek Blog, Placing a prepopulated sqlite database in an Android app, http://www.catalinacreek.com/blog/Placing_a_prepopulated_sqlite_database_in_an_Android_app 
 
 [12] Android Examples - SQL Demo, http://marakana.com/forums/android/android_examples/55.html 
+
+
 

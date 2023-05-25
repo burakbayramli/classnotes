@@ -8,20 +8,16 @@ Ubuntu üzerinde kurmak için
 sudo apt-get install emacs25
 ```
 
-Başlatmak için ben bir bash script yazdım, çünkü o script içinden bir
-Python sanal ortam başlatıyorum, böylece Emacs ıcindeyken istediğim
-Python paketlerine de erişebilmiş oluyorum. Çünkü Python script'leri
-çoğunlukla Emacs ıcinden işletirim, eğer Emacs süreci Python
+Başlatmak için ben bir alias kullanıyorum çünkü o script içinden bir
+Python sanal ortam başlatıyorum, böylece Emacs icindeyken istediğim
+Python paketlerine de erişebiliyoruz. Çünkü Python script'leri
+çoğunlukla Emacs içinden işletirim, eğer Emacs süreci Python
 paketlerinden habersiz ise, script işini yapamaz. Mesela `env3` adlı
 bir ortam için
 
 ```
-#!/bin/bash
-source /home/burak/Documents/env3/bin/activate 
-/usr/bin/emacs25 &
+alias em='source /home/burak/Documents/env3/bin/activate; emacs & disown '
 ```
-
-Bu script'i bir ikon üzerinden başlatmak için Ubuntu kuruluş notlarına bakılabilir.
 
 Emacs'ın tüm başlangıç ayarlarını bir el dosyasında
 tutabiliriz. Olağan haliyle Emacs ev dizini `$HOME` altındaki `.emacs`
@@ -172,3 +168,4 @@ Referans
 [Ayarlarım (My Config File)](https://github.com/burakbayramli/kod/tree/master/site-lisp)
 
 [Unicode, Ascii, Deascii, Python, Emacs](../../2018/07/unicode-ascii-deascii-python-emacs.html)
+

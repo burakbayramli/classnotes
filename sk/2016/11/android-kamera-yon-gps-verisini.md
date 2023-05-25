@@ -1,15 +1,17 @@
-# Android, Kamera, Yon, GPS Verisini Kaydetmek
+# Android, Kamera, Yön, GPS Verisini Kaydetmek
 
-Test amacli olarak cep telefonunda kamera goruntusu (video olarak),
-hangi yone donuk oldugumuz, ve varsa GPS verisini telefon uzerinde
-bazi dosyalara kaydedebiliriz (DCIM dizini). Bir kaydedici program
-isleyince goruntu, GPS, vs. kaydedilir, program bitisinde dizine
-yazilir.. Veri
+Test amaçlı olarak cep telefonunda kamera görüntüsü (video olarak),
+hangi yöne dönük olduğumüz, ve varsa GPS verisini telefon üzerinde
+bazı dosyalara kaydedebiliriz (DCİM dizini). Bir kaydedici program
+işleyince görüntü, GPS, vs. kaydedilir, program bitişinde dizine
+yazılır.. Veri
 
+```
 ANDROID/platform-tools/adb -d pull /sdcard/DCIM/cam.txt /tmp
 ANDROID/platform-tools/adb -d pull /sdcard/DCIM/orientations.txt /tmp
 ANDROID/platform-tools/adb -d pull /sdcard/DCIM/gps.txt /tmp
 ANDROID/platform-tools/adb -d pull /sdcard/DCIM/sizes.txt /tmp
+```
 
 ile dizustu ortamina indirilebilir. Kamera goruntusunu gormek icin Python ile
 
@@ -368,18 +370,4 @@ public class MyCamera extends Activity implements SensorEventListener
     }
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

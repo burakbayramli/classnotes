@@ -1,4 +1,4 @@
-# Python Bazli Tasinabilir Mobil UI Kodlari - Kivy
+# Python Bazlı Taşınabilir Mobil UI Kodları - Kivy
 
 Kivy bazli yazilan Python UI kodlari hem Android hem iOS uzerinde
 isleyebiliyor. Android kodlamasi icin Java kullanmak istemeyenler icin
@@ -26,7 +26,9 @@ from kivy.app
 import App
 from kivy.uix.button import Button
 
-class TestApp(App):    def build(self):        return Button(text='Hello World')
+class TestApp(App):
+   def build(self):
+      return Button(text='Hello World')
 
 TestApp().run()
 ```
@@ -91,8 +93,4 @@ isliyor.  Fakat Kivy, VirtualBox uzerinden isletilebilecek ve icinde
 gerekli tum araclar onceden kurulmus bir sanal makina imajini
 sitesinden paylasiyor. Ya bu, ya da kendimiz Ubuntu kurarak
 python-for-android'i kullanabiliriz. 
-
-
-
-
 

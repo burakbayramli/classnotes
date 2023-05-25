@@ -1,29 +1,35 @@
-# Bekleme Isareti (ProgressDialog)
+# Bekleme İşareti (ProgressDialog)
 
-Android programimiz baslarken, ya da daha sonraki ekranlarda cok zaman
-alabilecek bir islem yaparken kullaniciya bir tur bekleme mesaji
-gostermek iyi olur (yoksa kullanici programin kitlendigini,
-calismadigini zannedebilir). Eger Activity class'imiz onCreate metotu
-icinde bir ProgressDialog yarattiysak, bu dialogun is isten gectikten
-sonra calistigini gorurduk. Sebep, UI thread yapisinda gizli, ozet
-olarak ekrandaki goruntuler onCreate bitmeden ekranda resmedilmiyor;
-bizim daha once calismasini bekledigimiz ProgressDialog dahil.Burada
-kullanilan numara, su olacak. onCreate sadece ProgressDialog ve
-(islemini beklemediginiz) turden bazi GUI elementlerini yaratacak, ve
-hemen arkasindan bir Thread uzerinde cok zaman alacak o isi
-baslatacak. Thread'in elinde bizim ProgressDialog, UI erisimi olacak,
-bu islem bitince ProgressDialog'u goruntuden kaldiracak.public class
-MyActivity extends Activity implements Runnable {private
-ProgressDialog pd;@Overridepublic void onCreate(Bundle
-savedInstanceState) { super.onCreate(savedInstanceState);
-setContentView(R.layout.main); pd = ProgressDialog.show(this,
-"Working..", "Preparing Database", true, false); Thread thread = new
-Thread(this); thread.start();}public void run() { // uzun surecek
-islem burada handler.sendEmptyMessage(0);}private Handler handler =
-new Handler() { @Override public void handleMessage(Message msg) {
-pd.dismiss(); // diger gui elementleri burada yaratilabilir } };}
+Android programımız başlarken, ya da daha sonraki ekranlarda çok zaman
+alabilecek bir işlem yaparken kullanıcıya bir tür bekleme mesajı
+göstermek iyi olur (yoksa kullanıcı programın kitlendiğini,
+çalışmadığını zannedebilir). Eğer Activity class'ımız önCreate metotu
+içinde bir ProgressDialog yarattıysak, bu dialoğun iş işten geçtikten
+sonra çalıştığını görürdük. Sebep, UI thread yapısında gizli, özet
+olarak ekrandaki görüntüler önCreate bitmeden ekranda resmedilmiyor;
+bizim daha önce çalışmasını beklediğimiz ProgressDialog dahil.Burada
+kullanılan numara, şu olacak. önCreate sadece ProgressDialog ve
+(işlemini beklemediğiniz) türden bazı GUİ elementlerini yaratacak, ve
+hemen arkasından bir Thread üzerinde çok zaman alacak o işi
+başlatacak. Thread'in elinde bizim ProgressDialog, UI erişimi olacak,
+bu işlem bitince ProgressDialog'u görüntüden kaldıracak.
 
+```
+public class MyActivity extends Activity implements Runnable {
 
+   private ProgressDialog pd;
+   @Override
+   public void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.main);
+      pd = ProgressDialog.show(this, "Working..", "Preparing Database", true, false);
+      Thread thread = new Thread(this); thread.start();
+   }
 
-
-
+   public void run() { // uzun surecek  islem burada
+      handler.sendEmptyMessage(0);}private Handler handler = new Handler() {
+         @Override public void handleMessage(Message msg) {
+              pd.dismiss(); // diger gui elementleri burada yaratilabilir }
+      };
+}
+```

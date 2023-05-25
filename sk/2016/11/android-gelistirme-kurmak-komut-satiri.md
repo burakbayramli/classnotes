@@ -1,9 +1,9 @@
-# Android, Gelistirme, Kurmak, Komut Satiri
+# Android, Geliştirme, Kurmak, Komut Satırı
 
-Uzun zamandir Android gelistirmesi yapmamistik, bir goruntu isleme
-uygulamasi icin gerekti.
+Uzun zamandır Android geliştirmesi yapmamıştık, bir görüntü işleme
+uygulaması için gerekti.
 
-Ubuntu uzerinde alttakiler kurulur,
+Ubuntu üzerinde alttakiler kurulur,
 
 ```
 sudo apt-get install -y build-essential  zlib1g-dev  libncurses5:i386 libstdc++6:i386 zlib1g:i386 default-jre default-jdk ant
@@ -20,11 +20,11 @@ buradan telefonumuz icin gerekli derleme hedefi ve diger bazi ekler
 kurulur. Mesela Android 4.2.2 var ise o kurulur, derleme hedefi 17
 aktif hale gelir. Bu hedef altta uretilecek build.xml icin gerekli.
 
-Simdi telefona USB'den baglaninca bazi cici uygulamalari kullanabilmek
-icin (mesela adb), ve ileride rooting yapabilmek icin telefonda
-gelistirici secenekleri (developer option) aktive etmek gerekli. Bunun
-icin bazi farkli yollar var(mis) benim telefonda secenekler (options)
-sonra About Device'a gidip "Build number" uzerinde 7 kere tiklama
+Şimdi telefona USB'den bağlanınca bazı cici uygulamaları kullanabilmek
+için (mesela adb), ve ileride rooting yapabilmek için telefonda
+geliştirici seçenekleri (developer option) aktıve etmek gerekli. Bunun
+için bazı farklı yollar var(mış) benim telefonda seçenekler (options)
+sonra About Device'a gidip "Build number" üzerinde 7 kere tıklama
 yapmak gerekti.
 
 Ayrica Settings | Developer options'dan Debugging | USB Debugging aktive edilmeli.
@@ -35,16 +35,19 @@ Altta arkadas baz bir kamera uygulamasi kodlamis, baslangic noktasi olarak iyi o
 
 https://github.com/ikkiChung/MyCamera
 
-Actiktan sonra baktik, icinde sadece cok temel kodlar, ayarlar
-var. Derlenebilir proje icin o dizine gidip alttaki komut isletilir,
+Açtıktan sonra baktık, içinde sadece çok temel kodlar, ayarlar
+var. Derlenebilir proje için o dizine gidip alttaki komut işletilir,
 
 ANDROID_SDK/tools/android update project  --target 1 --name MyName  --path .
 
-Bu gerekli tum script'leri yaratir. Simdi ant debug yapilir, bu bir
-apk  yaratir, bu apk telefona kopyalabilir, vs.
+Bu gerekli tüm script'leri yaratır. Şimdi `ant debug` yapılır, bu bir
+apk  yaratır, bu apk telefona kopyalabilir, vs.
 
 Android icindeki algilayicilarin degerlerini gormek icin ornek kod
 
 https://github.com/onyxbits/sensorreadout
 
 ![](usb2.jpg)
+
+
+

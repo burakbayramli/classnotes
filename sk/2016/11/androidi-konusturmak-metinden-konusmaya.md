@@ -1,4 +1,4 @@
-# Bilgisayari Konusturmak,  Metinden Konusma (Text-to-Speech)
+# Bilgisayarı Konuşturmak,  Metinden Konuşma (Text-to-Speech)
 
 Python
 

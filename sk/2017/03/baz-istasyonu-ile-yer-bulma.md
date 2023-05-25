@@ -1,13 +1,13 @@
-# Baz Istasyonu ile Yer Bulma, Android
+# Baz İstasyonu ile Yer Bulma, Android
 
-Bu bolume bazi ekler:
+Bu bölüme bazı ekler:
 
-Altta baz istasyonlari hakkinda veri tabanindan bahsedildi. Telefonun
-o anda bagli oldugu baz istasyonun verisini Android'den almak ve
-kaydetmek icin surada bahsettigimiz olcum toplayici kodlara ekler
-yaptik. Artik cell.txt adli bir text dosyasinda o anda bagli olunan
-(servis veren) baz istasyonunun bilgileri yaziliyor. Mesela biraz once
-bir ornek topladik, bir satirda
+Altta baz istasyonları hakkında veri tabanından bahsedildi. Telefonun
+o anda bağlı olduğu baz istasyonun verisini Android'den almak ve
+kaydetmek için şurada bahsettiğimiz ölçüm toplayıcı kodlara ekler
+yaptık. Artık cell.txt adlı bir text dosyasında o anda bağlı olunan
+(servis veren) baz istasyonunun bilgileri yazılıyor. Mesela biraz önce
+bir örnek topladık, bir satırda
 
 262:02:15:13227508:
 
@@ -63,8 +63,4 @@ itibaren bu cagri Android API kod bazinda var. Fakat tum telefonlar bu
 cagriyi halen desteklemiyor, biz Android 6.0 (API 23) destekli olan
 bir telefonda denedik (ucuz bir marka) ve getAllCellInfo bos bir liste
 geri getirdi. 
-
-
-
-
 

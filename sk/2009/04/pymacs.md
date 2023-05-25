@@ -20,7 +20,7 @@ Biraz arama sonucunda Emacs'i Python ile uzatmami saglayacak bir araci
 buldum: Pymacs. Pymacs, tum Emacs lisp fonksiyonlarina bir Python
 script'i icinden ve tum Python modullerine de Emacs icinden
 erisebilmenize izin veriyor. Kurmak icin ya apt-get ile ya da kaynagi
-indirip python setup.py install ile kurabilirsiniz.
+indirip `make` sonra `python setup.py install` ile kurabiliriz.
 
 https://github.com/pinard/Pymacs
 
@@ -78,7 +78,9 @@ Bazı komutlar:
 metni istiyoruz,
 
 ```
-b = lisp.search_forward("[BITIS]")e = lisp.search_backward("[BASLA]")content = lisp.buffer_substring(b, e)
+b = lisp.search_forward("[BITIS]")
+e = lisp.search_backward("[BASLA]")
+content = lisp.buffer_substring(b, e)
 ```
 
 Burada Emacs LİSP fonksiyonlarından ikisini kullanmış olduk.
@@ -108,8 +110,4 @@ Diyelim ki olduğumuz noktaya bir sürü işlemden sonra dönmek istiyoruz
 remember_where = lisp.point()...
 lisp.goto_char(remember_where)
 ```
-
-
-
-
 

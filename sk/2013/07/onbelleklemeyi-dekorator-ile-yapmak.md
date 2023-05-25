@@ -2,30 +2,135 @@
 
 Bir fonksiyonu çağırıyoruz, ona bazı parametreler geçiyoruz, bu
 parametrelerle fonksiyon bir hesap yapıyor, bize sonucu veriyor.
-Mesela verili bir sayıya kadar olan tüm tam sayıları toplayan bir
-fonksiyon olsun,
+Mesela bir sayıya kadar olan tüm tam sayıları toplayan bir fonksiyon
+olsun,
 
 ```python
-def n_topla(N):
-   return np.sum(range(N+1))
+def n_topla1(N):
+   tmp = list(range(N+1))
+   print (tmp)
+   res = np.sum(tmp)
+   return res
 
-n_topla(10)
+print (n_topla1(10))
+print (n_topla1(5))
+print (n_topla1(10))
 ```
 
 ```text
-Out[1]: 55
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+55
+[0, 1, 2, 3, 4, 5]
+15
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+55
 ```
 
-Toplam 1,2,3,.. diye 10'a kadar olan sayıları topladı ve döndürdü.
+Toplam 1 + 2 + 3 + .. + 10 diye 10'a kadar olan sayıları topladı ve
+döndürdü.  Sonra 5 ve tekrar 10 için aynı teknik kullanıldı.
 
-Fakat diyelim ki bu fonksiyon pek çok kez ardı ardına çağrılabiliyor,
-ve çağrıların çoğu benzer parametreleri kullanıyor, mesela `N=10`
-çağrısı pek çok kez yapılabiliyor.. Bu durumda üstteki toplam işlemini
-bir kez yapıp ikinci, üçüncü çağrılarda aynı hesabı döndürsek olmaz
-mı?
+Fakat diyelim ki bu fonksiyon pek çok kez ardı ardına çağırmak
+gerekiyor, ve çağrıların çoğu benzer parametreleri kullanacak, mesela
+10'a kadar olan toplam pek çok kez yapılabilecek.. Acaba üstteki
+toplam işlemini bir kez yapıp ikinci, üçüncü çağrılarda aynı hesabı
+döndürsek olmaz mı?
 
-### Paket Kullanarak
+Koda böyle bir ek yapılabilir. Mesela `n_topla1` fonksiyonunda daha
+başka bir şey yapmadan önce parametreleri biraraya koyarak bir tür
+anahtar oluşturabiliriz, bu anahtarı bir sözlükte arama için
+kullanırız, eğer değer bulunursa birisi önceden o hesabı yapıp oraya
+koymuş demektir, fonksiyonda devam etmek yerine sözlükteki değeri
+döndürürüz, hesaba gerek kalmaz. Tabii ki eğer sözlükte o değer yoksa,
+hesabı yapıp sözlüğe bizim koymamız gerekir, böylece bir sonraki çağrı
+yapan o değerleri bulsun.
 
+"Parametrelerden anahtar oluşturmak", "varsa döndürmek yoksa oraya
+koymak" - burada bir sürü hamaliyesi fazla kodlama var. Bu kodları bir
+paket üzerinden, hatta bir fonksiyon başına koyulacak bir etiket /
+işaret üzerinden Python'a yaptırsak iyi olacak.
+
+### Hazır Paket Kullanarak
+
+Paket `cachetools` içinde böyle kodlar var [1]. Toplam foksiyonunu etiketleyelim,
+
+```python
+from cachetools import cached
+
+@cached(cache={})
+def n_topla2(N):
+   tmp = list(range(N+1))
+   print (N, "=>", tmp)
+   res = np.sum(tmp)
+   return res
+
+print (n_topla2(5))
+print (n_topla2(10))
+print (n_topla2(10))
+```
+
+```text
+5 => [0, 1, 2, 3, 4, 5]
+15
+10 => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+55
+55
+```
+10 toplamı önbellekten geldi, onun listesi basılmadı dikkat edersek
+çünkü fonksiyonun o kısmına gidilmesi gerekmedi.
+
+Önbellekleme etiketi `@cached` ile kullanılacak sözlük tipini de
+tanımlayabiliyoruz, üstteki örnekte standart bir Python sözlüğü `{}`
+kullanıldı. Başka türlü sözlükler de var, bu sözlükler ayrıca
+önbellekleme stratejisini değiştirmemize yarıyor. Mesela "sadece en
+son 2 konulan öğe hatırlansın" istiyorsam, yani büyüklüğü 2'den fazla
+olmasın, ve üçüncü öğeyi koymaya çalışırsam ilk eklediğim atılsın
+istiyorsam, bu bir ilk giren ilk çıkar (first in first out -FIFO-)
+mantığıdır, ve böyle bir sözlük tipi vardır, `FIFOCache`.
+
+
+```python
+from cachetools import FIFOCache
+
+@cached(cache=FIFOCache(maxsize=2))
+def n_topla2(N):
+   tmp = list(range(N+1))
+   print (N, "=>", tmp)
+   res = np.sum(tmp)
+   return res
+
+print ('5 Toplami', n_topla2(5))
+print ('10 Toplami',n_topla2(10))
+print ('20 Toplami',n_topla2(20))
+
+# tersten sor, son girenleri bulalim
+print ('20 Toplami',n_topla2(20))
+print ('10 Toplami',n_topla2(10))
+print ('5 Toplami', n_topla2(5))
+```
+
+```text
+5 => [0, 1, 2, 3, 4, 5]
+5 Toplami 15
+10 => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+10 Toplami 55
+20 => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+20 Toplami 210
+20 Toplami 210
+10 Toplami 55
+5 => [0, 1, 2, 3, 4, 5]
+5 Toplami 15
+```
+
+20,10 toplamları hatırlandı, ama 5 için tekrar hesap yapıldı çünkü büyüklüğü 2
+olan `FIFOCache` o sonuçları atmıştı.
+
+Diğer bazı önbellek tipleri mesela `LRUCache` en az kullanılan
+objeleri atar. `TTLCache` ise konulan her obje üzerinde bir zaman
+aşımını kontrol eder, bunu `ttl` parametresi ile saniye üzerinden
+kullanıcı ayarlayabilir, mesela `ttl=600` ile objeler konulduktan 10
+dakika sonra onbellekten çıkartılırlar, "eskimiş" olurlar.
+
+Diğer önbellek tipleri için [2].
 
 ### Kendi Kodumuz İle
 
@@ -151,6 +256,9 @@ Yeni ekleri de işletecek, bu ek Foo üzerinde yeni bir öğe yarattı, ve
 bu öğeye `o.was` diye erişiyoruz.
 
 
+Kaynaklar
 
+[1] https://pypi.org/project/cachetools/
 
+[2] https://cachetools.readthedocs.io/en/latest/
 

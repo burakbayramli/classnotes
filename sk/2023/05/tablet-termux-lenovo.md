@@ -70,7 +70,8 @@ geçeriz.
 Alttaki paketler üzerinde `pkg install`.
 
 ```
-python3 git openssh build-essential python-numpy emacs libxml2 libxslt cmake freetype binutils
+python3 git openssh build-essential python-numpy emacs libxml2 libxslt
+cmake freetype binutils file libxapian recoll boost gettext
 ```
 
 Bazen kurulum patlayabilir, birkaç deneme problemi çözer. Üsttekiler

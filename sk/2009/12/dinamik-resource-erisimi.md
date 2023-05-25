@@ -1,13 +1,13 @@
-n# Dinamik Resource Erisimi
+# Dinamik Resource Erişimi
 
-Android'de referans bilgilerini bir dosya icinde tutabiliriz; bu
-dosyalara erismek icin onlari res/raw altinda tutuyoruz. Eger
-erisilecek dosya ismi dinamik bir sekilde uretiliyor ise, o zaman
-String tipinden bir sekilde R.java dosyasi icinde static olarak
-tanimli int ogelere eslemena yapmamiz lazim. Bnnun icin Java Reflection
-kullanacagiz:
+Android'de referans bilgilerini bir dosya içinde tutabiliriz; bu
+dosyalara erişmek için onları res/raw altında tutuyoruz. Eğer
+erişilecek dosya ismi dinamik bir şekilde üretiliyor ise, o zaman
+String tipinden bir şekilde R.java dosyası içinde static olarak
+tanımlı ınt ögelere eşlemena yapmamız lazım. Bnnun için Java Reflection
+kullanacağız:
 
-```
+```java
 import java.lang.reflect.Field;
 import java.io.InputStream;
 Field id = R.raw.class.getDeclaredField([string tipinde dinamik oge ismi]);
@@ -16,7 +16,4 @@ int i = id.getInt(rr);
 InputStream in = getResources().openRawResource(i);
 ...
 ```
-
-
-
 

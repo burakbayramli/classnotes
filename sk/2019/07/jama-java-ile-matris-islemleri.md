@@ -1,4 +1,4 @@
-# JAMA - Java ile Matris Islemleri
+# JAMA - Java ile Matris İşlemleri
 
 Python ile prototip hatta servis tarafı sayısal işlem kodları rahatça
 yazılıyor; fakat bazen lineer cebir yapan kodları Java'ya çevirmek
@@ -145,11 +145,4 @@ public class Util {
      }
 }
 ```
-
-
-
-
-
-
-
 

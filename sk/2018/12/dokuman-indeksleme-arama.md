@@ -9,8 +9,7 @@ bir indeks dizini altında gerekli dosyaları yazar. Bu dosyalar
 negatif. Bu dosyaların idare edilmesi gerekli. Ayrıca whoosh ile
 güncelleme işlemleri biraz problemli.
 
-
-Sqlite3 içinde işleyen bir diğer çözüm, fts3 daha
+Sqlite3 içinde işleyen bir diğer çözüm, `fts3` daha
 kullanışlı. İndeksleme için bir kolonu `fts3` tipinde tanımlamak
 yeterli, artık bu kolona konan her veri doküman arama yaklaşımıyla
 aranabilir.
@@ -56,6 +55,9 @@ ara 3
 ('book2.pdf', 'All SQLite is source code...')
 ('book2.pdf', 'All is code...')
 ```
+
+Eğer sonuçlarda arama kelimeleriyle uyumlu metin parçalarını görmek
+istersek `snippet(BOOKS)` fonksiyonunu `SELECT` içinde kullanabiliriz.
 
 Veri taban semantiği aslında döküman indeksleme için çok uygun. Bir
 "dokümanı" indeksten çıkartmak için o dokümanın olduğu satırı tabandan

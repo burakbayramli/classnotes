@@ -495,7 +495,6 @@ sonucunu gerçek bir mesafe ile karşılaştırmıyoruz, "acaba 10 km'den
 küçük mü büyük mü" gibi, onu sadece belli bir liste içindeki
 noktalardan en yakınını bulmak için kullandık. 
 
-
 Kaynaklar
 
 [1] <a href="http://download.geofabrik.de/index.html">GEOFabrik</a>
@@ -513,13 +512,4 @@ Kaynaklar
 [7] <a href="https://burakbayramli.github.io/dersblog/algs/algs_035_dijks/dijkstra_algoritmasi_ile_en_kisa_yol.html">Dijkstra Algoritması ile En Kısa Yol</a>
 
 [8] <a href="https://www.ics.uci.edu/~eppstein/161/python/">University of California Bilgisayar Bilim Kodları</a>
-
-
-
-
-
-
-
-
-
 

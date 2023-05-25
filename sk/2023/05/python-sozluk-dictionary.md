@@ -202,6 +202,25 @@ fakat sonuçta yaptıkları disk bazlı bir sözlük servisi sağlamaktır.
 
 Konu hakkında önceki bir yazı şurada [2].
 
+### SQliteDict
+
+Ustteki `diskdict` kurulumu problem cikartirsa erisimi bir o kadar hizli
+`sqlitedict` paketi olabilir. Bu paket ile
+
+```python
+from sqlitedict import SqliteDict
+
+dd = SqliteDict('walkdict.sqlite', autocommit=False)
+```
+
+ile bir disk bazlı, daha doğrusu sqlite taban bazlı bir sözlük
+yaratıyoruz, ardından `dd['anahtar'] = 'değer'` ve `dd.commit()`
+türündeki çağrılar diskteki sözlüğü güncelliyor. Erişim için
+`SqliteDict` objesi aynı dosya ismi için tekrar oluşturuluyor ve
+`dd[anahtar']` bize gerekli değeri geri veriyor. Arka planda paket
+anahtarları muhakkak SQL tablosunda bir ana anahtar olarak kullammış,
+erişimim hızlı indisler üzerinden ve her şeyi bellege taşımadan yapacaktır.
+
 ### Olağan Değerler, Sıralanma
 
 Olağan Değerler
@@ -261,8 +280,8 @@ yapabildik çünkü listenin orada olacağını varsayabiliyoruz.
 
 Eklenme Sırasını Hatırlayan Sözlük
 
-Anahtarin eklenme sirasini hatirlayip degerler istendiginde ona gore
-listeyi donduren bir diger sozluk tipi `collections.OrderedDict`.
+Anahtarın eklenme sırasını hatırlayıp değerler istendiğinde ona göre
+listeyi döndüren bir diğer sözlük tipi `collections.OrderedDict`.
 
 ```python
 import collections
@@ -306,10 +325,10 @@ bazi degerler burada
 baska degerler
 ```
 
-Anahtar olabilecek temel tipler değiştirilemeyen (ımmutable)
+Anahtar olabilecek temel tipler değiştirilemeyen (immutable)
 nesnelerdir, bunlar String, int, tuple tipleri. Fakat daha önce
-bahsettiğimiz gibi bir anahtar sonuçta böleclenen bir şey, o zaman bir
-bölec fonksiyonu sağlayan her nesne, kullanıcı tanımlı bile olsa
+bahsettiğimiz gibi bir anahtar sonuçta böleçlenen bir şey, o zaman bir
+böleç fonksiyonu sağlayan her nesne, kullanıcı tanımlı bile olsa
 anahtar olabilir.
 
 ```python
@@ -365,5 +384,7 @@ Kaynaklar
 [2] <a href="../../2022/11/nosql-diy-python.html">NoSQL</a>
 
 [3] https://github.com/deep-compute/diskdict
+
+
 
 
