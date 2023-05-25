@@ -51,7 +51,8 @@ bottom = """
 """
 
 def tex_mathjax_html(texfile, htmlfile, title):
-
+   tmpdir = '/tmp'
+   if 'TMPDIR' in os.environ: tmpdir = os.environ['TMPDIR']
    fin = codecs.open(texfile, encoding='utf-8')
    fout = codecs.open("/tmp/out.md",mode="w",encoding="utf-8")
 
