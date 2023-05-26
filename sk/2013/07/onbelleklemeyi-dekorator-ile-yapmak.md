@@ -47,7 +47,7 @@ yapan o değerleri bulsun.
 "Parametrelerden anahtar oluşturmak", "varsa döndürmek yoksa oraya
 koymak" - burada bir sürü hamaliyesi fazla kodlama var. Bu kodları bir
 paket üzerinden, hatta bir fonksiyon başına koyulacak bir etiket /
-işaret üzerinden Python'a yaptırsak iyi olacak.
+işaret / dekoratör üzerinden Python'a yaptırsak iyi olacak.
 
 ### Hazır Paket Kullanarak
 
@@ -150,7 +150,7 @@ kare("filan", 3)
 
 diye çağırıyoruz ve sonuç olarak 9 gelmesini bekliyoruz. 
 
-Onbellekleme için, diyelim ki, eğer a değeri önceden görülmüşse, kare
+Önbellekleme için, diyelim ki, eğer a değeri önceden görülmüşse, kare
 işlemi sonucunun tekrar hesaplanmasını istemiyoruz, onu onbellekten
 bulup hızlı bir şekilde geri döndürmek tercihimiz (tabii çarpım işlemi
 de çok hızlı işler, ama bu örnek için yavaş olabileceğini hayal
@@ -166,14 +166,12 @@ def kare(dummy, a):
     return cache[a]
 ```
 
-Değişken cache bir Python dictionary'dir ve onbelleğimiz onun
-üzerinde  duruyor. Görüldüğü gibi kod biraz kalabalıklaştı. Onbellek
-objesi alanen ortada, ayrıca ıf gibi çok ciddi bir ibareyi koda
-sokuşturmak zorunda kaldık :) Genellikle bu ifade önemli bir işlem
-mantığı var ise kullanılır - en azından kod okunabilirliği açısından
-böyle olması daha iyidir.
-
-Peki bu isi daha temiz bir sekilde yapamaz miydik?
+Değişken cache bir Python sözlüğüdür ve onbelleğimiz onun üzerinde
+duruyor. Görüldüğü gibi kod biraz kalabalıklaştı. Onbellek objesi
+alanen ortada, ayrıca ıf gibi çok ciddi bir ibareyi koda sokuşturmak
+zorunda kaldık. Genellikle bu ifade önemli bir işlem mantığı var ise
+kullanılır - en azından kod okunabilirliği açısından böyle olması daha
+iyidir. Peki bu isi daha temiz bir sekilde yapamaz miydik?
 
 Python dekoratör fonksiyonları işte tam burada ise yarar. Bir
 dekoratör bir fonsiyonu "sarmalayabilir (wrap)", ve o fonksiyona giren

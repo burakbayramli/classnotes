@@ -1,8 +1,8 @@
 # SQLite, Android, JDBC, Python
 
 Android cep telefonlarında SQL bazlı erişilebilen bir taban gerekirse
-SQLite programı bu ihtiyaçı karşılıyor. Bu taban çok hafif, hızlı
-çalışır, taban olarak tek ihtiyaçı bir .db dosyasından
+SQLite programı bu ihtiyacı karşılıyor. Bu taban çok hafif, hızlı
+çalışır, taban olarak tek gerekli olan bir .db dosyasından
 ibarettir. Dizüstü bilgisayarında da SQLite kullanılabiliyor, pek çok
 dilden erişim var, Python, Ruby, Java, vs.. Diğer bazı özellikler
 tablo indeksleyebilmek, birleşim (join), alt sorgular (subjoin) -
@@ -163,10 +163,4 @@ göre külfetli.
 Dizustu ortami icin Java JDBC SQLite jar'i
 
 https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.8.9.1/
-
-
-
-
-
-
 

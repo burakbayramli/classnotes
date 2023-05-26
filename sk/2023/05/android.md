@@ -14,9 +14,9 @@
 
 [Telefonda HTML](../../2010/03/telefonda-html.html)
 
-[Android -> AppEngine Bağlantısı, Tekil Kullanıcılar](./2010/04/android-appengine-baglantisi-tekil.html)
+[Android -> AppEngine Bağlantısı, Tekil Kullanıcılar](../../2010/04/android-appengine-baglantisi-tekil.html)
 
-[Android Üzerinde Veri Tabanı Kullanımı - sqllite](./2010/04/android-uzerinde-database-kullanm.html)
+[Android Üzerinde Veri Tabanı Kullanımı - sqllite](../../2010/04/android-uzerinde-database-kullanm.html)
 
 [Python Bazlı Taşınabilir Mobil UI Kodları - Kivy](../../2015/02/python-bazli-tasinabilir-mobil-ui.html)
 

@@ -298,7 +298,7 @@ Kaynaklar
 
 [6] Data Storage | Android Developers, http://developer.android.com/guide/topics/data/data-storage.html 
 
-[7] Android ve Statik Dosyalari Okumak  | Sayilar ve Kuramlar Blog, http://sayilarvekuramlar.blogspot.com/2009/12/android-ve-statik-dosyalari-okumak.html 
+[7] <a href="../../2009/12/android-ve-statik-dosyalari-okumak.html">Android ve Statik Dosyalari Okumak</a>
 
 [8] InputStreamChain | Paranoid Engineering Blog, http://paranoid-engineering.blogspot.com/2008/11/inputstreamchain.html
 
