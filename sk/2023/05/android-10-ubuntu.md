@@ -35,18 +35,19 @@ adb push dosya1.zip /storage/emulated/0/Download/
 Bu dosya telefon SD kart üzerinde Internal Storage | Download altına
 gidecek. Eğer dizüstü ve Android arasında bir dizini senkronize etmek
 istiyorsam, bunu ittirme (push) çekme (pull) bazlı yapabilirim. Mesela
-ittirme örneği dizüstünde `/home/user1/Downloads/work` adlı bir dizin
-Android'de Download | work dizini ile senkronize edilsin, dizüstünde
-olan eklenmiş, değişmiş dosyalar ittirilsin / gönderilsin istiyorsam,
+ittirme örneği dizüstünde /home/user1/dizin2/work adlı bir dizin
+Android'de Download/work dizini ile senkronize edilsin istiyorsam, ki
+sadece dizüstünde yeni olan ve değişmiş dosyalar ittirilsin /
+gönderilecek şekilde,
 
 ```
-adb push --sync /home/user1/Downloads/work/ /storage/emulated/0/Download/
+adb push --sync /home/user1/dizin2/work/ /storage/emulated/0/Download/
 ```
 
 diyebilirim. Dikkat `work` ibaresi hedef dizinine koyulmadı, bunu
 `adb` ekliyor, karışıklık yaratabilir ama sistemi böyle kurmuşlar.
 
-Benzer şekilde `pull` var, bir de her iki işlemi yapan `sync` var.
+Benzer şekilde `pull` var, bir de her iki işlemi yapan `sync`.
 
 Kaynaklar
 
