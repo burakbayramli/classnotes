@@ -1,15 +1,5 @@
 # ffmpeg, moviepy
 
-Video birlestirmek icin en rahat arac Python `moviepy` paketi ile,
-
-```
-from moviepy.editor import VideoFileClip, concatenate_videoclips
-clip1 = VideoFileClip("v1.mp4").resize(0.50)
-clip2 = VideoFileClip("v2.mp4").resize(0.50)
-final_clip = concatenate_videoclips([clip1,clip2])
-final_clip.write_videofile("out.mp4")
-```
-
 Bazi ffmpeg, komutlari
 
 Bir video dosyasinin belli zaman araligindaki parcasini cikartmak icin
@@ -56,7 +46,7 @@ Ya da
 ffmpeg -y  -filter_complex 'fps=10,scale=460:-1:flags=lanczos' -i girdi.mp4 -f gif cikti.gif
 ```
 
-GİF içinde yazı yazmak istersek,
+GIF içinde yazı yazmak istersek,
 
 ```
 ffmpeg -ss 30 -t 3 -i [DOSYA] -filter_complex "fps=10,scale=720:-1:flags=lanczos,drawtext=enable='between(t,0,1)':fontfile=font3.ttf:text='word':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,drawtext=enable='between(t,1,2)':fontfile=font3.ttf:text='word what':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,split[x1][x2];[x1]palettegen[p];[x2][p]paletteuse" output.gif
@@ -70,7 +60,8 @@ kaliteli 0)
 ffmpeg -i input.mkv -vf scale=-1:440 -crf 23  output.avi
 ```
 
-Format degisimi (ornekte mp4'den avi), video'nun bir kismini cekip cikartmak, mesela 100. saniyeden baslayarak 20 saniyelik kisim,
+Format degisimi (ornekte mp4'den avi), video'nun bir kismini cekip
+cikartmak, mesela 100. saniyeden baslayarak 20 saniyelik kisim,
 
 ```
 ffmpeg -i vid1.mp4 -ss 100 -t 20 -acodec copy -vcodec copy vid2.avi
@@ -129,6 +120,16 @@ Eger Windows'da bir mp4 cikmiyorsa, bir cevrim sekli de soyle,
 ```
 ffmpeg -i dosya.mp4 -r 30  -codec:v mpeg4 -flags:v +qscale \
   -global_quality:v 0 -codec:a libmp3lame dosya.avi 
+```
+
+Ya da en rahat arac Python `moviepy` paketi ile,
+
+```
+from moviepy.editor import VideoFileClip, concatenate_videoclips
+clip1 = VideoFileClip("v1.mp4").resize(0.50)
+clip2 = VideoFileClip("v2.mp4").resize(0.50)
+final_clip = concatenate_videoclips([clip1,clip2])
+final_clip.write_videofile("out.mp4")
 ```
 
 mencoder

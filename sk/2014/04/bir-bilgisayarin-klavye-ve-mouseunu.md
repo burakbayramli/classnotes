@@ -1,68 +1,72 @@
-# Bir Bilgisayarin Klavye ve Mouse'unu Digeri Icin Kullanmak
+# Bir Bilgisayarın Klavye ve Mouse'unu Diğeri İçin Kullanmak
 
-Diyelim ki evde ve iste farkli bilgisayarlar var, ama tum bunlari tek
-bir aletten kontrol etmek istiyoruz, bu durumda fare / klavye paylasim
-yazilimlari ise yarayabilir. Artik cogunlukla herkesin kendi dizustu
-oluyor, ama isyerinde masaustu (desktop) verilebiliyor mesela, ama biz
-bu masaustunu cogunlukla ona bagli kulustur (!) bir klavye uzerinden
-kullanmak istemiyor olabiliriz. Sahsi olarak zaten not defteri yumusak
-klavyelerine cok alistik, ve oteki turden klavye kullanmakta
-zorlaniyoruz.
+Diyelim ki evde ve işte farklı bilgisayarlar var, ama tüm bunları tek
+bir aletten kontrol etmek istiyoruz, bu durumda fare / klavye paylaşım
+yazılımları ise yarayabilir. Artık çoğunlukla herkesin kendi dizüstü
+oluyor, ama işyerinde masaüstü (desktop) verilebiliyor mesela, ama biz
+bu masaüstünü çoğunlukla ona bağlı kuluştur (!) bir klavye üzerinden
+kullanmak istemiyor olabiliriz. Şahsi olarak zaten not defteri yumuşak
+klavyelerine çok alıştık, ve öteki türden klavye kullanmakta
+zorlanıyoruz.
 
-Cozum olarak fare / klavye paylasim araclari faydali, dikkat -
-masaustu (desktop) paylasim araclari degil, mesela VNC gibi, fare /
-klavye paylasim araclari. Masaustu paylasiminda bir diger bilgisayara
-girip tamamen onun ekranini baska bir bilgisayarda goruyoruz, otekinde
-ise bir bilgisayarin sadece kontrollerini bir digerine
-aktariyoruz. Yani hala buyuk bilgisayarin buyuk ekranina bakiyoruz,
-ama klavye ve fare hareketleri dizustu makinasindan geliyor.
+Çözüm olarak fare / klavye paylaşım araçları faydalı, dikkat -
+masaüstü (desktop) paylaşım araçları değil, mesela VNÇ gibi, fare /
+klavye paylaşım araçları. Masaüstü paylaşımında bir diğer bilgisayara
+girip tamamen onun ekranını başka bir bilgisayarda görüyoruz, ötekinde
+ise bir bilgisayarın sadece kontrollerini bir diğerine
+aktarıyoruz. Yani hala büyük bilgisayarın büyük ekranına bakıyoruz,
+ama klavye ve fare hareketleri dizüstü makinasından geliyor.
 
-Bu alanda en iyi bilinen arac Synergy. Kurmak icin  
+Bu alanda en iyi bilinen araç Synergy. Kurmak için  
 
 ```
 synergy-foss.org/download/?alt
 ```
 
-Buradan 1.3.8 indirilebilir. Dikkat, eger Ubuntu 12/13 farklari var
-ise, her iki bilgisayarda direk apt-get install iki bilgisayarda
-farkli surumleri kurabilir, ve farkli surumler birbiriyle
-konusamayabilirler. O sebeple 1.3.8'in deb dosyasini indirip sudo dpkg
--i ile kurmak en iyisi. Bir not daha: Ubuntu sistem guncellemesi
-yaparken 1.3.8 paketini "eski" olarak gorup guncellemeye calisir, bu
-sebeple sistem guncellemesi sonrasi tekrar dpkg ile eski versiyona
-gecmeniz gerekebilir.
+Buradan 1.3.8 indirilebilir. Dikkat, eğer Ubuntu 12/13 farkları var
+ise, her iki bilgisayarda direk apt-get ınstall iki bilgisayarda
+farklı sürümleri kurabilir, ve farklı sürümler birbiriyle
+konuşamayabilirler. O sebeple 1.3.8'ın deb dosyasını indirip sudo dpkg
+-i ile kurmak en iyisi. Bir not daha: Ubuntu sistem güncellemesi
+yaparken 1.3.8 paketini "eski" olarak görüp güncellemeye çalışır, bu
+sebeple sistem güncellemesi sonrası tekrar dpkg ile eski versiyona
+geçmeniz gerekebilir.
 
-Kurulum yapildiktan sonra klavyesinin paylasilacagi "master" bilgisayardan bir de quicksynergy denen bir arac kurmak iyi olur. Klavye bilgisinin "gonderildigi" makinada
+Kurulum yapıldıktan sonra klavyesinin paylaşılacağı "master"
+bilgisayardan bir de quicksynergy denen bir araç kurmak iyi
+olur. Klavye bilgisinin "gönderildiği" makinada
 
+```
 synergyc -f [master bilgisayar ip adresi]
+```
 
 Master uzerinde Accessories | Quick Synergy baslatiriz, ve
 
-Share tab'i icinde dev51 yazdik, bu isim bizim /etc/hosts icinde hedef
-bilgisayarinin ip'sine tercume oluyor. Peki bu resimle ne soylemis
-oluyoruz? Diyoruz ki eger dizustunde fareyi hareket ettirirken isaret
-dizustu ekranindan yukari dogru "tasarsa", synergy bu durumu algiliyor
-ve fare isaretini oteki bilgisayarda hareket ettirmeye basliyor!
-Klavye yazimi da bu noktadan sonra diger bilgisayara dogru akmaya
-basliyor! Eger geri dizustune donmek istersek tam tersini yapiyoruz,
-oteki bilgisayarin ekraninda fareyi asagi dogru hareket ettirip alttan
-disari "tasiyoruz" ve synergy bunu da algilayip bizi dizustu
-makinasina geri donduruyor.
+Share tab'ı içinde dev51 yazdık, bu isim bizim /etc/hoşts içinde hedef
+bilgisayarının ip'sine tercüme oluyor. Peki bu resimle ne söylemiş
+oluyoruz? Diyoruz ki eğer dizüstünde fareyi hareket ettirirken işaret
+dizüstü ekranından yukarı doğru "taşarsa", synergy bu durumu algılıyor
+ve fare işaretini öteki bilgisayarda hareket ettirmeye başlıyor!
+Klavye yazımı da bu noktadan sonra diğer bilgisayara doğru akmaya
+başlıyor! Eğer geri dizüstüne dönmek istersek tam tersini yapıyoruz,
+öteki bilgisayarın ekranında fareyi aşağı doğru hareket ettirip alttan
+dışarı "taşıyoruz" ve synergy bunu da algılayıp bizi dizüstü
+makinasına geri döndürüyor.
 
-Not: Synergy'nin islemesi icin her iki bilgisayarin birbirini yerel ag
-uzerinden gormesi lazim (yani ping ile birbirlerinin ip'sini
-gorebilmeliler). Eger sirketinizin IT departmanini ugrastirmak
-istemezseniz, is yerine basit bir network switch goturebilirsiniz, ve
-surada tarif edildigi gibi statik IP'ler uzerinden bir "alternatif ag"
-kurabilirsiniz. Mesela sirket ici ip adresleri 10.1.1.x ile
-basliyorsa, bu alternatif agi 192.168.1.x uzerinden
-tanimlayabiliriz. Bu durumda, dis Internet baglantisi bile her iki
-bilgisayarda normal sirket agi uzerinden akmaya devam edecektir, ama
-bizim iki bilgisayar birbiriyle 192.168.1.x uzerinden baglanti
-kurabilirler. Statik tanim sirasinda tek dikkat edilmesi gereken
-switch'e baglandiktan sonra statik IP tanimini "Wired Connection 2"
-gibi "farkli" bir isimde cikacak ikon uzerinden yapmak. Bunun
-haricinde baska hicbir ek tanima gerek yok.
+Not: Synergy'nin işlemesi için her iki bilgisayarın birbirini yerel ağ
+üzerinden görmesi lazım (yani ping ile birbirlerinin ip'sini
+görebilmeliler). Eğer şirketinizin İT departmanını uğraştırmak
+istemezseniz, iş yerine basit bir network switch götürebilirsiniz, ve
+şurada tarif edildiği gibi statik İP'ler üzerinden bir "alternatif ağ"
+kurabilirsiniz. Mesela şirket içi ip adresleri 10.1.1.x ile
+başlıyorsa, bu alternatif ağı 192.168.1.x üzerinden
+tanımlayabiliriz. Bu durumda, dış İnternet bağlantısı bile her iki
+bilgisayarda normal şirket ağı üzerinden akmaya devam edecektir, ama
+bizim iki bilgisayar birbiriyle 192.168.1.x üzerinden bağlantı
+kurabilirler. Statik tanım sırasında tek dikkat edilmesi gereken
+switch'e bağlandıktan sonra statik İP tanımını "Wired Connection 2"
+gibi "farklı" bir isimde çıkacak ikon üzerinden yapmak. Bunun
+haricinde başka hiçbir ek tanıma gerek yok.
 
 ![](Screenshotfrom2014-04-10161526.png)
 
