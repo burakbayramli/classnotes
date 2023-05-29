@@ -218,11 +218,19 @@ benziyor. Ayrıca Clough/Tocher yaklaşımı çok hızlı işler.
 
 ### Izgara İçinde En Yakın Değer Aradeğerlemesi
 
-Eğer bir izgara içinde düştüğümüz hücreyi bulabilirsek, o hücrenin
+Eğer bir ızgara içinde düştüğümüz hücreyi bulabilirsek, o hücrenin
 dört köşesinin x,y,z değerleri ile aradeğerleme yapılabilir. Burada
 iki lineerli (bilinear) aradeğerleme tekniği var, her kenara olan
 uzaklığı ölçüp bunlarla bir ağırlık değeri yaratıyor ve o ağırlıklara
 göre 4 bilinen z değerini kullanıp yeni z değerini üretiyor.
+
+Buna benzer bir yaklaşımla biz de kendi tekniğimizi yaratabiliriz,
+mesela içine düştüğümüz hücrenin dört kenarına olan bir basit uzaklık
+hesabı yaparız, uzaklığı benzerliğe çeviririz (yakın olan daha önemli
+olsun diye) ve bu ağırlıklarla dört köşe z değerinin ağırlıklı
+ortalamasını alırız.
+
+Örnek veriyi yaratalım,
 
 ```python
 from matplotlib import cm
@@ -233,8 +241,7 @@ def func(x, y):
     g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
     g2 = np.exp( -2 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)    
     return g1 + g2 
-D = 50
-S = 100
+D = 20
 x = np.linspace(36,37,D)
 y = np.linspace(32,33,D)
 xx,yy = np.meshgrid(x,y)
@@ -247,15 +254,119 @@ plt.savefig('aradegerleme-interpolation_04.png')
 
 ![](aradegerleme-interpolation_04.png)
 
+```python
+def find_corners(xi,yi):
+    idx1 = np.searchsorted(x, xi, side="left")
+    idx1 = len(x)-idx1-1
+    idx2 = np.searchsorted(y, yi, side="left")
+    idx2 = len(y)-idx2-1
+    return [(idx1-1,idx2-1),(idx1-1,idx2-2),(idx1-2,idx2-1),(idx1-2,idx2-2)]
+
+def cdist(p1,p2):    
+    distances = np.linalg.norm(p1 - p2, axis=1)
+    return distances
+```
+
+Örnek bir noktanın içinde olduğu hücrenin indis değerleri,
+
+```python
+cs = find_corners(36.5,32.4)
+print (cs)
+```
+
+```text
+[(9, 11), (9, 10), (8, 11), (8, 10)]
+```
+
+```python
+def grid_corner_interpolator(x, y, points):
+    a = np.array([x,y]).reshape(-1,2)
+    b = np.array(points)[:,:2]
+    ds = cdist(a,b)
+    ds = ds / np.sum(ds)
+    ds = 1. - ds
+    c = np.array(points)[:,2]
+    iz = np.sum(c * ds) / np.sum(ds)
+    return iz
+
+def test(intx,inty):
+    cs = find_corners(intx,inty)
+
+    i,j = cs[0][0],cs[0][1]
+    i,j = cs[1][0],cs[1][1]
+    i,j = cs[2][0],cs[2][1]
+    i,j = cs[3][0],cs[3][1]
+    
+    i0,j0 = cs[0][0],cs[0][1]
+    i1,j1 = cs[1][0],cs[1][1]
+    i2,j2 = cs[2][0],cs[2][1]
+    i3,j3 = cs[3][0],cs[3][1]
+    
+    introw = [(xx[i0,j0],yy[i0,j0],zz[i0,j0]),
+              (xx[i1,j1],yy[i1,j1],zz[i1,j1]),
+              (xx[i2,j2],yy[i2,j2],zz[i2,j2]),
+              (xx[i3,j3],yy[i3,j3],zz[i3,j3])]
+    res = grid_corner_interpolator(intx,inty,introw)
+
+    print ('aradeg',res, 'gercek',func(intx,inty))
+```
+
+```python
+test(36.5,32.4)
+test(36.1,32.1)
+test(36.8,32.2)
+test(36.111,32.711)
+```
+
+```text
+aradeg 0.5203198060581533 gercek 0.5624999999999915
+aradeg 0.012292103603170563 gercek 0.014328188407904384
+aradeg 0.000476645535074579 gercek 0.0006370371360601354
+aradeg 0.9209512999874692 gercek 0.9326947927222742
+```
+
+Altta yardımcı olabilecek bir grafikleme fonksiyonu, yeni nokta için onun
+içine düştüğü hücrenin köşelerini kontur grafiği içinde gösteriyor.
+
+```python
+def plot_corners(intx,inty):
+    cs = find_corners(intx,inty)
+    plt.contour(xx,yy,zz)
+    i,j = cs[0][0],cs[0][1]
+    plt.plot (xx[i,j],yy[i,j],'r.')
+    i,j = cs[1][0],cs[1][1]
+    plt.plot (xx[i,j],yy[i,j],'r.')
+    i,j = cs[2][0],cs[2][1]
+    plt.plot (xx[i,j],yy[i,j],'r.')
+    i,j = cs[3][0],cs[3][1]
+    plt.plot (xx[i,j],yy[i,j],'r.')
+
+plot_corners(36.5,32.4)
+plt.savefig('aradegerleme-interpolation_05.png')
+```
+
+```text
+10
+[36.         36.05263158 36.10526316 36.15789474 36.21052632 36.26315789
+ 36.31578947 36.36842105 36.42105263 36.47368421 36.52631579 36.57894737
+ 36.63157895 36.68421053 36.73684211 36.78947368 36.84210526 36.89473684
+ 36.94736842 37.        ]
+8
+[32.         32.05263158 32.10526316 32.15789474 32.21052632 32.26315789
+ 32.31578947 32.36842105 32.42105263 32.47368421 32.52631579 32.57894737
+ 32.63157895 32.68421053 32.73684211 32.78947368 32.84210526 32.89473684
+ 32.94736842 33.        ]
+```
+
+![](aradegerleme-interpolation_05.png)
 
 
 Kaynaklar
 
-[1] [Eğri Uydurma, Aradeğerleme (Interpolation) - 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit1/egri_uydurma_aradegerleme__interpolation___1.html)
+[1] <a href="https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit1/egri_uydurma_aradegerleme__interpolation___1.html">Eğri Uydurma, Aradeğerleme (Interpolation) - 1</a>
 
-[2] [Eğri Uydurma, Aradeğerleme (Interpolation) - 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit2/egri_uydurma_aradegerleme__interpolation___2.html)
+[2] <a href="https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit2/egri_uydurma_aradegerleme__interpolation___2.html">Eğri Uydurma, Aradeğerleme (Interpolation) - 2</a>
 
-[3] [Eğri Uydurma, Aradeğerleme (Interpolation) - 3](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit3/egri_uydurma_aradegerleme__interpolation___3.html)
+[3] <a href="https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit3/egri_uydurma_aradegerleme__interpolation___3.html">Eğri Uydurma, Aradeğerleme (Interpolation) - 3</a>
 
-[4] [Aradeğerleme (Interpolation) - 4 - Dairesel Baz Fonksiyonları (Radial Basis Functions -RBF-)](https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit4/aradegerleme__interpolation___4__dairesel_baz_fonksiyonlari__radial_basis_functions_rbf_.html)
-
+[4] <a href="https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit4/aradegerleme__interpolation___4__dairesel_baz_fonksiyonlari__radial_basis_functions_rbf_.html">Aradeğerleme (Interpolation) - 4 - Dairesel Baz Fonksiyonları (Radial Basis Functions -RBF-)</a>
