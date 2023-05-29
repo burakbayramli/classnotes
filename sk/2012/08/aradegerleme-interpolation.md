@@ -209,7 +209,7 @@ surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=Fal
 plt.savefig('aradegerleme-interpolation_03.png')
 ```
 
-![](aradegerleme-interpolation_03.png)
+[Sonuç](aradegerleme-interpolation_03.png)
 
 Farkettiysek üstteki ızgara her ekseni 50 parçaya böldü, `interp`
 objesi 30 parçalık izgara üzerinden yaratılmıştı; böylece elde olmayan
@@ -217,6 +217,12 @@ bir sürü değeri sormuş olduk ama nihai grafik hala orijinale
 benziyor. Ayrıca Clough/Tocher yaklaşımı çok hızlı işler.
 
 ### Izgara İçinde En Yakın Değer Aradeğerlemesi
+
+Eğer bir izgara içinde düştüğümüz hücreyi bulabilirsek, o hücrenin
+dört köşesinin x,y,z değerleri ile aradeğerleme yapılabilir. Burada
+iki lineerli (bilinear) aradeğerleme tekniği var, her kenara olan
+uzaklığı ölçüp bunlarla bir ağırlık değeri yaratıyor ve o ağırlıklara
+göre 4 bilinen z değerini kullanıp yeni z değerini üretiyor.
 
 ```python
 from matplotlib import cm
