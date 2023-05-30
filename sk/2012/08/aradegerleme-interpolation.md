@@ -225,12 +225,26 @@ içinde düştüğümüz hücreyi bulabilirsek, o hücrenin dört köşesinin
 x,y,z değerleri ile aradeğerleme yapılabilir. Burada iki lineerli
 (bilinear) aradeğerleme tekniği var, her kenara olan uzaklığı ölçüp
 bunlarla bir ağırlık değeri yaratıyor ve o ağırlıklara göre 4 bilinen
-z değerini kullanıp yeni z değerini üretiyor. Buna benzer bir
-yaklaşımla biz de kendi tekniğimizi yaratabiliriz, mesela içine
-düştüğümüz hücrenin dört kenarına olan bir basit uzaklık hesabı
-yaparız, uzaklığı benzerliğe çeviririz (yakın olan daha önemli olsun
-diye) ve bu ağırlıklarla dört köşe z değerinin ağırlıklı ortalamasını
-alırız.
+z değerini kullanıp yeni z değerini üretiyor. [5] bağlantısından
+adapte edilen bir kod alttadır, `x`,`y` içinde `linspace` sonucu dizi
+`zz` içinde ise gerçek fonksiyon sonucu `meshgrid` değerleri olduğunu
+varsayıyor.
+
+```python
+def bilinear_interpolator(x_new,y_new):
+    i = np.searchsorted(x, x_new) - 1
+    j = np.searchsorted(y, y_new) - 1
+    wx = (x[i+1] - x_new) / (x[i+1] - x[i])
+    wy = (y[j+1] - y_new) / (y[j+1] - y[j])
+    Pn = (1 - wx)*(1 - wy)*zz[i,j] + wx*(1 - wy)*zz[i+1,j] + (1 - wx)*wy*zz[i,j+1] + wx*wy*zz[i+1,j+1]
+    return Pn
+```
+
+Buna benzer bir yaklaşımla biz de kendi tekniğimizi yaratabiliriz,
+mesela içine düştüğümüz hücrenin dört kenarına olan bir basit uzaklık
+hesabı yaparız, uzaklığı benzerliğe çeviririz (yakın olan daha önemli
+olsun diye) ve bu ağırlıklarla dört köşe z değerinin ağırlıklı
+ortalamasını alırız.
 
 ![](aradegerleme-interpolation_06.png)
 
@@ -265,11 +279,17 @@ plt.savefig('aradegerleme-interpolation_04.png')
 
 ![](aradegerleme-interpolation_04.png)
 
+Verili x,y noktasının hangi hücre içinde olduğunu bulalım önce, burada
+`np.searchsorted` cağrısı yapıldı, bu çağrı sıralı bir dizi içinde
+aranan öğenin hangi aralığa düştüğünü hesaplıyor. Tüm `meshgrid`
+çağrısından gelen ızgara içinde aramak yerine daha az noktası olan
+düz dizi `x`,`y` içinde aramak daha iyi.
+
 ```python
 def find_corners(xi,yi):
     idx1 = np.searchsorted(x, xi, side="left")
     idx2 = np.searchsorted(y, yi, side="left")
-    cs = [(idx1,idx2),(idx1,idx2-1),(idx1-1,idx2),(idx1-1,idx2-1)]
+    cs = [(idx2,idx1),(idx2-1,idx1),(idx2,idx1-1),(idx2-1,idx1-1)]
     return cs
 ```
 
@@ -281,8 +301,12 @@ print (cs)
 ```
 
 ```text
-[(10, 8), (10, 7), (9, 8), (9, 7)]
+[(8, 10), (7, 10), (8, 9), (7, 9)]
 ```
+
+Noktanın içine düştüğü hücre kenarları bulununca onlara olan uzaklık
+hesaplanır, uzaklık bir yakınlık / benzerlik hesabına çevrilir, ve bu
+hesap her köşenin z değeri üzerinden bir ağırlıklı ortalama için kullanılır.
 
 ```python
 def cdist(p1,p2):    
@@ -319,6 +343,11 @@ def grid_interp(intx,inty):
     return cell_interp(intx,inty,introw)
 ```
 
+Test amaçlı olarak yeni, daha yoğun bir izgara yaratalım,
+`np.vectorize` ile aradeğerleme fonksiyonumuzu tüm matris üzerinde
+uygulanabilir hale çevirebiliriz, ve hesabı yapıp gerçek değerler ile
+tahmin arasında bir hata karesi ortalaması (mean square error) hesabı
+yaparız,
 
 ```python
 x2 = np.linspace(36.0001,36.9999,D*2)
@@ -327,13 +356,15 @@ xx2,yy2 = np.meshgrid(x2,y2)
 zz2 = func(xx2,yy2)
 
 grid_interp_vec = np.vectorize(grid_interp,otypes=[np.float])
-zz2_grid = grid_interp_vec(xx2,yy2).T
+zz2_grid = grid_interp_vec(xx2,yy2)
 print (np.mean(np.square(zz2-zz2_grid)))
 ```
 
 ```text
-0.0007539498751741862
+0.0006008344674974951
 ```
+
+Oldukça yakın. Ayrıca çağrı hızlı işledi. Grafikleyelim,
 
 ```python
 fig = plt.figure()
@@ -342,6 +373,46 @@ surf = ax.plot_surface(xx2, yy2, zz2_grid, cmap=cm.coolwarm,linewidth=0, antiali
 plt.savefig('aradegerleme-interpolation_05.png')
 ```
 
+[Sonuç](aradegerleme-interpolation_05.png)
+
+### QuadTree
+
+Üzerinden aradeğerleme yapılacak değerler düzgün izgara şeklinde ise
+üstteki teknik iyidir. Fakat bazen dağınık bir halde, içinde
+boşluklar, eksik verisi olan bir öbek elde olabilir, bu durumda hangi
+hücre içine düşüldüğü, dört köşe bulunması, vb. manevralar etkili
+olmaz.
+
+Eksik değerlerle iş yapabilmek için mevcut veriyi düz liste olarak
+kabul edip (izgara olup olmadığına bakmadan) x,y kordinatları
+üzerinden en yakın noktaları hızlı bir şekilde bize döndüren bir veri
+yapısı kullanmamız gerekir. Bu tür yapılardan bazılarının detaylarını,
+KDTree, BallTree gibi, [6]'da gördük. Bu yazıda QuadTree denen bir teknik
+kullanacağız, paket `quads` içinde.
+
+```python
+class QuadTreeInterpolator:
+    def __init__(self, x, y, z):
+        self.tree = quads.QuadTree((np.mean(x), np.mean(y)), 100, 100)
+        for xx,yy,zz in zip(x,y,z):
+            self.tree.insert((xx,yy),data=zz)
+            
+    def interpolate(self,x,y):
+        res = self.tree.nearest_neighbors((x,y), count=4)
+        points = np.array([[c.x, c.y, c.data] for c in res])
+        return cell_interp(x, y, points)               
+
+q = QuadTreeInterpolator(xx.flatten(), yy.flatten(), zz.flatten())    
+qinterp = np.vectorize(q.interpolate,otypes=[np.float])
+zz2_quad = qinterp(xx2,yy2)
+print (np.mean(np.square(zz2-zz2_quad)))
+```
+
+```
+0.0005101521958506852
+```
+
+Bu teknik te iyi sonuç verdi.
 
 Kaynaklar
 
@@ -352,3 +423,8 @@ Kaynaklar
 [3] <a href="https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit3/egri_uydurma_aradegerleme__interpolation___3.html">Eğri Uydurma, Aradeğerleme (Interpolation) - 3</a>
 
 [4] <a href="https://burakbayramli.github.io/dersblog/compscieng/compscieng_app20cfit4/aradegerleme__interpolation___4__dairesel_baz_fonksiyonlari__radial_basis_functions_rbf_.html">Aradeğerleme (Interpolation) - 4 - Dairesel Baz Fonksiyonları (Radial Basis Functions -RBF-)</a>
+
+[5] https://www.bottomscience.com/bilinear-interpolation-method-python/
+
+[6] <a href="https://burakbayramli.github.io/dersblog/algs/algs_070_knn/en_yakin_kkomsu__knearest_neighbor__geometrik_yakinlik_hesabi.html">En Yakın k-Komşu (k-Nearest Neighbor), Geometrik Yakınlık Hesabı</a>
+
