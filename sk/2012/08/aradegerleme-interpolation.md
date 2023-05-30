@@ -218,17 +218,28 @@ benziyor. Ayrıca Clough/Tocher yaklaşımı çok hızlı işler.
 
 ### Izgara İçinde En Yakın Değer Aradeğerlemesi
 
-Eğer bir ızgara içinde düştüğümüz hücreyi bulabilirsek, o hücrenin
-dört köşesinin x,y,z değerleri ile aradeğerleme yapılabilir. Burada
-iki lineerli (bilinear) aradeğerleme tekniği var, her kenara olan
-uzaklığı ölçüp bunlarla bir ağırlık değeri yaratıyor ve o ağırlıklara
-göre 4 bilinen z değerini kullanıp yeni z değerini üretiyor.
+Aradeğerleme çoğunlukla bir ızgara bazlı yapılır, elde ayrıksal bir
+ızgaradaki noktalara tekabül eden veri vardır, bu veriyi temel alarak
+diğer noktaları kestirmek gerekir. Bir teknik şöyle: eğer ızgara
+içinde düştüğümüz hücreyi bulabilirsek, o hücrenin dört köşesinin
+x,y,z değerleri ile aradeğerleme yapılabilir. Burada iki lineerli
+(bilinear) aradeğerleme tekniği var, her kenara olan uzaklığı ölçüp
+bunlarla bir ağırlık değeri yaratıyor ve o ağırlıklara göre 4 bilinen
+z değerini kullanıp yeni z değerini üretiyor. Buna benzer bir
+yaklaşımla biz de kendi tekniğimizi yaratabiliriz, mesela içine
+düştüğümüz hücrenin dört kenarına olan bir basit uzaklık hesabı
+yaparız, uzaklığı benzerliğe çeviririz (yakın olan daha önemli olsun
+diye) ve bu ağırlıklarla dört köşe z değerinin ağırlıklı ortalamasını
+alırız.
 
-Buna benzer bir yaklaşımla biz de kendi tekniğimizi yaratabiliriz,
-mesela içine düştüğümüz hücrenin dört kenarına olan bir basit uzaklık
-hesabı yaparız, uzaklığı benzerliğe çeviririz (yakın olan daha önemli
-olsun diye) ve bu ağırlıklarla dört köşe z değerinin ağırlıklı
-ortalamasını alırız.
+![](aradegerleme-interpolation_06.png)
+
+Resme göre anlatırsak A'nin x,y değerleri 0.2,0.8 sol üst köşeye daha
+yakındır, o zaman A için bir z değeri ortalaması hesaplamak
+gerekiyorsa sol üst köşenin z değeri (7 olarak gösteriliyor) diğer üç
+köşedeki z değerlerinden (0,3,5) ortalamada daha fazla etkili
+olmalıdır. Bir algoritma bu yakınlıkları dört köşe için ayrı ayrı
+hesaplayabilir, ve bir ağırlıklama tekniği oluşturur.
 
 Örnek veriyi yaratalım,
 
@@ -257,14 +268,9 @@ plt.savefig('aradegerleme-interpolation_04.png')
 ```python
 def find_corners(xi,yi):
     idx1 = np.searchsorted(x, xi, side="left")
-    idx1 = len(x)-idx1-1
     idx2 = np.searchsorted(y, yi, side="left")
-    idx2 = len(y)-idx2-1
-    return [(idx1-1,idx2-1),(idx1-1,idx2-2),(idx1-2,idx2-1),(idx1-2,idx2-2)]
-
-def cdist(p1,p2):    
-    distances = np.linalg.norm(p1 - p2, axis=1)
-    return distances
+    cs = [(idx1,idx2),(idx1,idx2-1),(idx1-1,idx2),(idx1-1,idx2-1)]
+    return cs
 ```
 
 Örnek bir noktanın içinde olduğu hücrenin indis değerleri,
@@ -275,11 +281,15 @@ print (cs)
 ```
 
 ```text
-[(9, 11), (9, 10), (8, 11), (8, 10)]
+[(10, 8), (10, 7), (9, 8), (9, 7)]
 ```
 
 ```python
-def grid_corner_interpolator(x, y, points):
+def cdist(p1,p2):    
+    distances = np.linalg.norm(p1 - p2, axis=1)
+    return distances
+
+def cell_interp(x, y, points):
     a = np.array([x,y]).reshape(-1,2)
     b = np.array(points)[:,:2]
     ds = cdist(a,b)
@@ -289,7 +299,7 @@ def grid_corner_interpolator(x, y, points):
     iz = np.sum(c * ds) / np.sum(ds)
     return iz
 
-def test(intx,inty):
+def grid_interp(intx,inty):
     cs = find_corners(intx,inty)
 
     i,j = cs[0][0],cs[0][1]
@@ -306,59 +316,31 @@ def test(intx,inty):
               (xx[i1,j1],yy[i1,j1],zz[i1,j1]),
               (xx[i2,j2],yy[i2,j2],zz[i2,j2]),
               (xx[i3,j3],yy[i3,j3],zz[i3,j3])]
-    res = grid_corner_interpolator(intx,inty,introw)
-
-    print ('aradeg',res, 'gercek',func(intx,inty))
+    return cell_interp(intx,inty,introw)
 ```
 
+
 ```python
-test(36.5,32.4)
-test(36.1,32.1)
-test(36.8,32.2)
-test(36.111,32.711)
+x2 = np.linspace(36.0001,36.9999,D*2)
+y2 = np.linspace(32.0001,32.9999,D*2)
+xx2,yy2 = np.meshgrid(x2,y2)
+zz2 = func(xx2,yy2)
+
+grid_interp_vec = np.vectorize(grid_interp,otypes=[np.float])
+zz2_grid = grid_interp_vec(xx2,yy2).T
+print (np.mean(np.square(zz2-zz2_grid)))
 ```
 
 ```text
-aradeg 0.5203198060581533 gercek 0.5624999999999915
-aradeg 0.012292103603170563 gercek 0.014328188407904384
-aradeg 0.000476645535074579 gercek 0.0006370371360601354
-aradeg 0.9209512999874692 gercek 0.9326947927222742
+0.0007539498751741862
 ```
 
-Altta yardımcı olabilecek bir grafikleme fonksiyonu, yeni nokta için onun
-içine düştüğü hücrenin köşelerini kontur grafiği içinde gösteriyor.
-
 ```python
-def plot_corners(intx,inty):
-    cs = find_corners(intx,inty)
-    plt.contour(xx,yy,zz)
-    i,j = cs[0][0],cs[0][1]
-    plt.plot (xx[i,j],yy[i,j],'r.')
-    i,j = cs[1][0],cs[1][1]
-    plt.plot (xx[i,j],yy[i,j],'r.')
-    i,j = cs[2][0],cs[2][1]
-    plt.plot (xx[i,j],yy[i,j],'r.')
-    i,j = cs[3][0],cs[3][1]
-    plt.plot (xx[i,j],yy[i,j],'r.')
-
-plot_corners(36.5,32.4)
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx2, yy2, zz2_grid, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 plt.savefig('aradegerleme-interpolation_05.png')
 ```
-
-```text
-10
-[36.         36.05263158 36.10526316 36.15789474 36.21052632 36.26315789
- 36.31578947 36.36842105 36.42105263 36.47368421 36.52631579 36.57894737
- 36.63157895 36.68421053 36.73684211 36.78947368 36.84210526 36.89473684
- 36.94736842 37.        ]
-8
-[32.         32.05263158 32.10526316 32.15789474 32.21052632 32.26315789
- 32.31578947 32.36842105 32.42105263 32.47368421 32.52631579 32.57894737
- 32.63157895 32.68421053 32.73684211 32.78947368 32.84210526 32.89473684
- 32.94736842 33.        ]
-```
-
-![](aradegerleme-interpolation_05.png)
 
 
 Kaynaklar
