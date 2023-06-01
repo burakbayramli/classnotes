@@ -1,11 +1,11 @@
-# Unix'e Giris
+# Unix'e Giriş
 
 İşletim sistemlerinin kralı tartışmasız Unix. Geliştirilmesi 70'li
 yıllarda başlayan ve C programlama diline yakın oluşuyla daha da
 yayılan bu sistem çekirdeksel olarak şu anda cep telefonlar dahil
 olmak üzere milyarlarca makina üzerinde işliyor.
 
-Süreçler
+### Süreçler
 
 Unix'i Unix yapan pek çok kavram var. Kullanıcıya pek gözükmeyen sahne
 arkasındaki programları denetleyen, işleten çekirdek seviyesinde
@@ -31,7 +31,7 @@ bkz [Faydalı Unix Komutları](../../2012/04/faydali-unix-komutlari.md).
 
 Süreç listesini daha renkli olarak htop komutu ile görebiliriz (bağlantı altta). 
 
-Komut Satırı, Kabuk
+### Komut Satırı, Kabuk
 
 Unix'te çoğu işlem komut satırı etrafında döner, en azından usta
 admin, kullanıcılar onu tercih eder. Programları başlatmak, idare
@@ -132,7 +132,6 @@ Eğer karışıklığı meydan bırakmayacak şekilde bir programı direk
 işletmek istersek bunu komut satırında `/bin/date` yazarak
 yapabilirdik. Hatta script yazarken tavsiye edilen yaklaşım budur. 
 
-
 Üstteki `ls` sonucunun soldaki kısmı kafa karıştırmış olabilir,
 `-rwxr-xr-x` ne demek? Alttaki resimle anlatmaya uğraşalım,
 
@@ -168,7 +167,7 @@ tutulur. Basit bir metin dosyasıdır, ama tabii ki herkes göremez,
 Dosya sahibi (admin) hariç başka kimsenin dosyaya yazma hakkı
 olmadığını görüyoruz.
 
-Izinleri değiştirmek icin [chmod](chmod.html) kullanılır.
+İzinleri değiştirmek icin [chmod](chmod.html) kullanılır.
 
 Pek çok şey kabuk etrafında döner dedik, program başlatmak bunlardan
 en önemlisi. Bir program ismini yazarak onu komut satırından
@@ -191,3 +190,38 @@ oradan `emacs &` ile editörü başlattım, konsolu kapatırsam, emacs
 programı da kapanacaktır. O zaman başlatanda "evlatlık reddi" yapmak
 lazım, yani `emacs & disown`. O zaman aradaki bağlantı kopar, başlatan
 ölürse başlatılan ölmez.
+
+### Başlangıç Ayarları
+
+Komut satırı metin bazlı bir ortam olduğu için eğer bazı komutları sürekli
+klavyede giriyorsak onları kısa temsil eden bir kısayol (alias) yaratmak
+faydalı olabilir. Mesela sürekli `ssh user1@192.168.44.33` ile bir makinaya
+ssh girişi yapıyorum, bu komutu
+
+```
+alias myssh='ssh user1@192.168.44.33`
+```
+
+ile özetleyebilirim. Artık `myssh` yazınca belirtilen `ssh` komutu
+işler. Bir alias sonrası gelen seçenekler, ek komutlar alias açılımı
+sonuna eklenir, eğer `myssh -X` diyorsam bu komut `ssh user1@192.168.44.33 -X`
+olarak açılacaktır.
+
+Peki ya alias *ortasına* bir ek parametre geçmek istesem? Diyelim ki standard
+bir `fınd /usr -name '*.txt'` komutu uyguladım, fakat aramanın başladığı
+dizini `/usr` değil bir değişken üzerinden tanımlamak istiyorum. Bu durumda
+düz alias işlemez, ama bir bash fonksiyonu işler,
+
+```
+function myfind() {
+  convert -sharpen 0x10 -quality 70 -scale 70%   out.jpg
+  find "$@" -name '*.txt'
+}
+```
+
+Bu kısayolu `myfind /tmp` şeklinde kullanabilirim, verdiğim parametre `fınd`
+komutunun `"$@"` kısmına eklenecektir. 
+
+
+
+

@@ -15,7 +15,7 @@
 
 ## Konular, Referans
 
-[Python](2016/01/python-dil-ogrenimi.html)
+[Python](2016/01/python.html)
 
 [Unix](2020/07/unix.html)
 

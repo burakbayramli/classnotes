@@ -355,7 +355,7 @@ y2 = np.linspace(32.0001,32.9999,D*2)
 xx2,yy2 = np.meshgrid(x2,y2)
 zz2 = func(xx2,yy2)
 
-grid_interp_vec = np.vectorize(grid_interp,otypes=[np.float])
+grid_interp_vec = np.vectorize(grid_interp,otypes=[np.float64])
 zz2_grid = grid_interp_vec(xx2,yy2)
 print (np.mean(np.square(zz2-zz2_grid)))
 ```
@@ -403,7 +403,7 @@ class QuadTreeInterpolator:
         return cell_interp(x, y, points)               
 
 q = QuadTreeInterpolator(xx.flatten(), yy.flatten(), zz.flatten())    
-qinterp = np.vectorize(q.interpolate,otypes=[np.float])
+qinterp = np.vectorize(q.interpolate,otypes=[np.float64])
 zz2_quad = qinterp(xx2,yy2)
 print (np.mean(np.square(zz2-zz2_quad)))
 ```
