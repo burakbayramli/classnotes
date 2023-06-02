@@ -111,6 +111,23 @@ Created GPX: <?xml version="1.0" encoding="UTF-8"?>
 </gpx>
 ```
 
+Eğer birden fazla yol parçası (track) var ise, bunları yeni 
+
+```
+... = gpxpy.gpx.GPXTrack()
+gpx.tracks.append(..)
+```
+
+çağrıları ile ekleyebiliriz. Eğer birden fazla yol parçasını geziyorsak, üstteki
+
+```
+for track in gpx.tracks:
+    for segment in track.segments:
+       ..
+```
+
+döngüdeki dış döngü tüm yol parçalarını gezecektir. 
+
 Kaynaklar
 
 [1] <a href="https://pypi.org/project/gpxpy/">PyPI</a>

@@ -242,3 +242,13 @@ Depo'nun eski tarihteki haline donmek istiyorsak,
 git checkout "`git rev-list master  -n 1 --first-parent --before=2022-06-02`"
 ```
 
+### Tüm Tarihte bir Dosyayı Aramak
+
+Sadece en son versiyonda değil gelmiş geçmiş commit edilmiş belki silinmiş
+ama hala tarihte olan dosyaları aramak istiyorsak,
+
+```
+git log --all --full-history -- "**/*myscript*.py"
+```
+
+

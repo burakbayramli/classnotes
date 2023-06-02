@@ -214,13 +214,12 @@ düz alias işlemez, ama bir bash fonksiyonu işler,
 
 ```
 function myfind() {
-  convert -sharpen 0x10 -quality 70 -scale 70%   out.jpg
   find "$@" -name '*.txt'
 }
 ```
 
 Bu kısayolu `myfind /tmp` şeklinde kullanabilirim, verdiğim parametre `fınd`
-komutunun `"$@"` kısmına eklenecektir. 
+komutunun `"$@"` kısmına enjekte edilecektir. 
 
 
 

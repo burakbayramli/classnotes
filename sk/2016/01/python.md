@@ -4,7 +4,7 @@
 
 [Python Liste Kavraması (List Comprehension)](../../2021/12/python-list-comprehension.html)
 
-[Virtualenv](../../2018/08/virtualenv-python-izole-sanal-calsma.html).
+[Virtualenv](../../2018/08/virtualenv-python-izole-sanal-calsma.html)
 
 [Python Sözlük (Dictionary) Veri Yapısı](../../2023/05/python-sozluk-dictionary.html)
 
