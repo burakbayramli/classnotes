@@ -318,7 +318,7 @@ durumlarda slice() çağrısı tercih edilmekte.
 
 Ekler
 
-[meshgrid](../../2011/02/meshgrid.html)
+[Grafiklemek, Meshgrid](../../2020/02/grafiklemek.html)
 
 [Histogram Numaraları](../../2015/10/histogram-numaralari.html)
 

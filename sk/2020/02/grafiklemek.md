@@ -1,6 +1,9 @@
 # Grafiklemek, Matplotlib, Pandas
 
-Basit X-Y grafikleri, ikili, üçlü, iki eksenli grafikleri bu yazıda işleyeceğiz.
+Basit X-Y grafikleri, ikili, üçlü, iki eksenli, üç boyutlu grafikleri
+bu yazıda işleyeceğiz.
+
+### Giriş
 
 En basit grafik,
 
@@ -30,6 +33,8 @@ plt.savefig('graf_02.png')
 ![](https://2.bp.blogspot.com/-XMnE4JdEx0M/XlywBM9ctHI/AAAAAAAAB7Q/sR96rsWw_UQO_K_0lGJGgdYsHToObTyjwCLcBGAsYHQ/s1600/graf_02.png)
 
 Renkleri de aynı komutta belirtilebiliyoruz. Üstteki `r` kırmızı (red) için. 
+
+### Eksenler
 
 Çoğu zaman aynı imajda birden fazla grafik olmasını isteyebiliyoruz,
 karşılaştırma amacıyla, vs. Alt alta iki grafik için çabuk bir şekilde
@@ -175,7 +180,46 @@ plt.savefig('graf_08.png')
 Böylece `crisis` (kriz) kolonuna dayanarak eğer orada 1 var ise o alanı
 dikey olarak işaretliyoruz, sıfır ise hiçbir şey gösterilmiyor. 
 
+### Üç Boyut
 
+Diyelim ki 3 boyutlu bir fonksiyon hesaplatacağız, fonksiyon alanı ise
+x kordinatı -5 ve 5 arasında, y kordinatı -3, 3 arasında olacak. O
+zaman bu aralıktaki her noktanın kombinasyonu bizen lazım. Bu
+kombinasyon `[-5,-3], [5.1,-3],..,[-5,-3.1]` diye gidecekti. Fonksiyon
+`meshgrid` 2 kordinat vektörü alır ve geriye 2 kordinat matrisi
+döndürür.
+
+`meshgrid` fonksiyonunun yaptığı bu kombinasyonu rahat erişilir hale
+getirmekten ibaret. meşhgrid çağrısından geri gelecek X ve Y
+matrislerinde `X[1]` ve `Y[1]`'e baktığımızda (her iki tarafta aynı
+indisi kullandığımızda yani) kombinasyonlardan birini anında
+alabileceğiz. Örnek
+
+```python
+x = np.arange(-5, 5, 0.1)
+y = np.arange(-3, 3, 0.1)
+xx, yy = np.meshgrid(x, y)
+zz = np.sin(xx**2+yy**2)/(xx**2+yy**2)
+```
+
+Not: Bu kodda `meshgrid`'den gelen xx ve yy üzerinde direk indis
+kullanılıyormuş gibi gözükmüyor, fakat arka planda aslında
+kullanılıyor. xx ile yy üzerinde aritmetik işlemler kullanılınca, bu
+otomatik olarak her xx ve yy elemanın teker teker, aynı indiste
+olanlarının beraber işleme sokulması demektir, +, -, ** gibi işlemler
+perde arkasında buna göre kodlanmıştır.
+
+
+```python
+from matplotlib import cm
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+plt.savefig('graf_09.png')
+```
+
+![](graf_09.png)
 
 
 

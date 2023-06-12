@@ -3,6 +3,8 @@
 
 ## En Son
 
+5/6 - [Aradeğerleme (Interpolation) - Ekler - En Yakın Değer Teknikleri](https://burakbayramli.github.io/dersblog/sk/2012/08/aradegerleme-interpolation.html)
+
 29/5 - [Sonlu Öğeler Metotu - Mittal](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp45fem90mittal/sonlu_ogeler_metotu__finite_elements_method_fem___mittal.html)
 
 25/5 - [Dekoratörler, Önbellek Kodlaması, Fonksiyon Değiştirmek](https://burakbayramli.github.io/dersblog/sk/2013/07/onbelleklemeyi-dekorator-ile-yapmak.html)
@@ -10,8 +12,6 @@
 22/5 - [Lenovo Tablet Üzerinde Termux](https://burakbayramli.github.io/dersblog/sk/2023/05/tablet-termux-lenovo.html)
 
 19/5 - [Ubuntu 22](https://burakbayramli.github.io/dersblog/sk/2023/05/ubuntu-22.html)
-
-10/5 - [Python Sözlük (Dictionary) Veri Yapısı](https://burakbayramli.github.io/dersblog/sk/2023/05/python-sozluk-dictionary.html)
 
 ## Konular, Referans
 

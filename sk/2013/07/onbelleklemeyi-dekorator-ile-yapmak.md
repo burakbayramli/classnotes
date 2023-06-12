@@ -29,7 +29,7 @@ print (n_topla1(10))
 Toplam 1 + 2 + 3 + .. + 10 diye 10'a kadar olan sayıları topladı ve
 döndürdü.  Sonra 5 ve tekrar 10 için aynı teknik kullanıldı.
 
-Fakat diyelim ki bu fonksiyon pek çok kez ardı ardına çağırmak
+Fakat diyelim ki bu fonksiyonu pek çok kez ardı ardına çağırmak
 gerekiyor, ve çağrıların çoğu benzer parametreleri kullanacak, mesela
 10'a kadar olan toplam pek çok kez yapılabilecek.. Acaba üstteki
 toplam işlemini bir kez yapıp ikinci, üçüncü çağrılarda aynı hesabı

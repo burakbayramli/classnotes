@@ -178,7 +178,7 @@ Aradeg: [0.53970076] Gercek: 0.540029869446153
 ```
 
 Görüldüğü gibi kullanım oldukca basit; x,y,z değerlerini iki boyutlu
-matris oalrak verdik (tek boyutlu vektör de işliyor), RBF objesi
+matris olarak verdik (tek boyutlu vektör de işliyor), RBF objesi
 üzerinden ek değerler için aradeğerleme yaptık.
 
 ### CloughTocher2DInterpolator
@@ -427,4 +427,7 @@ Kaynaklar
 [5] https://www.bottomscience.com/bilinear-interpolation-method-python/
 
 [6] <a href="https://burakbayramli.github.io/dersblog/algs/algs_070_knn/en_yakin_kkomsu__knearest_neighbor__geometrik_yakinlik_hesabi.html">En Yakın k-Komşu (k-Nearest Neighbor), Geometrik Yakınlık Hesabı</a>
+
+
+
 

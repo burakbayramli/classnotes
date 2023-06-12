@@ -48,6 +48,8 @@
 
 [Liste Gezerken Eleman Silmek](../../2011/03/liste-gezerken-eleman-silmek.html)
 
+[Grafiklemek, Matplotlib, Pandas](../../2020/02/grafiklemek.html)
+
 [Cython](../../2010/11/cython.html)
 
 [Numpy](../../2016/10/numpy.html)
