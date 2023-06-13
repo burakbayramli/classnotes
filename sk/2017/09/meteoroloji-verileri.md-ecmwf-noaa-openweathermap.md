@@ -2,7 +2,7 @@
 
 OpenWeatherMap
 
-Bu Web servisi kayıt olanlara bir APİ anahtarı verir ve belli sayıda
+Bu Web servisi kayıt olanlara bir API anahtarı verir ve belli sayıda
 APİ çağrısı için kullanım bedavadır. Servisten o andaki sıcaklık,
 rüzgar, nem vs gibi verileri alabiliriz, ayrıca bu veriler için
 tahminler de aynı API üzerinden paylaşılıyor [2,3].
