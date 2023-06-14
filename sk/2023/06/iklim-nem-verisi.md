@@ -78,23 +78,10 @@ O günün verisini kullanarak daha detaylı nemlilik verisini
 OpenWeatherMap ile alabiliriz [2]. Gerçi OWM'in tarihi veri servisi de
 var fakat bu servis paralı, belli kota altındaki anlık veri alımı
 bedava, bu yazı için onu kullanalım. Onları önceden rasgele seçilmiş
-belli noktalar için alacağız, `util.coords` içinde,
-
-```python
-year,month = 2019,8
-util.get_sm().plot_continents(40, 35, zoom=1, incolor='red', outcolor='white', fill=False)
-plt.xlim(26,44)
-plt.ylim(35,42)
-cs = np.array(util.coords)
-plt.plot(cs[:,1], cs[:,0], 'r.')
-plt.savefig('iklim03.jpg',quality=40)
-```
-
-[Noktalar](iklim03.jpg)
-
-Bugünün verisini alalım, erişim için OWM anahtarının alınmış olduğunu
-farzediyoruz, bizimki `$HOME` altında `.nomterr.conf` adlı bir JSON
-dosyasında, `weatherapi` anahtarına tekabül ediyor,
+belli noktalar için alacağız, `util.coords` içinde. Bugünün verisini
+alalım, erişim için OWM anahtarının alınmış olduğunu farzediyoruz,
+bizimki `$HOME` altında `.nomterr.conf` adlı bir JSON dosyasında,
+`weatherapi` anahtarına tekabül ediyor,
 
 ```python
 base_url = 'http://api.openweathermap.org/data/2.5/weather?'
@@ -127,6 +114,7 @@ util.get_sm().plot_continents(40, 35, zoom=1, incolor='red', outcolor='white', f
 
 df = util.get_pd().read_csv('trall.csv',header=None)
 df = df.tail(1)
+cs = np.array(util.coords)
 x = cs[:,0]
 y = cs[:,1]
 z = np.array(df[list(range(1,28))])[0]

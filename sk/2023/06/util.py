@@ -3,6 +3,8 @@ import requests, json, os, datetime
 import simplegeomap as sm
 import csv, pandas as pd, re
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 def get_pd(): return pd
 
@@ -63,3 +65,45 @@ def hadisdh_process():
             fout.flush()
         fout.flush()
         
+def get_humidity():
+    base_url = 'http://api.openweathermap.org/data/2.5/weather?'
+    params = json.loads(open(os.environ['HOME'] + "/.nomterr.conf").read())
+    n = datetime.datetime.now()
+    ns = n.strftime("%Y-%m-%d")
+    hums = []
+    for i in range(len(coords)):
+        print (i)
+        payload = { 'lat': str(coords[i][0]), 'lon': str(coords[i][1]),'appid': params['weatherapi'] }
+        r = requests.get(base_url, params=payload) 
+        res = [json.loads(x.decode()) for x in r.iter_lines()]
+        hums.append(str(res[0]['main']['humidity']))
+
+    line = ns + "," + ",".join(hums) 
+    fout = open("trall.csv","a")
+    fout.write(line)
+    fout.write("\n")
+    fout.close()    
+
+def plot_latest():
+    get_sm().plot_continents(40, 35, zoom=1, incolor='red', outcolor='white', fill=False)
+    cs = np.array(coords)
+    df = get_pd().read_csv('trall.csv',header=None)
+    df = df.tail(1)
+    x = cs[:,0]
+    y = cs[:,1]
+    z = np.array(df[list(range(1,28))])[0]
+
+    xi,yi = np.meshgrid(np.linspace(35,42,20),np.linspace(26,44,20))
+
+    q = get_qti()(x,y,z)
+    interp = np.vectorize(q.interpolate,otypes=[np.float64])
+    zi = interp(xi, yi)
+    plt.xlim(26,44)
+    plt.ylim(35,42)
+    plt.pcolormesh(yi,xi,zi,cmap='Blues')
+    plt.show()
+    
+if __name__ == "__main__":
+    
+    #get_humidity()
+    plot_latest()
