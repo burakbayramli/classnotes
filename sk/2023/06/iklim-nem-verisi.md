@@ -98,9 +98,9 @@ for i in range(len(coords)):
     res = [json.loads(x.decode()) for x in r.iter_lines()]
     hums.append(str(res[0]['main']['humidity']))
 
-line = ns + "," + ",".join(hums) 
-fout = open("trall.csv","a")
-fout.write(line)
+hline = ns + "," + ",".join(hums) 
+fout = open("trhumid.csv","a")
+fout.write(hline)
 fout.write("\n")
 fout.close()
 ```

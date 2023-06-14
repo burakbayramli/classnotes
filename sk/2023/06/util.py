@@ -65,24 +65,32 @@ def hadisdh_process():
             fout.flush()
         fout.flush()
         
-def get_humidity():
+def get_latest():
     base_url = 'http://api.openweathermap.org/data/2.5/weather?'
     params = json.loads(open(os.environ['HOME'] + "/.nomterr.conf").read())
     n = datetime.datetime.now()
     ns = n.strftime("%Y-%m-%d")
-    hums = []
+    hums = []; temps = []
     for i in range(len(coords)):
         print (i)
-        payload = { 'lat': str(coords[i][0]), 'lon': str(coords[i][1]),'appid': params['weatherapi'] }
+        payload = { 'units': 'metric', 'lat': str(coords[i][0]), 'lon': str(coords[i][1]),'appid': params['weatherapi'] }
         r = requests.get(base_url, params=payload) 
         res = [json.loads(x.decode()) for x in r.iter_lines()]
         hums.append(str(res[0]['main']['humidity']))
+        temps.append(str(res[0]['main']['temp']))
 
-    line = ns + "," + ",".join(hums) 
-    fout = open("trall.csv","a")
-    fout.write(line)
-    fout.write("\n")
-    fout.close()    
+    hline = ns + "," + ",".join(hums)
+    tline = ns + "," + ",".join(temps)
+    
+    hout = open("trhumid.csv","a")
+    hout.write(hline)
+    hout.write("\n")
+    tout = open("trtemp.csv","a")
+    tout.write(tline)
+    tout.write("\n")
+    
+    hout.close()    
+    tout.close()    
 
 def plot_latest():
     get_sm().plot_continents(40, 35, zoom=1, incolor='red', outcolor='white', fill=False)
@@ -105,5 +113,5 @@ def plot_latest():
     
 if __name__ == "__main__":
     
-    #get_humidity()
-    plot_latest()
+    get_latest()
+    #plot_latest()
