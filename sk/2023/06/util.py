@@ -95,7 +95,8 @@ def get_latest():
 def plot_latest():
     get_sm().plot_continents(40, 35, zoom=1, incolor='red', outcolor='white', fill=False)
     cs = np.array(coords)
-    df = get_pd().read_csv('trall.csv',header=None)
+    df = get_pd().read_csv('trhumid.csv',header=None)
+    #df = get_pd().read_csv('trtemp.csv',header=None)
     df = df.tail(1)
     x = cs[:,0]
     y = cs[:,1]
@@ -113,5 +114,5 @@ def plot_latest():
     
 if __name__ == "__main__":
     
-    get_latest()
-    #plot_latest()
+    #get_latest()
+    plot_latest()

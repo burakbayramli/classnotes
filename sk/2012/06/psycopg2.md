@@ -7,7 +7,7 @@ bir paket, yani MySql tabanlara bağlantı için kod yazanlar için
 çağrılar tanıdık gelecektir. En basit örnek `test.py` adlı bir dosya
 olsun,
 
-```
+```python
 import psycopg2
 
 conn = psycopg2.connect("dbname=[taban] user=postgres password=postgres")
@@ -29,7 +29,7 @@ görmek istersek, GUİ araçları yerine bir jupyter not defteri üzerinden
 kod işletmeyi seçebiliriz. Taban erişimi için psycopg2 iş
 görür. Bağlantı aldıktan sonra (Postgresql olsun),
 
-```
+```python
 import psycopg2
 
 conn = psycopg2.connect(
@@ -43,7 +43,7 @@ conn = psycopg2.connect(
 
 şu metotlarla taban içeriği gösterilebilir
 
-```
+```python
 import psycopg2
 
 sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
