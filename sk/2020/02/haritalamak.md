@@ -197,6 +197,34 @@ y = np.linspace(lowlat,hilat,4)
 xx,yy = np.meshgrid(x,y)
 ```
 
+Eğer bir merkez nokta etrafında tek bir mesafe uzaklığı baz alıp bir ızgara
+yaratmak istiyorsak,
+
+```python
+p1 = LatLon(clat,clon)
+EARTH_RAD = 6371
+upright = p1.destination (dist, bearing=45, radius=EARTH_RAD)
+lowleft = p1.destination (dist, bearing=225, radius=EARTH_RAD)
+latmin = np.min([lowleft.lat, upright.lat])
+latmax = np.max([lowleft.lat, upright.lat])
+lonmin = np.min([lowleft.lon, upright.lon])
+lonmax = np.max([lowleft.lon, upright.lon])
+x = np.linspace(lonmin,lonmax,N)
+y = np.linspace(latmin,latmax,N)
+xx,yy =  np.meshgrid(x,y)
+latints = np.unique(x.astype(np.int))
+lonints = np.unique(y.astype(np.int))
+```
+
+Bu kod 45 derece kuzeydoğu 225 derece güneybatıya `dist` mesafesi
+kadar adım atıp o noktaları sağ üst, sol alt köşe olarak kabul etti ve
+bu dikdörtgeni baz alıp bir `N*N` noktalı bir ızgara yarattı. Ayrıca o
+ızgara noktalarındaki tüm kordinatların enlem, boylam değerlerinin tam
+sayı bazlı bir listesini de hesapladı, bu bilgi pek çok uygulamada
+lazım olabiliyor (mesela tam sayı enlem/boylam bazlı bazı bilgiler
+önbellekte, tabanda tutulmuş olabilir, ve üstteki tam sayılar ile
+bu bölgesel bilgiler tabandan alınabilir).
+
 ![](har4.jpg)
 
 Oklar, Quiver
