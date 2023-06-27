@@ -106,9 +106,10 @@ python setup.py sdist bdist_wheel
 ```
 
 ile PyPi için gerekli dosyaları da üretmek mümkün, bu dosyalar `dist`
-dizini altında konuluyor. Dikkat, önce `python setup.py install`
-komutu işletin, sonra üsttekini, `dist` altında üç tane dosya lazım,
-`.egg`, `.zip` ve `.whl`.
+dizini altında konuluyor. Dikkat, önce `python setup.py build` komutu
+işletin, sonra üsttekini, `dist` altında iki tane dosya lazım, `.zip`
+ve `.whl` (`install` işletmeye gerek yok, bu komut bir .egg dosyası
+yaratır, PyPi artık bu dosyaları taşımak istemiyor).
 
 Nihai paketin PyPi'a gönderilmesi için PyPi'a üye olunması lazım, ve  `twine` adlı
 araç gerekli, onu
