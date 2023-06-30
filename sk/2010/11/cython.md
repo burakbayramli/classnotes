@@ -1,13 +1,13 @@
 # Cython
 
-Python icinden C cagirmanin, Python kodunu C'ye cevirmenin yani daha
-hizli isler hale getirmenin yollarindan olan Cython'un populerligi
-artiyor. Bu arac ile Python icinde, Python sozdizimine benzer bir
-sekilde yazdiginiz kodlardan C kodu uretilmesi mumkun. Bir fark, bu
-kodu derlemek icin "python" cagrisi yerine "cython" cagrisi kullanmak
-gerekli. Bu cagri sonrasi .c dosyasi uretilecek, bu dosya gcc ile .o
-sonra .so dosyasina derlenecek. Elde edilen .so dosyasi artik pur
-Python tarafindan "import" edilebilir bir modul olacaktir.
+Python içinden C çağırmanın, Python kodunu C'ye çevirmenin yani daha
+hızlı işler hale getirmenin yollarından olan Cython'un popülerliği
+artıyor. Bu araç ile Python içinde, Python sözdizimine benzer bir
+şekilde yazdığınız kodlardan C kodu üretilmesi mümkün. Bir fark, bu
+kodu derlemek için "python" çağrısı yerine "cython" çağrısı kullanmak
+gerekli. Bu çağrı sonrası .c dosyası üretilecek, bu dosya gcc ile .o
+sonra .sö döşyasına derlenecek. Elde edilen .so dosyası artık pür
+Python tarafından "import" edilebilir bir modül olacaktır.
 
 Kurmak icin
 
@@ -29,7 +29,7 @@ isimdeki so kutuphanesine derlenmesi gereklidir.
 
 c1.pyx
 
-```
+```python
 import math
 
 def great_circle(float lon1,float lat1,float lon2,float lat2):
@@ -45,7 +45,7 @@ def great_circle(float lon1,float lat1,float lon2,float lat2):
     return radius*c
 ```
 
-```
+```python
 import timeit  
 
 lon1, lat1, lon2, lat2 = -72.345, 34.323, -61.823, 54.826
@@ -58,7 +58,7 @@ print "Pure python function", t.timeit(num), "sec"
 
 c1-main.py
 
-```
+```python
 import timeit
 
 lon1, lat1, lon2, lat2 = -72.345, 34.323, -61.823, 54.826
@@ -69,11 +69,9 @@ t = timeit.Timer("c1.great_circle(%f,%f,%f,%f)" % (lon1,lat1,lon2,lat2),
 print "Cython function (still using python math)", t.timeit(num), "sec"
 ```
 
-
 p1.py
 
-
-```
+```python
 import math
 
 def great_circle(lon1,lat1,lon2,lat2):
@@ -88,8 +86,7 @@ def great_circle(lon1,lat1,lon2,lat2):
     return radius*c
 ```
 
-
-```
+```python
 import timeit  
 
 lon1, lat1, lon2, lat2 = -72.345, 34.323, -61.823, 54.826

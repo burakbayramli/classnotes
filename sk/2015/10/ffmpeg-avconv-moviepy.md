@@ -1,6 +1,6 @@
 # ffmpeg, moviepy
 
-Bazi ffmpeg, komutlari
+### Bazı ffmpeg, komutları
 
 Bir video dosyasinin belli zaman araligindaki parcasini cikartmak icin
 (baslangictan 4 saniyelik kisim)
@@ -9,10 +9,10 @@ Bir video dosyasinin belli zaman araligindaki parcasini cikartmak icin
 ffmpeg -ss 00:00:00 -i girdi.mp4 -t 00:00:04 -c copy cikti.mp4
 ```
 
-Bir video'nun belli bir parcasini nasil animasyon gif dosyasi haline
-ceviririz? Bir frames alt dizini yaratalim, sonra 20. saniyeden
-baslayip 10 saniyelik kismi cikartalim. Once sadece goruntu dosyalari
-alacagiz,
+Bir video'nun belli bir parçasını nasıl animasyon gif dosyası haline
+çeviririz? Bir frames alt dizini yaratalım, sonra 20. saniyeden
+başlayıp 10 saniyelik kısmı çıkartalım. Önce sadece görüntü dosyaları
+alacağız,
 
 ```
 ffmpeg -ss 00:00:20 -t 00:00:10 -i [video dosyasi]  -vf \
@@ -52,8 +52,8 @@ GIF içinde yazı yazmak istersek,
 ffmpeg -ss 30 -t 3 -i [DOSYA] -filter_complex "fps=10,scale=720:-1:flags=lanczos,drawtext=enable='between(t,0,1)':fontfile=font3.ttf:text='word':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,drawtext=enable='between(t,1,2)':fontfile=font3.ttf:text='word what':fontsize=24:fontcolor=white:x=(w-tw)/2:y=(h/PHI)+th,split[x1][x2];[x1]palettegen[p];[x2][p]paletteuse" output.gif
 ```
 
-Format degisimi, kucultmek, mumkun oldugu kadar kaliteyi istenen
-sekilde tutmak, 440 yuksekliginde, genislik izafi, kalite 23 (en
+Format değişimi, küçültmek, mümkün olduğu kadar kaliteyi istenen
+şekilde tutmak, 440 yüksekliğinde, genişlik izafi, kalite 23 (en
 kaliteli 0)
 
 ```
@@ -132,7 +132,7 @@ final_clip = concatenate_videoclips([clip1,clip2])
 final_clip.write_videofile("out.mp4")
 ```
 
-mencoder
+### mencoder
 
 Bir AVI video'nun parcasini kesip cikartmak icin
 
@@ -146,14 +146,64 @@ parca cikartip parca.avi dosyasina kaydediyor. Dikkat: Ustteki
 seceneklerde "endpos" ibaresinin tercumesi "bitis noktasi" olmasina
 ragmen komut "reklam edildigi gibi" islemiyor.
 
-Video'dan Ses Cikartmak
+### Video'dan Ses Cikartmak
 
 ```
 ffmpeg -y -ss 00:02:10 -i vid.mp4 -t 00:00:04 -q:a 0 -map a out.mp3
 ```
 
+### Pek Çok Parça, Altyazı
+
+Bazen birden fazla video'nun birden fazla parcasini cekip cikarip birlestirip
+hepsine zaman indisi verilerek altyazi koymak isteyebiliriz. Alttaki kod
+ImageMagick `convert` ve `ffmpeg` cagrisini sarmalayarak bu islemleri yapiyor.
+
+```python
+import os
+
+def avigif(pieces, text):
+    files = ""
+    for i,(file,start,dur) in enumerate(pieces):
+        cmd = 'ffmpeg -y -ss %s -i %s -t %s -c copy /tmp/out-%d.mp4' % (start, file, dur, i)
+        print (cmd)
+        os.system(cmd)       
+        cmd = 'ffmpeg -y -i /tmp/out-%d.mp4 -filter_complex "fps=10,scale=360:-1:flags=lanczos,split[x1][x2];[x1]palettegen[p];[x2][p]paletteuse" /tmp/out-%d.gif' % (i,i)
+        files += "/tmp/out-%d.gif " % i 
+        print (cmd)
+        os.system(cmd)
+    
+    cmd = "convert %s /tmp/output1.gif" % files
+    print (cmd)
+    os.system(cmd)
+        
+    w = '"fps=10,scale=360:-1:flags=lanczos,'
+    for i,(start,finish,text,pos) in enumerate(text):  
+        w += "drawtext=enable='between(t,%s,%s)':fontfile=font3.ttf:text='%s':fontsize=15:fontcolor=white:x=%s:y=%s," % (start,finish,text,pos[0],pos[1])
+    w += 'split[x1][x2];[x1]palettegen[p];[x2][p]paletteuse"'
+    cmd = "/usr/bin/ffmpeg -y -i /tmp/output1.gif -filter_complex " + w + " /tmp/output2.gif"
+    print (cmd)
+    os.system(cmd)       
+```
+
+Örnek olarak [2]'deki video'yu kullanalım, tek bir mp4 video
+dosyasından tek parça çıkartıyoruz, 2'inci ve 6'inci saniye arasındaki
+parça bu, ve ilk iki saniyeye bir yazı, sonrakine başka bir yazı
+yazıyoruz. Eğer isteseydik bu listeleri büyütebilirdik, farklı
+video'lardan farklı parçalar daha fazla alt yazı
+olabilirdi. `(100,170)` diye gösterilen GİF içindeki ekran
+kordinatıdır, yazının nereye konulacağını kontrol eder.
+
+```python
+ps = [['/tmp/bwalk1.mp4','00:00:02','00:00:4']]
+text = [[1,2,'Ilk Yazi',(100,170)],
+        [3,4,'Sonraki Yazi',(80,170)]]
+
+avigif(ps,text)
+```
 
 Kaynaklar
 
-https://engineering.giphy.com/how-to-make-gifs-with-ffmpeg/
+[1] https://engineering.giphy.com/how-to-make-gifs-with-ffmpeg/
+
+[2] [Ornek Video](https://drive.google.com/uc?export=view&id=1nR4E7SYLfKhm8nO0BEfFcw0pwWmMNm19)
 

@@ -1,6 +1,6 @@
-# Operatorler
+# Operatörler
 
-Bir class tıpı üzerinde işlemesini istediğimiz operatörler için o
+Bir class tipi üzerinde işlemesini istediğimiz operatörler için o
 tipin class'ı içindeki "özel" fonksiyon isimlerini kullanmamız
 gerekir.
 
@@ -22,7 +22,4 @@ yy = X(20)
 if (xx < yy): print "kucuk"
 if (xx > yy): print "degil"
 ```
-
-
-
 
