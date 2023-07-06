@@ -5,6 +5,7 @@ d = os.environ['HOME']
 
 if len(sys.argv) == 1:
     cmd = "pdfunite " + pdfs + " " + d + "/Downloads/multivar_calculus.pdf"
+    print (cmd)
     os.system(cmd)
     exit()    
 elif sys.argv[1] == 'all':
@@ -12,6 +13,7 @@ elif sys.argv[1] == 'all':
         os.chdir(a)
         os.system("pdflatex -shell-escape %s" % glob.glob("calc_*.tex")[0] )
         os.chdir("..")
+        
 elif sys.argv[1] == 'clean':
     os.system("find . -name '_region_*' | xargs rm  -rf")
     os.system("find . -name '_minted-*' | xargs rm  -rf")

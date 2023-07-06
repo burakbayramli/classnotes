@@ -79,3 +79,4 @@ Kaynaklar
 [1] https://github.com/burakbayramli/simplegeomap
 
 [2] https://pypi.org/project/simplegeomap/
+
