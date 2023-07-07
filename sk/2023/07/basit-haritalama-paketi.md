@@ -1,29 +1,29 @@
 # Yeni Haritalama Paketi
 
-Çorbada bizim de tuzumuz olsun; İnternet bağlantısı gerektirmeyen,
-gerekli verisini paket kurulum dosyalarında taşıyan haritalama paketi
-bulamadık, kendimiz yazdık - `simplegeomap`.  Açık yazılım olarak
-paylaşılıyor [1], ve PyPi üzerinde kurulmaya hazır whl dosyası var,
-`pip install simplegeomap` ile kurulabilir.
+İnternet bağlantısı gerektirmeyen, gerekli verisini paket kurulum
+dosyalarında taşıyan haritalama paketi revaçta yoktu, yazmak zorunda
+kaldık - `simplegeomap`.  Açık yazılım olarak paylaşılıyor [1], ve
+PyPi üzerinde kurulmaya hazır whl dosyası var, `pip ınstall
+simplegeomap` ile kurulabilir.
 
 Simplegeomap temel ihtiyaçları basit, hızlı bir şekilde cevaplaması
 için yazılmıştır, bu ihtiyaçlar en azından bizim için istenen bir
-bölge içine düşen kıta, ülke sınırlarını çizebilmek, sınırlar
-dışındaki denizleri belli bir renkte vermek, çok detaylı olmasa da
-yükseklik (dağlar) ve şu alanları (nehir, gol gibi) haritalamanın,
-raporlamanın mümkün olması.
+bölge içine düşen kıta, ülke sınırlarını çabuk bir şekilde çizebilmek,
+sınırlar dışında kalanları (mesela denizler) belli bir renkte vermek,
+çok detaylı olmasa da yükseklik (dağlar) ve su alanları (nehir, gol
+gibi) haritalamanın, raporlamanın mümkün olması.
 
-Smgm yuvarlık olan yerkürenin farklı şekildeki iki boyuta yansıtma
+Smgm yuvarlak olan yerkürenin farklı şekildeki iki boyuta yansıtma
 tekniklerini kullanmıyor, en temel yaklaşım olan boylamı x, enlemi y
-kordinatı kabul edip grafiklemeyi bu şekilde yapmayı seçiyor. Bu
-yaklaşım her çok uzun mesafelerde kesin olmayabilir, fakat yakın
-mesafeler ve objelerin genel yerlerini göstermesi açısından
+kordinatı kabul edip veriyi direk kartezyen hale getirme teknigini
+seçiyor. Bu yaklaşım her çok uzun mesafelerde kesin olmayabilir, fakat
+yakın mesafeler ve objelerin genel yerlerini göstermesi açısından
 yeterlidir.
 
 ## Kıtalar, Ülkeler
 
-En temel cizimle baslayalim. Bir kordinate merkez alip belli bir
-odak (zoom) seviyesine gore o noktadaki kita sinirlarini cizelim,
+En temel çizimle başlayalım. Bir kordinatı merkez alıp belli bir
+odak (zoom) seviyesine göre o noktadaki kıta sınırlarını çizelim,
 
 ```python
 import simplegeomap as sm
@@ -47,7 +47,7 @@ plt.savefig('sm_02.jpg',quality=40)
 Smgm üstteki türden haritalama için iç renk ve dış renk (`incolor`,
 `outcolor`) kavramlarını kullanır. Sınırları olan alanlar, kıtalar, ya
 da ülkelerin içi `incolor` ile dışarıda kalan herşey `outcolor` ile
-renklenir. Mesela ic kahverengimsi, dis daha koyu mavi istersek bunu
+renklenir. Mesela iç kahverengimsi, dış daha köyü mavi istersek bunu
 yapabiliriz,
 
 ```python
@@ -57,9 +57,10 @@ plt.savefig('sm_03.jpg',quality=40)
 
 ![](sm_03.jpg)
 
-Olağan (default) değerler iç `lightyellow` dış `lightblue` kullanıyor.
+Olağan (default) değerler iç `lightyellow` dış `lightblue`. Kullanici bu degerleri
+goruldugu gibi degistirebiliyor.
 
-Ülkeler için
+Ülkeler,
 
 ```python
 sm.plot_countries(clat=30,clon=30,zoom=2)
@@ -68,10 +69,11 @@ plt.savefig('sm_04.jpg',quality=40)
 
 ![](sm_04.jpg)
 
-Görüldüğü gibi gösterilen bölgenin içine düşen tüm ülke sınırları çizildi.
-Tekrar belirtmek gerekirse, kıta sınırları, ülke sınırlarını içeren veri
-dosyaları paketin bir parçası, bu dosyalar kurulum ile beraber geliyorlar
-ve her an erişime hazırlar, İnternet bağlantısına gerek yok.
+Görüldüğü gibi gösterilen bölgenin içine düşen tüm ülke sınırları
+çizildi.  Tekrar belirtmek gerekirse, kıta sınırları, ülke sınırlarını
+içeren veri dosyaları paketin bir parçasıdir, bu dosyalar kurulum ile
+beraber gelirler ve her an erişime hazır olacaklardir, İnternet
+bağlantısına ihtiyaclari yoktur.
 
 
 Kaynaklar
