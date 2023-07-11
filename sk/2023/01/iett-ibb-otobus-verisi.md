@@ -1,8 +1,8 @@
-# IETT Verileri, SOAP
+# IETT Verileri, OSM, SOAP
 
 Moovit [4] benzeri bir uygulamayı nasıl yazarız sorusuna cevap, önce
-İETT baz seyahat verileri gerekli. Gerekli verilerin bazıları İETT API
-servisi üzerinden alınabilir.
+İETT baz seyahat verileri gerekli. Gerekli veriler açık kaynak OSM
+verisi, ya da IETT API servisi üzerinden alınabilir.
 
 ### OSM
 
