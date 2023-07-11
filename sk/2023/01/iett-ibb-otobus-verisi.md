@@ -100,6 +100,19 @@ m.save("43r.html")
 
 [Çıktı](43r.html)
 
+Eğer kısayol algoritmaları işletmek istersek, ki bunun için
+düğüm/kenar verisini (yani durak/hat) bir sözlük içinde tutmak lazım,
+bu sözlük `d['elements']` listesini gezerken bir `G` sözlüğü için
+alttaki gibi yaratılabilir,
+
+```python
+  ...
+  for i in range(len(e['members'])-1):
+      src,dest = e['members'][i]['ref'], e['members'][i+1]['ref']
+      if src not in G: G[src] = {}
+      G[src][dest] = 1
+```
+
 ### IETT
 
 IETT API'si hakkında belgeler [2]'de, örnek kod [1]'de.

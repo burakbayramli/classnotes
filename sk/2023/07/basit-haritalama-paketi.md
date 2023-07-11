@@ -1,21 +1,21 @@
 # Yeni Haritalama Paketi
 
 İnternet bağlantısı gerektirmeyen, gerekli verisini paket kurulum
-dosyalarında taşıyan haritalama paketi revaçta yoktu, yazmak zorunda
-kaldık - `simplegeomap`.  Açık yazılım olarak paylaşılıyor [1], ve
-PyPi üzerinde kurulmaya hazır whl dosyası var, `pip ınstall
-simplegeomap` ile kurulabilir.
+dosyalarında taşıyan haritalama paketi revaçta yoktu, yazalım dedik -
+`simplegeomap`.  Açık yazılım olarak paylaşılıyor [1], ve PyPi
+üzerinde kurulmaya hazır whl dosyası var, `pip install simplegeomap`
+ile kurulabilir.
 
 Simplegeomap temel ihtiyaçları basit, hızlı bir şekilde cevaplaması
 için yazılmıştır, bu ihtiyaçlar en azından bizim için istenen bir
 bölge içine düşen kıta, ülke sınırlarını çabuk bir şekilde çizebilmek,
 sınırlar dışında kalanları (mesela denizler) belli bir renkte vermek,
-çok detaylı olmasa da yükseklik (dağlar) ve su alanları (nehir, gol
+çok detaylı olmasa da yükseklik (dağlar) ve su alanları (nehir, göl
 gibi) haritalamanın, raporlamanın mümkün olması.
 
 Smgm yuvarlak olan yerkürenin farklı şekildeki iki boyuta yansıtma
 tekniklerini kullanmıyor, en temel yaklaşım olan boylamı x, enlemi y
-kordinatı kabul edip veriyi direk kartezyen hale getirme teknigini
+kordinatı kabul edip veriyi direk kartezyen halde grafikleme tekniğini
 seçiyor. Bu yaklaşım her çok uzun mesafelerde kesin olmayabilir, fakat
 yakın mesafeler ve objelerin genel yerlerini göstermesi açısından
 yeterlidir.
@@ -31,6 +31,10 @@ import simplegeomap as sm
 sm.plot_continents(clat=0,clon=0,zoom=20)
 plt.savefig('sm_01.jpg',quality=40)
 ```
+
+Bu grafikleme için gereken veri smgm içinde mevcut `continents.zip`
+dosyasından geliyor, kıta sınırları bir JSON içinde, 300K
+büyüklüğünde. İnternet bağlantısına gerek yok.
 
 ![](sm_01.jpg)
 
@@ -71,16 +75,17 @@ plt.savefig('sm_04.jpg',quality=40)
 Görüldüğü gibi gösterilen bölgenin içine düşen tüm ülke sınırları
 çizildi.  Tekrar belirtmek gerekirse, kıta sınırları, ülke sınırlarını
 içeren veri dosyaları paketin bir parçasıdır, bu dosyalar kurulum ile
-beraber gelirler ve her an erişime hazır olacaklardır, İnternet
-bağlantısına ihtiyaçları yoktur.
+beraber gelirler ve her an erişime hazır olacaklardır. Üstteki
+grafikleme `TM_WORLD_BORDERS-0.3.shp` dosyasından geldi, ki bu veri
+açık olarak paylaşılan bir veridir.
 
-Paket grafiklemesini yaparken temel `matplotlib` kavramlarını
-kullanır, zaten enlem/boylam bilgisini boylam/enlem olarak x,y
-noktaları olarak kullandığımızı söylemiştik, bu durumda, eğer ek
-bilgileri haritaya konuşlandırmak istersek bunu hala `matplotlib`
-yapılarıyla x,y kordinatlarını kullanarak yapabiliriz. Mesela üstteki
-haritada Mısır'da enlem=28, boylam=30 noktasını göstermek istiyorum,
-oraya bir kırmızı 'elmas' şekli koyabilirim, altına yazı yazabilirim,
+Paket grafikleme yaparken temel `matplotlib` kavramlarını kullanır,
+zaten enlem/boylam bilgisini boylam/enlem olarak x,y noktaları olarak
+kullandığımızı söylemiştik, bu durumda, eğer ek bilgileri haritaya
+konuşlandırmak istersek bunu hala `matplotlib` yapılarıyla x,y vererek
+yapabiliriz. Mesela üstteki haritada Mısır'da enlem=28, boylam=30
+noktasını göstermek istiyorum, oraya bir kırmızı 'elmas' şekli
+koyabilirim, altına yazı yazabilirim,
 
 ```python
 sm.plot_countries(clat=30,clon=30,zoom=2)
@@ -91,24 +96,23 @@ plt.savefig('sm_05.jpg',quality=40)
 
 ![](sm_05.jpg)
 
-Uzak Ulkeler
+Uzak Ülkeler
 
-Paket iç kodlamasında verilen merkez nokta ve odak (zoom) üzerinden
-haritalama yaparken verilen noktadan 'uzak' olan ülkeleri çizmemeye
+Paket verilen merkez nokta ve odak (zoom) üzerinden haritalama
+yaparken verilen noktadan 'uzak' olan ülkeleri çizmemeye
 uğraşıyor. Bunu odak parametresini bir uzaklığa çevirerek ve merkezi
 uzaklığın dışına düşen ülkeleri atlayarak yapıyor. Fakat bazen bu
 algoritma işlemeyebilir, mesela Rusya büyüklüğü sebebiyle bir ülkenin
 sınırında olsa bile merkezi çok uzakta olduğu için 'dış bölge' olarak
 kabul edilebilir, bu durumda `force_include=['RUS']` ile bu ülkeyi
-haritaya tekrar 'dahil' edebiliriz. 
+haritaya tekrar 'dahil' edebiliriz.
 
 Bölgeler, Çizgiler
 
 Bir kordinat listesi ile bir eğri, çizgi göstermek mümkündür. Çizgiyi
-temsil eden noktaları liste olarak smgm'e verince çizgi gösterilir.
-
-Eğer kapalı bölge istersem verilen listenin son kordinatı ilk
-kordinatına bağlı kabul edilecektir, ve alan kapatılacaktır.
+temsil eden noktaları liste olarak smgm'e verince çizgi basılır. Eğer
+kapalı bölge istersem verilen listenin son kordinatı ilk kordinatına
+bağlı kabul edilecektir, ve alan kapatılacaktır.
 
 ```python
 pts = np.array([[40,10],[43,10], [43,15]])
@@ -154,6 +158,34 @@ plt.savefig('sm_08.jpg',quality=40)
 ```
 
 ![](sm_08.jpg)
+
+Nehirler, Göller  
+
+Odaklanan bölge içine duen şu öbekleri için `plot_water` var,
+
+```python
+clat,clon = 48, 33
+zoom = 0.5
+fig, ax = plt.subplots() 
+sm.plot_countries(clat,clon,zoom=zoom,ax=ax,force_include=['RUS'])
+sm.plot_water(clat,clon,zoom=zoom,ax=ax)
+plt.savefig('sm_09.jpg',quality=40)
+```
+
+![](sm_09.jpg)
+
+Dağlar, Yükseklik Verisi
+
+```python
+clat,clon = 39, 43; zoom = 0.12
+fig, ax = plt.subplots() 
+sm.plot_countries(clat,clon,zoom=zoom,ax=ax)
+sm.plot_elevation(clat,clon,zoom=zoom,ax=ax)
+plt.savefig('sm_10.jpg',quality=40)
+```
+
+![](sm_10.jpg)
+
 
 Kaynaklar
 
