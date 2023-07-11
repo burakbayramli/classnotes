@@ -164,8 +164,8 @@ Nehirler, Göller
 Odaklanan bölge içine duen şu öbekleri için `plot_water` var,
 
 ```python
-clat,clon = 48, 33
-zoom = 0.5
+clat,clon = 48, 35
+zoom = 1.0
 fig, ax = plt.subplots() 
 sm.plot_countries(clat,clon,zoom=zoom,ax=ax,force_include=['RUS'])
 sm.plot_water(clat,clon,zoom=zoom,ax=ax)
