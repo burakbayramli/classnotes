@@ -91,7 +91,18 @@ plt.savefig('sm_05.jpg',quality=40)
 
 ![](sm_05.jpg)
 
-Bolgeler, Cizgiler
+Uzak Ulkeler
+
+Paket iç kodlamasında verilen merkez nokta ve odak (zoom) üzerinden
+haritalama yaparken verilen noktadan 'uzak' olan ülkeleri çizmemeye
+uğraşıyor. Bunu odak parametresini bir uzaklığa çevirerek ve merkezi
+uzaklığın dışına düşen ülkeleri atlayarak yapıyor. Fakat bazen bu
+algoritma işlemeyebilir, mesela Rusya büyüklüğü sebebiyle bir ülkenin
+sınırında olsa bile merkezi çok uzakta olduğu için 'dış bölge' olarak
+kabul edilebilir, bu durumda `force_include=['RUS']` ile bu ülkeyi
+haritaya tekrar 'dahil' edebiliriz. 
+
+Bölgeler, Çizgiler
 
 Bir kordinat listesi ile bir eğri, çizgi göstermek mümkündür. Çizgiyi
 temsil eden noktaları liste olarak smgm'e verince çizgi gösterilir.
@@ -118,7 +129,31 @@ plt.savefig('sm_07.jpg',quality=40)
 
 ![](sm_07.jpg)
 
+Aynı Harita İçin Birden Fazla smgm Çağrısı
 
+Üstteki çağrıda birden fazla çağrı yaptık ama çıktı sadece bir
+haritaydı.  Bu durumda grafiği temsil eden Axis, Figure objelerini
+matplotlib'den alıp onları `simplegeomap` çağrılarına ek parametreler
+olarak geçtik. Bu şekilde paket hangi grafik üzerine gösterim
+yapacağını anlamış oldu.
+
+Her seferinde bunu yapmak gerekli değil, bazı temel çağrılar, mesela
+`plot_continents`, ya da `plot_countries` gibi, eğer ax, fig objeleri
+geçilmemişse bir tane olağan obje yaratabilir, ve ardından gelecek
+`plt` çağrıları bu objeleri nasıl olsa kullanacaktır.  Fakat daha
+çetrefil kullanımlarda ax, fig bizim tarafımızdan yaratılmalı, ve her
+arayüze geçilmeli. Mesela aynı grafik içinde birden fazla alt grafik
+kullanımı bir çetrefil kullanım örneği, bu durumda gerekli alt
+grafiğin ax, fig objeleri farklı çağrılara geçilebilir,
+
+```python
+fig, ax = plt.subplots(2,figsize=(4,4))
+sm.plot_countries(40,20,zoom=1,ax=ax[0])
+sm.plot_countries(40,30,zoom=1,ax=ax[1])
+plt.savefig('sm_08.jpg',quality=40)
+```
+
+![](sm_08.jpg)
 
 Kaynaklar
 

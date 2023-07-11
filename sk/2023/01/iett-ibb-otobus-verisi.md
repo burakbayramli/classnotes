@@ -1,12 +1,110 @@
 # IETT Verileri, SOAP
 
 Moovit [4] benzeri bir uygulamayı nasıl yazarız sorusuna cevap, önce
-İETT baz seyahat verileri gerekli. Gerekli verilerin bazıları İETT APİ
-servisi üzerinden alınabilir. APİ hakkında belgeler [2]'de, örnek kod
-[1]'de.
+İETT baz seyahat verileri gerekli. Gerekli verilerin bazıları İETT API
+servisi üzerinden alınabilir.
+
+### OSM
+
+Open Street Map adresinde gönüllülerin oluşturduğu metro, otobüs hat
+verileri var. Bu veriler her ülke için mevcut ana OSM dosyaları
+içinde, onların tarama yöntemleri var, fakat bazı servisler ile bu
+veriyi sorgulayıp çıktıları JSON dosyası ile yazmak ta mümkün. Mesela
+alttaki siteye gidilebilir,
+
+https://overpass-turbo.eu
+
+Bu sitede sol kısımda kod girilen yere alttaki kod yazılır,
+
+```
+[out:json];
+area[name="İstanbul"]->.a;
+(
+  nwr["route"="subway"](area.a);
+);
+out body;
+>;
+out skel;
+```
+
+Bu sorgu `Run` düğmesi ile işletilir, ardından `Export` düğmesi ile mesela GeoJSON
+çıktısı alınabilir. Bu çıktı içinde metro hatlarının durakları, durak kordinatları,
+her hattın geçtiği durak listesi vardır.
+
+Sitede sorgu işletmek yerine aslında program işleterek aynı sonuçları
+alabiliriz, işleri otomatikleştirme için bu daha iyi olur. Bunun için
+
+https://overpass-api.de/api/interpreter
+
+servisi var, istenen sorgu `?data=` sonrasında üstteki bağlantıya
+verilebiliyor, arka plandaki servis sorguyu işletip sonucu
+kayıtlamamızı sağlıyor. Tüm URL'in neye benzediği `Export` ile gidilen
+ekranda `Overpass API` bağlantısında görülebilir. Üretilen string
+basit aslında, üstteki sorgu kodunun kodlanmış hali, bu kodlamayı
+Python ile biz de yapabiliriz, ve böylece çağrıyı otomatikleştirmiş
+oluruz.
+
+```python
+import urllib.parse, requests
+
+base_url = "https://overpass-api.de/api/interpreter?data="
+
+q2 = """
+[out:json];
+area[name="İstanbul"]->.a;
+(
+  nwr["route"="bus"](area.a);
+);
+out body;
+>;
+out skel;
+"""
+
+safe_string = urllib.parse.quote_plus(q)
+r = requests.get(base_url + safe_string)
+fout = open("bus.json","w")
+fout.write(r.text)
+fout.close()
+```
+
+Artık üretilen `bus.json` verisini işleyip hat verisini çıkartabiliriz,
+alttaki örnekte kordinatı olan duraklar hat verisini ekleniyor ve bir tanesi
+örnek olarak haritaya basılıyor.
+
+```python
+import folium
+import json
+
+d = json.loads(open("bus.json").read())
+lines = {}
+
+nodes = {}
+for e in d['elements']:
+    if 'lat' in e:
+        nodes[e['id']] = (e['lat'],e['lon'])
+
+for e in d['elements']:
+    if e['type'] == 'relation':
+        if 'name' not in e['tags']: continue           
+        line = [m['ref'] for m in e['members']]
+        lines[e['tags']['name']] = line
+
+coords = [nodes[m] for m in lines['43R Rumelihisarüstü-Kabataş'] if m in nodes]
+
+m = folium.Map(location=[41,29], tiles='Stamen Terrain', zoom_start=10)
+
+folium.PolyLine(locations=coords, color="blue").add_to(m)
+
+m.save("43r.html")
+```
+
+[Çıktı](43r.html)
+
+### IETT
+
+IETT API'si hakkında belgeler [2]'de, örnek kod [1]'de.
 
 Baz URL ve başlangıç ayarları,
-
 
 ```python
 import pandas as pd, json
@@ -144,12 +242,7 @@ print (df)
 API'de olmayan bir veri çeşidi bir hattın geçtiği tüm durakların
 listesi. Hat üzerinde giden otobüslerin o anda yakın olduğu duraklar
 canlı olarak paylaşılıyor fakat statik hat verisi yok, önce şu durak
-sonra şu durak gibi..  Bu veriyi belki üstteki çağrıları gün içinde
-birkaç kere işletip, veriyi toplayıp, sonradan birleştirerek elde
-edebiliriz. Biraz bulmaca çözer gibi olacak ama durak konumu
-biliniyor, hat üzerinde birkaç kere canlı veriyi alıp otobüsün önce
-hangi sonra hangi durağa yakın olduğu görülüyor (bkz
-`yakinDurakKodu`), bunları birleştirip bir hat oluşturmak mümkündür.
+sonra şu durak gibi..  
 
 Bazı Eksikler
 
