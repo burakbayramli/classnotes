@@ -60,8 +60,8 @@ plt.savefig('sm_03.jpg',quality=40)
 
 ![](sm_03.jpg)
 
-Olağan (default) değerler iç `lightyellow` dış `lightblue`. Kullanici bu degerleri
-goruldugu gibi degistirebiliyor.
+Olağan (default) değerler iç `lightyellow` dış `lightblue`. Kullanıcı
+bu değerleri görüldüğü gibi değiştirebiliyor.
 
 Ülkeler,
 
@@ -72,7 +72,7 @@ plt.savefig('sm_04.jpg',quality=40)
 
 ![](sm_04.jpg)
 
-Görüldüğü gibi gösterilen bölgenin içine düşen tüm ülke sınırları
+Üstte kodda tanımlanan bölgenin içine düşen tüm ülke sınırları
 çizildi.  Tekrar belirtmek gerekirse, kıta sınırları, ülke sınırlarını
 içeren veri dosyaları paketin bir parçasıdır, bu dosyalar kurulum ile
 beraber gelirler ve her an erişime hazır olacaklardır. Üstteki
@@ -96,9 +96,9 @@ plt.savefig('sm_05.jpg',quality=40)
 
 ![](sm_05.jpg)
 
-Uzak Ülkeler
+Odak, Uzak Ülkeler
 
-Paket verilen merkez nokta ve odak (zoom) üzerinden haritalama
+Paket, verilen merkez nokta ve odak (zoom) üzerinden haritalama
 yaparken verilen noktadan 'uzak' olan ülkeleri çizmemeye
 uğraşıyor. Bunu odak parametresini bir uzaklığa çevirerek ve merkezi
 uzaklığın dışına düşen ülkeleri atlayarak yapıyor. Fakat bazen bu
@@ -161,7 +161,7 @@ plt.savefig('sm_08.jpg',quality=40)
 
 Nehirler, Göller  
 
-Odaklanan bölge içine duen şu öbekleri için `plot_water` var,
+Odaklanan bölge içine duen su öbekleri için `plot_water` var,
 
 ```python
 clat,clon = 48, 35
@@ -184,12 +184,13 @@ sm.plot_elevation(clat,clon,zoom=zoom,ax=ax)
 plt.savefig('sm_10.jpg',quality=40)
 ```
 
-![](sm_10.jpg)
-
+Sonuç kontur çizgileri olarak gösterilecektir.
 
 Kaynaklar
 
 [1] https://github.com/burakbayramli/simplegeomap
 
 [2] https://pypi.org/project/simplegeomap/
+
+
 

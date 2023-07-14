@@ -3,6 +3,8 @@
 
 ## En Son
 
+14/7 - [Yeni Haritalama Paketi](https://burakbayramli.github.io/dersblog/sk/2023/07/basit-haritalama-paketi.html)
+
 5/7 - [Sonlu Öğeler Metotu - 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp45fem1/sonlu_ogeler_metotu__finite_elements_method_fem___1.html)
 
 24/6 - [Materyel Mekaniği - 3](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_03/materyel_mekanigi__3.html)
@@ -10,8 +12,6 @@
 21/6 - [Ubuntu, Android 10](https://burakbayramli.github.io/dersblog/sk/2023/05/android-10-ubuntu.html)
 
 13/6 - [İklim, Nem Verileri](https://burakbayramli.github.io/dersblog/sk/2023/06/iklim-nem-verisi.html)
-
-5/6 - [Aradeğerleme (Interpolation) - Ekler - En Yakın Değer Teknikleri](https://burakbayramli.github.io/dersblog/sk/2012/08/aradegerleme-interpolation.html)
 
 ## Konular, Referans
 

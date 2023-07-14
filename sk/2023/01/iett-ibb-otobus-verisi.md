@@ -49,7 +49,7 @@ import urllib.parse, requests
 
 base_url = "https://overpass-api.de/api/interpreter?data="
 
-q2 = """
+q = """
 [out:json];
 area[name="İstanbul"]->.a;
 (
