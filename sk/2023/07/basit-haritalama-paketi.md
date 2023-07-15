@@ -181,12 +181,19 @@ plt.savefig('sm_09.jpg',quality=40)
 Dağlar, Yükseklik Verisi
 
 ```python
-clat,clon = 39, 43; zoom = 0.12
+clat,clon=39, 35; zoom = 1.0
 fig, ax = plt.subplots() 
 sm.plot_countries(clat,clon,zoom=zoom,ax=ax)
 sm.plot_elevation(clat,clon,zoom=zoom,ax=ax)
 plt.savefig('sm_10.jpg',quality=40)
 ```
+
+```text
+dist 2000.0
+```
+![](sm_10.jpg)
+
+
 
 Sonuç kontur çizgileri olarak gösterilecektir.
 
