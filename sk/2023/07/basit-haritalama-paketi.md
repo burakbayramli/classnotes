@@ -99,6 +99,23 @@ Muhakkak `matplotlib` paketinin içinde pek çok diğer çağrı var, mesela
 oklarla bir vektör alanı `quiver` ile, her türlü `plot` şekli üstteki
 grafikte `plt` ya da `ax` objeleri üzerinden direk kullanılabilirdi.
 
+Ülke Renklendirmek
+
+Ülkelerin ayrı renklerle gösterilmesi için ülkenin ISO3 koduna
+eşlenen renk verisini bir sözlük içinde `plot_countries` çağrısına
+verebiliriz. Tüm İSO3 kodları `sm.get_country_name_iso3()` çağrısı
+ile alınabilir.
+
+```python
+plt.figure()
+clat,clon = 40, 29; zoom = 2.0
+colors = {"TUR": "red", "GRC": "yellow"}
+sm.plot_countries(clat,clon,zoom,country_color=colors)
+plt.savefig('sm_11.jpg')
+```
+
+![](sm_11.jpg)
+
 Odak, Uzak Ülkeler
 
 Paket, verilen merkez nokta ve odak (zoom) üzerinden haritalama
