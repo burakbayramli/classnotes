@@ -25,7 +25,7 @@ seçenekler var, büyültürken muhakkak aradeğerleme (interpolation)
 yapılması lazım, bahsedilen seçenekler bu aradeğerlemenin nasıl
 yapılacağını kontrol ediyor.
 
-Biraz önce küçültülen resmi şimdi geri büyültmelim,
+Biraz önce küçültülen resmi şimdi geri büyültelim,
 
 ```python
 new_img3 = new_img.resize((340,340), Image.BICUBIC)

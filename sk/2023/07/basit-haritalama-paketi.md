@@ -10,15 +10,14 @@ Simplegeomap temel ihtiyaçları basit, hızlı bir şekilde cevaplaması
 için yazılmıştır, bu ihtiyaçlar en azından bizim için istenen bir
 bölge içine düşen kıta, ülke sınırlarını çabuk bir şekilde çizebilmek,
 sınırlar dışında kalanları (mesela denizler) belli bir renkte vermek,
-çok detaylı olmasa da yükseklik (dağlar) ve su alanları (nehir, göl
-gibi) haritalamanın, raporlamanın mümkün olması.
+yükseklik (dağlar) ve su alanları (nehir, göl gibi) haritalamanın,
+raporlamanın mümkün olması.
 
 Smgm yuvarlak olan yerkürenin farklı şekildeki iki boyuta yansıtma
 tekniklerini kullanmıyor, en temel yaklaşım olan boylamı x, enlemi y
 kordinatı kabul edip veriyi direk kartezyen halde grafikleme tekniğini
-seçiyor. Bu yaklaşım her çok uzun mesafelerde kesin olmayabilir, fakat
-yakın mesafeler ve objelerin genel yerlerini göstermesi açısından
-yeterlidir.
+seçiyor. Bu yaklaşım yakın mesafeler ve objelerin genel yerlerini
+göstermesi açısından yeterlidir.
 
 ## Kıtalar, Ülkeler
 
@@ -165,7 +164,7 @@ plt.savefig('sm_08.jpg',quality=40)
 
 Nehirler, Göller  
 
-Odaklanan bölge içine duen su öbekleri için `plot_water` var,
+Odaklanan bölge içine düşen su öbekleri için `plot_water` var,
 
 ```python
 clat,clon = 48, 35
@@ -188,14 +187,11 @@ sm.plot_elevation(clat,clon,zoom=zoom,ax=ax)
 plt.savefig('sm_10.jpg',quality=40)
 ```
 
-```text
-dist 2000.0
-```
 ![](sm_10.jpg)
 
-
-
-Sonuç kontur çizgileri olarak gösterilecektir.
+Eğer kontur seviyelerini biz tanımlamak istersek bunu `levels=[100,200,..]`
+şeklinde bir parametre geçerek smgm kodlarına bildirebiliriz, bu durumda 100 metre,
+200 metre, vs kontur çizgileri basılacaktır. 
 
 Kaynaklar
 

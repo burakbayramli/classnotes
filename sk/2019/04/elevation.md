@@ -226,9 +226,7 @@ file" seçeneği. Çoğu yükseklik matrisi 10800 kolon, 4800 satır
 olacaktır, bazıları daha az, altta her bölgenin boyutları var.
 
 Zip dosyasını açalım, alttaki kod `g10g` bölgesini okuyup haritalıyor,
-[5] kodu örnek alındı, `downsample` ile veriyi daha da azalttığımızı
-görebiliyoruz, istemeyenler bu satırı çıkartıp ya da `downsample=1`
-ile veriyi olduğu gibi kullanabilir.
+[5] kodu örnek alındı. 
 
 
 ```python
@@ -278,6 +276,49 @@ plt.savefig('gltiles1.png')
 
 ![](gltiles1.png)
 
+Eger belli bir bolgeyi cekip cikartmak istiyorsak biraz daha ek islem
+gerekli. Mesela sol alt kose 35,25 sag ust kose 42,46 olacak sekilde
+(TR bolgesi) bir dikdortgenin icine dusen yukseklikleri istiyoruz. Bu
+durumda `lat`, `lon` vektorleri icindeki o alana dusen kordinat
+indislerini bulup, onlara gore `zm` matrisi icindeki o veriyi almak
+gerekir.
+
+Burada bize yardımcı olabilecek bir kod türü aslında görüntü işlem
+kodlarıdır. Eğer yükseklik verisini gri görüntüdeki piksel değerleri
+gibi görürsek görüntü işlem kütüphanelerinin küçültme, büyültme, bölge
+çekip çıkartma gibi pek çok yardımcı fonksiyonlarını kullanabiliriz [7].
+
+```python
+from PIL import Image
+
+lon = lon_min + 1/120*np.arange(cols)
+lat = lat_max - 1/120*np.arange(rows)
+
+latidx = np.where( (lat > 35) & (lat < 42) )[0]
+print (latidx[0], latidx[-1])
+lonidx = np.where( (lon > 25) & (lon < 46) )[0]
+print (lonidx[0], lonidx[-1])
+
+zm[zm<0] = 0
+img = Image.fromarray(zm)
+
+img2 = img.crop((lonidx[0],latidx[0],lonidx[-1],latidx[-1]))
+
+W = 500; H = 300
+new_img = img2.resize((W,H), Image.BICUBIC)
+
+arr = np.array(new_img)
+x = np.linspace(lon[lonidx[0]],lon[lonidx[-1]],W)
+y = np.linspace(lat[latidx[0]],lat[latidx[-1]],H)
+xx,yy = np.meshgrid(x,y)
+
+CS=plt.contour(xx,yy,arr,cmap=plt.cm.binary)
+plt.clabel(CS, fontsize=10, inline=1)
+plt.savefig('gltiles2.jpg')
+```
+
+![](gltiles2.jpg)
+
 Kaynaklar
 
 [1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
@@ -292,3 +333,4 @@ Kaynaklar
 
 [6] [Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](../../2021/11/yukseklik-kontur-folium-harita.html)
 
+[7] [İmaj / Görüntü İşleme Teknikleri](https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html)
