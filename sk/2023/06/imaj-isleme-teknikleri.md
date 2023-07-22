@@ -1,8 +1,8 @@
 # İmaj / Görüntü İşleme Teknikleri
 
-Standart bazi sayisal goruntu isleme tekniklerini listeleyecegiz,
-referans amacli, mumkun oldugu kadar yaygin bilinen kutuphaneleri
-kullanarak kod ornekleri verilecek.
+Standart bazı sayısal görüntü işleme tekniklerini listeleyeceğiz,
+referans amaçlı, mümkün olduğu kadar yaygın bilinen kütüphaneleri
+kullanarak kod örnekleri verilecek.
 
 ### Küçültmek, Büyütmek
 
@@ -23,7 +23,13 @@ Boyut değişimi yapılırken `ANTIALIAS`, `BICUBIC`, `BILINEAR` ve
 `CUBIC` seçenekleri kullanılabilir. Küçültme, büyültme farketmez, aynı
 seçenekler var, büyültürken muhakkak aradeğerleme (interpolation)
 yapılması lazım, bahsedilen seçenekler bu aradeğerlemenin nasıl
-yapılacağını kontrol ediyor.
+yapılacağını kontrol ediyor. Aradeğerleme lazım çünkü mesela büyütme
+durumunda 100x100 boyutunda bir resim 300x300 olacaksa bu 40,000 tane
+yeni piksel yaratılması demektir, bu piksellere bir değer atanmalı, bu
+değerler mevcut değerler kullanılarak bulunabilir, bilinen yakın olan
+piksellerin ortalama değeri mesela, lineer ağırlıklı, ya da başka
+türlü. Üstteki seçenekler hangi aradeğerlemenin seçileceğini kontrol
+ediyor.
 
 Biraz önce küçültülen resmi şimdi geri büyültelim,
 
@@ -126,6 +132,3 @@ imageio.imwrite('img1.jpg',img1)
 Kaynaklar
 
 [1] Haidar, https://medium.com/@haidarlina4/tutorial-convert-an-image-into-a-sketch-step-by-step-e00e2f312521
-
-
-

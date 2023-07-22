@@ -208,7 +208,7 @@ array([[-1,  1,  0,  0],
 
 Diske Yazmak, Okumak
 
-En kullanışlı yaklaşım `scipy.iö` içindeki `mmread` ve `mmwrite`
+En kullanışlı yaklaşım `scipy.io` içindeki `mmread` ve `mmwrite`
 kullanımı. Matrisi diske yazmak için
 
 ```python
@@ -242,4 +242,6 @@ print (X.shape, X[2,3])
 ```text
 (4, 4) 10.0
 ```
+
+
 

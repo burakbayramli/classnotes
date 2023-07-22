@@ -103,11 +103,10 @@ grafikte `plt` ya da `ax` objeleri üzerinden direk kullanılabilirdi.
 
 Ülkelerin ayrı renklerle gösterilmesi için ülkenin ISO3 koduna
 eşlenen renk verisini bir sözlük içinde `plot_countries` çağrısına
-verebiliriz. Tüm İSO3 kodları `sm.get_country_name_iso3()` çağrısı
+verebiliriz. Tüm ISO3 kodları `sm.get_country_name_iso3()` çağrısı
 ile alınabilir.
 
 ```python
-plt.figure()
 clat,clon = 40, 29; zoom = 2.0
 colors = {"TUR": "red", "GRC": "yellow"}
 sm.plot_countries(clat,clon,zoom,country_color=colors)
