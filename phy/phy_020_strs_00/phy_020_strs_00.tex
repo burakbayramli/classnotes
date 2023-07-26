@@ -299,6 +299,99 @@ $$
 \sigma_z = \frac{E}{(1+v)(1-2v)} [v \epsilon_x + v \epsilon_y + \epsilon_z (1-v)  ]
 $$
 
+Ayrıca normal stresler için kullanılan Hooke Kanunu $\sigma = E \epsilon$ benzer
+bir şekilde kaykılma stresi ve kaykılma gerinimi için de geçerlidir, ama sabit
+$E$ yerine $G$ kullanılır,
+
+$$
+\tau = G \gamma
+$$
+
+$G$ sabitine Kaykılma Genliği (Shear Modulus) ismi veriliyor. 0 zaman üç boyutta
+ortaya çıkabilecek üç kaykılma stresi
+
+$$
+\tau_{xy} = G \gamma_{xy} \qquad 
+\tau_{yz} = G \gamma_{yz} \qquad 
+\tau_{zx} = G \gamma_{zx}
+$$
+
+$G$ ile $E$ arasında bir ilişki var, bu formül
+
+$$
+G = \frac{E}{2(1+v)}
+$$
+
+Bu formülün türetilmesi için [3, sf. 70]'e bakılabilir.
+
+Şimdi üstteki tüm formülleri matris formunda bir araya koyabiliriz,
+
+$$
+\left[\begin{array}{c}
+\sigma_x \\ \sigma_y \\ \sigma_z \\ \tau_{xy} \\ \tau_{yz} \\ \tau_{zx}
+\end{array}\right] =
+\frac{E}{(1+v)(1-2v)}
+\left[\begin{array}{cccccc}
+1-v &  v  &  v  &            0      &               0  &  0  \\
+ v  & 1-v &  v  &            0      &               0  &  0  \\
+ v  &  v  & 1-v &            0      &               0  &  0  \\
+ 0  &  0  &  0  & \dfrac{1-2v}{2}   &               0  &  0  \\
+ 0  &  0  &  0  &            0      &  \dfrac{1-2v}{2} &  0  \\
+ 0  &  0  &  0  &            0      &               0  &  \dfrac{1-2v}{2} 
+\end{array}\right]
+\left[\begin{array}{c}
+\epsilon_x \\ \epsilon_y \\ \epsilon_z \\ \gamma_{xy} \\ \gamma_{yz} \\ \gamma_{zx}
+\end{array}\right]
+$$
+
+Matrisin sol alt kısmı doldurulmadı orası simetri sebebiyle sağ üst kısım ile
+aynı.
+
+Eğer gerinim değişkenlerini eşitliğin solunda stresleri sağda tutmak istersek,
+üstteki matrisin tersini bulmamız lazım [7, sf. 161], sembolik ters alma
+işlemini \verb!sympy! ile yapabiliriz,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sympy as sym
+E, v = sym.symbols('E v')
+matrix = E/((1+v)*(1-2*v))*sym.Matrix([[1-v,v,v,0,0,0],
+                     [v,1-v,v,0,0,0],
+		     [v,v,1-v,0,0,0],
+		     [0,0,0,(1-2*v)/2,0,0],
+                     [0,0,0,0,(1-2*v)/2,0],
+		     [0,0,0,0,0,(1-2*v)/2]])
+sym.latex(matrix.inv())
+\end{minted}
+
+
+$$
+\left[\begin{matrix}\dfrac{1}{E} & - \dfrac{v}{E} & - \dfrac{v}{E} & 0 & 0 & 0\\- \dfrac{v}{E} & \dfrac{1}{E} & - \dfrac{v}{E} & 0 & 0 & 0\\- \dfrac{v}{E} & - \dfrac{v}{E} & \dfrac{1}{E} & 0 & 0 & 0\\0 & 0 & 0 & \dfrac{2 v + 2}{E} & 0 & 0\\0 & 0 & 0 & 0 & \dfrac{2 v + 2}{E} & 0\\0 & 0 & 0 & 0 & 0 & \dfrac{2 v + 2}{E}\end{matrix}\right]
+$$
+
+Bir basitleştirme daha yapılabilir, bunu kendimiz görebiliyoruz, $1/E$ dışarı
+çekelim, hepsini bir araya koyalım,
+
+$$
+\left[\begin{array}{c}
+\epsilon_x \\ \epsilon_y \\ \epsilon_z \\ \gamma_{xy} \\ \gamma_{yz} \\ \gamma_{zx}
+\end{array}\right] =
+\frac{1}{E}
+\left[\begin{array}{cccccc}
+1 & -v & -v & 0 & 0 & 0 \\
+-v & 1 & -v & 0 & 0 & 0 \\
+-v & -v & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 2(1+v) & 0 & 0 \\
+0 & 0 & 0 & 0 & 2(1+v) & 0 \\
+0 & 0 & 0 & 0 & 0 & 2(1+v)
+\end{array}\right]
+\left[\begin{array}{c}
+\sigma_x \\ \sigma_y \\ \sigma_z \\ \tau_{xy} \\ \tau_{yz} \\ \tau_{zx}
+\end{array}\right]
+$$
+
+Düzlem Stresi (Plane Stres)
+
+
 
 
 [devam edecek]
@@ -438,6 +531,8 @@ Kaynaklar
 [5] Bayramlı, {\em Fizik, Temel Fizik 1}
 
 [6] Logan, {\em A First Course in the FEM, 5th Ed}
+
+[7] Khennane, {\em Introduction to Finite Element Analysis using Matlab and Abaqus}
 
 \end{document}
 

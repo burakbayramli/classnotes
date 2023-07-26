@@ -2,11 +2,7 @@
 
 Daha önce 2 boyut için [gördüğümüz](kati-govde-fizik-simulasyon-rigid-body-physics-pymunk.html)
 simülasyon yazılımının 3 boyutta karşılığı Chrono. Ubuntu üzerinde derlemek
-için bazı bilgiler,
-
-http://api.projectchrono.org/4.0.0/tutorial_install_chrono.html
-
-Kurmak için önce
+için bazı bilgiler [1]. Kurmak için önce
 
 ```
 sudo apt-get install libeigen3-dev
@@ -76,5 +72,7 @@ Chrono'da pek cok fiziksel kavram var, mesela
 [motorlar](http://api.projectchrono.org/tutorial_demo_motors.html),
 `demo_IRR_motors.cpp` kodunda bunu gorebiliriz.
 
+Kaynaklar
 
+[1] projectchrono.org
 
