@@ -41,10 +41,10 @@ coords = [[41.66660574372402, 27.597843572891335], \
           [39.93075475946135, 43.184987971740945]]
 
 
-def hadisdh_process():
-    fin = open("/tmp/HadISDH.landq.4.4.0.2021f_FLATgridHOM5by5_anoms9120_actuals.dat")
+def hadisdh_process(infile,outfile):
+    fin = open(fin)
     rd = csv.reader(fin)
-    fout = open("/tmp/q.csv","w")
+    fout = open(outfile,"w")
     for i in range(47*12):
         print ('i',i)
         date_line = next(rd)
