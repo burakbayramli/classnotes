@@ -151,10 +151,10 @@ atarak serinler, fakat yüksek nemli ortamda bu atış işlemez olur
 (dışarıdaki hava içinde çok fazla sıvı var) ve bu sıcaklığın etkisini
 arttırır.
 
-Sıcaklık ve nem ölçülerini birleştirip tek bir ölçüt haline getiren
-bir hesap ıslak termometre sıcaklığı. Bu bize irdeleme açısından tek
-bir ölçüt veriyor, bilimsel makalelere göre 35 derece (Çelcius) hatta
-son bazı araştırmalara göre 31 C bile ölümcül olabiliyor.
+Sıcaklık ve nemi birleştirip tek bir ölçüt haline getiren bir hesap
+ıslak termometre sıcaklığı. Bu bize irdeleme açısından tek bir sayı
+veriyor, bilimsel makalelere göre 35 derece (Celcius) hatta son bazı
+araştırmalara göre 31 C bile ölümcül olabiliyor.
 
 Hesabı yapmak için `MetPy` paketini kullanabiliriz,
 
@@ -173,9 +173,22 @@ Out[1]: 35.12274652837743 <Unit('degree_Celsius')>
 Yani izafi nem 50% (normal) 1000 hPa basıncında 46 derece ölümcül ıslak termometre
 sıcaklığı 35 C'ye geliyor.
 
-Dunya bazinda bu olcutu grafiklesek nasil cikardi acaba? Dosya listesi
-[1]'den ASCII bazli olan `HadISDH.landRH` ve `HadISDH.landT`
-dosyalarini alabiliriz. Bu dosyalar uzerinde `hadisdh_process(..,..)` isletiriz,
+Alternatif bir [kod](wetbulb.py),
+
+```python
+import wetbulb
+
+wetbulb.wet_bulb(46, 1000*100, 50.)
+```
+
+```text
+Out[1]: 36.034835648928826
+```
+
+Dünya bazında bu ölçütü grafiklesek nasıl çıkardı acaba? Dosya listesi
+[1]'den ASCII bazlı olan `HadISDH.landRH` ve `HadISDH.landT`
+dosyalarını alabiliriz. Bu dosyalar üzerinde `hadisdh_process(..,..)`
+işletiriz, sonuçlar `Rh.csv` ve `T.csv` üzerinde varsayalım,
 
 ```python
 year = 2019; month = 7
@@ -202,10 +215,14 @@ plt.pcolormesh(x,y,wet,shading='auto',cmap='Reds')
 
 ![](iklim05.jpg)
 
-Bu kodla sadece 19 derece üstündeki İTS gösteriliyor, şahsi
-gözlemlerimiz 20 C üstünün rahatsız edici olması filtrelemeyi ona gore
-yaptik. Sonuca bakınca Uzakdoğu'da, Akdeniz, Karadeniz etrafında bazi
-bölgeler görülüyor.
+Bu kodla sadece 19 derece üstündeki İTS gösterdik, şahsi gözlemlerimiz
+20 C üstünün rahatsız edici olması filtreleme ona göre yapıldı. Sonuca
+bakınca Uzakdoğu'da, Akdeniz, Karadeniz etrafında bazı tehlikeli
+bölgeler görülüyor. Tayland, Singapur'a gidenler yüksek nemli günlerde
+dışarıda durmanın zorluğunu farketmiştir. Not: Analiz 2019 yılı Temmuz
+ayı için yapıldı, bu ay kuzey yarımküre için yaz sezounu, ekvator
+altındaki sonuçlara bakarken bunu aklımızda tutalım.
+
 
 
 Kaynaklar
@@ -219,4 +236,7 @@ Kaynaklar
 [4] <a href="https://www.metoffice.gov.uk/hadobs/hadisdh">Hadisdh Degerler Listesi</a>
 
 [5] <a href="https://www.metoffice.gov.uk/hadobs/hadisdh/downloadEXTREMES.html">Hadisdh Ekstrem Degerler</a>
+
+
+
 
