@@ -8,13 +8,38 @@ bağlantısındaki metotlarla alınabilir.
 sırasıyla bir kg ıslak hava içinde ne kadar g bazında buhar olduğunu
 gosteren g/kg birimindeki spesifik nemlilik `q`, ya da birim hacimdeki
 buharın o sıcaklıkta tutulabilecek maksimum buhara olan yüzde olarak
-oranını gosteren izafi nemlilik `rh`.
+oranını gosteren izafi nemlilik `rh`. Veri indirilip alttaki icindeki
+`hadisdh_process` ile işlenebilir.
 
-Veri indirilip `util.py` icindeki `hadisdh_process` ile
-işlenebilir. Okunan dosya formatı biraz garip, tarihler ay olarak bir
-blok üzerine düz tarih olarak yazılmış, ve dosyanın en sonunda her
-bloğun kolonlarının ve satırlarının tekabül ettiği enlem, boylam
-ızgara noktaları verilmiş. Biz Pandas gibi ürünlerle çalışmaya alışık
+```python
+def hadisdh_process(infile,outfile):
+    fin = open(fin)
+    rd = csv.reader(fin)
+    fout = open(outfile,"w")
+    for i in range(47*12):
+        date_line = next(rd)
+        date_line = date_line[0].split(" ")
+        dt = date_line[1] + "-" + date_line[0]
+        dt = pd.to_datetime(dt)
+        for j in range(36):
+            print ('j',j)
+            line = next(rd)
+            line = line[0]
+            line = re.split('\s*',line)
+            line = line[1:]
+            line = [str(dt.year), str(dt.month)] + line
+            res = ";".join(line)
+            res = res.replace("-9999.99","")
+            fout.write(res)
+            fout.write("\n")
+            fout.flush()
+        fout.flush()
+```
+
+Okunan dosya formatı biraz garip, tarihler ay olarak bir blok üzerine
+düz tarih olarak yazılmış, ve dosyanın en sonunda her bloğun
+kolonlarının ve satırlarının tekabül ettiği enlem, boylam ızgara
+noktaları verilmiş. Biz Pandas gibi ürünlerle çalışmaya alışık
 olduğumuz için her satırda gerekli bilgiyi içeren normalize edilmiş
 verilerle iş yapmaya daha alışkınız, bizim ürettiğimiz çıktının
 formatında sene/ay bilgisi ayrı kolonlarda, ve her satırda veriliyor,
@@ -236,7 +261,4 @@ Kaynaklar
 [4] <a href="https://www.metoffice.gov.uk/hadobs/hadisdh">Hadisdh Degerler Listesi</a>
 
 [5] <a href="https://www.metoffice.gov.uk/hadobs/hadisdh/downloadEXTREMES.html">Hadisdh Ekstrem Degerler</a>
-
-
-
 
