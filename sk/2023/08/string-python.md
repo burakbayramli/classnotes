@@ -1,7 +1,7 @@
 # String Yapısı ve Python
 
 Metin bilgisini depolayabilen Python `str` yani kelime dizisi string
-yapısına bakalım. Bu tip temel olarak değiştirilemez (ımmutable) bir
+yapısına bakalım. Bu tip temel olarak değiştirilemez (immutable) bir
 tiptir, yani bir kere bir kelime, cümle bir obje haline geldiğine
 içeriği değiştirilemez, ona yapılan ekler, işlemler *yeni* bir `str`
 yaratacaktır.
@@ -21,7 +21,7 @@ aaa-bbb-ccc
 ```
 
 Diğer bir yöntem yerine geçen String (subsitution) yöntemi. Bu yöntem
-aslında Ç/++ dilinde bilinen sprintf mantığına benziyor. Format
+aslında C/++ dilinde bilinen `sprintf` mantığına benziyor. Format
 belirleyen bir kısım var, bir de formatın tanımladığı yerlere yeni
 değerler parametre olarak geçilen değerler var, ve bu değerler ile
 yeni bir String oluşturuluyor. Örnek:
@@ -35,10 +35,10 @@ print (s2)
 aaa-bbb-ccc
 ```
 
-s ekrana basıldığında ilk örnekle aynı sonucu göreceğiz. Bu kullanımın
-birkaç avantajı var, String tipini temsil eden %s yerine diğer tipler
-de kullanılabilir, mesela float'ları temsil eden %f. Ö zaman hem
-String birleştirme hem de tiplere göre formatlama aynı anda
+`s2` ekrana basıldığında ilk örnekle aynı sonucu göreceğiz. Bu
+kullanımın birkaç avantajı var, String tipini temsil eden `%s` yerine
+diğer tipler de kullanılabilir, mesela float'ları temsil eden `%f`. O
+zaman hem String birleştirme hem de tiplere göre formatlama aynı anda
 yapılabilecektir.
 
 Örnek
@@ -52,14 +52,13 @@ print (s3)
 Burada bir float deger var: 3.434550
 ```
 
-Bu örnekte 3.43455 değeri %f yerine koyulmuş olacak ve ekranaBurada
-bir float değer var: 3.434550 basılacak. %f daha sofistike şekilde de
-kullanılabilir. Mesela:s = "Burada bir float değer var: %3.2f" %
-(3.43455)
+Bu örnekte 3.43455 değeri `%f` yerine koyulmuş olacak ve ekrana
+`Burada bir float değer var: 3.434550` basılacak. `%f` daha sofistike
+şekilde de kullanılabilir. Mesela: `s = "Burada bir float değer var: %3.2f" % (3.43455)`
 
-Bu formatlamaya gore float degerini noktadan sonra sadece 2 basamak
-olacak sekilde ayarladik. O zaman sonuc:Burada bir float degenr var:
-3.43 olacaktir.  ```
+Bu formatlamaya göre float değerini noktadan sonra sadece 2 basamak
+olacak şekilde ayarladık. O zaman sonuç: `Burada bir float değer var: 3.43`
+olacaktır
 
 ### Eşitlik
 
@@ -92,6 +91,46 @@ print ("bir" in s5)
 
 ```text
 True
+```
+
+### Bir Dizin Olarak String
+
+Fakat sonuçta `str` tipinin bir harf dizini olduğunu unutmayalım. Eğer bu dizini
+aynen bir listeyi gezer gibi gezmek istersek bunu yapabiliriz,
+
+```python
+for s in s5: print (s)
+```
+
+```text
+b
+i
+r
+ 
+k
+e
+l
+i
+m
+e
+```
+
+Ve doğal olarak indis bazlı erişim de işleyecektir,
+
+```python
+s5[4]
+```
+
+```text
+Out[1]: 'k'
+```
+
+```python
+s5[-1]
+```
+
+```text
+Out[1]: 'e'
 ```
 
 ### Harf Bloklarını Değiştirmek
@@ -158,4 +197,6 @@ cagri
 olacak, yani TR karakterleri İngilizce harflerden en yakın olanlarına
 tercüme edilecek. Bu niye yapılır? Belki metin arama yaparken lazım
 olabilir.
+
+
 
