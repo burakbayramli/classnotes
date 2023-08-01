@@ -113,6 +113,19 @@ alttaki gibi yaratılabilir,
       G[src][dest] = 1
 ```
 
+Not olarak ekleyelim, OSM açık bir veri kaynağı olarak katkıcıların
+her türlü veriyi kaydetmesini sağlar, tüm taban içinde kafeler,
+sinemalar, benzin istasyonları, restoranlar gibi pek çok bilgi
+bulunmaktadır. Mesela bir noktaya en fazla 2 km yakındaki kafeler için
+
+```
+q = """
+[out:json];
+  node["amenity"~"cafe"](around:2000,40.958905, 29.1020804);
+  out center;
+"""
+```
+
 ### IETT
 
 IETT API'si hakkında belgeler [2]'de, örnek kod [1]'de.
