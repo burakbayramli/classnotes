@@ -30,7 +30,7 @@
 
 [Closure](../../2009/05/closure.html)
 
-[String Birlestirmek](../../2011/03/string-birlestirmek.html)
+[String Yapısı ve Python](../../2023/08/string-python.html)
 
 [Tarih Zaman İçin datetime](../../2016/06/datetime.html)
 
