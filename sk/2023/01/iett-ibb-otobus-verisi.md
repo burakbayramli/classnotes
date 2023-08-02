@@ -126,6 +126,16 @@ q = """
 """
 ```
 
+Bir kutu içine düşen, mesela alt sol 30,20 üst sağ nokta 32,22 olsun,
+tüm kamp alanlarını görmek için
+
+```
+[out:json];
+   node["tourism"="camp_site"]
+   (30,20,32,22); out; (._;>;);
+out;
+```
+
 ### IETT
 
 IETT API'si hakkında belgeler [2]'de, örnek kod [1]'de.
