@@ -4,7 +4,9 @@ Python
 
 ```
 pip install gtts, pyttsx
+```
 
+```python
 from gtts import gTTS
 import os
 tts = gTTS(text='Good morning', lang='en')
@@ -13,7 +15,7 @@ tts.save("good.mp3")
 
 ya da 
 
-```
+```python
 import pyttsx
 
 engine = pyttsx.init()
