@@ -245,7 +245,7 @@ Bu kodla sadece 19 derece üstündeki İTS gösterdik, şahsi gözlemlerimiz
 bakınca Uzakdoğu'da, Akdeniz, Karadeniz etrafında bazı tehlikeli
 bölgeler görülüyor. Tayland, Singapur'a gidenler yüksek nemli günlerde
 dışarıda durmanın zorluğunu farketmiştir. Not: Analiz 2019 yılı Temmuz
-ayı için yapıldı, bu ay kuzey yarımküre için yaz sezounu, ekvator
+ayı için yapıldı, bu ay kuzey yarımküre için yaz sezonu, ekvator
 altındaki sonuçlara bakarken bunu aklımızda tutalım.
 
 
