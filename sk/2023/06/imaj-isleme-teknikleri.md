@@ -121,6 +121,30 @@ imageio.imwrite('img1.jpg',img1)
 
 ![](img1.jpg)
 
+### Cizgiler
+
+Bir imajdaki ana çizgileri bulmak artık görüntü işlem biliminde
+demirbaş haline gelmiş Canny kenar bulucusu ve Hough transformu ile
+yapılabilir.
+
+```python
+from PIL import Image, ImageDraw
+from skimage.transform import  probabilistic_hough_line
+from skimage.feature import canny
+from skimage import data
+
+im1 = Image.open('in1.jpg').convert('L')
+edges1 = canny(np.array(im1), 2, 1, 25)
+lines1 = probabilistic_hough_line(edges1, threshold=10, line_length=30,line_gap=3)
+im1 = Image.open('in1.jpg')
+for line in lines1:
+    p0, p1 = line
+    plt.plot((p0[0], p1[0]), (p0[1], p1[1]))
+plt.imshow(im1)
+plt.savefig('img4.jpg',quality=40)
+```
+
+![](img4.jpg)
 
 
 
