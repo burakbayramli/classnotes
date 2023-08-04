@@ -157,9 +157,10 @@ Out[1]: 4
 ```
 
 Bu çağrı aranan metnin ilk görüldüğü yerin indisini döndürdü. Diğer
-`berber` kelimelerini bulmak için `fınd` çağrısına başlangıç, bitiş
-değerleri vermek mümkündür, yani ilk bulunan kısmı atlayarak oradan
-itibaren ararsak, bir sonraki uyumun yeri döndürülür,
+`berber` kelimelerini bulmak için `find` çağrısını bir aralık üzerinde
+işletmek mümkündür, yani başlangıç, bitiş değerleri verebiliriz,
+üstteki örnekte ilk bulunan kısmı atlayarak oradan itibaren arama
+yaparsak, bir sonraki uyumun yeri döndürülür,
 
 ```python
 s4.find("berber",5,len(s4))

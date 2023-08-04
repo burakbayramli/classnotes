@@ -316,6 +316,34 @@ atlanır. print a[sl] çağrısı bize [3, 5, 7] sonucunu döndürecek.Aynı
 değişkenler kullanılarak slice() objeleri yaratmak gerekebiliyor, bu
 durumlarda slice() çağrısı tercih edilmekte.
 
+### Loadtxt ve Converter
+
+CSV dosyası diye bilinen boşluk, virgül, vs. ile ayrılmış satırsal,
+düz text bazlı dosyaları Loadtxt ile yüklüyoruz. Eğer bu yükleme
+sırasında mesela bir float olması gereken bir hücrede 'NA' gibi bir
+string bazlı değer varsa, loadtxt bu değeri float yapamadığı için
+şikayet edecektir. NA bilindiği gibi "değer yok" anlamına gelen "not
+applicable" kelimesinden geliyor; Numpy içinde buna tekabül eden bir
+float değeri var (Nump.nan diye erışılıyor), o zaman String görünce bu
+değere dönüşümü bizim yapmamız lazım.
+
+Alttaki kod neş.dat adlı bir dosyayı okur, 1. satırı atlar, ve sadece
+11 ve 32. kolonlarını çekip çıkartır, bu kolonların her ikisinde de
+bazen NA metni görülürse, onu `converter()` fonksiyonu üzerinden
+numpy.nan değerine çevirir.
+
+```python
+import numpy as np
+
+def converter(x):
+  if x == 'NA':
+      return np.nan
+    else:
+       return float(x)
+       
+nes = np.loadtxt("nes.dat", skiprows=1, usecols = (11,32), converters={11:converter, 32:converter})
+```
+
 Ekler
 
 [Grafiklemek, Meshgrid](../../2020/02/grafiklemek.html)
