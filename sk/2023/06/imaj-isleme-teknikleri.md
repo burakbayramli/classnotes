@@ -21,15 +21,15 @@ new_img.save("img3_2.jpg", "JPEG")
 
 Boyut değişimi yapılırken `ANTIALIAS`, `BICUBIC`, `BILINEAR` ve
 `CUBIC` seçenekleri kullanılabilir. Küçültme, büyültme farketmez, aynı
-seçenekler var, büyültürken muhakkak aradeğerleme (interpolation)
-yapılması lazım, bahsedilen seçenekler bu aradeğerlemenin nasıl
-yapılacağını kontrol ediyor. Aradeğerleme lazım çünkü mesela büyütme
-durumunda 100x100 boyutunda bir resim 300x300 olacaksa bu 40,000 tane
-yeni piksel yaratılması demektir, bu piksellere bir değer atanmalı, bu
-değerler mevcut değerler kullanılarak bulunabilir, bilinen yakın olan
-piksellerin ortalama değeri mesela, lineer ağırlıklı, ya da başka
-türlü. Üstteki seçenekler hangi aradeğerlemenin seçileceğini kontrol
-ediyor.
+seçenekler var, ölçü değişimi olduğunda muhakkak aradeğerleme
+(interpolation) yapılması lazım, bahsedilen seçenekler bu
+aradeğerlemenin nasıl yapılacağını kontrol ediyor. Aradeğerleme lazım
+çünkü mesela büyütme durumunda 100x100 boyutunda bir resim 300x300
+olacaksa bu 40,000 tane yeni piksel yaratılması demektir, bu
+piksellere bir değer atanmalı, bu değerler mevcut değerler
+kullanılarak bulunabilir, bilinen yakın olan piksellerin ortalama
+değeri mesela, lineer ağırlıklı, ya da başka türlü. Üstteki seçenekler
+hangi aradeğerlemenin seçileceğini kontrol ediyor.
 
 Biraz önce küçültülen resmi şimdi geri büyültelim,
 
@@ -121,7 +121,7 @@ imageio.imwrite('img1.jpg',img1)
 
 ![](img1.jpg)
 
-### Cizgiler
+### Çizgiler
 
 Bir imajdaki ana çizgileri bulmak artık görüntü işlem biliminde
 demirbaş haline gelmiş Canny kenar bulucusu ve Hough transformu ile
@@ -145,9 +145,6 @@ plt.savefig('img4.jpg',quality=40)
 ```
 
 ![](img4.jpg)
-
-
-
 
 
 
