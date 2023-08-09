@@ -24,3 +24,5 @@
 
 [En Kısa Yol Algoritması, Yol Ağı, OSMNX](../../2023/04/yol-bolmak-osm-osmnx.html)
 
+[Haritalama, Nehirler, Göller](../../2023/08/haritalama-su-kaynaklari-nehirler-goller.html)
+

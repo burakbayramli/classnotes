@@ -1,6 +1,6 @@
 # Meteoroloji Verileri - ECMWF, NOAA, OpenWeatherMap
 
-OpenWeatherMap
+### OpenWeatherMap
 
 Bu Web servisi kayıt olanlara bir API anahtarı verir ve belli sayıda
 APİ çağrısı için kullanım bedavadır. Servisten o andaki sıcaklık,
@@ -142,7 +142,36 @@ yagmur
 ('2021-01-08 00:00:00', {'3h': 1.08})
 ```
 
-ECMWF
+Nem ve sicaklik verilerini alalim, onları önceden rasgele seçilmiş
+belli noktalar için alacağız, `util.coords` içinde. Bugünün verisini
+alalım, erişim için OWM anahtarının alınmış olduğunu farzediyoruz,
+bizimki `$HOME` altında `.nomterr.conf` adlı bir JSON dosyasında,
+`weatherapi` anahtarına tekabül ediyor,
+
+```python
+base_url = 'http://api.openweathermap.org/data/2.5/weather?'
+
+params = json.loads(open(os.environ['HOME'] + "/.nomterr.conf").read())
+
+n = datetime.datetime.now()
+ns = n.strftime("%Y-%m-%d")
+hums = []
+for i in range(len(coords)):
+    print (i)
+    payload = {'units': 'metric', 'lat': str(coords[i][0]), 'lon': str(coords[i][1]),'appid': params['weatherapi'] }
+    r = requests.get(base_url, params=payload) 
+    res = [json.loads(x.decode()) for x in r.iter_lines()]
+    hums.append(str(res[0]['main']['humidity']))
+
+hline = ns + "," + ",".join(hums) 
+fout = open("trhumid.csv","a")
+fout.write(hline)
+fout.write("\n")
+fout.close()
+```
+
+
+### ECMWF
 
 Hava verisi uzerinde yapay ogrenim ile tahminler yapmak isteyenler ham
 veriyi almak icin alttaki siteye basvurabilir.

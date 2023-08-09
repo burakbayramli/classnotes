@@ -392,25 +392,39 @@ kullanacağız, paket `quads` içinde.
 
 ```python
 class QuadTreeInterpolator:
-    def __init__(self, x, y, z):
+    def __init__(self,x,y):
         self.tree = quads.QuadTree((np.mean(x), np.mean(y)), 100, 100)
+
+    def cell_interp(self, x, y, points):
+        a = np.array([x,y]).reshape(-1,2)
+        b = np.array(points)[:,:2]
+        ds = cdist(a,b)
+        ds = ds / np.sum(ds)
+        ds = 1. - ds
+        c = np.array(points)[:,2]
+        iz = np.sum(c * ds) / np.sum(ds)
+        return iz
+
+    def append(self, x, y, z):
         for xx,yy,zz in zip(x,y,z):
             self.tree.insert((xx,yy),data=zz)
             
     def interpolate(self,x,y):
         res = self.tree.nearest_neighbors((x,y), count=4)
         points = np.array([[c.x, c.y, c.data] for c in res])
-        return cell_interp(x, y, points)               
+        return self.cell_interp(x, y, points)               
 
-q = QuadTreeInterpolator(xx.flatten(), yy.flatten(), zz.flatten())    
+q = QuadTreeInterpolator(xx.flatten(), yy.flatten())
+q.append(xx.flatten(), yy.flatten(), zz.flatten())    
 qinterp = np.vectorize(q.interpolate,otypes=[np.float64])
 zz2_quad = qinterp(xx2,yy2)
 print (np.mean(np.square(zz2-zz2_quad)))
 ```
 
-```
+```text
 0.0005101521958506852
 ```
+
 
 Bu teknik te iyi sonuç verdi.
 
