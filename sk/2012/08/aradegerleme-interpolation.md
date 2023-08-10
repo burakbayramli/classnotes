@@ -196,8 +196,6 @@ print (interp([4],[4]))
 [0.54049742]
 ```
 
-Benzer bir sonuc elde ettik.
-
 ```python
 x2 = np.linspace(0,10,50)
 y2 = np.linspace(0,10,50)
@@ -215,6 +213,23 @@ Farkettiysek üstteki ızgara her ekseni 50 parçaya böldü, `interp`
 objesi 30 parçalık izgara üzerinden yaratılmıştı; böylece elde olmayan
 bir sürü değeri sormuş olduk ama nihai grafik hala orijinale
 benziyor. Ayrıca Clough/Tocher yaklaşımı çok hızlı işler.
+
+### NearestNDInterpolator
+
+En yakın değerleri kullanarak aradeğerleme yapan bir araçtır. Bazı
+durumlarda üstteki daha çetrefil yaklaşımlardan daha iyi sonuç
+verebilir.
+
+```python
+from scipy.interpolate import NearestNDInterpolator
+
+interp = NearestNDInterpolator(list(zip(xx.flatten(), yy.flatten())), zz.flatten())
+print (interp([4],[4]))
+```
+
+```text
+[0.63261986]
+```
 
 ### Izgara İçinde En Yakın Değer Aradeğerlemesi
 
