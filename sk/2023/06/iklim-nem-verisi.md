@@ -180,18 +180,18 @@ altındaki sonuçlara bakarken bunu aklımızda tutalım.
 
 ### NOAA Verisi
 
-[6] gunluk NOAA verileri tarihi iklim uzerinde ve dunyanin herhangi
-bir noktasinin islik termometre sicakligi hesabi icin kullanilabilir.
-Herhangi bir sene icin, 2022 diyelim, tum istasyonlarin verisini aliriz,
-`/tmp/data/2022` altinda diyelim,
+[6] günlük NOAA verileri tarihi iklim üzerinde ve dünyanin herhangi
+bir noktasının ıslak termometre sıcaklığı hesabı için kullanılabilir.
+Herhangi bir sene için, 2022 diyelim, tüm istasyonların verisini alırız,
+mesela `/tmp/data/2022`,
 
 ```python
 from metpy.calc import dewpoint_from_relative_humidity, wet_bulb_temperature
 from metpy.units import units
 import pandas as pd, numpy as np, glob
 
-fout = open("wbt_max.csv","w")
-for f in glob.glob("2022/*.csv"):
+fout = open("/tmp/data/wbt_max.csv","w")
+for f in glob.glob("/tmp/data/2022/*.csv"):
     print (f)
     df = pd.read_csv(f,index_col='DATE')
     dfh = df.head(1)
@@ -206,12 +206,12 @@ for f in glob.glob("2022/*.csv"):
     fout.flush()
 ```
 
-Ustteki kod 2022'deki Agustos ayi icin her istasyonun kaydetmis oldugu
-maksimum islak termometre sicakligini bir dosyaya yaziyor, isi bitince
-tek bir dosya elde edilecek, bu dosyada her istasyonun kaydetmis
-oldugu ITS o istasyonun cografi yeri ile beraber paylasilmis olacak.
-Sonra bu dosyayi alip herhangi bir noktaya en yakin olan istasyonlari
-alip renksel haritalama yapabiliriz, mesela yine TR ornegi olsun,
+Üstteki kod 2022'deki Ağustos ayı için her istasyonun kaydetmiş olduğu
+maksimum ıslak termometre sıcaklığını bir dosyaya yazıyor, işi bitince
+tek bir dosya elde edilecek, bu dosyada her istasyonun kaydetmiş
+olduğu ITS o istasyonun coğrafi yeri ile beraber paylaşılmış olacak.
+Sonra bu dosyayı alıp herhangi bir noktaya en yakın olan istasyonları
+toparlayıp renksel haritalama yapabiliriz, TR örneği,
 
 ```python
 import numpy as np, glob, simplegeomap as sm, quads
@@ -221,7 +221,7 @@ def cdist(p1,p2):
     distances = np.linalg.norm(p1 - p2, axis=1)
     return distances
 
-class QuadTreeInterpolator2:
+class QuadTreeInterpolator:
     def __init__(self, x, y):
         self.tree = quads.QuadTree((np.mean(x), np.mean(y)), 100, 100)
 
@@ -255,7 +255,7 @@ sm.plot_continents(clat,clon,zoom=zoom,outcolor='white', fill=False)
 
 stats = df.loc[s[:140]]
 
-q = QuadTreeInterpolator2(np.array(stats.lon), np.array(stats.lat))
+q = QuadTreeInterpolator(np.array(stats.lon), np.array(stats.lat))
 
 q.append(np.array(stats.lon), np.array(stats.lat), np.array(stats.wbt))
 interp = np.vectorize(q.interpolate,otypes=[np.float64])

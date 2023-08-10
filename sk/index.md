@@ -3,9 +3,9 @@
 
 ## En Son
 
-4/8 - [String Yapısı ve Python](https://burakbayramli.github.io/dersblog/sk/2023/08/string-python.html)
+10/8 - [OSM, Şehir Ulaşım Verileri - Ekler](https://burakbayramli.github.io/dersblog/sk/2023/01/iett-ibb-otobus-verisi.html)
 
-28/7 - [Sıcaklık, Nem Hesapları - Ekler](https://burakbayramli.github.io/dersblog/sk/2023/06/iklim-nem-verisi.html)
+4/8 - [String Yapısı ve Python](https://burakbayramli.github.io/dersblog/sk/2023/08/string-python.html)
 
 14/7 - [Yeni Haritalama Paketi](https://burakbayramli.github.io/dersblog/sk/2023/07/basit-haritalama-paketi.html)
 
