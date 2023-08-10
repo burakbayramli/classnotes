@@ -178,7 +178,99 @@ dışarıda durmanın zorluğunu farketmiştir. Not: Analiz 2019 yılı Temmuz
 ayı için yapıldı, bu ay kuzey yarımküre için yaz sezonu, ekvator
 altındaki sonuçlara bakarken bunu aklımızda tutalım.
 
+### NOAA Verisi
 
+[6] gunluk NOAA verileri tarihi iklim uzerinde ve dunyanin herhangi
+bir noktasinin islik termometre sicakligi hesabi icin kullanilabilir.
+Herhangi bir sene icin, 2022 diyelim, tum istasyonlarin verisini aliriz,
+`/tmp/data/2022` altinda diyelim,
+
+```python
+from metpy.calc import dewpoint_from_relative_humidity, wet_bulb_temperature
+from metpy.units import units
+import pandas as pd, numpy as np, glob
+
+fout = open("wbt_max.csv","w")
+for f in glob.glob("2022/*.csv"):
+    print (f)
+    df = pd.read_csv(f,index_col='DATE')
+    dfh = df.head(1)
+    lat,lon = list(dfh.LATITUDE)[0],list(dfh.LONGITUDE)[0]
+    df1 = df[(df.SLP < 9999.9) & (df.TEMP < 9999.9) & (df.DEWP < 9999.9) &
+             (df.index > '2022-07-31') & (df.index < '2022-09-01')]
+    if len(df1) == 0: continue
+    res = df1.apply(lambda x: wet_bulb_temperature(x['SLP'] * units.hPa, x['TEMP']*units.degF, x['DEWP']*units.degF).to(units.degC).magnitude,axis=1)
+    st = f.replace("2022/","").replace(".csv","")
+    fout.write ("%s,%f,%f,%f" % (st,lat,lon,res.max()))
+    fout.write("\n")
+    fout.flush()
+```
+
+Ustteki kod 2022'deki Agustos ayi icin her istasyonun kaydetmis oldugu
+maksimum islak termometre sicakligini bir dosyaya yaziyor, isi bitince
+tek bir dosya elde edilecek, bu dosyada her istasyonun kaydetmis
+oldugu ITS o istasyonun cografi yeri ile beraber paylasilmis olacak.
+Sonra bu dosyayi alip herhangi bir noktaya en yakin olan istasyonlari
+alip renksel haritalama yapabiliriz, mesela yine TR ornegi olsun,
+
+```python
+import numpy as np, glob, simplegeomap as sm, quads
+import pandas as pd, os, matplotlib.pyplot as plt
+
+def cdist(p1,p2):    
+    distances = np.linalg.norm(p1 - p2, axis=1)
+    return distances
+
+class QuadTreeInterpolator2:
+    def __init__(self, x, y):
+        self.tree = quads.QuadTree((np.mean(x), np.mean(y)), 100, 100)
+
+    def cell_interp(self, x, y, points):
+        a = np.array([x,y]).reshape(-1,2)
+        b = np.array(points)[:,:2]
+        ds = cdist(a,b)
+        ds = ds / np.sum(ds)
+        ds = 1. - ds
+        c = np.array(points)[:,2]
+        iz = np.sum(c * ds) / np.sum(ds)
+        return iz
+
+    def append(self, x, y, z):
+        for xx,yy,zz in zip(x,y,z):
+            self.tree.insert((xx,yy),data=zz)
+            
+    def interpolate(self,x,y):
+        res = self.tree.nearest_neighbors((x,y), count=4)
+        points = np.array([[c.x, c.y, c.data] for c in res])
+        return self.cell_interp(x, y, points)               
+
+clat,clon,zoom = 39,34,2
+
+df = pd.read_csv('/tmp/data/wbt_max.csv')
+
+res = cdist (df[['lat','lon']],np.array([clat,clon]))
+s = res.argsort()
+
+sm.plot_continents(clat,clon,zoom=zoom,outcolor='white', fill=False)
+
+stats = df.loc[s[:140]]
+
+q = QuadTreeInterpolator2(np.array(stats.lon), np.array(stats.lat))
+
+q.append(np.array(stats.lon), np.array(stats.lat), np.array(stats.wbt))
+interp = np.vectorize(q.interpolate,otypes=[np.float64])
+xi,yi = np.meshgrid(np.linspace(26,44,20),np.linspace(35,42,20))
+zi = interp(xi, yi)
+
+plt.xlim(26,44)
+plt.ylim(35,42)
+im = plt.pcolormesh(xi,yi,zi,cmap='Blues',shading='auto')
+plt.colorbar(im)
+
+plt.savefig('iklim03.jpg')
+```
+
+![](iklim03.jpg)
 
 Kaynaklar
 
@@ -192,3 +284,4 @@ Kaynaklar
 
 [5] <a href="https://www.metoffice.gov.uk/hadobs/hadisdh/downloadEXTREMES.html">Hadisdh Ekstrem Degerler</a>
 
+[6] <a href="../../2021/12/netcdf-wind-historical-noaa-iklim-veri.md">Iklim Verileri</a>

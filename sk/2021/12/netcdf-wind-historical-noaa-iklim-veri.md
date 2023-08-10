@@ -251,6 +251,15 @@ print (uwnd.shape)
 (334, 277, 349)
 ```
 
+### NOAA Günlük Ortalamalar
+
+Bu veri [4] çok kullanışlı, çünkü her sene ayrı bir zip dosyası olarak
+veriliyor, zip açılınca her ölçüm istasyonunun ayrı csv dosyaları
+görülüyor. Günlük ortamalar bu dosyalar içinde, her gün ayrı satırda
+verilmiş. Paylaşılan ölçümler Fahrenheit olarak `TEMP` günün sıcaklığı
+çiy noktası `DEWP`, basınç `SLP`, yağmur miktarı `PRCP` gibi öğeler
+[5].
+
 Kaynaklar
 
 [1] THREDDS Catalog, https://psl.noaa.gov/thredds/catalog/Datasets/NARR/catalog.html
@@ -259,7 +268,8 @@ Kaynaklar
 
 [3] http://berkeleyearth.org/data/
 
+[4] NOAA, Gunluk Ortalamalar, https://www.ncei.noaa.gov/data/global-summary-of-the-day/archive/
 
-
+[5] https://www.ncei.noaa.gov/data/global-summary-of-the-day/doc/readme.txt
 
 
