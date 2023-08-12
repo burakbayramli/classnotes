@@ -216,33 +216,11 @@ toparlayıp renksel haritalama yapabiliriz, TR örneği,
 ```python
 import numpy as np, glob, simplegeomap as sm, quads
 import pandas as pd, os, matplotlib.pyplot as plt
+from scipy.interpolate import NearestNDInterpolator, CloughTocher2DInterpolator
 
 def cdist(p1,p2):    
     distances = np.linalg.norm(p1 - p2, axis=1)
     return distances
-
-class QuadTreeInterpolator:
-    def __init__(self, x, y):
-        self.tree = quads.QuadTree((np.mean(x), np.mean(y)), 100, 100)
-
-    def cell_interp(self, x, y, points):
-        a = np.array([x,y]).reshape(-1,2)
-        b = np.array(points)[:,:2]
-        ds = cdist(a,b)
-        ds = ds / np.sum(ds)
-        ds = 1. - ds
-        c = np.array(points)[:,2]
-        iz = np.sum(c * ds) / np.sum(ds)
-        return iz
-
-    def append(self, x, y, z):
-        for xx,yy,zz in zip(x,y,z):
-            self.tree.insert((xx,yy),data=zz)
-            
-    def interpolate(self,x,y):
-        res = self.tree.nearest_neighbors((x,y), count=4)
-        points = np.array([[c.x, c.y, c.data] for c in res])
-        return self.cell_interp(x, y, points)               
 
 clat,clon,zoom = 39,34,2
 
@@ -255,14 +233,12 @@ sm.plot_continents(clat,clon,zoom=zoom,outcolor='white', fill=False)
 
 stats = df.loc[s[:140]]
 
-q = QuadTreeInterpolator(np.array(stats.lon), np.array(stats.lat))
+interp = CloughTocher2DInterpolator(list(zip(stats.lon, stats.lat)), stats.wbt)
 
-q.append(np.array(stats.lon), np.array(stats.lat), np.array(stats.wbt))
-interp = np.vectorize(q.interpolate,otypes=[np.float64])
-xi,yi = np.meshgrid(np.linspace(26,44,20),np.linspace(35,42,20))
+xi,yi = np.meshgrid(np.linspace(26,44,640),np.linspace(35,42,480))
 zi = interp(xi, yi)
 
-plt.xlim(26,44)
+plt.xlim(26,42)
 plt.ylim(35,42)
 im = plt.pcolormesh(xi,yi,zi,cmap='Blues',shading='auto')
 plt.colorbar(im)
@@ -271,6 +247,24 @@ plt.savefig('iklim03.jpg')
 ```
 
 ![](iklim03.jpg)
+
+Tüm dünya için
+
+```python
+fig, ax = plt.subplots(figsize=(20,12))
+...
+stats = pd.read_csv('wbt_max.csv')
+stats = stats.dropna()
+interp = NearestNDInterpolator(list(zip(stats.lon, stats.lat)), stats.wbt)
+xi,yi = np.meshgrid(np.linspace(-180,180,640),np.linspace(0,90,480))
+zi = interp(xi, yi)
+im = ax.pcolormesh(xi,yi,zi,cmap='Blues',shading='auto')
+plt.colorbar(im)
+plt.ylim(0,80)
+plt.xlim(-180,180)
+```
+
+gibi bir kod işletilebilir.
 
 Kaynaklar
 
@@ -284,4 +278,5 @@ Kaynaklar
 
 [5] <a href="https://www.metoffice.gov.uk/hadobs/hadisdh/downloadEXTREMES.html">Hadisdh Ekstrem Degerler</a>
 
-[6] <a href="../../2021/12/netcdf-wind-historical-noaa-iklim-veri.md">Iklim Verileri</a>
+[6] <a href="../../2021/12/netcdf-wind-historical-noaa-iklim-veri.html">Iklim Verileri</a>
+
