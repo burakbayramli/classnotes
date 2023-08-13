@@ -33,7 +33,20 @@ print (headers)
 for row in rd: print (row[headers['KOLON1']])
 ```
 
-Network üzerinden akış işlemi için smart_open var,
+Gzip ile sıkıştırılmış tar dosyaları bile satır satır okunabilir,
+
+```pythn
+with tarfile.open(dir + "dosya.tar.gz",mode="r:gz") as tar:
+    for member in tar:
+        if member.isreg():      # Is it a regular file?
+            csv_file = io.StringIO(tar.extractfile(member).read().decode('ascii'))
+            rd = csv.reader(csv_file)
+            headers = {k: v for v, k in enumerate(next(rd))}
+            for row in enumerate(rd):
+                print (row[headers['KOLON1']])
+```
+
+Network üzerinden akış işlemi için `smart_open` var,
 
 ```python
 from boto.s3.connection import S3Connection
