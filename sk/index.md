@@ -3,6 +3,8 @@
 
 ## En Son
 
+15/8 - [İmaj / Görüntü İşleme Teknikleri](https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html)
+
 10/8 - [OSM, Şehir Ulaşım Verileri - Ekler](https://burakbayramli.github.io/dersblog/sk/2023/01/iett-ibb-otobus-verisi.html)
 
 4/8 - [String Yapısı ve Python](https://burakbayramli.github.io/dersblog/sk/2023/08/string-python.html)
@@ -10,8 +12,6 @@
 14/7 - [Yeni Haritalama Paketi](https://burakbayramli.github.io/dersblog/sk/2023/07/basit-haritalama-paketi.html)
 
 5/7 - [Sonlu Öğeler Metotu - 1](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp45fem1/sonlu_ogeler_metotu__finite_elements_method_fem___1.html)
-
-24/6 - [Materyel Mekaniği - 3](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_03/materyel_mekanigi__3.html)
 
 ## Konular, Referans
 
