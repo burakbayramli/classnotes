@@ -57,9 +57,8 @@ new_img4.save("img3_4.jpg", "JPEG")
 
 ### Pürüzsüzleştirme (Smoothing)
 
-Pürüzsüzleştirme, ya da bulanıklaştırma işlemi yapmak için bir `scipy` bazlı
-bir de pür `numpy` bazlı bir teknik göreceğiz. İşlenecek resim demirbaş
-Lena,
+Pürüzsüzleştirme, ya da bulanıklaştırma işlemi yapmak için bir `scipy`
+bazlı bir de pür `numpy` bazlı bir teknik göreceğiz. 
 
 ![](../../../func_analysis/func_70_tvd/lenad0.jpg)
 
