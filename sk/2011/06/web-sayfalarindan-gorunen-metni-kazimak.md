@@ -214,6 +214,21 @@ Eger imaj toplamak istiyorsak, mesela Bing'den alttaki kod faydali,
 python -u console.py bing dog --limit 10 --json
 ```
 
-10 tane kopek imaji indirilip dataset dizini altina yazilacak.
+10 tane köpek imajı indirilip dataset dizini altına yazılacak.
 
+Varsa Indir Yoksa Indirme
+
+Alttaki kalip faydali olabilir, ayrica `urllib.request` kullanimini gostermesi
+acisindan faydali, diyelim ki `https://vs.vs.com/dosya.csv` diye bir dosya var,
+eger bu dosya `/tmp` altinda varsa indirme, yoksa indir kodunu soyle yazabiliriz,
+
+```python
+import urllib.request, os
+
+url = "https://vs.vs.com"
+f = 'dosya.csv'
+target_file = "/tmp/" + f
+if not os.path.isfile("/tmp/" + f):    
+    urllib.request.urlretrieve(url + "/" + f, target_file)
+```
 
