@@ -216,7 +216,7 @@ toparlayıp renksel haritalama yapabiliriz, TR örneği,
 ```python
 import numpy as np, glob, simplegeomap as sm, quads
 import pandas as pd, os, matplotlib.pyplot as plt
-from scipy.interpolate import NearestNDInterpolator, CloughTocher2DInterpolator
+from scipy.interpolate import NearestNDInterpolator
 
 def cdist(p1,p2):    
     distances = np.linalg.norm(p1 - p2, axis=1)
@@ -233,7 +233,7 @@ sm.plot_continents(clat,clon,zoom=zoom,outcolor='white', fill=False)
 
 stats = df.loc[s[:140]]
 
-interp = CloughTocher2DInterpolator(list(zip(stats.lon, stats.lat)), stats.wbt)
+interp = NearestNDInterpolator(list(zip(stats.lon, stats.lat)), stats.wbt)
 
 xi,yi = np.meshgrid(np.linspace(26,44,640),np.linspace(35,42,480))
 zi = interp(xi, yi)

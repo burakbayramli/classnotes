@@ -71,16 +71,16 @@ Seviye 3: Göller içindeki adalar
 
 Seviye 4: Göller içindeki adalardaki ufak göller
 
-Seviye 5: Buz kütlelerine göre Antarctika sınırı
+Seviye 5: Buz kütlelerine göre Antartika sınırı
 
-Seviye 6: Kıta sathına göre Antarctika sınırı
+Seviye 6: Kıta sathına göre Antartika sınırı
 
 Gerekli detaylılık, bilgi tipine göre üstteki seçeneklerden herhangi biri
 devreye sokulabilir.
 
 Bazı önemli notlar; bazen yaygın olarak 'nehir' olarak tanımlanan
 alanlar GSHHG için bu şekilde tanımlanmamış olabilir. Dışarıdan
-gözlenenler için birbiri ile bağlantılı çok geniş olmayan ve akıntısı
+gözleyenler için birbiri ile bağlantılı çok geniş olmayan ve akıntısı
 olan şu öbekleri bağlantılı bir nehirdir, fakat bu şekilde grafikleme
 yaptığımızda, örnek olarak Ukrayna'daki Dniper nehrini alalım,
 
