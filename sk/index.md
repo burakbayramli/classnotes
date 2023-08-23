@@ -3,7 +3,7 @@
 
 ## En Son
 
-23/8 - [Poligon, Üçgen Alanı - Ekler](https://burakbayramli.github.io/dersblog/algs/algs_075_enc/nokta_bulutlari_noktalari_cevreleyen_bolgeler.html)
+23/8 - [Poligon, Üçgen Alanı - Ekler](https://burakbayramli.github.io/dersblog/algs/algs_075_enc/poligon_alani_nokta_bulutlari_noktalari_cevreleyen_bolgeler.html)
 
 15/8 - [İmaj / Görüntü İşleme Teknikleri](https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html)
 

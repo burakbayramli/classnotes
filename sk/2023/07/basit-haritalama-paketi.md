@@ -226,15 +226,14 @@ gerekli yükseklik matrisleri yaratılacaktır.
 Yükseklik grafiklemesi odaklanan yere göre önce üstte bahsedilen ana
 bölgeyi ve onun matrisini bulur, bu `g10a.npz` olabilir, `g10b.npz`
 olabilir. Fakat veri ana a-p bölgelerine ayrılmış olsa bile hala ham
-verinin tamamını hafızaya getirmek her seferinde külfetli olacağı için
-odak parametresine göre gerekli yerlerini çekip
-çıkartıyoruz. Yükseklik verisi aslında gri imaj verisi gibi
-görülebilir, grilik seviyesi yükseklik seviyesi gibidir, değerler eşit
-aralıklı ızgara bazlıdır, bu sebeple zaten hızlı işleyen görüntü işlem
-tekniklerini yükseklik için kullanmak mümkündür. Herhangi bir bölgenin
-yükseklik verisini çekip çıkartmak mesela imaj bölgesini kesip
-çıkartmak (crop) ve o bölgeyi büyütmek (resize) işlemi olarak
-yapılıyor.
+verinin tamamını hafızada işlemek külfetli olacağı için odak
+parametresine göre gerekli yerlerini çekip çıkartıyoruz. Yükseklik
+verisi aslında gri imaj verisi gibi görülebilir, grilik seviyesi
+yükseklik seviyesi gibidir, değerler eşit aralıklı ızgara bazlıdır, bu
+sebeple zaten hızlı işleyen görüntü işlem tekniklerini yükseklik için
+kullanmak mümkündür. Herhangi bir bölgenin yükseklik verisini almak
+mesela imaj bölgesini kesip çıkartmak (crop) ve o bölgeyi büyütmek
+(resize) işlemi olarak yapılıyor.
 
 Kaynaklar
 
