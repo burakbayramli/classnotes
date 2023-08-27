@@ -136,6 +136,18 @@ tüm kamp alanlarını görmek için
 out;
 ```
 
+Yürüyüş (hiking) yolları bulmak için, yine bir kutu içinde, ki kutu
+dort sayı ile tanımlanıyor, ilk iki sayı kutunun sol alt köşesinin
+enlem, boylam sayıları, son iki sayı ise kutunun sağ üst köşesinin
+enlem ve boylamı.
+
+```
+[out:json];
+way["highway"~"path|track|footway|steps|bridleway|cycleway"]
+(30,20,32,22);
+out;
+```
+
 ### IETT
 
 IETT API'si hakkında belgeler [2]'de, örnek kod [1]'de.
