@@ -260,6 +260,12 @@ verilmiş. Paylaşılan ölçümler Fahrenheit olarak `TEMP` günün sıcaklığ
 çiy noktası `DEWP`, basınç `SLP`, yağmur miktarı `PRCP` gibi öğeler
 [5].
 
+### ECMWF
+
+Avrupa merkezli meteoroloji veri ve tahminleri paylasan 
+
+
+
 Kaynaklar
 
 [1] THREDDS Catalog, https://psl.noaa.gov/thredds/catalog/Datasets/NARR/catalog.html

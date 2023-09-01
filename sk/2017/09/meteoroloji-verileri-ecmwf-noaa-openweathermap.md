@@ -173,8 +173,58 @@ fout.close()
 
 ### ECMWF
 
+Önce günlük, bedava kaynaklara bakalım. Kurulmasi gereken paketler,
+
+```
+ecmwf-data ecmwf-opendata magpye
+```
+
+Örnek kod, [7] adresinden,
+
+```python
+import ecmwf.data as ecdata
+from magpye import GeoMap
+from ecmwf.opendata import Client
+client = Client("ecmwf", beta=True)
+parameters = ['10u', '10v','2t']
+filename = '/tmp/medium-2t-wind.grib'
+
+client.retrieve(
+    date=0,
+    time=0,
+    step=12,
+    stream="oper",
+    type="fc",
+    levtype="sfc",
+    param=parameters,
+    target=filename
+)
+
+data = ecdata.read(filename)
+
+t2m = data.select(shortName= "2t")
+u = data.select(shortName= "10u")
+v = data.select(shortName= "10v")
+```
+
+```python
+print (u.values())
+
+print (u.latitudes())
+
+print (u.longitudes())
+```
+
+```text
+[-4.91452026 -4.91452026 -4.91452026 ... -4.35202026 -4.35202026
+ -4.35202026]
+[ 90.  90.  90. ... -90. -90. -90.]
+[-180.  -179.6 -179.2 ...  178.8  179.2  179.6]
+```
+
+
 Hava verisi uzerinde yapay ogrenim ile tahminler yapmak isteyenler ham
-veriyi almak icin alttaki siteye basvurabilir.
+veriyi almak icin alttaki siteye basvurabilir. 
 
 https://www.ecmwf.int/
 
@@ -265,5 +315,5 @@ Kaynaklar
 
 [6] http://apps.ecmwf.int/datasets/licences/general
 
-
+[7] https://github.com/ecmwf/notebook-examples/blob/master/opencharts/medium-2t-wind.ipynb
 
