@@ -126,7 +126,7 @@ tar zxvf Python-2.7.7.tgz
 
 cd Python-2.7.7
 
-./configure --prefix=/opt/python-2.7.7
+./configure --prefix=/home/burak/opt/python-2.7.7
 
 make
 

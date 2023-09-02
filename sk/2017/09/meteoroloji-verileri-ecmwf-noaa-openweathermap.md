@@ -222,6 +222,71 @@ print (u.longitudes())
 [-180.  -179.6 -179.2 ...  178.8  179.2  179.6]
 ```
 
+Grafiklemek
+
+Üstteki verileri grafiklemek istersek alınan enlem, boylam verisini
+aradeğerleme kaynağı olarak kullanmak gerekli, aradeğerleme hedefi
+bizim tanımladığımız izgara olacak, bu izgara üzerinde `quiver`
+çağrısı işletilebilir,
+
+```python
+from scipy.interpolate import NearestNDInterpolator
+import ecmwf.data as ecdata
+from magpye import GeoMap
+from ecmwf.opendata import Client
+import pandas as pd
+import simplegeomap as sm
+import numpy as np
+import matplotlib.pyplot as plt
+
+client = Client("ecmwf", beta=True)
+parameters = ['10u', '10v','2t']
+filename = '/tmp/medium-2t-wind.grib'
+
+client.retrieve(
+    date=0,
+    time=0,
+    step=12,
+    stream="oper",
+    type="fc",
+    levtype="sfc",
+    param=parameters,
+    target=filename
+)
+
+data = ecdata.read(filename)
+
+t2m = data.select(shortName= "2t")
+u = data.select(shortName= "10u")
+v = data.select(shortName= "10v")
+
+M,N = 40,20
+
+lons = u.longitudes()
+lats = u.latitudes()
+udata = u.values()
+xi = np.linspace(min(lons), max(lons), M)
+yi = np.linspace(min(lats), max(lats), N)
+Xi, Yi = np.meshgrid(xi, yi)
+interp = NearestNDInterpolator(list(zip(lons,lats)), udata)
+uzi = interp(Xi, Yi)
+
+lons = v.longitudes()
+lats = v.latitudes()
+vdata = v.values()
+xi = np.linspace(min(lons), max(lons), M)
+yi = np.linspace(min(lats), max(lats), N)
+Xi, Yi = np.meshgrid(xi, yi)
+interp = NearestNDInterpolator(list(zip(lons,lats)), vdata)
+vzi = interp(Xi, Yi)
+
+fig, ax = plt.subplots()
+sm.plot_continents(0,0,18,incolor='green', outcolor='white', fill=False,ax=ax)
+ax.quiver(xi,yi,uzi,vzi)
+plt.savefig('ecmwf1.jpg')
+```
+
+![](ecmwf1.jpg)
 
 Hava verisi uzerinde yapay ogrenim ile tahminler yapmak isteyenler ham
 veriyi almak icin alttaki siteye basvurabilir. 

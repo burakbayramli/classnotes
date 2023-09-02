@@ -145,9 +145,68 @@ plt.savefig('img4.jpg',quality=40)
 
 ![](img4.jpg)
 
+### Kayan Pencere İçinde İşlem (Sliding Window)
 
+Bir görüntü, ya da genel olarak bir matris üzerinde bazen ufak
+bölgelerde işlem yapmak isteyebiliriz, mesela görüntünün her 16 x 16
+piksel büyüklüğündeki bölgesine bakıp orada bir yüz aramak
+gerekebilir, ya da 5 x 5 alt grupların ortalama değeri lazımdır, bir
+tür pürüzsüzleştirme işlemi için. Kaydırılan pencere bizim tanımladığımız
+ölçüdeki bir pencereyi tüm imaj üzerinde kaydırarak o anda baktığı matris
+değerlerini alıp onlara bir işlem uygulayabilir. Bir bölge bitince kaç piksel
+yana, alta kayılacağı programcı tarafından tanımlanabilir, 3 x 3 pencere iki
+piksel yana kaydırılır mesela.
 
+Potansiyel pürüzler görüntü üç noktalarında ne olacağı, 3 x 3 pencere kısmen
+dışarı taştığında kısmı değerler döndürebilir sadece, bu noktalara ne yapılacağı
+programcıya kalmış, taşan bölgelerde `nan` koyulabilir, ya da pencere içindeki
+değerler tekrarlanabilir. 
 
+```python
+def sliding_window(image, stepSize, windowSize):
+  for y in range(0, image.shape[0], stepSize):
+    for x in range(0, image.shape[1], stepSize):
+      yield image[y:y + windowSize[1], x:x + windowSize[0]]
+
+arr = np.array([[1,2,3,4],
+                [2,3,4,5],
+                [3,4,5,6],
+                [4,5,6,7]])
+	       
+for i,x in enumerate(sliding_window(arr,1,(2,2))):
+    print ('----------------------------')
+    print (x)
+    if i==5: break
+```
+
+```text
+----------------------------
+[[1 2]
+ [2 3]]
+----------------------------
+[[2 3]
+ [3 4]]
+----------------------------
+[[3 4]
+ [4 5]]
+----------------------------
+[[4]
+ [5]]
+----------------------------
+[[2 3]
+ [3 4]]
+----------------------------
+[[3 4]
+ [4 5]]
+```
+
+Üstte taşma olan yerler eksik donduruldu, tekrarlama için
+
+```python
+yield np.resize(image[y:y + windowSize[1], x:x + windowSize[0]],windowSize)
+```
+
+kodu kullanılabilir.
 
 Kaynaklar
 
