@@ -5,7 +5,6 @@ d = os.environ['HOME']
 
 if len(sys.argv) == 1:
     cmd = "pdfunite " + pdfs + " " + d + "/Downloads/multivar_calculus.pdf"
-    print (cmd)
     os.system(cmd)
     exit()    
 elif sys.argv[1] == 'all':
