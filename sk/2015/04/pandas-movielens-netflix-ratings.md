@@ -174,6 +174,25 @@ ratings = pd.read_csv(d + "/ratings.csv")
 utility_csr = csr_matrix((ratings.rating, (ratings.userId , ratings.movieId)))
 ```
 
+Bu matris ile kendi beğenilerimizi temsile eden bir vektör arasında kosinüs
+uzaklığı şöyle hesaplayabiliriz,
+
+```python
+from sklearn.metrics.pairwise import cosine_similarity
+
+my_ratings = np.zeros((1,utility_csr.shape[1]))
+my_ratings[0,movId1] = rating1
+my_ratings[0,movId2] = rating2
+...
+similarities = cosine_similarity(utility_csr, tst)
+close_people = np.argsort(similarities[:,0])
+...
+```
+
+Bizim beğenilerle bize en yakın seyircileri bulduktan sonra o seyircilerin
+en yüksek not verdiği filmleri tavsiye olarak listeleyebiliriz.
+
+
 JSON
 
 Bir diğer seyrek sayılabilecek format her satırda ayrı kullanıcı için
