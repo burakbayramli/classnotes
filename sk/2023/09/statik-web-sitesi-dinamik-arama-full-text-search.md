@@ -140,3 +140,27 @@ for i in range(20):
       </py-script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+<div id="output"></div>
+
+<py-script>
+  def write_to_page():
+     manual_div = Element("output")
+     inp = Element("search")
+     manual_div.element.innerText = inp.element.value
+</py-script>
+
+<p>
+ <input type="text" name="search" id="search"/>
+</p>
+<p>
+  <button py-click="write_to_page()" id="manual">Search</button>
+</p>
+
