@@ -38,8 +38,6 @@ def index_dir():
     fout.write(json.dumps(invidx))
     fout.close()
 
-    exit()
-    
     # split the index
 
     invidx = json.loads(open("/tmp/invidx.json").read())
@@ -53,8 +51,10 @@ def index_dir():
         if first_letter in string.ascii_lowercase:
             invidx_dict[first_letter][k] = v
 
+    target_dir = "/home/burak/Documents/repos/burakbayramli.github.com"
+    
     for k,v in invidx_dict.items():
-        fout = open("idx/invidx-%s.json" % k,"w")
+        fout = open(target_dir + "/idx/invidx-%s.json" % k,"w")
         fout.write(json.dumps(v))
         fout.close()    
 
@@ -65,6 +65,6 @@ def test1():
         
 if __name__ == "__main__": 
 
-    #index_dir()
-    test1()
+    index_dir()
+    #test1()
 
