@@ -112,37 +112,6 @@ def clean(to):
     d = to + "/sk"
     deleteDir(d)
 
-def translit_low(c):
-    res = c.lower()
-    res = res.replace(u'ğ','g')
-    res = res.replace(u'ş','s')
-    res = res.replace(u'ı','i')
-    res = res.replace(u'ç','c')
-    res = res.replace(u'ü','u')
-    res = res.replace(u'ö','o')
-    return res
-                
-def filename_from_title(title):                
-    url = translit_low(title)
-    url = url.replace(" ","_")
-    url = url.replace("(","_")
-    url = url.replace("'","_")
-    url = url.replace(")","_")
-    url = url.replace("/","_")
-    url = url.replace("-","")
-    url = url.replace(",","")
-    url = url.replace("?","")
-    url = url.replace("̇","")
-    url = url.replace("#_","")
-    return url
-
-
-def get_title_from_tex(f):
-    fin = codecs.open(f, encoding='utf8')
-    content = fin.read()
-    title = re.findall(u"begin.*?document.*?\n(.*?)\n",content,re.DOTALL)[0]
-    return title
-
 def title_tex(to):
     lecs = json.loads(open("lecs.conf").read())
     for dir in topdirs:
@@ -155,8 +124,8 @@ def title_tex(to):
             if "cover" in subdir or "000" in subdir : continue
             # read tex file, get header
             tex = subdir + ".tex"
-            title = get_title_from_tex(dir + "/" + subdir + "/" + tex)
-            html = subdir + "/" + filename_from_title(title) + ".html"        
+            title = util.get_title_from_tex(dir + "/" + subdir + "/" + tex)
+            html = subdir + "/" + util.filename_from_title(title) + ".html"        
             fout.write("<p><a href='%s'>%s</a><p/>" % (html,title))
         fout.write("<br/><a href='../index.html'>Yukarı</a><br/>")
 
@@ -216,8 +185,8 @@ def gen_html_cl():
             target_dir = basedir + "/" + dir + "/" + subdir
             os.chdir(target_dir)        
             tex = subdir + ".tex"
-            title = get_title_from_tex(tex)
-            html = filename_from_title(title) + ".html"
+            title = util.get_title_from_tex(tex)
+            html = util.filename_from_title(title) + ".html"
             update = True
             if os.path.isfile(html):
                 textime = os.path.getmtime(tex)

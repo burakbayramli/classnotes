@@ -50,6 +50,37 @@ bottom = """
 </html>
 """
 
+def translit_low(c):
+    res = c.lower()
+    res = res.replace(u'ğ','g')
+    res = res.replace(u'ş','s')
+    res = res.replace(u'ı','i')
+    res = res.replace(u'ç','c')
+    res = res.replace(u'ü','u')
+    res = res.replace(u'ö','o')
+    return res
+                
+def filename_from_title(title):                
+    url = translit_low(title)
+    url = url.replace(" ","_")
+    url = url.replace("(","_")
+    url = url.replace("'","_")
+    url = url.replace(")","_")
+    url = url.replace("/","_")
+    url = url.replace("-","")
+    url = url.replace(",","")
+    url = url.replace("?","")
+    url = url.replace("̇","")
+    url = url.replace("#_","")
+    return url
+
+
+def get_title_from_tex(f):
+    fin = codecs.open(f, encoding='utf8')
+    content = fin.read()
+    title = re.findall(u"begin.*?document.*?\n(.*?)\n",content,re.DOTALL)[0]
+    return title
+
 def tex_mathjax_html(texfile, htmlfile, title):
    tmpdir = '/tmp'
    if 'TMPDIR' in os.environ: tmpdir = os.environ['TMPDIR']

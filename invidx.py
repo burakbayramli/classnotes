@@ -1,4 +1,4 @@
-import re, json, glob, string, os
+import re, json, glob, string, os, util
 from collections import defaultdict
 from unidecode import unidecode
 
@@ -57,8 +57,14 @@ def index_dir():
         fout = open("idx/invidx-%s.json" % k,"w")
         fout.write(json.dumps(v))
         fout.close()    
-    
+
+def test1():
+    res = util.get_title_from_tex('algs/algs_045_probsolve/algs_045_probsolve.tex')
+    print (res)
+    print (util.filename_from_title(res))
+        
 if __name__ == "__main__": 
 
-    index_dir()
+    #index_dir()
+    test1()
 
