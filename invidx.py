@@ -4,6 +4,7 @@ from unidecode import unidecode
 
 WORD = re.compile(r'\w+')
 target_dir = "/home/burak/Documents/repos/burakbayramli.github.com"    
+topdirs = ['algs','calc_multi','chaos','compscieng','func_analysis','linear','ode', 'stat','tser','vision','phy']
 
 def clean_text(text):
     text = text.replace("\n"," ").replace("\r"," ")
@@ -22,16 +23,31 @@ def reg_tokenize(text):
 def index_dir():
 
     invidx = defaultdict(lambda: defaultdict(int))
-    dir = os.getcwd()
-    files1 = glob.glob(dir + "/**/**/**/*.md")
-    files2 = glob.glob(dir + "/**/**/*.tex")
+    basedir = os.getcwd()
+    tex_html_map = {}
+    files1 = glob.glob(basedir + "/**/**/**/*.md")
+    files2 = []
+    for dir in topdirs:
+        for subdir in sorted(os.listdir(dir)):
+            if not os.path.isdir(dir + "/" + subdir): continue
+            if "cover" in subdir or "000" in subdir : continue
+            # read tex file, get header
+            ftex = subdir + ".tex"
+            title = util.get_title_from_tex(dir + "/" + subdir + "/" + ftex)
+            html =  "/" + dir + "/" + subdir + "/" + util.filename_from_title(title) + ".html"
+            tex = dir + "/" + subdir + "/" + ftex
+            tex_html_map[tex] = html
+            files2.append(tex)
+
     files = files1 + files2
     files = sorted(files)
     for file in enumerate(files):        
-        doc = file[1].replace(dir,"")    
+        doc = file[1].replace(basedir,"")    
         for word in reg_tokenize(open(file[1]).read()):
             word = unidecode(word).lower()
             if len(word) < 2: continue
+            if ".tex" in doc: doc = tex_html_map[doc]
+            if ".md" in doc: doc = doc.replace(".md",".html")
             invidx[word][doc] += 1
         print (doc)
 
@@ -64,8 +80,8 @@ def test1():
 
 
 def test2():
-    search = "green teorisi"
-    #search = "convnet"
+    #search = "green teorisi"
+    search = "convnet"
     stok = search.split()
     stok_hits = {}
     results = []
@@ -87,6 +103,6 @@ def test2():
     
 if __name__ == "__main__": 
 
-    #index_dir()
+    index_dir()
     test2()
 
