@@ -1,5 +1,17 @@
 # Statik Sitelerde Dinamik Kelime Arama Sistemi
 
+Dinamik Web siteleri bilindiği gibi üç katmana sahiptir, istemci /
+müşteri tarayıcı ile bağlanır, buradan gelen istekle (requests) servis
+tarafında karşılanır, servis tarafındaki kodlar işlem mantığı
+koşturur, bir veri tabanına bağlanıp veri alışveri yapabilir, ve
+sonuçta sayfa üretilir, ve kullanıcıya gösterilir. Tarayıcı içinde de
+müşteri odaklı ek kodlar işletilebiliyor, bu kodlar sayfa ile beraber
+bağlanana gönderilir, Javascript dilindeki bu kodlar prezentasyon
+üzerinde ek işlemler yapabilir, bir sürü görsel işlem Javascript ile
+mümkün, hatta bir süredir Ajax ile serviste direk fonksiyon çağrısı
+bile yapılabiliyor.
+
+
 from collections import defaultdict
 from unidecode import unidecode
 import re, json, glob
