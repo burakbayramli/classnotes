@@ -48,7 +48,7 @@ def index_dir():
             word = unidecode(word).lower()
             if len(word) < 2: continue
             if ".tex" in doc: doc = tex_html_map[doc]
-            if ".md" in doc: doc = doc.replace(".md",".html")
+            if ".md" in doc: doc = '/dersblog' + doc.replace(".md",".html")
             invidx[word][doc] += 1
         print (doc)
 
@@ -81,8 +81,8 @@ def test1():
 
 
 def test2():
-    search = "green teorisi"
-    #search = "convnet"
+    #search = "green teorisi"
+    search = "convnet"
     stok = search.split()
     stok_hits = {}
     results = []
