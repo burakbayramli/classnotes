@@ -30,11 +30,12 @@ def index_dir():
     for dir in topdirs:
         for subdir in sorted(os.listdir(dir)):
             if not os.path.isdir(dir + "/" + subdir): continue
-            if "cover" in subdir or "000" in subdir : continue
+            if "cover" in subdir or "000" in subdir: continue
             # read tex file, get header
             ftex = subdir + ".tex"
+            if ftex=='dict.tex': continue
             title = util.get_title_from_tex(dir + "/" + subdir + "/" + ftex)
-            html =  "/" + dir + "/" + subdir + "/" + util.filename_from_title(title) + ".html"
+            html =  "/dersblog/" + dir + "/" + subdir + "/" + util.filename_from_title(title) + ".html"
             tex = dir + "/" + subdir + "/" + ftex
             tex_html_map[tex] = html
             files2.append(tex)
@@ -80,8 +81,8 @@ def test1():
 
 
 def test2():
-    #search = "green teorisi"
-    search = "convnet"
+    search = "green teorisi"
+    #search = "convnet"
     stok = search.split()
     stok_hits = {}
     results = []
@@ -103,6 +104,6 @@ def test2():
     
 if __name__ == "__main__": 
 
-    index_dir()
+    #index_dir()
     test2()
 
