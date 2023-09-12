@@ -30,12 +30,14 @@
          
          for tok in stok:
             url = base_url + '/idx/invidx-%s.json' % tok[0]
-            df = open_url(url)        
-            stok_hits[tok] = json.loads(df.getvalue())[tok]
-            results.append(set(stok_hits[tok]))
+            df = open_url(url)
+            letter_dict = json.loads(df.getvalue())
+            if tok in letter_dict:
+               stok_hits[tok] = letter_dict[tok]
+               results.append(set(letter_dict[tok]))
 
-         u = set.intersection(*results)
-
+         u = set([])
+         if len(results) > 0: u = set.intersection(*results)
          hits = []        
          for f in u:
             hits.append([f,sum([stok_hits[tok][f] for tok in stok])])
@@ -50,6 +52,7 @@
             out = out + s1 + base_url + \
                   str(hits[sorted_hits[i]][0]).replace(".md",".html") + s2 % str(hits[sorted_hits[i]][0])
 
+         if len(out) == 0: out = "No Results"
          manual_div.element.innerHTML = out
 
     </py-script>
