@@ -1,15 +1,133 @@
-# Statik Sitelerde Dinamik Kelime Arama Sistemi
+# Statik Sitelerde Arama Motoru
 
-Dinamik Web siteleri bilindiği gibi üç katmana sahiptir, istemci /
-müşteri tarayıcı ile bağlanır, buradan gelen istekle (requests) servis
-tarafında karşılanır, servis tarafındaki kodlar işlem mantığı
-koşturur, bir veri tabanına bağlanıp veri alışveri yapabilir, ve
-sonuçta sayfa üretilir, ve kullanıcıya gösterilir. Tarayıcı içinde de
-müşteri odaklı ek kodlar işletilebiliyor, bu kodlar sayfa ile beraber
-bağlanana gönderilir, Javascript dilindeki bu kodlar prezentasyon
-üzerinde ek işlemler yapabilir, bir sürü görsel işlem Javascript ile
-mümkün, hatta bir süredir Ajax ile serviste direk fonksiyon çağrısı
-bile yapılabiliyor.
+Bu yazıdaki amacımız bir statik dizini aranır hale getirmek ve bunu
+orta katman olmadan yapabilmek.
+
+Dinamik Web siteleri üç katmana sahiptir. 1'inci katmanda istemci,
+müşteri tarayıcısı ile 2'inci katmandaki servise bağlanır, müşteri
+isteği (request) orada karşılamak için işlem mantığı koştulur, mesela
+3'üncü katmandaki bir veri tabanına bağlanıp veri alışveri yapmak
+gibi, ve sonuçta sayfa üretilir, kullanıcıya gösterilir.
+
+Tarayıcı içindeki mekanizma o kadar aptal değildir, orada da kodlar
+işletilebiliyor, bu katmandaki Javascript oldukça kuvvetli bir
+dil. Javascript kodları sayfa içeriği ile beraber bağlanana
+gönderilir, Javascript dilindeki bu kodlar prezentasyon üzerinde ek
+işlemler yapabilir, bir sürü görsel işlem Javascript ile mümkün, hatta
+bir süredir Ajax ile serviste direk fonksiyon çağrısı bile
+yapılabiliyor.
+
+Orta katman bir sürü işlem yapabiliyor, fakat eğer gereken kabiliyet
+pür okuma bazlı ise ve gerekli veri dosyalarını hızlı erişilebilir
+halde önceden hazırlamışsak, Tarayıcı -> Statik Dosya erişimi ile pek
+çok işi yapmak mümkündür.
+
+Arama motorunu işte bu şekilde kodlayacağız. Javascript, ya da bu
+yazıda onun yerine PyScript [1], kodları tarayıcıda işleyecek,
+çetrefil bir arayüz mantığı orada kodlanacak.. Bu mantık gerektiği
+yerde gerekli kelimeler için belli indis dosyalarına bağlanacak,
+onların içeriğine ek işlemler yapıp birleştirecek, ve sonuçları
+sunacak. Bunun pür dosyalar ile nasıl yapılabileceğini anlamak için
+önce tüm metni arama (full-text search) teknolojisine bakalım, ve bizim
+yapacağımız eklerden bahsedelim.
+
+# Tam Metin Arama
+
+Doküman arama kelime bazlı yapılır, arama için girdiğimiz kelimeler
+teker teker bir indis içinde bulunarak onların bağlı olduğu dokümanlar
+getirilmeye uğraşılır. Verili bir doküman içindeki kelimeleri bulmak
+mümkün, bir anlamda döküman bir kelime listesidir, ve doküman ID
+verilip döküman bulunup içindeki kelime listesi dökülebilir. Tam metin
+aramanın yaptığı bunun tersidir, kelime verilip içinde geçtiği
+doküman(lar) bulunmaya uğraşılır, yani ters yönde gidiyoruz. Bunun
+için farklı bir indis gerekir, bu indis yapısına uygun bir şekilde
+tersyüz edilmiş indis (inverted index) ismi veriliyor.
+
+Tam metin arama için tersyüz edilmiş indisi yaratmak gerekir, bunun
+için tüm dokümanlar gezilir, dokümanlar alt kelimelerine, simgelere
+(token) ayrılır, ve bu kelimelerden içinde geçtiği dokümanlara bir
+işaret konur. Bunu bir sözlük yapısı içinde gerçekleştirebiliriz,
+sözlük anahtarı kelime, değeri ise ikinci bir sözlük, bu sözlük içinde
+o kelimenin hangi dokümanda kaç kez geçtiği olacak. Mesela bütün dokümanlar
+içinde "araba" kelimesi doküman1 içinde 4 kere doküman2 içinde 7 kere
+geçmişse, `{"araba": {"döküman1": 4, "doküman2": 7}.... }` gibi bir
+sözlük yapısı görmeliyiz.
+
+```python
+import re
+
+WORD = re.compile(r'\w+')
+
+def clean_text(text):
+    text = text.replace("\n"," ").replace("\r"," ")
+    punc_list = '!"#$%^()*+,-./:;<=>?@[\]^_{|}~' + '0123456789'
+    t = str.maketrans(dict.fromkeys(punc_list, " "))
+    text = text.translate(t)
+    t = str.maketrans(dict.fromkeys("'`",""))
+    text = text.translate(t)
+    return text
+
+def reg_tokenize(text):
+    text = clean_text(text)
+    words = WORD.findall(text)
+    return words
+```
+
+```python
+from collections import defaultdict
+import json
+
+text1 = "Search engine optimization is the process of improving the quality and quantity of website traffic to a website or a web page from search engines. SEO targets unpaid traffic rather than direct traffic or paid traffic."
+text2 = "Note: This standard is not intended to dictate the internal formats used by sites for optimization, the specific message system features that they are expected to support, or any of the characteristics of user interface programs"
+
+invidx = defaultdict(lambda: defaultdict(int))
+
+for di,doc in enumerate([text1,text2]):
+    for word in reg_tokenize(doc):
+        if len(word) > 1: invidx[word][di] += 1
+
+print (json.dumps(invidx)) 
+```
+
+```text
+
+{"Search": {"0": 1}, "engine": {"0": 1}, "optimization": {"0": 1, "1":
+1}, "is": {"0": 1, "1": 1}, "the": {"0": 2, "1": 3}, "process": {"0":
+1}, "of": {"0": 2, "1": 2}, "improving": {"0": 1}, "quality": {"0":
+1}, "and": {"0": 1}, "quantity": {"0": 1}, "website": {"0": 2},
+"traffic": {"0": 4}, "to": {"0": 1, "1": 2}, "or": {"0": 2, "1": 1},
+"web": {"0": 1}, "page": {"0": 1}, "from": {"0": 1}, "search": {"0":
+1}, "engines": {"0": 1}, "SEO": {"0": 1}, "targets": {"0": 1},
+"unpaid": {"0": 1}, "rather": {"0": 1}, "than": {"0": 1}, "direct":
+{"0": 1}, "paid": {"0": 1}, "Note": {"1": 1}, "This": {"1": 1},
+"standard": {"1": 1}, "not": {"1": 1}, "intended": {"1": 1},
+"dictate": {"1": 1}, "internal": {"1": 1}, "formats": {"1": 1},
+"used": {"1": 1}, "by": {"1": 1}, "sites": {"1": 1}, "for": {"1": 1},
+"specific": {"1": 1}, "message": {"1": 1}, "system": {"1": 1},
+"features": {"1": 1}, "that": {"1": 1}, "they": {"1": 1}, "are": {"1":
+1}, "expected": {"1": 1}, "support": {"1": 1}, "any": {"1": 1},
+"characteristics": {"1": 1}, "user": {"1": 1}, "interface": {"1": 1},
+"programs": {"1": 1}}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```python
@@ -188,3 +306,8 @@ for i in range(20):
 
 
 [devam edecek]
+
+Kaynaklar
+
+[1] <a href="pyscript.html">PyScript</a>
+
