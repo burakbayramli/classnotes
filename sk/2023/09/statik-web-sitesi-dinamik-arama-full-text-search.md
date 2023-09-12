@@ -12,6 +12,7 @@ mümkün, hatta bir süredir Ajax ile serviste direk fonksiyon çağrısı
 bile yapılabiliyor.
 
 
+```python
 from collections import defaultdict
 from unidecode import unidecode
 import re, json, glob
@@ -47,6 +48,7 @@ for file in enumerate(files):
 fout = open("data/invidx.json","w")
 fout.write(json.dumps(invidx))
 fout.close()
+```
 
 
 
@@ -55,7 +57,7 @@ fout.close()
 
 
 
-
+```python
 invidx = json.loads(open("data/invidx.json").read())
 invidx_dict = {}
 
@@ -71,17 +73,19 @@ for k,v in invidx_dict.items():
     fout = open("data/invidx-%s.json" % k,"w")
     fout.write(json.dumps(v))
     fout.close()    
+```
 
 
 
 
 
-
+```python
 #points = [0, 12, 9]
 #res = sorted(range(len(points)), key=lambda x: points[x])
 #print(res)
-#exit()
+```
 
+```python
 #a = [1, 2, 3, 4]; b = [2, 3, 4, 5]; c = [3, 4, 5, 6]; d = [4, 1, 3, 9]
 #u = set.intersection(set(a),set(b),set(c),set(d))
 #print (u)
@@ -107,12 +111,12 @@ sorted_hits = sorted(range(len(hits)), key=lambda x: hits[x][1], reverse=True)
 
 for i in range(20):
     print (hits[sorted_hits[i]])
+```
 
 
 
 
-
-
+```html
 <head>
     <script defer src="pyscript.js"></script>
 </head>
@@ -152,14 +156,14 @@ for i in range(20):
       </py-script>
 </body>
 </html>
+```
 
 
 
 
 
 
-
-
+```html
 <div id="output"></div>
 
 <py-script>
@@ -175,4 +179,12 @@ for i in range(20):
 <p>
   <button py-click="write_to_page()" id="manual">Search</button>
 </p>
+```
 
+
+
+
+
+
+
+[devam edecek]
