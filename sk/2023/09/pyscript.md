@@ -193,6 +193,13 @@ yapalım,
 
 ### Diger Paketler
 
+Fakat kabiliyetler bunlarla sınırlı değil. PyScript taklit bir Python
+ortamı değil, tam tekmilli bir Python ortamı. Amacı bildik Python
+yorumlayıcısını tamamen Javascript bazlı işletmek. Bu sebeple mesela
+dış paket yüklemesi de pek çok paket için işliyor. Mesela altta
+`pandaş` paketinin kurulduğu ve bir CSV verisini işlediği örneği
+görüyoruz. Daha fazla örnekler [1]'de bulunabilir.
+
 ```html
 <html>
   <head>
