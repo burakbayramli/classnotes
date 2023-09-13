@@ -173,7 +173,7 @@ print(res)
 [0, 2, 1]
 ```
 
-### Web Kodlamasi
+### Web Kodlaması
 
 Eğer üstteki arama metotunu uygulama servisi (app server) olmadan
 kodlamak istiyorsak, yani sadece PyScript (ya da Javascript) ve servis
@@ -182,18 +182,24 @@ yapabiliriz.
 
 İlk akla gelen tersyüz edilmiş indisi dizüstü geliştirme ortamında tek
 bir JSON olarak kaydetmek, onu web servisine koymak, ve bu dosyanın
-gerektiğinde istemciden `öpen_ürl` ile https adresinden alinip sözlük
+gerektiğinde istemciden `open_url` ile https adresinden alınıp sözlük
 olarak tarayıcıda işlenmesidir. Tek problem tek JSON dosyasının büyük
 olma ihtimali, bizim site için mesela bu dosya 10-15 MB. Çözüm şudur,
 indisi kelime ilk harfini baz alarak parçalara bölmek. Mesela 'a' ile
 başlayan tüm kelimelerin tersyüz edilmiş indis dosyası
-`ınvidx-a.json`, 'b' için `ınvidx-b.json`, böyle gidiyor.
+`invidx-a.json`, 'b' için `invidx-b.json`, böyle gidiyor.
 
+Bu yaklaşımı bu site için kodladık, sonuçları [2]'de görebiliriz.
 
-
+Kodlar Github deposunda [3] `invidx.py` ve `sk/ara.html` dosyaları
+içinde.
 
 
 Kaynaklar
 
 [1] <a href="pyscript.html">PyScript</a>
+
+[2] <a href="">Blog Arama Sayfasi</a>
+
+[3] https://github.com/burakbayramli/classnotes
 
