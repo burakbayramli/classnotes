@@ -25,41 +25,56 @@ halde önceden hazırlamışsak, Tarayıcı -> Statik Dosya erişimi ile pek
 Arama motorunu işte bu şekilde kodlayacağız. Javascript, ya da bu
 yazıda onun yerine PyScript [1], kodları tarayıcıda işleyecek,
 çetrefil bir arayüz mantığı orada kodlanacak.. Bu mantık gerektiği
-yerde gerekli kelimeler için belli indis dosyalarına bağlanacak,
-onların içeriğine ek işlemler yapıp birleştirecek, ve sonuçları
+yerde gerekli kelimeler için belli indis dosyalarını okuyacak, bu
+okuduğu içeriğe ek işlemler uygulayıp birleştirecek, ve sonuçları
 sunacak. Bunun pür dosyalar ile nasıl yapılabileceğini anlamak için
-önce tüm metni arama (full-text search) teknolojisine bakalım, ve bizim
-yapacağımız eklerden bahsedelim.
+önce tüm metni arama (full-text search) teknolojisine bakalım, ve
+bizim yapacağımız eklerden bahsedelim.
 
 # Tam Metin Arama
 
 Doküman arama kelime bazlı yapılır, arama için girdiğimiz kelimeler
 teker teker bir indis içinde bulunarak onların bağlı olduğu dokümanlar
-getirilmeye uğraşılır. Verili bir doküman içindeki kelimeleri bulmak
-mümkün, bir anlamda döküman bir kelime listesidir, ve doküman ID
-verilip döküman bulunup içindeki kelime listesi dökülebilir. Tam metin
-aramanın yaptığı bunun tersidir, kelime verilip içinde geçtiği
-doküman(lar) bulunmaya uğraşılır, yani ters yönde gidiyoruz. Bunun
-için farklı bir indis gerekir, bu indis yapısına uygun bir şekilde
-tersyüz edilmiş indis (inverted index) ismi veriliyor.
+getirilmeye uğraşılır. Genel olarak bir dokümandaki kelimeleri almak
+kolay, sonuçta döküman bir kelime listesi, doküman ID verilip döküman
+bulunup içindeki kelime listesi dökülebilir. Tam metin aramanın
+yaptığı bunun tersidir, kelime verilip içinde geçtiği doküman(lar)
+bulunmaya uğraşılır, yani ters yönde gidiyoruz. Bunun için farklı bir
+indis gerekir, bu indis yapısına tersyüz edilmiş indis (inverted
+index) ismi veriliyor.
 
-Tam metin arama için tersyüz edilmiş indisi yaratmak gerekir, bunun
-için tüm dokümanlar gezilir, dokümanlar alt kelimelerine, simgelere
+Tam metin arama için bu indisi yaratmak gerekir, o amaçla tüm
+dokümanlar gezilir, gezilirken her doküman alt kelimelerine, simgelere
 (token) ayrılır, ve bu kelimelerden içinde geçtiği dokümanlara bir
 işaret konur. Bunu bir sözlük yapısı içinde gerçekleştirebiliriz,
-sözlük anahtarı kelime, değeri ise ikinci bir sözlük, bu sözlük içinde
-o kelimenin hangi dokümanda kaç kez geçtiği olacak. Mesela bütün dokümanlar
-içinde "araba" kelimesi doküman1 içinde 4 kere doküman2 içinde 7 kere
-geçmişse, `{"araba": {"döküman1": 4, "doküman2": 7}.... }` gibi bir
-sözlük yapısı görmeliyiz.
+sözlük içinde sözlük olacak, anahtar kelime, değeri ise ikinci bir
+sözlük, bu sözlük içinde o kelimenin hangi dokümanda kaç kez geçtiği
+olur. Mesela bütün dokümanlar içinde "araba" kelimesi doküman1
+içinde 4 kere doküman2 içinde 7 kere geçmişse, `{"araba": {"döküman1":
+4, "doküman2": 7}.... }` gibi bir sözlük yapısı görmeliyiz.
+
+Daha sonra arama yaparken her arama kelimesi tersyüz edilmiş indise
+geçilir, o kelimenin hangi dokümanlarda kaç kez geçtiğini hemen
+bulabiliriz. Eğer birden fazla arama kelimesi var ise, her kelime için
+alınan doküman listelerinin bir "kesişim kümesi" hesaplanabilir
+mesela, yani katı bir şart koşulabilir, tüm arama kelimelerinin
+beraber geçtiği dokümanları böylece buluruz. Daha gevşek sonuç
+kriterleri kullanılabilir, mesela iki kelime ile arama yapıldı ise
+"ya biri ya öteki" gibi, farklı kriterler düşünülebilir.
+
+Simgelere Ayırma
+
+İlk önce belgeyi kelimelere ayırma (tokenization) işlemine bakalım. Bu
+aşamada nokta, virgül ve diğer özel karakterler çıkartılabilir, tüm kelimeler
+küçük hale getirilebilir, dil TR durumunda ascii çevirimi yapılabilir.
 
 ```python
-import re
+import re, unidecode
 
 WORD = re.compile(r'\w+')
 
 def clean_text(text):
-    text = text.replace("\n"," ").replace("\r"," ")
+    text = unidecode.unidecode(text).lower().replace("\n"," ").replace("\r"," ")
     punc_list = '!"#$%^()*+,-./:;<=>?@[\]^_{|}~' + '0123456789'
     t = str.maketrans(dict.fromkeys(punc_list, " "))
     text = text.translate(t)
@@ -73,239 +88,110 @@ def reg_tokenize(text):
     return words
 ```
 
+Ardından indisı yaratabiliriz,
+
 ```python
 from collections import defaultdict
 import json
 
-text1 = "Search engine optimization is the process of improving the quality and quantity of website traffic to a website or a web page from search engines. SEO targets unpaid traffic rather than direct traffic or paid traffic."
-text2 = "Note: This standard is not intended to dictate the internal formats used by sites for optimization, the specific message system features that they are expected to support, or any of the characteristics of user interface programs"
+text1 = "Otomobillerin genellikle otobanda ve şehirlerarası yolda seyir halinde iken karşılaştıkları sorun aracın ön camının dışarıdan gelen bir cisimle çatlamasıdır. Araba hareket halindeyken yoldan ya da öndeki araçtan ön cama gelen taş veya sert bir cisim ön camı çatlatır"
+text2 = "Araç sahipleri yolda araba sorunu yasamamak için genellikle ellerinden geleni yaparlar. Çatlağın durdurulmaması görüntünün her geçen gün kötüleşmesi anlamına gelir. Bu durumu hiçbir sürücü istemez."
 
 invidx = defaultdict(lambda: defaultdict(int))
 
-for di,doc in enumerate([text1,text2]):
-    for word in reg_tokenize(doc):
-        if len(word) > 1: invidx[word][di] += 1
+for word in reg_tokenize(text1):
+   if len(word) > 1: invidx[word]['doc1'] += 1
+for word in reg_tokenize(text2):
+   if len(word) > 1: invidx[word]['doc2'] += 1
 
 print (json.dumps(invidx)) 
 ```
 
 ```text
 
-{"Search": {"0": 1}, "engine": {"0": 1}, "optimization": {"0": 1, "1":
-1}, "is": {"0": 1, "1": 1}, "the": {"0": 2, "1": 3}, "process": {"0":
-1}, "of": {"0": 2, "1": 2}, "improving": {"0": 1}, "quality": {"0":
-1}, "and": {"0": 1}, "quantity": {"0": 1}, "website": {"0": 2},
-"traffic": {"0": 4}, "to": {"0": 1, "1": 2}, "or": {"0": 2, "1": 1},
-"web": {"0": 1}, "page": {"0": 1}, "from": {"0": 1}, "search": {"0":
-1}, "engines": {"0": 1}, "SEO": {"0": 1}, "targets": {"0": 1},
-"unpaid": {"0": 1}, "rather": {"0": 1}, "than": {"0": 1}, "direct":
-{"0": 1}, "paid": {"0": 1}, "Note": {"1": 1}, "This": {"1": 1},
-"standard": {"1": 1}, "not": {"1": 1}, "intended": {"1": 1},
-"dictate": {"1": 1}, "internal": {"1": 1}, "formats": {"1": 1},
-"used": {"1": 1}, "by": {"1": 1}, "sites": {"1": 1}, "for": {"1": 1},
-"specific": {"1": 1}, "message": {"1": 1}, "system": {"1": 1},
-"features": {"1": 1}, "that": {"1": 1}, "they": {"1": 1}, "are": {"1":
-1}, "expected": {"1": 1}, "support": {"1": 1}, "any": {"1": 1},
-"characteristics": {"1": 1}, "user": {"1": 1}, "interface": {"1": 1},
-"programs": {"1": 1}}
+{"otomobillerin": {"doc1": 1}, "genellikle": {"doc1": 1, "doc2": 1},
+"otobanda": {"doc1": 1}, "ve": {"doc1": 1}, "sehirlerarasi": {"doc1":
+1}, "yolda": {"doc1": 1, "doc2": 1}, "seyir": {"doc1": 1}, "halinde":
+{"doc1": 1}, "iken": {"doc1": 1}, "karsilastiklari": {"doc1": 1},
+"sorun": {"doc1": 1}, "aracin": {"doc1": 1}, "on": {"doc1": 3},
+"caminin": {"doc1": 1}, "disaridan": {"doc1": 1}, "gelen": {"doc1":
+2}, "bir": {"doc1": 2}, "cisimle": {"doc1": 1}, "catlamasidir":
+{"doc1": 1}, "araba": {"doc1": 1, "doc2": 1}, "hareket": {"doc1": 1},
+"halindeyken": {"doc1": 1}, "yoldan": {"doc1": 1}, "ya": {"doc1": 1},
+"da": {"doc1": 1}, "ondeki": {"doc1": 1}, "aractan": {"doc1": 1},
+"cama": {"doc1": 1}, "tas": {"doc1": 1}, "veya": {"doc1": 1}, "sert":
+{"doc1": 1}, "cisim": {"doc1": 1}, "cami": {"doc1": 1}, "catlatir":
+{"doc1": 1}, "arac": {"doc2": 1}, "sahipleri": {"doc2": 1}, "sorunu":
+{"doc2": 1}, "yasamamak": {"doc2": 1}, "icin": {"doc2": 1},
+"ellerinden": {"doc2": 1}, "geleni": {"doc2": 1}, "yaparlar": {"doc2":
+1}, "catlagin": {"doc2": 1}, "durdurulmamasi": {"doc2": 1},
+"goruntunun": {"doc2": 1}, "her": {"doc2": 1}, "gecen": {"doc2": 1},
+"gun": {"doc2": 1}, "kotulesmesi": {"doc2": 1}, "anlamina": {"doc2":
+1}, "gelir": {"doc2": 1}, "bu": {"doc2": 1}, "durumu": {"doc2": 1},
+"hicbir": {"doc2": 1}, "surucu": {"doc2": 1}, "istemez": {"doc2": 1}}
 
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Arama kodlaması oldukca basit, indise direk olarak o kelimeyi
+soruyoruz, tabii arama kutusuna girilen kelimeler üzerinde de üstteki
+temizleme, simgeleme yapıldıktan sonra. Bunların yapıldığını
+farzedelim, ve tek bir kelimeyi soralım,
 
 ```python
-from collections import defaultdict
-from unidecode import unidecode
-import re, json, glob
-
-WORD = re.compile(r'\w+')
-
-def clean_text(text):
-    text = text.replace("\n"," ").replace("\r"," ")
-    punc_list = '!"#$%^()*+,-./:;<=>?@[\]^_{|}~' + '0123456789'
-    t = str.maketrans(dict.fromkeys(punc_list, " "))
-    text = text.translate(t)
-    t = str.maketrans(dict.fromkeys("'`",""))
-    text = text.translate(t)
-    return text
-
-def reg_tokenize(text):
-    text = clean_text(text)
-    words = WORD.findall(text)
-    return words
-
-invidx = defaultdict(lambda: defaultdict(int))
-dir = "[DIR]"
-
-files = glob.glob(dir + "/**/**/*.md")
-files = sorted(files)
-for file in enumerate(files):
-    doc = file[1].replace(dir,"")    
-    for word in reg_tokenize(open(file[1]).read()):
-        word = unidecode(word).lower()
-        invidx[word][doc] += 1
-    print (doc)
-
-fout = open("data/invidx.json","w")
-fout.write(json.dumps(invidx))
-fout.close()
+invidx['araba']
 ```
 
+```text
+Out[1]: defaultdict(int, {'doc1': 1, 'doc2': 1})
+```
 
-
-
-
-
-
+Bu kadar. Birden fazla kelime için sonuç listelerinin `set.ıntersection` ile
+kesişimini bulabiliriz, bir örnek alttadır,
 
 ```python
-invidx = json.loads(open("data/invidx.json").read())
-invidx_dict = {}
-
-for c in  string.ascii_lowercase:
-    invidx_dict[c] = defaultdict(lambda: defaultdict(int))
-
-for k,v in invidx.items():
-    first_letter = k[0]
-    if first_letter in string.ascii_lowercase:
-        invidx_dict[first_letter][k] = v
-
-for k,v in invidx_dict.items():
-    fout = open("data/invidx-%s.json" % k,"w")
-    fout.write(json.dumps(v))
-    fout.close()    
+a = [1, 2, 3, 4]; b = [2, 3, 4, 5]; c = [3, 4, 5, 6]; d = [4, 1, 3, 9]
+u = set.intersection(set(a),set(b),set(c),set(d))
+print (u)
 ```
 
+```text
+{3, 4}
+```
 
-
-
+Sıralama amaçlı şunu yaparız, her kelime için mesela "araba" kelimesi
+doç1 içinde 2 kere, "cami" kelimesi aynı doç1 içinde 1 kere geçtiyse
+doç1 için 2+1 = 3 ağırlık vardır, doç1 için 3 döndürürüz, ve tüm liste
+üzerinde bu ağırlık bazlı sıralama yaparız.
 
 ```python
-#points = [0, 12, 9]
-#res = sorted(range(len(points)), key=lambda x: points[x])
-#print(res)
+points = [0, 12, 9]
+res = sorted(range(len(points)), key=lambda x: points[x])
+print(res)
 ```
 
-```python
-#a = [1, 2, 3, 4]; b = [2, 3, 4, 5]; c = [3, 4, 5, 6]; d = [4, 1, 3, 9]
-#u = set.intersection(set(a),set(b),set(c),set(d))
-#print (u)
-
-search = "green ammonia"
-
-stok = search.split()
-
-stok_hits = {}
-
-results = []
-for tok in stok:
-    stok_hits[tok] = json.loads(open("data/invidx-%s.json" % tok[0]).read())[tok]
-    results.append(set(stok_hits[tok]))
-    
-u = set.intersection(*results)
-
-hits = []
-for f in u:
-    hits.append([f,sum([stok_hits[tok][f] for tok in stok])])
-    
-sorted_hits = sorted(range(len(hits)), key=lambda x: hits[x][1], reverse=True)
-
-for i in range(20):
-    print (hits[sorted_hits[i]])
+```text
+[0, 2, 1]
 ```
 
+### Web Kodlamasi
 
+Eğer üstteki arama metotunu uygulama servisi (app server) olmadan
+kodlamak istiyorsak, yani sadece PyScript (ya da Javascript) ve servis
+tarafında bir takım dosyaların olduğu yaklaşım, kodlamayı şöyle
+yapabiliriz.
 
-
-```html
-<head>
-    <script defer src="pyscript.js"></script>
-</head>
-<body>    
-      <py-script>
-        from pyodide.http import open_url
-        from collections import defaultdict
-        import json
-
-        search = "green ammonia"
-
-        stok = search.split()
-
-        stok_hits = {}
-
-        results = []
-        
-        for tok in stok:
-           url = 'http://192.168.43.49:5000/static/invidx-%s.json' % tok[0]
-           df = open_url(url)        
-           stok_hits[tok] = json.loads(df.getvalue())[tok]
-           results.append(set(stok_hits[tok]))
-
-
-        u = set.intersection(*results)
-
-        hits = []
-        
-        for f in u:
-           hits.append([f,sum([stok_hits[tok][f] for tok in stok])])
-    
-        sorted_hits = sorted(range(len(hits)), key=lambda x: hits[x][1], reverse=True)
-
-        for i in range(20):
-           display (hits[sorted_hits[i]])
-           
-      </py-script>
-</body>
-</html>
-```
+İlk akla gelen tersyüz edilmiş indisi dizüstü geliştirme ortamında tek
+bir JSON olarak kaydetmek, onu web servisine koymak, ve bu dosyanın
+gerektiğinde istemciden `öpen_ürl` ile https adresinden alinip sözlük
+olarak tarayıcıda işlenmesidir. Tek problem tek JSON dosyasının büyük
+olma ihtimali, bizim site için mesela bu dosya 10-15 MB. Çözüm şudur,
+indisi kelime ilk harfini baz alarak parçalara bölmek. Mesela 'a' ile
+başlayan tüm kelimelerin tersyüz edilmiş indis dosyası
+`ınvidx-a.json`, 'b' için `ınvidx-b.json`, böyle gidiyor.
 
 
 
 
-
-
-```html
-<div id="output"></div>
-
-<py-script>
-  def write_to_page():
-     manual_div = Element("output")
-     inp = Element("search")
-     manual_div.element.innerText = inp.element.value
-</py-script>
-
-<p>
- <input type="text" name="search" id="search"/>
-</p>
-<p>
-  <button py-click="write_to_page()" id="manual">Search</button>
-</p>
-```
-
-
-
-
-
-
-
-[devam edecek]
 
 Kaynaklar
 
