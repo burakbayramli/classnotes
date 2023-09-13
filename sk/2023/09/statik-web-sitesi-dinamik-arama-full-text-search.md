@@ -3,33 +3,34 @@
 Bu yazıdaki amacımız bir statik dizini aranır hale getirmek ve bunu
 orta katman olmadan yapabilmek.
 
-Dinamik Web siteleri üç katmana sahiptir. 1'inci katmanda istemci,
-müşteri tarayıcısı ile 2'inci katmandaki servise bağlanır, müşteri
-isteği (request) orada karşılamak için işlem mantığı koştulur, mesela
-3'üncü katmandaki bir veri tabanına bağlanıp veri alışveri yapmak
-gibi, ve sonuçta sayfa üretilir, kullanıcıya gösterilir.
+Dinamik Web siteleri üç katmana sahiptir. 1'inci katmanda istemci
+vardır, müşteri tarayıcısı ile 2'inci katmandaki servise bağlanır,
+müşteri isteğini (request) orada karşılamak için işlem mantığı
+koşturulur, mesela 3'üncü katmandaki bir veri tabanına bağlanıp veri
+alışveri yapmak gibi, ve sonuçta sayfa üretilir, kullanıcıya
+gösterilir.
 
-Tarayıcı içindeki mekanizma o kadar aptal değildir, orada da kodlar
+Tarayıcı içindeki mekanizma o kadar nötr değildir, orada da kodlar
 işletilebiliyor, bu katmandaki Javascript oldukça kuvvetli bir
 dil. Javascript kodları sayfa içeriği ile beraber bağlanana
-gönderilir, Javascript dilindeki bu kodlar prezentasyon üzerinde ek
-işlemler yapabilir, bir sürü görsel işlem Javascript ile mümkün, hatta
-bir süredir Ajax ile serviste direk fonksiyon çağrısı bile
-yapılabiliyor.
+gönderilir, fakat tarayıcı içinde koşturulur, ve bu tür kodlar
+prezentasyon üzerinde ek işlemler yapabilir, bir sürü görsel işlem
+yapılabilir, ve hatta bir süredir Ajax ile serviste direk fonksiyon
+çağrısı bile yapılabilmektedir.
 
-Orta katman bir sürü işlem yapabiliyor, fakat eğer gereken kabiliyet
-pür okuma bazlı ise ve gerekli veri dosyalarını hızlı erişilebilir
-halde önceden hazırlamışsak, Tarayıcı -> Statik Dosya erişimi ile pek
-çok işi yapmak mümkündür.
+Orta katman da pek çok işlem, hesap yapabilir, fakat eğer gereken
+kabiliyet pür okuma bazlı ise ve gerekli veri dosyalarını hızlı
+erişilebilir halde önceden hazırlamışsak, Tarayıcı -> Statik Dosya
+erişimi ile envai türden servisi sağlamak mümkündür.
 
 Arama motorunu işte bu şekilde kodlayacağız. Javascript, ya da bu
 yazıda onun yerine PyScript [1], kodları tarayıcıda işleyecek,
 çetrefil bir arayüz mantığı orada kodlanacak.. Bu mantık gerektiği
 yerde gerekli kelimeler için belli indis dosyalarını okuyacak, bu
 okuduğu içeriğe ek işlemler uygulayıp birleştirecek, ve sonuçları
-sunacak. Bunun pür dosyalar ile nasıl yapılabileceğini anlamak için
-önce tüm metni arama (full-text search) teknolojisine bakalım, ve
-bizim yapacağımız eklerden bahsedelim.
+sunacak. Bunun servis tarafında statik, pür dosyalar ile nasıl
+yapılabileceğini anlamak için önce tüm metin arama (full-text search)
+teknolojisine bakalım, ve bizim yapacağımız eklerden sonra bahsedelim.
 
 # Tam Metin Arama
 
@@ -45,22 +46,23 @@ index) ismi veriliyor.
 
 Tam metin arama için bu indisi yaratmak gerekir, o amaçla tüm
 dokümanlar gezilir, gezilirken her doküman alt kelimelerine, simgelere
-(token) ayrılır, ve bu kelimelerden içinde geçtiği dokümanlara bir
+(token) ayrılır [4], ve bu kelimelerden içinde geçtiği dokümanlara bir
 işaret konur. Bunu bir sözlük yapısı içinde gerçekleştirebiliriz,
-sözlük içinde sözlük olacak, anahtar kelime, değeri ise ikinci bir
-sözlük, bu sözlük içinde o kelimenin hangi dokümanda kaç kez geçtiği
-olur. Mesela bütün dokümanlar içinde "araba" kelimesi doküman1
-içinde 4 kere doküman2 içinde 7 kere geçmişse, `{"araba": {"döküman1":
-4, "doküman2": 7}.... }` gibi bir sözlük yapısı görmeliyiz.
+sözlük içinde sözlük olacak, anahtar (key) bir kelime, değer (value)
+ise ikinci bir sözlük, bu sözlük içinde o kelimenin hangi dokümanda
+kaç kez geçtiği olacak. Mesela bütün dokümanlar içinde "araba"
+kelimesi doküman1 içinde 4 kere doküman2 içinde 7 kere geçmişse,
+`{"araba": {"döküman1": 4, "doküman2": 7}.... }` gibi bir sözlük
+yapısı görmeliyiz.
 
 Daha sonra arama yaparken her arama kelimesi tersyüz edilmiş indise
-geçilir, o kelimenin hangi dokümanlarda kaç kez geçtiğini hemen
+sorulur, o kelimenin hangi dokümanlarda kaç kez geçtiğini hemen
 bulabiliriz. Eğer birden fazla arama kelimesi var ise, her kelime için
 alınan doküman listelerinin bir "kesişim kümesi" hesaplanabilir
-mesela, yani katı bir şart koşulabilir, tüm arama kelimelerinin
+mesela, bu biraz katı bir şart olabilir tabii, tüm arama kelimelerinin
 beraber geçtiği dokümanları böylece buluruz. Daha gevşek sonuç
-kriterleri kullanılabilir, mesela iki kelime ile arama yapıldı ise
-"ya biri ya öteki" gibi, farklı kriterler düşünülebilir.
+kriterleri kullanılabilir, mesela iki kelime ile arama yapıldı ise "ya
+biri ya öteki" gibi, bunun gibi farklı kriterler düşünülebilir.
 
 Simgelere Ayırma
 
@@ -145,7 +147,7 @@ invidx['araba']
 Out[1]: defaultdict(int, {'doc1': 1, 'doc2': 1})
 ```
 
-Bu kadar. Birden fazla kelime için sonuç listelerinin `set.ıntersection` ile
+Bu kadar. Birden fazla kelime için sonuç listelerinin `set.intersection` ile
 kesişimini bulabiliriz, bir örnek alttadır,
 
 ```python
@@ -159,9 +161,9 @@ print (u)
 ```
 
 Sıralama amaçlı şunu yaparız, her kelime için mesela "araba" kelimesi
-doç1 içinde 2 kere, "cami" kelimesi aynı doç1 içinde 1 kere geçtiyse
-doç1 için 2+1 = 3 ağırlık vardır, doç1 için 3 döndürürüz, ve tüm liste
-üzerinde bu ağırlık bazlı sıralama yaparız.
+`doc1` içinde 2 kere, "cami" kelimesi aynı doç1 içinde 1 kere geçtiyse
+`doc1` için 2+1 = 3 ağırlık vardır, `doc1` için 3 döndürürüz, ve tüm
+liste üzerinde bu ağırlık bazlı sıralama yaparız.
 
 ```python
 points = [0, 12, 9]
@@ -189,7 +191,11 @@ indisi kelime ilk harfini baz alarak parçalara bölmek. Mesela 'a' ile
 başlayan tüm kelimelerin tersyüz edilmiş indis dosyası
 `invidx-a.json`, 'b' için `invidx-b.json`, böyle gidiyor.
 
-Bu yaklaşımı bu site için kodladık, sonuçları [2]'de görebiliriz.
+Bölünmüş indis dosyaları çoğunlukla 0.5 MB civarı olacaktır. Eğer iki
+kelime aranıyorsa bu ortalama 1 MB JSON dosya indirilmesi demektir,
+hızlı bir şekilde yapılabilir.
+
+Bahsedilen yaklaşımı bu site için kodladık, sonuçları [2]'de görebiliriz.
 
 Kodlar Github deposunda [3] `invidx.py` ve `sk/ara.html` dosyaları
 içinde.
@@ -199,7 +205,9 @@ Kaynaklar
 
 [1] <a href="pyscript.html">PyScript</a>
 
-[2] <a href="">Blog Arama Sayfasi</a>
+[2] <a href="../../ara.html">Blog Arama Sayfasi</a>
 
-[3] https://github.com/burakbayramli/classnotes
+[3] <a href="https://github.com/burakbayramli/classnotes">Github</a>
+
+[4] <a href="https://towardsdatascience.com/benchmarking-python-nlp-tokenizers-3ac4735100c5">Benchmarking Python NLP Tokenizers</a>
 

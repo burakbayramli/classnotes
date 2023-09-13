@@ -8,12 +8,19 @@ tarayıcı işletilir yani bağlanan kişinin CPU'şu bu kodları
 işletmektedir, servis tarafı değil.
 
 Peki tarayıcıda başka diller mümkün mü? Farklı dilleri WebAssembly
-altyapısı üzerinen Javascript'e derlemek mümkün. Fakat PyScript
+altyapısı üzerinen Javascript'e derlemek mümkün. Fakat PyScript [1]
 yaklaşımı en temiz, basit, hızlı yöntem, sayfa içinde iki dosya dahil
 ediliyor, ve bundan sonra tam tekmilli Python kodlarını sayfa içine
 koymak mümkün oluyor.
 
 ### Başlangıç
+
+Basit bir kodu altta görüyoruz. Bu sayfada tek bir metin kutusu var,
+bir de düğme. Kutuya girilen yazı OK tuşuna basınca aynı sayfa
+üzerinde gösterilecek. Kodun gösterdiği kabiliyetler form öğeleri ile
+iletişim kurabilme, ve sayfaya bilgi yazabilmek, bunun için DOM
+objelerine erişmek, mesela `output` kimlikli `<div>` HTML objesi içine
+çıktı veriliyor.
 
 ```html
 <html>
@@ -43,16 +50,16 @@ koymak mümkün oluyor.
 </html>
 ```
 
-Test etmek icin ustteki kodlari mesela bir `tst1.html` dosyasina yazariz,
+Test etmek için üstteki kodları mesela bir `tst1.html` dosyasına yazarız,
 ve o dizinde 
 
 ```
 python -m http.server 8080 --bind 127.0.0.1
 ```
 
-komutunu isletiriz, `http.server` Python icindeki hafif bir Web
-servisidir, Flask yapabilirdik o da cok basit ama ustteki yontem daha
-da basit. Simdi
+komutunu işletiriz, `http.server` Python içindeki hafif bir Web
+servisidir, Flask yapabilirdik o da çok kolay ama üstteki yöntem daha
+da basit. Şimdi,
 
 ```
 http://localhost:8080/tst1.html
@@ -77,7 +84,7 @@ değiştirilir,
 
 Pyscript kodunda `element.innerText` çağrısı ile bir metni sayfaya yazabildik.
 Eğer HTML gösterilsin istiyorsak, mesela bağlantılar, renkli yazılar, listeler
-gibi daha çetrefilli çıktılar için `.innerHTML kullanabiliriz.
+gibi daha çetrefilli çıktılar için `.innerHTML` kullanabiliriz.
 
 Bir örnekte görelim, 0 ila 9 arasındaki sayıları gezip URL bağlantılarını
 dinamik olarak değiştirip sayfaya o şekilde basacağız,
@@ -110,11 +117,12 @@ Düğmeye basınca bu kod 10 tane bağlantı üretmeli, Link 0, Link 1 gibi..
 
 ### Http ile Uzaktaki Dosyayı Okumak, İşlemek
 
-Aynen Javascript ile olduğu gibi PyScript bir dosya servisindeki bir
-dosyayı URL ile okuyup işleyebilir. Alttaki örnek için üstteki basit
-web servisi işlemez, ama Flask işler. Aynı dizinde bir de `test1.json`
-dosyası yarattık ve içinde `{"a": 1, "b": 2}` değerleri var, dosyayı
-HTML sayfası ile berabe Flask `static` dizini içine koyduk.
+Aynen Javascript ile olduğu gibi PyScript bir dosya servisindeki
+(fileserver) bir dosyayı URL ile okuyup işleyebilir. Alttaki örnek
+için Flask lazım (basit web servisinde olmuyor), aynı dizinde bir
+`test1.json` dosyası yarattık ve içinde `{"a": 1, "b": 2}` değerleri
+var, dosyayı HTML sayfası ile berabe Flask `static` dizini içine
+koyduk.
 
 ```html
 <html>
@@ -138,9 +146,10 @@ HTML sayfası ile berabe Flask `static` dizini içine koyduk.
 
 Sayfayı yükleyince bu değerlerin ekrana basıldığını göreceğiz.
 
-Eğer ham JSON dosyasını indirebiliyorsak bu dosya içeriğini JSON paketi
-ile işlemek nasıl olurdu? Böylece içeriğe bildiğimiz sözlük, liste kavramları
-ile erisebilirdik, üstteki kodu şöyle değiştirelim,
+Eğer ham JSON dosyasını indirebiliyorsak bu dosya içeriğini JSON
+paketi ile işlemek te mümkün olacak muhakkak? Böylece içeriğe
+bildiğimiz sözlük, liste kavramları ile erisebiliriz, üstteki kodu
+şöyle değiştirelim,
 
 ```
 from pyodide.http import open_url
@@ -155,9 +164,9 @@ Bu kod ekrana sadece `1` değeri basacak.
 
 Web üzerinden dosya erişimi pek çok fayda sağlar, mesela 5-10 MB veri
 dosyalarını gerektiği yerde indirip içeriklerini ek işlemlere tabi
-tutmak, ve sonuçları HTML olarak göstermek mümkün.
+tutmak mümkün.
 
-Karşılaştırma amacıyla aynı işlemi (JSON işleme kısmi yok) Javascript ile
+Karşılaştırma amacıyla aynı işlemi (JSON işleme kısmı yok) Javascript ile
 yapalım,
 
 ```html
@@ -182,9 +191,7 @@ yapalım,
 </html>
 ```
 
+Kaynaklar
 
-
-
-
-[devam edecek]
+[1] PyScript, https://docs.pyscript.net/latest/tutorials/getting-started.html
 
