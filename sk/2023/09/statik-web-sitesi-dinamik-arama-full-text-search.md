@@ -180,16 +180,15 @@ print(res)
 Eğer üstteki arama metotunu uygulama servisi (app server) olmadan
 kodlamak istiyorsak, yani sadece PyScript (ya da Javascript) ve servis
 tarafında bir takım dosyaların olduğu yaklaşım, kodlamayı şöyle
-yapabiliriz.
-
-İlk akla gelen tersyüz edilmiş indisi dizüstü geliştirme ortamında tek
-bir JSON olarak kaydetmek, onu web servisine koymak, ve bu dosyanın
+yapabiliriz. Tersyüz edilmiş indisi dizüstü geliştirme ortamında tek
+bir JSON olarak kaydedebilirdik, onu web servisine koyup, bu dosyanın
 gerektiğinde istemciden `open_url` ile https adresinden alınıp sözlük
-olarak tarayıcıda işlenmesidir. Tek problem tek JSON dosyasının büyük
-olma ihtimali, bizim site için mesela bu dosya 10-15 MB. Çözüm şudur,
-indisi kelime ilk harfini baz alarak parçalara bölmek. Mesela 'a' ile
-başlayan tüm kelimelerin tersyüz edilmiş indis dosyası
-`invidx-a.json`, 'b' için `invidx-b.json`, böyle gidiyor.
+olarak tarayıcıda işlenmesi neredeyse tüm ihtiyaçları karşılardı. Tek
+problem tek JSON dosyasının büyük olma ihtimali, bizim site için
+mesela bu dosya 10-15 MB, çözüm şudur, indisi kelime ilk harfini baz
+alarak parçalara böleriz. Mesela 'a' ile başlayan tüm kelimelerin
+tersyüz edilmiş indis dosyası `invidx-a.json`, 'b' için
+`invidx-b.json`, böyle gidiyor..
 
 Bölünmüş indis dosyaları çoğunlukla 0.5 MB civarı olacaktır. Eğer iki
 kelime aranıyorsa bu ortalama 1 MB JSON dosya indirilmesi demektir,
