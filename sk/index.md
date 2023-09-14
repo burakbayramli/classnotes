@@ -3,6 +3,8 @@
 
 ## En Son
 
+14/9 - [Javascript Yerine Tarayıcıda Python, PyScript](https://burakbayramli.github.io/dersblog/sk/2023/09/pyscript.html)
+
 6/9 - [Çok Değişkenli Calculus - Ders 29](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_29/ders_29.html)
 
 23/8 - [Poligon, Üçgen Alanı - Ekler](https://burakbayramli.github.io/dersblog/algs/algs_075_enc/poligon_alani_nokta_bulutlari_noktalari_cevreleyen_bolgeler.html)
@@ -10,8 +12,6 @@
 15/8 - [İmaj / Görüntü İşleme Teknikleri](https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html)
 
 10/8 - [OSM, Şehir Ulaşım Verileri - Ekler](https://burakbayramli.github.io/dersblog/sk/2023/01/iett-ibb-otobus-verisi.html)
-
-4/8 - [String Yapısı ve Python](https://burakbayramli.github.io/dersblog/sk/2023/08/string-python.html)
 
 ## Konular, Referans
 
@@ -50,4 +50,7 @@
 [Sene](year.html)
 
 [Ara](ara.html)
+
+
+
 

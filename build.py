@@ -202,6 +202,7 @@ if __name__ == "__main__":
     
     fr = os.getcwd()
     to = os.environ['HOME'] + "/Documents/dersblog"
+    #to = os.environ['HOME'] + "/Documents/repos/burakbayramli.github.com/dersblog"
  
     if len(sys.argv) < 2:
       print ("options: all | clean | html ")
