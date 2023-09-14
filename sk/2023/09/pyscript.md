@@ -1,26 +1,25 @@
 # Javascript Yerine Tarayıcıda Python, PyScript
 
 Tarayıcı tarafında kullanılan dil Javascript adlı bir dil, Java'nın
-daha dinamik, güçlü tipleme gerektirmeyen bir hali denebilir. Bu dil
-oldukca güçlüdür, müşteri tarafında gereken neredeyse her işlemi,
-hesabı yapabilir. Önemli nokta, Javascript işlediğinde bu kodları
-tarayıcı işletilir yani bağlanan kişinin CPU'şu bu kodları
-işletmektedir, servis tarafı değil.
+daha dinamik, tipleme gerektirmeyen bir hali denebilir. Bu dil oldukca
+güçlüdür, müşteri tarafında gereken neredeyse her işlemi, hesabı
+yapabilir. Önemli nokta, Javascript işlediğinde bu kodları tarayıcı
+işletilir yani bağlanan kişinin CPU'su bu kodları işletmektedir.
 
 Peki tarayıcıda başka diller mümkün mü? Farklı dilleri WebAssembly
 altyapısı üzerinen Javascript'e derlemek mümkün. Fakat PyScript [1]
-yaklaşımı en temiz, basit, hızlı yöntem, sayfa içinde iki dosya dahil
+yaklaşımı en basit, hızlı yöntem, sayfa içinde iki dosya dahil
 ediliyor, ve bundan sonra tam tekmilli Python kodlarını sayfa içine
 koymak mümkün oluyor.
 
 ### Başlangıç
 
 Basit bir kodu altta görüyoruz. Bu sayfada tek bir metin kutusu var,
-bir de düğme. Kutuya girilen yazı OK tuşuna basınca aynı sayfa
-üzerinde gösterilecek. Kodun gösterdiği kabiliyetler form öğeleri ile
-iletişim kurabilme, ve sayfaya bilgi yazabilmek, bunun için DOM
-objelerine erişmek, mesela `output` kimlikli `<div>` HTML objesi içine
-çıktı veriliyor.
+bir de düğme. Kutuya girilen yazı düğmeye basınca aynı sayfa üzerinde
+gösterilecek. Kodun gösterdiği kabiliyetler form öğeleri ile iletişim
+kurabilme, ve sayfaya bilgi yazabilmek, bunun için DOM objelerine
+erişmek, mesela `output` kimlikli `<div>` HTML objesi içine çıktı
+veriliyor.
 
 ```html
 <html>
@@ -58,8 +57,8 @@ python -m http.server 8080 --bind 127.0.0.1
 ```
 
 komutunu işletiriz, `http.server` Python içindeki hafif bir Web
-servisidir, Flask yapabilirdik o da çok kolay ama üstteki yöntem daha
-da basit. Şimdi,
+servisidir, Flask yapabilirdik o da çok kolay ama üstteki yöntem de
+işler. Şimdi,
 
 ```
 http://localhost:8080/tst1.html
@@ -82,9 +81,9 @@ değiştirilir,
 
 ### HTML Üretmek
 
-Pyscript kodunda `element.innerText` çağrısı ile bir metni sayfaya yazabildik.
+Pyscript kodunda `element.innerText` çağrısı ile bir metni sayfaya yazdık.
 Eğer HTML gösterilsin istiyorsak, mesela bağlantılar, renkli yazılar, listeler
-gibi daha çetrefilli çıktılar için `.innerHTML` kullanabiliriz.
+gibi daha çetrefilli çıktılar için `.innerHTML` var.
 
 Bir örnekte görelim, 0 ila 9 arasındaki sayıları gezip URL bağlantılarını
 dinamik olarak değiştirip sayfaya o şekilde basacağız,
@@ -144,12 +143,14 @@ koyduk.
 </html>
 ```
 
-Sayfayı yükleyince bu değerlerin ekrana basıldığını göreceğiz.
+Sayfayı yükleyince bu değerlerin ekrana basıldığını göreceğiz. Muhakkak
+İnternet üzerindeki herhangi bir dosya için aynı çağrı işleyecektir.
 
 Eğer ham JSON dosyasını indirebiliyorsak bu dosya içeriğini JSON
-paketi ile işlemek te mümkün olacak muhakkak? Böylece içeriğe
-bildiğimiz sözlük, liste kavramları ile erisebiliriz, üstteki kodu
-şöyle değiştirelim,
+paketi ile işlemek te mümkün olacak muhakkak? Problem değil, PyScript
+tam bir Python sistemı olduğu için bildiğimiz `json` paketini dahil
+edip tarayıcıda kullanabiliriz.  Böylece veriye alışık olunan sözlük,
+liste kavramları ile erisebiliriz, üstteki kodu şöyle değiştirelim,
 
 ```
 from pyodide.http import open_url
@@ -164,10 +165,11 @@ Bu kod ekrana sadece `1` değeri basacak.
 
 Web üzerinden dosya erişimi pek çok fayda sağlar, mesela 5-10 MB veri
 dosyalarını gerektiği yerde indirip içeriklerini ek işlemlere tabi
-tutmak mümkün.
+tutmak mümkün. Büyük dosyaları parçalara ayırarak gerekli olanı
+indirmek neredeyse pek çok okuma bazlı uygulama için yeterli.
 
-Karşılaştırma amacıyla aynı işlemi (JSON işleme kısmı yok) Javascript ile
-yapalım,
+Dosya indirme işlemini karşılaştırma amacıyla (JSON işleme kısmı yok)
+Javascript ile yapalım,
 
 ```html
 <html>
@@ -193,11 +195,10 @@ yapalım,
 
 ### Diger Paketler
 
-Fakat kabiliyetler bunlarla sınırlı değil. PyScript taklit bir Python
-ortamı değil, tam tekmilli bir Python ortamı. Amacı bildik Python
-yorumlayıcısını tamamen Javascript bazlı işletmek. Bu sebeple mesela
-dış paket yüklemesi de pek çok paket için işliyor. Mesela altta
-`pandaş` paketinin kurulduğu ve bir CSV verisini işlediği örneği
+Fakat kabiliyetler bunlarla sınırlı değil. PyScript gerçek bir Python
+ortamı olduğu için bir sürü paket kullanımına hazır çünkü amacı bildik
+Python yorumlayıcısını tamamen tarayıcı bazlı işletmek. Mesela altta
+`pandas` paketinin kurulduğu ve bir CSV verisini işlediği örneği
 görüyoruz. Daha fazla örnekler [1]'de bulunabilir.
 
 ```html
