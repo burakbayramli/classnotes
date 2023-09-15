@@ -23,6 +23,9 @@ def preproc():
             row_dict[int(row[headers['movieId']])] = float(row[headers['rating']])
     fout.close()
 
+import os, numpy as np, util, json, pandas as pd
+import numpy.linalg as lin
+
 K = 5
 M = 9742
 U = 610
@@ -43,7 +46,9 @@ class KMeans1Job:
         ratings = json.loads(jsval)
         my_k = int(self.cluster_ass[int(id)-1])
         for mov,rating in ratings.items():
-            self.m[my_k, self.movie_id_int[mov]] = self.m[my_k, self.movie_id_int[mov]] +  (rating - self.m[my_k, self.movie_id_int[mov]]) / int(id)
+            if self.movie_id_int[mov]==3217: print (rating)
+            if self.m[my_k, self.movie_id_int[mov]] == 0.0: self.m[my_k, self.movie_id_int[mov]] = rating
+            else: self.m[my_k, self.movie_id_int[mov]] = self.m[my_k, self.movie_id_int[mov]] +  (rating - self.m[my_k, self.movie_id_int[mov]]) / int(id)
                 
     def post(self):
         np.savez('data/means-%d' % self.iter_no,self.m)
