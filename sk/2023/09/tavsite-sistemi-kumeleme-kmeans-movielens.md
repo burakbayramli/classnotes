@@ -2,9 +2,10 @@
 
 Tavsiye sistemlerini kodlamanın klasik yolu kullanıcı-ürün matrisinde
 (ki matris ögeleri beğeni notunu taşır) arama yapmaktır. Kendi
-beğenilerim bu matris sidinda ayrı bir satır olarak düşünülebilir,
-satırın tüm kullanıcılara olan mesafeisini [2] hesaplarım, bana en
-yakın kullanıcıların en iyi not verdiği ürünleri tavsiye alırım.
+beğenilerim bu matris dışında one benzer ama ayrı bir satır olarak
+düşünülebilir, bu satırın tüm kullanıcılara olan mesafesini [2]
+hesaplarım, bana en yakın kullanıcıları bulurum, ve onların en
+beğendiği ürünleri tavsiye alırım.
 
 Bu teknik tüm matrisi tarar, onun tüm satırlarına bakar. Beğeni
 matrisi seyrektir tabii ki bu aramayı hızlandırır fakat yine de
@@ -17,10 +18,10 @@ yeni kullanıcının bu merkezlere olan mesafesini hesaplarız sadece,
 10-20 tane küme için, ve sonra kümedeki kullanıcıları listeleyip
 onların beğenilerini tavsiye olarak veririz.
 
-Örnek veri [1] sitesinden, oradaki `ml-latest-small.zıp` verisini
-alacağız.  Daha büyük bir veri seti `ml-25m.zıp` içinde.
-
-Fakat veri setinde `ratings.csv` dosyası şu formatta,
+Örnek veri [1] sitesinden, oradaki `ml-latest-small.zip` verisini
+alacağız.  Daha büyük bir veri seti `ml-25m.zip` içinde. Bazı
+değişimler hala lazım, veri setinde `ratings.csv` dosyası mesela şu
+formatta,
 
 ```
 userId,movieId,rating,timestamp
@@ -30,7 +31,7 @@ userId,movieId,rating,timestamp
 1,665,5.0,1147878820
 ```
 
-Aynı kullanıcı kimliği birden fazla farklı satıra yayılmış
+Aynı kullanıcı kimliği birden fazla farklı satıra dağılmış
 halde. Satır satır işleme bazlı yapan yaklaşımlar için bir
 kullanıcının tüm verisini aynı satırda almak daha iyidir, böylece azar
 azar (incremental) işlem birimi kullanıcı olur, tek satır okuyunca tek
@@ -38,14 +39,14 @@ bir kullanıcı işlemiş oluruz. Ayrıca parallel işlem gerektiğinde aynı
 kullanıcı veisinin farklı süreçlere dağıtılması gerekmez, bunun
 kordinasyonu zor olurdu. O zaman üstteki veriyi kullanıcı bazlı hale
 getirelim, ayrıca verinin seyrekliğini gözönünde bulundurursak, not
-verilen filmlerin bir sözlük öğesi yapalım. Sözlük, metin formatta
-JSON olarak tutulabilir, dosyaya böyle yazılır.  Yeni veride iki kolon
+verilen filmleri sözlük öğesi yapalım. Sözlük, metin formatta JSON
+olarak tutulabilir, dosyaya böyle yazılır.  Yeni veride iki kolon
 olacak, birincisi `userId`, ikincisi ise bir JSON metni. Değişimi
 yapalım,
 
 
 ```python
-import json, csv, subprocess
+import json, csv, subprocess, os
 
 indir = "/opt/Downloads/ml-latest-small"
 outdir = "/tmp/movie"
@@ -53,6 +54,8 @@ infile = indir + "/ratings.csv"
 outfile = outdir + "/ratings-json.csv"
 curruser = 0
 row_dict = {}
+
+if os.path.exists(outdir) == False: os.mkdir(outdir)
 
 fout = open(outfile, "w")
 with open(infile) as csvfile:   
@@ -83,10 +86,6 @@ def ls(dirname):
    for x in res: print (x)   
 ```
 
-
-
-
-
 ```python
 show_out(2,6)
 ```
@@ -101,25 +100,27 @@ show_out(2,6)
 
 Kullanıcı `4` film `21` için 3 notunu vermiş.. böyle gidiyor.
 
-### Kumeleme
+### Kümeleme
 
-K-Means algoritmasinin, ana mantığı, paralel versiyonu [3,4]'te işlendi.
+K-Means algoritmasının ana mantığı, paralel versiyonu [3,4]'te
+işlendi.
 
 Algoritmaya geçmeden önce bazı hazırlık işlemleri yapalım. Filmlerin tabandaki
 kimlik no'ları matris üzerinde kullanıma hazır değil, onlara 0'dan başlayan bir
 artarak giden kimliği biz atayacağız, ve aradaki eşlemeyi bir sözlük ile
-yapacağız, sözlükler `movie_id_ınt.json` ve `movie_tıtle_ınt.json` içinde
+yapacağız, sözlükler `movie_id_int.json` ve `movie_title_int.json` içinde
 olacak. 
 
-Ayrıca K-Means'e bir başlangıç noktası gerekiyor, çünkü algoritma
-verili etiketler üzerinden küme merkezleri, verili küme merkezleri
-üzerinden etiket eşlemesi hesaplar, özyineli bir algoritmadir, tabii
-bu durumda bir yerden başlanılması gerekir, çoğu yaklaşım mesela küme
-merkezlerini rasgele atar. Bu örnekte küme merkezi yerine etiket
-ataması (hangi kullanıcı hangi kümeye ait) rasgele yapılırsa daha iyi,
-çünkü seyrek veri durumunda reel sayılar olan küme merkezlerini iyi
-seçememek mümkün. Belli bir aralıktaki tam sayı küme ataması daha basit,
-`cluster_ass` değişkeninde bu atama olacak.
+Ayrıca K-Means'te bir ilk fitilin yakılması, önyükleme (boostrap)
+gerekir, çünkü algoritma verili etiketler üzerinden küme merkezleri,
+verili küme merkezleri üzerinden etiket eşlemesi hesaplar, özyineli
+bir algoritmadir, tabii bu durumda bir yerden başlanılması gerekir,
+çoğu yaklaşım mesela küme merkezlerini rasgele atar. Bu örnekte küme
+merkezi yerine etiket ataması (hangi kullanıcı hangi kümeye ait)
+rasgele yapılırsa daha iyi, çünkü seyrek veri durumunda reel sayılar
+olan küme merkezlerini iyi seçememek mümkün. Belli bir aralıktaki tam
+sayı küme ataması daha basit, `cluster_ass` değişkeninde bu atama
+olacak.
 
 ```python
 import os, numpy as np, json, pandas as pd
@@ -127,6 +128,8 @@ import os, numpy as np, json, pandas as pd
 K = 5 # kume sayisi
 M = 9742 # film sayisi
 U = 610 # kullanici sayisi
+
+np.random.seed(0)
 
 def prepare():
 
@@ -147,6 +150,11 @@ def prepare():
 
 prepare()
 ```
+
+Bu kodu işlettikten sonra gerekli başlangıç dosyaları `outdir` içinde
+olmalı.  Şimdi işletimi sağlayacak yardımcı kodu paylaşalım, detaylar
+[4] içinde bulunabilir, ileride paralel işletimi de sağlayacak,
+
 
 ```python
 import os
@@ -174,9 +182,33 @@ def process(file_name,N,hookobj):
             hookobj.exec(line)
             if f.tell() > c[1]: break
         f.close()
-        hookobj.post()
-        
+        hookobj.post()        
 ```
+
+Artık işleyici kodları yazabiliriz. Bize iki tane ayrı kod bloğu
+gerekiyor, bunlardan ilki daha önce söylediğimiz gibi verili küme
+atamalarını kullanarak küme merkezlerini hesaplar. İkincisi küme
+merkezlerini kullanarak kullanıcı küme atamalarını yapar. Atama verisi
+basit tek bir vektör içinde, `U` tane kullanıcı (seyirci), `K` tane
+küme var, o zaman `(1,M)` boyutunda, içeriği 0 ile `K` arasında bir
+değer, ilk atamaların rasgele yapıldığı vektöre bakalım,
+
+```python
+ca = np.load(outdir + "/cluster-assignments-0.npz")['arr_0']
+print ('atamalar',ca.shape)
+print (ca[:10], '...')
+```
+
+```text
+atamalar (610,)
+[4 0 3 3 3 1 3 2 4 0] ...
+```
+
+İkinci kod parçası atamaları kullanıp küme merkezlerini yaratır, bu
+merkez bir küme içindeki seyircilerin tüm filmlere verdiği notların
+ortalamasıdır, bu tüm kümeler için yapılır o zaman sonuç matrisinin
+boyutu `K` küme `M` film için K x M olmalı. Her iki kod parçası
+alttadır,
 
 
 ```python
@@ -197,7 +229,7 @@ class KMeans1Job:
     def exec(self,line):
         id,jsval = line.split("|")
         ratings = json.loads(jsval)
-        my_k = int(self.cluster_ass[int(id)-1])
+        my_k = int(self.cluster_ass[int(id)])
         for mov,rating in ratings.items():
             self.s[my_k, self.movie_id_int[mov]] += rating
             self.N[my_k, self.movie_id_int[mov]] += 1.0
@@ -219,11 +251,11 @@ class KMeans2Job:
     def exec(self,line):
         id,jsval = line.split("|")
         ratings = json.loads(jsval)
-        vec = np.zeros((1,M))
+        vec = np.zeros(M)
         for mov,rating in ratings.items():
-            vec[0,self.movie_id_int[str(mov)]] = rating
-        nearest = np.argmin(lin.norm(vec - self.means,axis=1))
-        self.cluster_ass[int(id)-1] = nearest
+            vec[self.movie_id_int[str(mov)]] = rating
+        nearest = np.argmin(lin.norm(vec[vec>0] - self.means[:,vec>0],axis=1))
+        self.cluster_ass[int(id)] = nearest
         
     def post(self):
         np.savez(outdir + '/cluster-assignments-%d' % self.iter_no,self.cluster_ass)
@@ -231,6 +263,69 @@ class KMeans2Job:
         
 ```
 
+Ortalamalar
+
+`KMeans1Job` kodunda ortalamalar için her küme için o küme altındaki
+kullanıcıların notları, yani vektörler toplanır, aynı sırada kaç not
+verilmiş olduğu takip edilir, ve toplam not not sayısına
+bölünur. Sıfır ile bölüm tehlikesi var muhakkak, bu durumda özel bir
+bölme çağrısı kullanacağız, `numpy.divide`, bir örnek altta,
+
+
+```python
+s = np.zeros((3,3,))
+N = np.zeros((3,3,))
+
+s[0,2] = 4; s[1,1] = 4; s[2,1] = 7
+
+N[0,2] = 2; N[1,1] = 4; N[2,1] = 7
+
+print (s)
+print (N)
+print ('\n')
+print (s/N)
+print (np.divide(s, N, out=np.zeros_like(N), where=N>0))
+```
+
+```text
+[[0. 0. 4.]
+ [0. 4. 0.]
+ [0. 7. 0.]]
+[[0. 0. 2.]
+ [0. 4. 0.]
+ [0. 7. 0.]]
+
+
+[[nan nan  2.]
+ [nan  1. nan]
+ [nan  1. nan]]
+[[0. 0. 2.]
+ [0. 1. 0.]
+ [0. 1. 0.]]
+```
+
+Mesafe
+
+Devam etmeden önce önemli bir konuya değinelim, bu da mesafe
+kavramı. K-Means kümelemesi Öklit (Euclidian) mesafe kullanır, bu
+mesafenin sıfır değerlerini nasıl kullandığına dikkat etmek
+gerekir. Sıfır değeri tabii ki bizim seçimlerimiz bağlamında
+"seyredilmemiş" demektir. Fakat Öklitsel mesafe hesaplıyorsam, mesela
+benim üç boyutlu vektörüm x1,y1,z1 ile başka bir x2,y2,z2 vektör
+arasında bu hesap (x1-x2) karesi artı (y1-y2) karesi vs diye devam
+ediyor. Sonra bu toplamın kareköku alınıyor. Fakat eğer bende film x1
+seyredilmemişse, yoğun matris bağlamında orada sıfır vardır, ama
+küme merkezine uzaklık hesaplıyorsam bu merkezin x2,y2,z2,.. öğelerinde
+muhakkak bir değer vardır. Bu mevcut değere uzaklık hesaplarsam bendeki
+sıfır değeri mevcut değeri beni uzakmışım gibi gösterecektir. Fakat
+belki o filmi seyretsem belli bir kümenin değerine yakın not verirdim,
+o zaman ona yakın gözükürdüm. Demek ki bendeki boş değerler mesafesel
+olarak problem çıkartabilir. İşte bu sebeple `KMeans2Job` kodunda
+mesafe hesaplarken `vec[vec>0] - self.means[:,vec>0]` kodunu kullandık,
+yani `vec` üzerinde sıfır olmayan değerlerin sadece `self.means` ile
+mesafesine bakılıyor. Diğerleri Öklit mesafesine dahil edilmiyor.
+
+Kodu işletelim şimdi, şimdilik iki kod parçasını tek bir döngü içinde çağıracağız,
 
 ```python
 process(file_name = outdir + '/ratings-json.csv', N=1, hookobj = KMeans1Job(0,1))
@@ -254,12 +349,11 @@ b'total 2156
  140 movie_id_int.json
  344 movie_title_int.json
 1272 ratings-json.csv
+
 ```
 
-
-
-
-
+Görüldüğü gibi `-1.npz` ile biten dosyalar yaratıldı, bu dosyaların
+1'inci döngünün sonuçları. Boyutlara bakıyoruz,
 
 ```python
 ca = np.load(outdir + "/cluster-assignments-1.npz")['arr_0']
@@ -273,58 +367,58 @@ atamalar (610,)
 kume merkezleri (5, 9742)
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Kullanım
 
 
 ```python
-s = np.zeros((3,3,))
-N = np.zeros((3,3,))
-
-s[0,2] = 4; s[1,1] = 4; s[2,1] = 7
-
-N[0,2] = 2; N[1,1] = 4; N[2,1] = 7
-
-print (s)
-print (N)
-
-print (s/N)
-print (np.divide(s, N, out=np.zeros_like(N), where=N>0))
-```
-
-```text
-[[nan nan  2.]
- [nan  1. nan]
- [nan  1. nan]]
-[[0. 0. 2.]
- [0. 1. 0.]
- [0. 1. 0.]]
-```
-
-
-
-
-
-```
+picks = """
 movie,rating
 Swordfish (2001),5
 "Rock, The (1996)",5
 Dunkirk (2017),2
+"""
+
+import os, numpy as np, numpy.linalg as lin, io
+
+dt = json.loads(open(outdir + "/movie_title_int.json").read())
+
+picks = pd.read_csv(io.StringIO(picks),index_col=0).to_dict('index')
+vec = np.zeros(M)
+for mov,rating in picks.items():
+    if str(mov) in dt:
+        vec[dt[str(mov)]] = rating['rating']
+nearest = np.argmin(lin.norm(vec[vec>0] - means[:,vec>0],axis=1))
+print (nearest)
 ```
+
+```text
+3
+```
+
+```python
+means[:,dt['Swordfish (2001)']]
+```
+
+```text
+Out[1]: array([2.25      , 3.5       , 3.27272727, 3.2       , 3.1       ])
+```
+
+```python
+means[:,dt['Rock, The (1996)']]
+```
+
+```text
+Out[1]: array([3.82142857, 3.26315789, 3.60714286, 3.86956522, 3.54347826])
+```
+
+```python
+means[:,dt['Dunkirk (2017)']]
+```
+
+```text
+Out[1]: array([3.375     , 3.75      , 5.        , 3.16666667, 3.        ])
+```
+
 
 
 [devam edecek]
@@ -338,4 +432,6 @@ Kaynaklar
 [3] <a href="../../../algs/algs_080_kmeans/kmeans_kumeleme_metodu.html">K-Means Kümeleme Metodu</a> 
 
 [4] <a href="../../2022/11/paralel-veri-analizi-istatistik.html">Paralel Veri Analizi, İstatistik</a>
+
+
 
