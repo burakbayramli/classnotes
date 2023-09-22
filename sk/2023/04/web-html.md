@@ -2,6 +2,8 @@
 
 [Web Sayfaları, HTML ve CSS](../../2023/05/web-sayfalari-html-css.html)
 
+[jQuery](../../2010/06/jquery.html)
+
 [Google App Engine](../../2010/03/google-app-engine.html)
 
 [Alternatif Combobox](../../2009/02/alternatif-combobox_08.html)
@@ -17,4 +19,6 @@
 [Flask ile Dinamik Web Sayfalari Gelistirmek](../../2016/09/flask-ile-dinamik-web-sayfalari.html)
 
 [HTML -> Ajax -> AppEngine](../../2010/04/html-ajax-appengine.html)
+
+[Javascript Yerine Tarayıcıda Python, PyScript](2023/09/pyscript.html)
 

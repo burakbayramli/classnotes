@@ -313,19 +313,20 @@ gerekir. Sıfır değeri tabii ki bizim seçimlerimiz bağlamında
 "seyredilmemiş" demektir. Fakat Öklitsel mesafe hesaplıyorsam, mesela
 benim üç boyutlu vektörüm x1,y1,z1 ile başka bir x2,y2,z2 vektör
 arasında bu hesap (x1-x2) karesi artı (y1-y2) karesi vs diye devam
-ediyor. Sonra bu toplamın kareköku alınıyor. Fakat eğer bende film x1
-seyredilmemişse, yoğun matris bağlamında orada sıfır vardır, ama
-küme merkezine uzaklık hesaplıyorsam bu merkezin x2,y2,z2,.. öğelerinde
-muhakkak bir değer vardır. Bu mevcut değere uzaklık hesaplarsam bendeki
-sıfır değeri mevcut değeri beni uzakmışım gibi gösterecektir. Fakat
-belki o filmi seyretsem belli bir kümenin değerine yakın not verirdim,
-o zaman ona yakın gözükürdüm. Demek ki bendeki boş değerler mesafesel
-olarak problem çıkartabilir. İşte bu sebeple `KMeans2Job` kodunda
-mesafe hesaplarken `vec[vec>0] - self.means[:,vec>0]` kodunu kullandık,
-yani `vec` üzerinde sıfır olmayan değerlerin sadece `self.means` ile
-mesafesine bakılıyor. Diğerleri Öklit mesafesine dahil edilmiyor.
+ediyor. Sonra bu toplamın kareköku alınıyor. Fakat eğer bende x filmi
+seyredilmemişse, yoğun matris bağlamında orada sıfır vardır, ama küme
+merkezine uzaklık hesaplıyorsam bu merkezin x2,y2,z2,.. öğelerinde
+muhakkak bir değer vardır. Bu mevcut değere uzaklık hesaplarsam
+bendeki sıfır değeri mevcut değeri beni uzakmışım gibi
+gösterecektir. Fakat belki o filmi seyretsem belli bir kümenin
+değerine yakın not verirdim, o zaman ona yakın gözükürdüm. Demek ki
+bendeki boş değerler mesafesel olarak problem çıkartabilir. İşte bu
+sebeple `KMeans2Job` kodunda mesafe hesaplarken `vec[vec>0] -
+self.means[:,vec>0]` kodunu kullandık, yani `vec` üzerinde sıfır
+*olmayan* değerlerin `self.means` ile mesafesine bakılıyor. Diğerleri
+Öklit mesafesine dahil edilmiyor.
 
-Kodu işletelim şimdi, şimdilik iki kod parçasını tek bir döngü içinde çağıracağız,
+Kodu işletelim, şimdilik iki kod parçasını tek bir döngü içinde çağıracağız,
 
 ```python
 process(file_name = outdir + '/ratings-json.csv', N=1, hookobj = KMeans1Job(0,1))
@@ -369,6 +370,16 @@ kume merkezleri (5, 9742)
 
 ### Kullanım
 
+Döngüyü birkaç kez işletelim,
+
+```python
+for iter_no in range(1,10):
+    process(file_name=fin1, N=1, hookobj = KMeans1Job(0,iter_no))
+    process(file_name=fin1, N=1, hookobj = KMeans2Job(0,iter_no))
+```
+
+Bunu yapmak sonuçları iyileştirir. Kendi seçtiğimiz bazı filmlere
+notlar verelim, ve bu seçimlere yakın olan kümeyi bulalım,
 
 ```python
 picks = """
@@ -378,29 +389,33 @@ Swordfish (2001),5
 Dunkirk (2017),2
 """
 
-import os, numpy as np, numpy.linalg as lin, io
+import io
 
 dt = json.loads(open(outdir + "/movie_title_int.json").read())
-
+means = np.load(outdir + "/means-9.npz")['arr_0']
 picks = pd.read_csv(io.StringIO(picks),index_col=0).to_dict('index')
 vec = np.zeros(M)
 for mov,rating in picks.items():
     if str(mov) in dt:
         vec[dt[str(mov)]] = rating['rating']
 nearest = np.argmin(lin.norm(vec[vec>0] - means[:,vec>0],axis=1))
-print (nearest)
+print ('en yakin', nearest)
 ```
 
 ```text
-3
+en yakin 3
 ```
+
+En yakın kümeyi bulduk. Şimdi not verdiğimiz her filmin tüm kümelerde
+ortalama nasıl notlanmış olduğuna bakalım, acaba bizim notlarla uyumlu
+mu?
 
 ```python
 means[:,dt['Swordfish (2001)']]
 ```
 
 ```text
-Out[1]: array([2.25      , 3.5       , 3.27272727, 3.2       , 3.1       ])
+Out[1]: array([2.25      , 3.5       , 3.33333333, 3.2       , 2.875     ])
 ```
 
 ```python
@@ -408,7 +423,7 @@ means[:,dt['Rock, The (1996)']]
 ```
 
 ```text
-Out[1]: array([3.82142857, 3.26315789, 3.60714286, 3.86956522, 3.54347826])
+Out[1]: array([3.8125    , 3.3125    , 3.58064516, 3.85714286, 3.5       ])
 ```
 
 ```python
@@ -419,9 +434,22 @@ means[:,dt['Dunkirk (2017)']]
 Out[1]: array([3.375     , 3.75      , 5.        , 3.16666667, 3.        ])
 ```
 
+Uyumlu gözüküyor.
 
+Paralel işletme kısmını ödev bırakıyoruz, burada eklenecek kodların
+genel yaklaşımından bahsedelim.
 
-[devam edecek]
+Ortalama için her paralel işletici kullanıcıların bir kısmını işler,
+ve o kısımla ilgili küme ortalamalarını hesaplar. İki tane süreç iki
+tane K x M ortalama yaratır, o zaman her döngüde paralel süreç
+ortalamaları bitince seri şekilde (paralel değil) bu ortalamaların
+ortalamaları alınır, o döngünün nihai ortalaması bu olur.
+
+Küme ataması daha bariz, çünkü zaten kullanıcı bazlı hesaplanan ve
+atanan bir değer, eh bizim paralel yaklaşım da kullanıcı bazlı
+işbölümü yaptığına göre burada tek yapılması gereken paralel atama
+bitince her süreçten gelen sonuçları birleştirmektir, yani ucu uca
+getirip yapıştırmak (concatanate), bu kadar.
 
 Kaynaklar
 
@@ -432,6 +460,4 @@ Kaynaklar
 [3] <a href="../../../algs/algs_080_kmeans/kmeans_kumeleme_metodu.html">K-Means Kümeleme Metodu</a> 
 
 [4] <a href="../../2022/11/paralel-veri-analizi-istatistik.html">Paralel Veri Analizi, İstatistik</a>
-
-
 
