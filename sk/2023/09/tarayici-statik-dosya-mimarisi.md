@@ -56,30 +56,26 @@ print (res.text)
 
 Üstteki kodlar aynı dosyanın farklı yerlerini gösterecekler.
 
-### Örnekler
+Zihin egzersizi: Bir tavsiye sistemini serviste pür dosya kullanarak
+nasıl yazarız? Tavsiye sistemlerinin en basit şekli kullanıcı
+yakınlığı bulmak. Tabanda 10 tane film varsa kullanıcı A belki üçünü
+seyretti, not verdi, bu bize 1 x 10 vektörü sağlar vektör içeriği `[0
+0 4 0 5 2 ... 0]` diye gidebilir.  Taban verisinde 500 tane farklı
+seyirci olabilir, onların verdiği notlar da kayıtlıdır, yani taban 500
+x 10. Kullanıcı A'ya film tavsiyesi üretmek için onun vektörünü alırım
+tüm tabanı tarayıp ona en yakın kişileri bulurum ve A'nın seyretmediği
+ama bu kişilerin seyredip beğendiği (4, 5 not verdiği) filmleri
+tavsiye ederim. Bu kadar basit.
 
-Biraz zihin egzersizi yapalım. Bir tavsiye sistemini serviste pür
-dosya kullanarak nasıl yazarız?
-
-Tavsiye sistemlerinin en basit şekli kullanıcı yakınlığı
-bulmak. Tabanda 10 tane film varsa kullanıcı A belki üçünü seyretti,
-not verdi, bu bize 1 x 10 vektörü sağlar vektör içeriği
-`[0 0 4 0 5 2 ... 0]` diye gidebilir.  Taban verisinde 500 tane
-farklı seyirci olabilir, onların verdiği notlar da kayıtlıdır,
-yani taban 500 x 10. Kullanıcı A'ya film tavsiyesi üretmek için
-onun vektörünü alırım tüm tabanı tarayıp ona en yakın kişileri
-bulurum ve A'nın seyretmediği ama bu kişilerin seyredip beğendiği
-(4, 5 not verdiği) filmleri tavsiye ederim. Bu kadar basit.
-
-Şimdi rakamları büyütelim; tabanda 150,000 kişi olabilir, film sayısı
-60,000. Yani sadece tek kişinin beğeni vektörü 1 x 60K olacak ve bu vektörün
-150K kişiye yakınlığı hesaplanacak! Büyük rakamlar. Javascript ->
-Statik mimarisinde tarayıcıya bir şeyler göndermek lazım, ama ne göndereceğiz?
-
-Tüm tabanı, yani 150K x 60K büyüklüğünde bir matrisi
+Rakamları büyütelim; tabanda 150,000 kişi olabilir, film sayısı
+60,000. Yani sadece tek kişinin beğeni vektörü 1 x 60K olacak ve bu
+vektörün 150K kişiye yakınlığı hesaplanacak! Zor iş. Javascript ->
+Statik mimarisinde tarayıcıya bir şeyler göndermek lazım, ne
+göndereceğiz? Tüm tabanı, yani 150K x 60K büyüklüğünde bir matrisi
 gönderemeyiz. Movielens verisi bu ölçülerde, ve beğeni matrisi her ne
 kadar seyrek olsa da (her kullanıcı her filmi seyretmemiş, ve o
-değerler tabana dahil edilmiyor) bu hala 300 MB büyüklüğünde bir dosya.
+değerler tabana dahil edilmiyor) bu hala 300 MB büyüklüğünde bir
+dosya.
 
 Tabanı parçalara bölmek için bir yapay öğrenim tekniği kullanırız,
 mesela K-Means küme bulma tekniği. Geliştirme ortamında yerel dosya

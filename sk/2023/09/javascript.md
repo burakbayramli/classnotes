@@ -27,6 +27,67 @@ alert
 console.log(text)
 
 
+Cache
+
+You can click the settings icon on top right corner ... | More Tools |
+Developer Tools | Network | Disable cache (while DevTools is open)
+
+
+### Temel Gorsel Islemler
+
+document.getElementById
+
+.innerText
+
+.innerHTML
+
+### JSON
+
+
+var json1 =  '{ "key1": "val1", "key2": "value2" }';
+var json2 =  '[2,3,4,5]';
+
+json1 = JSON.parse(json1);
+json2 = JSON.parse(json2);
+
+console.log(json1['key1']);
+console.log(json2[2]);
+
+var l1 = [1,2,3,4];
+text = "";
+for (let i = 0; i < l1.length; i++) {
+  text += l1[i] + "<br>";
+}
+
+console.log(text);
+
+
+
+### Cookie
+
+
+  <script>
+
+    function add_movie() {
+      if (document.cookie.length < 1) {
+         document.cookie = "[]"
+      }
+      res = document.getElementById("myInput").value;
+      cook = JSON.parse(document.cookie);
+      cook.push(res);
+      alert(cook);
+      document.cookie = JSON.stringify(cook);
+    }
+   
+</script>
+
+<form autocomplete="off">
+  <div class="autocomplete" style="width:300px;">
+    <input id="myInput" type="text" name="myCountry" placeholder="Movie">
+    <p><button onclick="add_movie()">Add</button></p>
+  </div>
+</form>
+
 
 ### XMLHttpRequest
 
@@ -86,17 +147,6 @@ function foo() {
 </html>
 
 
-
-function fetch_movie_data() {
-
-    url = "http://192.168.43.49:5000/static/recom/movie_title_int.json";
-    return fetch(url)
-        .then((response) => { if(response.ok)  return response.json(); })
-        .then((json) => {
-            const out = json
-            return out;
-        });
-}
 
 function autocomplete(inp) {
 
@@ -170,6 +220,22 @@ function autocomplete(inp) {
 
 autocomplete(document.getElementById("myInput"));
 
+### Node
+
+```
+sudo apt install nodejs
+```
+
+```
+node code1.js
+```
+
+const fs = require('fs')
+
+file = fs.readFileSync(path1, 'utf8');
+const means = JSON.parse(file);
+
+
 
 
 
@@ -186,4 +252,5 @@ autocomplete(document.getElementById("myInput"));
 
 Kaynaklar
 
-[1] https://www.w3schools.com/howto/howto_js_autocomplete.asp  
+[1] https://www.w3schools.com/howto/howto_js_autocomplete.asp
+
