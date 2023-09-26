@@ -75,7 +75,7 @@ console.log(text);
 
 ### Cookie
 
-
+```html
   <script>
 
     function add_movie() {
@@ -97,14 +97,92 @@ console.log(text);
     <p><button onclick="add_movie()">Add</button></p>
   </div>
 </form>
+```
+
+```python
+from flask import Flask, url_for, jsonify, request
+import sys, os, sqlite3
+
+app = Flask(__name__)
+
+db = {"a": "ali", "v": "veli"}
+
+@app.route('/get', methods=["PUT", "POST"])
+def get():    
+    data = request.get_json(force=True)   
+    key = data['key']    
+    return jsonify({'result': db[key]})
+
+@app.route('/set', methods=["PUT", "POST"])
+def set():    
+    data = request.get_json(force=True)   
+    key = data['key']
+    value = data['value']
+    db[key] = value
+    print ("new db", db)
+    return jsonify({'result': "OK"})
+
+if __name__ == "__main__":
+    app.run(host="localhost", port=8080)   
+```
+
 
 
 ### XMLHttpRequest
 
+Statik Dosya
+
+```
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.open( "GET", url = 'http://192.168.43.49:5000/static/recom/test2.csv', false ); 
 xmlHttp.send( null );
 document.getElementById("output").innerText = xmlHttp.responseText
+```
+
+Ajax
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  </head>
+  <script>
+  function set(key, val) {
+
+    url = "http://localhost:8080/set";
+    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+    xmlhttp.open("POST", url, false);
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.send(JSON.stringify({ "key": key, "value": val }));
+  }
+
+  function get(key) {
+    url = "http://localhost:8080/get";
+    const xhr = new XMLHttpRequest()
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const response = JSON.parse(xhr.responseText)
+        console.log(response)
+      }
+    }
+
+    xhr.open('POST', url)
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhr.send(JSON.stringify({"key": key}))
+  }
+  
+  function foo() {
+      //set("ah","ahmet");
+      //get("a");
+      get("v");
+  }
+
+  
+</script>
+    
+  <body onload="foo()">
+  </body>
+  
+</html>
 
 
 ### Girdi Tamamlamak (Autocomplete)
