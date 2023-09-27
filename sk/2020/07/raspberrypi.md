@@ -111,7 +111,7 @@ Wifi üzerinden bu bağlantı işliyor çünkü aynı hotspot'a bağlandıysak
 aynı network'un içindeyiz demektir ve aynı network içinde makinalar
 birbirlerini bulabilirler.
 
-Eğer başlangıçta masaüstü başlatılmasın istiyorsak `raspı-config` deriz
+Eğer başlangıçta masaüstü başlatılmasın istiyorsak `raspi-config` deriz
 ve alttaki seçimleri yapınca 
 
 [ekran 1](https://www.digikey.com/-/media/MakerIO/Images/blogs/2018/How%20to%20Boot%20to%20Command%20Line%20and%20SSH%20on%20Raspberry%20Pi/Fig-3.jpg)

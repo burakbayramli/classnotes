@@ -1,11 +1,29 @@
 # Javascript
 
+Tamamen istemci, tarayıcı üzerinde işleyen kodlara ihtiyaç varsa Javascript
+kodlaması yaparız. Javascript kodları HTML içine bile gömülebilir, ve
+bu kodlar içinde olduğu HTML öğelerine erisebilirler. Bu sayede Uygulama/Web
+servisi bağlanana serviste üretilmiş bir HTML göndermiş olsa bile hala
+o HTML üzerinde değişiklik yapılabilir. Bir girdi kutusuna girilen bilgi
+yeni bir liste yaratılmasını sağlayabilir mesela, her türlü ekleme, çıkarma,
+düzeltme işlemi kullanıcı tarafında halledilebilir.
 
 ### Gelistirme Ortami
 
+Javascript geliştirme her zaman bir uygulama servisi gerektirmeyebilir
+sonuçta bir HTML kodlanıyor ve bu kodlar tarayıcıda düz dosya olarak
+yüklenebilirler, fakat daha ileri özellikler için gene de bir servis
+başlatılması iyi olur. Python bilenler için en iyisi Flask, bir `static`
+dizini yaratılabilir, ve düz HTML dosyaları buraya koyulur, ve
+`http://localhost:8080/static/dosya.html` şeklinde erişilebilir.
+
+Javascript ne zaman, nerede yüklenir, nasıl çağrılır? 
+
+Sablon olarak bir HTML suna benzeyebilir,
+
+```html
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="/static/main.css" media="screen" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   </head>
   <script>
@@ -20,17 +38,38 @@
   </body>
   
 </html>
+```
+
+Bu dosyada bir JS fonksiyonunu HTML içine gömdük, bu fonksiyon HTML
+yüklenir yüklenmez çağrılacaktır. Fonksiyon `foo` yu `body onload`
+çengeline takarak bunu yapmış olduk. 
 
 
 alert
 
 console.log(text)
 
-
 Cache
 
 You can click the settings icon on top right corner ... | More Tools |
 Developer Tools | Network | Disable cache (while DevTools is open)
+
+Node
+
+```
+sudo apt install nodejs
+```
+
+```
+node code1.js
+```
+
+```javascript
+const fs = require('fs')
+
+file = fs.readFileSync(path1, 'utf8');
+const means = JSON.parse(file);
+```
 
 
 ### Temel Gorsel Islemler
@@ -43,6 +82,7 @@ document.getElementById
 
 ### Strings
 
+```javascript
 let header = "Templates Literals";
 let tags = ["template literals", "javascript", "es6"];
 let html = `<h2>${header}</h2><ul>`;
@@ -50,10 +90,11 @@ for (const x of tags) {
   html += `<li>${x}</li>`;
 }
 html += `</ul>`;
+```
 
 ### JSON
 
-
+```javascript
 var json1 =  '{ "key1": "val1", "key2": "value2" }';
 var json2 =  '[2,3,4,5]';
 
@@ -70,7 +111,7 @@ for (let i = 0; i < l1.length; i++) {
 }
 
 console.log(text);
-
+```
 
 
 ### Cookie
@@ -132,7 +173,7 @@ if __name__ == "__main__":
 
 Statik Dosya
 
-```
+```javascript
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.open( "GET", url = 'http://192.168.43.49:5000/static/recom/test2.csv', false ); 
 xmlHttp.send( null );
@@ -141,6 +182,7 @@ document.getElementById("output").innerText = xmlHttp.responseText
 
 Ajax
 
+```html
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -183,10 +225,12 @@ Ajax
   </body>
   
 </html>
+```
 
 
 ### Girdi Tamamlamak (Autocomplete)
 
+```html
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -204,13 +248,13 @@ Ajax
   <input type="submit">
 </form>
 
-<script src="test2.js"></script>
+<script src="common.js"></script>
 
 </body>
 </html>
+```
 
-
-
+```javascript
 function autocomplete(inp) {
 
     var arr = ['aa','bb','aaa']
@@ -280,23 +324,8 @@ function autocomplete(inp) {
     });
 }
 
-
 autocomplete(document.getElementById("myInput"));
-
-### Node
-
 ```
-sudo apt install nodejs
-```
-
-```
-node code1.js
-```
-
-const fs = require('fs')
-
-file = fs.readFileSync(path1, 'utf8');
-const means = JSON.parse(file);
 
 
 

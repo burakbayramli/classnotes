@@ -29,12 +29,13 @@ ve kendi tarafında işlemler uygulayıp HTML olarak sunabilir.
 
 Daha fazla neler yapılabilir? İlginç bazı fikirler var, mesela bir
 arkadaş tüm bir SQLite dosyasının pür dosya olarak paylaşılıp müşteri
-tarafından kısmı olarak okunduğu bir mimariyi şurada [2] anlatılıyor.
-Yani teorik olarak 1 Gıgabaytlik bir sqlite taban dosyası pür dosya olarak
-paylaşılabilir, bağlanan onun gerekli kısımlarına noktasal (hızlı)
-erişim yaparak veriyi alır. Sonuçta bir sürücü (driver) kodunun da
-yaptığı bu değil midir? `import sqlite3` diyerek bu tür bir sürücüyü
-kullanıyoruz sürekli, o işlemi network üzerinden yapmak imkansız değil.
+tarafından kısmı olarak okunduğu bir mimari şurada [2] anlatılıyor.
+Yani teorik olarak 1 Gıgabaytlik bir sqlite taban dosyası pür dosya
+olarak paylaşılabilir, bağlanan onun gerekli kısımlarına noktasal
+(hızlı) erişim yaparak veriyi alır. Sonuçta bir sürücü (driver)
+kodunun da yaptığı bu değil midir? `import sqlite3` diyerek bu tür bir
+sürücüyü kullanıyoruz sürekli, o işlemi network üzerinden yapmak
+imkansız değil.
 
 Eğer kendi kısmı erişim kodlarımızı yazmak istersek, başlangıç noktası
 Web'in "kapsam isteği" (range request) standardı olabilir. İnternet'ten
@@ -56,16 +57,16 @@ print (res.text)
 
 Üstteki kodlar aynı dosyanın farklı yerlerini gösterecekler.
 
-Zihin egzersizi: Bir tavsiye sistemini serviste pür dosya kullanarak
-nasıl yazarız? Tavsiye sistemlerinin en basit şekli kullanıcı
-yakınlığı bulmak. Tabanda 10 tane film varsa kullanıcı A belki üçünü
-seyretti, not verdi, bu bize 1 x 10 vektörü sağlar vektör içeriği `[0
-0 4 0 5 2 ... 0]` diye gidebilir.  Taban verisinde 500 tane farklı
-seyirci olabilir, onların verdiği notlar da kayıtlıdır, yani taban 500
-x 10. Kullanıcı A'ya film tavsiyesi üretmek için onun vektörünü alırım
-tüm tabanı tarayıp ona en yakın kişileri bulurum ve A'nın seyretmediği
-ama bu kişilerin seyredip beğendiği (4, 5 not verdiği) filmleri
-tavsiye ederim. Bu kadar basit.
+Bir tavsiye sistemini serviste pür dosya kullanarak nasıl yazarız?
+Tavsiye sistemlerinin en basit şekli kullanıcı yakınlığı
+bulmak. Tabanda 10 tane film varsa kullanıcı A belki üçünü seyretti,
+not verdi, bu bize 1 x 10 vektörü sağlar vektör içeriği `[0 0 4 0 5 2
+... 0]` diye gidebilir.  Taban verisinde 500 tane farklı seyirci
+olabilir, onların verdiği notlar da kayıtlıdır, yani veri 500 x 10
+boyutarında bir matris. Kullanıcı A'ya film tavsiyesi üretmek için
+onun vektörünü alırım tüm tabanı tarayıp ona en yakın kişileri bulurum
+ve A'nın seyretmediği ama bu kişilerin seyredip beğendiği (4, 5 not
+verdiği) filmleri tavsiye ederim. Bu kadar basit.
 
 Rakamları büyütelim; tabanda 150,000 kişi olabilir, film sayısı
 60,000. Yani sadece tek kişinin beğeni vektörü 1 x 60K olacak ve bu
