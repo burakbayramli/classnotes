@@ -8,8 +8,6 @@
 
 [Alternatif Combobox](../../2009/02/alternatif-combobox_08.html)
 
-[WebView ve CSS](../../2010/03/webview-ve-css.html)
-
 [Markdown Bazlı Web Yayıncılığı, Github Pages](../../2020/08/github-pages.html)
 
 [Dropdown Secimi Ile Ayri DIV Gostermek](../../2012/05/dropdown-secimi-ile-ayri-div-gostermek.html)

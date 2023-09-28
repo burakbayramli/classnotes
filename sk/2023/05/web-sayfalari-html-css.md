@@ -263,3 +263,35 @@ ile tanımladık.
 
 ![](web3.jpg)
 
+### Fare Bir Blok Üzerine Gidince Bağlantı Göstermek
+
+Bir metin grubu üzerine gittiğimizde ek aksiyon imkanı gösterilsin istiyor muyuz?
+Alttaki kod faydalı olur,
+
+```html
+<html>
+  <head>
+    <style>
+      .container a {display:none}
+      .container:hover a {display:inline}
+    </style>
+  </head>
+  <body>
+    
+    <br/>
+    <span class="container">
+      fare buraya
+      <a href="https://www.cnn.com">link 1</a>
+      <a href="https://www.google.com">link 2</a>
+    </span>
+
+    <span class="container">
+      sonra buraya
+      <a href="https://www.111.com">link 1</a>
+      <a href="https://www.222.com">link 2</a>
+    </span>
+
+  </body>
+</html>
+```
+
