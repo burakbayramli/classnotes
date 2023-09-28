@@ -27,10 +27,4 @@ Tüm yazılarda görülen kodlar <a href="https://github.com/burakbayramli/class
 https://github.com/burakbayramli/classnotes</a> adresinden
 alınabilir. 
 
-<form action="https://www.google.com/search" class="searchform" method="get" name="searchform" target="_blank">
-  <input name="sitesearch" type="hidden" value="https://burakbayramli.github.io/dersblog">
-  <input autocomplete="on" class="form-controls search" name="q" placeholder="ders notlarını ara" required="required"  type="text">
-  <button class="button" type="submit">Ara</button>        
-</form>
-
 
