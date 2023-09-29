@@ -2,6 +2,8 @@
 
 [Web Sayfaları, HTML ve CSS](../../2023/05/web-sayfalari-html-css.html)
 
+[Javascript](../../2023/09/javascript.html)
+
 [jQuery](../../2010/06/jquery.html)
 
 [Google App Engine](../../2010/03/google-app-engine.html)
