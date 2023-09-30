@@ -44,16 +44,6 @@ Bu dosyada bir JS fonksiyonunu HTML içine gömdük, bu fonksiyon HTML
 yüklenir yüklenmez çağrılacaktır. Fonksiyon `foo` yu `body onload`
 çengeline takarak bunu yapmış olduk. 
 
-Eğer kod işletimi sırasında bazı değerleri log bırakmak açısından düz metin
-olarak basmak istiyorsak, bunu `console.log(..)` ile yapabiliriz. Çıktıları görmek
-için Chrome içinde üst sağ köşede tıklama yapıp `More tools` ve `Developer tools`
-seçimi yaparız. Bu araç tarayıcının sağ kenarında çıkar, üstteki tab içinde
-`Console` seçimi yaparak log çıktılarını görmek mümkündür. 
-
-Bir diğer mesaj basma yöntemi `alert` çağrısı, fakat bu çağrı bir
-diyalog kutusu yaratır, tıklama yapıp kapatmak gerektiği için her
-yerde kullanılmıyor.
-
 Kodlama direk sayfa içine Javascript gömerek, ya da ayrı bir `js`
 dosyasını sayfaya dahil edilerek yapabiliriz. İkinci yöntem kod
 idaresi açısından daha rahattır. HTML içine
@@ -64,7 +54,7 @@ idaresi açısından daha rahattır. HTML içine
 
 koyunca `funcs.js` otomatik olarak dahil edilecektir.
 
-Fakat dikkat, eğer onbellekleme (cache) açık ise, ki olağan durum
+Fakat dikkat, eğer önbellekleme (cache) açık ise, ki olağan durum
 budur, js dosyasında yapılan değişiklikler HTML tarayıcıda tekrar
 yüklense bile etki etmeyebilir, o zaman `Developer tools`, `Network`
 ve oradan `Disable cache` seçimi yapılırsa bu sayfa için önbelleklenme
@@ -72,6 +62,18 @@ kapatılmış olur, kod her seferinde tekrar yüklenir. Tabi Web'de her
 kullanıcının bunu yapmasını bekleyemeyiz, o zaman yeni kod sürümü
 yapacaksak yeni kod için yeni bir js dosya ismi kullanmak bir çözüm
 olabilir.
+
+Log
+
+Eğer kod işletimi sırasında bazı değerleri log bırakmak açısından düz metin
+olarak basmak istiyorsak, bunu `console.log(..)` ile yapabiliriz. Çıktıları görmek
+için Chrome içinde üst sağ köşede tıklama yapıp `More tools` ve `Developer tools`
+seçimi yaparız. Bu araç tarayıcının sağ kenarında çıkar, üstteki tab içinde
+`Console` seçimi yaparak log çıktılarını görmek mümkündür. 
+
+Bir diğer mesaj basma yöntemi `alert` çağrısı, fakat bu çağrı bir
+diyalog kutusu yaratır, tıklama yapıp kapatmak gerektiği için her
+yerde kullanılmıyor.
 
 Node
 
@@ -114,14 +116,26 @@ ile işletince `7` değeri basılacaktır. Dikkat edersek görsel kod içinde ku
 aynı `console.log` çağrısı var, ve bu çağrı otomatik olarak komut satırı ekranına
 çıktıyı basacağını bildi.
 
+Node kodlarından dosya yüklemek bile mümkün,
+
 ```javascript
 const fs = require('fs')
 
-file = fs.readFileSync(path1, 'utf8');
-const means = JSON.parse(file);
+file = fs.readFileSync("/home/user1/dir/dosya.json", 'utf8');
+const res = JSON.parse(file);
 ```
 
-### Cengeller
+Tabii üstteki kod görsel kodlama için uygun değil çünkü tarayıcı içindeki
+Javascript yerel dizindeki dosyalara erisemez, İnternet üzerinden dosya
+okumak için `XMLHttpRequest` gerekir, o konuya geliyoruz, fakat test
+amacıyla üstteki çağrı hala faydalıdır. 
+
+### Çengeller
+
+Javascript fonksiyonları her türlü kullanıcı aksiyonu sayesinde çağrılabilir.
+Mesela bir ÜRL bağlantısına tıklanınca bir fonksiyon çağrılsın istiyorsak
+`a href='#' önclıck='funç2()`...`  diyebiliriz. Diğer pek çok çengel noktası,
+vardır bunlar bir HTML referansından öğrenilebilir.
 
 ### Temel Gorsel Islemler
 
