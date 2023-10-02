@@ -169,14 +169,14 @@ deger = document.getElementById("myInput").value;
 
 ile kutudaki değeri okuyabiliriz.
 
-### Temel Programlama Yapilari, Kapsam
+### Temel Programlama Yapıları, Kapsam
 
-Degisken tanimlarken onlarin kapsamini (scope) iyi bilmek lazim, yani
-degisken hangi bolgelerde tanimlidir, bir bolumde set edilince diger
-yerde gorunebilir mi, deger alimi yapilabilir mi?
+Değişken tanımlarken onların kapsamını (scope) iyi bilmek lazım, yani
+değişken hangi bölgelerde tanımlıdır, bir bölümde set edilince diğer
+yerde görünebilir mi, değer alımı yapılabilir mi?
 
-Javascript';in olagan davranisi eger degisken kapsami tanimlanmamissa, onun
-her yerde (global) kapsami olmasidir. Mesela
+Javascript'in olağan davranışı eğer değişken kapsamı tanımlanmamışsa,
+onun her yerde (global) kapsamı olmasıdır. Mesela
 
 ```javascript
 function func1() {
@@ -200,23 +200,97 @@ değer diğerinde görülebilmiştir.
 
 Diğer kapsamlar `let` ve `var` ile yapılır, bunlardan birincisi
 değişkeni içinde olduğu kapsama sınırlar, diğeri içinde olduğu
-fonksiyona sınırlar. Mesela üstteki kodda `funç1` içinde `let var2 = "bbbbbb"`
-tanımlasam ve `funç2` içinden erişmeye uğraşsam hata mesajı alırım. 
+fonksiyona sınırlar. Mesela üstteki kodda `func1` içinde `let var2 = "bbbbbb"`
+tanımlasam ve `func2` içinden erişmeye uğraşsam hata mesajı alırım. 
 
-
-dict, liste, for, foreach, if, else, 
+Tek anahtar hızlı erişilen sözlük (dictionary) yapısı pek çok diğer dilde
+olduğu gibi Javascript'te de mevcuttur. Yaratmak için direk kod içinde
 
 ```javascript
-let header = "Templates Literals";
-let tags = ["template literals", "javascript", "es6"];
-let html = `<h2>${header}</h2><ul>`;
-for (const x of tags) {
-  html += `<li>${x}</li>`;
-}
-html += `</ul>`;
+d1 = {'a': 3, 'b': 2}
 ```
 
+diyebilirdim, erişmek için `console.log(d1['a']);` çağrısı 3 değerini basacaktır.
+Bir anahtar değer olarak bir liste, bir başka sözlük vs içerebilir. Eğer
+anahtarları gezmek (iterate) istersem,
+
+```javascript
+Object.keys(d1).forEach(function(key) {
+    console.log(key);
+})
+```
+
+Bu anahtarları kullanıp değerleri de alabilirdim muhakkak.
+
+Listeler benzer şekilde direk kod içinde yaratılabilir, bir tane yaratalım,
+ve eski usul C vari bir şekilde onu gezelim,
+
+```javascript
+l1 = [2, 4, 6]
+
+for (let i=0; i<l1.length; i++) {
+    console.log(l1[i]);
+}
+```
+
+Listeleri `forEach` mantigi ile de gezilebilir,
+
+```javascript
+l1.forEach(function(key) {
+    console.log(key);
+})
+```
+
+Koşul komutları `if`, `else` tahmin edilebilecek şekilde ve C, Java da
+olduğu gibi işler.
+
+Metinler (String)
+
+Bir metin yaratmak icin yine direk kod icinde
+
+```javascript
+s1 = "bir kelime";
+```
+
+diyebilirdik. Kelimeye ekler yapmak arti isareti kullanabilir,
+
+```
+s2 = s1 + " arti bir sey";
+```
+
+gibi. Kelimeler üzerine Python'dan tanıdık `split` çağrısı var, mesela
+
+```javascript
+console.log(s2.split(" "));
+```
+
+```
+[ 'bir', 'kelime', 'arti', 'bir', 'sey' ]
+```
+
+Şablon kullanımı için ilginç bir sözdizimi var, 
+
+```javascript
+let header = "baslik";
+
+let html = `<h2>${header}</h2><ul>`;
+
+console.log(html);
+```
+
+Bu kodlar ekrana `html` içindeki değerleri basar ve oradaki
+`${header}` için `header` değişkeninde görülen değer geçirilir. Yani
+`html` içindeki şablonda bir değer doldurması yapıyoruz, bu doldurma
+için geriye tek tırnak (backtick) içinde Javascript'teki değişken
+isimlerini kullanabiliyoruz.
+
 ### JSON
+
+Javascript'in dış dünya ile alışverisi en rahat JSON bazlı yapılır, bu
+sebeple kullanımını bilmek iyi olur. JSON sonuçta bir sözlük, ya da
+listenin metin halidir. Dışarıdan gelen JSON formatındaki metni Javascript'te
+görülebilen ona karşılık olan yapılara çevirmek için `JSON.parse` yapıları
+geri JSON'a çevirmek için `JSON.stringify` kullanılır. 
 
 ```javascript
 var json1 =  '{ "key1": "val1", "key2": "value2" }';
@@ -227,22 +301,45 @@ json2 = JSON.parse(json2);
 
 console.log(json1['key1']);
 console.log(json2[2]);
-
-var l1 = [1,2,3,4];
-text = "";
-for (let i = 0; i < l1.length; i++) {
-  text += l1[i] + "<br>";
-}
-
-console.log(text);
 ```
 
+### Cerez (Cookie) Kullanimi
 
-### Cookie
+Cerezler sitelerin kullanici tarayisina yerel birakabildigi 'bilgi
+kirintilaridir', bilgi notlaridir. Cerezler sayesinde en basit statik
+HTML + Javascript bile kullanicinin o siteye ozel bazi bilgileri kendi
+bilgisayarinda depolamasini saglayabilir. Mesela bir kullanici favori
+filmlerini secer, Javascript o bilgiyi alip bir cereze koyar, sonraki
+ziyaretinde kullanici (bizim kod uzerinden) o cereze erisir, ve
+tarayicisinda o bilgiyi gorur. Boylece site tarafindan hatirlanmis
+olur, bu arayuz tasarimi acisindan iyi bir seydir. 
 
+Javascript ile cerezlere erisim basittir, `document.cookie` ile tum
+cerezi alirim, ona bir deger yazdigimda cerezi degistirmis
+olurum. Tabi belli bir formati takip etmek iyidir, metin icinde ilk
+basta `isim=` tanimlarsak o cereze isim vermis oluyoruz. Sonda bir `;`
+sonrasi `expires=Wed, 05 Aug 2025 23:00:00 UTC` gibi bir tarih vermek
+o cereze bir zamanaşımı veriyor, bu zamandan sonra o cerez gecersiz
+oluyor, siliniyor.
 
+Benim bazı çerez kullanım kalıplarım şunlar, sitemi ziyaret edenlerin
+çerezini kontrol ederim, `document.cookie.length < 1` ile, eğer çerez
+boş ise, hemen bir çerez atarım. Mesela film listesi için
 
+```
+empty = {"movies": {}}
+document.cookie = 'bb=' + JSON.stringify(empty) + '; expires=Wed, 05 Aug 2025 23:00:00 UTC';
+```
 
+Böylece film listesi için bir sözlük yarattım, onun JSON tanımını bir zamanaşımı
+ile çereze koydum. Çerez okurken
+
+```javascript
+var elems = document.cookie.split("=");
+movies = JSON.parse(elems[1]);
+```
+
+diyebilirim.
 
 ### XMLHttpRequest
 
@@ -448,4 +545,6 @@ autocomplete(document.getElementById("myInput"));
 Kaynaklar
 
 [1] https://www.w3schools.com/howto/howto_js_autocomplete.asp
+
+
 
