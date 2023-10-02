@@ -345,14 +345,24 @@ diyebilirim.
 
 Statik Dosya
 
+Uzaktaki bir JSON dosyasını alıp okumak istiyorsak,
+
 ```javascript
+url = "https://www.filanca.com/dir/file1.json";
 var xmlHttp = new XMLHttpRequest();
-xmlHttp.open( "GET", url = 'http://192.168.43.49:5000/static/recom/test2.csv', false ); 
+xmlHttp.open( "GET", url = url, false ); 
 xmlHttp.send( null );
-document.getElementById("output").innerText = xmlHttp.responseText
+var res = JSON.parse(xmlHttp.responseText);
+...
 ```
 
 Ajax
+
+XMLHttpRequest ile Ajax çağrısı yapmak ta mümkündür. Diyelim ki bir
+taban yarattım ona bir servis arayüzü üzerinden iletişim vermek
+istiyorum, `get` ile geçilen anahtar değeri tabanda bakılıp
+döndürülecek, `set` ile verilen değer ve anahtar tabana yazılacak.
+Servis tarafını Flask ile yazalım,
 
 ```python
 from flask import Flask, url_for, jsonify, request
@@ -381,6 +391,7 @@ if __name__ == "__main__":
     app.run(host="localhost", port=8080)   
 ```
 
+HTML/Javascript şöyle olabilir,
 
 ```html
 <html>
@@ -430,6 +441,8 @@ if __name__ == "__main__":
 
 ### Girdi Tamamlamak (Autocomplete)
 
+HTML şöyle,
+
 ```html
 <html>
 <head>
@@ -453,6 +466,8 @@ if __name__ == "__main__":
 </body>
 </html>
 ```
+
+Javascript kodlari `common.js` icinde
 
 ```javascript
 function autocomplete(inp) {
@@ -526,20 +541,6 @@ function autocomplete(inp) {
 
 autocomplete(document.getElementById("myInput"));
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 Kaynaklar
