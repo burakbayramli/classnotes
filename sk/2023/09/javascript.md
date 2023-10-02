@@ -25,13 +25,12 @@ Sablon olarak bir HTML suna benzeyebilir,
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  </head>
+  </head>  
   <script>
-  function foo() {
-      document.getElementById("output").innerText = xmlHttp.responseText      
-  }
-</script>
-    
+    function foo() {
+        document.getElementById("output").innerText = xmlHttp.responseText      
+    }
+  </script>    
   <body onload="foo()">
     <div id="output">
     </div>  
@@ -42,7 +41,11 @@ Sablon olarak bir HTML suna benzeyebilir,
 
 Bu dosyada bir JS fonksiyonunu HTML içine gömdük, bu fonksiyon HTML
 yüklenir yüklenmez çağrılacaktır. Fonksiyon `foo` yu `body onload`
-çengeline takarak bunu yapmış olduk. 
+çengeline takarak bunu yapmış olduk. Çengel derken İngilizce hook
+kavramına atıf yapılıyor, yani beni arama ben seni ararım tekniği, biz
+çağrılmasını istediğimiz fonksiyonu altyapıya veriyoruz, onun ne zaman
+çağrılacağını biz kontrol etmiyoruz, yeri gelince altyapı onu
+çağırıyor.
 
 Kodlama direk sayfa içine Javascript gömerek, ya da ayrı bir `js`
 dosyasını sayfaya dahil edilerek yapabiliriz. İkinci yöntem kod
@@ -57,11 +60,10 @@ koyunca `funcs.js` otomatik olarak dahil edilecektir.
 Fakat dikkat, eğer önbellekleme (cache) açık ise, ki olağan durum
 budur, js dosyasında yapılan değişiklikler HTML tarayıcıda tekrar
 yüklense bile etki etmeyebilir, o zaman `Developer tools`, `Network`
-ve oradan `Disable cache` seçimi yapılırsa bu sayfa için önbelleklenme
-kapatılmış olur, kod her seferinde tekrar yüklenir. Tabi Web'de her
-kullanıcının bunu yapmasını bekleyemeyiz, o zaman yeni kod sürümü
-yapacaksak yeni kod için yeni bir js dosya ismi kullanmak bir çözüm
-olabilir.
+ve oradan `Disable cache` seçimi yapılırsa önbelleklenme kapatılmış
+olur, kod her seferinde tekrar yüklenir. Tabi Web'de her kullanıcının
+bunu yapmasını bekleyemeyiz, o zaman yeni kod sürümü yapacaksak yeni
+kod için yeni bir js dosya ismi kullanmak bir çözüm olabilir.
 
 Log
 
@@ -133,19 +135,74 @@ amacıyla üstteki çağrı hala faydalıdır.
 ### Çengeller
 
 Javascript fonksiyonları her türlü kullanıcı aksiyonu sayesinde çağrılabilir.
-Mesela bir ÜRL bağlantısına tıklanınca bir fonksiyon çağrılsın istiyorsak
-`a href='#' önclıck='funç2()`...`  diyebiliriz. Diğer pek çok çengel noktası,
+Mesela bir URL bağlantısına tıklanınca bir fonksiyon çağrılsın istiyorsak
+`a href='#' onclick='func2()`...`  diyebiliriz. Diğer pek çok çengel noktası,
 vardır bunlar bir HTML referansından öğrenilebilir.
 
-### Temel Gorsel Islemler
+### Temel Görsel İşlemler
 
-document.getElementById
+Javascript icinden HTML sayfasinin gorsel ogelerine erisilebilir demistik,
+bu ogelerden bilgi alinabilir, ve geri bilgi yazilip goruntude degisim
+yapilabilir.
 
-.innerText
+HTML içinde `id=".."` ile işaretlenen etiketlerin, mesela `<div>`
+etiketi olsun, ana objesini kimlik değeri geçerek
+`document.getElementById(..)` ile alabiliriz, sonra bu obje üzerinde
+`.innerText` ile içerik değişimi yapabiliriz. Sadece düz metin değil
+HTML de geçmek mümkündür, bunun için `.innerHTML`.
 
-.innerHTML
+Eger bir metin giris kutusu var ise, kimligi `myInput` olsun,
 
-### Temel Programlama Yapilari
+```
+<form ..>
+   <input id="myInput" type="text" name="myCountry" placeholder="Movie"/>
+   <button onclick="func2()">Ok</button>
+</form>
+```
+
+Düğmeye basılınca bir `funç2()` Javascript çağrısı yapılmasını sağlarız, bu
+fonksiyon içinden
+
+```javascript
+deger = document.getElementById("myInput").value;
+```
+
+ile kutudaki değeri okuyabiliriz.
+
+### Temel Programlama Yapilari, Kapsam
+
+Degisken tanimlarken onlarin kapsamini (scope) iyi bilmek lazim, yani
+degisken hangi bolgelerde tanimlidir, bir bolumde set edilince diger
+yerde gorunebilir mi, deger alimi yapilabilir mi?
+
+Javascript';in olagan davranisi eger degisken kapsami tanimlanmamissa, onun
+her yerde (global) kapsami olmasidir. Mesela
+
+```javascript
+function func1() {
+    console.log('in func1');    
+    var1 = "aaaaaa";
+}
+
+function func2() {
+    console.log('in func2');    
+    console.log(var1);
+}
+
+
+func1();
+
+func2();
+```
+
+script'i işleyince `var1` değeri basılır. Bir fonksiyon içinde tanımlanan
+değer diğerinde görülebilmiştir.
+
+Diğer kapsamlar `let` ve `var` ile yapılır, bunlardan birincisi
+değişkeni içinde olduğu kapsama sınırlar, diğeri içinde olduğu
+fonksiyona sınırlar. Mesela üstteki kodda `funç1` içinde `let var2 = "bbbbbb"`
+tanımlasam ve `funç2` içinden erişmeye uğraşsam hata mesajı alırım. 
+
 
 dict, liste, for, foreach, if, else, 
 
