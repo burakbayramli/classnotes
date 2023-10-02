@@ -3,6 +3,8 @@
 
 ## En Son
 
+2/10 - [Kümeleme (Clustering) ile Tavsiye Sistemi](https://burakbayramli.github.io/dersblog/sk/2023/09/tavsite-sistemi-kumeleme-kmeans-movielens.html)
+
 26/9 - [Tarayıcı ve Statik Dosya Servisi ile Uygulama](https://burakbayramli.github.io/dersblog/sk/2023/09/tarayici-statik-dosya-mimarisi.html)
 
 18/9 - [Statik Sitelerde Arama Motoru](https://burakbayramli.github.io/dersblog/sk/2023/09/statik-web-sitesi-dinamik-arama-full-text-search.html)
@@ -10,8 +12,6 @@
 14/9 - [Javascript Yerine Tarayıcıda Python, PyScript](https://burakbayramli.github.io/dersblog/sk/2023/09/pyscript.html)
 
 6/9 - [Çok Değişkenli Calculus - Ders 29](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_29/ders_29.html)
-
-23/8 - [Poligon, Üçgen Alanı - Ekler](https://burakbayramli.github.io/dersblog/algs/algs_075_enc/poligon_alani_nokta_bulutlari_noktalari_cevreleyen_bolgeler.html)
 
 ## Konular, Referans
 
