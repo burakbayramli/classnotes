@@ -2,7 +2,7 @@
 
 Tavsiye sistemlerini kodlamanın klasik yolu kullanıcı-ürün matrisinde
 (ki matris ögeleri beğeni notunu taşır) arama yapmaktır. Kendi
-beğenilerim bu matris dışında one benzer ama ayrı bir satır olarak
+beğenilerim bu matris dışında ona benzer ama ayrı bir satır olarak
 düşünülebilir, bu satırın tüm kullanıcılara olan mesafesini [2]
 hesaplarım, bana en yakın kullanıcıları bulurum, ve onların en
 beğendiği ürünleri tavsiye alırım.
@@ -19,8 +19,8 @@ yeni kullanıcının bu merkezlere olan mesafesini hesaplarız sadece,
 onların beğenilerini tavsiye olarak veririz.
 
 Örnek veri [1] sitesinden, oradaki `ml-latest-small.zip` verisini
-alacağız.  Daha büyük bir veri seti `ml-25m.zip` içinde. Bazı
-değişimler hala lazım, veri setinde `ratings.csv` dosyası mesela şu
+alacağız.  Daha büyük bir veri seti `ml-25m.zip` içinde. Veride bazı
+önişlemler hala lazım, veri setinde `ratings.csv` dosyası mesela şu
 formatta,
 
 ```
@@ -114,13 +114,13 @@ olacak.
 Ayrıca K-Means'te bir ilk fitilin yakılması, önyükleme (boostrap)
 gerekir, çünkü algoritma verili etiketler üzerinden küme merkezleri,
 verili küme merkezleri üzerinden etiket eşlemesi hesaplar, özyineli
-bir algoritmadir, tabii bu durumda bir yerden başlanılması gerekir,
-çoğu yaklaşım mesela küme merkezlerini rasgele atar. Bu örnekte küme
-merkezi yerine etiket ataması (hangi kullanıcı hangi kümeye ait)
-rasgele yapılırsa daha iyi, çünkü seyrek veri durumunda reel sayılar
-olan küme merkezlerini iyi seçememek mümkün. Belli bir aralıktaki tam
-sayı küme ataması daha basit, `cluster_ass` değişkeninde bu atama
-olacak.
+bir algoritmadir, fakat ilk başlangıçta bu iki bilgide mevcut
+değildir, bu durumda bir yerden başlanılması gerekir, çoğu yaklaşım
+mesela küme merkezlerini rasgele atar. Bu örnekte küme merkezi yerine
+etiket ataması (hangi kullanıcı hangi kümeye ait) rasgele yapılırsa
+daha iyi, çünkü seyrek veri durumunda reel sayılar olan küme
+merkezlerini iyi seçememek mümkün. Belli bir aralıktaki tam sayı küme
+ataması daha basit, `cluster_ass` değişkeninde bu atama olacak.
 
 ```python
 import os, numpy as np, json, pandas as pd
@@ -267,9 +267,9 @@ Ortalamalar
 
 `KMeans1Job` kodunda ortalamalar için her küme için o küme altındaki
 kullanıcıların notları, yani vektörler toplanır, aynı sırada kaç not
-verilmiş olduğu takip edilir, ve toplam not not sayısına
-bölünur. Sıfır ile bölüm tehlikesi var muhakkak, bu durumda özel bir
-bölme çağrısı kullanacağız, `numpy.divide`, bir örnek altta,
+verilmiş olduğu takip edilir, ve toplam not sayısına bölünür. Sıfır
+ile bölüm tehlikesi var muhakkak, bu durumda özel bir bölme çağrısı
+kullanacağız, `numpy.divide`, bir örnek altta,
 
 
 ```python
@@ -313,11 +313,11 @@ gerekir. Sıfır değeri tabii ki bizim seçimlerimiz bağlamında
 "seyredilmemiş" demektir. Fakat Öklitsel mesafe hesaplıyorsam, mesela
 benim üç boyutlu vektörüm x1,y1,z1 ile başka bir x2,y2,z2 vektör
 arasında bu hesap (x1-x2) karesi artı (y1-y2) karesi vs diye devam
-ediyor. Sonra bu toplamın kareköku alınıyor. Fakat eğer bende x filmi
+ediyor. Sonra bu toplamın karekökü alınıyor. Fakat eğer bende x filmi
 seyredilmemişse, yoğun matris bağlamında orada sıfır vardır, ama küme
-merkezine uzaklık hesaplıyorsam bu merkezin x2,y2,z2,.. öğelerinde
-muhakkak bir değer vardır. Bu mevcut değere uzaklık hesaplarsam
-bendeki sıfır değeri mevcut değeri beni uzakmışım gibi
+merkezine uzaklık hesaplıyorsam bu merkezin x2 (ve diğer
+y2,z2).. öğesinde muhakkak bir değer vardır. Bu mevcut değere uzaklık
+hesaplarsam bendeki sıfır değeri mevcut değeri beni uzakmışım gibi
 gösterecektir. Fakat belki o filmi seyretsem belli bir kümenin
 değerine yakın not verirdim, o zaman ona yakın gözükürdüm. Demek ki
 bendeki boş değerler mesafesel olarak problem çıkartabilir. İşte bu
@@ -437,19 +437,25 @@ Out[1]: array([3.375     , 3.75      , 5.        , 3.16666667, 3.        ])
 Uyumlu gözüküyor.
 
 Paralel işletme kısmını ödev bırakıyoruz, burada eklenecek kodların
-genel yaklaşımından bahsedelim.
-
-Ortalama için her paralel işletici kullanıcıların bir kısmını işler,
-ve o kısımla ilgili küme ortalamalarını hesaplar. İki tane süreç iki
-tane K x M ortalama yaratır, o zaman her döngüde paralel süreç
-ortalamaları bitince seri şekilde (paralel değil) bu ortalamaların
-ortalamaları alınır, o döngünün nihai ortalaması bu olur.
+genel yaklaşımından bahsedelim. Ortalama için her paralel işletici
+kullanıcıların bir kısmını işler, ve o kısımla ilgili küme
+ortalamalarını hesaplar. İki tane süreç iki tane K x M ortalama
+yaratır, o zaman her döngüde paralel süreç ortalamaları bitince seri
+şekilde (paralel değil) bu ortalamaların ortalamaları alınır, o
+döngünün nihai ortalaması bu olur.
 
 Küme ataması daha bariz, çünkü zaten kullanıcı bazlı hesaplanan ve
 atanan bir değer, eh bizim paralel yaklaşım da kullanıcı bazlı
 işbölümü yaptığına göre burada tek yapılması gereken paralel atama
 bitince her süreçten gelen sonuçları birleştirmektir, yani ucu uca
 getirip yapıştırmak (concatanate), bu kadar.
+
+Not: K-Means algoritmasi nereden başlanırsa başlansın yakınsama
+yapabilen (convergent) bir algoritmadır, bir optimal noktaya muhakkak
+ulaşır. Fakat bu optimal nokta yerel (local) optima olabilir, genel,
+kullanışlı optima olmayabilir. Bu durumda farklı yerlerden (birkaç
+farklı rasgele noktadan) algoritmaya birkaç kere işletip nereye
+ulaştığına bakmak bir ek yöntem olabilir.
 
 Kaynaklar
 
@@ -460,4 +466,6 @@ Kaynaklar
 [3] <a href="../../../algs/algs_080_kmeans/kmeans_kumeleme_metodu.html">K-Means Kümeleme Metodu</a> 
 
 [4] <a href="../../2022/11/paralel-veri-analizi-istatistik.html">Paralel Veri Analizi, İstatistik</a>
+
+
 
