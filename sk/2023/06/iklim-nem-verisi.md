@@ -128,7 +128,9 @@ Out[1]: 35.12274652837743 <Unit('degree_Celsius')>
 Yani izafi nem 50% (normal) 1000 hPa basıncında 46 derece ölümcül ıslak termometre
 sıcaklığı 35 C'ye geliyor.
 
-Alternatif bir [kod](wetbulb.py),
+Alternatif kodlar [Python](wetbulb.py), [Javascript](wetbulb.js).
+
+Python örneği,
 
 ```python
 import wetbulb
