@@ -12,9 +12,9 @@ düzeltme işlemi kullanıcı tarafında halledilebilir.
 
 Javascript geliştirme her zaman bir uygulama servisi gerektirmeyebilir
 sonuçta bir HTML kodlanıyor ve bu kodlar tarayıcıda düz dosya olarak
-yüklenebilirler, fakat daha ileri özellikler için gene de bir servis
-başlatılması iyi olur. Python bilenler için en iyisi Flask, bir `static`
-dizini yaratılabilir, ve düz HTML dosyaları buraya koyulur, ve
+yüklenebilirler, fakat biz gene de bir servis başlatalım. Python
+bilenler için en iyisi Flask, bir `static` dizini yaratılabilir, ve
+düz HTML dosyaları buraya koyulur, ve
 `http://localhost:8080/static/dosya.html` şeklinde erişilebilir.
 
 Javascript ne zaman, nerede yüklenir, nasıl çağrılır? 
@@ -43,11 +43,11 @@ Bu dosyada bir JS fonksiyonunu HTML içine gömdük, bu fonksiyon HTML
 yüklenir yüklenmez çağrılacaktır. Fonksiyon `foo` yu `body onload`
 çengeline takarak bunu yapmış olduk. Çengel derken İngilizce hook
 kavramına atıf yapılıyor, yani beni arama ben seni ararım tekniği, biz
-çağrılmasını istediğimiz fonksiyonu altyapıya veriyoruz, onun ne zaman
-çağrılacağını biz kontrol etmiyoruz, yeri gelince altyapı onu
-çağırıyor.
+çağrılmasını istediğimiz fonksiyonu altyapıya veriyoruz (çengele
+takıyoruz), onun ne zaman çağrılacağını biz kontrol etmiyoruz, yeri
+gelince altyapı onu çağırıyor.
 
-Kodlamayi direk sayfa içine Javascript gömerek, ya da ayrı bir `js`
+Kodlamayı direk sayfa içine Javascript gömerek, ya da ayrı bir `js`
 dosyasını sayfaya dahil ederek yapabiliriz. İkinci yöntem kod
 idaresi açısından daha rahattır. HTML içine
 
