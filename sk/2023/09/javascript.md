@@ -28,7 +28,7 @@ Sablon olarak bir HTML suna benzeyebilir,
   </head>  
   <script>
     function foo() {
-        document.getElementById("output").innerText = xmlHttp.responseText      
+        document.getElementById("output").innerText = "vs vs vs";
     }
   </script>    
   <body onload="foo()">
@@ -47,23 +47,22 @@ kavramına atıf yapılıyor, yani beni arama ben seni ararım tekniği, biz
 çağrılacağını biz kontrol etmiyoruz, yeri gelince altyapı onu
 çağırıyor.
 
-Kodlama direk sayfa içine Javascript gömerek, ya da ayrı bir `js`
-dosyasını sayfaya dahil edilerek yapabiliriz. İkinci yöntem kod
+Kodlamayi direk sayfa içine Javascript gömerek, ya da ayrı bir `js`
+dosyasını sayfaya dahil ederek yapabiliriz. İkinci yöntem kod
 idaresi açısından daha rahattır. HTML içine
 
 ```
 <script src="funcs.js"></script>
 ```
 
-koyunca `funcs.js` otomatik olarak dahil edilecektir.
-
-Fakat dikkat, eğer önbellekleme (cache) açık ise, ki olağan durum
-budur, js dosyasında yapılan değişiklikler HTML tarayıcıda tekrar
-yüklense bile etki etmeyebilir, o zaman `Developer tools`, `Network`
-ve oradan `Disable cache` seçimi yapılırsa önbelleklenme kapatılmış
-olur, kod her seferinde tekrar yüklenir. Tabi Web'de her kullanıcının
-bunu yapmasını bekleyemeyiz, o zaman yeni kod sürümü yapacaksak yeni
-kod için yeni bir js dosya ismi kullanmak bir çözüm olabilir.
+koyunca `funcs.js` otomatik olarak dahil edilecektir.  Fakat dikkat,
+eğer tarayıcı önbelleklemesi (cache) açık ise, ki olağan durum budur,
+js dosyasında yapılan değişiklikler HTML tarayıcıda tekrar yüklense
+bile etki etmeyebilir, o zaman `Developer tools`, `Network` ve oradan
+`Disable cache` seçimi yapılırsa önbelleklenme kapatılmış olur, kod
+her seferinde tekrar yüklenir. Tabi Web'de her kullanıcının bunu
+yapmasını bekleyemeyiz, o zaman yeni kod sürümü yapacaksak yeni kod
+için yeni bir js dosya ismi kullanmak bir çözüm olabilir.
 
 Log
 
@@ -141,9 +140,9 @@ vardır bunlar bir HTML referansından öğrenilebilir.
 
 ### Temel Görsel İşlemler
 
-Javascript icinden HTML sayfasinin gorsel ogelerine erisilebilir demistik,
-bu ogelerden bilgi alinabilir, ve geri bilgi yazilip goruntude degisim
-yapilabilir.
+Javascript içinden HTML sayfasının görsel öğelerine erişilebilir
+demiştik, bu öğelerden bilgi alınabilir, ve geri bilgi yazılıp
+görüntüde değişim yapılabilir.
 
 HTML içinde `id=".."` ile işaretlenen etiketlerin, mesela `<div>`
 etiketi olsun, ana objesini kimlik değeri geçerek
@@ -160,7 +159,7 @@ Eger bir metin giris kutusu var ise, kimligi `myInput` olsun,
 </form>
 ```
 
-Düğmeye basılınca bir `funç2()` Javascript çağrısı yapılmasını sağlarız, bu
+Düğmeye basılınca bir `func2()` Javascript çağrısı yapılmasını sağlarız, bu
 fonksiyon içinden
 
 ```javascript
@@ -195,8 +194,9 @@ func1();
 func2();
 ```
 
-script'i işleyince `var1` değeri basılır. Bir fonksiyon içinde tanımlanan
-değer diğerinde görülebilmiştir.
+script'i işleyince `func1` içinde set edilen `var1` değeri
+basılır. Bir fonksiyon içinde tanımlanan değer diğerinde
+görülebilmiştir.
 
 Diğer kapsamlar `let` ve `var` ile yapılır, bunlardan birincisi
 değişkeni içinde olduğu kapsama sınırlar, diğeri içinde olduğu
@@ -210,8 +210,8 @@ olduğu gibi Javascript'te de mevcuttur. Yaratmak için direk kod içinde
 d1 = {'a': 3, 'b': 2}
 ```
 
-diyebilirdim, erişmek için `console.log(d1['a']);` çağrısı 3 değerini basacaktır.
-Bir anahtar değer olarak bir liste, bir başka sözlük vs içerebilir. Eğer
+diyebilirdim, erişmek için `d1['a']` çağrısı 3 değerini verir. Sözlük
+değeri olarak bir liste, bir başka sözlük te kullanabilirdik. Eğer
 anahtarları gezmek (iterate) istersem,
 
 ```javascript
@@ -233,7 +233,7 @@ for (let i=0; i<l1.length; i++) {
 }
 ```
 
-Listeleri `forEach` mantigi ile de gezilebilir,
+Listeler de `forEach` tekniği ile gezilebilir,
 
 ```javascript
 l1.forEach(function(key) {
@@ -289,8 +289,8 @@ isimlerini kullanabiliyoruz.
 Javascript'in dış dünya ile alışverisi en rahat JSON bazlı yapılır, bu
 sebeple kullanımını bilmek iyi olur. JSON sonuçta bir sözlük, ya da
 listenin metin halidir. Dışarıdan gelen JSON formatındaki metni Javascript'te
-görülebilen ona karşılık olan yapılara çevirmek için `JSON.parse` yapıları
-geri JSON'a çevirmek için `JSON.stringify` kullanılır. 
+görülebilen ona karşılık olan yapılara çevirmek için `JSON.parse`, yapıları
+geri JSON metnine çevirmek için `JSON.stringify` kullanılır. 
 
 ```javascript
 var json1 =  '{ "key1": "val1", "key2": "value2" }';
@@ -303,23 +303,24 @@ console.log(json1['key1']);
 console.log(json2[2]);
 ```
 
-### Cerez (Cookie) Kullanimi
+### Çerez (Cookie) Kullanımı
 
-Cerezler sitelerin kullanici tarayisina yerel birakabildigi 'bilgi
-kirintilaridir', bilgi notlaridir. Cerezler sayesinde en basit statik
-HTML + Javascript bile kullanicinin o siteye ozel bazi bilgileri kendi
-bilgisayarinda depolamasini saglayabilir. Mesela bir kullanici favori
-filmlerini secer, Javascript o bilgiyi alip bir cereze koyar, sonraki
-ziyaretinde kullanici (bizim kod uzerinden) o cereze erisir, ve
-tarayicisinda o bilgiyi gorur. Boylece site tarafindan hatirlanmis
-olur, bu arayuz tasarimi acisindan iyi bir seydir. 
+Çerezler sitelerin kullanıcı tarayışına yerel bırakabildiği 'bilgi
+kırıntılarıdır', bilgi notlarıdır. Çerezler sayesinde en basit statik
+HTML + Javascript bile kullanıcının o siteye özel bazı bilgileri kendi
+bilgisayarında depolamasını sağlayabilir. Mesela bir kullanıcı favori
+filmlerini seçer, Javascript o bilgiyi alıp bir çereze koyar, sonraki
+ziyaretinde kullanıcı (bizim kod üzerinden) o çereze erişir, ve
+tarayıcısında o bilgiyi görür. Böylece site tarafından hatırlanmış
+olur, bu arayüz tasarımı açısından iyi bir şeydir. 
 
-Javascript ile cerezlere erisim basittir, `document.cookie` ile tum
-cerezi alirim, ona bir deger yazdigimda cerezi degistirmis
-olurum. Tabi belli bir formati takip etmek iyidir, metin icinde ilk
-basta `isim=` tanimlarsak o cereze isim vermis oluyoruz. Sonda bir `;`
-sonrasi `expires=Wed, 05 Aug 2025 23:00:00 UTC` gibi bir tarih vermek
-o cereze bir zamanaşımı veriyor, bu zamandan sonra o cerez gecersiz
+Javascript ile çerezlere erişim basittir, `document.cookie` ile
+kodladığım, kullanıcının ziyaret etmekte olduğu tüm çerezleri
+alabilirim, bu degiskene bir değer yazdığımda çerezi değiştirmiş
+olurum. Tabi belli bir formatı takip etmek iyidir, metin içinde ilk
+başta `isim=` tanımlarsak o çereze isim vermiş oluyoruz. Sonda bir `;`
+sonrası `expires=Wed, 05 Aug 2025 23:00:00 UTC` gibi bir tarih vermek
+o çereze bir zamanaşımı veriyor, bu zamandan sonra o çerez geçersiz
 oluyor, siliniyor.
 
 Benim bazı çerez kullanım kalıplarım şunlar, sitemi ziyaret edenlerin
@@ -441,7 +442,9 @@ HTML/Javascript şöyle olabilir,
 
 ### Girdi Tamamlamak (Autocomplete)
 
-HTML şöyle,
+Javascript'in kabiliyetlerini göstermek açısından alttaki kod faydalı olur,
+giriş kutusuna girilen birkaç kelime sonrası gerisini tamamlama amaçlı seçenek
+listesi veren (autocomplete) kodu altta görülüyor.
 
 ```html
 <html>
