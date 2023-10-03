@@ -1,21 +1,22 @@
 # Javascript
 
-Tamamen istemci, tarayıcı üzerinde işleyen kodlara ihtiyaç varsa Javascript
-kodlaması yaparız. Javascript kodları HTML içine bile gömülebilir, ve
-bu kodlar içinde olduğu HTML öğelerine erisebilirler. Bu sayede Uygulama/Web
-servisi bağlanana serviste üretilmiş bir HTML göndermiş olsa bile hala
-o HTML üzerinde değişiklik yapılabilir. Bir girdi kutusuna girilen bilgi
-yeni bir liste yaratılmasını sağlayabilir mesela, her türlü ekleme, çıkarma,
-düzeltme işlemi kullanıcı tarafında halledilebilir.
+Tamamen istemci, tarayıcı üzerinde işleyen kodlara ihtiyaç varsa
+Javascript kodlaması yaparız. Javascript kodları HTML içine bile
+gömülebilir, ve bu kodlar içinde olduğu HTML öğelerine
+erisebilirler. Bu sayede servis tarafında üretilmiş bir HTML
+gönderilmiş olsa bile hala o HTML üzerinde değişiklik yapılabilir. Bir
+girdi kutusuna girilen bilgi yeni bir liste yaratılmasını sağlayabilir
+mesela, her türlü ekleme, çıkarma, düzeltme işlemi kullanıcı tarafında
+halledilebilir. 
 
 ### Geliştirme Ortamı
 
 Javascript geliştirme her zaman bir uygulama servisi gerektirmeyebilir
 sonuçta bir HTML kodlanıyor ve bu kodlar tarayıcıda düz dosya olarak
-yüklenebilirler, fakat biz gene de bir servis başlatalım. Python
+yüklenebilirler, fakat biz gene de bir tane başlatalım. Python
 bilenler için en iyisi Flask, bir `static` dizini yaratılabilir, ve
-düz HTML dosyaları buraya koyulur, ve
-`http://localhost:8080/static/dosya.html` şeklinde erişilebilir.
+düz HTML dosyaları buraya koyulur, ve `http://localhost:8080/static/dosya.html`
+şeklinde erişilebilir.
 
 Javascript ne zaman, nerede yüklenir, nasıl çağrılır? 
 
@@ -359,11 +360,15 @@ var res = JSON.parse(xmlHttp.responseText);
 
 Ajax
 
-XMLHttpRequest ile Ajax çağrısı yapmak ta mümkündür. Diyelim ki bir
-taban yarattım ona bir servis arayüzü üzerinden iletişim vermek
-istiyorum, `get` ile geçilen anahtar değeri tabanda bakılıp
-döndürülecek, `set` ile verilen değer ve anahtar tabana yazılacak.
-Servis tarafını Flask ile yazalım,
+XMLHttpRequest ile Ajax çağrısı yapmak ta mümkündür. İlk kez bu
+noktada bir pür uygulama servisi özelliği kullanacağız yani işlem
+kodlarının servis tarafında olduğu türden, üç katmanlı (three-tier)
+mimarinin orta katmanının gerekli olduğu yapı.
+
+Diyelim ki bir taban yarattım (üçüncü katman) ona bir servis arayüzü
+üzerinden iletişim vermek istiyorum, `get` ile geçilen anahtar değeri
+tabanda bakılıp döndürülecek, `set` ile verilen değer ve anahtar
+tabana yazılacak.  Servis tarafını Flask ile yazalım,
 
 ```python
 from flask import Flask, url_for, jsonify, request
@@ -439,6 +444,45 @@ HTML/Javascript şöyle olabilir,
 </html>
 ```
 
+### Tarih Objeleri
+
+Tarih objesi yaratmak için en rahat yöntem,
+
+```javascript
+dt1 = new Date("2022-03-25");
+console.log(dt1);
+```
+
+```
+2022-03-25T00:00:00.000Z
+```
+
+Eğer yıl, ay, gün ayrı ayrı geçmek istersek biraz takla lazım, ay
+sıfır indisli, gün değil, alttaki gibi oluyor,
+
+```javascript
+dt1 = new Date(2022, 3-1, 25+1);
+```
+
+Bir tarihe gün ekleyip yeni tarih elde etmek için
+
+```javascript
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+dt2 = dt1.addDays(20);
+```
+
+İki tarih arası gün farkı
+
+```javascript
+diff = dt2.getTime() - dt1.getTime();
+
+step = diff / (1000*60*60*24);
+```
 
 ### Girdi Tamamlamak (Autocomplete)
 
