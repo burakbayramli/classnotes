@@ -136,7 +136,7 @@ amacıyla üstteki çağrı hala faydalıdır.
 
 Javascript fonksiyonları her türlü kullanıcı aksiyonu sayesinde çağrılabilir.
 Mesela bir URL bağlantısına tıklanınca bir fonksiyon çağrılsın istiyorsak
-`a href='#' onclick='func2()`...`  diyebiliriz. Diğer pek çok çengel noktası,
+`a href='#' onclick='func2()`...`  diyebiliriz. Diğer pek çok çengel noktası
 vardır bunlar bir HTML referansından öğrenilebilir.
 
 ### Temel Görsel İşlemler
@@ -151,7 +151,7 @@ etiketi olsun, ana objesini kimlik değeri geçerek
 `.innerText` ile içerik değişimi yapabiliriz. Sadece düz metin değil
 HTML de geçmek mümkündür, bunun için `.innerHTML`.
 
-Eger bir metin giris kutusu var ise, kimligi `myInput` olsun,
+Eğer bir metin giriş kutusu var ise, kimliği `myInput` olsun,
 
 ```
 <form ..>
@@ -204,8 +204,9 @@ değişkeni içinde olduğu kapsama sınırlar, diğeri içinde olduğu
 fonksiyona sınırlar. Mesela üstteki kodda `func1` içinde `let var2 = "bbbbbb"`
 tanımlasam ve `func2` içinden erişmeye uğraşsam hata mesajı alırım. 
 
-Tek anahtar hızlı erişilen sözlük (dictionary) yapısı pek çok diğer dilde
-olduğu gibi Javascript'te de mevcuttur. Yaratmak için direk kod içinde
+Anahtar bazlı hızlı erişilebilen sözlük (dictionary) yapısı pek çok
+diğer dilde olduğu gibi Javascript'te de mevcuttur. Yaratmak için
+direk kod içinde
 
 ```javascript
 d1 = {'a': 3, 'b': 2}
@@ -213,7 +214,7 @@ d1 = {'a': 3, 'b': 2}
 
 diyebilirdim, erişmek için `d1['a']` çağrısı 3 değerini verir. Sözlük
 değeri olarak bir liste, bir başka sözlük te kullanabilirdik. Eğer
-anahtarları gezmek (iterate) istersem,
+tüm anahtarları gezmek (iterate) istersem,
 
 ```javascript
 Object.keys(d1).forEach(function(key) {
@@ -289,9 +290,12 @@ isimlerini kullanabiliyoruz.
 
 Javascript'in dış dünya ile alışverisi en rahat JSON bazlı yapılır, bu
 sebeple kullanımını bilmek iyi olur. JSON sonuçta bir sözlük, ya da
-listenin metin halidir. Dışarıdan gelen JSON formatındaki metni Javascript'te
-görülebilen ona karşılık olan yapılara çevirmek için `JSON.parse`, yapıları
-geri JSON metnine çevirmek için `JSON.stringify` kullanılır. 
+listenin metin halidir. Tabii sözluk içinde sözlük, onun içinde liste
+gibi istenildiği kadar çetrefil yapılari taşıyabilir bu sebeple
+kuvvetli bir temsil şeklidir. Dışarıdan gelen JSON formatındaki metni
+Javascript'te görülebilen ona karşılık olan yapılara çevirmek için
+`JSON.parse`, yapıları geri JSON metnine çevirmek için
+`JSON.stringify` kullanılır.
 
 ```javascript
 var json1 =  '{ "key1": "val1", "key2": "value2" }';
@@ -306,14 +310,14 @@ console.log(json2[2]);
 
 ### Çerez (Cookie) Kullanımı
 
-Çerezler sitelerin kullanıcı tarayışına yerel bırakabildiği 'bilgi
+Çerezler sitelerin kullanıcı tarayıcısına yerel bırakabildiği 'bilgi
 kırıntılarıdır', bilgi notlarıdır. Çerezler sayesinde en basit statik
 HTML + Javascript bile kullanıcının o siteye özel bazı bilgileri kendi
 bilgisayarında depolamasını sağlayabilir. Mesela bir kullanıcı favori
 filmlerini seçer, Javascript o bilgiyi alıp bir çereze koyar, sonraki
 ziyaretinde kullanıcı (bizim kod üzerinden) o çereze erişir, ve
 tarayıcısında o bilgiyi görür. Böylece site tarafından hatırlanmış
-olur, bu arayüz tasarımı açısından iyi bir şeydir. 
+olur, bu arayüz tasarımı açısından iyi bir şeydir.
 
 Javascript ile çerezlere erişim basittir, `document.cookie` ile
 kodladığım, kullanıcının ziyaret etmekte olduğu tüm çerezleri
@@ -322,19 +326,20 @@ olurum. Tabi belli bir formatı takip etmek iyidir, metin içinde ilk
 başta `isim=` tanımlarsak o çereze isim vermiş oluyoruz. Sonda bir `;`
 sonrası `expires=Wed, 05 Aug 2025 23:00:00 UTC` gibi bir tarih vermek
 o çereze bir zamanaşımı veriyor, bu zamandan sonra o çerez geçersiz
-oluyor, siliniyor.
+oluyor, ondan önce hatırlanıyor. Eğer zamanaşımı verilmezse olağan
+davranış çerezin silinmesidir.
 
-Benim bazı çerez kullanım kalıplarım şunlar, sitemi ziyaret edenlerin
-çerezini kontrol ederim, `document.cookie.length < 1` ile, eğer çerez
-boş ise, hemen bir çerez atarım. Mesela film listesi için
+Bazı çerez kullanım kalıpları şöyle olabilir, siteyi ziyaret edenlerin
+çerezi kontrol edilir, `document.cookie.length < 1` ile, eğer çerez
+boş ise, hemen bir çerez atanır. Mesela alışveriş listesi (cart) için
 
 ```
-empty = {"movies": {}}
+empty = {"cart": {}}
 document.cookie = 'bb=' + JSON.stringify(empty) + '; expires=Wed, 05 Aug 2025 23:00:00 UTC';
 ```
 
-Böylece film listesi için bir sözlük yarattım, onun JSON tanımını bir zamanaşımı
-ile çereze koydum. Çerez okurken
+Böylece alışveriş için bir sözlük yarattım, onun JSON tanımını bir
+zamanaşımı ile çereze koydum. Çerez okurken
 
 ```javascript
 var elems = document.cookie.split("=");
