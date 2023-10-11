@@ -3,6 +3,8 @@
 
 ## En Son
 
+9/10 - [Tavsiye Sistemi: Örnek](https://burakbayramli.github.io/dersblog/sk/2023/09/tavsiye-sistemi-anons.html)
+
 6/10 - [Javascript](https://burakbayramli.github.io/dersblog/sk/2023/09/javascript.html)
 
 2/10 - [Kümeleme (Clustering) ile Tavsiye Sistemi](https://burakbayramli.github.io/dersblog/sk/2023/09/tavsite-sistemi-kumeleme-kmeans-movielens.html)
@@ -10,8 +12,6 @@
 26/9 - [Tarayıcı ve Statik Dosya Servisi ile Uygulama](https://burakbayramli.github.io/dersblog/sk/2023/09/tarayici-statik-dosya-mimarisi.html)
 
 18/9 - [Statik Sitelerde Arama Motoru](https://burakbayramli.github.io/dersblog/sk/2023/09/statik-web-sitesi-dinamik-arama-full-text-search.html)
-
-14/9 - [Javascript Yerine Tarayıcıda Python, PyScript](https://burakbayramli.github.io/dersblog/sk/2023/09/pyscript.html)
 
 ## Konular, Referans
 

@@ -161,6 +161,25 @@ Video
 
 VLC programi ne yazik ki calismiyor. Video icin en iyi bulabildigim
 program Totem programi.
+
+Monitor
+
+Jetson HDMİ üzerinden herhangi bir monitöre bağlanabilir. Fakat bir
+kez 6 inch büyüklüğünde bir ufak monitöre bağladığımda çözünülürlüğün
+düşük seçildiğini farkettim. Çözünülürlüğü komut satırından düzeltmek
+için önce `xrandr` ile monitör ismini bulduk, sonra
+
+```
+xrandr --output HDMI-0 --mode 800x600
+```
+
+ile çözünülürlük değiştirdik. Ekran aydınlık seviyesi bile bu şekilde
+değiştirilebilir,
+
+```
+xrandr --output HDMI-1 --brightness 0.63
+```
+
 Bağlanmak
 
 VNC

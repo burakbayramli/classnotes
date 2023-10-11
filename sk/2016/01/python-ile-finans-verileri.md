@@ -13,12 +13,13 @@ kendimiz yapmamız gerekiyor,
 
 ```
 import pandas as pd, datetime, time
+import urllib.request as urllib2
 from io import BytesIO
 
 end = datetime.datetime.now()
 start=end-datetime.timedelta(days=90)
-start = int(timelib.mktime(start.timetuple()))
-end = int(timelib.mktime(end.timetuple()))
+start = int(time.mktime(start.timetuple()))
+end = int(time.mktime(end.timetuple()))
 
 url = "https://query1.finance.yahoo.com/v7/finance/download/^IXIC?period1=" + str(start) + "&period2=" + str(end) + "&interval=1d&events=history&includeAdjustedClose=true"
 r = urllib2.urlopen(url).read()

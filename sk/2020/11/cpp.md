@@ -101,7 +101,7 @@ olacak,
 print (open("cat.cpp").read().strip())
 ```
 
-```text
+```cpp
 #include <iostream>
 #include <string>
 
@@ -145,7 +145,7 @@ Kedi kodunu kullanmak için bir `main()` yazalım,
 print (open("ex2.cpp").read().strip())
 ```
 
-```text
+```cpp
 #include <iostream>
 #include <string>
 #include "cat.h"
@@ -228,7 +228,6 @@ arar. Bu dosyanın içeriği (üstteki örnek için) şuna benzeyebilir,
 ```
 CC=g++
 CFLAGS=
-LIBS=-lm
 OBJ = cat.o ex2.o
      
 %.o: %.cpp
@@ -266,7 +265,7 @@ haline gelirdi.
 ```
 g++ -c -o cat.o cat.cpp 
 g++ -c -o ex2.o ex2.cpp 
-g++ -o kedi.exe cat.o ex2.o -lm 
+g++ -o kedi.exe cat.o ex2.o  
 ```
 
 görürüz, ve `kedi.exe` yaratılmış olur. Eğer tekrar işletsek,
@@ -277,6 +276,57 @@ make: 'kedi.exe' is up to date.
 
 mesajını görürdük. Temizlik yapmak istersek, `.o`, `.exe` dosyalarını
 silmek için, `make clean` işletebiliriz.
+
+GNU derleyicilerinin birkaç çeşidi var, `g++` mesela arka planda `gcc`
+çağırır, fakat bazı ek seçenekleri otomatik olarak geçiyor
+olabilir. Matematik kütüphanesi `libm.so` otomatik bağlantılanması
+bunlardan biri. Örnek, düz bir C kodu `gcc` derleyip `libm.so` için
+`-lm` verilmeyince ne olacağını görelim,
+
+```cpp
+#include <math.h>
+#include <stdio.h>
+
+int main(void) {
+        float floati, pi;
+        pi= 3.141492653;
+        floati = sinf( pi- 1 );
+        printf ("sine of pi -1 = %f\n", floati);
+        return (0);
+}
+```
+
+```
+CC=gcc
+CFLAGS=
+LIBS=-lm
+OBJ = test1.o
+     
+%.o: %.cpp
+	$(CC)-c -o $@ $< $(CFLAGS)
+
+test1.exe: $(OBJ)
+	$(CC) -o $@ $^ $(LIBS) 
+```
+
+Eger `LIBS=-lm` ibaresi olmasaydi
+
+```
+test1.o: In function `main':
+test1.c:(.text+0x27): undefined reference to `sinf'
+collect2: error: ld returned 1 exit status
+Makefile:10: recipe for target 'test1.exe' failed
+make: *** [test1.exe] Error 1
+```
+
+hatası görülecekti. Yani bir dış kodu kullanmak için başlık (header)
+`.h` dosyasını `#inçlude` ile dahil etmek yeterli değildir, başlıkta
+sadece fonksiyon tanımları vardır, o tanımların gerçek kodunu da
+(implementation) bağlantılama evresinde ana koda bağlamak
+gerekir. Dosyalar `.o`, `.so` ya da `.a` içinde işte bu tür gerçek
+işler kodlar vardır, o kodların çağırılabilmesi için onları bağlamak
+gerekir.
+
 
 Bağlantılar
 
