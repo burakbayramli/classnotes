@@ -284,6 +284,15 @@ console.log(s2.split(" "));
 [ 'bir', 'kelime', 'arti', 'bir', 'sey' ]
 ```
 
+Bir metnin diğeri içinde olup olmadığını kontrol için `inçludes`, mesela
+
+```javascript
+console.log("berber".includes("erb"));
+```
+
+çağrısı `true` döndürür.
+
+
 Şablon kullanımı için ilginç bir sözdizimi var, 
 
 ```javascript
