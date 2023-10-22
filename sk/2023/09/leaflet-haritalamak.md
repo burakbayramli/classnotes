@@ -179,27 +179,28 @@ var map = L.map('map', {
 var control = L.control.layers(base).addTo(map);
 
 path = [[40,31],[41,31],[41,30]];
-  var line = new L.Polyline(path, {
-                     color: 'red', weight: 3, opacity: 0.5, smoothFactor: 1
-      });
-      line.addTo(map);
+var line = new L.Polyline(path, {
+            color: 'red', weight: 3, opacity: 0.5, smoothFactor: 1
+});
+line.addTo(map);
 ```
 
 [HTML](leaf5.html)
 
-# Fayans Servisi
+### Fayans Servisi
 
-Kendi fayans servisimide yazabiliriz.  Leaflet'in arka plandaki fayans
-servisi ile iletişimi direk, temiz bir yaklaşım, `tileLayer` çağrısına
-geçilen parametreler haritanin belli bir parcasına nasıl erişileceğini
-tarif ediyor, bu erişim basit dizin / dosya üzerinden.. Makina ismi
-sonrası z,x,y parametreleri ile bir URL oluşturuyor ve bu URL ile bir
-görüntü dosyası alınıyor, ki ünlü açık veri servisi OSM'nin zaten
-böyle bir servisi var. Adresi https://tile.openstreetmap.org, dosya
-servisinin dizin yapısında en üst dizinde büyüklük seviyesi, onun
-altındaki dizinde x (boylam) dizinleri onun altında y (enlem)
-kordinatına tekabül eden y.png dosyaları var. Bu bizi eğer mesela
-büyüklük seviyesi 4 boylam 11 enlem 7 ise bir
+Kendi fayans servisimizi de yazabiliriz.  Leaflet'in arka plandaki
+fayans servisi ile iletişimi direk, temiz bir yaklaşım, `tileLayer`
+çağrısına geçilen parametreler haritanın belli bir parç3asına nasıl
+erişileceğini tarif ediyor, bu erişim basit dizin / dosya
+üzerinden.. Makina ismi sonrası z,x,y parametreleri ile bir URL
+oluşturuyor ve bu URL ile bir görüntü dosyası alınıyor (250x250
+boyutunda), ki ünlü açık veri servisi OSM'nin zaten böyle bir servisi
+var. Adresi https://tile.openstreetmap.org, dosya servisinin dizin
+yapısında en üst dizinde büyüklük seviyesi, onun altındaki dizinde x
+(boylam) dizinleri onun altında y (enlem) kordinatına tekabül eden
+y.png dosyaları var. Bu bizi eğer mesela büyüklük seviyesi 4 boylam 11
+enlem 7 ise bir
 
 [https://tile.openstreetmap.org/4/11/7.png](https://tile.openstreetmap.org/4/11/7.png)
 
@@ -210,7 +211,7 @@ Fakat arka planda illa bir dosya servisi sart degil, erişim
 parametrelerini bir servis kodu ile 'yakalayarak' kendi fayans
 servisimizi kod ile sağlayabiliriz. Flask ya da herhangi bir REST
 servisi ile makina / parametre1 / parametre2 / parametre3 gibi
-erişimleri parametre olarak işleyebileceğimizi biliyoruz. o zaman önce
+erişimlerin parametrelerini okuyabileceğimizi biliyoruz. o zaman önce
 leaflet'e kendi servis adresimizi veririz,
 
 
@@ -259,16 +260,15 @@ yapısı bu.
 Başlatılınca kullanım herhangi bir leaflet haritası kullanır gibi,
 görüntü olarak bazen daire bazen kare resimleri göreceğiz, hangi
 resmin servis edildiği x,y,zoom parametreleri birleştirilip sayının
-tek/çift olduğuna bakılarak yapılıyor, örnek amaçlı bir yapı
-sadece. Sayı tek ise bir dosya, çift ise diğeri servis
-edilir. Leaflet'in mekanizmasını anlamak açısından faydalı
-olabilir. Profosyonel bir uygulama servise gönderilen x,y,z
-parametrelerini işleyerek bir veri tabanından gerekli bir bilgiyi alıp
-görüntüyü anında yaratıp istemciye verebilir, leaflet bu görüntüleri
-anında yapıştırıp akıcı bir harita tecrübesi yaratabilir. Veri belki
-dağlar, belki nehirler, belki şehir isimleridir, tüm mümkün
-görüntüleri önceden yaratmak yerine belki bu şekilde bir işlem metotu
-daha uygundur. 
+tek/çift olduğuna bakılarak yapılıyor, örnek amaçlı bir kod. Sayı tek
+ise bir dosya, çift ise diğeri servis ediliyor. Leaflet'in
+mekanizmasını anlamak açısından faydalı olabilir. Profosyonel bir
+uygulama servise gönderilen x,y,z parametrelerini işleyerek bir veri
+tabanından gerekli bir bilgiyi alıp görüntüyü yaratıp istemciye
+verebilir, leaflet bu görüntüleri anında yapıştırıp akıcı bir harita
+tecrübesi yaratabilir. Veri belki dağlar, belki nehirler, belki şehir
+isimleridir, tüm mümkün görüntüleri önceden yaratmak yerine belki bu
+şekilde veri bazlı bir işlem metotu daha uygundur.
 
 Kaynaklar
 
