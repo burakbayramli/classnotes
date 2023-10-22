@@ -128,7 +128,7 @@ line.addTo(map);
 Eğer verili noktalar bir poligon oluştursun istiyorsak leaflet bu
 noktaları bir kapalı alan olarak işleyebilir, listedeki son nokta ilk
 nokta ile birleştirilir, ve bizim verdiğimiz bir renk ile doldurulacak
-şekilde bir poligon çizebilir. Üstteki aynı noktaları kullanarak şunu
+şekilde bir poligon çizilir. Üstteki aynı noktaları kullanarak şunu
 yapabilirdik,
 
 ```javascript
@@ -148,8 +148,8 @@ ne olur diye soranlar olabilir, fayda şurada, arka plan olmasa da
 sonradan eklenen çizgiler, noktalar hala büyütme, kaydırma kurallarına
 tabi oluyor, yani tamamen kendimizin yarattığı istenen yerine
 bakılabilen bir ağ yapısını burada çizebiliriz. Mesela ilk akla gelen
-örnek fayans iptal edilir, ve bir JSON dosyasından tüm dünya
-kıtalarının sınırları alınıp çizilir, başka istenen ekler de yapılır,
+örnek, fayans iptal edilir, ve bir JSON dosyasından tüm dünya
+kıtalarının sınırları alınıp çizmek, başka istenen ekler de yapılır,
 böylece kendimizin sıfırdan oluşturduğu bir harita yaratmış oluruz.
 
 Basit bir boş fayans örneği için CSS içine
@@ -189,6 +189,38 @@ path = [[40,31],[41,31],[41,30]];
 
 # Fayans Servisi
 
+Kendi fayans servisimide yazabiliriz.  Leaflet'in arka plandaki fayans
+servisi ile iletişimi direk, temiz bir yaklaşım, `tileLayer` çağrısına
+geçilen parametreler haritanin belli bir parcasına nasıl erişileceğini
+tarif ediyor, bu erişim basit dizin / dosya üzerinden.. Makina ismi
+sonrası z,x,y parametreleri ile bir URL oluşturuyor ve bu URL ile bir
+görüntü dosyası alınıyor, ki ünlü açık veri servisi OSM'nin zaten
+böyle bir servisi var. Adresi https://tile.openstreetmap.org, dosya
+servisinin dizin yapısında en üst dizinde büyüklük seviyesi, onun
+altındaki dizinde x (boylam) dizinleri onun altında y (enlem)
+kordinatına tekabül eden y.png dosyaları var. Bu bizi eğer mesela
+büyüklük seviyesi 4 boylam 11 enlem 7 ise bir
+
+[https://tile.openstreetmap.org/4/11/7.png](https://tile.openstreetmap.org/4/11/7.png)
+
+dosyasına eriştirecektir, mümkün her parametre kombinasyonu için bu
+dosya servisinde imaj dosyaları vardır.
+
+Fakat arka planda illa bir dosya servisi sart degil, erişim
+parametrelerini bir servis kodu ile 'yakalayarak' kendi fayans
+servisimizi kod ile sağlayabiliriz. Flask ya da herhangi bir REST
+servisi ile makina / parametre1 / parametre2 / parametre3 gibi
+erişimleri parametre olarak işleyebileceğimizi biliyoruz. o zaman önce
+leaflet'e kendi servis adresimizi veririz,
+
+
+```javascript
+L.tileLayer('http://localhost:5000/tiles/{z}/{x}/{y}.jpg',...
+```
+
+Ardından servis kodlarımızı yazarız,
+
+
 ```python
 from flask import Flask, send_file
 import os.path
@@ -216,18 +248,33 @@ if __name__ == '__main__':
     app.run(debug=True, host='localhost', port=5000)
 ```
 
-```javascript
-...
-L.tileLayer('http://localhost:5000/tiles/{z}/{x}/{y}.jpg', {
-```
+Kod icin gereken iki imaj altta,
 
 [tile1.jpg](tile1.jpg),[tile2.jpg](tile2.jpg)
 
+Bu dosyalar `index.html` ile bir `static` dizini altına yazılır,
+servis için gereken `app.py` bir üstteki dizindedir, standard Flask
+yapısı bu.
+
+Başlatılınca kullanım herhangi bir leaflet haritası kullanır gibi,
+görüntü olarak bazen daire bazen kare resimleri göreceğiz, hangi
+resmin servis edildiği x,y,zoom parametreleri birleştirilip sayının
+tek/çift olduğuna bakılarak yapılıyor, örnek amaçlı bir yapı
+sadece. Sayı tek ise bir dosya, çift ise diğeri servis
+edilir. Leaflet'in mekanizmasını anlamak açısından faydalı
+olabilir. Profosyonel bir uygulama servise gönderilen x,y,z
+parametrelerini işleyerek bir veri tabanından gerekli bir bilgiyi alıp
+görüntüyü anında yaratıp istemciye verebilir, leaflet bu görüntüleri
+anında yapıştırıp akıcı bir harita tecrübesi yaratabilir. Veri belki
+dağlar, belki nehirler, belki şehir isimleridir, tüm mümkün
+görüntüleri önceden yaratmak yerine belki bu şekilde bir işlem metotu
+daha uygundur. 
+
 Kaynaklar
 
-[1] [Haritalamak](../../2020/02/haritalamak.html)
+[1] <a href="../../2020/02/haritalamak.html">Haritalamak</a>
 
-[2] https://stackoverflow.com/questions/28094649/add-option-for-blank-tilelayer-in-leaflet-layergroup
+[2] <a href="https://stackoverflow.com/questions/28094649/add-option-for-blank-tilelayer-in-leaflet-layergroup">Stackoverflow</a>
 
-[3] https://nithanaroy.medium.com/create-your-own-tile-server-and-map-client-5f7515fff28
+[3] <a href="https://nithanaroy.medium.com/create-your-own-tile-server-and-map-client-5f7515fff28">Medium</a>
 
