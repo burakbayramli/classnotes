@@ -191,7 +191,7 @@ line.addTo(map);
 
 Kendi fayans servisimizi de yazabiliriz.  Leaflet'in arka plandaki
 fayans servisi ile iletişimi direk, temiz bir yaklaşım, `tileLayer`
-çağrısına geçilen parametreler haritanın belli bir parç3asına nasıl
+çağrısına geçilen parametreler haritanın belli bir parçasına nasıl
 erişileceğini tarif ediyor, bu erişim basit dizin / dosya
 üzerinden.. Makina ismi sonrası z,x,y parametreleri ile bir URL
 oluşturuyor ve bu URL ile bir görüntü dosyası alınıyor (250x250
