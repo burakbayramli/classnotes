@@ -146,6 +146,29 @@ C = math.multiply(A, B);
 
 gibi bir kod işletebilirim. Üstte lineer cebir matris çarpım işlemi yapmış olduk.
 
+Eğer kendim dahil edilebilir kodlar yazmak istiyorsam, mesela `util.js` içinde
+bir `add` fonksiyonumun dışarıdan dahil edilebilir olmasını istiyorsam,
+
+```javascript
+function add(x,y) {
+  return x+y;
+}
+function subtract(..,...) {
+  return x-y;
+}
+module.exports = {
+    add: add,
+    subtract: subtract
+};
+```
+
+Artık bu modülü üstteki tarif edildiği gibi dahil edip kullanabilirim,
+
+```
+var u = require("./util.js")
+u.add(...)
+```
+
 ### Çengeller
 
 Javascript fonksiyonları her türlü kullanıcı aksiyonu sayesinde çağrılabilir.
