@@ -249,9 +249,12 @@ direk kod içinde
 d1 = {'a': 3, 'b': 2}
 ```
 
-diyebilirdim, erişmek için `d1['a']` çağrısı 3 değerini verir. Sözlük
-değeri olarak bir liste, bir başka sözlük te kullanabilirdik. Eğer
-tüm anahtarları gezmek (iterate) istersem,
+diyebilirdim, erişmek için `d1['a']` çağrısı 3 değerini verir. Bir
+anahtarın sözlükte olup olmadığını kontrol için `hasOwnProperty`
+çağrısı var.
+
+Sözlük değeri olarak bir liste, bir başka sözlük te
+kullanabilirdik. Eğer tüm anahtarları gezmek (iterate) istersem,
 
 ```javascript
 Object.keys(d1).forEach(function(key) {
