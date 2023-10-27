@@ -310,7 +310,7 @@ console.log(s2.split(" "));
 [ 'bir', 'kelime', 'arti', 'bir', 'sey' ]
 ```
 
-Bir metnin diğeri içinde olup olmadığını kontrol için `inçludes`, mesela
+Bir metnin diğeri içinde olup olmadığını kontrol için `includes`, mesela
 
 ```javascript
 console.log("berber".includes("erb"));
@@ -711,4 +711,7 @@ Kaynaklar
 [1] https://www.w3schools.com/howto/howto_js_autocomplete.asp
 
 [2] https://mathjs.org/download.html
+
+
+
 
