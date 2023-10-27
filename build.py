@@ -72,7 +72,7 @@ def copy_files_and_dirs(fr,to,ignore_list):
         if os.path.exists(x) == False:            
             os.mkdir(x)
 
-    print ('a files not in b')
+    print ('1 a files not in b')
     for (x,size) in frfiles:
         x_to=x.replace(fr,to)
         if x_to in tofilesdict and tofilesdict[x_to] != size: 

@@ -599,6 +599,57 @@ const end = Date.now();
 console.log("Islem zamani: " + (end - start)");
 ```
 
+### Islem Sirasinda Animasyon Gostermek
+
+Uzun sürebilecek işlemler sırasında bir anımasyon GİF göstermek mümkündür.
+Bir teknik şudur, bir `<div>` içine koyulmuş bir anımasyon GİF var,
+bu `<div>` sayfa yüklendiğinde stili `dışplay: nöne;` ile kapalı tutulur,
+yani gösterilmez. İşlem için bir düğmeye basıldığında ilk önce stil
+`block` haline getirilir, yani anımasyon gösterilir, işlem bitince
+anımasyon yine kapatılır.
+
+Burada tek problem üstte sıralanan tüm işlemlerin aynı iş parçacığı
+(thread) içinde olacağı için kapatma/açılma işlemlerinin doğru
+gösterilmemesi. Fakat eğer uzun sürecek işlemi başka bir iş parçacığı
+içine asenkron olarak işletirsek [3], istenen görüntü elde
+edilir. Kullanılan animasyon gif [şurada](busy.gif).
+
+```html
+<head>
+  <script>
+    function longLoop() {
+        let count = 1000000000;
+        let result = 0;
+        for (let i = 1; i <= count; i++) {
+          result = i;
+        }
+        return result;
+    }
+
+    function go() {
+        let spinnerElement = document.getElementById('spinner');
+        let resultElement = document.getElementById('result');
+        spinnerElement.style.display = 'block';
+
+        new Promise(resolve => setTimeout(() => {
+            resolve(longLoop())
+        }))
+      .then((result) => {
+          spinnerElement.style.display = 'none';
+          resultElement.innerHTML = result;   
+      })
+    }
+  </script>
+</head>
+
+<body>
+  <button onclick="go();">Go</button>
+  <span id="result"></span>
+  <img style="display: none;" id="spinner" src="busy.gif">
+  </img>  
+</body>
+```
+
 
 ### Girdi Tamamlamak (Autocomplete)
 
@@ -712,6 +763,4 @@ Kaynaklar
 
 [2] https://mathjs.org/download.html
 
-
-
-
+[3] https://stackoverflow.com/questions/71943182/how-to-show-hide-animated-gif-during-the-execution-of-a-function/71944178#71944178
