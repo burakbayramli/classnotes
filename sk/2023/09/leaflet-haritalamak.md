@@ -141,6 +141,19 @@ poly.addTo(map);
 
 [HTML](leaf6.html)
 
+### Tıklama Adresi
+
+Haritada3 tıklanan yerdeki enlem/boylam kordinalarını almak için
+
+```javascript
+map.on('click', function(e){
+  var coord = e.latlng;
+  var latclick = coord.lat;
+  var lngclick = coord.lng;
+  console.log(latclick,lngclick);
+});
+```
+
 ### Boş Fayans
 
 Arka planı yani fayans kısmını tamamen iptal edebiliriz, bunun faydası
