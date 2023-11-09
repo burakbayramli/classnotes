@@ -4,13 +4,13 @@ Diyelim ki evde ve işte farklı bilgisayarlar var, ama tüm bunları tek
 bir aletten kontrol etmek istiyoruz, bu durumda fare / klavye paylaşım
 yazılımları ise yarayabilir. Artık çoğunlukla herkesin kendi dizüstü
 oluyor, ama işyerinde masaüstü (desktop) verilebiliyor mesela, ama biz
-bu masaüstünü çoğunlukla ona bağlı kuluştur (!) bir klavye üzerinden
+bu masaüstünü çoğunlukla ona bağlı külüstür (!) bir klavye üzerinden
 kullanmak istemiyor olabiliriz. Şahsi olarak zaten not defteri yumuşak
 klavyelerine çok alıştık, ve öteki türden klavye kullanmakta
 zorlanıyoruz.
 
 Çözüm olarak fare / klavye paylaşım araçları faydalı, dikkat -
-masaüstü (desktop) paylaşım araçları değil, mesela VNÇ gibi, fare /
+masaüstü (desktop) paylaşım araçları değil, mesela VNC gibi, fare /
 klavye paylaşım araçları. Masaüstü paylaşımında bir diğer bilgisayara
 girip tamamen onun ekranını başka bir bilgisayarda görüyoruz, ötekinde
 ise bir bilgisayarın sadece kontrollerini bir diğerine
@@ -42,7 +42,7 @@ synergyc -f [master bilgisayar ip adresi]
 
 Master uzerinde Accessories | Quick Synergy baslatiriz, ve
 
-Share tab'ı içinde dev51 yazdık, bu isim bizim /etc/hoşts içinde hedef
+Share tab'ı içinde dev51 yazdık, bu isim bizim /etc/hosts içinde hedef
 bilgisayarının ip'sine tercüme oluyor. Peki bu resimle ne söylemiş
 oluyoruz? Diyoruz ki eğer dizüstünde fareyi hareket ettirirken işaret
 dizüstü ekranından yukarı doğru "taşarsa", synergy bu durumu algılıyor
@@ -69,4 +69,6 @@ gibi "farklı" bir isimde çıkacak ikon üzerinden yapmak. Bunun
 haricinde başka hiçbir ek tanıma gerek yok.
 
 ![](Screenshotfrom2014-04-10161526.png)
+
+
 

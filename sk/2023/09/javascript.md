@@ -599,7 +599,7 @@ const end = Date.now();
 console.log("Islem zamani: " + (end - start)");
 ```
 
-### Islem Sirasinda Animasyon Gostermek
+### İşlem Sırasında Animasyon Göstermek
 
 Uzun sürebilecek işlemler sırasında bir anımasyon GİF göstermek mümkündür.
 Bir teknik şudur, bir `<div>` içine koyulmuş bir anımasyon GİF var,
@@ -764,3 +764,4 @@ Kaynaklar
 [2] https://mathjs.org/download.html
 
 [3] https://stackoverflow.com/questions/71943182/how-to-show-hide-animated-gif-during-the-execution-of-a-function/71944178#71944178
+

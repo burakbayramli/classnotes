@@ -3,15 +3,15 @@
 
 ## En Son
 
+9/11 - [Leaflet ile Sınır Çizimi, Ukrayna](https://burakbayramli.github.io/dersblog/sk/2023/11/ukrayna-sinirlar-leaflet.html)
+
+6/11 - [Haritalama, Nehirler, Göller](https://burakbayramli.github.io/dersblog/sk/2023/08/haritalama-su-kaynaklari-nehirler-goller.html)
+
 29/10 - [Leaflet ile Haritalamak](https://burakbayramli.github.io/dersblog/sk/2023/09/leaflet-haritalamak.html)
 
 9/10 - [Tavsiye Sistemi: Örnek](https://burakbayramli.github.io/dersblog/sk/2023/09/tavsiye-sistemi-anons.html)
 
 6/10 - [Javascript](https://burakbayramli.github.io/dersblog/sk/2023/09/javascript.html)
-
-2/10 - [Kümeleme (Clustering) ile Tavsiye Sistemi](https://burakbayramli.github.io/dersblog/sk/2023/09/tavsite-sistemi-kumeleme-kmeans-movielens.html)
-
-26/9 - [Tarayıcı ve Statik Dosya Servisi ile Uygulama](https://burakbayramli.github.io/dersblog/sk/2023/09/tarayici-statik-dosya-mimarisi.html)
 
 ## Konular, Referans
 
