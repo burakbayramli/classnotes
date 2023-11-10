@@ -61,6 +61,16 @@ En basit leaflet kodu alttaki gibi,
 
 [HTML](leaf1.html)
 
+Farklı fayans servisleri var, üstteki servis her ülkenin şehirlerini
+kendi alfabesi ile veriyor, eğer Latinize edilmiş isimler içeren
+haritalar görmek istiyorsak, Basemap servisinden,
+
+```
+https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png
+```
+
+adresini kullanabiliriz. 
+
 ### İşaretler
 
 Bu haritaya gösterime sunmadan önce bazı ekler yapabiliriz. Mesela
