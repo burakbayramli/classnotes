@@ -180,7 +180,7 @@ değiştirilebilir,
 xrandr --output HDMI-1 --brightness 0.63
 ```
 
-Bağlanmak
+### Bağlanmak
 
 VNC
 
@@ -212,17 +212,32 @@ ayak izi ikonu var, ona tıklayınca orada idareci seçenekleri çıkacak,
 burada Unity seçeriz, ve sisteme böyle gireriz. Servis tarafı böyle
 ayarlanır.
 
-Nihayet müşteri tarafı bağlanmasına geldik, dizüstü bilgisayarında
-benim Ubuntu 18'de `remmina` programı var, bu programa İP adresini
-verip bağlanma metotu olarak VNC seçersek, artık Nano'ya görsel olarak
-bağlanabiliriz.
+Nihayet müşteri tarafı bağlanmasına geldik, Ubuntu 18'de `remmina`
+programı var, bu programa İP adresini verip bağlanma metotu olarak VNC
+seçersek, artık Nano'ya görsel olarak bağlanabiliriz. Android uzerinde
+RealVNC kullanılabilir.
+
+VNC3 durumunda servis tarafında olağan çözünülürlük 640x480 çıkabilir,
+bu yeterli olmaz, alttakini `/etc/X11/xorg.conf` içinde koyarsak,3
+
+```
+Section "Screen"
+  Identifier "Default Screen"
+  Monitor "Configured Monitor"
+  Device "Tegra0"
+  SubSection "Display"
+    Depth 24
+    Virtual 1280 800 
+  EndSubSection
+EndSection
+```
+
+daha detaylı bir masaüstü çıkabilir.
 
 Bir diğer seçenek, aynen Raspberry Pi durumunda olduğu gibi, ufak bir
 elle tutulan HDMI monitör ve dongle'li klavye/mouse donanımı almak, bu
 ikisini direk Nano'ya bağlayınca her şeyi, hiç dizüstünden geçmeden,
-Nano üzerinde yapabiliriz. Nano tek başına oldukca kuvvetli bir
-bilgisayar, eh kendi Ubuntu'su var, tam tekmilli bir bilgisayar olarak
-kullanılabilir.
+Nano üzerinde yapabiliriz.
 
 ### PyCuda
 
