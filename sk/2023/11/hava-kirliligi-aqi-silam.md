@@ -134,7 +134,7 @@ import simplegeomap as sm
 x,y = np.meshgrid(np.linspace(-180,180,600),np.linspace(-90,90,297))
 z = sf.variables['daymax_cnc_PM2_5'][4,0,:,:] 
 
-z = z * 1e8
+pz = z * 1e8
 z = np.log(z)
 
 sm.plot_continents(0, 20, zoom=18, incolor='black', outcolor='white', fill=False)
@@ -148,7 +148,7 @@ plt.savefig('hava1.jpg',pil_kwargs={'quality':40})
 
 Dikkat log ile bir işlem yapmak gerekti çünkü veri lineer olmayan bir
 sürecin sonucu, çok ekstrem değerler var, çoğu yerde çok düşük
-değerler var [3]. Grafikleme amaçlı olarak bu önişlemi yapmak gerekti.
+değerler var [3]. Grafikleme amaçlı olarak bu önişlemi iyi olur.
 
 OWM bir özet AQI hesaplar, SILAM için eldeki bileşenler kullanılarak
 [4] bir AQI hesabı yapılabilir.
