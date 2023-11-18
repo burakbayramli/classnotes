@@ -154,11 +154,11 @@ OWM bir özet AQI hesaplar, SILAM için eldeki bileşenler kullanılarak
 [4] bir AQI hesabı yapılabilir.
 
 
-[1] https://silam.fmi.fi/thredds/catalog/dailysilam_glob06_v5_8/files/catalog.html
+[1] <a href="https://silam.fmi.fi/thredds/catalog/dailysilam_glob06_v5_8/files/catalog.html">Silam Catalog</a>
 
-[2] https://silam.fmi.fi/aqforecast.html
+[2] <a href="https://silam.fmi.fi/aqforecast.html">Silam</a>
 
-[3] https://github.com/fmidev/opendata-resources/blob/master/examples/python/timeseries-airquality.ipynb
+[3] <a href="https://github.com/fmidev/opendata-resources/blob/master/examples/python/timeseries-airquality.ipynb">FMIDev</a>
 
-[4] https://www.health.act.gov.au/about-our-health-system/population-health/environmental-monitoring/air-quality/measuring-air
+[4] <a href="https://www.health.act.gov.au/about-our-health-system/population-health/environmental-monitoring/air-quality/measuring-air">Health Act Gov AU</a>
 
