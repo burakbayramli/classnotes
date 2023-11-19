@@ -88,9 +88,37 @@ Farklı bilgisayarlardaki tus kodlarını almak için `xev` kullanılabilir.
 Dikkat: Touchpad üzerinden sağ tıklama için taam alt köşeden basmak
 lazım. Pek kullanışlı denemez, tuşlarla daha iyi.
 
+Klavye Donanım İptali
+
+Eğer bir kablosuz bir klavyeyi bağlayıp mevcut donanımdaki klavyeyi
+iptal etmek istiyorsak
+
+```
+xinput list
+```
+
+deriz sonuç olarak
+
+```
+...
+    ↳ HD WebCam: HD WebCam                    	id=10	[slave  keyboard (3)]
+    ↳ AT Translated Set 2 keyboard            	id=13	[slave  keyboard (3)]
+    ↳ Acer WMI hotkeys                        	id=14	[slave  keyboard (3)]
+...
+```
+
+gibi bir liste gelir. Bu listede 13 kodu donanım klavyesidir, onu
+iptal etmek için
+
+```
+xinput float 13
+```
+
+bir donanim listesi aliriz, ve gorulen 
+
+
 Ubuntu kurulusu ile pek cok yazilim gelir, Transmission gibi. Alttaki
 paketler ilk işlettiğimiz `apt-get install` listesi,
-
 
 ```
 git chromium-browser emacs xkbset virtualenv texlive-latex-extra
