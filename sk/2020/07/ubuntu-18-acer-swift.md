@@ -88,6 +88,12 @@ Farklı bilgisayarlardaki tus kodlarını almak için `xev` kullanılabilir.
 Dikkat: Touchpad üzerinden sağ tıklama için taam alt köşeden basmak
 lazım. Pek kullanışlı denemez, tuşlarla daha iyi.
 
+Bazı durumlarda sol Windows tuşunun sol alt ile yerini değiştirmek
+istenebilir, bu ve diğer bazı sıradışı tus atamaları için `gnome-tweaks`
+programu `apt ınstall` ile kurulur, program başlatılır, orada `Keyboard and Mouse`
+altından `Additional Layout options` seçilerek oradaki pek çok seçeneklerden
+istenilen aktıve edilir.
+
 Klavye Donanım İptali
 
 Eğer bir kablosuz bir klavyeyi bağlayıp mevcut donanımdaki klavyeyi
