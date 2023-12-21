@@ -85,6 +85,12 @@ xkbset m
 
 Farklı bilgisayarlardaki tus kodlarını almak için `xev` kullanılabilir.
 
+Ayni yaklasimla bazi klavyelerdeki Windows tusunu Alt yapmak isteyenler icin
+
+```
+setxkbmap -option altwin:swap_alt_win
+```
+
 Dikkat: Touchpad üzerinden sağ tıklama için taam alt köşeden basmak
 lazım. Pek kullanışlı denemez, tuşlarla daha iyi.
 
