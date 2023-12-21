@@ -3,6 +3,8 @@
 
 ## En Son
 
+21/12 - [Materyel Mekaniği - 4](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_04/materyel_mekanigi__4.html)
+
 7/12 - [Çok Değişkenli Calculus - Ders 22 - Ekler](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_22/ders_22.html)
 
 17/11 - [Hava Kirliliği, SILAM, AQI](https://burakbayramli.github.io/dersblog/sk/2023/11/hava-kirliligi-aqi-silam.html)
@@ -10,8 +12,6 @@
 9/11 - [Leaflet ile Sınır Çizimi, Ukrayna](https://burakbayramli.github.io/dersblog/sk/2023/11/ukrayna-sinirlar-leaflet.html)
 
 6/11 - [Haritalama, Nehirler, Göller](https://burakbayramli.github.io/dersblog/sk/2023/08/haritalama-su-kaynaklari-nehirler-goller.html)
-
-29/10 - [Leaflet ile Haritalamak](https://burakbayramli.github.io/dersblog/sk/2023/09/leaflet-haritalamak.html)
 
 ## Konular, Referans
 
