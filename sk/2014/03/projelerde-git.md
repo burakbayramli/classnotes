@@ -48,6 +48,12 @@ kod biter bitmez hemen almışız, ve onun üzerinde bizimkini yazmışız
 gibi... Bu durumda da çakışmalar görülebilir muhakkak, onlar varsa
 çözülür; Sonra `git push` daha önce yapıldığı gibi yapılır.
 
+Eger Github'daki depo bizdeki kodlari tamamen ezsin istiyorak,
+
+```
+git reset --hard origin/master
+```
+
 ### Dosyayı Tamamen Silmek
 
 Belki geliştirme dizini içinde geçici dosyalar üretiliyor, ya da şifre
