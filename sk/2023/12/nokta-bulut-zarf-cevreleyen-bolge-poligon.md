@@ -1,6 +1,11 @@
-# Poligon Birlesimi, Çevreleyen Bölge
+# Poligon Birleşimi, Çevreleyen Bölge
 
 Poligon Birleşimi
+
+Bir harita uygulaması için bir poligon grubunun dış çeperini bulmak
+gerekti. Poligonların kestiği bölgeler var, bu bölgeleri dikkate almadan
+tüm poligonların birleşiminin dış sınırını nasıl buluruz? Yardımcı olacak
+kütüphaneler `shapely` ve `geopandaş`.
 
 ```python
 from matplotlib import pyplot as plt
@@ -13,8 +18,17 @@ poly1 = Polygon([(0,0), (2,0), (2,2), (0,2)])
 poly2 = Polygon([(2,2), (4,2), (4,4), (2,4)])
 poly3 = Polygon([(1,1), (3,1), (3,3), (1,3)])
 poly4 = Polygon([(3,3), (5,3), (5,5), (3,5)])
-polys = [poly1, poly2, poly3, poly4]     
+polys = [poly1, poly2, poly3, poly4]
 
+gpd.GeoSeries(polys).boundary.plot()
+plt.savefig('nokta3.jpg')
+```
+
+![](nokta3.jpg)
+
+Birleştirmek için `unary_union` çağrısı yapılır,
+
+```python
 from shapely.ops import unary_union
 
 mergedPolys = unary_union(polys)
@@ -28,6 +42,10 @@ plt.savefig('nokta2.jpg')
 ```
 
 ![](nokta2.jpg)
+
+Not: Çağrıdan geriye tek bir birleşmiş Polygon geliyor. Fakat eğer
+çağrıdan geriye bir liste gelirse her liste içindeki Polygon
+objelerine ayrı ayrı bakılabilir, uygun olanı seçilir.
 
 Üçgenleme, Delanuay (Triangulation)
 
@@ -51,7 +69,7 @@ plt.triplot(points[:,0], points[:,1], tri.simplices)
 plt.savefig('algs_075_enc_12.png')
 ```
 
-[[-]](algs_075_enc_12.png)
+[Grafik](algs_075_enc_12.png)
 
 Kodda \verb!tr.simplicies! icinde gorulen ucgenler kodlanmis, her kenar
 \verb!points! icindeki bir indisi degerine, bir noktaya isaret ediyor.
@@ -112,7 +130,7 @@ plt.triplot(points[:,0], points[:,1], newsimp)
 plt.savefig('algs_075_enc_13.png')
 ```
 
-[[-]](algs_075_enc_13.png)
+[Grafik](algs_075_enc_13.png)
 
 Farklı bir şekle bakalım,
 
@@ -124,7 +142,7 @@ plt.plot(points[:,0],points[:,1],'.')
 plt.savefig('algs_075_enc_14.png')
 ```
 
-[[-]](algs_075_enc_14.png)
+[Grafik](algs_075_enc_14.png)
 
 Bu nokta bulutu üzerinde Delanuay uygularsak,
 
@@ -134,7 +152,7 @@ plt.triplot(points[:,0], points[:,1], tri.simplices)
 plt.savefig('algs_075_enc_15.png')
 ```
 
-[[-]](algs_075_enc_15.png)
+[Grafik](algs_075_enc_15.png)
 
 Bu veride büyük açılı üçgenleri çıkartsak bile hala geriye iç kısımdaki bazı çok
 uzun çizgiler kalacak. Eğer aşırı uzun bağlantıları, çizgileri çıkartırsak belki
@@ -171,9 +189,32 @@ plt.triplot(points[:,0], points[:,1], tri.simplices[mask])
 plt.savefig('algs_075_enc_16.png')
 ```
 
-[[-]](algs_075_enc_16.png)
+[Grafik](algs_075_enc_16.png)
 
 Bu güzel bir şekil oldu.
+
+Alfa Sekilleri (Alpha Shapes)
+
+Bu yaklasim ustteki tarif edilen yontemin literaturdeki yaygin
+kullanilan bir versiyonu, bu yaklasimi kodlayan bir paket `alphashapes`,
+
+```python
+import pandas as pd
+import alphashape
+
+pts=np.array(pd.read_csv("cres.csv"))
+
+plt.plot(pts[:,0],pts[:,1],'r.')
+
+poly = alphashape.alphashape(pts, 0.3)
+    
+c = np.array(poly.exterior.coords)
+plt.plot(c[:,0].T,c[:,1].T)
+
+plt.savefig('nokta4.jpg')
+```
+
+[Grafik](nokta4.jpg)
 
 Dışbükey Zarf (Convex Hull)
 
@@ -201,7 +242,7 @@ plt.xlim(6,12); plt.ylim(8,15)
 plt.savefig('enc_09.png')
 ```
 
-[[-]](enc_09.png)
+[Grafik](enc_09.png)
 
 Bu noktaların dışbükey zarfını (convex hull) bulmak için pek çok algoritma
 var. Mesela Quickhull [1], ya da Graham Scan adlı algoritmalar. Altta
@@ -221,7 +262,7 @@ plt.xlim(6,12); plt.ylim(8,15)
 plt.savefig('enc_01.png')
 ```
 
-[[-]](enc_01.png)
+[Grafik](enc_01.png)
 
 3 boyutlu bir veri için,
 
@@ -250,7 +291,7 @@ ax.set_zlabel('z')
 plt.savefig('enc_08.png')
 ```
 
-[[-]](enc_08.png)
+[Grafik](enc_08.png)
 
 Sonuçlar üstte. Piyasadaki en iyi dışbükey zarf algoritmalarının algoritmik
 karmaşıklığı $O(n \log n)$ olarak biliniyor. Bu bazı uygulamalar için yavaş
@@ -258,4 +299,7 @@ gelebilir, ayrıca çoğu uygulamanın kesin bir dış çeper bilgisine
 ihtiyacı yoktur, yaklaşık bir çeper, kabaca şeklin ne olduğunu bildiren bir
 algoritma da kabul edilir olabilir.
 
+Kaynaklar
+
+[1] https://www.matecdev.com/posts/shapely-merge-polygons.html
 
