@@ -272,7 +272,6 @@ plt.savefig('enc_01.png')
 ```python
 from scipy.spatial import ConvexHull
 from mpl_toolkits.mplot3d import Axes3D
-from scipy.spatial import ConvexHull
 
 np.random.seed(2)
 
@@ -280,7 +279,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 points3 = np.random.rand(20,3)
 hull = ConvexHull(points3)
-edges= zip(*points3)
+edges= list(zip(*points3))
 
 for i in hull.simplices:
     plt.plot(points3[i,0], points3[i,1], points3[i,2], 'r-')
