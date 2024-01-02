@@ -124,7 +124,7 @@ print (tri.simplices)
 
 Temel olarak Delaunay ile yapılan ızgaraları oluşturan üçgenlerin açılarını
 minimum tutmak, içiçe üçgen oluşturmamak ve yakın noktaların birbiri ile
-bağlantılı olmasına uğraşmak [7]. Algoritma bu şartların sonucu olarak görülen
+bağlantılı olmasına uğraşmak [2]. Algoritma bu şartların sonucu olarak görülen
 ızgaraya doğru evrilir.
 
 Fakat bazı ilerlemeler hala mümkün; mesela bir insana sadece ham noktalar
@@ -310,5 +310,5 @@ Kaynaklar
 
 [1] https://www.matecdev.com/posts/shapely-merge-polygons.html
 
-
+[2] https://en.wikipedia.org/wiki/Delaunay_triangulation
 
