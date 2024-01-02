@@ -87,7 +87,7 @@ gereken ızgaralar Delanuay ile yaratılabilir. Noktalar verilir, üçgen bazlı
 ızgara ortaya çıkartılır, bu ızgara hücreleri baz alınarak hesabın gerisi
 işletilir.
 
-Kütüphane \verb!scipy! içinde Delanuay hesabı yapabilen kodlar var.
+Kütüphane `scipy` içinde Delanuay hesabı yapabilen kodlar var.
 
 ```python
 from scipy.spatial import Delaunay
@@ -102,8 +102,8 @@ plt.savefig('algs_075_enc_12.png')
 
 [Grafik](algs_075_enc_12.png)
 
-Kodda \verb!tr.simplicies! icinde gorulen ucgenler kodlanmis, her kenar
-\verb!points! icindeki bir indisi degerine, bir noktaya isaret ediyor.
+Kodda `tr.simplicies` içinde görülen üçgenler kodlanmış, her kenar
+points` içindeki bir indisi değerine, bir noktaya işaret ediyor.
 
 ```python
 print (tri.simplices)
@@ -254,7 +254,7 @@ plt.savefig('enc_09.png')
 
 Bu noktaların dışbükey zarfını (convex hull) bulmak için pek çok algoritma
 var. Mesela Quickhull [1], ya da Graham Scan adlı algoritmalar. Altta
-\verb!scipy!'in çağrısını kullanıyoruz, bu çağrı içinde [2] koduna çağrı
+`scipy` ın çağrısını kullanıyoruz, bu çağrı içinde [2] koduna çağrı
 yapıyor, QHull Quickhull kullanıyor.
 
 ```python
