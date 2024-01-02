@@ -253,8 +253,8 @@ plt.savefig('enc_09.png')
 [Grafik](enc_09.png)
 
 Bu noktaların dışbükey zarfını (convex hull) bulmak için pek çok algoritma
-var. Mesela Quickhull [1], ya da Graham Scan adlı algoritmalar. Altta
-`scipy` ın çağrısını kullanıyoruz, bu çağrı içinde [2] koduna çağrı
+var. Mesela Quickhull [3], ya da Graham Scan adlı algoritmalar. Altta
+`scipy` ın çağrısını kullanıyoruz, bu çağrı içinde [4] koduna çağrı
 yapıyor, QHull Quickhull kullanıyor.
 
 ```python
@@ -311,4 +311,8 @@ Kaynaklar
 [1] https://www.matecdev.com/posts/shapely-merge-polygons.html
 
 [2] https://en.wikipedia.org/wiki/Delaunay_triangulation
+
+[3] Barber, {\em The Quickhull Algorithm for Convex Hulls}
+
+[4] The Geometry Center Home Page, {\em QHull}, \url{http://www.qhull.org}
 
