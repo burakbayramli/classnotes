@@ -3,7 +3,7 @@
 Poligon Birleşimi
 
 Bir harita uygulaması için bir poligon grubunun dış çeperini bulmak
-gerekti. Poligonların kestiği bölgeler var, bu bölgeleri dikkate almadan
+gerekti. Poligonların kesiştiği bölgeler var, bu bölgeleri dikkate almadan
 tüm poligonların birleşiminin dış sınırını nasıl buluruz? Yardımcı olacak
 kütüphaneler `shapely` ve `geopandas`.
 
@@ -46,6 +46,37 @@ plt.savefig('nokta2.jpg')
 Not: Çağrıdan geriye tek bir birleşmiş Polygon geliyor. Fakat eğer
 çağrıdan geriye bir liste gelirse her liste içindeki Polygon
 objelerine ayrı ayrı bakılabilir, uygun olanı seçilir.
+
+Alfa Şekilleri (Alpha Shapes)
+
+Bu yaklaşım altta birazdan Delanuay üzerinden tarif edilecek yöntemin
+literatürdeki yaygın kullanılan bir versiyonu, yaklaşımı kodlayan bir
+paket `alphashapes`,
+
+```python
+import pandas as pd
+import alphashape
+
+pts=np.array(pd.read_csv("cres.csv"))
+
+plt.plot(pts[:,0],pts[:,1],'r.')
+
+poly = alphashape.alphashape(pts, 0.3)
+    
+c = np.array(poly.exterior.coords)
+plt.plot(c[:,0].T,c[:,1].T)
+
+plt.savefig('nokta4.jpg')
+```
+
+[Grafik](nokta4.jpg)
+
+Parametre `alpha`, üstte 0.3 verildi, çevreleyen çizginin ne kadar
+detaylı olacağını tanımlıyor. Dikkat, alfa şekilleri her zaman her dış
+noktayı sınıra dahil etmeyebilir. Verilen parametre ile bazı noktaları
+atlamayı seçebilir bu sebeple eğer eldeki tüm noktalardan emin isek,
+gürültü yoksa ya başka bir yöntem ya da ona göre bir parametre seçmek
+lazım.
 
 Üçgenleme, Delanuay (Triangulation)
 
@@ -192,32 +223,6 @@ plt.savefig('algs_075_enc_16.png')
 [Grafik](algs_075_enc_16.png)
 
 Bu güzel bir şekil oldu.
-
-Alfa Şekilleri (Alpha Shapes)
-
-Bu yaklaşım üstteki tarif edilen yöntemin literatürdeki yaygın
-kullanılan bir versiyonu, yaklaşımı kodlayan bir paket `alphashapes`,
-
-```python
-import pandas as pd
-import alphashape
-
-pts=np.array(pd.read_csv("cres.csv"))
-
-plt.plot(pts[:,0],pts[:,1],'r.')
-
-poly = alphashape.alphashape(pts, 0.3)
-    
-c = np.array(poly.exterior.coords)
-plt.plot(c[:,0].T,c[:,1].T)
-
-plt.savefig('nokta4.jpg')
-```
-
-[Grafik](nokta4.jpg)
-
-Parametre `alpha`, üstte 0.3 verildi, çevreleyen çizginin ne kadar
-detaylı olacağını tanımlıyor.
 
 Dışbükey Zarf (Convex Hull)
 
