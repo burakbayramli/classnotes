@@ -469,10 +469,10 @@ dönüşe izin verir ama yer değişime izin vermez).
 Bu yapıyı üç tane düğüm (node) üzerinden ayrıksal hale getirebiliriz,
 düğümler 1,2, ve 3, ve elde iki tane kiriş var, grafikte görülüyor.
 
-Bu iki kiris parcasi icin direngenlik matrisleri,
+Bu iki kiriş parçası için direngenlik matrisleri,
 
 $$
-k^{(1)} =
+k^{(1)} = \frac{EI}{L^3}
 \begin{array}{cc} & \begin{array}{rrrr} v_1 & \phi_1 & v_2 & \phi_2 \end{array} \\ &
 \left[
 \begin{array}{cccc}
@@ -484,6 +484,99 @@ k^{(1)} =
 \right]
 \end{array} 
 $$
+
+$$
+k^{(2)} = \frac{EI}{L^3}
+\begin{array}{cc} & \begin{array}{rrrr} v_2 & \phi_2 & v_3 & \phi_3 \end{array} \\ &
+\left[
+\begin{array}{cccc}
+  12 & 6L & -12 & 6L \\
+  6L & 4L^2 & -6L & 2L^2 \\
+  -12 & -6L & 12 & -6L \\
+  6L & 2L^2 & -6L & 4L^2
+\end{array}
+\right]
+\end{array} 
+$$
+
+Tüm direngenlik matrisini oluşturmak için yine direk direngenlik metotunu
+kullanırız, üstdüşüm uygulayınca her iki matris genişletilir, ve üst üste konur,
+nihai sonuç,
+
+$$
+\left[\begin{array}{c}
+F_{1y} \\ M_1 \\ F_{2y} \\ M_2 \\ F_{3y} \\ M_3
+\end{array}\right] =
+\frac{EI}{L^3}
+\left[\begin{array}{cccccc}
+12 & 6L & -12 & 6L & 0 & 0 \\
+6L & 4L^2 & -6L & 2L^2 & 0 & 0 \\
+-12L & -6L & 12+12 & -6L+6L & -12 & 6L \\
+6L & 2L^2 & -6L+6L & 4L^2+4L^2 & -6L & 2L^2 \\
+0 & 0 & -12 & -6L & 12 & -6L \\
+0 & 0 & 6L & 2L^2 & -6L & 4L^2
+\end{array}\right]
+\left[\begin{array}{c}
+v_1 \\ \phi_1 \\ v_2 \\ \phi_2 \\ v_3 \\ \phi_3
+\end{array}\right]
+$$
+
+Bu noktada sınır şartlarını, ya da kısıtlamaları sisteme dahil edebiliriz.
+Düğüm 1'de bir sabit destek var, düğüm 3'te bir menteşe (hinge) desteği var,
+bu demektir ki
+
+$$
+\phi_1 = 0, \qquad
+v_1 = 0, \qquad
+v_3 = 0
+$$
+
+En sağ uçta $v_3 = 0$ oldu çünkü menteşe dönüşe izin verir, yer değişime
+izin vermez, $\phi_3$ değeri sıfırdan büyük olabilir, ama $v_3$ sıfır olur.
+
+Kısıtlamaları dahil edince birinci, ikinci ve beşinci satır ve kolonları
+dışarıda bırakarak bir sistem elde edebiliriz,
+
+$$
+\left[\begin{array}{c}
+-5000 \\ 5000 \\ 0
+\end{array}\right] =
+\frac{EI}{L^3}
+\left[\begin{array}{ccc}
+24 & 0 & 6L \\
+0 & 8L^2 & 2L^2 \\
+6L & 2L^2 & 4L^2
+\end{array}\right]
+\left[\begin{array}{c}
+v_2 \\ \phi_2 \\ \phi_3
+\end{array}\right]
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sympy import symbols, simplify, latex
+from sympy.matrices import Matrix
+L,E,I = symbols("L, E, I")
+A = Matrix([[24,0,6*L], [0,8*L**2,2*L**2],[6*L,2*L**2,4*L**2]])
+b = Matrix([[-5000],[5000],[0]])
+sol = A.solve(b)
+\end{minted}
+
+Elde edilen \verb!sol! sonucuna baktığımızda, biraz basitleştirme sonrası
+
+$$
+\left[\begin{array}{c}
+v_2 \\ \phi_2 \\ \phi_3
+\end{array}\right] =
+\frac{625}{L}
+\left[\begin{array}{c}
+(3-7L)/12 \\
+(5-L)/4L \\
+(L-1)/L
+\end{array}\right]
+$$
+
+sonucu çıkıyor.
+
 
 [devam edecek]
 
