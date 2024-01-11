@@ -3,6 +3,8 @@
 
 ## En Son
 
+11/1 - [Sonlu Öğeler Metotu - 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp45fem2/sonlu_ogeler_metotu__finite_elements_method_fem___2.html)
+
 2/1 - [Poligon Birleşimi, Çevreleyen Bölge](https://burakbayramli.github.io/dersblog/sk/2023/12/nokta-bulut-zarf-cevreleyen-bolge-poligon.html)
 
 21/12 - [Materyel Mekaniği - 4](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_04/materyel_mekanigi__4.html)
@@ -10,8 +12,6 @@
 7/12 - [Çok Değişkenli Calculus - Ders 22 - Ekler](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_22/ders_22.html)
 
 17/11 - [Hava Kirliliği, SILAM, AQI](https://burakbayramli.github.io/dersblog/sk/2023/11/hava-kirliligi-aqi-silam.html)
-
-9/11 - [Leaflet ile Sınır Çizimi, Ukrayna](https://burakbayramli.github.io/dersblog/sk/2023/11/ukrayna-sinirlar-leaflet.html)
 
 ## Konular, Referans
 
