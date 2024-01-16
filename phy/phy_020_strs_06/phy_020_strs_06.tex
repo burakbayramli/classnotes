@@ -254,8 +254,8 @@ T = Matrix([[C,S,0,0,0,0],[-S,C,0,0,0,0],[0,0,1,0,0,0],
 res = T.transpose()*kprime*T
 res = res.subs(C1,A*E/L) 
 res = res.subs(C2,E*I/L**3)
-pickle.dump(res,open("frame.pkl","wb"))
-res = res / (E/L) # E/L ile onceden bol cunku basitlestirme yapamadi
+pickle.dump(res,open("frame.pkl","wb")) # sonra lazim olacak diske kaydet
+res = res / (E/L) 
 print (latex(simplify(res))[:70],'...')
 \end{minted}
 
@@ -265,14 +265,19 @@ print (latex(simplify(res))[:70],'...')
 
 $$
 k = 
-\frac{E}{L} \times % sonradan biz ekledik cunku bolum yapmistik
+\frac{E}{L} \times 
 \left[\begin{matrix}A C^{2} + \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & - \frac{6 I S}{L} & - A C^{2} - \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & - \frac{6 I S}{L}\\\frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & A S^{2} + \frac{12 C^{2} I}{L^{2}} & \frac{6 C I}{L} & \frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & - A S^{2} - \frac{12 C^{2} I}{L^{2}} & \frac{6 C I}{L}\\- \frac{6 I S}{L} & \frac{6 C I}{L} & 4 I & \frac{6 I S}{L} & - \frac{6 C I}{L} & 2 I\\- A C^{2} - \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & \frac{6 I S}{L} & A C^{2} + \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & \frac{6 I S}{L}\\\frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & - A S^{2} - \frac{12 C^{2} I}{L^{2}} & - \frac{6 C I}{L} & \frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & A S^{2} + \frac{12 C^{2} I}{L^{2}} & - \frac{6 C I}{L}\\- \frac{6 I S}{L} & \frac{6 C I}{L} & 2 I & \frac{6 I S}{L} & - \frac{6 C I}{L} & 4 I\end{matrix}\right]
+\mlabel{3}
 $$
 
-Bu sonuç [1]'deki sonuca benziyor, cebirsel olarak eşit. Kod yorumlarında
-vurgulandı tekrar bahsedelim, $E/L$ bölümünü \verb!sympy! basitleştirmesi öncesi
-sistemde biz uyguladık çünkü cebirsel düzenlemede sisteme yardım etmek istedik,
-bu sayede sonuç kitaptaki çıktıya benzemiş oldu.
+Bu sonuç [1]'deki sonuca benziyor, cebirsel olarak eşit.
+
+Not: $E/L$ bölümünü \verb!sympy! basitleştirmesi öncesi sistemde dışarıdan
+uyguladık çünkü cebirsel düzenlemede sisteme yardım etmek istedik, bu sayede
+sonuç kitaptaki çıktıya benzemiş oldu.
+
+Cebirsel işlem sonucunu diske kaydettik (3) çıktısı alttaki problemde
+lazım olacak. 
 
 Üstteki formül / matris düz katı şasi / düz oynamaz çerçeve (rigid plane frame)
 formülü olarak bilinir, bu sistem ``katı bir şekilde birbirine bağlanmış bir
@@ -292,9 +297,15 @@ Cevap
 
 Sistem düğüm 1 ve 4 üzerinden sabitlenmiş, düğüm 2 üzerinde ve yatay 40 kN
 kuvvet uygulanıyor, ayrıca düğüm 3'te pozitif moment 500 N-m var. Üstteki
-resimde global kordinat sisteminin yeri gösteriliyor.
+resimde global kordinat sisteminin yeri gösteriliyor [1, sf. 244].
 
-Parca 1
+Çözüm için her parçayı kiriş matematiği (3) ile formülize edeceğiz, ve bu
+parçaları üstdüşüm ile biraraya koyacağız, nihai matrisi çözerek yükleri ve yer
+değişimleri bulacağız.
+
+Parça 1
+
+Bu parçanın duruş açısı 90 derece, o zaman $C = \cos 90 = 0$, $S = \sin 90 = 1$.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sympy import symbols, latex, simplify
@@ -326,7 +337,11 @@ print ('66.67*1000 * \n', df1)
 5 -160.00  0.0  160000.0  160.00  0.0  320000.0
 \end{verbatim}
 
-Parca 2
+Üstteki matrisin birimi N/mm. 
+
+Parça 2
+
+Bu parçanın duruşu sebebiyle açı sıfır, yani $C=1,S=0$.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 d = {L:3000.0, C:1.0, S:0.0, E:200.0*1e3, A:6500.0, I:40.0*1e6}
@@ -347,7 +362,9 @@ print ('66.67*1000 * \n', df2)
 5  0.0  80.0000  80000.0   0.0 -80.0000  160000.0
 \end{verbatim}
 
-Parca 3
+Parça 3
+
+Açı 270 derece, demek ki $C=0,S=-1$.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 d = {L:3000.0, C:0.0, S:-1, E:200.0*1e3, A:6500.0, I:80.0*1e6}
@@ -368,28 +385,48 @@ print ('66.67*1000 * \n', df3)
 5  160.0000  0.0  160000.0 -160.0000  0.0  320000.0
 \end{verbatim}
 
+Üstteki üç matris birleştirilip, üstdüşüm üzerinden daha büyük bir matris haline
+getirilecek. Üstdüşüm yapılabilmesi için her matrisin aynı boyutta, aynı
+kolonlara sahip olması gerekir. Bize şimdi gereken bir matrisi (ya da Dataframe)
+alıp yeni değişkenlere ``büyüten'' bir kod parçası.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
+pd.set_option('display.max_columns', None)
 
-df = pd.DataFrame(np.zeros((3,3)))
-df.columns = ['a','b','c']
+def expand_dataframe(df, new_cols):
 
-A1 = np.array([[10,10],
-               [20,20]])
-df1 = pd.DataFrame(A1)
-df1.columns = ['a','c']
+    res = df.copy()
+    old_cols = list(df.columns)
+    addn_vars = [x for x in new_cols if x not in old_cols]
+    res.index = df.columns
+    for x in addn_vars:
+        res[x] = np.nan
+        res.loc[x] = pd.Series(res.columns)
+    res = res[new_cols]
+    res = res.reindex(new_cols).fillna(0)
+    return res
 
-A2 = np.array([[30,30],
-               [40,40]])
-df2 = pd.DataFrame(A2)
-df2.columns = ['b','c']
-
+df = pd.DataFrame([['a','c'],['b','d']],columns = ['u1','u3'])
+print (df)
+res = expand_dataframe(df,['u1','u2','u3','u4'])
+print (res)
 \end{minted}
 
+\begin{verbatim}
+  u1 u3
+0  a  c
+1  b  d
+   u1   u2 u3   u4
+u1  a  0.0  c  0.0
+u2  0  0.0  0  0.0
+u3  b  0.0  d  0.0
+u4  0  0.0  0  0.0
+\end{verbatim}
 
-
-
+Üstteki kod parçası bunu yapabiliyor, ilk u1, u3 kolon listesini ü1,u2,u3,u4
+listesine büyüttük, ve kod gerekli yerlere gerekli sıfır değerlerini yazdı
+ve eski matrisin değerlerini büyütülmüş yeni matriste gereken yerlere yazdı.
 
 
 
