@@ -272,20 +272,21 @@ $$
 
 Bu sonuç [1]'deki sonuca benziyor, cebirsel olarak eşit.
 
-Not: $E/L$ bölümünü \verb!sympy! basitleştirmesi öncesi sistemde dışarıdan
-uyguladık çünkü cebirsel düzenlemede sisteme yardım etmek istedik, bu sayede
-sonuç kitaptaki çıktıya benzemiş oldu.
+$E/L$ bölümünü \verb!sympy! basitleştirmesi öncesi sistemde dışarıdan uyguladık
+çünkü cebirsel düzenlemede sisteme yardım etmek istedik, bu sayede sonuç
+kitaptaki çıktıya benzemiş oldu. Koda bakarsak cebirsel işlem sonucunu diske
+kaydettik (3) çıktısı alttaki problemde lazım olacak.
 
-Cebirsel işlem sonucunu diske kaydettik (3) çıktısı alttaki problemde
-lazım olacak. 
-
-Üstteki formül / matris düz katı şasi / düz oynamaz çerçeve (rigid plane frame)
-formülü olarak bilinir, bu sistem ``katı bir şekilde birbirine bağlanmış bir
-grup kiriş parçalarının toplamı'' olarak ta tarif edilebilir, yani kiriş
-parçalarının birbirine olan açıları, yük uygulandıktan sonra bağlandıklarında ne
-ise o halde kalırlar, deformasyon sonrası değişime uğramazlar. Ayrıca bu tür bir
-sistemde moment bir parçadan diğerine, bağlantı noktaları üzerinden transfer
-olabilir, yani katı bağlantı noktaları üzerinden bir moment sürekliliği vardır.
+Birden fazla kiriş formülü de üstdüşüm ile birleştirilerek daha büyük bir
+yapının formülü haline getirilebilir, alttaki soruda bunun nasıl yapılacağını
+göreceğiz. Elde edilecek sistem / matris düz katı şasi / düz oynamaz çerçeve
+(rigid plane frame) formülasyonu için kullanılacak, bu sistem ``katı bir şekilde
+birbirine bağlanmış bir grup kırış parçalarının toplamı'' olarak ta tarif
+edilebilir, yani kiriş parçalarının birbirine olan açıları, yük uygulandıktan
+sonra bağlandıklarında ne ise o halde kalırlar, deformasyon sonrası değişime
+uğramazlar. Ayrıca bu tür bir sistemde moment bir parçadan diğerine, bağlantı
+noktaları üzerinden transfer olabilir, yani katı bağlantı noktaları üzerinden
+bir moment sürekliliği vardır.
 
 Soru
 
@@ -452,6 +453,8 @@ u3  0.0  d  0.0
 u4  0.0  0  0.0
 \end{verbatim}
 
+Verilen bir kolon ve satırların listesini çıkartmak için de bir fonksiyon yazalım,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 def drop_col_row(df, var_list):
     res = df.copy()
@@ -460,6 +463,9 @@ def drop_col_row(df, var_list):
         res = res.drop(x,axis=0)
     return res
 \end{minted}
+
+Son hesap aşamasına geldik. Üstdüşüm yapalım, ve $u_1 = v_1 = \phi_1 = 0$,
+$u_4 = v_4 = \phi_4 = 0$ şartlarını uygulayalım,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 new_cols = ['u1','v1','phi1','u2','v2','phi2','u3','v3','phi3','u4','v4','phi4']
@@ -481,6 +487,72 @@ u3     -6.50   0.0000       0.0    6.6067   0.0000     160.0
 v3      0.00  -0.0533     -80.0    0.0000   6.5533     -80.0
 phi3    0.00  80.0000   80000.0  160.0000 -80.0000  480000.0
 \end{verbatim}
+
+Bu matrisi bir $Ax = b$ lineer sistemini çözmek için kullanacağız. Üstteki
+matris $A$ olacak, $b$ ise kuvvet ve momentleri taşıyan bir vektör,
+sınır şartlarının çıkarttığı değerleri sonrası kalan değişkenler,
+
+$$
+\left[\begin{array}{c}
+f_{2x} \\ f_{2y} \\ m_{2} \\ f_{3x} \\ f_{3y} \\ m_{3} 
+\end{array}\right] =
+\left[\begin{array}{c}
+4 \times 10^4 \\ 0 \\ 0 \\ 0 \\ 0 \\ 5 \times 10^5
+\end{array}\right]
+$$
+
+Çözeceğimiz sistem
+
+$$
+\left[\begin{array}{c}
+4 \times 10^4 \\ 0 \\ 0 \\ 0 \\ 0 \\ 5 \times 10^5
+\end{array}\right]
+=
+66.67 \times 10^3
+\left[\begin{array}{cccccc}
+  6.61 &  0 &     160 &   -6.5 &   0   &    0 \\
+  0    & 6.5533 &  80.0 &    0 &  -0.0533 &   80.0 \\
+160 &  80 &  480000 &    0 & -80 &   80000 \\
+ -6.50 &   0 &       0 &    6.6067 &   0 &     160.0 \\
+  0 &  -0.0533 &     -80.0 &    0 &   6.5533 &     -80.0 \\
+  0 &  80 &.   80000 &  160 & -80 &  480000 
+\end{array}\right]
+\left[\begin{array}{c}
+u_2 \\ v_2 \\ \phi_2 \\ u_3 \\ v_3 \\ \phi_3
+\end{array}\right]
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+
+b = np.array([4*1e4,0,0,0,0,5*1e5])
+
+x = lin.solve(66.67*1e3*df_super, b)
+
+pd.DataFrame(x,index=df_super.columns)
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 
+           0
+u2    4.8197
+v2    0.0333
+phi2 -0.0014
+u3    4.7747
+v3   -0.0333
+phi3 -0.0014
+\end{verbatim}
+
+Sonuçlara göre düğüm 2 ve 3 noktalarında şasi bir miktar sağa doğru gidiyor,
+ve dikey yer değişim ve dönüş yok denecek kadar az.
+
+
+
+
+
+
+
+
 
 
 
