@@ -233,11 +233,13 @@ C & S & 0 & 0 & 0 & 0 \\
 \left[\begin{array}{ccc}
 u_1 \\ v_1 \\ \phi_1 \\ u_2 \\ v_2 \\ \phi_2 
 \end{array}\right]
+\mlabel{5}
 $$
 
-Dikkat edersek dönüş sağlayan 2 x 2 boyutundaki altmatristir, üstteki matriste
-görülen o iki bölge, daha büyük matriste öyle yerleştirildi ki sadece $u_1,v_1$
-ve $u_2,v_2$ değişkenlerini etkiliyor, onlara tekabül eden bölgelerde duruyor.
+Ortadaki matris yerel öğeler için etkili $T$ matrisi. Dikkat edersek dönüş
+sağlayan 2 x 2 boyutundaki iki altmatrisler, $T$'de görülen o iki bölge, daha
+büyük matriste öyle yerleştirildi ki sadece $u_1,v_1$ ve $u_2,v_2$
+değişkenlerini etkiliyor, onlara tekabül eden bölgelerde duruyor.
 
 Böylece $T$ matrisini bulmuş olduk. Şimdi $k$ matrisini hesaplamak için
 $k = T^T k' T$ işlemini yapabiliriz [1, sf. 243].
@@ -263,6 +265,7 @@ res = res.subs(C1,A*E/L)
 res = res.subs(C2,E*I/L**3)
 pickle.dump(res,open("frame.pkl","wb")) # sonra lazim olacak diske kaydet
 pickle.dump(kprime,open("kprime.pkl","wb"))
+pickle.dump(T,open("T.pkl","wb"))
 res = res / (E/L) 
 print (latex(simplify(res))[:70],'...')
 \end{minted}
@@ -559,8 +562,9 @@ Her Parçaya Etki Eden Yerel Kuvvetler
 
 Bir kez tüm sistem bazında yer değişimlerini hesapladıktan sonra bunları
 kullanarak her ögeye etki eden kuvvetleri bulabiliriz, $f' = k' T d$
-gerekli. Daha önce (4)'te gösterilen $k'$ matrisini sembolik olarak
-kaydetmiştik, onu geri okuyup birinci öğe için değerleri geçelim,
+gerekli. Daha önce (4)'te gösterilen $k'$ ve (5)'te gösterilen $T$ matrislerini
+sembolik olarak kaydetmiştik, onları geri okuyup birinci öğe için değerleri
+geçelim [1, sf. 247],
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pickle, pandas as pd
@@ -569,13 +573,19 @@ pd.set_option("display.precision", 4)
 pd.set_option('display.max_columns', None)
 
 kprime = pickle.load(open('kprime.pkl','rb'))
+T = pickle.load(open('T.pkl','rb'))
 C,S,C1,C2,L,A,E,I = symbols("C,S,C1,C2,L,A,E,I")
 d = {L:3000.0, C:0.0, S:1.0, E:200.0*1e3, A:6500.0, I:80.0*1e6}
 kprime = kprime.subs(C1,A*E/L) 
 kprime = kprime.subs(C2,E*I/L**3)
 kprime = kprime.subs(d) 
-df = pd.DataFrame(np.array(kprime),dtype=np.float64)
-print (df / (66.67*1e3))
+kprime = pd.DataFrame(np.array(kprime),dtype=np.float64)  / (66.67*1e3)
+print (kprime)
+
+T = T.subs(C,0)
+T = T.subs(S,1)
+T = pd.DataFrame(np.array(T),dtype=np.float64)
+print (T)
 \end{minted}
 
 \begin{verbatim}
@@ -586,26 +596,46 @@ print (df / (66.67*1e3))
 3 -6.50   0.00      0.00  6.50    0.00      0.00
 4  0.00  -0.11   -159.99  0.00    0.11   -159.99
 5  0.00 159.99 159992.00  0.00 -159.99 319984.00
+      0    1    2     3    4    5
+0  0.00 1.00 0.00  0.00 0.00 0.00
+1 -1.00 0.00 0.00  0.00 0.00 0.00
+2  0.00 0.00 1.00  0.00 0.00 0.00
+3  0.00 0.00 0.00  0.00 1.00 0.00
+4  0.00 0.00 0.00 -1.00 0.00 0.00
+5  0.00 0.00 0.00  0.00 0.00 1.00
 \end{verbatim}
 
+Birinci öğe için geçerli olan yer değişimler
 
+$$
+d = \left[\begin{array}{c}
+u_1 = 0 \\ v_1 = 0 \\ \phi_1 = 0 \\ u_2 = 5.007 \\ v_2 = 0.0345 \\ \phi_2 = -0.00144
+\end{array}\right]
+$$
 
+Artık $f' = k' T d$ hesaplanabilir,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+d = np.array([[0,0,0,5.007,0.0345,-0.00144]]).T
+fprime = 66.67*1e3 * np.dot(kprime,T).dot(d)
+fprime = pd.DataFrame(fprime)
+fprime.index = ['fprime1x','fprime1y','mprime1','fprime2x','fprime2y','mprime2']
+print (fprime)
+\end{minted}
 
+\begin{verbatim}
+                   0
+fprime1x   -14950.00
+fprime1y    20245.33
+mprime1  38048000.00
+fprime2x    14950.00
+fprime2y   -20245.33
+mprime2  22688000.00
+\end{verbatim}
 
+Birimler kuvvetler için Newton, momentler için Newton-mm.
 
-
-
-
-
-
-
-
-
-
-
-
-[devam edecek]
+Diğer ögeler için benzer hesap yapılabilir.
 
 Kaynaklar
 
