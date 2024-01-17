@@ -25,9 +25,9 @@ u'_1 \\ u'_2
 \mlabel{1}
 $$
 
-olarak göstermiştik. Üstte yazılan kirişin yerel, kendisine has kordinat
+olarak göstermiştik. Üstteki formül kirişin yerel, kendisine has kordinat
 sistemini baz alıyor. Eğer üstteki değişkenleri global kordinat sistemine
-eşlemek, yansıtmak istiyorsak o zaman sistemi görülen $\theta$ kadar döndürmemiz
+eşlemek, yansıtmak istiyorsak o zaman sistemi resimdeki $\theta$ kadar döndürmemiz
 gerekiyor. Döndürme işlemi genel olarak iki boyuttaki bir $[u, v]$ vektörü için
 [1, sf. 85]
 
@@ -112,10 +112,10 @@ $$
 Hatırlarsak $C = \cos\theta, S = \sin\theta$, bunları yerine koyunca tüm köşegen
 boyunca 1 değeri elde edilir, diğer hücrelerde sıfır var, demek ki bir birim
 matrisi elde ettik. Bu demektir ki $T T^T = I$, ve bu ifadenin doğru olmasının
-tek yolu $T^T = T^{-1}$ olmasıdır.
+tek yolu $T^T = T^{-1}$ olmasıdır. İspat tamamlandı.
 
-Bir önemli eşitlik daha, hem yer değişimleri, hem kuvvetler döndürme
-matematiğini kullanabilirler. Mesela dönüş matrisi $T$ için
+Bir önemli eşitlik daha, yer değişimlerde olduğu gibi, kuvvetler de döndürme
+matematiğine tabi olabilirler. Mesela dönüş matrisi $T$ için
 
 $$
 d' = T d
@@ -140,7 +140,13 @@ $$
 f' = k' d' 
 $$
 
-sistem şöyle de gösterilebilir,
+Bu sistem şöyle de gösterilebilir,
+
+$$
+f' = k' T d
+$$
+
+ve
 
 $$
 T f = k' T d
@@ -204,6 +210,7 @@ C_1 & 0 & 0 & -C_1 & 0 & 0 \\
 \left[\begin{array}{c}
 u'_1 \\ v'_1 \\ \phi'_1 \\ u'_2 \\ v'_2 \\ \phi'_2
 \end{array}\right]
+\mlabel{4}
 $$
 
 elde edilir, ki $C_1 = \dfrac{AE}{L}$ ve $C_2 = \dfrac{EI}{L^3}$
@@ -228,9 +235,9 @@ u_1 \\ v_1 \\ \phi_1 \\ u_2 \\ v_2 \\ \phi_2
 \end{array}\right]
 $$
 
-Dikkat edersek dönüşümü sağlayan 2 x 2 boyutundaki altmatris, üstteki matristeki
-o iki bölge, daha büyük matriste öyle yerleştirildi ki sadece $u_1,v_1$ ve
-$u_2,v_2$ değişkenlerini etkiliyor, onlara tekabül eden bölgelerde duruyor.
+Dikkat edersek dönüş sağlayan 2 x 2 boyutundaki altmatristir, üstteki matriste
+görülen o iki bölge, daha büyük matriste öyle yerleştirildi ki sadece $u_1,v_1$
+ve $u_2,v_2$ değişkenlerini etkiliyor, onlara tekabül eden bölgelerde duruyor.
 
 Böylece $T$ matrisini bulmuş olduk. Şimdi $k$ matrisini hesaplamak için
 $k = T^T k' T$ işlemini yapabiliriz [1, sf. 243].
@@ -255,6 +262,7 @@ res = T.transpose()*kprime*T
 res = res.subs(C1,A*E/L) 
 res = res.subs(C2,E*I/L**3)
 pickle.dump(res,open("frame.pkl","wb")) # sonra lazim olacak diske kaydet
+pickle.dump(kprime,open("kprime.pkl","wb"))
 res = res / (E/L) 
 print (latex(simplify(res))[:70],'...')
 \end{minted}
@@ -274,14 +282,14 @@ Bu sonuç [1]'deki sonuca benziyor, cebirsel olarak eşit.
 
 $E/L$ bölümünü \verb!sympy! basitleştirmesi öncesi sistemde dışarıdan uyguladık
 çünkü cebirsel düzenlemede sisteme yardım etmek istedik, bu sayede sonuç
-kitaptaki çıktıya benzemiş oldu. Koda bakarsak cebirsel işlem sonucunu diske
-kaydettik (3) çıktısı alttaki problemde lazım olacak.
+kitaptaki çıktıya benzemiş oldu. Ayrıca cebirsel işlem sonucunu diske kaydettik
+(3) çıktısı alttaki problemde lazım olacak.
 
 Birden fazla kiriş formülü de üstdüşüm ile birleştirilerek daha büyük bir
 yapının formülü haline getirilebilir, alttaki soruda bunun nasıl yapılacağını
 göreceğiz. Elde edilecek sistem / matris düz katı şasi / düz oynamaz çerçeve
 (rigid plane frame) formülasyonu için kullanılacak, bu sistem ``katı bir şekilde
-birbirine bağlanmış bir grup kırış parçalarının toplamı'' olarak ta tarif
+birbirine bağlanmış bir grup kiriş parçalarının toplamı'' olarak ta tarif
 edilebilir, yani kiriş parçalarının birbirine olan açıları, yük uygulandıktan
 sonra bağlandıklarında ne ise o halde kalırlar, deformasyon sonrası değişime
 uğramazlar. Ayrıca bu tür bir sistemde moment bir parçadan diğerine, bağlantı
@@ -319,9 +327,9 @@ C,S,L,A,E,I = symbols("C,S,L,A,E,I")
 frame = pickle.load(open('frame.pkl','rb'))
 \end{minted}
 
-Birinci parçanın duruş açısı 90 derece, o zaman $C = \cos 90 = 0$, $S = \sin 90 = 1$.
-Bu değerleri sembolik matrisi sayısal halee çevirmek için kullanacağız,
-\verb!subs! çağrısı ile,
+Birinci parçanın duruş açısı 90 derece, o zaman $C = \cos 90 = 0$, $S = \sin 90
+= 1$.  Bu değerleri sembolik matrisi sayısal hale çevirmek için kullanacağız,
+``yoğun (dense) matris'' elde edeceğiz, \verb!subs! çağrısı ile,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 d = {L:3000.0, C:0.0, S:1.0, E:200.0*1e3, A:6500.0, I:80.0*1e6}
@@ -468,10 +476,10 @@ Son hesap aşamasına geldik. Üstdüşüm yapalım, ve $u_1 = v_1 = \phi_1 = 0$
 $u_4 = v_4 = \phi_4 = 0$ şartlarını uygulayalım,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-new_cols = ['u1','v1','phi1','u2','v2','phi2','u3','v3','phi3','u4','v4','phi4']
-df1f = expand_dataframe(df1,new_cols)
-df2f = expand_dataframe(df2,new_cols)
-df3f = expand_dataframe(df3,new_cols)
+all_vars = ['u1','v1','phi1','u2','v2','phi2','u3','v3','phi3','u4','v4','phi4']
+df1f = expand_dataframe(df1,all_vars)
+df2f = expand_dataframe(df2,all_vars)
+df3f = expand_dataframe(df3,all_vars)
 df_super = df1f + df2f + df3f
 
 df_super = drop_col_row(df_super, ['u1','v1','phi1','u4','v4','phi4'])
@@ -543,8 +551,46 @@ v3   -0.0333
 phi3 -0.0014
 \end{verbatim}
 
-Sonuçlara göre düğüm 2 ve 3 noktalarında şasi bir miktar sağa doğru gidiyor,
-ve dikey yer değişim ve dönüş yok denecek kadar az.
+Birimler yer değişimleri için mm, açılar için radyan. Sonuçlara göre düğüm 2 ve
+3 noktalarında şaşı bir miktar sağa doğru gidiyor, ve dikey yer değişim ve dönüş
+yok denecek kadar az.
+
+Her Parçaya Etki Eden Yerel Kuvvetler
+
+Bir kez tüm sistem bazında yer değişimlerini hesapladıktan sonra bunları
+kullanarak her ögeye etki eden kuvvetleri bulabiliriz, $f' = k' T d$
+gerekli. Daha önce (4)'te gösterilen $k'$ matrisini sembolik olarak
+kaydetmiştik, onu geri okuyup birinci öğe için değerleri geçelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pickle, pandas as pd
+from sympy import symbols
+pd.set_option("display.precision", 4)
+pd.set_option('display.max_columns', None)
+
+kprime = pickle.load(open('kprime.pkl','rb'))
+C,S,C1,C2,L,A,E,I = symbols("C,S,C1,C2,L,A,E,I")
+d = {L:3000.0, C:0.0, S:1.0, E:200.0*1e3, A:6500.0, I:80.0*1e6}
+kprime = kprime.subs(C1,A*E/L) 
+kprime = kprime.subs(C2,E*I/L**3)
+kprime = kprime.subs(d) 
+df = pd.DataFrame(np.array(kprime),dtype=np.float64)
+print (df / (66.67*1e3))
+\end{minted}
+
+\begin{verbatim}
+      0      1         2     3       4         5
+0  6.50   0.00      0.00 -6.50    0.00      0.00
+1  0.00   0.11    159.99  0.00   -0.11    159.99
+2  0.00 159.99 319984.00  0.00 -159.99 159992.00
+3 -6.50   0.00      0.00  6.50    0.00      0.00
+4  0.00  -0.11   -159.99  0.00    0.11   -159.99
+5  0.00 159.99 159992.00  0.00 -159.99 319984.00
+\end{verbatim}
+
+
+
+
 
 
 
