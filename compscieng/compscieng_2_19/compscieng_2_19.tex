@@ -458,4 +458,77 @@ solution [ 0.13249211  0.11041009  0.09463722]
 [ 0.13249211  0.11041009  0.09463722]
 \end{verbatim}
 
+Seyrek Matrisler
+
+Eğer üstteki kodu seyrek formda ve artımsal (incremental) olarak kodlamak
+istesek, $A$ matrisini bir Python ``sözlükler sözlüğü'' olarak temsil
+edebilirdik, her satır 0,1,.. gibi anahtar değerlerine sahip olur, ve her
+satırda ayrı sözlükler kodlanabilir, bu sözlük içinde o satırda mevcut
+kolonların değerleri anahtar/değer olarak kayıtlıdır. Yüksek ölçekli ortamlarda
+bu yaklaşımın faydaları açık, satırlar büyük bir dosyada ayrı ayrı okunabilir,
+hatta paralelize yaklaşımlar mesela $A p$ çarpımı paralel şekilde
+işletebilirler. Örnek bir kodlama şu şekilde olabilir,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+A = dict({0: {0: 6., 1:1., 2:1.},
+          1: {0: 1., 1:7., 2:1.},
+          2: {0:1., 1:1., 2:8.}})
+
+b = dict({0:1., 1:1., 2:1.})
+
+def mult_A_b(A,b):
+    return dict((k, sum(b[key]*row.get(key, 0) for key in b)) for k,row in A.items()  )
+
+def dot(a,b):
+    return sum(b[key]*a.get(key, 0) for key in b)
+
+def vec_sum(a,b):
+    return {k: a.get(k, 0) + b.get(k, 0) for k in set(a) | set(b)}
+
+def vec_subt(a,b):
+    return {k: a.get(k, 0) - b.get(k, 0) for k in set(a) | set(b)}
+
+def vec_scalar_times (vec,a):
+    return dict((k,v*a) for k,v in vec.items())
+
+def vec_scalar_sum (vec,a):
+    return dict((k,v+a) for k,v in vec.items())
+
+def vec_scalar_subt (vec,a):
+    return dict((k,v-a) for k,v in vec.items())
+
+p = b; r = b; x = {}
+
+r2 = dot(r,r)
+
+for i in range(5):
+
+    Ap = mult_A_b(A,p)
+
+    alpha = r2 / dot(Ap, p)
+
+    x = vec_sum(x,vec_scalar_times(p,alpha))
+
+    r = vec_subt(r,vec_scalar_times(Ap,alpha))
+
+    r2old = r2
+
+    r2 = dot(r,r)
+
+    beta = r2 / r2old
+
+    p = vec_sum(r,vec_scalar_times(p,beta))
+
+    print (x)
+    
+\end{minted}
+
+\begin{verbatim}
+{0: 0.1111111111111111, 1: 0.1111111111111111, 2: 0.1111111111111111}
+{0: 0.13125, 1: 0.11249999999999999, 2: 0.09374999999999999}
+{0: 0.13249211356466878, 1: 0.11041009463722397, 2: 0.09463722397476339}
+{0: 0.13249211356466878, 1: 0.11041009463722397, 2: 0.09463722397476339}
+{0: 0.13249211356466878, 1: 0.11041009463722397, 2: 0.09463722397476339}
+\end{verbatim}
+
 \end{document}
