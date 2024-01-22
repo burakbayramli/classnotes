@@ -131,7 +131,7 @@ def title_tex(to):
 
 def title_sk(to):
     d = "sk"
-    for year in range(2000,2024):
+    for year in range(2000,2025):
         if year == 2007: continue
         out = d + "/" + str(year) + "/index.md"
         fout = codecs.open(out,mode="w",encoding="utf-8")
