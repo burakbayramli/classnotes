@@ -9,8 +9,6 @@
 
 2/1 - [Poligon Birleşimi, Çevreleyen Bölge](https://burakbayramli.github.io/dersblog/sk/2023/12/nokta-bulut-zarf-cevreleyen-bolge-poligon.html)
 
-21/12 - [Materyel Mekaniği - 4](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_04/materyel_mekanigi__4.html)
-
 7/12 - [Çok Değişkenli Calculus - Ders 22 - Ekler](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_22/ders_22.html)
 
 ## Konular, Referans
