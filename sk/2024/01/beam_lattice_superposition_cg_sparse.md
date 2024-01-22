@@ -3,6 +3,8 @@
 [1] yazisinda anlatilan sistemi seyrek matrisler ve eslenik gradyan
 tekniklerini kullanarak cozmenin iki yolu alttadir.
 
+Once [1]'deki uc matrisi tekrar olusturualim,
+
 ```python
 from sympy import symbols, latex, simplify
 from sympy.matrices import Matrix
@@ -52,6 +54,22 @@ vars3 = ['u3','v3','phi3','u4','v4','phi4']
 df3 = pd.DataFrame(np.array(res).astype(np.float64))
 df3.columns = vars2; df3.index = vars2
 ```
+
+Bu matrisleri ustdutum ile birlestirmek istiyoruz. Bunun icin her
+matriste diger matristekilere uyan degiskenleri toplamak
+gerekiyor. [1] yazisinda gosterim amacli her matrisi nihai boyutlara
+buyutmustuk, ve ayni boyutta olan uc matrisi ustdusum icin
+toplamistik.
+
+Fakat bu islem bellekte tutulan yer, performans icin ideal
+olmayabilir.  Bir yogun matrisi buyutunce sifir olan degerlerin bile
+bellekte depolanmasi gerekiyor. Bu durum ayni sekilde ustdusum matrisi
+sonucu icin de gecerli.
+
+Alttaki ilk yontem matrisleri Python sozlugu olarak muhafaza ediyor.
+Her alt matrisi sozluk olarak gezilir, ve nihai matris bir sozluk
+olarak olusturulur.
+
 
 ```python
 import pandas as pd, pickle
@@ -184,14 +202,11 @@ print (x)
  -1.25065134e-02  1.03503075e-03]
 ```
 
-
-
-
-
-
 Kaynaklar
 
 [1] <a href="../../../phy/phy_020_strs_06/materyel_mekanigi__6.html">Materyel Mekaniği - 6</a>
 
 [2] https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.cg.html
+
+[3] <a href="../../..//compscieng/compscieng_2_19/ders_2.19.html">Ders 2.19</a>
 
