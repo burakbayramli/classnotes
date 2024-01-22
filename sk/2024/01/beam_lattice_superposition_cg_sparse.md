@@ -68,8 +68,13 @@ sonucu icin de gecerli.
 
 Alttaki ilk yontem matrisleri Python sozlugu olarak muhafaza ediyor.
 Her alt matrisi sozluk olarak gezilir, ve nihai matris bir sozluk
-olarak olusturulur.
+olarak olusturulur. Matrisler bir sozluk icinde sozluk olarak temsil
+edilir, her satir ayri bir sozluktur, ilk anahtar u1, ikinci v1, boyle
+gidiyor. Ilk satirin anahtari `u1`, ilk kolonun anahtari ayni sekilde.
 
+Sozluk yapisini kullanmanin bir faydasi bildik bir yapi olmasi ve
+aynen diger seyrek depolama yaklasimlarinda oldugu gibi kodun geri
+kalani olmayan degerin sifir kabul edebilir.
 
 ```python
 import pandas as pd, pickle
@@ -118,7 +123,13 @@ def add_to_super(df):
 add_to_super(df1)
 add_to_super(df2)
 add_to_super(df3)
+```
 
+Cozmek icin [3]'te anlatilan eslenik gradyan (conjugate gradient)
+yontemik kodlandi. CG kodu altta A matrisini sozluk icinde sozluk
+olarak aliyor. 
+
+```python
 A = df_super.copy()
 
 for id,row in A.items():
