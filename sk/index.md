@@ -3,6 +3,8 @@
 
 ## En Son
 
+23/1 - [Eğrilik (Curvature)](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_60/egrilik__curvature_.html)
+
 19/1 - [Bükülme Direnci (Stiffness) Metotu - MM 2 - Ekler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_01/materyel_mekanigi__2.html)
 
 11/1 - [Sonlu Öğeler Metotu - 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp45fem2/sonlu_ogeler_metotu__finite_elements_method_fem___2.html)
