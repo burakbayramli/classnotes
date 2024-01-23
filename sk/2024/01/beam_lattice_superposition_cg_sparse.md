@@ -1,9 +1,9 @@
 # Üstdüşümlü Matris Sistemini Çözmek
 
-[1] yazisinda anlatilan sistemi seyrek matrisler ve eslenik gradyan
-tekniklerini kullanarak cozmenin iki yolu alttadir.
+[1] yazısında anlatılan sistemı seyrek matrisler ve eşlenik gradyan
+tekniklerini kullanarak çözmenin iki yolu alttadır.
 
-Once [1]'deki uc matrisi tekrar olusturualim,
+Önce [1]'deki üç matrisi tekrar oluşturualım,
 
 ```python
 from sympy import symbols, latex, simplify
@@ -55,26 +55,28 @@ df3 = pd.DataFrame(np.array(res).astype(np.float64))
 df3.columns = vars2; df3.index = vars2
 ```
 
-Bu matrisleri ustdutum ile birlestirmek istiyoruz. Bunun icin her
-matriste diger matristekilere uyan degiskenleri toplamak
-gerekiyor. [1] yazisinda gosterim amacli her matrisi nihai boyutlara
-buyutmustuk, ve ayni boyutta olan uc matrisi ustdusum icin
-toplamistik.
+Bu matrisleri üstdüşüm ile birleştirmek istiyoruz, her matriste diğer
+matristekilere uyan değişkenleri toplamak gerekiyor. [1] yazısında
+gösterim amaçlı her matrisi nihai boyutlara büyütmüştük, ve aynı
+boyutta olan üç matrisi üstdüşüm için toplamıştık.
 
-Fakat bu islem bellekte tutulan yer, performans icin ideal
-olmayabilir.  Bir yogun matrisi buyutunce sifir olan degerlerin bile
-bellekte depolanmasi gerekiyor. Bu durum ayni sekilde ustdusum matrisi
-sonucu icin de gecerli.
+Fakat bu işlem bellekte tutulan yer, performans için ideal
+olmayabilir.  Bir yoğun matrisi büyütünce sıfır olan değerlerin bile
+bellekte depolanması gerekiyor. Bu durum aynı şekilde üstdüşüm matrisi
+sonucu için de geçerli.
 
-Alttaki ilk yontem matrisleri Python sozlugu olarak muhafaza ediyor.
-Her alt matrisi sozluk olarak gezilir, ve nihai matris bir sozluk
-olarak olusturulur. Matrisler bir sozluk icinde sozluk olarak temsil
-edilir, her satir ayri bir sozluktur, ilk anahtar u1, ikinci v1, boyle
-gidiyor. Ilk satirin anahtari `u1`, ilk kolonun anahtari ayni sekilde.
+Alttaki yöntemler alternatif yaklaşımlar, ilki matrisleri Python
+sözlüğü olarak muhafaza eder. Her alt matris gezilir, ve nihai matris
+bir sözlük olarak oluşturulur. Matrisler bir sözlük içinde sözlük
+olarak temsil edilir, her satır ayrı bir anahtardır, ilk satır
+anahtarı `u1`, ikinci `v1`, böyle gider, ve ilk kolonun anahtarı aynı
+şekilde. Sözlük yapısını kullanmanın bir faydası bildik bir yapı
+olması ve aynen diğer seyrek yaklaşımlarda olduğu gibi kullanıcı kod
+olmayan değerin sıfır kabul edebilir.
 
-Sozluk yapisini kullanmanin bir faydasi bildik bir yapi olmasi ve
-aynen diger seyrek depolama yaklasimlarinda oldugu gibi kodun geri
-kalani olmayan degerin sifir kabul edebilir.
+Üstdüşüm matrisi, çakışan değerlerin birbiriyle toplanması aynı kod
+içinde yapılır, hatta değişken çıkartma işlemi bile aynı döngülerle
+hallediliyor.
 
 ```python
 import pandas as pd, pickle
@@ -117,7 +119,6 @@ def add_to_super(df):
         if rowid in drop_vars: continue
         for k,v in row.items():
             if v != 0 and k not in drop_vars:
-                #print (rowid,k)
                 df_super[rowid][k] = df_super[rowid].get(k,0) + v
  
 add_to_super(df1)
@@ -125,9 +126,9 @@ add_to_super(df2)
 add_to_super(df3)
 ```
 
-Cozmek icin [3]'te anlatilan eslenik gradyan (conjugate gradient)
-yontemik kodlandi. CG kodu altta A matrisini sozluk icinde sozluk
-olarak aliyor. 
+Çözmek için [3]'te anlatılan eşlenik gradyan (conjugate gradient)
+yöntemi kodlandı. CG kodu altta A matrisini sözlük içinde sözlük
+olarak alıyor.
 
 ```python
 A = df_super.copy()
@@ -169,6 +170,16 @@ print (x)
 8.714002731297926, 'phi1': 0.0}
 ```
 
+İkinci yaklaşım `scipy.sparse` içindeki `lil_matrix` seyrek matris
+tipini kullanıyor. Bildiğimiz gibi `scipy.sparse` matrislerinin isim
+bazlı erişim yöntemi yoktur, indis, yani tam sayı kullanarak erişim
+yapmak gerekir. Bu yüzden alttaki çözümde değişken listesini kullanarak
+her değişken için bir indis değeri üretiyoruz, onu seyrek matriste erişim
+için kullanıyoruz. Eğer satır `v1` kolon `u1` ise bu bize indisler `(1,0)`
+değerlerini verir, erişimi bunlarla yaparız.
+
+Üstdüşümü nihai matrisi ölüstürürken aynı kod içinde yapıyoruz. Değişken
+çıkartmak için basit bir dilimleme (slicing) işlemi uygulandı. 
 
 ```python
 from scipy.sparse.linalg import cg
@@ -217,7 +228,6 @@ Kaynaklar
 
 [1] <a href="../../../phy/phy_020_strs_06/materyel_mekanigi__6.html">Materyel Mekaniği - 6</a>
 
-[2] https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.cg.html
+[2] <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.cg.html">scipy.sparse.linalg.cg</a>
 
 [3] <a href="../../..//compscieng/compscieng_2_19/ders_2.19.html">Ders 2.19</a>
-
