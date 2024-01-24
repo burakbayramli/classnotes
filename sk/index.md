@@ -37,7 +37,7 @@
 
 [Github Depoları](https://github.com/burakbayramli)
 
-[Blog İçeriği PDF Olarak](https://drive.google.com/uc?export=view&id=1Yq6ovajFbXFWurbiFNhXOl0iN5NlkKtE)
+[Blog İçeriği PDF Olarak](https://www.dropbox.com/scl/fi/g4y41s47w1njutgoc772x/sk-blog-all.pdf?rlkey=zogg5evurbdk7ktliq9zs2dnc&dl=1)
 
 [Tüm Matematik Içeriği](https://burakbayramli.github.io/dersblog/)
 
