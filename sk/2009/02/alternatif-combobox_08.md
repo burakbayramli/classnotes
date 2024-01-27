@@ -1,35 +1,36 @@
 # Alternatif Combobox
 
-Standard HTML birimlerinden olan select..options birimlerinin ne yazik
-ki bazi problemleri var; Oncelikle IE 6 uzerinde bu select
-etiketlerini stillemek, yani CSS ile bazi goruntu ogelerini
-degistirmek mumkun degil. Bunlardan biri border degisimi mesela, siz
-CSS'e hangi komutu koyarsaniz koyun, IE 6 uzerinde select o garip uc
-boyutumsu golgeli sInIrlI goruntuyu kaybedemiyor.
+Standard HTML birimlerinden olan select..options birimlerinin ne yazık
+ki bazı problemleri var; Öncelikle İE 6 üzerinde bu select
+etiketlerini stillemek, yani CSS ile bazı görüntü öğelerini
+değiştirmek mümkün değil. Bunlardan biri border değişimi mesela, siz
+CSS'e hangi komutu koyarsanız koyun, İE 6 üzerinde select o garip üç
+boyutumsu gölgeli sInİrlİ görüntüyü kaybedemiyor.
 
-Bu sebeple klasik select..option yerine, CSS/DHTML/Javascript bazli
+Bu sebeple klasik select..option yerine, CSS/DHTML/Javascript bazlı
 alternatif bir Combobox kullanmak daha yerinde olacak. Bu alternatif
-kodlar <div> temelli olacak ve bu kodlar Javascript bazli event'leri
-kullanarak bir normal combobox isleyisini taklit edecekler.  Bu
-birimler direk en temel DHTML ogeleri ile is yaptigi icin, onun
-herhangi bir gorsel ogesi ile oynamak serbest olabilecek.
+kodlar `<div>` temelli olacak ve bu kodlar Javascript bazlı event'leri
+kullanarak bir normal combobox işleyişini taklit edecekler.  Bu
+birimler direk en temel DHTML öğeleri ile iş yaptığı için, onun
+herhangi bir görsel öğesi ile oynamak serbest olabilecek.
 
-Peki hangi paketi kullanmak en iyisi? Etrafta pek cok Javascript bazli
-combobox kodu var. Hem combobox hem de diger veri giris ogelerinin
-alternatifleri icin su sayfa faydali olabilir. Benim buldugum ayri bir
-paket dhtmlxcombo adinda bir pakettir. Bu paket, duz HTML temelli olan
-select'i alip onu combolastiriyor, ya da sadece bos bir <div> blogunu
-da alip combo haline getirebiliyor.
+Peki hangi paketi kullanmak en iyisi? Etrafta pek çok Javascript bazlı
+combobox kodu var. Hem combobox hem de diğer veri giriş öğelerinin
+alternatifleri için şu sayfa faydalı olabilir. Benim bulduğum ayrı bir
+paket dhtmlxcombo adında bir pakettir. Bu paket, düz HTML temelli olan
+select'i alıp onu combolaştırıyor, ya da sadece boş bir <div> bloğunu
+da alıp combo haline getirebiliyor.
 
-Bu kutuphaneyi kullanarak yazdigimiz ornek kodlari altta
-bulabilirsiniz. Onemli noktalardan biri combo'nun asagi gosteren ok
-imajini bulabilmesi icin `<script>` tagi icinde `window.dhx_globalImgPath="/imaj/dizin/ismi";`
-ile ok imajinin yerini vermeniz. test.html icinde bunu gorebilirsiniz.
+Bu kütüphaneyi kullanarak yazdığımız örnek kodları altta
+bulabilirsiniz. Önemli noktalardan biri combo'nun aşağı gösteren ok
+imajını bulabilmesi için `<script>` tağı içinde
+`window.dhx_globalImgPath="/imaj/dizin/ismi";` ile ok imajının yerini
+vermeniz. test.html içinde bunu görebilirsiniz.
 
 Dosyalar
 
 `dhtmlxcombo.js` ve dhtmlxcommon.js ustteki kaynaklardan indirilebilir,
-ayrica bir blank.gif ve combo_select.gif lazim.
+ayrica bir `blank.gif` ve `combo_select.gif` lazim.
 
 dhtmlxcombo.css
 
