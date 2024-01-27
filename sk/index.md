@@ -3,6 +3,8 @@
 
 ## En Son
 
+27/1 - [Euler-Bernoulli Kirişleri, MM - 3 - Ekler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_03/materyel_mekanigi__3.html)
+
 23/1 - [Eğrilik (Curvature)](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_60/egrilik__curvature_.html)
 
 19/1 - [Bükülme Direnci (Stiffness) Metotu - MM 2 - Ekler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_01/materyel_mekanigi__2.html)
@@ -10,8 +12,6 @@
 11/1 - [Sonlu Öğeler Metotu - 2](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp45fem2/sonlu_ogeler_metotu__finite_elements_method_fem___2.html)
 
 2/1 - [Poligon Birleşimi, Çevreleyen Bölge](https://burakbayramli.github.io/dersblog/sk/2023/12/nokta-bulut-zarf-cevreleyen-bolge-poligon.html)
-
-7/12 - [Çok Değişkenli Calculus - Ders 22 - Ekler](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_22/ders_22.html)
 
 ## Konular, Referans
 
@@ -48,4 +48,7 @@
 [Sene](year.html)
 
 [Ara](ara.html)
+
+
+
 
