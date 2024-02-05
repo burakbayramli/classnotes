@@ -3,7 +3,7 @@
 
 ## En Son
 
-5/2 - [Materyel Mekaniği - 4](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_05/materyel_mekanigi__4.html)
+5/2 - [Materyel Mekaniği - 4](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_04/materyel_mekanigi__4.html)
 
 27/1 - [Euler-Bernoulli Kirişleri, MM - 3 - Ekler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_03/materyel_mekanigi__3.html)
 
@@ -48,7 +48,4 @@
 [Sene](year.html)
 
 [Ara](ara.html)
-
-
-
 
