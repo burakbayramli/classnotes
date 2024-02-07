@@ -1,9 +1,9 @@
 # Üstdüşümlü Matris Sistemini Çözmek
 
-[1] yazısında anlatılan sistemı seyrek matrisler ve eşlenik gradyan
+[1] yazısında anlatılan sistemi seyrek matrisler ve eşlenik gradyan
 tekniklerini kullanarak çözmenin iki yolu alttadır.
 
-Önce [1]'deki üç matrisi tekrar oluşturualım,
+Önce [1]'deki üç matrisi tekrar oluşturalım,
 
 ```python
 from sympy import symbols, latex, simplify
@@ -178,7 +178,7 @@ her değişken için bir indis değeri üretiyoruz, onu seyrek matriste erişim
 için kullanıyoruz. Eğer satır `v1` kolon `u1` ise bu bize indisler `(1,0)`
 değerlerini verir, erişimi bunlarla yaparız.
 
-Üstdüşümü nihai matrisi ölüstürürken aynı kod içinde yapıyoruz. Değişken
+Üstdüşümü nihai matrisi oluştururken aynı kod içinde yapıyoruz. Değişken
 çıkartmak için basit bir dilimleme (slicing) işlemi uygulandı. 
 
 ```python
@@ -226,8 +226,8 @@ print (x)
 
 Kaynaklar
 
-[1] <a href="../../../phy/phy_020_strs_06/materyel_mekanigi__6.html">Materyel Mekaniği - 6</a>
+[1] <a href="../../../phy/phy_020_strs_06/materyel_mekanigi__6.html">Fizik - Materyel Mekaniği - 6</a>
 
 [2] <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.cg.html">scipy.sparse.linalg.cg</a>
 
-[3] <a href="../../..//compscieng/compscieng_2_19/ders_2.19.html">Ders 2.19</a>
+[3] <a href="../../..//compscieng/compscieng_2_19/ders_2.19.html">Hesapsal Bilim Ders 2.19</a>
