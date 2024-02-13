@@ -22,11 +22,12 @@ html_head = '''
     });
     </script>
    <script type="text/javascript"
-   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full">
+       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full">
    </script>
+   <script async="async" data-cfasync="false" src="//pl22489825.profitablegatecpm.com/d84f574876e65b2d8f0c7bae784c22b3/invoke.js"></script>
+      <div id="container-d84f574876e65b2d8f0c7bae784c22b3"></div>   
+
    <link rel="stylesheet" type="text/css" media="screen" href="https://burakbayramli.github.io/css/style.css">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1548953794786292"
-          crossorigin="anonymous"></script>  
   </head>
     <body>
       <div id="header_wrap" class="outer">
