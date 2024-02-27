@@ -3,6 +3,8 @@
 
 ## En Son
 
+27/2 - [Diferansiyel Denklemler, Trigonometri - Ek - Radyan](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_50_trig/trigonometri.html)
+
 19/2 - [Üstdüşümlü Matris Sistemini Çözmek](https://burakbayramli.github.io/dersblog/sk/2024/01/beam_lattice_superposition_cg_sparse.html)
 
 12/2 - [Materyel Mekaniği - 5](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_05/materyel_mekanigi__5.html)
@@ -10,8 +12,6 @@
 5/2 - [Materyel Mekaniği - 4](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_04/materyel_mekanigi__4.html)
 
 27/1 - [Euler-Bernoulli Kirişleri, MM - 3 - Ekler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_03/materyel_mekanigi__3.html)
-
-23/1 - [Eğrilik (Curvature)](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_60/egrilik__curvature_.html)
 
 ## Konular, Referans
 
