@@ -103,7 +103,38 @@ Attributes:
 
 ![](uydu_01.png)
 
-Detaylar net gözüküyor.. 
+Detaylar net gözüküyor..
+
+Mapbox
+
+Sık güncellenmese de dünyanin her noktası için hızlı görüntü almanın bir
+diğer yolu Mapbox. Sitesinden anahtar alınır, bizdeki bir json `.conf`
+dosyası içinde. Eyfel kulesi fotoğrafı için,
+
+```python
+def sat_img(latitude, longitude, zoom, outfile):
+    params = json.loads(open(os.environ['HOME'] + "/.nomterr.conf").read())
+    accessToken = params['mapbox']
+    def latToTile(latDeg, zoom):
+        latRadians = math.radians(latDeg)
+        n = 2.0 ** zoom
+        return int((1.0 - math.asinh(math.tan(latRadians)) / math.pi) / 2.0 * n)
+
+    def lonToTile(lonDeg, zoom):
+        n = 2.0 ** zoom
+        return int((lonDeg + 180.0) / 360.0 * n)
+    
+    url = ("https://api.mapbox.com/v4/" + "mapbox.satellite/" + str(zoom) + "/" + str(lonToTile(longitude, zoom)) +
+           "/" + str(latToTile(latitude, zoom)) + "@2x.png?access_token=" + accessToken)
+
+    response = requests.get(url, stream=True)
+    with open(outfile, "wb") as image:
+        shutil.copyfileobj(response.raw, image)
+    
+sat_img(48.85859253797154, 2.2945835762002353, 17, "uydu_02.jpg")
+```
+
+![](uydu_02.jpg)
 
 Kaynaklar
 
