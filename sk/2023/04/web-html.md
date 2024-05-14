@@ -4,6 +4,8 @@
 
 [Javascript](../../2023/09/javascript.html)
 
+[Web, HTML, Görüntü Dosyaları, Tıklama Kordinatları, Görsel Veri Gömmek](../../2024/05/web_images.html)
+
 [jQuery](../../2010/06/jquery.html)
 
 [Google App Engine](../../2010/03/google-app-engine.html)
