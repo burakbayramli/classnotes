@@ -3,7 +3,7 @@
 ### Resim Verisi Gömmek
 
 HTML sayfaları içinde `<img src=.../>` ile jpg, png dosyalarını
-gösterebiliyoruz, `img` etikenin `width` gibi seçenekleri var, imaj
+gösterebiliyoruz, `img` etiketinin `width` gibi seçenekleri var, imaj
 dosyasının pek çok özelliği etiket içinde tanımlanabiliyor.
 
 Seçenek `src=..` ile bir dosya ismi verilir, dosya İnternet'ten
