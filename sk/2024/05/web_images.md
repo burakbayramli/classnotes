@@ -35,8 +35,9 @@ print (encoded_string)
 b'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAOklEQVR4nO3KMQ3AMAwAwVcpVDKahJuDrVLIZAgDfyl0yNibjyq1mqNSfIx1u2Ir3WQIU8CLj/54Jr5UQBkFUixHywAAAABJRU5ErkJggg=='
 ```
 
-Resmi küçülttük ve base64 halini aldık. Şimdi bu çıktıyı alıp altta `img` içine
-`data:image/png;base64,` ifadesinden sonra koyuyoruz,
+ile alabiliriz. Resmi küçülttük ve base64 formatını aldık. Şimdi bu
+çıktıyı alıp altta `img` içine `data:image/png;base64,` ifadesinden
+sonra koyuyoruz,
 
 ```
 <img width="100" src='data:image/png;base64,iVBORw0KGgoA...'/>
