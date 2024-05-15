@@ -13,7 +13,7 @@ gömülebiliyor. Bir ikisel veri bu tabii ki bu ikisel veriyi bir
 şekilde metin formatında verebilmek lazım (ancak o şekilde HTML içine
 koyabiliriz), bu da base64 formatı ile yapılabilir.
 
-Üstteki yaklaşım özellikle onizleme görseli (thumbnail) yaratırken ise
+Üstteki yaklaşım özellikle önizleme görseli (thumbnail) yaratırken işe
 yarayabilir, büyük resimler vardır, onların ufak hali ise direk HTML
 içine gömülmüş halde servis edilebilir.
 
@@ -69,6 +69,3 @@ bir örneği görülüyor,
 ```
 
 [Örnek](test2.html)
-
-
-

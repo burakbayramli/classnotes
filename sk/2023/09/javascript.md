@@ -462,6 +462,23 @@ var res = JSON.parse(xmlHttp.responseText);
 ...
 ```
 
+Fakat dikkat, eğer üstteki kod `filanca.com` sitesi dışındaki başka
+bir siteden geliyorsa, mesela HTML/JS kodu `falanca.com`'da
+eriştiğimiz json `filanca.com`'da olabilir, o zaman çoğunlukla bu
+erişim CORS denilen bir hata verir, her site dışarıdan gelen kodlara
+programsal erişim sağlamak istemiyor. En garanti olan sitenin kendi
+servis ettiği json dosyalarına erişmektir, bu da izafi dizin erişimi
+ile yapılabilir, mesela `filanca.com/dir/ındex.html` içindeki Javascript
+aynı dizindeki json dosyasına `/dır/file1.json` ile erişir.
+
+Önbellekleme
+
+JSON dosyalarına bir kez erişildiğinde bu dosyalara ikinci erişim
+onbellekten veriyi alır, bir daha Internet'e gidiş olmaz. Bu hem
+programlama hem performans açısından yardımcı olur, farklı sayfalar
+aynı json dosyasına erişiyorsa ikinci ve sonraki erişimler hızla
+işleyecektir, çetrefil onbellekleme kodlarına gerek kalmaz.
+
 Ajax
 
 XMLHttpRequest ile Ajax çağrısı yapmak ta mümkündür. İlk kez bu
@@ -547,6 +564,39 @@ HTML/Javascript şöyle olabilir,
   
 </html>
 ```
+
+### URL Parametresi Okumak
+
+Servis tarafı kodlarında olduğu gibi pür istemci tarafında işleyen
+Javascript kodlarında da ÜRL sonuna eklenen parametreler
+okunabilir. Mesela bir ürün programı yazmışsak, ürün listesinden bir
+ürüne tıklayınca onun detaylarını ayrı bir `detay.html` sayfasında
+görmek isteyebilirim. Hangi ürüne baktığımı bu sayfaya bir parametre
+ile geçmek isterim, mesela `id=...` gibi. Tüm URL
+`/detay.html?id=12231` gibi bir çağrı olabilir.
+
+Parametreyi ÜRL'den almak için `location.search` çağrısından tüm URL'i
+alırım, ve parametre kısmını ayırırım, bunlar o sayfa yüklenir
+yüklenmez işleyen bir Javascript fonksiyonu içinde yapılabilir,
+
+```
+<html>
+  <script>
+    function detail() {
+      var id = location.search.split('id=')[1];
+      var s = `Gonderilen urun id ${id}`;
+      document.getElementById('output').innerHTML = s; 
+    }
+  </script>    
+  <body onload='detail()'>
+    <div id="output">
+    </div>
+  </body>
+
+</html>
+```
+
+[Örnek](detay.html?id=4444)
 
 ### Tarih Objeleri
 
