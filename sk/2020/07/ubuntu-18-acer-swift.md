@@ -256,6 +256,20 @@ dconf write /org/gnome/desktop/sound/event-sounds false
 
 onlari kapatir.
 
+Tracker
+
+Gnome ortamında masaüstü için diskteki dosyalar sürekli indeksleniyor, bunlar
+`/usr/lib/tracker` altındaki programlar tarafından yapılıyor. `apt remove` ile
+yapılabilecek silme işlemi `gnome` u da silebilir, bunun yerine tracker sisteminin
+kullandığı programları "işlemez" hale getirmek en iyisi, yani `chmod -x` ile
+işlerlik statüsünü kaldırmak.
+
+```
+sudo chmod -x /usr/lib/tracker/tracker-miner-fs
+sudo chmod -x /usr/lib/tracker/tracker-extract 
+sudo chmod -x /usr/lib/tracker/tracker-store
+```
+
 Renkler
 
 Chrome tarayıcıyı siyah üzeri beyaz göstermek istiyorsak arama
