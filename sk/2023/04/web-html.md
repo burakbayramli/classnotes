@@ -4,6 +4,8 @@
 
 [Javascript](../../2023/09/javascript.html)
 
+[Javascript - 2](../../2024/06/javascript-2.html)
+
 [Web, HTML, Görüntü Dosyaları, Tıklama Kordinatları, Görsel Veri Gömmek](../../2024/05/web_images.html)
 
 [jQuery](../../2010/06/jquery.html)

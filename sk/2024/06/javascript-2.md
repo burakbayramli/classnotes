@@ -32,15 +32,15 @@ function read_zip() {
 Üstteki kod CSV dosyasının her kaydının ayrı bir satırda ve
 kolonlarının virgül ile ayrılmış olduğunu farz ediyor, bu sebeple önce
 ters zip yapar, sonra yeni satır `\n` karakteri üzerinden ayırma
-(split) yapar, ve en on her elde edilen her satırda virgül üzerinden
-ayrım yapar. Bu işlem sonunda her satır işlenirken `tokens` dizini icinde
-gerekli kolon bilgileri alinabilecektir.
+(split) yapar, ve en son elde edilen her satırda virgül üzerinden bir
+ayrım daha yapar. Bu işlem sonunda her satır işlenirken `tokens`
+dizini icinde gerekli kolon bilgileri alinabilecektir.
 
 ### Girdi Tamamlamak (Autocomplete)
 
-Javascript'in kabiliyetlerini göstermek açısından alttaki kod faydalı olur,
-giriş kutusuna girilen birkaç kelime sonrası gerisini tamamlama amaçlı seçenek
-listesi veren (autocomplete) kodu [1] altta görülüyor.
+HTML sayfasındaki bir giriş kutusuna girilen birkaç kelime sonrası
+gerisini tamamlama amaçlı seçenek listesi veren (autocomplete) kodu
+[1] altta görülüyor.
 
 ```html
 <html>
