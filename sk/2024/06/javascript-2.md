@@ -36,6 +36,13 @@ ters zip yapar, sonra yeni satır `\n` karakteri üzerinden ayırma
 ayrım daha yapar. Bu işlem sonunda her satır işlenirken `tokens`
 dizini icinde gerekli kolon bilgileri alinabilecektir.
 
+Not: `JSZip` ve `zip.file` ile yapılan tüm işlemler bellekte olmakta,
+diske hiçbir noktada yazım yapılmıyor. Tarayıcı ortamında bunun nasıl
+faydalı olacağını görebiliriz, çünkü tarayıcının kullanıcının diskine
+yazma izni yoktur, fakat eğer zip çok büyük değilse üstteki kod
+tarayıcı üstteki kodla zip indirip, içindeki dosyayı açıp onu rahat
+bir şekilde tarayıp, işlemini yapabilir.
+
 ### Girdi Tamamlamak (Autocomplete)
 
 HTML sayfasındaki bir giriş kutusuna girilen birkaç kelime sonrası
