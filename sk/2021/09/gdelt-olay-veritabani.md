@@ -113,6 +113,45 @@ Bu makaleye bakınca evet içinde saldırı kelimesi geçtiğini görüyoruz
 fakat bu askeri değil, politika bağlamında sözel bir çekişme var. Demek
 ki GDELT her zaman işlemiyor, ek filtreleme yapmak gerekebilir.
 
+Ekler
+
+En son versiyon üzerinde işleyen kod alttadır, 20240602 tarihi için bir zıp
+dosyasının indirilmiş olduğunu kabul edelim,
+
+```python
+import zipfile, pandas as pd
+with zipfile.ZipFile('20240602.export.CSV.zip', 'r') as z:
+     df = pd.read_csv(z.open('20240602.export.CSV'),sep='\t',header=None)
+     
+cols = ["GLOBALEVENTID", "SQLDATE", "MonthYear", "Year",
+"FractionDate", "Actor1Code", "Actor1Name", "Actor1CountryCode",
+"Actor1KnownGroupCode", "Actor1EthnicCode", "Actor1Religion1Code",
+"Actor1Religion2Code", "Actor1Type1Code", "Actor1Type2Code",
+"Actor1Type3Code", "Actor2Code", "Actor2Name", "Actor2CountryCode",
+"Actor2KnownGroupCode", "Actor2EthnicCode", "Actor2Religion1Code",
+"Actor2Religion2Code", "Actor2Type1Code", "Actor2Type2Code",
+"Actor2Type3Code", "IsRootEvent", "EventCode", "EventBaseCode",
+"EventRootCode", "QuadClass", "GoldsteinScale", "NumMentions",
+"NumSources", "NumArticles", "AvgTone", "Actor1Geo_Type",
+"Actor1Geo_FullName", "Actor1Geo_CountryCode", "Actor1Geo_ADM1Code",
+"Actor1Geo_Lat", "Actor1Geo_Long", "Actor1Geo_FeatureID",
+"Actor2Geo_Type", "Actor2Geo_FullName", "Actor2Geo_CountryCode",
+"Actor2Geo_ADM1Code", "Actor2Geo_Lat", "Actor2Geo_Long",
+"Actor2Geo_FeatureID", "ActionGeo_Type", "ActionGeo_FullName",
+"ActionGeo_CountryCode", "ActionGeo_ADM1Code", "ActionGeo_Lat",
+"ActionGeo_Long", "ActionGeo_FeatureID", "DATEADDED","SOURCEURL"];
+
+df.columns = cols
+
+df = df[(df['Actor1Type1Code'] == 'MIL') | (df.EventCode==154)]
+df = df[['Actor1Geo_Lat','Actor1Geo_Long','SOURCEURL']]
+df = df.drop_duplicates(subset=['SOURCEURL'],keep='last')
+df = df[pd.isnull(df2.Actor1Geo_Lat)==False]
+```
+
+Artık `df` içinde filtrelenmiş ve enlem, boylam ve haber kaynağının
+URL bağlantısını içeren bir veri sonucu vardır.
+
 
 Kaynaklar
 
