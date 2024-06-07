@@ -447,6 +447,28 @@ Her sayfa başlangıcında `init_cookies` çağrılır, site çerezi ismi
 her sayfa kendine ait bilgiye bir sözlük üzerinden erişir. Çerezleri
 almak için `get_prefs` geri yazmak için `save_cookie`.
 
+### Alternatif Depolama Yöntemleri
+
+Eğer çerez kullanmak istemiyorsak ya da kullanmak mümkün değil ise
+(bir keresinde siteme eklediğim reklam servisinin Javascript kodu site
+seviyesinde ne çerez bulursa onları siliyordu, uygulamamızın çerezi
+yok oluyordu), alternatif depolama yöntemleri vardır. Bunlardan kalıcı
+olanı `localStorage`, oturum bazında olanı `sessionStorage`.
+
+Her iki değişken her zaman kullanıma hazır durumdadır, ve anahtar /
+değer bazında çalışırlar. `setItem('anahtar','değer')` ile depolama
+yapılır, `.getİtem('anahtar')` ile depolanan değer geri alınır. Eğer
+`localStorage` kullanılmışsa tarayıcı kapatıldıktan sonra bile
+değerler sonraki ziyarette hatırlanır, `sessionStorage` ile oturum
+bitince değerler silinir.
+
+Önemli nokta, her iki depolama sisteminin de metin (string) bazlı
+depolama yapması, yani çetrefil obje mesela dizin, sözlük gibi
+depolayınca onu olduğu gibi geri alabilmeyi bekleyemeyiz, o yüzden her
+iki durumda da depolamadan önce `JSON.stringify` ile metne çevirip,
+geri okurken de `JSON.parse` ile gerekli objelere çevirim yapmamız
+gerekir.
+
 ### XMLHttpRequest
 
 Statik Dosya
