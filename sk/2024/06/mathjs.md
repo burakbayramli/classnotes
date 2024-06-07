@@ -99,6 +99,9 @@ DenseMatrix {
   _datatype: undefined }
 ```
 
+Devrik alma `transpose` ve tersine çevirme `inv` işlemleri de aynı
+kütüphane üzerinde bulunabilir.
+
 Kaynaklar
 
 [1] https://mathjs.org/examples/index.html
