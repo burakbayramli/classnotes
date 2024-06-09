@@ -3,6 +3,8 @@
 
 ## En Son
 
+7/6 - [Math.js](https://burakbayramli.github.io/dersblog/sk/2024/06/mathjs.html)
+
 3/6 - [Javascript - 2](https://burakbayramli.github.io/dersblog/sk/2024/06/javascript-2.html)
 
 15/5 - [Web, HTML, Görüntü Dosyaları, Tıklama Kordinatları, Görsel Veri Gömmek](https://burakbayramli.github.io/dersblog/sk/2024/05/web_images.html)
@@ -10,8 +12,6 @@
 16/4 - [Materyel Mekaniği - 6](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_06/materyel_mekanigi__6.html)
 
 27/2 - [Diferansiyel Denklemler, Trigonometri - Ek - Radyan](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_50_trig/trigonometri.html)
-
-19/2 - [Üstdüşümlü Matris Sistemini Çözmek](https://burakbayramli.github.io/dersblog/sk/2024/01/beam_lattice_superposition_cg_sparse.html)
 
 ## Konular, Referans
 

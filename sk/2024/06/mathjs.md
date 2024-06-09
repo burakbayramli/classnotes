@@ -7,14 +7,13 @@ etmek için komut satırı ortamında
 var math = require('./math.js');
 ```
 
-ve artık mesela `cos` çağırmak için `math.cos()` çağrısı yapılır, ve
-`node` ile script çağrılır. HTML sayfa bağlamında standard `src include`
-komutu gerekir. Yazının geri kalanı komut satırı farz edecek.
-
-Bir matris işlemi,
+ve artık mesela `cos` hesabı için `math.cos()` çağrısı yapılır, ve
+`node` ile script işletilir. HTML sayfa bağlamında standard `src
+include` komutu gerekir. Yazının geri kalanı komut satırı farz
+edecek. Bir matris işlemi,
 
 ```javascript
-let N = 20;
+N = 20;
 A = math.round(math.random([N,N]),5);
 B = math.round(math.random([N,N]),5);
 
@@ -100,7 +99,37 @@ DenseMatrix {
 ```
 
 Devrik alma `transpose` ve tersine çevirme `inv` işlemleri de aynı
-kütüphane üzerinde bulunabilir.
+kütüphane üzerinde bulunabilir,
+
+```
+const H = math.matrix([[2, 0], [0, 2]]);
+
+console.log(math.inv(H));
+```
+
+Tersini alma,
+
+```
+DenseMatrix {
+  _data: [ [ 0.5, -0 ], [ -0, 0.5 ] ],
+  _size: [ 2, 2 ],
+  _datatype: undefined }
+```
+
+Devrik,
+
+```
+const H = math.matrix([[1, 2], [3, 4]]);
+
+console.log(math.transpose(H));
+```
+
+```
+DenseMatrix {
+  _data: [ [ 1, 3 ], [ 2, 4 ] ],
+  _size: [ 2, 2 ],
+  _datatype: undefined }
+```
 
 Kaynaklar
 
