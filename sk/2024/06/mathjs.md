@@ -99,15 +99,15 @@ DenseMatrix {
 ```
 
 Devrik alma `transpose` ve tersine çevirme `inv` işlemleri de aynı
-kütüphane üzerinde bulunabilir,
+kütüphane üzerinde bulunabilir.
+
+Tersini alma,
 
 ```
 const H = math.matrix([[2, 0], [0, 2]]);
 
 console.log(math.inv(H));
 ```
-
-Tersini alma,
 
 ```
 DenseMatrix {
@@ -134,4 +134,7 @@ DenseMatrix {
 Kaynaklar
 
 [1] https://mathjs.org/examples/index.html
+
+
+
 
