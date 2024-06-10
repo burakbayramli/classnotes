@@ -241,6 +241,15 @@ değişkeni içinde olduğu kapsama sınırlar, diğeri içinde olduğu
 fonksiyona sınırlar. Mesela üstteki kodda `func1` içinde `let var2 = "bbbbbb"`
 tanımlasam ve `func2` içinden erişmeye uğraşsam hata mesajı alırım. 
 
+Javascript tiplemesi dinamiktir, yani statik olan C++ gibi dillerin
+tersini derleme aşaması yoktur ki bu aşamalarda bazı diller tip
+uyuşması şartı arayabiliyor, mesela `a == b` testi yapıyorsam
+derleyici `a` ve `b` tiplerinin uyumlu olma şartını isteyebilir. JS
+ile derleme süreci yok, hatta işlem anında JS yapabildiği kadar
+otomatik değişimi yapmaya uğraşır. Mesela `2 == "02"` gibi bir eşitlik
+kontrolü "doğru" cevabını verecektir, sistem `02` metin değerini sayı
+yapıp `2` ile karşılaştırmasını gerçekleştirmiştir.
+
 Anahtar bazlı hızlı erişilebilen sözlük (dictionary) yapısı pek çok
 diğer dilde olduğu gibi Javascript'te de mevcuttur. Yaratmak için
 direk kod içinde
