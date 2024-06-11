@@ -342,6 +342,37 @@ var res = getElevation(29,37);
 console.log(res);
 ```
 
+Eğer Javascript ortamında GLOBE veri dosyalarını okuyup işlemek istiyorsak,
+
+```
+var url = "/vs/vs/all10/g10g";    
+fetch(url).then(res => res.arrayBuffer())
+    .then(arrayBuffer => {
+        byteArray = new Uint8Array(arrayBuffer);
+    })
+    .then(function(done) {
+        console.log('done');
+	// Alttaki bayt indix degeri fileIndex cagrisindan alinabilir
+        console.log(byteArray[33681360]);
+        console.log(byteArray[33681361]);
+        var buffer = new ArrayBuffer(2);
+        var Uint8View = new Uint8Array(buffer);
+        Uint8View[0] = byteArray[33681360];
+        Uint8View[1] = byteArray[33681361]
+        var Uint16View = new Uint16Array(buffer);
+        console.log(Uint16View[0]);     
+    })
+    .catch(error => {
+        console.log('error');           
+    });
+```
+
+gibi bir kalıp takip edebiliriz. Muhakkak her dosya parçası, `a10g`,
+`b10g` 100 MB civarı, bunları Internet'ten indirmek zaman alır. Fakat
+belki yerel bir uygulama var, ya da bahsedilen dosyalar parçalara
+bölündu, zaten ilk erişim sonrası ikinci, üçüncü erişimler onbellekten
+gelir diyorsak, bu durumda üstteki kod faydalı olabilir.
+
 Kaynaklar
 
 [1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
