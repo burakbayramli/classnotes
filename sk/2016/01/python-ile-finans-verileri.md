@@ -24,7 +24,7 @@ end = int(time.mktime(end.timetuple()))
 url = "https://query1.finance.yahoo.com/v7/finance/download/^IXIC?period1=" + str(start) + "&period2=" + str(end) + "&interval=1d&events=history&includeAdjustedClose=true"
 r = urllib2.urlopen(url).read()
 file = BytesIO(r)
-df = pd.read_csv(file,index_col='Date')3
+df = pd.read_csv(file,index_col='Date')
 ```
 
 Aynı şekilde 'FRED' ABD merkez bankası tabanından veri indirilebiliyor. 
