@@ -36,6 +36,7 @@ veriyor; onun sayfalarından "kazıyarak" istenen veriyi alabiliriz,
 
 
 ```python
+from urllib.request import urlopen
 import re
 
 url = "http://veloroutes.org/elevation/?" + \
@@ -51,36 +52,6 @@ print (float(rres[0]))
 215.0
 ```
 
-Bir diğeri elevation.racemap.com adresinden; bu arkadaşlar da bedava
-servis veriyorlar, Curl kullanıp
-
-```python
-! curl -d '[[51.3, 13.4], [51.4, 13.3]]' -XPOST \
-  -H 'Content-Type: application/json' \
-  https://elevation.racemap.com/api
-```
-
-```text
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    37  100     9  100    28      8     27  0:00:01  0:00:01 --:--:--    27100    37  100     9  100    28      8     27  0:00:01  0:00:01 --:--:--    27
-[101,100]
-```
-
-Bu komutu tabii ki sarmalayıp sonucu bir yere yazdırıp Python ile
-güzel liste döndürmesi için ayarlayabiliriz. Ya da `requests`
-kullanarak aynı çağrıyı yapabiliriz,
-
-```python
-import requests
-
-headers = {  'Content-Type': 'application/json', }
-data = '[[51.3, 13.4], [51.4, 13.3]]'
-response = requests.post('https://elevation.racemap.com/api',
-                         headers=headers, data=data)
-print(response.text)
-```
-
 Daha Çetrefil Kullanım
 
 Alttaki örnekte bir kordinat alanıda 7 x 7 büyüklüğünde bir ızgara yaratıyoruz,
@@ -89,27 +60,6 @@ ile aradeğerleme (interpolation) yaparak yüksekliği yaklaşık şekilde temsi
 ediyoruz. 
 
 
-```python
-import requests
-
-def get_elev_data(coords):
-    chunk = [list(x) for x in coords]
-    data = "["
-    for i,x in enumerate(chunk):
-        data += str(x)
-        if i != len(chunk)-1: data += ","
-    data += "]"
-    response = requests.post('https://elevation.racemap.com/api',
-                             headers={'Content-Type': 'application/json',},
-                             data=data)
-    res = response.text
-    res = res.replace("]","").replace("[","")
-    res = res.split(",")
-    res = [float(x) for x in res]
-    return res
-
-```
-
 Veri alındı, şimdi RBF,
 
 ```python
@@ -117,6 +67,10 @@ from scipy.interpolate import Rbf
 
 latlow = 36; lathigh = 37
 lonlow = 29; lonhigh = 30
+
+def get_elev_data(coords):
+    ...
+
 
 D = 7
 x = np.linspace(lonlow,lonhigh,D)
@@ -225,6 +179,8 @@ civarı, A,B,C,D bölge dosyaları bu zip içinde, "All Tiles in One .zip
 file" seçeneği. Çoğu yükseklik matrisi 10800 kolon, 4800 satır
 olacaktır, bazıları daha az, altta her bölgenin boyutları var.
 
+Python
+
 Zip dosyasını açalım, alttaki kod `g10g` bölgesini okuyup haritalıyor,
 [5] kodu örnek alındı. 
 
@@ -276,11 +232,11 @@ plt.savefig('gltiles1.png')
 
 ![](gltiles1.png)
 
-Eger belli bir bolgeyi cekip cikartmak istiyorsak biraz daha ek islem
-gerekli. Mesela sol alt kose 35,25 sag ust kose 42,46 olacak sekilde
-(TR bolgesi) bir dikdortgenin icine dusen yukseklikleri istiyoruz. Bu
-durumda `lat`, `lon` vektorleri icindeki o alana dusen kordinat
-indislerini bulup, onlara gore `zm` matrisi icindeki o veriyi almak
+Eğer belli bir bölgeyi çekip çıkartmak istiyorsak biraz daha ek işlem
+gerekli. Mesela sol alt köşe 35,25 sağ üst köşe 42,46 olacak şekilde
+(TR bölgesi) bir dikdörtgenin içine düşen yükseklikleri istiyoruz. Bu
+durumda `lat`, `lon` vektörleri içindeki o alana düşen kordinat
+indislerini bulup, onlara göre `zm` matrisi içindeki o veriyi almak
 gerekir.
 
 Burada bize yardımcı olabilecek bir kod türü aslında görüntü işlem
@@ -319,6 +275,73 @@ plt.savefig('gltiles2.jpg')
 
 ![](gltiles2.jpg)
 
+Javascript
+
+Alttaki kod [8] kod deposunu baz almıştır, komut satırında `node` ile işletilebilir,
+
+```javascript
+'use strict';
+var path= require('path');
+var fs= require('fs');
+
+var resolution= 120;
+
+var dataFiles= [
+    // ...
+    { name: 'g10g', latMin:     0, latMax:     50, lngMin:      0, lngMax:     90, elMin:   -407, elMax:    8752, columns:    10800, rows:   6000 }
+    // ...
+];
+
+var baseDir = './all10';
+
+function findFile( lng, lat ) {
+    for ( var i in dataFiles ) {
+        var df= dataFiles[i];
+        if (df.latMin <= lat && df.latMax > lat && df.lngMin <= lng && df.lngMax > lng) {
+            return df;
+        }
+    }
+}
+
+function fileIndex( lng, lat, fileEntry, resolution ) {
+    var column= Math.floor(lng * resolution);
+    var row= Math.floor(lat * resolution);
+
+    var rowIndex= row - fileEntry.latMin * resolution;
+    var columnIndex= column - fileEntry.lngMin * resolution;
+    var index= ((fileEntry.rows - rowIndex - 1) * fileEntry.columns + columnIndex) * 2;
+    return index;
+};
+
+function openFile( name ) {
+    return fs.openSync(baseDir + '/' + name , 'r');
+}
+
+function readNumberFromFile(name,position) {
+
+    var buffer= new Buffer(2);
+
+    var fd = openFile(name);
+    if ( fs.readSync(fd, buffer, 0, 2, position) !== 2 ) return new Error('Could not fetch value from file');
+
+    var int16= buffer.readInt16LE(0);
+    
+    // return 0 for oceans
+    return int16 === -500 ? 0 : int16;
+}
+
+function getElevation( lng, lat, onError ) {
+    var fileEntry= findFile(lng, lat);
+    var result= readNumberFromFile(fileEntry.name, fileIndex(lng, lat, fileEntry, resolution));
+
+    return result;
+};
+
+var res = getElevation(29,37);
+
+console.log(res);
+```
+
 Kaynaklar
 
 [1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
@@ -334,3 +357,6 @@ Kaynaklar
 [6] [Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](../../2021/11/yukseklik-kontur-folium-harita.html)
 
 [7] [İmaj / Görüntü İşleme Teknikleri](https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html)
+
+[8] git@github.com:rl3/nodejs-globe-elevation.git
+
