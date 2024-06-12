@@ -66,29 +66,7 @@ silsek bile bir şifre dosyasının tarihte kalması durumu var, birisi
 `checkout` ile eski hale giderek şifreleri görebilir. Çözüm tamamen
 silmek.
 
-Metot 1
-
-```
-git filter-branch --force --index-filter 'git rm --cached \
-   --ignore-unmatch [BUYUK DOSYA, * VS ISARETLERI KULLANILABILIR]' \
-   --prune-empty --tag-name-filter cat -- --all
-```
-
-Ya da en basit kullanım
-
-```
-git filter-branch --tree-filter 'rm -rf [dizin]' HEAD
-```
-
-Bu islemler uzun zaman alabilir bu arada. Değişikliği göndermek için
-
-```
-git push origin --force --all 
-```
-
-Metot 2
-
-Artik Git tarafindan tavsiye edilen yeni yaklasim `git-filter-repo`
+Git tarafindan tavsiye edilen yeni yaklasim `git-filter-repo`
 kullanimi. Bu ayri bir yardimci kod, indirmek icin
 
 https://github.com/newren/git-filter-repo
@@ -106,7 +84,7 @@ git --version
 ve `git-filter-repo` [DİZİN] altında kurulduğunu varsayarak,
 
 ```
-[DIZIN]/git-filter-repo/git-filter-repo--invert-paths --path dir1/dir2/dosya3.txt
+[DIZIN]/git-filter-repo/git-filter-repo --invert-paths --path dir1/dir2/dosya3.txt
 ```
 
 ile `dir1/dir2/dosya3.txt` dosyasını tarihten silelim. Tabii önceden
