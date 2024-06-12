@@ -26,3 +26,5 @@
 
 [Javascript Yerine Tarayıcıda Python, PyScript](2023/09/pyscript.html)
 
+[Tarayıcı ve Statik Dosya Servisi ile Uygulama](../../2023/09/tarayici-statik-dosya-mimarisi.html)
+

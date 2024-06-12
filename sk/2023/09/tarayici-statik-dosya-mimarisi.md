@@ -57,6 +57,32 @@ print (res.text)
 
 Üstteki kodlar aynı dosyanın farklı yerlerini gösterecekler.
 
+Javascript ile,
+
+```javascript
+function get_data() {
+
+    var url = "/vs/vs/data.bin";
+    
+    fetch(url, {
+        headers: {
+            'content-type': 'multipart/byteranges',
+            'range': 'bytes=2-2',
+        },
+    }).then(response => {
+        if (response.ok) {
+	    return response.arrayBuffer();
+        }
+    }).then(response => {
+	var a = new Uint8Array(response);
+        console.log(a[0]);
+    });    
+}
+
+```
+
+Bu kodla verinin sadece 2'inci baytını okumuş olduk.
+
 Bir tavsiye sistemini serviste pür dosya kullanarak nasıl yazarız?
 Tavsiye sistemlerinin en basit şekli kullanıcı yakınlığı
 bulmak. Tabanda 10 tane film varsa kullanıcı A belki üçünü seyretti,
