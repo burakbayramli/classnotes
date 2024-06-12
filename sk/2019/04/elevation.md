@@ -378,21 +378,21 @@ alınıp önbelleğe alıyoruz, üstteki koda bu tür uzatmalar yapılabilir,
 
 Kaynaklar
 
-[1] [RBF](https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html)
+[1] <a href="https://burakbayramli.github.io/dersblog/stat/stat_175_rbf/dairesel_baz_fonksiyonlari__radial_basis_functions_rbf__yukseklik_verisi_daglar.html">RBF</a>
 
-[2] World digital elevation model (ETOPO5), https://www.eea.europa.eu/data-and-maps/data/world-digital-elevation-model-etopo5
+[2] <a href="https://www.eea.europa.eu/data-and-maps/data/world-digital-elevation-model-etopo5">World digital elevation model (ETOPO5)</a>
 
-[3] https://github.com/KipCrossing/geotiff
+[3] <a href="https://github.com/KipCrossing/geotiff">geotiff</a>
 
-[4] [GLOBE](https://www.ngdc.noaa.gov/mgg/topo/gltiles.html)
+[4] <a href="https://www.ngdc.noaa.gov/mgg/topo/gltiles.html">GLOBE</a>
 
-[5] https://github.com/developmentseed/landsat-util
+[5] <a href="https://github.com/developmentseed/landsat-util">landsat-util</a>
 
-[6] [Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek](../../2021/11/yukseklik-kontur-folium-harita.html)
+[6] <a href="../../2021/11/yukseklik-kontur-folium-harita.html">Yükseklik Verisini Kontur olarak Folium Haritasında Göstermek</a>
 
-[7] [İmaj / Görüntü İşleme Teknikleri](https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html)
+[7] <a href="https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html">İmaj / Görüntü İşleme Teknikleri</a>
 
-[8] [nodejs-globe-elevation](https://github.com/rl3/nodejs-globe-elevation)
+[8] <a href="https://github.com/rl3/nodejs-globe-elevation">nodejs-globe-elevation</a>
 
-[9] [Github](https://github.com/burakbayramli/nomadicterrain/blob/main/static/elev/elev.js)
+[9] <a href="https://github.com/burakbayramli/nomadicterrain/blob/main/static/elev/elev.js">Github</a>
 
