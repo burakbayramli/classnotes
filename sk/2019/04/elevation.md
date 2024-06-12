@@ -367,11 +367,13 @@ fetch(url).then(res => res.arrayBuffer())
     });
 ```
 
-gibi bir kalıp takip edebiliriz. Muhakkak her dosya parçası, `a10g`,
-`b10g` 100 MB civarı, bunları Internet'ten indirmek zaman alır. Fakat
-belki yerel bir uygulama var, ya da bahsedilen dosyalar parçalara
-bölündu, zaten ilk erişim sonrası ikinci, üçüncü erişimler onbellekten
-gelir diyorsak, bu durumda üstteki kod faydalı olabilir.
+gibi bir kalıp takip edebiliriz.
+
+Muhakkak her dosya parçası, `a10g`, `b10g` 100 MB civarı, bunları
+Internet'ten indirmek zaman alır. Fakat belki yerel web uygulaması
+yazdık, ya da bahsedilen dosyalar parçalara bölündü ve parça parça
+alınıp önbelleğe alıyoruz, üstteki koda bu tür uzatmalar yapılabilir,
+[9] kodunda bu yaklaşımı görüyoruz.
 
 Kaynaklar
 
@@ -389,5 +391,7 @@ Kaynaklar
 
 [7] [İmaj / Görüntü İşleme Teknikleri](https://burakbayramli.github.io/dersblog/sk/2023/06/imaj-isleme-teknikleri.html)
 
-[8] git@github.com:rl3/nodejs-globe-elevation.git
+[8] [nodejs-globe-elevation](https://github.com/rl3/nodejs-globe-elevation)
+
+[9] [Github](https://github.com/burakbayramli/nomadicterrain/blob/main/static/elev/elev.js)
 
