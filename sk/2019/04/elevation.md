@@ -352,7 +352,8 @@ fetch(url).then(res => res.arrayBuffer())
     })
     .then(function(done) {
         console.log('done');
-	// Alttaki bayt indix degeri fileIndex cagrisindan alinabilir
+        // Alttaki indis degeri enlem,boylam icin fileIndex
+	// cagrisindan alinabilir, ornek 37,29 icin olan degerler bunlar
         console.log(byteArray[33681360]);
         console.log(byteArray[33681361]);
         var buffer = new ArrayBuffer(2);
@@ -373,7 +374,7 @@ Muhakkak her dosya parçası, `a10g`, `b10g` 100 MB civarı, bunları
 Internet'ten indirmek zaman alır. Fakat belki yerel web uygulaması
 yazdık, ya da bahsedilen dosyalar parçalara bölündü ve parça parça
 alınıp önbelleğe alıyoruz, üstteki koda bu tür uzatmalar yapılabilir,
-[9] kodunda bu yaklaşımı görüyoruz.
+[9] kodunda parçalı okuma yaklaşımını görüyoruz.
 
 Kaynaklar
 
