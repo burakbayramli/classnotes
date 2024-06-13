@@ -377,11 +377,11 @@ alınıp önbelleğe alıyoruz, üstteki koda bu tür uzatmalar yapılabilir.
 
 Bir diğer seçenek (belki bu en iyisi) kapsam isteği (range request)
 kavramını kullanmak. Kİ ile çoğu statik web servisinin ne kadar büyük
-olursa olsun servis ettiği dosyalara noktasal erişim elde edebiliyoruz.
-Kİ web standartının bir parçası, yani çoğu web servisi (Apaçhe gibi)
-bu tür erişimi sağlayacaktır, böylece dosya `data.bin` diyelim, 1 GB olsa
-bile kapsam isteği ile 1000'inci ve 1010'uncu baytları arasındaki ufak
-bölgeyi çekip çıkartabiliyoruz.
+olursa olsun servis ettiği dosyalara noktasal erişim elde
+edebiliyoruz.  Kİ web standartının bir parçası, yani çoğu web servisi
+(Apache gibi) bu tür erişimi sağlayacaktır, böylece dosya `data.bin`
+diyelim, 1 GB olsa bile kapsam isteği ile 1000'inci ve 1010'uncu
+baytları arasındaki ufak bölgeyi çekip çıkartabiliyoruz.
 
 GLOBE verisine erişim için bu çok faydalı çünkü zaten üstte görüldüğü
 gibi o veriye de baytsal indis vererek erişim yapıyoruz. O zaman o
@@ -417,6 +417,12 @@ function init() {
 ```
 
 Bu kod çıktı olarak 756 (metre) değerini basacaktır.
+
+Not: GLOBE verileri, mesela `a10g`, `b10g` gibi nasıl alt parçalara
+ayrılır?  Dosyaların büyüklüğüne bakarız, eğer 200000 diyorsa mesela,
+dört parçaya bölmek için Unix komut satırında `split` kullanılabilir,
+`split -b 50000 a10g` çağrısı `xaa`, `xab`, .. şeklinde dört tane
+dosya yaratacaktır.
 
 Kaynaklar
 
