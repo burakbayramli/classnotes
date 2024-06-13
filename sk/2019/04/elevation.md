@@ -344,7 +344,7 @@ console.log(res);
 
 Eğer Javascript ortamında GLOBE veri dosyalarını okuyup işlemek istiyorsak,
 
-```
+```javascript
 var url = "/vs/vs/all10/g10g";    
 fetch(url).then(res => res.arrayBuffer())
     .then(arrayBuffer => {
@@ -353,7 +353,7 @@ fetch(url).then(res => res.arrayBuffer())
     .then(function(done) {
         console.log('done');
         // Alttaki indis degeri enlem,boylam icin fileIndex
-	// cagrisindan alinabilir, ornek 37,29 icin olan degerler bunlar
+        // cagrisindan alinabilir, ornek 37,29 icin olan degerler bunlar
         console.log(byteArray[33681360]);
         console.log(byteArray[33681361]);
         var buffer = new ArrayBuffer(2);
@@ -373,8 +373,50 @@ gibi bir kalıp takip edebiliriz.
 Muhakkak her dosya parçası, `a10g`, `b10g` 100 MB civarı, bunları
 Internet'ten indirmek zaman alır. Fakat belki yerel web uygulaması
 yazdık, ya da bahsedilen dosyalar parçalara bölündü ve parça parça
-alınıp önbelleğe alıyoruz, üstteki koda bu tür uzatmalar yapılabilir,
-[9] kodunda parçalı okuma yaklaşımını görüyoruz.
+alınıp önbelleğe alıyoruz, üstteki koda bu tür uzatmalar yapılabilir.
+
+Bir diğer seçenek (belki bu en iyisi) kapsam isteği (range request)
+kavramını kullanmak. Kİ ile çoğu statik web servisinin ne kadar büyük
+olursa olsun servis ettiği dosyalara noktasal erişim elde edebiliyoruz.
+Kİ web standartının bir parçası, yani çoğu web servisi (Apaçhe gibi)
+bu tür erişimi sağlayacaktır, böylece dosya `data.bin` diyelim, 1 GB olsa
+bile kapsam isteği ile 1000'inci ve 1010'uncu baytları arasındaki ufak
+bölgeyi çekip çıkartabiliyoruz.
+
+GLOBE verisine erişim için bu çok faydalı çünkü zaten üstte görüldüğü
+gibi o veriye de baytsal indis vererek erişim yapıyoruz. O zaman o
+erişimi kapsam isteği haline çevirirsek bellege büyük dosyalar almadan
+direk erişim yapabiliriz. Alttaki kod bunu gösteriyor,
+
+```javascript
+function init() {
+
+    var url = "/static/elev/data/g10g2";
+    // g10g dosyalari dort parcaya bolundu, bu durumda 33681360-33681361
+    // erisimi ikinci ufak parcada 1281360-1281361 erisimine tekabul eder
+    // aslinda dort parcaya bolmeye gerek yoktu direk g10g uzerinde de
+    // erisim yapabilirdik fakat Github dosya limiti icin boyle yapmak gerekti
+    fetch(url, {
+        headers: {
+            'content-type': 'multipart/byteranges',
+            'range': 'bytes=1281360-1281361',
+        },
+    }).then(response => {
+        if (response.ok) {
+	    return response.arrayBuffer();
+        }
+    }).then(response => {
+	var a = new Uint8Array(response);
+        console.log(a[0]);
+        console.log(a[1]);
+	var res = new Uint16Array(response);
+        console.log(res[0]);
+    });
+    
+}
+```
+
+Bu kod çıktı olarak 756 (metre) değerini basacaktır.
 
 Kaynaklar
 
