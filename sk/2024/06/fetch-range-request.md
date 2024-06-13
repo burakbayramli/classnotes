@@ -27,7 +27,7 @@ const fetchURLs = async (urls) => {
 async function init() {
 
     const urls = ['https://raw.githubusercontent.com/tj/histo/master/examples/small.txt',
-		  'https://raw.githubusercontent.com/tj/histo/master/examples/medium.txt'];
+                  'https://raw.githubusercontent.com/tj/histo/master/examples/medium.txt'];
     console.log('start');
     var res = await fetchURLs(urls);
     console.log('end');
@@ -65,21 +65,21 @@ async function init() {
     var promises = [];
 
     promises.push(
-	fetch(url, {
+        fetch(url, {
             headers: {
-		'content-type': 'multipart/byteranges',
-		'range': 'bytes=33681360-33681361',
+                'content-type': 'multipart/byteranges',
+                'range': 'bytes=33681360-33681361',
             },
-	})
+        })
     );
 
     promises.push(
-	fetch(url, {
+        fetch(url, {
             headers: {
-		'content-type': 'multipart/byteranges',
-		'range': 'bytes=33681362-33681363',
+                'content-type': 'multipart/byteranges',
+                'range': 'bytes=33681362-33681363',
             },
-	})
+        })
     );
     
     const responses = await Promise.all(promises);
@@ -89,7 +89,7 @@ async function init() {
     const data2 = await Promise.all( data1.map(response => new Uint16Array(response) ));
 
     data2.forEach(function(x) {
-	console.log(x[0]);
+        console.log(x[0]);
     });
     
 }
@@ -98,4 +98,6 @@ async function init() {
 Kaynaklar
 
 [1] <a href="../../2019/04/elevation.html">Yükseklik (Elevation) Verileri</a>
+
+
 
