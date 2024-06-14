@@ -175,7 +175,7 @@ print(res)
 [0, 2, 1]
 ```
 
-### Web Kodlaması
+### Web Kodlaması, Pyscript
 
 Eğer üstteki arama metotunu uygulama servisi (app server) olmadan
 kodlamak istiyorsak, yani sadece PyScript (ya da Javascript) ve servis
@@ -194,19 +194,124 @@ Bölünmüş indis dosyaları çoğunlukla 0.5 MB civarı olacaktır. Eğer iki
 kelime aranıyorsa bu ortalama 1 MB JSON dosya indirilmesi demektir,
 hızlı bir şekilde yapılabilir.
 
-Bahsedilen yaklaşımı bu site için kodladık, sonuçları [2]'de görebiliriz.
+Bahsedilen yaklaşımı bu site için kodladık, sonuçları [2]'de
+görebiliriz. Kodlar Github deposunda [3] `invidx.py` ve `sk/ara.html`
+dosyaları içinde. Kod kabaca soyle,
 
-Kodlar Github deposunda [3] `invidx.py` ve `sk/ara.html` dosyaları
-içinde.
+```python
+from pyodide.http import open_url
+from collections import defaultdict
+import json
 
+def write_to_page():
+   manual_div = Element("output")
+   search = Element("search").element.value
+   search = search.lower().replace("ç","c").replace("ö","o").replace("ğ","g")
+   search = search.replace("ı","i").replace("ü","u").replace("ş","s")
+   stok = search.split()
+
+   stok_hits = {}
+
+   results = []
+  
+   base_url = "https://burakbayramli.github.io"
+   
+   for tok in stok:
+      url = base_url + '/idx/invidx-%s.json' % tok[0]
+      df = open_url(url)
+      letter_dict = json.loads(df.getvalue())
+      if tok in letter_dict:
+         stok_hits[tok] = letter_dict[tok]
+         results.append(set(letter_dict[tok]))
+
+   u = set([])
+   if len(results) > 0: u = set.intersection(*results)
+   hits = []        
+   for f in u:
+      hits.append([f,sum([stok_hits[tok][f] for tok in stok])])
+
+   sorted_hits = sorted(range(len(hits)), key=lambda x: hits[x][1], reverse=True)
+
+   out = ""         
+   s1 = '<p><a target='_blank' href="' 
+   s2 = '">%s</a></p>'
+   N = min(20,len(hits))
+   for i in range(N):
+      out = out + s1 + base_url + \
+            str(hits[sorted_hits[i]][0]).replace(".md",".html") + s2 % str(hits[sorted_hits[i]][0])
+
+   if len(out) == 0: out = "No Results"
+   manual_div.element.innerHTML = out
+```
+
+### Web Kodlaması, Javascript
+
+Üstteki kodun benzeri Javascript ile şöyle kodlanabilir,
+
+```javascript
+async function searchText() {
+
+    var s = document.getElementById("keywords").value;
+    s = s.toLowerCase().replace("ç","c").replace("ö","o").replace("ğ","g");
+    s = s.replace("ı","i").replace("ü","u").replace("ş","s");
+    var stoks = s;
+    
+    var stoks = stoks.split(" ");
+
+    var stok_hits = {}
+    
+    for (var i=0; i<stoks.length; i++) {
+	var tok = stoks[i];
+	var letter_dict;
+	var firstLetter = tok.substring(0,1);
+	var url = `/static/skidx/invidx-${firstLetter}.json`;
+	await fetch(url)
+	    .then(response => response.json())
+	    .then(data => letter_dict = data );
+	
+	if (letter_dict.hasOwnProperty(tok)) {
+	    Object.keys(letter_dict[tok]).forEach(function(article) {
+		if (stok_hits.hasOwnProperty(article)) {
+		    stok_hits[article] = stok_hits[article] + letter_dict[tok][article];
+		} else {
+		    stok_hits[article] = letter_dict[tok][article];
+		}
+	    });	    
+	}	
+    }
+
+    var keyValues = []
+
+    for (var key in stok_hits) {
+	keyValues.push([ key, stok_hits[key] ])
+    }
+
+    keyValues.sort(function compare(kv1, kv2) {
+	return kv2[1] - kv1[1] 
+    })
+
+    N = Math.min(20,keyValues.length);
+    var out = ""
+    for (var i=0;i<N;i++) {
+	out +=
+	    '<p><a target="_blank" href="' +
+	    'https://burakbayramli.github.io' + keyValues[i][0] + '">' +
+	    keyValues[i][0] +
+	    '</a></p>';
+	
+	document.getElementById("output").innerHTML = out;
+    }
+}
+```
 
 Kaynaklar
 
 [1] <a href="pyscript.html">PyScript</a>
 
-[2] <a href="../../ara.html">Blog Arama Sayfasi</a>
-
 [3] <a href="https://github.com/burakbayramli/classnotes">Github</a>
 
 [4] <a href="https://towardsdatascience.com/benchmarking-python-nlp-tokenizers-3ac4735100c5">Benchmarking Python NLP Tokenizers</a>
+
+
+
 

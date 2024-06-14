@@ -47,7 +47,4 @@
 
 [Sene](year.html)
 
-[Ara](ara.html)
-
-
-
+[Ara](https://burakbayramli.github.io/sksearch)
