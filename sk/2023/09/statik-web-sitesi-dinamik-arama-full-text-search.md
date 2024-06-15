@@ -244,6 +244,8 @@ def write_to_page():
    manual_div.element.innerHTML = out
 ```
 
+<a name='jssearch'></a>
+
 ### Web Kodlaması, Javascript
 
 Üstteki kodun benzeri Javascript ile şöyle kodlanabilir,
