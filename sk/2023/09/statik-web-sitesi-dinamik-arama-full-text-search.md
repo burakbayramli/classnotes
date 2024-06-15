@@ -248,7 +248,11 @@ def write_to_page():
 
 ### Web Kodlaması, Javascript
 
-Üstteki kodun benzeri Javascript ile şöyle kodlanabilir,
+Pyscript bazlı kod teknoloji ile yapılabilecekleri göstermesi
+açısından ilginç, fakat gerekli yardımcı kodların yüklenmesi ilk arama
+sayfasına girildiğinde zaman alabiliyor. Bu kodlamayı nihai ortam
+açısından kodlamanın en iyi yolu Javascript ile, üstteki kodun benzeri
+şöyle kodlanabilir,
 
 ```javascript
 async function searchText() {
@@ -305,6 +309,8 @@ async function searchText() {
     }
 }
 ```
+
+Bu kodun işler halini [2] bağlantısında görebiliriz.
 
 Kaynaklar
 
