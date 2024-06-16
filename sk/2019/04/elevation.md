@@ -376,8 +376,8 @@ yazdık, ya da bahsedilen dosyalar parçalara bölündü ve parça parça
 alınıp önbelleğe alıyoruz, üstteki koda bu tür uzatmalar yapılabilir.
 
 Bir diğer seçenek (belki bu en iyisi) kapsam isteği (range request)
-kavramını kullanmak. Kİ ile çoğu statik web servisinin ne kadar büyük
-olursa olsun servis ettiği dosyalara noktasal erişim elde
+kavramını kullanmak [9]. Kİ ile çoğu statik web servisinin ne kadar
+büyük olursa olsun servis ettiği dosyalara noktasal erişim elde
 edebiliyoruz.  Kİ web standartının bir parçası, yani çoğu web servisi
 (Apache gibi) bu tür erişimi sağlayacaktır, böylece dosya `data.bin`
 diyelim, 1 GB olsa bile kapsam isteği ile 1000'inci ve 1010'uncu
