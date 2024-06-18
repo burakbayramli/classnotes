@@ -172,6 +172,7 @@ olabilir. Bunu yapmak için kullanici `burakbayramli` icin ve
 ```
 cd [PROJE DIZINI]
 .git dizinini sil
+git branch -m main 
 git init
 git add .
 git commit -m 'Initial commit'
