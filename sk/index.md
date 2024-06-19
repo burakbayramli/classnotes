@@ -3,6 +3,8 @@
 
 ## En Son
 
+19/6 - [Statik Sitelerde Arama Motoru - Ekler - Javascript](https://burakbayramli.github.io/dersblog/sk/2023/09/statik-web-sitesi-dinamik-arama-full-text-search.html#jssearch)
+
 13/6 - [Fetch, Paralellik, Kapsam İsteği (Range Request), Javascript](https://burakbayramli.github.io/dersblog/sk/2024/06/fetch-range-request.html)
 
 12/6 - [Javascript - Ekler - Yükseklik (Elevation) Grafikleme](https://burakbayramli.github.io/dersblog/sk/2019/04/elevation.html)
@@ -10,8 +12,6 @@
 7/6 - [Math.js](https://burakbayramli.github.io/dersblog/sk/2024/06/mathjs.html)
 
 3/6 - [Javascript - 2](https://burakbayramli.github.io/dersblog/sk/2024/06/javascript-2.html)
-
-15/5 - [Web, HTML, Görüntü Dosyaları, Tıklama Kordinatları, Görsel Veri Gömmek](https://burakbayramli.github.io/dersblog/sk/2024/05/web_images.html)
 
 ## Konular, Referans
 
