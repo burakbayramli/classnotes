@@ -316,6 +316,8 @@ Kaynaklar
 
 [1] <a href="pyscript.html">PyScript</a>
 
+[2] <a href="https://burakbayramli.github.io/sksearch/">Arama Sayfası</a>
+
 [3] <a href="https://github.com/burakbayramli/classnotes">Github</a>
 
 [4] <a href="https://towardsdatascience.com/benchmarking-python-nlp-tokenizers-3ac4735100c5">Benchmarking Python NLP Tokenizers</a>
