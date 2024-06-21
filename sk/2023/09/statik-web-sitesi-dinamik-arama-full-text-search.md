@@ -23,14 +23,14 @@ kabiliyet pür okuma bazlı ise ve gerekli veri dosyalarını hızlı
 erişilebilir halde önceden hazırlamışsak, Tarayıcı -> Statik Dosya
 erişimi ile envai türden servisi sağlamak mümkündür.
 
-Arama motorunu işte bu şekilde kodlayacağız. Javascript, ya da bu
-yazıda onun yerine PyScript [1], kodları tarayıcıda işleyecek,
-çetrefil bir arayüz mantığı orada kodlanacak.. Bu mantık gerektiği
-yerde gerekli kelimeler için belli indis dosyalarını okuyacak, bu
-okuduğu içeriğe ek işlemler uygulayıp birleştirecek, ve sonuçları
-sunacak. Bunun servis tarafında statik, pür dosyalar ile nasıl
-yapılabileceğini anlamak için önce tüm metin arama (full-text search)
-teknolojisine bakalım, ve bizim yapacağımız eklerden sonra bahsedelim.
+Arama motorunu işte bu şekilde kodlayacağız. Javascript ve PyScript
+[1] ile kodlar tarayıcıda işleyecek, çetrefil bir arayüz mantığı orada
+kodlanacak.. Bu mantık gerektiği yerde gerekli kelimeler için belli
+indis dosyalarını okuyacak, bu okuduğu içeriğe ek işlemler uygulayıp
+birleştirecek, ve sonuçları sunacak. Bunun servis tarafında statik,
+pür dosyalar ile nasıl yapılabileceğini anlamak için önce tüm metin
+arama (full-text search) teknolojisine bakalım, ve bizim yapacağımız
+eklerden sonra bahsedelim.
 
 # Tam Metin Arama
 
