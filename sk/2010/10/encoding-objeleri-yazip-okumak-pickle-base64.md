@@ -150,6 +150,14 @@ print (d)
 b'bubirkelime'
 ```
 
+```python
+print (d.decode('utf-8'))
+```
+
+```text
+bbubirkelime
+```
+
 Bir örnek daha,
 
 ```python
