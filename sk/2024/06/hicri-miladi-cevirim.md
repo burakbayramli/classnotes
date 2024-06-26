@@ -89,8 +89,8 @@ function julianToGregorian (julianDate) {
 ```
 
 Bu kodu kullanabilmek için kurban bayramı ilk günü hesabı
-yapalım. Bayramın ay takviminin son ayının 10'uncu günü olduğunü
-biliyoruz, 2024 senesinde bu Temmuz'un 16'si idi,
+yapalım. Bayramın hicri takviminde yılın son ayın 10'uncu günü
+olduğunu biliyoruz, 2024 senesinde bu Temmuz'un 16'sı idi,
 
 
 ```javascript
@@ -120,7 +120,6 @@ yılında bayram hangi güne denk gelir?
 // Eid Al-Adha (kurban) is 10th day of last month
 var res = sh.hijriToJulian(1446, 12, 10);
 res = sh.julianToGregorian(res);
-
 console.log(res.year, res.month, res.day);
 ```
 
