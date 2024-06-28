@@ -43,6 +43,20 @@ print (os.getcwd())
 /tmp/filan1
 ```
 
+Dosya kopyalamak için
+
+```python
+shutil.copy("/vs/vs/dir1/dosya1.txt", "/vs/vs/dir2") 
+```
+
+Tüm dizini alt dizinleri ile birlikte başka bir dizin altına kopyalamak
+için, diyelim ki `/tmp` altındaki `aaa` dizinini `/tmp/bbb` dizini altına
+kopyalamak istiyoruz,
+
+```
+shutil.copytree("/tmp/aaa","/tmp/bbb/aaa")
+```
+
 Tüm dosya isminden (dizin artı dosya ismi) sadece dizin bölümünü çıkartmak
 için,
 
@@ -73,6 +87,15 @@ Dizini altındaki tüm dosyalarla beraber silmek
 import shutil
 shutil.rmtree("/tmp/filan1")
 ```
+
+Bir dizin altındaki dosyaları, dizinleri listlemek
+
+```python
+os.listdir('/usr/dir1/dir2")
+```
+
+Üstteki çağrıdaki listede hem dosya hem dizin olacak, hangisi olduğunu
+anlamak için `os.path.isdir` ve `os.path.isfile` kullanılabilir.
 
 Bir dizin altındaki dosyaları, dizinleri belli bir kalıba uyacak şekilde listelemek. 
 
