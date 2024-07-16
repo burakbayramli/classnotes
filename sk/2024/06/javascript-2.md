@@ -43,6 +43,51 @@ yazma izni yoktur, fakat eğer zip çok büyük değilse tarayıcı üstteki
 kodla zip indirip, içindeki dosyayı açıp onu rahat bir şekilde
 tarayıp, işlemini yapabilir.
 
+### Düzenli İfadeler (Regex)
+
+Regex desteği dil seviyesinde dahil edilmiş, ek paket dahil etmeye
+gerek yok. İki yana yatik çubuk arasında bilinen regex ifadeleri
+kullanılabilir.
+
+```javascript
+const re = /d(b+)d/g;
+var s = "cdbbdbsbza";
+console.log(re.exec(s));
+```
+
+```
+[ 'dbbd', 'bb', index: 1, input: 'cdbbdbsbza' ]
+```
+
+Sonuç bir liste olarak geldi, ilk öğe uyan tüm ifade için, ikinci öğe
+ifadenin uyan parantez içindeki kısmı, `g` ile global bir uydurma
+istediğimizi belirtiyoruz.
+
+Üstteki örnek tek bir uyumu gösterdi, eğer aynı ifade metin içinde
+birden çok yere uysaydı? Bu durumda sonuçları gezmek gerekiyor,
+`re.exeç` global bir yerde / değişkende o uyum listesinde nerede
+olduğunu hatırlıyor, aynı çağrıyı birkaç kez yapınca farklı sonuçlar
+gelecek, sonuçlar bitince `nüll` döndürülüyor, `while` ile bunu test
+ederen döngüden çıkıyoruz.
+
+```javascript
+const re = /d(b+)d/g;
+var s = "cdbbdbsbzaaaadbbbbbbd";
+
+let result;
+while(result = re.exec(s)) {
+    console.log(result);
+} 
+```
+
+```
+[ 'dbbd', 'bb', index: 1, input: 'cdbbdbsbzaaaadbbbbbbd' ]
+[ 'dbbbbbbd',
+  'bbbbbb',
+  index: 13,
+  input: 'cdbbdbsbzaaaadbbbbbbd' ]
+```
+
 ### Girdi Tamamlamak (Autocomplete)
 
 HTML sayfasındaki bir giriş kutusuna girilen birkaç kelime sonrası
