@@ -46,7 +46,7 @@ tarayıp, işlemini yapabilir.
 ### Düzenli İfadeler (Regex)
 
 Regex desteği dil seviyesinde dahil edilmiş, ek paket dahil etmeye
-gerek yok. İki yana yatik çubuk arasında bilinen regex ifadeleri
+gerek yok. İki yana yatık çubuk arasında bilinen regex ifadeleri
 kullanılabilir.
 
 ```javascript
@@ -65,10 +65,10 @@ istediğimizi belirtiyoruz.
 
 Üstteki örnek tek bir uyumu gösterdi, eğer aynı ifade metin içinde
 birden çok yere uysaydı? Bu durumda sonuçları gezmek gerekiyor,
-`re.exeç` global bir yerde / değişkende o uyum listesinde nerede
+`re.exec` global bir yerde / değişkende o uyum listesinde nerede
 olduğunu hatırlıyor, aynı çağrıyı birkaç kez yapınca farklı sonuçlar
-gelecek, sonuçlar bitince `nüll` döndürülüyor, `while` ile bunu test
-ederen döngüden çıkıyoruz.
+gelecek, sonuçlar bitince `null` döndürülüyor, `while` ile bunu test
+ederek döngüden çıkıyoruz.
 
 ```javascript
 const re = /d(b+)d/g;
@@ -198,3 +198,7 @@ autocomplete(document.getElementById("myInput"));
 Kaynaklar
 
 [1] https://www.w3schools.com/howto/howto_js_autocomplete.asp
+
+
+
+
