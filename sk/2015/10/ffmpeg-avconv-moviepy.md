@@ -101,6 +101,17 @@ ffmpeg -i dosya.mp4 -filter:v scale=640:-1 -c:a copy sonuc.mp4
 
 Genisligi 640 yap, geri kalan her seyi ona gore ayarla dedik.
 
+Aydinlik (brightness), renkleri canlandirmak (gamma, contrast) ayarlari icin
+`-vf eq=eq=brightness=1.5:gamma=1.5:saturation=1.5` komutu kullanilabilir.
+Fakat sunu belirtmek gerekir ki cogunlukla gereken karanlik bir resimde
+renk canlandirmasi yapmak, o yuzden `gamma` ve `saturation` ayarlari yeterli
+olacaktir, yani
+
+```
+ffmpeg -i in.mp4 -y -vf eq=gamma=1.5:saturation=1.5 -c:a copy out.mp4
+```
+
+
 Video birlestirmek icin bir ara formattan gecmek lazim.
 
 ```
@@ -122,7 +133,7 @@ ffmpeg -i dosya.mp4 -r 30  -codec:v mpeg4 -flags:v +qscale \
   -global_quality:v 0 -codec:a libmp3lame dosya.avi 
 ```
 
-Ya da en rahat arac Python `moviepy` paketi ile,
+Python `moviepy` paketi ile,
 
 ```
 from moviepy.editor import VideoFileClip, concatenate_videoclips
