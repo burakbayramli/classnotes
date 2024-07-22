@@ -86,7 +86,7 @@ baci_top_products()
 elapsed time 0:01:60.95
 ```
 
-İşlem bitince sonuçlar BACI dizini altında yazılmış olmalı.
+İşlem bitince sonuçlar `baci_dir` dizini altında yazılmış olmalı.
 
 Çıktıları raporlamak için yeni iki fonksiyon yazalım, bu
 fonksiyonlardan `baci_top_product()` verili iki ülke için, ihraccı /
@@ -148,7 +148,7 @@ Oils: petroleum oils and oils obtained from bituminous minerals, crude
 
 Kaynaklar
 
-[1] [BACI](http://www.cepii.fr/cepii/en/bdd_modele/bdd_modele_item.asp?id=37)
+[1] <a href="http://www.cepii.fr/cepii/en/bdd_modele/bdd_modele_item.asp?id=37)">BACI</a>
 
 [2] Bayramlı, [Paralel, Satır Bazlı Dosya İşlemek](../../2016/02/toptan-islemler-paralelizasyon.html)
 
