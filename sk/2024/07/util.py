@@ -1,6 +1,6 @@
 import json
 
-def lineproc(file_name,chunk_i,N,hookobj,skip_lines=0):
+def process(file_name,chunk_i,N,hookobj,skip_lines=0):
     file_size = os.path.getsize(file_name)
     hookobj.infile = file_name # lineprocessor object
     hookobj.chunk = chunk_i

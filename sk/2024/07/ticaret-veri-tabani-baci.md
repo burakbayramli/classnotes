@@ -71,7 +71,7 @@ def process_baci_top_products():
     file_name = baci_dir + "/BACI_HS22_Y2022_V202401b.csv"
     start = timer()
     N = 1 
-    ps = [Process(target=util.lineproc,args=(file_name, i, N, BaciJob(),1)) for i in range(N)]
+    ps = [Process(target=util.process,args=(file_name, i, N, BaciJob(),1)) for i in range(N)]
     for p in ps: p.start()
     for p in ps: p.join()
     end = timer()
