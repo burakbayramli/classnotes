@@ -20,6 +20,27 @@ q: miktar
 
 Para deger birimi 1000 Amerikan doları, miktar ise metrik ton.
 
+Girdi verisine bir göz atalım,
+
+```python
+baci_dir = "/opt/Downloads/baci"
+
+!head -10 $baci_dir/BACI_HS22_Y2022_V202401b.csv
+```
+
+```text
+t,i,j,k,v,q
+2022,4,20,210610,        0.357,        0.002
+2022,4,20,210690,        0.061,        0.001
+2022,4,20,271000,        5.807,        8.103
+2022,4,20,843131,        0.313,        0.022
+2022,4,31,080211,        2.027,        0.500
+2022,4,31,081310,        0.912,        0.240
+2022,4,31,252620,        5.642,       47.550
+2022,4,31,340600,        0.167,        0.002
+2022,4,31,680221,        5.034,       21.000
+```
+
 Kayıtları işlemek için [2]'deki paralel, satırsal işleyici altyapısını
 kullanacağız.  CSV dosyasında her satırda ihraç eden ülke / ithal eden
 ülke / ürün üçlüsü var. Alttaki kod her satırı okurken iki ülke
@@ -33,8 +54,10 @@ ikili için o değerin tekabul ettiği ürünün anahtarı kayıt ediliyor.
 
 
 ```python
+from timeit import default_timer as timer
 from multiprocessing import Process
-import util, json
+from datetime import timedelta
+import util, json, os
 
 baci_dir = "/opt/Downloads/baci"
 
@@ -79,14 +102,15 @@ def process_baci_top_products():
 ```
 
 ```python
-baci_top_products()
+process_baci_top_products()
 ```
 
 ```text
-elapsed time 0:01:60.95
+elapsed time 0:01:41.059329
 ```
 
-İşlem bitince sonuçlar `baci_dir` dizini altında yazılmış olmalı.
+İşlem bitince sonuçlar `baci_dir` dizini altında yazılmış olmalı. Referans edilen
+`process` kodu [util.py](util.py) içinde.
 
 Çıktıları raporlamak için yeni iki fonksiyon yazalım, bu
 fonksiyonlardan `baci_top_product()` verili iki ülke için, ihraccı /

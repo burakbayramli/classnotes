@@ -1,4 +1,4 @@
-import json
+import json, os
 
 def process(file_name,chunk_i,N,hookobj,skip_lines=0):
     file_size = os.path.getsize(file_name)
