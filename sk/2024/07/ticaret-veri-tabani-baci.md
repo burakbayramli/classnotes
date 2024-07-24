@@ -59,8 +59,6 @@ from multiprocessing import Process
 from datetime import timedelta
 import util, json, os
 
-baci_dir = "/opt/Downloads/baci"
-
 class BaciJob:
     def __init__(self):
         self.infile = "" 
@@ -116,12 +114,11 @@ elapsed time 0:01:41.059329
 fonksiyonlardan `baci_top_product()` verili iki ülke için, ihraccı /
 ithalci olarak, en değerli ürün kategorisini ve o kategorinin tanmını
 geri getirsin. Bu bilgilerin raporlanabilmesi için bazı referans csv
-dosyaları okunmalı, ama o dosyalar ardı ardı yapılacak fonksiyon
-çağrılarında sürekli okunmasın diye onları otomatik olarak önbellege
-gönderiyoruz, `@lru_cache` kullanımına dikkat, `init()` ilk
-çağrıldığında dört tane DataFrame'i diskten okuyup geri döndürür,
-sonraki çağrılarda önbellekteki objeler diske gitmeden geri verilir.
-
+dosyaları okunmalı, ardı ardı yapılacak fonksiyon çağrılarında sürekli
+okunmasın diye onları otomatik olarak önbellege gönderiyoruz,
+`@lru_cache` kullanımına dikkat, `init()` ilk çağrıldığında dört tane
+DataFrame'i diskten okuyup geri döndürür, sonraki çağrılarda
+önbellekteki objeler diske gitmeden geri verilir.
 
 ```python
 from functools import lru_cache
