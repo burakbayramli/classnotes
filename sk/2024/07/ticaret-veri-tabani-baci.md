@@ -2,7 +2,7 @@
 
 200 ülke için ikili ticaret ilişkilerinin verisi B.A.C.I. tabanında
 paylaşılıyor [1].  Bu yazıda tabanın 2022 yılı için olan verisini
-işleyeceğiz, veri 5000 ürün kategorisini içermeke, kategori sistemi
+işleyeceğiz, veri 5000 ürün kategorisini içermekte, kategori sistemi
 "harmonize edilmiş sistem" adı verilen 6 sayılık bir kod
 kullanıyor. BACI kayıtları alan / satan bilgini içerir, yani her ülke
 ikilisi için ihraç edici / ithal edici kayıtlanmıştır, ve bu ilişkide
@@ -117,7 +117,7 @@ geri getirsin. Bu bilgilerin raporlanabilmesi için bazı referans csv
 dosyaları okunmalı, ardı ardı yapılacak fonksiyon çağrılarında sürekli
 okunmasın diye onları otomatik olarak önbellege gönderiyoruz,
 `@lru_cache` kullanımına dikkat, `init()` ilk çağrıldığında dört tane
-DataFrame'i diskten okuyup geri döndürür, sonraki çağrılarda
+veri objesini diskten okuyup geri döndürür, sonraki çağrılarda
 önbellekteki objeler diske gitmeden geri verilir.
 
 ```python

@@ -37,6 +37,15 @@ Her saniyede kaç kare (frame rate) olduğunu kontrol etmek için
 ffmpeg  -ss 10.0 -t 5.0 -i girdi.mp4 -vf "fps=10,scale=320:-1" -f gif cikti.gif
 ```
 
+Üretilen video'yu yavaşlatmak ya da hızlandırmak için (dikkat bu her sabit
+saniye içinde kaç kare olduğundan farklı), filtre ibaresi içine
+
+```
+-filter_complex 'fps=10,setpts=2.0*PTS...
+```
+
+eki yapılabilir, üstteki örnekte video'yu iki kat yavaşlatmış oluyoruz.
+
 10. saniyeden başlayıp 5 saniyelik bir videoyu saniyede 10 kare
 üzerinden ve 320 piksel genişliğinde animasyonlu GIF yapmış olduk.
 
