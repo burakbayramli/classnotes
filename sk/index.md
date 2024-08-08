@@ -3,6 +3,8 @@
 
 ## En Son
 
+8/8 - [Materyel Mekaniği - 7](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_07/materyel_mekanigi__7.html)
+
 24/7 - [Ticaret Veri Tabanı, Önişlemler, Raporlar](https://burakbayramli.github.io/dersblog/sk/2024/07/ticaret-veri-tabani-baci.html)
 
 12/7 - [Türevler ve Entegraller](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_65_diffint1/turevler_ve_entegraller.html)
@@ -10,8 +12,6 @@
 27/6 - [Flask ile Web Üzerinden Dizin Gezebilmek - webfilebrowser](https://burakbayramli.github.io/dersblog/sk/2024/06/webfilebrowser.html)
 
 19/6 - [Statik Sitelerde Arama Motoru - Ekler - Javascript](https://burakbayramli.github.io/dersblog/sk/2023/09/statik-web-sitesi-dinamik-arama-full-text-search.html#jssearch)
-
-13/6 - [Fetch, Paralellik, Kapsam İsteği (Range Request), Javascript](https://burakbayramli.github.io/dersblog/sk/2024/06/fetch-range-request.html)
 
 ## Konular, Referans
 
