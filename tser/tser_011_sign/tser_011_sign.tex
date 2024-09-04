@@ -1,0 +1,90 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Sinyaller, Geriye Dönük Analiz, Performans
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+#d = np.array([100,102,104.04,106.12,108.24,110.41,105,100])
+d = np.array([100,102,104.04,106.12,108.24,110.41])
+p = pd.Series(d)
+print (list(p))
+print (list(np.round(p.pct_change(),2)))
+\end{minted}
+
+\begin{verbatim}
+[100.0, 102.0, 104.04, 106.12, 108.24, 110.41]
+[nan, 0.02, 0.02, 0.02, 0.02, 0.02]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ret = p.pct_change()
+print (100*np.cumprod(1+ret))
+\end{minted}
+
+\begin{verbatim}
+0       NaN
+1    102.00
+2    104.04
+3    106.12
+4    108.24
+5    110.41
+dtype: float64
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (1*np.cumprod(1+ret))
+\end{minted}
+
+\begin{verbatim}
+0       NaN
+1    1.0200
+2    1.0404
+3    1.0612
+4    1.0824
+5    1.1041
+dtype: float64
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+signal = pd.Series(np.array([1,1,1,1,0,1]))
+print (ret*signal)
+\end{minted}
+
+\begin{verbatim}
+0         NaN
+1    0.020000
+2    0.020000
+3    0.019992
+4    0.000000
+5    0.020048
+dtype: float64
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+signal = pd.Series(np.array([1,1,1,1,0,1]))
+print (1*np.cumprod(1+(ret*signal)))
+\end{minted}
+
+\begin{verbatim}
+0         NaN
+1    1.020000
+2    1.040400
+3    1.061200
+4    1.061200
+5    1.082475
+dtype: float64
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('../tser_008_data/AAPL.csv',index_col='Date',parse_dates=True)
+df.plot()
+plt.savefig('tser_011_sign_01.jpg')
+\end{minted}
+
+
+
+
+\end{document}
