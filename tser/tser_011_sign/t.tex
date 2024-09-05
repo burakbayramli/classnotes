@@ -1,0 +1,67 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+a = np.array([2.0, 2.33, 2.67, 3.0, 3.33, 3.67, 4.0, 4.33, 4.67, 5.0])
+b = np.array([4.0, 4.22, 4.44, 4.67, 4.89, 5.11, 5.33, 5.56, 5.78, 6.0])
+
+a = pd.Series(a); b = pd.Series(b)
+print (list(np.round(a.pct_change(),2)))
+print (list(np.round(b.pct_change(),2)))
+\end{minted}
+
+\begin{verbatim}
+[nan, 0.17, 0.15, 0.12, 0.11, 0.1, 0.09, 0.08, 0.08, 0.07]
+[nan, 0.05, 0.05, 0.05, 0.05, 0.04, 0.04, 0.04, 0.04, 0.04]
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.concat([a,b],axis=1)
+df.columns = ['a','b']
+print (df)
+\end{minted}
+
+\begin{verbatim}
+      a     b
+0  2.00  4.00
+1  2.33  4.22
+2  2.67  4.44
+3  3.00  4.67
+4  3.33  4.89
+5  3.67  5.11
+6  4.00  5.33
+7  4.33  5.56
+8  4.67  5.78
+9  5.00  6.00
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+positions = np.zeros(df.shape)
+positions[:,0] = 0.5
+positions[:,1] = 0.5
+ret = (df.pct_change() * positions).sum(axis=1)
+print (ret)
+\end{minted}
+
+\begin{verbatim}
+0    0.000000
+1    0.110000
+2    0.099028
+3    0.087699
+4    0.078555
+5    0.073546
+6    0.066486
+7    0.062826
+8    0.059045
+9    0.054363
+dtype: float64
+\end{verbatim}
+
+
+
+
+\end{document}
