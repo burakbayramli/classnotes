@@ -100,37 +100,42 @@ import pandas as pd
 df = pd.read_csv('twosec.csv',index_col='Date',parse_dates=True)
 \end{minted}
 
+
 \begin{minted}[fontsize=\footnotesize]{python}
 ge_df = df.copy()
-ge_df = ge_df[(ge_df.index > '2008-01-01') & (ge_df.index < '2011-01-01')]
+ge_df = ge_df[(ge_df.index > '2003-01-01') & (ge_df.index < '2010-01-01')]
 positions = np.zeros(ge_df.shape)
 for x in np.linspace(0,1,11):
    positions[:,0] = x
    positions[:,1] = 1.0-x
    ret = (ge_df.pct_change() * positions).sum(axis=1)
-   #print (x, np.prod(1+ret))
-   print ('APR', x, ((np.prod(1+ret))**(252./len(ret)))-1)
+   print (x, np.prod(1.0+ret))
+   #print ('APR', x, ((np.prod(1.0+ret))**(252./len(ret)))-1.0)
 \end{minted}
 
 \begin{verbatim}
-APR 0.0 0.055587201479677883
-APR 0.1 0.05324497628735436
-APR 0.2 0.049891504031668754
-APR 0.30000000000000004 0.04553588344607862
-APR 0.4 0.04018993282701078
-APR 0.5 0.03386813991444626
-APR 0.6000000000000001 0.02658760032681262
-APR 0.7000000000000001 0.018367944897164756
-APR 0.8 0.009231256321054149
-APR 0.9 -0.0007980244129607295
-APR 1.0 -0.011693201281921306
+0.0 1.3175589050265493
+0.1 1.3471848857829003
+0.2 1.3725916367646633
+0.30000000000000004 1.3935133448691503
+0.4 1.4097267595591307
+0.5 1.421055081171739
+0.6000000000000001 1.4273711064494141
+0.7000000000000001 1.428599554531858
+0.8 1.4247185151567334
+0.9 1.4157599811622292
+1.0 1.4018094489736128
 \end{verbatim}
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+ret = ge_df.SPY.pct_change()
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+\end{minted}
 
-
-
-
+\begin{verbatim}
+APR 0.04946378214520886
+\end{verbatim}
 
 
 
