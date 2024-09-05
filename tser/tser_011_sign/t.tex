@@ -66,14 +66,18 @@ APR 43.01472199080321
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-np.prod(np.ones(252)*1.07)
+positions = np.zeros(df.shape)
+positions[:,0] = 0.8
+positions[:,1] = 0.2
+ret = (df.pct_change() * positions).sum(axis=1)
+print (np.prod(1+ret))
+print ('APR', ((np.prod(1+ret))**(252./len(ret)))-1)
 \end{minted}
 
 \begin{verbatim}
-Out[1]: 25392880.956519134
+1.1847063822264405
+APR 70.61274939993416
 \end{verbatim}
-
-
 
 
 
@@ -93,13 +97,49 @@ Out[1]: 25392880.956519134
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
-df = pd.read_csv('gldeur.csv',index_col='Date',parse_dates=True)
+df = pd.read_csv('curr.csv',index_col='Date',parse_dates=True)
 \end{minted}
-
 
 \begin{minted}[fontsize=\footnotesize]{python}
-df['GLDT'] = df.GLD * df['USDTRY=X']
+ge_df = df[df.index < '2023-01-01']
+positions = np.zeros(ge_df.shape)
+for x in np.linspace(0,1,10):
+   positions[:,0] = x
+   positions[:,1] = 1-x
+   ret = (ge_df.pct_change() * positions).sum(axis=1)
+   #print (x, np.prod(1+ret))
+   print ('APR', x, ((np.prod(1+ret))**(252./len(ret)))-1)
 \end{minted}
+
+\begin{verbatim}
+APR 0.0 0.22988755267779637
+APR 0.1111111111111111 0.2355206263222165
+APR 0.2222222222222222 0.2399030652310279
+APR 0.3333333333333333 0.24302505391637585
+APR 0.4444444444444444 0.24488021914767022
+APR 0.5555555555555556 0.2454656487088207
+APR 0.6666666666666666 0.24478189547725693
+APR 0.7777777777777777 0.24283296684140043
+APR 0.8888888888888888 0.23962629955379122
+APR 1.0 0.2351727201965763
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
