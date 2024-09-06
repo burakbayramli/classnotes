@@ -261,6 +261,148 @@ ise, -1 * -0.01 = 0.01, bu sayı kazanç olarak haneye yazılır.
 
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
+a = np.array([2.0, 2.03, 2.07, 2.11, 2.13, 2.17, 2.25, 2.29, 2.33, 2.4])
+b = np.array([4.0, 4.06, 4.11, 4.17, 4.22, 4.28, 4.33, 4.39, 4.44, 4.5])
+
+a = pd.Series(a); b = pd.Series(b)
+print (list(np.round(a.pct_change(),2)))
+print (list(np.round(b.pct_change(),2)))
+\end{minted}
+
+\begin{verbatim}
+[nan, 0.01, 0.02, 0.02, 0.01, 0.02, 0.04, 0.02, 0.02, 0.03]
+[nan, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+df = pd.concat([a,b],axis=1)
+df.columns = ['a','b']
+print (df)
+\end{minted}
+
+\begin{verbatim}
+      a     b
+0  2.00  4.00
+1  2.03  4.06
+2  2.07  4.11
+3  2.11  4.17
+4  2.13  4.22
+5  2.17  4.28
+6  2.25  4.33
+7  2.29  4.39
+8  2.33  4.44
+9  2.40  4.50
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+positions = np.zeros(df.shape)
+positions[:,0] = 0.5
+positions[:,1] = 0.5
+ret = (df.pct_change() * positions).sum(axis=1)
+print (ret)
+print (np.prod(1+ret))
+print ('APR', ((np.prod(1+ret))**(252./len(ret)))-1)
+\end{minted}
+
+\begin{verbatim}
+0    0.000000
+1    0.015000
+2    0.016010
+3    0.016961
+4    0.010735
+5    0.016499
+6    0.024274
+7    0.015817
+8    0.014428
+9    0.021778
+dtype: float64
+1.1620428461381263
+APR 43.01472199080321
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+positions = np.zeros(df.shape)
+positions[:,0] = 0.8
+positions[:,1] = 0.2
+ret = (df.pct_change() * positions).sum(axis=1)
+print (np.prod(1+ret))
+print ('APR', ((np.prod(1+ret))**(252./len(ret)))-1)
+\end{minted}
+
+\begin{verbatim}
+1.1847063822264405
+APR 70.61274939993416
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+df = pd.read_csv('eqbnd.csv',index_col='Date',parse_dates=True)
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ge_df = df.copy()
+ge_df = ge_df[(ge_df.index > '2003-01-01') & (ge_df.index < '2010-01-01')]
+positions = np.zeros(ge_df.shape)
+for x in np.linspace(0,1,11):
+   positions[:,0] = x
+   positions[:,1] = 1.0-x
+   ret = (ge_df.pct_change() * positions).sum(axis=1)
+   print (x, np.prod(1.0+ret))
+\end{minted}
+
+\begin{verbatim}
+0.0 1.3175589050265493
+0.1 1.3471848857829003
+0.2 1.3725916367646633
+0.30000000000000004 1.3935133448691503
+0.4 1.4097267595591307
+0.5 1.421055081171739
+0.6000000000000001 1.4273711064494141
+0.7000000000000001 1.428599554531858
+0.8 1.4247185151567334
+0.9 1.4157599811622292
+1.0 1.4018094489736128
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ret = ge_df.SPY.pct_change()
+print ('Senet',np.prod(1.0+ret))
+ret = ge_df.AGG.pct_change()
+print ('Tahvil',np.prod(1.0+ret))
+\end{minted}
+
+\begin{verbatim}
+Senet 1.4018094489736128
+Tahvil 1.3175589050265493
+\end{verbatim}
+
+
+
+
+
+
 
 
 [devam edecek]
