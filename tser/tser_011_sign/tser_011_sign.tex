@@ -7,7 +7,6 @@ olabilir, belki Apple senedidir, ilk gün 100 ikinci gün 102 olmuş, böyle
 gidiyor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import pandas as pd
 d = np.array([100,102,104.04,106.12,108.24,110.41])
 \end{minted}
 
@@ -15,6 +14,8 @@ Peki bu fiyat seviyeleri günlük hangi yüzde değişimlerine tekabül ediyor?
 Bu hesabın bir yolu var, \verb!pct_change! kullanabiliriz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+
 p = pd.Series(d)
 print (list(p))
 print (list(np.round(p.pct_change(),2)))
@@ -225,41 +226,25 @@ daha yüksek olurdu. Neyse örneği basit tutma amacıyla bu değişikliği yapm
 
 Sinyaller
 
-Almış olmanın 1, elde olmama için 0 sinyalinden bahsettik. Aslında sinyal bazlı
-strateji hesabı sadece bu iki rakamla sınırlı değildir, mesela eksi değer
-kullanırsak, -1 gibi, bu açığa satış stratejisini kodlayabilirdi. Açığa satışta
-düşüşten kazanıldığı için zaman serisinin getiri yüzdesi eksi 1 ile
-çarpılacaktır, yüzde artışta düşüş var ise o değer eksi değerdir ve eksi yüzde
-çarpı eksi 1 artı değer olacağı için, o değişim kazanç olarak portföye yansımış
-olacaktır. Değişim -0.01 olabilir, fakat o noktada strateji açığa sat, -1 diyor
-ise, -1 * -0.01 = 0.01, bu sayı kazanç olarak haneye yazılır.
+Varlığı almış olmanın 1, olmamanın 0 sinyali ile belirtildiğinden
+bahsettik. Aslında sinyal bazlı strateji hesabı sadece bu iki rakamla sınırlı
+değildir, mesela eksi değer kullanırsak, -1 gibi, bu açığa satış stratejisini
+kodlayabilirdi. Açığa satışta düşüşten kazanıldığı için zaman serisinin getiri
+yüzdesi eksi 1 ile çarpılacaktır. Düşüş var ise o değer eksi değerdir ve eksi
+yüzde çarpı eksi 1 artı değer olacağı için, o değişim kazanç olarak portföye
+yansımış olacaktır. Değişim -0.01 olabilir, fakat o noktada strateji açığa sat,
+-1 diyor ise, -1 * -0.01 = 0.01, bu sayı kazanç sayılır.
 
+Sinyaller birden fazla varlığı da kapsayabilir, 0 ile 1 arası birkaç değer
+kullanırsak (ki bu değerlerin toplamı 1 olmalıdır) o zaman sinyaller portföydeki
+``dağılımı'' temsil edebilir. Sinyal 1 sonuçta bir zaman aralığındaki tüm
+değişimden istifade etmek demektir, eğer mesela 0.5 ile çarparsam değişimin
+sadece yarısından istifade ediyorum, paranın yarısının o varlığa koymuşum, diğer
+yarısı 0.5 ile başka bir değişimi çarpabilir, onun kazancı (ya da kaybı)
+kümülatife yansır.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Alttaki örnekle devam edelim, iki tane zaman serisi görüyoruz, önce onların
+yüzde değişimlerini hesaplıyoruz,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
@@ -277,11 +262,15 @@ print (list(np.round(b.pct_change(),2)))
 [nan, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 \end{verbatim}
 
+Bariz şekilde birinci seri ikinciye göre daha çok yükseliyor. Bu seriler
+üzerinde yarı yarıya dağılım yaparsak elde edilecek kazancı hesaplayalım
+şimdi. \verb!DataFrame! yaratılır,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 df = pd.concat([a,b],axis=1)
 df.columns = ['a','b']
 print (df)
+print (df.shape)
 \end{minted}
 
 \begin{verbatim}
@@ -296,7 +285,19 @@ print (df)
 7  2.29  4.39
 8  2.33  4.44
 9  2.40  4.50
+(10, 2)
 \end{verbatim}
+
+Veri \verb!(10,2)! boyutlarında, iki varlığın fiyat seviyelerini gösteren 10
+zaman dilimi var. Şimdi sinyali ikiye bölüyoruz, biri varlık a diğeri b için,
+dağılım 0.5, 0.5 olacak, bu dağılımı 10 kere tekrarlayacağız, getirilerin
+matrisini bu dağılım matrisi ile çarpacağız, sonucu toplayacağız.  Sonuçta
+elimize aynen tek varlık durumunda olduğu gibi tek boyutlu bir getiri zaman
+serisi geçecek.
+
+Not: Dağılım her zaman diliminde aynı, o zaman niye (10,2) boyutlu bir matris
+kullandık? Burada göstermiyoruz ama dağılımlar da zamana göre değişebilir,
+dinamik karakterde olabilir. Bu tür stratejileri ilerideki derslerde göreceğiz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 positions = np.zeros(df.shape)
@@ -304,8 +305,6 @@ positions[:,0] = 0.5
 positions[:,1] = 0.5
 ret = (df.pct_change() * positions).sum(axis=1)
 print (ret)
-print (np.prod(1+ret))
-print ('APR', ((np.prod(1+ret))**(252./len(ret)))-1)
 \end{minted}
 
 \begin{verbatim}
@@ -320,9 +319,21 @@ print ('APR', ((np.prod(1+ret))**(252./len(ret)))-1)
 8    0.014428
 9    0.021778
 dtype: float64
+\end{verbatim}
+
+Bu serinin başarısını hesaplayalım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (np.prod(1+ret))
+print ('APR', ((np.prod(1+ret))**(252./len(ret)))-1)
+\end{minted}
+
+\begin{verbatim}
 1.1620428461381263
 APR 43.01472199080321
 \end{verbatim}
+
+Eğer dağılım farklı olsaydı, 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 positions = np.zeros(df.shape)
@@ -338,56 +349,60 @@ print ('APR', ((np.prod(1+ret))**(252./len(ret)))-1)
 APR 70.61274939993416
 \end{verbatim}
 
+Bu sonuç mantıklı çünkü varlık a daha hızlı artıyordu, ağırlığı oraya daha fazla
+veren strateji tabii ki daha iyi kazandırır.
 
+Akla gelebilecek sorular, eğer bir seri diğerinden daha iyi getiri veriyorsa
+niye hep ona, hatta sadece ona ağırlık verilmez? Cevabın ilk kısmı üstteki
+yapılan test geriye dönük bir test olduğu, geriye dönük test ileri fiyatların
+garantisi olmaması. Ayrıca veri uyduruk, gerçek dünya şartlarında iki serinin
+birbirini dengeleyici bazı özellikleri olabilir, mesela genellikle birleşik
+performansı ortalama olsa da iki seriden birinin sert düşüşünü diğerinin
+dengeleyici özelliği varsa, portföyün getirisi uzun vadede daha sağlam
+olabilir.
 
+Birleşik portföy avantajını iyi gösteren bir örnek 60/40 kuralı, yatırımcılıkta
+bilinen ünlü bir dağılım yatırımın yüzde 60'inin senet yüzde 40'inin tahvil
+olması tavsiyesidir. Acaba bu dağılım hakikaten işliyor mu? Geri dönük testlerle
+kontrol edebiliriz. 
 
-
-
-
-
-
-
-
-
-
-
-
-
+Veri SP 500 indisini baz alan \verb!SPY! ve tahvilleri baz alan \verb!AGG! fon
+fiyatları olacak [2,3]. Bu iki zaman serisini genel bir borsa, ve tahvil fiyatı
+yerine kullanacağız. Farklı karışım oranları deneyeceğiz, ve her dağılım için
+getiri performansını hesaplayacağız.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import pandas as pd
 df = pd.read_csv('eqbnd.csv',index_col='Date',parse_dates=True)
-\end{minted}
-
-
-\begin{minted}[fontsize=\footnotesize]{python}
-ge_df = df.copy()
-ge_df = ge_df[(ge_df.index > '2003-01-01') & (ge_df.index < '2010-01-01')]
-positions = np.zeros(ge_df.shape)
+df = df[(df.index > '2003-01-01') & (df.index < '2010-01-01')]
+positions = np.zeros(df.shape)
 print ('Senet  Tahvil')
 for x in np.linspace(0,1,11):
-   x = np.round(x,3)
+   x = np.round(x,4)
    positions[:,0] = x
    positions[:,1] = 1.0-x
-   ret = (ge_df.pct_change() * positions).sum(axis=1)
-   print ('%0.2f   %0.2f   %0.2f' % (x, np.round(1-x,2), np.round(np.prod(1.0+ret),3)))
+   ret = (df.pct_change() * positions).sum(axis=1)
+   print ('%0.3f   %0.3f   %0.3f' % (x, np.round(1-x,2), np.round(np.prod(1.0+ret),3)))
 \end{minted}
 
 \begin{verbatim}
 Senet  Tahvil
-0.00   1.00   1.32
-0.10   0.90   1.35
-0.20   0.80   1.37
-0.30   0.70   1.39
-0.40   0.60   1.41
-0.50   0.50   1.42
-0.60   0.40   1.43
-0.70   0.30   1.43
-0.80   0.20   1.43
-0.90   0.10   1.42
-1.00   0.00   1.40
+0.000   1.000   1.318
+0.100   0.900   1.347
+0.200   0.800   1.373
+0.300   0.700   1.394
+0.400   0.600   1.410
+0.500   0.500   1.421
+0.600   0.400   1.427
+0.700   0.300   1.429
+0.800   0.200   1.425
+0.900   0.100   1.416
+1.000   0.000   1.402
 \end{verbatim}
 
+Sonuca göre 60/40 iyi gözüküyor, gerçi 70/30 en iyisi. Demek ki bahsedilen
+dağılımın iyi performans verdiği doğruymuş. Ayrıca dikkat edersek bahsedilen
+oran her iki varlığın tek başına olan performansından daha iyi.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 ret = ge_df.SPY.pct_change()
@@ -401,17 +416,12 @@ Senet 1.4
 Tahvil 1.32
 \end{verbatim}
 
-
-
-
-
-
-
-
-[devam edecek]
-
 Kaynaklar
 
 [1] \url{https://www.quantstart.com/qstrader/tutorial-60-40-portfolio/}
+
+[2] \url{https://finance.yahoo.com/quote/SPY/}
+
+[3] \url{https://finance.yahoo.com/quote/AGG/}
   
 \end{document}
