@@ -100,6 +100,17 @@ m.save("43r.html")
 
 [Çıktı](43r.html)
 
+Bir diger sorgu, mesela bir kordinat etrafindaki tum hatlar icin
+
+```
+[out:json];
+(
+  node(around:10000,40.25450, 28.94227);
+  way(around:10000,40.25450, 28.94227);
+);
+out geom;
+```
+
 Eğer kısayol algoritmaları işletmek istersek, ki bunun için
 düğüm/kenar verisini (yani durak/hat) bir sözlük içinde tutmak lazım,
 bu sözlük `d['elements']` listesini gezerken bir `G` sözlüğü için
