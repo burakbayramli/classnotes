@@ -82,6 +82,30 @@ print (df)
 [2276 rows x 1 columns]
 ```
 
+### Polygon.io
+
+Ticare bir servis olsa da bedava olan seviyesi hala ise yariyor, fakat
+bedava serviste bazi kisitlamalar var, mesela tarihi verilerde iki
+sene oncesinde daha fazlasi verilmiyor. Gene de faydali olabilir, servise
+uye olduktan sonra API anahtar kelimesi / sifresi alinir, biz alttaki
+gibi bir kod kullaniyoruz,
+
+```python
+KEY = "[anahtar buraya]"
+d1 = "2018-01-01"
+ticker = "AAPL"
+
+conf = json.loads(open(fname).read())
+today = datetime.datetime.now().strftime("%Y-%m-%d")
+url = poly_url % (ticker, d1, today, KEY)
+r = urllib2.urlopen(url).read()
+data = json.loads(r)
+res = data['results']
+res = [[ datetime.datetime.fromtimestamp(float(x['t']) / 1000.).strftime("%Y-%m-%d"), x['c']] for x in res]
+df = pd.DataFrame(res)
+df.columns = ['Date',ticker]
+df = df.set_index('Date')
+```
 
 ### FRED
 
