@@ -6,10 +6,11 @@ projesini ilk başta zaman serileri / finans verisi işlemek için
 başlattığını söylemişti. Bu yakınlık devam etmiş anlaşılan, şu anda
 Yahoo Finance, Google Finance, hatta makroekonomik veriler için FRED
 bağlantısı var. Hatta birisi opsiyon (option) verisi indirecek kodları
-bile eklemiş - açık yazılımın faydaları. Bazı örnekler altta.
+bile eklemiş - açık yazılımın faydaları.
 
-İndeks verisi, mesela Nasdaq için `^IXIC`, ama paketsiz, kendi işimizi
-kendimiz yapmamız gerekiyor,
+### Yahoo Finance
+
+İndeks verisi, mesela Nasdaq için `^IXIC`,
 
 ```
 import pandas as pd, datetime, time
@@ -27,8 +28,65 @@ file = BytesIO(r)
 df = pd.read_csv(file,index_col='Date')
 ```
 
-Aynı şekilde 'FRED' ABD merkez bankası tabanından veri indirilebiliyor. 
-ABD gayrı safi milli hasıla verisi için mesela,
+Not: Yahoo Finans'ın üstteki bağlantı yöntemi 2024 Eylül'de aksaklığa
+uğradı, tamamen kapatıldı mı bilinmiyor, bir alternatif yöntem
+altadır. Bu yontemle başlangıç ve bitiş tarihleri Ünix epoch
+milisaniye üzerinden verilir, ve sonuç JSON içinden alınır.
+
+```python
+import pandas as pd, datetime, requests
+import urllib.request as urllib2
+
+d1 = datetime.datetime.strptime("2015-09-01", "%Y-%m-%d").timestamp()
+d2 = datetime.datetime.strptime("2024-09-17", "%Y-%m-%d").timestamp()
+print (int(d1))
+print (int(d2))
+```
+
+```text
+1441054800
+1726520400
+```
+
+```python
+ticker = "AAPL"
+url = "https://query2.finance.yahoo.com/v8/finance/chart/%s?period1=%d&period2=%d&interval=1d&events=history&includeAdjustedClose=true" 
+url = url % (ticker,int(d1),int(d2))
+r = urllib2.urlopen(url).read()
+```
+
+```python
+import json
+res = json.loads(r)
+ts = res['chart']['result'][0]['timestamp']
+adjclose = res['chart']['result'][0]['indicators']['adjclose'][0]['adjclose']
+ts = [datetime.datetime.fromtimestamp(x).strftime("%Y-%m-%d") for x in ts]
+df = pd.DataFrame(adjclose,index=pd.to_datetime(ts),columns=[ticker])
+print (df)
+```
+
+```text
+                  AAPL
+2015-08-31   25.457985
+2015-09-01   24.320099
+2015-09-02   25.363161
+2015-09-03   24.918392
+2015-09-04   24.670042
+...                ...
+2024-09-10  220.110001
+2024-09-11  222.660004
+2024-09-12  222.770004
+2024-09-13  222.500000
+2024-09-16  216.320007
+
+[2276 rows x 1 columns]
+```
+
+
+### FRED
+
+'FRED' ABD merkez bankası tabanından veri indirilebiliyor.  ABD gayrı
+safi milli hasıla verisi için mesela,
 
 ```python
 import pandas as pd, datetime
