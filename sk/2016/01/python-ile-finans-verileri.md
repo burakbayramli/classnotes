@@ -1,16 +1,12 @@
 # Python ile Finans Verileri
 
-Finans verilerini indirmek, işlemek Python üzerinde iyice
-basitleşti. Veri işleme amaçlı başlatılan Pandas'ın yazarı zaten
-projesini ilk başta zaman serileri / finans verisi işlemek için
-başlattığını söylemişti. Bu yakınlık devam etmiş anlaşılan, şu anda
-Yahoo Finance, Google Finance, hatta makroekonomik veriler için FRED
-bağlantısı var. Hatta birisi opsiyon (option) verisi indirecek kodları
-bile eklemiş - açık yazılımın faydaları.
-
 ### Yahoo Finance
 
-İndeks verisi, mesela Nasdaq için `^IXIC`,
+Alttaki yöntemle YF arayüze özel ÜRL oluşturarak bağlanıyoruz. Bu
+bağlantı yöntemi arka planda `finance.yahoo.com` sitesinin girdi
+mantığını takip ediyor, senetler için direk onların kodu girilebilir,
+AAPL, MSFT gibi, indisler ve özel göstergeler başında `^` vardır,
+indis verisi, mesela Nasdaq için `^IXIC`,
 
 ```
 import pandas as pd, datetime, time
@@ -30,8 +26,7 @@ df = pd.read_csv(file,index_col='Date')
 
 Not: Yahoo Finans'ın üstteki bağlantı yöntemi 2024 Eylül'de aksaklığa
 uğradı, tamamen kapatıldı mı bilinmiyor, bir alternatif yöntem
-altadır. Bu yontemle başlangıç ve bitiş tarihleri Ünix epoch
-milisaniye üzerinden verilir, ve sonuç JSON içinden alınır.
+altadır. Bu yöntem biraz farklı, sonuç JSON olarak geliyor,
 
 ```python
 import pandas as pd, datetime, requests
@@ -84,11 +79,11 @@ print (df)
 
 ### Polygon.io
 
-Ticare bir servis olsa da bedava olan seviyesi hala ise yariyor, fakat
-bedava serviste bazi kisitlamalar var, mesela tarihi verilerde iki
-sene oncesinde daha fazlasi verilmiyor. Gene de faydali olabilir, servise
-uye olduktan sonra API anahtar kelimesi / sifresi alinir, biz alttaki
-gibi bir kod kullaniyoruz,
+Ticari bir servis olsa da bedava olan seviyesi hala ise yarıyor, fakat
+bedava serviste bazı kısıtlamalar var, mesela tarihi verilerde iki
+sene öncesinde daha fazlası verilmiyor. Gene de faydalı olabilir, servise
+üye olduktan sonra APİ anahtar kelimesi / şifresi alınır, biz alttaki
+gibi bir kod kullanıyoruz,
 
 ```python
 KEY = "[anahtar buraya]"
@@ -138,7 +133,7 @@ Opsiyon
 
 Alttaki url kazınabilir
 
-https://www.nasdaq.com/symbol/aapl/option-chain
+[https://www.nasdaq.com/symbol/aapl/option-chain](https://www.nasdaq.com/symbol/aapl/option-chain)
 
 Makroekonomik Veriler ve Digerleri
 
@@ -158,7 +153,7 @@ df1 = quandl.get("CURRFX/GBPUSD",
                  authtoken=auth)
 ```
 
-Bilanco, kar, zarar gibi şirket temel verileri için `yahoo_fin` paketi
+Bilanço, kâr, zarar gibi şirket temel verileri için `yahoo_fin` paketi
 faydalıdır, mesela Amazon şirketinin brüt karı (gross profit) ve
 toplam hasılat (total revenue) verisi için,
 

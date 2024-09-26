@@ -2,11 +2,15 @@
 
 SILAM [2] adlı bir kurum hava kirlilik durumu verilerini paylaşıyor.
 Bu veriler kullanılarak hava kirliliğini belirten bir özet ölçüt AQI
-hesaplanabilir, bu bağlamda Ventusky uygulaması faydalı, zaten onlar da
-verisini SILAM'dan alıyor.
+hesaplanabilir.
+
+### Ventusky
+
+Ventusky uygulaması faydalı, zaten onlar da verisini SILAM'dan alıyor.
 
 [https://www.ventusky.com/?p=40;32;6&l=aqi](https://www.ventusky.com/?p=40;32;6&l=aqi)
 
+### OpenWeatherMap
 
 OpenWeatherMap sitesinden de yeryüzündeki herhangi bir yer için anlık
 hava temizlik durumu alınabilir. Verilen bilgiler yer seviyesi ozon
@@ -57,6 +61,8 @@ Out[1]:
 
 Rapor Hindistan'ın başkenti Yeni Delhi için, bu sıralarda hava
 kirlilik problemi var, ve AQI maksimum olan 5 seviyesinde çıktı.
+
+### SILAM
 
 SILAM ile tüm dünya için geçmiş tarihteki kirlilik verisi bulunabilir,
 [1] bağlantısında dosyalar görülüyor, alttaki kodla `20231104` tarihi
