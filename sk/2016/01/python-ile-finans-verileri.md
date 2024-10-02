@@ -2,7 +2,7 @@
 
 ### Yahoo Finance
 
-Alttaki yöntemle YF arayüze özel ÜRL oluşturarak bağlanıyoruz. Bu
+Alttaki yöntemle YF arayüze özel URL oluşturarak bağlanıyoruz. Bu
 bağlantı yöntemi arka planda `finance.yahoo.com` sitesinin girdi
 mantığını takip ediyor, senetler için direk onların kodu girilebilir,
 AAPL, MSFT gibi, indisler ve özel göstergeler başında `^` vardır,
@@ -79,13 +79,14 @@ print (df)
 
 ### Polygon.io
 
-Ticari bir servis olsa da bedava olan seviyesi hala ise yarıyor, fakat
+Ticari bir servis olsa da bedava olan seviyesi hala işe yarıyor, fakat
 bedava serviste bazı kısıtlamalar var, mesela tarihi verilerde iki
 sene öncesinde daha fazlası verilmiyor. Gene de faydalı olabilir, servise
-üye olduktan sonra APİ anahtar kelimesi / şifresi alınır, biz alttaki
+üye olduktan sonra API anahtar kelimesi / şifresi alınır, biz alttaki
 gibi bir kod kullanıyoruz,
 
 ```python
+poly_url =  "https://api.polygon.io/v2/aggs/ticker/%s/range/1/day/%s/%s?apiKey=%s"
 KEY = "[anahtar buraya]"
 d1 = "2018-01-01"
 ticker = "AAPL"
@@ -216,8 +217,3 @@ Görüldüğü gibi analist tahmini 1.48 ama birinci çeyrekte karlılık 1.30.
 Tahmine eriselemedi ve Walmart senetleri bunu yazdığımız Mayıs 2022'de
 ağır bir darbe yedi. Ayrıca bir sonraki çeyrek için tahminin yapılmış olduğunu
 görüyoruz, 1.83 diyor. Bakalım ne olacak.
-
-
-
-
-
