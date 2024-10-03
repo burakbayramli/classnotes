@@ -105,8 +105,9 @@ df = df.set_index('Date')
 
 ### FRED
 
-'FRED' ABD merkez bankası tabanından veri indirilebiliyor.  ABD gayrı
-safi milli hasıla verisi için mesela,
+FRED, tam açılımıyla "Federal Reserve Economic Data" servisi ile ABD
+merkez bankası (federal reserve) tabanından veri indirilebiliyor. ABD
+gayrı safi milli hasıla verisi için mesela,
 
 ```python
 import pandas as pd, datetime
