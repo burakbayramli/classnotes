@@ -131,13 +131,13 @@ DATE
 2021-10-01  19806.290
 ```
 
-Opsiyon
+### Opsiyonlar, Nasdaq
 
 Alttaki url kazınabilir
 
 [https://www.nasdaq.com/symbol/aapl/option-chain](https://www.nasdaq.com/symbol/aapl/option-chain)
 
-Makroekonomik Veriler ve Digerleri
+### Quandl
 
 Alttaki örnek ABD/Avro döviz kuru için; işsizlik, enflasyon, vs. gibi
 pek çok veri mümkün. Yanlız Quandl verisi için üye olup bir APİ
