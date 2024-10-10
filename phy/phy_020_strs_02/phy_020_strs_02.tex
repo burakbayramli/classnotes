@@ -6,70 +6,78 @@ Direk Direngenlik Metotu (Direct Stiffness Method)
 
 Direngenlik metotunu anlamak için direngenlik matrisi kavramını işlemek
 gerekir. Bu konuya biraz [5]'de değindik. Bir öğe grubunun, sistemin direngenlik
-matrisi düğümsel yer değişimler $d$ ile düğümsel kuvvetler $F$'yi ilintilendiren
-bir $K$ matrisidir, öyle ki [4, sf. 34]
+matrisi düğümsel yer değişimler $u$ ile düğümsel kuvvetler $F$'yi ilintilendiren
+bir $K$ matrisidir, öyle ki
 
 $$
-F = K d
+F = K u
 $$
 
-eşitliği geçerlidir. Alttaki gibi bir sistem olsun,
+eşitliği geçerlidir. Alttaki gibi bir sistem olsun [7, sf. 21],
 
-\includegraphics[width=15em]{phy_020_strs_06_03.jpg}
+\includegraphics[width=20em]{phy_020_strs_02_01.jpg}
 
-Sistemde bir yay görülüyor, bu yay üzerinde iki tane düğüm noktası seçtik,
-onları takip edeceğiz, düğüm 1 ve 2. Düğümlerdeki yer değişimler $u_1,u_2$
-olsun, yaydaki toplam değişim $\delta = u_1 - u_2$. Uygulanan kuvvet $T$
-ise bir sabit $k$ üzerinden $T = k \delta$ eşitliği ortaya atılabilir.
+Üstteki sistem kısım kısım incelenen daha büyük bir yay sisteminin parçası
+olabilir, birazdan göreceğimiz en basit örnekte sol taraf hareket etmiyor, bu
+sebeple $u_1$ yer değişimini düşünmek anlamsız, fakat 1 noktasının tam yayın
+esneyen kısmını işaret ettiği durumda ve daha büyük bir sistem var ise bu nokta
+da hareket edecektir.
 
-Direngenlik matrisine gelirsek, sistemdeki tüm yer değişimleri şöyle gösterebiliriz,
-
-\includegraphics[width=15em]{phy_020_strs_06_04.jpg}
-
-Sağ uçta yay $T$ kuvveti ile çekiliyorsa, bu durum sol uçta $-T$ tepkisel
-kuvvete sebep olur. Ayrıca $u_1$'in sol yönü işaret ettiğine dikkat, çünkü yer
-değişimin yönü pozitif yönün tersinde, yaydaki takip edilen nokta başlangıç
-anının sol tarafında kalıyor, bu sebeple yön eksi.
+Herneyse $u_1$ şimdilik hareket edemez olsa da formülasyonu yapalım. Yayın
+toplam esnemesi
 
 $$
-f_{1x} = -T, \quad f_{2x} = T
+\delta = u_2 - u_1
 $$
 
-Hepsini bir araya koyarsak
+Eğer yay sabiti $k$ ise yaydaki etki eden kuvvet
 
 $$
-T = -f_{1x} = k (u_2 - u_1)
+f = k \delta = k (u_2 - u_1)
 $$
 
-$$
-T = f_{2x} = k (u_2 - u_1)
-$$
-
-Yani
+Kuvvet denge koşulu için $f_1 + f_2  = 0$, yani $f_1 = -f_2$ olur, o zaman
+her düğümdeki kuvvetleri genel formül üzerinden şöyle açabiliriz,
 
 $$
-f_{1x} = k(u_1 - u_2)
+f_1 = -k (u_2 - u_1)
 $$
 
 $$
-f_{2x} = k(u_2 - u_1)
+f_2 = k(u_2 - u_1)
 $$
 
-Matris formunu kullanarak,
+Matris formunda üstteki iki formül
 
 $$
-\left[\begin{array}{ccc}
-f_{1x} \\ f_{2x}
-\end{array}\right] = 
-\left[\begin{array}{ccc}
+\left[\begin{array}{cc}
 k & -k \\ -k & k
 \end{array}\right]
-\left[\begin{array}{ccc}
-u_1 \\ u_2
-\end{array}\right]
+\left[\begin{array}{c}
+u_1 \\ u_2 
+\end{array}\right] =
+\left[\begin{array}{c}
+f_1 \\ f_2 
+\end{array}\right]  \Rightarrow
+Ku = f
 $$
 
-İfadenin ortasındaki 2 x 2 matrisi direngenlik matrisidir.
+Eger ornek bazi sayilari kullanip yer degisim hesabini yaparsak,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+k = 2
+K = np.array([[k+0.00001, -k],[-k, k]])
+f = np.array([[-10],[10]])
+print (np.dot (lin.inv(K), f) )
+\end{minted}
+
+\begin{verbatim}
+[[0.]
+ [5.]]
+\end{verbatim}
+
+$u_2 = 5$, ve $u_1 = 0$ çıktı.
 
 Üstdüşüm (Superposition)
 
@@ -77,7 +85,7 @@ Eğer iki tane yay sistemini birbiriyle bağlı olarak işlemek istersek [4, sf.
 üstdüşüm tekniği kullanılabilir. Üstdüşüm basit bir matris toplamı ile
 yapılabiliyor. Alttaki örneğe bakalım,
 
-\includegraphics[width=20em]{phy_020_strs_06_02.jpg}
+\includegraphics[width=20em]{phy_020_strs_02_02.jpg}
 
 İki yay var, birbirlerine bağlılar, iki yayın sabitleri $k_1$, $k_2$
 olsun. Her iki yayın direngenlik matrisi ayrı ayrı (tekabül eden yer değişim
@@ -361,6 +369,8 @@ Kaynaklar
 [5] Bayramlı, {\em Hesapsal Bilim, Ders 1-8}
 
 [6] Gerek, {\em Mechanics of Materials}
+
+[7] Hutton, {\em Fundamentals of Finite Element Analysis}
 
 \end{document}
 
