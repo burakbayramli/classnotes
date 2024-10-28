@@ -3,6 +3,8 @@
 
 ## En Son
 
+28/10 - [Materyel Mekaniği - 1 - Ekler - Stresler, Bükülme Momentleri](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_01/materyel_mekanigi__1.html)
+
 2/10 - [Python ile Finans Verileri - Ekler](https://burakbayramli.github.io/dersblog/sk/2016/01/python-ile-finans-verileri.html)
 
 1/10 - [S&P 500 Verisi](https://burakbayramli.github.io/dersblog/sk/2024/09/sp500.html)
@@ -10,8 +12,6 @@
 17/9 - [Sinyaller, Geriye Dönük Analiz, Performans](https://burakbayramli.github.io/dersblog/tser/tser_011_sign/sinyaller_geriye_donuk_analiz_performans.html)
 
 4/9 - [Miladi, Hicri Takvimler, Tarih Çevirimi](https://burakbayramli.github.io/dersblog/sk/2024/06/hicri-miladi-cevirim.html)
-
-8/8 - [Materyel Mekaniği - 7](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_07/materyel_mekanigi__7.html)
 
 ## Konular, Referans
 
