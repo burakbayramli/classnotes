@@ -18,7 +18,7 @@ elif sys.argv[1] == 'clean':
     os.system("find . -name '*.log' | xargs rm  -rf")
     os.system("find . -name '*.aux' | xargs rm  -rf")
     os.system("find . -name '*.out' | xargs rm  -rf")
-    os.system("find . -name '*.pdf' | xargs rm  -rf")
+    #os.system("find . -name '*.pdf' | xargs rm  -rf")
 
 elif sys.argv[1] == 'tex':
     file = glob.glob('phy_*.tex')
