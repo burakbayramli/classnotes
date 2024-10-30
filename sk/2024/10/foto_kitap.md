@@ -74,9 +74,9 @@ gelir.
 
 Kaynaklar
 
-[1] [Flask ile Web Üzerinden Dizin Gezebilmek - webfilebrowser](2024/06/webfilebrowser.html)
+[1] <a href="2024/06/webfilebrowser.html">Flask ile Web Üzerinden Dizin Gezebilmek - webfilebrowser</a>
 
-[2] [PDFTK](../../2011/12/pdftk.html)
+[2] <a href="../../2011/12/pdftk.html">PDFTK</a>
 
-[3] [ImageMagic](../../2010/08/imagemagick.html)
+[3] <a href="../../2010/08/imagemagick.html">ImageMagic</a>
 
