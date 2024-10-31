@@ -13,10 +13,9 @@ son foto dosyası hep en sondadır.
 Çekilmiş tüm fotoları dizüstü bilgisayara aktarmak için önce zip
 sıkıştırması yapmak lazım, `ZArchiver` kullanalım.
 
-Dizüstü bilgisayara dosyalar bizim kodlayacağımız yükleme (upload)
-özelliği ile yapılabilir, ikinci bilgisayarda bir web uygulaması
-işletiriz, Flask üzerinden, oradaki özellik dosya gönderimi sağlar
-[1],
+Dizüstü bilgisayara dosyalar kodlayacağımız yükleme (upload) özelliği
+ile yapılabilir, ikinci bilgisayarda bir web uygulaması işletiriz,
+Flask üzerinden, oradaki özellik dosya gönderimi sağlar [1],
 
 ```python
 @app.route('/upload', methods = ['GET', 'POST'])
@@ -30,14 +29,12 @@ def upload_file():
    return "OK"
 ```
 
-Foto çekimi bitince ZIP dosyasını bu şekilde göndermiş oluruz.
-
-Son işlem kısmına geldik, dizüstü ortamında bir Python script zip
-içindeki tüm dosyaları alıp, küçültüp, PDF haline getirebilir, yeni
-bir dizine yazabilir. Ardından `pdftk` ile birleştirimi yapılır.
+Foto çekimi bitince ZIP dosyası ustteki kodla gönderilir. Son işlem
+dizüstü ortamında olur, bir Python script zip içindeki tüm dosyaları
+alıp, küçültüp, PDF haline getirir, yeni bir dizine yazar. Ardından
+`pdftk` ile birleştirim yapılır.
 
 ```python
-DIR = 
 z    = zipfile.ZipFile('dosya.zip')
 files_orig = list(z.namelist())
 for x in files_orig:
@@ -53,28 +50,30 @@ for x in files_orig:
 ```
 
 Görüntü işlemek için ImageMagick kullandık, her sayfayı 90 derece sağa
-döndürüyoruz, gerekirse ek işlemler bu noktada kodlanabilir. Mesela
-sayfanın sağında solunda fazla boş bölgeler varsa `-shave 50x0` gibi
-bir seçenek o işlemi yapar, resim üzerinde keskinlik (sharpening)
-yapılabilir, pek çok diğer kabiliyet mevcut [3].
+döndürüyoruz (foto programından öyle geldi), gerekirse ek işlemler bu
+noktada kodlanabilir. Mesela sayfanın sağında solunda fazla boş
+bölgeler varsa `-shave 50x0` gibi bir seçenek o işlemi yapar, resim
+üzerinde keskinlik (sharpening) yapılabilir, pek çok diğer kabiliyet
+mevcut [3].
 
-Üstteki kodda zip dosyasının gezilmesine dikkat, işlemden önce tüm zip
-dosyasını açıp içindeki dosyaları diske yazmıyoruz, gerekli bilgiyi
-zip içinde gezerken Python `zipfile` ile alabiliyoruz. İşlem öncesi
-ham görüntü dosyası sadece `/tmp/out.jpg` içinde, yeni görüntü sadece
-gerekli işlemler sonrası yazılıyor. Böylece yerden muhafaza ediyoruz.
+Üstteki kodda zip dosyasının içeriğinin gezilmesine dikkat, işlemden
+önce tüm zip dosyasını açıp içindeki dosyaları diske yazmıyoruz,
+gerekli bilgiyi zip içinde gezerken Python `zipfile` ile
+alabiliyoruz. Imagemagick işlemi öncesi ham görüntü dosyası sadece
+`/tmp/out.jpg` içinde, yeni görüntü dosyası, ayrı bir dosya olarak
+gerekli işlemler bittikten sonra yazılıyor. Böylece yerden muhafaza
+ediyoruz.
 
-Yeni goruntuler olusunca `pdftk` ile birlesimi yapiyoruz [2]. 
+Yeni görüntüler oluşunca `pdftk` ile birleştirmeyi yapıyoruz [2]. 
 
-Eğer artık kitaplaşmış PDF dosyası içinde CTRL-F ile arama yapabilmek
-istiyorsak, `ocrmypdf` ile bunu yapabiliriz, gerekli metin bilgisi PDF
-içine bu program tarafından eklenecektir. Hatta bu sayede doküman
-herhangi bir indeksleyici program tarafından indekslenebilir hale
-gelir.
+Kitaplaşmış PDF dosyası içinde CTRL-F ile arama yapabilmek istiyorsak,
+`ocrmypdf` ile bunu da yapabiliriz, gerekli metin bilgisi PDF içine bu
+program tarafından eklenecektir. Hatta bu sayede doküman herhangi bir
+indeksleyici program tarafından indekslenebilir hale gelir.
 
 Kaynaklar
 
-[1] <a href="2024/06/webfilebrowser.html">Flask ile Web Üzerinden Dizin Gezebilmek - webfilebrowser</a>
+[1] <a href="../../2024/06/webfilebrowser.html">Flask ile Web Üzerinden Dizin Gezebilmek - webfilebrowser</a>
 
 [2] <a href="../../2011/12/pdftk.html">PDFTK</a>
 
