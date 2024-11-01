@@ -29,7 +29,7 @@ def upload_file():
    return "OK"
 ```
 
-Foto çekimi bitince ZIP dosyası ustteki kodla gönderilir. Son işlem
+Foto çekimi bitince ZIP dosyası üstteki kodla gönderilir. Son işlem
 dizüstü ortamında olur, bir Python script zip içindeki tüm dosyaları
 alıp, küçültüp, PDF haline getirir, yeni bir dizine yazar. Ardından
 `pdftk` ile birleştirim yapılır.
@@ -78,4 +78,6 @@ Kaynaklar
 [2] <a href="../../2011/12/pdftk.html">PDFTK</a>
 
 [3] <a href="../../2010/08/imagemagick.html">ImageMagic</a>
+
+
 
