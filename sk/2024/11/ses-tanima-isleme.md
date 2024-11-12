@@ -15,6 +15,8 @@ axs[1].plot(wav2)
 plt.savefig('ses_01.jpg')
 ```
 
+![](ses_01.jpg)
+
 Ses verisi sonuçta bir zaman serisidir. Şekil olarak iki sesin (fonem)
 birbirinden farkı görülebiliyor.
 
@@ -63,11 +65,13 @@ x = np.abs(np.sin(2*np.pi*440*t))
 t = np.linspace(0, T, int(T*fs), endpoint=False) 
 x2 = np.abs(np.sin(2*np.pi*220*t))
 xx = x+x2
-scipy.io.wavfile.write('tmp2.wav', fs, xx)
-tmp, wav4 = scipy.io.wavfile.read('/tmp/out3.wav')
+scipy.io.wavfile.write('/tmp/out2.wav', fs, xx)
+tmp, wav4 = scipy.io.wavfile.read('/tmp/out2.wav')
 plt.plot(wav4[:1000])
 plt.savefig('ses_03.jpg')
 ```
+
+![](ses_03.jpg)
 
 Altta bir polis sireni örneği,
 
@@ -75,7 +79,7 @@ Altta bir polis sireni örneği,
 y = sin(2*pi*1500*t - 100*sin(2*2*pi*t))
 ```
 
-Ses Verişi Karşılaştırmak
+Ses Verisini Karşılaştırmak
 
 Ses verisi bir tür zaman serisi olduğuna göre bu zaman serisini bildik
 araçlarla karşılaştıramaz mıyız? Mesela basit korelasyon, ya da basit
@@ -150,12 +154,15 @@ for f in max_freqs:
      x = np.sin(2*np.pi*f*t)
      tmp += x
 tmp = tmp * 500.
-scipy.io.wavfile.write('tmp3.wav', fs, tmp[0])
+scipy.io.wavfile.write('/tmp/out3.wav', fs, tmp[0])
 import scipy.io.wavfile
-tmp, wav11 = scipy.io.wavfile.read('tmp3.wav')
+tmp, wav11 = scipy.io.wavfile.read('/tmp/out3.wav')
 plt.plot(wav11)
-plt.savefig('ses_04.png')
+plt.savefig('ses_04.jpg')
 ```
+
+![](ses_04.jpg)
+
 
 Sinüssel Regresyon ile Ayırmak
 
