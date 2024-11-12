@@ -63,11 +63,56 @@ plt.plot(wav4[:1000])
 plt.savefig('ses_03.jpg')
 ```
 
-Altta bir polis sireni ornegi,
+Altta bir polis sireni örneği,
 
-\begin{minted}[fontsize=\footnotesize]{python}
+```python
 y = sin(2*pi*1500*t - 100*sin(2*2*pi*t))
-\end{minted}
+```
+
+Ses Verisi Karsilastirmak
+
+Tek boyutlu vektör olduğu için ses verisi bir tür zaman serisidir. Bu
+zaman serisini bildik araçlarla karşılaştıramaz miyiz? Mesela basit
+korelasyon, ya da basit Öklitsel uzaklık ölçütleri ile mesel?
+
+Eğer ses tanıma için kullanacaksak, basit karşılaştırma yöntemleri
+problem çıkartabilir. Gürültü konusunu bir kenara bıraksak, boyutsal,
+genlik (amplitude) uyusşmazlık problemleri olabilir. Yani aynı ses
+bazen daha yüksek genli, bazen faz olarak sağa, sola kaymış olabilir,
+ya da ses verisi daha çok zamana yayılmış olabilir.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Fourier Analizi ile Sesi Sinüs Eğrilerine Ayırmak
 
