@@ -91,7 +91,7 @@ YSA'nın parçası haline gelebiliyorlar. İyi bir özellik.
 Devam edelim, up/down ses komutlarini iceren dosya altta (başka bir
 konuşma tanımı yazısında kullanılan aynı ham veri)
 
-https://drive.google.com/open?id=1BIGj3NtUZfSrXMaJ8hCqsz0UzS01MSrF
+[Veri](https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ni9ibhbs&dl=1)
 
 Bu dosyadaki up/down ses kayıtlarını alıp YSA'ya teker teker
 vereceğiz, özellik çıkartımı yaptıracağız, ve bu özellik vektörlerini
