@@ -162,3 +162,5 @@ Kaynaklar
 
 [6] Bayramli, Zaman Serileri, Finans, Sezonsallık, Periyotlar
 
+[7] <a href="https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ni9ibhbs&dl=1">Ufak Ses Komut Verisi</a>
+    
