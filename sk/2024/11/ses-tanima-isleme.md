@@ -1,19 +1,25 @@
-# Ses Tanima, Isleme
+# Ses Tanıma, İşleme
 
 Veri Okuma, Yazma
 
-Okuma islemi `scipy.io.wavfile` ile yapilabilir, tek boyutlu bir vektor
-elde edilecektir. Bir ornek gorelim,
+Okuma işlemi `scipy.io.wavfile` ile yapılabilir, tek boyutlu bir vektör
+elde edilecektir. Bir örnek görelim,
 
 ```python
 import scipy.io.wavfile
 tmp, wav1 = scipy.io.wavfile.read('phonemes/ow.wav')
-plt.plot(wav1)
+tmp, wav2 = scipy.io.wavfile.read('phonemes/ao.wav')
+fig, axs = plt.subplots(2)
+axs[0].plot(wav1)
+axs[1].plot(wav2)
 plt.savefig('ses_01.jpg')
 ```
 
-Bu ses dosyasini komut satirinda calmak icin `aplay` ya da `ffmpeg`
-kullanilabilir. 
+Ses verisi sonuçta bir zaman serisidir. Şekil olarak iki sesin (fonem)
+birbirinden farkı görülebiliyor.
+
+Bu ses dosyalarını komut satirinda calmak icin `aplay` ya da `ffmpeg`
+kullanilabilir.
 
 Eger elde tek boyutlu bir ses verisi varsa diske yazmak icin `scipy.io.wavfile.write`,
 
@@ -69,17 +75,18 @@ Altta bir polis sireni örneği,
 y = sin(2*pi*1500*t - 100*sin(2*2*pi*t))
 ```
 
-Ses Verisi Karsilastirmak
+Ses Verişi Karşılaştırmak
 
-Tek boyutlu vektör olduğu için ses verisi bir tür zaman serisidir. Bu
-zaman serisini bildik araçlarla karşılaştıramaz miyiz? Mesela basit
-korelasyon, ya da basit Öklitsel uzaklık ölçütleri ile mesel?
+Ses verisi bir tür zaman serisi olduğuna göre bu zaman serisini bildik
+araçlarla karşılaştıramaz mıyız? Mesela basit korelasyon, ya da basit
+Öklitsel uzaklık ölçütleri ile bir mesafe irdelemesi kullansak olmaz
+mi acaba?
 
-Eğer ses tanıma için kullanacaksak, basit karşılaştırma yöntemleri
-problem çıkartabilir. Gürültü konusunu bir kenara bıraksak, boyutsal,
-genlik (amplitude) uyusşmazlık problemleri olabilir. Yani aynı ses
-bazen daha yüksek genli, bazen faz olarak sağa, sola kaymış olabilir,
-ya da ses verisi daha çok zamana yayılmış olabilir.
+Eğer amac ses tanıma ise, basit karşılaştırma yöntemleri problem
+çıkartabilir. Gürültü konusunu bir kenara bıraksak, boyutsal, genlik
+(amplitude) uyuşmazlık problemleri olabilir. Yani aynı ses bazen daha
+yüksek genli, bazen faz olarak sağa, sola kaymış olabilir, ya da ses
+verisi daha çok zamana yayılmış olabilir.
 
 
 
@@ -150,7 +157,7 @@ plt.plot(wav11)
 plt.savefig('ses_04.png')
 ```
 
-Sinussel Regresyon ile Ayirmak
+Sinüssel Regresyon ile Ayırmak
 
 ```python
 import statsmodels.api as sm
@@ -195,17 +202,17 @@ R^2 0.5121417785266622
 
 Kaynaklar
 
-[1] https://github.com/talcs/simpledtw/
+[1] <a href="https://github.com/talcs/simpledtw">SimpleDTW</a>
 
-[2] https://github.com/slaypni/fastdtw
+[2] <a href="https://github.com/slaypni/fastdtw">FastDTW</a>
 
-[3] https://cs.fit.edu/~pkc/papers/tdm04.pdf
+[3] <a href="https://cs.fit.edu/~pkc/papers/tdm04.pdf">FastDTW Makale</a>
 
-[4] https://rtavenar.github.io/blog/dtw.html
+[4] Tavenard, <a href="https://rtavenar.github.io/blog/dtw.html">An introduction to Dynamic Time Warping</a>
+    
+[5] Mishra, <a href="https://medium.com/walmartglobaltech/time-series-similarity-using-dynamic-time-warping-explained-9d09119e48ec">Time Series Similarity Using Dynamic Time Warping -Explained</a>
 
-[5] https://medium.com/walmartglobaltech/time-series-similarity-using-dynamic-time-warping-explained-9d09119e48ec
-
-[6] Bayramli, Zaman Serileri, Finans, Sezonsallık, Periyotlar
+[6] Bayramlı, Finans ve Zaman Serileri - Sezonsallık, Periyotlar
 
 [7] <a href="https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ni9ibhbs&dl=1">Ufak Ses Komut Verisi</a>
     
