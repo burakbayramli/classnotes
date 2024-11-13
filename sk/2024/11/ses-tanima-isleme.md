@@ -211,7 +211,7 @@ Kaynaklar
 
 [1] <a href="https://github.com/talcs/simpledtw">SimpleDTW</a>
 
-[2] <a href="https://github.com/slaypni/fastdtw">FastDTW</a>
+[2] <a href="https://github.com/slaypni/fastdtw">FastDTW Kod</a>
 
 [3] <a href="https://cs.fit.edu/~pkc/papers/tdm04.pdf">FastDTW Makale</a>
 
