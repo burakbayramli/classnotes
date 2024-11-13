@@ -20,27 +20,27 @@ plt.savefig('ses_01.jpg')
 Ses verisi sonuçta bir zaman serisidir. Şekil olarak iki sesin (fonem)
 birbirinden farkı görülebiliyor.
 
-Bu ses dosyalarını komut satirinda calmak icin `aplay` ya da `ffmpeg`
-kullanilabilir.
+Bu ses dosyalarını komut satırında çalmak için `aplay` ya da `ffmpeg`
+kullanılabilir.
 
-Eger elde tek boyutlu bir ses verisi varsa diske yazmak icin `scipy.io.wavfile.write`,
+Eğer elde tek boyutlu bir ses verisi varsa diske yazmak için
+`scipy.io.wavfile.write`,
 
 ```python
-wav1tmp = wav1 + 1000
-plt.plot(wav1tmp)
 fs = 16000 
+wav1tmp = wav1 + 1000
 scipy.io.wavfile.write('/tmp/out1.wav', fs, np.array(wav1tmp))
 ```
 
-Ilginc bir durum ses dosyasini yukari kaydirdik fakat ses calininca
-hala ayni ses duyuluyor.
+İlginç bir durum ses dosyasını yukarı kaydırdık fakat ses çalınınca
+hala aynı ses duyuluyor.
 
 Fakat tüm ses verisini 100 ile bölersem, bu ``ses kısması'' demek, ses
-azalir.
+azalır.
 
-Ses Olusturma
+Ses Oluşturma
 
-Kendimiz sinus bazli sesler yaratabilirdik,
+Kendimiz sinüs bazlı sesler yaratabilirdik,
 
 ```python
 import scipy.io.wavfile
@@ -105,13 +105,18 @@ eşleme üzerinden iki zaman serisi arasındaki toplam mesafe en minimal
 olsun. Eğriltme metaforu niye kullanılmış resme bakınca anlıyoruz, bir
 şerideki her zaman dilimi birebir diğer şerideki aynı seriye
 eşlenmiyor, serilerin arasında kayma, büyüme, küçülme olabileceği
-beklentisi ile eşleme farklı şekillerde olabiliyor. Hatta bazen aynı
-zaman noktası diğer şerideki birkaç farklı noktaya bile eşlenebiliyor!
+beklentisi ile eşleme farklı şekillerde olabiliyor, eşlemede "eğrilme"
+görülebiliyor. Hatta bazen aynı zaman noktası diğer serideki birkaç
+farklı noktaya bile eşlenebiliyor!
 
 Bahsedilen eşlemenin bulunması bir arama gerektirir, pek çok seçenek
-arasından arama yapılmalıdır, ve bu arama, $M$ ve $N$ büyüklüğüneki
-iki zaman serisi için başlangıç DTW algoritmasıyla $O(M N)$
-karmaşıklığına [1] sahiptir.
+arasından arama yapılmalıdır, ve bu arama, $M$ ve $N$ büyüklüğündeki
+iki zaman serisi için başlangıç DTW algoritmasında $O(M N)$
+karmaşıklığına [1] sebep olur. Bu arama çok daha fazla karmaşıklığa
+sahip olabilirdi, fakat dinamik programlama ile bu süre biraz daha
+kısaltılabiliyor. Detaylar için [1,4,5].
+
+Standart DTW algoritması `simpledtw.py` içinde bulunabilir. Kullanım örneği,
 
 ```python
 import simpledtw
@@ -152,12 +157,13 @@ print (cost)
 ```
 
 Üstteki işlemin biraz yavaş işlediği farkedilebilir, bunun sebebi
-$O(MN)$ ya da aşağı yukarı benzer uzunluktaki seriler için $O(M^2)$.
-Karesel karmaşıklık hep kaçınmaya uğraştığımız bir durum, mümkün
-olduğu kadar $O(M)$'e yakın olmak isteriz.
+karmaşıklığın $O(MN)$ ya da aşağı yukarı benzer uzunluktaki seriler
+için $O(M^2)$ olması. Karesel karmaşıklık hep kaçınmaya uğraştığımız
+bir durum, mümkün olduğu kadar $O(M)$'e yakın olmak isteriz.
 
 Hızlandırma amaçlı bir algoritma FastDTW [2,3] yaklaşımı, $O(M)$
-karmaşıklığına sahiptir. Aynı veriler üzerinde kullanalım,
+karmaşıklığına sahiptir. Kodlaması `fastdtw.py` içinde. Aynı veriler
+üzerinde kullanalım,
 
 ```python
 from scipy.spatial.distance import euclidean
@@ -177,7 +183,7 @@ print (distance)
 Bu çağrının çok daha hızlı işlediğini göreceğiz.
 
 Ses komut örnekleri üzerinde aynı programı işletelim (diğer komut ses
-dosyaları [7] bağlantısında). Bu komutlardan ilk ikisi farklı
+dosyaları [7] zip dosyasında var). Bu komutlardan ilk ikisi farklı
 konuşmacıların söylediği "bed" kelimesi, üçüncüsü "down" kelimesi.
 Acaba birinci ses komut dosyası 2'inci ve 3'üncü arasından hangi ses
 zaman serisine daha yakın çıkacak?
@@ -298,3 +304,5 @@ Kaynaklar
 
 [7] <a href="https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ni9ibhbs&dl=1">Ufak Ses Komut Verisi</a>
     
+
+
