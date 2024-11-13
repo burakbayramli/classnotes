@@ -108,32 +108,97 @@ eşlenmiyor, serilerin arasında kayma, büyüme, küçülme olabileceği
 beklentisi ile eşleme farklı şekillerde olabiliyor. Hatta bazen aynı
 zaman noktası diğer şerideki birkaç farklı noktaya bile eşlenebiliyor!
 
+Bahsedilen eşlemenin bulunması bir arama gerektirir, pek çok seçenek
+arasından arama yapılmalıdır, ve bu arama, $M$ ve $N$ büyüklüğüneki
+iki zaman serisi için başlangıç DTW algoritmasıyla $O(M N)$
+karmaşıklığına [1] sahiptir.
 
+```python
+import simpledtw
 
+series_1 = [1, 2, 3, 2, 2.13, 1]
+series_2 = [1, 1, 2, 2, 2.42, 3, 2, 1]
+series_3 = [4, 3, 1, 9, 9.2, 1, 1, 1]
+matches, cost, mapping_1, mapping_2, matrix = simpledtw.dtw(series_1, series_2)
+print (cost)
+matches, cost, mapping_1, mapping_2, matrix = simpledtw.dtw(series_1, series_3)
+print (cost)
+```
 
+```text
+0.5499999999999998
+18.94
+```
 
+Ses verileri için aynı işlemi uygulayabiliriz,
 
+```python
+import scipy.io.wavfile
+tmp, wav1 = scipy.io.wavfile.read('phonemes/b.wav')
+tmp, wav2 = scipy.io.wavfile.read('phonemes/d.wav')
+tmp, wav3 = scipy.io.wavfile.read('phonemes/ay.wav')
+```
 
+```python
+matches, cost, mapping_1, mapping_2, matrix = simpledtw.dtw(wav1, wav2)
+print (cost)
+matches, cost, mapping_1, mapping_2, matrix = simpledtw.dtw(wav1, wav3)
+print (cost)
+```
 
+```
+856568.0
+3479812.0
+```
 
+Üstteki işlemin biraz yavaş işlediği farkedilebilir, bunun sebebi
+$O(MN)$ ya da aşağı yukarı benzer uzunluktaki seriler için $O(M^2)$.
+Karesel karmaşıklık hep kaçınmaya uğraştığımız bir durum, mümkün
+olduğu kadar $O(M)$'e yakın olmak isteriz.
 
+Hızlandırma amaçlı bir algoritma FastDTW [2,3] yaklaşımı, $O(M)$
+karmaşıklığına sahiptir. Aynı veriler üzerinde kullanalım,
 
+```python
+from scipy.spatial.distance import euclidean
+import fastdtw
 
+distance, path = fastdtw.fastdtw(wav1, wav2, dist=euclidean)
+print (distance)
+distance, path = fastdtw.fastdtw(wav1, wav3, dist=euclidean)
+print (distance)
+```
 
+```text
+865169.0
+3619304.0
+```
 
+Bu çağrının çok daha hızlı işlediğini göreceğiz.
 
+Ses komut örnekleri üzerinde aynı programı işletelim (diğer komut ses
+dosyaları [7] bağlantısında). Bu komutlardan ilk ikisi farklı
+konuşmacıların söylediği "bed" kelimesi, üçüncüsü "down" kelimesi.
+Acaba birinci ses komut dosyası 2'inci ve 3'üncü arasından hangi ses
+zaman serisine daha yakın çıkacak?
 
+```python
+tmp, wav1 = scipy.io.wavfile.read('vcommand/fb24c826_nohash_0.wav')
+tmp, wav2 = scipy.io.wavfile.read('vcommand/fb7c9b3b_nohash_2.wav')
+tmp, wav3 = scipy.io.wavfile.read('vcommand/fda46b78_nohash_1.wav')
 
+distance, path = fastdtw.fastdtw(wav1, wav2, dist=euclidean)
+print (distance)
+distance, path = fastdtw.fastdtw(wav1, wav3, dist=euclidean)
+print (distance)
+```
 
+```text
+10319233.0
+19032652.0
+```
 
-
-
-
-
-
-
-
-
+İkinciye daha yakın çıktı, bu iyi bir sonuç.
 
 Fourier Analizi ile Sesi Sinüs Eğrilerine Ayırmak
 
