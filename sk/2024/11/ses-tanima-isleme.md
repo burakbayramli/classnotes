@@ -86,17 +86,27 @@ araçlarla karşılaştıramaz mıyız? Mesela basit korelasyon, ya da basit
 Öklitsel uzaklık ölçütleri ile bir mesafe irdelemesi kullansak olmaz
 mi acaba?
 
-Eğer amac ses tanıma ise, basit karşılaştırma yöntemleri problem
-çıkartabilir. Gürültü konusunu bir kenara bıraksak, boyutsal, genlik
-(amplitude) uyuşmazlık problemleri olabilir. Yani aynı ses bazen daha
-yüksek genli, bazen faz olarak sağa, sola kaymış olabilir, ya da ses
-verisi daha çok zamana yayılmış olabilir.
+Eğer amaç ses tanıma ise, basit karşılaştırma yöntemleri problem
+çıkartabilir. Standart karşılaştırma metotları aynı boyutlarda ve
+zaman dilimleri birbirine uyan veriyi bekler. Fakat gürültü konusunu
+bir kenara bıraksak, boyutsal, genlik (amplitude) uyuşmazlık
+problemleri olabilir. Yani aynı ses bazen daha yüksek genli, bazen faz
+olarak sağa, sola kaymış olabilir, ya da ses verisi daha çok zamana
+yayılmış olabilir. Bu tür veri durumlarında, özellikle ses
+karşılaştırmasında Dinamik Zaman Eğriltmesi (Dynamic Time Warping
+-DTW-) metotu var.
 
+Dinamik Zaman Eğriltmesi
 
+![](ses_05.jpg)
 
-
-
-
+DTW ile iki zaman serisi arasında bir eşleme aranır, öyle ki optimal
+eşleme üzerinden iki zaman serisi arasındaki toplam mesafe en minimal
+olsun. Eğriltme metaforu niye kullanılmış resme bakınca anlıyoruz, bir
+şerideki her zaman dilimi birebir diğer şerideki aynı seriye
+eşlenmiyor, serilerin arasında kayma, büyüme, küçülme olabileceği
+beklentisi ile eşleme farklı şekillerde olabiliyor. Hatta bazen aynı
+zaman noktası diğer şerideki birkaç farklı noktaya bile eşlenebiliyor!
 
 
 
