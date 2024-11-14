@@ -79,6 +79,14 @@ Altta bir polis sireni örneği,
 y = sin(2*pi*1500*t - 100*sin(2*2*pi*t))
 ```
 
+Beyaz Gürültü
+
+```
+fs = 16000 
+y = np.random.randn(fs*10).astype(np.float32)
+scipy.io.wavfile.write('/tmp/out4.wav', fs, y)
+```
+
 Ses Verisini Karşılaştırmak
 
 Ses verisi bir tür zaman serisi olduğuna göre bu zaman serisini bildik
