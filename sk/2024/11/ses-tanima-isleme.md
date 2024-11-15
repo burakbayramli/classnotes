@@ -17,8 +17,8 @@ plt.savefig('ses_01.jpg')
 
 ![](ses_01.jpg)
 
-Ses verisi sonuçta bir zaman serisidir. Şekil olarak iki sesin (fonem)
-birbirinden farkı görülebiliyor.
+Ses verisi sonuçta bir zaman serisidir. Şekil olarak iki temel sesin
+(fonem) birbirinden farkı görülebiliyor.
 
 Bu ses dosyalarını komut satırında çalmak için `aplay` ya da `ffmpeg`
 kullanılabilir.
@@ -85,6 +85,17 @@ Beyaz Gürültü
 fs = 16000 
 y = np.random.randn(fs*10).astype(np.float32)
 scipy.io.wavfile.write('/tmp/out4.wav', fs, y)
+```
+
+Ya da
+
+```python
+from scipy import stats
+sample_rate = 44100
+length_in_seconds = 3
+amplitude = 11
+noise = stats.truncnorm(-1, 1, scale=min(2**16, 2**amplitude)).rvs(sample_rate * length_in_seconds)
+scipy.io.wavfile.write('/tmp/noise.wav', sample_rate, noise.astype(np.int16))
 ```
 
 Ses Verisini Karşılaştırmak

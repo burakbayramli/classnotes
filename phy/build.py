@@ -10,7 +10,7 @@ if len(sys.argv) == 1:
 elif sys.argv[1] == 'all':
     for a in sorted(glob.glob("phy*")):
         os.chdir(a)
-        os.system("pdflatex -shell-escape %s" % glob.glob("phy_*.tex")[0] )
+        os.system("pdflatex -shell-escape -output-directory=/tmp %s" % glob.glob("phy_*.tex")[0] )
         os.chdir("..")
 elif sys.argv[1] == 'clean':
     os.system("find . -name '_region_*' | xargs rm  -rf")
