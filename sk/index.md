@@ -3,7 +3,7 @@
 
 ## En Son
 
-18/1 - [Materyel Mekaniği - 2 - Ekler - Yatay Kesme (Shear) Stresi](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_02/materyel_mekanigi__2.html)
+18/1 - [Materyel Mekaniği - 2 - Ekler - Yatay Kesme (Shear) Stresi, Problemler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_02/materyel_mekanigi__2.html)
 
 13/11 - [Ses Tanıma, İşleme](https://burakbayramli.github.io/dersblog/sk/2024/11/ses-tanima-isleme.html)
 
