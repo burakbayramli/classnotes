@@ -1,0 +1,444 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+Materyel Mekaniği - 10
+
+Izgara Denklemleri
+
+Yapısal mekanikte ızgara yüklerin dik uygulandığı bir sistemdir. Izgaranın
+öğelerinin katı (rigid) şekilde bağlandığı farz edilir, yani ögelerin birbirine
+bağlandığındaki açılar aynı kalır. Düğüm noktalarında burumsal ve bükülme
+momentleri süreklilik gösterir. Izgara örnekleri bir evin tabanı (floor) ya da
+bir köprünün alt yüzeyi olabilir [3, sf. 262].
+
+\includegraphics[width=20em]{compscieng_bpp43fem_01.jpg}
+
+Ama ızgara denklemlerine detaylı giriş yapmadan önce Galerkin, ve şekil
+fonksiyonları (shape function) konusuna bakalım.
+
+Alttaki gibi bir denklem düşünelim,
+
+$$
+E I \frac{\ud^4 y}{\ud X_1^4} = q
+\mlabel{1}
+$$
+
+Biraz düzenleme sonrası
+
+$$
+E I \frac{\ud^4 y}{\ud X_1^4} - q = 0
+$$
+
+elde ederim. Amacım öyle bir yaklaşık $y$, ya da $y_{approx}$ diyelim, bulmak ki
+üstteki denklemi çözebileyim. Bunu $y$ yerine onu yaklaşık temsil edebilen bir
+diğer fonksiyonu geçirerek yapabilirim. Bir polinom bu işi görebilir; Pek çok
+diğer yöntemin kullandığı tipik bir polinom vardır,
+
+$$
+y_{approx} = a_0 + a_1 X_1 + a_2 X_1^2 
+$$
+
+diye gider, aslında daha genel olarak olan her terimde ``bir katsayı çarpı
+$X_1$'in bir tür fonksiyonu'' gibi bir toplam kullanmak daha iyi olabilir,
+bu formda,
+
+$$
+y_{approx} = a_0 \phi_0(X_1) + a_1 \phi_1(X_1) + a_2 \phi_2(X_1) 
+$$
+
+Daha kısa olarak
+
+$$
+y_{approx} = \sum_{i=0}^{n} a_i \phi_i(X) 
+$$
+
+Dikkat $\phi_i(X)$ içinde $X$ var bu $X = X_1,X_2,..,X_n$ anlamında, cebirsel
+olarak her $\phi$ fonksiyonuna $X$ geçildiğini düşünebiliriz ama her $\phi_i$
+tüm $X$ öğelerini kullanmayabilir; üstteki polinom örneğinde mesela $\phi_1$
+fonksiyonu sadece $X_1$'i kullanarak bir hesap yapar, diğerleri diğer şekillerde.
+
+Not, $y_{approx}$ gerekli (essential) sınır şartlarını yerine getirmelidir.
+
+Şekil Fonksiyonları (Shape Functions)
+
+Diyelim ki bir çubuğa bakıyorum ve onun üzerinde iki tane düğüm tanımladım,
+düğümlerden biri $X_1 = x_1$ noktasında diğeri $X_2 = x_2$ noktasında.
+
+\includegraphics[width=15em]{compscieng_bpp45fem2_05.jpg}
+
+Ve yine diyelim ki bu iki düğümdeki yer değişimi $u_i$ değerlerini biliyorum,
+eldeki örnek için $u_1$ ve $u_2$, kabaca alttaki gibi olsun,
+
+\includegraphics[width=15em]{compscieng_bpp45fem2_06.jpg}
+
+Şekle gelelim; eğer bu iki düğüm üzerinden bir lineer bağlantı kullanmak
+istiyorsam yani iki düğüm arasında aradeğerleme yapacak fonksiyon lineer olsun
+diyorsam, yapılacak olan bariz aslında,
+
+\includegraphics[width=15em]{compscieng_bpp45fem2_07.jpg}
+
+Aradeğerleme $u_e$ bu şekilde. Peki o fonksiyonda bilinmeyen $a_0,a_1$ nasıl
+bulunacak? Biz nihai sonuç olarak bu katsayılarla ilgilenmiyoruz, bizi tek
+ilgilendiren yer değişim fonksiyonu, bunu belirtmiştik. O zaman üstteki
+fonksiyonu $u_1,u_2$ temelli olarak tekrar yazabilir miyiz acaba? Eğer $x_1$
+noktasında fonksiyon değeri $u_1$, $x_2$ noktasında $u_2$ ise,
+
+$$
+u(x_1) = a_0 + a_1 x_1 = u_1
+$$
+
+$$
+u(x_2) = a_0 + a_1 x_2 = u_2
+$$
+
+İki bilinmeyen var, iki denklem var, çözüm [1, Ders 2]
+
+$$
+a_0 = \frac{u_2 x_1 - u_1 x_2}{L}, \qquad a_1 = \frac{u_2 - u_1}{L}
+$$
+
+$L$ kırmızı ile gösterilen parçanın uzunluğu sadece, yani $x_2 - x_1$.
+
+Üstteki $a_0,a_1$ değerlerini nasıl bulduğumuzu merak edenler için
+
+$$
+u(x_1) = a_0 + a_1 x_1 = u_1, \quad
+u(x_2) = a_0 + a_1 x_2 = u_2
+$$
+
+ile başlarız, ikinci formülden birinciyi çıkartırsak,
+
+$$
+(x_2 - x_1) a_1 = u_2 - u_1 \to a_1 = \frac{u_2 - u_1}{L}
+$$
+
+ki $L = x_2 - x_1$
+
+$a_0$'i bulmak için birinci formüldeki $a_1$'i alıp, yani
+$a_1 = \frac{u_1 - a_0}{x_1}$, ikinciye sokuyoruz,
+
+
+$$
+a_0 + \frac{\frac{u_1 - a_0}{x_1}}{x_1} x_2 = u_2
+$$
+
+$$
+x_1 a_0 + u_1 x_2 - a_0 x_2 = u_2 x_2
+$$
+
+$$
+u_1 x_2 - u_2x_1 = -a_0 x_1 + a_0 x_2
+$$
+
+$$
+= a_0 (x_2 - x_1) = a_0 L
+$$
+
+$$
+a_0 = \frac{u_1 x_2 - u_1 x_2}{L}
+$$
+
+Devam edelim.
+
+$a_0,a_1$ degerlerini $u_e$ icine koyunca,
+
+$$
+u = \frac{u_2 x_1 - u_1 x_2}{L} - \frac{u_2 - u_1}{L} X_1
+$$
+
+Biraz daha cebirsel değiştirme sonrası
+
+$$
+u = \frac{(x_2 - X_1)}{L} u_1 + \frac{(X_1 - x_1)}{L} u_2
+$$
+
+Bu son değişimi yaptık çünkü bu formda dikkat edersek denklem daha önce
+gördüğümüz Galerkin deneme fonksiyonlarına benziyor,
+
+$$
+u = u_1 \phi_1(X_1) + u_2 \phi_2 (X_1)
+$$
+
+kalıbında görüldüğü gibi. Deneme fonksiyonlarında $u_1,u_2$ sabit değerlerdi, bu
+bölümde gördüğümüz $u_i$ değerleri de öyle aslında. Bilinen $u_i$ değerlerini
+yaklaşık temsile uğraşıyoruz, gerçi çözüm mekaniği içinde o $u$ değerleri de
+hesaplanıyor fakat bu belli formülasyonlar için onların bilindiği
+farzedilebilir.
+
+Şimdi $\phi_1,\phi_2$ fonksiyonları bizim önceden seçtiğimiz fonksiyonlardı,
+polinom seçtiğimizde $X_1,X_1^2$ gibi hesaplar kullandık. Üstteki türetim
+sonrası $N_1,N_2$ var, ve ulaştığımız fonksiyonlar
+
+$$
+N_1 = \frac{(x_2 - X_1)}{L}, \quad N_2 = \frac{(X_1 - x_1)}{L} 
+$$
+
+Bu şekil fonksiyonları neye benziyor acaba? Alttaki gibi,
+
+\includegraphics[width=25em]{compscieng_bpp45fem2_08.jpg}
+
+Bu iki fonksiyonu üst üste koyduğumuzda (superimpose) yani topladığımızda,
+sonucun mavi çizgiyi aynen vereceğini görebilirdik.
+
+İlginç bir diğer özellik, eğer mesela $N_2$'ye tek başına bakarsam, onun ilk
+düğümde 0 değerinde, ikinci düğümde 1 değerinde olduğunu görebiliriz.  Eğer
+$N_3$ olsa bu şekil de birinci ve ikinci düğümde sıfır olurdu. Diğer yandan her
+şekil fonksiyonu ait olduğu düğümde 1 değerindedir. $N_1$ birinci düğümde 1
+değerinde, $N_2$ ikinci düğümde 1 değerinde, vs. Bu şekil fonksiyonları öyle
+tasarlanmıştır.
+
+Fakat üstteki türetimden daha basit olanı iki noktadaki farkı uzunluğa bölmek,
+ve $x$ ile çarpıp başlangıç değerine eklemek. Altta bu teknik kullanılacak.
+
+Şimdi ızgara formüllerine dönelim. Bu sistemin öğelerinin katı (rigid) şekilde
+bağlandığını söylemiştik, yani öğelerin birbirine bağlandığındaki açılar aynı
+kalır, düğüm noktalarında burumsal ve bükülme momentleri süreklilik gösterir. O
+zaman bu tür bir ızgaranın her ögesinin her ucunda 3 olmak üzere 6 derece
+serbestliği olacaktır.
+
+\includegraphics[width=20em]{compscieng_bpp43fem_04.jpg}
+
+Değişkenlere bakarsak, sol uçta mesela $v'_1$ var, bu yer değişimi.  Bir diğer
+değişken $\phi'_{1z}$ bükülme açısı, notasyonel olarak hangi eksen etrafında
+dönüldüğünü değişkene yazıyoruz. Sol kısım için üçüncü değişken yine dönüş
+açısı, ama bu seferki burulma sebebiyle ortaya çıkıyor, $x$ ekseni etrafında bu
+sebeple ona $\phi'_{1x}$ diyoruz. Aynı notasyonu sağ kısma uyguluyoruz, $v'_2$,
+$\phi'_{2z}$ ve $\phi'_{2x}$ elde ediyoruz.
+
+Burulma icin alttaki çubuğu düşünelim [3, sf. 264],
+
+\includegraphics[width=15em]{compscieng_bpp43fem_02.jpg}
+
+Eğer bir $\phi'$ açısı 1 noktasında $\phi'_{1x}$ 2 noktasında $\phi'_{2x}$
+olsun istiyorsak ve aradaki değişim lineer ise,
+
+$$
+\phi' = \left( \frac{\phi'_{2x} - \phi'_{1x}}{L}  \right) x' + \phi'_{1x}
+\mlabel{2}
+$$
+
+Eğer şekil fonksiyonu $N_1,N_2$ kullanmak istersek ki her iki fonksiyon
+sırasıyla $x'$ değişkeninin birer fonksiyonu, yani
+
+$$
+\phi' = N_1 \phi'_{1x} + N_2 \phi'_{2x}
+$$
+
+olacak şekilde, o zaman
+
+$$
+N_1 = 1 - \frac{x'}{L}, \quad N_2 = \frac{x'}{L}
+$$
+
+ile bunu yapabilirdik. Matris formunda
+
+$$
+\phi' = [\begin{array}{cc} N_1 & N_2 \end{array}]
+\left[\begin{array}{c}
+\phi'_{1x} \\ \phi'_{2x}
+\end{array}\right]
+$$
+
+\includegraphics[width=20em]{compscieng_bpp43fem_03.jpg}
+
+Maksimum kaykılma gerginliğini bulmak için daha önceki formülü hatırlayalım,
+
+$$
+\gamma_{max} = \frac{R \ud \phi'}{\ud x'}
+$$
+
+Herhangi bir $r$ yarıçapı için
+
+$$
+\gamma = \frac{r \ud \phi'}{\ud x'}
+$$
+
+Üstteki formüle (2)'deki ifadeyi sokarsak,
+
+$$
+\gamma =
+\frac{r \ud \phi'}{\ud x'} =
+\frac{r}{L} ( \phi'_{2x} - \phi'_{1x}  )
+\mlabel{3}
+$$
+
+[2] dersinde görmüştük ki Burulma Formülü (Torsion Formula)
+
+$$
+\tau = \frac{T\rho}{I_P}
+$$
+
+[3, sf. 265] notasyonu ile belirtirsek 
+
+$$
+\tau = \frac{m'_x R}{J}
+$$
+
+Ya da
+
+$$
+m'_x = \frac{\tau J}{R}
+$$
+
+Lineer elastik eşyönlü (isotropic) materyeller için kaykılma stresi $\tau$
+ve kaykılma gerginliği $\gamma$ arasındaki ilişkiyi
+
+$$
+\tau = G \gamma
+$$
+
+olarak biliyoruz. Üstteki formülü iki üsttekine sokunca,
+
+$$
+m'_x = \frac{G J}{R} \gamma
+$$
+
+Bu formüle (3)'ü sokarsak, 
+
+$$
+m'_x = \frac{G J}{R} \frac{R}{L} ( \phi'_{2x} - \phi'_{1x}  )
+$$
+
+$$
+m'_x = \frac{G J}{L} ( \phi'_{2x} - \phi'_{1x}  )
+$$
+
+Son bulduğumuz formül $1x,2x$ ifadeleri içeriyor fakat aslında genel bir
+$x$ için bu hesap yapıldı. Eğer gerçekten 1 noktasındaki torku hesaplamak
+istiyorsak (resmi tekrar paylaşalım),
+
+\includegraphics[width=15em]{compscieng_bpp43fem_02.jpg}
+
+Formül,
+
+$$
+m'_{1x} = \frac{G J}{L} ( \phi'_{1x} - \phi'_{2x}  )
+$$
+
+Dikkat edersek 1 eksi 2 yazdık, burulma açısı 2'ye giderken büyüyecek, 1'de
+sabit. 2 noktası için [4],
+
+$$
+m'_{2x} = \frac{G J}{L} ( \phi'_{2x} - \phi'_{1x}  )
+$$
+
+Son iki formülü matris formunda yazabiliriz,
+
+$$
+\left[\begin{array}{c}
+m'_{1x} \\ m'_{2x} 
+\end{array}\right] =
+\frac{GJ}{L}
+\left[\begin{array}{rr}
+1 & -1 \\ -1 & 1
+\end{array}\right]
+\left[\begin{array}{c}
+\phi'_{1x} \\ \phi'_{2x} 
+\end{array}\right]
+\mlabel{5}
+$$
+
+Demek ki direngenlik matrisi eşitliğin sağındaki ortada kalan bölümdür. Bu
+matris burulma (torsion) etkilerini gösteriyor, etkiler tek bir kiriş öğesi
+temel alınarak hesaplandı.
+
+Eğer burulma etkilerini bükülme (bending) ve kaykılma etkileriyle birleştirmek
+istiyorsak [5]'teki formülü kullanabiliriz, hatırlarsak bu formüldeki
+direngenlik matrisi, yine tek bir kiriş öğesi için, şöyleydi,
+
+$$
+\frac{EI}{L^3}
+\left[\begin{array}{cccc}
+12 & 6L & -12 & 6L \\
+6L & 4L^2 & -6L & 2L^2 \\
+-12 & -6L & 12 & -6L \\
+6L & 2L^2 & -6L & 4L^2
+\end{array}\right]
+\mlabel{4}
+$$
+
+Matris bir değişken listesini referans alıyor muhakkak, bu liste daha
+önce göstermiştik ki $f_{1y}, m_1, f_{2y}, m_2$, yer değişim için
+$v_1, \phi_1, v_2, \phi_2$. 
+
+Bize gereken (5)'teki burulma mantığını (4)'teki bükülme ve yer değişim mantığı
+ile birleştirmek. Bu birleşmiş eşitliğin solunda, kirişin bir tarafı için eksene
+dik yer değişim kuvveti, burulma torku ve bükülme momenti, $f'_{1y}$, $m'_{1x}$,
+$m'_{1z}$ olacak, öğenin sağ kısmı için benzer durum, $f'_{2y}$, $m'_{2x}$,
+$m'_{2z}$.  Eşitliğin sağında, direngenlik matrisini çarpacak yine 6 değişken
+var, bunlar $v'_1$, $\phi'_{1x}$, $\phi'_{1z}$, $v'_2$, $\phi'_{2x}$,
+$\phi'_{2z}$. Üstdüşüm ile birleştirme için değişken listesini 1, 2, 3, 4, 5, 6
+diye etiketlesem, o zaman 1, 3, 4, 6 değişkenleri (4)'ten 2, 5 değişkenleri
+(5)'ten geliyor olurdu. Birleşmiş sistem,
+
+$$
+\renewcommand*{\arraystretch}{1.5}
+\left[\begin{array}{c}
+f'_{1y} \\ m'_{1x} \\ m'_{1z} \\ f'_{2y} \\ m'_{2x} \\ m'_{2z} 
+\end{array}\right] =
+\renewcommand*{\arraystretch}{2.2}
+\left[\begin{array}{cccccc}
+\dfrac{12 EI}{L^3} & 0 & \dfrac{6 EI}{L^2} & \dfrac{-12EI}{L^3} & 0 & \dfrac{6EI}{L^2}\\
+ & \dfrac{GJ}{L} & 0 & 0 & \dfrac{-GJ}{L} & 0 \\
+ & & \dfrac{4EI}{L} & \dfrac{-6EI}{L^2} & 0 & \dfrac{2EI}{L} \\
+ & & & \dfrac{12EI}{L^3} & 0 & \dfrac{-6EI}{L^2} \\
+ & & & & \dfrac{GJ}{L} & 0 \\
+ & & & & & \dfrac{4EI}{L} 
+\end{array}\right]
+\renewcommand*{\arraystretch}{1.5}
+\left[\begin{array}{c}
+v'_1 \\ \phi'_{1x} \\ \phi'_{1z} \\ v'_2 \\ \phi'_{2x} \\ \phi'_{2z}
+\end{array}\right]
+$$
+
+Üstteki matris simetriktir, bu sebeple sol alt kısmı boş bıraktık, üst sağ kısım
+ile simetriktir. Direngenlik matrisi $k'$ ortadaki 6x6 matrisi olarak kabul
+edilebilir.
+
+Izgarayı yerel kordinat sisteminden globala çeviren transform matrisi ise
+alttadır,
+
+$$
+T_G = \left[\begin{array}{cccccc}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & C & S & 0 & 0 & 0 \\ 
+0 & -S & C & 0 & 0 & 0 \\ 
+0 & 0 & 0 & 1 & 0 & 0 \\ 
+0 & 0 & 0 & 0 & C & S \\ 
+0 & 0 & 0 & 0 & -S & C 
+\end{array}\right]
+$$
+
+ki buradaki $\theta$ $x$ ve $x'$ arasındaki açıdır, $i$,$j$ düğümlerini baz
+alacak şekilde figür altta gösteriliyor,
+
+\includegraphics[width=15em]{compscieng_bpp43fem_05.jpg}
+
+O zaman global direngenlik matrisi $k$ şu formül olacaktır,
+
+$$
+k = T_G^T k' T_G
+$$
+
+Örnek
+
+\includegraphics[width=20em]{compscieng_bpp43fem_06.jpg}
+
+[devam edecek]
+
+Kaynaklar
+
+[1] Petitt, {\em Finite Element Method Theory}, University of Alberta,
+    \url{https://www.youtube.com/watch?v=2iUnfPRk6Ro&list=PLLSzlda_AXa3yQEJAb5JcmsVDy9i9K_fi}
+
+[2] Bayramlı, {\em Fizik, Materyel Mekaniği 7}
+
+[3] Logan, {\em A First Course in the Finite Element Method, 6th Ed}
+
+[4] Barsoum, {\em 5 4 Grid Element Equations and Stiffness Matrix},
+    \url{https://youtu.be/Jejd1UGqq1s}
+
+[5] Bayramlı, {\em Fizik, Materyel Mekanigi 4}
+
+\end{document}
+
+
