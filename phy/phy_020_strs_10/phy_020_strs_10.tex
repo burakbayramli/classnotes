@@ -449,19 +449,111 @@ T_G = Matrix([[1,0,0,0,0,0],
               [0,0,0,1,0,0],
               [0,0,0,0,C,S],
               [0,0,0,0,-S,C]])
-k = T_G.transpose()*kprime*T_G
+k_G = T_G.transpose()*kprime*T_G
+print (k_G.shape)
+\end{minted}
+
+\begin{verbatim}
+(6, 6)
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+pd.set_option('display.max_columns', None)
+
+d = {E:30000.0, G: 12000, I: 400, J: 110}
+d1 = d.copy(); d1.update({L:22.36*12, C:-0.894, S: 0.447})
+df1 = k_G.subs(d1)
+df1 = pd.DataFrame(np.array(df1).astype(np.float64))
+df1.columns = ['v1','phi1x','phi1z','v2','phi2x','phi2z']
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+pd.set_option('display.max_columns', None)
+
+d = {E:30000.0, G: 12000, I: 400, J: 110}
+d2 = d.copy(); d2.update({L:22.36*12, C:-0.894, S: -0.447})
+df2 = k_G.subs(d2)
+df2 = pd.DataFrame(np.array(df2).astype(np.float64))
+df2.columns = ['v1','phi1x','phi1z','v3','phi3x','phi3z']
+\end{minted}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+pd.set_option('display.max_columns', None)
+
+d = {E:30000.0, G: 12000, I: 400, J: 110}
+d3 = d.copy(); d3.update({L:10*12, C:0, S: -1})
+df3 = k_G.subs(d3)
+df3 = pd.DataFrame(np.array(df3).astype(np.float64))
+df3.columns = ['v1','phi1x','phi1z','v4','phi4x','phi4z']
 \end{minted}
 
 
 
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import pandas as pd
+pd.set_option('display.max_columns', None)
+
+def expand_dataframe(dfarg, new_cols):
+
+    res = dfarg.copy()
+    old_cols = list(dfarg.columns)
+    addn_vars = [x for x in new_cols if x not in old_cols]
+    res.index = dfarg.columns
+    for x in addn_vars:
+        res[x] = np.nan
+        res.loc[x] = pd.Series(res.columns)
+    res = res[new_cols]
+    res = res.reindex(new_cols).fillna(0)
+    return res
+
+def drop_col_row(df, var_list):
+    res = df.copy()
+    for x in var_list:
+        res = res.drop(x,axis=1)
+        res = res.drop(x,axis=0)
+    return res    
+
+all_vars = ['v1','phi1x','phi1z','v2','phi2x','phi2z','v3','phi3x','phi3z','v4','phi4x','phi4z']
+df1f = expand_dataframe(df1,all_vars)
+df2f = expand_dataframe(df2,all_vars)
+df3f = expand_dataframe(df3,all_vars)
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+dfall = df1f + df2f + df3f
+dfall = drop_col_row(dfall, ['v2','phi2x','phi2z','v3','phi3x','phi3z','v4','phi4x','phi4z'])
+print (dfall)
+\end{minted}
+
+\begin{verbatim}
+                v1          phi1x          phi1z
+v1       98.241813    5000.000000   -1788.108717
+phi1x  5000.000000  479351.695886       0.000000
+phi1z -1788.108717       0.000000  298917.977639
+\end{verbatim}
 
 
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
 
+b = np.array([-100.0,0,0])
 
+x = lin.solve(dfall, b)
 
+print (x)
+\end{minted}
 
+\begin{verbatim}
+[-2.82552252  0.02947233 -0.0169021 ]
+\end{verbatim}
 
 [devam edecek]
 
