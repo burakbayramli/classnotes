@@ -550,46 +550,24 @@ df3.columns = ['v1','phi1x','phi1z','v4','phi4x','phi4z']
 \end{minted}
 
 Öğelerin $k$ matrisleri tamamlandı. Şimdi genişletme, toplama ve gereksiz
-değişkenleri çıkartma aşamasına geldik.
-
-[6]'daki kod fonksiyonlarını tekrar verelim, bu fonksiyonlar değişken
-genişletme, ve atma işlemlerini yapacak,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-def expand_dataframe(dfarg, new_cols):
-
-    res = dfarg.copy()
-    old_cols = list(dfarg.columns)
-    addn_vars = [x for x in new_cols if x not in old_cols]
-    res.index = dfarg.columns
-    for x in addn_vars:
-        res[x] = np.nan
-        res.loc[x] = pd.Series(res.columns)
-    res = res[new_cols]
-    res = res.reindex(new_cols).fillna(0)
-    return res
-
-def drop_col_row(df, var_list):
-    res = df.copy()
-    for x in var_list:
-        res = res.drop(x,axis=1)
-        res = res.drop(x,axis=0)
-    return res    
-
-\end{minted}
+değişkenleri çıkartma aşamasına geldik. [6]'daki kod fonksiyonlarını
+\verb!dfutil! dosyasından alabiliriz, bu fonksiyonlar değişken genişletme, ve
+atma işlemlerini yapıyordu.
 
 Altta her üç $k$ matrisini bu problemin ana değişken listesi ile genişletiyoruz,
 ve toplamayı yapıyoruz, sonra toplam matrisinden gereksiz değişkenleri
 çıkartıyoruz.
 
-\begin{minted}[fontsize=\footnotesize]{python}
+\begin{minted}[fontsize=\footnotesize]{python}  
+import sys; sys.path.append('../phy_020_strs_08')
+import dfutil
 all_vars = ['v1','phi1x','phi1z','v2','phi2x','phi2z','v3','phi3x','phi3z','v4','phi4x','phi4z']
-df1f = expand_dataframe(df1,all_vars)
-df2f = expand_dataframe(df2,all_vars)
-df3f = expand_dataframe(df3,all_vars)
+df1f = dfutil.expand_dataframe(df1,all_vars)
+df2f = dfutil.expand_dataframe(df2,all_vars)
+df3f = dfutil.expand_dataframe(df3,all_vars)
   
 dfall = df1f + df2f + df3f
-dfall = drop_col_row(dfall, ['v2','phi2x','phi2z','v3','phi3x','phi3z','v4','phi4x','phi4z'])
+dfall = dfutil.drop_col_row(dfall, ['v2','phi2x','phi2z','v3','phi3x','phi3z','v4','phi4x','phi4z'])
 print (dfall)
 \end{minted}
 
