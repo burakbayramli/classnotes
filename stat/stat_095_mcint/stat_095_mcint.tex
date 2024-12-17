@@ -81,8 +81,44 @@ Monte Carlo çözümü:  5.3254
 Analitik çözüm:  5.3333
 \end{verbatim}
 
+Eğer boyutları arttırsak çözümün genel yapısı değişmiyor mesela üç boyuta çıktık
+diyelim [3, sf. 752], entegral hesabı alttaki gibi gözükecekti,
 
+$$
+\int_{x_0}^{x_1} \int_{y_0}^{y_1} \int_{z_0}^{z_1}  f(x,y,z) \ud x \ud y \ud z
+$$
 
+O zaman Monte Carlo hesabı için $X_i = (x_i,y_i,z_i)$ örneklemi almak gerekir,
+çok boyutlu yine birörnek dağılımdan diyelim, ve $p(X)$ hesaplanır, ve kestirme
+hesap
+
+$$
+\frac{(x_1-x_0)(y_1-y_0)(z_1-z_0)}{N} \sum_i f(X_i)
+$$
+
+Bu hesap için bir örnek, iki boyutlu bir fonksiyonun entegralini hesaplayalım,
+$f(x) = 10 - x_1^2 - x_2^2$, sınırlar $-2,+2$ olsun.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def func1(x):
+    return 10 + np.sum(-1*np.power(x, 2), axis=1)
+  
+def mc_integrate(func, a, b, dim, n = 1000):
+    x_list = np.random.uniform(a, b, (n, dim))
+    y = func(x_list)
+    y_mean =  y.sum()/len(y)
+    domain = np.power(b-a, dim)
+    integ = domain * y_mean
+    return integ
+
+print(f"Monte Carlo çözümü : {mc_integrate(func1, -2, 2, 2, 1000000): .3f}")
+print(f"Analitik çözüm: 117.333")
+\end{minted}
+
+\begin{verbatim}
+Monte Carlo çözümü :  117.305
+Analitik çözüm: 117.333
+\end{verbatim}
 
 
 Kaynaklar
@@ -90,8 +126,10 @@ Kaynaklar
 [1] Zhao, {\em Monte Carlo integration in Python over univariate and multivariate functions},
     \url{https://boyangzhao.github.io/posts/monte-carlo-integration}
 
-[2] Pharr, {\em Physically Based Rendering 3rd Ed}
+[2] Gezerlis, {\em Numerical Methods in Physics with Python}
     
+[3] Pharr, {\em Physically Based Rendering 3rd Ed}
+
 \end{document}
 
 
