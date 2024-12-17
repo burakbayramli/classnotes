@@ -3,6 +3,8 @@
 
 ## En Son
 
+17/12 - [Diferansiyel Denklemler - Ders 11 - Ekler - Ozgünlük, Picard Teorisi](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_11/ders_11.html)
+
 3/12 - [Çok Değişkenli Calculus - Ders 30](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_30/ders_30.html)
 
 18/1 - [Materyel Mekaniği - 2 - Ekler - Yatay Kesme (Shear) Stresi, Problemler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_02/materyel_mekanigi__2.html)
@@ -10,8 +12,6 @@
 13/11 - [Ses Tanıma, İşleme](https://burakbayramli.github.io/dersblog/sk/2024/11/ses-tanima-isleme.html)
 
 31/10 - [Görüntü Dosyaları, PDF, Birleştirme, Kitap](https://burakbayramli.github.io/dersblog/sk/2024/10/foto_kitap.html)
-
-28/10 - [Materyel Mekaniği - 1 - Ekler - Stresler, Bükülme Momentleri](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_01/materyel_mekanigi__1.html)
 
 ## Konular, Referans
 
