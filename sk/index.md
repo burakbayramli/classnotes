@@ -31,7 +31,7 @@
 
 [Android](2023/05/android.html)
 
-[Animasyonlu Matematik](2023/02/animasyonlu-matematik-video.html)
+[Animasyonlu Matematik](https://www.youtube.com/channel/UCx64ou5qw0Q9LLkwE8xSNEg/videos)
 
 [Nereden Başlarım](2019/01/nereden.html)
 

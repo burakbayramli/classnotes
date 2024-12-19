@@ -1,7 +1,7 @@
 # Jupyter Not Defterleri Video
 
 <video width="95%" controls>
-    <source src="https://drive.google.com/uc?export=view&id=194_Ko6pjdNmQU2-ip6ZaEu0Uwp8E2T8l/view" type='video/mp4'>
+    <source src="https://www.dropbox.com/scl/fi/uavhylg0l95er2bbrwbu5/jupyter-intro.mkv?rlkey=dfnm4c8asc88obt6zyh35t0om&st=6gtv6f1v&raw=1" type='video/mp4'>
 </video>
 
 

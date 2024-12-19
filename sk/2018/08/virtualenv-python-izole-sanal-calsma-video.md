@@ -1,5 +1,5 @@
 # virtualenv, Python İzole, Sanal Çalışma Alanı (Python Virtual Environment) Video
 
 <video width="95%" controls>
-    <source src="https://drive.google.com/uc?export=view&id=14LfDVK2fD5KBQv8rjnUmB22s7Bo3g1Mf" type='video/mp4'>
+    <source src="https://www.dropbox.com/scl/fi/9sh6vdzpfs62iqui6434t/py-virt-ders.mp4?rlkey=p6gb4np4klz5cu0aseecfc5o4&st=f8qfar6n&raw=1" type='video/mp4'>
 </video>
