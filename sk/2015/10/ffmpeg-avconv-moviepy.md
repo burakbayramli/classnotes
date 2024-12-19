@@ -246,5 +246,7 @@ Kaynaklar
 
 [1] https://engineering.giphy.com/how-to-make-gifs-with-ffmpeg/
 
-[2] [Ornek Video](https://drive.google.com/uc?export=view&id=1nR4E7SYLfKhm8nO0BEfFcw0pwWmMNm19)
+[2] [Örnek Video](https://drive.google.com/uc?export=view&id=1nR4E7SYLfKhm8nO0BEfFcw0pwWmMNm19)
+
+
 
