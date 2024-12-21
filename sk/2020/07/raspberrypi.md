@@ -148,6 +148,15 @@ Android uzerinde Termux `ssh` var ise, ve bir X-Server programi [6]
 isliyorsa, Termux'tan `ssh -X` ile RPi'a baglaninca gorsel X
 programlari Android uzerinde gorebiliriz.
 
+### Java
+
+RPi uzerinde Ubuntu sistemi var, fakat Java kurmak icin Ubuntu'da isleyen
+komutlar burada islemeyebilir, mesela `default-jdk` uzerinde `apt install`
+problem verirse, alttaki komut isler,
+
+```
+sudo apt install openjdk-8-jre-zero
+```
 
 ### Donanım Programcılığı
 
