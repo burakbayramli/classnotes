@@ -225,6 +225,27 @@ print (distance)
 
 İkinciye daha yakın çıktı, bu iyi bir sonuç.
 
+Javascript
+
+JS dilinde DTW için [8] kodu faydalı olabilir, indirip üst dizin
+seviyesinde
+
+```javascript
+var dtw = require('./src/dynamic-time-warping.js');
+
+var ser1 = [ 9, 93, 15, 19, 24 ];
+var ser2 = [ 31, 97, 81, 82, 39 ];
+var distFunc = function( a, b ) {
+    return Math.abs( a - b );
+};
+
+var dtw = new dtw.DynamicTimeWarping(ser1, ser2, distFunc);
+var dist = dtw.getDistance();
+console.log(dist);
+```
+
+şeklinde yazdığımız test başarılı sonuç verdi. 
+
 Fourier Analizi ile Sesi Sinüs Eğrilerine Ayırmak
 
 ```python
@@ -322,3 +343,5 @@ Kaynaklar
 [6] Bayramlı, Finans ve Zaman Serileri - Sezonsallık, Periyotlar
 
 [7] <a href="https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ni9ibhbs&dl=1">Ufak Ses Komut Verisi</a>
+
+[8] Lesti, <a href="https://github.com/GordonLesti/dynamic-time-warping">dynamic-time-warping</a>
