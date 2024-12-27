@@ -316,7 +316,6 @@ def test_csv():
 Artık tarayıcıyla `/test_csv` adresi ziyaret edildiğinde dosya indirilmeye
 başlayacaktır. 
 
-
 ### Başlatma Numaraları
 
 En basit kullanımla bir `app.py` içinde olan uygulamayı `python
@@ -345,8 +344,17 @@ adresini vermemiz gerekir, makinanın adresi `ifconfig -a` ile
 bakılabilir, ve mesela `host="192.168.22.33"` gibi bir seçenek
 geçilir.
 
+### HTTPS
 
+Bazen geliştirme sırasında güvenli http, yani http**s** ile erişim
+yapmak gerekebilir, mesela cep telefonu geliştirme ortamına eriseçek,
+ve Javascript içinde mikrofon vs gibi kullanımlar varsa https
+gerekebiliyor. Bu durumda başlangıç komutunu
 
+```python
+app.run(host="192.168.1.1000",port=8100, ssl_context='adhoc')
+```
 
-
+gibi değiştirebiliriz, IP adresi rasgele seçildi, geliştirici kendi İP
+adresini koyabilir.
 
