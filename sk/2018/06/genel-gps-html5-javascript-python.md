@@ -192,6 +192,33 @@ print (fstr(x, prec=6))
 
 İlk iki sayı enlem ve boylamdır.
 
+### Bir Kordinatın Evrensel Zaman Farkını Bulmak
+
+Greenwich'i sıfır kabul ederek herhangi bir noktanın zaman farkını nasıl buluruz?
+Mesela New York -5 İstanbul +3 olmalı..
+
+```python
+from timezonefinder import TimezoneFinder
+from pytz import timezone, utc
+
+def time_zone(lat,lon):
+    tf = TimezoneFinder() 
+    today = datetime.datetime.now()
+    tz_target = timezone(tf.certain_timezone_at(lng=lon, lat=lat))
+    today_target = tz_target.localize(today)
+    today_utc = utc.localize(today)
+    offset = (today_utc - today_target).total_seconds() / 3600
+    return offset
+
+print (time_zone(40.70,-73.79)) # New York
+print (time_zone(41.0,29.0)) # Istanbul
+```
+
+```text
+-5.0
+3.0
+```
+
 ### HTML5 ve Javascript ile Yer Bulmak
 
 Javascript icinden yer bulmak mumkun, bu cep telefonunda da isliyor,
