@@ -1,4 +1,4 @@
-from scipy.optimize import minimize, Bounds, SR1, BFGS
+from scipy.optimize import minimize, newton_krylov
 import sympy
 import pandas as pd
 import numpy as np
@@ -27,7 +27,7 @@ def gfunc1(x, y):
 
 ts = np.linspace(0,1,100)
 def calcint_g1(pars):
-    pa1,pa2,pa3,pb1,pb2,pb3=pars
+    pa1,pa2,pa3,pb1,pb2,pb3=pars[0],pars[1],pars[2],pars[3],pars[4],pars[5]
     pa4 = pex - pa0 - (pa1+pa2+pa3)
     pb4 = pey - pb0 - (pb1+pb2+pb3)
     argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, \
@@ -38,30 +38,24 @@ def calcint_g1(pars):
        xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
        yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
        prod1 = gfunc1(float(xval),float(yval))*float(sqrtval)
-       # print ('tcurr',tcurr)
-       # print (pa1,pa2,pa3,pb1,pb2,pb3)
-       # print (pa4,pb4)
-       # print (xval)
-       # print (yval)
-       # print (prod1)
-       # print ("-----------------------------")
+       print ('tcurr',tcurr)
+       print (pa1,pa2,pa3,pb1,pb2,pb3)
+       print (pa4,pb4)
+       print (xval)
+       print (yval)
+       print (prod1)
+       print ("-----------------------------")
        ys.append(prod1)
-    W = np.trapz(ys,x=ts)
+    W = [ np.trapz(ys,x=ts) ]
+    print ('W',W)
     return W
 
-LIM = 10.0
-# rasgele secilmis baslangic degerleri
-pa1,pa2,pa3 = 0.1,0.1,0.1
-pb1,pb2,pb3 = 0.1,0.1,0.1
-x0 = pa1,pa2,pa3,pb1,pb2,pb3
+def fun(x):
+    res = [x[0] + 0.5 * x[1] - 1.0, 0.5 * (x[1] - x[0]) ** 2]
+    print (res)
+    return res
 
-opts = {'maxiter': 20, 'verbose': 0}
-
-parstest = (0.2,0.2,0.2,0.2,0.2,0.2)
-print (calcint_g1(parstest))
-
-parstest = (0.1,0.1,0.2,0.2,0.2,0.2)
-print (calcint_g1(parstest))
-
-#res = minimize (fun=calcint_g1,x0=x0)
+#res = newton_krylov(fun, [0, 0])
 #print (res)
+res = newton_krylov (calcint_g1,[0.1,0.1,0.1,0.1,0.1,0.1])
+oprint (res)
