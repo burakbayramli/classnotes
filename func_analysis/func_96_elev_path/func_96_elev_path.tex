@@ -219,18 +219,16 @@ yval 3.25000000000000
 ts = np.linspace(0,1,200)
 def calcint_g1(pars):
     pa1,pa2,pa3,pb1,pb2,pb3=pars
-    pt = 0.5
     pa4 = pex - pa0 - (pa1+pa2+pa3)
     pb4 = pey - pb0 - (pb1+pb2+pb3)
     argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, \
                b1:pb1, b2:pb2, b3:pb3, b4:pb4}
     ys = []
     for tcurr in ts:
-       sqrtval = sqrtdef.subs(argsubs)
-       sqrtval = sqrtval.subs({t:pt})
+       sqrtval = sqrtdef.subs(argsubs).subs({t:tcurr})
        xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
        yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
-       prod1 = gfunc1(float(xval),float(yval))*sqrtval
+       prod1 = gfunc1(float(xval),float(yval))*float(sqrtval)
        ys.append(prod1)
     W = np.trapz(ys,x=ts)
     return W    
@@ -241,7 +239,7 @@ calcint_g1([2,2,2,3,3,3])
 \end{minted}
 
 \begin{verbatim}
-Out[1]: 12.3067342304706
+Out[1]: 13.68183051753328
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -249,8 +247,31 @@ calcint_g1([1,2,3,4,4,4])
 \end{minted}
 
 \begin{verbatim}
-Out[1]: 8.66626375422142
+Out[1]: 8.537113505749188
 \end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from scipy.optimize import minimize, Bounds, SR1, BFGS
+
+LIM = 5.0
+# rasgele secilmis baslangic degerleri
+pa1,pa2,pa3 = 0,0,0
+pb1,pb2,pb3 = 0,0,0
+x0 = pa1,pa2,pa3,pb1,pb2,pb3
+
+opts = {'maxiter': 20, 'verbose': 0}
+res = minimize (fun=calcint_g1,
+                x0=x0,
+                method='trust-constr',
+                hess = BFGS (),
+                bounds=Bounds([-LIM, -LIM, -LIM, -LIM, -LIM, -LIM],
+                              [LIM, LIM, LIM, LIM, LIM, LIM]),
+                options=opts)
+
+print (res)
+\end{minted}
+
+
 
 
 
