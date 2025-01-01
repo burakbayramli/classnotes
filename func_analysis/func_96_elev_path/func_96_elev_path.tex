@@ -187,26 +187,72 @@ print (xval, yval, sqrtval, g1)
 \begin{minted}[fontsize=\footnotesize]{python}
 pa0,pb0=(1.0,1.0)
 pex,pey=(0.3,4.0)
-def calcint_g1(pars):
+def calcint_test_g1(pars):
     pa1,pa2,pa3,pb1,pb2,pb3=pars
     pt = 0.5
     pa4 = pex - pa0 - (pa1+pa2+pa3)
     pb4 = pey - pb0 - (pb1+pb2+pb3)
-    argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, b0:pb0, b1:pb1, b2:pb2, b3:pb3, b4:pb4}
+    argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, \
+               b1:pb1, b2:pb2, b3:pb3, b4:pb4}
     sqrtval = sqrtdef.subs(argsubs)
     sqrtval = sqrtval.subs({t:pt})
     xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:pt})
     yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:pt})
     print ('xval',xval)
-    return sqrtval
+    print ('yval',yval)
+    print (sqrtval)
+    print ( gfunc1(float(xval),float(yval)) )
+    print ( gfunc1(float(xval),float(yval))*sqrtval )
     
-calcint_g1([2,2,2,3,3,3])
+calcint_test_g1([2,2,2,3,3,3])
 \end{minted}
 
 \begin{verbatim}
 xval 2.33125000000000
-Out[1]: 3.14205346867299
+yval 3.25000000000000
+3.14205346867299
+3.836850816021378
+12.0555904152608
 \end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ts = np.linspace(0,1,200)
+def calcint_g1(pars):
+    pa1,pa2,pa3,pb1,pb2,pb3=pars
+    pt = 0.5
+    pa4 = pex - pa0 - (pa1+pa2+pa3)
+    pb4 = pey - pb0 - (pb1+pb2+pb3)
+    argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, \
+               b1:pb1, b2:pb2, b3:pb3, b4:pb4}
+    ys = []
+    for tcurr in ts:
+       sqrtval = sqrtdef.subs(argsubs)
+       sqrtval = sqrtval.subs({t:pt})
+       xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
+       yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
+       prod1 = gfunc1(float(xval),float(yval))*sqrtval
+       ys.append(prod1)
+    W = np.trapz(ys,x=ts)
+    return W    
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+calcint_g1([2,2,2,3,3,3])
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 12.3067342304706
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+calcint_g1([1,2,3,4,4,4])
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 8.66626375422142
+\end{verbatim}
+
+
 
 Kaynaklar 
 
