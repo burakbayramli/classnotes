@@ -96,7 +96,6 @@ başlangıç, bitiş noktalarını genel formülasyon üzerinde zorlamış olduk
 Şimdi ikinci bir gidiş yoluna bakalım, başlangıç noktası aynı ama bitiş farklı,
 
 \begin{minted}[fontsize=\footnotesize]{python}
-# 2. gidis yolunun tanimi, dik cikip iniyor
 a1,a2,a3 = 1.5, 3.0, 1.0
 b1,b2,b3 = 0.0, 1.0, 1.0
 a0,b0=(1.0,1.0)
@@ -240,7 +239,7 @@ plt.savefig('calc_multi_40_elev_07.jpg')
 
 \includegraphics[width=20em]{calc_multi_40_elev_07.jpg}
 
-Fena değil, optimal bir yola benziyor, tepelerden kaçınildi mümkün olduğu kadar
+Fena değil, optimal bir yola benziyor, tepelerden kaçınıldı mümkün olduğu kadar
 düşük yükseklikli ve kısa yoldan gidildi.
 
 Başka bir yükseklik fonksiyonunu kullanalım, iki tepe var şimdi, ve
@@ -256,8 +255,51 @@ def gfunc2(x, y):
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-# sort of optimal
-a1,a2,a3,b1,b2,b3  = 0.10273294,  0.07639032, -0.02498681, -0.0396142,  -0.00716718, -0.14862271
+from scipy.optimize import minimize, Bounds, SR1, BFGS
+
+pa0,pb0=(1.0,1.0)
+pex,pey=(4.0,2.0)
+
+ts = np.linspace(0,1,50)
+
+def calcint_g2(pars):
+    pa1,pa2,pa3,pb1,pb2,pb3=pars
+    pa4 = pex - pa0 - (pa1+pa2+pa3)
+    pb4 = pey - pb0 - (pb1+pb2+pb3)
+    argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, \
+               b1:pb1, b2:pb2, b3:pb3, b4:pb4}
+    ys = []
+    for tcurr in ts:
+       sqrval = sqrdef.subs(argsubs).subs({t:tcurr})
+       if sqrval < 0: sqrval = 0    
+       xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
+       yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
+       prod2 = gfunc2(float(xval),float(yval))*sqrval
+       ys.append(prod2)
+    W = np.trapz(ys,x=ts)
+    return W
+    
+LIM = 5.0
+# rasgele secilmis baslangic degerleri
+pa1,pa2,pa3,pb1,pb2,pb3 = 0,0,0,0,0,0
+x0 = pa1,pa2,pa3,pb1,pb2,pb3
+
+opts = {'maxiter': 40, 'verbose': 3}
+
+res = minimize (fun=calcint_g2,x0=x0,
+                method='Nelder-Mead',
+                bounds=Bounds([-LIM, -LIM, -LIM, -LIM, -LIM, -LIM],
+                              [LIM, LIM, LIM, LIM, LIM, LIM]),
+                options=opts)
+print (res['x'])
+\end{minted}
+
+\begin{verbatim}
+[ 0.10273294  0.07639032 -0.02498681 -0.0396142  -0.00716718 -0.14862271]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+a1,a2,a3,b1,b2,b3  = list(res['x'])
 a4 = ex - pa0 - (a1+a2+a3)
 b4 = ey - pb0 - (b1+b2+b3)
 test_coefs2 = (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
