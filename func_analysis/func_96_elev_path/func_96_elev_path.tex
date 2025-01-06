@@ -57,7 +57,7 @@ def plot_surf_path(myfunc,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
     x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
     y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
 
-    ax.plot3D(x, y, gfunc1(x,y),'r.')
+    ax.plot3D(x, y, myfunc(x,y),'r.')
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -277,10 +277,11 @@ def calcint_g2(pars):
        prod2 = gfunc2(float(xval),float(yval))*sqrval
        ys.append(prod2)
     W = np.trapz(ys,x=ts)
+    if W < 0: return LARGE_FLOAT
     return W
     
 LIM = 5.0
-pa1,pa2,pa3,pb1,pb2,pb3 = 0,0,0,0,0,0
+pa1,pa2,pa3,pb1,pb2,pb3 = 1,1,1,1,1,1
 x0 = pa1,pa2,pa3,pb1,pb2,pb3
 
 opts = {'maxiter': 40, 'verbose': 3}
@@ -294,19 +295,22 @@ print (res['x'])
 \end{minted}
 
 \begin{verbatim}
-[ 0.10273294  0.07639032 -0.02498681 -0.0396142  -0.00716718 -0.14862271]
+[ 2.27463285  1.17233979  1.48426044 -0.08218053  1.12299169  0.40471825]
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 a1,a2,a3,b1,b2,b3  = list(res['x'])
-a4 = ex - pa0 - (a1+a2+a3)
-b4 = ey - pb0 - (b1+b2+b3)
+a4 = pex - pa0 - (a1+a2+a3)
+b4 = pey - pb0 - (b1+b2+b3)
 test_coefs2 = (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
 plot_surf_path(gfunc2,pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
 plt.savefig('calc_multi_40_elev_08.jpg')
 \end{minted}
 
 \includegraphics[width=20em]{calc_multi_40_elev_08.jpg}
+
+Bu yol da iyi oldu, iki tepe ortasındaki yüksekliği düşük olan yerden
+geçildi. 
 
 Eğri Uzunlukları, Yatay, Dikey
 

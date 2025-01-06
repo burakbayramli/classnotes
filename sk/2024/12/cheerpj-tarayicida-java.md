@@ -27,3 +27,8 @@ Not: Üstteki HTML Unix `tree -af -H . ` komutu ile üretilmiştir, dizin
 yapısını göstermek istedik, aynı zamanda dosyalar tıklanıp
 görülebilir, indirilebilir.
 
+https://cheerpj.com/docs/getting-started/Java-library
+
+https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/java-in-the-browser-webassembly-tutorial-wasm-teavm-html-javascript
+
+https://labs.leaningtech.com/docs/cheerpj2/reference/Runtime-API
