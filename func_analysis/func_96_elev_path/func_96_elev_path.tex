@@ -185,6 +185,7 @@ bitiş değerlerini de bu kavrama ilintilendirdik), ve fonksiyon değişken olar
 katsayı değerlerini bu bedel üzerinden bulacak.
 
 \begin{minted}[fontsize=\footnotesize]{python}
+LARGE_FLOAT = 1e6
 pa0,pb0=(1.0,1.0)
 pex,pey=(0.3,4.0)
 ts = np.linspace(0,1,20)
@@ -197,27 +198,27 @@ def calcint_g1(pars):
     ys = []
     for tcurr in ts:
        sqrval = sqrdef.subs(argsubs).subs({t:tcurr})
-       if sqrval < 0: sqrval = 0    
        xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
        yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
        prod1 = gfunc1(float(xval),float(yval))*sqrval
        ys.append(prod1)
     W = np.trapz(ys,x=ts)
+    if W < 0: return LARGE_FLOAT
     return W
 \end{minted}
 
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from scipy.optimize import minimize, Bounds, SR1, BFGS
+from scipy.optimize import minimize, Bounds
 
 LIM = 5.0
 pa1,pa2,pa3 = 0,0,0
 pb1,pb2,pb3 = 0,0,0
 x0 = pa1,pa2,pa3,pb1,pb2,pb3
-opts = {'maxiter': 20, 'verbose': 0}
+opts = {'maxiter': 40, 'verbose': 3}
+
 res = minimize (fun=calcint_g1,x0=x0,
-                method='trust-constr',
-                hess = BFGS (),
+                method='Nelder-Mead',
                 bounds=Bounds([-LIM, -LIM, -LIM, -LIM, -LIM, -LIM],
                               [LIM, LIM, LIM, LIM, LIM, LIM]),
                 options=opts)
@@ -225,7 +226,7 @@ print (res['x'])
 \end{minted}
 
 \begin{verbatim}
-[-0.35628684 -2.58099677 -3.26315201 -3.87505375  1.12278098  1.70215256]
+[-1.92645176  0.87238797  1.45300069  1.5909808   2.46135117  0.73187586]
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -242,6 +243,14 @@ plt.savefig('calc_multi_40_elev_07.jpg')
 Fena değil, optimal bir yola benziyor, tepelerden kaçınıldı mümkün olduğu kadar
 düşük yükseklikli ve kısa yoldan gidildi.
 
+Üstteki optimizasyon kodunda dikkat edilirse bazı püf noktalar var, mesela eğer
+\verb!W! değeri sıfırdan küçük ise çok büyük bir değer donduruyoruz böylece o
+tür parametrelerden kaçınmiş oluyoruz, optimizasyonu diğer yönlere kanalize
+ediyoruz. Bu basit bir sağlama işlemi, tarif edilen türden entegral hesabı
+sıfırdan küçük olamaz, eğer öyle ise o tür sonucu veren parametrelerle
+ilgilenmiyoruz.
+
+
 Başka bir yükseklik fonksiyonunu kullanalım, iki tepe var şimdi, ve
 bitiş noktası farklı,
 
@@ -255,7 +264,7 @@ def gfunc2(x, y):
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
-from scipy.optimize import minimize, Bounds, SR1, BFGS
+from scipy.optimize import minimize, Bounds
 
 pa0,pb0=(1.0,1.0)
 pex,pey=(4.0,2.0)
