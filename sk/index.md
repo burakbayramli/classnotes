@@ -3,6 +3,8 @@
 
 ## En Son
 
+7/12 - [En Düz, Optimal Yol - Ekler - Çit Entegral Hesabı](https://burakbayramli.github.io/dersblog/func_analysis/func_96_elev_path/yukseklik_fonksiyonu__tepeler__arasindan_en_duz_optimal_yuruyus_yolunu_bulmak.html)
+
 23/12 - [Monte Carlo, Entegraller](https://burakbayramli.github.io/dersblog/stat/stat_095_mcint/monte_carlo_entegraller.html)
 
 17/12 - [Diferansiyel Denklemler - Ders 11 - Ekler - Ozgünlük, Picard Teorisi](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_11/ders_11.html)
@@ -10,8 +12,6 @@
 3/12 - [Çok Değişkenli Calculus - Ders 30](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_30/ders_30.html)
 
 18/1 - [Materyel Mekaniği - 2 - Ekler - Yatay Kesme (Shear) Stresi, Problemler](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_02/materyel_mekanigi__2.html)
-
-13/11 - [Ses Tanıma, İşleme](https://burakbayramli.github.io/dersblog/sk/2024/11/ses-tanima-isleme.html)
 
 ## Konular, Referans
 
