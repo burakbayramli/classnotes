@@ -303,7 +303,7 @@ function findFile( lng, lat ) {
     }
 }
 
-function fileIndex( lng, lat, fileEntry, resolution ) {
+function fileIndex(lng, lat, fileEntry, resolution ) {
     var column= Math.floor(lng * resolution);
     var row= Math.floor(lat * resolution);
 
