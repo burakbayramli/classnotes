@@ -1,0 +1,121 @@
+\documentclass[12pt,fleqn]{article}\usepackage{../../common}
+\begin{document}
+% pdflatex -shell-escape tst1.tex
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sympy import symbols, pprint, latex
+from sympy.matrices import Matrix
+import pandas as pd
+pd.set_option('display.max_columns', None)
+
+G,J,E,L,I = symbols("G,J,E,L,I")
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+vars1 = ['phi1x','phi2x']
+M1 = pd.DataFrame([[1,-1],[-1,1]],index=vars1)
+M1 = (G*J/L)*M1
+M1.columns = vars1
+print (M1)
+\end{minted}
+
+\begin{verbatim}
+        phi1x   phi2x
+phi1x   G*J/L  -G*J/L
+phi2x  -G*J/L   G*J/L
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+vars2 = ['v1','phi1z','v2','phi2z']
+M2 = pd.DataFrame([[12, 6*L,-12,6*L],
+                  [6*L,4*L**2,-6*L,2*L**2],
+                  [-12,-6*L,12,-6*L],
+                  [6*L,2*L**2,-6*L,4*L**2]],index=vars2)
+M2 = (E*I/L**3)*M2
+M2.columns = vars2
+print (M2)
+\end{minted}
+
+\begin{verbatim}
+                 v1        phi1z            v2        phi2z
+v1      12*E*I/L**3   6*E*I/L**2  -12*E*I/L**3   6*E*I/L**2
+phi1z    6*E*I/L**2      4*E*I/L   -6*E*I/L**2      2*E*I/L
+v2     -12*E*I/L**3  -6*E*I/L**2   12*E*I/L**3  -6*E*I/L**2
+phi2z    6*E*I/L**2      2*E*I/L   -6*E*I/L**2      4*E*I/L
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../phy_020_strs_08')
+import dfutil
+
+all_vars = ['v1','phi1x','phi1z','v2','phi2x','phi2z']
+M1f = dfutil.expand_dataframe(M1,all_vars)
+M2f = dfutil.expand_dataframe(M2,all_vars)
+Mall = M1f + M2f
+print (Mall)
+\end{minted}
+
+\begin{verbatim}
+                 v1   phi1x        phi1z            v2   phi2x        phi2z
+v1      12*E*I/L**3       0   6*E*I/L**2  -12*E*I/L**3       0   6*E*I/L**2
+phi1x             0   G*J/L            0             0  -G*J/L            0
+phi1z    6*E*I/L**2       0      4*E*I/L   -6*E*I/L**2       0      2*E*I/L
+v2     -12*E*I/L**3       0  -6*E*I/L**2   12*E*I/L**3       0  -6*E*I/L**2
+phi2x             0  -G*J/L            0             0   G*J/L            0
+phi2z    6*E*I/L**2       0      2*E*I/L   -6*E*I/L**2       0      4*E*I/L
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
