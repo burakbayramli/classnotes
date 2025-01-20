@@ -8,27 +8,43 @@ from sympy.matrices import Matrix
 import pandas as pd
 pd.set_option('display.max_columns', None)
 
-G,J,E,L,I = symbols("G,J,E,L,I")
+all_vars = ['u1','v1','w1','phi1x','phi1y','phi1z',\
+            'u2','v2','w2','phi2x','phi2y','phi2z']
+G,J,E,L,Iy,Iz = symbols("G,J,E,L,Iy,Iz")
 \end{minted}
 
 \begin{minted}[fontsize=\footnotesize]{python}
+# x-z
+vars1 = ['w1','phi1y','w2','phi2y']
+M1 = pd.DataFrame([[12*L, -6*L**2,-12*L,-6*L**2],
+                  [-6*L**2,4*L**3,6*L**2,2*L**3],
+                  [-12*L,6*L**2,12*L,6*L**2],
+                  [-6*L**2,2*L**3,6*L**2,4*L**3]],index=vars1)
+M1.columns = vars1
+M1 = M1 * (E*Iy/L**4 )
+# x-y
+vars2 = ['v1','phi1z','v2','phi2z']
 M2 = pd.DataFrame([[12*L, 6*L**2,-12*L,6*L**2],
-                  [6*L,4*L**2,-6*L,2*L**2],
-                  [-12,-6*L,12,-6*L],
-                  [6*L,2*L**2,-6*L,4*L**2]],index=vars2)
+                  [6*L**2,4*L**3,-6*L**2,2*L**3],
+                  [-12*L,-6*L**2,12*L,-6*L**2],
+                  [6*L**2,2*L**3,-6*L**2,4*L**3]],index=vars2)
+M2.columns = vars2
+M2 = M2 * (E*Iz/L**4 )
 \end{minted}
-
 
 \begin{minted}[fontsize=\footnotesize]{python}
-import numpy.linalg as lin
+import sys; sys.path.append('../phy_020_strs_08')
+import dfutil
 
-A = np.array([[0,0,0,1],[1,1,1,1],[0,0,1,0],[3,2,1,0]])
-b = np.array([0,3,1,2])
-lin.solve(A,b)
+M1f = dfutil.expand_dataframe(M1,all_vars)
+M2f = dfutil.expand_dataframe(M2,all_vars)
+Mall = M1f + M2f
+print (Mall)
+print (latex(Mall))
 \end{minted}
 
-\begin{verbatim}
-Out[1]: array([-3.,  5.,  1.,  0.])
-\end{verbatim}
+
+
+
 
 \end{document}
