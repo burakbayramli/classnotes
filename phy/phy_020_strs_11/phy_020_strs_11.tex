@@ -93,7 +93,7 @@ birbiriyle toplanacaktır!
 \begin{minted}[fontsize=\footnotesize]{python}
 from sympy import symbols, pprint, latex
 from sympy.matrices import Matrix
-import pandas as pd
+import pandas as pd, pickle
 pd.set_option('display.max_columns', None)
 
 all_vars = ['u1','v1','w1','phi1x','phi1y','phi1z',\
@@ -154,6 +154,7 @@ M2f = dfutil.expand_dataframe(M2,all_vars)
 M3f = dfutil.expand_dataframe(M3,all_vars)
 M4f = dfutil.expand_dataframe(M4,all_vars)
 Mall = M1f + M2f + M3f + M4f
+pickle.dump(Matrix(Mall),open("Mall.pkl","wb"))
 \end{minted}
 
 Sonuç matrisini bir dosyaya yazalım, 
@@ -192,6 +193,32 @@ $$
 $$
 
 Bu matrisin [2, sf. 282]'deki matris ile aynı olduğunu göreceğiz.
+
+Problem 5.8
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sympy.matrices import Matrix
+from sympy import symbols
+import pickle
+
+A,G,J,E,L,Iy,Iz = symbols("A,G,J,E,L,Iy,Iz")
+Mall = pickle.load(open('Mall.pkl','rb'))
+
+D = {E: 30000, G: 10000, J:50, Iy:100, Iz:100, A:10, L:100}
+M = Mall.subs(D)
+print (latex(M)[:100], '..')
+\end{minted}
+
+\begin{verbatim}
+\left[\begin{array}{cccccccccccc}3000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -3000 & 0.0 & 0.0 & 0.0 & 0.0  ..
+\end{verbatim}
+
+$$
+{\scriptsize
+\left[\begin{array}{cccccccccccc}3000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -3000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 36 & 0.0 & 0.0 & 0.0 & 1800 & 0.0 & -36 & 0.0 & 0.0 & 0.0 & 1800\\0.0 & 0.0 & 36 & 0.0 & -1800 & 0.0 & 0.0 & 0.0 & -36 & 0.0 & -1800 & 0.0\\0.0 & 0.0 & 0.0 & 5000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -5000 & 0.0 & 0.0\\0.0 & 0.0 & -1800 & 0.0 & 120000 & 0.0 & 0.0 & 0.0 & 1800 & 0.0 & 60000 & 0.0\\0.0 & 1800 & 0.0 & 0.0 & 0.0 & 120000 & 0.0 & -1800 & 0.0 & 0.0 & 0.0 & 60000\\-3000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 3000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & -36 & 0.0 & 0.0 & 0.0 & -1800 & 0.0 & 36 & 0.0 & 0.0 & 0.0 & -1800\\0.0 & 0.0 & -36 & 0.0 & 1800 & 0.0 & 0.0 & 0.0 & 36 & 0.0 & 1800 & 0.0\\0.0 & 0.0 & 0.0 & -5000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 5000 & 0.0 & 0.0\\0.0 & 0.0 & -1800 & 0.0 & 60000 & 0.0 & 0.0 & 0.0 & 1800 & 0.0 & 120000 & 0.0\\0.0 & 1800 & 0.0 & 0.0 & 0.0 & 60000 & 0.0 & -1800 & 0.0 & 0.0 & 0.0 & 120000\end{array}\right]
+}
+$$
+
 
 Kaynaklar
 
