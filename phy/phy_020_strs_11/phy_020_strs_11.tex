@@ -2,13 +2,23 @@
 \begin{document}
 Materyel Mekaniği - 11
 
+Üç boyutta herhangi bir yönde olabilecek bir kiriş öğesinin direngenlik
+matrisini bu bölümde geliştirelim [2, sf. 281]. Bunu yapabilmek için daha önce
+gördüğümüz eksenel, iki boyutlu kiriş, burulma direngenlik matrislerini
+birleştireceğiz.
 
-\includegraphics[width=25em]{phy_020_strs_11_01.jpg}
+İki boyuttaki kirişin mekanığı bükülme alttaki gibiydi [1],
 
 \includegraphics[width=25em]{phy_020_strs_11_02.jpg}
 
 \includegraphics[width=25em]{phy_020_strs_11_03.jpg}
 
+Şimdi işaretler alttaki gibi olacak,
+
+\includegraphics[width=25em]{phy_020_strs_11_01.jpg}
+
+İki boyutlu kiriş matrisini [1] iki kez kullanacagiz, ilki $x-z$ düzlemi icin,
+ikincisi $x-y$ düzlemi için,
 
 $x-z$ düzlemi
 
@@ -20,6 +30,7 @@ $$
     &      & 12L  & 6L^2  \\
     &      &      & 4L^3
 \end{array}\right]
+\mlabel{1}
 $$
 
 $x-y$ düzlemi
@@ -32,10 +43,52 @@ $$
     &      & 12L  & -6L^2  \\
     &      &      & 4L^3
 \end{array}\right]
+\mlabel{2}
 $$
 
+Dikkat edersek $x-y$ düzleminin matrisi [1] matrisi ile aynı. $x-z$ düzlemi
+matrisinin bazı işaretleri farklı, bunun sebebi düzlemdeki bükülmenin sağ el
+kuralına göre farklı yönleri gösterebilmesi. Mesela [1]'deki 
 
+$$
+m_1 = -m = -EI \frac{\ud^2 v(0)}{\ud x^2} =
+\frac{EI}{L^3} ( 6L v_1 + 4L^2 \phi_1 - 6L v_2 + 2 L^2 \phi_2 )
+$$
 
+formülünü hatırlarsak, o formülde bir uçta $m$ diğer üçta $-m$ vardı, fakat
+üstteki figürde $x-z$ düzlemindeki iki uçtaki $m$ değerleri aynı işarettedir,
+sağ el kuralını düşünürsek $x-z$'deki bükülme 1 noktasında kağıttan bize doğru
+gösteriyor, 2 noktasında aynı şekilde. O zaman üstteki formüldeki işaretler
+değişir,
+
+$$
+\Rightarrow \frac{EI}{L^3} ( -6L v_1 - 4L^2 \phi_1 + 6L v_2 - 2 L^2 \phi_2 )
+$$
+
+Bir değişim daha açılarda, üstteki formülde $\phi_1,\phi_2$ olan acılar,
+üç boyuttaki üstteki şekilde bunlar $\phi_{1y}$ ve $\phi_{2y}$. Bu açılar
+iki boyutlu durumun aksine artı yönde tam ters işaretli, tersi yönde bir
+yer değişim $v_1,v_2$'ye sebep oluyorlarlar, bu yüzden o işaretler de
+tersine dönüyor, notasyonu da düzeltince,
+
+$$
+\Rightarrow \frac{EI}{L^3} ( -6L v_1 + 4L^2 \phi_{1y} + 6L v_2 + 2 L^2 \phi_{2y} )
+$$
+
+Böylece matrisin ikinci satırında $-6,+4,+6,+2$ katsayılarını elde ediyoruz.
+Bu işaretlerin (1) matrisinin ikinci satırıyla aynı olduğunu görebiliriz,
+diğer satırlar benzer şekilde değiştiriliyorlar.
+
+Üstdüşüm (Süperposition)
+
+Artık bahsedilen matrisleri birleştirebiliriz. Bu üstdüşümü \verb!sympy!  ile
+otomatik olarak yapacağız, daha önce sayısal değerler için kullandığımız
+\verb!expand_dataframe! kodu yine kullanılabilecek, çünkü kod bir \verb!pandas!
+Dataframe'i baz alıyor, bu Dataframe içinde herhangi bir obje depolamak mümkün,
+oraya sayılar yerine \verb!sympy! sembolik matematik objeleri koyabiliriz. Bir
+bonus ta elde ediyoruz, toplama işlemi \verb!sympy! tipleri için önceden
+tanımlıdır, yani eğer üstdüşüm sırasında çakışma olursa, sembolik objeler
+birbiriyle toplanacaktır!
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sympy import symbols, pprint, latex
@@ -47,6 +100,8 @@ all_vars = ['u1','v1','w1','phi1x','phi1y','phi1z',\
             'u2','v2','w2','phi2x','phi2y','phi2z']
 A,G,J,E,L,Iy,Iz = symbols("A,G,J,E,L,Iy,Iz")
 \end{minted}
+
+Önce üstte bahsedilen iki düzlemi alalım,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 # x-z
@@ -65,19 +120,30 @@ M2 = pd.DataFrame([[12*L, 6*L**2,-12*L,6*L**2],
                   [6*L**2,2*L**3,-6*L**2,4*L**3]],index=vars2)
 M2.columns = vars2
 M2 = M2 * (E*Iz/L**4 )
+\end{minted}
 
+Şimdi [1]'deki eksenel yükleri tanımlayan makaskiriş direngenlik matrisini
+alalım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
 # Eksenel Yuk
 vars3 = ['u1','u2']
 M3 = pd.DataFrame([[1,-1],[-1,1]],index=vars3)
 M3.columns = vars3
 M3 = M3 * (A*E/L)
+\end{minted}
 
+[4]'te tanımladığımız burulma mekaniğinin matrisini belirtelim,
+
+\begin{minted}[fontsize=\footnotesize]{python}
 # Burulma (Torsion)
 vars4 = ['phi1x','phi2x']
 M4 = pd.DataFrame([[1,-1],[-1,1]],index=vars3)
 M4.columns = vars4
 M4 = M4 * (G*J/L)
 \end{minted}
+
+Hepsini üstdüşüm ile birleştirelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import sys; sys.path.append('../phy_020_strs_08')
@@ -106,9 +172,11 @@ fout.write ('\\end{array}\\right]$$')
 fout.close()
 \end{minted}
 
-Ve altta belgeye dahil edelim,
+Ve kodu belgeye dahil edelim, matris alttaki gibi olacak,
 
 \input{matrix1.tex}
+
+Bu matrisin [2, sf. 282]'deki matris ile aynı olduğunu göreceğiz.
 
 Kaynaklar
 
@@ -116,8 +184,8 @@ Kaynaklar
 
 [2] Logan, {\em A First Course in the Finite Element Method, 6th Ed}
 
+[3] Witt {\em Concepts and Apps of FEM}
+
+[4] Bayramlı, {\em Fizik, Materyel Mekanigi 9}
 
 \end{document}
-
-
-
