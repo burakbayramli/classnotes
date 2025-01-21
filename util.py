@@ -168,6 +168,11 @@ def tex_mathjax_html(texfile, htmlfile, title):
          fout.write("```python\n")
          fout.write(pfcontent)
          fout.write("```\n")
+      elif '\input{' in line:
+         pf = re.findall("input\{(.*?)\}",line,re.DOTALL)[0]
+         pfcontent = codecs.open(pf).read()
+         #print (pfcontent)
+         fout.write(pfcontent)
       elif '_' in line:
          line = line.replace("_","@@UUEEE@@") # special code
          fout.write(line)
