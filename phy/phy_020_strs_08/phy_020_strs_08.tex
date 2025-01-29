@@ -218,74 +218,9 @@ u'_1 \\ v'_1 \\ \phi'_1 \\ u'_2 \\ v'_2 \\ \phi'_2
 \mlabel{4}
 $$
 
-elde edilir, ki $C_1 = \dfrac{AE}{L}$ ve $C_2 = \dfrac{EI}{L^3}$
-olmak üzere. Üstte ortada duran matris $k'$ matrisidir.
-
-Hemen \verb!sympy! ile doğrulamasını yapalım,
-
-\begin{minted}[fontsize=\footnotesize]{python}
-from sympy import symbols, pprint, latex
-from sympy.matrices import Matrix
-import pandas as pd
-pd.set_option('display.max_columns', None)
-
-A,E,L,I,u1,u2,v1,v2,phi1,phi2 = symbols("A,E,L,I,u1,u2,v1,v2,phi1,phi2")
-\end{minted}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-vars1 = ['u1','u2']
-M1 = pd.DataFrame([[1,-1],[-1,1]],index=vars1)
-M1 = (A*E/L)*M1
-M1.columns = vars1
-print (M1)
-\end{minted}
-
-\begin{verbatim}
-        u1      u2
-u1   A*E/L  -A*E/L
-u2  -A*E/L   A*E/L
-\end{verbatim}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-vars2 = ['v1','phi1','v2','phi2']
-M2 = pd.DataFrame([[12, 6*L,-12,6*L],
-                  [6*L,4*L**2,-6*L,2*L**2],
-                  [-12,-6*L,12,-6*L],
-                  [6*L,2*L**2,-6*L,4*L**2]],index=vars2)
-M2 = (E*I/L**3)*M2
-M2.columns = vars2
-print (M2)
-\end{minted}
-
-\begin{verbatim}
-                v1         phi1            v2         phi2
-v1     12*E*I/L**3   6*E*I/L**2  -12*E*I/L**3   6*E*I/L**2
-phi1    6*E*I/L**2      4*E*I/L   -6*E*I/L**2      2*E*I/L
-v2    -12*E*I/L**3  -6*E*I/L**2   12*E*I/L**3  -6*E*I/L**2
-phi2    6*E*I/L**2      2*E*I/L   -6*E*I/L**2      4*E*I/L
-\end{verbatim}
-
-\begin{minted}[fontsize=\footnotesize]{python}
-import dfutil
-
-all_vars = ['u1','v1','phi1','u2','v2','phi2']
-M1f = dfutil.expand_dataframe(M1,all_vars)
-M2f = dfutil.expand_dataframe(M2,all_vars)
-Mall = M1f + M2f
-print (Mall)
-\end{minted}
-
-\begin{verbatim}
-          u1            v1         phi1      u2            v2         phi2
-u1     A*E/L             0            0  -A*E/L             0            0
-v1         0   12*E*I/L**3   6*E*I/L**2       0  -12*E*I/L**3   6*E*I/L**2
-phi1       0    6*E*I/L**2      4*E*I/L       0   -6*E*I/L**2      2*E*I/L
-u2    -A*E/L             0            0   A*E/L             0            0
-v2         0  -12*E*I/L**3  -6*E*I/L**2       0   12*E*I/L**3  -6*E*I/L**2
-phi2       0    6*E*I/L**2      2*E*I/L       0   -6*E*I/L**2      4*E*I/L
-\end{verbatim}
-
-Aynı sonuca eriştik.
+elde edilir, ki $C_1 = \dfrac{AE}{L}$ ve $C_2 = \dfrac{EI}{L^3}$ olmak
+üzere. Üstte ortada duran matris $k'$ matrisidir. İfadenin \verb!sympy! ile
+doğrulaması için yazının sonuna gidebiliriz.
 
 Şimdi dönüş mekaniğini ekleyelim.
 
@@ -720,8 +655,10 @@ değerleri JSON olarak ayrı sözlükler olarak alınabilir ve bu satırlar art�
 (incremental) çözüm yapabilen bir eşlenik gradyan [2,3] koduna satır satır
 geçilebilir.
 
-Not: Alttakiler biraz önce yazdığımız fonksiyonları diğer kodların
-kullanabilmesi için onları dinamik olarak hafızadan alıp diske yazıyor.
+Diske Kayıt
+
+Alttakiler biraz önce yazdığımız fonksiyonları diğer kodların kullanabilmesi
+için onları dinamik olarak hafızadan alıp diske yazıyor.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 fout = open('dfutil.py','w')
@@ -732,6 +669,74 @@ code = inspect.getsourcelines(drop_col_row)
 for line in code[0]: fout.write(line)
 fout.close()
 \end{minted}
+
+Doğrulama
+
+(4)'ün \verb!sympy! ile doğrulaması
+
+\begin{minted}[fontsize=\footnotesize]{python}
+from sympy import symbols, pprint, latex
+from sympy.matrices import Matrix
+import pandas as pd
+pd.set_option('display.max_columns', None)
+
+A,E,L,I,u1,u2,v1,v2,phi1,phi2 = symbols("A,E,L,I,u1,u2,v1,v2,phi1,phi2")
+\end{minted}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+vars1 = ['u1','u2']
+M1 = pd.DataFrame([[1,-1],[-1,1]],index=vars1)
+M1 = (A*E/L)*M1
+M1.columns = vars1
+print (M1)
+\end{minted}
+
+\begin{verbatim}
+        u1      u2
+u1   A*E/L  -A*E/L
+u2  -A*E/L   A*E/L
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+vars2 = ['v1','phi1','v2','phi2']
+M2 = pd.DataFrame([[12, 6*L,-12,6*L],
+                  [6*L,4*L**2,-6*L,2*L**2],
+                  [-12,-6*L,12,-6*L],
+                  [6*L,2*L**2,-6*L,4*L**2]],index=vars2)
+M2 = (E*I/L**3)*M2
+M2.columns = vars2
+print (M2)
+\end{minted}
+
+\begin{verbatim}
+                v1         phi1            v2         phi2
+v1     12*E*I/L**3   6*E*I/L**2  -12*E*I/L**3   6*E*I/L**2
+phi1    6*E*I/L**2      4*E*I/L   -6*E*I/L**2      2*E*I/L
+v2    -12*E*I/L**3  -6*E*I/L**2   12*E*I/L**3  -6*E*I/L**2
+phi2    6*E*I/L**2      2*E*I/L   -6*E*I/L**2      4*E*I/L
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import dfutil
+
+all_vars = ['u1','v1','phi1','u2','v2','phi2']
+M1f = dfutil.expand_dataframe(M1,all_vars)
+M2f = dfutil.expand_dataframe(M2,all_vars)
+Mall = M1f + M2f
+print (Mall)
+\end{minted}
+
+\begin{verbatim}
+          u1            v1         phi1      u2            v2         phi2
+u1     A*E/L             0            0  -A*E/L             0            0
+v1         0   12*E*I/L**3   6*E*I/L**2       0  -12*E*I/L**3   6*E*I/L**2
+phi1       0    6*E*I/L**2      4*E*I/L       0   -6*E*I/L**2      2*E*I/L
+u2    -A*E/L             0            0   A*E/L             0            0
+v2         0  -12*E*I/L**3  -6*E*I/L**2       0   12*E*I/L**3  -6*E*I/L**2
+phi2       0    6*E*I/L**2      2*E*I/L       0   -6*E*I/L**2      4*E*I/L
+\end{verbatim}
+
+Aynı sonuca eriştik.
 
 Kaynaklar
 
