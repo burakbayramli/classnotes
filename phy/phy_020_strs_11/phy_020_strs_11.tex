@@ -395,12 +395,12 @@ A,G,J,E,L,Iy,Iz = symbols("A,G,J,E,L,Iy,Iz")
 Mall = pickle.load(open('Mall.pkl','rb'))
 
 D = {E: 30000, G: 10000, J:50, Iy:100, Iz:100, A:10, L:100}
-k = Mall.subs(D)
-print (latex(k)[:100], '..')
+kprime = Mall.subs(D)
+print (latex(kprime)[:100], '..')
 \end{minted}
 
 \begin{verbatim}
-\left[\begin{array}{cccccccccccc}3000 & 0 & 0 & 0 & 0 & 0 & -3000 & 0 & 0 & 0 & 0  ..
+\left[\begin{array}{cccccccccccc}3000 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -3000 & 0.0 & 0.0 & 0.0 & 0.0  ..
 \end{verbatim}
 
 $$
@@ -450,15 +450,56 @@ $T^T k' T$ aynı $k'$ matrisini verir.
 
 Parça 2
 
+Bu parça düğüm 3 noktasıdan düğüm 1 noktasına gidiyor. O zaman $x'$ ekseni
+global $z$ ekseni ile aynı şey, o zaman ve yine önceki formüllere bakarak,
 
+$$
+\lambda = \left[\begin{array}{ccc}
+0 & 0 & 1 \\ 0 & 1 & 0 \\ -1 & 0 & 0
+\end{array}\right]
+$$
 
+elde ederiz. $T$ matrisi suna benzer,
 
+\begin{minted}[fontsize=\footnotesize]{python}
+T_P2 = np.array([
+[0, 0,1, 0,0,0, 0,0,0, 0,0,0 ],
+[0, 1,0, 0,0,0, 0,0,0, 0,0,0 ],
+[-1,0,0, 0,0,0, 0,0,0, 0,0,0],
+[0, 0,0, 0,0,1, 0,0,0, 0,0,0 ],
+[0, 0,0, 0,1,0, 0,0,0, 0,0,0],
+[0, 0,0,-1,0,0, 0,0,0, 0,0,0],
+[0, 0,0, 0,0,0, 0,0,1, 0,0,0 ],
+[0, 0,0, 0,0,0, 0,1,0, 0,0,0 ],
+[0, 0,0, 0,0,0,-1,0,0, 0,0,0],
+[0, 0,0, 0,0,0, 0,0,0, 0,0,1],
+[0, 0,0, 0,0,0, 0,0,0, 0,1,0 ],
+[0, 0,0, 0,0,0, 0,0,0,-1,0,0]])
+\end{minted}
 
+\begin{minted}[fontsize=\footnotesize]{python}
+res2 = T_P2.transpose()*kprime*T_P2
+res2 = latex(res2)
+print (res2[:100],'..')
+\end{minted}
 
+\begin{verbatim}
+\left[\begin{array}{cccccccccccc}36 & 0 & 0 & 0 & 1800 & 0 & -36 & 0 & 0 & 0 & 1800 & 0\\0 & 36 & 0  ..
+\end{verbatim}
 
-
-
-
+$$
+\scriptsize
+\left[\begin{array}{cccccccccccc}36 & 0 & 0 & 0 & 1800 & 0 & -36 & 0 & 0 & 0 &
+    1800 & 0\\0 & 36 & 0 & -1800 & 0 & 0 & 0 & -36 & 0 & -1800 & 0 & 0\\0 & 0 &
+    3000 & 0 & 0 & 0 & 0 & 0 & -3000 & 0 & 0 & 0\\0 & -1800 & 0 & 120000 & 0 & 0
+    & 0 & 1800 & 0 & 60000 & 0 & 0\\1800 & 0 & 0 & 0 & 120000 & 0 & -1800 & 0 &
+    0 & 0 & 60000 & 0\\0 & 0 & 0 & 0 & 0 & 5000 & 0 & 0 & 0 & 0 & 0 & -5000\\-36
+    & 0 & 0 & 0 & -1800 & 0 & 36 & 0 & 0 & 0 & -1800 & 0\\0 & -36 & 0 & 1800 & 0
+    & 0 & 0 & 36 & 0 & 1800 & 0 & 0\\0 & 0 & -3000 & 0 & 0 & 0 & 0 & 0 & 3000 &
+    0 & 0 & 0\\0 & -1800 & 0 & 60000 & 0 & 0 & 0 & 1800 & 0 & 120000 & 0 &
+    0\\1800 & 0 & 0 & 0 & 60000 & 0 & -1800 & 0 & 0 & 0 & 120000 & 0\\0 & 0 & 0
+    & 0 & 0 & -5000 & 0 & 0 & 0 & 0 & 0 & 5000\end{array}\right]
+$$
 
 
 
