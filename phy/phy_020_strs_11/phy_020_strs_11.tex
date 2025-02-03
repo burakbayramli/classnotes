@@ -3,9 +3,9 @@
 Materyel Mekaniği - 11
 
 Üç boyutta herhangi bir yönde olabilecek bir kiriş öğesinin direngenlik
-matrisini bu bölümde geliştirelim [2, sf. 281]. Bunu yapabilmek için daha önce
-gördüğümüz eksenel, iki boyutlu kiriş, burulma direngenlik matrislerini
-birleştireceğiz.
+matrisini bu bölümde geliştirelim [2, sf. 281]. Literatürde bu yapılara uzay
+çerçeveleri (space frame) denebiliyor. Bunu yapabilmek için daha önce gördüğümüz
+eksenel, iki boyutlu kiriş, burulma direngenlik matrislerini birleştireceğiz.
 
 İki boyuttaki kirişin mekaniği bükülme alttaki gibiydi [1],
 
@@ -17,7 +17,7 @@ birleştireceğiz.
 
 \includegraphics[width=25em]{phy_020_strs_11_01.jpg}
 
-İki boyutlu kiriş matrisini [1] iki kez kullanacagiz, ilki $x-z$ düzlemi icin,
+İki boyutlu kiriş matrisini [1] iki kez kullanacağız, ilki $x-z$ düzlemi icin,
 ikincisi $x-y$ düzlemi için,
 
 $x-z$ düzlemi
@@ -210,10 +210,9 @@ C_{xz'} & C_{yz'} & C_{zz'}
 $$
 
 Sonlu Öğeler (Finite Element) bu hesap şu şekilde uygulanır, FEM problemlerinde
-genellikle yapılan bir kiriş parçasını transform edilmiş $x'$ ekseni kabul
-edilir, ve geri kalan $\lambda$ değerleri buna göre doldurulur. Bu durumda
-kirişin uç ve baş noktasını kullanarak $x'$ ile oluşan açıları şöyle
-bulabiliriz,
+genellikle yapılan bir kiriş parçası transform edilmiş $x'$ ekseni kabul edilir,
+ve geri kalan $\lambda$ değerleri buna göre doldurulur. Bu durumda kirişin uç ve
+baş noktasını kullanarak $x'$ ile oluşan açıları şöyle bulabiliriz,
 
 $$
 \cos_{xx'} = \frac{x_2 - x_1}{L} = l
@@ -287,19 +286,105 @@ yaparız.
 
 Problem 5.7
 
-
 \includegraphics[width=20em]{phy_020_strs_11_05.jpg}
 
+Üstteki şekil için gereken $\lambda$ matrisini bulun.
 
+Çözüm
 
+Önce kiriş uzunluğunu bulalım.
 
+\begin{minted}[fontsize=\footnotesize]{python}
+np.sqrt(3**2 + 4**2 + 12**2)
+\end{minted}
 
+\begin{verbatim}
+Out[1]: 13.0
+\end{verbatim}
 
+Şimdi uzunluğu kullanarak $x'$ eksenini bulalım, daha önce bahsedildiği gibi bu
+eksenin çubuğun bir ucundan başlayıp onunla aynı yönü gösterdiği kabul edilir.
+Bu değerlere $l_x,l_y,l_z$ diyelim, $\lambda$ matrisinin ilk satırı bu değerler,
 
+$$
+l_x = \frac{x_2 - x_1}{L} = \frac{3 = 0}{13} = \frac{3}{13}
+$$
 
+$$
+m_x = \frac{y_2 - y_1}{L} = \frac{4-0}{13} = \frac{4}{13}
+$$
 
+$$
+n_x = \frac{z_2 - z_1}{L} = \frac{12 = 0}{13} = \frac{12}{13}
+$$
+
+Şimdi $D$ hesabını yapabiliriz,
+
+$$
+D = (l_x^2 + m_x^2)^{1/2} =
+\left[
+  \left(\frac{3}{13}\right)^2 +
+  \left(\frac{4}{13}\right)^2
+\right]^{1/2} = \frac{5}{13}
+$$
+
+$y'$ eksenini hesaplamak için
+
+$$
+l_y = -\frac{m}{D} = -\frac{4}{5}
+$$
+
+$$
+m_y = \frac{l}{D} = \frac{3}{5}
+$$
+
+$$
+n_y = 0
+$$
+
+$z'$ ekseni
+
+$$
+l_z = -\frac{l_x n_x}{D} =
+\frac{-\frac{3}{13} \frac{12}{13}}{\frac{5}{13}} =
+- \frac{36}{65}
+$$
+
+$$
+m_z =
+-\frac{m_x n_x}{D} =
+\frac{-\frac{4}{13} \frac{12}{13}}{\frac{5}{13}} =
+-\frac{48}{65}
+$$
+
+$$
+n_z = D = \frac{5}{13}
+$$
+
+Tek bir matriste üstteki tüm değerleri gösterelim,
+
+$$
+\renewcommand*{\arraystretch}{1.8}
+\lambda = \left[\begin{array}{ccc}
+\frac{3}{13} & \frac{4}{13} & \frac{12}{13} \\
+-\frac{4}{5} & \frac{3}{5} & 0 \\
+-\frac{36}{65} & -\frac{48}{65} & \frac{5}{13}
+\end{array}\right]
+$$
 
 Problem 5.8
+
+Alttaki uzay çerçevesindeki düğüm 1 noktasındaki yer değişimlerini ve dönüşleri
+hesaplayın. Her üç kiriş parçası için $E=30,000$ ksi, $G=10,000$ ksi, $J = 50$
+$in^4$, $I_y=100$ $in^4$, $I_z = 100$ $in^4$, $A=10$ $in^2$, $L = 100$ in.
+değerleri geçerlidir.
+
+\includegraphics[width=20em]{phy_020_strs_11_06.jpg}
+
+Çözüm
+
+Üç kiriş parçası uzunluk, madde, yapı açısından birbirlerine eşit olduğu için
+$k$ matrisini bir kere hesaplamak yeterli. 
 
 \begin{minted}[fontsize=\footnotesize]{python}
 from sympy.matrices import Matrix
@@ -310,8 +395,8 @@ A,G,J,E,L,Iy,Iz = symbols("A,G,J,E,L,Iy,Iz")
 Mall = pickle.load(open('Mall.pkl','rb'))
 
 D = {E: 30000, G: 10000, J:50, Iy:100, Iz:100, A:10, L:100}
-M = Mall.subs(D)
-print (latex(M)[:100], '..')
+k = Mall.subs(D)
+print (latex(k)[:100], '..')
 \end{minted}
 
 \begin{verbatim}
@@ -324,6 +409,46 @@ $$
 }
 $$
 
+Geri kalan her parça için dönüş matrislerini hesaplamak.
+
+Parça 1
+
+Önce parça 1 hesapları yapalım, bu parça düğüm 2 noktasından başlayıp
+düğüm 1 noktasına gidiyor. O zaman $x'$ ekseni için
+
+$$
+l = 1, \quad m = 0, \quad n = 0, \quad D = 1
+$$
+
+Diger hesaplar
+
+$$
+I_y = -\frac{m_x}{D}, \quad
+m_y = \frac{1}{D}, \quad
+n_y = 0
+$$
+
+$$
+i_z = -\frac{l_x n_x}{D} = 0, \quad
+m_z = -\frac{m_x n_x}{D} = 0, \quad
+n_z = D = 1
+$$
+
+Matris içinde gösterirsek,
+
+$$
+\lambda = \left[\begin{array}{ccc}
+1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
+\end{array}\right]
+$$
+
+Sonuç şaşırtıcı olmasa gerek, çünkü yeni $x$ eski $x$ ile aynı. Bu parça için
+sanki eksen hiç değişmesin demiş olduk ve sonuç olarak çarpılınca hiçbir
+değişiklik yaratmayacak birim matrisi elde ettik. Bu matrisi büyük $T$ içinde
+köşegenlere parça parça yerleştirince yine birim matris elde edilir, yani
+$T^T k' T$ aynı $k'$ matrisini verir.
+
+Parça 2
 
 
 
@@ -334,6 +459,12 @@ $$
 
 
 
+
+
+
+
+
+[devam edecek]
 
 Kaynaklar
 
