@@ -218,7 +218,7 @@ plt.savefig('torus-rotated.png')
 
 ![](torus-rotated.png)
 
-Ekler
+Ubuntu Linux
 
 STL dosyalarını çabuk bir şekilde Ubuntu'da görebilmek için, bir program `meshlab`.
 
