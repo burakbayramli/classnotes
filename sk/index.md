@@ -3,7 +3,7 @@
 
 ## En Son
 
-17/2 - [Materyel Mekaniği 10 - Izgara (Grid) Denklemleri](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp43fem/izgara_denklemleri.html)
+17/2 - [Materyel Mekaniği 10 - Izgara (Grid) Denklemleri](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_10/materyel_mekanigi__10.html)
 
 3/2 - [Fizik 2 - Ekler - Merkezcil Kuvvet](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donussel_kuvvet.html)
 
