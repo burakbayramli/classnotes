@@ -610,6 +610,17 @@ phi1y -1800.0     0.0  1800.0       0.0  245000.0       0.0
 phi1z  1800.0 -1800.0     0.0       0.0       0.0  245000.0
 \end{verbatim}
 
+Yer değişimlerini kuvvetlerle ilintilendiren denklemi
+
+$$
+f = k d
+$$
+
+olarak görmüştük. Üstdüşüm ile birleştirip ve sinir şartları ile ufalttığımız
+matris bize bir global $k$ verdi. Global kuvvetlerin ne olduğunu da problem
+tanımından biliyoruz, bunlar $F_{1y} = -50$ kips, ve $M_{1x} = -1000$ k-inch.  O
+zaman $f = kd$ sisteminde bilinen $f,k$ ve bilinmeyen $d$ için lineer cebirin
+tanıdık çözüm işlemini uygulayabiliriz.
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy.linalg as lin
@@ -629,7 +640,42 @@ phi1y  0.000018
 phi1z -0.000103
 \end{verbatim}
 
-Parca 1
+Yer değişimleri üstteki şekilde hesaplandı. Şimdi her öge için yerel etki eden
+kuvvetleri $f' = k' T d$ hesabı ile bulabiliriz. Tabii boyutlara dikkat etmek
+gerekiyor, mesela birinci parçanın kullandığı değişken listesi farklı, $d$
+vektörünü o değişken listesi için uyarlamak lazım, Pandas yazılımı burada
+yardıma yetişiyor, bir seri (liste, vektör) objesini bir diğeri ile yaratırken
+eksik olan indis (değişken) değerler varsa onlar için boş değer atayabilir, o
+boş değerlere biz sıfır dersek istediğimiz sonucu elde edebiliriz. Mesela
+birinci parça için
+
+\begin{minted}[fontsize=\footnotesize]{python}
+pd.DataFrame(d,index=vars1)
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 
+              0
+u2          NaN
+v2          NaN
+w2          NaN
+phi2x       NaN
+phi2y       NaN
+phi2z       NaN
+u1     0.000071
+v1    -0.013995
+w1    -0.002352
+phi1x -0.003996
+phi1y  0.000018
+phi1z -0.000103
+\end{verbatim}
+
+sonucunu alıyoruz. Görüldüğü gibi parça 1 için $d$'de olan değerler dolduruldu,
+diğerleri boş bırakıldı.  Bu tekniği tüm parçalara uygulayalım ve kuvvet
+tarafındaki değişkenlerin $u_1,v_1..,\phi_{1x},\phi_{1y},...$ için
+$f_{1x},f_{1y},..,M_{1x},M_{1y},..$ şeklinde gittiğini dikkate alalım,
+
+Parça 1
 
 \begin{minted}[fontsize=\footnotesize]{python}
 d_expanded1 = pd.DataFrame(d,index=vars1).fillna(0)
@@ -653,7 +699,7 @@ array([[-0.212947726538524],
        [12.7900943580873]], dtype=object)
 \end{verbatim}
 
-Parca 2
+Parça 2
 
 \begin{minted}[fontsize=\footnotesize]{python}
 d_expanded2 = pd.DataFrame(d,index=vars2).fillna(0)
@@ -677,7 +723,7 @@ array([[7.05566800597642],
        [504.722095716214]], dtype=object)
 \end{verbatim}
 
-Parca 2
+Parça 3
 
 \begin{minted}[fontsize=\footnotesize]{python}
 d_expanded3 = pd.DataFrame(d,index=vars3).fillna(0)
