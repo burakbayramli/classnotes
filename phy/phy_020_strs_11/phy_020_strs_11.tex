@@ -390,6 +390,7 @@ $k$ matrisini bir kere hesaplamak yeterli.
 from sympy.matrices import Matrix
 from sympy import symbols, latex
 import pickle, pandas as pd
+pd.set_option('display.max_columns', None)
 import sys; sys.path.append('../phy_020_strs_08')
 import dfutil
 
@@ -451,6 +452,7 @@ köşegenlere parça parça yerleştirince yine birim matris elde edilir, yani
 $T^T k'T$ aynı $k'$ matrisini verir.
 
 \begin{minted}[fontsize=\footnotesize]{python}
+T_P1 = np.eye(12,12)
 res1 = np.array(kprime)
 vars1 = ['u2','v2','w2','phi2x','phi2y','phi2z','u1','v1','w1','phi1x','phi1y','phi1z']
 df1 = pd.DataFrame(res1,columns=vars1)
@@ -483,9 +485,7 @@ T_P2 = np.array([
 [0, 0,0, 0,0,0, 0,0,0, 0,0,1],
 [0, 0,0, 0,0,0, 0,0,0, 0,1,0 ],
 [0, 0,0, 0,0,0, 0,0,0,-1,0,0]])
-\end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{python}
 res2 = T_P2.transpose()*kprime*T_P2
 vars2 = ['u3','v3','w3','phi3x','phi3y','phi3z','u1','v1','w1','phi1x','phi1y','phi1z']
 df2 = pd.DataFrame(np.array(res2),columns=vars2)
@@ -558,9 +558,7 @@ T_P3 = np.array([
 [0, 0,0, 0,0,0, 0,0,0, 0, 1,0],
 [0, 0,0, 0,0,0, 0,0,0,-1, 0,0 ],
 [0, 0,0, 0,0,0, 0,0,0, 0, 0,1]])
-\end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{python}
 res3 = T_P3.transpose()*kprime*T_P3
 vars3 = ['u4','v4','w4','phi4x','phi4y','phi4z','u1','v1','w1','phi1x','phi1y','phi1z']
 df3 = pd.DataFrame(np.array(res3),columns=vars3)
@@ -598,24 +596,118 @@ drop_cols = ['u2','v2','w2','phi2x','phi2y','phi2z', \
              'u3','v3','w3','phi3x','phi3y','phi3z',\
              'u4','v4','w4','phi4x','phi4y','phi4z']
 df_super = dfutil.drop_col_row(df_super,drop_cols)
-df_super = df_super.applymap(lambda x: np.round(np.float(x),2))
+df_super = df_super.applymap(lambda x: np.round(np.float(x),0))
 print (df_super)
 \end{minted}
 
 \begin{verbatim}
-            u1       v1       w1     phi1x     phi1y     phi1z
-u1     3072.00     0.00     0.00      0.00  -1800.00   1800.00
-v1        0.00  3072.00     0.00   1800.00      0.00  -1800.00
-w1        0.00     0.00  3072.00  -1800.00   1800.00      0.00
-phi1x     0.00  1800.00 -1800.00 245000.00      0.00      0.00
-phi1y -1800.00     0.00  1800.00      0.00 245000.00      0.00
-phi1z  1800.00 -1800.00     0.00      0.00      0.00 245000.00
+           u1      v1      w1     phi1x     phi1y     phi1z
+u1     3072.0     0.0     0.0       0.0   -1800.0    1800.0
+v1        0.0  3072.0     0.0    1800.0       0.0   -1800.0
+w1        0.0     0.0  3072.0   -1800.0    1800.0       0.0
+phi1x     0.0  1800.0 -1800.0  245000.0       0.0       0.0
+phi1y -1800.0     0.0  1800.0       0.0  245000.0       0.0
+phi1z  1800.0 -1800.0     0.0       0.0       0.0  245000.0
+\end{verbatim}
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+d = lin.solve(df_super,np.array([[0,-50,0,-1000,0,0]]).T)
+d = pd.DataFrame(d,index=df_super.index)
+d
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 
+              0
+u1     0.000071
+v1    -0.013995
+w1    -0.002352
+phi1x -0.003996
+phi1y  0.000018
+phi1z -0.000103
+\end{verbatim}
+
+Parca 1
+
+\begin{minted}[fontsize=\footnotesize]{python}
+d_expanded1 = pd.DataFrame(d,index=vars1).fillna(0)
+f1 = np.dot(np.dot(kprime, T_P1), d_expanded1)
+f1
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 
+array([[-0.212947726538524],
+       [0.317807629532996],
+       [0.0526267712100185],
+       [19.9804522034949],
+       [-3.16535930819590],
+       [18.9906685952123],
+       [0.212947726538524],
+       [-0.317807629532996],
+       [-0.0526267712100185],
+       [-19.9804522034949],
+       [-2.09731781280595],
+       [12.7900943580873]], dtype=object)
+\end{verbatim}
+
+Parca 2
+
+\begin{minted}[fontsize=\footnotesize]{python}
+d_expanded2 = pd.DataFrame(d,index=vars2).fillna(0)
+f2 = np.dot(np.dot(kprime, T_P2), d_expanded2)
+f2
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 
+array([[7.05566800597642],
+       [7.69678764990490],
+       [-0.0294858721432362],
+       [0.516714519760416],
+       [0.940272859466836],
+       [264.956669274276],
+       [-7.05566800597642],
+       [-7.69678764990490],
+       [0.0294858721432362],
+       [-0.516714519760416],
+       [2.00831435485679],
+       [504.722095716214]], dtype=object)
+\end{verbatim}
+
+Parca 2
+
+\begin{minted}[fontsize=\footnotesize]{python}
+d_expanded3 = pd.DataFrame(d,index=vars3).fillna(0)
+f3 = np.dot(np.dot(kprime, T_P3), d_expanded3)
+f3
+\end{minted}
+
+\begin{verbatim}
+Out[1]: 
+array([[41.9854047205621],
+       [-0.183461854395287],
+       [-7.10829477718644],
+       [-0.0890034579491625],
+       [235.532025638353],
+       [-6.07280560120188],
+       [-41.9854047205621],
+       [0.183461854395287],
+       [7.10829477718644],
+       [0.0890034579491625],
+       [475.297452080291],
+       [-12.2733798383269]], dtype=object)
 \end{verbatim}
 
 
 
 
-  
+
+
+
+
 [devam edecek]
 
 Kaynaklar
