@@ -389,7 +389,9 @@ $k$ matrisini bir kere hesaplamak yeterli.
 \begin{minted}[fontsize=\footnotesize]{python}
 from sympy.matrices import Matrix
 from sympy import symbols, latex
-import pickle
+import pickle, pandas as pd
+import sys; sys.path.append('../phy_020_strs_08')
+import dfutil
 
 A,G,J,E,L,Iy,Iz = symbols("A,G,J,E,L,Iy,Iz")
 Mall = pickle.load(open('Mall.pkl','rb'))
@@ -446,7 +448,13 @@ Sonuç şaşırtıcı olmasa gerek, çünkü yeni $x$ eski $x$ ile aynı. Bu par
 sanki eksen hiç değişmesin demiş olduk ve sonuç olarak çarpılınca hiçbir
 değişiklik yaratmayacak birim matrisi elde ettik. Bu matrisi büyük $T$ içinde
 köşegenlere parça parça yerleştirince yine birim matris elde edilir, yani
-$T^T k' T$ aynı $k'$ matrisini verir.
+$T^T k'T$ aynı $k'$ matrisini verir.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+res1 = np.array(kprime)
+vars1 = ['u2','v2','w2','phi2x','phi2y','phi2z','u1','v1','w1','phi1x','phi1y','phi1z']
+df1 = pd.DataFrame(res1,columns=vars1)
+\end{minted}
 
 Parça 2
 
@@ -479,8 +487,9 @@ T_P2 = np.array([
 
 \begin{minted}[fontsize=\footnotesize]{python}
 res2 = T_P2.transpose()*kprime*T_P2
-res2 = latex(res2)
-print (res2[:100],'..')
+vars2 = ['u3','v3','w3','phi3x','phi3y','phi3z','u1','v1','w1','phi1x','phi1y','phi1z']
+df2 = pd.DataFrame(np.array(res2),columns=vars2)
+print (latex(res2)[:100],'..')
 \end{minted}
 
 \begin{verbatim}
@@ -553,8 +562,9 @@ T_P3 = np.array([
 
 \begin{minted}[fontsize=\footnotesize]{python}
 res3 = T_P3.transpose()*kprime*T_P3
-res3 = latex(res3)
-print (res3[:100],'..')
+vars3 = ['u4','v4','w4','phi4x','phi4y','phi4z','u1','v1','w1','phi1x','phi1y','phi1z']
+df3 = pd.DataFrame(np.array(res3),columns=vars3)
+print (latex(res3)[:100],'..')
 \end{minted}
 
 \begin{verbatim}
@@ -575,12 +585,32 @@ $$
     & 0 & 0 & 60000 & 1800 & 0 & 0 & 0 & 0 & 120000\end{array}\right]
 $$
 
+\begin{minted}[fontsize=\footnotesize]{python}
+all_vars = ['u1','v1','w1','phi1x','phi1y','phi1z',\
+            'u2','v2','w2','phi2x','phi2y','phi2z',\
+            'u3','v3','w3','phi3x','phi3y','phi3z',\
+            'u4','v4','w4','phi4x','phi4y','phi4z']
+df1f = dfutil.expand_dataframe(df1,all_vars)
+df2f = dfutil.expand_dataframe(df2,all_vars)
+df3f = dfutil.expand_dataframe(df3,all_vars)
+df_super = df1f + df2f + df3f
+drop_cols = ['u2','v2','w2','phi2x','phi2y','phi2z', \
+             'u3','v3','w3','phi3x','phi3y','phi3z',\
+             'u4','v4','w4','phi4x','phi4y','phi4z']
+df_super = dfutil.drop_col_row(df_super,drop_cols)
+df_super = df_super.applymap(lambda x: np.round(np.float(x),2))
+print (df_super)
+\end{minted}
 
-
-
-
-
-
+\begin{verbatim}
+            u1       v1       w1     phi1x     phi1y     phi1z
+u1     3072.00     0.00     0.00      0.00  -1800.00   1800.00
+v1        0.00  3072.00     0.00   1800.00      0.00  -1800.00
+w1        0.00     0.00  3072.00  -1800.00   1800.00      0.00
+phi1x     0.00  1800.00 -1800.00 245000.00      0.00      0.00
+phi1y -1800.00     0.00  1800.00      0.00 245000.00      0.00
+phi1z  1800.00 -1800.00     0.00      0.00      0.00 245000.00
+\end{verbatim}
 
 
 
