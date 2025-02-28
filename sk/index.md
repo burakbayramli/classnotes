@@ -3,6 +3,8 @@
 
 ## En Son
 
+27/2 - [Materyel Mekaniği 11 - Üç Boyutta Kiriş Yapıları](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_11/materyel_mekanigi__11.html)
+
 17/2 - [Materyel Mekaniği 10 - Izgara (Grid) Denklemleri](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_10/materyel_mekanigi__10.html)
 
 3/2 - [Fizik 2 - Ekler - Merkezcil Kuvvet](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_02/temel_fizik_2_donussel_kuvvet.html)
@@ -10,8 +12,6 @@
 27/1 - [Materyel Mekaniği 8 - Ekler - Çok Yönlü Kiriş, Sympy Formül Doğrulaması](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_08/materyel_mekanigi__8.html)
 
 15/1 - [Materyel Mekaniği - 6 - Ekler - Burkulma (Buckling), Euler Denklemi](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_06/materyel_mekanigi__6.html)
-
-7/1 - [En Düz, Optimal Yol - Ekler - Çit Entegral Hesabı](https://burakbayramli.github.io/dersblog/func_analysis/func_96_elev_path/yukseklik_fonksiyonu__tepeler__arasindan_en_duz_optimal_yuruyus_yolunu_bulmak.html)
 
 ## Konular, Referans
 
