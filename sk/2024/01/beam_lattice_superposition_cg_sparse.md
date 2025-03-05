@@ -226,8 +226,8 @@ print (x)
 
 Kaynaklar
 
-[1] <a href="../../../phy_020_strs_08/materyel_mekanigi__8.html">Fizik - Materyel Mekaniği - 8</a>
+[1] <a href="../../../phy/phy_020_strs_08/materyel_mekanigi__8.html">Fizik - Materyel Mekaniği - 8</a>
 
 [2] <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.cg.html">scipy.sparse.linalg.cg</a>
 
-[3] <a href="../../..//compscieng/compscieng_2_19/ders_2.19.html">Hesapsal Bilim Ders 2.19</a>
+[3] <a href="../../../compscieng/compscieng_2_19/ders_2.19.html">Hesapsal Bilim Ders 2.19</a>
