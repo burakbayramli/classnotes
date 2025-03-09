@@ -129,7 +129,7 @@ class MaxAndSkipEnv(gym.Wrapper):
                 break
 
         max_frame = np.max(np.stack(self._obs_buffer), axis=0)
- max_frame = greyscale(max_frame)
+        max_frame = greyscale(max_frame)
         return max_frame, total_reward, done, info
 
     def _reset(self):
