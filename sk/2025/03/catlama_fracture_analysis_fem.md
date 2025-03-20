@@ -8,26 +8,27 @@ metotu (finite element method) ile hesaplayabildik.
 Aslında bu metotu kullanarak bütünsel, tek bir maddenin yüklenmesi
 durumunda nasıl davranacağını da bulabiliriz. Araştırmacı Schlangen ve
 onun grubu şöyle bir faraziye yaptılar [2,3], acaba bütünsel bir
-maddeyi belli düğümler üzerinden kirişlerle bağlı bir uzay çatısı
-olarak göremez miyiz?
+maddenin iç yapısını (hayali) düğümler / kirişlerle birbirine bağlı
+bir uzay çatısı olarak göremez miyiz?
 
 Bu sorunun cevabı en azından kırılma, çatlama analizi bağlamında,
 evet. Araştırmacılar probleme şöyle yaklaştılar; bir maddeyi al, ona
 dıştan uygulanan yükün iç yansımasının hesabını o madde içinde sanki
 birbirine bağlı kirişlerden oluşuyormuş gibi yap, ve sonuçları bu
 şekilde bildir. Çatlama, kırılma noktalarını bulmak için kullanılan
-numara şöyle, bir döngü içinde her kirişe teker teker bak, eğer o
-kiriş tek başına dayanabileceği yük sınırını geçmiş ise o kirişi
-sistemden çıkar. Bu hesapsal çıkartma, o noktada kırılma, çatlamayı
-simüle eder, döngünün bir sonraki aşamasında hesaba bu eksik şekilde
-devam edilir, ve belki de kopuş farklı öğelerde de görülecektir, amaç
-çatlamanın yayılması (crack propagation) durumunu saptamaktır.
+numara şöyle, yük sonrası bir döngü içinde her kirişe teker teker bak,
+eğer o kiriş tek başına dayanabileceği yük sınırını geçmiş ise o
+kirişi sistemden çıkar. Bu hesapsal çıkartma, o noktada kırılma,
+çatlamayı simule eder, döngünün bir sonraki aşamasında hesaba bu eksik
+şekilde devam edilir, ve belki de kopuş farklı öğelerde de
+görülecektir, amaç çatlamanın yayılması (crack propagation) durumunu
+saptamaktır.
 
 Yayılma olması mümkündür çünkü tek bir kirişi çıkarttığımızda o
 noktada bir zayıflık yaratmış oluyoruz, bu belki çıkartılan parçaya
 bağlı olan diğer parçaların hissettiği yükü arttıracaktır, eğer
 kapasitelerinin ötesinde bir yüke maruz kalırlarsa onlar da kopuş
-yaşayabilirler.. Çatlak bu şekilde yayılir, hatta tüm materyelin
+yaşayabilirler.. Çatlak bu şekilde yayılabilir, hatta tüm materyelin
 paramparça olması durumu bile ortaya çıkabilir.
 
 ![](frac3.jpg)
@@ -42,10 +43,10 @@ paramparça olması durumu bile ortaya çıkabilir.
 Uzay çerçevesi hesapsal amaçlı, sanal olarak yaratılıyor, bu
 çerçevenin düğüm ve bağlantı yapısı herhangi bir şekilde
 oluşturalabilir, ızgara yapısı programcı tarafından seçilecektir.
-Fakat bilimsel hesaplama alanında ızgara kullanımı bilinmez bir şey
-değil, pek çok analitik formülü gerçek dünyada çözmek için bir sanal
-ızgara yaratma tekniği kullanılır. Buradaki bir ek özellik ızgara
-sisteminin materyel mekaniği literatüründe direk bir karşılığının olması.
+Bilimsel hesaplama alanında ızgara kullanımı bilinmez bir şey değil,
+pek çok analitik formülü gerçek dünyada çözmek için bir sanal ızgara
+yaratma tekniği kullanılır. Buradaki bir ek özellik ızgara sisteminin
+materyel mekaniği literatüründe direk bir karşılığının olması.
 
 ![](frac1.jpg)
 
