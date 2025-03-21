@@ -112,6 +112,18 @@ gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook \
 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
 ```
 
+Eksik Font Problemi
+
+Eğer PDF mesela tarayıcı içinde doğru ama masaüstü PDF gösterici
+programlar `evince`, `acrobat` gibi yanlış gözüküyorsa (eksik yazı
+bölümleri, eksik tablolar) bu durumda eksik gösteren sistemde eksik
+font durumu olabilir, font bilgisi doküman içine gömülmemiştir. Bu
+gömmeyi sonradan yapabiliriz, yine Ghoştscript kullanarak,
+
+```
+gs -o output.pdf -dPDFSETTINGS=/prepress -sDEVICE=pdfwrite input.pdf
+```
+
 Python
 
 Bazen PDF içinden tablo verisi çıkartmak gerekiyor. İşaretle-kopyala
