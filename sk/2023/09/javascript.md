@@ -499,8 +499,8 @@ eriştiğimiz json `filanca.com`'da olabilir, o zaman çoğunlukla bu
 erişim CORS denilen bir hata verir, her site dışarıdan gelen kodlara
 programsal erişim sağlamak istemiyor. En garanti olan sitenin kendi
 servis ettiği json dosyalarına erişmektir, bu da izafi dizin erişimi
-ile yapılabilir, mesela `filanca.com/dir/ındex.html` içindeki Javascript
-aynı dizindeki json dosyasına `/dır/file1.json` ile erişir.
+ile yapılabilir, mesela `filanca.com/dir/index.html` içindeki
+Javascript aynı dizindeki json dosyasına `/dir/file1.json` ile erişir.
 
 Önbellekleme
 
@@ -736,6 +736,3 @@ Kaynaklar
 [2] https://mathjs.org/download.html
 
 [3] https://stackoverflow.com/questions/71943182/how-to-show-hide-animated-gif-during-the-execution-of-a-function/71944178#71944178
-
-
-
