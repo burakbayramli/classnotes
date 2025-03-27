@@ -11,7 +11,7 @@ print (dist)
 print (dist.km)
 ```
 
-İkinci ifade float tıpınde mesafeyi verir, kilometre bazlıdır.
+İkinci ifade float tipinde mesafeyi verir, kilometre bazlıdır.
 
 Ya da
 
