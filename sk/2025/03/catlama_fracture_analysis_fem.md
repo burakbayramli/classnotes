@@ -1,4 +1,4 @@
-# Kırılma, Çatlama (Fracture) Analizi, FEM
+# Çatlama, Kırılma (Fracture) Analizi, FEM
 
 Üç boyutta birbirine bağlı kirişlerin dinamiği [1] notları dersler
 5-11'de incelendi. Özelde uzay çatıları / çerçeveleri (space frame)
@@ -72,5 +72,3 @@ Kaynaklar
 [3] Schlangen, Garboczi, <a href="https://www.sciencedirect.com/science/article/abs/pii/S0013794497000106">Fracture simulations of concrete using lattice models: Computational aspects</a>
 
 [4] <a href="../../2024/01/beam_lattice_superposition_cg_sparse.html">Üstdüşümlü Matris Sistemini Çözmek</a>
-
-
