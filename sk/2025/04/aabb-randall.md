@@ -64,7 +64,7 @@ below add in z following the same pattern as for x and y. Hopefully
 that is clear in the sample code but if you have any questions you can
 always reach out on Twitter.
 
-What are AABBs?
+### What are AABBs?
 
 AABBs are simpler than they sound – they are essentially boxes who’s
 axes (so x,y for 2d and x,y,z for 3d) align / run in the same
@@ -111,7 +111,7 @@ encompasses the complex shape as shown in the diagram below:
 
 Obviously testing the AABBs for an intersection will not result in pixel perfect collision detection but remember the primary goal of using AABBs is in the broad range part of the process. Having quickly and cheaply determined that the two AABBs in the diagram above do not intersect we can save ourselves the computational expense of trying to figure out if two complex shapes intersect.
 
-The AABB Tree
+### The AABB Tree
 
 Using the above approach you can see how we can quickly and easily
 test for collisions between two objects in your world space however
@@ -133,20 +133,20 @@ terminology from this Wikipedia article.
 In the case of the AABB tree presented here the root, branch and
 leaves have some very specific properties:
 
-Branch – Our branches always have exactly two children (known as left
-and right) and are assigned an AABB that is large enough to contain
-all of it’s descendants.
-
-Leaf – Our leaves are associated with a game world object and through
-that have an AABB. A leaf’s AABB must fit entirely within it’s parents
-AABB and due to how our branches are defined that means it fits in
-every ancestors AABB.
-
-Root – Our root may be a branch or a leaf
+- Branch – Our branches always have exactly two children (known as left
+  and right) and are assigned an AABB that is large enough to contain
+  all of it’s descendants.
+  
+- Leaf – Our leaves are associated with a game world object and through
+  that have an AABB. A leaf’s AABB must fit entirely within it’s parents
+  AABB and due to how our branches are defined that means it fits in
+  every ancestors AABB.
+  
+- Root – Our root may be a branch or a leaf
 
 The best way to illustrate how this works is through a worked example.
 
-Constructing an AABB Tree
+### Constructing an AABB Tree
 
 Imagine we have an empty world, and so at this point our tree is
 empty, to which we are adding our first object. As our tree is
@@ -172,7 +172,8 @@ have it intersect with an existing object:
 
 ![](https://web.archive.org/web/20170821173618im_/http://www.azurefromthetrenches.com/wp-content/uploads/2017/01/treeaabb3.png)
 
-Again when we added this object some interesting things happened to our tree:
+Again when we added this object some interesting things happened to
+our tree:
 
 1. We created a new branch node (b) and assigned it an AABB that encompassed objects (1) and (3).
 1. We created a new leaf node for object (3) and assigned it to branch (b).
@@ -201,7 +202,7 @@ cheaper the subsequent queries.
 
 A common heuristic used here is to assign a cost to the surface area of the left and right nodes having been adjusted for the addition of the new leaf’s AABB and descend in the direction of the cheapest node until you find yourself on a leaf.
 
-Querying the AABB Tree
+### Querying the AABB Tree
 
 This is where all of our hard work pays off – it’s very simple and very fast. If we want to find all the possible collisions for a given AABB object all we need to do, starting at the root of the tree, is:
 
@@ -223,7 +224,7 @@ In implementation it’s best not to actually use a recursive approach as this c
 Understanding how to iterate over trees none-recursively can be very
 useful.
 
-Updating the AABB Tree
+### Updating the AABB Tree
 
 In most (but not all) scenarios involving collision detection at least
 some of the objects in the world are moving. As the objects move that
@@ -253,17 +254,17 @@ evenly child nodes divide the parent nodes AABB. That’s slightly
 beyond the scope of a beginners guide and I’ve not yet implemented it
 myself in the sample code – however I may return to it at some point.
 
-Sample Code
+### Sample Code
 
 Finally their is sample code that goes along with this blog post and
 you can find it in my game engine. It’s pretty decoupled from the
 engine itself and you should be able to use it in your own code
 without too many problems. The key files are:
 
-[AABB.h](AABB.h)
-[AABBTree.h](AABBTree.h)
-[AABBTree.cpp](AABBTree.cpp)
-[IAABB.h](IAABB.h)
+- [AABB.h](AABB.h)
+- [AABBTree.h](AABBTree.h)
+- [AABBTree.cpp](AABBTree.cpp)
+- [IAABB.h](IAABB.h)
 
 To use the tree you will need to add those four files to your project
 and construct an instance of the AABBTree class – it’s constructor is
