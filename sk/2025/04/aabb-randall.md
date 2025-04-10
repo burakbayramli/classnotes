@@ -261,10 +261,10 @@ you can find it in my game engine. It’s pretty decoupled from the
 engine itself and you should be able to use it in your own code
 without too many problems. The key files are:
 
-- [AABB.h](AABB.h)
-- [AABBTree.h](AABBTree.h)
-- [AABBTree.cpp](AABBTree.cpp)
-- [IAABB.h](IAABB.h)
+- [AABB.h](randall/AABB.h)
+- [AABBTree.h](randall/AABBTree.h)
+- [AABBTree.cpp](randall/AABBTree.cpp)
+- [IAABB.h](randall/IAABB.h)
 
 To use the tree you will need to add those four files to your project
 and construct an instance of the AABBTree class – it’s constructor is
