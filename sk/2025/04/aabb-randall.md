@@ -252,6 +252,7 @@ without too many problems. The key files are:
 - [AABBTree.h](randall/AABBTree.h)
 - [AABBTree.cpp](randall/AABBTree.cpp)
 - [IAABB.h](randall/IAABB.h)
+- [AABB.py](randall/AABB.py) (added by this blog, Python equivalent, conversion done by Google Gemini 2.5)
 
 To use the tree you will need to add those four files to your project
 and construct an instance of the AABBTree class – it’s constructor is
