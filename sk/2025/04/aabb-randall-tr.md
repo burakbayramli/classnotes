@@ -107,9 +107,132 @@ hızlı ve ucuza belirledikten sonra, iki karmaşık şeklin kesişip
 kesişmediğini anlamaya çalışmanın hesaplama maliyetinden kendimizi
 kurtarabiliriz.
 
+### AABB Ağacı
+
+Yukarıdaki yaklaşımı kullanarak, dünya uzayınızdaki iki nesne
+arasındaki çarpışmaları nasıl hızlı ve kolay bir şekilde test
+edebileceğimizi görebilirsiniz, ancak ya 100 nesneniz varsa? Veya
+1000? Bireysel testler ne kadar verimli olursa olsun, 1000 AABB'yi
+birbirleriyle karşılaştırmak maliyetli ve oldukça israflı bir işlem
+olacaktır.
+
+İşte burada AABB ağacı devreye girer. Yapılması gereken AABB kesişim
+testi sayısını en aza indirmek için AABB'lerimizi organize etmemizi ve
+indekslememizi sağlar; bunu da dünyayı, tahmin edin ne kullanarak,
+daha fazla AABB kullanarak dilimleyerek yapar.
+
+Daha önce karşılaşmadıysanız, ağaçlar inanılmaz derecede kullanışlı
+hiyerarşik veri yapılarıdır ve temel kavramın birçok çeşidi vardır
+(eğer bu tür şeyler ilginizi çekiyorsa, konuyla ilgili mükemmel, ancak
+oldukça resmi bir kitap "Introduction to Algorithms" kitabıdır) ve
+devam etmeden önce bu Wikipedia makalesinden yapı ve terminoloji
+hakkında temel bilgi edinmeye değer.
+
+Burada sunulan AABB ağacı durumunda kök, dal ve yaprakların çok özel
+özellikleri vardır:
+
+- Dal (Branch) – Dallarımızın her zaman tam olarak iki çocuğu (sol ve
+  sağ olarak bilinir) vardır ve tüm alt öğelerini (descendants)
+  içerecek kadar büyük bir AABB atanır.
+
+- Yaprak (Leaf) – Yapraklarımız bir oyun dünyası nesnesiyle
+  ilişkilidir ve bu sayede bir AABB'ye sahiptir. Bir yaprağın AABB'si
+  tamamen ebeveyninin AABB'sinin içine sığmalıdır ve dallarımızın
+  nasıl tanımlandığı nedeniyle bu, her ata (ancestor) AABB'sinin içine
+  sığdığı anlamına gelir.
+
+- Kök (Root) – Kökümüz bir dal veya bir yaprak olabilir.
 
 
+Bunun nasıl çalıştığını göstermenin en iyi yolu, adım adım bir örnektir.
 
+### Bir AABB Ağacı Oluşturma
+
+Boş bir dünyamız olduğunu ve dolayısıyla bu noktada ağacımızın boş
+olduğunu hayal edin. Bu dünyaya ilk nesnemizi ekliyoruz. Ağacımız şu
+anda boş olduğundan, yeni nesnemize karşılık gelen ve onun AABB'sini
+paylaşan bir yaprak düğümü oluştururuz ve bu yaprağı kök olarak
+atarız:
+
+![](aabbr5.jpg)
+
+Şimdi dünyamıza ikinci bir nesne ekliyoruz, ilk düğümümüzle kesişmiyor
+ve ağacımızda ilginç bir şey oluyor:
+
+![](aabbr6.jpg)
+
+
+İkinci nesneyi oyun dünyasına eklediğimizde bir dizi şey meydana geldi:
+
+1. Ağacımız için bir dal düğümü oluşturduk ve ona hem nesne (1)'i hem
+de nesne (2)'yi içerecek kadar büyük bir AABB atadık.
+
+1. Nesne (2) için yeni bir yaprak düğümü oluşturduk ve onu yeni dal
+düğümümüze bağladık.
+
+1. Nesne (1) için orijinal yaprak düğümümüzü aldık ve onu yeni dal
+düğümümüze bağladık.
+
+1. Yeni dal düğümünü ağacın kökü yaptık.
+
+Tamam. Oyun dünyasına başka bir nesne ekleyelim ve bu sefer mevcut bir
+nesneyle kesişsin:
+
+![](aabbr7.jpg)
+
+Yine bu nesneyi eklediğimizde ağacımızda bazı ilginç şeyler oldu:
+
+1. Yeni bir dal düğümü (b) oluşturduk ve ona nesne (1) ve (3)'ü kapsayan
+bir AABB atadık.
+
+1. Nesne (3) için yeni bir yaprak düğümü oluşturduk ve
+onu dal (b)'ye atadık.
+
+1. Yaprak düğüm (1)'i dal düğüm (b)'nin bir çocuğu olacak şekilde
+taşıdık ve bu yeni dal düğümünü (b) dal düğüm (a)'ya bağladık.
+
+1. Bu ince ama önemli bir nokta: dal düğüm (a)'ya atanan AABB'yi, yeni
+yaprak düğümünü hesaba katacak şekilde ayarladık. Eğer bunu
+yapmasaydık, dal düğüm a'ya atanan AABB artık alt öğelerinin
+AABB'lerini içerecek kadar büyük olmazdı.
+
+Esasen, her yeni oyun dünyası nesnesi eklediğimizde, ağacı daha önce
+tanımladığım dal ve kök düğümleri kuralları hala geçerli olacak
+şekilde manipüle ederiz. Durum böyle olduğuna göre, ağaca yeni bir
+oyun dünyası nesnesi eklemek için genel bir süreci tanımlayabiliriz:
+
+1. Nesne için bir yaprak düğümü oluşturun ve ona ilişkili nesneye dayalı
+bir AABB atayın.
+
+1. Ağaçta, yeni yaprağı kardeş yapmak için en iyi mevcut düğümü
+(yaprak veya dal) bulun.
+
+1. Bulunan düğüm ve yeni yaprak için yeni bir dal düğümü oluşturun ve
+ona her iki düğümü de içeren bir AABB atayın (esas olarak bulunan
+düğümün ve yeni yaprağın AABB'lerini birleştirin).
+
+1. Yeni yaprağı yeni dal düğümüne bağlayın.
+
+1. Mevcut düğümü ağaçtan kaldırın ve yeni dal düğümüne bağlayın.
+
+1. Yeni dal düğümünü, mevcut düğümün önceki ebeveyn düğümünün bir
+çocuğu olarak bağlayın.
+
+1. Ağaçta yukarı doğru geri giderek, tüm atalarımızın AABB'lerini,
+hala tüm alt öğelerinin AABB'lerini içerdiklerinden emin olmak için
+ayarlayın.
+
+Yukarıdaki 2. adım şu soruyu akla getiriyor: Yeni yaprağı kardeş
+yapmak için ağaçtaki en iyi yaprağı nasıl bulursunuz? Esasen bu,
+ağaçta aşağı inip geçtiğiniz her dalın soluna veya sağına bağlanmanın
+olası maliyetini değerlendirmeyi içerir. Ne kadar iyi bir karar
+verirseniz, ağaç o kadar dengeli olur ve sonraki sorgular o kadar ucuz
+olur.
+
+Burada kullanılan yaygın bir sezgisel yöntem (heuristic), yeni
+yaprağın AABB'sinin eklenmesi için ayarlanmış olan sol ve sağ
+düğümlerin yüzey alanına bir maliyet atamak ve kendinizi bir yaprakta
+bulana kadar en ucuz düğüm yönünde inmektir.
 
 
 
