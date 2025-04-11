@@ -120,9 +120,9 @@ need to be made by slicing the world up using, guess what, more AABBs.
 If you’ve not come across them before trees are incredibly useful
 hierarchical data structures and there are many variants on the basic
 concept (if such things interest you an excellent, if quite formal,
-book on the subject is Introduction to Algorithms) and before
+book on the subject is Cormen's Introduction to Algorithms) and before
 continuing it’s worth gaining a basic knowledge of the structure and
-terminology from this Wikipedia article.
+terminology from <a href="https://en.wikipedia.org/wiki/Tree_(abstract_data_type)">this Wikipedia article</a>.
 
 In the case of the AABB tree presented here the root, branch and
 leaves have some very specific properties:

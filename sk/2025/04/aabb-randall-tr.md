@@ -1,6 +1,6 @@
 # AABB Ağaçları ile Çarpışma Saptamasına Giriş
 
-James Randall (içerik [Wayback Machine](https://web.archive.org/web/20170821173618/https://www.azurefromthetrenches.com/introductory-guide-to-aabb-tree-collision-detection/) ile kurtarıldı, tercüme edildi)
+[James Randall](aabb-randall.html) 
 
 Bir [oyun] dünyasına hareket eden obbjeler veya herhangi bir şey
 eklediğiniz anda, çarpışmaları tespit etmeyi düşünmeye başlarsınız ve
@@ -53,8 +53,8 @@ takip ederek z'yi ekleyin. Umarım bu durum örnek kodda açıktır...
 
 ### AABB'ler Nedir?
 
-AABB'ler , göründüklerinden daha basittirler – esasen eksenleri (2D
-için x,y ve 3D için x,y,z) aynı yönde hızalanan ve uzanan
+AABB'ler göründüklerinden daha basittirler – esasen eksenleri (2D için
+x,y ve 3D için x,y,z) aynı yönde hızalanan ve uzanan
 kutulardır. İsimdeki "sınırlayıcı" (bounding) kısmı, çarpışma tespiti
 için veya bir ağacın parçası olarak kullanıldıklarında genellikle
 diğer kutuları içermelerinden veya sınırlamalarından
@@ -103,7 +103,7 @@ Açıkçası, AABB'leri kesişim için test etmek piksel hassasiyetinde
 çarpışma tespitiyle sonuçlanmayacaktır, ancak AABB kullanmanın
 birincil amacının sürecin geniş kapsamlı (broad phase) kısmında
 olduğunu unutmayın. Yukarıdaki diyagramdaki iki AABB'nin kesişmediğini
-hızlı ve ucuza belirledikten sonra, iki karmaşık şeklin kesişip
+hızlı ve ucuzca belirledikten sonra, iki karmaşık şeklin kesişip
 kesişmediğini anlamaya çalışmanın hesaplama maliyetinden kendimizi
 kurtarabiliriz.
 
@@ -118,14 +118,16 @@ olacaktır.
 
 İşte burada AABB ağacı devreye girer. Yapılması gereken AABB kesişim
 testi sayısını en aza indirmek için AABB'lerimizi organize etmemizi ve
-indekslememizi sağlar; bunu da dünyayı, tahmin edin ne kullanarak,
-daha fazla AABB kullanarak dilimleyerek yapar.
+indekslemek; AABB ağacı bunu dünyayı, tahmin edin ne kullanarak, daha
+fazla AABB kullanarak dilimleyerek yapar. Yani AABB ağacı AABB'leri
+indeksler, bunun kodlamasında yardımcı olarak iç yapısında aynı AABB
+kavramını kullanır.
 
 Daha önce karşılaşmadıysanız, ağaçlar inanılmaz derecede kullanışlı
 hiyerarşik veri yapılarıdır ve temel kavramın birçok çeşidi vardır
 (eğer bu tür şeyler ilginizi çekiyorsa, konuyla ilgili mükemmel, ancak
-oldukça resmi bir kitap "Introduction to Algorithms" kitabıdır) ve
-devam etmeden önce bu Wikipedia makalesinden yapı ve terminoloji
+oldukça resmi bir kitap Cormen'in Algoritmaya Giriş -Introduction to
+Algorithms- kitabıdır) ve devam etmeden önce yapı ve terminoloji
 hakkında temel bilgi edinmeye değer.
 
 Burada sunulan AABB ağacı durumunda kök, dal ve yaprakların çok özel
@@ -143,8 +145,8 @@ Burada sunulan AABB ağacı durumunda kök, dal ve yaprakların çok özel
 
 - Kök (Root) – Kökümüz bir dal veya bir yaprak olabilir.
 
-
-Bunun nasıl çalıştığını göstermenin en iyi yolu, adım adım bir örnektir.
+Bunun nasıl çalıştığını göstermenin en iyi yolu, onu adım adım
+gösteren bir örnektir.
 
 ### Bir AABB Ağacı Oluşturma
 
@@ -152,7 +154,7 @@ Boş bir dünyamız olduğunu ve dolayısıyla bu noktada ağacımızın boş
 olduğunu hayal edin. Bu dünyaya ilk nesnemizi ekliyoruz. Ağacımız şu
 anda boş olduğundan, yeni nesnemize karşılık gelen ve onun AABB'sini
 paylaşan bir yaprak düğümü oluştururuz ve bu yaprağı kök olarak
-atarız:
+atıyoruz:
 
 ![](aabbr5.jpg)
 
@@ -236,10 +238,10 @@ bulana kadar en ucuz düğüm yönünde inmektir.
 
 ### AABB Ağacını Sorgulama
 
-İşte tüm ağır çalışmamızın karşılığını aldığımız yer – çok basit ve
-çok hızlı olacak. Belirli bir AABB nesnesi için tüm olası çarpışmaları
-bulmak istiyorsak, ağacın kökünden başlayarak yapmamız gereken tek şey
-şudur:
+İşte tüm ağır çalışmamızın karşılığını aldığımız yer – sorgulama artık
+çok basit ve çok hızlı olacak. Belirli bir AABB nesnesi için tüm olası
+çarpışmaları bulmak istiyorsak, ağacın kökünden başlayarak yapmamız
+gereken tek şey şudur:
 
 1. Mevcut düğümün test nesnesinin AABB'si ile kesişip kesişmediğini
 kontrol edin.
@@ -281,5 +283,60 @@ kullanıyorum)
 
 Ağaçları özyinelemesiz olarak nasıl dolaşacağınızı anlamak çok faydalı
 olabilir.
+
+### AABB Ağacını Güncelleme
+
+Çarpışma tespiti içeren çoğu (ama hepsi değil) senaryoda, dünyadaki
+nesnelerin en azından bir kısmı hareket etmektedir. Nesneler hareket
+ettikçe, bu durum ağacın güncellenmesini gerektirir ve bu, dünya
+nesnesine karşılık gelen yaprağın kaldırılıp yeniden eklenmesiyle
+gerçekleştirilir.
+
+Bu pahalı bir işlem olabilir ve dünya nesnelerinizin hareketini bir
+hız vektörü kullanarak ifade ederseniz ve bunu ağaca eklediğiniz
+AABB'leri "genişletmek" (fatten) için kullanırsanız, bunu yapmanız
+gereken sayıyı en aza indirebilirsiniz. Örneğin, aşağıdaki
+diyagramdaki nesneyi ele alın, (1,0) (x,y) hızına sahiptir ve
+sınırlayıcı AABB'si buna göre genişletilmiştir:
+
+![](aabbr8.jpg)
+
+AABB'leri ne kadar genişleteceğiniz; güncelleme maliyeti,
+öngörülebilirlik ve geniş aralık doğruluğu arasında bir denge
+meselesidir ve en iyi performansı elde etmek için denemeler yapmanız
+gerekebilir.
+
+Son olarak, ağaçlar güncellendikçe dengesiz hale gelmeleri mümkündür;
+bazı sorgular uygunsuz bir şekilde diğerlerinden çok daha fazla
+düğümün dolaşılmasını gerektirebilir. Bunu çözmek için bir teknik, her
+düğümün yüksekliğine (alttan derinlik) dayalı rotasyonlar kullanarak
+ağacı yeniden dengelemektir. Bir diğeri ise, çocuk düğümlerin ebeveyn
+düğümlerinin AABB'sini ne kadar eşit böldüğüne göre ağacı
+dengelemektir. Bu, başlangıç seviyesi bir rehberin kapsamının biraz
+dışındadır ve henüz örnek kodda kendim uygulamadım – ancak bir noktada
+buna geri dönebilirim.
+
+Örnek Kod
+
+Son olarak, bu blog yazısıyla birlikte gelen örnek kod bulunmaktadır
+ve bunu oyun motorumda bulabilirsiniz. Motorun kendisinden oldukça
+bağımsızdır ve çok fazla sorun yaşamadan kendi kodunuzda
+kullanabilmelisiniz. Anahtar dosyalar şunlardır:
+
+- [AABB.h](randall/AABB.h)
+- [AABBTree.h](randall/AABBTree.h)
+- [AABBTree.cpp](randall/AABBTree.cpp)
+- [IAABB.h](randall/IAABB.h)
+- [AABB.py](randall/AABB.py) (biz ekledik, Python tercümesi, Google Gemini 2.5 ile yapıldı)
+
+Ağacı kullanmak için üstteki dört C++ dosyasını projenize eklemeniz ve
+AABBTree sınıfının bir örneğini oluşturmanız gerekecektir – yapıcısı
+(constructor) çok basittir ve başlangıç boyutunu (önceden ayrılacak
+ağaç düğümü sayısı) alır. Ağaca eklemek istediğiniz herhangi bir
+nesnenin, istendiğinde AABB yapısını döndürmesi gereken IAABB
+arayüzünü (interface) uygulaması gerekir. Bu nesneleri sırasıyla
+insertObject, updateObject ve removeObject yöntemleriyle ekleyebilir,
+güncelleyebilir ve kaldırabilirsiniz ve queryOverlaps yöntemiyle
+çakışmaları sorgulayabilirsiniz.
 
 
