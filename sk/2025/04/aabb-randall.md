@@ -194,18 +194,26 @@ attaching to the left or right of each branch you move through. The
 better the decision you can make the more balanced the tree and the
 cheaper the subsequent queries.
 
-A common heuristic used here is to assign a cost to the surface area of the left and right nodes having been adjusted for the addition of the new leaf’s AABB and descend in the direction of the cheapest node until you find yourself on a leaf.
+A common heuristic used here is to assign a cost to the surface area
+of the left and right nodes having been adjusted for the addition of
+the new leaf’s AABB and descend in the direction of the cheapest node
+until you find yourself on a leaf.
 
 ### Querying the AABB Tree
 
-This is where all of our hard work pays off – it’s very simple and very fast. If we want to find all the possible collisions for a given AABB object all we need to do, starting at the root of the tree, is:
+This is where all of our hard work pays off – it’s very simple and
+very fast. If we want to find all the possible collisions for a given
+AABB object all we need to do, starting at the root of the tree, is:
 
 1. Check to see if the current node intersects with the test objects AABB.
 1. If it does and if its a leaf node then this is a collision and so add it to the list of collisions.
 1. If it does and it’s a branch node then descend to the left and right and recursively repeat this process.
 1. At the end of the above your list will contain all the possible collisions for your test object and we will have minimised the number of AABB intersection checks we had to perform as we will not have descended down any pathways (and therefore all the subsequent children) that could not intersect with the test AABB tree.
 
-In implementation it’s best not to actually use a recursive approach as this can get expensive (and could fail) on large trees. Instead just maintain a stack / list of nodes that are to be further explored  as follows:
+In implementation it’s best not to actually use a recursive approach
+as this can get expensive (and could fail) on large trees. Instead
+just maintain a stack / list of nodes that are to be further explored
+as follows:
 
 1. Push the root node onto a stack (in C++ I use std::stack)
 1. While the stack is not empty:

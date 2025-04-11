@@ -234,8 +234,52 @@ yaprağın AABB'sinin eklenmesi için ayarlanmış olan sol ve sağ
 düğümlerin yüzey alanına bir maliyet atamak ve kendinizi bir yaprakta
 bulana kadar en ucuz düğüm yönünde inmektir.
 
+### AABB Ağacını Sorgulama
 
+İşte tüm ağır çalışmamızın karşılığını aldığımız yer – çok basit ve
+çok hızlı olacak. Belirli bir AABB nesnesi için tüm olası çarpışmaları
+bulmak istiyorsak, ağacın kökünden başlayarak yapmamız gereken tek şey
+şudur:
 
+1. Mevcut düğümün test nesnesinin AABB'si ile kesişip kesişmediğini
+kontrol edin.
 
+1. Eğer kesişiyorsa ve bir yaprak düğümse, bu bir çarpışmadır ve bu
+yüzden onu çarpışma listesine ekleyin.
+
+1. Eğer kesişiyorsa ve bir dal düğümse, o zaman sola ve sağa inin ve
+bu işlemi özyinelemeli (recursive) olarak tekrarlayın.
+
+1. Yukarıdakilerin sonunda listeniz, test nesneniz için tüm olası
+çarpışmaları içerecektir ve test AABB ağacıyla kesişemeyecek hiçbir
+yola (ve dolayısıyla sonraki tüm çocuklara) inmediğimiz için yapmamız
+gereken AABB kesişim kontrolü sayısını en aza indirmiş olacağız.
+
+Uygulamada, büyük ağaçlarda maliyetli olabileceği (ve başarısız
+olabileceği) için aslında özyinelemeli bir yaklaşım kullanmamak en
+iyisidir. Bunun yerine, aşağıdaki gibi daha fazla araştırılacak
+düğümlerin bir yığınını / listesini tutun:
+
+1. Kök düğümü bir yığına (stack) itin (C++'da `std::stack`
+kullanıyorum)
+
+1. Yığın boş olmadığı sürece:
+
+   	 1. Yığından bir düğüm çıkarın (pop).
+	 
+	 1. Düğümün test AABB nesnesiyle kesişip kesişmediğini kontrol
+	 edin.
+	 
+	 1. Eğer kesişiyorsa, ya:
+	 
+	    1. Eğer bir yaprak düğümse, bu bir çarpışma
+	    eşleşmesidir. Yaprak düğümü (veya referans verdiği
+	    nesneyi) çarpışma listesine ekleyin.
+	    
+	    1. Eğer bir dal düğümse, çocukları (sol ve sağ düğümleri)
+	    yığına itin (push).
+
+Ağaçları özyinelemesiz olarak nasıl dolaşacağınızı anlamak çok faydalı
+olabilir.
 
 
