@@ -77,7 +77,9 @@ AABBs intersect. Consider the two AABBs in the diagram below:
 
 ![](aabbr3.jpg)
 
-In this diagram we have two AABBs defined by a pair of points and the result of the following expression can determine whether or not they intersect:
+In this diagram we have two AABBs defined by a pair of points and the
+result of the following expression can determine whether or not they
+intersect:
 
 ```
 maxx1 > minx2 && minx1 < maxx2 && maxy1 > miny1 && miny1 < maxy2
@@ -96,7 +98,12 @@ encompasses the complex shape as shown in the diagram below:
 
 ![](aabbr4.jpg)
 
-Obviously testing the AABBs for an intersection will not result in pixel perfect collision detection but remember the primary goal of using AABBs is in the broad range part of the process. Having quickly and cheaply determined that the two AABBs in the diagram above do not intersect we can save ourselves the computational expense of trying to figure out if two complex shapes intersect.
+Obviously testing the AABBs for an intersection will not result in
+pixel perfect collision detection but remember the primary goal of
+using AABBs is in the broad range part of the process. Having quickly
+and cheaply determined that the two AABBs in the diagram above do not
+intersect we can save ourselves the computational expense of trying to
+figure out if two complex shapes intersect.
 
 ### The AABB Tree
 
