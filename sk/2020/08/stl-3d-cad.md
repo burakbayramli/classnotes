@@ -281,7 +281,7 @@ Kaynaklar
 
 [2] <a href="https://pythonhosted.org/numpy-stl/">Numpy STL</a>
 
-[3] <a href="http://www.sgh1.net/posts/read-stl-file.html">C++ ile STL Dosyasi Okumak</a>
+[3] <a href="http://www.sgh1.net/posts/read-stl-file.html">C++ ile STL Dosyası Okumak</a>
 
 [4] <a href="http://www.cs.cornell.edu/courses/cs4620/2014fa/lectures/02trimesh1.pdf">Cornell, Triangle meshes I, PDF</a>
 
@@ -290,3 +290,5 @@ Kaynaklar
 [6] <a href="https://burakbayramli.github.io/dersblog/phy/phy_072_rot/dondurme__rotation_.html">Döndürme (Rotation)</a>
 
 [7] <a href="https://www.viewstl.com/plugin/">STL Viewer</a>
+
+
