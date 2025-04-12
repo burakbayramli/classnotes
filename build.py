@@ -223,3 +223,6 @@ if __name__ == "__main__":
         
     if sys.argv[1] == 'clean': 
         clean(to)
+        
+    if sys.argv[1] == 'zip':
+        os.system("zip /opt/Downloads/dotbkps/classnotes.zip -r /home/burak/Documents/classnotes/.git/")
