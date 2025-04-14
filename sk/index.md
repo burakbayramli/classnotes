@@ -3,6 +3,8 @@
 
 ## En Son
 
+14/4 - [Kosinüsler Kanunu (Law of Cosines)](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_50_trig/trigonometri.html)
+
 7/4 - [Çatlama, Kırılma (Fracture) Analizi, FEM](https://burakbayramli.github.io/dersblog/sk/2025/03/catlama_fracture_analysis_fem.html)
 
 28/3 - [Euler-Lagrange Formülasyonu - Ekler](https://burakbayramli.github.io/dersblog/phy/phy_050_cont2/lagrange_bicimi__formalism_.html)
@@ -10,8 +12,6 @@
 17/3 - [Modern Bilim Öncesi Astronomi - Ekler - Dünya, Ay Uzaklığı](https://burakbayramli.github.io/dersblog/phy/phy_077_anc/modern_bilim_oncesi_astronomi_gezegenler_yorungeler.html)
 
 27/2 - [Materyel Mekaniği 11 - Üç Boyutta Kiriş Yapıları](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_11/materyel_mekanigi__11.html)
-
-17/2 - [Materyel Mekaniği 10 - Izgara (Grid) Denklemleri](https://burakbayramli.github.io/dersblog/phy/phy_020_strs_10/materyel_mekanigi__10.html)
 
 ## Konular, Referans
 
