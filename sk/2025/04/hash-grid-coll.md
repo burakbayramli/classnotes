@@ -472,19 +472,12 @@ yanlis negatif 114
 
 Kaynaklar
 
-[1] Optimized Spatial Hashing for Collision Detection of Deformable Objects
-    https://matthias-research.github.io/pages/publications/tetraederCollision.pdf
-
-[2] Hari, Locality Sensitive Hashing for Similar Item Search,
-    https://towardsdatascience.com/locality-sensitive-hashing-for-music-search-f2f1940ace23
-
+[1] <a href="https://matthias-research.github.io/pages/publications/tetraederCollision.pdf">Optimized Spatial Hashing for Collision Detection of Deformable Objects</a>
+    
+[2] Hari, <a href="https://towardsdatascience.com/locality-sensitive-hashing-for-music-search-f2f1940ace23">Locality Sensitive Hashing for Similar Item Search</a>,
+    
 [3] Bayramlı, Rasgele İzdüşümü (Random Projection) ile SVD
 
-[4] Slaney, Locality-Sensitive Hashing for Finding Nearest Neighbors,
-    \https://www.slaney.org/malcolm/yahoo/Slaney2008-LSHTutorial.pdf
-
-
-
-
-
+[4] Slaney, <a href="https://www.slaney.org/malcolm/yahoo/Slaney2008-LSHTutorial.pdf">Locality-Sensitive Hashing for Finding Nearest Neighbors</a>
+    
 
