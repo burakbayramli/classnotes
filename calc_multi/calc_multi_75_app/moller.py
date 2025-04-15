@@ -1,3 +1,6 @@
+# Python code for paper "A Fast Triangle-Triangle Intersection Test" by Tomas Möller
+# Converted into Python from its C version by Gemini 2.5
+# https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/code/
 import math
 
 # Configuration Constants

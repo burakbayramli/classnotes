@@ -1,3 +1,5 @@
+// C code for A Fast Triangle-Triangle Intersection Test by Tomas Möller
+// https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/code/
 // g++ moller.c -std=c++11 -o moller.exe
 #include <math.h>
 #include <iostream>
