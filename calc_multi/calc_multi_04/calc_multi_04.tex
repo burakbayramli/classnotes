@@ -378,11 +378,84 @@ de vektörel formda zaten biliyoruz, $\vec{n} \cdot [x,y,z] = d$. Değerleri
 yerine koyarak $(12,21,13) \cdot (x,y,z) = 97 $. Açılmış formda
 $12x + 21y + 13x = 97$.
 
+Çizgi Parçasına Noktanın En Yakın Mesafesi
 
+Elimizde verili iki nokta arasında tanımlı çizgi parçası var. Herhangi bir
+noktanın bu parçaya en yakın mesafesi nedir? Ayrıca o noktadan parçaya bir düz
+çizgi çekilse kesişimin olduğu nokta nerededir?
 
+Şu metota bakalım [5]. Çizgiyi $\vec{z} = \vec{a} + t \vec{b}$ olarak
+tanımlayabiliriz. O zaman bu çizgi ile bir diğer nokta $\vec{x}$ arasındaki
+mesafe $\vec{x}-\vec{z}$ vektörünün uzunluğudur, yani
 
+$$
+|| \vec{x} - (\vec{a} + t' \vec{b}) ||
+$$
 
+olarak tanımlanabilir, ki burada $t'$ özel bir $t$ değeri oluyor. Bu değer öyle
+bir $t$ değeri ki o noktaya kadar gelen $\vec{z}$'nin bolumu $\vec{x}$'e dik. Bu
+noktayı ve ardından çizgiye olan (dik) mesafeyi nasıl buluruz?
 
+Şimdi üstteki çizgi formülünde kesişim anına kadar olan bölümdeki, $t'$'ye
+tekabül eden kısma $\vec{r}$ diyelim, ve onu
+
+$$
+\vec{r} = \vec{a} + t' \vec{b}
+$$
+
+olarak gösterelim. İstediğimiz $||\vec{r}-\vec{x}||$ uzunluğunu bulmak. $t'$
+değerinde aradaki vektör $\vec{b}$'ye dik olduğuna göre
+
+$$
+(\vec{x} - \vec{r}) \cdot \vec{b} = 0
+$$
+
+$\vec{r}$ formülünü açalım,
+
+$$
+= (\vec{x} - \vec{a} - t' \vec{b}) \cdot \vec{b} = 0
+$$
+
+$$
+= \vec{x}\cdot\vec{b} - \vec{a}\cdot\vec{b} - t'||b||^2 = 0
+$$
+
+$$
+t' = \frac{\vec{x}\cdot\vec{b} - \vec{a}\cdot\vec{b}}{||b||^2}
+$$
+
+Örnek
+
+$< 2,2 >$ ve $< 5,5 >$ noktaları noktalarından geçen çizgiye $< 4,1 >$ noktasının
+uzaklığı nedir? Kesişim nerede olur?
+
+\begin{minted}[fontsize=\footnotesize]{python}
+def dist(x1,y1,x2,y2,px,py):
+    a = np.array([[x1,y1]]).T
+    b = np.array([[x2,y2]]).T
+    x = np.array([[px,py]]).T
+    tp = (np.dot(x.T, b) - np.dot(a.T, b)) / np.dot(b.T, b)
+    tp = tp[0][0]
+    tmp = x - (a + tp*b)
+    d = np.sqrt(np.dot(tmp.T,tmp)[0][0])
+    return d, a+tp*b
+
+x1,y1=2.,2.
+x2,y2=5.,5.
+px,py=4.,1.
+
+d, inters = dist(x1,y1, x2,y2, px,py)
+print (d)
+print (inters)
+\end{minted}
+
+\begin{verbatim}
+2.1213203435596424
+[[2.5]
+ [2.5]]
+\end{verbatim}
+
+Not: Üstteki metot 2, 3 üzeri boyutlar için de işleyecektir. 
 
 \end{document}
 
