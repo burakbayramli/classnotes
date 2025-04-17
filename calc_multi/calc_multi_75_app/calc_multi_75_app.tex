@@ -2,6 +2,107 @@
 \begin{document}
 Green'in Teorisi, Düzlem Kesişmeleri, Eğriler
 
+İki 3D Üçgenin Kesişme Kontrolü
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import mpl_toolkits.mplot3d as a3
+import matplotlib.colors as colors
+import pylab as pl
+import numpy as np
+
+def plot_tri3d(corners, axx):
+   tri = a3.art3d.Poly3DCollection([corners])   
+   tri.set_edgecolor('k')
+   tri.set_color('red')
+   tri.set_alpha(0.2)
+   axx.add_collection3d(tri)
+   axx.view_init(elev=20, azim=250)
+   axx.set_xlim(-5,8)
+   axx.set_ylim(-5,8)
+   axx.set_zlim(-5,8)   
+
+vtx1 = np.array([[0,5,0],[8,0,0 ],[0,0,0]])
+
+vtx2 = np.array([[6,8,3],[6,8,-2],[6,-4,-2]])
+
+ax = a3.Axes3D(pl.figure())
+plot_tri3d(vtx1,ax)
+plot_tri3d(vtx2,ax)
+plt.savefig('calc_multi_75_app_12.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{calc_multi_75_app_12.jpg}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ax = a3.Axes3D(pl.figure())
+vtx3 = vtx2 + 3
+plot_tri3d(vtx1,ax)
+plot_tri3d(vtx3,ax)
+plt.savefig('calc_multi_75_app_13.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{calc_multi_75_app_13.jpg}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# ikinci ucgen ile duzlem yarat
+n2 = np.cross( vtx2[1,:]-vtx2[0,:], vtx2[2,:]-vtx2[0,:]  )
+d2 = -np.dot(n2,vtx2[0,:])
+print (n2,d2)
+\end{minted}
+
+\begin{verbatim}
+[-60   0   0] 360
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+for i in range(3):
+    sdi = np.dot(n2,vtx1[i,:])+d2
+    print ('%d. noktaya uzaklik = %d' % (i,sdi))
+\end{minted}
+
+\begin{verbatim}
+0. noktaya uzaklik = 360
+1. noktaya uzaklik = -120
+2. noktaya uzaklik = 360
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+# ucuncu ucgen ile duzlem yarat
+n3 = np.cross( vtx3[1,:]-vtx3[0,:], vtx3[2,:]-vtx3[0,:]  )
+d3 = -np.dot(n3,vtx3[0,:])
+print (n3,d3)
+\end{minted}
+
+\begin{verbatim}
+[-60   0   0] 540
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+for i in range(3):
+    sdi = np.dot(n2,vtx1[i,:])+d3
+    print ('%d. noktaya uzaklik = %d' % (i,sdi))
+\end{minted}
+
+\begin{verbatim}
+0. noktaya uzaklik = 540
+1. noktaya uzaklik = 60
+2. noktaya uzaklik = 540
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+[devam edecek]
+
 Çizgi Düzlem Kesişmesini Vektörler ile Hesaplamak
 
 Üstteki yöntem cebirsel manipülasyon gerektiriyor, fakat sayısal hesap için
