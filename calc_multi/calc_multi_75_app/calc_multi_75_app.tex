@@ -2,7 +2,7 @@
 \begin{document}
 Green'in Teorisi, Düzlem Kesişmeleri, Eğriler
 
-İki 3D Üçgenin Kesişme Kontrolü
+Çizgi Parçası ve bir 3D Üçgenin Kesişmesi
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import mpl_toolkits.mplot3d as a3
@@ -19,8 +19,71 @@ def plot_tri3d(corners, axx):
    axx.view_init(elev=20, azim=250)
    axx.set_xlim(-5,8)
    axx.set_ylim(-5,8)
-   axx.set_zlim(-5,8)   
+   axx.set_zlim(-5,8)
 
+def plot_line(p0,p1,axx):
+   x0,y0,z0 = p0[0],p0[1],p0[2]
+   x1,y1,z1 = p1[0],p1[1],p1[2]
+   axx.plot([x0,x1],[y0,y1],[z0,z1])
+   
+vtx1 = np.array([[0,5,0],[8,4,0 ],[0,0,0]])
+
+ax = a3.Axes3D(pl.figure())
+plot_tri3d(vtx1,ax)
+s = np.array([2,3,-2])
+t = np.array([5,3,2])
+plot_line(s,t,ax)
+plt.savefig('calc_multi_75_app_14.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{calc_multi_75_app_14.jpg}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+r = t - s
+d1 = vtx1[1,:]-vtx1[0,:]
+d2 = vtx1[2,:]-vtx1[0,:]
+A = np.zeros((3,3))
+A[:,0] = -r
+A[:,1] = d1
+A[:,2] = d2
+print (A)
+res = np.dot(lin.inv(A),(s-vtx1[0,:]))
+lam,mu1,mu2 = list(res)
+\end{minted}
+
+\begin{verbatim}
+[[-3.  8.  0.]
+ [ 0. -1. -5.]
+ [-4.  0.  0.]]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+print (mu1,mu2,mu1+mu2)
+xintersect = s + lam * (t-s)
+print (xintersect)
+\end{minted}
+
+\begin{verbatim}
+0.4375 0.3125 0.75
+[3.5 3.  0. ]
+\end{verbatim}
+
+\begin{minted}[fontsize=\footnotesize]{python}
+ax = a3.Axes3D(pl.figure())
+plot_tri3d(vtx1,ax)
+s = np.array([2,3,-2])
+t = np.array([5,3,2])
+plot_line(s,t,ax)
+ax.plot(xintersect[0],xintersect[1],xintersect[2],'rd')
+plt.savefig('calc_multi_75_app_15.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{calc_multi_75_app_15.jpg}
+
+İki 3D Üçgenin Kesişme Kontrolü
+
+\begin{minted}[fontsize=\footnotesize]{python}
 vtx1 = np.array([[0,5,0],[8,0,0 ],[0,0,0]])
 
 vtx2 = np.array([[6,8,3],[6,8,-2],[6,-4,-2]])
@@ -639,6 +702,8 @@ Kaynaklar
     \url{https://cseweb.ucsd.edu/classes/wi19/cse169-a/slides/}
 
 [8] Bayramlı, {\em Cok Degiskenli Calculus - Ders 4}
+
+[9] Bergen, {\em Collision Detection}
     
 \end{document}
 
