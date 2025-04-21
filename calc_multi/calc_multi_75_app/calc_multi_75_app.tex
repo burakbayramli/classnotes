@@ -10,6 +10,7 @@ herhangi bir $x$ noktası [9, sf. 84]
 
 $$
 x = s + \lambda (t-s) \quad 0 \le \lambda \le 1
+\mlabel{1}
 $$
 
 ile temsil edilebilir, ki $x,s,t$ üç boyutlu vektörler olmak üzere, yani
@@ -31,8 +32,71 @@ $mu_0 = 1-\mu_1-\mu_2$, üstteki formülü tekrar düzenleyince,
 
 $$
 x = p_0 + \mu_1 (p_1 - p_0) + \mu_2 (p_2 - p_0)
+\mlabel{2}
 $$
 
+Böylece, (1),(2) ile, bizi çizgi parçası biri üçgen sathi ile ilgili iki
+formül elde ettik. Kesişme noktası bu iki formülün $x$'leri aynı olduğu
+yerdedir değil mi? $r=t-s$, $d_1=p_1-p_0$, $d_2 = p_2-p_0$ diyelim,
+ve (1) ile (2)'yi $x$ üzerinden birbirine eşitleyelim,
+
+$$
+s + r\lambda = p_0 + \mu_1 d_1 + \mu_2 d_2
+$$
+
+formülü bulunabilir. Üstteki formülü matris notasyonunda tekrar düzenlemek
+mümkündür,
+
+$$
+[\begin{array}{ccc} -r & d_1 & d_2 \end{array}]
+\left[\begin{array}{ccc}
+\lambda \\ \mu_1 \\ \mu_2 
+\end{array}\right] = s - p_0
+$$
+
+Dikkat, $-r,d_1,d_2$ vektör oluşturmuş gibi gözüküyor ama böyle değil, bu
+değişkenlerin her birinin kendisi vektör, onların değerlerinin asağı doğru
+açılmış hali solda bir matris yaratıyor, o matrise $A$ diyelim, yani
+
+$$
+\left[\begin{array}{ccc}
+\uparrow & \uparrow & \uparrow  \\
+ -r & d_1 & d_2 \\
+\downarrow & \downarrow & \downarrow 
+\end{array}\right]
+\left[\begin{array}{ccc}
+\lambda \\ \mu_1 \\ \mu_2 
+\end{array}\right] = s - p_0
+$$
+
+$$
+A
+\left[\begin{array}{ccc}
+\lambda \\ \mu_1 \\ \mu_2 
+\end{array}\right] = s - p_0
+$$
+
+$$
+\left[\begin{array}{ccc}
+\lambda \\ \mu_1 \\ \mu_2 
+\end{array}\right] = A^{-1} (s - p_0)
+$$
+
+Yani $A$'nin tersini alıp eşitliğin sağ tarafını soldan çarpınca kesişme
+noktasındaki $\lambda,\mu_1,\mu_2$ elde ediliyor. Bu değerleri kullanarak
+kesişme noktasının kordinat yerini artık bulabiliriz, mesela çizgi parçası
+formülünden yola çıkarsak $x = s + \lambda (t-s)$ formülüne bulunan $\lambda$
+değerini sokunca, ki $t,s$ zaten biliniyor, kesişim noktası $x$ elde edilebilir.
+
+Önemli bir nokta eğer kesişme {\em yoksa} üstteki çözümün ne vereceği. Bu
+durumda $A$ matrisi özgün olur, yani tersi alınamaz. Bu durumda eğer bir lineer
+cebir paketi kullanıyorsak bir hata mesajı alırız. Tabii özgünlüğün basit bir
+kontrol yöntemi var, $A$'nin determinantini alırız, eğer sıfır ise matris
+özgündür, çözüm / kesişme yoktur.
+
+Örnek
+
+Gerekli grafik rutinleri,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import mpl_toolkits.mplot3d as a3
@@ -56,6 +120,8 @@ def plot_line(p0,p1,axx):
    
 \end{minted}
 
+Bir çizgi parçası ve bir üçgen yaratalım,
+
 \begin{minted}[fontsize=\footnotesize]{python}
 vtx1 = np.array([[0,5,0],[8,4,0 ],[0,0,0]])
 
@@ -67,8 +133,9 @@ plot_line(s,t,ax)
 plt.savefig('calc_multi_75_app_14.jpg')
 \end{minted}
 
-
 \includegraphics[width=20em]{calc_multi_75_app_14.jpg}
+
+Kesişmeyi bulmak için,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import numpy.linalg as lin
@@ -80,7 +147,7 @@ A[:,0] = -r
 A[:,1] = d1
 A[:,2] = d2
 print ('A',A)
-print ('A determinant', lin.det(A))
+print (u'A determinantı', lin.det(A))
 res = np.dot(lin.inv(A),(s-vtx1[0,:]))
 lam,mu1,mu2 = list(res)
 \end{minted}
@@ -89,18 +156,18 @@ lam,mu1,mu2 = list(res)
 A [[-3.  8.  0.]
  [ 0. -1. -5.]
  [-4.  0.  0.]]
-A determinant 159.99999999999994
+A determinantı 159.99999999999994
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
 print (mu1,mu2,mu1+mu2)
 xintersect = s + lam * (t-s)
-print (xintersect)
+print (u'kesişme noktası',xintersect)
 \end{minted}
 
 \begin{verbatim}
 0.4375 0.3125 0.75
-[3.5 3.  0. ]
+kesişme noktası [3.5 3.  0. ]
 \end{verbatim}
 
 \begin{minted}[fontsize=\footnotesize]{python}
@@ -112,6 +179,10 @@ plt.savefig('calc_multi_75_app_15.jpg')
 \end{minted}
 
 \includegraphics[width=20em]{calc_multi_75_app_15.jpg}
+
+Örnek
+
+Kesişmenin olmadığı bir örneğe bakalım,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 ax = a3.Axes3D(pl.figure())
@@ -138,6 +209,7 @@ A determinant 0.0
 
 \includegraphics[width=20em]{calc_multi_75_app_16.jpg}
 
+İki 3D Üçgenin Hızlı Kesişme Kontrolü
 
 
 
@@ -154,7 +226,7 @@ A determinant 0.0
 
 
 
-İki 3D Üçgenin Kesişme Kontrolü
+
 
 \begin{minted}[fontsize=\footnotesize]{python}
 vtx1 = np.array([[0,5,0],[8,0,0 ],[0,0,0]])
