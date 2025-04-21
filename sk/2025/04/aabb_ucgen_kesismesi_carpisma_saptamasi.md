@@ -64,3 +64,14 @@ results
 
 
 
+Kaynaklar
+
+[1] Bayramli, Green'in Teorisi, Düzlem Kesişmeleri, Eğriler,
+    https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_75_app/green_in_teorisi_duzlem_kesismeleri_egriler.html
+
+[2] Randall, AABB Ağaçları ile Çarpışma Saptamasına Giriş,
+    aabb-randall-tr.html
+
+
+
+
