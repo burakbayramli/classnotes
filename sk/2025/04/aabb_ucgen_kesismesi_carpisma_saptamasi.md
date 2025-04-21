@@ -93,6 +93,11 @@ plt.savefig('tetra_01.jpg')
 ![](tetra_01.jpg)
 
 
+![](out.jpg)
+
+
+
+
 [devam edecek]
 
 Kaynaklar
