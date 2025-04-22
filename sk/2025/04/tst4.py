@@ -44,7 +44,9 @@ class Tetrahedron(AABB.IAABB):
         maxs = np.max(self.offset + self.base_tri,axis=0)
         x,y,z,w,h,d = list(mins) + list(maxs)
         return AABB.AABB(x,y,z,w,h,d)
-    
+
+    def get_center(self):
+        return np.mean(self.base_tri + self.offset,axis=0)
 
 if __name__ == "__main__": 
 
