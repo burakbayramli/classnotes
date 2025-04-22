@@ -25,7 +25,7 @@ class Tetrahedron(AABB.IAABB):
         self.triangles.append(tmp + self.offset)
         tmp = np.vstack((self.base_tri[3,:],self.base_tri[0,:],self.base_tri[1,:]))
         self.triangles.append(tmp + self.offset)
-        self.tri_centers = [np.mean(x,axis=1) for x in self.triangles]
+        self.tri_centers = [np.mean(x,axis=0) for x in self.triangles]
 
     def set_offset(self,offset):
         self.offset = offset
@@ -52,10 +52,10 @@ class Tetrahedron(AABB.IAABB):
         c = np.mean(self.base_tri + self.offset,axis=0).reshape(1,3)
         return c
 
-    def find_closest_triangle(self, p):
-        d = cdist(p.get_center(),self.tri_centers,metric='euclid')
-        d = np.argsort(d)
-        return self.triangles[d[0][0]]
+    def find_closest_triangle(self, p, i=0):
+        d = cdist(p.get_center(),self.tri_centers,metric='euclid')[0]
+        d2 = np.argsort(d)
+        return self.triangles[d2[i]]
 
 if __name__ == "__main__": 
 
@@ -71,18 +71,30 @@ if __name__ == "__main__":
     for i in range(15):
         fig = plt.figure()
         ax = a3.Axes3D(fig)
-        ax.view_init(elev=21, azim=i+70)
+        ax.view_init(elev=21, azim=40)
         
-        cts = ts[0].find_closest_triangle(ts[1])
+        cts = ts[0].find_closest_triangle(ts[1],i=0)
         tri = a3.art3d.Poly3DCollection([cts])
         tri.set_edgecolor('k')
         tri.set_color('red')
         ax.add_collection3d(tri)
 
-        cts = ts[1].find_closest_triangle(ts[0])
+        cts = ts[0].find_closest_triangle(ts[1],i=1)
+        tri = a3.art3d.Poly3DCollection([cts])
+        tri.set_edgecolor('k')
+        tri.set_color('green')
+        ax.add_collection3d(tri)
+
+        cts = ts[1].find_closest_triangle(ts[0],i=0)
         tri = a3.art3d.Poly3DCollection([cts])
         tri.set_edgecolor('k')
         tri.set_color('red')
+        ax.add_collection3d(tri)
+        
+        cts = ts[1].find_closest_triangle(ts[0],i=1)
+        tri = a3.art3d.Poly3DCollection([cts])
+        tri.set_edgecolor('k')
+        tri.set_color('green')
         ax.add_collection3d(tri)
         
         ax.set_xlim(-1,2);ax.set_ylim(-1,2); ax.set_zlim(-1,2)
