@@ -64,6 +64,7 @@ if __name__ == "__main__":
             ts[j].plot(ax)
             ts[j].offset = ts[j].offset + dirs[j]*0.1
             tree.update_object(ts[j])
+        for j in range(len(ts)):
             overlaps = tree.query_overlaps(ts[j])
             olsum += len(overlaps)
         ax.text(3, 3, 4, "Overlaps: %d" % olsum)
