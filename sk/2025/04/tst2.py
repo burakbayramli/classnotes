@@ -54,9 +54,11 @@ if __name__ == "__main__":
     for i in range(15):
         fig = plt.figure()
         ax = a3.Axes3D(fig)
-        ax.set_xlim(-1,2);ax.set_ylim(-1,2); ax.set_zlim(-1,2)
+        #ax.view_init(elev=21, azim=i-30)
+        ax.set_xlim(-1,3);ax.set_ylim(-1,3); ax.set_zlim(-1,3)
         for j in range(len(ts)):
             ts[j].plot(ax)
             ts[j].offset = ts[j].offset + dirs[j]*0.1
         plt.savefig('/tmp/tetra/tetra_%02d.jpg' % i)
         plt.close(fig)
+        #break
