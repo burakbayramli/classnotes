@@ -7,6 +7,7 @@ import AABB
 class Tetrahedron(AABB.IAABB):
     def __init__(self,offset):
         self.offset = offset
+	# alttakiler tetrahedron seklini veren bilinen dort nokta
         self.base_tri = np.array([[ 0.2309401,  1.2309401,  0.2309401],
                                   [-0.2309401,  1.2309401, -0.2309401],
                                   [ 0.2309401,  0.7690599, -0.2309401],
