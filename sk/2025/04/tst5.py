@@ -17,6 +17,8 @@ class Tetrahedron(AABB.IAABB):
 
     def init_triangles(self):
         self.triangles = []
+        # dort noktadan dort ucgen cikartiyoruz, base_tri icindeki 1-3 noktalari,
+        # 2,3,4 noktalari, 3,4,1 noktalari ve 4,1,2 noktalarini kullanarak.
         self.triangles.append(self.base_tri[0:3,:] + self.offset)
         self.triangles.append(self.base_tri[1:4,:] + self.offset)
         tmp = np.vstack((self.base_tri[2,:],self.base_tri[3,:],self.base_tri[0,:]))
@@ -33,7 +35,7 @@ class Tetrahedron(AABB.IAABB):
         for x in self.triangles: 
             tri = a3.art3d.Poly3DCollection([x])
             tri.set_edgecolor('k')
-            tri.set_color('red')
+            tri.set_color('blue')
             tri.set_alpha(0.2)
             ax.add_collection3d(tri)
 
@@ -50,9 +52,9 @@ class Tetrahedron(AABB.IAABB):
         c = np.mean(self.base_tri + self.offset,axis=0).reshape(1,3)
         return c
 
-    def find_closest_triangles(self, p):
+    def find_closest_triangle(self, p):
         d = cdist(p.get_center(),self.tri_centers,metric='euclid')
-        return d
+        return self.triangles[np.argmin(d)]
 
 if __name__ == "__main__": 
 
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     for i in range(15):
         fig = plt.figure()
         ax = a3.Axes3D(fig)
-        #ax.view_init(elev=21, azim=i-30)
+        #ax.view_init(elev=21, azim=i+40)
         ax.set_xlim(-1,3);ax.set_ylim(-1,3); ax.set_zlim(-1,3)
         olsum = 0
         for j in range(len(ts)):
@@ -78,7 +80,7 @@ if __name__ == "__main__":
         for j in range(len(ts)):
             overlaps = tree.query_overlaps(ts[j])
             olsum += len(overlaps)
-        d = ts[0].find_closest_triangles(ts[1])
+        d = ts[0].find_closest_triangle(ts[1])
         print (d)
         ax.text(3, 3, 4, "Overlaps: %d" % olsum)
         plt.savefig('/tmp/tetra/tetra_%02d.jpg' % i)
