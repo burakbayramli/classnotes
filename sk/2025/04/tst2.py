@@ -9,7 +9,7 @@ def pairwise(iterable):
     a, b = itertools.tee(iterable)
     return itertools.zip_longest(a, b, fillvalue=next(b, None))
 
-def plot_box(x_min, y_min, z_min, x_max, y_max, z_max, axx):        
+def plot_box_imp(x_min, y_min, z_min, x_max, y_max, z_max, axx):        
     axx.plot3D([x_min, x_max], [y_min, y_min], [z_min, z_min], 'y--')
     axx.plot3D([x_min, x_max], [y_max, y_max], [z_min, z_min], 'y--')
     axx.plot3D([x_min, x_max], [y_min, y_min], [z_max, z_max], 'y--')
@@ -43,7 +43,13 @@ class Triangle(AABB.IAABB):
             xs.append(fr[0]); ys.append(fr[1]); zs.append(fr[2])
             xs.append(to[0]); ys.append(to[1]); zs.append(to[2])        
         axx.plot(xs, ys, zs, 'red')
-    
+
+    def plot_box(self,axx):
+        mins = np.min(self.corners,axis=0)
+        maxs = np.max(self.corners,axis=0)
+        x,y,z,w,h,d = list(mins) + list(maxs)
+        plot_box_imp(x,y,z,w,h,d,axx)
+        
 class PrismTri(AABB.IAABB):
     def __init__(self,offset):
         self.offset = offset
@@ -97,6 +103,7 @@ class PrismTri(AABB.IAABB):
             tri.set_linestyle('dotted')
             tri.set_alpha(0.1)
             ax.add_collection3d(tri)
+            Triangle(x).plot_box(ax)
 
     def __repr__(self):
         return f"PrismTri {self.offset}"
@@ -127,9 +134,10 @@ if __name__ == "__main__":
         fig = plt.figure()
         ax = a3.Axes3D(fig)
         ax.view_init(elev=21, azim=40)
-        #ax.view_init(elev=21, azim=150)
         #ax.view_init(elev=21, azim=90)
+        #ax.view_init(elev=21, azim=150)
         #ax.view_init(elev=21, azim=180)
+        #ax.view_init(elev=21, azim=270)
 
         ax.set_xlim(20,60);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
         olsum = 0
@@ -145,7 +153,7 @@ if __name__ == "__main__":
                 narrow_tree = AABB.AABBTree(initial_size=10)
                 for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
                 for x in ts[j].get_aabb_triangles(): narrow_tree.insert_object(x)
-                for tobj in other.get_aabb_triangles(): 
+                for tobj in ts[j].get_aabb_triangles(): 
                     overlaps_narrow = narrow_tree.query_overlaps(tobj)                    
                     for tt in overlaps_narrow:
                         print ('overlap')
