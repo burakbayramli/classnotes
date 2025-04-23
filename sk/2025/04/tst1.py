@@ -1,12 +1,11 @@
 import sys; sys.path.append("randall")
 import mpl_toolkits.mplot3d as a3, numpy as np
-import matplotlib.colors as colors
+import matplotlib.colors as colors, os
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
 import AABB
 
-def plot_box(x_min, y_min, z_min, x_max, y_max, z_max, axx):
-        
+def plot_box(x_min, y_min, z_min, x_max, y_max, z_max, axx):        
     axx.plot3D([x_min, x_max], [y_min, y_min], [z_min, z_min], 'y--')
     axx.plot3D([x_min, x_max], [y_max, y_max], [z_min, z_min], 'y--')
     axx.plot3D([x_min, x_max], [y_min, y_min], [z_max, z_max], 'y--')
@@ -21,9 +20,8 @@ def plot_box(x_min, y_min, z_min, x_max, y_max, z_max, axx):
     axx.plot3D([x_max, x_max], [y_max, y_max], [z_min, z_max], 'y--')
 
 class Triangle(AABB.IAABB):
-    def __init__(self,corners,marker):
+    def __init__(self,corners):
         self.corners = corners
-        self.marker = marker
 
     def get_aabb(self):
         mins = np.min(self.corners,axis=0)
@@ -35,7 +33,14 @@ class Triangle(AABB.IAABB):
     def __repr__(self):
         #hid = hash(str(self.corners))
         aabb = self.get_aabb()
-        return f"T {self.marker}, {aabb}"
+        return f"T {aabb}"
+
+    def plot(self,axx):
+        #tri = a3.art3d.Poly3DCollection([self.corners])
+        #tri.set_alpha(0.5)
+        #tri.set_color('red')
+        #axx.add_collection3d(tri)
+        for xx in self.corners: axx.plot(xx[0],xx[1],xx[2], 'r.')
     
 class PrismTri(AABB.IAABB):
     def __init__(self,offset):
@@ -43,11 +48,11 @@ class PrismTri(AABB.IAABB):
 	# alttakiler tetrahedron seklini veren bilinen dort nokta
         self.init_triangles()
 
-    def get_aabb_triangles(self,marker):
+    def get_aabb_triangles(self):
         #print ('**************')
         #for t in self.triangles: print (t,Triangle(t,marker).get_aabb())
         #print ('**************')
-        return [Triangle(t,marker) for t in self.triangles]
+        return [Triangle(t) for t in self.triangles]
         
     def init_triangles(self):
         self.triangles = []
@@ -108,10 +113,12 @@ class PrismTri(AABB.IAABB):
         return AABB.AABB(x,y,z,w,h,d)
 
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
 
-    dirs = [[-1,0,0],[2,2,0]]
-    offsets = [[0,0,0],[-10,-10,0]]
+    if not os.path.exists("/tmp/coll"): print ("not")
+
+    dirs = [[-2,0,4],[2,2,0]]
+    offsets = [[0,0,0],[-13,-13,0]]
 
     dirs = np.array(dirs)
     ts = [PrismTri(offset=np.array(o)) for o in offsets]
@@ -123,10 +130,10 @@ if __name__ == "__main__":
         print (i,'------------------')
         fig = plt.figure()
         ax = a3.Axes3D(fig)
-        #ax.view_init(elev=21, azim=40)
+        ax.view_init(elev=21, azim=40)
         #ax.view_init(elev=21, azim=150)
         #ax.view_init(elev=21, azim=90)
-        ax.view_init(elev=21, azim=180)
+        #ax.view_init(elev=21, azim=180)
 
         ax.set_xlim(20,60);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
         olsum = 0
@@ -136,30 +143,32 @@ if __name__ == "__main__":
             tree.update_object(ts[j])
             ts[j].plot(ax)
 
-        for tetra in ts:
-            for tri in tetra.get_aabb_triangles("aa"):
-                aabb = tri.get_aabb()
-                plot_box(aabb.min_x, aabb.min_y, aabb.min_z,
-                         aabb.max_x, aabb.max_y, aabb.max_z, ax)
+#        for tetra in ts:
+#            for tri in tetra.get_aabb_triangles():
+#                aabb = tri.get_aabb()
+#                plot_box(aabb.min_x, aabb.min_y, aabb.min_z,
+#                         aabb.max_x, aabb.max_y, aabb.max_z, ax)
             
         for j in range(len(ts)):
             overlaps = tree.query_overlaps(ts[j])
             for other in overlaps:
                 # test detailed intersection of ts[j] with other
                 narrow_tree = AABB.AABBTree(initial_size=10)
-                for x in other.get_aabb_triangles(marker="other"): narrow_tree.insert_object(x)
-                for x in ts[j].get_aabb_triangles(marker="main"): narrow_tree.insert_object(x)
-                for tobj in other.get_aabb_triangles(marker="other"): 
+                for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
+                for x in ts[j].get_aabb_triangles(): narrow_tree.insert_object(x)
+                for tobj in other.get_aabb_triangles(): 
                     overlaps_narrow = narrow_tree.query_overlaps(tobj)                    
                     #print ('obj',tobj.get_aabb())
                     #print ('obj obj overlaps',overlaps_narrow)
+                    for tt in overlaps_narrow:
+                        tt.plot(ax)
                 
             olsum += len(overlaps)
         ax.text(45, 0, 35, "Overlaps: %d" % olsum)
         ax.set_xlabel("x axis")
         ax.set_ylabel("y axis")
         ax.set_zlabel("z axis")
-        plt.savefig('/tmp/tetra/tetra_%02d.jpg' % i)
+        plt.savefig('/tmp/coll/coll_%02d.jpg' % i)
         plt.close(fig)
         plt.clf()
         #break
