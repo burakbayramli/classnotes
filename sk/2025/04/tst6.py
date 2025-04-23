@@ -110,8 +110,8 @@ class PrismTri(AABB.IAABB):
 
 if __name__ == "__main__": 
 
-    dirs = [[1,1,0],[-0.9,0,0]]
-    offsets = [[0,0,0],[10,10,10]]
+    dirs = [[-1,0,0],[2,2,0]]
+    offsets = [[0,0,0],[-10,-10,0]]
 
     dirs = np.array(dirs)
     ts = [PrismTri(offset=np.array(o)) for o in offsets]
@@ -124,13 +124,15 @@ if __name__ == "__main__":
         fig = plt.figure()
         ax = a3.Axes3D(fig)
         #ax.view_init(elev=21, azim=40)
-        ax.view_init(elev=21, azim=100)
+        #ax.view_init(elev=21, azim=150)
+        #ax.view_init(elev=21, azim=90)
+        ax.view_init(elev=21, azim=180)
 
-        ax.set_xlim(25,60);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
+        ax.set_xlim(20,60);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
         olsum = 0
         
         for j in range(len(ts)):
-            ts[j].set_offset(ts[j].offset + dirs[j]*0.1)
+            ts[j].set_offset(ts[j].offset + dirs[j]*0.5)
             tree.update_object(ts[j])
             ts[j].plot(ax)
 
@@ -153,7 +155,10 @@ if __name__ == "__main__":
                     #print ('obj obj overlaps',overlaps_narrow)
                 
             olsum += len(overlaps)
-        ax.text(3, 3, 4, "Overlaps: %d" % olsum)
+        ax.text(45, 0, 35, "Overlaps: %d" % olsum)
+        ax.set_xlabel("x axis")
+        ax.set_ylabel("y axis")
+        ax.set_zlabel("z axis")
         plt.savefig('/tmp/tetra/tetra_%02d.jpg' % i)
         plt.close(fig)
         plt.clf()
