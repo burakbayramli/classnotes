@@ -6,17 +6,18 @@ from scipy.spatial.distance import cdist
 import AABB
 
 class Triangle(AABB.IAABB):
-    def __init__(self,corners):
+    def __init__(self,corners,marker):
         self.corners = corners
-
-    def __repr__(self):
-        return f"Tetrahedron {self.offset}"
+        self.marker = marker
 
     def get_aabb(self):
         mins = np.min(self.corners,axis=0)
         maxs = np.max(self.corners,axis=0)
         x,y,z,w,h,d = list(mins) + list(maxs)
         return AABB.AABB(x,y,z,w,h,d)
+    
+    def __repr__(self):
+        return f"Tetrahedron {self.marker}"
     
 class Tetrahedron(AABB.IAABB):
     def __init__(self,offset):
@@ -28,8 +29,8 @@ class Tetrahedron(AABB.IAABB):
                                   [-0.2309401,  0.7690599,  0.2309401]])
         self.init_triangles()
 
-    def get_aabb_triangles(self):
-        return [Triangle(t) for t in self.triangles]
+    def get_aabb_triangles(self,marker):
+        return [Triangle(t,marker) for t in self.triangles]
         
     def init_triangles(self):
         self.triangles = []
@@ -76,6 +77,7 @@ if __name__ == "__main__":
     for t in ts: tree.insert_object(t)
 
     for i in range(15):
+        print (i,'------------------')
         fig = plt.figure()
         ax = a3.Axes3D(fig)
         ax.view_init(elev=21, azim=40)
@@ -91,8 +93,11 @@ if __name__ == "__main__":
             for other in overlaps:
                 # test detailed intersection of ts[j] with other
                 narrow_tree = AABB.AABBTree(initial_size=10)
-                for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
-                for x in ts[j].get_aabb_triangles(): narrow_tree.insert_object(x)
+                for x in other.get_aabb_triangles(marker="other"): narrow_tree.insert_object(x)
+                for x in ts[j].get_aabb_triangles(marker="main"): narrow_tree.insert_object(x)
+                for tobj in other.get_aabb_triangles(marker="other"): 
+                    overlaps_narrow = narrow_tree.query_overlaps(tobj)
+                    print ('obj obj overlaps',overlaps_narrow)
                 
             olsum += len(overlaps)
         ax.text(3, 3, 4, "Overlaps: %d" % olsum)
