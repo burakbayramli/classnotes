@@ -122,7 +122,7 @@ if __name__ == "__main__":
             for other in overlaps:
                 narrow_tree = AABB.AABBTree(initial_size=10)
                 for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
-                for x in ts[j].get_aabb_triangles(): narrow_tree.insert_object(x)
+                #for x in ts[j].get_aabb_triangles(): narrow_tree.insert_object(x)
                 for tobj in ts[j].get_aabb_triangles(): 
                     overlaps_narrow = narrow_tree.query_overlaps(tobj)                    
                     for tt in overlaps_narrow:
