@@ -37,7 +37,7 @@ class Triangle(AABB.IAABB):
         aabb = self.get_aabb()
         return f"T {self.marker}, {aabb}"
     
-class Tetrahedron(AABB.IAABB):
+class PrismTri(AABB.IAABB):
     def __init__(self,offset):
         self.offset = offset
 	# alttakiler tetrahedron seklini veren bilinen dort nokta
@@ -98,7 +98,7 @@ class Tetrahedron(AABB.IAABB):
             ax.add_collection3d(tri)
 
     def __repr__(self):
-        return f"Tetrahedron {self.offset}"
+        return f"PrismTri {self.offset}"
 
     def get_aabb(self):
         tmp = np.vstack(self.triangles)
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     offsets = [[0,0,0],[10,10,10]]
 
     dirs = np.array(dirs)
-    ts = [Tetrahedron(offset=np.array(o)) for o in offsets]
+    ts = [PrismTri(offset=np.array(o)) for o in offsets]
 
     tree = AABB.AABBTree(initial_size=4)    
     for t in ts: tree.insert_object(t)
