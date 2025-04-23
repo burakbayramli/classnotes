@@ -127,6 +127,8 @@ plt.savefig('prop2.png')
 noktasının ortalamasını aldık, böylece kabaca bir orta noktadan çıkan
 `SCALE` ile ölçeklediğimiz normal yönde bir ok çizebilmiş olduk.
 
+Not: İlginç ve daha basit bazı objeler bu dizinde `shapes` altında bulunabilir.
+
 Özet Verileri
 
 Küre, kare gibi basit objelerin analitik hacim formülü bilinir. Fakat
