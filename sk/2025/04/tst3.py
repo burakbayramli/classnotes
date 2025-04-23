@@ -59,7 +59,8 @@ class PrismTri(AABB.IAABB):
         return [Triangle(t) for t in self.triangles]
         
     def init_triangles(self):        
-        self.triangles = pickle.load(open("prismtri.pkl","rb")) + self.offset
+        #self.triangles = pickle.load(open("prismtri.pkl","rb")) + self.offset
+        self.triangles = pickle.load(open("prismhex.pkl","rb")) + self.offset
         
     def set_offset(self,offset):
         self.offset = offset
