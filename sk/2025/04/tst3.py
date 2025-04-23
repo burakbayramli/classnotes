@@ -91,6 +91,7 @@ if __name__ == "__main__":
                 
         ax.set_xlim(-1,2);ax.set_ylim(-1,2); ax.set_zlim(-1,2)
         olsum = 0
+
         for j in range(len(ts)):
             ts[j].set_offset(ts[j].offset + dirs[j]*0.1)
             tree.update_object(ts[j])
@@ -104,8 +105,8 @@ if __name__ == "__main__":
                 for x in ts[j].get_aabb_triangles(marker="main"): narrow_tree.insert_object(x)
                 for tobj in other.get_aabb_triangles(marker="other"): 
                     overlaps_narrow = narrow_tree.query_overlaps(tobj)                    
-                    print ('obj',tobj.get_aabb())
-                    print ('obj obj overlaps',overlaps_narrow)
+                    #print ('obj',tobj.get_aabb())
+                    #print ('obj obj overlaps',overlaps_narrow)
                 
             olsum += len(overlaps)
         ax.text(3, 3, 4, "Overlaps: %d" % olsum)
