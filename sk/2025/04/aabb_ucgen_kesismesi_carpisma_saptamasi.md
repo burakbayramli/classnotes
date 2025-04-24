@@ -20,7 +20,6 @@ plt.savefig('coll_01.jpg')
 import pickle
 print (u'dış üçgen sayısı =',len(your_mesh.vectors))
 print (your_mesh.vectors.shape)
-pickle.dump(your_mesh.vectors, open('prismhex.pkl', 'wb'))
 ```
 
 ```text

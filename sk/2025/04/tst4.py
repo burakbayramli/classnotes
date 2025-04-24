@@ -1,6 +1,7 @@
 import sys; sys.path.append("randall")
 import mpl_toolkits.mplot3d as a3, numpy as np
 import os, pickle, matplotlib.pyplot as plt
+from stl import mesh
 import AABB, util
 
 class Triangle(AABB.IAABB):
@@ -38,8 +39,9 @@ class STLObj(AABB.IAABB):
     def get_aabb_triangles(self):
         return [Triangle(t) for t in self.triangles]
         
-    def init_triangles(self):        
-        self.triangles = pickle.load(open("prismhex.pkl","rb")) + self.offset
+    def init_triangles(self):
+        m = mesh.Mesh.from_file('../../2020/08/shapes/Prism_hexagon.stl')
+        self.triangles = m.vectors + self.offset
         
     def set_offset(self,offset):
         self.offset = offset
