@@ -300,62 +300,64 @@ class STLObj(AABB.IAABB):
 ```
 
 ```python
-if not os.path.exists("/tmp/coll"): os.mkdir ("/tmp/coll")
 
-offsets = [[20,0,0],[-10,-10,0]] # baslangıç offset değerleri
-dirs = [[-1,-2,-1],[4,2,1] # gidiş yönleri
+def run_animation(offsets, dirs, azim):
+    if not os.path.exists("/tmp/coll"): os.mkdir ("/tmp/coll")
 
-dirs = np.array(dirs)
-sobjs = [STLObj(offset=np.array(o)) for o in offsets]
+    #offsets = [[20,2,0],[-10,-10,0]]
+    #dirs = [[-1,-2,-1],[4,2,1]]
 
-tree = AABB.AABBTree(initial_size=4)    
-for t in sobjs: tree.insert_object(t)
+    dirs = np.array(dirs)
+    sobjs = [STLObj(offset=np.array(o)) for o in offsets]
 
-for i in range(15):
-    fig = plt.figure()
-    ax = a3.Axes3D(fig)
-    ax.view_init(elev=21, azim=40)
+    tree = AABB.AABBTree(initial_size=4)    
+    for t in sobjs: tree.insert_object(t)
 
-    ax.set_xlim(40,80);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
-    olsum = 0
-    
-    for j in range(len(sobjs)):
-        sobjs[j].set_offset(sobjs[j].offset + dirs[j]*0.5)
-        tree.update_object(sobjs[j])
-        sobjs[j].plot(ax)
+    for i in range(15):
+        fig = plt.figure()
+        ax = a3.Axes3D(fig)
+        ax.view_init(elev=21, azim=azim)
 
-    # kesisme olan objeler icin
-    for j in range(len(sobjs)):
-        overlaps = tree.query_overlaps(sobjs[j])
-        for other in overlaps:
-            # A-B kesismesi tahmin edilen her B objesinin ucgenleri icin bir
-            # aabb agaci yarat
-            narrow_tree = AABB.AABBTree(initial_size=10)
-            for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
-            # A objesinin ucgenlerini alip B agacina kesisip kesismedigini sor
-            for a_tri in sobjs[j].get_aabb_triangles(): 
-                overlaps_narrow = narrow_tree.query_overlaps(a_tri) 
-                for b_tri in overlaps_narrow:
-                    # burada a_tri ile b_tri arasinda nihai
-                    # kesisme noktasi bulunabilir
-                    b_tri.plot(ax)
+        ax.set_xlim(40,80);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
+        olsum = 0
+        
+        for j in range(len(sobjs)):
+            sobjs[j].set_offset(sobjs[j].offset + dirs[j]*0.5)
+            tree.update_object(sobjs[j])
+            sobjs[j].plot(ax)
+            sobjs[j].plot_aabb(ax)
+
+        # kesisme olan objeler icin
+        for j in range(len(sobjs)):
+            overlaps = tree.query_overlaps(sobjs[j])
+            for other in overlaps:
+                # A-B kesismesi tahmin edilen her B objesinin ucgenleri icin bir
+                # aabb agaci yarat
+                narrow_tree = AABB.AABBTree(initial_size=10)
+                for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
+                # A objesinin ucgenlerini alip B agacina kesisip kesismedigini sor
+                for a_tri in sobjs[j].get_aabb_triangles(): 
+                    overlaps_narrow = narrow_tree.query_overlaps(a_tri)
+                    for b_tri in overlaps_narrow:
+                        # burada a_tri ile b_tri arasinda nihai
+                        # kesisme noktasi bulunabilir
+                        b_tri.plot(ax)
+                            
                         
-                    
-            
-        olsum += len(overlaps)
-    ax.text(45, 0, 35, "Overlaps: %d" % olsum)
-    ax.set_xlabel("x axis")
-    ax.set_ylabel("y axis")
-    ax.set_zlabel("z axis")
-    plt.savefig('/tmp/coll/coll_%02d.jpg' % i)
-    plt.close(fig)
-    plt.clf()
-    print (u'Animasyon Tamamlandı')
+                
+            olsum += len(overlaps)
+        ax.text(45, 0, 35, "Overlaps: %d" % olsum)
+        ax.set_xlabel("x axis")
+        ax.set_ylabel("y axis")
+        ax.set_zlabel("z axis")
+        plt.savefig('/tmp/coll/coll_%02d.jpg' % i)
+        plt.close(fig)
+        plt.clf()
 ```
 
-```text
-Animasyon Tamamlandı
-````
+```python
+run_animation(offsets = [[20,0,0],[-10,-10,0]],dirs = [[-1,-2,-1],[4,2,1]],azim=40)
+```
 
 Animasyonun her karesi bir JPG olarak yaratıldı, bu resimleri birleştirip bir
 GİF yaratalım,
@@ -385,6 +387,32 @@ yaptığımızı düşünelim, bu 1000 x 1000, yine bir milyondan fazla hesap
 yapmak anlamına gelecektir. Ağaç araması (ve elemesi) ile bu yükten
 kurtulmuş olduk.
 
+Not
+
+```python
+run_animation(offsets = [[20,0,0],[-10,-10,0]],dirs = [[-1,-2,-1],[4,2,1]],azim=220)
+```
+
+```python
+! convert -delay 20 -loop 0 /tmp/coll/*.jpg /tmp/aabb2.gif
+```
+
+İlk animasyondaki genel çarpışma saptamasına farklı açıdan [7] bakınca detayda
+çarpışma olmadığını görüyoruz. Ödev olarak okuyucu bu çarpışmanın olmadığını
+[1]'deki determinant yöntemi ile bulabilir.
+
+```python
+run_animation(offsets = [[20,2,0],[-10,-10,0]],dirs = [[-1,-2,-1],[4,2,1]],azim=220)
+```
+
+```python
+! convert -delay 20 -loop 0 /tmp/coll/*.jpg /tmp/aabb3.gif
+```
+
+Üstteki parametrelerle animasyon objenin gerçekten çarpışma olduğu bir
+örnek gibi duruyor [8], yine aynı determinant testi ve nihai
+çizgi/üçgen kesişme yöntemi burada devreye girebilir.
+
 Kaynaklar
 
 [1] Bayramlı, 
@@ -400,5 +428,11 @@ Kaynaklar
     <a href="../../2000/10/nesnesel-programlama.html">Nesnesel Progralama</a>
 
 [6] Bayramli, 
-    <a href="https://www.dropbox.com/scl/fi/m0x1170yc8duo80c0592k/aabb1.gif?rlkey=08gwsgwiqnk09smpe6bbz2tpi&st=2s2voz8k&raw=1">Animasyon</a>
+    <a href="https://www.dropbox.com/scl/fi/m0x1170yc8duo80c0592k/aabb1.gif?rlkey=08gwsgwiqnk09smpe6bbz2tpi&st=2s2voz8k&raw=1">Animasyon 1</a>
+
+[7] Bayramli, 
+    <a href="">Animasyon 2</a>
+
+[8] Bayramli, 
+    <a href="">Animasyon 3</a>
 
