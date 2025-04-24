@@ -50,8 +50,4 @@ Kaynaklar
 
 [2] <a href="aabb-randall-tr.html">Randall, AABB Ağaçları ile Çarpışma Saptamasına Giriş</a>
 
-[3] <a href="https://www.printables.com/model/568502-basic-geometric-shapes-3d/files">
-      Basic Geometric Shapes, STL
-    </a>
-
 [4] Bayramlı, <a href="../../2020/08/stl-3d-cad.html">3D Baskıya Hazır CAD Tasarım Formatı, STL</a>

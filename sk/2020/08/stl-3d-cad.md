@@ -37,7 +37,9 @@ plt.savefig('prop.png')
 
 ![](prop.png)
 
-Daha detaylı işlemler için dokümana [2] bakılabilir,
+Daha detaylı işlemler için dokümana [2] bakılabilir. Temel, dış üçgen
+sayısı az olan geometrik bazı obje örnekleri için [8]'den indirdiğimiz
+objelerin STL dosyalari `shapes` dizini altinda bulunabilir.
 
 STL Veri Yapısı
 
@@ -293,4 +295,7 @@ Kaynaklar
 
 [7] <a href="https://www.viewstl.com/plugin/">STL Viewer</a>
 
+[8] <a href="https://www.printables.com/model/568502-basic-geometric-shapes-3d/files">
+      Basic Geometric Shapes, STL
+    </a>
 
