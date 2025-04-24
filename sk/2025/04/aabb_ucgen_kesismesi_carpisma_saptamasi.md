@@ -214,10 +214,15 @@ plt.savefig('coll_03.jpg')
 ### Nihai Kod, Animasyon
 
 Şimdi ikinci kalemdeki kodlamaya gelelim, ve tüm fikirleri bir araya
-koyarak içinde objelerin hareket ettiği bir anımasyon
+koyarak içinde objelerin hareket ettiği bir animasyon
 yaratalım. Objeleri hareket ettirmek kolay, her obje için bir yön
-vektörü tanımlarız, ve her objenin `offset` değerine bu yön çarpı bir
-sabit ekleyerek objenin o yöne gitmesini sağlarız.
+vektörü tanımlarız, ve her karede objenin `offset` değerine bu yön
+çarpı bir sabit değerini ekleyerek objenin o yöne gitmesini sağlarız.
+Ayrıca alttaki kodda yüzeyler arası çarpışma adayları gerektiği için
+AABB Ağacının bu parçaları indisleyebilmesi gerekir, bunun için bir
+`Triangle` sınıfı yarattık, her prizma objesinin yüzeyini oluşturan 20
+tane üçgen objesi bu sınıftan yaratılıyor olacak. Bu sınıf aynen ana
+objelerde olduğu gibi `AABB.IAABB` arayüzünen miras alımı yapacak.
 
 ```python
 import sys; sys.path.append("randall")
@@ -352,14 +357,29 @@ for i in range(15):
 Animasyon Tamamlandı
 ````
 
+Animasyonun her karesi bir JPG olarak yaratıldı, bu resimleri birleştirip bir
+GİF yaratalım,
+
 ```python
 ! convert -delay 20 -loop 0 /tmp/coll/*.jpg /tmp/aabb1.gif
 ```
 
+Nihai animasyon [6]'da bulunabilir.
 
+Animasyonda muhtemel çarpışma genel fazda saptanınca görüntünün
+üstündeki çarpışma sayısı arttırılıyor. Bu genel adaylar arasında
+üçgenleri çarpışanlar var ise, bu çarpışması muhtemel üçgenler kırmızı
+ile gösteriliyor.
 
-
-[devam edecek]
+İki obje arasında üçgenler arası çarpışmalar için de ağaç
+kullanmamızın önemini bir daha vurgulamak iyi olur, üstteki basit
+objede 20 tane yüzey üçgeni vardı. Fakat daha çetrefil objelerde,
+mesela [4] yazısında görülen pervane cisminin yüzeyinde 1000'den fazla
+üçgen mevcuttur. Böyle bir objenin benzer bir diğer obje ile
+üçgenlerini birer birer karşılaştırıp detaylı kesişme testi
+yaptığımızı düşünelim, bu 1000 x 1000, yine bir milyondan fazla hesap
+yapmak anlamına gelecektir. Ağaç araması (ve elemesi) ile bu yükten
+kurtulmuş olduk.
 
 Kaynaklar
 
