@@ -1,3 +1,4 @@
+# carpisma yok
 import sys; sys.path.append("randall")
 import mpl_toolkits.mplot3d as a3, numpy as np
 import os, matplotlib.pyplot as plt
@@ -88,9 +89,10 @@ if __name__ == "__main__":
     for i in range(15):
         fig = plt.figure()
         ax = a3.Axes3D(fig)
-        ax.view_init(elev=21, azim=40)
+        #ax.view_init(elev=21, azim=40)
+        ax.view_init(elev=21, azim=220)
 
-        ax.set_xlim(20,60);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
+        ax.set_xlim(40,80);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
         olsum = 0
         
         for j in range(len(sobjs)):
@@ -108,7 +110,7 @@ if __name__ == "__main__":
                 for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
                 # A objesinin ucgenlerini alip B agacina kesisip kesismedigini sor
                 for a_tri in sobjs[j].get_aabb_triangles(): 
-                    overlaps_narrow = narrow_tree.query_overlaps(a_tri) 
+                    overlaps_narrow = narrow_tree.query_overlaps(a_tri)
                     for b_tri in overlaps_narrow:
                         # burada a_tri ile b_tri arasinda nihai
                         # kesisme noktasi bulunabilir
