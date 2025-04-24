@@ -304,9 +304,6 @@ class STLObj(AABB.IAABB):
 def run_animation(offsets, dirs, azim):
     if not os.path.exists("/tmp/coll"): os.mkdir ("/tmp/coll")
 
-    #offsets = [[20,2,0],[-10,-10,0]]
-    #dirs = [[-1,-2,-1],[4,2,1]]
-
     dirs = np.array(dirs)
     sobjs = [STLObj(offset=np.array(o)) for o in offsets]
 
@@ -397,9 +394,10 @@ run_animation(offsets = [[20,0,0],[-10,-10,0]],dirs = [[-1,-2,-1],[4,2,1]],azim=
 ! convert -delay 20 -loop 0 /tmp/coll/*.jpg /tmp/aabb2.gif
 ```
 
-İlk animasyondaki genel çarpışma saptamasına farklı açıdan [7] bakınca detayda
-çarpışma olmadığını görüyoruz. Ödev olarak okuyucu bu çarpışmanın olmadığını
-[1]'deki determinant yöntemi ile bulabilir.
+İlk animasyondaki genel çarpışma saptamasına üstteki kodla farklı
+açıdan [7] bakınca detayda çarpışma olmadığını görüyoruz. Ödev olarak
+okuyucu bu çarpışmanın olmadığını [1]'deki determinant yöntemi ile
+bulabilir.
 
 ```python
 run_animation(offsets = [[20,2,0],[-10,-10,0]],dirs = [[-1,-2,-1],[4,2,1]],azim=220)
@@ -411,7 +409,7 @@ run_animation(offsets = [[20,2,0],[-10,-10,0]],dirs = [[-1,-2,-1],[4,2,1]],azim=
 
 Üstteki parametrelerle animasyon objenin gerçekten çarpışma olduğu bir
 örnek gibi duruyor [8], yine aynı determinant testi ve nihai
-çizgi/üçgen kesişme yöntemi burada devreye girebilir.
+çizgi/üçgen kesişme yöntemi burada kullanılabilir.
 
 Kaynaklar
 
