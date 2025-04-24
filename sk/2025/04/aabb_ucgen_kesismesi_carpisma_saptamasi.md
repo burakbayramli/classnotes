@@ -109,6 +109,6 @@ Kaynaklar
 [2] Randall, AABB Ağaçları ile Çarpışma Saptamasına Giriş,
     aabb-randall-tr.html
 
-
+[3] https://www.printables.com/model/568502-basic-geometric-shapes-3d/files
 
 
