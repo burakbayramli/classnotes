@@ -50,7 +50,7 @@ class Triangle(AABB.IAABB):
         x,y,z,w,h,d = list(mins) + list(maxs)
         plot_box_imp(x,y,z,w,h,d,axx)
         
-class PrismTri(AABB.IAABB):
+class STLObj(AABB.IAABB):
     def __init__(self,offset):
         self.offset = offset
         self.init_triangles()
@@ -76,7 +76,7 @@ class PrismTri(AABB.IAABB):
             Triangle(x).plot_box(ax)
 
     def __repr__(self):
-        return f"PrismTri {self.offset}"
+        return f"STLObj {self.offset}"
 
     def get_aabb(self):
         tmp = np.vstack(self.triangles)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     dirs = [[-1,-2,-1],[4,2,1]]
 
     dirs = np.array(dirs)
-    ts = [PrismTri(offset=np.array(o)) for o in offsets]
+    ts = [STLObj(offset=np.array(o)) for o in offsets]
 
     tree = AABB.AABBTree(initial_size=4)    
     for t in ts: tree.insert_object(t)
