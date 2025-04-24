@@ -1,6 +1,6 @@
 import sys; sys.path.append("randall")
 import mpl_toolkits.mplot3d as a3, numpy as np
-import os, pickle, matplotlib.pyplot as plt
+import os, matplotlib.pyplot as plt
 from stl import mesh
 import AABB, util
 
@@ -86,14 +86,9 @@ if __name__ == "__main__":
     for t in sobjs: tree.insert_object(t)
 
     for i in range(15):
-        print (i,'------------------')
         fig = plt.figure()
         ax = a3.Axes3D(fig)
         ax.view_init(elev=21, azim=40)
-        #ax.view_init(elev=21, azim=90)
-        #ax.view_init(elev=21, azim=150)
-        #ax.view_init(elev=21, azim=180)
-        #ax.view_init(elev=21, azim=270)
 
         ax.set_xlim(20,60);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
         olsum = 0
@@ -115,12 +110,9 @@ if __name__ == "__main__":
                 for a_tri in sobjs[j].get_aabb_triangles(): 
                     overlaps_narrow = narrow_tree.query_overlaps(a_tri) 
                     for b_tri in overlaps_narrow:
-                        print ('overlap')
-                        b_tri.plot(ax)
                         # burada a_tri ile b_tri arasinda nihai
                         # kesisme noktasi bulunabilir
-                        print (type(a_tri))
-                        print (type(b_tri))
+                        b_tri.plot(ax)
                             
                         
                 
