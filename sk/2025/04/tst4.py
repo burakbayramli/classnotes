@@ -1,27 +1,7 @@
 import sys; sys.path.append("randall")
 import mpl_toolkits.mplot3d as a3, numpy as np
-import matplotlib.colors as colors, os, pickle
-import matplotlib.pyplot as plt, itertools
-from scipy.spatial.distance import cdist
-import AABB
-
-def pairwise(iterable):
-    a, b = itertools.tee(iterable)
-    return itertools.zip_longest(a, b, fillvalue=next(b, None))
-
-def plot_box_imp(x_min, y_min, z_min, x_max, y_max, z_max, axx):        
-    axx.plot3D([x_min, x_max], [y_min, y_min], [z_min, z_min], 'y--')
-    axx.plot3D([x_min, x_max], [y_max, y_max], [z_min, z_min], 'y--')
-    axx.plot3D([x_min, x_max], [y_min, y_min], [z_max, z_max], 'y--')
-    axx.plot3D([x_min, x_max], [y_max, y_max], [z_max, z_max], 'y--')
-    axx.plot3D([x_min, x_min], [y_min, y_max], [z_min, z_min], 'y--')
-    axx.plot3D([x_max, x_max], [y_min, y_max], [z_min, z_min], 'y--')
-    axx.plot3D([x_min, x_min], [y_min, y_max], [z_max, z_max], 'y--')
-    axx.plot3D([x_max, x_max], [y_min, y_max], [z_max, z_max], 'y--')
-    axx.plot3D([x_min, x_min], [y_min, y_min], [z_min, z_max], 'y--')
-    axx.plot3D([x_max, x_max], [y_min, y_min], [z_min, z_max], 'y--')
-    axx.plot3D([x_min, x_min], [y_max, y_max], [z_min, z_max], 'y--')
-    axx.plot3D([x_max, x_max], [y_max, y_max], [z_min, z_max], 'y--')
+import os, pickle, matplotlib.pyplot as plt
+import AABB, util
 
 class Triangle(AABB.IAABB):
     def __init__(self,corners):
@@ -39,7 +19,7 @@ class Triangle(AABB.IAABB):
     
     def plot(self,axx):
         xs = []; ys = []; zs = []
-        for fr,to in list(pairwise(self.corners)):
+        for fr,to in list(util.pairwise(self.corners)):
             xs.append(fr[0]); ys.append(fr[1]); zs.append(fr[2])
             xs.append(to[0]); ys.append(to[1]); zs.append(to[2])        
         axx.plot(xs, ys, zs, 'red')
@@ -48,7 +28,7 @@ class Triangle(AABB.IAABB):
         mins = np.min(self.corners,axis=0)
         maxs = np.max(self.corners,axis=0)
         x,y,z,w,h,d = list(mins) + list(maxs)
-        plot_box_imp(x,y,z,w,h,d,axx)
+        util.plot_box_imp(x,y,z,w,h,d,axx)
         
 class STLObj(AABB.IAABB):
     def __init__(self,offset):
@@ -59,7 +39,6 @@ class STLObj(AABB.IAABB):
         return [Triangle(t) for t in self.triangles]
         
     def init_triangles(self):        
-        #self.triangles = pickle.load(open("prismtri.pkl","rb")) + self.offset
         self.triangles = pickle.load(open("prismhex.pkl","rb")) + self.offset
         
     def set_offset(self,offset):
@@ -121,13 +100,18 @@ if __name__ == "__main__":
         for j in range(len(sobjs)):
             overlaps = tree.query_overlaps(sobjs[j])
             for other in overlaps:
+                # A-B kesismesi tahmin edilen her B objesinin ucgenleri icin bir
+                # aabb agaci yarat
                 narrow_tree = AABB.AABBTree(initial_size=10)
                 for x in other.get_aabb_triangles(): narrow_tree.insert_object(x)
-                for so in sobjs[j].get_aabb_triangles(): 
-                    overlaps_narrow = narrow_tree.query_overlaps(so) 
-                    for tt in overlaps_narrow:
+                # A objesinin ucgenlerini alip B agacina kesisip kesismedigini sor
+                for a_tri in sobjs[j].get_aabb_triangles(): 
+                    overlaps_narrow = narrow_tree.query_overlaps(a_tri) 
+                    for b_tri in overlaps_narrow:
                         print ('overlap')
-                        tt.plot(ax)
+                        b_tri.plot(ax)
+                        # burada a_tri ile b_tri arasinda nihai
+                        # kesisme noktasi bulunabilir
                 
             olsum += len(overlaps)
         ax.text(45, 0, 35, "Overlaps: %d" % olsum)
