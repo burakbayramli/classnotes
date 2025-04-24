@@ -369,7 +369,11 @@ Nihai animasyon [6]'da bulunabilir.
 Animasyonda muhtemel çarpışma genel fazda saptanınca görüntünün
 üstündeki çarpışma sayısı arttırılıyor. Bu genel adaylar arasında
 üçgenleri çarpışanlar var ise, bu çarpışması muhtemel üçgenler kırmızı
-ile gösteriliyor.
+ile gösteriliyor. Muhtemel çarpışma anında her iki objede aydınlatılan
+üçgen sayısına dikkat edersek 20'den daha az sayıda olduğunu
+görebiliriz, ve her iki objenin birbirine yakın üçgenleri potansiyel
+çarpışmış olarak işaretlendi. Demek ki teknik ise yaradı, daraltılmış
+fazda kesişme hesabının yapılacağı üçgen sayısını azaltmış olduk.
 
 İki obje arasında üçgenler arası çarpışmalar için de ağaç
 kullanmamızın önemini bir daha vurgulamak iyi olur, üstteki basit
