@@ -29,6 +29,45 @@ dış üçgen sayısı = 20
 
 ![](coll_01.jpg)
 
+```python
+import sys; sys.path.append("randall")
+import mpl_toolkits.mplot3d as a3
+from stl import mesh
+import AABB, util
+        
+class STLObj(AABB.IAABB):
+    def __init__(self,offset):
+        self.offset = offset
+        self.init_triangles()
+
+    def init_triangles(self):
+        m = mesh.Mesh.from_file('../../2020/08/shapes/Prism_hexagon.stl')
+        self.triangles = m.vectors + self.offset
+        
+    def set_offset(self,offset):
+        self.offset = offset
+        self.init_triangles()
+
+    def plot(self,ax):
+        for x in self.triangles: 
+            tri = a3.art3d.Poly3DCollection([x])
+            tri.set_color('blue')
+            tri.set_linestyle('dotted')
+            tri.set_alpha(0.1)
+            ax.add_collection3d(tri)
+            Triangle(x).plot_box(ax)
+
+    def __repr__(self):
+        return f"STLObj {self.offset}"
+
+    def get_aabb(self):
+        tmp = np.vstack(self.triangles)
+        mins = np.min(tmp,axis=0)
+        maxs = np.max(tmp,axis=0)
+        x,y,z,w,h,d = list(mins) + list(maxs)
+        return AABB.AABB(x,y,z,w,h,d)
+
+```
 
 
 
