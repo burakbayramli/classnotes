@@ -56,9 +56,14 @@ class STLObj(AABB.IAABB):
             ax.add_collection3d(tri)
             Triangle(x).plot_box(ax)
 
+    def plot_aabb(self,axx):
+        aabb = self.get_aabb()
+        util.plot_box_imp(aabb.min_x, aabb.min_y, aabb.min_z,
+                          aabb.max_x, aabb.max_y, aabb.max_z,axx)
+        
     def __repr__(self):
         return f"STLObj {self.offset}"
-
+    
     def get_aabb(self):
         tmp = np.vstack(self.triangles)
         mins = np.min(tmp,axis=0)

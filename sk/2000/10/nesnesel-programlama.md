@@ -29,16 +29,16 @@ Mesela,
 
 ```java
 public class Yığıt {
-public void ekle(Object o) { .. }
+   public void ekle(Object o) { .. }
 
-public Object siradakiEleman() {
-    .. elemani bul.. yigittan cikart
-    return nesne;
-  }
+   public Object siradakiEleman() {
+      .. elemani bul.. yigittan cikart
+      return nesne;
+    }
 }
 ```
 
-Bu örnekteki siradakiEleman sorgusunun yan etkisi var, çünkü, hem
+Bu örnekteki `siradakiEleman` sorgusunun yan etkisi var, çünkü, hem
 sıradaki elemanın ne olduğunu söylemekte, hem de bu elemanı yığıttan
 çıkartmaktadır. Bu sebeple aynı sorgu iki kere üst üste
 çâğırıldığında, aynı sonuç gelmeyecektir.  Bu tür bir sorgu, o sorguyu
@@ -94,16 +94,15 @@ aşağıdaki gibi bir nesne düşünelim:
 ```java
 public class Isleyici {
 
-public void birIslem() {}
+   public void birIslem() {}
 
-public void baskaBirIslem() {}
+   public void baskaBirIslem() {}
 
-public void ekle(Object bunu, Vector bunaEkle) {......}
+   public void ekle(Object bunu, Vector bunaEkle) {......}
 
-public Object cikart(Vector bundanCikart) { ... }
+   public Object cikart(Vector bundanCikart) { ... }
 
 }
-
 ```
 
 Gördüğümüz gibi aynı Vector nesnesi sürekli olarak Isleyici nesnesinin
@@ -118,11 +117,22 @@ nesne tarafından muhafaza edilmesini sağlamalalıyız. Bu yapıldıktan
 sonra, artık sonraki bütün işlemler içerde tutulan Vector üzerinde
 yapılacaktır, yani Vector'ün bir daha geçilmesine gerek kalmaz.
 
-public class VectorYığıtı {protected int tepeIndisi = ...;protected
-Vector vector = null;public VectorYığıtı(Vector v) {vector = v;}public
-void ekle(Object eleman) {vector.add(eleman);}public Object cikart()
-{...return vector.get(tepeIndisi);}}public class Isleyici {public void
-birIslem() {}public void baskaBirIslem() {}}
+```java
+public class VectorYığıtı {
+   protected int tepeIndisi = ...;
+   protected Vector vector = null;
+   public VectorYığıtı(Vector v) {vector = v;}
+   public void ekle(Object eleman) {
+       vector.add(eleman);
+   }
+   public Object cikart() {
+      ...return vector.get(tepeIndisi);}}
+
+public class Isleyici {
+   public void birIslem() {}
+   public void baskaBirIslem() {}
+}
+```
 
 İşte bu kadar! Böylece İşleyici nesnesi daha anlaşılır hale geldi, ve
 yeni VectorYığıtı nesnesi çok daha temiz.
@@ -145,14 +155,17 @@ kurtarır.
 
 ```java
 public class Cizer {
-public void metot (ParametreClass obj) {
-if (obj instanceof Ucgen) {
-  ucgenCiz(obj);
-}
-if (obj instanceof Dikdortgen) {
-  dikdortgenCiz(obj); }
-if (obj instanceof Kare) {
-  kareCiz(obj); }}...
+  public void metot (ParametreClass obj) {
+    if (obj instanceof Ucgen) {
+      ucgenCiz(obj);
+    }
+    if (obj instanceof Dikdortgen) {
+       dikdortgenCiz(obj);
+    }
+    if (obj instanceof Kare) {
+        kareCiz(obj); }
+    }
+    ...
 }
 ```
 
@@ -207,30 +220,37 @@ sırasında ufak bir JVM kontrolü yaparak aktif nesnenin esas tipini
 öğrenecek, ve ciz() çağrısını doğru tipteki nesneye gönderecektir. Tüm
 bu kontroller için programcının kılını kıpırdatmasına gerek yoktur.
 
-public class HerhangiBirClass { public void ciz() { GrafikNesne nesne
-= new Ucgen(); // dikkat, Ucgen nesne = new Ucgen degil!!!  ..
-nesne.ciz(); }}
+```java
+public class HerhangiBirClass {
+   public void ciz() {
+      GrafikNesne nesne = new Ucgen(); // dikkat, Ucgen nesne = new Ucgen degil!!!
+      ...
+      nesne.ciz();
+   }
+}
+```
 
 Bu aynı satırda yapılan yaratma ve anında kullanma vadedilen
 avantajlar açısından sizi hayal kırıklığına uğratmasın. Onbinlerce
 satırlık bir kodun ta bir ucunda yaratılmış bir Ucgen nesnesinin,
 öteki ucunda, başkasının yazmış olduğu bir metot gönderildiğini
 düşünün. Alan metot, soyutluk seviyesi bakımından grafik nesnesinin
-ciz() metotunu "kabul ettiği haricinde" daha fazla bir bilgiyle
+`ciz()` metotunu "kabul ettiği haricinde" daha fazla bir bilgiyle
 ilgilenmeme gibi bir sânsı artık elinde vardır. Böylece elindeki
 referansı GrafikNesne seviyesinden daha aşağıda tutmasına gerek
-yoktur.  Böylece, ileriki bir günde yeni bir GrafikNesne kodlandığında
-(Beşgen diyelim), hiçbir ana listenin, hiçbir merkezi noktanın
-değişmesine gerek kalmayacaktır. Tüm ciz() metotlarıni çağıranlar aynı
-şekilde çağırmaya devam edeceklerdir, çünkü ellerindeki GrafikNesne
-class'ı halen statik olarak geçerli bir referanstır (Beşgen de
-GrafikNesne'den kalıtım yapacaktır, ve ciz() metotunu tekrar
-tanımlayacaktır).  Instanceof yöntemini kullanıyor olsaydık, "büyük"
-listemize bir de instanceof Besgen gibi bir ibare eklememiz
-gerekecekti. Nesnesel yöntemlerde buna hiçbir gerek yoktur. Tip
-kontrolleri, düzgün yapılan nesnesel model üzerinden JVM tarafınan
-otomatik olarak yapılabilen birşeydir. Makinanın yapacağını, makinaya
-bırakalım.
+yoktur.
+
+Böylece, ileriki bir günde yeni bir GrafikNesne kodlandığında (Beşgen
+diyelim), hiçbir ana listenin, hiçbir merkezi noktanın değişmesine
+gerek kalmayacaktır. Tüm ciz() metotlarıni çağıranlar aynı şekilde
+çağırmaya devam edeceklerdir, çünkü ellerindeki GrafikNesne class'ı
+halen statik olarak geçerli bir referanstır (Beşgen de GrafikNesne'den
+kalıtım yapacaktır, ve ciz() metotunu tekrar tanımlayacaktır).
+Instanceof yöntemini kullanıyor olsaydık, "büyük" listemize bir de
+instanceof Besgen gibi bir ibare eklememiz gerekecekti. Nesnesel
+yöntemlerde buna hiçbir gerek yoktur. Tip kontrolleri, düzgün yapılan
+nesnesel model üzerinden JVM tarafınan otomatik olarak yapılabilen
+birşeydir. Makinanın yapacağını, makinaya bırakalım.
 
 Referans
 

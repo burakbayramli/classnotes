@@ -1,5 +1,7 @@
 # AABB, Üçgen Kesişmesi, Hızlı Çarpışma Saptaması
 
+
+
 ```python
 from stl import mesh
 from mpl_toolkits import mplot3d
@@ -33,7 +35,7 @@ dış üçgen sayısı = 20
 import sys; sys.path.append("randall")
 import mpl_toolkits.mplot3d as a3
 from stl import mesh
-import AABB, util
+import AABB
         
 class STLObj(AABB.IAABB):
     def __init__(self,offset):
@@ -58,6 +60,11 @@ class STLObj(AABB.IAABB):
             tri.set_linestyle('dotted')
             tri.set_alpha(0.1)
             ax.add_collection3d(tri)
+
+    def plot_aabb(self,axx):
+        aabb = self.get_aabb()
+        util.plot_box_imp(aabb.min_x, aabb.min_y, aabb.min_z,
+                          aabb.max_x, aabb.max_y, aabb.max_z,axx)
 
     def get_aabb(self):
         tmp = np.vstack(self.triangles)
@@ -85,6 +92,20 @@ plt.savefig('coll_02.jpg')
 ![](coll_02.jpg)
 
 ```python
+import util
+ax = a3.Axes3D(plt.figure())        
+o1.plot(ax); o1.plot_aabb(ax)
+o2.plot(ax); o2.plot_aabb(ax)
+o3.plot(ax); o3.plot_aabb(ax)
+ax.set_xlim(30,70);ax.set_ylim(-20,20); ax.set_zlim(-20,30)
+ax.set_xlabel("x axis");ax.set_ylabel("y axis");ax.set_zlabel("z axis")
+ax.view_init(elev=21, azim=200)
+
+plt.savefig('coll_03.jpg')
+```
+
+
+```python
 tree = AABB.AABBTree(initial_size=10)
 tree.insert_object(o1)
 tree.insert_object(o2)
@@ -92,16 +113,16 @@ tree.insert_object(o3)
 ```
 
 ```python
-print (o1)
+print (o1, u'çarpışma testi')
 overlaps = tree.query_overlaps(o1)
-print ('results')
-for obj in overlaps: print(f"  - Overlaps with {obj}")
+print (u'Sonuçlar:')
+for obj in overlaps: print(f"  - Çakışma {obj} ile")
 ```
 
 ```text
-Obje offset [0 0 0]
-results
-  - Overlaps with Obje offset [ 5 -7  0]
+Obje offset [0 0 0] çarpışma testi
+Sonuçlar:
+  - Çakışma Obje offset [ 5 -7  0] ile
 ```
 
 
@@ -125,3 +146,6 @@ Kaynaklar
 [2] <a href="aabb-randall-tr.html">Randall, AABB Ağaçları ile Çarpışma Saptamasına Giriş</a>
 
 [4] Bayramlı, <a href="../../2020/08/stl-3d-cad.html">3D Baskıya Hazır CAD Tasarım Formatı, STL</a>
+
+[5] Bayramli, 
+    <a href="../../2000/10/nesnesel-programlama.html">Nesnesel Progralama</a>
