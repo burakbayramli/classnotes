@@ -28,8 +28,8 @@ kaynaklanan muhtemel çarpışmaları filtreleyerek gerçek piksel /
 [nesne] bazında mükemmel çarpışmalara indirgemek için ek detay
 kullanır. Motorumdaki kaba problemi çözmeye yönelik ilk denemem yaygın
 bir yöntemdir ve iki kutunun (2D veya 3D) kesişip kesişmediğini
-belirlemenin, kutuların eksenlere hızalı olmasına dayanan verimli bir
-yolundan yararlanır – bu nedenle eksenlere hızalı sınırlayıcı kutu
+belirlemenin, kutuların eksenlere hizalı olmasına dayanan verimli bir
+yolundan yararlanır – bu nedenle eksenlere hizalı sınırlayıcı kutu
 (axis aligned bounding box) veya AABB denir. Eğer bu kulağa karmaşık
 geliyorsa – endişelenmeyin, daha sonra açıklayacağım.
 
@@ -338,5 +338,8 @@ arayüzünü (interface) uygulaması gerekir. Bu nesneleri sırasıyla
 insertObject, updateObject ve removeObject yöntemleriyle ekleyebilir,
 güncelleyebilir ve kaldırabilirsiniz ve queryOverlaps yöntemiyle
 çakışmaları sorgulayabilirsiniz.
+
+
+
 
 

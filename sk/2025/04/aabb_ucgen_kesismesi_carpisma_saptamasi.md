@@ -1,6 +1,70 @@
 # AABB, Üçgen Kesişmesi, Hızlı Çarpışma Saptaması
 
+Fiziksel dünyada hesaplanan bir simülasyon düşünelim, objeler var,
+hareket ediyorlar, bu objelerin çarpışıp çarpışmadığını her animasyon
+karesi (frame) içinde saptamamız gerekir, ki bu durumun bir sonraki
+karede fiziksel sonucunu gösterelim. Çarpışan bilardo topları çarpışma
+sonucu yer değiştirmelidir. Bir taşıt bir duvara çarpımışsa
+durmalıdır, gibi.
 
+İki obje arasında detaylı çarpışma hesabını yapabilen yaklaşımlar
+mevcut, [1]'de bunlardan birini gördük, fakat bu hesaplar her ikili
+kombinasyonuna teker teker bakmayı gerektirir, eğer irili ufaklı 1000
+obje simüle ediliyorsa bu 1000 x 1000 bir milyon işlem demektir!
+Çarpışmaları daha hızlı ve en detaylı şekilde acaba nasıl hesaplarız?
+Burada ele alacağımız çözüm birkaç aşamadan oluşuyor olacak.
+
+1. İlk aşama obje çiftlerinin birbirinden çarpışamayacak kadar uzak
+olanları saptayarak, ya da bu objelere hiç bakmayarak, bir sonraki
+fazdaki detaylı hesap yükünü azaltmak. Çarpışma saptama literatüründen
+bu aşamaya genel faz (broad phase) ismi veriliyor.
+
+1. Birbiri ile çarpışması muhtemel olan objeler bulunduktan sonra,
+çarpışması muhtemel iki objenin yüzey parçalarının da birbirine uzak
+olanlarını elemek.
+
+1. İki aday obje arasındaki aday yüzey parçalarını bulduktan sonra,
+artık detaylı kesişim testlerini yapabiliriz, bu testler / hesaplar
+nihai kesişim noktasını bulacaktır. Bu son iki kalem literatürde
+daraltılmış faz (narrow phase) olarak anılıyor.
+
+Bu kalemlerden ilki için AABB Ağaçı yaklaşımını [2] yazısında gördük.
+O yazıda verilen `AABB.py` kodunu kullanarak etrafında birer
+"eksenlere hizalı sınırlayıcı kutu (axis aligned bounding box -AABB-)"
+tanımlanan objeler arasında kabaca çakışma olup olmayacağını anlamak
+mümkündür. AABB Ağaç yapısı içindeki AABB kutularını hızlı bir şekilde
+indisleyip birbirine uzak olan objelere bakmamak için optimize
+edilmiştir.
+
+İkinci kalem için ilginç bir yaklaşım şudur, aslında AABB Ağaç
+tekniğini iki aday obje arasındaki "kesişme adayı yüzey parçaları"
+(çoğunlukla bu parçalar 3D üçgendir) için de kullanabiliriz.  Çünkü
+aynen objeler etrafında AABB kutuları tanımlanabildiği gibi üç boyutlu
+yüzey parçaları etrafında da AABB kutuları tanımlanabilir, ve mesela
+bir objenin tüm yüzey parçaları bir ağaç oluşturur, ve bu ağaca artık
+çarpışma adayı diğer objenin tüm yüzey parçalarını teker teker alıp
+"çarpışma var mı?" diye sorabiliriz. Bu işlem de, aynen objeler
+arasında olduğu gibi, birbirinden uzak olan parçalara bakmayarak
+sadece aday parçalara bakarak sonuca ulaşmayı hızlandıracaktır.
+
+Üçüncü kalemde artık uzak objeler elenmiştir, bakılan iki obje
+arasında onların uzak yüzey parçaları elenmiştir, ve bakılan iki parça
+arasında nihai hesap zamanı gelmiştir. Bu aşamada yüzey parçaları
+üçgen ise, [1]'de görülen çizgi/üçgen kesişme hesabı kullanılabilir,
+her üçgenin her kenarını bir çizgi parçası olarak alıp diğer üçgen ile
+kesişmesinin testi/hesabı yapılır, bu her seferinde 6 tane işlem
+demektir, hızlı bir şekilde yapılabilir.
+
+### Objeler, AABB
+
+Örnek obje olarak bir STL cismi [4] kullanacağız. STL cisimlerinin
+yüzeyleri birbiri ile bağlı üçgen parçalarıdır, en ufak parçanın üçgen
+olması çok iyi çünkü üç boyutta üçgen, çizgi kesişmeleri için elimizde
+gerekli kodlar var.
+
+Altta örnek seçilen ve yazının geri kalanında kullanılacak olan cisim
+prizma heksagon'dur, [4]'teki örnek cisimler arasından
+seçilmiştir. Onu grafikleyelim,
 
 ```python
 from stl import mesh
@@ -11,8 +75,6 @@ your_mesh = mesh.Mesh.from_file('../../2020/08/shapes/Prism_hexagon.stl')
 obj = mplot3d.art3d.Poly3DCollection(your_mesh.vectors)
 obj.set_edgecolor('k')
 ax.add_collection3d(obj)
-scale = your_mesh.points.flatten()
-ax.auto_scale_xyz(scale, scale, scale)
 ax.set_xlim(40,60);ax.set_ylim(-5,15); ax.set_zlim(-4,20)
 ax.view_init(elev=21, azim=40)
 plt.savefig('coll_01.jpg')
@@ -30,6 +92,14 @@ dış üçgen sayısı = 20
 ```
 
 ![](coll_01.jpg)
+
+Bu objenin dış yüzeyi 20 tane üçgen ile tanımlı, yani STL dosyası 20
+tane üçgen kordinatı taşıyor. Bu temel objeyi birden fazla yerde
+kullanmak basit, STL dosyasında tanımlı olan obje belli kordinat
+sisteminde spesifik bir yerde, ama biz bir `offset` parametresi
+üzerinden bu kordinata ekleme, çıkartmalar yaparak yeni bir prizmayı
+herhangi bir yerde dünyaya yerleştirebiliriz. Şimdi objemizi temsil
+eden sınıfı yaratalım ve üç tane farklı yerlerde cisim yaratalım,
 
 ```python
 import sys; sys.path.append("randall")
@@ -74,6 +144,15 @@ class STLObj(AABB.IAABB):
         return AABB.AABB(x,y,z,w,h,d)
 ```
 
+Dikkat edersek `STLObj` sınıfı `AABB.IAABB` arayüzünden kod mirası
+yapıyor, bu miras sayesinde ve onun `get_aabb` metotunu tanımladıktan
+sonra, bir `STLObj` program objesi artık AABB Ağacı ile aranabilir
+hale gelir. Burada kullanılan bir nesnesel temelli çok yüzlülük
+(polymorphism) [5] prensibidir, `AABB.py` kodu `AABB.IAABB`
+arayüzünden miras almış objelerle ilgilenir, bu objelerin bir
+`get_aabb` metotu tanımlı olduğu sürece onlar ağaç tarafından
+tanınır.
+
 ```python
 o1 = STLObj(offset=np.array([0,0,0]))
 o2 = STLObj(offset=np.array([5,-7,0]))
@@ -90,6 +169,10 @@ plt.savefig('coll_02.jpg')
 ```
 
 ![](coll_02.jpg)
+
+Biz kabaca bakarak iki tane obje arasında çarpışma olduğunu
+görebiliyoruz.  O zaman ağaca sorduğumuzda bize bir ve ikinci objeler
+arasında potansiyel (detaylı) çarpışma var demelidir.
 
 ```python
 tree = AABB.AABBTree(initial_size=10)
@@ -111,6 +194,9 @@ Sonuçlar:
   - Çakışma Obje offset [ 5 -7  0] ile
 ```
 
+Hakikaten çarpışma bulundu. Objeler etrafındaki AABB kutularını da
+grafiklersek görsel olarak durum daha açık hale gelir.
+
 ```python
 ax = a3.Axes3D(plt.figure())        
 o1.plot(ax); o1.plot_aabb(ax)
@@ -125,7 +211,13 @@ plt.savefig('coll_03.jpg')
 
 ![](coll_03.jpg)
 
-### Nihai Cakisma, Animasyon
+### Nihai Kod, Animasyon
+
+Şimdi ikinci kalemdeki kodlamaya gelelim, ve tüm fikirleri bir araya
+koyarak içinde objelerin hareket ettiği bir anımasyon
+yaratalım. Objeleri hareket ettirmek kolay, her obje için bir yön
+vektörü tanımlarız, ve her objenin `offset` değerine bu yön çarpı bir
+sabit ekleyerek objenin o yöne gitmesini sağlarız.
 
 ```python
 import sys; sys.path.append("randall")
@@ -205,8 +297,8 @@ class STLObj(AABB.IAABB):
 ```python
 if not os.path.exists("/tmp/coll"): os.mkdir ("/tmp/coll")
 
-offsets = [[20,0,0],[-10,-10,0]]
-dirs = [[-1,-2,-1],[4,2,1]]
+offsets = [[20,0,0],[-10,-10,0]] # baslangıç offset değerleri
+dirs = [[-1,-2,-1],[4,2,1] # gidiş yönleri
 
 dirs = np.array(dirs)
 sobjs = [STLObj(offset=np.array(o)) for o in offsets]
@@ -285,3 +377,4 @@ Kaynaklar
 
 [6] Bayramli, 
     <a href="https://www.dropbox.com/scl/fi/m0x1170yc8duo80c0592k/aabb1.gif?rlkey=08gwsgwiqnk09smpe6bbz2tpi&st=2s2voz8k&raw=1">Animasyon</a>
+
