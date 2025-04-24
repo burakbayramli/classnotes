@@ -431,8 +431,8 @@ Kaynaklar
     <a href="https://www.dropbox.com/scl/fi/m0x1170yc8duo80c0592k/aabb1.gif?rlkey=08gwsgwiqnk09smpe6bbz2tpi&st=2s2voz8k&raw=1">Animasyon 1</a>
 
 [7] Bayramli, 
-    <a href="">Animasyon 2</a>
+    <a href="https://www.dropbox.com/scl/fi/ymaug651wik2hpi2o2m20/aabb2.gif?rlkey=xxkds9oa7w7bca67yz9ravuse&st=ui77u6vy&raw=1">Animasyon 2</a>
 
 [8] Bayramli, 
-    <a href="">Animasyon 3</a>
+    <a href="https://www.dropbox.com/scl/fi/seuqx5hrgfhyhfxpzohyp/aabb3.gif?rlkey=hae5dr0ukfm7e47vcnwkprk20&st=0i47cieb&raw=1">Animasyon 3</a>
 
