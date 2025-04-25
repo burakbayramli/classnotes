@@ -444,18 +444,22 @@ Kaynaklar
     Green'in Teorisi, Düzlem Kesişmeleri, Eğriler
     </a>
 
-[2] <a href="aabb-randall-tr.html">Randall, AABB Ağaçları ile Çarpışma Saptamasına Giriş</a>
+[2] Randall, <a href="aabb-randall-tr.html">AABB Ağaçları ile Çarpışma Saptamasına Giriş</a>
 
 [4] Bayramlı, <a href="../../2020/08/stl-3d-cad.html">3D Baskıya Hazır CAD Tasarım Formatı, STL</a>
 
-[5] Bayramli, 
+[5] Bayramlı, 
     <a href="../../2000/10/nesnesel-programlama.html">Nesnesel Programlama</a>
 
-[6] Bayramli, 
+[6] Bayramlı, 
     <a href="https://www.dropbox.com/scl/fi/m0x1170yc8duo80c0592k/aabb1.gif?rlkey=08gwsgwiqnk09smpe6bbz2tpi&st=2s2voz8k&raw=1">Animasyon 1</a>
 
-[7] Bayramli, 
+[7] Bayramlı, 
     <a href="https://www.dropbox.com/scl/fi/ymaug651wik2hpi2o2m20/aabb2.gif?rlkey=xxkds9oa7w7bca67yz9ravuse&st=ui77u6vy&raw=1">Animasyon 2</a>
 
-[8] Bayramli, 
+[8] Bayramlı, 
     <a href="https://www.dropbox.com/scl/fi/seuqx5hrgfhyhfxpzohyp/aabb3.gif?rlkey=hae5dr0ukfm7e47vcnwkprk20&st=0i47cieb&raw=1">Animasyon 3</a>
+
+
+
+
