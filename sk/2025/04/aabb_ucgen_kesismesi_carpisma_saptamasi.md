@@ -211,7 +211,7 @@ plt.savefig('coll_03.jpg')
 
 ![](coll_03.jpg)
 
-### Nihai Kod, Animasyon
+### Detaylı Saptama
 
 Şimdi ikinci kalemdeki kodlamaya gelelim, ve tüm fikirleri bir araya
 koyarak içinde objelerin hareket ettiği bir animasyon
@@ -315,7 +315,7 @@ plt.savefig('coll_04.jpg')
 
 ![](coll_04.jpg)
 
-Animasyon kodunu yazabiliriz.
+### Animasyon
 
 ```python
 def run_animation(offsets, dirs, azim):
@@ -449,7 +449,7 @@ Kaynaklar
 [4] Bayramlı, <a href="../../2020/08/stl-3d-cad.html">3D Baskıya Hazır CAD Tasarım Formatı, STL</a>
 
 [5] Bayramli, 
-    <a href="../../2000/10/nesnesel-programlama.html">Nesnesel Progralama</a>
+    <a href="../../2000/10/nesnesel-programlama.html">Nesnesel Programlama</a>
 
 [6] Bayramli, 
     <a href="https://www.dropbox.com/scl/fi/m0x1170yc8duo80c0592k/aabb1.gif?rlkey=08gwsgwiqnk09smpe6bbz2tpi&st=2s2voz8k&raw=1">Animasyon 1</a>
