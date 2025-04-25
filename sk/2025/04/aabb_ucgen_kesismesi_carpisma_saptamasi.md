@@ -48,12 +48,12 @@ arasında olduğu gibi, birbirinden uzak olan parçalara bakmayarak
 sadece aday parçalara bakarak sonuca ulaşmayı hızlandıracaktır.
 
 Üçüncü kalemde artık uzak objeler elenmiştir, bakılan iki obje
-arasında onların uzak yüzey parçaları elenmiştir, ve bakılan iki parça
-arasında nihai hesap zamanı gelmiştir. Bu aşamada yüzey parçaları
-üçgen ise, [1]'de görülen çizgi/üçgen kesişme hesabı kullanılabilir,
-her üçgenin her kenarını bir çizgi parçası olarak alıp diğer üçgen ile
-kesişmesinin testi/hesabı yapılır, bu her seferinde 6 tane işlem
-demektir, hızlı bir şekilde yapılabilir.
+arasında onların uzak yüzey parçaları elenmiştir, ve geri kalan
+parçalar arasında nihai kesişme hesabı zamanı gelmiştir. Bu aşamada
+yüzey parçaları üçgen ise, [1]'de görülen çizgi/üçgen kesişme hesabı
+kullanılabilir, her üçgenin her kenarını bir çizgi parçası olarak alıp
+diğer üçgen ile kesişmesinin testi/hesabı yapılır, bu her seferinde 6
+tane işlem demektir, hızlı bir şekilde yapılabilir.
 
 ### Objeler, AABB
 
@@ -407,7 +407,7 @@ güncellenmiş oldu. Kullandığımız AABB Ağaç kodunu seçmemizin bir
 sebebi bu tür güncellemeye izin vermesiydi, eğer güncelleme mümkün
 değilse ya da hızlı bir şekilde yapılamıyorsa obje yerlerini
 indisleyen bu yaklaşımı kullanmak anlamsız olurdu. Yüzlerce objenin
-olduğu bir anımasyon düşünsek her karede her seferinde ağacı silbaştan
+olduğu bir animasyon düşünsek her karede her seferinde ağacı silbaştan
 yaratmak performanta düşüşe sebep olacaktı.
 
 Not
@@ -459,7 +459,3 @@ Kaynaklar
 
 [8] Bayramli, 
     <a href="https://www.dropbox.com/scl/fi/seuqx5hrgfhyhfxpzohyp/aabb3.gif?rlkey=hae5dr0ukfm7e47vcnwkprk20&st=0i47cieb&raw=1">Animasyon 3</a>
-
-
-
-
