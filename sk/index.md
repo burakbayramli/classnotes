@@ -3,15 +3,15 @@
 
 ## En Son
 
+26/4 - [Çok Değişkenli Calculus Ders 4 - Ekler - Nokta Düzlem Uzaklığı](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_04/ders_4.html)
+
+26/4 - [CAD Tasarım Formatı, STL - Ekler - STL Viewer](https://burakbayramli.github.io/dersblog/sk/2020/08/stl-3d-cad.html)
+
 21/4 - [MH370 Uçağı Nerede?](https://burakbayramli.github.io/dersblog/sk/2025/03/mh370.html)
 
 14/4 - [Kosinüsler Kanunu (Law of Cosines)](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_50_trig/trigonometri.html)
 
 7/4 - [Çatlama, Kırılma (Fracture) Analizi, FEM](https://burakbayramli.github.io/dersblog/sk/2025/03/catlama_fracture_analysis_fem.html)
-
-28/3 - [Euler-Lagrange Formülasyonu - Ekler](https://burakbayramli.github.io/dersblog/phy/phy_050_cont2/lagrange_bicimi__formalism_.html)
-
-17/3 - [Modern Bilim Öncesi Astronomi - Ekler - Dünya, Ay Uzaklığı](https://burakbayramli.github.io/dersblog/phy/phy_077_anc/modern_bilim_oncesi_astronomi_gezegenler_yorungeler.html)
 
 ## Konular, Referans
 
