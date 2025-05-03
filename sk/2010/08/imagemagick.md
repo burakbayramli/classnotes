@@ -93,6 +93,19 @@ convert dosya.tiff -crop 100%x50% +repage dosya_%d.tiff
 Bu çağrıdan sonuç olarak dosya_00.tiff, dosya_01.tiff adında iki imaj
 ortaya çıkacak.
 
+Eger bir imajin belli bir bolgesini cekip cikartmak ve geri parcalari
+atmak istiyorsak (yine crop), alttaki komutlar var,
+
+```
+convert in.jpg -crop 300x200+0+0 +repage out.jpg
+```
+
+Üstteki komut kesmenin hangi noktadan başlayaçığini söylüyor,
+seceeneklere göre üst sol köşeye referanslı olarak 0,0 noktasından
+başlanıyor, ve oradan başlayarak sağa doğru 300 piksel ve aşağı doğru
+200 piksel alınıyor, gerisi atılıyor.
+
+
 Bir video dosyasını numaralanmış görüntü dosyalarına çevirmek için,
 
 ```

@@ -173,6 +173,22 @@ Birleştirme için,
 mkvmerge -o out.mp4 in1.mp4 + in2.mp4 + in3.mp4
 ```
 
+Eger bir videonun her karesindeki goruntunun bir bolgesini atmak
+istiyorsak (crop) komut soyle,
+
+```
+ffmpeg -i in.mp4 -vf "crop=out_w:out_h:x:y" out.mp4
+```
+
+Burada `out_w` alınacak dikdörtgenin genişliği, `out_h`
+yüksekliği. Eğer bu parametreler için `iw` ve `ıh` kullanırsak mevcut
+değerleri tut demektir. Parametreler `x,y` ise dikdörtgenin sol üst
+köşeninin nerede olduğudur, oraya 10,10 dersek mesela ve genişlik
+yükseklik için 100,100 desek, dikdörtenin sağ alt köşesi 110,110
+noktasına gelecektir, üstten 10 piksel soldan 10 piksel atılmış
+olacaktır.
+
+
 ### mencoder
 
 Bir AVI video'nun parcasini kesip cikartmak icin
