@@ -28,7 +28,7 @@ artık detaylı kesişim testlerini yapabiliriz, bu testler / hesaplar
 nihai kesişim noktasını bulacaktır. Bu son iki kalem literatürde
 daraltılmış faz (narrow phase) olarak anılıyor.
 
-Bu kalemlerden ilki için AABB Ağaçı yaklaşımını [2] yazısında gördük.
+Bu kalemlerden ilki için AABB Ağacı yaklaşımını [2] yazısında gördük.
 O yazıda verilen `AABB.py` kodunu kullanarak etrafında birer
 "eksenlere hizalı sınırlayıcı kutu (axis aligned bounding box -AABB-)"
 tanımlanan objeler arasında kabaca çakışma olup olmayacağını anlamak
@@ -105,7 +105,7 @@ eden sınıfı yaratalım ve üç tane farklı yerlerde cisim yaratalım,
 import sys; sys.path.append("randall")
 import mpl_toolkits.mplot3d as a3
 from stl import mesh
-import AABB
+import AABB, util
         
 class STLObj(AABB.IAABB):
     def __init__(self,offset):
@@ -374,7 +374,7 @@ run_animation(offsets = [[20,0,0],[-10,-10,0]],dirs = [[-1,-2,-1],[4,2,1]],azim=
 ```
 
 Animasyonun her karesi bir JPG olarak yaratıldı, bu resimleri birleştirip bir
-GİF yaratalım,
+GIF yaratalım,
 
 ```python
 ! convert -delay 20 -loop 0 /tmp/coll/*.jpg /tmp/aabb1.gif
@@ -459,7 +459,3 @@ Kaynaklar
 
 [8] Bayramlı, 
     <a href="https://www.dropbox.com/scl/fi/seuqx5hrgfhyhfxpzohyp/aabb3.gif?rlkey=hae5dr0ukfm7e47vcnwkprk20&st=0i47cieb&raw=1">Animasyon 3</a>
-
-
-
-
