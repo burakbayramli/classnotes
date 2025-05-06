@@ -383,7 +383,7 @@ GIF yaratalım,
 Nihai animasyon [6]'da bulunabilir.
 
 Animasyonda muhtemel çarpışma genel fazda saptanınca görüntünün
-üstündeki çarpışma sayısı arttırılıyor. Bu genel adaylar arasında
+üstündeki çarpışma sayacı arttırılıyor. Bu genel adaylar arasında
 üçgenleri çarpışanlar var ise, bu çarpışması muhtemel üçgenler kırmızı
 ile gösteriliyor. Muhtemel çarpışma anında her iki objede aydınlatılan
 üçgen sayısına dikkat edersek 20'den daha az sayıda olduğunu
