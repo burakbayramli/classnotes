@@ -9,7 +9,7 @@ teknikle göstereceğiz. Bulmak istediğimiz $\vec{n}$ etrafında $\theta$ dön�
 yaptıracak bir matris, yani öyle bir matris $R(\vec{n},\theta)$ arıyoruz ki bu
 matrisle $\vec{v}$ vektörünü sağdan çarpınca $\vec{v}'$ elde edilecek ve bu yeni
 vektör $\vec{v}$ vektörünün $\vec{n}$ etrafında $\theta$ kadar dönmüş hali
-olacak,
+olacak [1, sf. 142]. Yazının geri kalanında $\vec{v} = v$, $\vec{n} = n$.. 
 
 $$
 v' = v R(n,\theta)
@@ -36,24 +36,121 @@ Hesap için şu adımları takip ediyoruz,
    \item $v_\parallel$ vektörü $v$ nin $n$ ye paralel olan şeklidir, ya da
      $v$ vektörünün $n$ üzerinde yansıtılmış halidir [2], bu formülün
      $v_\parallel = (v \cdot n) n$ olduğunu biliyoruz.
-   \item $v_\perp$ vektoru $v$ nin $n$ ye dik olan kismidir.
-     $v = v_\parallel + v_\perp$ oldugu icin $v_\perp = v - v_\parallel$.
+   \item $v_\perp$ vektörü $v$ nin $n$ ye dik olan kısmıdır.
+     $v = v_\parallel + v_\perp$ olduğu için $v_\perp = v - v_\parallel$.
+   \item Üstteki şekilde $w$ vektörü var, bu vektör $v_\perp$ ve $v_\parallel$
+     ile diktir, ve uzunluğu $v_\perp$ ile aynıdır. Bu vektör $v_\perp$
+     vektörünü 90 derece döndürerek elde edilebilir. Bu sebeple $w = n \times v_\perp$.
+     
 \end{itemize}
 
+Bu vektörlerle nasıl $v'$ hesaplayacağız? Dikkat edersek $w$ ve $v_\perp$ bir 2D
+kordinate uzayı oluşturuyor. $v'_\perp$ vektörü $v'$ yi bu uzayda $\theta$ kadar
+döndürerek elde edilebilir. Bu dönüşün formülünün
 
+$$
+v'_\perp = \cos \theta v_\perp + \sin \theta w
+$$
 
+olduğunu biliyoruz (ispatı bu anlatım ardından paylaşılıyor).
+
+Şimdi eldeki formüllere bakalım:
+
+$$
+v_\parallel = (v \cdot n) n
+$$
+
+$$
+v_\perp = v - v_\parallel
+$$
+
+$$
+= v - (v \cdot n) n
+$$
+
+$$
+w = n \times v_\perp
+$$
+
+$$
+= n \times (v - v_\parallel)
+$$
+
+$$
+= n \times v - n \times v_\parallel
+$$
+
+$n$ ve $v_\parallel$ birbirine paralel olduğu için çapraz çarpımları sıfırdır,
+
+$$
+= n \times v - 0 
+$$
+
+$$
+w = n \times v
+$$
+
+$$
+v'_\perp = \cos \theta v_\perp + \sin \theta w
+$$
+
+$$
+= \cos \theta (v - (v \cdot n) n) + \sin \theta (n \times v)
+$$
+
+Üstteki değeri $v'$ formülü içine sokalım,
+
+$$
+v' = v'_\perp + v_\parallel
+$$
+
+$$
+v' = \cos \theta (v - (v \cdot n) n) + \sin \theta (n \times v) + (v \cdot n) n
+$$
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import sys; sys.path.append('../phy_072_rot')
+from mpl_toolkits.mplot3d import Axes3D
+import plot3d
+
+def rotate(v, n, theta):
+    return np.cos(theta) * ( v - np.dot(v,n) ) + \
+           np.sin(theta)* np.cross(n,v) + \
+           np.dot(v,n)*n
+ 
+o1 = np.array([5,5,5])
+v1 = np.array([3,3,3])
+n1 = np.array([-1/3.,2/3.,2/3.])
+
+theta = np.deg2rad(20)
+
+v1r = rotate(v1, n1, theta)
+
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_vector(fig, o1, v1)
+plot3d.plot_vector(fig, o1, v1r, 'cyan')
+plot3d.plot_vector(fig, o1, 3*np.array(n1), 'red')
+plot3d.plot_plane(ax, o1, n1, size=3)
+ax.view_init(elev=40., azim=10)
+plt.savefig('phy_073_rot_01.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{phy_073_rot_01.jpg}
 
 Teori
 
-2D düzlemde, A vektörünün $\theta$ açısı kadar döndürülmesinin, $Y =
-\cos \theta A + \sin \theta B$ vektörünü verir.
+3D A,B vektörleri birbirine dikgen ve bir 2D uzay yaratıyorlar, ki sanki A
+vektörü $x$ ekseni, B ise $y$ ekseni. A vektörünün $\theta$ açısı kadar
+döndürülmesi $Y = \cos \theta A + \sin \theta B$ vektörünü verir (üstteki
+problemde $A = v_\perp$, $B = w$).
 
 İspat
 
-A ve B'nin 3D uzayında 2D bir düzlemi kapsayan iki dikgen vektör olduğunu
-varsayalım. A ve B'yi bu 2D düzlem için baz vektörleri olarak düşünebiliriz. A
-ve B tarafından kapsanan düzlemdeki herhangi bir X vektörü, A ve B'nin bir
-doğrusal birleşimi olarak ifade edilebilir:
+A ve B 3D uzayında bir 2D düzlemi kapsayan iki dikgen vektör ise, A ve B'yi bu
+2D düzlem için baz vektörleri olarak düşünebiliriz. A ve B tarafından kapsanan
+düzlemdeki herhangi bir X vektörü, A ve B'nin bir doğrusal birleşimi olarak
+ifade edilebilir:
 
 $X = x_A A + x_B B$
 
@@ -100,6 +197,8 @@ verdiğini kanıtlar. Bu, bir 2D Kartezyen düzlemde x eksenindeki $(1,
 0)$ vektörünün $\theta$ kadar döndürüldüğünde $(\cos \theta, \sin
 \theta)$'ye dönmesiyle benzerdir. A ve B vektörleri, 3D uzayında bu 2D
 dönüşüm için eksenleri sağlar.
+
+[devam edecek]
 
 Kaynaklar
 
