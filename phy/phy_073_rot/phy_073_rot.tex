@@ -200,15 +200,10 @@ dönüşüm için eksenleri sağlar.
 
 Dörtlü Grup / Kuaterniyon (Quaternions)
 
+Turetim [1, sf. 281]
+
 \begin{minted}[fontsize=\footnotesize]{python}
 import math
-
-def normalize(v, tolerance=0.00001):
-    mag2 = sum(n * n for n in v)
-    if abs(mag2 - 1.0) > tolerance:
-        mag = math.sqrt(mag2)
-        v = tuple(n / mag for n in v)
-    return v
 
 def q_mult(q1, q2):
     w1, x1, y1, z1 = q1
@@ -223,12 +218,12 @@ def q_conjugate(q):
     w, x, y, z = q
     return (w, -x, -y, -z)
 
-def rotate(q1, v1):
-    q2 = (0.0,) + v1
-    tmp1 = q_mult(q1, q2)
-    tmp2 = q_conjugate(q1)
-    return q_mult(tmp1, tmp2)[1:]
-
+def normalize(v, tolerance=0.00001):
+    mag2 = sum(n * n for n in v)
+    if abs(mag2 - 1.0) > tolerance:
+        mag = math.sqrt(mag2)
+        v = tuple(n / mag for n in v)
+    return v
 
 def axisangle_to_q(v, theta):
     v = normalize(v)
@@ -240,10 +235,12 @@ def axisangle_to_q(v, theta):
     z = z * math.sin(theta)
     return w, x, y, z
 
-def q_to_axisangle(q):
-    w, v = q[0], q[1:]
-    theta = math.acos(w) * 2.0
-    return normalize(v), theta
+def rotate(q1, v1):
+    q2 = (0.0,) + v1
+    tmp1 = q_mult(q1, q2)
+    tmp2 = q_conjugate(q1)
+    return q_mult(tmp1, tmp2)[1:]
+    
 \end{minted}
 
 
@@ -268,6 +265,32 @@ plt.savefig('phy_073_rot_03.jpg')
 \end{minted}
 
 \includegraphics[width=20em]{phy_073_rot_03.jpg}
+
+Farklı bir açıdan daha bakalım, bazen kamera bakış yönüne göre sonuç tam
+belli olmayabiliyor. Etrafında dönüş yapılan $n$ vektörü direk $y$ eksenine
+bakıyor olsun, kamerayı o yöne koyalım ve 90 derece dönüş yapalım,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+o2 = (5.0,5.0,5.0)
+v2 = (3.0,3.0,3.0)
+n2 = (0, 1, 0)
+
+theta = np.deg2rad(90)
+
+r2 = axisangle_to_q(n1, theta)
+v2r = rotate(r2, v2)
+
+fig = plt.figure()
+ax = Axes3D(fig)
+plot3d.plot_vector(fig, o2, v2)
+plot3d.plot_vector(fig, o2, v2r, 'cyan')
+plot3d.plot_vector(fig, o2, 3*np.array(n2), 'red')
+plot3d.plot_plane(ax, o2, n2, size=3)
+ax.view_init(elev=0., azim=90)
+plt.savefig('phy_073_rot_04.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{phy_073_rot_04.jpg}
 
 
 [devam edecek]
