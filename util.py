@@ -202,6 +202,8 @@ def tex_mathjax_html(texfile, htmlfile, title):
    res = res.replace("<em>i</em>","i")
    res = res.replace("<em>j</em>","j")
    res = res.replace("<em>k</em>","k")
+   res = res.replace("align<em>","align*")
+   res = res.replace("align</em>","align*")
    fout.write(res)
    fout.write(bottom)   
    fout.close()
