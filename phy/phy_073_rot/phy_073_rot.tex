@@ -198,9 +198,162 @@ verdiğini kanıtlar. Bu, bir 2D Kartezyen düzlemde x eksenindeki $(1,
 \theta)$'ye dönmesiyle benzerdir. A ve B vektörleri, 3D uzayında bu 2D
 dönüşüm için eksenleri sağlar.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 Dörtlü Grup / Kuaterniyon (Quaternions)
 
-Turetim [1, sf. 281]
+Bir vektörü, fiziksel objeyi döndürmek için çok faydalı bir diğer kavram
+kuaterniyon kavramı.  Kuaterniyon matematiği hayali (imaginery, complex)
+sayıları baz alan bir cebir sistemidir, William Hamilton tarafından
+keşfedilmiştir. Bir kuaterniyon sayı dört reel sayı ve üç tane hayali sayı
+içerir,
+
+$$
+q = [\begin{array}{cccc} w & x & y & z \end{array}]
+$$
+
+olarak yazılabilir, ki son üç sayı hayalidir, ya da
+
+$$
+q = w + i x + j y + k z
+$$
+
+Görüldüğü gibi bu cebirin olabilmesi için sadece $i$ değil, ek olarak $j,k$
+hayali sayıları sisteme ekleniyor, ve önkabul olarak şu ifade ileri sürülüyor
+[1, sf. 247],
+
+$$
+i^2 = j^2 = k^2 = ijk = -1
+$$
+
+Üstteki ifadelerden geri kalan eşitlikler türetilebilir [4, sf. 170], mesela
+
+$$
+ijk = -1 = k^2 \Rightarrow ij = k
+$$
+
+Ayrıca $ij = -ji$, yani sırabağımsızlık yoktur.
+
+Tüm önverili ve türetilmiş ifadeleri biraraya koyarsak,
+
+$$
+i^2 = j^2 = k^2 = ijk = -1
+$$
+
+$$
+ij = -ji = k
+$$
+
+$$
+jk = -kj = i
+$$
+
+$$
+ki = -ik = j
+\mlabel{1}
+$$
+
+Üsttekiler Hamilton'un kurallları adı veriliyor.
+
+Eşlenik (conjugate) hesabı bir $q$ için $q^{\ast}$ olarak gösterilir, hayali
+olan kısmın negatiflenmesi ile elde edilir, yani
+
+$$
+q^{\ast} = [\begin{array}{cccc} w & -x & -y & -z \end{array}]
+$$
+
+Tersi (inverse) işlemi ise eşleniğin büyüklüğe bölünmuş halidir,
+
+$$
+q^{-1} = \frac{q^{\ast}}{|| q ||}
+$$
+
+Kuaterniyon çarpımı mesela $q_1,q_2$ arasında, parantez içi dört sayının çarpım
+ve toplamsal açılımı yapılıp üstteki kurallar uygulanarak elde edilebilir
+[1, sf. 773],
+
+$$
+q_1 = w_1 + x_1 i + y_1 j + z_1 k
+$$
+
+$$
+q_2 = w_2 + x_2 i + y_2 j + z_2 k 
+$$
+
+\begin{eqnarray*}
+q_1 q_2 =
+w_1 w_2 + w_1 x_2 i + w_1 y_2 j + w_1 z_2 k + \\
+x_1 w_2 i + x_1 x_2 i^2 + x_1 y_2 ij x_1 z_2 ik + \\
+y_1 w_2 j + y_1 x_2 ji + y_1 y_2 j^2 + y_1 z_2 jk + \\
+z_1 w_2 k + z_1 x_2 ki + z_1 y_2 kj + z_1 z_2 k^2
+\end{eqnarray*}
+
+\begin{eqnarray*}
+= w_1 w_2 + w_1 x_2 i + w_1 y_2 j + w_1 z_2 k + \\
+x_1 w_2 i + x_1 x_2 (-1) + x_1 y_2 k + x_1 z_2 (-j) + \\
+y_1 w_2 j + y_1 x_2 (-k) y_1 y_2 (-1) + y_1 z_2 (i) + \\
+z_1 w_2 k + z_1 x_2 j + z_1 y_2 (-i) + z_1 z_2 (-1)
+\end{eqnarray*}
+
+Nihai çarpım denklemi
+
+\begin{eqnarray*}
+= w_1 w_2 - x_1 x_2 - y_1 y_2 - z_1 z_2 + \\
+(w_1 x_2 + x_1 w_2 + y_1 z_2 - z_1 y_2 + \\
+(w_1 y_2 + y_1 w_2 + z_1 x_2 - x_1 z_2) j + \\
+(w_1 z_2 + z_1 w_2 + x_1 y_2 - y_1 x_2) k
+\end{eqnarray*}
+
+Ve nihayet döndürme işleminin nasıl yapılacağına geliyoruz, $n$ vektörü
+etrafında bir $p$ noktasına $\theta$ dönüşü yaptırabilmek için bir su şekilde
+bir kuaterniyon yaratıyoruz,
+
+$$
+q = [\begin{array}{cccc}
+    \cos(\theta/2) &
+    \sin(\theta/2) n_x &
+    \sin(\theta/2) n_y &
+    \sin(\theta/2) n_z \end{array}]
+$$
+
+$p$ noktasını skala değeri 0 olan bir diğer kuaterniyon olarak yazıyoruz,
+
+$$
+p = [\begin{array}{cccc} 0 & p_x & p_y & p_z \end{array}]
+$$
+
+Ve şu şekilde bir çarpım yapıyoruz,
+
+$$
+p' = q p q^{-1}
+$$
+
+Kod üzerinde görelim,
 
 \begin{minted}[fontsize=\footnotesize]{python}
 import math
@@ -277,7 +430,7 @@ n2 = (0, 1, 0)
 
 theta = np.deg2rad(90)
 
-r2 = axisangle_to_q(n1, theta)
+r2 = axisangle_to_q(n2, theta)
 v2r = rotate(r2, v2)
 
 fig = plt.figure()
@@ -293,6 +446,11 @@ plt.savefig('phy_073_rot_04.jpg')
 \includegraphics[width=20em]{phy_073_rot_04.jpg}
 
 
+Türetim 
+
+[1, sf. 281],
+
+
 [devam edecek]
 
 Kaynaklar
@@ -303,5 +461,10 @@ Kaynaklar
 
 [3] Stackoverflow,
     \url{https://stackoverflow.com/questions/4870393/rotating-coordinate-system-via-a-quaternion/42180896#42180896}
+
+[4] Millington, {\em Game Physics Engine Development}
+
+[5] Wolfram Mathworld,
+    \url{https://mathworld.wolfram.com/Quaternion.html}
 
 \end{document}
