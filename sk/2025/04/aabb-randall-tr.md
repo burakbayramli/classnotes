@@ -37,7 +37,7 @@ Bunun Internet'te birçok uygulaması ve çeşitli blog yazıları ile
 eğitimleri mevcuttur ancak hepsini bir araya getiren bir şey bulamadım
 ve bu nedenle aşağıda, AABB'lere ve kesişimleri hızla belirlemek için
 bunların bir ağaç yapısında nasıl sıralanacağına dair adım adım bir
-kılavuz yazdım. Motorumdaki C++ uygulamasında örnek kod sağlanmıştır
+kılavuz yazdım. Motorumdaki C++ uygulamasının örnek kodu sağlanmıştır
 ve bu yazının sonunda bunu (sadece AABB ağaç uygulamasını) kendi
 kodunuzda nasıl kullanabileceğinizi açıklıyorum. Ancak bu yazı daha
 çok teoriyle ilgilidir ve bunu anladığınızda basit bir uygulamanın
@@ -87,7 +87,13 @@ maxx1 > minx2 && minx1 < maxx2 && maxy1 > miny1 && miny1 < maxy2
 
 Bu ifadeyle ilgili dikkat edilmesi gereken önemli bir nokta, bir dizi
 've' (and) işleminden oluşmasıdır, bu da koşullardan biri sağlanmazsa
-(false olursa) değerlendirmenin hemen duracağı anlamına gelir.
+(false olursa) değerlendirmenin hemen duracağı anlamına gelir [yazarın
+bahsettiği "kısa-devre değerlendirmesi" (short-circuit evaluation),
+eğer bir dizi VE ifadesi var ise terimlerden biri yanlış değeri
+verirse geri kalan terimleri hesaplamaya ihtiyaç yoktur çünkü VE
+zincirinin tamamının doğru sonucunu vermesi için tüm ifadelerin doğru
+olması gerekir, o zaman ilk yanlışta zincirden çıkılabilir (kısa devre) bu
+bir hızlandırıcı tekniktir, bir tür optimizasyondur].
 
 Bir oyun motorunda çalıştığım için şanslıyım çünkü oyun dünyamdaki
 nesneler doğal olarak eksen hizalıdır: [nesneler] esasen 3 boyutlu
@@ -99,13 +105,12 @@ kutu oluşturmanız gerekir:
 
 ![](aabbr4.jpg)
 
-Açıkçası, AABB'leri kesişim için test etmek piksel hassasiyetinde
-çarpışma tespitiyle sonuçlanmayacaktır, ancak AABB kullanmanın
-birincil amacının sürecin geniş kapsamlı (broad phase) kısmında
-olduğunu unutmayın. Yukarıdaki diyagramdaki iki AABB'nin kesişmediğini
-hızlı ve ucuzca belirledikten sonra, iki karmaşık şeklin kesişip
-kesişmediğini anlamaya çalışmanın hesaplama maliyetinden kendimizi
-kurtarabiliriz.
+Tabii ki AABB'yi kesişim için test etmek piksel hassasiyetinde çarpışma
+tespitiyle sonuçlanmayacaktır, ancak AABB kullanmanın birincil
+amacının sürecin geniş kapsamlı (broad phase) kısmında olduğunu
+unutmayın. Yukarıdaki diyagramdaki iki AABB'nin kesişmediğini hızlı ve
+ucuzca belirledikten sonra, iki karmaşık şeklin kesişip kesişmediğini
+anlamaya çalışmanın hesaplama maliyetinden kendimizi kurtarabiliriz.
 
 ### AABB Ağacı
 
@@ -118,16 +123,16 @@ olacaktır.
 
 İşte burada AABB ağacı devreye girer. Yapılması gereken AABB kesişim
 testi sayısını en aza indirmek için AABB'lerimizi organize etmemizi ve
-indekslemek; AABB ağacı bunu dünyayı, tahmin edin ne kullanarak, daha
-fazla AABB kullanarak dilimleyerek yapar. Yani AABB ağacı AABB'leri
+indekslemek; AABB ağacı bunu dünyayı -tahmin edin ne kullanarak- daha
+fazla AABB kullanarak, dilimleyerek yapar. Yani AABB ağacı AABB'leri
 indeksler, bunun kodlamasında yardımcı olarak iç yapısında aynı AABB
 kavramını kullanır.
 
 Daha önce karşılaşmadıysanız, ağaçlar inanılmaz derecede kullanışlı
-hiyerarşik veri yapılarıdır ve temel kavramın birçok çeşidi vardır
-(eğer bu tür şeyler ilginizi çekiyorsa, konuyla ilgili mükemmel, ancak
-oldukça resmi bir kitap Cormen'in Algoritmaya Giriş -Introduction to
-Algorithms- kitabıdır) ve devam etmeden önce yapı ve terminoloji
+hiyerarşik veri yapılarıdır ve temel kavramın birçok çeşidi vardır,
+eğer bu tür şeyler ilginizi çekiyorsa, konuyla ilgili mükemmel, ancak
+oldukça resmi bir kitap Cormen'in *Algoritmaya Giriş (Introduction to
+Algorithms*) kitabıdır ve devam etmeden önce yapı ve terminoloji
 hakkında temel bilgi edinmeye değer.
 
 Burada sunulan AABB ağacı durumunda kök, dal ve yaprakların çok özel
