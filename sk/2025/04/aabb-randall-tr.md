@@ -2,7 +2,7 @@
 
 [James Randall](aabb-randall.html) 
 
-Bir [oyun] dünyasına hareket eden obbjeler veya herhangi bir şey
+Bir [oyun] dünyasına hareket eden objeler veya herhangi bir şey
 eklediğiniz anda, çarpışmaları tespit etmeyi düşünmeye başlarsınız ve
 bunu verimli bir şekilde yapmak, farklı yaklaşımların farklı koşullar
 için az ya da çok optimal olmasıyla birlikte ilginç bir geliştirme
@@ -22,7 +22,7 @@ yüzlerce nesneyi dikkate almam gerekiyor. Bu objelerin her biri
 arasındaki mükemmel çakışma tespitinin çok maliyetli olacağı bellidir
 ve bu yüzden çarpışma tespiti tipik olarak iki aşamaya ayrılır:
 
-Kaba hatlı çarpışma saptamasi – muhtemel çarpışmaların kısa bir
+Kaba hatlı çarpışma saptaması – muhtemel çarpışmaların kısa bir
 listesini hızla çıkarmaktır. Detaylı çarpışmalar – kaba hatlı adımdan
 kaynaklanan muhtemel çarpışmaları filtreleyerek gerçek piksel /
 [nesne] bazında mükemmel çarpışmalara indirgemek için ek detay
@@ -343,8 +343,3 @@ arayüzünü (interface) uygulaması gerekir. Bu nesneleri sırasıyla
 insertObject, updateObject ve removeObject yöntemleriyle ekleyebilir,
 güncelleyebilir ve kaldırabilirsiniz ve queryOverlaps yöntemiyle
 çakışmaları sorgulayabilirsiniz.
-
-
-
-
-
