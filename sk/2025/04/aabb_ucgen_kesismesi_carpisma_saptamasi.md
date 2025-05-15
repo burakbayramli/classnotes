@@ -172,7 +172,7 @@ plt.savefig('coll_02.jpg')
 
 Biz kabaca bakarak iki tane obje arasında çarpışma olduğunu
 görebiliyoruz.  O zaman ağaca sorduğumuzda bize bir ve ikinci objeler
-arasında potansiyel (detaylı) çarpışma var demelidir.
+arasında potansiyel çarpışma var demelidir.
 
 ```python
 tree = AABB.AABBTree(initial_size=10)
@@ -211,15 +211,19 @@ plt.savefig('coll_03.jpg')
 
 ![](coll_03.jpg)
 
-### Detaylı Saptama
+### Daha Detaylı Saptama
 
 Şimdi ikinci kalemdeki kodlamaya gelelim, ve tüm fikirleri bir araya
-koyarak içinde objelerin hareket ettiği bir animasyon
-yaratalım. Objeleri hareket ettirmek kolay, her obje için bir yön
-vektörü tanımlarız, ve her karede objenin `offset` değerine bu yön
-çarpı bir sabit değerini ekleyerek objenin o yöne gitmesini sağlarız.
-Ayrıca alttaki kodda yüzeyler arası çarpışma adayları gerektiği için
-AABB Ağacının bu parçaları indisleyebilmesi gerekir, bunun için bir
+koyarak içinde objelerin hareket ettiği bir animasyon yaratalım. Dikkat
+bu faz da hala 100% detaylı saptama yapmıyor, tüm objenin etrafındaki
+AABB kutusundan sonra objenin şimdi dış cephesindeki üçgenlerin AABB
+kutularını ek bir eleme için kullanıyor.
+
+Objeleri hareket ettirmek kolay, her obje için bir yön vektörü
+tanımlarız, ve her karede objenin `offset` değerine bu yön çarpı bir
+sabit değerini ekleyerek objenin o yöne gitmesini sağlarız.  Ayrıca
+alttaki kodda yüzeyler arası çarpışma adayları gerektiği için AABB
+Ağacının bu parçaları indisleyebilmesi gerekir, bunun için bir
 `Triangle` sınıfı yarattık, her prizma objesinin yüzeyini oluşturan 20
 tane üçgen objesi bu sınıftan yaratılıyor olacak. Bu sınıf aynen ana
 objelerde olduğu gibi `AABB.IAABB` arayüzünden miras alımı yapacak.
