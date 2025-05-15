@@ -2,6 +2,43 @@
 \begin{document}
 Hareketin Katı-Gövde Denklemleri - 3
 
+[1, sf. 842]
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n = 256
+theta0 = 0.1
+dtheta0 = 1.0
+h = 0.1
+c = 1.0
+
+theta_values = np.zeros(n)
+
+for i in range(n):
+    K1theta = h * dtheta0
+    K1dtheta = -h * c * np.sin(theta0)
+    theta1 = theta0 + 0.5 * K1theta
+    dtheta1 = dtheta0 + 0.5 * K1dtheta
+    K2theta = h * dtheta1
+    K2dtheta = -h * c * np.sin(theta1)
+
+    theta1 = theta0 + 0.5 * K2theta
+    dtheta1 = dtheta0 + 0.5 * K2dtheta
+    K3theta = h * dtheta1
+    K3dtheta = -h * c * np.sin(theta1)
+    theta1 = theta0 + K3theta
+    dtheta1 = dtheta0 + K3dtheta
+    K4theta = h * dtheta1
+    K4dtheta = -h * c * np.sin(theta1)
+    theta1 = theta0 + (K1theta + 2.0 * K2theta + 2.0 * K3theta + K4theta) / 6.0
+    dtheta1 = dtheta0 + (K1dtheta + 2.0 * K2dtheta + 2.0 * K3dtheta + K4dtheta) / 6.0
+    theta_values[i] = theta1
+    theta0 = theta1
+    dtheta0 = dtheta1
+
+plt.ylim(-1.20,1.20)
+plt.plot(range(n), theta_values)
+plt.savefig('phy_005_basics_06_01.jpg')
+\end{minted}
 
 
 
@@ -18,7 +55,8 @@ Hareketin Katı-Gövde Denklemleri - 3
 
 
 
+Kaynaklar
 
-
+[1] Eberly, {\em Game Physics 2nd Ed}
 
 \end{document}
