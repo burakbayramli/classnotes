@@ -173,7 +173,8 @@ import numpy as np
 from stl import mesh
 fig = plt.figure()
 axes = mplot3d.Axes3D(fig)
-your_mesh = mesh.Mesh.from_file('../../../compscieng/compscieng_bpp32sim_rigbod/torus.stl')
+ftor = '../../../phy/phy_005_basics_05/torus.stl'
+your_mesh = mesh.Mesh.from_file(ftor)
 axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
 scale = your_mesh.points.flatten()
 axes.auto_scale_xyz(scale, scale, scale)
@@ -187,36 +188,11 @@ axes.view_init(azim=40,elev=30)
 plt.savefig('torus-begin.png')
 ```
 
-```text
-exception (0, 'Cannot read normals (2:b\'?\\xcb\\xba\\r\\xbf%n\\x8e?\\xd5=i?k\\xa8v\\xbe"\\x19\\x8b?\\xf5\\xc8c?\\x18y\\x96\\xbeq\\x84\\x82?\\xe5cw?\\x18y\\x96\\xbe\')')
-
-TypeErrorTraceback (most recent call last)
-<ipython-input-1-375dba368e8e> in <module>
-      6 fig = plt.figure()
-      7 axes = mplot3d.Axes3D(fig)
-----> 8 your_mesh = mesh.Mesh.from_file('../../../compscieng/compscieng_bpp32sim_rigbod/torus.stl')
-      9 axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha=0.3))
-     10 scale = your_mesh.points.flatten()
-
-~/Documents/env3/lib/python3.6/site-packages/stl/stl.py in from_file(cls, filename, calculate_normals, fh, mode, speedups, **kwargs)
-    394         return cls(
-    395             data, calculate_normals, name=name,
---> 396             speedups=speedups, **kwargs
-    397         )
-    398 
-
-~/Documents/env3/lib/python3.6/site-packages/python_utils/logger.py in __new__(cls, *args, **kwargs)
-    100             cls.__get_name(cls.__module__, cls.__name__)
-    101         )
---> 102         return super(Logged, cls).__new__(cls)
-
-TypeError: super(type, obj): obj must be an instance or subtype of type
-```
 ![](torus-begin.png)
 
 
 ```python
-your_mesh = mesh.Mesh.from_file('../../../phy/phy_005_basics_04/torus.stl')
+your_mesh = mesh.Mesh.from_file(ftor)
 theta = np.deg2rad(90) # 90 derece x ekseni etrafinda dondur
 R = np.array(
   [[1, 0, 0],
