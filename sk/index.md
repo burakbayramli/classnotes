@@ -3,6 +3,8 @@
 
 ## En Son
 
+22/5 - [AABB, Üçgen Kesişmesi, Hızlı Çarpışma Saptaması](https://burakbayramli.github.io/dersblog/sk/2025/04/aabb_ucgen_kesismesi_carpisma_saptamasi.html)
+
 14/5 - [AABB Ağaçları ile Çarpışma Saptamasına Giriş](https://burakbayramli.github.io/dersblog/sk/2025/04/aabb-randall-tr.html)
 
 6/5 - [Çok Değişkenli Calculus - Ekler - 3D Çizgi/Üçgen, Üçgen/Üçgen Kesişme Hesapları](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_75_app/green_in_teorisi_duzlem_kesismeleri_egriler.html)
@@ -10,8 +12,6 @@
 26/4 - [Çok Değişkenli Calculus Ders 4 - Ekler - Nokta Düzlem Uzaklığı](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_04/ders_4.html)
 
 26/4 - [CAD Tasarım Formatı, STL - Ekler - STL Viewer](https://burakbayramli.github.io/dersblog/sk/2020/08/stl-3d-cad.html)
-
-21/4 - [MH370 Uçağı Nerede?](https://burakbayramli.github.io/dersblog/sk/2025/03/mh370.html)
 
 ## Konular, Referans
 
