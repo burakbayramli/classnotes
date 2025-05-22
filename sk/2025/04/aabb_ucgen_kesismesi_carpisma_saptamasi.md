@@ -81,7 +81,6 @@ plt.savefig('coll_01.jpg')
 ```
 
 ```python
-import pickle
 print (u'dış üçgen sayısı =',len(your_mesh.vectors))
 print (your_mesh.vectors.shape)
 ```
