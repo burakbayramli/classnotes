@@ -115,7 +115,7 @@ ki GDELT her zaman işlemiyor, ek filtreleme yapmak gerekebilir.
 
 Ekler
 
-En son versiyon üzerinde işleyen kod alttadır, 20240602 tarihi için bir zıp
+En son versiyon üzerinde işleyen kod alttadır, 20240602 tarihi için bir zip
 dosyasının indirilmiş olduğunu kabul edelim,
 
 ```python
@@ -158,3 +158,5 @@ Kaynaklar
 [1] [GDELT](http://data.gdeltproject.org/events/index.html)
 
 [2] [GDELT Olay Kodlari - PDF](http://data.gdeltproject.org/documentation/CAMEO.Manual.1.1b3.pdf)
+
+
