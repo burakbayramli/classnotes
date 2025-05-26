@@ -1,122 +1,99 @@
 \documentclass[12pt,fleqn]{article}\usepackage{../../common}
 \begin{document}
-Hareketin Katı-Gövde Denklemleri - 3
+Hareketin Katı-Gövde Denklemleri - 2
 
-Bir diferansiyel denklemi entegre edebilmek için Runge-Kutta yaklaşımının
-kodlamasını detaylı şekilde anlamak gerekiyor. RK yaklaşımını [3]'te gördük.
-Şimdi Runge-Kutta dördüncü derece çözüm yaklaşımını bir örnekte görelim.
+Daha önce rotasyon matrisi bazlı hareket denklemlerini vermiştik. Bu yazıda
+cisim duruşu ve dönüş mekaniğini kuaterniyon kavramı üzerinden hesaplayacağız,
+daha önce görülen bazı kavramların da tekrar üzerinden geçeceğiz.
 
-Sarkaç Problemi
+Lineer Hız, Momentum
 
-Bağlantı noktasında sürtünme içerebilecek basit bir şarkacın hareket denklemleri
-[1, sf. 842],
-
-$$
-\ddot{\theta} + b\dot{\theta}  c\sin(\theta) = 0, \quad
-t \ge 0, \theta(0)=\theta_0, \quad
-\dot{\theta} = \dot{\theta}_0
-\mlabel{1}
-$$
-
-olarak verilebilir. Bu denklemi ODE sistemi ölarak çözmek için yeni değişken
-tanımları üzerinden onu iki parçaya ayırıyoruz,
+Cisim yeri ve hızı şöyle alakalı,
 
 $$
-\vec{x} = x = \left[\begin{array}{ccc}
-x_1 \\ x_2
-\end{array}\right] = 
-\left[\begin{array}{c}
-\theta \\ \dot{\theta}
-\end{array}\right], \quad
-f(t,x) = \left[\begin{array}{c}
-\dot{\theta} \\ -b \dot{\theta} - c\sin\theta
-\end{array}\right]
+\frac{\ud x(t)}{\ud t} = v(t)
 $$
 
-Bu tanimlarla $\dot{x}$ ifadesi
-$
-\dot{x} = \left[\begin{array}{c} \dot{\theta} \\ \ddot{\theta} \end{array}\right]
-$
-haline gelir,  ve $\dot{x} = f(t,x)$ matris denkleminde 
+Katı gövdenin momentumu
 
 $$
-\left[\begin{array}{c} \dot{\theta} \\ \ddot{\theta} \end{array}\right]=
-\left[\begin{array}{c} \dot{\theta} \\ -b \dot{\theta} - c\sin\theta \end{array}\right]
+p(t) = m v(t)
 $$
 
-alt satıra odaklanırsak, orada (1) denklemine geri gidebileceğimizi görebiliriz.
-
-Sayısal çözüme gelirsek, benzer bir problemin çözümünü [2]'de işlemiştik.  O
-derste bir paket çağrısı olan \verb!odeint! kullanılmıştı, bu paketin
-entegrasyonu nasıl yaptığından bahsedilmemişti. Şimdi daha detaylandıralım,
-\verb!odeint! kodu iç mantığında dördünce derece Runge-Kutta çözümü kullanır,
-yani RK4 yaklaşımını. RK4 formülleri [3]'te verilmişti, [1, sf. 803] üzerinden
-bir daha paylaşalım,
+Newton'un ikinci kanununa gore,
 
 $$
-k_1 = h f(t_i, y_i)
+\frac{\ud p(t)}{\ud t} = F(t)
 $$
 
-$$
-k_2 = h f(t_i + h/2, y_i + k_1/2)
-$$
+Yani momentumun zamansal türevi kuvvettir. Hareket hesaplarında $F$ entegre
+edilerek $p$ hesaplanır, $p$'yi $m$ ile bölerek $v$ elde ederiz, ve onu entegre
+ederek cisim yeri $x$ elde edilir [1, sf. 466].
+
+Açısal Momentum
+
+Lineer momentum kavramı anlaşılması kolay, onu bir tür atalet olarak görüyoruz,
+hareket eden bir objenin düz bir çizgi üzerindeki hareketini devam ettirmeye
+olan meyili. Tabii ki bu meyil, hareketin devamlılığı o anki hız ve cismin
+kütlesiyle orantılı, $mv$ buradan geliyor. Açısal momentum da benzer bir kavram,
+tek fark bir eksen etrafında dönmekte olan bir cismin dönmeye devam etme meyili.
+O zaman üç boyutta, orijin etrafındaki açısal momentum $\vec{L}$, $m$ kütleli
+cismin orijine olan uzaklığı $\vec{r}$ ile $m\vec{v}$ çapraz çarpımıdır [1, sf. 42].
 
 $$
-k_3 = h f(t_i + h/2, y_i + k_2/2)
+L = r \times p = r \times mv
 $$
 
-$$
-k_4 = h f(t_i + h, y_i + k_3)
-$$
+Aynen kuvvetin momentumun zamansal türevi olması gibi, tork benzer şekilde
+açısal momentumun türevidir, bunu görmek için üstteki $L$'nin türevini alalım,
 
 $$
-y_{i+1} = y_i + (k_1 + 2 k_2 + 2 k_3 + k_4) / 6
+\frac{\ud L}{\ud t} = \frac{\ud (r \times p)}{\ud t}
 $$
 
-ki başlangıç değerleri $y_0 = (\theta_0,\dot{\theta}_0)$ olmak üzere. Çözmek
-istediğimiz sistemde sürtünme yok, yani $b=0$, geri kalan değerler $c=1$,
-$\theta_0=0.1$, $\dot{\theta}_0 = 1.0$.
+Eşitliğin sağındaki türev zincirleme kuralı ile şöyle açılır,
 
+$$
+= r \times \frac{\ud p}{\ud t} + \frac{\ud r}{\ud t} \times p
+$$
 
-\begin{minted}[fontsize=\footnotesize]{python}
-n = 256; theta0 = 0.1; dtheta0 = 1.0; h = 0.1; c = 1.0
+$\ud p / \ud t = F$, $\ud r / \ud t = v$ olduğunu biliyoruz, üstte yerine
+geçirelim,
 
-theta_values = np.zeros(n)
+$$
+= r \times F + v \times p
+$$
 
-for i in range(n):
-    K1theta = h * dtheta0
-    K1dtheta = -h * c * np.sin(theta0)
-    theta1 = theta0 + 0.5 * K1theta
-    dtheta1 = dtheta0 + 0.5 * K1dtheta # b=0, bir terim yokoldu burada
-    K2theta = h * dtheta1
-    K2dtheta = -h * c * np.sin(theta1)
+Fakat $v$ ile $p$ aynı yöne işaret eden vektörler, onların çapraz çarpımı sıfır,
+geri kalanlar,
 
-    theta1 = theta0 + 0.5 * K2theta
-    dtheta1 = dtheta0 + 0.5 * K2dtheta
-    K3theta = h * dtheta1
-    K3dtheta = -h * c * np.sin(theta1)
-    theta1 = theta0 + K3theta
-    dtheta1 = dtheta0 + K3dtheta
-    K4theta = h * dtheta1
-    K4dtheta = -h * c * np.sin(theta1)
-    theta1 = theta0 + (K1theta + 2.0 * K2theta + 2.0 * K3theta + K4theta) / 6.0
-    dtheta1 = dtheta0 + (K1dtheta + 2.0 * K2dtheta + 2.0 * K3dtheta + K4dtheta) / 6.0
-    theta_values[i] = theta1
-    theta0 = theta1
-    dtheta0 = dtheta1
+$$
+\frac{\ud L}{\ud t} = r \times F = \tau
+$$
 
-plt.ylim(-1.20,1.20)
-plt.plot(range(n), theta_values)
-plt.savefig('phy_005_basics_06_01.jpg')
-\end{minted}
+Bir diger esitlik
 
-\includegraphics[width=20em]{phy_005_basics_06_01.jpg}
+$$
+L(t) = J(t) w(t)
+$$
 
-Çözümün üstteki grafiği şarkacın (dikey eksene göre olan) açılarının zamana göre
-grafiğini gösteriyor. Metot stabil gözüküyor, açıda azalma ya da patlama olmadı,
-$b=0$ şartını koştuğumuz için bunun hesaba yansıması iyi oldu, sürtünme yoksa
-sönüm (damping) görülmemeliydi. 
+Bu formül açısal momentum ile açısal hız $w$ (diğer kaynaklarda $\omega$) ile
+ilişkilendirir, lineer momentum'daki kütle yerine burada $J$ (diğer kaynaklarda
+$I$ diye geçer) var, ki $J$ bir atalet tensoru, objenin şekline, ağırlık
+dağılımına göre değişir, ve bu değerin kendisi de obje döndükçe değişime uğrar.
 
+Hesaplarda gereken uygulanan tork $\tau(t)$'un sebep olduğu cisim dönüşünü
+bulmak, bunun için $\tau$ entegre edilerek $L$ elde edilir, $L$ değeri $J$ ile
+bölünerek (daha doğrusu $J$ bir matris olduğu için onun tersi alıp çarpılarak)
+$w$ elde edilir. Kuaterniyon durumunda
+
+$$
+\frac{\ud q(t)}{\ud t} = \frac{1}{2} \omega(t) q(t)
+$$
+
+entegre edilerek objenin dönüş sonrası yeni işaret ettiği yer bulunur (burada
+$\omega$ açısal hızı temsil eden kuaterniyon). Üstteki denklemi türetmek
+gerekirse,
 
 
 
@@ -132,11 +109,8 @@ Kaynaklar
 
 [1] Eberly, {\em Game Physics 2nd Ed}
 
-[2] Bayramlı, {\em Gayrı-Lineer Dinamik ve Kaos Ders 1}
-
-[3] Bayramlı, {\em Diferansiyel Denklemler Ders 2}
+[2] Bayramlı, {\em Diferansiyel Denklemler Ders 2}
 
 \end{document}
 
-
-
+ 

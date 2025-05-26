@@ -504,6 +504,120 @@ $$
 k_4 = f(x_i+h, y_i + k_3 h)
 $$
 
+Şimdi Runge-Kutta dördüncü derece çözüm yaklaşımını bir örnekte görelim.
+
+Sarkaç Problemi
+
+Bağlantı noktasında sürtünme içerebilecek basit bir şarkacın hareket denklemleri
+[5, sf. 842],
+
+$$
+\ddot{\theta} + b\dot{\theta}  c\sin(\theta) = 0, \quad
+t \ge 0, \theta(0)=\theta_0, \quad
+\dot{\theta} = \dot{\theta}_0
+\mlabel{1}
+$$
+
+olarak verilebilir. Bu denklemi ODE sistemi ölarak çözmek için yeni değişken
+tanımları üzerinden onu iki parçaya ayırıyoruz,
+
+$$
+\vec{x} = x = \left[\begin{array}{ccc}
+x_1 \\ x_2
+\end{array}\right] = 
+\left[\begin{array}{c}
+\theta \\ \dot{\theta}
+\end{array}\right], \quad
+f(t,x) = \left[\begin{array}{c}
+\dot{\theta} \\ -b \dot{\theta} - c\sin\theta
+\end{array}\right]
+$$
+
+Bu tanımlarla $\dot{x}$ ifadesi
+
+$
+\dot{x} = \left[\begin{array}{c} \dot{\theta} \\ \ddot{\theta} \end{array}\right]
+$
+haline gelir,  ve $\dot{x} = f(t,x)$ matris denkleminde 
+
+$$
+\left[\begin{array}{c} \dot{\theta} \\ \ddot{\theta} \end{array}\right]=
+\left[\begin{array}{c} \dot{\theta} \\ -b \dot{\theta} - c\sin\theta \end{array}\right]
+$$
+
+alt satıra odaklanırsak, orada (1) denklemine geri gidebileceğimizi görebiliriz.
+
+Sayısal çözüme gelirsek, benzer bir problemin çözümünü [6]'de işlemiştik.  O
+derste bir paket çağrısı olan \verb!odeint! kullanılmıştı, bu paketin
+entegrasyonu nasıl yaptığından bahsedilmemişti. Şimdi daha detaylandıralım,
+\verb!odeint! kodu iç mantığında dördünce derece Runge-Kutta çözümü kullanır,
+yani RK4 yaklaşımını. RK4 formülleri üstte verildi, [5, sf. 803] üzerinden
+bir daha paylaşalım,
+
+$$
+k_1 = h f(t_i, y_i)
+$$
+
+$$
+k_2 = h f(t_i + h/2, y_i + k_1/2)
+$$
+
+$$
+k_3 = h f(t_i + h/2, y_i + k_2/2)
+$$
+
+$$
+k_4 = h f(t_i + h, y_i + k_3)
+$$
+
+$$
+y_{i+1} = y_i + (k_1 + 2 k_2 + 2 k_3 + k_4) / 6
+$$
+
+ki başlangıç değerleri $y_0 = (\theta_0,\dot{\theta}_0)$ olmak üzere. Çözmek
+istediğimiz sistemde sürtünme yok, yani $b=0$, geri kalan değerler $c=1$,
+$\theta_0=0.1$, $\dot{\theta}_0 = 1.0$.
+
+
+\begin{minted}[fontsize=\footnotesize]{python}
+n = 256; theta0 = 0.1; dtheta0 = 1.0; h = 0.1; c = 1.0
+
+theta_values = np.zeros(n)
+
+for i in range(n):
+    K1theta = h * dtheta0
+    K1dtheta = -h * c * np.sin(theta0)
+    theta1 = theta0 + 0.5 * K1theta
+    dtheta1 = dtheta0 + 0.5 * K1dtheta # b=0, bir terim yokoldu burada
+    K2theta = h * dtheta1
+    K2dtheta = -h * c * np.sin(theta1)
+
+    theta1 = theta0 + 0.5 * K2theta
+    dtheta1 = dtheta0 + 0.5 * K2dtheta
+    K3theta = h * dtheta1
+    K3dtheta = -h * c * np.sin(theta1)
+    theta1 = theta0 + K3theta
+    dtheta1 = dtheta0 + K3dtheta
+    K4theta = h * dtheta1
+    K4dtheta = -h * c * np.sin(theta1)
+    theta1 = theta0 + (K1theta + 2.0 * K2theta + 2.0 * K3theta + K4theta) / 6.0
+    dtheta1 = dtheta0 + (K1dtheta + 2.0 * K2dtheta + 2.0 * K3dtheta + K4dtheta) / 6.0
+    theta_values[i] = theta1
+    theta0 = theta1
+    dtheta0 = dtheta1
+
+plt.ylim(-1.20,1.20)
+plt.plot(range(n), theta_values)
+plt.savefig('phy_005_basics_06_01.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{phy_005_basics_06_01.jpg}
+
+Çözümün üstteki grafiği şarkacın (dikey eksene göre olan) açılarının zamana göre
+grafiğini gösteriyor. Metot stabil gözüküyor, açıda azalma ya da patlama olmadı,
+$b=0$ şartını koştuğumuz için bunun hesaba yansıması iyi oldu, sürtünme yoksa
+sönüm (damping) görülmemeliydi. 
+
 Kaynaklar
 
 [1] Ackleh, {\em Classical and Modern Numerical Analysis Theory}
@@ -513,6 +627,10 @@ Kaynaklar
 [3] Faires, {\em Numerical Analysis, 9th Ed}
 
 [4] Canale, {\em Numerical Methods for Engineers, 7th Ed}
+
+[5] Eberly, {\em Game Physics 2nd Ed}
+
+[6] Bayramlı, {\em Gayrı-Lineer Dinamik ve Kaos Ders 1}
 
 \end{document}
 
