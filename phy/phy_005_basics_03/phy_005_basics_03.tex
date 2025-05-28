@@ -211,8 +211,80 @@ O zaman belli bir alandaki basınç için o alan üzerinden entegral almak gerek
 Basıncın birimi $N / m^2$, şaşırtıcı olmasa gerek, kuvvet birimi
 Newton, ve alan birimi $m^2$.
 
+Simulasyon
+
+Önce basit bir simülasyon kodlayalım. Bazı toplar var, onları başta bir kuvvetle
+rasgele yönlere iteceğiz ve ne yapacaklarına bakacağız. Fiziksel parametreler
+şöyle, yerçekimi sabiti $g = 0.8$ (dünyadan daha az), topların birbirine ya da
+duvara çarpması sonucu hiç enerji kaybı olmuyor.
+
+Bu tür bir sistemin konumu, o anki hali her parçacık için bazı değişkenlerin
+takip edilmesiyle olacak, bu değişkenler pozisyon, hız, kuvvet. Kütle her
+parçacık için aynı olacak.
+
+Parçacık hareketi o parçacık üzerinde uygulanan kuvvet ile belirlenir, Newton
+denklemi $m \bar{a} = \bar{f}$, ki ivme ve kuvvet çok boyutlu dikkat edelim, o
+sebeple vektör notasyonu olarak üstte çizgi kullandık. Peki ivmeden, hiza ve yer
+değişikliğine nasıl gideriz? Newton formülünü bir ODE olarak tekrar düzenlersek
+onu ileri doğru entegre edebiliriz. Yer $\bar{x}$, hız $\bar{v}$ olmak üzere
+[9,10] ve her $i$ parçacığı için,
+
+$$
+\dot{\bar{v}}_i = \bar{f}_i / m_i
+$$
+
+$$
+\dot{\bar{x}}_i = \bar{v}_i
+$$
+
+Bu tür bir sistemi entegre etmek için Euler'in metotu kullanılabilir [5, sf 5],
+her $n$ anında bir sonraki $n+1$ değeri için
+
+$$
+\bar{x}^{n+1} = \bar{x}^n + h \bar{v}^n
+$$
+
+$$
+\bar{v}^{n+1} = \bar{v}^n + h \bar{a}^n
+$$
+
+ki $h$ ufak zaman aralığı olarak alınır, bir diğer isim $\Delta t$ olabilir,
+alttaki kodda \verb!dt! . O zaman her zaman diliminde her parçacığa etki eden
+kuvvetler toplanır, bir nihai kuvvet vektörü elde edilir. Ardından üstteki
+formüllerle sistem her parçacık için entegre edilir ve bir sonraki sistem durumu
+elde edilir.
+
+Bu ilk sistemde bazı basitleştirmeler var; kuvvet uygulanma ve onun hıza
+dönüşmesine her koşulda bakmıyoruz, duvarlar ve parçacıklar arası etkileri direk
+hız üzerinde uyguluyoruz. Topların birbirine çarpma sonucu hız vektörlerinin
+hesabı [8]'te.
+
+Kodlama notu, çarpışma hesabı için her parçacığın diğer parçacığa yakınlık
+kontrolü pahalı olursa, daha fazla parçacık için mesela, bunun için böleç
+tekniği kullanılabilir [7].
+
+Genel grafik yöntemi şurada [1] işlendi.
+
+\inputminted[fontsize=\footnotesize]{python}{sim.py}
+
+
+\includegraphics[width=15em]{glutout-140.png}
+\includegraphics[width=15em]{glutout-390.png}
+
+Tüm resimleri birleştirirsek,
+
+\begin{minted}[fontsize=\footnotesize]{python}
+! convert -scale 30% /tmp/glutout-*.png /tmp/balls1.gif
+\end{minted}
+
+Sonuç [2]'de görülebilir.
 
 Kaynaklar
+
+[1] Bayramlı, {\em OpenGL, PyOpenGL}, \url{https://burakbayramli.github.io/dersblog/sk/2020/08/pyopengl.html}
+
+[2] Bayramlı, {\em Simulasyon 1 Animasyon},
+    \url{https://www.dropbox.com/scl/fi/0hfn6b7wltqfs9hf68uxv/balls1.gif?rlkey=m6atp3r1mx89v10u0adcum4wx&st=e4uvvrv1&raw=1}
 
 [3] Wikipedia, {\em Elastic collision}, \url{https://en.wikipedia.org/wiki/Elastic_collision}
 
@@ -220,5 +292,13 @@ Kaynaklar
 
 [6] Levi, {\em Classical Mechanics with Calculus of Variations and Optimal Control}
 
+[7] Bayramlı, {\em Bilgisayar Bilim, Geometrik Anahtarlama (Spatial Hashing) ve Izgara (Grid) ile En Yakın Noktaları Bulmak}
+
+[8] Bayramlı, Fizik, {\em Temel Fizik 2, Dönüşler, Basınç, Çarpışma}
+
+[9] Müller, {\em Fluid Simulation SIGGRAPH 2007 Course Notes},
+
+[10] {\em Visual Interactive Simulation (Spring 15)},
+    \url{https://www8.cs.umu.se/kurser/5DV058/VT15/}
 
 \end{document}
