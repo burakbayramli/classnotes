@@ -209,6 +209,71 @@ momentumu ekileyen faktörler, sonraki adımlarda etkileri yok.
 Başlangıç torku ve kuvvetin nasıl başlangıç hızına çevirilecebileceğini daha
 önceki derste gördük.
 
+Uygulanan kuvveti şöyle seçelim, STL objesi üzerindeki üçgenlerden birinin
+köşesini son nokta olarak alalım, uzayda herhangi bir noktası başlangıç
+noktası olarak alalım, ve ilk kuvvet bu vektör olsun.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+import numpy.linalg as lin
+from mpl_toolkits import mplot3d
+from stl import mesh
+
+mesh1 = mesh.Mesh.from_file('../../sk/2020/08/shapes/Prism_hexagon.stl')
+
+def plot_vector1(fig, orig, v, color='blue'):
+   '''
+   places vector v at orig point
+   '''
+   ax = fig.gca(projection='3d')
+   orig = np.array(orig); v=np.array(v)
+   ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
+   ax = fig.gca(projection='3d')  
+   return fig
+
+def plot_vector2(fig, torig, tend, color='blue'):
+   '''
+   plots vector from starting point torig towards end points tend
+   '''
+   ax = fig.gca(projection='3d')
+   v = tend - torig
+   ax.quiver(torig[0], torig[1], torig[2], v[0], v[1], v[2],color=color)
+   ax = fig.gca(projection='3d')  
+   return fig
+
+tidx = 7
+f0 = np.array([40,20,-5])
+f1 = mesh1.vectors[tidx][0]
+cog = mesh1.get_mass_properties()[1]
+
+a = f1-f0
+b = cog-f0
+flin = (a.dot(b) / (lin.norm(b)**2))*b
+
+figure = plt.figure()
+ax = mplot3d.Axes3D(figure)
+obj = mplot3d.art3d.Poly3DCollection(mesh1.vectors)
+obj.set_edgecolor('k')
+obj.set_alpha(0.3)
+ax.add_collection3d(obj)
+plot_vector2(figure, f0, f1)
+plot_vector1(figure, f0, flin)
+ax.plot(cog[0], cog[1], cog[2], 'ks')
+ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
+ax.view_init(elev=21, azim=0)
+plt.savefig('phy_005_basics_06_01.jpg')
+\end{minted}
+
+\includegraphics[width=20em]{phy_005_basics_06_01.jpg}
+
+Kuvvet uygulama yönü gösterildi, ayrıca yerçekim merkezi de bir ufak küp olarak
+obje içinde belirtiliyor.
+
+\begin{minted}[fontsize=\footnotesize]{python}
+flindir = (cog-f0) / lin.norm(cog-f0)
+Fproj = np.dot(f1-f0, cog-f0)
+flin = Fproj*flindir
+\end{minted}
+
 [devam edecek]
 
 Kaynaklar

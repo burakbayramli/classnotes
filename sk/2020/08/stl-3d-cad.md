@@ -223,6 +223,75 @@ plt.savefig('torus-rotated.png')
 
 ![](torus-rotated.png)
 
+Bir örnek daha
+
+```python
+from stl import mesh
+from mpl_toolkits import mplot3d
+fig = plt.figure()
+
+ax = fig.add_subplot(1, 2, 1, projection='3d')
+mesh1 = mesh.Mesh.from_file('shapes/Prism_hexagon.stl')
+obj = mplot3d.art3d.Poly3DCollection(mesh1.vectors)
+obj.set_edgecolor('k')
+ax.add_collection3d(obj)
+ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
+ax.view_init(elev=21, azim=40)
+
+ax = fig.add_subplot(1, 2, 2, projection='3d')
+theta = np.deg2rad(90)
+R = np.array(
+  [[1, 0, 0],
+  [0,np.cos(theta),np.sin(theta)],
+  [0,-np.sin(theta),np.cos(theta)]])
+mesh1.rotate_using_matrix(R)
+obj = mplot3d.art3d.Poly3DCollection(mesh1.vectors)
+obj.set_edgecolor('k')
+ax.add_collection3d(obj)
+ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
+ax.view_init(elev=21, azim=40)
+
+plt.savefig('stl1.jpg')
+```
+
+![](stl1.jpg)
+
+Hareket Ettirme
+
+Objeyi X ekseni boyunca 5 birim kaydırmak istersek,
+
+```python
+mesh1 = mesh.Mesh.from_file('shapes/Prism_hexagon.stl')
+prop = mesh1.get_mass_properties()
+print ('yercekim merkezi (COG)',prop[1])
+XLIMS = (40,60); YLIMS = (-5,15); ZLIMS = (-5,15)
+e = 21; a = 100
+obj = mplot3d.art3d.Poly3DCollection(mesh1.vectors)
+obj.set_edgecolor('k')
+ax.add_collection3d(obj)
+ax.set_xlim(XLIMS);ax.set_ylim(YLIMS); ax.set_zlim(ZLIMS)
+ax.view_init(elev=e, azim=a)
+
+ax = fig.add_subplot(1, 2, 2, projection='3d')
+STEP = 10
+mesh1.vectors = mesh1.vectors + np.array([5,0,0])
+prop = mesh1.get_mass_properties()
+print ('yercekim merkezi (COG)',prop[1])
+obj = mplot3d.art3d.Poly3DCollection(mesh1.vectors)
+obj.set_edgecolor('k')
+ax.add_collection3d(obj)
+ax.set_xlim(XLIMS);ax.set_ylim(YLIMS); ax.set_zlim(ZLIMS)
+plt.savefig('stl2.jpg')
+```
+
+```text
+yercekim merkezi (COG) [49.99998897  4.99999966  4.99999962]
+yercekim merkezi (COG) [54.99999348  4.99999966  4.99999962]
+```
+
+![](stl2.jpg)
+
+
 Ubuntu Linux
 
 STL dosyalarını çabuk bir şekilde Ubuntu'da görebilmek için, bir program `meshlab`.
