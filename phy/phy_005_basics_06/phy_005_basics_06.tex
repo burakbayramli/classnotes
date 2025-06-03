@@ -222,7 +222,7 @@ mesh1 = mesh.Mesh.from_file('../../sk/2020/08/shapes/Prism_hexagon.stl')
 
 def plot_vector1(fig, orig, v, color='blue'):
    '''
-   places vector v at orig point
+   baslangıcı orig olan v büyüklüğü/yönünde olan vektorü çiz
    '''
    ax = fig.gca(projection='3d')
    orig = np.array(orig); v=np.array(v)
@@ -232,7 +232,7 @@ def plot_vector1(fig, orig, v, color='blue'):
 
 def plot_vector2(fig, torig, tend, color='blue'):
    '''
-   plots vector from starting point torig towards end points tend
+   baslangic torig bitis tend olmak uzere bir vektor ciz
    '''
    ax = fig.gca(projection='3d')
    v = tend - torig
@@ -241,7 +241,7 @@ def plot_vector2(fig, torig, tend, color='blue'):
    return fig
 
 tidx = 7
-f0 = np.array([40,20,-5])
+f0 = np.array([40,20,10])
 f1 = mesh1.vectors[tidx][0]
 cog = mesh1.get_mass_properties()[1]
 
@@ -249,6 +249,7 @@ a = f1-f0
 b = cog-f0
 flin = (a.dot(b) / (lin.norm(b)**2))*b
 
+tau = np.cross(f1-cog,f1-f0)
 figure = plt.figure()
 ax = mplot3d.Axes3D(figure)
 obj = mplot3d.art3d.Poly3DCollection(mesh1.vectors)
@@ -256,19 +257,27 @@ obj.set_edgecolor('k')
 obj.set_alpha(0.3)
 ax.add_collection3d(obj)
 plot_vector2(figure, f0, f1)
-plot_vector1(figure, f0, flin)
-ax.plot(cog[0], cog[1], cog[2], 'ks')
+plot_vector1(figure, cog, tau, color='cyan')
+plot_vector1(figure, f0, flin, color='cyan')
+ax.plot(cog[0], cog[1], cog[2], 'gs')
 ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
-ax.view_init(elev=21, azim=0)
+ax.text(65,0,8,r'$\tau$',fontsize=20)
+ax.text(35,5,8,r'$F$',fontsize=20)
+ax.text(35,5,-3,r'$F_{cog}$',fontsize=20)
+ax.view_init(elev=20, azim=40)
 plt.savefig('phy_005_basics_06_01.jpg')
 \end{minted}
 
 \includegraphics[width=20em]{phy_005_basics_06_01.jpg}
 
-Kuvvet uygulama yönü gösterildi, ayrıca yerçekim merkezi de bir ufak küp olarak
-obje içinde belirtiliyor.
+Kuvvet uygulama yönü ve onun kütle merkezine doğru olan yansıması gösterildi,
+ayrıca yerçekim merkezi de bir ufak küp olarak nesne içinde belirtiliyor.
+Merkeze olan bileşen kuvveti gösteren vektörün üçü tabii ki merkeze dokunuyor
+olmalı, biz burada gösterim amaçlı olarak hem kuvveti hem de bileşenini aynı
+başlangıçtan gösterdik. Yansıtma hesabı için bkz [6]. Tork vektörü de
+hesaplanıyor, ve COG çıkışlı olarak gösteriliyor. Objenin dönüşü bu vektör
+etrafında ve vektörün büyüklüğüne oranlı hızda olacaktır.
 
-Yansitma hesabi icin [6]
 
 [devam edecek]
 
