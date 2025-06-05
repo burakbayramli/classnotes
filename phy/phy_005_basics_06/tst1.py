@@ -1,20 +1,31 @@
 import numpy as np
+from stl import mesh
+import numpy.linalg as lin
 
-def rk4_step(func, dt, t, y):
-    k1 = dt * func(t, y)
-    k2 = dt * func(t + 0.5 * dt, y + 0.5 * k1)
-    k3 = dt * func(t + 0.5 * dt, y + 0.5 * k2)
-    k4 = dt * func(t + dt, y + k3)
-    return y + (k1 + 2*k2 + 2*k3 + k4) / 6
+obj = mesh.Mesh.from_file('../../sk/2020/08/shapes/Prism_hexagon.stl')
+cog = obj.get_mass_properties()[1]
+tidx = 7
 
-def rb_motion(t, X):
-    x, y_pos, vx, vy = X
+m = 1 # kg
+p = np.ones(3) * 0 # linear momentum
+w = np.ones(3) * 0 # angular vel
+q = np.ones(3) * 0 # orientation
+F = np.ones(3) * 0 # force
+tau  = np.ones(3) * 0 # torque
+dt = 0.05
+f0 = np.array([40,20,10])
+f1 = obj.vectors[tidx][0]
+F_ext  = f1 - f0
 
-    m = 1     # topun kutlesi
+a = f1-f0
+b = cog-f0
+flin = (a.dot(b) / (lin.norm(b)**2))*b
+tau_ext = np.cross(f1-cog,f1-f0)
+x = cog
 
-    dx_dt = vx
-    dy_dt = vy
-    dvx_dt = 0.0 
-    dvy_dt = -g  
-
-    return np.array([dx_dt, dy_dt, dvx_dt, dvy_dt])
+for t in np.linspace(0,1,20):
+    print (t)
+    F = 0
+    if t==0: p = F_ext*m
+    x = x + dt*(p / m)
+    print (x)
