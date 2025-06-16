@@ -39,7 +39,8 @@ for line in fin.readlines():
    line = line.replace("%<a name","<a name")
    line = re.sub(r'{\\em (.*?)}', r'*\1*', line)
    line = re.sub(r'\\textbf{(.*?)}', r'*\1*', line)
-   line = re.sub(r'\\url\{(.*?)\}', r'<a href="\1">\1</a>', line)
+   #line = re.sub(r'\\url\{(.*?)\}', r'<a href="\1">\1</a>', line)
+   line = re.sub(r'\\url\{(.*?)\}', r'[\1](\1)', line)
    s = re.sub(r'verb!(.*?)!', r'`\1`', line)
    s = s.replace('\`','`')
    line = s
@@ -79,5 +80,6 @@ for line in fin.readlines():
 
 fout.close()
 
-cmd = "pandoc %s ../../metadata.yaml --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+#cmd = "pandoc %s ../../metadata.yaml --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+cmd = "pandoc %s ../../metadata.yaml -t latex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
 os.system(cmd)
