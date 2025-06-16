@@ -1,4 +1,4 @@
-import codecs, re
+import codecs, re, os
 
 texfile = "phy_005_basics_06.tex"
 
@@ -96,3 +96,6 @@ for line in fin.readlines():
        fout.write(line)
 
 fout.close()
+
+cmd = "pandoc %s --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+os.system(cmd)
