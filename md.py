@@ -1,6 +1,5 @@
 import codecs, re, os, sys
 
-#texfile = "phy_005_basics_06.tex"
 texfile = sys.argv[1]
 
 fin = codecs.open(texfile, encoding='utf-8')
@@ -13,7 +12,6 @@ fout.write("# " + title)
 
 for line in fin.readlines():
    line = line.replace("\\ud", "\\mathrm{d}")
-#   line = line.replace("^*", "@@RR@@@")
    line = line.replace("\\curl", "\\mathrm{curl}")
    line = line.replace("\\sinc", "\\mathrm{sinc}")
    line = line.replace("\\begin{quote}", "```")
@@ -32,19 +30,6 @@ for line in fin.readlines():
    line = line.replace("\\begin{tabular}","\\begin{array}")
    line = line.replace("\\end{tabular}","\\end{array}")
    line = line.replace('``','"')
-   #line = line.replace("''",'"')
-   #line = line.replace("\$","\\$")
-   #line = line.replace("\\\\","\\\\\\\\")
-   #line = line.replace("\\left\{","\\left\\\\{")
-   #line = line.replace("\\right\}","\\right\\\\}")
-   #line = line.replace("\\bigg\{","\\bigg\\\\{")
-   #line = line.replace("\\bigg\}","\\bigg\\\\}")
-   #line = line.replace("\\bigg\]","\\bigg\\\\]")
-   #line = line.replace("\\bigg\[","\\bigg\\\\[")
-   #line = line.replace("\\big\[","\\big\\\\[")
-   #line = line.replace("\\big\]","\\big\\\\]")
-   #line = line.replace("\\big\{","\\big\\\\{")
-   #line = line.replace("\\big\}","\\big\\\\}")
    line = re.sub(r'\\hspace\{(.*?)\}', r'\n', line)
    line = line.replace("\\begin{itemize}","")
    line = line.replace("\\end{itemize}","")
@@ -85,11 +70,7 @@ for line in fin.readlines():
    elif '\input{' in line:
       pf = re.findall("input\{(.*?)\}",line,re.DOTALL)[0]
       pfcontent = codecs.open(pf).read()
-      #print (pfcontent)
       fout.write(pfcontent)
-#   elif '_' in line:
-#      line = line.replace("_","@@UUEEE@@") # special code
-#      fout.write(line)
    elif '\\mlabel' in line:
       line = re.sub("\\\mlabel{(.*?)}", "\\\qquad (\\1)", line)
       fout.write(line)
