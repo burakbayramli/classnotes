@@ -1,6 +1,7 @@
-import codecs, re, os
+import codecs, re, os, sys
 
-texfile = "phy_005_basics_06.tex"
+#texfile = "phy_005_basics_06.tex"
+texfile = sys.argv[1]
 
 fin = codecs.open(texfile, encoding='utf-8')
 fout = codecs.open("/tmp/out.md",mode="w",encoding="utf-8")
@@ -32,18 +33,18 @@ for line in fin.readlines():
    line = line.replace("\\end{tabular}","\\end{array}")
    line = line.replace('``','"')
    #line = line.replace("''",'"')
-   line = line.replace("\$","\\$")
-   line = line.replace("\\\\","\\\\\\\\")
-   line = line.replace("\\left\{","\\left\\\\{")
-   line = line.replace("\\right\}","\\right\\\\}")
-   line = line.replace("\\bigg\{","\\bigg\\\\{")
-   line = line.replace("\\bigg\}","\\bigg\\\\}")
-   line = line.replace("\\bigg\]","\\bigg\\\\]")
-   line = line.replace("\\bigg\[","\\bigg\\\\[")
-   line = line.replace("\\big\[","\\big\\\\[")
-   line = line.replace("\\big\]","\\big\\\\]")
-   line = line.replace("\\big\{","\\big\\\\{")
-   line = line.replace("\\big\}","\\big\\\\}")
+   #line = line.replace("\$","\\$")
+   #line = line.replace("\\\\","\\\\\\\\")
+   #line = line.replace("\\left\{","\\left\\\\{")
+   #line = line.replace("\\right\}","\\right\\\\}")
+   #line = line.replace("\\bigg\{","\\bigg\\\\{")
+   #line = line.replace("\\bigg\}","\\bigg\\\\}")
+   #line = line.replace("\\bigg\]","\\bigg\\\\]")
+   #line = line.replace("\\bigg\[","\\bigg\\\\[")
+   #line = line.replace("\\big\[","\\big\\\\[")
+   #line = line.replace("\\big\]","\\big\\\\]")
+   #line = line.replace("\\big\{","\\big\\\\{")
+   #line = line.replace("\\big\}","\\big\\\\}")
    line = re.sub(r'\\hspace\{(.*?)\}', r'\n', line)
    line = line.replace("\\begin{itemize}","")
    line = line.replace("\\end{itemize}","")
