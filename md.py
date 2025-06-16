@@ -98,5 +98,5 @@ for line in fin.readlines():
 
 fout.close()
 
-cmd = "pandoc %s --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+cmd = "pandoc %s ../../metadata.yaml --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
 os.system(cmd)
