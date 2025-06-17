@@ -80,7 +80,6 @@ def conv(texfile):
 
     fout.close()
 
-    #cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml --latex-engine=xelatex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
     cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
     os.system(cmd)
 
@@ -88,7 +87,7 @@ topdirs = ['algs','calc_multi','chaos','compscieng',
            'func_analysis','linear','ode', 'stat',
            'tser','vision','phy']
 
-topdirs = ['calc_multi']
+topdirs = ['linear']
 
 curr = os.getcwd()
 print (curr)
