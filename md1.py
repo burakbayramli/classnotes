@@ -16,6 +16,7 @@ def conv(texfile):
        line = line.replace("\\begin{quote}", "```")
        line = line.replace("\\end{quote}", "```")
        line = line.replace("\\bdiv", "\\mathrm{div}")
+       line = line.replace("\\mdiv", "\\mathrm{div}")
        line = line.replace("\\tr", "\\mathrm{tr}")
        line = line.replace("\\grad", "\\mathrm{grad}")
        line = line.replace("\\dom", "\\mathrm{dom}")
@@ -79,8 +80,7 @@ def conv(texfile):
 
     fout.close()
 
-    #cmd = "pandoc %s ../../metadata.yaml --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
-    cmd = "pandoc %s ../../metadata.yaml -t latex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+    cmd = "pandoc %s ../../metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
     os.system(cmd)
 
 if __name__ == "__main__": 

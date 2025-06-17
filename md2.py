@@ -16,6 +16,7 @@ def conv(texfile):
        line = line.replace("\\begin{quote}", "```")
        line = line.replace("\\end{quote}", "```")
        line = line.replace("\\bdiv", "\\mathrm{div}")
+       line = line.replace("\\mdiv", "\\mathrm{div}")
        line = line.replace("\\tr", "\\mathrm{tr}")
        line = line.replace("\\grad", "\\mathrm{grad}")
        line = line.replace("\\dom", "\\mathrm{dom}")
@@ -79,13 +80,15 @@ def conv(texfile):
 
     fout.close()
 
-    #cmd = "pandoc %s ../../metadata.yaml --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
-    cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+    #cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml --latex-engine=xelatex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+    cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
     os.system(cmd)
 
 topdirs = ['algs','calc_multi','chaos','compscieng',
            'func_analysis','linear','ode', 'stat',
            'tser','vision','phy']
+
+topdirs = ['calc_multi']
 
 curr = os.getcwd()
 print (curr)
@@ -105,5 +108,3 @@ for topdir in topdirs:
         print ("copying to", mdfile)
         shutil.copy("/tmp/out.md", mdfile) 
         shutil.copy("/tmp/out.pdf", pdffile) 
-        break
-    #break
