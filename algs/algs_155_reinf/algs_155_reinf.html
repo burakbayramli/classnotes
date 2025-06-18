@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="derin-takviyeli-öğrenme-ilke-gradyanları-deep-reinforcement-learning-policy-gradients">Derin Takviyeli Öğrenme, İlke Gradyanları (Deep Reinforcement Learning, Policy Gradients )</h1>
+<p>Bilgisayar otomatik olarak oyun oynamayı öğrenebilir mi? Diyelim herhangi bir bilgisayar oyunu, dama, satranç, ya da eğlence oyunlarından Pong. Eğer elimizde bir simülasyon ortamı var ise, ve takviyeli öğrenme teknikleri ile bu sorunun cevabı evet. Simülasyon ortamında bilgisayara karşı istediğimiz kadar oynayıp RL teknikleri bir oyunu oynamayı öğrenebilir.</p>
+<p>Daha önce [7] yazısında farklı bir yaklaşım gördük, bir değer fonksiyonu vardı, bu fonksiyona tahtanın son halini veriyorduk, değer fonksiyonu bize pozisyonun taraflar için ne kadar avantajlı olduğunu raporluyordu (tek bir sayı). Bu fonksiyon bir kez, ve önceden kodlanmaktaydı, ve oyun oynayan yapay zeka altüst (minimax) algoritması ile kendisi için en avantajlı karşı taraf için en avantajsız pozisyonları bu fonksiyon ile değerlendirerek ve arama yaparak buluyordu. Fakat değer fonksiyonu yaklaşımının bazı dezavantajları var, birincisi fonksiyonun deterministik olması. Oyun sırasında değişmiyor, önceden kodlanmış.</p>
+<p>Daha iyi bir yaklaşım olasılıksal bir ilke <span class="math inline">\(\pi_\theta(a,s)\)</span> kodlamak, atılan adımları örnekleme ile atmak, ve ilkeyi her oyun sonunda güncellemek. Böylece oyun sırasında hem oyuncu yeni şeyler denemeye (açık fikirli!) hazır oluyor, takılıp kalmıyor, oyun durumundan tam emin olunamadığı durumlar icin bile hazır oluyor, ve kazandıran ilkeler daha yoğun olasılıklara tekabül ettiği için yine iyi bir oyun oynama becerisine kavuşuyor, ve kendini sürekli güncelliyor.</p>
+<p>İlke <span class="math inline">\(\pi_\theta(a,s)\)</span>, oyun konumu (state) <span class="math inline">\(s\)</span> ile, yapılacak hareket (action) ise <span class="math inline">\(a\)</span> ile belirtilir. Pong örneğinde konum tüm oyunun o andaki piksel görüntüsü olarak bize bildiriliyor olabilir, hareket ise raketin yukarı mı aşağı mı gideceği; verili konum <span class="math inline">\(s\)</span> için <span class="math inline">\(\pi_\theta(a|s)\)</span> (kazanmak için optimallik bağlamında) mümkün tüm davranışların dağılımını verecek.</p>
+<p>Peki ilke fonksiyonunu nasıl güncelleriz? İlke gradyanı (policy gradient) kavramı ile. İlke bir fonksiyondur, bir softmax fonksiyonu ile ya da yapay sinir ağı ile temsil edilebilir. YSA'lar her türlü fonksiyonu temsil edebildikleri için sofistike kabiliyetleri için daha tercih ediliyorlar (daha önemlisi gradyanları otomatik alınabiliyor, bunun niye faydalı olduğunu birazdan göreceğiz).</p>
+<div class="figure">
+<img src="policy.png" />
+
+</div>
+<p>Güncelleme nasıl olacak? Burada skor fonksiyonunu kavramı gerekli, optimize etmek istediğimiz bir skor fonksiyonunun beklentisinin optimize edilmesi, skor fonksiyonu tabii ki ilke fonksiyonuna bağlıdır, yani skor beklentisi en iyi olacak ilkeyi arıyoruz. Bu beklentinin gradyanını istiyoruz, çünkü ilkeyi tanımlayan <span class="math inline">\(\theta\)</span>'yi skor bağlamında öyle güncelleyeceğiz ki eğer aynı konumu tekrar gelmiş olsak, daha iyi hareketlerle daha iyi skora erişelim. Aradığımız gradyan (<span class="math inline">\(s,a\)</span> yerine kısaca <span class="math inline">\(x\)</span> kullanalım, skor <span class="math inline">\(Q\)</span> olsun [2]),</p>
+<p><span class="math display">\[ 
+\nabla_\theta E_{x \sim \pi_\theta(x)} [Q(x)] 
+\]</span></p>
+<p>Üstteki ifadeyi açalım, beklentinin tanımı üzerinden,</p>
+<p><span class="math display">\[ \nabla_\theta E_{x \sim \pi_\theta(s)} [Q(x)] = 
+\nabla_\theta \sum_x \pi(x) Q(x)
+\]</span></p>
+<p>Gradyan içeri nüfuz edebilir,</p>
+<p><span class="math display">\[ 
+= \sum_x \nabla_\theta \pi_\theta(x) Q(x)
+\]</span></p>
+<p><span class="math inline">\(\pi(x)\)</span> ile çarpıp bölersek hiç bir şey değişmemiş olur,</p>
+<p><span class="math display">\[ 
+= \sum_x \pi(x) \frac{\nabla_\theta \pi(x)}{\pi(x)} Q(x)
+\]</span></p>
+<p>Cebirsel olarak biliyoruz ki <span class="math inline">\(\nabla_\theta \log(z) = \frac{1}{z}\nabla_\theta\)</span>, o zaman,</p>
+<p><span class="math display">\[ 
+= \sum_x \pi(x) \nabla_\theta \log \pi(x)Q(x)
+\]</span></p>
+<p>Yine beklenti tanımından hareketle</p>
+<p><span class="math display">\[ 
+= E_x \big[ \nabla_\theta \log \pi(x) Q(x) \big]
+\]</span></p>
+<p><span class="math inline">\(x = (s,a)\)</span> demistik, o zaman nihai denklem</p>
+<p><span class="math display">\[ 
+\nabla_\theta E_{x \sim \pi_\theta(s,a)} [Q(s,a)] 
+= E_{s,a} \big[ \nabla_\theta \log \pi_\theta(s,a) Q(s,a) \big]
+\]</span></p>
+<p>Eşitliğin sağ tarafı bize güzel bir kabiliyet sunmuş oldu, orada bir beklenti var, bu hesabı analitik olarak yapmak çok zor olabilir, fakat beklentilerin örneklem alarak nasıl hesaplanacağını biliyoruz! Detaylar için <em>İstatistik, Monte Carlo, Entegraller, MCMC</em> yazısı. O zaman <span class="math inline">\(v_t \sim Q(s,a)\)</span> örneklemi alırız, yani oyunu baştan sonra kadar oynarız ve skora bakarız, ve <span class="math inline">\(\theta\)</span> güncellemesi için [5],</p>
+<p><span class="math display">\[ \Delta \theta_t = \alpha \nabla_\theta \log \pi_\theta (s_t,a_t) v_t\]</span></p>
+<p>Oyun oynamak ile örneklemin alakası ne? Oynanan bir oyun mümkün tüm oyunlar içinden alınan bir örneklem değil midir? Evet. Ayrıca DYSA durumunda da olası her aksiyonun olasılığını hesaplıyoruz ve bu olasıklar üzerinden zar atarak bir hareket seçiyoruz. Daha olası olan daha fazla seçiliyor tabii ama az olası olan da bazen seçilebiliyor.</p>
+<p>Tabii mesela Pong oyunu bir sürü adım <span class="math inline">\(a_1,..,a_n\)</span> sonrası bitiyor, bu durumda en sondaki kazanç (ya da kaybı) o oyundaki tüm adımlara geriye giderek uyguluyoruz. Güncelleme sonrası ilke fonksiyonumuz değişiyor, ve bir oyun daha oynayarak aynı şeyi tekrarlıyoruz.</p>
+<p><span class="math inline">\(\pi_\theta (s,a)\)</span>'nin ilke fonksiyonu olduğunu söyledik, bu fonksiyon DYSA olabilir, ya da daha basit, sonlu sayıda seçenek üzerinden ayrıksal olasılıkları depolayan softmax olabilir (bu durum için gradyan türetmesi altta). DYSA durumunda üstteki formüle göre <span class="math inline">\(\log \pi_\theta (s,a)\)</span>'un gradyanının gerektiğini görüyoruz, otomatik türev uzerinden bu gradyan DYSA paketinden rahatça alınabilir.</p>
+<p>Pong oyunu kodunu göreceğiz, ama ondan önce daha basit çubuk dengeleme problemine bakalım [1], kuruluş, oyun açıklaması için [3]. Bir simulasyon ortamındayız, ve bu ortamda bize bir çubuk veriliyor, ve çubuğun konumu dört tane sayı üzerinden bildirilir, ödül her adımda anında alınır (çubuk düşmediyse, ekrandan çıkmadıysa o anda başarı).</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># cartpole_train.py - egitim</span>
+<span class="im">import</span> tensorflow <span class="im">as</span> tf, gym
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> reset_graph(seed<span class="op">=</span><span class="dv">42</span>):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+<span class="kw">def</span> discount_rewards(rewards, discount_rate):
+    discounted_rewards <span class="op">=</span> np.zeros(<span class="bu">len</span>(rewards))
+    cumulative_rewards <span class="op">=</span> <span class="dv">0</span>
+    <span class="cf">for</span> step <span class="kw">in</span> <span class="bu">reversed</span>(<span class="bu">range</span>(<span class="bu">len</span>(rewards))):
+        cumulative_rewards <span class="op">=</span> rewards[step] <span class="op">+</span> cumulative_rewards <span class="op">*</span> discount_rate
+        discounted_rewards[step] <span class="op">=</span> cumulative_rewards
+    <span class="cf">return</span> discounted_rewards
+
+<span class="kw">def</span> discount_and_normalize_rewards(all_rewards, discount_rate):
+    all_discounted_rewards <span class="op">=</span> [discount_rewards(rewards, discount_rate) <span class="op">\</span>
+                              <span class="cf">for</span> rewards <span class="kw">in</span> all_rewards]
+    flat_rewards <span class="op">=</span> np.concatenate(all_discounted_rewards)
+    reward_mean <span class="op">=</span> flat_rewards.mean()
+    reward_std <span class="op">=</span> flat_rewards.std()
+    <span class="cf">return</span> [(discounted_rewards <span class="op">-</span> reward_mean)<span class="op">/</span>reward_std <span class="cf">for</span> <span class="op">\</span>
+            discounted_rewards <span class="kw">in</span> all_discounted_rewards]
+
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+reset_graph()
+
+n_inputs <span class="op">=</span> <span class="dv">4</span>
+n_hidden <span class="op">=</span> <span class="dv">4</span>
+n_outputs <span class="op">=</span> <span class="dv">1</span>
+
+learning_rate <span class="op">=</span> <span class="fl">0.01</span>
+
+initializer <span class="op">=</span> tf.contrib.layers.variance_scaling_initializer()
+
+X <span class="op">=</span> tf.placeholder(tf.float32, shape<span class="op">=</span>[<span class="va">None</span>, n_inputs])
+
+hidden <span class="op">=</span> tf.layers.dense(X, n_hidden,
+                         activation<span class="op">=</span>tf.nn.elu,
+                         kernel_initializer<span class="op">=</span>initializer)
+
+logits <span class="op">=</span> tf.layers.dense(hidden, n_outputs)
+
+outputs <span class="op">=</span> tf.nn.sigmoid(logits)
+
+p_left_and_right <span class="op">=</span> tf.concat(axis<span class="op">=</span><span class="dv">1</span>, values<span class="op">=</span>[outputs, <span class="dv">1</span> <span class="op">-</span> outputs])
+
+action <span class="op">=</span> tf.multinomial(tf.log(p_left_and_right), num_samples<span class="op">=</span><span class="dv">1</span>)
+
+y <span class="op">=</span> <span class="fl">1.</span> <span class="op">-</span> tf.to_float(action)
+
+cross_entropy <span class="op">=</span> tf.nn.sigmoid_cross_entropy_with_logits(labels<span class="op">=</span>y, logits<span class="op">=</span>logits)
+
+optimizer <span class="op">=</span> tf.train.AdamOptimizer(learning_rate)
+
+grads_and_vars <span class="op">=</span> optimizer.compute_gradients(cross_entropy)
+gradients <span class="op">=</span> [grad <span class="cf">for</span> grad, variable <span class="kw">in</span> grads_and_vars]
+gradient_placeholders <span class="op">=</span> []
+
+grads_and_vars_feed <span class="op">=</span> []
+<span class="cf">for</span> grad, variable <span class="kw">in</span> grads_and_vars:
+    gradient_placeholder <span class="op">=</span> tf.placeholder(tf.float32, shape<span class="op">=</span>grad.get_shape())
+    gradient_placeholders.append(gradient_placeholder)
+    grads_and_vars_feed.append((gradient_placeholder, variable))
+training_op <span class="op">=</span> optimizer.apply_gradients(grads_and_vars_feed)
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+saver <span class="op">=</span> tf.train.Saver()        
+
+env <span class="op">=</span> gym.make(<span class="st">&quot;CartPole-v0&quot;</span>)
+
+n_games_per_update <span class="op">=</span> <span class="dv">10</span>
+n_max_steps <span class="op">=</span> <span class="dv">1000</span>
+n_iterations <span class="op">=</span> <span class="dv">250</span>
+save_iterations <span class="op">=</span> <span class="dv">10</span>
+discount_rate <span class="op">=</span> <span class="fl">0.95</span>
+ffile <span class="op">=</span> <span class="st">&quot;/tmp/cartpole.ckpt&quot;</span>
+
+sess <span class="op">=</span> tf.Session()
+sess.run(init)
+
+<span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(n_iterations):
+    <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\r</span><span class="st">Iteration: </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(iteration))
+    all_rewards <span class="op">=</span> []
+    all_gradients <span class="op">=</span> []
+    <span class="cf">for</span> game <span class="kw">in</span> <span class="bu">range</span>(n_games_per_update):
+        current_rewards <span class="op">=</span> []
+        current_gradients <span class="op">=</span> []
+        obs <span class="op">=</span> env.reset()
+        <span class="cf">for</span> step <span class="kw">in</span> <span class="bu">range</span>(n_max_steps):
+            d <span class="op">=</span> {X: obs.reshape(<span class="dv">1</span>, n_inputs)}
+            action_val, gradients_val <span class="op">=</span> sess.run([action, gradients], feed_dict<span class="op">=</span>d)
+            obs, reward, done, info <span class="op">=</span> env.step(action_val[<span class="dv">0</span>][<span class="dv">0</span>])
+            current_rewards.append(reward)
+            current_gradients.append(gradients_val)
+            <span class="cf">if</span> done: <span class="cf">break</span>
+        all_rewards.append(current_rewards)
+        all_gradients.append(current_gradients)
+
+    all_rewards <span class="op">=</span> discount_and_normalize_rewards(all_rewards,
+                                                 discount_rate<span class="op">=</span>discount_rate)
+    feed_dict <span class="op">=</span> {}
+    <span class="cf">for</span> var_index, gradient_placeholder <span class="kw">in</span> <span class="bu">enumerate</span>(gradient_placeholders):
+        tmp <span class="op">=</span> [reward <span class="op">*</span> all_gradients[game_index][step][var_index] <span class="op">\</span>
+               <span class="cf">for</span> game_index, rewards <span class="kw">in</span> <span class="bu">enumerate</span>(all_rewards) <span class="op">\</span>
+               <span class="cf">for</span> step, reward <span class="kw">in</span> <span class="bu">enumerate</span>(rewards)]
+        mean_gradients <span class="op">=</span> np.mean(tmp, axis<span class="op">=</span><span class="dv">0</span>)
+        feed_dict[gradient_placeholder] <span class="op">=</span> mean_gradients
+    sess.run(training_op, feed_dict<span class="op">=</span>feed_dict)
+    <span class="cf">if</span> iteration <span class="op">%</span> save_iterations <span class="op">==</span> <span class="dv">0</span>:
+        saver.save(sess, ffile)</code></pre></div>
+<p>Eğitim fazla sürmüyor. Bittikten sonra alttaki kodla sonucu görebiliriz. Çubuğun dengeli bir şekilde tutulabildiğini göreceğiz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># cartpole_play.py - oyunu oyna</span>
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> matplotlib.animation <span class="im">as</span> animation
+<span class="im">import</span> gym
+<span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+
+<span class="kw">def</span> reset_graph(seed<span class="op">=</span><span class="dv">42</span>):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+<span class="kw">def</span> render_cart_pole(env, obs):
+    <span class="cf">return</span> env.render(mode<span class="op">=</span><span class="st">&quot;rgb_array&quot;</span>)
+
+<span class="kw">def</span> update_scene(num, frames, patch):
+    patch.set_data(frames[num])
+    <span class="cf">return</span> patch,
+
+<span class="kw">def</span> render_policy_net(model_path, action, X, n_max_steps <span class="op">=</span> <span class="dv">1000</span>):
+    frames <span class="op">=</span> []
+    env <span class="op">=</span> gym.make(<span class="st">&quot;CartPole-v0&quot;</span>)
+    obs <span class="op">=</span> env.reset()
+    <span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+        saver.restore(sess, model_path)
+        <span class="cf">for</span> step <span class="kw">in</span> <span class="bu">range</span>(n_max_steps):
+            img <span class="op">=</span> render_cart_pole(env, obs)
+            frames.append(img)
+            action_val <span class="op">=</span> action.<span class="bu">eval</span>(feed_dict<span class="op">=</span>{X: obs.reshape(<span class="dv">1</span>, n_inputs)})
+            obs, reward, done, info <span class="op">=</span> env.step(action_val[<span class="dv">0</span>][<span class="dv">0</span>])
+            <span class="cf">if</span> done:
+                <span class="cf">break</span>
+    env.close()
+    <span class="cf">return</span> frames
+
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+reset_graph()
+
+n_inputs <span class="op">=</span> <span class="dv">4</span>
+n_hidden <span class="op">=</span> <span class="dv">4</span>
+n_outputs <span class="op">=</span> <span class="dv">1</span>
+
+learning_rate <span class="op">=</span> <span class="fl">0.01</span>
+
+initializer <span class="op">=</span> tf.contrib.layers.variance_scaling_initializer()
+
+X <span class="op">=</span> tf.placeholder(tf.float32, shape<span class="op">=</span>[<span class="va">None</span>, n_inputs])
+
+hidden <span class="op">=</span> tf.layers.dense(X, n_hidden,
+                         activation<span class="op">=</span>tf.nn.elu,
+                         kernel_initializer<span class="op">=</span>initializer)
+logits <span class="op">=</span> tf.layers.dense(hidden, n_outputs)
+outputs <span class="op">=</span> tf.nn.sigmoid(logits)  <span class="co"># probability of action 0 (left)</span>
+p_left_and_right <span class="op">=</span> tf.concat(axis<span class="op">=</span><span class="dv">1</span>, values<span class="op">=</span>[outputs, <span class="dv">1</span> <span class="op">-</span> outputs])
+action <span class="op">=</span> tf.multinomial(tf.log(p_left_and_right), num_samples<span class="op">=</span><span class="dv">1</span>)
+
+y <span class="op">=</span> <span class="fl">1.</span> <span class="op">-</span> tf.to_float(action)
+cross_entropy <span class="op">=</span> tf.nn.sigmoid_cross_entropy_with_logits(labels<span class="op">=</span>y, logits<span class="op">=</span>logits)
+optimizer <span class="op">=</span> tf.train.AdamOptimizer(learning_rate)
+grads_and_vars <span class="op">=</span> optimizer.compute_gradients(cross_entropy)
+gradients <span class="op">=</span> [grad <span class="cf">for</span> grad, variable <span class="kw">in</span> grads_and_vars]
+gradient_placeholders <span class="op">=</span> []
+grads_and_vars_feed <span class="op">=</span> []
+<span class="cf">for</span> grad, variable <span class="kw">in</span> grads_and_vars:
+    gradient_placeholder <span class="op">=</span> tf.placeholder(tf.float32, shape<span class="op">=</span>grad.get_shape())
+    gradient_placeholders.append(gradient_placeholder)
+    grads_and_vars_feed.append((gradient_placeholder, variable))
+training_op <span class="op">=</span> optimizer.apply_gradients(grads_and_vars_feed)
+
+init <span class="op">=</span> tf.global_variables_initializer()
+saver <span class="op">=</span> tf.train.Saver()        
+
+env <span class="op">=</span> gym.make(<span class="st">&quot;CartPole-v0&quot;</span>)
+
+n_games_per_update <span class="op">=</span> <span class="dv">10</span>
+n_max_steps <span class="op">=</span> <span class="dv">1000</span>
+n_iterations <span class="op">=</span> <span class="dv">250</span>
+save_iterations <span class="op">=</span> <span class="dv">10</span>
+discount_rate <span class="op">=</span> <span class="fl">0.95</span>
+ffile <span class="op">=</span> <span class="st">&quot;/tmp/cartpole.ckpt&quot;</span>
+
+frames <span class="op">=</span> render_policy_net(ffile, action, X, n_max_steps<span class="op">=</span><span class="dv">500</span>)</code></pre></div>
+<p>Pong oyunu kodu alttadır [6]. Bu eğitim paralellik özelliği olmayan normal bilgisayarda uzun sürüyor (ben birkaç gün eğittim), fakat TensorFlow çizitini arada sırada kaydedip kaldığı yerden devam edebildiği için parça parça işletilebilir. Oyunun otomatik nasıl oynandığını görmek için alttaki <code>env.render</code> satırını aktive etmek yeterli. Bilgisayarın kendi başına öğrenip oynaması müthiş!</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># pong.py</span>
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> gym
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+n_obs <span class="op">=</span> <span class="dv">80</span> <span class="op">*</span> <span class="dv">80</span>          
+h <span class="op">=</span> <span class="dv">200</span>                  
+n_actions <span class="op">=</span> <span class="dv">3</span>            
+learning_rate <span class="op">=</span> <span class="fl">1e-3</span>
+gamma <span class="op">=</span> <span class="fl">.99</span>              
+decay <span class="op">=</span> <span class="fl">0.99</span>             
+save_path<span class="op">=</span><span class="st">&#39;/home/burak/Downloads/scikit-data/models/pong/pong.ckpt&#39;</span>
+
+env <span class="op">=</span> gym.make(<span class="st">&quot;Pong-v0&quot;</span>)
+observation <span class="op">=</span> env.reset()
+prev_x <span class="op">=</span> <span class="va">None</span>
+xs,rs,ys <span class="op">=</span> [],[],[]
+running_reward <span class="op">=</span> <span class="va">None</span>
+reward_sum <span class="op">=</span> <span class="dv">0</span>
+episode_number <span class="op">=</span> <span class="dv">0</span>
+
+tf_model <span class="op">=</span> {}
+<span class="cf">with</span> tf.variable_scope(<span class="st">&#39;layer_one&#39;</span>,reuse<span class="op">=</span><span class="va">False</span>):
+    xavier_l1 <span class="op">=</span> tf.truncated_normal_initializer(mean<span class="op">=</span><span class="dv">0</span>,
+                                                stddev<span class="op">=</span><span class="fl">1.</span><span class="op">/</span>np.sqrt(n_obs),
+                                                dtype<span class="op">=</span>tf.float32)
+    tf_model[<span class="st">&#39;W1&#39;</span>] <span class="op">=</span> tf.get_variable(<span class="st">&quot;W1&quot;</span>, [n_obs, h], initializer<span class="op">=</span>xavier_l1)
+<span class="cf">with</span> tf.variable_scope(<span class="st">&#39;layer_two&#39;</span>,reuse<span class="op">=</span><span class="va">False</span>):
+    xavier_l2 <span class="op">=</span> tf.truncated_normal_initializer(mean<span class="op">=</span><span class="dv">0</span>,
+                                                stddev<span class="op">=</span><span class="fl">1.</span><span class="op">/</span>np.sqrt(h),
+                                                dtype<span class="op">=</span>tf.float32)
+    tf_model[<span class="st">&#39;W2&#39;</span>] <span class="op">=</span> tf.get_variable(<span class="st">&quot;W2&quot;</span>, [h,n_actions], initializer<span class="op">=</span>xavier_l2)
+
+<span class="kw">def</span> tf_discount_rewards(tf_r):
+    discount_f <span class="op">=</span> <span class="kw">lambda</span> a, v: a<span class="op">*</span>gamma <span class="op">+</span> v<span class="op">;</span>
+    tf_r_reverse <span class="op">=</span> tf.scan(discount_f, tf.reverse(tf_r,[<span class="va">True</span>, <span class="va">False</span>]))
+    tf_discounted_r <span class="op">=</span> tf.reverse(tf_r_reverse,[<span class="va">True</span>, <span class="va">False</span>])
+    <span class="cf">return</span> tf_discounted_r
+
+<span class="kw">def</span> tf_policy_forward(x): <span class="co">#x ~ [1,D]</span>
+    h <span class="op">=</span> tf.matmul(x, tf_model[<span class="st">&#39;W1&#39;</span>])
+    h <span class="op">=</span> tf.nn.relu(h)
+    logp <span class="op">=</span> tf.matmul(h, tf_model[<span class="st">&#39;W2&#39;</span>])
+    p <span class="op">=</span> tf.nn.softmax(logp)
+    <span class="cf">return</span> p
+
+<span class="kw">def</span> prepro(I):
+    I <span class="op">=</span> I[<span class="dv">35</span>:<span class="dv">195</span>] 
+    I <span class="op">=</span> I[::<span class="dv">2</span>,::<span class="dv">2</span>,<span class="dv">0</span>]
+    I[I <span class="op">==</span> <span class="dv">144</span>] <span class="op">=</span> <span class="dv">0</span> 
+    I[I <span class="op">==</span> <span class="dv">109</span>] <span class="op">=</span> <span class="dv">0</span> 
+    I[I <span class="op">!=</span> <span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span>   
+    <span class="cf">return</span> I.astype(np.<span class="bu">float</span>).ravel()
+
+tf_x <span class="op">=</span> tf.placeholder(dtype<span class="op">=</span>tf.float32, shape<span class="op">=</span>[<span class="va">None</span>, n_obs],name<span class="op">=</span><span class="st">&quot;tf_x&quot;</span>)
+tf_y <span class="op">=</span> tf.placeholder(dtype<span class="op">=</span>tf.float32, shape<span class="op">=</span>[<span class="va">None</span>, n_actions],name<span class="op">=</span><span class="st">&quot;tf_y&quot;</span>)
+tf_epr <span class="op">=</span> tf.placeholder(dtype<span class="op">=</span>tf.float32, shape<span class="op">=</span>[<span class="va">None</span>,<span class="dv">1</span>], name<span class="op">=</span><span class="st">&quot;tf_epr&quot;</span>)
+
+tf_discounted_epr <span class="op">=</span> tf_discount_rewards(tf_epr)
+tf_mean, tf_variance<span class="op">=</span> tf.nn.moments(tf_discounted_epr, [<span class="dv">0</span>],
+                                    shift<span class="op">=</span><span class="va">None</span>, name<span class="op">=</span><span class="st">&quot;reward_moments&quot;</span>)
+tf_discounted_epr <span class="op">-=</span> tf_mean
+tf_discounted_epr <span class="op">/=</span> tf.sqrt(tf_variance <span class="op">+</span> <span class="fl">1e-6</span>)
+
+tf_aprob <span class="op">=</span> tf_policy_forward(tf_x)
+loss <span class="op">=</span> tf.nn.l2_loss(tf_y<span class="op">-</span>tf_aprob)
+optimizer <span class="op">=</span> tf.train.RMSPropOptimizer(learning_rate, decay<span class="op">=</span>decay)
+tf_grads <span class="op">=</span> optimizer.compute_gradients(loss,
+                                       var_list<span class="op">=</span>tf.trainable_variables(),
+                                       grad_loss<span class="op">=</span>tf_discounted_epr)
+train_op <span class="op">=</span> optimizer.apply_gradients(tf_grads)
+
+sess <span class="op">=</span> tf.InteractiveSession()
+tf.initialize_all_variables().run()
+
+saver <span class="op">=</span> tf.train.Saver(tf.all_variables())
+load_was_success <span class="op">=</span> <span class="va">True</span> 
+<span class="cf">try</span>:
+    <span class="co"># mevcut TF ciziti varsa yuklemeye ugras, kaldigi yerden devam icin</span>
+    save_dir <span class="op">=</span> <span class="st">&#39;/&#39;</span>.join(save_path.split(<span class="st">&#39;/&#39;</span>)[:<span class="op">-</span><span class="dv">1</span>])
+    ckpt <span class="op">=</span> tf.train.get_checkpoint_state(save_dir)
+    load_path <span class="op">=</span> ckpt.model_checkpoint_path
+    saver.restore(sess, load_path)
+<span class="cf">except</span>:
+    <span class="bu">print</span> <span class="st">&quot;no saved model to load. starting new session&quot;</span>
+    load_was_success <span class="op">=</span> <span class="va">False</span>
+<span class="cf">else</span>:
+    <span class="bu">print</span> <span class="st">&quot;loaded model: </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(load_path)
+    saver <span class="op">=</span> tf.train.Saver(tf.all_variables())
+    episode_number <span class="op">=</span> <span class="bu">int</span>(load_path.split(<span class="st">&#39;-&#39;</span>)[<span class="op">-</span><span class="dv">1</span>])
+
+<span class="cf">while</span> <span class="va">True</span>:
+    <span class="co"># oyunu seyretmek icin bir sure egitildikten sonra</span>
+    <span class="co"># alttaki satiri aktif hale getirebiliriz</span>
+    <span class="co"># env.render() </span>
+    cur_x <span class="op">=</span> prepro(observation)
+    x <span class="op">=</span> cur_x <span class="op">-</span> prev_x <span class="cf">if</span> prev_x <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> np.zeros(n_obs)
+    prev_x <span class="op">=</span> cur_x
+
+    feed <span class="op">=</span> {tf_x: np.reshape(x, (<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))}
+    aprob <span class="op">=</span> sess.run(tf_aprob,feed) <span class="op">;</span> aprob <span class="op">=</span> aprob[<span class="dv">0</span>,:]
+    action <span class="op">=</span> np.random.choice(n_actions, p<span class="op">=</span>aprob)
+    label <span class="op">=</span> np.zeros_like(aprob) <span class="op">;</span> label[action] <span class="op">=</span> <span class="dv">1</span>
+
+    observation, reward, done, info <span class="op">=</span> env.step(action<span class="op">+</span><span class="dv">1</span>)
+    reward_sum <span class="op">+=</span> reward
+    
+    xs.append(x) <span class="op">;</span> ys.append(label) <span class="op">;</span> rs.append(reward)
+    
+    <span class="cf">if</span> done:
+        running_reward <span class="op">=</span> reward_sum <span class="cf">if</span> running_reward <span class="op">\</span>
+                         <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> running_reward <span class="op">*</span> <span class="fl">0.99</span> <span class="op">+</span> reward_sum <span class="op">*</span> <span class="fl">0.01</span>
+        
+        feed <span class="op">=</span> {tf_x: np.vstack(xs), tf_epr: np.vstack(rs), tf_y: np.vstack(ys)}
+        _ <span class="op">=</span> sess.run(train_op,feed)
+        
+        <span class="cf">if</span> episode_number <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>:
+            <span class="bu">print</span> <span class="st">&#39;ep </span><span class="sc">{}</span><span class="st">: reward: </span><span class="sc">{}</span><span class="st">, mean reward: </span><span class="sc">{:3f}</span><span class="st">&#39;</span>.<span class="op">\</span>
+                <span class="bu">format</span>(episode_number, reward_sum, running_reward)
+        <span class="cf">else</span>:
+            <span class="bu">print</span> <span class="st">&#39;</span><span class="ch">\t</span><span class="st">ep </span><span class="sc">{}</span><span class="st">: reward: </span><span class="sc">{}</span><span class="st">&#39;</span>.<span class="bu">format</span>(episode_number, reward_sum)
+        
+        xs,rs,ys <span class="op">=</span> [],[],[] 
+        episode_number <span class="op">+=</span> <span class="dv">1</span> 
+        observation <span class="op">=</span> env.reset() 
+        reward_sum <span class="op">=</span> <span class="dv">0</span>
+        <span class="cf">if</span> episode_number <span class="op">%</span> <span class="dv">50</span> <span class="op">==</span> <span class="dv">0</span>:
+            saver.save(sess, save_path, global_step<span class="op">=</span>episode_number)
+            <span class="bu">print</span> <span class="st">&quot;SAVED MODEL #</span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(episode_number)</code></pre></div>
+<p>Softmax</p>
+<p>Softmax sonlu sayıda seçenek üzerinden bir dağılım tanımlar,</p>
+<p><span class="math display">\[ 
+\pi_\theta(s,a) = \frac{e^{h(s,a,\theta)}}{\sum_b e^{h(s,b,\theta)} }
+\]</span></p>
+<p>ki <span class="math inline">\(h(s,a,\theta) = \phi(s,a)^T\theta\)</span>. Şimdi ilke gradyanını softmax ile nasıl işletiriz onu görelim. Softmax'in kodlaması için bir çözüm ayrıksal olarak (bir matriste mesela) her <span class="math inline">\(s,a\)</span> kombinasyonu için gerekli ağırlıkları tutmak. O zaman spesifik bir <span class="math inline">\(\phi\)</span> çağrısı sonrası <span class="math inline">\(\theta\)</span> ile bu katsayılar çarpılır ve sonuç alınır. <span class="math inline">\(\theta\)</span> ilkenin ne olduğunu, onun özünü tanımlar. DYSA durumundan bir fark softmax için otomatik türeve gerek olmadan direk türevi kendimiz hesaplayabiliriz [4]. Üstteki formülün log gradyanı</p>
+<p><span class="math display">\[ 
+\nabla_\theta \log \pi_\theta = 
+\nabla_\theta \log \frac{e^{h(s,a,\theta)}}{\sum_b e^{h(s,b,\theta)} }
+\]</span></p>
+<p><span class="math display">\[ = \nabla_\theta \big[ \log e^{h(s,a,\theta)} - \log \sum_b e^{h(s,b,\theta)}\big]\]</span></p>
+<p>çünkü</p>
+<p><span class="math display">\[ \log(\frac{x}{y}) = \log x - \log y \]</span></p>
+<p>Devam edelim</p>
+<p><span class="math display">\[ = \nabla_\theta \big[ h(s,a,\theta) - \log \sum_b e^{h(s,b,\theta)} \big]\]</span></p>
+<p>Gradyan her iki terime de uygulanır,</p>
+<p><span class="math display">\[ 
+= \phi(s,a) - \sum_b h(s,b,\theta)\frac{e^{h(s,b,\theta)}}{\sum_b e^{h(s,b,\theta)}} 
+\]</span></p>
+<p><span class="math display">\[ 
+= \phi(s,a) - \sum_b h(s,b,\theta) \pi_\theta(b,s)
+\]</span></p>
+<p><span class="math display">\[ 
+= \phi(s,a) - E_{\pi_\theta} \big[ \phi(s,\cdot) \big]
+\]</span></p>
+<p>İlginç ve ilk bakışta anlaşılabilen / akla yatacak (intuitive) bir sonuca ulaştık. Log gradyanı içinde bulunduğumuz konum ve attığımız adım için hesaplanan <span class="math inline">\(\phi\)</span>'den mevcut atılabilecek tüm adımlar üzerinden hesaplanan bir <span class="math inline">\(\phi\)</span> ortalamasının çıkartılmış hali. Yani &quot;bu spesifik <span class="math inline">\(\phi\)</span> normalden ne kadar fazla?'' sorusunu sormuş oluyorum, ve gradyanın gideceği, iyileştirme yönünü bu sayı belirliyor. Yani bir <span class="math inline">\(\phi\)</span> eğer normalden fazla ortaya çıkıyorsa ve iyi sonuç alıyorsa (skorla çarpım yaptığımızı unutmayalım), ilkeyi o yönde daha fazla güncelliyoruz ki bu başarılı sonuçları daha fazla alabilelim.</p>
+<p>Kaynaklar</p>
+<p>[1] Géron, <em>Hands-On Machine Learning with Scikit-Learn and TensorFlow</em></p>
+<p>[2] Karpathy, <em>Deep Reinforcement Learning: Pong from Pixels</em>, <a href="http://karpathy.github.io/2016/05/31/rl/" class="uri">http://karpathy.github.io/2016/05/31/rl/</a></p>
+<p>[3] Bayramlı, <em>OpenAI Gym, Pong, Derin Takviyeli Öğrenme</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2017/09/openai-gym-pong-derin-takviyeli-ogrenme.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2017/09/openai-gym-pong-derin-takviyeli-ogrenme.html</a></p>
+<p>[3] Bayramlı, <em>OpenAI, Çubuklu Araba, CartPole</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2017/09/openai-cubuklu-araba-cartpole.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2017/09/openai-cubuklu-araba-cartpole.html</a></p>
+<p>[4] Silver, <em>Monte-Carlo Simulation Balancing</em>, <a href="http://www.machinelearning.org/archive/icml2009/papers/500.pdf" class="uri">http://www.machinelearning.org/archive/icml2009/papers/500.pdf</a></p>
+<p>[5] Silver, <em>Reinforcement Learning</em>, <a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html" class="uri">http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html</a></p>
+<p>[6] Greydanus, <em>Solves Pong with Policy Gradients in Tensorflow</em>, <a href="https://gist.github.com/greydanus/5036f784eec2036252e1990da21eda18" class="uri">https://gist.github.com/greydanus/5036f784eec2036252e1990da21eda18</a></p>
+<p>[7] Bayramlı, Bilgisayar Bilim, <em>Yapay Zeka ve Müsabaka</em></p>
+</body>
+</html>

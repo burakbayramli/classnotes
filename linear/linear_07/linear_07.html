@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-7">Ders 7</h1>
+<p>Vektör uzaylarından, özellikle sıfır uzayından (nullspace), ve kolon uzayından bahsettik, şimdi bu uzayların içindeki vektörleri nasıl bulacağımızı, nasıl hesaplayacağımızı göreceğiz. Yani önceki derste gördüğümüz tanımları bu derste algoritmaya dönüştüreceğiz. <span class="math inline">\(Ax=0\)</span>'i çözen algoritma nedir, mesela. Örnek üzerinde görelim,</p>
+<p><span class="math display">\[ 
+A = 
+\left[\begin{array}{cccc}
+1 &amp; 2 &amp; 2 &amp; 2  \\
+2 &amp; 4 &amp; 6 &amp; 8 \\
+3 &amp; 6 &amp; 8 &amp; 10
+\end{array}\right]
+ \]</span></p>
+<p>İlk bakışta gözüme çarpan 2. kolon 1. kolonun bir katı. Ya da 2. kolon 1. ile &quot;aynı yönde'', bu iki kolon &quot;bağımsız değil''. Tabii bu bilgileri çözüm sırasında da algoritmanın bir yan etkisi olarak keşfetmeyi bekleriz. Satırlara bakıyorum, 1. ve 2. toplamı 3. ile aynı, yani 3. satır bağımsız değil. Tüm bunlar eliminasyonun yan ürünleri olarak bulunmalılar.</p>
+<p>Ana algoritmamız eliminasyon olacak, ama onun dikdörtgensel koşula adapte edilmiş hali, pivotta sıfır var ise durmadan çözüme devam ediyoruz, vs.</p>
+<p>Eliminasyon sırasında yapılan işlemler sıfır uzayını değiştirmez. Değil mi? Bu önemli. Bir denklem sisteminde bir denklemin (satırın) bir katını bir diğer denklemden çıkartıyorsam bu nihai çözümü değiştirmez, çünkü denklem sistemi bir bütün olarak değişmemiştir. Satır uzayı değişmez, ama dikkat, kolon uzayı değişir. Eliminasyonun neyi değiştirdiği neyi değiştirmediğini bilmek lazım.</p>
+<p>İlk pivot'tan başlayalım (paranteze alınmış olan öğe)</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cccc}
+(1) &amp; 2 &amp; 2 &amp; 2  \\
+2 &amp; 4 &amp; 6 &amp; 8 \\
+3 &amp; 6 &amp; 8 &amp; 10
+\end{array}\right]
+ \]</span></p>
+<p>Pivot satırını 2 ile çarpıp 2. satırdan çıkartıyoruz. Sonra pivot satırını 3 ile çarpıp 3. satırdan çıkartıyoruz. Sonuç</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cccc}
+1 &amp; 2 &amp; 2 &amp; 2  \\
+0 &amp; 0 &amp; 2 &amp; 4 \\
+0 &amp; 0 &amp; 2 &amp; 4
+\end{array}\right]
+ \]</span></p>
+<p>Şimdi sonraki pivot'u arıyoruz, normal durumda bu pivot</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cccc}
+1 &amp; 2 &amp; 2 &amp; 2  \\
+0 &amp; (0) &amp; 2 &amp; 4 \\
+0 &amp; 0 &amp; 2 &amp; 4
+\end{array}\right]
+ \]</span></p>
+<p>olurdu. Ama orada sıfır var, o zaman bir alttaki satıra bakıyoruz, ki umuyoruz ki satır değiş-tokuşu yaparak o noktaya sıfır olmayan bir değer gelsin. Ama müstakbel pivot'un altındaki hücre de sıfır değerini taşıyor! Bu bir şeyin işareti aslında.. Neyin? Bu baktığımız kolonun kendinden önce gelen kolonların bir kombinasyonu olduğunun işareti. Fakat bunun üzerinde fazla durmaya gerek yok, algoritmik olarak durup düşünmeye gerek yok, eğer bir pivot'u kullanamıyorsak hemen yana geçeriz, yani</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cccc}
+1 &amp; 2 &amp; 2 &amp; 2  \\
+0 &amp; 0 &amp; (2) &amp; 4 \\
+0 &amp; 0 &amp; 2 &amp; 4
+\end{array}\right]
+ \]</span></p>
+<p>Şimdi 2. satırı 3. satırdan çıkartmak yeterli. Sonuç altta. Bu matrise <span class="math inline">\(U\)</span> diyebiliriz, gerçi tam üstüçgensel (uppertriangular) sayılmaz, çünkü sıfır dengesi tam değil, ama basamaklı (echelon) formda, &quot;hafiften'' üstüçgensel. Tüm pivot'ları gösterirsek,</p>
+<p><span class="math display">\[ 
+U = 
+\left[\begin{array}{cccc}
+(1) &amp; 2 &amp; 2 &amp; 2  \\
+0 &amp; 0 &amp; (2) &amp; 4 \\
+0 &amp; 0 &amp; 0 &amp; 0
+\end{array}\right]
+ \]</span></p>
+<p>İki tane pivot var; ve bu iki sayısı bu matris hakkında önemli bir bulguya işaret ediyor, bu matrisin kertesi (rank) 2. Kerte bir matrisin pivot sayısıdır.</p>
+<p>Bu noktada geriye sokmak (backsubstitution) ile sonucu elde edebiliriz. Tabii <span class="math inline">\(Ax=0\)</span>'in bir sonucu vardır, değil mi? Evet, ki bu beklenir çünkü elde 3 denklem ve 4 bilinmeyen var, bu sistemden &quot;bir'' çözüm çıkması normal. Şimdi onları bulmak istiyorum.</p>
+<p>Bu çözümleri bulurken kritik adım şu, ki bu adıma &quot;pivot kolonlarını / değişkenlerini ayırma'' adı veriyoruz. Pivot kolonları pivot hücrelerinin olduğu kolonlar ki bunlar 1. ve 3. kolonlar, ve &quot;serbest kolonlar'' ki bunlar geri kalanları, yani 2. ve 4. Niye bu isimleri kullandım, özellikle pivot olmayan kolonlara niye &quot;serbest'' adını verdim?</p>
+<p>Şimdi <span class="math inline">\(Ux=0\)</span>'nun çözümünü bulma bağlamında düşünelim. Bu durumda <span class="math inline">\(x_2,x_4\)</span>'a istediğim değeri atayabilirim. Belki cebirsel olarak tüm denklemleri görmek daha faydalı olur, <span class="math inline">\(Ux=0\)</span>'i şöyle yazabiliriz,</p>
+<p><span class="math display">\[ x_1 + 2x_2 + 2x_3 + 2x_4 = 0 \]</span></p>
+<p><span class="math display">\[ 2x_3 + 4x_4 = 0 \]</span></p>
+<p>Ve daha önce dediğimiz gibi bu denklem sistemini geriye sokma yöntemi ile çözebiliriz, bunlar bildiğimiz şeyler. Yeni olan, elimizde serbest değişkenler olması, ki bu değişkenlere herhangi bir değer verebiliyorum. Ve ben şimdi, onlara sistematik olarak &quot;belli'' değerler atayacağım (herhangi bir değer olabildiklerine görelim, istediğim değeri atayabilirim), mesela</p>
+<p><span class="math display">\[ x = 
+\left[\begin{array}{r}
+\\
+1\\
+\\
+0
+\end{array}\right]
+ \]</span></p>
+<p>Yani <span class="math inline">\(x_2=1,x_4=0\)</span> seçtim. Şimdi üstteki 2. formülde <span class="math inline">\(x_4=0\)</span> geriye koyarsam, <span class="math inline">\(x_3=0\)</span> elde ederim. <span class="math inline">\(x_2=1\)</span> ise, <span class="math inline">\(x_1=-2\)</span>. Böylece tamamlanmış <span class="math inline">\(x\)</span>,</p>
+<p><span class="math display">\[ x = 
+\left[\begin{array}{r}
+-2\\
+1\\
+0\\
+0
+\end{array}\right]
+ \]</span></p>
+<p>İşte sıfır uzayında bir vektör bu, çünkü bu <span class="math inline">\(Ax=0\)</span>'in çözümlerinden biri.</p>
+<p>Başka hangi çözümler olabilir? Elimizdeki çözümden daha fazla çözüm üretebilir miyiz? Evet. Üstteki vektörü katlarını alırsak elde edilen vektörler de sıfır uzayındadır, bir <span class="math inline">\(c\)</span> sabiti kullanalım,</p>
+<p><span class="math display">\[ x = 
+c \cdot 
+\left[\begin{array}{r}
+-2\\
+1\\
+0\\
+0
+\end{array}\right]
+ \]</span></p>
+<p>Bu bize 4 boyutlu uzayda olan bir çizgiyi tarif ediyor. Peki sıfır uzayının tamamını tarif etmiş olduk mu? Hayır. Çünkü iki tane serbest değişkenim vardı, onlar için belli bir seçim yaptım. Ama şöyle bir seçim de yapabilirdim,</p>
+<p><span class="math display">\[ x = 
+\left[\begin{array}{r}
+\\
+0\\
+\\
+1
+\end{array}\right]
+ \]</span></p>
+<p>Yani <span class="math inline">\(x_2=0,x_4=1\)</span>. Bu yeni değerleri geri koyalım; <span class="math inline">\(x_3=-2\)</span>, ve 1. denklem bize <span class="math inline">\(x_1=2\)</span> verir. Hepsi (ve bir <span class="math inline">\(d\)</span> sabiti üzerinden),</p>
+<p><span class="math display">\[ x = d \cdot 
+\left[\begin{array}{r}
+2\\
+0\\
+-2\\
+1
+\end{array}\right]
+ \]</span></p>
+<p>Terminoloji; üstte belli değerler üzerinden elde ettiğim iki çözüme &quot;özel çözümler'' ismi veriyorum, çünkü kendi seçtiğim belli &quot;özel'' değerler üzerinden o çözümlere eriştim.</p>
+<p>Nihai çözüm, yani sıfır uzayı üstte hesapladığım iki özel çözümün tüm lineer kombinasyonları olacaktır.</p>
+<p>Soru: serbest değişken sayısı nereden gelir? Kerte (rank) <span class="math inline">\(r\)</span> ise, kolon boyutu <span class="math inline">\(n\)</span> olan matris için <span class="math inline">\(n-r = 4-2 = 2\)</span> serbest değişken vardır. Kertenin kolon boyutundan az olması o matrisin sıfır uzayının büyüklüğü hakkında bir işaret yani.</p>
+<p>Azaltılmış Basamaklı (Reduced Echelon) Matris</p>
+<p>Eliminasyon sonrası elde ettiğimiz matrisi hatırlarsak,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cccc}
+1 &amp; 2 &amp; 2 &amp; 2  \\
+0 &amp; 0 &amp; 2 &amp; 4 \\
+0 &amp; 0 &amp; 0 &amp; 0
+\end{array}\right]
+ \]</span></p>
+<p>ki bu matris basamaklı, üstüçgensel sayılabilecek bir matristir. 3. satırın tamamen sıfır olduğuna dikkat edelim, bu oldu çünkü orijinal matriste 3. satır, 1. ve 2. satırların bir kombinasyonu idi ve eliminasyon bu durumu keşfetti, üstteki 3. satır bu sebeple tamamen sıfır haline geldi.</p>
+<p>Neyse, şimdi bu matrisi biraz daha temizlemek istiyorum. Ne yapabilirim?</p>
+<p>Eliminasyon işlemini yukarı doğru uygulayamaz mıyım? Böylece pivotların üstünde de, altında olduğu gibi, sıfır değerleri gelebilir - ki bu azaltılmış basamaklı matrislerin tanımı zaten; bu matrislerde pivotların hem altında hem üstünde sıfır vardır.</p>
+<p>İlerleyelim, 2. satırı 1. satırdan çıkartırsam,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cccc}
+(1) &amp; 2 &amp; 0 &amp; -2  \\
+0 &amp; 0 &amp; (2) &amp; 4 \\
+0 &amp; 0 &amp; 0 &amp; 0
+\end{array}\right]
+ \]</span></p>
+<p>Yeni bir sıfır elde etmiş olduk (pivotlar parantezde). Bu arada pivotlarda hep 1 sayısı görmek istiyorum, 2. satırı 2 ile bölebilirim, bu denklem sistemini değiştirmez, o zaman</p>
+<p><span class="math display">\[ R = 
+\left[\begin{array}{cccc}
+(1) &amp; 2 &amp; 0 &amp; -2  \\
+0 &amp; 0 &amp; (1) &amp; 2 \\
+0 &amp; 0 &amp; 0 &amp; 0
+\end{array}\right]
+ \]</span></p>
+<p>Bu formdaki bir matrise azaltılmış satır basamaklı formu (reduced row echelon form -rref-) adı veriliyor. Python <code>sympy</code> paketindeki <code>rref</code> çağrısı bu çözümü yapar.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sympy
+A <span class="op">=</span> sympy.Matrix([[<span class="fl">1.</span>, <span class="fl">2.</span>, <span class="fl">2.</span>, <span class="fl">2.</span> ],
+                 [<span class="fl">2.</span>, <span class="fl">4.</span>, <span class="fl">6.</span>, <span class="fl">8.</span> ],
+                 [<span class="fl">3.</span>, <span class="fl">6.</span>, <span class="fl">8.</span>, <span class="fl">10.</span>]] )
+<span class="bu">print</span> A.rref()[<span class="dv">0</span>]</code></pre></div>
+<pre><code>[1.0, 2.0,   0, -2.0]
+[  0,   0, 1.0,  2.0]
+[  0,   0,   0,    0]</code></pre>
+<p><span class="math inline">\(R\)</span> olabilecek en özet bilgiyi içeriyor. Pivot kolonları 1,2 görülüyor, pivot satırları 1,2 aynı şekilde. Bu arada eğer pivot kolon ve satırları dışarı çekmiş olsam, bu matris bir birim (identity) matrisi olurdu.</p>
+<p>Eğer <span class="math inline">\(Ux=0\)</span> yerine <span class="math inline">\(Rx=0\)</span>'i görmek istersem,</p>
+<p><span class="math display">\[ x_1 + 2x_2 - 2x_4 = 0 \]</span></p>
+<p><span class="math display">\[ x_3 + 2x_4 = 0 \]</span></p>
+<p>Umarım anlaşılıyordur, <span class="math inline">\(Ax=0\)</span> ile başladık, sonra &quot;orta nokta'' olarak görebileceğimiz <span class="math inline">\(Ux=0\)</span>'i elde ettik, ve şimdi üstte <span class="math inline">\(Rx=0\)</span>'i görüyoruz... Bu sistemlerin hepsi birbiri ile eşdeğerdir, çünkü birinden diğerine giderken sistemi bozmadık. Bir satırı bir şey ile çarpıp bir diğerinden çıkartmak gibi işlemler uyguladık ki bu tür işlemler denklem sistemini bozmuyor.</p>
+<p>Tüm çözümler,</p>
+<p><span class="math display">\[ 
+x = 
+c \cdot 
+\left[\begin{array}{r}
+-2\\ 1\\ 0\\ 0
+\end{array}\right]
++
+d \cdot 
+\left[\begin{array}{r}
+2\\ 0\\ -2\\ 1
+\end{array}\right]
+ \]</span></p>
+<p>Önemli nokta: üstteki serbest değişkenlerin değerleri <span class="math inline">\(R\)</span>'içindeki değerlerin negatifi alınmış hali. Niye?</p>
+<div class="figure">
+<img src="7_01.png" />
+
+</div>
+<p>Eğer pivot kolonlarını bir araya, serbest (free) kolonlarını biraraya koyarsam üstteki şekil ortaya çıkar.</p>
+<p><span class="math display">\[ R = 
+\left[\begin{array}{cccc}
+I &amp; F   \\
+0 &amp; 0
+\end{array}\right]
+ \]</span></p>
+<p>Üstte görülen oldukça tipik bir rref matrisidir. <span class="math inline">\(I\)</span>'nin boyutları <span class="math inline">\(r \times r\)</span>, çünkü <span class="math inline">\(r\)</span> tane pivot kolonu var, <span class="math inline">\(F\)</span>'nin kolon sayısı <span class="math inline">\(n-r\)</span>, çünkü o kadar serbest değişken var. Peki özel çözümler nedir? Madem matris bir blok matris halinde (yani <span class="math inline">\(I,F\)</span> bloklar olarak bir diğerinin içinde), eh o zaman <span class="math inline">\(Rx = 0\)</span>'in çözümlerini direk bu matris üzerinden elde edebilirim. Bir sıfır uzayı matrisi oluşturacağım ki bu matrisin kolonları özel çözümüm olacak. Bu matrise <span class="math inline">\(N\)</span> diyeyim, öyle ki <span class="math inline">\(RN = 0\)</span> olsun,</p>
+<p><span class="math display">\[ 
+N = 
+\left[\begin{array}{rr}
+-F &amp; I
+\end{array}\right]
+\]</span></p>
+<p>Eksi işaret nereden geldi? <span class="math inline">\(Rx=0\)</span>'i şöyle gösterirsek,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+I &amp; F
+\end{array}\right]
+\left[\begin{array}{l}
+x_{pivot} \\ x_{serbest} 
+\end{array}\right] = 0
+ \]</span></p>
+<p>Açarsak,</p>
+<p><span class="math inline">\(x_{pivot} = -F x_{serbest}\)</span></p>
+<p>Yeni bir örnek çözelim.</p>
+<p><span class="math display">\[ 
+A = \left[\begin{array}{rrr}
+1 &amp; 2 &amp; 3 \\
+2 &amp; 4 &amp; 6 \\
+2 &amp; 6 &amp; 8 \\
+2 &amp; 8 &amp; 10 \\
+\end{array}\right]
+ \]</span></p>
+<p>Çözmeye başlamadan önce hemen ilk bakışla ne gördüğümüzü söyleyelim; Kaç tane pivot olmasını, yani kaç tane kolonun pivot'unun olmasını beklemeliyiz? Bu matriste üç tane kolon var, peki üç tane pivot elde edecek miyiz? Hayır, çünkü 3. kolon 1. ve 2. kolonların bir toplamı. Bu kolon yeni bir enformasyon sağlamıyor, yani &quot;bağımsız değil''. Çözüm sırasında benim beklentim şöyle, 1. ve 2. kolon pivot olacak, ama 3. bağımlı olduğu için serbest kolon olacak. Eliminasyon bunu bulmalı.</p>
+<p>2 tane 1. satırı 2., 3. ve 4. satırdan çıkartırsam,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rrr}
+1 &amp; 2 &amp; 3 \\
+0 &amp; 0 &amp; 0 \\
+0 &amp; 2 &amp; 2 \\
+0 &amp; 4 &amp; 4 \\
+\end{array}\right]
+ \]</span></p>
+<p>Şimdi sonraki pivot'a gidiyorum, yani (2,2) kordinatına, orada sıfır var. Altına gidiyorum, orada 2 var. Demek ki satır değiş-tokuşu lazım, bunu yaptıktan sonra istediğim noktada pivot var,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{ccc}
+(1) &amp; 2 &amp; 3 \\
+0 &amp; (2) &amp; 2 \\
+0 &amp; 0 &amp; 0 \\
+0 &amp; 4 &amp; 4 \\
+\end{array}\right]
+ \]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li>tane 2. satırı 4.'den çıkartıyorum, nihayet <span class="math inline">\(U\)</span>'yu elde ediyorum,</li>
+</ol>
+<p><span class="math display">\[ 
+U = \left[\begin{array}{rrr}
+1 &amp; 2 &amp; 3 \\
+0 &amp; 2 &amp; 2 \\
+0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 \\
+\end{array}\right]
+ \]</span></p>
+<p>Kerte yine <span class="math inline">\(r=2\)</span>. Kaç tane özel çözüm var? <span class="math inline">\(3-2=1\)</span>, demek ki 1 tane serbest kolon var. Özel çözümü bulmak için serbest değişkene 1 değeri veririm,</p>
+<p>Denklem halinde</p>
+<p><span class="math display">\[ x_1 + 2x_2 + 3x_3 = 0 \]</span></p>
+<p><span class="math display">\[ 2x_2 + 2x_3 = 0 \]</span></p>
+<p><span class="math inline">\(x_3=1\)</span> ile başlarsak geriye koyma ile,</p>
+<p><span class="math display">\[ x = 
+\left[\begin{array}{r}
+-1\\
+-1\\
+1
+\end{array}\right]
+ \]</span></p>
+<p>Hızlı bir doğrulama yapmak gerekirse, üstteki çözüm ne diyor? <span class="math inline">\(A\)</span>'nin 1. ve 2. kolonundan -1 tane ve 3. kolonundan 1 tane alıp toplarsam sonuç sıfır olacaktır. Ve hakikaten de bu doğru, zaten problemin başında 1. ve 2. kolonun toplamının 3.'ye eşit olduğunu söylemememiş miydik? Evet.</p>
+<p>Tüm çözümler,</p>
+<p><span class="math display">\[ x = 
+c \cdot \left[\begin{array}{r}
+-1\\
+-1\\
+1
+\end{array}\right]
+ \]</span></p>
+<p>Sınavda üstteki çözümü göstermenizi beklerim. Daha ilerideki sınavlarda sıfır uzayın &quot;bazını'' soracağım, o zaman <span class="math inline">\(c\)</span> olmadan tek vektörü verebilirsiniz, ama sıfır uzayını istiyorsam üstteki problem için tüm bir çizgiyi vermeniz lazım.</p>
+<p>Bu örnekte gidilecek sonraki doğal adım, rref formuna gitmek. 2. satırı alıp 1. den çıkartabilirim, ve 2. satırı 2'ye bölebilirim,</p>
+<p><span class="math display">\[ 
+R = \left[\begin{array}{rrr}
+1 &amp; 0 &amp; 1 \\
+0 &amp; 1 &amp; 1 \\
+0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 \\
+\end{array}\right]
+ \]</span></p>
+<p><span class="math inline">\(I\)</span> kısmı görülüyor, sol üst köşedeki <span class="math inline">\(2 \times 2\)</span> boyutlu blok matris. Onun hemen yanındaki <span class="math inline">\(2 \times 1\)</span> boyutlu içinde sadece 1 olan kısım <span class="math inline">\(F\)</span>. Üstte <span class="math inline">\(x\)</span> için gösterdiğimiz bölümde <span class="math inline">\(F\)</span>'in negatifi olduğunu dikkat, yani</p>
+<p><span class="math display">\[ x = 
+c \cdot \left[\begin{array}{r}
+-F \\
+I
+\end{array}\right]
+ \]</span></p>
+<p>ki <span class="math inline">\(c\)</span>'nin çarptığı matris <span class="math inline">\(N\)</span> matrisi, yani sıfır uzayı matrisidir, ki bu matrisin kolonları bizim özel çözümlerimiz.</p>
+<p><span class="math inline">\(Ax=0\)</span> hakkında söyleyecek daha fazla bir şey kalmadı sanıyorum. <span class="math inline">\(Ax=b\)</span> konusunda söyleyeceklerimiz daha var, ama bu bir sonraki derste.</p>
+</body>
+</html>

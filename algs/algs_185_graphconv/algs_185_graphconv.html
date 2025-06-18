@@ -1,0 +1,565 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="evrişimsel-çizit-ağları-graph-convolutional-networks">Evrişimsel Çizit Ağları (Graph Convolutional Networks)</h1>
+<p>Gerçek dünyadaki pek çok veriyi çizit olarak temsil etmek doğal; arkadaşlık verisi, bilgi temsili. Çizitler bildiğimiz gibi düğümler ve o düğümler arasındaki bağlantılardan oluşur, bilgi temsili örneğinde mesela A kişisi B okulunda okudu için A ve B düğümleri arasında &quot;okudu'' bağlantısı konur, ve yine bu kişinin C şehrinde &quot;yaşamış'' olduğu yine bir bağlantı ile temsil edilebilir. Bu şekilde tüm çizit kurulabilir, ve sonra çizitin özetsel bir halini hesaplattırabiliriz (temsili gömme verisi yaratmak mümkün), sonra bu &quot;öğrenilmiş'' özet üzerinden eksik bilgileri çizite sormak mümkün olabilir. Acaba A kişisi D işinde &quot;çalışmış mıdır?''. Bu eksik bir bağlantı, belki veride yok ama olması gerekiyor, eldeki özetten bu bilgi tamamlanabilir.</p>
+<p>Matematiksel olarak bir düğüm verisinin etrafındaki komşu düğümlerin bir fonksiyonu olarak modellenir.</p>
+<div class="figure">
+<img src="graphconv_02.png" />
+
+</div>
+<p>Yaklaşıma evrişimsel denmesinin sebebi tüm 1. derece komşuluk ilişkilerinin aynı ağırlıklar ile hesaplanıyor olması. Bu isim yaklaşımın ismi derin yapay sinir ağlarındaki evrişimsel operatörlere benzemesinden geliyor, bir evrişimsel operatörü veri üzerinde gezdirdiğimiz zaman o gezdirme yapılırken operatörün hep aynı ağırlıkları kullanıldığı varsayarız / o şekilde kodlarız.</p>
+<p><span class="math display">\[ h_v = ReLU(W_{loop}h_v + \sum_{u \in N(v)} W h_u ) \]</span></p>
+<p><span class="math inline">\(W_{loop}\)</span> düğümlerin kendilerine olan bağlantısını (loop) modelliyor, buna etraftaki bağlantılar ekleniyor. Fakat bir DYSA'da evrişimsel (ve diğer) tabakalar, katmanlar vardır, GCN'de katmanlar nerede? Katmanlar bir düğümün hesabı için kaç komşuluk seviyesi geriye gitmesi üzerinden hesaplanıyor. Eğer bir düğüm için komşunun komşusuna gidiyorsak bu ilişki ağın ikinci katmanını oluşturur.</p>
+<div class="figure">
+<img src="graphconv_01.png" />
+
+</div>
+<p>Üstteki figürde gördüğümüz gibi ilk seviye komşuluklar mavi komşular ve kırmızı düğüm arasında, bu birinci katman (her kırmızı düğüm için komşuluk aynı ağırlıklarla). İkinci katmanda komşunun komşusu sarı düğümler de dahil ediliyor, ve bunlar da farklı (ama yine her ikinci seviye komşuluk için aynı) ağırlıklarla hallediliyor.</p>
+<p>GCN'lerin diğer çizit işleyen yaklaşımlara göre bir diğer avantajı hem bağlantı yapısını, hem de düğümler üzerindeki referans bilgisini de (mesela kişileri temsil eden düğümlerde yaş, cinsiyet gibi bilgiler) kullanabilmesi.</p>
+<p>[2] konudaki yayınlardan biri, örnek olarak bilimsel yayınların birbirini referansını analiz etmişler, ayrıca tavsiye sistemleriyle kendi yaklaşımlarını yarıştırmışlar, sonuçlar oldukca iyi [3].</p>
+<p>Kod</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> __future__ <span class="im">import</span> division
+<span class="im">from</span> __future__ <span class="im">import</span> print_function
+
+<span class="im">import</span> time
+<span class="im">import</span> os
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> pickle <span class="im">as</span> pkl
+<span class="im">import</span> networkx <span class="im">as</span> nx
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sp
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sp
+<span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_auc_score
+<span class="im">from</span> sklearn.metrics <span class="im">import</span> average_precision_score
+
+flags <span class="op">=</span> tf.app.flags
+FLAGS <span class="op">=</span> flags.FLAGS
+
+<span class="kw">class</span> OptimizerAE(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, preds, labels, pos_weight, norm):
+        preds_sub <span class="op">=</span> preds
+        labels_sub <span class="op">=</span> labels
+
+        tmp <span class="op">=</span> tf.nn.weighted_cross_entropy_with_logits(logits<span class="op">=</span>preds_sub, targets<span class="op">=</span>labels_sub, pos_weight<span class="op">=</span>pos_weight)
+        <span class="va">self</span>.cost <span class="op">=</span> norm <span class="op">*</span> tf.reduce_mean(tmp)
+        <span class="va">self</span>.optimizer <span class="op">=</span> tf.train.AdamOptimizer(learning_rate<span class="op">=</span>FLAGS.learning_rate)  <span class="co"># Adam Optimizer</span>
+
+        <span class="va">self</span>.opt_op <span class="op">=</span> <span class="va">self</span>.optimizer.minimize(<span class="va">self</span>.cost)
+        <span class="va">self</span>.grads_vars <span class="op">=</span> <span class="va">self</span>.optimizer.compute_gradients(<span class="va">self</span>.cost)
+
+        tmp <span class="op">=</span> tf.cast(tf.greater_equal(tf.sigmoid(preds_sub), <span class="fl">0.5</span>), tf.int32)
+        <span class="va">self</span>.correct_prediction <span class="op">=</span> tf.equal(tmp, tf.cast(labels_sub, tf.int32))
+        <span class="va">self</span>.accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(<span class="va">self</span>.correct_prediction, tf.float32))
+
+<span class="kw">def</span> parse_index_file(filename):
+    index <span class="op">=</span> []
+    <span class="cf">for</span> line <span class="kw">in</span> <span class="bu">open</span>(filename):
+        index.append(<span class="bu">int</span>(line.strip()))
+    <span class="cf">return</span> index
+
+
+<span class="kw">def</span> load_data(dataset):
+    names <span class="op">=</span> [<span class="st">&#39;x&#39;</span>, <span class="st">&#39;tx&#39;</span>, <span class="st">&#39;allx&#39;</span>, <span class="st">&#39;graph&#39;</span>]
+    objects <span class="op">=</span> []
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(names)):
+        objects.append(pkl.load(<span class="bu">open</span>(<span class="st">&quot;data/ind.</span><span class="sc">{}</span><span class="st">.</span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(dataset, names[i]))))
+    x, tx, allx, graph <span class="op">=</span> <span class="bu">tuple</span>(objects)
+    test_idx_reorder <span class="op">=</span> parse_index_file(<span class="st">&quot;data/ind.</span><span class="sc">{}</span><span class="st">.test.index&quot;</span>.<span class="bu">format</span>(dataset))
+    test_idx_range <span class="op">=</span> np.sort(test_idx_reorder)
+
+    test_idx_range_full <span class="op">=</span> <span class="bu">range</span>(<span class="bu">min</span>(test_idx_reorder), <span class="bu">max</span>(test_idx_reorder)<span class="op">+</span><span class="dv">1</span>)
+    tx_extended <span class="op">=</span> sp.lil_matrix((<span class="bu">len</span>(test_idx_range_full), x.shape[<span class="dv">1</span>]))
+    tx_extended[test_idx_range<span class="op">-</span><span class="bu">min</span>(test_idx_range), :] <span class="op">=</span> tx
+    tx <span class="op">=</span> tx_extended
+
+    features <span class="op">=</span> sp.vstack((allx, tx)).tolil()
+    features[test_idx_reorder, :] <span class="op">=</span> features[test_idx_range, :]
+    adj <span class="op">=</span> nx.adjacency_matrix(nx.from_dict_of_lists(graph))
+
+    <span class="cf">return</span> adj, features
+
+<span class="kw">def</span> weight_variable_glorot(input_dim, output_dim, name<span class="op">=</span><span class="st">&quot;&quot;</span>):
+    init_range <span class="op">=</span> np.sqrt(<span class="fl">6.0</span> <span class="op">/</span> (input_dim <span class="op">+</span> output_dim))
+    initial <span class="op">=</span> tf.random_uniform([input_dim, output_dim], minval<span class="op">=-</span>init_range,
+                                maxval<span class="op">=</span>init_range, dtype<span class="op">=</span>tf.float32)
+    <span class="cf">return</span> tf.Variable(initial, name<span class="op">=</span>name)
+
+_LAYER_UIDS <span class="op">=</span> {}
+
+<span class="kw">def</span> get_layer_uid(layer_name<span class="op">=</span><span class="st">&#39;&#39;</span>):
+    <span class="cf">if</span> layer_name <span class="kw">not</span> <span class="kw">in</span> _LAYER_UIDS:
+        _LAYER_UIDS[layer_name] <span class="op">=</span> <span class="dv">1</span>
+        <span class="cf">return</span> <span class="dv">1</span>
+    <span class="cf">else</span>:
+        _LAYER_UIDS[layer_name] <span class="op">+=</span> <span class="dv">1</span>
+        <span class="cf">return</span> _LAYER_UIDS[layer_name]
+
+
+<span class="kw">def</span> dropout_sparse(x, keep_prob, num_nonzero_elems):
+    noise_shape <span class="op">=</span> [num_nonzero_elems]
+    random_tensor <span class="op">=</span> keep_prob
+    random_tensor <span class="op">+=</span> tf.random_uniform(noise_shape)
+    dropout_mask <span class="op">=</span> tf.cast(tf.floor(random_tensor), dtype<span class="op">=</span>tf.<span class="bu">bool</span>)
+    pre_out <span class="op">=</span> tf.sparse_retain(x, dropout_mask)
+    <span class="cf">return</span> pre_out <span class="op">*</span> (<span class="fl">1.</span><span class="op">/</span>keep_prob)
+
+
+<span class="kw">class</span> Layer(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, <span class="op">**</span>kwargs):
+        allowed_kwargs <span class="op">=</span> {<span class="st">&#39;name&#39;</span>, <span class="st">&#39;logging&#39;</span>}
+        <span class="cf">for</span> kwarg <span class="kw">in</span> kwargs.keys():
+            <span class="cf">assert</span> kwarg <span class="kw">in</span> allowed_kwargs, <span class="st">&#39;Invalid keyword argument: &#39;</span> <span class="op">+</span> kwarg
+        name <span class="op">=</span> kwargs.get(<span class="st">&#39;name&#39;</span>)
+        <span class="cf">if</span> <span class="kw">not</span> name:
+            layer <span class="op">=</span> <span class="va">self</span>.__class__.<span class="va">__name__</span>.lower()
+            name <span class="op">=</span> layer <span class="op">+</span> <span class="st">&#39;_&#39;</span> <span class="op">+</span> <span class="bu">str</span>(get_layer_uid(layer))
+        <span class="va">self</span>.name <span class="op">=</span> name
+        <span class="va">self</span>.<span class="bu">vars</span> <span class="op">=</span> {}
+        logging <span class="op">=</span> kwargs.get(<span class="st">&#39;logging&#39;</span>, <span class="va">False</span>)
+        <span class="va">self</span>.logging <span class="op">=</span> logging
+        <span class="va">self</span>.issparse <span class="op">=</span> <span class="va">False</span>
+
+    <span class="kw">def</span> _call(<span class="va">self</span>, inputs):
+        <span class="cf">return</span> inputs
+
+    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, inputs):
+        <span class="cf">with</span> tf.name_scope(<span class="va">self</span>.name):
+            outputs <span class="op">=</span> <span class="va">self</span>._call(inputs)
+            <span class="cf">return</span> outputs
+
+
+<span class="kw">class</span> GraphConvolution(Layer):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_dim,
+                 output_dim, adj,
+                 dropout<span class="op">=</span><span class="fl">0.</span>,
+                 act<span class="op">=</span>tf.nn.relu, <span class="op">**</span>kwargs):
+        <span class="bu">super</span>(GraphConvolution, <span class="va">self</span>).<span class="fu">__init__</span>(<span class="op">**</span>kwargs)
+        <span class="cf">with</span> tf.variable_scope(<span class="va">self</span>.name <span class="op">+</span> <span class="st">&#39;_vars&#39;</span>):
+            <span class="va">self</span>.<span class="bu">vars</span>[<span class="st">&#39;weights&#39;</span>] <span class="op">=</span> weight_variable_glorot(input_dim,
+                                                          output_dim,
+                                                          name<span class="op">=</span><span class="st">&quot;weights&quot;</span>)
+        <span class="va">self</span>.dropout <span class="op">=</span> dropout
+        <span class="va">self</span>.adj <span class="op">=</span> adj
+        <span class="va">self</span>.act <span class="op">=</span> act
+
+    <span class="kw">def</span> _call(<span class="va">self</span>, inputs):
+        x <span class="op">=</span> inputs
+        x <span class="op">=</span> tf.nn.dropout(x, <span class="dv">1</span><span class="op">-</span><span class="va">self</span>.dropout)
+        x <span class="op">=</span> tf.matmul(x, <span class="va">self</span>.<span class="bu">vars</span>[<span class="st">&#39;weights&#39;</span>])
+        x <span class="op">=</span> tf.sparse_tensor_dense_matmul(<span class="va">self</span>.adj, x)
+        outputs <span class="op">=</span> <span class="va">self</span>.act(x)
+        <span class="cf">return</span> outputs
+
+
+<span class="kw">class</span> GraphConvolutionSparse(Layer):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_dim,
+                 output_dim, adj,
+                 features_nonzero,
+                 dropout<span class="op">=</span><span class="fl">0.</span>, act<span class="op">=</span>tf.nn.relu, <span class="op">**</span>kwargs):
+        <span class="bu">super</span>(GraphConvolutionSparse, <span class="va">self</span>).<span class="fu">__init__</span>(<span class="op">**</span>kwargs)
+        <span class="cf">with</span> tf.variable_scope(<span class="va">self</span>.name <span class="op">+</span> <span class="st">&#39;_vars&#39;</span>):
+            <span class="va">self</span>.<span class="bu">vars</span>[<span class="st">&#39;weights&#39;</span>] <span class="op">=</span> weight_variable_glorot(input_dim,
+                                                          output_dim,
+                                                          name<span class="op">=</span><span class="st">&quot;weights&quot;</span>)
+        <span class="va">self</span>.dropout <span class="op">=</span> dropout
+        <span class="va">self</span>.adj <span class="op">=</span> adj
+        <span class="va">self</span>.act <span class="op">=</span> act
+        <span class="va">self</span>.issparse <span class="op">=</span> <span class="va">True</span>
+        <span class="va">self</span>.features_nonzero <span class="op">=</span> features_nonzero
+
+    <span class="kw">def</span> _call(<span class="va">self</span>, inputs):
+        x <span class="op">=</span> inputs
+        x <span class="op">=</span> dropout_sparse(x, <span class="dv">1</span><span class="op">-</span><span class="va">self</span>.dropout, <span class="va">self</span>.features_nonzero)
+        x <span class="op">=</span> tf.sparse_tensor_dense_matmul(x, <span class="va">self</span>.<span class="bu">vars</span>[<span class="st">&#39;weights&#39;</span>])
+        x <span class="op">=</span> tf.sparse_tensor_dense_matmul(<span class="va">self</span>.adj, x)
+        outputs <span class="op">=</span> <span class="va">self</span>.act(x)
+        <span class="cf">return</span> outputs
+
+
+<span class="kw">class</span> InnerProductDecoder(Layer):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_dim, dropout<span class="op">=</span><span class="fl">0.</span>, act<span class="op">=</span>tf.nn.sigmoid, <span class="op">**</span>kwargs):
+        <span class="bu">super</span>(InnerProductDecoder, <span class="va">self</span>).<span class="fu">__init__</span>(<span class="op">**</span>kwargs)
+        <span class="va">self</span>.dropout <span class="op">=</span> dropout
+        <span class="va">self</span>.act <span class="op">=</span> act
+
+    <span class="kw">def</span> _call(<span class="va">self</span>, inputs):
+        inputs <span class="op">=</span> tf.nn.dropout(inputs, <span class="dv">1</span><span class="op">-</span><span class="va">self</span>.dropout)
+        x <span class="op">=</span> tf.transpose(inputs)
+        x <span class="op">=</span> tf.matmul(inputs, x)
+        x <span class="op">=</span> tf.reshape(x, [<span class="op">-</span><span class="dv">1</span>])
+        outputs <span class="op">=</span> <span class="va">self</span>.act(x)
+        <span class="cf">return</span> outputs
+
+<span class="kw">class</span> Model(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, <span class="op">**</span>kwargs):
+        allowed_kwargs <span class="op">=</span> {<span class="st">&#39;name&#39;</span>, <span class="st">&#39;logging&#39;</span>}
+        <span class="cf">for</span> kwarg <span class="kw">in</span> kwargs.keys():
+            <span class="cf">assert</span> kwarg <span class="kw">in</span> allowed_kwargs, <span class="st">&#39;Invalid keyword argument: &#39;</span> <span class="op">+</span> kwarg
+
+        <span class="cf">for</span> kwarg <span class="kw">in</span> kwargs.keys():
+            <span class="cf">assert</span> kwarg <span class="kw">in</span> allowed_kwargs, <span class="st">&#39;Invalid keyword argument: &#39;</span> <span class="op">+</span> kwarg
+        name <span class="op">=</span> kwargs.get(<span class="st">&#39;name&#39;</span>)
+        <span class="cf">if</span> <span class="kw">not</span> name:
+            name <span class="op">=</span> <span class="va">self</span>.__class__.<span class="va">__name__</span>.lower()
+        <span class="va">self</span>.name <span class="op">=</span> name
+
+        logging <span class="op">=</span> kwargs.get(<span class="st">&#39;logging&#39;</span>, <span class="va">False</span>)
+        <span class="va">self</span>.logging <span class="op">=</span> logging
+
+        <span class="va">self</span>.<span class="bu">vars</span> <span class="op">=</span> {}
+
+    <span class="kw">def</span> _build(<span class="va">self</span>):
+        <span class="cf">raise</span> <span class="pp">NotImplementedError</span>
+
+    <span class="kw">def</span> build(<span class="va">self</span>):
+        <span class="co">&quot;&quot;&quot; Wrapper for _build() &quot;&quot;&quot;</span>
+        <span class="cf">with</span> tf.variable_scope(<span class="va">self</span>.name):
+            <span class="va">self</span>._build()
+        variables <span class="op">=</span> tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope<span class="op">=</span><span class="va">self</span>.name)
+        <span class="va">self</span>.<span class="bu">vars</span> <span class="op">=</span> {var.name: var <span class="cf">for</span> var <span class="kw">in</span> variables}
+
+    <span class="kw">def</span> fit(<span class="va">self</span>):
+        <span class="cf">pass</span>
+
+    <span class="kw">def</span> predict(<span class="va">self</span>):
+        <span class="cf">pass</span>
+
+
+<span class="kw">class</span> GCNModelAE(Model):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, placeholders, num_features, features_nonzero, <span class="op">**</span>kwargs):
+        <span class="bu">super</span>(GCNModelAE, <span class="va">self</span>).<span class="fu">__init__</span>(<span class="op">**</span>kwargs)
+
+        <span class="va">self</span>.inputs <span class="op">=</span> placeholders[<span class="st">&#39;features&#39;</span>]
+        <span class="va">self</span>.input_dim <span class="op">=</span> num_features
+        <span class="va">self</span>.features_nonzero <span class="op">=</span> features_nonzero
+        <span class="va">self</span>.adj <span class="op">=</span> placeholders[<span class="st">&#39;adj&#39;</span>]
+        <span class="va">self</span>.dropout <span class="op">=</span> placeholders[<span class="st">&#39;dropout&#39;</span>]
+        <span class="va">self</span>.build()
+
+    <span class="kw">def</span> _build(<span class="va">self</span>):
+        <span class="va">self</span>.hidden1 <span class="op">=</span> GraphConvolutionSparse(input_dim<span class="op">=</span><span class="va">self</span>.input_dim,
+                                              output_dim<span class="op">=</span>FLAGS.hidden1,
+                                              adj<span class="op">=</span><span class="va">self</span>.adj,
+                                              features_nonzero<span class="op">=</span><span class="va">self</span>.features_nonzero,
+                                              act<span class="op">=</span>tf.nn.relu,
+                                              dropout<span class="op">=</span><span class="va">self</span>.dropout,
+                                              logging<span class="op">=</span><span class="va">self</span>.logging)(<span class="va">self</span>.inputs)
+
+        <span class="va">self</span>.embeddings <span class="op">=</span> GraphConvolution(input_dim<span class="op">=</span>FLAGS.hidden1,
+                                           output_dim<span class="op">=</span>FLAGS.hidden2,
+                                           adj<span class="op">=</span><span class="va">self</span>.adj,
+                                           act<span class="op">=</span><span class="kw">lambda</span> x: x,
+                                           dropout<span class="op">=</span><span class="va">self</span>.dropout,
+                                           logging<span class="op">=</span><span class="va">self</span>.logging)(<span class="va">self</span>.hidden1)
+
+        <span class="va">self</span>.z_mean <span class="op">=</span> <span class="va">self</span>.embeddings
+
+        <span class="va">self</span>.reconstructions <span class="op">=</span> InnerProductDecoder(input_dim<span class="op">=</span>FLAGS.hidden2,
+                                      act<span class="op">=</span><span class="kw">lambda</span> x: x,
+                                      logging<span class="op">=</span><span class="va">self</span>.logging)(<span class="va">self</span>.embeddings)
+
+
+
+<span class="kw">def</span> sparse_to_tuple(sparse_mx):
+    <span class="cf">if</span> <span class="kw">not</span> sp.isspmatrix_coo(sparse_mx):
+        sparse_mx <span class="op">=</span> sparse_mx.tocoo()
+    coords <span class="op">=</span> np.vstack((sparse_mx.row, sparse_mx.col)).transpose()
+    values <span class="op">=</span> sparse_mx.data
+    shape <span class="op">=</span> sparse_mx.shape
+    <span class="cf">return</span> coords, values, shape
+
+
+<span class="kw">def</span> preprocess_graph(adj):
+    adj <span class="op">=</span> sp.coo_matrix(adj)
+    adj_ <span class="op">=</span> adj <span class="op">+</span> sp.eye(adj.shape[<span class="dv">0</span>])
+    rowsum <span class="op">=</span> np.array(adj_.<span class="bu">sum</span>(<span class="dv">1</span>))
+    degree_mat_inv_sqrt <span class="op">=</span> sp.diags(np.power(rowsum, <span class="fl">-0.5</span>).flatten())
+    adj_normalized <span class="op">=</span> adj_.dot(degree_mat_inv_sqrt).<span class="op">\</span>
+                     transpose().<span class="op">\</span>
+                     dot(degree_mat_inv_sqrt).tocoo()
+    <span class="cf">return</span> sparse_to_tuple(adj_normalized)
+
+
+<span class="kw">def</span> construct_feed_dict(adj_normalized, adj, features, placeholders):
+    <span class="co"># construct feed dictionary</span>
+    feed_dict <span class="op">=</span> <span class="bu">dict</span>()
+    feed_dict.update({placeholders[<span class="st">&#39;features&#39;</span>]: features})
+    feed_dict.update({placeholders[<span class="st">&#39;adj&#39;</span>]: adj_normalized})
+    feed_dict.update({placeholders[<span class="st">&#39;adj_orig&#39;</span>]: adj})
+    <span class="cf">return</span> feed_dict
+
+
+<span class="kw">def</span> mask_test_edges(adj):
+    adj <span class="op">=</span> adj <span class="op">-</span> sp.dia_matrix((adj.diagonal()[np.newaxis, :], [<span class="dv">0</span>]), shape<span class="op">=</span>adj.shape)
+    adj.eliminate_zeros()
+    <span class="cf">assert</span> np.diag(adj.todense()).<span class="bu">sum</span>() <span class="op">==</span> <span class="dv">0</span>
+
+    adj_triu <span class="op">=</span> sp.triu(adj)
+    adj_tuple <span class="op">=</span> sparse_to_tuple(adj_triu)
+    edges <span class="op">=</span> adj_tuple[<span class="dv">0</span>]
+    edges_all <span class="op">=</span> sparse_to_tuple(adj)[<span class="dv">0</span>]
+    num_test <span class="op">=</span> <span class="bu">int</span>(np.floor(edges.shape[<span class="dv">0</span>] <span class="op">/</span> <span class="fl">10.</span>))
+    num_val <span class="op">=</span> <span class="bu">int</span>(np.floor(edges.shape[<span class="dv">0</span>] <span class="op">/</span> <span class="fl">20.</span>))
+
+    all_edge_idx <span class="op">=</span> <span class="bu">range</span>(edges.shape[<span class="dv">0</span>])
+    np.random.shuffle(all_edge_idx)
+    val_edge_idx <span class="op">=</span> all_edge_idx[:num_val]
+    test_edge_idx <span class="op">=</span> all_edge_idx[num_val:(num_val <span class="op">+</span> num_test)]
+    test_edges <span class="op">=</span> edges[test_edge_idx]
+    val_edges <span class="op">=</span> edges[val_edge_idx]
+    train_edges <span class="op">=</span> np.delete(edges, np.hstack([test_edge_idx, val_edge_idx]), axis<span class="op">=</span><span class="dv">0</span>)
+
+    <span class="kw">def</span> ismember(a, b, tol<span class="op">=</span><span class="dv">5</span>):
+        rows_close <span class="op">=</span> np.<span class="bu">all</span>(np.<span class="bu">round</span>(a <span class="op">-</span> b[:, <span class="va">None</span>], tol) <span class="op">==</span> <span class="dv">0</span>, axis<span class="op">=-</span><span class="dv">1</span>)
+        <span class="cf">return</span> (np.<span class="bu">all</span>(np.<span class="bu">any</span>(rows_close, axis<span class="op">=-</span><span class="dv">1</span>), axis<span class="op">=-</span><span class="dv">1</span>) <span class="kw">and</span>
+                np.<span class="bu">all</span>(np.<span class="bu">any</span>(rows_close, axis<span class="op">=</span><span class="dv">0</span>), axis<span class="op">=</span><span class="dv">0</span>))
+
+    test_edges_false <span class="op">=</span> []
+    <span class="cf">while</span> <span class="bu">len</span>(test_edges_false) <span class="op">&lt;</span> <span class="bu">len</span>(test_edges):
+        idx_i <span class="op">=</span> np.random.randint(<span class="dv">0</span>, adj.shape[<span class="dv">0</span>])
+        idx_j <span class="op">=</span> np.random.randint(<span class="dv">0</span>, adj.shape[<span class="dv">0</span>])
+        <span class="cf">if</span> idx_i <span class="op">==</span> idx_j:
+            <span class="cf">continue</span>
+        <span class="cf">if</span> ismember([idx_i, idx_j], edges_all):
+            <span class="cf">continue</span>
+        <span class="cf">if</span> test_edges_false:
+            <span class="cf">if</span> ismember([idx_j, idx_i], np.array(test_edges_false)):
+                <span class="cf">continue</span>
+            <span class="cf">if</span> ismember([idx_i, idx_j], np.array(test_edges_false)):
+                <span class="cf">continue</span>
+        test_edges_false.append([idx_i, idx_j])
+
+    val_edges_false <span class="op">=</span> []
+    <span class="cf">while</span> <span class="bu">len</span>(val_edges_false) <span class="op">&lt;</span> <span class="bu">len</span>(val_edges):
+        idx_i <span class="op">=</span> np.random.randint(<span class="dv">0</span>, adj.shape[<span class="dv">0</span>])
+        idx_j <span class="op">=</span> np.random.randint(<span class="dv">0</span>, adj.shape[<span class="dv">0</span>])
+        <span class="cf">if</span> idx_i <span class="op">==</span> idx_j:
+            <span class="cf">continue</span>
+        <span class="cf">if</span> ismember([idx_i, idx_j], train_edges):
+            <span class="cf">continue</span>
+        <span class="cf">if</span> ismember([idx_j, idx_i], train_edges):
+            <span class="cf">continue</span>
+        <span class="cf">if</span> ismember([idx_i, idx_j], val_edges):
+            <span class="cf">continue</span>
+        <span class="cf">if</span> ismember([idx_j, idx_i], val_edges):
+            <span class="cf">continue</span>
+        <span class="cf">if</span> val_edges_false:
+            <span class="cf">if</span> ismember([idx_j, idx_i], np.array(val_edges_false)):
+                <span class="cf">continue</span>
+            <span class="cf">if</span> ismember([idx_i, idx_j], np.array(val_edges_false)):
+                <span class="cf">continue</span>
+        val_edges_false.append([idx_i, idx_j])
+
+    <span class="cf">assert</span> <span class="op">~</span>ismember(test_edges_false, edges_all)
+    <span class="cf">assert</span> <span class="op">~</span>ismember(val_edges_false, edges_all)
+    <span class="cf">assert</span> <span class="op">~</span>ismember(val_edges, train_edges)
+    <span class="cf">assert</span> <span class="op">~</span>ismember(test_edges, train_edges)
+    <span class="cf">assert</span> <span class="op">~</span>ismember(val_edges, test_edges)
+
+    data <span class="op">=</span> np.ones(train_edges.shape[<span class="dv">0</span>])
+
+    adj_train <span class="op">=</span> sp.csr_matrix((data, (train_edges[:, <span class="dv">0</span>],
+                                      train_edges[:, <span class="dv">1</span>])),
+                              shape<span class="op">=</span>adj.shape)
+    adj_train <span class="op">=</span> adj_train <span class="op">+</span> adj_train.T
+
+    <span class="cf">return</span> <span class="op">\</span>
+        adj_train, train_edges, val_edges, <span class="op">\</span>
+        val_edges_false, test_edges, <span class="op">\</span>
+        test_edges_false</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> __future__ <span class="im">import</span> division
+<span class="im">from</span> __future__ <span class="im">import</span> print_function
+
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sp
+<span class="im">import</span> util
+<span class="im">import</span> time
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_auc_score
+<span class="im">from</span> sklearn.metrics <span class="im">import</span> average_precision_score
+
+flags <span class="op">=</span> tf.app.flags
+FLAGS <span class="op">=</span> flags.FLAGS
+
+flags.DEFINE_float(<span class="st">&#39;learning_rate&#39;</span>, <span class="fl">0.01</span>, <span class="st">&#39;Initial learning rate.&#39;</span>)
+flags.DEFINE_integer(<span class="st">&#39;epochs&#39;</span>, <span class="dv">200</span>, <span class="st">&#39;Number of epochs to train.&#39;</span>)
+flags.DEFINE_integer(<span class="st">&#39;hidden1&#39;</span>, <span class="dv">32</span>, <span class="st">&#39;Number of units in hidden layer 1.&#39;</span>)
+flags.DEFINE_integer(<span class="st">&#39;hidden2&#39;</span>, <span class="dv">16</span>, <span class="st">&#39;Number of units in hidden layer 2.&#39;</span>)
+flags.DEFINE_float(<span class="st">&#39;weight_decay&#39;</span>, <span class="fl">0.</span>, <span class="st">&#39;Weight for L2 loss on embedding matrix.&#39;</span>)
+flags.DEFINE_float(<span class="st">&#39;dropout&#39;</span>, <span class="fl">0.</span>, <span class="st">&#39;Dropout rate (1 - keep probability).&#39;</span>)
+
+flags.DEFINE_string(<span class="st">&#39;model&#39;</span>, <span class="st">&#39;gcn_ae&#39;</span>, <span class="st">&#39;Model string.&#39;</span>)
+flags.DEFINE_string(<span class="st">&#39;dataset&#39;</span>, <span class="st">&#39;citeseer&#39;</span>, <span class="st">&#39;Dataset string.&#39;</span>)
+flags.DEFINE_integer(<span class="st">&#39;features&#39;</span>, <span class="dv">1</span>, <span class="st">&#39;Whether to use features (1) or not (0).&#39;</span>)
+
+model_str <span class="op">=</span> FLAGS.model
+dataset_str <span class="op">=</span> FLAGS.dataset
+
+adj, features <span class="op">=</span> util.load_data(dataset_str)
+
+adj_orig <span class="op">=</span> adj
+adj_orig <span class="op">=</span> adj_orig <span class="op">-</span> sp.dia_matrix(
+    ( adj_orig.diagonal()[np.newaxis, :], [<span class="dv">0</span>]), shape<span class="op">=</span>adj_orig.shape
+)
+adj_orig.eliminate_zeros()
+
+adj_train, train_edges, val_edges,<span class="op">\</span>
+val_edges_false, test_edges,<span class="op">\</span>
+test_edges_false <span class="op">=</span> util.mask_test_edges(adj)
+
+adj <span class="op">=</span> adj_train
+
+<span class="cf">if</span> FLAGS.features <span class="op">==</span> <span class="dv">0</span>:
+    features <span class="op">=</span> sp.identity(features.shape[<span class="dv">0</span>])  <span class="co"># featureless</span>
+
+adj_norm <span class="op">=</span> util.preprocess_graph(adj)
+
+placeholders <span class="op">=</span> {
+    <span class="st">&#39;features&#39;</span>: tf.sparse_placeholder(tf.float32),
+    <span class="st">&#39;adj&#39;</span>: tf.sparse_placeholder(tf.float32),
+    <span class="st">&#39;adj_orig&#39;</span>: tf.sparse_placeholder(tf.float32),
+    <span class="st">&#39;dropout&#39;</span>: tf.placeholder_with_default(<span class="fl">0.</span>, shape<span class="op">=</span>())
+}
+
+num_nodes <span class="op">=</span> adj.shape[<span class="dv">0</span>]
+
+features <span class="op">=</span> util.sparse_to_tuple(features.tocoo())
+num_features <span class="op">=</span> features[<span class="dv">2</span>][<span class="dv">1</span>]
+features_nonzero <span class="op">=</span> features[<span class="dv">1</span>].shape[<span class="dv">0</span>]
+
+model <span class="op">=</span> util.GCNModelAE(placeholders, num_features, features_nonzero)
+
+pos_weight <span class="op">=</span> <span class="bu">float</span>(adj.shape[<span class="dv">0</span>] <span class="op">*</span> adj.shape[<span class="dv">0</span>] <span class="op">-</span> adj.<span class="bu">sum</span>()) <span class="op">/</span> adj.<span class="bu">sum</span>()
+norm <span class="op">=</span> adj.shape[<span class="dv">0</span>] <span class="op">*</span> adj.shape[<span class="dv">0</span>] <span class="op">/</span> <span class="bu">float</span>((adj.shape[<span class="dv">0</span>] <span class="op">*</span> adj.shape[<span class="dv">0</span>] <span class="op">-</span> adj.<span class="bu">sum</span>()) <span class="op">*</span> <span class="dv">2</span>)
+
+tmp <span class="op">=</span> tf.reshape(tf.sparse_tensor_to_dense(placeholders[<span class="st">&#39;adj_orig&#39;</span>],validate_indices<span class="op">=</span><span class="va">False</span>), [<span class="op">-</span><span class="dv">1</span>])
+opt <span class="op">=</span> util.OptimizerAE(preds<span class="op">=</span>model.reconstructions,labels<span class="op">=</span>tmp,
+                       pos_weight<span class="op">=</span>pos_weight,norm<span class="op">=</span>norm)
+
+sess <span class="op">=</span> tf.Session()
+sess.run(tf.global_variables_initializer())
+
+cost_val <span class="op">=</span> []
+acc_val <span class="op">=</span> []
+
+<span class="kw">def</span> get_roc_score(edges_pos, edges_neg, emb<span class="op">=</span><span class="va">None</span>):
+    <span class="cf">if</span> emb <span class="kw">is</span> <span class="va">None</span>:
+        feed_dict.update({placeholders[<span class="st">&#39;dropout&#39;</span>]: <span class="dv">0</span>})
+        emb <span class="op">=</span> sess.run(model.z_mean, feed_dict<span class="op">=</span>feed_dict)
+
+    <span class="kw">def</span> sigmoid(x):
+        <span class="cf">return</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>x))
+
+    <span class="co"># Predict on test set of edges</span>
+    adj_rec <span class="op">=</span> np.dot(emb, emb.T)
+    preds <span class="op">=</span> []
+    pos <span class="op">=</span> []
+    <span class="cf">for</span> e <span class="kw">in</span> edges_pos:
+        preds.append(sigmoid(adj_rec[e[<span class="dv">0</span>], e[<span class="dv">1</span>]]))
+        pos.append(adj_orig[e[<span class="dv">0</span>], e[<span class="dv">1</span>]])
+
+    preds_neg <span class="op">=</span> []
+    neg <span class="op">=</span> []
+    <span class="cf">for</span> e <span class="kw">in</span> edges_neg:
+        preds_neg.append(sigmoid(adj_rec[e[<span class="dv">0</span>], e[<span class="dv">1</span>]]))
+        neg.append(adj_orig[e[<span class="dv">0</span>], e[<span class="dv">1</span>]])
+
+    preds_all <span class="op">=</span> np.hstack([preds, preds_neg])
+    labels_all <span class="op">=</span> np.hstack([np.ones(<span class="bu">len</span>(preds)), np.zeros(<span class="bu">len</span>(preds))])
+    roc_score <span class="op">=</span> roc_auc_score(labels_all, preds_all)
+    ap_score <span class="op">=</span> average_precision_score(labels_all, preds_all)
+
+    <span class="cf">return</span> roc_score, ap_score
+
+
+cost_val <span class="op">=</span> []
+acc_val <span class="op">=</span> []
+val_roc_score <span class="op">=</span> []
+
+adj_label <span class="op">=</span> adj_train <span class="op">+</span> sp.eye(adj_train.shape[<span class="dv">0</span>])
+adj_label <span class="op">=</span> util.sparse_to_tuple(adj_label)
+
+<span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(FLAGS.epochs):
+
+    t <span class="op">=</span> time.time()
+
+    feed_dict <span class="op">=</span> util.construct_feed_dict(adj_norm, adj_label, features, placeholders)
+    feed_dict.update({placeholders[<span class="st">&#39;dropout&#39;</span>]: FLAGS.dropout})
+
+    outs <span class="op">=</span> sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict<span class="op">=</span>feed_dict)
+
+    avg_cost <span class="op">=</span> outs[<span class="dv">1</span>]
+    avg_accuracy <span class="op">=</span> outs[<span class="dv">2</span>]
+
+    roc_curr, ap_curr <span class="op">=</span> get_roc_score(val_edges, val_edges_false)
+    val_roc_score.append(roc_curr)
+
+    <span class="bu">print</span>(<span class="st">&quot;Epoch:&quot;</span>, <span class="st">&#39;</span><span class="sc">%04d</span><span class="st">&#39;</span> <span class="op">%</span> (epoch <span class="op">+</span> <span class="dv">1</span>), <span class="st">&quot;train_loss=&quot;</span>, <span class="st">&quot;</span><span class="sc">{:.5f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(avg_cost),
+          <span class="st">&quot;train_acc=&quot;</span>, <span class="st">&quot;</span><span class="sc">{:.5f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(avg_accuracy), <span class="st">&quot;val_roc=&quot;</span>, <span class="st">&quot;</span><span class="sc">{:.5f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(val_roc_score[<span class="op">-</span><span class="dv">1</span>]),
+          <span class="st">&quot;val_ap=&quot;</span>, <span class="st">&quot;</span><span class="sc">{:.5f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(ap_curr),
+          <span class="st">&quot;time=&quot;</span>, <span class="st">&quot;</span><span class="sc">{:.5f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(time.time() <span class="op">-</span> t))
+
+<span class="bu">print</span>(<span class="st">&quot;Optimization Finished!&quot;</span>)
+
+roc_score, ap_score <span class="op">=</span> get_roc_score(test_edges, test_edges_false)
+<span class="bu">print</span>(<span class="st">&#39;Test ROC score: &#39;</span> <span class="op">+</span> <span class="bu">str</span>(roc_score))
+<span class="bu">print</span>(<span class="st">&#39;Test AP score: &#39;</span> <span class="op">+</span> <span class="bu">str</span>(ap_score))</code></pre></div>
+<p>Peki bu metotu keşfedenler çizitleri evrişimsel kavramlarla bağlantılamak istemişler? Bunun sebebi büyük bir ihtimalle mevcut DYSA hesaplayan kodlama altyapısından faydalanmak istemeleri. DYSA hesaplamak için Tensorflow gibi kütüphanelerden oluşan kuvvetli bir kod altyapısı var artık, eğer problemimizi bu kütüphanelerin çözebileceği formlara sokabilirsek pek çok yan faydayı bedava elde edebilmiş oluruz.</p>
+<p>Üstteki kodu <code>train.py</code>'dan işletince sonucu göreceğiz, AUC yüzde 90 civarında olmalı.</p>
+<p>Kaynaklar</p>
+<p>[1] Titov, <em>Extracting and Modeling Relations with Graph Convolutional Networks</em>, <a href="http://www.akbc.ws/2017/slides/ivan-titov-slides.pdf" class="uri">http://www.akbc.ws/2017/slides/ivan-titov-slides.pdf</a></p>
+<p>[2] Kipf, <em>Variational Graph Auto-Encoders</em>, <a href="https://arxiv.org/abs/1611.07308" class="uri">https://arxiv.org/abs/1611.07308</a></p>
+<p>[3] Kipf, <em>Implementation of Graph Auto-Encoders in TensorFlow</em>, <a href="https://github.com/tkipf/gae" class="uri">https://github.com/tkipf/gae</a></p>
+</body>
+</html>

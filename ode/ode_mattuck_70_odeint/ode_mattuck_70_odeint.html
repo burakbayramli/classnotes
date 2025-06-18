@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="bir-ode-sistemi-sayısal-olarak-nasıl-çözülür">Bir ODE Sistemi Sayısal Olarak Nasıl Çözülür</h1>
+<p>Yazıda <code>scipy</code> paketinin içindeki <code>odeint</code> çözücüyü işleyeceğiz. Sayısal çözümler önemli çünkü çoğu ODE sisteminin analitik çözümü yoktur. Onları sayısal paketler kullanarak çözmek gerekir.</p>
+<p>Bir sarkaç denklemi düşünelim, bu denklem ikinci dereceden <span class="math inline">\(\theta\)</span>'yi baz alan bir denklemdir,</p>
+<p><span class="math display">\[
+\ddot{\theta}(t) + \frac{b}{m} \dot{\theta}(t) +  \frac{g}{L} \sin(\theta(t)) = 0
+\]</span></p>
+<p>Ya da <span class="math inline">\(m = 1\)</span> dersek ve <span class="math inline">\(\frac{g}{L} = c\)</span> ile</p>
+<p><span class="math display">\[
+\ddot{\theta}(t) + b \dot{\theta}(t) +  c \sin(\theta(t)) = 0
+\]</span></p>
+<p>ki <span class="math inline">\(b,c\)</span> dışarıdan tanımlanan sabitler, ve üst nokta zamansal türevi temsil ediyor.</p>
+<p>Bu denklemi <code>odeint</code> ile çözmek için onu ilk önce bir birinci derece denklemler sistemine çevirmemiz gerekiyor.</p>
+<p><span class="math display">\[
+\omega(t) = \dot{\theta}(t)
+\]</span></p>
+<p>dersek (okunuş olarak <span class="math inline">\(\omega\)</span> omega, <span class="math inline">\(\theta\)</span> theta),</p>
+<p><span class="math display">\[
+\dot{\theta} = \omega(t)
+\]</span></p>
+<p><span class="math display">\[
+\dot{\omega}(t) = -b \omega(t) - c\sin(\theta(t))
+\]</span></p>
+<p>elde ederiz. Şimdi <code>pend</code> adlı bir fonksiyon tanımlayalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">b <span class="op">=</span> <span class="fl">0.25</span>
+c <span class="op">=</span> <span class="fl">5.0</span>
+
+<span class="kw">def</span> pend(y, t):
+    theta, omega <span class="op">=</span> y
+    <span class="cf">return</span> [omega, <span class="op">-</span>b<span class="op">*</span>omega <span class="op">-</span> c<span class="op">*</span>np.sin(theta)]</code></pre></div>
+<p>Bu fonksiyon ana ODE çözücünün denklemimiz hakkında bilgi aldığı nokta, <code>y</code> dizini içinde <span class="math inline">\(\dot{\theta}\)</span> ve <span class="math inline">\(\dot{\omega}\)</span> var, onları <span class="math inline">\(y\)</span> içinde aynen bu sırada almayı bekliyoruz ve yenilerini hesapladıktan sonra geri döndürürken de aynen bu sırada döndürüyoruz. Mesela döndürülen dizinde ilk öğe <code>omega</code> var, bu doğru, çünkü biraz önce <span class="math inline">\(\dot{\theta} = \omega(t)\)</span> tanımını yapmıştık, yani ilk öğede <code>theta</code> turevi geri vermiş olduk, alırken <code>theta,omega=y</code> ile <code>theta</code> aldığımız gibi.</p>
+<p><code>t</code> değişkeninde çoğunlukla zaman tanımlanır, ve bu zaman ilgilendiğimiz zaman aralığı belli (çoğunlukla eşit aralıklı) noktalar üzerinden dizin olarak <code>odeint</code>'e verilir, bunu <code>linspace</code> ile yapabiliriz. <span class="math inline">\(y\)</span> için başlangıç şartlarını ayrı bir değişken içinde, mesela <code>y0</code>, tanımlarız, bu aynen <code>y</code> büyüklüğünde bir dizin olacaktır ve <code>y</code> için olduğu gibi ilk öğe <code>theta</code> ikinci öğe <code>omega</code> için başlangıç değerini tanımlayacak.</p>
+<p>Hepsi bir arada</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.integrate <span class="im">import</span> odeint
+
+b <span class="op">=</span> <span class="fl">0.25</span>
+c <span class="op">=</span> <span class="fl">5.0</span>
+
+<span class="kw">def</span> pend(y, t):
+    theta, omega <span class="op">=</span> y
+    <span class="cf">return</span> [omega, <span class="op">-</span>b<span class="op">*</span>omega <span class="op">-</span> c<span class="op">*</span>np.sin(theta)]
+
+t <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">101</span>)
+
+y0 <span class="op">=</span> [np.pi <span class="op">-</span> <span class="fl">0.1</span>, <span class="fl">0.0</span>]
+
+sol <span class="op">=</span> odeint(pend, y0, t)
+
+<span class="bu">print</span> (sol.shape)</code></pre></div>
+<pre><code>(101, 2)</code></pre>
+<p>Başlangıç noktası <span class="math inline">\(\theta\)</span> için <span class="math inline">\(\pi - 0.1\)</span>, yani şarkacın en üst noktasından biraz yanda. Açı olarak <span class="math inline">\(\theta=0\)</span> sarkacın nötr durduğu nokta, <span class="math inline">\(\pi\)</span> en üst noktası.</p>
+<p>Sayısal çözüm sırasında bir dizi <span class="math inline">\(\theta,\omega\)</span> elde edildi. Bu değerler hesaplandıkları gibi zamansal sırada, bir dizin içindeler ve üstte gördüğümüz gibi <code>101,2</code> boyutlu bir dizin bu. En son varılan değer</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (sol[<span class="op">-</span><span class="dv">1</span>])</code></pre></div>
+<pre><code>[0.02001168 1.56781812]</code></pre>
+<p>Degiskenleri grafiklersek</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+plt.plot(t, sol[:, <span class="dv">0</span>], <span class="st">&#39;b&#39;</span>, label<span class="op">=</span><span class="st">&#39;theta(t)&#39;</span>)
+plt.plot(t, sol[:, <span class="dv">1</span>], <span class="st">&#39;g&#39;</span>, label<span class="op">=</span><span class="st">&#39;omega(t)&#39;</span>)
+plt.legend(loc<span class="op">=</span><span class="st">&#39;best&#39;</span>)
+plt.xlabel(<span class="st">&#39;t&#39;</span>)
+plt.grid()
+plt.savefig(<span class="st">&#39;ode_mattuck_70_odeint_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="ode_mattuck_70_odeint_01.png" />
+
+</div>
+<p>Şarkaçın hareketini görmek istiyorsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">L <span class="op">=</span> <span class="fl">9.8</span> <span class="op">/</span> c
+x1 <span class="op">=</span> L<span class="op">*</span>np.sin(sol[:,<span class="dv">0</span>])
+y1 <span class="op">=</span> <span class="op">-</span>L<span class="op">*</span>np.cos(sol[:,<span class="dv">0</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> matplotlib.patches <span class="im">import</span> Circle
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">from</span> numpy <span class="im">import</span> cos, sin
+
+<span class="kw">def</span> make_plot(fout,x1,y1):
+    r <span class="op">=</span> <span class="fl">0.05</span>
+    fig <span class="op">=</span> plt.figure()
+    ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>)
+    ax.set_xlim(<span class="op">-</span><span class="dv">3</span>,<span class="dv">3</span>)
+    ax.set_ylim(<span class="op">-</span><span class="dv">3</span>,<span class="dv">3</span>)
+    plt.plot([<span class="dv">0</span>, x1], [<span class="dv">0</span>, y1], lw<span class="op">=</span><span class="dv">2</span>, c<span class="op">=</span><span class="st">&#39;k&#39;</span>)
+    c0 <span class="op">=</span> Circle((<span class="dv">0</span>, <span class="dv">0</span>), r<span class="op">/</span><span class="dv">2</span>, fc<span class="op">=</span><span class="st">&#39;k&#39;</span>, zorder<span class="op">=</span><span class="dv">10</span>)
+    c1 <span class="op">=</span> Circle((x1, y1), r, fc<span class="op">=</span><span class="st">&#39;b&#39;</span>, ec<span class="op">=</span><span class="st">&#39;b&#39;</span>, zorder<span class="op">=</span><span class="dv">10</span>)
+    ax.add_patch(c0)
+    ax.add_patch(c1)
+    plt.savefig(fout)
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(x1)):
+    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">5</span> <span class="op">==</span> <span class="dv">0</span>: 
+        make_plot(<span class="st">&#39;frames/img</span><span class="sc">{:04d}</span><span class="st">.png&#39;</span>.<span class="bu">format</span>(i),x1[i],y1[i])</code></pre></div>
+<p><img src="frames/img0000.png" /> <img src="frames/img0020.png" /> <img src="frames/img0030.png" /> <img src="frames/img0040.png" /> <img src="frames/img0050.png" /> <img src="frames/img0060.png" /></p>
+<p>Animasyon yaratabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">!</span> convert <span class="op">-</span>loop <span class="dv">0</span> <span class="op">-</span>delay <span class="dv">100</span> frames<span class="op">/*</span>.png frames<span class="op">/</span>pend.gif</code></pre></div>
+<p>Sonuç [2]'de görülebilir.</p>
+<p>Not: Bir ODE sistemini çözmek hakkında konuşurken bazen onu &quot;entegre ettiğimiz'' de söylenir. Bu aslında yanlış bir tarif değil, çünkü eşitliklerin sol tarafında <span class="math inline">\(\dot{x}_1\)</span>, <span class="math inline">\(\dot{x}_2\)</span> gibi değişkenler var, bizim ilgilendiğimiz, çözerek elde etmek istediğimiz sonuç <span class="math inline">\(x_1\)</span>, <span class="math inline">\(x_2\)</span> değerleri. Aslında yapılanın bir bakıma sistemi &quot;ileri doğru işletmek'' olduğu da söylenebilir, değişim denklemlerini kullanarak sistemın simülasyonunu yapıyoruz bir bakıma.</p>
+<p>Kaynaklar</p>
+<p>[1] SciPy.org, <em>scipy.integrate.odeint</em>, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html" class="uri">https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html</a></p>
+<p>[2] Bayramlı, <em>Sarkac Animasyonu</em>, <a href="https://github.com/burakbayramli/classnotes/blob/master/ode/ode_mattuck_70_odeint/frames/pend.gif" class="uri">https://github.com/burakbayramli/classnotes/blob/master/ode/ode_mattuck_70_odeint/frames/pend.gif</a></p>
+</body>
+</html>

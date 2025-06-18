@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="optik-karakter-tanıma-yazı-tanıma-optical-character-recognition--ocr-">Optik Karakter Tanıma, Yazı Tanıma (Optical Character Recognition -OCR-)</h1>
+<p>OCR, iki dizini birbiriyle uyuşturma problemi olarak görülebilir. Dizi derken neden bahsetmek istediğimi anlatmaya uğrasayım. Çoğunlukla tanımak istediğimiz görüntü bir kelime, bir sayı dizisidir, ve bu dizi ufak ya da büyük bir kelime olabilir. Girdi ise boyutları önceden tanımlanan görüntüyü temsil eden veri parçaları olacaktır, bu görüntü bir kelimeye odaklanabilir, görüntü aktarılmadan önce o kelime bir kare içine alınmaya çalışır.</p>
+<p>Kelime görüntüsünü bir evrişim tabakası üzerinden mesela işlenmiş veriler olarak parça parça, kesitler olarak alabiliriz. Ardından veri parçalarının zamansal ilintilerini yakalayabilmek için onları bir LSTM katmanına verebiliriz, ve her zaman adımındaki alfabe boyutundaki çıktılar, bir vektör olarak, her hücrede belli bir harfin olma olasılığı olarak ayarlanabilir. Eğer en son katmandan sonra uygun bir hata fonksiyonu tanımlayabilirsek bilinen etiketli kelimeler, onların görüntüsünü içeren eğitim verisi üzerinden tüm bu yapıyı eğitebiliriz.</p>
+<div class="figure">
+<img src="ocr_01.png" />
+
+</div>
+<p>Üstteki figürde İngilizce apple (elma) kelimesini görüyoruz. Girdi görüntü (input image) genişliği 128, yüksekliği 64 ve üç kanal var, bu kanallar her renk için R,G,B olabilir. İlk önce evrişimsel sinir ağı özellik çıkartma (CNN feature extraction) katmanı ile özellik bulmaya uğraşılıyor, buradan (4,8,4) boyutunda bir tensor elde ediliyor. Bu tensor (16,8) boyutuna getiriliyor, bu yeni tensor'daki her kolon (biri yeşille işaretli) önceki tensorda bir parçaya tekabül eder, yani kelime görüntüsünün bir parçasına.</p>
+<p>Ardından şekillendirme (reshape) sonrası alınan yeni tensoru parça parça LSTM tabakasına veriyoruz, ilk LSTM hücresi mesela alttaki gibi,</p>
+<div class="figure">
+<img src="ocr_02.png" />
+
+</div>
+<p>LSTM sonrası tamamen bağlanmış (fully-connected) tabaka ve softmax ile alfabe tahmini üretiliyor. Bu örnekte alfabede 6 karakter var, bu sebeple vektör (6,1) boyutlu, karakterler 'a','e','l','p','z','-'. En son '-' karakteri &quot;boş karakter'' demek, boş karakterin niye lazım olduğunu göreceğiz. Vektördeki ilk hücre <span class="math inline">\(y_a^1\)</span> yani 'a', o noktada 'a' karakterinin olma olasılığı. Diğerleri o birinci hücre için aşağı doğru <span class="math inline">\(y_e^1\)</span>, <span class="math inline">\(y_l^1\)</span>, vs. diye devam edecek. Şimdi tüm LSTM hücrelerini iceren resme bakalım,</p>
+<div class="figure">
+<img src="ocr_03.png" />
+
+</div>
+<p>Şimdi elimizde 8 tane 6 boyutlu softmax vektörü var.</p>
+<p>Bu noktada iki sorumuz var: ilki YSA eğitimi bağlamında nasıl bir kayıp fonksiyonu bulalım ki uyan kelimeler için az, kötü uyanlar için yüksek rakam üretsin, ikincisi farklı boyutlardaki iki vektörün birbirine uyması ne demektir? Tüm bunlar tabii ki üstteki softmax vektörlerini nasıl dekode edip bir kelime üretiriz sorusu ile yakın alakalı.</p>
+<p>Uyum konusu önemli çünkü el yazısı, ya da font seçimi dolasıyla bazı karakterler diğerlerinden daha fazla yer tutuyor olabilir. Aynı şey ses tanıma için de geçerli, &quot;merhaba'' derken kimisi &quot;meeeerhaba'' demiş olabilir, burada 'e' harfinden daha fazla ses verisi alınacaktır, ama o noktada üzerinde olunan harf değişmemiştir.</p>
+<p>Dekode için akla gelebilecek ilk yaklaşım her vektör için en yüksek olasılıktaki hücreye tekabül eden karakteri seçmek (find the most probable symbol), sonra bir ek işlem tabakasına giderek bazı elemeler, düzeltmeler yaparak bir kelimeye erişmeye uğraşmak. Mesela en olasılı karakter seçimi sonrası arka arka gelen tekrar eden harfleri çıkartırız, sonra boş karakteri çıkartırız,</p>
+<div class="figure">
+<img src="ocr_04.png" />
+
+</div>
+<p>Tüm bunlar oldukca basit görünüyor. Fakat tüm bu işlemleri bir kayıp fonksiyonu olarak kullanmak istersek işler karışıyor. Çünkü kelime bulmaya uğraşırken softmax'lerde başlangıçtan sona pek çok farklı gidiş yolu var, tüm kombinasyonları işlemek zor.</p>
+<div class="figure">
+<img src="ocr_05.png" />
+
+</div>
+<p>Ayrıca üstteki kısaltma algoritması en iyi sonucu da her zaman vermeyebilir. Kombinasyon derken üstteki örnek için bile <span class="math inline">\(6^8 = 1,679,616\)</span> tane seçenekten bahsediyoruz. Daha büyük bir sözlük, ve daha fazla LSTM adımı için bu sayı astronomik boyutlara varabilir.</p>
+<p>Çözüm nedir? Seçenekler arasından uygun yolu bulup hesaplayan, ya da verili bir etiket için olurluk (likelihood) hesabı yapan bir yaklaşım var, buna bağlantısal zamansal bedel (connectionist temporal cost) adı veriliyor, detaylar için [1,2,3]. CTC dinamik programlama kullanır, ayrıca yolu hesaplarken Gizli Markov Modellerine benzer <span class="math inline">\(\alpha,\beta\)</span> fonksiyonları yaratır, ve YSA öğrenimi bağlamında bu fonksiyonlar üzerinden gradyan hesabı mümkün oluyor, ve farklı boyuttaki girdi / çıktı arasındaki uyuşma, eğitim işte bu şekilde yapılıyor.</p>
+<p>TensorFlow ile CTC</p>
+<p>TF ile CTC hesabını görelim. Alttaki çıktının daha önce şemasını verdiğimiz YSA'ya benzer bir yapının son adımından çıkan softmax olasılıkları olduğunu düşünelim. Verinin satırları her LSTM adımı, her kolon alfabedeki farklı bir karakter.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">train_inputs_0 <span class="op">=</span> np.asarray(
+    [[<span class="fl">0.633766</span>, <span class="fl">0.221185</span>, <span class="fl">0.0917319</span>, <span class="fl">0.0129757</span>, <span class="fl">0.0142857</span>, <span class="fl">0.0260553</span>],
+     [<span class="fl">0.111121</span>, <span class="fl">0.588392</span>, <span class="fl">0.278779</span>, <span class="fl">0.0055756</span>, <span class="fl">0.00569609</span>, <span class="fl">0.010436</span>],
+     [<span class="fl">0.0357786</span>, <span class="fl">0.633813</span>, <span class="fl">0.321418</span>, <span class="fl">0.00249248</span>, <span class="fl">0.00272882</span>, <span class="fl">0.0037688</span>],
+     [<span class="fl">0.0663296</span>, <span class="fl">0.643849</span>, <span class="fl">0.280111</span>, <span class="fl">0.00283995</span>, <span class="fl">0.0035545</span>, <span class="fl">0.00331533</span>],
+     [<span class="fl">0.458235</span>, <span class="fl">0.396634</span>, <span class="fl">0.123377</span>, <span class="fl">0.00648837</span>, <span class="fl">0.00903441</span>, <span class="fl">0.00623107</span>]],
+    dtype<span class="op">=</span>np.float32)</code></pre></div>
+<p>Bu yapı üzerinde için mesela <code>[0, 1, 2, 1, 0]</code> dizisini kontrol etmemiz istense dizinin kaybı / hatası nedir?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+<span class="kw">def</span> sparse_tuple_from(sequences, dtype<span class="op">=</span>np.int32):
+    indices <span class="op">=</span> []
+    values <span class="op">=</span> []
+    <span class="cf">for</span> n, seq <span class="kw">in</span> <span class="bu">enumerate</span>(sequences):
+        indices.extend(<span class="bu">zip</span>([n] <span class="op">*</span> <span class="bu">len</span>(seq), <span class="bu">range</span>(<span class="bu">len</span>(seq))))
+        values.extend(seq)
+    indices <span class="op">=</span> np.asarray(indices, dtype<span class="op">=</span>np.int64)
+    values <span class="op">=</span> np.asarray(values, dtype<span class="op">=</span>dtype)
+    shape <span class="op">=</span> np.asarray([<span class="bu">len</span>(sequences), np.asarray(indices).<span class="bu">max</span>(<span class="dv">0</span>)[<span class="dv">1</span>] <span class="op">+</span> <span class="dv">1</span>], dtype<span class="op">=</span>np.int64)
+    <span class="cf">return</span> indices, values, shape
+
+train_seq_len <span class="op">=</span> [<span class="dv">5</span>]
+num_features <span class="op">=</span> <span class="dv">6</span>
+
+tf.reset_default_graph()
+
+targets <span class="op">=</span> tf.sparse_placeholder(tf.int32)
+logits1 <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, num_features] )
+logits2 <span class="op">=</span> tf.reshape(logits1, [<span class="dv">1</span>, <span class="dv">-1</span>, num_features])
+logits3 <span class="op">=</span> tf.transpose(logits2, (<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">2</span>))
+seq_len <span class="op">=</span> tf.placeholder(tf.int32, [<span class="va">None</span>])
+loss <span class="op">=</span> tf.nn.ctc_loss(targets, logits3, seq_len)
+decoded, log_prob <span class="op">=</span> tf.nn.ctc_greedy_decoder(logits3, seq_len)
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     train_targets <span class="op">=</span> sparse_tuple_from([[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>]])     
+     feed_t <span class="op">=</span> { logits1: train_inputs_0, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res <span class="op">=</span> sess.run(loss, feed_t)     
+     <span class="bu">print</span> <span class="st">u&#39;kayıp&#39;</span>, res</code></pre></div>
+<pre><code>kayıp [ 7.27719784]</code></pre>
+<p>Farklı veri, farklı çıktı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">train_inputs_1 <span class="op">=</span> np.asarray(
+    [[<span class="fl">0.30176</span>, <span class="fl">0.28562</span>, <span class="fl">0.0831517</span>, <span class="fl">0.0862751</span>, <span class="fl">0.0816851</span>, <span class="fl">0.161508</span>],
+     [<span class="fl">0.24082</span>, <span class="fl">0.397533</span>, <span class="fl">0.0557226</span>, <span class="fl">0.0546814</span>, <span class="fl">0.0557528</span>, <span class="fl">0.19549</span>],
+     [<span class="fl">0.230246</span>, <span class="fl">0.450868</span>, <span class="fl">0.0389607</span>, <span class="fl">0.038309</span>, <span class="fl">0.0391602</span>, <span class="fl">0.202456</span>],
+     [<span class="fl">0.280884</span>, <span class="fl">0.429522</span>, <span class="fl">0.0326593</span>, <span class="fl">0.0339046</span>, <span class="fl">0.0326856</span>, <span class="fl">0.190345</span>],
+     [<span class="fl">0.423286</span>, <span class="fl">0.315517</span>, <span class="fl">0.0338439</span>, <span class="fl">0.0393744</span>, <span class="fl">0.0339315</span>, <span class="fl">0.154046</span>]],
+    dtype<span class="op">=</span>np.float32)
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     train_targets <span class="op">=</span> sparse_tuple_from([[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>]])     
+     feed_t <span class="op">=</span> { logits1: train_inputs_1, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res <span class="op">=</span> sess.run(loss, feed_t)     
+     <span class="bu">print</span> <span class="st">u&#39;kayıp&#39;</span>, res</code></pre></div>
+<pre><code>kayıp [ 8.08572388]</code></pre>
+<p>Şimdi ilginç bir veri, burada veri direk 2. karakter olsun diyor. O zaman buna uyan çıktılar alçak (kayıp az), uymayanlar yüksek sonuç vermeli,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">train_inputs_2 <span class="op">=</span> np.asarray(
+    [[<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>],
+     [<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>],
+     [<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>],
+     [<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>],
+     [<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>]],
+    dtype<span class="op">=</span>np.float32)
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     train_targets <span class="op">=</span> sparse_tuple_from([[<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>]]) 
+     feed_t <span class="op">=</span> { logits1: train_inputs_2, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res <span class="op">=</span> sess.run(loss, feed_t)     
+     <span class="bu">print</span> <span class="st">u&#39;kayıp&#39;</span>, res
+
+     train_targets <span class="op">=</span> sparse_tuple_from([[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>]]) 
+     feed_t <span class="op">=</span> { logits1: train_inputs_2, 
+                targets: train_targets, 
+                seq_len: train_seq_len }
+     res <span class="op">=</span> sess.run(loss, feed_t)     
+     <span class="bu">print</span> <span class="st">u&#39;kayıp&#39;</span>, res</code></pre></div>
+<pre><code>kayıp [ 7.21795845]
+kayıp [ 10.21795845]</code></pre>
+<p>Dekode</p>
+<p>TF CTC ile dekode işlemi de yapılabilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+
+     sess.run(tf.global_variables_initializer())
+
+     feed_dec <span class="op">=</span> { logits1: train_inputs_0, seq_len: train_seq_len }
+     decoded_res <span class="op">=</span> sess.run(decoded, feed_dec)     
+     <span class="bu">print</span> <span class="st">&#39;dekode&#39;</span>, decoded_res
+     
+     feed_dec <span class="op">=</span> { logits1: train_inputs_1, seq_len: train_seq_len }
+     decoded_res <span class="op">=</span> sess.run(decoded, feed_dec)     
+     <span class="bu">print</span> <span class="st">&#39;dekode&#39;</span>, decoded_res
+     
+     feed_dec <span class="op">=</span> { logits1: train_inputs_2, seq_len: train_seq_len }
+     decoded_res <span class="op">=</span> sess.run(decoded, feed_dec)     
+     <span class="bu">print</span> <span class="st">&#39;dekode&#39;</span>, decoded_res</code></pre></div>
+<pre><code>dekode [SparseTensorValue(indices=array([[0, 0],
+       [0, 1],
+       [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
+dekode [SparseTensorValue(indices=array([[0, 0],
+       [0, 1],
+       [0, 2]]), values=array([0, 1, 0]), dense_shape=array([1, 3]))]
+dekode [SparseTensorValue(indices=array([[0, 0]]), values=array([2]), dense_shape=array([1, 1]))]</code></pre>
+<p>En son örnekte <code>values=array([2])</code> sonucu geldi, yani dekode işlemi doğru bir şekilde tüm adımlar için tek bir seçim olan 2 seçimini yaptı. Bu seçim arka arkaya tekrarlanmış olacaktı tabii ki bu sebeple bir kez gösteriliyor, appleeee yerine apple demek gibi.</p>
+<p>Ağ Yapısı ve Kod</p>
+<p>Şimdi örnek veriyi, alfabeyi genişletelim ve ağ yapısını daha derinleştirelim. Altta gösterilen ağ yapısı [4] tezi ve onun esinlendiği [5] kütüphanesini baz alıyor. Nihai kodda teze göre bazı boyut değişiklikleri var, okur bunu akılda tutarak diyagramları, işlemleri takip edebilir. Mimaride ilk evrişim tabakasında arka arkaya iki evrişim ve max pool operasyonları var, sonra bir boyut değiştirme sonrası tamamen bağlanmış (fully connected) bir tabakaya sonuç geçiliyor, oradan çıkan sonuç iki yönlü (bi-directional) GRU tabakasına veriliyor. Bu zamansal YSA ilk başta görülen tek LSTM seviyesinden daha çetrefil yani. GRU hücreleri, LSTM hücre yapısının biraz daha basitleştirilmiş halidir. Devam edelim, buradan çıkan sonuçlar bir başka yoğun tabakaya oradan da softmax aktivasyonuna veriliyor, kayıp fonksiyonu CTC.</p>
+<div class="figure">
+<img src="ocr_07.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># -*- coding: utf-8 -*-</span>
+<span class="im">import</span> os, util
+<span class="im">import</span> datetime
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> keras <span class="im">import</span> backend <span class="im">as</span> K
+<span class="im">from</span> keras.layers.convolutional <span class="im">import</span> Conv2D, MaxPooling2D
+<span class="im">from</span> keras.layers <span class="im">import</span> Input, Dense, Activation
+<span class="im">from</span> keras.layers <span class="im">import</span> Reshape, Lambda
+<span class="im">from</span> keras.layers.merge <span class="im">import</span> add, concatenate
+<span class="im">from</span> keras.models <span class="im">import</span> Model
+<span class="im">from</span> keras.layers.recurrent <span class="im">import</span> GRU
+<span class="im">from</span> keras.optimizers <span class="im">import</span> SGD
+<span class="im">from</span> keras.utils.data_utils <span class="im">import</span> get_file
+<span class="im">from</span> keras.preprocessing <span class="im">import</span> image
+<span class="im">import</span> keras.callbacks
+
+<span class="kw">def</span> ctc_lambda_func(args):
+    y_pred, labels, input_length, label_length <span class="op">=</span> args
+    <span class="co"># the 2 is critical here since the first couple outputs of the RNN</span>
+    <span class="co"># tend to be garbage:</span>
+    y_pred <span class="op">=</span> y_pred[:, <span class="dv">2</span>:, :]
+    <span class="cf">return</span> K.ctc_batch_cost(labels, y_pred, input_length, label_length)
+
+<span class="kw">def</span> get_model(img_w,img_h,minibatch_size,pool_size):
+    conv_filters <span class="op">=</span> <span class="dv">20</span>
+    kernel_size <span class="op">=</span> (<span class="dv">2</span>, <span class="dv">2</span>)
+    time_dense_size <span class="op">=</span> <span class="dv">32</span>
+    rnn_size <span class="op">=</span> <span class="dv">256</span>
+
+    input_shape <span class="op">=</span> (img_w, img_h, <span class="dv">1</span>)
+    
+    img_gen <span class="op">=</span> util.TextImageGenerator(minibatch_size<span class="op">=</span>minibatch_size,
+                                      img_w<span class="op">=</span>img_w,
+                                      img_h<span class="op">=</span>img_h,
+                                      downsample_factor<span class="op">=</span>(pool_size <span class="op">**</span> <span class="dv">2</span>),
+                                      absolute_max_string_len<span class="op">=</span><span class="dv">12</span>
+    )
+        
+    act <span class="op">=</span> <span class="st">&#39;relu&#39;</span>
+    
+    input_data <span class="op">=</span> Input(name<span class="op">=</span><span class="st">&#39;the_input&#39;</span>, shape<span class="op">=</span>input_shape, dtype<span class="op">=</span><span class="st">&#39;float32&#39;</span>)
+    
+    inner <span class="op">=</span> Conv2D(conv_filters, kernel_size, padding<span class="op">=</span><span class="st">&#39;same&#39;</span>,
+                   activation<span class="op">=</span>act, kernel_initializer<span class="op">=</span><span class="st">&#39;he_normal&#39;</span>,
+                   name<span class="op">=</span><span class="st">&#39;conv1&#39;</span>)(input_data)
+    
+    inner <span class="op">=</span> MaxPooling2D(pool_size<span class="op">=</span>(pool_size, pool_size), name<span class="op">=</span><span class="st">&#39;max1&#39;</span>)(inner)
+    
+    inner <span class="op">=</span> Conv2D(conv_filters, kernel_size, padding<span class="op">=</span><span class="st">&#39;same&#39;</span>,
+                   activation<span class="op">=</span>act, kernel_initializer<span class="op">=</span><span class="st">&#39;he_normal&#39;</span>,
+                   name<span class="op">=</span><span class="st">&#39;conv2&#39;</span>)(inner)
+    
+    inner <span class="op">=</span> MaxPooling2D(pool_size<span class="op">=</span>(pool_size, pool_size), name<span class="op">=</span><span class="st">&#39;max2&#39;</span>)(inner)
+    
+    conv_to_rnn_dims <span class="op">=</span> (img_w <span class="op">//</span> (pool_size <span class="op">**</span> <span class="dv">2</span>), (img_h <span class="op">//</span> (pool_size <span class="op">**</span> <span class="dv">2</span>))
+                        <span class="op">*</span> conv_filters)
+
+    inner <span class="op">=</span> Reshape(target_shape<span class="op">=</span>conv_to_rnn_dims, name<span class="op">=</span><span class="st">&#39;reshape&#39;</span>)(inner)
+    inner <span class="op">=</span> Dense(time_dense_size, activation<span class="op">=</span>act, name<span class="op">=</span><span class="st">&#39;dense1&#39;</span>)(inner)
+    
+    gru_1 <span class="op">=</span> GRU(rnn_size, return_sequences<span class="op">=</span><span class="va">True</span>,
+                kernel_initializer<span class="op">=</span><span class="st">&#39;he_normal&#39;</span>, name<span class="op">=</span><span class="st">&#39;gru1&#39;</span>)(inner)
+    
+    gru_1b <span class="op">=</span> GRU(rnn_size, return_sequences<span class="op">=</span><span class="va">True</span>,
+                 go_backwards<span class="op">=</span><span class="va">True</span>, kernel_initializer<span class="op">=</span><span class="st">&#39;he_normal&#39;</span>,
+                 name<span class="op">=</span><span class="st">&#39;gru1_b&#39;</span>)(inner)
+
+    gru1_merged <span class="op">=</span> add([gru_1, gru_1b])
+
+    gru_2 <span class="op">=</span> GRU(rnn_size, return_sequences<span class="op">=</span><span class="va">True</span>,
+                kernel_initializer<span class="op">=</span><span class="st">&#39;he_normal&#39;</span>, name<span class="op">=</span><span class="st">&#39;gru2&#39;</span>)(gru1_merged)
+    
+    gru_2b <span class="op">=</span> GRU(rnn_size, return_sequences<span class="op">=</span><span class="va">True</span>,
+                 go_backwards<span class="op">=</span><span class="va">True</span>, kernel_initializer<span class="op">=</span><span class="st">&#39;he_normal&#39;</span>,
+                 name<span class="op">=</span><span class="st">&#39;gru2_b&#39;</span>)(gru1_merged)
+
+    inner <span class="op">=</span> Dense(img_gen.get_output_size(),
+                  kernel_initializer<span class="op">=</span><span class="st">&#39;he_normal&#39;</span>,
+                  name<span class="op">=</span><span class="st">&#39;dense2&#39;</span>)(concatenate([gru_2, gru_2b]))
+    
+    y_pred <span class="op">=</span> Activation(<span class="st">&#39;softmax&#39;</span>, name<span class="op">=</span><span class="st">&#39;softmax&#39;</span>)(inner)
+    
+    Model(inputs<span class="op">=</span>input_data, outputs<span class="op">=</span>y_pred).summary()
+
+    labels <span class="op">=</span> Input(name<span class="op">=</span><span class="st">&#39;the_labels&#39;</span>,
+                   shape<span class="op">=</span>[img_gen.absolute_max_string_len],
+                   dtype<span class="op">=</span><span class="st">&#39;float32&#39;</span>)
+
+    input_length <span class="op">=</span> Input(name<span class="op">=</span><span class="st">&#39;input_length&#39;</span>, shape<span class="op">=</span>[<span class="dv">1</span>], dtype<span class="op">=</span><span class="st">&#39;int64&#39;</span>)
+
+    label_length <span class="op">=</span> Input(name<span class="op">=</span><span class="st">&#39;label_length&#39;</span>, shape<span class="op">=</span>[<span class="dv">1</span>], dtype<span class="op">=</span><span class="st">&#39;int64&#39;</span>)
+
+    loss_out <span class="op">=</span> Lambda(ctc_lambda_func, output_shape<span class="op">=</span>(<span class="dv">1</span>,), name<span class="op">=</span><span class="st">&#39;ctc&#39;</span>)([y_pred,
+                                                                       labels,
+                                                                       input_length,
+                                                                       label_length])
+
+    sgd <span class="op">=</span> SGD(lr<span class="op">=</span><span class="fl">0.02</span>, decay<span class="op">=</span><span class="fl">1e-6</span>, momentum<span class="op">=</span><span class="fl">0.9</span>, nesterov<span class="op">=</span><span class="va">True</span>, clipnorm<span class="op">=</span><span class="dv">5</span>)
+
+    model <span class="op">=</span> Model(inputs<span class="op">=</span>[input_data,
+                          labels,
+                          input_length,
+                          label_length], outputs<span class="op">=</span>loss_out)
+
+    model.<span class="bu">compile</span>(loss<span class="op">=</span>{<span class="st">&#39;ctc&#39;</span>: <span class="kw">lambda</span> y_true, y_pred: y_pred}, optimizer<span class="op">=</span>sgd)
+
+    test_func <span class="op">=</span> K.function([input_data], [y_pred])
+
+    <span class="cf">return</span> model, test_func
+        
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
+    pool_size <span class="op">=</span> <span class="dv">3</span>
+    img_w <span class="op">=</span> <span class="dv">256</span>
+    img_h <span class="op">=</span> <span class="dv">64</span>
+    minibatch_size <span class="op">=</span> <span class="dv">10</span>
+    img_gen <span class="op">=</span> util.TextImageGenerator(minibatch_size<span class="op">=</span>minibatch_size,
+                                      img_w<span class="op">=</span>img_w,
+                                      img_h<span class="op">=</span>img_h,
+                                      downsample_factor<span class="op">=</span>(pool_size <span class="op">**</span> <span class="dv">2</span>),
+                                      absolute_max_string_len<span class="op">=</span><span class="dv">12</span>
+    )
+    model, dummy <span class="op">=</span> get_model(img_w,img_h,minibatch_size,pool_size)
+    mfile <span class="op">=</span> <span class="st">&quot;/tmp/ocr.h5&quot;</span>
+    <span class="cf">if</span> os.path.isfile(mfile):
+        <span class="bu">print</span> <span class="st">&#39;Loaded&#39;</span>, mfile
+        model.load_weights(mfile)
+
+    model.fit_generator(generator<span class="op">=</span>img_gen.next_train(),
+                        steps_per_epoch<span class="op">=</span><span class="dv">1000</span>,
+                        epochs<span class="op">=</span><span class="dv">1</span>,
+                        validation_steps<span class="op">=</span><span class="dv">0</span>,
+                        callbacks<span class="op">=</span>[img_gen],
+                        initial_epoch<span class="op">=</span><span class="dv">0</span>)
+
+    model.save(mfile)
+    </code></pre></div>
+<p>Eğitim verisi ne olacak? Burada ilginç bir teknik kullanacağız, bir kelimenin imajını üretebilen yazılımlar var, yani masaüstünde Paint ya da Gimp ile bir imaj içine yazı yazmak gibi, bu kodlardan birini kullanıp, hatta üretilen imajı deforme bile ederek tanıma algoritmasının işini bilerek zorlaştırabiliriz, ve eğitime bu verileri sokarak, hiç ek eğitim verisi diskte tutmadan eğitim operasyonunu istediğimiz şekilde gerçekleştiririz. Bir örnek kelime imajı üretelim mesela,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> util
+
+img_w <span class="op">=</span> <span class="dv">256</span>
+img_h <span class="op">=</span> <span class="dv">64</span>
+
+img_gen <span class="op">=</span> util.TextImageGenerator(minibatch_size<span class="op">=</span><span class="dv">1</span>,
+                                  img_w<span class="op">=</span>img_w,
+                                  img_h<span class="op">=</span>img_h,
+                                  downsample_factor<span class="op">=</span><span class="dv">4</span>,
+                                  absolute_max_string_len<span class="op">=</span><span class="dv">12</span>)
+
+<span class="cf">for</span> x <span class="kw">in</span> img_gen.next_train(): <span class="cf">break</span>
+img <span class="op">=</span> x[<span class="dv">0</span>][<span class="st">&#39;the_input&#39;</span>].reshape(img_w,img_h).T
+<span class="bu">print</span> x[<span class="dv">0</span>][<span class="st">&#39;source_str&#39;</span>],
+plt.imshow(img,cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>,interpolation<span class="op">=</span><span class="st">&quot;none&quot;</span>)
+plt.savefig(<span class="st">&#39;ocr_06.png&#39;</span>)    </code></pre></div>
+<pre><code>[u&#39;daxco7mu1&#39;]</code></pre>
+<p>İmaj neye benziyor?</p>
+<div class="figure">
+<img src="ocr_06.png" />
+
+</div>
+<p>Eğitim verisini üreteç (generator) tekniği [6] üzerinden yaratıyoruz dikkat edildiyse, üreteç eğitim verisini bir gezici arayüzü üzerinden eğitim rutinine vermemizi sağlıyor. Üreteç, döngüsünde her dönüldüğünde ve çağıran veri istendiğinde rasgele bir kelime üretir, bu kelimeyi imaja çevirip etiketi ile birlikte çağrıyı yapana veriyor. Üreteç yapısını kullanmanın güzel tarafı çağıran tarafın döngü sözdizimini kullanabilmesi. Üstte tek bir kere dönüp çıktık (tek imaj istiyorduk), eğitim mekanizması istediği kadar dönerek istediği kadar eğtim verisi alabilir.</p>
+<p>Görüldüğü gibi imaj biraz aşağı doğru eğimli çıktı, bu iyi, çünkü gerçek dünyada olan şartları tekrarlamak istiyoruz, belki bir cep telefonunun çektiği resimdeki kelimeleri tanıyacağız ve telefonu mükemmel şekilde tutmak mümkün değil, farklı açılardan kelimeleri tanıyabilmek çok iyi olur. Ayrıca kullandığımız rutin suni &quot;gürültü'' bile ekliyor, karlandırma yapıyor mesela, hatta kelimenin imajın çok farklı yerlerinden başlatabiliyor.</p>
+<p>Neyse, işte bu şekilde üretilen veri üzerinden eğitimi yapıp raporlanan kaybı belli bir seviyeye indirdikten sonra (5,6 civarı mesela, fakat uzun süre sonra 2 seviyesi de mümkün), YSA hazır demektir. Bizim önceden eğittiğimiz YSA'yı yükleyelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> train
+mfile <span class="op">=</span> <span class="st">&#39;/tmp/ocr.h5&#39;</span>
+
+pool_size <span class="op">=</span> <span class="dv">3</span>
+img_w <span class="op">=</span> <span class="dv">256</span>
+img_h <span class="op">=</span> <span class="dv">64</span>
+minibatch_size <span class="op">=</span> <span class="dv">1</span>
+model, test_func <span class="op">=</span> train.get_model(img_w,img_h,minibatch_size,pool_size)
+model.load_weights(mfile)</code></pre></div>
+<pre><code>____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+the_input (InputLayer)           (None, 256, 64, 1)    0                                            
+____________________________________________________________________________________________________
+conv1 (Conv2D)                   (None, 256, 64, 20)   100         the_input[0][0]                  
+____________________________________________________________________________________________________
+max1 (MaxPooling2D)              (None, 85, 21, 20)    0           conv1[0][0]                      
+____________________________________________________________________________________________________
+conv2 (Conv2D)                   (None, 85, 21, 20)    1620        max1[0][0]                       
+____________________________________________________________________________________________________
+max2 (MaxPooling2D)              (None, 28, 7, 20)     0           conv2[0][0]                      
+____________________________________________________________________________________________________
+reshape (Reshape)                (None, 28, 140)       0           max2[0][0]                       
+____________________________________________________________________________________________________
+dense1 (Dense)                   (None, 28, 32)        4512        reshape[0][0]                    
+____________________________________________________________________________________________________
+gru1 (GRU)                       (None, 28, 256)       221952      dense1[0][0]                     
+____________________________________________________________________________________________________
+gru1_b (GRU)                     (None, 28, 256)       221952      dense1[0][0]                     
+____________________________________________________________________________________________________
+add_1 (Add)                      (None, 28, 256)       0           gru1[0][0]                       
+                                                                   gru1_b[0][0]                     
+____________________________________________________________________________________________________
+gru2 (GRU)                       (None, 28, 256)       393984      add_1[0][0]                      
+____________________________________________________________________________________________________
+gru2_b (GRU)                     (None, 28, 256)       393984      add_1[0][0]                      
+____________________________________________________________________________________________________
+concatenate_1 (Concatenate)      (None, 28, 512)       0           gru2[0][0]                       
+                                                                   gru2_b[0][0]                     
+____________________________________________________________________________________________________
+dense2 (Dense)                   (None, 28, 40)        20520       concatenate_1[0][0]              
+____________________________________________________________________________________________________
+softmax (Activation)             (None, 28, 40)        0           dense2[0][0]                     
+====================================================================================================
+Total params: 1,258,624
+Trainable params: 1,258,624
+Non-trainable params: 0
+____________________________________________________________________________________________________</code></pre>
+<p>Şimdi üstteki örnek imajı tanımaya uğraşalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> itertools
+
+<span class="kw">def</span> labels_to_text(labels):
+    ret <span class="op">=</span> []
+    <span class="cf">for</span> c <span class="kw">in</span> labels:
+        <span class="cf">if</span> c <span class="op">==</span> <span class="bu">len</span>(util.alphabet):  <span class="co"># CTC Blank</span>
+            ret.append(<span class="st">&quot;&quot;</span>)
+        <span class="cf">else</span>:
+            ret.append(util.alphabet[c])
+    <span class="cf">return</span> <span class="st">&quot;&quot;</span>.join(ret)
+
+
+<span class="kw">def</span> decode_batch(test_func, word_batch):
+    out <span class="op">=</span> test_func([word_batch])[<span class="dv">0</span>]
+    ret <span class="op">=</span> []
+    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(out.shape[<span class="dv">0</span>]):
+        out_best <span class="op">=</span> <span class="bu">list</span>(np.argmax(out[j, <span class="dv">2</span>:], <span class="dv">1</span>))
+        out_best <span class="op">=</span> [k <span class="cf">for</span> k, g <span class="kw">in</span> itertools.groupby(out_best)]
+        outstr <span class="op">=</span> labels_to_text(out_best)
+        ret.append(outstr)
+    <span class="cf">return</span> ret
+
+pred_result <span class="op">=</span> decode_batch(test_func, x[<span class="dv">0</span>][<span class="st">&#39;the_input&#39;</span>])[<span class="dv">0</span>]
+<span class="bu">print</span> pred_result</code></pre></div>
+<pre><code>qaxco7mu4</code></pre>
+<p>Fena değil.</p>
+<p>Kaynaklar</p>
+<p>[1] Graves, <em>Supervised Sequence Labelling with Recurrent Neural Networks</em>, <a href="https://www.cs.toronto.edu/~graves/preprint.pdf" class="uri">https://www.cs.toronto.edu/~graves/preprint.pdf</a></p>
+<p>[2] Graves, <em>How to build a recognition system (Part 2): CTC Loss</em>, <a href="https://docs.google.com/presentation/d/12gYcPft9_4cxk2AD6Z6ZlJNa3wvZCW1ms31nhq51vMk" class="uri">https://docs.google.com/presentation/d/12gYcPft9_4cxk2AD6Z6ZlJNa3wvZCW1ms31nhq51vMk</a></p>
+<p>[3] Graves, <em>How to build a recognition system (Part 1): CTC Loss</em>, <a href="https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI" class="uri">https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI</a></p>
+<p>[4] Troller, <em>Practical OCR system based on state of art neural networks</em>, <a href="https://support.dce.felk.cvut.cz/mediawiki/images/2/24/Bp_2017_troller_milan.pdf" class="uri">https://support.dce.felk.cvut.cz/mediawiki/images/2/24/Bp_2017_troller_milan.pdf</a></p>
+<p>[5] Chollet, <em>Keras</em>, <a href="https://github.com/fchollet/keras/blob/master/examples/image_ocr.py" class="uri">https://github.com/fchollet/keras/blob/master/examples/image_ocr.py</a></p>
+<p>[6] Bayramlı, <em>Fonksiyon Gezmek ve Yield</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2011/02/fonksiyon-gezmek-ve-yield.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2011/02/fonksiyon-gezmek-ve-yield.html</a></p>
+</body>
+</html>

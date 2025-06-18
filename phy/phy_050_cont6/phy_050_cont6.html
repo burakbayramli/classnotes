@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="pid-proportional-integral-derivative-kontrol">PID (Proportional, Integral, Derivative) Kontrol</h1>
+<p>Endüstride en yaygın kullanilan, en basit kontrol yöntemi PID kontrol yöntemi. Bu yaklaşım kontrol edilen mekanizma, süreç, fabrika, vs için elde denklemler elde olmasa bile çoğunlukla işler (mekanizmanın fazla gayrı lineer olmaması kaydıyla). Elde edilmek istenilen bir parametre hedefi vardır, mesela bu arabanın hızı olabilir, kontrol edilen ise bir gaz pedalı olabilir (pedalın basılma açısı gibi), ve arabanın belli <span class="math inline">\(\Delta t\)</span> aralıklarında hız ölçümüne bakılır, ve en basit formda istenilen hız ile o anda olunan hız arasındaki fark, hataya oranlı bir kontrol uygulaması yapılır. Eğer 60 km/saat ile gidilmek isteniyorsa ama ölçüm 40 km/saat diyorsa aradaki farka oranla gaz pedalına biraz daha basılır. En basit formda dedik, bazı ekler, o ana kadar olan hataların toplamına oranlı (integral), ya da hatanın önceki hataya göre artışına oranlı (derivative) da olabilir.</p>
+<p>Tüm bunlar biraraya koyulunca PID kontrolünü elde ederiz [1, sf. 42] [3]. Formül,</p>
+<p><span class="math display">\[
+u(t) = 
+K_p \cdot e(t) + 
+K_i \cdot \int_0^t e(\tau) \mathrm{d} \tau + 
+K_d \frac{\mathrm{d} e(t)}{\mathrm{d} t}
+\]</span></p>
+<p><span class="math inline">\(K_p\)</span> ile hataya oranlı (proportional) bir kontrol uygulanır, <span class="math inline">\(K_I\)</span> üzerinden önceki hataların entegrali (toplamı) üzerinden bir kontrol, <span class="math inline">\(K_D\)</span> ile hata değişimine oranlı kontrol uygulamış oluruz. Bu sabitlerin bulunması deneme / yanılma ile olabilir (ayar -tune-) safhasında bunlar yapılabilir.</p>
+<p>Bu yaklaşımda genel olarak kontrol edilen parametre ve hedef değişken arasında yapay / lineer bir ilişki kurulduğu söylenebilir. Sabitleri ayarlayarak herhangi bir sistem için bu ilişkinin işlemesini sağlıyoruz, fakat formülsel olarak elimizde daha derin bir bağlantı yok. &quot;Hata'' büyüklüğüne, onun birkaç formuna bakarak, bunlara oranla bir kontrol uygulamak PID yaklaşımının özüdür. Pratikte iyi işliyor.</p>
+<p>Bir sistemi kontrol etmek için birden fazla değişken olabilir, tipik olarak her değişken için ayrı bir PID hesabı işletilir. Kod idaresi açısından bu sebeple üstteki formülü bir obje içine koymak böylece her değişken için ayrı bir PID objesi yaratmak iyi bir yaklaşım olabilir. Her obje kendi eski hatasını, kendi değişkenini takip edip, ona özel kontrol hesabını her adımda hesaplayacaktır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> PID:
+   <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dt, Kp, Ki, Kd, lastErr<span class="op">=</span><span class="fl">0.0</span>):
+      <span class="va">self</span>.Kp <span class="op">=</span> Kp
+      <span class="va">self</span>.Ki <span class="op">=</span> Ki
+      <span class="va">self</span>.Kd <span class="op">=</span> Kd
+      <span class="va">self</span>.dt <span class="op">=</span> dt
+      <span class="va">self</span>.errSum <span class="op">=</span> <span class="dv">0</span>
+      <span class="va">self</span>.lastErr <span class="op">=</span> lastErr
+
+   <span class="kw">def</span> compute(<span class="va">self</span>, setpoint, <span class="bu">input</span>):
+      error <span class="op">=</span> setpoint <span class="op">-</span> <span class="bu">input</span>
+      <span class="va">self</span>.errSum <span class="op">+=</span> (error <span class="op">*</span> <span class="va">self</span>.dt)
+      dErr <span class="op">=</span> (error <span class="op">-</span> <span class="va">self</span>.lastErr) <span class="op">/</span> <span class="va">self</span>.dt
+      output <span class="op">=</span> <span class="va">self</span>.Kp <span class="op">*</span> error <span class="op">+</span> <span class="va">self</span>.Ki <span class="op">*</span> <span class="va">self</span>.errSum <span class="op">+</span> <span class="va">self</span>.Kd <span class="op">*</span> dErr
+      <span class="va">self</span>.lastErr <span class="op">=</span> error
+      <span class="cf">return</span> output</code></pre></div>
+<p>(Kurucuda <code>lastErr</code> geçildi, bu başta çok yüksek olabilecek 'önceki hata' problemini düzeltmek için)</p>
+<p>Örnek olarak basit bir hedef, 10, ve rasgele bazı çarpanlar üzerinden uygulanacak kontrolü hesaplayalım. 3 ile başlıyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">p <span class="op">=</span> PID(<span class="fl">0.01</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">10</span>)
+
+<span class="bu">print</span> (p.compute(<span class="dv">10</span>,<span class="dv">3</span>))
+<span class="bu">print</span> (p.compute(<span class="dv">10</span>,<span class="dv">4</span>))
+<span class="bu">print</span> (p.compute(<span class="dv">10</span>,<span class="dv">5</span>))
+<span class="bu">print</span> (p.compute(<span class="dv">10</span>,<span class="dv">8</span>))</code></pre></div>
+<pre><code>7.07
+6.13
+5.18
+2.2</code></pre>
+<p>Örnek</p>
+<p>Klasik fizik üzerinden ilerleyelim.. Alttaki örnek [2, sf. 12]'den alınmıştır, <span class="math inline">\(M\)</span> kütlesindeki bir objeyi masa üzerinden ittirerek bir hedef hızına ulaştırmak istiyoruz.</p>
+<div class="figure">
+<img src="phy_030_pid_02.png" />
+
+</div>
+<p><span class="math inline">\(F = m \ddot{x}\)</span> formülü standart fizik, herhangi bir zaman noktasındaki <span class="math inline">\(T\)</span> zaman aralığındaki hız artışı için gereken kuvvet <span class="math inline">\(F = \frac{m v_t - m v_{t-1}}{T}\)</span> ile hesaplanabilir. Sürtünmeyi hesaba katmayalım. Zaman aralığı 10 milisaniye olsun, kütle <span class="math inline">\(M = 2\)</span> kg, ulaşılmak istenen hedef hız 4 metre / saniye. Durağan hızdan başlıyoruz, ve PID kontrol ile her <span class="math inline">\(t\)</span> anında uygulanması gereken kuvveti görmek istiyoruz. Endüstriyel uygulamalarda bu tür problemler için PD yaklaşımı kullanılıyor, yani I yok, o yüzden onun sabitini sıfır yapıyoruz (iptal etmiş oluyoruz), geri kalanlar için <span class="math inline">\(K_p=2\)</span>, <span class="math inline">\(K_D=1\)</span> üzerinden,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+
+T <span class="op">=</span> <span class="fl">0.1</span>
+M <span class="op">=</span> <span class="fl">2.0</span>
+desired_vel <span class="op">=</span> <span class="fl">4.0</span>
+vel <span class="op">=</span> <span class="dv">0</span>
+p <span class="op">=</span> PID(T, <span class="fl">2.0</span>, <span class="dv">0</span>, <span class="fl">1.0</span>, <span class="fl">4.0</span>)
+forces <span class="op">=</span> []<span class="op">;</span> vels <span class="op">=</span> []<span class="op">;</span> velerrs <span class="op">=</span> []<span class="op">;</span> ts <span class="op">=</span> []
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):
+    vels.append(vel)
+    force <span class="op">=</span> p.compute(desired_vel, vel)
+    accel <span class="op">=</span> force <span class="op">/</span> M
+    vel <span class="op">=</span> vel <span class="op">+</span> accel<span class="op">*</span>T
+    forces.append(force)
+    velerrs.append(p.lastErr)
+    ts.append(i<span class="op">*</span>T)
+
+df <span class="op">=</span> pd.DataFrame([ts, forces, vels, velerrs]).T
+df.columns <span class="op">=</span> [<span class="st">&#39;ts&#39;</span>,<span class="st">&#39;forces&#39;</span>,<span class="st">&#39;vels&#39;</span>,<span class="st">&#39;velerrs&#39;</span>]
+df <span class="op">=</span> df.set_index(<span class="st">&#39;ts&#39;</span>)
+df[[<span class="st">&#39;forces&#39;</span>,<span class="st">&#39;vels&#39;</span>]].plot()
+plt.savefig(<span class="st">&#39;phy_030_pid_03.png&#39;</span>)
+df[[<span class="st">&#39;vels&#39;</span>,<span class="st">&#39;velerrs&#39;</span>]].plot()
+plt.savefig(<span class="st">&#39;phy_030_pid_04.png&#39;</span>)</code></pre></div>
+<p><img src="phy_030_pid_03.png" /> <img src="phy_030_pid_04.png" /></p>
+<p>Quadkopter</p>
+<p>Bir quadkopter dört tane motor üzerinden kontrol edilen bir İHA'dır (drone, insansız hava aracı). Helikopter aksine pervanelere / dört motora eğim verilemez, sabit dururlar, ve araç sadece bu motorların daha az veya daha çok döndürülmesi üzerinden kontrol edilir. Her motorun pervanesi bir yanındakinin tersi yönünde döner, böylece her motorun getirebileceği savrulma dengelenmiş olur, teorik olarak dengeli bir quadkopterde her motor aynı hızda döndüğünde araç havada asılı duruyor olmalıdır. Tabii pratikte pek çok sebep dolayısıyla bu olmayabilir, o yüzden asılı durma, herhangi bir yöne uçma, dönme için quadkopter sürekli kontrol edilmelidir.</p>
+<div class="figure">
+<img src="phy_030_pid_01.png" />
+
+</div>
+<p>Resimde dönüş açıları gösteriliyor, havacılıktaki adım, yalpa , sapma (pitch, roll, yaw) açıları bunlar, mesela z ekseni bazlı bir dönüş sapma. Kontrol <span class="math inline">\(T = [T_0,T_1,T_2,T_3]\)</span> üzerinden dört motora uygulanacak güçtür [1, sf. 44], quadkopterin hedeflenen duruş açıları <span class="math inline">\(\theta_c, \phi_c, \psi_c\)</span> olsun, ölçüm aletlerinden o andaki duruş <span class="math inline">\(\theta_{IMU}, \phi_{IMU}, \psi_{IMU}\)</span> ile geliyor olsun.</p>
+<div class="figure">
+<img src="phy_030_pid_05.png" />
+
+</div>
+<p>Kontrol için üç açı, artı, yukarı aşağı iniş çıkış amaçlı yerçekimi telafisiyle (gravity compensation) beraber dört tane PİD kontrolü tasarlanıyor. Mesela [1, sf. 46]'daki koda bakarsak, istenen adım açısına ulaşmak için adım PID'den gelen kontrolü alıyoruz, ve bu kontrolü yine belli bir sabitle çarpıp <span class="math inline">\(T_0,T_1\)</span>'e ekliyoruz, <span class="math inline">\(T_2,T_3\)</span>'ten çıkartıyoruz. İki üstteki resimden pozitif bu şekilde uygulanan bir değerin İHA'yı ön kısma göre yukarı kaldıracağını, yani <span class="math inline">\(y\)</span> eksen bazlı bir dönme yaratacağını kestirebiliriz. Tabii her quadkopterin fiziki yapısı sebebiyle her açının hatasına oranla uygulanacak düzeltme <span class="math inline">\(K_p,K_I,K_D\)</span> sabitleri farklı olabilir, ne olduklari başta bilinmez, bu sabitler tasarlama evresinde deneme / yanılma ile ayarlanarak İHA işler hale getirilir.</p>
+<p>Kaynaklar</p>
+<p>[1] Zimmerman, <em>Flight Control and Hardware Design of Multi-Rotor Systems</em></p>
+<p>[2] Jamshidi, <em>Intelligent Control Systems with an Introduction to System of Systems Engineering</em></p>
+<p>[3] Beauregard, <em>Improving the Beginner's PID - Introduction</em>, <a href="http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/" class="uri">http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/</a></p>
+</body>
+</html>

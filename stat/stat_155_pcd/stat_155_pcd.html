@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="kalıcı-cd-persistent-contrastive-divergence--pcd-">Kalıcı CD (Persistent Contrastive Divergence -PCD-)</h1>
+<p>Kısıtlı Boltzman Makinaları (RBM) yazısında gösterilen eğitim CD (contrastive divergence) üzerinden idi. Amaç alttaki formülde, özellikle eksiden sonraki terimi yaklaşıksal olarak hesaplamaktır.</p>
+<p><span class="math display">\[ 
+\sum_{n=1}^{N}  &lt; y_iy_j &gt;_{P(h|x^n;W)} - &lt; y_iy_j &gt;_{P(x,h;W)} 
+\]</span></p>
+<p>Bu terime basında eksi olduğu için negatif parçacıklar (negatıve partıcles) ismi de veriliyor.</p>
+<p>Şimdi RBM'de gördüğümüz CD'yi hatırlayalım, CD bir tür &quot;tek adımlık Gibbs örneklemesi'' yapıyordu; bu tek adım örnekleme sonrasında bir sonraki adım öncesi, veri, tekrar başlangıç noktası olarak zincire veriliyordu. Yani her CD adımının başlangıcı illa ki verinin kendisi olacaktır. Bu usul Gibbs'in veriden uzaklaşma şansı çok azdır. Fakat çoğu ilginç yapay öğrenim verisi çok dorukludur (multimodal), optimizasyon bağlamında düşünülürse birden fazla tepe (ya da çukur) noktası içerir. Eğer eldeki veri, eğitimi bu noktalara yeterince kanalize edemiyorsa o noktalar öğrenilmemiş olur. Bazen verinin (bile) söylediğinden değişik yönleri gezebilen bir prosedür bu çokdoruklu alanı gezmesi açısından daha başarılı olabilecektir.</p>
+<p>PCD bu eksikleri düzeltmeye çabalar. PCD'ye göre modelden gelen &quot;negatif parçacıkların'' örneklemesi arka planda, kendi başlarına ilerler, ve bu zincir hiçbir zaman veriye, ya da başka bir şeye set edilmez (hatta zincirin başlangıç noktası bile veriden alakasız olarak, rasgele seçilir). Bu yönteme göre <span class="math inline">\(h^0,x^0, h^1, x^1, ...\)</span> üretimi neredeyse tamamen &quot;kapalı devre'' kendi kendine ilerleyen bir süreç olacaktır. Diğer yanda pozitif parçacıklar veriden geliyor (ve tabii ki her gradyan adımı sonrası değişen <span class="math inline">\(W\)</span> hem pozitif hem negatif parçacıkları etkiler), ve bu al/ver ilişkisi, hatta bir bakıma model ile verinin kapışmasının PCD'yi daha avantajlı hale getirdiği iddia edilir, ki PCD, CD'den genellikle daha iyi öğrenim sağlar [5].</p>
+<p>CD'ye kıyasla PCD'nin Gibbs ya da genel olarak MCMC örneklemesinin prensibine daha yakın durduğu iddia edilebilir, çünkü PCD ile bir örneklem zinciri kesintisiz olarak devam ettirilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.utils <span class="im">import</span> gen_even_slices
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> itertools
+
+<span class="kw">class</span> RBM:  
+  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_hidden, num_visible, learning_rate,max_epochs<span class="op">=</span><span class="dv">10</span>,
+               batch_size<span class="op">=</span><span class="dv">10</span>):
+    <span class="va">self</span>.num_hidden <span class="op">=</span> num_hidden
+    <span class="va">self</span>.num_visible <span class="op">=</span> num_visible
+    <span class="va">self</span>.learning_rate <span class="op">=</span> learning_rate
+    <span class="va">self</span>.weights <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> np.random.randn(<span class="va">self</span>.num_visible, <span class="va">self</span>.num_hidden)    
+    <span class="va">self</span>.weights <span class="op">=</span> np.insert(<span class="va">self</span>.weights, <span class="dv">0</span>, <span class="dv">0</span>, axis <span class="op">=</span> <span class="dv">0</span>)
+    <span class="va">self</span>.weights <span class="op">=</span> np.insert(<span class="va">self</span>.weights, <span class="dv">0</span>, <span class="dv">0</span>, axis <span class="op">=</span> <span class="dv">1</span>)
+    <span class="va">self</span>.max_epochs <span class="op">=</span> max_epochs
+    <span class="va">self</span>.batch_size <span class="op">=</span> batch_size
+            
+  <span class="kw">def</span> run_visible(<span class="va">self</span>, data):
+    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]
+    
+    hidden_states <span class="op">=</span> np.ones((num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>))
+    
+    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
+
+    hidden_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights)
+    hidden_probs <span class="op">=</span> <span class="va">self</span>._logistic(hidden_activations)
+    hidden_states[:,:] <span class="op">=</span> hidden_probs <span class="op">&gt;</span> <span class="op">\</span>
+        np.random.rand(num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>)  
+    hidden_states <span class="op">=</span> hidden_states[:,<span class="dv">1</span>:]
+    <span class="cf">return</span> hidden_states
+
+          
+  <span class="kw">def</span> run_hidden(<span class="va">self</span>, data):
+    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]
+
+    visible_states <span class="op">=</span> np.ones((num_examples, <span class="va">self</span>.num_visible <span class="op">+</span> <span class="dv">1</span>))
+
+    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
+
+    visible_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights.T)
+    visible_probs <span class="op">=</span> <span class="va">self</span>._logistic(visible_activations)
+    visible_states[:,:] <span class="op">=</span> visible_probs <span class="op">&gt;</span> <span class="op">\</span>
+        np.random.rand(num_examples, <span class="va">self</span>.num_visible <span class="op">+</span> <span class="dv">1</span>)
+
+    visible_states <span class="op">=</span> visible_states[:,<span class="dv">1</span>:]
+    <span class="cf">return</span> visible_states
+  
+  <span class="kw">def</span> _logistic(<span class="va">self</span>, x):
+    <span class="cf">return</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>x))
+
+  <span class="kw">def</span> _fit(<span class="va">self</span>, v_pos):
+    h_pos <span class="op">=</span> <span class="va">self</span>.run_visible(v_pos)
+    v_neg <span class="op">=</span> <span class="va">self</span>.run_hidden(<span class="va">self</span>.h_samples_)
+    h_neg <span class="op">=</span> <span class="va">self</span>.run_visible(v_neg)
+    lr <span class="op">=</span> <span class="bu">float</span>(<span class="va">self</span>.learning_rate) <span class="op">/</span> v_pos.shape[<span class="dv">0</span>]
+    v_pos <span class="op">=</span> np.insert(v_pos, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
+    h_pos <span class="op">=</span> np.insert(h_pos, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
+    v_neg <span class="op">=</span> np.insert(v_neg, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
+    h_neg <span class="op">=</span> np.insert(h_neg, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
+    update <span class="op">=</span> np.dot(v_pos.T, h_pos).T
+    update <span class="op">-=</span> np.dot(h_neg.T, v_neg)
+    <span class="va">self</span>.weights <span class="op">+=</span> lr <span class="op">*</span> update.T
+    h_neg[np.random.rand(h_neg.shape[<span class="dv">0</span>], h_neg.shape[<span class="dv">1</span>]) <span class="op">&lt;</span> h_neg] <span class="op">=</span> <span class="fl">1.0</span> 
+    <span class="va">self</span>.h_samples_ <span class="op">=</span> np.floor(h_neg, h_neg)[:,<span class="dv">1</span>:]
+
+  <span class="kw">def</span> fit(<span class="va">self</span>, data):
+    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]
+    <span class="va">self</span>.h_samples_ <span class="op">=</span> np.zeros((<span class="va">self</span>.batch_size, <span class="va">self</span>.num_hidden))
+    n_batches <span class="op">=</span> <span class="bu">int</span>(np.ceil(<span class="bu">float</span>(num_examples) <span class="op">/</span> <span class="va">self</span>.batch_size))
+    batch_slices <span class="op">=</span> <span class="bu">list</span>(gen_even_slices(n_batches <span class="op">*</span> <span class="va">self</span>.batch_size,
+                                        n_batches, num_examples))
+    
+    <span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">xrange</span>(<span class="dv">1</span>, <span class="va">self</span>.max_epochs <span class="op">+</span> <span class="dv">1</span>):
+        <span class="cf">for</span> batch_slice <span class="kw">in</span> batch_slices:
+            <span class="va">self</span>._fit(data[batch_slice])
+    
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:    
+    <span class="im">import</span> numpy <span class="im">as</span> np
+    X <span class="op">=</span> np.array([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]])
+    model <span class="op">=</span> RBM(num_hidden<span class="op">=</span><span class="dv">2</span>, num_visible<span class="op">=</span><span class="dv">3</span>, learning_rate<span class="op">=</span><span class="fl">0.1</span>,batch_size<span class="op">=</span><span class="dv">2</span>)
+    model.fit(X)
+    <span class="bu">print</span> model.weights</code></pre></div>
+<p>Üstte görülen kod daha önce RBM için kullanılan kodla benzeşiyor, sadece <code>fit</code> değişik, ve <code>_fit</code> eklendi. Bu kodda miniparça (minibatch) kavramı da var, her gradyan adımı ufak verinin mini parçaları üzerinden atılır. Bu parçalar hakikaten ufak, mesela 10 ila 100 satırlık veri arasındadırlar ve bu ilginç bir durumu ortaya çıkartır, özellikle negatif parçacıklar için, ki bu parçacıklar <span class="math inline">\(W\)</span> bağlantısı haricinde kendi başlarına ilerler, çok az veri noktası ile işlem yapabilmektedirler.</p>
+<p>Metot <code>fit</code> içinde <code>self.h_samples_</code> değişkenine dikkat, bu değişken PCD'nin &quot;kalıcı'' olmasını sağlar, her <code>_fit</code> çağrı sonrası negatif parçacık örneklemesi <code>self.h_samples_</code> 'in bıraktığı yerden başlar.</p>
+<p>RBM için kullandığımız aynı veri seti üzerine k-katlama ile test edelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression
+<span class="im">from</span> sklearn.cross_validation <span class="im">import</span> KFold
+<span class="im">import</span> numpy <span class="im">as</span> np, rbmp, sys
+
+X <span class="op">=</span> np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/binarydigits.txt&#39;</span>)
+Y <span class="op">=</span> np.ravel(np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/bindigitlabels.txt&#39;</span>))
+
+np.random.seed(<span class="dv">0</span>)
+
+scores <span class="op">=</span> []
+cv <span class="op">=</span> KFold(n<span class="op">=</span><span class="bu">len</span>(X),n_folds<span class="op">=</span><span class="dv">3</span>)
+<span class="cf">for</span> train, test <span class="kw">in</span> cv:
+    X_train, Y_train <span class="op">=</span> X[train], Y[train]
+    X_test, Y_test <span class="op">=</span> X[test], Y[test]
+    r <span class="op">=</span> rbmp.RBM(num_hidden<span class="op">=</span><span class="dv">40</span>, learning_rate<span class="op">=</span><span class="fl">0.1</span>, max_epochs<span class="op">=</span><span class="dv">100</span>,
+                 num_visible<span class="op">=</span><span class="dv">64</span>, batch_size<span class="op">=</span><span class="dv">10</span>)
+    r.fit(X_train)
+    clf <span class="op">=</span> LogisticRegression(C<span class="op">=</span><span class="dv">1000</span>)
+    clf.fit(r.run_visible(X_train), Y_train)
+    res3 <span class="op">=</span> clf.predict(r.run_visible(X_test))
+    scores.append(np.<span class="bu">sum</span>(res3<span class="op">==</span>Y_test) <span class="op">/</span> <span class="bu">float</span>(<span class="bu">len</span>(Y_test)))        
+    
+<span class="bu">print</span> np.mean(scores)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">!</span> python test_rbmkfold.py</code></pre></div>
+<pre><code>0.989898989899</code></pre>
+<p>Daha çetrefil bir veri seti MNIST veri setine [2] bakalım. Veri 28x28 boyutunda ikisel veri olarak kodlanmış rakamların el yazısından alınmış resimlerini içerir. Veri seti ünlü çünkü Derin Öğrenim'in ilk büyük başarıları bu veri seti üzerinde paylaşıldı. MNIST'i aldıktan sonra eğitim / test kısımlarının ilk 1000 tanesi üzerinde algoritmamızı kullanırsak, tek komşulu KNN (yani 1-NN) yüzde 85.4 başarı sonucunu verir. Alttaki parametreler üzerinden PCD ile RBM'in başarısı yüzde 86 olacaktır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np, gzip, sys
+<span class="im">from</span> sklearn <span class="im">import</span> neighbors
+<span class="im">from</span> sklearn.cross_validation <span class="im">import</span> train_test_split
+<span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression
+
+np.random.seed(<span class="dv">0</span>)
+S <span class="op">=</span> <span class="dv">1000</span>
+
+f <span class="op">=</span> gzip.<span class="bu">open</span>(<span class="st">&#39;/tmp/mnist.pkl.gz&#39;</span>, <span class="st">&#39;rb&#39;</span>)
+train_set, valid_set, test_set <span class="op">=</span> cPickle.load(f)
+f.close()
+
+X_train,y_train <span class="op">=</span> train_set
+X_test,y_test <span class="op">=</span> valid_set
+X_train <span class="op">=</span> X_train[:S]<span class="op">;</span> y_train <span class="op">=</span> y_train[:S]
+X_test <span class="op">=</span> X_test[:S]<span class="op">;</span> y_test <span class="op">=</span> y_test[:S]
+<span class="bu">print</span> X_train.shape
+
+clf <span class="op">=</span> neighbors.KNeighborsClassifier(n_neighbors<span class="op">=</span><span class="dv">1</span>)
+clf.fit(X_train, y_train)
+<span class="bu">print</span> <span class="st">&#39;KNN&#39;</span>, clf.score(X_test, y_test)
+
+<span class="im">import</span> rbmp
+r <span class="op">=</span> rbmp.RBM(num_hidden<span class="op">=</span><span class="dv">500</span>, learning_rate<span class="op">=</span><span class="fl">0.1</span>, max_epochs<span class="op">=</span><span class="dv">200</span>,
+             num_visible<span class="op">=</span><span class="dv">784</span>,batch_size<span class="op">=</span><span class="dv">20</span>)
+r.fit(X_train)
+clf <span class="op">=</span> LogisticRegression(C<span class="op">=</span><span class="dv">1000</span>)
+clf.fit(r.run_visible(X_train), y_train)
+res3 <span class="op">=</span> clf.predict(r.run_visible(X_test))
+<span class="bu">print</span> <span class="st">&#39;RBM&#39;</span>, np.<span class="bu">sum</span>(res3<span class="op">==</span>y_test) <span class="op">/</span> <span class="bu">float</span>(<span class="bu">len</span>(y_test))</code></pre></div>
+<p>Kaynaklar</p>
+<p>[1] Tieleman, <em>Using Fast Weights to Improve Persistent Contrastive Divergence</em>,<a href="http://videolectures.net/icml09_tieleman_ufw/" class="uri">http://videolectures.net/icml09_tieleman_ufw/</a></p>
+<p>[2] Montreal Institute for Learning Algorithms, <em>MNIST Data</em>, <a href="http://www.iro.umontreal.ca/~lisa/deep/data/mnist/mnist.pkl.gz" class="uri">http://www.iro.umontreal.ca/~lisa/deep/data/mnist/mnist.pkl.gz</a></p>
+<p>[3] Bengio, Y., <em>Learning Deep Architectures for AI</em></p>
+<p>[4] Larochelle, H., <em>Neural networks [5.6] : Restricted Boltzmann machine - persistent CD</em>, <a href="https://www.youtube.com/watch?v=S0kFFiHzR8M" class="uri">https://www.youtube.com/watch?v=S0kFFiHzR8M</a></p>
+<p>[5] Murphy, K. <em>Machine Learning A Probabilistic Perspective</em></p>
+</body>
+</html>

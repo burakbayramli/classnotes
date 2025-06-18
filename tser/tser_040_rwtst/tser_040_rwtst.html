@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="rasgele-yürüyüş-testleri">Rasgele Yürüyüş Testleri</h1>
+<p>Bir zaman serisinin rasgele yürüyüş (RY, random walk) olup olmadığını anlamak için Genişletilmiş Dickey-Fuller (ADF) testini görmüştük. Şimdi bu testin hangi teoriye dayandığını göreceğiz, önemli bir bölümünü kendimiz kodlayacağız, ve <code>urca</code> paketi üzerinden bu testin bazı yan ürünlerini irdelemeyi öğreneceğiz. Alttaki tabloda farklı çeşitlerde rasgele yürüyüş modellerini görüyoruz, bunlar sırasıyla trendlı RY, kaymalı (drift) RY ve normal RY olarak tanımlanabilir. Bu modellerin test istatistikleri vardır.</p>
+<p><span class="math display">\[
+\begin{array}{cccc}
+\hline 
+Sıfır Modeli &amp; Alternatif &amp; Kısıtlama &amp; Test \\
+\hline 
+y_t = y_{t-1} + e_t &amp; 
+y_t = \alpha + \rho y_{t-1} + e_t &amp; 
+\alpha=0,\rho=1 &amp;
+\phi_1 \\
+\hline   
+y_t = y_{t-1} + e_t &amp; 
+y_t = \alpha + \beta t + \rho y_{t-1} + e_t &amp; 
+\alpha=0,\beta=0,\rho=1 &amp;
+\phi_2 \\
+\hline   
+y_t = \alpha + y_{t-1} + e_t &amp; 
+y_t = \alpha + \beta t + \rho y_{t-1} + e_t &amp; 
+\beta=0,\rho=1 &amp;
+\phi_3 \\
+\hline   
+y_t =  y_{t-1} + e_t &amp; 
+y_t = \alpha + \rho y_{t-1} + e_t &amp; 
+\alpha = 0,\rho=1 &amp;
+\tau_\mu \\
+\hline   
+y_t =  \alpha + y_{t-1} + e_t &amp; 
+y_t = \alpha + \beta t + \rho y_{t-1} + e_t &amp; 
+\beta = 0,\rho=1 &amp;
+\tau_\tau \\
+\hline   
+\end{array}
+\]</span></p>
+<p><span class="math inline">\(e_t\)</span> birbirinden bağımsız, aynı dağılımlı Gaussian'dır. Bu testlerden <span class="math inline">\(\phi_1,\phi_2,\phi_3\)</span> birleşik hipotez testleridir, bu kavramı <em>İstatistik, Birleşik Hipotez Testleri</em> altında görmüştük. Mesela <span class="math inline">\(\phi_2\)</span> için &quot;kısıtlanmış'' durum sıfır hipotezi altında gösteriliyor, &quot;kısıtlanmamış'' durum ise alternatif kolonu altında. Reddetmek istediğimiz hipotez iptal edilen değişkenlerin önemli olmadığı, eğer F-testi ile bu hipotezi reddedersek, yani önemli olduklarını kanıtlarsak, üstteki tablodaki sıfır hipotezi reddedilmiş olur.</p>
+<p>Peki eğer <span class="math inline">\(\phi_2\)</span> için mesela, hem sıfır hem alternatif hipotez altında <span class="math inline">\(y_{t-1}\)</span> görülüyor, o zaman rasgele yürüyüş varlığını nasıl reddederiz? Evet iki tarafta da <span class="math inline">\(y_{t-1}\)</span> var fakat bir tarafta birim kök (unit root) olarak var, yani <span class="math inline">\(1 \cdot y_{t-1}\)</span> olarak, öteki tarafta bir katsayı üzerinden modele dahil, ayrıca diğer değişkenler de bu durumda mevcut. Eğer pür birim kök'e karşı alternatif güçlü çıkar ise o tüm diğer değişkenler zamann serisinin açıklamak için önemli sonucu çıkar, bu durum rasgele yürüyüş olmadığına dair güçlü bir işarettir (tabii tamamen yok denemez).</p>
+<p>Hesaplar bir tür birleşik hipotezdir demiştik, yani F-test'i olarak hesaplanırlar,</p>
+<p><span class="math display">\[ \phi_i = \frac{(SSE_r - SSE_u) / r}{SSE_u} / (N-k) \]</span></p>
+<p><span class="math inline">\(r\)</span> kısıtlanan değişken sayısıdır, <span class="math inline">\(\phi_3\)</span> için bu 3 olurdu mesela, SSE değerleri ise artıkların karesi kullanılarak hesaplanacaktır, <span class="math inline">\(SSE_r\)</span> kısıtlanan durum için, <span class="math inline">\(SSE_u\)</span> kısıtlama olmayan durum için, <span class="math inline">\(N-k\)</span> işe kısıtlı olmayan modelin serbestlik derecesi.</p>
+<p>Örnek olarak Federal Reserve Board tarafından yayınlanan Üretim İndisi verisinin logaritması alınmış halini kullanacağız, veri 1950 1. çeyrek-1977 4. çeyrek arasını kapsar ve çeyreksel bazlıdır. Endüstriyel Üretim İndisi bir ekonomik göstergedir, sanayisel, madencilik, elektrik, doğal gaz gibi sektörlerin üretimini tek bir sayı altında özetlemeye uğraşır. Soru şu, acaba bu seri rasgele yürüyüş özellikleri taşıyor mu, taşımıyor ise, hangi alternatifler geçerli?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfind <span class="op">=</span> pd.read_csv(<span class="st">&#39;ind.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;date&#39;</span>)
+dfind <span class="op">=</span> dfind[dfind.index <span class="op">&gt;</span> <span class="st">&#39;1950-01-01&#39;</span>]
+dfind <span class="op">=</span> dfind[dfind.index <span class="op">&lt;</span> <span class="st">&#39;1977-10-01&#39;</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">np.log(dfind.indpro).plot()
+plt.title(<span class="st">u&#39;Üretim Indisi&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_rwtst_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_rwtst_02.png" />
+
+</div>
+<p>Farz ediyoruz ki bu zaman serisi şu şekilde temsil edilebiliyor,</p>
+<p><span class="math display">\[ 
+y_t = \beta_0 + \beta_1 t + \alpha_1 y_{t-1} + \alpha_2 (y_{t-1} - y_{t-2}) + e_t 
+\qquad (1)
+\]</span></p>
+<p>Şimdi mesela <span class="math inline">\(\phi_2\)</span> testi için bir regresyon işleteceğiz, bunun için denklem üzerinde biraz değişiklik yapalım, kısıtlamalar üzerinden <span class="math inline">\(\beta_0=0,\beta_1=0,\alpha_1=1\)</span> ve iki taraftan <span class="math inline">\(y_{t-1}\)</span> çıkartalım,</p>
+<p><span class="math display">\[ 
+y_t - y_{t-1} =  \cancel{y_{t-1} - y_{t-1}} + \alpha_2 (y_{t-1} - y_{t-2}) + e_t 
+\]</span></p>
+<p><span class="math display">\[ 
+\Delta y_t =  \alpha_2 \Delta y_{t-1}  + e_t  
+\qquad (2)
+\]</span></p>
+<p>Bu durumda kısıtlanmış regresyon (2)'yi kullanacaktır, kısıtlanmamış ise (1)'i. Ardından bu iki regresyonun sonucundan gelen hata karelerinin toplamlarını (SSE) kullanarak bir F-testi hesaplanır.</p>
+<p><span class="math inline">\(\phi_3\)</span> için benzer bir durum, tek fark kısıtlanmış formülde bir kesi hala var, yani her iki tarafta da <span class="math inline">\(\beta_0\)</span> mevcut.</p>
+<p><span class="math display">\[ 
+\Delta y_t =  \beta_0 + \alpha_2 \Delta y_{t-1}  + e_t  
+\qquad (3)
+\]</span></p>
+<p>Tabii ana formül (1)'i de <span class="math inline">\(\Delta y_t\)</span> bazında göstermek iyi olur, iki taratan <span class="math inline">\(y_{t-1}\)</span> çıkartalım,</p>
+<p><span class="math display">\[ 
+y_t-y_{t-1} = \beta_0 + \beta_1 t + (\alpha_1-1) y_{t-1} + \alpha_2 (y_{t-1} - y_{t-2}) + e_t 
+\]</span></p>
+<p><span class="math display">\[ 
+\Delta y_t = \beta_0 + \beta_1 t + (\alpha_1-1) y_{t-1} + \alpha_2 \Delta y_{t-1} + e_t 
+\]</span></p>
+<p><span class="math inline">\(\alpha_1-1\)</span> tek başına bir katsayı olarak girebilir, hangi sembolü taşıdığı pek önemli değil.</p>
+<p>Bu arada (1,2)'deki semboller tabloda gösterilenlerden biraz değişik olabilir, fakat işin özü aynıdır. (1) formülü bir gecikme (lag) ile önceki farklara bağlantı yaratmayı seçti, bunun için bazı sembollerin değişmesi gerekti.</p>
+<p>Regresyon ve F-test hesapları,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf
+
+dfind[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> np.log(dfind.indpro)
+dfind[<span class="st">&#39;dy&#39;</span>] <span class="op">=</span> dfind.y.diff()
+dfind[<span class="st">&#39;ylag&#39;</span>] <span class="op">=</span> dfind.y.shift(<span class="dv">1</span>)
+dfind[<span class="st">&#39;dylag&#39;</span>] <span class="op">=</span> dfind.ylag.diff()
+dfind[<span class="st">&#39;t&#39;</span>] <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(dfind))
+
+res1 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ t + ylag + dylag&#39;</span>, data<span class="op">=</span>dfind).fit()
+sse1 <span class="op">=</span> np.<span class="bu">sum</span>(res1.resid<span class="op">**</span><span class="dv">2</span>)
+<span class="bu">print</span> <span class="bu">list</span>(res1.params)
+<span class="bu">print</span> <span class="st">&#39;sse1&#39;</span>,sse1
+
+res2 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ dylag &#39;</span>, data<span class="op">=</span>dfind).fit()
+sse2 <span class="op">=</span> np.<span class="bu">sum</span>(res2.resid<span class="op">**</span><span class="dv">2</span>)
+<span class="bu">print</span> <span class="bu">list</span>(res2.params)
+<span class="bu">print</span> <span class="st">&#39;sse2&#39;</span>,sse2
+
+<span class="co"># dikkat kesi yok burada</span>
+res3 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ 0 + dylag&#39;</span>, data<span class="op">=</span>dfind).fit()
+<span class="bu">print</span> <span class="bu">list</span>(res3.params)
+sse3 <span class="op">=</span> np.<span class="bu">sum</span>(res3.resid<span class="op">**</span><span class="dv">2</span>)
+<span class="bu">print</span> <span class="st">&#39;sse3&#39;</span>,sse3
+
+k <span class="op">=</span> <span class="dv">3</span>
+phi2 <span class="op">=</span> (sse3<span class="op">-</span>sse1)<span class="op">/</span>(k<span class="op">*</span>sse1<span class="op">/</span>(<span class="bu">len</span>(dfind)<span class="op">-</span><span class="dv">4</span>))
+<span class="bu">print</span> <span class="st">&#39;</span><span class="ch">\n</span><span class="st">phi2&#39;</span>, phi2
+k <span class="op">=</span> <span class="dv">2</span>
+phi3 <span class="op">=</span> (sse2<span class="op">-</span>sse1)<span class="op">/</span>(k<span class="op">*</span>sse1<span class="op">/</span>(<span class="bu">len</span>(dfind)<span class="op">-</span><span class="dv">4</span>))
+<span class="bu">print</span> <span class="st">&#39;phi3&#39;</span>, phi3</code></pre></div>
+<pre><code>[0.32890563193314926, 0.0012176940580472463, -0.11592339963358432, 0.47618947733620209]
+sse1 0.0439920148353
+[0.0054652611288141572, 0.41767827251937806]
+sse2 0.0490062183592
+[0.49810699391267177]
+sse3 0.0517366340291
+
+phi2 6.22029276313
+phi3 6.04093237744</code></pre>
+<p>Kontrol için aynı hesabı <code>urca</code> paketi üzerinden işletelim, ki kritik değerleri de görebilelim. Not: kritik değerler için de F dağılımı kullanamıyoruz, çünkü artıklarda (residuals) normallik farz edemiyoruz, ki onların karesi ve toplamı chi kare olsun, ve chi kare bölümler F ölsün. Kalıntılarda normallik niye farz edilemiyor? Çünkü regresyonda bir önkabul değişkenlerin de <span class="math inline">\(N(0,\sigma)\)</span> olarak dağıldığıdır, fakat sıfır hipotezine bakarsak regresyona sokulan değişken zaman serisinin ta kendisi, ve zaman serisi sıfır hipotezi altında normal dağılmaz ({değişimi} normal dağılır), bu yüzden kalıntılar da normal olamaz. [5] bu standard olmayan F dağılımı simülasyon ile üretiyor ve kritik değerleri bir tabloda paylaşıyor. Simülasyonun nasıl yapıldığı [1, sf 204]'te.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">%</span>load_ext rpy2.ipython
+<span class="op">%</span>R library(urca)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">series <span class="op">=</span> np.log(dfind.indpro)
+<span class="op">%</span>R <span class="op">-</span>i series
+<span class="op">%</span>R  adf <span class="op">&lt;-</span> ur.df(series, <span class="bu">type</span> <span class="op">=</span> <span class="st">&#39;trend&#39;</span>,lags<span class="op">=</span><span class="dv">1</span>)
+<span class="op">%</span>R <span class="op">-</span>o adfout adfout <span class="op">&lt;-</span> summary(adf)
+<span class="bu">print</span> adfout</code></pre></div>
+<pre><code>
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.068623 -0.007659  0.002293  0.011152  0.051096 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.3289056  0.0942984   3.488 0.000715 ***
+z.lag.1     -0.1159234  0.0337053  -3.439 0.000840 ***
+tt           0.0012177  0.0003568   3.412 0.000918 ***
+z.diff.lag   0.4761895  0.0826273   5.763  8.5e-08 ***
+---
+
+Residual standard error: 0.02057 on 104 degrees of freedom
+Multiple R-squared:  0.2706,    Adjusted R-squared:  0.2496 
+F-statistic: 12.86 on 3 and 104 DF,  p-value: 3.262e-07
+
+
+Value of test-statistic is: -3.4393 6.1029 5.927 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -3.99 -3.43 -3.13
+phi2  6.22  4.75  4.07
+phi3  8.43  6.49  5.47</code></pre>
+<p>Sonuçlara göre <span class="math inline">\(\phi_2 = 6.1\)</span>, kritik değere göre yüzde 1 önemlilik (significance) seviyesinde <span class="math inline">\(\phi_2\)</span> hipotezini reddediyoruz, yani rasgele yürüyüş hipotezini reddediyoruz (daha doğrusu kısıtlamaların önemsiz olduğunu reddedince RY dolaylı olarak reddedilmiş oluyor). Bu demektir ki veride bir kayış (drift), birim kök, ya da deterministik bir trend var (<span class="math inline">\(\beta_1 t\)</span> ile gösterilen). Tabii birim kök hala &quot;tamamen yok'' diyemiyoruz, bu nüansı önce belirttik.</p>
+<p>Şimdi, acaba kayış (drift), yoksa trend varlığından hangisi daha muhtemel diye görmek için <span class="math inline">\(\phi_3\)</span>'e bakıyoruz. Bu test ile sıfır hipotezi üstteki tabloda 1. model, alternatifi 2. model, aradaki tek fark <span class="math inline">\(\beta_1=0\)</span> olması. Eğer bunu reddedebilirsek trendi kabul etmemiz gerekir. Test değeri 5.9, kritik değere göre yüzde 10 seviyesinden bu hipotezi reddedebiliriz, ve alternatif tez olan bu zaman serisinin trend durağan (trend stationary) olduğunu kabul ederiz. Trend durağanlık formüldeki <span class="math inline">\(\beta_1 t\)</span>'nin sıfır olmadığı / etkin olduğunu söylemektedir.</p>
+<p>Not: Trend durağanlık nedir? Bir zaman serisi durağan değil ise bu durağan olmamanın birkaç farklı sebebi olabilir, birim kök durumu bunlardan biri ki bu durumda RY ortaya çıkıyor. Fakat RY yerine deterministik trend de durağansızlığın bir sebebi olabiliyor, <span class="math inline">\(\beta_1 t\)</span> kadar bir ek sürekli her zaman diliminde seriye ekleniyor; bu da durağanlığı bozar. Yani durağanlığın bozulması hem birinci hem ikinci ya da ikisinin birden varlığı sebebiyle ortaya çıkabilir [4, sf 270]. Üstteki testler bu iki durumu birbirine alternatif hale getirip test etmeye uğraşır.</p>
+<p>Görüldüğü gibi elle yapılan regresyon ve F-test sonuçları paketin sonuçlarına oldukça yakın. Bir de <span class="math inline">\(\tau_\tau\)</span> değerini hesaplayalım, bu testin sonucu 1. regresyondaki <span class="math inline">\(y_{t-1}\)</span>'nin katsayısından gelir, daha doğrusu onun t değeridir, yani regresyon katsayısını standart hatası ile bölersek sonucu elde ederiz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="st">&#39;t degeri&#39;</span>, res1.params[<span class="st">&#39;ylag&#39;</span>] <span class="op">/</span> res1.bse[<span class="st">&#39;ylag&#39;</span>]</code></pre></div>
+<pre><code>t degeri -3.43932388217</code></pre>
+<p>ki üstteki kritik değerlere göre bu değeri yüzde 5 seviyesi -3.43'ten küçük olduğu için bu hipotezi de reddetmek mümkün, yani birim kök varlığı reddedilmiştir.</p>
+<p>S&amp;P Fiyat / Kazanç Oranı</p>
+<p>Bu örnekte 1871-2002 yılları arasında S&amp;P Birleşik Hisse İndisi fiyat seviyesi ile bu indis altında izlenen şirketlerin getirdiği kazancın oranına bakacağız. Literatürde bu gibi değerleme oranlarının (valuation ratio) ortalamaya dönüş (mean reversion) davranışı gösterip göstermediği oldukça ilgi çeken bir konudur, çünkü hisse senetlerinin fiyatlarının ne olacağını tahmin etmek gibi ilginç uygulama alanları vardır [4, sf. 274]. Mesela Campbell and Shiller adlı araştırmacılara göre 1990'ların sonlarında görülen çok yüksek fiyat/getiri oranı hisse senetlerinin düşeceğinin habercisidir, ki böylece &quot;tarihi normale dönüş'' olacaktır / olmalıdır. Önce bu oranını log'u alınmış halini grafikleyelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfpe <span class="op">=</span> pd.read_csv(<span class="st">&#39;pe.dat&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s*&#39;</span>)
+dfpe[<span class="st">&#39;ln_price_earnings&#39;</span>] <span class="op">=</span> np.log(dfpe.PRICE<span class="op">/</span>dfpe.EARNINGS)
+dfpe.ln_price_earnings.plot()
+plt.savefig(<span class="st">&#39;tser_rwtst_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_rwtst_01.png" />
+
+</div>
+<p>Görünüşe göre bir ortalamayı merkez alan / etrafında salınım var gibi gözüküyor, bazen ortalamaya dönüş uzun yıllar alabiliyor gibi de duruyor.. Şimdi birim kök varlığını test edelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">series <span class="op">=</span> dfpe.ln_price_earnings
+<span class="op">%</span>R <span class="op">-</span>i series
+<span class="op">%</span>R  adf <span class="op">&lt;-</span> ur.df(series, <span class="bu">type</span> <span class="op">=</span> <span class="st">&#39;drift&#39;</span>,lags<span class="op">=</span><span class="dv">0</span>)
+<span class="op">%</span>R <span class="op">-</span>o adfout adfout <span class="op">&lt;-</span> summary(adf)
+<span class="bu">print</span> adfout</code></pre></div>
+<pre><code>
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0,53078 -0,10211  0,00324  0,12171  0,41194 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)   
+(Intercept)  0,33486    0,12790   2,618   0,0099 **
+z.lag.1     -0,12452    0,04847  -2,569   0,0113 * 
+---
+
+Residual standard error: 0,1777 on 129 degrees of freedom
+Multiple R-squared:  0,04867,   Adjusted R-squared:  0,04129 
+F-statistic:   6,6 on 1 and 129 DF,  p-value: 0,01134
+
+
+Value of test-statistic is: -2,569 3,4573 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3,46 -2,88 -2,57
+phi1  6,52  4,63  3,81</code></pre>
+<p>Kritik değer -2.569, yüzde 10 eşiğinden bile daha büyük bu, demek ki rasgele yürüyüş tezini reddedemiyoruz.</p>
+<p>Fakat diğer yandan, ve özellikle serinin görünüşünde net şekilde görülebileceği üzere, serinin durağan-olmadığını da tam reddedemiyoruz. Hurst hesabı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_mean&#39;</span>)
+<span class="im">import</span> hurst <span class="im">as</span> h
+<span class="bu">print</span> h.hurst(dfpe.ln_price_earnings)</code></pre></div>
+<pre><code>0.0756699198133</code></pre>
+<p>Bu değer 0.5'ten oldukça uzak.</p>
+<p>Küresel Isınma Var mı?</p>
+<p>İklimin daha sıcaklaşıp sıcaklaşmadığı politikacılar, bilim adamları arasındaki tartışma konularından biri. Eğer ısınma var ise, ve kaynağı biz insanlar isek, bu durumu durdurmak için adımlar atılmalı, çünkü yine bilim adamlarına göre sonuçları kötü olabilir. Isınmanın olup olmadığını kontrol etmek için GİSS tarafından yayınlanan veriye bakacağız, bu veri 1880-2010 arasında ay bazlı tüm dünyadaki sıcaklık anormalliklerini kaydetmiştir, anormallik ise 1951-80 periyotunun ortalaması baz alınarak tanımlanmıştır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfclim <span class="op">=</span> pd.read_csv(<span class="st">&#39;climate-giss.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dfclim.Temp.plot()
+plt.savefig(<span class="st">&#39;tser_rwtst_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_rwtst_03.png" />
+
+</div>
+<p>&quot;Küresel ısınma yok'' diyen arkadaşlar üstteki grafikte görüldüğü gibi özellikle 20. yüzyılda mevcudiyeti bariz olan yükselişi açıklamak durumundalar, bunun için sıcaklık &quot;rasgele yürüyüştür'' diyenler var; bu teze göre sıcaklık verisi hisse senedi gibidir, &quot;yukarı da çıkabilir, aşağı da inebilir, tahmin edilemez bir şekilde dalgalanır''. Bu teze göre şimdiye kadar olan çıkışın bir inişi de &quot;olabilir'', herşey rasgeledir belki de onlar için daha önemlisi &quot;olanlar bizim (insanlığın) kontrolü dışındadır'' . Tabii ilk akla gelen soru 100 kusur senedir yükselen nasıl bir senet ki bu analoji doğru olabilsin..? Matematiksel olarak, yazının başında gördüğümüz RY testi herhalde faydalı bir bilgi sağlar.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">series <span class="op">=</span> dfclim.Temp
+<span class="op">%</span>R <span class="op">-</span>i series
+<span class="op">%</span>R  adf <span class="op">&lt;-</span> ur.df(series, <span class="bu">type</span> <span class="op">=</span> <span class="st">&#39;trend&#39;</span>,selectlags<span class="op">=</span><span class="st">&quot;AIC&quot;</span>)
+<span class="op">%</span>R <span class="op">-</span>o adfout adfout <span class="op">&lt;-</span> summary(adf)
+<span class="bu">print</span> adfout</code></pre></div>
+<pre><code>
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-80.967  -9.868   0.214  10.370  85.279 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -10.578706   1.163642  -9.091   &lt;2e-16 ***
+z.lag.1      -0.277517   0.020894 -13.282   &lt;2e-16 ***
+tt            0.014425   0.001428  10.105   &lt;2e-16 ***
+z.diff.lag   -0.224780   0.024657  -9.116   &lt;2e-16 ***
+---
+
+Residual standard error: 16.81 on 1562 degrees of freedom
+Multiple R-squared:  0.2205,    Adjusted R-squared:  0.219 
+F-statistic: 147.3 on 3 and 1562 DF,  p-value: &lt; 2.2e-16
+
+
+Value of test-statistic is: -13.2819 58.8243 88.2169 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -3.96 -3.41 -3.12
+phi2  6.09  4.68  4.03
+phi3  8.27  6.25  5.34</code></pre>
+<p>Testlere bakınca <code>tau3</code> reddedilmiş, <span class="math inline">\(\phi_2,\phi_3\)</span> reddedilmiş. Yani RY tezi net bir şekilde reddedildi, daha önemlisi trend durağanlığı kabul edildi. Bir trend var, ve bu trend bariz bir şekilde yukarıya doğru.</p>
+<p>Bu noktada inkarcı arkadaşlar (!) vites değiştirip &quot;burada ortalamaya dönüş var'' diyebilirler, eh tabii ki sıcaklık verisinde ortalama dönüş var, evet Hurst hesabına bakarsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_mean&#39;</span>)
+<span class="im">import</span> hurst <span class="im">as</span> h
+<span class="bu">print</span> h.hurst(dfclim.Temp)</code></pre></div>
+<pre><code>0.040611546891</code></pre>
+<p>Varyans Oranı</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> arch.unitroot <span class="im">import</span> VarianceRatio
+vr <span class="op">=</span> VarianceRatio(dfclim.Temp, <span class="dv">12</span>)
+<span class="bu">print</span>(vr.summary().as_text())</code></pre></div>
+<pre><code>     Variance-Ratio Test Results     
+=====================================
+Test Statistic                -15.768
+P-value                         0.000
+Lags                               12
+-------------------------------------
+Computed with overlapping blocks (de-biased)</code></pre>
+<p>Fakat bu iki sonuç rasgele yürüyüş reddi aslında, direk ortalamaya dönüşün kabulü değil! Bunun detayları için Varyans Ortalaması teorisine yakında bakmak lazım. Yanlız şu da var ki ADF testlerindeki red gözardı edilemez, ki bu red rasgele yürüyüşü reddedip onu trende göre test etti. Üstüne üstlük kritik değerler çok yüksek seviyelerde asıldı, ki bu yüzden trendi kabul etmek zorunda kaldık. İşin meteorolojik tarafı da önemli; bilimcilere göre iklimdeki birkaç derecelik kalıcı değişimin bile büyük etkileri olacağını duyuyoruz. Yanlış sonuca varmanın bedeli ağır olur.</p>
+<p>Kaynaklar</p>
+<p>[1] Enders, <em>Applied Econometric Time Series</em></p>
+<p>[2] Pfaff, <em>Analysis of Integrated and Cointegrated Time Series with R</em></p>
+<p>[3] FRED, <em>Industrial Production Index</em>, <a href="https://research.stlouisfed.org/fred2/graph/?g=1bHY" class="uri">https://research.stlouisfed.org/fred2/graph/?g=1bHY</a></p>
+<p>[4] Verbeek, <em>A Guide to Modern Econometrics</em></p>
+<p>[5] Dickey D., Fuller W., {}, 1981</p>
+</body>
+</html>

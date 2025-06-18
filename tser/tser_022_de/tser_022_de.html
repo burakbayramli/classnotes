@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="değişim-noktası-analizi-cusum-chow-test">Değişim Noktası Analizi, CUSUM, Chow Test</h1>
+<p>Değişim noktası zaman serisinin bir nokta öncesi ve sonrasında farklı karakterde olmasıdır. Bu noktaları bulmak için basit bir yaklaşım herhangi bir nokta öncesi ve sonrası zaman serisi parçalarını almak, ve önceki parçada lineer regresyon, yapıp katsayıları alıp gürültünün normalliğini kontrol etmektir. Eğer normallik varsa, katsayılar alınıp ikinci parçada kullanılır, gürültü yine normalse kopuş yoktur (aynı zaman serisi). Birincide gürültü normalliği yoksa kopuş yine yoktur, ilk parça doğru tanımlı değil. Sezonşallık benzer şekilde kontrol edilebilir, vs.</p>
+<p>Bu alanda pek cok yaklasim var. Pür istatistik bazlı bir Poisson tekniğini de [8]'de görmüştük.</p>
+<p>Chow Testi ve Yapısal Kopma (Structural Break)</p>
+<p>Diyelim ki elimizdeki bir modelin bir verinin iki parçasında değişik sonuçlar verip vermeyeceğini merak ediyoruz. Önceki regresyon örneğinde bunu tek kesi ve değişken üzerinden gördük. Peki ya model daha çetrefil olsaydı?</p>
+<p>Bu durumda Chow Testini kullanabiliriz. Bu test daha önce gördüğümüz F-testini verinin iki parçası üzerinde işletir, modelin her iki parça üzerindeki SSE değeri, yani hata karelerinin toplamı (sum of squared errors) üzerinden bir istatistik yaratır. Sıfır hipotezi katsayıların iki bölgede aynı olduğudur, ve bunun irdelenmesi modelin her iki bölgedeki varyansına bakılarak yapılır. Tersi yönde kanıt var ise faraziyeyi reddederiz, ve iki bölgenin (en azından kullandığımız model açısından) çok farklı olduğu sonucuna varırız.</p>
+<p>F-testi için kısıtlı (restricted), ve kısıtlı olmayan (unrestricted) modeli tanımlamak gerekiyor. Regresyonun her iki veri bölgesinde değişik değerlere sahip olmasına izin verirsek (yani regresyonu ayrı ayrı iki parça üzerinde işletirsek) bu kısıtlı olmayan demektir, eğer tüm veri üzerinde aynı regresyonu kullanıyorsak o zaman katsayılar değişik bölgelere göre değişemezler, bu da kısıtlı model olacaktır. Getirdiğimiz kısıtlama sayısı regresyonun kullandığı değişken sayısına eşittir. Eğer değişken sayısı <span class="math inline">\(k\)</span> veri nokta sayısı <span class="math inline">\(n\)</span> işe formül,</p>
+<p><span class="math display">\[ 
+F = \frac{SSE_r - (SSE_1 + SSE_2) / k}{(SSE_1 + SSE_2) / (n-2k)}
+ \]</span></p>
+<p>ki <span class="math inline">\(SSE_1,SSE_2\)</span> sırasıyla 1. ve 2. bölgedeki hataların kare toplamıdır, <span class="math inline">\(SSE_u = SSE_1 + SSE_2\)</span>, yani bölgelerin ayrı ayrı hesaplanan hata kare toplamının toplamı kısıtlı olmayan SSE'yi verir. <span class="math inline">\(F\)</span> rasgele değişkeni <span class="math inline">\(F_{k,n-2k}\)</span> serbestlik derecesine sahip bir F dağılımına sahiptir. Kısıtlama <span class="math inline">\(k\)</span> çünkü ikinci bölgede <span class="math inline">\(k\)</span> kadar değişkenin değişik olmasına izin vermedik.</p>
+<p>Örnek</p>
+<p>Kullanacağımız veri Amerika'daki benzin tüketimi ile alakalı, bu veri içinde aslında iki farklı periyotu kapsıyor [8, sf. 209]. 1973'e kadar dünyada petrol boldu ve dünya petrol fiyatları ya stabil ya da düşüş trendinde idi. Fakat 1973'teki ambargo piyasada büyük değişimlere sebep oldu, kıtlık başladı, fiyatlar yükseldi.</p>
+<p>Alttaki figürde benzin fiyatı (PG) ile kişi başına tüketim (per capita consumption) grafikli, ve görüldüğü gibi 1973 öncesi piyasa oldukça stabil gidiyor (kırmızı noktalar) ama sonrasında işler karışıyor (mavi noktalar).</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;gasoline.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s+&#39;</span>)
+
+plt.plot(df[df.Year<span class="op">&lt;=</span><span class="dv">1973</span>].G,df[df.Year<span class="op">&lt;=</span><span class="dv">1973</span>].Pg,<span class="st">&#39;r.&#39;</span>)
+plt.xlabel(<span class="st">&#39;G&#39;</span>)<span class="op">;</span> plt.ylabel(<span class="st">&#39;PG&#39;</span>)
+plt.plot(df[df.Year<span class="op">&gt;</span><span class="dv">1973</span>].G,df[df.Year<span class="op">&gt;</span><span class="dv">1973</span>].Pg,<span class="st">&#39;b.&#39;</span>)
+plt.savefig(<span class="st">&#39;stat_tests2_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_tests2_02.png" />
+
+</div>
+<p>1973 ve 1980'deki fiyat zıplamaları net bir şekilde görülüyor, ayrıca tüketimde de daha fazla değişkenlik / varyans mevcut. Eğer bu veriye bir model uydurmak isteseydik, aynı modelin iki ayrı bölgeye her değişken için aynı mükemmeliyette uymasını beklemek hayalcilik olurdu.</p>
+<p>Test edeceğimiz model şöyle,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">model <span class="op">=</span> <span class="st">&#39;Ln_G_Pop ~ Ln_Income_Pop + Ln_Pg + Ln_Pnc + Ln_Puc&#39;</span></code></pre></div>
+<p>Bu modeldeki fiyatlar <code>G,Pnc,Puc</code>, sırasıyla benzin, yeni araba ve kullanılmış araba fiyatları. <code>Ln_G_Pop</code>, <code>G</code> ile <code>Pop</code> (nüfus) bölünmesiyle elde ediliyor, ve <code>Ln</code> notasyonumuz log işlemi demek. <code>Income</code> ülke geliri, o da <code>Pop</code> ile bölünüyor ve log'u alınıyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df[<span class="st">&#39;Ln_G_Pop&#39;</span>] <span class="op">=</span> np.log(df.G<span class="op">/</span>df.Pop)
+df[<span class="st">&#39;Ln_Income_Pop&#39;</span>] <span class="op">=</span> np.log(df.Y<span class="op">/</span>df.Pop)
+df[<span class="st">&#39;Ln_Pg&#39;</span>] <span class="op">=</span> np.log(df.Pg)
+df[<span class="st">&#39;Ln_Pnc&#39;</span>] <span class="op">=</span> np.log(df.Pnc)
+df[<span class="st">&#39;Ln_Puc&#39;</span>] <span class="op">=</span> np.log(df.Puc)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(df.Year,df.Ln_G_Pop)
+plt.xlabel(<span class="st">&#39;Sene&#39;</span>)
+plt.ylabel(<span class="st">&#39;Ln(G/Nufus)&#39;</span>)
+plt.title(<span class="st">&#39;Amerika Benzin Tuketimi&#39;</span>)
+plt.savefig(<span class="st">&#39;stat_tests2_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_tests2_03.png" />
+
+</div>
+<p>Modeli tüm veri üzerinde işletirsek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> statsmodels.formula.api <span class="im">import</span> ols
+res_r <span class="op">=</span> ols(model, data<span class="op">=</span>df).fit()
+<span class="bu">print</span> (res_r.summary())</code></pre></div>
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               Ln_G_Pop   R-squared:                       0.969
+Model:                            OLS   Adj. R-squared:                  0.965
+Method:                 Least Squares   F-statistic:                     243.2
+Date:                Wed, 17 Nov 2021   Prob (F-statistic):           6.25e-23
+Time:                        10:06:35   Log-Likelihood:                 79.913
+No. Observations:                  36   AIC:                            -149.8
+Df Residuals:                      31   BIC:                            -141.9
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+=================================================================================
+                    coef    std err          t      P&gt;|t|      [0.025      0.975]
+---------------------------------------------------------------------------------
+Intercept        -7.7892      0.359    -21.679      0.000      -8.522      -7.056
+Ln_Income_Pop     2.1175      0.099     21.443      0.000       1.916       2.319
+Ln_Pg            -0.0979      0.028     -3.459      0.002      -0.156      -0.040
+Ln_Pnc            0.1224      0.112      1.092      0.283      -0.106       0.351
+Ln_Puc           -0.1022      0.069     -1.475      0.150      -0.243       0.039
+==============================================================================
+Omnibus:                        2.323   Durbin-Watson:                   0.891
+Prob(Omnibus):                  0.313   Jarque-Bera (JB):                1.281
+Skew:                           0.049   Prob(JB):                        0.527
+Kurtosis:                       2.081   Cond. No.                         319.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+<p>Şimdi her iki parça üzerinde ayrı ayrı regresyon işletelim, ki parçaları 1973 değeri üzerinden oluşturacağız, bu bildiğimiz bir değer ve bir anlamda bu değerin gerçekten bir kopuş noktası olup olmadığını test etmek istiyoruz, ve ardından Chow testi için gerekli değerleri hesaplıyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df_x <span class="op">=</span> df[[<span class="st">&#39;Ln_Income_Pop&#39;</span>,<span class="st">&#39;Ln_Pg&#39;</span>,<span class="st">&#39;Ln_Pnc&#39;</span>,<span class="st">&#39;Ln_Puc&#39;</span>]]
+df_y <span class="op">=</span> df[<span class="st">&#39;Ln_G_Pop&#39;</span>]
+
+<span class="bu">print</span> (<span class="bu">len</span>(df[df.Year<span class="op">&lt;=</span><span class="dv">1973</span>]), <span class="bu">len</span>(df[df.Year<span class="op">&gt;</span><span class="dv">1973</span>]))
+res1 <span class="op">=</span> ols(model, data<span class="op">=</span>df[df.Year<span class="op">&lt;</span><span class="dv">1974</span>]).fit()
+res2 <span class="op">=</span> ols(model, data<span class="op">=</span>df[df.Year<span class="op">&gt;=</span><span class="dv">1974</span>]).fit()
+S_1 <span class="op">=</span> np.<span class="bu">sum</span>(res1.resid<span class="op">**</span><span class="dv">2</span>)
+S_2 <span class="op">=</span> np.<span class="bu">sum</span>(res2.resid<span class="op">**</span><span class="dv">2</span>)
+S_r <span class="op">=</span> np.<span class="bu">sum</span>(res_r.resid<span class="op">**</span><span class="dv">2</span>)
+<span class="bu">print</span> (<span class="st">&#39;S 1 =&#39;</span>, S_1)
+<span class="bu">print</span> (<span class="st">&#39;S 2 =&#39;</span>, S_2)
+<span class="bu">print</span> (<span class="st">&#39;S_r =&#39;</span>, S_r)
+<span class="bu">print</span> (<span class="st">&#39;N =&#39;</span>, <span class="bu">len</span>(df))
+k <span class="op">=</span> df_x.shape[<span class="dv">1</span>]
+tmp1 <span class="op">=</span> (S_r<span class="op">-</span>(S_1<span class="op">+</span>S_2))<span class="op">/</span>k
+tmp2 <span class="op">=</span> (S_1<span class="op">+</span>S_2)<span class="op">/</span>(<span class="bu">len</span>(df)<span class="op">-</span><span class="dv">2</span><span class="op">*</span>k<span class="dv">-1</span>)
+F <span class="op">=</span> tmp1<span class="op">/</span>tmp2
+<span class="bu">print</span> (<span class="st">&#39;F =&#39;</span>, F)
+
+<span class="im">import</span> scipy.stats <span class="im">as</span> st
+f <span class="op">=</span> st.f(k,<span class="bu">len</span>(df)<span class="op">-</span><span class="dv">2</span><span class="op">*</span>k<span class="dv">-1</span>)
+<span class="bu">print</span> (<span class="st">&#39;p degeri =&#39;</span>, <span class="dv">1</span><span class="op">-</span>f.cdf(F))</code></pre></div>
+<pre><code>14 22
+S 1 = 0.002567339947532824
+S 2 = 0.0049117547066572
+S_r = 0.02487343626197274
+N = 36
+F = 15.698665584711588
+p degeri = 9.40286063455531e-07</code></pre>
+<p>Hesaplanan p değeri çok küçük, ve 0.05'ten daha az, demek ki hipotez reddedildi. Demek ki hakikaten 1973'te bir değişim olmuş!</p>
+<p>Paket</p>
+<p><code>pip install chow_test</code> ile kurulabilecek bir paket var [10], bu paketin kullanımı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> chow_test, pandas <span class="im">as</span> pd
+
+df <span class="op">=</span> pd.DataFrame({<span class="st">&#39;x&#39;</span>: [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">10</span>,
+                         <span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">12</span>, <span class="dv">13</span>, <span class="dv">14</span>, <span class="dv">15</span>, <span class="dv">15</span>, <span class="dv">16</span>, <span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">18</span>, <span class="dv">19</span>, <span class="dv">20</span>, <span class="dv">20</span>],
+                   <span class="st">&#39;y&#39;</span>: [<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">13</span>, <span class="dv">15</span>, <span class="dv">17</span>, <span class="dv">14</span>, <span class="dv">20</span>, <span class="dv">23</span>, <span class="dv">25</span>, <span class="dv">27</span>, <span class="dv">30</span>, <span class="dv">30</span>, <span class="dv">31</span>,
+                         <span class="dv">33</span>, <span class="dv">32</span>, <span class="dv">32</span>, <span class="dv">30</span>, <span class="dv">32</span>, <span class="dv">34</span>, <span class="dv">34</span>, <span class="dv">37</span>, <span class="dv">35</span>, <span class="dv">34</span>, <span class="dv">36</span>, <span class="dv">34</span>, <span class="dv">37</span>, <span class="dv">38</span>, <span class="dv">36</span>]})
+<span class="bu">print</span> (df)
+res <span class="op">=</span> chow_test.chow_test(df[<span class="st">&#39;y&#39;</span>], df[<span class="st">&#39;x&#39;</span>],<span class="dv">15</span>,<span class="dv">16</span>,.<span class="dv">05</span>)
+<span class="bu">print</span> (df.iloc[<span class="dv">15</span>])
+<span class="bu">print</span> (res)</code></pre></div>
+<pre><code>Reject the null hypothesis of equality of regression coefficients in the two periods.
+Chow Statistic: 37.96716203561837, P_value: 2.6531641550420204e-08
+x    10
+y    33
+Name: 15, dtype: int64
+(37.96716203561837, 2.6531641550420204e-08)</code></pre>
+<p>Değişim Noktasını Bulmak</p>
+<p>Eğer değişim anı 1973'ü bilmeseydik onu nasıl ortaya çıkartırdık? Bir yaklaşıma göre [5] tüm seneleri teker teker deneyerek Chow testini ardı ardına işletebilirdik ve elde edilen en büyük F değeri bize değişim noktasını verirdi. Bu kodu işletirsek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> statsmodels.regression.linear_model <span class="im">import</span> OLS
+<span class="im">from</span> numpy.linalg <span class="im">import</span> pinv
+
+<span class="kw">def</span> supf(y, x, p):
+    N <span class="op">=</span> y.shape[<span class="dv">0</span>]
+    <span class="bu">range</span> <span class="op">=</span> np.floor(np.array([N <span class="op">*</span> p, N <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p)]))
+    <span class="bu">range</span> <span class="op">=</span> np.arange(<span class="bu">range</span>[<span class="dv">0</span>], <span class="bu">range</span>[<span class="dv">1</span>] <span class="op">+</span> <span class="dv">1</span>, dtype<span class="op">=</span>np.int32)
+    x <span class="op">=</span> x <span class="op">-</span> np.mean(x)
+    y <span class="op">=</span> y <span class="op">-</span> np.mean(y)
+    e <span class="op">=</span> OLS(y,x).fit().resid
+    S_r <span class="op">=</span> np.<span class="bu">sum</span>(e<span class="op">**</span><span class="dv">2</span>)
+    k <span class="op">=</span> x.shape[<span class="dv">1</span>]
+    <span class="bu">print</span> (<span class="st">&#39;N =&#39;</span>,N)
+    <span class="bu">print</span> (<span class="st">&#39;k =&#39;</span>,k)
+    <span class="bu">print</span> (<span class="st">&#39;N-k =&#39;</span>,N<span class="op">-</span>k)
+    F_stat <span class="op">=</span> np.zeros(N)
+    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>:
+        X1 <span class="op">=</span> x[:t]
+        X2 <span class="op">=</span> x[t:]
+        e[:t] <span class="op">=</span> OLS(y[:t],X1).fit().resid
+        e[t:] <span class="op">=</span> OLS(y[t:],X2).fit().resid
+        R2_u <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> e.dot(e) <span class="op">/</span> y.dot(y)
+        S_u <span class="op">=</span> np.<span class="bu">sum</span>(e<span class="op">**</span><span class="dv">2</span>)
+        F_stat[t] <span class="op">=</span> ((S_r <span class="op">-</span> S_u) <span class="op">/</span> k) <span class="op">/</span> (( S_u) <span class="op">/</span> (N<span class="dv">-2</span><span class="op">*</span>k))
+    <span class="cf">return</span> F_stat.argmax(),F_stat.<span class="bu">max</span>()
+    
+p <span class="op">=</span> <span class="fl">0.2</span>
+
+idx,val <span class="op">=</span> supf(df_y, df_x, p)
+<span class="bu">print</span> (idx,val)
+<span class="bu">print</span> (<span class="st">&#39;Sene&#39;</span>, df.Year[idx])</code></pre></div>
+<pre><code>N = 36
+k = 4
+N-k = 32
+14 3.904972193103
+Sene 1974</code></pre>
+<p>Not: Sene araması için baştan ve sonda bir kısım veri atlandı, ki her iki parça için elde yeterli veri olabilsin.</p>
+<p>Not: <code>lmfit</code> hakkında bazı tavsiyeler için bkz [12] yazısı.</p>
+<p>Sonucu 1974 olarak bulduk. Fena değil!</p>
+<p>Not: Fakat şu gözlemi de eklemek gerekiyor.. p değerini nihai bir karar verici olarak kullanmak her zaman ise yaramayabilir. Dikkat edersek örneklem büyüklüğü p değeri hesabında önemli bir yer tutuyor, o sebeple veri setlerinin büyüdüğü bu günlerde p değeri her zaman çok küçük değerler gösterebilir. Her noktada F değeri hesaplayıp en büyüğünü bulmak ise yarar fakat tek bir noktaya bakıp &quot;bu nokta ayraç olarak istatistiki öneme sahip mi?'' sorusu her örneklem büyüklüğünde işlemeyebilir.</p>
+<p>Cusum</p>
+<p>Cusum yaklaşımı [5] makalesinde araştırılmış, özyineli (recursive), yani teker teker her yeni veri noktası üzerinde işlem yapan ve kopuşları o anda yakalamaya uğraşan bir yaklaşımdır. Özyineli regresyon konusunu [4]'te gördük. Bir regresyon hipotezi ile başlayıp her veri noktası geldiğinde regresyonu güncellemek, iyileştirmek mümkündür. Cusum bunu yapar aynı anda modelin gürültüsünü kontrol eder ve zaman serisinin bazı hipotezlere uyup uymadığını her defasında kontrol eder, uyum yoksa kopuş yakalanmış demektir.</p>
+<p>Faraziye şudur, normal kopuksuz bir zaman serisi her anda <span class="math inline">\(\beta_t\)</span> vektöründe katsayılara sahipse, modelden geri kalan gürültünün ortalaması (mean) sıfır olacaktır, ve her anda <span class="math inline">\(\sigma_t\)</span> varyasyonu için,</p>
+<p><span class="math display">\[
+\beta_1 = \beta_2 = ... = \beta_T = \beta
+\]</span></p>
+<p><span class="math display">\[
+\sigma_1^2 = \sigma_2^2 = ... = \sigma_T^2 = \sigma
+\]</span></p>
+<p>Yani her anda katsayılar ve gürültünün varyasyonu sabit olmalı. Cusum <span class="math inline">\(\beta_t\)</span>'deki değişimi yakalamak için ayarlanmıştır, bunu yapmak için gürültü ortalamasının sıfırdan sapmasını yakalamaya uğraşır. Detayları için Cusum makalesine danışılabilir.</p>
+<p>Alttaki kod [2]'yi temel alıyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> detect_cusum(x, threshold<span class="op">=</span><span class="dv">1</span>, drift<span class="op">=</span><span class="dv">0</span>, ending<span class="op">=</span><span class="va">False</span>, show<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span><span class="va">None</span>):
+
+    x <span class="op">=</span> np.atleast_1d(x).astype(<span class="st">&#39;float64&#39;</span>)
+    gp, gn <span class="op">=</span> np.zeros(x.size), np.zeros(x.size)
+    ta, tai, taf <span class="op">=</span> np.array([[], [], []], dtype<span class="op">=</span><span class="bu">int</span>)
+    tap, tan <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span>
+    amp <span class="op">=</span> np.array([])
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, x.size):
+        s <span class="op">=</span> x[i] <span class="op">-</span> x[i<span class="dv">-1</span>]
+        gp[i] <span class="op">=</span> gp[i<span class="dv">-1</span>] <span class="op">+</span> s <span class="op">-</span> drift  <span class="co"># cumulative sum for + change</span>
+        gn[i] <span class="op">=</span> gn[i<span class="dv">-1</span>] <span class="op">-</span> s <span class="op">-</span> drift  <span class="co"># cumulative sum for - change</span>
+        <span class="cf">if</span> gp[i] <span class="op">&lt;</span> <span class="dv">0</span>:
+            gp[i], tap <span class="op">=</span> <span class="dv">0</span>, i
+        <span class="cf">if</span> gn[i] <span class="op">&lt;</span> <span class="dv">0</span>:
+            gn[i], tan <span class="op">=</span> <span class="dv">0</span>, i
+        <span class="cf">if</span> gp[i] <span class="op">&gt;</span> threshold <span class="kw">or</span> gn[i] <span class="op">&gt;</span> threshold:  <span class="co"># change detected!</span>
+            ta <span class="op">=</span> np.append(ta, i)    <span class="co"># alarm index</span>
+            tai <span class="op">=</span> np.append(tai, tap <span class="cf">if</span> gp[i] <span class="op">&gt;</span> threshold <span class="cf">else</span> tan)  <span class="co"># start</span>
+            gp[i], gn[i] <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span>      <span class="co"># reset alarm</span>
+
+    <span class="cf">if</span> tai.size <span class="kw">and</span> ending:
+        _, tai2, _, _ <span class="op">=</span> detect_cusum(x[::<span class="op">-</span><span class="dv">1</span>], threshold, drift, show<span class="op">=</span><span class="va">False</span>)
+        taf <span class="op">=</span> x.size <span class="op">-</span> tai2[::<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> <span class="dv">1</span>
+        tai, ind <span class="op">=</span> np.unique(tai, return_index<span class="op">=</span><span class="va">True</span>)
+        ta <span class="op">=</span> ta[ind]
+        <span class="cf">if</span> tai.size <span class="op">!=</span> taf.size:
+            <span class="cf">if</span> tai.size <span class="op">&lt;</span> taf.size:
+                taf <span class="op">=</span> taf[[np.argmax(taf <span class="op">&gt;=</span> i) <span class="cf">for</span> i <span class="kw">in</span> ta]]
+            <span class="cf">else</span>:
+                ind <span class="op">=</span> [np.argmax(i <span class="op">&gt;=</span> ta[::<span class="op">-</span><span class="dv">1</span>])<span class="op">-</span><span class="dv">1</span> <span class="cf">for</span> i <span class="kw">in</span> taf]
+                ta <span class="op">=</span> ta[ind]
+                tai <span class="op">=</span> tai[ind]
+        ind <span class="op">=</span> taf[:<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> tai[<span class="dv">1</span>:] <span class="op">&gt;</span> <span class="dv">0</span>
+        <span class="cf">if</span> ind.<span class="bu">any</span>():
+            ta <span class="op">=</span> ta[<span class="op">~</span>np.append(<span class="va">False</span>, ind)]
+            tai <span class="op">=</span> tai[<span class="op">~</span>np.append(<span class="va">False</span>, ind)]
+            taf <span class="op">=</span> taf[<span class="op">~</span>np.append(ind, <span class="va">False</span>)]
+        amp <span class="op">=</span> x[taf] <span class="op">-</span> x[tai]
+
+    <span class="cf">return</span> ta, tai, taf, amp</code></pre></div>
+<p>Örnek bir zaman serisinde görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+  
+y <span class="op">=</span> np.random.randn(<span class="dv">300</span>)<span class="op">/</span><span class="dv">5</span>
+y[<span class="dv">100</span>:<span class="dv">200</span>] <span class="op">+=</span> np.arange(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">4</span><span class="op">/</span><span class="dv">100</span>)
+x <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(y))
+df <span class="op">=</span> pd.DataFrame(y,columns<span class="op">=</span>[<span class="st">&#39;y&#39;</span>])
+df[<span class="st">&#39;x&#39;</span>] <span class="op">=</span> x
+df <span class="op">=</span> df.set_index(<span class="st">&#39;x&#39;</span>)
+df.y.plot()
+plt.savefig(<span class="st">&#39;tser_022_de_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_022_de_05.png" />
+
+</div>
+<p>Bu zaman serisinde bariz kopuşlar var, yaklaşık indeks 100 anında, sonra 200 anında. Cusum ile bunları yakalamaya uğraşalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> cusum
+ta, tai, taf, amp <span class="op">=</span> cusum.detect_cusum(df.y, <span class="dv">2</span>, <span class="fl">.02</span>, <span class="va">True</span>, <span class="va">True</span>)
+
+<span class="bu">print</span> (<span class="bu">len</span>(ta))
+<span class="bu">print</span> (<span class="st">&#39;Baslangic =&#39;</span>, tai[<span class="dv">0</span>], <span class="st">&#39;Bitis =&#39;</span>, taf[<span class="dv">0</span>])</code></pre></div>
+<pre><code>2
+Baslangic = 95 Bitis = 197</code></pre>
+<p>Geri döndürülen <code>tai</code>, <code>taf</code> birer vektördür, ve sırasıyla kopuş noktasının başlangıç ve bitiş indisini verirler. Yukarıda ilk kopuşun indisini görüyoruz.</p>
+<p>Grafiklersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>)
+t <span class="op">=</span> <span class="bu">range</span>(df.y.size)
+ax.plot(t, df.y, <span class="st">&#39;b-&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>)
+<span class="cf">if</span> <span class="bu">len</span>(ta):
+    ax.plot(tai, df.y[tai], <span class="st">&#39;&gt;&#39;</span>, mfc<span class="op">=</span><span class="st">&#39;g&#39;</span>, mec<span class="op">=</span><span class="st">&#39;g&#39;</span>, ms<span class="op">=</span><span class="dv">10</span>, label<span class="op">=</span><span class="st">&#39;Start&#39;</span>)
+    ax.plot(taf, df.y[taf], <span class="st">&#39;&lt;&#39;</span>, mfc<span class="op">=</span><span class="st">&#39;g&#39;</span>, mec<span class="op">=</span><span class="st">&#39;g&#39;</span>, ms<span class="op">=</span><span class="dv">10</span>, label<span class="op">=</span><span class="st">&#39;Ending&#39;</span>)
+    ax.plot(ta, df.y[ta], <span class="st">&#39;o&#39;</span>, mfc<span class="op">=</span><span class="st">&#39;r&#39;</span>, mec<span class="op">=</span><span class="st">&#39;r&#39;</span>, mew<span class="op">=</span><span class="dv">1</span>, ms<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="st">&#39;Alarm&#39;</span>)
+    
+plt.savefig(<span class="st">&#39;tser_022_de_06.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_022_de_06.png" />
+
+</div>
+<p>Sağa dönük yeşil ok başlangıç, sola dönük bitiş demek. En tepede ikisi birbirinin üstüne bindi çünkü orada bir parça bitip diğeri başlıyor, ama olanlar gözüküyor herhalde. Kırmızı noktalar ise alarm anları olarak tanımlanmış.</p>
+<p>Kaynaklar</p>
+<p>[1] Brownlee, <em>Introduction to Time Series Modeling with Python</em></p>
+<p>[2] Github, <a href="https://raw.githubusercontent.com/BMClab/BMC/master/functions/detect_cusum.py" class="uri">https://raw.githubusercontent.com/BMClab/BMC/master/functions/detect_cusum.py</a></p>
+<p>[3] MIT, <em>OCW Single Variable Calculus, unit 5, Session 99</em>, <a href="https://ocw.mit.edu/courses/mathematics/18-01sc-single-variable-calculus-fall-2010/index.htm" class="uri">https://ocw.mit.edu/courses/mathematics/18-01sc-single-variable-calculus-fall-2010/index.htm</a></p>
+<p>[4] Bayramlı, <em>Hesapsal Bilim, Özyineli En Az Kareler</em></p>
+<p>[5] Brown, et al, <em>Techniques for Testing the Constancy of Regression Relationships over Time</em></p>
+<p>[6] Bayramlı, <em>Zaman Serileri, Sinüssel Regresyon (Sinusoidal Regression)</em></p>
+<p>[7] Bayramlı, <em>Istatistik, Testlere devam</em></p>
+<p>[8] Bayramlı, <em>Istatistik, Değişim Noktası Analizi</em></p>
+<p>[9] Woroniuk, <em>Chow test</em>, <a href="https://github.com/David-Woroniuk/chowtest" class="uri">https://github.com/David-Woroniuk/chowtest</a></p>
+<p>[10] Bobbitt, <em>How to Perform a Chow Test in Python</em>, <a href="https://www.statology.org/chow-test-in-python/" class="uri">https://www.statology.org/chow-test-in-python/</a></p>
+</body>
+</html>

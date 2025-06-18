@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="adım-ölçmek-pedometre">Adım Ölçmek, Pedometre</h1>
+<p>Cep telefonlarının çoğunda artık ivmeölçer (acceloremeter) algılayıcılar var; bu algılayıcılar telefonun <span class="math inline">\(x,y,z\)</span> eksenlerini baz alarak tüm eksenlerde ne kadar ivme etkisi olduğunu ölçüyorlar. Bu etkilerden en büyüklerinden biri tabii ki yerçekimi, telefonda hiçbir hareket olmasa bile telefonu tutuşa göre 9.8 metre / <span class="math inline">\(s^2\)</span>'lik bir ivme tek ya da tüm eksenlere dağılmış olarak ölçülecektir [4]. Yürürken, adım atarken meydana çıkan yukarı ve aşağı yönde kuvvet uygulaması da ivmeölçerlerle yakalanır. Bu ölçümleri kullanarak acaba atılan adım sayısını bulamaz mıyız? [5]'deki uygulamayı kullanarak alınan ölçümlere bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfacc <span class="op">=</span> pd.read_csv(<span class="st">&#39;acc.txt&#39;</span>,header<span class="op">=</span><span class="va">None</span>,sep<span class="op">=</span><span class="st">&#39;\s+&#39;</span>)
+<span class="bu">print</span> dfacc.head()</code></pre></div>
+<pre><code>               0         1         2         3
+0  1493818386218 -0.147100  6.972528  6.707748
+1  1493818386422 -0.215746  7.001948  6.854848
+2  1493818386610 -0.304006  7.041174  6.697942
+3  1493818386812 -0.304006  7.050981  6.884268
+4  1493818387008 -0.225553  7.011754  6.943108</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">steps1 <span class="op">=</span> np.sqrt(np.<span class="bu">sum</span>(dfacc[[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]]<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">1</span>))
+steps2 <span class="op">=</span> steps1 <span class="op">-</span> <span class="fl">9.8</span>
+steps2[:<span class="dv">200</span>].plot()
+plt.savefig(<span class="st">&#39;compscieng_app40walk_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app40walk_01.png" />
+
+</div>
+<p>Üç eksendeki ivme ölçümünün normalize ettik (karelerinin toplamının karekökü),</p>
+<p><span class="math display">\[ r = \sqrt{r_x^2 + r_y^2 + r_z^2}\]</span></p>
+<p>Daha önce belirtildiğimiz gibi telefonun duruşu değişik şekillerde olabilir, ve yerçekiminde olduğu gibi bu ölçümler üç eksene dağılmış olacaktır. Bu üç ölçümü birleştirerek esas bizi ilgilendiren hesaba daha yaklaşmış olmayı umduk.</p>
+<p>Sonuçlar fena değil, baştaki sıfıra yakın bölgede hiç hareket etmiyorduk mesela, ve ivme hesabı burada ufak bir değer gösteriyor. Yapılan bir ek işlemden daha bahsedelim, 9.8'lik yerçekimi ivmesini karekökten çıkarttık çünkü yerçekimini ölçmekle de ilgilenmiyoruz (hep aynı zaten), bu değeri çıkartarak yine bizi ilgilendiren veriyi daha net şekilde görebileceğimizi umduk. Altta bu çıkartma öncesi ve sonrasında yapılan Fourier analizine göre yerçekimi çıkartılmış verinin ilgilendiğimiz frekansları daha net gösterdiği belli oluyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../compscieng_1_32&#39;</span>)
+<span class="im">import</span> filt
+f<span class="op">=</span>plt.figure()
+filt.plotSpectrum(steps1, <span class="dv">6</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_02.png&#39;</span>)
+f<span class="op">=</span>plt.figure()
+filt.plotSpectrum(steps2, <span class="dv">6</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_06.png&#39;</span>)</code></pre></div>
+<p><img src="compscieng_app40walk_02.png" /> <img src="compscieng_app40walk_06.png" /></p>
+<p>1 Hz. ve 2 Hz. seviyesindeki frekanslar ilginç, bunlar saniyede bir ve iki adıma tekabül ediyor olmalılar.</p>
+<p>Adım saymak için zaman serilerinde tepe / uç nokta bulabilen kodlar kullanacağız, <code>peakutils</code> altında bu kodları görüyoruz; bu kodlarla belli eşik, minimum mesafe değerlerini belirleyerek bir zaman serisindeki uç noktaları bulabiliyoruz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> peakutils
+idx <span class="op">=</span> peakutils.indexes(steps2, thres<span class="op">=</span><span class="fl">0.1</span>, min_dist<span class="op">=</span><span class="dv">3</span>)
+<span class="bu">print</span> <span class="bu">len</span>(idx), <span class="st">u&#39;tepe noktası var&#39;</span>
+plt.plot(steps2)
+plt.plot(idx,steps2[idx],<span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_03.png&#39;</span>)</code></pre></div>
+<pre><code>89 tepe noktası var</code></pre>
+<p>Bu noktaların alt bölümü de var tabii, bu nihai sayı için üstteki sonucu iki ile çarpabiliriz. Hesap fena değil, bu deney için 170 adım atmıştık.</p>
+<div class="figure">
+<img src="compscieng_app40walk_03.png" />
+
+</div>
+<p>Tepe bulmaktaki farklı parametre etkilerini de gösterelim. Önce gürültülü, iki büyük tepeden oluşan bir yapay veri üretelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> peakutils
+np.random.seed(<span class="dv">0</span>)
+centers <span class="op">=</span> (<span class="fl">30.5</span>, <span class="fl">72.3</span>)
+x <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">120</span>, <span class="dv">121</span>)
+y <span class="op">=</span> peakutils.gaussian(x, <span class="dv">5</span>, centers[<span class="dv">0</span>], <span class="dv">3</span>) <span class="op">+</span> <span class="op">\</span>
+    peakutils.gaussian(x, <span class="dv">7</span>, centers[<span class="dv">1</span>], <span class="dv">10</span>) <span class="op">+</span> <span class="op">\</span>
+    np.random.rand(x.size)</code></pre></div>
+<p>Şimdi farklı parametrelerle tepe noktalarını bulalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.figure()
+plt.plot(x, y)
+indexes <span class="op">=</span> peakutils.indexes(y, thres<span class="op">=</span><span class="fl">0.5</span>, min_dist<span class="op">=</span><span class="dv">30</span>)
+plt.plot(x[indexes], y[indexes], <span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_04.png&#39;</span>)
+plt.figure()
+plt.plot(x, y)
+indexes <span class="op">=</span> peakutils.indexes(y, thres<span class="op">=</span><span class="fl">0.5</span>, min_dist<span class="op">=</span><span class="dv">3</span>)
+plt.plot(x[indexes], y[indexes], <span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_05.png&#39;</span>)
+plt.figure()
+plt.plot(x, y)
+indexes <span class="op">=</span> peakutils.indexes(y, thres<span class="op">=</span><span class="fl">0.1</span>, min_dist<span class="op">=</span><span class="dv">5</span>)
+plt.plot(x[indexes], y[indexes], <span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_07.png&#39;</span>)</code></pre></div>
+<p><img src="compscieng_app40walk_04.png" /> <img src="compscieng_app40walk_05.png" /> <img src="compscieng_app40walk_07.png" /></p>
+<p>Parametre <code>thres</code> dikey bir eşik değeri tanımlıyor, en yüksek nokta 1.0 olacak şekilde. Mesela yarım seviyede minimal bir yükseklik eşik değeri 0.5 ile tanımlanabilir, o zaman sadece bu değer üstündeki noktalar tepe olarak saptanacaktır. Yatay yönde ama bu sefer reel değer bazlı bir eşik değeri <code>min_dist</code> ile verilir, bu durumda tepe noktaları arasında en az bu kadar mesafe olması gerekir.</p>
+<p>Yürüyüş Yönünü Bulmak</p>
+<p>Cep telefonuyla, telefon hangi konumda olursa olsun (cepte, çantada, elde) hangi yöne yürüdüğümüzü nasıl buluruz? Bilim kurgu filmleri biz izleyicileri biraz şımarttı aslında -zamanda seyahat, istediği yere inen uzay gemileri, ışıktan hızlı seyahat- fakat cep telefonu ile yürüyüş yönünü hesaplamak 2014 civarına kadar hala tam, genel bir şekilde çözülmüş değildi. GPS işe yaramıyor mu? GPS kesin çözüm olabilirdi çünkü dünya üzerinde global kordinatları direk cihaza alıyoruz ve ardı ardına alınan ölçümler bir gidiş yönünü gösteriyor olurdu, fakat GPS şehir ortamında binalardan sinyal yansıması (multipath) problemi sebebiyle herhangi bir yönde birkaç yüz metre hatalı olabiliyor, ve kapalı alanlarda zaten hiç GPS sinyali alamıyoruz. Başka bir yöntemi kullanmamız gerekiyor.</p>
+<p>Daha önce adım sayısında olduğu gibi ivmeölçer kullanımı akla gelecektir, ivmeölçer önemli, fakat bu algılayıcıların kaydettikleri veri yürüyüş sırasında pek çok diğer hareket ile karışmış halde. Sallanma, aşağı yukarı gidiş geliş gibi. Ayrıca ivmeölçerin kaydettiği telefon bazlı bir eksen sistemine göredir, bu sistem</p>
+<div class="figure">
+<img src="compscieng_app40walk_08.png" />
+
+</div>
+<p>Eğer telefonun ekranı bana tam dönük, yere dik şekilde tutup yürürsem ivmeölçer y kordinatında daha yüksek değerler kaydediyor mesela. Bu bilgiyi alıp telefonun bir diğer algılayıcısı elektronik pusula / manyetometre (magnetometer) üzerinden bir global yön bilgisine belki çevirebilirim, fakat pusula da tam güvenli değil, bu birleştirmeyi dikkatli yapmak lazım.</p>
+<p>Birleştirme için Android ortamında rotasyon matrisi [3] bazlı bir yöntemi tavsiye edenler var; bu yönteme göre ivmeölçer ve pusula birleştirilip kamera kordinat sistemini dünya kordinat sistemine tercüme edecek bir matris hesaplanıyor. Fakat bu hesap hareketli ortamda tam güvenilir değil, ayrıca hesaplanan çok boyutlu bir ürün. Bu tür girift ara ürünler nihai çözümdeki hata ihtimalini daha arttırır, bize gereken tek bir yön sadece, <em>tüm</em> üç boyutlu eksenin bir diğer üç boyutlu eksene direk eşlemesine ihtiyaç yok. Bir diğer problem bu hesabın nasıl kullanılacağı... Mesela ivme hesaplarını rotasyon matrisi ile dünya kordinat sistemine çevirdik, şimdi kuzey-güney doğu-batı bağlamında ivlenmeyi &quot;biliyoruz''. Bu ivmelenmeyi bir kere sayısal entegrasyon ile hıza çevirip oradan yön elde edebilir miyiz? Ne yazık ki entegrasyon hassas bir hesaptır. Eğer olmayan yerde birkaç saniye bile fazla ivme ölçümü almışsak, hızda, yönde aşırı farklılıklar ortaya çıkabiliyor.</p>
+<p>Daha sağlam çözüm için yürüyüşün ivmeölçere nasıl yansıdığını yakından incelemek gerekiyor, ki [1, 2]'deki araştırma aynen bunu yapmış.</p>
+<p>Not: Bu alanda bir diğer yaklaşım veri bilimi, yapay öğrenim yaklaşımı. Eğer elde yeterince veri varsa, ham veri ve yürünen yön olarak, bu veriler denetimli eğitimde bir yapay öğrenme algoritmasina verilir ve algoritma aradaki ilişkiyi öğrenir. Hangi yaklaşımın nerede yeterli, kuvvetli olacağını anlamak tecrübeye bağlı. Bazen problemi elden geldiği kadar matematiksel olarak modellemek, temel fiziksel kavramlardan başlayarak tanımlamak daha iyi olur, bazen diğer yaklaşım daha kolay olabilir.</p>
+<p>[1]'e göre insan yürüyüşü belli bölgelere ayrılabilir ve her bölgenin ivmeölçerde farklı bir yansıması vardır. İki büyük bölge duruş ve sallanış denebilecek konumlar; duruşta (aslında tam duruş değil, fakat senkronize hareket) bacak ve üst gövde aynı anda öne doğru gitmekte, sallanış ise bir bacağın arkadan öne doğru itilmesiyle üst gövdeden öne geçme anı.</p>
+<div class="figure">
+<img src="compscieng_app40walk_13.png" />
+
+</div>
+<p>Sallanış bölgesinin ilk kısmında ivme pozitif, ikinci kısmında ise negatif. Ayrıca, diyelim ki sallanış <span class="math inline">\(t_1,..,t_9\)</span> zaman kesitlerini kapsıyor, ivme <span class="math inline">\(t_3\)</span>'te maksimum, <span class="math inline">\(t_5\)</span>'te sıfır, ve geriye doğru ters ivme (deceleration) <span class="math inline">\(t_7\)</span>'de en üst noktasında.</p>
+<p>Araştırmanın en önemli bulgusu şudur: güvenli bir şekilde ivmeölçere yansıyan ve yürüyüş yönü bilgisini taşıyan en iyi veri bölgesi topuk vuruşuna giden maksimum yavaşlamanın olduğu bir bölgedir, bunun için [1] önce ivme sinyalinde aşırı yüksek frekanslı sinyalleri eler, ardından sıfır geçiş anlarını bulur - bu noktalar sinyalin artıdan eksiye doğru geçiş yaptığı anlardır. Ardından sıfır geçiş ve tepe noktaları arasındaki topuk vuruşuna en yakın bölgeye odaklanılır, ve bu kesit çıkartılarak bütün üç eksenler üzerinden o bölgedeki ortalama alınır. Bu ortalama telefonun tüm eksenlerindeki ivme ölçüsü olacaktır, sonuç üç boyutlu bir vektör. Vektörün işaretini tersine çevirirsek (yavaşlama yönünün tersi) bu bize yürüyüş yönünü verecektir. Tekrar vurgulayalım, negatiflik, pozitiflik, sıfır geçiş irdelemeleri birleştirilmiş ivme verisinde, aranan bölge bulununca o bölgedeki ortalama üç eksendeki ivme verisinde hesaplanır.</p>
+<p>Alttaki kodda bizim [5]'teki uygulama <em>Steps</em>'i kullanarak kaydettiğimiz verilerle yürüyüş yönü hesabını görüyoruz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, health
+<span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+<span class="bu">dir</span> <span class="op">=</span> <span class="st">&#39;./data/pots1/&#39;</span>
+dfacc <span class="op">=</span> pd.read_csv(<span class="bu">dir</span> <span class="op">+</span> <span class="st">&#39;lacc.txt&#39;</span>,header<span class="op">=</span><span class="va">None</span>,sep<span class="op">=</span><span class="st">&#39;\s+&#39;</span>)
+fr<span class="op">=</span><span class="dv">100</span><span class="op">;</span> to<span class="op">=</span><span class="dv">250</span>
+dfacc <span class="op">=</span> np.array(dfacc)[fr:to]
+t <span class="op">=</span> dfacc[:,<span class="dv">0</span>] <span class="op">/</span> <span class="fl">1e9</span>
+ax <span class="op">=</span> dfacc[:,<span class="dv">1</span>]
+ay <span class="op">=</span> dfacc[:,<span class="dv">2</span>]
+az <span class="op">=</span> dfacc[:,<span class="dv">3</span>]
+data <span class="op">=</span> np.<span class="bu">abs</span>(ax) <span class="op">+</span> np.<span class="bu">abs</span>(ay) <span class="op">+</span> np.<span class="bu">abs</span>(az)
+
+sample_rate <span class="op">=</span> <span class="fl">25.0</span> <span class="co"># orneklem orani</span>
+cutoff <span class="op">=</span> <span class="fl">5.0</span> <span class="co"># kac Hz yukarisini eleyelim</span>
+threshold <span class="op">=</span> <span class="fl">0.1</span> <span class="co"># esik degeri</span>
+order<span class="op">=</span><span class="dv">4</span> <span class="co"># butterworth filtresinin derecesi</span>
+<span class="co"># sallanis bolumunu kac kesite bolelim (ki ilgilendigimiz son kesit). </span>
+<span class="co"># [1]&#39;e gore 4, altta 8 parcaya boluyoruz.</span>
+stride_fraction <span class="op">=</span> <span class="fl">1.0</span><span class="op">/</span><span class="fl">8.0</span> 
+
+<span class="co"># Tum eksenlerdeki degerleri pozitifle ve topla</span>
+data <span class="op">=</span> np.<span class="bu">abs</span>(ax) <span class="op">+</span> np.<span class="bu">abs</span>(ay) <span class="op">+</span> np.<span class="bu">abs</span>(az)
+
+<span class="co"># ortalamayi cikar</span>
+data <span class="op">-=</span> np.mean(data)
+
+<span class="co"># Veri uzerinde alcak geciren (low-pass) Butterworth filtre islet,</span>
+<span class="co"># esik noktasi  5 Hz. Bu cok alcak bir deger degil, Huseyin Bolt bile </span>
+<span class="co"># saniyede 5 adimdan fazla atmiyordur herhalde</span>
+filtered <span class="op">=</span> health.butter_lowpass_filter(data, sample_rate, cutoff, order)
+
+<span class="co"># Pozitiften negatife gecis noktalarini bul</span>
+transitions <span class="op">=</span> health.crossings_nonzero_pos2neg(filtered)
+
+f<span class="op">=</span>plt.figure()
+plt.plot(filtered)
+plt.plot(transitions,filtered[transitions],<span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_09.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app40walk_09.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">strike_indices_smooth <span class="op">=</span> []
+filter_threshold <span class="op">=</span> np.<span class="bu">abs</span>(threshold <span class="op">*</span> np.<span class="bu">max</span>(filtered))
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, np.size(transitions)):
+    segment <span class="op">=</span> <span class="bu">range</span>(transitions[i<span class="dv">-1</span>], transitions[i])
+    imax <span class="op">=</span> np.argmax(filtered[segment])
+    <span class="cf">if</span> filtered[segment[imax]] <span class="op">&gt;</span> filter_threshold:
+        strike_indices_smooth.append(segment[imax])
+
+f<span class="op">=</span>plt.figure()
+plt.plot(filtered)
+plt.plot(strike_indices_smooth,filtered[strike_indices_smooth],<span class="st">&#39;rd&#39;</span>)
+plt.plot(transitions,filtered[transitions],<span class="st">&#39;gx&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_10.png&#39;</span>)
+
+<span class="co"># Tepe noktalari arasinda kac veri noktasi oldugunu FFT&#39;nin reel kismini </span>
+<span class="co"># kullanarak hesapla</span>
+interpeak <span class="op">=</span> health.compute_interpeak(data, sample_rate)
+decel <span class="op">=</span> np.<span class="bu">int</span>(interpeak <span class="op">/</span> <span class="dv">2</span>)
+
+<span class="co"># Puruzlestirilmis verinin maksimum noktalarina yakin olan maksimum</span>
+<span class="co"># noktalarini bul</span>
+strike_indices <span class="op">=</span> []
+<span class="cf">for</span> ismooth <span class="kw">in</span> strike_indices_smooth:
+    istrike <span class="op">=</span> np.argmax(data[ismooth <span class="op">-</span> decel:ismooth <span class="op">+</span> decel])
+    istrike <span class="op">=</span> istrike <span class="op">+</span> ismooth <span class="op">-</span> decel
+    strike_indices.append(istrike)
+
+strikes <span class="op">=</span> np.asarray(strike_indices)
+strikes <span class="op">-=</span> strikes[<span class="dv">0</span>]
+strikes <span class="op">=</span> strikes <span class="op">/</span> sample_rate
+
+f<span class="op">=</span>plt.figure()
+plt.plot(data)
+plt.plot(strike_indices,data[strike_indices],<span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app40walk_11.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app40walk_10.png" />
+
+</div>
+<div class="figure">
+<img src="compscieng_app40walk_11.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">decel <span class="op">=</span> np.<span class="bu">int</span>(np.<span class="bu">round</span>(stride_fraction <span class="op">*</span> interpeak))
+
+<span class="co"># ters ivmenin oldugu bolgede ortalama al, sonuc uc boyutlu vektor</span>
+vectors <span class="op">=</span> []
+<span class="cf">for</span> ipeak <span class="kw">in</span> strike_indices:
+    decel_vectors <span class="op">=</span> np.asarray([[ax[i], ay[i], az[i]]
+                                <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ipeak <span class="op">-</span> decel, ipeak)])
+    vectors.append(np.mean(decel_vectors, axis<span class="op">=</span><span class="dv">0</span>))
+
+<span class="co"># ve isareti tersine cevir</span>
+direction <span class="op">=</span> <span class="dv">-1</span> <span class="op">*</span> np.mean(vectors, axis<span class="op">=</span><span class="dv">0</span>)
+
+<span class="co"># Birim vektor haline getir / normalize et</span>
+direction <span class="op">/=</span> np.sqrt(direction.dot(direction))
+
+<span class="bu">print</span> <span class="st">u&#39;yürüyüş yönü&#39;, direction</span></code></pre></div>
+<pre><code>yürüyüş yönü [ 0.24212494 -0.25265038  0.93677281]</code></pre>
+<p>Pusula</p>
+<p>Yürüyüş yönünü telefon eksenleri bazlı saptadık, peki bu yön dünyada nereyi gösteriyor? Pusulayı kullabiliriz, cep telefonları pusula algılayıcısı ile kuzey manyetik etkisinin telefon eksenlerine ne kadar etki ettiğini kaydedebiliyor, yani bu üç eksenden alınan üç veri noktası bir vektör olarak telefon kordinat sisteminde kuzeyin neresi olduğuna işaret edecektir.</p>
+<p>Son durum şöyle, bir telefonun standart elde tutuluş tarzını baz alalım, ve iki örnek vektör alttaki gibi olsun,</p>
+<div class="figure">
+<img src="compscieng_app40walk_14.png" />
+
+</div>
+<p>Güzel, şimdi pusula ve yürüyüş vektörlerini kullanarak kuzeye göre gidiş yönünü bulalım. Üstteki vektörlerin üç boyutlu olduğuna dikkat, eğer yürüyüş yönü ve kuzey vektörü arasında direk açı hesaplamaya uğraşsak, diyelim biri çok yukarıda diğeri çok aşağıda ama yeryüzü bazında doğu-batı temelli çok az farklı olan iki vektör arasında çok büyük açı ortaya çıkabilirdi. Bize aslında gereken sadece kuzeye göre nasıl hareket ettiğimizi verecek &quot;yataysal'' bir açı. Şimdi işimizi kolaylaştıracak bir yeni kavramı daha kullanabiliriz: yerçekim vektörü.</p>
+<p>Yerçekim ivmeölçerler tarafından sürekli kaydedilir, yerçekimi müthiş bir kuvvettir, 9.8 <span class="math inline">\(m/s^2\)</span> ile sürekli üzerimizde etkisi var. Bunun iyi tarafı telefonlar bu kuvveti, ve onun yönünü bir vektör olarak güvenilir bir şekilde hesaplayabilirler. Hatta Android'in bu vektörü ivme verisinden çıkartan bir &quot;türevsel algılayıcısı'' bile var. Yerçekim vektör algılayıcısı (gravity vector sensor) hızlı bir şekilde bu hesabı veriyor. Telefon hangi konumda olursa olsun yerçekimin, yine telefon kordinatlarına göre, hangi yönde olduğunu gösteriyor.</p>
+<p>Yerçekim vektörünün faydası şurada: bu vektörün normal olduğu düzlemi hayal edersek, bu üzerinde durduğumuz yeryüzeyi olacaktır! Ve, eğer pusula ve yürüyüş yönü vektörlerini bu düzlem üzerine yansıtırsak, artık bu iki vektör arasındaki açıyı bulmak çok basittir. Yansıtma için bkz [6]. Açı hesabı için iki vektor arasındaki şu ilişkiyi hatırlayalım,</p>
+<p><span class="math display">\[ \cos \theta = \frac{u \cdot v}{||u||||v|||}\]</span></p>
+<p>Açı için,</p>
+<p><span class="math display">\[ \theta = \arccos \frac{u \cdot v}{||u||||v|||}\]</span></p>
+<p><img src="compscieng_app40walk_15.png" /> <img src="compscieng_app40walk_12.png" /></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> proj(u, n):
+    <span class="cf">return</span> u <span class="op">-</span> (np.dot(u,n) <span class="op">/</span> np.dot(n,n)) <span class="op">*</span> n
+
+dfmag <span class="op">=</span> pd.read_csv(<span class="bu">dir</span> <span class="op">+</span> <span class="st">&#39;mags.txt&#39;</span>,header<span class="op">=</span><span class="va">None</span>,sep<span class="op">=</span><span class="st">&#39;\s+&#39;</span>)
+dfmag <span class="op">=</span> np.array(dfmag)
+dfmag <span class="op">=</span> dfmag[fr:to,<span class="dv">1</span>:].mean(axis<span class="op">=</span><span class="dv">0</span>)
+<span class="bu">print</span> <span class="st">u&#39;kuzey yönü&#39;, dfmag</span>
+
+<span class="st">dfg = pd.read_csv(dir + &#39;</span>grav.txt<span class="st">&#39;,header=None,sep=&#39;</span><span class="op">\</span>s<span class="op">+</span><span class="st">&#39;)</span>
+<span class="st">dfg = np.array(dfg)</span>
+<span class="st">dfg = dfg[fr:to,1:].mean(axis=0)</span>
+<span class="st">print u&#39;</span>yerçekim vektörü&#39;, dfg
+
+pmag <span class="op">=</span> proj(dfmag, dfg)
+<span class="bu">print</span> <span class="st">u&#39;kuzey vektörü yeryüzeyinde yansıtma sonrası&#39;</span>
+<span class="bu">print</span> pmag
+
+pwdir <span class="op">=</span> proj(direction, dfg)
+pwdir <span class="op">=</span> pwdir <span class="op">/</span> lin.norm(pwdir)
+<span class="bu">print</span> <span class="st">u&#39;yürüyüş yönü yansıtma sonrası&#39;</span>
+<span class="bu">print</span> pwdir
+a <span class="op">=</span> np.arccos(np.dot(pwdir, pmag) <span class="op">/</span> (lin.norm(pwdir)<span class="op">*</span>lin.norm(pmag)))
+<span class="bu">print</span> <span class="st">u&#39;Açı&#39;</span>, np.rad2deg(a)
+<span class="bu">print</span> <span class="st">u&#39;Açı 180 den az mi?&#39;</span>, np.dot(dfg, np.cross(pmag, pwdir)) <span class="op">&gt;</span> <span class="dv">0</span></code></pre></div>
+<pre><code>kuzey yönü [-41.02575884  16.51051212  -2.29159006]
+yerçekim vektörü [ 0.70329063  3.60535991  9.0586454 ]
+kuzey vektörü yeryüzeyinde yansıtma sonrası
+[-41.098733    16.13641625  -3.23152448]
+yürüyüş yönü yansıtma sonrası
+[ 0.30343773 -0.89316924  0.33192509]
+Açı 129.15898241
+Açı 180 den az mi? True</code></pre>
+<p>Bu yön hakikaten doğru, ölçüm alırken aşağı yukarı o yönde yürüyorduk.</p>
+<p>Not: 180 dereden azlık irdelemesinin mantığı için bkz [6].</p>
+<p>Üstteki kodun kullandığı yardımcı kodlar alttadır,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># http://github.com/sage-bionetworks/mhealthx baz alinmistir</span>
+<span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">from</span> scipy.fftpack <span class="im">import</span> rfft, fftfreq
+<span class="im">from</span> scipy.signal <span class="im">import</span> butter, lfilter
+
+<span class="kw">def</span> crossings_nonzero_pos2neg(data):
+    <span class="co"># sifir gecislerini burada hesapla</span>
+    pos <span class="op">=</span> data <span class="op">&gt;</span> <span class="dv">0</span>
+    crossings <span class="op">=</span> (pos[:<span class="op">-</span><span class="dv">1</span>] <span class="op">&amp;</span> <span class="op">~</span>pos[<span class="dv">1</span>:]).nonzero()[<span class="dv">0</span>]
+    <span class="cf">return</span> crossings
+
+<span class="kw">def</span> butter_lowpass_filter(data, sample_rate, cutoff<span class="op">=</span><span class="dv">10</span>, order<span class="op">=</span><span class="dv">4</span>):
+    nyquist <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> sample_rate
+    normal_cutoff <span class="op">=</span> cutoff <span class="op">/</span> nyquist
+    b, a <span class="op">=</span> butter(order, normal_cutoff, btype<span class="op">=</span><span class="st">&#39;low&#39;</span>, analog<span class="op">=</span><span class="va">False</span>)
+    y <span class="op">=</span> lfilter(b, a, data)
+    <span class="cf">return</span> y
+
+<span class="kw">def</span> compute_interpeak(data, sample_rate):
+    freqs <span class="op">=</span> fftfreq(data.size, d<span class="op">=</span><span class="fl">1.0</span><span class="op">/</span>sample_rate)
+    f_signal <span class="op">=</span> rfft(data)
+    imax_freq <span class="op">=</span> np.argsort(f_signal)[<span class="op">-</span><span class="dv">2</span>]
+    freq <span class="op">=</span> np.<span class="bu">abs</span>(freqs[imax_freq])
+    <span class="co"># tepe noktalari arasindaki veri nokta sayisi</span>
+    interpeak <span class="op">=</span> np.<span class="bu">int</span>(np.<span class="bu">round</span>(sample_rate <span class="op">/</span> freq))
+
+    <span class="cf">return</span> interpeak</code></pre></div>
+<p>Görüldüğü gibi bu hesap çok hassas ölçümlere dayanarak yapılmadı. Yürüyüş yönü için [1] araştırması veride yürüyüşün en çok iz bıraktığı bölgeye odaklanıyor, ve gürültüyü eleyip belli kesitler çıkartarak bir ortalama alıyor. Bu sağlam bir hesap. Pusula ölçümleri için de yaklaşım öyle, telefondan telefona, markadan markaya göre bir eksendeki ölçüm 20 mikrotesla yerine 40 mikrotesla gelebilir, fakat bu tür bir fark hesapta savrulma yaratacaksa yaklaşımımız sağlam değil demektir. Fakat hesaplar vektörsel, ama ölçümdeki değişiklik, hata her ne ise, <em>tutarlı</em> ise vektörün tüm öğelerinde mevcut olacaktır, ve vektörün yönünde değişiklik olmayacaktır. Vektörler, düzlemler, tek açılar ile iş yaparak, tek bir amaca odaklı algılayıcıların verisine güvenerek ve onları bir araya getirerek işimizi kolaylaştırmış olduk.</p>
+<p>Önemli bir diğer özellik üstteki yaklaşım telefon hangi konumda olursa olsun işlemesi. Bu çok faydalı çünkü telefon cebimizde, çantada herhangi bir şekilde duruyor olabilir, fakat şimdiye kadar gördüğümüz tüm vektörleri hesapladığımız anda kuzeye referanslı hangi yönde yürüdüğümüzü kolaylıkla bulabiliriz.</p>
+<p>Kaynaklar</p>
+<p>[1] Roy, <em>WalkCompass: Finding Walking Direction Leveraging Smartphone's Inertial Sensors</em>, <a href="http://scholarcommons.sc.edu/etd/2352/" class="uri">http://scholarcommons.sc.edu/etd/2352/</a></p>
+<p>[2] Roy, <em>I am a Smartphone and I can Tell my User's Walking Direction</em>, <a href="http://synrg.csl.illinois.edu/papers/walkcompass.pdf" class="uri">http://synrg.csl.illinois.edu/papers/walkcompass.pdf</a></p>
+<p>[3] Google, <em>Position Sensors</em>, <a href="https://developer.android.com/guide/topics/sensors/sensors_position.html" class="uri">https://developer.android.com/guide/topics/sensors/sensors_position.html</a></p>
+<p>[4] Daskalov, <em>A Pedometer in the Real World</em>, <a href="http://www.aosabook.org/en/500L/a-pedometer-in-the-real-world.htm" class="uri">http://www.aosabook.org/en/500L/a-pedometer-in-the-real-world.htm</a></p>
+<p>[5] Bayramlı, <em>Algılayıcı Ölçümleri, Video, Android</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2017/02/algilayici-olcumleri-video-android.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2017/02/algilayici-olcumleri-video-android.html</a></p>
+<p>[6] Bayramlı, Lineer Cebir, <em>Ders 15</em></p>
+</body>
+</html>

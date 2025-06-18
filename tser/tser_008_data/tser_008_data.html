@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="zaman-serisi-veri-analizi">Zaman Serisi Veri Analizi</h1>
+<p>Daha fazla ilerlemeden bu yazıda bazı veri işlem numaraları göreceğiz.</p>
+<p>Durağanlık</p>
+<p>Yapay Öğrenim (machine learning) ya da diğer istatistiki tahminsel yaklaşımlar çoğunlukla işledikleri verinin durağan olmasının beklerler [1]. Durağanlık zaman serisindeki her veri noktasının diğerleri ile aynı dağılıma sahip olması demektir. Bu durum yoksa algoritmalar iyi çalışmayabilir. Zaman serilerinde durağanlık olmaması pek çok kez ortaya çıkar; serilerde bazen sezonsallık vardır, bazen trend mevcuttur vs. O zaman durağan olmayan serileri durağan hale getirmek zaman serisi analizinde önemli bir kabiliyettir.</p>
+<p>Şimdi alttaki resimlere bakalım ve hangisinin durağan olduğunu tahmin etmeye uğraşalım.</p>
+<div class="figure">
+<img src="tser_008_data_01.png" />
+
+</div>
+<p>Durağan serilerin sabit varyansı olduğuna göre a,c,e,f ve i resimlerini atabiliriz. Bu seriler ya net bir yukarı ya da aşağı trend içeriyorlar ya da seviyelerde değişim var, mesela f örneğindeki gibi.</p>
+<p>d ve h içinde sezonsal kalıplar var, onları da atıyoruz. Ya peki g? Sanki sezonsal bir kalıp varmış gibi duruyor fakat bu doğru değil. Bu seri doğadaki bir canlının nüfusunu gösteriyor, yiyecek azalınca canlılar azalıyor, yiyecek varsa nüfus artıyor, bu tür tekrar eden bir süreç sezonsallıkla aynı şey değil. Sezonsallık varsa herhangi bir zaman diliminde ne olacağını kesinlikle biliyoruz. Kıyasla nüfus artış azalış tekrarı tahmin edilebilir değil.</p>
+<p>O zaman eldeki tek durağan seri b ve g.</p>
+<p>Testler</p>
+<p>Durağanlığı bulmak için bazı istatistiki testler var, bu testlere birim kök (unit root) testleri adı veriliyor, en popüleri olanı eklemlenmiş Dickey-Fuller testi. Bu teste göre sıfır hipotezi serinin durağan olmadığıdır, o zaman bu hipotez reddedilirse, mesela 0.05, ya da 0.01'den az bir p-değeri elde edilirse, bu demektir ki elde bir durağan seri var.</p>
+<p>Örnek olarak elmas verisine bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> seaborn <span class="im">as</span> sns
+<span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller
+diamonds <span class="op">=</span> sns.load_dataset(<span class="st">&quot;diamonds&quot;</span>)
+test_results <span class="op">=</span> adfuller(diamonds[<span class="st">&quot;price&quot;</span>])
+<span class="bu">print</span>(<span class="ss">f&quot;ADF test statistic: </span><span class="sc">{</span>test_results[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">&quot;</span>)
+<span class="bu">print</span>(<span class="ss">f&quot;p-value: </span><span class="sc">{</span>test_results[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">&quot;</span>)
+<span class="bu">print</span>(<span class="st">&quot;Critical thresholds:&quot;</span>)
+<span class="cf">for</span> key, value <span class="kw">in</span> test_results[<span class="dv">4</span>].items():
+    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\t</span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>value<span class="sc">}</span><span class="ss">&quot;</span>)</code></pre></div>
+<pre><code>ADF test statistic: -8.11493066831561
+p-value: 1.1980457313375998e-12
+Critical thresholds:
+    1%: -3.430471308341908
+    5%: -2.8615936158814588
+    10%: -2.566798537945544</code></pre>
+<p>p-değerine bakıyoruz, neredeyse sıfır. O zaman H0 reddedildi, seri durağan.</p>
+<p>Şimdi büyük ihtimalle durağan olmayan bir seriye bakalım, Apple şirketinin hisse senet fiyati bu,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;AAPL.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+df.plot()
+plt.savefig(<span class="st">&#39;tser_008_data_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_008_data_04.png" />
+
+</div>
+<p>Şeride açık bir yukarı doğru trend var. Test edelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">adfuller(df)[<span class="dv">1</span>]</code></pre></div>
+<pre><code>Out[1]: 0.9069640607490215</code></pre>
+<p>Sıfırdan çok uzak bir p-değeri bu, demek ki seri durağan değil.</p>
+<p>Bir seriyi durağan hale getirmek için kullanılan en basit yöntem fark almaktır, yani serideki her veri noktasını bir öncekinden çıkartmak. Mesela üstteki AAPL senet verisi için bunu yaparsak ve testi tekrar uygularsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+d1 <span class="op">=</span> df.diff().dropna()
+d1.plot()
+plt.savefig(<span class="st">&#39;tser_008_data_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_008_data_03.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller
+adfuller(d1)[<span class="dv">1</span>]</code></pre></div>
+<pre><code>Out[1]: 9.132206809895503e-19</code></pre>
+<p>p-değeri çok küçük, demek ki farkı alınmış seri durağan hale geldi.</p>
+<p>Peki fark alarak hangi matematiksel işlemi uygulamış oluyoruz? Bu işlemin ne olduğunu görmek zor değil, fark alma işlemlerini bir türevin yaklaşık hali olarak görebiliriz,</p>
+<p><span class="math display">\[
+\frac{f(x)-f(x+\Delta)}{\Delta}
+\]</span></p>
+<p>ki <span class="math inline">\(\Delta\)</span> değerleri 1'de sabitlenmiş oluyor (ve yokolur) ve bir sonraki <span class="math inline">\(f(x)\)</span>'e ulaşmak için sabit artış farzedersek o zaman zaman serisinde fark almak bir tür türev almakla eşdeğerdir [2]. Bu sebeple basit fark işlemi trendi çıkartır, eğer elde gürültülü bir <span class="math inline">\(y = ax + b\)</span> var ise türev sonrası (gürültülü) <span class="math inline">\(a\)</span> elde edilmesi gibi..</p>
+<p>Fark işlemleri birkaç derecede yapılabilir, mesela iki kez türev almaya eşdeğer olan farkın farkını almak, <code>diff(periods=2)</code> ile yapılabilir. Birkaç örneği yanyana görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">pd.set_option(<span class="st">&#39;display.max_columns&#39;</span>, <span class="va">None</span>)
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;AAPL.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+df[<span class="st">&#39;diff_1&#39;</span>] <span class="op">=</span> df.AAPL.diff(periods<span class="op">=</span><span class="dv">1</span>)
+df[<span class="st">&#39;diff_2&#39;</span>] <span class="op">=</span> df.AAPL.diff(periods<span class="op">=</span><span class="dv">2</span>)
+df[<span class="st">&#39;diff_3&#39;</span>] <span class="op">=</span> df.AAPL.diff(periods<span class="op">=</span><span class="dv">3</span>)
+<span class="bu">print</span> (df[[<span class="st">&#39;diff_1&#39;</span>,<span class="st">&#39;diff_2&#39;</span>,<span class="st">&#39;diff_3&#39;</span>]])</code></pre></div>
+<pre><code>              diff_1    diff_2    diff_3
+Date                                    
+2003-12-31       NaN       NaN       NaN
+2004-01-02 -0.001607       NaN       NaN
+2004-01-05  0.015893  0.014286       NaN
+2004-01-06 -0.001429  0.014464  0.012857
+2004-01-07  0.008929  0.007500  0.023393
+...              ...       ...       ...
+2006-12-22 -0.025000 -0.091429 -0.146786
+2006-12-26 -0.024643 -0.049643 -0.116072
+2006-12-27  0.000358 -0.024285 -0.049285
+2006-12-28 -0.023215 -0.022857 -0.047500
+2006-12-29  0.141786  0.118571  0.118929
+
+[756 rows x 3 columns]</code></pre>
+<p>Tabii gürültülü bir veride yaklaşık bir işlem yapıyoruz, eğer hakikaten trendi genel eğim üzerinden çıkartmak istersek, veri üzerinde lineer regresyon yapabilirdik ve regresyon eğrisini ana seriden çıkartabilirdik,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;AAPL.csv&#39;</span>).reset_index()
+<span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf
+results <span class="op">=</span> smf.ols(<span class="st">&#39;AAPL ~ index&#39;</span>, data<span class="op">=</span>df).fit()
+df[<span class="st">&#39;AAPL Trendsiz&#39;</span>] <span class="op">=</span> results.resid
+df[[<span class="st">&#39;AAPL&#39;</span>,<span class="st">&#39;AAPL Trendsiz&#39;</span>]].plot()
+plt.savefig(<span class="st">&#39;tser_008_data_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_008_data_02.png" />
+
+</div>
+<p>Trend çıkarılmış grafik için <code>resid</code> verisi kullanıldı çünkü bu değişken içinde model ile gerçek değerler arasındaki fark, 'artıklar' gösteriliyor, ki bu dolaylı olarak veriden trend çıkartılmış hal demektir.</p>
+<p>Gayri-Lineerlik</p>
+<p>Fakat her dağılım bu kadar kolayca idare edilemeyebilir. Mesela alttaki zaman serisine bakalım, bu Amazon şirketinin hisse senet fiyatları,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;AMZN.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+df.plot()
+plt.savefig(<span class="st">&#39;tser_008_data_06.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_008_data_06.png" />
+
+</div>
+<p>Bu seride fark almadan önce bariz olan gayrı lineerligi göz önüne almamız gerekiyor, yoksa fark aldıktan sonra bile seri durağan olmaz. Gayri-lineerligi çıkartmak için logaritmik fonksiyon kullanılabilir, ondan sonra fark alınır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">transformed_amzn <span class="op">=</span> np.log(df).diff().dropna()
+transformed_amzn.plot(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">4</span>))<span class="op">;</span>
+plt.savefig(<span class="st">&#39;tser_008_data_07.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_008_data_07.png" />
+
+</div>
+<p>Gayri lineerligi çıkartmak ile log alakası nedir? Bildiğimiz gibi nüfus artışı, gelir dağılımı gibi pek çok ölçüm mevcut seviyeye bağlı olarak artan serilerdir, ve orada bir üstel bağlantı vardır, <span class="math inline">\(e^{ax}\)</span> gibi.. Bu tür serileri lineerize etmek için üstel fonksiyonu nötralize etmek gerekir bu da onun tersi olan log fonksiyonu ile yapılabilir.</p>
+<p>Sezonsallık</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">drugs <span class="op">=</span> pd.read_csv(<span class="st">&quot;drug_sales.csv&quot;</span>, index_col<span class="op">=</span><span class="dv">0</span>)
+drugs.value.plot(figsize<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">5</span>))
+plt.xlabel(<span class="st">&quot;Sene&quot;</span>)
+plt.ylabel(<span class="st">&quot;Satılan Miktar (milyon)&quot;</span>)<span class="op">;</span>
+plt.savefig(<span class="st">&#39;tser_008_data_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_008_data_05.png" />
+
+</div>
+<p>Bu seride hem yukarı doğru bir trend, hem de güçlü sezonsallık var. Burada tekrar log uygulayacağız ve sezonsallığı çıkartmak için sene farkı alacağız, seri aylık ölçüde olduğuna göre 12 adımlık fark alırsak senesel sezonsallığı çıkartmış oluruz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">15</span>))
+drugs <span class="op">=</span> pd.read_csv(<span class="st">&quot;drug_sales.csv&quot;</span>, index_col<span class="op">=</span><span class="dv">0</span>)
+drugs[<span class="st">&#39;log&#39;</span>] <span class="op">=</span> np.log(drugs[<span class="st">&#39;value&#39;</span>])
+drugs[<span class="st">&#39;logdiff&#39;</span>] <span class="op">=</span> np.log(drugs[<span class="st">&#39;value&#39;</span>]).diff(periods<span class="op">=</span><span class="dv">12</span>)
+drugs.log.plot(ax<span class="op">=</span>ax[<span class="dv">0</span>])
+drugs.logdiff.plot(ax<span class="op">=</span>ax[<span class="dv">1</span>])
+plt.savefig(<span class="st">&#39;tser_008_data_08.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_008_data_08.png" />
+
+</div>
+<p>Durağanlığı ispat etmek için testi uygulayalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller
+adfuller(drugs.logdiff.dropna())[<span class="dv">1</span>]</code></pre></div>
+<pre><code>Out[1]: 8.209874468611596e-06</code></pre>
+<p>Bu çok ufak bir değer demek ki seri durağan hale geldi, transformasyonlar ise yaradı.</p>
+<p>Fakat akılda tutalım ki her zaman serisi farklıdır ve durağanlığa erişmek için farklı operasyonları ardı ardına zincirleme kullanmak gerekebilir. Fakat bu işlemler çoğunlukla logarıtma almak, birinci, ikinci derece ya da sezonsal fark almak olacaktır.</p>
+<p>Not: Bu yazıdaki anlatım konuya daha pür verisel yaklaştı, ilk bakılan veride yapılabilecek ilk işlemleri gördük bir bakıma. Durağanlık, sezonsallık, kendisiyle korelasyon hakkında daha derin detaylar [3,4,5,6] yazılarında bulunabilir.</p>
+<p>Kaynaklar</p>
+<p>[1] Bexgboost, <em>How to Remove Non-Stationarity From Time Series</em>, <a href="https://www.kaggle.com/code/bextuychiev/how-to-remove-non-stationarity-from-time-series?scriptVersionId=73876070" class="uri">https://www.kaggle.com/code/bextuychiev/how-to-remove-non-stationarity-from-time-series?scriptVersionId=73876070</a></p>
+<p>[2] Stackexchange, <a href="https://stats.stackexchange.com/questions/200517/why-does-differencing-once-remove-not-only-linear-but-also-nonlinear-trends" class="uri">https://stats.stackexchange.com/questions/200517/why-does-differencing-once-remove-not-only-linear-but-also-nonlinear-trends</a></p>
+<p>[3] Bayramlı, <em>Zaman Serileri, Rasgele Yürüyüş Testleri</em></p>
+<p>[4] Bayramlı, <em>Zaman Serileri, ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama</em></p>
+<p>[5] Bayramlı, <em>Zaman Serileri,Sezonsallık, Periyotlar</em></p>
+<p>[6] Bayramlı, <em>Zaman Serileri, Durağanlık ve Testler</em></p>
+</body>
+</html>

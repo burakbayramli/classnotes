@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="radyo-dalgaları">Radyo Dalgaları</h1>
+<div class="figure">
+<img src="AM_waves.jpg" />
+
+</div>
+<div class="figure">
+<img src="FM_waves.jpg" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">import</span> scipy.signal <span class="im">as</span> signal
+<span class="bu">dir</span> <span class="op">=</span> <span class="st">&quot;/home/burak/Documents/Dropbox/Public/data&quot;</span>
+extract_data <span class="op">=</span> np.fromfile(<span class="bu">dir</span> <span class="op">+</span> <span class="st">&quot;/fm1.dat&quot;</span>,dtype<span class="op">=</span><span class="st">&quot;uint8&quot;</span>)
+interleavedData <span class="op">=</span> extract_data[<span class="dv">0</span>::<span class="dv">2</span>] <span class="op">+</span><span class="ot"> 1j</span><span class="op">*</span>extract_data[<span class="dv">1</span>::<span class="dv">2</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.title(<span class="st">&quot;SpectoGram of &#39;signal&#39; loaded from file&quot;</span>)
+plt.xlabel(<span class="st">&quot;Time&quot;</span>)
+plt.ylabel(<span class="st">&quot;Frequency&quot;</span>)
+plt.specgram(interleavedData, NFFT <span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span><span class="dv">1140000</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_07.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_07.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.title(<span class="st">&quot;PSD of interleaved Data&quot;</span>)
+plt.psd(interleavedData, NFFT<span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span><span class="dv">1140000</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_08.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_08.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">calculate_range <span class="op">=</span> <span class="bu">max</span>(interleavedData) <span class="op">-</span> <span class="bu">min</span>(interleavedData)<span class="op">;</span>
+data <span class="op">=</span> (interleavedData <span class="op">-</span> <span class="bu">min</span>(interleavedData))<span class="op">/</span> calculate_range
+x1 <span class="op">=</span> (data<span class="op">*</span><span class="dv">2</span>) <span class="op">-</span> <span class="dv">1</span>
+plt.title(<span class="st">&quot;SpectoGram of signal post normalization&quot;</span>)
+plt.xlabel(<span class="st">&quot;Time&quot;</span>)
+plt.ylabel(<span class="st">&quot;Frequency&quot;</span>)
+plt.specgram(x1, NFFT <span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span><span class="dv">1140000</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_09.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_09.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.title(<span class="st">&quot;PSD of normalized signal&quot;</span>)
+plt.psd(x1, NFFT<span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span><span class="dv">1140000</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_10.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_10.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">Fs <span class="op">=</span> <span class="dv">1140000</span>
+fc <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">1.0</span>j<span class="op">*</span><span class="fl">2.0</span><span class="op">*</span>np.pi<span class="op">*</span> <span class="dv">250000</span><span class="op">/</span>Fs<span class="op">*</span>np.arange(<span class="bu">len</span>(x1)))
+x2 <span class="op">=</span> x1<span class="op">*</span>fc
+f_bw<span class="op">=</span><span class="dv">200000</span>
+Fs<span class="op">=</span><span class="dv">1140000</span>
+n_taps<span class="op">=</span><span class="dv">64</span>
+lpf<span class="op">=</span> signal.remez(n_taps, [<span class="dv">0</span>, f_bw, f_bw <span class="op">+</span>(Fs<span class="op">/</span><span class="dv">2</span><span class="op">-</span>f_bw)<span class="op">/</span><span class="dv">4</span>,Fs<span class="op">/</span><span class="dv">2</span>], [<span class="dv">1</span>,<span class="dv">0</span>], Hz<span class="op">=</span>Fs)
+plt.xscale(<span class="st">&#39;log&#39;</span>)
+plt.title(<span class="st">&#39;Filter Frequency Response&#39;</span>)
+plt.xlabel(<span class="st">&#39;Frequency&#39;</span>)
+plt.ylabel(<span class="st">&#39;Amplitude&#39;</span>)
+plt.margins(<span class="dv">0</span>,<span class="dv">1</span>)
+plt.grid(which<span class="op">=</span><span class="st">&#39;both&#39;</span>,axis<span class="op">=</span><span class="st">&#39;both&#39;</span>)
+plt.plot(w, <span class="dv">20</span><span class="op">*</span>np.log10(<span class="bu">abs</span>(h)))
+plt.savefig(<span class="st">&#39;compscieng_app60wave_11.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_11.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">w,h <span class="op">=</span> signal.freqz(lpf)
+x3 <span class="op">=</span> signal.lfilter(lpf, <span class="fl">1.0</span>, x2)
+plt.psd(x2, NFFT<span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span><span class="dv">1140000</span>, color<span class="op">=</span><span class="st">&quot;blue&quot;</span>)  <span class="co"># original</span>
+plt.psd(x3, NFFT<span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span><span class="dv">1140000</span>, color<span class="op">=</span><span class="st">&quot;green&quot;</span>)  <span class="co"># filtered</span>
+plt.title(<span class="st">&quot;PSD of output signal from LPF Vs Original Signal&quot;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_12.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_12.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dec_rate <span class="op">=</span> <span class="bu">int</span>(Fs<span class="op">/</span>f_bw)
+x4 <span class="op">=</span> signal.decimate(x3, dec_rate)
+Fs_x4 <span class="op">=</span> Fs<span class="op">/</span>dec_rate
+plt.psd(x4, NFFT<span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span>Fs_x4, color<span class="op">=</span><span class="st">&quot;blue&quot;</span>)
+plt.title(<span class="st">&quot;PSD of deimated signal&quot;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_13.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_13.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">y <span class="op">=</span> x4[<span class="dv">1</span>:] <span class="op">*</span> np.conj(x4[:<span class="op">-</span><span class="dv">1</span>])
+x5 <span class="op">=</span> np.angle(y)
+plt.psd(x5, NFFT<span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span>Fs_x4, color<span class="op">=</span><span class="st">&quot;blue&quot;</span>)
+plt.title(<span class="st">&quot;PSD of Post Frequency Discrimination&quot;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_14.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_14.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">d <span class="op">=</span> Fs_x4 <span class="op">*</span> <span class="fl">75e-6</span>   <span class="co"># Calculate the # of samples to hit the -3dB point</span>
+r <span class="op">=</span> np.exp(<span class="op">-</span><span class="dv">1</span><span class="op">/</span>d)   <span class="co"># Calculate the decay between each sample</span>
+b <span class="op">=</span> [<span class="dv">1</span><span class="op">-</span>r]          <span class="co"># Create the filter coefficients</span>
+a <span class="op">=</span> [<span class="dv">1</span>,<span class="op">-</span>r]
+x6 <span class="op">=</span> signal.lfilter(b,a,x5)
+plt.psd(x6, NFFT<span class="op">=</span><span class="dv">1024</span>, Fs<span class="op">=</span>Fs_x4, color<span class="op">=</span><span class="st">&quot;blue&quot;</span>)
+plt.title(<span class="st">&quot;PSD of signal Post DeEmphasis&quot;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app60wave_15.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app60wave_15.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">d <span class="op">=</span> Fs_x4 <span class="op">*</span> <span class="fl">75e-6</span>   <span class="co"># Calculate the # of samples to hit the -3dB point</span>
+r <span class="op">=</span> np.exp(<span class="op">-</span><span class="dv">1</span><span class="op">/</span>d)   <span class="co"># Calculate the decay between each sample</span>
+b <span class="op">=</span> [<span class="dv">1</span><span class="op">-</span>r]          <span class="co"># Create the filter coefficients</span>
+a <span class="op">=</span> [<span class="dv">1</span>,<span class="op">-</span>r]
+dec_rate <span class="op">=</span> <span class="bu">int</span>(Fs<span class="op">/</span>f_bw)
+x7<span class="op">=</span>signal.decimate(x6,dec_rate)
+x7<span class="op">*=</span> <span class="dv">10000</span> <span class="op">/</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(x7))               <span class="co"># scale so it&#39;s audible</span>
+x7.astype(<span class="st">&quot;int16&quot;</span>).tofile(<span class="st">&quot;radio.raw&quot;</span>)</code></pre></div>
+<pre><code>aplay radio.raw -r 100000.0 -f S16_LE -t raw -c 1</code></pre>
+<pre><code>aplay radio.raw -r 45600 -f S16_LE -t raw -c 1</code></pre>
+<p>Kaynaklar</p>
+<p>[1] <em>The Basic Facts About Radio Signals</em>, <a href="https://www.windows2universe.org/spaceweather/wave_modulation.html" class="uri">https://www.windows2universe.org/spaceweather/wave_modulation.html</a></p>
+<p>[2] [https://drive.google.com/uc?export=view&amp;id=1oevS3Dxy-ksVEQrulxI57R-mHcwFI-Tk](https://drive.google.com/uc?export=view&amp;id=1oevS3Dxy-ksVEQrulxI57R-mHcwFI-Tk)</p>
+<p>[3] [https://drive.google.com/uc?export=view&amp;id=1B65C4v4m8TUx4R__CQ58Jzyw7fnWYDDK](https://drive.google.com/uc?export=view&amp;id=1B65C4v4m8TUx4R__CQ58Jzyw7fnWYDDK)</p>
+<p>[4] Scher, <em>How to capture raw IQ data from a RTL-SDR dongle and FM demodulate with MATLAB</em>,<a href="http://www.aaronscher.com/wireless_com_SDR/RTL_SDR_AM_spectrum_demod.html" class="uri">http://www.aaronscher.com/wireless_com_SDR/RTL_SDR_AM_spectrum_demod.html</a></p>
+<p>[5] <em>EE123: Digital Signal Processing</em>, <a href="http://inst.eecs.berkeley.edu/~ee123/sp14/" class="uri">http://inst.eecs.berkeley.edu/~ee123/sp14/</a></p>
+<p>[6] Fund, <em>Capture and decode FM radio</em>, <a href="https://witestlab.poly.edu/blog/capture-and-decode-fm-radio/" class="uri">https://witestlab.poly.edu/blog/capture-and-decode-fm-radio/</a></p>
+<p>[7] Fund, <em>Lab 1: Working with IQ data in Python</em>, <a href="http://witestlab.poly.edu/~ffund/el9043/labs/lab1.html" class="uri">http://witestlab.poly.edu/~ffund/el9043/labs/lab1.html</a></p>
+<p>[9] Swiston, <em>pyFmRadio - A Stereo FM Receiver For Your PC</em>, <a href="http://davidswiston.blogspot.de/2014/10/pyfmradio-stereo-fm-receiver-for-your-pc.html" class="uri">http://davidswiston.blogspot.de/2014/10/pyfmradio-stereo-fm-receiver-for-your-pc.html</a></p>
+</body>
+</html>

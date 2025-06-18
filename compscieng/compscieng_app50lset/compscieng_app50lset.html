@@ -1,0 +1,510 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="kesit-seviyeleri-level-sets-ile-imaj-gruplamak">Kesit Seviyeleri (Level Sets) ile İmaj Gruplamak</h1>
+<p>Bir dijital resimdeki bir kümeyi, grubu ortaya çıkartmak (segmentation) için bir teknik daha, kesit seviyeleri kullanmak. Grup bulmak derken resimdeki diğerlerinden daha ayrı duran, bizim çıplak gözle gördüğümüz bir grubu diğerlerinden ayırıp etrafındaki sınırlar çizmek, ve bunları otomatik olarak yazılımın yapmasını sağlamak.</p>
+<p>Kesit seviyeleri tekniği her ne kadar dışarıdan bir eğriyi belli bir enerji fonksiyonunu minimize ederek kümenin etrafında &quot;sarmalayan'' yılan (snake) tekniğine benzese de, aslında daha derin ve kuvvetli özellikleri olan bir yaklaşımdır. Yılan tekniğinde eldeki bir eğriyi bizzat değiştirerek grup etrafını sarmalasına uğraşıyoruz. Kesit seviyeleri ile grubu tanımlayan manipüle ettiğimiz sınıların kendisi değil bir yansımadan dolaylı elde edilen ama kendisi daha yüksek boyutta olan başka bir fonksiyon.</p>
+<p>Alttaki görüntüler daha iyi açıklayabilir,</p>
+<div class="figure">
+<img src="compscieng_app50lset_02.png" />
+
+</div>
+<p>İmajın düzlemde olduğunu düşünürsek o görülen kırmızı çizgiler kesit seviyesi (<span class="math inline">\(\phi=0\)</span> için). İmaj düzlemi, ve kesit seviyesi iki boyutlu, manipüle edilen ise üç boyutlu bir <span class="math inline">\(\phi\)</span> fonksiyonu, ve gruplamayı yapan bu fonksiyonun sıfır kesit seviyesindeki kontur çizgileridir, yani <span class="math inline">\(\phi(x,y,t) = 0\)</span> ne ise gruplama, küme (segment) odur.</p>
+<p>Altta, değişen <span class="math inline">\(\phi\)</span>'nin imaj düzlemindeki değişen kesit seviyesini görebiliyoruz.</p>
+<div class="figure">
+<img src="compscieng_app50lset_01.png" />
+
+</div>
+<p>Peki <span class="math inline">\(\phi\)</span> fonksiyonunu imaj üzerindeki yakın duran pikselleri göz önüne alarak (ki kesit seviyesi onların etrafını sarsın) nasıl değiştireceğiz? İşte kesit seviyeleri matematiği burada devreye giriyor.</p>
+<p>Ana yüzey fonksiyonu <span class="math inline">\(\phi(x,y)\)</span>, ya da vektörel olarak <span class="math inline">\(\phi(\vec{x})\)</span>, daha basit <span class="math inline">\(\phi(x)\)</span> diyelim, bu yüzeyi <span class="math inline">\(t\)</span> ile parametrize edersek kesit seviyesini</p>
+<p><span class="math display">\[
+\phi(x(t), t) = 0
+\]</span></p>
+<p>ile tanımlarız. Üstteki eşitliği <span class="math inline">\(t\)</span> için elde edilen <span class="math inline">\(x\)</span> için <span class="math inline">\(t\)</span> anındaki yüzeyin fonksiyonu olarak düşünebiliriz. Şimdi sıfır seviyesindeki kontur eğrisinin değişimini takip etmek istediğimiz için [5], üstteki eşitliğin <span class="math inline">\(t\)</span>'ye göre değişiminin açılımını görmek istiyoruz. Hatırlarsak pozisyonun türevi hızdır, ve eğer hızı bilirsek yüzeyin hareketini modelleyebiliriz.</p>
+<p><span class="math display">\[
+\frac{\partial \phi(x(t),t)}{\partial t} = 0
+\]</span></p>
+<p>Zincirleme Kuralını uygulayınca</p>
+<p><span class="math display">\[
+\frac{\partial \phi}{\partial x(t)} \frac{\partial x(t)}{\partial t} +
+\frac{\partial \phi}{\partial t} = 0
+\]</span></p>
+<p>Tanım itibariyle <span class="math inline">\(\partial \phi / \partial x(t)\)</span> kısmi türev yüzeyimizin gradyanı, bunu temel çok boyutlu Calculus'tan biliyoruz. Diğer notasyonu da biraz kısaltınca</p>
+<p><span class="math display">\[
+\nabla \phi x_t + \phi_t = 0
+\]</span></p>
+<p>Üstte eğrinin hareketinin <span class="math inline">\(\phi\)</span>'ye normal / dik olduğunu söylemiş olduk, eğer yönü birim vektör olarak göstermek gerekirse, <span class="math inline">\(\frac{\nabla \phi}{||\nabla \phi ||}\)</span>. Şimdi hızın kendisi lazım, düzlemdeki yere bağlı olarak değişebilecek bir <span class="math inline">\(F\)</span> kuvveti ile yönü çarparak yönsel hızı elde edebiliriz, <span class="math inline">\(x_t = F \frac{\nabla \phi}{||\nabla \phi ||}\)</span>. Yerine koyarsak,</p>
+<p><span class="math display">\[
+\nabla \phi F \frac{\nabla \phi}{||\nabla \phi ||}  + \phi_t = 0
+\]</span></p>
+<p><span class="math display">\[
+F \frac{||\nabla \phi||^2}{||\nabla \phi ||}  + \phi_t = 0
+\]</span></p>
+<p><span class="math display">\[
+F ||\nabla \phi||  + \phi_t = 0
+\]</span></p>
+<p>Biraz daha organize edince kesit seviyeleri denklemini elde ediyoruz.</p>
+<p><span class="math display">\[
+\phi_t = - F ||\nabla \phi|| 
+\]</span></p>
+<p>Bu bize yüzeyin değişim hızı <span class="math inline">\(\phi_t\)</span>'yi veriyor.</p>
+<p>Hesaplama</p>
+<p><span class="math inline">\(\phi\)</span>'nin başlangıç değerlerini biliyorsak ve değişim hız formülünü baz alarak hareket denklemini çözebiliriz / zamanda ileri doğru taşıyabiliriz. Yani bulmak istediğimiz herhangi bir <span class="math inline">\(t\)</span> anındaki <span class="math inline">\(\phi\)</span>. Hesabı yapmanın en basit yolu Sonlu Farklar (Finite Differences) yöntemi ile. Temel Calculus'tan hatırlarsak,</p>
+<p><span class="math display">\[
+f&#39;(x) = \frac{f(x+\Delta x) - f(x)}{\Delta x}
+\]</span></p>
+<p>Bunu <span class="math inline">\(\phi\)</span> için uygularsak,</p>
+<p><span class="math display">\[
+\frac{\partial \phi(x(t),t)}{\partial t} =
+\frac{\phi(x(t),t+\Delta t) - \phi(x(t),t)}{\Delta t}
+\]</span></p>
+<p><span class="math display">\[
+\Delta t \phi_t = \phi(x(t),t+\Delta t) - \phi(x(t),t)
+\]</span></p>
+<p><span class="math display">\[
+\phi(x(t),t+\Delta t) = \phi(x(t),t) + \Delta t \phi_t
+\]</span></p>
+<p>Şimdi <span class="math inline">\(\phi_t\)</span> için daha önce bulduğumuz formülü koyarsak,</p>
+<p><span class="math display">\[
+\phi(x(t),t+\Delta t) = \phi(x(t),t) - \Delta t F ||\nabla \phi|| 
+\]</span></p>
+<p>Böylece değişim fonksiyonunu elde etmiş olduk. Yapay Öğrenim konusunu bilenlere üstteki formül tanıdık gelebilir, <span class="math inline">\(\phi\)</span> üzerinde <span class="math inline">\(t\)</span> bazlı olarak gradyan inişi (gradient descent) yapmış oluyoruz bir bakıma.</p>
+<p><span class="math display">\[
+\phi&#39; = \phi + \Delta t F ||\nabla \phi ||
+\]</span></p>
+<p>Not: Üstte <span class="math inline">\(+\Delta t F\)</span> var fakat türetimden <span class="math inline">\(-\Delta t F\)</span> gelmesi gerekiyor. Bu nasıl oldu? Eğer ilerideki kodda işareti değiştirsek eksinin işlemeyeceğini görürdük, artı olması gerekiyor. Bu gradyan tanımıyla alakalı, fakat istenen işarete erişmek için sonlu farklar başlangıcında ufak bir değişiklik yeterli olurdu.</p>
+<p>Şimdi <span class="math inline">\(F\)</span> konusuna gelelim; bu <span class="math inline">\(F\)</span>'nin seçilmesi kesit seviyesi yöntemimize direk etki edecektir. Sonuç olarak eğriyi belli bir yönde, ve hızda ittiren &quot;kuvvet'' budur. <span class="math inline">\(F\)</span> resmin her noktasında tanımlı bir nevi hız, kuvvet alanı (velocity field) olarak görülebilir, her noktada bize <span class="math inline">\(\phi\)</span>'nin hareketinin yönünü ve büyüklüğünü verir.</p>
+<p>O zaman düşünürsek, imajda gruplama yapmak istiyoruz, ve alttaki gibi bir resim var diyelim,</p>
+<div class="figure">
+<img src="twoObj.png" />
+
+</div>
+<p><span class="math inline">\(F\)</span>'nin ortadaki objenin sınırlarına kadar yüksek olmasını ama sınırlarda çok az hatta sıfır olmasını isteyebiliriz, değil mi? Bu dolaylı olarak obje tanımlamayı gerçekleştirecektir, çünkü <span class="math inline">\(\phi\)</span> yüzeyi objeye gelinceye kadar hızla ilerleyecek, ardından obje çevresine geldiği noktalarda yavaşlayacaktır, ve yan etki olarak kesit seviyesi nesneyi sarmalamış olur, ve bu noktada gruplamayı bitmiş kabul edebiliriz.</p>
+<p><span class="math inline">\(F\)</span>'yi o zaman direk imajın kendisinden hesaplayalım, ve onu bir nevi kenar algılayıcı (edge detector) olarak görelim. Eh en basit kenar bulucu gradyan olduğuna göre imajın gradyanını almak yeterli olacaktır. <span class="math inline">\(I\)</span> imajı için <span class="math inline">\(g\)</span> gradyanı [6],</p>
+<p><span class="math display">\[
+g(I) = \frac{1}{1  + || \nabla I ||^2}
+\]</span></p>
+<p>Hepsini bir araya koyunca alttaki kod yazılabilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> skimage <span class="im">import</span> color, io
+<span class="im">import</span> scipy.ndimage
+
+<span class="kw">def</span> grad(x):
+    <span class="cf">return</span> np.array(np.gradient(x))
+
+<span class="kw">def</span> norm(x, axis<span class="op">=</span><span class="dv">0</span>):
+    <span class="cf">return</span> np.sqrt(np.<span class="bu">sum</span>(np.square(x), axis<span class="op">=</span>axis))
+
+<span class="kw">def</span> stopping_fun(x):
+    <span class="cf">return</span> <span class="fl">1.</span> <span class="op">/</span> (<span class="fl">1.</span> <span class="op">+</span> norm(grad(x))<span class="op">**</span><span class="dv">2</span>)
+
+<span class="kw">def</span> default_phi(x):
+    <span class="co"># phi yuzeyini imaj disindaki 5 piksel genisligindeki bantta 1</span>
+    <span class="co"># bant icinde ise -1 olarak tanimliyoruz</span>
+    phi <span class="op">=</span> np.ones(x.shape[:<span class="dv">2</span>])
+    phi[<span class="dv">5</span>:<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>:<span class="op">-</span><span class="dv">5</span>] <span class="op">=</span> <span class="fl">-1.</span>
+    <span class="cf">return</span> phi
+
+img <span class="op">=</span> io.imread(<span class="st">&#39;twoObj.bmp&#39;</span>)
+img <span class="op">=</span> color.rgb2gray(img) <span class="co"># grilestir</span>
+img <span class="op">=</span> img <span class="op">-</span> np.mean(img) <span class="co"># ortalamayi cikart</span>
+<span class="co"># puruzsuzlestirme uygula yanyana pikseller daha benzer olsun</span>
+img_smooth <span class="op">=</span> scipy.ndimage.filters.gaussian_filter(img, sigma<span class="op">=</span><span class="dv">2</span>)
+
+F <span class="op">=</span> stopping_fun(img_smooth)
+
+dt <span class="op">=</span> <span class="fl">1.</span>
+n_iter <span class="op">=</span> <span class="dv">100</span>
+phi <span class="op">=</span> default_phi(img)
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_iter):
+    dphi <span class="op">=</span> grad(phi)
+    dphi_norm <span class="op">=</span> norm(dphi)
+    dphi_t <span class="op">=</span> F <span class="op">*</span> dphi_norm
+    phi <span class="op">=</span> phi <span class="op">+</span> dt <span class="op">*</span> dphi_t
+    <span class="cf">if</span> i<span class="op">%</span><span class="dv">10</span><span class="op">==</span><span class="dv">0</span>:
+        plt.imshow(img,cmap <span class="op">=</span> <span class="st">&#39;gray&#39;</span>)
+        plt.contour(phi, levels<span class="op">=</span>[<span class="dv">0</span>],colors<span class="op">=</span>[<span class="st">&#39;red&#39;</span>])
+        plt.savefig(<span class="st">&#39;img2/out-</span><span class="sc">%03d</span><span class="st">.png&#39;</span> <span class="op">%</span> i)
+        plt.close()</code></pre></div>
+<p>İşlemden seçilmiş üç kare alttadır,</p>
+<p><img src="img2/out-000.png" /> <img src="img2/out-020.png" /> <img src="img2/out-090.png" /></p>
+<p>Kesit seviyeleri tekniğinin faydalarını görmek zor değil; üç boyutlu fonksiyonu daha esnek yönlerde değiştirebileceğimiz için onu düzlemdeki yansımaları birbirinden kopuk duran (ama alakalı) obje gruplarını bile bulup çıkartabilir.</p>
+<hr>
+<p>Eski Yazı</p>
+<p>Kesit Seviyeleri, Kenar Bazlı İmaj Gruplamak</p>
+<p>Bir dijital imajı renklere, objelere göre belli parçalara bölmek (segmentation) için, matematiksel bir formül kullanmak iyi çözümlerden biridir. Bunu yapmanın bazı yolları var. Basitleştirerek bir örnek verelim: diyelim ki gruplama için elimizdeki formül bir yuvarlak formülü <span class="math inline">\(x^2+y^2 - c = 0\)</span>, ki <span class="math inline">\(c\)</span> bir sabit. Bu formülü x ve y kordinatları üzerinde bastığımız zaman radius'u <span class="math inline">\(\sqrt{c}\)</span> olan bir çember elde ederiz. Gruplama için bu çemberi büyütüp küçültebildiğimizi farzedelim, çember imaj üzerindeki istediğimiz bölüme en iyi uyduğu anda gruplamayı başarılı olarak kabul ediyoruz.</p>
+<p>Fakat problem şurada: eğer imajda birden fazla grup var ise, o zaman birden fazla çember gerekecektir, bu sefer algoritmik olarak üstteki formülü ikinci, üçüncü kere yaratmamız, ve o formüllerin o gruplara uyumunu ayrı ayrı takip etmemiz gerekirdi. Ya da diyelim ki özyineli (iterative) bir uydurma işlemi takip ediyoruz, bu işlem sırasında belki iki çemberin birleşmesi gerekse, o zaman iki formülü silip, yerine yenisini oluşturmakla uğraşmak gerekli olacaktı. Bunlar hem matematiksel, hem kodlama açısından külfet oluşturacaktır.</p>
+<p>Kesit Seviyeleri kavramını kullanarak bu işi daha basitleştirebiliriz. Diyelim ki bölme görevini yapan <span class="math inline">\(\phi\)</span> adli fonksiyonumuzu 2 boyutlu olmak yerine 3 boyutlu eksende tanımladık, ve, 2 boyutta bölme yapma görevini onun bir kesitine verdik. Kesit derken, alttaki üç boyutlu fonksiyonu yatay olarak bir noktadan &quot;kestiğimizi'' farz ediyoruz, ve o kesit üzerinde düşen <span class="math inline">\(\phi\)</span> değerlerine bakıyoruz.</p>
+<p>Bakıç açışımızı, tanımlamamızı değiştirerek, bazı avantajlar elde etmeyi umuyoruz aslında. Altta iki tane <span class="math inline">\(\phi\)</span> fonksiyonu ve onların altında kesitlerini görebiliriz.</p>
+<p>Kesit Seviyeleri tekniğini kullanarak elde ettiğimiz avantaj nedir? Artık sadece <em>tek</em> bir <span class="math inline">\(\phi\)</span> fonksiyonu kullanarak 2 boyutlu imajımız üzerinde birbirinden ayrı gruplamalar yaratabiliyoruz. Bu gruplar birbiri ile birleşebilir, ayrılabilir, bu artık bizi ilgilendirmiyor. Biz sadece 3. boyuttaki <span class="math inline">\(\phi\)</span> fonksiyonunu değiştirmekle uğraşacağız, imaj üzerindeki gruplamalar ise o fonksiyonun 2. boyuta yansıması (projection) üzerinden kendiliğinden gerçekleşecekler.</p>
+<p>Matematiksel olarak <span class="math inline">\(\phi\)</span> fonksiyonunu nasıl temsil ederiz? <span class="math inline">\(\phi\)</span> fonksiyonu <span class="math inline">\(x\)</span>, <span class="math inline">\(y\)</span>, boyutlarını alıp bize bir üçüncü <span class="math inline">\(z\)</span> boyutu döndürmeli, ayrıca bu fonksiyonu imajı parçalarına ayırma işlemini gerçekleştirmek için kademeli olarak değiştirmeyi planladığımıza göre, o zaman bir <span class="math inline">\(t\)</span> değişkeni de gerekiyor. Yani <span class="math inline">\(\phi(x,y,t)\)</span> fonksiyonu. Gruplama için kullanılacak kesiti ise sıfır kesiti olarak alalım, yani <span class="math inline">\(\phi(x,y,t) = 0\)</span>. Doğal olarak</p>
+<p><span class="math display">\[ \frac{d}{dt}(\phi(x,y,t) = 0) = 0 \]</span></p>
+<p>Şimdi <span class="math inline">\(x\)</span>, ve <span class="math inline">\(y\)</span> değişkenlerinin zaman göre değişimini formüle bir şekilde dahil etmek lazım. Bunun için sıfır kesit seviyesi üzerinde bir parçacık hayal edilir, ve bu parçacığın gittiği yol <span class="math inline">\(x(t)\)</span>, ve <span class="math inline">\(y(t)\)</span> olarak tanımlanır. O zaman</p>
+<p><span class="math display">\[ \frac{d}{dt}(\phi(x(t),y(t),t)) = 0 \]</span></p>
+<p>Tam diferansiyel formülünden hareketle:</p>
+<p><span class="math display">\[ 
+d(\phi(x(t),y(t),t) = 
+\frac{\partial \phi}{\partial x}dx + 
+\frac{\partial \phi}{\partial y}dy + 
+\frac{\partial \phi}{\partial t}dt  = 0
+ \]</span></p>
+<p><span class="math display">\[ 
+\frac{d(\phi(x(t),y(t),t))}{dt} = 
+\frac{\partial \phi}{\partial x}\frac{dx}{dt} + 
+\frac{\partial \phi}{\partial y}\frac{dy}{dt} + 
+\frac{\partial \phi}{\partial t} = 0
+ \]</span></p>
+<p><span class="math display">\[
+ = 
+\frac{\partial \phi}{\partial x}\frac{dx}{dt} + 
+\frac{\partial \phi}{\partial y}\frac{dy}{dt} + 
+\phi_t = 0
+\qquad (1)
+\]</span></p>
+<p>Temsilen daha kısa bir işaret kullanmak gerekirse, <span class="math inline">\(\bigtriangledown\)</span> ile <span class="math inline">\(\phi\)</span>'nin gradyanını (gradient) alarak, elde edilecek vektörün nokta çarpımını kullanabiliriz. O zaman formül (1) daha kısa olarak:</p>
+<p><span class="math display">\[ \phi_t + \bigtriangledown \phi \cdot \vec{V} = 0 \]</span></p>
+<p>olarak temsil edilebilir, ki</p>
+<p><span class="math display">\[ \bigtriangledown \phi = \bigg(
+\frac{\partial \phi}{\partial x},
+\frac{\partial \phi}{\partial y} \bigg)
+ \]</span></p>
+<p><span class="math display">\[ \vec{V} = \bigg(
+\frac{dx}{dt} ,
+\frac{dy}{dt} \bigg)
+ \]</span></p>
+<p>İki vektörün nokta çarpımı bilindiği gibi sırayla her iki vektörün sırasıyla uyan elemanlarının birbirleri ile çarpılması ve o çarpımların toplanmasıdır.</p>
+<p><span class="math inline">\(\vec{V}\)</span> vektörü neyi temsil eder? Formüle göre bu vektör <span class="math inline">\(\phi\)</span>'nin üzerindeki değişimi etkiliyor, ve bu değişimler <span class="math inline">\(t\)</span>'nin değişimine göre tanımlandığına göre bu değerler &quot;hız'' olarak tanımlanabilir. İmaj bağlamında düşünürsek mesela <span class="math inline">\(\phi\)</span> renklerin aynı olduğu yerlerde yüksek hızda, renklerin değiştiği yerler düşük hızda değişebilir şeklinde bir kurgu yapılabilir, işte bu bölgelerde değişiminin hızını <span class="math inline">\(\vec{V}\)</span> ile gösterebiliriz.</p>
+<p><span class="math inline">\(\vec{V}\)</span> yerine kesit seviyelerine dik olan (normal) vektörler ile çalışmak isteseydik, <span class="math inline">\(\vec{V}\)</span>'yi dik ve teğet bileşenlerine ayırarak tekrar temsil edebilirdik: <span class="math inline">\(\vec{V} = V_N\vec{N} + V_T\vec{T}\)</span>. Bu formülde <span class="math inline">\(\vec{T}\)</span> teğet, <span class="math inline">\(\vec{N}\)</span> dik vektörler, <span class="math inline">\(V_N\)</span> ve <span class="math inline">\(V_T\)</span> skalar. Yerine koyalım:</p>
+<p><span class="math display">\[ \phi_t + \bigtriangledown \phi \cdot (V_N\vec{N} + V_T\vec{T}) = 0 \]</span></p>
+<p><span class="math inline">\(\phi\)</span>'ye göre dik vektörün diğer bir formülü <span class="math inline">\(\vec{N} = \frac{\bigtriangledown\phi}{|\bigtriangledown\phi|}\)</span> olduğuna göre</p>
+<p><span class="math display">\[ \phi_t + (\bigtriangledown \phi \cdot
+V_N\frac{\bigtriangledown\phi}{|\bigtriangledown\phi|} + \bigtriangledown
+\phi \cdot V_T\vec{T}) = 0 \]</span></p>
+<p>Devam edelim: <span class="math inline">\(\bigtriangledown \phi\)</span> yüzeye dik olduğuna göre, bu dik vektörün teğet olan <span class="math inline">\(\vec{T}\)</span> ile noktasal çarpımı sıfır değerini verecektir, o çarpım formülden atılabilir. Kalanlar:</p>
+<p><span class="math display">\[ \phi_t + (\bigtriangledown \phi \cdot 
+V_N\frac{\bigtriangledown\phi}{|\bigtriangledown\phi|}) = 0 \]</span></p>
+<p>Daha da kısaltabiliriz: <span class="math inline">\(\bigtriangledown \phi \cdot \bigtriangledown \phi = |\bigtriangledown \phi|^2\)</span> olduğunu biliyoruz, gradyanın kendisi ile noktasal çarpımı, o gradyan vektörünün uzunluğunun karesidir. Daha genel olarak, bir vektörün uzunluğu, o vektörün kendisi ile noktasal çarpımının kareköküdür. O zaman en son formülde bu çarpımı gerçekleştirip, uzunluk olarak yazalım:</p>
+<p><span class="math display">\[ \phi_t + V_N\frac{|\bigtriangledown\phi|^2}{|\bigtriangledown\phi|} = 0  \]</span></p>
+<p><span class="math display">\[ \phi_t + V_N |\bigtriangledown\phi| = 0  \]</span></p>
+<p>Şimdi bu formül hakkında biraz anlayış geliştirelim. Eğer elimizdeki bir <span class="math inline">\(\phi\)</span> seviye kesitinin şeklen olduğu gibi kalmasını ama sadece küçülmesini isteseydik, <span class="math inline">\(\phi\)</span>'nin normalinin tersi yönünde bir büyüme tanımlamamız gerekirdi. Normal vektör dışa doğru işaret ettiğine göre üstteki formülde mesela <span class="math inline">\(V_N = -1\)</span> tanımlayabilirdik. O zaman</p>
+<p><span class="math display">\[ \phi_t +  |\bigtriangledown\phi| = 0 \]</span></p>
+<p><span class="math display">\[ \phi_t = - |\bigtriangledown\phi|   \]</span></p>
+<p>Hesapsal olarak bunu nasıl gerçekleştiririz? 80 x 80 boyutunda bir matris içinde <span class="math inline">\(\phi\)</span> fonksiyonu ayrıksal olarak tutalım. Yani 80 tane x, 80 tane ayrı y değeri var, her x ve y değerlerin kombinasyonlarına tekabül eden <span class="math inline">\(\phi\)</span> değerleri bu matris içinde. Gradyanın ne olduğunu hatırlayalım. Gradyan</p>
+<p><span class="math display">\[ 
+\bigtriangledown \phi = \bigg(
+\frac{\partial \phi}{\partial x},
+\frac{\partial \phi}{\partial y} \bigg)
+\]</span></p>
+<p>olarak tanımlıdır, ve her <span class="math inline">\((x_i,y_i)\)</span> noktasındaki <span class="math inline">\(\phi(x_i,y_i)\)</span> değerine göre değişik bir vektör sonucunu getirecektir. Bilgisayar dünyasında parçalı türevler hesapsal &quot;farklılıklara'' dönüşürler, <code>phi</code> matrisindeki farklılıkları Python ile</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">gradPhiY, gradPhiX <span class="op">=</span> np.gradient(phi)</code></pre></div>
+<p>olarak hesaplayabiliriz. Üstte elimize geçen gradyan dizinlerindeki değerler ile <span class="math inline">\(|\bigtriangledown\phi|\)</span> büyüklüğünü hesaplayabiliriz, ve bu sonucu <span class="math inline">\(\phi\)</span> üzerindeki değişim oranı <span class="math inline">\(\phi_t\)</span> olarak kabul ederiz. O zaman <span class="math inline">\(\phi_t\)</span> ile zaman <span class="math inline">\(t\)</span> değimi <code>dt</code> çarptığımız zaman ele geçecek olan <span class="math inline">\(\phi\)</span>'nin değişimidir. Döngünün her basamağında eski <code>phi</code> değerlerine bu farkları eklediğimiz zaman <span class="math inline">\(\phi\)</span> fonksiyonu istediğimiz gibi evrilecektir.</p>
+<p>Alttaki kodda bizim başlangıç <span class="math inline">\(\phi\)</span>'miz kenarlardan w uzaklığında içi boş bir kutu olacak.</p>
+<p>İmaj Gruplamak</p>
+<p>İmajı bölümlere ayırmak için (segmentation) birkaç faktörün bileşimi kullanılıyor. Köşeleri kullanan aktif kontur (edge based active contour) yönteminde ortalama eğim ve imajın piksel değerlerinin farklılıkları (image gradient) aynı anda kullanılır. Yani kesit seviyesini ilerletirken hızı hem eğime oranlıyoruz, hem de imaj piksel renk değerleri arasındaki farka ters oranda hızlandırıyor, ya da yavaşlatıyoruz. Böylece kesit seviyemiz renk farklılığı çok olmayan yani büyük bir ihtimalle tek bir objeye ait bir bölgede hızla ilerliyor, büyük renk farkının olduğu büyük bir ihtimalle bir kenar noktasına gelince ise yavaşlıyor. O sırada kesit seviyesinin geri kalan tarafları tabii ki başka hızlarda hareket ediyor olabilirler, zaten işin püf noktası burada, sonunda resim bölgelere ayrılmış oluyor.</p>
+<p>Bitirirken önemli gözlemi vurgulayalım. Problemi matematiksel olarak temsil ederken, hedefe doğru türetirken sürekli (continous) alemde, sürekli, kesintisiz fonksiyonlarla iş yapıyoruz. Hesaplama anı gelince sürekli fonksiyonları ayrıksal (discrete) hale çeviriyoruz, işte uygulamalı matematiğin hesapsal kısmı burada devreye giriyor. Fakat diferansiyel denklemler, fonksiyonlar, türevler gibi sürekli matematiğin kavramları çok önemli, bunlar olmasa problemi soyut bir şekilde temsil edemez, ve basitleştiremezdik. Temel matematiğin kavramlarını kullanırken yüzyılların matematiksel bilgisi devreye girebiliyor, matematiğin en yoğun şekilde kullanıldığı fizikten bol bol teknik alınabilir. Yani söylemek istediğimiz problemi çözmek için hemen kodlamaya başlamıyoruz, düşünsel eylemin önemli bir kısmı matematiksel formüllerle (belki kalem kağıtla) yapılıyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">import</span> scipy.signal <span class="im">as</span> signal
+<span class="im">import</span> scipy.ndimage <span class="im">as</span> image
+<span class="im">import</span> time
+
+<span class="kw">def</span> gauss_kern():
+    <span class="co">&quot;&quot;&quot; Returns a normalized 2D gauss kernel array for convolutions &quot;&quot;&quot;</span>
+    h1 <span class="op">=</span> <span class="dv">8</span>
+    h2 <span class="op">=</span> <span class="dv">8</span>
+    x, y <span class="op">=</span> np.mgrid[<span class="dv">0</span>:h2, <span class="dv">0</span>:h1]
+    x <span class="op">=</span> x<span class="op">-</span>h2<span class="op">/</span><span class="dv">2</span>
+    y <span class="op">=</span> y<span class="op">-</span>h1<span class="op">/</span><span class="dv">2</span>
+    sigma <span class="op">=</span> <span class="fl">10.0</span>
+    g <span class="op">=</span> np.exp( <span class="op">-</span>( x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span> ) <span class="op">/</span> (<span class="dv">2</span><span class="op">*</span>sigma<span class="op">**</span><span class="dv">2</span>) )<span class="op">;</span>
+    <span class="cf">return</span> g <span class="op">/</span> g.<span class="bu">sum</span>()
+
+Img <span class="op">=</span> plt.imread(<span class="st">&quot;twoObj.bmp&quot;</span>)
+Img <span class="op">=</span> Img[::<span class="op">-</span><span class="dv">1</span>] 
+g <span class="op">=</span> gauss_kern()
+Img_smooth <span class="op">=</span> signal.convolve(Img,g,mode<span class="op">=</span><span class="st">&#39;same&#39;</span>)
+Iy,Ix<span class="op">=</span>np.gradient(Img_smooth)
+absGradI<span class="op">=</span>np.sqrt(Ix<span class="op">**</span><span class="dv">2</span><span class="op">+</span>Iy<span class="op">**</span><span class="dv">2</span>)<span class="op">;</span>
+rows, cols <span class="op">=</span> Img.shape
+
+<span class="co"># initial function phi - level set is a square 4 pixels</span>
+<span class="co"># away from borders on each side, in 3D it looks like an empty</span>
+<span class="co"># box</span>
+c0<span class="op">=</span><span class="dv">4</span>
+w<span class="op">=</span><span class="dv">4</span>
+nrow, ncol<span class="op">=</span>Img.shape
+phi<span class="op">=</span>c0<span class="op">*</span>np.ones((nrow,ncol))
+phi[w<span class="op">+</span><span class="dv">1</span>:<span class="op">-</span>w<span class="dv">-1</span>, w<span class="op">+</span><span class="dv">1</span>:<span class="op">-</span>w<span class="dv">-1</span>]<span class="op">=-</span>c0
+
+<span class="co"># edge-stopping function</span>
+g <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span><span class="op">+</span>absGradI<span class="op">**</span><span class="dv">2</span>)
+
+<span class="co"># gradient of edge-stopping function</span>
+gy,gx <span class="op">=</span> np.gradient(g)
+
+<span class="co"># gradient descent step size</span>
+dt<span class="op">=</span><span class="dv">1</span>
+
+<span class="co"># number of iterations after which we reinitialize the surface</span>
+num_reinit<span class="op">=</span><span class="dv">10</span>
+
+phiOld<span class="op">=</span>np.zeros((rows,cols))
+
+<span class="co"># number of iterations after which we reinitialize the surface</span>
+<span class="bu">iter</span><span class="op">=</span><span class="dv">0</span>
+
+<span class="cf">while</span> <span class="bu">iter</span><span class="op">&lt;</span><span class="dv">150</span>:
+    <span class="co"># gradient of phi</span>
+    gradPhiY, gradPhiX <span class="op">=</span> np.gradient(phi)    
+    <span class="co"># magnitude of gradient of phi</span>
+    absGradPhi<span class="op">=</span>np.sqrt(gradPhiX<span class="op">**</span><span class="dv">2</span><span class="op">+</span>gradPhiY<span class="op">**</span><span class="dv">2</span>)
+    <span class="co"># normalized gradient of phi - eliminating singularities</span>
+    normGradPhiX<span class="op">=</span>gradPhiX<span class="op">/</span>(absGradPhi<span class="op">+</span>(absGradPhi<span class="op">==</span><span class="dv">0</span>))
+    normGradPhiY<span class="op">=</span>gradPhiY<span class="op">/</span>(absGradPhi<span class="op">+</span>(absGradPhi<span class="op">==</span><span class="dv">0</span>))
+    
+    divYnormGradPhiX, divXnormGradPhiX<span class="op">=</span>np.gradient(normGradPhiX)
+    divYnormGradPhiY, divXnormGradPhiY<span class="op">=</span>np.gradient(normGradPhiY)
+                           
+    <span class="co"># curvature is the divergence of normalized gradient of phi</span>
+    K <span class="op">=</span> divXnormGradPhiX <span class="op">+</span> divYnormGradPhiY
+    tmp1 <span class="op">=</span> g <span class="op">*</span> K <span class="op">*</span> absGradPhi
+    tmp2 <span class="op">=</span> g <span class="op">*</span> absGradPhi
+    tmp3 <span class="op">=</span> gx <span class="op">*</span> gradPhiX <span class="op">+</span> gy<span class="op">*</span>gradPhiY
+    dPhiBydT <span class="op">=</span>tmp1 <span class="op">+</span> tmp2 <span class="op">+</span> tmp3    
+    
+    phiOld<span class="op">=</span>phi
+    <span class="co"># level set evolution equation    </span>
+    phi <span class="op">=</span> phi <span class="op">+</span> ( dt <span class="op">*</span> dPhiBydT )
+    <span class="bu">iter</span><span class="op">=</span><span class="bu">iter</span><span class="op">+</span><span class="dv">1</span>
+    <span class="cf">if</span> np.mod(<span class="bu">iter</span>,<span class="dv">20</span>)<span class="op">==</span><span class="dv">0</span>:
+        f<span class="op">=</span>plt.figure()
+        plt.imshow(Img, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)
+        CS <span class="op">=</span> plt.contour(phi,<span class="dv">0</span>, colors<span class="op">=</span><span class="st">&#39;r&#39;</span>) 
+        plt.savefig(<span class="st">&#39;/tmp/level_2_</span><span class="sc">%03d</span><span class="st">.png&#39;</span> <span class="op">%</span> <span class="bu">iter</span>)</code></pre></div>
+<p><img src="img1/level_2_040.png" /> <img src="img1/level_2_100.png" /></p>
+<p>Ortalama Eğim (Mean Curvature) Kullanmak</p>
+<p>Eğer imaj içindeki değer farklılıklarını hız için kullanmak yerine yerine sıfır kesit seviyesinin herhangi bir noktada ne kadar &quot;eğri'' olduğuna göre ilerlemesini işletseydik ne olurdu? Diyelim ki çok eğri bölgelerde çok hızlı, az eğik (düz, düze yakın) bölgelerde ilerleme az hız istiyoruz. O zaman hangi şekille başlarsa başlasındalar <span class="math inline">\(\phi\)</span> kesiti sonuçta bir çember şekline doğru evrilecektir. Ortalama eğim (mean curvatüre) hesabı için şu denklem kullanılır:</p>
+<p><span class="math display">\[ \kappa = -div \bigg( \frac{\bigtriangledown \phi}
+{|\bigtriangledown \phi| } \bigg) \]</span></p>
+<p>Bu formul nereden geliyor?</p>
+<p>Eğim (Curvature)</p>
+<p>Kesit seviyeleri tekniğinde bir eğri normal formda değil, dolaylı (implicit) bir fonksiyon ile <span class="math inline">\(F(x,y) = 0\)</span> olarak gösterilir. Bu fonksiyonun tam diferansiyelini alırsak,</p>
+<p><span class="math display">\[ dF = F_x dx + F_y dy = 0  \]</span></p>
+<p><span class="math display">\[ dy = -F_x / F_y dx  \]</span></p>
+<p><span class="math display">\[ y&#39; = \frac{dy}{dx} = -F_x / F_y = f&#39;(x) = \frac{df}{dx} \]</span></p>
+<p>Burada bir faraziye daha var, o da aslında ilk verilen formülde olmasa bile <span class="math inline">\(y=f(x)\)</span> olarak kabul etmemiz, yani <span class="math inline">\(F(x,y)\)</span> nasıl bir formül olursa olsun, <span class="math inline">\(y\)</span>'nin <span class="math inline">\(x\)</span>'leri içerecek şekilde tekrar düzenlenebileceğini farz etmemiz, böylece <span class="math inline">\(F(x,f(x))\)</span> olabileceğini söylemiş oluyoruz [4].</p>
+<p>Şimdi <span class="math inline">\(y&#39;\)</span> ifadesinin türevini bir daha alalım. Yukarıdaki <span class="math inline">\(y&#39;\)</span> formülünde en sağ taraf bir bölme işlemi içerdiği için burada Calculus'un Bölümler Kuralını (Quotient Rule) uygulamamız lazım (detaylar için Bölüm Kuralı yazısına bakınız). Bu kural şöyle gösterilir:</p>
+<p><span class="math display">\[ \frac{d}{dx}\bigg(\frac{u}{v}\bigg) = 
+\frac{\displaystyle \frac{v du}{dx} - \frac{u dv}{dx}}{v^2} \]</span></p>
+<p>Bölümler Kuralı için <span class="math inline">\(u\)</span> ve <span class="math inline">\(v\)</span> tanımları nedir?</p>
+<p><span class="math display">\[ u = -F_x(x,f(x))  \]</span></p>
+<p><span class="math display">\[ v = F_y(x,f(x)) \]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[ 
+v \frac{du}{dx} = F_y \frac{dF_x}{dx} 
+\qquad (1)
+\]</span></p>
+<p><span class="math display">\[
+u \frac{dv}{dx} = -F_x \frac{dF_y }{dx} 
+\qquad (2)
+\]</span></p>
+<p>Bunlardan mesela <span class="math inline">\(dF_x/dx\)</span> üzerinde Zincirleme Kanunu (Chain Rule) uygulamak lazım (bu kural tam integral kuralının bir sonucu).</p>
+<p><span class="math display">\[ \frac{d F_x(x,f(x)) }{dx} = \frac{\partial F_x}{\partial  x}(x,f(x))+\frac{\partial F_x}{\partial y}\frac{df}{dx}\\ \]</span></p>
+<p><span class="math display">\[
+= F_{xx}(x,f(x))+F_{xy}(x,f(x))f&#39;(x) 
+\qquad (3)
+\]</span></p>
+<p><span class="math display">\[
+\frac{d F_y(x,f(x)) }{dx} =  F_{xy}(x,f(x))+F_{yy}(x,f(x))f&#39;(x) 
+\qquad (4)
+\]</span></p>
+<p>Zincirleme Kanunu niye üstteki şekilde açıldı? Tam Diferansiyeli bir daha hatırlayalım:</p>
+<p><span class="math display">\[ df = \frac{\partial f}{\partial x} dx + \frac{\partial f}{\partial y} dy  \]</span></p>
+<p><span class="math display">\[ \frac{df}{dx} = \frac{\partial f}{\partial x} \frac{dx}{dx} + \frac{\partial f}{\partial y} \frac{dy}{dx}  \]</span></p>
+<p><span class="math display">\[ \frac{df}{dx} = \frac{\partial f}{\partial x} + \frac{\partial f}{\partial y} \frac{dy}{dx}  \]</span></p>
+<p>O zaman formüller (1) (2) (3) ve (4) bir araya konulursa,</p>
+<p><span class="math display">\[ y &#39;&#39; = - \frac{F_yF_{xx} - F_y F_{xy}\frac{F_x}{F_y} - F_xF_{xy} + F_xF_{yy}\frac{F_x}{F_y}}{F_y^2}\\ \]</span></p>
+<p><span class="math display">\[ y &#39;&#39; = - \frac{F_yF_{xx} - F_{xy}F_x - F_xF_{xy} + \frac{F_x^2F_{yy}}{F_y}}{F_y^2} \]</span></p>
+<p>Üstteki bölümün hem bölen, hem bölünen terimlerini <span class="math inline">\(F_y\)</span> ile çarparsak, ve sadeleştirirsek</p>
+<p><span class="math display">\[ y &#39;&#39; = - \frac{F_y^2F_{xx} - 2F_{xy}F_xF_y + F_x^2F_{yy}}{F_y^3} \]</span></p>
+<p>Şimdi surada [2] türetimi gösterilen eğim formülüne bakalım. Not: Eğer</p>
+<p><span class="math display">\[ \kappa = \frac{x&#39;y&#39;&#39;-y&#39;x&#39;&#39;}{\bigg(x&#39;^2 + y&#39;^2 \bigg)^{3/2}} \]</span></p>
+<p>formülünün alttaki formüle nasıl dönüştüğü tam anlaşılır değilse, hatırlayalım ki, <span class="math inline">\(y=f(x)\)</span>, ve <span class="math inline">\(x&#39;=1\)</span>, ve <span class="math inline">\(x&#39;&#39; = 0\)</span>.</p>
+<p>Bu formülün Courant [1] sf. 231'de benzer bir formunu görüyoruz (Bu arada o karmaşık formül yerine yaklaşıksal olarak hesaplama sırasında sadece <span class="math inline">\(f&#39;&#39;\)</span> kullanmak ta mümkün [3, giriş bölümü])</p>
+<p><span class="math display">\[ \kappa = \frac{f&#39;&#39;}{(1+f&#39;^2)^{3/2}} \]</span></p>
+<p>Bu formüldeki <span class="math inline">\(f&#39;&#39;\)</span> yani <span class="math inline">\(y&#39;&#39;\)</span> için üstte bulduğumuz sonucu, <span class="math inline">\(f&#39;\)</span> yani <span class="math inline">\(y&#39;\)</span> için bu yazının başındaki formülü koyarsak,</p>
+<p><span class="math display">\[ 
+\kappa = \frac
+{-\frac
+{\displaystyle F_y^2F_{xx} - 2F_{xy}F_xF_y +  F_x^2F_{yy}}{\displaystyle F_y^3}}
+{(1+f&#39;^2)^{3/2}} 
+\]</span></p>
+<p>Bölen kısmı nedir?</p>
+<p><span class="math display">\[ (1+f&#39;^2)^{3/2} = \bigg( 1 + \bigg(\frac{-F_x}{F_y}\bigg)^2 \bigg)^{3/2}  \]</span></p>
+<p><span class="math display">\[ = \bigg( 1 + \frac{F_x^2}{F_y^2} \bigg)^{3/2}  \]</span></p>
+<p><span class="math display">\[ = \bigg( \frac{F_y^2 + F_x^2}{F_y^2} \bigg)^{3/2}  \]</span></p>
+<p><span class="math display">\[ = (F_y^2 + F_x^2)^{3/2}(F_y^{-2})^{3/2}  \]</span></p>
+<p><span class="math display">\[ = (F_y^2 + F_x^2)^{3/2}F_y^{-6/2}  \]</span></p>
+<p><span class="math display">\[ = (F_y^2 + F_x^2)^{3/2}F_y^{-3} \]</span></p>
+<p>Yerine koyarsak,</p>
+<p><span class="math display">\[ 
+\kappa = \frac{\displaystyle
+- \frac{F_y^2F_{xx} - 2F_{xy}F_xF_y + F_x^2F_{yy}}{F_y^3}}
+{(F_y^2 + F_x^2)^{3/2}F_y^{-3}}
+ \]</span></p>
+<p><span class="math inline">\(F_y^{-3}\)</span> ve <span class="math inline">\(F_y^{3}\)</span> birbirlerini iptal ederler ve sonuç:</p>
+<p><span class="math display">\[
+\kappa = \frac{F_y^2F_{xx} - 2F_{xy}F_xF_y +
+    F_x^2F_{yy}}{(F_y^2 + F_x^2)^{3/2}}
+\qquad (5)
+\]</span></p>
+<p>Üstteki ünlü eğim formülüdür.</p>
+<p>Bu eğim formülünün diğer bir şekli şöyledir (<span class="math inline">\(F\)</span> yerine <span class="math inline">\(\phi\)</span> kullanırsak)</p>
+<p><span class="math display">\[ \kappa = \bigtriangledown \cdot \frac{\bigtriangledown \phi}{|\bigtriangledown \phi|} \]</span></p>
+<p>Bunun okunuş şekli &quot;birim normal gradyanın uzaklaşım ölçüsü (divergence of the unit normal gradient)'' şeklindedir. Acaba bu formül, (5). formül ile uyumlu mu?</p>
+<p><span class="math display">\[ \kappa = \nabla \cdot \frac{\nabla \phi}{|\nabla \phi|}  \]</span></p>
+<p><span class="math display">\[ = \nabla \cdot \frac{(\phi_x,\phi_y)}{\sqrt{\phi_x^2+\phi_y^2}} \]</span></p>
+<p><span class="math display">\[ = \left(\partial_x \frac{\phi_x}{\sqrt{\phi_x^2+\phi_y^2}}\right)+ 
+\left(\partial_y \frac{\phi_y}{\sqrt{\phi_x^2+\phi_y^2}}\right)  \]</span></p>
+<p><span class="math display">\[ = \frac{\phi_{xx}}{\sqrt{\phi_x^2+\phi_y^2}} - \frac{\phi_x (\phi_x\phi_{xx}+\phi_y\phi_{xy})}
+{(\phi_x^2+\phi_y^2)^{3/2}} +
+\frac{\phi_{yy}}{\sqrt{\phi_x^2+\phi_y^2}} - \frac{\phi_y(\phi_x\phi_{xy}+\phi_y\phi_{yy})}
+{(\phi_x^2+\phi_y^2)^{3/2}}  \]</span></p>
+<p><span class="math display">\[ = \frac{\phi_{xx}(\phi_x^2+\phi_y^2) - \phi_x
+  (\phi_x\phi_{xx}+\phi_y\phi_{xy}) +\phi_{yy}(\phi_x^2+\phi_y^2) -
+  \phi_y(\phi_x\phi_{xy}+\phi_y\phi_{yy})}{(\phi_x^2+\phi_y^2)^{3/2}} \]</span></p>
+<p><span class="math display">\[ = \frac{\phi_{xx}\phi_y^2 - 2\phi_x\phi_y\phi_{xy} + \phi_{yy}\phi_x^2}{(\phi_x^2+\phi_y^2)^{3/2}}  \]</span></p>
+<p>Bu formül bizim (5). formül ile tıpatıp aynı.</p>
+<p>Üstteki işlemlerde uzaklaşım ölçüsü (divergence) operatörü <span class="math inline">\(\nabla \cdot\)</span> ile gradyan operatörü <span class="math inline">\(\nabla\)</span> arasındaki farkı belirtelim: <span class="math inline">\(\nabla \cdot\)</span> operatörü <span class="math inline">\(F(x,y)\)</span> üzerinde kısmi türevlerin toplamını verir, yani bir skalar tek sayı döndürür. Gradyan ise her bir elemanı bir kısmi türeve tekabül eden bir <em>vektör</em> geri getirir.</p>
+<p>Python Numpy kodlaması bağlamında, daha önce <em>Kesit Seviyeleri</em> yazısında ayrıksal olarak bir <code>phi</code> değişkeni içindeki bir fonksiyon üzerinde eğimselliği şöyle hesaplamıştık:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">gradPhiY, gradPhiX <span class="op">=</span> np.gradient(phi)
+absGradPhi<span class="op">=</span>np.sqrt(gradPhiX<span class="op">**</span><span class="dv">2</span><span class="op">+</span>gradPhiY<span class="op">**</span><span class="dv">2</span>)                               
+
+normGradPhiX<span class="op">=</span>gradPhiX<span class="op">/</span>(absGradPhi<span class="op">+</span>(absGradPhi<span class="op">==</span><span class="dv">0</span>))
+normGradPhiY<span class="op">=</span>gradPhiY<span class="op">/</span>(absGradPhi<span class="op">+</span>(absGradPhi<span class="op">==</span><span class="dv">0</span>))
+
+divYnormGradPhiX, divXnormGradPhiX<span class="op">=</span>np.gradient(normGradPhiX)
+divYnormGradPhiY, divXnormGradPhiY<span class="op">=</span>np.gradient(normGradPhiY)
+                       
+K <span class="op">=</span> divXnormGradPhiX <span class="op">+</span> divYnormGradPhiY</code></pre></div>
+<p>Bu satırların <span class="math inline">\(\nabla \cdot \frac{\nabla \phi}{|\nabla \phi|}\)</span> ifadesiyle birebir uyum gösterdiğini herhalde görebiliyoruz. Satır 1, <span class="math inline">\(\nabla \phi\)</span> ifadesidir. Satırlar 4-5 <span class="math inline">\(\frac{\nabla \phi}{|\nabla \phi|}\)</span> işlemini gerçekleştiriyor, gradyanı onun uzunluğuna (magnitude) bölerek onu birim vektörü haline getiriyor. Satırlar 7-10 tekrar sonucun gradyanını bir daha alıyor, ama bu sefer hesapsal kısmi türevleri birbiriyle topluyor, böylece uzaklaşım ölçüsü (divergence) hesaplanmış oluyor. Tüm bu işlemlerin sonucu eğimsellik <span class="math inline">\(\kappa\)</span> oluyor.</p>
+<p>Dikkat edilirse Python kodundaki K yani <span class="math inline">\(\kappa\)</span>, N x N boyutlu bir matristir, bu mantıklı çünkü <span class="math inline">\(\kappa\)</span> hesabı için kullandığımız <span class="math inline">\(F_x\)</span>, <span class="math inline">\(F_y\)</span> gibi türevler aslında <span class="math inline">\(F_x(x,y)\)</span>, <span class="math inline">\(F_y(x,y)\)</span> formüllerine sahipler, yani her <span class="math inline">\(x,y\)</span> kombinasyonu için farklı bir sonuç döndürebilirler. Bu sebeple K yani <span class="math inline">\(\kappa\)</span> <span class="math inline">\(\phi\)</span> fonksiyonunun her <span class="math inline">\(x,y\)</span> noktası için tanımlıdır.</p>
+<p>Bazen literatürde <span class="math inline">\(\nabla \cdot\)</span> yerine <span class="math inline">\(div(..)\)</span> kullanıldığını görebilirsiniz, bu operatörlerin ikisi de aynıdır.</p>
+<p>Kodu görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> plot_phi(phi):
+    fig <span class="op">=</span> plt.figure()
+    ax <span class="op">=</span> Axes3D(fig)
+    x <span class="op">=</span> []
+    y <span class="op">=</span> []
+    <span class="cf">for</span> (i,j),val <span class="kw">in</span> np.ndenumerate(phi):
+        x.append(i)
+        y.append(j)
+    ax.plot(xs<span class="op">=</span>x, ys<span class="op">=</span>y, zs<span class="op">=</span>phi.flatten(), 
+            zdir<span class="op">=</span><span class="st">&#39;z&#39;</span>, label<span class="op">=</span><span class="st">&#39;ys=0, zdir=z&#39;</span>)
+
+f, ax <span class="op">=</span> plt.subplots()
+
+<span class="co"># initial function phi - level set is a square 4 pixels</span>
+<span class="co"># away from borders on each side, in 3D it looks like an empty</span>
+<span class="co"># box</span>
+c0<span class="op">=</span><span class="dv">2</span><span class="op">;</span> w<span class="op">=</span><span class="dv">2</span>
+nrow, ncol<span class="op">=</span> (<span class="dv">30</span>,<span class="dv">30</span>)
+phi<span class="op">=</span>c0<span class="op">*</span>np.ones((nrow,ncol))
+phi[w<span class="op">+</span><span class="dv">1</span>:<span class="op">-</span>w<span class="dv">-1</span>, w<span class="op">+</span><span class="dv">1</span>:<span class="op">-</span>w<span class="dv">-1</span>]<span class="op">=-</span>c0
+
+dt<span class="op">=</span><span class="fl">1.</span>
+
+phiOld<span class="op">=</span>np.zeros((nrow,ncol))
+
+<span class="bu">iter</span><span class="op">=</span><span class="dv">0</span>
+
+<span class="cf">while</span> <span class="bu">iter</span> <span class="op">&lt;</span> <span class="dv">50</span>:
+    <span class="co"># gradient of phi</span>
+    gradPhiY, gradPhiX <span class="op">=</span> np.gradient(phi)
+    <span class="co"># magnitude of gradient of phi</span>
+    absGradPhi<span class="op">=</span>np.sqrt(gradPhiX<span class="op">**</span><span class="dv">2</span><span class="op">+</span>gradPhiY<span class="op">**</span><span class="dv">2</span>)                               
+    
+    <span class="co"># normalized gradient of phi - eliminating singularities</span>
+    normGradPhiX<span class="op">=</span>gradPhiX<span class="op">/</span>(absGradPhi<span class="op">+</span>(absGradPhi<span class="op">==</span><span class="dv">0</span>))
+    normGradPhiY<span class="op">=</span>gradPhiY<span class="op">/</span>(absGradPhi<span class="op">+</span>(absGradPhi<span class="op">==</span><span class="dv">0</span>))
+    
+    divYnormGradPhiX, divXnormGradPhiX<span class="op">=</span>np.gradient(normGradPhiX)
+    divYnormGradPhiY, divXnormGradPhiY<span class="op">=</span>np.gradient(normGradPhiY)
+                           
+    <span class="co"># curvature is the divergence of normalized gradient of phi</span>
+    K <span class="op">=</span> divXnormGradPhiX <span class="op">+</span> divYnormGradPhiY
+    dPhiBydT <span class="op">=</span> K <span class="op">*</span> absGradPhi <span class="co"># makes everything circle</span>
+    
+    <span class="co"># level set evolution equation    </span>
+    phi <span class="op">=</span> phi <span class="op">+</span> ( dt <span class="op">*</span> dPhiBydT )
+    <span class="cf">if</span> <span class="bu">iter</span> <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>: 
+        CS <span class="op">=</span> plt.contour(phi,<span class="dv">0</span>,colors<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+        plt.hold(<span class="va">False</span>)
+        plt.savefig(<span class="st">&#39;img1/level_1_&#39;</span><span class="op">+</span> <span class="bu">str</span>(<span class="bu">iter</span>) <span class="op">+</span> <span class="st">&#39;.png&#39;</span>)
+        <span class="co">#plot_phi(phi)</span>
+        plt.savefig(<span class="st">&#39;img1/phi_1_&#39;</span><span class="op">+</span> <span class="bu">str</span>(<span class="bu">iter</span>) <span class="op">+</span> <span class="st">&#39;.png&#39;</span>)
+    <span class="bu">iter</span> <span class="op">+=</span> <span class="dv">1</span></code></pre></div>
+<p><img src="img1/level_1_0.png" /> <img src="img1/level_1_10.png" /> <img src="img1/level_1_20.png" /> <img src="img1/level_1_30.png" /> <img src="img1/level_1_40.png" /></p>
+<p>Kaynaklar</p>
+<p>[1] Courant, <em>Introduction to Calculus and Analysis Volume 2</em>, sf. 223-232</p>
+<p>[2] Wolfram Mathworld, <em>Curvature</em>, <a href="http://mathworld.wolfram.com/Curvature.html" class="uri">http://mathworld.wolfram.com/Curvature.html</a></p>
+<p>[3] Strang, <em>Computational Science and Engineering</em>,</p>
+<p>[4] Bayramlı, <em>Diferansiyel Denklemler, Türevler</em></p>
+<p>[5] Kristiadi, <em>Level Set Method Part I: Introduction</em>, <a href="https://agustinus.kristia.de/techblog/2016/11/05/levelset-method/" class="uri">https://agustinus.kristia.de/techblog/2016/11/05/levelset-method/</a></p>
+<p>[6] Kristiadi, <em>Level Set Method Part II: Image Segmentation</em>, <a href="https://agustinus.kristia.de/techblog/2016/11/20/levelset-segmentation/" class="uri">https://agustinus.kristia.de/techblog/2016/11/20/levelset-segmentation/</a></p>
+<p>[7] Lombaert, <em>Level set method: Explanation</em>, <a href="https://profs.etsmtl.ca/hlombaert/levelset/" class="uri">https://profs.etsmtl.ca/hlombaert/levelset/</a></p>
+</body>
+</html>

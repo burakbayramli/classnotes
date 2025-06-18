@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="durağanlık-ve-testler">Durağanlık ve Testler</h1>
+<p>Bazı durumlarda bir durağan seriyi çıplak gözle bakarak tanıyabiliriz. Her zaman bu mümkün olmayabilir fakat bariz durumlarda bunu anlamak, hatta anlayabilmek lazım.</p>
+<p>Bir durağan serinin grafiği sabit bir seviye etrafında salınım yapıyor olmalıdır, ki bu fenomene ortalamaya dönüş (mean-reversion) adı verilir. Yani seri yükseliyor, azalıyor olabilir, ama sürekli belli bir değere rutin şekilde dönüş yapıyor olmalıdır. Seri içinde bazı noktalarda bir zıplayış ta görülebilir, eğer bu zıplayış düzenli aralıklarla oluyorsa yine durağanlığı bozmaz.</p>
+<p>Mesela altta Nil Nehrinin seviyesinin ölçümü MS 622-1284 arasında alınmış, bu seriyi grafikleyelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+nile <span class="op">=</span> pd.read_csv(<span class="st">&#39;nile-water-level.csv&#39;</span>,header<span class="op">=</span><span class="va">None</span>)
+nile[<span class="dv">1</span>].plot()
+plt.title(<span class="st">&#39;Nil Nehri Seviyesi&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_mean_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mean_01.png" />
+
+</div>
+<p>Onun durağan olduğunu görüyoruz. Diğer yandan ABD Doları / Kanada Doları arasındaki döviz kuru gösterilmektedir, bu verinin alttaki dosya içinde sadece 16:59 itibariyle kapanış fiyatlarını baz aldık, 1 dakikalık bir kesit bu,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> statsmodels.tsa.stattools <span class="im">as</span> st
+<span class="im">import</span> pandas <span class="im">as</span> pd
+df_caus <span class="op">=</span> pd.read_csv(<span class="st">&#39;USDCAD.csv&#39;</span>)
+df_caus[<span class="st">&#39;y&#39;</span>].plot()
+plt.title(<span class="st">&#39;ABD/Kanada Dolar Kuru&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_mean_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mean_02.png" />
+
+</div>
+<p>Bu zaman serisi durağan değildir.</p>
+<p>Durağanlık senet al/sat için kullanılabilecek bir faktördür. Çünkü ortalamaya-dönüş / durağanlık var ise, varlık fiyatı bilinen ortalamadan aşağı düştükçe senet alınır, yukarı çıkınca senet satılır, aradaki fark kar olarak cebe atılır. Azdan Al Üstten Sat (Buy Low Sell High) deyişi tam burada uygundur. Tabii finans zaman serilerinin çoğu durağan değildir, ama bazen belli zaman aralıklarında ortalama dönüş keşfedilebilir, ya da durağanlık &quot;yaratılır''. Bunun detaylarına ileride geleceğiz.</p>
+<p>Durağanlığı anlamak istatistiki testler vardır.</p>
+<p>Dickey-Fuller Testi</p>
+<p>Bu teste gore</p>
+<p><span class="math display">\[ \Delta y_t = \lambda y_{t-1} + \mu + \beta t + 
+\alpha_1 \Delta y_{t-1} + ... + 
+\alpha_k \Delta y_{t-k} + \epsilon_t
+\]</span></p>
+<p>ki <span class="math inline">\(\epsilon_t\)</span> gürültüdür. Çoğunlukla testte <span class="math inline">\(k=1\)</span> kabul edilir, yani formül şu halde olacaktır,</p>
+<p><span class="math display">\[ \Delta y_t = \lambda y_{t-1} + 
+\mu + \beta t +  
+\alpha_1 \Delta y_{t-1} + 
+\epsilon_t 
+\qquad (1)
+\]</span></p>
+<p>Formül nereden geliyor? Anlamak için önce Rasgele Yürüyüş (random walk) zaman serilerine bakalım, bu seri</p>
+<p><span class="math display">\[ y_t = y_{t-1} + \epsilon_t \]</span></p>
+<p>olarak gösteriliyor, yani <span class="math inline">\(t\)</span> anındaki değer bir önceki <span class="math inline">\(t-1\)</span> anındaki değer artı gürültüdür, ki <span class="math inline">\(\epsilon_t \sim N(0,\sigma^2)\)</span>. Bir de Kaymalı Rasgele Yürüyüş (random walk with drift) var,</p>
+<p><span class="math display">\[ y_t = y_{t-1} + \mu + \epsilon_t \]</span></p>
+<p>Rasgele Yürüyüş serileri üstteki haliyle durağan değil. Çünkü yürüyüş &quot;rasgele'', genel trend toplana toplana yukarı da aşağı da gidebilir, bir ortalamaya dönmesi garanti değil. Problem bir önceki değere olan bağlantı, yani <span class="math inline">\(y_{t-1}\)</span>. Rasgele yürüyüş olmaması için o bağlantının yokolması lazım. Bunun istatistiki testini</p>
+<p><span class="math display">\[ y_t = \rho y_{t-1} + \mu + \epsilon_t \]</span></p>
+<p>şeklinde tanımlayabilirdik, bu durumda</p>
+<p><span class="math display">\[ H_0: \rho = 1 \]</span></p>
+<p><span class="math display">\[ H_1: \rho &lt; 1 \]</span></p>
+<p>test edilirdi. Eğer <span class="math inline">\(\rho=1\)</span> değil ise, rasgele yürüyüş yok. Cebirsel olarak işleri kolaylaştırmak için iki taraftan <span class="math inline">\(y_{t-1}\)</span> çıkartılır,</p>
+<p><span class="math display">\[ y_t - y_{t-1} = \rho y_{t-1} - y_{t-1} + \mu + \epsilon_t \]</span></p>
+<p><span class="math display">\[  = (1-\rho) y_{t-1} + \mu + \epsilon_t \]</span></p>
+<p><span class="math inline">\(1-\rho = \lambda\)</span> kullanalım,</p>
+<p><span class="math display">\[ \Delta y_t  = \lambda y_{t-1} + \mu + \epsilon_t \]</span></p>
+<p>Şimdi <span class="math inline">\(\rho = 1\)</span> testi <span class="math inline">\(\lambda=0\)</span> testi demektir, bu durumda</p>
+<p><span class="math display">\[ \Delta y_t  = \cancel{\lambda y_{t-1}} + \mu + \epsilon_t \]</span></p>
+<p>olurdu. Ayrıca zamana bağlı lineer kaydırma da (linear drift) eklenebilir,</p>
+<p><span class="math display">\[ \Delta y_t  = \lambda y_{t-1} + \mu + \beta t + \epsilon_t
+\qquad (2)
+\]</span></p>
+<p>Görüldüğü gibi neredeyse (1) ile tamamen aynı. Üstteki ifade <span class="math inline">\(y_t\)</span> farkları ve <span class="math inline">\(y_{t-1}\)</span> ve diğer değişkenler üzerinden regresyona sokulacaktır ve sonuçlar irdelenecektir. Fakat bir pürüz var, <span class="math inline">\(y_{t-1}\)</span> değişkeni <span class="math inline">\(H_o\)</span> altında normal dağılamaz, çünkü katsayı <span class="math inline">\(y_{t-1}\)</span> için, ki bu değişken de zaman serisindeki noktalardan biri sonuçta ve onun üzerinde normallik faraziyesi yapamayız (rasgele yürüyüş her adımda normal bir adımı <em>toplar</em>, bu toplam normal diyemeyiz). Regresyona sokulan değişken <span class="math inline">\(\Delta y_t\)</span> bir I(1) değişkeni, orada normallik farzedilebilir. Bu durumda <span class="math inline">\(\lambda\)</span> için elde edilen katsayı ve onun t değeri Öğrenci t dağılımına sahip değil, başka bir dağılım ortaya çıkıyor. Neyse ki Dickey ve Fuller bize gereken kritik değerleri bu başka dağılım için simülasyon üzerinden hesaplamışlar, ve hipotez reddi için bu eşik değerlerini kullanıyoruz, zaten ADF kütüphaneleri <span class="math inline">\(\lambda\)</span> hesabı ile beraber bu kritik değerleri raporluyorlar.</p>
+<p>Veri üzerinde görelim, önce Nil Nehri verisi</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> st.adfuller(nile[<span class="dv">1</span>],maxlag<span class="op">=</span><span class="dv">1</span>)</code></pre></div>
+<pre><code>(-10.065106269033185, 1.302505000632203e-17, 1, 661, {&#39;5%&#39;: -2.8659224464259823,
+ &#39;1%&#39;: -3.4402817347322583, &#39;10%&#39;: -2.5691038118332603}, 7529.8499066238182)</code></pre>
+<p>Hipotezi reddetmek istiyorsak elde edilen değer, kritik eşit değerlerinden daha küçük olmalı, bizim elimizde -10.06 değeri var, %95 için eşik değeri -2.86. Daha küçük, hipotez reddedildi. Unutmayalım, hipotez <span class="math inline">\(H_0\)</span> serisinin durağan olmadığı.</p>
+<p>Döviz kuru verisi üzerinde,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> st.adfuller(df_caus.y,maxlag<span class="op">=</span><span class="dv">1</span>)</code></pre></div>
+<pre><code>(-1.869396174934818, 0.34659219335600189, 0, 1236, {&#39;5%&#39;:
+                                %-2.8638812231195359, &#39;1%&#39;:
+                                %-3.4356517256484151, &#39;10%&#39;:
+                                %-2.5680164989107781}, -8190.3235420441761) </code></pre>
+<p>Bu sonuca göre hipotezi, yani <span class="math inline">\(\lambda=0\)</span>'i reddedemedik. Serinin durağan olmadığı olasılığı hala çok güçlü. Demek ki ABD/Kanada dolar kurunun durağan olduğunu gösteremiyoruz.</p>
+<p>Hurst Üsteli (Hurst Exponent)</p>
+<p>Kabaca belirtmek gerekirse durağan bir fiyat serisinin yayınımı (diffusion) bir geometrik rasgele yürüyüşe göre daha yavaştır. Matematiksel olarak bu yayınımı ölçmenin yolu var,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> hurst <span class="im">as</span> h
+<span class="bu">print</span> <span class="st">&#39;H doviz kuru&#39;</span>, h.hurst(np.log(df_caus.y))
+<span class="bu">print</span> <span class="st">&#39;H Nil Nehri&#39;</span>, h.hurst(nile[<span class="dv">1</span>])</code></pre></div>
+<pre><code>H doviz kuru 0.460763303802
+H Nil Nehri 0.075586961757</code></pre>
+<p>Eğer <span class="math inline">\(H=0.5\)</span> ise bu rasgele yürüyüş demektir. Eğer <span class="math inline">\(H&lt;0.5\)</span> ise ortalama dönüş mevcuttur, trend olan bir şeride (ki bu patlıyor, yani yayınımı yüksek demek) <span class="math inline">\(H&gt;0.5\)</span> olacaktır.</p>
+<p>Üstteki sonuçlarda 0.46 elde edildi, <em>bir ihtimal</em> ortalamaya dönüşün mevcuduna ispat olabilir bu, ama kesin değil, hala 0.5'e çok yakın. Nil Nehri için 0.075, ortalama dönüşün varlığı için kuvvetli ihtimal.</p>
+<p>Varyans Oranı (Variance Ratio)</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> arch.unitroot <span class="im">import</span> VarianceRatio
+vr <span class="op">=</span> VarianceRatio(np.log(df_caus.y),overlap<span class="op">=</span><span class="va">False</span>)
+<span class="bu">print</span>(vr.summary().as_text())</code></pre></div>
+<pre><code>     Variance-Ratio Test Results     
+=====================================
+Test Statistic                  0.846
+P-value                         0.398
+Lags                                2
+-------------------------------------
+
+Computed with non-overlapping blocks</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> arch.unitroot <span class="im">import</span> VarianceRatio
+vr <span class="op">=</span> VarianceRatio(nile[<span class="dv">1</span>], overlap<span class="op">=</span><span class="va">False</span>)
+<span class="bu">print</span>(vr.summary().as_text())</code></pre></div>
+<pre><code>     Variance-Ratio Test Results     
+=====================================
+Test Statistic                 -5.493
+P-value                         0.000
+Lags                                2
+-------------------------------------
+
+Computed with non-overlapping blocks</code></pre>
+<p>Burada elde edilen p-değerleri sıfır hipotezi için kullanılmalı, ki bu hipotez %90 güven ile rasgele yürüyüş hipotezinin varlığının ispatıdır, çok düşük p-değeri bu hipotezi red için kullanılabilir. Üstte %54 tamamen, kesin şekilde rededemiyoruz anlamına gelir. Nil Nehri için p-value 0; yani rasgele yürüyüş ihtimali sıfır.</p>
+<p>Ortalamaya Dönüş için Hayat Yarılama Zamanı (Half-Life) Hesaplamak</p>
+<p>Bir önceki örnekte %90 güvenle ABD/Kanada kurununun ortalamaya dönüş yapan bir seri olmadığını gösterdik. Fakat bu demek değildir ki bu seri üzerinden ortalamaya dönüş stratejisi ile para kazanmak mümkün olmasın. Çoğu kazançlı borsa alım/satım modelinin bu kadar yüksek bir güvene ihtiyacı yoktur. ABD/Kanada serisinin alım/satım için bir aday olup olmadığını anlamak için onun hayat yarılama zamanını hesaplayabiliriz.</p>
+<p>Hayat yarılama zamanı şu formüle bağlı olarak hesaplanabilir,</p>
+<p><span class="math display">\[ dy_t = (\lambda y_{t-1} + \mu )dt + d\epsilon \]</span></p>
+<p>Bu formül Rasgele Calculus'tan (Stochastic Calculus) geliyor, ve Ornstein-Uhlenbeck formülü olarak bilinir. Dikkat edilirse (2)'nin bir nevi Calculus formu olduğu görülebilir. Bu formülün <span class="math inline">\(\lambda\)</span> parametresini veriye lineer regresyon ile uydurarak hesaplayabiliriz, <span class="math inline">\(dy_t\)</span> <code>deltaY</code> olarak, <span class="math inline">\(y_{t-1}\)</span> ise <code>ylag</code> olarak regresyona verilir.</p>
+<p>Not: [7]'de <span class="math inline">\(y_{t-1}\)</span> kullanılıyor fakat bu denklemin asıl formu <span class="math inline">\(y_t\)</span> kullanır. Yazar herhalde <span class="math inline">\(\Delta y\)</span> hesaplanırken <span class="math inline">\(y_t-y_{t-1}\)</span> yapıldığı için üstteki eşitliğin sağ tarafında <span class="math inline">\(y_{t-1}\)</span> kullanma ihtiyacı hissetmiş.</p>
+<p>Not: Regresyon için gereken <span class="math inline">\(y = ax + b\)</span> formunu tam göremiyor olabiliriz, <span class="math inline">\(dt\)</span> pürüz çıkartıyor. Fakat bu değer <span class="math inline">\(dt=1\)</span>, yani bir birimlik bir değişim, değişim birimini 1 almalıyız ki bu şekilde hesapladığımız <span class="math inline">\(\lambda\)</span> hayat yarılama için gün hesabı verebilsin.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df_caus[<span class="st">&#39;ylag&#39;</span>] <span class="op">=</span> df_caus[<span class="st">&#39;y&#39;</span>].shift(<span class="dv">1</span>)
+df_caus[<span class="st">&#39;deltaY&#39;</span>] <span class="op">=</span> df_caus[<span class="st">&#39;y&#39;</span>] <span class="op">-</span> df_caus[<span class="st">&#39;ylag&#39;</span>]
+
+<span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf
+results <span class="op">=</span> smf.ols(<span class="st">&#39;deltaY ~ ylag&#39;</span>, data<span class="op">=</span>df_caus).fit()</code></pre></div>
+<p>Bu formülün ilginç tarafı şurada, Olasıksal Calculus ile çözümün beklentisi,</p>
+<p><span class="math display">\[ E[y_t] = y_0 e^{\lambda t} - \frac{\mu}{\lambda} ( 1 - e^{\lambda t}) \]</span> Şimdi biraz önce veriden bulduğumuz <span class="math inline">\(\lambda\)</span> hayat yarılama hesabı için kullanılabilir, çünkü üstteki denklem <span class="math inline">\(e\)</span>'nin üstel değeri olarak <span class="math inline">\(\lambda\)</span>'yi kullanıyor. Negatif <span class="math inline">\(\lambda\)</span> ortalamaya dönüş işaretidir ve azalışın hayat yarılama zamanı <span class="math inline">\(-\log(2)/\lambda\)</span> olarak bilinir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">lam <span class="op">=</span> results.params[<span class="st">&#39;ylag&#39;</span>]
+<span class="bu">print</span> lam</code></pre></div>
+<pre><code>-0.00590028106064</code></pre>
+<p>Bu hesabın borsacılar için ne kadar faydalı olduğu görülebilir, eğer <span class="math inline">\(\lambda\)</span> pozitif ise ortalamaya dönüş zaten yoktur, bu hisseden uzak durulur. Eğer negatif ise ve çok sıfıra yakın ise hayat yarılama zamanı çok uzun olur, herhangi bir zaman periyotu içinde yeteri kadar al/sat yapılamaz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">halflife<span class="op">=-</span>np.log(<span class="dv">2</span>)<span class="op">/</span>lam
+<span class="bu">print</span> halflife, <span class="st">&#39;days&#39;</span></code></pre></div>
+<pre><code>117.476976679 days</code></pre>
+<p>Daha fazla detay için [8] bölümüne bakılabilir.</p>
+<p>Alım / Satım</p>
+<p>Bir seri ortalamaya dönen türden ise, ve hayat yarılama zamanı bizim satın alma zaman dilimine uygunsa (mesela 112 günlük bir zaman bazıları için çok uzun olabilir, o kadar beklemek istemeyenler olabilir) o zaman üstteki kur fiyatı üzerinde basit bir lineer strateji ile oynamaya başlanabilir. Fiyatın normalize edilmiş sapması hesaplanır, ki bunu yapmak için yürüyen ortalama (moving average) ile hareket eden standard sapma (moving standard deviation) bölünür, ve bu sapmaya <em>ters</em> orandaki miktarda varlık (asset) elde tutulur. Üstteki durumda, elinde ABD doları olan biri için, Z hesabı mesela -2 ise 2 Kanada doları almak lazım, +2 ise 2 birim açığa satmış olmak lazım. Oran nedir? Mesela 1000 olabilir, -2 ise 2000 alınır, vs.</p>
+<p>Bu testin gerçek alışveriş ile bağlantısı şurada, eğer ortalamadan düşüş var ise o düşüşe oranlı varlık alıp elde tutuyoruz, ve ortalama dönünce varlıkları satıyoruz. Alttan aldığımız için aradaki fark kardır. Ortalamadan yükseklik durumu var ise o oranda varlığı açığa satarız, çünkü biliriz ki fiyat aşağı inecektir, bu satışın bedeli hesaba yazılır, sonra (umarız ki daha düşük fiyattan) ortalamaya dönüş (düşüş) olduğunda pozisyonu kapattığımızda aradaki fark cepte kar kalacaktır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">halflife <span class="op">=</span> <span class="dv">117</span>
+data_mean <span class="op">=</span> pd.rolling_mean(df_caus[<span class="st">&#39;y&#39;</span>], window<span class="op">=</span><span class="bu">int</span>(halflife))
+data_std <span class="op">=</span> pd.rolling_std(df_caus[<span class="st">&#39;y&#39;</span>], window<span class="op">=</span><span class="bu">int</span>(halflife))
+df_caus[<span class="st">&#39;mktVal&#39;</span>] <span class="op">=</span> <span class="dv">-1</span><span class="op">*</span>(df_caus[<span class="st">&#39;y&#39;</span>]<span class="op">-</span>data_mean) <span class="op">/</span> data_std
+pnl <span class="op">=</span> df_caus[<span class="st">&#39;mktVal&#39;</span>].shift(<span class="dv">1</span>) <span class="op">*</span> df_caus.y.pct_change()
+pnl <span class="op">=</span> pnl.fillna(<span class="dv">0</span>).cumsum()
+pnl.plot()
+plt.ylabel(<span class="st">&#39;Kumulatif Kazanc / Kayip&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_mean_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mean_03.png" />
+
+</div>
+<p>Kumulatif hesap görülüyor. Uzun bir düşüş kalıcılığı (drawdown) var, bu pek iyi değil, strateji sonlara doğru pozitif getiri noktasına geliyor. Fena değil. Tabii bu stratejiyi olduğu gibi alım/satım için baz almak pek pratik olmayabilir, üstteki kazanç / zararı üretmek için sınırsız sermaye gerekebilir mesela ki bu gerçekçi değil. Bu örneğin yapmaya çalıştığı şudur -- her zaman durağanlık olmamasının ortalamaya dönüş stratejisini kullanmak için bir engel olmayabileceğini göstermek. Ayrıca ortalamaya dönüş ile getiri elde etmek için aşırı çetrefil teknik göstergeçler ve stratejiler gerekmediğini anlatmak.</p>
+<p>Yanlız şu gözlemi de eklemek lazım, çoğu varlığın hareketi durağan / ortalamaya dönüş karakterinde değildir. Fakat bu limitasyonun etrafından dolaşmamızı sağlayacak bir teknik var. Koentegrasyon bölümünde bunu göreceğiz. Bu bölümde öğrendiklerimiz boşa gitmeyecek!</p>
+<p>Dikkat, Z skorunun söylediği miktarın ters oranı <em>seviyesindeki</em> varlığı elde tutuyoruz, her gün skorun söylediği kadar varlığı eklemiyoruz. Mesela bugün 1 diyor, ertesi gün 2 diyor şimdi elde 3 değil, bugün 1, yarın 2 diyorsa, eldeki 1'e 1 ekleyip 2 seviyesine geliyoruz.</p>
+<p>Kaynaklar</p>
+<p>[1] FRED, <em>Canada / U.S. Foreign Exchange Rate (DEXCAUS)</em>, <a href="https://research.stlouisfed.org/fred2/series/DEXCAUS/downloaddata" class="uri">https://research.stlouisfed.org/fred2/series/DEXCAUS/downloaddata</a></p>
+<p>[2] IHMC, <em>A random walk process</em>, <a href="http://cmapskm.ihmc.us/rid=1052458884462_996058812_7176" class="uri">http://cmapskm.ihmc.us/rid=1052458884462_996058812_7176</a></p>
+<p>[3] Lambert, <em>Dickey Fuller test for unit root</em>, <a href="https://www.youtube.com/watch?v=2GxWgIumPTA" class="uri">https://www.youtube.com/watch?v=2GxWgIumPTA</a></p>
+<p>[4] Cross Validated, <em>Which Dickey-Fuller test for a time series modelled with an intercept/drift and a linear trend?</em>,<a href="http://stats.stackexchange.com/questions/44647/which-dickey-fuller-test-should-i-apply-to-a-time-series-with-an-underlying-mode" class="uri">http://stats.stackexchange.com/questions/44647/which-dickey-fuller-test-should-i-apply-to-a-time-series-with-an-underlying-mode</a></p>
+<p>[5] Halls-Moore, <em>Basics of Statistical Mean Reversion Testing</em>,<a href="https://www.quantstart.com/articles/Basics-of-Statistical-Mean-Reversion-Testing" class="uri">https://www.quantstart.com/articles/Basics-of-Statistical-Mean-Reversion-Testing</a></p>
+<p>[6] Sheppard, <em>Unit Root Testing</em>, <a href="http://nbviewer.ipython.org/github/bashtage/arch/blob/master/examples/unitroot_examples.ipynb" class="uri">http://nbviewer.ipython.org/github/bashtage/arch/blob/master/examples/unitroot_examples.ipynb</a></p>
+<p>[7] Chan, <em>Algorithmic Trading</em></p>
+<p>[8] Bayramlı, Istatistik, <em>Olasılıksal Calculus</em></p>
+</body>
+</html>

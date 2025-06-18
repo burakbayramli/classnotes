@@ -1,0 +1,425 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="newton-umsu-metotlar-quasi-newton-methods-dfp-bfgs">Newton-umsu Metotlar (Quasi-Newton Methods), DFP, BFGS</h1>
+<p>Bir <span class="math inline">\(f\)</span> hedef fonksiyonunun minimizasyonu için Newton metodunun özyineli algoritması</p>
+<p><span class="math display">\[
+x_{k+1} = x_k - F(x_k)^{-1} g_k
+\]</span></p>
+<p>ki <span class="math inline">\(g\)</span> gradyan, <span class="math inline">\(F\)</span> ise Hessian.</p>
+<p>Ya da</p>
+<p><span class="math display">\[
+x_{k+1} = x_k - (\nabla^2 f(x_k))^{-1} \nabla f(x_k)
+\]</span></p>
+<p>Newton'umsu metotların ana fikri Hessian matrisi yerine sadece gradyan bilgisini kullanarak yaklaşık bir <span class="math inline">\(F_k\)</span> kullanmak, diyelim ki <span class="math inline">\(H_k\)</span>. Sonra <span class="math inline">\(f(\cdot)\)</span>'un karesel olarak temsilini yazalım, özyineli gidişat sırasında, bir herhangi bir <span class="math inline">\(x_{k+1}\)</span> etrafında Taylor açılımı</p>
+<p><span class="math display">\[
+m_k(x) \equiv f(x_{k+1}) + \nabla f(x_{k+1})^T (x - x_{k+1}) + 
+\frac{1}{2} (x - x_{k+1}) ^T H_{k+1}^T (x - x_{k+1}) 
+\]</span></p>
+<p>Eğer gradyanı alırsak</p>
+<p><span class="math display">\[
+\nabla m_k(x) = \nabla f(x_{k+1}) + H_{k+1}^{-1} (x-x_{k+1})
+\]</span></p>
+<p>Şimdi <span class="math inline">\(k\)</span> ve <span class="math inline">\(k+1\)</span> noktaları, gradyanları üzerinden bir <span class="math inline">\(H^{k+1}\)</span> ilişkisi ortaya çıkartmak istiyoruz ki çözüp bir sonuç elde edebilelim. Ek denklemler elde etmek için şu akla yatkın şartları öne sürebiliriz, <span class="math inline">\(m\)</span> ve <span class="math inline">\(f\)</span> gradyanları birbirine uysun. Yani,</p>
+<p><span class="math display">\[
+\nabla m_k(x) = \nabla f(x_k)
+\]</span></p>
+<p>O zaman, &quot;Newton-umsuluk şartı (quasi-Newton condition)'' da denen iki üstteki denklemle beraber, ve açılımda <span class="math inline">\(x\)</span> herhangi bir <span class="math inline">\(x\)</span> olabileceği için onun yerine <span class="math inline">\(x_k\)</span> kullanarak,</p>
+<p><span class="math display">\[
+\nabla f(x_{k+1}) + H_{k+1}^{-1} (x_k-x_{k+1}) = \nabla f(x_k)
+\]</span></p>
+<p><span class="math display">\[
+H_{k+1}^{-1} (x_k-x_{k+1}) = \nabla f(x_k) - \nabla f(x_{k+1}) 
+\]</span></p>
+<p><span class="math display">\[
+H_{k+1}^{-1} (x_{k+1}-x_k) = \nabla f(x_{k+1}) - \nabla f(x_k) 
+\]</span></p>
+<p>Üsttekine sekant denklemi adı veriliyor, şu figürle alakalı,</p>
+<div class="figure">
+<img src="func_50_bfgs_01.png" />
+
+</div>
+<p>Yani sekant denklemine göre <span class="math inline">\(H_{k+1}^{-1}\)</span> değeri, yatay kordinattaki <span class="math inline">\(x^{k+1}-x^k\)</span> değişimini, gradyan değişimi <span class="math inline">\(\nabla f(x^{k+1}) - \nabla f(x^k)\)</span>'e taşıyor / eşliyor [4].</p>
+<p>Kısaltma amaçlı,</p>
+<p><span class="math display">\[
+H_{k+1}^{-1} \underbrace{(x_{k+1}-x_k)}_{y_k} = 
+\underbrace{\nabla f(x_{k+1}) - \nabla f(x_k)}_{s_k}
+\]</span></p>
+<p><span class="math display">\[
+H_{k+1}^{-1} y_k = s_k
+\qquad (1)
+\]</span></p>
+<p>Özyineli bağlamda bir <span class="math inline">\(H_0\)</span>'dan başlayarak ufak değişimlerle sonuca ulaşılmaya uğraşılır. Değişimlerin ufak olması gerekliliği üzerinden ve bu değişimlerin kerte 1 eki ile olması sonucu [4]'teki matris normu ile beraber aslında birazdan türeteceğimiz güncelleme denklemi alınabiliyor. Kerte 1 eki konusu için bkz [5]. Biz farklı bir yönden, eğer ufak değişim kerte 1 ve 2 ile yapılsa nereye varılacağına bakacağız [1, sf. 111].</p>
+<p>Kerte 1 eki ile <span class="math inline">\(H_k\)</span>'yi <span class="math inline">\(H_{k+1}\)</span> yapmak demek aslında</p>
+<p><span class="math display">\[
+H_{k+1} = H_k + czz^T 
+\]</span></p>
+<p>demektir. Bunu iki üstteki formül içine koyarsak</p>
+<p><span class="math display">\[
+s_k = (H_k + czz^T) y_k = H_k y_k + cz (z^T y_k)
+\]</span></p>
+<p><span class="math inline">\(z^T y_k\)</span> bir skalar olduğu için</p>
+<p><span class="math display">\[
+cz = \frac{s_k - H_k y_k}{z^T y_k}
+\]</span></p>
+<p>Bu denklemi çözen en basit <span class="math inline">\(c,z\)</span> seçenekleri</p>
+<p><span class="math display">\[
+z = s_k - H_ky_k
+\]</span></p>
+<p><span class="math display">\[
+c = \frac{1}{z^Ty_k}
+\]</span></p>
+<p>Bu bize kerte 1 güncelleme formülünü verir,</p>
+<p><span class="math display">\[
+H_{k+1} = H_k + \frac{ (s-H_ky_k) (s-H_ky_k)^T }{(s-H_ky_k) y_k}
+\]</span></p>
+<p>Ne yazık ki kerte 1 güncelemesinin bazı problemleri var. Bunlardan en önemlisi güncelleme sonrası elde edilen yeni <span class="math inline">\(H_{k+1}\)</span>'in pozitif kesin olmasının garanti olmaması, bu sebeple bir sonraki döngüde elde edilecek yön <span class="math inline">\(d_k = -H_k \nabla f(x_k)\)</span>'nin bir iniş yönü olmasının garantisinin de tehlikeye girmesi.</p>
+<p>Çözüm olarak <span class="math inline">\(H_{k+1}\)</span>'in pozitif kesin kalmasını garantileyecek kerte 2 güncellemesi keşfedilmiştir. Yani</p>
+<p><span class="math display">\[
+H_{k+1} = H_k + c_1z_1z_1^T + c_2z_2z_2^T 
+\]</span></p>
+<p>Pozitif kesinliğin ispatı için [2, sf. 206].</p>
+<p>Yine (1)'deki Newton-umsuluk şartıyla beraber</p>
+<p><span class="math display">\[
+s_k = H_k y_k + c_1 z_1 (z_1^Ty_k) + c_2z_2 (z_2^Ty_k)
+\]</span></p>
+<p><span class="math inline">\(z_1\)</span> ve <span class="math inline">\(z_2\)</span> için özgün çözüm olmamasına rağmen üstteki denklemi tatmin edecek seçenekler bulunabilir,</p>
+<p><span class="math display">\[
+z_1 = s_k, \quad 
+z_2 = H_k y_k, \quad
+c_1 = \frac{1}{z_1^Ty_k}, \quad
+c_2 = \frac{1}{z_2^Ty_k}
+\]</span></p>
+<p>Ve böylece kerte 2 güncellemesi şu hale gelir,</p>
+<p><span class="math display">\[
+H_{k+1} = H_k + \frac{y_ky_k^T}{s_k^Ty_k} - \frac{(H_k y_k)(H_k y_k)^T}{(H_ky_k)^Ty_k}
+\]</span></p>
+<p>Bu formüle Davidon-Fletcher-Powell (DFP) formülü adı verilir.</p>
+<p>Algoritma şöyle</p>
+<ol style="list-style-type: decimal">
+<li><p><span class="math inline">\(k=0\)</span> yap. Bir <span class="math inline">\(x_0\)</span>'dan başla, ve herhangi bir simetrik, pozitif kesin bir <span class="math inline">\(H_0\)</span> al</p></li>
+<li><p>Eğer <span class="math inline">\(s_k = 0\)</span> ise dur, yoksa <span class="math inline">\(d_k = -H_k g_k\)</span></p></li>
+<li><p>Şunu hesapla</p></li>
+</ol>
+<p><span class="math display">\[
+\alpha_k = \arg\min_{\alpha \ge 0} f(x_k + \alpha d_k)
+\]</span></p>
+<p><span class="math display">\[
+x_{k+1} = x_k + \alpha_k d_k
+\]</span></p>
+<ol start="4" style="list-style-type: decimal">
+<li>Hesapla</li>
+</ol>
+<p><span class="math display">\[
+y_k = \alpha_k d_k
+\]</span></p>
+<p><span class="math display">\[
+s_k = g_{k+1} - g_k
+\]</span></p>
+<p><span class="math display">\[
+H_{k+1} = H_k + \frac{y_ky_k^T}{s_k^Ty_k} - \frac{(H_k y_k)(H_k y_k)^T}{(H_ky_k)^Ty_k}
+\]</span></p>
+<p>BFGS</p>
+<p>DFP ile kerte 2 güncellemesi oluyor böylece <span class="math inline">\(H_{k+1}\)</span> pozitif kesin kalıyor, güzel. Fakat DFP'nin hala sayısal olarak bazı problemleri var. Burada problem Hessian'ın değil Hessian'ın tersinin yaklaşıklamasının güncelleniyor olması. Daha iyi bir seçim Hessian'ın <em>kendisinin</em> yaklaşıklamasının güncellenmesi ve onun üzerinden bir terslik elde edilmesi olmaz mıydı? Evet.</p>
+<p>Devam etmeden önce işimize yarayacak başka bir konu, ikizlik konusundan bahsedelim. Eğer DFP formülünün tersinin alırsak belli bir sonuç elde ederiz (bunun benzerini yapacağız). Ama biz bu noktaya (1)'deki</p>
+<p><span class="math display">\[
+H_{k+1} y_k = s_k
+\]</span></p>
+<p>ile geldiğimizi biliyoruz, ve üstteki formülde ufak bir takla atarsak</p>
+<p><span class="math display">\[
+y_k = B_{k+1} s_k
+\]</span></p>
+<p>sonucuna gelebileceğimizi de biliyoruz, ki <span class="math inline">\(B_k\)</span>, <span class="math inline">\(F_k\)</span>'nin yaklaşık hali. Dikkat edersek bu yeni Newton-umsuluk kuralı form olarak bir öncekine çok benziyor, sadece <span class="math inline">\(H_k\)</span> yerine <span class="math inline">\(B_k\)</span> var ve <span class="math inline">\(y_k,s_k\)</span> yerleri değişti! Bundan istifade edebiliriz, ve şimdiye kadar yapılan tüm türetme işlemlerini kullanarak ve sadece <span class="math inline">\(y_k,s_k\)</span> yerini değiştirerek <span class="math inline">\(B_k\)</span> için bir güncelleme formülü elde edebiliriz.</p>
+<p><span class="math display">\[
+B_{k+1} = B_k + \frac{s_ks_k^T}{y_k^Ts_k} - \frac{(B_k s_k)(B_k s_k)^T}{(B_ks_k)^Ts_k}
+\]</span></p>
+<p>İşte <span class="math inline">\(B_k\)</span>'nin BFGS güncellemesi budur, isim Broyden, Fletcher, Goldfarb, and Shannon adlı araştırmacılardan geliyor. Şimdi <em>üsttekinin tersini</em> alırsak arka planda yapılan ve daha stabil olan <span class="math inline">\(H_k\)</span>'nin güncellenmesinden faydalanmış oluyoruz, ama hala her adımda bizim ilgilendiğimiz matris tersine erişmiş oluyoruz. Üstteki formülün sağ tarafının tersi için [6]'daki Sherman-Morrison tekniğini kullanacağız. SM formülü neydi?</p>
+<p><span class="math display">\[
+(A+uv^T)^{-1} = A ^{-1} - \frac{(A^{-1} u)(v^TA^{-1})}{1 + v^T A^{-1} u}
+\]</span></p>
+<p>eğer <span class="math inline">\(1+v^TA ^{-1} y \ne 0\)</span> ise.</p>
+<p>Şimdi eğer ana güncelleme formülünü</p>
+<p><span class="math display">\[
+B_{k+1} = A_0 + u_0v_0^T + u_1v_1^T
+\]</span></p>
+<p>formuna getirebilirsek SM kullanabiliriz. Şu eşitlikleri kullanalım,</p>
+<p><span class="math display">\[
+A_0 = B_k, \quad u_o = \frac{s_k}{s_k^Ty_k}, \quad v_0^T = s_k^T
+\]</span></p>
+<p><span class="math display">\[
+A_1 = B_k + \frac{s_k s_k^T}{s_k^Ty_k} = A_0 + u_0v_0^T, \quad 
+u_1 = -\frac{B_k y_k}{y_k^TB_ky_k}
+\]</span></p>
+<p><span class="math display">\[
+v_1^T = y_k^T B_k
+\]</span></p>
+<p>Böylece</p>
+<p><span class="math display">\[
+B_{k+1} = A_0 + u_0v_0^T + u_1v_1^T
+\]</span></p>
+<p>formülüne erişmiş olduk. Bu <span class="math inline">\(B_{k+1}\)</span> üzerinden bir ters elde etmek için, ki bu sonuca <span class="math inline">\(H_{k+1}^{BFGS}\)</span> diyelim,</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} = B_{k+1}^{-1} 
+\]</span></p>
+<p><span class="math display">\[
+= (A_1 + u_1v_1^T)^{-1} 
+\]</span></p>
+<p>SM açılımına göre,</p>
+<p><span class="math display">\[
+= A_1^{-1} - \frac{A_1^{-1}u_1v_1^TA_1^{-1}}{1+v_1^TA_1^{-1}u_1 }
+\]</span></p>
+<p><span class="math inline">\(A_1^{-1}\)</span> de SM ile açılacak tabii (onun için bu <span class="math inline">\(A_1\)</span>'i belli bir forma getirdik)</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} = 
+A_0^{-1} - \frac{A_0^{-1} u_0v_0^T A_0^{-1}}{1+v_0^TA_0^{-1}u_0 } -
+\frac
+  {
+    (A_0^{-1} - \frac{A_0^{-1} u_0v_0^T A_0^{-1}}{1+v_0^TA_0^{-1}u_0})
+     u_1v_1^T
+    (A_0^{-1} - \frac{A_0^{-1} u_0v_0^T A_0^{-1}}{1+v_0^TA_0^{-1}u_0})
+   }
+  {1 + v_1^T (A_0^{-1} - \frac{A_0^{-1} u_0v_0^T A_0^{-1}}{1+v_0^TA_0^{-1}u_0})u_1}
+\]</span></p>
+<p>Dikkat edersek <span class="math inline">\(A_0 = B_k\)</span>. O zaman <span class="math inline">\(A_0^{-1} = B_k^{-1} = H_k\)</span>. Bu eşitliği ve ilk başta gösterdiğimiz notasyonu kullanarak,</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} = H_k - \frac{H_ks_ks_k^TH_k}{y_k^Ts_k + s_k^TH_ks_k} -
+\frac
+  {(H_k - \frac{H_ks_ks_k^TH_k}{y_k^Ts_k + s_k^TH_ks_k})
+    (\frac{-B_k y_ky_k^TB_k}{y_k^TB_ky_k}) 
+  }
+  {1+y_k^TB_k (H_k - \frac{H_ks_ks_k^TH_k}{y_k^Ts_k + s_k^TH_ks_k})(\frac{-B_k y_ky_k^TB_k}{y_k^TB_ky_k})}
+\]</span> <span class="math display">\[
+\times (H_k - \frac{H_ks_ks_k^TH_k}{y_k^Ts_k + s_k^TH_ks_k})
+\]</span></p>
+<p>Bazı çarpımları yaptıktan sonra ve <span class="math inline">\(H_k = B_k^{-1}\)</span> olduğunu hesaba katarak, yani</p>
+<p><span class="math display">\[
+H_kB_k = B_kH_k=I_n
+\]</span></p>
+<p>diyerek, alttakini elde ediyoruz,</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} = H_k - \frac{H_ks_ks_k^TH_k}{s_k^Ty_k + s_k^TH_ks_k} -
+\frac
+{ 
+  (1 - \frac{H_k s_ks_k^T}{s_k^T y_k + s_k^TH_ks_k})
+  (-y_ky_k^T)
+  (1 - \frac{s_ks_k^TH_k}{s_k^Ty_k + s_k^TH_ks_k})
+}
+{y_k^T B_k y_k + y_k^T (B_k - \frac{s_k^Ts_k}{s_k^Ty_k + s_k^TH_ks_k})(-y_k)  }
+\]</span></p>
+<p>Sembolik işlemlerimize devam ediyoruz. <span class="math inline">\(y_k\)</span> ve <span class="math inline">\(y_k^T\)</span> çarparak alttakini elde ediyoruz,</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} =  H_k - \frac{H_ks_ks_k^TH_k}{s_k^Ty_k + s_k^TH_ks_k} - 
+\frac
+{ 
+  (\frac{H_k s_ks_k^Ty_k}{s_k^T y_k + s_k^TH_ks_k} - y_k)
+  (x_k^T - \frac{y_k^T s_ks_k^TH_k}{s_k^Ty_k + s_k^TH_ks_k})
+}
+{
+y_k^TB_ky_k - y_k^T B_k y_k + 
+\frac{y_k^T s_ks_k^Ty_k}{s_k^Ty_k + s_k^TH_ks_k}
+}
+\]</span></p>
+<p>Üstte en son terimdeki bölendeki terimleri iptal edince ve daha fazla çarpma işlemi yapınca,</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} =  H_k - 
+\frac{H_ks_ks_k^TH_k}{s_ky_k + s_k^TH_ks_k} +
+\frac
+   {\frac{H_k s_k(s_k^T y_k) (y_k^T s_k)s_k H_k }{s_k^T y_k + s_k^T H_k s_k}}
+   {(y_k^T s_k)(s_k^T y_k)} +
+\frac
+   {y_k y_k^T (s_k^T y_k + s_k^T H_k s_k) }
+   {(y_k^T s_k)(s_k^T y_k)} - 
+\]</span> <span class="math display">\[
+\frac
+   {H_k s_k (s_k^T y_k) y_k^T + y_k s_k^T H_k  }
+   {(y_k^T s_k)(s_k^Ty_k)}
+\]</span></p>
+<ol start="3" style="list-style-type: decimal">
+<li>ve 5. terimlerde daha da basitleştirme yapınca</li>
+</ol>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} =  
+H_k - \frac{H_k s_k s_k^T H_k}{s_k^T y_k + s_k^T H_k s_k} +
+\frac{H_k s_k s_k^T H_k}{s_k y_k + s_k^T H_k s_k} +
+\frac{y_k y_k^T (s_k^T y_k + s_k^T H_k s_k)}{(y_k^T s_k)(s_k^Ty_k)} - 
+\frac{H_k s_k y_k^T + y_ks_k^T H_k}{y_k^T s_k}
+\]</span></p>
+<p>Dikkat edersek 2. ve 3. terimleri birbirini iptal ediyor, o zaman, ve 4. terimi alternatif bir formda gösterirsek,</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} =  H_k + 
+\frac{y_k y_k^T}{y_k^T s_k} \left( 1 + \frac{s_k^T H_k s_k}{s_k^T y_k}  \right) - 
+\frac{H_k s_k y_k^T + y_k s_k^T H_k}{y_k^T s_k}
+\]</span></p>
+<p>Nihai BFGS formülüne erişmiş olduk. Bu formülü alttaki gibi de gösterebiliriz [7],</p>
+<p><span class="math display">\[
+H_{k+1}^{BFGS} =  
+\left( I - \frac{s_k y_k^T}{s_k y_k} \right) 
+H_k
+\left( I - \frac{s_k y_k^T}{y_k^T s_k} \right) + 
+\frac{y_k y_k^T}{y_k^T s_k}
+\]</span></p>
+<p>Bir örnek üzerinde görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+
+eps <span class="op">=</span> np.sqrt(np.finfo(<span class="bu">float</span>).eps)
+
+<span class="kw">def</span> rosen(x):
+    <span class="cf">return</span> <span class="dv">100</span><span class="op">*</span>(x[<span class="dv">1</span>]<span class="op">-</span>x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">0</span>])<span class="op">**</span><span class="dv">2</span>
+
+<span class="kw">def</span> rosen_real(x):
+    gy <span class="op">=</span>[<span class="op">-</span><span class="dv">400</span><span class="op">*</span>(x[<span class="dv">1</span>]<span class="op">-</span>x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span>)<span class="op">*</span>x[<span class="dv">0</span>]<span class="op">-</span><span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>x[<span class="dv">0</span>]), <span class="dv">200</span><span class="op">*</span>(x[<span class="dv">1</span>]<span class="op">-</span>x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span>)]
+    <span class="cf">return</span> rosen(x), gy
+
+<span class="kw">def</span> linesearch_secant(f, d, x):
+    epsilon<span class="op">=</span><span class="dv">10</span><span class="op">**</span>(<span class="op">-</span><span class="dv">5</span>)
+    <span class="bu">max</span> <span class="op">=</span> <span class="dv">500</span>
+    alpha_curr<span class="op">=</span><span class="dv">0</span>
+    alpha<span class="op">=</span><span class="dv">10</span><span class="op">**-</span><span class="dv">5</span>
+    y,grad<span class="op">=</span>f(x)
+    dphi_zero<span class="op">=</span>np.dot(np.array(grad).T,d)
+
+    dphi_curr<span class="op">=</span>dphi_zero
+    i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>
+    <span class="cf">while</span> np.<span class="bu">abs</span>(dphi_curr)<span class="op">&gt;</span>epsilon<span class="op">*</span>np.<span class="bu">abs</span>(dphi_zero):
+        alpha_old<span class="op">=</span>alpha_curr
+        alpha_curr<span class="op">=</span>alpha
+        dphi_old<span class="op">=</span>dphi_curr
+        y,grad<span class="op">=</span>f(x<span class="op">+</span>alpha_curr<span class="op">*</span>d)
+        dphi_curr<span class="op">=</span>np.dot(np.array(grad).T,d)
+        alpha<span class="op">=</span>(dphi_curr<span class="op">*</span>alpha_old<span class="op">-</span>dphi_old<span class="op">*</span>alpha_curr)<span class="op">/</span>(dphi_curr<span class="op">-</span>dphi_old)<span class="op">;</span>
+        i <span class="op">+=</span> <span class="dv">1</span>
+        <span class="cf">if</span> (i <span class="op">&gt;=</span> <span class="bu">max</span>) <span class="kw">and</span> (np.<span class="bu">abs</span>(dphi_curr)<span class="op">&gt;</span>epsilon<span class="op">*</span>np.<span class="bu">abs</span>(dphi_zero)):
+            <span class="bu">print</span>(<span class="st">&#39;Line search terminating with number of iterations:&#39;</span>)
+            <span class="bu">print</span>(i)
+            <span class="bu">print</span>(alpha)
+            <span class="cf">break</span>
+        
+    <span class="cf">return</span> alpha
+
+<span class="kw">def</span> bfgs(x, func):
+    
+    H <span class="op">=</span> np.eye(<span class="dv">2</span>)
+    tol <span class="op">=</span> <span class="fl">1e-20</span>
+    y,grad <span class="op">=</span> func(x)
+    dist<span class="op">=</span><span class="dv">2</span><span class="op">*</span>tol
+    epsilon <span class="op">=</span> tol
+    <span class="bu">iter</span><span class="op">=</span><span class="dv">0</span><span class="op">;</span>
+
+    <span class="cf">while</span> lin.norm(grad)<span class="op">&gt;</span><span class="fl">1e-6</span>:
+        value,grad<span class="op">=</span>func(x)
+        p<span class="op">=</span>np.dot(<span class="op">-</span>H,grad)
+        lam <span class="op">=</span> linesearch_secant(func,p,x)
+        <span class="bu">iter</span> <span class="op">+=</span> <span class="dv">1</span>
+        xt <span class="op">=</span> x
+        x <span class="op">=</span> x <span class="op">+</span> lam<span class="op">*</span>p
+        s <span class="op">=</span> lam<span class="op">*</span>p
+        dist<span class="op">=</span>lin.norm(s)
+        newvalue,newgrad<span class="op">=</span>func(x)
+        y <span class="op">=</span> np.array(newgrad)<span class="op">-</span>grad
+        rho<span class="op">=</span><span class="dv">1</span><span class="op">/</span>np.dot(y.T,s)
+        s <span class="op">=</span> s.reshape(<span class="dv">2</span>,<span class="dv">1</span>)
+        y <span class="op">=</span> y.reshape(<span class="dv">2</span>,<span class="dv">1</span>)
+        tmp1 <span class="op">=</span> np.eye(<span class="dv">2</span>)<span class="op">-</span>rho<span class="op">*</span>np.dot(s,y.T)
+        tmp2 <span class="op">=</span> np.eye(<span class="dv">2</span>)<span class="op">-</span>rho<span class="op">*</span>np.dot(y,s.T)
+        tmp3 <span class="op">=</span> rho<span class="op">*</span>np.dot(s,s.T)
+        H<span class="op">=</span> np.dot(np.dot(tmp1,H),tmp2) <span class="op">+</span> tmp3
+        <span class="co">#print (&#39;lambda:&#39;,lam)</span>
+
+    <span class="bu">print</span> (xt)
+    <span class="bu">print</span> (<span class="st">&#39;iter&#39;</span>,<span class="bu">iter</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x<span class="op">=</span>np.array([<span class="op">-</span><span class="fl">1.0</span>,<span class="dv">0</span>])
+bfgs(x,rosen_real)    </code></pre></div>
+<pre><code>[1. 1.]
+iter 19</code></pre>
+<p>Eğer gradyan yerine yaklaşıksal gradyan hesap fonksiyonunu kullanırsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> _approx_fprime_helper(xk, f, epsilon):
+    f0 <span class="op">=</span> f(xk)
+    grad <span class="op">=</span> np.zeros((<span class="bu">len</span>(xk),), <span class="bu">float</span>)
+    ei <span class="op">=</span> np.zeros((<span class="bu">len</span>(xk),), <span class="bu">float</span>)
+    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(xk)):
+        ei[k] <span class="op">=</span> <span class="fl">1.0</span>
+        d <span class="op">=</span> epsilon <span class="op">*</span> ei
+        df <span class="op">=</span> (f(xk <span class="op">+</span> d) <span class="op">-</span> f0) <span class="op">/</span> d[k]
+        <span class="cf">if</span> <span class="kw">not</span> np.isscalar(df):
+            <span class="cf">try</span>:
+                df <span class="op">=</span> df.item()
+            <span class="cf">except</span> (<span class="pp">ValueError</span>, <span class="pp">AttributeError</span>):
+                <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;The user-provided &quot;</span>
+                                 <span class="st">&quot;objective function must &quot;</span>
+                                 <span class="st">&quot;return a scalar value.&quot;</span>)
+        grad[k] <span class="op">=</span> df
+        ei[k] <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">return</span> grad
+
+
+<span class="kw">def</span> rosen_approx(x):
+    g <span class="op">=</span> _approx_fprime_helper(x, rosen, eps)
+    <span class="cf">return</span> rosen(x),g
+
+bfgs(x,rosen_approx)</code></pre></div>
+<pre><code>[0.99999552 0.99999104]
+iter 19</code></pre>
+<p>yine optimum noktaya erişmiş oluyoruz.</p>
+<p>Yakınsaklık garantileri açısından, Newton-umsu metotlar her adımda bir pozitif kesin <span class="math inline">\(H_k\)</span> ürettikleri için çizgi aramasıyla birleştirilmiş normal Newton metotlarıyla aynı şekilde sürekli iniş özelliğine sahip olacaktır, bu sebeple 1. derecede optimallik şartı açısından, nereden başlanırsa başlansın bir minimuma ulaşacaklardır. Detaylar için [2].</p>
+<p>Kaynaklar</p>
+<p>[1] Dutta, <em>Optimization in Chemical Engineering</em></p>
+<p>[2] Zak, <em>An Introduction to Optimization, 4th Edition</em></p>
+<p>[3] Bayramlı, <em>Hesapsal Bilim, Sayısal Entegrasyon ve Sonlu Farklılıklar ile Sayısal Türev</em></p>
+<p>[4] Chen, <em>ELE522 - Large Scale Optimization Lecture, Princeton</em>, <a href="http://www.princeton.edu/~yc5/ele522_optimization/" class="uri">http://www.princeton.edu/~yc5/ele522_optimization/</a></p>
+<p>[5] Bayramlı, <em>Lineer Cebir, Ders 8, Kerte Konusu</em></p>
+<p>[6] Bayramlı, <em>Lineer Cebir, Ekler, Sherley-Morrison Formülü</em></p>
+<p>[7] Fletcher, <em>A new approach to variable metric problems</em></p>
+</body>
+</html>

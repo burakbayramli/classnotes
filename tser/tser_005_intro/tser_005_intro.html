@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="zaman-serileri">Zaman Serileri</h1>
+<p>Bir zaman serisi <span class="math inline">\(t\)</span> anında belli bir değeri olan veri noktalarıdır. Finans bağlamında çoğunlukla birbirini takip eden iki veri noktası arasında bağlantı olduğu ispatlanmıştır. Altta örnek bir zaman serisi görüyoruz; 500 senetin ağırlıklı ortalaması olan S&amp;P 500 indisinin zaman göre gidişatı (düzeltilmiş kapanış hesaplarını baz alarak),</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../tser_risk/SPY2.csv&#39;</span>,parse_dates<span class="op">=</span><span class="va">True</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)
+df <span class="op">=</span> df.sort_index()
+df <span class="op">=</span> df[df.index <span class="op">&gt;</span> <span class="st">&#39;1950-01-01&#39;</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df[<span class="st">&#39;Adj Close&#39;</span>].plot()
+plt.savefig(<span class="st">&#39;tser_intro_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_intro_01.png" />
+
+</div>
+<p>Zaman serileri hakkında önemli bir bilgi onların &quot;getirisidir (returns)''. Getiri hesabı <span class="math inline">\(t\)</span> ile <span class="math inline">\(t-1\)</span> arasındaki değişim oranı, yani <span class="math inline">\(X_{t}-X_{t-1}/X_{t-1}\)</span>. Bu sayıyı 100 ile çarpınca ise yüzde değişimi elde ederiz. Pandas ile,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">returns <span class="op">=</span> df[<span class="st">&#39;Adj Close&#39;</span>].pct_change()
+<span class="bu">print</span> returns.head()</code></pre></div>
+<pre><code>Date
+1993-01-29         NaN
+1993-02-01    0.007022
+1993-02-02    0.002034
+1993-02-03    0.010728
+1993-02-04    0.004303
+Name: Adj Close, dtype: float64</code></pre>
+<p>İlk veri noktası <code>NaN</code> oldu çünkü bir önceki veri noktası yok.</p>
+<p>Bu değişim oranı getiri zaman serilerinin doğasına göre bir yukarı bir aşağı iner, çünkü arz talebe, ya da diğer sebeplere göre senet fiyatları bazen çıkar, bazen düşer. Bir trend de olabilir tabii, bazen daha çok çıkabilir, bazen daha çok inebilir. Tamama bakılınca ve bu <em>getirilerin</em>, dikkat fiyat veri noktalarının değil, frekansını düşünürsek bu getirilerin bir dağılımdan geldiği kabul edilebilir, histograma bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">returns.plot(kind<span class="op">=</span><span class="st">&#39;hist&#39;</span>,bins<span class="op">=</span><span class="dv">100</span>)
+plt.savefig(<span class="st">&#39;tser_intro_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_intro_02.png" />
+
+</div>
+<p>İstatistikten hatırlarsak histogram bize belli değerlerin hangi frekansla görüldüğünü söylüyor. Bir histogram ile bir olasılık dağılımı arasında yakın bağlantılar var, histogram bir dağılımın sayısal hali denebilir. Şekil Gaussian dağılımına benziyor. Fakat genel bağlamda finans serilerinde tüm getirilerin Gaussian olduğunu direk söylemek hatalı olur, bu konuyu işleyeceğiz.</p>
+<p>Histogramı okurken şöyle çıkarımlar yapabiliriz; mesela yüzdeliklere bakarız, ve diyelim ki yüzde 5 noktasında (histogram alanının yüzde 5'ine tekabül eden x-eksenindeki nokta) değeri okuruz, bu değer 0.02 civarında gibi duruyor; o zaman varılacak sonuç şöyle seslendirilebilir, &quot;100 günün 5 gününde %2'lik düşüşler görülebilir''. Bu mantıklı herhalde, çünkü bir dağılımdaki belli bir alan o alanın x-eksenindeki değerlerin ortaya çıkma olasılığını verir. Ortaya çıkma birimi gün ise, yüzde 5, 100 gün içinde 5 gün demektir.</p>
+<p>Çıplak gözle bakmak yerine direk veriden bu hesabı yapabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> returns.quantile(q<span class="op">=</span><span class="fl">0.05</span>)</code></pre></div>
+<pre><code>-0.0177541105196</code></pre>
+<p>Gaussian durumu ilginç; kabaca Gaussian kabulü yapılabilir, fakat literatürdeki çoğu yazı finans serilerinde düşüşlerin daha sert olduğunu belirtir, yani Gaussian'da sola, negatif değerlere doğru bir yamukluk (skew) vardır. Ayrıca fazla sayıda zaman serilerine bakıldığında her iki yönde aşırı değerlerin Gaussian faraziyesine uymayan şekilde daha fazla olduğu tespit edilmiştir, yani finans getirilerinin dağlımı &quot;etekleri kabarık'' bir Gaussian'dır, daha doğrusu Öğrenci t dağılımıdır. Fakat basitleştirme amacıyla Gaussian kullanılabilir, tabii bu faraziyenin sınırlarını bilmek şartıyla.</p>
+<p>Oynaklık (Volatility)</p>
+<p>Artışların, düşüşlerin ne kadar sert, yüksek boyutta olduğunun iyi bir göstergesi olarak oynaklık kullanılır, oynaklık üstteki Gaussian faraziyesinden hareketle getirilerin standart sapması <span class="math inline">\(\sigma\)</span>'dan (sigma) ibarettir, o zaman tanıdığımız, bildiğimiz <span class="math inline">\(\sigma\)</span> hesabı direk burada kullanılabilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> returns.std()</code></pre></div>
+<pre><code>0.010654265587</code></pre>
+<p>Üstte en soldan yüzde 5 noktasına baktık, her iki yönde tek sigma büyüklüğünde bir getirinin Gaussian bağlamında alanın yüzde 68'ine tekabül ettiğini biliyoruz.</p>
+<div class="figure">
+<img src="gausspercentiles.png" />
+
+</div>
+<p>Bu demektir ki getiriler Gaussian ile dağılmışsa artı ya da eksi tek sigmalık (ya da ondan azı olan) değişimlerin olasılığı yüzde 68'dir. İki sigmalık (ve daha azı) büyüklüğünde getirilerin olasılığı yüzde 95'tır.</p>
+<p>Günlükten yıllığa geçmek için getiriler için direk 256 ile çarpılır, bir yıl içinde aşağı yukarı 256 tane iş günü vardır. Standart sapma geçişi için <span class="math inline">\(\sqrt{256}\)</span> yani 16 ile çarpmak gerekir. Bazıları 252 kullanıyor, çünkü NYSE borsasında 252 günde alışveriş yapılabilir. Karekök basitliği sebebiyle bizce 256 daha uygun.</p>
+<p>Niye <span class="math inline">\(\sqrt{252}\)</span> ile çarpıyoruz? Bu durum varlık fiyat zaman serisinin Brownian yürüyüş olmasıyla alakalı. BM serilerinde varyans <span class="math inline">\(t\)</span> ile doğru orantılıdır, yani başlangıç noktasından ne kadar uzaklaşırsak varyans o kadar büyür, çünkü her adımdaki varyans toplanır (oynaklık standart sapmadır, ki bu varyansın kareköku o sebeple zamanın kareköku ile çarpıyoruz). <em>Olasılıksal Calculus</em> yazısında bu matematiği görüyoruz. Kabaca düşünmek gerekirse BM 'sarhoş yürüyüşü' ise ve bu yürüyüş her adımda rasgele bir hareket yapıyorsa, bu adımlar toplana toplana tabii ki başlangıç noktasından bizi çok uzak noktalara taşıyabilir (ve geri getirebilir).</p>
+<p>Kabaca borsacılar bilir ki senetlerin yıllık standart sapması %20 civarıdır, daha güvenli olan tahvillerin ise %1.5. Kaldıraç, yani borç kullanıldığı zaman, mesela 10 kat kaldıraç olduğunu düşünelim, bu oynaklığı 10 ile çarpmak demektir. Normal bir hisse için 10 kat kaldıraç sizi yıllık sigma %200'e seviyesine getirir, bu günde %200 / 16 = %12.5 demektir. Eğer getirimiz son derece iyimser bir bakışla yılda %200 olsaydı, bu günlük %0.8 olurdu (256 ile böldük) ve ters yönde bir sigma'lık düşüş geldiği anda 0.8-12.5=-%11.7'ı görürdük, diğer yönde 0.8+12.5=%13.3. Fakat bu demektir ki günlük getiriler 100 günün 68'inde -%11.7 ile %13.3 arasında gidip geliyor, 95'inde %-24.2 ile %25.8 arasında gidip geliyor. O zaman günlerin 100-95=%5'inde bu bantın her iki taraftan dışında (en azdan daha az, en fazladan fazla) rakamlar göreceğiz demektir, 5/2=%2.5 kadar zamanda %-24.2'dan daha fazla düşüş olacak demektir bu! 100 günde 2.5 demek, 40/1 oran anlamına geliyor, bir ay içinde 20 işgünü olduğuna göre bahsedilen olayın aşağı yukarı iki ayda bir ortaya çıkması muhtemeldir. Yani iki ayda bir günde -%24.2'lik getiri kaybı! Bu frekans olarak çok ciddi bir kayıptır, ve psikolojik olarak yatırımcıyı rahatsız edecektir. Bu noktaya nasıl geldiğimizi hatırlayalım, son derece iyimser bir getiri, 10 kat seviyesinde bir kaldıraçla başlamıştık.</p>
+<p>Sharpe Oranı (Sharpe Ratio)</p>
+<p>Sharpe oranı (SO) bir işlem stratejisinin, ya da bir varlığı elde tutmanın, ki basit olsa bile bu da bir strateji, ne kadar karlı olacağını ölçek bir hesaptır. Hesaplamak için getirileri riske göre uyarlarız. Formel olarak getirinin ortalamasını aynı periyottaki standart sapmaya böleriz. Bu bize günlük SO verir, yıllığı hesaplamak için <span class="math inline">\(\sqrt{256}\)</span> ile çarpmak gerekir.</p>
+<p>Rasgele Yürüyüş (Random Walk)</p>
+<p>Senet fiyatlarının rasgele yürüyüşe göre hareket ettiği söylenir. Modelin bir şekli</p>
+<p><span class="math display">\[ y_t = y_{t-1} + z \]</span></p>
+<p>ki <span class="math inline">\(z \sim N(0,\sigma)\)</span>. Formülü alttaki şekliyle görürsek daha açık olabilir, <span class="math inline">\(Z_1,Z_2,..,\)</span> bağımsız özdeşçe dağılmış (independently, identically distributed -iid-), ortalaması <span class="math inline">\(\mu\)</span>, standart sapması <span class="math inline">\(\sigma\)</span> olan dağılımlar olsun, ve herhangi bir başlangıç noktası <span class="math inline">\(X_o\)</span>'dan <span class="math inline">\(t\)</span> anında gelinen nokta</p>
+<p><span class="math display">\[ X_t = X_0 + Z_1 + Z_2 + ... + Z_t , t \ge 1\]</span></p>
+<p>olarak belirtilebilir. Her <span class="math inline">\(t\)</span> anında bir rasgele değişkene göre bir yere savruluyoruz. Modele dikkat, önceki veri noktası ile bir korelasyonumuz yok, her noktada zar atılıyor, başka hiçbir şey yapılmıyor.</p>
+<p><span class="math inline">\(X_t\)</span> bu durumda bir rasgele yürüyüştür, ve adımları <span class="math inline">\(Z_1,Z_2,..\)</span>'dir. Eğer adımlar normal olarak dağılmış ise, sürece normal rasgele yürüyüş adı verilir. <span class="math inline">\(X_0\)</span> verildiği / bilindiği durumda <span class="math inline">\(X_t\)</span>'nin beklentisi ve varyansı,</p>
+<p><span class="math display">\[ E(X_t|X_0) = X_o + \mu t \]</span></p>
+<p><span class="math display">\[ Var(X_t|X_0) = \sigma^2 t \]</span></p>
+<p>Varyans için bağımsızlık durumunda <span class="math inline">\(Var(X+Y) = Var(X)+Var(Y)\)</span> olduğunu hatırlayalım, varyans toplamları <span class="math inline">\(\sigma t\)</span> olur, sabit <span class="math inline">\(\sigma\)</span> varyans dışına karesi alınmış olarak çıkar. Sabit <span class="math inline">\(X_0\)</span> zaten yokolur, onun varyansı yoktur.</p>
+<p>Bu modelin bir diğer ismi Brown Hareketi (Brownian Motion), <span class="math inline">\(\mu\)</span> parametresi kaymadır (drift), tüm zaman serisine bir genel yön verir. Kaymanın tanımlandığı duruma Kaymalı Brown Hareketi (Brownian Motion with Drift) ismi verilir.</p>
+<p>Simüle edelim, iki tane <span class="math inline">\(\mu=0\)</span>, iki tane <span class="math inline">\(\mu=0.5\)</span> ile.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> statsmodels.api <span class="im">as</span> sm
+<span class="im">import</span> pandas <span class="im">as</span> pd</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">np.random.seed(<span class="dv">0</span>)
+<span class="kw">def</span> random_walk(i,mu<span class="op">=</span><span class="dv">0</span>):
+    Z_s <span class="op">=</span> np.random.normal(loc<span class="op">=</span>mu,scale<span class="op">=</span><span class="fl">1.0</span>,size<span class="op">=</span><span class="dv">100</span>)
+    X_0 <span class="op">=</span> <span class="dv">10</span>
+    X_t <span class="op">=</span> X_0 <span class="op">+</span> Z_s.cumsum()
+    plt.plot(X_t)
+    plt.title(<span class="st">&#39;Rasgele Yürüyüş %d&#39;</span> <span class="op">%</span> i)
+    plt.savefig(<span class="st">&#39;tser_stoc_0</span><span class="sc">%d</span><span class="st">.png&#39;</span> <span class="op">%</span> i)
+    plt.hold(<span class="va">False</span>)
+random_walk(<span class="dv">1</span>)
+random_walk(<span class="dv">2</span>)
+random_walk(<span class="dv">3</span>,mu<span class="op">=</span><span class="fl">0.5</span>)
+random_walk(<span class="dv">4</span>,mu<span class="op">=</span><span class="fl">0.5</span>)</code></pre></div>
+<p><img src="tser_stoc_01.png" /> <img src="tser_stoc_02.png" /> <img src="tser_stoc_03.png" /> <img src="tser_stoc_04.png" /></p>
+<p>Görüldüğü gibi rasgele yürüyüş üretimini sağlayan çağrıya <span class="math inline">\(\mu\)</span> haricinde (bir de dokümantasyon amaçlı bir indis) haricinde başka hiçbir parametre vermedik, yani aynı kod arka arkaya dört kez işledi, ama herbirinde aynı başlangıç değeri olmasına rağmen tamamen farklı görüntüler çıktı. Görüntüler borsadaki senet fiyatlarını da andırıyor!</p>
+<p>Her adımda Gaussian gürültü eklendiği için veri analizi yaparken Guassian'lığı fiyatların getirisi / farkında görmek mümkündür. Günlük bazda diyelim artış / azalışın histogramını alırsak, ünlü can eğrisini elde ederiz. Tabii şunu da eklemek lazım, değişimin dağılımı &quot;tam olarak'' Gaussian kabul edilmiyor, bu dağılımın &quot;etekleri daha kabarıktır'', yani ekstrem değerler Gaussian'a göre daha muhtemeldir. Bu dağılımın Öğrenci t (Student t) dağılımı olduğu söylenir. Fakat kolaylık açısından, kriz şartlarına dikkat etmek koşuluyla, Gaussian kullanılabilir.</p>
+<p>Bağımlılık</p>
+<p>Genel İstatistik öğrenirken çoğunlukla veri noktalarının birbirinden bağımsız olduğunu farzettik, mesela regresyon durumunda eğer <span class="math inline">\(X_i\)</span> biliniyorsa her <span class="math inline">\(Y_i\)</span> birbirinden bağımsızdı, ayrıca <span class="math inline">\(X_i\)</span>'ler birbirinden bağımsızdı. Çok değişkenli durumda veri noktalarının öğelerinin birbiriyle çetrefil şekilde alakalı olma durumunda bile veri noktalarının birbirinden bağımsız olduğunu farzettik. Şimdi bu faraziyeyi gevşeteceğiz, yani ayrı veri noktaları arasında bağımlılık durumuna bakacağız.</p>
+<p>Bağımlı verilere en iyi örnek zaman serileridir, ve bu veri tipi aynen isminin çağrıştırdığı gibi bir değerin bir zaman süreci içinde kaydedilmiş değerleri olacaktır. İstatistik uygulamalarında bu durum çoğunlukla bir <span class="math inline">\(X\)</span> değişkeninin <span class="math inline">\(t\)</span> anından başlanarak eşit zaman aralıklarında, mesela <span class="math inline">\(h\)</span> aralıklarıyla değerinin kaydedilmesiyle ortaya çıkabilir, <span class="math inline">\(X_t,X_{t+h},X_{t+2h},...\)</span> gibi..</p>
+<p>Altta iki tipik zaman serisi görüyoruz. Bunlardan ilki yapay olarak üretilmiş, ikincisi Kanada'nın bir bölgesinde her sene yakalanan lynx (orta boylu bir kedi türü) sayısı baz alınarak yaratılmış. Bu verilerin dalgalanış şekilleri, kabaca gidişatları, vs. aslında birbirlerine çok benziyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> logistic_map(x,r<span class="op">=</span><span class="dv">4</span>): <span class="cf">return</span> r<span class="op">*</span>x<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>x) 
+<span class="kw">def</span> logistic_iteration(n,x_init,r<span class="op">=</span><span class="dv">4</span>):
+   x <span class="op">=</span> [<span class="dv">0</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]
+   x[<span class="dv">0</span>] <span class="op">=</span> x_init
+   <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="dv">-1</span>): x[i<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> logistic_map(x[i])
+   <span class="cf">return</span> x
+n <span class="op">=</span> <span class="dv">1000</span>
+x <span class="op">=</span> logistic_iteration(n, x_init<span class="op">=</span><span class="fl">0.01</span>)
+y <span class="op">=</span> x <span class="op">+</span> np.random.normal(size<span class="op">=</span>n,loc<span class="op">=</span><span class="fl">0.</span>,scale<span class="op">=</span><span class="fl">0.05</span>)
+plt.title(<span class="st">&#39;Yapay Veri&#39;</span>)
+df_artificial <span class="op">=</span> pd.DataFrame()
+df_artificial[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> y
+df_artificial.y[:<span class="dv">100</span>].plot()
+plt.savefig(<span class="st">&#39;tser_stoc_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_stoc_05.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;lynx.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+df.plot()
+plt.title(<span class="st">&#39;Lynx&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_stoc_06.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_stoc_06.png" />
+
+</div>
+<p>Soru: Yapay veriyi üretirken niye lojistik harita (logistic map) kullandık? Cevap: Hoca [1] herhalde hem birbirine bağımlı noktalar yaratmak, hem de onların biraz &quot;kaotik'' olmasını istedi, ki lojistik harita kaos matematiğinde iyi bilinen bir fonksiyondur.</p>
+<p>Zaman serisi analizinde yapmaya çalıştığımız İstatistiğin geri kalanından bize tanıdık: önümüzde gördüğümüz zaman serisini, o seriyi üreten, görmediğimiz, yarı-rasgele (&quot;stochastic'') bir süreçten alınmış bir yansıma / oluş (realization) olarak görmek, önümüzdeki veriyi bu süreç hakkında tahminler (çıkarsama / inference) yapmak için kullanmak, ve bu tahminlerin, rasgeleliğini açıkça belirledikten sonra güvenilir olması için uğraşmak. İşimizi zorlaştıran her gözlemin / veri noktasının birbiri ile bağlantılı olması; diğer yandan çoğu zaman üzerinde çıkarsama yapmak istediğimiz şey de aslında bu bağlantının ta kendisi.</p>
+<p>Notasyon</p>
+<p>Eşit aralıklı örneklenmiş zaman serisini göstermek için indeks olarak zamanın kendisini kullanmak yerine (mesela 1920 senesinde, 1921 senesinde, vs demek yerine) her öğenin seri içindeki yerini kullanmak daha rahattır, <span class="math inline">\(X_1,X_2,..\)</span> gibi. Buradan hareketle bir kısayol notasyonu şudur: bir zaman blokunu göstermek için <span class="math inline">\(X_i^j = (X_i,X_{i+1},...,X_{j-1},X_j)\)</span>.</p>
+<p>Durağanlık (Stationarity)</p>
+<p>Tablosal dünyamızda durum nasıldı? Her biri birbirinden bağımsız ama aynı dağılımlı (IID) veri noktalarımız var, bu bize analizde bazı faydalar sağlıyor. Zaman serileri için de benzer bir aynılık özelliğinin olması iyi olmaz mıydı? Böyle bir özellik var, ve ismi durağanlık. Kelimenin anlamı zaman serisinin hiç değişmediği anlamına gelmiyor tabii, onun <em>dağılımının</em> değişmediği anlamına geliyor.</p>
+<p>Daha kesin bir şekilde belirtmek gerekirse, eğer tüm <span class="math inline">\(k,t\)</span> için <span class="math inline">\(X_1^k\)</span> ve <span class="math inline">\(X_t^{t+k-1}\)</span> aynı dağılıma sahipse bu zaman serisi <span class="math inline">\(X\)</span>'in güçlü durağan (strongly stationary), ya da kesin durağan (strictly stationary) olduğu söylenir, yani <span class="math inline">\(k\)</span> büyüklüğündeki blokların dağılımı zamana bağlı değildir (time-ınvariant). Tekrarlamak gerekirse bu tüm blokların aynı değerlere sahip olduğu anlamına gelmez, sadece aynı dağılıma sahip olduğu anlamına gelir.</p>
+<p>Çoğunlukla finans zaman serileri durağan olmaz, ama serinin değişimi, yani <span class="math inline">\(t\)</span> ile <span class="math inline">\(t-1\)</span> arasındaki fark durağan olabilir, arada bir log transform da da gerekebilir. İstatistiki modelleme açısından bu işlemlerin pek negatif bir etkisi yoktur, her halükarda ise yarar bir model elde ederiz.</p>
+<p>Durağan süreçlerin güzel tarafı şudur, onları çok az parametre ile modelleyebilirsiniz. Mesela her <span class="math inline">\(X_t\)</span> için farklı bir beklentiye (expectation) ihtiyaç yoktur, hepsinin beklentisi aynıdır, <span class="math inline">\(\mu\)</span>. Bu demektir ki <span class="math inline">\(\mu\)</span>'yu <span class="math inline">\(\bar{X}\)</span> ile doğru doğru bir şekilde kestirmek (estimate) mümkündür.</p>
+<p>Eh bir &quot;güçlü'' durağanlık varsa, herhalde bir &quot;zayıf'' durağanlık ta olmalı.. Hakikaten de bu var. Zayıf durağanlık için tek gereken şartlar <span class="math inline">\(E(X_1) = E(X_t)\)</span> ve <span class="math inline">\(Cov(X_1,X_k) = Cov(X_t,X_{t+k-1})\)</span> olması. Dikkat, bu şart için bloklar üzerinden değil tek veri noktaları üzerinden bir beyan yapıyoruz. Doğal olarak güçlü durağanlık aynı zamanda zayıf durağanlık ta olduğunu söyler (bunu egzersiz olarak doğrulayabilirsiniz) , fakat çoğunlukla bu eşitlik ters yönde geçerli değildir.</p>
+<p>Kendisiyle Korelasyon (Autocorrelation)</p>
+<p>Zaman serileri çoğunlukla zincirleme olarak bağlantılıdır, yani <span class="math inline">\(X_t\)</span> noktası kendinden önceki ve sonraki tüm değerler ile bağlantılıdır. Fakat bu bağlantı her mesafede aynı etkide değildir, çoğunlukla bir bağlantı kaybı (decay of dependence) durumu sözkonusudur (bazen korelasyon kaybı -decay of correlations- ismi de veriliyor), yani <span class="math inline">\(h \to \infty\)</span> iken <span class="math inline">\(X_t,X_{t+h}\)</span> değişkenleri birbirinden gittikçe daha çok neredeyse tam bağımsız hale gelir (kelimelendirme kritik, hoca tam bağımsız olur demiyor, çok az bağımlılık hala kalabilir, ama aralık büyüdükçe, hatta sonsuzluğa yaklaştıkça bağımsızlık artar, neredeyse tam bağımsızlık haline gelir).</p>
+<p>Bu durumu ölçmenin bilinen en eski yöntemi kendisiyle koveryans (dikkat korelasyon değil) ölçütüdür,</p>
+<p><span class="math display">\[ \gamma(h) = Cov(X_t,X_{t+h}) \]</span></p>
+<p>Aynı şekilde kendisiyle korelasyon (autocorrelation) da kullanabilirdik,</p>
+<p><span class="math display">\[ 
+\rho(h) = \frac{Cov(X_t,X_{t+h}) }{Var(X_t) } = \frac{\gamma(h)}{\gamma(0)}
+\]</span></p>
+<p>Korelasyon tanımından üstteki ilk eşitliğe nasıl geldik? Korelasyon bilindiği gibi</p>
+<p><span class="math display">\[ \frac{Cov(X_t,X_{t+h}) }{\sqrt{Var(X_t)}\sqrt{Var(X_{t+h})} } \]</span></p>
+<p>Daha önceki zayıf durağanlık tanımından,</p>
+<p><span class="math display">\[ Cov(X_1,X_k) = Cov(X_t,X_{t+k-1}) \]</span></p>
+<p>Eğer <span class="math inline">\(k=1\)</span> olsaydı,</p>
+<p><span class="math display">\[ Cov(X_1,X_1) = Cov(X_t,X_t) = Var(X_1) = Var(X_t)\]</span></p>
+<p>Bu ifadenin her <span class="math inline">\(t\)</span> için doğru olması gerektiği için <span class="math inline">\(Var(X_t) = Var(X_{t+h})\)</span> diyebiliriz. O zaman korelasyon şu hale gelir,</p>
+<p><span class="math display">\[
+\frac{Cov(X_t,X_{t+h}) }{\sqrt{Var(X_t)}\sqrt{Var(X_t)} }  =
+\frac{Cov(X_t,X_{t+h}) }{Var(X_t)} 
+\]</span></p>
+<p>Sağ taraftaki eşitliğe gelelim: sadece <span class="math inline">\(\gamma\)</span> formu kullanmaya uğraşalım, <span class="math inline">\(h=0\)</span> dersek <span class="math inline">\(\gamma(0) = Cov(X_t,X_{t+0}) = Cov(X_t,X_t)\)</span> elde ediliyor ve bilindiği gibi <span class="math inline">\(Var(X_t)=Cov(X_t,X_t)\)</span>. O zaman</p>
+<p><span class="math display">\[ \frac{Cov(X_t,X_{t+h}) }{Var(X_t)} = \frac{\gamma(h)}{\gamma(0)} \]</span></p>
+<p>Daha önce belirttiğimiz gibi çoğu zaman serisi için <span class="math inline">\(h \to \infty\)</span> <span class="math inline">\(\gamma(h) \to 0\)</span>.</p>
+<p>Python Pandas ile korelasyon grafiği şöyle basılır,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">8</span>))
+plt.hold(<span class="va">True</span>)
+ax1 <span class="op">=</span> fig.add_subplot(<span class="dv">211</span>)
+fig <span class="op">=</span> sm.graphics.tsa.plot_acf(df.values.squeeze(), lags<span class="op">=</span><span class="dv">40</span>, ax<span class="op">=</span>ax1)
+ax2 <span class="op">=</span> fig.add_subplot(<span class="dv">212</span>)
+fig <span class="op">=</span> sm.graphics.tsa.plot_pacf(df, lags<span class="op">=</span><span class="dv">40</span>, ax<span class="op">=</span>ax2)
+plt.savefig(<span class="st">&#39;tser_stoc_07.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_stoc_07.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">8</span>))
+plt.hold(<span class="va">True</span>)
+ax1 <span class="op">=</span> fig.add_subplot(<span class="dv">211</span>)
+fig <span class="op">=</span> sm.graphics.tsa.plot_acf(df_artificial.values.squeeze(), lags<span class="op">=</span><span class="dv">40</span>, ax<span class="op">=</span>ax1)
+plt.hold(<span class="va">True</span>)
+ax2 <span class="op">=</span> fig.add_subplot(<span class="dv">212</span>)
+fig <span class="op">=</span> sm.graphics.tsa.plot_pacf(df_artificial, lags<span class="op">=</span><span class="dv">40</span>, ax<span class="op">=</span>ax2)
+plt.savefig(<span class="st">&#39;tser_stoc_08.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_stoc_08.png" />
+
+</div>
+<p>Üstteki her iki verinin de kendisiyle korelasyonunu görüyoruz. İlginç bir durum ortaya çıktı, yapay zaman serisinin kendisiyle korelasyonu neredeyse hep sıfır etrafında, yani hangi aralığı baz alırsak alalım, iki veri noktası arasındaki bağlantı çok az. Bu durum serinin ilk grafiğini düşününce garip geliyor. Hakikaten bir acaiplik var, bu şeride bir takım bağlantılar olduğunu <span class="math inline">\(X_{t+1},X_t\)</span> grafiğini basarak bile görebiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df_artificial[<span class="st">&#39;lagged_y&#39;</span>] <span class="op">=</span> df_artificial.y.shift(<span class="op">-</span><span class="dv">1</span>)
+df_artificial.plot(kind<span class="op">=</span><span class="st">&#39;scatter&#39;</span>,x<span class="op">=</span><span class="st">&#39;y&#39;</span>,y<span class="op">=</span><span class="st">&#39;lagged_y&#39;</span>)
+plt.title(<span class="st">&#39;Yapay&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_stoc_09.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_stoc_09.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df[<span class="st">&#39;lagged_x&#39;</span>] <span class="op">=</span> df.x.shift(<span class="op">-</span><span class="dv">1</span>)
+df.plot(kind<span class="op">=</span><span class="st">&#39;scatter&#39;</span>,x<span class="op">=</span><span class="st">&#39;x&#39;</span>,y<span class="op">=</span><span class="st">&#39;lagged_x&#39;</span>)
+plt.title(<span class="st">&#39;Lynx&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_stoc_10.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_stoc_10.png" />
+
+</div>
+<p>Yani kendisiyle korelasyon her zaman gerekli bilgiyi vermeyebilir, ama bilinmesi iyi olur. Daha genel ölçütler mesela Spearman <span class="math inline">\(X_{t+h},X_t\)</span> kerte korelasyonu (Spearman rank-correlation) ya da ortak bilgi (mutual information) gibi ölçütler.</p>
+<p>Ama aslında kendisiyle korelasyonun önemli olmasının 4 sebebi var. İlki, bu ölçüt istatistikteki en eski ölçütlerden biri, yani &quot;kullanıcı bazı'' geniş, herkes kendisiyle korelasyon hakkında birşeyler biliyor, iletişimde bu kavramı kullanıyorlar, ve gelip size bu ölçüt hakkında birşeyler soracaklar. İkincisi, son derece nadir bir durum olan Gaussian süreçleri durumunda kendisiyle korelasyon size hakikaten bilmeniz gereken <em>herşeyi</em> söyler. Üç, birazcık daha az nadir olan lineer tahmin durumunda yine bilmemiz gereken herşeyi bize söyler.</p>
+<p>Kaynaklar</p>
+<p>[1] Carver, <em>Systematic Trading</em></p>
+<p>[2] Macrooption, <em>Why Is Volatility Proportional to the Square Root of Time</em>, <a href="https://www.macroption.com/why-is-volatility-proportional-to-square-root-of-time/" class="uri">https://www.macroption.com/why-is-volatility-proportional-to-square-root-of-time/</a></p>
+</body>
+</html>

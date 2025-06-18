@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="obje-takibi">Obje Takibi</h1>
+<p>Video görüntülerinde obje takibi için filtreleme kullanmak mümkün, bu teknik ile iki boyutlu yansımadan üç boyutlu konum bilgisini takip edebiliriz. Kalman Filtreleri (KF) ile görüntüde ilgilendiğimiz objeyi her seferinde iki boyutta &quot;bulmalıyız'', yani bu objenin örüntüsünün ne olduğunu önceden biliyor olmamız gerekir, ve onu sonraki resimlerde takip etmemiz gerekir. Bulduğumuz, iki boyutlu kordinat değerleridir, yani ölçümsel büyüklüklerdir, ardından KF'in en son konumuna göre ürettiği tahmin ile aradaki fark KF'i düzeltmek için kullanılır.</p>
+<p>Parçacık filtreleri (PF) ile yine konum ve ölçüm fonksiyonu ikilisi var, fakat ölçüm ile konumdan üretilen tahmin arasındaki uyumu bir olasılık, olurluk (likelihood) olarak belirtmemiz gerekiyor, ki böylece PF tahminde başarılı olan parçacıklara daha fazla önem verebilsin, ve hipotezler o yönde devam etsin.</p>
+<p>Alttaki örnekte OpenCV kütüphanesinden elde ettiğimiz 2 boyutlu değerleri ölçüm <span class="math inline">\(y_t\)</span> için kullanacağız. Değerler OpenCV'nin bir satranç tahtası şeklinin köşe noktalarını <code>cvFindChessboardCorners</code> ile buluyor (ve onları <code>cvDrawChessboardCorners</code> ile onları resimde gösteriyoruz).</p>
+<p>Elimizdeki &quot;gürültülü'' ölçümler iki boyutlu noktasal değerler. Gürültülü çünkü kamera bize bu imajları aktarırken hata eklemiş olabilir, OpenCV fonksiyonu hesabı yaparken hata eklemiş olabilir, bir sürü olasılık var.</p>
+<p>Kalman Fitreleri</p>
+<p>Bu örnekte, ayrıca, ilk kez KF ortamında boyut değişikliği olasılığını net bir şekilde görebiliyoruz. Gizli konum bilgisi <span class="math inline">\(x_t\)</span> 3 boyutlu bir nokta, ama elimizdeki ölçüm 2 boyutlu bir &quot;yansıma''. Yansıma sırasında kaçınılmaz olarak değer kaybediliyor, bir boyutun bilgisi ortadan yokoluyor. Ama tüm bu bilinmezlere rağmen Kalman filtresinin bizim için gizli bilgiyi hesaplamasını istiyoruz.</p>
+<p>Bu problemde <span class="math inline">\(\Phi\)</span> matrisi ne olacaktır? Obje takibi konularında <span class="math inline">\(\Phi\)</span>'nin ne olduğunu hayal etmek daha kolay, <span class="math inline">\(\Phi\)</span> matrisi iki zaman dilimi arasındaki &quot;hareketi'' temsil edecek. Bu problemdeki ek bir kolaylık bu hareketi önceden bildiğimiz, ve hareketin tek yönde olduğu. Yani resimde benim tuttuğum kartonu ne kadar hızla hareket ettirdiğimi ben önceden probleme bildiriyorum. Yer değişikliğini <span class="math inline">\(d\)</span> olarak tanımladım, ve <span class="math inline">\(\Phi\)</span> şöyle oldu:</p>
+<p><span class="math display">\[ 
+\Phi = 
+\left[\begin{array}{rrrr}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; d \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{array}\right]
+\]</span></p>
+<p>Dikkat edersek <span class="math inline">\(\Phi\)</span> 4x4 boyutunda, 3x3 değil. 3 boyutlu kordinatları temsil etmek için homojen kordinat sistemini kullandığımız için böyle oldu, o sebeple zaten <span class="math inline">\(x_t\)</span> de 4x1 oldu, ona uymak için <span class="math inline">\(\Phi\)</span>'nin değişmesi gerekiyordu. <span class="math inline">\(\Phi x_t\)</span> çarpımının hakikaten kartonu hareket ettirdiğini göstermek için bu çarpımı bir örnek üzerinde yapalım: Diyelim ki <span class="math inline">\(x_t = \left[\begin{array}{cccc}a_1&amp;a_2&amp;a_3&amp;a_4\end{array}\right]\)</span> o zaman <span class="math inline">\(\Phi x_t\)</span> ya da <span class="math inline">\(x_{t+1}\)</span> şu hale gelir: <span class="math inline">\(\left[\begin{array}{cccc}a_1&amp;a_2&amp;a_3+d&amp;a_4\end{array}\right]\)</span>.</p>
+<p>Bakıyoruz, hakikaten de d kadarlık bir yer değişimi z kordinatı, yani derinlik üzerinde eklenmiş. Test amaçlarımız için d = -0.5 aldık, yani satranç tahta kartonunun her zaman diliminde kameraya doğru 0.5 cm ilerlediğini belirttik. Tabii bu da kabaca bir tahmindi (her ne kadar hareketi yaptıran ben olsam bile!), ama filrelemenin gücünü burada görüyoruz. Benim tahminimde &quot;gürültü'' yani &quot;hata payı'' var, ölçümde gürültü var, tüm bunlar üst üste konsa bile filtre yine de gizli konumu bulacak.</p>
+<p>Ölçümsel dönüşümü temsil eden H'e ben onun temeli olan yansıtma (projection) kelimesinden gelen P matrisinden bahsedelim. Yansıma matrisi görüntü (vision) literatüründe iğne delik kamerası (pinhole camera) modelinden ileri gelen bir matristir ve bu matrisi hesaplamak ayarlama / kalibrasyon (calibration) denen apayrı bir işlemin parçasıdır. OpenCV içinde kalibrasyon için fonksiyonlar var, biz de bunları denedik, kalibrasyon için kullandığımız resimlerle alakalı olmalı, elde edilen sonuçlardan memnun kalmadık. Alternatif olarak şunu yaptık; resimde görülen yeşil yüzey bizim programın oluşturduğu hayali bir yüzey. Filtrenin o anki tahminini P üzerinden görüntüye yansıtarak bu yüzeyi oluşturduk, böylece deneme / yanılma yöntemiyle pek çok P değerini deneyerek, yüzeyin resimde görülen masanın sonunda çıkacak şekilde olmasını sağladık. Yansıtma için kullanılan <span class="math inline">\(K\)</span> matrisi, yansıtma metotu ve başlangıç imajı altta:</p>
+<div class="figure">
+<img src="vision_60track_01.jpg" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy <span class="im">import</span> <span class="op">*</span>
+
+K <span class="op">=</span> array([[<span class="fl">700.</span>, <span class="fl">0.</span>, <span class="fl">300.</span>],
+           [<span class="fl">0.</span>, <span class="fl">700.</span>, <span class="fl">330.</span>],
+           [<span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">1.</span>]])
+
+<span class="kw">def</span> proj_board(im, xl, yl, z):
+    h,w <span class="op">=</span> im.shape[:<span class="dv">2</span>]
+    <span class="cf">for</span> x <span class="kw">in</span> arange(xl<span class="dv">-9</span>, xl<span class="op">+</span><span class="dv">9</span>, <span class="fl">0.5</span>):
+        <span class="cf">for</span> y <span class="kw">in</span> arange(yl<span class="dv">-9</span>, yl<span class="op">+</span><span class="dv">9</span>, <span class="fl">0.5</span>):
+            X <span class="op">=</span> array([x, y, z])
+            q <span class="op">=</span> dot(K, X)
+            q <span class="op">=</span> [<span class="bu">int</span>(q[<span class="dv">0</span>]<span class="op">/</span>q[<span class="dv">2</span>]), <span class="bu">int</span>(q[<span class="dv">1</span>]<span class="op">/</span>q[<span class="dv">2</span>])]           
+            <span class="cf">if</span> q[<span class="dv">0</span>] <span class="op">&gt;=</span> w: <span class="cf">return</span>
+            <span class="cf">if</span> h<span class="op">-</span>q[<span class="dv">1</span>] <span class="op">&gt;=</span> h: <span class="cf">return</span>
+            <span class="cf">if</span> h<span class="op">-</span>q[<span class="dv">1</span>] <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span>
+            im[h<span class="op">-</span>q[<span class="dv">1</span>], q[<span class="dv">0</span>]] <span class="op">=</span> <span class="dv">255</span></code></pre></div>
+<p>O noktaya gelince istediğimiz P değerini bulmuş oluyorduk. Yansıtma matrisleri 3x3 olur, KF buna bir dördüncü [0 0 0] satırı ekleyerek onu 4x3 H haline getiriyor.</p>
+<p>KF'in başlangıç noktası olarak P'yi bulmak için kullandığımız masa sonunu kullandık. Kararsızlık ölçütü Q için, ki bu değişken bir Gaussian kovaryansıdır, <span class="math inline">\(Q = I \cdot 150 cm\)</span> değerini kullandık, yani oldukça büyük bir kararsızlık değeri kullandık. Sebep başlangıç değeri olan masa ortasını seçtik, ve takip edeceğimiz satranç tahtasının nerede olduğunu bilmiyoruz, &quot;emin değiliz''. Bu kararsızlığı sayısal olarak programa bildirmiş olduk.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../../tser/tser_083_kf&#39;</span>)
+<span class="im">import</span> util
+<span class="im">from</span> kalman_3d <span class="im">import</span> <span class="op">*</span>
+<span class="im">import</span> cv2
+
+dim <span class="op">=</span> <span class="dv">3</span>
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:    
+    fin <span class="op">=</span> sys.argv[<span class="dv">1</span>]
+    cap <span class="op">=</span> cv2.VideoCapture(fin)
+    N <span class="op">=</span> <span class="bu">int</span>(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps <span class="op">=</span> <span class="bu">int</span>(cap.get(cv2.CAP_PROP_FPS))
+    kalman <span class="op">=</span> Kalman(util.K, mu_init<span class="op">=</span>array([<span class="fl">1.</span>, <span class="fl">1.</span>, <span class="fl">165.</span>, <span class="fl">0.5</span>]))
+    
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):
+        ret, frame <span class="op">=</span> cap.read()
+        h,w <span class="op">=</span> frame.shape[:<span class="dv">2</span>]
+        <span class="co">#proj_board(frame, 1, 1, 160) # basla</span>
+        gray <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        status, corners <span class="op">=</span> cv2.findChessboardCorners( gray, (dim,dim))
+        is_x <span class="op">=</span> []<span class="op">;</span> is_y <span class="op">=</span> []
+        <span class="cf">if</span> status: 
+            cv2.drawChessboardCorners( gray, (dim,dim), corners, status)
+            <span class="cf">for</span> p <span class="kw">in</span> corners:
+                is_x.append(p[<span class="dv">0</span>][<span class="dv">0</span>])
+                is_y.append(p[<span class="dv">0</span>][<span class="dv">1</span>])
+
+        <span class="cf">if</span> <span class="bu">len</span>(is_x) <span class="op">&gt;</span> <span class="dv">0</span> : 
+            kalman.update(array([is_x[<span class="dv">5</span>], h<span class="op">-</span>is_y[<span class="dv">5</span>], <span class="fl">1.</span>]))
+            util.proj_board(gray, 
+                            kalman.mu_hat[<span class="dv">0</span>], 
+                            kalman.mu_hat[<span class="dv">1</span>], 
+                            kalman.mu_hat[<span class="dv">2</span>])
+        <span class="cf">if</span> i <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>: 
+            cv2.imwrite(<span class="st">&#39;/tmp/kf-out-</span><span class="sc">%d</span><span class="st">.jpg&#39;</span> <span class="op">%</span> i, gray)
+        cv2.imshow(<span class="st">&#39;frame&#39;</span>,gray)
+        cv2.waitKey(<span class="dv">20</span>)
+    </code></pre></div>
+<p>Kalman filtreleri (KF), eğer kararsızlık Gaussian olarak gösterilebiliyorsa çok faydalı, ve hızlı bir yöntem. Bir KF bellekte çok az yer tutar, 3 boyutlu bir Gaussian için 3x1 boyutunda bir ortalama vektörü, ve 3x3 boyutunda bir kovaryans matrisi yeterlidir, yani 3 + 9 = 12 sayı.</p>
+<p><img src="kf-out-50.jpg" /> <img src="kf-out-70.jpg" /></p>
+<p>Parcaçık Filtreleri (Partıcle Filters)</p>
+<p>Parçacık filtreleri (PF) bir dağılımı ayrıksal olarak temsil edebilirler. Diyelim ki tek boyutlu bir dağılımı 100 öğe içeren bir dizin ile temsil edebiliriz, o zaman dağılımın değerlerini 100 tane noktada taşımamız gerekir. Bunun faydaları her türlü dağılım şeklini temsil edebilmemiz. Gaussian ile sadece tek bir tepe noktası olabilir, fakat ayrıksal temsil ile 2, 3, istediğimiz kadar tepe noktası olan bir dağılımı temsil edebiliriz. Bu sayede birden fazla gayrı lineer hipotezi aynı anda işletebiliriz. KF ile tepe noktası en iyi tahminimizdir (mesela.. satranç kartonu masa ortasında), PF ile birkaç tahmini aynı anda hesaplatmak mümkün olabilir.</p>
+<p>PF kodlaması <span class="math inline">\(x_t\)</span> için iki tane veri yapısı gerektirir. Biri dağılım değerlerini temsil eden parçacıklardır, diğeri dağılımdaki önemini temsil eden ağırlıklardır. Filtreleme mekaniği KF'e benzer, önce bir geçiş uygulanır, ki bu geçiş kararsızlığı arttıracaktır, ardından gözlem verisi ve bir hata fonksiyonu üzerinden dağılım güncellenir. Bu işlem sırasında hatası yüksek olan parçacıklar cezalandırılır, onların ağırlığı azalır, ötekilerinki yükselir. Her parçacık için hata fonksiyonu şudur:</p>
+<p><span class="math display">\[
+w^{[i]} = \frac{1}{1 + (y^{[i]} - p^{[i]})^2  )}
+\]</span></p>
+<p><span class="math inline">\(y^{[i]}\)</span> gözlem değeri, <span class="math inline">\(p^{[i]}\)</span> geçiş uygulandıktan sonra elimizdeki tahminimizdir, ki bu KF dünyasındaki <span class="math inline">\(\Phi x_t + Q\)</span>'nun karşılığıdır. PF için hareket geçişi şöyle hesaplanır: Bir birörnek (uniform) dağılımdan örnekleme yapılır, ve bu örneklenen değerler <span class="math inline">\(x\)</span>'e eklenir. Örnekleme için z-kordinatı için <span class="math inline">\(Unif (-0.1, -1)\)</span>'i, x kordinatı için <span class="math inline">\(Unif (-40, 40)\)</span>'i kullandık. Yani ileri doğru 0.1 ve 1 santimetre arasında bir hareket ekliyoruz, ve sağa ve sola dönük olarak 80 santimetrelik bir kararsızlığı hesaplara ekliyoruz.</p>
+<p>Üstteki formülde <span class="math inline">\((y^{[i]} - p^{[i]})^2\)</span> e niye 1 değeri eklediğimiz açıktır herhalde, bu sayede hata fonksiyonunun olasılık değerlerini andıran bir sonuç döndürmesini istiyoruz. Çok ufak hatalar için <span class="math inline">\(1 + hata\)</span> bölünendeki 1'i bölecek, ve 1'e yakın bir değer geri getirecek. İstediğimiz de bu zaten, küçük hataların daha büyük ağırlığa, büyük hataların ise tam tersine sebep olmaları.</p>
+<p>Tekrar örnekleme (resampling) sürecinde parçacıklar tekrar düzenlenerek ağırlığı çok olan parçacıkların ağırlığı az olanlara göre daha fazla tekrarlanmasını istiyoruz. Dikkat: tekrar örnekleme süreci yeni parçacık değerleri yaratmıyor, sadece mevcut olanları tekrarlıyor ya da onları atlıyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../../tser/tser_085_pf&#39;</span>)
+<span class="im">import</span> cv2
+<span class="im">import</span> util
+<span class="im">from</span> PF <span class="im">import</span> <span class="op">*</span>
+
+dim <span class="op">=</span> <span class="dv">3</span>
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:    
+
+    fin <span class="op">=</span> sys.argv[<span class="dv">1</span>]
+    cap <span class="op">=</span> cv2.VideoCapture(fin)
+    N <span class="op">=</span> <span class="bu">int</span>(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    pf <span class="op">=</span> PF(util.K, <span class="dv">200</span>)
+
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):
+        ret, frame <span class="op">=</span> cap.read()
+        h,w <span class="op">=</span> frame.shape[:<span class="dv">2</span>]
+        gray <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        status, corners <span class="op">=</span> cv2.findChessboardCorners( gray, (dim,dim))
+        is_x <span class="op">=</span> []<span class="op">;</span> is_y <span class="op">=</span> []
+        <span class="cf">if</span> status: 
+            cv2.drawChessboardCorners( gray, (dim,dim), corners, status)
+            <span class="cf">for</span> p <span class="kw">in</span> corners:
+                is_x.append(p[<span class="dv">0</span>][<span class="dv">0</span>])
+                is_y.append(p[<span class="dv">0</span>][<span class="dv">1</span>])
+
+        <span class="cf">if</span> <span class="bu">len</span>(is_x) <span class="op">&gt;</span> <span class="dv">0</span>: 
+            pf.update(array([is_x[<span class="dv">5</span>], h<span class="op">-</span>is_y[<span class="dv">5</span>], <span class="fl">1.</span>]))
+            mu_x <span class="op">=</span> pf.average()
+            util.proj_board(gray, mu_x[<span class="dv">0</span>], mu_x[<span class="dv">1</span>], mu_x[<span class="dv">2</span>])
+
+        cv2.imshow(<span class="st">&#39;frame&#39;</span>,gray)
+        <span class="cf">if</span> cv2.waitKey(<span class="dv">20</span>) <span class="op">&amp;</span> <span class="bn">0xFF</span> <span class="op">==</span> <span class="bu">ord</span>(<span class="st">&#39;q&#39;</span>):
+            <span class="cf">break</span>        
+    
+      </code></pre></div>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, Sample Video, <a href="https://drive.google.com/uc?export=view&amp;id=1gq6J3mPFj4UMbkmi3vDrXKwa9IdtxNLH" class="uri">https://drive.google.com/uc?export=view&amp;id=1gq6J3mPFj4UMbkmi3vDrXKwa9IdtxNLH</a></p>
+<p>[2] Bayramlı, Sample Video, <a href="https://drive.google.com/uc?export=view&amp;id=1F8G5ROkD76YIRKOM5W9iVj6Jok4-CQxp" class="uri">https://drive.google.com/uc?export=view&amp;id=1F8G5ROkD76YIRKOM5W9iVj6Jok4-CQxp</a></p>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="derin-öğrenme-ile-doğal-dil-işlemek-natural-language-processing--nlp-">Derin Öğrenme ile Doğal Dil İşlemek (Natural Language Processing -NLP-)</h1>
+<p>Doküman sınıflamak, bir film için yazılmış yorumu beğendi / beğenmedi şeklinde irdelemek; tüm bu işlemler doğal dil işlemek kategorisine girer, ve derin yapay sinir ağları (DYSA) bu alanda kullanılabilir.</p>
+<p>Doküman nasıl temsil edilir?</p>
+<p>Doküman kelimelerden oluşur, fakat kelimeler sayısal değil kategorik şeyler, DYSA kullanmak için kelimelerin sayısallaştırılması lazım. Bir çözüm 1-hot kodlaması, tüm dokümanlardaki tüm kelimeler on bin kelimelik bir &quot;sözlükten'' geliyorsa, her kelime için on bin boyutunda bir vektör yaratırız, bu vektörde kelimelerin yerleri önceden bellidir, &quot;cat (kedi)'' kelimesi mesela 300. indis, o zaman &quot;cat'' kelimesini temsil için 10,000 büyüklüğündeki bir vektörün 300. öğesi 1 diğer 9999 ögesi 0 olur.</p>
+<p>Bu temsil şekli biraz israflı degil mi? Ayrıca kelimeler arasında benzerlik için bize hiçbir fayda getirmiyor.</p>
+<p>Daha önce [4] yazısında boyut azaltma işleminden bahsettik. Bir kelimeyi, ya da dökümanı her ikisinin ilişkisini içeren bir matris üzerinde SVD işlettikten sonra daha ufak bir boyutta temsil edebiliyorduk. Bu azaltılmış boyutta, ki boyutu binlere varan ham veri için azaltılmış boyut <span class="math inline">\(k=10,20,100\)</span> gibi olabiliyordu, kelimeler pür sayısal hale geliyordu ve kelimelere tekabül eden <span class="math inline">\(k\)</span> büyüklüğündeki vektörlerin, anlamsal bağlamda birbirine yakınlık ya da uzaklıkları bu sayılar üzerinden ölçülebiliyordu. Bu tür bir temsilde bazı kelimeler sayısal olarak şu halde olabiliyordu,</p>
+<pre><code>cat:  (0.01359, ..., -0.2524, 1.0048, 0.06259)
+mat:  (0.01396, ..., 0.033483, -0.10007, 0.1158)
+chills: (-0.24776, ..., 0.079717, 0.23865, -0.014213)
+sat:  (-0.35609, ..., -0.35413, 0.38511, -0.070976)</code></pre>
+<p>Derin YSA ile aynı sonuç kelime gömme (word embedding) mekanizması ile elde ediliyor. Fikir aslında gayet basit ve dahiyane. Kelime yerine onları temsil eden sayısal vektörler YSA'nın bir tabakasına &quot;gömülür'' ve aynen YSA'nın diğer katmanları gibi ağırlık olarak addedilip eğitilirler. Başlangıçta tüm kelimelerin gömme vektörleri rasgele sayılardır, eğitim ilerledikçe bu değerler anlamlı hale gelirler.</p>
+<p>Kodlama kabaca şöyle: tüm dokümanlar üzerinden sözlüğü oluştururuz. Kelimeler 1-hot vektörü değil, tek bir indis haline getirilir, üstteki &quot;cat'' sadece 300 sayısına dönüşür yani. Gömme tabakası için sadece sınırlı sayıda kelimeyi alırız, mesela ilk 5'i, yani her dokümanın ilk 5 kelimesi tutulur, gerisi atılır, eğer eksik varsa dolgulama (padding) ile sıfırlar eklenip 5'e getirilir. Tabii bu indis değerleri YSA için direk kullanılamaz, bir sonraki aşama, YSA'ya bir gömme tabakası eklemek, YSA'nın eğitimde kullanacağı esas değerler bunlar. Her (tek) kelimenin gömme boyutu da önceden kararlaştırılır (gömme vektörünün sayısal boyutu), <span class="math inline">\(n\)</span> diyelim, mesela <span class="math inline">\(n=4\)</span>, eğer sözlük büyüklüğü <span class="math inline">\(|V|\)</span> ise, <span class="math inline">\(n \times |V|\)</span> boyutunda bir büyük gömme referans matrisi elde edilir.</p>
+<div class="figure">
+<img src="nlp_02.png" />
+
+</div>
+<p>Bu referans matrisin başlangıç değerleri rasgeledir. Bu örnekte YSA içinde bulunan gömme girdi katmanının tamamı 5 x 4 = 20 olacaktır. Altta &quot;cat chills on a mat (kedi paspas üzerinde takılıyor)'' cümlesini görüyoruz,</p>
+<div class="figure">
+<img src="nlp_03.png" />
+
+</div>
+<p>Üstteki girdiyi olduğu gibi alabilirdik, yani girdi katmanı 5 x 4 boyutundaki bir &quot;tensor'' da olabilirdi (modern YSA araçları çok boyutlu tensorlar ile rahatça çalışırlar), biz basitleştirme amacıyla vektörün düzleştirildiğini düşünelim,</p>
+<div class="figure">
+<img src="nlp_04.png" />
+
+</div>
+<p>Burada ilginç bir durum var, alışılagelen YSA kodlamasından farklı olarak <span class="math inline">\(x\)</span> vektörüne &quot;girdi'' dedik, fakat <span class="math inline">\(x\)</span>'i bir tamamen bağlanmış ağırlık tabakası olarak görmek daha doğru. Fakat bu ağırlık tabakası diğer ağırlık tabakaları gibi de değil; Her eğitim veri noktasının içindeki kelimelerin indisleri üzerinden <em>referans gömme matrisindeki</em> uygun satırlar çekilip o anda bir <span class="math inline">\(x\)</span> haline getiriliyor. Ardından geriye yayılma ile YSA hata düzeltme yapacağı zaman gömme referans matrisindeki uygun vektörler güncelleniyor.</p>
+<p>Bu kadar. Şimdi eğitim hedef değerlerine bakalım. Burada farklı yaklaşımlar var, üstteki <em>Lineer Cebir</em> yazısında bahsedilen YSA komşu kelimeleri tahmin etmeye uğraşıyordu. Bir başka numara bir cümleyi alıp içindeki tek bir kelimeyi &quot;bozmak'', oraya anlamsız bir kelime getirmek, ve bu yeni cümleyi 0, bozulmamış olanını 1 etiketiyle eğitmek. Cümleler nasıl olsa hazır var, onları bozmak kolay, bu şekilde iki kategorili bir sınıflama problemi elde ediyoruz. Örnek boyutlarla [3],</p>
+<p><span class="math inline">\(x \in \mathbb{R}^{20 \times 1}, W \in \mathbb{R}^{8 \times 20}, U \in \mathbb{R}^{8 \times 1}\)</span></p>
+<p>olsa, örnek girdi,</p>
+<p><span class="math display">\[ x = \left[\begin{array}{rrrrr}
+x_{cat} &amp; x_{chills} &amp; x_{on} &amp; x_{a} &amp; x_{mat}
+\end{array}\right]\]</span></p>
+<p>olacak şekilde,</p>
+<p><span class="math display">\[ s = U^T a\]</span></p>
+<p><span class="math display">\[ a = f(z)\]</span></p>
+<p><span class="math display">\[ z = Wx + b\]</span></p>
+<p>katmanları tasarlanabilir.</p>
+<div class="figure">
+<img src="nlp_05.png" />
+
+</div>
+<p>TensorFlow</p>
+<p>TF bağlamında gömme tabakası ile referans matrisi arasındaki ilişki <code>embedding_lookup</code> çağrısı ile yapılıyor. Bu çağrı bir matriste indis erişimi sadece,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+tf.reset_default_graph()
+
+params <span class="op">=</span> tf.constant([<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">30</span>,<span class="dv">40</span>])
+ids <span class="op">=</span> tf.constant([<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>])
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+     <span class="bu">print</span> tf.nn.embedding_lookup(params,ids).<span class="bu">eval</span>()</code></pre></div>
+<pre><code>[10 20 30 40]</code></pre>
+<p>Fakat YSA içine konduğu zaman bu çağrı ve onun oluşturduğu katman geriye yayılma sırasında nasıl davranacağını biliyor.</p>
+<p>Şimdi daha geniş bir örnek olarak [2] verisi üzerinde üstte tarif edilen türden basit ağ yapısını oluşturalım. Veri <em>Rotten Tomatoes</em> adlı film yorum sitesinden alınan kullanıcı yorumları (yazdığı kelimeler yani) ve kullanıcının filmi beğendi / beğenmedi şeklindeki hissiyatı 0/1 olarak içeriyor (bozma işlemine gerek yok, her iki etiket için bol veri mevcut). Bu bir doğal dil işleme ikisel sınıflama problemi. Veriye bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> data_helpers
+<span class="im">from</span> tensorflow.contrib <span class="im">import</span> learn
+
+dev_sample_percentage <span class="op">=</span> <span class="fl">.1</span>
+positive_data_file <span class="op">=</span> <span class="st">&quot;./data/rt-polarity.pos&quot;</span>
+negative_data_file <span class="op">=</span> <span class="st">&quot;./data/rt-polarity.neg&quot;</span>
+embedding_dim <span class="op">=</span> <span class="dv">120</span> <span class="co"># bir kelime icin gomme boyutu</span>
+batch_size <span class="op">=</span> <span class="dv">40</span>
+num_epochs <span class="op">=</span> <span class="dv">200</span>
+
+x_text, y <span class="op">=</span> data_helpers.load_data_and_labels(positive_data_file, negative_data_file)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> y[<span class="dv">3</span>], x_text[<span class="dv">3</span>]
+<span class="bu">print</span> y[<span class="dv">4</span>], x_text[<span class="dv">4</span>]
+<span class="bu">print</span> y[<span class="dv">10000</span>], x_text[<span class="dv">10000</span>]</code></pre></div>
+<pre><code>[0 1] if you sometimes like to go to the movies to have fun , wasabi is a good place to start
+[0 1] emerges as something rare , an issue movie that &#39;s so honest and keenly observed that it does n&#39;t feel like one
+[1 0] like mike is a slight and uninventive movie like the exalted michael jordan referred to in the title , many can aspire but none can equal</code></pre>
+<p>Örnek gösterdiğimiz üç yoruma bakıyoruz, birincisi, ikincisi pozitif, üçüncüsü negatif. Yorumlarda kullanılan kelimelerde mesela ilkinde &quot;a good place to start (iyi bir başlangıç noktası)'' yorumu pozitifsel bir hava taşıyor, üçüncüde &quot;uninventive (bir yenilik yok)'' kelimesi kullanılmış, negatif. YSA eğitildikten sonra bu kelimelerin doğru temsilsel (gömme) ağırlıklarını ve onların 0/1 hedefine olan bağlantısını öğrenmeyi umuyoruz.</p>
+<p>İndis matrisini yaratalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">max_document_length <span class="op">=</span> <span class="bu">max</span>([<span class="bu">len</span>(x.split(<span class="st">&quot; &quot;</span>)) <span class="cf">for</span> x <span class="kw">in</span> x_text])
+<span class="bu">print</span> <span class="st">&#39;dokuman buyuklugu&#39;</span>, max_document_length
+vocab_processor <span class="op">=</span> learn.preprocessing.VocabularyProcessor(max_document_length)
+x <span class="op">=</span> np.array(<span class="bu">list</span>(vocab_processor.fit_transform(x_text)))
+<span class="bu">print</span> x</code></pre></div>
+<pre><code>dokuman buyuklugu 56
+[[    1     2     3 ...,     0     0     0]
+ [    1    31    32 ...,     0     0     0]
+ [   57    58    59 ...,     0     0     0]
+ ..., 
+ [   75    84  1949 ...,     0     0     0]
+ [    1  2191  2690 ...,     0     0     0]
+ [11512     3   147 ...,     0     0     0]]</code></pre>
+<p>İndis için <code>x</code> kullanımı kafa karıştırmasın, [1] kodlaması o şekilde seçmiş.</p>
+<p>Ardından gömme yapılır, ve bu ağırlıklar <code>fully_connected</code> ile tam bağlanmış YSA tabakasına verilir, oradan çıkan sonuç ise iki kategorili softmax'e verilir. Tüm kod,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># nlp1.py</span>
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> data_helpers
+<span class="im">from</span> tensorflow.contrib <span class="im">import</span> learn
+
+dev_sample_percentage <span class="op">=</span> <span class="fl">.1</span>
+positive_data_file <span class="op">=</span> <span class="st">&quot;./data/rt-polarity.pos&quot;</span>
+negative_data_file <span class="op">=</span> <span class="st">&quot;./data/rt-polarity.neg&quot;</span>
+embedding_dim <span class="op">=</span> <span class="dv">120</span>
+batch_size <span class="op">=</span> <span class="dv">40</span>
+num_epochs <span class="op">=</span> <span class="dv">200</span>
+
+x_text, y <span class="op">=</span> data_helpers.load_data_and_labels(positive_data_file, negative_data_file)
+
+max_document_length <span class="op">=</span> <span class="bu">max</span>([<span class="bu">len</span>(x.split(<span class="st">&quot; &quot;</span>)) <span class="cf">for</span> x <span class="kw">in</span> x_text])
+vocab_processor <span class="op">=</span> learn.preprocessing.VocabularyProcessor(max_document_length)
+x <span class="op">=</span> np.array(<span class="bu">list</span>(vocab_processor.fit_transform(x_text)))
+
+np.random.seed(<span class="dv">10</span>)
+shuffle_indices <span class="op">=</span> np.random.permutation(np.arange(<span class="bu">len</span>(y)))
+x_shuffled <span class="op">=</span> x[shuffle_indices]
+y_shuffled <span class="op">=</span> y[shuffle_indices]
+
+dev_sample_index <span class="op">=</span> <span class="dv">-1</span> <span class="op">*</span> <span class="bu">int</span>(dev_sample_percentage <span class="op">*</span> <span class="bu">float</span>(<span class="bu">len</span>(y)))
+x_train, x_dev <span class="op">=</span> x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+y_train, y_dev <span class="op">=</span> y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+<span class="bu">print</span>(<span class="st">&quot;Vocabulary Size: </span><span class="sc">{:d}</span><span class="st">&quot;</span>.<span class="bu">format</span>(<span class="bu">len</span>(vocab_processor.vocabulary_)))
+<span class="bu">print</span>(<span class="st">&quot;Train/Dev split: </span><span class="sc">{:d}</span><span class="st">/</span><span class="sc">{:d}</span><span class="st">&quot;</span>.<span class="bu">format</span>(<span class="bu">len</span>(y_train), <span class="bu">len</span>(y_dev)))
+
+tf.reset_default_graph()
+
+num_classes<span class="op">=</span>y_train.shape[<span class="dv">1</span>]
+sequence_length<span class="op">=</span>x_train.shape[<span class="dv">1</span>]
+
+input_x <span class="op">=</span> tf.placeholder(tf.int32, [<span class="va">None</span>, sequence_length])
+input_y <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, num_classes])
+
+<span class="co"># rasgele agirliklar</span>
+W <span class="op">=</span> tf.Variable(tf.random_uniform([<span class="bu">len</span>(vocab_processor.vocabulary_),
+                                   embedding_dim], <span class="fl">-1.0</span>, <span class="fl">1.0</span>))
+
+ec <span class="op">=</span> tf.nn.embedding_lookup(W, input_x)
+
+<span class="co"># duzlestir</span>
+embed <span class="op">=</span> tf.contrib.layers.flatten(ec)
+
+scores <span class="op">=</span> tf.contrib.layers.fully_connected(inputs<span class="op">=</span>embed, num_outputs<span class="op">=</span><span class="dv">2</span>, 
+                                           activation_fn<span class="op">=</span>tf.nn.softmax)
+
+predictions <span class="op">=</span> tf.argmax(scores, <span class="dv">1</span>)
+
+losses <span class="op">=</span> tf.nn.softmax_cross_entropy_with_logits(logits<span class="op">=</span>scores, labels<span class="op">=</span>input_y)
+
+loss <span class="op">=</span> tf.reduce_mean(losses) 
+
+correct_predictions <span class="op">=</span> tf.equal(predictions, tf.argmax(input_y, <span class="dv">1</span>))
+
+accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(correct_predictions, <span class="st">&quot;float&quot;</span>))
+
+global_step <span class="op">=</span> tf.Variable(<span class="dv">0</span>, trainable<span class="op">=</span><span class="va">False</span>)
+
+optimizer <span class="op">=</span> tf.train.AdamOptimizer(<span class="fl">1e-3</span>)
+
+grads_and_vars <span class="op">=</span> optimizer.compute_gradients(loss)
+
+train_op <span class="op">=</span> optimizer.apply_gradients(grads_and_vars, global_step<span class="op">=</span>global_step)
+
+sess <span class="op">=</span> tf.Session()
+
+sess.run(tf.global_variables_initializer())
+
+batches <span class="op">=</span> data_helpers.batch_iter(<span class="bu">list</span>(<span class="bu">zip</span>(x_train, y_train)),batch_size,num_epochs)
+
+saver <span class="op">=</span> tf.train.Saver(tf.global_variables())
+
+<span class="cf">for</span> i,batch <span class="kw">in</span> <span class="bu">enumerate</span>(batches):
+    
+    x_batch, y_batch <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>batch)    
+    feed_dict <span class="op">=</span> { input_x: x_batch, input_y: y_batch }    
+    sess.run(train_op, feed_dict)
+    
+    <span class="cf">if</span> (i <span class="op">%</span> <span class="dv">30</span>) <span class="op">==</span> <span class="dv">0</span>:
+        feed_dict2 <span class="op">=</span> { input_x: x_dev, input_y: y_dev }
+        train_acc <span class="op">=</span> sess.run(accuracy, feed_dict)
+        test_acc <span class="op">=</span> sess.run(accuracy, feed_dict2)
+        <span class="bu">print</span> train_acc, test_acc
+    <span class="cf">if</span> (i <span class="op">%</span> <span class="dv">200</span>) <span class="op">==</span> <span class="dv">0</span>: <span class="co"># arada sirada modeli kaydet</span>
+        path <span class="op">=</span> saver.save(sess, <span class="st">&quot;/tmp/nlpembed1&quot;</span>)</code></pre></div>
+<p>Bu kodun başarısı yüzde 67 civarı.</p>
+<p>Evrişim Tabakası</p>
+<p>Fakat daha yapılacaklar var. NLP alanında DYSA moda olmadan önce mesela lojistik regresyon ile eğitim yapıldığında bir n-gram yaklaşımı vardı. Bir doküman sayısal hale getirilirken kelimeleri tek tek alabiliriz, ya da, yanyana gelen her iki (2-gram), üç (3-gram) kelime demetlerini sanki başlı başına kelimelermiş gibi sayısala çevirebiliriz. Eğer mesela &quot;küçük ev'' ve &quot;sarı kedi'' 2-gramları sürekli dökümanlarda beraber görülüyorsa, bu kelime çiftinin bir sınıflayıcı kuvveti olabilir, ve n-gram yaklaşımı bunu kullanmaya uğraşır. n-gram işlemi bu yaklaşımlarda çoğunlukla bir önişlem (preprocessing) aşamasında veriden yeni veri çıkartarak yapılırdı (dokümanın kelimelerini sırayla ikişer ikişer, üçer üçer okuyarak), DYSA ile elimizde daha kullanışlı bir silah var. Evrişim.</p>
+<div class="figure">
+<img src="nlp_01.png" />
+
+</div>
+<p>Üstte görülen örnekte gömme tabakası <span class="math inline">\(9 \times 6\)</span> boyutunda, bu tabaka üzerinde farklı boyutlarda evrişim operasyonları uygulanıyor, mesela 2 x 6 boyutlu bir evrişim var (kırmızı renkli), üstten başlanıp birer birer aşağı kaydırılarak ikinci tabakadaki sonuç elde ediliyor, aynı şekilde 3 x 6 bir diğeri (sarı renkli), vs. Böylece ikinci seviyedeki vektörler elde ediliyor, bu vektörler üzerine max-pool işlemi uygulanıyor üçüncü seviye elde ediliyor, ve oradan gelen sonuçlar softmax'e veriliyor.</p>
+<p>Evrişim bir blok olarak girdi üzerinde işletildiği için, yanyana olan kelimeler arasında alaka bulabilmesi gayet normal. Ayrıca değişik boyutlarda, pek çok farklı filtre tanımladık, yani pek çok farklı ilişkiyi bu filtreler üzerinden yakalamaya uğraştık.</p>
+<p>Evrişim içeren genişletilmiş kod altta.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># nlp2.py</span>
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> data_helpers
+<span class="im">from</span> tensorflow.contrib <span class="im">import</span> learn
+
+dev_sample_percentage <span class="op">=</span> <span class="fl">.1</span>
+positive_data_file <span class="op">=</span> <span class="st">&quot;./data/rt-polarity.pos&quot;</span>
+negative_data_file <span class="op">=</span> <span class="st">&quot;./data/rt-polarity.neg&quot;</span>
+embedding_dim <span class="op">=</span> <span class="dv">200</span>
+filter_sizes <span class="op">=</span> <span class="st">&quot;3,4,5&quot;</span>
+num_filters <span class="op">=</span> <span class="dv">200</span>
+dropout_keep_prob <span class="op">=</span> <span class="fl">0.5</span>
+l2_reg_lambda <span class="op">=</span> <span class="fl">0.0</span>
+batch_size <span class="op">=</span> <span class="dv">70</span>
+num_epochs <span class="op">=</span> <span class="dv">200</span>
+
+x_text, y <span class="op">=</span> data_helpers.load_data_and_labels(positive_data_file, negative_data_file)
+
+max_document_length <span class="op">=</span> <span class="bu">max</span>([<span class="bu">len</span>(x.split(<span class="st">&quot; &quot;</span>)) <span class="cf">for</span> x <span class="kw">in</span> x_text])
+vocab_processor <span class="op">=</span> learn.preprocessing.VocabularyProcessor(max_document_length)
+x <span class="op">=</span> np.array(<span class="bu">list</span>(vocab_processor.fit_transform(x_text)))
+
+np.random.seed(<span class="dv">10</span>)
+shuffle_indices <span class="op">=</span> np.random.permutation(np.arange(<span class="bu">len</span>(y)))
+x_shuffled <span class="op">=</span> x[shuffle_indices]
+y_shuffled <span class="op">=</span> y[shuffle_indices]
+
+dev_sample_index <span class="op">=</span> <span class="dv">-1</span> <span class="op">*</span> <span class="bu">int</span>(dev_sample_percentage <span class="op">*</span> <span class="bu">float</span>(<span class="bu">len</span>(y)))
+x_train, x_dev <span class="op">=</span> x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+y_train, y_dev <span class="op">=</span> y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+<span class="bu">print</span>(<span class="st">&quot;Vocabulary Size: </span><span class="sc">{:d}</span><span class="st">&quot;</span>.<span class="bu">format</span>(<span class="bu">len</span>(vocab_processor.vocabulary_)))
+<span class="bu">print</span>(<span class="st">&quot;Train/Dev split: </span><span class="sc">{:d}</span><span class="st">/</span><span class="sc">{:d}</span><span class="st">&quot;</span>.<span class="bu">format</span>(<span class="bu">len</span>(y_train), <span class="bu">len</span>(y_dev)))
+
+tf.reset_default_graph()
+
+num_classes<span class="op">=</span>y_train.shape[<span class="dv">1</span>]
+sequence_length<span class="op">=</span>x_train.shape[<span class="dv">1</span>]
+filter_sizes<span class="op">=</span><span class="bu">list</span>(<span class="bu">map</span>(<span class="bu">int</span>, filter_sizes.split(<span class="st">&quot;,&quot;</span>)))
+
+input_x <span class="op">=</span> tf.placeholder(tf.int32, [<span class="va">None</span>, sequence_length])
+input_y <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, num_classes])
+dropout_keep_prob <span class="op">=</span> tf.placeholder(tf.float32)
+
+l2_loss <span class="op">=</span> tf.constant(<span class="fl">0.0</span>)
+
+W <span class="op">=</span> tf.Variable(tf.random_uniform([<span class="bu">len</span>(vocab_processor.vocabulary_),
+                                   embedding_dim], <span class="fl">-1.0</span>, <span class="fl">1.0</span>))
+
+embedded_chars <span class="op">=</span> tf.nn.embedding_lookup(W, input_x)
+embedded_chars_expanded <span class="op">=</span> tf.expand_dims(embedded_chars, <span class="dv">-1</span>)
+
+pooled_outputs <span class="op">=</span> []
+<span class="cf">for</span> i, filter_size <span class="kw">in</span> <span class="bu">enumerate</span>(filter_sizes):
+    filter_shape <span class="op">=</span> [filter_size, embedding_dim, <span class="dv">1</span>, num_filters]
+    W <span class="op">=</span> tf.Variable(tf.truncated_normal(filter_shape, stddev<span class="op">=</span><span class="fl">0.1</span>))
+    b <span class="op">=</span> tf.Variable(tf.constant(<span class="fl">0.1</span>, shape<span class="op">=</span>[num_filters]))
+    conv <span class="op">=</span> tf.nn.conv2d(
+        embedded_chars_expanded,
+        W,
+        strides<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>],
+        padding<span class="op">=</span><span class="st">&quot;VALID&quot;</span>)
+
+    h <span class="op">=</span> tf.nn.relu(tf.nn.bias_add(conv, b))
+
+    pooled <span class="op">=</span> tf.nn.max_pool(
+        h, ksize<span class="op">=</span>[<span class="dv">1</span>, sequence_length <span class="op">-</span> filter_size <span class="op">+</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>],
+        strides<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>],
+        padding<span class="op">=</span><span class="st">&#39;VALID&#39;</span>,
+        name<span class="op">=</span><span class="st">&quot;pool&quot;</span>)
+    pooled_outputs.append(pooled)
+
+num_filters_total <span class="op">=</span> num_filters <span class="op">*</span> <span class="bu">len</span>(filter_sizes)
+
+h_pool <span class="op">=</span> tf.concat(pooled_outputs, <span class="dv">3</span>)
+
+h_pool_flat <span class="op">=</span> tf.reshape(h_pool, [<span class="op">-</span><span class="dv">1</span>, num_filters_total])
+
+h_drop <span class="op">=</span> tf.nn.dropout(h_pool_flat, dropout_keep_prob)
+
+l2_loss <span class="op">=</span> tf.constant(<span class="fl">0.0</span>)
+
+W <span class="op">=</span> tf.Variable(tf.random_normal(shape<span class="op">=</span>[num_filters_total, num_classes]))
+
+b <span class="op">=</span> tf.Variable(tf.constant(<span class="fl">0.1</span>, shape<span class="op">=</span>[num_classes]))
+
+l2_loss <span class="op">+=</span> tf.nn.l2_loss(W)
+l2_loss <span class="op">+=</span> tf.nn.l2_loss(b)
+
+scores <span class="op">=</span> tf.nn.xw_plus_b(h_drop, W, b)
+
+predictions <span class="op">=</span> tf.argmax(scores, <span class="dv">1</span>)
+
+losses <span class="op">=</span> tf.nn.softmax_cross_entropy_with_logits(logits<span class="op">=</span>scores, labels<span class="op">=</span>input_y)
+
+loss <span class="op">=</span> tf.reduce_mean(losses) <span class="op">+</span> l2_reg_lambda <span class="op">*</span> l2_loss
+
+correct_predictions <span class="op">=</span> tf.equal(predictions, tf.argmax(input_y, <span class="dv">1</span>))
+
+accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(correct_predictions, <span class="st">&quot;float&quot;</span>))
+
+global_step <span class="op">=</span> tf.Variable(<span class="dv">0</span>, trainable<span class="op">=</span><span class="va">False</span>)
+
+optimizer <span class="op">=</span> tf.train.AdamOptimizer(<span class="fl">1e-3</span>)
+
+grads_and_vars <span class="op">=</span> optimizer.compute_gradients(loss)
+
+train_op <span class="op">=</span> optimizer.apply_gradients(grads_and_vars, global_step<span class="op">=</span>global_step)
+
+sess <span class="op">=</span> tf.Session()
+
+sess.run(tf.global_variables_initializer())
+
+batches <span class="op">=</span> data_helpers.batch_iter(
+    <span class="bu">list</span>(<span class="bu">zip</span>(x_train, y_train)), batch_size, num_epochs)
+
+saver <span class="op">=</span> tf.train.Saver(tf.global_variables())
+
+<span class="cf">for</span> i,batch <span class="kw">in</span> <span class="bu">enumerate</span>(batches):
+    x_batch, y_batch <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>batch)
+    feed_dict <span class="op">=</span> {
+        input_x: x_batch,input_y: y_batch, dropout_keep_prob: dropout_kp
+    }
+    sess.run(train_op, feed_dict)
+    <span class="cf">if</span> (i <span class="op">%</span> <span class="dv">30</span>) <span class="op">==</span> <span class="dv">0</span>:
+        feed_dict2 <span class="op">=</span> {
+            input_x: x_dev,
+            input_y: y_dev,
+            dropout_keep_prob: dropout_kp
+        }
+        train_acc <span class="op">=</span> sess.run(accuracy, feed_dict)
+        test_acc <span class="op">=</span> sess.run(accuracy, feed_dict2)
+        <span class="bu">print</span> train_acc, test_acc
+    <span class="cf">if</span> (i <span class="op">%</span> <span class="dv">100</span>) <span class="op">==</span> <span class="dv">0</span>:
+        path <span class="op">=</span> saver.save(sess, <span class="st">&quot;/tmp/nlpembed2&quot;</span>)
+</code></pre></div>
+<p>Bu kod eğitim sonrası yüzde 74 başarıya erişti, kodun orijinal yazarı [1] yüzde 76'yi görmüş, zaten bu veri seti üzerinde bilinen en iyi başarı bu civarda.</p>
+<p>Gömme Temsilinin Transferi</p>
+<p>Ya kelimelerin komşuyla olan ilişkisini, ya da bozma tekniği, ya da başka şekilde etiket elde edip eğittiğimiz gömülü referans matrisindeki ağırlıkların anlamsal bir önemi olduğunu söylemiştik. O zaman, eğer yeterince büyük bir sözlük, etiket ile eğitince elde ettiğimiz gömme ağırlıklarının bir uygulamadan alınıp bir diğerinde de kullanılabilmesi gerekir, değil mi? Bu sorunun cevabı evet. Gömme ağırlıklarını transfer etmek hakikaten mümkün, ve bunu yapan pek çok kişi var.</p>
+<p>Ödev</p>
+<p>1'inci kodu işletin, ve gömme referans matris ağırlıklarına bakın. Örnek bir kelime seçip o kelimenin gömme matrisindeki diğerlerine olan mesafesini Öklitsel uzaklık hesabıyla bulun, en yakın on kelimeyi gösterin.</p>
+<p>Kaynaklar</p>
+<p>[1] Britz, <em>Implementing a CNN for Text Classification in TensorFlow</em>, <a href="http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/" class="uri">http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/</a></p>
+<p>[2] Cornell U., <em>Movie Review Data</em>, <a href="http://www.cs.cornell.edu/people/pabo/movie-review-data" class="uri">http://www.cs.cornell.edu/people/pabo/movie-review-data</a></p>
+<p>[3] Socher, <em>Deep Learning for NLP, without Magic), \url{https://nlp.stanford.edu/courses/NAACL2013/NAACL2013-Socher-Manning-DeepLearning.pdf</em></p>
+<p>[4] Bayramlı, Lineer Cebir, <em>SVD ile Kümeleme, Benzerlik</em></p>
+</body>
+</html>

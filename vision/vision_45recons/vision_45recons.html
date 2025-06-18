@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="iki-imaj-kullanarak-3-boyutta-tekrar-oluşturmak-3d-reconstruction-from-two-images">İki İmaj Kullanarak 3 Boyutta Tekrar Oluşturmak (3D Reconstruction from Two Images)</h1>
+<p>Temel Matris (Fundamental Matrix)</p>
+<p>8'inci derste vazgeçilmez matris (essential matrix) konusunu görmüştük. Şimdi bu bölümdeki eşkutupsal kısıtlamanın (epipolar contraint) bir daha üzerinden geçelim, ama bu sefer temel matrisi merkez alalım. Aslında vazgeçilmez ve temel matrisler birbirine çok yakınlar, temel matris vazgeçilmezin içinden kalibre edilme faraziyesinin çıkartılmış hali. [1, sf. 257] diyor ki vazgeçilmez matriste her şey vazgeçilmez değilmiş demek ki (!).</p>
+<p>Kalibrasyon, yani <span class="math inline">\(K\)</span> nasıl çıkartılır? Diyelim ki bir kamera matrisi <span class="math inline">\(P = K[R | t]\)</span> olarak tanımlı ve <span class="math inline">\(x = PX\)</span> görüntüdeki bir piksel noktası. Bilinen bir <span class="math inline">\(K\)</span> varsa onun tersini <span class="math inline">\(x\)</span>'e uygulayarak <span class="math inline">\(\hat{x} = K ^{-1}x\)</span> noktasını elde edebiliriz, o zaman <span class="math inline">\(\hat{x} = [R | t]X\)</span> olur. Burada <span class="math inline">\(\hat{x}\)</span>'i bir tür &quot;normalize edilmiş'' kordinat sistemindeki bir görüntü pikseli olarak düşünebiliriz, bu sistem sanki kalibrasyonu birim matris, yani <span class="math inline">\(I\)</span> olan bir kamera sistemidir. Aynı şekilde <span class="math inline">\(K ^{-1} P = [R|t]\)</span> normalize kamera matrisi olarak adlandırılır.</p>
+<p>Şimdi eşkutupsal kısıtlamaya tekrar bakalım. Altta soldaki resimde üç boyutlu gerçek dünyada bir <span class="math inline">\(X\)</span> noktası var, bu noktadan merkezi <span class="math inline">\(C_1\)</span>'de olan kameraya bir çizgi çekiyoruz. Bu çizgi üzerindeki her nokta aslında aynı piksel noktasına tekabül ediyor. Değil mi? Bu aslında bir bilgi kaybıdır, o çizgi üzerindeki tüm noktalar aynı piksele yansırsa bir şeyler kaybediliyor. Bu kaybedilen derinlik bilgisi. Neyse, şimdi bu çizgi üzerindeki tüm o noktaların ikinci bir kameradaki yansımalarını düşünelim. Bu tüm değişik yansımalar ikinci kameranın görüntüsünde bir çizgi oluştururlar (aynı piksel değil bu sefer, çünkü başka bir kameradayız), bu çizgiye eşkutupsal çizgi diyoruz (alt sağda).</p>
+<p><img src="vision_20recons_04.png" /> <img src="vision_20recons_05.png" /></p>
+<p>Aynı duruma tek bir <span class="math inline">\(X\)</span> için bakalım,</p>
+<div class="figure">
+<img src="vision_20recons_06.png" />
+
+</div>
+<p>Demek ki ilk kameradaki iki boyutlu bir <span class="math inline">\(x\)</span>'i alıp ikinci kameradaki <span class="math inline">\(x&#39;\)</span> noktasına transfer eden bir fonksiyon var, buna <span class="math inline">\(H_{\pi}\)</span> diyelim. Tranfer 2D-2D, yani iki boyuttan iki boyuta bir geçiş, bir homografi, ve <span class="math inline">\(\pi\)</span> düzlemi üzerinde bu geçiş oluyor. İkinci kameradaki eşkutupsal çizgi <span class="math inline">\(l&#39; = [e&#39;]_x x&#39;\)</span> ile elde edilir, çünkü hatırlarsak iki noktadan çizgi elde etmek için çapraz çarpım lazım, ya da vektörlerden birinin eksi bakışımlı hali ile normal çarpım (altsimge <span class="math inline">\(_x\)</span> eksi bakışımlılık dönüşümünü temsil ediyor). O zaman, ve <span class="math inline">\(x&#39; = H_\pi x\)</span> olduğu için,</p>
+<p><span class="math display">\[ l&#39; = [e&#39;]_x x&#39; = l&#39; = [e&#39;]_x H x = F x \]</span></p>
+<p>de denebilir. İşte bu denklemin <span class="math inline">\([e&#39;]_xH\)</span> kısmına temel matris <span class="math inline">\(F\)</span> denir.</p>
+<p>Eşkutupsal kısıtlama nedir? Bu kısıtlama</p>
+<p><span class="math display">\[ x&#39;^T F x = 0\]</span></p>
+<p>ifadesidir. Bu ifade doğru çünkü eğer <span class="math inline">\(x\)</span> ve <span class="math inline">\(x&#39;\)</span> birbirlerine karşılık noktalar iseler, o zaman <span class="math inline">\(x&#39;\)</span> eşkutupsal çizgi <span class="math inline">\(l&#39; = Fx\)</span> üzerinde olmalı, yani <span class="math inline">\(0 = x&#39;^T l&#39; = x&#39;^T F x\)</span>.</p>
+<p>Nokta Karşılıkları ve 8-Nokta Algoritması</p>
+<p>İki resimden üç boyutta tekrar oluşturma için önce <span class="math inline">\(F\)</span> matrisini hesaplamak gerekiyor. Oradan vazgeçilmez matris <span class="math inline">\(E\)</span>'ye geçeceğiz, sonra <span class="math inline">\(E\)</span> içinden <span class="math inline">\(R,T\)</span> matrislerini çıkartabiliriz.</p>
+<p><span class="math inline">\(F\)</span>'den <span class="math inline">\(E\)</span>'ye geçiş basit, <span class="math inline">\(E = K^TFK\)</span>. İspat: Eğer eşkutupsal kısıtlama türetiminde normalize edilmiş noktaları kullansaydık <span class="math inline">\(\hat{x}&#39;E \hat{x} = 0\)</span> elde ederdik, ve <span class="math inline">\(\hat{x}\)</span> ve <span class="math inline">\(\hat{x}&#39;\)</span> yerine <span class="math inline">\(x\)</span> ve <span class="math inline">\(x&#39;\)</span> kullanırsak, <span class="math inline">\(\hat{x} = K ^{-1}x, \hat{x&#39;} = K ^{-1}x&#39;\)</span>, o zaman <span class="math inline">\(x&#39;^TK^{-T}E K ^{-1}x = 0\)</span> elde ederiz, bu demektir ki <span class="math inline">\(E = K ^T F K\)</span>.</p>
+<p><span class="math inline">\(F\)</span> hesabına dönelim. Elimizde iki imaj var, Alkatraz adasının iki değişik yerden fotoğrafı [2,3]. Bu iki imaj üzerinde önce birbirine tekabül eden noktaları bulacağız. Bu iş için OpenCV'nin ORB adı verilen nokta özelliği (feature) çıkartan işlevini kullanabiliriz, onun yerine SIFT, SURF te olabilirdi.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> axes3d
+<span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+<span class="im">import</span> cv2
+
+<span class="bu">dir</span> <span class="op">=</span> <span class="st">&quot;/home/burak/Documents/Dropbox/Public/data/pcv_data&quot;</span>
+img1 <span class="op">=</span> cv2.imread(<span class="bu">dir</span> <span class="op">+</span> <span class="st">&quot;/alcatraz1.jpg&quot;</span>)
+img2 <span class="op">=</span> cv2.imread(<span class="bu">dir</span> <span class="op">+</span> <span class="st">&quot;/alcatraz2.jpg&quot;</span>)
+
+detector <span class="op">=</span> cv2.ORB_create( nfeatures <span class="op">=</span> <span class="dv">10000</span> )
+
+<span class="kw">def</span> detect_features(frame):
+    keypoints, descrs <span class="op">=</span> detector.detectAndCompute(frame, <span class="va">None</span>)
+    <span class="cf">if</span> descrs <span class="kw">is</span> <span class="va">None</span>: descrs <span class="op">=</span> []
+    <span class="cf">return</span> keypoints, descrs
+
+FLANN_INDEX_LSH    <span class="op">=</span> <span class="dv">6</span>
+flann_params<span class="op">=</span> <span class="bu">dict</span>(algorithm <span class="op">=</span> FLANN_INDEX_LSH,
+                   table_number <span class="op">=</span> <span class="dv">6</span>, <span class="co"># 12</span>
+                   key_size <span class="op">=</span> <span class="dv">12</span>,     <span class="co"># 20</span>
+                   multi_probe_level <span class="op">=</span> <span class="dv">1</span>) <span class="co">#2</span>
+
+
+kp1, des1 <span class="op">=</span> detect_features(img1)
+kp2, des2 <span class="op">=</span> detect_features(img2)
+
+matcher <span class="op">=</span> cv2.FlannBasedMatcher(flann_params, {})
+matches <span class="op">=</span> matcher.knnMatch(des1, des2, k <span class="op">=</span> <span class="dv">2</span>)
+
+matches <span class="op">=</span> [m[<span class="dv">0</span>] <span class="cf">for</span> m <span class="kw">in</span> matches <span class="op">\</span>
+           <span class="cf">if</span> <span class="bu">len</span>(m) <span class="op">==</span> <span class="dv">2</span> <span class="kw">and</span> m[<span class="dv">0</span>].distance <span class="op">&lt;</span> m[<span class="dv">1</span>].distance <span class="op">*</span> <span class="fl">0.75</span>]
+
+<span class="bu">print</span> <span class="st">&#39;uyan noktalar&#39;</span>, <span class="bu">len</span>(matches)
+
+pts1 <span class="op">=</span> []<span class="op">;</span> pts2 <span class="op">=</span> []
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(matches)):
+    pt_a <span class="op">=</span> kp1[matches[i].queryIdx].pt
+    pt_b <span class="op">=</span> kp2[matches[i].trainIdx].pt
+    pt_a <span class="op">=</span> np.array(pt_a).astype(<span class="bu">int</span>)
+    pt_b <span class="op">=</span> np.array(pt_b).astype(<span class="bu">int</span>)
+    <span class="cf">if</span> np.sqrt(np.dot(pt_b<span class="op">-</span>pt_a,pt_b<span class="op">-</span>pt_a)) <span class="op">&lt;</span> <span class="dv">200</span>:
+        pts1.append(pt_a)
+        pts2.append(pt_b)
+        cv2.line(img1, <span class="bu">tuple</span>(pt_a), <span class="bu">tuple</span>(pt_b), (<span class="dv">255</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">5</span>)
+        cv2.circle(img1,<span class="bu">tuple</span>(pt_b), <span class="dv">5</span>, (<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">255</span>), <span class="dv">-1</span>)
+
+h,w,d <span class="op">=</span> img1.shape
+tmp <span class="op">=</span> cv2.resize(img1, (<span class="bu">int</span>(w<span class="op">/</span><span class="dv">4</span>),<span class="bu">int</span>(h<span class="op">/</span><span class="dv">4</span>)))
+cv2.imwrite(<span class="st">&#39;vision_20recons_01.jpg&#39;</span>,tmp)
+
+<span class="cf">for</span> pt <span class="kw">in</span> pts2: cv2.circle(img2,<span class="bu">tuple</span>(pt),<span class="dv">5</span>,(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">255</span>),<span class="op">-</span><span class="dv">1</span>)
+tmp <span class="op">=</span> cv2.resize(img2, (<span class="bu">int</span>(w<span class="op">/</span><span class="dv">4</span>),<span class="bu">int</span>(h<span class="op">/</span><span class="dv">4</span>)))
+cv2.imwrite(<span class="st">&#39;vision_20recons_02.jpg&#39;</span>,tmp)
+
+pts1 <span class="op">=</span> np.array(pts1)
+pts2 <span class="op">=</span> np.array(pts2)
+
+h,w,dum <span class="op">=</span> img1.shape
+pts1[:,<span class="dv">1</span>] <span class="op">=</span> h<span class="op">-</span>pts1[:,<span class="dv">1</span>]
+pts2[:,<span class="dv">1</span>] <span class="op">=</span> h<span class="op">-</span>pts2[:,<span class="dv">1</span>]</code></pre></div>
+<pre><code>uyan noktalar 1298</code></pre>
+<div class="figure">
+<img src="vision_20recons_01.jpg" />
+
+</div>
+<div class="figure">
+<img src="vision_20recons_02.jpg" />
+
+</div>
+<p>Birinci resimde saptanan ORB noktalarının ikinci resimdeki noktalara nasıl nasıl eşleştiğini (yine birinci resimde) gösterdik, ikinci resimde o resimdeki eşleşme noktaları görülüyor. Noktalardaki kayma kameranının hareketi hakkında bir ipucu veriyor bize, hareketi çıplak gözle bile görebiliyoruz. Temel matrisi hesaplayınca daha net bir sonuç alacağız tabii.</p>
+<p>8-Nokta Algoritması</p>
+<p>Daha önce <span class="math inline">\(E\)</span> için 8-nokta algoritmasını gördük, benzer bir hesap <span class="math inline">\(F\)</span> için de var. Bu arada 8 nokta dedik daha fazlasına da izin veren bir çözüm yöntemi SVD ile mümkün. Çözülecek sistem eşkutupsal kısıtlamadan başlar, <span class="math inline">\(i=1,2,..\)</span> olacak şekilde her <span class="math inline">\(x_1^i,x_2^i\)</span> eşleşmelerini bir <span class="math inline">\(x_1^i F x_2^i = 0\)</span> hesabını içinde barındıran bir <span class="math inline">\(Af = 0\)</span> sistemi yaratabiliriz, <span class="math inline">\(x_1^i = (x_1^i,y_1^i,w_1^i)\)</span> ve <span class="math inline">\(x_2^i=(x_2^i,y_2^i,w_2^i)\)</span> olacak şekilde,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{ccccc}
+x_2^1x_1^1 &amp; x_2^1y_1^1 &amp; x_2^1w_1^1 &amp; \dots &amp; w_2^1w_1^1 \\
+x_2^2x_1^2 &amp; x_2^2y_1^2 &amp; x_2^2w_1^2 &amp; \dots &amp; w_2^2w_1^2 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots  \\
+x_2^nx_1^n &amp; x_2^ny_1^n &amp; x_2^nw_1^n &amp; \dots &amp; w_2^nw_1^n
+\end{array}\right]
+\left[\begin{array}{c}
+F_{11} \\ F_{12} \\ F_{13} \\ \vdots \\ F_{33} 
+\end{array}\right] = 0
+\]</span></p>
+<p>ki <span class="math inline">\(f\)</span> içinde <span class="math inline">\(F\)</span>'nin öğeleri var. Üstteki çarpım yapılınca teker teker her satırda eşkutupsal kısıtlamayı elde edebileceğimizi görebiliriz. <span class="math inline">\(Af = 0\)</span> sistemi yaklaşık olarak SVD ile çözülebilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> compute_fundamental(x1, x2):
+  n <span class="op">=</span> x1.shape[<span class="dv">1</span>]
+  A <span class="op">=</span> np.zeros((n, <span class="dv">9</span>))
+  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):
+    A[i] <span class="op">=</span> [x1[<span class="dv">0</span>, i] <span class="op">*</span> x2[<span class="dv">0</span>, i],  x1[<span class="dv">0</span>, i] <span class="op">*</span> x2[<span class="dv">1</span>, i],  x1[<span class="dv">0</span>, i] <span class="op">*</span> x2[<span class="dv">2</span>, i],
+            x1[<span class="dv">1</span>, i] <span class="op">*</span> x2[<span class="dv">0</span>, i],  x1[<span class="dv">1</span>, i] <span class="op">*</span> x2[<span class="dv">1</span>, i],  x1[<span class="dv">1</span>, i] <span class="op">*</span> x2[<span class="dv">2</span>, i],
+            x1[<span class="dv">2</span>, i] <span class="op">*</span> x2[<span class="dv">0</span>, i],  x1[<span class="dv">2</span>, i] <span class="op">*</span> x2[<span class="dv">1</span>, i],  x1[<span class="dv">2</span>, i] <span class="op">*</span> x2[<span class="dv">2</span>, i],
+           ]
+
+  U, S, V <span class="op">=</span> np.linalg.svd(A)
+  F <span class="op">=</span> V[<span class="op">-</span><span class="dv">1</span>].reshape(<span class="dv">3</span>, <span class="dv">3</span>)
+
+  U, S, V <span class="op">=</span> np.linalg.svd(F)
+  S[<span class="dv">2</span>] <span class="op">=</span> <span class="dv">0</span>
+  F <span class="op">=</span> np.dot(U, np.dot(np.diag(S), V))
+  <span class="cf">return</span> F <span class="op">/</span> F[<span class="dv">2</span>, <span class="dv">2</span>]</code></pre></div>
+<p>Eğer biraz önce bulunan noktalar üzerinde uygularsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> make_homog(points):
+  <span class="cf">return</span> np.vstack((points, np.ones((<span class="dv">1</span>, points.shape[<span class="dv">1</span>]))))
+<span class="bu">print</span> compute_fundamental(make_homog(pts1.T),make_homog(pts2.T))</code></pre></div>
+<pre><code>[[  1.30375335e-07   1.65553204e-07  -9.29038216e-04]
+ [  5.01128878e-07   8.40553282e-07  -3.40774405e-03]
+ [  3.28488982e-05   1.58554327e-03   1.00000000e+00]]</code></pre>
+<p>Dahası da var. Bu hesap fena değildir, fakat <span class="math inline">\(F\)</span> gibi kritik bir hesap için daha sağlam bir yaklaşım tercih ediliyor. RANSAC adı verilen metotla verilen tüm eşleşme noktalarından ufak örneklemler toplanır, her örneklem üzerinde üstteki hesap uygulanır, ve elde edilen sonuçlara bakılarak gerçek <span class="math inline">\(F\)</span>'e yaklaşıp yaklaşılmadığı kararlarlaştırılmaya çalışılır, en iyi, stabil olan nihai sonuç elde tutulur. Detaylar için [1, sf. 291]. OpenCV <code>cv2.findFundamentalMat</code> çağrısı <span class="math inline">\(F\)</span>'yi RANSAC ile hesaplayabilir. Sonra <span class="math inline">\(E\)</span>, onu <span class="math inline">\(R,t\)</span> parçalarına ayırırız, vs., böyle devam ederiz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># kamera matrisi biliniyor</span>
+K <span class="op">=</span> np.array([[<span class="dv">2394</span>,<span class="dv">0</span>,<span class="dv">932</span>],[<span class="dv">0</span>,<span class="dv">2398</span>,<span class="dv">628</span>],[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>]])
+
+F, mask <span class="op">=</span> cv2.findFundamentalMat(pts1,pts2,method<span class="op">=</span>cv2.RANSAC, param1<span class="op">=</span><span class="fl">3.</span>, param2<span class="op">=</span><span class="fl">0.99</span>)
+<span class="bu">print</span> <span class="st">&#39;F&#39;</span>, F
+E <span class="op">=</span> K.T.dot(F).dot(K)
+<span class="bu">print</span> <span class="st">&#39;E&#39;</span>, E
+R1,R2,t <span class="op">=</span> cv2.decomposeEssentialMat(E)
+<span class="bu">print</span> <span class="st">&#39;R1&#39;</span>,R1
+<span class="bu">print</span> <span class="st">&#39;R2&#39;</span>,R2
+<span class="bu">print</span> <span class="st">&#39;t&#39;</span>,t</code></pre></div>
+<pre><code>F [[  5.96322112e-08   5.60043096e-06  -2.04058699e-03]
+ [ -5.99484026e-06   1.84659966e-07   1.51380328e-02]
+ [  1.78053340e-03  -1.63463214e-02   1.00000000e+00]]
+E [[  0.34176628  32.15102128   3.66775373]
+ [-34.41525089   1.0618694   23.18100597]
+ [ -4.61718585 -26.40378644  -0.10739647]]
+R1 [[-0.29336175 -0.1052158   0.95019394]
+ [-0.13001529 -0.98029957 -0.14869019]
+ [ 0.94711927 -0.16715975  0.27390274]]
+R2 [[ 0.9950157  -0.02174197  0.09731924]
+ [ 0.02293629  0.99967452 -0.01117018]
+ [-0.09704471  0.01334665  0.99519053]]
+t [[ 0.63358512]
+ [-0.09669105]
+ [ 0.76760715]]</code></pre>
+<p>Üçgenleme (Triangulation)</p>
+<p>Yer değiştirme, rotasyon matrislerini biliyoruz, oradan her kamera için yansıtma matrisleri <span class="math inline">\(P,P&#39;\)</span>'yi oluşturabiliriz. Peki bu matrisleri kullanarak üç boyutta gerçek nokta <span class="math inline">\(X\)</span>'leri nasıl hesaplarız? Halen elimizde sadece iki boyutlu imaj noktaları var, 3D dünya noktaları yok. <span class="math inline">\(X\)</span>'leri hesaplamak için daha önce gördüğümüz direk lineer transform metotunun benzerini uygularız. Bu gerekli çünkü her iki kameradaki yansımadan oluşan hatalar, vs. sonucu mesela iki kameradan direk çizgi çekerek kesiştikleri yeri bulmaya çalışsak, alttaki durum ortaya çıkar,</p>
+<div class="figure">
+<img src="vision_20recons_07.png" />
+
+</div>
+<p>O zaman yaklaşıksal bir çözüm gerekli, üstteki hata ortaya çıksa da, bu hatayı olabildiğince minimize etmeye uğraşmalıyız.</p>
+<p>Birbirinin eşi olan iki piksel noktası için elimizde <span class="math inline">\(x = PX, x&#39; = P&#39;X\)</span> denklemleri var, bu denklemde <span class="math inline">\(X\)</span> aynı dikkat edersek, çünkü aynı 3D noktasının iki kameradaki değişik yansımaları var. Bu denklemleri birleştirerek bir <span class="math inline">\(AX=0\)</span> sistemi ortaya çıkartabiliriz [1, sf. 312], ve bu sistem minimize edilebilir. Çapraz çarpım ile homojen ölçek faktörünü çıkartırsak, mesela ilk imaj için</p>
+<p><span class="math display">\[ x \times (PX) = 0\]</span></p>
+<p>Bu bize üç denklem verir,</p>
+<p><span class="math display">\[ x(p^{3T}X) - (p^{1T}X) = 0 \]</span></p>
+<p><span class="math display">\[ y(p^{3T}X) - (p^{2T}X) = 0 \]</span></p>
+<p><span class="math display">\[ x(p^{2T}X) - (p^{1T}X) = 0 \]</span></p>
+<p>ki <span class="math inline">\(p^{iT}\)</span> <span class="math inline">\(P\)</span> matrisinin satırlarıdır. Bu denklemler <span class="math inline">\(X\)</span>'in öğelerine göre lineerdir. Bu sistemden hareketle <span class="math inline">\(AX=0\)</span>'daki <span class="math inline">\(A\)</span> şöyle,</p>
+<p><span class="math display">\[ A = \left[\begin{array}{c}
+xp^{3T} - p^{1T} \\ 
+yp^{3T} - p^{2T} \\
+x&#39;p&#39;^{3T} - p&#39;^{1T} \\
+y&#39;p&#39;^{3T} - p&#39;^{2T} 
+\end{array}\right]\]</span></p>
+<p>Her iki imajdan iki denklem alındı, toplam 4 denklem oldu. Bu denklem SVD ile, ya da <span class="math inline">\(AX=b\)</span> şeklinde tekrar düzenlenip 2. derste gördüğümüz sözde ters (pseudoinverse) ile çözülebilir. Altta bu yöntem takip edildi,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+<span class="kw">def</span> triangulate_point(u1, u2, P1, P2):
+  A <span class="op">=</span> [[u1[<span class="dv">0</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">0</span>]<span class="op">-</span>P1[<span class="dv">0</span>,<span class="dv">0</span>],u1[<span class="dv">0</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">1</span>]<span class="op">-</span>P1[<span class="dv">0</span>,<span class="dv">1</span>],u1[<span class="dv">0</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">2</span>]<span class="op">-</span>P1[<span class="dv">0</span>,<span class="dv">2</span>]],
+       [u1[<span class="dv">1</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">0</span>]<span class="op">-</span>P1[<span class="dv">1</span>,<span class="dv">0</span>],u1[<span class="dv">1</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">1</span>]<span class="op">-</span>P1[<span class="dv">1</span>,<span class="dv">1</span>],u1[<span class="dv">1</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">2</span>]<span class="op">-</span>P1[<span class="dv">1</span>,<span class="dv">2</span>]],
+       [u2[<span class="dv">0</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">0</span>]<span class="op">-</span>P2[<span class="dv">0</span>,<span class="dv">0</span>],u2[<span class="dv">0</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">1</span>]<span class="op">-</span>P2[<span class="dv">0</span>,<span class="dv">1</span>],u2[<span class="dv">0</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">2</span>]<span class="op">-</span>P2[<span class="dv">0</span>,<span class="dv">2</span>]],
+       [u2[<span class="dv">1</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">0</span>]<span class="op">-</span>P2[<span class="dv">1</span>,<span class="dv">0</span>],u2[<span class="dv">1</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">1</span>]<span class="op">-</span>P2[<span class="dv">1</span>,<span class="dv">1</span>],u2[<span class="dv">1</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">2</span>]<span class="op">-</span>P2[<span class="dv">1</span>,<span class="dv">2</span>]]]
+  B <span class="op">=</span> [[<span class="op">-</span>(u1[<span class="dv">0</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">3</span>]<span class="op">-</span>P1[<span class="dv">0</span>,<span class="dv">3</span>])],
+       [<span class="op">-</span>(u1[<span class="dv">1</span>]<span class="op">*</span>P1[<span class="dv">2</span>,<span class="dv">3</span>]<span class="op">-</span>P1[<span class="dv">1</span>,<span class="dv">3</span>])],
+       [<span class="op">-</span>(u2[<span class="dv">0</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">3</span>]<span class="op">-</span>P2[<span class="dv">0</span>,<span class="dv">3</span>])],
+       [<span class="op">-</span>(u2[<span class="dv">1</span>]<span class="op">*</span>P2[<span class="dv">2</span>,<span class="dv">3</span>]<span class="op">-</span>P2[<span class="dv">1</span>,<span class="dv">3</span>])]]
+  A <span class="op">=</span> np.array(A)
+  B <span class="op">=</span> np.array(B)
+  X <span class="op">=</span> lin.lstsq(A,B)[<span class="dv">0</span>].T[<span class="dv">0</span>]
+  res <span class="op">=</span> np.array([X[<span class="dv">0</span>],X[<span class="dv">1</span>],X[<span class="dv">2</span>],<span class="dv">1</span>])
+  <span class="cf">return</span> res
+
+<span class="kw">def</span> triangulate(x1, x2, P1, P2):
+  X <span class="op">=</span> [triangulate_point(x1[i, :], x2[i, :], P1, P2) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(x1))]
+  <span class="cf">return</span> np.array(X).T</code></pre></div>
+<p>Test amaçlı olarak bilinen <code>P1,P2</code> ve yine iki boyutta eşliği bilinen noktalarla üçgenleme yapalım, sonra elde edilen üç boyutlu noktaları kameralara yansıtalım ve başladığımız imaj noktalarına uyuyor mu kontrol edelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">P1 <span class="op">=</span> np.eye(<span class="dv">4</span>)
+P2 <span class="op">=</span> np.array([[ <span class="fl">0.878</span>, <span class="fl">-0.01</span> ,  <span class="fl">0.479</span>, <span class="fl">-1.995</span>],
+              [ <span class="fl">0.01</span> ,  <span class="fl">1.</span>   ,  <span class="fl">0.002</span>, <span class="fl">-0.226</span>],
+              [<span class="op">-</span><span class="fl">0.479</span>,  <span class="fl">0.002</span>,  <span class="fl">0.878</span>,  <span class="fl">0.615</span>],
+              [ <span class="fl">0.</span>   ,  <span class="fl">0.</span>   ,  <span class="fl">0.</span>   ,  <span class="fl">1.</span>   ]])
+<span class="co"># Homogeneous arrays</span>
+x1real <span class="op">=</span> np.array([[ <span class="fl">0.091</span>,  <span class="fl">0.167</span>,  <span class="fl">0.231</span>,  <span class="fl">0.083</span>,  <span class="fl">0.154</span>],
+                   [ <span class="fl">0.364</span>,  <span class="fl">0.333</span>,  <span class="fl">0.308</span>,  <span class="fl">0.333</span>,  <span class="fl">0.308</span>],
+                   [ <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ]])
+x2real <span class="op">=</span> np.array([[ <span class="fl">0.42</span> ,  <span class="fl">0.537</span>,  <span class="fl">0.645</span>,  <span class="fl">0.431</span>,  <span class="fl">0.538</span>],
+                   [ <span class="fl">0.389</span>,  <span class="fl">0.375</span>,  <span class="fl">0.362</span>,  <span class="fl">0.357</span>,  <span class="fl">0.345</span>],
+                   [ <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ,  <span class="fl">1.</span>   ]])
+X <span class="op">=</span> triangulate( x1real.T, x2real.T, P1, P2 )
+X <span class="op">/=</span> X[<span class="dv">3</span>]
+x1 <span class="op">=</span> np.dot(P1[:<span class="dv">3</span>],X)
+x2 <span class="op">=</span> np.dot(P2[:<span class="dv">3</span>],X)
+x1 <span class="op">/=</span> x1[<span class="dv">2</span>]
+x2 <span class="op">/=</span> x2[<span class="dv">2</span>]
+ 
+<span class="bu">print</span> <span class="st">&#39;X&#39;</span>, X
+<span class="bu">print</span> <span class="st">&#39;x&#39;</span>, x1
+<span class="bu">print</span> <span class="st">&#39;x2&#39;</span>, x2</code></pre></div>
+<pre><code>X [[  1.00277411   2.00859585   3.01259205   1.00350223   2.01053989]
+ [  4.01217675   4.01023497   4.01743619   4.02955748   4.01893278]
+ [ 11.01977032  12.02833872  13.04162674  12.0914948   13.05493008]
+ [  1.           1.           1.           1.           1.        ]]
+x [[ 0.09099773  0.16698863  0.23099818  0.0829924   0.15400618]
+ [ 0.36408896  0.33339891  0.30804717  0.33325553  0.3078479 ]
+ [ 1.          1.          1.          1.          1.        ]]
+x2 [[ 0.4200205   0.53709008  0.64501081  0.43105574  0.5379661 ]
+ [ 0.38890029  0.37453124  0.36194221  0.35671322  0.34517828]
+ [ 1.          1.          1.          1.          1.        ]]</code></pre>
+<p>Ana problemimize dönelim; şimdi ikinci kamera için ayrıştırmadan elde edilen <span class="math inline">\(R,t\)</span> sonuçlarını kamera matrisi <span class="math inline">\(K\)</span> ile çarparak <span class="math inline">\(P_2\)</span> oluşturulmak lazım (<span class="math inline">\(P_1\)</span> birim matrisi, o biliniyor), ve böylece her imaj nokta eşleri için üçgenleme yapacağız. Fakat 8. derste bahsedildiği gibi <span class="math inline">\(E\)</span>'nin ayrıştırmasından dört türlü farklı <span class="math inline">\(R,t\)</span> olasılığı ortaya çıkıyor, bu sonuçların her biri denenmeli. Altta bunu yapıyoruz, yani her seçenek için bir üç boyutta tekrar oluşturma yapacağız, ve sonuçları farklı grafiklerde göstereceğiz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="cf">for</span> i,P <span class="kw">in</span> <span class="bu">enumerate</span>(((R1,t),(R1,<span class="op">-</span>t),(R2,t),(R2,<span class="op">-</span>t))):
+
+    P1 <span class="op">=</span> K.dot(np.hstack(P))
+    P00 <span class="op">=</span> np.float64([ [<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],
+                       [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>],
+                       [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>]])
+    P0 <span class="op">=</span> K.dot(P00) 
+
+    X <span class="op">=</span> triangulate(pts1, pts2, P0, P1)
+
+    fig <span class="op">=</span> plt.figure()
+    ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)    
+    ax.plot(X[<span class="dv">0</span>], X[<span class="dv">2</span>], X[<span class="dv">1</span>], <span class="st">&#39;r.&#39;</span>)
+    ax.view_init(elev<span class="op">=</span><span class="fl">23.</span>, azim<span class="op">=-</span><span class="dv">67</span>)
+    plt.savefig(<span class="st">&#39;vision_20recons_03_</span><span class="sc">%d</span><span class="st">.png&#39;</span> <span class="op">%</span> i)</code></pre></div>
+<p><img src="vision_20recons_03_0.png" /> <img src="vision_20recons_03_1.png" /> <img src="vision_20recons_03_2.png" /> <img src="vision_20recons_03_3.png" /></p>
+<p>Galiba alt sağdaki resim Alkatraz'a daha çok benziyor. Gerçek dünya uygulamalarında &quot;kamera önüne düşen en çok nokta hangisinde'' gibi ek kodlar geliştirip gerçek 3D sonucu bu şekilde elenebiliyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Zisserman, <em>Multiple View Geometry in Computer Vision 2nd Edition</em></p>
+<p>[2] Bayramlı, <em>Resim 1</em>, <a href="https://drive.google.com/uc?export=view&amp;id=1pwzbfotghDX617znCMUd9AWet2XheiwZ" class="uri">https://drive.google.com/uc?export=view&amp;id=1pwzbfotghDX617znCMUd9AWet2XheiwZ</a></p>
+<p>[3] Bayramlı, <em>Resim 2</em>, <a href="https://drive.google.com/uc?export=view&amp;id=1GHbK2UpaSc7B3Ko84rEk83t0eesLFf7S" class="uri">https://drive.google.com/uc?export=view&amp;id=1GHbK2UpaSc7B3Ko84rEk83t0eesLFf7S</a></p>
+</body>
+</html>

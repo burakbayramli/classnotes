@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="dinamik-programlama">Dinamik Programlama</h1>
+<p>Dinamik programlamanın (DP) temelinde ardı ardına verilen kararların bulunması / hesaplanması fikri vardır; ilgilendiği problemler her verilen kararın diğer karar seçeneklerini ortaya çıkardığı türden problemlerdir, ve her seferinde bu seçeneklerin arasından bir tanesi seçilmelidir. Amaç en iyi karar zincirini bulmaktır. Metot olarak kullanılanlar kısmen &quot;açgözlü algoritmalar (greedy algorithms)'' olarak bilinen algoritmaların yaptığına benzer fakat açgözlü algoritmalar en kısa yolu bulmaya uğraşırken, gezilen düğümlerde sadece &quot;o an için'' en iyi seçimi yapar. Bu tür seçim nihai sonuç göze alındığı zamanen iyi sonucu vermeyebilir. Alttaki grafiğe bakarsak,</p>
+<div class="figure">
+<img src="dp1.png" />
+
+</div>
+<p>diyelim ki <code>a</code> noktasından <code>f</code> noktasına en kısa yoldan ulaşmaya çalışıyoruz - açgözlü algoritma <code>a,b,c,d</code> üzerinden gidiş yapardı çünkü her an, sadece o an için en iyi olanı seçerdi. Fakat en iyi yol <code>a,b,d</code> üzerinden giden yoldur. Gösterilen çizit / ağ yapısı (graph) yönlü ve çevrimsiz (directed, acyclic graph -DAG-) olarak bilinen bir yapı. Tipik kısa yol problemleri bu yapılar üzerinde çalışırlar.</p>
+<p>DP problemleri özellikle bir problemi alt problemlere bölebildiğimiz zaman faydalıdırlar, ve bu alt problemler tekrar tekrar hesaplanıyorlarsa da bu daha iyidir, çünkü DP o alt problemleri önbellekleyerek (caching) tekrar hesaplanmadan geri getirilmelerini sağlayabilir.</p>
+<p>Üstteki en kısa yol problemini DP ile çözelim.</p>
+<p>Önce bazı teorik, mantıksal konular: tümevarımsal olarak düşünelim. Diyelim ki üstteki DAG'de <span class="math inline">\(a,f\)</span> arasındaki en kısa yolu kesinlikle &quot;biliyoruz''. Ve yine diyelim ki bu yol üzerinde / bir ara nokta <span class="math inline">\(x\)</span> noktası var. O zaman, <span class="math inline">\(a,x\)</span>, ve <span class="math inline">\(x,f\)</span> arasındaki yollar da tanım itibariyle en kısadır. İspatlayalım: eğer mesela <span class="math inline">\(x,f\)</span> arasındaki en kısa yol bildiğimizden <em>başka</em> olsaydı, o zaman eldekini atıp o yolu kullanıyor olurduk (en kısa olduğunu kesin biliyoruz ya), ve bu sefer o alternatif en kısa olurdu. Fakat ilk başta en kısa yolu bildiğimiz faraziyesi ile başladık. Bir çelişki elde ettik, demek ki ara noktanın kısalığı doğrudur <span class="math inline">\(\square\)</span></p>
+<p>Bu ispattan hareketle kısa yolu tek sayısal (numeric) bir değer olarak hesaplamaya uğraşabiliriz.</p>
+<p>Öyle bir fonksiyon <span class="math inline">\(d(v)\)</span> olsun ki herhangi bir <span class="math inline">\(v\)</span> nodu için o nod'dan bitiş noktasına olan en kısa uzaklığı kesin biliyor olsun (dikkat, bu hesabın nasıl olacağını düşünmüyoruz şimdilik, sadece olabileceğini, olmuş olduğunu farz ediyoruz). Çoğu tümevarımsal tasarımda olduğu gibi hesabın kendisinin özyinelilik (recursive) çağrı zincirinin mekaniği içinde halolmasını amaçlıyoruz. Doğru olan bir ifadeyi düşünüyoruz öncelikle, ve hesabın kendisini sürekli bir sonraki noktaya erteliyoruz.</p>
+<p>Devam edelim: <span class="math inline">\(u,v\)</span> arasındaki parça mesafeler <span class="math inline">\(w(u,v)\)</span>'dir. Şimdi, eğer bir ara nokta <span class="math inline">\(u\)</span>'ya gelmişsek -yine tümevarımsal olarak düşünmeye devam ediyoruz- bu noktanın her komşusu <span class="math inline">\(w\)</span> için <span class="math inline">\(d(w)\)</span>'yi &quot;bildiğimize'' göre, en kısa yol için tek yapmamız gereken her seçim anında en minimal <span class="math inline">\(w(u,v) + d(v)\)</span>'yi <span class="math inline">\(u\)</span>'nun uzaklığı olarak almaktır.</p>
+<p>Veri yapısı olarak DAG'ı alttaki gibi gösterelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">DAG <span class="op">=</span> {
+    <span class="st">&#39;a&#39;</span>: {<span class="st">&#39;b&#39;</span>:<span class="dv">2</span>, <span class="st">&#39;f&#39;</span>: <span class="dv">9</span>},
+    <span class="st">&#39;b&#39;</span>: {<span class="st">&#39;d&#39;</span>:<span class="dv">2</span>, <span class="st">&#39;c&#39;</span>:<span class="dv">1</span>, <span class="st">&#39;f&#39;</span>: <span class="dv">6</span>},
+    <span class="st">&#39;c&#39;</span>: {<span class="st">&#39;d&#39;</span>:<span class="dv">7</span>},
+    <span class="st">&#39;d&#39;</span>: {<span class="st">&#39;e&#39;</span>:<span class="dv">2</span>, <span class="st">&#39;f&#39;</span>: <span class="dv">3</span>},
+    <span class="st">&#39;e&#39;</span>: {<span class="st">&#39;f&#39;</span>:<span class="dv">4</span>},
+    <span class="st">&#39;f&#39;</span>: {}
+}</code></pre></div>
+<p>Böylece <span class="math inline">\(w(u,v)\)</span> basit bir Python sözlük (dictionary) erişimi haline geliyor, <code>a,b</code> arası parça mesafe için</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> DAG[<span class="st">&#39;a&#39;</span>][<span class="st">&#39;b&#39;</span>]</code></pre></div>
+<pre><code>2</code></pre>
+<p>En kısa yolu bulacak program</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> functools <span class="im">import</span> wraps
+
+<span class="kw">def</span> memo(func):
+    cache <span class="op">=</span> {}                                  
+    <span class="at">@wraps</span>(func)                                
+    <span class="kw">def</span> wrap(<span class="op">*</span>args):                            
+        <span class="cf">if</span> args <span class="kw">not</span> <span class="kw">in</span> cache:
+            <span class="bu">print</span> <span class="st">&#39;onbellekte yok -&#39;</span>, args[<span class="dv">0</span>]
+            cache[args] <span class="op">=</span> func(<span class="op">*</span>args)
+        <span class="cf">else</span>: <span class="bu">print</span> <span class="st">&#39;onbellekte var -&#39;</span>, args[<span class="dv">0</span>]
+        <span class="cf">return</span> cache[args]                      
+    <span class="cf">return</span> wrap </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> memo <span class="im">import</span> <span class="op">*</span>
+
+<span class="kw">def</span> rec_dag_sp(W, s, t): 
+    <span class="at">@memo</span>                                    
+    <span class="kw">def</span> d(u):
+        <span class="bu">print</span> <span class="st">&#39;Dugum:&#39;</span> <span class="op">+</span> u[<span class="dv">0</span>]
+        <span class="cf">if</span> u <span class="op">==</span> t:  <span class="bu">print</span> <span class="st">&#39;Son nokta t, geri donus&#39;</span><span class="op">;</span> <span class="cf">return</span> <span class="dv">0</span>  
+        min_dist <span class="op">=</span> <span class="bu">min</span>(W[u][v]<span class="op">+</span>d(v) <span class="cf">for</span> v <span class="kw">in</span> W[u])  
+        <span class="bu">print</span> <span class="st">&#39;Geri donus,&#39;</span>,u,<span class="st">&#39;uzerindeyiz, mesafe=&#39;</span>,min_dist
+        <span class="cf">return</span> min_dist
+    <span class="cf">return</span> d(s)                                 
+
+dist <span class="op">=</span> rec_dag_sp(DAG, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;f&#39;</span>)
+<span class="bu">print</span> <span class="st">&#39;toplam mesafe=&#39;</span>, dist</code></pre></div>
+<pre><code>onbellekte yok - a
+Dugum:a
+onbellekte yok - b
+Dugum:b
+onbellekte yok - c
+Dugum:c
+onbellekte yok - d
+Dugum:d
+onbellekte yok - e
+Dugum:e
+onbellekte yok - f
+Dugum:f
+Son nokta t, geri donus
+Geri donus, e uzerindeyiz, mesafe= 4
+onbellekte var - f
+Geri donus, d uzerindeyiz, mesafe= 3
+Geri donus, c uzerindeyiz, mesafe= 10
+onbellekte var - d
+onbellekte var - f
+Geri donus, b uzerindeyiz, mesafe= 5
+onbellekte var - f
+Geri donus, a uzerindeyiz, mesafe= 7
+toplam mesafe= 7</code></pre>
+<p>Şimdi çağrı mekaniğinin hakikaten nasıl işlediğini görelim. Not: Önbellek kodlaması dekoratör kullanıyor, dekoratörler hakkında bir yazı için [2].</p>
+<p>Başlangıç <span class="math inline">\(u\)</span>, oradan, minimum seçerken, sürekli <span class="math inline">\(d()\)</span> çağrısı yapıyoruz, yani <span class="math inline">\(d()\)</span> kendini çağırıyor. Çağrının geri dönmesinin tek yolu son noktaya erişmek. Bu ne demektir? Programımız daha hesap yapmadan &quot;derinliğine bir dalış'' yapıyor. Son noktalara gelene kadar özyineli çağrıları ardı ardına uyguluyor, esas hesapları geri dönüş sırasında yapıyor. Bu nasıl ise yarıyor? Ayrıca önbelleklemenin hakikaten işleyip işlemediğini nasıl bileceğiz? Ya da önbellekteki bir değerin hep en iyisi olduğunu nereden bileceğim?</p>
+<p>Bu arada, böyle bir yaklaşımda, önbellek değeri bir kez set edildi mi, hiç değiştirmeye gerek yok.</p>
+<p>Nokta <code>d</code>'ye bakalım. Bu noktanın mesafesi (yani son nokta <code>f</code>'ye uzaklığı) kararlaştırılırken algoritma <code>d</code>'nin her komşusuna bakacaktır, bunu <code>for v in W[u])</code> ile yapacaktır. Her komşu için <code>f</code>'ye gelene kadar o yol derinliğine takıp edilecektir. Üstteki çıktıda görüyoruz ki <code>d</code> sonrası iki komşu <code>e,f</code> için önce <code>d-f</code> ve <code>d-e-f</code> gidişi yapılmıştır (amaç hep o son noktaya ulaşmak, unutmayalım). 'Komşulara bakma ve aralarından en azı seçme'' mantığı tüm bu yollar denenene kadar bekleyecektir, ancak hepsi bittikten sonra içlerinden bir minimum seçecektir.</p>
+<p>İşte şimdi niye her düğümdeki minimum hesabının en iyisi olduğunu anlıyoruz, çünkü o noktadan nihai noktaya varış için tüm alternatifler deneniyor. O derine dalışın sonuçları arasından bir tanesi seçiliyor. önbellekteki değer bu sebeple bir kez set ediliyor, ve hiç değişmiyor. Tabii ki önbellekteki değer tekrar tekrar kullanılabiliyor, <code>c</code> için bir <code>d</code> uzaklığı gerektiğinde bu önbellekten servis edilecektir.</p>
+<p>Ve her düğümdeki minimum hesabı en iyiyse, bu hesapları kullanan başlangıca yakın noktaların hesabı da doğal olarak en iyisi (kısası) olacaktır. Başta tümevarımsal olarak belirttiğimizin tekrar ifade edilmesidir bu.</p>
+<p>Kısa Yol Tarifini Bulmak</p>
+<p>Mesafe hesabı işte böyle yapılıyor... Peki en kısa yolun kendisini nasıl biliriz? Yani önce şuraya, sonra şuraya git türünden yol tarifi bilgisi nasıl hesaplanır? Aslında komşular arasındaki en kısa mesafeyi seçme problemi, o komşular içinden hangisinin o en mesafeyi sağladığını hatırlama problemine oldukça benziyor. Yani, her düğüm üzerindeyken ve komşular arasından en kısa mesafeyi seçerken, o mesafenin &quot;hangi komşudan'' geldiğini hatırlamak ve bunu bir yerlere kaydetmek yeterli. Her düğüm için, son noktaya olan en kısa mesafe değişmediğine göre, &quot;o mesafe bilgisinin geldiği komşunun hangisi olduğu'' bilgisi de değişmeyecektir. Ve her nokta için o &quot;ebeveyn komşu'' bilindiği zaman herşey işleyip bittikten sonra en kısa yol tarifi için eldeki kayda bakarız, ve başlangıç noktası <code>a</code>'dan başlayarak zıplaya zıplaya o ebeveyn zinciri ile sona kadar geliriz. Bu değişiklikleri ekleyince kod şu hale gelir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> memo <span class="im">import</span> <span class="op">*</span>
+
+<span class="kw">def</span> rec_dag_sp2(W, s, t, debug<span class="op">=</span><span class="va">True</span>): 
+    parent <span class="op">=</span> {}
+    <span class="at">@memo</span>                                      
+    <span class="kw">def</span> d(u):                                  
+        <span class="cf">if</span> u <span class="op">==</span> t: <span class="cf">return</span> <span class="dv">0</span>                    
+        distances <span class="op">=</span> [W[u][v]<span class="op">+</span>d(v) <span class="cf">for</span> v <span class="kw">in</span> W[u]]
+        min_dist <span class="op">=</span> <span class="bu">min</span>(distances)
+        parent[u] <span class="op">=</span> <span class="bu">list</span>(W[u])[np.argmin(distances)]
+        <span class="cf">if</span> debug: <span class="bu">print</span> <span class="st">&#39;Geri donus,&#39;</span>,u,<span class="st">&#39;uzerindeyiz, mesafe=&#39;</span>,min_dist
+        <span class="cf">return</span> min_dist
+    <span class="cf">return</span> d(s), parent</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sp
+dist, parent <span class="op">=</span> sp.rec_dag_sp2(DAG, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;f&#39;</span>)
+<span class="bu">print</span> <span class="st">&#39;ebeveynler&#39;</span>, parent</code></pre></div>
+<pre><code>onbellekte yok - a
+onbellekte yok - b
+onbellekte yok - c
+onbellekte yok - d
+onbellekte yok - e
+onbellekte yok - f
+Geri donus, e uzerindeyiz, mesafe= 4
+onbellekte var - f
+Geri donus, d uzerindeyiz, mesafe= 3
+Geri donus, c uzerindeyiz, mesafe= 10
+onbellekte var - d
+onbellekte var - f
+Geri donus, b uzerindeyiz, mesafe= 5
+onbellekte var - f
+Geri donus, a uzerindeyiz, mesafe= 7
+ebeveynler {&#39;a&#39;: &#39;b&#39;, &#39;c&#39;: &#39;d&#39;, &#39;b&#39;: &#39;d&#39;, &#39;e&#39;: &#39;f&#39;, &#39;d&#39;: &#39;f&#39;}</code></pre>
+<p>Not: <code>argmin</code> bir liste içindeki en minimal değerin indisini verir.</p>
+<p>İşte sonuç. Başlangıç <code>a</code>, onun ebeveyni <code>b</code>. <code>b</code>'ye bakıyoruz, onunki <code>d</code>. Oradan <code>f</code>'ye atlıyoruz, ve sonuca erişmiş oluyoruz, en kısa yol <code>a-b-d-f</code>.</p>
+<p>Analiz</p>
+<p>Açgözlü yaklaşımdan bu yaklaşımın farkını şimdi daha iyi görebiliriz, açgözlü teknik her düğümde en azı bizzat takip eder, ve kısayol hesabı, mesafe hesabı hep bu takip eylemi sırasın o anda yapılır, elde bir toplam vardır ve ona eklenir, vs. Bu yaklaşım daha hangi yolu seçtiği, sonradan, birkaç adım sonrasında hiçbir seçimle ilgilenmez. Dinamik Programlama ise takip etme eylemi ile hesap eylemini birbirinden ayırır, ve tümevarımsal bir tanımdan yola çıkarak, hep en kısa, en optimali bulmayı başarır.</p>
+<p>DP algoritmasının karmaşıklığı, <span class="math inline">\(M\)</span> tane bağlantı (edges) ve <span class="math inline">\(N\)</span> tane düğüm için <span class="math inline">\(O(N + M)\)</span>'dir. Yani çözüm lineer zamandadır! Alt problemleri tekrar tekrar çözüyoruz evet, ve <code>@memo</code> ibaresini koddan çıkartsaydık algoritmamızın üstel (exponential) zamanda işlediğini görürdük, ki bu çok kötüdür. Fakat çözülen alt problemleri bir daha çözmeyip sonuçlarını önbellekten aldığımız için algoritma son derece hızlı işliyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Hetland, M., L., <em>Python Algorithms, 8. Bolum</em></p>
+<p>[2] Bayramlı, <em>Dekoratorler, Onbellek Kodlamasi, Fonksiyon Degistirmek</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2013/07/onbelleklemeyi-dekorator-ile-yapmak.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2013/07/onbelleklemeyi-dekorator-ile-yapmak.html</a></p>
+</body>
+</html>

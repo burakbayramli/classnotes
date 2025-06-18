@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-2.18">Ders 2.18</h1>
+<p>[bazı multigrid yorumları atlandı]</p>
+<p>Krylov Matrisleri</p>
+<p>Bu matrislerden <span class="math inline">\(K\)</span> olarak bahsedeceğiz ve bu yöntem bağlamında</p>
+<p><span class="math display">\[ Ax = b \]</span></p>
+<p>sistemini çözüyor olacağız. Krylov matrisleri şöyle yaratılır</p>
+<p><span class="math display">\[ K_j = \left[\begin{array}{rrrrr}
+b &amp; Ab &amp; A^2b &amp; .. &amp; A^{j-1}b
+\end{array}\right] \]</span></p>
+<p>Krylov altuzayı <span class="math inline">\(\mathscr{K}\)</span> ise üstteki kolonların lineer kombinasyonudur (span), ya da üstteki matrisin kolon uzayıdır da denebilir. Bu tür bir matrisle niye ilgilenirim? Jacobi işlemi aslında bu kolonların kombinasyonlarından birini her adımda yavaş yavaş seçer, yani aslında Krylov altuzayının bir parçasında çalışır. Daha doğrusu ufak ufak başlar, o altuzayda yavaş yavaş büyür.</p>
+<p>Jacobi sürekli bir kombinasyon seçimi yapar, tabii bu seçimin en iyi seçim olduğu söylenemez. Seçimin en iyisini yapsak daha iyi olmaz mı?</p>
+<p>En iyiyi seçmek için kullanılacak metot eşlenik gradyan (conjugate gradient) olacak. Bu metot <span class="math inline">\(K\)</span> içinde <span class="math inline">\(x_j\)</span>'yi seçer.</p>
+<p><span class="math inline">\(\mathscr{K}\)</span> uzayı yaklaşıksal çözümümüzü aradığımız yer tabii ki. Bu arada üstteki <span class="math inline">\(K\)</span> matrisinin elemanlarını yaratmak çok kolay, matris çarpımı yapıyoruz, ve bir sonraki eleman bir öncekinin <span class="math inline">\(A\)</span> katıdır, ve <span class="math inline">\(A\)</span> çoğunlukla seyrektir (sparse), bazen de simetriktir (eşlenik gradyan metotu için <span class="math inline">\(A\)</span> simetrik, pozitif kesin olmalı).</p>
+<p>Ama EG metotundan önce Arnoldi kavramını görmemiz lazım.</p>
+<p>Uygulamalı Matematikte sürekli bir şeyler &quot;seçeriz'', ve çoğunlukla baz vektörleri seçeriz ve birkaç özellik ararız. Aradığımız özellikler öncelikle hızdır, yukarıda gördüğümüz gibi, matris çarpımı var, bu çok hızlı. Bir diğer özellik bağımsızlık. Bir diğeri baz vektörlerinin birimdik (orthonormal) olması. Bu son özellik elde edilebilirse en iyisidir. Üstteki <span class="math inline">\(K\)</span> pek iyi bir baz değildir. Arnoldi'nin amacı Krylov bazını dikgenleştirmektir. <span class="math inline">\(b,Ab,..\)</span>'yi alıp <span class="math inline">\(q_1,q_2,..,q_j\)</span> oluşturmaktır. Koda bakalım,</p>
+<p>Algoritma <code>arnoldi</code></p>
+<ul>
+<li><span class="math inline">\(q_1 = b / ||b||\)</span>, normalize et</li>
+<li><p>Her <span class="math inline">\(j = 1,..,n-1\)</span> için <span class="math inline">\(q_{j+1}\)</span>'i hesaplamaya başla</p>
+<ul>
+<li><span class="math inline">\(t = A * q_j\)</span></li>
+<li><p>Her $i = 1,..,j $ için <span class="math inline">\(t\)</span>, <span class="math inline">\(\mathscr{K}_{j+1}\)</span> uzayında</p></li>
+<li><span class="math inline">\(h_{ij} = q_i^T t\)</span>, <span class="math inline">\(h_{ij}q_i\)</span>, <span class="math inline">\(t\)</span>'nin <span class="math inline">\(q_i\)</span>'ye yansıması</li>
+<li><p><span class="math inline">\(t = t - h_{ij}q_i\)</span>, yansımayı çıkart</p></li>
+</ul></li>
+<li>// <span class="math inline">\(t\)</span>, <span class="math inline">\(q_1,..,q_j\)</span>'ye dikgen oldu</li>
+<li><span class="math inline">\(h_{j+1,j} = ||t||\)</span>, <span class="math inline">\(t\)</span>'nin büyüklüğünü hesapla</li>
+<li><p>// <span class="math inline">\(q_{j+1} = t / h_{j+1,j}\)</span> <span class="math inline">\(q_1,..,q_j\)</span> birimdik</p></li>
+</ul>
+<p>Fikir Gram-Schmidt fikriyle çok benzer. 1. satırda ilk vektörü olduğu gibi alıyoruz, sadece normalize ediyoruz. Sonra 3. satırda bir deneme amaçlı bir vektör <span class="math inline">\(t\)</span>'ye bakıyoruz. Bu vektör ilk baştaki <span class="math inline">\(b\)</span>'ye dikgen olmayacak muhakkak. O zaman 5. satırda bir iç çarpım (inner product) sonrası, 6. satırda <span class="math inline">\(t\)</span>'den çıkartıyoruz. 8 ve 9. satırlarda bu vektörü normalize ediyoruz.</p>
+<p>Eğer <span class="math inline">\(A\)</span> simetrik ise, <span class="math inline">\(h_{ij}h_{ij-1}\)</span> çarpımını birkaç kere çıkartmam yeterlidir.</p>
+<p>Örnek</p>
+<p><span class="math display">\[  
+A = 
+\left[\begin{array}{rrrr}
+1 &amp;&amp;&amp; \\
+ &amp; 2 &amp;&amp; \\
+ &amp;&amp; 3 &amp; \\
+ &amp;&amp;&amp; 4 
+\end{array}\right],
+b = 
+\left[\begin{array}{r}
+1 \\ 1\\ 1 \\ 1
+\end{array}\right]
+,
+K_4 = 
+\left[\begin{array}{rrrr}
+1 &amp; 1 &amp; 1 &amp; 1\\
+1 &amp; 2 &amp; 4 &amp; 8\\
+1 &amp; 3 &amp; 9 &amp; 27\\
+1 &amp; 4 &amp; 16 &amp; 64 
+\end{array}\right]
+\]</span></p>
+<p><span class="math inline">\(A\)</span> hem simetrik, onun ötesinde köşegen, ayrıca oldukça seyrek. Krylov matrisi de üstte. İlk kolonu <span class="math inline">\(b\)</span> ile aynı. 2. kolon için <span class="math inline">\(A\)</span> ile çarpmışız. 3. için bir daha <span class="math inline">\(A\)</span> ile çarpmışsız, 4. için bir daha.</p>
+<p><span class="math inline">\(K\)</span> eğer bir baz ise, temsil ettiği uzay tüm <span class="math inline">\(\mathbb{R}^4\)</span>'tür. Üstteki örnekte <span class="math inline">\(j = n = 4\)</span>, tüm değerleri işledik. Eğer <span class="math inline">\(n\)</span> çok büyük bir sayi ise mesela <span class="math inline">\(10^5\)</span> gibi, <span class="math inline">\(j &lt;&lt; n\)</span> yani sona gelmeden çok önce durmak isteriz. Eşlenik gradyan bunu başarıyor.</p>
+<p><span class="math inline">\(K\)</span> formatındaki bir matrise Vondermonde matrisi de denir, bu tür matrislerde ilk kolon sabit, 3., 4., .. kolonlar ikincinin üstel halidir.</p>
+<p>Vondermond matrisleri pek iyi koşullandırılmış (conditioned) matrisler değildir. Alakalı bir soru: iyi, kötü koşullandırılmış matrisi nasıl anlarız? Matris eşsiz (singular) değil. Determinanti hesaplasak sıfır çıkmaz. Ama neredeyse &quot;eşsiz olmaya yakın''. Bunun testini nasıl yaparız?</p>
+<p>Matris eşsiz değil, o zaman özdeğerleri hesaplamak akla gelebilir, oradan <span class="math inline">\(\lambda_{min}\)</span>, <span class="math inline">\(\lambda_{maks}\)</span>'i kontrol etmek.. Fakat simetrik olmayan matrislerin özdeğerlerini hesaplamak hoş değildir, &quot;güvenilir'' hesaplar değildirler. Çok kötü koşullandırılmış ama tüm özdeğerleri 1 olan matrisler olabilir mesela, çaprazında 1'ler olur, çaprazın üstünden katrilyonlar olabilir..</p>
+<p>Bu işi doğru yapmanın yolu <span class="math inline">\(V^TV\)</span>'ye bakmak. Yani genel kural, matris simetrik değilse, devriği ile kendisini çarp, sonucun özdeğerleri hep pozitif olur. <span class="math inline">\(V^TV\)</span>'nin <span class="math inline">\(i\)</span>'inci özdeğeri, <span class="math inline">\(V\)</span>'nin <span class="math inline">\(i\)</span>'inci özdeğerinin karesi olacaktır.</p>
+<p>Bu arada <span class="math inline">\(V^TV\)</span> matrisine Gram matrisi denir.</p>
+<p>Eğer <span class="math inline">\(Q^TQ\)</span> olsaydı koşullandırma sayısı (condition number), yani en büyük / en küçük özdeğer ne olurdu? <span class="math inline">\(Q^TQ = I\)</span> o zaman çaprazda hep 1 var, <span class="math inline">\(1/1 = 1\)</span>. Bu en iyi koşullandırma sayısıdır.</p>
+<p>Şimdi şu çok önemli formül için gerekli her bileşene sahibiz.</p>
+<p><span class="math display">\[ AQ = QH \]</span></p>
+<p><span class="math inline">\(A\)</span> bize verilen -diyelim ki- simetrik matris. <span class="math inline">\(Q\)</span> Arnoldi'den gelen baz. <span class="math inline">\(H\)</span> ise kodda görülen çarpan değerleri. Yani <span class="math inline">\(QH\)</span> bir nevi Gram-Schmidt'teki gibi, hatırlarsak Gram-Schmidt <span class="math inline">\(QR\)</span> ile temsil ediliyordu. <span class="math inline">\(Q\)</span> yine birimdik, Gram-Schmidt'te <span class="math inline">\(R\)</span> üst köşegen.</p>
+<p><span class="math inline">\(H\)</span> hesaplanırsa</p>
+<p><span class="math display">\[  H = 
+\left[\begin{array}{rrrr}
+5/2 &amp; \sqrt{ 5/2} &amp;&amp; \\
+\sqrt{ 5/2} &amp; 5/2 &amp; \sqrt{ 4/5}&amp; \\
+ &amp; \sqrt{ 4/5} &amp; 5/2 &amp; \sqrt{ 9/20}\\
+ &amp;&amp;  \sqrt{ 9/20} &amp; 5/2 
+\end{array}\right]
+\]</span></p>
+<p><span class="math inline">\(H\)</span> simetrik ve üçlü köşegen (tridiagonal). Üçlü köşegenlik bize ne söyler? Tekrarın (recurrence) kısa olduğunu.</p>
+<p><span class="math display">\[ AQ = QH \]</span></p>
+<p>formülüne dönelim, kolonsal olarak üstteki çarpımı nasıl gösteririz?</p>
+<p><span class="math display">\[ Aq_1  = \frac{ 5}{2}q_1  + \frac{ \sqrt{ 5}}{2} q_2 \]</span></p>
+<p>Tek bir kalemde eğer <span class="math inline">\(A\)</span> simetrik ise <span class="math inline">\(H\)</span>'in de simetrik olduğunu nasıl gösteririm? <span class="math inline">\(H\)</span>'nin formülü lazım,</p>
+<p><span class="math display">\[ H = Q^{-1}AQ \]</span></p>
+<p><span class="math inline">\(Q^{-1}\)</span> nedir? <span class="math inline">\(Q\)</span>'nun dikgen olduğunu hatırlayalım, o zaman <span class="math inline">\(Q^{-1} = Q^T\)</span>. Üstte yerine koyalım,</p>
+<p><span class="math display">\[ H = Q^{T}AQ \]</span></p>
+<p>Buna bakarak <span class="math inline">\(H\)</span> kesin simetriktir diyebiliriz, simetrik matrisler aynen üstteki gibi yaratılır zaten, ortaya bir simetrik matris koyarsın, sağdan herhangi bir matris, soldan onun devriği ile çarparsın, ve yeni bir simetrik matris ortaya çıkar.</p>
+<p>Yani vardığımız sonuç Krylov bazının hızlı, basit şekilde dikgen hale getirilebileceğidir.</p>
+</body>
+</html>

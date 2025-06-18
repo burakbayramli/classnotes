@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="portföy-performansı">Portföy Performansı</h1>
+<p>Bir stratejiyi tasarladıktan sonra onu piyasada kullanmadan önce geriye dönük veri üzerinde testten geçirmek iyi olur. Hatta mevcut işlemekte olan bir stratejinin o ana kadar olan başarısını da aynı tekniklerle ölçebilmek faydalı olurdu.</p>
+<p>Geriye Dönük Testler (Backtesting)</p>
+<p>Stratejinin başarısını ölçmek için bazı kriterler var, Sharpe Oranı, Düşüş Kalıcılığı bu ölçütlerden bazıları.</p>
+<p>Sharpe Oranı</p>
+<p>Diyelim ki bir stratejiyi geriye dönük teste tabi tutuyoruz, yani tarihi veri üzerinde ileride ne olacağını &quot;bilmiyormuş gibi'' yapıp alışverisin performansının ne olacağını ölçüyoruz. Belli zamanlarda alınıp satılan varlığın tabii ki bir getirisi (return) olacaktır, getiri eksi de olabilir, yani kayıp. Bu getirinin istatistiki olarak önemli (significant) olup olmadığını anlamak için bazı testler uygulayabiliriz. Diyelim ki herhangi bir zaman <span class="math inline">\(t\)</span>'deki getiri <span class="math inline">\(R_t\)</span>, ve <span class="math inline">\(\mu = E(R_t), \sigma^2=Var(R_t)\)</span> - her <span class="math inline">\(t\)</span> için dağılım aynı ve bağımsız (IID). Zaman bir günü temsil ediyor olabilir, ve eğer veri bunu doğruluyorsa, getirilerin Gaussian olduğu faraziyesi de yapılabilir. IGE verisi için</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">ige <span class="op">=</span> pd.read_csv(<span class="st">&#39;IGE.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)
+ige <span class="op">=</span> ige.sort_index()
+ige[<span class="st">&#39;Returns&#39;</span>] <span class="op">=</span> ige[<span class="st">&#39;Adj Close&#39;</span>].pct_change()
+ige.Returns.hist()
+plt.savefig(<span class="st">&#39;tser_back_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_back_01.png" />
+
+</div>
+<p>Varlığın &quot;getirisi'' dedik, üstteki durumda sanki varlığı en başta alıp elde tutmuşuz gibi düşünüyoruz, bu durumda günlük yüzde değişimler o gündeki kazanç / kayıp gibi düşünülebiliyor.</p>
+<p>Baştaki soruya gelelim, getirinin sıfırdan farklı mı, ve bu farklılık istatistiki olarak önemli mi?</p>
+<p>Sharpe Oranı (Sharpe Ratio) bu noktada devreye girer. SO &quot;risk bazında ölçeklenmiş getiri'' diye adlandırılır bazen, yani birimi oynaklık (volatility) olan getiridir. Birim derken mesela hızı belirtmek için arabanın hızı saatte 60 km diyebiliyoruz, hızı saat bazında belirtmiş oluyoruz. Bu demektir ki 1 saat geçince alınan yol 60 kilometredir. SO için benzer durum geçerli, birim risk, o zaman SO rakamı &quot;riskteki yüzde 1'lik değişimin getiriye ne kadar etki edeceği'' olarak ta görülebilir.</p>
+<p>Eğer yıllık bazda getirilerin standart sapması (ki oynaklığın tanımı bu) yüzde 20 ise ve mesela borsadan / bir senetten / entrumandan yüzde 3'lük bir yıllık getiri bekliyorsak, %3 / %20 = 0.15 Sharpe oranını elde ederiz. Matematiksel olarak,</p>
+<p><span class="math display">\[ SR = \frac{E(R_t) - R_f}{\sqrt{Var(R_t)}} = \frac{\mu - R_f}{\sigma} \]</span></p>
+<p><span class="math inline">\(R_f\)</span> &quot;risksiz yatırım'' dır, yatırım sratejinizin finans edilmesi gerekiyor ve bu sebeple para yatırımda bağlı tutuluyorsa, risksiz yatırımın getirisinin çıkartılması gerekir (çünkü yatırım yapmayıp risksiz getiri elde edebilirdiniz, gerçek getiri riskliden risksizin çıkartılmış hali olmalıdır), ve o zaman test edilen &quot;artık getiri (excess return)'' olacaktır. Merak ettiğimiz getirimizin risksiz olan getiriye göre performansıdır yani. <span class="math inline">\(\mu,\sigma\)</span> veriden tahmin edilecektir, ki <span class="math inline">\(\hat{\mu},\hat{\sigma}\)</span>, böylece <span class="math inline">\(SR\)</span> için tahmin edici <span class="math inline">\(\hat{SR}\)</span> olur,</p>
+<p><span class="math display">\[ 
+\hat{SR} = \frac{\hat{\mu} - R_f}{\hat{\sigma}} 
+\qquad (1) 
+\]</span></p>
+<p>Üstteki ifade standardizasyon, Z testine benzemesi raslantı değil, hatta bu benzerlikten özellikle bahsetmemiz lazım; <em>İstatistik</em> notlarından hatırlarsak, z-testi, standardizasyon,</p>
+<p><span class="math display">\[ Z = \frac{\bar{X} - \mu}{\sigma / \sqrt{n} } \]</span></p>
+<p>Nüfus <span class="math inline">\(\mu\)</span>'nun sıfır olduğunu kabul edersek, ve yeterince büyük örneklem <span class="math inline">\(n\)</span> için <span class="math inline">\(\sigma\)</span> yerine <span class="math inline">\(s\)</span> kullanabileceğimiz için,</p>
+<p><span class="math display">\[ Z = \frac{\bar{X}}{s / \sqrt{n} } \]</span></p>
+<p><span class="math display">\[ \frac{Z}{\sqrt{n}} = \frac{\bar{X}}{s} \]</span></p>
+<ol style="list-style-type: decimal">
+<li>ile benzerlik görülüyor, eğer <span class="math inline">\(R_f=0\)</span> alırsak (hatta almasak bile, çünkü <span class="math inline">\(R_f\)</span> bir sabit, ve normal dağılımdan normal çıkartınca sonuç yine normal dağılım olacaktı), o zaman ifadeler daha da benzer. Bu benzerliğin verdiği yan bilgi bir işe yarayacak. Sharpe Oranı tahminini, mesela gün seviyesinden yıl seviyesine çıkartmak gerekince (bunu yapmak gerekebilir, çünkü farklı periyotlardaki yatırımların hepsini yıl seviyesinde getirip birbirleri ile karşılaştırmak istenebilir) tecrübesiz heşapçılar eşitliğin sağ tarafını alıp <span class="math inline">\(n\)</span> ile çarpar. Halbuki <span class="math inline">\(\sqrt{n}\)</span> ile çarpmak gerekir. Bu yapılınca bölendeki <span class="math inline">\(\sqrt{n}\)</span> iptal olacağı için elde edilen <span class="math inline">\(Z\)</span> değeridir, yani z-testi yapabileceğimiz, istatistiki önemliliğini kontrol edebileceğimiz bir değer!</li>
+</ol>
+<p>Bir diğer açıdan gelirsek, <span class="math inline">\(R_t(q)\)</span> bir <span class="math inline">\(q\)</span> periyodunun tamamının getirisi olsun, ki</p>
+<p><span class="math display">\[ R_t(q) \equiv R_t + R_{t-1} + ... + R_{t-q+1}  \]</span></p>
+<p><span class="math display">\[ SR(q) = \frac{E(R_t(q)) - R_f(q)}{\sqrt{Var(R_t(q))}} \]</span></p>
+<p><span class="math display">\[ \frac{q(\mu-R_f)}{\sqrt{q} \sigma} \]</span></p>
+<p><span class="math display">\[ = \sqrt{q}SR \]</span></p>
+<p>Altta IGE üzerindeki Sharpe oranı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="bu">len</span>(ige)
+n <span class="op">=</span> <span class="dv">252</span> <span class="co"># bir yil, bu kadar ticari gun</span>
+Rf <span class="op">=</span> <span class="fl">0.04</span> <span class="co"># risksiz getiri yuzde 4</span>
+ige[<span class="st">&#39;excessRet&#39;</span>] <span class="op">=</span> ige[<span class="st">&#39;Returns&#39;</span>] <span class="op">-</span> Rf<span class="op">/</span>n
+sharpeRatio <span class="op">=</span> np.sqrt(n)<span class="op">*</span>ige[<span class="st">&#39;excessRet&#39;</span>].mean() <span class="op">/</span> ige[<span class="st">&#39;excessRet&#39;</span>].std()
+<span class="bu">print</span> sharpeRatio</code></pre></div>
+<pre><code>1504
+0.789317538345</code></pre>
+<p>Averajı hesaplarken 252'den fazla veri noktası kullandık, niye hala 252'nın karekökü ile çarpıyoruz? Dikkat risksiz getiri çıkartırken bu çıkartma işlemini <span class="math inline">\(R_f/n\)</span> ile yaptık, ki <span class="math inline">\(n=252\)</span>. Ayrıca bu çarpımı bir &quot;daha büyük zaman dilimine ölçekleme'' olarak görebiliriz; eldeki verinin tamamına ölçeklemek için veri sayısı ile çarpabilirdik, eğer yıl bazına ölçeklemek istersek 252 karekökü ile çarpacağız. Yani [4, sf. 120],</p>
+<p><span class="math display">\[ \sigma_{sene}^2 = 252 \sigma_{gun}^2 \]</span></p>
+<p>Sharpe oranını hesaplayınca alttaki Z skorlarına göre ne kadar iyi olduğunu görebiliriz. Üstteki değer alttaki değerlerin herhangi birinden yüksek mi?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.stats.distributions <span class="im">import</span> norm
+alpha<span class="op">=</span><span class="fl">0.10</span><span class="op">;</span> <span class="bu">print</span> norm.ppf(<span class="dv">1</span><span class="op">-</span>alpha), alpha
+alpha<span class="op">=</span><span class="fl">0.05</span><span class="op">;</span> <span class="bu">print</span> norm.ppf(<span class="dv">1</span><span class="op">-</span>alpha), alpha
+alpha<span class="op">=</span><span class="fl">0.01</span><span class="op">;</span> <span class="bu">print</span> norm.ppf(<span class="dv">1</span><span class="op">-</span>alpha), alpha
+alpha<span class="op">=</span><span class="fl">0.001</span><span class="op">;</span> <span class="bu">print</span> norm.ppf(<span class="dv">1</span><span class="op">-</span>alpha), alpha</code></pre></div>
+<pre><code>1.28155156554 0.1
+1.64485362695 0.05
+2.32634787404 0.01
+3.09023230617 0.001</code></pre>
+<p>Değil. Demek ki istatistiki olarak önemli / büyük bir Sharpe oranı elde edemedik. Genel kural olarak bir stratejinin etkili kabul edilmesi için 1'den büyük Sharpe Oranına sahip olması gerekir.</p>
+<p>Üstteki listedeki soldaki değerlerle onların <code>alpha</code>, yani p-değerlerinin beraber gösterilmiş olmasına dikkat, ikisi arasında ilişki var (aslında liste kullanmayıp direk <code>statsmodels</code> çağrıları ile p-değerini her Sharpe değeri için hesaplayabilirdik, bu da ödev olsun), p-değeri sıfıra yakın ise &quot;hipotezi reddetmemizi'' sağlar, ki bu problemde sıfır hipotezimiz, yani reddetmek için ezici kanıt elde etmemiz gereken şey getirilerin Gaussian'ının sıfır merkezli olduğu idi, bu iddiayı reddedemedik.</p>
+<p>Daha direk / basit bir örnek üzerinde görmek gerekirse, mesela hisselerin mi, tahvillerin mi getirilerinin kriz zamanında daha iyi olacağını merak ediyoruz. 2008-2012 arasında SP&amp;500 ve 7-10 senelik tahvil fiyatlarını takip eden bir enstrüman (ETF) olan İEF getirilerini Sharpe oranı ile karşılaştırabiriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+
+df1 <span class="op">=</span> pd.read_csv(<span class="st">&quot;sharpe-spy.csv&quot;</span>)
+df2 <span class="op">=</span> pd.read_csv(<span class="st">&quot;sharpe-ief.csv&quot;</span>)
+
+<span class="kw">def</span> sharpe(series):
+   dailyret <span class="op">=</span> series.pct_change()
+   excessRet<span class="op">=</span>dailyret<span class="fl">-0.04</span><span class="op">/</span><span class="dv">252</span>
+   <span class="cf">return</span> np.sqrt(<span class="dv">252</span>)<span class="op">*</span>np.mean(excessRet)<span class="op">/</span>np.std(excessRet)
+
+<span class="bu">print</span> (sharpe(df1[<span class="st">&#39;Adj Close&#39;</span>]))
+<span class="bu">print</span> (sharpe(df2[<span class="st">&#39;Adj Close&#39;</span>]))</code></pre></div>
+<pre><code>-0.04718388850111191
+0.5100019269309098</code></pre>
+<p>Sonuca gore tahviller kriz zamaninda daha iyi getiri veriyor.</p>
+<p>Düşüş Kalıcılığı (Drawdown)</p>
+<p>Bir strateji eğer yakın geçmişte para kaybetmiş ise düşüşte demektir. İki önemli düşüş kavramı maksimum düşüş ve maksimum düşüş süresi - bu iki ölçüt ayrı düşüşleri temsil ediyor olabilirler.</p>
+<div class="figure">
+<img src="tser_back_02.png" />
+
+</div>
+<p>Yatırımcılar için en moral bozucu durumlardan biri budur, uzun süren ve içinden çıkalamayan düşüşler. Bu sebeple yatırım stratejimiz onlardan uzak durmaya gayret etmeli, bu sebeple tarihi veriye bakıp bazı düşüş ölçütlerini kestirmeye uğraşıyoruz ki gelecek hakkında bir fikir edinebilelim. Bunları öğrendikten sonra yatırımcı kendine şunu da sormalıdır: &quot;ne kadarlık düşüşü tolere edebilirim?''. %20'lik ve 3 ay mı, yoksa %10 ve bir ay mı? Kullanmayı düşündüğümüz stratejinin geriye dönük testinden gelen ölçütleri bu toleransa göre irdelemek gerekir.</p>
+<p>Bir önceki örnek IGE varlığını alıp tutmak üzere kurulmuştu. Şimdi bu stratejiye bir ek yapalım, IGE aldığımız zaman dengeleme amaçlı olarak SPY adlı (Standard's and Poors endeksi üzerinden alım/satım yapılmasını sağlayan bir ETF üzerinden açığa satış yapalım. Bu sebeple SPY getirisi çıkartılıyor, yani getiri ne ise onun etkisi bize tersi olarak gelecek, ayrıca ikiye bölüyoruz çünkü sermayemiz iki katına çıktı.</p>
+<p>Düşüş hesabının kümülatif getiriyi baz aldığına dikkat. Yani herhangi bir ana kadar elde ettiğimiz biriken getirinin düşüşe geçip geçmediğini kontrol ediyoruz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> calculateMaxDD(cumret):
+    highwatermark<span class="op">=</span>np.zeros(<span class="bu">len</span>(cumret))
+    drawdown<span class="op">=</span>np.zeros(<span class="bu">len</span>(cumret))
+    drawdownduration<span class="op">=</span>np.zeros(<span class="bu">len</span>(cumret))
+    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="bu">len</span>(cumret)):
+        highwatermark[t]<span class="op">=</span>np.<span class="bu">max</span>([highwatermark[t<span class="dv">-1</span>], cumret[t]])
+        drawdown[t]<span class="op">=</span>(<span class="dv">1</span><span class="op">+</span>cumret[t])<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>highwatermark[t])<span class="op">-</span><span class="dv">1</span>
+        <span class="cf">if</span> (drawdown[t]<span class="op">==</span><span class="dv">0</span>):
+            drawdownduration[t]<span class="op">=</span><span class="dv">0</span>
+        <span class="cf">else</span>:
+            drawdownduration[t]<span class="op">=</span>drawdownduration[t<span class="dv">-1</span>]<span class="op">+</span><span class="dv">1</span>
+    <span class="cf">return</span> np.<span class="bu">min</span>(drawdown), np.<span class="bu">max</span>(drawdownduration)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> dd, pandas <span class="im">as</span> pd
+spy <span class="op">=</span> pd.read_csv(<span class="st">&#39;SPY.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)
+spy <span class="op">=</span> spy.sort_index()
+spy[<span class="st">&#39;Returns&#39;</span>] <span class="op">=</span> spy[<span class="st">&#39;Adj Close&#39;</span>].pct_change()
+spy[<span class="st">&#39;netRet&#39;</span>]<span class="op">=</span>(ige[<span class="st">&#39;Returns&#39;</span>] <span class="op">-</span> spy[<span class="st">&#39;Returns&#39;</span>])<span class="op">/</span><span class="fl">2.</span>
+spy[<span class="st">&#39;cumret&#39;</span>]<span class="op">=</span>(<span class="dv">1</span><span class="op">+</span>spy[<span class="st">&#39;netRet&#39;</span>]).cumprod()<span class="op">-</span><span class="fl">1.0</span>
+
+n <span class="op">=</span> <span class="dv">252</span> 
+sharpeRatio <span class="op">=</span> np.sqrt(n)<span class="op">*</span>spy[<span class="st">&#39;netRet&#39;</span>].mean() <span class="op">/</span> spy[<span class="st">&#39;netRet&#39;</span>].std()
+<span class="bu">print</span> (<span class="st">&#39;SR&#39;</span>, sharpeRatio)
+<span class="bu">print</span> <span class="st">&#39;Dusus&#39;</span>, dd.calculateMaxDD(spy[<span class="st">&#39;cumret&#39;</span>])</code></pre></div>
+<pre><code>SR 0.783681100181
+Dusus (-0.095292680472086833, 497.0)</code></pre>
+<p>Bu stratejinin Sharpe oranı 0.78 çıktı. Maksimum düşüş %10 civarı, maksimum düşüş süresi 497 gün! Oldukça uzun bir süre. SO zaten çok yüksek değil.</p>
+<p>Stratejiler Kodlamak</p>
+<p>Strateji kodlarken günlük bazda sinyal üretmek, ve pozisyon hesaplama yapmak gerekiyor. Sinyal üretmek demek mesela al için +1 sat için -1 üretmek demek olabilir. Pozisyon üretmek ise bu sinyali alıp para miktarı bazlı ne kadar işlem yapıldığıdır. Eğer +1 sinyali var ise ve ertesi günün fiyatı 1200 lira ise, +1200 liralık pozisyona girmişim demektir.</p>
+<p>Kumulatif getiriyi hesaplamak için pozisyonları günlük getiri yüzdesine çevirmek en iyisi, böylece günlük getiri <span class="math inline">\(r_i\)</span>'leri <span class="math inline">\(1+r_i\)</span> ile birbiri ile çarparak ele geçen kumulatif miktarı hesaplayabiliriz.</p>
+<p>Dikkat, sinyali hesapladıktan sonra bir ileri kaydırıyoruz ki bir önceki günün sinyali bir sonraki günün alımına yansısın.</p>
+<p>Alttaki strateji basit bir momentum stratejisi, bu konuda daha fazla detay {} bölümünde.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile
+<span class="im">import</span> numpy <span class="im">as</span> np, dd
+
+<span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;amzn.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:
+    px <span class="op">=</span> pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;amzn.csv&#39;</span>),index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span>)
+
+px <span class="op">=</span> px[px.index <span class="op">&lt;</span> <span class="st">&#39;27-01-2016&#39;</span>]
+
+signals <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>px.index) 
+signals[<span class="st">&#39;signal&#39;</span>] <span class="op">=</span> <span class="dv">0</span> 
+
+short_ma <span class="op">=</span> pd.rolling_mean(px[<span class="st">&#39;Adj Close&#39;</span>], <span class="dv">40</span>, min_periods<span class="op">=</span><span class="dv">1</span>) 
+long_ma <span class="op">=</span> pd.rolling_mean(px[<span class="st">&#39;Adj Close&#39;</span>], <span class="dv">100</span>, min_periods<span class="op">=</span><span class="dv">1</span>) 
+signals[<span class="st">&#39;signal&#39;</span>] <span class="op">=</span> np.where(short_ma <span class="op">&gt;</span> long_ma, <span class="dv">1</span>, <span class="dv">0</span>) 
+px[<span class="st">&#39;signal&#39;</span>] <span class="op">=</span> signals[<span class="st">&#39;signal&#39;</span>].shift(<span class="dv">1</span>) 
+px[<span class="st">&#39;ret&#39;</span>] <span class="op">=</span> px[<span class="st">&#39;Adj Close&#39;</span>].pct_change() <span class="op">*</span> px[<span class="st">&#39;signal&#39;</span>]
+ret <span class="op">=</span> px.ret.dropna()
+cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)
+<span class="bu">print</span> <span class="st">&#39;Dusus&#39;</span>, dd.calculateMaxDD(cumret)</code></pre></div>
+<pre><code>APR 0.150911691294
+Sharpe 0.646084214921
+Dusus (-0.26067046806090866, 374.0)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">cumret.plot()
+plt.savefig(<span class="st">&#39;tser_back_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_back_02.png" />
+
+</div>
+<p>Bir diğer ana yaklaşım Bollinger Bantlarını baz alır. Bu yaklaşımda fiyatın yürüyen ortalaması ve yürüyen standart sapması hesaplanır, iki zaman serisi elde edilir. Şimdi, günlük bazda, eğer fiyat serisi ortalamanın iki standart sapma üstüne çıkmış ise satım, iki standart sapma altında ise alım sinyali üretilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df_yhoo <span class="op">=</span> pd.read_csv(<span class="st">&#39;yhoo.csv&#39;</span>,parse_dates<span class="op">=</span><span class="va">True</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+signals <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>df_yhoo.index) 
+signals[<span class="st">&#39;signal&#39;</span>] <span class="op">=</span> np.nan
+middle <span class="op">=</span> pd.rolling_mean(df_yhoo[<span class="st">&#39;Adj Close&#39;</span>], <span class="dv">40</span>, min_periods<span class="op">=</span><span class="dv">1</span>) 
+std <span class="op">=</span> pd.rolling_std(df_yhoo[<span class="st">&#39;Adj Close&#39;</span>], <span class="dv">40</span>, min_periods<span class="op">=</span><span class="dv">1</span>)
+
+df_yhoo[<span class="st">&#39;Middle&#39;</span>] <span class="op">=</span> middle
+df_yhoo[<span class="st">&#39;Top&#39;</span>] <span class="op">=</span> middle<span class="op">+</span><span class="dv">2</span><span class="op">*</span>std
+df_yhoo[<span class="st">&#39;Bottom&#39;</span>] <span class="op">=</span> middle<span class="dv">-2</span><span class="op">*</span>std
+df_yhoo[[<span class="st">&#39;Adj Close&#39;</span>,<span class="st">&#39;Middle&#39;</span>,<span class="st">&#39;Bottom&#39;</span>,<span class="st">&#39;Top&#39;</span>]].plot()
+plt.savefig(<span class="st">&#39;tser_back_04.png&#39;</span>)
+
+signals[<span class="st">&#39;signal&#39;</span>] <span class="op">=</span> np.where(df_yhoo[<span class="st">&#39;Adj Close&#39;</span>] <span class="op">&gt;</span> middle<span class="op">+</span><span class="dv">2</span><span class="op">*</span>std, <span class="dv">-1</span>, np.nan) 
+signals[<span class="st">&#39;signal&#39;</span>] <span class="op">=</span> np.where(df_yhoo[<span class="st">&#39;Adj Close&#39;</span>] <span class="op">&lt;</span> middle<span class="dv">-2</span><span class="op">*</span>std, <span class="dv">1</span>, np.nan)
+signals[<span class="st">&#39;signal&#39;</span>] <span class="op">=</span> signals[<span class="st">&#39;signal&#39;</span>].fillna(method<span class="op">=</span><span class="st">&#39;ffill&#39;</span>)
+df_yhoo[<span class="st">&#39;ret&#39;</span>] <span class="op">=</span> df_yhoo[<span class="st">&#39;Adj Close&#39;</span>].pct_change() <span class="op">*</span> signals[<span class="st">&#39;signal&#39;</span>].shift(<span class="dv">1</span>)
+ret <span class="op">=</span> df_yhoo.ret.dropna()
+cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)
+<span class="bu">print</span> <span class="st">&#39;Dusus&#39;</span>, dd.calculateMaxDD(cumret)</code></pre></div>
+<pre><code>APR 0.120315754795
+Sharpe 0.515472721337
+Dusus (-0.40536193029490575, 390.0)</code></pre>
+<div class="figure">
+<img src="tser_back_04.png" />
+
+</div>
+<p>Üstte <code>ffill</code> ile her sinyali bir sonraki diğer sinyale kadar &quot;uzatmak'' zorunda kaldık, yani her iki sinyal arasındaki boşluğu önceki sinyali tekrarlayarak doldurduk. Bunu yapmak zorunda kaldık çünkü sinyal tek bir gün için üretiliyordu, fakat mesela bir al anından sat anına kadar aradaki tüm getiri veri noktalarını o alıma saymak lazımdı, bu sebeple sinyal ileri doğru tekrarlandı. Momentum örneğinde bu problem olmamıştı çünkü iki yürüyen ortalama sinyalinden biri diğerinin üzerine çıktığı zaman bu sürede sürekli aynı sinyal üretiliyor, yani tekrarlamaya gerek kalmıyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">cumret.plot()
+plt.savefig(<span class="st">&#39;tser_back_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_back_03.png" />
+
+</div>
+<p>Farklar ile Sharpe Oranı</p>
+<p>Oynaklık günlük getirilerin (fiyatların yüzde değişimi) standart sapmasıdır. Bir diğer yaklaşım fiyat <em>farklarının</em> standart sapmasını kullanıyor. Niye? Çünkü Vadeli İşlem Sözleşmeleri durumunda fiyatlar tüm sözleşmeler üzerinden Panama yöntemiyle birleştirildiğinde bazı başlangıçtaki zaman serisi eksi fiyat değerlerine sahip olabilir. Eğer bu seri üzerinden yüzde değişimi hesaplarsak bölen eksi olacağı için değişimin işareti yanlış olur. Fakat fiyat farkı her iki durumda da işler. Peki fiyat farkı üzerinden oynaklık hesaplanabilir mi? Bu bilinen bir yaklaşım, evet işliyor.</p>
+<p>Alttaki örnekte bir momentum stratejisi üzerinden bu hesabı görebiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_voltar&#39;</span>)
+<span class="im">import</span> util, zipfile, pandas <span class="im">as</span> pd
+
+DEFAULT_CAPITAL <span class="op">=</span> <span class="fl">1.0</span>
+DEFAULT_ANN_RISK_TARGET <span class="op">=</span> <span class="fl">0.16</span>
+
+<span class="kw">def</span> sharpe(price, forecast):
+    base_capital <span class="op">=</span> DEFAULT_CAPITAL
+    daily_risk_capital <span class="op">=</span> DEFAULT_CAPITAL <span class="op">*</span> DEFAULT_ANN_RISK_TARGET <span class="op">/</span> util.ROOT_BDAYS_INYEAR 
+    ts_capital<span class="op">=</span>pd.Series([DEFAULT_CAPITAL]<span class="op">*</span><span class="bu">len</span>(price), index<span class="op">=</span>price.index)        
+    ann_risk <span class="op">=</span> ts_capital <span class="op">*</span> DEFAULT_ANN_RISK_TARGET
+    daily_returns_volatility <span class="op">=</span> util.robust_vol_calc(price.diff())
+    multiplier <span class="op">=</span> daily_risk_capital <span class="op">*</span> <span class="fl">1.0</span> <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="fl">10.0</span>
+    numerator <span class="op">=</span> forecast <span class="op">*</span>  multiplier
+    positions <span class="op">=</span> numerator.ffill() <span class="op">/</span>  daily_returns_volatility.ffill()
+    cum_trades <span class="op">=</span> positions.shift(<span class="dv">1</span>).ffill()
+    price_returns <span class="op">=</span> price.diff()
+    instr_ccy_returns <span class="op">=</span> cum_trades.shift(<span class="dv">1</span>)<span class="op">*</span>price_returns 
+    instr_ccy_returns<span class="op">=</span>instr_ccy_returns.cumsum().ffill().reindex(price.index).diff()
+    mean_return <span class="op">=</span> instr_ccy_returns.mean() <span class="op">*</span> util.BUSINESS_DAYS_IN_YEAR
+    vol <span class="op">=</span> instr_ccy_returns.std() <span class="op">*</span> util.ROOT_BDAYS_INYEAR
+    <span class="cf">return</span> mean_return <span class="op">/</span> vol
+      
+<span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;../tser_voltar/legacycsv.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:
+     df <span class="op">=</span> pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;EDOLLAR_price.csv&#39;</span>), index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span> )
+
+fast_ewma <span class="op">=</span> pd.ewma(df.PRICE, span<span class="op">=</span><span class="dv">32</span>)
+slow_ewma <span class="op">=</span> pd.ewma(df.PRICE, span<span class="op">=</span><span class="dv">128</span>)
+raw_ewmac <span class="op">=</span> fast_ewma <span class="op">-</span> slow_ewma
+vol <span class="op">=</span> util.robust_vol_calc(df.PRICE.diff())
+forecast <span class="op">=</span> raw_ewmac <span class="op">/</span>  vol 
+<span class="bu">print</span> sharpe(df.PRICE, forecast)</code></pre></div>
+<pre><code>0.508384873452</code></pre>
+<p>Sharpe Oranı İstatistiki Önemi (Significance)</p>
+<p>SO'yu hesapladık ama elde ettiğimiz sayının istatistiki bir önemi var mı acaba? Bunu anlamanın bir yolu getiriler üzerinde t-testi işletmek. Getirilerin Normal dağılıma sahip olduğunu farz ediyoruz, ve bu getirileri nüfus ortalaması sıfır hipotezine göre bir t-teste tabi tutuyoruz. Eğer getiriler sıfırdan önemli bir şekilde farklı ise, o zaman bu getirilere bağlı olarak hesaplanan SO da önemli demektir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.stats
+ret <span class="op">=</span> util.ccy_returns(df.PRICE, forecast)
+tval,pval <span class="op">=</span> scipy.stats.ttest_1samp(ret.dropna(), <span class="dv">0</span>)
+<span class="bu">print</span> tval,pval</code></pre></div>
+<pre><code>2.92942308888 0.00340494600657</code></pre>
+<p>P-değeri 0.05'ten küçük olduğuna göre bu SO önemli.</p>
+<p>Bu tekniği tüm portföyün SO önemliliği için de kullanabiliriz; her alt sistemin getirisi hesaplandıktan sonra bu getiriler portföy ağırlıkları üzerinden toplanır, ve gerekli katsayı ile çarpıldıktan sonra portföyün gün bazında getirisi bir zaman serisi olarak elde edilir. Bu seri üzerinde üstteki test işletilebilir.</p>
+<p>Kayıpları Hesaplamak</p>
+<p>Rasgele sayı üretimi kullanarak zaman serisi üretmek simülasyon amaçlı faydalı bir işlem; mesela istediğimiz hedeflediğimiz oynaklık seviyesi, ve SO üzerinden belli bir yamukluğa sahip bir zaman serisini üretip (daha doğrusu getirileri üretip sonra zaman kumulatif hesap ile seriyi üretip), onun üzerinden muhtemel kayıpların ne seviyede olacağını görebiliriz. Diyelim ki hiç yamukluğu olmayan, yüzde 50 oynaklık hedefi ile yıllık SÖ=0.5 üzerinden kayıplar ne olacaktır?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> commonrandom <span class="im">import</span> arbitrary_timeindex, skew_returns_annualised
+<span class="im">from</span> common <span class="im">import</span> account_curve
+<span class="im">import</span> pandas <span class="im">as</span> pd
+
+want_skew <span class="op">=</span> <span class="fl">0.0</span>
+annualSR <span class="op">=</span> <span class="fl">0.5</span>
+days <span class="op">=</span> <span class="dv">256</span><span class="op">*</span><span class="fl">10.</span> <span class="co"># 10 senelik</span>
+res <span class="op">=</span> skew_returns_annualised(annualSR<span class="op">=</span>annualSR, want_skew<span class="op">=</span>want_skew, <span class="op">\</span>
+                              voltarget<span class="op">=</span><span class="fl">0.50</span>, size<span class="op">=</span>days) 
+df <span class="op">=</span> pd.DataFrame(res)
+df <span class="op">=</span> df.set_index(pd.to_datetime(df.index, unit<span class="op">=</span><span class="st">&#39;d&#39;</span>))
+df[<span class="st">&#39;cum&#39;</span>] <span class="op">=</span> (<span class="dv">1</span><span class="op">+</span>df).cumprod() <span class="co"># kumulatif - zaman serisinin kendisi burada</span></code></pre></div>
+<p>Her ayın en kötü günlük kaybı, 100,000 Eur'lik sermaye üzerinden diyelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">K <span class="op">=</span> <span class="dv">1000</span><span class="op">;</span> capital <span class="op">=</span> <span class="dv">100</span><span class="op">*</span>K
+<span class="bu">print</span> capital <span class="op">*</span> df[<span class="dv">0</span>].quantile(q<span class="op">=</span><span class="fl">0.05</span>)</code></pre></div>
+<pre><code>-5144.01215594</code></pre>
+<p>0.05 yüzdelik dilimine (quantile) baktık, çünkü 100 gün içinde 5 gün 20 gün içinde 1 gün demektir, bir ayda 20 iş günü olduğunu kabul edersek her ayın en kötü kaybını bu şekilde hesaplayabiliriz.</p>
+<p>Yüzdelik dilime bakmak güzel bir numara; getirilerin dağılımına bakıyoruz, ama yamukluk sebebiyle bu dağılımın analitik bir formülü elimizde yok, sadece sayısal bir dağılım var, yani verinin kendisi. Bu sayısal dağılımda yüzdelik dilime bakmak, analitik durumda ters kumulatif yoğunluk fonksiyonu (inverse cdf) hesabı yapmak ile eşdeğerdir, yani &quot;olasılığı (olasılık yoğunluk alanı, ya da cdf) vesaire olan şey hangi değere tekabül eder?'' sorusunun cevabını sayısal olarak buluyoruz.</p>
+<p>Her sene en kötü haftalık kayıp için elimizdeki günlük getirileri haftalık getiriye çevirmemiz lazım. Bunun için getirilerin kumulatifi (yani zaman serisinin gerçek hali) alıp, ondan haftasal örneklem alıp, bu yeni zaman serisi üzerinde getirileri tekrar hesaplamak lazım, ve bakacağımız yüzdelik dilimi yüzde 1/52 noktası çünkü bir yıl içinde 52 hafta var.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">weekly_returns <span class="op">=</span> df.cum.resample(<span class="st">&#39;W&#39;</span>).pct_change()
+<span class="bu">print</span> capital <span class="op">*</span> weekly_returns.quantile(q<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="fl">52.</span>)</code></pre></div>
+<pre><code>-12480.850705</code></pre>
+<p>Her 10 sene en kötü aylık kayıp,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">weekly_returns <span class="op">=</span> df.cum.resample(<span class="st">&#39;M&#39;</span>).pct_change()
+<span class="bu">print</span> capital <span class="op">*</span> weekly_returns.quantile(q<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="fl">120.</span>)</code></pre></div>
+<pre><code>-26703.5859597</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Lo, <em>The Statistics of Sharpe Ratios</em>, <a href="http://edge-fund.com/Lo02.pdf" class="uri">http://edge-fund.com/Lo02.pdf</a></p>
+<p>[2] Berntson, <em>Introduction to Statistics</em>, <a href="http://web.grinnell.edu/courses/sst/s02/sst115-03/practice/hypothesisteststeps1.pdf" class="uri">http://web.grinnell.edu/courses/sst/s02/sst115-03/practice/hypothesisteststeps1.pdf</a></p>
+<p>[3] Pav, <em>Maximizing Sharpe and re-inventing the wheel</em>, <a href="http://www.rinfinance.com/agenda/2012/talk/StevenPav.pdf" class="uri">http://www.rinfinance.com/agenda/2012/talk/StevenPav.pdf</a></p>
+<p>[4] Yan, <em>Python for Finance</em></p>
+<p>[5] Chan, <em>Algorithmic Trading</em></p>
+</body>
+</html>

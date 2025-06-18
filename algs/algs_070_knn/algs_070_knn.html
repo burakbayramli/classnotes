@@ -1,0 +1,673 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="en-yakın-k-komşu-k-nearest-neighbor-geometrik-yakınlık-hesabı">En Yakın k-Komşu (k-Nearest Neighbor), Geometrik Yakınlık Hesabı</h1>
+<p>Yapay Öğrenim alanında örnek bazlı öğrenen algoritmalardan bilinen KNN, eğitim verinin kendisini sınıflama (classification) amaçlı olarak kullanır, yeni bir model ortaya çıkartmaz. Algoritma şöyle işler: etiketleri bilinen eğitim verisi alınır ve bir kenarda tutulur. Yeni bir veri noktası görülünce bu veriye geri dönülür ve o noktaya &quot;en yakın'' k tane nokta bulunur. Daha sonra bu noktaların etiketlerine bakılır ve çoğunluğun etiketi ne ise, o etiket yeni noktanın etiketi olarak kabul edilir. Mesela elde <code>1</code> kategorisi altında <code>[2 2]</code>, <code>2</code> kategorisi altında <code>[5 5]</code> var ise, yeni nokta <code>[3, 3]</code> için yakınlık açısından <code>[2 2]</code> bulunmalı ve etiket olarak <code>1</code> sonucu döndürülmelidir.</p>
+<p>Üstte tarif edilen basit bir ihtiyaç, yöntem gibi görülebilir. Fakat yapay öğrenim ve yapay zeka çok boyutlarda örüntü tanıma (pattern recognition) ile uğraşır, ve milyonlarca satırlık veri, onlarca boyut (üstteki örnekte 2, fakat çoğunlukla çok daha fazla boyut vardır) işler hakikaten zorlaşabilir. Mesela görüntü tanımada veri <code>M x N</code> boyutundaki dijital imajlar (düzleştirilince <span class="math inline">\(M \cdot N\)</span> boyutunda), ve onların içindeki resimlerin kime ait olduğu etiket bilgisi olabilir. KNN bu tür multimedya, çok boyutlu veri ortamında başarılı şekilde çalışabilmektedir. Ayrıca en yakın k komşunun içeriği tarifsel bilgi çıkarımı (knowledge extraction) amacıyla da kullanılabilir [2].</p>
+<p>&quot;En yakın'' sözü bir kordinat sistemi anlamına geliyor, ve KNN, aynen GMM ve diğer pek çok kordinatsal öğrenme yöntemi gibi eldeki çok boyutlu veri noktalarının elemanlarını bir kordinat sistemindeymiş gibi görür. Kıyasla mesela APriori gibi bir algoritma metin bazlı veriyle olduğu gibi çalışabilirdi.</p>
+<p>Peki arama bağlamında, bir veri öbeği içinden en yakın noktaları bulmanın en basit yolu nedir? Listeyi baştan sonra taramak (kaba kuvvet yöntemi -brute force-) listedeki her nokta ile yeni nokta arasındaki mesafeyi teker teker hesaplayıp en yakın k taneyi içinden seçerdi, bu bir yöntemdir.. Bu basit algoritmanın yükü <span class="math inline">\(O(N)\)</span>'dir. Eğer tek bir nokta arıyor olsaydık, kabul edilebilir olabilirdi. Fakat genellikle bir sınıflayıcı (classifier) algoritmasının sürekli işlemesi, mesela bir online site için günde milyonlarca kez bazı kararları alması gerekebilir. Bu durumda ve <span class="math inline">\(N\)</span>'in çok büyük olduğu şartlarda, üstteki hız bile yeterli olmayacaktır.</p>
+<p>Arama işlemini daha hızlı yapmanın yolları var. Akıllı arama algoritmaları kullanarak eğitim verilerini bir ağaç yapısı üzerinden tarayıp erişim hızını <span class="math inline">\(O(\log N)\)</span>'e indirmek mümkündür.</p>
+<p>K-D Ağaçları (k-d tree)</p>
+<p>Bilgisayar bilimde K-D ağaçları (k-boyutlu ağaçlar kelimesinin kısaltılmışı) bir çok boyutlu bölümlere ayırma yaklaşımıdır, eldeki çok boyutlu veri noktaları bölgelere ayrılarak arama ile bulunmaları kolaylaştırılmaya uğraşılır. Bu yapı belli bir noktaya en yakın k nokta bulmaya yardımcı olur.</p>
+<p>Yapı şöyledir: K-D ağaçları bir ikisel ağaç olarak kodlanır, ağacın her düğümü k boyutlu uzayı sadece tek bir kordinat üzerinden ikiye böler. Eğer 3 boyutta isek mesela 1. kordinat üzerinden bu ikiye bölüm yapılabilir. Ardından o düğümde seçilen kordinat üzerinden bakılan öğeden daha küçük olan veri noktaları sol dala büyük olanları sağ dala verilir. Bu işleyiş ağacın altına doğru benzer şekilde devam eder, her seviyede farklı bir kordinat seçilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># -*- coding: utf-8 -*-</span>
+<span class="im">from</span> __future__ <span class="im">import</span> print_function
+
+<span class="im">import</span> operator, math
+<span class="im">from</span> collections <span class="im">import</span> deque
+<span class="im">from</span> functools <span class="im">import</span> wraps
+<span class="im">from</span> bpq <span class="im">import</span> BoundedPriorityQueue
+
+<span class="kw">class</span> Node(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data<span class="op">=</span><span class="va">None</span>, left<span class="op">=</span><span class="va">None</span>, right<span class="op">=</span><span class="va">None</span>):
+        <span class="va">self</span>.data <span class="op">=</span> data
+        <span class="va">self</span>.left <span class="op">=</span> left
+        <span class="va">self</span>.right <span class="op">=</span> right
+
+    <span class="at">@property</span>
+    <span class="kw">def</span> is_leaf(<span class="va">self</span>):
+        <span class="cf">return</span> (<span class="kw">not</span> <span class="va">self</span>.data) <span class="kw">or</span> <span class="op">\</span>
+               (<span class="bu">all</span>(<span class="kw">not</span> <span class="bu">bool</span>(c) <span class="cf">for</span> c, p <span class="kw">in</span> <span class="va">self</span>.children))
+
+
+    <span class="kw">def</span> preorder(<span class="va">self</span>):
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>:
+            <span class="cf">return</span>
+        <span class="cf">yield</span> <span class="va">self</span>
+        <span class="cf">if</span> <span class="va">self</span>.left:
+            <span class="cf">for</span> x <span class="kw">in</span> <span class="va">self</span>.left.preorder():
+                <span class="cf">yield</span> x
+        <span class="cf">if</span> <span class="va">self</span>.right:
+            <span class="cf">for</span> x <span class="kw">in</span> <span class="va">self</span>.right.preorder():
+                <span class="cf">yield</span> x
+
+    <span class="kw">def</span> inorder(<span class="va">self</span>):
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>:
+            <span class="cf">return</span>
+        <span class="cf">if</span> <span class="va">self</span>.left:
+            <span class="cf">for</span> x <span class="kw">in</span> <span class="va">self</span>.left.inorder():
+                <span class="cf">yield</span> x
+        <span class="cf">yield</span> <span class="va">self</span>
+        <span class="cf">if</span> <span class="va">self</span>.right:
+            <span class="cf">for</span> x <span class="kw">in</span> <span class="va">self</span>.right.inorder():
+                <span class="cf">yield</span> x
+
+
+    <span class="kw">def</span> postorder(<span class="va">self</span>):
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>:
+            <span class="cf">return</span>
+        <span class="cf">if</span> <span class="va">self</span>.left:
+            <span class="cf">for</span> x <span class="kw">in</span> <span class="va">self</span>.left.postorder():
+                <span class="cf">yield</span> x
+        <span class="cf">if</span> <span class="va">self</span>.right:
+            <span class="cf">for</span> x <span class="kw">in</span> <span class="va">self</span>.right.postorder():
+                <span class="cf">yield</span> x
+        <span class="cf">yield</span> <span class="va">self</span>
+
+    <span class="at">@property</span>
+    <span class="kw">def</span> children(<span class="va">self</span>):
+        <span class="cf">if</span> <span class="va">self</span>.left <span class="kw">and</span> <span class="va">self</span>.left.data <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
+            <span class="cf">yield</span> <span class="va">self</span>.left, <span class="dv">0</span>
+        <span class="cf">if</span> <span class="va">self</span>.right <span class="kw">and</span> <span class="va">self</span>.right.data <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
+            <span class="cf">yield</span> <span class="va">self</span>.right, <span class="dv">1</span>
+
+    <span class="kw">def</span> set_child(<span class="va">self</span>, index, child):
+        <span class="cf">if</span> index <span class="op">==</span> <span class="dv">0</span>:
+            <span class="va">self</span>.left <span class="op">=</span> child
+        <span class="cf">else</span>:
+            <span class="va">self</span>.right <span class="op">=</span> child
+
+    <span class="kw">def</span> height(<span class="va">self</span>):
+        min_height <span class="op">=</span> <span class="bu">int</span>(<span class="bu">bool</span>(<span class="va">self</span>))
+        <span class="cf">return</span> <span class="bu">max</span>([min_height] <span class="op">+</span> [c.height()<span class="op">+</span><span class="dv">1</span> <span class="cf">for</span> c, p <span class="kw">in</span> <span class="va">self</span>.children])
+
+
+    <span class="kw">def</span> get_child_pos(<span class="va">self</span>, child):
+        <span class="cf">for</span> c, pos <span class="kw">in</span> <span class="va">self</span>.children:
+            <span class="cf">if</span> child <span class="op">==</span> c:
+                <span class="cf">return</span> pos
+
+    <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):
+        <span class="cf">return</span> <span class="st">&#39;&lt;</span><span class="sc">%(cls)s</span><span class="st"> - </span><span class="sc">%(data)s</span><span class="st">&gt;&#39;</span> <span class="op">%</span> <span class="op">\</span>
+            <span class="bu">dict</span>(cls<span class="op">=</span><span class="va">self</span>.__class__.<span class="va">__name__</span>, data<span class="op">=</span><span class="bu">repr</span>(<span class="va">self</span>.data))
+
+    <span class="kw">def</span> <span class="fu">__nonzero__</span>(<span class="va">self</span>):
+        <span class="cf">return</span> <span class="va">self</span>.data <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>
+
+    __bool__ <span class="op">=</span> <span class="fu">__nonzero__</span>
+
+    <span class="kw">def</span> <span class="fu">__eq__</span>(<span class="va">self</span>, other):
+        <span class="cf">if</span> <span class="bu">isinstance</span>(other, <span class="bu">tuple</span>):
+            <span class="cf">return</span> <span class="va">self</span>.data <span class="op">==</span> other
+        <span class="cf">else</span>:
+            <span class="cf">return</span> <span class="va">self</span>.data <span class="op">==</span> other.data
+
+    <span class="kw">def</span> <span class="fu">__hash__</span>(<span class="va">self</span>):
+        <span class="cf">return</span> <span class="bu">id</span>(<span class="va">self</span>)
+
+
+<span class="kw">def</span> require_axis(f):
+    <span class="at">@wraps</span>(f)
+    <span class="kw">def</span> _wrapper(<span class="va">self</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs):
+        <span class="cf">if</span> <span class="va">None</span> <span class="kw">in</span> (<span class="va">self</span>.axis, <span class="va">self</span>.sel_axis):
+            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&#39;</span><span class="sc">%(func_name) r</span><span class="st">equires the node </span><span class="sc">%(node)s</span><span class="st"> &#39;</span>
+                    <span class="st">&#39;to have an axis and a sel_axis function&#39;</span> <span class="op">%</span>
+                    <span class="bu">dict</span>(func_name<span class="op">=</span>f.<span class="va">__name__</span>, node<span class="op">=</span><span class="bu">repr</span>(<span class="va">self</span>)))
+
+        <span class="cf">return</span> f(<span class="va">self</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs)
+
+    <span class="cf">return</span> _wrapper
+
+
+<span class="kw">class</span> KDNode(Node):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data<span class="op">=</span><span class="va">None</span>, left<span class="op">=</span><span class="va">None</span>, right<span class="op">=</span><span class="va">None</span>, axis<span class="op">=</span><span class="va">None</span>,
+            sel_axis<span class="op">=</span><span class="va">None</span>, dimensions<span class="op">=</span><span class="va">None</span>):
+        <span class="bu">super</span>(KDNode, <span class="va">self</span>).<span class="fu">__init__</span>(data, left, right)
+        <span class="va">self</span>.axis <span class="op">=</span> axis
+        <span class="va">self</span>.sel_axis <span class="op">=</span> sel_axis
+        <span class="va">self</span>.dimensions <span class="op">=</span> dimensions
+
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> add(<span class="va">self</span>, point):
+        current <span class="op">=</span> <span class="va">self</span>
+        <span class="cf">while</span> <span class="va">True</span>:
+            check_dimensionality([point], dimensions<span class="op">=</span>current.dimensions)
+
+            <span class="cf">if</span> current.data <span class="kw">is</span> <span class="va">None</span>:
+                current.data <span class="op">=</span> point
+                <span class="cf">return</span> current
+
+            <span class="cf">if</span> point[current.axis] <span class="op">&lt;</span> current.data[current.axis]:
+                <span class="cf">if</span> current.left <span class="kw">is</span> <span class="va">None</span>:
+                    current.left <span class="op">=</span> current.create_subnode(point)
+                    <span class="cf">return</span> current.left
+                <span class="cf">else</span>:
+                    current <span class="op">=</span> current.left
+            <span class="cf">else</span>:
+                <span class="cf">if</span> current.right <span class="kw">is</span> <span class="va">None</span>:
+                    current.right <span class="op">=</span> current.create_subnode(point)
+                    <span class="cf">return</span> current.right
+                <span class="cf">else</span>:
+                    current <span class="op">=</span> current.right
+
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> create_subnode(<span class="va">self</span>, data):
+        <span class="cf">return</span> <span class="va">self</span>.__class__(data,
+                axis<span class="op">=</span><span class="va">self</span>.sel_axis(<span class="va">self</span>.axis),
+                sel_axis<span class="op">=</span><span class="va">self</span>.sel_axis,
+                dimensions<span class="op">=</span><span class="va">self</span>.dimensions)
+
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> find_replacement(<span class="va">self</span>):
+        <span class="cf">if</span> <span class="va">self</span>.right:
+            child, parent <span class="op">=</span> <span class="va">self</span>.right.extreme_child(<span class="bu">min</span>, <span class="va">self</span>.axis)
+        <span class="cf">else</span>:
+            child, parent <span class="op">=</span> <span class="va">self</span>.left.extreme_child(<span class="bu">max</span>, <span class="va">self</span>.axis)
+
+        <span class="cf">return</span> (child, parent <span class="cf">if</span> parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> <span class="va">self</span>)
+
+    <span class="kw">def</span> should_remove(<span class="va">self</span>, point, node):
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.data <span class="op">==</span> point:
+            <span class="cf">return</span> <span class="va">False</span>
+
+        <span class="cf">return</span> (node <span class="kw">is</span> <span class="va">None</span>) <span class="kw">or</span> (node <span class="kw">is</span> <span class="va">self</span>)
+
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> remove(<span class="va">self</span>, point, node<span class="op">=</span><span class="va">None</span>):
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>:
+            <span class="cf">return</span>
+
+        <span class="cf">if</span> <span class="va">self</span>.should_remove(point, node):
+            <span class="cf">return</span> <span class="va">self</span>._remove(point)
+
+        <span class="cf">if</span> <span class="va">self</span>.left <span class="kw">and</span> <span class="va">self</span>.left.should_remove(point, node):
+            <span class="va">self</span>.left <span class="op">=</span> <span class="va">self</span>.left._remove(point)
+
+        <span class="cf">elif</span> <span class="va">self</span>.right <span class="kw">and</span> <span class="va">self</span>.right.should_remove(point, node):
+            <span class="va">self</span>.right <span class="op">=</span> <span class="va">self</span>.right._remove(point)
+
+        <span class="cf">if</span> point[<span class="va">self</span>.axis] <span class="op">&lt;=</span> <span class="va">self</span>.data[<span class="va">self</span>.axis]:
+            <span class="cf">if</span> <span class="va">self</span>.left:
+                <span class="va">self</span>.left <span class="op">=</span> <span class="va">self</span>.left.remove(point, node)
+
+        <span class="cf">if</span> point[<span class="va">self</span>.axis] <span class="op">&gt;=</span> <span class="va">self</span>.data[<span class="va">self</span>.axis]:
+            <span class="cf">if</span> <span class="va">self</span>.right:
+                <span class="va">self</span>.right <span class="op">=</span> <span class="va">self</span>.right.remove(point, node)
+
+        <span class="cf">return</span> <span class="va">self</span>
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> _remove(<span class="va">self</span>, point):
+        <span class="cf">if</span> <span class="va">self</span>.is_leaf:
+            <span class="va">self</span>.data <span class="op">=</span> <span class="va">None</span>
+            <span class="cf">return</span> <span class="va">self</span>
+
+        root, max_p <span class="op">=</span> <span class="va">self</span>.find_replacement()
+
+        tmp_l, tmp_r <span class="op">=</span> <span class="va">self</span>.left, <span class="va">self</span>.right
+        <span class="va">self</span>.left, <span class="va">self</span>.right <span class="op">=</span> root.left, root.right
+        root.left, root.right <span class="op">=</span> tmp_l <span class="cf">if</span> tmp_l <span class="kw">is</span> <span class="kw">not</span> root <span class="cf">else</span> <span class="va">self</span>, tmp_r <span class="cf">if</span> tmp_r <span class="kw">is</span> <span class="kw">not</span> root <span class="cf">else</span> <span class="va">self</span>
+        <span class="va">self</span>.axis, root.axis <span class="op">=</span> root.axis, <span class="va">self</span>.axis
+
+        <span class="cf">if</span> max_p <span class="kw">is</span> <span class="kw">not</span> <span class="va">self</span>:
+            pos <span class="op">=</span> max_p.get_child_pos(root)
+            max_p.set_child(pos, <span class="va">self</span>)
+            max_p.remove(point, <span class="va">self</span>)
+
+        <span class="cf">else</span>:
+            root.remove(point, <span class="va">self</span>)
+
+        <span class="cf">return</span> root
+
+
+    <span class="at">@property</span>
+    <span class="kw">def</span> is_balanced(<span class="va">self</span>):
+        left_height <span class="op">=</span> <span class="va">self</span>.left.height() <span class="cf">if</span> <span class="va">self</span>.left <span class="cf">else</span> <span class="dv">0</span>
+        right_height <span class="op">=</span> <span class="va">self</span>.right.height() <span class="cf">if</span> <span class="va">self</span>.right <span class="cf">else</span> <span class="dv">0</span>
+
+        <span class="cf">if</span> <span class="bu">abs</span>(left_height <span class="op">-</span> right_height) <span class="op">&gt;</span> <span class="dv">1</span>:
+            <span class="cf">return</span> <span class="va">False</span>
+        <span class="cf">return</span> <span class="bu">all</span>(c.is_balanced <span class="cf">for</span> c, _ <span class="kw">in</span> <span class="va">self</span>.children)
+
+    <span class="kw">def</span> rebalance(<span class="va">self</span>):
+        <span class="cf">return</span> create([x.data <span class="cf">for</span> x <span class="kw">in</span> <span class="va">self</span>.inorder()])
+
+    <span class="kw">def</span> axis_dist(<span class="va">self</span>, point, axis):
+        <span class="cf">return</span> math.<span class="bu">pow</span>(<span class="va">self</span>.data[axis] <span class="op">-</span> point[axis], <span class="dv">2</span>)
+
+
+    <span class="kw">def</span> dist(<span class="va">self</span>, point):
+        r <span class="op">=</span> <span class="bu">range</span>(<span class="va">self</span>.dimensions)
+        <span class="cf">return</span> <span class="bu">sum</span>([<span class="va">self</span>.axis_dist(point, i) <span class="cf">for</span> i <span class="kw">in</span> r])
+
+
+    <span class="kw">def</span> search_knn(<span class="va">self</span>, point, k, dist<span class="op">=</span><span class="va">None</span>):
+        <span class="cf">if</span> dist <span class="kw">is</span> <span class="va">None</span>:
+            get_dist <span class="op">=</span> <span class="kw">lambda</span> n: n.dist(point)
+        <span class="cf">else</span>:
+            get_dist <span class="op">=</span> <span class="kw">lambda</span> n: dist(n.data, point)
+
+        results <span class="op">=</span> BoundedPriorityQueue(k)
+
+        <span class="va">self</span>._search_node(point, k, results, get_dist)
+
+        <span class="co"># We sort the final result by the distance in the tuple</span>
+        <span class="co"># (&lt;KdNode&gt;, distance)</span>
+        BY_VALUE <span class="op">=</span> <span class="kw">lambda</span> kv: kv[<span class="dv">1</span>]
+        <span class="cf">return</span> <span class="bu">sorted</span>(results.items(), key<span class="op">=</span>BY_VALUE)
+
+
+    <span class="kw">def</span> _search_node(<span class="va">self</span>, point, k, results, get_dist):
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>:
+            <span class="cf">return</span>
+
+        nodeDist <span class="op">=</span> get_dist(<span class="va">self</span>)
+        results.add((<span class="va">self</span>, nodeDist))
+        split_plane <span class="op">=</span> <span class="va">self</span>.data[<span class="va">self</span>.axis]
+        plane_dist <span class="op">=</span> point[<span class="va">self</span>.axis] <span class="op">-</span> split_plane
+        plane_dist2 <span class="op">=</span> plane_dist <span class="op">*</span> plane_dist
+        <span class="cf">if</span> point[<span class="va">self</span>.axis] <span class="op">&lt;</span> split_plane:
+            <span class="cf">if</span> <span class="va">self</span>.left <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
+                <span class="va">self</span>.left._search_node(point, k, results, get_dist)
+        <span class="cf">else</span>:
+            <span class="cf">if</span> <span class="va">self</span>.right <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
+                <span class="va">self</span>.right._search_node(point, k, results, get_dist)
+
+        <span class="cf">if</span> plane_dist2 <span class="op">&lt;</span> results.<span class="bu">max</span>() <span class="kw">or</span> results.size() <span class="op">&lt;</span> k:
+            <span class="cf">if</span> point[<span class="va">self</span>.axis] <span class="op">&lt;</span> <span class="va">self</span>.data[<span class="va">self</span>.axis]:
+                <span class="cf">if</span> <span class="va">self</span>.right <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
+                    <span class="va">self</span>.right._search_node(point, k, results, get_dist)
+            <span class="cf">else</span>:
+                <span class="cf">if</span> <span class="va">self</span>.left <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
+                    <span class="va">self</span>.left._search_node(point, k, results, get_dist)
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> search_nn(<span class="va">self</span>, point, dist<span class="op">=</span><span class="va">None</span>):
+        <span class="cf">return</span> <span class="bu">next</span>(<span class="bu">iter</span>(<span class="va">self</span>.search_knn(point, <span class="dv">1</span>, dist)), <span class="va">None</span>)
+
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> search_nn_dist(<span class="va">self</span>, point, distance, best<span class="op">=</span><span class="va">None</span>):
+        <span class="cf">if</span> best <span class="kw">is</span> <span class="va">None</span>:
+            best <span class="op">=</span> []
+
+        <span class="cf">if</span> <span class="va">self</span>.dist(point) <span class="op">&lt;</span> distance:
+            best.append(<span class="va">self</span>)
+
+        children <span class="op">=</span> <span class="bu">sorted</span>(<span class="va">self</span>.children, key<span class="op">=</span><span class="kw">lambda</span> c_p1: c_p1[<span class="dv">0</span>].dist(point))
+
+        <span class="cf">for</span> child, p <span class="kw">in</span> children:
+            <span class="cf">if</span> <span class="va">self</span>.axis_dist(point, <span class="va">self</span>.axis) <span class="op">&lt;</span> math.<span class="bu">pow</span>(distance, <span class="dv">2</span>):
+                child.search_nn_dist(point, distance, best)
+
+        <span class="cf">return</span> best
+
+
+    <span class="at">@require_axis</span>
+    <span class="kw">def</span> is_valid(<span class="va">self</span>):
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>:
+            <span class="cf">return</span> <span class="va">True</span>
+        <span class="cf">if</span> <span class="va">self</span>.left <span class="kw">and</span> <span class="va">self</span>.data[<span class="va">self</span>.axis] <span class="op">&lt;</span> <span class="va">self</span>.left.data[<span class="va">self</span>.axis]:
+            <span class="cf">return</span> <span class="va">False</span>
+        <span class="cf">if</span> <span class="va">self</span>.right <span class="kw">and</span> <span class="va">self</span>.data[<span class="va">self</span>.axis] <span class="op">&gt;</span> <span class="va">self</span>.right.data[<span class="va">self</span>.axis]:
+            <span class="cf">return</span> <span class="va">False</span>
+        <span class="cf">return</span> <span class="bu">all</span>(c.is_valid() <span class="cf">for</span> c, _ <span class="kw">in</span> <span class="va">self</span>.children) <span class="kw">or</span> <span class="va">self</span>.is_leaf
+
+
+    <span class="kw">def</span> extreme_child(<span class="va">self</span>, sel_func, axis):
+        max_key <span class="op">=</span> <span class="kw">lambda</span> child_parent: child_parent[<span class="dv">0</span>].data[axis]
+        me <span class="op">=</span> [(<span class="va">self</span>, <span class="va">None</span>)] <span class="cf">if</span> <span class="va">self</span> <span class="cf">else</span> []
+        child_max <span class="op">=</span> [c.extreme_child(sel_func, axis) <span class="cf">for</span> c, _ <span class="kw">in</span> <span class="va">self</span>.children]
+        child_max <span class="op">=</span> [(c, p <span class="cf">if</span> p <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> <span class="va">self</span>) <span class="cf">for</span> c, p <span class="kw">in</span> child_max]
+        candidates <span class="op">=</span>  me <span class="op">+</span> child_max
+        <span class="cf">if</span> <span class="kw">not</span> candidates:
+            <span class="cf">return</span> <span class="va">None</span>, <span class="va">None</span>
+
+        <span class="cf">return</span> sel_func(candidates, key<span class="op">=</span>max_key)
+
+<span class="kw">def</span> create(point_list<span class="op">=</span><span class="va">None</span>, dimensions<span class="op">=</span><span class="va">None</span>, axis<span class="op">=</span><span class="dv">0</span>, sel_axis<span class="op">=</span><span class="va">None</span>):
+    <span class="cf">if</span> <span class="kw">not</span> point_list <span class="kw">and</span> <span class="kw">not</span> dimensions:
+        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&#39;either point_list or dimensions must be provided&#39;</span>)
+    <span class="cf">elif</span> point_list:
+        dimensions <span class="op">=</span> check_dimensionality(point_list, dimensions)
+    sel_axis <span class="op">=</span> sel_axis <span class="kw">or</span> (<span class="kw">lambda</span> prev_axis: (prev_axis<span class="op">+</span><span class="dv">1</span>) <span class="op">%</span> dimensions)
+
+    <span class="cf">if</span> <span class="kw">not</span> point_list:
+        <span class="cf">return</span> KDNode(sel_axis<span class="op">=</span>sel_axis, axis<span class="op">=</span>axis, dimensions<span class="op">=</span>dimensions)
+
+    point_list <span class="op">=</span> <span class="bu">list</span>(point_list)
+    point_list.sort(key<span class="op">=</span><span class="kw">lambda</span> point: point[axis])
+    median <span class="op">=</span> <span class="bu">len</span>(point_list) <span class="op">//</span> <span class="dv">2</span>
+
+    loc   <span class="op">=</span> point_list[median]
+    left  <span class="op">=</span> create(point_list[:median], dimensions, sel_axis(axis))
+    right <span class="op">=</span> create(point_list[median <span class="op">+</span> <span class="dv">1</span>:], dimensions, sel_axis(axis))
+    <span class="cf">return</span> KDNode(loc, left, right, axis<span class="op">=</span>axis, sel_axis<span class="op">=</span>sel_axis, dimensions<span class="op">=</span>dimensions)
+
+
+<span class="kw">def</span> check_dimensionality(point_list, dimensions<span class="op">=</span><span class="va">None</span>):
+    dimensions <span class="op">=</span> dimensions <span class="kw">or</span> <span class="bu">len</span>(point_list[<span class="dv">0</span>])
+    <span class="cf">for</span> p <span class="kw">in</span> point_list:
+        <span class="cf">if</span> <span class="bu">len</span>(p) <span class="op">!=</span> dimensions:
+            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&#39;All Points in the point_list must have the same dimensionality&#39;</span>)
+    <span class="cf">return</span> dimensions
+
+
+<span class="kw">def</span> level_order(tree, include_all<span class="op">=</span><span class="va">False</span>):
+    q <span class="op">=</span> deque()
+    q.append(tree)
+    <span class="cf">while</span> q:
+        node <span class="op">=</span> q.popleft()
+        <span class="cf">yield</span> node
+
+        <span class="cf">if</span> include_all <span class="kw">or</span> node.left:
+            q.append(node.left <span class="kw">or</span> node.__class__())
+
+        <span class="cf">if</span> include_all <span class="kw">or</span> node.right:
+            q.append(node.right <span class="kw">or</span> node.__class__())</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> bpq, kdtree
+tree <span class="op">=</span> kdtree.create([[<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>], [<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>], [<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">2</span>]])
+<span class="bu">print</span> tree.search_nn( (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) )</code></pre></div>
+<pre><code>(&lt;KDNode - [2, 3, 4]&gt;, 3.0)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.random.random((<span class="dv">1000</span>,<span class="dv">2</span>)) <span class="op">*</span> <span class="fl">100.</span>
+kx <span class="op">=</span> [<span class="bu">list</span>(xxx) <span class="cf">for</span> xxx <span class="kw">in</span> x]
+tree <span class="op">=</span> kdtree.create(kx)
+kres <span class="op">=</span> tree.search_knn( [<span class="dv">39</span>, <span class="dv">39</span>], k<span class="op">=</span><span class="dv">7</span> )
+<span class="cf">for</span> kx <span class="kw">in</span> kres: <span class="bu">print</span> kx</code></pre></div>
+<pre><code>(&lt;KDNode - [37.944809008167091, 36.859556115064997]&gt;, 5.694928053800966)
+(&lt;KDNode - [36.282279773622861, 39.25727857203173]&gt;, 7.452195492486094)
+(&lt;KDNode - [36.011835939092215, 39.387237685986818]&gt;, 9.07907748034933)
+(&lt;KDNode - [38.766178732185438, 34.670053651771802]&gt;, 18.803107763817117)
+(&lt;KDNode - [39.443975626797602, 34.581772823651235]&gt;, 19.7178457390171)
+(&lt;KDNode - [42.733856969186199, 36.292326352854367]&gt;, 21.27318444578728)
+(&lt;KDNode - [43.489959416330848, 37.855783990677935]&gt;, 21.468965836286962)</code></pre>
+<p>Küre Agaçları (Ball Tree, BT)</p>
+<p>Bir noktanın diğer noktalara yakın olup olmadığının hesabında yapılması gereken en pahalı işlem nedir? Mesafe hesabıdır. BT algoritmasının püf noktası bu hesabı yapmadan, noktalara değil, noktaları kapsayan &quot;kürelere&quot; bakarak hız kazandırmasıdır. Noktaların her biri yerine o noktaları temsil eden kürenin pivot noktasına (bu nokta küre içindeki noktaların ortalamasal olarak merkezi de olabilir, herhangi bir başka nokta da) bakılır, ve oraya olan mesafeye göre bir küre altındaki noktalara olabilecek en az ve en fazla uzaklık hemen anlaşılmış olur.</p>
+<p>Not: Küre kavramı üç boyutta anlamlı tabii ki, iki boyutta bir çemberden bahsetmek lazım, daha yüksek boyutlarda ise merkezi ve çapı olan bir &quot;hiper yüzeyden'' bahsetmek lazım. Tarifi kolaylaştırdığı için çember ve küre tanımlarını kullanıyoruz.</p>
+<p>Mesela elimizde alttaki gibi noktalar var ve küreyi oluşturduk.</p>
+<div class="figure">
+<img src="knn0.png" />
+
+</div>
+<p>Bu küreyi kullanarak küre dışındaki herhangi bir nokta <span class="math inline">\(q\)</span>'nun küredeki &quot;diğer tüm noktalar <span class="math inline">\(x\)</span>'e&quot; olabileceği en az mesafenin ne olacağını üçgensel eşitsizlik ile anlayabiliriz.</p>
+<p>Üçgensel eşitsizlik</p>
+<p><span class="math display">\[ |x-y| \le |x-z| + |z-y| \]</span></p>
+<p>Operatör <span class="math inline">\(| |\)</span> norm anlamına gelir ve uzaklık hesabının genelleştirilmiş halidir. Konu hakkında daha fazla detay {} ders notlarında. Kısaca söylenmek istenen iki nokta arasında direk gitmek yerine yolu uzatırsak, mesafenin artacağıdır. Tabii uzaklık, yol, nokta gibi kavramlar tamamen soyut matematiksel ortamda da işleyecek şekilde ayarlanmıştır. Mesela mesafe (norm) kavramını değiştirebiliriz, Öklitsel yerine Manhattan mesafesi kullanırız (blok mesafesi, binalar etrafından dolaşılıyor, direk gidiş yok), fakat bu kavram bir norm olduğu ve belirttiğimiz uzayda geçerli olduğu için üçgensel eşitsizlik üzerine kurulmuş tüm diğer kurallar geçerli olur.</p>
+<div class="figure">
+<img src="tri1.jpg" />
+
+</div>
+<p>Şimdi diyelim ki dışarıdaki bir <span class="math inline">\(q\)</span> noktasından bir küre içindeki diğer tüm <span class="math inline">\(x\)</span> noktalarına olan mesafe hakkında bir şeyler söylemek istiyoruz. Üstteki şekilden bir üçgensel eşitsizlik çıkartabiliriz,</p>
+<p><span class="math display">\[ |x-c| + |x-q| \ge |q-c|  \]</span></p>
+<p>Bunun doğru bir ifade olduğunu biliyoruz. Peki şimdi yarıçapı bu işe dahil edelim, çünkü yarıçap hesabı bir kere yapılıp küre seviyesinde depolanacak ve bir daha hesaplanması gerekmeyecek, yani algoritmayı hızlandıracak bir şey olabilir bu, o zaman eğer <span class="math inline">\(|x-c|\)</span> yerine yarıçapı (radius) kullanırsak, eşitsizlik hala geçerli olur, sol taraf zaten büyüktü, şimdi daha da büyük olacak,</p>
+<p><span class="math display">\[ radius + |x-q| \ge |q-c|  \]</span></p>
+<p>Bunu nasıl böyle kesin bilebiliyoruz? Çünkü BT algoritması radius'u <span class="math inline">\(|x-c|\)</span>'ten kesinlikle daha büyük olacak şekilde seçer). Şimdi yarıçapı sağa geçirelim,</p>
+<p><span class="math display">\[ |x-q| \ge |q-c| - radius \]</span></p>
+<p>Böylece güzel bir tanım elde ettik. Yeni noktanın küredeki herhangi bir nokta <span class="math inline">\(x\)</span>'e olan uzaklığı, yeni noktanın pivota olan uzaklığının yarıçapı çıkartılmış halinden <em>muhakkak</em> fazladır. Yani bu çıkartma işleminden ele geçen rakam yeni noktanın <span class="math inline">\(x\)</span>'e uzaklığına bir &quot;alt sınır (lower bound)&quot; olarak kabul edilebilir. Diğer tüm mesafeler bu rakamdan daha büyük olacaktır. Ne elde ettik? Sadece bir yeni nokta, pivot ve yarıçap kullanarak küredeki &quot;diğer tüm noktalar hakkında&quot; bir irdeleme yapmamız mümkün olacak. Bu noktalara teker teker bakmamız gerekmeyecek. Bunun nasıl ise yaradığını algoritma detaylarında göreceğiz.</p>
+<p>Benzer şekilde</p>
+<div class="figure">
+<img src="tri2.jpg" />
+
+</div>
+<p>Bu ne diyor?</p>
+<p><span class="math display">\[ |q-c| + |x-c| \ge |q-x| \]</span></p>
+<p><span class="math inline">\(|x-c|\)</span> yerine yarıçap kullanırsak, sol taraf büyüyeceği için büyüklük hala büyüklük olarak kalır,</p>
+<p><span class="math display">\[ |q-c| + radius \ge |q-x| \]</span></p>
+<p>Ve yine daha genel ve hızlı hesaplanan bir kural elde ettik (önceki ifadeye benzemesi için yer düzenlemesi yapalım)</p>
+<p><span class="math display">\[ |q-x| \le |q-c| + radius \]</span></p>
+<p>Bu ifade ne diyor? Yeni noktanın pivota olan uzaklığına yarıçap &quot;eklenirse'' bu uzaklıktan, büyüklükten daha büyük bir yeni nokta / küre mesafesi olamaz, küredeki hangi nokta olursa olsun. Bu eşitsizlik te bize bir üst sınır (upper bound) vermiş oldu.</p>
+<p>Algoritma <code>ball_knn</code><span class="math inline">\(\left(PS^{in},node\right)\)</span></p>
+<ul>
+<li><p>Eğer alttaki şart geçerli ise node içindeki bir noktanın daha önce keşfedilmiş <span class="math inline">\(k\)</span> en yakın komşudan daha yakın olması imkansızdır</p></li>
+<li><p><code>if</code> <span class="math inline">\(D^{node}_{minp} \ge D_{sofar}\)</span> <code>return</code> <span class="math inline">\(PS_{in}\)</span> değişmemiş halde;</p></li>
+<li><p><code>else if</code> <span class="math inline">\(node\)</span> bir çocuk noktası ise</p></li>
+<li><span class="math inline">\(PS_{out} = PS_{in}\)</span></li>
+<li><p>Her <span class="math inline">\(\forall x \in points(node)\)</span> için</p>
+<ul>
+<li><code>if</code> <span class="math inline">\(\left( |x-q| &lt; D_{sofar} \right)\)</span>, basit lineer arama yap</li>
+<li><span class="math inline">\(x\)</span>'i <span class="math inline">\(PS_{out}\)</span>'a ekle</li>
+<li><code>if</code> <span class="math inline">\(|PS^{out}| == k+1\)</span> o zaman en uzak olan komşuyu <span class="math inline">\(PS^{out}\)</span>'tan çıkart ve <span class="math inline">\(D_{sofar}\)</span>'i güncelle</li>
+</ul></li>
+<li><p>Eğer uç nokta değil ise iki çocuk düğümden daha yakın olanını incele, sonra daha uzakta olanına bak. büyük bir ihtimalle arama devam ettirilirse bu arama kendiliğinden kesilecektir.</p></li>
+<li><p><code>else</code></p>
+<ul>
+<li><span class="math inline">\(node_1 = node\)</span>'un <span class="math inline">\(q\)</span>'ya en yakın çocuğu;</li>
+<li><span class="math inline">\(node_2 = node\)</span>'un <span class="math inline">\(q\)</span>'dan en uzak çocuğu;</li>
+<li><span class="math inline">\(PS^{temp}\)</span> = <code>ball_knn</code>(<span class="math inline">\(PS^{in},node_1)\)</span>;</li>
+<li><span class="math inline">\(PS^{out}\)</span> = <code>ball_knn</code>(<span class="math inline">\(PS^{temp},node_2);\)</span></li>
+</ul></li>
+</ul>
+<p>Küre Ağaçları (BT) metotu önce küreleri, ağaçları oluşturmalıdır. Bu küreler hiyerarşik şekilde planlanır, tüm noktaların içinde olduğu bir &quot;en üst küre&quot; vardır her kürenin iki tane çocuk küresi olabilir. Belli bir (dışarıdan tanımlanan) minimum <span class="math inline">\(r_{min}\)</span> veri noktasına gelinceye kadar sadece noktaları geometrik olarak kapsamakla görevli küreler oluşturulur, küreler noktaları sahiplenmezler. Fakat bu <span class="math inline">\(r_{min}\)</span> sayısına erişince (artık oldukça alttaki) kürelerin üzerine noktalar konacaktır.</p>
+<p>Önce tek kürenin oluşturuluşuna bakalım. Bir küre oluşumu için eldeki veri içinden herhangi bir tanesi pivot olarak kabul edilebilir. Daha sonra bu pivot'tan diğer tüm noktalara olan uzaklık ölçülür, ve en fazla, en büyük olan uzaklık yarıçap olarak kabul edilir (her şeyi kapsayabilmesi için).</p>
+<p>Not: Bu arada &quot;tüm diğer noktalara bakılması&quot; dedik, bundan kaçınmaya çalışmıyor muyduk? Fakat dikkat, &quot;küre oluşturulması&quot; evresindeyiz, k tane yakın nokta arama evresinde değiliz. Yapmaya çalıştığımız aramaları hızlandırmak - eğitim / küre oluşturması bir kez yapılacak ve bu eğitilmiş küreler bir kenarda tutulacak ve sürekli aramalar için ardı ardına kullanılacaklar.</p>
+<p>Küreyi oluşturmanın algoritması şöyledir: verilen noktalar içinde herhangi birisi pivot olarak seçilir. Sonra bu noktadan en uzakta olan nokta <span class="math inline">\(f_1\)</span>, sonra <span class="math inline">\(f_1\)</span>'den en uzakta olan nokta <span class="math inline">\(f_2\)</span> seçilir. Sonra tüm noktalara teker teker bakılır ve <span class="math inline">\(f_1\)</span>'e yakın olanlar bir gruba, <span class="math inline">\(f_2\)</span>'ye yakın olanlar bir gruba ayrılır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> balltree, pprint
+
+points <span class="op">=</span> np.array([[<span class="fl">3.</span>,<span class="fl">3.</span>],[<span class="fl">2.</span>,<span class="fl">2.</span>]])
+q <span class="op">=</span> [<span class="fl">1.</span>,<span class="fl">1.</span>]
+<span class="bu">print</span> <span class="st">&#39;diff&#39;</span>, points<span class="op">-</span>q
+<span class="bu">print</span> <span class="st">&#39;dist&#39;</span>, balltree.dist(points,q)</code></pre></div>
+<pre><code>diff [[ 2.  2.]
+ [ 1.  1.]]
+dist [ 2.82842712  1.41421356]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># k-nearest neighbor Ball Tree algorithm in Python</span>
+
+<span class="im">import</span> itertools, numpy <span class="im">as</span> np
+
+__rmin__ <span class="op">=</span> <span class="dv">2</span>
+
+<span class="kw">def</span> dist(vect,x):
+    <span class="cf">return</span> np.fromiter(itertools.imap
+                       (np.linalg.norm, vect<span class="op">-</span>x),dtype<span class="op">=</span>np.<span class="bu">float</span>)
+
+<span class="kw">def</span> norm(x,y): <span class="cf">return</span> np.linalg.norm(x<span class="op">-</span>y)
+
+<span class="co"># node: [pivot, radius, points, [child1,child2]]</span>
+<span class="kw">def</span> new_node():
+    <span class="cf">return</span>  [<span class="va">None</span>,<span class="va">None</span>,<span class="va">None</span>,[<span class="va">None</span>,<span class="va">None</span>]]
+
+<span class="kw">def</span> zero_if_neg(x):
+    <span class="cf">if</span> x <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span> <span class="dv">0</span>
+    <span class="cf">else</span>: <span class="cf">return</span> x
+
+<span class="kw">def</span> form_tree(points,node,all_points,plot_tree<span class="op">=</span><span class="va">False</span>):    
+    pivot <span class="op">=</span> points[<span class="dv">0</span>]
+    radius <span class="op">=</span> np.<span class="bu">max</span>(dist(points,pivot))
+    <span class="cf">if</span> plot_tree: plot_circles(pivot, radius, points, all_points)
+    node[<span class="dv">0</span>] <span class="op">=</span> pivot
+    node[<span class="dv">1</span>] <span class="op">=</span> radius
+    <span class="cf">if</span> <span class="bu">len</span>(points) <span class="op">&lt;=</span> __rmin__:
+        node[<span class="dv">2</span>] <span class="op">=</span> points
+        <span class="cf">return</span>
+    idx <span class="op">=</span> np.argmax(dist(points,pivot))
+    furthest <span class="op">=</span> points[idx,:]
+    idx <span class="op">=</span> np.argmax(dist(points,furthest))
+    furthest2 <span class="op">=</span> points[idx,:]
+    dist1<span class="op">=</span>dist(points,furthest)
+    dist2<span class="op">=</span>dist(points,furthest2)
+    diffs <span class="op">=</span> dist1<span class="op">-</span>dist2
+    p1 <span class="op">=</span> points[diffs <span class="op">&lt;=</span> <span class="dv">0</span>]
+    p2 <span class="op">=</span> points[diffs <span class="op">&gt;</span> <span class="dv">0</span>]
+    node[<span class="dv">3</span>][<span class="dv">0</span>] <span class="op">=</span> new_node() <span class="co"># left child</span>
+    node[<span class="dv">3</span>][<span class="dv">1</span>] <span class="op">=</span> new_node() <span class="co"># right child</span>
+    form_tree(p1,node[<span class="dv">3</span>][<span class="dv">0</span>],all_points)
+    form_tree(p2,node[<span class="dv">3</span>][<span class="dv">1</span>],all_points)
+
+<span class="co"># knn: [min_so_far, [points]]</span>
+<span class="kw">def</span> search_tree(new_point, knn_matches, node, k):
+    pivot <span class="op">=</span> node[<span class="dv">0</span>]
+    radius <span class="op">=</span> node[<span class="dv">1</span>]
+    node_points <span class="op">=</span> node[<span class="dv">2</span>]
+    children <span class="op">=</span> node[<span class="dv">3</span>]
+
+    <span class="co"># calculate min distance between new point and pivot</span>
+    <span class="co"># it is direct distance minus the radius</span>
+    min_dist_new_pt_node <span class="op">=</span> norm(pivot,new_point) <span class="op">-</span> radius
+    
+    <span class="co"># if the new pt is inside the circle, its potential minimum</span>
+    <span class="co"># distance to a random point inside is zero (hence</span>
+    <span class="co"># zero_if_neg). we can only say so much without looking at all</span>
+    <span class="co"># points (and if we did, that would defeat the purpose of this</span>
+    <span class="co"># algorithm)</span>
+    min_dist_new_pt_node <span class="op">=</span> zero_if_neg(min_dist_new_pt_node)
+    
+    knn_matches_out <span class="op">=</span> <span class="va">None</span>
+    
+    <span class="co"># min is greater than so far</span>
+    <span class="cf">if</span> min_dist_new_pt_node <span class="op">&gt;=</span> knn_matches[<span class="dv">0</span>]:
+        <span class="co"># nothing to do</span>
+        <span class="cf">return</span> knn_matches
+    <span class="cf">elif</span> node_points <span class="op">!=</span> <span class="va">None</span>: <span class="co"># if node is a leaf</span>
+        <span class="bu">print</span> knn_matches_out
+        knn_matches_out <span class="op">=</span> knn_matches[:] <span class="co"># copy it</span>
+        <span class="cf">for</span> p <span class="kw">in</span> node_points: <span class="co"># linear scan</span>
+            <span class="cf">if</span> norm(new_point,p) <span class="op">&lt;</span> radius:
+                knn_matches_out[<span class="dv">1</span>].append([<span class="bu">list</span>(p)])
+                <span class="cf">if</span> <span class="bu">len</span>(knn_matches_out[<span class="dv">1</span>]) <span class="op">==</span> k<span class="op">+</span><span class="dv">1</span>:
+                    tmp <span class="op">=</span> [norm(new_point,x) <span class="op">\</span>
+                               <span class="cf">for</span> x <span class="kw">in</span> knn_matches_out[<span class="dv">1</span>]]
+                    <span class="kw">del</span> knn_matches_out[<span class="dv">1</span>][np.argmax(tmp)]
+                    knn_matches_out[<span class="dv">0</span>] <span class="op">=</span> np.<span class="bu">min</span>(tmp)
+
+    <span class="cf">else</span>:
+        dist_child_1 <span class="op">=</span> norm(children[<span class="dv">0</span>][<span class="dv">0</span>],new_point)
+        dist_child_2 <span class="op">=</span> norm(children[<span class="dv">1</span>][<span class="dv">0</span>],new_point)
+        node1 <span class="op">=</span> <span class="va">None</span><span class="op">;</span> node2 <span class="op">=</span> <span class="va">None</span>
+        <span class="cf">if</span> dist_child_1 <span class="op">&lt;</span> dist_child_2:
+            node1 <span class="op">=</span> children[<span class="dv">0</span>]
+            node2 <span class="op">=</span> children[<span class="dv">1</span>]
+        <span class="cf">else</span>:
+            node1 <span class="op">=</span> children[<span class="dv">1</span>]
+            node2 <span class="op">=</span> children[<span class="dv">0</span>]
+
+        knn_tmp <span class="op">=</span> search_tree(new_point, knn_matches, node1, k)
+        knn_matches_out <span class="op">=</span> search_tree(new_point, knn_tmp, node2, k)
+            
+    <span class="cf">return</span> knn_matches_out
+                   </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">points <span class="op">=</span> np.array([[<span class="fl">3.</span>,<span class="fl">4.</span>],[<span class="fl">5.</span>,<span class="fl">5.</span>],[<span class="fl">9.</span>,<span class="fl">2.</span>],[<span class="fl">3.2</span>,<span class="fl">5.</span>],[<span class="fl">7.</span>,<span class="fl">5.</span>],
+                 [<span class="fl">8.</span>,<span class="fl">9.</span>],[<span class="fl">7.</span>,<span class="fl">6.</span>],[<span class="dv">8</span>,<span class="dv">4</span>],[<span class="dv">6</span>,<span class="dv">2</span>]])
+tree <span class="op">=</span> balltree.new_node()
+balltree.form_tree(points,tree,all_points<span class="op">=</span>points)
+pp <span class="op">=</span> pprint.PrettyPrinter(indent<span class="op">=</span><span class="dv">4</span>)
+<span class="bu">print</span> <span class="st">&quot;tree&quot;</span>
+pp.pprint(tree)
+newp <span class="op">=</span> np.array([<span class="fl">7.</span>,<span class="fl">7.</span>])
+dummyp <span class="op">=</span> [np.Inf,np.Inf] <span class="co"># it should be removed immediately</span>
+res <span class="op">=</span> balltree.search_tree(newp,[np.Inf, [dummyp]], tree, k<span class="op">=</span><span class="dv">2</span>)
+<span class="bu">print</span> <span class="st">&quot;done&quot;</span>, res</code></pre></div>
+<pre><code>tree
+[   array([ 3.,  4.]),
+    7.0710678118654755,
+    None,
+    [   [   array([ 8.,  9.]),
+            3.1622776601683795,
+            array([[ 8.,  9.],
+       [ 7.,  6.]]),
+            [None, None]],
+        [   array([ 3.,  4.]),
+            6.324555320336759,
+            None,
+            [   [   array([ 9.,  2.]),
+                    3.6055512754639891,
+                    None,
+                    [   [   array([ 7.,  5.]),
+                            1.4142135623730951,
+                            array([[ 7.,  5.],
+       [ 8.,  4.]]),
+                            [None, None]],
+                        [   array([ 9.,  2.]),
+                            3.0,
+                            array([[ 9.,  2.],
+       [ 6.,  2.]]),
+                            [None, None]]]],
+                [   array([ 3.,  4.]),
+                    2.2360679774997898,
+                    None,
+                    [   [   array([ 5.,  5.]),
+                            0.0,
+                            array([[ 5.,  5.]]),
+                            [None, None]],
+                        [   array([ 3.,  4.]),
+                            1.019803902718557,
+                            array([[ 3. ,  4. ],
+       [ 3.2,  5. ]]),
+                            [None, None]]]]]]]]
+None
+done [1.0, [[[8.0, 9.0]], [[7.0, 6.0]]]]</code></pre>
+<p>Bu iki grup, o anda işlemekte olduğumuz ağaç düğümün (node) iki çocukları olacaktır. Çocuk noktaları kararlaştırıldıktan sonra artık sonraki aşamaya geçilir, fonksiyon <code>form_tree</code> bu çocuk noktaları alarak, ayrı ayrı, her çocuk grubu için özyineli (recursive) olarak kendi kendini çağırır. Kendi kendini çağıran <code>form_tree</code>, tekrar başladığında kendini yeni (bir) nokta grubu ve yeni bir düğüm objesi ile başbaşa bulur, ve hiçbir şeyden habersiz olarak işleme koyulur. Tabii her özyineli çağrı yeni düğüm objesini yaratırken bir referansı üstteki ebeveyn düğüme koymayı unutmamıştır, böylece özyineli fonksiyon dünyadan habersiz olsa bile, ağacın en üstünden en altına kesintisiz bir bağlantı zinciri hep elimizde olur.</p>
+<p>Not: <code>form_tree</code> içinde bir numara yaptık, tüm noktaların <span class="math inline">\(f_1\)</span>'e olan uzaklığı <code>dist1</code>, <span class="math inline">\(f_2\)</span>'e olan uzaklığı ise <code>dist2</code>. Sonra <code>diffs = dist1-dist2</code> ile bu iki uzaklığı birbirinden çıkartıyoruz ve mesela <code>points[diffs &lt;= 0]</code> ile <span class="math inline">\(f_1\)</span>'e yakın olanları buluyoruz, çünkü bir tarafta <span class="math inline">\(f_1\)</span>'e yakınlık 4 diğer tarafta <span class="math inline">\(f_2\)</span>'ye yakınlık 6 ise, 4-6=-2 ie o nokta <span class="math inline">\(f_1\)</span>'e yakın demektir. Ufak bir numara ile numpy dilimleme (slicing) tekniğini kullanabilmiş olduk ve bu önemli çünkü böylece <code>for</code> döngüsü yazmıyoruz, numpy'in arka planda C ile yazılmış hızlı rutinlerini kullanıyoruz.</p>
+<p>Tekrar hatırlatalım: kürelerin sınırları kesişebilir.</p>
+<p>Arama</p>
+<p>Üstte sözde program (pseudocode) <code>ball_knn</code> olarak gösterilen ve bizim kodda <code>search_tree</code> olarak anılan fonksiyon arama fonksiyonu. Aranan <code>new_point</code>'e olan k en yakın diğer veri noktalar. Dışarıdan verilen değişken <code>knn_matches</code> üzerinde fonksiyon özyineli bir şekilde arama yaparken &quot;o ana kadar bulunmuş en yakın k nokta&quot; ve o noktaların <code>new_point</code>'e olan en yakın mesafesi saklanır, arama işleyişi sırasında <code>knn_matches</code>, <code>knn_matches_out</code> sürekli verilip geri döndürülen değişkenlerdir, sözde programdaki <span class="math inline">\(P^{in},P^{out}\)</span>'un karşılığıdırlar.</p>
+<p>Arama algoritması şöyle işler: şimdi önceden oluşturulmuş küre hiyerarşisini üstten alta doğru gezmeye başlarız. Her basamakta yeni nokta ile o kürenin pivot'unu, yarıçapını kullanarak bir &quot;alt sınır mesafe hesabı&quot; yaparız, bu mesafe hesabının arkasında yatan düşünceyi yazının başında anlatmıştık. Bu mesafe küre içindeki tüm noktalara olan bir en az mesafe idi, ve eğer eldeki <code>knn_matches</code> üzerindeki şimdiye kadar bulunmuş mesafelerin en azından daha az ise, o zaman bu küre &quot;bakmaya değer&quot; bir küredir, ve arama algoritması bu küreden işleme devam eder. Şimdiye kadar bulunmuş mesafelerin en azı <code>knn_matches</code> veri yapısı içine <code>min_so_far</code> olarak saklanıyor, sözde programdaki <span class="math inline">\(D_{sofar}\)</span>.</p>
+<p>Bu irdeleme sonrası (yani vs küresinden yola devam kararı arkasından) işleme iki şekilde devam edilebilir, çünkü bir küre iki türden olabilir; ya nihai en alt kürelerden biridir ve üzerinde gerçek noktalar depolanmıştır, ya da ara kürelerden biridir (sona gelmedik ama doğru yoldayız, daha alta inmeye devam), o zaman fonksiyon yine özyineli bir şekilde bu kürenin çocuklarına bakacaktır - her çocuk için kendi kendini çağıracaktır. İkinci durumda, kürede noktalar depolanmıştır, artık basit lineer bir şekilde o tüm noktalara teker teker bakılır, eldekilerden daha yakın olanı alınır, eldeki liste şişmeye başlamışsa (k'den daha fazla ise) en büyük noktalardan biri atılır, vs.</p>
+<p>Not: Silme işlemi örnek kodumuzda Python <code>del</code> ile gerçekleştirildi. Eğer bu işlem de hızlandırılmak istenirse, en alt küre seviyesindeki veriler bir öncelik kuyruğu (priority queue) üzerinde tutulabilir, ve silme işlemi hep en sondaki elemanı siler, ekleme işlemi ise yeni elemanı (hep sıralı olan) listede doğru yere koyar.</p>
+<p>Daha alta inmemiz gereken birinci durumda yapılan iki çağrının bir özelliğine dikkat çekmek isterim. Yeni noktanın bu çocuklara olan uzaklığı da ölçülüyor, ve en önce, en yakın olan çocuğa doğru bir özyineleme yapılıyor. Bu nokta çok önemli: niye böyle yapıldı? Çünkü içinde muhtemelen daha yakın noktaların olabileceği kürelere doğru gidersek, özyineli çağrıların teker teker bitip yukarı doğru çıkmaya başlaması ve kaldıkları yerden bu sefer ikinci çocuk çağrılarını yapmaya başlaması ardından, elimizdeki <code>knn_matches</code> üzerinde en yakın noktaları büyük bir ihtimalle zaten bulmuş olacağız. Bu durumda ikinci çağrı yapılsa bile tek bir alt sınır hesabı o kürede dikkate değer hiçbir nokta olamayacağını ortaya çıkaracak (çünkü en iyiler zaten elimizde), ve ikinci çocuğa olan çağrılar hiç alta inmeden pat diye geri dönecektir, hiç aşağı inilmeyecektir.</p>
+<p>Bu müthiş bir kazanımdır: zaten bu stratejiye litetürde &quot;budamak (pruning)&quot; adı veriliyor, bu da çok uygun bir kelime aslında, çünkü ağaçlarla uğraşıyoruz ve bir düğüm (küre) ve onun altındaki hiçbir alt küreye uğramaktan kurtularak o dalların tamamını bir nevi &quot;budamış&quot; oluyoruz. Bir sürü gereksiz işlemden de kurtuluyoruz, ve aramayı hızlandırıyoruz.</p>
+<p>Model</p>
+<p>KNN'in model kullanmayan, model yerine verinin kendisini kullanan bir algoritma olarak tanıttık. Peki &quot;eğitim'' evresi sonrası ele geçen küreler ve ağaç yapısı bir nevi model olarak görülebilir mi?</p>
+<p>Bu önemli bir soru, ve bir bakıma, evet ağaç yapısı sanki bir modelmiş gibi duruyor. Fakat, mesela istatistiksel, grafiksel, yapay sınır ağları (neural net) bağlamında bakılırsa bu yapıya tam bir model denemez. Model bazlı metotlarda model kurulunca veri atılır, ona bir daha bakılmaz. Fakat KNN, küre ve ağaç yapısını hala eldeki veriye erişmek için kullanmaktadır. Yani bir bakıma veriyi &quot;indeksliyoruz'', ona erişimi kolaylaştırıp hızlandırıyoruz, ama ondan model çıkartmıyoruz.</p>
+<p>Not: Verilen Python kodu ve algoritma yakın noktaları hesaplıyor sadece, onların etiketlerinden hareketle yeni noktanın etiketini tahmin etme aşamasını gerçekleştirmiyor. Fakat bu son aşama işin en basit tarafı, eğitim veri yapısına eklenecek bir etiket bilgisi ve sınıflama sonrası k noktanın ağırlıklı etiketinin hesabı ile basit şekilde gerçekleştirilebilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">!</span>python plot_circles.py</code></pre></div>
+<p>Ağaç oluşumu sırasındaki kürelerin grafiği alttadır.</p>
+<p><img src="knn0.png" /> <img src="knn1.png" /> <img src="knn2.png" /> <img src="knn3.png" /> <img src="knn4.png" /> <img src="knn5.png" /> <img src="knn6.png" /> <img src="knn7.png" /> <img src="knn8.png" /> <img src="knn9.png" /></p>
+<p>Kaynaklar</p>
+<p>[1] Liu, Moore, Gray, {}</p>
+<p>[2] Alpaydın, <em>Introduction to Machine Learning</em></p>
+<p>[3] <em>A simple kd-tree in Python</em>, <a href="https://github.com/stefankoegl/kdtree" class="uri">https://github.com/stefankoegl/kdtree</a></p>
+</body>
+</html>

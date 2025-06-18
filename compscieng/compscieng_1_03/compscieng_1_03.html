@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-1.3">Ders 1.3</h1>
+<p>Konumuz <span class="math inline">\(Au = b\)</span> sistemini çözmek. Bu çözüm için Python'da <code>linalg.solve</code> çağrısı var. Mesela</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg
+A <span class="op">=</span> [[<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>],[<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">6</span>],[<span class="dv">7</span>,<span class="dv">7</span>,<span class="dv">7</span>]]
+b <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]
+u <span class="op">=</span> scipy.linalg.solve(A, b)
+<span class="bu">print</span> u</code></pre></div>
+<pre><code>[ 0.14285714  0.42857143 -0.14285714]</code></pre>
+<p><code>linalg.solve</code> çağrısı Matlab'de <code>çağrısının karşılığı, oradaki kullanım u = A</code> b şeklinde.</p>
+<p>Eğer elimizde ikinci bir <code>c</code> vektörü var ise, ve eşitliğin sağ tarafında <code>b</code> sonrası onu kullanmak istiyorsak ayrı ayrı <code>solve</code> komutlarına gerek yoktur. Her iki vektörü birbirine ekleyerek, <code>solve</code>'u toplu halde çağırabiliriz, bu performans açısından daha iyi olur.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">c <span class="op">=</span> [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">8</span>]
+bc <span class="op">=</span> np.vstack((b,c)).T
+u <span class="op">=</span> scipy.linalg.solve(A,  bc)
+<span class="bu">print</span> u</code></pre></div>
+<pre><code>[[ 0.14285714 -1.28571429]
+ [ 0.42857143  5.14285714]
+ [-0.14285714 -2.71428571]]</code></pre>
+<p>Python <code>vstack</code> komutu iki matrisi üst üste koymak için kullanılır.</p>
+<p>Her iki çözüm beraber olarak geri gelecektir. Bu niye daha hızlı? Çünkü Python'un çözücüsü daha eşitliğin sağ tarafına bile gelmeden sadece <code>A</code>'ya bakarak bir sürü işlem gerçekleştiriyor, eliminasyon yaparak <code>A</code>'yı üçgensel hale getirmek gibi. Bu tür işlemleri gereksiz kere iki kere yapmak pahalı olurdu.</p>
+<p>Eğer <span class="math inline">\(A\)</span> karesel değilse, ama biz her iki durumda da işleyen bir komut istiyorsak, <code>np.linalg.lstsq(A,b)</code> kullanabiliriz.</p>
+<p>Soru: matematiksel olarak <span class="math inline">\(u\)</span>'yu bulmak</p>
+<p><span class="math display">\[ Au = b \]</span></p>
+<p><span class="math display">\[ u = A^{-1}b \]</span></p>
+<p>demektir. Peki Python bu hesap için gerçekten <span class="math inline">\(A^{-1}\)</span>'i hesaplar mı?</p>
+<p>Hayır. Çünkü büyük problemler için matris tersini hesaplamak oldukça pahalıdır. Ayrıca <span class="math inline">\(A\)</span> matrisi zaten üçlü köşegen (tridiagonal) bir halde olabilir, ve cevap zaten hazır haldedir, bu noktada ters alma işlemi gereksiz olurdu.</p>
+<p>Biraz zihin egzersizi yapalım. Eğer şöyle bir komut kullansam ne elde ederim (ki <code>I</code> matrisi birim matrisi) ?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">solve(A, I)</code></pre></div>
+<p>Cevap, tabii ki <span class="math inline">\(A\)</span>'nin tersini elde ederim, yani <span class="math inline">\(A^{-1}\)</span> çünkü <span class="math inline">\(AA^{-1} =I\)</span>, sağ tarafta birim matrisi var ise çözüm sadece <span class="math inline">\(A^{-1}\)</span> olabilir.</p>
+<p><span class="math display">\[ 
+A 
+\left[\begin{array}{rrr}
+u_1 &amp; u_2 &amp; u_3
+\end{array}\right]
+=
+\left[\begin{array}{rrr}
+1 &amp; 0 &amp; 0\\
+0 &amp; 1 &amp; 0\\
+0 &amp; 0 &amp; 1
+\end{array}\right]
+ \]</span></p>
+<p>Bu probleme bakmanın değişik bir yolu: sağ taraftaki birim matrisi içindeki [1 0 0] gibi değerler içindeki 1 değerlerini birer zıplama (impulse) anı gibi görmek, sanki elimizde bir düz [0 0 .. 0] bir veri var, içinde tek zıplama olan yer orası, ve bu [1 0 0], [0 1 0], .. içinde tek zıplama olan veriler &quot;işlenerek'' bize <span class="math inline">\(u_1\)</span>, <span class="math inline">\(u_2\)</span>, .. gibi sonuçları veriyorlar.</p>
+<p>Elle <span class="math inline">\(A\)</span>'nin tersini bulmak için ne yapardık? Bir blok matrisi yaratırdık, <code>[A İ]</code>, yani 3x3 ve 3x3 iki matrisi yanyana koyup 3x6 boyutunda yeni bir matris elde ederdik, ve bu matriste <span class="math inline">\(A\)</span> üzerinde eliminasyon, pivotları sıfırlama gibi numaraları kullanarak onu birim matrise çevirirdik, bu arada aynı operasyonları tabii ki <span class="math inline">\(I\)</span> üzerinde uygulardık. En sonunda <span class="math inline">\(A\)</span> birim olunca <span class="math inline">\(I\)</span> <span class="math inline">\(A^{-1}\)</span>'e dönüşmüş olurdu!</p>
+<p>Şimdi biraz büyük resme bakalım.</p>
+<p>Lineer cebirin 4 büyük problemi Python komutları ile beraber şunlardır:</p>
+<ol style="list-style-type: decimal">
+<li><p>Eliminasyon, <code>scipy.linalg.lu(A)</code> <span class="math inline">\(A = LU\)</span></p></li>
+<li><p>Dikgenleştirme (orthogonalization), <code>scipy.linalg.qr(A)</code>, <span class="math inline">\(A = QR\)</span></p></li>
+<li><p>Özdeğerler (eigenvalues), <code>scipy.linalg.eig(A)</code> <span class="math inline">\(A = SAS^{-1}\)</span></p></li>
+<li><p>Eşsiz değerler (singular values), <code>scipy.linalg.svd(A)</code> <span class="math inline">\(A = U \Sigma V^{T}\)</span></p></li>
+</ol>
+<p>Eliminasyon ne yapar? Dikkat edersek aslında bu işlemin bir alt üçgensel (lower triangular) matris (<span class="math inline">\(L\)</span>) ve bir tane de üst üçgensel matris (<span class="math inline">\(U\)</span>) ortaya çıkardığını görürüz. Şimdi alttaki matris üzerinde eliminasyon yapalım ve bu arada tersini de bulmuş olalım.</p>
+<p><span class="math display">\[
+\left[\begin{array}{rrr}
+1 &amp; -1 &amp; 0 \\
+-1 &amp; 2 &amp; -1 \\
+0 &amp; -1 &amp; 2 
+\end{array}\right]
+\]</span></p>
+<p>Eliminasyon işlemlerini yapalım (pivotlar öğeleri parantez içinde)</p>
+<p><span class="math display">\[
+\left[\begin{array}{rrr}
+(1) &amp; -1 &amp; 0 \\
+-1 &amp; 2 &amp; -1 \\
+0 &amp; -1 &amp; 2
+\end{array}\right]
+\to
+\left[\begin{array}{rrr}
+(1) &amp; -1 &amp; 0 \\
+0 &amp; (1) &amp; -1 \\
+0 &amp; 0 &amp; (1)
+\end{array}\right] = U
+\]</span></p>
+<p><span class="math display">\[ l_{21} = -1 \quad l_{31} = 0 \quad l_{32} = -1 \]</span></p>
+<p><span class="math display">\[
+L = \left[\begin{array}{rrr}
+1 &amp; 0 &amp; 0 \\ -1 &amp; 1 &amp; 0 \\ 0 &amp; -1 &amp; 1
+\end{array}\right]
+\]</span></p>
+<p><span class="math inline">\(l_{21} = -1\)</span> yapılan ilk işlemi kodluyor, 1. satırı -1 ile çarp ve 2. satırdan çıkart anlamına geliyor. Diğerlerini de sırasıyla görüyoruz ve bu işlemlerin sonucunda üst üçgensel matris <span class="math inline">\(U\)</span>'yu elde ediyoruz. Tüm <span class="math inline">\(l\)</span> değerlerini bir araya koyup <span class="math inline">\(L\)</span>'yi elde edebiliriz. Bir tane daha yapalım:</p>
+<p><span class="math display">\[
+\left[\begin{array}{rrr}
+2 &amp; -1 &amp; \\ -1 &amp; 2 &amp; -1 \\ &amp; -1 &amp; 2
+\end{array}\right]
+\to
+\left[\begin{array}{rrr}
+2 &amp; -1 &amp; 0 \\ 0 &amp; 3/2 &amp; -1 \\ 0 &amp; 0 &amp; 4/3
+\end{array}\right] = U
+\]</span></p>
+<p><span class="math display">\[ l_{21}=-\frac{1}{2}, \quad
+l_{31} = 0, \quad
+l_{32} = -\frac{2}{3}
+\]</span></p>
+<p><span class="math display">\[ L =
+\left[\begin{array}{ccc}
+1 &amp;  &amp;  \\ -1/2 &amp; 1 &amp;  \\ 0 &amp; -2/3 &amp; 1
+\end{array}\right] 
+\]</span></p>
+<p>Eğer eşsiz (singular) bir matris üzerinde eliminasyon yapsak, bu işlemi nasıl etkilerdi?</p>
+<p><span class="math display">\[
+\left[\begin{array}{rrr}
+(1) &amp; -1 &amp; 0 \\ -1 &amp; 2 &amp; -1 \\ 0 &amp; -1 &amp; 1
+\end{array}\right]
+\to
+\left[\begin{array}{rrr}
+(1) &amp; -1 &amp; 0 \\ 0 &amp; (1) &amp; -1 \\ 0 &amp; 0 &amp; (0)
+\end{array}\right] 
+\]</span></p>
+<p>Yani bu durumda 3 tane pivot elde edemezdik, sağ alt köşedeki değer eliminasyon sırasında 0 olurdu, ve sağ matris, aynen sol matris gibi, eşsiz olurdu. Bu işimize yaramazdı.</p>
+<p>İki üstteki probleme dönelim: Burada ilk matris simetrik idi, ama <span class="math inline">\(L\)</span> ve <span class="math inline">\(U\)</span> matrisi artık simetrik değil. Simetriyi geri getirebilir miyiz? <span class="math inline">\(U\)</span> içinden sadece çaprazları çekip çıkartalım</p>
+<p><span class="math display">\[
+\left[\begin{array}{rrr}
+(2) &amp; -1 &amp; 0 \\
+0 &amp; (3/2) &amp; -1 \\
+0 &amp; 0 &amp; (4/3)
+\end{array}\right] = U =
+\left[\begin{array}{rrr}
+2 &amp; &amp; \\ &amp; 3/2 &amp; \\ &amp; &amp; 4/3
+\end{array}\right] 
+\left[\begin{array}{rrr}
+1 &amp; -1/2 &amp; 0 \\ 0 &amp; 1 &amp; -2/3 \\ 0 &amp; 0 &amp; 1
+\end{array}\right]
+\]</span></p>
+<p>Böylece çaprazında <span class="math inline">\(\left[\begin{array}{ccc} 2 &amp; 3/2 &amp; 4/3 \end{array}\right]\)</span> olan bir matris elde ettik. Peki bu matrisin çarptığı (onun hemen sağında) içinden çaprazları çekip çıkardığımız matristen geri kalanlar tanıdık geliyor mu? Evet, bu matris te <span class="math inline">\(L^T\)</span>'e eşit. Demek ki <span class="math inline">\(LU = LDL^T\)</span> gibi bir ifade mümkün.</p>
+<p>Biliyoruz ki</p>
+<p><span class="math inline">\(K = LDL^T\)</span></p>
+<p>ifadesinde <span class="math inline">\(K\)</span> her zaman simetriktir. Ters yönden söylersek, herhangi bir simetrik <span class="math inline">\(K\)</span> matrisini alıp eliminasyon yaparsam ve <span class="math inline">\(L\)</span> ve <span class="math inline">\(D\)</span> elde edince, <span class="math inline">\(L^T\)</span> ile çarpabilirim.</p>
+<p>Peki şunu ispat edebilir miyiz? Herhangi bir <span class="math inline">\(L\)</span> ve çapraz <span class="math inline">\(D\)</span> var ise, <span class="math inline">\(LDL^T\)</span> her zaman simetrik midir? Bir matrisin simetrik olması demek kendi devriğine (transpose) eşit olması demektir. Yani</p>
+<p><span class="math display">\[ K = LDL^T \]</span></p>
+<p><span class="math display">\[ K^T = (LDL^T)^T \]</span></p>
+<p>Devriği alınca parantez içindeki çarpımların sırası değişir.</p>
+<p><span class="math display">\[ = (L^T)^TD^TL^T \]</span></p>
+<p><span class="math inline">\(D^T = D\)</span> çünkü <span class="math inline">\(D\)</span> zaten köşegen bir matris, önemli tüm değerleri çaprazında ve devrik işlemi bu durumu değiştirmiyor. O zaman</p>
+<p><span class="math display">\[ = LDL^T \]</span></p>
+<p>Tekrar başladığımız noktaya döndük. Demek ki başladığımız matris simetriktir. İspat tamamlandı.</p>
+<p>Genele dönelim: <span class="math inline">\(A^TA\)</span>'nin mesela karesel olduğunu biliyorduk (<span class="math inline">\(n \times m\)</span> ile <span class="math inline">\(m \times n\)</span> çarpılınca <span class="math inline">\(n \times n\)</span> boyutu elde edilir). Şimdi bunun üzerine simetrik olduğunu da artık biliyoruz, üstte ispatladık.</p>
+<p>Kural: Simetrik matrislerin tersi (inverse) de simetriktir. O zaman <span class="math inline">\(K^{-1}\)</span> de simetriktir.</p>
+</body>
+</html>

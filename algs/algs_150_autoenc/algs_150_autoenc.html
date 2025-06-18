@@ -1,0 +1,737 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="özkodlama-autoencoding">Özkodlama (Autoencoding)</h1>
+<p>Özkodlamanın yaptığının bir tür &quot;veriyi sıkıştırma&quot; işlemi olduğu söylenebilir. Yapay öğrenmede algoritmaların denetimli ve denetimsiz olarak ikiye ayrıldığından bahsetmiştik, özkodlama denetimsiz çalışır yani ortada etiket yoktur, daha doğrusu özkodlama verinin kendisini etiket olarak kullanır.</p>
+<div class="figure">
+<img src="autoenc_02.png" />
+
+</div>
+<p>Yani girdi olarak verilen veriyi çıktı olarak ta kullanırsak, YSA'yı kendi çıktısını tekrar oluşturmayı öğrenmeye zorlamış oluruz, bu YSA'yı veriyi özetlemeye doğru yöneltecektir, ve bu tekrar oluşturma için ileri besleme sırasında veriyi dar bir noktadan geçmeye zorlarsak (üstteki resimde görülüyor, 7 nöronluk girdi 5 nöronluk &quot;daha dar&quot; bir katmandan geçmeye zorlanıyor), bu YSA'yı &quot;sıkıştırma&quot; yapmaya daha da meyillendirecektir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> keras.layers <span class="im">import</span> Input, Dense
+<span class="im">from</span> keras.models <span class="im">import</span> Model
+
+<span class="co"># gizli katman</span>
+encoding_dim <span class="op">=</span> <span class="dv">32</span>
+
+<span class="kw">def</span> get_model():
+    <span class="co"># girdi</span>
+    input_img <span class="op">=</span> Input(shape<span class="op">=</span>(<span class="dv">784</span>,))
+    <span class="co"># kodlanmis temsil</span>
+    encoded <span class="op">=</span> Dense(encoding_dim, activation<span class="op">=</span><span class="st">&#39;relu&#39;</span>)(input_img)
+    <span class="co"># kodcozulmus temsil</span>
+    decoded <span class="op">=</span> Dense(<span class="dv">784</span>, activation<span class="op">=</span><span class="st">&#39;sigmoid&#39;</span>)(encoded)
+    
+    <span class="co"># bu model girdiyi tekrar olusturulmus hale cevirir</span>
+    autoencoder <span class="op">=</span> Model(input_img, decoded)
+
+    <span class="co"># bu model girdiyi kodlanmis hale getirir</span>
+    encoder <span class="op">=</span> Model(input_img, encoded)
+
+    encoded_input <span class="op">=</span> Input(shape<span class="op">=</span>(encoding_dim,))
+    <span class="co"># ozkodlayicinin son tabakasini al bu kodcozulmus katman</span>
+    decoder_layer <span class="op">=</span> autoencoder.layers[<span class="op">-</span><span class="dv">1</span>]
+    <span class="co"># kodcozucu model</span>
+    decoder <span class="op">=</span> Model(encoded_input, decoder_layer(encoded_input))
+
+    autoencoder.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">&#39;adadelta&#39;</span>, loss<span class="op">=</span><span class="st">&#39;binary_crossentropy&#39;</span>)
+    <span class="cf">return</span> autoencoder, encoder, decoder
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: 
+ 
+    autoencoder, encoder, decoder <span class="op">=</span> get_model()
+
+    <span class="im">from</span> keras.datasets <span class="im">import</span> mnist
+    <span class="im">import</span> numpy <span class="im">as</span> np
+    (x_train, _), (x_test, _) <span class="op">=</span> mnist.load_data()
+
+    x_train <span class="op">=</span> x_train.astype(<span class="st">&#39;float32&#39;</span>) <span class="op">/</span> <span class="fl">255.</span>
+    x_test <span class="op">=</span> x_test.astype(<span class="st">&#39;float32&#39;</span>) <span class="op">/</span> <span class="fl">255.</span>
+    x_train <span class="op">=</span> x_train.reshape((<span class="bu">len</span>(x_train), np.prod(x_train.shape[<span class="dv">1</span>:])))
+    x_test <span class="op">=</span> x_test.reshape((<span class="bu">len</span>(x_test), np.prod(x_test.shape[<span class="dv">1</span>:])))
+    <span class="bu">print</span> (x_train.shape)
+    <span class="bu">print</span> (x_test.shape)
+
+    autoencoder.fit(x_train, x_train,
+                    epochs<span class="op">=</span><span class="dv">50</span>,
+                    batch_size<span class="op">=</span><span class="dv">256</span>,
+                    shuffle<span class="op">=</span><span class="va">True</span>,
+                    validation_data<span class="op">=</span>(x_test, x_test))
+
+    autoencoder.save(<span class="st">&#39;mod-autoenc-1.h5&#39;</span>)
+    encoder.save(<span class="st">&#39;mod-enc-1.h5&#39;</span>)
+    decoder.save(<span class="st">&#39;mod-dec-1.h5&#39;</span>)</code></pre></div>
+<p>Üstteki kodla modeli eğittikten sonra herhangi bir sayı resmini alıyoruz, kodluyoruz, kodçözme yapıyoruz ve tekrar oluşturulmuş hali ekrana basıyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> keras.datasets <span class="im">import</span> mnist
+<span class="im">import</span> mnist_autoenc
+
+(x_train, _), (x_test, y_test) <span class="op">=</span> mnist.load_data()
+x_test <span class="op">=</span> x_test.astype(<span class="st">&#39;float32&#39;</span>) <span class="op">/</span> <span class="fl">255.</span>
+autoencoder, encoder, decoder <span class="op">=</span> mnist_autoenc.get_model()
+encoder.load_weights(<span class="st">&quot;mod-enc-1.h5&quot;</span>)
+decoder.load_weights(<span class="st">&quot;mod-dec-1.h5&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">idx <span class="op">=</span> <span class="dv">1090</span>  <span class="co"># herhangi bir sayi resmini al</span>
+<span class="bu">print</span> y_test[idx]
+tmp <span class="op">=</span> x_test[idx, :, :].reshape(<span class="dv">1</span>,<span class="dv">28</span><span class="op">*</span><span class="dv">28</span>)
+encoded <span class="op">=</span> encoder.predict(tmp)
+<span class="bu">print</span> (encoded.shape)
+decoded <span class="op">=</span> decoder.predict(encoded).reshape(<span class="dv">28</span>,<span class="dv">28</span>)
+<span class="bu">print</span> (decoded.shape)
+plt.imshow(decoded)
+plt.gray()
+plt.savefig(<span class="st">&#39;autoenc_01.png&#39;</span>)</code></pre></div>
+<pre><code>9
+(1, 32)
+(28, 28)</code></pre>
+<div class="figure">
+<img src="autoenc_01.png" />
+
+</div>
+<p>9 resmini elde ettik.</p>
+<p>Biraz onceki resmin kodlanmis halini gosterelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (encoded)</code></pre></div>
+<pre><code>[[ 13.18540382   9.90277767   2.81214857  14.67686176   3.90287089
+    0.95043498   4.25797892  13.59305477   8.71218967   2.61786652
+    8.67911053   5.27269077   3.68898463   6.26301765   0.           3.73920846
+    4.90339994   6.61260319   8.80308342   5.41205883   0.           6.12768221
+   11.42174625   3.13173342   3.79943371  11.27116108   6.003757
+   10.82552242   8.44533443   4.84582376   5.63021088  11.27607727]]</code></pre>
+<p>32 boyutlu bir vektör içinde reel sayılar bunlar. Şimdi bu sayıları alıp başka bir sınıflayıcı içinde kullanabilirdim. Öyle bir uygulama düşünelim ki mesela müşterilerin yaşı, cinsiyeti bilgisi var, biz ayrıca herkesin fotoğrafları üzerinden bir özkodlayıcı eğitiyoruz, ve müşterinin resmi üzerinden elde edilen üstteki gibi bir temsili sıkıştırılmış gizli tabaka verisini yaş, cinsiyet ile beraber bu ayrı sınıflayıcıya verip cevap bekliyoruz. Bu sınıflayıcı &quot;potansiyel yaz alışverişçisi mi / değil mi'' şeklinde bir sınıflama yapıyor olabilir mesela, belki kişilerin resminde bu sınıflayıcıya yardım edecek bir şeyler vardır.. Bu ayrı sınıflayıcı bir YSA olabilir, ama çoğu zaman basit lojistik regresyon bile kullanılabiliyor. Ayrıca sadece bir değil, farklı veriler üzerinde işletilmiş pek çok özkodlayıcıdan gelen özet bilgisini de yan yana aynı lojistik regresyona verebiliriz.</p>
+<p>Zaman Serisi Özkodlaması, RNN</p>
+<p>Eğer zamana bağlı bir veri yapısını özkodlamak istesek nasıl bir model kullanırdık? Mesela birkaç boyutlu bir finans verisini (bir andaki hisse fiyatı, satım miktarı çok boyutlu bir vektörde olabilirdi) modelliyor olabilidiik. MNIST verisini bu şekilde kullanabiliriz aslında, 28 x 28 boyutlu veride sanki 28 tane 28 boyutlu veriyi zamana bağlı alıyormuşuz gibi görebilirdik, sanki resimde soldan sağa doğru dikey şeritler alıp teker teker bunları işlediğimizi düşünebiliriz. MNIST sayı görüntülerine bu şekilde bakmak aslında çok anlamsız değil, mesela bir altı görüntüsünü düşünürsek soldan sağa giderken kavisli yukarı doğru bir gidiş vardır, bu gidişi zamana bağlı bir NN yakalayabilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> keras.layers <span class="im">import</span> Input, Dense, concatenate
+<span class="im">from</span> keras.layers <span class="im">import</span> LSTMCell, RNN
+<span class="im">from</span> keras.layers <span class="im">import</span> Input, LSTM, RepeatVector
+<span class="im">from</span> keras.models <span class="im">import</span> Model
+
+latent_dim <span class="op">=</span> <span class="dv">20</span><span class="op">;</span> timesteps <span class="op">=</span> <span class="dv">28</span><span class="op">;</span> input_dim <span class="op">=</span> <span class="dv">28</span><span class="op">;</span> hist_dim <span class="op">=</span> <span class="dv">5</span>
+
+<span class="kw">def</span> get_model():
+    inputs <span class="op">=</span> Input(shape<span class="op">=</span>(timesteps, input_dim))
+
+    encoded <span class="op">=</span> LSTM(latent_dim,return_sequences<span class="op">=</span><span class="va">True</span>)(inputs)
+    decoded <span class="op">=</span> encoded
+    decoded <span class="op">=</span> LSTM(input_dim, return_sequences<span class="op">=</span><span class="va">True</span>)(decoded)
+
+    seq_autoencoder <span class="op">=</span> Model(inputs, decoded)
+
+    encoder <span class="op">=</span> Model(inputs, encoded)
+    <span class="cf">return</span> seq_autoencoder, encoder
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: 
+  
+    <span class="im">from</span> keras.datasets <span class="im">import</span> mnist
+    <span class="im">import</span> numpy <span class="im">as</span> np
+    (x_train, _), (x_test, _) <span class="op">=</span> mnist.load_data()
+
+    x_train <span class="op">=</span> x_train.astype(<span class="st">&#39;float32&#39;</span>) <span class="op">/</span> <span class="fl">255.</span>
+    x_test <span class="op">=</span> x_test.astype(<span class="st">&#39;float32&#39;</span>) <span class="op">/</span> <span class="fl">255.</span>
+    <span class="bu">print</span> (x_train.shape)
+    <span class="bu">print</span> (x_test.shape)
+
+    seq_autoencoder, encoder <span class="op">=</span> get_model()
+
+    seq_autoencoder.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">&#39;adadelta&#39;</span>, loss<span class="op">=</span><span class="st">&#39;binary_crossentropy&#39;</span>)
+
+    seq_autoencoder.fit(x_train, x_train,
+                        epochs<span class="op">=</span><span class="dv">50</span>,
+                        batch_size<span class="op">=</span><span class="dv">256</span>,
+                        shuffle<span class="op">=</span><span class="va">True</span>,
+                        validation_data<span class="op">=</span>(x_test, x_test))
+
+    seq_autoencoder.save(<span class="st">&#39;mod-rnn-autoenc-sim.h5&#39;</span>)
+    encoder.save(<span class="st">&#39;mod-rnn-enc-sim.h5&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> mnist_autoenc_rnn_simple
+
+seq_autoencoder, encoder <span class="op">=</span> mnist_autoenc_rnn_simple.get_model()
+seq_autoencoder.load_weights(<span class="st">&quot;mod-rnn-autoenc-sim.h5&quot;</span>)
+encoder.load_weights(<span class="st">&quot;mod-rnn-enc-sim.h5&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">decoded <span class="op">=</span> seq_autoencoder.predict(tmp).reshape(<span class="dv">28</span>,<span class="dv">28</span>)
+<span class="bu">print</span> (decoded.shape)
+plt.imshow(decoded)
+plt.gray()
+plt.savefig(<span class="st">&#39;autoenc_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="autoenc_03.png" />
+
+</div>
+<p>Varyasyonel Özkodlayıcılar (Variational Autoencoder -VAE-)</p>
+<p>Standard özkodlayıcıların bir problemi kodlama yaptıkları daralmış alandaki vektörlerin sürekli olmayabileceği, ve buradaki değerlerin kolay bir şekilde interpolasyon yapılmasındaki bazı zorluklar.</p>
+<p>VAE özkodlayıcılarda, kodlayıcı tabaka bir tamamen bağlanmış / yoğun (dense) bir katmandan geçiyor ama bir değişiklik var; yoğun katman <span class="math inline">\(\mu,\sigma\)</span> rasgele <em>değişkenleri</em> haline geliyor ve ondan bir sonraki katman bu değişkenlerden örneklem alıyor! Bu dahiyene bir düşünce. Fakat akla gelebilir - YSA yapısı deterministik bir yapıdır, örneklem, yani zar atma rasgele (stochastic) bir hesap. Bu kavramı YSA mekanizmasına nasıl dahil ediyoruz?</p>
+<div class="figure">
+<img src="autoenc_06.png" />
+
+</div>
+<p>Çözüm örneklem operasyonunu gürültü, yani Gaussian <span class="math inline">\(N(0,1)\)</span> + <span class="math inline">\(\mu\)</span> çarpı <span class="math inline">\(\sigma\)</span> olarak modellemek, bu şekilde sanki <span class="math inline">\(N(\mu,\sigma)\)</span>'dan örneklem alıyoruz, ama eğitilen, optimize edilen çarpma, toplama üzerinden <span class="math inline">\(\mu,\sigma\)</span> değişkenleri, ve halen YSA mekanizması devrede ve bu değişkenler deterministik değişkenler. Gürültü işin içinde var, ama gürültü eh, Gaussian sıfır merkezli bir stardart sapmalı gürültü. Bir gürültü bir diğerinden farklı değil, model için hepsi aynı gürültü.</p>
+<p>Üstteki mantığın temelinde şu bilgi var: Biliyoruz ki herhangi bir dağılıma sahip rasgele değişken <span class="math inline">\(z\)</span>'yi bir <span class="math inline">\(g\)</span> fonksiyonu kullanarak <span class="math inline">\(X=g(z)\)</span> ile başka bir dağılıma çevirebiliyoruz. Altta örneği görülüyor, soldaki resim Gaussian dağılımdan, sağdaki resim soldaki verilerin <span class="math inline">\(g(z) = z/10 + z/||z||\)</span> ile başka bir dağılıma eşlenmiş hali ve bu yeni dağılım bir çember şeklini oluşturmuş. VAE'nin rasgele dağılımlar yaratabilmesinin arkasında yatan gizem bu işte. Eğitim ile VAE <span class="math inline">\(g\)</span>'yi öğrenmiş oluyor, ki bu bir determinstik fonksiyon.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> random, numpy.linalg <span class="im">as</span> lin, pandas <span class="im">as</span> pd
+x <span class="op">=</span> np.random.randn(<span class="dv">1000</span>,<span class="dv">2</span>)
+x <span class="op">=</span> pd.DataFrame(x)
+x[<span class="st">&#39;n&#39;</span>] <span class="op">=</span> np.sqrt(x[<span class="dv">0</span>]<span class="op">*</span>x[<span class="dv">0</span>] <span class="op">+</span> x[<span class="dv">1</span>]<span class="op">*</span>x[<span class="dv">1</span>])
+x[<span class="st">&#39;g0&#39;</span>] <span class="op">=</span> (x[<span class="dv">0</span>]<span class="op">/</span><span class="fl">10.0</span>) <span class="op">+</span> x[<span class="dv">0</span>]<span class="op">/</span>x[<span class="st">&#39;n&#39;</span>]
+x[<span class="st">&#39;g1&#39;</span>] <span class="op">=</span> (x[<span class="dv">1</span>]<span class="op">/</span><span class="fl">10.0</span>) <span class="op">+</span> x[<span class="dv">1</span>]<span class="op">/</span>x[<span class="st">&#39;n&#39;</span>]
+plt.figure()
+ax <span class="op">=</span> plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)
+plt.plot(x[<span class="dv">0</span>],x[<span class="dv">1</span>],<span class="st">&#39;.&#39;</span>)
+ax <span class="op">=</span> plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)
+plt.plot(x[<span class="st">&#39;g0&#39;</span>],x[<span class="st">&#39;g1&#39;</span>],<span class="st">&#39;.&#39;</span>)
+plt.xlim(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>)
+plt.ylim(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>)
+plt.savefig(<span class="st">&#39;autoenc_10.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="autoenc_10.png" />
+
+</div>
+<div class="figure">
+<img src="autoenc_07.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">&quot;&quot;&quot;</span>
+<span class="co">Based on https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py</span>
+<span class="co">&quot;&quot;&quot;</span>
+<span class="im">import</span> keras
+<span class="im">from</span> keras.datasets <span class="im">import</span> mnist
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> keras <span class="im">import</span> backend <span class="im">as</span> K
+<span class="im">from</span> keras.models <span class="im">import</span> Sequential, Model
+<span class="im">from</span> keras.layers <span class="im">import</span> Input, LSTM, RepeatVector
+<span class="im">from</span> keras.layers.core <span class="im">import</span> Flatten, Dense, Dropout, Lambda
+<span class="im">from</span> keras.optimizers <span class="im">import</span> SGD, RMSprop, Adam
+<span class="im">from</span> keras <span class="im">import</span> objectives
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+timesteps <span class="op">=</span> <span class="dv">28</span><span class="op">;</span> input_dim <span class="op">=</span> <span class="dv">28</span><span class="op">;</span>
+batch_size <span class="op">=</span> <span class="dv">1</span>
+latent_dim <span class="op">=</span> <span class="dv">30</span>
+
+<span class="kw">def</span> create_lstm_vae(input_dim, 
+    timesteps, 
+    batch_size, 
+    intermediate_dim, 
+    latent_dim,
+    epsilon_std<span class="op">=</span><span class="fl">1.</span>):
+
+    x <span class="op">=</span> Input(shape<span class="op">=</span>(timesteps, input_dim,))
+    <span class="bu">print</span> (x)
+    
+    <span class="co"># LSTM encoding</span>
+    h <span class="op">=</span> LSTM(intermediate_dim)(x)
+    <span class="bu">print</span> (h)
+
+    <span class="co"># VAE Z layer</span>
+    z_mean <span class="op">=</span> Dense(latent_dim)(h)
+    z_log_sigma <span class="op">=</span> Dense(latent_dim)(h)
+    
+    <span class="kw">def</span> sampling(args):
+        z_mean, z_log_sigma <span class="op">=</span> args
+        epsilon <span class="op">=</span> K.random_normal(shape<span class="op">=</span>(batch_size, latent_dim),
+                                  mean<span class="op">=</span><span class="fl">0.</span>, stddev<span class="op">=</span>epsilon_std)
+        <span class="cf">return</span> z_mean <span class="op">+</span> z_log_sigma <span class="op">*</span> epsilon
+
+    z <span class="op">=</span> Lambda(sampling, output_shape<span class="op">=</span>(latent_dim,))([z_mean, z_log_sigma])
+    <span class="bu">print</span> (z)
+    
+    <span class="co"># decoded LSTM layer</span>
+    decoder_h <span class="op">=</span> LSTM(intermediate_dim, return_sequences<span class="op">=</span><span class="va">True</span>)
+    decoder_mean <span class="op">=</span> LSTM(input_dim, return_sequences<span class="op">=</span><span class="va">True</span>)
+
+    h_decoded <span class="op">=</span> RepeatVector(timesteps)(z)
+    <span class="bu">print</span> (h_decoded)
+    h_decoded <span class="op">=</span> decoder_h(h_decoded)
+    <span class="bu">print</span> (h_decoded)
+
+    <span class="co"># decoded layer</span>
+    x_decoded_mean <span class="op">=</span> decoder_mean(h_decoded)
+    <span class="bu">print</span> (x_decoded_mean)
+    
+    <span class="co"># end-to-end autoencoder</span>
+    vae <span class="op">=</span> Model(x, x_decoded_mean)
+
+    <span class="co"># encoder, from inputs to latent space</span>
+    encoder <span class="op">=</span> Model(x, z_mean)
+
+    <span class="co"># generator, from latent space to reconstructed inputs</span>
+    decoder_input <span class="op">=</span> Input(shape<span class="op">=</span>(latent_dim,))
+    <span class="bu">print</span> (decoder_input)
+
+    _h_decoded <span class="op">=</span> RepeatVector(timesteps)(decoder_input)
+    <span class="bu">print</span> (_h_decoded)
+    _h_decoded <span class="op">=</span> decoder_h(_h_decoded)
+    <span class="bu">print</span> (_h_decoded)
+
+    _x_decoded_mean <span class="op">=</span> decoder_mean(_h_decoded)
+    generator <span class="op">=</span> Model(decoder_input, _x_decoded_mean)
+    
+    <span class="kw">def</span> vae_loss(x, x_decoded_mean):
+        xent_loss <span class="op">=</span> objectives.mse(x, x_decoded_mean)
+        kl_loss <span class="op">=</span> <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> K.mean(<span class="dv">1</span> <span class="op">+</span> z_log_sigma <span class="op">-</span> K.square(z_mean) <span class="op">-</span> K.exp(z_log_sigma))
+        loss <span class="op">=</span> xent_loss <span class="op">+</span> kl_loss
+        <span class="cf">return</span> loss
+
+    
+    vae.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">&#39;rmsprop&#39;</span>, loss<span class="op">=</span>vae_loss)
+    
+    <span class="cf">return</span> vae, encoder, generator
+
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:
+    
+    (x_train, _), (x_test, _) <span class="op">=</span> mnist.load_data()
+    x_train <span class="op">=</span> x_train.astype(<span class="st">&#39;float32&#39;</span>) <span class="op">/</span> <span class="fl">255.</span>
+    <span class="co">#x_train = x_train[:200]</span>
+    x_test <span class="op">=</span> x_test.astype(<span class="st">&#39;float32&#39;</span>) <span class="op">/</span> <span class="fl">255.</span>
+    <span class="co">#x_test = x_test[:200]</span>
+    <span class="bu">print</span> (x_train.shape)
+    <span class="bu">print</span> (x_test.shape)    
+    x <span class="op">=</span> x_train
+    vae, enc, gen <span class="op">=</span> create_lstm_vae(input_dim, 
+        timesteps<span class="op">=</span>timesteps, 
+        batch_size<span class="op">=</span>batch_size, 
+        intermediate_dim<span class="op">=</span>latent_dim,
+        latent_dim<span class="op">=</span>latent_dim,
+        epsilon_std<span class="op">=</span><span class="fl">1.</span>)
+
+    vae.fit(x, x, validation_data<span class="op">=</span>(x_test, x_test), epochs<span class="op">=</span><span class="dv">30</span>)
+
+    vae.save(<span class="st">&#39;mnist_lstm_vae.h5&#39;</span>)
+    enc.save(<span class="st">&#39;mnist_lstm_enc.h5&#39;</span>)
+    gen.save(<span class="st">&#39;mnist_lstm_gen.h5&#39;</span>)
+    
+
+    <span class="co">#preds = vae.predict(x, batch_size=batch_size)</span>
+</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> mnist_lstm_vae
+
+vae, enc, gen <span class="op">=</span> mnist_lstm_vae.create_lstm_vae(mnist_lstm_vae.input_dim, 
+    timesteps<span class="op">=</span>mnist_lstm_vae.timesteps, 
+    batch_size<span class="op">=</span>mnist_lstm_vae.batch_size, 
+    intermediate_dim<span class="op">=</span>mnist_lstm_vae.latent_dim,
+    latent_dim<span class="op">=</span>mnist_lstm_vae.latent_dim,
+    epsilon_std<span class="op">=</span><span class="fl">1.</span>)
+vae.load_weights(<span class="st">&#39;mnist_lstm_vae.h5&#39;</span>)
+enc.load_weights(<span class="st">&#39;mnist_lstm_enc.h5&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> random
+idx <span class="op">=</span> <span class="dv">400</span> <span class="co"># herhangi bir imaji sec</span>
+<span class="bu">print</span> (tmp.shape)
+x_test_tmp <span class="op">=</span> x_test[idx]
+res <span class="op">=</span> vae.predict(x_test_tmp.reshape((<span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>)))
+
+plt.figure()
+ax <span class="op">=</span> plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)
+pixels <span class="op">=</span> res.reshape((<span class="dv">28</span>, <span class="dv">28</span>))
+plt.imshow(pixels)
+plt.gray()
+ax <span class="op">=</span> plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)
+plt.imshow(x_test_tmp)
+plt.gray()
+
+plt.savefig(<span class="st">&#39;autoenc_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="autoenc_04.png" />
+
+</div>
+<p>Gördüğümüz gibi zamansal işlem yaptık ama VAE çok iyi sonuç verdi. Hatta test imajını daha netleştirdi!</p>
+<p>Hasımsal Özkodlayıcı (Adverserial Autoencoder -AA-)</p>
+<p>Üretici Hasımsal Ağlar (Generative Adverserial Networks -GAN-) kavramının özkodlayıcılara uygulanmış hali AA olur.</p>
+<div class="figure">
+<img src="autoenc_09.png" />
+
+</div>
+<p>Burada bir kodlayıcı / kodçözücü yapısı var (üst blok) bu yapıdan kodlanmış ara tabaka <span class="math inline">\(z \sim q(z)\)</span> &quot;kötü'' örnekler çekilip <span class="math inline">\(p(z)\)</span>'den gelen &quot;iyi'' örnekler ile birleştiriliyor ve ayırdedici yine bu iki grup arasında ayırım yapmayı öğreniyor. Bu durumda üst bloktaki kodçözücü GAN'deki üretici gibi olur, ona dönüşür bir bakıma, çünkü öyle iyi üretim yapmaya çalışacaktır ki <span class="math inline">\(p(z)\)</span> gürültüsü ile onun aldığı kodlanmış tabaka verisi ayiredilemez hale gelmelidir. Tabii ki üst soldaki kodlayıcı bu ara tabakaya o şekilde temsili veri üretmeye çalışacaktır, bu arada kodlayıcı / kodçözücü yapısı da eğitilmiş olur. Yani <span class="math inline">\(z\)</span> bir anlamda alt soldaki gerçek gürültüye yaklaşır, bu gürültüden sayı üretebilir hale geliriz, bu klasik GAN, ayrıca bu &quot;kodlanmış'' gürültüyü üreten kodlayıcı / kodçözücü tabaka da ayrı bir şekilde kendini optimize eder ve kodlama işini yapar hale gelir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># import os</span>
+<span class="co"># os.environ[&quot;THEANO_FLAGS&quot;] = &quot;mode=FAST_COMPILE,device=cpu,floatX=float32&quot;</span>
+
+<span class="co"># This line allows mpl to run with no DISPLAY defined</span>
+<span class="im">from</span> keras.layers <span class="im">import</span> Dense, Reshape, Flatten, Input, merge
+<span class="im">from</span> keras.models <span class="im">import</span> Sequential, Model
+<span class="im">from</span> keras.optimizers <span class="im">import</span> Adam
+<span class="im">from</span> legacy <span class="im">import</span> l1l2
+<span class="im">import</span> keras.backend <span class="im">as</span> K
+<span class="im">import</span> pandas <span class="im">as</span> pd, os
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> adversarial_model <span class="im">import</span> AdversarialModel
+<span class="im">from</span> adversarial_utils <span class="im">import</span> fix_names, n_choice, normal_latent_sampling
+<span class="im">from</span> adversarial_optimizers <span class="im">import</span> AdversarialOptimizerSimultaneous
+<span class="im">from</span> keras.layers <span class="im">import</span> LeakyReLU, Activation
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> keras.datasets <span class="im">import</span> mnist
+
+<span class="kw">def</span> mnist_process(x):
+    x <span class="op">=</span> x.astype(np.float32) <span class="op">/</span> <span class="fl">255.0</span>
+    <span class="cf">return</span> x
+
+<span class="kw">def</span> mnist_data():
+    (xtrain, ytrain), (xtest, ytest) <span class="op">=</span> mnist.load_data()
+    <span class="cf">return</span> mnist_process(xtrain), mnist_process(xtest)
+
+
+<span class="kw">def</span> model_generator(latent_dim, input_shape,
+                    hidden_dim<span class="op">=</span><span class="dv">512</span>,
+                    reg<span class="op">=</span><span class="kw">lambda</span>: l1l2(<span class="fl">1e-7</span>, <span class="dv">0</span>)):
+    <span class="cf">return</span> Sequential([
+        Dense(hidden_dim, name<span class="op">=</span><span class="st">&quot;generator_h1&quot;</span>,
+              input_dim<span class="op">=</span>latent_dim,
+              W_regularizer<span class="op">=</span>reg()),
+        LeakyReLU(<span class="fl">0.2</span>),
+        Dense(hidden_dim,
+              name<span class="op">=</span><span class="st">&quot;generator_h2&quot;</span>,
+              W_regularizer<span class="op">=</span>reg()),
+        LeakyReLU(<span class="fl">0.2</span>),
+        Dense(np.prod(input_shape),
+              name<span class="op">=</span><span class="st">&quot;generator_x_flat&quot;</span>,
+              W_regularizer<span class="op">=</span>reg()),
+        Activation(<span class="st">&#39;sigmoid&#39;</span>),
+        Reshape(input_shape, name<span class="op">=</span><span class="st">&quot;generator_x&quot;</span>)],
+        name<span class="op">=</span><span class="st">&quot;generator&quot;</span>)
+
+
+<span class="kw">def</span> model_encoder(latent_dim, input_shape,
+                  hidden_dim<span class="op">=</span><span class="dv">512</span>,
+                  reg<span class="op">=</span><span class="kw">lambda</span>: l1l2(<span class="fl">1e-7</span>, <span class="dv">0</span>)):
+    x <span class="op">=</span> Input(input_shape, name<span class="op">=</span><span class="st">&quot;x&quot;</span>)
+    h <span class="op">=</span> Flatten()(x)
+    h <span class="op">=</span> Dense(hidden_dim, name<span class="op">=</span><span class="st">&quot;encoder_h1&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    h <span class="op">=</span> LeakyReLU(<span class="fl">0.2</span>)(h)
+    h <span class="op">=</span> Dense(hidden_dim, name<span class="op">=</span><span class="st">&quot;encoder_h2&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    h <span class="op">=</span> LeakyReLU(<span class="fl">0.2</span>)(h)
+    mu <span class="op">=</span> Dense(latent_dim, name<span class="op">=</span><span class="st">&quot;encoder_mu&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    log_sigma_sq <span class="op">=</span> Dense(latent_dim, name<span class="op">=</span><span class="st">&quot;encoder_log_sigma_sq&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    z <span class="op">=</span> merge([mu, log_sigma_sq], mode<span class="op">=</span><span class="kw">lambda</span> p: p[<span class="dv">0</span>] <span class="op">+</span> K.random_normal(K.shape(p[<span class="dv">0</span>])) <span class="op">*</span> K.exp(p[<span class="dv">1</span>] <span class="op">/</span> <span class="dv">2</span>),
+              output_shape<span class="op">=</span><span class="kw">lambda</span> p: p[<span class="dv">0</span>])
+    <span class="cf">return</span> Model(x, z, name<span class="op">=</span><span class="st">&quot;encoder&quot;</span>)
+
+
+<span class="kw">def</span> model_discriminator(latent_dim, output_dim<span class="op">=</span><span class="dv">1</span>, hidden_dim<span class="op">=</span><span class="dv">512</span>,
+                        reg<span class="op">=</span><span class="kw">lambda</span>: l1l2(<span class="fl">1e-7</span>, <span class="fl">1e-7</span>)):
+    z <span class="op">=</span> Input((latent_dim,))
+    h <span class="op">=</span> z
+    h <span class="op">=</span> Dense(hidden_dim, name<span class="op">=</span><span class="st">&quot;discriminator_h1&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    h <span class="op">=</span> LeakyReLU(<span class="fl">0.2</span>)(h)
+    h <span class="op">=</span> Dense(hidden_dim, name<span class="op">=</span><span class="st">&quot;discriminator_h2&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    h <span class="op">=</span> LeakyReLU(<span class="fl">0.2</span>)(h)
+    y <span class="op">=</span> Dense(output_dim, name<span class="op">=</span><span class="st">&quot;discriminator_y&quot;</span>, activation<span class="op">=</span><span class="st">&quot;sigmoid&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    <span class="cf">return</span> Model(z, y)
+
+
+<span class="kw">def</span> train(adversarial_optimizer):
+    <span class="co"># z \in R^100</span>
+    latent_dim <span class="op">=</span> <span class="dv">100</span>
+    <span class="co"># x \in R^{28x28}</span>
+    input_shape <span class="op">=</span> (<span class="dv">28</span>, <span class="dv">28</span>)
+
+    <span class="co"># generator (z -&gt; x)</span>
+    generator <span class="op">=</span> model_generator(latent_dim, input_shape)
+    <span class="co"># encoder (x -&gt;z)</span>
+    encoder <span class="op">=</span> model_encoder(latent_dim, input_shape)
+    <span class="co"># autoencoder (x -&gt; x&#39;)</span>
+    autoencoder <span class="op">=</span> Model(encoder.inputs, generator(encoder(encoder.inputs)))
+    <span class="co"># discriminator (z -&gt; y)</span>
+    discriminator <span class="op">=</span> model_discriminator(latent_dim)
+
+    <span class="co"># assemple AAE</span>
+    x <span class="op">=</span> encoder.inputs[<span class="dv">0</span>]
+    z <span class="op">=</span> encoder(x)
+    xpred <span class="op">=</span> generator(z)
+    zreal <span class="op">=</span> normal_latent_sampling((latent_dim,))(x)
+    yreal <span class="op">=</span> discriminator(zreal)
+    yfake <span class="op">=</span> discriminator(z)
+    aae <span class="op">=</span> Model(x, fix_names([xpred, yfake, yreal], [<span class="st">&quot;xpred&quot;</span>, <span class="st">&quot;yfake&quot;</span>, <span class="st">&quot;yreal&quot;</span>]))
+
+    <span class="co"># print summary of models</span>
+    generator.summary()
+    encoder.summary()
+    discriminator.summary()
+    autoencoder.summary()
+
+    <span class="co"># build adversarial model</span>
+    generative_params <span class="op">=</span> generator.trainable_weights <span class="op">+</span> encoder.trainable_weights
+    model <span class="op">=</span> AdversarialModel(base_model<span class="op">=</span>aae,
+                             player_params<span class="op">=</span>[generative_params, discriminator.trainable_weights],
+                             player_names<span class="op">=</span>[<span class="st">&quot;generator&quot;</span>, <span class="st">&quot;discriminator&quot;</span>])
+    model.adversarial_compile(adversarial_optimizer<span class="op">=</span>adversarial_optimizer,
+                              player_optimizers<span class="op">=</span>[Adam(<span class="fl">1e-4</span>, decay<span class="op">=</span><span class="fl">1e-4</span>), Adam(<span class="fl">1e-3</span>, decay<span class="op">=</span><span class="fl">1e-4</span>)],
+                              loss<span class="op">=</span>{<span class="st">&quot;yfake&quot;</span>: <span class="st">&quot;binary_crossentropy&quot;</span>, <span class="st">&quot;yreal&quot;</span>: <span class="st">&quot;binary_crossentropy&quot;</span>,
+                                    <span class="st">&quot;xpred&quot;</span>: <span class="st">&quot;mean_squared_error&quot;</span>},
+                              player_compile_kwargs<span class="op">=</span>[{<span class="st">&quot;loss_weights&quot;</span>: {<span class="st">&quot;yfake&quot;</span>: <span class="fl">1e-2</span>, <span class="st">&quot;yreal&quot;</span>: <span class="fl">1e-2</span>, <span class="st">&quot;xpred&quot;</span>: <span class="dv">1</span>}}] <span class="op">*</span> <span class="dv">2</span>)
+
+    <span class="co"># load mnist data</span>
+    xtrain, xtest <span class="op">=</span> mnist_data()
+
+    <span class="co"># callback for image grid of generated samples</span>
+    <span class="kw">def</span> generator_sampler():
+        zsamples <span class="op">=</span> np.random.normal(size<span class="op">=</span>(<span class="dv">10</span> <span class="op">*</span> <span class="dv">10</span>, latent_dim))
+        <span class="cf">return</span> generator.predict(zsamples).reshape((<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">28</span>, <span class="dv">28</span>))
+
+    <span class="co"># callback   for image grid of autoencoded samples</span>
+    <span class="kw">def</span> autoencoder_sampler():
+        xsamples <span class="op">=</span> n_choice(xtest, <span class="dv">10</span>)
+        xrep <span class="op">=</span> np.repeat(xsamples, <span class="dv">9</span>, axis<span class="op">=</span><span class="dv">0</span>)
+        xgen <span class="op">=</span> autoencoder.predict(xrep).reshape((<span class="dv">10</span>, <span class="dv">9</span>, <span class="dv">28</span>, <span class="dv">28</span>))
+        xsamples <span class="op">=</span> xsamples.reshape((<span class="dv">10</span>, <span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>))
+        samples <span class="op">=</span> np.concatenate((xsamples, xgen), axis<span class="op">=</span><span class="dv">1</span>)
+        <span class="cf">return</span> samples
+
+    <span class="co"># train network</span>
+    <span class="co"># generator, discriminator; pred, yfake, yreal</span>
+    n <span class="op">=</span> xtrain.shape[<span class="dv">0</span>]
+    y <span class="op">=</span> [xtrain, np.ones((n, <span class="dv">1</span>)), np.zeros((n, <span class="dv">1</span>)), xtrain, np.zeros((n, <span class="dv">1</span>)), np.ones((n, <span class="dv">1</span>))]
+    ntest <span class="op">=</span> xtest.shape[<span class="dv">0</span>]
+    ytest <span class="op">=</span> [xtest, np.ones((ntest, <span class="dv">1</span>)), np.zeros((ntest, <span class="dv">1</span>)), xtest, np.zeros((ntest, <span class="dv">1</span>)), np.ones((ntest, <span class="dv">1</span>))]
+    history <span class="op">=</span> model.fit(x<span class="op">=</span>xtrain, y<span class="op">=</span>y, validation_data<span class="op">=</span>(xtest, ytest), nb_epoch<span class="op">=</span><span class="dv">100</span>, batch_size<span class="op">=</span><span class="dv">32</span>)
+
+
+    <span class="co"># save model</span>
+    encoder.save(<span class="st">&quot;aae-norm-encoder.h5&quot;</span>)
+    generator.save(<span class="st">&quot;aae-norm-generator.h5&quot;</span>)
+    discriminator.save(<span class="st">&quot;aae-norm-discriminator.h5&quot;</span>)
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:
+    train(AdversarialOptimizerSimultaneous())</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> aae_normal
+latent_dim <span class="op">=</span> <span class="dv">100</span>
+input_shape <span class="op">=</span> (<span class="dv">28</span>, <span class="dv">28</span>)
+encoder <span class="op">=</span> aae_normal.model_encoder(latent_dim, input_shape)
+encoder.load_weights(<span class="st">&#39;aae-norm-encoder.h5&#39;</span>)
+generator <span class="op">=</span> aae_normal.model_generator(latent_dim, input_shape)
+generator.load_weights(<span class="st">&#39;aae-norm-generator.h5&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">idx <span class="op">=</span> <span class="dv">100</span> <span class="co"># herhangi bir imaji sec</span>
+<span class="bu">print</span> (x_test[idx, :].shape)
+res <span class="op">=</span> encoder.predict(x_test[idx, :].reshape(<span class="dv">1</span>,<span class="dv">28</span>,<span class="dv">28</span>))
+<span class="bu">print</span> (res.shape)
+pixels <span class="op">=</span> generator.predict(res)
+pixels <span class="op">=</span> pixels.reshape((<span class="dv">28</span>, <span class="dv">28</span>))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig(<span class="st">&#39;autoenc_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="autoenc_05.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># import os</span>
+<span class="co"># os.environ[&quot;THEANO_FLAGS&quot;] = &quot;mode=FAST_COMPILE,device=cpu,floatX=float32&quot;</span>
+
+<span class="co"># This line allows mpl to run with no DISPLAY defined</span>
+<span class="im">from</span> keras.layers <span class="im">import</span> Dense, Reshape, Flatten, Input, merge
+<span class="im">from</span> keras.models <span class="im">import</span> Sequential, Model
+<span class="im">from</span> keras.optimizers <span class="im">import</span> Adam
+<span class="im">from</span> legacy <span class="im">import</span> l1l2
+<span class="im">import</span> keras.backend <span class="im">as</span> K
+<span class="im">from</span> keras.datasets <span class="im">import</span> mnist
+<span class="im">import</span> numpy <span class="im">as</span> np, os, pandas <span class="im">as</span> pd
+<span class="im">from</span> adversarial_model <span class="im">import</span> AdversarialModel
+<span class="im">from</span> adversarial_utils <span class="im">import</span> fix_names, n_choice, normal_latent_sampling
+<span class="im">from</span> adversarial_optimizers <span class="im">import</span> AdversarialOptimizerSimultaneous
+<span class="im">from</span> keras.layers <span class="im">import</span> LeakyReLU, Activation, LSTM, GRU, RepeatVector
+
+<span class="kw">def</span> mnist_process(x):
+    x <span class="op">=</span> x.astype(np.float32) <span class="op">/</span> <span class="fl">255.0</span>
+    <span class="cf">return</span> x
+
+<span class="kw">def</span> mnist_data():
+    (xtrain, ytrain), (xtest, ytest) <span class="op">=</span> mnist.load_data()
+    <span class="cf">return</span> mnist_process(xtrain), mnist_process(xtest)
+
+activation<span class="op">=</span><span class="st">&#39;relu&#39;</span>
+
+<span class="kw">def</span> model_generator(latent_dim, input_shape,
+                    hidden_dim<span class="op">=</span><span class="dv">100</span>,
+                    reg<span class="op">=</span><span class="kw">lambda</span>: l1l2(<span class="fl">1e-7</span>, <span class="dv">0</span>)):
+    <span class="cf">return</span> Sequential([
+        Dense(np.prod(input_shape), activation<span class="op">=</span>activation,
+              name<span class="op">=</span><span class="st">&quot;generator_h1&quot;</span>, input_dim<span class="op">=</span>latent_dim,
+              W_regularizer<span class="op">=</span>reg()),
+        Reshape(input_shape, name<span class="op">=</span><span class="st">&quot;generator_x&quot;</span>),
+        GRU(latent_dim,return_sequences<span class="op">=</span><span class="va">True</span>),
+        GRU(<span class="dv">28</span>,return_sequences<span class="op">=</span><span class="va">True</span>),
+        ],
+        name<span class="op">=</span><span class="st">&quot;generator&quot;</span>)
+
+
+<span class="kw">def</span> model_encoder(latent_dim, input_shape,
+                  hidden_dim<span class="op">=</span><span class="dv">100</span>,
+                  reg<span class="op">=</span><span class="kw">lambda</span>: l1l2(<span class="fl">1e-7</span>, <span class="dv">0</span>)):
+    x <span class="op">=</span> Input(input_shape, name<span class="op">=</span><span class="st">&quot;x&quot;</span>)
+    h <span class="op">=</span> GRU(hidden_dim, return_sequences<span class="op">=</span><span class="va">True</span>)(x)
+    h <span class="op">=</span> GRU(hidden_dim)(h)
+    h <span class="op">=</span> Dense(hidden_dim, activation<span class="op">=</span>activation,
+              name<span class="op">=</span><span class="st">&quot;encoder_h3&quot;</span>,
+              W_regularizer<span class="op">=</span>reg())(h)    
+    
+    mu <span class="op">=</span> Dense(latent_dim, name<span class="op">=</span><span class="st">&quot;encoder_mu&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    
+    log_sigma_sq <span class="op">=</span> Dense(latent_dim, name<span class="op">=</span><span class="st">&quot;encoder_log_sigma_sq&quot;</span>,
+                         W_regularizer<span class="op">=</span>reg())(h)
+    
+    z <span class="op">=</span> merge([mu, log_sigma_sq],
+              mode<span class="op">=</span><span class="kw">lambda</span> p: p[<span class="dv">0</span>] <span class="op">+</span> K.random_normal(K.shape(p[<span class="dv">0</span>])) <span class="op">*</span> K.exp(p[<span class="dv">1</span>] <span class="op">/</span> <span class="dv">2</span>),
+              output_shape<span class="op">=</span><span class="kw">lambda</span> p: p[<span class="dv">0</span>])
+    
+    <span class="cf">return</span> Model(x, z, name<span class="op">=</span><span class="st">&quot;encoder&quot;</span>)
+
+
+<span class="kw">def</span> model_discriminator(latent_dim, output_dim<span class="op">=</span><span class="dv">1</span>, hidden_dim<span class="op">=</span><span class="dv">100</span>,
+                        reg<span class="op">=</span><span class="kw">lambda</span>: l1l2(<span class="fl">1e-7</span>, <span class="fl">1e-7</span>)):
+    z <span class="op">=</span> Input((latent_dim,))
+    h <span class="op">=</span> z
+    h <span class="op">=</span> Dense(hidden_dim, name<span class="op">=</span><span class="st">&quot;discriminator_h1&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    h <span class="op">=</span> LeakyReLU(<span class="fl">0.2</span>)(h)
+    h <span class="op">=</span> Dense(hidden_dim, name<span class="op">=</span><span class="st">&quot;discriminator_h2&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    h <span class="op">=</span> LeakyReLU(<span class="fl">0.2</span>)(h)
+    y <span class="op">=</span> Dense(output_dim, name<span class="op">=</span><span class="st">&quot;discriminator_y&quot;</span>, activation<span class="op">=</span><span class="st">&quot;sigmoid&quot;</span>, W_regularizer<span class="op">=</span>reg())(h)
+    <span class="cf">return</span> Model(z, y)
+
+
+<span class="kw">def</span> example_aae(adversarial_optimizer):
+    <span class="co"># z \in R^100</span>
+    latent_dim <span class="op">=</span> <span class="dv">200</span>
+    <span class="co"># x \in R^{28x28}</span>
+    input_shape <span class="op">=</span> (<span class="dv">28</span>, <span class="dv">28</span>)
+
+    <span class="co"># generator (z -&gt; x)</span>
+    generator <span class="op">=</span> model_generator(latent_dim, input_shape)
+    <span class="co"># encoder (x -&gt;z)</span>
+    encoder <span class="op">=</span> model_encoder(latent_dim, input_shape)
+    <span class="co"># autoencoder (x -&gt; x&#39;)</span>
+    <span class="bu">print</span> (encoder.inputs)
+    e <span class="op">=</span> encoder(encoder.inputs)
+    g <span class="op">=</span> generator(e)
+    autoencoder <span class="op">=</span> Model(encoder.inputs, g)
+    <span class="co"># discriminator (z -&gt; y)</span>
+    discriminator <span class="op">=</span> model_discriminator(latent_dim)
+
+    <span class="co"># assemple AAE</span>
+    x <span class="op">=</span> encoder.inputs[<span class="dv">0</span>]
+    z <span class="op">=</span> encoder(x)
+    xpred <span class="op">=</span> generator(z)
+    zreal <span class="op">=</span> normal_latent_sampling((latent_dim,))(x)
+    yreal <span class="op">=</span> discriminator(zreal)
+    yfake <span class="op">=</span> discriminator(z)
+    aae <span class="op">=</span> Model(x, fix_names([xpred, yfake, yreal], [<span class="st">&quot;xpred&quot;</span>, <span class="st">&quot;yfake&quot;</span>, <span class="st">&quot;yreal&quot;</span>]))
+
+    <span class="co"># print summary of models</span>
+    generator.summary()
+    encoder.summary()
+    discriminator.summary()
+    autoencoder.summary()
+
+    <span class="co"># build adversarial model</span>
+    generative_params <span class="op">=</span> generator.trainable_weights <span class="op">+</span> encoder.trainable_weights
+    model <span class="op">=</span> AdversarialModel(base_model<span class="op">=</span>aae,
+                             player_params<span class="op">=</span>[generative_params, discriminator.trainable_weights],
+                             player_names<span class="op">=</span>[<span class="st">&quot;generator&quot;</span>, <span class="st">&quot;discriminator&quot;</span>])
+    model.adversarial_compile(adversarial_optimizer<span class="op">=</span>adversarial_optimizer,
+                              player_optimizers<span class="op">=</span>[Adam(<span class="fl">1e-4</span>, decay<span class="op">=</span><span class="fl">1e-4</span>), Adam(<span class="fl">1e-3</span>, decay<span class="op">=</span><span class="fl">1e-4</span>)],
+                              loss<span class="op">=</span>{<span class="st">&quot;yfake&quot;</span>: <span class="st">&quot;binary_crossentropy&quot;</span>, <span class="st">&quot;yreal&quot;</span>: <span class="st">&quot;binary_crossentropy&quot;</span>,
+                                    <span class="st">&quot;xpred&quot;</span>: <span class="st">&quot;mean_squared_error&quot;</span>},
+                              player_compile_kwargs<span class="op">=</span>[{<span class="st">&quot;loss_weights&quot;</span>: {<span class="st">&quot;yfake&quot;</span>: <span class="fl">1e-2</span>, <span class="st">&quot;yreal&quot;</span>: <span class="fl">1e-2</span>, <span class="st">&quot;xpred&quot;</span>: <span class="dv">1</span>}}] <span class="op">*</span> <span class="dv">2</span>)
+
+    <span class="co"># load mnist data</span>
+    xtrain, xtest <span class="op">=</span> mnist_data()
+
+    <span class="co"># callback for image grid of generated samples</span>
+    <span class="kw">def</span> generator_sampler():
+        zsamples <span class="op">=</span> np.random.normal(size<span class="op">=</span>(<span class="dv">10</span> <span class="op">*</span> <span class="dv">10</span>, latent_dim))
+        <span class="cf">return</span> generator.predict(zsamples).reshape((<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">28</span>, <span class="dv">28</span>))
+
+    <span class="co"># callback   for image grid of autoencoded samples</span>
+    <span class="kw">def</span> autoencoder_sampler():
+        xsamples <span class="op">=</span> n_choice(xtest, <span class="dv">10</span>)
+        xrep <span class="op">=</span> np.repeat(xsamples, <span class="dv">9</span>, axis<span class="op">=</span><span class="dv">0</span>)
+        xgen <span class="op">=</span> autoencoder.predict(xrep).reshape((<span class="dv">10</span>, <span class="dv">9</span>, <span class="dv">28</span>, <span class="dv">28</span>))
+        xsamples <span class="op">=</span> xsamples.reshape((<span class="dv">10</span>, <span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>))
+        samples <span class="op">=</span> np.concatenate((xsamples, xgen), axis<span class="op">=</span><span class="dv">1</span>)
+        <span class="cf">return</span> samples
+    
+    <span class="co"># train network</span>
+    <span class="co"># generator, discriminator; pred, yfake, yreal</span>
+    n <span class="op">=</span> xtrain.shape[<span class="dv">0</span>]
+    y <span class="op">=</span> [xtrain, np.ones((n, <span class="dv">1</span>)), np.zeros((n, <span class="dv">1</span>)), xtrain, np.zeros((n, <span class="dv">1</span>)), np.ones((n, <span class="dv">1</span>))]
+    ntest <span class="op">=</span> xtest.shape[<span class="dv">0</span>]
+    ytest <span class="op">=</span> [xtest, np.ones((ntest, <span class="dv">1</span>)), np.zeros((ntest, <span class="dv">1</span>)), xtest, np.zeros((ntest, <span class="dv">1</span>)), np.ones((ntest, <span class="dv">1</span>))]
+    history <span class="op">=</span> model.fit(x<span class="op">=</span>xtrain, y<span class="op">=</span>y, validation_data<span class="op">=</span>(xtest, ytest), nb_epoch<span class="op">=</span><span class="dv">50</span>, batch_size<span class="op">=</span><span class="dv">32</span>)
+
+    <span class="co"># save model</span>
+    encoder.save(<span class="st">&quot;aae-lstm-encoder.h5&quot;</span>)
+    generator.save(<span class="st">&quot;aae-lstm-generator.h5&quot;</span>)
+    discriminator.save(<span class="st">&quot;aae-lstm-discriminator.h5&quot;</span>)
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:
+    example_aae(AdversarialOptimizerSimultaneous())</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> aae_lstm
+latent_dim <span class="op">=</span> <span class="dv">200</span>
+input_shape <span class="op">=</span> (<span class="dv">28</span>, <span class="dv">28</span>)
+encoder <span class="op">=</span> aae_lstm.model_encoder(latent_dim, input_shape)
+encoder.load_weights(<span class="st">&#39;aae-lstm-encoder.h5&#39;</span>)
+generator <span class="op">=</span> aae_lstm.model_generator(latent_dim, input_shape)
+generator.load_weights(<span class="st">&#39;aae-lstm-generator.h5&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">idx <span class="op">=</span> <span class="dv">1030</span> <span class="co"># herhangi bir imaji sec</span>
+res <span class="op">=</span> encoder.predict(x_test[idx, :].reshape(<span class="dv">1</span>, <span class="dv">28</span>,<span class="dv">28</span>))
+pixels <span class="op">=</span> generator.predict(res)
+pixels <span class="op">=</span> pixels.reshape((<span class="dv">28</span>, <span class="dv">28</span>))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig(<span class="st">&#39;autoenc_08.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="autoenc_08.png" />
+
+</div>
+<p>Kaynaklar</p>
+<p>[1] [https://blog.keras.io/building-autoencoders-in-keras.html](https://blog.keras.io/building-autoencoders-in-keras.html)</p>
+<p>[2] <em>Adverserial Autoencoder Keras</em>, <a href="https://github.com/bstriner/keras-adversarial/blob/master/examples/example_aae.py" class="uri">https://github.com/bstriner/keras-adversarial/blob/master/examples/example_aae.py</a></p>
+<p>[3] [https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf](https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf)</p>
+<p>[4] [https://hsaghir.github.io/data_science/denoising-vs-variational-autoencoder/](https://hsaghir.github.io/data_science/denoising-vs-variational-autoencoder/)</p>
+<p>[5] Doersch, Tutorial on Variational Autoencoders, <a href="https://arxiv.org/pdf/1606.05908.pdf" class="uri">https://arxiv.org/pdf/1606.05908.pdf</a></p>
+<p>[6] Goodfellow, Adversarial Autoencoders, <a href="https://arxiv.org/pdf/1511.05644.pdf" class="uri">https://arxiv.org/pdf/1511.05644.pdf</a></p>
+<p>[7] What is Adversarial Autoencoder?, <a href="https://www.quora.com/What-is-Adversarial-Autoencoder" class="uri">https://www.quora.com/What-is-Adversarial-Autoencoder</a></p>
+<p>[8] [http://www.inference.vc/adversarial-autoencoders/](http://www.inference.vc/adversarial-autoencoders/)</p>
+</body>
+</html>

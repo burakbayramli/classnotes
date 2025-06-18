@@ -1,0 +1,440 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-2">Ders 2</h1>
+<p>Gerçek dünyada çoğu ODE sayısal (numerical) yöntemlerle çözülür. Bilgisayarınızda bir ODE'yi grafiklettirdiğiniz zaman da aslında arka planda bilgisayar o denklemi sayısal olarak çözmekte ve sonucu grafiklettirmektedir. Bir başlangıç değerli (initial value) probleminin formunu yazalım:</p>
+<p><span class="math display">\[
+y&#39; = f(x,y)
+\]</span></p>
+<p><span class="math display">\[
+y_1(x_o) = y_o
+\]</span></p>
+<p>Problemde ilk satır ODE, ikinci satır bu ODE'nin başlangıç değeri, <span class="math inline">\(x_0\)</span> ve <span class="math inline">\(y_0\)</span> sabit değerler.</p>
+<p>Sayısal olarak (mesela Euler yöntemiyle) bu denklemi çözmek ne demektir? Alttaki çizime bakalım, <span class="math inline">\(y_0\)</span>'dan değerinden başlıyoruz, bu noktada <span class="math inline">\(x_0,y_0\)</span> noktasındaki eğimi <span class="math inline">\(y&#39;\)</span> ile hesaplıyoruz, ve bu eğim bize <span class="math inline">\(y\)</span>'nin olacağı bir sonraki yeri söylüyor. Bu eğim ile yukarı ya da aşağı çıkıyoruz, ve bunu devam ettiriyoruz, ta ki bir sonuca gelinceye kadar.</p>
+<div class="figure">
+<img src="2_1.jpg" />
+
+</div>
+<p>Peki bahsedilen ODE bağlamında bir yere &quot;gitmek'' ne demektir? Takip ettiğimiz, cevap olarak odaklandığımız <span class="math inline">\(y\)</span> fonksiyonudur. Unutmayalım ki bu fonksiyonun tam hali <span class="math inline">\(y(x)\)</span>, yani <span class="math inline">\(y\)</span>, <span class="math inline">\(x\)</span>'in bir fonksiyonu, <span class="math inline">\(y\)</span>'nin türevi <span class="math inline">\(y\)</span>'nin <span class="math inline">\(x\)</span>'e göre türevi demek. Türev eğim demektir, eğim fonksiyonun o noktadaki kabaca, yaklaşıksal bir yönüdür. O yönü takıp edersek o fonksiyonu aşağı yukarı takip ediyoruz demektir.</p>
+<p>Grafikte <span class="math inline">\(h\)</span> basamak mesafesi, yani <span class="math inline">\(x\)</span> üzerinde yaptığımız sabit zıplama mesafesi. Bu kordinatta hangi aralıkla zıplıyoruz? 0.1 mi, 1 mi, 5 mi? Bunun seçimini biz yapıyoruz.</p>
+<p>Euler Denklemleri bir adım için şöyle tanımlıdır:</p>
+<p><span class="math display">\[ x_{n+1} = x_n + h \]</span></p>
+<p><span class="math display">\[ y_{n+1} = y_n + hA_n \]</span></p>
+<p><span class="math display">\[ A_n = f(x_n, y_n) \]</span></p>
+<p>Bu basamaklar özyineli (recursive) olarak tanımlanır, bir sonraki adım, bir önceki adımın değerlerini kullanır.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ y&#39; = x^2 - y^2 \]</span></p>
+<p><span class="math display">\[ y_1(0) = 1 \]</span></p>
+<p><span class="math display">\[ h = 0.1 \]</span></p>
+<p>Üstteki formül temel (elementary) fonksiyonlar kullanılarak çözülemez. O yüzden Euler'in yöntemi gibi bir sayısal çözüm burada uygun olur.</p>
+<p><span class="math display">\[
+\begin{array}{ccccc}
+n &amp; x_n &amp; y_n &amp; A_n &amp; hA_n \\
+\hline
+0 &amp; 0 &amp; 1 &amp; -1 &amp; -0.1 \\
+\hline
+1 &amp; .1 &amp; .9 &amp; -.80 &amp; -0.08 \\
+\hline
+2 &amp; .2 &amp; .82 &amp;  &amp; 
+\end{array}
+\]</span></p>
+<p><span class="math inline">\(y\)</span> için eriştiğimiz sonuç .82 değeridir. Şimdi şunu soralım: Bu cevap çok yukarıda mı çok aşağıda bir cevap mı? Pür sayısal sonuçlarda karşılaşılan bir problem budur, gerçek cevabı analitik olarak bilmediğimiz için ona ne kadar yaklaşıp yaklaşmadığımız. Cevabı geometrik olarak verelim. Eğer çözüm bir düz çizgi olsaydı, Euler metodu her bu çizgi üzerinde hep doğru cevabı veriyor olurdu.</p>
+<div class="figure">
+<img src="2_2.jpg" />
+
+</div>
+<p>Eğer çözüm dışbükey (concave) olsaydı, üstteki gibi Euler metodu çok aşağı düşecekti. İlk adımda fazla aşağı inecekti, ve sonra bu hatadan dönemeyecek, hep esas fonksiyona uzak kalacaktı. İçbükey olunca benzer şekilde, ama fazla yukarıda kalacaktı.</p>
+<p>Peki elimizde bir analitik cevap olmadığına göre cevabın düşbükey (convex) mi içbükey mi (concave) olup olmadığını nereye bakarak anlayacağız? Calculus tekrar hızır gibi imdada yetişiyor. İkinci türevi hatırlayalım: Eğer <span class="math inline">\(y&#39;&#39; &gt; 0\)</span> ise birinci türev sürekli artıyor demektir, yani <span class="math inline">\(y\)</span> dişbükeydir. Eğer <span class="math inline">\(y&#39;&#39; &lt; 0\)</span> ise tam tersi. Fakat hala bir problem var, analitik fonksiyon yok ise ikinci türevi nasıl hesaplayacağız? Cevap: Diferansiyel fonksiyonun kendisini kullanarak.</p>
+<p><span class="math inline">\(y&#39; = x^2 - y^2\)</span>'nin türevini alırsak,</p>
+<p><span class="math inline">\(y&#39;&#39; = 2x - 2yy&#39;\)</span> sonucunu elde ederiz (türev alırken zincirleme kanununu kullandığımıza dikkat).</p>
+<p>O zaman başlangıç noktası <span class="math inline">\((0,1)\)</span> de <span class="math inline">\(y&#39;&#39;\)</span> nedir? <span class="math inline">\(y&#39;(0) = -1\)</span>, <span class="math inline">\(y&#39;&#39;= 2 \cdot 0 - 2\cdot 1 = 2\)</span>. Demek ki çözüm başlangıçta dişbükey, ve Euler çözümünü uzun süreli takip etmezsek çözümün çok altında kalabiliriz.</p>
+<p>Tabii ki çözüm bir dış bir iç olarak sürekli değişen, dalgalı bir yapıda olabilir, bu da mümkün. Burada asıl göstermek istediğimiz diferansiyel denklemin kendisini kullanarak çözüm hakkında analitik hiçbir şey bilmeden onun hakkında nasıl bilgi edinebileceğimizi görmektir.</p>
+<p>Hata Analizi</p>
+<div class="figure">
+<img src="2_3.png" />
+
+</div>
+<p>Hata analizi Euler'in çözüme ne kadar uzak kaldığının hesabıdır, yani <span class="math inline">\(e\)</span> sayısını hesaplamaktır. Bu değerin mutlak değeri (absolute value) kullanılır.</p>
+<p>Daha iyi sonuçlar için daha küçük <span class="math inline">\(h\)</span> basamakları kullanılabilir, o zaman sonuca daha yakın kalabiliriz. O zaman <span class="math inline">\(e\)</span>'nin <span class="math inline">\(h\)</span>'ye bağlı olduğunu söyleyebiliriz. Formülsel olarak bu ifade suna benzer:</p>
+<p><span class="math display">\[
+|e \sim c_1 h|
+\]</span></p>
+<p>Buna ifadeye göre Euler metotu birinci derece bir metottur denir, bu derecenin ODE'nin derecesiyle alakası yok, <span class="math inline">\(h\)</span>'nin üstteki formülde hangi üstel formde olduğuyla alakalı. Birincil derecede bir ilişki mesela basamağı yarısına indirince hatayı yarısına indirirmek demektir.</p>
+<p>Euler metodundan daha bir yöntem bulmak demek, eğimi daha iyi hesaplayan bir yöntem bulmak demektir. Eğer hatada rol oynayan en önemli faktör eğim olduğuna göre, daha az hata için daha iyi eğim hesaplamak mantıklı olacaktır.</p>
+<div class="figure">
+<img src="2_4.png" />
+
+</div>
+<p>Daha iyi eğim nasıl hesaplanır? Diyelim ki tek bir zıplama yerine iki kere zıpladık. Dişbükey durumda birinci zıplamada çok aşağı, ikincide biraz daha yukarı gidiyor olurduk, o zaman bunların ortalamasını alırsak, daha iyi bir eğim elde edebilirdik.</p>
+<p><span class="math display">\[ x_{n+1} = x_n + h \]</span></p>
+<p><span class="math display">\[ \hat{y}_{n+1} = y_n + h A_n \]</span></p>
+<p><span class="math display">\[ B_n = f(x_{n+1},\hat{y}_{n+1}) \]</span></p>
+<p><span class="math display">\[ y_{n+1} = y_n + h(\frac{A_n+B_n}{2}) \]</span></p>
+<p>Niye şapkalı <span class="math inline">\(y\)</span> yani <span class="math inline">\(\hat{y}\)</span> kullandık? Çünkü ortalama hesaplamak için aslında n+1 noktasında geçici bir değer hesaplıyoruz, bu geçiciliği göstermek için <span class="math inline">\(\hat{y}\)</span> ifadesini kullandık.</p>
+<p>Bu metot Heun, Geliştirilmiş (Improved) Euler, Değiştirilmiş (Modified) Euler, RK2 gibi isimlerle anılır. RK2 Runga-Kutta'nın kısaltması, '2' ibaresi bu yöntemin ikinci dereceli bir metot olmasıdır. Yani</p>
+<p><span class="math display">\[ e \sim c_2 h^2 \]</span></p>
+<p>Basamağı yarısına indirmek hatayı dörtte birine indirmek demektir. O zaman niye bu metot her yerde kullanılmıyor? Çünkü RK2 ile eğim iki kere hesaplanıyor, Euler ile bir kere, yani sayısal kod iki kat daha fazla çalışmak, yani daha yavaşlamak zorundadır.</p>
+<p>RK4 te var, bu dördüncü seviyede bir metot. Eğim şöyle hesaplanır:</p>
+<p><span class="math display">\[ \frac{A_n + 2B_n + 2C_n + D_n}{6} \]</span></p>
+<p>Sayısal Yöntemlerde Bazı Tehlikeli Noktalar</p>
+<ol style="list-style-type: decimal">
+<li><p>Hoca ödevde bizim keşfetmemizi istedi</p></li>
+<li><p>Şu basit denkleme bakalım: <span class="math inline">\(y&#39; = y^2\)</span>. Değişkenleri ayıralım ve analitik cevabı <span class="math inline">\(y=\frac{1}{c}\)</span>. O zaman bu denklemi sayısal olarak çözerken alttaki grafik takip ediliyor olacak.</p></li>
+</ol>
+<div class="figure">
+<img src="2_5.png" />
+
+</div>
+<p>Diyelim ki <span class="math inline">\(y(0) = 1\)</span>'den başladık ve <span class="math inline">\(y(2)\)</span>'i bulacağız. Sağa doğru yavaş yavaş gidiyoruz ama problem, bu fonksiyon <span class="math inline">\(y(1)\)</span> değerinde sonsuza gidiyor. Demek ki adım adım sağa giden sayısal çözüm o noktayı hiçbir zaman aşamayacaktır, sonsuzlukta kaybolacaktır. Bu tehlikeli noktayı önceden tahmin edemez miydik? Hayır. Üstteki diferansiyel denklemin her çözümünün kendine has bir eşsizsel (singularity) noktası vardır ve bundan sadece kendisi haberdadır.</p>
+<p>Ekler</p>
+<p>Taylor Açılımı Bağlantıları</p>
+<p>Euler yöntemininin çoğu kaynakta ODE sistemini &quot;entegre ettiği'' söylenir; hakikaten de bir entegrasyon yapıyoruz, yani <span class="math inline">\(dy\)</span> değişim formülünü <span class="math inline">\(y\)</span>'ye uygulayarak adım adım ilerliyoruz, <span class="math inline">\(y\)</span>'nin değerlerini bulmuş oluyoruz, bu bir entegrasyon işlemidir. Euler fonksiyonu ile analitik fonksiyonları sayısal entegre etmiş oluyoruz.</p>
+<p>Range-Kutta ile atılan adımlar üzerinde oynama yapılarak ilerleme sağlanmaya uğraşılıyor. Fakat aslında Taylor açılımı kullanarak ta ODE çözmek mümkün [1, sf. 395]. Bu metot çoğunlukla teşvik edilmiyor çünkü bazı denklemlerin 2., 3. türevini sembolik olarak almak çok zor. Fakat otomatik türev ile, bkz [2], bu türevler rahatlıkla alınabilir. Altta gösterme amaçlı olarak sembolik alınabilen türevli ODE gösteriyoruz.</p>
+<p>ODE bir <span class="math inline">\(y(t)&#39; = f(x,y)\)</span> sistemidir,</p>
+<p><span class="math display">\[ y(t)&#39; = t + y , \quad y(1) = 2\]</span></p>
+<p>Bu sistemin çözümü biliniyor,</p>
+<p><span class="math display">\[ y(t) = -t -1 + 4e^{-1}e^t\]</span></p>
+<p>Eğer çözüm bilinmeseydi, sayısal olarak çözmek gerekecekti. <span class="math inline">\(a\)</span> yakınında <span class="math inline">\(g(x)\)</span>'in Taylor açılımını analitik olarak biliyoruz,</p>
+<p><span class="math display">\[ g(x) = g(a) + g&#39;(a)(x-a) + g&#39;&#39;(a) \frac{(x-a)^2}{2}\]</span></p>
+<p>Eğer <span class="math inline">\(x\)</span>'i <span class="math inline">\(h\)</span> adım atarak <span class="math inline">\(a\)</span>'den gelinen nokta olarak belirtirsek</p>
+<p><span class="math display">\[ x=a+h\]</span></p>
+<p><span class="math display">\[ g(a+h) = g(a) + g&#39;(a)h + g&#39;&#39;(a)\frac{h^2}{2}\]</span></p>
+<p>Bu açılım özyineli bir hesabı ima ediyor; yani <span class="math inline">\(h\)</span> adımı sonrasında elde edilen yeni <span class="math inline">\(g\)</span>'nin bir önceki adımdaki değerler ile nasıl bağlantılı olduğunu gösteriyor. O zaman <span class="math inline">\(g\)</span> yerine üstteki <span class="math inline">\(f\)</span> tanımını geçirirsek,</p>
+<p><span class="math display">\[ y_{k+1} = y_k + h \frac{d}{dt} f(t_k,y_l) + \frac{h^2}{2} \frac{d^2}{dt} f(t_k,y_l)\]</span></p>
+<p><span class="math display">\[  = y_k + hf(t_k,y_k) + \frac{h^2}{2} \frac{d}{dt} f(t_k,y_l)\]</span></p>
+<p>Aslında Euler yöntemi olarak bilinen yöntem üstteki formülde ilk iki terimin tutulup gerisinin atılmasıyla elde edilmiştir. O zaman daha iyi hesap için üstteki tüm terimleri (hatta açılımı devam ettirerek daha bile fazlasını) kullanabilirdik. 3. terimdeki diferansiyel hesabı için, tam diferansiyel (total derivative) tanımından,</p>
+<p><span class="math display">\[ 
+df = \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial y} dy
+\]</span></p>
+<p>Yani</p>
+<p><span class="math display">\[ 
+\frac{df}{dt} = \frac{\partial f}{\partial t} + 
+\frac{\partial f}{\partial y} \frac{dy}{dt} 
+\]</span></p>
+<p><span class="math inline">\(y&#39;(t)=dy/dt\)</span> olduğuna göre <span class="math inline">\(t + y\)</span>'ye eşittir, onu üstte yerine koyarız, kısmi türevleri de hesapladıktan sonra,</p>
+<p><span class="math display">\[ 
+\frac{df}{dt} =  1 + t + y
+\]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[  = y_k + hf(t_k,y_k) + \frac{h^2}{2} (1 + t_k + y_k) \]</span></p>
+<p>İlk önce normal Euler gösterelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+y1 <span class="op">=</span> <span class="dv">2</span><span class="op">;</span> t <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span> N <span class="op">=</span> <span class="dv">5</span><span class="op">;</span> h <span class="op">=</span> <span class="fl">0.1</span>
+vals <span class="op">=</span> []
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N): 
+    yreal <span class="op">=</span> <span class="op">-</span>t<span class="dv">-1</span><span class="op">+</span><span class="dv">4</span><span class="op">*</span>(<span class="fl">1.</span><span class="op">/</span>np.e)<span class="op">*</span>np.exp(t)
+    vals.append([t, y1, yreal])
+    y1 <span class="op">=</span> y1 <span class="op">+</span> (t <span class="op">+</span> y1)<span class="op">*</span>h
+    t <span class="op">=</span> t <span class="op">+</span> h
+df <span class="op">=</span> pd.DataFrame(vals)
+df.columns <span class="op">=</span> [<span class="st">&#39;t&#39;</span>,<span class="st">&#39;euler&#39;</span>, <span class="st">&#39;analitik&#39;</span>]
+df <span class="op">=</span> df.set_index(<span class="st">&#39;t&#39;</span>)
+<span class="bu">print</span> df
+df.plot()
+plt.savefig(<span class="st">&#39;2_6.png&#39;</span>)</code></pre></div>
+<pre><code>      euler  analitik
+t                    
+1.0  2.0000  2.000000
+1.1  2.3000  2.320684
+1.2  2.6400  2.685611
+1.3  3.0240  3.099435
+1.4  3.4564  3.567299</code></pre>
+<div class="figure">
+<img src="2_6.png" />
+
+</div>
+<p>Oldukça büyük bir sapma var. Şimdi tüm Taylor terimlerini kullanalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+y2 <span class="op">=</span> <span class="dv">2</span><span class="op">;</span> t <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span> N <span class="op">=</span> <span class="dv">5</span><span class="op">;</span> h <span class="op">=</span> <span class="fl">0.1</span>
+vals <span class="op">=</span> []
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N): 
+    yreal <span class="op">=</span> <span class="op">-</span>t<span class="dv">-1</span><span class="op">+</span><span class="dv">4</span><span class="op">*</span>(<span class="fl">1.</span><span class="op">/</span>np.e)<span class="op">*</span>np.exp(t)
+    vals.append([t, y2, yreal])
+    y2 <span class="op">=</span> y2 <span class="op">+</span> (t <span class="op">+</span> y2)<span class="op">*</span>h <span class="op">+</span> (<span class="dv">1</span><span class="op">+</span>t<span class="op">+</span>y2)<span class="op">*</span>(h<span class="op">**</span><span class="dv">2</span><span class="op">/</span><span class="dv">2</span>)
+    t <span class="op">=</span> t <span class="op">+</span> h
+df <span class="op">=</span> pd.DataFrame(vals)
+df.columns <span class="op">=</span> [<span class="st">&#39;t&#39;</span>,<span class="st">&#39;taylor&#39;</span>, <span class="st">&#39;analitik&#39;</span>]
+df <span class="op">=</span> df.set_index(<span class="st">&#39;t&#39;</span>)
+<span class="bu">print</span> df
+df.plot()
+plt.savefig(<span class="st">&#39;2_7.png&#39;</span>)</code></pre></div>
+<pre><code>       taylor  analitik
+t                      
+1.0  2.000000  2.000000
+1.1  2.320000  2.320684
+1.2  2.684100  2.685611
+1.3  3.096931  3.099435
+1.4  3.563608  3.567299</code></pre>
+<div class="figure">
+<img src="2_7.png" />
+
+</div>
+<p>Runge-Kutta</p>
+<p>Taylor Serileri ile hesap yapmanın bir dezavantajı var, hesaplanan fonksiyonun ikinci, üçüncü ve daha yüksek türevlerinin analitik olarak elde edilebilmesi gerekiyor. Bu hesap her zaman kolay elde edilmeyebilir. Runge-Kutta metotu daha yüksek türevlerin yerine farklı <span class="math inline">\(f\)</span> hesaplarının bir şekilde ağırlıklarını alarak aynı sonuç erişiyor [3, sf.282]. RK yönteminin hata payı Taylor yöntemine eşittir, daha doğrusu RK2 ikinci derece sonrası terimleri atılmış Taylor yaklaşıksallamasına eşittir, RK4 aynı şekilde dördücü derece için.</p>
+<p>RK yaklaşımını direk Taylor serilerinden türetmek mümkün, RK4 için gereken dördüncü derece ve üstü cebirsel türetim olarak oldukca çetrefilli, fakat bir fikir vermesi açısından ikinci derece için gereken türetimi burada göstereceğiz.</p>
+<p>Yine Taylor serilerinden başlayalım, eldeki bir diferansiyel denklem</p>
+<p><span class="math display">\[
+y&#39; = f(x,y)
+\]</span></p>
+<p>için [4, sf. 713],</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + f(x_i,y_i) h + \frac{f&#39;(x_i,y_i)}{2!} h^2 + ...
+\qquad (1)
+\]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + y&#39;_i h + \frac{y_i&#39;&#39;}{2!} h^2 + ..
+\]</span></p>
+<p>olduğunu biliyoruz. İkinci derece Runge-Kutta için deriz ki üstteki formüldeki <span class="math inline">\(y_i\)</span> sonrası <span class="math inline">\(f\)</span> bazında bir formül olacak, türev içermeyecek [4, sf. 730],</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + (a_1 k_1 + a_2 k_2) h
+\qquad (2)
+\]</span></p>
+<p>ki</p>
+<p><span class="math display">\[
+k_1 = (x_i,y_i), \quad k_2 = f(x_i+p_1 h, y_i + q_{11}k_1h)
+\]</span></p>
+<p>Dikkat değerler <span class="math inline">\(a_1,a_2,p_1,q_{11}\)</span> katsayıdır, onların ne olduğunu bulmamız gerekiyor. Bunun için <span class="math inline">\(k_2\)</span>'nin Taylor Serisi açılımını yapıp birleşik formülün ana Taylor serisi açılımıyla olan benzerliklerine bakıp katsayıları bu benzerlik üzerinden bulmaya çalışacağız.</p>
+<p>Ana Taylor serisi açılımının başlangıç noktası (1), tabi bir <span class="math inline">\(f&#39;(x_i,y_i)\)</span> türevi var, bu türevi Zincirleme Kanunu ile açacağız, genel formda bu kanun</p>
+<p><span class="math display">\[
+f&#39;(x_i,y_i) = \frac{\partial f(x,y)}{\partial x} +
+\frac{\partial f(x,y)}{\partial y} \frac{\mathrm{d} y}{\mathrm{d} x}
+\]</span></p>
+<p>Üstteki formülü (1) içine sokarsak,</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + f(x_i,y_i) h +
+\left( \frac{\partial f(x,y)}{\partial y} \frac{\mathrm{d} y}{\mathrm{d} x}  \right) \frac{h^2}{2}
+\qquad (3)
+\]</span></p>
+<p>Şimdi <span class="math inline">\(k_2\)</span>'nin açılımına gelelim, burada iki değişkenli Taylor açılımı gerekli, bu açılım genel formda şöyle gider,</p>
+<p><span class="math display">\[
+g(x+r,y+s) = g(x,y) + r \frac{\partial g}{\partial x} + s \frac{\partial g}{\partial y} + ...
+\]</span></p>
+<p>Uygulanırsa,</p>
+<p><span class="math display">\[
+f(x_i+p_1 h, y_i + q_{11}k_1h) = f(x_i,y_i) +
+p_1 h \frac{\partial f}{\partial x} +
+q_{11} k_1 h \frac{\partial f}{\partial y} + ...
+\]</span></p>
+<p>Bu ifadeyi (2) içindeki <span class="math inline">\(k_2\)</span>'ye sokalım, <span class="math inline">\(k_1\)</span> tanımını da kullanalım, ve (2)'yi bu şekilde tekrar yazalım,</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + a_1 h f(x_i,y_i) + a_2 h f(x_i,y_i) +
+a_2 p_1 h^2 \frac{\partial f}{\partial x} +
+a_2 q_{11} h^2 f(x_i,y_i) \frac{\partial f}{\partial y} + ..
+\]</span></p>
+<p><span class="math inline">\(h\)</span> ve <span class="math inline">\(h^2\)</span> bazlı terimleri toplayıp ayrı gruplar halinde yazarsak, ve nokta noktalı bölümü atalım,</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + [a_1 f(x_i,y_i) + a_2 f(x_i,y_i)] h +
+\left[a_2 p_1 \frac{\partial f}{\partial x} +
+ a_2 q_{11} f(x_i,y_i) \frac{\partial f}{\partial y}
+\right] h^2
+\]</span></p>
+<p>Şimdi üstteki son formül ile (3) karşılaştırması yapalım, bu iki denklemin eşit olması için ne gerekir? Şunlar,</p>
+<p><span class="math display">\[
+a_1 + a_2 = 1
+\]</span></p>
+<p><span class="math display">\[
+a_2 p_1 = \frac{1}{2}
+\]</span></p>
+<p><span class="math display">\[
+a_2 q_{11} = \frac{1}{2}
+\]</span></p>
+<p>Bu denklemleri çözersek ve sabitleri bulursak bize gereken türevsiz, <span class="math inline">\(f\)</span>'nin ağırlıklanmış halini kullanarak çözüm yapabiliriz. Fakat bir problem var, elde 3 denklem ama 4 bilinmeyen var, özgün bir çözüm bulmak mümkün değil. Şöyle bir çözüm olabilir, eğer bir sabite bir değeri kendimiz atarsak, geri kalanları ona göre bulabiliriz. Diyelim ki <span class="math inline">\(a_2 = 1/2\)</span> dedik, o zaman <span class="math inline">\(a_1 = 1/2\)</span> ve <span class="math inline">\(p_1 = q_{11} = 1\)</span>. Bu bize Heun metodu denen yaklaşımı verir,</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + \left( \frac{1}{2} k_1 + \frac{1}{2} k_2 \right) h
+\]</span></p>
+<p>ki</p>
+<p><span class="math display">\[
+k_1 = f(x_i,y_i)
+\]</span></p>
+<p><span class="math display">\[
+k_2 = f(x_i + h, y_i + k_1 h)
+\]</span></p>
+<p>Örnek</p>
+<p>Alttaki denklemi Heun yaklaşımı ile çözelim,</p>
+<p><span class="math display">\[
+y&#39; = -2x^3 + 12x^2 - 20x + 8.5
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">h <span class="op">=</span> <span class="fl">0.5</span>
+yreal <span class="op">=</span> [<span class="dv">1</span>, <span class="fl">3.21875</span>, <span class="dv">3</span>, <span class="fl">2.21875</span>, <span class="dv">2</span>, <span class="fl">2.71875</span>, <span class="dv">4</span>, <span class="fl">4.71875</span>, <span class="dv">3</span>]
+<span class="kw">def</span> f(x,y): <span class="cf">return</span> <span class="dv">-2</span><span class="op">*</span>(x<span class="op">**</span><span class="dv">3</span>) <span class="op">+</span> <span class="dv">12</span><span class="op">*</span>(x<span class="op">**</span><span class="dv">2</span>) <span class="op">-</span> <span class="dv">20</span><span class="op">*</span>x <span class="op">+</span> <span class="fl">8.5</span>
+x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">4</span>,<span class="dv">9</span>)
+yrk <span class="op">=</span> np.zeros(<span class="bu">len</span>(x))
+yrk[<span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span>
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="bu">len</span>(yreal)):
+    k1 <span class="op">=</span> f(x[i<span class="dv">-1</span>],<span class="va">None</span>)
+    k2 <span class="op">=</span> f(x[i],<span class="va">None</span>)
+    yrk[i] <span class="op">=</span> yrk[i<span class="dv">-1</span>] <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span> (k1 <span class="op">+</span> k2)<span class="op">*</span>h
+    
+plt.plot(x,yreal)
+plt.plot(x,yrk)
+plt.legend([<span class="st">u&#39;Gerçek&#39;</span>,<span class="st">&#39;RK2&#39;</span>])
+plt.savefig(<span class="st">&#39;2_8.jpg&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="2_8.jpg" />
+
+</div>
+<p>RK4</p>
+<p>En popüler Runge-Kutta metotu dorduncu derecedir, aynen ikinci derecede olduğu gibi sonsuz tane çeşidi olabilir (hatırlarsak RK2 ile bir sabite değeri biz atadık, farklı atamalar için farklı RK çeşitleri elde edilebilir), fakat alttaki form en yaygın kullanılan formdur [4, sf. 735].</p>
+<p><span class="math display">\[
+y_{i+1} = y_i + \frac{1}{6} (k_1 + k_2 + k_3 + k4) h
+\]</span></p>
+<p>ki</p>
+<p><span class="math display">\[
+k_1 = f(x_i,y_i)
+\]</span></p>
+<p><span class="math display">\[
+k_2 = f \left( x_i + \frac{1}{2} h, y_i + \frac{1}{2}k_1 h  \right)
+\]</span></p>
+<p><span class="math display">\[
+k_3 = f \left( k_i + \frac{1}{2} h, y_i + \frac{1}{2}k_2 h  \right)
+\]</span></p>
+<p><span class="math display">\[
+k_4 = f(x_i+h, y_i + k_3 h)
+\]</span></p>
+<p>Şimdi Runge-Kutta dördüncü derece çözüm yaklaşımını bir örnekte görelim.</p>
+<p>Sarkaç Problemi</p>
+<p>Bağlantı noktasında sürtünme içerebilecek basit bir şarkacın hareket denklemleri [5, sf. 842],</p>
+<p><span class="math display">\[
+\ddot{\theta} + b\dot{\theta}  c\sin(\theta) = 0,
+\quad
+t \ge 0, \theta(0)=\theta_0,
+\quad
+\dot{\theta} = \dot{\theta}_0
+\qquad (1)
+\]</span></p>
+<p>olarak verilebilir. Bu denklemi ODE sistemi olarak çözmek için yeni değişken tanımları üzerinden onu iki parçaya ayırıyoruz,</p>
+<p><span class="math display">\[
+\vec{x} = x =
+\left[\begin{array}{ccc}
+    x_1 \\ x_2
+\end{array}\right] = 
+\left[\begin{array}{c}
+    \theta \\ \dot{\theta}
+\end{array} \right],
+\quad
+f(t,x) = \left[\begin{array}{c}
+\dot{\theta} \\ -b \dot{\theta} - c\sin\theta
+\end{array} \right]
+\]</span></p>
+<p>Bu tanımlarla <span class="math inline">\(\dot{x}\)</span> ifadesi</p>
+<p><span class="math display">\[
+\dot{x} = \left[
+  \begin{array}{c} \dot{\theta} \\ \ddot{\theta} \end{array}
+\right]
+\]</span></p>
+<p>haline gelir, ve <span class="math inline">\(\dot{x} = f(t,x)\)</span> matris denkleminde</p>
+<p><span class="math display">\[
+\left[\begin{array}{c} \dot{\theta} \\ \ddot{\theta} \end{array}\right]=
+\left[\begin{array}{c} \dot{\theta} \\ -b \dot{\theta} - c\sin\theta \end{array}\right]
+\]</span></p>
+<p>alt satıra odaklanırsak, orada (1) denklemine geri gidebileceğimizi görebiliriz.</p>
+<p>Sayısal çözüme gelirsek, benzer bir problemin çözümünü [6]'de işlemiştik. O derste bir paket çağrısı olan <code>odeint</code> kullanılmıştı, bu paketin entegrasyonu nasıl yaptığından bahsedilmemişti. Şimdi daha detaylandıralım, <code>odeint</code> kodu iç mantığında dördünce derece Runge-Kutta çözümü kullanır, yani RK4 yaklaşımını. RK4 formülleri üstte verildi, [5, sf. 803] üzerinden bir daha paylaşalım,</p>
+<p><span class="math display">\[
+k_1 = h f(t_i, y_i)
+\]</span></p>
+<p><span class="math display">\[
+k_2 = h f(t_i + h/2, y_i + k_1/2)
+\]</span></p>
+<p><span class="math display">\[
+k_3 = h f(t_i + h/2, y_i + k_2/2)
+\]</span></p>
+<p><span class="math display">\[
+k_4 = h f(t_i + h, y_i + k_3)
+\]</span></p>
+<p><span class="math display">\[
+y_{i+1} = y_i + (k_1 + 2 k_2 + 2 k_3 + k_4) / 6
+\]</span></p>
+<p>ki başlangıç değerleri <span class="math inline">\(y_0 = (\theta_0,\dot{\theta}_0)\)</span> olmak üzere. Çözmek istediğimiz sistemde sürtünme yok, yani <span class="math inline">\(b=0\)</span>, geri kalan değerler <span class="math inline">\(c=1\)</span>, <span class="math inline">\(\theta_0=0.1\)</span>, <span class="math inline">\(\dot{\theta}_0 = 1.0\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">n <span class="op">=</span> <span class="dv">256</span><span class="op">;</span> theta0 <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span> dtheta0 <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span> h <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span> c <span class="op">=</span> <span class="fl">1.0</span>
+
+theta_values <span class="op">=</span> np.zeros(n)
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):
+    K1theta <span class="op">=</span> h <span class="op">*</span> dtheta0
+    K1dtheta <span class="op">=</span> <span class="op">-</span>h <span class="op">*</span> c <span class="op">*</span> np.sin(theta0)
+    theta1 <span class="op">=</span> theta0 <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> K1theta
+    dtheta1 <span class="op">=</span> dtheta0 <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> K1dtheta <span class="co"># b=0, bir terim yokoldu burada</span>
+    K2theta <span class="op">=</span> h <span class="op">*</span> dtheta1
+    K2dtheta <span class="op">=</span> <span class="op">-</span>h <span class="op">*</span> c <span class="op">*</span> np.sin(theta1)
+
+    theta1 <span class="op">=</span> theta0 <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> K2theta
+    dtheta1 <span class="op">=</span> dtheta0 <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> K2dtheta
+    K3theta <span class="op">=</span> h <span class="op">*</span> dtheta1
+    K3dtheta <span class="op">=</span> <span class="op">-</span>h <span class="op">*</span> c <span class="op">*</span> np.sin(theta1)
+    theta1 <span class="op">=</span> theta0 <span class="op">+</span> K3theta
+    dtheta1 <span class="op">=</span> dtheta0 <span class="op">+</span> K3dtheta
+    K4theta <span class="op">=</span> h <span class="op">*</span> dtheta1
+    K4dtheta <span class="op">=</span> <span class="op">-</span>h <span class="op">*</span> c <span class="op">*</span> np.sin(theta1)
+    theta1 <span class="op">=</span> theta0 <span class="op">+</span> (K1theta <span class="op">+</span> <span class="fl">2.0</span> <span class="op">*</span> K2theta <span class="op">+</span> <span class="fl">2.0</span> <span class="op">*</span> K3theta <span class="op">+</span> K4theta) <span class="op">/</span> <span class="fl">6.0</span>
+    dtheta1 <span class="op">=</span> dtheta0 <span class="op">+</span> (K1dtheta <span class="op">+</span> <span class="fl">2.0</span> <span class="op">*</span> K2dtheta <span class="op">+</span> <span class="fl">2.0</span> <span class="op">*</span> K3dtheta <span class="op">+</span> K4dtheta) <span class="op">/</span> <span class="fl">6.0</span>
+    theta_values[i] <span class="op">=</span> theta1
+    theta0 <span class="op">=</span> theta1
+    dtheta0 <span class="op">=</span> dtheta1
+
+plt.ylim(<span class="op">-</span><span class="fl">1.20</span>,<span class="fl">1.20</span>)
+plt.plot(<span class="bu">range</span>(n), theta_values)
+plt.savefig(<span class="st">&#39;phy_005_basics_06_01.jpg&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="phy_005_basics_06_01.jpg" />
+
+</div>
+<p>Çözümün üstteki grafiği şarkacın (dikey eksene göre olan) açılarının zamana göre grafiğini gösteriyor. Metot stabil gözüküyor, açıda azalma ya da patlama olmadı, <span class="math inline">\(b=0\)</span> şartını koştuğumuz için bunun hesaba yansıması iyi oldu, sürtünme yoksa sönüm (damping) görülmemeliydi.</p>
+<p>Kaynaklar</p>
+<p>[1] Ackleh, <em>Classical and Modern Numerical Analysis Theory</em></p>
+<p>[2] Bayramlı, Bilgisayar Bilim, Yapay Zeka, <em>Otomatik Türev Almak</em></p>
+<p>[3] Faires, <em>Numerical Analysis, 9th Ed</em></p>
+<p>[4] Canale, <em>Numerical Methods for Engineers, 7th Ed</em></p>
+<p>[5] Eberly, <em>Game Physics 2nd Ed</em></p>
+<p>[6] Bayramlı, <em>Gayrı-Lineer Dinamik ve Kaos Ders 1</em></p>
+</body>
+</html>

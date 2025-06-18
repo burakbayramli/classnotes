@@ -1,0 +1,528 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ana-çift-iç-nokta-metotları-primal-dual-interior-point-methods">Ana-Çift İç Nokta Metotları (Primal-Dual Interior-Point Methods)</h1>
+<p>Şimdiye kadar gördüğümüz problem tiplerini hatırlayalım şimdi ve çözme zorluğu açısından sıralayalım. En üstte, en basit olan karesel problemlerdi,</p>
+<p><span class="math display">\[
+\min_x \frac{1}{2}  x^T Q x + c^T x
+\]</span></p>
+<p>formunda oluyorlardı. Bu problemler en basiti, eğer <span class="math inline">\(Q\)</span> pozitif yarı-kesin ise. Basit çünkü gradyanı alıp sıfıra eşitliyorum, pat diye sonucu buluyorum.</p>
+<p>Sonraki seviye, biraz daha zor, üstteki probleme <span class="math inline">\(Ax=b\)</span> formunda eşitlik kısıtlaması getirmek. Bu problemi de kapalı / analitik halde (closed-form) çözebiliriz, KKT koşullarını kullanarak. <span class="math inline">\(Ax=b\)</span> ifadesini ek değişkenler üzerinden kritere ekleriz, Lagrangian'ı oluştururuz, KKT koşulunda iki tane öğe olur, durağanlık, ve ana olurluk, bu iki öğeyi eşzamanlı olarak çözerek sonuca ulaşırız, koca bir lineer sistemdir bu.</p>
+<p>Bir sonraki pürüzsüz minimizasyon, yani üstteki kriterin yerine <span class="math inline">\(f(x)\)</span> kullanmak ki <span class="math inline">\(f(x)\)</span> bir pürüzsüz fonksiyon. Bu durumda Newton metotu kullanıyoruz, bu metot <span class="math inline">\(Ax=b\)</span> kısıtlamasında <span class="math inline">\(f(x)\)</span> minimizasyonunu birkaç adımda çözmeye uğraşıyor, bunu her adımda <span class="math inline">\(f(x)\)</span>'e bir karesel yaklaşıklama yaparak başarıyor.</p>
+<p>Sonraki seviye ise iç nokta metotları, eşitlik kısıtlamalarına ek olarak <span class="math inline">\(h_i(x) \le 0, i=1,..,m\)</span> formunda eşitsizlik kısıtlamaları eklemek. Bu derste bu tür problemleri ana-çift yöntemi ile çözeceğiz, daha önceki bir derste bariyer yöntemi iç nokta metotu ile çözdük.</p>
+<p>Genel olarak yaptığımız herhangi bir seviyedeki problemi çözmeye uğraştığımızda onu bir önce seviyedeki probleme indirgemek, problemi belli adımlara bölerek her adımda nasıl işlediğini bildiğimiz önceki seviyedeki tekniği uygulamak. Bariyer metotunda öyle oldu mesela, eşitsizlik problemini bariyer terimini kritere ekleyerek bilinen Newton adımlarıyla onu çözmeye uğraştık.</p>
+<p>Ana-çift metotu biraz daha farklı olacak. Onu öğrendiğimizde göreceksiniz ki bir problemi açık bir şekilde başka bir probleme indirgemediğini göreceksiniz [1, 5:55]. Bu tekniği sarsıma uğratılmış KKT koşulları ışığında ele almak lazım, ana prensibi bu.</p>
+<p>[bariyer metot özeti atlandı]</p>
+<p>Ana-çift metotu, bariyer metodundan farklı olarak, <span class="math inline">\(t\)</span> parametresinin güncellemeden önce sadece tek Newton adımı atar. Yani ana-çift metotunda da yaklaşıksallamanın kuvvetini kontrol eden bir <span class="math inline">\(t\)</span> var, ama o belli bir <span class="math inline">\(t\)</span> üzerinden yakınsama oluncaya kadar Newton adımı atmak yerine her <span class="math inline">\(t\)</span> için tek Newton adımı atılıyor. Bu demektir ki dış döngü, iç döngü farkı yok, her şey tek bir döngü içinde.</p>
+<p>Bir diğer fark ana-çift döngüsünde giderken üretilen (ziyaret edilen) noktalar illa olurlu olmayabiliyor. Yapısı itibariyle metot döngüsü sırasında eşitsizlik kısıtlamalarını tatmin eder, fakat her zaman eşitlik kısıtlamalarını tatmin etmeyebilir. Hatta bazen ikiz olurlu noktalar bile mevcut olmayabilir, bu daha ciddi bir durum. Hatırlarsak bariyer metotunda ikiz olurlu nokta her zaman vardı ve bu noktayı bir ikiz boşluğu hesaplamak için kullanabiliyorduk. Bu boşluğu hesaplamak kolaydı, her noktada <span class="math inline">\(m / t &lt; \epsilon\)</span> değerindeydi.</p>
+<p>O zaman ana-çift ile bu hesap yoksa, ne zaman duracağımızı tam bilmiyoruz demektir, demek ki akıllıca uydurma (heuristic) yaparak bir durma şartı bulmamız lazım.</p>
+<p>Pozitif bağlamda ana-çift metotları daha verimli çalışır. İspatına girmeyeceğiz ama ana-çift yakınsaması lineerden daha iyidir.</p>
+<p>Negatif olarak ana-çift metotlarını kabaca, sezgisel kavramak bariyer metotu kadar direk olmayabilir. Şahsen bu alanda araştırmacı olan ben bile ana-çift metot adımlarının temelii hatırlamakta bazen zorlanıyorum, bariyer metotunu hatırlamak basit, kısıtlamanın log'unu alıp kritere ekliyorsunuz, sonra Newton metotu uyguluyorsunuz [1, 13:35].</p>
+<p>Detaylara gelelim. KKT koşul sarsımını hatırlarsak, bariyer metotunu KKT koşullarında bir sarsım olarak görebiliyorduk, şu ifadelerde</p>
+<p><span class="math display">\[
+\nabla f(x) + \sum_{i=1}^{m} u_i\nabla h_i + A^T v = 0
+\qquad (1)
+\]</span></p>
+<p><span class="math display">\[
+u_i \cdot h_i(x) = (-1/t) 1, \quad i=1,..,m
+\]</span></p>
+<p><span class="math display">\[
+h_i(x) \le 0, \quad i=1,..,m, \quad Ax = b
+\]</span></p>
+<p><span class="math display">\[
+u_i \ge 0
+\]</span></p>
+<p>Normal sartlarda bloktaki ikinci ifade yerine</p>
+<p><span class="math display">\[
+u_i \cdot h_i(x) = 0, \quad i=1,..,m
+\qquad (2)
+\]</span></p>
+<p>olacaktı. Değişen tamamlayıcı gevşeklik yani.</p>
+<p>Ana problem neydi?</p>
+<p><span class="math display">\[
+\min_x f(x) \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+Ax = b
+\]</span> <span class="math display">\[
+h_i(x) \le 0, \quad i=1,..,m
+\]</span></p>
+<p>Bu problemin KKT şartları görülen blokta, durağanlık için gradyan alıp sıfıra eşitlenir, (1) elde edilir, tabii <span class="math inline">\(f,h_i\)</span>'in pürüzsüz ve dışbükey olduğu farz edilir, o sebeple gradyan yeterli, altgradyana gerek yok, vs. Tek değiştirdiğimiz tamamlayıcı gevşeklik ve onun artık sıfıra eşit olmasını şart koşmuyorum, ufak başka bir değere, ve doğru işarete sahip olan başka bir değere eşit olmasını zorluyorum, <span class="math inline">\(u_i \cdot h_i(x) = (-1/t)\)</span> şartı bu. <span class="math inline">\(1/t\)</span> gibi bir değerin sebebi aslında <span class="math inline">\(\log(x)\)</span>'in türevinin <span class="math inline">\(1/\log(x)\)</span> olmasıyla alakalı, çünkü log bariyerleştirilmiş kriterin türevini alıp sıfıra eşitleyince ve ikiz değişkenleri uygun şekilde tanımlayınca log bariyer metotunun orijinal KKT koşulları yerine üstteki şekilde bir problemi çözülebildiğini görmüştük [1, 16:19], ve <span class="math inline">\(t\)</span> büyütüldükçe görülen değiştirilmiş tamamlayıcı gevşeklik esas versiyonuna daha da yaklaşıyordu.</p>
+<p>Ana-çift metotlarına erişmenin bir diğer yolu sarsımın ortaya çıkarttığı denklemleri birarada çözmek ve Newton adımını ona göre atmak [1, 22:55].</p>
+<p>Denklemler ayrı ayrı olarak</p>
+<p><span class="math display">\[
+r_{dual}= \nabla f(x) + Dh(x)^T u + A^T v 
+\qquad (6)
+\]</span></p>
+<p><span class="math display">\[
+r_{cent} = -\mathrm{diag}(u)h(x) - 1/t 
+\]</span></p>
+<p><span class="math display">\[
+r_{prim} = Ax - b
+\]</span></p>
+<p>Sarsım denklem sistemini sıfıra eşitlemek amacıyla matris formunda düzenlersek,</p>
+<p><span class="math display">\[
+r(x,u,v) = 
+\left[\begin{array}{c}
+\nabla f(x) + Dh(x)^T u + A^T v \\
+-\mathrm{diag}(u)h(x) - 1/t \\
+Ax - b
+\end{array}\right]
+\qquad (3)
+\]</span></p>
+<p>ki</p>
+<p><span class="math display">\[
+h(x) = \left[\begin{array}{c}
+h_1(x) \\
+\dots \\
+h_m(x)
+\end{array}\right]
+\quad
+D h(x) = \left[\begin{array}{c}
+D h_1(x)^T \\
+\dots \\
+D h_m(x)^T
+\end{array}\right]
+\qquad (4)
+\]</span></p>
+<p><span class="math inline">\(r(x,u,v)\)</span>'yu sıfıra eşitliyoruz, yani bir anlamda</p>
+<p><span class="math display">\[
+0 = r (x+\Delta x, u + \Delta u, v + \Delta v)
+\]</span></p>
+<p>çözülecek, bunu 1. derece Taylor açılımı ile yaklaşıklarım,</p>
+<p><span class="math display">\[
+\approx r(x,u,v) + D r(x,u,v) \left[\begin{array}{c}
+\Delta x \\ \Delta u \\ \Delta v
+\end{array}\right]
+\]</span></p>
+<p>Üstteki denklemde (3) ve (4) öğelerini kullanarak özyineli şekilde dönersem gayrı-lineer denklemi çözmüş olurum. Notasyonu biraz degistirirsek, <span class="math inline">\(y = (x,u,v)\)</span> ile,</p>
+<p><span class="math display">\[
+0 = r(y + \Delta y) \approx r(y) + D r(y) \Delta y
+\]</span></p>
+<p>ve <span class="math inline">\(\Delta y\)</span> için çözmek istiyoruz.</p>
+<p>Ya da, genel bir <span class="math inline">\(F\)</span> için <span class="math inline">\(F(y) = 0\)</span> çözümü, yani &quot;kök bulmak'' amacıyla her döngü adımında bir <span class="math inline">\(\Delta y\)</span> hesaplayabilmek istiyoruz. Şu şekilde</p>
+<p><span class="math display">\[
+F(y + \Delta y) \approx F(y) + D F(y) \Delta y
+\]</span></p>
+<p>yaklaşıklarsak, ve kök amaçlı <span class="math inline">\(F(y)=0\)</span> olmalı ama <span class="math inline">\(F(y + \Delta y) = 0\)</span> da denebilir,</p>
+<p><span class="math display">\[
+0 \approx F(y) + D F(y) \Delta y
+\]</span></p>
+<p><span class="math display">\[
+-F(y) =  D F(y) \Delta y
+\]</span></p>
+<p><span class="math display">\[
+\Delta y = -(DF(y))^{-1} F(y) 
+\]</span></p>
+<p>Ya da</p>
+<p><span class="math display">\[
+DF(y) \Delta y = -F(y) 
+\]</span></p>
+<p>Bu problemde <span class="math inline">\(F\)</span> yerine <span class="math inline">\(r\)</span> var.</p>
+<p><span class="math display">\[
+D r(y) \Delta y = -r(y) 
+\]</span></p>
+<p>O zaman (3)'teki <span class="math inline">\(r(y)\)</span>'nin türevi, yani Jacobian'ı gerekiyor. Üsttekini şöyle yazıyoruz,</p>
+<p><span class="math display">\[
+\left[\begin{array}{ccc}
+\nabla^2 f(x) + \sum_{i=1}^{m} u_i \nabla^2 h_i(x) &amp; D h(x)^T &amp; A^T \\
+-\mathrm{diag}(u) D h(x) &amp; -\mathrm{diag}(h(x)) &amp; 0 \\
+A &amp; 0 &amp; 0
+\end{array}\right]
+\left[\begin{array}{c}
+\Delta x \\ \Delta y \\ \Delta v
+\end{array}\right] = 
+\left[\begin{array}{c}
+r_{dual} \\ r_{cent} \\ r_{prim}
+\end{array}\right]  
+\qquad (5)
+\]</span></p>
+<p>Büyük Jacobian'ı nasıl elde ettik? Mesela (3)'ün ilk satırına bakalım,</p>
+<p><span class="math display">\[
+\nabla f(x) + Dh(x)^T u + A^T v 
+\]</span></p>
+<p>var, onun <span class="math inline">\(x,u,v\)</span>'ye göre türevlerini almak bize iki üstteki matrisin 1. satır 1. 2. ve 3. kolonunu veriyor, mesela <span class="math inline">\(x\)</span>'e göre türev alınca bir üstteki ifadede 1. ve 2. terimin türevi alınır, $A^T v $ yokolur, bu bize <span class="math inline">\(\nabla^2 f(x) + \sum_{i=1}^{m} u_i \nabla^2 h_i(x)\)</span> verir [1, 28:43]. Aynı şekilde devam edersek görülen matrisi elde ederiz. Tüm sistemi <span class="math inline">\(\Delta y\)</span> için çözünce de istediğimiz Newton yönünü elde ederiz.</p>
+<p>Bu yönteme ana-çift denmesinin sebebi üstte görülüyor aslında, çünkü dikkat edersek hem ana hem ikiz değişkenleri aynı sistemde, aynı anda çözüyoruz. Değil mi? Denklem sistemi KKT koşularının formülize edilmesinden geldi, ve bu koşullarda ana ve ikiz değişkenler aynı yerde mevcuttur, ve çözerken tüm <span class="math inline">\(x,u,v\)</span> için çözüyoruz.</p>
+<p>Not: Bu yaklaşımla bariyer metotuna erişmek mümkün, o durumda sistemden <span class="math inline">\(u\)</span> çıkartılır, ve geri kalanlar çözülür.</p>
+<p>Metotu algoritmik olarak görmeden önce bir konudan daha bahsetmek istiyorum; alternatif ikizlik boşluğu. Bu gerçek ikizlik boşluğu değil, çünkü daha önce belirttiğimiz gibi bu metotta ikiz değişkenler her zaman olurlu olmayabiliyor.</p>
+<p>Bariyer metotu için ikizlik boşluğu basitti, <span class="math inline">\(m/t\)</span> çünkü <span class="math inline">\(u_i = -1 / (t h_i(x))\)</span>, <span class="math inline">\(i=1,..,m\)</span> tanımlamıştık ve bu ikiz olurlu idi. Alternatif boşluk için sanki ikiz olurluk varmış gibi yapıyoruz, ve</p>
+<p><span class="math display">\[
+\eta = -h(x)^T u = - \sum_{i=1}^{m} u_i h_i(x)
+\]</span></p>
+<p>hesabını yapıyoruz. Eğer üstteki hesabı bariyer problemi için yapıyor olsaydık, <span class="math inline">\(u_i = -1/t\)</span> tanımlamış olacaktık ve o zaman bariyer metotu için olan boşluğu elde edecektik. Ana-çift yönteminde böyle değil tabii, sistemi çözerken <span class="math inline">\(u_i\)</span> için de çözüm yapıyoruz, onu önceden tanımlamıyoruz, fakat üstteki formu kullanarak alternatif ikizlik boşluğunu elde edebiliriz.<br />
+<span class="math inline">\(\eta\)</span> her zaman pozitif olacak, çünkü kendimizi her zaman <span class="math inline">\(h_i(x) \le 0\)</span> olacak şekilde kısıtlayacağız, ve <span class="math inline">\(u_i \ge 0\)</span> zaten, o zaman çarpımlarının ekşi ile çarpılması pozitif sonuç verir.</p>
+<p>Tüm bunları durma şartı için nasıl kullanırız? Her ne kadar <span class="math inline">\(u_i\)</span>'lar olurlu olmayabilse bile yine de boşluğu hesaplıyoruz, ardından ikiz değişkenlerin olurluğa ne kadar yakın olduğunu ayrı bir yerde hesaplıyoruz. Yani eğer alternatif boşluk az, ve olurluğa yakınlık varsa, akıllıca bir uydurma ile kullanarak durma / durmama kararı verebiliriz. Gerçi bu teknik uydurmadan biraz daha iyi aslında, ana-çift metotunun yakınsadığına dair matematiksel ispatlar var, fakat terminolojik olarak bu boşluk hesabı gerçek bir boşluk hesabı değil.</p>
+<p>Artık metotu tanımlayabiliriz. Bir harfiyen olurlu <span class="math inline">\(x^{(0)}\)</span> ile başla, yani bu nokta $h_i(x^{(0)}) &lt; 0 $, ve <span class="math inline">\(A x^{(0)}= b\)</span>. Ayrıca <span class="math inline">\(u^{(0)} &gt; 0\)</span>, <span class="math inline">\(v^{(0)}\)</span> herhangi bir değer. Alternatif ikizlik boşluğu <span class="math inline">\(\eta^{(0)} = -h(x^{(0)})^T u^{(0)}\)</span> olarak tanımla [1, 45:21].</p>
+<p><span class="math inline">\(t\)</span>'yi büyütmek için <span class="math inline">\(\mu &gt; 1\)</span> kullanıyoruz. Her döngü sonunda eski <span class="math inline">\(t\)</span>'yi <span class="math inline">\(\mu\)</span> ile çarpıp yeni <span class="math inline">\(t\)</span> elde edeceğiz.</p>
+<p>Adımlar</p>
+<ol style="list-style-type: decimal">
+<li><p><span class="math inline">\(t = \mu m / \eta^{(k-1)}\)</span> tanımla.</p></li>
+<li><p>Ana-çift güncelleme yönü <span class="math inline">\(\Delta y\)</span>'yi hesapla (nasıl yapılacağını gördük, (5)'teki lineer sistemi çözerek).</p></li>
+<li><p>Geri iz sürme (backtracking) tekniği ile adım büyüklüğü <span class="math inline">\(s\)</span>'yi hesapla (birazdan nasıl yapılacağını göreceğiz)</p></li>
+<li><p><span class="math inline">\(y^{(k)} = y^{(k-1)} + s \cdot \Delta y\)</span> ile <span class="math inline">\(y\)</span>'yi güncelle. Yani bu hesapla tüm ana, ikiz değişkenleri güncellemiş oluyoruz, <span class="math inline">\(x,u,v\)</span>.</p></li>
+<li><p>Alternatif ikizlik boşluğunu hesapla <span class="math inline">\(\eta^{(k)} = -h(x^{(k)})^T u^{(k)}\)</span>.</p></li>
+<li><p>Ana ve ikiz artıklar ufak ise, yani eğer <span class="math inline">\(\eta^{(k)} &lt; \epsilon\)</span> ise ve <span class="math inline">\((|| r_{prim} ||_2^2 + ||r_{dual}||_2^2)^{1/2} &lt; \epsilon\)</span> ise dur.</p></li>
+</ol>
+<p><span class="math inline">\(r_{prim}\)</span> hatırlarsak eşitlik sınırlamasından ne kadar uzak olduğumüz. <span class="math inline">\(r_{dual}\)</span> ise durağanlık şartıydı, onun sıfırdan ne kadar uzak olduğuydu. Niye ona &quot;ikiz (dual)'' etiketi verdik? Bunun ikiz olurluk ile ne alakası var? Burada biraz nüans var..</p>
+<p>Not: artık kelimesini kullandık daha önce <span class="math inline">\(r_{dual}\)</span> ikiz artık, <span class="math inline">\(r_{prim}\)</span> ana artık.</p>
+<p>Hatırlarsak <span class="math inline">\(u,v\)</span> üzerindeki kısıtlamalar nelerdi? <span class="math inline">\(u \ge 0\)</span>, ve <span class="math inline">\(v\)</span> herhangi bir şey olabilir. Ama dolaylı bir kısıtlama daha var aslında, o da <span class="math inline">\(u,v\)</span>'nin Lagrange iki fonksiyonunun tanım alanında olma zorunluluğu.. Ve bu kısıtlamalar işte (6)'dan başlayan üç denklemde aslında belirtiliyor. Yani, çünkü eğer alttaki sıfır ise</p>
+<p><span class="math display">\[
+\nabla f(x) + D h(x)^T u + A^T v = 0
+\]</span></p>
+<p>bu sadece ve sadece doğru olabilir <span class="math inline">\(x\)</span> eğer <span class="math inline">\(x\)</span> üzerinden <span class="math inline">\(L(x,u,v)\)</span>'i minimize ediyorsa. Ki bu durumda</p>
+<p><span class="math display">\[
+g(u,v) = L(x,u,v)
+\]</span></p>
+<p>doğru olur. Yani <span class="math inline">\(x\)</span> Lagrangian'ı minimize ediyorsa, tanım itibariyle <span class="math inline">\(L(x,u,v)\)</span> eksi sonsuzluk değildir. Değil mi? Çünkü eksi sonsuzluğa gidiş olmasın diye ikizde spesifik kısıtlamalar getirdik. Ve bu da demektir ki <span class="math inline">\(u,v\)</span> Lagrangian'ın tanım alanında olmalı.</p>
+<p>Geriye İz Sürme</p>
+<p>Üstteki algoritmada #4 adımında bir adım atıldığını gördük, fakat bu adım atılırken <span class="math inline">\(s\)</span>'nin nasıl bulunacağını anlatmadık. Adım atılırken <span class="math inline">\(y^+ = y + s \Delta y\)</span> ile, <span class="math inline">\(h_i(x) \le 0\)</span>, ve <span class="math inline">\(u_i(x) &gt; 0\)</span> şartlarının hala geçerli olmasını garantilemek istiyoruz, ve <span class="math inline">\(s\)</span>'yi bu olacak şekilde seçeceğiz. Tabii <span class="math inline">\(y^+ = y + s \Delta y\)</span> derken</p>
+<p><span class="math display">\[
+x^+ = x + s \Delta y
+\]</span></p>
+<p><span class="math display">\[
+u^+ = u + s \Delta y
+\]</span></p>
+<p><span class="math display">\[
+v^+ = v + s \Delta y
+\]</span></p>
+<p>demek istiyoruz. Bu seçim şöyle yapılabilir, önce <span class="math inline">\(s\)</span>'yi her öge için <span class="math inline">\(u_i &gt; 0, i=1,..,m\)</span> olacak sekide mümkün en büyük adımdan başlarız. Bu çözüm kolaydır, çünkü her <span class="math inline">\(u_i\)</span> için her <span class="math inline">\(\Delta u_i\)</span> bizi sıfıra yaklaştırıyor mu, eğer yaklaştırıyorsa sıfıra gelmeden ne kadar uzağa gidebiliriz sorusunuz sorabiliriz, ve tüm bu uzaklıklar arasından en ufak olanı <span class="math inline">\(s\)</span> seçimi için başlayacağımız en büyük uzaklık olacaktır. Matematiksel olarak</p>
+<p><span class="math display">\[
+s_{max} = \min \bigg\{
+  1, \min \{ -u_i / \Delta u_i : \Delta u_i &lt; 0  \}
+\bigg\}
+\]</span></p>
+<p>Tabii harfiyen olurluk istiyoruz, yani <span class="math inline">\(u &gt; 0\)</span> o zaman bulunan büyüklüğün 0.999'ü kadarını alırız. Bu değeri alınca oradan &quot;geriye iz sürmeye'' başlarız, yani küçülte küçülte bu sefer <span class="math inline">\(h\)</span> şartlarını da tatmin eden bir <span class="math inline">\(s\)</span> aramaya başlayabiliriz. Bu aramayı yaparken <span class="math inline">\(u\)</span> işaretini tatmin edeceğimizden eminizdir çünkü en büyük <span class="math inline">\(s\)</span>'yi özellikle <span class="math inline">\(u\)</span> için ayarladık.</p>
+<p>Döngünün bu aşamasında her küçültme sonrası alttaki şartları da kontrol edeceğiz, şu şekilde;</p>
+<p><span class="math inline">\(s = \beta s\)</span> yap, ta ki</p>
+<p>1 - <span class="math inline">\(h_i(x^+) &lt; 0, i=1,..,m\)</span>.</p>
+<p>2 - <span class="math inline">\(|| r(x^+, u^+, v^+) ||_2 \le (1-\alpha s) || r(x,u,v) ||_2\)</span></p>
+<p>olana kadar. 2. şartta eşitsizliğin sol tarafı sarsıma uğratılmış KKT koşulları, onu <span class="math inline">\(1-\alpha s\)</span> oranında azaltıyorum.</p>
+<p>Ya da şu şekilde bakabiliriz, 1. kontrolda <span class="math inline">\(s\)</span>'i ana olurluk tatmin oluncaya kadar azalt. Ondan sonra 2. adım üzerinden normal geriye iz sürme gerçekleştir.</p>
+<p>Artik elimizde ana-cift metotunu kodlamak icin gereken her sey var. Bir ornek uzerinde gorelim, standart form LP.</p>
+<p><span class="math display">\[
+\min_x c^T x, \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+Ax = b
+\]</span> <span class="math display">\[
+x \ge 0
+\]</span></p>
+<p>ki <span class="math inline">\(c \in \mathbb{R}^n\)</span>, <span class="math inline">\(A \in \mathbb{R}^{m \times n}\)</span>, <span class="math inline">\(b \in \mathbb{R}^m\)</span>.</p>
+<p>Ikiz</p>
+<p><span class="math display">\[
+\max_{u,v} \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+A^T u + u = c
+\]</span> <span class="math display">\[
+u \ge 0
+\]</span></p>
+<p>Bu formu ezberlemek aslında faydalı olabilir çünkü optimizasyonda başka yerlerde bu formu görebilmek faydalı olabiliyor.</p>
+<p>Ana-çift metotu bu problem üzerinde işleyecek, ve bize olurluğa çok yakın olan hem ana hem de ikiz problem için bir çözüm verecek. <span class="math inline">\(Ax=b\)</span>, ya da <span class="math inline">\(A^T u + u = c\)</span> şartını tam olarak tatmin etmiyor olabilirim ama onlara yakın bir yerde olacağım. Tabii ana-çift metotu işleyişi sırasında doğal olarak bu şartlara yakın durmayabilir, o sebeple artıkları kontrol ediyoruz.</p>
+<p>Şimdi bu konunun tarihi hakkında biraz konuşalım. Lineer programları ilk çözen araştırmacı Dantzig, simplex adlı bir metodu keşfetti. Hala bu yöntem LP çözmek için en yaygın metotdur. Ne yazık ki onu LP'ler ötesine genelleştirmek mümkün değil, o sebeple bu derste onu işlemedik. İç nokta metotları, kıyasla, çok daha geniş bir problem sınıfında geçerlidir, Newton metotu, gradyan inişi, hep bu bağlamda devreye girer, vs.</p>
+<p>Tabii simplex değişik bir mahluktur, &quot;direk yöntem'' denen bir metot sınıfındadır, şimdiye kadar gördüğümüz metotlarda olduğu gibi döngü içinde daha iyi, daha iyi çözüme gitmiyor, en iyi, kesin çözümü bulmaya uğraşıyor [tabii lineerlik burada faydalı herhalde, ayrıksal şekilde seçenek arama açısından, ama diğer yandan lineerlik ötesine geçilemiyor].</p>
+<p>Simplex iyi isler fakat bir sure sonra anlasildi ki en-kotu durum cetrefilligi oldukca kotu.</p>
+<p>İç-nokta metotları simplex'den sonra geliştirildi, burada 70'ler, 80'lerde müthiş bir aktivite oldu. Khachiyan ve Karmarkar burada önemli isimler, LP'ler için ilk ispatlanabilir polinom zamanlı çözümü geliştirdiler. Khachiyan'ın metotu elipsoid yakasımını kullanıyordu, teorik olarak çok kuvvetliydi ama pratikte ne yazık ki böyle olmadığı görüldü, fakat en azından alternatif bir şekilde LP çözülebileceğini gösterdi. Karmarkar'ın buluşu en önemlisi, buluşu bugün gördüğümüz ana-çift iç nokta yöntemine benziyordu, ispatlanabilir polinom hızdaydı, ve pratikte oldukca verimliydi. Karmarkar'ın yaklaşımı iç-nokta alanında bir araştırma patlamasına sebep oldu.</p>
+<p>Örnekle devam edelim. Bir LP'yi ana-çift yöntemi ile çözeceğiz ve farklarına bakacağız. Standart form LP'nin KKT koşulları,</p>
+<p><span class="math display">\[
+A^T v + u = c
+\]</span> <span class="math display">\[
+x_i u_i = 0, i=1,..,n
+\]</span> <span class="math display">\[
+Ax = b
+\]</span> <span class="math display">\[
+x,u \ge 0
+\]</span></p>
+<p>İç-nokta yöntemleri ilk ve son iki şarta uyacak şekilde ayarlanır ve döngü içinde yavaş yavaş 2. şartı yerine getirmeye uğraşır [2, 13:47].</p>
+<p>Sarsıma uğratılmış KKT şartları, üstteki formülde tamamlayıcı gevşeklik için eşitlikte <span class="math inline">\(1/t\)</span> kullanarak elde edilir,</p>
+<p><span class="math display">\[
+A^T v + u = c
+\]</span> <span class="math display">\[
+x_i u_i = 1/t, \quad i=1,..,n
+\]</span> <span class="math display">\[
+Ax = b
+\]</span> <span class="math display">\[
+x,u \ge 0
+\]</span></p>
+<p>Sonra üstteki tüm eşitlik sınırlamalarını alıyorum (eşitsizlikleri döngü sırasında tatmin etmeye uğraşacağım) ve onları bir matriste istifliyorum,</p>
+<p><span class="math display">\[
+0 = r_{pd}(x,u,v)
+\]</span></p>
+<p><span class="math display">\[
+= \left[\begin{array}{c}
+A^T v + u - c \\
+\mathrm{diag}(x) u - (1/t) \\
+Ax - b
+\end{array}\right]
+\]</span></p>
+<p>Sonra matrisin türevini alıyorum, bir lineer yaklaşıklama yaratıyorum, güncelleme yönünü buluyorum, geriye iz sürme yapıyorum, vs [2, 15:42].</p>
+<p>Genel olarak ana-çift yönteminin (log bariyere nazaran) daha büyük bir sistemi çözdüğünü söyleyebiliriz, <span class="math inline">\(0 = r_{pd}(y + \Delta y) \approx r_{pd}(y) + D r_{pd}(y) + D r_{pd}(y) \Delta y\)</span> diyoruz, ve alttaki sistemi çözüyoruz,</p>
+<p><span class="math display">\[
+\left[\begin{array}{ccc}
+0 &amp; I &amp; A^T \\
+\mathrm{diag}(u) &amp; \mathrm{diag}(x) &amp; 0 \\
+A &amp; 0 &amp; 0 
+\end{array}\right]
+\left[\begin{array}{c}
+\Delta x \\ \Delta u \\ \Delta v  
+\end{array}\right] = -r_{pd}(x,u,v)
+\]</span></p>
+<p>Güncelleme için her <span class="math inline">\(t\)</span> ile tek bir adım atıyorum,m adım <span class="math inline">\(y^+ = y + \Delta s\)</span> (tabii <span class="math inline">\(s &gt; 0\)</span> için çizgi araması yaparak) ama tek bir kez. Sonra <span class="math inline">\(t = \mu t\)</span> ile <span class="math inline">\(t\)</span>'yi güncelliyorum [1, 18:13].</p>
+<p>Ekler</p>
+<p>LP Kodu</p>
+<p>Altta şimdiye kadar anlatılan metotlar ile çözüm yapan ve sonucu <code>linprog</code> çağrısı ile karşılaştıran bir kod [5] görüyoruz. Çözülen problem [4, sf. 209]</p>
+<p><span class="math display">\[
+\min_x -x_1 - 5x_2 \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+x_1 + x_2 + x_3  = 5 
+\]</span> <span class="math display">\[
+x_1 + 3 x_2 + x_4 = 7
+\]</span> <span class="math display">\[
+x_1,x_2,x_3,x_4 \ge 0
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> scipy.optimize <span class="im">import</span> linprog
+<span class="im">from</span> numpy.linalg <span class="im">import</span> matrix_rank
+
+<span class="kw">def</span> solve(c, A, b, epsilon<span class="op">=</span><span class="fl">0.0001</span>):
+    <span class="cf">if</span> matrix_rank(A) <span class="op">&lt;</span> <span class="bu">min</span>(A.shape[<span class="dv">0</span>], A.shape[<span class="dv">1</span>]):
+        <span class="bu">print</span>(<span class="st">&#39;A is not full rank, dropping redundant rows&#39;</span>)
+        _, pivots <span class="op">=</span> sympy.Matrix(A).T.rref()
+        A <span class="op">=</span> A[<span class="bu">list</span>(pivots)]
+        <span class="bu">print</span>(<span class="st">&#39;Shape of A after dropping redundant rows is </span><span class="sc">{}</span><span class="st">&#39;</span>.<span class="bu">format</span>(A.shape))
+
+    m <span class="op">=</span> A.shape[<span class="dv">0</span>]
+    n <span class="op">=</span> A.shape[<span class="dv">1</span>]
+
+    x <span class="op">=</span> np.ones(shape<span class="op">=</span>(n, ))
+    l <span class="op">=</span> np.ones(shape<span class="op">=</span>(m, ))
+    s <span class="op">=</span> np.ones(shape<span class="op">=</span>(n, ))
+
+    k <span class="op">=</span> <span class="dv">0</span>
+
+    <span class="cf">while</span> <span class="bu">abs</span>(np.dot(x, s)) <span class="op">&gt;</span> epsilon:        
+        k <span class="op">+=</span> <span class="dv">1</span>
+        primal_obj <span class="op">=</span> np.dot(c, x)
+        dual_obj <span class="op">=</span> np.dot(b, l)
+        <span class="bu">print</span>(<span class="st">&#39;iteration #</span><span class="sc">{}</span><span class="st">; primal_obj = </span><span class="sc">{:.5f}</span><span class="st">, dual_obj = </span><span class="sc">{:.5f}</span><span class="st">; duality_gap = </span><span class="sc">{:.5f}</span><span class="st">&#39;</span>.<span class="bu">format</span>
+              (k, primal_obj, dual_obj, primal_obj <span class="op">-</span> dual_obj)) 
+        sigma_k <span class="op">=</span> <span class="fl">0.4</span>
+        mu_k <span class="op">=</span> np.dot(x, s) <span class="op">/</span> n
+
+        A_ <span class="op">=</span> np.zeros(shape<span class="op">=</span>(m <span class="op">+</span> n <span class="op">+</span> n, n <span class="op">+</span> m <span class="op">+</span> n))
+        A_[<span class="dv">0</span>:m, <span class="dv">0</span>:n] <span class="op">=</span> np.copy(A)
+        A_[m:m <span class="op">+</span> n, n:n <span class="op">+</span> m] <span class="op">=</span> np.copy(A.T)
+        A_[m:m <span class="op">+</span> n, n <span class="op">+</span> m:n <span class="op">+</span> m <span class="op">+</span> n] <span class="op">=</span> np.eye(n)
+        A_[m <span class="op">+</span> n:m <span class="op">+</span> n <span class="op">+</span> n, <span class="dv">0</span>:n] <span class="op">=</span> np.copy(np.diag(s))
+        A_[m <span class="op">+</span> n:m <span class="op">+</span> n <span class="op">+</span> n, n <span class="op">+</span> m:n <span class="op">+</span> m <span class="op">+</span> n] <span class="op">=</span> np.copy(np.diag(x))
+
+        b_ <span class="op">=</span> np.zeros(shape<span class="op">=</span>(n <span class="op">+</span> m <span class="op">+</span> n, ))
+        b_[<span class="dv">0</span>:m] <span class="op">=</span> np.copy(b <span class="op">-</span> np.dot(A, x))
+        b_[m:m <span class="op">+</span> n] <span class="op">=</span> np.copy(c <span class="op">-</span> np.dot(A.T, l) <span class="op">-</span> s)
+        tmp <span class="op">=</span> np.dot(np.dot(np.diag(x), np.diag(s)), np.ones(shape<span class="op">=</span>(n, )))
+        b_[m <span class="op">+</span> n:m <span class="op">+</span> n <span class="op">+</span> n] <span class="op">=</span> np.copy( sigma_k <span class="op">*</span> mu_k <span class="op">*</span> np.ones(shape<span class="op">=</span>(n, )) <span class="op">-</span> tmp )
+
+        delta <span class="op">=</span> np.linalg.solve(A_, b_)
+        delta_x <span class="op">=</span> delta[<span class="dv">0</span>:n]
+        delta_l <span class="op">=</span> delta[n:n <span class="op">+</span> m]
+        delta_s <span class="op">=</span> delta[n <span class="op">+</span> m:n <span class="op">+</span> m <span class="op">+</span> n]
+
+        alpha_max <span class="op">=</span> <span class="fl">1.0</span>
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):
+            <span class="cf">if</span> delta_x[i] <span class="op">&lt;</span> <span class="dv">0</span>:
+                alpha_max <span class="op">=</span> <span class="bu">min</span>(alpha_max, <span class="op">-</span>x[i]<span class="op">/</span>delta_x[i])
+            <span class="cf">if</span> delta_s[i] <span class="op">&lt;</span> <span class="dv">0</span>:
+                alpha_max <span class="op">=</span> <span class="bu">min</span>(alpha_max, <span class="op">-</span>s[i]<span class="op">/</span>delta_s[i])
+        eta_k <span class="op">=</span> <span class="fl">0.99</span>
+        alpha_k <span class="op">=</span> <span class="bu">min</span>(<span class="fl">1.0</span>, eta_k <span class="op">*</span> alpha_max)
+
+        x <span class="op">=</span> x <span class="op">+</span> alpha_k <span class="op">*</span> delta_x
+        l <span class="op">=</span> l <span class="op">+</span> alpha_k <span class="op">*</span> delta_l
+        s <span class="op">=</span> s <span class="op">+</span> alpha_k <span class="op">*</span> delta_s
+
+    diff <span class="op">=</span> np.dot(A, x) <span class="op">-</span> b
+    <span class="bu">print</span>(<span class="st">&#39;Ax - b = </span><span class="sc">{}</span><span class="st">; ideally it should have been zero vector&#39;</span>.<span class="bu">format</span>(diff))
+    <span class="bu">print</span>(<span class="st">&#39;norm of Ax - b is = </span><span class="sc">{}</span><span class="st">; ideally it should have been zero&#39;</span>.<span class="bu">format</span>
+          (np.linalg.norm(diff)))
+
+    <span class="cf">return</span> x
+
+A <span class="op">=</span> np.array([[<span class="dv">1</span>,  <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>],
+              [<span class="dv">1</span>,  <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">1</span>]])
+
+b <span class="op">=</span> np.array([<span class="dv">5</span>,<span class="dv">7</span>])
+
+c <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">1</span>, <span class="dv">-5</span>, <span class="dv">0</span>, <span class="dv">0</span> ])
+            
+res <span class="op">=</span> solve(c,A,b)
+<span class="bu">print</span> (res)
+
+res <span class="op">=</span> linprog(c, A_eq<span class="op">=</span>A, b_eq<span class="op">=</span>b, options<span class="op">=</span>{<span class="st">&quot;disp&quot;</span>: <span class="va">True</span>})
+
+<span class="bu">print</span> (res)</code></pre></div>
+<pre><code>iteration #1; primal_obj = -6.00000, dual_obj = 12.00000; duality_gap = -18.00000
+iteration #2; primal_obj = -9.21750, dual_obj = -1.11750; duality_gap = -8.10000
+iteration #3; primal_obj = -11.15521, dual_obj = -9.33695; duality_gap = -1.81826
+iteration #4; primal_obj = -11.60327, dual_obj = -11.70816; duality_gap = 0.10489
+iteration #5; primal_obj = -11.64091, dual_obj = -11.69203; duality_gap = 0.05113
+iteration #6; primal_obj = -11.65622, dual_obj = -11.67707; duality_gap = 0.02084
+iteration #7; primal_obj = -11.66243, dual_obj = -11.67089; duality_gap = 0.00846
+iteration #8; primal_obj = -11.66495, dual_obj = -11.66838; duality_gap = 0.00344
+iteration #9; primal_obj = -11.66597, dual_obj = -11.66736; duality_gap = 0.00140
+iteration #10; primal_obj = -11.66638, dual_obj = -11.66695; duality_gap = 0.00057
+iteration #11; primal_obj = -11.66655, dual_obj = -11.66678; duality_gap = 0.00023
+Ax - b = [0. 0.]; ideally it should have been zero vector
+norm of Ax - b is = 0.0; ideally it should have been zero
+[3.50107272e-05 2.33331700e+00 2.66664799e+00 1.40040490e-05]
+Primal Feasibility  Dual Feasibility    Duality Gap         Step             Path Parameter      Objective          
+1.0                 1.0                 1.0                 -                1.0                 -6.0                
+0.1105388427842     0.1105388427842     0.1105388427842     0.8919387648961  0.1105388427842     -10.34625028215     
+0.001400532337055   0.00140053233704    0.00140053233704    0.9918943193656  0.00140053233704    -11.65623916548     
+7.115191880125e-08  7.11519194345e-08   7.115191920093e-08  0.9999491966235  7.115192025851e-08  -11.66666613752     
+3.556266503391e-12  3.557079864332e-12  3.557332206583e-12  0.9999500067836  3.557595982315e-12  -11.66666666664     
+Optimization terminated successfully.
+         Current function value: -11.666667  
+         Iterations: 4
+     con: array([1.18571819e-11, 1.18527410e-11])
+     fun: -11.66666666664022
+ message: &#39;Optimization terminated successfully.&#39;
+     nit: 4
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([1.15454732e-13, 2.33333333e+00, 2.66666667e+00, 3.96953400e-12])</code></pre>
+<p>QP Kodu</p>
+<p>[3]'den odev sorusu 11.24 cozumu olarak altta ana-çift yöntemi ile bir QP nasıl çözülür görüyoruz. QP şu formda,</p>
+<p><span class="math display">\[
+\min_x (1/2) x^T P x + q^T x \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+Ax \le b
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+<span class="im">import</span> scipy.linalg <span class="im">as</span> slin
+
+MAXITERS <span class="op">=</span> <span class="dv">200</span><span class="op">;</span>
+TOL <span class="op">=</span> <span class="fl">1e-6</span><span class="op">;</span>
+m<span class="op">=</span><span class="dv">3</span><span class="op">;</span>n <span class="op">=</span> <span class="dv">3</span>
+RESTOL <span class="op">=</span> <span class="fl">1e-8</span><span class="op">;</span>
+MU <span class="op">=</span> <span class="dv">10</span><span class="op">;</span>
+ALPHA <span class="op">=</span> <span class="fl">0.01</span><span class="op">;</span>
+BETA <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span>
+x <span class="op">=</span> np.zeros((n,<span class="dv">1</span>))<span class="op">;</span>
+
+b <span class="op">=</span> np.ones((n,<span class="dv">1</span>))<span class="op">*</span><span class="fl">10.</span>
+q <span class="op">=</span> np.ones((n,<span class="dv">1</span>))<span class="op">*</span><span class="fl">3.</span>
+
+A <span class="op">=</span> np.array( [[<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>],
+               [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],
+               [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>]] )
+
+P <span class="op">=</span> np.array( [[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>],
+               [<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">4</span>],
+               [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]] )
+
+s <span class="op">=</span> b<span class="op">-</span>np.dot(A,x)<span class="op">;</span>
+z <span class="op">=</span> <span class="fl">1.</span><span class="op">/</span>s<span class="op">;</span>
+
+<span class="cf">for</span> iters <span class="kw">in</span> (<span class="bu">range</span>(MAXITERS)):
+  gap <span class="op">=</span> np.dot(s.T,z)
+  res <span class="op">=</span> np.dot(P,x) <span class="op">+</span> q <span class="op">+</span> np.dot(A.T,z)
+  <span class="cf">if</span> (gap <span class="op">&lt;</span> TOL) <span class="op">&amp;</span> (lin.norm(res) <span class="op">&lt;</span> RESTOL):
+      <span class="cf">break</span>
+  tinv <span class="op">=</span> gap<span class="op">/</span>(m<span class="op">*</span>MU)
+
+  tmp1 <span class="op">=</span> <span class="op">-</span>np.vstack((np.hstack((P, A.T)),
+                     np.hstack((A, np.diag(  (<span class="op">-</span>s<span class="op">/</span>z).T[<span class="dv">0</span>]  )))))
+  tmp2 <span class="op">=</span> np.vstack(( np.dot(P,x)<span class="op">+</span>q<span class="op">+</span>np.dot(A.T,z), <span class="op">-</span>s<span class="op">+</span>tinv<span class="op">*</span>(<span class="fl">1.0</span><span class="op">/</span>z) )) 
+  sol <span class="op">=</span> lin.solve(tmp1, tmp2)
+  dx <span class="op">=</span> sol[<span class="dv">0</span>:n]
+  dz <span class="op">=</span> sol[n:n<span class="op">+</span>m]
+  ds <span class="op">=</span> <span class="op">-</span>np.dot(A,dx)
+  r <span class="op">=</span> np.vstack((np.dot(P,x)<span class="op">+</span>q<span class="op">+</span>np.dot(A.T,z),
+                 z<span class="op">*</span>s<span class="op">-</span>tinv))
+  step <span class="op">=</span> np.<span class="bu">min</span>([<span class="fl">1.0</span>, <span class="fl">0.99</span><span class="op">/</span>np.<span class="bu">max</span>(<span class="op">-</span>dz<span class="op">/</span>z)])<span class="op">;</span>
+  <span class="cf">while</span> (np.<span class="bu">min</span>(s<span class="op">+</span>step<span class="op">*</span>ds) <span class="op">&lt;=</span> <span class="dv">0</span>):
+    step <span class="op">=</span> BETA<span class="op">*</span>step
+    <span class="bu">print</span> (step)
+    
+  newz <span class="op">=</span> z<span class="op">+</span>step<span class="op">*</span>dz
+  newx <span class="op">=</span> x<span class="op">+</span>step<span class="op">*</span>dx
+  news <span class="op">=</span> s<span class="op">+</span>step<span class="op">*</span>ds
+
+  tmp1 <span class="op">=</span> np.dot(P,newx)<span class="op">+</span>q<span class="op">+</span>np.dot(A.T,newz)
+  tmp2 <span class="op">=</span> newz<span class="op">*</span>news<span class="op">-</span>tinv
+  newr <span class="op">=</span> np.vstack((tmp1,tmp2))
+  <span class="cf">while</span> (lin.norm(newr) <span class="op">&gt;</span> (<span class="dv">1</span><span class="op">-</span>ALPHA<span class="op">*</span>step)<span class="op">*</span>lin.norm(r)):
+    step <span class="op">=</span> BETA<span class="op">*</span>step<span class="op">;</span>
+    newz <span class="op">=</span> z<span class="op">+</span>step<span class="op">*</span>dz
+    newx <span class="op">=</span> x<span class="op">+</span>step<span class="op">*</span>dx
+    news <span class="op">=</span> s<span class="op">+</span>step<span class="op">*</span>ds
+    newr <span class="op">=</span> np.vstack((np.dot(P,newx)<span class="op">+</span>q<span class="op">+</span>np.dot(A.T,newz),
+                      newz<span class="op">*</span>news<span class="op">-</span>tinv))
+    
+  x <span class="op">=</span> x<span class="op">+</span>step<span class="op">*</span>dx
+  z <span class="op">=</span> z <span class="op">+</span>step<span class="op">*</span>dz
+  s <span class="op">=</span> b<span class="op">-</span>np.dot(A,x)
+
+<span class="bu">print</span> (x)
+  </code></pre></div>
+<pre><code>[[-4.50000029]
+ [ 2.25000012]
+ [-0.75000002]]</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Tibshirani, <em>Convex Optimization, Lecture Video 16 (Part 1)</em>, <a href="https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg" class="uri">https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg</a></p>
+<p>[2] Tibshirani, <em>Convex Optimization, Lecture Video 16 (Part 2)</em>, <a href="https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg" class="uri">https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg</a></p>
+<p>[3] Boyd, <em>Convex Optimization I</em>, <a href="http://web.stanford.edu/class/ee364a/" class="uri">http://web.stanford.edu/class/ee364a/</a></p>
+<p>[4] Wright, <em>Linear Programming with MATLAB</em></p>
+<p>[5] Kamal, {Linear Program Solvers}, <a href="https://github.com/hasan-kamal/Linear-Program-Solvers" class="uri">https://github.com/hasan-kamal/Linear-Program-Solvers</a></p>
+</body>
+</html>

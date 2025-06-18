@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="newtonun-metodu-newtons-method">Newton'un Metodu (Newton's Method)</h1>
+<p>Kısıtlanmamış bir pürüzsüz optimizasyon problemini düşünelim [6, 6:00],</p>
+<p><span class="math display">\[
+\min f(x)
+\]</span></p>
+<p>Baktığımız <span class="math inline">\(f\)</span>'in iki kez türevi alınabilir olduğunu düşünelim. Hatırlarsak gradyan inişi nasıl işliyordu? Alttaki gibi,</p>
+<p><span class="math display">\[
+x^{k} = x^{k-1} - t_k \cdot \nabla f(x^{k-1}), k=1,2,...
+\]</span></p>
+<p>Bir başlangıç <span class="math inline">\(x^{(0)} \in \mathbb{R}^n\)</span> seçiliyor ve üstteki ardı ardına işletiliyor, her adımda negatif gradyan yönünde <span class="math inline">\(t_k\)</span> boyunda adım atılıyor.</p>
+<p>Kıyasla Newton metotu alttakini işletir,</p>
+<p><span class="math display">\[
+x^{k} = x^{k-1} - 
+\left( \nabla^2 f(x^{(k-1)}) \right)^{-1} \nabla f(x^{k-1}), k=1,2,...
+\]</span></p>
+<p>ki <span class="math inline">\(\nabla^2 f(x^{(k-1)})\)</span> <span class="math inline">\(f\)</span>'in <span class="math inline">\(x^{(k-1)}\)</span> noktasındaki Hessian'ı. Yani <span class="math inline">\(t_k\)</span> boyunda eksi gradyan yönünde gitmek yerine gradyanin &quot;negatif Hessian'ı yönünde'' gideceğiz. Dikkat edersek bu yöntemde adım büyüklüğü kavramı yok, seçilen yönde tam bir adım atılıyor.</p>
+<p>Newton metotunu nasıl yorumlamak gerekir? Gradyan inişini hatırlarsak, bir fonksiyon <span class="math inline">\(f\)</span>'i alalım, ve onu <span class="math inline">\(x\)</span> noktasında karesel olarak yaklaşıklamasını alıyorduk,</p>
+<div class="figure">
+<img src="func_35_newton_01.png" />
+
+</div>
+<p>Hessian nerede? Aslında var, ama birim matris <span class="math inline">\(\frac{1}{2t} I\)</span> olarak alındı. Alttaki resimde Newton metotu için yaratılan yaklaşıklamayı görüyoruz, bu büyük ihtimalle daha iyi bir yaklaşıklama olacak çünkü karesel açılımda daha fazla bilgi kullanıyor, bu sefer formülde <span class="math inline">\(\nabla^2 f(x)\)</span> ile Hessian da var.</p>
+<div class="figure">
+<img src="func_35_newton_02.png" />
+
+</div>
+<p>Bu yeni yaklaşıklama üzerinden <span class="math inline">\(x - (\nabla^2 f(x))^{-1}\nabla f(x)\)</span> ile adım atınca belki yeşil okla gösterilen yere geleceğiz, bu daha iyi bir nokta olabilecek. Atılan adım formülünün resimdeki karesel formun minimize edicisi olduğunu görmek zor değil.</p>
+<p>Gradyan inişi ve Newton metotu adımları arasındaki farkı görmek için örnek bir fonksiyona bakalım, <span class="math inline">\(f(x) = (10 x_1^2 + x_2^2)/2 + 5 \log (1+e^{-x_1 - x_2})\)</span>. Fonksiyonu kontur grafiğini basınca alttaki gibi çıkıyor,</p>
+<div class="figure">
+<img src="func_35_newton_03.png" />
+
+</div>
+<p>Siyah çizgi gradyan inişi, mavi Newton. Aynı yerden başlattım, ve gördüğümüz gibi minimal noktaya doğru çok farklı yollar takip ediyorlar. Karşılaştırması kolay olsun diye her iki tarafta atılan adım büyüklüklerini aynı tutmaya uğraştım. Graydan inişinin attığı adımların yönünün niye böyle olduğu gayet bariz, tüm adımlar görüldüğü gibi o noktadaki kontura dikgen, ki bu gradyanın tanımıdır zaten, bir noktadaki gradyan oradaki konturun teğetine diktir / normaldir.</p>
+<p>Newton tamamen farklı bir şekilde gidiyor. Resimde tüm adımlar tek bir çizgide gibi duruyor ama aslında değil, başka bir yerden başlatsaydım bazen zigzaglı bile gidilebileceğini görürdük [6, 13:40]. Newton'un adımlarını yorumlamanın görsel olarak zihinde hayal etmenin iyi bir yolu onun her adımda bir küre, bir balon yarattığını düşünmek, ve o balonun gradyanina göre adım atmak.</p>
+<p>Dersin geri kalanında Newton metotunda geriye çizgisel iz sürme (backtracking) yöntemini göreceğiz, ki &quot;Newton metotu'' denince aslında bu çeşitten bahsedilir, üstteki bahsettiğimize &quot;pür Newton'' adı veriliyor. Sonra bazı yakınsama özelliklerine bakacağız, ardından Newton metotunun bir çeşidi, eşitlik kısıtlamalı Newton metotunu göreceğiz. Eğer zaman kalırsa Newton-umsu (quasi-Newton) metotlara da bakmak istiyorum.</p>
+<p>Newton metotuna bakmanın bir diğer yolu nedir? Onun her adımda bir karesel açılımı minimize ettiğini biliyoruz. Bir diğeri [6, 17:04] birinci derece optimalite şartını lineerize etmek. Biz <span class="math inline">\(x\)</span>'teyiz diyelim, öyle bir yön <span class="math inline">\(v\)</span> arıyoruz ki o yönde bir adım atınca gradyan sıfır hale gelsin, <span class="math inline">\(\nabla f(x+v)=0\)</span>. Bu genel bir ifade değil mi, ayrıca <span class="math inline">\(v\)</span> bağlamında lineer, <span class="math inline">\(x\)</span> sabit. Şimdi bu gradyanin lineer yaklaşıklamasını yaparsak doğal olarak Hessian'lı ifadeye eriseceğiz,</p>
+<p><span class="math display">\[
+0 = \nabla f(x+v) \approx \nabla f(x) + \nabla^2 f(x) v
+\]</span></p>
+<p>Ve üstteki formülü <span class="math inline">\(v\)</span> için çözersek, bu bizi tekrar daha önce gösterdiğimiz Newton adımına götürüyor, <span class="math inline">\(v = - \left( \nabla^2 f(x) \right)^{-1} \nabla f(x)\)</span></p>
+<p>Bu metotun tarihi bir arka planı da var, İsaac Newton bizim bugün Newton metotu dediğimiz yöntemi minimizasyon için değil, kök bulmak için keşfetti. Düşündü ki gayrı-lineer bir denklemin çözümlerini bulmak istiyorsan böyle bir metot gerekli. Tek boyutta düşünelim, mesela bir <span class="math inline">\(g\)</span> var, onun köklerini bulmak istiyoruz, o zaman Newton metotu kullan. Hatta genel fonksiyonlar için bile değil, polinomlar için bu yöntemi bulmuştu. Rhapson, bir diğer bilimci, aynı şekilde, aynı metotu düşündü. O sebeple bu metota bazen Newton-Rhapson adı verildiğini de görebilirsiniz. Çok sonraları bilimciler bu metotu minimizasyon için kullanmayı akıl etti, gradyanı sıfıra eşitliyerek. Bu kullanım çoğunlukla Simpson'a atfedilir.</p>
+<p>Devam edelim, Newton adımının önemli bir özelliği onun ılgın değişmezliği (affine invariance). Bu ne demek? Bir lineer transformasyona bakalım. Diyelim ki <span class="math inline">\(f,x\)</span> üzerinden Newton adımı hesaplıyorken ben gelip diyorum ki &quot;<span class="math inline">\(x\)</span> üzerinde değil yeni bir değişken <span class="math inline">\(y\)</span> üzerinden bunu yapmanı istiyorum'' ve formül <span class="math inline">\(x = Ay\)</span>, ve <span class="math inline">\(g(y) = f(Ay)\)</span>. O zaman <span class="math inline">\(g\)</span> üzerinde Newton adımları neye benzer?</p>
+<p><span class="math display">\[
+y^+ = y - (\nabla^2 g(y))^{-1} \nabla g(y)
+\]</span></p>
+<p><span class="math display">\[
+= y - (A^T \nabla^2 f(Ay) A)^{-1} A^T \nabla f(Ay)
+\]</span></p>
+<p><span class="math display">\[
+= y - A^{-1} (\nabla^2 f(Ay))^{-1} f(Ay)
+\]</span></p>
+<p>Eğer üsttekini <span class="math inline">\(A\)</span> ile çarparsam, ki solda <span class="math inline">\(Ay^+\)</span> elde edebileyim,</p>
+<p><span class="math display">\[
+Ay^+ = Ay -  (\nabla^2 f(Ay))^{-1} f(Ay)
+\]</span></p>
+<p>ki</p>
+<p><span class="math display">\[
+\underbrace{Ay^+}_{x^+} =
+\underbrace{Ay}_{x} -  
+(\nabla^2 f(\underbrace{Ay}_{x}))^{-1} f(\underbrace{Ay}_{x})
+\]</span></p>
+<p><span class="math inline">\(x\)</span>'e göre atmış olacağımız adıma eriştik yani [6, 22:30].</p>
+<p>Bu demektir ki lineer ölçeklemeden bağımsız davranabiliyoruz. Mesela size bir problem verdim, Hessian'ı hesapsal bağlamda uygunsuz (poorly conditioned) ama bir lineer transformasyon uygularsam iyi hale gelecek, o zaman prensipsel olarak ilk ya da transform edilmiş problem üzerinde Newton işletmeniz bir fark yaratmaz. Dikkat, bu durum gradyan inişi için geçerli değildir.</p>
+<p>Newton azalışı (decrement)</p>
+<p>Yeni bir kavram bu, Newton azalışı. Bu kavram bize Newton adımını yorumlamada bir açı daha kazandırıyor, ayrıca birazdan geriye çizgisel iz sürmeden bahsederken, ve duruş kriterini hesaplamada da yardımcı oluyor.</p>
+<p>[atlandı]</p>
+<p>Geriye çizgisel iz sürmek</p>
+<p>Eğer pür Newton adımı atarsak başladığımız noktaya göre uzaksama (diverge) mümkündür, yani optimal noktadan uzaklaşabiliriz. Newton metotunun çok hızlı bir yakınsama oranı vardır, ama belirttiğimiz bu durumlarda aynı şekilde çok hızlı bir şekilde de uzaksayabilir. Yani başladığımız noktaya göre Newton metotu ya çok iyi, ya da çok kötüdür. O sebeple araştırmacılar pratik uygulamalarda muhakkak geriye çizgisel iz sürme yönteminin Newton'la beraber kullanırlar. Pür Newton metotunu olduğu gibi kullanan neredeyse kimse tanımıyorum. Gradyan inişi de benzer şekilde kullanılır, hatta bu iki yöntemi aslında aynı altyapı odaklı görebiliriz.</p>
+<p>İz sürme yöntemi adım büyüklüğü <span class="math inline">\(t\)</span>'yi hesaplamak için kullanılır, pür metot <span class="math inline">\(t=1\)</span> kullanıyor tabii ki. Arama algoritması iki parametreyi baz alır, <span class="math inline">\(\alpha,\beta\)</span>. Bu parametreler için iyi işleyen bazı değerler mesela <span class="math inline">\(0 &lt; \alpha &lt;1/2\)</span> ve <span class="math inline">\(0 &lt; \beta &lt; 1\)</span>. Her adımda <span class="math inline">\(t=1\)</span> ile başlarız, ve</p>
+<p><span class="math display">\[
+f(x+tv) &gt; f(x) + \alpha t \nabla f(x)^T v
+\]</span></p>
+<p>koşuluna bakarız. Soldaki Newton adımı, sağdaki o yönde ama daha ufak, <span class="math inline">\(\alpha t\)</span> kadar ufak bir lineer yaklaşıklama, ara değerleme (interpolation). Yani <span class="math inline">\(t\)</span>'nin bir kısmı kadar, <span class="math inline">\(\alpha\)</span> kısmı kadar yönde bir ilerleme kaydedip etmeyeceğimize bakıyoruz, eğer üstteki şart doğruysa o <span class="math inline">\(t\)</span>'yi adım olarak seçiyoruz. Yoksa <span class="math inline">\(t = \beta t\)</span> ile <span class="math inline">\(t\)</span>'yi küçültüp alt döngüde aynı işlemi bir daha tekrarlıyoruz.</p>
+<p>Newton yönteminin çok hızlı yakınsadığını söylemiştik, arama adımını hesaba katınca bile bu doğru. Peki hiç dezavantajı yok mu? Bir tane var, eğer Hessian yoğun (dense) matris ise o zaman temel lineer cebir'e göre tersini hesaplamak ne kadar yük getirir? <span class="math inline">\(O(n^3)\)</span> değil mi? Bu ağır bir yük olabilir.</p>
+<p>[yakınsama analizi atlandı]</p>
+<p>Şimdi Newton'un yöntemini birinci derece yöntemlerle (gradyan inişi gibi) karşılaştıralım.</p>
+<ul>
+<li><p>Bellek: her adımda Newton yöntemi <span class="math inline">\(O(n^2)\)</span> yer tutar, çünkü Hessian <span class="math inline">\(n \times n\)</span> boyutunda, kıyasla her gradyan adımı <span class="math inline">\(O(n)\)</span> yer tutar, çünkü <span class="math inline">\(n\)</span> boyutlu gradyan var.</p></li>
+<li><p>Hesap: her adıma <span class="math inline">\(O(n^3)\)</span> hızında, eğer yoğun <span class="math inline">\(n \times n\)</span> boyutunda bir lineer sistemi çözmek gerekiyorsa. Ama her gradyan iniş adımı <span class="math inline">\(O(n)\)</span> hızında işler, çünkü <span class="math inline">\(n\)</span> boyutlu bir vektörü topluyoruz, ölçekliyoruz, basit işlemler yapıyoruz yani.</p></li>
+<li><p>Geriye iz sürme: her iki yöntem için de <span class="math inline">\(O(n)\)</span> hızında işler.</p></li>
+<li><p>Uyumlama, transformasyon: Newton yöntemi problemin mevcut haline çok bağımlı değil, eğer transforme edersek eşit bir başka problem elde ediyoruz, ve Newton onu da çözüyor. Gradyan inişi problem çeşidine göre hızlı bir şekilde dejenere olabilir, sonuca varamayabilir.</p></li>
+<li><p>Kırılganlık: Newton yönteminin hatalar, sayısal hesap problemlerine biraz daha hassas olduğu söylenebilir, gradyan inişi daha sağlamdır.</p></li>
+</ul>
+<p>O zaman Newton yöntemini hangi durumlarda kullanmak iyidir? Eğer Hessian seyrek ve bir iç yapıya sahip ise o zaman o lineer sistemi çözmek hızlı olur, bu durumda Newton yöntemi kullanmak uygundur. Yapıya sahip ile ne demek istiyorum? Mesela bantlı bir matris var ise. Bantlı matris köşegende bir veya daha fazla çapraz satır olduğu durumlardır, bir şerit, bir &quot;bant'' vardır, alttaki gibi,</p>
+<div class="figure">
+<img src="banded.png" />
+
+</div>
+<p>Bu durumda bellek ve hesapsal yük her adım için <span class="math inline">\(O(n)\)</span> olacaktır.</p>
+<p>Yapıya sahip Hessian'lar alttaki gibi durumlarda ortaya çıkabilir,</p>
+<ul>
+<li><p>Eğer <span class="math inline">\(g(\beta) = f(X\beta)\)</span> ise o zaman <span class="math inline">\(\nabla^2 g(\beta) = X^T \nabla ^2 f(X\beta) X\)</span> olur. Yani eğer <span class="math inline">\(X\)</span> bir yapıya sahip tahmin edici matris ise ve <span class="math inline">\(\nabla^2 f\)</span> köşegen ise o zaman <span class="math inline">\(\nabla^2 g\)</span> yapıya sahiptir.</p></li>
+<li><p>Amacımız <span class="math inline">\(f(\beta) + g(D\beta)\)</span>'yi minimize etmek, <span class="math inline">\(\nabla^2\)</span> köşegen, <span class="math inline">\(g\)</span> pürüzsüz değil, ve <span class="math inline">\(D\)</span> yapıya sahip bir ceza matrisi, o zaman Lagrange ikiz fonksiyonu <span class="math inline">\(-f^\ast(-D^Tu)-g^\ast(-u)\)</span>. Çoğunlukla bu durumlarda <span class="math inline">\(\nabla^2f^\ast\)</span> köşegen olur (mesela <span class="math inline">\(f(\beta) = \sum_{i=1}^{p}f_i (\beta_i)\)</span> ise bu durumda ikizdeki Hessian yapıya sahiptir.</p></li>
+</ul>
+<p>Eşitlik kısıtlamalı Newton yöntemi</p>
+<p>Şu formdaki bir problem düşünelim,</p>
+<p><span class="math display">\[
+\min_x f(x) \quad \textrm{öyle ki} \quad Ax = b
+\]</span></p>
+<p>Bu tür problemleri çözmek için elimizde aşağı yukarı üç yöntem var.</p>
+<ol style="list-style-type: decimal">
+<li>Eşitlik sınırlamalarını yoket. Problemi <span class="math inline">\(A\)</span>'nin sıfır uzayı bağlamında tekrar parametrize et, yani <span class="math inline">\(x = My + x_o\)</span> yap, <span class="math inline">\(M\)</span>, <span class="math inline">\(A\)</span>'nin sıfır uzayını kapsar, ve <span class="math inline">\(A x_0 = b\)</span>'dir. Çözümü <span class="math inline">\(y\)</span> bağlamında yap.</li>
+</ol>
+<p>Bu fena bir çözüm değil, ama <span class="math inline">\(A\)</span>'nin sıfır uzayını kapsayan bir <span class="math inline">\(M\)</span> bulmamızı gerektiriyor. Ayrıca problemde yapı varsa bunu bozmuş olabiliriz, seyrek Hessian elimizde olabilir ama değişim sonrası Hessian yoğun olabilir.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>İkizi türet. Daha önce gördük ki bu tür problemlerde ikizi hesaplarken eşitlik sınırı kritere dahil ediliyordu. Ama bu da her zaman kolay değildir.</p></li>
+<li><p>Eşitlik kısıtlamalı Newton yöntemi. Çoğu durumda en direk yaklaşım budur. Bu yöntemde <span class="math inline">\(x^{(0)}\)</span> ile başlarız, ki <span class="math inline">\(Ax^{(0)}=b\)</span> olacak şekilde, ve</p></li>
+</ol>
+<p><span class="math display">\[
+x^+ = x + tv
+\]</span></p>
+<p>adımı atarız, ama normal Hessian'lı karesel açılımı minimize etmek yerine yeni bir sınırlama ekleyeceğiz, her Newton adımının saygı göstermesi gereken <span class="math inline">\(Az=0\)</span> şartı koyacağız,</p>
+<p><span class="math display">\[
+v = \arg\min_{Az=0} \nabla f(x)^T (z-x) + \frac{1}{2} (z-x)^T \nabla^2 f(x)(z-x)
+\]</span></p>
+<p>Böylece her adımda kısıtlanmış bölge içinde kalmış olacağız. Üstteki eşitlik şartını KKT dersimizde görmüştük, bu hesap tek bir lineer sistemi çözmeye indirgenebiliyordu. Lineer sistemi tekrar altta veriyorum,</p>
+<p><span class="math display">\[
+\left[\begin{array}{cc}
+\nabla^2 f(x) &amp; A^T \\ A &amp; 0
+\end{array}\right]
+\left[\begin{array}{cc}
+v \\ w
+\end{array}\right] = 
+\left[\begin{array}{cc}
+-\nabla f(x) \\ 0
+\end{array}\right] 
+\]</span></p>
+<p>Bu lineer sistemi <span class="math inline">\(v\)</span> için çözersek bu bize eşitlikle sınırlanmış Newton adımını verecektir. Eşitliğin solundaki matris çoğunlukla seyrek ve yapıya sahiptir, çünkü <span class="math inline">\(\nabla^2 f(x)\)</span> Hessian'ı içindeki seyreklik ve yapı aynen orada da mevcuttur, ve <span class="math inline">\(A\)</span>'lar blok halinde belli yerdeler, vs. Ayrıca Boyd [7, 1:04:00]'da benzer bir anlatım var.</p>
+<p>Alternatif Anlatım</p>
+<p>Newton birazdan bahsedeceğimiz yöntemi tek boyutlu problemler için kullandı [2]. Rhapson adlı bilimci yöntemi çok boyutlu problemler için genişletti. Biz bu yönteme optimizasyon çerçevesinde bakacağız. Konunun tarihinden biraz bahsetmek istiyorum, bu dersi öğretmeye başladığımda 1986 senesiydi, Newton'un metodunu nasıl gördüğümüz o zamandan beri değişime uğradı, o zamanlar son başvurulan metot diye öğretiliyordu, çünkü kullanmak için &quot;büyük'' bir denklem sistemi çözmek gerekiyordu, 500 x 500 bir sistem mesela. Bugüne gelelim Newton metotu artık ilk başvurulan metot haline geldi, 50,000 x 50,000 boyutlarında bir sistem çözmek &quot;yetiyor'' ve böyle bir sistem artık idare edilebilen bir boyut haline geldi. Yani hesapsal kapasite Newton metodunun optimizasyon alanında oynadığı rolü tamamen değiştirdi.</p>
+<p>Diğer bir faktör ileride öğreneceğimiz iç nokta (interior-point) metotlarının Newton'un metodunu kullanıyor olmaları. İç nokta metotları içbükey optimizasyonda çok popüler, onlar için Newton metotu gerekiyor, bu da onun popülaritesini arttırıyor.</p>
+<p>NM nedir? Elimde bir kısıtlanmamış (unconstrained) problemim var diyelim,</p>
+<p><span class="math display">\[
+\min f(x), \quad \textrm{ öyle ki } \quad x \in X = \mathbb{R}^n
+\]</span></p>
+<p>Bir Taylor açılımı yapabiliriz,</p>
+<p><span class="math display">\[
+f(x) \approx 
+f(\bar{x}) + 
+\nabla f(\bar{x})^T (x-\bar{x}) + 
+\frac{1}{2} (x-\bar{x})^T F (x-\bar{x}) 
+\]</span></p>
+<p>ki <span class="math inline">\(F\)</span> Hessian matrisi. Üstteki formüle <span class="math inline">\(h(x)\)</span> diyelim. Böylece bir karesel model ortaya çıkartmış oldum, formülün sağ tarafındaki çarpım onu karesel yapıyor, ve şimdi onu kesin olarak çözmek istiyorum. Bunu nasıl yaparım? Formülün gradyanını sıfıra eşitleyebilirim. Üstteki fonksiyonun <span class="math inline">\(x\)</span>'teki gradyanı nedir?</p>
+<p>Gradyanı <span class="math inline">\(x\)</span>'e göre aldığımızı unutmayalım, <span class="math inline">\(h(x)\)</span>'in ikinci terimi <span class="math inline">\(\nabla f(\bar{x})^T\)</span> bir sabit sayı, ikinci gradyan alınırken sıfırlanır, ve tüm ikinci terim sıfırlanır. Üçüncü terimin gradyanını almak bir nevi <span class="math inline">\(\frac{\partial (x^TAx)}{\partial x}\)</span> almak gibi [1], <span class="math inline">\(F\)</span> belli bir noktadaki ikinci türev matrisi olduğu için <span class="math inline">\(A\)</span> gibi bir sabit matris kabul edilebilir, <span class="math inline">\(A\)</span> simetrik olunca gradyan <span class="math inline">\(2Ax\)</span> sonucunu veriyordu, <span class="math inline">\(F\)</span> simetrik, o zaman üçüncü terimde <span class="math inline">\(F\)</span> kalır, 2 ve <span class="math inline">\(1/2\)</span> birbirini iptal eder, sonuç</p>
+<p><span class="math display">\[
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + F(\bar{x})(x-\bar{x}) 
+\]</span></p>
+<p>İki üstteki karesel yaklaşıksal ifadenin gradyanı bu işte. Onu sıfıra eşitleriz ve çözeriz. <span class="math inline">\(F\)</span> tersi alinabilir bir matristir, o zaman</p>
+<p><span class="math display">\[
+\nabla h(\bar{x}) = \nabla f(\bar{x}) + F(\bar{x})(x-\bar{x}) = 0
+\]</span></p>
+<p><span class="math display">\[
+(x-\bar{x}) = -F^{-1} \nabla f(\bar{x})
+\]</span></p>
+<p>Üstteki ifadeye <span class="math inline">\(d\)</span> diyebilirim, ve bu <span class="math inline">\(d\)</span> benim Newton yönüm olarak görülebilir, yön derken optimizasyon bağlamında minimuma giden yön.</p>
+<p>Bu bizi gayet basit 4 adımlık bir algoritmaya taşıyor,</p>
+<ol start="0" style="list-style-type: decimal">
+<li><p><span class="math inline">\(x^0\)</span> verildi, bu başlangıç noktası, <span class="math inline">\(k = 0\)</span> yap.</p></li>
+<li><p><span class="math inline">\(d^k = -F(x^k)^{-1} \nabla f(x^k)\)</span>. Eğer <span class="math inline">\(d^k=0\)</span> ise dur.</p></li>
+<li><p><span class="math inline">\(\alpha^k = 1\)</span> adım boyu seç</p></li>
+<li><p><span class="math inline">\(x^{k+1} = x^k + \alpha^k d^k\)</span>, <span class="math inline">\(k = k + 1\)</span> yap, ve 1. adıma geri dön.</p></li>
+</ol>
+<p>Bu metodun önemli bir özelliğinin her adımda sadece bir lineer sistemi çözmek olduğunu görüyoruz (tersini alma işlemi). Bir lineer sistemi çözmek kolay mıdır? Sisteme göre değişir, 100 x 100 sistem, problem yok. 10,000 x 10,000 yoğun bir sistem var ise (seyrek matrisle temsil edilen lineer sisteme nazaran) işimiz daha zor olacaktır. Bu tür sistemlerde Gaussian eliminasyon işlemeyebilir, bir tür özyineli metot gerekli. Demek istediğim Newton yönteminin darboğazı bir lineer denklem sistemini her seferinde sıfırdan başlayarak çözmek, ve bunu her döngüde yapmak.</p>
+<p>Fakat bu çözümün bize pek çok şey kazandırdığını da görmek lazım; bahsedilen sistemi çözmek bize pek çok bilgi kazandırıyor çünkü çözülen problem içinde 1. ve 2. türev bilgisi var. Bu bilgi minimizasyon açısından daha akıllıca adım atılabilmesini sağlıyor.</p>
+<p>Metot Hessian'ın her adımda tersi alınabilir olduğunu farzediyor, bu her zaman doğru olmayabilir. O sebeple bunun doğru olduğu türden problemler ile uğraşacağız, ya da Hessian'ın tersi alınabilir olmasını sağlayan mekanizmaları göreceğiz. <span class="math inline">\(F\)</span>'nin özünü bozmadan değiştirerek tersi alınabilir olmasını sağlayan yöntemler var.</p>
+<p>Ayrıca hedef her adımda fonksiyonunu oluşturduğumda bu fonksiyonun azalma garantisi yok. Öyle ya akıllı bir algoritmanin her adımda hedef fonksiyonumu daha iyiye götürdüğümü düşünebilirdim, ama şu anda kadar gördüklerimiz ışığında, bunun garantisi yok. Bu konuya sonra değineceğiz.</p>
+<p>Bir diğer nokta 2. adımın çizgi arama ile genişletilebilmesi [bu konuya altta baska kaynaklardan deginiyoruz]</p>
+<p>NY'nin en çekici tarafı, eğer yakınsama (convergence) mümkün ise bu yakınsamanın çok hızlı bir şekilde olması, ki bu iyi. Bu konuya gelmeden metodun bazı ek özelliklerini görelim.</p>
+<p>Terminoloji: bir matrise SPD denir eger matris simetrik, pozitif kesin ise (simetric positive-definite).</p>
+<p>Teklif (Proposition) 1:</p>
+<p>Eğer <span class="math inline">\(F(x)\)</span> SPD ise <span class="math inline">\(d \ne 0\)</span>, o zaman <span class="math inline">\(d\)</span> <span class="math inline">\(\bar{x}\)</span> noktasında bir iniş yönüne işaret eder. İniş yönü olması demek, eğer makul ufak bir adım çerçevesinde gidilen noktada <span class="math inline">\(f\)</span>'in değerinin o an olduğumuz noktadan daha az olması demektir.</p>
+<p>Nasıl ispatlarım? Önceki dersten hatırlarsak, eğer yönüm gradyan ile negatif iç çarpıma sahip ise, o zaman yönüm kesinlikle bir iniş yönüydü.</p>
+<p>Teori</p>
+<p>Diyelim ki <span class="math inline">\(f(x)\)</span> fonksiyonu <span class="math inline">\(\bar{x}\)</span> noktasında türevi alınabilir halde [2, sf. 9]. Eğer elimizde <span class="math inline">\(\nabla f(\bar{x})^T d &lt; 0\)</span> sonucunu veren bir <span class="math inline">\(d\)</span> vektörü var ise, öyle ki her yeterince küçük <span class="math inline">\(\lambda &gt; 0\)</span> için <span class="math inline">\(f(\bar{x}+\lambda d) &lt; f(\bar{x})\)</span> olacak şekilde, o zaman <span class="math inline">\(d\)</span> bir iniş yönüdür.</p>
+<p>İspat</p>
+<p>Taylor açılımı ile yönsel türev tanımına bakarsak,</p>
+<p><span class="math display">\[
+f(\bar{x} + \lambda d ) = 
+f(\bar{x}) + \lambda \nabla f(\bar{x})^T d + 
+\lambda ||d|| \alpha(\bar{x},\lambda d)
+\]</span></p>
+<p>öyle ki <span class="math inline">\(\alpha(\bar{x},\lambda d) \to 0\)</span>, <span class="math inline">\(\lambda \to 0\)</span> olurken. Not: Norm içeren üçüncü terimdeki <span class="math inline">\(\lambda ||d|| \alpha(\bar{x},\lambda d)\)</span> ifadesi Taylor serisinin artıklı tanımından geliyor. Detaylar için [3, sf. 360]'a bakılabilir.</p>
+<p>Üstteki ifadeyi tekrar düzenlersek,</p>
+<p><span class="math display">\[
+\frac{f(\bar{x} + \lambda d) - f(\bar{x})}{\lambda} = 
+\nabla f(\bar{x})^T + ||d||\alpha(\bar{x},\lambda d)
+\]</span></p>
+<p><span class="math inline">\(\nabla f(\bar{x})^T d &lt; 0\)</span> olduğuna göre (aradığımız şart bu) o zaman, ve <span class="math inline">\(\alpha(\bar{x},\lambda d) \to 0\)</span>, <span class="math inline">\(\lambda \to 0\)</span> iken, her yeterince küçük <span class="math inline">\(\lambda &gt; 0\)</span> için <span class="math inline">\(f(\bar{x} + \lambda d)-f(\bar{x}) &lt; 0\)</span> olmalıdır, yani her hangi bir yönde atılan adım bir önceki <span class="math inline">\(f\)</span> değerinden bizi daha ufak bir <span class="math inline">\(f\)</span> değerine götürmelidir.</p>
+<p>Ana Teklif'e dönelim. Newton adımınıdaki SPD <span class="math inline">\(F\)</span> için <span class="math inline">\(0 &lt; d^T \nabla f\)</span> olduğunu göstermemiz lazım (ki böylece iniş yönü olduğunu ispatlayabilelim, bir önceki teori),</p>
+<p><span class="math display">\[
+d = -F^{-1} \nabla f(\bar{x})
+\]</span></p>
+<p>demiştik, her iki tarafı <span class="math inline">\(\nabla f(x)\)</span> ile çarpalım,</p>
+<p><span class="math display">\[
+d \nabla f(x) = -\nabla f(x) F^{-1} \nabla f(x) 
+\]</span></p>
+<p>Eşitliğin sağ tarafındaki ifade hangi şartlarda eksi olur? Eğer <span class="math inline">\(F\)</span> matrisi pozitif kesin ise değil mi? Genel matrislerden hatırlarsak, matris <span class="math inline">\(A\)</span> ve bir vektör için <span class="math inline">\(v\)</span> eğer <span class="math inline">\(A\)</span> pozitif kesin ise <span class="math inline">\(v^TAv &gt; 0\)</span>. Daha önce <span class="math inline">\(F\)</span>'nin pozitif kesin olduğunu söylemiştik, o zaman bir şekilde eğer <span class="math inline">\(F\)</span> pozitif kesin olmasının sadece ve sadece <span class="math inline">\(F\)</span>'nin tersinin pozitif kesin olmasına bağlı olduğuna gösterebilirsem amacıma ulaşabilirim.</p>
+<p>Bunu yapmak aslında pek zor değil. Biliyorum ki <span class="math inline">\(F(x)\)</span> SPD. Simdi herhangi bir vektor <span class="math inline">\(v\)</span> icin</p>
+<p><span class="math display">\[
+0 &lt; v^T F(x)^{-1}v
+\]</span></p>
+<p>ifadeyi şöyle genişletelim, <span class="math inline">\(F(x)F(x)^{-1}\)</span> eklemek hiçbir şeyi değiştirmez çünkü bu çarpım birim matristir,</p>
+<p><span class="math display">\[
+v^T F(x)^{-1}v = v^T F(x)^{-1} F(x)F(x)^{-1} v &gt; 0
+\]</span></p>
+<p>Genişlemiş ifadenin harfiyen pozitif olduğunu biliyorum, iki üstteki tanımdan. Ama şimdi üstteki ifadeye farklı bir şekilde bakarsak,</p>
+<p><span class="math display">\[
+v^T F(x)^{-1}v = \underbrace{v^TF(x)^{-1}} F(x) \underbrace{F(x)^{-1} v} &gt; 0
+\]</span></p>
+<p>İşaretlenen bölümlerin birer vektör olduğunu görebiliriz, bu durumda <span class="math inline">\(v^TAv &gt; 0\)</span> pozitif kesinlik formülü farklı bir <span class="math inline">\(v\)</span> için hala geçerlidir, o zaman ortadaki <span class="math inline">\(A\)</span>, bu durumda <span class="math inline">\(F(x)\)</span> pozitif kesin olmalıdır.</p>
+<p>Örnek 1</p>
+<p><span class="math inline">\(f(x) = 7x - \ln(x)\)</span> olsun. O zaman <span class="math inline">\(\nabla f(x) = 7 - \frac{1}{x}\)</span> ve <span class="math inline">\(F(x) = f&#39;&#39;(x) = \frac{1}{x^2}\)</span>. Bu fonksiyonun özgün global minimumunun <span class="math inline">\(x^\ast = 1/7 = 1.428..\)</span> olduğunu kontrol etmek zor değil. <span class="math inline">\(x\)</span> noktasındaki Newton yönü</p>
+<p><span class="math display">\[
+d = -F(x)^{-1} \nabla f(x) = -\frac{f&#39;(x)}{f&#39;&#39;(x)} = 
+-x^2 \left( 7 - \frac{1}{x}  \right)=
+x - 7x^2
+\]</span></p>
+<p>Newton yöntemi <span class="math inline">\(\{ x^k \}\)</span> serisini üretecek, öyle ki</p>
+<p><span class="math display">\[
+x^{k+1} = x^k + ( x^k - 7(x^k)^2  ) = 2x^k - 7(x^k)^2
+\]</span></p>
+<p>Altta farklı başlangıç noktalarına göre üretilen serileri görüyoruz. Yakınsamanın hangi değere doğru olduğu bariz, ve global minimum da o değer zaten.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+pd.set_option(<span class="st">&#39;display.notebook_repr_html&#39;</span>, <span class="va">False</span>)
+pd.set_option(<span class="st">&#39;display.max_columns&#39;</span>, <span class="dv">20</span>)
+pd.set_option(<span class="st">&#39;display.max_rows&#39;</span>, <span class="dv">30</span>) 
+pd.set_option(<span class="st">&#39;display.width&#39;</span>, <span class="dv">82</span>) 
+pd.set_option(<span class="st">&#39;precision&#39;</span>, <span class="dv">6</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>np.arange(<span class="dv">11</span>))
+
+<span class="kw">def</span> calculate_newton_ex1(x):
+    arr <span class="op">=</span> []
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">11</span>):
+        arr.append(x)
+        x <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">-</span> <span class="dv">7</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span>
+        <span class="cf">if</span> (x <span class="op">&gt;</span> <span class="fl">1e100</span>):  x <span class="op">=</span> np.inf
+        <span class="cf">if</span> (x <span class="op">&lt;</span> <span class="fl">-1e100</span>):  x <span class="op">=</span> <span class="op">-</span>np.inf
+    <span class="cf">return</span> arr
+
+df[<span class="st">&#39;1&#39;</span>] <span class="op">=</span> calculate_newton_ex1(<span class="fl">1.0</span>)
+df[<span class="st">&#39;2&#39;</span>] <span class="op">=</span> calculate_newton_ex1(<span class="fl">0.0</span>)
+df[<span class="st">&#39;3&#39;</span>] <span class="op">=</span> calculate_newton_ex1(<span class="fl">0.1</span>)
+df[<span class="st">&#39;4&#39;</span>] <span class="op">=</span> calculate_newton_ex1(<span class="fl">0.01</span>)
+
+<span class="bu">print</span> (df)    </code></pre></div>
+<pre><code>               1    2         3         4
+0   1.000000e+00  0.0  0.100000  0.010000
+1  -5.000000e+00  0.0  0.130000  0.019300
+2  -1.850000e+02  0.0  0.141700  0.035993
+3  -2.399450e+05  0.0  0.142848  0.062917
+4  -4.030157e+11  0.0  0.142857  0.098124
+5  -1.136952e+24  0.0  0.142857  0.128850
+6  -9.048612e+48  0.0  0.142857  0.141484
+7  -5.731417e+98  0.0  0.142857  0.142844
+8           -inf  0.0  0.142857  0.142857
+9           -inf  0.0  0.142857  0.142857
+10          -inf  0.0  0.142857  0.142857</code></pre>
+<p>Örnek 2</p>
+<p>Bu örnekte iki değişkenli bir fonksiyon görelim. Global minimum <span class="math inline">\((1/3,1/3)\)</span>. Bakalım bu değeri bulabilecek miyiz?</p>
+<p><span class="math inline">\(f(x) = -\ln( 1 - x_1 - x_2) - \ln x_1 - \ln x_2\)</span></p>
+<p><span class="math display">\[
+\nabla f(x) = 
+\left[\begin{array}{r}
+\frac{1}{1-x_1-x_2} - \frac{1}{x_1} \\
+\frac{1}{1-x_1-x_2} - \frac{1}{x_2} 
+\end{array}\right]
+\]</span></p>
+<p><span class="math display">\[
+F(x) = 
+\left[\begin{array}{rr}
+(\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_1})^2 &amp; (\frac{1}{1-x_1-x_2} )^2 \\
+(\frac{1}{1-x_1-x_2} )^2 &amp; (\frac{1}{1-x_1-x_2})^2 - (\frac{1}{x_2})^2
+\end{array}\right]
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+df <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>np.arange(<span class="dv">11</span>))
+
+<span class="kw">def</span> calculate_newton_ex2(x):    
+    arr <span class="op">=</span> []
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">8</span>):
+        arr.append(x)
+        x1,x2 <span class="op">=</span> x[<span class="dv">0</span>],x[<span class="dv">1</span>]    
+        F <span class="op">=</span> [[(<span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span><span class="op">-</span>x1<span class="op">-</span>x2))<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> (<span class="fl">1.0</span><span class="op">/</span>x1)<span class="op">**</span><span class="fl">2.0</span>, (<span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span><span class="op">-</span>x1<span class="op">-</span>x2))<span class="op">**</span><span class="fl">2.0</span>],
+             [(<span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span><span class="op">-</span>x1<span class="op">-</span>x2))<span class="op">**</span><span class="dv">2</span>, (<span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span><span class="op">-</span>x1<span class="op">-</span>x2))<span class="op">**</span><span class="fl">2.0</span> <span class="op">+</span> (<span class="fl">1.0</span><span class="op">/</span>x2)<span class="op">**</span><span class="fl">2.0</span>]]
+        F <span class="op">=</span> np.array(F)
+
+        Df <span class="op">=</span> [[<span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span><span class="op">-</span>x1<span class="op">-</span>x2) <span class="op">-</span> (<span class="fl">1.0</span><span class="op">/</span>x1)], [<span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span><span class="op">-</span>x1<span class="op">-</span>x2)<span class="op">-</span>(<span class="fl">1.0</span><span class="op">/</span>x2)]]
+        Df <span class="op">=</span> np.array(Df)
+
+        d <span class="op">=</span> np.dot(<span class="op">-</span>lin.inv(F),Df)
+        x <span class="op">=</span> x <span class="op">+</span> d.flatten()
+
+    <span class="cf">return</span> np.array(arr)
+
+res <span class="op">=</span> calculate_newton_ex2([<span class="fl">0.85</span>,<span class="fl">0.05</span>])
+<span class="bu">print</span> (res)</code></pre></div>
+<pre><code>[[0.85  0.05 ]
+ [0.717 0.097]
+ [0.513 0.176]
+ [0.352 0.273]
+ [0.338 0.326]
+ [0.333 0.333]
+ [0.333 0.333]
+ [0.333 0.333]]</code></pre>
+<p>[diğer yakınsama konusu atlandı]</p>
+<p>Dikkat edilirse şimdiye kadar dışbükeylik (convexity) farzını yapmadık, sadece Hessian matrinin tersi alınabilir olduğunu farzettik.</p>
+<p>Devam edersek, özyineli şekilde güncelememizi yaparken Hessian'ın eşsiz olduğu bazı noktalara gelmiş olabiliriz. Bu olduğunda çoğu yazılım bu durumu yakalayacak şekilde yazılmıştır, &quot;yeterince eşsiz'' Hessian matrislere önceden tanımlı ufak bir <span class="math inline">\(\epsilon\)</span> çarpı birim matrisi kadar bir ekleme yaparlar, böylece tersin alınamama durumundan kurtulunmuş olur. Bu metotlara Newton-umsu (quasi-Newton) ismi de veriliyor.</p>
+<p>Eskiden Newton-umsu metotlar koca bir araştırma sahasıydı. Benim bildiğim kadarıyla tarihte 15 sene kadar geriye gidersek, üstteki görüldüğü gibi her adımda büyük bir denklem sistemi çözmek istemiyoruz, <span class="math inline">\(x\)</span> noktasındayım, Hessian işliyorum, Newton yönümü buluyorum, adım atıyorum, yeni bir noktadayım. Newton-umsu metotlarda bu yeni noktada sil baştan bir Hessian işlemek yerine bir önceki adımdaki işlenen Hessian sonuçlarını, bir şekilde, az ek işlem yaparak sonraki adımda kullanmaya uğraşıyorlar. Aslında pek çok farklı Newton-umsu metot var, hepsi farklı şekilde Newton metotundan farklı (!)</p>
+<p>[teori 1.1 ispatı atlandı]</p>
+<p>Newton metodunun eğer başlangıç noktası nihai minimuma yakınsa iyi yakınsaklık özellikleri var. Fakat eğer sonuca uzaktan bir yerden başlamışsak yakınsaklık garantisi yok. Geldiğimiz yeni noktada Hessian eşsiz olabilir. Bu sebeple metot sürekli iniş özelliğine (descent property) sahip olmayacaktır, yani <span class="math inline">\(f(x_{x+1}) \ge f(x_k)\)</span> olabilir, ve yakınsaklık garantisi bu durumda kaybolur [4, sf. 167]. Fakat bu algoritmayı biraz değiştirerek sürekli iniş özelliğine sahip olmasını sağlayabiliriz.</p>
+<p>Teori</p>
+<p><span class="math inline">\(x_1,x_2,...\)</span> ya da kısaca <span class="math inline">\(\{x_k\}\)</span> Newton'un metodu tarafından üretilmiş <span class="math inline">\(f(x)\)</span> hedef fonksiyonunu minimize etme amaçlı bir çözüm dizisi olsun. Eğer Hessian <span class="math inline">\(F(x)_k\)</span> pozitif kesin ise ve gradyan <span class="math inline">\(g_k = \nabla f(x_k) \ne 0\)</span> ise, o zaman çözüm yönü</p>
+<p><span class="math display">\[
+d_k = -F(x_k)^{-1} g_k = x_{k+1} - x_k
+\]</span></p>
+<p>bir iniş yönüdür, ki bu ifadeyle kastedilen bir <span class="math inline">\(\bar{\alpha} &gt; 0\)</span> kesinlikle vardır öyle ki her <span class="math inline">\(\alpha \in (0,\bar{\alpha})\)</span> için</p>
+<p><span class="math display">\[
+f(x_k + \alpha d_k) &lt; f(x_k)
+\]</span></p>
+<p>ifadesi doğrudur.</p>
+<p>İspat</p>
+<p><span class="math inline">\(\phi(\alpha)\)</span> diye yeni bir eşitlik yaratalım,</p>
+<p><span class="math display">\[
+\phi(\alpha) = f(x_k + \alpha d_k)
+\]</span></p>
+<p>Üstteki formülün türevini alalım. Zincirleme Kuralını kullanarak,</p>
+<p><span class="math display">\[
+\phi(\alpha)&#39; = f(x_k + \alpha d_k) d_k
+\]</span></p>
+<p>elde ederiz. Şimdi <span class="math inline">\(\phi(0)&#39;\)</span> ne oluyor ona bakalım,</p>
+<p><span class="math display">\[
+\phi(0)&#39; = \nabla f(x_k) d_k = -g_k^T F(x_k) ^{-1} g_k &lt; 0
+\]</span></p>
+<p><span class="math inline">\(-g_k^T F(x_k) ^{-1} g_k\)</span> ifadesinin sıfırdan küçük olduğunu biliyoruz çünkü <span class="math inline">\(F(x_k) ^{-1}\)</span> pozitif kesin, ve <span class="math inline">\(g_k \ne 0\)</span>. O zaman diyebiliriz ki bir <span class="math inline">\(\bar{\alpha} &gt; 0\)</span> mevcuttur öyle ki her <span class="math inline">\(\alpha \in (0,\bar{\alpha})\)</span> için <span class="math inline">\(\phi(\alpha) &lt; \phi(0)\)</span>. Bu da demektir ki her <span class="math inline">\(\alpha \in (0,\bar{\alpha})\)</span> için</p>
+<p><span class="math display">\[
+\phi(\alpha) &lt; \phi(0) =  f(x_k + \alpha x_k) &lt; f(x_k)
+\]</span></p>
+<p>İspat tamamlandı.</p>
+<p>Üstteki gördüklerimiz <span class="math inline">\(d_k\)</span> yönünde bir arama yaparsak, muhakkak bir minimum bulacağımızı söylüyor. Eğer her geldiğimiz noktada, bir sonraki gidiş noktasını hesap için bu minimum yeri ararsak, sürekli iniş özelliğine kavuşmuş olacağız, ve böylece Newton metodunu kurtarmış olacağız. Demek ki Newton metotunu şu şekilde değiştirmemiz gerekiyor,</p>
+<p><span class="math display">\[
+x_{k+1} = x_k - \alpha_k F(x_k)^{-1} g_k
+\]</span></p>
+<p>ki</p>
+<p><span class="math display">\[
+\alpha_k = \arg\min_{\alpha \ge 0} f(x_k -\alpha F(x_k)^{-1} g_k)
+\]</span></p>
+<p>Yani döngünün her adımında <span class="math inline">\(-F(x_k)^{-1} g_k\)</span> yönünde bir arama gerçekleştiriyoruz, o yöndeki en fazla azalmayı buluyoruz, ve <span class="math inline">\(\alpha_k\)</span> adımını o büyüklükte seçiyoruz. Ve üstteki teori sayesinde <span class="math inline">\(g_k \ne 0\)</span> olduğu sürece</p>
+<p><span class="math display">\[
+f(x_{k+1}) &lt; f(x_k)
+\]</span></p>
+<p>sürekli iniş özelliğinin mevcut olduğundan emin oluyoruz.</p>
+<p>Örnek</p>
+<p>Newton metodunu bir örnek üzerinde görelim, fonksiyon [8, 10-9]'dan geliyor,</p>
+<p><span class="math display">\[
+f(x_1,x_2) = e^{x_1 + 3x_2 - 0.1} + e^{x_1 - 3x_2 - 0.1} + e^{-x_1 - 0.1}
+\]</span></p>
+<p>Hessian ve gradyan hesaplarını otomatik türev üzerinden yapacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> autograd.numpy <span class="im">as</span> anp
+<span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+<span class="im">import</span> autograd
+
+<span class="kw">def</span> f(x):
+    x1,x2<span class="op">=</span>x
+    <span class="cf">return</span> anp.exp(x1 <span class="op">+</span> <span class="fl">3.0</span><span class="op">*</span>x2 <span class="op">-</span> <span class="fl">0.1</span>) <span class="op">+</span> anp.exp( x1 <span class="op">-</span> <span class="fl">3.0</span><span class="op">*</span>x2 <span class="op">-</span> <span class="fl">0.1</span> ) <span class="op">+</span> anp.exp(<span class="op">-</span>x1<span class="fl">-0.1</span>)
+
+alpha <span class="op">=</span> <span class="fl">0.1</span>
+beta <span class="op">=</span> <span class="fl">0.7</span>
+eps <span class="op">=</span> <span class="fl">0.001</span>
+x0 <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.1</span>, <span class="fl">1.0</span>])
+x <span class="op">=</span> x0
+hist <span class="op">=</span> []
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):
+   h <span class="op">=</span> autograd.hessian(f)
+   g <span class="op">=</span> autograd.grad(f)
+   v <span class="op">=</span> np.dot(<span class="op">-</span>lin.inv(h(x)),g(x))
+   lamsq <span class="op">=</span> np.dot(np.dot(g(x).T,lin.inv(h(x))),g(x))
+   hist.append(x)
+   <span class="cf">if</span> lamsq<span class="op">/</span><span class="dv">2</span> <span class="op">&lt;=</span> eps:
+      <span class="bu">print</span> (<span class="st">&#39;done&#39;</span>)
+      <span class="cf">break</span>
+   t <span class="op">=</span> <span class="fl">1.0</span>
+   <span class="cf">while</span> f(x<span class="op">+</span>t<span class="op">*</span>v) <span class="op">&gt;=</span> f(x)<span class="op">+</span>alpha<span class="op">*</span>t<span class="op">*</span>np.dot(g(x).T,v): t <span class="op">=</span> t<span class="op">*</span>beta
+   x <span class="op">=</span> x <span class="op">+</span> t<span class="op">*</span>v
+h <span class="op">=</span> np.array(hist)
+h <span class="op">=</span> np.reshape(h,(<span class="bu">len</span>(h),<span class="dv">2</span>))
+<span class="bu">print</span> (h)</code></pre></div>
+<pre><code>done
+[[-1.10000000e+00  1.00000000e+00]
+ [-1.43075233e-01  3.50917569e-01]
+ [-1.09323466e-01  8.11516892e-02]
+ [-3.28295993e-01  1.89932171e-02]
+ [-3.45760583e-01  3.51878538e-04]]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+
+<span class="kw">def</span> f2(x1,x2):
+    <span class="cf">return</span> f([x1,x2])
+
+D <span class="op">=</span> <span class="dv">50</span>
+x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">2.0</span>,<span class="fl">1.0</span>,D)
+y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">1.0</span>,<span class="fl">1.0</span>,D)
+
+xx,yy <span class="op">=</span> np.meshgrid(x,y)
+zz <span class="op">=</span> f2(xx,yy)
+
+contours <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>]
+cs<span class="op">=</span>plt.contour(xx,yy,zz,contours)
+plt.plot(h[:,<span class="dv">0</span>],h[:,<span class="dv">1</span>],<span class="st">&#39;rd&#39;</span>)
+plt.plot(h[:,<span class="dv">0</span>],h[:,<span class="dv">1</span>])
+plt.savefig(<span class="st">&#39;boyd-1092.png&#39;</span>)
+
+fig <span class="op">=</span> plt.figure()
+ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)
+surf <span class="op">=</span> ax.plot_surface(xx, yy, zz)
+plt.savefig(<span class="st">&#39;boyd-1091.png&#39;</span>)</code></pre></div>
+<p><img src="boyd-1091.png" /> <img src="boyd-1092.png" /></p>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, Çok Boyutlu Calculus, <em>Vektör Calculus, Kurallar, Matris Türevleri</em></p>
+<p>[2] Freund, <em>MIT OCW Nonlinear Programming Lecture</em>, <a href="https://ocw.mit.edu/courses/sloan-school-of-management/15-084j-nonlinear-programming-spring-2004/" class="uri">https://ocw.mit.edu/courses/sloan-school-of-management/15-084j-nonlinear-programming-spring-2004/</a></p>
+<p>[3] Miller, <em>Numerical Analysis for Scientists and Engineers</em></p>
+<p>[4] Zak, <em>An Introduction to Optimization, 4th Edition</em></p>
+<p>[6] Tibshirani, <em>Convex Optimization, Lecture Video 14</em>, <a href="https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg" class="uri">https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg</a></p>
+<p>[7], Boyd, <em>Convex Optimization I, Video Lecture 16</em></p>
+<p>[8], Boyd, <em>Convex Optimization I, Lecture Notes</em></p>
+</body>
+</html>

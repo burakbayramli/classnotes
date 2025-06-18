@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="üretici-hasımsal-ağlar-generative-adverserial-networks--gan-">Üretici Hasımsal Ağlar (Generative Adverserial Networks -GAN-)</h1>
+<p>Derin Öğrenme ustalarından Yann LeCun GAN'leri &quot;son 10 senede yapay öğrenmede görülen en büyük ilerleme'' olarak tarif ediyor. Burada haksız değil. YSA'lar ilk başta (geri gelişinden sonraki ilk evresinde de) bir resimde kedi, köpek ya da uçak olup olmadığını sınıflayabiliyordu. Yeni evrişimsel (convolutional) yapı ile çetrefil görüntü ilişkilerini öğrenip bunları sınıflama özelliği kazandı, fakat bunlar basit bir etikete bağlı olarak denetimli (süpervised) olarak yapıyordu.</p>
+<p>GAN'ler denetimsiz olarak eğitilebiliyor, ve daha ilginci &quot;üretimsel (generative)'' olarak kullanılabiliyor. Mesela pek çok görüntüye bakıp yeni görüntüler üreten bir GAN olabilir, ya da, sözel tarif verilince o tarifteki söylenen görüntüyü üreten bir GAN olabilir! Öyle ya sonuçta verilen girdi bir takım reel sayılar içeren çok boyutlu vektörlerdir, bu sayıların kelimeleri, başka görüntüleri temsil etmesi mimarı açısından çok fark yaratmaz.</p>
+<div class="figure">
+<img src="gan_02.png" />
+
+</div>
+<p>Resimden resime tercüme edebilmek, &quot;üretim yapmak'' elle çizilmiş taslakları gerçeğe çok yakın resimlere dönüştürmek, ya da tam tersi yönde gitmek mesela bir uydunun çektiği şehir resmini haritasal yollar, evler şemasına tercüme etmek, vs.</p>
+<div class="figure">
+<img src="gan_04.png" />
+
+</div>
+<p>Mimari</p>
+<p>Şimdi GAN'lerin nasıl kurulduğuna gelelim. Bir GAN yapısı kabaca bir kalpazan (üretimsel) ve polis (ayırtaç -discriminatör-) arasındaki ilişkiyi benzetilebilir. İlk başta kalpazan polise bir sahte para gösterir, polis buna sahte der. Bu noktada polis kalpazana önemli bir bilgi / geri besleme vermiş olur, kalpazan bu bilgiyi kullanarak bir sonraki sefere daha iyi sahte para basmaya uğraşabilir. Bu döngü uzun süre devam ettirilir ta ki kalpazan işleri iyice ilerletip polisi tamamen aldatabilinceye kadar.</p>
+<p>İmajlar bağlamında düşünelim şimdi; sahte imajlar üretmek ve onları ayırdedebilmek. Üstteki anlatımdan bize iki tane ağ gerektiğinin anlayabiliriz. Birincisi ayırtaç, bu ağa imaj verilir, o da cevap olarak 0/1 olarak sahte / değil, doğru / yanlış şeklinde bir cevap hesaplar.</p>
+<div class="figure">
+<img src="gan_05.png" />
+
+</div>
+<p>İkinci ağ yapısı sahte imaj üretmeye uğraşıyor, ve bu üretimi çok iyi yapmaya uğraşıyor. Peki girdi nedir? Gürültü! İkinci ağa 100 boyutlu gürültü vereceğiz (başka boyutlar da olabilir), ve bu gürültüyü işleyerek 28x28 boyutlarında bir imaj üretmesini bekleyeceğiz. Bu dahiyane bir yöntem. Ağın hayal görmesini, üretmesini istiyoruz, bu tür bir ağa gürültü, ya da hiçlikten daha iyi bir girdi verilemezdi herhalde. Bu arada eğitildikten sonra YSA'nın deterministik bir yapıda olduğunu unutmayalım, yani eğitim bitince aynı gürültü iki kere verilince aynı imaj üretilir. Değişik imajlar için değişik gürültüler vermek lazım! Değişik gürültü nasıl olur? Gaussian bazlı N(0,1) gürültü ürettiğimizi düşünelim, bazen 0'in solundan bazen sağından değer üretiyor olabiliriz. Müthiş olan YSA'nın eğitim sırasında bu tür gürültü farklarına hassas hale gelmesidir! İkinci ağ altta,</p>
+<div class="figure">
+<img src="gan_06.png" />
+
+</div>
+<p>Peki eğitim verisi <span class="math inline">\(X,y\)</span> nedir, yani kaynak etiket nasıl ayarlanır? Eğitim sırasında gerçek görüntüler arasından belli sayıda dosya toplanır, bunlar &quot;gerçek'' yani 1 etiketi, ardından elde en son olan üretece görüntü üretmesi söylenir ve bu veriler 0 etiketi ile eğitim verisine dahil edilir. Dikkat edersek MNIST bağlamında mesela bu tabandan gelen 0,1,2,. gibi etiketleri kullanmıyoruz, etiketleri kendimiz üretiyoruz.</p>
+<div class="figure">
+<img src="gan_07.png" />
+
+</div>
+<p>Amaç üretecin o kadar iyi hale gelmesi ki ayırtaç gerçek imaj ile hayali olanı birbirinden ayırt edemesin.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">&quot;&quot;&quot;</span>
+<span class="co">From https://github.com/eriklindernoren/Keras-GAN/tree/master/dcgan</span>
+<span class="co">&quot;&quot;&quot;</span>
+<span class="im">import</span> os
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> tqdm <span class="im">import</span> tqdm
+<span class="im">from</span> keras.layers <span class="im">import</span> Input
+<span class="im">from</span> keras.models <span class="im">import</span> Model, Sequential
+<span class="im">from</span> keras.layers.core <span class="im">import</span> Reshape, Dense, Dropout, Flatten
+<span class="im">from</span> keras.layers.advanced_activations <span class="im">import</span> LeakyReLU
+<span class="im">from</span> keras.layers.convolutional <span class="im">import</span> Conv2D, UpSampling2D
+<span class="im">from</span> keras.datasets <span class="im">import</span> mnist
+<span class="im">from</span> keras.optimizers <span class="im">import</span> Adam
+<span class="im">from</span> keras <span class="im">import</span> backend <span class="im">as</span> K
+<span class="im">from</span> keras <span class="im">import</span> initializers
+
+K.set_image_dim_ordering(<span class="st">&#39;th&#39;</span>)
+
+<span class="co"># Deterministic output.</span>
+<span class="co"># Tired of seeing the same results every time? Remove the line below.</span>
+np.random.seed(<span class="dv">1000</span>)
+
+<span class="co"># The results are a little better when the dimensionality of the</span>
+<span class="co"># random vector is only 10.  The dimensionality has been left at 100</span>
+<span class="co"># for consistency with other GAN implementations.</span>
+randomDim <span class="op">=</span> <span class="dv">200</span>
+
+
+<span class="kw">def</span> get_model():
+    <span class="co"># Optimizer</span>
+    adam <span class="op">=</span> Adam(lr<span class="op">=</span><span class="fl">0.0002</span>, beta_1<span class="op">=</span><span class="fl">0.5</span>)
+
+    <span class="co"># Generator</span>
+    generator <span class="op">=</span> Sequential()
+    generator.add(Dense(<span class="dv">128</span><span class="op">*</span><span class="dv">7</span><span class="op">*</span><span class="dv">7</span>, input_dim<span class="op">=</span>randomDim, kernel_initializer<span class="op">=</span>initializers.RandomNormal(stddev<span class="op">=</span><span class="fl">0.02</span>)))
+    generator.add(LeakyReLU(<span class="fl">0.2</span>))
+    generator.add(Reshape((<span class="dv">128</span>, <span class="dv">7</span>, <span class="dv">7</span>)))
+    generator.add(UpSampling2D(size<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">2</span>)))
+    generator.add(Conv2D(<span class="dv">64</span>, kernel_size<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>), padding<span class="op">=</span><span class="st">&#39;same&#39;</span>))
+    generator.add(LeakyReLU(<span class="fl">0.2</span>))
+    generator.add(UpSampling2D(size<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">2</span>)))
+    generator.add(Conv2D(<span class="dv">1</span>, kernel_size<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>), padding<span class="op">=</span><span class="st">&#39;same&#39;</span>, activation<span class="op">=</span><span class="st">&#39;tanh&#39;</span>))
+    generator.<span class="bu">compile</span>(loss<span class="op">=</span><span class="st">&#39;binary_crossentropy&#39;</span>, optimizer<span class="op">=</span>adam)
+
+    <span class="co"># Discriminator</span>
+    discriminator <span class="op">=</span> Sequential()
+    discriminator.add(Conv2D(<span class="dv">64</span>, kernel_size<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>), strides<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">2</span>), padding<span class="op">=</span><span class="st">&#39;same&#39;</span>, input_shape<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>), kernel_initializer<span class="op">=</span>initializers.RandomNormal(stddev<span class="op">=</span><span class="fl">0.02</span>)))
+    discriminator.add(LeakyReLU(<span class="fl">0.2</span>))
+    discriminator.add(Dropout(<span class="fl">0.3</span>))
+    discriminator.add(Conv2D(<span class="dv">128</span>, kernel_size<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">5</span>), strides<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">2</span>), padding<span class="op">=</span><span class="st">&#39;same&#39;</span>))
+    discriminator.add(LeakyReLU(<span class="fl">0.2</span>))
+    discriminator.add(Dropout(<span class="fl">0.3</span>))
+    discriminator.add(Flatten())
+    discriminator.add(Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">&#39;sigmoid&#39;</span>))
+    discriminator.<span class="bu">compile</span>(loss<span class="op">=</span><span class="st">&#39;binary_crossentropy&#39;</span>, optimizer<span class="op">=</span>adam)
+
+    <span class="co"># Combined network</span>
+    discriminator.trainable <span class="op">=</span> <span class="va">False</span>
+    ganInput <span class="op">=</span> Input(shape<span class="op">=</span>(randomDim,))
+    x <span class="op">=</span> generator(ganInput)
+    ganOutput <span class="op">=</span> discriminator(x)
+    gan <span class="op">=</span> Model(inputs<span class="op">=</span>ganInput, outputs<span class="op">=</span>ganOutput)
+    gan.<span class="bu">compile</span>(loss<span class="op">=</span><span class="st">&#39;binary_crossentropy&#39;</span>, optimizer<span class="op">=</span>adam)
+
+    <span class="cf">return</span> generator, discriminator, gan
+
+<span class="kw">def</span> train(epochs<span class="op">=</span><span class="dv">1</span>, batchSize<span class="op">=</span><span class="dv">128</span>):
+
+    <span class="co"># Load MNIST data</span>
+    (X_train, y_train), (X_test, y_test) <span class="op">=</span> mnist.load_data()
+    X_train <span class="op">=</span> (X_train.astype(np.float32) <span class="op">-</span> <span class="fl">127.5</span>)<span class="op">/</span><span class="fl">127.5</span>
+    X_train <span class="op">=</span> X_train[:, np.newaxis, :, :]
+    
+    batchCount <span class="op">=</span> X_train.shape[<span class="dv">0</span>] <span class="op">/</span> batchSize
+    <span class="bu">print</span> (<span class="st">&#39;Epochs: </span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> epochs)
+    <span class="bu">print</span> (<span class="st">&#39;Batch size: </span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> batchSize)
+    <span class="bu">print</span> (<span class="st">&#39;Batches per epoch: </span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> batchCount)
+    generator, discriminator, gan <span class="op">=</span> get_model()
+    <span class="cf">for</span> e <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, epochs<span class="op">+</span><span class="dv">1</span>):
+        <span class="bu">print</span> (<span class="st">&#39;Epoch </span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> e)
+        <span class="cf">for</span> _ <span class="kw">in</span> tqdm(<span class="bu">range</span>(<span class="bu">int</span>(batchCount))):
+            <span class="co"># Get a random set of input noise and images</span>
+            noise <span class="op">=</span> np.random.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>[batchSize, randomDim])
+            imageBatch <span class="op">=</span> X_train[np.random.randint(<span class="dv">0</span>, X_train.shape[<span class="dv">0</span>], size<span class="op">=</span>batchSize)]
+
+            <span class="co"># Generate fake MNIST images</span>
+            generatedImages <span class="op">=</span> generator.predict(noise)
+            X <span class="op">=</span> np.concatenate([imageBatch, generatedImages])
+
+            <span class="co"># Labels for generated and real data</span>
+            yDis <span class="op">=</span> np.zeros(<span class="dv">2</span><span class="op">*</span>batchSize)
+            <span class="co"># One-sided label smoothing</span>
+            yDis[:batchSize] <span class="op">=</span> <span class="fl">0.9</span>
+
+            <span class="co"># Train discriminator</span>
+            discriminator.trainable <span class="op">=</span> <span class="va">True</span>
+            dloss <span class="op">=</span> discriminator.train_on_batch(X, yDis)
+
+            <span class="co"># Train generator</span>
+            noise <span class="op">=</span> np.random.normal(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>[batchSize, randomDim])
+            yGen <span class="op">=</span> np.ones(batchSize)
+            discriminator.trainable <span class="op">=</span> <span class="va">False</span>
+            gloss <span class="op">=</span> gan.train_on_batch(noise, yGen)
+
+    generator.save(<span class="st">&#39;dcgan_generator_epoch_</span><span class="sc">%d</span><span class="st">.h5&#39;</span> <span class="op">%</span> e)
+    discriminator.save(<span class="st">&#39;dcgan_discriminator_epoch_</span><span class="sc">%d</span><span class="st">.h5&#39;</span> <span class="op">%</span> e)
+
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
+    train(<span class="dv">50</span>, <span class="dv">128</span>)</code></pre></div>
+<p>Eğittikten sonra bir gürültü verip üretim yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> mnist_dcgan
+generator, discriminator, gan <span class="op">=</span> mnist_dcgan.get_model()
+generator.load_weights(<span class="st">&quot;dcgan_generator_epoch_50.h5&quot;</span>)
+noise <span class="op">=</span> np.random.randn(<span class="dv">1</span>,<span class="dv">200</span>)
+pixels <span class="op">=</span> generator.predict(noise).reshape((<span class="dv">28</span>,<span class="dv">28</span>))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig(<span class="st">&#39;gan_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="gan_01.png" />
+
+</div>
+<p>Bir kez daha gürültü üretelim ve imaj üretelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">noise <span class="op">=</span> np.random.randn(<span class="dv">1</span>,<span class="dv">200</span>)
+pixels <span class="op">=</span> generator.predict(noise).reshape((<span class="dv">28</span>,<span class="dv">28</span>))
+plt.imshow(pixels)
+plt.gray()
+plt.savefig(<span class="st">&#39;gan_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="gan_03.png" />
+
+</div>
+<p>Bu çıktıların görüntüsü ilginç değil mi? Aslında MNİST imajlarına tıpatıp benzemiyorlar, &quot;hayal edilmiş'' ya da &quot;tekrar oluşturulmuş'' bir halleri var sanki. GAN'lerin sihri burada.</p>
+<p>Kaynaklar</p>
+<p>[1] [https://towardsdatascience.com/gans-n-roses-c6652d513260](https://towardsdatascience.com/gans-n-roses-c6652d513260)</p>
+<p>[2] [https://towardsdatascience.com/gan-by-example-using-keras-on-tensorflow-backend-1a6d515a60d0](https://towardsdatascience.com/gan-by-example-using-keras-on-tensorflow-backend-1a6d515a60d0)</p>
+</body>
+</html>

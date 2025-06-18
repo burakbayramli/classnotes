@@ -1,0 +1,807 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="kısmi-türevsel-denklemler">Kısmi Türevsel Denklemler</h1>
+<p>Ders 1</p>
+<p>Konumuz [2] Kısmi Türevsel Denklemler (partial differential equations -PDE-). Bu dersin ön gerekliliklerinden en önemlisi normal diferansiyel denklemlerdir (ordinary differential equtions -ODE-), çünkü pek çok PDE'yi çözmenin tekniği onları bir ODE sistemine indirgemekten geçiyor. Yani PDE çözmek için ODE çözme tekniklerini de bilmek gerekiyor. Bir diğer gerekli bilgi Lineer Cebir dersi.</p>
+<p>Bu dersin ana amacı, bir mühendislik dersi olarak, denklem çözmek, ve pek çok denklemin çıkış noktası fiziksel problemler. Mesela sıcaklık yayılması (heat diffusion), dalga hareketi (wave motion), titreşen hücre zarı (vibrating membrane) gibi. Fakat PDE kavramı finansta bile ortaya çıkabilen bir kavram, mesela Black-Sholes denklemlerinde olduğu gibi.</p>
+<p>Yani dersimiz çok teori odaklı olmayacak, bazı ispatlardan bahsedeceğiz, ama onun haricinde teori üzerinde fazla durmayacağız.</p>
+<p>PDE nedir? İlk önce ODE tanımından başlayalım.</p>
+<p><span class="math display">\[ y = y(x) \]</span></p>
+<p><span class="math display">\[ \frac{dy}{dx} = y \]</span></p>
+<p>Başlangıç şartları</p>
+<p><span class="math display">\[ y(0) = y_0 \]</span></p>
+<p>Çözüm</p>
+<p><span class="math display">\[ y = y_0e^x \]</span></p>
+<p>Bu bir ODE çünkü sadece bir tane bağımsız değişken var (<span class="math inline">\(x\)</span>), ve bir tane bağımlı değişken var (<span class="math inline">\(y\)</span>).</p>
+<p>PDE ise içinde kısmi türevleri, ve bir veya <em>birden fazla</em> bağımsız değişkeni barındıran bir denklemdir.</p>
+<p>Eğer güneş etrafındaki yörüngeleri temsil etmek istiyorsanız gezegenleri boyutsuz parçacıklar gibi kabul ederek ODE'ler ile temsil etmek yeterli olabilir, ama diğer problemlerde daha fazla bağımsız değişken gerekeceği için ODE yetmez, mesela zaman, cismin 3D uzaydaki boyutları gibi.</p>
+<p>Mesela bir PDE</p>
+<p><span class="math display">\[ u = u(x,y) \]</span></p>
+<p>Çoğunlukla problem tanımının ilk başında fonksiyonel ilişkiyi hemen göstermek iyi olur, mesela üstte bağımsız değişkenler <span class="math inline">\(x,y\)</span>, ve <span class="math inline">\(u\)</span> bu iki değişkene bağımlı. Devam edelim, PDE şöyle olsun</p>
+<p><span class="math display">\[ \frac{\partial^3 u}{\partial x^3} + 
+\cos(y)\frac{\partial u}{\partial y} + 3 = 0
+\]</span></p>
+<p>Bir PDE problemine çoğunlukla ek olarak sınır koşulları (boundary condition -BC-) ve başlangıç koşulları (initial conditions) eklemek de gerekir.</p>
+<p>Kısmi Türev nedir?</p>
+<p><span class="math display">\[ u = u(x_1, x_2,...,x_n) \]</span></p>
+<p><span class="math display">\[ 
+\frac{\partial u}{\partial x_i} = 
+\lim_{\Delta x_i \to 0} 
+\frac{
+u(x_1,..,x_i+\Delta x_i,x_{i+1},...,x_n) - u(x_1,..,x_i,x_{i+1},...,x_n)}
+{\Delta x_i}  \]</span></p>
+<p>Yani bir fonksiyonun kısmi türevini almak istediğimiz değişken haricinde tüm diğer değişkenlerinin sabit tutulduğu bir durum.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ u = x_1^2 + x_1\sin(x_2) \]</span></p>
+<p><span class="math display">\[ 
+\frac{\partial u}{\partial x_1} = 2x_1 + \sin(x_2)
+ \]</span></p>
+<p><span class="math display">\[ 
+\frac{\partial u}{\partial x_2} = x_1 \cos(x_2)
+ \]</span></p>
+<p>Notasyon</p>
+<p>Çoğunlukla kısmi türevler 3 farklı şekilde gösteriliyor.</p>
+<p><span class="math display">\[ \frac{\partial u}{\partial x} \equiv u_x \equiv \partial_x u \]</span></p>
+<p>Üstte soldaki tanımı gördük, bazen ortadaki de tercih edilebiliyor, ya da bazen en sağdaki.</p>
+<p>PDE Derecesi</p>
+<p>Bir PDE'nin derecesi, o denklemdeki kısmi türevlerin en yüksek dereceli olanın derecesi neyse o'dur.</p>
+<p>Mesela</p>
+<p><span class="math display">\[ u_{xxx} + u_y = 5 \]</span></p>
+<p>derecesi 3. Aynı zamanda bu lineer ve homojen olmayan (inhomogeneous) bir PDE. Bu son iki kavramı birazdan tanımlayacağım.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ (u_{xx})^2 + u_xu_y = u \]</span></p>
+<p>Bu 2. derece. Bu bazı insanların kafasını karıştırıyor, çünkü <span class="math inline">\(u_{xx}\)</span>'in karesi var. Bu aynı zamanda homojen, ve gayrı lineer. Bu dersteki çoğu PDE lineer olacak.</p>
+<p>Lineer ve gayrı lineerlikten bahsetmişken, şunu ekleyelim.</p>
+<div class="figure">
+<img src="1_5.png" />
+
+</div>
+<p>Şimdi diyelim ki bir girdi (input) fonksiyonu <span class="math inline">\(I(t)\)</span> bir işleme giriyor (<span class="math inline">\(L\)</span> operatörü) ve çıktı (output) olarak <span class="math inline">\(R(t)\)</span> çıkıyor. Yani sistem</p>
+<p><span class="math display">\[ R = \mathcal{L} \ I \]</span></p>
+<p>Bir lineer sistemde eğer girdiyi iki ile çarparsanız, çıktı da iki katına çıkar. O zaman kurallar</p>
+<ul>
+<li><p><span class="math inline">\(\mathcal{L}(\alpha I) = \alpha \ \mathcal{L}(I)\)</span>, ki <span class="math inline">\(\alpha\)</span> bir sabit.</p></li>
+<li><p><span class="math inline">\(\mathcal{L}(I_1 + I_2) = \mathcal{L}(I_1) + \mathcal{L}(I_2)\)</span>, ki buna üst üste eklenebilme (superposition) prensibi deniyor. Bu prensibi bu dersteki çoğu PDE'yi çözmek için kullanacağız. Bir lineer sistem varsa çoğu zaman arka planda bir yerlerde üst üste eklenebilme prensibi geziniyordur.</p></li>
+</ul>
+<p>Diyelim ki PDE'nizi şöyle yazdınız</p>
+<p><span class="math display">\[\mathcal{L}u = f(\vec{x}) \]</span></p>
+<p>Burada <span class="math inline">\(u\)</span> bağımlı değişken, <span class="math inline">\(\vec{x}\)</span> bir vektör, <span class="math inline">\(\vec{x} \in \mathbb{R} ^n\)</span>, ve bu vektörün içinde birden fazla değişken var, bu değişkenlerin hepsi bağımsız.</p>
+<p><span class="math display">\[ 
+\vec{x} = 
+\left(\begin{array}{r}
+x_1,\\
+.. \\
+x_n
+\end{array}\right)
+ \]</span></p>
+<p>Bu denkleme benzer bir diğer denklem lineer cebirdeki <span class="math inline">\(A\vec{x} = \vec{b}\)</span> denklemidir. PDE sisteminde de cevabını aradığımız, lineer cebir sisteminde &quot;<span class="math inline">\(A\)</span> ile çarpılıp <span class="math inline">\(b\)</span> sonucunu verecek <span class="math inline">\(\vec{x}\)</span> hangisidir?'' sorusuna benzer bir şekilde &quot;<span class="math inline">\(\mathcal{L}\)</span> operatörü uygulanıp <span class="math inline">\(f(\vec{x})\)</span> sonucunu verecek <span class="math inline">\(u\)</span> hangisidir?'' sorusudur.</p>
+<p>Bu analojiden devam etmek gerekirse, belli bir noktada <span class="math inline">\(u\)</span>'nun içinde olduğu &quot;fonksiyon uzayı'' hakkında düşünmemiz gerekebilir, <span class="math inline">\(\vec{x}\)</span>'in içinde olduğu <span class="math inline">\(\mathbb{R}^n\)</span> uzayı gibi. Lineer cebir durumunda operatörün özelliklerine bakılır, mesela &quot; <span class="math inline">\(b\)</span>'nin içinde olduğu ve <span class="math inline">\(A\)</span> operatörü uygulanıp hiç sonuç alınamayacak uzayın belli kısımları var mıdır?'' gibi sorularla uğraşılabilir, bunlar <span class="math inline">\(A\)</span>'nin &quot;ulaşamadığı yerlerdir'' vs. PDE'deki <span class="math inline">\(\mathcal{L}\)</span> operatörü için de benzer sorular sorulabilir.</p>
+<p>Yani lineer cebirle pek çok kavram PDE dünyasına benziyor, orada vektör uzayı var, burada fonksiyon uzayı var. Yani bir analoji olarak bu benzerliği aklımızda tutmamız faydalı.</p>
+<p>Bir operatör şu şekilde de olabilir</p>
+<p><span class="math display">\[ \mathcal{L} = \mathcal{L} \bigg(
+\frac{\partial }{\partial x_1}, \frac{\partial }{\partial x_2},..,
+u,..
+\bigg)
+ \]</span></p>
+<p>Yani operatör kısmi türevlere ve hatta <span class="math inline">\(u\)</span>'nun kendisine de bağımlı olabilir.</p>
+<p>Eğer elimizde gayrı lineer bir PDE var ise, başımız dertte demektir. Böyle bir sistemi çözmek için çoğunlukla sayısal çözümlere başvurmak gerekir. Eğer lineer ise çözümde bayağı ilerlemek mümkündür.</p>
+<p>Lineerlik</p>
+<p>Bir operatör ve onun tanımladığı bir üst üste eklenebilme durumu düşünelim</p>
+<p><span class="math display">\[ \mathcal{L} = \mathcal{L}(\alpha_1 u_1 + \alpha_2 u_2) = 
+\alpha_1 \mathcal{L}u_1 + \alpha_2 \mathcal{L}u_2 \]</span></p>
+<p>ki <span class="math inline">\(\alpha_1,\alpha_2\)</span> birer tek sayıdır (scalar), ya reel, ya da kompleks.</p>
+<p>Örnek</p>
+<p>Birazdan bakacağımız denklem dalga denklemi. Orada</p>
+<p><span class="math display">\[ u_{tt} - c^2u_x = 0 \]</span></p>
+<p>Bu denklemi</p>
+<p><span class="math display">\[ \mathcal{L}u = 0 \]</span></p>
+<p>şeklinde yazabiliriz ki <span class="math inline">\(\mathcal{L}\)</span> şöyle tanımlı olacaktır</p>
+<p><span class="math display">\[ \mathcal{L} = \frac{\partial^2}{\partial t^2} - 
+c^2 \frac{\partial ^2}{\partial x^2 = 0}\]</span></p>
+<p><span class="math inline">\(c\)</span> bir sabittir.</p>
+<p>Şimdi diyelim ki şu denklemi çözmemiz lazım</p>
+<p><span class="math display">\[\mathcal{L} u = f \]</span></p>
+<p>ki</p>
+<p><span class="math display">\[ \mathcal{L}: V \to V \]</span></p>
+<p>Yani, <span class="math inline">\(\mathcal{L}\)</span> bir vektör uzayını bir diğerine eşlemekte (map), ve yine diyelim ki bu uzaylar birer Hilbert Uzayı (bunun anlamına şimdi bilmemiz gerekmiyor, ileride bu konuya döneceğiz, bu kelimeyi şöyle bir ortaya atmak istedim).</p>
+<p>Yani sorduğumuz Hilbert Uzayı <span class="math inline">\(V\)</span>'de bir <span class="math inline">\(f\)</span>'e eşleyecek bir <span class="math inline">\(u\)</span> fonksiyonu olup olmadığı. Bu arada tipik bir Hilbert Uzayı mesela kare alıp bir sınır bölgesinde (boundary domain) entegre edince elde edilen sonlu (finite) bir sonuçların oluşturduğu uzay. Yani &quot;derli toplu'' fonksiyonlar bir anlamda, absürt sonuçlar vermeyen türden, sonsuzluğa doğru patlayıp giden türden olanları değil.</p>
+<p>Faraziyeye devam edelim, diyelim ki <span class="math inline">\(V\)</span> içinde bir baz (basis) var. Baz nedir? Lineer cebirden hatırlayalım, mesela üç boyutlu Öklitsel (Euclidian) uzayı <span class="math inline">\(\mathbb{R}^3\)</span>.</p>
+<div class="figure">
+<img src="1_6.png" />
+
+</div>
+<p><span class="math display">\[ 
+\vec{x} = 
+\left[\begin{array}{r}
+1 \\ 0 \\ 0
+\end{array}\right]
+ \]</span></p>
+<p><span class="math display">\[ 
+\vec{y} = 
+\left[\begin{array}{r}
+0 \\ 1 \\ 0
+\end{array}\right]
+ \]</span></p>
+<p><span class="math display">\[ 
+\vec{z} = 
+\left[\begin{array}{r}
+0 \\ 0 \\ 1
+\end{array}\right]
+ \]</span></p>
+<div class="figure">
+<img src="1_7.png" />
+
+</div>
+<p>Bu uzaydaki herhangi bir vektör <span class="math inline">\(\vec{r}\)</span> üstteki üç baz vektörü kullanılarak parçalarına ayırılabilir, ya da, onların bir lineer kombinasyonu olarak gösterilebilir. Mesela</p>
+<p><span class="math display">\[ \vec{r} = x\vec{x} +  y\vec{y} +  z\vec{z} \]</span></p>
+<p>Bu üç vektörün bu uzay için bir &quot;baz oluşturduğu'' söylenebilir, çünkü bu uzaydaki her vektör bu üç vektörün bir kombinasyonu olarak temsil edilebilir. Dikkat edelim, iki baz vektör yeterli olmazdı, dört taneye gerek yok. Tamı tamına üç tane vektör bu uzayın bazını oluşturuyor.</p>
+<p>Bu sonlu (finite) miktarda bir uzay, herhangi bir vektörü tanımlamak için sonlu miktarda baz vektörü yeterli. Sonsuz boyutlu bir uzay da olabilirdi, o zaman herhangi bir fonksiyonu tanımlamak için sonsuz tane baz vektörü gerekirdi. Mesela Fourier Serilerini düşünelim</p>
+<p><span class="math display">\[ u = \sum_{i=1}^{\infty} \alpha_i \phi_i(x) \]</span></p>
+<p>ki baz fonksiyonlar <span class="math inline">\(\bigg\{ \phi_i(x) \bigg\}_{i=1}^\infty\)</span>.</p>
+<p>Bu fonksiyonların her biri trigonometrik fonksiyonlar olabilir (cos, sin) gibi, o zaman seri Fourier Serisi olur. Her halükarda, yukarıdaki tanımla diyoruz ki özgün (unique) <span class="math inline">\(\alpha\)</span> değerleri var ki, o değerleri zaten önceden bilinen baz fonksiyonları ile çarpıp toplayarak <span class="math inline">\(u\)</span>'yu oluşturabiliyoruz.</p>
+<p>Eğer lineer operatörümüzü hatırlarsak</p>
+<p><span class="math display">\[ \mathcal{L} = \mathcal{L}(\alpha_1 u_1 + \alpha_2 u_2) = 
+\alpha_1 Lu_1 + \alpha_2 Lu_2 \]</span></p>
+<p>Bu operatör herhangi iki katsayıyı kullanıyordu, fakat iki üstteki sonsuz tane toplamı da içerecek şekilde genişletilebilir, ve baz kavramı ile üst üste eklenebilme kavramının arasındaki alakayı gösterir.</p>
+<p>Diyelim ki <span class="math inline">\(\mathcal{L}\)</span>'nin her baz vektörünü nasıl eşlediğini biliyoruz,</p>
+<p><span class="math display">\[ \mathcal{L} \phi_i = -\lambda_i \phi_i \]</span></p>
+<p>Üstteki ifade <span class="math inline">\(\phi\)</span>'in <span class="math inline">\(L\)</span>'in özfonksiyonu olduğunu söylüyor aynı zamanda. Eğer alttaki açılımı yaparsak, ki bunu yapabiliriz çünkü <span class="math inline">\(\phi\)</span>'ler bazdırlar,</p>
+<p><span class="math display">\[ \mathcal{L}u = \mathcal{L} \bigg( \sum_i \alpha_i \phi_i(x) \bigg) =
+\sum_i \alpha_i \bigg( \mathcal{L} \phi_i \bigg)
+ \]</span></p>
+<p><span class="math display">\[ = -\sum_i \alpha_i \lambda_i \phi_i  \]</span></p>
+<p>Bir operatörün herhangi bir baz üzerinde nasıl işlem yaptığını anladığımız anda, o zaman <span class="math inline">\(\mathcal{L}\)</span>'in herhangi bir <span class="math inline">\(u\)</span> fonksiyonu üzerinde ne etki yaptığını bilebiliriz. Diğer bir deyişle bir uzayda sonsuz tane fonksiyon olabilir, ama biz operatörümüzün bazlara nasıl etki ettiğini biliyorsak, o bazlarla oluşturulan tüm fonksiyonlara nasıl etki ettiğini de biliyoruz demektir.</p>
+<p>Tekrar belirtelim, bu sadece <span class="math inline">\(\mathcal{L}\)</span> lineer bir operatör olduğu zaman mümkün.</p>
+<p>Örnek</p>
+<p>Klasik Burger denklemi</p>
+<p><span class="math display">\[ u_t + u u_x = v u_{xx} \]</span></p>
+<p>Denklemi</p>
+<p><span class="math display">\[ \mathcal{L}u = 0 \]</span></p>
+<p>olarak yazabiliriz, ki</p>
+<p><span class="math display">\[ \mathcal{L} = \frac{\partial }{\partial t} + 
+u \frac{\partial }{\partial x} - v\frac{\partial ^2}{\partial x^2}
+\]</span></p>
+<p>Bu gayrı lineer</p>
+<p>Örnek</p>
+<p><span class="math display">\[ u_{xx} + u_{yy} + \sin(u) \]</span></p>
+<p><span class="math display">\[ \mathcal{L} u = 0 \]</span></p>
+<p><span class="math display">\[ \mathcal{L} = \partial_{xx} + \partial_{yy} + \sin(\cdot) \]</span></p>
+<p>Üsttteki ilginç bir durum sinüs fonksiyonun da içi boş halde, operatör olarak kullanılmış olması. Operatör tanımında bazen böyle nokta konulduğu oluyor, ki neyin üzerinde operasyon yapıldığı anlaşılsın diye, mesela üstteki şöyle de gösteriliyor bazen</p>
+<p><span class="math display">\[ \mathcal{L} = \partial\cdot_{xx} + \partial\cdot_{yy} + \sin(\cdot) \]</span></p>
+<p>Bu da gayrı lineer çünkü <span class="math inline">\(\sin\)</span> fonksiyonu lineer değil, yani</p>
+<p><span class="math display">\[ \sin(u_1 + u_2) \ne \sin(u_1) + \sin(u_2) \]</span></p>
+<p>Lineerlik üzerinde çok duruyoruz çünkü diferansiyel denklemimiz hakkında bilmemiz gereken en önemli bilgilerden / ipuçlarından biri bu, çünkü denklemimizin lineer ya da gayrı lineer olması, bizi çok farklı çözüm teknikleri kullanmaya itecek.</p>
+<p>Bir diğer önemli terim homojen (homogeneous), homojen olmayan (inhomogeneous) kavramı.</p>
+<p>Homojenlik</p>
+<p>Eğer <span class="math inline">\(u=0\)</span> bir çözüm ise PDE homojendir.</p>
+<p>Yani <span class="math inline">\(\mathcal{L} u = f(\vec{x})\)</span> denklem tanımında eğer <span class="math inline">\(f(\vec{x})=0\)</span> ise PDE homojendir.</p>
+<p>Ornek</p>
+<p><span class="math display">\[ u_{xx} + u_y^2 = xu \]</span></p>
+<p>Denklem 2. derece, gayrı lineer çünkü bir kare var, ve homojen çünkü <span class="math inline">\(u=0\)</span>'in bir çözüm olduğunu görebiliyoruz.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ u_x^2 + u_y = 6y \sin\bigg(\frac{x^3}{5}\bigg) \]</span></p>
+<p>PDE 1. derece, gayrı lineer, ve homojen değil.</p>
+<p>Soru</p>
+<p>Bağımsız değişkenlere bağlı bir lineer operatör olabilir mi?</p>
+<p>Cevap</p>
+<p>Evet. Mesela <span class="math inline">\(u=u(x,y)\)</span>, ve denklem <span class="math inline">\(xu_x + u_y = u\)</span>.</p>
+<p>Bu homojen bir denklem, ve <span class="math inline">\(\mathcal{L} u = 0\)</span> olarak gösterilebilen bir denklem, ve</p>
+<p><span class="math display">\[ \mathcal{L} = x\frac{\partial }{\partial x} + 
+\frac{\partial }{\partial y} - 1
+\]</span></p>
+<p>ve görüldüğü üzere operatör tanımında bağımsız değişken <span class="math inline">\(x\)</span> var.</p>
+<p>Bu lineer bir operatör. Lineerliğin bağlı olduğu şey bağımlı değişkenler, bağımsızlar değil, mesela üstteki <span class="math inline">\(x\)</span>, <span class="math inline">\(x^3\)</span> gibi bir şey olabilirdi ama problem hala lineer olurdu.</p>
+<p>Sınır koşulları da bu bağlamda çok önemli, mesela diyelim ki tanımı lineer olan bir PDE var, ama problem tanımındaki sınır koşulları eğer fonksiyonun gayrı lineer bir kombinasyonunu içeriyorsa o zaman problemin tamamı gayrı lineer hale gelir.</p>
+<p>Biraz formel olarak düşünürsek, mesela tek boyutlu ısı denklemi</p>
+<p><span class="math display">\[ u_t = k u_{xx} \]</span></p>
+<p>ki <span class="math inline">\(x\)</span> mesafe belirten değişken, <span class="math inline">\(t\)</span> zaman,</p>
+<div class="figure">
+<img src="1_8.png" />
+
+</div>
+<p>Bu denklem üstteki gibi bir borudaki ısının dağılımını, akışını gösteriyor olsun. <span class="math inline">\(u|_{x=L}\)</span> ile gösterilen bir sınır şartı, yani <span class="math inline">\(L\)</span> uzunluğundaki borunun en ucunda (sağındaki) olması şart olan ısı seviyesi. Mesela bu şart <span class="math inline">\(u|_{x=L} = T_2\)</span> olsun, ki <span class="math inline">\(T_2\)</span> bir tek sayı, <span class="math inline">\(100^o\)</span> , <span class="math inline">\(200^o\)</span> gibi. Şimdi homojenliğe ne oldu? Ana denklem homojen, ama homojenlik testini sinir şartına uyguladığımız zaman <span class="math inline">\(0 = T_2\)</span> gibi bir sonuç alıyoruz, ki bu absürt bir sonuç demek ki sınır şartı homojen değil. O zaman bu problemin tamamı homojen olamaz.</p>
+<p>Benzer şekilde borunun öteki ucu için tanımlanan şart gayrı lineer olsa</p>
+<div class="figure">
+<img src="1_9.png" />
+
+</div>
+<p>ki bu şart o uçtan bir tür sinüsoidal bir enerji, ısı verildiği bir durumu tarif ediyor, o zaman ana denklem lineer olsa bile, sınır şartında gayrı lineerlik olduğu için problemin tamamı gayrı lineer olacaktır.</p>
+<p>Aslında formel olarak sınır şartlarını alıp</p>
+<p><span class="math display">\[ \mathcal{L}  = \frac{\partial }{\partial t} - k \partial_{xx}\]</span></p>
+<p>operatör tanımına bir şekilde dahil etmenin yolları var, ama biz bunlar çok ileri seviye teknikler, bu derste bu teknikleri görmeyeceğiz.</p>
+<p>Başlangıç Şartları</p>
+<p>Mesela yayılma (diffusion) denklemi <span class="math inline">\(u(x,t)\)</span> için <span class="math inline">\(u(x,0) = f(x)\)</span>, yani başlangıç anında ısı dağılımının tüm boru boyunca hangi seviyelerde olduğunun (burada bu dağılım <span class="math inline">\(f(x)\)</span>) belirtilmesi , başlangıç şartını tanımlamak demektir.</p>
+<p>Genel bir kural PDE'deki türev sayısı kadar şart tanımlanması gerektiğidir. Mesela iki zaman türevi var ise, iki tane koşul gerekir, mesela <span class="math inline">\(t=0\)</span> anındaki bir koşul, artı zamana göreve türevin <span class="math inline">\(t=0\)</span> anındaki değeri, vs.</p>
+<p>Şöyle düşünebiliriz, <span class="math inline">\(u_{xx}\)</span>'in olduğu bir denklemde <span class="math inline">\(u\)</span> elde etmek için iki kere entegre edilir, ve bunun sonucu olarak iki tane entegrasyon sabiti ortaya çıkar, ki bu değerler herhangi bir sayı olabilir. O iki sabiti hesaplamak için iki tane koşul gerekecektir.</p>
+<p>Genel kuralı daha somutlaştırırsak, &quot;her bağımsız değişken için gereken sınır koşulu, o bağımsız değişkenin derecesine eşittir''. Tabii bu genel bir kural, bazen gerçek dünyadaki fizik problemlerinde bu geçerli olmayabiliyor, bir problem için düzgün sınır koşulları bulmak başlı başına bir sanat denebilir aslında.</p>
+<p>Ornek</p>
+<p>Laplace denklemi</p>
+<p><span class="math display">\[ \nabla^2 u \equiv \frac{\partial ^2u}{\partial x^2} + 
+\frac{\partial ^2u}{\partial y^2}  +
+\frac{\partial ^2u}{\partial z^2} 
+\]</span></p>
+<p>ki <span class="math inline">\(\nabla^2\)</span> Laplacian operatörü olarak bilinir.</p>
+<p>Üstteki türden bir denklem hiç kaynak akım verilmeyen sonsuz uzayda elektrik potansiyeli alanını temsil ediyor olabilir.</p>
+<p>Bu denklemin bir çözümün (ki sınır şartlarına dikkat edelim) şu şekilde olduğunu göstermek kolaydır:</p>
+<p><span class="math display">\[ u(\vec{x}) = \frac{1}{\sqrt{x^2+y^2+z^2}} \]</span></p>
+<p>Bu Potansiyel Teori'sinde tipik bir problem, bir alan değişkeni var, ve orijinden uzaklaştıkça bu değişken azalıyor, bu azalma $1 / $ uzaklığın karesi oranında.</p>
+<p>Bu &quot;bir'' çözüm, fakat bir sürü 2. derece türev var ortalıkta, o zaman <span class="math inline">\(x,y,z\)</span>'nin her türlü lineer fonksiyonu de aslında bir çözümdür. Mesela</p>
+<p><span class="math display">\[ u(\vec{x}) = \alpha x + \beta y + \gamma z + \delta \]</span></p>
+<p>formülü de bir çözüm olabilir. Niye? Herhangi bir lineer fonksiyonun iki kere türevini alırsak o fonksiyon yokolur.</p>
+<p>Demek ki bu problemin tanımı eksik, sınır şartları da tanımlanması gerekli, aksi takdirde elde edilen sonuçlar özgün olmayacak. Envai türden çözüm mümkün.</p>
+<p>Bu problem için tipik bir sınır koşulu <span class="math inline">\(\lim_{|\vec{x}|\to \infty} u = 0\)</span> ifadesidir. Elektrik alan örneğine dönersek, elektrik alanı sonsuzluğa giderken sıfıra düşüyor demiş oluyoruz. Bir sabite gidiyor da diyebilirdik, o da işlerdi.</p>
+<p>O tür bir şart</p>
+<p><span class="math display">\[ u(\vec{x}) = \frac{1}{\sqrt{x^2+y^2+z^2}} \]</span></p>
+<p>sonucunu sağlardı, diğer seçenekleri elemiş olurdu. Bu örneği sınır koşullarının önemini belirtmek için seçtik, bu koşullar ana denklemin kendisi kadar önemli.</p>
+<p>Bir nokta daha:</p>
+<p>Şöyle bir ODE düşünelim</p>
+<p><span class="math display">\[ \frac{du}{dt} = 1 \]</span></p>
+<p>Entegre edince genel çözüm</p>
+<p><span class="math display">\[ u(t) = t + c_1 \]</span></p>
+<p>Fakat PDE için</p>
+<p><span class="math display">\[ u = u(x,y) \]</span></p>
+<p><span class="math display">\[ u_x = xy \]</span></p>
+<p>Burada <span class="math inline">\(y\)</span> bazlı bir türev yok, basit bir PDE, çözmesi kolay, fakat unutmayalım, entegre edince</p>
+<p><span class="math display">\[ u = \frac{1}{2}x^2y + [..] \]</span></p>
+<p>Noktaların olduğu yere ne gelecek? Bir sayı sabiti değil bir fonksiyon gelecek.</p>
+<p><span class="math display">\[ u = \frac{1}{2}x^2y + g(y) \]</span></p>
+<p>çünkü <span class="math inline">\(u\)</span>, <span class="math inline">\(y\)</span>'nin bir fonksiyonu, o zaman elimize geçen <span class="math inline">\(y\)</span>'nin herhangi bir fonksiyonu olacak, ki bu fonksiyonun değeri sinir koşulları üzerinden tanımlanmış olmalı. Bunu özellikle vurgulamak istedim çünkü insanlar bu detayı unutabiliyor.</p>
+<p>Sınır koşulu nasıl olabilir? Mesela <span class="math inline">\(u(\alpha,y) = f(y)\)</span> şeklinde olabilir. Bu koşulu yerine sokunca</p>
+<p><span class="math display">\[ \frac{1}{2}\alpha^2 y + g(y) = f(y) \]</span></p>
+<p>Bu bize <span class="math inline">\(g(y)\)</span>'in ne olduğunu söyler</p>
+<p><span class="math display">\[ g(y)  = f(y) - \frac{1}{2}\alpha^2 y \]</span></p>
+<p>ve bu örnek için nihai çözüm</p>
+<p><span class="math display">\[ u(x,y) = \frac{1}{2}x^2y + f - \frac{1}{2}\alpha^2 y \]</span></p>
+<p>Tekrarlamak gerekirse</p>
+<p>Bir Kısmi Türevsel Denklem (PDE) çok değişkenli bilinmeyen bir fonksiyon ve o fonksiyonun kısmi türevleri arasında kurulan bir ilişkidir.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ u = u(x,t) \]</span></p>
+<p>olmak üzere</p>
+<p><span class="math display">\[ \frac{\partial u}{\partial x} + \frac{\partial u}{\partial t} = 0\]</span></p>
+<p>denklemi bir PDE'dir. Çözüm bir tek sayısal sonuç değil, bir fonksiyondur. Düşünelim, mesela <span class="math inline">\(f\)</span> fonksiyonu tek değişkenli ve türevi alınabilir bir fonksiyon ise</p>
+<p><span class="math display">\[ u(x,t) = f(x-t) \]</span></p>
+<p>çözümdür diyebilir miyiz? Yani çözüm <span class="math inline">\(f(x-t)\)</span> olabilir mi? Kontrol edelim</p>
+<p><span class="math display">\[ u_x = f&#39;(x-t) \]</span></p>
+<p><span class="math display">\[ u_t = -f&#39;(x-t) \]</span></p>
+<p>Bu iki kısmi türev toplanınca sıfır çıkar, yani sonuç üstte tanımlı PDE'ye uyar. Bu genel tanıma uyan bir sürü fonksiyon vardır, mesela</p>
+<p><span class="math display">\[ u(x,t) = (x-t)^2 \]</span></p>
+<div class="figure">
+<img src="1_1.png" />
+
+</div>
+<p><span class="math display">\[ u(x,t) = e^{-(x-t)^2} \]</span></p>
+<div class="figure">
+<img src="1_2.png" />
+
+</div>
+<p><span class="math display">\[ u(x,t) = 3\sin(x-t) \]</span></p>
+<div class="figure">
+<img src="1_4.png" />
+
+</div>
+<p>Not: Burada <span class="math inline">\(f\)</span>'i bir <span class="math inline">\(f(z)\)</span> olarak görebiliriz, bu fonksiyona <span class="math inline">\((x-y)\)</span> geçiliyor, yani bir içiçe fonksiyon ortaya çıkıyor. O zaman üstteki formlar aslında <span class="math inline">\(f(z) = z^2\)</span>, ve <span class="math inline">\(e^{-z^2}\)</span> şeklinde. Tabii kısmi türevler ile türev alınca Zincirleme Kanunu devreye girmelidir ve geçilen değerlerin, &quot;fonksiyonların'' da türevi alınmalıdır, vs.</p>
+<p>Yani üstteki sonuç aslında diyor ki <span class="math inline">\(x-t\)</span> şeklinde hep beraber olmak üzere bu ikiliyi kullanan herhangi bir fonksiyon, üstteki PDE'nin çözümüdür. Bu şekilde çözüm birden fazla fonksiyon oluyor, ve bu çözüm fonksiyonlarının birbirinden ne kadar farklı olabildiği, göstermeye çalıştığımız noktalardan biri.</p>
+<p>Üstteki PDE bir taşınım (convection) örneğidir, ve 1. seviye lineer homojen bir denklemdir. 1. seviye en yüksek türev seviyesinin seviyesine işaret eder, lineer homojen ise tüm çözümlerin lineer bir şekildeki kombinasyonu yine bir çözümdür anlamına gelir. Üstteki PDE için ne kadar çeşitli çözümler olabildiğini gördük, onların kombinasyonlarıyla bu çeşitlerin daha da artacağını düşünebiliriz. kıyasla şöyle bir ODE</p>
+<p><span class="math display">\[  y&#39; - y  = 0\]</span></p>
+<p>için çözümler</p>
+<p><span class="math display">\[ y = Ae^x \]</span></p>
+<p>denklemidir Tek bir çözüme indirgemek için başlangıç şartı mesela <span class="math inline">\(y(0) =2\)</span> veririz ve oradan tek çözüm <span class="math inline">\(y = 2e^x\)</span> buluruz.</p>
+<p>Örnek PDE'miz için de, benzer şekilde, tek bir fonksiyonu bulmak için başlangıç, ya da sınır şartları koymalıyız.</p>
+<p>Örnek</p>
+<p>Örnek PDE çözümleri arasında hangisi x ekseni boyunca <span class="math inline">\(u = e^{-x^2}\)</span> şartını tatmin eder?</p>
+<p><span class="math inline">\(u = e^{-x^2}\)</span> demek, <span class="math inline">\(u(x,0)\)</span> demektir, çünkü <span class="math inline">\(t\)</span> yoktur. Çözümlerimizi teker teker gözden geçirirsek, <span class="math inline">\(u(x,0)\)</span> denklemi <span class="math inline">\(u = e^{-x^2}\)</span> olan çözüm</p>
+<p><span class="math display">\[ u(x,t) =  e^{-(x-t)^2} \]</span></p>
+<p>çözümüdür. Görsel olarak durumu canlandırmak gerekirse, <span class="math inline">\(t\)</span>'yi bir zaman değişkeni olarak kabul edelim, ve</p>
+<div class="figure">
+<img src="1_3.png" />
+
+</div>
+<p>her <span class="math inline">\(t\)</span> değerinde o anda <span class="math inline">\(u\)</span>'nun <span class="math inline">\(x\)</span> üzerinde düşen yansımasının bir fotoğrafını çekiyoruz sanki, üstteki resimde soldaki <span class="math inline">\(t=0\)</span> anındaki mesela.</p>
+<p>Devam edelim. Örnek 1 için bir sürü çözümden bahsettik ama bu çözümleri nasıl türettiğimizi söylemedik. Ayrıca bu örnekte &quot;tüm mümkün çözümleri'' bulup bulmadığımızı da söylemedik. Şimdi göstereceğimiz işlemler hakikaten tüm çözümleri bulduğumuzu gösterecek, ve akıllıca kullanılabilecek bir değişken değiştirme (change of variables) tekniğinin bir problemi basitleştirmekte nasıl faydalı olacağını anlatmaya uğraşacak.</p>
+<p>Örnek</p>
+<p>Üstteki PDE'yi lineer değişken değişimi kullanarak bir ODE'ye indirgemeye uğraşacağız. Diyelim ki</p>
+<p><span class="math display">\[ \alpha = a x + b t \]</span></p>
+<p><span class="math display">\[ \beta = cx + dt \]</span></p>
+<p>Kısmi türevler <span class="math inline">\(u_x\)</span> ve <span class="math inline">\(u_t\)</span> şu şekilde genişletilebilir</p>
+<p><span class="math display">\[ u_x = 
+\frac{\partial u}{\partial \alpha}\frac{\partial \alpha}{\partial x}  +
+\frac{\partial u}{\partial \beta}\frac{\partial \beta}{\partial x} 
+\]</span></p>
+<p><span class="math display">\[ u_t = 
+\frac{\partial u}{\partial \alpha}\frac{\partial \alpha}{\partial t}  +
+\frac{\partial u}{\partial \beta}\frac{\partial \beta}{\partial t} 
+\]</span></p>
+<p>İlk baştaki değişken değişimine göre bazı kısmi türevler şöyle:</p>
+<p><span class="math display">\[ \frac{\partial \alpha}{\partial x} = a , \ \frac{\partial \alpha}{\partial t} = b, \ \frac{\partial \beta}{\partial x} = c , \
+\frac{\partial \beta}{\partial t} = d 
+\]</span></p>
+<p>Bunları <span class="math inline">\(u_x\)</span> ve <span class="math inline">\(u_t\)</span> içinde yerlerine geçirirsek,</p>
+<p><span class="math display">\[ u_x = 
+\frac{\partial u}{\partial \alpha} a +
+\frac{\partial u}{\partial \beta} c
+\qquad (1)
+\]</span></p>
+<p><span class="math display">\[ u_t = 
+\frac{\partial u}{\partial \alpha} b +
+\frac{\partial u}{\partial \beta} d
+\qquad (2)
+\]</span></p>
+<p>Üstteki iki kısmi türevi ana PDE'de yerine koyarsak</p>
+<p><span class="math display">\[ \frac{\partial u}{\partial x} + \frac{\partial u}{\partial t} = 0\]</span></p>
+<p>şöyle olur</p>
+<p><span class="math display">\[ 
+\frac{\partial u}{\partial \alpha} a  +
+\frac{\partial u}{\partial \beta} c + 
+\frac{\partial u}{\partial \alpha} b + 
+\frac{\partial u}{\partial \beta} d = 0
+\]</span></p>
+<p>Benzer terimleri gruplayalım</p>
+<p><span class="math display">\[ 
+\frac{\partial u}{\partial \alpha} (a+b)
+\frac{\partial u}{\partial \beta} (c+d) = 0
+\]</span></p>
+<p>Şimdi öyle <span class="math inline">\(a,b,c,d\)</span> değerleri seçelim ki bir kısmi türev yokolsun. Mesela</p>
+<p><span class="math display">\[ a = 1, b = 0, c=1, d=-1 \]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[ \frac{\partial u}{\partial \alpha} = 0 \]</span></p>
+<p>kalır. Bu artık bir basit diferansiyel denklemdir, çözüm için entegral alırız,</p>
+<p><span class="math display">\[ u = C(\beta) \]</span></p>
+<p>Unutmayalım, sıfırın entegrali bir sabittir, ama <span class="math inline">\(u\)</span> birden fazla değişkene sahip olduğu için bu &quot;sabitin'' <span class="math inline">\(\beta\)</span> içermesi gerekir. <span class="math inline">\(C(\beta)\)</span>, <span class="math inline">\(\alpha\)</span>'ya göre bir sabittir.</p>
+<p><span class="math inline">\(C(\beta)\)</span>'yi daha somutlaştıralım,</p>
+<p><span class="math display">\[ \beta = cx + dt \]</span></p>
+<p>demiştik, ayrıca <span class="math inline">\(c=1,d=-1\)</span>. O zaman çözüm</p>
+<p><span class="math display">\[ u = C(x-t) \]</span></p>
+<p>Bu da başta bulduğumuz çözüm ile aynı zaten.</p>
+<p>Ders 2</p>
+<p>Karakteristik Eğriler Metodu</p>
+<p>Bu metot katsayıları sabit olmayan 1. derece, lineer PDE çözmemize yardım eder. PDE şu formdadır</p>
+<p><span class="math display">\[ \frac{\partial u}{\partial x} + 
+p(x,y) \frac{\partial u}{\partial y} = 0 
+\qquad (1)
+ \]</span></p>
+<p>ve <span class="math inline">\(p(x,y)\)</span>, <span class="math inline">\(x,y\)</span> değişkenlerinin bir fonksiyonudur.</p>
+<p>Üstteki denklemi iki vektörün noktasal çarpımı olarak ta görebiliriz.</p>
+<p><span class="math display">\[ 
+&lt;\frac{\partial u}{\partial x}, \frac{\partial u}{\partial y}&gt; \cdot 
+&lt;1,p(x,y)&gt; = 0
+ \]</span></p>
+<p>Bu açıdan bakınca yukarıdaki ifade yeni bir şey söylüyor, <span class="math inline">\(u\)</span>'nun <span class="math inline">\(&lt;1,p(x,y)&gt;\)</span> vektörüne göre yönsel türevinin sıfır olduğunu söylüyor, yani o yönde hiçbir değişim yok.</p>
+<p>Şimdi tek başına <span class="math inline">\(&lt;1,p(x,y)&gt;\)</span> vektörünü düşünelim, her değişik <span class="math inline">\(x,y\)</span> için bu vektörler bir vektör alanı oluşturur, bu alandaki vektörleri bir eğrinin &quot;belli bir noktadaki eğimini gösterdiği'' şeklinde alabiliriz. O noktalardaki eğim <span class="math inline">\(p(x,y) / 1\)</span> olacaktır doğal olarak, o zaman bu eğriler için şöyle bir basit diferansiyel denklem (ODE) yazabiliriz.</p>
+<p><span class="math display">\[ \frac{dy}{dx} = \frac{p(x,y)}{1} \]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[ \frac{dy}{dx} = p(x,y) 
+\qquad (2)
+\]</span></p>
+<p>Bu ODE bir yön alanı (direction field) oluşturur, bkz [1].</p>
+<p>Şimdi geri adım atıp her şeye tekrar bakalım. (1) diyor ki <span class="math inline">\(x,y\)</span> noktasında <span class="math inline">\(u\)</span>'nun <span class="math inline">\(&lt;1,p(x,y)&gt;\)</span> yönündeki yönsel türevi sıfır. Yani <span class="math inline">\(x,y\)</span> noktasında <span class="math inline">\(&lt;1,p(x,y)&gt;\)</span> yönünde ilerlersek <span class="math inline">\(u\)</span> hiç değişmeyecek.</p>
+<p>Aynı zamanda <span class="math inline">\(&lt;1,p(x,y)&gt;\)</span> vektörleri (2) için bir yönsel alan da tanımlıyor! Bilindiği gibi (2) denklemi çözüm eğrileri (solution curves) ortaya çıkartır, ve ne raslantı ki (!) bu çözüm eğrilerinin her birinde (1)'deki <span class="math inline">\(u\)</span> sabit kalır.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ \frac{\partial u}{\partial x} + 
+x \frac{\partial u}{\partial y} = 0 
+ \]</span></p>
+<p>Yani <span class="math inline">\(p(x,y) = x\)</span>. O zaman</p>
+<p><span class="math display">\[ \frac{dy}{dx} = x \]</span></p>
+<p>denklemini çözeriz, ve</p>
+<p><span class="math display">\[ y = \frac{1}{2}x^2 + C \]</span></p>
+<p>karakteristik eğrilerini elde ederiz. Tekrar düzenlersek</p>
+<p><span class="math display">\[ y - \frac{1}{2}x^2 = C \]</span></p>
+<div class="figure">
+<img src="2_1.png" />
+
+</div>
+<p>O zaman PDE'nin genel çözümü</p>
+<p><span class="math display">\[ u(x,y) = f(C) = f(y - \frac{1}{2}x^2) \]</span></p>
+<p>diyebiliriz, <span class="math inline">\(f\)</span> rasgele bir fonksiyondur, söylenmeye uğraşılan farklı sabitlere tekabül eden <span class="math inline">\(u\)</span>'lardır. PDE çözümü <span class="math inline">\(u\)</span>'nun sabite eşit olmasıyla alakalı çünkü PDE'yi yönsel türev olarak temsil edince bu sonuca varıyoruz. Üstteki denklem de karakteristik eğriler açısından gelerek o sabiti bize sağlıyor.</p>
+<p><span class="math inline">\(f\)</span>'in genel çözüm olduğunu ana denklemde yerine koyarak test edebiliriz.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ u_x + yu_y = 0 \]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[ \frac{dy}{dx} = y \]</span></p>
+<p><span class="math display">\[ y = Ce^x \]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[  C = e^{-x}y\]</span></p>
+<p>Genel çözüm</p>
+<p><span class="math display">\[ u(x,y) = f(C) = f(e^{-x}y) \]</span></p>
+<p>PDE içinde yerine koyarak sonucu kontrol edelim</p>
+<p><span class="math display">\[ u_x + yu_y = 
+-f&#39;(e^{-x}y)e^{-x}y + y f&#39;(e^{-x}y) e^{-x} = 0
+ \]</span></p>
+<p>Dalga Denklemi</p>
+<p><span class="math display">\[ u_{tt} = c^2 u_{xx} \]</span></p>
+<p>dalga denklemi olarak bilinir. Bir diğer şekilde</p>
+<p><span class="math display">\[ u_{tt} - c^2 u_{xx} = 0\]</span></p>
+<p>Bu denklemi operatörlerin faktorize edilmiş hali olarak görmek mümkündür.</p>
+<p><span class="math display">\[ u_{tt} - c^2 u_{xx} = 
+\bigg( \frac{\partial }{\partial t} - c \frac{\partial }{\partial x} \bigg)
+\bigg( \frac{\partial }{\partial t} + c \frac{\partial }{\partial x} \bigg)
+u = 0
+\qquad (3)
+\]</span></p>
+<p>Eşitliğin sağ tarafındaki operatörler hakikaten dalga denklemine tekabül ediyor mu? Kontrol edelim, üstteki <span class="math inline">\(u\)</span> üzerinde etki eden ilk operatör şu şekilde açılıyor</p>
+<p><span class="math display">\[ \bigg( \frac{\partial }{\partial t} + c \frac{\partial }{\partial x}
+\bigg) u = 
+\frac{\partial u}{\partial t} + c \frac{\partial u}{\partial x}
+\]</span></p>
+<p>Şimdi ikinci operatörü uygulayalım (bu sefer eksi olan operatör), yani şunu hesaplayalım, ve üstteki eşitliğin sağ tarafı şöyle olur</p>
+<p><span class="math display">\[ 
+\bigg( \frac{\partial }{\partial t} - c \frac{\partial }{\partial x} \bigg)
+\frac{\partial u}{\partial t} + c \frac{\partial u}{\partial x} 
+ \]</span></p>
+<p><span class="math display">\[ = 
+\frac{\partial ^2 u}{\partial t^2} + 
+c \frac{\partial u}{\partial x \partial t} - 
+c \frac{\partial u}{\partial t \partial x} - 
+c^2\frac{\partial ^2 u}{\partial x^2} 
+ \]</span></p>
+<p><span class="math inline">\(u_{xt} = u_{tx}\)</span> olduğuna göre ortadaki iki terim iptal olur</p>
+<p><span class="math display">\[ = 
+\frac{\partial ^2 u}{\partial t^2} -
+c^2\frac{\partial ^2 u}{\partial x^2} 
+ \]</span></p>
+<p>Açılımı ispatlamış olduk.</p>
+<p>Çözümü bulalım. Karakteristik kordinat (characteristic coordinate) yöntemini kullanalım. Bu sefer ilginç bir şey yapacağız, kordinat değişimini tanımlayan eşitliklerden sonra operatörler üzerinde sanki cebirsel büyüklüklermiş gibi işlem yapacağız.</p>
+<p><span class="math display">\[ \xi = x + ct \]</span></p>
+<p><span class="math display">\[ \eta = x - ct \]</span></p>
+<p>Bu kordinat değişimi için bir tahmin yürüttük. Doğru olup olmadığını şimdi göreceğiz.</p>
+<p><span class="math display">\[ \partial_x = \partial_\xi + \partial_\eta \]</span></p>
+<p><span class="math display">\[ \partial_t = c\partial_\xi - c \partial_\eta \]</span></p>
+<p>Bu formüller aslında 1. derste gördüğümüz (1),(2) formüllerine benziyor, sadece üsttekiler pür operatör formunda ve sabitler bu probleme göre ayarlı.</p>
+<p>Şimdi iki üstteki formülü <span class="math inline">\(c\)</span> ile çarpıp bir üstteki formül ile toplarsak, sonuç</p>
+<p><span class="math display">\[ \partial_t + c\partial_x = 2c \partial_\xi \]</span></p>
+<p>Toplamak yerine bir üstteki formülden iki üstteki formülü çıkartırsak</p>
+<p><span class="math display">\[ \partial_t - c\partial_x = -2c \partial_\eta \]</span></p>
+<p>Üstteki eşitliklerin sol tarafları, daha önce PDE için operatör açılımı yaptığımızda ortaya çıkan operatörler ile aynı. O zaman açılımda yerlerine koyarsak, PDE şöyle olur</p>
+<p><span class="math display">\[ (2c\partial_\xi)(-2c\partial_\eta)u = 0 \]</span></p>
+<p>Diğer bir deyişle</p>
+<p><span class="math display">\[ u_{\xi_\eta} = 0 \]</span></p>
+<p>Biliyoruz ki <span class="math inline">\(c \ne 0\)</span>. Bu transform edilmiş denklemin çözümü nedir? İlk önce <span class="math inline">\(\eta\)</span>'ya göre entegral alırız,</p>
+<p><span class="math display">\[ u_\xi = f(\xi) \]</span></p>
+<p>Bir daha entegral alırız</p>
+<p><span class="math display">\[ u = F(\xi) + G(\eta) \]</span></p>
+<p>ki <span class="math inline">\(F&#39; = f\)</span> olarak alındı. Burada aslında <span class="math inline">\(f,F\)</span>'in ne oldukları pek önemli değil, ikisi de rasgele fonksiyonlar, tek önemli olan aldıkları parametreler. O zaman çözüm</p>
+<p><span class="math display">\[ u(x,t) = F(x+ct) + G(x-ct) \]</span></p>
+<p>ki <span class="math inline">\(F,G\)</span> rasgele fonksiyonlar.</p>
+<p>Ders 3</p>
+<p>Dalga Denklemi Başlangıç Değer Problemi (Initial Value Problem)</p>
+<p>Başlangıç değer problemi</p>
+<p><span class="math display">\[ u_{tt} = c^2u_{xx} \]</span></p>
+<p><span class="math display">\[ -\infty &lt; x &lt; \infty \]</span></p>
+<p>ve başlangıç şartları</p>
+<p><span class="math display">\[ u(x,0) = \phi(x) \]</span></p>
+<p><span class="math display">\[ u_t(x,0) = \psi(x) \]</span></p>
+<p>ki <span class="math inline">\(\phi\)</span> ve <span class="math inline">\(\psi\)</span>, <span class="math inline">\(x\)</span>'in herhangi bir fonksiyonu.</p>
+<p>Her <span class="math inline">\(\phi\)</span> ve <span class="math inline">\(\psi\)</span> için bu problemde tek bir çözüm vardır, yani tek bir <span class="math inline">\(u\)</span> elde edilir. Mesela <span class="math inline">\(\phi(x) = \sin(x)\)</span> ve <span class="math inline">\(\psi(x) = 0\)</span> ise, o zaman <span class="math inline">\(u(x,t) = \sin x \cos ct\)</span>.</p>
+<p>Kontrol edelim. Çözüm şöyleydi:</p>
+<p><span class="math display">\[ u(x,t) = f(x+ct) + g(x-ct)  
+\qquad (5)
+\]</span></p>
+<p><span class="math inline">\(t=0\)</span> dersek</p>
+<p><span class="math display">\[ u(x,0)  = f(x) + g(x) \]</span></p>
+<p><span class="math inline">\(u(x,0) = \phi(x)\)</span> demiştik</p>
+<p><span class="math display">\[ \phi(x) = f(x) + g(x) 
+\qquad (1) 
+\]</span></p>
+<p>Zincirleme Kanunu kullanarak <span class="math inline">\(t\)</span>'ye göre türev alalım ve <span class="math inline">\(t=0\)</span> diyelim</p>
+<p><span class="math display">\[ u_t(x,0) = cf&#39; - cg&#39; \]</span></p>
+<p><span class="math inline">\(u_t(x,0) = \psi(x)\)</span> demiştik</p>
+<p><span class="math display">\[ \psi(x) = cf&#39;(x) - cg&#39;(x) 
+\qquad (2) \]</span></p>
+<p>Formül (1) ve (2)'yi bir denklem sistemi olarak görebiliriz, ve aynı anda çözmeye uğraşabiliriz. (1)'in türevini alalım, ve (2)'yi <span class="math inline">\(c\)</span>'ye bölelim</p>
+<p><span class="math display">\[ \phi&#39; = f&#39; + g&#39; \]</span></p>
+<p><span class="math display">\[ \frac{1}{c}\psi = f&#39; - g&#39; \]</span></p>
+<p>Üstteki iki denklemi toplarsak</p>
+<p><span class="math display">\[ f&#39; = \frac{1}{2} \bigg( \phi&#39; + \frac{\psi}{c}  \bigg) \]</span></p>
+<p>Çıkarırsak</p>
+<p><span class="math display">\[ g&#39; = \frac{1}{2}  \bigg( \phi&#39; - \frac{\psi}{c}  \bigg) \]</span></p>
+<p><span class="math inline">\(f&#39;\)</span>'in entegralini alalım. Ek: <span class="math inline">\(x\)</span> yerine <span class="math inline">\(s\)</span> kullanacağız şimdi,</p>
+<p><span class="math display">\[ \int f&#39; = \int \frac{1}{2} \bigg( \phi&#39; + \frac{\psi}{c}  \bigg) \]</span></p>
+<p><span class="math display">\[ f = \frac{1}{2}\phi(s) + \frac{1}{2}\int_0^s \frac{\psi(x)}{c} + A\]</span></p>
+<p><span class="math display">\[ f = \frac{1}{2}\phi(s) + \frac{1}{2c} \int_0^s \psi(x) + A 
+\qquad (3)
+\]</span></p>
+<p><span class="math inline">\(g&#39;\)</span>'nin entegrali</p>
+<p><span class="math display">\[ g = \frac{1}{2}\phi(s) - \frac{1}{2c} \int_0^s \psi(x) + B
+\qquad (4)
+\]</span></p>
+<p>ki <span class="math inline">\(A\)</span> ve <span class="math inline">\(B\)</span> sabitler. <span class="math inline">\(A=0,B=0\)</span> çünkü (3) ve (4) toplanınca içinde <span class="math inline">\(A,B\)</span> olmayan (1) elde edilir, o zaman <span class="math inline">\(A=0,B=0\)</span> olmalıdır. Böylece genel formül (5) için gereken <span class="math inline">\(f,g\)</span> fonksiyonlarını elde etmiş oluyoruz. Genel formülde biraz önce bulduğumuz <span class="math inline">\(f,g\)</span> yerine geçirirsek, ve <span class="math inline">\(f\)</span> için <span class="math inline">\(s = x+ct\)</span>, <span class="math inline">\(g\)</span> için <span class="math inline">\(s = x-ct\)</span> kullanırsak,</p>
+<p><span class="math display">\[ u(x,t) = 
+\frac{1}{2}\phi(x+ct) + 
+\frac{1}{2c} \int_0 ^{x+ct} \psi + 
+\frac{1}{2}\phi(x-ct) -
+\frac{1}{2c} \int_0 ^{x+ct} \psi 
+ \]</span></p>
+<p>Basitleştirirsek</p>
+<p><span class="math display">\[ = \frac{1}{2}[\phi(x+ct) + \phi(x-ct)] + 
+\frac{1}{2c} \int_{x-ct} ^{x+ct} \psi (s) \mathrm{d} s
+ \]</span></p>
+<p>Bu çözüm matematikçi d'Alembert'in 1746'da bulduğu başlangıç değer probleminin çözümdür.</p>
+<p>Örnek</p>
+<p><span class="math display">\[ \phi(x) = 0, \psi(x) = \sin(x)\cos(ct) \]</span></p>
+<p>Üstteki formüllerden 2.'yi 1.'den çıkartalım,</p>
+<p><span class="math display">\[ \sin(x+ct) - \sin(x-ct) = 2\cos(x)\sin(ct) \]</span></p>
+<p><span class="math inline">\(u(x,t)\)</span> içinde yerine koyalım</p>
+<p><span class="math display">\[ u(x,t) = \frac{1}{c}\cos(x)\sin(ct) \]</span></p>
+<p>Çözüm bu. Kontrol edersek,</p>
+<p><span class="math display">\[ u_{tt} = -c \cos(x)\sin(ct) \]</span></p>
+<p><span class="math display">\[ u_{xx} = -(1/c)\cos(x)\sin(ct) \]</span></p>
+<p>böylece</p>
+<p><span class="math display">\[ u_{tt} = c^2 u_{xx} \]</span></p>
+<p>Başlangıç şartını kontrol etmek daha da kolay, ilk şart</p>
+<p><span class="math display">\[ u(x,0) = \frac{1}{c}\cos(x)\sin(c \cdot 0)  = 0\]</span></p>
+<p>İkinci şart</p>
+<p><span class="math display">\[ u_t(x,t) = \frac{1}{c}\cos(x) c \cos(ct) \]</span></p>
+<p><span class="math display">\[ u_t(x,0) = \frac{1}{c}\cos(x) c \]</span></p>
+<p><span class="math display">\[  = \cos(x) \]</span></p>
+<p>Yayılım (Diffusion) Denklemi</p>
+<p>Bu bölümde çözmeye uğraşacağımız problem</p>
+<p><span class="math display">\[  u_t = k u_{xx}  \]</span></p>
+<p><span class="math display">\[ u(x,0) = \phi(x) \]</span></p>
+<p>öyle ki</p>
+<p><span class="math display">\[ -\infty &lt; x &lt; \infty, 0 &lt; t &lt; \infty \]</span></p>
+<p>Bu denklemi özel (particular) bir <span class="math inline">\(\phi\)</span> için çözeceğiz, ve sonra genel çözümü bu özel çözümden elde edeceğiz. Bunu yaparken yayılım denklemin 5 tane değişmezlik (invariance) özelliğini kullanacağız.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Bir sabit <span class="math inline">\(y\)</span> için <span class="math inline">\(u(x,y)\)</span> çözümünü <span class="math inline">\(u(x-y,t)\)</span> olarak tercüme edilir / taşınırsa (translate), ortaya çıkan denklem yeni bir çözümdür.</p></li>
+<li><p>Çözümün her türevi, mesela <span class="math inline">\(u_x\)</span>, <span class="math inline">\(u_t\)</span>, <span class="math inline">\(u_{xx}\)</span> gibi, yeni bir çözümdür.</p></li>
+<li><p>Çözümlerin lineer kombinasyonları yeni bir çözümdür. Bu lineerliğin doğal bir sonucu zaten.</p></li>
+<li><p>İki çözümün entegrali bir çözümdür, mesela <span class="math inline">\(S(x,t)\)</span> bir çözüm ise, o zaman <span class="math inline">\(S(x-y,t)\)</span> de bir çözümdür -(a)'da söylendiği gibi-, o zaman</p></li>
+</ol>
+<p><span class="math display">\[ v(x,t) = \int_{-\infty}^{\infty}S(x-y,t)g(y)\mathrm{d} y   \]</span></p>
+<p>bir çözümdür. Aslında bu beyan, (c)'nin limite gidiyor iken olan versiyonu / şekli.</p>
+<ol start="5" style="list-style-type: lower-alpha">
+<li>Eğer <span class="math inline">\(u(x,t)\)</span> yayılım denkleminin bir çözümü ise, o zaman genişletilmiş (dilated) fonksiyon <span class="math inline">\(u(\sqrt{a} x, at)\)</span> da, herhangi bir <span class="math inline">\(a&gt;0\)</span> için, bir çözümdür. İspat (Zincirleme Kanunu ile)</li>
+</ol>
+<p><span class="math display">\[ v(x,t) =  u(\sqrt{a} x, at) \]</span></p>
+<p><span class="math display">\[ v_t = [\partial(at) / \partial t]u_t = au_t \]</span></p>
+<p><span class="math display">\[ v_x = [\partial(\sqrt{a}x) / \partial x]u_x = \sqrt{a}u_x \]</span></p>
+<p><span class="math display">\[ v_{xx} = \sqrt{a} \cdot \sqrt{a} u_{xx} = a u_{xx} \]</span></p>
+<p>Hedefimiz özel bir çözüm bulmak ve özellik (d)'yi kullanarak tüm diğer çözümleri inşa etmek. Aradığımız özel fonksiyon ise <span class="math inline">\(Q(x,t)\)</span> adını vereceğimiz bir fonksiyon ve bizim tanımladığımız özel başlangıç şartları şöyle:</p>
+<p><span class="math display">\[
+Q(x,0) = 1, \ x&gt;0 \textit{ için } \qquad (7)
+\]</span></p>
+<p><span class="math display">\[ Q(x,0)=0, \ x&lt;0 \textit{ için }  \]</span></p>
+<p>Bu başlangıç şartlarını seçmemizin sebebi genişletme (dilation) operasyonunun bu şartlara etki etmemesi.</p>
+<p><span class="math inline">\(Q\)</span>'yu üç adımda bulacağız.</p>
+<p>1'inci Adım</p>
+<p>Çözümün şu özel formda olacağını söylüyoruz.</p>
+<p><span class="math display">\[ Q(x,t) = g(p), \ p = \frac{x}{\sqrt{4kt}} 
+\qquad (6) \]</span></p>
+<p><span class="math inline">\(g\)</span> tek değişkenli bir fonksiyon, fonksiyonun ne olduğunu sonra tanımlayacağız, <span class="math inline">\(\sqrt{4kt}\)</span> ise daha ilerideki başka bir formülü basitleştirmek için kullanılıyor.</p>
+<p><span class="math inline">\(Q\)</span>'nin niye bu özel formda olmasını istiyoruz? Çünkü çözümün genişletmeye &quot;dayanıklı'' olması gerekiyorsa, böyle bir çözüm sadece <span class="math inline">\(Q\)</span> <span class="math inline">\(x,t\)</span>'ye <span class="math inline">\(x/\sqrt{t}\)</span> kombinasyonu üzerinden bağlıysa mümkündür. Kontrol edelim, genişleme <span class="math inline">\(x/\sqrt{t}\)</span>'yi alıp <span class="math inline">\(\sqrt{a}x/\sqrt{at} = x/\sqrt{t}\)</span> yapar, yani başlangıca döndürür.</p>
+<p>İkinci Adım</p>
+<p>Öne sürdüğümüz çözümden ana PDE'ye erişmek için <span class="math inline">\(Q_t,Q_{x},Q_{xx}\)</span>'i bulmamız lazım. (6) üzerinde Zincirleme Kanunu kullanarak bunları elde etmeye uğraşalım.</p>
+<p><span class="math display">\[ \frac{\partial Q}{\partial t} = 
+\frac{\partial Q}{\partial p}\frac{\partial p}{\partial t}
+\]</span></p>
+<p><span class="math inline">\(Q\)</span> tek bir değişken <span class="math inline">\(p\)</span>'ye bağlı olduğuna göre <span class="math inline">\(\partial\)</span> yerine <span class="math inline">\(d\)</span> kullanabiliriz.</p>
+<p><span class="math display">\[ Q_t = 
+\frac{dQ}{dp}\frac{\partial p}{\partial t}  = 
+g&#39;(p)\frac{\partial p}{\partial t} 
+\]</span></p>
+<p><span class="math inline">\(\partial p/\partial t\)</span>'yi şu şekilde hesaplarız</p>
+<p><span class="math display">\[ 
+\frac{\partial }{\partial t}
+\bigg( 
+\frac{x}{\sqrt{4k} t ^{-1/2}}
+\bigg) = 
+-\frac{1}{2} \frac{x}{\sqrt{4k}} t ^{-3/2} = 
+-\frac{1}{2t} \frac{x}{\sqrt{4kt}}
+ \]</span></p>
+<p>Yani</p>
+<p><span class="math display">\[ Q_t = 
+- g&#39;(p)\frac{1}{2t} \frac{x}{\sqrt{4kt}}
+\]</span></p>
+<p>Aynı mantıkla <span class="math inline">\(Q_x\)</span></p>
+<p><span class="math display">\[ Q_x = g&#39;(p)\frac{1}{\sqrt{4kt}} \]</span></p>
+<p>Bir daha <span class="math inline">\(x\)</span>'e göre kısmi türev alalım, yine Zincirleme Kanunu</p>
+<p><span class="math display">\[ Q_{xx} = \frac{\partial dQ_x}{\partial dp}
+\frac{\partial p}{\partial x} = 
+\frac{1}{\sqrt{4kt}}g&#39;&#39;(p)\frac{1}{\sqrt{4kt}} 
+ \]</span></p>
+<p><span class="math display">\[ = \frac{1}{4kt}g&#39;&#39;(p) \]</span></p>
+<p><span class="math display">\[ Q_t - kQ_{xx} = 
+- g&#39;(p)\frac{1}{2t} \frac{x}{\sqrt{4kt}} -
+k\bigg[ 
+ \frac{1}{4kt}g&#39;&#39;(p) 
+\bigg] = 0
+ \]</span></p>
+<p>(6)'ya göre <span class="math inline">\(p = x/\sqrt{4kt}\)</span>, o zaman</p>
+<p><span class="math display">\[ =
+- g&#39;(p)\frac{1}{2t} p - \frac{1}{4t}g&#39;&#39;(p)  = 0
+ \]</span></p>
+<p><span class="math display">\[ = \frac{1}{t} \bigg[
+-p\frac{1}{2}g&#39;(p) - \frac{1}{4}g&#39;&#39;(p)
+\bigg] = 0
+ \]</span></p>
+<p>Tüm çarpım sıfıra eşitse, köşeli parantez içi sıfır demektir, çünkü <span class="math inline">\(0 &lt; t\)</span> şartı var, <span class="math inline">\(t\)</span> sıfır olamaz, ayrıca parantez içini 4 ile çarparsak, sıfıra eşitlik bozulmaz, o zaman</p>
+<p><span class="math display">\[ g&#39;&#39; + 2pg = 0 \]</span></p>
+<p>Bu bir ODE ! Çözüm için entegre edici faktör (integrating factor) <span class="math inline">\(\exp \int 2p \mathrm{d} p = exp(p^2)\)</span> kullanılabilir. <span class="math inline">\(g&#39;(p) = c_1 \exp(-p^2)\)</span> elde ederiz.</p>
+<p><span class="math display">\[ Q(x,t) = g(p) = c_1 \int e^{-p^2} \mathrm{d} p + c_2 \]</span></p>
+<p>3'üncü Adım</p>
+<p>Bu adımda <span class="math inline">\(Q\)</span> için nihai bir formül üretmeye uğraşacağız. Üstteki formül sadece <span class="math inline">\(t&gt;0\)</span> şartını dikkate aldı, fakat bizim (7)'de belirttiğimiz başlangıç şartlarımız da var. Bu şartları limit olarak ifade edebiliriz, çünkü mesela <span class="math inline">\(x&gt;0\)</span> sonrası tüm değerler için bir şey tanımladık, ve <span class="math inline">\(Q\)</span>'nun bu durum için olacağı nihai değer belli, şarta göre 1. Bu tanım limit tanımını çağrıştırıyor,</p>
+<p>Eğer <span class="math inline">\(x&gt;0\)</span> ise</p>
+<p><span class="math display">\[ 1 = \lim_{t \to 0} Q = 
+ c_1 \int_0^{\infty} e^{-p^2} \mathrm{d} p + c_2 = 
+c_1 \frac{\pi}{2} + c_2
+ \]</span></p>
+<p>Eğer <span class="math inline">\(x&lt;0\)</span> ise</p>
+<p><span class="math display">\[
+0 = \lim_{t \to 0} Q = 
+ c_1 \int_0^{-\infty} e^{-p^2} \mathrm{d} p + c_2 = 
+-c_1 \frac{\pi}{2} + c_2
+ \]</span></p>
+<p>Not: <span class="math inline">\(\int_0^{-\infty} e^{-p^2} \mathrm{d} p\)</span> entegralinin niye <span class="math inline">\(\pi/2\)</span> sonucunu verdiğini &quot;<span class="math inline">\(e^{-x^2}\)</span> Nasıl Entegre Edilir?'' yazısında bulabilirsiniz.</p>
+<p>Böylece katsayılar <span class="math inline">\(c_1 = 1/\pi\)</span> ve <span class="math inline">\(c_2 = 1/2\)</span> sonuçlarına erişiyoruz. O zaman <span class="math inline">\(Q\)</span> şu fonksiyon olmalı</p>
+<p><span class="math display">\[
+Q(x,t) = 
+\frac{1}{2} + \frac{ 1}{\sqrt{\pi}} \int_{0}^{x/\sqrt{4kt}} e^{-p^2} \mathrm{d} p
+\]</span></p>
+<p><span class="math inline">\(t&gt;0\)</span> olmak üzere. Bu sonucun ana PDE denklemi, (6) ve (7) denklemlerini tatmin ettiğine dikkat.</p>
+<p>4'üncü Adım</p>
+<p><span class="math inline">\(Q\)</span>'yu bulduktan sonra şimdi <span class="math inline">\(S = \partial Q/\partial x\)</span> tanımını yapalım. (b) özelliği üzerinden <span class="math inline">\(S\)</span>'nin aynı zamanda ana denklemin bir çözümü olduğunu biliyoruz. Herhangi bir fonksiyon <span class="math inline">\(\phi\)</span> için, ayrıca şunu da tanımlıyoruz.</p>
+<p><span class="math display">\[
+u(x,t) = \int_{-\infty}^{\infty} S(x-y,t) \phi(y) \mathrm{d} y  \qquad (8)
+\]</span></p>
+<p><span class="math inline">\(t&gt;0\)</span> için. (d) özelliği üzerinden <span class="math inline">\(u\)</span>, PDE için yeni bir çözümdür. Biz ek olarak şunu iddia ediyoruz ki <span class="math inline">\(u\)</span> özgün (unique) çözümdür. PDE'nin ve sınır şartının çözüm için doğru olup olmadığını kontrol etmek için</p>
+<p><span class="math display">\[
+u(x,t) = \int_{-\infty}^{\infty} 
+\frac{\partial Q}{\partial x}(x-y,t)\phi(y) \mathrm{d} y
+\]</span></p>
+<p><span class="math display">\[ = -\int_{-\infty}^{\infty} 
+\frac{\partial }{\partial x}[Q(x-y,t)]\phi(y)\mathrm{d} y
+  \]</span></p>
+<p>Parçalarla entegral (integration by parts) uyguladıktan sonra</p>
+<p><span class="math display">\[ 
+=  + \int_{-\infty}^{\infty}  Q(x-y,t)\phi&#39;(y)\mathrm{d} y - 
+Q(x-y,t)\phi(y) \bigg|_{y=-\infty}^{y=+\infty}
+\]</span></p>
+<p>Limitlerin yokolacağını farzediyoruz. Özelde, geçici olarak <span class="math inline">\(\phi(y)\)</span>'nin büyük <span class="math inline">\(|y|\)</span> değerleri için sıfıra eşit olacağını farzedelim. O zaman</p>
+<p><span class="math display">\[ u(x,0) = 
+\int_{-\infty}^{\infty} Q(x-y, 0) \phi&#39;(y)\mathrm{d} y 
+ \]</span></p>
+<p><span class="math display">\[ 
+= \int_{-\infty}^{\infty} \phi&#39;(y)\mathrm{d} y = \phi \bigg|_{-\infty}^{x} = \phi(x)
+\]</span></p>
+<p>Üsttekinin sonucun sebebi <span class="math inline">\(Q\)</span> için farzettiğimiz başlangıç şartları, ve <span class="math inline">\(\phi(-\infty) = 0\)</span> faraziyesi. Bu PDE'nin sınır şartı. (8)'ın çözüm formülü olduğunu anlıyoruz, ki</p>
+<p><span class="math display">\[ S = \frac{\partial Q}{\partial x} = \frac{ 1}{2\sqrt{\pi kt}} 
+e^{ -x^2 / 4kt}
+\]</span></p>
+<p><span class="math inline">\(t&gt;0\)</span> için. Yani</p>
+<p><span class="math display">\[
+u(x,t) =  \frac{ 1}{2\sqrt{\pi kt}} 
+\int_{-\infty}^{\infty} e^{-(x-y)^2 / 4kt} \phi(y) \mathrm{d} y
+\]</span></p>
+<p><span class="math inline">\(S(x,t)\)</span> literatürde <em>kaynak fonksiyonu</em> (source function), {}, <em>temel çözüm</em> (fundamental solution), <em>gaussian</em>, ya da <em>aktarıcı / yayıcı</em> (propagatör) ya da <em>yayılım</em> (diffusion) denklemi olarak bilinir. Ya da basitçe yayılım çekirdeği (diffusion kernel). Formül sadece <span class="math inline">\(t&gt;0\)</span> için bir çözüm verir, <span class="math inline">\(t=0\)</span> için anlamsızdır.</p>
+<p>Analitik PDE - Ders 1</p>
+<p>Dersin kullanacağı ana kitap L. C. Evans'ın Kısmi Türevsel Denklemler (partial differential equations -PDE-) kitabı olacak. Bir sonraki ders için okuma ödevi şöyle:</p>
+<ol style="list-style-type: decimal">
+<li><p>Sf. 1-13'teki özet</p></li>
+<li><p>Alt bölüm 2.1 sf. 17-19</p></li>
+<li><p>Bölüm 3 sf. 91-115 arasını tamamen.</p></li>
+</ol>
+<p>PDE'leri incelerken çoğunlukla onların temsil ettiği fiziksel fenomenleri de inceleyeceğiz. Mesela transportasyon (transport) denklemleri, ki</p>
+<p><span class="math display">\[ \partial_t u + \vec{b} \cdot \vec{\nabla} u = 0 \]</span></p>
+<p>Üstteki ifadede gradyan operatörü var, bu bilindiği gibi</p>
+<p><span class="math display">\[ \vec{\nabla} = \bigg( 
+\frac{\partial }{\partial x_1},.., 
+\frac{\partial }{\partial x_n},
+\bigg)
+\]</span></p>
+<p><span class="math inline">\(\vec{b}\)</span> içinde sabitler olan bir vektör olabilir</p>
+<p><span class="math display">\[ \vec{b} = (b_1,...,b_n)
+ \]</span></p>
+<p>Bu denklem 1. derece PDE'lerin özel bir durumudur bu arada. 1. derece PDE'ler</p>
+<p><span class="math display">\[ F(x, u(x), Du(x)) = 0 \]</span></p>
+<p>şeklindedir. <span class="math inline">\(D\)</span> notasyonu Evans'ın gradyan için kullandığı notasyon, alışsak iyi olur. Yani</p>
+<p><span class="math display">\[ Du = \nabla u \]</span></p>
+<p>Üstteki gibi denklemlere bakacağız, çözümlerini göreceğiz. Mesela üstteki denklem direk ODE yaklaşımı ile çözülebiliyor. Bu hakikaten ilginç bir şey, yani üstteki gibi geniş bir PDE kategorisi, <span class="math inline">\(n\)</span> tane değişken içerebilen türden denklemler ODE'lere indirgenerek çözülebiliyor. Bu yönteme &quot;karakteristikler metotu (method of characteristics)'' ismi veriliyor.</p>
+<p>Bu arada</p>
+<p><span class="math display">\[ F(x, u(x), Du(x)) = 0 \]</span></p>
+<p>formu oldukça geneldir, çok genel gayrı lineer, normal (ordinary) diferansiyel denklemin formudur. Bir örnek</p>
+<p><span class="math display">\[ |\nabla u|^2 = n^2(x) \]</span></p>
+<p>denklemidir, ki bu denklem dalga denkleminde dalgaların uç noktalarını (wavefront) incelerken ortaya çıkar.</p>
+<p>Lineer PDE</p>
+<p>Lineer PDE'lerin örnekleri mesela ısı denklemi (heat equation), ya da yayılma / difüzyon (diffusion) denklemi.</p>
+<p><span class="math display">\[ \frac{\partial u}{\partial t} = 
+\nabla  u
+\]</span></p>
+<p>Bir diğer örnek dalga denklemi (wave equation)</p>
+<p><span class="math display">\[ \frac{1}{c^2} \frac{\partial ^2}{\partial t^2}u = \nabla u\]</span></p>
+<p>yayılmanın hızı <span class="math inline">\(c\)</span> sabiti olarak gösteriliyor.</p>
+<p>Shrodinger denklemi ise şöyle</p>
+<p><span class="math display">\[ i \frac{\partial }{\partial t}\psi  = -\nabla \psi \]</span></p>
+<p>Isı denklemiyle alakalı önemli bir nokta denge (equilibrium) noktasıdır. Denklem uzun zaman zarfı bağlamında incelendiğinde bir denge noktasına eriştiği görülecektir. Ki bu bizi Laplaca denklemine götürür.</p>
+<p><span class="math display">\[ \nabla u = 0 \]</span></p>
+<p>Ya da daha genel olarak</p>
+<p><span class="math display">\[ \nabla u = f \]</span></p>
+<p>ise bu denkleme Poisson denklemi adı veriliyor.</p>
+<p>Tüm bu denklemler aslında pek çok uygulama alanında ortaya çıkan, çok geniş belli başlı bazı kategorilerin prototipidirler. Mesela İşi denklemine parabolik (paraboliç) kısmı denklem kategorisi deniyor. Dalga denklemi hiperbolik (hyperboliç) kategorisi, Schrödinger ise dağılan (dispursive) PDE kategorisi olarak anılıyor. Laplaca, Poisson denklemlerine elliptik (elliptic) kategorisi ismi veriliyor.</p>
+<p>Tüm bu denklemleri incelerken onları temsil ettikleri daha geniş kategorinin örnekleri olarak göreceğiz.</p>
+<p>Şimdi PDE'lerin ortaya çıktığı çok basit bir örneği görelim.</p>
+<p>Elimizde bir <span class="math inline">\(\Omega\)</span> bölgesi / alanı olduğunu hayal edelim, ki <span class="math inline">\(\Omega \in \mathbb{R}^n\)</span> olsun, yani alttaki resimde çizdiğimiz <span class="math inline">\(\mathbb{R}^2\)</span>.</p>
+<p>Yine diyelim ki bu <span class="math inline">\(\Omega\)</span> bölgesinin etrafında bir tür sıvıyla kaplı, ve bu sıvı hareket ediyor. Bu hareketi sabit bir hız vektör alanı olarak gösteriyoruz.</p>
+<div class="figure">
+<img src="4_1.png" />
+
+</div>
+<p><span class="math inline">\(\mathbb{R}^n\)</span>'deki bu sabit hız alanını <span class="math inline">\(\vec{V}\)</span> olarak gösterelim. <span class="math inline">\(\vec{V}\)</span>'nin vektör işaretini koyduk, ama ileride bunu yapmayabiliriz, ama anlatımın çerçevesinden bir şeyin vektör olup olmadığını anlamak kolay.</p>
+<p>Yani bu sıvıyı oluşturan parçacıkler birörnek (üniform) hızda hareket ediyorlar.</p>
+<p>Sıvının <span class="math inline">\(x\)</span> noktasındaki <span class="math inline">\(t\)</span> anındaki yoğunluğu <span class="math inline">\(\rho(x,t)\)</span> olarak gösterilsin. O zaman <span class="math inline">\(t\)</span> anında <span class="math inline">\(\Omega\)</span> alanındaki kütleyi hesaplamak istiyorsam, o zaman yoğunluğun hacim üzerinden entegralini alırım.</p>
+<p><span class="math display">\[ \textit{Kutle } = \int_\Omega \rho(x,t) \mathrm{d} x \]</span></p>
+<p>Birimleri kontrol edeli, <span class="math inline">\(\rho(x,t)\)</span> kütle / hacim (mesela <span class="math inline">\(kg / cm^3\)</span>) birimine sahip, hacim üzerinden entegral alınca elimize kütle geçer.</p>
+<p>Bu sıvı belirlenen alan üzerinden sürekli akıyor. O alan içindeki kütlenin değişim oranını merak ediyorum. Şu hesabı yapmam lazım</p>
+<p><span class="math display">\[ \frac{d}{dt} \int_\Omega \rho(x,t) \mathrm{d} x   \]</span></p>
+<p>Değişim oranı <span class="math inline">\(\Omega\)</span> bölgesinin sınırlarından ne geçiyorsa o'dur.</p>
+<p>Bölgenin dış sınırına dik olan birim normal vektörler düşünelim. Eğer bu vektörlerden kırmızı okla gösterilen soldaki normale bakarsak, sıvı akisi ona pek etki etmiyor, yani zarın o bölgesinde çıkış fazla yok. Fakat sağda işaretli normal üzerinden oldukça fazla akış var.</p>
+<div class="figure">
+<img src="4_2.png" />
+
+</div>
+<p>Bu durumu da</p>
+<p><span class="math display">\[ \frac{d}{dt} \int_\Omega \rho(x,t) \mathrm{d} x   = 
+- \int_{\partial \Omega} \rho(x,t) \vec{v} \cdot \vec{n} \mathrm{d} S 
+\]</span></p>
+<p>şeklinde gösterebiliriz (eşitliğin sağ tarafını şimdi ekledik). <span class="math inline">\(\partial \Omega\)</span> bölgenin &quot;sınırı'' anlamında kullanıldı, eğer 2 boyutlu düzlemde isek <span class="math inline">\(\partial \Omega\)</span> sınırı bir eğridir, eğer 3 boyutta isek sınır 2 boyutlu bir yüzey (surface), vs (genel kural olarak <span class="math inline">\(n-1\)</span> boyutlu bir yüzeydir).</p>
+<p><span class="math inline">\(\vec{n}\)</span> resimde çizilen birim normaller.</p>
+<p>Bu denklemin tek söylediği içeri giren ile çıkanın birbirine (eksi işaret sonrasında) birbirine eşit olduğu. İki tarafın kütle / zaman birimine sahip olduğunu kontrol edebiliriz.</p>
+<p>Şimdi İleri Calculus'tan hatırlayabileceğiniz bir kural</p>
+<p>Gauss'un Teorisi</p>
+<p><span class="math inline">\(F: \mathbb{R}^n \to \mathbb{R}^n\)</span> üzerinde tanımlı herhangi bir vektör alanı için, <span class="math inline">\(x \mapsto F(x)\)</span> olmak üzere, <span class="math inline">\(\mapsto\)</span> işareti eşlenme (maps to) anlamına geliyor, <span class="math inline">\(\Omega \subset \mathbb{R}^n\)</span> bölgesi var ise, ve bu vektör alanı pürüzsüz (smooth) bir vektör alani ise (bu vektör bileşenlerinin türevi alınabilir fonksiyonlar olduğunu söyler), o zaman şu da doğrudur. Vektör alanının sapmasını (divergence) entegre ediyorum,</p>
+<p><span class="math display">\[ 
+\int_\Omega \nabla \cdot F \mathrm{d} x =
+\int_{\partial \Omega} F \cdot n \mathrm{d} S
+\]</span></p>
+<p><span class="math inline">\(\nabla \cdot\)</span> operatörü <span class="math inline">\(div\)</span> anlamında kullanıldı, ve <span class="math inline">\(\Omega\)</span> bir alan.</p>
+<p>Gauss'un Teorisi, Calculus'un Temel Teorisinin çok boyutlu bir karşılığı olarak düşünülebilir aslında.</p>
+<p>Gauss'un Teorisini bizim formülasyona uygulayalım</p>
+<p><span class="math display">\[ \int_{\partial \Omega} \rho \vec{v} \cdot \vec{n} \mathrm{d} S =
+\int_\Omega \nabla \cdot (\rho \vec{v}) \mathrm{d} x 
+\]</span></p>
+<p>Şimdi şunu yazabilirim</p>
+<p><span class="math display">\[
+\frac{d}{dt} \int_\Omega \rho \mathrm{d} x = 
+\int_\Omega \nabla \cdot (\rho \vec{v}) \mathrm{d} x
+ \]</span></p>
+<p>Eşitliğin solundaki türevi alıp, sağ tarafı sola taşıyalım</p>
+<p><span class="math display">\[ \int_\Omega \bigg( 
+\partial_t \rho + \nabla \cdot (\rho \vec{v}) 
+\bigg)dx = 0
+ \]</span></p>
+<p><span class="math inline">\(\Omega\)</span> işareti <span class="math inline">\(\mathbb{R}^n\)</span> içinde herhangi bir hacim ise (iki boyutta bir alan, 3 boyutta hacim), bu hacimi sonsuz küçülttüğümüzde artık şu ifadenin</p>
+<p><span class="math display">\[ \partial_t \rho + \nabla \cdot (\rho \vec{v})  = 0 \]</span></p>
+<p>noktasal (pointwise) olarak her <span class="math inline">\(x,t\)</span> için doğru olduğunu görebiliriz, eğer <span class="math inline">\(\rho\)</span> yeterinç pürüzsüz bir fonksiyon ise tabii ki.</p>
+<p>Üstteki fonksiyon suna da eşittir</p>
+<p><span class="math display">\[ \partial_t \rho + \vec{v} \cdot \nabla \rho = 0\]</span></p>
+<p>Bu denklem <span class="math inline">\(F(x,\rho,\nabla \rho)=0\)</span> formundaki bir denklemdir, genel olarak bu formla ilgileniriz, bir üstteki örnek ise bu formun en basit örneklerinden biri, transportasyon fenomeni (transport phenomena) denklemi.</p>
+<p>Şimdi transport denklemini çözelim, önce direk olarak, sonra biraz dolaylı gibi gözükebilecek bir şekilde ama sonra göreceğiz ki bu dolaylı yöntem aslında çözüm için çok uygun.</p>
+<p>Tek boyutta formül şu formda</p>
+<p><span class="math display">\[ \partial_t \rho + v \partial_x \rho = 0 \]</span></p>
+<p>Daha genel olarak diyelim ki</p>
+<p><span class="math display">\[ \partial_t u + c\partial_x u = 0, \ \ c&gt;0 \]</span></p>
+<p>var diyelim, başlangıç şartı</p>
+<p><span class="math display">\[ u(x,0) = F(x) \]</span></p>
+<p>Böyle problemlere çoğunlukla Başlangıç Şart Problemleri (İnitial Value Problem) ismi verilir.</p>
+<p>Diyelim başlangıç şartı <span class="math inline">\(F \in C&#39;\)</span> şöyle bir fonksiyon</p>
+<div class="figure">
+<img src="4_3.png" />
+
+</div>
+<p>Çözüm nedir? Sudur</p>
+<p><span class="math display">\[ u(x,t) = F(x-ct) \]</span></p>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, Diferansiyel Denklemler, <em>Ders 1</em></p>
+<p>[2] Weinstein, <em>Analytic Methods for PDEs, APMA E6301, Columbia University</em></p>
+</body>
+</html>

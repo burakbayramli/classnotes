@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="döviz-kuru-ticareti">Döviz Kuru Ticareti</h1>
+<p>Eğer döviz kurları üzerinden al/sat yapmak istersem bunu koentegrasyon üzerinden nasıl yaparım? Aynen iki hissenin fiyatının koentegre olabilmesi gibi, iki ülkenin dövizi de koentegre olabilir. Bu koentegrasyon tabii ki bu dövizlerin kurlarına yansıyacaktır, ve bu kurların üzerinden alım / satım yaparsak o koentegrasyona oynamış oluruz. Daha önce gördüğümüz ETF örneğini genişletmek gerekirse, Avustralya ve Kanada'nın ETF'leri koentegre idi, herhalde onların döviz kurlarının da koentgre olduğunu beklemek anormal olmaz. Bu hakikaten böyle. Ama ondan önce döviz ticareti hakkında bazı pürüzler.</p>
+<p>Döviz ticareti hisse ticaretinden biraz farklı. Mesela AUD.ZAR (Avustralya doları ve Güney Afrika randı) ticareti yapıyorsak, bunlardan birincisi baz dövizi (base currency) diğeri kayıt dövizi (quote currency) olarak biliniyor. Hatırlamanın iyi bir yolu baz'ın b'si kayıtın k'sinden önce gelir. Eğer AUD.ZAR 9.58'den kayıtlıysa bir AUD almak için 9.58 ZAR gerekir. Eğer 100,000 AUD.ZAR alıyorsak önceki kayıt fiyatından 100,000 x 9.58 = 958,000 ZAR satmak gerekir.</p>
+<p>Fakat çoğu zaman aracı kurumlar AUD.ZAR kurunu sağlamazlar. Bu yüzden X Avustralya doları AUD.ZAR alabilmek için X birim B.ZAR alıp X birim B.AUD satmak gerekir, ki burada B başka bir baz döviz olacaktır. B çoğunlukla likiditesi yüksek olan rahatça alınıp satılabilecek bir dövizden seçilir, mesela USD (dolar) ya da EUR (avro) gibi.</p>
+<p>Alttaki dosyaları almak için [1]'e bakınız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, os, sys
+<span class="im">from</span> scipy <span class="im">import</span> io <span class="im">as</span> spio
+
+cols <span class="op">=</span> [<span class="st">&#39;tday&#39;</span>,<span class="st">&#39;cl&#39;</span>,<span class="st">&#39;lo&#39;</span>,<span class="st">&#39;hi&#39;</span>,<span class="st">&#39;hhmm&#39;</span>,<span class="st">&#39;op&#39;</span>]
+base <span class="op">=</span> <span class="st">&#39;</span><span class="sc">%s</span><span class="st">/Dropbox/Public/data&#39;</span> <span class="op">%</span> os.environ[<span class="st">&#39;HOME&#39;</span>]
+a <span class="op">=</span> spio.loadmat(base <span class="op">+</span> <span class="st">&#39;/inputData_USDCAD_20120426.mat&#39;</span>)
+usdcad <span class="op">=</span> pd.concat([pd.DataFrame(a[x]) <span class="cf">for</span> x <span class="kw">in</span> cols], axis<span class="op">=</span><span class="dv">1</span>)
+usdcad.columns <span class="op">=</span> cols
+a <span class="op">=</span> spio.loadmat(base <span class="op">+</span> <span class="st">&#39;/inputData_AUDUSD_20120426.mat&#39;</span>)
+audusd <span class="op">=</span> pd.concat([pd.DataFrame(a[x]) <span class="cf">for</span> x <span class="kw">in</span> cols], axis<span class="op">=</span><span class="dv">1</span>)
+audusd.columns <span class="op">=</span> cols
+
+usdcad2 <span class="op">=</span> usdcad[(usdcad.tday<span class="op">&gt;</span><span class="dv">20090101</span>) <span class="op">&amp;</span> (usdcad.hhmm <span class="op">==</span> <span class="dv">1659</span>)]
+audusd2 <span class="op">=</span> audusd[(audusd.tday<span class="op">&gt;</span><span class="dv">20090101</span>) <span class="op">&amp;</span> (audusd.hhmm <span class="op">==</span> <span class="dv">1659</span>)]
+usdcad2 <span class="op">=</span> usdcad2.set_index([<span class="st">&#39;tday&#39;</span>,<span class="st">&#39;hhmm&#39;</span>])
+audusd2 <span class="op">=</span> audusd2.set_index([<span class="st">&#39;tday&#39;</span>,<span class="st">&#39;hhmm&#39;</span>])
+cad <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> usdcad2.cl
+aud<span class="op">=</span>audusd2.cl
+y <span class="op">=</span> pd.concat([aud, cad],axis<span class="op">=</span><span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">sys.path.append(<span class="st">&#39;../tser_coint&#39;</span>)
+sys.path.append(<span class="st">&#39;../tser_draw_sharpe&#39;</span>)
+<span class="im">from</span> johansen <span class="im">import</span> coint_johansen
+<span class="im">import</span> dd
+trainlen<span class="op">=</span><span class="dv">250</span>
+lookback<span class="op">=</span><span class="dv">20</span>
+numUnits <span class="op">=</span> np.ones(<span class="bu">len</span>(y))<span class="op">*</span>np.nan
+hedgeRatio <span class="op">=</span> np.ones(y.shape)<span class="op">*</span>np.nan
+<span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(trainlen,<span class="bu">len</span>(y)):
+   df <span class="op">=</span> y[t<span class="op">-</span>trainlen:t]
+   hedgeRatio[t] <span class="op">=</span> coint_johansen(df, <span class="dv">0</span>, <span class="dv">1</span>).evec[:,<span class="dv">0</span>]
+   tmp1 <span class="op">=</span> np.array(y[t<span class="op">-</span>lookback:t])
+   tmp2 <span class="op">=</span> np.kron(np.ones((lookback,<span class="dv">1</span>)),hedgeRatio[t])
+   yport <span class="op">=</span> np.<span class="bu">sum</span>(tmp1<span class="op">*</span>tmp2,axis<span class="op">=</span><span class="dv">1</span>)
+   ma<span class="op">=</span>np.mean(yport)
+   mstd<span class="op">=</span>np.std(yport)
+   zScore<span class="op">=</span>(yport[<span class="op">-</span><span class="dv">1</span>]<span class="op">-</span>ma)<span class="op">/</span>mstd<span class="op">;</span>
+   numUnits[t] <span class="op">=</span> <span class="op">-</span>(yport[<span class="op">-</span><span class="dv">1</span>]<span class="op">-</span>ma)<span class="op">/</span>mstd
+   <span class="co">#break</span>
+
+<span class="co"># copy positions in multiple coumns. positions are market values </span>
+<span class="co"># of AUDUSD and CADUSD in portfolio expressed in US.</span>
+tmp1<span class="op">=</span>np.kron(np.ones((y.shape[<span class="dv">1</span>],<span class="dv">1</span>)),numUnits)
+positions <span class="op">=</span> tmp1.T <span class="op">*</span> hedgeRatio <span class="op">*</span> y
+pnl <span class="op">=</span> positions.shift(<span class="dv">1</span>) <span class="op">*</span> (y <span class="op">-</span> y.shift(<span class="dv">1</span>))  <span class="op">/</span> y.shift(<span class="dv">1</span>)
+pnl <span class="op">=</span> pnl.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)
+ret<span class="op">=</span>pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)
+ret <span class="op">=</span> ret[trainlen:<span class="op">-</span><span class="dv">1</span>] <span class="co"># trainlen kadar ilk bolumu disarida birak</span>
+cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)
+<span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(cumret)</code></pre></div>
+<pre><code>APR 0.100221828618
+Sharpe 1.44796592471
+Dusus Kaliciligi (-0.050369126045008095, 158.0)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>)
+plt.title(<span class="st">&#39;Kümülatif Birleşik Getiri&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_curr_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_curr_01.png" />
+
+</div>
+<p>Kaynaklar</p>
+<p>[1] Chan, <em>Book Code</em>, <a href="https://github.com/burakbayramli/books/tree/master/Algorithmic_Trading_Chan" class="uri">https://github.com/burakbayramli/books/tree/master/Algorithmic_Trading_Chan</a></p>
+<p>[2] Chan, <em>Algorithmic Trading</em></p>
+</body>
+</html>

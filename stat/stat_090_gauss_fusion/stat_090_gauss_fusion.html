@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="algılayıcı-birleştirimi-füzyonu-sensor-fusion">Algılayıcı Birleştirimi, Füzyonu (Sensor Fusion)</h1>
+<p>Tek boyutlu ortamda bir büyüklüğü mesela bir lokasyon bilgisi <span class="math inline">\(x\)</span>'i, iki kere ölçüyoruz, ve bu ölçümü iki değişik algılayıcıya yaptırıyoruz, ve yine diyelim ki iki değişik alet bir cismin olduğu uzaklığını / yerini bize geri döndürüyor. Devam edelim, bu bilgilerde belli ölçüde gürültü var; bu aletlerin hatalı ölçümü yüzünden olabilir, çevre şartları sebebiyle olabilir, örnek olarak iki <span class="math inline">\(z_1,z_2\)</span> ölçümü için iki değişik belirsizlik (uncertainty) olduğunu farzedelim, bunlar <span class="math inline">\(\sigma_1,\sigma_2\)</span>. Soru şu: bu iki ölçümü kullanarak daha iyi bir <span class="math inline">\(x\)</span> tahmini yapabilir miyiz?</p>
+<p>Bunun için iki ölçümü bir şekilde birleştirmemiz gerekiyor. Her ölçümü Gaussian / Normal dağılım olarak modelleyebiliriz, o zaman iki Gaussian dağılımı bir şekilde birleştirmemiz (fusion) lazım.</p>
+<p>Ölçümleri temsil etmek için Gaussian biçilmiş kaftan. Ölçümdeki belirsizliği standart sapma (standart deviation) üzerinden rahatlıkla temsil edebiliriz. Peki birleştirimi nasıl yapalım?</p>
+<p>Bu tür problemlerde maksimum olurluk (maximum likelihood) kullanılması gerektiğini aşağı yukarı tahmin edebiliriz, çünkü maksimum olurluk verinin olurluğunu (olasılığını yani) maksimize ederek bilinmeyen parametreleri tahmin etmeye uğraşır. Çoğunlukla bu tekniği hep <em>tek</em> bir dağılım bağlamında görürüz, bazı bilinmeyen parametreleri olan tek bir dağılıma değişik veri noktaları verilerek olasılık sonuçları çarpılır, ve elde edilen formül maksimize edilmeye uğraşılırken aynı anda bilinmeyen parametrelerin optimal değerleri saptanmaya uğraşılır. Bizim bu problemimizde iki değişik dağılım olacak, maksimum olurluk illa tek bir dağılımla kullanılabilir diye bir kural yok.</p>
+<p>Problemimizde iki ölçümü, iki Gaussian ile temsil edebiliriz, ve bu iki Gaussian'a verilen iki ölçüm noktasını olurluğunu bu Gaussian'ların sonuçlarını çarparak hesaplayabiliriz. Peki bilinmeyen parametre nedir? Onu da <em>her iki Gaussian için de aynı olduğunu farzettiğimiz orta nokta</em> (mean) olarak alabiliriz, ve <span class="math inline">\(x\)</span> olarak belirtiriz. Yani</p>
+<p><span class="math display">\[ L(x) = p(z_1|x,\sigma_1) p(z_2|x,\sigma_2) \]</span></p>
+<p><span class="math display">\[ L(x) \sim \exp{\frac{-(z_1-x)^2}{2\sigma_1^2} } 
+\times \exp \frac{-(z_2-x)^2}{2\sigma_2^2} \]</span></p>
+<p>1D Gaussian formülünü hatırlarsak,</p>
+<p><span class="math display">\[ p(z;x,\sigma) = \frac{1}{\sigma\sqrt{2\pi}} 
+\exp \bigg\{ - \frac{(z-x)^2}{2\sigma^2}  \bigg\}
+ \]</span></p>
+<p>Ders notları [1]'de iki üstteki formülün nasıl maksimize edilerek bir <span class="math inline">\(x_{MLE}\)</span> formülüne erişildiğini görebiliriz.</p>
+<p>Formül başındaki sabit kısmının <span class="math inline">\(L(x)\)</span>'de kullanılmadığını görüyoruz, çünkü maksimizasyon açısından düşünürsek o kısım tekrar tekrar çarpılacak ve hesaplamaya çalıştığımız değişkenler açısından bu sürekli tekrar bir fark yaratmaz.</p>
+<p>Bu metot işler. Fakat biz alternatif olarak daha temiz olacak değişik bir yoldan gideceğiz. Elimizdeki her iki ölçümü iki farklı tek boyutlu Gaussian yerine <em>2 boyutlu</em> tek bir Gaussian içine koyacağız, iki ölçümü tek bir 2 boyutlu vektör içinde belirteceğiz yani, ve tek bir olasılık hesabını <span class="math inline">\(p(z;x,\Sigma)\)</span>'i baz alacağız. Belirsizlikler ne olacak? Ölçüm belirsizliklerini bu 2D Gaussian'ın kovaryansında çapraza (diagonal) koyabiliriz, çapraz dişindaki matris öğeleri sıfır yapılırsa iki ölçümün birbirinden bağımsızlığını temsil etmiş oluruz. Maksimizasyon? Tek bir ölçümün olurluğunu maksimize edeceğiz, bu tek bir ölçümün olasılığını hesaplamaktan ibarettir, ve bu hesap sırasında bilinmeyen değişkenleri içeren yeni bir formül ortaya çıkacaktır. Maksimize etmeye uğraşacağımız bu formül olur.</p>
+<p>Çok boyutlu Gaussian'ı hatırlayalım (artık <span class="math inline">\(z,x\)</span> birer vektör),</p>
+<p><span class="math display">\[ p(z;x,\Sigma) = 
+\frac{ 1}{(2\pi)^{k/2} \det(\Sigma)^{1/2}} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z-x)^T\Sigma^{-1}(z-x)
+\bigg\} \]</span></p>
+<p>Kısaca,</p>
+<p><span class="math display">\[ =  \frac{ 1}{C} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z-x)^T\Sigma^{-1}(z-x)
+\bigg\} \]</span></p>
+<p>Bir numara, <span class="math inline">\(\exp\)</span> ve parantez içi negatif ibareden kurtulmak için <span class="math inline">\(-\ln p\)</span> alalım,</p>
+<p><span class="math display">\[ L = -\ln p(z) = 
+\frac{ 1}{2}(z-x)^T\Sigma^{-1}(z-x)
+\]</span></p>
+<p>Şimdi iki ölçümü, belirsizliği vektör / matris öğeleri olarak gösterelim,</p>
+<p><span class="math display">\[ = \frac{1}{2}  
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]^T
+\left[\begin{array}{cc}
+\sigma_1^2 &amp; 0 \\
+0 &amp; \sigma_2^2 
+\end{array}\right]^{-1}
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]
+\]</span></p>
+<p>Çapraz matrisin tersini almak için çaprazdaki öğelerin tersini almak yeterlidir,</p>
+<p><span class="math display">\[ = \frac{1}{2}  
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]^T
+\left[\begin{array}{cc}
+\sigma_1^{-2} &amp; 0 \\
+0 &amp; \sigma_2^{-2} 
+\end{array}\right]
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]
+\]</span></p>
+<p><span class="math display">\[ = \frac{1}{2}  
+\left[\begin{array}{cc}
+\sigma_1^{-2}(z_1-x) &amp; \sigma_2^{-2} (z_2-x)
+\end{array}\right]
+\left[\begin{array}{c}
+z_1-x \\ z_2-x
+\end{array}\right]
+\]</span></p>
+<p><span class="math display">\[ = 
+\frac{1}{2}\sigma_1^{-2}(z_1-x)^2 + \frac{1}{2}\sigma_2^{-2} (z_2-x)^2
+\]</span></p>
+<p>Maksimize etmek için, formül karesel olduğuna göre, bilinmeyen <span class="math inline">\(x\)</span> değişkenine göre türev alıp sıfıra eşitleyebiliriz,</p>
+<p><span class="math display">\[ 
+\frac{dL}{dx} = \sigma_1^{-2}z_1-\sigma_1^{-2}x + \sigma_2^{-2}z_2-\sigma_2^{-2}x = 0
+\]</span></p>
+<p><span class="math inline">\(x\)</span> üzerinden gruplarsak,</p>
+<p><span class="math display">\[ 
+-x(\sigma_1^{-2}+\sigma_2^{-2}) + \sigma_1^{-2}z_1+ \sigma_2^{-2}z_2 = 0
+\]</span></p>
+<p>Gruplanan kısmı eşitliğin sağına alalım,</p>
+<p><span class="math display">\[ 
+\sigma_1^{-2}z_1+ \sigma_2^{-2}z_2 = x(\sigma_1^{-2}+\sigma_2^{-2}) 
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{\sigma_1^{-2}z_1+ \sigma_2^{-2}z_2 }{\sigma_1^{-2}+\sigma_2^{-2}}= x_{MLE}
+\]</span></p>
+<p>Gayet temiz bir şekilde sonuca eriştik.</p>
+<p>Örnek</p>
+<p>Elimizde belirsizlikleri <span class="math inline">\(\sigma_1=10,\sigma_2=20\)</span> olan iki algılayıcı var. Bu algılayıcılar aynı obje hakkında <span class="math inline">\(z_1=130,z_2=170\)</span> olarak iki ölçüm gönderiyorlar. Bu ölçümleri birleştirelim. Hatırlarsak <span class="math inline">\(10^{-2}\)</span> ile çarpmak <span class="math inline">\(10^{2}\)</span> ile bölmek aynı şey.</p>
+<p><span class="math display">\[ x_{MLE} =
+\frac{130/10^2 + 170/20^2}{1/10^2 + 1/20^2} = 138.0
+\]</span></p>
+<p>Sonuç belirsizliği daha az olan ölçüme daha yakın çıktı, bu akla yatkın bir sonuç.</p>
+<p>Çok Boyutlu Gaussian Füzyon</p>
+<p>Peki ya elimizdeki ölçümlerin kendisi çok boyutlu ise? Yani <span class="math inline">\(z_1,z_2\)</span> birer vektör ise?</p>
+<p>Yine maksimum olurluk üzerinden bir formül türetebiliriz. Bu durumda tek olasılık hesabı yetmez, iki ayrı dağılım olmalı,</p>
+<p><span class="math display">\[ p(z_1;x,\Sigma_1) =  \frac{ 1}{C_1} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z_1-x)^T\Sigma_1^{-1}(z_1-x)
+\bigg\} \]</span></p>
+<p><span class="math display">\[ p(z_2;x,\Sigma_2) =  \frac{ 1}{C_2} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(z_2-x)^T\Sigma_2^{-1}(z_2-x)
+\bigg\} \]</span></p>
+<p>Orta nokta <span class="math inline">\(x\)</span> her iki formülde aynı çünkü değişmeyen olan o; aynı orta nokta için tahmin üretmeye uğraşıyoruz. Bu durum bildik maksimum olurluk hesaplarına benziyor, fakat ilk başta belirttiğimiz gibi farklı türden olasılık fonksiyonlarının (bu sefer çok boyutlu) farklı veri noktaları üzerinden çarpılması.</p>
+<p>Devam edelim. Daha önce <span class="math inline">\(\ln\)</span> alarak <span class="math inline">\(\exp\)</span>'yi yoketmiştik. Bunun bir diğer faydası <span class="math inline">\(\ln\)</span> alınınca çarpımların toplama dönüşmesidir,</p>
+<p><span class="math display">\[ L = p(z_1;x,\Sigma_1) p(z_2;x,\Sigma_2) 
+\]</span></p>
+<p><span class="math display">\[ -\ln L = -\ln p(z_1;x,\Sigma_1) -\ln p(z_2;x,\Sigma_2) 
+\]</span></p>
+<p><span class="math display">\[ 
+\mathcal{L} = 
+-\ln L = 
+\frac{ 1}{2}(z_1-x)^T\Sigma_1^{-1}(z_1-x) + 
+\frac{ 1}{2}(z_2-x)^T\Sigma_2^{-1}(z_2-x)
+\]</span></p>
+<p>Şimdi eşitliğin sağ tarafının <span class="math inline">\(x\)</span>'e göre türevini alalım, vektör ve matris bağlamında türev nasıl alınır? Herhangi bir <span class="math inline">\(M\)</span>'in simetrik olduğu durumlarda (ki kovaryans matrisleri her zaman simetriktir, çünkü mesela iki değişkenli durumda <span class="math inline">\(x_1,x_2\)</span> kovaryansı -ilişkisi- <span class="math inline">\(x_2,x_1\)</span> kovaryansından farklı olamaz),</p>
+<p><span class="math display">\[ \frac{\partial}{\partial x}[x^TMx] = 2Mx \]</span></p>
+<p>olduğunu biliyoruz [2]. O zaman türev sonucu şöyle olur,</p>
+<p><span class="math display">\[ 
+\frac{d\mathcal{L}}{dx} = 
+(z_1-x)^T\Sigma_1^{-1} +  (z_2-x)^T\Sigma_2^{-1}
+\]</span></p>
+<p>Sıfıra eşitleyip çözelim,</p>
+<p><span class="math display">\[ 
+(z_1-x)\Sigma_1^{-1} +  (z_2-x)\Sigma_2^{-1} = 0
+\]</span></p>
+<p><span class="math display">\[ 
+z_1\Sigma_1^{-1} - x\Sigma_1^{-1} + z_2\Sigma_2^{-1} - x\Sigma_2^{-1} = 0
+\]</span></p>
+<p>Yine <span class="math inline">\(x\)</span> altında gruplayalım,</p>
+<p><span class="math display">\[ 
+-x(\Sigma_1^{-1} + \Sigma_2^{-1}) + z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}  = 0
+\]</span></p>
+<p><span class="math display">\[ 
+z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}  = x(\Sigma_1^{-1} + \Sigma_2^{-1}) 
+\]</span></p>
+<p>Eğer iki belirsizliğin toplamını <span class="math inline">\(\Sigma_x^{-1}\)</span> olarak özetlersek, yani</p>
+<p><span class="math display">\[ 
+\Sigma_x^{-1} = \Sigma_1^{-1} + \Sigma_2^{-1}
+\]</span></p>
+<p>Not: Aslında <span class="math inline">\(\Sigma_x\)</span> te diyebilirdik, fakat tersi alınmış matrislerin toplamı olduğunu temsil etmesi için &quot;tersi alınmış bir sembol'' kullandık. Tabii diğer yandan tersin tersini alınca ele geçecek <span class="math inline">\(\Sigma_x\)</span>'in de bir anlamı olduğu iddia edilebilir, bu <span class="math inline">\(\Sigma_x\)</span> en olası <span class="math inline">\(x\)</span> tahmininin yeni belirsizliğidir de bir bakıma.</p>
+<p>Simdi ana formule donelim,</p>
+<p><span class="math display">\[ 
+z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}  = x\Sigma_x^{-1}
+\]</span></p>
+<p><span class="math display">\[ 
+\Sigma_x (z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}) = x_{MLE}
+\]</span></p>
+<p>Örnek</p>
+<p>Elimizde iki tane iki boyutlu ölçüm var,</p>
+<p><span class="math display">\[ z_1 = \left[\begin{array}{c}
+1 \\ 1
+\end{array}\right], 
+z_2 = \left[\begin{array}{r}
+2 \\ -1
+\end{array}\right] 
+\]</span></p>
+<p>Ölçümler iki değişik algılayıcıdan geliyor, belirsizlikleri</p>
+<p><span class="math display">\[ 
+\Sigma_1 = 
+\left[\begin{array}{cc}
+1 &amp; 0 \\ 0 &amp; 4
+\end{array}\right], 
+\Sigma_2 = 
+\left[\begin{array}{cc}
+4 &amp; 0 \\ 0 &amp; 1
+\end{array}\right]
+ \]</span></p>
+<p>Nihai ölçüm nedir?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+<span class="im">from</span> matplotlib <span class="im">import</span> cm
+<span class="im">import</span> matplotlib.mlab <span class="im">as</span> mlab
+
+x <span class="op">=</span> np.arange(<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">0.1</span>)
+y <span class="op">=</span> np.arange(<span class="op">-</span><span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="fl">0.1</span>)
+
+X, Y <span class="op">=</span> np.meshgrid(x, y)
+Z1 <span class="op">=</span> mlab.bivariate_normal(X, Y, sigmax<span class="op">=</span><span class="fl">1.0</span>, sigmay<span class="op">=</span><span class="fl">4.0</span>,mux<span class="op">=</span><span class="fl">1.</span>, <span class="op">\</span>
+     muy<span class="op">=</span><span class="fl">1.</span>,sigmaxy<span class="op">=</span><span class="fl">0.0</span>)
+Z2 <span class="op">=</span> mlab.bivariate_normal(X, Y, sigmax<span class="op">=</span><span class="fl">4.0</span>, sigmay<span class="op">=</span><span class="fl">1.0</span>,mux<span class="op">=</span><span class="fl">2.</span>, <span class="op">\</span>
+     muy<span class="op">=-</span><span class="fl">1.</span>,sigmaxy<span class="op">=</span><span class="fl">0.0</span>)
+
+<span class="co"># iki yuzeyi ayni grafikte birlestirmek icin herhangi iki nokta arasinda</span>
+<span class="co"># daha fazla (maksimum) olani al, cunku nihai yuzey olarak onu gormek </span>
+<span class="co"># istiyoruz zaten</span>
+Z <span class="op">=</span> np.maximum(Z1,Z2)
+
+fig <span class="op">=</span> plt.figure()
+
+ax <span class="op">=</span> Axes3D(fig)
+ax.view_init(elev<span class="op">=</span><span class="fl">50.</span>, azim<span class="op">=</span><span class="dv">80</span>)
+
+ax.plot_surface(X,Y,Z,cmap<span class="op">=</span>cm.jet)
+plt.savefig(<span class="st">&#39;fusion_1.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="fusion_1.png" />
+
+</div>
+<p>İki ölçümü Gaussian olarak ekrana bastık, bu Gaussian'ların orta noktası <span class="math inline">\(z_1,z_2\)</span>, bu durumu maksimum olurluk için aynı olduğunu farz ettiğimiz <span class="math inline">\(x\)</span> ile karıştırmayalım; o <span class="math inline">\(x\)</span> modelleme sırasında olduğunu farzettiğimiz ideal bir Gaussian idi. Üstte sadece veri noktalarını ekrana basıyoruz.</p>
+<p>Üstten bakışla kontur (contour) olarak gösterirsek</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">CS <span class="op">=</span> plt.contour(X, Y, Z1,rotation<span class="op">=</span><span class="dv">70</span>)
+CS <span class="op">=</span> plt.contour(X, Y, Z2,rotation<span class="op">=</span><span class="dv">70</span>)
+plt.savefig(<span class="st">&#39;fusion_3.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="fusion_3.png" />
+
+</div>
+<p>Resimde önce ilk ölçüm, sonra onunla yanyana olacak ikinci ölçüm koyulmuş.</p>
+<p><span class="math display">\[ \Sigma_x^{-1} = \Sigma_1^{-1} + \Sigma_2^{-1}  =
+\left[\begin{array}{cc}
+1 &amp; 0 \\ 0 &amp; 0.25
+\end{array}\right] + 
+\left[\begin{array}{cc}
+0.25 &amp; 0 \\ 0 &amp; 1
+\end{array}\right] =
+\left[\begin{array}{cc}
+1.25 &amp; 0 \\ 0 &amp; 1.25
+\end{array}\right] 
+\]</span></p>
+<p>Tersini alalım</p>
+<p><span class="math display">\[ \Sigma_x =
+\left[\begin{array}{cc}
+0.8 &amp; 0 \\ 0 &amp; 0.8
+\end{array}\right] 
+\]</span></p>
+<p><span class="math display">\[ x_{MLE} =  \Sigma_x (z_1\Sigma_1^{-1}  + z_2\Sigma_2^{-1}) \]</span></p>
+<p><span class="math display">\[ 
+x_{MLE} =
+\left[\begin{array}{cc}
+0.8 &amp; 0 \\ 0 &amp; 0.8
+\end{array}\right] 
+\bigg(
+\left[\begin{array}{cc}
+1 &amp; 0 \\ 0 &amp; 0.25
+\end{array}\right] 
+\left[\begin{array}{c}
+1 \\ 1
+\end{array}\right]  + 
+\left[\begin{array}{cc}
+0.25 &amp; 0 \\ 0 &amp; 1
+\end{array}\right] 
+\left[\begin{array}{r}
+2 \\ -1
+\end{array}\right]  
+\bigg) = 
+\left[\begin{array}{r}
+1.2 \\ -0.6
+\end{array}\right]  
+\]</span></p>
+<p>Sonuç grafiklenirse suna benzer (ki yeni belirsizlik <span class="math inline">\(\Sigma_x\)</span>'i de grafikte kullanalım),</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">Z3 <span class="op">=</span> mlab.bivariate_normal(X, Y, sigmax<span class="op">=</span><span class="fl">0.8</span>, sigmay<span class="op">=</span><span class="fl">0.8</span>,mux<span class="op">=</span><span class="fl">1.2</span>, <span class="op">\</span>
+     muy<span class="op">=-</span><span class="fl">0.6</span>,sigmaxy<span class="op">=</span><span class="fl">0.0</span>)
+
+fig <span class="op">=</span> plt.figure()
+
+ax <span class="op">=</span> Axes3D(fig)
+ax.view_init(elev<span class="op">=</span><span class="fl">40.</span>,azim<span class="op">=</span><span class="dv">80</span>)
+
+ax.plot_surface(X,Y,Z3,cmap<span class="op">=</span>cm.jet)
+plt.savefig(<span class="st">&#39;fusion_2.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="fusion_2.png" />
+
+</div>
+<p>Yeni tahminimiz böyle çıktı. Çok daha emin olduğumuz bir noktada en olası ölçümü ortaya çıkardık. Kontur olarak grafiklersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">CS <span class="op">=</span> plt.contour(X, Y, Z3)
+plt.savefig(<span class="st">&#39;fusion_4.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="fusion_4.png" />
+
+</div>
+<p>[1] Zisserman, <em>Lectures 3 &amp; 4: Estimators</em>, <a href="www.robots.ox.ac.uk/~az/lectures/est/lect34.pdf" class="uri">www.robots.ox.ac.uk/~az/lectures/est/lect34.pdf</a></p>
+<p>[2] Hart, Duda, <em>Pattern Classification</em></p>
+</body>
+</html>

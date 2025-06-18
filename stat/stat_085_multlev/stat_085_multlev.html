@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="çok-seviyeli-modeller-multilevel-models">Çok Seviyeli Modeller (Multilevel Models)</h1>
+<p>Lineer, lojistik regresyon tek seviyeli modellerdir; modellenen verinin regresyona bildirilen tüm katsayılarının hepsi, aynı anda kullanılır. Fakat bazı durumlarda, mesela coğrafi bir parametrenin modelin parçası olduğu durumlarda daha değişik bir yaklaşım gerekli olabilir. Eğer regresyonumuzun katsayılarının belli bir grup için (şehir, okul, zaman, bölge, vs), her grup için farklı şekillerde veriye uydurulmasını (fit) istiyorsak, o zaman çok seviyeli modelleri kullanmak gerekebilir.</p>
+<p>Altta gösterilen iki parametreli klasik regresyon</p>
+<p><span class="math display">\[ y_i = \alpha + \beta x_i + \epsilon_i \]</span></p>
+<p>çok seviyeli modellerde mesela <span class="math inline">\(\alpha\)</span>'yi, yani kesisi (intercept) her grupta farklı olacak şekilde uydurabilir,</p>
+<p><span class="math display">\[ y_i = \alpha_{j[i]} + \beta x_i + \epsilon_i \]</span></p>
+<p>Bu durumda her grup <span class="math inline">\(j\)</span>'nin kendi kesi değeri olacaktır. Ya da her grubun kendi eğimi (slope) olacak şekilde <span class="math inline">\(\beta\)</span>'nin gruptan gruba değişmesine izin verilebilir,</p>
+<p><span class="math display">\[ y_i = \alpha + \beta_{j[i]} x_i + \epsilon_i \]</span></p>
+<p>Ya da her ikisinin birden değişmesine izin verilebilir,</p>
+<p><span class="math display">\[ y_i = \alpha_{j[i]} + \beta_{j[i]} x_i + \epsilon_i \]</span></p>
+<p>Terminoloji</p>
+<p>Literatürde bazen çok seviyeli modeller hakkında sabit etkiler (fixed effects), rasgele etkiler (random effects) gibi kelimeler kullanıldığını görürsünüz. Bu terminolojiye göre grup seviyesinde değişmesine izin verilen <span class="math inline">\(\alpha_j,\beta_j\)</span> gibi parametrelere &quot;sabit etki'' adı veriliyor, çünkü o parametreler grup içinde değişmemektedir, modelin geri kalanı ise rasgele etki olacaktır. Bu iki kavramın karışımı da (ki neredeyse her zaman öyle olur) &quot;karışık etki (mixed effects)'' modeli olarak anılıyor. Bu terminoloji biraz kafa karıştırıcı olabilir, bilinmesi iyidir böylece literatürü takip edebiliriz, ama biz [1]'deki tavsiyeyi kullanıp &quot;çok seviyeli modeller'' kelimelerini kullanacağız.</p>
+<p>Örnek</p>
+<p>Yeni bir ilacın etkili olup olmadığını anlamak için hastalar (subject) üzerinde deneyler yapılır [2]. Bu veride ilginç olan hastanın durumunun tekrar tekrar belli aralıklarla ölçülmesi, ve durumun (status) yeni bir veri satırı olarak kaydedilmesi. Ayrıca rasgele seçilen hastalara ya ilaç, ya da etkisiz ilaç (placebo) veriliyor. Veride cinsiyet (gender), yaş (age), tedavi merkezi numarası (centre) kolonları var. İlk aydaki durum &quot;başlangıç noktası (baseline)'' olarak ayrı bir kolona ayrılıyor, ve ilk ay satırları regresyon öncesi siliniyor. Soru şudur: ilaç etkili midir?</p>
+<p>Soru bir evet/hayır sorusu olduğu için lojistik regresyon kullanacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> statsmodels.api <span class="im">as</span> sm, pandas <span class="im">as</span> pd
+<span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;respiratory.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+baseline <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">==</span> <span class="dv">0</span>][[<span class="st">&#39;subject&#39;</span>,<span class="st">&#39;status&#39;</span>]].set_index(<span class="st">&#39;subject&#39;</span>)
+df[<span class="st">&#39;status&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;status&#39;</span>] <span class="op">==</span> <span class="st">&#39;good&#39;</span>).astype(<span class="bu">int</span>)
+df[<span class="st">&#39;baseline&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: baseline.ix[x[<span class="st">&#39;subject&#39;</span>]],axis<span class="op">=</span><span class="dv">1</span>)
+df[<span class="st">&#39;centre&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;centre&#39;</span>].astype(<span class="bu">str</span>)
+df <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">&gt;</span> <span class="dv">0</span>]
+<span class="bu">print</span> (df.head(<span class="dv">4</span>).to_string())</code></pre></div>
+<pre><code>    centre treatment  gender  age  status  month  subject baseline
+112      1   placebo  female   46       0      1        1     poor
+223      1   placebo  female   46       0      2        1     poor
+334      1   placebo  female   46       0      3        1     poor
+445      1   placebo  female   46       0      4        1     poor</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">mdlm <span class="op">=</span> smf.logit(<span class="st">&quot;status ~ baseline + month  + treatment + gender + \</span>
+<span class="st">age + C(centre)&quot;</span>, df)
+mdlmf <span class="op">=</span> mdlm.fit()
+<span class="bu">print</span>(mdlmf.summary())</code></pre></div>
+<pre><code>Optimization terminated successfully.
+         Current function value: 0.543694
+         Iterations 6
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 status   No. Observations:                  444
+Model:                          Logit   Df Residuals:                      437
+Method:                           MLE   Df Model:                            6
+Date:                Tue, 13 Nov 2018   Pseudo R-squ.:                  0.2071
+Time:                        12:00:13   Log-Likelihood:                -241.40
+converged:                       True   LL-Null:                       -304.47
+                                        LLR p-value:                 8.385e-25
+==========================================================================================
+                             coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+Intercept                  1.1436      0.426      2.682      0.007       0.308       1.979
+baseline[T.poor]          -1.8841      0.241     -7.802      0.000      -2.357      -1.411
+treatment[T.treatment]     1.3006      0.237      5.488      0.000       0.836       1.765
+gender[T.male]             0.1194      0.295      0.405      0.686      -0.458       0.697
+C(centre)[T.2]             0.6723      0.240      2.805      0.005       0.203       1.142
+month                     -0.0643      0.100     -0.646      0.518      -0.259       0.131
+age                       -0.0182      0.009     -2.050      0.040      -0.036      -0.001
+==========================================================================================</code></pre>
+<p>Statsmodels altyapısı kategorik gördüğü değerleri 1-hot kodlamasıyla 1/0 değerli kolonlara çevirir, yani <code>treatment[T.treatment]</code> tedavi uygulanıp uygulanmadığını gösteren 1/0 değerli kolondur. Bir başkası <code>treatment[T.placebo]</code>; fakat bu kolon regresyonda &quot;önemli'' bulunmadığı için üstte gösterilmemiş.</p>
+<p>Görülen katsayılara göre tedavinin (treatment) katsayısı 1.3, <span class="math inline">\(exp(1.3)=3.66\)</span>. Yani tedavi katsayısındaki 1 birimlik değişiklik (ki bu 0/1 bazlı bir değişken olduğu için tedavi uygulamak ya da uygulamamak anlamına gelir), hastanın iyileşmesinde 3.66 kat etki yaratıyor.</p>
+<p>Fakat bu regresyon sonuçlarındaki standart hatalarının bazılarından pek memnun değiliz, mesela gruplararası değişkenlerin (between-subject covariates), yaş gibi, standart hataları aşırı ufak. Bunun sebebi regresyon işleminin tüm veri satırlarını bağımsız (independent) kabul etmesidir, yani her satırdaki verinin çoğu aynı kişiye ait olsa bile farklı kişilere aitmiş gibi işlenmektedir. Regresyon sonuçlarını irdelerken sürekli tetikte olmak gerekir, görüldüğü gibi ufak hata bile bazen iyi bir şey olmayabiliyor!</p>
+<p>Peki çözüm nedir? Çok seviyeli modeller burada devreye girebilir. Eğer kişiyi ve ona tekabül eden tüm verileri bir grup olarak alırsak, o kişi için alınan tüm ölçümlerin tekrar eden kısımlarının genele daha az etkide bulunmasını sağlayabiliriz. Altta <code>glmer</code> adlı komut üzerinden çok seviyeli regresyon örneğini görüyoruz, ayrıca R diliyle bağlantı kurmak ta burada gösteriliyor; Python <code>statsmodels</code>'a bu fonksiyon daha taşınmadı. Daha fazla detay için [3]'e bakılabilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">%</span>load_ext rpy2.ipython
+<span class="op">%</span>R library(lme4)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">%</span>R <span class="op">-</span>i df 
+<span class="op">%</span>R p1 <span class="op">=</span> <span class="st">&quot;status ~ baseline + month + treatment + gender &quot;</span>
+<span class="op">%</span>R p2 <span class="op">=</span> <span class="st">&quot;+ age + centre + (1 | subject) &quot;</span>
+<span class="op">%</span>R params <span class="op">=</span> paste(p1,p2)
+<span class="op">%</span>R resp_lmer <span class="op">&lt;-</span> glmer(<span class="im">as</span>.formula(params), family <span class="op">=</span> binomial(), data <span class="op">=</span> df)
+<span class="op">%</span>R <span class="op">-</span>o res res <span class="op">=</span> summary(resp_lmer)
+<span class="op">%</span>R <span class="op">-</span>o exp_res exp_res <span class="op">=</span> exp(fixef(resp_lmer))
+<span class="bu">print</span> res
+<span class="bu">print</span> exp_res</code></pre></div>
+<pre><code>Generalized linear mixed model fit by maximum likelihood (Laplace
+  Approximation) [glmerMod]
+ Family: binomial  ( logit )
+Formula: status ~ baseline + month + treatment + gender + age + centre +  
+    (1 | subject)
+   Data: df
+
+     AIC      BIC   logLik deviance df.resid 
+   444.3    477.1   -214.2    428.3      436 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.8574 -0.3590  0.1427  0.3693  2.2393 
+
+Random effects:
+ Groups  Name        Variance Std.Dev.
+ subject (Intercept) 3.89     1.972   
+Number of obs: 444, groups:  subject, 111
+
+Fixed effects:
+                   Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)         1.68254    0.84436   1.993 0.046296 *  
+baselinepoor       -3.07838    0.60272  -5.107 3.26e-07 ***
+month              -0.10133    0.12518  -0.809 0.418257    
+treatmenttreatment  2.16325    0.55644   3.888 0.000101 ***
+gendermale          0.20249    0.67270   0.301 0.763402    
+age                -0.02546    0.02014  -1.264 0.206125    
+centre2             1.04667    0.54784   1.911 0.056064 .  
+---
+
+Correlation of Fixed Effects:
+            (Intr) bslnpr month  trtmnt gndrml age   
+baselinepor -0.367                                   
+month       -0.383  0.041                            
+trtmnttrtmn -0.178 -0.301 -0.031                     
+gendermale   0.065 -0.102 -0.003  0.219              
+age         -0.655 -0.015  0.009 -0.050 -0.263       
+centre2     -0.184  0.150 -0.015  0.058 -0.147 -0.223
+
+       (Intercept)       baselinepoor              month treatmenttreatment 
+        5.37919357         0.04603378         0.90363768         8.69940763 
+        gendermale                age            centre2 
+        1.22445202         0.97485954         2.84815273 
+</code></pre>
+<p><code>(1+subject)</code> kullanımı gruplamayı kişi bazında yapıyor ve her grup için kesinin değişmesine izin veriliyor. Regresyonun sonucu 2.16, <span class="math inline">\(exp(2.16)=8.67\)</span>, yani bu ilaç aslında hastanın iyileşmesinde 8.67 kat etkili! Bu çok daha büyük bir rakam ve gerçek sonuç aslında bu. Yaş değişkeninin standart hatasına bakarsak, daha büyük olduğunu görüyoruz, yani bu katsayı daha uygun bir seviyeye gelmiş bulunuyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Gelman, Hill, {}</p>
+<p>[2] Everitt, <em>A Handbook of Statistical Analysis Using R</em></p>
+<p>[3] Bayramlı, <em>iPython, rpy2, rmagic</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2015/02/ipython-rpy2-rmagic.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2015/02/ipython-rpy2-rmagic.html</a></p>
+</body>
+</html>

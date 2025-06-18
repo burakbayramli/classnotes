@@ -1,0 +1,630 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="tensorflow-ile-regresyon-ysa">Tensorflow ile Regresyon, YSA</h1>
+<p>Toptan basit lineer regresyon hesabını Tensorflow [5] ile nasıl yaparız? Regresyonu California emlak veri seti üzerinde işleteceğiz, bu veride bölge bazlı olarak ev sahiplerinin ortalama yaşı, geliri, gibi değişkenler ile hedef değişkeni olan ev fiyatı kayıtlı. Hedef ve kaynak değişkenler arasındaki lineer ilişki lineer regresyon ile hesaplanabilir, tanıdık formül,</p>
+<p><span class="math display">\[
+\hat{\theta} = (X^TX )^{-1} X^T y
+\]</span></p>
+<p>Veriye bir yanlılık (sadece 1 değeri içeren yeni bir kolon) ekleyip üstteki hesabı yapalım.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">from</span> sklearn.datasets <span class="im">import</span> fetch_california_housing
+<span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler
+
+<span class="kw">def</span> reset_graph(seed<span class="op">=</span><span class="dv">42</span>):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+housing <span class="op">=</span> fetch_california_housing(data_home<span class="op">=</span><span class="st">&quot;/home/burak/Downloads/scikit-data&quot;</span>)
+<span class="bu">print</span> housing[<span class="st">&#39;data&#39;</span>].shape
+<span class="bu">print</span> housing[<span class="st">&#39;target&#39;</span>][:<span class="dv">5</span>]
+
+m, n <span class="op">=</span> housing.data.shape
+
+housing_data_plus_bias <span class="op">=</span> np.c_[np.ones((m, <span class="dv">1</span>)), housing.data]
+X <span class="op">=</span> tf.constant(housing_data_plus_bias, dtype<span class="op">=</span>tf.float32, name<span class="op">=</span><span class="st">&quot;X&quot;</span>)
+y <span class="op">=</span> tf.constant(housing.target.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), dtype<span class="op">=</span>tf.float32, name<span class="op">=</span><span class="st">&quot;y&quot;</span>)
+XT <span class="op">=</span> tf.transpose(X)
+theta <span class="op">=</span> tf.matmul(tf.matmul(tf.matrix_inverse(tf.matmul(XT, X)), XT), y)
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    theta_value <span class="op">=</span> theta.<span class="bu">eval</span>()
+<span class="bu">print</span> <span class="st">&#39;theta&#39;</span>
+<span class="bu">print</span> theta_value</code></pre></div>
+<pre><code>(20640, 8)
+[ 4.526  3.585  3.521  3.413  3.422]
+theta
+[[ -3.68059006e+01]
+ [  4.36796039e-01]
+ [  9.45724174e-03]
+ [ -1.07348330e-01]
+ [  6.44418657e-01]
+ [ -3.95741154e-06]
+ [ -3.78908939e-03]
+ [ -4.20193195e-01]
+ [ -4.33070064e-01]]</code></pre>
+<p>TF'in matris çarpımı için <code>matmul</code>, tersini alma için <code>matrix_inverse</code> çağrılarını görüyoruz. Üstteki kodu olduğu gibi alıp pek çok işlemci üzerinde direk paralel şekilde işletebiliriz, aynı işi pür numpy bazlı kodla yapmak daha külfetli olurdu.</p>
+<p>Gradyan İnişi</p>
+<p>Klasik toptan usül ile hesabı gördük. Peki gradyan inişi ile lineer regresyon nasıl yaparız? Burada iki yaklaşımı göstereceğiz, biri daha zor, diğeri daha kolay. Zor olan matematiksel olarak elle kendimizin gradyan türevini alması, daha kolay olanı türevi TF içindeki otomatik türev alma mekanizmasını kullanarak o işi de TF'e yaptırmak.</p>
+<p>Veriyi hazırlayalım ve çiziti oluşturalım; başlangıç <span class="math inline">\(\theta\)</span> değeri rasgele atansın, <span class="math inline">\(X,y\)</span> değerleri verinin kendisi olacak, tahmin ve hata için fonksiyonlar olsun.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">scaler <span class="op">=</span> StandardScaler()
+scaled_housing_data <span class="op">=</span> scaler.fit_transform(housing.data)
+scaled_housing_data_plus_bias <span class="op">=</span> np.c_[np.ones((m, <span class="dv">1</span>)), scaled_housing_data]
+
+reset_graph()
+
+X <span class="op">=</span> tf.constant(scaled_housing_data_plus_bias, dtype<span class="op">=</span>tf.float32, name<span class="op">=</span><span class="st">&quot;X&quot;</span>)
+y <span class="op">=</span> tf.constant(housing.target.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>), dtype<span class="op">=</span>tf.float32, name<span class="op">=</span><span class="st">&quot;y&quot;</span>)
+theta <span class="op">=</span> tf.Variable(tf.random_uniform([n <span class="op">+</span> <span class="dv">1</span>, <span class="dv">1</span>], <span class="fl">-1.0</span>, <span class="fl">1.0</span>, seed<span class="op">=</span><span class="dv">42</span>), name<span class="op">=</span><span class="st">&quot;theta&quot;</span>)
+y_pred <span class="op">=</span> tf.matmul(X, theta, name<span class="op">=</span><span class="st">&quot;predictions&quot;</span>)
+error <span class="op">=</span> y_pred <span class="op">-</span> y
+mse <span class="op">=</span> tf.reduce_mean(tf.square(error), name<span class="op">=</span><span class="st">&quot;mse&quot;</span>)</code></pre></div>
+<p>Elle türevi alınmış gradyan nedir? [1, sf. 261]'e göre formül</p>
+<p><span class="math display">\[ 
+\nabla_\theta MSE(\theta) = \frac{2}{m} X^T (X \cdot \theta - y)
+\]</span></p>
+<p>ve gradyan güncellemesi</p>
+<p><span class="math display">\[ 
+\theta^{t+1} = \theta - \eta \nabla_\theta MSE(\theta)
+\]</span></p>
+<p>Alttaki TF kodu bir döngü içinde gradyan güncellemesi yapacak ve hata karelerinin ortalaması (mean square error -MSE-) hesaplayıp ekrana basacak. MSE'in gittikçe aşağı inmesi lazım, çünkü gradyanın tersi yönünde hatayı azaltacak şekilde hareket ediyoruz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">n_epochs <span class="op">=</span> <span class="dv">1000</span>
+learning_rate <span class="op">=</span> <span class="fl">0.01</span>
+
+gradients <span class="op">=</span> <span class="dv">2</span><span class="op">/</span>np.<span class="bu">float</span>(m) <span class="op">*</span> tf.matmul(tf.transpose(X), error)
+training_op <span class="op">=</span> tf.assign(theta, theta<span class="op">-</span>(learning_rate<span class="op">*</span>gradients))
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    sess.run(init)
+    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(n_epochs):
+        <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">100</span> <span class="op">==</span> <span class="dv">0</span>: <span class="bu">print</span>(<span class="st">&quot;Epoch&quot;</span>, epoch, <span class="st">&quot;MSE =&quot;</span>, mse.<span class="bu">eval</span>())
+    sess.run(training_op)    
+    best_theta <span class="op">=</span> theta.<span class="bu">eval</span>()
+    
+<span class="bu">print</span> <span class="st">&#39;theta&#39;</span>
+<span class="bu">print</span> best_theta</code></pre></div>
+<pre><code>(&#39;Epoch&#39;, 0, &#39;MSE =&#39;, 9.1615429)
+(&#39;Epoch&#39;, 100, &#39;MSE =&#39;, 0.71450073)
+(&#39;Epoch&#39;, 200, &#39;MSE =&#39;, 0.56670469)
+(&#39;Epoch&#39;, 300, &#39;MSE =&#39;, 0.55557162)
+(&#39;Epoch&#39;, 400, &#39;MSE =&#39;, 0.54881161)
+(&#39;Epoch&#39;, 500, &#39;MSE =&#39;, 0.54363626)
+(&#39;Epoch&#39;, 600, &#39;MSE =&#39;, 0.53962916)
+(&#39;Epoch&#39;, 700, &#39;MSE =&#39;, 0.53650916)
+(&#39;Epoch&#39;, 800, &#39;MSE =&#39;, 0.53406781)
+(&#39;Epoch&#39;, 900, &#39;MSE =&#39;, 0.53214705)
+theta
+[[ 2.06855249]
+ [ 0.88740271]
+ [ 0.14401658]
+ [-0.34770882]
+ [ 0.36178368]
+ [ 0.00393812]
+ [-0.04269557]
+ [-0.66145277]
+ [-0.63752776]]</code></pre>
+<p>Otomatik Türev ile Gradyan</p>
+<p>Sembolik türev yerine TF içindeki <code>autodiff</code> paketine türevi aldıralım ve gradyan inişini böyle yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">gradients <span class="op">=</span> tf.gradients(mse, [theta])[<span class="dv">0</span>] <span class="co"># otomatik turev</span>
+
+training_op <span class="op">=</span> tf.assign(theta, theta<span class="op">-</span>(learning_rate<span class="op">*</span>gradients))
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    sess.run(init)
+    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(n_epochs):
+        <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">100</span> <span class="op">==</span> <span class="dv">0</span>: <span class="bu">print</span>(<span class="st">&quot;Epoch&quot;</span>, epoch, <span class="st">&quot;MSE =&quot;</span>, mse.<span class="bu">eval</span>())
+    sess.run(training_op)
+    
+    best_theta <span class="op">=</span> theta.<span class="bu">eval</span>()
+    
+<span class="bu">print</span> best_theta</code></pre></div>
+<pre><code>(&#39;Epoch&#39;, 0, &#39;MSE =&#39;, 9.1615429)
+(&#39;Epoch&#39;, 100, &#39;MSE =&#39;, 0.71450061)
+(&#39;Epoch&#39;, 200, &#39;MSE =&#39;, 0.56670463)
+(&#39;Epoch&#39;, 300, &#39;MSE =&#39;, 0.55557162)
+(&#39;Epoch&#39;, 400, &#39;MSE =&#39;, 0.54881167)
+(&#39;Epoch&#39;, 500, &#39;MSE =&#39;, 0.5436362)
+(&#39;Epoch&#39;, 600, &#39;MSE =&#39;, 0.53962916)
+(&#39;Epoch&#39;, 700, &#39;MSE =&#39;, 0.53650916)
+(&#39;Epoch&#39;, 800, &#39;MSE =&#39;, 0.53406781)
+(&#39;Epoch&#39;, 900, &#39;MSE =&#39;, 0.53214717)
+[[ 2.06855249]
+ [ 0.88740271]
+ [ 0.14401658]
+ [-0.34770882]
+ [ 0.36178368]
+ [ 0.00393811]
+ [-0.04269556]
+ [-0.66145277]
+ [-0.6375277 ]]</code></pre>
+<p>Aynı sonuca eriştik.</p>
+<p>Daha da basitleştirebiliriz, üstteki kodda <code>assign</code> ile gradyan inişi için gereken çıkartma işlemi elle yapıldı. TF paketi içinde bu çıkartmayı yapacak optimizasyon rutinleri de var, mesela <code>GradientDescentOptimizer</code>.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">optimizer <span class="op">=</span> tf.train.GradientDescentOptimizer(learning_rate<span class="op">=</span>learning_rate)
+training_op <span class="op">=</span> optimizer.minimize(mse)
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    sess.run(init)
+    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(n_epochs):
+        <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">100</span> <span class="op">==</span> <span class="dv">0</span>: <span class="bu">print</span>(<span class="st">&quot;Epoch&quot;</span>, epoch, <span class="st">&quot;MSE =&quot;</span>, mse.<span class="bu">eval</span>())
+        sess.run(training_op)    
+    best_theta <span class="op">=</span> theta.<span class="bu">eval</span>()
+
+<span class="bu">print</span>(<span class="st">&#39;theta&#39;</span>)
+<span class="bu">print</span>(best_theta)</code></pre></div>
+<pre><code>(&#39;Epoch&#39;, 0, &#39;MSE =&#39;, 9.1615429)
+(&#39;Epoch&#39;, 100, &#39;MSE =&#39;, 0.71450061)
+(&#39;Epoch&#39;, 200, &#39;MSE =&#39;, 0.56670463)
+(&#39;Epoch&#39;, 300, &#39;MSE =&#39;, 0.55557162)
+(&#39;Epoch&#39;, 400, &#39;MSE =&#39;, 0.54881167)
+(&#39;Epoch&#39;, 500, &#39;MSE =&#39;, 0.5436362)
+(&#39;Epoch&#39;, 600, &#39;MSE =&#39;, 0.53962916)
+(&#39;Epoch&#39;, 700, &#39;MSE =&#39;, 0.53650916)
+(&#39;Epoch&#39;, 800, &#39;MSE =&#39;, 0.53406781)
+(&#39;Epoch&#39;, 900, &#39;MSE =&#39;, 0.53214717)
+theta
+[[ 2.06855249]
+ [ 0.88740271]
+ [ 0.14401658]
+ [-0.34770882]
+ [ 0.36178368]
+ [ 0.00393811]
+ [-0.04269556]
+ [-0.66145277]
+ [-0.6375277 ]]</code></pre>
+<p>Görüldüğü gibi matris işlemi içeren her türlü hesap TF ile kodlanabilir, bu yapıldığında kodlar rahat bir şekilde paralelize edilebilir. Yapay öğrenimde ne kadar çok lineer cebir kullanımı olduğunu biliyoruz, ayrıca türev almak otomatikleştirildiği için akla gelebilecek her türlü lineer cebir, optimizasyon işlemi TF üzerinden kodlanabilir.</p>
+<p>TensorFlow ile Çok Katmanlı Yapay Sinir Ağları (Neural Network -NN-)</p>
+<p>Şimdi çok katmanlı NN ile regresyon yapma örneği görelim. Bir NN bildiğimiz gibi evrensel yaklaşıklayıcı, yeterli veri var ise her türlü fonksiyonu yaklaşık olarak temsil edebilir, öğrenebilir. Düz lineer regresyon ile yaptığımız da bir bakıma budur, bilinmeyen bir fonksiyonu veriden öğrenmeye uğraşırız, fakat nihai fonksiyon lineer olmalı. NN ile lineer, gayrı-lineer her türlü fonksiyon temsil edilebilir.</p>
+<p>Her katmanda girdi ağırlıklar ile çarpılacak, bir yanlılık (bias) eklenecek, ve sonuç bir aktivasyon fonksiyonuna verilecek (altta kullanılan ReLu), buradan çıkan sonuç bir sonraki katmana aktarılacak. Aktivasyon lazım çünkü aktivasyon olmasa, her katman sadece ağırlıklarla çarpılan sonucu bir sonraki katmana verse, tüm NN'in işlemi ardı ardına matrislerin çarpımı olarak ta görülebilirdi, ama bu bir lineer işlem olurdu, o zaman NN gayri-lineerligi modelleyemezdi. Diğer yandan lineer regresyon bir bakıma tek katmanlı ve aktivasyonu olmayan bir NN gibi görülebilir.</p>
+<p>Örnek için kullanılan veri seti Low Birth Weight [2] verisi, bu veride yeni doğan çocukların annenin tıbbi verileri ile çocuğun doğduğundaki ağırlığı kaydedilmiş, ve bu hedef değişkeni ile diğerleri arasındaki ilişkiyi öğrenmek istiyoruz. Veriyi okuyup normalize edelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> tensorflow.python.framework <span class="im">import</span> ops
+<span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+cols_of_interest <span class="op">=</span> [<span class="st">&#39;AGE&#39;</span>, <span class="st">&#39;LWT&#39;</span>, <span class="st">&#39;RACE&#39;</span>, <span class="st">&#39;SMOKE&#39;</span>, <span class="st">&#39;PTL&#39;</span>, <span class="st">&#39;HT&#39;</span>, <span class="st">&#39;UI&#39;</span>, <span class="st">&#39;FTV&#39;</span>]
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;lowbwt.dat&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s*&#39;</span>,engine<span class="op">=</span><span class="st">&#39;python&#39;</span>)
+x_vals <span class="op">=</span> np.array(df[cols_of_interest])
+y_vals <span class="op">=</span> np.array(df[<span class="st">&#39;BWT&#39;</span>])
+
+ops.reset_default_graph()
+tf.set_random_seed(<span class="dv">3</span>)
+np.random.seed(<span class="dv">3</span>)
+
+sess <span class="op">=</span> tf.Session()
+
+tmp <span class="op">=</span> np.random.choice(<span class="bu">range</span>(<span class="bu">len</span>(x_vals)), size<span class="op">=</span><span class="bu">len</span>(x_vals), replace<span class="op">=</span><span class="va">False</span>)
+first <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(x_vals)<span class="op">*</span><span class="fl">0.80</span>)
+train_indices <span class="op">=</span> tmp[:first]
+test_indices <span class="op">=</span> tmp[first:]
+
+x_vals_train <span class="op">=</span> x_vals[train_indices]
+x_vals_test <span class="op">=</span> x_vals[test_indices]
+y_vals_train <span class="op">=</span> y_vals[train_indices]
+y_vals_test <span class="op">=</span> y_vals[test_indices]
+
+<span class="kw">def</span> normalize_cols(m):
+    col_max <span class="op">=</span> m.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">0</span>)
+    col_min <span class="op">=</span> m.<span class="bu">min</span>(axis<span class="op">=</span><span class="dv">0</span>)
+    <span class="cf">return</span> (m<span class="op">-</span>col_min) <span class="op">/</span> (col_max <span class="op">-</span> col_min)
+    
+x_vals_train <span class="op">=</span> np.nan_to_num(normalize_cols(x_vals_train))
+x_vals_test <span class="op">=</span> np.nan_to_num(normalize_cols(x_vals_test))</code></pre></div>
+<p>NN katmanlarını hazırlayalım [3], üç katman olacak, katmanlarda sırasıyla 25, 10 ve 3 tane nöron olacak. Kayıp (loss) fonksiyonu L1 (mutlak değer) üzerinden hesaplanıyor. Optimize edici olarak TF'in <code>AdamOptimizer</code>'ini kullanacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> init_weight(shape, st_dev):
+    weight <span class="op">=</span> tf.Variable(tf.random_normal(shape, stddev<span class="op">=</span>st_dev))
+    <span class="cf">return</span>(weight)
+    
+<span class="kw">def</span> init_bias(shape, st_dev):
+    bias <span class="op">=</span> tf.Variable(tf.random_normal(shape, stddev<span class="op">=</span>st_dev))
+    <span class="cf">return</span>(bias)
+    
+x_data <span class="op">=</span> tf.placeholder(shape<span class="op">=</span>[<span class="va">None</span>, <span class="dv">8</span>], dtype<span class="op">=</span>tf.float32)
+y_target <span class="op">=</span> tf.placeholder(shape<span class="op">=</span>[<span class="va">None</span>, <span class="dv">1</span>], dtype<span class="op">=</span>tf.float32)
+
+<span class="kw">def</span> fully_connected(input_layer, weights, biases):
+    layer <span class="op">=</span> tf.add(tf.matmul(input_layer, weights), biases)
+    <span class="cf">return</span>(tf.nn.relu(layer))
+
+weight_1 <span class="op">=</span> init_weight(shape<span class="op">=</span>[<span class="dv">8</span>, <span class="dv">25</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+bias_1 <span class="op">=</span> init_bias(shape<span class="op">=</span>[<span class="dv">25</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+layer_1 <span class="op">=</span> fully_connected(x_data, weight_1, bias_1)
+
+weight_2 <span class="op">=</span> init_weight(shape<span class="op">=</span>[<span class="dv">25</span>, <span class="dv">10</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+bias_2 <span class="op">=</span> init_bias(shape<span class="op">=</span>[<span class="dv">10</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+layer_2 <span class="op">=</span> fully_connected(layer_1, weight_2, bias_2)
+
+weight_3 <span class="op">=</span> init_weight(shape<span class="op">=</span>[<span class="dv">10</span>, <span class="dv">3</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+bias_3 <span class="op">=</span> init_bias(shape<span class="op">=</span>[<span class="dv">3</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+layer_3 <span class="op">=</span> fully_connected(layer_2, weight_3, bias_3)
+
+weight_4 <span class="op">=</span> init_weight(shape<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">1</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+bias_4 <span class="op">=</span> init_bias(shape<span class="op">=</span>[<span class="dv">1</span>], st_dev<span class="op">=</span><span class="fl">10.0</span>)
+final_output <span class="op">=</span> fully_connected(layer_3, weight_4, bias_4)
+
+loss <span class="op">=</span> tf.reduce_mean(tf.<span class="bu">abs</span>(y_target <span class="op">-</span> final_output))
+
+my_opt <span class="op">=</span> tf.train.AdamOptimizer(<span class="fl">0.02</span>)
+train_step <span class="op">=</span> my_opt.minimize(loss)
+
+init <span class="op">=</span> tf.initialize_all_variables()
+sess.run(init)</code></pre></div>
+<p>NN ağ çizit yapısı kuruldu, hatta ağırlıkların değerleri bile var. Tabii başta bu değerler rasgele değerler, yani istediğimiz nihai değerler değiller. Fakat üsttekinin geçerli bir NN olduğunu ispatlamak için dışarıdan bir test verisi versek bize bir hesap yapacağını göreceğiz. Bunun için yer tutuculara tek bir veri noktası verelim, ve sonuç düğümünün hesaplanmasını isteyelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.array([<span class="fl">20.</span>,<span class="fl">181.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">0.</span>,<span class="fl">0.</span>,<span class="fl">1.</span>,<span class="fl">0.</span>]) <span class="co"># uyduruk veri</span>
+x <span class="op">=</span> np.reshape(x, (<span class="dv">1</span>,<span class="dv">8</span>))
+<span class="bu">print</span> sess.run(final_output,feed_dict<span class="op">=</span>{x_data: x})</code></pre></div>
+<pre><code>[[ 8723006.]]</code></pre>
+<p>Bu sayı çok büyük, problem açısından tabii ki anlamsız, NN'i eğitim verisiyle eğittikçe NN ağırlıkları gerçek hallerine yaklaşacaklar, o zaman üstteki gibi bir veri noktası için daha iyi bir sonuç alabileceğiz, fakat bir hesabın yapılabildiğini görüyoruz.</p>
+<p>Şimdi veriyi 80/20 oranında eğitim / doğrulama olarak ayıralım, ve eğitim veri seti üzerinde eğitim yapalım. Eğitim verisinden <code>batch_size</code> büyüklüğünde mini toptan parçalar (minibatch) örnekleyelim, ve her eğitim döngüsünde optimize ediciye bu parçaları verelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">loss_vec <span class="op">=</span> []<span class="op">;</span> test_loss <span class="op">=</span> []
+
+batch_size <span class="op">=</span> <span class="dv">200</span>
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">200</span>):
+    rand_index <span class="op">=</span> np.random.choice(<span class="bu">len</span>(x_vals_train), size<span class="op">=</span>batch_size)
+    rand_x <span class="op">=</span> x_vals_train[rand_index]
+    rand_y <span class="op">=</span> np.transpose([y_vals_train[rand_index]])
+    sess.run(train_step, feed_dict<span class="op">=</span>{x_data: rand_x, y_target: rand_y})
+
+    temp_loss <span class="op">=</span> sess.run(loss, feed_dict<span class="op">=</span>{x_data: rand_x, y_target: rand_y})
+    loss_vec.append(temp_loss)
+
+    d <span class="op">=</span> {x_data: x_vals_test, y_target: np.transpose([y_vals_test])}
+    test_temp_loss <span class="op">=</span> sess.run(loss, feed_dict<span class="op">=</span>d)
+    test_loss.append(test_temp_loss)
+    <span class="cf">if</span> (i<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span><span class="dv">25</span><span class="op">==</span><span class="dv">0</span>:
+        <span class="bu">print</span>(<span class="st">&#39;Epoch: &#39;</span> <span class="op">+</span> <span class="bu">str</span>(i<span class="op">+</span><span class="dv">1</span>) <span class="op">+</span> <span class="st">&#39;. Kayip = &#39;</span> <span class="op">+</span> <span class="bu">str</span>(temp_loss))
+
+<span class="co"># Plot loss over time</span>
+plt.plot(loss_vec, <span class="st">&#39;k-&#39;</span>, label<span class="op">=</span><span class="st">u&#39;Eğitim Kaybı&#39;</span>)
+plt.plot(test_loss, <span class="st">&#39;r--&#39;</span>, label<span class="op">=</span><span class="st">u&#39;Test Kaybı&#39;</span>)
+plt.title(<span class="st">u&#39;Her Epoch İçinde Kayıp&#39;</span>)
+plt.xlabel(<span class="st">&#39;Epoch&#39;</span>)
+plt.ylabel(<span class="st">u&#39;Kayıp&#39;</span>)
+plt.legend(loc<span class="op">=</span><span class="st">&quot;upper right&quot;</span>)
+plt.savefig(<span class="st">&#39;tf_03.png&#39;</span>)</code></pre></div>
+<pre><code>Epoch: 25. Kayip = 16744.3
+Epoch: 50. Kayip = 8367.32
+Epoch: 75. Kayip = 4687.56
+Epoch: 100. Kayip = 1767.07
+Epoch: 125. Kayip = 1297.27
+Epoch: 150. Kayip = 852.689
+Epoch: 175. Kayip = 705.81
+Epoch: 200. Kayip = 728.779</code></pre>
+<div class="figure">
+<img src="tf_03.png" />
+
+</div>
+<p>Görüldüğü gibi eğitim ve test kaybı birbirine yakın ki bu iyiye işaret, model iyi öğreniyor, eksik uyum, aşırı uyum durumları yok demektir, ve nihai kayıp her iki tarafta da 0.7 kg civarı.</p>
+<p>Not: Girdi verisinde yaklaşık 200 satır veri olduğuna dikkat, şu sorulabilir, eğitim sırasında 200 kere dönüyoruz, her döngüde 200 civarı toptan parça kullanıyoruz, bu nasıl oluyor? Ufak parçaların içeriğini {}, o zaman döngü sayısı, parça sayısına bakarsak bir anlamda veriyi örnekleyerek çoğaltmış (upsample) oluyoruz. Bu NN eğitiminde sürekli ortaya çıkan bir kavram, aklımızda olsun.</p>
+<p>İki Kategori Sınıflaması</p>
+<p>Peki istatistikte lojistik regresyon ile yaptığımız iki kategori arasında sınıflamayı çok katmanlı NN ile nasıl yaparız? Mesela bebeğin 2.5 kg altında doğup doğmaması diyelim, bu bir riskli durum, ve iki farklı sınıf olarak görülebilecek bu hedef değişkeni için 0/1 tarzında bir eğitim yapmak istiyoruz. İlk akla gelebilecek çözüm bir önceki NN'i alıp oradan gelecek tahminleri eşik değeri 2.5 üstünde mi altında mı diye ek bir filtrelemeden geçirmek, yani regresyon sonucunu 0/1 tahminine çevirmek. Bu yaklaşım yüzde 55 civarı başarı veriyor.</p>
+<p>Daha iyisi, daha farklı bir NN'i özellikle 0/1 hedefi için eğitmek.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> tensorflow.python.framework <span class="im">import</span> ops
+<span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+cols_of_interest <span class="op">=</span> [<span class="st">&#39;AGE&#39;</span>, <span class="st">&#39;LWT&#39;</span>, <span class="st">&#39;RACE&#39;</span>, <span class="st">&#39;SMOKE&#39;</span>, <span class="st">&#39;PTL&#39;</span>, <span class="st">&#39;HT&#39;</span>, <span class="st">&#39;UI&#39;</span>, <span class="st">&#39;FTV&#39;</span>]
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;lowbwt.dat&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s*&#39;</span>,engine<span class="op">=</span><span class="st">&#39;python&#39;</span>)
+x_vals <span class="op">=</span> np.array(df[cols_of_interest])
+y_vals <span class="op">=</span> np.array(df[<span class="st">&#39;LOW&#39;</span>])
+
+ops.reset_default_graph()
+tf.set_random_seed(<span class="dv">1</span>)
+np.random.seed(<span class="dv">1</span>)
+sess <span class="op">=</span> tf.Session()
+
+tmp <span class="op">=</span> np.random.choice(<span class="bu">range</span>(<span class="bu">len</span>(x_vals)), size<span class="op">=</span><span class="bu">len</span>(x_vals), replace<span class="op">=</span><span class="va">False</span>)
+first <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(x_vals)<span class="op">*</span><span class="fl">0.80</span>)
+train_indices <span class="op">=</span> tmp[:first]
+test_indices <span class="op">=</span> tmp[first:]
+
+x_vals_train <span class="op">=</span> x_vals[train_indices]
+x_vals_test <span class="op">=</span> x_vals[test_indices]
+y_vals_train <span class="op">=</span> y_vals[train_indices]
+y_vals_test <span class="op">=</span> y_vals[test_indices]
+
+<span class="kw">def</span> normalize_cols(m):
+    col_max <span class="op">=</span> m.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">0</span>)
+    col_min <span class="op">=</span> m.<span class="bu">min</span>(axis<span class="op">=</span><span class="dv">0</span>)
+    <span class="cf">return</span> (m<span class="op">-</span>col_min) <span class="op">/</span> (col_max <span class="op">-</span> col_min)
+    
+x_vals_train <span class="op">=</span> np.nan_to_num(normalize_cols(x_vals_train))
+x_vals_test <span class="op">=</span> np.nan_to_num(normalize_cols(x_vals_test))
+
+batch_size <span class="op">=</span> <span class="dv">50</span>
+
+x_data <span class="op">=</span> tf.placeholder(shape<span class="op">=</span>[<span class="va">None</span>, <span class="dv">8</span>], dtype<span class="op">=</span>tf.float32)
+y_target <span class="op">=</span> tf.placeholder(shape<span class="op">=</span>[<span class="va">None</span>, <span class="dv">1</span>], dtype<span class="op">=</span>tf.float32)
+
+<span class="kw">def</span> init_variable(shape):
+    <span class="cf">return</span>(tf.Variable(tf.random_normal(shape<span class="op">=</span>shape)))
+
+<span class="kw">def</span> logistic(input_layer, multiplication_weight, bias_weight, activation <span class="op">=</span> <span class="va">True</span>):
+    linear_layer <span class="op">=</span> tf.add(tf.matmul(input_layer, multiplication_weight), bias_weight)
+    <span class="cf">if</span> activation:
+        <span class="cf">return</span>(tf.nn.sigmoid(linear_layer))
+    <span class="cf">else</span>:
+        <span class="cf">return</span>(linear_layer)</code></pre></div>
+<p>Üstteki <code>logistic</code> çağrısı ağırlıklarla çarpım sonucunu bir sigmoid fonksiyonundan geçiriyor. Yeni NN'imiz 20, 20, 10 nöron içeren bu yeni stili kullanacak.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">A1 <span class="op">=</span> init_variable(shape<span class="op">=</span>[<span class="dv">8</span>,<span class="dv">20</span>])
+b1 <span class="op">=</span> init_variable(shape<span class="op">=</span>[<span class="dv">20</span>])
+logistic_layer1 <span class="op">=</span> logistic(x_data, A1, b1)
+
+A2 <span class="op">=</span> init_variable(shape<span class="op">=</span>[<span class="dv">20</span>,<span class="dv">10</span>])
+b2 <span class="op">=</span> init_variable(shape<span class="op">=</span>[<span class="dv">10</span>])
+logistic_layer2 <span class="op">=</span> logistic(logistic_layer1, A2, b2)
+
+A3 <span class="op">=</span> init_variable(shape<span class="op">=</span>[<span class="dv">10</span>,<span class="dv">1</span>])
+b3 <span class="op">=</span> init_variable(shape<span class="op">=</span>[<span class="dv">1</span>])
+final_output <span class="op">=</span> logistic(logistic_layer2, A3, b3, activation<span class="op">=</span><span class="va">False</span>)
+
+tmp <span class="op">=</span> tf.nn.sigmoid_cross_entropy_with_logits(logits<span class="op">=</span>final_output, labels<span class="op">=</span>y_target)
+loss <span class="op">=</span> tf.reduce_mean(tmp)
+     
+my_opt <span class="op">=</span> tf.train.AdamOptimizer(learning_rate <span class="op">=</span> <span class="fl">0.002</span>)
+train_step <span class="op">=</span> my_opt.minimize(loss)
+
+init <span class="op">=</span> tf.global_variables_initializer()
+sess.run(init)
+
+prediction <span class="op">=</span> tf.<span class="bu">round</span>(tf.nn.sigmoid(final_output))
+predictions_correct <span class="op">=</span> tf.cast(tf.equal(prediction, y_target), tf.float32)
+accuracy <span class="op">=</span> tf.reduce_mean(predictions_correct)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">loss_vec <span class="op">=</span> []<span class="op">;</span> train_acc <span class="op">=</span> []<span class="op">;</span> test_acc <span class="op">=</span> []
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1500</span>):
+    rand_index <span class="op">=</span> np.random.choice(<span class="bu">len</span>(x_vals_train), size<span class="op">=</span>batch_size)
+    rand_x <span class="op">=</span> x_vals_train[rand_index]
+    rand_y <span class="op">=</span> np.transpose([y_vals_train[rand_index]])
+
+    sess.run(train_step, feed_dict<span class="op">=</span>{x_data: rand_x, y_target: rand_y})
+    temp_loss <span class="op">=</span> sess.run(loss, feed_dict<span class="op">=</span>{x_data: rand_x, y_target: rand_y})
+    loss_vec.append(temp_loss)
+
+    d1 <span class="op">=</span> {x_data: x_vals_train, y_target: np.transpose([y_vals_train])}
+    temp_acc_train <span class="op">=</span> sess.run(accuracy, feed_dict<span class="op">=</span>d1)
+    train_acc.append(temp_acc_train)
+
+    d2 <span class="op">=</span> {x_data: x_vals_test, y_target: np.transpose([y_vals_test])}
+    temp_acc_test <span class="op">=</span> sess.run(accuracy, feed_dict<span class="op">=</span>d2)
+    test_acc.append(temp_acc_test)
+    <span class="cf">if</span> (i<span class="op">+</span><span class="dv">1</span>)<span class="op">%</span><span class="dv">150</span><span class="op">==</span><span class="dv">0</span>: <span class="bu">print</span>(<span class="st">&#39;Loss = &#39;</span> <span class="op">+</span> <span class="bu">str</span>(temp_loss))
+
+plt.plot(loss_vec, <span class="st">&#39;k-&#39;</span>)
+plt.title(<span class="st">u&quot;Her Epoch İçin Çapraz Entropi Kaybı&quot;</span>)
+plt.xlabel(<span class="st">u&quot;Epoch&quot;</span>)
+plt.ylabel(<span class="st">u&quot;Çapraz Entropi Kaybı&quot;</span>)
+plt.ylim(<span class="fl">0.0</span>,<span class="fl">2.0</span>)
+plt.savefig(<span class="st">&#39;tf_04.png&#39;</span>)        
+
+plt.figure()
+plt.plot(train_acc, <span class="st">&#39;k-&#39;</span>, label<span class="op">=</span><span class="st">u&quot;Eğitim Seti Doğrulugu&quot;</span>)
+plt.plot(test_acc, <span class="st">&#39;r--&#39;</span>, label<span class="op">=</span><span class="st">u&quot;Test Set Doğrulugu&quot;</span>)
+plt.title(<span class="st">u&quot;Eğitim ve Test Doğruluğu&quot;</span>)
+plt.xlabel(<span class="st">&quot;Epoch&quot;</span>)
+plt.ylabel(<span class="st">u&quot;Doğruluk&quot;</span>)
+plt.ylim(<span class="fl">0.0</span>,<span class="fl">0.8</span>)
+plt.legend(loc<span class="op">=</span><span class="st">&#39;lower right&#39;</span>)
+plt.savefig(<span class="st">&#39;tf_05.png&#39;</span>)        </code></pre></div>
+<pre><code>Loss = 0.615425
+Loss = 0.593725
+Loss = 0.575125
+Loss = 0.664008
+Loss = 0.667132
+Loss = 0.617393
+Loss = 0.504238
+Loss = 0.447125
+Loss = 0.530287
+Loss = 0.528585</code></pre>
+<div class="figure">
+<img src="tf_04.png" />
+
+</div>
+<div class="figure">
+<img src="tf_05.png" />
+
+</div>
+<p>Çoklu Kategori Hedefi</p>
+<p>Çiçeklerin ölçümleri ve çiçek çeşitlerini içeren ünlü IRIS veri setinde 4 boyutlu sayısal veri ile 3 çiçek çeşidi arasında softmax ile seçim yapacak bir kodu görelim. Bu kodda tamamen tamamen bağlanmış katman (fully-connected layer) hesabını elle değil, TF çağrısı <code>tf.contrib.layers.fully_connected</code> ile yapıyoruz.</p>
+<p>İlk önce sadece tek tamamen bağlanmış katman içeren bir kod görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split
+<span class="im">from</span> sklearn <span class="im">import</span> preprocessing
+
+np.random.seed(<span class="dv">0</span>)
+tf.set_random_seed(<span class="dv">0</span>)
+
+cols <span class="op">=</span> [<span class="st">&quot;sepal_length&quot;</span>, <span class="st">&quot;sepal_width&quot;</span>, <span class="st">&quot;petal_length&quot;</span>, <span class="st">&quot;petal_width&quot;</span>, <span class="st">&quot;iris_class&quot;</span>]
+data <span class="op">=</span> pd.read_csv(<span class="st">&quot;iris.data&quot;</span>, sep<span class="op">=</span><span class="st">&quot;,&quot;</span>,names<span class="op">=</span>cols)
+data <span class="op">=</span> data.sample(frac<span class="op">=</span><span class="dv">1</span>,random_state<span class="op">=</span><span class="dv">0</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)
+all_x <span class="op">=</span> data[[<span class="st">&quot;sepal_length&quot;</span>, <span class="st">&quot;sepal_width&quot;</span>, <span class="st">&quot;petal_length&quot;</span>, <span class="st">&quot;petal_width&quot;</span>]]
+min_max_scaler <span class="op">=</span> preprocessing.MinMaxScaler()
+all_x <span class="op">=</span> min_max_scaler.fit_transform(all_x)
+all_y <span class="op">=</span> pd.get_dummies(data.iris_class)
+train_x, test_x, train_y, test_y <span class="op">=</span> train_test_split(all_x, all_y, test_size<span class="op">=</span><span class="fl">0.20</span>)
+
+<span class="bu">print</span>(train_x.shape)
+<span class="bu">print</span>(train_y.shape)
+<span class="bu">print</span>(test_x.shape)
+<span class="bu">print</span>(test_y.shape)
+
+tf.reset_default_graph()
+
+learning_rate <span class="op">=</span> <span class="fl">0.01</span>
+
+x <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, np.shape(train_x)[<span class="dv">1</span>]], name<span class="op">=</span><span class="st">&quot;x&quot;</span>)
+y <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, np.shape(train_y)[<span class="dv">1</span>]], name<span class="op">=</span><span class="st">&quot;y&quot;</span>)
+
+prediction <span class="op">=</span> tf.contrib.layers.fully_connected(inputs<span class="op">=</span>x,
+                                               num_outputs<span class="op">=</span>np.shape(train_y)[<span class="dv">1</span>], 
+                                               activation_fn<span class="op">=</span>tf.nn.softmax)
+
+cost <span class="op">=</span> tf.losses.softmax_cross_entropy(onehot_labels<span class="op">=</span>y,logits<span class="op">=</span>prediction)
+
+correct_prediction <span class="op">=</span> tf.equal(tf.argmax(prediction,<span class="dv">1</span>),tf.argmax(y, <span class="dv">1</span>))
+
+accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+
+optimizer <span class="op">=</span> tf.train.AdagradOptimizer(learning_rate).minimize(cost)
+
+sess <span class="op">=</span> tf.InteractiveSession()
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+sess.run(init)
+
+training_epochs <span class="op">=</span> <span class="dv">3000</span>
+<span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(training_epochs):
+    sess.run([optimizer, cost], feed_dict<span class="op">=</span>{x: train_x, y: train_y})
+
+<span class="bu">print</span>(<span class="st">&quot;Dogruluk:&quot;</span>, accuracy.<span class="bu">eval</span>({x: test_x, y: test_y}))    </code></pre></div>
+<pre><code>(120, 4)
+(120, 3)
+(30, 4)
+(30, 3)
+(&#39;Dogruluk:&#39;, 0.76666665)</code></pre>
+<p>Şimdi sırasıyla 10,20,10 olacak şekilde üç katmanlı bir YSA ile sınıflama yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">tf.reset_default_graph()
+
+learning_rate <span class="op">=</span> <span class="fl">0.01</span>
+
+x <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, np.shape(train_x)[<span class="dv">1</span>]], name<span class="op">=</span><span class="st">&quot;x&quot;</span>)
+y <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, np.shape(train_y)[<span class="dv">1</span>]], name<span class="op">=</span><span class="st">&quot;y&quot;</span>)
+
+h1 <span class="op">=</span> <span class="dv">10</span> <span class="co"># 1. gizli (hidden) katman</span>
+h2 <span class="op">=</span> <span class="dv">20</span> <span class="co"># 2. gizli katman</span>
+h3 <span class="op">=</span> <span class="dv">10</span> <span class="co"># 3. gizli katman</span>
+
+k1 <span class="op">=</span> tf.contrib.layers.fully_connected(inputs<span class="op">=</span>x,
+                                       num_outputs<span class="op">=</span>h1, 
+                                       activation_fn<span class="op">=</span>tf.nn.relu)
+
+k2 <span class="op">=</span> tf.contrib.layers.fully_connected(inputs<span class="op">=</span>k1,
+                                       num_outputs<span class="op">=</span>h2, 
+                                       activation_fn<span class="op">=</span>tf.nn.relu)
+
+k3 <span class="op">=</span> tf.contrib.layers.fully_connected(inputs<span class="op">=</span>k2,
+                                       num_outputs<span class="op">=</span>h3, 
+                                       activation_fn<span class="op">=</span>tf.nn.relu)
+
+prediction <span class="op">=</span> tf.contrib.layers.fully_connected(inputs<span class="op">=</span>k3,
+                                               num_outputs<span class="op">=</span>np.shape(train_y)[<span class="dv">1</span>], 
+                                               activation_fn<span class="op">=</span>tf.nn.softmax)
+
+cost <span class="op">=</span> tf.losses.softmax_cross_entropy(onehot_labels<span class="op">=</span>y,logits<span class="op">=</span>prediction)
+
+correct_prediction <span class="op">=</span> tf.equal(tf.argmax(prediction,<span class="dv">1</span>),tf.argmax(y, <span class="dv">1</span>))
+
+accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+
+optimizer <span class="op">=</span> tf.train.AdagradOptimizer(learning_rate).minimize(cost)
+
+sess <span class="op">=</span> tf.InteractiveSession()
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+sess.run(init)
+
+training_epochs <span class="op">=</span> <span class="dv">3000</span>
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(training_epochs):
+    sess.run([optimizer, cost], feed_dict<span class="op">=</span>{x: train_x, y: train_y})
+
+<span class="bu">print</span>(<span class="st">&quot;Dogruluk:&quot;</span>, accuracy.<span class="bu">eval</span>({x: test_x, y: test_y}))    </code></pre></div>
+<pre><code>(&#39;Dogruluk:&#39;, 0.96666664)</code></pre>
+<p>Notlar</p>
+<p>Vektorler, gradyanlar hakkinda birkac cabuk not,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+<span class="co"># y + 2x = 2x + x</span>
+x <span class="op">=</span> tf.constant(<span class="fl">0.</span>)
+y <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> x
+g1 <span class="op">=</span> tf.gradients(x <span class="op">+</span> y, [x, y])
+
+xvec <span class="op">=</span> tf.Variable([[<span class="fl">1.</span>], [<span class="fl">2.</span>],[<span class="fl">3.</span>]]) 
+yvec <span class="op">=</span> tf.Variable([[<span class="fl">3.</span>], [<span class="fl">4.</span>],[<span class="fl">5.</span>]]) 
+xvec <span class="op">=</span> xvec <span class="op">+</span> np.array([[<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]]).T
+zvec <span class="op">=</span> tf.matmul(tf.transpose(xvec),yvec)
+g2 <span class="op">=</span> tf.gradients(zvec, xvec)
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    sess.run(tf.global_variables_initializer())
+    <span class="bu">print</span> (sess.run(g1))
+    <span class="bu">print</span> (sess.run(xvec))
+    <span class="bu">print</span> (sess.run(yvec))
+    <span class="bu">print</span> (sess.run(zvec))
+    <span class="bu">print</span> (sess.run(g2))</code></pre></div>
+<pre><code>[3.0, 1.0]
+[[2.]
+ [3.]
+ [4.]]
+[[3.]
+ [4.]
+ [5.]]
+[[38.]]
+[array([[3.],
+       [4.],
+       [5.]], dtype=float32)]</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Géron, <em>Hands-On Machine Learning with Scikit-Learn and TensorFlow</em></p>
+<p>[2] Heidelberg U., <em>Risk Factors Associated with Low Infant Birth Weight</em>, <a href="http://www.statlab.uni-heidelberg.de/data/linmod/birthweight.html" class="uri">http://www.statlab.uni-heidelberg.de/data/linmod/birthweight.html</a></p>
+<p>[3] McClure, <em>TensorFlow Machine Learning Cookbook</em></p>
+<p>[4] Bayramlı, Bilgisayar Bilim, <em>Otomatik Türev Almak</em></p>
+<p>[5] Bayramlı, Tensorflow, <a href="https://burakbayramli.github.io/dersblog/sk/2022/10/tensorflow.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2022/10/tensorflow.html</a></p>
+</body>
+</html>

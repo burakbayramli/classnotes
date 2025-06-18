@@ -1,0 +1,414 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-1.2">Ders 1.2</h1>
+<p>Bir diferansiyel denklemle başlayıp çözebileceğimiz bir ayrıksal (discrete) probleme nasıl ulaşırız? İkinci türevi içeren basit bir diferansiyel denkleme bakalım</p>
+<p><span class="math display">\[ -\frac{d^2u}{dx^2} = f(x) \]</span></p>
+<p><span class="math display">\[ u(0) = 0, \ u(1) = 0 \]</span></p>
+<p>Eksi işareti var çünkü ikinci türevler negatif kesin (negative definite) şeylerdir ve eksi işareti bu durumu telafi etmek için, onu pozitif kesin hale çevirmek için konuldu. Ayrıca dikkat edersek sınır (boundary) şartları var, her iki uçta da fonksiyona sıfır değeri vermişiz, her iki uçta da onu &quot;sabitlemişiz''. Dikkat edelim, bu başlangıç değer probleminden farklı, <span class="math inline">\(u\)</span>, <span class="math inline">\(x\)</span>'in bir fonksiyonu, <span class="math inline">\(t\)</span> yani zamanın değil. Diyelim ki bu problem iki tarafı sabitlenmiş bir elastik çubuğu temsil ediyor, <span class="math inline">\(f(x)\)</span> çubuk üzerindeki her <span class="math inline">\(x\)</span> noktasındaki yükü gösteriyor. Bu derste <span class="math inline">\(f(x) = 1\)</span> alacağız, yani</p>
+<p><span class="math display">\[ -\frac{d^2u}{dx^2} = 1 \]</span></p>
+<p>Amacımız bir diferansiyel denklem alıp, onu ayrıksal olarak temsil edebilmek, yani şöyle</p>
+<p><span class="math display">\[ \frac{-u_{i+1}+2u_i - u_{i-1}}{(\Delta x)^2} = f(x_i)\]</span></p>
+<p>Bu denklem ikinci farklılıkları (second difference) gösteriyor.</p>
+<p>Diferansiyelden (differential) farklılıklara (differences) geçişin birkaç yöntemi olabilir.</p>
+<p>Birinci Farklılıklar (İleri Doğru)</p>
+<p><span class="math display">\[ \Delta_Fu = \frac{u(x+h)-u(x)}{h} \]</span></p>
+<p>Ayrıksal: <span class="math inline">\((u_{i+1} - u_{i}) / h\)</span></p>
+<p>Birinci Farklılıklar (Geriye Doğru)</p>
+<p><span class="math display">\[ \Delta_Bu = \frac{u(x)-u(x-h)}{h} \]</span></p>
+<p>Ayrıksal: <span class="math inline">\((u_{i-1} - u_{i}) / h\)</span></p>
+<p>Birinci Farklılıklar (Ortalanmış)</p>
+<p><span class="math display">\[ \Delta_Cu = \frac{u(x+h)-u(x-h)}{2h} \]</span></p>
+<p>Ayrıksal: <span class="math inline">\((u_{i+1} - u_{i-1}) / h\)</span></p>
+<p>Bunlar Calculus'tan hatırlanabilecek şeyler, fakat burada <span class="math inline">\(h\)</span> limitte sıfıra doğru gitmiyor. Hesapsal dünyada <span class="math inline">\(h\)</span> bizim belirlediğimiz bir mesafe, belki <span class="math inline">\(1\)</span>, belki <span class="math inline">\(0.1\)</span>. O kadar bir hesapsal adım atmayı biz seçiyoruz, her şey ayrıksal.</p>
+<p>Ayrıca Calculus'ta hep <span class="math inline">\(\Delta_F u\)</span> gösterilir ve yaklaşıksal olarak türeve eşittir yani <span class="math inline">\(u&#39;(x)\)</span>. Geriye adım da vardır, hesapsal olarak ileri adım kadar iyidir, ve o da aşağı yukarı türeve eşittir. Çok önemli bir farklılık hesabı ise ortalanmış (centered) olandır, bu hesap ileri ve geri farklılıkların ortalamasıdır, aynı şekilde aşağı yukarı türeve eşittir.</p>
+<p>Baştaki denklemimize birinci türevi dahil etmedik, çünkü birinci türevler anti-simetriktir.</p>
+<p>Birinci farklılıklar yöntemine dönelim, türeve ne kadar yakındırlar?</p>
+<p>Birinci Farklılıklar (İleri Doğru)</p>
+<p><span class="math display">\[ \Delta_Fu  \approx u&#39;(x) + O(h) \]</span></p>
+<p>Birinci Farklılıklar (Geriye Doğru)</p>
+<p><span class="math display">\[ \Delta_Bu \approx u&#39;(x) + O(h)\]</span></p>
+<p>Birinci Farklılıklar (Ortalanmış)</p>
+<p><span class="math display">\[ \Delta_Cu  \approx u&#39;(x) + O(h^2)\]</span></p>
+<p><span class="math inline">\(O(h)\)</span> <span class="math inline">\(h\)</span>'ye oranlı (order of <span class="math inline">\(h\)</span>) anlamına gelir, gerçek değerden &quot;kesilip atılmış fark'' olduğunu farz edelim. Ortalama için niye <span class="math inline">\(O(h^2)\)</span>? Hesabı yapalım. Taylor serilerinin ne olduğunu hatırlayalım ve <span class="math inline">\(u(x+h)\)</span> açılımıni yapalım. Dikkat, ayrıksal formla değil, sürekli fonksiyonla çalışıyoruz, sürekli fonksiyon üzerinde &quot;ayrıksal bir adım'' atılınca ne olacağını bulmaya çalışıyoruz, bu şekilde sürekli formatta, cebirsel bir kural elde etmeye uğraşıyoruz.</p>
+<p><span class="math display">\[ u(x+h) = u(x)+hu&#39;(x)+\frac{h^2}{2}u&#39;&#39;(x) + \frac{h^3}{6}u&#39;&#39;&#39;(x) ...\]</span></p>
+<p>Taylor açılımlarında ve hesapsal bilimde ikinci seviye kesinlik (accuracy) çoğunlukla yeterli oluyor. Hesapsal kodları geliştirirken, test ederken tipik olarak birinci seviyede başlanır, ve nihai ürün, sonuç ortamı (production) için 2. seviye eklenir. Devam edelim, geriye doğru:</p>
+<p><span class="math display">\[ u(x-h) = u(x)-hu&#39;(x)+\frac{h^2}{2}u&#39;&#39;(x) - \frac{h^3}{6}u&#39;&#39;&#39;(x) + ...\]</span></p>
+<p>Ortalanmış farklılık için iki formülü birbirinden çıkartırız, ve <span class="math inline">\(2h\)</span>'ye böleriz.</p>
+<p><span class="math display">\[ u(x+h)-u(x-h) = 2hu&#39;(x) + \frac{h^3}{3}u&#39;&#39;&#39;\]</span></p>
+<p>İki tarafı <span class="math inline">\(2h\)</span>'ye bölelim</p>
+<p><span class="math display">\[ \frac{u(x+h)-u(x-h)}{2h} = u&#39;(x) + \frac{h^2}{6}u&#39;&#39;&#39;\]</span></p>
+<p>Görüyoruz ki ortalama farklılık doğru türevi <span class="math inline">\(u&#39;\)</span> eşitliğin sağında veriyor, ve <span class="math inline">\(h^2\)</span> terimine bakarak yaklaşıklığın, hatanın ikinci seviyede olduğunu anlıyoruz.</p>
+<p>Türevlerin yerine farklılık geçirirken seçenekler bunlar. Elimizde 3 seçenek var, ve çoğunlukla ortalanmış olan en iyisidir.</p>
+<p>Şimdi ikinci farklılıklara gelelim: İkinci türev nedir? Türevin türevidir. İkinci farklılık nedir? Farkların farkıdır.</p>
+<p>Nasıl hesaplanır? <span class="math inline">\(\Delta_F \Delta_B\)</span> yapabiliriz. Ya da <span class="math inline">\(\Delta_B \Delta_F\)</span>. Birisi cikip <span class="math inline">\(\Delta_C \Delta_C\)</span> diyebilir. Hangisi? Hoca <span class="math inline">\(\Delta_C \Delta_C\)</span>'yi sevmiyor çünkü elimize [1 0 -2 0 1] gibi bir farklılık vektörü geçiyor, fazla &quot;dağılıyoruz''. <span class="math inline">\(\Delta_F \Delta_B\)</span>, ve <span class="math inline">\(\Delta_B \Delta_F\)</span> daha iyi çünkü ikisi de [1 -2 1] kullanır. Onlar daha 'odaklı''.</p>
+<p>İkincil farklılıklar (second differences) formülünü de türetelim. Bu formül ileri doğru bir adım attıktan sonraki fark ile geri doğru adım attıktan sonraki farkın farkı. Yani</p>
+<p><span class="math display">\[ \frac{1}{h} 
+\bigg[
+\bigg(\frac{u_{i+1}-u_{i}}{h}\bigg) -
+\bigg(\frac{u_{i}-u_{i-1}}{h}\bigg) 
+\bigg]
+ \]</span></p>
+<p><span class="math display">\[ = \frac{1}{h} 
+\bigg[
+\frac{u_{i+1} - 2u_{i}+u_{i-1}}{h}
+\bigg]
+ \]</span></p>
+<p><span class="math display">\[ = \frac{u_{i+1} - 2u_{i}+u_{i-1}}{h^2} \]</span></p>
+<p>İkinci seviye diferansiyel denklem çözüme dönelim.</p>
+<p><span class="math display">\[ -\frac{d^2u}{dx^2} = 1 \]</span></p>
+<p>denkleminin genel çözümü ne olabilir? Özel (particular) çözüm ikinci türevi 1 olan ve negatifi alınan şey nedir sorusunun cevabından bulunabilir, iki kere entegre edilerek</p>
+<p><span class="math display">\[ -\frac{1}{2}x^2 \]</span></p>
+<p>buna ikinci türevi sıfır olan iki tane daha çözüm eklemek istiyorum, çünkü elimizde ikinci dereceden bir diferansiyel denklem var.</p>
+<p><span class="math display">\[ u(x) = -\frac{1}{2}x^2 + Dx + C\]</span></p>
+<p>Bu ek iki sabiti nasıl kullanacağım? Onları elimdeki iki tane sınır şartını tatmin etmek için kullanacağım. Bunu yapmak zor değil, birinci şartı formüle koyarım, sabitler için bir formül elde ederim, ikinci şartı koyarım, ikinci bir formül elde ederim, iki sabit, iki formül, böylece sonuç gelir.</p>
+<p><span class="math inline">\(u(0)\)</span> ise <span class="math inline">\(C = 0\)</span>, <span class="math inline">\(u(1)\)</span> için <span class="math inline">\(D=1/2\)</span>.</p>
+<p><span class="math display">\[ u(x) = -\frac{1}{2}x^2  + \frac{1}{2} x\]</span></p>
+<p>Şimdi ana diferansiyel denklem</p>
+<p><span class="math display">\[ -\frac{d^2u}{dx^2} = 1 \]</span></p>
+<p>ve onun ayrıksal formu</p>
+<p><span class="math display">\[ \frac{-u_{i+1}+2u_i - u_{i-1}}{(\Delta x)^2} = f(x_i)\]</span></p>
+<p>nasıl matris formatında göstereceğimize gelelim. <span class="math inline">\(u_i\)</span>, <span class="math inline">\(u_{i+1}\)</span> gibi değerlerin birbirinden çıkartılması, vs gibi işlemler gerekiyor. Altta böyle bir işlemi matris üzerinden yapmanın yolunu görüyoruz.</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rrrr}
+\ddots &amp;&amp;&amp; \\
+-1 &amp; 0 &amp; 1 &amp; \\
+ &amp; -1 &amp; 0 &amp; 1 \\
+&amp;&amp;&amp; \ddots 
+\end{array}\right]
+\left[\begin{array}{l}
+u_{i-1} \\
+u_{i} \\
+u_{i+1} \\
+u_{i+2} 
+\end{array}\right]
+=
+\left[\begin{array}{c}
+\vdots \\
+u_{i+1}-u_{i-1} \\
+u_{i+2}-u_i \\
+\vdots
+\end{array}\right]
+ \]</span></p>
+<p>Soldaki matris <span class="math inline">\(\left[\begin{array}{ccc} -1 &amp; 0 &amp; 1\end{array}\right]\)</span> yerine ikinci farklılıklar için <span class="math inline">\(\left[\begin{array}{ccc} -1 &amp; 2 &amp; 1\end{array}\right]\)</span> de kullanabilir, o zaman ikinci farklılık hesabını yapmış oluruz. Yani şöyle</p>
+<p><span class="math display">\[ 
+\frac{1}{h^2} \left[\begin{array}{rrrrr} 2 &amp; -1 &amp; &amp; &amp; \\ -1 &amp; 2 &amp; -1 &amp; &amp; \\ &amp; -1
+    &amp; 2 &amp; -1 &amp; \\ &amp; &amp; -1 &amp; 2 &amp; -1 \\ &amp; &amp; &amp; -1 &amp; 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_1 \\
+u_2 \\
+u_3 \\
+u_4 \\
+u_5 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1 \\
+1 \\
+1 \\
+1 \\
+1 
+\end{array}\right]
+ \]</span></p>
+<p>Bu <span class="math inline">\(KU = F\)</span> denkleminin matris formudur. Diferansiyel denklem çözmek demek <span class="math inline">\(u\)</span> fonksiyonunu bulmak demektir, o zaman yukarıdaki bilinmeyen <span class="math inline">\(u_1,u_2,..\)</span> değerlerinin hesaplamamız gerekiyor. Onlar &quot;ayrıksal'' <span class="math inline">\(u\)</span> fonksiyonunun her veri noktasındaki değerlerini temsil ediyor olacaklar.</p>
+<p>Bu çözüm perde arkasında Python tarafından nasıl hesaplanacak? Yoketme (eliminasyon) tekniği ile.</p>
+<p><span class="math inline">\(h^2\)</span>, ayrıksal formüldeki <span class="math inline">\(\Delta x^2\)</span>, nedir? <span class="math inline">\(u\)</span>'yu kaç parçaya ve hangi değerler arasında bolduğumüze bakalım: 0 ve 1 arasında ve 6 parçaya bölüyoruz, o zaman <span class="math inline">\(h=1/6\)</span>, <span class="math inline">\(h^2=1/36\)</span>, yani <span class="math inline">\(1/h^2 = 36\)</span>, yani üstteki imajda <span class="math inline">\(h^2\)</span>'yi en solda çarpan 36 olarak yazabiliriz. Sonra <span class="math inline">\(u\)</span>'yu hesaplatırız.</p>
+<div class="figure">
+<img src="2_6.png" />
+
+</div>
+<p><span class="math inline">\(K\)</span> matrisinin 5x5 olması karışıklık yaratmış olabilir. Burada sebep K matrisine <span class="math inline">\(u_0\)</span> ve <span class="math inline">\(u_6\)</span>'nin dahil edilmemiş olması, çünkü o değerleri zaten biliyoruz. Bu değerler olsaydı <span class="math inline">\(K\)</span> matrisinin sol ve sağına tamamen sıfır içeren iki kolon gerekecekti, <span class="math inline">\(u\)</span> vektörüne alttan ve üstten <span class="math inline">\(u_0\)</span> ve <span class="math inline">\(u_6\)</span> eklenecekti ve bu iki değer sıfır olduğu için <span class="math inline">\(K\)</span>'nin sol ve sağındaki sıfırlar ile çarpılacaklardı, bu yüzden mevcut toplam üzerinde hiç etkileri olmayacaktı . Bu sebeple bu iki kolonu ve <span class="math inline">\(u\)</span> değerini tamamen kaldırmak sonuç üzerine hiçbir etki yapmıyor.</p>
+<p>Devam edelim. Şimdi orijinal problemi değiştirelim. Eğer üstteki problem iki ucu sabitlenmiş kendi ağırlığıyla asılan bir elastik çubuğu gösteriyorsa (ve <span class="math inline">\(u\)</span> değerleri çubuğun ne kadar uzadığını temsil ediyorsa), bu sefer üstteki ucu serbest bırakabiliriz. Yani <span class="math inline">\(u(0)=0\)</span> olmayacak.</p>
+<p>Yine birörnek (uniform) çubuk, eşit dağılmış yük.</p>
+<p><span class="math display">\[ -\frac{d^2u}{dx^2} = 1 \]</span></p>
+<p><span class="math display">\[ \frac{du}{dx}(0) = 0, \ u(1) = 0 \]</span></p>
+<p>Burada ilk şart <span class="math inline">\(u\)</span>'nin eğiminin (slope) sıfıra eşitlenmiş olması.</p>
+<p>Önceki denklemdeki genel çözüm hala ise yarar.</p>
+<p><span class="math display">\[ u(x) = -\frac{1}{2}x^2 + Cx + D\]</span></p>
+<p><span class="math display">\[ \frac{du}{dx} = -x + C \]</span></p>
+<p><span class="math display">\[ \frac{du}{dx}(0) = 0 + C = 0 \]</span></p>
+<p><span class="math display">\[ C = 0 \]</span></p>
+<p><span class="math display">\[ u(1) = 0 = -1/2 + 0 + D  \]</span></p>
+<p><span class="math display">\[ D = 1/2  \]</span></p>
+<p>O zaman çözüm</p>
+<p><span class="math display">\[ u(x) = -\frac{1}{2}x^2  + 1/2\]</span></p>
+<p>Grafikleyince şuna benzer</p>
+<div class="figure">
+<img src="2_4.png" />
+
+</div>
+<p>Eğimin sıfır noktasında sıfır olduğunu görüyoruz.</p>
+<p>Şimdi farklılıklar formülüne gelelim. Diferansiyel denklemin karşılığı olan farklılık formülü nedir? Hala aynı:</p>
+<p><span class="math display">\[ \frac{-u_{i+1}+2u_i - u_{i-1}}{h^2} = f(x_i)\]</span></p>
+<p>Şimdi önemli noktaya geldik: başlangıç şartları ne olacak? <span class="math inline">\(u(1)=0\)</span> kolay, $ du/dx(0) = 0$ nasıl temsil edilecek? Bir fikir şu olabilir.</p>
+<p><span class="math display">\[ \frac{u_1-u_0}{h} = 0 \]</span></p>
+<p>Bu ifadeyi matrise nasıl tercüme ederiz? Üstteki ifade aynı zamanda <span class="math inline">\(u_1 - u_0 = 0\)</span> demektir, yer degistirince <span class="math inline">\(u_1 = u_0\)</span>. <span class="math inline">\(K\)</span> matrisinin birinci satırı nedir?</p>
+<p><span class="math display">\[ -u_0 + 2u_1 - u_2 \]</span></p>
+<p><span class="math inline">\(u_0\)</span> yerine <span class="math inline">\(u_1\)</span> koyalım</p>
+<p><span class="math display">\[ = -u_1 + 2u_1 - u_2 \]</span></p>
+<p><span class="math display">\[ = u_1 - u_2 \]</span></p>
+<p>O zaman birinci satırı üstteki gibi değiştirirsek, sınır şartlarından birini yerine getirmiş oluruz, yani ilk satıra <span class="math inline">\(\left[\begin{array}{cc} 1&amp;-1\end{array}\right]\)</span> koyacağız, orada <span class="math inline">\(\left[\begin{array}{cc} 2&amp;-1\end{array}\right]\)</span> yerine <span class="math inline">\(\left[\begin{array}{cc} 1&amp;-1\end{array}\right]\)</span> var artık. Matris bu şekilde değişince ona <span class="math inline">\(K\)</span> yerine <span class="math inline">\(T\)</span> matrisi deniyor. <span class="math inline">\(TU = \left[\begin{array}{ccc} 1&amp;1&amp;\dots\end{array}\right]^T\)</span>.</p>
+<p><span class="math display">\[ 
+\frac{1}{h^2}
+\left[\begin{array}{rrrrr}
+1 &amp; -1 &amp; &amp; &amp; \\
+-1 &amp; 2 &amp; -1 &amp; &amp; \\
+&amp; -1 &amp; 2 &amp; -1 &amp; \\
+&amp; &amp; -1 &amp; 2 &amp; -1 \\
+&amp; &amp; &amp; -1 &amp; 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_1 \\
+u_2 \\
+u_3 \\
+u_4 \\
+u_5 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1 \\
+1 \\
+1 \\
+1 \\
+1 
+\end{array}\right]
+ \]</span></p>
+<p>Soru: ayrıksal çözüm gerçek çözüme ne kadar yakın? Cevap hata payı <span class="math inline">\(O(h)\)</span> çünkü <span class="math inline">\((u_1 - u_0) / h\)</span> tanımı birinci dereceden bir yaklaşıksallık (approximation). Kabaca çizince şöyle gözükür:</p>
+<div class="figure">
+<img src="2_7.png" />
+
+</div>
+<p>Hesap kalitesi pek iyi denemez. Çözümü ikinci dereceden yapsak daha iyi olacaktı. Nasıl? <span class="math inline">\((u_1 - u_0) / h\)</span> yerine başka bir şey kullanmamız lazım. Ortalanmış farklılığı hatırlayalım, bu yöntem ikinci derece doğruluğu olan bir yöntemdir,</p>
+<p>Problem 1.2 A</p>
+<p>Kitaptaki ufak problemi hatırlayalım</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rrr}
+1 &amp; -1 &amp; \\
+-1 &amp; 2 &amp; -1 \\
+&amp; -1 &amp; 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_1 \\
+u_2 \\
+u_3 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1 \\
+1 \\
+1 
+\end{array}\right]
+ \]</span></p>
+<p>Bu problem işte <span class="math inline">\(O(h)\)</span> hatasını azaltma konusunu işliyor, bunun için ortalama farklılık (centered difference) kullanılacak, <span class="math inline">\((u_1 - u_o)/h\)</span> yerine 0'inci değere denk gelecek şekilde farklılığı ortalayacağız, 0 üzerinde ortalama yapmamız için onun bir gerisine ve bir ilerisine gitmek lazım, o zaman önce <span class="math inline">\(K\)</span> matrisini bir genişletelim, çünkü artık <span class="math inline">\(u_0\)</span>'in dahil edilmesi gerekecek ve hayali bir <span class="math inline">\(u_{-1}\)</span>'i düşünelim, <span class="math inline">\(u&#39;(0) = 0\)</span> için</p>
+<p><span class="math display">\[ \frac{u_1-u_{-1}}{2h} = 0\]</span></p>
+<p>tanımını kullanalım. O zaman</p>
+<p><span class="math display">\[ u_1 - u_{-1} = 0\]</span></p>
+<p><span class="math display">\[ u_1 =  u_{-1} \]</span></p>
+<p><span class="math display">\[ -u_{-1} + 2u_0 - u_1 = h^2 f(0) \]</span></p>
+<p><span class="math inline">\(u_1 = u_{-1}\)</span> ifadesini yerine koyalım</p>
+<p><span class="math display">\[ -u_1 + 2u_0 - u_1 = h^2 f(0) \]</span></p>
+<p><span class="math display">\[ -2u_1 + 2u_0 = h^2 f(0) \]</span></p>
+<p><span class="math display">\[ -u_1 + u_0 = \frac{1}{2} h^2 f(0) \]</span></p>
+<p>O zaman matrisin üst sol değeri <span class="math inline">\(u_0\)</span> katsayısına göre 1, onun sağındaki değer <span class="math inline">\(u_1\)</span> katsayısına göre -1 olmalı. <span class="math inline">\(1/2\)</span> değerini de eşitliğin sağındaki <span class="math inline">\(f\)</span> için kullandığımıza dikkat. Tüm bunları <span class="math inline">\(u_{-1}\)</span>'in yerine değer geçirerek elde ettiğimiz için o kolona artık ihtiyaç kalmadı, o geçici kolon, matristen atıldı.</p>
+<p><span class="math display">\[ \frac{1}{h^2}
+\left[\begin{array}{rrrr}
+1 &amp; -1 &amp; &amp; \\
+-1 &amp; 2 &amp; -1 &amp; \\
+&amp; -1 &amp; 2 &amp; -1 \\
+ &amp; &amp; -1 &amp; 2
+\end{array}\right]
+\left[\begin{array}{r}
+u_0 \\
+u_1 \\
+u_2 \\
+u_3 
+\end{array}\right] 
+=
+\left[\begin{array}{r}
+1/2 \\
+1 \\
+1 \\
+1 
+\end{array}\right]
+ \]</span></p>
+<p>Matris boyutlarının nasıl büyüdüğüne, ve <span class="math inline">\(u_0\)</span>'in dahil edilmesine dikkat edelim. Problemin başındaki matris 3x3 boyutundaydı, bu 4x4 boyutunda, ayrıca <span class="math inline">\(h\)</span> hala <span class="math inline">\(1/4\)</span> değerinde.</p>
+<p>Problem 1-2-A</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+<span class="kw">def</span> ktbc(n):
+    vec <span class="op">=</span> np.zeros((<span class="dv">1</span>,n))
+    vec[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">2</span>
+    vec[<span class="dv">0</span>,<span class="dv">1</span>] <span class="op">=</span> <span class="dv">-1</span>
+    K <span class="op">=</span> lin.toeplitz(vec)
+    T <span class="op">=</span> np.copy(K)
+    T[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span>
+    B <span class="op">=</span> np.copy(K)
+    B[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span>
+    B[n<span class="dv">-1</span>,n<span class="dv">-1</span>] <span class="op">=</span> <span class="dv">1</span>
+    C <span class="op">=</span> np.copy(K)
+    C[n<span class="dv">-1</span>,n<span class="dv">-1</span>] <span class="op">=</span> <span class="dv">1</span>
+    
+    <span class="cf">return</span> K, T, B, C
+
+K,T,B,C <span class="op">=</span> ktbc(<span class="dv">3</span>)<span class="op">;</span> <span class="bu">print</span> T
+
+h <span class="op">=</span> <span class="fl">1.</span><span class="op">/</span><span class="fl">4.</span>
+
+discrete <span class="op">=</span> lin.solve( (<span class="fl">1.</span><span class="op">/</span>h)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> T, [<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>] )
+
+discrete <span class="op">=</span> np.insert(discrete, <span class="dv">0</span>, discrete[<span class="dv">0</span>]) 
+discrete <span class="op">=</span> np.append(discrete, <span class="fl">0.</span>) 
+
+K,T,B,C <span class="op">=</span> ktbc(<span class="dv">4</span>)<span class="op">;</span> <span class="bu">print</span> T
+
+discrete_2 <span class="op">=</span> lin.solve( (<span class="fl">1.</span><span class="op">/</span>h<span class="op">**</span><span class="dv">2</span>)<span class="op">*</span>T, [<span class="fl">1.</span><span class="op">/</span><span class="fl">2.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>] )
+<span class="co"># add little diff for plotting</span>
+<span class="co"># grafik ust uste binmesin diye azicik fark ekledik</span>
+discrete_2 <span class="op">=</span> discrete_2 <span class="op">+</span> <span class="fl">0.01</span> 
+discrete_2 <span class="op">=</span> np.append(discrete_2, <span class="fl">0.</span>) 
+
+<span class="kw">def</span> u(x): <span class="cf">return</span> (<span class="fl">1.</span><span class="op">/</span><span class="fl">2.</span>)<span class="op">*</span>(<span class="fl">1.</span> <span class="op">-</span> x<span class="op">**</span><span class="dv">2</span>)
+
+p1 <span class="op">=</span> plt.plot([u(<span class="fl">0.0</span>), u(<span class="fl">0.25</span>), u(<span class="fl">0.5</span>), u(<span class="fl">0.75</span>), u(<span class="fl">1.</span>)])
+
+p2 <span class="op">=</span> plt.plot(discrete)
+
+p3 <span class="op">=</span> plt.plot(discrete_2)
+
+plt.legend([p1,p2,p3], [<span class="st">&quot;analytical solution (analitik cozum)&quot;</span>,
+                        <span class="st">&quot;discrete solution 1 (ayriksal cozum 1)&quot;</span>,
+                        <span class="st">&quot;discrete solution 2 (ayriksal cozum 2)&quot;</span>
+                        ])
+
+plt.savefig(<span class="st">&#39;1-2-A.png&#39;</span>)</code></pre></div>
+<pre><code>[[ 1. -1.  0.]
+ [-1.  2. -1.]
+ [ 0. -1.  2.]]
+[[ 1. -1.  0.  0.]
+ [-1.  2. -1.  0.]
+ [ 0. -1.  2. -1.]
+ [ 0.  0. -1.  2.]]</code></pre>
+<div class="figure">
+<img src="1-2-A.png" />
+
+</div>
+<p>Güzel. Artık hesap gerçek sonuca iyice yaklaşacak.</p>
+<p>[Derse dönelim] Bunlardan bahsetmemizin önemli bir sebebi sınır şartlarının ne kadar önemli olduğunu anlatmak. Görüldüğü gibi sınır şartları, onların yaklaşıksallanma yöntemleri sonucun üzerinde direk bir etki yaratıyor.</p>
+<p>Bir dipnot olarak bahsedelim, burada kullandığımız metot sınırlı farklılıklar (finite differences) metodu. Eğer sınırlı elementler (finite elements) metodu kullanıyor olsaydık, üstteki satırın değişmesi otomatik olarak gerçekleşecekti. Sınırlı elementler metotu ileriki derslerin birinde işlenecek.</p>
+<p>Soru 1.2.7</p>
+<p><span class="math inline">\(u\)</span>'dan alınacak dört veri noktasıyla (sample) <span class="math inline">\(du/dx\)</span> ortada olmak üzere 4. seviye kesinlik elde edilebilir.</p>
+<p><span class="math display">\[
+\frac{-u_2 + 8u_1 - 8u_{-1} + u_{-2}}{12h} = \frac{du}{dx} + bh^4
+\frac{d^5}{dx^5} + ..
+\]</span></p>
+<ol style="list-style-type: decimal">
+<li><p>Bunun <span class="math inline">\(u=1\)</span>, <span class="math inline">\(u=x^2\)</span> ve <span class="math inline">\(u=x^4\)</span> için doğru olduğunu kontrol edin.</p></li>
+<li><p><span class="math inline">\(u_2,u_1,u_{-1},u_{-2}\)</span>'yi genişletin. Elde edilen dört Taylor serisini birleştirerek <span class="math inline">\(h^4\)</span> için gelecek <span class="math inline">\(b\)</span> katsayısını hesaplayın.</p></li>
+</ol>
+<p>Cevap</p>
+<p>Eşitliğin sol tarafındaki 1, 8 gibi katsayılar modelleyici tarafından seçilmiş, bir teorinin, ispatın sonucu değil. Hala birincil farklılık (first differences) dünyasındayız, ama ileri, geriye gidip katsayı 1 kullanmak yerine dört noktayı kullanmak istemiş, ve ortadaki noktalara daha fazla &quot;ağırlık'' vermek istemişiz. Tabii bu katsayılarla bu noktalar kullanılınca, ortalamanın düzelmesi için katsayıların bölüme yansıması gerekiyor, o yüzden bölümde <span class="math inline">\(12h\)</span> görüyoruz.</p>
+<p>Ve aynen ileri, geriye doğru ayrıksal formu sürekli fonksiyonlar üzerinde Taylor serisiyle temsil edebildiğimiz gibi, üstteki eşitliğin sol tarafını da Taylor serisi ile <span class="math inline">\(u(x+h)\)</span> türü terimler üzerinden temsil edebiliriz. Üstte <span class="math inline">\(u_{2}\)</span>, <span class="math inline">\(u_{-1}\)</span> gibi ibareler var, bunların Taylor karşılığı <span class="math inline">\(u(x+2h)\)</span>, <span class="math inline">\(u(x-h)\)</span> gibi ifadeler olur. Katsayı çarpımlarının ve <span class="math inline">\(12h\)</span>'ye bölüm işleminin Taylor serisi üzerinde de aynen kullanılması gerekiyor tabii ki.</p>
+<p>Bu arada <span class="math inline">\(b\)</span> sabitinin ne olduğunu soru söylemiyor, ama tüm bu cebirsel işlemi gerçekleştirince denklemdeki eşitliğin sağ tarafı aynen elde edilecek ve böylece <span class="math inline">\(b\)</span> yerine hangi sayı geleceği de ortaya çıkacak.</p>
+<p><span class="math display">\[ \frac{-u_2 + 8u_{-1} + u_{-2}}{12h} = \frac{du}{dx} + bh^4 \frac{d^5u}{dx^5}+..\]</span></p>
+<p><span class="math inline">\(u(x) = 1\)</span> için</p>
+<p><span class="math display">\[ \frac{du}{dx} = \frac{-1 + 8 -8 + 1}{12h}  = 0\]</span></p>
+<p><span class="math inline">\(u(x)=x^2\)</span> için</p>
+<p><span class="math display">\[ \frac{du}{dx} = \frac{0(x+2h)^2 + 8(x+h)^2 - 8(x-h)^2 + (x-2h)^2}{12h}\]</span></p>
+<p><span class="math display">\[ \frac{(x-2h)^2 - (x+2h)^2 + 8\{ (x_h)^2 - (x-h)^2\}}{12h} \]</span></p>
+<p><span class="math display">\[ \frac{
+  (x-\cancel{2h} + x + \cancel{2h})
+  (\cancel{x}-2h-\cancel{x}-2h) +
+  8(x + \cancel{h} + x - \cancel{h})
+  (\cancel{x} + h - x + \cancel{h})}
+{12h}
+\]</span></p>
+<p><span class="math display">\[ \frac{-4h(2x) + 8(2x)(2h)}{12h} \]</span></p>
+<p><span class="math display">\[ 2x \]</span></p>
+<p><span class="math inline">\(u(x) = x^4\)</span> için</p>
+<p><span class="math display">\[ \frac{du}{dx} = \frac{(x-2h)^4 - (x+2h)^4 + 8\{ (x+h)^4 - (x-h)^4\}}{12h} \]</span></p>
+<p><span class="math display">\[ =
+\bigg\{
+    [ (x-2h)^2 + (x+2h)^2 ] [ (x-2h)^2 - (x+2h)^2] +
+    8\{ [ (x+h)^2 + (x-h)^2 \ [(x+h)^2 - (x-h)]  \}
+\bigg\} / 12h
+\]</span></p>
+<p><span class="math display">\[ = \frac{1}{12h} \bigg\{
+-8hx [(x-2h)^2 + (x+2h)^2] + 8(4hx)[(x+h)^2 + (x-h)^2]
+\bigg\}
+\]</span></p>
+<p><span class="math display">\[ = \frac{1}{12h} \bigg\{
+-8hx[x^2 - \cancel{4hx} + 4h^2 + x^2 + \cancel{4xh} + 4h^2 ] +
+8(4hx)[x^2 + \cancel{2xh} + h^2 + x^2 - \cancel{2xh} + h^2]
+\bigg\}
+\]</span></p>
+<p><span class="math display">\[ = \frac{1}{12h} \bigg\{\
+-8hx [2x^2 + 8h^2] + 8(4xh)[2x^2+ 2h^2]
+\bigg\}
+\]</span></p>
+<p><span class="math display">\[ = \frac{8hx}{12h} \bigg\{ 2x^2 + \cancel{8h^2} - 8x^2 - \cancel{8h^2} \bigg\}\]</span></p>
+<p><span class="math display">\[ = 4x^3 \]</span></p>
+<p><span class="math display">\[ u(x+h) = u(x) + hu&#39;(x) + \frac{1}{2}h^2u&#39;&#39;(x) + \frac{1}{6}h^3u&#39;&#39;&#39;(x)+
+\frac{1}{24}h^4u&#39;&#39;&#39;&#39;(x) + \frac{1}{120}h^5u^{(5)} (x) + ...
+\]</span></p>
+<p><span class="math display">\[ u(x-h) = u(x) - hu&#39;(x) + \frac{1}{2}h^2u&#39;&#39;(x) - \frac{1}{6}h^3 u&#39;&#39;&#39;(x) +
+\frac{1}{24}h^4u&#39;&#39;&#39;&#39;(x) - \frac{1}{120}h^5u^{(5)}(x) + ...
+\]</span></p>
+<p><span class="math display">\[ u(x+2h) = u(x) + 2hu&#39;(x) + \frac{1}{2}(2h)^2u&#39;&#39;(x) + \frac{1}{6}(2h)^3u&#39;&#39;&#39;(x)+
+\frac{1}{24}(2h)^4 u^{(4)} (x) + \frac{1}{120} (2h)^5 u^{(5)} (x) + ...
+\]</span></p>
+<p><span class="math display">\[ u(x-2h) = u(x) - 2hu&#39;(x) + \frac{1}{2}(2h)^2u&#39;&#39;(x) -\frac{1}{6}(2h)^3u&#39;&#39;&#39;(x)+
+\frac{1}{24}(2h)^4 u^{(4)} (x) - \frac{1}{120} (2h)^5 u^{(5)} (x) + ...
+\]</span></p>
+<p><span class="math display">\[ \frac{-u_2 + 8u_1 - 8_{u-1} + u_{-2}}{12h} \]</span></p>
+</body>
+</html>

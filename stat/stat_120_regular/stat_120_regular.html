@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="regresyon-ridge-lasso-çapraz-sağlama-regülarize-etmek">Regresyon, Ridge, Lasso, Çapraz Sağlama, Regülarize Etmek</h1>
+<p>Konumuz regresyon çeşitleri, ve örnek veri olarak diyabet hastalığı olan kişilerden alınmış bazı temel verilerle hastalığın bir sene sonraki ilerleme miktarı kullanılacak. Regresyon sayesinde temel veriler ile hastalığın ilerlemesi arasında bir bağlantı bulunabilir, bu sayede hem veri açıklanır / daha iyi anlaşılır (hangi değişken önemlidir, hangisi değildir), hem de başka bir hastanın temel verilerini kullanarak o hastanın diyabetinin bir sene sonra ne olacağını tahmin etmek mümkün olur. Kullanılan temel veriler kişinin yaşı, cinsiyeti, vücut kütle endeksi (body mass index) ortalama tansiyonu ve altı kere alınmış kan serum ölçümleridir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> pandas <span class="im">import</span> <span class="op">*</span>
+diabetes <span class="op">=</span> read_csv(<span class="st">&quot;diabetes.csv&quot;</span>,sep<span class="op">=</span><span class="st">&#39;;&#39;</span>)
+diabetes_y <span class="op">=</span> diabetes[<span class="st">&#39;response&#39;</span>]
+diabetes_x <span class="op">=</span> diabetes.drop(<span class="st">&quot;response&quot;</span>,axis<span class="op">=</span><span class="dv">1</span>)
+diabetes_x_train <span class="op">=</span> diabetes_x[:<span class="op">-</span><span class="dv">20</span>]
+diabetes_x_test  <span class="op">=</span> diabetes_x[<span class="op">-</span><span class="dv">20</span>:]
+diabetes_y_train <span class="op">=</span> diabetes_y[:<span class="op">-</span><span class="dv">20</span>]
+diabetes_y_test  <span class="op">=</span> diabetes_y[<span class="op">-</span><span class="dv">20</span>:]</code></pre></div>
+<p>İlk önce basit regresyonu hatırlayalım. Bu tekniği daha önce pek çok yönden gördük. <em>Lineer Cebir</em>, <em>Çok Değişkenli Calculus</em> ders notlarında bu tekniğin türetilmesi mevcut. Formül</p>
+<p><span class="math display">\[ \hat{w} = (X^TX) ^{-1} X^{T}y \]</span></p>
+<p>Sayısal olarak hemen bu hesabı yapabiliriz. Bir hatırlatma: veri setine <span class="math inline">\(y\)</span> ekseninin nerede kesildiğinin bulunabilmesi için suni bir ekstra kesi, &quot;intercept'' adlı kolon ekleyeceğiz, bu kolon iki boyutta <span class="math inline">\(y=ax+c\)</span> formülündeki <span class="math inline">\(c\)</span>'nin bulunabilmesi içindir. Pandas ile bu ekstra kolonu eklemek çok basit, ismen mevcut olmayan kolon erişildiği anda o kolon hemen yoktan yaratılır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy.linalg <span class="im">as</span> la
+x_tmp <span class="op">=</span> diabetes_x_train.copy()
+x_tmp[<span class="st">&#39;intercept&#39;</span>] <span class="op">=</span> <span class="dv">1</span>
+xTx <span class="op">=</span> np.dot(x_tmp.T,x_tmp )
+ws <span class="op">=</span> np.dot(la.inv(xTx),np.dot(x_tmp.T,diabetes_y_train))
+<span class="bu">print</span> ws</code></pre></div>
+<pre><code>[  3.03499452e-01  -2.37639315e+02   5.10530605e+02   3.27736981e+02
+  -8.14131711e+02   4.92814589e+02   1.02848453e+02   1.84606489e+02
+   7.43519617e+02   7.60951724e+01   1.52764307e+02]</code></pre>
+<p>Aynı hesabı bir de <code>scikit-learn</code> paketini kullanarak yapalım. Bu paketin <code>LinearRegression</code> çağrısı kesi ekleme işini otomatik olarak hallediyor, eğer kesi olmasın isteseydik, <code>fit_intercept=False</code> diyecektik.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn <span class="im">import</span> linear_model, cross_validation
+lin <span class="op">=</span> linear_model.LinearRegression()
+lin.fit(diabetes_x_train, diabetes_y_train)
+<span class="bu">print</span> lin.coef_
+<span class="bu">print</span> <span class="st">&quot;score&quot;</span>, lin.score(diabetes_x_test, diabetes_y_test), </code></pre></div>
+<pre><code>[  3.03499452e-01  -2.37639315e+02   5.10530605e+02   3.27736981e+02
+  -8.14131711e+02   4.92814589e+02   1.02848453e+02   1.84606489e+02
+   7.43519617e+02   7.60951724e+01]
+score 0.585075302278</code></pre>
+<p>Sonuçlar birbirine oldukça yakın. Şimdi diğer tekniklere gelelim.</p>
+<p>Sırt Regresyonu (Ridge Regression)</p>
+<p>Klasik regresyon ile</p>
+<p><span class="math display">\[ \hat{w} = \arg \min_w ||y-Xw||^2  \]</span></p>
+<p>problemini çözdüğümüzü biliyoruz, ki <span class="math inline">\(||\cdot||^2\)</span> Öklit normunun karesini temsil ediyor. Fakat bazı durumlarda <span class="math inline">\(X^TX\)</span>'in eşsiz (singular) olması mümkün ki böyle bir durumda <span class="math inline">\((X^TX)^{-1}\)</span>'in tersini almamız mümkün olmazdı. Eşsizlik ne zaman ortaya çıkar? Eğer elimizde veri noktasından daha fazla boyut var ise mesela... Diyelim ki veri olarak 10 tane kolon var, ama sadece 9 tane veri satırı. Sırt Regregyonunun çıkış noktası budur.</p>
+<p>Fakat ek olarak bu teknik kestirme hesaplarımıza (estimation) bir yanlılık (bias) eklemek için de kullanılabilir ve bu meyil kestirme hesaplarının iyileşmesine faydalı olabilir.</p>
+<p>Meyili nasıl ekleriz? Diyelim ki bizim tanımlayacağımız bir <span class="math inline">\(\lambda\)</span> ile tüm <span class="math inline">\(ws\)</span>'lerin toplamına bir üst sınır tanımlayabiliriz. Böylelikle regresyonun bulacağı katsayıların çok fazla büyümesine bir &quot;ceza&quot; getirmiş olacağız, ve bu cezayı içeren regresyon hesabı o cezadan kaçınmak için mecburen bulacağı katsayıları ufak tutacak, hatta bazılarını sıfıra indirebilecek. Bu azaltmaya istatistikte küçülme (shrinkage) ismi veriliyor.</p>
+<p>Sırt regresyonu için bu küçültme şöyle</p>
+<p><span class="math display">\[ \hat{w}_{sirt} = \arg \min_w ( ||y-Xw||^2 + \lambda||w||^2 )  \]</span></p>
+<p>Görüldüğü üzere <span class="math inline">\(w\)</span>'nin büyüklüğünü, bir <span class="math inline">\(\lambda\)</span> katsayısı üzerinden minimizasyon problemine dahil ettik, böylece diğer parametreler ile büyüklük te minimize edilecek. Üstteki tanım sınırı tanımlanmamış (unconstrained) bir optimizasyon problemidir. Sınırlı olarak</p>
+<p><span class="math display">\[ \min_w ||y-Xw||^2  \]</span> <span class="math display">\[ ||w||^2 \le \tau \textrm{ koşuluna göre (subject to) }\]</span></p>
+<p>ki <span class="math inline">\(\lambda\)</span> Lagrange çarpanıdır. Aslında şimdiye kadar üstteki çevrimin tersini gördük çoğunlukla (yani sınırlı problemden sınırsıza gitmeyi), bu gidiş tarzını görmek te iyi oldu.</p>
+<p>Neyse baştaki sınırsız problemi çözmek için ifadenin gradyanını alalım,</p>
+<p><span class="math display">\[ \nabla \big( ||y-Xw||^2 + \lambda||w||^2 \big) \]</span></p>
+<p><span class="math display">\[ \nabla \big( (y-Xw)^T (y-Xw) + \lambda w^Tw \big) \]</span></p>
+<p><span class="math display">\[ \nabla \big(  (y^T-w^TX^T)(y-Xw) + \lambda w^Tw  \big) \]</span></p>
+<p><span class="math display">\[ \nabla ( y^Ty - y^TXw - w^TX^Ty + w^TX^TXw + \lambda w^Tw   )  \]</span></p>
+<p><span class="math display">\[  - y^TX - X^Ty + 2X^TXw + 2\lambda w   \]</span></p>
+<p><span class="math display">\[  - 2X^Ty + 2X^TXw + 2\lambda w   \]</span></p>
+<p><span class="math display">\[   2X^TXw + 2\lambda w - 2X^Ty   \]</span></p>
+<p><span class="math display">\[   2(X^TX + \lambda I ) w - 2X^Ty   \]</span></p>
+<p>Minimizasyon için üstteki ifadeyi sıfıra eşitleyebiliriz</p>
+<p><span class="math display">\[   2(X^TX + \lambda I ) w - 2X^Ty  = 0 \]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[   (X^TX + \lambda I ) w = X^Ty  \]</span></p>
+<p><span class="math display">\[   \hat{w} = (X^TX + \lambda I)^{-1} X^Ty  \]</span></p>
+<p>Bu son ifade en az kareler (least squares) yani normal regresyon çözüm formülüne çok benziyor, sadece ek olarak bir <span class="math inline">\(\lambda I\)</span> toplama işlemi var. Demek ki sırt regresyonunu kullanmak için zaten yaptığımız hesaba, zaten bizim kendimizin karar verdiği bir <span class="math inline">\(\lambda\)</span> üzerinden <span class="math inline">\(\lambda I\)</span> eklersek, geri kalan tüm işlemler aynı olacak.</p>
+<p>Kontrol edelim</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">lam <span class="op">=</span> <span class="fl">0.2</span>
+wridge <span class="op">=</span> np.dot(la.inv(xTx<span class="op">+</span>lam<span class="op">*</span>np.eye(xTx.shape[<span class="dv">0</span>])),<span class="op">\</span>
+                np.dot(x_tmp.T,diabetes_y_train))
+<span class="bu">print</span> wridge</code></pre></div>
+<pre><code>[  16.70807829 -179.42288145  447.64999897  285.41866481  -51.7991733
+  -75.09876191 -192.46341288  123.61066573  387.91385823  105.53294479
+  152.7637018 ]</code></pre>
+<p>Şimdi <code>scikit-learn</code> ile aynı hesabı yapalım</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">ridge <span class="op">=</span> linear_model.Ridge(alpha<span class="op">=</span><span class="fl">0.2</span>)
+ridge.fit(diabetes_x_train, diabetes_y_train) 
+<span class="bu">print</span> ridge.score(diabetes_x_test, diabetes_y_test), ridge.coef_</code></pre></div>
+<pre><code>0.553680030106 [  16.69330211 -179.414259    447.63706059  285.40960442  -51.79094255
+  -75.08327488 -192.45037659  123.60400024  387.91106403  105.55514774]</code></pre>
+<p>Bir yöntem daha var, bu yönteme Lasso ismi veriliyor. Lasso'ya göre cezalandırma</p>
+<p><span class="math display">\[ \sum_{k=1}^{n} w_k^2 \le \lambda \]</span></p>
+<p>üzerinden olur. Bu yöntemin tüm detaylarına şimdilik inmeyeceğiz.</p>
+<p>Örnek olarak bir <span class="math inline">\(\lambda\)</span> ile onun bulduğu katsayılara bakalım.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">lasso <span class="op">=</span> linear_model.Lasso(alpha<span class="op">=</span><span class="fl">0.3</span>)
+lasso.fit(diabetes_x_train, diabetes_y_train)
+<span class="bu">print</span> lasso.coef_</code></pre></div>
+<pre><code>[   0.           -0.          497.3407568   199.17441037   -0.           -0.
+ -118.89291549    0.          430.93795945    0.        ]</code></pre>
+<p>Lasso bazı katsayıları sıfıra indirdi! Bu katsayıların ağırlık verdiği değişkenleri, eğer Lasso'ya inanırsak, modelden tamamen atmak mümkündür.</p>
+<p>Bu arada Sırt ve Lasso yöntemlerinin metotlarına &quot;regülarize etmek (regularization)&quot; ismi de veriliyor.</p>
+<p>k-Katlamalı Çapraz Sağlama (k-fold Cross-Validation)</p>
+<p>Bir yapay öğrenim algoritmasını kullanmadan önce veriyi iki parçaya ayırmak ise yarar; bu parçalar tipik olarak eğitim verisi (training set) diğeri ise test verisi (validation set) olarak isimlendirilir. İsimlerden belli olacağı üzere, algoritma eğitim seti üzerinde eğitilir; ve başarısı test verisi üzerinden rapor edilir. Bir bakıma modelin oluşturulması bir set üzerindendir, sonra &quot;al şimdi hiç görmediğin bir veri seti, bakalım ne yapacaksın&quot; sorusunun cevabı, sağlaması bu şekilde yapılır.</p>
+<p>Not: AIC istatistiği, standart şartlar altında, çapraz saglama ile eşdeğerdedir, ki bu durumda iki farklı veri öbeğine gerek yok, eğitim verisi yeterli.</p>
+<p>k-Katlamalı Çapraz Sağlama bu iki parçalı eğitim / test kavramını bir adım öteye taşır. Ufak bir k seçeriz, ki bu genellikle 5 ila 10 arasında bir sayı olur, ve tüm verimizi rasgele bir şekilde ama k tane ve eşit büyüklükte olacak şekilde parçalara ayırırız. Bu parçalara &quot;katlar (folds)&quot; ismi verilir bazen (ki isim buradan geliyor). Sonra teker teker her parçayı test verisi yaparız ve geri kalan tüm parçaları eğitim verisi olarak kullanırız. Bu işlemi tüm parçalar için tekrarlarız.</p>
+<p>Bu yaklaşım niye faydalıdır? Çünkü veriyi rasgele şekillerde bölüp, pek çok yönden eğitim / test için kullanınca verinin herhangi bir şekilde bizi yönlendirmesi / aldatması daha az mümkün hale gelir.</p>
+<p>Ve işte bu özelliği, ek olarak, çapraz sağlamayı &quot;model seçmek&quot; için vazgeçilmez bir araç haline getirir.</p>
+<p>Model seçmek nedir? Model seçimi üstteki bağlamda optimal bir <span class="math inline">\(\lambda\)</span> bulmaktır mesela, yani her modeli temsil eden bir <span class="math inline">\(\lambda\)</span> var ise, en iyi <span class="math inline">\(\lambda\)</span>'yi bulmak, en iyi modeli bulmak anlamına geliyor, çapraz sağlama bunu sağlıyor. Çapraz sağlama için <code>scikit-learn</code>'un sağladığı fonksiyonlar vardır, önce katları tanımlarız, sonra bu değiştirilmiş regresyon fonksiyonlarına katlama usulünü geçeriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">k_fold <span class="op">=</span> cross_validation.KFold(n<span class="op">=</span><span class="dv">420</span>, n_folds<span class="op">=</span><span class="dv">7</span>)</code></pre></div>
+<p>Katları üstteki gibi tanımladık. 420 tane veri noktasını 7 kata bol dedik. Şimdi bu katları kullanalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">ridge_cv <span class="op">=</span> linear_model.RidgeCV(cv<span class="op">=</span>k_fold)
+ridge_cv.fit(np.array(diabetes_x), np.array(diabetes_y))
+<span class="bu">print</span> ridge_cv.alpha_</code></pre></div>
+<pre><code>0.1</code></pre>
+<p>Üstteki sonuç <span class="math inline">\(\lambda = 0.1\)</span>'i gösteriyor. Bu <span class="math inline">\(\lambda\)</span> daha optimalmış demek ki. Lasso için benzer şekilde</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">lasso_cv <span class="op">=</span> linear_model.LassoCV(cv<span class="op">=</span>k_fold)
+<span class="bu">print</span> lasso_cv.fit(diabetes_x, diabetes_y)</code></pre></div>
+<pre><code>LassoCV(alphas=None, copy_X=True,
+    cv=sklearn.cross_validation.KFold(n=420, n_folds=7), eps=0.001,
+    fit_intercept=True, max_iter=1000, n_alphas=100, normalize=False,
+    precompute=auto, tol=0.0001, verbose=False)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> lasso_cv.alpha_</code></pre></div>
+<pre><code>0.00283958719118</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> lasso_cv.score(diabetes_x_test, diabetes_y_test) </code></pre></div>
+<pre><code>0.597090337358</code></pre>
+<p>Şimdi veri setinin bir kısmı üzerinde teker teker hangi algoritmanın daha başarılı olduğunu görelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> predict(row):
+    j <span class="op">=</span> row<span class="op">;</span> i <span class="op">=</span> row<span class="dv">-1</span>
+    new_data <span class="op">=</span> diabetes_x[i:j]
+    <span class="bu">print</span> diabetes_y[i:j], <span class="st">&quot;lasso&quot;</span>,lasso_cv.predict(new_data), <span class="op">\</span>
+            <span class="co">&quot;ridge&quot;</span>,ridge_cv.predict(new_data), <span class="op">\</span>
+            <span class="co">&quot;linear&quot;</span>,lin.predict(new_data)      
+
+predict(<span class="op">-</span><span class="dv">2</span>) <span class="co"># sondan ikinci veri satiri</span>
+predict(<span class="op">-</span><span class="dv">3</span>)
+predict(<span class="op">-</span><span class="dv">4</span>)
+predict(<span class="op">-</span><span class="dv">5</span>)
+predict(<span class="op">-</span><span class="dv">8</span>)</code></pre></div>
+<pre><code>439    132
+Name: response, dtype: int64 lasso [ 122.2361344] ridge [ 127.1821212] linear [ 123.56604986]
+438    104
+Name: response, dtype: int64 lasso [ 101.85154189] ridge [ 108.89678818] linear [ 102.5713971]
+437    178
+Name: response, dtype: int64 lasso [ 192.95670241] ridge [ 189.58095011] linear [ 194.03798086]
+436    48
+Name: response, dtype: int64 lasso [ 52.8903924] ridge [ 57.66611598] linear [ 52.5445869]
+433    72
+Name: response, dtype: int64 lasso [ 60.42852107] ridge [ 66.3661042] linear [ 61.19831285]</code></pre>
+<p>Üstteki sonuçlara göre gerçek değeri 132 olan 439. satırda lasso 122.2, sırt (ridge) 127.1, basit regresyon ise 123.5 bulmuş. O veri noktası için sırt yöntemi daha başarılı çıktı.</p>
+<p>Sonuçlara bakınca bazen sırt, bazen normal regresyon başarılı çıkıyor. Hangi yöntem kazanmış o zaman? Bir o, bir bu öndeyse, hangi yöntemi kullanacağımızı nasıl bileceğiz?</p>
+<p>Aslında her seferinde tek bir metotu kullanmak gerekmiyor. Bu metotları bir takım (ensemble) halinde işletebiliriz. Her test noktasını, her seferinde tüm metotlara sorarız, gelen sonuçların mesela.. ortalamasını alırız. Bu şekilde tek başına işleyen tüm metotlardan tutarlı olarak her seferinde daha iyi sonuca ulaşacak bir sonuç elde edebiliriz. Zaten Kaggle gibi yarışmalarda çoğunlukla birinciliği kazanan metotlar bu türden takım yöntemlerini kullanan metotlar, mesela Netflix yarışmasını kNN ve SVD metotlarını takım halinde işleten bir grup kazandı.</p>
+<p>Kaynaklar</p>
+<p>[1] Figueiredo, <em>Lecture Notes on Linear Regression</em>, <a href="www.lx.it.pt/~mtf/Figueiredo_Linear_Regression.pdf" class="uri">www.lx.it.pt/~mtf/Figueiredo_Linear_Regression.pdf</a></p>
+<p>[3] Harrington, P., <em>Machine Learning in Action</em></p>
+<p>[4] Shalizi, <em>Data Analysis from an Elementary Point of View</em></p>
+</body>
+</html>

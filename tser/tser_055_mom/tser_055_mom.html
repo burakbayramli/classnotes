@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="momentum-stratejileri">Momentum Stratejileri</h1>
+<p>Momentum kelimesi akılda ivmeli bir hareketi çağrıştırıyor, yani olmakta olan bir gidişatın olmaya devam etmesi gibi görebiliriz bu kavramı. Bu tür bir kalıcılık, yukarı ya da aşağı doğru, borsacı için al/sat bağlamında önemli bir sinyaldir ve kar amaçlı olarak kullanılabilir.</p>
+<p>Araştırmacılar bazen varlık fiyatlarındaki momentumu ikiye ayırıyorlar; zaman serisi momentumu ve kesitsel (cross-sectional) momentum. Zaman serisi momentumu basit: bir serinin gelecekteki getirisinin geçmişteki getirisi ile arasında pozitif korelasyon vardır. Kesitsel durumda ise izafi bir olay vardır: eğer bir serinin getirisi diğer serilerden daha iyi olmuş ise, bu performans büyük bir ihtimalle bu şekilde devam edecektir, ya da tersi durumda, kötü performans kötü olmaya devam edecektir.</p>
+<p>Zaman serisi korelasyonunu ölçmek için istatistiki korelasyon hesabını kullanabiliriz, ki bu hesap ayrıca bir p-değeri de hesaplıyor (korelasyon olmadığı sıfır hipotezinin sıfır değeri), çok düşük p-değeri korelasyon varlığına dair bir işaret.</p>
+<p>Korelasyon hesaplarken bir zaman adımı / gecikmesi (lag) seçmek lazım. Mesela 1 günlük bazında hesaplanmış geçmiş ve gelecek getirileri arasında negatif korelasyon bulunabilir, ama 20 günlük adımlar üzerinden hesaplanmış getirilerin 40 günlük adımlar üzerinden hesaplanmış gelecek getirileri arasında pozitif korelasyon bulunabilir. Bu tabii ki önemli çünkü bu bize 20 günlük sinyal üzerinden 40 günlük elde tutma (ya da açığa satma) işlemi yapmamız gerektiğini söylüyor.</p>
+<p>Örnek olarak 2 yıllık Hazine Vadeli İşlem Sözleşmesinin (Treasury Future) fiyatını işleyelim. Bu varlığın geçmişteki ve gelecekteki farklı kombinasyondaki adımlar üzerindeki getirilerinin korelasyonunu test edeceğiz; mesela geçmiş getiriyi (lookback) 5 günlük adımlardan hesaplayıp, geleceği (hold days) 10 günlük adımlardan hesaplamak gibi. Ya da 10-10, 25-60, vs, ve tüm bu farklı kombinasyonların verilerinin ikili olarak korelasyonunu alıp onların p-değerini hesaplayacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_draw_sharpe&#39;</span>)
+<span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;TU.csv&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_coint&#39;</span>)
+<span class="im">import</span> corr
+
+res <span class="op">=</span> []
+<span class="cf">for</span> lookback <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">25</span>, <span class="dv">60</span>, <span class="dv">120</span>, <span class="dv">250</span>]:
+   <span class="cf">for</span> holddays <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">25</span>, <span class="dv">60</span>, <span class="dv">120</span>, <span class="dv">250</span>]:
+       df_Close_lookback <span class="op">=</span> df.Close.shift(lookback)
+       df_Close_holddays <span class="op">=</span> df.Close.shift(<span class="op">-</span>holddays)
+       df[<span class="st">&#39;ret_lag&#39;</span>] <span class="op">=</span> (df.Close<span class="op">-</span>df_Close_lookback)<span class="op">/</span>df_Close_lookback
+       df[<span class="st">&#39;ret_fut&#39;</span>] <span class="op">=</span> (df_Close_holddays<span class="op">-</span>df.Close)<span class="op">/</span>df.Close
+       dfc <span class="op">=</span> df[[<span class="st">&#39;ret_lag&#39;</span>,<span class="st">&#39;ret_fut&#39;</span>]].dropna()
+       idx <span class="op">=</span> <span class="va">None</span>
+       <span class="cf">if</span> lookback <span class="op">&gt;=</span> holddays: 
+           idx <span class="op">=</span> np.array(<span class="bu">range</span>(<span class="dv">0</span>,<span class="bu">len</span>(dfc.ret_lag), holddays))
+       <span class="cf">else</span>: 
+           idx <span class="op">=</span> np.array(<span class="bu">range</span>(<span class="dv">0</span>,<span class="bu">len</span>(dfc.ret_lag), lookback))
+       dfc <span class="op">=</span> dfc.ix[idx]
+       t, x, p <span class="op">=</span> corr.p_corr(dfc.ret_lag, dfc.ret_fut)
+       res.append([lookback, holddays,  t, p])
+res <span class="op">=</span> pd.DataFrame(res,columns<span class="op">=</span>[<span class="st">&#39;geriye bakis&#39;</span>,<span class="st">&#39;tutma gunu&#39;</span>,<span class="st">&#39;korelasyon&#39;</span>,<span class="st">&#39;p degeri&#39;</span>])
+<span class="bu">print</span> res[res[<span class="st">&#39;geriye bakis&#39;</span>] <span class="op">&gt;=</span> <span class="dv">25</span>]</code></pre></div>
+<pre><code>    geriye bakis  tutma gunu  korelasyon  p degeri
+21            25           1   -0.013846  0.270625
+22            25           5    0.032196  0.263327
+23            25          10    0.151663  0.017386
+24            25          25    0.194388  0.045128
+25            25          60    0.233075  0.021371
+26            25         120    0.149209  0.102255
+27            25         250    0.261104  0.015751
+28            60           1    0.031111  0.088828
+29            60           5    0.079022  0.063314
+30            60          10    0.170948  0.009661
+31            60          25    0.182575  0.059741
+32            60          60    0.213958  0.123890
+33            60         120   -0.036387  0.424304
+34            60         250    0.318615  0.049219
+35           120           1    0.021126  0.187942
+36           120           5    0.053784  0.157502
+37           120          10    0.092116  0.112675
+38           120          25    0.152030  0.104487
+39           120          60   -0.023771  0.451293
+40           120         120    0.217406  0.227647
+41           120         250    0.403921  0.085531
+42           250           1    0.040612  0.058007
+43           250           5    0.105563  0.034167
+44           250          10    0.178648  0.014633
+45           250          25    0.273233  0.018136
+46           250          60    0.319392  0.064088
+47           250         120    0.354586  0.142317
+48           250         250    0.512954  0.188391</code></pre>
+<p>Kod bir anlamda her zaman anı için o andaki tarihsel getiri ve eğer o noktada pozisyon alınmış olsa eldeki varlığın tutulmasından elde edilecek getiri hesabını yapıyor. Bu iki hesaptan iki zaman serisi türetiliyor, sonra geriye bakış, tutma günü arasından ufak olanı oranında bu seri örnekleniyor (sample). Niye bu örnekleme? Bu lazım, çünkü geriye bakış, alış belli aralıklardan yapılır, çok ufak (ya da hiç) örnekleme yapsak birbiriyle çakışan hesapları üst üste görmüş olurduk.</p>
+<p>Seçimimizi yapmak için en iyi korelasyon katsayısı ve p-değeri arasında bir denge gözetmek gerektiğini görüyoruz, bazen iyi olabilecek bir katsayı için p-değeri iyi olmayabiliyor. (60, 10), (60, 25), (250, 10), (250, 25), (250, 60), (250, 120) eşleri bu bağlamda en iyi dengede olanlar herhalde, ve al/sat yapmaya gelince bizim genel tercihimiz düşük elde tutma gününe ve ayrıca en yüksek Sharpe oranına sahip olan varlıklar tabii ki. Para kazanmak için 10 gün mü 100 gün mü beklemek daha iyi? Eğer getiriler kabaca iki tarafta eşit ise 10 gün tercihimiz!</p>
+<p>Şimdi getiriyi hesaplayalım. Bu hesap için 250,25 kombinasyonunu seçelim, bu kombinasyonun katsayısı 0.273233 p-değeri 0.018. Fena değil. Stratejiyi şöyle kodlayacağız, eğer geçmişteki 12 aylık (aşağı yukarı 250 gün) getiri pozitif ise, hisseyi alıp bu pozisyonda 1 ay (25 gün) dur. Pozitif / negatif bize al / sat yönünde sinyal çünkü korelasyon olduğunu biliyoruz ya artık, demek ki eskiden çıkmışsa gelecekte çıkacak, düşmüşse gelecekte düşecek. Bu bilinen bir strateji aslında ama biz onu biraz değiştirdik, al/sat kararını her ay vermeye çalışmak yerine her gün vereceğiz, ve her gün alım/satım için sermayemizin 1/25'ini kullanacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> dd
+
+<span class="kw">def</span> report(df,lookback,holddays):
+
+    longs <span class="op">=</span> df.Close <span class="op">&gt;</span> df.Close.shift(lookback)
+    shorts <span class="op">=</span> df.Close <span class="op">&lt;</span> df.Close.shift(lookback)
+    df[<span class="st">&#39;pos&#39;</span>] <span class="op">=</span> <span class="fl">0.</span>
+    <span class="cf">for</span> h <span class="kw">in</span> <span class="bu">range</span>(holddays):
+       long_lag <span class="op">=</span> longs.shift(h).fillna(<span class="va">False</span>)
+       short_lag <span class="op">=</span> shorts.shift(h).fillna(<span class="va">False</span>)
+       df.loc[long_lag,<span class="st">&#39;pos&#39;</span>] <span class="op">+=</span> <span class="dv">1</span>
+       df.loc[short_lag,<span class="st">&#39;pos&#39;</span>] <span class="op">-=</span> <span class="dv">1</span>
+
+    ret<span class="op">=</span>(df.pos.shift(<span class="dv">1</span>)<span class="op">*</span> (df.Close<span class="op">-</span>df.Close.shift(<span class="dv">1</span>)) <span class="op">/</span> df.Close.shift(<span class="dv">1</span>)) <span class="op">\</span>
+         <span class="op">/</span> holddays <span class="co"># sermayenin holddays&#39;lik parcasini kullan</span>
+
+    cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>
+
+    <span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>
+    <span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)
+    <span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret))
+    <span class="cf">return</span> cumret
+
+cumret<span class="op">=</span>report(dftu,lookback <span class="op">=</span> <span class="dv">250</span>,holddays <span class="op">=</span> <span class="dv">25</span>)</code></pre></div>
+<pre><code>APR 0.0167080584229
+Sharpe 1.04172346649
+Dusus Kaliciligi (-0.024847461773700896, 343.0)</code></pre>
+<p>Tabii al/sat kararlaştırınca bu al ve satların 25 gün elde tutulması ve bunların birikmesi durumunu hesaplamak lazım, bunu da <span class="math inline">\(h=0,1,..,25\)</span> kadar kaydırıp bu kaydırılmış 25 vektörü toplayarak elde elde ediyoruz, mesela sadece 3 vektör için gösterelim,</p>
+<pre><code>+ + + ... - - + - ...
+  + + + ... - - + - ...
+    + + + ... - - + - ...</code></pre>
+<p>Üstteki ilk satır al/sat kararları, arka arkaya 3 al kararı var, bunlar toplana toplana 3. günde 3 birim varlık birikmiş olacak, aynı şekilde satlar eksiltilir, vs. Diğer hesaplar önceden gördüğümüz tanıdık getiri, kumulatif getiri hesapları.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(cumret)
+plt.title(<span class="st">u&#39;Kümülatif Birleşik Getiri&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_mom_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mom_01.png" />
+
+</div>
+<p>Aynı stratejiyi diğer bazı vadeli işlemler HG, BRE üzerinde kullanırsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dfhg <span class="op">=</span> pd.read_csv(<span class="st">&#39;HG.csv&#39;</span>)
+cumret <span class="op">=</span> report(dfhg,lookback <span class="op">=</span> <span class="dv">40</span>,holddays <span class="op">=</span> <span class="dv">40</span>)</code></pre></div>
+<pre><code>APR 0.177399755457
+Sharpe 1.04800326416
+Dusus Kaliciligi (-0.23984679762413508, 424.0)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(cumret)
+plt.savefig(<span class="st">&#39;tser_mom_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mom_04.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dfbre <span class="op">=</span> pd.read_csv(<span class="st">&#39;BRE.csv&#39;</span>)
+cumret <span class="op">=</span> report(dfbre,lookback <span class="op">=</span> <span class="dv">100</span>,holddays <span class="op">=</span> <span class="dv">10</span>)</code></pre></div>
+<pre><code>APR 0.177086083041
+Sharpe 1.08707778803
+Dusus Kaliciligi (-0.14812255240727923, 191.0)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(cumret)
+plt.savefig(<span class="st">&#39;tser_mom_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mom_05.png" />
+
+</div>
+<p>Boşluk Görünce Alım (Buy on Gap)</p>
+<p>Değişik bir momentum stratejisi &quot;boşluk görünce işlem yapmak''. Mesela bir varlığın kapanış (close) getirilerini bir pencere üzerinden yürüyen ortalamayla (moving average) hesaplıyoruz, böylece bir baz şablon oluşturuyoruz, eğer bir günün açılış (open) fiyatı bu şablon getiri, çarpı önceki günün en yüksek (high) fiyatından belli oranda yüksek ise alım yapıyoruz, önceki günün en düşük (low) fiyatından belli oranda düşük ise satım yapıyoruz. Yani yükselme trendi var, bir momentum oluşmuş, bu devam ediyor, bu alım sinyalidir, ya da tersi olmuştur bu satış sinyalidir.</p>
+<p>Altta FSTX sembolüne sahip Dow Jones STOXX 50 vadeli işlem sözleşmesinin (futures) üzerinde bu tekniği görebiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, dd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;FSTX.csv&#39;</span>)
+entryZscore<span class="op">=</span><span class="fl">0.1</span>
+
+stdret <span class="op">=</span> pd.rolling_mean(df.cl.pct_change(), window<span class="op">=</span><span class="dv">90</span>).shift(<span class="dv">1</span>)
+longs <span class="op">=</span> df.op <span class="op">&gt;=</span> df.hi.shift(<span class="dv">1</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>entryZscore<span class="op">*</span>stdret)
+shorts <span class="op">=</span> df.op <span class="op">&lt;=</span> df.lo.shift(<span class="dv">1</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>entryZscore<span class="op">*</span>stdret)
+df[<span class="st">&#39;pos&#39;</span>] <span class="op">=</span> <span class="dv">0</span>
+df.loc[longs,<span class="st">&#39;pos&#39;</span>] <span class="op">=</span> <span class="dv">1</span>
+df.loc[shorts,<span class="st">&#39;pos&#39;</span>] <span class="op">=</span> <span class="dv">-1</span>
+ret<span class="op">=</span>df.pos <span class="op">*</span> (df.op<span class="op">-</span>df.cl) <span class="op">/</span> df.op
+ret <span class="op">=</span> ret.dropna()
+cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)
+<span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret))</code></pre></div>
+<pre><code>APR 0.140771737387
+Sharpe 1.35989260747
+Dusus Kaliciligi (-0.14880173773680128, 190.0)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(cumret)
+plt.title(<span class="st">u&#39;Kümülatif Birleşik Getiri&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_mom_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mom_02.png" />
+
+</div>
+<p>Şirket Kar Açıklamaları</p>
+<p>Kar açıklamalarının şirket fiyatlarına momentum vermesi şaşırtıcı değil. Fakat bu açıklamanın ardından nispeten uzun bir süre bu etkinin sürmesi ilginç. Daha ilginç olan bu etki uzun süredir biliniyor ve kullanıla kullanıla etkisi yokolabilirdi, fakat bu hala gerçekleşmedi!</p>
+<p>Kâr açıklamalarını kullanan strateji çok basit: açıklamanın &quot;iyi'' ya da &quot;kötü'' olduğunu bile bilmemize gerek yok, o sinyali almak için yine piyasanın kendisini kullanacağız. Eğer önceki gün kapanış sonrası bir açıklama yapılmışsa, ve yine önceki günün kapanışı ve bugünin açılışı üzerinden hesaplanan getiri &quot;yeterince'' pozitif ise (ki bunu hareketli standart sapmaya izafi olarak hesaplayacağız), senedi al, yoksa açığa sat, ve günün kapanışında tüm pozisyonlardan çık. Burada yapmaya uğraştığımız momentumu, bir senet etrafında olan &quot;heyecanı'' açılışın önceki günün kapanışına göre farkından anlamaya çalışmak.</p>
+<p>Altta bu stratejinin S&amp;P 500 senetleri üzerinde ve Ocak 3, 2011, to Nisan 24, 2012 arasında geriye dönük testini görüyoruz. Şirket kar açıklamaları, açılış, kapanış fiyatları farklı matrisler içinde. Her matrisin kolonlarında şirketler var, satırları ise zaman. Geriye bakış zamanı 90 gün. Kar açıklama verisi <a href="earnings.com" class="uri">earnings.com</a> sitesinden alınmış.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile, dd
+<span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;earnann.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:
+    earnann <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;earnann.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>)
+    op <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;earnann-op.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>)
+    cl <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;earnann-cl.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">lookback<span class="op">=</span><span class="dv">90</span>
+retC2O<span class="op">=</span>(op<span class="op">-</span>cl.shift(<span class="dv">1</span>)) <span class="op">/</span> cl.shift(<span class="dv">1</span>)
+stdC2O<span class="op">=</span>pd.rolling_std(retC2O, window<span class="op">=</span>lookback)
+pos <span class="op">=</span> pd.DataFrame(np.zeros(cl.shape),index<span class="op">=</span>cl.index,columns<span class="op">=</span>cl.columns)
+longs<span class="op">=</span>(retC2O <span class="op">&gt;=</span> <span class="fl">0.5</span><span class="op">*</span>stdC2O).astype(<span class="bu">int</span>) <span class="op">*</span> earnann
+shorts<span class="op">=</span>(retC2O <span class="op">&lt;=</span> <span class="fl">-0.5</span><span class="op">*</span>stdC2O).astype(<span class="bu">int</span>) <span class="op">*</span> earnann<span class="op">;</span>
+pos <span class="op">=</span> pos <span class="op">+</span> longs <span class="op">-</span> shorts
+ret<span class="op">=</span>(pos<span class="op">*</span>(cl<span class="op">-</span>op)<span class="op">/</span>op).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)<span class="op">/</span><span class="fl">30.</span>
+
+cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)
+<span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret))</code></pre></div>
+<pre><code>APR 0.0681264455203
+Sharpe 1.49474260654
+Dusus Kaliciligi (-0.026051533343801503, 109.0)</code></pre>
+<p>Üstteki hesapta 30'a böldük çünkü bir günde aşağı yukarı bu kadar kar açıklaması yapılıyor,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> earnann.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).<span class="bu">max</span>()</code></pre></div>
+<pre><code>41</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(cumret)
+plt.title(<span class="st">u&#39;Kümülatif Birleşik Getiri&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_mom_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mom_03.png" />
+
+</div>
+<p>Üstel Yürüyen Ortalama (EWMA) ile Momentum</p>
+<p>Pandas'in EWMA hesabı için bir çağrısı var, olağan durumunda üstelli katsayıları kullanır, fakat istenirse özyineli formda da hesap yapabilir. Pandas ile pencere gibi bir parametre var, buna kapsam (span) deniyor. Kapsam <span class="math inline">\(k\)</span> ile <span class="math inline">\(\alpha\)</span> arasındaki ilişki şöyle,</p>
+<p><span class="math display">\[\alpha = 2/(k+1) \]</span></p>
+<p>Örnek</p>
+<p>Alım satım kararları için EWMA kullanılabilir. Bir fiyat serisinini iki tane ayrı EWMA'sı alınır. Bu ortalamalardan bir tanesi daha yavaş olarak addedilir, çünkü daha geniş bir kapsamda geriye bakar. Diğeri daha hızlı addedilir, daha kısa vadeli geriye bakar. Eğer daha hızlı olan ortalama daha yavaş olanın üzerindeyse fiyat serisi yukarı doğru bir trende girmiştir, alım yapılmalıdır, tersi var ise, satım trendine girilmiştir, satım yapılmalıdır.</p>
+<p>Altta ham petrol vadeli işlem sözleşmesi (future) üzerinde örneği görüyoruz. İki kapsam var, 32 ve 128. EWMA'lar birbirinin üzerine çıktığı noktalar alım, satım anları olarak kullanılabilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&quot;oil_crude_future.csv&quot;</span>)
+df[<span class="st">&#39;hızlı&#39;</span>] <span class="op">=</span> pd.ewma(df.price, span<span class="op">=</span><span class="dv">32</span>)
+df[<span class="st">&#39;yavaş&#39;</span>] <span class="op">=</span> pd.ewma(df.price, span<span class="op">=</span><span class="dv">128</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df[[<span class="st">&#39;price&#39;</span>,<span class="st">&#39;hızlı&#39;</span>,<span class="st">&#39;yavaş&#39;</span>]].plot()
+plt.annotate(<span class="st">&#39;Sat&#39;</span>,xy<span class="op">=</span>(<span class="dv">50</span>,<span class="dv">150</span>),xytext<span class="op">=</span>(<span class="dv">100</span>,<span class="dv">160</span>),<span class="op">\</span>
+             arrowprops<span class="op">=</span><span class="bu">dict</span>(facecolor<span class="op">=</span><span class="st">&#39;black&#39;</span>,width<span class="op">=</span><span class="dv">1</span>,shrink<span class="op">=</span><span class="fl">0.05</span>))
+plt.annotate(<span class="st">&#39;Al&#39;</span>,xy<span class="op">=</span>(<span class="dv">240</span>,<span class="dv">80</span>),xytext<span class="op">=</span>(<span class="dv">200</span>,<span class="dv">100</span>),<span class="op">\</span>
+             arrowprops<span class="op">=</span><span class="bu">dict</span>(facecolor<span class="op">=</span><span class="st">&#39;black&#39;</span>,width<span class="op">=</span><span class="dv">1</span>,shrink<span class="op">=</span><span class="fl">0.05</span>))
+plt.savefig(<span class="st">&#39;tser_misc_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_mom_06.png" />
+
+</div>
+<p>Tabii alım ve satım olma / olmama türünden ikisel kararlar değil. [2] alımda olma ve satıma olmayı sürekli bağlamda düşünüyor, yani üstteki örnekte hangi &quot;pozisyonda'' olunduğu hesabı için hızlı EWMAC'ten yavaş olan çıkartılıyor, ve bu fark kadar, ki bir reel sayı, posiyona giriliyor. Eğer sonuç -4.5 ise 4.5 ünite kadar açığa satışta olmak lazım.</p>
+<p>Negatif Yamukluk (Negative Skew)</p>
+<p>Momentum stratejilerinin, özelde EWMA stratejilerinin pozitif yamukluğu olduğu hep söylenir. Böyle olup olmadığını kontrol edelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_voltar&#39;</span>)
+<span class="im">import</span> util, pandas <span class="im">as</span> pd, zipfile
+f <span class="op">=</span> <span class="st">&#39;CORN_price.csv&#39;</span>
+<span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;../tser_voltar/legacycsv.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:
+    df <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(f),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span>)
+pred <span class="op">=</span> util.ewma(df.PRICE,<span class="dv">2</span>,<span class="dv">8</span>)
+<span class="bu">print</span> util.skew(df.PRICE, pred)</code></pre></div>
+<pre><code>1.18</code></pre>
+<p>Daha &quot;yavaş'' EWMA stratejilerinde negatif yamukluk görülebilir, hızlı olanda görülmüyor çünkü bu strateji daha hızlı adapte oluyor, [2]'nin tarif ettiği gibi uzun zaman azar azar kaybedip düşüş veya çıkış başlayınca birdenbire kazanç sağlıyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Chan, <em>Algorithmic Trading</em></p>
+<p>[2] Carver, <em>Systematics Trading</em></p>
+</body>
+</html>

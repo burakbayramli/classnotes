@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="temel-algoritmalar-veri-yapıları">Temel Algoritmalar, Veri Yapıları</h1>
+<p>Bilgisayar Bilimdeki (Computer Science) pek çok algoritmanın kullandığı bazı temel yapılar var. Bu yapıları görelim.</p>
+<p>Sözlükler, Böleç Anahtarları (Hash Keys)</p>
+<p>Elde anahtarlar ve değerlerden oluşan bir liste var, bize bir anahtar verilince o anahtara tekabül eden değeri geri getirmek istiyoruz. Bu anahtarları ve değerleri bildik düz listeye koyabiliriz, ama düz listeler indis bazlı erişim sağlarlar, bu durumda arama yapmak gerekince listeyi sürekli baştan sona kadar taramak gerekecektir. Hesapsal karmaşıklık <span class="math inline">\(O(n)\)</span>.</p>
+<p>Daha iyi bir yöntem anahtardan dizin indisi üretmek, boylece dizin indisi ile direk aradığımız elemana gidebiliriz. Eğer anahtarlar, mesela, meyve isimleri ise &quot;portakal'' anahtarını bir sayı indisine nasıl çeviririz?</p>
+<p>Tüm harflerin sayısal karşılığını kullanabiliriz, ve bu sayıları bir şekilde daha büyük bir sayıya çevirerek her anahtar değerinden bir sayısal indis üretebiliriz. Bu indis değeri bir dizine direk erişim sağlayacaktır. Not: Sayı değeri bazen dizinin nihai kapasitesinden daha büyük bir değer döndürebilir, o zaman matematiksel modülo kullanarak (yani bölümden arta kalan) indisin sürekli belli bir aralıkta kalmasını sağlayabiliriz.</p>
+<p>Tabii bu durumda farklı anahtarlar aynı indisi değerine gidebilir (çarpışma -collision- durumu, problemler bitmiyor (!)), o zaman çarpışma olan yere bir alt liste ekleriz, arama o noktadan sonra kaba kuvvet ile devam eder.</p>
+<p>Programlama dillerinin çoğunda böleç kabiliyeti vardır;</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="bu">hash</span>(<span class="st">&#39;portakal&#39;</span>)
+<span class="bu">print</span> <span class="bu">hash</span>(<span class="st">&#39;armut&#39;</span>)</code></pre></div>
+<pre><code>5699995722992068222
+4709300584609918268</code></pre>
+<p>Modülo uygulayalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="bu">hash</span>(<span class="st">&#39;portakal&#39;</span>) <span class="op">%</span> <span class="dv">15</span> <span class="co"># dizin 15 buyuklugunde </span>
+<span class="bu">print</span> <span class="bu">hash</span>(<span class="st">&#39;armut&#39;</span>) <span class="op">%</span> <span class="dv">15</span></code></pre></div>
+<pre><code>7
+8</code></pre>
+<p>Yığıt (Stacks)</p>
+<p>Bu yapı bir listedir, fakat özel bir tür listedir. Ona eklenen öğe en tepeye / sona eklenir, yani &quot;yığılmış'' olur, bir saman yığını gibi, eklenen her şey en tepeye eklenir. Öğe alınması gerektiğinde de en son eklenen öğe alınır, yani en tepedeki / sondaki öğe. Bu yaklaşıma ilk-giren-son-çıkar (first-in-last-out, FILO) ismi de veriliyor. Python ile düz listeler direk yığıt olarak kullanılabiliyor, ve üzerinde ekleme icin <code>extend</code>, çıkarma için <code>pop</code> çağrıları yapılabiliyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">a  <span class="op">=</span> []
+a.extend([<span class="st">&quot;ddd&quot;</span>])
+a.extend([<span class="st">&quot;eddd&quot;</span>])
+<span class="bu">print</span> a
+<span class="bu">print</span> a.pop()
+<span class="bu">print</span> a</code></pre></div>
+<pre><code>[&#39;ddd&#39;, &#39;eddd&#39;]
+eddd
+[&#39;ddd&#39;]</code></pre>
+<p>Kuyruk (Queue)</p>
+<p>Bu yapı da yine liste gibi, dizili öğeler var, ama eklenen öğe başa eklenir, alınan öğe sondan alınır. Kuyruklara ilk-eklenen-ilk-çıkar (first-in-first-out, FIFO) ismi veriliyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> collections <span class="im">import</span> deque
+<span class="kw">class</span> Queue(deque):
+    pull <span class="op">=</span> deque.popleft
+    push <span class="op">=</span> deque.append
+
+q <span class="op">=</span> Queue([<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">4</span>])
+<span class="bu">print</span> q.pull()
+q.push(<span class="dv">44</span>)
+<span class="bu">print</span> q.pull()
+<span class="bu">print</span> q</code></pre></div>
+<pre><code>3
+4
+deque([5, 4, 44])</code></pre>
+<div class="figure">
+<img src="basic_01.png" />
+
+</div>
+<p>Hem yığıt hem de kuyrukların farklı kodlama şekilleri görülebiliyor. Üstteki örnekte basitlik amaçlı olarak liste bazlı bir kodlama gösterdik, fakat bağlanmış liste (linked list) kullanan çok hızlı işleyen, etkili kodlar da vardır. Bağlanmış listeler bilindiği gibi hafızada öğeler arası göstergeç (pointer) kullanarak öğede öğeye çok hızlı şekilde atlayabilirler, iki öğe arasına yeni öğe sokmak çok kolaydır, vs. Bağlantılı öğe kullanınca, ayrıca, dizinlerde olduğu gibi illa önceden belli bir büyüklükteki yeri ayırmak gerekmiyor.</p>
+<p>Bağlanmış Listeler</p>
+<p>Eğer bir listede başa, sona ya da araya öğe sokmak hızlı olsun istiyorsak bağlantılı liste kullanabiliriz. Listede öğeler (node) vardır, ve her öge kendinden sonra gelecek diğer öğeye bir referans tutmakla yükümlüdür. Referans derken bir objeye olan referanstan bahsediyoruz; Python gibi yorumlanan, dinamik, temiz diller arka planda neler olduğunu biraz saklıyorlar aslında, fakat C, C++ gibi diller ile uğraşanlar bilirler, bir referans, ya da göstergeç (pointer) bir hafıza adresidir. O adresin gösterdiği bir başka obje vardır. Göstergecin hangi objeye işaret ettiği rahatlıkla değiştirilebilir.</p>
+<p>Alttaki kodda düğüm (node) sınıfını görüyoruz, ve bağlantılı liste bu düğümleri tutan (daha doğrusu sadece en baştakini tutan) bir objeden ibaret. Başa yeni bir eleman eklemek demek başlangıç referansı <code>head</code>'i bu yeni düğüme doğru &quot;göstertmek'' ile olur, aynı şekilde yeni elemanın sonraki obje referansı <code>next</code> daha önceki baş elemana doğru yönlendirilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> Node(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, value, <span class="bu">next</span><span class="op">=</span><span class="va">None</span>):
+        <span class="va">self</span>.value <span class="op">=</span> value
+        <span class="va">self</span>.<span class="bu">next</span> <span class="op">=</span> <span class="bu">next</span>
+    <span class="kw">def</span> <span class="fu">__str__</span>(<span class="va">self</span>): <span class="cf">return</span> <span class="bu">str</span>(<span class="va">self</span>.value)
+        
+<span class="kw">class</span> LinkedList(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):
+        <span class="va">self</span>.head <span class="op">=</span> <span class="va">None</span>
+  
+    <span class="kw">def</span> _add(<span class="va">self</span>, value):
+        <span class="va">self</span>.head <span class="op">=</span> Node(value, <span class="va">self</span>.head)
+            
+    <span class="kw">def</span> _printList(<span class="va">self</span>):
+        node <span class="op">=</span> <span class="va">self</span>.head
+        <span class="cf">while</span> node:
+            <span class="bu">print</span> node.value,
+            node <span class="op">=</span> node.<span class="bu">next</span>
+        <span class="bu">print</span> 
+            
+    <span class="kw">def</span> _find(<span class="va">self</span>, index):
+        prev <span class="op">=</span> <span class="va">None</span>
+        node <span class="op">=</span> <span class="va">self</span>.head
+        i <span class="op">=</span> <span class="dv">0</span>
+        <span class="cf">while</span> node <span class="kw">and</span> i <span class="op">&lt;</span> index:
+            prev <span class="op">=</span> node
+            node <span class="op">=</span> node.<span class="bu">next</span>
+            i <span class="op">+=</span> <span class="dv">1</span>
+        <span class="cf">return</span> node, prev, i
+
+    <span class="kw">def</span> _insert_middle(<span class="va">self</span>, index, value):
+        node, prev, i <span class="op">=</span> <span class="va">self</span>._find(index)
+        tmp <span class="op">=</span> Node(value, node)
+        prev.<span class="bu">next</span> <span class="op">=</span> tmp
+        
+    <span class="kw">def</span> _delete(<span class="va">self</span>, prev, node):
+        <span class="cf">if</span> <span class="kw">not</span> prev:
+            <span class="va">self</span>.head <span class="op">=</span> node.<span class="bu">next</span>
+        <span class="cf">else</span>:
+            prev.<span class="bu">next</span> <span class="op">=</span> node.<span class="bu">next</span>
+    
+    <span class="kw">def</span> deleteNode(<span class="va">self</span>, index):
+        node, prev, i <span class="op">=</span> <span class="va">self</span>._find(index)
+        <span class="cf">if</span> index <span class="op">==</span> i:
+            <span class="va">self</span>._delete(prev, node)
+        <span class="cf">else</span>:
+            <span class="bu">print</span>(<span class="st">&#39;Node with index </span><span class="sc">{}</span><span class="st"> not found&#39;</span>.<span class="bu">format</span>(index))
+
+ll <span class="op">=</span> LinkedList()
+ll._add(<span class="dv">37</span>)
+ll._add(<span class="dv">99</span>)
+ll._add(<span class="dv">12</span>)
+ll._printList()
+node, prev, i <span class="op">=</span> ll._find(<span class="dv">1</span>)
+<span class="bu">print</span> <span class="bu">str</span>(node), <span class="st">&#39;bulundu&#39;</span></code></pre></div>
+<pre><code>12 99 37
+99 bulundu</code></pre>
+<div class="figure">
+<img src="basic_02.png" />
+
+</div>
+<p>Şimdi yeni bir örnekte araya bir öğe sokmayı görelim. Ortalarda bir yerde öğe sokmak için önce indis değerine göre eski eleman bulunur, bu öğeden sonra eleman sokulacak, ve daha önce <code>head</code> ile yapılan ekleme örneğinde olduğu gibi, bu eski elemanın göstergeci yeni objeye, yeni objenin göstergeci eski objenin gösterdiği objeye yönlendirilecek.</p>
+<div class="figure">
+<img src="basic_03.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">ll <span class="op">=</span> LinkedList()
+ll._add(<span class="dv">99</span>)
+ll._add(<span class="dv">12</span>)
+ll._insert_middle(<span class="dv">1</span>,<span class="dv">37</span>)
+ll._printList()</code></pre></div>
+<pre><code>12 37 99</code></pre>
+<p>Aradan bir öğe silelim. Silmek için yine göstergeç cambazlığı; silinecek öğeye işaret eden göstergeç silinecek öğenin gösterdiği objeye işaret ettiriliyor, böylece silinecek objeye kimse işaret etmez hale geliyor. Erişilemez hale gelen obje silinmiş demektir.</p>
+<p>Not: Bellek idaresi açısından hiç işaret edilmeyen objelere ne olur? Bu objeler dinamik programlama dillerinde etrafta hala bir süre daha kalmaya devam edebilirler, ne zaman dilin çöp toplayıcısı devreye girerse o zaman silinirler. Yani bellekten gerçekten çıkartıldıkları an çöp toplama işlemi sonrasıdır. C gibi dillerde bellekten silme işlemi programcı tarafından tetiklenir, çöp toplayıcı yoktur.</p>
+<div class="figure">
+<img src="basic_04.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">ll <span class="op">=</span> LinkedList()
+ll._add(<span class="dv">37</span>)
+ll._add(<span class="dv">99</span>)
+ll._add(<span class="dv">12</span>)
+ll._printList()
+node, prev, i <span class="op">=</span> ll._find(<span class="dv">1</span>)
+ll._delete(prev, node)
+ll._printList()</code></pre></div>
+<pre><code>12 99 37
+12 37</code></pre>
+<p>Bağlantılı listelerin yığıt, kuyruk gibi yapıların kodlaması için ne kadar faydalı olabileceği sürpriz değil; yığıt ya da kuyruk için hem baş hem sondaki düğümlere referans tutulur, sona, başa ekleme, oradan obje alma gibi işlemler biraz göstergeç cambazlığı ile çok hızlı bir şekilde kodlanabilir.</p>
+<p>İki Yönlü Bağlantılı Liste</p>
+<p>Üstteki örnek tek yönlü bağlantılı listeydi, iki yönlü referans tutmak ta mümkün.</p>
+<div class="figure">
+<img src="basic_05.png" />
+
+</div>
+<p>Önce Genişliğine (Breadth-First) ve Önce Derinliğine (Depth-First) Arama</p>
+<p>Elimizde alttaki gibi bir çizit olsun,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">graph <span class="op">=</span> {<span class="st">&#39;A&#39;</span>: <span class="bu">set</span>([<span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>]),
+         <span class="st">&#39;B&#39;</span>: <span class="bu">set</span>([<span class="st">&#39;A&#39;</span>, <span class="st">&#39;D&#39;</span>, <span class="st">&#39;E&#39;</span>]),
+         <span class="st">&#39;C&#39;</span>: <span class="bu">set</span>([<span class="st">&#39;A&#39;</span>, <span class="st">&#39;F&#39;</span>]),
+         <span class="st">&#39;D&#39;</span>: <span class="bu">set</span>([<span class="st">&#39;B&#39;</span>]),
+         <span class="st">&#39;E&#39;</span>: <span class="bu">set</span>([<span class="st">&#39;B&#39;</span>, <span class="st">&#39;F&#39;</span>]),
+         <span class="st">&#39;F&#39;</span>: <span class="bu">set</span>([<span class="st">&#39;C&#39;</span>, <span class="st">&#39;E&#39;</span>])}</code></pre></div>
+<div class="figure">
+<img src="graph.png" />
+
+</div>
+<p>Arama için bir başlangıç düğümünü alıyoruz, onun komşularını, komşuların komşularını ziyaret ede ede tüm çiziti ziyaret etmiş oluyoruz. Ama bu ziyaret hangi sırada olmalı?</p>
+<p>Bu sırayı belirlemek için bir yığıt kullanabiliriz. Yığıt kullanınca aslında önce derinliğe türden bir arama kodlamış oluyoruz. Her ziyaret öncesi bir düğümün komşularını alıp, onları yığıta koyuyoruz, sonra yığıtın en üstündeki düğümü alıp onu ziyaret ediyoruz. Bu işlem aynı seviyedeki tüm komşuları ziyaret etmeden sürekli komşunun komşusu, vs. aldığı için bu bir derinliğe iniş kodlar.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> collections
+
+<span class="kw">def</span> dfs(graph, start):
+    visited, stack <span class="op">=</span> collections.OrderedDict(), [start]
+    <span class="cf">while</span> stack: <span class="co"># yigit bos ise bu ifade false olur</span>
+        vertex <span class="op">=</span> stack.pop()
+        <span class="co"># bu kontrol hizli olsun diye OrderedDict kullandik</span>
+        <span class="co"># boylece hem ziyaret sirasi hatirlanacak, hem de</span>
+        <span class="co"># dugum ziyaret edilip edilmedigi sorusu cok hizli cevaplanacak</span>
+        <span class="cf">if</span> vertex <span class="kw">not</span> <span class="kw">in</span> visited:
+            visited[vertex] <span class="op">=</span> <span class="st">&#39;&#39;</span>
+            stack.extend(graph[vertex])
+    <span class="cf">return</span> visited
+<span class="bu">print</span> dfs(graph, <span class="st">&#39;A&#39;</span>)</code></pre></div>
+<pre><code>OrderedDict([(&#39;A&#39;, &#39;&#39;), (&#39;B&#39;, &#39;&#39;), (&#39;D&#39;, &#39;&#39;), (&#39;E&#39;, &#39;&#39;), (&#39;F&#39;, &#39;&#39;), (&#39;C&#39;, &#39;&#39;)])</code></pre>
+<p>Özyineli formda da yazabiliriz, eğer her komşu için teker teker <code>dfs</code>'in kendisini çağırırsak derinleme dalış yapmış oluruz, çünkü komşu listesinde ilk elemanda özyineli çağrı yapınca o geri gelene kadar o çağrı içindeyiz, o çağrı da bir komşu listesi alıp öğelerde özyineli çağrı yapacak, böyle derinleme devam edecek... Tabii bu durumda gidilen yolu hatırlamak için onu bir liste olarak sürekli bir sonraki özyineli çağrıya geçeriz ve her çağrıdan da geriye döndürürüz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> collections
+<span class="kw">def</span> dfs(graph,curr,path <span class="op">=</span> collections.OrderedDict()):
+    path[curr] <span class="op">=</span> <span class="st">&#39;&#39;</span>
+    <span class="cf">for</span> edge <span class="kw">in</span> graph[curr]:
+        <span class="cf">if</span> edge <span class="kw">not</span> <span class="kw">in</span> path:
+            path <span class="op">=</span> dfs(graph,edge,path)
+    <span class="cf">return</span> path
+
+<span class="bu">print</span> dfs(graph,<span class="st">&#39;A&#39;</span>)</code></pre></div>
+<pre><code>OrderedDict([(&#39;A&#39;, &#39;&#39;), (&#39;C&#39;, &#39;&#39;), (&#39;F&#39;, &#39;&#39;), (&#39;E&#39;, &#39;&#39;), (&#39;B&#39;, &#39;&#39;), (&#39;D&#39;, &#39;&#39;)])</code></pre>
+<p>Şimdi diğer arama şekline, önce genişliğine aramaya gelelim. Bunu yapmak için yığıt veri yapısı yerine kuyruk kullanmak yeterli. Bu durumda komşuları kuyruğa koyduğumuz zaman o komşuların işlenmesi bitmeden sonraki düğümlere geçilmeyecektir, çünkü kuyruğa ilk konan ilk önce işlenir, yani komşuların kendisinin işlenmesi bitmeden onların alt çocuklarına sıra gelmeyecektir. Bu, ziyareti seviye seviye işlem yapmaya zorlar.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> bfs(graph, start):
+    visited, queue <span class="op">=</span> collections.OrderedDict(), Queue([start])
+    <span class="cf">while</span> queue:
+        vertex <span class="op">=</span> queue.pull()
+        <span class="cf">if</span> vertex <span class="kw">not</span> <span class="kw">in</span> visited:
+            visited[vertex] <span class="op">=</span> <span class="st">&#39;&#39;</span>
+            <span class="cf">for</span> x <span class="kw">in</span> graph[vertex]: queue.push(x)
+    <span class="cf">return</span> visited
+<span class="bu">print</span> bfs(graph, <span class="st">&#39;A&#39;</span>)</code></pre></div>
+<pre><code>OrderedDict([(&#39;A&#39;, &#39;&#39;), (&#39;C&#39;, &#39;&#39;), (&#39;B&#39;, &#39;&#39;), (&#39;F&#39;, &#39;&#39;), (&#39;E&#39;, &#39;&#39;), (&#39;D&#39;, &#39;&#39;)])</code></pre>
+<p>İkisel Arama Ağaçları (Binary Search Trees -BST-)</p>
+<p>Bir BST şu özelliklere sahiptir: bir düğümün sadece iki tane alt düğümü vardır, bu alt düğümlerden solda olanı üst düğümden her zaman küçük, sağda olanı her zaman büyüktür. Ağaçta tekrarlanan öğe yoktur. Ağaç eğer dengeli ise (yani birkaç düğümün altı sürekli dallanarak gittiği ama ötekilerin aynı seviyede kaldığı durum yok ise) o zaman ağaç derinliği <span class="math inline">\(n\)</span> öğe için <span class="math inline">\(\log n\)</span> olacaktır.</p>
+<div class="figure">
+<img src="basic_06.png" />
+
+</div>
+<p>Böyle bir yapının pek çok farklı şekildeki aramalar için ne kadar elverişli olduğunu görmek zor olmaz; mesela &quot;belli bir aralıktaki tüm düğümleri getir'' algoritması hızlı işler [3, sf. 403]. Üst düğümden başlarız, baktığımız düğümün eldeki değerden küçük ya da büyük olduğuna göre sola ya da sağa gideriz, vs. Bir özellik daha; mesela alttaki gibi bir ağaca bakalım (harfler arasında da küçüktür / büyüktür irdelemesi yapılabiliyor tabii ki),</p>
+<div class="figure">
+<img src="basic_07.png" />
+
+</div>
+<p>Şimdi bu ağacı üstten alta doğru &quot;yassılaştırdığımızı'' düşünelim, bu bize anahtarları sıralanmış bir düz yapı vermez mi? Evet. Yani bir ağaç yapısının doğal bir sonucu olarak her zaman bize çok hızlı bir şekilde sıralanmış bir liste verebilir. Üstelik ağaca ekleme, silme işlemleri de hızlı olduğu için bu sıralanmışlık kalıcı olacaktır. Altta <code>_printInorder</code> bu özelliği gösteriyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> Node:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, val):
+        <span class="va">self</span>.l <span class="op">=</span> <span class="va">None</span>
+        <span class="va">self</span>.r <span class="op">=</span> <span class="va">None</span>
+        <span class="va">self</span>.v <span class="op">=</span> val
+
+<span class="kw">class</span> BST:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):
+        <span class="va">self</span>.root <span class="op">=</span> <span class="va">None</span>
+        
+    <span class="kw">def</span> add(<span class="va">self</span>, val):
+        <span class="cf">if</span>(<span class="va">self</span>.root <span class="op">==</span> <span class="va">None</span>):
+            <span class="va">self</span>.root <span class="op">=</span> Node(val)
+        <span class="cf">else</span>:
+            <span class="va">self</span>._add(val, <span class="va">self</span>.root)
+
+    <span class="kw">def</span> _add(<span class="va">self</span>, val, node):
+        <span class="cf">if</span>(val <span class="op">&lt;</span> node.v):
+            <span class="cf">if</span>(node.l <span class="op">!=</span> <span class="va">None</span>):
+                <span class="va">self</span>._add(val, node.l)
+            <span class="cf">else</span>:
+                node.l <span class="op">=</span> Node(val)
+        <span class="cf">else</span>:
+            <span class="cf">if</span>(node.r <span class="op">!=</span> <span class="va">None</span>):
+                <span class="va">self</span>._add(val, node.r)
+            <span class="cf">else</span>:
+                node.r <span class="op">=</span> Node(val)
+
+    <span class="kw">def</span> find(<span class="va">self</span>, val):
+        <span class="cf">if</span>(<span class="va">self</span>.root <span class="op">!=</span> <span class="va">None</span>):
+            <span class="cf">return</span> <span class="va">self</span>._find(val, <span class="va">self</span>.root)
+        <span class="cf">else</span>:
+            <span class="cf">return</span> <span class="va">None</span>
+
+    <span class="kw">def</span> _find(<span class="va">self</span>, val, node):
+        <span class="cf">if</span>(val <span class="op">==</span> node.v):
+            <span class="cf">return</span> node
+        <span class="cf">elif</span>(val <span class="op">&lt;</span> node.v <span class="kw">and</span> node.l <span class="op">!=</span> <span class="va">None</span>):
+            <span class="cf">return</span> <span class="va">self</span>._find(val, node.l)
+        <span class="cf">elif</span>(val <span class="op">&gt;</span> node.v <span class="kw">and</span> node.r <span class="op">!=</span> <span class="va">None</span>):
+            <span class="cf">return</span> <span class="va">self</span>._find(val, node.r)
+
+    <span class="kw">def</span> printInOrder(<span class="va">self</span>):
+        <span class="cf">if</span>(<span class="va">self</span>.root <span class="op">!=</span> <span class="va">None</span>):
+            <span class="va">self</span>._printInOrder(<span class="va">self</span>.root)
+
+    <span class="kw">def</span> _printInOrder(<span class="va">self</span>, node):
+        <span class="cf">if</span>(node <span class="op">!=</span> <span class="va">None</span>):
+            <span class="va">self</span>._printInOrder(node.l)
+            <span class="bu">print</span> <span class="bu">str</span>(node.v) <span class="op">+</span> <span class="st">&#39; &#39;</span>
+            <span class="va">self</span>._printInOrder(node.r)
+
+    <span class="kw">def</span> printPreOrder(<span class="va">self</span>):
+        <span class="cf">if</span>(<span class="va">self</span>.root <span class="op">!=</span> <span class="va">None</span>):
+            <span class="va">self</span>._printPreOrder(<span class="va">self</span>.root)
+
+    <span class="kw">def</span> _printPreOrder(<span class="va">self</span>, node):
+        <span class="cf">if</span>(node <span class="op">!=</span> <span class="va">None</span>):
+            <span class="bu">print</span> <span class="bu">str</span>(node.v) <span class="op">+</span> <span class="st">&#39; &#39;</span>
+            <span class="va">self</span>._printPreOrder(node.l)
+            <span class="va">self</span>._printPreOrder(node.r)            
+                        
+    <span class="kw">def</span> printPostOrder(<span class="va">self</span>):
+        <span class="cf">if</span>(<span class="va">self</span>.root <span class="op">!=</span> <span class="va">None</span>):
+            <span class="va">self</span>._printPostOrder(<span class="va">self</span>.root)
+
+    <span class="kw">def</span> _printPostOrder(<span class="va">self</span>, node):
+        <span class="cf">if</span>(node <span class="op">!=</span> <span class="va">None</span>):
+            <span class="bu">print</span> <span class="bu">str</span>(node.v) <span class="op">+</span> <span class="st">&#39; &#39;</span>
+            <span class="va">self</span>._printPostOrder(node.l)
+            <span class="va">self</span>._printPostOrder(node.r)
+                        
+    <span class="kw">def</span> closest(<span class="va">self</span>, target):
+        gap <span class="op">=</span> <span class="bu">float</span>(<span class="st">&quot;inf&quot;</span>)
+        closest <span class="op">=</span> <span class="bu">float</span>(<span class="st">&quot;inf&quot;</span>)
+        curr <span class="op">=</span> <span class="va">self</span>.root
+        <span class="cf">while</span> curr:
+            <span class="cf">if</span> <span class="bu">abs</span>(curr.v <span class="op">-</span> target) <span class="op">&lt;</span> gap:
+                gap <span class="op">=</span> <span class="bu">abs</span>(curr.v <span class="op">-</span> target)
+                closest <span class="op">=</span> curr
+            <span class="cf">if</span> target <span class="op">==</span> curr.v:
+                <span class="cf">break</span>
+            <span class="cf">elif</span> target <span class="op">&lt;</span> curr.v:
+                curr <span class="op">=</span> curr.l
+            <span class="cf">else</span>:
+                curr <span class="op">=</span> curr.r
+        <span class="cf">return</span> closest.v
+
+bst <span class="op">=</span> BST()
+<span class="bu">print</span> <span class="st">&quot;Adding nodes 1 to 10 in the tree...&quot;</span>
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>):
+    bst.add(i)
+
+<span class="bu">print</span>
+<span class="bu">print</span> <span class="st">&quot;Searching for nodes 16 and 6&quot;</span>
+f <span class="op">=</span> bst.find(<span class="dv">16</span>)
+<span class="cf">if</span> f: <span class="bu">print</span> f.v
+f <span class="op">=</span> bst.find(<span class="dv">6</span>)
+<span class="cf">if</span> f: <span class="bu">print</span> f.v
+
+<span class="bu">print</span>
+<span class="bu">print</span> <span class="st">&quot;Printing preorder...&quot;</span>
+bst.printInOrder()</code></pre></div>
+<pre><code>Adding nodes 1 to 10 in the tree...
+
+Searching for nodes 16 and 6
+6
+
+Printing preorder...
+1 
+2 
+3 
+4 
+5 
+6 
+7 
+8 
+9 
+10 </code></pre>
+<p>En yakın öğe arama fonksiyonu <code>closest</code> ilginç; BST'de bir öğeyi tam eşitlik üzerinden aramak zaten oldukca hızlı. Şimdi düğümler arasında aynı gezinme tekniğini kullanarak istenen yaklaşık bir değere olan o gezilen düğümlere &quot;yakınlığı'' hesaplayıp, en yakın olanı sürekli akılda tutup iş bittiğinde bu elemanı geri döndürmek bize en yakın öğeyi verecektir.</p>
+<p>Vektörler ve İkisel Arama (Binary Search)</p>
+<p>Aslında ağaç üzerinde gördüğümüz sağa ya da sola gitme kavramı genelleştirilerek bir dizin üzerinde arama yapmak için kullanılabilir. Elimizde sıralanmış (bu önemli) bir dizin olduğunu düşünelim. Şimdi eldeki bir test noktasının bu dizinde olup olmadığını merak ediyoruz. Şöyle bir algoritma kullanabiliriz: dizinin tam ortasındaki öğesine bakarız, eğer aranan eleman o ise, iş biter. Eğer değil ise ve elimizdeki öğe bakılan orta noktadan küçük ise o orta noktanın solundaki hiçbir öğeye artık bakmaya gerek yoktur. Sağ kısma geçeriz, ve aynı işlemi tekrarlarız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> binary_search(alist, item):
+    first <span class="op">=</span> <span class="dv">0</span>
+    last <span class="op">=</span> <span class="bu">len</span>(alist)<span class="op">-</span><span class="dv">1</span>
+    found <span class="op">=</span> <span class="va">False</span>
+
+    <span class="cf">while</span> first<span class="op">&lt;=</span>last <span class="kw">and</span> <span class="kw">not</span> found:
+        midpoint <span class="op">=</span> (first <span class="op">+</span> last)<span class="op">//</span><span class="dv">2</span> <span class="co"># // tamsayi bolumu demek, 5//2=2</span>
+        <span class="cf">if</span> alist[midpoint] <span class="op">==</span> item:
+            found <span class="op">=</span> <span class="va">True</span>
+        <span class="cf">else</span>:
+            <span class="cf">if</span> item <span class="op">&lt;</span> alist[midpoint]:
+                last <span class="op">=</span> midpoint<span class="dv">-1</span>
+            <span class="cf">else</span>:
+                first <span class="op">=</span> midpoint<span class="op">+</span><span class="dv">1</span>
+
+    <span class="cf">return</span> found, midpoint
+
+testlist <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">8</span>, <span class="dv">13</span>, <span class="dv">17</span>, <span class="dv">19</span>, <span class="dv">32</span>, <span class="dv">42</span>,]
+<span class="bu">print</span>(binary_search(testlist, <span class="dv">3</span>))
+<span class="bu">print</span>(binary_search(testlist, <span class="dv">13</span>))
+<span class="bu">print</span>(binary_search(testlist, <span class="dv">20</span>))</code></pre></div>
+<pre><code>(False, 3)
+(True, 4)
+(False, 7)</code></pre>
+<p>Yakın öğe bulmak benzer mantığı kullanır.</p>
+<p>Bakılan kısımlar sürekli yarıya bölündüğü için bakılan kısım çok hızlı bir şekilde küçülecektir, bu işlem hızını arttırır. Karmaşıklık <span class="math inline">\(O(\log N)\)</span>. Lineer arama yapmaktan (kaba kuvvet) daha hızlı.</p>
+<p>Yarıya bölüp arama hakkında ilginç bir hikaye: bir projede bir arkadaşımın üzerinde çalıştığı aşağı yukarı 1000 satırlık bir CSS dosyası vardı (CSS'i web sayfaları ile uğraşanlar bilirler). Her nasılsa dosya bir şekilde değişime uğramış, ve işleyen dosya artık işlemez hale gelmiş. Bu dosya üzerinde kaynak kod deposu da kullanılmamış, yani değişimin ne olduğunu depoya sorma şansı yok. CSS'in bir tarafı bozuk ama neresi?</p>
+<p>Benim fikrim ikiye bölme tekniği ile hatayı bulmaktı; CSS'in bir yarısını iptal edip diğer kısmını kullan, işliyorsa öteki kısımda devam et, aynı şekilde onu yarıla, ta ki hata ortadan yokoluncaya kadar. Bu şekilde birkaç deneme ile hatalı satırı bulduk.</p>
+<p>Öncelik Kuyruğu (Priority Queue)</p>
+<p>Bu tür kuyruklarda öğe alma işlemi her zaman en küçük öğeyi verir. Bir öğe eklediğimiz zaman o öğe büyüklüğüne göre kuyruk içindeki yerine otomatik olarak sokulur. Öncelik kuyrukları arka planda ikisel ağaç (binary tree) üzerinden kodlanırlar, en küçük öğeyi almak sabit, müthiş hızlıdır çünkü en küçük öğe her zaman ağacın en tepesindeki düğümdedir. Ekleme de oldukca iyi çalışır. Yani öncelik kuyrukları dışarıdan ikidebir &quot;sırala'' komutu verilmeden sürekli kendilerini sıralı halde tutan bir yapıdırlar. Bu kuyruklar pek çok bilgisayar bilim algoritmasının demirbaşıdır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> heapq <span class="im">import</span> heappush, heappop
+<span class="im">from</span> random <span class="im">import</span> randrange
+
+<span class="kw">class</span> pqueue():
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>): <span class="va">self</span>.data <span class="op">=</span> []
+    <span class="kw">def</span> push(<span class="va">self</span>,x): heappush(<span class="va">self</span>.data,x)
+    <span class="kw">def</span> pull(<span class="va">self</span>): <span class="cf">return</span> heappop(<span class="va">self</span>.data)
+    <span class="kw">def</span> <span class="fu">__str__</span>(<span class="va">self</span>): <span class="cf">return</span> <span class="st">&#39;&#39;</span>.join(<span class="bu">str</span>(<span class="va">self</span>.data))
+
+pq <span class="op">=</span> pqueue()
+<span class="co"># rasgele degerler</span>
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>): pq.push(randrange(<span class="dv">100</span>))
+<span class="bu">print</span> pq
+<span class="bu">print</span> pq.pull()
+pq.push(<span class="dv">100</span>)
+<span class="bu">print</span> pq</code></pre></div>
+<pre><code>[2, 12, 15, 37, 70, 54, 42, 92, 54, 82]
+2
+[12, 37, 15, 54, 70, 54, 42, 92, 82, 100]</code></pre>
+<p>Biraz daha kapsamlı bir kod <code>pqdict</code> paketinde, bu önemsel kuyruğa anahtar / değerler veriliyor, anahtar değerleri mesela araba modelleri, önem ise fiyatları olabilir, ve değerler çekildiğinde değeri en az (önemi en fazla) olan değer çekilecektir. Ayrıca bu kuyruğu bir döngüyle &quot;gezmek'' kuyruktan değerlerin çekilmesini de sağlıyor. Kuyruğun iç kodlamasında kullandığı temel yapı ikisel yığın (binary heap) adlı bir yapıdır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> pqdict <span class="im">import</span> pqdict
+Q <span class="op">=</span> pqdict() 
+Q[<span class="st">&#39;toyota&#39;</span>] <span class="op">=</span> <span class="dv">4</span>
+Q[<span class="st">&#39;mercedes&#39;</span>] <span class="op">=</span> <span class="dv">10</span>
+Q[<span class="st">&#39;bmw&#39;</span>] <span class="op">=</span> <span class="dv">6</span>
+<span class="cf">for</span> c <span class="kw">in</span> Q: <span class="bu">print</span> c</code></pre></div>
+<pre><code>toyota
+bmw
+mercedes</code></pre>
+<p>Bir ilginç özellik daha: bir döngü içinde değilsek <code>[]</code> operatörü hem öncelik değerine bakılmasını hem de o değerin, anahtar kuyruktan çekilmeden, değiştirilebilmesini sağlıyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">Q[<span class="st">&#39;toyota&#39;</span>] <span class="op">=</span> <span class="dv">4</span>
+Q[<span class="st">&#39;mercedes&#39;</span>] <span class="op">=</span> <span class="dv">10</span>
+Q[<span class="st">&#39;bmw&#39;</span>] <span class="op">=</span> <span class="dv">6</span>
+<span class="bu">print</span> <span class="bu">len</span>(Q)
+Q[<span class="st">&#39;bmw&#39;</span>] <span class="op">=</span> <span class="dv">1</span>
+<span class="bu">print</span> <span class="st">&#39;hala&#39;</span>, <span class="bu">len</span>(Q)
+<span class="cf">for</span> c <span class="kw">in</span> Q: <span class="bu">print</span> c</code></pre></div>
+<pre><code>3
+hala 3
+bmw
+toyota
+mercedes</code></pre>
+<p>Silmeden bakabilmek ve güncelleyebilmek önemli bir özellik (Java karşılığı <code>PG.java</code> dosyasında).</p>
+<p>Bellek Kullanımı</p>
+<p>Bitirmeden önce bellek kullanımı hakkında birkaç paragraf yazalım. Algoritmalarımız için veri yapısı seçerken o veri yapısının belleği nasıl idare ettiğini bilmek iyi olur. Mesela sayı indisli bir dizin / liste kullanıyoruz, dizinlere indis bazlı erişim çok hızlıdır, burası güzel. Fakat dizinin sürekli büyümesi gerekiyorsa bu büyüme arka planda nasıl idare ediliyor? Bazı kodlamalar vardır ki dizinleri parça parça büyütür, yani 10'dan 20'ye büyümek gerekiyorsa 20 öğelik yeni yer ayrılır, ve 10 öğe yeni listeye kopyalanır. O zaman parçalar küçük ise bu kopyalama işleminde sırasında zaman kaybı olabilir. Eğer başa, sona sürekli ekleme yapıldığı dinamik bir durum var ise belki bağlantılı liste kullanmak daha iyidir.</p>
+<p>Kaynaklar</p>
+<p>[1] Heatland, <em>Python Algorithms</em></p>
+<p>[2] Wahl, <em>Algorithms in Python</em></p>
+<p>[3] Sedgewick, <em>Algorihms, 4th Edition</em></p>
+</body>
+</html>

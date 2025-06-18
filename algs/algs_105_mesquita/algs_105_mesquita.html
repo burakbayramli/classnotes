@@ -1,0 +1,499 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="oyun-teorisi-ile-grup-kararları-tahmini">Oyun Teorisi ile Grup Kararları Tahmini</h1>
+<p>Bruce de Mesquita mutabakata / anlaşmaya varma / savaş konularında tahminler yapabilen bir araştırmacı. Girdi olarak alttaki gibi bir veriyi alıp,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfemis <span class="op">=</span> pd.read_csv(<span class="st">&#39;emission.csv&#39;</span>)<span class="op">;</span> <span class="bu">print</span> dfemis</code></pre></div>
+<pre><code>         Actor  Capability  Position  Salience
+0  Netherlands        0.08         4        80
+1      Belgium        0.08         7        40
+2   Luxembourg        0.03         4        20
+3      Germany        0.16         4        80
+4       France        0.16        10        60
+5        Italy        0.16        10        60
+6           UK        0.16        10        90
+7      Ireland        0.05         7        10
+8      Denmark        0.05         4       100
+9       Greece        0.08         7        70</code></pre>
+<p>onu hangi mutabakatın olacağı tahmini için kullanabiliyor. Üstteki veri bazı ülkeler arasında orta boy arabalarda emisyon kontrolünü kaç sene sonra devreye sokulacağı hakkında bir grup kararı. BDM'nin bu hesabı yapmak için iki yöntemi var, birincisi yarı-Oyun Teorisel (quasi Game Theoretic), ikincisi tam Oyun Teorik (ve daha kuvvetli bazı özellikleri var). Birinci model hakkında daha çok dokümantasyon var, bu model ile BDM pek çok başarılı tahmine de imza attı bu arada. Bu yazıda paylaşacağımız birinci model ve onun kodlaması.</p>
+<p>Veride güç / beceri (capability), ve ilgi (salience) parametreleri var. Bunların ne olduğu belli. Pozisyon üzerinde anlaşmazlık olan şeydir, her türlü karar ilginç bir şekilde tek boyutlu bir skala üzerinden temsil edilebiliyor, yani bir şey hiç istememek 0, çok istemek 100, ve arada tüm seçimler aradaki değerler olabilir. Çok / az istemek arasındaki her nokta belli seçenek kombinasyonlarını bile barındırıyor olabilir.</p>
+<p>Oyunun sonucu &quot;evreler'' üzerinden işlenir. Her evrede aktörler güçleri oranında diğer aktörleri kendi pozisyonlarına davet ediyorlar, ya da etmiyorlar. Bir evrede her aktör pek çok diğer aktörden &quot;benim yanıma gel'' isteği almış olabilir, evre sonunda aktör bu tekliflerden (offer) kendisi için en az değişim gerektirecek seçeneğe gidiyor (ilk başlangıç noktasına göre, bir öncekine göre değil). Hoca bunu bu şekilde seçmiş ve iyi bir seçim bizce çünkü doğa enerji israfını sevmez. İnsanlar da öyle!</p>
+<p>Ortalamalar</p>
+<p>Bir oyunun, herhangi bir evresi için, ağırlıklı ortalama ve ağırlıklı doruğu (mode) hesaplanabilir. Ağırlıklı çünkü herkesin pozisyonunun basit ortalaması değil, kişilerin ilgi ve gücü ile orantılı bir ortalama. Ağırlıklı ortalama için formül</p>
+<p><span class="math display">\[ \frac{\sum_{i=1}^{n} c_i s_i x_i}{\sum_{i=1}^{n} c_i s_i} \]</span></p>
+<p>Ağırlıklı doruk için biraz takla lazım, önce tüm veriyi pozisyonlara göre sıralarız, herkesin <span class="math inline">\(c_is_i\)</span> çarpımını hesaplayıp normalize ederiz, ve kümülatif olarak bu rakamları toplarız. Hangi noktada 0.5'e erişilmiş ise o nokta &quot;ağırlıklı orta'' oluyor, ve o noktanın pozisyonu doruk olarak kabul ediliyor. Hatırlanabileceği üzere basit doruk hesabı için, yani düz bir liste sayı için, o sayılar sıralanıyordu, ve ortadaki sayı mode olarak seçiliyordu. Burada aynı kavram sadece <span class="math inline">\(c_i,s_i\)</span> işin içinde.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scholz
+dfiran.Salience <span class="op">=</span> dfiran.Salience<span class="op">/</span><span class="fl">100.</span>
+game <span class="op">=</span> scholz.Game(dfiran)
+<span class="bu">print</span> <span class="st">&#39;ortalama&#39;</span>, game.mean()
+<span class="bu">print</span> <span class="st">&#39;mode&#39;</span>, game.weighted_median()</code></pre></div>
+<pre><code>ortalama 54.3833734112
+mode 50.0</code></pre>
+<p>Her evrede hesaplanan ana formüller şunlar,</p>
+<p><span class="math display">\[ E(U_{ij}|\textrm{teklif et}) = (1-s_j)U_{si} + s_jP_i^i U_{si} + s_j(1-P_i^i)U_{fi} \]</span></p>
+<p><span class="math display">\[ E(U_{ij}|\textrm{teklif etme}) = QU_{sq} + (1-Q) \big( T U_{bi}) + (1-T)U_{wi} \big)\]</span></p>
+<p><span class="math display">\[ E(U_{ij}) = E(U_{ij}|\textrm{teklif et}) - E(U_{ij}|\textrm{teklif etme}) \]</span></p>
+<p>Teklif etmek bir diğer oyuncuyu pozisyonunu değiştirmesi için iknaya uğraşmak / ona &quot;sormak'' (challange). Formülerin bileşenlerini altta açacağız. Önce genel faydadan başlayalım. Fayda (utility) <span class="math inline">\(U_{ij}^i\)</span> aktör <span class="math inline">\(i\)</span>'nin kendi pozisyonuna benzerliğe verdiği değerdir, diğer aktör <span class="math inline">\(j\)</span> uzaksa buna atanan fayda az, yakınsa çoktur.</p>
+<p><span class="math display">\[ U_{ij}^i = 1-2 \bigg| \frac{x_i - x_j}{x_{max}-x_{min}}\bigg|   \]</span></p>
+<p><span class="math inline">\(U_{ii}^i\)</span> doğal olarak 1 değerinde, aktör kendi pozisyonunda en çok faydayı görüyor.</p>
+<p>Bir aktör bir diğer aktörü iknaya uğraşabilir. Bu durumda elde edeceği fayda -başarılı olursa- aktörün kendi pozisyon faydası ve diğerinin arasındaki uzaklığa oranlı görülebilir. Yani bana en uzak pozisiyondaki birini ikna etmek bana en çok fayda getirir, daha yakın, daha az. Her aktörün içinde olduğu risk <span class="math inline">\(0 \le r_i \le 1\)</span> olacak şekilde (ki risk ile ne denmek istediğini ileride anlatacağız),</p>
+<p><span class="math display">\[ U_{si}^i = 2 - 4 \bigg[ \frac{2-(U_{ii}^i - U_{ij}^i)}{4}  \bigg]^{r_i}\]</span></p>
+<p>Kaybetme durumunda kaybedilen fayda <span class="math inline">\(U_{fi}^i\)</span> ise üstteki faydalar çıkartmalarının ters çevirilmiş hali olarak düşünebilirim, bir anlamda ikna edilmiş olma durumu olabilir bu, ikna ettiğimde kazandığıma göre edildiğimde kaybederim, ve bu çıkarma işleminin ters çevirilmiş hali gibi görülebilir, yani $ U_{ij}^i - U_{ii}^i$, o zaman</p>
+<p><span class="math display">\[ U_{fi}^i = 2 - 4 \bigg[ \frac{2-(U_{ij}^i - U_{ii}^i)}{4}  \bigg]^{r_i}\]</span></p>
+<p><span class="math inline">\(U_{ij}^i\)</span> formülünü üstteki iki formüle sokarsak, ve <span class="math inline">\(U_{ii}^i=1\)</span> olduğuna göre, basitleştirdikten sonra,</p>
+<p><span class="math display">\[ U_{si}^i = 2 - 4 
+\bigg[ 
+0.5 - 0.5 \bigg| \frac{x_i-x_j}{x_{max}-x_{min}} \bigg|
+\bigg]^{r_i}
+\]</span></p>
+<p><span class="math display">\[ U_{fi}^i = 2 - 4 
+\bigg[ 
+0.5 - 0.5 \bigg| \frac{x_j-x_i}{x_{max}-x_{min}} \bigg|
+\bigg]^{r_i}
+\]</span></p>
+<p>elde ederim.</p>
+<p>Yarışma</p>
+<p>Nihai hesap için aktörler arasındaki muhtemel bir yarışta kim üstte kalır, bunu hesaplamamız gerekiyor. Bu ölçütü <span class="math inline">\(v_i^{jk}\)</span> ile gösterebilirim, yani aktör <span class="math inline">\(i\)</span> eğer aktörler <span class="math inline">\(j,k\)</span> arasında seçim yapması gerekirse kimi tercih eder? Daha doğrusu, <span class="math inline">\(i\)</span>'nin oyu (vote) ne olur? Bunun formülü,</p>
+<p><span class="math display">\[ v_i^{jk} = c_is_i (U_{ij} - U_{ik}) \]</span></p>
+<p>olarak gösterilebilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+Q <span class="op">=</span> <span class="fl">1.0</span> <span class="op">;</span> T <span class="op">=</span> <span class="fl">1.0</span>
+
+<span class="kw">class</span> Game:
+
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,df):
+        <span class="va">self</span>.df <span class="op">=</span> df.copy()
+        <span class="va">self</span>.df_orig <span class="op">=</span> <span class="va">self</span>.df.copy()
+        <span class="co"># dictionaries of df variables - used for speedy access</span>
+        <span class="va">self</span>.df_capability <span class="op">=</span> df.Capability.to_dict()    
+        <span class="va">self</span>.df_position <span class="op">=</span> df.Position.to_dict()    
+        <span class="va">self</span>.df_salience <span class="op">=</span> df.Salience.to_dict()    
+        <span class="va">self</span>.max_pos <span class="op">=</span> df.Position.<span class="bu">max</span>()
+        <span class="va">self</span>.min_pos <span class="op">=</span> df.Position.<span class="bu">min</span>()
+
+    <span class="kw">def</span> weighted_median(<span class="va">self</span>):
+        df <span class="op">=</span> <span class="va">self</span>.df.copy()
+        df[<span class="st">&#39;w&#39;</span>] <span class="op">=</span> df.Capability<span class="op">*</span>df.Salience
+        df <span class="op">=</span> df.sort_index(by<span class="op">=</span><span class="st">&#39;Position&#39;</span>,ascending<span class="op">=</span><span class="va">True</span>)
+        df[<span class="st">&#39;w&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;w&#39;</span>] <span class="op">/</span> df[<span class="st">&#39;w&#39;</span>].<span class="bu">sum</span>()
+        df[<span class="st">&#39;w&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;w&#39;</span>].cumsum()       
+        <span class="cf">return</span> <span class="bu">float</span>(df[df[<span class="st">&#39;w&#39;</span>]<span class="op">&gt;=</span><span class="fl">0.5</span>].head(<span class="dv">1</span>).Position)
+
+    <span class="kw">def</span> mean(<span class="va">self</span>):
+        <span class="cf">return</span> (<span class="va">self</span>.df.Capability<span class="op">*</span><span class="va">self</span>.df.Position<span class="op">*</span><span class="va">self</span>.df.Salience).<span class="bu">sum</span>() <span class="op">/</span> <span class="op">\</span>
+               (<span class="va">self</span>.df.Capability<span class="op">*</span><span class="va">self</span>.df.Salience).<span class="bu">sum</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="st">&#39;v&#39;</span>
+<span class="bu">print</span> game.v(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">2</span>)
+<span class="bu">print</span> game.v(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)
+<span class="bu">print</span> game.v(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">3</span>)</code></pre></div>
+<pre><code>v
+63.1578947368
+84.2105263158
+94.7368421053</code></pre>
+<p>Kabiliyet ve ilgi ile çarpmak mantıklı herhalde, çünkü aktörün oyunu hesaplıyoruz, bu oy aktörün gücüne oranlı olmalı. Hesapta <span class="math inline">\(i\)</span> aktörünün <span class="math inline">\(j\)</span>'den elde edeceği faydayı <span class="math inline">\(j\)</span> faydasından çıkartıyoruz. <span class="math inline">\(j\)</span> solda olduğu için bu hesap, artı sayılar bağlamında, <span class="math inline">\(i\)</span>'nin <span class="math inline">\(j\)</span>'yi tercihi olarak ta görülebilir, eğer <span class="math inline">\(j\)</span>'ye verilen tüm oyları hesaplamak istersek, o zaman her <span class="math inline">\(i\)</span> için yapılan <span class="math inline">\(v_i^{jk}\)</span>'leri toplayıp bölümde kullanmalıyız, ve bölümde ise <span class="math inline">\(j\)</span>'den gelen faydanın daha fazla olduğu oyları kullanmalıyız,</p>
+<p><span class="math display">\[
+P^j = 
+\sum_{ U_{ij} &gt; U_{ik} } v_i^{jk} \bigg/ 
+\sum_i \big| v_i^{jk} \big|
+\]</span></p>
+<p>İndiste <span class="math inline">\(j\)</span> kullanımı biraz garip oldu, genellikle eşitliğin sol tarafında <span class="math inline">\(i\)</span> kullanmaya alıştık, ufak bir indis değişimi yapalım,</p>
+<p><span class="math display">\[
+P^i = 
+\sum_{ U_{ji} &gt; U_{jk} } v_j^{ik} \bigg/ 
+\sum_j \big| v_j^{ik} \big|
+\]</span></p>
+<p>Üstteki hesap &quot;kim benimle beraber'' hesabı olarak ta görülebilir. Eğer daha fazla aktör bu kişiyle beraber ise (bölümdeki kısım), bu durum herhangi bir ikili çarpışmada üstte kalınabileceği anlamına gelir.</p>
+<p>Alttaki &quot;oyun ağacı (game tree)'' şöyle okunabilir, ana beklenti formülleri bu ağacın &quot;düzleştirilmiş'' hali bir bakıma. Her seçenek, seçilebilecek her yol o yolun olasılığı ve nihai uç değeri ile çarpılıp toplanıyor.</p>
+<div class="figure">
+<img src="gametree.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> __future__ <span class="im">import</span> division
+<span class="im">import</span> csv
+
+<span class="kw">class</span> Actor(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, model, x, c, s):
+        <span class="va">self</span>.name <span class="op">=</span> name
+        <span class="va">self</span>.x <span class="op">=</span> x
+        <span class="va">self</span>.c <span class="op">=</span> c
+        <span class="va">self</span>.s <span class="op">=</span> s
+        <span class="va">self</span>.r <span class="op">=</span> <span class="dv">1</span>
+
+        <span class="va">self</span>.basic_utilities <span class="op">=</span> {}
+        <span class="va">self</span>.probs <span class="op">=</span> {}
+        <span class="va">self</span>.expected_utilities <span class="op">=</span> {}
+        <span class="va">self</span>.offers <span class="op">=</span> [] 
+
+
+    <span class="kw">def</span> calculate_utilities(<span class="va">self</span>, alter):
+        dx <span class="op">=</span> <span class="va">self</span>.model.xmax <span class="op">-</span> <span class="va">self</span>.model.xmin
+        mu <span class="op">=</span> <span class="va">self</span>.model.mu
+
+        Us <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">abs</span>((<span class="va">self</span>.x <span class="op">-</span> alter.x)<span class="op">/</span>(dx)))<span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)
+        Uf <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">abs</span>((<span class="va">self</span>.x <span class="op">-</span> alter.x)<span class="op">/</span>(dx)))<span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)
+        Ub <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.25</span><span class="op">*</span>((<span class="bu">abs</span>(<span class="va">self</span>.x <span class="op">-</span> mu)<span class="op">+</span><span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>alter.x))<span class="op">/</span>dx)) <span class="op">\</span>
+             <span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)
+        Uw <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.25</span><span class="op">*</span>((<span class="bu">abs</span>(<span class="va">self</span>.x <span class="op">-</span> mu)<span class="op">+</span><span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>alter.x))<span class="op">/</span>dx)) <span class="op">\</span>
+             <span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)
+        Usq <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span><span class="fl">0.5</span><span class="op">**</span><span class="va">self</span>.r
+
+        <span class="va">self</span>.basic_utilities[alter.name] <span class="op">=</span> {<span class="st">&quot;Us&quot;</span>: Us,
+                                            <span class="st">&quot;Uf&quot;</span>: Uf,
+                                            <span class="st">&quot;Ub&quot;</span>: Ub,
+                                            <span class="st">&quot;Uw&quot;</span>: Uw,
+                                            <span class="st">&quot;Usq&quot;</span>: Usq}
+    <span class="kw">def</span> calculate_prob(<span class="va">self</span>, alter):
+        <span class="cf">if</span> <span class="va">self</span>.x <span class="op">==</span> alter.x:
+            <span class="va">self</span>.probs[alter.name] <span class="op">=</span> <span class="dv">0</span>
+            <span class="cf">return</span>
+
+        top <span class="op">=</span> <span class="dv">0</span>
+        bottom <span class="op">=</span> <span class="dv">0</span>
+        <span class="cf">for</span> agent <span class="kw">in</span> <span class="va">self</span>.model.Actors:
+            d <span class="op">=</span> <span class="bu">abs</span>(agent.x <span class="op">-</span> alter.x) <span class="op">-</span> <span class="bu">abs</span>(agent.x <span class="op">-</span> <span class="va">self</span>.x)
+            top <span class="op">+=</span> agent.c <span class="op">*</span> agent.s <span class="op">*</span> d
+            bottom <span class="op">+=</span> agent.c <span class="op">*</span> agent.s <span class="op">*</span> <span class="bu">abs</span>(d)
+        top <span class="op">=</span> <span class="bu">max</span>(top, <span class="dv">0</span>)
+        <span class="va">self</span>.probs[alter.name] <span class="op">=</span> top<span class="op">/</span>bottom
+
+    <span class="kw">def</span> calculate_expected_utility(<span class="va">self</span>, alter):
+        p <span class="op">=</span> <span class="va">self</span>.probs[alter.name]
+        utils <span class="op">=</span> <span class="va">self</span>.basic_utilities[alter.name]
+        Q <span class="op">=</span> <span class="va">self</span>.model.Q
+        T <span class="op">=</span> <span class="va">self</span>.model.T
+        s <span class="op">=</span> alter.s
+        EU <span class="op">=</span> s <span class="op">*</span> (p <span class="op">*</span> utils[<span class="st">&quot;Us&quot;</span>] <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>p)<span class="op">*</span>utils[<span class="st">&quot;Uf&quot;</span>]) <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>s)<span class="op">*</span>utils[<span class="st">&quot;Us&quot;</span>]
+        EU <span class="op">-=</span> Q<span class="op">*</span>utils[<span class="st">&quot;Usq&quot;</span>] <span class="op">-</span> (<span class="dv">1</span><span class="op">-</span>Q)<span class="op">*</span>(T<span class="op">*</span>utils[<span class="st">&quot;Ub&quot;</span>] <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>T)<span class="op">*</span>utils[<span class="st">&quot;Uw&quot;</span>])
+        <span class="va">self</span>.expected_utilities[alter.name] <span class="op">=</span> EU
+
+    <span class="kw">def</span> calculate_r(<span class="va">self</span>):
+        attack_utils <span class="op">=</span> [alter.expected_utilities[<span class="va">self</span>.name] 
+            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.model.Actors <span class="cf">if</span> alter <span class="kw">is</span> <span class="kw">not</span> <span class="va">self</span>]
+
+        security_levels <span class="op">=</span> []
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.model.Actors:
+            security <span class="op">=</span> <span class="bu">sum</span>([alter.expected_utilities[actor.name] 
+                    <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.model.Actors <span class="cf">if</span> alter <span class="kw">is</span> <span class="kw">not</span> actor])
+            security_levels.append(security)
+
+        max_security <span class="op">=</span> <span class="bu">max</span>(security_levels)
+        min_security <span class="op">=</span> <span class="bu">min</span>(security_levels)
+        R <span class="op">=</span> (<span class="dv">2</span> <span class="op">*</span> <span class="bu">sum</span>(attack_utils) <span class="op">-</span> max_security <span class="op">-</span> min_security) <span class="op">/</span> <span class="op">\</span>
+            <span class="bu">max</span>(<span class="fl">0.001</span>,(max_security <span class="op">-</span> min_security))
+        <span class="va">self</span>.r <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> R<span class="op">/</span><span class="dv">3</span>)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>R<span class="op">/</span><span class="dv">3</span>)
+
+    <span class="kw">def</span> send_offers(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.model.Actors:
+            <span class="cf">if</span> actor.name <span class="kw">in</span> <span class="va">self</span>.expected_utilities:
+                <span class="cf">if</span> <span class="va">self</span>.expected_utilities[actor.name] <span class="op">&gt;</span> <span class="dv">0</span>:
+                    <span class="co"># Send a challenge!                    </span>
+                    offer <span class="op">=</span> {<span class="st">&quot;Sender&quot;</span>: <span class="va">self</span>.name,
+                            <span class="st">&quot;x&quot;</span>: <span class="va">self</span>.x, <span class="co"># Target position</span>
+                            <span class="st">&quot;EU&quot;</span>: <span class="va">self</span>.expected_utilities[actor.name]
+                            }
+                    actor.offers.append(offer)
+
+    <span class="kw">def</span> choose_offer(<span class="va">self</span>):
+        <span class="cf">if</span> <span class="bu">len</span>(<span class="va">self</span>.offers) <span class="op">==</span> <span class="dv">0</span>: <span class="cf">return</span>
+
+        max_util <span class="op">=</span> <span class="bu">max</span>([offer[<span class="st">&quot;EU&quot;</span>] <span class="cf">for</span> offer <span class="kw">in</span> <span class="va">self</span>.offers])
+        <span class="va">self</span>.offers <span class="op">=</span> [offer <span class="cf">for</span> offer <span class="kw">in</span> <span class="va">self</span>.offers <span class="cf">if</span> offer[<span class="st">&quot;EU&quot;</span>] <span class="op">==</span> max_util]
+        offer <span class="op">=</span> <span class="bu">min</span>(<span class="va">self</span>.offers, key<span class="op">=</span><span class="kw">lambda</span> x: <span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>x[<span class="st">&quot;x&quot;</span>]))
+
+        <span class="co"># Resolve offer</span>
+        Uj <span class="op">=</span> offer[<span class="st">&quot;EU&quot;</span>]
+        Ui <span class="op">=</span> <span class="va">self</span>.expected_utilities[offer[<span class="st">&quot;Sender&quot;</span>]]
+        <span class="cf">if</span> Ui <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> Ui <span class="op">&lt;</span> Uj:
+            <span class="co"># There was a conflict, and this actor lost</span>
+            <span class="bu">print</span> <span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; kaybediyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>]
+            <span class="va">self</span>.x <span class="op">=</span> offer[<span class="st">&quot;x&quot;</span>]
+            <span class="co"># If the actor won the conflict, action will be taken on the other end</span>
+        <span class="cf">elif</span> Ui <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">abs</span>(Ui) <span class="op">&lt;</span> Uj:
+            <span class="co"># Compromise</span>
+            <span class="bu">print</span> <span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; orta noktada anlasiyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>]
+            <span class="va">self</span>.x <span class="op">+=</span> (offer[<span class="st">&quot;x&quot;</span>] <span class="op">-</span> <span class="va">self</span>.x) <span class="op">*</span> <span class="bu">abs</span>(Ui<span class="op">/</span>Uj)
+        <span class="cf">elif</span> Ui <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">abs</span>(Ui) <span class="op">&gt;</span> Uj:
+            <span class="co"># Capituate</span>
+            <span class="bu">print</span> <span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; tarafina geciyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>]
+            <span class="va">self</span>.x <span class="op">=</span> offer[<span class="st">&quot;x&quot;</span>]
+
+        <span class="va">self</span>.offers <span class="op">=</span> [] <span class="co"># Reset offers</span>
+
+
+<span class="kw">class</span> Model(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, Actors, xmax, xmin, Q<span class="op">=</span><span class="fl">1.0</span>, T<span class="op">=</span><span class="fl">1.0</span>):
+        <span class="va">self</span>.Actors <span class="op">=</span> Actors
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            actor.model <span class="op">=</span> <span class="va">self</span>
+        <span class="va">self</span>.xmax <span class="op">=</span> xmax
+        <span class="va">self</span>.xmin <span class="op">=</span> xmin
+        <span class="va">self</span>.dx <span class="op">=</span> xmax <span class="op">-</span> xmin
+        <span class="va">self</span>.mu <span class="op">=</span> <span class="dv">0</span> <span class="co"># Current median position</span>
+        <span class="va">self</span>.Q <span class="op">=</span>  Q
+        <span class="va">self</span>.T <span class="op">=</span> T
+
+        <span class="va">self</span>.actor <span class="op">=</span> {actor.name: actor <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors}
+
+    <span class="kw">def</span> vote(<span class="va">self</span>, verbose<span class="op">=</span><span class="va">False</span>):
+        pairwise_contests <span class="op">=</span> {}
+        <span class="cf">for</span> j <span class="kw">in</span> <span class="va">self</span>.Actors:
+            <span class="cf">for</span> k <span class="kw">in</span> <span class="va">self</span>.Actors:
+                votes <span class="op">=</span> <span class="dv">0</span>
+                <span class="cf">for</span> i <span class="kw">in</span> <span class="va">self</span>.Actors:
+                    votes <span class="op">+=</span> i.c<span class="op">*</span>i.s<span class="op">*</span>((<span class="bu">abs</span>(i.x <span class="op">-</span> k.x) <span class="op">-</span> <span class="bu">abs</span>(i.x <span class="op">-</span> j.x))<span class="op">/</span>(<span class="va">self</span>.dx))
+                pairwise_contests[(j.x, k.x)] <span class="op">=</span> votes
+        
+        <span class="cf">if</span> verbose:
+            <span class="cf">for</span> key, val <span class="kw">in</span> pairwise_contests.items():
+                <span class="bu">print</span> key, val
+        <span class="cf">return</span> <span class="bu">max</span>(pairwise_contests, key<span class="op">=</span><span class="kw">lambda</span> x: pairwise_contests[x])[<span class="dv">0</span>]
+
+    <span class="kw">def</span> find_mean(<span class="va">self</span>):
+        t <span class="op">=</span> <span class="dv">0</span> <span class="co"># Running weighted total</span>
+        w <span class="op">=</span> <span class="dv">0</span> <span class="co"># Running total weight</span>
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            w <span class="op">+=</span> actor.s <span class="op">*</span> actor.c
+            t <span class="op">+=</span> actor.s <span class="op">*</span> actor.c <span class="op">*</span> actor.x
+        <span class="cf">return</span> t<span class="op">/</span>w
+
+    <span class="kw">def</span> calculate_basic_utilities(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:
+                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:
+                    actor.calculate_utilities(alter)
+
+    <span class="kw">def</span> calculate_win_probabilities(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:
+                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:
+                    actor.calculate_prob(alter)
+    
+    <span class="kw">def</span> calculate_expected_utilities(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:
+                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:
+                    actor.calculate_expected_utility(alter)
+
+    <span class="kw">def</span> calculate_r(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            actor.calculate_r()
+
+
+    <span class="kw">def</span> make_offers(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            actor.send_offers()
+
+    <span class="kw">def</span> resolve_offers(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            actor.choose_offer()
+
+    <span class="kw">def</span> run_model(<span class="va">self</span>):
+        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:
+            actor.r <span class="op">=</span> <span class="dv">1</span>
+        <span class="va">self</span>.mu <span class="op">=</span> <span class="va">self</span>.vote(<span class="va">False</span>)
+        <span class="va">self</span>.calculate_basic_utilities()
+        <span class="va">self</span>.calculate_win_probabilities()
+        <span class="va">self</span>.calculate_expected_utilities()
+        <span class="va">self</span>.calculate_r()
+        <span class="va">self</span>.mu <span class="op">=</span> <span class="va">self</span>.find_mean()
+        <span class="va">self</span>.calculate_basic_utilities()
+        <span class="va">self</span>.calculate_win_probabilities()
+        <span class="va">self</span>.calculate_expected_utilities()
+        <span class="va">self</span>.make_offers()
+        <span class="va">self</span>.resolve_offers()
+
+<span class="kw">def</span> run(csv_file, <span class="bu">iter</span><span class="op">=</span><span class="dv">10</span>, xmin<span class="op">=</span><span class="dv">1</span>, xmax<span class="op">=</span><span class="dv">10</span>,T<span class="op">=</span><span class="fl">1.0</span>,Q<span class="op">=</span><span class="fl">1.0</span>):
+    <span class="cf">with</span> <span class="bu">open</span>(csv_file, <span class="st">&#39;rU&#39;</span>) <span class="im">as</span> f:
+        reader <span class="op">=</span> csv.DictReader(f, )
+        actors <span class="op">=</span> [actor <span class="cf">for</span> actor <span class="kw">in</span> reader]
+    <span class="cf">for</span> actor <span class="kw">in</span> actors:
+        <span class="cf">for</span> key <span class="kw">in</span> actor:
+            <span class="cf">try</span>:
+                actor[key] <span class="op">=</span> <span class="bu">float</span>(actor[key])
+            <span class="cf">except</span>:
+                <span class="cf">continue</span>
+    Actors <span class="op">=</span> []
+    <span class="cf">for</span> actor <span class="kw">in</span> actors:
+        new_actor <span class="op">=</span> Actor(actor[<span class="st">&quot;Actor&quot;</span>],
+                          <span class="va">None</span>,
+                          actor[<span class="st">&quot;Position&quot;</span>],
+                          actor[<span class="st">&quot;Capability&quot;</span>],
+                          actor[<span class="st">&quot;Salience&quot;</span>]<span class="op">/</span><span class="fl">100.0</span>)
+        Actors.append(new_actor)
+
+    model <span class="op">=</span> Model(Actors, xmax, xmin)
+    <span class="cf">for</span> actor <span class="kw">in</span> model.Actors:
+        actor.model <span class="op">=</span> model
+
+    model.T <span class="op">=</span> T
+    model.Q <span class="op">=</span> Q
+    model.vote()
+    model.find_mean()
+    [actor.x <span class="cf">for</span> actor <span class="kw">in</span> model.Actors]
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">iter</span>):
+        model.run_model()
+        <span class="bu">print</span> model.vote(<span class="va">False</span>)</code></pre></div>
+<p>Bu yaklaşımı örnek olarak 1998'de Britanya'nın Avro para birliğine girip girmeyeceği kararı üzerinde uygulayalım [6]. Alttaki değerler İşçi Partisinin iktidarda olduğu senaryosuna göre seçilmiş, Muhafazakar iktidarı seçeneğinde sadece aktörlerin gücü / etkileri değişiyor, pozisyonlar her iki durumda da aynı. Skalada güç 0-1 arası, pozisyon 0-10.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfuk <span class="op">=</span> pd.read_csv(<span class="st">&#39;uk_emu_labor.csv&#39;</span>)<span class="op">;</span> <span class="bu">print</span> dfuk</code></pre></div>
+<pre><code>                       Actor  Capability  Position  Salience
+0      Isci Partisi (Avrocu)         1.0         8        40
+1  Isci Partisi (AB Karsiti)         0.5         4        40
+2     Ingiliz Merkez Bankasi         0.1         5        60
+3               Teknokratlar         0.1        10        40
+4                Sanayiciler         0.1         5        40
+5      Direktorler Enstitusu         0.1         4        40
+6                Finanscilar         0.1         9        60
+7     Muhafazakar AB Karsiti         0.3         1        95
+8   Muhafazakar AB Taraftari         0.3         6        50</code></pre>
+<p>Oyunu isletince sonuc,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> bdm
+bdm.run(<span class="st">&quot;uk_emu_labor.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">5</span>)</code></pre></div>
+<pre><code>Isci Partisi (Avrocu) tarafina geciyor Sanayiciler
+Isci Partisi (AB Karsiti) tarafina geciyor Finanscilar
+Teknokratlar tarafina geciyor Sanayiciler
+Direktorler Enstitusu tarafina geciyor Finanscilar
+Finanscilar kaybediyor Sanayiciler
+Muhafazakar AB Karsiti tarafina geciyor Sanayiciler
+5.0
+Isci Partisi (AB Karsiti) tarafina geciyor Isci Partisi (Avrocu)
+Direktorler Enstitusu tarafina geciyor Isci Partisi (Avrocu)
+5.0
+5.0
+5.0
+5.0</code></pre>
+<p>5 değeri çıktı, ki bu [6]'daki sonuca yakın. Eğer Muhafazakar Parti iktidarına göre işletirsek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> bdm
+bdm.run(<span class="st">&quot;uk_emu_cons.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">5</span>)</code></pre></div>
+<pre><code>Isci Partisi (Avrocu) tarafina geciyor Ingiliz Merkez Bankasi
+Isci Partisi (AB Karsiti) tarafina geciyor Ingiliz Merkez Bankasi
+Teknokratlar tarafina geciyor Ingiliz Merkez Bankasi
+Direktorler Enstitusu tarafina geciyor Ingiliz Merkez Bankasi
+Finanscilar tarafina geciyor Ingiliz Merkez Bankasi
+Muhafazakar AB Taraftari tarafina geciyor Ingiliz Merkez Bankasi
+1.0
+Isci Partisi (Avrocu) tarafina geciyor Muhafazakar AB Karsiti
+Isci Partisi (AB Karsiti) tarafina geciyor Muhafazakar AB Karsiti
+Teknokratlar tarafina geciyor Muhafazakar AB Karsiti
+Sanayiciler tarafina geciyor Muhafazakar AB Karsiti
+Direktorler Enstitusu tarafina geciyor Muhafazakar AB Karsiti
+1.0
+Ingiliz Merkez Bankasi tarafina geciyor Muhafazakar AB Karsiti
+Finanscilar tarafina geciyor Muhafazakar AB Karsiti
+Muhafazakar AB Taraftari tarafina geciyor Muhafazakar AB Karsiti
+1.0
+1.0
+1.0</code></pre>
+<p>Sonuç 1, yani Avro'ya hiç destek yok. Bu pek beklenmez bir durum değil, çünkü İngiltere'de Muhafazakarlar AB'ye zaten soğuk dururlar. Tarihten biliyoruz ki Britanya Avro'ya girmedi, hatta bilindiği gibi 2016'da referandumda AB'den çıkma kararı aldı!</p>
+<p>Ödev: Britanya'nın AB'den çıkışını (Brexit) tahmini. Mesquita'ya göre metotu için gereken ham veriyi yeterince haberleri izleyen herhangi biri yaratabilir. Aktörler herhalde üstteki örneğe yakın olur, halkın seçiminin bu aktörlerin seçimini yansıttığı varsayılabilir. Sonuç ne olur?</p>
+<p>İlk baştaki emisyon örneği,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> bdm
+bdm.run(<span class="st">&quot;emission.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">10</span>,xmin<span class="op">=</span><span class="dv">4</span>)</code></pre></div>
+<pre><code>Belgium tarafina geciyor France
+Luxembourg orta noktada anlasiyor France
+Ireland tarafina geciyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland orta noktada anlasiyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0
+Belgium tarafina geciyor France
+Luxembourg tarafina geciyor France
+Ireland orta noktada anlasiyor France
+10.0
+Belgium tarafina geciyor Netherlands
+Luxembourg tarafina geciyor Netherlands
+Ireland tarafina geciyor Netherlands
+7.0</code></pre>
+<p>Yeni Model</p>
+<p>BDM'in yeni modeli yeni parametreler kullanıyor, örnek <code>mugabe-full.csv</code> içinde bulunabilir. Uzun yıllar başta kalan bir diktatör Mugabe'nin nasil o noktada kalabildiğini destekcileri uzerinden görmek mümkün, bir türlü gitmek bilmeyen liderlerin arkasındaki dinamikleri anlamak için bilgilendirici herhalde!</p>
+<p>Hocanın yeni modeli [4,9]'ta anlatılıyor fakat, kodlamak için hala yeterli bilgi yok. Aslında eski kod için de yeterli bilgi yok, fakat [10]'daki araştırmacı kolları siyayıp tüm makalelerde anlatılanları birleştirerek bir kod çıkartmaya uğraşmış. Bir örneği <code>masad/emissions.py</code> içinde bulabiliriz.</p>
+<p>Kaynaklar</p>
+<p>[1] Stack Exchange, <em>Expected Utility Method and a Repeated Game Solution</em>, <a href="http://math.stackexchange.com/questions/1366279/expected-utility-method-and-a-repeated-game-solution" class="uri">http://math.stackexchange.com/questions/1366279/expected-utility-method-and-a-repeated-game-solution</a></p>
+<p>[2] Bueno De Mesquita BB (1994) {}. In: Stockman F (ed.) <em>European Community Decision Making</em>. Yale, CT: Yale University Press, Chapter 4, 71-104.</p>
+<p>[3] Scholz, <em>Unravelling Bueno De Mesquita's group decision model</em>, <a href="https://oficiodesociologo.files.wordpress.com/2012/03/scholz-et-all-unravelling-bueno-de-mesquita-s-group-decision-model.pdf" class="uri">https://oficiodesociologo.files.wordpress.com/2012/03/scholz-et-all-unravelling-bueno-de-mesquita-s-group-decision-model.pdf</a></p>
+<p>[4] <em>A New Model for Predicting Policy Choices: Preliminary Tests</em> <a href="http://irworkshop.sites.yale.edu/sites/default/files/BdM_A%20New%20Model%20for%20Predicting%20Policy%20ChoicesREvised.pdf">http://irworkshop.sites.yale.edu/sites/default/files/BdM_A%20New%20Model%20for%20Predicting%20Policy%20ChoicesREvised.pdf</a></p>
+<p>[5] Eftekhari, <em>Preana: Game Theory Based Prediction with Reinforcement Learning</em>, <a href="http://www.scirp.org/journal/PaperDownload.aspx?paperID=49058" class="uri">http://www.scirp.org/journal/PaperDownload.aspx?paperID=49058</a></p>
+<p>[6] <em>The Predictability of Foreign Policies</em>, The British EMU Policy, <a href="https://www.rug.nl/research/portal/files/3198774/13854.pdf" class="uri">https://www.rug.nl/research/portal/files/3198774/13854.pdf</a></p>
+<p>[7] J. Velev, Python Code, <a href="https://github.com/jmckib/bdm-scholz-expected-utility-model.git" class="uri">https://github.com/jmckib/bdm-scholz-expected-utility-model.git</a></p>
+<p>[8] <em>The Visible Hand</em>, <a href="http://s3.amazonaws.com/os_extranet_files_test/27236_59690_fa12visible.pdf" class="uri">http://s3.amazonaws.com/os_extranet_files_test/27236_59690_fa12visible.pdf</a></p>
+<p>[9] Mesquita, <em>The Predictioneer's Game</em></p>
+<p>[10] Masad, <em>Replicating the replication of BDM's Expected Utility Model</em>, <a href="https://github.com/dmasad/BDM_DecisionModel_Replication" class="uri">https://github.com/dmasad/BDM_DecisionModel_Replication</a></p>
+</body>
+</html>

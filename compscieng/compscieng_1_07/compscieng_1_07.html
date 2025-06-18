@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-1.7">Ders 1.7</h1>
+<p>Bugün pozitif kesinlik (positive definite) günü. Şimdiye kadar lineer cebirin temellerini işledik, bundan sonra uygulamalara daha ağırlık vereceğiz, tabii ki matrisler yapacağımız her şeyin temelinde olmaya devam edecekler. Konuya şu açılardan yaklaşacağız:</p>
+<ol style="list-style-type: decimal">
+<li>Testler 2) Anlam 3) Uygulamalar</li>
+</ol>
+<p>İlk önce testler. Pozitif kesinlik kelimesi söyleyince matrisin simetrik olduğunu anlamak gerekiyor, yani matrisin reel özdeğerleri var, ve pek çok diğer özelliği de var muhakkak, mesela özvektörlerinin birbirine dik olması gibi. Bu derste daha fazla özellik göreceğiz, ve bu ekstralar özellikler uygulamalarda hakikaten müthiş faydalar sağlıyorlar.</p>
+<p>Daha önce söylediğimiz gibi pozitif kesinlik lineer cebirin tamamını bir araya getirir. Testleri şunlardır:</p>
+<ol style="list-style-type: decimal">
+<li><p>Tüm pivotlar <span class="math inline">\(&gt;\)</span> 0</p></li>
+<li><p>Tüm üst sol determinantlar (upper left determinants) <span class="math inline">\(&gt;\)</span> 0</p></li>
+<li><p>Tüm özdeğerler <span class="math inline">\(&gt;\)</span> 0</p></li>
+</ol>
+<p>&quot;Üst sol'' ile neyi kastediyorum? 3x3 bir matriste (alttaki resim) kareye alınılmış bölümlerden. Bunlardan birincisi sadece <span class="math inline">\(a\)</span> değerini veriyor. İkinci üst sol determinant <span class="math inline">\(ac - b^2\)</span> (iki tane <span class="math inline">\(b\)</span> var çünkü matris simetrik, unutmayalım) değerini veriyor, vs. Bu iki değerin de sıfırdan büyük olması gerekiyor. Tabii ki ana determinantın da <span class="math inline">\(&gt;\)</span> 0 olması gerekiyor. Doğal olarak <span class="math inline">\(ac &gt; b^2\)</span>, çaprazdaki çarpım, çapraz dışındaki değerlerin çarpımını &quot;pozitiflikte geçmeli'', başka türlü çıkarma işlemi pozitif sonuç vermezdi.</p>
+<div class="figure">
+<img src="7_1.png" />
+
+</div>
+<p>Anlama gelelim. Pozitif kesinlik kavramı, bir eğrinin [eliyle dışbükey bir parabol hareketi yapıyor, onun alt noktasını kastederek] minimumunu bulmak ile yakından alakalı, ya da &quot;enerjiyi azaltma'' problemleriyle alakalı. Bu fiziksel anlamı bu özelliğin uygulamalarda niye bu kadar faydalı olmasının da bir sebebi aslında. <span class="math inline">\(x\)</span>'in bir fonksiyonunu hayal edelim:</p>
+<p><span class="math display">\[ f(x) = x^TKx \]</span></p>
+<p>ve diyelim ki <span class="math inline">\(K\)</span></p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+a &amp; b \\
+b &amp; c
+\end{array}\right]
+ \]</span></p>
+<p>bu derste <span class="math inline">\(x\)</span>'in kendisi ile çarpımını ilk kez kullanıyoruz bu arada. Bu form doğal olarak karesel bir sonuç ortaya çıkartacak. Biraraya koyarsak</p>
+<p><span class="math display">\[ f(x) =
+\left[\begin{array}{rr}
+x_1 &amp; x_2 
+\end{array}\right]
+\left[\begin{array}{rr}
+a &amp; b \\
+b &amp; c
+\end{array}\right]
+\left[\begin{array}{r}
+x_1 \\ x_2 
+\end{array}\right]
+ \]</span></p>
+<p>Sonuç hangi boyutlarda çıkar?</p>
+<p><span class="math display">\[ f(x) = \underbrace{x}_{1xn}^T\underbrace{K}_{nxn}\underbrace{x}_{nx1} \]</span></p>
+<p>Zinciri takip edersek, 1x1 boyutlarında. Temel lineer cebirden hatırlarsak, <span class="math inline">\(N \times M\)</span> ve <span class="math inline">\(M \times K\)</span> çarpımı <span class="math inline">\(N \times K\)</span> boyutlarında bir matris çıkartır. Elde edeceğimiz <span class="math inline">\(1 \times 1\)</span> ise, bu tek bir sayıdır. Tek sayının bileşenleri nedir? Çarpımı cebirsel olarak takip edersek</p>
+<p><span class="math display">\[ = ax_1^2 + 2bx_1x_2 + cx_2^2 \]</span></p>
+<p>İşte &quot;enerji'' formülü bu, bu forma niye enerji dediğimiz ileriki derslerde uygulamalara girince daha da iyi belli olacak. Formun çok önemli bir anlamı var.</p>
+<p>Bu noktada üstte belirttiğim testlere bir 4. kalem ekleyebilirim, hatta önemini belirtmek için başına yıldız bile koymak düşünülebilir!</p>
+<ol start="4" style="list-style-type: decimal">
+<li><span class="math inline">\(x=0\)</span> haricindeki tüm <span class="math inline">\(x\)</span>'ler için <span class="math inline">\(x^TKx &gt; 0\)</span>.</li>
+</ol>
+<p>Bu son formülü açıklamak için bir grafik çizelim.</p>
+<div class="figure">
+<img src="7_2.png" />
+
+</div>
+<p>Değişen her <span class="math inline">\(x_1\)</span> ve <span class="math inline">\(x_2\)</span>'ya göre hesaplanan, çizilen <span class="math inline">\(x^TKx\)</span>'in grafiği yani. Bu grafik neye benzerdi acaba? Sıfırdan başlarsam hep yukarı gider değil mi? Bir kapa benzerdi, ve resmi aşağı yukarı şöyle olurdu.</p>
+<div class="figure">
+<img src="7_3.png" />
+
+</div>
+<p><span class="math inline">\(K\)</span> yerine diğer bazı pozitif kesin matrisleri düşünelim. Mesela birim matris hangi <span class="math inline">\(f(x)\)</span>'e sebep olur? <span class="math inline">\(x_1^2 + x_2^2\)</span>, ki bu formülde mükemmel bir kap şeklini ortaya çıkartır. Ya şu matris olsaydı?</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+1 &amp; 2 \\
+2 &amp; 9
+\end{array}\right]
+ \]</span></p>
+<p>Sonuç <span class="math inline">\(x_1^2 + 4x_1x_2 + 9x_2^2\)</span> olurdu, o zaman şekil üst kesitinde daha eliptik bir şekilde olurdu. Üstteki matriste 2 değerinden yukarı çıkabiliriz, ama pozitif kesinlik istiyorsak bu <span class="math inline">\(9 \cdot 1\)</span>'i geçmeyecek kadar olmalı.</p>
+<p>İlginç bir durum pozitif kesinliğin tam sınırındaki durumdur. Matematikte bu tür sınır şartları anlamak bütünü kavramakta faydalı oluyor. Mesela üstteki örnekte 2 yerine 3 olsaydı o zaman</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+1 &amp; 3 \\
+3 &amp; 9
+\end{array}\right]
+ \]</span></p>
+<p>Bu matrise bakalım, ikinci kolon birincisinin &quot;katı'' olduğu için hemen bu matrisin eşsiz olduğunu anlıyoruz. O zaman özdeğerlerinden biri kesinlikle 0 olmalı. Matrisin izi özdeğer toplamını verdiğine göre ikinci özdeğer 10. Formülü neye benzer? <span class="math inline">\(x_1^2 + 6x_1x_2 + 9x_2^2\)</span>. Bu tür matrislere pozitif yarı-kesin (semi-definite) deniyor. Özdeğerleri <span class="math inline">\(\ge 0\)</span>, determinantları <span class="math inline">\(\ge 0\)</span>, ve sebep oldukları <span class="math inline">\(f(x) \ge 0\)</span>, yani enerjileri <span class="math inline">\(\ge 0\)</span>.</p>
+<p>Mantık yürütmeye devam edelim. Pozitif yarı kesinlik eşsiz bir matrisin olduğu anlamına geliyorsa, o zaman bazı <span class="math inline">\(x\)</span> değerleri için <span class="math inline">\(f(x)\)</span> sıfır olacak demektir. Üstteki örnekte bu hangi değer? [3 -1]'i deneyelim, ve çarpımı yapalım</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+1 &amp; 3 \\
+3 &amp; 9
+\end{array}\right]
+\left[\begin{array}{r}
+3 \\
+-1
+\end{array}\right] =
+\left[\begin{array}{r}
+0 \\
+0
+\end{array}\right] 
+ \]</span></p>
+<p>Hakikaten de <span class="math inline">\(x_1 = 3\)</span> ve <span class="math inline">\(x_2=-1\)</span> kullanınca <span class="math inline">\(x_1^2 + 6x_1x_2 + 9x_2^2\)</span> formülünün sıfır sonucunu verdiğini görürüz. Şekil aşağı yukarı şöyle:</p>
+<div class="figure">
+<img src="7_4.png" />
+
+</div>
+<p>Hoca bu şekli çizmek için <span class="math inline">\(x_1\)</span> üzerinde 3 birim ileri, <span class="math inline">\(x_2\)</span> üzerinde 1 birim geri gitti, ve o noktadan geçen bir çizgi üzerinde değişim, yukarı aşağı gidiş yok. Bu çizgi tabii ki 3 ve -1'ın katları alınarak elde edilebilecek noktalardan oluşuyor, ve bu noktalar üstteki matrisin &quot;sıfırlık uzayında (nullspace)''. Pozitif kesin matrislerden gelen grafikler, kıyasla, böyle değildi. O grafiklerde kap uzerindeki her noktadaki gidiş yönü yukarı işaret ediyordu.</p>
+<p>Daha iyi çizilmiş bir şekil şöyle:</p>
+<div class="figure">
+<img src="7_5.png" />
+
+</div>
+<p>Şimdi de pozitif yarı-kesin bile olmayan bir matrisi düşünelim. Bu matriste çapraz dışı (off-diagonal) değerler çok daha büyük ve &quot;kazanıyorlar''. Örnek</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+x_1 &amp; x_2 
+\end{array}\right]
+\left[\begin{array}{rr}
+1 &amp; 5 \\
+5 &amp; 9
+\end{array}\right]
+\left[\begin{array}{r}
+x_1 \\ x_2 
+\end{array}\right] =
+x_1^2 + 10x_1x_2 + 9x_2^2
+ \]</span></p>
+<p>Bu formülü belli bazı <span class="math inline">\(x\)</span> değerleriyle negatif yapmak mümkün. Hangi değerler mesela? Diyelim ki <span class="math inline">\(x_1 = -1\)</span> ve <span class="math inline">\(x_2 = 1/2\)</span>. Bu formül bazı noktalarda aşağı, bazılarında yukarı gidebiliyor. Bu durumu ortaya çıkartan matrislere &quot;tanımsız (indefinite)'' ismi veriliyor. Grafiği alttaki gibi, atların üzerine koyulan bir eğer gibi.</p>
+<div class="figure">
+<img src="7_6.png" />
+
+</div>
+<p>Bunlar önemli noktalar. Şimdi biraz ileri atlayalım. Elimizde bazı seçenekler var. Mesela tipik olarak <span class="math inline">\(Ku = f\)</span> durumunda bir formül çözüyorduk ve tek bir çözüm buluyorduk. Bir diğer seçenek te bir fonksiyonu, bir enerjiyi minimize etmek. Uygulamalar için seçenekler bunlar.</p>
+<p>Pozitif kesin matrisler alttaki ifadeden gelirler. Bu kavram test olarak ta anlamlı, o yüzden testlere bir 5. kalem ekleyeceğiz.</p>
+<ol start="5" style="list-style-type: decimal">
+<li><span class="math inline">\(K = A^TA\)</span>.</li>
+</ol>
+<p>Bu ifade pozitif kesin. Niye? <span class="math inline">\(x^TKx = x^TA^TAx\)</span>'ye bakalım.</p>
+<p><span class="math display">\[ x^TA^TAx \]</span></p>
+<p>Bu ifade aslında şu değil mi?</p>
+<p><span class="math display">\[ = (Ax)^T(Ax) \]</span></p>
+<p>Ve bu ifadenin de <span class="math inline">\((Ax)^T(Ax) \ge 0\)</span> olduğunu biliyoruz, çünkü <span class="math inline">\(Ax\)</span>'in devriği tekrar kendisi ile çarpılıyor. İfadenin sıfıra eşit olması ancak <span class="math inline">\(Ax=0\)</span> ise mümkündür. Mantık zincirine devam edersek, <span class="math inline">\(Ax=0\)</span>'yi çözen bir <span class="math inline">\(x\)</span> varsa (<span class="math inline">\(A\)</span>'nin sıfır uzayı boş değilse), yani <span class="math inline">\(Ax=0\)</span>'e sebep olacak sıfır vektörü haricinde bir <span class="math inline">\(x\)</span> mevcutsa, o zaman <span class="math inline">\((Ax)^T(Ax)\)</span> pozitif yarı-kesin demektir, çünkü o zaman <span class="math inline">\(Ax=0\)</span> olabilecektir.</p>
+<p><span class="math inline">\(Ax=0\)</span> uygulamalarda nasıl ortaya çıkar? Mesela bir yay sisteminde eğer yer değişimi var ama yay esnemesi yoksa (<span class="math inline">\(Ax\)</span> yay esnemesini ölçer), bu durum ortaya çıkabilir. Peki bu nasıl mümkün olabilir, yay esnemeden, daralmadan nasıl hareket olabilir? Eğer yay sisteminin &quot;tamamı'' kaldırılıp başka yere götürülürse. Bu sistem serbest-serbest sistemi ile mümkün, yani iki ucun bir yere bağlı olmadığı bir yay sisteminde, sistem <span class="math inline">\(\left[\begin{array}{ccc}1&amp;1&amp;1\end{array}\right]\)</span> vektörü ile bir yere taşınıyor. Bu durumda matris eşsiz demektir, çünkü pozitif yarı-kesindir. Yani tipik matrislerimizden</p>
+<p><span class="math inline">\(K,T\)</span> pozitif kesin.</p>
+<p><span class="math inline">\(B, C\)</span> pozitif yarı-kesin.</p>
+<p>Mantığa devam: Sadece ve sadece <span class="math inline">\(A\)</span> matrisinin bağımsız kolonları var ise, o zaman <span class="math inline">\(Ax\)</span> pozitif kesindir.</p>
+<p>Şimdi pozitif-kesin matrislerin tersini (inverse) düşünelim. Tersini alınca ele geçen matris te pozitif kesin midir? Bunu kararlaştırmak için elimizde bir sürü test var. Pivot ve determinantlara girmek biraz işleri karıştırır, ama özdeğerlere ne olur, kendimize bunu soralım. Bu özdeğerlerin ne olacağını hemen biliyoruz, mesela elimizde 3,4,5 gibi özdeğerler olsa (hepsi pozitif tabii ki), matrisin tersini alınca elde edeceğimiz özdeğerler 1/3,1/4,1/5 gibi değerler olacaktır, ki bu değerler de pozitiften. 1'den küçük olabilirler ama 0'dan büyüktürler. En basit kontrol edilebilecek test buydu. Pozitif kesinlik için bütün testlerin doğru olması gerekir.</p>
+<p>Peki elimizde iki pozitif kesin matris <span class="math inline">\(K_1\)</span> ve <span class="math inline">\(K_2\)</span> varsa</p>
+<p><span class="math display">\[ K_1 + K_2 \]</span></p>
+<p>pozitif kesin midir? Bu toplamın özdeğerlerine bakmak zor olur. Fakat 4. testi kullanabiliriz. <span class="math inline">\(K_1\)</span> ve <span class="math inline">\(K_2\)</span>'yi <span class="math inline">\(x\)</span> ile çarpalım.</p>
+<p><span class="math display">\[ x^TK_1x + x^TK_2x \]</span></p>
+<p>Formüldeki her terim sıfırdan büyüktür, çünkü bu pozitif kesinliğin tanımı. O zaman toplam da sıfırdan büyük olacaktır. Bu sonuca eriştikten sonra, şimdi cebirsel olarak basitleştiririz:</p>
+<p><span class="math display">\[ x^T(K_1 + K_2)x \]</span></p>
+<p>Ve iki pozitif kesin matrisin toplamına erişmiş oluruz. Demek ki iki pozitif kesin matrisin toplamı da pozitif kesindir.</p>
+<p>Peki toplam şöyle olsaydı?</p>
+<p><span class="math display">\[ \underbrace{K_1}_{A^TA} + \underbrace{K_2}_{B^TB} \]</span></p>
+<p>A ve B'yi tek bir matris içine koyduğumuzu varsayalım, ki bu matrislere &quot;blok matrisleri'' deniyor:</p>
+<p><span class="math display">\[ C = 
+\left[\begin{array}{r}
+A \\
+B
+\end{array}\right]
+ \]</span></p>
+<p>Blok matrisinin devriği nedir?</p>
+<p><span class="math display">\[ 
+C^T = 
+\left[\begin{array}{rr}
+A^T &amp; B^T
+\end{array}\right]
+ \]</span></p>
+<p>Blok matrisleri nasıl çarparım?</p>
+<p><span class="math display">\[  
+C^TC = A^TA + B^TB 
+\]</span></p>
+<p>Bu <span class="math inline">\(K_1 + K_2\)</span>'ya eşittir.</p>
+<p>Ekler</p>
+<p>Noktasal çarpım bakış açısı çarpım içeren açılımı göstermek için <span class="math inline">\((Ax)^T Ax\)</span> iyi bir örnek. Mesela bir problemde <span class="math inline">\(||Ax||^2 = Ax \cdot Ax\)</span> verilmiş ise eşitliğin sağ tarafını <span class="math inline">\((Ax)^T Ax\)</span> olarak görerek açılıma oradan devam edebiliriz [1],</p>
+<p><span class="math display">\[
+Ax \cdot Ax = (Ax)^T Ax = x^T A^T (Ax) =
+x^T (A^T A) x 
+\]</span></p>
+<p>Dikkat, <span class="math inline">\(x^T\)</span> ile ifadenin geri kalanı arasında da bir noktasal çarpım var aslında, o zaman</p>
+<p><span class="math display">\[
+= x \cdot (A^T A) x
+\]</span></p>
+<p>formülüne de erişilebilir.</p>
+<p>Kaynaklar</p>
+<p>[1] Math Stack Exchange, <em>Transpose matrix and inner product</em>, <a href="https://math.stackexchange.com/questions/2823831/transpose-matrix-and-inner-product" class="uri">https://math.stackexchange.com/questions/2823831/transpose-matrix-and-inner-product</a></p>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-2.11">Ders 2.11</h1>
+<p>Konumuz kesit seviyeleri (level sets). Bu alanda Sethian ve Osher otorite sayılıyor, 80'li yıllarda yayınladıkları makale ve kitaplarda konuyu etraflıca işlediler.</p>
+<p>Elimizde bir eğri var diyelim (altta resimde <span class="math inline">\(t=0\)</span> anındaki)</p>
+<div class="figure">
+<img src="2_11_01.jpg" />
+
+</div>
+<p>ve bu &quot;arayüz (interface)'' ya da duvar, bu eğri hareket ediyor. İlerliyor. Bu ilerlemenin kendi normali (yani eğrinin her noktasındaki teğetine dik) yönünde olduğunu düşünelim. Bu ilerleme şeklini biz empoze ediyoruz, sonra formüllerin buna göre nasıl şekillendiğini göreceğiz. Bu ilerleme sonunda mesela <span class="math inline">\(t=0\)</span>'da görülen şekilden <span class="math inline">\(t=1\)</span>'deki şekle gelinmiş olacak. En ideal şartlarda hızın hiçbir noktada değişmediğini düşünebiliriz, yani hız sabit. O zaman birim zamanda sabit hızda (diyelim o da 1), mesafe 1 katedilmiş olur.</p>
+<p>Eğrinin nasıl tarif edildiği anahtar. Eğriyi, o eğri üzerindeki belli yerlerde noktalar üzerinden mi temsil etsem? Ki o her nokta bir bilinmeyen / değişkenle genel formüle dahil edilse? O noktaların her birinde ayrı bir normal diferansiyel denklem (ordinary differential eqution) olabilirdi, o denklemi takip ederek bir sonraki noktaya gidebilirdim, vs.</p>
+<p>Fakat kesit seviyeleri böyle işlemiyor. Hatta ilk akla gelen (gayet doğal)parçacıklı üstteki fikir sayısal hesaplarda çabucak bazı engellere tosluyor. Mesela üstteki resimdeki örnek idealdi dedik, parçacıklar <span class="math inline">\(t=1\)</span>'da biraz yayılırlar, çok değil, ama çok yayılıyor da olabilirlerdi. Ya da ters yönde eğime göre noktalar aynı noktada toplanabilirdi, bu sayısal hesabı iyice bozardı çünkü noktalar üst üste binerdi, aradaki farkları doğru dürüst hesaplayamazdık.</p>
+<p>Peki o zaman kesit seviyeleri bu problemleri nasıl çözüyor? Ondan önce kesit seviyesi nedir? Kesit seviyesi bir ana fonksiyona göre tarif edilir, mesela <span class="math inline">\(\Phi(x,y)\)</span>'nin kesit seviyesi. Bu seviye <span class="math inline">\(\Phi(x,y) = 0\)</span> olabilir, yani <span class="math inline">\(\Phi(x,y)\)</span>'nin sıfırdaki kesit seviyesine bakabiliriz.</p>
+<p>Kesitleri üç boyutlu yüzey üzerinde yapılan yatay kesitler olarak düşünebiliriz. Üç boyutlu fonksiyonun o yatay düzlem üzerindeki hali, yansıması bu kesittir. Birden fazla kesiti farklı kontur renkleri ile gösterebilirdik. Mesela yeryüzeyi <span class="math inline">\(x,y\)</span> kordinatlarındaki yükseklik (dağlar) verisini konturlar olarak göstermek klasik bir topografi tekniğidir. Yapay bir veri üzerinde görelim, <span class="math inline">\(x,y\)</span> ve yükseklik deyince üç boyutlu bir fonksiyondan bahsediyoruz, onun ayrıksal halini mesela 10x10 boyutunda bir matris ile gösterebiliriz. Formül</p>
+<p><span class="math display">\[\Phi(x,y) = \exp \left( -2 \log(2) ((x-x_0)^2 + (y-y_0)^2) / s^2 \right) \]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+<span class="im">from</span> matplotlib <span class="im">import</span> cm
+
+<span class="kw">def</span> Phi(x, y):
+    s <span class="op">=</span> <span class="fl">1.5</span><span class="op">;</span> x1 <span class="op">=</span> <span class="fl">5.0</span><span class="op">;</span> y1 <span class="op">=</span> <span class="fl">5.0</span>
+    g <span class="op">=</span> np.exp( <span class="dv">-2</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x1)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y1)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s<span class="op">**</span><span class="dv">2</span>)
+    <span class="cf">return</span> g
+  
+D <span class="op">=</span> <span class="dv">10</span>
+x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">10</span>,D)
+y <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">10</span>,D)
+xx,yy <span class="op">=</span> np.meshgrid(x,y)
+zz <span class="op">=</span> Phi(xx,yy)
+
+fig <span class="op">=</span> plt.figure()
+ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)
+surf <span class="op">=</span> ax.plot_surface(xx, yy, zz, cmap<span class="op">=</span>cm.coolwarm,
+                       linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">False</span>)
+plt.savefig(<span class="st">&#39;2_11_02.png&#39;</span>)
+
+plt.figure()
+contours <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>]
+cs<span class="op">=</span>plt.contour(xx,yy,zz,contours)
+plt.clabel(cs,inline<span class="op">=</span><span class="dv">1</span>,fontsize<span class="op">=</span><span class="dv">9</span>)
+plt.savefig(<span class="st">&#39;2_11_03.png&#39;</span>)</code></pre></div>
+<p><img src="2_11_02.png" /> <img src="2_11_03.png" /></p>
+<p>Tam ortasına bir tepe koyduk, bir analitik fonksiyon kulladik ama bunu rahatlık amacıyla yaptık, elle bazı değerleri matriste gerekli yerlere direk koysak aynı sonucu elde ederdik. Üstteki matrisin değerlerini basarsak mesela şuna benzer,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">np.set_printoptions(precision<span class="op">=</span><span class="dv">3</span>,suppress<span class="op">=</span><span class="va">True</span>)
+<span class="bu">print</span> (zz)</code></pre></div>
+<pre><code>[[0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]
+ [0.    0.    0.    0.002 0.005 0.005 0.002 0.    0.    0.   ]
+ [0.    0.    0.005 0.026 0.062 0.062 0.026 0.005 0.    0.   ]
+ [0.    0.002 0.026 0.146 0.343 0.343 0.146 0.026 0.002 0.   ]
+ [0.    0.005 0.062 0.343 0.807 0.807 0.343 0.062 0.005 0.   ]
+ [0.    0.005 0.062 0.343 0.807 0.807 0.343 0.062 0.005 0.   ]
+ [0.    0.002 0.026 0.146 0.343 0.343 0.146 0.026 0.002 0.   ]
+ [0.    0.    0.005 0.026 0.062 0.062 0.026 0.005 0.    0.   ]
+ [0.    0.    0.    0.002 0.005 0.005 0.002 0.    0.    0.   ]
+ [0.    0.    0.    0.    0.    0.    0.    0.    0.    0.   ]]</code></pre>
+<p>Kontur grafiğinde üç tane konturu gösterdik, <code>contours</code> değişkeni listesinde tanımlı.</p>
+<p>Derse dönelim. Yani kesit seviyeleri bir eğriyi dolaylı (implicitely) tanımlamış oluyor. İki boyutlu bir eğriyi bir sürü nokta üzerinden tanımlamak yerine, üç boyutlu bir yüzeyin bir kesit üzerindeki yansıması üzerinden tanımlıyoruz, yani <span class="math inline">\(\Phi(x,y) = 0\)</span> gibi. Yani bir eğri, <span class="math inline">\(\Phi(x,y) = 0\)</span> denklemini <em>çözen</em> <span class="math inline">\(x,y\)</span> değerleri oluyor.</p>
+<p>Basit bir örnek üzerinde görürsek, mesela <span class="math inline">\(\Phi(x,y) = x^2 + y^2\)</span>. Bu fonksiyonun kesit seviyelerini nasıl alırım? <span class="math inline">\(\Phi\)</span>'yi bir sabite eşitleyerek bu seviyeleri elde edebilirim, <span class="math inline">\(\Phi(x,y) = x^2 + y^2 = c\)</span>. <span class="math inline">\(c\)</span> pozitif olduğunda elde edilen sonuçlar çember olacaktır tabii, bu formül klasik, ünlü bir formül.</p>
+<p>Üç boyutta <span class="math inline">\(z=\Phi(x,y)\)</span> <span class="math inline">\(x,y,z\)</span> kordinatında bir yüzeydir, bir kap şekli, onu <span class="math inline">\(z=c\)</span> düzlemi ile kesersek o düzleme yansıyan eğri kesit seviyesi, bir çember. Onu <span class="math inline">\(x,y\)</span> düzlemine indirirsek orada da bir çember görürüz.</p>
+<div class="figure">
+<img src="2_11_04.jpg" />
+
+</div>
+<p>Kesit seviyelerin önemli bir avantajı üç boyuttaki tek fonksiyonu manipüle etmeye izin vermesi, bu rahat, tek <span class="math inline">\(\Phi\)</span> ile mesela iki tane ayrı çember elde edebilirdim.</p>
+<div class="figure">
+<img src="2_11_05.jpg" />
+
+</div>
+<p>Eğriyi ilerletmek için gradyan yönünü seçiyoruz. Bu yön eğrinin birim normali,</p>
+<p><span class="math display">\[
+\vec{n} = \frac{\mathrm{grad} \Phi}{|\mathrm{grad} \Phi|}
+\]</span></p>
+<p>Gradyanın 1 olduğu özel durum için, yani <span class="math inline">\(|\mathrm{grad} \Phi| = 1\)</span>, üstteki formül basitleşir.</p>
+<p>Eğrinin hareketini tanımlayan bir diğer faktör eğriye etki eden hız alanı, yani <span class="math inline">\(v\)</span>. Bu alan her <span class="math inline">\(x,y\)</span> noktasında tanımlı <span class="math inline">\(v(x,y)\)</span> olarak gösterilebilir. Hepsi bir arada olursa,</p>
+<p><span class="math display">\[
+\frac{\partial \Phi}{\partial t} + v \cdot \mathrm{grad} \Phi = 0 
+\qquad (1)
+\]</span></p>
+<p>Üstteki formülasyonun detaylı türetilmesi için bkz [3].</p>
+<p><span class="math inline">\(v\)</span> bir alandır, her <span class="math inline">\(x,y\)</span> için farklı olabilir. <span class="math inline">\(\Phi\)</span>'nin bir fonksiyonu da olabilir. Yani hız eğrinin ne durumda olduğuyla bağlantılı olabilir, Çoğunlukla <span class="math inline">\(v\)</span> mesela eğrinin kavisliliğine (curvature) bağlantılandırılır.</p>
+<p>(1)'i şu şekilde tekrar yazarsak,</p>
+<p><span class="math display">\[
+\frac{\partial \Phi}{\partial t} + v \cdot
+\frac{\mathrm{grad} \Phi}{|\mathrm{grad} \Phi|} |\mathrm{grad} \Phi| = 0 
+\]</span></p>
+<p><span class="math inline">\(\mathrm{grad} \Phi/|\mathrm{grad} \Phi|\)</span> ifadesi egrinin normali <span class="math inline">\(\vec{n}\)</span>, o zaman</p>
+<p><span class="math display">\[
+\frac{\partial \Phi}{\partial t} + v \cdot n |\mathrm{grad} \Phi| = 0 
+\]</span></p>
+<p>elde ediyoruz, <span class="math inline">\(v \cdot n\)</span>'e yeni bir isim verebilirim, ona hız diyelim. Normal yöndeki hız, <span class="math inline">\(F\)</span>, ve <span class="math inline">\(\mathrm{grad}\)</span> yerine <span class="math inline">\(\nabla\)</span> kullanırsak,</p>
+<p><span class="math display">\[
+\frac{\partial \Phi}{\partial t} + F |\nabla \Phi| = 0 
+\]</span></p>
+<p>Bu hız normal yöndedir. Ünlü kesit seviyesi formülü budur. Eğer <span class="math inline">\(F\)</span> sabit ise biraz önce bahsettiğimiz yangının yayılma durumu ortaya çıkar. Ateş bildiğimiz gibi yakabildiği her yere gitmek ister, sürekli ileri doğru ilerler. <span class="math inline">\(F\)</span>'nin illa sabit olması gerekmez, <span class="math inline">\(\nabla \Phi\)</span>'nin bir fonksiyonu bile olabilir, o zaman onu <span class="math inline">\(F(\nabla \Phi)\)</span> yapardım. Mesela</p>
+<p><span class="math display">\[
+\kappa = \mathrm{div} \left( \frac{\mathrm{grad} \Phi}{|\mathrm{grad} \Phi|} \right)
+\]</span></p>
+<p>Bu bir <span class="math inline">\(F(\nabla \Phi)\)</span> örneği, <span class="math inline">\(\nabla \Phi\)</span>'nin bir fonksiyonu. Lineer değil doğal olarak, gayrı lineer işlemler var.</p>
+<p>Üstteki formül eğrinin kavisliliğiyle bir alaka kuruyor. Kavislilik üzerinden eğri hareketi ilginç bir şey; mesela bir elipsi düşünelim, ve hareket içeri doğru olsun.</p>
+<div class="figure">
+<img src="2_11_06.jpg" />
+
+</div>
+<p>Elipsin üst, kavisin daha az olduğu yerlerde içeri hareket (hızı) daha az, çok olduğu yerlerde daha fazla ise, o zaman değişim ardından bir çembere ulaşılacaktır. Hatta aslında hangi ilk şekilden başlarsak başlayalım, gidişat aynı şekilde mükemmel bir çembere doğru olacaktır.</p>
+<p>Şimdiye kadar gördüklerimiz kesit seviyeleri. Bu denklemlerin bir de hesapsal olarak sonlu farklar (finite difference) yöntemiyle çözüm formülleri var. Bu formüller oldukca çetrefil.</p>
+<p>Şimdi hızlı marş (fast marching) kouşuna gelelim. Hızlı marş eğri ilerletmenin çok hızlı bir çözümü olduğu durumlar için. Çünkü bu özel durumda &quot;dalga'' on kısmı hep aynı şekilde ilerliyor. F'nin işareti hiç değişmiyor, yani hareket hep aynı genel yönde. Bu durumda kesit seviyeleri formülü, sonlu farklar hesabı yerine hızlı marş yöntemi kullanılabiliyor, çünkü çok farklı hareket şekli yok, eğri gelip kendi üstüne dönemiyor, vs.</p>
+<p>Hızlı mars yöntemi aslında geliş zamanı bazlı başka bir formülasyonu çözüyor.</p>
+<p><span class="math display">\[
+|\nabla T| F = 1
+\]</span></p>
+<p>Eğer <span class="math inline">\(T(x,y)\)</span> fonksiyonunu yayılan dalga önünün <span class="math inline">\(x,y\)</span> noktasına geliş zamanını temsil ettiğini düşünürsek, tek boyutta katedilen mesafe <span class="math inline">\(x = F T\)</span>, bu basit bir mesafe eşittir hız çarpı zaman sonucu. Mesafeye göre türev alırsak,</p>
+<p><span class="math display">\[
+1 = F \frac{\mathrm{d} T}{\mathrm{d} x}
+\]</span></p>
+<p>Çok boyuttaki <span class="math inline">\(\nabla T\)</span> kullanılabilir, çünkü gradyan <span class="math inline">\(T\)</span>'nin kesit seviyelerine dikgendir. O zaman</p>
+<p><span class="math display">\[ \frac{1}{F} = |\nabla T| \]</span></p>
+<p>denebilir. ya da</p>
+<p><span class="math display">\[ |\nabla T| T = 1\]</span></p>
+<p>Hızlı marşı nasıl kodlarım? Eğri ilerleme hesabını eğriden ileri gidişin mesafesi hesabına çevirebilirim. Eğriyi için alacak şekilde bir izgara yaratabilirim,</p>
+<div class="figure">
+<img src="2_11_07.jpg" />
+
+</div>
+<p>Bu ızgarayı baz alarak eğriye olan bir uzaklığın fonksiyonu <span class="math inline">\(d(x,y)\)</span>'i bulmak istiyorum. Eğri içini hesaba katalım, orada eğriden geriye bir uzaklık olacak, orada eksi, dışarıda artı.</p>
+<p>Uzaklığı her izgara köşesi için hesaplamak istersem, ne yaparım?</p>
+<p>Altta kısayol bulmak için hızlı marş yöntemini görüyoruz, kod [1,2]'yi baz aldı.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">from</span> scipy <span class="im">import</span> ndimage
+<span class="im">import</span> util
+
+<span class="kw">def</span> perform_fm(W, pstart, niter<span class="op">=</span>np.inf, bound<span class="op">=</span><span class="st">&#39;sym&#39;</span>, svg_rate<span class="op">=</span><span class="dv">10</span>):
+    n <span class="op">=</span> W.shape[<span class="dv">0</span>]
+    neigh <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">0</span>,  <span class="dv">1</span>, <span class="dv">-1</span>]])
+
+    <span class="kw">def</span> symmetrize(x,n):
+        <span class="cf">if</span> (x<span class="op">&lt;</span><span class="dv">0</span>):
+            x <span class="op">=</span> <span class="op">-</span>x<span class="op">;</span>
+        <span class="cf">elif</span> (x<span class="op">&gt;=</span>n):
+            x <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>(n<span class="dv">-1</span>)<span class="op">-</span>x
+        <span class="cf">return</span> x
+
+    <span class="cf">if</span> bound<span class="op">==</span><span class="st">&#39;per&#39;</span>:
+        boundary <span class="op">=</span> <span class="kw">lambda</span> x: np.mod(x,n)
+    <span class="cf">else</span>:
+        boundary <span class="op">=</span> <span class="kw">lambda</span> x: [symmetrize(x[<span class="dv">0</span>],n), symmetrize(x[<span class="dv">1</span>],n)] <span class="co"># todo</span>
+
+    ind2sub1 <span class="op">=</span> <span class="kw">lambda</span> k: [<span class="bu">int</span>( (k<span class="op">-</span>np.fmod(k,n))<span class="op">/</span>n ), np.fmod(k,n)]
+    sub2ind1 <span class="op">=</span> <span class="kw">lambda</span> u: <span class="bu">int</span>( u[<span class="dv">0</span>]<span class="op">*</span>n <span class="op">+</span> u[<span class="dv">1</span>] )
+    Neigh <span class="op">=</span> <span class="kw">lambda</span> k,i: sub2ind1(boundary(ind2sub1(k) <span class="op">+</span> neigh[:,i]))
+    extract   <span class="op">=</span> <span class="kw">lambda</span> x,I: x[I]
+    extract1d <span class="op">=</span> <span class="kw">lambda</span> x,I: extract(x.flatten(),I)
+
+    nstart <span class="op">=</span> pstart.shape[<span class="dv">1</span>]
+    I <span class="op">=</span> <span class="bu">list</span>( np.zeros( (nstart, <span class="dv">1</span>) ) )
+    <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">0</span>, nstart):
+        I[i] <span class="op">=</span> <span class="bu">int</span>( sub2ind1(pstart[:,i]) )
+
+    D <span class="op">=</span> np.zeros( (n,n) ) <span class="op">+</span> np.inf <span class="co"># current distance</span>
+    <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">0</span>, nstart):
+        D[pstart[<span class="dv">0</span>,i],pstart[<span class="dv">1</span>,i]] <span class="op">=</span> <span class="dv">0</span>
+
+    S <span class="op">=</span> np.zeros( (n,n) )
+    <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">0</span>, nstart):
+        S[pstart[<span class="dv">0</span>,i],pstart[<span class="dv">1</span>,i]] <span class="op">=</span> <span class="dv">1</span> <span class="co"># open</span>
+
+    <span class="bu">iter</span> <span class="op">=</span> <span class="dv">0</span>
+    q <span class="op">=</span> <span class="dv">100</span>  <span class="co"># maximum number of saves</span>
+    Dsvg <span class="op">=</span> np.zeros( (n,n,q) )
+    Ssvg <span class="op">=</span> np.zeros( (n,n,q) )
+    <span class="cf">while</span> ( <span class="kw">not</span>(I<span class="op">==</span>[]) <span class="op">&amp;</span> (<span class="bu">iter</span><span class="op">&lt;=</span>niter) ):
+        <span class="bu">iter</span> <span class="op">=</span> <span class="bu">iter</span><span class="op">+</span><span class="dv">1</span><span class="op">;</span>
+        <span class="cf">if</span> <span class="bu">iter</span><span class="op">==</span>niter:
+            <span class="cf">break</span>
+        j <span class="op">=</span> np.argsort( extract1d(D,I)  )
+        <span class="cf">if</span> np.ndim(j)<span class="op">==</span><span class="dv">0</span>:
+            j <span class="op">=</span> [j]
+        j <span class="op">=</span> j[<span class="dv">0</span>]
+        i <span class="op">=</span> I[j]
+        a <span class="op">=</span> I.pop(j)
+        u <span class="op">=</span> ind2sub1(i)<span class="op">;</span>
+        S[u[<span class="dv">0</span>],u[<span class="dv">1</span>]] <span class="op">=</span> <span class="dv">-1</span>
+        J <span class="op">=</span> []
+        <span class="cf">for</span> k <span class="kw">in</span> np.arange(<span class="dv">0</span>,<span class="dv">4</span>):
+            j <span class="op">=</span> Neigh(i,k)
+            <span class="cf">if</span> extract1d(S,j)<span class="op">!=-</span><span class="dv">1</span>:
+                J.append(j)
+                <span class="cf">if</span> extract1d(S,j)<span class="op">==</span><span class="dv">0</span>:
+                    u <span class="op">=</span> ind2sub1(j)
+                    S[u[<span class="dv">0</span>],u[<span class="dv">1</span>]] <span class="op">=</span> <span class="dv">1</span>
+                    I.append(j)
+        DNeigh <span class="op">=</span> <span class="kw">lambda</span> D,k: extract1d(D,Neigh(j,k))
+        <span class="cf">for</span> j <span class="kw">in</span> J:
+            dx <span class="op">=</span> <span class="bu">min</span>(DNeigh(D,<span class="dv">0</span>), DNeigh(D,<span class="dv">1</span>))
+            dy <span class="op">=</span> <span class="bu">min</span>(DNeigh(D,<span class="dv">2</span>), DNeigh(D,<span class="dv">3</span>))
+            u <span class="op">=</span> ind2sub1(j)
+            w <span class="op">=</span> extract1d(W,j)<span class="op">;</span>
+            Delta <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>w <span class="op">-</span> (dx<span class="op">-</span>dy)<span class="op">**</span><span class="dv">2</span>
+            <span class="cf">if</span> (Delta<span class="op">&gt;=</span><span class="dv">0</span>):
+                D[u[<span class="dv">0</span>],u[<span class="dv">1</span>]] <span class="op">=</span> (dx <span class="op">+</span> dy <span class="op">+</span> np.sqrt(Delta))<span class="op">/</span> <span class="dv">2</span>
+            <span class="cf">else</span>:
+                D[u[<span class="dv">0</span>],u[<span class="dv">1</span>]] <span class="op">=</span> <span class="bu">min</span>(dx <span class="op">+</span> w, dy <span class="op">+</span> w)
+        t <span class="op">=</span> <span class="bu">iter</span><span class="op">/</span>svg_rate
+        <span class="cf">if</span> (np.mod(<span class="bu">iter</span>,svg_rate)<span class="op">==</span><span class="dv">0</span>) <span class="op">&amp;</span> (t<span class="op">&lt;</span>q):
+            <span class="bu">print</span> (t)
+            Dsvg[:,:,<span class="bu">int</span>(t<span class="dv">-1</span>)] <span class="op">=</span> D
+            Ssvg[:,:,<span class="bu">int</span>(t<span class="dv">-1</span>)] <span class="op">=</span> S
+
+    Dsvg <span class="op">=</span> Dsvg[:,:,:<span class="bu">int</span>(t<span class="dv">-1</span>)]
+    Ssvg <span class="op">=</span> Ssvg[:,:,:<span class="bu">int</span>(t<span class="dv">-1</span>)]
+    <span class="cf">return</span> (D,Dsvg,Ssvg)<span class="op">;</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> exo2(x0,W):
+    n <span class="op">=</span> W.shape[<span class="dv">0</span>]
+    pstart <span class="op">=</span> np.transpose(np.array([x0]))
+    [D,Dsvg,Ssvg] <span class="op">=</span> perform_fm(W, pstart, np.inf, <span class="st">&#39;sym&#39;</span>,n<span class="op">*</span><span class="dv">6</span>)
+    plt.figure()<span class="op">;</span>
+    <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">0</span>,<span class="dv">4</span>):
+        plt.subplot(<span class="dv">2</span>, <span class="dv">2</span>, i<span class="op">+</span><span class="dv">1</span>)
+        d <span class="op">=</span> Dsvg[:,:,i]
+        d[d<span class="op">==</span>np.inf] <span class="op">=</span> <span class="dv">0</span>
+        util.imageplot(d)
+        plt.set_cmap(<span class="st">&#39;jet&#39;</span>)        
+    plt.savefig(<span class="st">&#39;out-450.png&#39;</span>)
+    <span class="cf">return</span> D
+  
+n <span class="op">=</span> <span class="dv">40</span>
+W <span class="op">=</span> np.ones( (n,n) )
+x0 <span class="op">=</span> [<span class="bu">int</span>(n<span class="op">/</span><span class="dv">2</span>), <span class="bu">int</span>(n<span class="op">/</span><span class="dv">2</span>)]
+
+D <span class="op">=</span> exo2(x0,W)
+
+plt.figure()
+displ <span class="op">=</span> <span class="kw">lambda</span> D: np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span><span class="dv">5</span><span class="op">*</span>D<span class="op">/</span>np.<span class="bu">max</span>(D.flatten()) )
+util.imageplot(displ(D))
+plt.savefig(<span class="st">&#39;out-480.png&#39;</span>)</code></pre></div>
+<pre><code>1.0
+2.0
+3.0
+4.0
+5.0
+6.0</code></pre>
+<div class="figure">
+<img src="out-450.png" />
+
+</div>
+<div class="figure">
+<img src="out-480.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> exo3(x0,W):
+    n <span class="op">=</span> W.shape[<span class="dv">0</span>]
+    pstart <span class="op">=</span> np.transpose(np.array([x0]))
+    [D,Dsvg,Ssvg] <span class="op">=</span> perform_fm(W, pstart, np.inf, <span class="st">&#39;sym&#39;</span>,n<span class="op">*</span><span class="dv">6</span>)
+    <span class="co"># display</span>
+    k <span class="op">=</span> <span class="dv">8</span>
+    displ <span class="op">=</span> <span class="kw">lambda</span> D: np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>k<span class="op">*</span>D <span class="op">/</span> np.<span class="bu">max</span>(D.flatten()))
+    plt.figure()
+    util.imageplot(displ(D))
+    plt.set_cmap(<span class="st">&#39;jet&#39;</span>)
+    plt.savefig(<span class="st">&#39;out-560.png&#39;</span>)
+    <span class="cf">return</span> D
+
+
+n <span class="op">=</span> <span class="dv">100</span>
+x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, n)
+[Y, X] <span class="op">=</span> np.meshgrid(x, x)
+sigma <span class="op">=</span> <span class="fl">.2</span>
+W <span class="op">=</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">8</span> <span class="op">*</span> np.exp(<span class="op">-</span>(X<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> Y<span class="op">**</span><span class="dv">2</span>)<span class="op">/</span> (<span class="dv">2</span><span class="op">*</span>sigma<span class="op">**</span><span class="dv">2</span>))
+util.imageplot(W)
+plt.savefig(<span class="st">&#39;out-520.png&#39;</span>)
+
+x0 <span class="op">=</span> [<span class="bu">round</span>(.<span class="dv">1</span><span class="op">*</span>n), <span class="bu">round</span>(.<span class="dv">1</span><span class="op">*</span>n)]
+res <span class="op">=</span> exo3(x0,W)</code></pre></div>
+<pre><code>1.0
+2.0
+3.0
+4.0
+5.0
+6.0
+7.0
+8.0
+9.0
+10.0
+11.0
+12.0
+13.0
+14.0
+15.0
+16.0</code></pre>
+<div class="figure">
+<img src="out-520.png" />
+
+</div>
+<div class="figure">
+<img src="out-560.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> exo4(tau,x0,x1,G):
+    n <span class="op">=</span> G.shape[<span class="dv">0</span>]
+    Geval <span class="op">=</span> <span class="kw">lambda</span> G,x: util.bilinear_interpolate(G[:,:,<span class="dv">0</span>], np.imag(x), np.real(x) ) <span class="op">+</span><span class="ot"> 1j</span> <span class="op">*</span> util.bilinear_interpolate(G[:,:,<span class="dv">1</span>],np.imag(x), np.real(x))
+    niter <span class="op">=</span> <span class="fl">1.5</span><span class="op">*</span>n<span class="op">/</span>tau<span class="op">;</span>
+    <span class="co"># init gamma</span>
+    gamma <span class="op">=</span> [x1]
+    xtgt <span class="op">=</span> x0[<span class="dv">0</span>] <span class="op">+</span><span class="ot"> 1j</span><span class="op">*</span>x0[<span class="dv">1</span>]
+    <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">0</span>,niter):
+        g <span class="op">=</span> Geval(G, gamma[<span class="op">-</span><span class="dv">1</span>] )
+        gamma.append( gamma[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> tau<span class="op">*</span>g )
+        <span class="cf">if</span> <span class="bu">abs</span>(gamma[<span class="op">-</span><span class="dv">1</span>]<span class="op">-</span>xtgt)<span class="op">&lt;</span><span class="dv">1</span>:
+            <span class="cf">break</span>
+    gamma.append( xtgt )
+    <span class="cf">return</span> gamma
+  
+n <span class="op">=</span> <span class="dv">100</span>
+x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, n)
+[Y, X] <span class="op">=</span> np.meshgrid(x, x)
+sigma <span class="op">=</span> <span class="fl">.2</span>
+W <span class="op">=</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">8</span> <span class="op">*</span> np.exp(<span class="op">-</span>(X<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> Y<span class="op">**</span><span class="dv">2</span>)<span class="op">/</span> (<span class="dv">2</span><span class="op">*</span>sigma<span class="op">**</span><span class="dv">2</span>))
+x0 <span class="op">=</span> [<span class="bu">round</span>(.<span class="dv">1</span><span class="op">*</span>n), <span class="bu">round</span>(.<span class="dv">1</span><span class="op">*</span>n)]
+D <span class="op">=</span> exo3(x0,W)
+
+G0 <span class="op">=</span> util.grad(D)
+d <span class="op">=</span> np.sqrt(np.<span class="bu">sum</span>(G0<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">2</span>))
+U <span class="op">=</span> np.zeros((n,n,<span class="dv">2</span>))
+U[:,:,<span class="dv">0</span>] <span class="op">=</span> d
+U[:,:,<span class="dv">1</span>] <span class="op">=</span> d
+G <span class="op">=</span> G0 <span class="op">/</span> U
+tau <span class="op">=</span> <span class="fl">.8</span>
+x1 <span class="op">=</span> <span class="bu">round</span>(.<span class="dv">9</span><span class="op">*</span>n) <span class="op">+</span><span class="ot"> 1j</span><span class="op">*</span><span class="bu">round</span>(.<span class="dv">88</span><span class="op">*</span>n)
+gamma <span class="op">=</span> [x1]
+
+Geval <span class="op">=</span> <span class="kw">lambda</span> G,x: util.bilinear_interpolate(G[:,:,<span class="dv">0</span>], np.imag(x), np.real(x) ) <span class="op">+</span><span class="ot"> 1j</span> <span class="op">*</span> util.bilinear_interpolate(G[:,:,<span class="dv">1</span>],np.imag(x), np.real(x))
+g <span class="op">=</span> Geval(G, gamma[<span class="op">-</span><span class="dv">1</span>] )
+gamma.append( gamma[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> tau<span class="op">*</span>g )
+gamma <span class="op">=</span> exo4(tau,x0,x1,G)
+
+util.imageplot(W) 
+plt.set_cmap(<span class="st">&#39;gray&#39;</span>)
+h <span class="op">=</span> plt.plot(np.imag(gamma), np.real(gamma), <span class="st">&#39;.b&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>)
+h <span class="op">=</span> plt.plot(x0[<span class="dv">1</span>], x0[<span class="dv">0</span>], <span class="st">&#39;.r&#39;</span>, markersize<span class="op">=</span><span class="dv">20</span>)
+h <span class="op">=</span> plt.plot(np.imag(x1), np.real(x1), <span class="st">&#39;.g&#39;</span>, markersize<span class="op">=</span><span class="dv">20</span>)
+plt.savefig(<span class="st">&#39;out-760.png&#39;</span>)</code></pre></div>
+<pre><code>1.0
+2.0
+3.0
+4.0
+5.0
+6.0
+7.0
+8.0
+9.0
+10.0
+11.0
+12.0
+13.0
+14.0
+15.0
+16.0</code></pre>
+<div class="figure">
+<img src="out-760.png" />
+
+</div>
+<p>Kaynaklar</p>
+<p>[1] Peyre, <em>Dijkstra and Fast Marching Algorithms</em>, <a href="https://nbviewer.jupyter.org/github/gpeyre/numerical-tours/blob/master/python/fastmarching_0_implementing.ipynb" class="uri">https://nbviewer.jupyter.org/github/gpeyre/numerical-tours/blob/master/python/fastmarching_0_implementing.ipynb</a></p>
+<p>[2] Peyre, <a href="https://github/gpeyre/numerical-tours" class="uri">https://github/gpeyre/numerical-tours</a></p>
+<p>[3] Bayramlı, Kısmi Türevsel Denklemler, <em>Kesit Seviyeleri</em></p>
+</body>
+</html>

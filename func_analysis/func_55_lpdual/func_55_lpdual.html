@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="çifteşlik-ikizlik-duality">Çifteşlik, İkizlik (Duality)</h1>
+<p>Bu benim en favori konularımdan [1]. Çok faydalı ve çok güzel bir teknik, bakış açısı. Bu konu üzerinde iki ders zamanı harcayacağız. Konuyu lineer programlama (LP) üzerinden göreceğiz, çünkü bu alanda çifteşlik pratik olarak rahatça gösterilebiliyor.</p>
+<p>[önceki ders özeti atlandı]</p>
+<p>Önümüzdeki iki ders için teori şapkamızı takacağız, tabii çifteşliğin pek çok optimizasyon problemi üzerinde çok ciddi etkileri var. Yani bu konu bulutlar üzerinde, aşırı soyut bir konu değil, onu vurgulamak istiyorum.</p>
+<p>Ama şimdilik soyut denebilecek bir problemle başlayalım. Diyelim ki elimde bir LP var ve bu LP'nin optimal değeri için bir alt sınır bulmak istiyorum, <span class="math inline">\(B \le \min_x f(x)\)</span>. Çifteşliğe bu çok basit soru üzerinden giriş yapacağız. Örnek</p>
+<p><span class="math display">\[
+\min_{x,y} x+y, \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+x + y \ge 2 
+\]</span> <span class="math display">\[
+x,y \ge 0
+\]</span></p>
+<p>dogru olsun.</p>
+<p>İki skalar değişken var, ve pozitif olmalılar. Bu problem için alt sınır nedir? Çıplak gözle bile bakarak bunu bulabiliriz, cevap 2. Değil mi? <span class="math inline">\(x+y \ge 2\)</span> şartına uymak gerekiyorsa alt sınır 2 olacaktır.</p>
+<p>Bazılarınız düşünebilir ki &quot;şanslıydık, problem şartları aradığımız şeyi söylüyordu zaten''. Doğru fakat iddia ediyorum ki bu stratejiyi metodik bir şekilde de kullanabilirdik. Benzer bir problem,</p>
+<p><span class="math display">\[
+\min_{x,y} x + 3y, \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+x + y \ge 2 
+\]</span> <span class="math display">\[
+x \ge 0, y \ge 0
+\]</span></p>
+<p>Bu problemin alt sınırını nasıl buluruz?</p>
+<p>Eğer <span class="math inline">\(y \ge 0\)</span> şartını ikiyle çarparsak <span class="math inline">\(2y \ge 0\)</span> diye yeni bir şart elde ederiz (hala doğru), bu yeni şartı alıp <span class="math inline">\(x + y \ge 2\)</span>'a eklersek <span class="math inline">\(x + 3y \ge 2\)</span> şeklinde bir şart daha elde etmiş oluruz. Bu şart hedef fonksiyonuna benzediği için alt sınırı direk söylüyor, alt sınır yine 2.</p>
+<p>Üstteki probleme daha genel bir açıdan bakalım,</p>
+<p><span class="math display">\[
+\min_{x,y} px + qy, \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+x + y \ge 2
+\]</span> <span class="math display">\[
+x,y \ge 0
+\]</span></p>
+<p>Alt sınır nedir? Öncekine göre biraz farklı bir strateji izleyeceğiz, diyelim ki her şartı <span class="math inline">\(a,b,c\)</span> sabitleri ile çarptım,</p>
+<p><span class="math display">\[
+ax + ay \ge 2a
+\]</span> <span class="math display">\[
+bx \ge 0
+\]</span> <span class="math display">\[
+cy \ge 0
+\]</span></p>
+<p>Bu tabii ki <span class="math inline">\(a,b,c \ge 0\)</span> ise yapılabilir yoksa işaretler değişirdi. Devam edelim, yine bazı ek koşullar yaratmış oldum. Bu yeni şartları toplarsam bir yeni şart daha elde ederim,</p>
+<p><span class="math display">\[
+(a+b)x + (a+c)y \ge 2a
+\]</span></p>
+<p>Yeni değişken isimleri <span class="math inline">\(p,q\)</span> atarsam</p>
+<p><span class="math display">\[
+px + qy \ge 2a
+\]</span></p>
+<p>atama</p>
+<p><span class="math display">\[
+a+b = p, \quad a+c = q
+\]</span></p>
+<p>Aslında alt sınırı iki üstteki denklemden bulmuş olduk, <span class="math inline">\(2a\)</span> (bir üstteki şartlara uyulduğu sürece tabii).</p>
+<p>Eğer en iyi alt sınırı isteseydim, onu nasıl elde ederdim? Bu demektir ki <span class="math inline">\(2a\)</span> olabildiğince büyük olmalı, tabii belli şartlara uyulduğu sürece. Aslında bu soru bizi ikinci bir LP'ye götürüyor, literatürde ana LP'nin çifteşi / ikizi denen LP'ye. İki değişkenli ortamda,</p>
+<p><span class="math display">\[
+\max_{a,b,c} 2a \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+a + b = p
+\]</span> <span class="math display">\[
+a + c = q
+\]</span> <span class="math display">\[
+a,b,c \ge 0
+\]</span></p>
+<p>Maksimum arandığına dikkat ve bu problemde üç tane değişken var (ana problemde iki taneydi). Ve böylece deriz ki üstteki şartlara uyan her <span class="math inline">\(a,b,c\)</span> (ki bu şartlara ikizin olurluk / fizibilite şartları deniyor) maksimal noktada ana problemin alt sınırını minimize eder.</p>
+<p>Bir soru sorayım: acaba üstteki problemden bir eşitlik elde etmem mümkün mü? Yani ikizdeki problemin optimal değeri ana problemdeki optimal değere eşit olabilir mi? Cevap evet. Peki arada boşluk olması mümkün mü? Cevap (bazen) evet. İyi bir sezgisel bakış bu, ana ve ikiz LP optimal değerleri neredeyse her zaman birbirine eşittir, bazı istanai patolojik durumlar dışında.</p>
+<p>Farklı bir probleme bakalım. Bu problemde bir eşitlik te olacak.</p>
+<p><span class="math display">\[
+\min_{a,b,c} px + qy \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+x \ge 0
+\]</span> <span class="math display">\[
+y \le 1
+\]</span> <span class="math display">\[
+3x + y = 2
+\]</span></p>
+<p>İkizi bulmak için her koşul için bir değişken atayalım, ama ondan önce her ana koşulda eşitsizlikler aynı şekilde ise işimiz daha rahatlaşır (çünkü <span class="math inline">\(a,b,c,..\)</span> değişkenlerini sıfırdan büyük yapacağız, ama farklı yönleri gösteren ana koşullar ile bu zorlaşıyor), <span class="math inline">\(y \le 1\)</span> yerine <span class="math inline">\(-y \ge -1\)</span> mesela, o zaman</p>
+<p><span class="math display">\[
+\min_{a,b,c} px + qy \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+x \ge 0
+\]</span> <span class="math display">\[
+-y \ge -1
+\]</span> <span class="math display">\[
+3x + y = 2
+\]</span></p>
+<p>Yine <span class="math inline">\(a,b,c\)</span> ile çarpıyorum,</p>
+<p><span class="math display">\[
+a x \ge 0
+\]</span> <span class="math display">\[
+-by \ge -b
+\]</span> <span class="math display">\[
+3cx + cy = 2c
+\]</span> <span class="math display">\[
+a,b \ge 0
+\]</span></p>
+<p><span class="math inline">\(c\)</span> üzerinde koşul var mı? Hayır, çünkü <span class="math inline">\(c\)</span>'nin çarptığı koşul bir eşitlik, <span class="math inline">\(c\)</span> ne olursa olsun yeni koşul geçerli, işaret değişiminden korkmaya gerek yok.</p>
+<p>Önceden olduğu gibi bir toplam alıyoruz,</p>
+<p><span class="math display">\[
+(a+3c) x + (-b+c)y \ge -b + 2c
+\]</span></p>
+<p>Yine <span class="math inline">\(p,q\)</span> atamasını yaparsam,</p>
+<p><span class="math display">\[
+p x + q y \ge -b + 2c
+\]</span></p>
+<p><span class="math display">\[
+p = a+3c, \quad q = -b + c 
+\]</span></p>
+<p>İkiz problemi elde ettik, amaç ana problemin alt sınırı <span class="math inline">\(-b+2c\)</span>'yi maksimize etmek, üstteki iki şart ve <span class="math inline">\(a,b \ge 0\)</span> olacak şekilde.</p>
+<p><span class="math display">\[
+\max_{a,b,c} 2c - b \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+a + 3c = p
+\]</span> <span class="math display">\[
+-b + c = q
+\]</span> <span class="math display">\[
+a,b \ge 0
+\]</span></p>
+<p>Dersin geri kalanında ikizlikten genel bir çerçevede bahsedeceğim, sonra bir ilginç örnek göreceğiz, ardından ikizliğe yeni bir bakış açısından yaklaşacağız, bu açı çok önemli olacak. Dersi ikinci bir örnekle bitireceğiz.</p>
+<p>LP'lere tüm genelliği ile bakalım şimdi. Önceki format neler olup bittiğini görmek açısından faydalı, ama genel şablonu da görmek lazım.</p>
+<p>Tanımlar</p>
+<p><span class="math inline">\(c \in \mathbb{R}^n\)</span>, <span class="math inline">\(A \in \mathbb{R}^{m \times n}\)</span>, <span class="math inline">\(b \in \mathbb{R}^m\)</span>, <span class="math inline">\(G \in \mathbb{R}^{r \times n}\)</span>, <span class="math inline">\(h \in \mathbb{R}^r\)</span> verili.</p>
+<p>Ana Problem</p>
+<p><span class="math display">\[
+\min_x c^T x \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+Ax = b
+\]</span> <span class="math display">\[
+Gx \le h
+\qquad (1)
+\]</span></p>
+<p>İkiz Problem</p>
+<p><span class="math display">\[
+\max_{u,v} -b^T u - h^T v \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+-A^Tu - G^Tv = c
+\]</span> <span class="math display">\[
+v \ge 0
+\qquad (2)
+\]</span></p>
+<p>İkizi nasıl elde ettik?</p>
+<p><span class="math inline">\(Ax = b\)</span> ve <span class="math inline">\(Gx \le h\)</span> için iki (vektör) değişkeni tanımlıyoruz, sırasıyla <span class="math inline">\(u,v\)</span>. <span class="math inline">\(u\)</span> için kısıtlama yok, çünkü eşitlik için. Sadece <span class="math inline">\(v \ge 0\)</span> olmalı.</p>
+<p>Eger <span class="math inline">\(x\)</span> olurlu ise</p>
+<p><span class="math display">\[
+a^T (Ax - b) + v^T (Gx-h) \le 0
+\]</span></p>
+<p>olur çünkü olurluluk noktasında <span class="math inline">\(Ax - b=0\)</span> ve <span class="math inline">\(Gx-h \le 0\)</span>, bu sebeple üstteki toplam tabii ki sıfırdan küçük.</p>
+<p>Gruplarsak,</p>
+<p><span class="math display">\[
+(A^T u + G^T v)^T x - b^Tu - h^T v \ge 0
+\]</span></p>
+<p><span class="math display">\[
+(-A^T u - G^T v)^T x \ge  -b^Tu - h^T v 
+\]</span></p>
+<p>Parantez içini <span class="math inline">\(c\)</span>'ye atarsam o zaman</p>
+<p><span class="math display">\[
+c^T x \ge  -b^Tu - h^T v 
+\]</span></p>
+<p>Böylece eşitliğin sağ tarafı alt sınırım olur, sol tarafı ise ikiz değişkenlerim üzerinde kısıtlama haline gelir, <span class="math inline">\(v \ge 0\)</span>. Böylece ikiz probleme erişmiş oluyoruz.</p>
+<p>Sonraki örneğe gelelim. Bu probleme maks akış min kesiş (max flow min cut) problemi deniyor. Konunun gelişmesindeki ilginç bir hikaye 20. yüzyıl başında Sovyetler maks akış Amerikalılar ise min kesiş problemlerini çözmeye odaklanmıştı, fakat bu iki problem ikizlik üzerinden aslında aynı problem.</p>
+<p>Maksimum akış problemi şöyle: bir yönlü çizit verildi diyelim,</p>
+<div class="figure">
+<img src="func_55_duality_01.png" />
+
+</div>
+<p>İki nokta arasında bağlantı varsa <span class="math inline">\(c_{ij}\)</span> o iki nokta <span class="math inline">\(i,j\)</span> arasındaki bağlantının kapasitesini gösteriyor, eğer bir tren hattından bahsediyorsak o bağlantıdan geçebilecek yük miktarı, eğer su borusu ise oradan akabilecek su miktarı, ya da bir yol ise o yolun uzunluğu, vs. olabilir. Bir bağlantıdan gerçekte olan akışı <span class="math inline">\(f_{ij}\)</span> olarak tanımlayabiliriz,</p>
+<p><span class="math display">\[
+0 \le f_{ij} \le c_{ij}
+\]</span></p>
+<p>ve <span class="math inline">\(i,j \in E\)</span> olacak, burada <span class="math inline">\(E\)</span> tüm kenarların (edges) indisleri, çizit <span class="math inline">\(G = (V,E)\)</span> olarak tanımlı, <span class="math inline">\(V\)</span> çizitin düğüm noktaları (vertices). Bir diğer şart (ki aslında bu bariz) bir düğüme giren akışın çıkan akışla eşit olması.</p>
+<p><span class="math display">\[
+\sum_{(i,k) \in E} f_{ik} = \sum_{kj} f_{kj} \quad k \in V \backslash \{s,t\} 
+\]</span></p>
+<p>Not: <span class="math inline">\(\backslash\)</span> işareti &quot;hariç&quot; demek.</p>
+<p>Maks akış problemi eldeki bir mali, nakliyatı diyelim, bir başlangıç noktası <span class="math inline">\(s\)</span> bitişi noktası <span class="math inline">\(t\)</span>'ye maksimum miktarda nakil edebilecek yolları bulmaktır. Dikkat: <span class="math inline">\(s\)</span>'den mal göndermek deyince <span class="math inline">\(s\)</span>'den çıkan pek çok yoldan nakliyat paylaştırılarak gönderilebilir, altta görüldüğü gibi (kırmızı hat kapasitesi, yeşil bir optimal akış örneği, başlangıç 0 bitiş 7).</p>
+<div class="figure">
+<img src="func_55_duality_02.png" />
+
+</div>
+<p>O zaman maksimum akışı bir LP olarak kodlayalım,</p>
+<p><span class="math display">\[
+\max_{f \in \mathbb{R}^{|E|}} \sum_{(s,j)\in E} f_{sj}, \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+0 \le f_{ij} \le c_{ij}, \quad \forall i,j \in E
+\]</span> <span class="math display">\[
+\sum_{(i,k) \in E} f_{ik} = \sum_{kj} f_{kj} \quad k \in V \backslash \{s,t\} 
+\]</span></p>
+<p>Fakat tek bir toplam ile tüm çizit üzerinden maksimum akışı nasıl formülize edebildik? Hedef fonksiyonundaki toplam sadece başlangıç <span class="math inline">\(s\)</span>'den çıkan akışa bakıyor? Buradaki ufak numara yaptığımız kısıtlamayla bağlantılı, akışın muhafaza edilmesini şart koştuğumuz için optimal akış, her ne ise, çıkış noktasından olan toplamı ile varış noktasına girişi aynı tutmalı (aradaki geçiş düğümleri için de aynı şey geçerli olduğu için tabii), bu sebeple optimizasyonu tek bir toplam ile tanımlayabildik. Üstteki grafik örnekte görülüyor, çıkış toplam 3+2+1 varış toplam 4+2. O zaman çıkışı optimize edersek <span class="math inline">\(t\)</span>'ye varan, tüm düğümler üzerinden olabilecek akışı maksimize etmiş oluruz.</p>
+<p>Bu programın ikizini hesaplayabiliriz, üstteki bir LP ikizini bulmayı biliyoruz, ana LP'dekiler kısıtlamalar kadar yeni değişken elde ederiz, vs.. Daha önce minimizasyon problemlerinin ikizine baktık, ana problemde bir alt sınır elde etmeye uğraşıyorduk. Şimdi ana problem maksimizasyon, o zaman hedef için üst sınır aramak bizi ikize götürür. Min probleminde bile hedefe bir eksi işareti eklesem onu maksimizasyon olarak görebilirdim, ve üst sınıra bakabilirdim. İkizin türetilmesi için notlara bakılabilir [2]. Sonuçta şu minimizasyonu elde ediyorum,</p>
+<p><span class="math display">\[
+\min_{b \in \mathbb{R}^{|E|}, x \in \mathbb{R}^{|V|}} 
+\sum_{(i,j) \in E} b_{ij} c_{ij} \quad \textrm{öyle ki}
+\]</span></p>
+<p><span class="math display">\[
+b_{ij} \ge x_i - x_j
+\]</span> <span class="math display">\[
+b_{ij}, x_i,x_j \in \{ 0,1\} \quad \forall i,j
+\]</span></p>
+<p>Elde ettiğimiz sonuc (hala ikize gelmedik) şunu söylüyor, elimdeki düğümleri öyle iki gruba ayırmak istiyorum ki (altta bir grup görülüyor, renkli kısım), bir gruptan diğer gruba geçen kapasitelerin, geçen kenarların kapasitelerinin toplamı minimal olsun.</p>
+<div class="figure">
+<img src="func_55_duality_03.png" />
+
+</div>
+<p>Bu arada üstteki program bir LP değil, bir tamsayı programı (integer program) çünkü eldeki düğümleri bir gruba ya da diğerine (0,1 değerleri üzerinden) atıyoruz, değişkenler ikisel, doğal olarak tam sayılar. Şimdi ikize geliyoruz, ana problemi ikiz üstteki tamsayı programının gevşetilmiş (relaxation) hali. 0,1 tamsayılarını alıp onları 0 ile 1 arasında gidip gelebilen reel değişkenler olarak tanımlarsak bir LP elde ederiz.</p>
+<p>Yani ana / ikizlik ve üstteki gevşetme arasındaki ilişkiler şöyle</p>
+<p>maksimum akış değeri <span class="math inline">\(\le\)</span> gevşetilmiş minimum kesiş <span class="math inline">\(\le\)</span> minimum kesişin kapasitesi</p>
+<p>Gevşetme ile minimum değer daha azaldı, tamsayı programını gevşetip dışbükey program haline getirince bunun olduğu biliniyor, kısıtlama kümesini genişlettim, bu minimumu küçültecektir.</p>
+<p>Herhalde kesiş kelimesinin nereden geldiği anlaşılıyor şimdi, eğer elimde bir makasla renkli bölgeye giden bağlantıları kessem, en az miktarda akışı kesmiş olurum, ve o renkli bölge içindeki akış en yüksek kapasitede olur. Ve buradaki problemde güçlü ikizlik durumu olduğu için bu iki değer birbirine eşit!</p>
+<p>Şimdi LP ikizliğine farklı bir açıdan bakalım, ki bu açı oldukca faydalı olacak.</p>
+<ol style="list-style-type: decimal">
+<li>ve (2) formunu tekrar hatırlayalım. Ana problemdeki <span class="math inline">\(c^Tx\)</span>'e eşitlik ve eşitsizlik kısıtlamalarını daha önce bir kez gördüğümüz gibi ekleyince,</li>
+</ol>
+<p><span class="math display">\[
+c^T x \ge c^T x + u^T (Ax-b) + v^T (Gx-h)
+\]</span></p>
+<p>Bu doğru çünkü olurlu <span class="math inline">\(x\)</span> için <span class="math inline">\(Ax-b\)</span> sıfır ve <span class="math inline">\(Gx-h\)</span> sıfırdan küçük, <span class="math inline">\(v \ge 0\)</span>. Yani toplam <span class="math inline">\(c^T x\)</span>'dan muhakkak daha küçük.</p>
+<p>Ayrıca şunu da söylemek mümkün, diyelim ki <span class="math inline">\(x \in C\)</span> olurlu değerler,</p>
+<p><span class="math display">\[
+f^\ast = \min_{x \in C} c^T x \ge 
+\min_{x \in C} c^T x + u^T (Ax-b) + v^T (Gx-h) \ge
+\min_x c^T x + u^T (Ax-b) + v^T (Gx-h)
+\]</span></p>
+<p>En sağdaki eşitsizlik yeni eklendi, buradaki ifadenin ortadakinen tek farkı <span class="math inline">\(x\)</span>'lerinin sadece olurlu kümeden değil mümkün tüm <span class="math inline">\(x\)</span>'ler olabilmesi. Herhangi bir <span class="math inline">\(x\)</span> de bizi herhangi bir hedefe götürebilecegi icin (kısıtlama kalmadı) <span class="math inline">\(-\infty\)</span> bile olmak mümkün, üstteki eşitsizlik bu sebeple doğru.</p>
+<p>En sağdaki ifadeyi <span class="math inline">\(g(u,v)\)</span> olarak yazabiliriz, <span class="math inline">\(u,v\)</span>'nin bir fonksiyonu olarak. Bu fonksiyon <span class="math inline">\(f^\ast\)</span>'ye bir alt sınır sağlar,</p>
+<p><span class="math display">\[
+f^\ast \ge g(u,v)
+\]</span></p>
+<p>ki <span class="math inline">\(v \ge 0\)</span> olduğu sürece.</p>
+<p>O zaman mümkün olan en büyük alt sınır <span class="math inline">\(g(u,v)\)</span>'yi hesaplamak istiyorsak, ikiz problemimiz <span class="math inline">\(g(u,v)\)</span>'yi olabildiğince büyük yapmak olabilir, yani onu maksimize etmek.</p>
+<p><span class="math display">\[
+\max_{u,v} g(u,v) \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+v \ge 0
+\]</span></p>
+<p>Bu ikizi türetmenin bir başka yoludur. Üstteki problemden gelen <span class="math inline">\(g\)</span> ki ona çoğunlukla <span class="math inline">\(g^\ast\)</span> denir, <span class="math inline">\(f^\ast\)</span> için bir alt sınır oluşturacaktır,</p>
+<p><span class="math display">\[
+g^\ast \le f^\ast
+\]</span></p>
+<p>Şimdi <span class="math inline">\(g\)</span>'nin nasıl bir fonksiyon olduğuna yakında bakalım. Tanım şöyleydi,</p>
+<p><span class="math display">\[
+g(u,v) = \min_x c^T x + u^T (Ax-b) + v^T (Gx-h)
+\]</span></p>
+<p>Bir gruplama yapalım,</p>
+<p><span class="math display">\[
+= \min_x (c^T + A^Tu + G^T v)^T x - b^T u - h^Tu
+\]</span></p>
+<p>Üstteki <span class="math inline">\(x\)</span> bağlamında bir lineer fonksiyon değil mi? Birşeyler devriği çarpı <span class="math inline">\(x\)</span> artı birşeyler. Tüm <span class="math inline">\(x\)</span>'ler üzerinden bu fonksiyonun minimumu nedir? Eksi sonsuzluk, eğer parantez içindeki değer sıfır değilse.. Değil mi? Eğer <span class="math inline">\(x\)</span> sıfırla çarpılıp yokedilmiyorsa <span class="math inline">\(x\)</span>'i istediğim tarafa çekip hedefi istediğim kadar negatife götürebilirim.</p>
+<p>Ama <span class="math inline">\(c^T + A^Tu + G^T v\)</span> sıfır ise o zaman minimum nedir? Sıfırdan geri kalanlar, <span class="math inline">\(- b^T u - h^Tu\)</span>, o zaman</p>
+<p><span class="math display">\[
+= \left\{ \begin{array}{ll}
+-\infty &amp; \text{eğer} \quad c^T + A^Tu + G^T v \ne 0 \\
+- b^T u - h^Tu &amp; \text{eğer} \quad c^T + A^Tu + G^T v = 0 
+\end{array} \right.
+\]</span></p>
+<p>Negatif sonsuz olmayan duruma bakıyoruz, $c^T + A^Tu + G^T v = 0 $ şartı aynı zamanda $c = -A^Tu - G^T v $ demektir, o zaman <span class="math inline">\(g(u,v)\)</span>'yi <span class="math inline">\(v \ge 0\)</span> olacak şekilde maksimize etmek demek</p>
+<p><span class="math display">\[
+\max_{u,v} - b^T u - h^Tu   \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+c = -A^Tu - G^T v, \quad v \ge 0
+\]</span></p>
+<p>programıyla eşdeğerdir.</p>
+<p>İkiz programa erişmiş olduk, farklı bir yönden geldik, ama yine (2) ile aynı noktaya ulaştık.</p>
+<p>Bu ikinci türetiş şeklinin daha faydalı olmasının sebebini anlatalım şimdi. İlk ikiz alma stratejimiz neydi? Elimizde</p>
+<p><span class="math display">\[
+\min f(x) \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+Ax = b
+\]</span> <span class="math display">\[
+Gx \ge h
+\]</span> <span class="math display">\[
+v \ge 0
+\]</span></p>
+<p>var, her kısıtlamaları ikiz değişkenler <span class="math inline">\(u,v\)</span> ile çarpıyoruz, birleşik bir denklem, bir lineer kombinasyon elde ediyoruz,</p>
+<p><span class="math display">\[
+u^T(Ax-b) + v^T (Gx-h) \le 0
+\]</span></p>
+<p>Sonra üstteki ifadeyi bir şekilde <span class="math inline">\(f(x)\)</span>'e eşitlemem lazım, ya da <span class="math inline">\(f(x)\)</span>'i içeren bir şeylere eşitlemem lazım, ki onu kullanarak ana değer için bir alt sınır elde edebileyim. İlk stratejimiz buydu değil mi?</p>
+<p><span class="math display">\[
+f(x) + \textrm{birşeyler} \ge 0
+\]</span></p>
+<p>elde etmek.</p>
+<p>Bu iyi güzel ama genel bağlamda bu yöntem her zaman işlemez. Eğer <span class="math inline">\(f(x)\)</span> lineer değilse, onu lineer kombinasyonlar kullanarak nasıl elde edebiliriz ki? Mümkün değil. Yani üstteki yöntem <span class="math inline">\(f(x)\)</span> lineer ise işler, diğer durumlarda işlemez.</p>
+<p>İkinci stratejinin güzel tarafı burada. Her zaman işler, yeter ki <span class="math inline">\(f\)</span> dışbükey olsun. Aslında bir açıdan dışbükeylik olmasa da işliyor, buna sonra geleceğiz. İkinci stratejiyi tekrar hatırlarsak, bir Lagrangian oluşturmuştuk, bu ifadede ana hedefe ikiz değişkenlerle noktasal çarpım üzerinden eklenen kısıtlamalar vardı, ve minimizasyonu olurlu set yerine tüm <span class="math inline">\(x\)</span>'ler üzerinden yapıyorduk, ve bu bize her zaman ana hedef için bir alt sınır veriyordu.</p>
+<p>[Matris oyunları örneği atlandı]</p>
+<p>Ekler</p>
+<p>Altta maksimum akışı LP olarak çözen sayısal bir örnek görüyoruz.</p>
+<p>Örnek</p>
+<p>Alttaki örnekte [3] bir maksimum akış çözümü görelim. Çizit ve her kenarın kapasiteleri görülüyor</p>
+<p><img src="func_55_duality_04.png" /> <img src="func_55_duality_05.png" /></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.optimize <span class="im">import</span> linprog
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+A_ub <span class="op">=</span> np.eye(<span class="dv">5</span>)
+b_ub <span class="op">=</span> np.array([<span class="fl">1.</span>,<span class="fl">2.</span>,<span class="fl">2.</span>,<span class="fl">3.</span>,<span class="fl">1.</span>])
+A_eq <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">0</span>],
+                 [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">-1</span>]])
+b_eq <span class="op">=</span> np.array([ <span class="dv">0</span>, <span class="dv">0</span> ])<span class="op">;</span>
+f <span class="op">=</span> np.array( [ <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span> ])
+res <span class="op">=</span> linprog(<span class="op">-</span>f, A_ub<span class="op">=</span>A_ub, b_ub<span class="op">=</span>b_ub, <span class="op">\</span>
+                 A_eq<span class="op">=</span>A_eq, b_eq<span class="op">=</span>b_eq)
+<span class="bu">print</span> (np.<span class="bu">round</span>(res.x))</code></pre></div>
+<pre><code>[1. 1. 0. 1. 1.]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (res.x.dot(f))</code></pre></div>
+<pre><code>1.9999999998438802</code></pre>
+<p>Not: <code>linprog</code> minimize etmeye ayarlı olduğu için hedefi eksi ile çarptık, yani maksimizasyon yaptırmış olduk.</p>
+<p>Maksimum akış 2.0 olarak bulundu.</p>
+<p>Optimize edilen <span class="math inline">\(-f^T x\)</span> dersek vektör <span class="math inline">\(x\)</span> içindeki öğeler <span class="math inline">\(e_1,e_2,e_3,e_4,e_5\)</span>, ve <span class="math inline">\(f\)</span> içinde <span class="math inline">\(1,1,0,0,0\)</span> var, yani aslında sadece <span class="math inline">\(e_1,e_2\)</span>'nin akış toplamına bakmış oluyoruz. Bu normal, sebeplerinden önce bahsetmiştik. Bulunan sonuç <span class="math inline">\(x^\ast = (1,1,0,1,1)\)</span>, ve <span class="math inline">\(f^Tx^\ast\)</span> çarpımı ilk iki öğeyi toplatıyor, ve 1+1 = 2, maksimum akış.</p>
+<p>Eşitlik kısıtlamaları <span class="math inline">\(A_{eq}\)</span> ve <span class="math inline">\(b_{eq}\)</span> içinde, <span class="math inline">\(A_{eq}x = b_{eq}\)</span> için. Sadece iki kısıtlama var, bu kısıtlamalardan ilki 1'e giren <span class="math inline">\(e_1\)</span> ile ondan çıkan <span class="math inline">\(e_3,e_4\)</span>'un eşit olması gerektiğini söylüyor, bu sebeple ilk kısıtlama <span class="math inline">\(1,0,-1,-1,0\)</span>, ve ona tekabül eden <span class="math inline">\(b_{eq}\)</span> sıfır değerinde, <span class="math inline">\(e_1\)</span> akışı ile <span class="math inline">\(e_3,e_4\)</span> toplanırsa sıfır olsun demiş oluyoruz. İkinci kısıtlama 2'ye giren iki akış <span class="math inline">\(e_2,e_3\)</span> ile çıkan <span class="math inline">\(e_5\)</span>'i dengeliyor.</p>
+<p>Eşitsizlik kısıtlamaları <span class="math inline">\(A_{ub}x \le b_{ub}\)</span>. Burada kapasiteleri kodluyoruz, her kenarın kapasitesi belli, <span class="math inline">\(e_1\)</span> için 1, <span class="math inline">\(e_2\)</span> için 2, vs. Ve optimal sonuç bulunuyor.</p>
+<p>Not: bu problemi lineer program olarak kodlayabilmek çok şey kazandırdı. Diğer yandan üstteki problemi bilgisayar bilim bağlamında çözen yaklaşımlar da vardır, hatta çizitin özel yapısından faydalanarak bu yaklaşımların bazıları oldukca hızlı.</p>
+<p>Kaynaklar</p>
+<p>[1] Tibshirani, <em>Convex Optimization, Lecture Video 10</em>, <a href="https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg" class="uri">https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg</a></p>
+<p>[2] Tibshirani, <em>Convex Optimization, Lecture Notes</em>, <a href="https://www.stat.cmu.edu/~ryantibs/convexopt/" class="uri">https://www.stat.cmu.edu/~ryantibs/convexopt/</a></p>
+<p>[3] Zisserman, <em>C25 Optimization</em>, <a href="http://www.robots.ox.ac.uk/~az/lectures/opt/" class="uri">http://www.robots.ox.ac.uk/~az/lectures/opt/</a></p>
+</body>
+</html>

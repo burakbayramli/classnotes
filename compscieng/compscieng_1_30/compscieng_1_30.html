@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ayrıksal-fourier-transformu-discrete-fourier-transform--dft-">Ayrıksal Fourier Transformu (Discrete Fourier Transform -DFT-)</h1>
+<p>Frekans Analizi, Periyodik Sinyaller</p>
+<p>Bir periyodik sinyali nasıl analiz ederiz? Kendimiz bir sinyal oluşturmak istesek bunu nasıl yapacağımızı düşünelim; <span class="math inline">\(\sin\)</span> ya da <span class="math inline">\(\cos\)</span> fonksiyonlarının bir periyotu vardır, <span class="math inline">\(0,2\pi\)</span> arasındaki değerler <span class="math inline">\(2\pi,4\pi\)</span> arasında tekrar eder, vs.. Bazı ek özellikler; mesela <span class="math inline">\(\cos\)</span> sıfır noktasında 1 değerine sahip, fakat elimizdeki zaman serisi sağa ya da sola &quot;kaymış'' olabilir, buna faz kayması (phase shift) deniyor, yani sıfır noktasında değer 1 olmayabilir. Ayrıca -1,+1 arasında gidip gelmek yerine mesela -10,+10 arasında gidip gelinebilir, buna genlik deniyor (amplitude). Bir diğer özellik <span class="math inline">\(0,2\pi\)</span> arasında tek bir periyot yerine birden fazla periyot olabilmesi (frekans değişimi).</p>
+<p>Frekans ile başlayalım, önce normal bir kosinüs sinyali,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">t <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">100</span>)
+plt.plot(t, np.cos(t))
+plt.xlim(<span class="dv">0</span>,<span class="dv">10</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_30_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_30_04.png" />
+
+</div>
+<p>Her <span class="math inline">\(\pi\)</span> noktasını gösterelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(t, np.cos(t))
+plt.axvline(<span class="dv">0</span>,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.axvline(np.pi,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.axvline(<span class="dv">2</span><span class="op">*</span>np.pi,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.axvline(<span class="dv">3</span><span class="op">*</span>np.pi,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.xlim(<span class="dv">0</span>,<span class="dv">10</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_30_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_30_05.png" />
+
+</div>
+<p>Bu sinyalde <span class="math inline">\(\cos\)</span>'a verilen <span class="math inline">\(t\)</span> değerlerini iki ile çarpsam ne olur? <span class="math inline">\(0,2\pi\)</span> arasında bir periyot için daha önceki <span class="math inline">\(t\)</span>'lerin yarısı ile bu iş yapılabilir, demek ki önceki tek periyot içinde şimdi sinyal iki kez tur atacaktır. O zaman <span class="math inline">\(\cos\)</span> içinde bir sabit ile çarpım yapmak ile frekansı o kadar arttırmış oldum,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(t, np.cos(<span class="dv">2</span><span class="op">*</span>t))
+plt.axvline(<span class="dv">0</span>,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.axvline(np.pi,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.axvline(<span class="dv">2</span><span class="op">*</span>np.pi,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.axvline(<span class="dv">3</span><span class="op">*</span>np.pi,lw<span class="op">=</span><span class="st">&#39;1&#39;</span>,ls<span class="op">=</span><span class="st">&#39;dashed&#39;</span>,color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.xlim(<span class="dv">0</span>,<span class="dv">10</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_30_06.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_30_06.png" />
+
+</div>
+<p>-1/+1 arasında gidip gelmeyi arttırmak en kolayı, <span class="math inline">\(\cos\)</span> hesabından elde edilen değeri mesela 10 ile çarparsam genlik o kadar artar. Faz kaydırma <span class="math inline">\(\cos\)</span> içinde bir toplam olabilir. Tüm resmi göstermek gerekirse, <span class="math inline">\(A\)</span> genlik, <span class="math inline">\(f_0\)</span> frekans, faz kayması <span class="math inline">\(\phi\)</span> olacak şekilde,</p>
+<p><span class="math display">\[ 
+x(t) = A \cos (2\pi f_0 t - \phi)
+\]</span></p>
+<p>Bu formülün grafiği,</p>
+<div class="figure">
+<img src="compscieng_1_30_07.png" />
+
+</div>
+<p>Direk formüle bakarak <span class="math inline">\(A\)</span> hemen anlaşılabiliyor. Frekans <span class="math inline">\(t\)</span>'yi çarpan değerle orantılı, yanlız dikkat, bu değer her zaman <span class="math inline">\(2\pi\)</span>'ye oranlı bir şey, yani formül <span class="math inline">\(\cos(10 t)\)</span> gibi bir ifade içeriyorsa, <span class="math inline">\(10 / 2\pi\)</span> ile <span class="math inline">\(f_0\)</span>'yi çıkartmamız gerekir. Eğer <span class="math inline">\(t\)</span> saniye birimine sahipse, bir periyot <span class="math inline">\(T_0 = 1/f_0 = 0.5\)</span> saniyedir, ve frekans 2 Hertz olacaktır. Eğer frekans <span class="math inline">\(w_0 = 2\pi f_o\)</span> formunda gösterilirse, o zaman birim radyan / saniye olur.</p>
+<p>Faz kayması <span class="math inline">\(\phi\)</span> sebebiyle tepe noktanın nerede olduğu da direk formülden anlaşılamıyor, biraz ek hesap lazım, üstteki örnekte 3/16, bunu bulmak için &quot;kosinüse geçilen değerin sıfır olduğu yer'' gerekli,</p>
+<p><span class="math display">\[ 0 = 2\pi \cdot 2 \cdot t  - 3\pi/4 
+\implies t = 3\pi / (4 \cdot 4\pi)  
+\implies t = 3/16
+\]</span></p>
+<p>Fakat hala faz kayması <span class="math inline">\(3\pi/4\)</span> diyebiliriz.</p>
+<p>Örneklemek (Sampling)</p>
+<p>Sayısal, yani bilgisayar ortamında bilgiler ayrıksaldır, kimse bize üstteki sürekli formül formatıyla sinyal parametrelerini vermez. Diyelim ki bir sinyalin saniyede 10 tane örneklemini alıyoruz. O zaman 3 saniye sonra elimizde 30 veri noktası olacak. Fakat her örneklem frekansı gerçek sinyali anlamak için yeterli değildir. Nyquist teorisine göre örneklem gerçek frekansın en az iki katı olmalıdır. Altta bazı örnekler görülüyor, en alttaki örneklem frekansı dalga frekansı ile aynı, ve bu sinyali anlamak için yeterli değil. Veri noktalarına bakarak onların ilk üç noktada bir düz çizgi oluşturduğunu zannedebilirdik.</p>
+<div class="figure">
+<img src="compscieng_1_30_10.png" />
+
+</div>
+<p>Tabii sadece ayrıksal frekansa bakarak sinyalin frekansının ne olduğunu anlamak ta mümkün degil. Eğer bir şekilde gercek sinyalin kaç örneklemde bir tekrar ettiğini bulursak, o zaman yaklaşık bir frekans bulabiliriz; mesela bir sinüssel sinyalin 20 ölçümde bir tekrar ettiğini bulduk, ve örneklem periyotu 0.05 milisaniye / örneklem ise (her iki örneklem arası geçen zaman), o zaman</p>
+<p><span class="math display">\[ 
+\textrm{sinüs dalgası periyotu} =  
+\frac{20 \textrm{ örneklem}}{periyot}
+\frac{0.05 \textrm{ milisaniye}}{\textrm{örneklem}} = 1 milisaniye
+\]</span></p>
+<p>Demek ki periyot 1 / 1 milisaniye = 1 Khz. Ya örneklem periyotu 2 milisaniye olsaydı? O zaman sinüs dalga periyotu 40 milisaniye olurdu, ve gerçek frekans 25 Hz olurdu. Söylemek istediğimiz ayrıksal durumda Hz. bazında gerçek frekansın hesabı her zaman örneklem frekansına <span class="math inline">\(f_s\)</span>'e bağlıdır,</p>
+<p><span class="math display">\[ f_s = 1 / t_s\]</span></p>
+<p>Ayrıksal Fourier Transformu</p>
+<p>[4]'te sürekli Fourier Transformunu gördük,</p>
+<p><span class="math display">\[ X(f) = \int_{-\infty}^{\infty} x(t) e^{j2\pi ft} \mathrm{d} t \]</span></p>
+<p>ki <span class="math inline">\(x(t)\)</span> zaman bazlı sürekli bir sinyaldir. Bilgisayarlar sayesinde üstteki işlemi ayrıksal olarak yapabiliyoruz [2, sf. 46],</p>
+<p><span class="math display">\[ X(m) = \sum_{n=0}^{N-1} x(n) e^{-j2\pi nm / N} \]</span></p>
+<p><span class="math inline">\(x(n)\)</span> her <span class="math inline">\(n\)</span> anında, bir <span class="math inline">\(n\)</span> indisiyle erişilen, bir anlamda <span class="math inline">\(x(t)\)</span>'den &quot;örneklenmiş'' sinyal verisi olacaktır, <span class="math inline">\(e\)</span> tabii ki doğal logaritma bazı, <span class="math inline">\(j\)</span> ise hayali sayı <span class="math inline">\(j = \sqrt{-1}\)</span>. Euler ilişkisi <span class="math inline">\(e^{-j\phi} = \cos(\phi) - j\sin(\phi)\)</span>'den hareketle üstteki ayrıksal denklem alttakine eşittir,</p>
+<p><span class="math display">\[ X(m) = \sum_{n=0}^{N-1} x(n) [ \cos(2\pi nm / N) - j \sin(2\pi nm / N)] 
+\qquad (1)
+\]</span></p>
+<p><span class="math inline">\(X(m)\)</span>: <span class="math inline">\(m\)</span>'inci DFT bileşeni / katsayısı - <span class="math inline">\(X(0),X(1),..\)</span> diye gidiyor</p>
+<p><span class="math inline">\(m\)</span>: Frekans yöresindeki (domain) DFT çıktısının katsayı indisi</p>
+<p><span class="math inline">\(x(n)\)</span>: Zaman yöresindeki bilginin ayrıksal verisi</p>
+<p><span class="math inline">\(n\)</span>: Zaman verisi indisi</p>
+<p><span class="math inline">\(N\)</span>: Giriş verisinden ve çıktı frekans noktalarından kaç tane olduğu</p>
+<p>Örnek</p>
+<p>Diyelim ki elimizde biri 1 kHz ve diğeri 2 kHz'lük frekanslardan oluşan bir sinyal var, bu sinyalin sürekli hali şöyle,</p>
+<p><span class="math display">\[ x(t) = \sin(2\pi \cdot 1000 \cdot t) + 0.5 \sin (2\pi \cdot t + 3\pi/4)\]</span></p>
+<p>Sinyali örnekleme oranımız <span class="math inline">\(f_s = 8000\)</span>, her saniye <span class="math inline">\(f_s\)</span> kadar örneklem alıyoruz, her veri nokta arasındaki zaman farkı <span class="math inline">\(t_s = 1/f_s\)</span>. Elimizdeki bu hızda ardı ardına alınmış 8 tane veri noktası olsun, yani <span class="math inline">\(N=8\)</span>. Ayrıksal formül,</p>
+<p><span class="math display">\[ x(n) = \sin(2\pi \cdot 1000 \cdot nt_s) + 0.5 \sin (2\pi \cdot nt_s + 3\pi/4) \]</span></p>
+<p>Bu noktalarda <span class="math inline">\(x(n)\)</span> değerleri</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">fs <span class="op">=</span> <span class="fl">8000.</span><span class="op">;</span> ts <span class="op">=</span> <span class="dv">1</span><span class="op">/</span>fs
+<span class="kw">def</span> x(n):
+    <span class="cf">return</span> np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span><span class="dv">1000</span><span class="op">*</span>n<span class="op">*</span>ts) <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span>np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span><span class="dv">2000</span><span class="op">*</span>n<span class="op">*</span>ts <span class="op">+</span> <span class="dv">3</span><span class="op">*</span>np.pi <span class="op">/</span> <span class="dv">4</span>)
+
+<span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">8</span>): <span class="bu">print</span> np.<span class="bu">round</span>(x(n),<span class="dv">4</span>),</code></pre></div>
+<pre><code>0.3536 0.3536 0.6464 1.0607 0.3536 -1.0607 -1.3536 -0.3536</code></pre>
+<p>Şimdi <span class="math inline">\(x(n)\)</span> girdisine DFT uygulayacağız. Eğer 1 kHz'un Fourier katsayılarını merak ediyorsak, <span class="math inline">\(X(1)\)</span> hesaplarız, yani (1) formülü kullanılacak, ki formül şuna benzer,</p>
+<p><span class="math display">\[ X(1) = \sum_{n=0}^{7}  x(n)\cos(2\pi n / 8) - jx(n)\sin(2\pi n / 8) \]</span></p>
+<p>Genel kodla gösterelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> X(m):
+    real <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span> imag <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">8</span>): 
+        real <span class="op">+=</span> x(n)<span class="op">*</span>np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>m<span class="op">*</span>n<span class="op">/</span><span class="fl">8.</span>)
+        imag <span class="op">-=</span> x(n)<span class="op">*</span>np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>m<span class="op">*</span>n<span class="op">/</span><span class="fl">8.</span>)
+    <span class="cf">return</span> np.<span class="bu">round</span>(real,<span class="dv">4</span>), imag
+
+<span class="bu">print</span> X(<span class="dv">1</span>)</code></pre></div>
+<pre><code>(-0.0, -4.0)</code></pre>
+<p>2 kHz için ne olur?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> X(<span class="dv">2</span>)</code></pre></div>
+<pre><code>(1.4141999999999999, 1.4142135623730947)</code></pre>
+<p>Bu sonuçlarda 1. kısım sayının reel tarafı, 2. kısmı pür kompleks tarafı. Çoğunlukla bu elde edilen <span class="math inline">\(X(m)\)</span> sayısının büyüklüğü (magnitude) ile ilgileniriz, bu hesap</p>
+<p><span class="math display">\[ X_{\textrm{büyüklük}} = |X(m)| = \sqrt{X_{reel}(m)^2 + X_{kompleks}(m)^2}\]</span></p>
+<p>olarak yapılıyor. <code>numpy.abs</code> çağrısı bu hesabı hayali sayılar üzerinde otomatik olarak yapar.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">r,i <span class="op">=</span> X(<span class="dv">2</span>)
+<span class="bu">print</span> res, <span class="st">u&#39;büyüklük&#39;, np.abs(complex(r,i))</span></code></pre></div>
+<pre><code>-5.55111512313e-17j büyüklük 1.99999040998</code></pre>
+<p>Büyüklüğe bakılırsa 2 Khz frekansının katsayısı ufak değil, demek ki bu frekans sinyal içinde var / önemli. 3 Khz'e bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">r,i <span class="op">=</span> X(<span class="dv">3</span>)
+<span class="bu">print</span> res, <span class="st">u&#39;büyüklük&#39;, np.abs(complex(r,i))</span></code></pre></div>
+<pre><code>-5.55111512313e-17j büyüklük 5.55111512313e-17</code></pre>
+<p>Çok ufak, demek ki bu frekans sinyal içinde mevcut değil.</p>
+<p>Örnekte sürekli bir formül kullanarak <span class="math inline">\(x(n)\)</span> hesabı yapılmış olması ayrıksallığın nerede başlayıp bittiği hakkında kafa karışıklığı yaratmasın; analitik formül iki yöre arasında gidiş / geliş nasıl oluyor bunu göstermek için verildi. Çoğunlukla elimizde sadece bir tek boyutlu bir dizi içinde bir veri serisi olur, bu verinin hangi analitik formülden geldiğini bilmeyiz (Fourier analizini onun için yapıyoruz zaten!), veri hakkında eldeki diğer tek bilgi onun örneklem frekansı olur.</p>
+<p>Bir örnek üzerinde daha görelim [3, sf. 152], bu sefer kütüphane çağrısı <code>scipy.fft</code> ile analiz yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy
+
+N <span class="op">=</span> <span class="dv">64</span><span class="op">;</span> n <span class="op">=</span> np.arange(N) <span class="op">-</span> <span class="dv">1</span><span class="op">;</span> T <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span>
+t <span class="op">=</span> n<span class="op">*</span>T<span class="op">;</span> xbn <span class="op">=</span> np.sin(w1<span class="op">*</span>t)<span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span>np.sin(w2<span class="op">*</span>t)<span class="op">;</span>
+plt.stem(t,xbn)
+plt.savefig(<span class="st">&#39;compscieng_1_30_08.png&#39;</span>)
+k <span class="op">=</span> np.arange(N) <span class="op">-</span> <span class="dv">1</span>
+Xb <span class="op">=</span> scipy.fft(xbn)<span class="op">;</span>
+plt.figure()
+plt.stem(k,<span class="bu">abs</span>(Xb))
+plt.savefig(<span class="st">&#39;compscieng_1_30_09.png&#39;</span>)</code></pre></div>
+<p><img src="compscieng_1_30_08.png" /> <img src="compscieng_1_30_09.png" /></p>
+<p>Üst sağdaki frekans analizine göre <span class="math inline">\(k=2\)</span> ve <span class="math inline">\(5\)</span>'te büyüklük var, bu değerler <span class="math inline">\(k\omega_0 = 2\pi k / NT\)</span> ile <span class="math inline">\(\pi\)</span> bazına çevirilebilir, <span class="math inline">\(k=2\)</span> için <span class="math inline">\(2\pi k / 3.2 = 1.25 \pi\)</span> olur, <span class="math inline">\(k=5\)</span> için <span class="math inline">\(3.125 \pi\)</span> elde ederiz.</p>
+<p>Ders 15</p>
+<p>[Strang hocanın notlarından. Üstteki DFT yöntemi toplamlar, döngüler, belli indisler kullanarak yapılıyor. Altta Strang'in anlattığı yaklaşımla, bir sinyalin belli frekansların katsayılarla ağırlıklanmış toplamı olduğu temel Fourier formülüyle başlarız, fakat diğer yöne gitmek için pür lineer cebir kullanırız, böylece katsayı hesabı bir matris tersi alma işlemi haline gelir].</p>
+<p>Ayrıksal (discrete) olarak Fourier modellemesi yapmak istiyorsak, elimizde devamlı (continuous) f(x) fonksiyonu olmayacak, bir f(x) fonksiyonun belli noktalarındaki değerleri (olduğunu farzettiğimiz) verileri içeren bir {} olacak. Bu vektörün N elemanı var diyelim. Fonksiyon periyodik olduğuna göre, x için <span class="math inline">\(2\pi\)</span>'i N eşit parçaya böleriz (tahtadan alınan resim altta). Bunu söylemekle fonksiyonun periyotunun <span class="math inline">\(N\)</span> olduğunu farz etmiş oluyoruz, bir anlamda diyoruz ki eğer elimizde <span class="math inline">\(N\)</span> tane daha nokta olsaydı, onlar elimizde olan değerlerle tıpatıp aynı olacaktı. Örneğimizde N=4 olsun.</p>
+<div class="figure">
+<img src="compscieng_1_30_01.png" />
+
+</div>
+<p>Ayrıca <span class="math inline">\(F(x)\)</span> formülü biraz değişecek. Elimizde sonsuz tane nokta olmadığına göre</p>
+<p><span class="math display">\[ F(x) = \sum_{n=0}^{N} c_ne^{inx} \]</span></p>
+<p>olması lazım. Şimdi, eğer bütün <span class="math inline">\(c_k\)</span> değerlerini biliyor olsaydık, bu fonksiyon, x=0 noktasında hangi değere sahip olurdu?</p>
+<p><span class="math display">\[ f(0) = c_0 + c_1 + c_2 + c_3 + c_4 = Y_0 \]</span></p>
+<p>Sonraki <span class="math inline">\(x\)</span> değerleri <span class="math inline">\(2\pi/N, 4\pi/N, ..\)</span> için (çünkü her parça <span class="math inline">\(2\pi/N\)</span>, bir sonraki parça <span class="math inline">\(2\pi/N + 2\pi/N\)</span>, bir kere topluyoruz, yani parçayı <span class="math inline">\(2\)</span> ile çarpıyoruz, sonra <span class="math inline">\(3\)</span> ile, vs) aşağıdaki gibi devam edeceğiz, ama ondan önce bir <span class="math inline">\(w\)</span> değişkeni tanımlayalım, bu değişkeni <span class="math inline">\(w=e^{2\pi i/N}\)</span> olarak alalım. Böylece <span class="math inline">\(w^2\)</span> dediğimizde üstel işlemlerde çarpım işlemi toplama işlemine dönüşeceği için <span class="math inline">\(e^{4i\pi/N}\)</span> değeri elde edilebilir, <span class="math inline">\(w^3\)</span> ile <span class="math inline">\(e^{6i\pi/N}\)</span> elde edilir, vs. Bu değerler bize lazım olacak değerler, <span class="math inline">\(w\)</span> sayesinde formüller daha temiz olacak. <span class="math inline">\(F(2\pi/N)\)</span> içindeki 3. terim (<span class="math inline">\(n=2\)</span>) nedir? <span class="math inline">\(c_ne^{inx} = c_2e^{2i2\pi/N} = c_2e^{4i\pi/N} = c_2w^2\)</span>. O zaman</p>
+<p><span class="math display">\[ f(2\pi/N) = c_o + wc_1 + w^2c_2 + w^3c_3 = Y_1 \]</span></p>
+<p>Devam edelim:</p>
+<p><span class="math display">\[ f(4\pi/N) = c_o + w^2c_1 + w^4c_2 + w^6c_3 = Y_2  \]</span></p>
+<p><span class="math display">\[ f(6\pi/N) = c_o + w^3c_1 + w^6c_2 + w^9c_3 = Y_3  \]</span></p>
+<p>Elimizdeki dört toplam işlemine bakınca, bu toplamlar ve çarpımların aslında lineer cebir üzerinden matrisler ile gösterilebildiğini farkedebiliriz.</p>
+<p><span class="math display">\[  
+\left[ \begin{array}{c}
+    Y_0 \\
+    Y_1 \\
+    Y_2 \\
+    Y_3
+\end{array} \right]
+=
+\left[ \begin{array}{cccc}
+    1 &amp; 1 &amp; 1 &amp; 1 \\
+    1 &amp; w &amp; w^2 &amp; w^3  \\
+    1 &amp; w^2 &amp; w^4 &amp; w^6  \\
+    1 &amp; w^3 &amp; w^6 &amp; w^9  
+\end{array} \right]
+\left[ \begin{array}{c}
+    c_0 \\
+    c_1 \\
+    c_2 \\
+    c_3
+\end{array} \right] \\
+\]</span></p>
+<p>Her matris için bir değişken kullanırsak</p>
+<p><span class="math display">\[ Y = WC \]</span></p>
+<p>F(x)'ten (yani Y'den) C'ye gitmek istersek, elimizde <span class="math inline">\(Y_n\)</span> değerleri var, <span class="math inline">\(w\)</span> değerleri zaten sabittir, W bu sabit değere göre oluşturulur, o zaman, <span class="math inline">\(c_n\)</span> sayılarını nasıl buluruz?</p>
+<p><span class="math display">\[ Y = WC  \]</span></p>
+<p><span class="math display">\[ W^{-1}Y = W^{-1}WC  \]</span></p>
+<p><span class="math display">\[ W^{-1}Y = C \]</span></p>
+<p>Yani <span class="math inline">\(W\)</span> matrisinin tersini (inverse) alıp, onu <span class="math inline">\(Y\)</span> ile çarpınca elimize <span class="math inline">\(C\)</span> değerleri geçecek [1, sf. 340-370].</p>
+<p>Güneş Benekleri</p>
+<p>Güneşte periyodik olarak olan benekler, aşağı yukarı 11 senede bir ortaya çıkarlar. Bu benekler uzun süredir gözlenmekte ve ölçülmektedir, şiddetlerine göre, <code>sunspots.dat</code> adlı dosyada bulabiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">tempdata <span class="op">=</span> np.loadtxt(<span class="st">&#39;sunspots.dat&#39;</span>)
+year<span class="op">=</span>tempdata[:,<span class="dv">0</span>]<span class="op">;</span> sunspots<span class="op">=</span>tempdata[:,<span class="dv">1</span>]
+year<span class="op">=</span>year[year<span class="op">&lt;</span><span class="dv">2001</span>]<span class="op">;</span> sunspots<span class="op">=</span>sunspots[year<span class="op">&lt;</span><span class="dv">2001</span>]
+plt.plot(year,sunspots)
+plt.title(<span class="st">u&#39;Güneş Benekleri&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_30_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_30_03.png" />
+
+</div>
+<p>Benek verisindeki periyodik oluşu Fourier transformu ile analiz edelim. Alttaki kod <span class="math inline">\(w\)</span>, <span class="math inline">\(W\)</span>'yi kullanarak üstteki çarpımlarla <span class="math inline">\(C\)</span> vektörünü bulacak. Bu vektör içindeki sayılar Fourier analizindeki belli frekanslara, harmoniklere tekabül ediyor olacaklar. Bu <span class="math inline">\(C\)</span> değerlerinde bazıları diğerlerinden daha güçlü bir etkidir, mesela 11 senelik periyot C içinde daha belirgin olarak çıkmalı.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy
+
+tempdata <span class="op">=</span> np.loadtxt(<span class="st">&quot;sunspots.dat&quot;</span>)
+
+year<span class="op">=</span>tempdata[:,<span class="dv">0</span>]
+
+Y<span class="op">=</span>tempdata[:,<span class="dv">1</span>]
+
+N <span class="op">=</span> <span class="bu">len</span>(Y)
+
+w <span class="op">=</span> np.exp((<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>1j)<span class="op">/</span>N)
+
+W <span class="op">=</span> np.zeros((N,N), <span class="bu">complex</span>)
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):
+    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(N):
+        W[i,k] <span class="op">=</span> w<span class="op">**</span>(i<span class="op">*</span>k)
+        
+C <span class="op">=</span> np.dot(np.linalg.inv(W), Y) </code></pre></div>
+<p>Periyotların grafiği,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">n<span class="op">=</span><span class="bu">len</span>(Y)<span class="op">;</span> <span class="bu">print</span> <span class="st">&#39;n=&#39;</span>,n
+power <span class="op">=</span> np.<span class="bu">abs</span>(C[<span class="dv">0</span>:<span class="bu">int</span>(n<span class="op">/</span><span class="dv">2</span>)])<span class="op">**</span><span class="dv">2</span>
+nyquist <span class="op">=</span> <span class="fl">1.</span><span class="op">/</span><span class="dv">2</span>
+freq <span class="op">=</span> np.array(<span class="bu">map</span>(<span class="bu">float</span>, np.array(arange(<span class="dv">0</span>,<span class="bu">int</span>(n<span class="op">/</span><span class="dv">2</span>))))) <span class="op">/</span> (n<span class="op">/</span><span class="dv">2</span>)<span class="op">*</span>nyquist
+<span class="bu">print</span> <span class="st">&#39;len(freq)=&#39;</span>,<span class="bu">len</span>(freq)
+period<span class="op">=</span><span class="fl">1.</span><span class="op">/</span>freq<span class="op">;</span>
+plt.plot(period,power)
+plt.xlim(<span class="dv">0</span>,<span class="dv">30</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_30_02.png&#39;</span>)</code></pre></div>
+<pre><code>n= 305
+len(freq)= 152</code></pre>
+<div class="figure">
+<img src="compscieng_1_30_02.png" />
+
+</div>
+<p>11 sene civarında belirgin bir frekans olduğunu görebiliyoruz.</p>
+<p>FFT</p>
+<p>Bitirmeden önce FFT konusundan bahsedelim. <span class="math inline">\(*D*\)</span>FT algoritması kodda görüldüğü gibi bir W matrisi ortaya çıkarır ve önce tersini alma, sonra bu ters ile bir çarpım işlemi yaparak C sonucunu üretir. <span class="math inline">\(O\)</span> notasyonunu kullanırsak DFT'nin karmaşıklığı <span class="math inline">\(O(N^2)\)</span>'dir. Bu iyi bir hızdır.</p>
+<p>FFT algoritması üstteki çarpımın bazı özelliklerini kullanarak DFT'yi daha da hızlandırır ve <span class="math inline">\(O(\frac{1}{2}Nlog_2N)\)</span> hızına getirir. FFT'den bu makalede bahsetmeyeceğiz, aklımızda olsun, <code>scipy.fft</code> çağrısı bu algoritmayı kullanır, örnek:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">C <span class="op">=</span> scipy.fft(Y)
+<span class="bu">print</span> C[:<span class="dv">3</span>]</code></pre></div>
+<pre><code>[ 15318.00000000   +0.j           1153.09522938 +866.74784921j
+    -72.35158374+1347.22954505j]</code></pre>
+<p>Soru</p>
+<p>FFT yaklaşıksal bir algoritma mıdır? Yani DFT'nin elde değerlere &quot;yakın'' değerler daha hızlı mı hesaplanıyor?</p>
+<p>Cevap</p>
+<p>FFT ile DFT tıpatıp aynı katsayıları hesaplıyorlar, FFT sadece bu hesabı daha hızlı yapıyor.</p>
+<p>Lomb-Scargle</p>
+<p>Daha önceki bir yazida güneş beneklerinin ortaya çıkışı verisinde periyotlar bulmak için Fourier analizi kullanmıştık. Bu analizin eksik bir tarafı istatistiki önemlilik (significance) hesabını göstermemesi. Daha iyi bir yöntem Lomb-Scargle yöntemi, ki bu yönteme göre periyot bulmak pek çok sinüs eğrisinin hangilerinin veriye daha iyi uyduğunu bulma problemine çeviriliyor, problem bir tür en az kareler çözümü haline geliyor, arka planda FFT kullanılıyor fakat problemin ana modeli artık FFT değil. Güneş benekleri,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">tempdata <span class="op">=</span> np.loadtxt(<span class="st">&#39;sunspots.dat&#39;</span>)
+year<span class="op">=</span>tempdata[:,<span class="dv">0</span>]<span class="op">;</span> sunspots<span class="op">=</span>tempdata[:,<span class="dv">1</span>]
+year<span class="op">=</span>year[year<span class="op">&lt;</span><span class="dv">2001</span>]<span class="op">;</span> sunspots<span class="op">=</span>sunspots[year<span class="op">&lt;</span><span class="dv">2001</span>]
+plt.plot(year,sunspots)
+plt.title(<span class="st">u&#39;Güneş Benekleri&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_ar_06.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ar_06.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> astroML.time_series <span class="im">import</span> lomb_scargle
+omega <span class="op">=</span> np.linspace(<span class="dv">1</span>, <span class="dv">40</span>, <span class="dv">200</span>)
+
+dy <span class="op">=</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> np.random.random(<span class="bu">len</span>(sunspots))
+sig <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>])
+PS, z <span class="op">=</span> lomb_scargle(year, sunspots, dy, omega, generalized<span class="op">=</span><span class="va">True</span>, significance<span class="op">=</span>sig)
+
+plt.plot(omega,PS)
+plt.hold(<span class="va">True</span>)
+
+xlim <span class="op">=</span> (omega[<span class="dv">0</span>], omega[<span class="op">-</span><span class="dv">1</span>])
+<span class="cf">for</span> zi, pi <span class="kw">in</span> <span class="bu">zip</span>(z, sig):
+    plt.plot(xlim, (zi, zi), <span class="st">&#39;:k&#39;</span>, lw<span class="op">=</span><span class="dv">1</span>)
+    plt.text(xlim[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> <span class="fl">0.001</span>, zi <span class="op">-</span> <span class="fl">0.02</span>, <span class="st">&quot;$</span><span class="sc">%.1g</span><span class="st">$&quot;</span> <span class="op">%</span> pi, ha<span class="op">=</span><span class="st">&#39;right&#39;</span>, va<span class="op">=</span><span class="st">&#39;top&#39;</span>)
+    plt.hold(<span class="va">True</span>)
+plt.title(<span class="st">u&#39;Güneş Benekleri Periyotları&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_ar_07.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ar_07.png" />
+
+</div>
+<p>Grafikte 0.1, 0.01, 0.001 önemliliğini yatay çizgiler olarak görüyoruz; bu çizgilerin üzerindeki her tepe noktası önemli bir periyottur.</p>
+<p>Bir diğer örnek: Altta dünyada 500 kusur milyon yıl geriye giden canlı tükenme yüzde grafiği görülüyor [7]. Mesela yaklaşık 66 milyon sene önce bir göktaşı çarpmasıyla müthiş bir tükeniş yaşandı, zaten dinazorların yokolması bu olay ile oldu. Bu olay grafikte açık bir şekilde görülüyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+ext <span class="op">=</span> pd.DataFrame(pd.read_csv(<span class="st">&#39;extinct.csv&#39;</span>,header<span class="op">=</span><span class="va">None</span>))
+ext2 <span class="op">=</span> ext.set_index(np.linspace(<span class="dv">542</span>,<span class="dv">1</span>,<span class="bu">len</span>(ext)))
+ext2[<span class="dv">0</span>].plot()
+ext <span class="op">=</span> ext[<span class="dv">0</span>]
+plt.savefig(<span class="st">&#39;tser_ar_09.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ar_09.png" />
+
+</div>
+<p>Soru şu: acaba bu verideki periyotlar hangileri? Tükenişte belli periyotlar var mı?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> astroML.time_series <span class="im">import</span> lomb_scargle
+
+dy <span class="op">=</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> np.random.random(<span class="bu">len</span>(ext))
+omega <span class="op">=</span> np.linspace(<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>)
+sig <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>])
+PS, z <span class="op">=</span> lomb_scargle(ext.index, ext, dy, omega, generalized<span class="op">=</span><span class="va">True</span>, significance<span class="op">=</span>sig)
+
+plt.plot(omega,PS)
+plt.hold(<span class="va">True</span>)
+
+xlim <span class="op">=</span> (omega[<span class="dv">0</span>], omega[<span class="op">-</span><span class="dv">1</span>])
+<span class="cf">for</span> zi, pi <span class="kw">in</span> <span class="bu">zip</span>(z, sig):
+    plt.plot(xlim, (zi, zi), <span class="st">&#39;:k&#39;</span>, lw<span class="op">=</span><span class="dv">1</span>)
+    plt.text(xlim[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> <span class="fl">0.001</span>, zi <span class="op">-</span> <span class="fl">0.02</span>, <span class="st">&quot;$</span><span class="sc">%.1g</span><span class="st">$&quot;</span> <span class="op">%</span> pi, ha<span class="op">=</span><span class="st">&#39;right&#39;</span>, va<span class="op">=</span><span class="st">&#39;top&#39;</span>)
+    plt.hold(<span class="va">True</span>)
+plt.title(<span class="st">u&#39;Canlıların Tükenme Periyotları&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_ar_08.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ar_08.png" />
+
+</div>
+<p>Grafiğe göre yaklaşık 25 milyon, 70 milyon yılda bir rutin tükenişler görülüyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Strang, <em>Computational Science and Engineering</em></p>
+<p>[2] Lyons, <em>Understanding Digital Signal Processing, 2nd Edition</em></p>
+<p>[3] Wang, <em>Applied Numerical Methods Using Matlab</em></p>
+<p>[4] Bayramlı, Diferansiyel Denklemler, <em>Ders 15</em></p>
+<p>[7] Bayramlı, <em>Grafikten Veri Çıkartmak</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2017/01/grafikten-veri-cikartmak.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2017/01/grafikten-veri-cikartmak.html</a></p>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="en-dik-iniş-steepest-descent">En Dik İniş (Steepest Descent)</h1>
+<p>Daha önce gradyan inişi konusunda işlediğimiz üzere bir <span class="math inline">\(f\)</span> fonksiyonu için hesaplanan <span class="math inline">\(-\nabla f(x)\)</span> gradyanı <span class="math inline">\(x\)</span> noktasında fonksiyon için en yüksek iniş (descent) olacak yönü gösteriyordu [1, sf. 151]. Fakat dikkat, {} kelimesini kullandık, o yönde ne kadar adım atılacağını belirtmedik. Gradyanın temel hesabı türeve dayalı olduğu için ve türev hesapladığı noktaya yakın bir yerde doğru bir yaklaşıklama olacağı için o yönde atılan adımın büyüklüğüne göre minimizasyon iyi ya da kötü sonuçlar verebilir. Bu sebeple gradyan inişi algoritmaları, ki</p>
+<p><span class="math display">\[
+x^{x+1} = x^k + \alpha_k \nabla f(x^k)
+\]</span></p>
+<p>ile kodlanırlar, çoğunlukla ufak ve pek çok adım atarlar, yani <span class="math inline">\(\alpha_k\)</span> sabitleri ufak seçilir. En Dik İniş (SD) algoritmasi bu noktada bir ilerleme. Her <span class="math inline">\(\alpha\)</span>, yani <span class="math inline">\(\alpha_k\)</span> öyle seçilir ki <span class="math inline">\(\phi(\alpha) \equiv f(x^k - \alpha \nabla f(x^k))\)</span> kesinlikle minimize edilsin / belli bir yöndeki en minimum noktaya vardıracak büyüklükte adım atılsın. Ya da</p>
+<p><span class="math display">\[
+\alpha_k = \arg\min_{\alpha \ge 0} f(x^k - \alpha \nabla f(x^k))
+\]</span></p>
+<p>Yani gradyanın işaret ettiği yönde bir tür &quot;arama'' yapmış oluyoruz, adım büyüklüğünü öyle seçiyoruz ki fonksiyon o yönde o kadar adım atıldığında en fazla inişi gerçekleştirmiş olsun. Bu sebeple bu metota çizgi araması (line search) metotu deniyor.</p>
+<p>Tabii arama derken akla ikinci bir döngü içinde yine ufak ufak adımlar atarak çizgi üzerinde gelinen yere bakıp büyüklük hesabını böyle yapmak gelebilir, bu sonuçsal olarak, kabaca doğru, ama asıl adım hesabı bazı cebirsel temellerle, ya da onu çözen yaklaşıksal şekilde yapılıyor.</p>
+<p>En basiti atılan adım <span class="math inline">\(\alpha\)</span>'yi pür cebirsel olarak çözmek, altta bir örnek [3, sf. 101].</p>
+<p>Soru</p>
+<p><span class="math inline">\(f(x) = 9x_1^2 + 4x_1x_2 + 7x_2^2\)</span> fonksiyonunun optimal noktasını bul.</p>
+<p>Çözüm</p>
+<p>Gradyanın öğeleri</p>
+<p><span class="math inline">\(\frac{\partial f}{\partial x_1} = 18 x_1 + 4x_2\)</span> ve <span class="math inline">\(\frac{\partial f}{\partial x_2} = 4 x_1 + 14 x_2\)</span>. Şimdi SD yöntemini uygulayalım, başlangıç noktası <span class="math inline">\(x^0 = [\begin{array}{cc} 1 &amp; 1 \end{array}]^T\)</span> olsun. Bu durumda <span class="math inline">\(f(x^0) = 20\)</span>, ve <span class="math inline">\(\nabla f(x_0) = [\begin{array}{cc} 22 &amp; 18 \end{array}]^T\)</span>. Adım denklemine göre,</p>
+<p><span class="math display">\[
+x^1 = x^0 - \alpha_0 \nabla f(x^0)
+\]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[
+\left[\begin{array}{c}
+x_1 \\ x_2
+\end{array}\right]
+= 
+\left[\begin{array}{c}
+1 \\ 1
+\end{array}\right]
+\alpha_0 
+\left[\begin{array}{c}
+22 \\ 18
+\end{array}\right]
+\]</span></p>
+<p>Şimdi öyle bir <span class="math inline">\(\alpha_0\)</span> seçmeliyiz ki <span class="math inline">\(f(x^1)\)</span> minimum olsun. Üstteki değerlerin bize verdiği <span class="math inline">\(x_1\)</span> ve <span class="math inline">\(x_2\)</span> değerleri (ki <span class="math inline">\(\alpha_0\)</span> bazlı olacaklar) ana formüle yeni <span class="math inline">\(x\)</span> olarak sokarsak, <span class="math inline">\(\alpha_o\)</span> bazlı bir denklem edeceğiz,</p>
+<p><span class="math display">\[
+f(\alpha_0) = 20 - 808 \alpha_0 + 8208 (\alpha_0)^2
+\]</span></p>
+<p><span class="math inline">\(\frac{\mathrm{d} f(\alpha_0)}{\mathrm{d} \alpha_0} = 0\)</span> üzerinden <span class="math inline">\(\alpha_0\)</span>'nun optimum değeri <span class="math inline">\(0.05\)</span>'tır. Yani adımı şu şekilde atmalıyız,</p>
+<p><span class="math display">\[
+x^1 = 
+\left[\begin{array}{c}
+x_1 \\ x_2
+\end{array}\right]
+= 
+\left[\begin{array}{c}
+1 \\ 1
+\end{array}\right]
+0.05
+\left[\begin{array}{c}
+22 \\ 18
+\end{array}\right]
+\]</span></p>
+<p>ki bu hesap bize <span class="math inline">\(f(x^1) = 0.12\)</span> verir. Bu şekilde özyineli döngüye devam edersek nihai optimum noktayı buluruz.</p>
+<p>Sekant Yöntemi</p>
+<p>Basit cebirsel numaralar ile üstte adımı bulduk. Daha çetrefil durumlar için sekant yöntemini kullanabiliriz. Bu yöntemi [2]'de işledik, ayrıca bkz [1, sf. 120]. Sonuçta aradığımız <span class="math inline">\(d\)</span> yönündeki minimum</p>
+<p><span class="math display">\[
+\phi_k(\alpha) = f(x^k + \alpha d^k)
+\]</span></p>
+<p>değerini bulmaktır. Üstteki formülün <span class="math inline">\(\alpha\)</span> üzerinden türevi</p>
+<p><span class="math display">\[
+\phi_k&#39;(\alpha) = {d^k}^T \nabla f(x^k + \alpha d^k) 
+\]</span></p>
+<p>O zaman minimum <span class="math inline">\(\alpha\)</span> icin</p>
+<p><span class="math display">\[
+0 = {d^k}^T \nabla f(x^k + \alpha d^k) 
+\]</span></p>
+<p>denklemini çözen <span class="math inline">\(\alpha\)</span> gerekli. Bu bir kök bulma problemi ve sekant yöntemini kullanabiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> linesearch_secant(grad, d, x):
+    epsilon<span class="op">=</span><span class="dv">10</span><span class="op">**</span>(<span class="op">-</span><span class="dv">8</span>)
+    <span class="bu">max</span> <span class="op">=</span> <span class="dv">500</span>
+    alpha_curr<span class="op">=</span><span class="dv">0</span>
+    alpha<span class="op">=</span><span class="dv">10</span><span class="op">**-</span><span class="dv">8</span>
+    dphi_zero<span class="op">=</span>np.dot(np.array(grad(x)).T,d)
+
+    dphi_curr<span class="op">=</span>dphi_zero
+    i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>
+    <span class="cf">while</span> np.<span class="bu">abs</span>(dphi_curr)<span class="op">&gt;</span>epsilon<span class="op">*</span>np.<span class="bu">abs</span>(dphi_zero):
+        alpha_old<span class="op">=</span>alpha_curr
+        alpha_curr<span class="op">=</span>alpha
+        dphi_old<span class="op">=</span>dphi_curr        
+        dphi_curr<span class="op">=</span>np.dot(np.array(grad(x<span class="op">+</span>alpha_curr<span class="op">*</span>d)).T,d)
+        alpha<span class="op">=</span>(dphi_curr<span class="op">*</span>alpha_old<span class="op">-</span>dphi_old<span class="op">*</span>alpha_curr)<span class="op">/</span>(dphi_curr<span class="op">-</span>dphi_old)<span class="op">;</span>
+        i <span class="op">+=</span> <span class="dv">1</span>
+        <span class="cf">if</span> (i <span class="op">&gt;=</span> <span class="bu">max</span>) <span class="kw">and</span> (np.<span class="bu">abs</span>(dphi_curr)<span class="op">&gt;</span>epsilon<span class="op">*</span>np.<span class="bu">abs</span>(dphi_zero)):
+            <span class="bu">print</span>(<span class="st">&#39;Line search terminating with number of iterations:&#39;</span>)
+            <span class="bu">print</span>(i)
+            <span class="bu">print</span>(alpha)
+            <span class="cf">break</span>
+        
+    <span class="cf">return</span> alpha</code></pre></div>
+<p>Örnek</p>
+<p><span class="math inline">\(f(x_1,x_2,x_3) = (x_1 - 4)^4 + (x_2 - 3)^2 + 4(x_3 + 5)^4\)</span> fonksiyonunun minimize edicisini bul.</p>
+<p>Başlangıç noktamız <span class="math inline">\(\left[\begin{array}{ccc} 4 &amp; 2 &amp; -1 \end{array}\right]^T\)</span> olacak.</p>
+<p>Üstteki fonksiyonun gradyanı</p>
+<p><span class="math display">\[
+\nabla f(x) = \left[\begin{array}{ccc}  
+4(x_1-4)^3 &amp; 2(x_2-3) &amp; 16(x_3+5)^3
+\end{array}\right]^T
+\]</span></p>
+<p>Kod olarak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> g(x): <span class="cf">return</span> np.array([<span class="dv">4</span><span class="op">*</span>(x[<span class="dv">0</span>]<span class="op">-</span><span class="dv">4</span>)<span class="op">**</span><span class="dv">3</span>, <span class="dv">2</span><span class="op">*</span>(x[<span class="dv">1</span>]<span class="op">-</span><span class="dv">3</span>), <span class="dv">16</span><span class="op">*</span>(x[<span class="dv">2</span>]<span class="op">+</span><span class="dv">5</span>)<span class="op">**</span><span class="dv">3</span>])</code></pre></div>
+<p><span class="math inline">\(x^1\)</span> hesaplamak için</p>
+<p><span class="math display">\[
+\alpha_0 = \arg\min_{\alpha \ge 0} f(x^0 - \alpha \nabla f(x^0))
+\]</span></p>
+<p>lazım, tam açılmış haliyle,</p>
+<p><span class="math display">\[
+= \arg\min_{\alpha \ge 0} (0 + (2+2\alpha-3)^2 + 4(-1-1024\alpha+5)^4
+\]</span></p>
+<p>Ama üstteki cebirle boğuşmaya gerek yok, gradyan fonksiyonu ve gidiş yönü üzerinden kök bulup bize döndürecek üstteki çizgi araması kodunu kullanabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x0 <span class="op">=</span> np.array([<span class="dv">4</span>,<span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>])
+<span class="bu">print</span> (g(x0))
+d0 <span class="op">=</span> <span class="op">-</span>g(x0)
+alpha0 <span class="op">=</span> linesearch_secant(g, d0, x0)
+alpha0 <span class="op">=</span> np.<span class="bu">round</span>(alpha0, <span class="dv">5</span>)
+<span class="bu">print</span> (<span class="st">&#39;alpha0 =&#39;</span>,alpha0)
+x1 <span class="op">=</span> x0 <span class="op">-</span> alpha0<span class="op">*</span>g(x0)
+<span class="bu">print</span> (<span class="st">&#39;x1&#39;</span>,x1)</code></pre></div>
+<pre><code>[   0   -2 1024]
+alpha0 = 0.00397
+x1 [ 4.       2.00794 -5.06528]</code></pre>
+<p>Arka arkaya iki adım daha atarsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (<span class="st">&#39;g1&#39;</span>,g(x1))
+d1 <span class="op">=</span> <span class="op">-</span>g(x1)
+alpha1 <span class="op">=</span> linesearch_secant(g, d1, x1)
+<span class="bu">print</span> (alpha1)
+x2 <span class="op">=</span> x1 <span class="op">-</span> alpha1<span class="op">*</span>g(x1)
+<span class="bu">print</span> (<span class="st">&#39;x2&#39;</span>,x2)
+<span class="bu">print</span> (<span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)
+<span class="bu">print</span> (<span class="st">&#39;g2&#39;</span>,g(x2))
+d2 <span class="op">=</span> <span class="op">-</span>g(x2)
+alpha3 <span class="op">=</span> linesearch_secant(g, d2, x2)
+<span class="bu">print</span> (alpha3)
+x3 <span class="op">=</span> x2 <span class="op">-</span> alpha3<span class="op">*</span>g(x2)
+<span class="bu">print</span> (<span class="st">&#39;x3&#39;</span>,x3)</code></pre></div>
+<pre><code>g1 [ 0.         -1.98412    -0.00445103]
+0.5000022675782785
+x2 [ 4.          3.0000045  -5.06305448]
+
+
+g2 [ 0.00000000e+00  8.99829483e-06 -4.01113920e-03]
+14.894217818923421
+x3 [ 4.          2.99987048 -5.00331169]</code></pre>
+<p>Optimal noktaya erişmiş olduk.</p>
+<p>Duruş Şartları</p>
+<p>Optimizasyonda minimum varlığı için birinci-derecen gerekli şart (first-order necessary condition -FONC-) minimumda <span class="math inline">\(\nabla f(x) = 0\)</span> olması. Eğer böyle bir noktaya erişmişsek, diyelim <span class="math inline">\(x^k\)</span> için <span class="math inline">\(\nabla f(x^k) = 0\)</span> olmuş, bu nokta FONC'yi tatmin eder çünkü o zaman <span class="math inline">\(x^{k+1} = x^k\)</span> olur, ve minimumdayız demektir. Bu teorik bilgiyi algoritmamızın ne zaman duracağını anlaması için bir şart olarak kullanamaz mıyız?</p>
+<p>Ne yazık ki sayısal hesaplarda, yani pratikte <span class="math inline">\(\nabla f(x^k) = 0\)</span> hesabı nadiren ortaya çıkar. Bir çözüm gradyanın normu <span class="math inline">\(|| \nabla f(x) ||\)</span> sıfır olmasına bakmak.</p>
+<p>Ya da <span class="math inline">\(| f(x^{k+1}) - f(x^k) |\)</span> mutlak değerine bakmak, yani hedef fonksiyonun iki nokta arasındaki farkının mutlak değerine, bu değer eğer daha önceden belirlenmiş bir eşik değeri <span class="math inline">\(\epsilon\)</span>'un altına düşmüşse durmak. Aynı şeyi <span class="math inline">\(x^{n+1}\)</span> ve <span class="math inline">\(x^n\)</span> değerlerinin kendisi için de yapabiliriz.</p>
+<p>Fakat bu yöntemler ölçek açısından problemli olabilir. Mesela 1 ve 1000 arasında gidip gelen <span class="math inline">\(f(x)\)</span>'lerle 0 ve 1 arasında gidip gelen <span class="math inline">\(f(x)\)</span>'lerin kullanacağı <span class="math inline">\(\epsilon\)</span> farklı olabilir. Bir tanesi için <span class="math inline">\(\epsilon = 100\)</span> iyidir, diğeri için belki <span class="math inline">\(\epsilon = 0.001\)</span>. Bu sebeple izafi bir hesap daha faydalı olur, mesela</p>
+<p><span class="math display">\[
+\frac{|f(x^{k+1} - f(x^k))|}{|f(x^k)|} &lt; \epsilon
+\]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[
+\frac{||x^{k+1} - x^k||}{||x^k||} &lt; \epsilon
+\]</span></p>
+<p>Üstteki yaklaşım &quot;ölçekten bağımsız'' olduğu için daha tercih edilir yaklaşım, bir problemden diğerine geçtiğimizde farklı bir <span class="math inline">\(\epsilon\)</span> kullanmamız gerekmez.</p>
+<p>Uygulama</p>
+<p>Gradyan İnişi ve Model Uydurmak</p>
+<p>Pek çok farklı probleme çözüm sağlayan bir teknik gradyan inişidir. Ne yazık ki bilgisayar bilim lisans seviyesinde bu teknik genellikle öğretilmiyor. Bu yazıda Gİ'nin hepimizin bildiği bir problemi, lineer regresyonu çözmek için nasıl kullanılacağını anlatacağım [1].</p>
+<p>Teorik seviyede Gİ bir fonksiyonu minimize etmeye yarar. Elde bazı parametreler üzerinden tanımlı bir fonksiyon vardır, ve Gİ bir başlangıç değerinden başlayarak azar azar o parametreleri değiştirerek fonksiyonun minimal olduğu yeri bulmaya uğraşır. Bu azar azar, adım atılarak yapılan minimizasyon Calculus sayesindedir, fonksiyonun gradyanının negatif yönünde adım atılarak mümkün olur. Bazen bu matematiksel açıklamanın pratik kullanımı nasıl olur görmek zor oluyor; Örnek olarak bir veriye lineer bir çizgi / model uyduralım.</p>
+<p>Basit bir tanım yaparsak lineer regresyonun amacı eldeki bir veri kümesine düz çizgi uydurmaktır. Veri alttaki gibi olabilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">points <span class="op">=</span> np.genfromtxt(<span class="st">&quot;data.csv&quot;</span>, delimiter<span class="op">=</span><span class="st">&quot;,&quot;</span>)
+plt.scatter(points[:,<span class="dv">0</span>],points[:,<span class="dv">1</span>])
+plt.savefig(<span class="st">&#39;vision_90fitting_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="vision_90fitting_04.png" />
+
+</div>
+<p>Üstteki veriyi düz çizgi olarak modellemek istiyoruz, bunun için lise matematiğinden bilinen <span class="math inline">\(y = mx + b\)</span> formülünü kullanacağız, <span class="math inline">\(m\)</span> eğim (slope), <span class="math inline">\(b\)</span> ise kesi (intercept), yani y-ekseninin kesildiği yer. Veriye uyan en iyi çizgiyi bulmak demek en iyi <span class="math inline">\(m,b\)</span> değerlerini bulmak demek.</p>
+<p>Bunu yapmanının standart yolu bir hata fonksiyonu tanımlamak (bazen bedel fonksiyonu da deniyor). Hata fonksiyonu bir çizginin ne kadar &quot;iyi'' olduğunu ölçebilen bir fonksiyondur, bir <span class="math inline">\(m,b\)</span> çiftini alacak, veriye bakacak, ve bize uyumun ne kadar iyi olduğunu bir hata değeri üzerinden raporlayacak. Hata değeri hesabı için elimizdeki verideki tüm <span class="math inline">\(x,y\)</span> değerlerine bakacağız, ve bunu yaparken her veri <span class="math inline">\(y\)</span> değeri ile, yine veri <span class="math inline">\(x\)</span>'i üzerinden hesapladığımız <span class="math inline">\(mx+b\)</span> değeri arasındaki farka bakacağız; daha doğrusu farkın karesini alacağız, ve her veri noktası için hesaplanan tüm bu kare hesaplarını toplayacağız. Kare alınıyor, çünkü bu hatayı pozitif hale çevirmemizi sağlıyor, bir diğer fayda tabii kare fonksiyonun türevi alınabilir olması (kıyasla mutlak değer fonksiyonu işleri daha karıştırırdı). Pozitif bir hata yeterli, çünkü hata yapılmışsa alttan mı üstten mi olduğu bizi ilgilendirmiyor. Hata <span class="math inline">\(E\)</span> hesabı şöyle,</p>
+<p>Matematiksel olarak</p>
+<p><span class="math display">\[ E_{(m,b)} = \frac{1}{N} \sum_{i=1}^{N} (y_i - (mx_i + b))^2\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># y = mx + b</span>
+<span class="co"># m is slope, b is y-intercept</span>
+<span class="kw">def</span> compute_error_for_line_given_points(b, m, points):
+    totalError <span class="op">=</span> <span class="dv">0</span>
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(points)):
+        x <span class="op">=</span> points[i, <span class="dv">0</span>]
+        y <span class="op">=</span> points[i, <span class="dv">1</span>]
+        totalError <span class="op">+=</span> (y <span class="op">-</span> (m <span class="op">*</span> x <span class="op">+</span> b)) <span class="op">**</span> <span class="dv">2</span>
+    <span class="cf">return</span> totalError <span class="op">/</span> <span class="bu">float</span>(<span class="bu">len</span>(points))</code></pre></div>
+<p>Veriye daha iyi uyan çizgiler (ki &quot;daha iyi''nin ne olduğu hata fonksiyonumuz üzerinden tanımlı) daha az hata değerleri anlamına gelecektir. O zaman, eğer hata fonksiyonunu minimize edersek, veriye uyan iyi çizgiyi bulacağız demektir. Hata fonksiyonumuz iki parametreli olduğu için onu iki boyutlu bir yüzey olarak grafikleyebiliriz,</p>
+<div class="figure">
+<img src="vision_90fitting_06.png" />
+
+</div>
+<p>Bu iki boyutlu yüzey üzerindeki her nokta değişik bir çizgiyi temsil ediyor. Yüzeyin alt düzlemden olan yüksekliği o çizgiye tekabül eden hata. Gördüğümüz gibi bazı çizgiler bazılarından daha az hataya sahip (yani veriye daha iyi uymuş). Gradyan inişi ile arama yaptığımız zaman bu yüzeyin herhangi bir noktasından başlayacağız, ve yokuş aşağı inerek hatası en az olan çizgiyi bulacağız.</p>
+<p>Hata fonksiyonu üzerinde Gİ işletmek için önce fonksiyonun gradyanını hesaplamamız lazım. Gradyan bizim için nerede olursak olalım her zaman dip noktasını gösteren bir pusula görevini görüyor. Gradyan hesabı için hata fonksiyonunun türevi alınmalı. Hata fonksiyonunun <span class="math inline">\(m,b\)</span> adında iki tane parametresi olduğuna göre bu iki parametrenin her biri için ayrı ayrı kısmi türev almamız lazım. Bu türevler,</p>
+<p><span class="math display">\[ 
+\frac{\partial E}{\partial m} =
+\frac{2}{N} \sum_{i=1}^{N} -x_i (y_i - (mx_i+b))
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{\partial E}{\partial b} =
+\frac{2}{N} \sum_{i=1}^{N} -(y_i - (mx_i+b))
+\]</span></p>
+<p>Artık Gİ işletmek için gerekli tüm araçlara sahibiz. Aramayı herhangi bir <span class="math inline">\(m,b\)</span> noktasından (herhangi bir çizgi) başlatırız, ve Gİ yokuş aşağı en iyi çizgi parametrelerine doğru gider. Her döngü <span class="math inline">\(m,b\)</span> değerlerini bu inişe göre günceller (dikkat inen <em>parametreler</em> değil, hatada inilirken bu inişe tekabül eden <span class="math inline">\(m,b\)</span> değerleri), ki bu sayede döngünün bir sonraki adımındaki hata bir öncekine göre azalmış olur.</p>
+<p>Matematiğe biraz daha yakından bakalım [2]. Türev almak, türeve göre adım atmak bir fonksiyonunun minimum noktasını bulmamızı nasıl sağlıyor? Basit bir fonksiyon <span class="math inline">\(f(x)\)</span>'i düşünelim,</p>
+<div class="figure">
+<img src="vision_90fitting_05.png" />
+
+</div>
+<p>Gradyan, ya da belli bir <span class="math inline">\(x\)</span> noktasındaki değişim oranı <span class="math inline">\(\oslash y / \oslash x\)</span> ile yaklaşıksallanabilir (çoğunlukla literatur <span class="math inline">\(\Delta\)</span> sembolünü kullanır, [2] <span class="math inline">\(\oslash\)</span> kullanmış, önemli değil). Ya da bu yaklaşıksallığı şöyle yazabiliriz,</p>
+<p><span class="math display">\[ 
+\frac{\partial f}{\partial x} =
+\lim_{\oslash \to 0} \frac{\oslash y}{\oslash x} =
+\lim_{\oslash \to 0} \frac{f(x + \oslash x) - f(x)}{\oslash x}
+\]</span></p>
+<p>ki bu ifade <span class="math inline">\(f(x)\)</span>'in <span class="math inline">\(x\)</span>'e göre kısmi türevi olarak bilinir. Üstteki yöntem ile sembolik olarak pek çok ifadenin türevini almayı biliyoruz, mesela <span class="math inline">\(ax^2\)</span> için <span class="math inline">\(2ax\)</span>, vs.</p>
+<p>Şimdi elimizde bir <span class="math inline">\(f(x)\)</span> olduğunu düşünelim, ve <span class="math inline">\(x\)</span>'i öyle bir şekilde değiştirmek istiyoruz ki <span class="math inline">\(f(x)\)</span> minimize olsun. Ne yapacağımız <span class="math inline">\(f(x)\)</span>'in gradyanının ne olduğuna bağlı. Üç tane mümkün durum var:</p>
+<p>Eğer <span class="math inline">\(\frac{\partial f}{\partial x} &gt; 0\)</span> ise <span class="math inline">\(x\)</span> artarken <span class="math inline">\(f(x)\)</span> artar, o zaman <span class="math inline">\(x\)</span>'i azaltmalıyız.</p>
+<p>Eğer <span class="math inline">\(\frac{\partial f}{\partial x} &lt; 0\)</span> ise <span class="math inline">\(x\)</span> artarken <span class="math inline">\(f(x)\)</span> azalır, o zaman <span class="math inline">\(x\)</span>'i arttırmalıyız.</p>
+<p>Eğer <span class="math inline">\(\frac{\partial f}{\partial x} = 0\)</span> ise <span class="math inline">\(f(x)\)</span> ya minimum ya da maksimum noktasındadır, o zaman <span class="math inline">\(x\)</span>'i olduğu gibi bırakmalıyız.</p>
+<p>Özet olarak <span class="math inline">\(x\)</span>'i alttaki miktar kadar azaltırsak <span class="math inline">\(f(x)\)</span>'i de azaltabiliriz,</p>
+<p><span class="math display">\[ \oslash x = x_{yeni} - x_{eski} = -\eta  \frac{\partial f}{\partial x}\]</span></p>
+<p>ki <span class="math inline">\(\eta\)</span> ufak bir pozitif sabittir, <span class="math inline">\(x\)</span>'i değiştirirken bu atılan adımın büyüklüğünü dışarıdan ayarlayabilmemizi sağlar, değişimin hangi yönde olacağını <span class="math inline">\(\frac{\partial f}{\partial x}\)</span> belirtiyor zaten. Bu formülü ardı ardına kullanırsak, <span class="math inline">\(f(x)\)</span> yavaş yavaş minimum noktasına doğru &quot;inecektir'', bu yönteme gradyan inişi minimizasyonu adı verilmesinin sebebi de budur.</p>
+<p>Örneğimize dönelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> step_gradient(b_current, m_current, points, eta):
+    b_gradient <span class="op">=</span> <span class="dv">0</span>
+    m_gradient <span class="op">=</span> <span class="dv">0</span>
+    N <span class="op">=</span> <span class="bu">float</span>(<span class="bu">len</span>(points))
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(points)):
+        x <span class="op">=</span> points[i, <span class="dv">0</span>]
+        y <span class="op">=</span> points[i, <span class="dv">1</span>]
+        b_gradient <span class="op">+=</span> <span class="op">-</span>(<span class="dv">2</span><span class="op">/</span>N) <span class="op">*</span> (y <span class="op">-</span> ((m_current <span class="op">*</span> x) <span class="op">+</span> b_current))
+        m_gradient <span class="op">+=</span> <span class="op">-</span>(<span class="dv">2</span><span class="op">/</span>N) <span class="op">*</span> x <span class="op">*</span> (y <span class="op">-</span> ((m_current <span class="op">*</span> x) <span class="op">+</span> b_current))
+    new_b <span class="op">=</span> b_current <span class="op">-</span> (eta <span class="op">*</span> b_gradient)
+    new_m <span class="op">=</span> m_current <span class="op">-</span> (eta <span class="op">*</span> m_gradient)
+    <span class="cf">return</span> [new_b, new_m]
+
+eta <span class="op">=</span> <span class="fl">0.0001</span>
+initial_b <span class="op">=</span> <span class="dv">0</span> <span class="co"># initial y-intercept guess</span>
+initial_m <span class="op">=</span> <span class="dv">0</span> <span class="co"># initial slope guess</span>
+num_iterations <span class="op">=</span> <span class="dv">8</span>
+<span class="bu">print</span> <span class="st">&quot;Starting gradient descent at b = </span><span class="sc">{0}</span><span class="st">, m = </span><span class="sc">{1}</span><span class="st">, error = </span><span class="sc">{2}</span><span class="st">&quot;</span>.<span class="bu">format</span>(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
+<span class="bu">print</span> <span class="st">&quot;Running...&quot;</span>
+b <span class="op">=</span> initial_b
+m <span class="op">=</span> initial_m
+xx <span class="op">=</span> np.linspace(np.<span class="bu">min</span>(points[:,<span class="dv">0</span>]),np.<span class="bu">max</span>(points[:,<span class="dv">0</span>]), <span class="dv">100</span>)
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_iterations):
+    b, m <span class="op">=</span> step_gradient(b, m, np.array(points), eta)
+    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>: 
+        <span class="bu">print</span> i, b,m
+        yy <span class="op">=</span> m <span class="op">*</span> xx <span class="op">+</span> b
+        plt.scatter(points[:,<span class="dv">0</span>],points[:,<span class="dv">1</span>])
+        plt.hold(<span class="va">True</span>)
+        plt.scatter(xx,yy)
+        plt.hold(<span class="va">False</span>)
+        plt.savefig(<span class="st">&#39;grad_desc_</span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> i)
+<span class="bu">print</span> <span class="st">&quot;After </span><span class="sc">{0}</span><span class="st"> iterations b = </span><span class="sc">{1}</span><span class="st">, m = </span><span class="sc">{2}</span><span class="st">, error = </span><span class="sc">{3}</span><span class="st">&quot;</span>.<span class="bu">format</span>(num_iterations, b, m, compute_error_for_line_given_points(b, m, points))    </code></pre></div>
+<pre><code>Starting gradient descent at b = 0, m = 0, error = 5565.10783448
+Running...
+0 0.0145470101107 0.737070297359
+2 0.0255792243213 1.29225466491
+4 0.0284450719817 1.43194723238
+6 0.029256114126 1.46709461772
+After 8 iterations b = 0.0294319691638, m = 1.47298329822, error = 112.737981876</code></pre>
+<p><img src="grad_desc_0.png" /> <img src="grad_desc_2.png" /> <img src="grad_desc_4.png" /> <img src="grad_desc_6.png" /></p>
+<p>Optimal <span class="math inline">\(m,b\)</span> değerleri bulundu. <span class="math inline">\(m=-1, b=0\)</span>'da başladık ve optimal sonucu bulduk. Değişken <code>eta</code> (yani <span class="math inline">\(\eta\)</span>) adım büyüklüğü demiştik, dikkat eğer adım çok büyük seçilirse minimum &quot;atlanabilir'', yani varış noktası kaçırılabilir. Eğer <span class="math inline">\(\eta\)</span> çok küçük ise minimuma erişmek için çok vakit geçebilir. Ayrıca Gİ'nin doğru işlediğini anlamanın iyi yollarından birisi her döngüde hatanın azalıp azalmadığına bakmaktır.</p>
+<p>Bu basit bir örnekti, fakat bir bedel fonksiyonunu minimize edecek parametre değişimlerini yapma kavramı yüksek dereceli polinomlarda, ya da diğer Yapay Öğrenim problemlerinde de işe yarıyor.</p>
+<p>Gİ ile akılda tutulması gereken bazı konular:</p>
+<ol style="list-style-type: decimal">
+<li><p>Dışbükeylik (Convexity): Üstteki problemde sadece bir tane minimum vardı, hata yüzeyi dışbükeydi. Nereden başlarsak başlayalım, adım atarak minimuma erişecektik. Çoğunlukla durum böyle olmaz. Bazı problemlerde yerel minimumda takılı kalmak mümkün olabiliyor, bu problemleri aşmak için farklı çözümler var, mesela Rasgele Gradyan İnişi (Stochastic Gradient Descent) kullanmak gibi.</p></li>
+<li><p>Performans: Örnekte basit bir Gİ yaklaşımı kullandık, çizgi arama (line search) gibi yaklaşımlarla döngü sayısının azaltmak mümkün olabiliyor.</p></li>
+<li><p>Yakınsama (Convergence): Aramanın bittiğinin kararlaştırılmasını kodlamadık, bu çoğunlukla hata döngüsündeki değişimlere bakılarak yapılır; eğer hatadaki değişim belli bir eşik değerinden daha küçük ise, gradyanın sıfır olduğu yere yaklaşılmış demektir, ve arama durdurulabilir.</p></li>
+</ol>
+<p>Not: Lineer regresyon tabii ki direk, tek bir adımda çözülebilen bir problem. Gİ'yi burada bir örnek amaçlı kullandık.</p>
+<p>Kaynaklar</p>
+<p>[1] Zak, <em>An Introduction to Optimization, 4th Edition</em></p>
+<p>[2] Bayramlı, <em>Diferansiyel Denklemler, Kök Bulmak, Karesel Formül (Root Finding, Quadratic Formula)</em></p>
+<p>[3] Dutta, <em>Optimization in Chemical Engineering</em></p>
+</body>
+</html>

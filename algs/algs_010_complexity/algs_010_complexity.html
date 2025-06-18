@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="hesapsal-karmaşıklık-teorisi-computational-complexity">Hesapsal Karmaşıklık Teorisi (Computational Complexity)</h1>
+<p>Bu bilim dalı algoritmaların yer ve zaman gibi kaynakları ne kadar kullandığından hareketle bu algoritmaları kategorize etmeye uğraşır. Diğer bazı amaçlar, hangi algoritmaların çözümsüz olacağı, hangi algoritmaların çok zaman alacak olsa bile, eninde sonunda bir sonuca varabileceği gibi konulardır.</p>
+<p>Algoritma türlerinin arasındaki benzerlikleri bulmak zorluk teorisin ana eylemlerinden; mesela problem <span class="math inline">\(A\)</span> için bir algoritma yazmamız gerektiğini düşünelim, ve aynı gün kuramsal bir bilgisayar bilim makâlesinde, bizim problemin diğer bir &quot;<span class="math inline">\(B\)</span> problemi&quot; ile tıpatıp aynı olduğunu okuduk. Bu makâleye göre, <span class="math inline">\(B\)</span> probleminin kabakuvvet çözümünün &quot;yavaş&quot; olduğu belirtilmiş olabilir, ve hızlı çözümün imkansız olduğu da ispat edilebiliyor. Bu bilgiden hareketle, <span class="math inline">\(A\)</span>'nın da hızlı cözümünün olamayacağını daha baştan anlarız, akıllı tahmin (heuristic) ekleyerek çözümü biraz olsun hızlandırmaya çalışabiliriz.</p>
+<p>P (Polinom) Grubu</p>
+<p>Bir algoritmanın P grubu içinde olduğu söyleniyorsa, bu algoritma polinom zamanda işliyor demektir, yani algoritma karmaşıklığı <span class="math inline">\(O(n^2)\)</span> gibi bir şekilde belirtilebiliyordur; polinom ifadesi herhalde <span class="math inline">\(n^2\)</span> ifadesinin bir polinom olmasından, <span class="math inline">\(O(n)\)</span>, yani eleman sayısına direk orantılı / lineer zamanda işleyen algoritmalar de tabii ki bu grupta (<span class="math inline">\(n^1\)</span> de bir polinom (!) ). P grubu en hızlı işleyen algoritmalar grubudur, algoritmalarımızı bu grupta görmek isteriz, ve ona göre tasarlamaya çabalarız. En iyi bilinen, &quot;iyi'' algoritmaların hepsi bu gruptadır, mesela tüm popüler sıralama (sorting) algoritmaları, aritmetik hesaplar, lineer cebirdeki çoğu matris işlemi, kısayol bulma algoritmaları, vs.</p>
+<p>NP-Zor (NP-Hard) ve NP-Tam (NP-Complete)</p>
+<p>Bilgisayar bilimde öyle problemler vardır çözümlerini bulmak için mümkün girdinin tüm kombinasyonlarını denemek gerekir. 3SAT bu problemlerden biri. Diyelim ki <span class="math inline">\(x_1,..,x_n\)</span> değişkenlerini kullanıp en fazla üç öğeli, ve grup içinde VEYA ile birbirine bağlı, gruplararası ise VE ile birbirine bağlı bir ifade zinciri oluşturuyoruz.</p>
+<p><span class="math display">\[
+(x_1 \lor x_2 \lor \bar{x_3}) \land 
+(\bar{x_1} \lor \bar{x_2} \lor \bar{x_3}) \land
+(x_1 \lor \bar{x_2}) \land
+(\bar{x_1} \lor \bar{x_2})
+\]</span></p>
+<p>ki <span class="math inline">\(\lor\)</span> işareti VEYA (OR), <span class="math inline">\(\land\)</span> işareti ise VE (AND), değişken üzerinde çizgi olması onun tersinin alınması (NOT) demek. Soru şu, bu ifadenin doğru yani 1 sonucunu vermesini sağlayacak girdiler / onu tatmin edecek (satisfy -SAT kısaltması buradan geliyor-) var mıdır? Ve bu sonuç polinom zamanda bulunabilir mi?</p>
+<p>Bu ufak örnekte tahmin etmeye uğraşırsak, <span class="math inline">\(x_1=1,x_2=0,x_3=0\)</span> bu formülü &quot;tatmin eder'', yani üstteki ifade 1 sonucunu verebilen bir ifadedir. Fakat bu sonuca &quot;kesinlikle'' erişmek ve bunu her tür 3SAT problemi için yapabilmek için bir programın tüm girdi kombinasyonlarını denemesi gerekir. Tüm seçeneklerin denenme mecburiyeti bir problemi zor kategorisine sokar. Kısayol, cinlik, envai türden tahmin (heuristic) her zaman ise yaramaz, bazı problemlerde yarayabilir, fakat hesapsal zorluk her zaman en kötü şartın performansını baz alır.</p>
+<p>3SAT o kadar temel bir problemdir ki, zor problemler kategorisinde temsili bir özelliği vardır. Tüm zor problemler 3SAT'a indirgenebilirler. Bu tür problemlere ayrıca NT-Tam ismi de verilir, çünkü çok zor problemleri &quot;tam'' olarak temsil ederler.</p>
+<p>Turing Makinaları</p>
+<p>Şimdi Turing makinalarına, onların baştan planlı (deterministic), baştan plansız (nondeterministic) şekillerinin üzerinden geçelim.</p>
+<p>Algoritma başı sonu belli, her muhtemel seçenek için önceden belirlenmiş bir kod parçasının devreye girdiği bir veri ve eylemler dizisidir. Bu algoritmayı yazarken içinde bulunduğumuz evren, değişkenler, girdi, çıktı aletleri, eğer/eylem çiftleri, gibi kavramların olduğu bir evren. Bu dili işleten makinayı bir soyut makina olarak görelim. Fakat göreceğiz ki, halâ teorik iş yapmamız için bu makina yeteri kadar basit değildir. Kullandığımız 'esnek' dili destekleyen makinamız oldukça çetrefil hâlde. Ayrıca, dili değiştirirsek (Java yerine LISP gibi) makinın da değişmesi gerekir, bütün dilleri temsil edebilen bir makina bulamaz mıyız? Teorik iş yapabilmemiz için böyle evrensel bir makinaya ihtiyacımız var.</p>
+<p>Dili basitleştirelim. Direk erişimli (random access) belleği olan, komutları ve verisi aynı gözüken bir makina yapalım ve onun kullandığı dili tasarlayalım. (Bu makina günümüzde kullanılan bilgisayardır).</p>
+<p>Peki bu makina daha da basit olamaz mı?</p>
+<p>Olur. Tek bir teyp üzerinde girdisini tutan, her an, önceden belirli ve sayılı konum/durum içinde olabilen, komutlarını, durumdan/duruma geçiş listesi olarak tutan bir makina düşünelim.</p>
+<p>Öyle gözüküyor ki, artık bilgisayar işleminin ruhuna indik. Bundan daha basit bir makina tasarlamamız mümkün gözükmüyor. Durum, geçiş, ve teyp kavramlarını kullanarak her türlü bilgisayar hesabını temsil edebileceğimizi düşünürsek (bunun ispatları yapılmıştır), en basit temsil şeklinde varmış olduğumuzu görüyoruz.</p>
+<p>İşte bu makina, Turing makinası olarak bilinir.</p>
+<div class="figure">
+<img src="turing_makinasi.jpg" />
+
+</div>
+<p>Formel olarak, Turing makinası M şu dörtlüyü içerir:</p>
+<p><span class="math display">\[ M = (K,\Sigma,\delta, s) \]</span></p>
+<p><span class="math inline">\(K\)</span> = makina durumu (state)</p>
+<p><span class="math inline">\(\delta\)</span> = gecis fonksiyonu</p>
+<p><span class="math inline">\(\Sigma\)</span> = teyp alfabesi</p>
+<p><span class="math inline">\(s\)</span>: teyp verisi</p>
+<p>Dörtlü içindeki bütün terimler birer kümedir. K terimi, M makinasının içerdiği durumların kümesi, delta bütün geçişlerin listesi, sigma, alfabe olduğu için teypin kullandığı harflerin kümesi ve s, giriş için M makinasına verilen harflerin kümesidir.</p>
+<p>Şimdi programa dönelim: Geçiş fonksiyonu olan delta, yani program, K x Sigma ile, (K U {dur, &quot;evet&quot;, &quot;hayır&quot;}) x Sigma x {Sol, Sağ, Hareketsiz} küme üyelerini birbirine eşler. Yani geçiş fonksiyonu, durum+teyp sembolu ikililerini, durum+teyp sembolu+teyp hareketi üçlülerine eşlemektedir.</p>
+<p>Not: 'x' operasyonu, iki küme arasında kartezyen eşleme yapmaktadır. Yâni, A x B, A kümesinin her elemanı ile B kümesinin her elemanını eşleyerek, |A|*|B| sayıda yeni bir küme oluşturur. SQL dilini bilenler JOIN komutu ile bağlantı kurabilirler)</p>
+<p>Turing makinasının işlevi, makinanın o anda gördüğü, kafasının okuduğu sembol, ve o an içinde olunan duruma göre başka bir duruma geçmek, ve (gerekiyorsa) teype yeni bir harf yazmak, sonra da teyp kafasını gene programa göre sağa ya da sola hareket ettirmekten ibarettir. Teyp kafasını hareketsiz bırakmakta mümkündür.</p>
+<p>Bu kadar basit temel işlemlere dayanan bir modelin dünyadaki bütün algoritmaları temsil edebilmesi ilginç değil mi?</p>
+<p>Örnek Turing makinası olarak, aşağıda teyp üzerinden verilen bir metnin palındrom olup olmadığını anlayabilen bir Turing Makinayı görebiliriz. Bu program (makina), eğer metin palındrom ise &quot;evet&quot; cevabı verecek, değil ise &quot;hayır&quot; cevabı verecektir. Palındrom metni, &quot;arabaabara&quot; gibi, içinde &quot;araba&quot; kelimesinin ters yüz edilerek yanyana konulduğu metne verilen isimdir. Palındrom tanımak çok kolay olmayıp çok zor da olmayan bir örnek olduğu için hesapsal karmaşıklık teorisi kitaplarında oldukca kullanılmaktadır [1]. Alttaki örnek ikisel veri üzerinde işliyor, yani <span class="math inline">\(M(0000) = &#39;evet&#39;\)</span>, <span class="math inline">\(M(011) = &#39;hayır&#39;\)</span>, ve <span class="math inline">\(M(0110) = &#39;evet&#39;\)</span> cevaplarını hesaplayacak.</p>
+<div class="figure">
+<img src="turing_pallindrome.png" />
+
+</div>
+<p><span class="math inline">\(\Sigma\)</span> her zaman özel karakterler <span class="math inline">\(\sqcup\)</span> ve <span class="math inline">\(\rhd\)</span>'yi içerir, bunlar sırasıyla &quot;boş'' ve verinin başını temsil eden ilk semboldur. Program denen şey <span class="math inline">\(\delta\)</span>'dir, <span class="math inline">\(\delta(q,\sigma) = (p,\rho,D)\)</span> olarak belirtilir, yani her <span class="math inline">\(q \in K\)</span> ve o anda üzerinde olunan sembol <span class="math inline">\(\sigma \in \Sigma\)</span> için sonraki konum <span class="math inline">\(p\)</span>'yi, <span class="math inline">\(\sigma\)</span> üzerine yazılacak (bir önceki silinerek) sembol <span class="math inline">\(\rho\)</span>'yu, ve teyp üzerinde hangi yöne hareket edileceğini gösteren <span class="math inline">\(D \in \{ \leftarrow, \rightarrow, -\}\)</span>'yi üretir. Eğer başlangıçta isek bu sembolü silmeden hep sağa gitmek istiyoruz, o sebeple programın değişmeyen tek parçası <span class="math inline">\(\delta(q,\rhd) = (p,\rho,D)\)</span> <span class="math inline">\(p=\rhd\)</span>, <span class="math inline">\(D=\rightarrow\)</span>.</p>
+<p>Program nasıl başlar? İlk önce konum <span class="math inline">\(s\)</span>'dir. Girdi <span class="math inline">\(\rhd\)</span>'ye getirilir, bu sembol arkasında sonlu (finite) bir karakter dizisi vardır, <span class="math inline">\(x \in (\Sigma-\{\sqcup\} )\)</span>. <span class="math inline">\(x\)</span>'e Turing makinasının girdisi adı verilir. Başta teyp kafası <span class="math inline">\(\rhd\)</span> üzerindedir.</p>
+<p>İşleyiş şöyle devam eder: <span class="math inline">\(s\)</span> konumunda girdinin ilk sembolü aranır, bulununca bu sembol bir <span class="math inline">\(\rhd\)</span> haline getirilir (böylece sanki girdi sola doğru çekilmiş gibi olur, daha doğrusu girdinin ilk öğesini &quot;işlenmiş'' hale getirdik, onu sildik -ama konumda onu hatırlıyoruz-). Konumda hatırlamak ilk karakter 0 ise <span class="math inline">\(q_0\)</span> konumuna 1 ise <span class="math inline">\(q_1\)</span> konumuna girmek ile oluyor. Sonsuz olmayan girdi öğelerini konum üzerinden hatırlanması Turing makinalarının önemli numaralarından biridir bu arada, ve pek çok farklı yerde kullanılır. Ardından <span class="math inline">\(M\)</span> teyp kafasını <span class="math inline">\(\sqcup\)</span> bulununcaya kadar sağa doğru gönderecektir, bir kez sona gelinince en sondan bir önceki sembole bakılır. Tabii &quot;sona gitmek'' te belli programsal adımlar ile yapılıyor, ilk sembol 0'dı diyelim, sağa geldik 0 ise 0 yaz, sağa git, 1 ise 1 yaz, sağa git adımları bu gidişi hallediyorlar.</p>
+<p>Sona gelinince akılda tutulan <span class="math inline">\(q_0&#39;\)</span> ya da <span class="math inline">\(q_1&#39;\)</span>'e geçilir, böylece hem sona gelmiş olduğumuzu, ve başta ne okumuş olduğumuzu hatırlamış oluyoruz, sonra teyp kafasını sola hareket ettiriyoruz. Buradaki öğe hatırlanan öğe ile uyumlu ise oraya <span class="math inline">\(\sqcup\)</span> yazıyoruz, böylece bu öğeyi bir bakıma &quot;işlenmiş'' olarak siliyoruz. Eğer uyumsuzluk var ise, 'hayır' cevabı verip duruyoruz. Devam ediyorusak bu noktada eldeki dizi hem soldan hem soldan hem sağdan küçülmüş oldu, ve geri kalan veri üzerinde aynı işleme devam edebiliriz, veri küçülecek, küçülecek, eğer elde bir palındrom var ise elde hiç girdi kalmayana kadar bu işlem devam edecek.</p>
+<p>Church-Turing Tezi</p>
+<p>Araştırmacılar uzun süre Turing makinasından daha basit bir model bulmaya uğraştılar, ve bu uğraşıda başarısız oldular.</p>
+<p>Daha sonra araştırmacılar, kaç değişik makina modelinin mevcut olabileceğini anlamak için, en basit Turing makinasının çözemeyeceği problemleri çözecek makinalar tasarlamaya da uğraştılar. Mesela RAM, birden fazla teyp, vs. gibi ekler koyarak, basit modeli güçlendirmeye çabaladılar. Eğer en basit modelin çözemeyeceği bir problemi çözen bir model bulsalardı, bu model yeni ve alternatif bir model olabilirdi. Yeni modelin değişik olup olmadığını nasıl anlamak için, kuramcılar indirgeme denen bir tekniği kullandılar. İndirgeme, yeni modelle kurulmuş olan makinayı, eski modelle kurulmuş makina aracılığı ile, yani onun dili ile, simule etmektir.</p>
+<p>Bu simulasyonun 'dönüşüm' denen aşamasında, simule edilen makinanın girdisi, ötekine çok hızlı bir şekilde dönüştürülür. Hemen ardından simule eden makinaya girdi olarak verilir. Çıktı da aynı şekilde dönüştürülür.</p>
+<p>Eğer çok hızlı (polinom zamanlı) olarak dönüşümü yapabildiysek, ve simule de çalışır ise, indirgeme başarılı olmuş demektir.</p>
+<p>Fakat, görülmüştür ki, envai türden ekler ile güçlenen her 'sözde yeni' model en basit Turing makinasına indirgenebilmiştir. Demek ki bu 'yeni' modeller gerçekten yeni model değillerdi, ve işte bu bu sayede bilgisayarlar için en basit Turing makinasından alternatif bir model olamacağı kanıtlanmış oldu.</p>
+<p>Bütün bu bulgulara dayanarak Church ve Turing şu tezi kabul etmeye karar verdiler.</p>
+<p>&quot;Bir algoritma ile, (bütün girdilerine &quot;evet&quot; ve &quot;hayır&quot; cevabı verebilen) bir Turing makinası tamamen aynıdır. Birbirleri arasında direk ilişki vardır. &quot;</p>
+<p>Yani, algoritma denen soyut kavram, en basit Turing makinası üzerinde yazılan bir program demektir, bütün teorik hesaplar ve kuramlar bu en basit makina üzerinden yapılabilir.</p>
+<p>Bu ortak bilgisayar kavramında fikirbirliğine varılmasının ne kadar önemli olduğunu vurgulamak istiyorum. Teorik dünyada, 'bilgisayar' denince, formel bir kavram akla gelmelidir. En basit makinalar arasında en güçlüsü seçilerek, bu makinayı baz alan kuramların da aynı şekilde basit olması sağlanmıştır. Basitlik, bilim dünyasında önemli yer tutar.</p>
+<p>&quot;Her girdiye evet ya da hayır cevabı veren&quot; makinaların özellikle belirtilmesi ilginçtir. Bunun sebebi şudur; Her Turing makınasının (yani programın) işleyişini biterek durması garanti değildir. Sonsuz döngüye giren programları hepimiz biliyoruz. Eğer evrendeki her Turing makinasını 11001010... gibi bir ikili düzen kodu ile belirtiliyorsak, bu makinalardan her biri durup, &quot;evet&quot; ya da &quot;hayır&quot; cevabı veriyor olamaz (bu söylemin ispatını algoritma çetrefilliğini işlediğimiz yazıda bulunabilir).</p>
+<p>Church-Turing tezi, duran ve &quot;evet&quot; ya da &quot;hayır&quot; cevabı veren makinaların bir algoritma ile eşgörülmesini belirtmiştir.</p>
+<p>Ek olarak belirtmek gerekir ki, Church-Turing tezi sadece bir tezdir, yani bir önkabuldür. Aynen matematikteki bir aksiyom gibidir, yani ispatlanmış teori değildir. Bu sebeple doğruluğu veya yanlışlığı ispat edilemez. Geometride nokta, çizgi gibi kavramların en baştan ispatsız olarak kabul edildiği gibi, Church-Turing tezi bir başlangıç önkabuludur. Bu önkabul olmadan geri kalan teorileri bir temele oturtmamız mümkün olmazdı.</p>
+<p>Tabii, Church-Turing tezi bir tez olduğuna göre, başka bir tez gelecek olsa değişik bir bilgisayar bilim teorisi kurulabilirdi. Fakat araştırmacılar bunun mümkün olduğunu düşünmüyor.</p>
+<p>Sonsuza Giden İkili Sayıların Kümesi</p>
+<p>Aşağıda gösterilen küme, sayılamayan sonsuz bir kümedir.</p>
+<pre><code>B =
+{1101 ....... }
+{1011 ....... }
+{1110 ....... }
+{.100 ....... }
+{.011 ....... }
+...</code></pre>
+<p>Teori: B sayılamayan sonsuzluktadır.</p>
+<p>İspat:</p>
+<p>B'nin sayılabilir olduğunu farzedelim.</p>
+<p>Kullanılan matematiksel teknik: Bir teorinin &quot;karşıtının&quot; doğru olduğunu, yani B'nin sayılabilir bir sonsuzluk olduğunu farzedip yola devam eder, ve anlamsız / saçma / absürt bir sonuca varırsak, tersini farzettiğimizi teori doğru demektir. Bu, yanlışın yanlışlığının doğruyu vermesidir bir anlamda.</p>
+<p>Bu teknik, matematikte &quot;karşıtlık ile ispat etmek&quot; diye bilinir. Teorinin tersini kabul edip yanlış bir sonuca vardıysak, demek ki teori doğrudur .</p>
+<p>Devam edelim. B'nin sayılabilir olduğunu farzettiğimize göre, aşağıdaki gibi bir eşleme mümkün olabilir.</p>
+<div class="figure">
+<img src="inf_binary_diagonalization_once.jpg" />
+
+</div>
+<p>Şimdi, doğal sayılar ile olan eşlemeyi yanlış çıkartmak için öyle bir sayı bulacağız ki, hiçbir n ile eşlenemeyecek.</p>
+<p>Bu sayı, köşegen üzerindeki sayının ikili aritmetiğe göre tam tersi olsun (köşegen aşağıda gösterilmiştir)</p>
+<div class="figure">
+<img src="inf_binary_diagonalization.jpg" />
+
+</div>
+<p>Yani köşegendeki 1010.. yerine, 0101... kullanacağız. Bu sayı, bir n ile eşlenebilir mi?</p>
+<p>Hayır! Neden olduğunu görelim. Bu eşlemenin imkansız olmasının sebebi, sol tarafta 1,2,..n diye giderken, n'in karşısındaki f(n)'in (terslik kuralımız yüzünden) n'inci değerinin her zaman gerekenden ters bir değer olacağıdır.</p>
+<p>Halbuki, elimizde sonsuz tane 0 ve 1 var, ve elimizdeki 0101.. değerini bir yerlere koyabilmeliydik. Fakat elimizdeki gayet masum ve basit kurala göre bile bunu yapamıyoruz. Demek ki, başta yapılan faraziye, yanlış idi, bu da teorinin doğruluğunu ispatlar. B sayılamayan büyüklükte bir sonsuz kümedir.</p>
+<p>Sonsuzluklar Arasındaki Farklar</p>
+<p>İki sonsuzluk arasındaki en bariz fark, bir sonsuzluğun sayılabilir ötekinin de sayılamayan türden olduğu zaman ortaya çıkar. Sayılabilen sonsuzlukları tanımlamak için, ünlü matematikçi Kurt Gödel, incelediği kümeyi doğal sayılar ile eşleme tekniğini denedi. Doğal sayılar bildiğimiz gibi 1'den başlayarak sonsuza kadar birer birer artan tam sayıların kümesidir.</p>
+<p>Sayılabilir Sonsuzluklar</p>
+<p>Zaten herhangi bir şeyi sayarken de yaptığımiz bu değil midir? Parmakla gösterip, söyleriz &quot;bir..iki..üç...vs.&quot;, ve kullandığımız bütün bu sayılar birer doğal sayıdır. Yani sayarken biz de gösterdiğimiz şeyi, bir doğal sayı ile eşleriz.</p>
+<p>Bu eşlemenin geçerli olabilmesi için, en güçlü matematiksel hâlinde olması gerekiyor, yani bize lazım olan birebir ve örten türden bir eşlemedir... A ve B kümesi düşünürsek; Birebir eşleme, iki değişik A elemanının hiçbir zaman aynı B elemanına eşlenmediği zaman ortaya çıkar, örten eşleme ise, B'nin bütün elemanlarının A'nın bir elemanı ile muhakkak eşlendiği zaman ortaya çıkar.</p>
+<p>Bu iki tür eşlemenin olduğu zaman, elimizde tekabül etme (correspondence) ilişkisi çıkar.</p>
+<p>Şimdi tekabül tekniği kullanarak örnek kümeleri inceleyelim: Mesela, 2,4,6,... olarak ikişer ikişer artan sayılar kümesi sayılabilir bir sonsuzluk mudur?</p>
+<p>Bu soruyu, yeni bilgilerimiz ışığında değiştirerek tekrar soruyoruz; Doğal sayılar ile {2,4,...} kümesi arasında ilişki varmı dır?</p>
+<p>Ek not: Lise matematiğinden hatırlayacağımız fonksiyon kavramı, aslında bir tekabül ilişkisidir.</p>
+<p>Demek ki, doğal sayılar ile {2,4,...N} arasında bir fonksiyon bulabilirsek, tekabül ilişkisini kurmuş olacağız, ve {2,4,...N}'in sayılabilir bir küme olduğunu ispatlamış olacağız.</p>
+<p>Bu fonksiyonu bulmak oldukça basit: f(x) = 2x. Demek ki {2,4,6..} kümesi sayılabilir bir sonsuzluktur.</p>
+<p>Sayılamayan Sonsuzluklar</p>
+<p>Gerçek sayılar, noktadan sonra kesire devam eden sayılardır, mesela pi sayısı 3.1415926.. ya da 2'nin karekökü 1.4142135... sayıları gerçek sayılardır. Cantor, R kümesinin sayılamaz olduğunu köşegenleştirme (diagonalization) tekniğini kullanarak ispat etmiştir.</p>
+<p>Teori: Gerçek sayılar kümesi R (real numbers), sayılamaz bir kümedir.</p>
+<p>İspat: R'ın sayılamaz olduğunu ispat etmek için, R ile N (doğal sayılar) arasında tekabül ilişkisi olmadığını ispat etmek zorundayız. İspat, karşıtlık ile ispat etme tekniğini kullanacak. Düşünelim ki, N ile R arasında f denen bir tekabül ilişkisi mümkün. Bizim yapmamız gereken, f'in gerektiği gibi çalışamacağını ispat etmekten ibaret.</p>
+<p>F'in doğru bir tekabül ilişkisi olabilmesi için, f bütün N'in elemanlarını, tüm R elemanları ile eşlemelidir. Ama biz öyle bir x bulacağız ki, bu x hiçbir N elemanı ile eşlenemeyecek. Aradığımız karşıtlıkta işte bu x olacak.</p>
+<p>Bu x'i arayıp bulamayız tabii, ama inşa edebiliriz.</p>
+<p>Şimdi, tekabül ilişkisinin olduğu farzından yola çıkarak, aşağıdaki türden bir ilişkinin mevcut olduğunu varsayalım.</p>
+<p><span class="math display">\[
+\begin{array}{cc}
+n &amp; f(n) \\
+\hline
+1 &amp;  3.14159 \dots \\
+\hline
+2 &amp;  55.555555 \dots \\
+\hline
+3 &amp;  0.12345 \dots \\
+\hline
+4 &amp;  0.5000000 \dots \\
+\hline
+\dots &amp; \dots 
+\end{array}
+\]</span></p>
+<p>Bu tekabül ilişkisi, f(1) = 3.14159...., f(2) = 55.55555..., f(3) = .. .olarak devam ediyor. Yani, f işlevi 1 sayısını 3.14159 ile eşliyor, 2 sayısını 55.55555 ile eşliyor, vs.</p>
+<p>Baştaki farzla ilerleyip geri kalan sonuçları patlatmak için, amacımız f(n)'in üyesi olamayacak bir x bulmak idi. Bunun için şöyle bir x kurgulayabiliriz.</p>
+<p>X'in inşa kuralını şöyle saptayalım: X'in 1. basamağındaki sayı, f(1)'in noktadan sonraki 1. basamağındaki sayıdan farklı olsun. Ne olursa olsun (önemli değil) ama farklı olsun. Yukarıdaki f(1) örneğinde bu sayı 1 (3.14159..), o zaman x'in noktadan sonraki 1. sayısı, 1'den farklı olması gerekiyor; mesela, rasgele seçiyoruz, 4.</p>
+<p>Aynı şekilde, x'in f(2)'de olamamasını zorlamak için, x'in 2. basmağındaki sayının f(2)'nin 2. basamağındaki sayıdan farklı seçiyoruz. Yani, 5 yerine (55.55555..) diyelim 6.</p>
+<p>Gene aynı şekilde, x'in f(3) için, 3 yerine 4 seçebiliriz, vs..</p>
+<p>Bu şekilde f(n)'in köşegeni üzerinde devam ederek bir x oluşturmuş oluruz.</p>
+<p><span class="math display">\[
+\begin{array}{cc}
+n &amp; f(n) \\
+\hline
+1 &amp;  3.[1]4159 \dots \\
+\hline
+2 &amp;  55.5[5]5555 \dots \\
+\hline
+3 &amp;  0.12[3]45 \dots \\
+\hline
+4 &amp;   0.500[0]000 \dots \\
+\hline
+\dots &amp; \dots
+\end{array}
+\]</span></p>
+<p>x = 0.464...</p>
+<p>X'in f(n)'in üyesi olamayacağını bu şekilde ispatlamış oluyoruz, çünkü x'in n'inci basamağı, f(n)'in noktadan sonraki n'inci basamağından <em>her zaman</em> değişik olacaktır.</p>
+<p>Not: Biraz daha görsel olan ispatlar, şunu da ekleyebiliyor: X'i f(n) içine sokuşturmuş olduğumuzu düşünelim;</p>
+<p><span class="math display">\[
+\begin{array}{cc}
+n &amp; f(n) \\
+\hline
+1 &amp; \enspace 3. [1]4159 \dots \\
+\hline
+2 &amp; 55.5[5]5555 \dots \\
+\hline
+3 &amp; \enspace 0.12[3]45 \dots \\
+\hline
+4 &amp; \enspace 0.500[0]000 \dots \\
+\hline
+\dots &amp; \dots  \\
+\hline
+\dots &amp; 0.464 ???
+\end{array}
+\]</span></p>
+<p>Soru işareti yerine hangi sayı gelmelidir? :) Soru işareti yerine istediğiniz sayıyı koyalim, bir taraf o sayıyı öyle kabul etmekte, x sırası ise ne olursa olsun o sayı olmasın (!) demektedir. Bu bir çakışma, uyuşmazlı, absürdlük ve saçmalıktır. Demek ki baştaki faraziyemiş yanlıştır. Demek ki, R kümesi olan f(n), doğal sayılar (n) ile eşlenemiyor; O zaman R sayılamayan büyüklükte sonsuz bir küme olmaktadır.</p>
+<p>Durmayan Turing Makinaları Var mıdır?</p>
+<p>Bilgisayar bilimde, bir dil (language) ile algoritma (Turing makinası) arasında çok sıkı bir bağlantı vardır.</p>
+<p>Algoritma, belli bir problemi çözmek için yazılır. Bu problemi çözmek demek, önceden kararlaştırılmış bir alfabe üzerinden oluşturulabilecek bir girdinin işlenmesi, ve bu girdiye ve programın mantığına göre bir cevabın verilmesidir.</p>
+<p>Algoritma ile eş görülen Turing makinalarının yaptığı (bkz. Church-Turing tezi), girdiye &quot;ret&quot; vermek, ya da &quot;kabul&quot; etmektir.</p>
+<p>O zaman, bir Turing makinasının kabul ettiği tüm girdilerin toplamını düşünürsek; bu toplama bir dil diyebiliriz.</p>
+<p>Formel olarak</p>
+<p><span class="math inline">\(M = (K,\Sigma,\delta,s)\)</span></p>
+<p><span class="math inline">\(\Sigma\)</span>: Teyp Alfabesi</p>
+<p><span class="math inline">\(\Sigma^\ast\)</span>: Teyp alfabesi ile oluşturulabilecek tüm girdilerin kümesi</p>
+<p><span class="math inline">\(s\)</span>: Teyp verisi</p>
+<p><span class="math inline">\(L \in \Sigma^\ast\)</span>, ki <span class="math inline">\(x \in L\)</span>, <span class="math inline">\(M(x)=&#39;evet&#39;\)</span>, ve <span class="math inline">\(x \cancel{\in} L\)</span>, <span class="math inline">\(M(x)=&#39;hayır&#39;\)</span> olacak şekilde.</p>
+<p>Demek ki, bir evet/hayır türünden karar problemini, aynı zamanda &quot;bir dilin karar verilme&quot; problemi gibi de görebiliriz. Bilgisayara verilen girdiyi (bir dile ait olan bir girdiyi) anlayabiliyor muyuz? Anlamaktan öte, evet ya da hayır diyebiliyor muyuz? Verilen girdinin, beklediğimiz dile ait olup olmadığına kesin evet ya da hayır diyebiliyor muyuz?</p>
+<p>Diller, Problemler</p>
+<p>Bunu takiben şu soru sorulabilir: Bütün bunlar iyi de, bilgisayarların işi çoğu zaman evet/hayır cevabı veren programlar değil ki. Çoğu problem, hesaplanmış bir değer istiyor, bir sonuç, çıktı veriyor. Dünyadaki her problemi bir karar problemine çevirebilir miyiz?</p>
+<p>Bu da kritik bir sorudur. Bunun da cevabı da &quot;evet&quot; olacak. Mesela bir optimizasyon problemini düşünelim. Şu ünlü seyahat eden satıcı problemi. N sayıda şehir arasındaki uzaklıklar biliniyor, bütün şehirleri ziyaret etmek kaydıyla, en kısa katedilebilecek yolu bulmamız lazım. Yani cevap, en kısa olan güzergahın raporudur.</p>
+<p>Başlangıçta evet/hayır cevabı verilmesi mümkün gözükmeyen bu problemi, aslında bir eşik değeri vererek bir karar problemine dönüştürebiliriz. Yani, &quot;en kısa yolu bul&quot; yerine, &quot;katedilen en kısa yol 1-4-3-3 şehirleri mi?&quot; sorusuna evet ya da hayır cevabı verilmesi gibi.</p>
+<p>Her Problem = Dil Ama Her Dil=Problem Mi?</p>
+<p>Bu kadar girişi, bir problemin (makinanın) bir dil ile aynı olduğunu belirtmek için yaptık. Fakat bunun tersi, her zaman geçerli değildir.</p>
+<p><em>Dünyadaki her dile karar verebilen bir Turing makinası olmayabilir</em>.</p>
+<p>Bu uyuşmazlığın sebebi ne olabilir?</p>
+<p>Basit bir sayı farkı bu uyuşmazlığa yol açacaktır. Eğer evrendeki tüm mümkün dillerin sayısı, tüm mümkün Turing makinalarından fazla ise, demek ki bazı diller için Turing makinası olamaz, ve bu diller karar verilen diller kategorisine giremezler.</p>
+<p>İyice kafaların karıştığını görür gibi oluyorum. Tüm diller derken bir sonsuzluktan bahsediyoruz, aynı şekilde tüm Turing makinaları derken de sonsuzluktan bahsediyoruz.. Bir sonsuzluk öteki sonsuzluktan nasıl büyük olabilir?</p>
+<p>Evet olabiliyor! Bazı sonsuzlukların bazı sonsuzluklardan daha büyük olduğu matematiksel olarak ispatlandı, ve tabii ki bu çok büyük bir buluş oldu.</p>
+<p>Bu yazıda numaralar üzerinden gördüğümüz örnekte olduğu gibi, tüm Turing makinalarının sayılabilir olduğunu, ama tüm dillerin sayılamayan kadar olduğunu ispatlayabilirsek, aradaki bariz farktan hareketle, bazı dilleri karar verebilecek bir Turing makinasının olamayacağını da ispatlamış oluruz.</p>
+<p>Teori: Her dil karar verilebilen bir dil değildir.</p>
+<p>İspat: Bütün Turing makinalarının sayılabilir kadar olduğunu biliyoruz. Turing makinası bir program olduğuna göre, her programın bir metin olarak kodlanması mümkündür. Bu kodlamayı <span class="math inline">\({0,1}\)</span> gibi bir alfabe ile yapacak olsak, tüm Turing makinaları <span class="math inline">\({0,1}^\ast\)</span> kümesine dahil olduğunu söyleyebiliriz. <span class="math inline">\({0,1}^\ast\)</span> kümesi, <span class="math inline">\({0,1,00,01,11,000,...}\)</span> olarak sonsuza giden bir kümedir. Bu kümenin içinden geçerli olmayan (bozuk) Turing makinalarını atsak, geriye kalan hâla sayılabilir bir sonsuzluktadır.</p>
+<p>Şimdi, tüm dillere dönelim. Bir dil, mesela gene aynı sigma alfabesi üzerinde <span class="math inline">\({0,1,00,01,11,000,...}\)</span> olarak giden bir kümede &quot;sadece 1 ile başlayan metinler&quot; olabilir. Aynı şekilde &quot;sadece 0 ile başlayan metinler&quot; bir başka dil olabilir, vs. Yani, sayılabilir sonsuz olduğunu bildiğimiz <span class="math inline">\({0,1}^\ast\)</span> üzerinden, sonsuz kadar altküme oluşturuyoruz, tüm diller işte bu kümede oluyor.</p>
+<p>Bu yeni küme, sayılamayan bir sonsuzluktur. İspat için, yeni kümeyi, B adını vereceğimiz sayılamayan sonsuz başka bir küme ile birebir ve örten türden eşleyelim.</p>
+<p>B kümesi, sigma alfabesi üzerinden yarattığımız ve her bir üyesi sonsuza giden, ayrıca bu üyelerden sonsuz kadar olan bir kümedir.</p>
+<p>Eğer eşleme başarı ile sonuçlanırsa, tüm dillerin de sayılamayan kadar sonsuz olduğu ispatlanmış olacaktır.</p>
+<p>Aşağıda bu eşlemenin bir örneğini görüyoruz. A ile gösterilen bir dildir. A dili, 0 ile başlayan bütün ikili düzenli sayıların dili olsun. Şimdi, bu dilin elemanlarına tekabül eden hemen altındaki Xa sırasına bakın. Bu sırada, eğer bir öğe o dile ait ise, bu öğenin o sıradaki bit değeri 1 olacak. Ait değil ise 0.</p>
+<div class="figure">
+<img src="infinite_binary_esleme.png" />
+
+</div>
+<p>Nereye gelmeye çalıştığımızı herhalde görüyoruz. <span class="math inline">\(X_A\)</span> numarasının tamâmı, A dilinin bir nevi &quot;temsilci numarası&quot; olmaktadır. Aynı şekilde &quot;1 ile başlayan metinlerin toplamı olan dil&quot;'in temsilci no'su başka olacaktır (mesela <span class="math inline">\(X_C\)</span>). Temsilci no'su, aynen B kümesinin elemanları gibi, sonsuza giden bir ikili sayıdır. Bütün dillerin temsilci no'larının kümesi, B ile tekabül eden bir ilişki içindedir.</p>
+<p>Demek ki bütün diller sayılamayan sonsuzluktadır, çünkü B'nin sayılamayan sonsuzlukta olduğunu ispatlamıştık. Kıyasla, Turing makinaları sayılabilir sonsuz olduğuna göre, aradaki fark, karar verilemeyen diller olacaktır. Bu dilleri karar verebilen Turing makinasının yazılması mümkün değildir.</p>
+<p>Kaynaklar</p>
+<p>[1] Papadimitrou, <em>Computational Complexity</em></p>
+</body>
+</html>

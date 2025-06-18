@@ -1,0 +1,611 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-1">Ders 1</h1>
+<p>İlk dersimize hoşgeldiniz, ben Gilbert Strang. Lineer cebirin çözmeye çalıştığı en temel problem bir lineer denklem sistemini çözmektir. Bu bağlamda mesela en genel durum &quot;bilinmeyen ve denklem sayısının birbirine eşit olduğu'' durumdur, ki bu &quot;güzel durum'' olarak nitelenebilir. Boyut <span class="math inline">\(n \times n\)</span> olunca bu durumda oluyoruz. Ama diğer durumları da işleyeceğiz.</p>
+<p>Dersin kavramlarını anlamak için &quot;satır bakışı''na başvuracağız, bu durumda her denkleme teker teker bakıyoruz gibi olacak, dersimizde pek çok kez kullanacağımız <span class="math inline">\(A\)</span> matrisimiz olacak mesela, ve bu matrisin satırların her denklemin değişkenlerinin katsayılarına tekabül edecek.</p>
+<p>Kolon bakış açısı belki daha önce görmediğiniz bir açı olacak, bu durumda her kolon ayrı ayrı işlenecek.</p>
+<p>Cebirsel bakış açısı ise tüm matrisi, bu durumda <span class="math inline">\(A\)</span>, aynı anda ele alacak.</p>
+<p>Güzel durumdan başlayalım; iki bilinmeyen, iki denklem.</p>
+<p><span class="math display">\[ 2x - y = 0 \]</span></p>
+<p><span class="math display">\[ -x + 2y = 3 \]</span></p>
+<p>Katsayıları matrise taşıyalım</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cc}
+2 &amp; -1 \\
+-1 &amp; 2
+\end{array}\right]
+\left[\begin{array}{c}
+x \\
+y
+\end{array}\right]
+=
+\left[\begin{array}{c}
+0 \\
+3
+\end{array}\right]
+ \]</span></p>
+<p>Soldaki matrise ben çoğunlukla <span class="math inline">\(A\)</span> derim, sonra içinde bilinmeyenleri taşıyan <span class="math inline">\(x\)</span> vektörü koyarım, ki bazıları bunu vektör olduğu için köyü renkte <span class="math inline">\(\mathbf{x}\)</span> olarak ta yazar, ve sonra bir vektör daha, ki buna ben çoğunlukla <span class="math inline">\(b\)</span> derim, yani sonuç şöyle olur,</p>
+<p><span class="math display">\[ A x = b \]</span></p>
+<p>Şimdi satır bakışına başvuralım. Grafik olarak düşünelim, hangi noktalar <span class="math inline">\(2x - y = 0\)</span> denklemini tatmin eder? Orijin <span class="math inline">\((0,0)\)</span> noktası bunlardan biri, bir diğeri <span class="math inline">\(x=1,y=2\)</span>. Bunları çizgi ile birleştirip çizgiyi sonsuza uzatırsak,</p>
+<div class="figure">
+<img src="1_01.png" />
+
+</div>
+<p>İkinci denklemi düşünelim, bu denklem orijinden geçmeyecek. <span class="math inline">\(y\)</span> sıfır olsaydı <span class="math inline">\(x\)</span> nereden geçerdi..? <span class="math inline">\(x=-3\)</span> noktasından. <span class="math inline">\(x=-1\)</span> işe, <span class="math inline">\(y\)</span> nedir? <span class="math inline">\(y=1\)</span>. Artık ikinci çizgiyi çizebiliriz,</p>
+<div class="figure">
+<img src="1_02.png" />
+
+</div>
+<p>Her iki çizgi <span class="math inline">\(x=1,y=2\)</span> noktasında buluştu (hoca o noktayı daha önceden tahtaya koymuştu ama buna bir &quot;hazır raslantı'' diyelim). Bu buluşma noktası her iki denklemi tatmin eden sistemin çözüm noktasıdır.</p>
+<p>Kolon bakışına gelelim. Bu bakışa göre</p>
+<p><span class="math display">\[ 
+x
+\left[\begin{array}{r}
+2 \\
+-1
+\end{array}\right]
++
+y
+\left[\begin{array}{r}
+-1 \\
+2
+\end{array}\right]
+=
+\left[\begin{array}{r}
+0 \\
+3
+\end{array}\right]
+\]</span></p>
+<p>Bu bakış açısı bize ne söylüyor? Bir anlamda diyor ki &quot;eşitliğin solundaki iki vektörü öyle bir şekilde kombine et ki bu lineer kombinasyon sonucu eşitliğin sağ tarafını versin''. Bu operasyon, işlem lineer cebir dersinin en temel işlemidir - kolonların lineer kombinasyonu.</p>
+<p>Kolonları vektörel olarak çizelim, bilindiği gibi bir vektör orijinden çıkan bir yönü ve büyüklüğü olan bir şeydir. Birinci kolon 2 sağa 1 aşağı gitmeli, ikincisi bir sola 2 yukarı gitmeli. Çizince,</p>
+<div class="figure">
+<img src="1_03.png" />
+
+</div>
+<p>Peki bu vektörleri nasıl &quot;birleştirelim'' yani hangi katsayılarla çarpıp toplayalım ki <span class="math inline">\(\left[\begin{array}{rr}3 &amp; 0\end{array}\right]^T\)</span> sonucunu elde edelim? Not: Burada devrik işaretini kullandık çünkü satır vektörünün devriğini alınca kolon vektörü olur, yazarken o şekilde yazdık çünkü başka türlü yazı içine rahat koymak mümkün olmayacaktı.</p>
+<p>Neyse, kombine etmek toplamaktır, o zaman ikinci kolonu alıp birinciye ekleyelim, vektör aritmeğitinde toplamak bir vektörü diğerinin bittiği noktadan başlatmak demektir, bir tane (yani katsayı 1 ile) ikinci vektörü birinciye ekleyince</p>
+<div class="figure">
+<img src="1_04.png" />
+
+</div>
+<p>Çözüm noktasına erişemedik daha, 2 tane ekleyince,</p>
+<div class="figure">
+<img src="1_05.png" />
+
+</div>
+<p>Çözüme eriştik. Çözüm <span class="math inline">\(y\)</span> ekseni üzerinde 3,0 noktası. Bu noktaya bir lineer kombinasyon yaparak eriştik. &quot;Doğru'' lineer kombinasyon bize sonucu verdi.</p>
+<p>Kendimize şunu soralım: <em>bütün</em> lineer kombinasyonlar bize neyi verirdi? Bu çok önemli bir soru, üzerinde iyi düşünelim, çünkü bu konu tekrar tekrar karşımıza çıkacak. Tüm kombinasyonlar derken tüm <span class="math inline">\(x,y\)</span>'lerin doğuracağı kombinasyonlar; bu şekilde eşitliğin sağ tarafı ne olursa olsun onu temsil edebilirdik. Yani bu tüm kombinasyonlar tüm bir düzlemi (plane) doldururdu. Bunu bir kenara koyalım, konuyu ileride daha detaylı olarak inceleyeceğiz.</p>
+<p>3 Boyut</p>
+<p><span class="math display">\[  2x - y = 0  \]</span></p>
+<p><span class="math display">\[ -2x + y - z = -1 \]</span></p>
+<p><span class="math display">\[ -3y + 4z = 4 \]</span></p>
+<p>Bu sistemi nasıl anlarız? Ne gördük: satır bakışı, kolon bakışı. Matris formuna bakalım,</p>
+<p><span class="math display">\[ A = 
+\left[\begin{array}{rrr}
+2 &amp; -1 &amp; 0 \\
+-1 &amp; 2 &amp; -1 \\
+0 &amp; -3 &amp; 4 
+\end{array}\right]
+,
+b = 
+\left[\begin{array}{r}
+0  \\
+-1 \\
+4  
+\end{array}\right]
+ \]</span></p>
+<p>Satır bakışı, üstteki ikinci denklemi alalım, grafiği neye benzer? Orijinden geçen bir şey yok, çünkü <span class="math inline">\(0,0,0\)</span> bir çözüm olamaz. Çözüm neye benzer? Elimizde bir lineer denklem var ise üç boyutta bu denklemi çözen tüm noktalar bir düzlem (plane) oluştururlar. Hoca diyor ki ben Rembrandt değilim, kabaca bir düzlem çizeceğim,</p>
+<div class="figure">
+<img src="1_06.png" />
+
+</div>
+<p>Birinci denklem neye benzer? <span class="math inline">\(z\)</span> belirtilmemiş, demek ki herhangi bir şey olabilir, geri kalanlar yine bir düzlem oluştururlar. Mesela alttaki gibi</p>
+<div class="figure">
+<img src="1_07.png" />
+
+</div>
+<p>Bu iki denklemin kesiştiği yer bir çizgidir (line). Bir üçüncü düzlem daha eklenince (üstte yok), tüm üç düzlemin kesiştiği yer bir nokta olur. Bu noktanın ne olduğunu ben kafadan bilmiyorum, ama lineer cebir bu noktayı bulur.</p>
+<p>Fakat herhalde görüyorsunuz, satır bakışını zihnimizde canlandırmak biraz zor. Düzlemler, kesişmeler vs düşünmemiz gerekiyor. İki boyutta iki çizgi kesişmesinde problem yoktu, fakat üç boyutta işler biraz karıştı. Dört ya da daha fazla boyutu düşünün!</p>
+<p>Kolon bakışı ile</p>
+<p><span class="math display">\[ 
+x 
+\left[\begin{array}{r}
+2 \\
+-1 \\
+0
+\end{array}\right]
++
+y
+\left[\begin{array}{r}
+-1 \\
+2 \\
+-3
+\end{array}\right]
++
+z 
+\left[\begin{array}{r}
+0 \\
+-1 \\
+4
+\end{array}\right]
+=
+\left[\begin{array}{r}
+0 \\
+-1 \\
+4
+\end{array}\right]
+ \]</span></p>
+<p>Yani eşitliğin sol tarafındaki üç boyutlu vektörlerin hangi kombinasyonu eşitliğin sağındaki üç boyutlu vektörü verir? Çizmeye uğraşalım,</p>
+<div class="figure">
+<img src="1_08.png" />
+
+</div>
+<p>Hocanın hazırladığı örnekte basit bir çözüm var, <span class="math inline">\(z\)</span> katsayıları ile <span class="math inline">\(b\)</span> aynı, o zaman <span class="math inline">\(\left[\begin{array}{ccc}0&amp;0&amp;1\end{array}\right]\)</span> denklemi çözer, <span class="math inline">\(z=1\)</span> çözüm için yeterli olur, <span class="math inline">\(z\)</span>'yi alırız, geri kalanları &quot;istemiyoruz'' onları sıfır yaparız - <span class="math inline">\(x=0,y=0,z=1\)</span>.</p>
+<p>Tabii kolon resminin daha düzgün olması her zaman çözümü pat diye görebileceğimiz anlamına gelmiyor, çoğu zaman, hatta yüksek boyutlarda bu da mümkün değil. Eliminasyon yöntemini göreceğiz ileriki derslerde, sistematik olarak herhangi bir boyutta bizim için lineer sistemi çözecek.</p>
+<p>Daha geniş resme bir bakalım. Eşitliğin sağ tarafı başka bir şey olsaydı, mesela</p>
+<p><span class="math display">\[ 
+x 
+\left[\begin{array}{r}
+2 \\
+-1 \\
+0
+\end{array}\right]
++
+y
+\left[\begin{array}{r}
+-1 \\
+2 \\
+-3
+\end{array}\right]
++
+z 
+\left[\begin{array}{r}
+0 \\
+-1 \\
+4
+\end{array}\right]
+=
+\left[\begin{array}{r}
+1 \\
+1 \\
+3
+\end{array}\right]
+ \]</span></p>
+<p>(Bu sağ tarafı 1. ve 2. kolonları birbirine ekleyerek uydurduk bu arada), çözüm o zaman ne olurdu? Çözüm basit (çünkü kendimiz pişirdik), <span class="math inline">\(x=1,y=1,z=0\)</span>. Üstteki durumda ve satır bakışında tamamen değişik üç tane düzlem elde ederdik. Kolon bakışında hala aynı üç vektörle uğraşırız, sadece onları değişik şekillerde kombine etmemiz gerekir.</p>
+<p>Soru: üstteki denklemi herhangi bir <span class="math inline">\(b\)</span> yani eşitliğin sağ tarafı için çözebilir miyim?</p>
+<p>Bu soruyu daha değişik bir şekle sokabilir miyiz, öyle ki soru lineer kombinasyon argümanlarını kullansın.</p>
+<p>Soru: üstteki kolonların lineer kombinasyonu bütün 3-boyutlu uzayı doldurur mu?</p>
+<p>Cevap, üstteki (gibi bir) matris için &quot;evet''. Bu matris nasıl bir matris? Bu matris iyi huylu, eşsiz (singular) olmayan, tersi alınabilir (ınvertible) bir matris. Bu tür matrisler için her zaman çözüm var.</p>
+<p>Peki iyi huylu olmayan durum nasıl olurdu? Düşünelim, ne yanlış gidebilirdi? Eğer tüm vektörler aynı düzlem üzerinde olsaydılar, o zaman bu vektörlerin her türlü kombinasyonu da aynı düzlem üzerinde olmak zorundadır, o zaman başımız dertte. Mesela 3. kolon 1. ve 2.'nin toplamı olsa (ki bu durumda her üç vektör aynı düzlemdedir), o zaman işler kötü. Niye? Çünkü <span class="math inline">\(b\)</span> farklı bir düzlemde ise artık hiçbir kombinasyonla oraya erişemem. Eğer <span class="math inline">\(b\)</span> aynı düzlem üzerinde olsaydı tabii erişilebilirdi, yani <em>bazı</em> <span class="math inline">\(b\)</span>'ler için çözüm hala var, ama hepsi, çoğunluğu için yok.</p>
+<p>İşte eşsiz durum budur, ki bu durumda çoğu <span class="math inline">\(b\)</span> için çözüm yoktur.</p>
+<p>Boyutları arttırdığımızı düşünelim. 9 boyut olsaydı ne olurdu? Bu kadar boyutu görsel olarak hayal etmek mümkün değil, ama yine aynı durum, <span class="math inline">\(Ax=b\)</span> var, bu sefer 9 boyutlu 9 tane kolon var, bunları kombine edip <span class="math inline">\(b\)</span> elde edeceğiz? Bunu yapmayı başarabilmemiz tabii ki <span class="math inline">\(A\)</span>'nin ne olduğuna bağlıdır. Rasgele bir <span class="math inline">\(A\)</span> matrisi üretseydim (ki bu Numpy <code>rand</code> ile basitçe yapılabilir) size garanti ediyorum bu matris iyi huylu olurdu, eşsiz olmayan tersi alınabilen vs. ve bu matris ile <span class="math inline">\(b\)</span>'ye erişebilirdiniz.</p>
+<p>Kötü durum kolonlar bağımsız olmadığı zaman. Mesela 7. kolon 5. kolonun tıpatıp aynısı, ki bu durumda 7. kolon sisteme &quot;yeni hiç bir bilgi eklemiyor''. Bu yüzden bazı <span class="math inline">\(b\)</span>'lere erişmem imkansız hale geliyor. İyi huylu durumda 9 bağımsız kolonun kombinasyonu tüm 9 boyutlu uzayı doldurabilirdi. Ama bir bağımlı vektör var ise o zaman sadece 9 boyutlu uzayın 8 boyutlu bir alt düzlemini doldurabilirsiniz. Dersimizin ileri noktalarında bu kısıtlı alt uzaylar ile de iş yapmayı öğreneceğiz, yapmamız gerekecek. Şimdilik güzel koşula odaklanalım.</p>
+<p>Ayrıca, şimdiye kadar sözel olarak belirttiklerimizi bir de matris formunda, cebiriyle anlatmayı deneyelim. <span class="math inline">\(Ax=b\)</span> dedik, <span class="math inline">\(A\)</span> matrisi bir <span class="math inline">\(x\)</span> vektörü ile çarpılır. Bir vektörü bir matris ile nasıl çarparsınız? Mesela</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+2 &amp; 5 \\
+1 &amp; 3
+\end{array}\right]
+\left[\begin{array}{r}
+1 \\
+2
+\end{array}\right]
+ \]</span></p>
+<p>Bunu yapmanın iki yolu var. Önce benim en favori yöntemimi söyleyeyim, belki de sürpriz olmayacak, kolonlar kullanarak. Bu durumda, mesela üstteki örnekte, <span class="math inline">\(A\)</span>'nin 1. kolunundan 1 tane, 2. kolonundan 2 tane alacağım, ve toplayacağım. Yani,</p>
+<p><span class="math display">\[ =
+1
+\left[\begin{array}{r}
+2 \\
+1
+\end{array}\right]
++
+2
+\left[\begin{array}{r}
+5 \\
+3
+\end{array}\right]
+=
+\left[\begin{array}{r}
+12 \\
+7
+\end{array}\right]
+ \]</span></p>
+<p>Diğer bir yöntem satır bazlı. Bu durumda <span class="math inline">\(A\)</span>'nin 1. satırı ile <span class="math inline">\(x\)</span>'i çarpıyorum, yani noktasal çarpımını alıyorum, ve bu tek bir değer sonucunu verecek, ve tek, skalar değeri alıp sonucun ilk hanesine yazıyorum. Aynı şekilde <span class="math inline">\(A\)</span>'nin 2. satırını tekrar aynı <span class="math inline">\(x\)</span> ile noktsal çarpıyorum, ikinci haneye yazıyorum.</p>
+<p>Fakat daha önce belirttiğimiz gibi kolon bakışı biraz daha rahat açıklanabilir halde. O zaman şunu söyleyebiliriz: &quot;<span class="math inline">\(Ax\)</span>, <span class="math inline">\(A\)</span>'nın kolonlarının bir kombinasyonudur''.</p>
+<p>Bir sonraki derste herhangi boyuttaki bir sistem için sistematik olarak eliminasyon yaparak, eğer varsa, bir sonuca ulaşmayı öğreneceğiz. Eğer eliminasyon başarısız olursa bunun üzerinden ne zaman bir sonuç olmadığını görmeyi de öğreneceğiz.</p>
+<p>Ekler</p>
+<p>Matris Çarpımı</p>
+<p>Sırabağımlılık</p>
+<p>Matris çarpımı sırabağımlı (commutative) değildir, yani <span class="math inline">\(AB \ne BA\)</span>. Bir örnekte görelim,</p>
+<p><span class="math display">\[
+\left[\begin{array}{cc}
+1&amp;0\\0&amp;0
+\end{array}\right]
+\left[\begin{array}{cc}
+0&amp;1\\0&amp;0
+\end{array}\right]
+=
+\left[\begin{array}{cc}
+0&amp;1\\0&amp;0
+\end{array}\right]
+\]</span></p>
+<p><span class="math display">\[
+\left[\begin{array}{cc}
+0&amp;1\\0&amp;0
+\end{array}\right]
+\left[\begin{array}{cc}
+1&amp;0\\0&amp;0
+\end{array}\right]
+=
+\left[\begin{array}{cc}
+0&amp;0\\0&amp;0
+\end{array}\right]
+\]</span></p>
+<p>Satır ve Kolon Bakış Açısı</p>
+<p>Matris çarpımının tarifini lise derslerinden hatırlayabiliriz. Sol el sol taraftaki matriste bir satır boyunca, sağ el sağdaki matris üzerinde kolon boyunca öğe öğe hareket ettirilir, ve bu hareket sırasındaki öğeler çarpılıp, o çarpımlar sürekli toplanır. Sol ve sağ elin bir hareketi bittiğinde, ele geçen tek bir sayı vardır, ve o sayı üzerinden geçilen satır <span class="math inline">\(i\)</span> ve kolon <span class="math inline">\(j\)</span> için sonuç matrisi, mesela <span class="math inline">\(C\)</span>'nin, <span class="math inline">\(i\)</span>'inci satırı ve <span class="math inline">\(j\)</span>'inci kolonuna yazılır.</p>
+<p>Daha basit bir <span class="math inline">\(Ax\)</span> örneğine bakarsak, yani solda <span class="math inline">\(A\)</span> ve sağda <span class="math inline">\(x\)</span> var, çarpım</p>
+<p><span class="math display">\[
+\left[\begin{array}{ccc}
+1 &amp; 1 &amp; 6 \\
+3 &amp; 0 &amp; 1 \\
+1 &amp; 1 &amp; 4 \\
+\end{array}\right]
+\left[\begin{array}{ccc}
+2  \\
+5  \\
+0  \\
+\end{array}\right]
+\]</span></p>
+<p>Noktasal Çarpım Bakışı</p>
+<p>Bu çarpımı bir kaç şekilde görebiliriz. Eğer üstte tarif edilen gibi gördüysek,</p>
+<p><span class="math display">\[
+\left[\begin{array}{ccc}
+1\cdot 2 + 1\cdot 5 + 6\cdot 0 \\
+3\cdot 2 + 0\cdot 1 + 3\cdot 0 \\
+1\cdot 2 + 1\cdot 5 + 4\cdot 0 
+\end{array}\right]
+=
+\left[\begin{array}{c}
+7 \\
+6 \\
+7 \\
+\end{array}\right]
+\]</span></p>
+<p>Kolonsal Kombinasyon Bakışı</p>
+<p>Fakat matris çarpımına bakmanın bir yolu daha var, hatta bu bakış açısının daha önemli bile olduğu söylenebilir, o da <span class="math inline">\(A\)</span>'nin kolonlarının kombine edilerek sağa sonuç olarak geçilmesi bakışıdır. Buna göre</p>
+<p><span class="math display">\[ 
+2\cdot 
+\left[\begin{array}{ccc}
+1 \\
+3 \\
+1 \\
+\end{array}\right]
++
+5\cdot 
+\left[\begin{array}{c}
+1 \\
+0 \\
+1 \\
+\end{array}\right]
++
+0\cdot 
+\left[\begin{array}{c}
+6 \\
+3 \\
+4 \\
+\end{array}\right]
+=
+\left[\begin{array}{c}
+7 \\
+6 \\
+7 \\
+\end{array}\right]
+\]</span></p>
+<p>Tabii burada ikinci &quot;matris&quot; aslinda bir vektör, ama o vektör de matris olsaydı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">A <span class="op">=</span> np.array([[<span class="dv">1</span> ,<span class="dv">1</span> , <span class="dv">6</span>],[<span class="dv">3</span> , <span class="dv">0</span> , <span class="dv">1</span>],[<span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">4</span>]])
+x <span class="op">=</span> np.array([[<span class="dv">2</span>], [<span class="dv">5</span>], [<span class="dv">0</span>]])
+<span class="bu">print</span> (<span class="st">&#39;vektor ile</span><span class="ch">\n</span><span class="st">&#39;</span>)
+<span class="bu">print</span> (np.dot(A,x))
+B <span class="op">=</span> np.array([[<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>],[<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>],[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]])
+<span class="bu">print</span> (<span class="st">&#39;</span><span class="ch">\n</span><span class="st">matris ile</span><span class="ch">\n</span><span class="st">&#39;</span>)
+<span class="bu">print</span> (np.dot(A,B))</code></pre></div>
+<pre><code>vektor ile
+
+[[7]
+ [6]
+ [7]]
+
+matris ile
+
+[[7 7 7]
+ [6 6 6]
+ [7 7 7]]</code></pre>
+<p>Satır Kombinasyon Bakışı</p>
+<p>Sağdan çarpan vektörü bir genişleterek 2 boyutlu hale getirelim,</p>
+<p><span class="math display">\[
+\left[\begin{array}{ccc}
+1 &amp; 1 &amp; 6 \\
+3 &amp; 0 &amp; 1 \\
+1 &amp; 1 &amp; 4 \\
+\end{array}\right]
+\left[\begin{array}{ccc}
+2 &amp; 2  \\
+5 &amp; 5  \\
+0 &amp; 0  \\
+\end{array}\right]
+\]</span></p>
+<p>Satırsal bakışa göre soldaki matrisinin herhangi bir <span class="math inline">\(i\)</span> satırındaki her öge, sağdaki matrisin tüm satırlarını kombine ederek sonucun <span class="math inline">\(i\)</span> satırını ortaya çıkarır. Mesela en üst (birinci satır) için</p>
+<p><span class="math display">\[ 
+1 \cdot
+\left[\begin{array}{cc}
+2 &amp; 2
+\end{array}\right] +
+1 \cdot
+\left[\begin{array}{cc}
+5 &amp; 5
+\end{array}\right] + 
+6 \cdot
+\left[\begin{array}{cc}
+0 &amp; 0
+\end{array}\right] 
+=
+\left[\begin{array}{cc}
+7 &amp; 7 \\
+\vdots &amp; \vdots \\
+\vdots &amp; \vdots
+\end{array}\right] 
+\]</span></p>
+<p>Diğerleri için benzer işlem uygulanır,</p>
+<p><span class="math display">\[ 
+3 \cdot
+\left[\begin{array}{cc}
+2 &amp; 2
+\end{array}\right] +
+0 \cdot
+\left[\begin{array}{cc}
+5 &amp; 5
+\end{array}\right] + 
+1 \cdot
+\left[\begin{array}{cc}
+0 &amp; 0
+\end{array}\right] 
+=
+\left[\begin{array}{cc}
+7 &amp; 7 \\
+6 &amp; 6 \\
+\vdots &amp; \vdots
+\end{array}\right] 
+\]</span></p>
+<p>ve böyle devam edilir.</p>
+<p>Kolon Satır Çarpım Bakışı</p>
+<p>Bir diğer bakış açısı <span class="math inline">\(A\)</span>'nin bir kolonunu, çarpan matris <span class="math inline">\(B\)</span>'nin bir satırı ile çarpılıp, bu her çarpımdan bir matris elde etmek, ve sonra bu matrisleri toplamaktır. Örnekte görelim,</p>
+<p><span class="math display">\[
+\left[\begin{array}{ccc}
+1 &amp; 1 &amp; 6 \\
+3 &amp; 0 &amp; 1 \\
+1 &amp; 1 &amp; 4 \\
+\end{array}\right]
+\left[\begin{array}{ccc}
+2 &amp; 2  \\
+3 &amp; 1  \\
+9 &amp; 5  \\
+\end{array}\right]
+\]</span></p>
+<p>Boyutları düşünürsek daha açık hale gelebilir, soldaki matrisin bir kolonu 3 x 1 boyutunda, sağdaki bir satır 1 x 2 boyutunda. Sonuç tabii ki 3 x 2 boyutunda bir matris olacaktır ve bu boyuttaki bir matris her kolon-satır çarpımından elde edilecektir. Bu durumda mesela ilk yapılan çarpım,</p>
+<p><span class="math display">\[
+\left[\begin{array}{ccc}
+1  \\
+3  \\
+1  \\
+\end{array}\right]
+\left[\begin{array}{ccc}
+2 &amp; 2 
+\end{array}\right]
+\]</span></p>
+<p>çarpımı olur. Hesabı altta yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">A <span class="op">=</span> np.array([[<span class="dv">1</span>],[<span class="dv">3</span>],[<span class="dv">1</span>]])
+b1 <span class="op">=</span> np.array([[<span class="dv">2</span>, <span class="dv">2</span>]])
+<span class="bu">print</span> (np.dot(A,b1))</code></pre></div>
+<pre><code>[[2 2]
+ [6 6]
+ [2 2]]</code></pre>
+<p>Bu şekilde diğer kolon-satır kombinasyonlarını da yaparsak (birinci kolon ile birinci satır, ikinci kolon ile ikinci satır, üçüncü kolon ile üçüncü satır çarpılacak),</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">A <span class="op">=</span> np.array([[<span class="dv">1</span> ,<span class="dv">1</span> , <span class="dv">6</span>],[<span class="dv">3</span> , <span class="dv">0</span> , <span class="dv">1</span>],[<span class="dv">1</span> , <span class="dv">1</span> , <span class="dv">4</span>]])
+B <span class="op">=</span> np.array([[<span class="dv">2</span>, <span class="dv">2</span>],[<span class="dv">3</span>, <span class="dv">1</span>],[<span class="dv">9</span>, <span class="dv">5</span>]])
+i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> r1 <span class="op">=</span> np.dot(A[:,i].reshape(<span class="dv">3</span>,<span class="dv">1</span>),B[i,:].reshape(<span class="dv">1</span>,<span class="dv">2</span>))
+i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> r2 <span class="op">=</span> np.dot(A[:,i].reshape(<span class="dv">3</span>,<span class="dv">1</span>),B[i,:].reshape(<span class="dv">1</span>,<span class="dv">2</span>))
+i <span class="op">=</span> <span class="dv">2</span><span class="op">;</span> r3 <span class="op">=</span> np.dot(A[:,i].reshape(<span class="dv">3</span>,<span class="dv">1</span>),B[i,:].reshape(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="bu">print</span> (r1)
+<span class="bu">print</span> (r2)
+<span class="bu">print</span> (r3)</code></pre></div>
+<pre><code>[[2 2]
+ [6 6]
+ [2 2]]
+[[3 1]
+ [0 0]
+ [3 1]]
+[[54 30]
+ [ 9  5]
+ [36 20]]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (<span class="st">&#39;kolon-matris carpim toplami&#39;</span>)
+<span class="bu">print</span> (r1<span class="op">+</span>r2<span class="op">+</span>r3)
+<span class="bu">print</span> (<span class="st">&#39;tum carpim&#39;</span>)
+<span class="bu">print</span> (A.dot(B))</code></pre></div>
+<pre><code>kolon-matris carpim toplami
+[[59 33]
+ [15 11]
+ [41 23]]
+tum carpim
+[[59 33]
+ [15 11]
+ [41 23]]</code></pre>
+<p>Aynı sonuca varıldığını görüyoruz.</p>
+<p>Vektörler</p>
+<p>Bir vektör bir yön ve büyüklüktür, başlangıç noktası olarak genellikle orijin kabul edilir. 1,2, ya da daha fazla boyutta bir sayı listesi ile gösterilebilir, tek boyutta ise bu tabii ki bir skalar ile aynı şeydir [5].</p>
+<p>Toplamak</p>
+<p>İki boyutta bir örnek görelim, iki vektör <span class="math inline">\(a,b\)</span> var, toplamları</p>
+<div class="figure">
+<img src="vector_a_plus_b.png" />
+
+</div>
+<p>Toplam sanki birinci vektörü alıp diğerinin bittiği yerden başlatmak gibi, varılan yeri gösteren yeni vektör toplam vektörüdür. Çıkartmak ise aynı yerden başlayan iki vektörde birinin sonundan diğerine sonuna giden vektörü bulmak gibidir. Aslında toplam üzerinden çıkartma doğrulabilir, <span class="math inline">\(a-b\)</span> düşünürken <span class="math inline">\(-b\)</span> diye yeni bir vektör yaratırız (yani vektörü tersine çeviririz) ve <span class="math inline">\(a+(-b)\)</span> ile toplam işlemini yaparız.</p>
+<p>Çıkartmak</p>
+<div class="figure">
+<img src="vector_b_minus_a.png" />
+
+</div>
+<p>Kosinüsler Kanunu (Law of Cosines)</p>
+<p>Şöyle bir üçgen olduğunu düşünelim [7],</p>
+<div class="figure">
+<img src="cos1.png" />
+
+</div>
+<p>Eğer, mesela C'nin 90 derece olduğunu bilseydik, Pitagor kuralından</p>
+<p><span class="math display">\[
+c^2 = a^2 + b^2
+\]</span></p>
+<p>diyebilirdik. Ama <span class="math inline">\(C &lt; 90\)</span> ise, farklı bir formül kullanılabilir,</p>
+<p><span class="math display">\[
+c^2 = a^2 + b^2 - 2 a b \cos C
+\]</span></p>
+<p>Eğer <span class="math inline">\(C=90\)</span> ise <span class="math inline">\(\cos(90) = 0\)</span> olduğu için Pitagor kuralını elde ettiğimizi görürüz.</p>
+<p>Üstteki kurala Kosinüsler Kanunu denir, ispatı şöyle,</p>
+<div class="figure">
+<img src="cos2.png" />
+
+</div>
+<p>Üstteki üçgene bakarsak,</p>
+<p><span class="math display">\[
+c^2 = (a \sin C)^2 + (b-a\cos C)^2
+\]</span></p>
+<p><span class="math display">\[
+= a^2 \sin^2 C + b^2 - 2 a b \cos C + a^2 \cos^2 C
+\]</span></p>
+<p><span class="math display">\[
+c^2 = a^2 + b^2 - 2 a b \cos C
+\]</span></p>
+<p>Noktasal Çarpım</p>
+<p>İki boyutta iki vektör <span class="math inline">\(\vec{a},\vec{b}\)</span> olduğunu düşünelim. Bu vektör ögelerini <span class="math inline">\(\vec{a} = [a_1, a_2]\)</span> ve <span class="math inline">\(\vec{b} = [b_1, b_2]\)</span> diye gösterirsek, noktasal çarpım <span class="math inline">\(\vec{a} \cdot \vec{b}\)</span> her iki vektörün tekabül eden öğelerinin çarpımının toplamıdır, yani</p>
+<p><span class="math display">\[
+\vec{a} \cdot \vec{b} = a_1 b_1 + a_2 b_2
+\]</span></p>
+<p>Daha yüksek boyutlarda benzer işlem devam ettirilir.</p>
+<p>Norm</p>
+<p>Bir vektörün uzunluğunun, büyüklüğünün, ya da normu, ki <span class="math inline">\(||\vec{a}||\)</span> ile gösterilebilir, karesi</p>
+<p><span class="math display">\[
+||\vec{a}||^2 = \vec{a} \cdot \vec{a} 
+\]</span></p>
+<p>Bu kurallara uygun çünkü</p>
+<p><span class="math display">\[
+(\vec{a} \cdot \vec{a})^2 = a_1 a_1 + a_2 a_2
+\]</span></p>
+<p>Ya da</p>
+<p><span class="math display">\[
+||\vec{a}|| = \sqrt{\vec{a} \cdot \vec{a}} = \sqrt{a_1 a_1 + a_2 a_2}
+\]</span></p>
+<p>Aslında büyüklük formülü Pitagor üçgen formülünden hareketle de anlaşılır çünkü herhangi bir vektör düşünürsek, <span class="math inline">\(a_1,a_2\)</span> ya da <span class="math inline">\(x\)</span> ekseninde <span class="math inline">\(a_1\)</span> <span class="math inline">\(y\)</span> ekseninde <span class="math inline">\(a_2\)</span> olan bir nokta düşünürsek bu noktaya olan orijinden olan uzaklık (vektör) Pitagor formülü ile hesaplanabilirdi, <span class="math inline">\(\sqrt{a_1^2 + a_2^2}\)</span>.</p>
+<p>Noktasal çarpım şu şekilde de hesaplanabilir,</p>
+<p><span class="math display">\[
+\vec{a} \cdot \vec{b} = ||\vec{a}|| ||\vec{b}|| \cos\theta
+\]</span></p>
+<p>İspat</p>
+<p>Alttaki şekle bakarsak,</p>
+<div class="figure">
+<img src="abcos.png" />
+
+</div>
+<p>Bu üçgenin kenarları arasında Kosinüsler Kanunu uygularsak,</p>
+<p><span class="math display">\[
+||\vec{a}-\vec{b}||^2 =
+||\vec{a}||^2 + ||\vec{b}||^2 -
+2 ||\vec{a}|| ||\vec{b}|| \cos\theta
+\qquad (1)
+\]</span></p>
+<p>Norm açılımından hareketle</p>
+<p><span class="math display">\[
+||\vec{a}-\vec{b}||^2 = (\vec{a}-\vec{b}) \cdot (\vec{a}-\vec{b}) 
+\]</span></p>
+<p>Noktasal çarpımı parantezler üzerinden açarsak,</p>
+<p><span class="math display">\[
+= \vec{a}\cdot\vec{a} - \vec{a}\cdot\vec{b} - \vec{b}\cdot\vec{a} + \vec{b}\cdot\vec{b}
+\]</span></p>
+<p><span class="math display">\[
+= ||\vec{a}||^2 - 2\vec{a}\cdot\vec{b} + ||\vec{b}||^2
+\]</span></p>
+<ol style="list-style-type: decimal">
+<li>formülünde sol tarafı üstteki formülle açarsak,</li>
+</ol>
+<p><span class="math display">\[
+||\vec{a}||^2 - 2\vec{a}\cdot\vec{b} + ||\vec{b}||^2 =
+||\vec{a}||^2 + ||\vec{b}||^2 - 2 ||\vec{a}|| ||\vec{b}|| \cos\theta
+\]</span></p>
+<p><span class="math display">\[
+- 2\vec{a}\cdot\vec{b} = - 2 ||\vec{a}|| ||\vec{b}|| \cos\theta
+\]</span></p>
+<p><span class="math display">\[
+\vec{a}\cdot\vec{b} = ||\vec{a}|| ||\vec{b}|| \cos\theta
+\]</span></p>
+<p>Üstteki eşitlik veri analizinde kullanışlı bulunmuştur, mesela kimisi müşterileri <span class="math inline">\(D\)</span> boyutunda vektörler olarak temsil edebilir, 1. öğe yaş, 2. öğe boy, vs. gibi bilgiler olabilir ve iki vektörün birbirine ne kadar &quot;yakın'' olduğu iki vektörün arasındaki açısal uzaklık üzerinden ölçülebilir,</p>
+<p><span class="math display">\[
+\cos\theta = \frac{\vec{a}\vec{b}}{||\vec{a}|| ||\vec{b}||}
+\]</span></p>
+<p>Eğer vektörler baştan normalize edilmiş ise bölme işlemine de gerek kalmaz, tek bir noktasal çarpım ile kabaca bir benzerlik ölçütü elde edilmiş olur.</p>
+<p>Bir diğer kullanım alanı fizikte &quot;yapılan iş'' hesabı. İş, uygulanan kuvvet çarpı mesafeden elde edilir fakat mesela bir kuvvet alanı <span class="math inline">\(\vec{F}\)</span> her yerde farklı olabilir ayrıca bu alanda belli bir <span class="math inline">\(\vec{d}\)</span> yolunda hareket eden bir parçacığı düşünürsek, parçacık bazen kuvvete karşı bazen onunla beraber hareket ediyor olabilir, bunun ne oranda olduğunun hesabı <span class="math inline">\(\vec{F}\)</span>'yi <span class="math inline">\(\vec{d}\)</span> üzerine skalar olarak yansıtmakla hesaplanır [3], <span class="math inline">\(W = \vec{F} \cdot \vec{d}\)</span>.</p>
+<p>Diklik</p>
+<p>İki vektörün birbirine dik olup olmadığı (orthogonality) testi de noktasal çarpım ile yapılır. <span class="math inline">\(\cos(90) = 0\)</span> olduğuna göre <span class="math inline">\(\vec{a}\cdot\vec{b}\)</span> çarpımı sıfır ise iki vektör dik demektir.</p>
+<p>Kaynaklar</p>
+<p>[3] [http://sites.science.oregonstate.edu/math/home/programs/undergrad/CalculusQuestStudyGuides/vcalc/dotprod/dotprod.html](http://sites.science.oregonstate.edu/math/home/programs/undergrad/CalculusQuestStudyGuides/vcalc/dotprod/dotprod.html)</p>
+<p>[5] <em>Math Insight</em>, <a href="https://mathinsight.org/vector_introduction" class="uri">https://mathinsight.org/vector_introduction</a></p>
+<p>[7] [https://mathworld.wolfram.com/LawofCosines.html](https://mathworld.wolfram.com/LawofCosines.html)</p>
+</body>
+</html>

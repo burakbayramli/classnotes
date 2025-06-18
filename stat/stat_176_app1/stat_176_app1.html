@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="uygulama---yağmur-yağış-verisi">Uygulama - Yağmur Yağış Verisi</h1>
+<p>Yağış verisini nasıl analiz ederiz? Bir örnek üzerinde görelim, [1]'den alınan Singapur yağış verisi,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;rainfall.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span>[<span class="st">&#39;dt&#39;</span>])
+df.columns <span class="op">=</span> [<span class="st">&#39;rain&#39;</span>]
+<span class="bu">print</span> (df)</code></pre></div>
+<pre><code>            rain
+dt              
+2015-01-01   0.6
+2015-01-02   0.0
+2015-01-03   0.0
+2015-01-04   0.0
+2015-01-05   0.0
+...          ...
+2022-01-27   0.0
+2022-01-28   0.0
+2022-01-29   0.0
+2022-01-30   3.8
+2022-01-31   0.0
+
+[2588 rows x 1 columns]</code></pre>
+<p>Yağış verisi milimetre yağış miktarı olarak gösterilmiş. Bazı günlerde hiç yağış yok, o günlerde su sıfır milimetre.</p>
+<p>Bu verinin dağılımını görmek ilginç olabilir. Tabii her ayın yağış dağılımı farklı olabilir, mesela altta Mart ayına bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> df[df.index.month <span class="op">==</span> <span class="dv">3</span>][<span class="st">&#39;rain&#39;</span>]</code></pre></div>
+<p>Bu veriye ne tür dağılım uygun olur? Literatürde pek çok kullanım var. Bazıları Gamma, bazıları Weibull diyor. Biz altta ikisini de test edeceğiz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.stats <span class="im">import</span> gamma
+res <span class="op">=</span> gamma.fit(df[<span class="st">&#39;rain&#39;</span>])
+a,loc,scale <span class="op">=</span> res  
+x.hist(density<span class="op">=</span><span class="va">True</span>)
+plt.ylim(<span class="dv">0</span>,<span class="fl">0.4</span>)
+plt.plot(x, gamma.pdf(x,a,loc,scale),<span class="st">&#39;r.&#39;</span>)
+plt.savefig(<span class="st">&#39;stat_176_app1_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_176_app1_01.png" />
+
+</div>
+<p>Hem veriden gelen histogramı hem de olasılık yoğunluk fonksiyonunu aynı grafikte gösterdik, kabaca ilk kontrol bu şekilde yapılabilir.</p>
+<p>Daha detayli veriye olan uygunluğu kontrol için olasılık dağılımları arasında bir yakınlık ölçüsü olan Kullback-Leibler mesafesini [2] kullanalım. Veri histogramı ve tahmin edilen dağılım üzerinden üretilenlerin histogramı arasında mesafeyi alttaki fonksiyon <code>kl</code> ile ölçebiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> kl(p, q):
+    <span class="cf">return</span> np.<span class="bu">sum</span>(p <span class="op">*</span> np.log(p <span class="op">/</span> q))    </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">b <span class="op">=</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="dv">50</span>)
+eps <span class="op">=</span> <span class="fl">1e-5</span>
+s <span class="op">=</span> <span class="dv">4000</span>
+dh <span class="op">=</span> np.histogram(df.rain, bins<span class="op">=</span>b, density<span class="op">=</span><span class="va">True</span>)[<span class="dv">0</span>]<span class="op">+</span>eps
+
+r1 <span class="op">=</span> gamma.rvs(a,loc,scale,size<span class="op">=</span>s)
+h1 <span class="op">=</span> np.histogram(r1, bins<span class="op">=</span>b, density<span class="op">=</span><span class="va">True</span>)[<span class="dv">0</span>]<span class="op">+</span>eps
+<span class="bu">print</span> (<span class="st">&#39;Gamma&#39;</span>, kl(h1, dh))</code></pre></div>
+<pre><code>Gamma 0.288253598547884</code></pre>
+<p>Weibull Min adlı dağılım için de kontrol yapalım.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.stats <span class="im">import</span> weibull_min
+res <span class="op">=</span> weibull_min.fit(df[<span class="st">&#39;rain&#39;</span>])
+a,loc,scale <span class="op">=</span> res  
+x.hist(density<span class="op">=</span><span class="va">True</span>)
+plt.ylim(<span class="dv">0</span>,<span class="fl">0.4</span>)
+plt.plot(x, weibull_min.pdf(x,a,loc,scale),<span class="st">&#39;r.&#39;</span>)
+plt.savefig(<span class="st">&#39;stat_176_app1_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_176_app1_02.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">r2 <span class="op">=</span> weibull_min.rvs(a,loc,scale,size<span class="op">=</span>s)
+h2 <span class="op">=</span> np.histogram(r2, bins<span class="op">=</span>b, density<span class="op">=</span><span class="va">True</span>)[<span class="dv">0</span>]<span class="op">+</span>eps
+<span class="bu">print</span> (<span class="st">&#39;Weibull Min&#39;</span>, kl(h2, dh))</code></pre></div>
+<pre><code>Weibull Min 0.06795850872796806</code></pre>
+<p>Weibull Min daha yakın gözüküyor.</p>
+<p>Olasılıklar</p>
+<p>Veriye en uygun dağılımı bulduktan sonra dağılıma bazı sorular sorabiliriz, mesela Mart ayında 10 mm'den daha fazla yağmur yağma olasılığı nedir? Bunun için kumulatif dağılım fonksiyonu CDF lazım, 'daha büyük' sorusu belli bir noktadan sonraki, onun sağındaki alanı ima ediyor, o zaman cdf çağrısını 1'den çıkartırız,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (<span class="st">&#39;</span><span class="sc">%0.3f</span><span class="st">&#39;</span> <span class="op">%</span> (<span class="dv">1</span><span class="op">-</span>weibull_min.cdf(<span class="dv">10</span>, a,loc,scale)))</code></pre></div>
+<pre><code>0.140</code></pre>
+<p>Az (ama sıfır olmayan) bir olasılık var.</p>
+<p>Yağmur Günleri, Kuraklık Günleri</p>
+<p>Bazı araştırmalar ne kadar yağdığını ayrı bir şekilde temsil edip, yagıp yağmadığı aksiyonunu ayrı bir şekilde tahmin ediyor (bu durumda herhalde miktar dağılımlarını sadece sıfırdan büyük değerler için kullanmak yeterli olur). Aksiyon derken ne kadar yağarsa yağsın o gün 'yağdı' olarak alınıyor, tersi ise 'yağmadı'. Bu ayrıksal konumlar arasındaki geçişler, olasılıksal şekilde Markov Zincirleri ile temsil edilebilir, bkz [4]'te gösterilen tek gün öncesine dayanarak yapılan tahmin (ilk örnek). Örnek tek gün öncesini kullanmış. Fakat önceki iki günün tüm kombinasyonları yağma/yağmama üzerinden 4 konum ile temsil edilirse, o zaman iki gün öncesi de hesaba dahil edilebilir.</p>
+<p>Markov Zinciri hazırlığı, önceki gün yağış olup olmadığı D1, iki gün öncesi D2, bugün D0.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df <span class="op">=</span> pd.read_csv(<span class="st">&#39;rainfall.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span>[<span class="st">&#39;dt&#39;</span>])
+df.columns <span class="op">=</span> [<span class="st">&#39;rain&#39;</span>]
+df[<span class="st">&#39;r1ago&#39;</span>] <span class="op">=</span> df.rain.shift(<span class="dv">1</span>)
+df[<span class="st">&#39;r2ago&#39;</span>] <span class="op">=</span> df.rain.shift(<span class="dv">2</span>)
+df[<span class="st">&#39;D1&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> row: (row.r1ago <span class="op">&gt;</span> <span class="fl">0.0</span>).astype(<span class="bu">int</span>), axis<span class="op">=</span><span class="dv">1</span>)
+df[<span class="st">&#39;D2&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> row: (row.r2ago <span class="op">&gt;</span> <span class="fl">0.0</span>).astype(<span class="bu">int</span>), axis<span class="op">=</span><span class="dv">1</span>)
+df[<span class="st">&#39;D0&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> row: (row.rain <span class="op">&gt;</span> <span class="fl">0.0</span>).astype(<span class="bu">int</span>), axis<span class="op">=</span><span class="dv">1</span>)
+pd.set_option(<span class="st">&#39;display.max_columns&#39;</span>, <span class="va">None</span>)
+<span class="bu">print</span> (df)</code></pre></div>
+<pre><code>            rain  r1ago  r2ago  D1  D2  D0
+dt                                        
+2015-01-01   0.6    NaN    NaN   0   0   1
+2015-01-02   0.0    0.6    NaN   1   0   0
+2015-01-03   0.0    0.0    0.6   0   1   0
+2015-01-04   0.0    0.0    0.0   0   0   0
+2015-01-05   0.0    0.0    0.0   0   0   0
+...          ...    ...    ...  ..  ..  ..
+2022-01-27   0.0    0.0    0.0   0   0   0
+2022-01-28   0.0    0.0    0.0   0   0   0
+2022-01-29   0.0    0.0    0.0   0   0   0
+2022-01-30   3.8    0.0    0.0   0   0   1
+2022-01-31   0.0    3.8    0.0   1   0   0
+
+[2588 rows x 6 columns]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">g <span class="op">=</span> df.groupby([<span class="st">&#39;D1&#39;</span>,<span class="st">&#39;D2&#39;</span>,<span class="st">&#39;D0&#39;</span>]).size().reset_index()
+<span class="bu">print</span> (g)</code></pre></div>
+<pre><code>   D1  D2  D0    0
+0   0   0   0  633
+1   0   0   1  269
+2   0   1   0  268
+3   0   1   1  228
+4   1   0   0  244
+5   1   0   1  253
+6   1   1   0  253
+7   1   1   1  440</code></pre>
+<p>Bu sayıları nasıl Markov matrisine çevireceğimizi anlamak için [1, sf. 193].</p>
+<p>Konumları etiketlemek için alttakini yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">pivot <span class="op">=</span> g.pivot_table(index<span class="op">=</span>[<span class="st">&#39;D1&#39;</span>,<span class="st">&#39;D2&#39;</span>], columns<span class="op">=</span><span class="st">&#39;D0&#39;</span>, aggfunc<span class="op">=</span><span class="st">&#39;mean&#39;</span>)
+pivot <span class="op">=</span> pivot.reset_index()
+<span class="bu">print</span> (pivot)</code></pre></div>
+<pre><code>   D1 D2    0     
+D0          0    1
+0   0  0  633  269
+1   0  1  268  228
+2   1  0  244  253
+3   1  1  253  440</code></pre>
+<p>Böylece konum 0,1,2,3 elde ettik. İki gün önce ve bir gün önce yağmadı konumu 0, iki gün önce yağdı bir gün önce yağmadı konum 1, böyle gidiyor. Şimdi dikkat, buradan bir Markov matrisi çıkartmak için geçiş hedefinde iki kolonlu bir matris (yağdı,yağmadı) kullanamayız. O durumda matris 4 x 2 boyutunda olurdu, bu bir Markov matrisi olmaz. Boyutlar 4 x 4 olmalı. Peki o zaman mesela yağdı, yağmadı konumundan bugün yağdı konumuna nasıl geçeceğiz? Ufak bir numara kullanarak; yağdı-yağmadı (2 etiketi) konumundan yağmadı-yağdı konumuna (1 etiketi) geçişi yapacağız. Öyle ya, yağdı, yağmadı konumundan geçiş yaptıktan sonra yeni bir gündeyiz, artık bir gün öncesi iki gun oncesi oldu, bugün de 'yağdı' durumu var, gelinen yer yağmadı-yağdı.</p>
+<p>Olasılık verisini oluşturalım. Üstteki matristeki toplamları her satırın nihai toplamı ile bölelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">MC <span class="op">=</span> np.array(pivot).astype(<span class="bu">float</span>)
+probs <span class="op">=</span> MC[:,[<span class="dv">2</span>,<span class="dv">3</span>]] <span class="op">/</span> MC.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).reshape(<span class="dv">4</span>,<span class="dv">1</span>)
+MC[:,[<span class="dv">2</span>,<span class="dv">3</span>]] <span class="op">=</span> probs
+MC <span class="op">=</span> pd.DataFrame(MC)
+MC.columns <span class="op">=</span> [<span class="st">&#39;D1&#39;</span>,<span class="st">&#39;D2&#39;</span>,<span class="st">&#39;norain&#39;</span>,<span class="st">&#39;rain&#39;</span>]
+<span class="bu">print</span> (MC)</code></pre></div>
+<pre><code>    D1   D2    norain      rain
+0  0.0  0.0  0.701774  0.298226
+1  0.0  1.0  0.539235  0.458753
+2  1.0  0.0  0.489960  0.508032
+3  1.0  1.0  0.364029  0.633094</code></pre>
+<p>Ufak bir matris olduğu için bu olasılıkları elle gerekli yerlere kodlayabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">MCfinal <span class="op">=</span> np.zeros((<span class="dv">4</span>,<span class="dv">4</span>))
+MCfinal[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> MC.loc[<span class="dv">0</span>][<span class="st">&#39;norain&#39;</span>]
+MCfinal[<span class="dv">0</span>,<span class="dv">2</span>] <span class="op">=</span> MC.loc[<span class="dv">0</span>][<span class="st">&#39;rain&#39;</span>]
+MCfinal[<span class="dv">1</span>,<span class="dv">0</span>] <span class="op">=</span> MC.loc[<span class="dv">1</span>][<span class="st">&#39;norain&#39;</span>]
+MCfinal[<span class="dv">1</span>,<span class="dv">2</span>] <span class="op">=</span> MC.loc[<span class="dv">1</span>][<span class="st">&#39;rain&#39;</span>]
+MCfinal[<span class="dv">2</span>,<span class="dv">1</span>] <span class="op">=</span> MC.loc[<span class="dv">2</span>][<span class="st">&#39;norain&#39;</span>]
+MCfinal[<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">=</span> MC.loc[<span class="dv">2</span>][<span class="st">&#39;rain&#39;</span>]
+MCfinal[<span class="dv">3</span>,<span class="dv">1</span>] <span class="op">=</span> MC.loc[<span class="dv">3</span>][<span class="st">&#39;norain&#39;</span>]
+MCfinal[<span class="dv">3</span>,<span class="dv">3</span>] <span class="op">=</span> MC.loc[<span class="dv">3</span>][<span class="st">&#39;rain&#39;</span>]
+<span class="bu">print</span> (MCfinal)</code></pre></div>
+<pre><code>[[0.70177384 0.         0.29822616 0.        ]
+ [0.53923541 0.         0.45875252 0.        ]
+ [0.         0.48995984 0.         0.50803213]
+ [0.         0.36402878 0.         0.63309353]]</code></pre>
+<p>Markov matrisini elde ettik. Artık bu matris üzerinde ek işlemler yapabiliriz. Daha önce [4]'te bir, iki, hatta daha fazla adım sonrasını MZ ile tahmin edebilme kabiliyeti işlendi, basit matris çarpımı ile bu yapılabiliyor. Eğer dün ve iki gün önce yağmur yağdıysa (etiket 3), acaba önümüzdeki iki gün, üç gün içinde yağmur yağma olasılığı nedir (aynı etiket)?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+P2 <span class="op">=</span> lin.matrix_power(MCfinal,<span class="dv">2</span>)
+<span class="bu">print</span> (P2)
+<span class="bu">print</span> (<span class="st">&#39;&#39;</span>)
+P3 <span class="op">=</span> lin.matrix_power(MCfinal,<span class="dv">3</span>)
+<span class="bu">print</span> (P3)</code></pre></div>
+<pre><code>[[0.49248652 0.14611884 0.20928732 0.15150847]
+ [0.3784213  0.22477031 0.16081411 0.23306102]
+ [0.2642037  0.18493831 0.22477031 0.32163185]
+ [0.19629721 0.23046426 0.16699912 0.40080741]]
+
+[[0.42440661 0.15769583 0.21390475 0.20224372]
+ [0.38677028 0.16363337 0.21596908 0.22924815]
+ [0.28513653 0.22721167 0.16363337 0.31781358]
+ [0.26203074 0.22772829 0.16426702 0.33858949]]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (MCfinal[<span class="dv">3</span>,<span class="dv">3</span>])
+<span class="bu">print</span> (P2[<span class="dv">3</span>,<span class="dv">3</span>])
+<span class="bu">print</span> (P3[<span class="dv">3</span>,<span class="dv">3</span>])</code></pre></div>
+<pre><code>0.6330935251798561
+0.40080741162465705
+0.33858949401527094</code></pre>
+<p>Peki önümüzdeki üç günün <em>herhangi birinde</em> yağma olasılığı nasıl hesaplanır? Her üç matris içinde yağdı-yağdı konumundan bu sefer yağmadı-yağdı konumuna (etiket 1) geçiş olasıklarına bakarız, bu olasılıkları birbiri ile çarparız, böylece sırasıyla üç gün hiç yağmama olasılığı elde edilir. 1 değerinden bu değeri çıkartınca herhangi bir gün yağma olasılığı çıkar.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">norain <span class="op">=</span> MCfinal[<span class="dv">3</span>,<span class="dv">1</span>]<span class="op">*</span>P2[<span class="dv">3</span>,<span class="dv">1</span>]<span class="op">*</span>P3[<span class="dv">3</span>,<span class="dv">1</span>]
+<span class="bu">print</span> (<span class="dv">1</span><span class="op">-</span>norain)</code></pre></div>
+<pre><code>0.9808945929621133</code></pre>
+<p>Kaynaklar</p>
+<p>[1] <em>Meteorological Service Singapore</em>, <a href="http://www.weather.gov.sg/climate-historical-daily/" class="uri">http://www.weather.gov.sg/climate-historical-daily/</a></p>
+<p>[2] Bayramlı, <em>Kullback-Leibler (KL) Mesafesi</em></p>
+<p>[3] Ross, <em>Introduction to Probability Models, 10th Ed</em></p>
+<p>[4] Bayramlı, <em>Istatistik, Markov Zincirleri</em></p>
+</body>
+</html>

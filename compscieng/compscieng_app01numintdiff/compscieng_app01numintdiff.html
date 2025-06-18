@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="sayısal-entegrasyon-numerical-integration-ve-sonlu-farklılıklar-ile-sayısal-türev-differentiation-with-finite-differences">Sayısal Entegrasyon (Numerical Integration) ve Sonlu Farklılıklar ile Sayısal Türev (Differentiation with Finite Differences)</h1>
+<p>Sayısal Türev</p>
+<p>Sonlu farklılıklar (finite differences) ile yaklaşık türev almak için, herhangi bir <span class="math inline">\(x\)</span> noktasında</p>
+<p><span class="math display">\[
+f&#39;(x) = \frac{f(x + \epsilon) - f(x)}{\epsilon}
+\]</span></p>
+<p>hesabını yapabiliriz. Tek boyutta tek sayı <span class="math inline">\(\epsilon\)</span> ile adım atılıp <span class="math inline">\(f\)</span> üzerindeki değişiklik üzerinden hesap yapılır, çok boyutlu durumda birer birer her kordinatta <span class="math inline">\(\epsilon\)</span> kadar adım atılır, ve bu adım üzerinden <span class="math inline">\(f\)</span> türevi alınıp o kordinat için kısmı türev olarak kaydedilir, <span class="math inline">\(x = \left[\begin{array}{ccc} x_0 &amp; ... &amp; x_n \end{array}\right]\)</span> için</p>
+<p><span class="math display">\[
+f&#39;(x) = \left[\begin{array}{c}
+\frac{ f \left( [\begin{array}{ccc} x_0 + \epsilon &amp; ... &amp; x_n \end{array}]\right) - f(x)}{\epsilon} \\
+\vdots \\
+\frac{ f \left( [\begin{array}{ccc} x_0  &amp; ... &amp; x_n+\epsilon \end{array}]\right) - f(x)}{\epsilon} 
+\end{array}\right]
+\]</span></p>
+<p>Alttaki kod [3]'teki <code>approx_fprime</code> metotunu baz almıştır,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">eps <span class="op">=</span> np.sqrt(np.finfo(<span class="bu">float</span>).eps)
+
+<span class="kw">def</span> _approx_fprime_helper(xk, f, epsilon):
+    f0 <span class="op">=</span> f(xk)
+    grad <span class="op">=</span> np.zeros((<span class="bu">len</span>(xk),), <span class="bu">float</span>)
+    ei <span class="op">=</span> np.zeros((<span class="bu">len</span>(xk),), <span class="bu">float</span>)
+    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(xk)):
+        ei[k] <span class="op">=</span> <span class="fl">1.0</span>
+        d <span class="op">=</span> epsilon <span class="op">*</span> ei
+        df <span class="op">=</span> (f(xk <span class="op">+</span> d) <span class="op">-</span> f0) <span class="op">/</span> d[k]
+        <span class="cf">if</span> <span class="kw">not</span> np.isscalar(df):
+            <span class="cf">try</span>:
+                df <span class="op">=</span> df.item()
+            <span class="cf">except</span> (<span class="pp">ValueError</span>, <span class="pp">AttributeError</span>):
+                <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;The user-provided &quot;</span>
+                                 <span class="st">&quot;objective function must &quot;</span>
+                                 <span class="st">&quot;return a scalar value.&quot;</span>)
+        grad[k] <span class="op">=</span> df
+        ei[k] <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">return</span> grad</code></pre></div>
+<p>Test olarak optimizasyonda bolca kullanılan Rosenbrock fonksiyonunu kullanabiliriz. Altta hem analitik olarak hem de sayısal olarak hesaplanmış türev sonuçlarını görebiliyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">rosen <span class="op">=</span> <span class="kw">lambda</span> x: (<span class="dv">1</span><span class="op">-</span>x[<span class="dv">0</span>])<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">100</span><span class="op">*</span>(x[<span class="dv">1</span>]<span class="op">-</span>x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>
+
+<span class="kw">def</span> rosen_d(x):
+    <span class="cf">return</span> np.array([<span class="dv">2</span><span class="op">*</span><span class="dv">100</span><span class="op">*</span>(x[<span class="dv">1</span>] <span class="op">-</span> x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span>)<span class="op">*</span>(<span class="op">-</span><span class="dv">2</span><span class="op">*</span>x[<span class="dv">0</span>]) <span class="op">-</span> <span class="dv">2</span><span class="op">*</span>(<span class="fl">1.</span><span class="op">-</span>x[<span class="dv">0</span>]), <span class="dv">2</span><span class="op">*</span><span class="dv">100</span><span class="op">*</span>(x[<span class="dv">1</span>]<span class="op">-</span>x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span>)])
+
+x <span class="op">=</span> [<span class="fl">0.5</span>, <span class="fl">0.5</span>]
+res <span class="op">=</span> _approx_fprime_helper(x, rosen, eps)
+<span class="bu">print</span> (<span class="st">&#39;analitik&#39;</span>, res, <span class="st">&#39;sayisal&#39;</span>, rosen_d(x))
+
+x <span class="op">=</span> [<span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>]
+res <span class="op">=</span> _approx_fprime_helper(x, rosen, eps)
+<span class="bu">print</span> (<span class="st">&#39;analitik&#39;</span>, res, <span class="st">&#39;sayisal&#39;</span>, rosen_d(x))</code></pre></div>
+<pre><code>analitik [-50.99999928  50.00000149] sayisal [-51.  50.]
+analitik [47.00000072 50.00000143] sayisal [47. 50.]</code></pre>
+<p>Sayısal Entegrasyon</p>
+<p>Trapezoid Bazlı</p>
+<p><span class="math inline">\(F(x)\)</span> fonksiyonunu bazen sembolik olarak entegre etmek zor olabilir. Bu durumlarda sayısal çözüm daha kullanışlı olabilir. Mesela <span class="math inline">\(F(x)\)</span>'in <span class="math inline">\(x_0\)</span> ve <span class="math inline">\(x_1\)</span> arasındaki entegrali aslında bir alan hesabıdır, ve bu alanı, <span class="math inline">\(x\)</span> aralığını ufak parçalara bölerek, ve bu parçaları kullanarak yaklaşık bir alan hesabı yapıp sonuçları toplayarak elde edebiliriz.</p>
+<p><span class="math inline">\(x_0\)</span> ve <span class="math inline">\(x_1\)</span> arasını <span class="math inline">\(N\)</span> parçaya bölelim.</p>
+<p>Artık entegrali yaklaşık olarak</p>
+<p><span class="math display">\[
+\int_{x_0}^{x_1} F(x) \mathrm{d} x \approx \sum_{i=1}^{N} F(x_i)
+\]</span></p>
+<p>hesaplayabiliriz. <span class="math inline">\(N\)</span> arttırıldıkça dikdörtgenler daha fazlalaşacak, ve gerçek alana daha fazla yaklaşacağız.</p>
+<p>Üstteki metot Euler'in metotu olarak biliniyor, ve anlatması, kodlaması en rahat olan yöntem bu. Bir diğer yöntem, trapezoid yöntemi olarak bilinir, ve daha iyi yaklaşıksal yeteneğinin olduğu bilinmektedir. Bu yöntemle pek çok dikdörtgen alanı yerine pek çok trapezoid alanı hesaplıyoruz [1, sf. 279].</p>
+<div class="figure">
+<img src="compscieng_app01numint_01.png" />
+
+</div>
+<p><span class="math display">\[
+\sum_{i=1}^{N} \Delta x \frac{1}{2} [F(x_i) + F(x_{i+1})]
+\]</span></p>
+<p>Bu formül iki kenarı <span class="math inline">\(a,b\)</span> olan ve genişliği <span class="math inline">\(\Delta x\)</span> olan trapezoid'in alanının <span class="math inline">\(1/2(a+b)\Delta x\)</span> olmasından ileri geliyor.</p>
+<p>Örnek</p>
+<p><span class="math inline">\(F(x) = 3 x e^{-0.7 x}\)</span>'in <span class="math inline">\(x_0=0.5\)</span> ve <span class="math inline">\(x_1=5\)</span> arasındaki entegralini hesaplayalım,</p>
+<p>Rutin <code>trapz</code> ile bunu yapabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.linspace(<span class="fl">0.5</span>,<span class="fl">5.0</span>,<span class="dv">1000</span>)
+y <span class="op">=</span> <span class="fl">3.0</span><span class="op">*</span>x<span class="op">*</span>np.exp(<span class="op">-</span><span class="fl">0.7</span><span class="op">*</span>xval)
+W <span class="op">=</span> np.trapz(y,x<span class="op">=</span>x)
+<span class="bu">print</span> (W)</code></pre></div>
+<pre><code>4.99249134896902</code></pre>
+<p>Trapezoidsel hesabı elle yapmak isteyenler için bazı kolaylaştırıcı ek formüller [2, sf. 605] alttadır,</p>
+<div class="figure">
+<img src="compscieng_app01numint_02.png" />
+
+</div>
+<p>Trapezoidsel entegral <span class="math inline">\(T\)</span> ve <span class="math inline">\(y_i = f(x_i)\)</span> için</p>
+<p><span class="math display">\[
+T = \frac{1}{2} (y_0 + y_1)\Delta x + \frac{1}{2} (y_1 + y_2)\Delta x +... +
+\frac{1}{2} (y_{n-2} + y_{n-1})\Delta x + \frac{1}{2} (y_{n-1} + y_n)\Delta x
+\]</span></p>
+<p><span class="math display">\[
+= \Delta x (\frac{1}{2}y_0 + y_1 + y_2 + ... + y_{n-1} + \frac{1}{2} y_n )
+\]</span></p>
+<p><span class="math display">\[
+= \frac{\Delta x}{2} (y_0 + 2y_1 + 2y_2 + ... + 2y_{n-1} + y_n)
+\]</span></p>
+<p>Örnek</p>
+<p><span class="math inline">\(n=4\)</span> ile <span class="math inline">\(\int_{1}^{2} x^2 \mathrm{d} x\)</span> hesabını yapalım.</p>
+<p><span class="math inline">\(\Delta x\)</span> = 1/4 olur,</p>
+<p><span class="math display">\[
+T = \frac{\Delta x}{2} (y_0 + 2y_1 + 2y_2 + 2y_3 + y_4)
+\]</span></p>
+<p><span class="math display">\[
+= \frac{1}{8} (1 + 2 (\frac{25}{16}) + 2(\frac{36}{16}) + 2 (\frac{49}{16}) + 4)
+\]</span></p>
+<p><span class="math display">\[
+= \frac{75}{32} = 2.34375
+\]</span></p>
+<p>Çağrı <code>trapz</code> ile</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.linspace(<span class="fl">1.0</span>,<span class="fl">2.0</span>,<span class="dv">4</span>)
+y <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span>
+T <span class="op">=</span> np.trapz(y,x<span class="op">=</span>x)
+<span class="bu">print</span> (T)</code></pre></div>
+<pre><code>2.351851851851852</code></pre>
+<p>Üstteki hesap tabii ki analitik şekilde de çok rahat yapılabilir,</p>
+<p><span class="math display">\[
+\int_{1}^{2} x^2 \mathrm{d} x = \frac{x^3}{3} \biggr|_{1}^{2} = 
+\frac{8}{3}-\frac{1}{3} = 
+\frac{7}{3}
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (<span class="fl">7.</span><span class="op">/</span><span class="dv">3</span>)</code></pre></div>
+<pre><code>2.3333333333333335</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Sorenssen, <em>Elementary Mechanics Using Python</em></p>
+<p>[2] Thomas, <em>Thomas's Calculus</em></p>
+<p>[3] Scipy, <a href="https://github.com/scipy/scipy/blob/master/scipy/optimize/optimize.py" class="uri">https://github.com/scipy/scipy/blob/master/scipy/optimize/optimize.py</a></p>
+</body>
+</html>

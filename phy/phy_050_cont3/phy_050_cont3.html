@@ -1,0 +1,595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="sayısal-kontrol-ve-sınır-değer-problemleri-bvp">Sayısal Kontrol ve Sınır Değer Problemleri (BVP)</h1>
+<p>Bu bölümde optimal kontrol problemlerini sayısal çözmenin yöntemlerini göreceğiz.</p>
+<p>Rayleigh Problemi</p>
+<p>Bir elektrik devresi düşünelim, bu devre düz voltajı salınıma çevirebiliyor,</p>
+<div class="figure">
+<img src="phy_num_01.png" />
+
+</div>
+<p>Devreyi sol taraftan verilen <span class="math inline">\(U_0(t)\)</span> ile kontrol etmek mümkün [1, sf. 189], [2, sf. 413]. Devreninin denklemi</p>
+<p><span class="math display">\[
+\ddot{x} = -x(t) + \dot{x}(t) ( 2.0 - p \dot{x}(t)^2 ) +  u(t)
+\]</span></p>
+<p>ki biz <span class="math inline">\(p = 0.1\)</span> seçeceğiz, ve konum değişkeni <span class="math inline">\(x(t)\)</span> <span class="math inline">\(t\)</span> anındaki elektrik akımı <span class="math inline">\(I\)</span>'yı temsil ediyor. ODE sistemini çıkartmak için <span class="math inline">\(x_1 = x\)</span>, <span class="math inline">\(x_2 = \dot{x}\)</span> dersek,</p>
+<p><span class="math display">\[
+\dot{x_2} = -x_1 + (2.0 - 0.1 x_2^2)x_2 + 4 u(t)
+\]</span></p>
+<p>Acaba <span class="math inline">\(x_1(t=0)=-5\)</span> ve <span class="math inline">\(x_2(t=0)=-5\)</span> başlangıç şartları için, <span class="math inline">\(t_f=2.5\)</span> anına kadar kontrolü ve salınımı az seviyede tutmaya çalışsak nasıl bir kontrol uygulamamız gerekir?</p>
+<p>Yani minimize etmek istedigimiz,</p>
+<p><span class="math display">\[
+J(u) = \int_{0}^{2.5} V  \mathrm{d} t = \int_{0}^{2.5} (x_1^2 + u^2)  \mathrm{d} t
+\]</span></p>
+<p>ki <span class="math inline">\(V = x_1^2 + u^2\)</span>.</p>
+<p>Not: Üstteki formül tam formül <span class="math inline">\(J(u) = \phi(x(t_f) + \int_{0}^{2.5} V \mathrm{d} t\)</span> formulunden biraz farklı, <span class="math inline">\(\phi\)</span> yok, yani varılan son konum için bir bedel tanımlanmadı. Bunun sonucu <span class="math inline">\(\lambda(t_f)\)</span>'in sıfır olmasıdır.</p>
+<p>Hamiltonian'ı tanımlarken</p>
+<p><span class="math display">\[
+\mathcal{H} = V + \lambda^T f
+\]</span></p>
+<p>formülü verilmişti. <span class="math inline">\(f\)</span> formülü üstte görülen <span class="math inline">\(\dot{x}_1\)</span> ve <span class="math inline">\(\dot{x}_2\)</span>'den oluşuyor tabii.</p>
+<p>Şimdi <span class="math inline">\(\mathcal{H}\)</span>'yi sembolik olarak bulalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sympy
+
+u, x1, x2, lam1, lam2 <span class="op">=</span> sympy.symbols(<span class="st">&#39;u x1 x2 lam1 lam2&#39;</span>)
+x <span class="op">=</span> sympy.Matrix([[x1],[x2]])
+lam <span class="op">=</span> sympy.Matrix([[lam1],[lam2]])
+f <span class="op">=</span> sympy.Matrix([[x[<span class="dv">1</span>]],[  <span class="op">-</span>x[<span class="dv">0</span>]<span class="op">+</span>(<span class="fl">2.0</span> <span class="op">-</span> <span class="fl">0.1</span><span class="op">*</span>x[<span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span>)<span class="op">*</span>x[<span class="dv">1</span>] <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>u ]])
+V <span class="op">=</span> x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> u<span class="op">**</span><span class="dv">2</span>
+H <span class="op">=</span> V <span class="op">+</span> lam.T.dot(f)
+<span class="bu">print</span> (H)
+<span class="bu">print</span> (sympy.latex(H))</code></pre></div>
+<pre><code>lam1*x2 + lam2*(4*u - x1 + x2*(2.0 - 0.1*x2**2)) + u**2 + x1**2
+lam_{1} x_{2} + lam_{2} \left(4 u - x_{1} + x_{2} \left(2.0 - 0.1 x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}</code></pre>
+<p><span class="math display">\[
+\mathcal{H} = \lambda_{1} x_{2} + \lambda_{2} \left(4 u - x_{1} + x_{2} \left(2.0 - 0.1
+x_{2}^{2}\right)\right) + u^{2} + x_{1}^{2}
+\]</span></p>
+<p>Eğer bu formülü biraz masajlarsak, [2]'deki sonucu elde ederiz,</p>
+<p><span class="math display">\[
+= x_1^2 + u^2 + \lambda_1 x_2 - \lambda_2
+\left( x_1 - 4u + x_2 \left( \frac{x_2^2}{10} - 2 \right)  \right)
+\]</span></p>
+<p><span class="math inline">\(\dot{\lambda} = -(\partial \mathcal{H} / \partial x)^T\)</span> ve <span class="math inline">\(\lambda(t_f) = (\partial \phi / \partial x)^T\)</span> üzerinden ,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">lam_dot <span class="op">=</span> <span class="op">-</span>sympy.diff(H, x).T
+<span class="bu">print</span> (lam_dot)</code></pre></div>
+<pre><code>Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])</code></pre>
+<p><span class="math display">\[
+\left[\begin{array}{c}
+\dot{\lambda_1} \\ \dot{\lambda_2} 
+\end{array}\right] =
+\left[\begin{array}{c}
+\lambda_2 - 2 x_1 \\
+\lambda_1 \left( \frac{3 x_2^2}{10} - 2  \right) - \lambda_1
+\end{array}\right],
+\quad
+\left[\begin{array}{c}
+\lambda_1(t_f) \\ \lambda_2(t_f) 
+\end{array}\right] =
+\left[\begin{array}{c}
+0 \\ 0
+\end{array}\right]
+\]</span></p>
+<p>Optimal kontrol girdisi için <span class="math inline">\(u(t)\)</span>'yi için bir çözüm bulmayı gerektiriyor,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">u, x1, x2, lam1, lam2 <span class="op">=</span> sympy.symbols(<span class="st">&#39;u x1 x2 lam1 lam2&#39;</span>)
+HH <span class="op">=</span> lam1<span class="op">*</span>x2 <span class="op">+</span> u<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> x1<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> lam2<span class="op">*</span>(x1 <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>u <span class="op">+</span> x2<span class="op">*</span>(x2<span class="op">**</span><span class="dv">2</span><span class="op">/</span><span class="dv">10</span> <span class="op">-</span> <span class="dv">2</span>))
+uopt <span class="op">=</span> sympy.solve(HH.diff(u),u)[<span class="dv">0</span>]
+<span class="bu">print</span> ( uopt )</code></pre></div>
+<pre><code>-2*lam2</code></pre>
+<p>Yani</p>
+<p><span class="math display">\[
+u^\ast(t) = -2 \lambda_2(t)
+\]</span></p>
+<p>sonucuna eriştik. Bulduğumuz optimal <span class="math inline">\(u^\ast\)</span> değerini <span class="math inline">\(f\)</span> denklemindeki <span class="math inline">\(u\)</span>'lar yerine koyarsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x_dot <span class="op">=</span> f.subs({u: uopt})
+<span class="bu">print</span> (x_dot)</code></pre></div>
+<pre><code>Matrix([[x2], [-8*lam2 - x1 + x2*(2.0 - 0.1*x2**2)]])</code></pre>
+<p>Daha önceden bulduğumuz <span class="math inline">\(\dot{\lambda}\)</span> formülünü hatırlayalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (lam_dot)</code></pre></div>
+<pre><code>Matrix([[lam2 - 2*x1, -lam1 - lam2*(2.0 - 0.3*x2**2)]])</code></pre>
+<p>Artık elimizde bir iki noktalı sınır problemi var, bu problemi sayısal olarak çözebiliriz.</p>
+<p><span class="math display">\[
+\left[\begin{array}{c}
+\dot{x}_1 \\ 
+\dot{x}_2 \\ 
+\dot{\lambda}_1 \\ 
+\dot{\lambda}_2 
+\end{array}\right] = 
+\left[\begin{array}{c}
+x_2 \\ 
+-x_1 + (2 - 0.1 x_2^2 ) x_2 - 8 \lambda_2 \\
+\lambda_2 \\
+\lambda_1 \left( \frac{3x_2^2}{10} - 2  \right) - \lambda_1
+\end{array}\right], 
+\quad
+\left[\begin{array}{c}
+x_1(0) \\ x_2(0) \\ \lambda_1(t_f) \\ \lambda_2(t_f)
+\end{array}\right] = 
+\left[\begin{array}{c}
+-5 \\ -5 \\ 0 \\ 0
+\end{array}\right]
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.integrate <span class="im">import</span> solve_bvp
+
+<span class="kw">def</span> fun(x, y):
+    <span class="cf">return</span> np.vstack((
+        y[<span class="dv">1</span>],
+        <span class="dv">-8</span><span class="op">*</span>y[<span class="dv">3</span>] <span class="op">-</span> y[<span class="dv">0</span>] <span class="op">-</span> y[<span class="dv">1</span>]<span class="op">*</span>(y[<span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span><span class="op">/</span><span class="fl">10.0</span>),
+        y[<span class="dv">3</span>]<span class="op">-</span><span class="dv">2</span><span class="op">*</span>y[<span class="dv">0</span>],
+        y[<span class="dv">3</span>]<span class="op">*</span>(<span class="dv">3</span><span class="op">/</span><span class="dv">10</span><span class="op">*</span>y[<span class="dv">1</span>]<span class="op">**</span><span class="dv">2-2</span>) <span class="op">-</span> y[<span class="dv">2</span>]
+        )
+    )
+
+<span class="kw">def</span> bc(ya, yb):
+    <span class="cf">return</span> np.array( [ ya[<span class="dv">0</span>]<span class="op">+</span><span class="dv">5</span>, ya[<span class="dv">1</span>]<span class="op">+</span><span class="dv">5</span>, yb[<span class="dv">2</span>], yb[<span class="dv">3</span>] ]   )
+                     
+t <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="fl">2.5</span>, <span class="dv">10</span>)
+y <span class="op">=</span> np.ones((<span class="dv">4</span>, t.size))
+sol <span class="op">=</span> solve_bvp(fun, bc, t, y)
+<span class="bu">print</span> (y.shape)
+<span class="bu">print</span> (sol.y[<span class="dv">0</span>].shape)</code></pre></div>
+<pre><code>(4, 10)
+(35,)</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df <span class="op">=</span> pd.DataFrame()
+df[<span class="st">&#39;x1&#39;</span>] <span class="op">=</span> sol.y[<span class="dv">0</span>]
+df[<span class="st">&#39;x2&#39;</span>] <span class="op">=</span> sol.y[<span class="dv">1</span>]
+df.plot()
+plt.savefig(<span class="st">&#39;phy_num_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="phy_num_02.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df <span class="op">=</span> pd.DataFrame()
+df[<span class="st">&#39;$\lambda_1$&#39;</span>] <span class="op">=</span> sol.y[<span class="dv">2</span>]
+df[<span class="st">&#39;$\lambda_2$&#39;</span>] <span class="op">=</span> sol.y[<span class="dv">3</span>]
+df.plot()
+plt.savefig(<span class="st">&#39;phy_num_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="phy_num_03.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df <span class="op">=</span> pd.DataFrame()
+df[<span class="st">&#39;u&#39;</span>] <span class="op">=</span> <span class="dv">-2</span><span class="op">*</span>sol.y[<span class="dv">3</span>]
+df.plot()
+plt.savefig(<span class="st">&#39;phy_num_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="phy_num_04.png" />
+
+</div>
+<p>Son grafikte optimal kontrol politikasını görüyoruz.</p>
+<p>Fonksiyon ve Fonksiyonel Optimizasyonu, Lagrangian, Hamiltonian</p>
+<p>Fonksiyon<em>el</em>den önce fonksiyon optimizasyonuna bakalım. Bu yazıda özellikle şartlı durumlar içeren optimizasyonlara bakacağız. Eğer elimizde bir bedel fonksiyonu var ise, bir diğer fonksiyonu Lagrange çarpanları yöntemi ile minimize edebiliriz.</p>
+<p>Örnek</p>
+<p>Bir depo üreticisi, silindir şeklinde ürettiği depoların eldeki sabit materyel ile maksimum hacim kapsayacak şekilde üretilmesini istiyor. Eğer materyelin (mesela demir olabilir) deponun her yerinde sabit kalınlıkta olacağını farz edersek, deponun ölçütleri ne olmalıdır? [3, sf. 42]</p>
+<div class="figure">
+<img src="cylinder.png" />
+
+</div>
+<p>Çözüm</p>
+<p>Aynı kalınlıkta materyel olacaksa, ve sabit materyel de olduğuna göre, depo dış alanının da sabit olması gereklidir. O zaman bu problem 'verili bir silindir dış alanına sahip en maksimal hacmi verecek depo boyutları nedir?' sorusuna dönüştü. Diyelim <span class="math inline">\(d\)</span> deponun çapı, <span class="math inline">\(h\)</span> yüksekliği. O zaman hacim</p>
+<p><span class="math display">\[
+V(d,h) = \pi d^2 h / 4
+\]</span></p>
+<p>Alan</p>
+<p><span class="math display">\[
+A(d,h) = 2 \pi d^2 / 4 + \pi d h = A_0
+\]</span></p>
+<p><span class="math inline">\(\pi d h\)</span> nereden geldi? Bu silindirin yan taraflarını iki dikdörtgen olacak şekilde açabilirdik, bu dikdörtgenlerin bir kenarı <span class="math inline">\(\pi r = \pi \cdot d/2\)</span>, yüksekliği <span class="math inline">\(h\)</span>, onlardan iki tane var, toplam alan <span class="math inline">\(\pi \cdot d/2 \cdot h \cdot 2 = \pi d h\)</span>. Alt ve üstte iki tane daire var zaten, her biri <span class="math inline">\(\pi \left( \frac{d}{2} \right)^2\)</span> iki tane <span class="math inline">\(2 \pi d^2 / 4\)</span>.</p>
+<p>Amacımız <span class="math inline">\(A(d,h) = A_0\)</span> seviyesinde tutarken (bu bir kısıtlama, şart) <span class="math inline">\(V(d,h)\)</span>'yi maksimize etmek.</p>
+<p>Lagrange çarpanlarıyla bu işi yapabiliriz, hem ana fonksiyonu hem de şartları birleştirip yeni bir genişleştirilmiş fonksiyon yaratırız, ve bu yeni fonksiyonun ekstrem noktasını klasik yöntemle buluruz, tüm değişkenleri üzerinden kısmı türevlerini alıp sıfıra eşitleriz, ve tüm bu denklem sistemini çözeriz.</p>
+<p>Maksimize edilecek hacim formülünü</p>
+<p><span class="math display">\[
+f(d,h) = \pi d^2 h / 4
+\]</span></p>
+<p>olarak yazalım, tatmin edilecek kısıtlamayı</p>
+<p><span class="math display">\[
+g(d,h) = 2 \pi d^2 / 4 + \pi d h - A_0 = 0
+\]</span></p>
+<p>Şimdi <em>Lagrangian</em> adı verilen yeni bir birleşmiş fonksiyon</p>
+<p><span class="math display">\[
+\mathcal{L}(d,h,\lambda) = f(d,h) + \lambda g(d,h) 
+\]</span></p>
+<p><span class="math display">\[
+= \pi d^2 h / 4 + \lambda (2 \pi d^2 / 4 + \pi d h - A_0 )
+\]</span></p>
+<p>yaratılır, ki Lagrange çarpanı denilen <span class="math inline">\(\lambda\)</span> daha bilinmiyor. Lagrangian <span class="math inline">\(\mathcal{L}\)</span> üç değişkenin fonksiyonu olduğuna göre <span class="math inline">\(\mathcal{L}\)</span>'in bu üç değişkene göre kısmi türevini alıp sıfıra eşitlemek gerekiyor.</p>
+<p><span class="math display">\[
+\frac{\partial \mathcal{L}}{\partial d} = \pi d h / 2 + \lambda (\pi d + \pi h) = 0
+\]</span></p>
+<p><span class="math display">\[
+\frac{\partial \mathcal{L}}{\partial h} = \pi d^2 / 4 + \lambda (\pi d) = 0 
+\]</span></p>
+<p><span class="math display">\[
+\frac{\partial \mathcal{L}}{\partial \lambda} = 2\pi d^2 / 4 + \pi d h - A_0 = 0
+\]</span></p>
+<p>Üstteki üç denklemi çözünce</p>
+<p><span class="math display">\[
+d^\ast = \sqrt{\frac{2 A_0}{3 \pi}}, \quad
+h^\ast = \sqrt{\frac{2 A_0}{3 \pi}}, \quad
+\lambda^\ast = -\sqrt{\frac{A_0}{24 \pi}}
+\]</span></p>
+<p>Bu sonuçlar diyor ki silindirsel deponun hacmini maksimize etmek için onun çapını ve yüksekliğini aynı tutmalıyız.</p>
+<p>Hamiltonian Biçimi</p>
+<p>Daha önce Lagrangian biçimini gördük, <span class="math inline">\(x=x(t)\)</span>, <span class="math inline">\(u=u(t)\)</span>, <span class="math inline">\(\dot{x}=\dot{x}(t)\)</span>, <span class="math inline">\(\lambda=\lambda(t)\)</span> olmak üzere, sistem denklemi</p>
+<p><span class="math display">\[
+\dot{x} = f(x, u, t)
+\]</span></p>
+<p>idi, sınır şartları <span class="math inline">\(x(t_0)\)</span> sabit, <span class="math inline">\(x(t_f)\)</span> serbest bırakılmış. Performans ölçütü bizim tanımlayabileceğimiz bir <span class="math inline">\(V\)</span> üzerinden basit haliyle şöyleydi,</p>
+<p><span class="math display">\[
+J(u) = \int_{t_0}^{t_f} V(x, u, t) \mathrm{d} t
+\]</span></p>
+<p>Sınır şartı <span class="math inline">\(g\)</span> sistem denklemi üzerinden,</p>
+<p><span class="math display">\[
+g(x, \dot{x}, u, t) = f(x, u, t) - \dot{x} = 0
+\]</span></p>
+<p>Lagrangian'i oluşturalım (<span class="math inline">\(g\)</span> burada),</p>
+<p><span class="math display">\[
+\mathcal{L} = \mathcal{L}( x, \dot{x}, u, \lambda, t) =
+V( x, u, t) +  \lambda^T g 
+\]</span></p>
+<p><span class="math display">\[
+= V(x, u, t) +  \lambda^T \big\{ f(x, u, t) - \dot{x} \big\}
+\qquad (4)
+\]</span></p>
+<p>Performans ölçütü şimdi şöyle oldu,</p>
+<p><span class="math display">\[
+J_a(u) = \int_{t_0}^{t_f} \mathcal{L}( x, \dot{x}, u, \lambda, t)
+\]</span></p>
+<p>Eğer Hamiltonian biçimine geçmek istiyorsak, bir <span class="math inline">\(\mathcal{H}\)</span> tanımlarız,</p>
+<p><span class="math display">\[
+\mathcal{H}(x, u, \lambda, t) = V( x, u, t) + \lambda^T f(x, u, t)
+\]</span></p>
+<p>o zaman Lagrangian <span class="math inline">\(\mathcal{H}\)</span> formu da şu hale gelir,</p>
+<p><span class="math display">\[
+\mathcal{L}( x, \dot{x}, u, \lambda, t) = 
+\mathcal{H}(x, u, \lambda, t) - \lambda^T \dot{x}
+\qquad (5)
+\]</span></p>
+<p>Bu aslında (4)'ün açılmış hali, ve o ilk bölümün <span class="math inline">\(\mathcal{H}\)</span> olarak tanımlanması,</p>
+<p><span class="math display">\[ 
+\mathcal{L} = \underbrace{V( x, u, t) + \lambda^T f( x, u, t))}_{\mathcal{H}} - 
+\lambda^T \dot{x}(t) 
+\]</span></p>
+<p>Şimdi Euler-Lagrange işlemini hatırlayalım, eldeki değişkenler <span class="math inline">\(x,\lambda,u\)</span> üzerinden bu denklemler</p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial x} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{x}} \right) 
+= 0 
+\quad
+\textrm{konum (state) denklemi}
+\]</span></p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial \lambda} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{\lambda}} \right) 
+= 0
+\quad
+\textrm{eşkonum (costate) denklemi}
+\]</span></p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial u} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{u}} \right) 
+= 0
+\quad
+\textrm{kontrol (control) denklemi}
+\]</span></p>
+<p>Üstte belirtildiği gibi bu denklemlere konum, eşkonum, kontrol denklemleri ismi veriliyor. Şimdi biz bu türetmeyi içinde <span class="math inline">\(\mathcal{H}\)</span> olan <span class="math inline">\(\mathcal{L}\)</span> için yapacağız, çünkü bu şekilde belli daha uygun formlar elde etmek istiyoruz, yani (4) denklemini baz alarak, üstteki üç formülü uygulayınca,</p>
+<p><span class="math display">\[
+\frac{\partial \mathcal{L}}{\partial x} = 
+\frac{\partial \mathcal{H}}{\partial x} - 
+\frac{\mathrm{d}}{\mathrm{d} t} \left( -\lambda \right)   = 0
+\]</span></p>
+<p><span class="math display">\[
+\frac{\partial \mathcal{L}}{\partial \lambda} = 
+\frac{\partial \mathcal{H}}{\partial \lambda} - \dot{x} -
+\frac{\mathrm{d}}{\mathrm{d} t} \left( 0 \right)   = 0
+\]</span></p>
+<p><span class="math display">\[
+\frac{\partial \mathcal{L}}{\partial u} = 
+\frac{\partial \mathcal{H}}{\partial u} - 
+\frac{\mathrm{d}}{\mathrm{d} t} \left( 0 \right)   = 0
+\]</span></p>
+<p>Ve bu türetme üzerinden konum, eşkonum, kontrol denklemlerinin yeniden düzenlenmiş hali şöyle olur,</p>
+<p><span class="math display">\[
+\dot{x} = + \left( \frac{\partial \mathcal{H}}{\partial \lambda} \right)
+\]</span></p>
+<p><span class="math display">\[
+\dot{\lambda} = - \left( \frac{\partial \mathcal{H}}{\partial x} \right)
+\]</span></p>
+<p><span class="math display">\[
+0 = + \left( \frac{\partial \mathcal{H}}{\partial u} \right)
+\]</span></p>
+<p>Üstteki son denklem Hamiltonian <span class="math inline">\(\mathcal{H}\)</span>'nin kontrol <span class="math inline">\(u\)</span>'ya göre nasıl optimize edileceğini gösteriyor. Yani <span class="math inline">\(J\)</span> fonksiyonelin sistem denklemine göre optimize edilmesi problemi şimdi Hamiltonian fonksiyonunun <span class="math inline">\(u\)</span> bazında optimize edilmesi problemine dönüştü. Böylece orijinal fonksiyonel optimizasyonunu normal bir fonksiyon optimizasyon problemine indirgemiş olduk [3, sf. 86].</p>
+<p>Örnek [3, sf. 70]</p>
+<p>Çift entegre edici (double-integrator) sistemine bakalım.</p>
+<p><span class="math display">\[
+\dot{x}_1(t) = x_2(t)
+\]</span></p>
+<p><span class="math display">\[
+\dot{x}_2(t) = u(t)
+\]</span></p>
+<p>Performans ölçütü</p>
+<p><span class="math display">\[
+J = \frac{1}{2} \int_{t_0}^{t_f} u^2 \mathrm{d} t
+\]</span></p>
+<p>Yani <span class="math inline">\(u(t)\)</span>'nin, tüm değerlerinin, ortalama olarak fazla büyük olmasını istemiyoruz. Sınır şartları <span class="math inline">\(\underline{x} = \left[\begin{array}{cc} x_1 &amp; x_2 \end{array}\right]^T\)</span> olmak üzere,</p>
+<p><span class="math display">\[
+\underline{x}(0) = \left[\begin{array}{cc} 1 &amp; 2 \end{array}\right]^T \quad 
+\underline{x}(2) = \left[\begin{array}{cc} 1 &amp; 0 \end{array}\right]^T 
+\]</span></p>
+<p>Yazının geri kalanında <span class="math inline">\(\underline{x}\)</span>, vs. kullanılmayacak, çerçeveden boyut tahmin edilebilir.</p>
+<p>Çözüm</p>
+<p>Hamiltonian'ı oluşturalım çünkü tüm sonuç türevleri ona göre alınıyor artık; o zaman <span class="math inline">\(V,\lambda,f\)</span> gerekiyor.</p>
+<p><span class="math display">\[
+V(x,u,t) = V(u) = \frac{1}{2} u^2
+\]</span></p>
+<p><span class="math display">\[
+f(x,u,t) = \left[\begin{array}{cc} f_1 &amp; f_2 \end{array}\right]^T
+\]</span></p>
+<p>oyle ki <span class="math inline">\(f_1 = x_2(t)\)</span>, <span class="math inline">\(f_2 = u(t)\)</span>.</p>
+<p>Hamiltonian</p>
+<p><span class="math display">\[
+\mathcal{H} = \mathcal{H}(x_1, x_2, u, \lambda_1, \lambda_2)
+\]</span></p>
+<p><span class="math display">\[
+= V(u) + \lambda^T f(x,u)
+\]</span></p>
+<p><span class="math display">\[
+= \frac{1}{2} u^2 + \lambda_1 x_2 + \lambda_2 u 
+\]</span></p>
+<p>Optimal <span class="math inline">\(u^\ast\)</span>'yu bulmak için <span class="math inline">\(\frac{\partial \mathcal{H}}{\partial u}\)</span> denklemini kullanıyoruz,</p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{H}}{\partial u} \right) = 0 \to
+u^\ast + \lambda_2^\ast = 0
+\]</span></p>
+<p><span class="math display">\[
+u^\ast = -\lambda_2^\ast
+\]</span></p>
+<p>Optimal <span class="math inline">\(\mathcal{H}\)</span>'yi bulmak için üstteki değerleri üç üstteki formüle sokuyoruz,</p>
+<p><span class="math display">\[
+\mathcal{H}^\ast(x_1^\ast, x_2^\ast,\lambda_1^\ast,\lambda_2^\ast) = 
+\frac{1}{2} \lambda_2^\ast + \lambda_1^\ast x_2^\ast - \lambda_2^\ast 
+\]</span></p>
+<p><span class="math display">\[
+= \lambda_1^\ast x_2^\ast - \frac{1}{2} {\lambda_2^\ast}^2  
+\]</span></p>
+<p>Devam edersek, <span class="math inline">\(\dot{x} = \left( \frac{\partial \mathcal{H}}{\partial \lambda} \right)\)</span> denkleminden hareketle,</p>
+<p><span class="math display">\[
+\dot{x}^\ast_1 = \left( \frac{\partial \mathcal{H}}{\partial \lambda_1} \right) =
+x_2^\ast
+\]</span></p>
+<p><span class="math display">\[
+\dot{x}^\ast_2 = \left( \frac{\partial \mathcal{H}}{\partial \lambda_2} \right) =
+\lambda_2^\ast
+\]</span></p>
+<p>Ve <span class="math inline">\(\dot{\lambda} = - \left( \frac{\partial \mathcal{H}}{\partial x} \right)\)</span> denkleminden hareketle,</p>
+<p><span class="math display">\[
+\dot{\lambda}_1^\ast = - \left( \frac{\partial \mathcal{H}}{\partial x_1} \right) = 0
+\]</span></p>
+<p><span class="math display">\[
+\dot{\lambda}_2^\ast = - \left( \frac{\partial \mathcal{H}}{\partial x_2} \right) = 
+- \lambda_1^\ast
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sympy <span class="im">import</span> symbols, Eq, Function, dsolve, latex, simplify
+
+t <span class="op">=</span> symbols(<span class="st">&#39;t&#39;</span>) 
+x1,x2,lam1,lam2 <span class="op">=</span> symbols(<span class="st">&#39;x1 x2 lam1 lam2&#39;</span>,cls<span class="op">=</span>Function)
+
+system <span class="op">=</span> [Eq(x1(t).diff(t), x2(t)), <span class="op">\</span>
+          Eq(x2(t).diff(t), <span class="op">-</span>lam2(t)), <span class="op">\</span>
+          Eq(lam1(t).diff(t), <span class="dv">0</span>), <span class="op">\</span>
+          Eq(lam2(t).diff(t), <span class="op">-</span>lam1(t)),  <span class="op">\</span>
+          ]
+
+sol <span class="op">=</span> dsolve(system, [x1(t),x2(t),lam1(t),lam2(t)])
+<span class="bu">print</span> (latex(simplify(sol[<span class="dv">0</span>])))
+<span class="bu">print</span> (latex(simplify(sol[<span class="dv">1</span>])))
+<span class="bu">print</span> (latex(sol[<span class="dv">2</span>]))
+<span class="bu">print</span> (latex(sol[<span class="dv">3</span>]))</code></pre></div>
+<pre><code>x_{1}{\left(t \right)} = C_{1} + C_{2} t + C_{2} + \frac{C_{3} t^{2}}{2} + C_{3} t + C_{3} + \frac{C_{4} t^{3}}{6} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+x_{2}{\left(t \right)} = C_{2} + C_{3} t + C_{3} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+lam_{1}{\left(t \right)} = C_{4}
+lam_{2}{\left(t \right)} = - C_{3} - C_{4} t - C_{4}</code></pre>
+<p><span class="math display">\[
+x_{1}{\left(t \right)} = C_{1} + C_{2} t + C_{2} + \frac{C_{3} t^{2}}{2} + C_{3} t + C_{3} + \frac{C_{4} t^{3}}{6} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+\]</span></p>
+<p><span class="math display">\[
+x_{2}{\left(t \right)} = C_{2} + C_{3} t + C_{3} + \frac{C_{4} t^{2}}{2} + C_{4} t + C_{4}
+\]</span></p>
+<p><span class="math display">\[
+lam_{1}{\left(t \right)} = C_{4}
+\]</span></p>
+<p><span class="math display">\[
+lam_{2}{\left(t \right)} = - C_{3} - C_{4} t - C_{4}
+\]</span></p>
+<p>Sınır şartlarını tanımlayarak çözersek, ve sadece <span class="math inline">\(\lambda_2\)</span>'ye bakarsak (çünkü <span class="math inline">\(u(t)\)</span> sonucunu <span class="math inline">\(u(t) = -\lambda_2^\ast (t)\)</span> olarak bulmuştuk),</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">ics <span class="op">=</span> { x1(<span class="dv">0</span>):<span class="dv">1</span>, x2(<span class="dv">0</span>):<span class="dv">2</span>, x1(<span class="dv">2</span>):<span class="dv">1</span>, x2(<span class="dv">2</span>):<span class="dv">0</span> } 
+sol <span class="op">=</span> dsolve(system, [x1(t),x2(t),lam1(t),lam2(t)], ics<span class="op">=</span>ics)
+<span class="bu">print</span> (latex(sol[<span class="dv">3</span>]))</code></pre></div>
+<pre><code>lam_{2}{\left(t \right) = 4 - 3 t</code></pre>
+<p><span class="math display">\[
+\lambda_{2}{\left(t \right)} = 4 - 3 t
+\]</span></p>
+<p>O zaman,</p>
+<p><span class="math display">\[
+u = -\lambda_2 = 3t - 4
+\]</span></p>
+<p>Ozetlemek gerekirse, aynen bir bedel üzerinden fonksiyon optimize ettiğimiz gibi, bir fonksiyonel bedel üzerinden bir optimal fonsiyon da bulabiliriz. Lagrange çarpanları yöntemi hala geçerli, bir birleşmiş fonksiyonel yaratıyoruz, ve Euler-Lagrange üzerinden bu yeni fonksiyonelin alt denklemlerini çıkartıyoruz, ve sonra bu diferansiyel sistemini çözüyoruz.</p>
+<p>İki değişken üzerinden bakalım, şu fonksiyonel olsun [3, sf. 48],</p>
+<p><span class="math display">\[
+J(x_1(t),x_2(t),t) = J = 
+\int_{t_0}^{t_1} V(x_1(t), x_2(t), \dot{x}_1(t), \dot{x}_2(t), t) \mathrm{d} t
+\]</span></p>
+<p>kısıtlama şartı (kontrol teorisindeki sistem denklemi buraya geliyor)</p>
+<p><span class="math display">\[
+g(x_1(t), x_2(t), \dot{x}_1(t), \dot{x}_2(t)) = 0
+\]</span></p>
+<p>ve şu sabit uç noktaları geçerli olacak şekilde,</p>
+<p><span class="math display">\[
+x_1(t_0) = x_{10}, \quad x_2(t_0) = x_{20}
+\]</span></p>
+<p><span class="math display">\[
+x_1(t_f) = x_{1f}, \quad x_2(t_f) = x_{2f}
+\]</span></p>
+<p>Euler-Lagrange</p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial x_1} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{x}_1} \right) 
+= 0
+\]</span></p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial x_2} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{x}_2} \right) 
+= 0
+\]</span></p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial \lambda} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{\lambda}} \right) 
+= 0
+\]</span></p>
+<p>Örnek</p>
+<p>Performans değerini</p>
+<p><span class="math display">\[
+J = \int_{0}^{1} \left[ x^2(t) + u^2(t) \right] \mathrm{d} t
+\]</span></p>
+<p>optimize edin ki uç noktalar</p>
+<p><span class="math display">\[
+x(0) = 1, \quad x(1) = 0
+\]</span></p>
+<p>ve kısıtlama (sistem denklemi)</p>
+<p><span class="math display">\[
+\dot{x}(t) = -x(t) + u(t)
+\]</span></p>
+<p>olacak şekilde.</p>
+<p>Çözüm</p>
+<p>İlk önce sistem denklemini <span class="math inline">\(g\)</span> formunda yazalım,</p>
+<p><span class="math display">\[
+g( x(t), \dot{x}(t), u(t) ) =  \dot{x}(t) + x(t) - u(t)  = 0
+\]</span></p>
+<p>Lagrange çarpanlar yöntemi ile birleşik fonksiyoneli yaratalım,</p>
+<p><span class="math display">\[
+J = \int_{0}^{1} \left[ 
+  x^2(t) + u^2(t) + \lambda(t) \left\{ \dot{x}(t) + x(t) - u(t)  \right\}
+\right] \mathrm{d} t
+\]</span></p>
+<p><span class="math display">\[
+=  \int_{0}^{1} \mathcal{L} (x(t), \dot{x}(t),u(t),\lambda(t)) \mathrm{d} t
+\]</span></p>
+<p>Şimdi üstteki Lagrangian üzerinde Euler-Lagrange formülünü uygulayalım,</p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial x_1} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{x}_1} \right) =
+0 \to 2 x(t) + \lambda(t) - \dot{\lambda}(t) = 0
+\qquad (1)
+\]</span></p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial u} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{u}} \right) =
+0 \to 2u(t) - \lambda(t) = 0
+\qquad (2)
+\]</span></p>
+<p><span class="math display">\[
+\left( \frac{\partial \mathcal{L}}{\partial \lambda} \right) -
+\frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{\lambda}} \right) =
+0 \to \dot{x}(t) + x(t) - u(t) = 0
+\qquad (3)
+\]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li>ve (3) formüllerini birleştirince,</li>
+</ol>
+<p><span class="math display">\[
+\lambda(t) = 2 u(t) = 2 (\dot{x}(t) + x(t) )
+\]</span></p>
+<p>Sonra (1) formülünü dahil edelim,</p>
+<p><span class="math display">\[
+2 x(t) + 2 (\dot{x}(t) + x(t)) - 2(\ddot{x}(t) + \dot{x}(t) ) = 0
+\]</span></p>
+<p>Basitleştirirsek,</p>
+<p><span class="math display">\[
+\ddot{x}(t) - 2x(t) = 0
+\]</span></p>
+<p>Çözelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sympy
+
+t <span class="op">=</span> sympy.symbols(<span class="st">&#39;t&#39;</span>)
+x <span class="op">=</span> sympy.Function(<span class="st">&#39;x&#39;</span>)
+diffeq <span class="op">=</span> sympy.Eq(x(t).diff(t, t) <span class="op">-</span> <span class="dv">2</span><span class="op">*</span>x(t),<span class="dv">0</span>)
+<span class="bu">print</span> (sympy.latex (sympy.dsolve(diffeq, x(t))))</code></pre></div>
+<pre><code>x{\left(t \right)} = C_{1} e^{- \sqrt{2} t} + C_{2} e^{\sqrt{2} t}</code></pre>
+<p><span class="math display">\[
+x{\left(t \right)} = C_{1} e^{- \sqrt{2} t} + C_{2} e^{\sqrt{2} t}
+\]</span></p>
+<p>Eğer başlangıç ve bitiş şartlarını verirsek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">diffeq <span class="op">=</span> sympy.Eq(x(t).diff(t, t) <span class="op">-</span> <span class="dv">2</span><span class="op">*</span>x(t),<span class="dv">0</span>)
+solved <span class="op">=</span> sympy.dsolve(diffeq, x(t), ics<span class="op">=</span>{x(<span class="dv">0</span>):<span class="dv">1</span>,x(<span class="dv">1</span>):<span class="dv">0</span> } ) 
+solved <span class="op">=</span> sympy.simplify(solved)
+<span class="bu">print</span> (sympy.latex (solved))</code></pre></div>
+<pre><code>x{\left(t \right)} = \frac{\left(e^{2 \sqrt{2} t} - e^{2 \sqrt{2}}\right) e^{- \sqrt{2} t}}{1 - e^{2 \sqrt{2}}}</code></pre>
+<p><span class="math display">\[
+x{\left(t \right)} = \frac{\left(e^{2 \sqrt{2} t} - e^{2 \sqrt{2}}\right) e^{- \sqrt{2} t}}{1 - e^{2 \sqrt{2}}}
+\]</span></p>
+<p>Ve <span class="math inline">\(u\)</span> için [3]'e bakarsak,</p>
+<p><span class="math display">\[
+u(t) = \dot{x}(t) + x(t) 
+\]</span></p>
+<p>olduğu için</p>
+<p><span class="math display">\[
+u(t) = C_1(1-\sqrt{2}) e^{-\sqrt{2t}} + C_2(1-\sqrt{2}) e^{\sqrt{2t}} 
+\]</span></p>
+<p>ki <span class="math inline">\(C_1 = 1/(1-e^{-2\sqrt{2}})\)</span> ve <span class="math inline">\(C_2 = 1/(1-e^{2\sqrt{2}})\)</span></p>
+<p>Böylece tanımladığımız bedeli optimize edecek bir kontrol aksiyonu <span class="math inline">\(u\)</span> ve <span class="math inline">\(x\)</span> elde etmiş olduk.</p>
+<p>Kaynaklar</p>
+<p>[1] Bittner, <em>Variational calculus, optimal control and applications</em></p>
+<p>[2] Wilson, <em>Advanced Control using MATLAB</em></p>
+<p>[3] Naidu, <em>Optimal Control Systems</em></p>
+</body>
+</html>

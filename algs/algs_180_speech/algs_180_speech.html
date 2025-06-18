@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="konuşma-tanıma-speech-recognition">Konuşma Tanıma (Speech Recognition)</h1>
+<p>Frekans Üzerinden Özellik Çıkartımı, RNN, LSTM, GRU</p>
+<p>1 saniyelik ses dosyaları var, bu dosyalardaki ses kayıtları dört farklı komutu içeriyor, İngilizce up, down, yes, no (yukarı, aşağı, evet, hayır) komutları. Ses kayıtları aslında zaman serileridir, tek boyutlu bir veri, mesela 1 saniyelik 16,000 sayı içeren bir vektör. Örnek bir 'down' kaydının neye benzediğini görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> util
+<span class="im">import</span> scipy.io.wavfile, zipfile
+<span class="im">import</span> io, time, os, random, re
+
+f <span class="op">=</span> util.train_dir <span class="op">+</span> <span class="st">&#39;/down/004ae714_nohash_0.wav&#39;</span>
+wav <span class="op">=</span> io.BytesIO(<span class="bu">open</span>(f).read())
+v <span class="op">=</span> scipy.io.wavfile.read(wav)
+<span class="bu">print</span> v[<span class="dv">1</span>]
+plt.plot(v[<span class="dv">1</span>])
+plt.savefig(<span class="st">&#39;speech_01.png&#39;</span>)</code></pre></div>
+<pre><code>train 8537 val 949
+[-130 -135 -131 ..., -154 -190 -224]</code></pre>
+<div class="figure">
+<img src="speech_01.png" />
+
+</div>
+<p>Yapay öğrenme bağlamında zaman serileri için daha önce [7] yazısında LSTM yapısını görmüştük. Örnek olarak zaman serilerini sınıfladık, zaman serisindeki tüm veriler LSTM'e verilmişti, o zaman bir şeride 150 kusur veri noktası varsa, o kadar LSTM hücresi yaratılacaktı. Fakat içinde binlerce öğe olan seriler için bu iyi olmayabilir. Çözüm seriyi bir şekilde özetleyerek bu daha az olan veriyi LSTM'e vermek. Bu özetlere ses işleme alanında parmak izi (fingerprint) ismi de verilmekte.</p>
+<p>Ses verilerini frekans üzerinden özetlemek bilinen bir teknik, ses verisi ufak pencerelere bölünür, bu pencereler üzerinde Fourier transformu işletilir, ve oradaki frekans bilgileri, hangi frekansın ne kadar önemli olduğu elde edilir. Spektogram bu bilgiyi renkli olarak göstermenin bir yolu, üstteki ses için,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.specgram(v[<span class="dv">1</span>], Fs<span class="op">=</span>util.fs, NFFT<span class="op">=</span><span class="dv">1024</span>)
+plt.savefig(<span class="st">&#39;speech_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="speech_02.png" />
+
+</div>
+<p>Spektogramın örüntü tanıma için kullanılabileceğini anlamak için bir tane daha farklı 'down' sesi, bir de 'no' sesinin spektogramına bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">f1 <span class="op">=</span> util.train_dir <span class="op">+</span> <span class="st">&#39;/down/0f3f64d5_nohash_2.wav&#39;</span>
+wav1 <span class="op">=</span> io.BytesIO(<span class="bu">open</span>(f1).read())
+v1 <span class="op">=</span> scipy.io.wavfile.read(wav1)
+plt.specgram(v1[<span class="dv">1</span>], Fs<span class="op">=</span>util.fs, NFFT<span class="op">=</span><span class="dv">1024</span>)
+plt.savefig(<span class="st">&#39;speech_03.png&#39;</span>)
+
+f2 <span class="op">=</span> util.train_dir <span class="op">+</span> <span class="st">&#39;/no/01bb6a2a_nohash_0.wav&#39;</span>
+wav2 <span class="op">=</span> io.BytesIO(<span class="bu">open</span>(f2).read())
+v2 <span class="op">=</span> scipy.io.wavfile.read(wav2)
+plt.specgram(v2[<span class="dv">1</span>], Fs<span class="op">=</span>util.fs, NFFT<span class="op">=</span><span class="dv">1024</span>)
+plt.savefig(<span class="st">&#39;speech_04.png&#39;</span>)</code></pre></div>
+<p><img src="speech_03.png" /> <img src="speech_04.png" /></p>
+<p>Görüyoruz ki 'down' seslerinin spektogramları birbirine benziyor. Öğrenme için bu yapıyı kullanabiliriz. Bu arada spektogram &quot;grafiği'' y-ekseninde frekansları, x-ekseni zaman adımları gösterir, grafikleme kodu her zaman penceresindeki belli frekans kuvvetlerinin hangi frekans kutucuğuna düştüğüne bakar ve o kutucukta o kuvvete göre renklendirme yapar. Şimdi bu grafikleme amaçlı, ama bazıları bu grafiğe bakarak &quot;ben çıplak gözle bunu tanıyabiliyorum, o zaman görsel tanımayla üstteki imajla sesi tanıyacak bir DYSA kullanayım'' diye düşünebiliyor. Bu işleyen bir metot, zaten DYSA'nın görsel tanıma tarihi eski, orada bilinen bir sürü teknik var. Her neyse bazıları üstteki görsel spektogram grafiği, yani R,G,B kanallı çıktı üzerinde görsel tanıma yapmayı da seçebiliyor, fakat bu şart değil, bir spektogram, bir veri durumunda iki boyutlu bir matriste gösterilebilir. TensorFlow ile bu hesabı örnek rasgele bir veri üzerinde yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+init_op <span class="op">=</span> tf.global_variables_initializer()
+data <span class="op">=</span> tf.placeholder(tf.float32, [<span class="dv">1</span>, <span class="dv">16000</span>])
+<span class="bu">print</span> data
+stfts <span class="op">=</span> tf.contrib.signal.stft(data, frame_length<span class="op">=</span><span class="dv">400</span>, 
+                               frame_step<span class="op">=</span><span class="dv">100</span>, fft_length<span class="op">=</span><span class="dv">512</span>)
+
+spec <span class="op">=</span> tf.<span class="bu">abs</span>(stfts)
+<span class="bu">print</span> spec
+
+s <span class="op">=</span> np.random.rand(<span class="dv">1</span>,<span class="dv">16000</span>) <span class="co"># rasgele bir zaman serisi uret</span>
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+     sess.run(tf.global_variables_initializer())
+     res <span class="op">=</span> sess.run(spec, feed_dict<span class="op">=</span>{data: s })  
+<span class="bu">print</span> res</code></pre></div>
+<pre><code>Tensor(&quot;Placeholder_1:0&quot;, shape=(1, 16000), dtype=float32)
+Tensor(&quot;Abs_1:0&quot;, shape=(1, 157, 257), dtype=float32)
+[[[  99.39490509   65.10092163   12.84116936 ...,    5.39213753
+      3.90902305    1.35875702]
+  [ 100.60041809   66.32343292   12.92744541 ...,    4.64194965
+      1.80256999    2.0458374 ]
+  [ 104.70896149   70.13975525   15.93750095 ...,    3.21846962
+      1.70909929    1.34316254]
+  ..., 
+  [  97.82588196   63.51060867   11.62135887 ...,    3.23712349
+      1.94706416    0.41742325]
+  [ 105.89834595   71.85715485   17.83632851 ...,    4.6476922
+      2.42140603    1.37829971]
+  [ 106.46664429   71.12073517   16.69457436 ...,    6.58148479
+x      3.24354243    3.80913925]]]</code></pre>
+<p>Cok Katmanlı LSTM</p>
+<p>LSTM, ya da diğer her RNN çeşidi çok katmanlı olarak kullanılabilir.</p>
+<div class="figure">
+<img src="stacked-rnn.png" />
+
+</div>
+<p>Girdiler en alttaki LSTM hücrelerine geçiliyor, bu hücreler birbirlerine konum aktarımı yaptıkları gibi bir sonraki LSTM katmanına girdi de sağlıyorlar, bu aktarım en üst tabakaya kadar gidiyor. Peki o zaman sınıflama amaçlı olarak kullanılan &quot;en son'' hücre hangisi olacaktır? Bunun için tipik olarak katmanlı LSTM'de en üst ve en sondaki hücre kullanılır.</p>
+<p>Her hücrede 200 nöron var, o zaman her katman (124,200) boyutunda çünkü spektogramdan 124 zaman boyutu geldi, ve LSTM'in en sondaki hücreden alınan vektör 200 boyutunda olacak, bu çıktı bir tam bağlanmış (fully-connected) katmana verilerek buradan 4 tane etiket için olasılık üretilecek, ve tahmin için kullanılan sonuçlar bunlar olacak. O sayılardan en büyük olanı en olası olan ses komutudur.</p>
+<p>Tüm modeli görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># model_lstm.py</span>
+<span class="im">import</span> tensorflow <span class="im">as</span> tf, util, os
+
+<span class="kw">class</span> Model:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):
+                
+        <span class="va">self</span>.<span class="bu">file</span> <span class="op">=</span> os.path.basename(<span class="va">__file__</span>).replace(<span class="st">&quot;.pyc&quot;</span>,<span class="st">&quot;&quot;</span>).replace(<span class="st">&quot;.py&quot;</span>,<span class="st">&quot;&quot;</span>)
+        
+        <span class="va">self</span>.mfile <span class="op">=</span> <span class="st">&quot;/tmp/&quot;</span> <span class="op">+</span> <span class="va">self</span>.<span class="bu">file</span> <span class="op">+</span> <span class="st">&quot;.ckpt&quot;</span>
+
+        <span class="va">self</span>.batch_size <span class="op">=</span> <span class="dv">100</span>
+        
+        <span class="va">self</span>.num_epochs <span class="op">=</span> <span class="dv">200</span>
+
+        <span class="va">self</span>.dop_param <span class="op">=</span> <span class="fl">0.0</span> <span class="co"># dropout olasiligi</span>
+
+        <span class="va">self</span>.num_layers <span class="op">=</span> <span class="dv">4</span>
+        
+        <span class="va">self</span>.num_cell <span class="op">=</span> <span class="dv">200</span>
+
+        tf.reset_default_graph()
+
+        <span class="va">self</span>.dop <span class="op">=</span> tf.placeholder(tf.float32) <span class="co"># dropout olasiligi (probability)</span>
+        
+        <span class="va">self</span>.data <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, util.fs])
+
+        <span class="bu">print</span> <span class="va">self</span>.data 
+        
+        <span class="va">self</span>.stfts <span class="op">=</span> tf.contrib.signal.stft(<span class="va">self</span>.data, frame_length<span class="op">=</span><span class="dv">256</span>,
+                                            frame_step<span class="op">=</span><span class="dv">128</span>, fft_length<span class="op">=</span><span class="dv">256</span>)
+
+        <span class="bu">print</span> <span class="va">self</span>.stfts
+        
+        <span class="va">self</span>.fingerprint <span class="op">=</span> tf.<span class="bu">abs</span>(<span class="va">self</span>.stfts)
+        
+        <span class="bu">print</span> <span class="va">self</span>.fingerprint
+
+        <span class="va">self</span>.y <span class="op">=</span> tf.placeholder(tf.float32, shape<span class="op">=</span>[<span class="va">None</span>, <span class="bu">len</span>(util.labels)])
+        cells <span class="op">=</span> []
+        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>.num_layers):
+            cell <span class="op">=</span> tf.contrib.rnn.LSTMCell(<span class="va">self</span>.num_cell)
+            cell <span class="op">=</span> tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob<span class="op">=</span><span class="dv">1</span><span class="op">-</span><span class="va">self</span>.dop)
+            cells.append(cell)
+        cell <span class="op">=</span> tf.contrib.rnn.MultiRNNCell(cells)
+        output, states <span class="op">=</span> tf.nn.dynamic_rnn(cell, <span class="va">self</span>.fingerprint, dtype<span class="op">=</span>tf.float32)
+        <span class="bu">print</span> output
+        <span class="cf">for</span> x <span class="kw">in</span> states: <span class="bu">print</span> x
+        <span class="va">self</span>.last <span class="op">=</span> states[<span class="op">-</span><span class="dv">1</span>][<span class="dv">0</span>] <span class="co"># en ust sagdaki son hucre</span>
+
+        <span class="bu">print</span> <span class="va">self</span>.last
+
+        <span class="va">self</span>.logits <span class="op">=</span> tf.contrib.layers.fully_connected(inputs<span class="op">=</span><span class="va">self</span>.last,
+                                                        num_outputs<span class="op">=</span><span class="bu">len</span>(util.labels),
+                                                        activation_fn<span class="op">=</span><span class="va">None</span>)
+
+        <span class="bu">print</span> <span class="va">self</span>.logits
+        
+        <span class="va">self</span>.softmax <span class="op">=</span> tf.nn.softmax_cross_entropy_with_logits(logits<span class="op">=</span><span class="va">self</span>.logits,
+                                                               labels<span class="op">=</span><span class="va">self</span>.y) 
+
+        <span class="va">self</span>.cross_entropy <span class="op">=</span> tf.reduce_mean(<span class="va">self</span>.softmax)
+
+        <span class="va">self</span>.train_step <span class="op">=</span> tf.train.AdamOptimizer(<span class="fl">0.001</span>).minimize(<span class="va">self</span>.cross_entropy)
+        
+        <span class="va">self</span>.correct_prediction <span class="op">=</span> tf.equal(tf.argmax(<span class="va">self</span>.y,<span class="dv">1</span>),
+                                           tf.argmax(<span class="va">self</span>.logits,<span class="dv">1</span>))
+
+        <span class="va">self</span>.evaluation_step <span class="op">=</span> tf.reduce_mean(tf.cast(<span class="va">self</span>.correct_prediction,
+                                                      tf.float32))
+
+
+        <span class="va">self</span>.saver <span class="op">=</span> tf.train.Saver()
+                
+        
+<span class="co"># training 0.91 validation 0.926238</span></code></pre></div>
+<p>Modelin girdi tensor'un boyutlarını nasıl değiştirdiği altta (üstteki resim iki katman gösterdi, bizim modelde 4 katman var),</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> model_lstm
+m <span class="op">=</span> model_lstm.Model()</code></pre></div>
+<pre><code>Tensor(&quot;Placeholder_1:0&quot;, shape=(?, 16000), dtype=float32)
+Tensor(&quot;stft/rfft:0&quot;, shape=(?, 124, 129), dtype=complex64)
+Tensor(&quot;Abs:0&quot;, shape=(?, 124, 129), dtype=float32)
+Tensor(&quot;rnn/transpose:0&quot;, shape=(?, 124, 200), dtype=float32)
+LSTMStateTuple(c=&lt;tf.Tensor &#39;rnn/while/Exit_2:0&#39; shape=(?, 200) dtype=float32&gt;, h=&lt;tf.Tensor &#39;rnn/while/Exit_3:0&#39; shape=(?, 200) dtype=float32&gt;)
+LSTMStateTuple(c=&lt;tf.Tensor &#39;rnn/while/Exit_4:0&#39; shape=(?, 200) dtype=float32&gt;, h=&lt;tf.Tensor &#39;rnn/while/Exit_5:0&#39; shape=(?, 200) dtype=float32&gt;)
+LSTMStateTuple(c=&lt;tf.Tensor &#39;rnn/while/Exit_6:0&#39; shape=(?, 200) dtype=float32&gt;, h=&lt;tf.Tensor &#39;rnn/while/Exit_7:0&#39; shape=(?, 200) dtype=float32&gt;)
+LSTMStateTuple(c=&lt;tf.Tensor &#39;rnn/while/Exit_8:0&#39; shape=(?, 200) dtype=float32&gt;, h=&lt;tf.Tensor &#39;rnn/while/Exit_9:0&#39; shape=(?, 200) dtype=float32&gt;)
+Tensor(&quot;rnn/while/Exit_8:0&quot;, shape=(?, 200), dtype=float32)
+Tensor(&quot;fully_connected/BiasAdd:0&quot;, shape=(?, 4), dtype=float32)</code></pre>
+<p>Eğitim kodu,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, sys
+<span class="im">import</span> numpy <span class="im">as</span> np, util
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> scipy.io.wavfile, zipfile
+<span class="im">import</span> io, time, os, random, re
+
+<span class="im">import</span> model_lstm
+
+m <span class="op">=</span> model_lstm.Model()
+
+sess <span class="op">=</span> tf.Session()
+
+sess.run(tf.global_variables_initializer())
+
+saver <span class="op">=</span> tf.train.Saver()
+
+<span class="co"># eger model diskte varsa yukle</span>
+<span class="bu">print</span> m.mfile
+<span class="bu">print</span> <span class="st">&#39;model file exists&#39;</span>, os.path.isfile(m.mfile <span class="op">+</span> <span class="st">&quot;.index&quot;</span>)
+<span class="cf">if</span> os.path.isfile(m.mfile <span class="op">+</span> <span class="st">&quot;.index&quot;</span>):
+     <span class="bu">print</span> <span class="st">&#39;restoring&#39;</span>
+     saver.restore(sess, m.mfile)
+
+train_files, val_files <span class="op">=</span> util.init_files()
+     
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(m.num_epochs):
+    train_x, train_y <span class="op">=</span> util.get_minibatch(m.batch_size, train_files, val_files)
+    d <span class="op">=</span> { m.data:train_x, m.y:train_y, m.dop:m.dop_param}
+    acc, _ <span class="op">=</span> sess.run([m.evaluation_step, m.train_step], feed_dict<span class="op">=</span>d)
+    <span class="bu">print</span> i, <span class="st">&#39;accuracy&#39;</span>, acc 
+    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">5</span> <span class="op">==</span> <span class="dv">0</span>:
+         d <span class="op">=</span> { m.data:train_x, m.y:train_y, m.dop:m.dop_param }
+         tacc <span class="op">=</span> sess.run(m.evaluation_step, feed_dict<span class="op">=</span>d)
+     val_x, val_y <span class="op">=</span> util.get_minibatch(m.batch_size,train_files, val_files,validation<span class="op">=</span><span class="va">True</span>)
+         d <span class="op">=</span> { m.data:val_x, m.y:val_y, m.dop:<span class="dv">0</span>}
+         vacc <span class="op">=</span> sess.run(m.evaluation_step, feed_dict<span class="op">=</span>d)
+         <span class="bu">print</span> i, <span class="st">&#39;training&#39;</span>, tacc, <span class="st">&#39;validation&#39;</span>, vacc
+
+<span class="co"># modeli diske yaz</span>
+saver.save(sess, m.mfile)</code></pre></div>
+<p>Eğitim sonrası modelin başarısı eğitim verisi üzerinde yüzde 91, doğrulama verisinde yüzde 92. Kullanılan veri [6]'da.</p>
+<p>Dropout</p>
+<p>TF ile katmanlararası her noktada dropout kullanılabilir. Dropout ile bir katmandan çıkan ya da ona giren bağlantıların bir kısmı yoksayılır, ve model elde kalanlar ile iş yapmaya uğraşır, aşırı uygunluk problemlerinden böylece kaçınılmış olur. Üstteki kodda hangi olasılıkla dropout yapılacağının olasılığı bir yer tutucu (placeholder) ile TF çizitinin parçası haline getirildi, niye? Böylece son üründeki kullanımda bu parametre 0 yapılarak hiç dropout yapılmaması sağlanabiliyor. Eğitim sırasında bu değer 0.5, 0.2, vs yapılabilir, o zaman dropout devrede olur. Gerçi biz eğitim sırasında da 0 ile eğittik, yani dropout kullanmadık, ama lazım olduğu yerler olabilir, referans açısından burada dursun.</p>
+<p>Uygulama</p>
+<p>Mikrofondan 1 saniyelik ses parçalarını alıp onu model üzerinde işletip dört komuttan birini seçen örnek kod <code>mic.py</code>'da bulunabilir. Performans gerçek zamanlı kullanım için yeterliydi, DYSA ufak bir şey değil aslında, kaç parametre olduğuna bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> util.network_parameters(), <span class="st">&#39;tane degisken var&#39;</span></code></pre></div>
+<pre><code>1227204 tane degisken var</code></pre>
+<p>1 milyon küsur parametreli bir DYSA , yani potansiyel olarak her saniye en az bir milyon işlem yapılıyor demektir. Görünüşe göre hesap işliyor, TF bazı optimizasyonlar yapmış belki, ve mikroişlemciler yeterince hızlı. Teknoloji güzel şey.</p>
+<p>CTC</p>
+<p>Ses tanıma için bir diğer yaklaşım optik karakter tanıma yazısında görülen CTC kullanımı [4,5]. Alttaki kodun kullandığı veri [1]'de, yaklaşımın detayları [2]'de görülebilir. Bu ses verisi koca kelimeler, cümleleri içeriyor, çok daha uzun veriler bunlar, ve kayıp fonksiyonu artık basit, belli sayıda komut arasından seçim bazlı değil, büyük bir alfabeden gelen öğelerin yanyana gelişini kontrol ediyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> python_speech_features <span class="im">import</span> mfcc
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">from</span> glob <span class="im">import</span> glob
+<span class="im">import</span> time, re, os, random
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> librosa
+
+num_epochs <span class="op">=</span> <span class="dv">1000</span>
+num_hidden <span class="op">=</span> <span class="dv">100</span>
+num_layers <span class="op">=</span> <span class="dv">1</span>
+batch_size <span class="op">=</span> <span class="dv">10</span>
+num_batches_per_epoch <span class="op">=</span> <span class="dv">10</span>
+sample_rate<span class="op">=</span><span class="dv">8000</span>
+num_features <span class="op">=</span> <span class="dv">13</span>
+<span class="co"># Accounting the 0th index +  space + blank label = 28 characters</span>
+num_classes <span class="op">=</span> <span class="bu">ord</span>(<span class="st">&#39;z&#39;</span>) <span class="op">-</span> <span class="bu">ord</span>(<span class="st">&#39;a&#39;</span>) <span class="op">+</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span>
+<span class="bu">print</span> (<span class="st">&#39;num_classes </span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> num_classes)
+
+SPACE_TOKEN <span class="op">=</span> <span class="st">&#39;&lt;space&gt;&#39;</span>
+SPACE_INDEX <span class="op">=</span> <span class="dv">0</span>
+FIRST_INDEX <span class="op">=</span> <span class="bu">ord</span>(<span class="st">&#39;a&#39;</span>) <span class="op">-</span> <span class="dv">1</span>  <span class="co"># 0 is reserved to space</span>
+mfile <span class="op">=</span> <span class="st">&quot;/tmp/speech.ckpt&quot;</span>
+
+<span class="kw">def</span> convert_inputs_to_ctc_format(audio, fs, target_text):
+    <span class="co">#print(&#39;convert_inputs_to_ctc_format target_text:&#39; + target_text)</span>
+    inputs <span class="op">=</span> mfcc(audio, samplerate<span class="op">=</span>fs, numcep<span class="op">=</span>num_features)
+    <span class="co"># Transform in 3D array</span>
+    train_inputs <span class="op">=</span> np.asarray(inputs[np.newaxis, :])
+    train_inputs <span class="op">=</span> (train_inputs <span class="op">-</span> np.mean(train_inputs)) <span class="op">/</span> np.std(train_inputs)
+    train_seq_len <span class="op">=</span> [train_inputs.shape[<span class="dv">1</span>]]
+
+    <span class="co"># Get only the words between [a-z] and replace period for none</span>
+    original <span class="op">=</span> <span class="st">&#39; &#39;</span>.join(target_text.strip().lower().split(<span class="st">&#39; &#39;</span>)).<span class="op">\</span>
+               replace(<span class="st">&#39;.&#39;</span>, <span class="st">&#39;&#39;</span>).<span class="op">\</span>
+               replace(<span class="st">&#39;?&#39;</span>, <span class="st">&#39;&#39;</span>).<span class="op">\</span>
+               replace(<span class="st">&#39;,&#39;</span>, <span class="st">&#39;&#39;</span>).<span class="op">\</span>
+               replace(<span class="st">&quot;&#39;&quot;</span>, <span class="st">&#39;&#39;</span>).<span class="op">\</span>
+               replace(<span class="st">&#39;!&#39;</span>, <span class="st">&#39;&#39;</span>).<span class="op">\</span>
+               replace(<span class="st">&#39;-&#39;</span>, <span class="st">&#39;&#39;</span>)
+    <span class="co">#print(&#39;original:&#39; + original)</span>
+    targets <span class="op">=</span> original.replace(<span class="st">&#39; &#39;</span>, <span class="st">&#39;  &#39;</span>)
+    targets <span class="op">=</span> targets.split(<span class="st">&#39; &#39;</span>)
+
+    <span class="co"># Adding blank label</span>
+    targets <span class="op">=</span> np.hstack([SPACE_TOKEN <span class="cf">if</span> x <span class="op">==</span> <span class="st">&#39;&#39;</span> <span class="cf">else</span> <span class="bu">list</span>(x) <span class="cf">for</span> x <span class="kw">in</span> targets])
+
+    <span class="co"># Transform char into index</span>
+    targets <span class="op">=</span> np.asarray([SPACE_INDEX <span class="cf">if</span> x <span class="op">==</span> SPACE_TOKEN <span class="cf">else</span> <span class="bu">ord</span>(x) <span class="op">-</span> FIRST_INDEX
+                          <span class="cf">for</span> x <span class="kw">in</span> targets])
+
+    <span class="co"># Creating sparse representation to feed the placeholder</span>
+    train_targets <span class="op">=</span> sparse_tuple_from([targets])
+
+    <span class="cf">return</span> train_inputs, train_targets, train_seq_len, original
+
+
+<span class="kw">def</span> sparse_tuple_from(sequences, dtype<span class="op">=</span>np.int32):
+    indices <span class="op">=</span> []
+    values <span class="op">=</span> []
+    <span class="cf">for</span> n, seq <span class="kw">in</span> <span class="bu">enumerate</span>(sequences):
+        indices.extend(<span class="bu">zip</span>([n] <span class="op">*</span> <span class="bu">len</span>(seq), <span class="bu">range</span>(<span class="bu">len</span>(seq))))
+        values.extend(seq)
+
+    indices <span class="op">=</span> np.asarray(indices, dtype<span class="op">=</span>np.int64)
+    values <span class="op">=</span> np.asarray(values, dtype<span class="op">=</span>dtype)
+    shape <span class="op">=</span> np.asarray([<span class="bu">len</span>(sequences),
+                        np.asarray(indices).<span class="bu">max</span>(<span class="dv">0</span>)[<span class="dv">1</span>] <span class="op">+</span> <span class="dv">1</span>],
+                       dtype<span class="op">=</span>np.int64)
+
+    <span class="cf">return</span> indices, values, shape
+
+<span class="kw">def</span> read_audio_from_filename(filename, sample_rate):
+    audio, _ <span class="op">=</span> librosa.load(filename, sr<span class="op">=</span>sample_rate, mono<span class="op">=</span><span class="va">True</span>)
+    audio <span class="op">=</span> audio.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)
+    <span class="cf">return</span> audio
+
+<span class="kw">def</span> find_files(directory, pattern<span class="op">=</span><span class="st">&#39;.wav&#39;</span>):
+    <span class="co">&quot;&quot;&quot;Recursively finds all files matching the pattern.&quot;&quot;&quot;</span>
+    files <span class="op">=</span> []
+    <span class="cf">for</span> root, directories, filenames <span class="kw">in</span> os.walk(directory):
+        <span class="cf">for</span> filename <span class="kw">in</span> filenames: 
+            path <span class="op">=</span> os.path.join(root,filename)
+            <span class="cf">if</span> pattern <span class="kw">in</span> path: files.append(path)    
+    res <span class="op">=</span> <span class="bu">sorted</span>(files)
+    <span class="cf">return</span> res
+
+<span class="kw">def</span> run_ctc():
+    graph <span class="op">=</span> tf.Graph()
+    <span class="cf">with</span> graph.as_default():
+        <span class="co"># e.g: log filter bank or MFCC features</span>
+        <span class="co"># Has size [batch_size, max_step_size, num_features], but the</span>
+        <span class="co"># batch_size and max_step_size can vary along each step</span>
+        inputs <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, <span class="va">None</span>, num_features])
+
+        <span class="co"># Here we use sparse_placeholder that will generate a</span>
+        <span class="co"># SparseTensor required by ctc_loss op.</span>
+        targets <span class="op">=</span> tf.sparse_placeholder(tf.int32)
+
+        <span class="co"># 1d array of size [batch_size]</span>
+        seq_len <span class="op">=</span> tf.placeholder(tf.int32, [<span class="va">None</span>])
+
+        <span class="co"># Defining the cell</span>
+        <span class="co"># Can be:</span>
+        cell <span class="op">=</span> tf.contrib.rnn.LSTMCell(num_hidden, state_is_tuple<span class="op">=</span><span class="va">True</span>)
+
+        <span class="co"># Stacking rnn cells</span>
+        stack <span class="op">=</span> tf.contrib.rnn.MultiRNNCell([cell] <span class="op">*</span> num_layers,
+                                            state_is_tuple<span class="op">=</span><span class="va">True</span>)
+
+        <span class="co"># The second output is the last state and we will no use that</span>
+        outputs, _ <span class="op">=</span> tf.nn.dynamic_rnn(stack, inputs, seq_len, dtype<span class="op">=</span>tf.float32)
+
+        shape <span class="op">=</span> tf.shape(inputs)
+        batch_s, max_time_steps <span class="op">=</span> shape[<span class="dv">0</span>], shape[<span class="dv">1</span>]
+
+        <span class="co"># Reshaping to apply the same weights over the timesteps</span>
+        outputs <span class="op">=</span> tf.reshape(outputs, [<span class="op">-</span><span class="dv">1</span>, num_hidden])
+
+        <span class="co"># Truncated normal with mean 0 and stdev=0.1</span>
+        <span class="co"># Tip: Try another initialization</span>
+        W <span class="op">=</span> tf.Variable(tf.truncated_normal([num_hidden,
+                                             num_classes],
+                                            stddev<span class="op">=</span><span class="fl">0.1</span>))
+        <span class="co"># Zero initialization</span>
+        <span class="co"># Tip: Is tf.zeros_initializer the same?</span>
+        b <span class="op">=</span> tf.Variable(tf.constant(<span class="fl">0.</span>, shape<span class="op">=</span>[num_classes]))
+
+        <span class="co"># Doing the affine projection</span>
+        logits <span class="op">=</span> tf.matmul(outputs, W) <span class="op">+</span> b
+
+        <span class="co"># Reshaping back to the original shape</span>
+        logits <span class="op">=</span> tf.reshape(logits, [batch_s, <span class="dv">-1</span>, num_classes])
+
+        <span class="co"># Time major</span>
+        logits <span class="op">=</span> tf.transpose(logits, (<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">2</span>))
+
+        loss <span class="op">=</span> tf.nn.ctc_loss(targets, logits, seq_len)
+        cost <span class="op">=</span> tf.reduce_mean(loss)
+
+        optimizer <span class="op">=</span> tf.train.MomentumOptimizer(learning_rate<span class="op">=</span><span class="fl">0.005</span>,
+                                               momentum<span class="op">=</span><span class="fl">0.9</span>).minimize(cost)
+
+        <span class="co"># Option 2: tf.contrib.ctc.ctc_beam_search_decoder</span>
+        <span class="co"># (it&#39;s slower but you&#39;ll get better results)</span>
+        decoded, log_prob <span class="op">=</span> tf.nn.ctc_greedy_decoder(logits, seq_len)
+
+        <span class="co"># Inaccuracy: label error rate</span>
+        ler <span class="op">=</span> tf.reduce_mean(tf.edit_distance(tf.cast(decoded[<span class="dv">0</span>], tf.int32),
+                                              targets))
+
+    files <span class="op">=</span> find_files(<span class="st">&quot;/home/burak/Downloads/vctk-p225-small/wav48/p225&quot;</span>)
+        
+    <span class="cf">with</span> tf.Session(graph<span class="op">=</span>graph) <span class="im">as</span> session:
+
+        tf.global_variables_initializer().run()
+
+        saver <span class="op">=</span> tf.train.Saver()                
+
+        <span class="cf">for</span> curr_epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):
+            train_cost <span class="op">=</span> train_ler <span class="op">=</span> <span class="dv">0</span>
+            <span class="cf">for</span> batch <span class="kw">in</span> <span class="bu">range</span>(num_batches_per_epoch):
+                filename <span class="op">=</span> random.choice(files)
+                txtfile <span class="op">=</span> filename.replace(<span class="st">&quot;wav48&quot;</span>,<span class="st">&quot;txt&quot;</span>)
+                txtfile <span class="op">=</span> txtfile.replace(<span class="st">&quot;.wav&quot;</span>,<span class="st">&quot;.txt&quot;</span>)
+                txt <span class="op">=</span> <span class="bu">open</span>(txtfile).read()
+                audio <span class="op">=</span> read_audio_from_filename(filename, sample_rate)
+                out <span class="op">=</span> convert_inputs_to_ctc_format(audio,sample_rate,txt)
+                train_inputs, train_targets, train_seq_len, original <span class="op">=</span> out
+
+                feed <span class="op">=</span> {inputs: train_inputs,
+                        targets: train_targets,
+                        seq_len: train_seq_len}
+
+                batch_cost, _ <span class="op">=</span> session.run([cost, optimizer], feed)
+                train_ler <span class="op">+=</span> session.run(ler, feed_dict<span class="op">=</span>feed)
+                
+                <span class="bu">print</span> <span class="st">&#39;batch_cost&#39;</span>, batch_cost, <span class="st">&#39;train_ler&#39;</span>, train_ler
+
+            <span class="co"># Decoding</span>
+            d <span class="op">=</span> session.run(decoded[<span class="dv">0</span>], feed_dict<span class="op">=</span>feed)
+            str_decoded <span class="op">=</span> <span class="st">&#39;&#39;</span>.join([<span class="bu">chr</span>(x) <span class="cf">for</span> x <span class="kw">in</span> np.asarray(d[<span class="dv">1</span>]) <span class="op">+</span> FIRST_INDEX])
+            <span class="co"># Replacing blank label to none</span>
+            str_decoded <span class="op">=</span> str_decoded.replace(<span class="bu">chr</span>(<span class="bu">ord</span>(<span class="st">&#39;z&#39;</span>) <span class="op">+</span> <span class="dv">1</span>), <span class="st">&#39;&#39;</span>)
+            <span class="co"># Replacing space label to space</span>
+            str_decoded <span class="op">=</span> str_decoded.replace(<span class="bu">chr</span>(<span class="bu">ord</span>(<span class="st">&#39;a&#39;</span>) <span class="op">-</span> <span class="dv">1</span>), <span class="st">&#39; &#39;</span>)
+
+            <span class="bu">print</span>(<span class="st">&#39;Original: </span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> original)
+            <span class="bu">print</span>(<span class="st">&#39;Decoded: </span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> str_decoded)
+                
+            <span class="cf">if</span> curr_epoch <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>: saver.save(session, mfile)
+            
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
+    run_ctc()</code></pre></div>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, <em>VCTK Ses Tanima Verisi, Konusmaci 225</em>, <a href="https://drive.google.com/uc?export=view&amp;id=1zK-mgG6Q8N8OuOGpexbxVkES3DuQhGOk" class="uri">https://drive.google.com/uc?export=view&amp;id=1zK-mgG6Q8N8OuOGpexbxVkES3DuQhGOk</a></p>
+<p>[2] Remy, <em>Application of Connectionist Temporal Classification (CTC) for Speech Recognition</em>,<a href="https://github.com/philipperemy/tensorflow-ctc-speech-recognition" class="uri">https://github.com/philipperemy/tensorflow-ctc-speech-recognition</a></p>
+<p>[3] Graves, <em>Supervised Sequence Labelling with Recurrent Neural Networks</em>, <a href="https://www.cs.toronto.edu/~graves/preprint.pdf" class="uri">https://www.cs.toronto.edu/~graves/preprint.pdf</a></p>
+<p>[4] Graves, <em>How to build a recognition system (Part 1): CTC Loss</em>, <a href="https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI" class="uri">https://docs.google.com/presentation/d/1AyLOecmW1k9cIbfexOT3dwoUU-Uu5UqlJZ0w3cxilkI</a></p>
+<p>[5] Graves, <em>How to build a recognition system (Part 2): CTC Loss</em>, <a href="https://docs.google.com/presentation/d/12gYcPft9_4cxk2AD6Z6ZlJNa3wvZCW1ms31nhq51vMk" class="uri">https://docs.google.com/presentation/d/12gYcPft9_4cxk2AD6Z6ZlJNa3wvZCW1ms31nhq51vMk</a></p>
+<p>[6] Bayramlı, <em>Ses Komut Verisi</em>, <a href="https://drive.google.com/open?id=1BIGj3NtUZfSrXMaJ8hCqsz0UzS01MSrF" class="uri">https://drive.google.com/open?id=1BIGj3NtUZfSrXMaJ8hCqsz0UzS01MSrF</a></p>
+<p>[7] Bayramlı, Bilgisayar Bilim, <em>Uzun Kısa-Vade Hafıza Ağları</em></p>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="model-başarısını-ölçmek">Model Başarısını Ölçmek</h1>
+<p>Eğitim ve kontrol (validation) verisini ayrı tutmak iyi fikirdir, model eğitim verisinde eğitilir, kontrol verisinde kontrol edilir. Yani modelin hiç görmediği veriler üzerinde kontrolünün yapılması gerekir. Bazen bu ayrışmanın veri üzerinde olan bir değer üzerinden olması da istenebilir, mesela parakende satış verileri üzerinde eğitim yapıyorsak, bir müşterinin hem eğitim hem kontrol verisinde olmasını istemeyebiliriz. Bu durumda ayırma nasıl yapılır? Çok basit bir yöntem kullanıcı kimliği üzerinde <code>hash</code> çağrısı yapmak ve sonuç üzerinde 2 üzerinden (mesela) modülo uygulamak. Eğer çift sayı ise eğitim tek ise kontrol. Böylece ayrı bir liste tutmadan kimliğe bakarak direk ayrımı yapabilmiş oluruz.</p>
+<p>Kafa Karışıklığı Matrisi (Confusion Matrix)</p>
+<p>İki ya da daha fazla etiketli tahmin problemlerinin sonuçlarını irdelemek için kafa karışıklığı matrisi (KKM) kullanılabilir. Bu matrisin dikey eksenini test verisinde gerçekten olan etiket, yatay eksenini tahmin edilen etiket olarak düşünürsek, kordinat kesişimleri her özgün etiket değeri için tahmin etme başarısını gösterecektir. Mesela herhangi bir yapay öğrenim algoritmasından <code>y_tahmin</code> üretilmiş olsun,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix
+y_gercek <span class="op">=</span> [<span class="st">&quot;kedi&quot;</span>, <span class="st">&quot;sinek&quot;</span>, <span class="st">&quot;kedi&quot;</span>, <span class="st">&quot;kedi&quot;</span>, <span class="st">&quot;sinek&quot;</span>, <span class="st">&quot;balik&quot;</span>]
+y_tahmin <span class="op">=</span> [<span class="st">&quot;sinek&quot;</span>, <span class="st">&quot;sinek&quot;</span>, <span class="st">&quot;kedi&quot;</span>, <span class="st">&quot;kedi&quot;</span>, <span class="st">&quot;sinek&quot;</span>, <span class="st">&quot;kedi&quot;</span>]
+<span class="bu">print</span> confusion_matrix(y_gercek, y_tahmin, labels<span class="op">=</span>[<span class="st">&quot;sinek&quot;</span>, <span class="st">&quot;balik&quot;</span>, <span class="st">&quot;kedi&quot;</span>])</code></pre></div>
+<pre><code>[[2 0 0]
+ [0 0 1]
+ [1 0 2]]</code></pre>
+<p>Bakıyoruz gerçekten sinek olduğu zaman 2 kere sinek tahmin edilmiş (matriste sol üst köşe), kedi aynı şekilde iki, ama bir defa kedi için sinek denmiş, bu matrisin sol alt köşesinde. KKM matrisi tüm bu doğruları, hataları tek bir yerde gösterebilen faydalı bir raporlama aracıdır.</p>
+<p>Eger sadece iki etiket varsa, matris alttaki gibi olur,</p>
+<div class="figure">
+<img src="modeval_06.png" />
+
+</div>
+<p>İki etiket durumunda matristeki sayıların özel isimleri var. Her eksende ilk hücre 1 tahmini, diğeri 0 tahmini olursa, üst sol köşedeki tahmin gerçekten 1 olduğu ve 1 tahmin edildiği durum, buna doğru pozitif (true positive) ismi veriliyor. 0 tahmin yapılmış ama aslında etiket 1 ise buna yanlış negatif (false negative), 1 tahmini yapılmış ama 0 ise buna yanlış pozitif (false positive), 0 tahmini yapılmış ve gerçekten 0 ise buna doğru negatif (true negative) ismi veriliyor. Kısaltılmış olarak sırasıyla TP, FN, FP, TN [1, sf. 190].</p>
+<p>Doğruluk (Accuracy)</p>
+<p>Üstteki değerler ile bazı özet hesaplar var, bunlardan biri doğruluk. Formülü</p>
+<p><span class="math display">\[ 
+ACC = \frac{FP + FN}{FP + FN + TP + TN}
+\]</span></p>
+<p>Kesinlik (Precision)</p>
+<p>Diyelim ki bir fotografta 12 kedi, birkac tane fare var. Bir program 8 tane kedi var diyor, ama kedi denen objelerden sadece 5 tanesi gercekten kedi. O zaman programin kesinligi 5/8.</p>
+<p><span class="math display">\[ 
+PRE = \frac{TP}{TP + FP}
+\]</span></p>
+<p>Hatırlama (Recall)</p>
+<p>Üstteki örnekte hatırlama 5/12</p>
+<p><span class="math display">\[ 
+REC = \frac{TP}{FN + TP}
+\]</span></p>
+<p>F1 Skoru</p>
+<p>Cogu zaman kesinlik ve hatirlamayi birlestirmek iyi bir fikirdir, bu bize F1-Skoru verir,</p>
+<p><span class="math display">\[ 
+F1 = 2 \frac{PRE \cdot REC}{PRE + REC}
+\]</span></p>
+<p>Özetlemek gerekirse doğruluk tahminlerimizin ne oranda doğru olduğudur, fakat bu ölçü eğer eğitim verisinde dengesizlik var ise başarısız olur (100 içinde 90 resim kedi ise sürekli &quot;kedi'' cevarı vermek yüzde 90 doğruluk verir ama bu iyi bir algoritma değildir). Kesinlik ise algoritmamiz &quot;kedi'' dediği zaman bu cevaplar içindeki doğruluk oranıdır. Yani pozitif tahmin edebilme oranıdır. Hatırlama ise sistemin tüm kediler içinde kaçıni bulabildiğidir, yani doğru pozitif oranı.</p>
+<p>AUC</p>
+<p>Eğitim verisindeki dengesizliği dikkate alarak başarı hesaplamanın bir yolu şu: algoritmalar 0/1 tahmini yerine &quot;1 olma olasılığı'' üretirler, yani 0 ile 1 arası bir sayı. Bu olasılıkları 0/1 tahminine çevirmek kolay, bir eşik değeri kararlaştırırız, ondan büyük olanlar 1 küçükler 0 olur; mesela eşik değeri 0.5 olabilir. AUC hesabı için eşik değerini sürekli değiştirerek bir döngü içinde doğru pozitif oranı, yanlış pozitif oranı hesaplarız, bunu grafikleyince ortaya bir eğri çıkar. Bu eğri 45 derece eğimli düz çizgi ne kadar üzerinde ise algoritmamiz o kadar başarılıdır.</p>
+<p>Matthews Korelasyon Katsayısı</p>
+<p>AUC kadar iyi işleyen, verideki dengesizliklere dayanıklı bir diğer ölçüt budur. Detaylar için [4] yazısı.</p>
+<p>Yanlılık-Varyans Dengesi (Bias-Variance Trade-off)</p>
+<div class="figure">
+<img src="modeval_01.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC
+<span class="im">from</span> sklearn.naive_bayes <span class="im">import</span> GaussianNB
+<span class="im">from</span> sklearn <span class="im">import</span> linear_model
+<span class="im">from</span> sklearn <span class="im">import</span> ensemble
+<span class="im">from</span> sklearn.model_selection <span class="im">import</span> ShuffleSplit
+<span class="im">from</span> sklearn.datasets <span class="im">import</span> load_digits
+<span class="im">import</span> lcurve
+
+digits <span class="op">=</span> load_digits()
+X, y <span class="op">=</span> digits.data, digits.target
+
+title <span class="op">=</span> <span class="st">&quot;Naive Bayes&quot;</span>
+cv <span class="op">=</span> ShuffleSplit(n_splits<span class="op">=</span><span class="dv">100</span>, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">0</span>)
+estimator <span class="op">=</span> GaussianNB()
+lcurve.plot(estimator, title, X, y, cv<span class="op">=</span>cv, n_jobs<span class="op">=</span><span class="dv">2</span>)
+plt.savefig(<span class="st">&#39;modeval_02.png&#39;</span>)
+
+title <span class="op">=</span> <span class="st">u&#39;SVM, RBF çekirdek (kernel), $\gamma=0.001$&#39;</span>
+cv <span class="op">=</span> ShuffleSplit(n_splits<span class="op">=</span><span class="dv">10</span>, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">0</span>)
+estimator <span class="op">=</span> SVC(gamma<span class="op">=</span><span class="fl">0.001</span>)
+lcurve.plot(estimator, title, X, y, cv<span class="op">=</span>cv, n_jobs<span class="op">=</span><span class="dv">2</span>)
+plt.savefig(<span class="st">&#39;modeval_03.png&#39;</span>)
+
+title <span class="op">=</span> <span class="st">&quot;Lojistik Regresyon&quot;</span>
+cv <span class="op">=</span> ShuffleSplit(n_splits<span class="op">=</span><span class="dv">10</span>, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">0</span>)
+estimator <span class="op">=</span> linear_model.LogisticRegression()
+lcurve.plot(estimator, title, X, y, ylim<span class="op">=</span>(<span class="op">-</span><span class="fl">0.1</span>,<span class="fl">0.1</span>), cv<span class="op">=</span>cv, n_jobs<span class="op">=</span><span class="dv">2</span>)
+plt.savefig(<span class="st">&#39;modeval_04.png&#39;</span>)
+
+title <span class="op">=</span> <span class="st">&quot;RandomForestClassifier&quot;</span>
+cv <span class="op">=</span> ShuffleSplit(n_splits<span class="op">=</span><span class="dv">10</span>, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">0</span>)
+estimator <span class="op">=</span> ensemble.RandomForestClassifier()
+lcurve.plot(estimator, title, X, y, ylim<span class="op">=</span>(<span class="op">-</span><span class="fl">0.1</span>,<span class="fl">0.1</span>), cv<span class="op">=</span>cv, n_jobs<span class="op">=</span><span class="dv">2</span>)
+plt.savefig(<span class="st">&#39;modeval_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="modeval_02.png" />
+
+</div>
+<div class="figure">
+<img src="modeval_03.png" />
+
+</div>
+<div class="figure">
+<img src="modeval_04.png" />
+
+</div>
+<p>Kaynaklar</p>
+<p>[1] Raschka, <em>Python Machine Learning</em></p>
+<p>[2] Ng, Diagnosing Bias vs Variance, <a href="https://www.youtube.com/watch?v=ymg03eGEBds" class="uri">https://www.youtube.com/watch?v=ymg03eGEBds</a></p>
+<p>[3] Ng, Regularization and Bias Variance, <a href="https://www.youtube.com/watch?v=yzS8bl75FV0" class="uri">https://www.youtube.com/watch?v=yzS8bl75FV0</a></p>
+<p>[4] Bayramlı, İstatistik, <em>Beklenti, Varyans, Kovaryans ve Korelasyon</em></p>
+</body>
+</html>

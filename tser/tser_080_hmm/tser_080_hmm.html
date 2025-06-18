@@ -1,0 +1,370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="saklı-markov-modelleri-hidden-markov-models--hmm-">Saklı Markov Modelleri (Hidden Markov Models -HMM-)</h1>
+<p>Zaman serilerini temsil etmek için Markov bazlı modeller sıkça kullanılır. Genelde istatistiki analiz bağımsız özdeşçe dağılmış (iid) örneklem noktaları olduğunu farz eder, fakat çoğu zaman serisinde veri noktaları birbirinden bağımsız değildir, <span class="math inline">\(t\)</span> anındaki bir nokta <span class="math inline">\(t-1\)</span> anındaki nokta ile bağlantılıdır.</p>
+<p>Saklı <em>olmayan</em> Markov modellerini, yani Markov Zincirlerini [5]'de görmüştük. Bir MZ sistemi her <span class="math inline">\(t\)</span> adımında bir konumda (state) olan bir sistem, <span class="math inline">\(X_1,..,X_T\)</span> rasgele değişkenleri ile temsil edelim, e bu modelde bir konumdan diğerine geçiş belli olasılıklar üzerinden temsil edilir. Hiç değişme olmaması da aslında bir geçiştir, bu durumda konum kendisine doğru bir geçiş yapar. Matematiksel olarak bir konumdan diğerine geçme olasılığı</p>
+<p><span class="math display">\[ P(X_t = j | X_{t-1} = i)  \]</span></p>
+<p>ile gösterilir. Önceki adımda <span class="math inline">\(i\)</span> konumundayız, geçiş sonrası <span class="math inline">\(j\)</span>'e geliyoruz, <span class="math inline">\(t\)</span> anındaki konuma geçiş için sadece <span class="math inline">\(t-1\)</span>'deki konumu bilmek yeterlidir. Resme bakalım,</p>
+<div class="figure">
+<img src="tser_hmm_01.png" />
+
+</div>
+<p>Konumlar ayrıksal, üstte 1,2,3 gibi değerler görülüyor. Bu değerler anlamı olan yine ayrıksal bir alfabeyi indisliyor olabilirler. Mesela 1 belki &quot;araba'', 2 &quot;bisiklet'', 3 &quot;uçak'' gibi. Geçiş olasılıkları bir <span class="math inline">\(A\)</span> matrisi içinde toplanabilir, resimde görüldüğü gibi, formülsel olarak</p>
+<p><span class="math display">\[ P(X_t = j | X_{t-1} = i) = a_{ij} \]</span></p>
+<p>Resimde ayrıca örnek bir konum serisi / dizisi de görüyoruz. Bu şekilde bir seri bilinen MZ geçiş olasılıklarından &quot;üretilebilir''; bir başlangıç konumu seçeriz, bir sonrakine geçiş olasılıklarına bakarız (5 tane), bu olasılıklar üzerinden zar atarız, birini seçeriz, ve o konuma geçeriz. İşlemi tekrarlarız. Böylece <span class="math inline">\(X_1,X_2,..\)</span> &quot;zincirini'' elde ederiz.</p>
+<p>Tam tersi yönde bir hesap yapmamız da gerekebilir; elde bir seri var, ama <span class="math inline">\(A\)</span> bilinmiyor, o zaman konum dizisinden <span class="math inline">\(A\)</span> matrisini &quot;öğrenebiliriz''. Öğrenim için bildiğimiz maksimum olurluk hesabı kullanılır, herhangi bir konum serisinin olasılığı nedir sorusunun cevabı şu formül;</p>
+<p><span class="math display">\[ P(X_1=x_1,..,X_T=x_T) = 
+P(X_1=x_1) \prod_{t=2}^{T} P(X_t=x_t | X_{t-1}=x_{t-1})
+\]</span></p>
+<p>Üstteki formül bir olurluk (likelihood) hesabı - <span class="math inline">\(L(A)\)</span> diyelim,</p>
+<p><span class="math display">\[ L(A) = P(X_1=x_1) \prod_{ t=2}^{T} a_{x_{t-1},x_t} \]</span></p>
+<p>Olurluğun maksimize edilmesi ardından <span class="math inline">\(A\)</span> için bir tahmin edici (estimator) hesaplanabilir - detaylar için [2, Ders 6]; <span class="math inline">\(n_{ij}\)</span>'yi veri serisinde <span class="math inline">\(i\)</span>'inci konumdan <span class="math inline">\(j\)</span>'ye kaç kere geçildiğinin sayısı olarak tanımlarsak, <span class="math inline">\(A\)</span> tahmin edicisi şöyle olur,</p>
+<p><span class="math display">\[ \hat{a}_{ij} = \frac{n_{ij}}{\sum_j n_{ij}}  \]</span></p>
+<p>Bu hesap akla yatkın (intuitive) bir sonuç, çünkü <span class="math inline">\(i\)</span>'den <span class="math inline">\(j\)</span>'ye geçiş &quot;olasılığını'' veriden hesaplamak istiyorsak, veride <span class="math inline">\(i\)</span>'den <span class="math inline">\(j\)</span>'ye kaç kere geçildiğini sayıp, bu sayıyı yine verideki tüm <span class="math inline">\(j\)</span>'ye olan geçişlere (hangi konumdan olursa olsun) bölmek bize iyi tahmin sağlar. Bir Gaussian'ın <span class="math inline">\(\mu\)</span>'sünü tahmin ederken tüm reel veri noktalarını toplayıp bölmek aynı şekilde akla yatkın bir tahmin edicidir.</p>
+<p>Şimdi MZ kavramına bir ek daha yapalım. Diyelim ki bir katman daha ekleyeceğiz, öyle ki artık konum geçişlerini dışarıdan göremiyoruz, sadece konumların <em>başka bir dağılıma göre</em> dışarıya ürettiği farklı bir alfabeden değerleri görüyoruz.</p>
+<div class="figure">
+<img src="tser_hmm_02.png" />
+
+</div>
+<p>Konum geçişleri bu sayede &quot;saklı'' hale geldi, ve bir HMM elde ettik. Matris olarak görelim,</p>
+<p><span class="math display">\[ 
+A = \left[\begin{array}{rrr}
+a_{11} &amp; a_{12} &amp; a_{13} \\
+a_{21} &amp; a_{22} &amp; a_{23} \\
+a_{31} &amp; a_{32} &amp; a_{33} 
+\end{array}\right], \qquad
+B = 
+\left[\begin{array}{rrrr}
+b_{11} &amp; b_{12} &amp; b_{13} &amp; b_{14} \\
+b_{21} &amp; b_{22} &amp; b_{23} &amp; b_{24} \\
+b_{31} &amp; b_{32} &amp; b_{33} &amp; b_{34} 
+\end{array}\right]
+\]</span></p>
+<p>Üstteki model bir ayrıksal HMM örneğidir, yani hem saklı geçişler ayrıksal (Markov durumunda hep öyle olmak zorunda) ve dışarı üretilen değerler de ayrıksal. Dışarı yansıtılan / salımlanan (emission) sembollerinden 4 tane var, <span class="math inline">\(v_1,v_2,v_2,v_4\)</span>. Salımlar sürekli de olabilirdi, mesela her konumun ayrı bir Gaussian dağılımı olabilirdi. Bu konuya sonra değineceğiz.</p>
+<p>Not: Salım sembolleri olarak <span class="math inline">\(v_1,v_2,..\)</span> kullandık fakat matematik olarak bunlar da aslında bir indis; saklı konumların aynı şekilde tamsayı olan indisleri ile karışmaması için semboller seçildi. Tabii aynen saklı konumda olduğu gibi salımların indisleri de herhangi bir alfabeyi indeksleyebilir. Mesela 1 &quot;a'', 2 &quot;b'' olabilir. İndislerin direk kendisi de kullanılabilir; mesela saklı konumlara bağlı zar atışlarını modelliyorsak salımlar 1,2,3,4,5,6 olacaktır.</p>
+<p>Devam edelim; HMM bu salım sembollerinden herhangi birini üretebilir, ama her saklı konumda üretim farklı bir dağılıma göre olur. Bu dağılımları içeren salım olasılıkları ayrı bir <span class="math inline">\(B\)</span> matrisi üzerinde tutulur. Matrisin boyutu 3 saklı 4 görünen konum üzerinden <span class="math inline">\(3 \times 4\)</span> olmalıdır, ve matrisin öğeleri <span class="math inline">\(b_{jk}\)</span>'nin matematiksel tanımı,</p>
+<p><span class="math display">\[ 
+b_{jk} =  P (V_t = k | X_t = j )
+\]</span></p>
+<p>(Görüldüğü gibi üstte salım indisini kullandık). <span class="math inline">\(V_t\)</span> değişkeni <span class="math inline">\(t\)</span> anında gizli <span class="math inline">\(j\)</span> konumunda olan bir HMM'in ürettiği semboldur. İki şarttan bahsetmek lazım şimdi, bunlardan birincisi pür MZ durumunda da geçerli,</p>
+<p><span class="math display">\[ \sum_j a_{ij} = 1, \quad \forall i\]</span></p>
+<p>HMM ek bir şart,</p>
+<p><span class="math display">\[ \sum_k b_{jk} = 1, \quad \forall j \]</span></p>
+<p>Şimdi diyelim ki <span class="math inline">\(V\)</span> bir görünen sembol vektörü, <span class="math inline">\(S_r\)</span> ise <span class="math inline">\(T\)</span> boyutunda bir saklı konum vektörü, ve bu boyutta olabilecek <em>tüm</em> konum serilerini düşünelim, <span class="math inline">\(c\)</span> mümkün gizli konum için <span class="math inline">\(c^T\)</span> tane olur. <span class="math inline">\(T=6\)</span> için bir vektör <span class="math inline">\(S_1 = \{1,4,2,2,1,4\}\)</span> gibi.. Şimdi görünen herhangi bir dizinin olasılığını hesaplayalım,</p>
+<p><span class="math display">\[ P(V) = \sum_{r}^{c^n} P(V | S_r) P(S_r) 
+\qquad (1)
+\]</span></p>
+<p>Üstteki formüldeki <span class="math inline">\(P(S_r)\)</span>'in açılımını MZ'lerden zaten biliyoruz,</p>
+<p><span class="math display">\[ P(S_r) = \prod_{t=1}^{T}P(X_t|X_{t-1}) \]</span></p>
+<p>Yani gizli konum geçişlerine tekabül eden <span class="math inline">\(a_{ij}\)</span>'leri bulup onları sırasıyla çarpıyoruz. Üstteki <span class="math inline">\(\{1,4,2,2,1,4\}\)</span> örneği için bu çarpım <span class="math inline">\(a_{14}a_{42}a_{22}a_{21}a_{14}\)</span> olurdu.</p>
+<p>Ayrıca <span class="math inline">\(P(V|S_r)\)</span>'in açılımını da biliyoruz,</p>
+<p><span class="math display">\[ P(V|S_r) = \prod_{t=1}^{T} P(V_t | X_t) \]</span></p>
+<p>Birleştirelim ve (1)'i genişletelim,</p>
+<p><span class="math display">\[ 
+P(V) = \sum_{r}^{c^T} \prod_{t=1}^{T} P(V_t | X_t)  P(X_t|X_{t-1}) 
+\]</span></p>
+<p>Formül biraz korkutucu duruyor ama aslında söylediği şu: verilen bir <span class="math inline">\(V\)</span>'nin olasılığını hesaplamak için tüm mümkün saklı konum dizileri üzerinden bir toplam almalıyız, bu toplamdaki her dizi için <span class="math inline">\(a_{ij}\)</span> üzerinden gizli geçişlerin çarpımını alırız, sonra görünen salımların bir çarpımını alırız, ki bu bilgi zaten <span class="math inline">\(b_{jk}\)</span> içinde. <span class="math inline">\(A,B\)</span> bilindiğine göre tarif edilen işlemler direk yapılabilir.</p>
+<p>Fakat bu hesap aşırı yüksek boyutlu bir hesaptır, çetrefilliği <span class="math inline">\(O(c^T \cdot T)\)</span>, mesela <span class="math inline">\(c=10,T=20\)</span> olsa <span class="math inline">\(10^{21}\)</span> ölçeğinde bir hesaptan bahsediyoruz. İçinde <span class="math inline">\(c\)</span> sembol olan bir alfabenin <span class="math inline">\(n\)</span> uzunluğunda çok fazla farklı dizilimi mümkündür.</p>
+<p>İleri Algoritması (Forward Algorithm)</p>
+<p>Fakat <span class="math inline">\(P(V)\)</span>'yi literatürde ileri algoritması denilen bir yöntemle özyineli (recursive) olarak hesaplamak mümkündür. Bakıyoruz her terim $P(V_t | X_t) P(X_t|X_{t-1}) $için sadece <span class="math inline">\(V_t,X_t,X_{t-1}\)</span> gerekli. O zaman özyineli hesap için yeni bir değişken tanımlarız, bilinen bir model <span class="math inline">\(\lambda = (A,B)\)</span> için</p>
+<p><span class="math display">\[ \alpha_t(i) = P(V_1,V_2,..,V_t, X_t = i; \lambda) \]</span></p>
+<p>Bu gözlenen salım dizisinin sadece bir kısmı üzerinden tanımlanmış bir olasılık; tanıma göre zaman indisi 1'den <span class="math inline">\(t\)</span>'ye kadar, ve bu en son <span class="math inline">\(t\)</span> noktasında saklı konum <span class="math inline">\(i\)</span>'de olmalı. Özyineli tanımı görmek için <span class="math inline">\(\alpha_1(i)\)</span>'nin ne olduğuna bakalım, notasyon kısalığı için <span class="math inline">\(\pi_i = P(X_1 = i)\)</span>,</p>
+<p><span class="math display">\[
+\alpha_1(i) = \pi_i b_{i,V_1}
+\]</span></p>
+<p>Tümevarımsal (induction), özyineli kısım ise şöyle tanımlanır,</p>
+<p><span class="math display">\[
+\alpha_{t+1}(j) = \bigg[  \sum_{i=1}^{c} \alpha_t(i)a_{ij} \bigg] b_{j,V_{t+1}}
+\]</span></p>
+<p>Formülün niye performans ilerlemesi getirdiğini görmek için örnek 1,2,3,4 gizli konumların tüm permutasyonlarının düşünelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> itertools
+l <span class="op">=</span> <span class="bu">list</span>(itertools.permutations([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]))[:<span class="dv">10</span>]
+<span class="cf">for</span> x <span class="kw">in</span> l: <span class="bu">print</span> x
+<span class="bu">print</span> <span class="st">&#39;...&#39;</span></code></pre></div>
+<pre><code>(1, 2, 3, 4)
+(1, 2, 4, 3)
+(1, 3, 2, 4)
+(1, 3, 4, 2)
+(1, 4, 2, 3)
+(1, 4, 3, 2)
+(2, 1, 3, 4)
+(2, 1, 4, 3)
+(2, 3, 1, 4)
+(2, 3, 4, 1)
+...</code></pre>
+<p>Mesela <span class="math inline">\(t=2\)</span>'de <span class="math inline">\(\alpha_2(V_2)\)</span> hesabını düşünelim; bu hesap ilk satırdaki 1,2,.. için bir kere yapılmış olacaktır, 2. satırda bir daha hesaplanması gerekmez. Hatta daha geriye gidersek ilk adımda 1 konumunda olan tüm satırlar da (6 tane) sadece bir kez <span class="math inline">\(\alpha\)</span> ile hesaplanırlar.</p>
+<p>Geri Algoritması (Backward Algorithm)</p>
+<p>Benzer şekilde <span class="math inline">\(\beta_t(i)\)</span> üzerinden bir geri algoritması diye bilinen bir algoritma vardır; bu algoritma ileri versiyonun bir nevi aynadaki yansıması. Bu algoritmada <span class="math inline">\(t=1\)</span>'den ileri değil, <span class="math inline">\(T\)</span>'den geriye doğru gitmiş oluyoruz.</p>
+<p><span class="math display">\[ \beta_t(i) = P(V_{t+1}, v_{t+2},...,V_{T} | X_t = i ; \lambda )  \]</span></p>
+<p>Bu formül bilinen model <span class="math inline">\(\lambda\)</span> ve <span class="math inline">\(t\)</span> anında saklı konum <span class="math inline">\(i\)</span>'de olma koşuluna göre, <span class="math inline">\(t+1\)</span>'den en sona kadar olan verili salımların olasılığının hesabını yapar. Özyineli adım,</p>
+<p><span class="math display">\[ \beta_T(i) = 1 \]</span></p>
+<p><span class="math display">\[ \beta_t(i) = \sum_{j=1}^{c} a_{ij}b_{j,V_{t+1}} \beta_{t+1}(j)  \]</span></p>
+<p>Viterbi Algoritması</p>
+<p>Bilinen <span class="math inline">\(\lambda\)</span> için verili bir <span class="math inline">\(V\)</span> salımlarına tekabül eden saklı konum geçişlerini bulmak için Viterbi algoritması kullanalım. Detaylara girmeden önce hemen bir örnek görelim [3, sf. 606].</p>
+<p>Bir kumarhanede tek zar üzerinden oynanan bir oyunda zarların hileli olduğundan şüphe ediyoruz. Bu problemi HMM ile şu şekilde modelleyebiliriz: bir iyi zar bir de hileli zar var. Bu iki zar iki farklı &quot;saklı'' konuma tekabül edecekler. Ama biz bu saklı konumları görmüyoruz, sadece zar atışlarının sonucunu görüyoruz.</p>
+<div class="figure">
+<img src="tser_hmm_09.png" />
+
+</div>
+<p>Üstteki modele göre hileli zardan 6 gelme olasılığı (salım olasılığı) daha yüksek. İki saklı konum arasındaki geçiş anormal sayılmaz, &quot;arada sırada'' birinden bir konumdan diğerine geçiş var, kumarhane &quot;bazen'' zarları değiştiriyor yani. Şimdi saklı geçişi bulalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> dhmm
+
+rolls <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">6</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="op">\</span>
+         <span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">6</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">6</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">6</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="op">\</span>
+         <span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">4</span>]
+rolls <span class="op">=</span> np.array(rolls)<span class="op">-</span><span class="dv">1</span>
+a <span class="op">=</span> np.array([[<span class="fl">0.95</span>, <span class="fl">0.05</span>],[<span class="fl">0.05</span>, <span class="fl">0.95</span>]])
+b <span class="op">=</span> np.array([[<span class="dv">1</span><span class="op">/</span><span class="fl">6.</span>, <span class="dv">1</span><span class="op">/</span><span class="fl">6.</span>, <span class="dv">1</span><span class="op">/</span><span class="fl">6.</span>, <span class="dv">1</span><span class="op">/</span><span class="fl">6.</span>, <span class="dv">1</span><span class="op">/</span><span class="fl">6.</span>, <span class="dv">1</span><span class="op">/</span><span class="fl">6.</span>], 
+              [<span class="dv">1</span><span class="op">/</span><span class="fl">10.</span>,<span class="dv">1</span><span class="op">/</span><span class="fl">10.</span>,<span class="dv">1</span><span class="op">/</span><span class="fl">10.</span>,<span class="dv">1</span><span class="op">/</span><span class="fl">10.</span>,<span class="dv">1</span><span class="op">/</span><span class="fl">10.</span>,<span class="dv">1</span><span class="op">/</span><span class="fl">2.</span>]])
+pi <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>])
+
+hmm <span class="op">=</span> dhmm.HMM(<span class="dv">2</span>,<span class="dv">6</span>,pi,a,b)
+<span class="bu">print</span> hmm.viterbi_path(rolls)</code></pre></div>
+<pre><code>[0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]</code></pre>
+<p>Müthiş! Viterbi ile ne zaman hileli, ne zaman düzgün zar kullanıldığını pat diye hesapladık. Kumarhane önce hilesiz başlıyor, ardından zarları değiştiriyor ve uzun süre hile yapıyor.</p>
+<p>Algoritmanın nasıl işlediğini anlamak için farklı bir modele bakalım,</p>
+<div class="figure">
+<img src="tser_hmm_03.png" />
+
+</div>
+<p>Bu modelde 3 tane saklı konum var, ve salım alfabesi <span class="math inline">\(a,b\)</span> (tabii kodlama / matematiksel olarak 1,2 olacak). Viterbi algoritmasının işleyişini anlatmak için saklı konumlar ve aralarındaki geçiş zamana doğru sağa doğru yayılacak şekilde resimlenir, bu resme &quot;trellis'' deniyor.</p>
+<div class="figure">
+<img src="tser_hmm_08.png" />
+
+</div>
+<p>Kısayol algoritması şöyle; üstteki resimde zaman/konum düğümlerine başlangıçtan o noktaya gelmenin olasılığı yazılmış. Yani bu değer o noktanın ne kadar olası olduğunu gösteriyor. Hesabın bir örneği; trellisin ortasından secelim, diyelim ki <span class="math inline">\(t=1\)</span> anında 3 konumundan 1 konumuna geçmek istiyoruz, bu geçiş sonrası yol ne olur? <span class="math inline">\(t=1\)</span>'de 3 üzerinde 0.1 diyor, 3-1 geçişinin olasılığı 0.4 çarpı 1 konumundan 'b' salımı olasılığı 0.5, o zaman 0.1<em>0.4</em>0.5 = 0.02. Böylece başla-3-1 yolunun olasılığı 0.02 haline geldi. Bu hesap sağa doğru genişletilir, eğer bir noktaya birden fazla geçiş mümkün ise, nihai hesaplar arasında en yüksek olan seçilir. En sağa geldiğimizde 1'de biten bir 0.016 yolu görüyoruz, bir de 3'de biten bir 0.016 yolu görüyoruz. İki yolun hesabı aynı çıktı, çoğunlukla bu durum olmaz, fakat bu yollardan herhangi birini seçmek, ya da ikisini birden raporlamak problem değildir.</p>
+<p>Yolu <code>dhmm</code>'e hesaplatırsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> dhmm
+a <span class="op">=</span> np.array([[<span class="fl">0.1</span>,<span class="fl">0.4</span>,<span class="fl">0.4</span>],[<span class="fl">0.4</span>,<span class="fl">0.1</span>,<span class="fl">0.5</span>],[<span class="fl">0.4</span>,<span class="fl">0.5</span>,<span class="fl">0.1</span>]])
+b <span class="op">=</span> np.array([[<span class="fl">0.5</span>,<span class="fl">0.5</span>],[<span class="fl">0.8</span>,<span class="fl">0.2</span>],[<span class="fl">0.2</span>,<span class="fl">0.8</span>]])
+pi <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>])
+
+hmm <span class="op">=</span> dhmm.HMM(<span class="dv">3</span>,<span class="dv">2</span>,pi,a,b)
+<span class="bu">print</span> hmm.viterbi_path([<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>])</code></pre></div>
+<pre><code>[0 2 0]</code></pre>
+<p>Eğer 1 ve 3'e en soldan giriş yapan bir başlangıç noktası S, ve en sonda tüm düğümlerin gittiği bir bitiş noktası E hayal edersek, aslında üstteki tarif edilen [6] yazısında anlatılan kısayol algoritmasına benziyor. Elimizde bir yönlü ve çevrimsiz bir çizit (directed, acyclic graph) var, S'den başlıyoruz, sürekli adım atarak arkada bıraktığımız yolun uzunluğunu (bu durumda olasılığını) sürekli toplayarak her adımda hesaplıyoruz, ve hatırlıyoruz (gerçi üstteki örnekte olasılıklar çarpıldı -çünkü o yolun birleşik olasılığı hesaplanmalıydı- fakat log alınıp toplanabilirdi, hatta sayısal stabilite sebepleriyle bu yapılmalıdır). Trellis'teki her geçiş çizitte bir kenar, daha önce kullandığımız örnek <span class="math inline">\(t=1\)</span> anındaki 3-1 geçişi için kenar 0.4*0.5=0.2. Bu kenarlar takip edilerek bir kısayol bulunacaktır.</p>
+<p>Model Öğrenmek, İleri-Geri Algoritması</p>
+<p>HMM'in güzellikleri bitmedi; sadece görünen semboller dizisini kullanarak, sadece kaç tane saklı konum olacağını tanımlayarak, tüm HMM modelini öğrenmek mümkün. Yani <span class="math inline">\(A,B\)</span> matrisleri, ve tabii ki bunu elde edince görünen salımlara tekabül eden saklı geçişleri de hesaplayabilecegiz. Kumarhane örneğine dönelim, yeni bir HMM yaratalım, ve dışarıdan bir model tanımlamadan, onu direk veri ile eğitelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">hmm2 <span class="op">=</span> dhmm.HMM(<span class="dv">2</span>,<span class="dv">6</span>)
+hmm2.train([rolls],<span class="bu">iter</span><span class="op">=</span><span class="dv">20</span>)
+<span class="bu">print</span> hmm2.viterbi_path(rolls)
+<span class="bu">print</span> <span class="st">&#39;aic&#39;</span>, hmm2.aic()
+<span class="bu">print</span> hmm2.transmat
+<span class="bu">print</span> hmm2.prior
+<span class="bu">print</span> hmm2.obsmat</code></pre></div>
+<pre><code>[0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+aic 233.31799296
+[[ 0.97008754  0.02991246]
+ [ 0.32816368  0.67183632]]
+[ 0.5  0.5]
+[[ 0.12184793  0.23208224  0.19549656  0.10143301  0.27422243  0.07491783]
+ [ 0.18905143  0.2018225   0.17782606  0.17010257  0.01788689  0.24331055]]</code></pre>
+<p>Saklı konum geçişleri aynı çıktı! Gerçi eğitimi birkaç kez işletmek gerekti, çünkü HMM eğitimi bir tür Beklenti-Maksimizasyon (Expectation-Maximization -EM-) algoritması kullanır, ve bu algoritmanın yerel maksimada takılıp kalması mümkündür, o yüzden birkaç kez işlettik, ve AIC'si en düşük olanı seçtik. Fakat bu zaten EM kullanıldığında uygulanması tavsiye edilen bir tekniktir.</p>
+<p>Detaylara inmeden önce formülsel olarak, bize verili bir <span class="math inline">\(V\)</span> dizisi bağlamında <span class="math inline">\(t\)</span> anında <span class="math inline">\(i\)</span> konumunda olmanın olasılığı lazım; yani <span class="math inline">\(P(X_t = i | V; \lambda)\)</span>. Bu formüle nasıl erişiriz? <span class="math inline">\(X_t = i\)</span> ile <span class="math inline">\(V\)</span>'nin birleşik dağılımını düşünelim (<span class="math inline">\(\lambda\)</span>'yi kalabalık olmasın diye göstermiyoruz), onu <span class="math inline">\(V\)</span>'leri ortadan bölerek iki parçalı olarak gösterebiliriz,</p>
+<p><span class="math display">\[
+P(X_t = i, V) = P( V_1,V_2,..,V_t,X_t=i) P (V_{t+1},V_{t+2},..,V_T | X_t=i )
+\]</span></p>
+<p>Eşitliğin sağ tarafındaki ilk kısım <span class="math inline">\(\alpha\)</span> ikinci kısım <span class="math inline">\(\beta\)</span> değil mi? Evet. O zaman</p>
+<p><span class="math display">\[  = \alpha_t(i) \beta_t(i) \]</span></p>
+<p>Fakat hala <span class="math inline">\(V\)</span>'nin verili olduğu hali elde etmedik, onun için bir bölüm lazım. Bölümü yapalım ve sonuca yeni bir sembol verelim,</p>
+<p><span class="math display">\[ 
+\gamma_t(i) \equiv P(X_t = i | V) = 
+\frac{P(X_t = i, V) }{P(V)} = 
+\frac{\beta_t(i)\alpha_t(i)}{ P(V)} 
+\]</span></p>
+<p>Bu noktada, teorik olarak,</p>
+<p><span class="math display">\[ \underset{argmax}{1 \le i \le c} [ \gamma_t(i) ] \]</span></p>
+<p>çözümü, yani <span class="math inline">\(t\)</span> anında <span class="math inline">\(\gamma_t(i)\)</span> maksimize edecek en iyi <span class="math inline">\(X_t\)</span> konumunu bulmak ve bunu tüm <span class="math inline">\(t\)</span>'ler için yapmak bize verili <span class="math inline">\(V\)</span> için en optimal saklı yolu verir diye düşünebilirdik, fakat üstteki ifade teker teker konumlara bakıyor, ve geçişleri gözönüne almıyor. Bunun için Viterbi algoritması hala en iyi çözüm. Detaylar için [1]. Her halükarda, üstteki ifade bize eğitim için yardımcı olacak.</p>
+<p>Devam edelim, <span class="math inline">\(\xi\)</span>'i tanımlayalım,</p>
+<p><span class="math display">\[
+\xi_t(i,j) = P(X_t = i, X_{t+1}= j | V; \lambda) 
+\qquad (2)
+\]</span></p>
+<p><span class="math inline">\(\xi\)</span> ile <span class="math inline">\(t\)</span> anında <span class="math inline">\(i\)</span> konumunda <span class="math inline">\(t+1\)</span> anında <span class="math inline">\(j\)</span> konumunda olma olasılığını tanımlamış oluyoruz. Üstteki ifadeyi</p>
+<p><span class="math display">\[  = \frac{\alpha_t(i)a_{ij}b_{j,V_{t+1}}\beta_{t+1}(j)  }{P(V;\lambda)}\]</span></p>
+<p>olarak yazabiliriz, ve</p>
+<p><span class="math display">\[  
+= \frac{\alpha_t(i)a_{ij}b_{j,V_{t+1}}\beta_{t+1}(j)  }
+{\sum_{i=1}^{c}\sum_{j=1}^{c} \alpha_t(i)a_{ij}b_{j,V_{t+1}}\beta_{t+1}(j)  }
+\]</span></p>
+<p>Bölendeki ifade bölünendeki ifadenin tüm <span class="math inline">\(i,j\)</span> üzerinden alınan toplamının geriye sadece <span class="math inline">\(P(V;\lambda)\)</span> bırakacak olmasından ileri geliyor, çünkü (2)'den hareketle bölünendeki ifade <span class="math inline">\(P(X_t = i, X_{t+1}= j, V; \lambda)\)</span>.</p>
+<p><span class="math inline">\(\gamma_t(i)\)</span>'yi daha önce <span class="math inline">\(V\)</span>'nin verildiği ve <span class="math inline">\(\lambda\)</span> modeli bilindiği durumda <span class="math inline">\(t\)</span> anındaki saklı konum <span class="math inline">\(i\)</span>'de olmak diye açıklamıştık. O zaman <span class="math inline">\(\gamma_t(i)\)</span> ve <span class="math inline">\(\xi_t(i,j)\)</span> arasında bir ilişki kurabiliriz,</p>
+<p><span class="math display">\[ \gamma_t(i) =  \sum_{j=1}^{c} \xi_t(i,j) \]</span></p>
+<p>Eğer <span class="math inline">\(\gamma_t(i)\)</span>'nin tüm <span class="math inline">\(t\)</span>'ler üzerinden toplamını alırsak, bu hesap tüm zamanlar için <span class="math inline">\(i\)</span> konumunda olmanın, ya da <span class="math inline">\(i\)</span> konumundan başka herhangi bir konuma geçmiş olmanın beklentisi olarak görülebilir (tabii en son zaman indisi <span class="math inline">\(T\)</span>'yi bu durumda toplamdan çıkartmak lazım, çünkü o noktadan başka bir noktaya geçmek mümkün değil). Aynı şekilde <span class="math inline">\(\xi_t(i,j)\)</span>'nin <span class="math inline">\(t=1,..,T-1\)</span> üzerinden toplamını almak, bize konum <span class="math inline">\(i\)</span> ve <span class="math inline">\(j\)</span> arasındaki tüm geçişlerin beklentisini verebilir.</p>
+<p><span class="math display">\[ \sum_{t=1}^{T-1} \gamma_t(i) = \textrm{ i&#39;den başka bir konuma geçiş beklentisi} \]</span></p>
+<p><span class="math display">\[ \sum_{t=1}^{T-1} \xi_t(i,j) = \textrm{ i&#39;den j&#39;ye geçiş beklentisi} \]</span></p>
+<p>Üstteki formülleri kullanarak HMM'in parametreleri <span class="math inline">\(\lambda = (\pi,A,B)\)</span>'yi tahminsel hesaplamak mümkündür.</p>
+<p><span class="math display">\[ \overline{\pi} = \textrm{t=1 anında i konumunda olma frekansı} = \gamma_1(i)
+\qquad (3)
+\]</span></p>
+<p><span class="math display">\[ \overline{a_{ij}} = \frac{\textrm{i konumundan j konumuna geçiş beklentisi}}
+{\textrm{i konumundan başka herhangi bir konuma geçişin beklentisi}}
+\]</span></p>
+<p><span class="math display">\[  = \frac{ \sum_{t=1}^{T-1}\xi_t(i,j) }{ \sum_{t=1}^{T-1} \gamma_t(i) } 
+\qquad (4)
+\]</span></p>
+<p><span class="math display">\[ 
+\overline{b_{j,k}} = 
+\frac{\textrm{j konumunda olup } v_k \textrm{ sembolunu görmüş olmanın beklentisi}}
+{j \textrm{ konumunda olmanın beklentisi} }
+ \]</span></p>
+<p><span class="math display">\[ = \frac{\sum_{t=1}^{T-1} \gamma_t(j) 1(V_t=k) }{\sum_{t=1}^{T-1}\gamma_t(j) } 
+\qquad (5)
+\]</span></p>
+<p>Tüm bunları kullanarak eğitim yaklaşımını şöyle belirleyebiliriz: bir <span class="math inline">\(\lambda=(\pi,A,B)\)</span> modeli ile başla, ki başlangıç model rasgele değerler ile bile tanımlanmış olabilir. Ardından formüller (3,4,5)'i kullanarak <span class="math inline">\(\overline{\pi},\overline{a_{ij}}\)</span> ve <span class="math inline">\(\overline{b_{j,k}}\)</span>'yi hesapla. Bu hesap ardından Baum ve arkadaşları tarafından ispatlanmıştır ki [1] <span class="math inline">\(P(V;\overline{\lambda}) &gt; P(V;\lambda)\)</span>, yani yeni hesaplanan model veriyi eskisinden daha iyi açıklayacaktır. O zaman üstteki hesapları yeni hesaplanan <span class="math inline">\(\overline{\lambda}\)</span> ile tekrarlarsak, tekrar daha iyi bir model elde ederiz. Bunu ardı ardına yaparsak en optimal modele erişmiş oluruz. Bu yaklaşım aslında bir Beklenti-Maksimizasyon'dur (EM). Karışım modellerinde olduğu gibi akılda tutmak gerekir ki EM lokal maksima'yı bulur, eğer bu maksimum nokta global (tüm modelin) maksimumu değil ise yanlış bir noktada takılıp kalmış olabilir. Bu yüzden standart tekniği burada da kullanıyoruz, farklı rasgele başlangıç noktalarından başlatıp en iyi olurluğu rapor eden modeli nihai model olarak seçeriz.</p>
+<p>Sürekli Salımlar (Continuous Emissions)</p>
+<p>Şimdiye kadar gördüğümüz ayrıksal HMM'ler her konumunda farklı bir ayrıksal dağılıma göre zar atıyordu. A,B,C konumları olsun, A konumundan ayrıksal dağılım <span class="math inline">\(\left[\begin{array}{ccc} 0.2 &amp; 0.5 &amp;  0.3 \end{array}\right]^T\)</span>'a göre zar atıyor olabiliriz, B konumunda farklı bir ayrıksal dağılım <span class="math inline">\(\left[\begin{array}{ccc} 0.4 &amp; 0.5 &amp;  0.1 \end{array}\right]^T\)</span>'e göre zar atıyor olabiliriz.</p>
+<p>Fakat HMM matematiği ayrıksal dağılımlar ile kısıtlı değildir. Her konumun salım dağılımının ayrıksal olduğu gibi sürekli olması da mümkündür.</p>
+<div class="figure">
+<img src="tser_hmm_10.png" />
+
+</div>
+<p>Üstteki resimde iki tane HMM gösteriyoruz, A,B,C diye tanımlı 3 konum var (üst sıra bir HMM, alt sıra bir diğeri). Bu modele göre her konumda farklı olan salım dağılımı ayrıksal değil, bir Gaussian. Mesela 1. HMM için A konumunun mavi renkle gösterilen tek boyutlu bir Gaussian dağılımı var (sol üst köşe), bu Gaussian <span class="math inline">\(\mu=1\)</span> üzerinden tanımlı, yeşil olan <span class="math inline">\(\mu=2\)</span>, vs. 1. HMM için örnek bir sürekli salım zinciri üst sağ köşedeki gibi olabilir. Bir blokta 1 değeri etrafında bazı değerler görüyoruz, ardından 2 etrafında bir blok, sonra 3, sonra 2, böyle devam ediyor. Bu salım değerlerine bakarak bir HMM'i eğitip hangi konumda hangi Gaussian olduğunu ve konumlar arası geçiş olasılıklarını öğrenebiliriz! Resimde alt sırada farklı Gaussian'lar ve (tabii ki) daha farklı salım zinciri var (saklı geçiş zinciri aynı, ki bu durum modele uygun, fakat saklı zincir biraz daha farklı da olabilirdi).</p>
+<p>Sürekli dağılım bazlı HMM matematiği biraz daha farklı, bu konunun detayları için [3, sf. 603]. Bu tür HMM hesapları için <code>mhmm</code> modülünü paylaştık. Bu modülle salım dağılımlarını hem çok boyutlu Gaussian, hem de her konum için çok boyutlu <em>birkaç</em> Gaussian karışımı olarak modelleyebiliriz.</p>
+<p>Bu modül ile [4, sf. 50]'de gösterilen deprem örneğini çözebiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;earthquakes.txt&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s*&#39;</span>,header<span class="op">=</span><span class="va">None</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+data <span class="op">=</span> df[<span class="dv">1</span>]
+data.plot()
+plt.title(<span class="st">&#39;Depremler&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_hmm_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_hmm_04.png" />
+
+</div>
+<p>Üstteki grafikte dünyada her sene kaç tane büyük (Richter ölçeği 7 ve üzeri) deprem olduğu gösteriliyor. Eşit büyüklükteki zaman aralıklarında vuku bulan olayların sayısı çoğunlukla Poisson ile modellenir, ki [4] problemi böyle çözmüş. Gaussian karışımları ile herhangi bir dağılımı yaklaşıklayabileceğimizi biliyoruz, o zaman tek boyutlu iki Gaussian karışımı üzerinden salımları modelleyebiliriz. Kaç tane saklı konum olmalı? [4]'te 2 ve 3 denenmiş; 2 konumlu durum depremlerin düşük seviyeli ya da yüksek seviyeli zaman bloklarında meydana geldiği şeklinde görülebilir. 3 konum veriyi düşük, orta, yüksek olarak ayırır. Bu modellerden hangisi daha iyidir?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> mhmm
+c<span class="op">=</span><span class="dv">2</span>
+prior0 <span class="op">=</span> np.ones(c) <span class="op">*</span> <span class="dv">1</span><span class="op">/</span>c
+transmat0, _ <span class="op">=</span> mhmm.mk_stochastic(np.random.rand(c,c))
+d <span class="op">=</span> np.reshape(data,(<span class="dv">1</span>,<span class="bu">len</span>(data),<span class="dv">1</span>))
+hmm <span class="op">=</span> mhmm.HMM(n_components<span class="op">=</span>c, n_mix<span class="op">=</span><span class="dv">2</span>, startprob<span class="op">=</span>prior0, 
+               transmat<span class="op">=</span>transmat0, covariance_type<span class="op">=</span><span class="st">&#39;diag&#39;</span>)        
+hmm.fit(dd)
+
+<span class="bu">print</span> <span class="st">&#39;aic&#39;</span>, hmm.aic()        
+<span class="bu">print</span> hmm.score(d)
+<span class="bu">print</span> hmm.transmat_</code></pre></div>
+<pre><code>(4, 1)
+iteration 1, loglik = -344.981925
+iteration 2, loglik = -339.666685
+iteration 3, loglik = -338.222636
+aic 696.445271513
+[-337.77961902]
+[[ 0.92211706  0.07788294]
+ [ 0.06461021  0.93538979]]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">c<span class="op">=</span><span class="dv">3</span>
+prior0 <span class="op">=</span> np.ones(c) <span class="op">*</span> <span class="dv">1</span><span class="op">/</span>c
+transmat0, _ <span class="op">=</span> mhmm.mk_stochastic(np.random.rand(c,c))
+d <span class="op">=</span> np.reshape(data,(<span class="dv">1</span>,<span class="bu">len</span>(data),<span class="dv">1</span>))
+hmm <span class="op">=</span> mhmm.HMM(n_components<span class="op">=</span>c, n_mix<span class="op">=</span><span class="dv">2</span>, startprob<span class="op">=</span>prior0, 
+               transmat<span class="op">=</span>transmat0, covariance_type<span class="op">=</span><span class="st">&#39;diag&#39;</span>)        
+hmm.fit(d)
+<span class="bu">print</span> <span class="st">&#39;aic&#39;</span>, hmm.aic()        
+<span class="bu">print</span> hmm.score(d)
+<span class="bu">print</span> hmm.transmat_</code></pre></div>
+<pre><code>(6, 1)
+iteration 1, loglik = -363.687193
+iteration 2, loglik = -355.604032
+iteration 3, loglik = -351.994401
+iteration 4, loglik = -347.108994
+iteration 5, loglik = -341.249047
+iteration 6, loglik = -336.556782
+iteration 7, loglik = -333.417138
+aic 702.834275264
+[-331.17921244]
+[[ 0.85777432  0.10857336  0.03365233]
+ [ 0.16314564  0.70421656  0.1326378 ]
+ [ 0.05122129  0.16358917  0.78518954]]</code></pre>
+<p>Her iki örnek için geçiş matrisi [4, sf. 51]'de gösterilen sonuçlara oldukça yakın çıktı. AIC sonuçlarına göre 2 saklı konumlu model 3 saklı modelliden biraz daha iyi gibi duruyor. AIC değerleri de [4. sf. 91]'de raporlanan değerlere oldukça yakın.</p>
+<p>Ses Tanımak</p>
+<p>Bir ses kaydı zaman dilimlerinin birbiri ile bağlantılı olduğu bir zaman serisine örnektir. <code>rec.py</code> ile istediğimiz sesi bilgisayarımızın mikrofonu ile kaydedebiliriz. Bizim önceden kaydettiğimiz bazı sesler altta,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.io.wavfile
+<span class="im">from</span> scikits.talkbox.features <span class="im">import</span> mfcc
+
+sample_rate, computer <span class="op">=</span> scipy.io.wavfile.read(<span class="st">&#39;computer.wav&#39;</span>)
+sample_rate, emacs <span class="op">=</span> scipy.io.wavfile.read(<span class="st">&#39;emacs.wav&#39;</span>)
+sample_rate, nothing <span class="op">=</span> scipy.io.wavfile.read(<span class="st">&#39;nothing.wav&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(computer)
+plt.title(<span class="st">&#39;Computer&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_hmm_05.png&#39;</span>)
+plt.hold(<span class="va">False</span>)
+plt.plot(emacs)
+plt.title(<span class="st">&#39;Emacs&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_hmm_06.png&#39;</span>)
+plt.hold(<span class="va">False</span>)
+plt.plot(nothing)
+plt.title(<span class="st">&#39;Nothing&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_hmm_07.png&#39;</span>)
+plt.hold(<span class="va">False</span>)</code></pre></div>
+<p><img src="tser_hmm_05.png" /> <img src="tser_hmm_06.png" /> <img src="tser_hmm_07.png" /></p>
+<p>HMM'ler ses tanıma için biçilmiş kaftan. Fakat genellikle üstteki zaman serileri direk oldukları şekilde kullanılmazlar. Ses kayıtları belli dilimlere bölünerek, o bölümler üzerinde özellik çıkarımı (feature extraction) uygulanır. Bu özelliklerden en popüleri Mel Frekansı Cepstral Katsayıları (MFCC). Alttaki çağrıyla 2 saniyelik kaydımız üzerinde MFCC hesabını görüyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scikits.talkbox.features <span class="im">import</span> mfcc
+ceps_c, mspec, spec <span class="op">=</span> mfcc(emacs)
+<span class="bu">print</span> <span class="st">&#39;ses kaydi&#39;</span>, <span class="bu">len</span>(emacs) , <span class="st">&#39;boyut&#39;</span>, ceps_c.shape
+<span class="bu">print</span> <span class="bu">len</span>(emacs) <span class="op">/</span> <span class="dv">549</span></code></pre></div>
+<pre><code>ses kaydi 88064 boyut (549, 13)
+160</code></pre>
+<p>Eğer HMM'ses tanımak için kullanmak istiyorsak HMM eğitimini üstte boyutları gösterilen MFCC vektör dizisi üzerinde uygularız. HMM salımı 13 boyutlu bir Gaussian karışımı olur (karışım sayısı uygulamaya göre farklı olabilir). Optimal saklı konum sayısı AIC üzerinden saptanır. Her bilinen ses kaydı için ayrı bir HMM eğitilir, mesela 'emacs' kaydı için bir HMM, 'computer' sesi için ayrı bir HMM... Nihai uygulama ise mikrofondan gelen sesleri 2. saniyelik kısımlara bölerek üzerlerinde yine aynı MFCC hesabını yapar, ve bu vektör dizisinin ne kadar olası olduğunu her HMM'e &quot;sorar''. Hangi HMM daha iyi olurluk rapor ediyorsa ses o etikete aittir.</p>
+<p>Ödev: Ekteki <code>mic.py</code>'da mikrofondan sürekli gelen verilerin işlenmesi gösteriliyor, bu örnek üstteki teknik ile HMM için uzatılabilir.</p>
+<p>Kaynaklar</p>
+<p>[1] Rabiner, {}</p>
+<p>[2] Shalizi, <em>Statistics, Chaos, Complexity and Inference Lecture</em></p>
+<p>[3] Murphy, <em>Machine Learning, A Probabilistic Perspective</em></p>
+<p>[4] Zuccini, <em>Hidden Markov Models for Time Series</em></p>
+<p>[5] Bayramlı, Lineer Cebir, <em>Ders 21</em></p>
+<p>[6] Bayramlı, Bilgisayar Bilim, <em>Dinamik Programlama</em></p>
+</body>
+</html>

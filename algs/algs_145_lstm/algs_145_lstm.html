@@ -1,0 +1,440 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="uzun-kısa-vade-hafıza-ağları-long-short-term-memory-networks-lstm">Uzun Kısa-Vade Hafıza Ağları (Long Short-Term Memory Networks, LSTM)</h1>
+<p>Kendini tekrarlayan YSA (RNN) yapılarının içindeki gizli konum <span class="math inline">\(h_t\)</span> (önceki yazıda <span class="math inline">\(s_t\)</span>) olarak bir zaman diliminden bir diğerine aktarılabiliyordu, ve bu sırada bir matris çarpımı üzerinden değişime uğrayabiliyordu. Böylece her zaman diliminde yeni görülen verinin &quot;hafıza'' olarak ta tanımlanabilen <span class="math inline">\(h_t\)</span>'ye etkisi olabiliyordu. RNN dış dünya hakkındaki iç modelini böyle güncelliyordu.</p>
+<p>Fakat RNN ile tarif edilen bu güncellemeye hiç bir sınır getirmedik. Biraz düşünürsek bu güncellemenin biraz kaotik bir hal alabileceğini görebiliriz [1]. Mesela bir filmi kare kare izleyerek filmde neler olduğunu tarif etmeye uğraşan bir RNN düşünelim. Bir karede bir karakterin ABD'de olduğunu düşünebilir, ama sonraki karede karakterin suşi yediğini görüyor ve Japonya'da olduğuna karar verebilir, sonra Panda ayısı görüyor ve karakteri kuzey kutbunda zannediyor.</p>
+<p>Bu tarif edilen kaos enformasyonun çok hızlı etki ettiğini ve aynı hızda yokolduğuna işaret. Bu tür bir yapıda modelin uzun vadeli hafıza tutması oldukça zor. Bize gereken modelin sadece güncelleme yapması değil, güncelleme yapmayı da öğrenmesi. Ali adlı bir karakter film karesinde yoksa o kareler Ali hakkındaki bilgiyi güncellemek için kullanılmamalı, aynı şekilde Ayşe'nin içinde olmadığı kareler onun hakkındaki bilgiyi güncellemek için kullanılmamalı.</p>
+<p>Çözüm için şöyle bir yaklaşım kullanabiliriz.</p>
+<ol style="list-style-type: decimal">
+<li><p>Bir &quot;unutma'' mekanizması ekle. Film seyrediyoruz, bir sahne bitiyor, o sahnenin hangi gün, saat kaçta, nerede olduğunu unutuyoruz. Fakat bir karakter o sahnede ölmüşse, bunu hatırlıyoruz. Modelin ne zaman hatırlayacağını, ne zaman unutacağını öğrenmesini istiyoruz (dikkat sadece belli bir şekilde unutması, hatırlaması değil, tüm bunları nasıl, ne zaman yapacağını öğrenmesi).</p></li>
+<li><p>Bir belleğe yazma (zulaya atma?) mekanizması. Modelin yeni bir kare gördüğünde o karedeki bilginin kaydetmeye değer olup olmadığına karar vermesi lazım, ve bu öğrenilse iyi olur.</p></li>
+<li><p>.. ki yeni bir girdi gelince model ihtiyacı olmadığı bilgiyi unutacak. Sonra girdinin hangi kısmının faydalı olduğuna karar verecek ve o kısmı uzun-vadeli hafızasına kaydedecek.</p></li>
+<li><p>Bir odaklanma mekanizması. Uzun-vadeli hafızanın hangi kısmı sık kullanım gerekiriyor, işlem hafızası (working memory) hangisi, buna karar vermek.</p></li>
+</ol>
+<p>Bize gereken bir uzun kısa-vade hafıza ağıdır, teknik ismiyle LSTM. RNN her zaman adımında hafızasını kontrolsüz bir şekilde güncelleyebiliyorken, bir LSTM hafızasını çok daha seçici, kararlı bir şekilde günceller, bunu yaparken spesifik öğrenme mekanizmaları kullanır ki bu mekanizma ona görülen bilginin hangi kısmının hatırlanmaya değer, hangisinin güncellenmesinin gerekli olduğunu, ve hangisinin daha fazla odaklanılmaya ihtiyaç duyduğunu belirler.</p>
+<p>Matematiksel olarak <span class="math inline">\(t\)</span> anında bir <span class="math inline">\(x_t\)</span> girdisi alıyoruz, uzun-vadeli ve işlem hafızası <span class="math inline">\(C_{t-1}\)</span> ve <span class="math inline">\(h_{t-1}\)</span> bir önceki zaman diliminden bir önceki bu zamana aktarılıyor ve onları bir şekilde güncellemek istiyoruz. Bize gereken bir tür hatırlama geçidi (remember gate), bu elektronik devrelerdeki gibi bir geçit, 0 ile 1 arasında olacak <span class="math inline">\(n\)</span> tane sayı, bu sayı <span class="math inline">\(n\)</span> hafıza ögesinin ne kadar hatırlanacağını, yani ne kadar uzun-vadeli olup olmayacağını belirleyecek. 1 tut, 0 unut demek olacak.</p>
+<p>Ufak bir YSA kullanarak bu geçidi öğrenebiliriz,</p>
+<p><span class="math display">\[ f_t = \sigma (W_r x_t + U_r h_{t-1}) \]</span></p>
+<p>Bu basit, sığ (derin olmayan) bir YSA, <span class="math inline">\(\sigma\)</span> sigmoid aktivasyonu. Sigmoid kullandık çünkü 0 ile 1 arasında çıktıya ihtiyacımız var. Şimdi girdiden öğreneceğimiz bilgiyi hesaplamamız lazım, bu bilgi uzun-vadeli hafızamız için bir aday olacak.</p>
+<p><span class="math display">\[ C_t&#39; = \phi(W_l x_t + U_l h_{t-1})\]</span></p>
+<p><span class="math inline">\(\phi\)</span> bir aktivasyon fonksiyonu, çoğunlukla <span class="math inline">\(\tanh\)</span> olarak seçilir.</p>
+<p>Fakat bir adayı hafızamıza eklemeden önce hangi bölümlerinin kullanıma, kaydetmeye değer olduğunu öğrenmemiz gerekir. Web'de bir şey okurken kendi zihnimizde neler olduğunu düşünelim. Bir haber makalesi okuyoruz mesela, Trabzonspor'un hep kötüye gittiğini, hep yanlış tranferler yaptığını anlatan bir haber okuyoruz, ama bu haberi fenerbahce.org sitesinde okuyorsak o habere daha az önem verebiliriz.</p>
+<p><span class="math display">\[ i_t = \sigma (W_s x_t + U_s h_{t-1}) \]</span></p>
+<p>Şimdi tüm bu basamakları birleştirelim. İhtiyacımız olmayan hafızaları unuttuktan ve bilgilerin faydalı olabilecek kısımlarını sakladıktan sonra, elimize bir güncellenmiş uzun-vadeli bellek geçer,</p>
+<p><span class="math display">\[ C_t = f_t \circ c_{t-1} \circ i_t \circ \tilde{C}_t \]</span></p>
+<p>ki <span class="math inline">\(\circ\)</span> operasyonu her iki taraftaki değişkenin içindeki her ögenin birer birer çarpılması (element-wise multiplication) demek.</p>
+<p>Sonra işlem hafızasını güncellememiz lazım, uzun-vade belleğimizi anlık işlem için faydalı olabilecek şekilde nasıl odaklarız, onu öğrenmek istiyoruz. O zaman bir odaklanma vektörü öğreniriz,</p>
+<p><span class="math display">\[ o_t = \sigma (W_f x_t + U_f h_{t-1}) \]</span></p>
+<p>O zaman işlem hafızamız</p>
+<p><span class="math display">\[ h_t = o_t \circ \phi (C_t)\]</span></p>
+<p>Yani odak değeri 1 olan öğelere tam dikkatimizi veriyoruz, 0 olanlara hiç dikkat etmiyoruz.</p>
+<p>Kuşbakışı ile tüm resmi görelim, kendini tekrar eden LSTM yapısı alttaki gibi,</p>
+<div class="figure">
+<img src="lstm_02.png" />
+
+</div>
+<p>Sol ve sağdaki hücreler ortadakinin kopyası.</p>
+<p>Kıyasla bir RNN'nin iç yapısı çok daha basittir,</p>
+<div class="figure">
+<img src="lstm_03.png" />
+
+</div>
+<p>LSTM resmindeki her birimin formülleriyle beraber teker teker tekrar üzerinden geçmek gerekirse [2] - ilk adım hücre bilgisinden neleri atacağımıza karar vermek. Bu karar unutma karar tabakası adı verilen bir sigmoid tabakasında veriliyor, tabaka <span class="math inline">\(h_{t-1}\)</span> ve <span class="math inline">\(x_t\)</span>'ye bakıyor ve <span class="math inline">\(C_{t-1}\)</span> hücre konumundaki her değer için 0 ile 1 arasında bir sayı üretiyor. 1 değeri tamamen tut, 0 değeri tamamen unut anlamına geliyor (tüm <span class="math inline">\(b\)</span> değerleri yanlılık -bias- için).</p>
+<div class="figure">
+<img src="lstm_04.png" />
+
+</div>
+<p>Bir sonraki adım hücrede hangi yeni bilgiyi depolayacağımıza karar vermek. Bu kararın iki parçası var, önce girdi geçit tabakası (input gate layer) hangi değerleri güncelleyeceğimize karar veriyor, ardından bir <span class="math inline">\(\tanh\)</span> tabakası bir &quot;aday vektörü'' <span class="math inline">\(\tilde{C}_t\)</span> üretiyor, bu vektör, adı üzerinde, hücre konumuna eklenmeye aday bilgiler. Ardından bu iki vektör birleştirilip konumu güncellemek için yeni bir vektör yaratılıyor.</p>
+<div class="figure">
+<img src="lstm_05.png" />
+
+</div>
+<p>Sıra güncelleme iş bantına (update conveyor) geldi. Herhalde bu isim verilmiş çünkü hücrenin en üstünde direk soldan sağa giden bu ok bir tür fabrika iş bantı gibi, bir ana akım hattı. Bir kaç bilgi akımı bu ana kola giriyor. Bu iş bantının görevi hücrenin eski konum bilgisini güncellemek, <span class="math inline">\(C_{t-1}\)</span>'i <span class="math inline">\(C_t\)</span> haline getirmek. Önceki adımlar ne yapılması gerektiğine karar vermişti, şimdi bu kararları eyleme geçirme zamanı. Eski konum bilgisini <span class="math inline">\(f_t\)</span> ile çarpıyoruz, böylece unutmak istediklerimizi unutuyoruz. Sonra <span class="math inline">\(i_t * C_t&#39;\)</span>'yi ekliyoruz, bunlar yeni konumu ne kadar güncellemek istediğimizi belirleyen ağırlıklarla ölçeklenmiş yeni aday değerler.</p>
+<div class="figure">
+<img src="lstm_06.png" />
+
+</div>
+<p>En son adım tahmin adımı, bu adımda artık çıktının ne olacağına karar veriyoruz. Çıktı mevcut hücre konumunu baz alacak, ama onun filtrelenmiş bir hali olacak. İlk önce bir sigmoid işleterek konumun hangi kısmının çıktıya verileceğini kararlaştırıyoruz. Ardından mevcut konum bilgisini bir <span class="math inline">\(\tanh\)</span>'e veriyoruz, ki bu değerlerin <span class="math inline">\(-1,+1\)</span> arasında gelmesini sağlıyoruz, ve bu sonucu sigmoid'den gelen değer ile çarpıyoruz, ki sadece istediğimiz kısmın dışarı verilmesini sağlayalım.</p>
+<div class="figure">
+<img src="lstm_07.png" />
+
+</div>
+<p>Şimdi üstteki formülleri kullanarak TensorFlow ile sıfırdan bir LSTM kodlayalım. Amacımız daha önce RNN için gördüğümüz zaman serisini öğrenmek, bu seriyi 5'er 5'er okuyacağız, yani yanyana 5 seri öğesini okuyacağız, ve 6. seri değeri hedef değeri olacak, seri içinden bu şekilde örneklem yaparak bir ufak toptan eğitim seti yaratacağız. Sonra serinin hiç görmediğimiz &quot;geleceğini'' tahmin etmeye uğraşacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> pprint <span class="im">import</span> pprint
+<span class="im">import</span> datetime
+<span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+
+tf.reset_default_graph()
+np.random.seed(<span class="dv">1</span>)
+tf.set_random_seed(<span class="dv">1</span>)
+
+LSTM_SIZE <span class="op">=</span> <span class="dv">30</span>
+t_min, t_max <span class="op">=</span> <span class="dv">0</span>, <span class="dv">30</span>
+resolution <span class="op">=</span> <span class="fl">0.1</span>
+sequence_length <span class="op">=</span> <span class="dv">4</span>
+instruction_count <span class="op">=</span> <span class="dv">1</span>
+epoch <span class="op">=</span> <span class="dv">500</span>
+
+<span class="kw">def</span> f(t):
+    <span class="cf">return</span> t <span class="op">*</span> np.sin(t) <span class="op">/</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> np.sin(t<span class="op">*</span><span class="dv">5</span>)
+
+<span class="kw">def</span> next_batch(batch_size, n_steps):
+    t0 <span class="op">=</span> np.random.rand(batch_size, <span class="dv">1</span>) <span class="op">*</span> (t_max <span class="op">-</span> t_min <span class="op">-</span> n_steps <span class="op">*</span> resolution)
+    Ts <span class="op">=</span> t0 <span class="op">+</span> np.arange(<span class="fl">0.</span>, n_steps <span class="op">+</span> <span class="dv">1</span>) <span class="op">*</span> resolution
+    ys <span class="op">=</span> f(Ts)
+    X <span class="op">=</span> ys[:, :<span class="op">-</span><span class="dv">1</span>].reshape(<span class="op">-</span><span class="dv">1</span>, n_steps, <span class="dv">1</span>)
+    y <span class="op">=</span> ys[:, <span class="dv">1</span>:].reshape(<span class="op">-</span><span class="dv">1</span>, n_steps, <span class="dv">1</span>)
+    y <span class="op">=</span> y[:,<span class="op">-</span><span class="dv">1</span>,:]
+    y <span class="op">=</span> y.flatten()
+    <span class="bu">print</span> y.shape    
+    <span class="cf">return</span> <span class="bu">list</span>(X),y
+
+reference_input_data,reference_output_data <span class="op">=</span> next_batch(<span class="dv">400</span>, sequence_length)
+   
+<span class="co"># verinin 1/4&#39;u egitim gerisi test</span>
+NUM_EXAMPLES <span class="op">=</span> <span class="bu">len</span>(reference_input_data) <span class="op">/</span> <span class="dv">4</span> 
+test_input <span class="op">=</span> reference_input_data[NUM_EXAMPLES:]
+test_output <span class="op">=</span> reference_output_data[NUM_EXAMPLES:] 
+train_input <span class="op">=</span> reference_input_data[:NUM_EXAMPLES]
+train_output <span class="op">=</span> reference_output_data[:NUM_EXAMPLES]
+
+<span class="bu">print</span> train_input[<span class="dv">1</span>]
+<span class="bu">print</span> train_output[<span class="dv">1</span>]
+
+data <span class="op">=</span> tf.placeholder(tf.float32, 
+                      [<span class="va">None</span>, sequence_length, instruction_count], 
+                      name<span class="op">=</span><span class="st">&#39;data&#39;</span>)
+
+target <span class="op">=</span> tf.transpose(tf.placeholder(tf.float32, [<span class="va">None</span>], name<span class="op">=</span><span class="st">&#39;target&#39;</span>))
+
+FEATURE_SIZE <span class="op">=</span> <span class="dv">1</span> 
+
+<span class="kw">def</span> default_weights_and_bias():
+    Weights <span class="op">=</span> tf.Variable(tf.truncated_normal([LSTM_SIZE, 
+                                               LSTM_SIZE <span class="op">+</span> FEATURE_SIZE], 
+                                               <span class="fl">-0.2</span>, <span class="fl">0.1</span>))
+    bias <span class="op">=</span> tf.Variable(tf.constant(<span class="fl">0.0</span>, shape <span class="op">=</span> [LSTM_SIZE, <span class="dv">1</span>]))
+    
+    <span class="cf">return</span> Weights, bias
+
+W_f, _ <span class="op">=</span> default_weights_and_bias()
+
+b_f <span class="op">=</span> tf.Variable(tf.constant(<span class="fl">1.0</span>, shape <span class="op">=</span> [LSTM_SIZE, <span class="dv">1</span>]))
+
+<span class="co"># Unutma tabakasi</span>
+<span class="kw">def</span> f_t(ht_minus_1_and_xt):
+    <span class="cf">return</span> tf.sigmoid(tf.matmul(W_f, ht_minus_1_and_xt) <span class="op">+</span> b_f)
+
+W_i, b_i <span class="op">=</span> default_weights_and_bias()
+
+<span class="co"># Girdi gecidi tabakasi</span>
+<span class="kw">def</span> i_t(ht_minus_1_and_xt):
+    <span class="cf">return</span> tf.sigmoid(tf.matmul(W_i, ht_minus_1_and_xt) <span class="op">+</span> b_i)
+
+W_C, b_c <span class="op">=</span> default_weights_and_bias()
+
+<span class="co"># is banti icin adaylar</span>
+<span class="kw">def</span> candidate_C_t(ht_minus_1_and_xt):
+    <span class="cf">return</span> tf.tanh(tf.matmul(W_C, ht_minus_1_and_xt) <span class="op">+</span> b_c)
+
+<span class="kw">def</span> C_t(ht_minus_1_and_xt, Conveyor, CandConv):
+    <span class="cf">return</span> f_t(ht_minus_1_and_xt) <span class="op">*</span> Conveyor <span class="op">+</span> i_t(ht_minus_1_and_xt) <span class="op">*</span> CandConv
+
+W_o, b_o <span class="op">=</span> default_weights_and_bias()
+
+<span class="co"># guncellenmis is banti</span>
+<span class="kw">def</span> h_t(ht_minus_1_and_xt, FinalConveyor):
+    o_t <span class="op">=</span> tf.sigmoid(tf.matmul(W_o, ht_minus_1_and_xt) <span class="op">+</span> b_o)    
+    <span class="cf">return</span> o_t <span class="op">*</span> tf.tanh(FinalConveyor)
+
+<span class="kw">def</span> lstm_cell(ht_minus_1_and_Conveyor, xt):
+    ht_minus_1, Conveyor <span class="op">=</span> ht_minus_1_and_Conveyor
+    
+    ht_minus_1_and_xt <span class="op">=</span> tf.transpose(tf.concat([ht_minus_1, xt], <span class="dv">1</span>))
+    
+    CandidateConveyor <span class="op">=</span> candidate_C_t(ht_minus_1_and_xt)
+    
+    FinalConveyor <span class="op">=</span> C_t(ht_minus_1_and_xt, Conveyor, CandidateConveyor)
+    
+    lstm_prediction <span class="op">=</span> tf.transpose(h_t(ht_minus_1_and_xt, FinalConveyor))
+    
+    <span class="cf">return</span>(lstm_prediction, FinalConveyor)
+
+data_length <span class="op">=</span> tf.shape(data)[<span class="dv">0</span>]
+
+<span class="kw">def</span> lstm_loop(last_lstm_prediction, last_state, step):
+    lstm_prediction, state <span class="op">=</span> lstm_cell((last_lstm_prediction, last_state),
+                                       data[:, step, :])
+    <span class="cf">return</span> lstm_prediction, state, tf.add(step, <span class="dv">1</span>)
+
+initial_Conveyor <span class="op">=</span> tf.zeros([LSTM_SIZE, data_length])
+
+initial_prediction <span class="op">=</span> tf.zeros([data_length, LSTM_SIZE])
+
+timesteps <span class="op">=</span> sequence_length
+
+for_each_time_step <span class="op">=</span> <span class="kw">lambda</span> a, b, step: tf.less(step, timesteps)
+
+arg <span class="op">=</span> (initial_prediction, initial_Conveyor, <span class="dv">0</span>)
+lstm_prediction, lstm_state, _ <span class="op">=</span> tf.while_loop(for_each_time_step,
+                                               lstm_loop, arg,
+                                               parallel_iterations<span class="op">=</span><span class="dv">32</span>)
+
+weight <span class="op">=</span> tf.Variable(tf.truncated_normal([LSTM_SIZE, <span class="dv">1</span>]))
+
+bias <span class="op">=</span> tf.Variable(tf.constant(<span class="fl">0.0</span>, shape<span class="op">=</span>[<span class="dv">1</span>]))
+
+prediction <span class="op">=</span> tf.matmul(lstm_prediction, weight) <span class="op">+</span> bias
+
+<span class="cf">with</span> tf.name_scope(<span class="st">&#39;mean_square_error&#39;</span>):
+    mean_square_error <span class="op">=</span> tf.reduce_sum(tf.square(tf.subtract(target, tf.unstack(prediction, axis <span class="op">=</span> <span class="dv">1</span>))))
+    
+tf.summary.scalar(<span class="st">&#39;mean_square_error&#39;</span>, mean_square_error)
+
+optimizer <span class="op">=</span> tf.train.AdamOptimizer()
+
+minimize <span class="op">=</span> optimizer.minimize(mean_square_error)
+
+mistakes <span class="op">=</span> tf.not_equal(target, tf.<span class="bu">round</span>(tf.unstack(prediction, axis <span class="op">=</span> <span class="dv">1</span>)))
+
+sess <span class="op">=</span> tf.InteractiveSession()
+
+date <span class="op">=</span> <span class="bu">str</span>(datetime.datetime.now())
+
+init_op <span class="op">=</span> tf.global_variables_initializer()
+
+saver <span class="op">=</span> tf.train.Saver() 
+
+sess.run(init_op)
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(epoch):
+    <span class="cf">if</span> (i <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">20</span> <span class="op">==</span> <span class="dv">0</span>:
+        mean_squ_err <span class="op">=</span> sess.run(mean_square_error, {data: test_input, target: test_output})
+        <span class="bu">print</span>(<span class="st">&#39;Epoch </span><span class="sc">{:4d}</span><span class="st"> | mean squ error </span><span class="sc">{: 3.1f}</span><span class="st">&#39;</span>.<span class="bu">format</span>(i <span class="op">+</span> <span class="dv">1</span>, mean_squ_err))
+    
+    sess.run(minimize,{data: train_input, target: train_output})</code></pre></div>
+<pre><code>(400,)
+[[ 4.00159218]
+ [ 4.4298434 ]
+ [ 4.67217731]
+ [ 4.52697138]]
+3.87853505042
+Epoch   20 | mean squ error  3181.8
+Epoch   40 | mean squ error  1860.6
+Epoch   60 | mean squ error  1307.7
+Epoch   80 | mean squ error  903.1
+Epoch  100 | mean squ error  628.8
+Epoch  120 | mean squ error  477.8
+Epoch  140 | mean squ error  390.5
+Epoch  160 | mean squ error  323.5
+Epoch  180 | mean squ error  271.9
+Epoch  200 | mean squ error  233.8
+Epoch  220 | mean squ error  204.4
+Epoch  240 | mean squ error  180.8
+Epoch  260 | mean squ error  161.2
+Epoch  280 | mean squ error  144.9
+Epoch  300 | mean squ error  131.7
+Epoch  320 | mean squ error  121.4
+Epoch  340 | mean squ error  113.0
+Epoch  360 | mean squ error  105.7
+Epoch  380 | mean squ error  99.0
+Epoch  400 | mean squ error  92.6
+Epoch  420 | mean squ error  86.6
+Epoch  440 | mean squ error  80.9
+Epoch  460 | mean squ error  75.4
+Epoch  480 | mean squ error  70.1
+Epoch  500 | mean squ error  64.9</code></pre>
+<p>Tahminleri üretirken eğitim verisinin en sonundaki <code>sequence_length</code> kadar öğeyi alıp sonraki 1 değeri üretiyoruz, bu değeri alıp tahmin için kullanılan biraz önce kullandığımız <code>sequence_length</code> kadar değerin sonuna ekleyip son <code>sequence_length</code> değer üzerinden tekrar bir tahmin üretiyoruz, böyle gidiyor, ve bu şekilde serinin hiç görmediğimiz kısmını tahmin ediyoruz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> f(t):
+    <span class="cf">return</span> t <span class="op">*</span> np.sin(t) <span class="op">/</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> np.sin(t<span class="op">*</span><span class="dv">5</span>)
+
+t <span class="op">=</span> np.linspace(t_min, t_max, <span class="bu">int</span>((t_max <span class="op">-</span> t_min) <span class="op">/</span> resolution))
+y <span class="op">=</span> f(t)
+
+newx <span class="op">=</span> <span class="bu">list</span>(t[<span class="op">-</span>sequence_length:])
+newy <span class="op">=</span> <span class="bu">list</span>(y[<span class="op">-</span>sequence_length:])
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">40</span>): <span class="co"># bu kadar daha uret</span>
+   tst_input <span class="op">=</span> np.array(newy[<span class="op">-</span>sequence_length:]).reshape(sequence_length,<span class="dv">1</span>)   
+   res <span class="op">=</span> sess.run(prediction, { data: [ tst_input ]  } )
+   newy.append(res)
+   newx.append(t_max <span class="op">+</span> (i<span class="op">*</span>resolution))
+
+plt.plot(t,y)
+plt.plot(newx,newy,<span class="st">&#39;g&#39;</span>)
+plt.savefig(<span class="st">&#39;lstm_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="lstm_01.png" />
+
+</div>
+<p>Yeşil renkli kısım tahmin. Fena değil.</p>
+<p>Zaman Serisi Sınıflandırmak</p>
+<p>Şimdi TF'in kendi LSTM çağrısını kullanarak zaman serisi sınıflandırması yapalım. İki farklı sınıfa ait olan zaman serisi verimiz var [3], mikroelektronik yarı-iletken üretiminden gelen bir veri, fabrikasyon sırasında algılayıcılar bu iki türlü seriyi kaydediyor, onları ayırtetmek bizim görevimiz. Okuma yöntemi kodlayalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+<span class="im">from</span> tensorflow.contrib <span class="im">import</span> rnn
+
+learning_rate <span class="op">=</span> <span class="fl">0.001</span>
+training_iters <span class="op">=</span> <span class="dv">100000</span>
+batch_size <span class="op">=</span> <span class="dv">25</span>
+display_step <span class="op">=</span> <span class="dv">10</span>
+
+n_input <span class="op">=</span> <span class="dv">1</span> 
+n_steps <span class="op">=</span> <span class="dv">152</span> 
+n_hidden <span class="op">=</span> <span class="dv">128</span> 
+n_classes <span class="op">=</span> <span class="dv">2</span>
+
+<span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;wafer.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:
+      df_train <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;Wafer/wafer_TRAIN.txt&#39;</span>),header<span class="op">=</span><span class="va">None</span>)
+      df_test <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;Wafer/wafer_TEST.txt&#39;</span>),header<span class="op">=</span><span class="va">None</span>)
+
+<span class="kw">def</span> minibatches(batch_size,<span class="bu">input</span><span class="op">=</span><span class="st">&quot;train&quot;</span>):
+      df <span class="op">=</span> <span class="va">None</span>
+      <span class="cf">if</span> <span class="bu">input</span><span class="op">==</span><span class="st">&quot;train&quot;</span>: df<span class="op">=</span>df_train
+      <span class="cf">if</span> <span class="bu">input</span><span class="op">==</span><span class="st">&quot;test&quot;</span>: df<span class="op">=</span>df_test
+      df <span class="op">=</span> np.array(df)
+      <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(df)):
+            batch_x <span class="op">=</span> []<span class="op">;</span> batch_y <span class="op">=</span> []
+            <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(batch_size):
+                  batch_x.append(<span class="bu">list</span>(df[i,<span class="dv">1</span>:]))
+                  batch_y.append([<span class="bu">int</span>(df[i,<span class="dv">0</span>]<span class="op">==-</span><span class="dv">1</span>), <span class="bu">int</span>(df[i,<span class="dv">0</span>]<span class="op">==</span><span class="dv">1</span>) ])
+            batch_x <span class="op">=</span> np.array(batch_x).reshape(batch_size,n_steps,<span class="dv">1</span>)
+            batch_y <span class="op">=</span> np.array(batch_y).reshape(batch_size,<span class="dv">2</span>)
+            <span class="cf">yield</span> batch_x, batch_y                  </code></pre></div>
+<p>TF hesap çizitini kodlayalım ve eğitelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> reset_graph(seed<span class="op">=</span><span class="dv">42</span>):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+reset_graph()
+
+x <span class="op">=</span> tf.placeholder(<span class="st">&quot;float&quot;</span>, [<span class="va">None</span>, n_steps, n_input])
+y <span class="op">=</span> tf.placeholder(<span class="st">&quot;float&quot;</span>, [<span class="va">None</span>, n_classes])
+
+weights <span class="op">=</span> {
+    <span class="st">&#39;out&#39;</span>: tf.Variable(tf.random_normal([n_hidden, n_classes]))
+}
+biases <span class="op">=</span> {
+    <span class="st">&#39;out&#39;</span>: tf.Variable(tf.random_normal([n_classes]))
+}
+
+<span class="kw">def</span> LSTM(x, weights, biases):
+    x <span class="op">=</span> tf.unstack(x, n_steps, <span class="dv">1</span>)
+    lstm_cell <span class="op">=</span> rnn.BasicLSTMCell(n_hidden)
+    outputs, states <span class="op">=</span> rnn.static_rnn(lstm_cell, x, dtype<span class="op">=</span>tf.float32)
+    <span class="cf">return</span> tf.matmul(outputs[<span class="op">-</span><span class="dv">1</span>], weights[<span class="st">&#39;out&#39;</span>]) <span class="op">+</span> biases[<span class="st">&#39;out&#39;</span>]
+
+pred <span class="op">=</span> LSTM(x, weights, biases)
+
+correct_pred <span class="op">=</span> tf.equal(tf.argmax(pred,<span class="dv">1</span>), tf.argmax(y,<span class="dv">1</span>))
+accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+new_pred <span class="op">=</span> tf.argmax(y,<span class="dv">1</span>)
+
+<span class="bu">print</span> <span class="st">&#39;cost&#39;</span>
+scf <span class="op">=</span> tf.nn.softmax_cross_entropy_with_logits(logits<span class="op">=</span>pred, labels<span class="op">=</span>y)
+cost <span class="op">=</span> tf.reduce_mean(scf)
+<span class="bu">print</span> <span class="st">&#39;optimizer&#39;</span>
+optimizer <span class="op">=</span> tf.train.AdamOptimizer(learning_rate<span class="op">=</span>learning_rate).minimize(cost)
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    sess.run(init)
+    step <span class="op">=</span> <span class="dv">1</span>
+    <span class="co"># Keep training until reach max iterations</span>
+    b_it <span class="op">=</span> minibatches(batch_size)
+    <span class="cf">while</span> step <span class="op">&lt;</span> <span class="bu">int</span>(<span class="dv">1000</span> <span class="op">/</span> batch_size):
+          batch_x, batch_y <span class="op">=</span> <span class="bu">next</span>(b_it)
+          sess.run(optimizer, feed_dict<span class="op">=</span>{x: batch_x, y: batch_y})
+          <span class="cf">if</span> step <span class="op">%</span> display_step <span class="op">==</span> <span class="dv">0</span>:
+                <span class="co"># Calculate batch accuracy</span>
+                acc <span class="op">=</span> sess.run(accuracy, feed_dict<span class="op">=</span>{x: batch_x, y: batch_y})
+                <span class="co"># Calculate batch loss</span>
+                loss <span class="op">=</span> sess.run(cost, feed_dict<span class="op">=</span>{x: batch_x, y: batch_y})
+                <span class="bu">print</span>(<span class="st">&quot;Iter &quot;</span> <span class="op">+</span> <span class="bu">str</span>(step) <span class="op">+</span> <span class="st">&quot;, Minibatch Loss= &quot;</span> <span class="op">+</span> <span class="op">\</span>
+                      <span class="st">&quot;</span><span class="sc">{:.6f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(loss) <span class="op">+</span> <span class="st">&quot;, Training Accuracy= &quot;</span> <span class="op">+</span> <span class="op">\</span>
+                      <span class="st">&quot;</span><span class="sc">{:.5f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(acc))
+          step <span class="op">+=</span> <span class="dv">1</span>
+
+    <span class="bu">print</span>(<span class="st">&quot;Optimization Finished!&quot;</span>)</code></pre></div>
+<pre><code>cost
+optimizer
+Iter 10, Minibatch Loss= 1.847300, Training Accuracy= 0.00000
+Iter 20, Minibatch Loss= 0.049264, Training Accuracy= 1.00000
+Iter 30, Minibatch Loss= 0.176535, Training Accuracy= 1.00000
+Optimization Finished!</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">saver <span class="op">=</span> tf.train.Saver()
+<span class="im">from</span> sklearn <span class="im">import</span> metrics
+real <span class="op">=</span> []
+pred <span class="op">=</span> []
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    <span class="cf">for</span> batch_x, batch_y <span class="kw">in</span> minibatches(<span class="dv">1</span>,<span class="bu">input</span><span class="op">=</span><span class="st">&quot;test&quot;</span>):
+      res <span class="op">=</span> sess.run(new_pred, feed_dict<span class="op">=</span>{x: batch_x, y: batch_y})
+      pred.append(res[<span class="dv">0</span>])
+      real.append(np.argmax(batch_y[<span class="dv">0</span>]))
+    fpr, tpr, thresholds <span class="op">=</span> metrics.roc_curve(np.array(real), np.array(pred))
+    <span class="bu">print</span> <span class="st">&#39;AUC&#39;</span>, metrics.auc(fpr, tpr)      </code></pre></div>
+<pre><code>AUC 1.0</code></pre>
+<p>Sonuç yüzde 100.</p>
+<p>Kaynaklar</p>
+<p>[1] Chen, <em>Exploring LSTMs: Understanding Basics (Part One)</em>, <a href="https://www.topbots.com/exploring-lstm-tutorial-part-1-recurrent-neural-network-deep-learning/" class="uri">https://www.topbots.com/exploring-lstm-tutorial-part-1-recurrent-neural-network-deep-learning/</a></p>
+<p>[2] Shell, <em>Do It Yourself LSTM with TensorFlow</em>, <a href="https://chrisschell.de/2017/07/10/do_it_yourself_lstm_with_tensorflow.html" class="uri">https://chrisschell.de/2017/07/10/do_it_yourself_lstm_with_tensorflow.html</a></p>
+<p>[3] Olszewski, <em>Wafer Dataset</em>, <a href="http://timeseriesclassification.com/description.php?Dataset=Wafer" class="uri">http://timeseriesclassification.com/description.php?Dataset=Wafer</a></p>
+<p>[4] Olah, <em>Understanding LSTM Networks</em>, <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs" class="uri">https://colah.github.io/posts/2015-08-Understanding-LSTMs</a></p>
+</body>
+</html>

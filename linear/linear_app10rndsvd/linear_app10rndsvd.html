@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="rasgele-izdüşümü-random-projection">Rasgele İzdüşümü (Random Projection)</h1>
+<p>Eğer ana matrisimiz <span class="math inline">\(A\)</span>'nin çok fazla kolonu var ise bunu bir şekilde azaltmanın yollarını arayabiliriz. [1,6]'ya göre bunu yapmanın yollarından biri rasgele izdüşüm hesabıdır. İlk önce <span class="math inline">\(n \times k\)</span> boyutunda bir Gaussian rasgele matris <span class="math inline">\(\Omega\)</span> üretiriz. Ardından</p>
+<p><span class="math display">\[ Y = A\Omega \]</span></p>
+<p>hesaplanır.</p>
+<p>İzdüşümü yapılmış matrisın iş mesafelerini muhafaza ettiği ispatlanmıştır, sayısal olarak kontrol etmek istersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+<span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cdist
+t <span class="op">=</span> <span class="st">&#39;euclid&#39;</span>
+k <span class="op">=</span> <span class="dv">7</span>
+df <span class="op">=</span> pd.read_csv(<span class="st">&quot;../linear_app10rndsvd/w1.dat&quot;</span>,sep<span class="op">=</span><span class="st">&#39;;&#39;</span>,header<span class="op">=</span><span class="va">None</span>)
+A <span class="op">=</span> np.array(df)[:,<span class="dv">1</span>:]
+<span class="bu">print</span> (A.shape)
+d1 <span class="op">=</span> cdist(A,A,metric<span class="op">=</span>t)
+d1 <span class="op">=</span> d1 <span class="op">/</span> np.<span class="bu">sum</span>(d1)
+<span class="bu">print</span> (np.mean(d1),d1.shape)
+
+<span class="co"># izdusumu yap</span>
+Y <span class="op">=</span> np.dot(A, np.random.normal(<span class="dv">0</span>,<span class="dv">1</span>,(A.shape[<span class="dv">1</span>],k)))
+<span class="co"># yeni matrisin ic mesafeleri nedir</span>
+d2 <span class="op">=</span> cdist(Y,Y,metric<span class="op">=</span>t)
+d2 <span class="op">=</span> d2 <span class="op">/</span> np.<span class="bu">sum</span>(d2)
+<span class="bu">print</span> (np.mean(d2),d2.shape)
+
+<span class="co"># onceki mesafeler ile fark ortalamasi</span>
+<span class="bu">print</span> (np.mean(np.<span class="bu">abs</span>(d1<span class="op">-</span>d2)))</code></pre></div>
+<pre><code>(71, 30)
+0.00019837333862328903 (71, 71)
+0.00019837333862328903 (71, 71)
+7.264191067984383e-06</code></pre>
+<p>Demek ki satırlar arası mesafeler muhafaza edildi. Birazdan işlenecek SVD yöntemi de aynı şekilde boyut azaltma yapabilir, altta rasgele izdüşümü SVD'ye yardım etmesi için işleyeceğiz, fakat aslında rasgele izdüşümü SVD yerine de kullanılabilir.</p>
+<p>Eğer mesafeler muhafaza ediliyorsa daha ufaltılmış kolon boyutları üzerinde, mesela tavsiye algoritmaları için, yakınlık hesapları yapmak daha kolaylaşır. Bir matris <span class="math inline">\(A\)</span> kullanıcı-ürün şeklinde tasarlanmış ise, herhangi bir kullanıcıya yakın diğer kullanıcıları bulmak azaltılmış boyutta daha hızlı işleyecektir.</p>
+<p>SVD</p>
+<p>Daha önce gördüğümüz <span class="math inline">\(Y\)</span> üzerinde QR ayrıştırması yaparız, ve elde edilen <span class="math inline">\(Q\)</span> ile</p>
+<p><span class="math display">\[ B = Q^T A \]</span></p>
+<p>hesabını da yapabiliriz ve <span class="math inline">\(B\)</span> üzerinde SVD ayrıştırması hesaplanabilir,</p>
+<p><span class="math display">\[ B = \hat{U}\Sigma V^T \]</span></p>
+<p>ve</p>
+<p><span class="math display">\[ U = Q\hat{U} \]</span></p>
+<p>matrisini hesaplarız. Ana fikir şuradan geliyor,</p>
+<p><span class="math display">\[ A = QQ^TA \]</span></p>
+<p>ki bu standart bir cebir numarası olurdu, <span class="math inline">\(Q\)</span> yerine rasgele izdüşumdan gelen yaklaşıksal <span class="math inline">\(Q\)</span>'yu kullanabiliriz, o zaman</p>
+<p><span class="math display">\[ A \approx \tilde{Q}\tilde{Q}^TA \]</span></p>
+<p>olacaktır. Yani izdüşümden gelen <span class="math inline">\(Q,R\)</span> gerçek versiyona yakın. Üstteki çarpımda <span class="math inline">\(R\)</span> yerine <span class="math inline">\(B\)</span> harfi kullanıyoruz, ki <span class="math inline">\(B = \tilde{Q}^T A\)</span> oluyor, yani</p>
+<p><span class="math display">\[ A \approx \tilde{Q}B \]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[ B \approx \tilde{Q}^T A \]</span></p>
+<p>O zaman İstatistik notlarımız altındaki [5] yazısında olduğu gibi <span class="math inline">\(B\)</span>'nin SVD'sini alarak yaklaşıksal bir <span class="math inline">\(U\)</span> elde etmek mümkün olacaktır.</p>
+<p>Bu yaklaşıksal metot işler çünkü noktaları yaklaşıksal bir altuzaya yansıttıktan sonra elde edilen yeni noktaların arasındaki mesafelerin fazla bozulmadan muhafaza edildiği söylenir, daha detaylı söylemek gerekirse, n-boyutlu verileri <span class="math inline">\(O(\log n / \epsilon^2)\)</span> boyutundaki bir rasgele altuzaya yansıtmak, pozitif olasılıkla, yeni noktaların arasındaki mesafeleri sadece <span class="math inline">\(1 \pm \epsilon\)</span> ölçüsünde değiştirir [2]. <span class="math inline">\(Y\)</span>'nin, <span class="math inline">\(A\)</span>'nin &quot;menzilini&quot; iyi temsil ettiği de söylenir.</p>
+<p>Test olarak şuradaki [3] veri seti üzerinde görelim:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy.random <span class="im">as</span> rand
+<span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+<span class="im">import</span> pandas <span class="im">as</span> pd
+
+k <span class="op">=</span> <span class="dv">7</span> <span class="co"># izdusum uzayinin boyutlari</span>
+df <span class="op">=</span> pd.read_csv(<span class="st">&quot;w1.dat&quot;</span>,sep<span class="op">=</span><span class="st">&#39;;&#39;</span>,header<span class="op">=</span><span class="va">None</span>)
+A <span class="op">=</span> np.array(df)[:,<span class="dv">1</span>:]
+
+<span class="bu">print</span> <span class="st">&quot;A&quot;</span>,A.shape
+
+rand.seed(<span class="dv">1000</span>)
+
+Omega <span class="op">=</span> rand.randn(A.shape[<span class="dv">1</span>],k)
+
+Y <span class="op">=</span> np.dot(A, Omega) 
+
+<span class="bu">print</span> <span class="st">&quot;Y&quot;</span>, Y.shape
+
+Q, R <span class="op">=</span> lin.qr(Y) 
+
+<span class="co"># niye devrigi ile is yaptigimizi altta anlatiyoruz</span>
+BT <span class="op">=</span> np.dot(A.T, Q)
+
+<span class="bu">print</span> <span class="st">&quot;Q&quot;</span>, Q.shape
+<span class="bu">print</span> <span class="st">&quot;BT&quot;</span>, BT.shape
+
+x, x, V <span class="op">=</span> lin.svd(BT)
+
+<span class="bu">print</span> <span class="st">&#39;V&#39;</span>, V.shape
+
+Uhat <span class="op">=</span> V.T <span class="co"># cunku B=USV&#39;, B&#39;=VSU&#39; U of B icin V&#39; lazim</span>
+
+<span class="bu">print</span> <span class="st">&quot;Uhat&quot;</span>, Uhat.shape
+
+U <span class="op">=</span> np.dot(Q, Uhat) 
+
+<span class="bu">print</span> <span class="st">&quot;U&quot;</span>, U.shape
+
+plt.plot(U[:,<span class="dv">0</span>],U[:,<span class="dv">1</span>],<span class="st">&#39;r+&#39;</span>)
+
+plt.hold(<span class="va">True</span>)
+        
+<span class="co"># gercek SVD ile karsilastir</span>
+
+U, Sigma, V <span class="op">=</span> lin.svd(A)<span class="op">;</span>
+plt.plot(U[:,<span class="dv">0</span>],<span class="op">-</span>U[:,<span class="dv">1</span>],<span class="st">&#39;bx&#39;</span>)
+plt.savefig(<span class="st">&#39;rnd_1.png&#39;</span>)</code></pre></div>
+<pre><code>A (71, 30)
+Y (71, 7)
+Q (71, 7)
+BT (30, 7)
+V (7, 7)
+Uhat (7, 7)
+U (71, 7)</code></pre>
+<div class="figure">
+<img src="rnd_1.png" />
+
+</div>
+<p>Mavi noktalar <span class="math inline">\(A\)</span> üzerinde &quot;gerçek&quot; SVD sonucu, kırmızılar yansıtma sonrası elde edilen <span class="math inline">\(U\)</span>. Sonuçlar çok iyi.</p>
+<p><span class="math inline">\(B\)</span> yerine <span class="math inline">\(B^T\)</span></p>
+<p>Kodlama açısından, ya da büyük veri bağlamında başka amaçlar [4] için <span class="math inline">\(B = Q^T A\)</span> yerine <span class="math inline">\(B^T = A^T Q\)</span> hesabı yapmak istenilebilir. Niye? Çünkü çıktı olarak <span class="math inline">\(n \times k\)</span> matrisi istiyor olabiliriz, <span class="math inline">\(k \times n\)</span> matrisi istemiyoruz, yani çok olanın satırlar olmasını istiyoruz, kolonlar olmasını istemiyoruz.</p>
+<p>O zaman, elde edilen <span class="math inline">\(B^T\)</span> işe, <span class="math inline">\(B\)</span> üzerinde değil <span class="math inline">\(B^T\)</span> üzerinde SVD alacağız demektir, bu da sonuçları birazcık değiştirir, yani</p>
+<p><span class="math display">\[ B = U\Sigma V^T \]</span></p>
+<p><span class="math display">\[ B^T = V\Sigma U^T \]</span></p>
+<p>haline gelir. Yani <span class="math inline">\(B\)</span>'nin <span class="math inline">\(U\)</span>'sunu elde etmek için <span class="math inline">\(B^T\)</span>'nin SVD'si sonrasında ele geçen sonuçta <span class="math inline">\((U_{BT}^T)^T\)</span> yapmak gerekir. Her şeyin hafızada yapıldığı durumda bu fark yaratmaz, fakat &quot;ilerisi için&quot;, yani eşle / indirge ortamları için akılda tutmak faydalı olur.</p>
+<p>Kaynaklar</p>
+<p>[1] Halko, N., <em>Randomized methods for computing low-rank approximations of matrices</em></p>
+<p>[2] Gupta, A., Dasgupta, S., <em>An Elementary Proof of a Theorem of Johnson and Lindenstrauss</em></p>
+<p>[3] UCI Machine Learning Repository, <em>Breast Cancer Data Set</em>, <a href="archive.ics.uci.edu/ml/datasets/Breast+Cancer" class="uri">archive.ics.uci.edu/ml/datasets/Breast+Cancer</a></p>
+<p>[4] Bayramlı, <em>SVD Factorization for Tall-and-Fat Matrices on Map/Reduce Architectures</em>, <a href="arxiv.org/abs/1310.4664" class="uri">arxiv.org/abs/1310.4664</a></p>
+<p>[5] Bayramlı, <em>Paralel Matris Çarpımı, Ax, QR ve SVD</em></p>
+<p>[6] Lu, <em>On Low Dimensional Random Projections and Similarity Search</em>, <a href="https://www.researchgate.net/publication/221615011_On_Low_Dimensional_Random_Projections_and_Similarity_Search" class="uri">https://www.researchgate.net/publication/221615011_On_Low_Dimensional_Random_Projections_and_Similarity_Search</a></p>
+</body>
+</html>

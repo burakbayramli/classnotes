@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="yükseklik-fonksiyonu-tepeler-arasından-en-düz-optimal-yürüyüş-yolunu-bulmak">Yükseklik Fonksiyonu (Tepeler) Arasından En Düz, Optimal Yürüyüş Yolunu Bulmak</h1>
+<p>Elimizde bir alan içindeki yükseklikleri veren bir fonksiyon <span class="math inline">\(f(x,y)\)</span> olduğunu düşünelim. Acaba verili bir başlangıç ve bitiş noktası arasındaki en &quot;rahat'' gidiş yolunu nasıl buluruz?</p>
+<p>Yükseklikler bir <span class="math inline">\(E(x,y)\)</span> fonksiyonunda olsun. Yolları nasıl temsil ederiz? Bir parametrik eğri kullanabiliriz, mesela</p>
+<p><span class="math display">\[
+x(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3 + a_4 t^4
+\]</span></p>
+<p><span class="math display">\[
+y(t) = b_0 + b_1 t + b_2 t^2 + b_3 t^3 + b_4 t^4
+\]</span></p>
+<p>İstediğimiz derecede polinom parametrize eğrileri nasıl yaratacağımızı biliyoruz [3]. Böylece doğru, optimal bir yolu bulmak demek <span class="math inline">\(a_0,a_1,a_2,a_3,b_0,b_1,b_2,b_3\)</span> katsayılarını doğru bulmak demek olacaktır. Bir optimizasyon problemi yani.</p>
+<p>Peki o zaman optimize, minimize edilecek bedel fonksiyonu ne olmalı? Burada farklı yaklaşımlar olabilir.</p>
+<p>Önce yükseklikleri ve eğrileri iki örnek üzerinde görelim. Bir rasgele tepe, ve bir rasgele yol çiziyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+<span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cdist
+<span class="im">from</span> matplotlib <span class="im">import</span> cm
+
+<span class="kw">def</span> gfunc1(x, y):
+    s1 <span class="op">=</span> <span class="fl">2.2</span><span class="op">;</span> x1 <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span> y1 <span class="op">=</span> <span class="fl">2.0</span>
+    g1 <span class="op">=</span> np.exp( <span class="dv">-4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x1)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y1)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s1<span class="op">**</span><span class="dv">2</span>)
+    <span class="cf">return</span> g1 <span class="op">*</span> <span class="fl">10.0</span>
+
+<span class="kw">def</span> plot_surf_path(myfunc,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
+
+    D <span class="op">=</span> <span class="dv">50</span>
+    x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,D)
+    y <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,D)
+    xx,yy <span class="op">=</span> np.meshgrid(x,y)
+    zz <span class="op">=</span> myfunc(xx,yy)
+
+    fig <span class="op">=</span> plt.figure()
+    ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)
+    ax.set_xlim(<span class="dv">0</span>,<span class="dv">5</span>)
+    ax.set_ylim(<span class="dv">0</span>,<span class="dv">5</span>)
+    surf <span class="op">=</span> ax.plot_wireframe(xx, yy, zz,rstride<span class="op">=</span><span class="dv">10</span>, cstride<span class="op">=</span><span class="dv">10</span>)
+
+    t <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="fl">1.0</span>,<span class="dv">100</span>)
+
+    x <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span> 
+    y <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span>
+
+    ax.plot3D(x, y, myfunc(x,y),<span class="st">&#39;r.&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># 1. gidis yolunun tanimi, uzun yoldan dolanarak gidiyor</span>
+a1,a2,a3 <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">8.1</span>, <span class="fl">4.0</span>
+b1,b2,b3 <span class="op">=</span> <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">23.3</span>
+a0,b0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)
+ex,ey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)
+a4 <span class="op">=</span> ex <span class="op">-</span> a0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)
+b4 <span class="op">=</span> ey <span class="op">-</span> b0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)
+test_coefs1 <span class="op">=</span> (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plot_surf_path(gfunc1,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+
+plt.savefig(<span class="st">&#39;calc_multi_40_elev_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="calc_multi_40_elev_01.png" />
+
+</div>
+<p>Başlangıç ve bitiş noktalarını nasıl formüle dahil ettiğimize dikkat, <span class="math inline">\(t=0\)</span> olduğu anda <span class="math inline">\(x(t),y(t)\)</span> değerleri sırasıyla <span class="math inline">\(a_0\)</span> ve <span class="math inline">\(b_0\)</span>'dir bunlar başlangıç değerleridir. Bitiş noktası ise <span class="math inline">\(t=1\)</span> anında sahip olunması gereken değerdir, bu noktada</p>
+<p><span class="math display">\[
+x(1) = a_0 + a_1 + a_2 + a_3 + a_4 ,\quad
+y(1) = b_0 + b_1 + b_2 + b_3 + b_4 
+\]</span></p>
+<p>olacağı için bitiş noktalarına <span class="math inline">\(e_x,e_y\)</span> diyelim, <span class="math inline">\(x(t)\)</span> için <span class="math inline">\(a_1,a_2,a_3\)</span> katsayılarının değişmesine izin veririz, fakat sonuncu katsayı <span class="math inline">\(a_4\)</span>'un ne olacağını formülde <span class="math inline">\(e_x\)</span> üzerinden zorlarız, yani <span class="math inline">\(a_4 = e_x - (a_0 + a_1 + a_2 + a_3)\)</span> hesabını yaparız. Böylece <span class="math inline">\(a_0 + a_1 + a_2 + a_3 + a_4\)</span> toplamı <span class="math inline">\(e_x\)</span> sonucunu vermelidir. <span class="math inline">\(y(t)\)</span> ve <span class="math inline">\(e_y\)</span> için benzer mantığı kullanırız. Bu şekilde başlangıç, bitiş noktalarını genel formülasyon üzerinde zorlamış olduk.</p>
+<p>Şimdi ikinci bir gidiş yoluna bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">a1,a2,a3 <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">3.0</span>, <span class="fl">1.0</span>
+b1,b2,b3 <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span>
+a0,b0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)
+ex,ey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)
+a4 <span class="op">=</span> ex <span class="op">-</span> a0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)
+b4 <span class="op">=</span> ey <span class="op">-</span> b0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)
+test_coefs2 <span class="op">=</span> (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plot_surf_path(gfunc1,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+plt.savefig(<span class="st">&#39;calc_multi_40_elev_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="calc_multi_40_elev_03.png" />
+
+</div>
+<p>Bu yolları tabii ki rasgele parametreler üzerinden yarattık, bunlar optimal yollar değiller.</p>
+<p>Bedel Ölçütü</p>
+<p>İlk kullanacağımız ölçüt çit yüksekliği denen [2]'de bahsedilen hesap, parametrik eğrinin gezdiği yol altında kalan yükseklikleri bir çit gibi düşünürsek bu çitin yan yüzeyinin alanı bir kısa yol ölçütü olarak kullanılabilir.</p>
+<p><span class="math display">\[
+\int_{t=0}^{t=1} f(x(t),y(t)) \sqrt {x&#39;(t)^2 + y&#39;(t)^2} \mathrm{d} t
+\]</span></p>
+<p>Öyle ya, yüksek tepelerden gitmeye kalksak çitin toplam alanı büyür, yol uzarsa yine büyür, bu sebeple çit alanını minimize etmeye uğraşan bir hesap yolu hem alçak yerlerden hem de kısa yollardan götürmeye uğraşacaktır.</p>
+<div class="figure">
+<img src="../../calc_multi/calc_multi_06/calc_multi_06_04.jpg" />
+
+</div>
+<p>Şimdi formülün gerektirdiği öğeleri birer birer bulalım, mesela <span class="math inline">\(x&#39;(t)\)</span>, ve <span class="math inline">\(y&#39;(t)\)</span> <code>sympy</code> ile hesaplanabilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sympy
+
+<span class="bu">vars</span> <span class="op">=</span> <span class="st">&#39;t a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 gamma x y&#39;</span>
+t, a0, a1, a2, a3, a4, b0, b1, b2, b3, b4, gamma, x, y <span class="op">=</span> sympy.symbols(<span class="bu">vars</span>)
+
+xdef <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span>
+ydef <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span>
+
+dxdt <span class="op">=</span> sympy.diff(xdef,t)
+<span class="bu">print</span> (dxdt)
+dydt <span class="op">=</span> sympy.diff(ydef,t)
+<span class="bu">print</span> (dydt)
+sqrtdef <span class="op">=</span> sympy.sqrt(sympy.diff(xdef,t)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> sympy.diff(ydef,t))
+<span class="bu">print</span> (sqrtdef)</code></pre></div>
+<pre><code>a1 + 2*a2*t + 3*a3*t**2 + 4*a4*t**3
+b1 + 2*b2*t + 3*b3*t**2 + 4*b4*t**3
+sqrt(b1 + 2*b2*t + 3*b3*t**2 + 4*b4*t**3 + (a1 + 2*a2*t + 3*a3*t**2 + 4*a4*t**3)**2)</code></pre>
+<p>Karekök her zaman lazım değil, karesel hesap ta yeterli olabilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">sqrdef <span class="op">=</span> sympy.diff(xdef,t)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> sympy.diff(ydef,t)</code></pre></div>
+<p>Şimdi sembolik olan hesaplara rasgele bazı katsayılar geçelim, ve sayısal bir sonucu görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">xsubs <span class="op">=</span> {a0: <span class="dv">2</span>, a1: <span class="dv">2</span>, a2: <span class="dv">2</span>, a3: <span class="dv">2</span>, a4: <span class="dv">2</span>, t:<span class="fl">0.5</span>}
+xval <span class="op">=</span> xdef.subs(xsubs)
+ysubs <span class="op">=</span> {b0: <span class="dv">3</span>, b1: <span class="dv">3</span>, b2: <span class="dv">3</span>, b3: <span class="dv">3</span>, b4: <span class="dv">3</span>, t:<span class="fl">0.5</span>}
+yval <span class="op">=</span> ydef.subs(ysubs)
+sqrval <span class="op">=</span> sqrtdef.subs(xsubs).subs(ysubs)
+g1 <span class="op">=</span> gfunc1(<span class="bu">float</span>(xval),<span class="bu">float</span>(yval))
+<span class="bu">print</span> (xval, yval, sqrval, g1)</code></pre></div>
+<pre><code>3.87500000000000 5.81250000000000 7.21110255092798 0.00032302357084224476</code></pre>
+<p>Artık optimizasyonun kullanacağı bedeli kodlayabiliriz, bu üstteki bahsettiğimiz entegral olacak, <span class="math inline">\(t=0,t=1\)</span> arasında hesaplanacak tabii ki (çünkü başlangıç, bitiş değerlerini de bu kavrama ilintilendirdik), ve fonksiyon değişken olarak şu anda bilinmeyen katsayıları alacak, optimizasyon rutini ise en optimal katsayı değerlerini bu bedel üzerinden bulacak.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">LARGE_FLOAT <span class="op">=</span> <span class="fl">1e6</span>
+pa0,pb0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)
+pex,pey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)
+ts <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">20</span>)
+<span class="kw">def</span> calcint_g1(pars):
+    pa1,pa2,pa3,pb1,pb2,pb3<span class="op">=</span>pars
+    pa4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (pa1<span class="op">+</span>pa2<span class="op">+</span>pa3)
+    pb4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (pb1<span class="op">+</span>pb2<span class="op">+</span>pb3)
+    argsubs <span class="op">=</span> {a1:pa1, a2:pa2, a3:pa3, a4:pa4, <span class="op">\</span>
+               b1:pb1, b2:pb2, b3:pb3, b4:pb4}
+    ys <span class="op">=</span> []
+    <span class="cf">for</span> tcurr <span class="kw">in</span> ts:
+       sqrval <span class="op">=</span> sqrdef.subs(argsubs).subs({t:tcurr})
+       xval <span class="op">=</span> xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
+       yval <span class="op">=</span> ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
+       prod1 <span class="op">=</span> gfunc1(<span class="bu">float</span>(xval),<span class="bu">float</span>(yval))<span class="op">*</span>sqrval
+       ys.append(prod1)
+    W <span class="op">=</span> np.trapz(ys,x<span class="op">=</span>ts)
+    <span class="cf">if</span> W <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span> LARGE_FLOAT
+    <span class="cf">return</span> W</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize, Bounds
+
+LIM <span class="op">=</span> <span class="fl">5.0</span>
+pa1,pa2,pa3 <span class="op">=</span> <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>
+pb1,pb2,pb3 <span class="op">=</span> <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>
+x0 <span class="op">=</span> pa1,pa2,pa3,pb1,pb2,pb3
+opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">40</span>, <span class="st">&#39;verbose&#39;</span>: <span class="dv">3</span>}
+
+res <span class="op">=</span> minimize (fun<span class="op">=</span>calcint_g1,x0<span class="op">=</span>x0,
+                method<span class="op">=</span><span class="st">&#39;Nelder-Mead&#39;</span>,
+                bounds<span class="op">=</span>Bounds([<span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM],
+                              [LIM, LIM, LIM, LIM, LIM, LIM]),
+                options<span class="op">=</span>opts)
+<span class="bu">print</span> (res[<span class="st">&#39;x&#39;</span>])</code></pre></div>
+<pre><code>[-1.92645176  0.87238797  1.45300069  1.5909808   2.46135117  0.73187586]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">a1,a2,a3,b1,b2,b3 <span class="op">=</span> <span class="bu">list</span>(res[<span class="st">&#39;x&#39;</span>])
+a4 <span class="op">=</span> ex <span class="op">-</span> pa0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)
+b4 <span class="op">=</span> ey <span class="op">-</span> pb0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)
+test_coefs1 <span class="op">=</span> (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
+plot_surf_path(gfunc1,pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
+plt.savefig(<span class="st">&#39;calc_multi_40_elev_07.jpg&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="calc_multi_40_elev_07.jpg" />
+
+</div>
+<p>Fena değil, optimal bir yola benziyor, tepelerden kaçınıldı mümkün olduğu kadar düşük yükseklikli ve kısa yoldan gidildi.</p>
+<p>Üstteki optimizasyon kodunda dikkat edilirse bazı püf noktalar var, mesela eğer <code>W</code> değeri sıfırdan küçük ise çok büyük bir değer döndürüyoruz böylece o tür parametrelerden kaçınmış oluyoruz, optimizasyonu diğer yönlere kanalize ediyoruz. Bu basit bir sağlama işlemi, çünkü üstte tarif edilen türden entegral hesabı sıfırdan küçük olamaz, eğer öyle ise o tür sonucu veren parametrelerle ilgilenmiyoruz.</p>
+<p>Başka bir yükseklik fonksiyonunu kullanalım, iki tepe var şimdi, ve bitiş noktası farklı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> gfunc2(x, y):
+    s1 <span class="op">=</span> <span class="fl">2.2</span><span class="op">;</span> x1 <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span> y1 <span class="op">=</span> <span class="fl">2.0</span>
+    g1 <span class="op">=</span> np.exp( <span class="dv">-4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x1)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y1)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s1<span class="op">**</span><span class="dv">2</span>)
+    s2 <span class="op">=</span> <span class="fl">1.2</span><span class="op">;</span> x2 <span class="op">=</span> <span class="fl">4.0</span><span class="op">;</span> y2 <span class="op">=</span> <span class="fl">1.0</span>
+    g2 <span class="op">=</span> np.exp( <span class="dv">-4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x2)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y2)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s2<span class="op">**</span><span class="dv">2</span>)
+    <span class="cf">return</span> g1<span class="op">*</span><span class="fl">10.0</span> <span class="op">+</span> g2<span class="op">*</span><span class="fl">10.0</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize, Bounds
+
+pa0,pb0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)
+pex,pey<span class="op">=</span>(<span class="fl">4.0</span>,<span class="fl">2.0</span>)
+
+ts <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">50</span>)
+
+<span class="kw">def</span> calcint_g2(pars):
+    pa1,pa2,pa3,pb1,pb2,pb3<span class="op">=</span>pars
+    pa4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (pa1<span class="op">+</span>pa2<span class="op">+</span>pa3)
+    pb4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (pb1<span class="op">+</span>pb2<span class="op">+</span>pb3)
+    argsubs <span class="op">=</span> {a1:pa1, a2:pa2, a3:pa3, a4:pa4, <span class="op">\</span>
+               b1:pb1, b2:pb2, b3:pb3, b4:pb4}
+    ys <span class="op">=</span> []
+    <span class="cf">for</span> tcurr <span class="kw">in</span> ts:
+       sqrval <span class="op">=</span> sqrdef.subs(argsubs).subs({t:tcurr})
+       <span class="cf">if</span> sqrval <span class="op">&lt;</span> <span class="dv">0</span>: sqrval <span class="op">=</span> <span class="dv">0</span>    
+       xval <span class="op">=</span> xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
+       yval <span class="op">=</span> ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
+       prod2 <span class="op">=</span> gfunc2(<span class="bu">float</span>(xval),<span class="bu">float</span>(yval))<span class="op">*</span>sqrval
+       ys.append(prod2)
+    W <span class="op">=</span> np.trapz(ys,x<span class="op">=</span>ts)
+    <span class="cf">if</span> W <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span> LARGE_FLOAT
+    <span class="cf">return</span> W
+    
+LIM <span class="op">=</span> <span class="fl">5.0</span>
+pa1,pa2,pa3,pb1,pb2,pb3 <span class="op">=</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>
+x0 <span class="op">=</span> pa1,pa2,pa3,pb1,pb2,pb3
+
+opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">40</span>, <span class="st">&#39;verbose&#39;</span>: <span class="dv">3</span>}
+
+res <span class="op">=</span> minimize (fun<span class="op">=</span>calcint_g2,x0<span class="op">=</span>x0,
+                method<span class="op">=</span><span class="st">&#39;Nelder-Mead&#39;</span>,
+                bounds<span class="op">=</span>Bounds([<span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM],
+                              [LIM, LIM, LIM, LIM, LIM, LIM]),
+                options<span class="op">=</span>opts)
+<span class="bu">print</span> (res[<span class="st">&#39;x&#39;</span>])</code></pre></div>
+<pre><code>[ 2.27463285  1.17233979  1.48426044 -0.08218053  1.12299169  0.40471825]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">a1,a2,a3,b1,b2,b3  <span class="op">=</span> <span class="bu">list</span>(res[<span class="st">&#39;x&#39;</span>])
+a4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)
+b4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)
+test_coefs2 <span class="op">=</span> (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
+plot_surf_path(gfunc2,pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
+plt.savefig(<span class="st">&#39;calc_multi_40_elev_08.jpg&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="calc_multi_40_elev_08.jpg" />
+
+</div>
+<p>Bu yol da iyi oldu, iki tepe ortasındaki yüksekliği düşük olan yerden geçildi.</p>
+<p>Eğri Uzunlukları, Yatay, Dikey</p>
+<p>Alternatif bir bedel ölçütü şöyle olabilir, eğri altına düşen yüksekliklerin toplamını bir çizgi entegrali ile hesaplayınca bu yaklaşım yüksekliklerden genel olarak uzak durabilir, çok inişli çıkışlı yolları hala tercih eder, ama bu tür yolların yürüyüş olarak yorucu olacağını biliyoruz. 1000 metrelik bir tepeye çıkıp onun üzerinde düz yürümek habire 1000 metreyi inmek çıkmaktan çok daha rahat.</p>
+<p>Alternatif bir ölçüt şöyle olabilir; Bir eğriyi düşünelim, onun <span class="math inline">\(z\)</span> eksenindeki yansıması da bir eğridir, <span class="math inline">\(x,y\)</span> düzlemindeki yansıması bir başka eğri. Bu eğrilerin <em>uzunluğunu</em> hesaplarsak [2] ve dikey yöndeki uzunluğu yatay olan uzunluğu farklı ağırlıklarla çarpıp toplarsak bu bir bedeli temsil eder. Ağırlık dikey/yatay uzunluklar için 5/1 oranında olabilir, o zaman yatay yöndeki bir uzunluk / katedilen yol dikeye göre 5 kat daha tercih edilir olur.</p>
+<p>Optimallik için gereken uzunluk hesabına gelelim. Bu hesap için formül, dikey için <span class="math inline">\(I_v\)</span> yatay için <span class="math inline">\(I_h\)</span></p>
+<p><span class="math display">\[
+I_v = \int_{t=0}^{t=1} \sqrt{1 + \left(\frac{\mathrm{d} z}{\mathrm{d} t} \right)^2 } \mathrm{d} t
+\]</span></p>
+<p><span class="math display">\[
+I_h = \int_{t=0}^{t=1} \sqrt{
+\left(\frac{\mathrm{d} x}{\mathrm{d} t} \right)^2 + 
+\left(\frac{\mathrm{d} y}{\mathrm{d} t} \right)^2
+} 
+\mathrm{d} t
+\]</span></p>
+<p>Formülde görülen <span class="math inline">\(\mathrm{d} z/\mathrm{d} t\)</span>, <span class="math inline">\(\mathrm{d} x/\mathrm{d} t\)</span> ve <span class="math inline">\(\mathrm{d} y/\mathrm{d} t\)</span>, parametrik eğri üzerinden alınacak tabii ki. Problem çözümü açısından <span class="math inline">\(\mathrm{d} z/\mathrm{d} t\)</span> hesabı külfetli olabilir, çünkü <span class="math inline">\(z = f(x,y)\)</span> yükseklik fonksiyonundur.</p>
+<p>Mesela ilk örnekteki gidiş yoluna kuşbakışı, iki boyutlu ortamda bakmak istersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">a1,a2,a3 <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">8.1</span>, <span class="fl">4.0</span>
+b1,b2,b3 <span class="op">=</span> <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">23.3</span>
+a0,b0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)
+ex,ey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)
+a4 <span class="op">=</span> ex <span class="op">-</span> a0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)
+b4 <span class="op">=</span> ey <span class="op">-</span> b0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)
+  
+t <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="fl">1.0</span>,<span class="dv">100</span>)
+x <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span> 
+y <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span>
+plt.xlim(<span class="dv">0</span>,<span class="fl">5.0</span>)
+plt.ylim(<span class="dv">0</span>,<span class="fl">5.0</span>)
+plt.plot(x,y)
+plt.savefig(<span class="st">&#39;calc_multi_40_elev_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="calc_multi_40_elev_02.png" />
+
+</div>
+<p>Bunun dikey versiyonunu da hesaplamak kolay. Üstte tarif edilen yaklaşımı kodlayan bir kod <code>pathvhlen.py</code> içindedir.</p>
+<p>Sigmoid Eğri Yöntemi ve Bitiş Noktası Sınırlaması</p>
+<p>[3]'te alternatif bir eğri şekli daha gördük, lineer parçalı ya da sigmoid bazlı parametrize eğriler. Bir parametrize eğriyi</p>
+<p><span class="math display">\[
+x = a_0 + a_1 \sigma(t,u_1) + a_2 \sigma(t,u_2) + ... 
+\]</span></p>
+<p><span class="math display">\[
+x = b_0 + b_1 \sigma(t,v_1) + b_2 \sigma(t,v_2) + ... 
+\]</span></p>
+<p>modelleyebilirdik, <span class="math inline">\(u_1,u_2,..\)</span> eksen <span class="math inline">\(x\)</span> için ilmik noktaları, <span class="math inline">\(v_1,v_2,..\)</span> eksen <span class="math inline">\(y\)</span> için ilmik noktaları olabilirdi ve biraz değiştirilmiş sigmoid <span class="math inline">\(\sigma\)</span> ifadesi</p>
+<p><span class="math display">\[
+\sigma (x,k) = (x-k) \frac{1}{1 + exp(-\alpha (x-k))}
+\]</span></p>
+<p>Bilindiği gibi normal sigmoid ifadesi</p>
+<p><span class="math display">\[
+\sigma (x) = \frac{1}{1 + exp(-\alpha x)}
+\]</span></p>
+<p>ve <span class="math inline">\(\alpha\)</span> büyüdükçe 0'dan 1'e geçiş sertleşir.</p>
+<p>Bu şekilde parametrize edilmiş eğri ile pek çok farklı şekil ortaya çıkartılabilir. Bitiş noktasını da farklı bir şekilde optimizasyon kısıtlaması üzerinden zorluyoruz [3]. Bu yaklasim icin gereken kodlar <code>pathsig.py</code> icinde.</p>
+<div class="figure">
+<img src="calc_multi_40_elev_06.png" />
+
+</div>
+<p>Sadece 3 tane ilmik noktası tanımladık, bu noktalar vektörel notasyon ile çoğaltılabilir. Fakat optimizasyon gayet optimal bir yolu bulabildi, bu örnekte iki tane tepe var, ama onların arasından geçerek sonuca ulaştı.</p>
+<p>Bitiş noktalarını cebirsel değil <code>conx</code> ve <code>cony</code> adlı iki sınırlama tabiri ile zorladık.</p>
+<p>Polinom bazlı eğride bazı türevleri sembolik olarak almıştık, burada tüm türevler sayısal bazlı fakat sigmoid bazlı parametrik eğrilerin de sembolik türevini kullanmak zor değil. Burada hızlı kodlama amaçlı bunu yapmadık.</p>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, Sayısal Bilim, <em>Sayısal Entegrasyon (Numerical Integration)</em></p>
+<p>[2] Bayramlı, Çok Boyutlu Calculus, <em>Ders 6, Eğri Uzunluğu</em></p>
+<p>[3] Bayramlı, Çok Boyutlu Calculus, <em>Ders 5, İki Nokta Arasında Parametrize Edilmiş Eğri</em></p>
+<p>[5] Bayramlı, Fonksiyonel Analiz ve Optimizasyon, <em>Newton-umsu Metotlar, DFP, BFGS </em></p>
+</body>
+</html>

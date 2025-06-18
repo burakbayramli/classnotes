@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="hareketin-katı-gövde-denklemleri---1">Hareketin Katı-Gövde Denklemleri - 1</h1>
+<p>Runge-Kutta Hesabı</p>
+<p>İleride lazım olacak bir hesapsal yöntemi görelim, katı gövde cisimlerinin hareketi için diferansiyel denklemleri entegre etmemiz gerekiyor, bunun için Runge-Kutta yaklaşımını bir örnek üzerine görebiliriz.</p>
+<p>İlk Uygulanan Kuvvet</p>
+<p>İki boyutlu ortama ağırlığı <span class="math inline">\(m=1\)</span> kg olan bir topu 45 derece açıyla sağ yukarı doğru atıyoruz, uyguladığımız kuvvet 500 Newton. Bu topun gidiş yönü nasıl hesaplanır?</p>
+<p>Önemli bir konu uygulanan kuvveti başlangıçta sisteme nasıl dahil edeceğimiz. Burada dürtü / vuruş / darbe (impulse) kavramına bakmak gerekiyor. Kuvvetle hız değişimini ilintilendirmek için Newton'un ikinci kanunu ile başlayalım,</p>
+<p><span class="math display">\[
+F = \frac{\mathrm{d} P}{\mathrm{d} t} 
+\]</span></p>
+<p>Uygulanan kuvvet momentum değişimine eşittir, ki <span class="math inline">\(P = mv\)</span> olmak üzere. Fakat sonsuz küçük zaman üzerinden iş yapamayız, iki tarafın entegralini alalım,</p>
+<p><span class="math display">\[
+\int_{t_1}^{t_2} F \mathrm{d} t = \int_{t_1}^{t_2} \mathrm{d} P \mathrm{d} t
+\]</span></p>
+<p><span class="math display">\[
+J = \int_{t_1}^{t_2} F \mathrm{d} t = P(t_2) - P(t_1)
+\]</span></p>
+<p>Sonuçtaki <span class="math inline">\(J\)</span> dürtü büyüklüğü, kuvvetin zaman üzerinden entegrali, yani bir zaman aralığında uygulanan kuvvetin toplamı. Bu büyüklük momentum üzerinde bir değişime yol açıyor, <span class="math inline">\(P(t_1)\)</span> momentumundan <span class="math inline">\(P(t_2)\)</span> değerine geliyoruz.</p>
+<p>Üstteki formül şunu söylüyor, momentum değişimi için bir kuvvetin uygulandığı bir zaman aralığı gerekir. O zaman problem tanımı eksik, 500 Newton'luk kuvvet uyguladık, peki ne kadar süreli? Devam etmeden önce diyelim ki bir saniye, o zaman dürtü 500 Newton <span class="math inline">\(\cdot\)</span> saniye (Ns) olur. Dikkat <span class="math inline">\(m\)</span> değeri değişmediği için tek değişim hız değişkeninde olacaktır, <span class="math inline">\(J = m(v_2 - v_1) = m \Delta v\)</span>, yani dürtü sonrası hızda değişim gözleyeceğiz.</p>
+<p>Başlangıçta <span class="math inline">\(v_1=0\)</span>, dürtü için 500 N <span class="math inline">\(\cdot\)</span> saniye</p>
+<p><span class="math display">\[
+J = m v_2 - m v_1 = m v_2 - m(0) \to J = m v_2
+\]</span></p>
+<p><span class="math display">\[
+\to 500 Ns = m v_2
+\to 500 \frac{kg \cdot m/s^2}{1 kg } \cdot s = v_2
+\to v_2 = 500 m/s
+\]</span></p>
+<p>diyebiliriz.</p>
+<p>Ilk Uygulanan Tork</p>
+<p>Gerçi alttaki örnek için lazım değil ama ilk uygulanan kuvvet gibi ilk uygulanan dürtü (impulse), tork kavramı da simülasyonlarda gerekli. Bu durumda açısal dürtü belli bir zamanda uygulanan torktur, yani torkun zaman üzerinden entegralidir denir, ve bu dürtü açısal momentumdaki değişime eşittir. İlk tanımla başlarsak,</p>
+<p><span class="math display">\[
+J = \int \tau \mathrm{d} t
+\]</span></p>
+<p>Eğer zaman aralığı ufak ve tork sabit ise</p>
+<p><span class="math display">\[
+J = \tau \Delta t
+\]</span></p>
+<p>Diğer yandan açısal momentum eşitliğini hatırlayalım,</p>
+<p><span class="math display">\[
+L = I \omega
+\]</span></p>
+<p>Açısal dürtü açısal momentum değişimine eşit ise</p>
+<p><span class="math display">\[
+\tau \Delta t = \Delta L = \Delta (I \omega)= I (\omega_2 - \omega_1)
+\]</span></p>
+<p>ki <span class="math inline">\(\omega_1\)</span> başlangıç açısal hızı, <span class="math inline">\(\omega_2\)</span> nihai hız. Hız başlangıçta sıfır olsa, <span class="math inline">\(\omega_1 = 0\)</span>, ve nihai hız ile başlangıçta uygulanan tork arasında bağlantı kurmak istesek</p>
+<p><span class="math display">\[
+\tau \Delta t = I \omega_2 
+\]</span></p>
+<p><span class="math display">\[
+\to \omega_2 = I^{-1} \tau \Delta t
+\]</span></p>
+<p>Örnek</p>
+<p>Artık sistem denklemini entegre edebiliriz, sistem <span class="math inline">\(\dot{x} = v_x\)</span>, <span class="math inline">\(\dot{y} = v_y\)</span> <span class="math inline">\(\dot{v} = a\)</span>. Sürekli etki eden tek ivme etkisi yerçekimi <span class="math inline">\(g\)</span>. Sistem bir vektör üzerinden temsil edilebiliyor,</p>
+<p><span class="math display">\[
+\left[\begin{array}{c}
+\dot{x} \\ \dot{y} \\ \dot{v}
+\end{array}\right] = F(\vec{x},t)
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+
+<span class="kw">def</span> rk4_step(func, dt, t, y):
+    k1 <span class="op">=</span> dt <span class="op">*</span> func(t, y)
+    k2 <span class="op">=</span> dt <span class="op">*</span> func(t <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> dt, y <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> k1)
+    k3 <span class="op">=</span> dt <span class="op">*</span> func(t <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> dt, y <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> k2)
+    k4 <span class="op">=</span> dt <span class="op">*</span> func(t <span class="op">+</span> dt, y <span class="op">+</span> k3)
+    <span class="cf">return</span> y <span class="op">+</span> (k1 <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>k2 <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>k3 <span class="op">+</span> k4) <span class="op">/</span> <span class="dv">6</span>
+
+<span class="kw">def</span> projectile_motion_eom(t, X):
+    x, y_pos, vx, vy <span class="op">=</span> X
+
+    g <span class="op">=</span> <span class="fl">9.81</span>  <span class="co"># yercekimi</span>
+    m <span class="op">=</span> <span class="dv">1</span>     <span class="co"># topun kutlesi</span>
+
+    dx_dt <span class="op">=</span> vx
+    dy_dt <span class="op">=</span> vy
+    dvx_dt <span class="op">=</span> <span class="fl">0.0</span> 
+    dvy_dt <span class="op">=</span> <span class="op">-</span>g  
+
+    <span class="cf">return</span> np.array([dx_dt, dy_dt, dvx_dt, dvy_dt])
+
+m <span class="op">=</span> <span class="fl">1.0</span>
+initial_force <span class="op">=</span> <span class="fl">500.0</span>  <span class="co"># baslangic kuvveti, Newton </span>
+force_direction <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">1.0</span>])
+force_direction <span class="op">=</span> force_direction <span class="op">/</span> np.linalg.norm(force_direction) 
+
+dt <span class="op">=</span> <span class="fl">0.01</span>  <span class="co"># zaman dilimi (saniye)</span>
+
+<span class="co"># Initial position [x0, y0]</span>
+x0 <span class="op">=</span> <span class="fl">0.0</span>
+y0 <span class="op">=</span> <span class="fl">0.0</span>
+
+initial_acceleration <span class="op">=</span> initial_force <span class="op">/</span> m <span class="op">*</span> force_direction
+initial_velocity_magnitude <span class="op">=</span> initial_force <span class="op">/</span> m 
+                                                                                                                                             
+initial_velocity_vector <span class="op">=</span> initial_velocity_magnitude <span class="op">*</span> force_direction
+vx0 <span class="op">=</span> initial_velocity_vector[<span class="dv">0</span>]
+vy0 <span class="op">=</span> initial_velocity_vector[<span class="dv">1</span>]
+
+<span class="bu">print</span>(<span class="ss">f&quot;Baslangic Hizi: [</span><span class="sc">{</span>vx0<span class="sc">:.2f}</span><span class="ss"> m/s, </span><span class="sc">{</span>vy0<span class="sc">:.2f}</span><span class="ss"> m/s]&quot;</span>)
+
+initial_state <span class="op">=</span> np.array([x0, y0, vx0, vy0])
+
+time_points <span class="op">=</span> [<span class="fl">0.0</span>]
+state_history <span class="op">=</span> [initial_state]
+current_state <span class="op">=</span> initial_state
+current_time <span class="op">=</span> <span class="fl">0.0</span>
+
+<span class="cf">while</span> current_state[<span class="dv">1</span>] <span class="op">&gt;=</span> <span class="dv">0</span>:
+    current_state <span class="op">=</span> rk4_step(projectile_motion_eom, dt, current_time, current_state)
+    current_time <span class="op">+=</span> dt
+    <span class="cf">if</span> current_state[<span class="dv">1</span>] <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">break</span>
+
+    time_points.append(current_time)
+    state_history.append(current_state)
+
+state_history <span class="op">=</span> np.array(state_history)
+x_positions <span class="op">=</span> state_history[:, <span class="dv">0</span>]
+y_positions <span class="op">=</span> state_history[:, <span class="dv">1</span>]
+vx_values <span class="op">=</span> state_history[:, <span class="dv">2</span>]
+vy_values <span class="op">=</span> state_history[:, <span class="dv">3</span>]
+
+plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))
+plt.plot(x_positions, y_positions)
+plt.xlabel(<span class="st">&#39;(m)&#39;</span>)
+plt.ylabel(<span class="st">&#39;(m)&#39;</span>)
+plt.grid(<span class="va">True</span>)
+plt.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, linewidth<span class="op">=</span><span class="fl">0.7</span>) <span class="co"># yer</span>
+plt.axis(<span class="st">&#39;equal&#39;</span>) 
+plt.savefig(<span class="st">&#39;phy_005_basics_05_05.jpg&#39;</span>)
+
+<span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Bitis Zamani: </span><span class="sc">{</span>time_points[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss"> saniye&quot;</span>)
+<span class="bu">print</span>(<span class="ss">f&quot;Son yer: x = </span><span class="sc">{</span>x_positions[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss"> m, y = </span><span class="sc">{</span>y_positions[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss"> m&quot;</span>)
+<span class="bu">print</span>(<span class="ss">f&quot;Son hız: vx = </span><span class="sc">{</span>vx_values[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss"> m/s, vy = </span><span class="sc">{</span>vy_values[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss"> m/s&quot;</span>)</code></pre></div>
+<pre><code>Baslangic Hizi: [353.55 m/s, 353.55 m/s]
+
+Bitis Zamani: 72.08 saniye
+Son yer: x = 25484.13 m, y = 0.07 m
+Son hız: vx = 353.55 m/s, vy = -353.55 m/s</code></pre>
+<div class="figure">
+<img src="phy_005_basics_05_05.jpg" />
+
+</div>
+<p>Rotasyon Matrisi ve Türevi</p>
+<p>Bir 3 x 3 dönüş matrisi ile herhangi bir vektörü döndürebileceğimizi biliyoruz. Yersel taşıma daha da basit, 3 boyutlu bir vektör sadece, mevcut konuma ekleyerek yeni konumu elde ediyoruz.</p>
+<p>Bir katı gövdeyi parçacıkları üzerinden alırsak, ve bu gövdenin açısal dönüşsel olarak hangi yöne baktığını bir dönüş matrisi <span class="math inline">\(R\)</span> ile temsil edersek, her parçacık üzerinde bu işlemin uygulandığını düşünebiliriz. Ayrıca konumsal taşınma ve bakılan yön başlangıçtaki bir &quot;gövde uzayı''na (body space) göre yapılabilir, gövdenin kütle merkezini dünya kordinatlarının (0,0,0) orijin noktasında ve yönü herhangi bir (başta belli) yöne doğru alalım, hareketler hep bu konuma referansla, onu değiştirecek şekilde düşünülebilir. Mesela gövde üzerindeki, gövde uzayındaki, herhangi bir <span class="math inline">\(p_0\)</span> noktasını düşünelim, <span class="math inline">\(t\)</span> anında bu noktanın dünya uzayındaki konumu</p>
+<p><span class="math display">\[
+p(t) = R(t) p_0 + x_{CM}(t)
+\]</span></p>
+<p>ki <span class="math inline">\(x_{CM}(t)\)</span> bir yersel taşınma, ve <span class="math inline">\(R(t)\)</span> açısal dönüş. Tabii taşınma her zaman kütle merkezine uygulandığı için <span class="math inline">\(x_{CM}\)</span> aynı zamanda kütle merkezinin her <span class="math inline">\(t\)</span> anında dünya uzayında olduğu yeri de gösteriyor.</p>
+<div class="figure">
+<img src="phy_005_basics_04_04.png" />
+
+</div>
+<p>Türeve gelirsek, bir vektör <span class="math inline">\(r\)</span>'nin orijin etrafında döndüğünü düşünelim. Herhangi bir anda bu dönüşün açısal hızı <span class="math inline">\(\omega\)</span> çapraz çarpımla hesaplanabilir,</p>
+<div class="figure">
+<img src="phy_005_basics_04_03.png" />
+
+</div>
+<p>Hız tabii ki sonsuz küçük zamandaki yer değişimi olduğu için onu</p>
+<p><span class="math display">\[
+\frac{\mathrm{d} r}{\mathrm{d} t} = \omega \times r
+\]</span></p>
+<p>olarak ta görebiliriz. Şimdi bir katı gövdeyi düşünelim, onun baktığı yön (orientation) bir matris <span class="math inline">\(R\)</span> içinde. Bu matrisin her kolonunda bir eksen var, ilk kolon <span class="math inline">\(x\)</span>, ikinci <span class="math inline">\(y\)</span>, vs. Eğer gövdenin baktığı yönü <span class="math inline">\(R\)</span> ile temsil ediyorsak tüm bu kolonlar gövde dönerken değişecektir. Eğer dönüş <span class="math inline">\(\omega\)</span> ise her eksenin açısal hızı <span class="math inline">\(\omega\)</span> demek, o zaman bu eksenlerin, <span class="math inline">\(b,c,d\)</span> diyelim, açısal hızı ayrı ayrı <span class="math inline">\(\omega \times b\)</span>, <span class="math inline">\(\omega \times c\)</span>, <span class="math inline">\(\omega \times d\)</span> olarak bulunabilir, ki bunların her biri aynı zamanda ayrı birer türevdir. Tüm matrisin türevi</p>
+<p><span class="math display">\[
+\frac{\mathrm{d} R}{\mathrm{d} t} = \tilde \omega \cdot R
+\]</span></p>
+<p>ki <span class="math inline">\(\tilde \omega\)</span> ile <span class="math inline">\(\omega\)</span>'yi eksi bakışımlı [4] bir matris hale getirdik, böylece çapraz çarpımı noktasal çarpım haline çevirmiş oluyoruz [5, sf. 9], [3].</p>
+<p>Devam edelim, diğer konuları daha önce bir gövdenin her bakımdan konumunu, statüsünü temsil etmek için gerekli matematiği gördük. Bu konumu <span class="math inline">\(\overline{X}(t)\)</span> ile gösterebiliriz,</p>
+<p><span class="math display">\[
+\overline{X} = \left[\begin{array}{c}
+x_{CM}(t) \\ R(t) \\ P(t) \\ L(t)
+\end{array}\right]
+\]</span></p>
+<p>Momentum <span class="math inline">\(P(t) = v(t) M\)</span> olduğu için <span class="math inline">\(v(t) = \frac{P(t)}{M}\)</span>.</p>
+<p><span class="math inline">\(I(t)\)</span>'yi yukarıda gördük, <span class="math inline">\(I(t) = R(t) I_{body} R(t)^T\)</span>.</p>
+<p><span class="math inline">\(L(t) = I(t) \omega(t)\)</span> olduğu için <span class="math inline">\(\omega(t) = I(t)^{-1} L(t)\)</span></p>
+<p>Hepsini biraraya koyunca <span class="math inline">\(\overline{X}\)</span>'nin türevi</p>
+<p><span class="math display">\[
+\frac{\mathrm{d}}{\mathrm{d} t} \overline{X}(t) =
+\frac{\mathrm{d}}{\mathrm{d} t}
+\left[\begin{array}{c}
+x_{CM}(t) \\ R(t) \\ P(t) \\ L(t)
+\end{array}\right]
+=
+\left[\begin{array}{c}
+v(t) \\ \tilde \omega \cdot R(t) \\ F(t) \\ \tau(t)
+\end{array}\right]
+\]</span></p>
+<p>Katı-Gövde Simülasyonu</p>
+<p>Dönüş</p>
+<p>Bir örnek gövde üzerinde simülasyon yapmaya uğraşalım. Elimizde bir simit, ya da geometride torus denen bir şekil var. Bu dosya STL denen bir format içinde, detaylar için [6]. Kuvvet uygulama sonrası lineer ve açısal momentum içeren simülasyon için pek çok değişkeni diferansiyel tanımları üzerinden entegre etmemiz gerekiyor, daha basit bir örnek ile, özellikle sabit bir açısal hız üzerinden salt döndürme ile başlamak uygun olabilir. [2]'te tarif edilen döndürme matrisi türevini hatırlarsak,</p>
+<p><span class="math display">\[
+\frac{\mathrm{d} R}{\mathrm{d} t} = \tilde \omega \cdot R
+\]</span></p>
+<p>Döndürmeyi bir <span class="math inline">\(\omega\)</span> etrafında düşünüyorduk, <span class="math inline">\(\omega\)</span>'nin büyüklüğü açısal dönme hızına tekabül ediyordu, ve <span class="math inline">\(\tilde \omega\)</span> eksi-bakışımlı matris idi.</p>
+<div class="figure">
+<img src="compscieng_bpp32sim_rigbod_01.png" />
+
+</div>
+<p>Tüm bunları entegre edici <code>odeint</code> çağrısının kabul edeceği bir formda nasıl kullanırız? Bu çağrı düzleştirilmiş bir liste içinde diferansiyel sonuçların, ve ana değişkenlerin olmasını bekliyor. O zaman <span class="math inline">\(R\)</span>'yi kolon bazlı olmak üzere düzleştiririz, ve gerektiği o listeden matris formuna geçeriz, vs.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.integrate <span class="im">import</span> odeint
+<span class="im">from</span> stl <span class="im">import</span> mesh
+
+<span class="kw">def</span> skew(a):
+   <span class="cf">return</span> np.array([[<span class="dv">0</span>,<span class="op">-</span>a[<span class="dv">2</span>],a[<span class="dv">1</span>]],[a[<span class="dv">2</span>],<span class="dv">0</span>,<span class="op">-</span>a[<span class="dv">0</span>]],[<span class="op">-</span>a[<span class="dv">1</span>],a[<span class="dv">0</span>],<span class="dv">0</span>]])
+
+your_mesh <span class="op">=</span> mesh.Mesh.from_file(<span class="st">&#39;torus.stl&#39;</span>)
+prop <span class="op">=</span> your_mesh.get_mass_properties()
+R0 <span class="op">=</span> np.eye(<span class="dv">3</span>,<span class="dv">3</span>)
+omega <span class="op">=</span> np.array([<span class="fl">1.0</span>,<span class="fl">1.0</span>,<span class="fl">1.0</span>])
+<span class="co">#omega = np.array([0.0,1.0,0.0])</span>
+skew_omega <span class="op">=</span> skew(omega)
+   
+<span class="kw">def</span> dRdt(u,t):   
+   R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z <span class="op">=</span> u
+   R <span class="op">=</span> np.array([R1x,R1y,R1z,R2x,R2y,R2z,R3x,R3y,R3z])
+   R <span class="op">=</span> R.reshape((<span class="dv">3</span>,<span class="dv">3</span>)).T
+   res <span class="op">=</span> np.dot(skew_omega, R)
+   <span class="cf">return</span> <span class="bu">list</span>(res.T.flatten())
+
+LIM <span class="op">=</span> <span class="dv">5</span>
+STEPS <span class="op">=</span> <span class="dv">20</span>
+t<span class="op">=</span>np.linspace(<span class="fl">0.0</span>, <span class="fl">3.0</span>, STEPS)
+R0 <span class="op">=</span> np.eye(<span class="dv">3</span>,<span class="dv">3</span>)
+u0 <span class="op">=</span> R0.flatten()
+u1<span class="op">=</span>odeint(dRdt,<span class="bu">list</span>(u0),t)</code></pre></div>
+<p>Üstte görülen mesela <code>R1x</code> <span class="math inline">\(R\)</span> matrisinin 1'inci kolonunun <span class="math inline">\(x\)</span> değişkeni anlamında.</p>
+<p>Simülasyonda simit şeklinin baktığı yön <span class="math inline">\(R\)</span> içinde, ve grafik amaçlı olarak her seferinde simit şeklini sıfırdan yükleyip son <span class="math inline">\(R\)</span>'ye ilerletiyoruz, ve her adımda bu grafiği basıyoruz. Simülasyonu hesapladık, tüm sonuç <code>u1</code> içinde, görüntüden bazı seçilmiş kareler altta görülebilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">from</span> mpl_toolkits <span class="im">import</span> mplot3d
+
+<span class="kw">def</span> plot_vector(fig, orig, v, color<span class="op">=</span><span class="st">&#39;blue&#39;</span>):
+   ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)
+   orig <span class="op">=</span> np.array(orig)<span class="op">;</span> v<span class="op">=</span>np.array(v)
+   ax.quiver(orig[<span class="dv">0</span>], orig[<span class="dv">1</span>], orig[<span class="dv">2</span>], v[<span class="dv">0</span>], v[<span class="dv">1</span>], v[<span class="dv">2</span>],color<span class="op">=</span>color)
+   ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)  
+   <span class="cf">return</span> fig
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(STEPS):
+    fig <span class="op">=</span> plt.figure()
+    axes <span class="op">=</span> mplot3d.Axes3D(fig)
+    your_mesh <span class="op">=</span> mesh.Mesh.from_file(<span class="st">&#39;torus.stl&#39;</span>)
+    R <span class="op">=</span> u1[i].reshape((<span class="dv">3</span>,<span class="dv">3</span>)).T
+    your_mesh.rotate_using_matrix(R)
+    scale <span class="op">=</span> your_mesh.points.flatten()
+    axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors,alpha<span class="op">=</span><span class="fl">0.3</span>))
+    plot_vector(fig, [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>], omega, color<span class="op">=</span><span class="st">&#39;red&#39;</span>)
+    axes.auto_scale_xyz(scale, scale, scale)
+    axes.set_xlim(<span class="op">-</span>LIM,LIM)<span class="op">;</span>axes.set_ylim(<span class="op">-</span>LIM,LIM)<span class="op">;</span>axes.set_zlim(<span class="op">-</span>LIM,LIM)
+    axes.view_init(azim<span class="op">=</span><span class="dv">20</span>,elev<span class="op">=</span><span class="dv">0</span>)
+    plt.savefig(<span class="st">&#39;/tmp/rotate_</span><span class="sc">%02d</span><span class="st">.png&#39;</span> <span class="op">%</span> i)  </code></pre></div>
+<div class="figure">
+<img src="sim1/rotate_00.png" />
+
+</div>
+<div class="figure">
+<img src="sim1/rotate_08.png" />
+
+</div>
+<div class="figure">
+<img src="sim1/rotate_14.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">!</span> convert <span class="op">-</span>delay <span class="dv">20</span> <span class="op">-</span>loop <span class="dv">0</span> <span class="op">/</span>tmp<span class="op">/</span>rotate<span class="op">*</span>.png <span class="op">/</span>tmp<span class="op">/</span>torus_rotate1.gif</code></pre></div>
+<p>Animasyon sonucu [1]'de.</p>
+<p>Torus şekli hakkında bazı istatistikler alttadır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> stl <span class="im">import</span> mesh
+
+your_mesh <span class="op">=</span> mesh.Mesh.from_file(<span class="st">&#39;torus.stl&#39;</span>)
+
+prop <span class="op">=</span> your_mesh.get_mass_properties()
+<span class="bu">print</span> (<span class="st">&#39;hacim&#39;</span>,np.<span class="bu">round</span>(prop[<span class="dv">0</span>],<span class="dv">3</span>))
+<span class="bu">print</span> (<span class="st">&#39;yercekim merkezi (COG)&#39;</span>,np.<span class="bu">round</span>(prop[<span class="dv">1</span>],<span class="dv">3</span>))
+<span class="bu">print</span> (<span class="st">&#39;COG noktasinda atalet matrisi&#39;</span>)
+<span class="bu">print</span> (np.<span class="bu">round</span>(prop[<span class="dv">2</span>],<span class="dv">3</span>))</code></pre></div>
+<pre><code>hacim 4.918
+yercekim merkezi (COG) [-0.  0. -0.]
+COG noktasinda atalet matrisi
+[[ 3.223 -0.     0.   ]
+ [-0.     3.223  0.   ]
+ [ 0.     0.     5.832]]</code></pre>
+<p>COG sıfır noktasında olması, ayrıca atalet matrisinin köşegen olması mantıklı çünkü simit şekli simetrik.</p>
+<p>Üstteki simülasyonda kuvvetler, lineer, açısal momentum gibi kavramlar gösterilmedi, bir sonraki yazıda tüm kavramların olduğu bir simülasyon olacak, yazıda dönüş matematiği de sayısal açıdan daha sağlam farklı bir yaklaşım kullanıyor olacak.</p>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, <em>Animasyon 1</em>, <a href="https://www.dropbox.com/scl/fi/l9wjyc2nar8bwucasfqpf/torus_rotate1.gif?rlkey=mhnye63g5auddh7m3e993ic43&amp;st=ttluuezu&amp;raw=1" class="uri">https://www.dropbox.com/scl/fi/l9wjyc2nar8bwucasfqpf/torus_rotate1.gif?rlkey=mhnye63g5auddh7m3e993ic43&amp;st=ttluuezu&amp;raw=1</a></p>
+<p>[2] Bayramlı, <em>Fizik, Temel Fizik 4, Katı Gövde</em></p>
+<p>[3] Rotenberg, <em>CSE169: Computer Animation, UCSD</em></p>
+<p>[4] Bayramlı, <em>Lineer Cebir, Ders 5</em></p>
+<p>[5] Witkin, <em>Physically Based Modeling</em></p>
+<p>[6] Bayramlı, <em>3D Baskıya Hazır CAD Tasarımlarına Erişmek, Numpy-STL</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2020/08/numpy-stl.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2020/08/numpy-stl.html</a></p>
+</body>
+</html>

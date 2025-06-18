@@ -1,0 +1,564 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="derin-öğrenme-ile-go-oyununu-oynamak-deepmind-alphago-zero">Derin Öğrenme ile Go Oyununu Oynamak, DeepMind AlphaGo Zero</h1>
+<p>Yapay Zeka alanındaki heyecan verici ilerlemelerden biri Google DeepMind şirketinin AlphaGo programının 17 kez Go şampiyonu olmuş Lee Sedol'u yenmesiydi. Fakat DeepMind orada durmadı, mimariyi geliştirerek AlphaGo'yu 100-0 yenecek AlphaGo Zero'yu geliştirdi! Yeni mimarinin ilginç tarafı YZ'nin hiç dış veriye ihtiyaç duymadan eğitilmiş olması. AGZ sıfır kabiliyet ile başlıyor (clean slate), ve kendisiyle oynaya oynaya Go şampiyonlarını yenecek hale geliyor. Bu ve ek ilerlemeleri bu yazıda paylaşıyoruz.</p>
+<p>Mimari</p>
+<p>Genel olarak AG ve AGZ'nin benzer bazı özellikleri var. Bunlardan ilki Monte Carlo Ağaç Aramasının (Monte Carlo Tree Search -MCTS-) bir derin YSA ile genişletilerek kabiliyetinin ilerletilmiş olması. MCTS konusunu işledik, herhangi bir tahta pozisyonundan başlayarak simülasyon yapılır, ve kazanç / kayıp verisi yukarı alınarak karar mekanizması için kullanılır. Fakat simülasyon yapılırken ve her tahta pozisyonundan hamle seçenekleri üretilirken ne kadar derine inilecek? Oyun bitene kadar inilirse bu özellikle Go gibi bir oyunda çok derin ve geniş bir ağaç ortaya çıkartabilir, bilgisayarlar performans açısından böyle bir ağaçla zorlanırlar. Çözüm belli bir tahtaya bakarak o oyunun kazanılıp kazanılmayacağı hakkında &quot;sezgisel'' bir karar verebilmek. Bu işi örüntü tanıma üzerinden YSA çok güzel yapabilir. Önceden (kendisiyle oynarken) elde edilen oyun verisine bakarak, tahta pozisyonları ve o oyunun kazanılıp kazanılmadığı verisiyle eğitilen &quot;değer YSA'sı'' artık yeni bir tahtayı görünce o durumun kazanç şansının olup olmadığını -1,+1 arasında bir değer ile hesaplayabilir. Bu durumda MCTS'in herhangi bir dalda oyunu sonuna kadar simüle etmesine gerek yoktur, belli bir seviye sonra durup YSA'ya kazanç şansını sorar, bu değeri kullanır.</p>
+<p>İkinci özellik bir ilke / siyaset / strateji YSA'sı kullanmak, ilke YSA'sı bir tahtayı girdi olarak alıp, yapılabilecek tüm hamleler için bir kazanç olasılığı üretebilir, ilke YSA'sin çıktısı potansiyel olarak tüm tahta hücreleri olabilir [1,3]. MCTS bu çıktıları kazanma olasılığı daha yüksek olan hamle ağaç dallarını simüle etmek için kullanacaktır.</p>
+<p>Yazının geri kalanında 9x9 Go boyutlarını referans alacağız, AG ve AGZ 19x19 oyunu üzerinde işliyor.</p>
+<div class="figure">
+<img src="go_02.jpg" />
+
+</div>
+<p>Bir not düşelim, YSA &quot;bir tahtayı girdi alıyor'' dedik ama girdi verisi oldukca zenginleştirilmiş halde, sadece (9,9) boyutunda tek bir tahta değil, (9,9,17) boyutunda yani 17 katmanlı bir veri &quot;balyası''. Bu balyayı hazırlamak için herhangi bir oyun anında tahtaya bakılır, her renk için (siyah/beyaz) 8 katman yaratılır, bu katmanlardan biri o rengin o andaki tahtadaki pozisyonu, diğer 7'si hemen önceki 7 adımdaki aynı rengin pozisyonları, aynı şekilde diğer renk için 8 katman, ve ek bir katman sıranın kimde olduğu. Tüm bunlar istiflenerek toplam 17 katman yaratılır. Herhangi bir anda oyunun durumu bu tensor üzerinden belirtilir. Verinin bu şekilde zenginleştirilmesinin sebebi herhalde zamansal bağlantıları yakalamaya uğraşmak.</p>
+<div class="figure">
+<img src="go_01.png" />
+
+</div>
+<p>AlphaGo Zero</p>
+<p>AGZ'nin yaptığı ilerlemeler ise şunlar [3]: AlphaGo değer ve ilke için iki ayrı ağ kullanıyordu. AGZ'de değer ve ilke YZ'leri birleştirilerek tek bir YSA ile iki çıktı üretilmesi sağlanıyor, bu yapıya esprili bir şekilde &quot;iki başlı canavar (two-headed monster)'' ismi de veriliyor. Bu mimari biraz garip gelebilir, çünkü çoğu uygulamada genellikle tek bir çıktı kullanılır, mesela bir resimde kedi olup olmadığını tahmin edecek bir YZ tek bir ikisel çıktı ile bunu yapabilir, ya da resmin belli kategorilere ait olup olmadığı tek bir vektör çıktısı ile, bu vektörde obje olasılıkları vardır. Fakat biraz düşününce iki farklı çıktılı yapının niye işlediğini anlayabiliriz, sonuçta YZ bir fonksiyonu yaklaşık olarak temsil etmeye çabalar, eğitim sırasında kafa #1 fonksiyonu bir tahmin üretir, ve eğitim o kafanın yaptığı tahmine sonuç veren parametreleri günceller, aynı şekilde kafa #2 için düzeltme yapılır.</p>
+<div class="figure">
+<img src="go_03.png" />
+
+</div>
+<p>İkinci bir AGZ ilerlemesi artıksal ağ (residual network) adı verilen bir derin YSA yapısı kullanmak. Artıksal ağlar pür evrişimsel ağların daha gelişmiş hali, bu yapılarda evrişimsel ağda bölge atlaması yapılarak sonraki bölgelere direk / kısayol bağlantıları koyuluyor [6]. Örnek bir yapı altta,</p>
+<div class="figure">
+<img src="resnet34.png" />
+
+</div>
+<p>Üçüncü ilerleme ise AGZ'nin kendisine karşı oynayarak kendini eğitmesi (AG için başkaların oynadığı oyunların kayıtları kullanıldı). DeepMind bilimcileri araştırmaları sırasında şunu anladılar: hangi baz mimariyle başlarsak başlayalım, MCTS onu daha iyileştirir. Bu durumda herhangi bir YZ alınır ki başta ağırlık değerleri rasgele yani hiç bir doğru karar vermez, ama bu YZ, MCTS ile daha iyi performans gösterecektir, bu sırada oyundan eğitim verisi toplanır ve bu veri YZ'yi iyileştirmek için ağa uygulanır, ve işlem başa dönerek devam edilir. Bu sayede en kötü performanstan en iyisine doğru ilerlemek mümkündür.</p>
+<p>Eğitim verisinde hedefin ne olduğunu daha iyi vurgulamak gerekirse, değer kafası için bu tek bir değer, ilke kafası için tüm 9x9 tahta pozisyonlarında hangi hamlenin yapılmış olduğu, o hücre 1 diğerleri 0 değerinde olacak. Bu şekilde eğitilen YSA, ilke tahmini üreteceği zaman tüm hücrelerde olasılık değerleri üretecektir.</p>
+<p>Alttaki kod [4]'u baz almıştır. Eğitmek için <code>train.py</code> kullanılır, eğitim sırasında en son YSA belli aralıklarla sürekli kaydedilecektir, eğitim sonunda ya da yeterince eğitilince işlem durulabilir, ve <code>gnugo_play.py</code> kaydedilen aynı modeli kullanarak GnuGo [1] programına karşı oynatılabilir. YSA olarak biz ResNet yerine daha basit bir yapı kullandık,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> simplenet
+simplenet.PolicyValue.create_network()</code></pre></div>
+<pre><code>Tensor(&quot;input_1:0&quot;, shape=(?, 17, 9, 9), dtype=float32)
+Tensor(&quot;conv2d/BiasAdd:0&quot;, shape=(?, 17, 9, 64), dtype=float32)
+Tensor(&quot;batch_normalization/batchnorm/add_1:0&quot;, shape=(?, 17, 9, 64), dtype=float32)
+Tensor(&quot;conv2d_2/BiasAdd:0&quot;, shape=(?, 17, 9, 128), dtype=float32)
+Tensor(&quot;batch_normalization_2/batchnorm/add_1:0&quot;, shape=(?, 17, 9, 128), dtype=float32)
+------------- value -------------------
+Tensor(&quot;conv2d_3/BiasAdd:0&quot;, shape=(?, 17, 9, 2), dtype=float32)
+Tensor(&quot;activation_3/Relu:0&quot;, shape=(?, 17, 9, 2), dtype=float32)
+Tensor(&quot;flatten/Reshape:0&quot;, shape=(?, 306), dtype=float32)
+policy_output Tensor(&quot;activation_4/Softmax:0&quot;, shape=(?, 82), dtype=float32)
+------------- policy -------------------
+Tensor(&quot;conv2d_4/BiasAdd:0&quot;, shape=(?, 17, 9, 1), dtype=float32)
+Tensor(&quot;activation_5/Relu:0&quot;, shape=(?, 17, 9, 1), dtype=float32)
+Tensor(&quot;flatten_2/Reshape:0&quot;, shape=(?, 153), dtype=float32)
+Tensor(&quot;dense_2/BiasAdd:0&quot;, shape=(?, 256), dtype=float32)
+Tensor(&quot;activation_6/Relu:0&quot;, shape=(?, 256), dtype=float32)
+Tensor(&quot;dense_3/BiasAdd:0&quot;, shape=(?, 1), dtype=float32)
+Tensor(&quot;dense_3/BiasAdd:0&quot;, shape=(?, 1), dtype=float32)
+Out[1]: &lt;tensorflow.python.keras._impl.keras.engine.training.Model at 0x7fa2dd30de50&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np, resource, sys
+<span class="im">from</span> operator <span class="im">import</span> itemgetter
+
+sys.setrecursionlimit(<span class="dv">1500</span>)
+resource.setrlimit(resource.RLIMIT_STACK, [<span class="bn">0x10000000</span>, resource.RLIM_INFINITY])
+sys.setrecursionlimit(<span class="bn">0x100000</span>)
+
+<span class="kw">class</span> TreeNode(<span class="bu">object</span>):
+    <span class="co">&quot;&quot;&quot;MCTS agacindaki bir dugum. Her dugum kendi Q degerini, onceki</span>
+<span class="co">    olasiligi P&#39;yi, ve kac kez ziyaret edildigi sayisiyla duzeltilmis</span>
+<span class="co">    onsel skoru u&#39;yu biliyor.</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, parent, prior_p):
+        <span class="va">self</span>._parent <span class="op">=</span> parent
+        <span class="va">self</span>._children <span class="op">=</span> {} 
+        <span class="va">self</span>._n_visits <span class="op">=</span> <span class="dv">0</span>
+        <span class="va">self</span>._W <span class="op">=</span> <span class="dv">0</span> 
+        <span class="va">self</span>._Q <span class="op">=</span> <span class="dv">0</span>
+        <span class="va">self</span>._u <span class="op">=</span> prior_p
+        <span class="va">self</span>._P <span class="op">=</span> prior_p
+
+    <span class="kw">def</span> printing(<span class="va">self</span>):
+        <span class="bu">print</span>(<span class="va">self</span>._children)
+        <span class="cf">for</span> _, child <span class="kw">in</span> <span class="va">self</span>._children.iteritems():
+            child.printing()
+
+    <span class="kw">def</span> expand(<span class="va">self</span>, action_priors):
+        <span class="cf">for</span> action, prob <span class="kw">in</span> action_priors:
+            <span class="cf">if</span> action <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>._children:
+                <span class="va">self</span>._children[action] <span class="op">=</span> TreeNode(<span class="va">self</span>, prob)
+
+    <span class="kw">def</span> select(<span class="va">self</span>):        
+        <span class="co">&quot;&quot;&quot;Cocuklar arasinda maksimum aksiyon Q + u(P)&#39;yi vereni sec</span>
+<span class="co">        &quot;&quot;&quot;</span>
+        <span class="cf">return</span> <span class="bu">max</span>(<span class="va">self</span>._children.iteritems(),
+                   key<span class="op">=</span><span class="kw">lambda</span> act_node: act_node[<span class="dv">1</span>].get_value())
+
+    <span class="kw">def</span> update(<span class="va">self</span>, leaf_value, c_puct):
+        <span class="co">&quot;&quot;&quot;Dugumu altindaki cocuklardan gelen irdeleme uzerinden guncelle</span>
+
+<span class="co">        Arguments:</span>
+<span class="co">        </span>
+<span class="co">        leaf_value -- mevcut oyuncu perspektifinden alt agacin degeri</span>
+<span class="co">        </span>
+<span class="co">        c_puct -- (0, inf) arasinda bir sayi, bu dugumun skoru</span>
+<span class="co">        uzerinde Q ve P&#39;nun etkisini izafi olarak ayarlar</span>
+
+<span class="co">        Returns:</span>
+<span class="co">        None</span>
+
+<span class="co">        &quot;&quot;&quot;</span>
+        <span class="va">self</span>._n_visits <span class="op">+=</span> <span class="dv">1</span>
+        <span class="va">self</span>._W <span class="op">+=</span> leaf_value
+        <span class="va">self</span>._Q <span class="op">=</span> <span class="va">self</span>._W <span class="op">/</span> <span class="va">self</span>._n_visits
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.is_root():
+            <span class="va">self</span>._u <span class="op">=</span> c_puct <span class="op">*</span> <span class="va">self</span>._P <span class="op">*</span> np.sqrt(<span class="va">self</span>._parent._n_visits) <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> <span class="va">self</span>._n_visits)
+
+    <span class="kw">def</span> update_recursive(<span class="va">self</span>, leaf_value, c_puct):
+        <span class="cf">if</span> <span class="va">self</span>._parent:
+            <span class="va">self</span>._parent.update_recursive(leaf_value, c_puct)
+        <span class="va">self</span>.update(leaf_value, c_puct)
+
+    <span class="kw">def</span> get_value(<span class="va">self</span>):
+        <span class="cf">return</span> <span class="va">self</span>._Q <span class="op">+</span> <span class="va">self</span>._u
+
+    <span class="kw">def</span> is_leaf(<span class="va">self</span>):
+        <span class="cf">return</span> <span class="va">self</span>._children <span class="op">==</span> {}
+
+    <span class="kw">def</span> is_root(<span class="va">self</span>):
+        <span class="cf">return</span> <span class="va">self</span>._parent <span class="kw">is</span> <span class="va">None</span>
+
+
+<span class="kw">class</span> MCTS(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, value_fn, policy_fn, c_puct<span class="op">=</span><span class="dv">5</span>, n_playout<span class="op">=</span><span class="dv">1600</span>):
+        <span class="va">self</span>._root <span class="op">=</span> TreeNode(<span class="va">None</span>, <span class="fl">1.0</span>)
+        <span class="va">self</span>._value <span class="op">=</span> value_fn
+        <span class="va">self</span>._policy <span class="op">=</span> policy_fn
+        <span class="va">self</span>._c_puct <span class="op">=</span> c_puct
+        <span class="va">self</span>._n_playout <span class="op">=</span> n_playout
+
+    <span class="kw">def</span> _playout(<span class="va">self</span>, state, self_play):
+        node <span class="op">=</span> <span class="va">self</span>._root
+        <span class="cf">if</span> <span class="kw">not</span> node.is_leaf() <span class="kw">and</span> self_play:
+            tmp <span class="op">=</span> [<span class="fl">0.03</span> <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(node._children.items()))]
+            etas <span class="op">=</span> np.random.dirichlet(tmp,<span class="dv">1</span>)[<span class="dv">0</span>]
+            j <span class="op">=</span> <span class="dv">0</span>
+            <span class="cf">for</span> action, child_node <span class="kw">in</span> node._children.iteritems():
+                child_node._P <span class="op">=</span> <span class="fl">0.75</span><span class="op">*</span>child_node._P <span class="op">+</span> <span class="fl">0.25</span><span class="op">*</span>etas[j]
+                j <span class="op">+=</span> <span class="dv">1</span>
+
+        <span class="cf">while</span> <span class="va">True</span>:
+            <span class="cf">if</span> node.is_leaf():
+                action_probs <span class="op">=</span> <span class="va">self</span>._policy(state)
+                <span class="co"># Check for end of game.</span>
+                <span class="cf">if</span> <span class="bu">len</span>(action_probs) <span class="op">==</span> <span class="dv">0</span>:
+                    <span class="cf">break</span>
+                <span class="cf">if</span> node.is_root() <span class="kw">and</span> self_play:
+                    tmp <span class="op">=</span> [<span class="fl">0.03</span> <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(action_probs))]
+                    etas <span class="op">=</span> np.random.dirichlet(tmp,<span class="dv">1</span>)[<span class="dv">0</span>]
+                    j <span class="op">=</span> <span class="dv">0</span>
+                    new_action_probs <span class="op">=</span> []
+                    <span class="cf">for</span> action, prob <span class="kw">in</span> action_probs:
+                        prob <span class="op">=</span> <span class="fl">0.75</span><span class="op">*</span>prob <span class="op">+</span> <span class="fl">0.25</span><span class="op">*</span>etas[j]
+                        new_action_probs.append((action, prob))
+                        j <span class="op">+=</span> <span class="dv">1</span>
+                    action_probs <span class="op">=</span> new_action_probs
+                node.expand(action_probs)
+                <span class="cf">break</span>
+            <span class="co"># Greedily select next move.</span>
+            action, node <span class="op">=</span> node.select()
+            state.do_move(action)
+
+        <span class="co"># Alt dugumunun degerini YSA&#39;yi kullanarak hesapla</span>
+        leaf_value <span class="op">=</span> <span class="va">self</span>._value(state)
+
+        node.update_recursive(leaf_value, <span class="va">self</span>._c_puct)
+
+
+    <span class="kw">def</span> get_move(<span class="va">self</span>, state, temperature, self_play):
+        <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._n_playout):
+            state_copy <span class="op">=</span> state.copy()
+            <span class="va">self</span>._playout(state_copy, self_play)
+
+        <span class="cf">if</span> temperature <span class="op">&gt;</span> <span class="dv">0</span>:
+            childrens <span class="op">=</span> <span class="va">self</span>._root._children.items()
+            actions, next_states <span class="op">=</span> <span class="bu">map</span>(<span class="bu">list</span>, <span class="bu">zip</span>(<span class="op">*</span>childrens))
+            tmp <span class="op">=</span> [next_state._n_visits <span class="cf">for</span> next_state <span class="kw">in</span> next_states]
+            exponentiated_n_visits <span class="op">=</span> np.power(tmp,<span class="fl">1.</span><span class="op">/</span>temperature)
+            pi <span class="op">=</span> np.divide(exponentiated_n_visits, np.<span class="bu">sum</span>(exponentiated_n_visits))
+            child_idx <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(childrens))
+            child_idx <span class="op">=</span> np.random.choice(child_idx, p <span class="op">=</span> pi)
+            <span class="cf">return</span> actions[child_idx]
+        <span class="cf">else</span> : <span class="co"># when temperature is infinitesimal</span>
+            <span class="cf">return</span> <span class="bu">max</span>(<span class="va">self</span>._root._children.iteritems(),
+                       key<span class="op">=</span><span class="kw">lambda</span> act_node: act_node[<span class="dv">1</span>]._n_visits)[<span class="dv">0</span>]
+
+    <span class="kw">def</span> update_with_move(<span class="va">self</span>, last_move):
+        <span class="cf">if</span> last_move <span class="kw">in</span> <span class="va">self</span>._root._children:
+            <span class="va">self</span>._root <span class="op">=</span> <span class="va">self</span>._root._children[last_move]
+            <span class="va">self</span>._root._parent <span class="op">=</span> <span class="va">None</span>
+        <span class="cf">else</span>:
+            <span class="va">self</span>._root <span class="op">=</span> TreeNode(<span class="va">None</span>, <span class="fl">1.0</span>)
+
+<span class="kw">class</span> MCTSPlayer(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, value_function, policy_function, c_puct<span class="op">=</span><span class="dv">5</span>, n_playout<span class="op">=</span><span class="dv">1600</span>, evaluating<span class="op">=</span><span class="va">True</span>, self_play<span class="op">=</span><span class="va">False</span>):
+        <span class="va">self</span>.mcts <span class="op">=</span> MCTS(value_function, policy_function, c_puct, n_playout)
+        <span class="va">self</span>.move_count <span class="op">=</span> <span class="dv">0</span>
+        <span class="va">self</span>.evaluating <span class="op">=</span> evaluating
+        <span class="va">self</span>.self_play <span class="op">=</span> self_play
+        <span class="cf">if</span> <span class="va">self</span>.evaluating:
+            temperature <span class="op">=</span> <span class="fl">0.</span>
+        <span class="cf">else</span>:
+            temperature <span class="op">=</span> <span class="fl">1.</span>
+        <span class="va">self</span>.temperature <span class="op">=</span> temperature
+        <span class="va">self</span>.is_human <span class="op">=</span> <span class="va">False</span> <span class="co"># for playing a game in play.py</span>
+
+    <span class="kw">def</span> get_move(<span class="va">self</span>, state, self_play<span class="op">=</span><span class="va">False</span>):
+        sensible_moves <span class="op">=</span> [move <span class="cf">for</span> move <span class="kw">in</span> state.get_legal_moves()]
+        <span class="cf">if</span> <span class="bu">len</span>(sensible_moves) <span class="op">&gt;</span> <span class="dv">0</span>:
+            move <span class="op">=</span> <span class="va">self</span>.mcts.get_move(state, <span class="va">self</span>.temperature, <span class="va">self</span>.self_play)
+            <span class="cf">if</span> <span class="kw">not</span> self_play:
+                <span class="va">self</span>.mcts.update_with_move(move)
+            <span class="va">self</span>.move_count <span class="op">+=</span> <span class="dv">1</span>
+            <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.evaluating :
+                <span class="cf">if</span> <span class="va">self</span>.move_count <span class="op">==</span> <span class="dv">2</span>:
+                    <span class="va">self</span>.temperature <span class="op">=</span> <span class="fl">0.</span>
+            <span class="cf">return</span> move
+
+        <span class="va">self</span>.move_count <span class="op">+=</span> <span class="dv">1</span>
+        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.evaluating:
+            <span class="cf">if</span> <span class="va">self</span>.move_count <span class="op">==</span> <span class="dv">2</span>:
+                <span class="va">self</span>.temperature <span class="op">=</span> <span class="fl">0.</span>
+        <span class="cf">return</span> go.PASS_MOVE</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> os, glob, pickle, go
+<span class="im">import</span> json, re, util
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> shutil <span class="im">import</span> copy
+<span class="im">from</span> mcts <span class="im">import</span> MCTSPlayer
+<span class="im">from</span> util <span class="im">import</span> flatten_idx, pprint_board
+<span class="im">from</span> tensorflow.contrib.keras <span class="im">import</span> optimizers <span class="im">as</span> O
+<span class="im">from</span> tensorflow.contrib.keras <span class="im">import</span> callbacks <span class="im">as</span> C
+<span class="im">from</span> tensorflow.contrib.keras <span class="im">import</span> backend <span class="im">as</span> K
+<span class="im">import</span> resnet
+<span class="im">import</span> simplenet
+
+<span class="kw">def</span> self_play_and_save(player, opp_player):
+    
+    state_list <span class="op">=</span> []
+    pi_list <span class="op">=</span> []
+    player_list <span class="op">=</span> []
+
+    state <span class="op">=</span> go.GameState(size<span class="op">=</span><span class="dv">9</span>, komi<span class="op">=</span><span class="dv">0</span>)
+
+    player_color <span class="op">=</span> go.BLACK
+    current <span class="op">=</span> player
+    other <span class="op">=</span> opp_player
+
+    step <span class="op">=</span> <span class="dv">0</span>
+    <span class="cf">while</span> <span class="kw">not</span> state.is_end_of_game:
+        move <span class="op">=</span> current.get_move(state, self_play<span class="op">=</span><span class="va">True</span>)
+
+        childrens <span class="op">=</span> current.mcts._root._children.items()
+
+        actions, next_states <span class="op">=</span> <span class="bu">map</span>(<span class="bu">list</span>, <span class="bu">zip</span>(<span class="op">*</span>childrens))
+        _n_visits <span class="op">=</span> [next_state._n_visits <span class="cf">for</span> next_state <span class="kw">in</span> next_states]
+        <span class="cf">if</span> <span class="kw">not</span> move <span class="op">==</span> go.PASS_MOVE:
+            <span class="cf">if</span> step <span class="op">&lt;</span> <span class="dv">25</span>: <span class="co"># temperature is considered to be 1</span>
+                distribution <span class="op">=</span> np.divide(_n_visits, np.<span class="bu">sum</span>(_n_visits))
+            <span class="cf">else</span>:
+                max_visit_idx <span class="op">=</span> np.argmax(_n_visits)
+                distribution <span class="op">=</span> np.zeros(np.shape(_n_visits))
+                distribution[max_visit_idx] <span class="op">=</span> <span class="fl">1.0</span>
+        <span class="cf">else</span>: <span class="co"># to prevent the model from overfitting to PASS_MOVE</span>
+            distribution <span class="op">=</span> np.zeros(np.shape(_n_visits))
+            
+        pi <span class="op">=</span> <span class="bu">zip</span>(actions, distribution)
+        pi_list.append(pi)
+
+        state_list.append(state.copy())
+
+        current.mcts.update_with_move(move)
+        state.do_move(move)
+        other.mcts.update_with_move(move)
+        current, other <span class="op">=</span> other, current
+        step <span class="op">+=</span> <span class="dv">1</span>
+
+    winner <span class="op">=</span> state.get_winner()
+    <span class="bu">print</span> <span class="st">&#39;winner&#39;</span>, winner
+    <span class="co"># oyun bitti kimin kazandigini biliyoruz, mesela siyah kazandiysa</span>
+    <span class="co"># odulleri hamle bazinda +1,-1,+1,.. olacak sekilde ata, beyaz</span>
+    <span class="co"># kazandiysa -1,+1,-1 seklinde. Siyah olunca +1 cunku oyuna hep siyah</span>
+    <span class="co"># basliyor.</span>
+    <span class="cf">if</span> winner <span class="op">==</span> go.BLACK:
+        reward_list <span class="op">=</span> [(<span class="op">-</span><span class="fl">1.</span>)<span class="op">**</span>j <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(state_list))]
+    <span class="cf">else</span> : <span class="co"># winner == go.WHITE:</span>
+        reward_list <span class="op">=</span> [(<span class="op">-</span><span class="fl">1.</span>)<span class="op">**</span>(j<span class="op">+</span><span class="dv">1</span>) <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(state_list))]
+    <span class="cf">return</span> state_list, pi_list, reward_list
+
+<span class="kw">def</span> self_play_and_train(cmd_line_args<span class="op">=</span><span class="va">None</span>):
+
+    <span class="co"># iki farkli ag yarat, egitim bunlardan ilkini gunceller.</span>
+    <span class="co"># belli bir sure sonra oteki YSA ilkinin kaydettigi veriden guncellenir,</span>
+    <span class="co"># ve ikisi tekrar esit hale gelir, bu boyle devam eder.</span>
+    policy <span class="op">=</span> simplenet.PolicyValue(simplenet.PolicyValue.create_network())
+    opp_policy <span class="op">=</span> simplenet.PolicyValue(simplenet.PolicyValue.create_network())
+
+    <span class="kw">def</span> lr_scheduler(epoch):
+        <span class="cf">if</span> epoch <span class="op">==</span> <span class="dv">5000</span>:
+            K.set_value(model.optimizer.lr, <span class="fl">.001</span>)
+        <span class="cf">elif</span> epoch <span class="op">==</span> <span class="dv">7000</span>:
+            K.set_value(model.optimizer.lr, <span class="fl">.0001</span>)
+        <span class="cf">return</span> K.get_value(model.optimizer.lr)
+
+    change_lr <span class="op">=</span> C.LearningRateScheduler(lr_scheduler)
+    sgd <span class="op">=</span> O.SGD(lr<span class="op">=</span>.<span class="dv">01</span>, momentum<span class="op">=</span><span class="fl">0.9</span>)
+    policy.model.<span class="bu">compile</span>(loss<span class="op">=</span>[<span class="st">&#39;categorical_crossentropy&#39;</span>,<span class="st">&#39;mean_squared_error&#39;</span>],
+                         optimizer<span class="op">=</span>sgd)        
+
+    batch_size <span class="op">=</span> <span class="dv">50</span>
+    n_pick <span class="op">=</span> <span class="dv">10</span> <span class="co"># her oyundan kac veri noktasi alalim</span>
+        
+    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>):
+
+        state_list2 <span class="op">=</span> []
+        pi_list2 <span class="op">=</span> []
+        reward_list2 <span class="op">=</span> []        
+        
+        <span class="cf">while</span> <span class="va">True</span>: <span class="co"># batch_size kadar veri toplayincaya kadar oyna</span>
+            <span class="cf">try</span>:
+                player <span class="op">=</span> MCTSPlayer(policy.eval_value_state,
+                                    policy.eval_policy_state,
+                                    n_playout<span class="op">=</span><span class="dv">50</span>, evaluating<span class="op">=</span><span class="va">False</span>,
+                                    self_play<span class="op">=</span><span class="va">True</span>)
+                
+                opp_player<span class="op">=</span> MCTSPlayer(opp_policy.eval_value_state,
+                                       opp_policy.eval_policy_state,
+                                       n_playout<span class="op">=</span><span class="dv">50</span>, evaluating<span class="op">=</span><span class="va">False</span>,
+                                       self_play<span class="op">=</span><span class="va">True</span>)
+                
+                state_list, pi_list, reward_list <span class="op">=</span> self_play_and_save(
+                    opp_player, player
+                )
+
+                <span class="co"># oyunda atilan tum adimlar, sonuclar state_list,</span>
+                <span class="co"># pi_list, reward_list listesi icinde. Simdi rasgele</span>
+                <span class="co"># n_pick tane veri noktasi her oyun kaydindan cekip</span>
+                <span class="co"># cikartilir.</span>
+                idxs <span class="op">=</span> [np.random.choice(<span class="bu">range</span>(<span class="dv">10</span>,<span class="bu">len</span>(state_list)),replace<span class="op">=</span><span class="va">False</span>) <span class="op">\</span>
+                        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_pick)]
+                
+                <span class="bu">print</span> <span class="st">&#39;picked results&#39;</span>, idxs
+                
+                <span class="cf">for</span> idx <span class="kw">in</span> idxs:
+                    state_list2.append(state_list[idx])
+                    pi_list2.append(pi_list[idx])
+                    reward_list2.append(reward_list[idx])
+                    
+                <span class="cf">if</span> <span class="bu">len</span>(state_list2) <span class="op">&gt;=</span> batch_size: <span class="cf">break</span>
+            <span class="cf">except</span>:
+                <span class="bu">print</span> <span class="st">&#39;exception&#39;</span>
+                <span class="cf">continue</span>
+
+        pout <span class="op">=</span> np.zeros((batch_size, <span class="dv">9</span><span class="op">*</span><span class="dv">9</span><span class="op">+</span><span class="dv">1</span>))
+        vout <span class="op">=</span> np.zeros((batch_size, <span class="dv">1</span>))
+        Y <span class="op">=</span> [pout, vout]
+        X <span class="op">=</span> np.zeros((batch_size, <span class="dv">17</span>, <span class="dv">9</span>, <span class="dv">9</span>))
+
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(state_list2)):
+            vout[i,:] <span class="op">=</span> reward_list2[i]
+            X[i, :] <span class="op">=</span> util.get_board(state_list2[i])
+            pout[i,:] <span class="op">=</span> util.to_pi_mat(pi_list2[i])
+                                                
+        policy.model.fit(X, Y)
+
+        <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">5</span> <span class="op">==</span> <span class="dv">0</span>:
+            <span class="bu">print</span> <span class="st">&#39;saving&#39;</span>
+            policy.save()
+
+        <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">50</span> <span class="op">==</span> <span class="dv">0</span>:
+            <span class="bu">print</span> <span class="st">&#39;birincinin en son kayitli agirliklarindan bu agi guncelle&#39;</span>
+            opp_policy.load()
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
+    self_play_and_train()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> tensorflow.contrib.keras <span class="im">import</span> regularizers <span class="im">as</span> R
+<span class="im">from</span> tensorflow.contrib.keras <span class="im">import</span> models <span class="im">as</span> M
+<span class="im">from</span> tensorflow.contrib.keras <span class="im">import</span> layers <span class="im">as</span> L
+<span class="im">from</span> tensorflow.contrib.keras <span class="im">import</span> backend <span class="im">as</span> K
+<span class="im">from</span> util <span class="im">import</span> flatten_idx, random_transform, idx_transformations
+<span class="im">import</span> numpy <span class="im">as</span> np, util, random
+
+mfile <span class="op">=</span> <span class="st">&quot;/tmp/alphago-zero.h5&quot;</span>
+
+<span class="kw">class</span> PolicyValue:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, model):
+        <span class="va">self</span>.model <span class="op">=</span> model
+
+    <span class="kw">def</span> save(<span class="va">self</span>):
+        <span class="va">self</span>.model.save_weights(mfile)
+        
+    <span class="kw">def</span> load(<span class="va">self</span>):
+        <span class="va">self</span>.model.load_weights(mfile)
+        
+    <span class="kw">def</span> eval_policy_state(<span class="va">self</span>, state):
+        x <span class="op">=</span> util.get_board(state).reshape(<span class="dv">1</span>, <span class="dv">17</span>, <span class="dv">9</span>, <span class="dv">9</span>)
+        probs1 <span class="op">=</span> <span class="va">self</span>.model.predict(x)[<span class="dv">0</span>][<span class="dv">0</span>]
+        probs2 <span class="op">=</span> probs1[<span class="dv">1</span>:].reshape(<span class="dv">9</span>,<span class="dv">9</span>)
+        res_probs <span class="op">=</span> [(action,probs2[action]) <span class="op">\</span>
+                     <span class="cf">for</span> action <span class="kw">in</span> state.get_legal_moves() <span class="cf">if</span> action]
+        res_probs.append((<span class="va">None</span>, probs1[<span class="dv">0</span>]))
+        <span class="cf">return</span> res_probs
+
+    <span class="kw">def</span> eval_value_state(<span class="va">self</span>, state):
+        x <span class="op">=</span> util.get_board(state).reshape(<span class="dv">1</span>, <span class="dv">17</span>, <span class="dv">9</span>, <span class="dv">9</span>)
+        <span class="cf">return</span> <span class="va">self</span>.model.predict(x)[<span class="dv">1</span>][<span class="dv">0</span>][<span class="dv">0</span>]
+            
+    <span class="at">@staticmethod</span>
+    <span class="kw">def</span> create_network(<span class="op">**</span>kwargs):
+        model_input <span class="op">=</span> L.Input(shape<span class="op">=</span>(<span class="dv">17</span>, <span class="dv">9</span>, <span class="dv">9</span>))
+        <span class="bu">print</span> model_input
+        
+        convolution_path <span class="op">=</span> L.Convolution2D(
+            input_shape<span class="op">=</span>(),
+            filters<span class="op">=</span><span class="dv">64</span>,
+            kernel_size<span class="op">=</span><span class="dv">3</span>,
+            activation<span class="op">=</span><span class="st">&#39;linear&#39;</span>,
+            padding<span class="op">=</span><span class="st">&#39;same&#39;</span>,
+            kernel_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+            bias_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(model_input)
+        <span class="bu">print</span> convolution_path
+        convolution_path <span class="op">=</span> L.BatchNormalization(
+            beta_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+            gamma_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(convolution_path)
+        <span class="bu">print</span> convolution_path
+        convolution_path <span class="op">=</span> L.Activation(<span class="st">&#39;relu&#39;</span>)(convolution_path)
+
+        convolution_path <span class="op">=</span> L.Convolution2D(
+            input_shape<span class="op">=</span>(),
+            filters<span class="op">=</span><span class="dv">128</span>,
+            kernel_size<span class="op">=</span><span class="dv">3</span>,
+            activation<span class="op">=</span><span class="st">&#39;linear&#39;</span>,
+            padding<span class="op">=</span><span class="st">&#39;same&#39;</span>,
+            kernel_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+            bias_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(convolution_path)
+        <span class="bu">print</span> convolution_path
+        convolution_path <span class="op">=</span> L.BatchNormalization(
+            beta_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+            gamma_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(convolution_path)
+        <span class="bu">print</span> convolution_path
+        convolution_path <span class="op">=</span> L.Activation(<span class="st">&#39;relu&#39;</span>)(convolution_path)
+
+
+        <span class="bu">print</span> <span class="st">&#39;------------- value -------------------&#39;</span>            
+        <span class="co"># policy head</span>
+        policy_path <span class="op">=</span> L.Convolution2D(
+            input_shape<span class="op">=</span>(),
+            filters<span class="op">=</span><span class="dv">2</span>,
+            kernel_size<span class="op">=</span><span class="dv">1</span>,
+            activation<span class="op">=</span><span class="st">&#39;linear&#39;</span>,
+            padding<span class="op">=</span><span class="st">&#39;same&#39;</span>,
+            kernel_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+            bias_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(convolution_path)
+        <span class="bu">print</span> policy_path
+        policy_path <span class="op">=</span> L.BatchNormalization(
+                beta_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+                gamma_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(policy_path)
+        policy_path <span class="op">=</span> L.Activation(<span class="st">&#39;relu&#39;</span>)(policy_path)
+        <span class="bu">print</span> policy_path
+        policy_path <span class="op">=</span> L.Flatten()(policy_path)
+        <span class="bu">print</span> policy_path
+        policy_path <span class="op">=</span> L.Dense(
+                (<span class="dv">9</span><span class="op">*</span><span class="dv">9</span>)<span class="op">+</span><span class="dv">1</span>,
+                kernel_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+                bias_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(policy_path)
+        policy_output <span class="op">=</span> L.Activation(<span class="st">&#39;softmax&#39;</span>)(policy_path)
+        <span class="bu">print</span> <span class="st">&#39;policy_output&#39;</span>, policy_output
+
+        <span class="bu">print</span> <span class="st">&#39;------------- policy -------------------&#39;</span>
+        
+        <span class="co"># value head</span>
+        value_path <span class="op">=</span> L.Convolution2D(
+            input_shape<span class="op">=</span>(),
+            filters<span class="op">=</span><span class="dv">1</span>,
+            kernel_size<span class="op">=</span><span class="dv">1</span>,
+            activation<span class="op">=</span><span class="st">&#39;linear&#39;</span>,
+            padding<span class="op">=</span><span class="st">&#39;same&#39;</span>,
+            kernel_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+            bias_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(convolution_path)
+        <span class="bu">print</span> value_path
+        value_path <span class="op">=</span> L.BatchNormalization(
+                beta_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+                gamma_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(value_path)
+        value_path <span class="op">=</span> L.Activation(<span class="st">&#39;relu&#39;</span>)(value_path)
+        <span class="bu">print</span> value_path
+        value_path <span class="op">=</span> L.Flatten()(value_path)
+        <span class="bu">print</span> value_path
+        value_path <span class="op">=</span> L.Dense(
+                <span class="dv">256</span>,
+                kernel_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+                bias_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(value_path)
+        <span class="bu">print</span> value_path
+        value_path <span class="op">=</span> L.Activation(<span class="st">&#39;relu&#39;</span>)(value_path)
+        <span class="bu">print</span> value_path
+        value_path <span class="op">=</span> L.Dense(
+                <span class="dv">1</span>,
+                kernel_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>),
+                bias_regularizer<span class="op">=</span>R.l2(.<span class="dv">0001</span>))(value_path)
+        <span class="bu">print</span> value_path
+        value_output <span class="op">=</span> L.Activation(<span class="st">&#39;tanh&#39;</span>)(value_path)
+        <span class="bu">print</span> value_path
+
+        <span class="cf">return</span> M.Model(inputs<span class="op">=</span>[model_input], outputs<span class="op">=</span>[policy_output, value_output])</code></pre></div>
+<p>İki YSA kendisine karşı oynarken aynı ağırlıklara sahip iki farklı YSA ile başlıyoruz, ve oyun sonuçlarını kullanarak sadece birini güncelliyoruz. Eğer her toptan demeti (minibatch) ile her iki YSA'yı güncelleseydik birbirlerinden farklılaşmaları zorlaşabilirdi. Ama döngünün daha ileri bir noktasında esitleme yapariz yine de, ilk YSA'yı güncellenenin ağırlıklarını diskten okuyarak güncelliyoruz, ve böyle devam ediyor. AGZ tasarımcıları &quot;en iyi'' olan ağırlıklara geçmeden yeni YSA'nın diğerini yüzde 55'ten fazla yenmesi şartını koymuşlar, tam donanımla testleri yapanlar bunu takip ederse iyi olur.</p>
+<p>Üstteki mimari birkaç saat eğitim sonrası GnuGo (kendi YZ'si olan bir dış Go programı) başlangıç, orta seviyelerini yenebiliyor. Okuyucular, grafik kartlı güçlü bir mimaride, ya üstteki YSA'yı derinleştirerek (daha fazla evrişim filtresi ekleyerek), ya da <code>resnet.py</code> ile, ve <code>n_play</code>'i arttırarak daha fazla simülasyonla sonuçları daha da iyileştirmeye uğraşabilirler.</p>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, <em>Go Oyunu, GnuGo</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2018/02/go-gnugo.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2018/02/go-gnugo.html</a></p>
+<p>[2] Silver, <em>Mastering the game of Go with deep neural networks and tree search</em>, <a href="https://www.nature.com/articles/nature16961" class="uri">https://www.nature.com/articles/nature16961</a></p>
+<p>[3] Weidman, <em>The 3 Tricks That Made AlphaGo Zero Work</em>, <a href="https://hackernoon.com/the-3-tricks-that-made-alphago-zero-work-f3d47b6686ef" class="uri">https://hackernoon.com/the-3-tricks-that-made-alphago-zero-work-f3d47b6686ef</a></p>
+<p>[4] Yi, <em>A reproduction of Alphago Zero in 'Mastering the game of Go without human knowledge'</em>, <a href="https://github.com/sangyi92/alphago_zero" class="uri">https://github.com/sangyi92/alphago_zero</a></p>
+<p>[5] <em>AlphaGo Zero Cheat Sheet</em>, <a href="https://applied-data.science/static/main/res/alpha_go_zero_cheat_sheet.png" class="uri">https://applied-data.science/static/main/res/alpha_go_zero_cheat_sheet.png</a></p>
+<p>[6] Kristiadi, <em>Residual Net</em>, <a href="https://wiseodd.github.io/techblog/2016/10/13/residual-net/" class="uri">https://wiseodd.github.io/techblog/2016/10/13/residual-net/</a></p>
+</body>
+</html>

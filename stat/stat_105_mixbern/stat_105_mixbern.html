@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="çok-değişkenli-bernoulli-karışımı-mixture-of-multivariate-bernoulli">Çok Değişkenli Bernoulli Karışımı (Mixture of Multivariate Bernoulli)</h1>
+<p>Eğer verimizi, her biri verinin değişik bir bölümünü, yönünü temsil eden bir &quot;dağılım grubu'' yani karışım ile modellemek istiyorsak, karışım modellemesi kullanılabilir. Mesela boy ve ağırlık verisinde bayanlar ve erkekler ayrı dağılımlara sahip olabilir, bu durumu modele dahil etmek modelin tahmin gücünü arttırır. Karışım modellerinin güzel bir tarafı kümeleme teknikleri ile başta &quot;bilinmeyen'' kümelerinin neye benzediğini bulmaları, ayrıca her veri noktasının bu kümelere olasılıksal olarak aidiyetini, &quot;yakınlığını'' hesaplamamızı mümkün kılmaları.</p>
+<p>Formel olarak bir karışım dağılımı <span class="math inline">\(f\)</span> her biri ayrı bir dağılım olan <span class="math inline">\(f_1,f_2,...,f_K\)</span> ile <span class="math inline">\(K\)</span> öğeden oluşan, bir yeni dağılımdır diyoruz, eğer</p>
+<p><span class="math display">\[ f(x) = \sum_{k=1}^{K} \lambda_k f_k(x)  \]</span></p>
+<p>ise, ve <span class="math inline">\(\lambda_k\)</span> karışım oranları, <span class="math inline">\(\lambda_k &gt; 0, \sum_k \lambda_k = 1\)</span> olacak şekilde.</p>
+<p>Üstteki model üzerinden zar atılabilecek bir model aynı zamanda (tüm olasılıksal dağılımlar simule edilebilir tabii, ama üstteki için simulasyon oldukça direk), <span class="math inline">\(\lambda\)</span> içindeki olasılıklara göre zar atıp bir karışım öğesi seçilir, daha sonra bu öğenin dağılımına gidilip ona zar attırılır. Bunun olabileceğini ispatlamak için, <span class="math inline">\(Z\)</span> rasgele değişkeninin <span class="math inline">\(\lambda_k\)</span> ile dağıldığını (ayrıksal dağılım) düşünelim, yani</p>
+<p><span class="math display">\[ Z \sim Mult(\lambda_1,..,\lambda_k) \]</span></p>
+<p><span class="math inline">\(f_k(x)\)</span> bir diğer açıdan <span class="math inline">\(f(x|Z=k)\)</span>'dir, notasyonel olarak böyle. O zaman,</p>
+<p><span class="math display">\[ = \sum_{k=1}^{K} f(x|Z=k)\lambda_k \]</span></p>
+<p><span class="math display">\[ = \sum_{k=1}^{K} f(x|Z=k)P(Z=k)  \]</span></p>
+<p><span class="math display">\[ = \sum_{k=1}^{K} f(x,k)  \]</span></p>
+<p><span class="math display">\[ = f(x)  \]</span></p>
+<p>Yani <span class="math inline">\(\lambda\)</span> olasılıklarına göre <span class="math inline">\(f_k\)</span> seçmek üstteki ifadedeki koşullu olasılık durumuna karşılık geliyor, koşullu olasılık <span class="math inline">\(P(A|B)\)</span> <span class="math inline">\(B\)</span>'nin verildiği / bilindiği durumda <span class="math inline">\(A\)</span>'nin olasılığı hatırlayacağımız üzere.</p>
+<p>Karışımın içindeki dağılımlar parametrik dağılımlar olduğu zaman onları nasıl hesapsal olarak kestiririz? Bir dağılımın parametrelerini kestirebilmek için en iyi yöntemlerden biri maksimum olurluk (maximum likelihood) yöntemi. Olurluk eldeki verinin belli dağılım parametreleri üzerinden olasılığı, yani &quot;verinin olasılığı''. Örneklemlerin bağımsız olduğundan hareketle <span class="math inline">\(x_1,x_2,...,x_N\)</span> verisi için olurluk,</p>
+<p><span class="math display">\[ \prod_{i=1}^{N} f(x_i;\theta) \]</span></p>
+<p>Her zaman olduğu gibi çarpımı toplam haline döndürmek için log alırız,</p>
+<p><span class="math display">\[ \ell(\theta) = \sum_{i=1}^{N} \log f(x_i;\theta) \]</span> Karışımları da dahil edersek,</p>
+<p><span class="math display">\[ = \sum_{i=1}^{N} \log \sum_{k=1}^{K} \lambda_k f(x_i;\theta_k) 
+\qquad (2)
+\]</span></p>
+<p>Şimdi log olurluğun mesela <span class="math inline">\(\theta_j\)</span>'ye göre türevini almayı deneyelim, yani <span class="math inline">\(j\)</span>'inci öğenin parametresine göre bir kısmi türev.</p>
+<p><span class="math display">\[ \frac{\partial \ell}{\partial \theta_j}  = 
+\sum_{i=1}^{N}  \frac{1}{\sum_{k=1}^{K} \lambda_k f(x_i;\theta_k) } 
+\lambda_j
+\frac{\partial f(x_i;\theta_j)}{\partial \theta_j}
+\]</span></p>
+<p>Bölüm ve bölene <span class="math inline">\(f(x_i;\theta_j)\)</span> ekleyelim, bu sonucu değiştirmez,</p>
+<p><span class="math display">\[ = \sum_{i=1}^{N}  
+\frac{\lambda_j f(x_i;\theta_j)}{\sum_{k=1}^{K} \lambda_k f(x_i;\theta_k)}
+\frac{1}{f(x_i;\theta_j)}
+\frac{\partial f(x_i;\theta_j)}{\partial \theta_j}
+\]</span></p>
+<p><span class="math display">\[ = \sum_{i=1}^{N}  
+\frac{\lambda_j f(x_i;\theta_j)}{\sum_{k=1}^{K} \lambda_k f(x_i;\theta_k)}
+\frac{\partial \log f(x_i;\theta_j)}{\partial \theta_j}
+\]</span></p>
+<p>Eğer elimizdeki, karışım olmayan, basit bir parametrik model olsaydı, log olurluk şuna benzeyecekti,</p>
+<p><span class="math display">\[ \frac{\partial \log f(x_i;\theta_j)}{\partial \theta_j} \]</span></p>
+<p>Bu formül iki üstteki formülün en sağındaki çarpan sadece. Demek ki &quot;karışım olmak'' log olurluğu bir tür belli ağırlıklara göre ortalanan (weighted) normal olurluk haline getirdi. Karışımın log olurluğunu maksimize etmek istiyorsak, bu ağırlığı alınmış olurluğu maksimize etmemiz gerekli. Bu ağırlığın alındığı kısmı iki üstteki formülden çekip çıkartırsak,</p>
+<p><span class="math display">\[ w_{ij} = \frac{\lambda_j f(x_i;\theta_j)}{\sum_{k=1}^{K} \lambda_k f(x_i;\theta_k)} \]</span></p>
+<p>Bu ağırlık hesabı <span class="math inline">\(i,j\)</span> için yapılacak. Bu noktaya niçin geldik hatırlayalım, olurluk üzerinden parametreleri hesaplamak istiyoruz. Fakat üstteki formülde <span class="math inline">\(w_{ij}\)</span> hesabı için <span class="math inline">\(\theta_j\)</span>'in bilinmesi gerekiyor!</p>
+<p>Ne yapacağız? Şu <span class="math inline">\(w_{ij}\)</span>'ye yakından bakalım. Daha önce belirttiğimiz gibi <span class="math inline">\(\lambda_j\)</span> <span class="math inline">\(Z\)</span>'nin <span class="math inline">\(j\)</span> olma olasılığı, o zaman bölünendeki ifade <span class="math inline">\(X = x_i\)</span> <span class="math inline">\(Z=j\)</span> olmasının ortak (joint) dağılımıdır, yani <span class="math inline">\(P(Z=j,X=x_i)\)</span> diyelim. Koşullu dağılım durumundan başlayarak bu sonuca nasıl erişildiğini görmüştük. Bölendeki ifade ise <span class="math inline">\(f(x_i)\)</span>'dir, bir kısmı dağılımdır - tüm <span class="math inline">\(k\)</span>'ler üzerinden olasılığın bir bölümü toplanarak kısmen çıkartılmış halidir (marginalized out) - o zaman tüm bölümden ele geçen sonuç <span class="math inline">\(Z=j\)</span>'nin <span class="math inline">\(X=x_i\)</span> verildiği, koşullu olasılığıdır,</p>
+<p><span class="math display">\[  
+ w_{ij} 
+= \frac{\lambda_j f(x_i;\theta_j)}{\sum_{k=1}^{K} \lambda_k f(x_i;\theta_k)} 
+= P(Z=j | X=x_i;\theta)
+\qquad (1)
+\]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[ \frac{\partial \ell}{\partial \theta_j}  = \sum_{i=1}^{N}
+w_{ij} \frac{\partial \log f(x_i;\theta_j)}{\partial \theta_j}
+\]</span></p>
+<p><span class="math inline">\(w_{ij}\)</span> ile, veriye göre, <span class="math inline">\(Z\)</span>'nin sonsal (posterior) hesaplamış oluyoruz. Yani karışımsal modeli hesaplarken bir ağırlıksal olurluk hesabı yapıyoruz, ki bu ağırlıklar sonsal dağılımlardan gelen değerlere ihtiyaç duyuyor. Ama bu sonsal dağılımlar da aslında hesaplamaya çalıştığımız parametrelere ihtiyaç duyuyor, yani bir kördüğüm!</p>
+<p>Ama şöyle bir deyiş vardır; kimisine kördüğüm gibi gözüken, bir başkasına ardışıl yaklaşıksal prosedür gibi gözükür (succcessive approximation procedure) [hoca şakadan uydurdu bu deyişi, ama teknik doğru]. Demek istiyorum ki eğer kördüğümde takılı kaldıysak, bir taraf için tahmin yapıp diğer tarafı hesaplarız, sonra bu hesaplanan değerleri kullanarak ilk tarafı hesaplarız. Bunu sürekli devam ettiririz.</p>
+<p>Ünlü Beklenti-Maksimizasyon (Expectation-Maximization -EM-) prosedürü tam da bunu yapıyor. Detaylar için [3, sf. 450]. EM özyinesel çalışan bir rutindir, birkaç adımda sonuca erişir, ve her adımda olurluğu iyileştirmesi ve yerel maksimuma erişmesi garantidir; Tabii başlangıç noktasına göre bu yerel maksimum tamamın (global) maksimumu olmayabilir, o zaman EM yerel maksimumda takılıp kalmış olur (stuck at local maxima), bu sebeple EM'i birkaç değişik rasgele başlangıç noktasından başlatıp en iyi yerel maksimimumu, yani en iyi olurluğu veren parametreleri bulmak iyi bir yaklaşımdır.</p>
+<div class="figure">
+<img src="localmax.png" />
+
+</div>
+<p><span class="math inline">\(w_{ij}\)</span>'ye Değişik bir Yönden Erişmek</p>
+<p><span class="math inline">\(\theta_j\)</span> hesabı için formülasyonu biraz değiştirmek lazım. Tüm ortak dağılımı yazalım, ayrıca <span class="math inline">\(z_{ik}\)</span> değişkenini katalım, <span class="math inline">\(Z\)</span> değişkeni multinom idi, onu 0/1 değerleri içeren vektörel olarak tasarlayalım, yani <span class="math inline">\(z\)</span> veri noktası <span class="math inline">\(i\)</span> ve bileşen <span class="math inline">\(k\)</span> için, <span class="math inline">\(Z_i\)</span> ise <span class="math inline">\(i\)</span>'inci nokta için</p>
+<p><span class="math display">\[  P(X_i = x_i, Z_i=k) =  
+\prod_{k=1}^{K} \big( f(x_i;\theta_k)P(Z_i=k) \big)^{z_{ik}} \]</span></p>
+<p>Şimdi log alalım,</p>
+<p><span class="math display">\[  = \sum_{k=1}^{K} z_{ij} \ln \big( f(x_i;\theta_k)P(Z_i=k) \big) \]</span></p>
+<p>Tüm veri noktaları için</p>
+<p><span class="math display">\[  \ell(\theta) = 
+\sum_{i=1}^{N} \sum_{k=1}^{K} z_{ij} \ln \big( f(x_i;\theta_k)P(Z_i=k) \big) \]</span></p>
+<p><span class="math display">\[ 
+= \sum_{i=1}^{N} \sum_{k=1}^{K} z_{ik} 
+\big( \ln f(x_i;\theta_j) + \ln(\lambda_j) \big)   
+\]</span></p>
+<p>Şimdi bu ifadenin beklentisini almamız lazım; bunun sebebi EM'in yakınsaması (convergence) ile alakalı [3, sf. 450]. Beklentiyi &quot;eksik'' olan yani bilinmeyen küme ataması üzerinden alıyoruz, <span class="math inline">\(\theta_k\)</span>,<span class="math inline">\(P(Z_i=k)\)</span> ve <span class="math inline">\(x_i\)</span> sabit olarak kalıyor,</p>
+<p><span class="math display">\[ 
+E[l(\theta)] = \sum_{i=1}^{N} \sum_{k=1}^{K} E[z_{ik}]
+\big( \ln f(x_i;\theta_j) + \ln(\lambda_j) \big)   
+\]</span></p>
+<p>Hesaplanacak tek şey burada <span class="math inline">\(E[z_{ik}]\)</span>. Peki bu beklenti nedir?</p>
+<p><span class="math display">\[ E[z_{ik}] = 1 \cdot P(z_{ik}=1 | x_i) + 0 \cdot P(z_{ik}=1 | x_i)  \]</span></p>
+<p><span class="math display">\[=  P(z_{ik}=1 | x_i)  \]</span></p>
+<p>Bu formül (1)'deki formülün aynısıdır! Yeni notasyon üzerinden tabii; o zaman</p>
+<p><span class="math display">\[  E[z_{ik}] = w_{ik} \]</span></p>
+<p>Yani</p>
+<p><span class="math display">\[ 
+E[l(\theta)] = \sum_{i=1}^{N} \sum_{k=1}^{K} w_{ik}
+\big( \ln f(x_i;\theta_j) + \ln(\lambda_j) \big) 
+\qquad (4)
+\]</span></p>
+<p>EM Hesap Adımları</p>
+<p><span class="math inline">\(w_{ij}\)</span> hesabına EM'in &quot;beklenti adımı (expectation step)'' ismi veriliyor, çünkü görüldüğü gibi beklenti alıyoruz. Bu adım için <span class="math inline">\(\theta\)</span>'nin bilindiği farz edilir, bilinmiyorsa, ki hesap döngüsünün ilk adımında durum böyledir, o zaman rasgele <span class="math inline">\(\theta\)</span> kullanılır. Döngünün diğer adımlarında döngünün bir önceki adımındaki değerler kullanılır.</p>
+<p>Maksimizasyon adımı için bilinen <span class="math inline">\(w_{ij}\)</span> için <span class="math inline">\(\theta\)</span>'nin hesaplanması gerekir; bu adıma maksimizasyon adı verilmesi de mantıklı, çünkü altta da görüleceği üzere, kısmi türevler alıp sıfıra eşitleyerek maksimal değerler hesaplayacağız.</p>
+<p>Bu hesap şöyle: Eğer (4) çok değişkenli Bernoulli modeli içinse, ki <span class="math inline">\(x_{id}\)</span> <span class="math inline">\(i\)</span>'inci veri noktasının <span class="math inline">\(D\)</span> boyutlu Bernoulli için <span class="math inline">\(d\)</span>'inci hücresinin değeri, <span class="math inline">\(\theta_{jd}\)</span> ise <span class="math inline">\(j\)</span>'inci karışım öğesinin <span class="math inline">\(D\)</span> boyut içinden <span class="math inline">\(d\)</span>'inci olasılık değeri olsun, <span class="math inline">\(f\)</span> içinde yerine koyunca ve <span class="math inline">\(f\)</span> üzerinde log etki yapınca çarpım yine toplam olur,</p>
+<p><span class="math display">\[ 
+= \sum_{i=1}^{N} \sum_{k=1}^{K} w_{ik}
+\bigg[ \ln(\lambda_k)  + 
+\sum_{d=1}^{D} \ln \big( \theta_{kd}^{x_{id}} (1-\theta_{kd})^{1-x_{id}} \big)
+\bigg]
+\]</span></p>
+<p><span class="math display">\[ 
+E[l(\theta)]= \sum_{i=1}^{N} \sum_{k=1}^{K} w_{ik}
+\bigg[ \ln(\lambda_k)  + 
+\sum_{d=1}^{D} x_{id} \ln \theta_{kd} + (1-x_{id}) \ln (1-\theta_{kd})
+\bigg]
+\]</span></p>
+<p>Şimdi <span class="math inline">\(\theta_{kd}\)</span> hesabı için ona göre türevi alıp sıfıra eşitleriz,</p>
+<p><span class="math display">\[ 
+\frac{\partial }{\partial \theta_{kd}} E[l(\theta)] = 
+w_{ik} \sum_{i=1}^{N} 
+x_{id} \frac{\partial }{\partial \theta_{kd}} (\ln \theta_{kd}) + 
+\frac{\partial }{\partial \theta_{kd}}\big[ (1-x_{id}) \ln (1-\theta_{kd})\big]
+= 0
+\]</span></p>
+<p><span class="math display">\[ 
+\sum_{i=1}^{N}  w_{ik} 
+(
+\frac{x_{id}}{\theta_{kd}}  -
+\frac{1-x_{id}}{1-\theta_{kd}}
+) = 0
+\]</span></p>
+<p><span class="math display">\[ 
+\sum_{i=1}^{N} \frac{w_{ik}  x_{id}}{\theta_{kd}} =
+\sum_{i=1}^{N} \frac{w_{ik}-w_{ik}x_{id}}{1-\theta_{kd}}
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{1}{\theta_{kd}}\sum_{i=1}^N w_{ik}  x_{id} =
+\frac{1}{1-\theta_{kd}}\sum_{i=1}^{N} w_{ik}-w_{ik}x_{id}
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{1-\theta_{kd}}{\theta_{kd}}\sum_{i=1}^N w_{ik}  x_{id} =
+\sum_{i=1}^{N} w_{ik}-w_{ik}x_{id}
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{1-\theta_{kd}}{\theta_{kd}} =
+\frac{\sum_i w_{ik}-\sum_i w_{ik}x_{id}}{\sum_i w_{ik}  x_{id}}
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{1}{\theta_{kd}} - 1=
+\frac{\sum_i w_{ik}}{\sum_i w_{ik}  x_{id}} - 1
+\]</span></p>
+<p><span class="math display">\[ 
+\hat{\theta}_{kd}=
+\frac{\sum_i w_{ik}  x_{id}}{\sum_i w_{ik}} 
+\]</span></p>
+<p>Ya da</p>
+<p><span class="math display">\[ 
+\hat{\theta}_{k}=
+\frac{\sum_i w_{ik}  x_{i}}{\sum_i w_{ik}} 
+\]</span></p>
+<p><span class="math inline">\(\lambda_j\)</span> Hesabı</p>
+<p>Şimdi <span class="math inline">\(\lambda_j\)</span>'ye göre bir türev almamız, sıfıra eşitlememiz ve çözmemiz lazım. Tek bir pürüz <span class="math inline">\(\sum_k \lambda_k = 1\)</span> olması şartı, yani tüm ağırlıkların toplamı 1'e eşit olmalı ve bu şartı bir şekilde denklemlere dahil etmemiz lazım. Lagrange çarpan tekniği burada kullanılır [1, sf. 395].</p>
+<p><span class="math display">\[ \frac{\partial }{\partial \lambda_j} 
+\big[ \ell(\theta)  + \alpha (\sum_k \lambda_k - 1) \big]
+\]</span></p>
+<p>Ondan önce olurluğun <span class="math inline">\(\lambda_j\)</span>'ye göre kısmi türevi lazım, (1) formülüne dönersek, ve kısmi türevi alırsak,</p>
+<p><span class="math display">\[ 
+\frac{\partial \ell}{\partial \lambda_j}  = 
+\sum_{i=1}^{N}
+\frac{f(x_i;\theta_j)}{\sum_{k=1}^{K} \lambda_k f(x_i;\theta_k) }
+=
+\sum_{i=1}^{N}
+\frac{f(x_i;\theta_j)}{f(x_i) }
+\]</span></p>
+<p>O zaman iki üstteki türev su hale gelir, sıfıra da eşitlersek,</p>
+<p><span class="math display">\[  
+\sum_{i=1}^{N} \frac{f(x_i;\theta_j)}{f(x_i) } + \alpha = 0
+\]</span></p>
+<p>Biraz düzenleyip iki tarafı da <span class="math inline">\(\lambda_j\)</span> ile çarpalım,</p>
+<p><span class="math display">\[
+\sum_{i=1}^{N} \frac{f(x_i;\theta_j) \lambda_j}{f(x_i) } = - \alpha \lambda_j 
+\]</span></p>
+<p>Eşitliğin sol tarafında toplam içinde yine (1)'de görülen <span class="math inline">\(w_{ij}\)</span>'ye eriştik! Yerine koyalım,</p>
+<p><span class="math display">\[
+\sum_{i=1}^{N} w_{ij} = - \alpha \lambda_j 
+\qquad (3) 
+\]</span></p>
+<p>Şimdi tüm öğeler / kümeler üzerinden bir toplam alalım (yani <span class="math inline">\(\sum_k\)</span>'yi her iki tarafa da uygulayalım),</p>
+<p><span class="math display">\[
+\sum_{k=1}^{K} \sum_{i=1}^{N} w_{ij} = - \alpha  \sum_{k=1}^{K} \lambda_j
+\]</span></p>
+<p><span class="math inline">\(\sum_k \lambda_j = 1\)</span>, <span class="math inline">\(\sum_j w_{ij} = 1\)</span> olduğu için,</p>
+<p><span class="math display">\[ 
+N = - \alpha 
+\]</span></p>
+<p>Üstteki formülü (3) içine koyarsak, ve tekrar düzenlersek,</p>
+<p><span class="math display">\[ 
+\lambda_j = \frac{\sum_{i=1}^{N} w_{ij}}{N} 
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> loginnerprodexp(t,a):
+    eps<span class="op">=</span><span class="fl">1e-15</span>
+    t[t<span class="op">&gt;</span><span class="fl">0.</span>] <span class="op">=</span> <span class="dv">1</span>
+    tmp <span class="op">=</span> np.dot(t,np.exp(a)) <span class="op">+</span> eps
+    b<span class="op">=</span>np.log(tmp)
+    <span class="cf">return</span> b
+
+<span class="kw">def</span> logsumexp(a):
+    <span class="cf">return</span> np.log(np.<span class="bu">sum</span>(np.exp(a), axis<span class="op">=</span><span class="dv">0</span>))
+
+<span class="kw">def</span> do_EMmixtureBernoulli(Y,K,<span class="bu">iter</span>,tol):
+    N,D<span class="op">=</span>Y.shape
+    OMY<span class="op">=</span><span class="dv">1</span><span class="op">+</span>(<span class="op">-</span><span class="dv">1</span><span class="op">*</span>Y) <span class="co">#  &quot;One minus Y&quot;, (1-Y)</span>
+    tmp<span class="op">=</span>np.random.rand(N,K)
+    tmp2<span class="op">=</span>np.<span class="bu">sum</span>(tmp,axis<span class="op">=</span><span class="dv">1</span>).reshape((N,<span class="dv">1</span>))
+    tmp3<span class="op">=</span>np.tile(tmp2,(<span class="dv">1</span>,K))
+    lR<span class="op">=</span>np.log(np.divide(tmp, tmp3))
+    L <span class="op">=</span> []
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">iter</span>):
+        <span class="co"># lPi log Mixture params Kx1</span>
+    lPi<span class="op">=</span>np.tile(<span class="op">-</span><span class="dv">1</span> <span class="op">*</span> np.log(N),(K,<span class="dv">1</span>))<span class="op">+</span>logsumexp(lR).T.reshape((K,<span class="dv">1</span>))
+        const<span class="op">=</span>np.tile(logsumexp(lR).T.reshape((K,<span class="dv">1</span>)),(<span class="dv">1</span>,D))
+        <span class="co"># lP log Bernoulli params KxD</span>
+        lP<span class="op">=</span>loginnerprodexp(Y.T,lR).T <span class="op">-</span> const
+        <span class="co"># lOMP log(1-P), also KxD</span>
+        lOMP<span class="op">=</span>loginnerprodexp(OMY.T,lR).T<span class="op">-</span>const
+    
+    <span class="co"># *** E-step        </span>
+    lR<span class="op">=</span>np.tile(lPi.T,(N,<span class="dv">1</span>))<span class="op">+</span>np.dot(Y,lP.T) <span class="op">+</span> np.dot(OMY,lOMP.T) <span class="co"># + const</span>
+        Z<span class="op">=</span>logsumexp(lR.T)
+
+        lR<span class="op">=</span>lR<span class="op">-</span>np.tile(Z.T.reshape((N,<span class="dv">1</span>)),(<span class="dv">1</span>,K))
+        L.append(np.<span class="bu">sum</span>(Z))
+        <span class="cf">if</span> (i<span class="op">&gt;</span><span class="dv">1</span>):
+            <span class="cf">if</span> np.<span class="bu">abs</span>(L[i]<span class="op">-</span>L[i<span class="dv">-1</span>]) <span class="op">&lt;</span> tol: <span class="cf">break</span>
+                        
+    iters <span class="op">=</span> i
+    <span class="cf">return</span> lR,lPi,lP,L,iters
+
+
+<span class="kw">def</span> EMmixtureBernoulli(Y,K,<span class="bu">iter</span>,tol,attempts):
+    Lbest <span class="op">=</span> <span class="op">-</span>np.inf
+    eps<span class="op">=</span><span class="fl">1e-15</span>
+    <span class="co"># EM&#39;i farkli noktalardan birkac kere (attempts kadar) baslat</span>
+    <span class="co"># En iyi sonucun sonuclarini elde tut</span>
+    <span class="cf">for</span> attempt <span class="kw">in</span> <span class="bu">range</span>(attempts):
+        lRtmp,lPitmp,lPtmp,L,iters <span class="op">=</span> do_EMmixtureBernoulli(Y,K,<span class="bu">iter</span>,eps)
+        <span class="cf">if</span> L[iters]<span class="op">&gt;</span>Lbest:
+            lR<span class="op">=</span>lRtmp
+            lPi<span class="op">=</span>lPitmp
+            lP<span class="op">=</span>lPtmp
+            Lbest<span class="op">=</span>L[iters]
+            itersbest<span class="op">=</span>iters
+    aic <span class="op">=</span> <span class="dv">-2</span><span class="op">*</span>Lbest <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>lP.shape[<span class="dv">0</span>]<span class="op">*</span>lP.shape[<span class="dv">1</span>]
+    <span class="cf">return</span> lR, lPi, lP, Lbest, aic</code></pre></div>
+<p>Kodda kullanılan log-toplam-exp numarası için <em>Ekler</em>'e bakılabilir.</p>
+<p>Örnek olarak ikisel olarak siyah/beyaz olarak kodlanmış üç tane farklı sayının 8x8 boyutundaki imajlarını içeren veriyi kullanabiliriz. Küme sayısını 3 olarak verdik.</p>
+<p>Veriden bazı örnekler görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">Y <span class="op">=</span> np.loadtxt(<span class="st">&#39;binarydigits.txt&#39;</span>)
+plt.imshow(Y[<span class="dv">4</span>,:].reshape((<span class="dv">8</span>,<span class="dv">8</span>),order<span class="op">=</span><span class="st">&#39;C&#39;</span>), cmap<span class="op">=</span>plt.cm.gray)
+plt.savefig(<span class="st">&#39;mixbern_04.png&#39;</span>)
+plt.imshow(Y[<span class="dv">7</span>,:].reshape((<span class="dv">8</span>,<span class="dv">8</span>),order<span class="op">=</span><span class="st">&#39;C&#39;</span>), cmap<span class="op">=</span>plt.cm.gray)
+plt.savefig(<span class="st">&#39;mixbern_05.png&#39;</span>)</code></pre></div>
+<p><img src="mixbern_04.png" /> <img src="mixbern_05.png" /></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> mixbern
+
+K<span class="op">=</span><span class="dv">3</span><span class="op">;</span> <span class="bu">iter</span><span class="op">=</span><span class="dv">40</span><span class="op">;</span> eps<span class="op">=</span><span class="fl">1e-15</span><span class="op">;</span> attempts<span class="op">=</span><span class="dv">5</span>
+lR,lPi,lP,lbest,aic <span class="op">=</span> mixbern.EMmixtureBernoulli(Y,K,<span class="bu">iter</span>,eps,attempts)
+labels <span class="op">=</span>  np.argmax(lR.T,axis<span class="op">=</span><span class="dv">0</span>)
+<span class="bu">print</span> labels
+<span class="bu">print</span> <span class="st">&#39;log olurluk&#39;</span>, lbest, <span class="st">&#39;aic&#39;</span>, aic</code></pre></div>
+<pre><code>[0 0 0 2 2 1 2 0 2 2 1 1 2 1 0 0 0 1 0 1 1 0 0 1 0 2 0 2 1 1 1 2 0 0 0 0 0
+ 0 1 2 0 0 0 0 0 1 2 0 0 2 2 2 1 2 1 2 2 0 0 1 2 1 2 1 0 1 0 0 2 2 2 1 0 2
+ 2 2 0 1 1 2 2 0 1 0 2 0 0 2 2 0 0 2 0 2 1 2 0 1 0 2]
+log olurluk -3049.95050527 aic 6483.90101054</code></pre>
+<p>Elde edilen sonuçlara göre, ve paylaştığımız say resimlerindeki sıraya bakarsak, mesela ilk üç sayı imajını birbirine benziyor olması lazım. Yine aynı sırada gidersek Daha sonra 4. ve 6. sayıların birbirine benziyor olması lazım, ve 8. imajın ilk üç imaja benziyor olması lazım, vs. Resimlere bakınca bunun hakikaten böyle olduğunu görüyoruz. Demek ki kümeleme başarıyla gerçekleştirilmiş.</p>
+<p>Her veri noktasının üyeliğini için <span class="math inline">\(w_{ij}\)</span>'ye baktık (kodda <code>lR</code>, üyeliğin log'u), <span class="math inline">\(i\)</span> hangi kümeye en fazla yakın ise (yüksek olasılık) bunu bir aidiyet olarak kabul ettik.</p>
+<p>Daha ilginç bir hesap şu; her <span class="math inline">\(\theta_k\)</span> (kodda <code>lP</code>, log'u alınmış parametreler) artık bir kümeyi &quot;temsil'' ediyor (multinom bir değişken bu hatırlarsak) ve bu dağılımların her biri, bir nevi &quot;şablon'' haline dönüşmüş olmalı; öyle ya, <span class="math inline">\(Z\)</span> ile zar atıyoruz bir dağılım seçiyoruz, sonra o dağılıma bir daha zar attırıyoruz, ve herhangi bir sayının imajını üretmek istiyorsak şablon gerçeğine oldukça yakın olmalı! Yani mantıki olarak düşünürsek, eğer model veriye iyi uymuş ise, her şablon dağılımının 0,7,5 sayılarının şeklini aşağı yukarı temsil etmesini bekleriz. Kontrol edelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dim <span class="op">=</span> (<span class="dv">8</span>,<span class="dv">8</span>)
+templates <span class="op">=</span> np.exp(lP)
+digit0 <span class="op">=</span> np.reshape(templates[<span class="dv">0</span>,:], dim,order<span class="op">=</span><span class="st">&#39;C&#39;</span>)
+plt.imshow(digit0, cmap<span class="op">=</span>plt.cm.gray)
+plt.savefig(<span class="st">&#39;mixbern_01.png&#39;</span>)
+digit1 <span class="op">=</span> np.reshape(templates[<span class="dv">1</span>,:], dim,order<span class="op">=</span><span class="st">&#39;C&#39;</span>)
+plt.imshow(digit1, cmap<span class="op">=</span>plt.cm.gray)
+plt.savefig(<span class="st">&#39;mixbern_02.png&#39;</span>)
+digit2 <span class="op">=</span> np.reshape(templates[<span class="dv">2</span>,:], dim, order<span class="op">=</span><span class="st">&#39;C&#39;</span>)
+plt.imshow(digit2, cmap<span class="op">=</span>plt.cm.gray)
+plt.savefig(<span class="st">&#39;mixbern_03.png&#39;</span>)</code></pre></div>
+<p><img src="mixbern_01.png" /> <img src="mixbern_02.png" /> <img src="mixbern_03.png" /></p>
+<p>Hakikaten de şeklen benziyorlar!</p>
+<p>Kaynaklar</p>
+<p>[1] Zaki, <em>Data Mining and Analysis: Fundamental Concepts and Algorithms</em></p>
+<p>[2] Alfons Juan, Enrique Vidal, <em>Bernoulli mixture models for binary images</em></p>
+<p>[3] Shalizi, <em>Advanced Data Analysis from an Elementary Point of View</em></p>
+<p>[4] Bishop, C., <em>Pattern Recognition and Machine Learning</em></p>
+</body>
+</html>

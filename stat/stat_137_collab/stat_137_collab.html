@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="toplu-tavsiye-collaborative-filtering-filmler-svd-ile-boyut-indirgeme">Toplu Tavsiye (Collaborative Filtering), Filmler, SVD ile Boyut İndirgeme</h1>
+<p>Film tavsiye verilerine kullanarak bazı analizler ve tavsiye yaklaşımlarına bakacağız. Diyelim ki Star Trek (ST) dizisini ne kadar beğendiğini 4 tane kullanıcı sezonlara göre işaretlemiş. Bu örnek veriyi alttaki gibi gösterelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> pandas <span class="im">import</span> <span class="op">*</span>
+
+d <span class="op">=</span>  np.array(
+     [[<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">5</span>],
+     [<span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">4</span>],
+     [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">0</span>, <span class="dv">3</span>],
+     [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">3</span>],
+     [<span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">5</span>],
+     [<span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>]])
+
+data <span class="op">=</span> DataFrame (d.T,
+    columns<span class="op">=</span>[<span class="st">&#39;S1&#39;</span>,<span class="st">&#39;S2&#39;</span>,<span class="st">&#39;S3&#39;</span>,<span class="st">&#39;S4&#39;</span>,<span class="st">&#39;S5&#39;</span>,<span class="st">&#39;S6&#39;</span>],
+    index<span class="op">=</span>[<span class="st">&#39;Ben&#39;</span>,<span class="st">&#39;Tom&#39;</span>,<span class="st">&#39;John&#39;</span>,<span class="st">&#39;Fred&#39;</span>])
+<span class="bu">print</span> data</code></pre></div>
+<pre><code>      S1  S2  S3  S4  S5  S6
+Ben    5   5   3   0   5   5
+Tom    5   0   4   0   4   4
+John   0   3   0   5   4   5
+Fred   5   4   3   3   5   5</code></pre>
+<p>Veriye göre Tom, ST dizisinin 3. sezonunu 4 seviyesinde sevmiş. 0 değeri o sezonun seyredilmediğini gösteriyor.</p>
+<p>Toplu Tavsiye algoritmaları verideki diğer kişilerin bir ürünü, diziyi, vs. ne kadar beğendiğinin verisinin diğer &quot;benzer&quot; kişilere tavsiye olarak sunabilir, ya da ondan önce, bir kişinin daha almadığı ürünü, seyretmediği sezonu, dinlemediği müziği ne kadar beğeneceğini tahmin eder. 2006 yılında yapılan ünlü Netflix yarışmasının amacı buydu mesela.</p>
+<p>Peki benzerliğin kriteri nedir, ve benzerlik nelerin arasında ölçülür?</p>
+<p>Benzerlik, ürün seviyesinde, ya da kişi seviyesinde yapılabilir. Eğer ürün seviyesinde ise, tek bir ürün için tüm kullanıcıların verdiği nota bakılır. Eğer kullanıcı seviyesinde ise, tek kullanıcının tüm ürünlere verdiği beğeni notları vektörü kullanılır. 1. sezonu örnek kullanalım,o sezonu beğenen kişilere o sezona benzer diğer sezonlar tavsiye edilebilir. Kişiden hareketle, mesela John'a benzeyen diğer kişiler bulunarak onların beğendiği ürünler John'a tavsiye edilebilir.</p>
+<p>Ürün ya da kişi bazında olsun, benzerliği hesaplamak için bir benzerlik ölçütü oluşturmalıyız. Genel olarak bu benzerlik ölçütünün 0 ile 1 arasında değişen bir sayı olmasını tercih edilir ve tavsiye mantığının geri kalanı bu ölçütü baz alacaktır. Elimizde beğeni notlarını taşıyan <span class="math inline">\(A,B\)</span> vektörleri olabilir, ve bu vektörlerin içinde beğeni notları olacaktır. Vektör içindeki sayıları baz alan benzerlik çeşitleri şöyledir:</p>
+<p>Öklit Benzerliği (Euclidian Similarity)</p>
+<p>Bu benzerlik <span class="math inline">\(1 / (1+mesafe)\)</span> olarak hesaplanır. Mesafe karelerin toplamının karekökü (yani Öklitsel mesafe, ki isim buradan geliyor). Bu yüzden mesafe 0 ise (yani iki &quot;şey&quot; arasında hiç mesafe yok, birbirlerine çok yakınlar), o zaman hesap 1 döndürür (mükemmel benzerlik). Mesafe arttıkça bölen büyüdüğü için benzerlik sıfıra yaklaşır.</p>
+<p>Pearson Benzerliği</p>
+<p>Bu benzerliğin Öklit'ten farklılığı, sayı büyüklüğüne hassas olmamasıdır. Diyelim ki birisi her sezonu 1 ile beğenmiş, diğeri 5 ile beğenmiş, bu iki vektörün Pearson benzerliğine göre birbirine eşit çıkar. Pearson -1 ile +1 arasında bir değer döndürür, alttaki hesap onu normalize ederek 0 ile 1 arasına çeker.</p>
+<p>Kosinüs Benzerliği (Cosine Similarity)</p>
+<p>İki vektörü geometrik vektör olarak görür ve bu vektörlerin arasında oluşan açıyı (daha doğrusu onun kosinüsünü) farklılık ölçütü olarak kullanır.</p>
+<p><span class="math display">\[
+\cos\theta = \frac{A \cdot B}{||A||||B||}
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy <span class="im">import</span> linalg <span class="im">as</span> la
+<span class="kw">def</span> euclid(inA,inB):
+    <span class="cf">return</span> <span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span> <span class="op">+</span> la.norm(inA <span class="op">-</span> inB))
+
+<span class="kw">def</span> pearson(inA,inB):
+    <span class="cf">if</span> <span class="bu">len</span>(inA) <span class="op">&lt;</span> <span class="dv">3</span> : <span class="cf">return</span> <span class="fl">1.0</span>
+    <span class="cf">return</span> <span class="fl">0.5+0.5</span><span class="op">*</span>np.corrcoef(inA, inB, rowvar <span class="op">=</span> <span class="dv">0</span>)[<span class="dv">0</span>][<span class="dv">1</span>]
+
+<span class="kw">def</span> cos_sim(inA,inB):
+    num <span class="op">=</span> <span class="bu">float</span>(np.dot(inA.T,inB))
+    denom <span class="op">=</span> la.norm(inA)<span class="op">*</span>la.norm(inB)
+    <span class="cf">return</span> <span class="fl">0.5+0.5</span><span class="op">*</span>(num<span class="op">/</span>denom)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> np.array(data.ix[<span class="st">&#39;Fred&#39;</span>])
+<span class="bu">print</span> np.array(data.ix[<span class="st">&#39;John&#39;</span>])
+<span class="bu">print</span> np.array(data.ix[<span class="st">&#39;Ben&#39;</span>])
+<span class="bu">print</span> pearson(data.ix[<span class="st">&#39;Fred&#39;</span>],data.ix[<span class="st">&#39;John&#39;</span>])
+<span class="bu">print</span> pearson(data.ix[<span class="st">&#39;Fred&#39;</span>],data.ix[<span class="st">&#39;Ben&#39;</span>])</code></pre></div>
+<pre><code>[5 4 3 3 5 5]
+[0 3 0 5 4 5]
+[5 5 3 0 5 5]
+0.551221949943
+0.906922851283</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> cos_sim(data.ix[<span class="st">&#39;Fred&#39;</span>],data.ix[<span class="st">&#39;John&#39;</span>])
+<span class="bu">print</span> cos_sim(data.ix[<span class="st">&#39;Fred&#39;</span>],data.ix[<span class="st">&#39;Ben&#39;</span>])</code></pre></div>
+<pre><code>0.898160909799
+0.977064220183</code></pre>
+<p>Şimdi tavsiye mekaniğine gelelim. En basit tavsiye yöntemi, mesela kişi bazlı olarak, bir kişiye en yakın diğer kişileri bulmak (matrisin tamamına bakarak) ve onların beğendikleri ürünü istenilen kişiye tavsiye etmek. Benzerlik için üstteki ölçütlerden birini kullanmak.</p>
+<p>Kosinüs Benzerliği ile Tavsiye Örneği</p>
+<p>Büyük ölçekte basit kosinüs benzerliği üzerinden tavsiyeleri alttaki gibi hesaplayabiliriz. Önce [8]'den en son tam dosyayı indirelim, ve zip dosyasını açalım, <code>base_dir</code> içinde açılmış olsun. Veride kaç kullanıcı, kaç film olduğu altta raporlandı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+base_dir <span class="op">=</span> <span class="st">&quot;/tmp/ml-latest&quot;</span>
+ratings <span class="op">=</span> pd.read_csv(base_dir <span class="op">+</span> <span class="st">&quot;/ratings.csv&quot;</span>)
+<span class="bu">print</span> (ratings.userId.nunique(), ratings.movieId.nunique())</code></pre></div>
+<pre><code>283228 53889</code></pre>
+<p>Büyük bir veri dosyası bu. Şimdi beğenilerden kullanıcı-film şeklinde olacak şekilde bir matris yaratacağız. Çoğu kişi çoğu filmi seyretmediği için matris seyrek olacak, bu sebeple seyrek matris kodu <code>csr_matrix</code> kullanılacak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.sparse <span class="im">import</span> csr_matrix
+sps <span class="op">=</span> csr_matrix((ratings.rating, (ratings.userId , ratings.movieId)))</code></pre></div>
+<p>Artık <code>sps</code> içinde kullanıcı-film kordinatlarından oluşan bilgiler var. Mesela 1'inci kullanıcının 307'üncü film beğenisi için</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (sps[<span class="dv">1</span>,<span class="dv">307</span>])</code></pre></div>
+<pre><code>3.5</code></pre>
+<p>Şimdi kendi beğenilerimi bir vektör üzerine kodlamanın zamanı geldi, böylece bu vektör ile tüm kullanıcı-film matrisi üzerinde bir kosinüs benzerliği hesaplayınca bizim beğenilere en yakın olan diğer kullanıcıların mesafesini bir diğer vektör içinde edebiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">mov <span class="op">=</span> pd.read_csv(base_dir <span class="op">+</span> <span class="st">&quot;/movies.csv&quot;</span>,index_col<span class="op">=</span><span class="st">&quot;title&quot;</span>)[<span class="st">&#39;movieId&#39;</span>].to_dict()
+picks <span class="op">=</span> {<span class="st">&quot;Swordfish (2001)&quot;</span>: <span class="fl">5.0</span>, <span class="st">&quot;Every Which Way But Loose (1978)&quot;</span>: <span class="fl">5.0</span>,
+         <span class="st">&quot;Sideways (2004)&quot;</span>: <span class="fl">5.0</span>}
+tst <span class="op">=</span> np.zeros((<span class="dv">1</span>,sps.shape[<span class="dv">1</span>]))
+<span class="cf">for</span> p <span class="kw">in</span> picks: tst[<span class="dv">0</span>,mov[p]] <span class="op">=</span> picks[p]</code></pre></div>
+<p>Benzerlik hesabını işletelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> cosine_similarity
+similarities <span class="op">=</span> cosine_similarity(sps, tst)
+<span class="bu">print</span> (similarities.shape)</code></pre></div>
+<pre><code>(283229, 1)</code></pre>
+<p>Bu vektörün büyüklüğü verideki kullanıcı sayısı kadar, bu mantıklı.</p>
+<p>Artık tavsiye vermek için bu kullanıcılara olan uzaklığa göre yakından-uzağa şekilde vektörü sıralayacağız, <code>argsort</code> ile sıralama yapınca bize sonuçlar indis vektörü olarak verilecek (yani en yakın öğenin indisi, indis vektöründe en sonda) böylece bu vektörü gezip en yakın kullanıcıları bulabiliriz, ve eğer istersek, onların en çok beğendiği filmleri toplayıp bir tavsiye listesi oluşturabiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">m <span class="op">=</span> np.argsort(similarities[:,<span class="dv">0</span>])
+<span class="bu">print</span> (sps[m[<span class="op">-</span><span class="dv">10</span>],:])</code></pre></div>
+<pre><code>  (0, 145)  3.5
+  (0, 805)  4.0
+  (0, 1061) 4.0
+  (0, 2013) 3.0
+  (0, 3173) 4.0
+  (0, 4344) 4.0</code></pre>
+<p>Üstte en yakın 10'uncu kullanıcının beğenilerini görüyoruz. Kodları film ismine çevirmek için alttakini işletelim, ve filmlerden birine bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">movi <span class="op">=</span> pd.read_csv(base_dir <span class="op">+</span> <span class="st">&quot;/movies.csv&quot;</span>,index_col<span class="op">=</span><span class="st">&quot;movieId&quot;</span>)[<span class="st">&#39;title&#39;</span>].to_dict()
+<span class="bu">print</span> (movi[<span class="dv">145</span>])</code></pre></div>
+<pre><code>Bad Boys (1995)</code></pre>
+<p>Bu iyi bir tavsiye; ben beğeni listeme koymamıştım ama filmi biliyorum, ve aksiyon filmi olarak güzeldi.</p>
+<p>Nihai listeyi oluşturma, tekrarlananları, zaten seyredilmiş olanları filtreleme kodlarını okuyuculara ödev olsun. Bazı tiyolar seyrek matris, ya da vektör üzerinde <code>nonzero</code> çağrısı içi dolu öğelerin indisini ve değerini döndürür, bunları kullanarak bir nihai tavsiye sonucu oluşturabiliriz.</p>
+<p>Not: Üstte hazır <code>cosine_similarity</code> çağrısı kullanıldı, bu kod bazı ek servisler sunuyor bize, mesela normalize etmek, seyrek matrislerle iş yapabilmek gibi. Fakat o fonksiyonun kodlamasının detayına baksak daha önce gösterdiğimiz <code>cos_sim</code> çağrısı ile benzer olduğunu görürdük.</p>
+<p>SVD</p>
+<p>Eğer boyut azaltma tekniği kullanmak istiyorsak SVD yöntemi burada da işimize yarar.</p>
+<p><span class="math display">\[ A = USV  \]</span></p>
+<p>elde edeceğimiz için, ve <span class="math inline">\(S\)</span> içindeki en büyük değerlere tekabül eden <span class="math inline">\(U,V\)</span> değerleri sıralanmış olarak geldiği için <span class="math inline">\(U,V\)</span>'nin en baştaki değerlerini almak bize &quot;en önemli&quot; blokları verir. Bu en önemli kolon ya da satırları alarak azaltılmış bir boyut içinde benzerlik hesabı yapmak işlemlerimizi hızlandırır. Bu azaltılmış boyutta kümeleme algoritmalarını devreye sokabiliriz; <span class="math inline">\(U\)</span>'nun mesela en önemli iki kolonu bize iki boyuttaki sezon kümelerini verebilir, <span class="math inline">\(V\)</span>'nin en önemli iki (en üst) satırı bize iki boyutta bir kişi kümesi verebilir.</p>
+<p>O zaman beğeni matrisi üzerinde SVD uygulayalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy.linalg <span class="im">import</span> linalg <span class="im">as</span> la
+U,Sigma,V<span class="op">=</span>la.svd(data, full_matrices<span class="op">=</span><span class="va">False</span>)
+<span class="bu">print</span> data.shape
+<span class="bu">print</span> U.shape, Sigma.shape, V.shape
+u <span class="op">=</span> U[:,:<span class="dv">2</span>]
+vt<span class="op">=</span>V[:<span class="dv">2</span>,:].T
+<span class="bu">print</span> <span class="st">&#39;u&#39;</span>, u
+<span class="bu">print</span> <span class="st">&#39;vt&#39;</span>, vt
+<span class="bu">print</span> u.shape, vt.shape</code></pre></div>
+<pre><code>(4, 6)
+(4, 4) (4,) (4, 6)
+u [[-0.57098887 -0.22279713]
+ [-0.4274751  -0.51723555]
+ [-0.38459931  0.82462029]
+ [-0.58593526  0.05319973]]
+vt [[-0.44721867 -0.53728743]
+ [-0.35861531  0.24605053]
+ [-0.29246336 -0.40329582]
+ [-0.20779151  0.67004393]
+ [-0.50993331  0.05969518]
+ [-0.53164501  0.18870999]]
+(4, 2) (6, 2)</code></pre>
+<p>degerleri elimize gecer. U ve VT matrisleri</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> label_points(d,xx,yy,style):
+    <span class="cf">for</span> label, x, y <span class="kw">in</span> <span class="bu">zip</span>(d, xx, yy):
+        plt.annotate(
+            label, 
+            xy <span class="op">=</span> (x, y), xytext <span class="op">=</span> style,
+            textcoords <span class="op">=</span> <span class="st">&#39;offset points&#39;</span>, ha <span class="op">=</span> <span class="st">&#39;right&#39;</span>, va <span class="op">=</span> <span class="st">&#39;bottom&#39;</span>,
+            bbox <span class="op">=</span> <span class="bu">dict</span>(boxstyle <span class="op">=</span> <span class="st">&#39;round,pad=0.5&#39;</span>, fc <span class="op">=</span> <span class="st">&#39;yellow&#39;</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>),
+            arrowprops <span class="op">=</span> <span class="bu">dict</span>(arrowstyle <span class="op">=</span> <span class="st">&#39;-&gt;&#39;</span>, connectionstyle <span class="op">=</span> <span class="st">&#39;arc3,rad=0&#39;</span>))
+
+plt.plot(u[:,<span class="dv">0</span>],u[:,<span class="dv">1</span>],<span class="st">&#39;r.&#39;</span>)
+label_points(data.index, u[:, <span class="dv">0</span>], u[:, <span class="dv">1</span>],style<span class="op">=</span>(<span class="op">-</span><span class="dv">10</span>, <span class="dv">30</span>))
+plt.plot(vt[:,<span class="dv">0</span>],vt[:,<span class="dv">1</span>],<span class="st">&#39;b.&#39;</span>)
+label_points(data.columns, vt[:, <span class="dv">0</span>], vt[:, <span class="dv">1</span>],style<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">20</span>))
+plt.savefig(<span class="st">&#39;svdrecom_1.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="svdrecom_1.png" />
+
+</div>
+<p>Çok güzel! SVD bize ürün bazında sezon 5 ve 6'nin bir küme oluşturduğunu, Ben ve Fred'in de kişi bazında ayrı bir küme olduğunu gösterdi.</p>
+<p>Azaltılmış boyutları nasıl kullanırız? Yeni bir kişiyi (mesela Bob) ele alınca, bu kişinin verisini öncelikle aynen diğer verilerin indirgendiği gibi azaltılmış boyuta &quot;indirgememiz&quot; gerekiyor. Çünkü artık işlem yaptığımız boyut orası. Peki bu indirgemeyi nasıl yaparız? SVD genel formülünü hatırlarsak,</p>
+<p><span class="math display">\[ A = USV \]</span></p>
+<p>Azaltılmış ortamda</p>
+<p><span class="math display">\[ A = U_k S_k V_k \]</span></p>
+<p>Diyelim ki gitmek istediğimiz nokta azaltılmış <span class="math inline">\(U\)</span>, o zaman <span class="math inline">\(U_k\)</span>'yi tek başına bırakalım (dikkat, mesela <span class="math inline">\(V\)</span>'nin tersini aldık, fakat bir matrisin tersini almak için o matrisin kare matris olması gerekir, eğer kare değilse, ters alma işlemi taklit ters alma işlemi -pseudoinverse- ile gerçekleştirilir, daha fazla detay için [6])</p>
+<p><span class="math display">\[ A V_k^{-1} = U_k S V_k V_k^{-1} \]</span></p>
+<p><span class="math inline">\(U_k,V_k\)</span> matrisleri birimdik (orthonormal), o zaman <span class="math inline">\(V_k^{-1}V_k = I\)</span> olacak, yani yokolacak</p>
+<p><span class="math display">\[ A V_k^{-1} = U_k S  \]</span></p>
+<p>Benzer şekilde</p>
+<p><span class="math display">\[  A V_k^{-1} S^{-1} = U_k \]</span></p>
+<p>Çok fazla ters alma işlemi var, her iki tarafın devriğini alalım</p>
+<p><span class="math display">\[ (S^{-1})^T (V_k^{-1})^T A^T = U_k^T \]</span></p>
+<p><span class="math inline">\(V_k^{-1} = V_k^T\)</span> olduğunu biliyoruz. Nasıl? Çünkü $ V_k^TV_k = I $, aynı şekilde $ V_k^{-1}V_k = I $. Ters alma işleminin özgünlüğü (üniqueness) sebebiyle <span class="math inline">\(V_k^{-1} = V_k^T\)</span> olmak zorundadır <span class="math inline">\(\Box\)</span></p>
+<p>Demek ki üstteki formül devriğin devriğini almak demektir, yani tekrar başa dönmüş oluyoruz, demek ki <span class="math inline">\(V_k\)</span> değişmeden kalıyor</p>
+<p><span class="math display">\[ (S^{-1})^T V_k A^T = U_k^T \]</span></p>
+<p><span class="math inline">\(S\)</span> ise köşegen matris, onun tersi yine köşegen, köşegen matrisin devriği yine kendisi</p>
+<p><span class="math display">\[ S^{-1} V_k A^T = U_k^T \]</span></p>
+<p>Bazı kod ispatları, <span class="math inline">\(u\)</span>'nun birimdik olması:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> np.dot(u.T,u)</code></pre></div>
+<pre><code>[[  1.00000000e+00   4.83147593e-18]
+ [  4.83147593e-18   1.00000000e+00]]</code></pre>
+<p>Doğal olarak <code>1e-17</code> gibi bir sayı sıfıra çok yakın, yani sıfır kabul edilebilir. Devrik ve tersin aynı olduğunu gösterelim: İki matrisi birbirinden çıkartıp, çok küçük bir sayıdan büyüklüğe göre filtreleme yapalım, ve sonuç içinde bir tane bile True olup olmadığını kontrol edelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="kw">not</span> <span class="bu">any</span>(U.T<span class="op">-</span>la.inv(U) <span class="op">&gt;</span> <span class="fl">1e-15</span>)</code></pre></div>
+<pre><code>True</code></pre>
+<p>Yeni Bob verisi</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">bob <span class="op">=</span> np.array([<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">5</span>]) </code></pre></div>
+<p>O zaman</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> bob.T.shape
+<span class="bu">print</span> u.shape
+S_k <span class="op">=</span> np.eye(<span class="dv">2</span>)<span class="op">*</span>Sigma[:<span class="dv">2</span>]
+bob_2d <span class="op">=</span> np.dot(np.dot(la.inv(S_k),vt.T),bob.T)
+<span class="bu">print</span> bob_2d</code></pre></div>
+<pre><code>(6,)
+(4, 2)
+[-0.37752201 -0.08020351]</code></pre>
+<p>Not: <code>bob.T</code> üstteki formüldeki <span class="math inline">\(A^T\)</span> yerine geçecek; formülü tekrar düzenlerken <span class="math inline">\(A\)</span> üzerinden işlem yaptık, fakat formülü &quot;<span class="math inline">\(A\)</span>'ya eklenen herhangi bir yeni satır'' olarak ta görebiliriz, ki bu örneğimizde Bob'un verisi olurdu.</p>
+<p>Üstte <code>eye</code> ve <code>Sigma</code> ile ufak bir takla attık, bunun sebebi <code>svd</code> çağrısından gelen <code>Sigma</code> sonucunun bir vektör olması ama üstteki işlem için köşegen bir &quot;matrise&quot; ihtiyacımız olması. Eğer birim (identity) matrisini alıp onu <code>Sigma</code> ile çarparsak, bu köşegen matrisi elde ederiz.</p>
+<p>Şimdi mesela kosinüs benzerliği kullanarak bu izdüşümlenmiş yeni vektörün hangi diğer vektörlere benzediğini bulalım.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="cf">for</span> i,user <span class="kw">in</span> <span class="bu">enumerate</span>(u):
+   <span class="bu">print</span> data.index[i],cos_sim(user,bob_2d)</code></pre></div>
+<pre><code>Ben 0.993397525045
+Tom 0.891664622942
+John 0.612561691287
+Fred 0.977685793579</code></pre>
+<p>Sonuca göre yeni kullanıcı Bob, en çok Ben ve Fred'e benziyor. Sonuca eriştik! Artık bu iki kullanıcının yüksek not verdiği ama Bob'un hiç not vermediği sezonları alıp Bob'a tavsiye olarak sunabiliriz.</p>
+<p>SVD ile Veriyi Oluşturmak</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> scipy.sparse.linalg <span class="im">as</span> lin
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sps
+
+d <span class="op">=</span>  np.array(
+[[ <span class="fl">5.</span>,  <span class="fl">5.</span>,  <span class="fl">3.</span>,  np.nan,  <span class="fl">5.</span>, <span class="fl">5.</span>],
+ [ <span class="fl">5.</span>,  np.nan,  <span class="fl">4.</span>,  np.nan,  <span class="fl">4.</span>, <span class="fl">4.</span>],
+ [ np.nan,  <span class="fl">3.</span>,  np.nan,  <span class="fl">5.</span>,  <span class="fl">4.</span>, <span class="fl">5.</span>],
+ [ <span class="fl">5.</span>,  <span class="fl">4.</span>,  <span class="fl">3.</span>,  <span class="fl">3.</span>,  <span class="fl">5.</span>, <span class="fl">5.</span>],
+ [ <span class="fl">5.</span>,  <span class="fl">5.</span>,  np.nan,  np.nan,  np.nan, <span class="fl">5.</span>]
+])
+users <span class="op">=</span> [<span class="st">&#39;Ben&#39;</span>,<span class="st">&#39;Tom&#39;</span>,<span class="st">&#39;John&#39;</span>,<span class="st">&#39;Fred&#39;</span>,<span class="st">&#39;Bob&#39;</span>]
+seasons <span class="op">=</span> [<span class="st">&#39;0&#39;</span>,<span class="st">&#39;1&#39;</span>,<span class="st">&#39;2&#39;</span>,<span class="st">&#39;3&#39;</span>,<span class="st">&#39;4&#39;</span>,<span class="st">&#39;5&#39;</span>]
+data <span class="op">=</span> pd.DataFrame (d, columns<span class="op">=</span>seasons,index<span class="op">=</span>users)
+<span class="bu">print</span> data
+avg_movies_data <span class="op">=</span> data.mean(axis<span class="op">=</span><span class="dv">0</span>)
+<span class="bu">print</span> avg_movies_data
+data_user_offset <span class="op">=</span> data.<span class="bu">apply</span>(<span class="kw">lambda</span> x: x<span class="op">-</span>avg_movies_data, axis<span class="op">=</span><span class="dv">1</span>)
+A <span class="op">=</span> sps.coo_matrix(np.nan_to_num(np.array(data_user_offset)))
+U,S,VT <span class="op">=</span> lin.svds(A,k<span class="op">=</span><span class="dv">3</span>)
+<span class="kw">def</span> predict(u,i):
+    offset <span class="op">=</span> np.dot(U[u,:],VT[:,i]) 
+    r_ui_hat <span class="op">=</span> offset <span class="op">+</span> avg_movies_data.ix[i] 
+    <span class="cf">return</span> r_ui_hat, offset
+
+<span class="bu">print</span> <span class="st">&#39;Bob&#39;</span>, predict(users.index(<span class="st">&#39;Bob&#39;</span>),<span class="dv">2</span>)
+<span class="bu">print</span> <span class="st">&#39;Tom&#39;</span>, predict(users.index(<span class="st">&#39;Tom&#39;</span>),<span class="dv">1</span>)</code></pre></div>
+<pre><code>       0   1   2   3   4  5
+Ben    5   5   3 NaN   5  5
+Tom    5 NaN   4 NaN   4  4
+John NaN   3 NaN   5   4  5
+Fred   5   4   3   3   5  5
+Bob    5   5 NaN NaN NaN  5
+0    5.000000
+1    4.250000
+2    3.333333
+3    4.000000
+4    4.500000
+5    4.800000
+dtype: float64
+Bob (3.3115641365499888, -0.021769196783344661)
+Tom (4.295419370813935, 0.045419370813934629)</code></pre>
+<p>Alternatif Yöntem</p>
+<p>Bir diğer yöntem [1] yeni Bob verisi <span class="math inline">\(y\)</span>'yi alıp</p>
+<p><span class="math display">\[ z = VV^Ty \]</span></p>
+<p>olarak <span class="math inline">\(z\)</span>'ye çevirmek. Bu durumda aslında cebirsel olarak hiçbir şey yapmamış oluyoruz,</p>
+<p><span class="math display">\[ z = VV^Ty = Iy = y\]</span></p>
+<p>ve iteratif sayısal çoğu algoritmanın temelini de bu oluşturuyor. Kavramsal olarak <span class="math inline">\(y\)</span>'yi alıp <span class="math inline">\(V\)</span> uzayına &quot;yansıtıyoruz''. Daha kavramsal olarak kullanıcı seçimlerini temsil eden veri için <span class="math inline">\(V\)</span> bir &quot;kordinat sistemi'' oluşturmuştur (SVD'nin doğal sonucu olarak) ve her veri noktası bu kordinat sistemi, bu bazın vektörlerinin bir kombinasyonu olarak temsil edilebilir durumdadır (SVD için kullanılan veriden bahsediyoruz). Bu durumda yeni veriyi oraya yansıtmak doğal bir işlemdir. Tabii yansıtıp sonra geri geliyoruz, yani başlangıçtaki boyutlara / hale dönüyoruz, bu olurken aynı zamanda Bob verisinin boş noktaları en makul tahminlerle &quot;doldurulmuş'' oluyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy.linalg <span class="im">import</span> linalg <span class="im">as</span> la
+U,Sigma,V<span class="op">=</span>la.svd(data, full_matrices<span class="op">=</span><span class="va">False</span>)
+<span class="bu">print</span> data.shape
+<span class="bu">print</span> U.shape, Sigma.shape, V.shape
+u <span class="op">=</span> U[:,:<span class="dv">2</span>]
+vt<span class="op">=</span>V[:<span class="dv">2</span>,:].T
+<span class="bu">print</span> data
+<span class="bu">print</span> <span class="st">&#39;bob&#39;</span>, bob
+y <span class="op">=</span> bob
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):
+    z <span class="op">=</span> np.dot(vt,np.dot(vt.T,y))
+    <span class="bu">print</span> z
+    z[y<span class="op">&gt;</span><span class="dv">0</span>] <span class="op">=</span> y[y<span class="op">&gt;</span><span class="dv">0</span>]
+<span class="bu">print</span> z</code></pre></div>
+<pre><code>(4, 6)
+(4, 4) (4,) (4, 6)
+      S1  S2  S3  S4  S5  S6
+Ben    5   5   3   0   5   5
+Tom    5   0   4   0   4   4
+John   0   3   0   5   4   5
+Fred   5   4   3   3   5   5
+bob [5 5 0 0 0 5]
+[ 3.26615993  2.27206826  2.16256132  1.04609626  3.37952362  3.45858088]
+[ 3.26615993  2.27206826  2.16256132  1.04609626  3.37952362  3.45858088]
+[ 3.26615993  2.27206826  2.16256132  1.04609626  3.37952362  3.45858088]
+[ 5.          5.          2.16256132  1.04609626  3.37952362  5.        ]</code></pre>
+<p>Sonuca göre Bob büyük ihtimalle S5'i sevecektir, not tahminleri arasında en yüksek puan orada tahmin edilmiş, ki bu daha önceki Ben ve Fred benzerlik tahminleri ile uyumlu.</p>
+<p>Not: Döngüde <span class="math inline">\(z\)</span>'nin hep aynı satır olması kafa karışıklığı yaratmasın, bu çok ufak bir veri seti, daha büyük veri setlerdinde bu değişim görülecektir.</p>
+<p>İteratif işlem sözde kod (pseudocode) olarak,</p>
+<p>Algoritma <code>imputed_svd</code></p>
+<ul>
+<li><code>while</code> <span class="math inline">\(z\)</span>'deki değişim azalıncaya kadar (convergence)</li>
+<li><span class="math inline">\(z = VV^Ty\)</span></li>
+<li><span class="math inline">\(y\)</span>'nin ilk halindeki bilinen noktaları alıp <span class="math inline">\(z\)</span>'ye kopyala</li>
+</ul>
+<p>En son projemizde üstteki işlemin en iyi sonuçlar verdiğini gözlemledik.</p>
+<p>Movielens 1M Verisi</p>
+<p>Bu veri seti 6000 kullanıcı tarafından yaklaşık 4000 tane filme verilen not / derece (rating) verisini içeriyor, 1 milyon tane not verilmiş, yani 4000 * 6000 = 24 milyon olasılık içinde sadece 1 milyon veri noktası dolu. Bu oldukça seyrek bir matris demektir.</p>
+<p>Verinin ham hali diğer ders notlarımızı içeren üst dizinlerde var, veriyi SVD ile kullanılır hale getirmek için bu dizindeki <code>movielens_prep.py</code> adlı script kullanılır. İşlem bitince <code>movielens.csv</code> adlı bir dosya script'te görülen yere yazılacak. Bu dosyada olmayan derecelendirmeler, verilmemiş notlar boş olacaktır. Bu boşlukları sıfırlarsak, seyrek matrisi o noktaları atlar. Ardından bu seyrek matris üzerinde seyrek SVD işletilebilir. Bu normal SVD'den daha hızlı işleyecektir.</p>
+<p>Tavsiye kodlamamız için yazının başında anlatılan tekniği kullanacağız, film verisi üzerinde boyut azaltılması yapılacak, benzer kullanıcı bulunacak, ve herhangi bir yeni kullanıcı / film kombinasyonu için bu diğer benzer kullanıcının o filme verdiği not baz alınacak.</p>
+<p>Veriyi eğitim ve test olarak iki parçaya böleceğiz. SVD eğitim bölümü üzerinde işletilecek.</p>
+<p>Bu bağlamda, önemli bir diğer konu eksik veri noktalarının SVD sonuçlarını nasıl etkileyeceği. Sonuçta eksik yerler <code>nan</code>, oradan sıfır yapılıp ardından seyrek matris kodlaması üzerinden &quot;atlanıyor&quot; olabilir, fakat bu değerler atlanıyor (yani hızlı işleniyor, depolanıyor) olsa bile, onların sıfır olmasının bir anlamı yok mudur? Evet vardır. Not bakımından sıfır da bir not'tur, ve bu sebeple sonuçları istenmeyen biçimde etkileyebilir.</p>
+<p>O zaman mevcut veriyi öyle bir değiştirelim ki verilmemiş notlar, yani sıfır değerleri sonucu fazla değiştirmesin.</p>
+<p>Bunu yapmanın yollarından biri her film için bir ortalama not değeri hesaplamak, ve bu ortalama değeri o filme verilen tüm not değerlerinden çıkartmaktır. Bu işleme &quot;sıfır çevresinde merkezlemek&quot; ismi de verilir, hakikaten mesela film j için ortalama 3 ise, 5 değeri 2, 3 değeri sıfır, 2 değeri -1 haline gelecektir. Bu bir ilerlemedir çünkü ortalama 3 değeri zaten bizim için &quot;önemsiz&quot; bir değerdir, tavsiye problemi bağlamında bizim en çok ilgilendiğimiz sevilen filmler, ve sevilmeyen filmler. Bu değerler sırasıyla artı ve eksi değerlere dönüşecekler, ve SVD bu farklılığı matematiksel olarak kullanabilme yeteneğine sahip.</p>
+<p>Altta Pandas <code>mean</code> çağrısı ile bu işlemin yapıldığını görüyoruz, dikkat, Pandas dataframe içinde <code>nan</code> değerleri olacaktır, ve Pandas bu değerleri atlaması gerektiğini bilir, yani bu değerler ortalamaya etki etmez. Ardından merkezleme işlemi eğitim verisi üzerinde uygulanıyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, os
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sps
+df <span class="op">=</span> pd.read_csv(<span class="st">&quot;</span><span class="sc">%s</span><span class="st">/Downloads/movielens.csv&quot;</span> <span class="op">%</span> os.environ[<span class="st">&#39;HOME&#39;</span>] ,sep<span class="op">=</span><span class="st">&#39;;&#39;</span>)
+<span class="bu">print</span> df.shape
+df <span class="op">=</span> df.ix[:,<span class="dv">1</span>:] <span class="co"># id kolonunu atla</span>
+df <span class="op">=</span> df.ix[:,:<span class="dv">3700</span>] <span class="co"># sadece filmleri al</span>
+df_train <span class="op">=</span> df.copy().ix[:<span class="dv">5000</span>,:]
+df_test <span class="op">=</span> df.copy().ix[<span class="dv">5001</span>:,:]
+df_train[np.isnan(df_train)] <span class="op">=</span> <span class="fl">0.0</span>
+movie_avg_rating <span class="op">=</span> np.array(df_train.mean(axis<span class="op">=</span><span class="dv">0</span>))
+df_train <span class="op">=</span> df_train <span class="op">-</span> movie_avg_rating
+dfs_train <span class="op">=</span> sps.coo_matrix(df_train)
+
+df_train <span class="op">=</span> np.array(df_train)
+df_test <span class="op">=</span> np.array(df_test)
+
+<span class="bu">print</span> df_train.shape
+<span class="bu">print</span> df_test.shape
+
+__top_k__ <span class="op">=</span> <span class="dv">10</span>
+<span class="im">import</span> scipy.sparse.linalg <span class="im">as</span> slin
+<span class="im">import</span> scipy.linalg <span class="im">as</span> la
+U,Sigma,V<span class="op">=</span>slin.svds(dfs_train,k<span class="op">=</span>__top_k__)
+<span class="bu">print</span> U.shape, Sigma.shape, V.shape
+Sigma <span class="op">=</span> np.diag(Sigma)</code></pre></div>
+<pre><code>(6040, 3731)
+(5001, 3700)
+(1039, 3700)
+(5001, 10) (10,) (10, 3700)</code></pre>
+<p>Altta test verisi üzerinde satır satır ilerliyoruz, ve her satır (test kullanıcısı) içinde film film ilerliyoruz. &quot;Verilmiş bir not&quot; arıyoruz (çoğunlukla not verilmemiş oluyor çünkü), ve bulduğumuz zaman artık elimizde test edebileceğimiz bir şey var, o notu &quot;sıfırlayıp&quot; vektörün geri kalanını azaltılmış boyuta yansıtıyoruz, ve sonra o boyuttaki tüm diğer <span class="math inline">\(U\)</span> vektörleri içinde arama yapıyoruz, en yakın diğer kullanıcıyı buluyoruz ve onun bu filme verdiği notu tahminimiz olarak kullanıyoruz.</p>
+<p>Altta eğer bulunan diğer kullanıcı o filme not vermemişse, basitleştirme amaçlı olarak, o filmi atladık. Gerçek dünya şartlarında filme not vermiş ve yakın olan (en yakın olmasa da) ikinci, üçüncü kullanıcılar bulunup onların notu kullanılabilir. Hatta en yakın k tane kullanıcının ortalaması alınabilir (o kullanıcılar kNN gibi bir metotla bulunur belki), vs.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> euclid(inA,inB):
+    <span class="cf">return</span> <span class="fl">1.0</span><span class="op">/</span>(<span class="fl">1.0</span> <span class="op">+</span> la.norm(inA <span class="op">-</span> inB))
+    
+rmse <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> n <span class="op">=</span> <span class="dv">0</span>
+<span class="cf">for</span> i,test_row <span class="kw">in</span> <span class="bu">enumerate</span>(df_test):
+    <span class="cf">for</span> j, test_val <span class="kw">in</span> <span class="bu">enumerate</span>(test_row):
+        <span class="co"># nan olmayan bir not buluncaya kadar ara</span>
+        <span class="cf">if</span> np.isnan(test_val): <span class="cf">continue</span> 
+        <span class="co"># bulduk, test satirini tamamen kopyala ve bulunan notu silerek</span>
+        <span class="co"># onu nan / sifir haline getir cunku yansitma (projection) oncesi</span>
+        <span class="co"># o notu &#39;bilmiyormus gibi&#39; yapmamiz lazim. </span>
+    curr <span class="op">=</span> test_row.copy()
+        curr[j] <span class="op">=</span> np.nan
+        curr[np.isnan(curr)] <span class="op">=</span> <span class="fl">0.</span>
+
+    proj_row <span class="op">=</span> np.dot(np.dot(la.inv(Sigma),V),curr)
+
+    sims <span class="op">=</span> np.array(<span class="bu">map</span>(<span class="kw">lambda</span> x: euclid(x, proj_row), U[:,:__top_k__]))
+    isim <span class="op">=</span> np.argmax(sims)
+
+    <span class="co"># eger bulunan kullanici o filme not vermemisse atla</span>
+    <span class="cf">if</span> np.isnan(df.ix[isim, j]): <span class="cf">continue</span>
+
+    <span class="co"># egitim verisinde notlar sifir etrafinda ortalanmis, tekrar</span>
+    <span class="co"># normal haline dondur</span>
+    est <span class="op">=</span> df_train[isim, j]<span class="op">+</span>movie_avg_rating[j]
+
+    <span class="co"># gercek not</span>
+    real <span class="op">=</span> df_test[i, j]
+
+    <span class="bu">print</span> i, <span class="st">&#39;icin en yakin&#39;</span>, isim, <span class="st">&#39;urun&#39;</span>,j, <span class="st">&#39;icin oy&#39;</span>, est, <span class="st">&#39;gercek&#39;</span>, real
+        rmse <span class="op">+=</span> (real<span class="op">-</span>est)<span class="op">**</span><span class="dv">2</span>
+        n <span class="op">+=</span> <span class="dv">1</span>
+    <span class="cf">break</span> <span class="co"># her kullanici icin tek film test et</span>
+    <span class="cf">if</span> i <span class="op">==</span> <span class="dv">20</span>: <span class="cf">break</span> <span class="co"># 20 kullanici test et</span>
+
+<span class="bu">print</span> <span class="st">&quot;rmse&quot;</span>, np.sqrt(rmse <span class="op">/</span> n)</code></pre></div>
+<pre><code>0 icin en yakin 1903 urun 144 icin oy 5.0 gercek 5.0
+1 icin en yakin 239 urun 144 icin oy 5.0 gercek 5.0
+2 icin en yakin 2045 urun 844 icin oy 4.0 gercek 4.0
+3 icin en yakin 4636 urun 0 icin oy 3.0 gercek 4.0
+4 icin en yakin 139 urun 845 icin oy 4.0 gercek 5.0
+5 icin en yakin 427 urun 1107 icin oy 4.0 gercek 5.0
+6 icin en yakin 3620 urun 31 icin oy 4.0 gercek 4.0
+7 icin en yakin 1870 urun 0 icin oy 4.0 gercek 3.0
+8 icin en yakin 4816 urun 106 icin oy 5.0 gercek 5.0
+9 icin en yakin 3511 urun 0 icin oy 3.0 gercek 4.0
+10 icin en yakin 3973 urun 1212 icin oy 5.0 gercek 4.0
+11 icin en yakin 2554 urun 287 icin oy 4.0 gercek 5.0
+12 icin en yakin 4733 urun 31 icin oy 4.0 gercek 3.0
+13 icin en yakin 2339 urun 9 icin oy 4.0 gercek 3.0
+14 icin en yakin 3036 urun 10 icin oy 4.0 gercek 3.0
+15 icin en yakin 2748 urun 253 icin oy 5.0 gercek 5.0
+16 icin en yakin 450 urun 16 icin oy 4.0 gercek 4.0
+17 icin en yakin 1133 urun 9 icin oy 5.0 gercek 2.0
+18 icin en yakin 3037 urun 253 icin oy 5.0 gercek 4.0
+19 icin en yakin 1266 urun 107 icin oy 3.0 gercek 3.0
+20 icin en yakin 537 urun 253 icin oy 5.0 gercek 5.0
+rmse 0.975900072949</code></pre>
+<p>Sonuç fena değil. Tavsiye programlarında RMSE 0.9 civarı iyi olarak bilinir, Netflix yarışmasında [3] mesela kazanan algoritma RMSE 0.85'e erişmiştir.</p>
+<p>Kaynaklar</p>
+<p>[1] Grigorik, <em>SVD Recommendation System in Ruby</em>, <a href="http://www.igvita.com/2007/01/15/svd-recommendation-system-in-ruby" class="uri">http://www.igvita.com/2007/01/15/svd-recommendation-system-in-ruby</a></p>
+<p>[2] Harrington, P., <em>Machine Learning in Action</em></p>
+<p>[3] Wikipedia, <em>Netflix Prize</em>, <a href="http://en.wikipedia.org/wiki/Netflix_Prize" class="uri">http://en.wikipedia.org/wiki/Netflix_Prize</a></p>
+<p>[4] Stack Exchange, <em>How do I use the SVD in collaborative filtering?</em>, <a href="http://stats.stackexchange.com/questions/31096/how-do-i-use-the-svd-in-collaborative-filtering" class="uri">http://stats.stackexchange.com/questions/31096/how-do-i-use-the-svd-in-collaborative-filtering</a></p>
+<p>[5] Anand, <em>MORE ON LINEAR STRUCTURE IN DATA, AND SINGULAR VALUE DECOMPOSITION</em>, <a href="https://anandoka.wordpress.com/tag/imputed-svd" class="uri">https://anandoka.wordpress.com/tag/imputed-svd</a></p>
+<p>[6] Bayramlı, Lineer Cebir, <em>Ders 33</em></p>
+<p>[8] Bayramlı, Netflix / Movielens Film Verisi, <a href="https://burakbayramli.github.io/dersblog/sk/2015/04/pandas-movielens-netflix-ratings.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2015/04/pandas-movielens-netflix-ratings.html</a></p>
+</body>
+</html>

@@ -1,0 +1,745 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="id3-karar-ağacı">ID3 Karar Ağacı</h1>
+<p>Zeki arama yazısında, arama algoritmasına tahmin yeteneği kazandırdığımızda problem sonucuna ulaşım hızını arttırmıştık. Tahmin yeteneği oyun tahtasına değer biçebilen işlev sayesinde bilgisayara kodlanmıştı.</p>
+<p>Bir soru; İnsan zekasında tahmin neye dayanır? Üzerinde bilgimiz, tecrübemiz olmayan konu hakkında tahmin yapabilirmiyiz? Hayır. Öyleyse bilgisayara tahmin özelliği kazandırdığımız zaman aynı zamanda makinaya &quot;bilgi&quot; verdiğimizi söyleyebiliriz. Makinayı bilgilendirdik, ona tecrübe kazandırdık da diyebiliriz çünkü tahmin, bir konu hakkında bilgimize, tecrübemize dayandığı ölçüde başarılı olabilir.</p>
+<p>Bilgisayara bilgiyi iki şekilde verebiliriz: Yapısal, ya da işlevsel. Zeki arama örneği işlevsel bir örnek gösterdi. Bilgiyi, bilgisayara algoritma halinde verdik. Tahta değerlendiren işlev, her taşa göre nasıl hesap yapacağını biliyordu. Bu hesabı toplama ve çarpma işlemlerini kullanarak ve daha önceden &quot;bildiği&quot; ağırlıklara göre birbirine ekleyerek tahta hakkında ne düşündüğünü tek bir sayı halinde bildirdi, ve algoritmanın geri kalanı bu değerler ile doğru seçimi yaparak sonuca ulaştı.</p>
+<p>Bu yazıda oyun oynama yerine birçok seçeneğin arasında karar vermek konusunu işleyeceğiz. Zeki aramanın aksine bilgi bilgisayara işlev olarak değil, bir karar ağaç yapısı olarak verilecek, ve daha da iyisi bilgisayarın bu yapıyı &quot;örnek veriden&quot; kendi kendine öğrenmesi sağlanacak.</p>
+<p>Karar Ağacı Nedir?</p>
+<p>Video, televizyon gibi bir ev elektronik eşyasının kılavuzunda &quot;şu, şöyle olduysa şöyle yap&quot; gibi tarifler vardir. İlk önce kontrol edilmesi tavsiye edilen ayarlar vardır, ve bu ayarlardan gelen cevaba göre değişik ayarlara bakılması tavsiye edilir ve en sonunda kılavuz ne hangi özel düğmeye basılması gerektiğini söyler. Kullanım kılavuzları onlarca sayfalık bir karar ağacıdır denebilir. İnsanlara karar ağacın kavramı doğal geldiği için kılavuzlar bu şekilde hazırlanmıştır.</p>
+<p>Diğer bir örnek, lokantalarda çok yemek yiyen birisinin kullandığı karar ağacı olabilir. Bu kimse her türlü değişik şart altında değişik lokantalara gitmiş, ve her seferindeki memnuniyet/pişmanlık durumunu kayıt ederek bir karar ağacı oluşturmuş ise, artık yeni bir lokantada karar kılması için kapısından şöyle içeri bakıp menüye göz gezdirmesi yeterli olacaktır. Bu kişinin lokanta deneyimleri mesela aşağıdaki gibi kayıtlı olsun.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">labels <span class="op">=</span> [<span class="st">&#39;BASKA&#39;</span>,<span class="st">&#39;BAR&#39;</span>,<span class="st">&#39;HAFTASONU&#39;</span>,<span class="st">&#39;ACMIYIZ&#39;</span>,<span class="st">&#39;MUSTERILER&#39;</span>,<span class="op">\</span>
+<span class="st">&#39;FIYAT&#39;</span>,<span class="st">&#39;YAGMUR&#39;</span>, <span class="st">&#39;RESERVASYON&#39;</span>,<span class="st">&#39;YEMEKTURU&#39;</span>,<span class="st">&#39;BEKLEMESURESI&#39;</span>,<span class="st">&#39;BEKLEYELIM&#39;</span>]
+dataSet <span class="op">=</span> [
+[<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;BIRAZ&#39;</span>,<span class="st">&#39;DDD&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;FRANSIZ&#39;</span>,<span class="st">&#39;0&#39;</span>,<span class="st">&#39;EVET&#39;</span>],
+[<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;DOLU&#39;</span>,<span class="st">&#39;D&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;TAYLAND&#39;</span>,<span class="st">&#39;30&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>],
+[<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;BIRAZ&#39;</span>,<span class="st">&#39;D&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;KEBAP&#39;</span>,<span class="st">&#39;0&#39;</span>,<span class="st">&#39;EVET&#39;</span>],
+[<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;DOLU&#39;</span>,<span class="st">&#39;D&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;TAYLAND&#39;</span>,<span class="st">&#39;10&#39;</span>,<span class="st">&#39;EVET&#39;</span>],
+[<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;DOLU&#39;</span>,<span class="st">&#39;DDD&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;FRANSIZ&#39;</span>,<span class="st">&#39;60&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>],
+[<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;BIRAZ&#39;</span>,<span class="st">&#39;DD&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;ITALYAN&#39;</span>,<span class="st">&#39;0&#39;</span>,<span class="st">&#39;EVET&#39;</span>],
+[<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HIC&#39;</span>,<span class="st">&#39;D&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;KEBAP&#39;</span>,<span class="st">&#39;0&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>],
+[<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;BIRAZ&#39;</span>,<span class="st">&#39;DD&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;TAYLAND&#39;</span>,<span class="st">&#39;0&#39;</span>,<span class="st">&#39;EVET&#39;</span>],
+[<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;DOLU&#39;</span>,<span class="st">&#39;D&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;KEBAP&#39;</span>,<span class="st">&#39;60&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>],
+[<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;DOLU&#39;</span>,<span class="st">&#39;DDD&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;ITALYAN&#39;</span>,<span class="st">&#39;10&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>],
+[<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HIC&#39;</span>,<span class="st">&#39;D&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;TAYLAND&#39;</span>,<span class="st">&#39;0&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>],
+[<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;EVET&#39;</span>,<span class="st">&#39;DOLU&#39;</span>,<span class="st">&#39;D&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;HAYIR&#39;</span>,<span class="st">&#39;KEBAP&#39;</span>,<span class="st">&#39;30&#39;</span>,<span class="st">&#39;EVET&#39;</span>]
+]</code></pre></div>
+<p>Peki bu veriye bakarak karar ağacını nasıl oluşturacağız?</p>
+<p>İnsanın aklında karar ağacını oluşturması başka bilim dalları altında araştırılıyor. Bilgisayar için karar ağacını &quot;kendi kendine çıkartan&quot; bir yapay zeka algoritması (ID3), bu yazımızın konusu olacak. ID3 ve genelde öğrenen algoritmalar ve ileride mekanize-öğrenme konusuna giriş açısından yararlı olabilir, ve bu konuda zaten en popüler yaklaşım olan ID3'ün geniş bir uygulama alanı vardır.</p>
+<p>Algoritma</p>
+<p>Karar ağacımız öyle olsun ki, eğitim verisi ile eğitildikten sonra, yeni bir soruya karşılılk, üstten başlayarak yeni şartlar çerçevesinde (ama eski veriye göre kurulmuş) ağaçta bizi bir 'evet' ya da 'hayır' cevabına doğru yönlendirsin. İyi kurulmuş bir karar ağacı, &quot;en az&quot; soru ile &quot;en çabuk&quot; cevaba erişmemizi sağlayan ağaçtır. Çünkü ileride de göreceğimiz gibi, aynı veri için birden fazla değişik karar ağacı kurmak mümkündür.</p>
+<p>Evet, algoritmamıza başlayalım. Veriyi bölmek için, bir başlık seçmemiz gerekiyor. Bu seçimi şimdilik rasgele yapalım, diyelim ki &quot;Müşteri&quot; başlığını seçtik. Veriye bakınca, bu başlık altında &quot;Hiç&quot;, &quot;Biraz&quot; ya da &quot;Dolu&quot; değerlerini görüyoruz. Bu başlığı en üst düğüm olarak ağaca yerleştirelim, ve veriyi, bu başlığın tekrar eden değerlere göre guruplayıp, bölelim.</p>
+<p>Alttaki ağaç, müşteri başlığı üzerinden oluşturulan ağacımızın ilk seviyesidir.</p>
+<div class="figure">
+<img src="id3_hangi_baslik_1.jpg" />
+
+</div>
+<p>Yeşil ve kırmızı toplar evet=yeşil, hayır=kırmızı cevaplarını temsil ediyorlar. Resimin anlatmak istediği, karar ağacı öğreniminin, eğitim verisinin tamamını böldüğü, ve seçenekler arasında taksim ettiği. Elimizdeki verinin &quot;hedef başlığı&quot; &quot;bekleyelim mi?&quot; sorusudur, ve cevabı sadece evet ya da hayır olabilir. Yazının geri kalan kısmında kırmızı ve yeşil topların hepsini göstermeyeceğiz. Kolaylık bakımından ağacın en uç kısmında tamamen yeşil ya da tamamen kırmızı var ise tek bir renk göstermek yeterli olacak.</p>
+<p>Ağacın bu ilk seviyesine bakınca, görüyoruz ki daha şimdiden elimizde yararlı bir karar ağacı var. Çünkü eğer, 'müşteriler' sorusuna yeni sorunun cevabı &quot;hiç&quot; olsaydı, direk olarak bir &quot;Y&quot; (Yanlış) cevabına erişmemiz mümkün oluyordu. Bu noktada iş bitiyor, karar verilmiş olurdu. Tabii bu cevap senaryosu çok iyimser bir senaryodur, çünkü eğer yeni sorunun cevabı &quot;Dolu&quot; olsa idi, bu dalı izleyerek hala bölünmüş olan bir dala geldiğimizi görecektik. Demek ki ağaç oluşturan algoritmanın işi daha bitmedi. &quot;Dolu&quot; dalını takip ederek, oradaki verileri de bölmeye devam etmemiz gerekiyor.</p>
+<p>Bu dalı bölmek için, 'müşteriler' başlığından sonra, gene rasgele olarak, 'bekleme süresi' başlığını seçebiliriz. Eğer lokanta dolu ise, kapıda beklememiz için eğitim verisinde elimizde olan bekleme süreleri bu başlık altında toplanmış. Mümkün değerler 60 dakika'dan fazla, 30-60 dakika arası, 10-30 dakika arası, ya da 10 dakikadan daha az beklemek olarak görülüyor. Bu bölünmeyi de yaptıktan sonra, sırası ile &quot;müşteriler=dolu'' ve &quot;bekleme süresi=60 dakidan fazla'' sorusunun bizi kesin bir cevaba eriştirdiğini göreceğiz. Ayrıca, &quot;müşteriler=dolu'' ve &quot;10 dakikadan az beklemek'' sorusu bizi 'evet' cevabına getirecektir. Bunlar da güzel. Fakat işimiz daha bitmedi, halâ bölünmemiş dallar var, vs.</p>
+<p>Herhalde algoritmanın bölen ve ağaç oluşturan kısmının mantığı anlaşıldı. Tahmin edilecegi gibi bu bölme ve dal oluşturma işlemi tamamen 'evet' ve 'hayır' sonuçlarına erişinceye kadar devam edecek. Sonuç karar ağacını aşağıda görüyoruz.</p>
+<div class="figure">
+<img src="id3_agac_ilk.jpg" />
+
+</div>
+<p>Optimizasyon</p>
+<p>Yapay zeka dalında, algoritmaların doğruluğu kadar, bilgisayara getirdiği yükün ne kadar önemli olduğunu görmüştük. O kadar ki, eğer bu yük kontrol edilir bir ölçüde değil ise, algoritmanın işe yararlılığı sorgulanmaya başlanır. Test olarak, bir algoritmanın 12 veri satırı (yukarıdaki örnek) yerine , 500,000 satırlık veri ile ne yapacağını sormak yerinde olur. Çünkü insan beyninin yaptığı binbir türlü teknik kullanarak bu kadar veriyi işlemektir, aktif zekamızda farkında olmasak bile, belli bir seviyede bu işlemler olmaktadır. Basit bir iş gibi görünen bir yerden bir yere kalkıp yürümek için kullandığımız algoritmaların neler çözmek zorunda olduğunu, robot yazılımlar ile uğraşanlar bilir.</p>
+<p>O yüzden, ID3 algoritmasını 500,000 satırlık veriyi idare edebilecek şekilde ilerletmemiz gerekiyor.</p>
+<p>Başlık Seçimi</p>
+<p>Ilerletme için uygun bir zaman herhalde başlık seçimi esnâsında olacaktır. İlk karar ağacında gördüğümüz gibi bazı sorulara olan cevaplar daha ilk seviyede kesin cevaba erişebiliyordu. Demek ki, sürekli olarak &quot;uygun başlığı uygun zamanda&quot; seçersek, ağacımızı oldukça küçültmemiz mümkün olur. Böylece kesin cevaba erişmemiz kolaylaşır. Tabii kolaylık derken, 500,000 satırlık veri için 100 derinliğindeki bir ağaç ile 10 birim arasındaki bir farktan bahsediyorum, ki bu fark hiç yabana atılacak bir fark değildir.</p>
+<p>Peki uygun başlık nedir? Mesela ilk seviye için, müşteri yerine, &quot;yemek türü&quot; başlığını seçseydik, daha mı iyi bir seçim yapmış olurduk? Bu farazi bölünmeyi aşağıdaki şekilde görelim.</p>
+<div class="figure">
+<img src="id3_hangi_baslik_2.jpg" />
+
+</div>
+<p>Görüyoruz ki, bu yeni bölünme bizi hiç bir kesin cevaba götürmedi. Üstüne üstlük, bütün bu dalların alt-dalları, onlarında alt-dalları derken ağacımızın arap saçına dönmesi ihtimal dahilinde. Demek ki 'yemek türü' bölünmesi bize yeni &quot;bilgi&quot; sâğlamadı. Halâ elimizde kesin cevaplar değil, seçenekler var.</p>
+<p>Bize öyle bir işlev lazım ki, her parçaya bakıp kazandırdığı bilgiyi ölçsün, hala bölünmüş kalan kısımlar içinde bile, onlardan en iyi olanını seçsin. İşte bu noktada bilgi kuramı yardımımıza yetişiyor.</p>
+<p>Bilgi Kuramı</p>
+<p>Bilgi kuramı (information theory), bilgiyi nasıl kodlayacağımızı ve sonuç kodlamanın ne kadar yer tutacağı gibi sorunlar ile uğraşır. Mesela, elimizde 2 değişik değer var ise ve bu değerleri ikili düzende kodlamamız gerekse, bu iş için kaç tane bit gerekir?</p>
+<p>Cevap: Bir tane.</p>
+<p>Peki, 4 tane değer olduğunu düşünelim. Şimdi kaç tane? Cevap: İki. Tekrar eden mantık belki farkedilmistir; eğer &quot;kaç bit&quot; sorusu ile &quot;eldeki bilgi&quot; arasında matematiksel bir bâglantı kurmak gerekse (K ye B), şöyle yazabiliriz. Parça Bilgi Değeri şuna eşit:</p>
+<p><span class="math display">\[ -\frac{d}{d+y} \log_2 \bigg( \frac{d}{d+y} \bigg) - 
+\frac{y}{d+y} \log_2 \bigg( \frac{y}{d+y} \bigg) 
+\]</span></p>
+<p>Adresleme, onluk düzen ve ikilik düzen arasında gidip gelme gibi problemlerden hatırlayabileceğimiz bir sonuç bu. Ya da, 'iki tane bit en fazla kaç onluk sayıyı gösterir' sorusunun tersten sorulmuş şeklidir denebilir.</p>
+<p>Şimdi bu ters soruyu karar ağacının böldüğü her parçaya soralım. Tabii birkaç değişiklik yapmamız gerekecek. Mesela elimizde <code>yemekturu=tayland</code> sonucunda tek bir parça üzerine 2 yanlış ve 2 doğru değer var ise, bu düğümün bilgi değerini kesirler ile hesaplamamız gerekecek. Kesirler ile uğraşırken log işlevi eksi değerler getireceği için cevabı önce kesirin kendisi, sonra da eksi ile çarpmamız lazım (<span class="math inline">\(\log\)</span>, 0 ve 1 arası için eksi değer getirir). Yani, genel olarak iki cevaplı bir uzayda, tek parçanın bilgi değeri şöyle gösterilebilir. Parça Bilgi Değeri suna eşit:</p>
+<p><span class="math display">\[ B(O(v_1),...,O(V_n)) = \sum_{i=1}^{n} -O(v_i)\log_2O(v_i) \]</span></p>
+<p><span class="math inline">\(O\)</span>, olasılığı temsil ediyor.</p>
+<p>Genel olarak göstermek gerekirse, n cevaplı bir uzayda parçanın bilgi değeri şudur.</p>
+<p><span class="math display">\[ B \bigg(\frac{1}{2}, \frac{1}{2} \bigg) = 
+\frac{1}{2}\log_2 \bigg(\frac{1}{2} \bigg) 
+- \frac{1}{2}\log_2 \bigg(\frac{1}{2} \bigg) = \textrm { 1 bit }
+ \]</span></p>
+<p>Formülü kontrol etmek için, başta verdiğimiz bit örneğini kullanalım: 2 değişik değer için kaç bit gerekir?</p>
+<p><span class="math display">\[ \sum_{i=1}^{parca} \frac{d_i + y_i}{d+y} 
+\bigg( \frac{d_i}{d_i+y_i}, \frac{y_i}{d_i+y_i} \bigg)
+\]</span></p>
+<p><span class="math inline">\(d_i\)</span>: i'inci parça doğru sayısı</p>
+<p><span class="math inline">\(y_i\)</span>: i'inci parca yanlis sayisi</p>
+<p><span class="math inline">\(d\)</span>: tüm doğrular</p>
+<p><span class="math inline">\(y\)</span>: tüm yanlışlar</p>
+<p>1 bit gerektiğini halâ bulabiliyoruz.</p>
+<p>Parçaların Bilgi Değer Toplamı</p>
+<p>Bölündükten sonra elimize geçen parçaların bilgi değer toplamı için</p>
+<p>Müşteri Parçaları</p>
+<p><span class="math display">\[  
+\frac{2}{12}B(0,1) + \frac{4}{12}B(1,0) + \frac{6}{12} B(\frac{2}{6},
+\frac{4}{6}) = 0.459
+\]</span></p>
+<p>Yemek Türü Parçaları</p>
+<p><span class="math display">\[ 
+\frac{2}{12}B(\frac{1}{2},\frac{1}{2}) + 
+\frac{2}{12}B(\frac{1}{2},\frac{1}{2}) + 
+\frac{4}{12}B(\frac{2}{4},\frac{2}{4}) + 
+\frac{4}{12}B(\frac{2}{4},\frac{2}{4}) 
+= 1
+ \]</span></p>
+<p>Problemi sözel olarak biraz daha berraklaştıralım. Herhangi bir düğümde iken, bu düğümün bilgi değerini B() ile bulabiliriz. Lokanta örneğinin ilk seviyesinde, en üst düğümün bilgi değeri '1' olduğunu görülebilir, çünkü elimizde tek düğüm, 6 yanlış, 6 doğru cevap var. Güzel.</p>
+<p>Şimdi bir seviye aşağı inelim. Her başlığı teker teker deneyip, ve veriyi her başlık için geçici olarak parçalayıp, muhtemel her bölünme için bu başlığa tekâbül eden parçaların bilgi değerini toplayalım (bir üstteki formül).</p>
+<p>Örnek veri üzerinde üstteki formülü deneyelim (1. seviye parçalanması için)</p>
+<p>Müşteri Parçaları</p>
+<p><span class="math display">\[ 
+\frac{2}{12}B(0,1) +
+\frac{4}{12}B(1,0) +
+\frac{6}{12}B(\frac{2}{6}, \frac{4}{6}) = 0.459
+ \]</span></p>
+<p>Yemek Türü Parçaları</p>
+<p><span class="math display">\[ 
+\frac{2}{12}B(\frac{1}{2}, \frac{1}{2}) + 
+\frac{2}{12}B(\frac{1}{2}, \frac{1}{2}) + 
+\frac{4}{12}B(\frac{2}{4}, \frac{2}{4}) + 
+\frac{4}{12}B(\frac{2}{4}, \frac{2}{4})  = 1
+ \]</span></p>
+<p>Görüyoruz ki, ağacın en üst seviyesini temsil etmek için 1 bit gerekiyor iken, müşteri bölünmesinden sonra 0.459 bit yetiyor (daha az). Fakat yemek türü bölünmesinden sonra halâ 1 bit lâzım! Yani, yemek türü bölünmesi bize hiç bir şey kazandırmadı.</p>
+<p>Kazanç kelimesini aritmetik olarak şöyle târif edebiliriz: Bir düğümün bilgi değerinden, bu düğümün alt-parçalarının bilgi değer toplamının düşülmesi kazanç değerini verir. ID3 algoritması, tabii ki daha az bit gerektiren ya da, daha çok bilgi &quot;kazandıran&quot; seçeneği takip ederse daha etkili olur. Böylece her seviyede gitgide daha berraklaşan karar ağacı, &quot;en az&quot; seviyede, kesin kararlara &quot;en çabuk&quot; şekilde ulaşan karar ağacı olacaktır.</p>
+<p>Eğer B() işlevinin iç mekanizmaları hala anlaşılmadı ise, şunları bilmek yardımcı olabilir:</p>
+<p>Parça tamamen yanlış değerler içeriyor (kesin cevap) = B(0,1) = 0 bit</p>
+<p>Parça tamamen doğru değerler içeriyor (kesin cevap) = B(1,0) = 0 bit</p>
+<p>... 3 doğru, 3 yanlış = B(3,3) = 1 bit ... 2 doğru, 4 yanlış = B(2,4) = 0.92 bit ... 1 doğru, 5 yanlış = B(1,5) = 0.65 bit</p>
+<p>Yeni algoritmanın sonucu ortaya çıkacak karar ağacı şöyle olacaktır. Bu ağacın ilk baştaki ağaca kıyasla çok daha küçük olduğunu görüyoruz.</p>
+<div class="figure">
+<img src="id3_agac_eniyi.jpg" />
+
+</div>
+<p>Kodu Python ile göstermek gerekirse [1]</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> math <span class="im">import</span> log
+<span class="im">import</span> operator
+
+<span class="kw">def</span> calcShannonEnt(dataSet):
+    numEntries <span class="op">=</span> <span class="bu">len</span>(dataSet)
+    labelCounts <span class="op">=</span> {}
+    <span class="co"># kac ozgun deger var ve bu degerler kac kere ortaya cikiyorlar</span>
+    <span class="cf">for</span> featVec <span class="kw">in</span> dataSet: 
+        currentLabel <span class="op">=</span> featVec[<span class="op">-</span><span class="dv">1</span>]
+        <span class="cf">if</span> currentLabel <span class="kw">not</span> <span class="kw">in</span> labelCounts.keys(): labelCounts[currentLabel] <span class="op">=</span> <span class="dv">0</span>
+        labelCounts[currentLabel] <span class="op">+=</span> <span class="dv">1</span>
+    shannonEnt <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">for</span> key <span class="kw">in</span> labelCounts:
+        prob <span class="op">=</span> <span class="bu">float</span>(labelCounts[key])<span class="op">/</span>numEntries
+        shannonEnt <span class="op">-=</span> prob <span class="op">*</span> log(prob,<span class="dv">2</span>) <span class="co">#log base 2</span>
+    <span class="cf">return</span> shannonEnt
+    
+<span class="kw">def</span> splitDataSet(dataSet, axis, value):
+    retDataSet <span class="op">=</span> []
+    <span class="cf">for</span> featVec <span class="kw">in</span> dataSet:
+        <span class="cf">if</span> featVec[axis] <span class="op">==</span> value:
+            reducedFeatVec <span class="op">=</span> featVec[:axis]     
+            reducedFeatVec.extend(featVec[axis<span class="op">+</span><span class="dv">1</span>:])
+            retDataSet.append(reducedFeatVec)
+    <span class="cf">return</span> retDataSet
+    
+<span class="kw">def</span> chooseBestFeatureToSplit(dataSet):
+    numFeatures <span class="op">=</span> <span class="bu">len</span>(dataSet[<span class="dv">0</span>]) <span class="op">-</span> <span class="dv">1</span>      
+    baseEntropy <span class="op">=</span> calcShannonEnt(dataSet)
+    bestInfoGain <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span> bestFeature <span class="op">=</span> <span class="dv">-1</span>
+    <span class="co"># tum ozellikleri ziyaret et</span>
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(numFeatures):        
+        featList <span class="op">=</span> [example[i] <span class="cf">for</span> example <span class="kw">in</span> dataSet]
+        uniqueVals <span class="op">=</span> <span class="bu">set</span>(featList)       
+        newEntropy <span class="op">=</span> <span class="fl">0.0</span>
+        <span class="cf">for</span> value <span class="kw">in</span> uniqueVals:
+            subDataSet <span class="op">=</span> splitDataSet(dataSet, i, value)
+            prob <span class="op">=</span> <span class="bu">len</span>(subDataSet)<span class="op">/</span><span class="bu">float</span>(<span class="bu">len</span>(dataSet))
+            newEntropy <span class="op">+=</span> prob <span class="op">*</span> calcShannonEnt(subDataSet)     
+        <span class="co"># enformasyon kazancini hesapla, yani entropideki azalisi</span>
+        infoGain <span class="op">=</span> baseEntropy <span class="op">-</span> newEntropy     
+        <span class="co"># bu hesabi simdiye kadarki en iyi kazancla karsilastir</span>
+        <span class="cf">if</span> (infoGain <span class="op">&gt;</span> bestInfoGain):       
+            bestInfoGain <span class="op">=</span> infoGain         
+            bestFeature <span class="op">=</span> i
+    <span class="cf">return</span> bestFeature                      
+
+
+<span class="kw">def</span> createTree(dataSet,labels):
+    classList <span class="op">=</span> [example[<span class="op">-</span><span class="dv">1</span>] <span class="cf">for</span> example <span class="kw">in</span> dataSet]
+    <span class="cf">if</span> classList.count(classList[<span class="dv">0</span>]) <span class="op">==</span> <span class="bu">len</span>(classList): 
+        <span class="co"># tum siniflar esitse bolmeyi durdur</span>
+        <span class="cf">return</span> classList[<span class="dv">0</span>]
+    <span class="cf">if</span> <span class="bu">len</span>(dataSet[<span class="dv">0</span>]) <span class="op">==</span> <span class="dv">1</span>: 
+        <span class="cf">return</span> majorityCnt(classList)
+    bestFeat <span class="op">=</span> chooseBestFeatureToSplit(dataSet)
+    bestFeatLabel <span class="op">=</span> labels[bestFeat]
+    myTree <span class="op">=</span> {bestFeatLabel:{}}
+    <span class="kw">del</span>(labels[bestFeat])
+    featValues <span class="op">=</span> [example[bestFeat] <span class="cf">for</span> example <span class="kw">in</span> dataSet]
+    uniqueVals <span class="op">=</span> <span class="bu">set</span>(featValues)
+    <span class="cf">for</span> value <span class="kw">in</span> uniqueVals:
+        <span class="co">#copy all of labels, so trees don&#39;t mess up existing labels</span>
+        subLabels <span class="op">=</span> labels[:]       
+        myTree[bestFeatLabel][value] <span class="op">=</span> <span class="op">\</span>
+            createTree(splitDataSet(dataSet, bestFeat, value),subLabels)
+    <span class="cf">return</span> myTree                            
+
+<span class="kw">def</span> getNumLeafs(myTree):
+    numLeafs <span class="op">=</span> <span class="dv">0</span>
+    firstStr <span class="op">=</span> myTree.keys()[<span class="dv">0</span>]
+    secondDict <span class="op">=</span> myTree[firstStr]
+    <span class="cf">for</span> key <span class="kw">in</span> secondDict.keys():
+        <span class="cf">if</span> <span class="bu">type</span>(secondDict[key]).<span class="va">__name__</span><span class="op">==</span><span class="st">&#39;dict&#39;</span>:
+            numLeafs <span class="op">+=</span> getNumLeafs(secondDict[key])
+        <span class="cf">else</span>:   numLeafs <span class="op">+=</span><span class="dv">1</span>
+    <span class="cf">return</span> numLeafs
+
+<span class="kw">def</span> getTreeDepth(myTree):
+    maxDepth <span class="op">=</span> <span class="dv">0</span>
+    firstStr <span class="op">=</span> myTree.keys()[<span class="dv">0</span>]
+    secondDict <span class="op">=</span> myTree[firstStr]
+    <span class="cf">for</span> key <span class="kw">in</span> secondDict.keys():
+        <span class="cf">if</span> <span class="bu">type</span>(secondDict[key]).<span class="va">__name__</span><span class="op">==</span><span class="st">&#39;dict&#39;</span>:
+            thisDepth <span class="op">=</span> <span class="dv">1</span> <span class="op">+</span> getTreeDepth(secondDict[key])
+        <span class="cf">else</span>:   thisDepth <span class="op">=</span> <span class="dv">1</span>
+        <span class="cf">if</span> thisDepth <span class="op">&gt;</span> maxDepth: maxDepth <span class="op">=</span> thisDepth
+    <span class="cf">return</span> maxDepth
+
+<span class="kw">def</span> plotNode(nodeTxt, centerPt, parentPt, nodeType):
+    createPlot.ax1.annotate(nodeTxt, xy<span class="op">=</span>parentPt,  xycoords<span class="op">=</span><span class="st">&#39;axes fraction&#39;</span>,
+             xytext<span class="op">=</span>centerPt, textcoords<span class="op">=</span><span class="st">&#39;axes fraction&#39;</span>,
+             va<span class="op">=</span><span class="st">&quot;center&quot;</span>, ha<span class="op">=</span><span class="st">&quot;center&quot;</span>, bbox<span class="op">=</span>nodeType, arrowprops<span class="op">=</span>arrow_args )
+    
+<span class="kw">def</span> plotMidText(cntrPt, parentPt, txtString):
+    xMid <span class="op">=</span> (parentPt[<span class="dv">0</span>]<span class="op">-</span>cntrPt[<span class="dv">0</span>])<span class="op">/</span><span class="fl">2.0</span> <span class="op">+</span> cntrPt[<span class="dv">0</span>]
+    yMid <span class="op">=</span> (parentPt[<span class="dv">1</span>]<span class="op">-</span>cntrPt[<span class="dv">1</span>])<span class="op">/</span><span class="fl">2.0</span> <span class="op">+</span> cntrPt[<span class="dv">1</span>]
+    createPlot.ax1.text(xMid, yMid, txtString, <span class="op">\</span>
+                        va<span class="op">=</span><span class="st">&quot;center&quot;</span>, ha<span class="op">=</span><span class="st">&quot;center&quot;</span>, rotation<span class="op">=</span><span class="dv">30</span>)
+
+<span class="kw">def</span> plotTree(myTree, parentPt, nodeTxt):
+    numLeafs <span class="op">=</span> getNumLeafs(myTree)  
+    depth <span class="op">=</span> getTreeDepth(myTree)
+    firstStr <span class="op">=</span> myTree.keys()[<span class="dv">0</span>]     
+    cntrPt <span class="op">=</span> (plotTree.xOff <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">+</span> <span class="bu">float</span>(numLeafs))<span class="op">/</span><span class="fl">2.0</span><span class="op">/</span>plotTree.totalW,<span class="op">\</span>
+              plotTree.yOff)
+    plotMidText(cntrPt, parentPt, nodeTxt)
+    plotNode(firstStr, cntrPt, parentPt, decisionNode)
+    secondDict <span class="op">=</span> myTree[firstStr]
+    plotTree.yOff <span class="op">=</span> plotTree.yOff <span class="op">-</span> <span class="fl">1.0</span><span class="op">/</span>plotTree.totalD
+    <span class="cf">for</span> key <span class="kw">in</span> secondDict.keys():
+        <span class="cf">if</span> <span class="bu">type</span>(secondDict[key]).<span class="va">__name__</span><span class="op">==</span><span class="st">&#39;dict&#39;</span>:
+            plotTree(secondDict[key],cntrPt,<span class="bu">str</span>(key))        
+        <span class="cf">else</span>:  
+            plotTree.xOff <span class="op">=</span> plotTree.xOff <span class="op">+</span> <span class="fl">1.0</span><span class="op">/</span>plotTree.totalW
+            plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), <span class="op">\</span>
+            cntrPt, leafNode)
+            plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, <span class="bu">str</span>(key))
+    plotTree.yOff <span class="op">=</span> plotTree.yOff <span class="op">+</span> <span class="fl">1.0</span><span class="op">/</span>plotTree.totalD
+
+<span class="kw">def</span> createPlot(inTree):
+    fig <span class="op">=</span> plt.figure(<span class="dv">1</span>, facecolor<span class="op">=</span><span class="st">&#39;white&#39;</span>)
+    fig.clf()
+    axprops <span class="op">=</span> <span class="bu">dict</span>(xticks<span class="op">=</span>[], yticks<span class="op">=</span>[])
+    createPlot.ax1 <span class="op">=</span> plt.subplot(<span class="dv">111</span>, frameon<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>axprops)    
+    plotTree.totalW <span class="op">=</span> <span class="bu">float</span>(getNumLeafs(inTree))
+    plotTree.totalD <span class="op">=</span> <span class="bu">float</span>(getTreeDepth(inTree))
+    plotTree.xOff <span class="op">=</span> <span class="fl">-0.5</span><span class="op">/</span>plotTree.totalW<span class="op">;</span> plotTree.yOff <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span>
+    plotTree(inTree, (<span class="fl">0.5</span>,<span class="fl">1.0</span>), <span class="st">&#39;&#39;</span>)
+    plt.savefig(<span class="st">&#39;id3_1.png&#39;</span>)
+
+decisionNode <span class="op">=</span> <span class="bu">dict</span>(boxstyle<span class="op">=</span><span class="st">&quot;sawtooth&quot;</span>, fc<span class="op">=</span><span class="st">&quot;0.8&quot;</span>)
+leafNode <span class="op">=</span> <span class="bu">dict</span>(boxstyle<span class="op">=</span><span class="st">&quot;round4&quot;</span>, fc<span class="op">=</span><span class="st">&quot;0.8&quot;</span>)
+arrow_args <span class="op">=</span> <span class="bu">dict</span>(arrowstyle<span class="op">=</span><span class="st">&quot;&lt;-&quot;</span>)
+
+tree <span class="op">=</span> createTree(dataSet, labels)
+createPlot(tree)</code></pre></div>
+<div class="figure">
+<img src="id3_1.png" />
+
+</div>
+<p>Aynı kodu LİSP ile görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">;;</span>
+<span class="op">;;</span> Ilk kolon, her satir icin kimlik gorevini yapiyor. Yani, d1<span class="st">&#39;i</span>
+<span class="st">;; kullanarak d1 ile baslayan tum veri satirina ulasmak mumkun.</span>
+<span class="st">;; Python kodundaki veri farkli olarak ikinci kolondaki etiket degerini</span>
+<span class="st">;; en sona atiyor</span>
+<span class="st">;; </span>
+<span class="st">;; LISP dilinde bu isi gerceklestirebilmek icin, veri satirindaki bilgileri</span>
+<span class="st">;; anahtar-deger deger cifti olarak kimlik kolonu &#39;</span>uzerinde<span class="st">&#39; sakliyoruz.</span>
+<span class="st">;; LISP komutlarindan &#39;</span>get<span class="st">&#39;, bu isi goruyor. </span>
+<span class="st">;;</span>
+<span class="st">(setf *egitim-verisi*</span>
+<span class="st">      &#39;</span>(
+    (d1 EVET EVET HAYIR HAYIR EVET BIRAZ DDD HAYIR EVET FRANSIZ T0)
+    (d2 HAYIR EVET HAYIR HAYIR EVET DOLU D HAYIR HAYIR TAYLAND T30)
+    (d3 EVET HAYIR EVET HAYIR HAYIR BIRAZ D HAYIR HAYIR KEBAP T0)
+    (d4 EVET EVET HAYIR EVET EVET DOLU D EVET HAYIR TAYLAND T10)
+    (d5 HAYIR EVET HAYIR EVET HAYIR DOLU DDD HAYIR EVET FRANSIZ T60)
+    (d6 EVET HAYIR EVET HAYIR EVET BIRAZ DD EVET EVET ITALYAN T0)
+    (d7 HAYIR HAYIR EVET HAYIR HAYIR HIC D EVET HAYIR KEBAP T0)
+    (d8 EVET HAYIR HAYIR HAYIR EVET BIRAZ DD EVET EVET TAYLAND T0)
+    (d9 HAYIR HAYIR EVET EVET HAYIR DOLU D EVET HAYIR KEBAP T60)
+    (d10 HAYIR EVET EVET EVET EVET DOLU DDD HAYIR EVET ITALYAN T10)
+    (d11 HAYIR HAYIR HAYIR HAYIR HAYIR HIC D HAYIR HAYIR TAYLAND T0)
+    (d12 EVET EVET EVET EVET EVET DOLU D HAYIR HAYIR KEBAP T30)
+    ))
+
+(setf <span class="op">*</span>dogru<span class="op">-</span>sayisi<span class="op">*</span> <span class="dv">0</span>)
+(setf <span class="op">*</span>yanlis<span class="op">-</span>sayisi<span class="op">*</span> <span class="dv">0</span>)
+(setf <span class="op">*</span>toplam<span class="op">-</span>veri<span class="op">-</span>sayisi<span class="op">*</span> <span class="dv">0</span>)
+
+(setf <span class="op">*</span>basliklar<span class="op">*</span>
+      <span class="st">&#39;(BEKLEYELIMMI</span>
+<span class="st">    BASKA</span>
+<span class="st">    BAR</span>
+<span class="st">    HAFTASONU</span>
+<span class="st">    ACMIYIZ</span>
+<span class="st">    MUSTERILER</span>
+<span class="st">    FIYAT</span>
+<span class="st">    YAGMUR</span>
+<span class="st">    RESERVASYON</span>
+<span class="st">    YEMEKTURU</span>
+<span class="st">    BEKLEMESURESI))</span>
+
+<span class="st">(defun deger-koy (baslik satir deger)</span>
+<span class="st">  (setf (get satir baslik) deger))</span>
+
+<span class="st">(defun deger-al (baslik satir)</span>
+<span class="st">  (get satir baslik))</span>
+
+<span class="st">;; uzerinde irdeleme yaptigimiz kolon degerini bulup geri</span>
+<span class="st">;; getirir. </span>
+<span class="st">(defun hedef-baslik-degeri (satir)</span>
+<span class="st">  (get satir &#39;</span>BEKLEYELIMMI))
+
+(defun hedef<span class="op">-</span>baslik () (<span class="cf">return</span> <span class="st">&#39;BEKLEYELIMMI))</span>
+
+<span class="st">(defun veriyi-satirkimligine-cevir (ornekler)</span>
+<span class="st">  (loop for satir in ornekler collect</span>
+<span class="st">    (car satir)))</span>
+
+<span class="st">;; verileri olusturan butun satirlarin irdeleme sonucu ayni mi?</span>
+<span class="st">;; yani, verilen satilarinin hepsinin &#39;</span>bekleyelimmi ozelligi
+<span class="op">;;</span> ayni cevabi mi tasiyor?
+(defun ayni<span class="op">-</span>cevap? (satirlar)
+  ( let ((sonuc nil))
+    (setq ilkdeger (hedef<span class="op">-</span>baslik<span class="op">-</span>degeri (car satirlar)))
+    (setf sonuc (every <span class="co">#&#39;(lambda(e)</span>
+               (equal ilkdeger (hedef<span class="op">-</span>baslik<span class="op">-</span>degeri e)))
+               (cdr satirlar))
+      ) sonuc ))
+   
+<span class="op">;;</span> bu islevin, program basladiktan hemen sonra cagrilmasi
+<span class="op">;;</span> gerekiyor. anahtar<span class="op">/</span>deger bilgilerini bu fonksiyon yaratip,
+<span class="op">;;</span> kimlik sembolu uzerine koyuyor
+(defun egitim<span class="op">-</span>verilerini<span class="op">-</span>cevir (veri basliklar)
+  (loop <span class="cf">for</span> d <span class="kw">in</span> veri do
+    (loop <span class="cf">for</span> baslik <span class="kw">in</span> basliklar
+          <span class="im">as</span> deger <span class="kw">in</span> (cdr d)
+          do
+          (setf kimlik<span class="op">-</span>no (first d))
+          (deger<span class="op">-</span>koy baslik kimlik<span class="op">-</span>no deger)
+          ))
+
+  (loop <span class="cf">for</span> d <span class="kw">in</span> veri do
+    (<span class="cf">if</span> (equal (hedef<span class="op">-</span>baslik<span class="op">-</span>degeri (car d)) <span class="st">&#39;EVET) (incf *dogru-sayisi*))</span>
+<span class="st">    (if (equal (hedef-baslik-degeri (car d)) &#39;</span>EVET) (incf <span class="op">*</span>yanlis<span class="op">-</span>sayisi<span class="op">*</span>))
+    )
+
+  (setf <span class="op">*</span>toplam<span class="op">-</span>veri<span class="op">-</span>sayisi<span class="op">*</span> (<span class="op">+</span> <span class="op">*</span>dogru<span class="op">-</span>sayisi<span class="op">*</span> <span class="op">*</span>yanlis<span class="op">-</span>sayisi<span class="op">*</span>))
+  )
+
+<span class="op">;;</span>
+<span class="op">;;</span>
+<span class="op">;;</span> Iste Algoritma
+<span class="op">;;</span>
+<span class="op">;;</span>
+(defun karar<span class="op">-</span>agaci<span class="op">-</span>egit (ornekler basliklar)
+  (let ((sonuc nil))
+    <span class="op">;;</span> ornekler, butun egitim verisini olusturur
+    (cond
+     ((equal basliklar nil)
+      (setf sonuc (encok<span class="op">-</span>gorulen<span class="op">-</span>deger ornekler)))
+      
+     <span class="op">;;</span> butun satirlarin klasmani ayni ise, bulunan bu klasmani getir
+     <span class="op">;;</span> hepsi ayni ise, herhangi birinin klasmani yeter
+     ((ayni<span class="op">-</span>cevap? ornekler)
+      (setf sonuc (hedef<span class="op">-</span>baslik<span class="op">-</span>degeri (car ornekler))))
+
+     <span class="op">;;</span> Burada, parca listelerinin listesini olustur. Bu kocaman liste
+     <span class="op">;;</span> elimizdeki veriyi her basligi kullanrak bolmus ve biraraya
+     <span class="op">;;</span> konulmus bir halidir. parca<span class="op">-</span>sec islevi, girdisini boyle bekliyor.
+     (t (progn
+      (setq parca<span class="op">-</span>listenin<span class="op">-</span>listesi
+        (loop <span class="cf">for</span> baslik <span class="kw">in</span> basliklar collect (parcala ornekler baslik)))
+    
+      (setf eniyi (parca<span class="op">-</span>sec parca<span class="op">-</span>listenin<span class="op">-</span>listesi))
+
+      (setf sonuc (cons (car eniyi)
+                (loop <span class="cf">for</span> dal <span class="kw">in</span> (cdr eniyi) collect
+                  (<span class="bu">list</span> (car dal)
+                    (karar<span class="op">-</span>agaci<span class="op">-</span>egit
+                     (cdr dal)
+                     (remove (car eniyi) basliklar))
+                    ))
+                ))
+      ))
+     
+     ) sonuc ))
+
+
+
+(defun kazanc (parca<span class="op">-</span>listesi)
+  (let ((kazanc <span class="dv">0</span>))
+
+    <span class="op">;;</span> Burada ufak bir numaraya dikkat. Gecici bir sekilde, parcalari
+    <span class="op">;;</span> <span class="st">&quot;butun&quot;</span> tek parcaya topluyoruz ki bolunmeden onceki bilgi
+    <span class="op">;;</span> icerigini hesaplayabilelim.
+    (setf birlesim (<span class="bu">reduce</span> <span class="co">#&#39;append (cdr parca-listesi)))</span>
+
+    (setf ust<span class="op">-</span>bilgi<span class="op">-</span>icerigi
+      (parca<span class="op">-</span>bilgi<span class="op">-</span>icerigi birlesim))
+
+    (setf cocuklarin<span class="op">-</span>bilgi<span class="op">-</span>icerigi (bilgi<span class="op">-</span>icerigi parca<span class="op">-</span>listesi))
+
+    (setf kazanc (<span class="op">-</span> ust<span class="op">-</span>bilgi<span class="op">-</span>icerigi cocuklarin<span class="op">-</span>bilgi<span class="op">-</span>icerigi))
+    kazanc ))
+
+(defun bilgi<span class="op">-</span>icerigi (parca<span class="op">-</span>listesi)
+  <span class="op">;;</span> her parcanin bilgi icerigini hesaplayip bu degerleri topla
+  (let ((toplam <span class="dv">0</span>))
+    (dolist (parca (cdr parca<span class="op">-</span>listesi)) <span class="op">;;</span> cdr komutu baslik kismini kesip atiyor
+      (incf toplam
+        (parca<span class="op">-</span>bilgi<span class="op">-</span>icerigi parca))
+      ) toplam ))
+
+(defun encok<span class="op">-</span>gorulen<span class="op">-</span>deger (baslik satirlar)
+  (let ((enuzun nil))
+    (loop <span class="cf">for</span> p <span class="kw">in</span> (parcala baslik satirlar) do
+          (when (<span class="op">&gt;</span> (length p) length)
+            (setq length (length p))
+            (setq enuzun p)))
+    (car enuzun)))
+
+(defun parca<span class="op">-</span>bilgi<span class="op">-</span>icerigi (parca)
+  <span class="op">;;</span> bu parca icindeki dogru ve yanlis satirlari say. Dogru
+  <span class="op">;;</span> ve yanlis <span class="st">&#39;hedef basligina&#39;</span> gore bulunuyor tabii
+  (let ((dogru<span class="op">-</span>sayisi <span class="dv">0</span>)(yanlis<span class="op">-</span>sayisi <span class="dv">0</span>))
+    (dolist (kimlik<span class="op">-</span>no parca)
+      (cond
+       <span class="op">;;</span> eger satir BEKLEYELIMMI<span class="op">=</span>EVET ise
+       ((<span class="kw">and</span> (member kimlik<span class="op">-</span>no parca)
+         (equal (hedef<span class="op">-</span>baslik<span class="op">-</span>degeri kimlik<span class="op">-</span>no) <span class="st">&#39;EVET))</span>
+<span class="st">    (incf dogru-sayisi))</span>
+<span class="st">       ;; eger satir BEKLEYELIMMI=HAYIR ise</span>
+<span class="st">       ((and (member kimlik-no parca)</span>
+<span class="st">         (equal (hedef-baslik-degeri kimlik-no) &#39;</span>HAYIR))
+    (incf yanlis<span class="op">-</span>sayisi))
+       (t nil))
+      )
+
+    (setf toplam (<span class="op">+</span> dogru<span class="op">-</span>sayisi yanlis<span class="op">-</span>sayisi))
+    (setf dogru<span class="op">-</span>orani (<span class="op">/</span> dogru<span class="op">-</span>sayisi toplam))
+    (setf yanlis<span class="op">-</span>orani (<span class="op">/</span> yanlis<span class="op">-</span>sayisi toplam))
+
+    <span class="op">;;</span> Asagida gorulan (zerop ..) kullanimi guzel bir LISP numarasi.
+    <span class="op">;;</span> Eger dogru<span class="op">-</span>orani <span class="dv">0</span> ise, hesabin geri kalani icin <span class="dv">0</span> kullan.
+    <span class="op">;;</span> Fakat (zerop xx) <span class="dv">0</span> ise, yani xx <span class="dv">0</span> degil ise :), o zaman
+    <span class="op">;;</span> log hesabini yap. Vay anasini.
+    <span class="op">;;</span> Bu numaradan once <span class="st">&#39;sifirla bolunme (division by zero)&#39;</span> hatasi
+    <span class="op">;;</span> aliyordum. log <span class="dv">0</span> hesap edilir bir deger degil demek ki,
+    <span class="op">;;</span> tanim olarak <span class="dv">0</span> oldugu kabul ediliyor. Sinifta hoca da oyle
+    <span class="op">;;</span> soylemisti.
+    (setf logp (<span class="op">*</span> (<span class="op">*</span> <span class="dv">-1</span> dogru<span class="op">-</span>orani)
+          (<span class="cf">if</span> (zerop dogru<span class="op">-</span>orani) <span class="dv">0</span> (log dogru<span class="op">-</span>orani <span class="dv">2</span>))))
+    (setf logn (<span class="op">*</span> (<span class="op">*</span> <span class="dv">-1</span> yanlis<span class="op">-</span>orani)
+          (<span class="cf">if</span> (zerop yanlis<span class="op">-</span>orani) <span class="dv">0</span> (log yanlis<span class="op">-</span>orani <span class="dv">2</span>))))
+
+    (setf log<span class="op">-</span>toplam (<span class="op">+</span> logp logn))
+
+    (setf butune<span class="op">-</span>olan<span class="op">-</span>d<span class="op">-</span>y<span class="op">-</span>orani (<span class="op">/</span> toplam <span class="op">*</span>toplam<span class="op">-</span>veri<span class="op">-</span>sayisi<span class="op">*</span>))
+    
+    (setf bilgi<span class="op">-</span>icerik (<span class="op">*</span> log<span class="op">-</span>toplam butune<span class="op">-</span>olan<span class="op">-</span>d<span class="op">-</span>y<span class="op">-</span>orani))
+
+    bilgi<span class="op">-</span>icerik ))
+
+<span class="op">;;</span>
+<span class="op">;;</span> veriyi bolmek icin en iyi basligi bul
+(defun parca<span class="op">-</span>sec (parca<span class="op">-</span>listenin<span class="op">-</span>listesi)
+  <span class="op">;;</span>
+  <span class="op">;;</span>
+  (let ((sonuc (car parca<span class="op">-</span>listenin<span class="op">-</span>listesi)))    
+    (dolist (parca<span class="op">-</span>listesi parca<span class="op">-</span>listenin<span class="op">-</span>listesi)
+      (<span class="cf">if</span> (<span class="op">&gt;</span> (kazanc parca<span class="op">-</span>listesi)
+         (kazanc sonuc))
+      (setf sonuc parca<span class="op">-</span>listesi)))
+    sonuc ))
+
+
+<span class="op">;;</span> karar agacina bunun ile soru sorabilirsin.
+(defun soru<span class="op">-</span>sor (satir agac)
+  (let (deger dal)
+    (<span class="cf">if</span> (atom agac) (<span class="cf">return</span><span class="op">-</span><span class="im">from</span> soru<span class="op">-</span>sor agac))
+    (setf deger (deger<span class="op">-</span>al (car agac) satir))
+    (setf dal (second (assoc deger (cdr agac))))
+    (soru<span class="op">-</span>sor satir dal)))
+
+<span class="op">;;</span>
+<span class="op">;;</span> Verilen basliga gore veriye bakar, basligin altindaki verinin
+<span class="op">;;</span> tekabul eden degerine gore guruplama yapip, veriyi parcalara ayirir
+(defun parcala (satirlar baslik)
+  (let ((gecici<span class="op">-</span>liste ())(e nil)(kimlik<span class="op">-</span>no nil)(bulunanlar<span class="op">-</span>sayisi <span class="dv">0</span>)(iteration <span class="dv">0</span>))
+    
+    (dolist (kimlik<span class="op">-</span>no satirlar)
+
+      (setf dongu <span class="dv">0</span>)
+      (setf bulunanlar<span class="op">-</span>sayisi <span class="dv">-1</span>)
+      
+      <span class="op">;;</span> eger konol degeri zaten mevcut ise, kimlik<span class="op">-</span>no<span class="st">&#39;yi bu alt</span>
+<span class="st">      ;; listeye ekle</span>
+<span class="st">      (dolist (su-anki-parca gecici-liste)</span>
+<span class="st">    ;; su anki parcanin ilk satirina bakmak yeterli, cunku</span>
+<span class="st">    ;; otekilerinde degeri ayni olacak</span>
+<span class="st">    (setf su-anki-ornek-deger (car su-anki-parca))</span>
+
+<span class="st">    ;; degerler ayni ise</span>
+<span class="st">    (if (equal su-anki-ornek-deger (deger-al baslik kimlik-no))</span>
+<span class="st">        (progn</span>
+<span class="st">          ;; demekki satir bu parcaya ait. ekle.</span>
+<span class="st">          (setf bulunanlar-sayisi dongu)</span>
+<span class="st">          (return)</span>
+<span class="st">          )</span>
+<span class="st">      )</span>
+<span class="st">    (incf dongu)</span>
+<span class="st">    </span>
+<span class="st">    ) ;; dolist sonu</span>
+
+<span class="st">      (if (&gt; bulunanlar-sayisi -1)</span>
+<span class="st">      (progn</span>
+<span class="st">        ;; buraya dikkat edin; bir liste icerigini degil, gostergecini</span>
+<span class="st">        ;; (pointer) degistiriyoruz. Nth&#39;</span><span class="kw">in</span> geri getirdigi, normal
+        <span class="op">;;</span> deger degil, gostergec degeri. Yeni listenin gostergecini bu deger
+        <span class="op">;;</span> uzerine yazinca, eski liste kaybolmus oluyor.
+        <span class="op">;;</span> Yeni liste bir oncekinin bir fazlasi aslinda..
+        (setf (nth bulunanlar<span class="op">-</span>sayisi gecici<span class="op">-</span>liste)
+          (append (nth bulunanlar<span class="op">-</span>sayisi gecici<span class="op">-</span>liste) (<span class="bu">list</span> kimlik<span class="op">-</span>no)))
+        ))
+
+      <span class="op">;;</span> yoksa, yeni bir alt<span class="op">-</span>liste baslat, ve gecici<span class="op">-</span>listeye ekle
+      (<span class="cf">if</span> (equal bulunanlar<span class="op">-</span>sayisi <span class="dv">-1</span>)
+      (progn
+        (setf gecici<span class="op">-</span>liste
+          (append gecici<span class="op">-</span>liste
+              (<span class="bu">list</span> (<span class="bu">list</span> (deger<span class="op">-</span>al baslik kimlik<span class="op">-</span>no) kimlik<span class="op">-</span>no))))
+        ))
+      
+      )
+
+    <span class="op">;;</span> baslik degerini listenin onune koy
+    (setf gecici<span class="op">-</span>liste (append (<span class="bu">list</span> baslik) gecici<span class="op">-</span>liste))
+    
+    gecici<span class="op">-</span>liste
+    ))
+                  
+
+(defun agac<span class="op">-</span>goster (agac <span class="op">&amp;</span>optional (derinlik <span class="dv">0</span>))
+  (tab derinlik)
+  (<span class="bu">format</span> t <span class="st">&quot;~A~%&quot;</span> (first agac))
+  (loop <span class="cf">for</span> alt<span class="op">-</span>agac <span class="kw">in</span> (cdr agac) do
+        (tab (<span class="op">+</span> derinlik <span class="dv">1</span>))
+        (<span class="bu">format</span> t <span class="st">&quot;= ~A&quot;</span> (first alt<span class="op">-</span>agac))
+        (<span class="cf">if</span> (atom (second alt<span class="op">-</span>agac))
+        (<span class="bu">format</span> t <span class="st">&quot; =&gt; ~A~%&quot;</span> (second alt<span class="op">-</span>agac))
+          (progn (terpri)(agac<span class="op">-</span>goster (second alt<span class="op">-</span>agac) (<span class="op">+</span> derinlik <span class="dv">5</span>))))))
+
+(defun tab (n)
+  (loop <span class="cf">for</span> i <span class="im">from</span> <span class="dv">1</span> to n do (<span class="bu">format</span> t <span class="st">&quot; &quot;</span>)))
+
+
+
+<span class="op">;;</span> bu satiri silme
+(egitim<span class="op">-</span>verilerini<span class="op">-</span>cevir <span class="op">*</span>egitim<span class="op">-</span>verisi<span class="op">*</span> <span class="op">*</span>basliklar<span class="op">*</span>)
+
+<span class="op">;;</span>
+<span class="op">;;</span> testler
+
+<span class="op">;;</span>
+<span class="op">;;</span> test degerlendiren fonksiyon
+(defun test (isim deyim sonuc)
+  (cond
+   ((equal deyim sonuc) t)
+   (t (<span class="bu">print</span> isim) (error <span class="st">&quot;HATA! Birim Testler Hata Yakaladi! &quot;</span>))  
+   ))
+
+<span class="op">;;</span> her sembolun bir ozellik listesi var
+(test <span class="st">&quot;ozellik listesi bos olan sembol&quot;</span> (get <span class="st">&#39;ornek-sembol &#39;</span>baharatlar) NIL)
+
+<span class="op">;;</span> her sembolun bir ozellik listesi var
+(setf (get <span class="st">&#39;ornek-sembol &#39;</span>baharatlar) <span class="st">&#39;tuz) </span>
+<span class="st">(test &quot;ornek sembole baska bir deger ekle&quot; (get &#39;</span>ornek<span class="op">-</span>sembol <span class="st">&#39;baharatlar) &#39;</span>tuz)
+
+<span class="op">;;</span> her sembolun bir ozellik listesi var
+(setf (get <span class="st">&#39;ornek-sembol &#39;</span>tatlilar) <span class="st">&#39;baklava) </span>
+<span class="st">(test &quot;degisik bir sembole birsey ekle&quot;</span>
+<span class="st">      (get &#39;</span>ornek<span class="op">-</span>sembol <span class="st">&#39;tatlilar) &#39;</span>baklava)
+
+<span class="op">;;</span> baslik degerini eriselim
+(test <span class="st">&quot;tablo dogru kuruldu&quot;</span> (hedef<span class="op">-</span>baslik<span class="op">-</span>degeri <span class="st">&#39;d1) &#39;</span>EVET)
+
+<span class="op">;;</span> yemekturu uzerinde parcalara ayiralim
+(setf beklenen<span class="op">-</span>parcalar <span class="st">&#39;(YEMEKTURU (FRANSIZ D1 D5)</span>
+<span class="st">                    (TAYLAND D2 D4 D8 D11)</span>
+<span class="st">                    (KEBAP D3 D7 D9 D12)</span>
+<span class="st">                    (ITALYAN D6 D10)))</span>
+<span class="st">(test &quot;parcala (yemekturu)&quot;</span>
+<span class="st">      (parcala (veriyi-satirkimligine-cevir *egitim-verisi*) &#39;</span>YEMEKTURU)
+      beklenen<span class="op">-</span>parcalar)
+
+<span class="op">;;</span> musteriler uzerinde parcalara ayiralim
+(setf beklenen<span class="op">-</span>parcalar <span class="st">&#39;(MUSTERILER (BIRAZ D1 D3 D6 D8)</span>
+<span class="st">                     (DOLU D2 D4 D5 D9 D10 D12)</span>
+<span class="st">                     (HIC D7 D11)))</span>
+<span class="st">(test &quot;musteriler uzerinden parcala&quot;</span>
+<span class="st">     (parcala (veriyi-satirkimligine-cevir *egitim-verisi*) &#39;</span>musteriler)
+     beklenen<span class="op">-</span>parcalar)
+
+<span class="op">;;</span> bilgi icerigi
+(setf <span class="op">*</span>toplam<span class="op">-</span>veri<span class="op">-</span>sayisi<span class="op">*</span> <span class="dv">12</span>)
+(test <span class="st">&quot;bilgi icerigi&quot;</span> (parca<span class="op">-</span>bilgi<span class="op">-</span>icerigi
+              (veriyi<span class="op">-</span>satirkimligine<span class="op">-</span>cevir <span class="op">*</span>egitim<span class="op">-</span>verisi<span class="op">*</span>))
+     <span class="dv">1</span>)
+
+<span class="op">;;</span> eniyi parcayi bul, MUSTERILER basliginin secilmesi lazim.
+(setf yemekturu<span class="op">-</span>parcalari
+     <span class="st">&#39;(TYPE</span>
+<span class="st">    (FRANSIZ D1 D5)</span>
+<span class="st">    (TAYLAND D2 D4 D8 D11)</span>
+<span class="st">    (KEBAP D3 D7 D9 D12)</span>
+<span class="st">    (ITALYAN D6 D10)))</span>
+<span class="st">(setf musteri-parcalari</span>
+<span class="st">     &#39;</span>(patrons
+    (BIRAZ D1 D3 D6 D8)
+    (TAYLAND D2 D4 D5 D9 D10 D12)
+    (HIC D7 D11)))
+(setf ornek<span class="op">-</span>girdi (<span class="bu">list</span> yemekturu<span class="op">-</span>parcalari musteri<span class="op">-</span>parcalari))
+(test <span class="st">&quot;parca-sec&quot;</span>
+     (parca<span class="op">-</span>sec ornek<span class="op">-</span>girdi) musteri<span class="op">-</span>parcalari)
+
+<span class="op">;;</span> eniyi parcalamayi sec, MUSTERILER basliginin secilmesi lazim
+(setf girdi <span class="st">&#39;(D1 D3))</span>
+<span class="st">(test &quot;ayni cevap 1&quot; (ayni-cevap? girdi) t)</span>
+
+<span class="st">(setf girdi &#39;</span>(D2 D4))
+(test <span class="st">&quot;ayni cevap 2&quot;</span> (ayni<span class="op">-</span>cevap? girdi) nil)
+
+<span class="op">;;</span> ana veriyi, kimlik no<span class="st">&#39;lara cevir</span>
+<span class="st">(test &quot;kimlik no ya ceviri testi&quot; (veriyi-satirkimligine-cevir *egitim-verisi*)</span>
+<span class="st">     &#39;</span>(D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12))
+
+(setf agac (karar<span class="op">-</span>agaci<span class="op">-</span>egit (veriyi<span class="op">-</span>satirkimligine<span class="op">-</span>cevir <span class="op">*</span>egitim<span class="op">-</span>verisi<span class="op">*</span>)
+                 <span class="st">&#39;(BASKA</span>
+<span class="st">                   BAR</span>
+<span class="st">                   HAFTASONU</span>
+<span class="st">                   ACMIYIZ</span>
+<span class="st">                   MUSTERILER</span>
+<span class="st">                   FIYAT</span>
+<span class="st">                   YAGMUR</span>
+<span class="st">                   RESERVASYON</span>
+<span class="st">                   YEMEKTURU</span>
+<span class="st">                   BEKLEMESURESI)                </span>
+<span class="st">                 ))</span>
+
+<span class="st">(agac-goster agac)</span>
+
+<span class="st">;; egitim verisinden bir satir kullanip soru sor</span>
+<span class="st">(test &quot;soru-sor 1&quot; (soru-sor &#39;</span>d6 agac) <span class="st">&#39;EVET)</span>
+<span class="st">(test &quot;soru-sor 2&quot; (soru-sor &#39;</span>d2 agac) <span class="st">&#39;HAYIR)</span>
+<span class="st">(test &quot;soru-sor 3&quot; (soru-sor &#39;</span>d3 agac) <span class="st">&#39;EVET)</span>
+<span class="st">(test &quot;soru-sor 4&quot; (soru-sor &#39;</span>d4 agac) <span class="st">&#39;EVET)</span>
+<span class="st">(test &quot;soru-sor 5&quot; (soru-sor &#39;</span>d5 agac) <span class="st">&#39;HAYIR)</span>
+<span class="st">(test &quot;soru-sor 6&quot; (soru-sor &#39;</span>d6 agac) <span class="st">&#39;EVET)</span>
+<span class="st">(test &quot;soru-sor 7&quot; (soru-sor &#39;</span>d7 agac) <span class="st">&#39;HAYIR)</span>
+<span class="st">(test &quot;soru-sor 8&quot; (soru-sor &#39;</span>d8 agac) <span class="st">&#39;EVET)</span>
+<span class="st">(test &quot;soru-sor 9&quot; (soru-sor &#39;</span>d9 agac) <span class="st">&#39;HAYIR)</span>
+<span class="st">(test &quot;soru-sor 10&quot; (soru-sor &#39;</span>d10 agac) <span class="st">&#39;HAYIR)</span>
+<span class="st">(test &quot;soru-sor 11&quot; (soru-sor &#39;</span>d11 agac) <span class="st">&#39;HAYIR)</span>
+<span class="st">(test &quot;soru-sor 12&quot; (soru-sor &#39;</span>d12 agac) <span class="st">&#39;EVET)</span>
+
+<span class="st">(print &quot;Tamam. Birim Testler Isledi.&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">!</span>clisp id3.lisp</code></pre></div>
+<pre><code>MUSTERILER
+ = BIRAZ =&gt; EVET
+ = DOLU
+     ACMIYIZ
+      = EVET
+          YEMEKTURU
+           = TAYLAND
+               HAFTASONU
+                = HAYIR =&gt; HAYIR
+                = EVET =&gt; EVET
+           = ITALYAN =&gt; HAYIR
+           = KEBAP =&gt; EVET
+      = HAYIR =&gt; HAYIR
+ = HIC =&gt; HAYIR
+
+&quot;Tamam. Birim Testler Isledi.&quot; </code></pre>
+<p>Kaynaklar</p>
+<p>[1] Harrington, P., <em>Machine Learning In Action</em></p>
+</body>
+</html>

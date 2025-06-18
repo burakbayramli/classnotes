@@ -1,0 +1,771 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="sigma-bazlı-kalman-filtreleri-unscented-kalman-filters--ukf-">Sigma Bazlı Kalman Filtreleri (Unscented Kalman Filters -UKF-)</h1>
+<p><em>Kalman Filtereleri</em> yazısında dış ölçümlerin bir iç konumu anlamak için nasıl kullanıldığını gördük, fakat KF'ler gayrı lineerliği iyi idare edemiyorlar. Mesela havaya atılan bir topu gürültülü ölçümlerden takip ettiğimizi düşünelim, top çıkıp inecek, değişim (state transition) / hareket parabol şeklinde (parabol gayrı lineer). Bu basit hareket bile KF ile takip edilemiyor. Gayri lineerlik ölçüm sırasında da ortaya çıkabilir, mesela bir objenin uzaklığını radardan alıyorsak ölçüm bize yerden yükseklik ve eğim olarak gelebilir, bu ölçümleri direk mesafeye çevirmek için karelerin toplamının karekökü gerekir ve bu yine bir gayrı lineerliği probleme sokmuş olur.</p>
+<p>Çözüm için farklı yaklaşımlar var; genişletilmiş KF (EKF) lokal bir nokta etrafında Taylor açılımı kullanarak gayrı lineerliği yakalamaya uğraşıyor. Fakat hem performans hem doğruluk açısından daha verimli bir yaklaşım sigma bazlı Kalman filtreleri (UKF).</p>
+<p>UKF'in yaptığı nedir? Normal KF'in işleyişi sırasında geçiş ya da gözlem fonsiyonlarının içinden Gaussian'lar geçirdiği söylenebilir. Gaussian'lar (yani onların <span class="math inline">\(\mu,\sigma\)</span> parametreleri) lineerlige tabi olduklarında bozulmazlar, iki Guassian toplamı yine bir Gaussian'dır, vs. Fakat gayrı lineer fonksiyonlar işleri bozar.</p>
+<p>UKF'in püf noktası o an eldeki Gaussian'ın standart sapma <span class="math inline">\(\sigma\)</span>'sına oranlı seçilmiş birkaç noktanın değişim yapan fonksiyona verilmesi; normal KF'i o zaman sadece merkez nokta <span class="math inline">\(\mu\)</span>'yu işlemden geçiriyor olarak görebiliriz, fakat UKF ile seçenekleri arttırıyoruz [1]. Bu noktalar seçildiğinde onları değişim fonksiyonuna tabi tutuyoruz, böylece ele geçen sonuç Gaussian'ı daha gerçeğe yakın oluyor. UKF yaklaşımında ayrıca seçilen her nokta için bir ağırlık gerekiyor, ve bu ağırlıklar da önceden kararlaştırılır, bazı uygulamalarda merkez noktaya daha fazla ağırlık vermek istenebilir, diğerleri dış noktaları tercih edebilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> __future__ <span class="im">import</span> (absolute_import, division, print_function,
+                        unicode_literals)
+
+<span class="im">import</span> math, util, scipy.linalg <span class="im">as</span> linalg, <span class="bu">filter</span>
+<span class="im">from</span> numpy <span class="im">import</span> eye, zeros, dot, isscalar, outer
+<span class="im">from</span> scipy.linalg <span class="im">import</span> inv, cholesky
+<span class="im">from</span> numpy.random <span class="im">import</span> randn
+<span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal
+
+ax<span class="op">=</span>plt.figure().gca()
+
+x <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">5</span>])
+P <span class="op">=</span> np.array([[<span class="dv">4</span>, <span class="fl">-2.2</span>], [<span class="op">-</span><span class="fl">2.2</span>, <span class="dv">3</span>]])
+
+util.plot_covariance_ellipse(x, P, facecolor<span class="op">=</span><span class="st">&#39;b&#39;</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, variance<span class="op">=</span><span class="dv">9</span>,plt<span class="op">=</span>plt)
+sigmas <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(<span class="dv">2</span>, alpha<span class="op">=</span>.<span class="dv">5</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=</span><span class="fl">0.</span>)
+
+S <span class="op">=</span> sigmas.sigma_points(x<span class="op">=</span>x, P<span class="op">=</span>P)
+plt.scatter(S[:,<span class="dv">0</span>], S[:,<span class="dv">1</span>], c<span class="op">=</span><span class="st">&#39;k&#39;</span>, s<span class="op">=</span><span class="dv">80</span>)
+
+x <span class="op">=</span> np.array([<span class="dv">15</span>, <span class="dv">5</span>])
+P <span class="op">=</span> np.array([[<span class="dv">3</span>, <span class="fl">1.2</span>],[<span class="fl">1.2</span>, <span class="dv">6</span>]])
+util.plot_covariance_ellipse(x, P, facecolor<span class="op">=</span><span class="st">&#39;g&#39;</span>, variance<span class="op">=</span><span class="dv">9</span>, alpha<span class="op">=</span><span class="fl">0.3</span>,plt<span class="op">=</span>plt)
+
+ax.add_artist(util.arrow(S[<span class="dv">0</span>,<span class="dv">0</span>], S[<span class="dv">0</span>,<span class="dv">1</span>], <span class="dv">11</span>, <span class="fl">4.1</span>, <span class="fl">0.6</span>))
+ax.add_artist(util.arrow(S[<span class="dv">1</span>,<span class="dv">0</span>], S[<span class="dv">1</span>,<span class="dv">1</span>], <span class="dv">13</span>, <span class="fl">7.7</span>, <span class="fl">0.6</span>))
+ax.add_artist(util.arrow(S[<span class="dv">2</span>,<span class="dv">0</span>], S[<span class="dv">2</span>,<span class="dv">1</span>], <span class="fl">16.3</span>, <span class="fl">0.93</span>, <span class="fl">0.6</span>))
+ax.add_artist(util.arrow(S[<span class="dv">3</span>,<span class="dv">0</span>], S[<span class="dv">3</span>,<span class="dv">1</span>], <span class="fl">16.7</span>, <span class="fl">10.8</span>, <span class="fl">0.6</span>))
+ax.add_artist(util.arrow(S[<span class="dv">4</span>,<span class="dv">0</span>], S[<span class="dv">4</span>,<span class="dv">1</span>], <span class="fl">17.7</span>, <span class="fl">5.6</span>, <span class="fl">0.6</span>))
+
+ax.axes.get_xaxis().set_visible(<span class="va">False</span>)
+ax.axes.get_yaxis().set_visible(<span class="va">False</span>)
+
+plt.savefig(<span class="st">&#39;tser_ukf_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ukf_02.png" />
+
+</div>
+<p>&quot;Sigma bazlı transform edilmiş'' (unscented transform) yeni Gaussian hesabı şöyle olur,</p>
+<p><span class="math display">\[ \mu = \sum_i w_i^m y_i \]</span></p>
+<p><span class="math display">\[ \Sigma = \sum_i w_i^c (y_i-\mu)(y_i-\mu)^T \]</span></p>
+<p>Dikkat, bu yaptığımız parçacık filtrelerindeki gibi örneklemek, ya da her değişik hipotezi temsil eden &quot;parçacıklar'' yaratmak değil, bir Gaussian'ın hep belli yerlerindeki belli noktalara bakmak. Bu seçim tamamen <em>deterministik</em>, hiçbir rasgelelik yok. Seçim nasıl yapılır? Her uygulama için tasarımcı buna karar verir, altta bazı örnekler görülüyor,</p>
+<div class="figure">
+<img src="tser_ukf_03.png" />
+
+</div>
+<p>Fakat endüstri sigmayı ve ağırlıklarını seçmek için 2005'ten itibaren [2]'deki yöntemi kabul etmiş görünüyor.</p>
+<p>Trasform Örneği</p>
+<p>Alttaki gibi bir gayrı-lineer fonksiyon</p>
+<p><span class="math display">\[ 
+\left\{ \begin{array}{ll}
+x = x + y \\
+y = 0.1 x^2 + y^2
+\end{array} \right.
+\]</span></p>
+<p>olsun, bu fonksiyona alttaki çok boyutlu Gaussian'dan örneklenmiş noktaları geçeceğiz,</p>
+<p><span class="math display">\[ 
+\mu = \left[\begin{array}{r} 0 \\ 0 \end{array}\right],
+\quad 
+\Sigma = \left[\begin{array}{rr} 32 &amp; 15 \\ 15 &amp; 40 \end{array}\right]
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> f_nonlinear_xy(x, y):
+    <span class="cf">return</span> np.array([x <span class="op">+</span> y, <span class="fl">.1</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">*</span>y])
+
+mean <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">0</span>)
+p <span class="op">=</span> np.array([[<span class="dv">32</span>, <span class="dv">15</span>], [<span class="fl">15.</span>, <span class="fl">40.</span>]])
+<span class="co"># Compute linearized mean</span>
+mean_fx <span class="op">=</span> f_nonlinear_xy(<span class="op">*</span>mean)
+
+<span class="co">#generate random points</span>
+xs, ys <span class="op">=</span> multivariate_normal.rvs(mean<span class="op">=</span>mean, cov<span class="op">=</span>p, size<span class="op">=</span><span class="dv">2000</span>).T
+util.plot_monte_carlo_mean(xs, ys, f_nonlinear_xy, mean_fx, <span class="st">&#39;Lineerize Edilmis Ortalama&#39;</span>)<span class="op">;</span>
+plt.savefig(<span class="st">&#39;tser_ukf_13.png&#39;</span>)</code></pre></div>
+<pre><code>Ortalamalardaki fark x=-0.471, y=43.237</code></pre>
+<div class="figure">
+<img src="tser_ukf_13.png" />
+
+</div>
+<p>Görülüyor ki eğer EKF ile olduğu gibi bir lineerizasyon yapılsa ortaya çok büyük bir hata çıkacak. Tekrar vurgulamak gerekirse figürde görülen &quot;lineerize edilmiş ortalama'' Gaussian <span class="math inline">\(\mu\)</span>'sunun gayrı lineer fonksiyona geçilmiş hali, ki EKF bu şekilde işlem yapar, diğeri Gaussian'dan alınan noktaların gayrı-lineer fonksiyona geçildikten sonra alınan ortalama.</p>
+<p>Fakat sigma bazlı transform kullanırsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy.random <span class="im">import</span> multivariate_normal
+<span class="im">import</span> util
+
+<span class="co">#initial mean and covariance</span>
+mean <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">0</span>)
+p <span class="op">=</span> np.array([[<span class="fl">32.</span>, <span class="dv">15</span>], [<span class="fl">15.</span>, <span class="fl">40.</span>]])
+
+<span class="co"># create sigma points - we will learn about this later</span>
+points <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(n<span class="op">=</span><span class="dv">2</span>, alpha<span class="op">=</span>.<span class="dv">3</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=</span>.<span class="dv">1</span>)
+Wm, Wc <span class="op">=</span> points.weights()
+sigmas <span class="op">=</span> points.sigma_points(mean, p)
+
+<span class="co">### gayri-lineer fonksiyondan gecir</span>
+sigmas_f <span class="op">=</span> np.empty((<span class="dv">5</span>, <span class="dv">2</span>))
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):
+    sigmas_f[i] <span class="op">=</span> f_nonlinear_xy(sigmas[i, <span class="dv">0</span>], sigmas[i ,<span class="dv">1</span>])
+
+<span class="co">### sigma bazli transform ile yeni ortalama ve kovaryansi hesapla</span>
+ukf_mean, ukf_cov <span class="op">=</span> <span class="bu">filter</span>.unscented_transform(sigmas_f, Wm, Wc)
+
+<span class="co"># rasgele noktalar uret</span>
+np.random.seed(<span class="dv">100</span>)
+xs, ys <span class="op">=</span> multivariate_normal(mean<span class="op">=</span>mean, cov<span class="op">=</span>p, size<span class="op">=</span><span class="dv">5000</span>).T
+util.plot_monte_carlo_mean(xs, ys, f_nonlinear_xy, ukf_mean, <span class="st">&#39;Sigma Bazli Ortalama&#39;</span>)
+plt.xlim(<span class="op">-</span><span class="dv">30</span>, <span class="dv">30</span>)<span class="op">;</span> plt.ylim(<span class="dv">0</span>, <span class="dv">90</span>)
+plt.subplot(<span class="dv">121</span>)
+plt.scatter(sigmas[:,<span class="dv">0</span>], sigmas[:,<span class="dv">1</span>], c<span class="op">=</span><span class="st">&#39;r&#39;</span>, s<span class="op">=</span><span class="dv">30</span>)<span class="op">;</span>
+plt.savefig(<span class="st">&#39;tser_ukf_12.png&#39;</span>)</code></pre></div>
+<pre><code>Ortalamalardaki fark x=-0.097, y=0.549</code></pre>
+<div class="figure">
+<img src="tser_ukf_12.png" />
+
+</div>
+<p>Bu sonuç bana müthiş geliyor; sadece 5 nokta kullanarak ortalamaya çok yakın bir sonucu hesaplayabildik, ayrıca bunu gayrı lineerliğin ne olduğundan tamamen bağımsız olarak yaptık; eğer sigma noktalarını üreten koda bakarsak göreceğiz ki bu kod gayrı-lineer fonksiyondan habersiz.</p>
+<p>Filtre</p>
+<p>UKF formüllerine bakalım. Geçiş ve gözlemin <span class="math inline">\(f,h\)</span> olduğunu düşünelim, matris formunda <span class="math inline">\(F,H\)</span>. O anda elde olan <span class="math inline">\(\mu,\Sigma\)</span>'yı alıp, önceden seçilmiş sigma noktaları üzerinden bir <span class="math inline">\(X\)</span> elde ediyoruz. Bir sonraki zaman dilimine</p>
+<p><span class="math display">\[ Y = f(X) \]</span></p>
+<p>ile geçiyoruz. Şimdi sigma bazlı transform ile tahmini ortalama kovaryans hesaplarız,</p>
+<p><span class="math display">\[ \bar{\mu} = \sum w^m Y \]</span></p>
+<p><span class="math display">\[ \bar{\Sigma} = \sum w^c (Y-\hat{\mu})(Y-\hat{\mu})^T + Q \]</span></p>
+<p>KF ile geçiş ortalama için <span class="math inline">\(\bar{x} = Fx\)</span> ve kovaryans <span class="math inline">\(\bar{P} = FPF^T + Q\)</span> ile olurdu.</p>
+<p>Güncelleme adımında eldeki sigma noktalarını bir tahmine çeviriyoruz,</p>
+<p><span class="math display">\[ Z = h(Y) \]</span></p>
+<p>Sonra bu noktaların ortalama ve kovaryansını sigma bazlı transformu kullanarak hesaplayabiliriz,</p>
+<p><span class="math display">\[ \mu_z = \sum w^m Z \]</span></p>
+<p><span class="math display">\[ P_z = \sum w^c (Z-\bar{\mu}) (Z-\bar{\mu})^T + R\]</span></p>
+<p>Şimdi Kalman kazancı (gain) ve artıkları hesaplanabilir. Artıklar basit</p>
+<p><span class="math display">\[ y = z - \mu_z\]</span></p>
+<p>Kazanç için önce konum ve ölçümlerin çapraz kovaryansını hesaplarız,</p>
+<p><span class="math display">\[ P_{xz} = \sum w^c (X-\mu)(Z-\mu_z)^T    \]</span></p>
+<p>sonra kazancı hesaplarız,</p>
+<p><span class="math display">\[ K = P_{xz}P_z^{-1} \]</span></p>
+<p>Üstteki matris tersi işlemi bir nevi oran hesabı gibi görebiliriz, o zaman Kalman kazancı</p>
+<p><span class="math display">\[ 
+K \approx \frac{P_{xz}}{P_z^{-1}} \approx 
+\frac{\textrm{mevcut konuma inanç}}{\textrm{ölçüme olan inanç}}
+\]</span></p>
+<p>oranından ibarettir. Nihayet yeni kestirme hesabı artık ve kazanç kullanarak hesaplanabilir,</p>
+<p><span class="math display">\[ x = \bar{x} + Ky \]</span></p>
+<p>yeni kovaryans</p>
+<p><span class="math display">\[ P = \bar{P} - KP_zK^T \]</span></p>
+<p>Filtrenin iç kodlaması hakkında diğer matematiksel detaylar için [1, sf. 382].</p>
+<p>Dikkat çekilmesi gereken püf nokta KF'te olduğu gibi ölçümleri üretenin artık bir matris olmadığıdır. Normal Kalman filtreleri ile elde bir ölçüm &quot;fonksiyonu'' vardır fakat bu fonksiyonu bir <span class="math inline">\(H\)</span> matrisi olarak temsil etmek zorundayız. Efendim boyutları düzgün olmalı, ki konum <span class="math inline">\(x\)</span>'i çarpabilsin, vs. UKF ile bir <span class="math inline">\(h\)</span> <em>fonksiyonu</em> var, bu fonksiyonlar ek işlemler yapılmadan önce verinin kendisini transforme ediyorlar, ve &quot;yeni'' veri üzerinde ek filtreleme işlemleri yapıyoruz, mesela Kalman kazancını bu transform edilmiş veri üzerinden hesaplıyoruz. Kıyasla KF ile <span class="math inline">\(H\)</span> matrisi matris olarak direk kazanç hesabında kullanılıyor. Ardından UKF ile veriye öyle noktalarda (sigma noktaları) bakıyoruz ki <span class="math inline">\(h\)</span> ne kadar gayrı-lineer olursa olsun onun temel özelliklerini yakalayabilmiş oluyoruz. Bu geçiş fonksiyonu <span class="math inline">\(f\)</span> için de geçerli tabii, artık onun da bir matris olması gerekmiyor. Ama hala <span class="math inline">\(F,H\)</span> matrislerini tasarlayıp onları <span class="math inline">\(f,h\)</span> fonksiyonları içinde <span class="math inline">\(x\)</span>'i çarpmak için kullanabiliriz tabii, ama bu şart değil.</p>
+<p>Örnek</p>
+<p>Bir KF tasarlamak için <span class="math inline">\(x,F,H,R\)</span> matrislerinin ne olduğunu kararlaştırmak gerekiyor demiştik, bu durum daha önce KF yazısında işlendi. Konum bilgisi nedir, geçiş nedir, ölçüm nedir? Hareket halindeki bir objeyi takip ettiğimizi düşünelim, konum</p>
+<p><span class="math display">\[ x=\left[\begin{array}{cccc} x&amp;\dot{x}&amp;y&amp;\dot{y} \end{array}\right]^T \]</span></p>
+<p>olabilir. Konum geçişi</p>
+<p><span class="math display">\[ F = 
+\left[\begin{array}{rrrr}
+1 &amp; \Delta t &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; \Delta t \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{array}\right]
+\]</span></p>
+<p>Üstteki denklemle bir Newton formülünü kodlamış oluyoruz,</p>
+<p><span class="math display">\[ x_k = x_{k-1} + \dot{x}_{k-1}\Delta t \]</span></p>
+<p>Algılayıcılar hareketli aracın yerini bildiriyor ama hızını bildiremiyor, o zaman</p>
+<p><span class="math display">\[ H = \left[\begin{array}{rrrr}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0 
+\end{array}\right]\]</span></p>
+<p>Diyelim ki algılayıcının pozisyonu belirleme hatası hem <span class="math inline">\(x\)</span> hem <span class="math inline">\(y\)</span> kordinatları için <span class="math inline">\(1\sigma = 0.3\)</span> metre, bu bize alttaki ölçüm gürültü matrisini veriyor,</p>
+<p><span class="math display">\[ R = \left[\begin{array}{cc}
+0.3^2  &amp; 0 \\ 0 &amp; 0.3^2
+\end{array}\right]\]</span></p>
+<p>Konum geçişinde de gürültü var, o da</p>
+<p><span class="math display">\[ Q = \left[\begin{array}{cc}
+\frac{1}{4} \Delta t^4 &amp; \frac{1}{2} \Delta t^3 \\
+\frac{1}{2} \Delta t^3 &amp; \Delta t^2 
+\end{array}\right] \sigma^2  \]</span></p>
+<p>Tabii biz simülasyon amaçlı veri üretirken de üstteki matrisi kullanacağız.</p>
+<p>Kodlar altta,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> __future__ <span class="im">import</span> (absolute_import, division, print_function,
+                        unicode_literals)
+
+<span class="im">import</span> math, util, scipy.linalg <span class="im">as</span> linalg
+<span class="im">from</span> numpy <span class="im">import</span> eye, zeros, dot, isscalar, outer
+<span class="im">from</span> scipy.linalg <span class="im">import</span> inv, cholesky
+<span class="im">from</span> numpy.random <span class="im">import</span> randn
+<span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> dot3(A,B,C):
+    <span class="cf">return</span> dot(A, dot(B,C))
+
+<span class="kw">def</span> logpdf(x, mean, cov):
+    flat_mean <span class="op">=</span> np.asarray(mean).flatten()
+    flat_x <span class="op">=</span> np.asarray(x).flatten()
+    <span class="cf">return</span> multivariate_normal.logpdf(flat_x, flat_mean, cov, <span class="va">True</span>)
+
+<span class="kw">def</span> unscented_transform(sigmas, Wm, Wc, noise_cov<span class="op">=</span><span class="va">None</span>,
+                        mean_fn<span class="op">=</span><span class="va">None</span>, residual_fn<span class="op">=</span><span class="va">None</span>):
+    kmax, n <span class="op">=</span> sigmas.shape
+
+    <span class="cf">if</span> mean_fn <span class="kw">is</span> <span class="va">None</span>:
+        x <span class="op">=</span> np.dot(Wm, sigmas)    <span class="co"># dot = \Sigma^n_1 (W[k]*Xi[k])</span>
+    <span class="cf">else</span>:
+        x <span class="op">=</span> mean_fn(sigmas, Wm)
+
+    <span class="cf">if</span> residual_fn <span class="kw">is</span> <span class="va">None</span>:
+        y <span class="op">=</span> sigmas <span class="op">-</span> x[np.newaxis,:]
+        P <span class="op">=</span> y.T.dot(np.diag(Wc)).dot(y)
+    <span class="cf">else</span>:
+        P <span class="op">=</span> np.zeros((n, n))
+        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(kmax):
+            y <span class="op">=</span> residual_fn(sigmas[k], x)
+            P <span class="op">+=</span> Wc[k] <span class="op">*</span> np.outer(y, y)
+
+    <span class="cf">if</span> noise_cov <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
+        P <span class="op">+=</span> noise_cov
+
+    <span class="cf">return</span> (x, P)
+
+<span class="kw">def</span> Q_discrete_white_noise(dim, dt<span class="op">=</span><span class="fl">1.</span>, var<span class="op">=</span><span class="fl">1.</span>):
+    <span class="cf">assert</span> dim <span class="op">==</span> <span class="dv">2</span> <span class="kw">or</span> dim <span class="op">==</span> <span class="dv">3</span>
+    <span class="cf">if</span> dim <span class="op">==</span> <span class="dv">2</span>:
+        Q <span class="op">=</span> np.array([[.<span class="dv">25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>],
+                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>]], dtype<span class="op">=</span><span class="bu">float</span>)
+    <span class="cf">else</span>:
+        Q <span class="op">=</span> np.array([[.<span class="dv">25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>],
+                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>,       dt],
+                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>,       dt,        <span class="dv">1</span>]], dtype<span class="op">=</span><span class="bu">float</span>)
+
+    <span class="cf">return</span> Q <span class="op">*</span> var
+
+<span class="kw">class</span> MerweScaledSigmaPoints(<span class="bu">object</span>):
+
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n, alpha, beta, kappa, sqrt_method<span class="op">=</span><span class="va">None</span>, subtract<span class="op">=</span><span class="va">None</span>):
+
+        <span class="va">self</span>.n <span class="op">=</span> n
+        <span class="va">self</span>.alpha <span class="op">=</span> alpha
+        <span class="va">self</span>.beta <span class="op">=</span> beta
+        <span class="va">self</span>.kappa <span class="op">=</span> kappa
+        <span class="cf">if</span> subtract <span class="kw">is</span> <span class="va">None</span>:
+            <span class="va">self</span>.subtract<span class="op">=</span> np.subtract
+        <span class="cf">else</span>:
+            <span class="va">self</span>.subtract <span class="op">=</span> subtract
+
+    <span class="kw">def</span> num_sigmas(<span class="va">self</span>):
+        <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span><span class="va">self</span>.n <span class="op">+</span> <span class="dv">1</span>
+
+    <span class="kw">def</span> sigma_points(<span class="va">self</span>, x, P):
+        <span class="cf">assert</span> <span class="va">self</span>.n <span class="op">==</span> np.size(x), <span class="op">\</span>
+            <span class="co">&quot;expected size {}, but size is {}&quot;</span>.<span class="bu">format</span>(<span class="va">self</span>.n, np.size(x))
+
+        n <span class="op">=</span> <span class="va">self</span>.n
+        <span class="cf">if</span> np.isscalar(x): x <span class="op">=</span> np.asarray([x])
+        <span class="cf">if</span>  np.isscalar(P): P <span class="op">=</span> np.eye(n)<span class="op">*</span>P
+        <span class="cf">else</span>: P <span class="op">=</span> np.asarray(P)
+
+        lambda_ <span class="op">=</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (n <span class="op">+</span> <span class="va">self</span>.kappa) <span class="op">-</span> n
+        U <span class="op">=</span> cholesky((lambda_ <span class="op">+</span> n)<span class="op">*</span>P)
+
+        sigmas <span class="op">=</span> np.zeros((<span class="dv">2</span><span class="op">*</span>n<span class="op">+</span><span class="dv">1</span>, n))
+        sigmas[<span class="dv">0</span>] <span class="op">=</span> x
+        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n):
+            sigmas[k<span class="op">+</span><span class="dv">1</span>]   <span class="op">=</span> <span class="va">self</span>.subtract(x, <span class="op">-</span>U[k])
+            sigmas[n<span class="op">+</span>k<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> <span class="va">self</span>.subtract(x, U[k])
+
+        <span class="cf">return</span> sigmas
+
+
+    <span class="kw">def</span> weights(<span class="va">self</span>):
+        n <span class="op">=</span> <span class="va">self</span>.n
+        lambda_ <span class="op">=</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (n <span class="op">+</span><span class="va">self</span>.kappa) <span class="op">-</span> n
+
+        c <span class="op">=</span> <span class="fl">.5</span> <span class="op">/</span> (n <span class="op">+</span> lambda_)
+        Wc <span class="op">=</span> np.full(<span class="dv">2</span><span class="op">*</span>n <span class="op">+</span> <span class="dv">1</span>, c)
+        Wm <span class="op">=</span> np.full(<span class="dv">2</span><span class="op">*</span>n <span class="op">+</span> <span class="dv">1</span>, c)
+        Wc[<span class="dv">0</span>] <span class="op">=</span> lambda_ <span class="op">/</span> (n <span class="op">+</span> lambda_) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="va">self</span>.beta)
+        Wm[<span class="dv">0</span>] <span class="op">=</span> lambda_ <span class="op">/</span> (n <span class="op">+</span> lambda_)
+        <span class="cf">return</span> Wm, Wc
+
+<span class="kw">class</span> UKF(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim_x, dim_z, hx, fx, points,
+                 x_mean_fn<span class="op">=</span><span class="va">None</span>, z_mean_fn<span class="op">=</span><span class="va">None</span>,
+                 residual_x<span class="op">=</span><span class="va">None</span>,
+                 residual_z<span class="op">=</span><span class="va">None</span>):
+
+        <span class="va">self</span>.Q <span class="op">=</span> eye(dim_x)
+        <span class="va">self</span>.R <span class="op">=</span> eye(dim_z)
+        <span class="va">self</span>.x <span class="op">=</span> zeros(dim_x)
+        <span class="va">self</span>.P <span class="op">=</span> eye(dim_x)
+        <span class="va">self</span>._dim_x <span class="op">=</span> dim_x
+        <span class="va">self</span>._dim_z <span class="op">=</span> dim_z
+        <span class="va">self</span>.points_fn <span class="op">=</span> points
+        <span class="va">self</span>._num_sigmas <span class="op">=</span> points.num_sigmas()
+        <span class="va">self</span>.hx <span class="op">=</span> hx
+        <span class="va">self</span>.fx <span class="op">=</span> fx
+        <span class="va">self</span>.x_mean <span class="op">=</span> x_mean_fn
+        <span class="va">self</span>.z_mean <span class="op">=</span> z_mean_fn
+        <span class="va">self</span>.log_likelihood <span class="op">=</span> <span class="fl">0.0</span>
+        <span class="va">self</span>.Wm, <span class="va">self</span>.Wc <span class="op">=</span> <span class="va">self</span>.points_fn.weights()
+
+        <span class="cf">if</span> residual_x <span class="kw">is</span> <span class="va">None</span>:
+            <span class="va">self</span>.residual_x <span class="op">=</span> np.subtract
+        <span class="cf">else</span>:
+            <span class="va">self</span>.residual_x <span class="op">=</span> residual_x
+
+        <span class="cf">if</span> residual_z <span class="kw">is</span> <span class="va">None</span>:
+            <span class="va">self</span>.residual_z <span class="op">=</span> np.subtract
+        <span class="cf">else</span>:
+            <span class="va">self</span>.residual_z <span class="op">=</span> residual_z
+
+        <span class="va">self</span>.sigmas_f <span class="op">=</span> zeros((<span class="va">self</span>._num_sigmas, <span class="va">self</span>._dim_x))
+        <span class="va">self</span>.sigmas_h <span class="op">=</span> zeros((<span class="va">self</span>._num_sigmas, <span class="va">self</span>._dim_z))
+
+
+    <span class="kw">def</span> predict(<span class="va">self</span>, dt):
+        sigmas <span class="op">=</span> <span class="va">self</span>.points_fn.sigma_points(<span class="va">self</span>.x, <span class="va">self</span>.P)        
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):
+            <span class="co"># parametre verilen dt oldugu gibi fx&#39;e geciliyor,</span>
+            <span class="co"># yani UKF matematiginde direk kullanilmiyor</span>
+            <span class="va">self</span>.sigmas_f[i] <span class="op">=</span> <span class="va">self</span>.fx(sigmas[i], dt)            
+        <span class="va">self</span>.x, <span class="va">self</span>.P <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_f,
+                                             <span class="va">self</span>.Wm,
+                                             <span class="va">self</span>.Wc,
+                                             <span class="va">self</span>.Q,
+                                             <span class="va">self</span>.x_mean,
+                                             <span class="va">self</span>.residual_x)
+
+    <span class="kw">def</span> predict(<span class="va">self</span>, dt, u):
+        sigmas <span class="op">=</span> <span class="va">self</span>.points_fn.sigma_points(<span class="va">self</span>.x, <span class="va">self</span>.P)        
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):
+            <span class="co"># parametre verilen dt oldugu gibi fx&#39;e geciliyor,</span>
+            <span class="co"># yani UKF matematiginde direk kullanilmiyor</span>
+            <span class="va">self</span>.sigmas_f[i] <span class="op">=</span> <span class="va">self</span>.fx(sigmas[i], dt, u)
+        <span class="va">self</span>.x, <span class="va">self</span>.P <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_f,
+                                             <span class="va">self</span>.Wm,
+                                             <span class="va">self</span>.Wc,
+                                             <span class="va">self</span>.Q,
+                                             <span class="va">self</span>.x_mean,
+                                             <span class="va">self</span>.residual_x)
+        
+
+    <span class="kw">def</span> update(<span class="va">self</span>, z):
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):
+            <span class="va">self</span>.sigmas_h[i] <span class="op">=</span> <span class="va">self</span>.hx(<span class="va">self</span>.sigmas_f[i])
+        zp, Pz <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_h,
+                                     <span class="va">self</span>.Wm,
+                                     <span class="va">self</span>.Wc,
+                                     <span class="va">self</span>.R,
+                                     <span class="va">self</span>.z_mean,
+                                     <span class="va">self</span>.residual_z)
+
+        Pxz <span class="op">=</span> zeros((<span class="va">self</span>._dim_x, <span class="va">self</span>._dim_z))
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):
+            dx <span class="op">=</span> <span class="va">self</span>.residual_x(<span class="va">self</span>.sigmas_f[i], <span class="va">self</span>.x)
+            dz <span class="op">=</span>  <span class="va">self</span>.residual_z(<span class="va">self</span>.sigmas_h[i], zp)
+            Pxz <span class="op">+=</span> <span class="va">self</span>.Wc[i] <span class="op">*</span> outer(dx, dz)
+
+
+        <span class="va">self</span>.K <span class="op">=</span> dot(Pxz, inv(Pz)) 
+        <span class="va">self</span>.y <span class="op">=</span> <span class="va">self</span>.residual_z(z, zp) 
+
+        <span class="va">self</span>.x <span class="op">=</span> <span class="va">self</span>.x <span class="op">+</span> dot(<span class="va">self</span>.K, <span class="va">self</span>.y)
+        <span class="va">self</span>.P <span class="op">=</span> <span class="va">self</span>.P <span class="op">-</span> dot3(<span class="va">self</span>.K, Pz, <span class="va">self</span>.K.T)
+
+        <span class="va">self</span>.log_likelihood <span class="op">=</span> logpdf(<span class="va">self</span>.y, np.zeros(<span class="bu">len</span>(<span class="va">self</span>.y)), Pz)
+
+
+    <span class="kw">def</span> cross_variance(<span class="va">self</span>, x, z, sigmas_f, sigmas_h):
+        Pxz <span class="op">=</span> zeros((sigmas_f.shape[<span class="dv">1</span>], sigmas_h.shape[<span class="dv">1</span>]))
+        N <span class="op">=</span> sigmas_f.shape[<span class="dv">0</span>]
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):
+            dx <span class="op">=</span> <span class="va">self</span>.residual_x(sigmas_f[i], x)
+            dz <span class="op">=</span>  <span class="va">self</span>.residual_z(sigmas_h[i], z)
+            Pxz <span class="op">+=</span> <span class="va">self</span>.Wc[i] <span class="op">*</span> outer(dx, dz)
+
+
+    <span class="at">@property</span>
+    <span class="kw">def</span> likelihood(<span class="va">self</span>):
+        <span class="cf">return</span> math.exp(<span class="va">self</span>.log_likelihood)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> <span class="bu">filter</span>
+
+<span class="kw">def</span> f_cv(x, dt):
+    F <span class="op">=</span> np.array([[<span class="dv">1</span>, dt, <span class="dv">0</span>, <span class="dv">0</span>],
+                 [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>],
+             [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, dt],
+             [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]])
+    <span class="cf">return</span> np.dot(F, x)
+
+<span class="kw">def</span> h_cv(x):
+    <span class="cf">return</span> np.array([x[<span class="dv">0</span>], x[<span class="dv">2</span>]])
+
+dt <span class="op">=</span> <span class="fl">1.0</span>
+std_x, std_y <span class="op">=</span> <span class="fl">.3</span>, <span class="fl">.3</span>
+zs <span class="op">=</span> [np.array([i <span class="op">+</span> randn()<span class="op">*</span>std_x,i <span class="op">+</span> randn()<span class="op">*</span>std_y]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>)]
+
+sigmas <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(<span class="dv">4</span>, alpha<span class="op">=</span>.<span class="dv">1</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=</span><span class="fl">1.</span>)
+ukf <span class="op">=</span> <span class="bu">filter</span>.UKF(dim_x<span class="op">=</span><span class="dv">4</span>, dim_z<span class="op">=</span><span class="dv">2</span>, fx<span class="op">=</span>f_cv,hx<span class="op">=</span>h_cv, points<span class="op">=</span>sigmas)
+ukf.x <span class="op">=</span> np.array([<span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>])
+ukf.R <span class="op">=</span> np.diag([<span class="fl">0.09</span>, <span class="fl">0.09</span>])
+ukf.Q[<span class="dv">0</span>:<span class="dv">2</span>, <span class="dv">0</span>:<span class="dv">2</span>] <span class="op">=</span> <span class="bu">filter</span>.Q_discrete_white_noise(<span class="dv">2</span>, dt<span class="op">=</span><span class="dv">1</span>, var<span class="op">=</span><span class="fl">0.02</span>)
+ukf.Q[<span class="dv">2</span>:<span class="dv">4</span>, <span class="dv">2</span>:<span class="dv">4</span>] <span class="op">=</span> <span class="bu">filter</span>.Q_discrete_white_noise(<span class="dv">2</span>, dt<span class="op">=</span><span class="dv">1</span>, var<span class="op">=</span><span class="fl">0.02</span>)
+uxs <span class="op">=</span> []
+<span class="cf">for</span> z <span class="kw">in</span> zs:
+    ukf.predict(dt<span class="op">=</span>dt)
+    ukf.update(z)
+    uxs.append(ukf.x.copy())
+uxs <span class="op">=</span> np.array(uxs)
+plt.plot(uxs[:, <span class="dv">0</span>], uxs[:, <span class="dv">2</span>])
+plt.savefig(<span class="st">&#39;tser_ukf_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ukf_01.png" />
+
+</div>
+<p>Bir Uçağı Radar ile Takip Etmek</p>
+<p>Şimdi ilk gayrı lineer problemimize gelelim. Yeryüzündeki sabit bir radarı algılayıcı olarak kullanarak bir uçağı takip edeceğiz. Basitlik amaçlı olarak radar sinyalleri ve takip iki boyutta olacak. Radarlar bilindiği gibi radyo sinyallerini etrafa yayarlar, ve etraftaki cisimlerden geri gelen yansımalara bakarak bir mesafe hesaplarlar. Bu problemdeki radar bize bir uzaklık ve cismin yerle olan açısını (slant) raporlayacak. Biz bu eğimi ve mesafeyi alıp bir uzaklık ve irtifa / yükseklik (altitude) hesabına çevireceğiz.</p>
+<div class="figure">
+<img src="tser_ukf_07.png" />
+
+</div>
+<p>Uçağın sabit irtifada uçtuğunu farz edelim,</p>
+<p><span class="math display">\[ \vec{x} = 
+\left[\begin{array}{c}  
+\textrm{uzaklık} \\ \textrm{hız} \\ \textrm{irtifa}
+\end{array}\right] = 
+\left[\begin{array}{c}  
+x_{pos} \\ x_{vel} \\ x_{alt}
+\end{array}\right] = 
+\left[\begin{array}{c}  
+x \\ \dot{x} \\ y
+\end{array}\right]
+\]</span></p>
+<p>Geçiş fonksiyonu lineer</p>
+<p><span class="math display">\[ F = 
+\left[\begin{array}{ccc}
+1 &amp; \Delta t &amp; 0 \\ 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 1
+\end{array}\right]
+\left[\begin{array}{c} x \\ \dot{x} \\ y \end{array}\right]
+\]</span></p>
+<p>Şimdi ölçüm fonksiyonunu tasarlamak lazım, probleme tersten bakıyoruz şimdi, yani &quot;eğer yer seviyesindeki uzaklığı ve irtifayı biliyor olsaydık açıyı (bearing) ve sinyal uzaklığını (range) nasıl ölçüyor olurduk?'' sorusunu cevaplıyoruz. Pitagor denklemini kullanabiliriz,</p>
+<p><span class="math display">\[ range = \sqrt{(x_{ac} - x_{radar})^2 + (z_{ac}-z_{radar})^2 } \]</span></p>
+<p>Yer ile açı için</p>
+<p><span class="math display">\[ bearing = \tan^{-1} \frac{z_{ac}-z_{radar}}{x_{ac}-x_{radar}}\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> f_radar(x, dt):
+    F <span class="op">=</span> np.array([[<span class="dv">1</span>, dt, <span class="dv">0</span>],
+                  [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>],
+                  [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]], dtype<span class="op">=</span><span class="bu">float</span>)
+    <span class="cf">return</span> np.dot(F, x)
+
+<span class="kw">def</span> h_radar(x):
+    dx <span class="op">=</span> x[<span class="dv">0</span>] <span class="op">-</span> h_radar.radar_pos[<span class="dv">0</span>]
+    dz <span class="op">=</span> x[<span class="dv">2</span>] <span class="op">-</span> h_radar.radar_pos[<span class="dv">1</span>]
+    slant_range <span class="op">=</span> math.sqrt(dx<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> dz<span class="op">**</span><span class="dv">2</span>)
+    bearing <span class="op">=</span> math.atan2(dz, dx)
+    <span class="cf">return</span> slant_range, bearing
+
+h_radar.radar_pos <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">0</span>)
+
+<span class="im">from</span> numpy.linalg <span class="im">import</span> norm
+<span class="im">from</span> math <span class="im">import</span> atan2
+
+<span class="kw">class</span> RadarStation(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, pos, range_std, bearing_std):
+        <span class="va">self</span>.pos <span class="op">=</span> np.asarray(pos)
+        <span class="va">self</span>.range_std <span class="op">=</span> range_std
+        <span class="va">self</span>.bearing_std <span class="op">=</span> bearing_std
+
+    <span class="kw">def</span> reading_of(<span class="va">self</span>, ac_pos):
+        diff <span class="op">=</span> np.subtract(ac_pos, <span class="va">self</span>.pos)
+        rng <span class="op">=</span> norm(diff)
+        brg <span class="op">=</span> atan2(diff[<span class="dv">1</span>], diff[<span class="dv">0</span>])
+        <span class="cf">return</span> rng, brg
+
+
+    <span class="kw">def</span> noisy_reading(<span class="va">self</span>, ac_pos):
+        rng, brg <span class="op">=</span> <span class="va">self</span>.reading_of(ac_pos)
+        rng <span class="op">+=</span> randn() <span class="op">*</span> <span class="va">self</span>.range_std
+        brg <span class="op">+=</span> randn() <span class="op">*</span> <span class="va">self</span>.bearing_std
+        <span class="cf">return</span> rng, brg
+
+
+    <span class="kw">def</span> z_to_x(<span class="va">self</span>, slant_range, angle):
+        x <span class="op">=</span> cos(angle)<span class="op">*</span>slant_range
+        z <span class="op">=</span> sin(angle)<span class="op">*</span>slant_range
+        
+        <span class="cf">return</span> <span class="va">self</span>.pos <span class="op">+</span> (x,z)
+        
+<span class="kw">class</span> ACSim(<span class="bu">object</span>):
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, pos, vel, vel_std):
+        <span class="va">self</span>.pos <span class="op">=</span> np.asarray(pos, dtype<span class="op">=</span><span class="bu">float</span>)
+        <span class="va">self</span>.vel <span class="op">=</span> np.asarray(vel, dtype<span class="op">=</span><span class="bu">float</span>)
+        <span class="va">self</span>.vel_std <span class="op">=</span> vel_std
+
+    <span class="kw">def</span> update(<span class="va">self</span>, dt):
+         dx <span class="op">=</span> <span class="va">self</span>.vel<span class="op">*</span>dt <span class="op">+</span> (randn() <span class="op">*</span> <span class="va">self</span>.vel_std) <span class="op">*</span> dt
+         <span class="va">self</span>.pos <span class="op">+=</span> dx
+         <span class="cf">return</span> <span class="va">self</span>.pos
+
+<span class="im">import</span> math
+<span class="im">from</span> numpy <span class="im">import</span> random
+
+dt <span class="op">=</span> <span class="fl">12.</span> <span class="co"># 12 seconds between readings</span>
+range_std <span class="op">=</span> <span class="dv">5</span> <span class="co"># meters</span>
+bearing_std <span class="op">=</span> math.radians(<span class="fl">0.5</span>)
+ac_pos <span class="op">=</span> (<span class="fl">0.</span>, <span class="fl">1000.</span>)
+ac_vel <span class="op">=</span> (<span class="fl">100.</span>, <span class="fl">0.</span>)
+radar_pos <span class="op">=</span> (<span class="fl">0.</span>, <span class="fl">0.</span>)
+h_radar.radar_pos <span class="op">=</span> radar_pos
+points <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(n<span class="op">=</span><span class="dv">3</span>, alpha<span class="op">=</span>.<span class="dv">1</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=</span><span class="fl">0.</span>)
+kf <span class="op">=</span> <span class="bu">filter</span>.UKF(<span class="dv">3</span>, <span class="dv">2</span>, fx<span class="op">=</span>f_radar, hx<span class="op">=</span>h_radar, points<span class="op">=</span>points)
+kf.Q[<span class="dv">0</span>:<span class="dv">2</span>, <span class="dv">0</span>:<span class="dv">2</span>] <span class="op">=</span> <span class="bu">filter</span>.Q_discrete_white_noise(<span class="dv">2</span>, dt<span class="op">=</span>dt, var<span class="op">=</span><span class="fl">0.1</span>)
+kf.Q[<span class="dv">2</span>,<span class="dv">2</span>] <span class="op">=</span> <span class="fl">0.1</span>
+kf.R <span class="op">=</span> np.diag([range_std<span class="op">**</span><span class="dv">2</span>, bearing_std<span class="op">**</span><span class="dv">2</span>])
+kf.x <span class="op">=</span> np.array([<span class="fl">0.</span>, <span class="fl">90.</span>, <span class="fl">1100.</span>])
+kf.P <span class="op">=</span> np.diag([<span class="dv">300</span><span class="op">**</span><span class="dv">2</span>, <span class="dv">30</span><span class="op">**</span><span class="dv">2</span>, <span class="dv">150</span><span class="op">**</span><span class="dv">2</span>])
+random.seed(<span class="dv">200</span>)
+pos <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">0</span>)
+radar <span class="op">=</span> RadarStation(pos, range_std, bearing_std)
+ac <span class="op">=</span> ACSim(ac_pos, (<span class="dv">100</span>, <span class="dv">0</span>), <span class="fl">0.02</span>)
+time <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">360</span> <span class="op">+</span> dt, dt)
+xs <span class="op">=</span> []
+<span class="cf">for</span> _ <span class="kw">in</span> time:
+    ac.update(dt)
+    r <span class="op">=</span> radar.noisy_reading(ac.pos)
+    kf.predict(dt<span class="op">=</span>dt)
+    kf.update([r[<span class="dv">0</span>], r[<span class="dv">1</span>]])
+    xs.append(kf.x)
+
+xs <span class="op">=</span> np.asarray(xs)
+
+
+plt.figure()
+plt.plot(time, xs[:, <span class="dv">0</span>]<span class="op">/</span><span class="fl">1000.</span>)
+plt.xlabel(<span class="st">&#39;zaman(saniye)&#39;</span>)
+plt.ylabel(<span class="st">&#39;yer(km)&#39;</span>)
+plt.tight_layout()
+plt.savefig(<span class="st">&#39;tser_ukf_04.png&#39;</span>)
+
+plt.figure()
+plt.plot(time, xs[:, <span class="dv">1</span>])
+plt.xlabel(<span class="st">&#39;zaman(saniye)&#39;</span>)
+plt.ylabel(<span class="st">u&#39;hız&#39;</span>)
+plt.tight_layout()
+plt.savefig(<span class="st">&#39;tser_ukf_05.png&#39;</span>)
+
+plt.figure()
+plt.plot(time, xs[:,<span class="dv">2</span>])
+plt.xlabel(<span class="st">&#39;zaman(saniye)&#39;</span>)
+plt.ylabel(<span class="st">&#39;irtifa&#39;</span>)
+plt.tight_layout()
+plt.savefig(<span class="st">&#39;tser_ukf_06.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ukf_04.png" />
+
+</div>
+<div class="figure">
+<img src="tser_ukf_05.png" />
+
+</div>
+<div class="figure">
+<img src="tser_ukf_06.png" />
+
+</div>
+<p>Sonuçlar iyi, fakat uçağın hiç irtifa değiştirmediğini farzettik. Şimdi uçağın bir dakika sonra daha yükseğe tırmanmaya başladığını düşünelim, ve simülasyon verisini ona göre üretelim. O zaman tırmanma oranını da konum matrisine eklememiz gerekir,</p>
+<p><span class="math display">\[ \vec{x} = 
+\left[\begin{array}{c}  
+\textrm{uzaklık} \\ \textrm{hız} \\ \textrm{irtifa} \\ \textrm{tırmanma oranı}
+\end{array}\right] = 
+\left[\begin{array}{c}  
+x \\ \dot{x} \\ y \\ \dot{y}
+\end{array}\right]
+\]</span></p>
+<p>Konum geçiş matrisi de değişir,</p>
+<p><span class="math display">\[ \vec{x}_{\textrm{geçiş sonrası}} = 
+\left[\begin{array}{cccc}
+1 &amp; \Delta t &amp; 0 &amp; 0 \\ 
+0 &amp; 1 &amp; 0 &amp; 0 \\ 
+0 &amp; 0 &amp; 1 &amp; dt \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{array}\right]
+\left[\begin{array}{c}  x \\ \dot{x} \\ y \\ \dot{y} \end{array}\right]
+\]</span></p>
+<p>ki geçiş hala lineer. Ölçüm fonksiyonu aynı kalıyor, sadece boyutlar değiştiği için <span class="math inline">\(Q\)</span>'yi buna göre uyarlamak gerekiyor. Bu kadar.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> f_cv_radar(x, dt):
+    F <span class="op">=</span> np.array([[<span class="dv">1</span>, dt, <span class="dv">0</span>, <span class="dv">0</span>],
+    [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>],
+    [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, dt],
+    [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]], dtype<span class="op">=</span><span class="bu">float</span>)
+    <span class="cf">return</span> np.dot(F, x)
+<span class="kw">def</span> cv_UKF(fx, hx, R_std):
+    points <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(n<span class="op">=</span><span class="dv">4</span>, alpha<span class="op">=</span>.<span class="dv">1</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=-</span><span class="fl">1.</span>)
+    kf <span class="op">=</span> <span class="bu">filter</span>.UKF(<span class="dv">4</span>, <span class="bu">len</span>(R_std), fx<span class="op">=</span>fx, hx<span class="op">=</span>hx, points<span class="op">=</span>points)
+    kf.Q[<span class="dv">0</span>:<span class="dv">2</span>, <span class="dv">0</span>:<span class="dv">2</span>] <span class="op">=</span> <span class="bu">filter</span>.Q_discrete_white_noise(<span class="dv">2</span>, dt<span class="op">=</span>dt, var<span class="op">=</span><span class="fl">0.1</span>)
+    kf.Q[<span class="dv">2</span>:<span class="dv">4</span>, <span class="dv">2</span>:<span class="dv">4</span>] <span class="op">=</span> <span class="bu">filter</span>.Q_discrete_white_noise(<span class="dv">2</span>, dt<span class="op">=</span>dt, var<span class="op">=</span><span class="fl">0.1</span>)
+    kf.R <span class="op">=</span> np.diag(R_std)
+    kf.R <span class="op">=</span> np.dot(kf.R, kf.R) <span class="co"># square to get rariance</span>
+    kf.x <span class="op">=</span> np.array([<span class="fl">0.</span>, <span class="fl">90.</span>, <span class="fl">1100.</span>, <span class="fl">0.</span>])
+    kf.P <span class="op">=</span> np.diag([<span class="dv">300</span><span class="op">**</span><span class="dv">2</span>, <span class="dv">3</span><span class="op">**</span><span class="dv">2</span>, <span class="dv">150</span><span class="op">**</span><span class="dv">2</span>, <span class="dv">3</span><span class="op">**</span><span class="dv">2</span>])
+    <span class="cf">return</span> kf
+
+random.seed(<span class="dv">200</span>)
+ac <span class="op">=</span> ACSim(ac_pos, (<span class="dv">100</span>, <span class="dv">0</span>), <span class="fl">0.02</span>)
+kf <span class="op">=</span> cv_UKF(f_cv_radar, h_radar, R_std<span class="op">=</span>[range_std, bearing_std])
+time <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">360</span> <span class="op">+</span> dt, dt)
+xs <span class="op">=</span> []
+<span class="cf">for</span> t <span class="kw">in</span> time:
+    <span class="cf">if</span> t <span class="op">&gt;=</span> <span class="dv">60</span>:
+        ac.vel[<span class="dv">1</span>] <span class="op">=</span> <span class="dv">300</span><span class="op">/</span><span class="dv">60</span> <span class="co"># 300 meters/minute climb</span>
+    ac.update(dt)
+    r <span class="op">=</span> radar.noisy_reading(ac.pos)
+    kf.predict(dt<span class="op">=</span>dt)
+    kf.update([r[<span class="dv">0</span>], r[<span class="dv">1</span>]])
+    xs.append(kf.x)
+
+xs <span class="op">=</span> np.array(xs)
+
+plt.figure()
+plt.plot(time, xs[:,<span class="dv">2</span>])
+plt.xlabel(<span class="st">&#39;zaman(saniye)&#39;</span>)
+plt.ylabel(<span class="st">&#39;yükseklik&#39;)</span>
+<span class="st">plt.tight_layout()</span>
+<span class="st">plt.savefig(&#39;</span>tser_ukf_08.png<span class="st">&#39;)</span>
+<span class="st">    </span>
+<span class="st">print(u&#39;</span>Gerçek irtifa: {:.1f}<span class="st">&#39;.format(ac.pos[1]))</span>
+<span class="st">print(u&#39;</span>UKF ile hesaplanan irtifa: {:.1f}<span class="st">&#39;.format(xs[-1][2]))</span></code></pre></div>
+<pre><code>Gerçek irtifa: 2561.9
+UKF ile hesaplanan irtifa: 2432.9</code></pre>
+<div class="figure">
+<img src="tser_ukf_08.png" />
+
+</div>
+<p>Görüldüğü gibi irtifa tahmini daha zor hale geldi, bolca gürültü var, fakat takip başarılı.</p>
+<p>Birden Fazla Pozisyon Verisini Birleştirmek</p>
+<p>GPS icat edilmeden önce gemiler ve uçaklar uzaklık ve açı üzerinden konum bulma sistemleri kullanırlardı, VOR sistemi bunlardan biriydi. Mesela bir uçakta iki tane VOR alıcısı olabilirdi, pilot bu alıcılardan her birini farklı bir istasyona ayarlardı (radyoda doğru frekans ile kanal bulmak gibi herhalde), ve her VOR alıcısı &quot;radyal (radial)'' denen bir bilgiyi verirdi, bu bilgi VOR istasyonunun alıcıya olan açısıydı. Bu iki radyalı, istasyon sinyal uzaklık kapasitesini kullanıp onun etrafında bir çember çizerek, istasyonların bilinen yerlerini kullanarak, ve çemberlerin kesişme noktasında uçağın olduğu yeri bulabilirdiniz.</p>
+<p>Ama tek bir kerelik kesişme bulmak, elle bu hesapları yapmak çok hataya açık bir yaklaşım. Kalman filtrelemesi ile, ardı ardına, özyineli olarak çok daha iyi hesap yapabiliriz. Problemi tarif edelim, elde iki tane algılayıcı var, ve bilinen A, B istasyonlarına olan açıyı elde ediyoruz,</p>
+<div class="figure">
+<img src="tser_ukf_09.png" />
+
+</div>
+<p>Çemberler katlı çizildi, eğer algılayıcıda gürültü varsa çember çizgisi daha kalın oluyor. İstasyon ile algılayıcı arasındaki açı (bearing) şöyle hesaplanıyor,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> bearing(sensor, target_pos):
+    <span class="cf">return</span> math.atan2(target_pos[<span class="dv">1</span>] <span class="op">-</span> sensor[<span class="dv">1</span>], 
+                      target_pos[<span class="dv">0</span>] <span class="op">-</span> sensor[<span class="dv">0</span>])</code></pre></div>
+<p>Filtre her güncelleme için bir vektör içinde farklı iki algılayıcıdan gelen iki tane ölçüm alıyor,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> measurement(A_pos, B_pos, pos):
+    angle_a <span class="op">=</span> bearing(A_pos, pos)
+    angle_b <span class="op">=</span> bearing(B_pos, pos)
+    <span class="cf">return</span> [angle_a, angle_b]</code></pre></div>
+<p>Şimdi filtrelemeyi yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy.random <span class="im">import</span> randn
+<span class="im">import</span> math, <span class="bu">filter</span>
+
+<span class="kw">def</span> fx_VOR(x, dt):
+    x[<span class="dv">0</span>] <span class="op">+=</span> x[<span class="dv">1</span>] <span class="op">*</span> dt
+    x[<span class="dv">2</span>] <span class="op">+=</span> x[<span class="dv">3</span>] <span class="op">*</span> dt
+    <span class="cf">return</span> x
+
+sa_pos <span class="op">=</span> [<span class="op">-</span><span class="dv">400</span>, <span class="dv">0</span>]
+sb_pos <span class="op">=</span> [<span class="dv">400</span>, <span class="dv">0</span>]
+
+<span class="kw">def</span> hx_VOR(x):
+    <span class="co"># measurement to A</span>
+    pos <span class="op">=</span> (x[<span class="dv">0</span>], x[<span class="dv">2</span>])
+    <span class="cf">return</span> measurement(sa_pos, sb_pos, pos)
+
+<span class="kw">def</span> run_vor_filter(target_pos):
+    np.random.seed(<span class="dv">123</span>)
+    std_noise <span class="op">=</span> math.radians(<span class="fl">0.5</span>)
+    Q <span class="op">=</span> <span class="fl">1.0</span>
+    dt<span class="op">=</span><span class="fl">0.1</span>
+    kappa<span class="op">=</span><span class="fl">0.0</span>
+    points <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(n<span class="op">=</span><span class="dv">4</span>, alpha<span class="op">=</span>.<span class="dv">1</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=</span>kappa)
+    f <span class="op">=</span> <span class="bu">filter</span>.UKF(dim_x<span class="op">=</span><span class="dv">4</span>, dim_z<span class="op">=</span><span class="dv">2</span>, hx<span class="op">=</span>hx_VOR, fx<span class="op">=</span>fx_VOR, points<span class="op">=</span>points)
+    f.x <span class="op">=</span> np.array([target_pos[<span class="dv">0</span>], <span class="fl">1.</span>, target_pos[<span class="dv">1</span>], <span class="fl">1.</span>])
+    q <span class="op">=</span> <span class="bu">filter</span>.Q_discrete_white_noise(<span class="dv">2</span>, dt, Q)
+    f.Q[<span class="dv">0</span>:<span class="dv">2</span>, <span class="dv">0</span>:<span class="dv">2</span>] <span class="op">=</span> q
+    f.Q[<span class="dv">2</span>:<span class="dv">4</span>, <span class="dv">2</span>:<span class="dv">4</span>] <span class="op">=</span> q
+    f.R <span class="op">*=</span> std_noise<span class="op">**</span><span class="dv">2</span>
+    f.P <span class="op">*=</span> <span class="dv">1000</span>    
+
+    xs, txs <span class="op">=</span> [], []
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">300</span>):
+        target_pos[<span class="dv">0</span>] <span class="op">+=</span> <span class="dv">1</span> <span class="op">+</span> randn()<span class="op">*</span><span class="fl">0.0001</span>
+        target_pos[<span class="dv">1</span>] <span class="op">+=</span> <span class="dv">1</span> <span class="op">+</span> randn()<span class="op">*</span><span class="fl">0.0001</span>
+        txs.append((target_pos[<span class="dv">0</span>], target_pos[<span class="dv">1</span>]))
+
+        z <span class="op">=</span> measurement(sa_pos, sb_pos, target_pos)
+        z[<span class="dv">0</span>] <span class="op">+=</span> randn() <span class="op">*</span> std_noise
+        z[<span class="dv">1</span>] <span class="op">+=</span> randn() <span class="op">*</span> std_noise
+
+        f.predict(dt<span class="op">=</span>dt)
+        f.update(z)
+        xs.append(f.x)
+
+    xs <span class="op">=</span> np.asarray(xs)
+    txs <span class="op">=</span> np.asarray(txs)
+    plt.plot(xs[:, <span class="dv">0</span>], xs[:, <span class="dv">2</span>])
+    plt.plot(txs[:, <span class="dv">0</span>], txs[:, <span class="dv">1</span>])
+
+run_vor_filter(target_pos <span class="op">=</span> [<span class="dv">100</span>, <span class="dv">200</span>])
+plt.savefig(<span class="st">&#39;tser_ukf_10.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ukf_10.png" />
+
+</div>
+<p>Sonuç oldukca iyi. Başlangıçta biraz hata var ama hata hemen düzeliyor, ve gerçeğe oldukca yakın hesabı elde etmeye başlıyoruz. Şimdi, problemin gayrı-lineerliğini iyi gözlemlemek için hedefi iki istasyon arasına, aynı y-ekseninde olacak şekilde koyacağım, bu sigma ortalamalarındaki gayrı-lineerliği daha çok ortaya çıkartacak, çünkü açı sıfır derece etrafında olacak, ama açı sıfır altına inmeye başlayınca birdenbire çok büyük bir açı hesaplanıyor olacak tabii, çünkü orada <span class="math inline">\(2\pi\)</span> açısı var. Bu tabii ki filtrenin işleyişini oldukca bozuyor,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">run_vor_filter(target_pos <span class="op">=</span> [<span class="dv">100</span>, <span class="dv">0</span>])
+plt.savefig(<span class="st">&#39;tser_ukf_11.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_ukf_11.png" />
+
+</div>
+<p>Not:</p>
+<p>Filtrenin ismindeki &quot;unscented'' kelimesi nereden geliyor? Bu kelime ilk kez &quot;unscented transform'' bağlamında bu kavramı icat eden kişi tarafından kullanılmış, fakat yazar o makalede niye kelimeyi kullandığını anlatmamış. Anlamsal olarak terimin çok uyduğu söylenemez, belki &quot;scent'' kullanımı İngilizce &quot;iz takibi'', &quot;iz sürme'' çağrışımı yaptığı için, bu filtre, örneklem bazlı parçacık filtreleri gibi, bir hipotez peşinden gitmiyor (o alandaki parçacıkları arttırıp), hep deterministik seçilen belli noktaları kullanıyor. İsmin belki buradan geldiği düşünülebilir.</p>
+<p>Kaynaklar</p>
+<p>[1] Labbe, <em>Kalman and Bayesian Filters in Python</em>, <a href="https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python" class="uri">https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python</a></p>
+<p>[2] Van der Merwe, <em>Sigma-Point Kalman Filters for Probabilistic Inference in Dynamic State-Space Models, dissertation (2004)</em>,<a href="http://www.cslu.ogi.edu/publications/ps/merwe04.pdf" class="uri">http://www.cslu.ogi.edu/publications/ps/merwe04.pdf</a></p>
+<p>[3] Julier, <em>The Scaled Unscented Transformation</em>, <a href="https://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF" class="uri">https://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF</a></p>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-2.15">Ders 2.15</h1>
+<p>Konumuz çok, çok büyük ve seyrek matrisler üzerinden <span class="math inline">\(Ax = b\)</span> çözümü. Çok büyük boyutlarda <span class="math inline">\(A\)</span>'nin tersini almak pahalı bir işlem olacaktır. Standart teknik Gauss Eliminiasyon tekniği de yüksek boyutlarda pahalı bir işlem olur. Pahalı olmayan işlem nedir? <span class="math inline">\(A\)</span>'yi bir vektör ile çarpmaktır mesela. Bu işlemin nasıl devreye gireceğini göreceğiz.</p>
+<p>Genel ismiyle daha hızlı olacak genel kategori özyineli (iterative) metotlardır. Bu yöntemlerde en iyi cevaba erişmeyiz, ama yeterince yaklaşırız, ve daha önemlisi bu işi çok hızlı bir şekilde yapabiliriz. Bu metotlarda iyi bir önkoşullandırıcı (preconditioner) matris <span class="math inline">\(P\)</span>'yi seçmek önemlidir. <span class="math inline">\(P\)</span>, <span class="math inline">\(A\)</span>'yi temel alan ve bazı işlemleri kolaylaştıran bir yapı olacaktır.</p>
+<p>Özyineli tekniklerden en iyi bilinenlerden biri eşlenik gradyan tekniğidir. Bu yöntem için <span class="math inline">\(A\)</span>'nin simetrik, pozitif kesin olması gerekir.</p>
+<p>Özyineli metotlarda bir başlangıç <span class="math inline">\(x_0\)</span> değeri vardır, ve oradan <span class="math inline">\(x_{k+1}\)</span> elde edilir. Lineer metotlar için başlangıcın nerede olduğu önemli değildir, sıfırda bile başlanabilir. Gayrılineer (nonlinear), &quot;Newton'' metotlarında sonuca yakın bir yerde olmak önemlidir, bunun için uğraşılır.</p>
+<p>Çözmek istediğimiz</p>
+<p><span class="math display">\[ Ax = b \]</span></p>
+<p>Bunu şöyle de yazabilirim</p>
+<p><span class="math display">\[ x = x - Ax + b \]</span></p>
+<p><span class="math display">\[ x = (I - A)x + b \]</span></p>
+<p>Şimdi bu denklemi alıp sağ tarafı &quot;eski'' sol tarafı &quot;yeni'' olarak temsil edersek,</p>
+<p><span class="math display">\[ x_{k+1} = (I - A)x_k + b \]</span></p>
+<p>elde ederiz. Bu önkoşulsuz, basit bir özyinelemedir. Önkoşul <span class="math inline">\(P\)</span> istersek,</p>
+<p><span class="math display">\[ Ax = b \]</span></p>
+<p><span class="math display">\[ 0 = -Ax + b \]</span></p>
+<p><span class="math display">\[ Px = Px - Ax + b \]</span></p>
+<p><span class="math display">\[ Px = (P -A)x + b \]</span></p>
+<p><span class="math display">\[ Px_{k+1} =  (P - A)x_k + b \]</span></p>
+<p>Eğer <span class="math inline">\(P = A\)</span> olsaydı, o zaman direk eski denklemi çözüyor olurduk.<br />
+Biz <span class="math inline">\(P\approx A\)</span> dedik, &quot;yakın ama aynı olmayan bir <span class="math inline">\(P\)</span>'' istiyoruz, özellikle. Bu <span class="math inline">\(P\)</span>'nin işlerimizi kolaylaştıracağını umuyoruz çünkü.</p>
+<p>Bazı <span class="math inline">\(P\)</span> örnekleri şunlardır: Jacobi <span class="math inline">\(A\)</span>'nin sadece çaprazındaki değerleri alıp <span class="math inline">\(P\)</span>'ye koyar. Gauss-Seidel yaklaşımı [1], hem çaprazı, hem alt üçgensel (lower triangular) kısmı alıp <span class="math inline">\(P\)</span>'ye koyar.</p>
+<p>Not: İlginç bir tarihi anektod, Gauss Eliminasyon yöntemini keşfeden bizzat Gauss'un kendisi bile bu yöntemi kullanmak istememişti, büyük matrislerde eliminasyon işinin özellikle hesabın elle yapıldığı eski yılllarda çok külfet getiriyordu. Özyineli ilk metotlardan Gauss-Seidel tekniği Gauss'u çok memnun etti, ve kendi hesaplarında bu tekniği kullandı.</p>
+<p>Diğer yaklaşımlar fazla rahatlatma (overrelaxation), ve tamamlanmamış (incomplete) LU gibi yaklaşımlar. Ben üstlisans yaparken bu son iki yöntem Jacobi, Gauss-Seidel'den bir adım ileri gitme yönündeki denemelerin başlangıcıydı.</p>
+<p>Peki <span class="math inline">\(x\)</span>'lerin doğru cevaba erişip erişmediğini nereden anlarız? Hata hesabı için bir formüle ihtiyacım var. Alttaki formüllerde 2. formülü 1. formülden çıkartırsam, ve <span class="math inline">\(e_k = x - x_k\)</span> ise</p>
+<p><span class="math display">\[ x_{k+1} = (I - A)x_k + b \]</span></p>
+<p><span class="math display">\[ x_k = (I - A)x + b \]</span></p>
+<p>Şunu elde ederim,</p>
+<p><span class="math display">\[ Pe_{k+1} = (P-A)e_k \]</span></p>
+<p>İki tarafı <span class="math inline">\(P^{-1}\)</span> ile çarparsam,</p>
+<p><span class="math display">\[ e_{k+1} = (I-P^{-1}A)e_k = Me_k\]</span></p>
+<p>O zaman hata hesabı için her özyineleme adımında üstteki hesabı yaparım. Parantez içindeki büyük ifadeye <span class="math inline">\(M\)</span> ismi verdim, buna özyineleme matrisi de diyebiliriz.</p>
+<p>Değerlere yakında bakarsak, <span class="math inline">\(P\)</span>'nin <span class="math inline">\(A\)</span>'ya yakın olmasını istiyoruz demiştik, o zaman <span class="math inline">\(P^{-1}A\)</span>, <span class="math inline">\(I\)</span>'ya yakın olacaktır, ve bu <span class="math inline">\(I\)</span>'ya yakın olan şey <span class="math inline">\(I\)</span>'dan çıkartılınca sonuç sıfıra yakın olacaktır. Hatanın ufak olmasını istediğimize göre bu mantıklı.</p>
+<p>Her adımda <span class="math inline">\(M\)</span> ile çarptığımıza göre,</p>
+<p><span class="math display">\[ e_k = M^k e_0 \]</span></p>
+<p>Üstteki sıfıra gider mi? Giderse ne kadar hızlı gider? Bunun olması için <span class="math inline">\(M\)</span>'nin hangi öğesine bakmak gerekir? En büyük özdeğerine bakmak gerekir. Genel olarak şunu söyleyebiliriz, her <span class="math inline">\(|\lambda(M)| &lt; 1\)</span> olması gerekir. Notasyonel olarak en büyük özdeğer <span class="math inline">\(\rho(M)\)</span>'dir, <span class="math inline">\(|\rho(M)|\)</span> ise spektral yarıçapı (spectral radius) olarak adlandırılır.</p>
+<p>Bazı örnekler</p>
+<p><span class="math display">\[ K = A = 
+\left[\begin{array}{rrrr}
+2 &amp; -1 &amp;&amp; \\
+&amp; 2 &amp; -1 &amp; \\
+&amp;&amp;&amp; \\
+&amp;&amp; -1 &amp; 2 \\
+\end{array}\right]
+ \]</span></p>
+<p>Özdeğerler <span class="math inline">\(\lambda_j(A) = 2 - 2 \cos\theta_j\)</span></p>
+<p><span class="math inline">\(P_{Jacobi} = 2I\)</span></p>
+<p><span class="math display">\[ M = I-P^{-1}A  \]</span></p>
+<p>Sonuç</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rrrr}
+0 &amp; \frac{ 1}{2} &amp; &amp; \\
+\frac{ 1}{2} &amp; 0 &amp; \frac{ 1}{2}&amp; \\
+ &amp; \frac{ 1}{2} &amp; \ddots &amp; \ddots \\
+ &amp;&amp; \ddots &amp; 0
+\end{array}\right]
+ \]</span></p>
+<p>Boş olan yerlerde sıfır değerleri var.</p>
+<p>Yani <span class="math inline">\(P^{-1} = 1/2\)</span></p>
+<p><span class="math display">\[ M = I-\frac{ 1}{2}A  \]</span></p>
+<p><span class="math display">\[ \lambda_j(M) = 1 - \frac{ 1}{2}\lambda_j(A) = \cos \frac{ j\pi}{N+1}\]</span></p>
+<p>O zaman yaklaşıksallama olacak. En büyük özdeğer</p>
+<p><span class="math display">\[ \rho = \cos \frac{ \pi}{N+1} \]</span></p>
+<p>Eğer her döngüde bir şeyleri grafiklemek istesem, neyi seçerdim? Her döngüdeki hatayı, &quot;artığı (residual)'' grafikleyebilirdim. Tam denklem</p>
+<p><span class="math display">\[ Ax = b \]</span></p>
+<p><span class="math inline">\(Ax_k\)</span> gerçeğe &quot;yakın'', o zaman artık değer <span class="math inline">\(r\)</span> bu ikisi arasındaki fark olabilir,</p>
+<p><span class="math display">\[ r = Ax - Ax_k \]</span></p>
+<p><span class="math display">\[ r = Ae_k \]</span></p>
+<p>[hata grafikleme atlandı]</p>
+<p>Örnek Jacobi kodları</p>
+<p>Kod #1</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+A <span class="op">=</span> np.array([[<span class="fl">6.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>],
+              [<span class="fl">1.</span>,<span class="fl">7.</span>,<span class="fl">1.</span>],
+              [<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">8.</span>]])
+b <span class="op">=</span> [<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>]
+
+xreal <span class="op">=</span> lin.solve(A, b)<span class="op">;</span> <span class="bu">print</span> <span class="st">&quot;solution&quot;</span>, xreal
+
+P <span class="op">=</span> np.diag(np.diag(A))<span class="op">;</span> <span class="bu">print</span> <span class="st">&quot;P&quot;</span>,P
+x <span class="op">=</span> np.zeros(A.shape[<span class="dv">0</span>])<span class="op">;</span> <span class="bu">print</span> x
+T <span class="op">=</span> P <span class="op">-</span> A
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):
+    x <span class="op">=</span>  lin.solve(P, b<span class="op">+</span>np.dot(T,x))
+    <span class="bu">print</span> x</code></pre></div>
+<pre><code>solution [ 0.13249211  0.11041009  0.09463722]
+P [[ 6.  0.  0.]
+ [ 0.  7.  0.]
+ [ 0.  0.  8.]]
+[ 0.  0.  0.]
+[ 0.16666667  0.14285714  0.125     ]
+[ 0.12202381  0.10119048  0.08630952]
+[ 0.13541667  0.11309524  0.09709821]
+[ 0.13163442  0.10964073  0.09393601]
+[ 0.13273721  0.11063279  0.09484061]
+[ 0.1324211   0.11034603  0.09457875]
+[ 0.13251254  0.11042859  0.09465411]
+[ 0.13248622  0.11040476  0.09463236]
+[ 0.13249381  0.11041163  0.09463863]
+[ 0.13249162  0.11040965  0.09463682]</code></pre>
+<p>Kod #2</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">A <span class="op">=</span> np.array([[<span class="fl">6.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>],
+              [<span class="fl">1.</span>,<span class="fl">7.</span>,<span class="fl">1.</span>],
+              [<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">8.</span>]])
+
+b <span class="op">=</span> [<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>]
+
+xreal <span class="op">=</span> lin.solve(A, b)<span class="op">;</span> <span class="bu">print</span> <span class="st">&quot;solution&quot;</span>, xreal
+
+P <span class="op">=</span> np.diag(np.diag(A))<span class="op">;</span> <span class="bu">print</span> <span class="st">&quot;P&quot;</span>,P
+x <span class="op">=</span> np.zeros(A.shape[<span class="dv">0</span>])<span class="op">;</span> <span class="bu">print</span> x
+J <span class="op">=</span> lin.solve(P,P<span class="op">-</span>A)
+c <span class="op">=</span> lin.solve(P,b)
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):
+    x <span class="op">=</span> np.dot(J,x) <span class="op">+</span> c
+    <span class="bu">print</span> x</code></pre></div>
+<pre><code>solution [ 0.13249211  0.11041009  0.09463722]
+P [[ 6.  0.  0.]
+ [ 0.  7.  0.]
+ [ 0.  0.  8.]]
+[ 0.  0.  0.]
+[ 0.16666667  0.14285714  0.125     ]
+[ 0.12202381  0.10119048  0.08630952]
+[ 0.13541667  0.11309524  0.09709821]
+[ 0.13163442  0.10964073  0.09393601]
+[ 0.13273721  0.11063279  0.09484061]
+[ 0.1324211   0.11034603  0.09457875]
+[ 0.13251254  0.11042859  0.09465411]
+[ 0.13248622  0.11040476  0.09463236]
+[ 0.13249381  0.11041163  0.09463863]
+[ 0.13249162  0.11040965  0.09463682]</code></pre>
+<p>Bu kodların ikisi de özyineli Jacobi hesabı yapıyor. Birincisi her döngüde <code>solve</code> işlemi yapıyor. Fakat daha önce belirttiğimiz gibi, her döngüde çarpım işlemi yapmak çok daha optimal olur. İkinci kod [1]</p>
+<p><span class="math display">\[ Px_{k+1} =  (P - A)x_k + b \]</span></p>
+<p>işlemini iki parçaya ayırmış, <span class="math inline">\(P,P-A\)</span> ve <span class="math inline">\(P,b\)</span> sistemlerini ayrı ayrı çözerek, döngü içinde <span class="math inline">\(Jx + c\)</span> ile sadece çarpma ve toplama kullanmayı başarmış. Bu parçalamanın yapılabilmesinin sebebi tabii ki bir lineer sistemle çalışıyor olmamız. Çok akıllıca bir teknik.</p>
+<p>Kaynaklar</p>
+<p>[1] Olver, <em>A Basic Introduction to Matlab</em>, <a href="http://www.math.umn.edu/~olver/matlab.html" class="uri">http://www.math.umn.edu/~olver/matlab.html</a></p>
+</body>
+</html>

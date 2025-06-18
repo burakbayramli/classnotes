@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="özellik-işlemek-feature-engineering">Özellik İşlemek (Feature Engineering)</h1>
+<p>Veri madenciliğinde &quot;veriden veri yaratma&quot; tekniği çok kullanılıyor; mesela bir sipariş veri satırında o siparişin hangi zamanda (timestamp) olduğunu belirten bir kolon varsa (ki çoğu zaman vardır), bu kolonu &quot;parçalayarak&quot; ek, daha genel, özetsel bilgi kolonları yaratılabilir. Ya da kategoriksel verileri pek çok farklı şekilde sayısal hale çevirebiliriz, mesela 1-hot kodlama ile N kategori N kolon haline gelir, eldeki kategoriye tekabül eden öğe 1 diğerleri sıfır yapılır.</p>
+<p>Özellik işlemenin önemi yapay öğrenme açısından önemi var, mesela bir SVM sınıflayıcısını en basit haliyle siyah/beyaz görüntüden sayı tanıma probleminde kullandık, ve diyelim yüzde 70 başarı elde ettik. Şimdi çok basit bir yeni özellik yaratalım, görüntüyü dikey ikiye bölelim, ve üstteki ve alttaki siyah noktaları toplayarak iki yeni kolon olarak görüntü matrisine ekleyelim. Bu yeni özellikleri kullanınca basit sınıflayıcının yüzde 20 kadar tanıma başarısında ilerleme kaydettiğini göreceğiz!</p>
+<p>Not: Derin yapay sınır ağları teknikleri ile özellik işlemeye artık gerek olmadığı söylenir, bu büyük ölçüde doğru. Bir DYSA farklı seviyelerdeki pek çok farklı nöronları üzerinden aslında üstte tarif edilen türden yeni özellikleri otomatik olarak yaratır, ögrenir. Fakat yine de yeni özellikleri elle yaratma tekniklerini bilmek iyi.</p>
+<p>Şimdi farklı yöntemlere bakalım.</p>
+<p>Zaman Kolonlarını Zenginleştirmek</p>
+<p>Zaman kolonları çoğu zaman saniyeye kadar kaydedilir, bu bilgiyi alıp mesela ay, mevsim, haftanın günü, saat, iş saati mi (9-5 arası), akşam mı, sabah mı, öğlen mi, vs. gibi ek bilgiler çıkartılabilir. Tüm kolonlar veri madenciliği algoritmasına verilir, ve algoritma belki öğlen saati ile sipariş verilmiş olması arasında genel bir bağlantı bulacaktır.</p>
+<p>Python + Pandas ile bir zaman kolonu şöyle parçalanabilir, örnek veri üzerinde görelim, sadece iki kolon var, müşteri no, ve sipariş zamanı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">from</span> StringIO <span class="im">import</span> StringIO
+s <span class="op">=</span> <span class="st">&quot;&quot;&quot;customer_id;order_date</span>
+<span class="st">  299;2012-07-20 19:44:55.661000+01:00</span>
+<span class="st">  421;2012-02-17 21:54:15.013000+01:00</span>
+<span class="st">  437;2012-02-20 22:18:12.021000+01:00</span>
+<span class="st">  463;2012-02-20 23:46:21.587000+01:00</span>
+<span class="st">  482;2012-05-21 09:50:02.739000+01:00</span>
+<span class="st">  607;2012-02-21 11:57:12.462000+01:00</span>
+<span class="st">  641;2012-02-21 13:40:28.088000+01:00</span>
+<span class="st">  674;2012-08-21 14:53:15.851000+01:00</span>
+<span class="st">  780;2012-02-23 10:31:05.571000+01:00</span>
+<span class="st">  &quot;&quot;&quot;</span>
+df <span class="op">=</span> pd.read_csv(StringIO(s),sep<span class="op">=</span><span class="st">&#39;;&#39;</span>, parse_dates<span class="op">=</span><span class="va">True</span>)
+
+<span class="kw">def</span> f(x):
+  tmp <span class="op">=</span> pd.to_datetime(x[<span class="st">&#39;order_date&#39;</span>])
+  tpl <span class="op">=</span> tmp.timetuple()<span class="op">;</span> yymm <span class="op">=</span> <span class="bu">int</span>(tmp.strftime(<span class="st">&#39;%m</span><span class="sc">%d</span><span class="st">&#39;</span>))
+  spring <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">321</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">621</span>)
+  summer <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">621</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">921</span>)
+  fall <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">921</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">1221</span>)
+  winter <span class="op">=</span> <span class="bu">int</span>( spring<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> summer<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> fall<span class="op">==</span><span class="dv">0</span> )
+  warm_season <span class="op">=</span> <span class="bu">float</span>(tpl.tm_mon <span class="op">&gt;=</span> <span class="dv">4</span> <span class="kw">and</span> tpl.tm_mon <span class="op">&lt;=</span> <span class="dv">9</span>)
+  work_hours <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;</span> <span class="dv">9</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;</span> <span class="dv">17</span>)
+  morning <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">7</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">11</span>)
+  noon <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">12</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">14</span>)
+  afternoon <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">15</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">19</span>)
+  night <span class="op">=</span> <span class="bu">int</span> (morning<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> noon<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> afternoon<span class="op">==</span><span class="dv">0</span>)
+
+  <span class="cf">return</span> pd.Series([tpl.tm_hour, tpl.tm_mon,
+                    tpl.tm_wday, warm_season,
+                    work_hours, morning, noon, afternoon, night,
+                    spring, summer, fall, winter])
+
+cols <span class="op">=</span> [<span class="st">&#39;ts_hour&#39;</span>,<span class="st">&#39;ts_mon&#39;</span>,<span class="st">&#39;ts_wday&#39;</span>,<span class="st">&#39;ts_warm_season&#39;</span>,<span class="op">\</span>
+  <span class="st">&#39;ts_work_hours&#39;</span>,<span class="st">&#39;ts_morning&#39;</span>,<span class="st">&#39;ts_noon&#39;</span>,<span class="st">&#39;ts_afternoon&#39;</span>,<span class="op">\</span>
+  <span class="st">&#39;ts_night&#39;</span>, <span class="st">&#39;ts_spring&#39;</span>, <span class="st">&#39;ts_summer&#39;</span>, <span class="st">&#39;ts_fall&#39;</span>, <span class="st">&#39;ts_winter&#39;</span>]
+
+df[cols] <span class="op">=</span> df.<span class="bu">apply</span>(f, axis<span class="op">=</span><span class="dv">1</span>)
+<span class="bu">print</span> df[cols]</code></pre></div>
+<pre><code>   ts_hour  ts_mon  ts_wday  ts_warm_season  ts_work_hours  ts_morning  \
+0     18.0     7.0      4.0             1.0            0.0         0.0   
+1     20.0     2.0      4.0             0.0            0.0         0.0   
+2     21.0     2.0      0.0             0.0            0.0         0.0   
+3     22.0     2.0      0.0             0.0            0.0         0.0   
+4      8.0     5.0      0.0             1.0            0.0         1.0   
+5     10.0     2.0      1.0             0.0            1.0         1.0   
+6     12.0     2.0      1.0             0.0            1.0         0.0   
+7     13.0     8.0      1.0             1.0            1.0         0.0   
+8      9.0     2.0      3.0             0.0            0.0         1.0   
+
+   ts_noon  ts_afternoon  ts_night  ts_spring  ts_summer  ts_fall  ts_winter  
+0      0.0           1.0       0.0        0.0        1.0      0.0        0.0  
+1      0.0           0.0       1.0        0.0        0.0      0.0        1.0  
+2      0.0           0.0       1.0        0.0        0.0      0.0        1.0  
+3      0.0           0.0       1.0        0.0        0.0      0.0        1.0  
+4      0.0           0.0       0.0        1.0        0.0      0.0        0.0  
+5      0.0           0.0       0.0        0.0        0.0      0.0        1.0  
+6      1.0           0.0       0.0        0.0        0.0      0.0        1.0  
+7      1.0           0.0       0.0        0.0        1.0      0.0        0.0  
+8      0.0           0.0       0.0        0.0        0.0      0.0        1.0  </code></pre>
+<p>Sıcak mevsim (warm season) Mart-Eylül aylarını kapsar, bu ikisel bir değişken hale getirildi. Belki siparişin, ya da diğer başka bir verinin bununla bir alakası vardır. Genel 4 sezon tek başına yeterli değil midir? Olabilir, fakat bazı kalıplar / örüntüler (patterns) belki sıcak / soğuk mevsim bilgisiyle daha çok bağlantılıdır.</p>
+<p>Aynı şekilde saat 1-24 arasında bir sayı olarak var, fakat &quot;iş saatini&quot; ayrı bir ikisel değişken olarak kodlamak yine bir &quot;kalıp yakalama&quot; şansımızı arttırabilir. Bu kolonun ayrı bir şekilde kodlanmış olması veri tasarımı açısından ona önem verildiğini gösterir, ve madencilik algoritmaları bu kolonu, eğer ona bağlı bir kalıp var ise, yakalayabilirler.</p>
+<p>Not: Burada ufak bir pürüz sabah, öğlen, akşamüstü gibi zamanları kodlarken çıktı. Gece 19'dan sonra ve 7'den önce bir sayı olacaktı, fakat bu durumda <span class="math inline">\(x&gt;19\)</span> ve <span class="math inline">\(x&lt;7\)</span> hiçbir sonuç getirmeyecekti. Burada saatlerin 24 sonrası başa dönmesi durumu problem çıkartıyordu, tabii ki karşılaştırma ifadelerini çetrefilleştirerek bu iş çözülebilir, ama o zaman kod temiz olmaz (mesela (<span class="math inline">\(x&gt;19\)</span> ve <span class="math inline">\(x&lt;24\)</span>) ya da (<span class="math inline">\(x&gt;0\)</span> ve <span class="math inline">\(x&lt;7\)</span>) yapabilirdik). Temiz kod için gece haricinde diğer tüm seçenekleri kontrol ediyoruz, ve gece &quot;sabah, öğlen, akşamüstü olmayan şey&quot; haline geliyor. Aynı durum mevsimler için de geçerli. Onun için</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">night <span class="op">=</span> <span class="bu">int</span> (morning<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> noon<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> afternoon<span class="op">==</span><span class="dv">0</span>)</code></pre></div>
+<p>kullanıldı.</p>
+<p>Kategorileri İkileştirme</p>
+<p>Yapay öğrenim algoritmalarının çoğu zaman hem kategorik hem sayısal değerleri aynı anda bulunduran verilerle iş yapması gerekebiliyor. Ayrıca literatüre bakılınca görülür ki çoğunlukla bir algoritma ya biri, ya diğeri ile çalışır, ikisi ile aynı anda çalışmaz (çalışanlar var tabii, mesela karar ağaçları -decision tree-). Bu gibi durumlarda iki seçenek var, ya numerik veri kategoriselleştirilir (ayrıksallaştırılır), ya da kategorik veri numerik hale getirilir.</p>
+<p>Bu durumda, kategorik bir kolon eyalet için, eyaletin Ohio olup olmaması başlı başına ayrı bir kolon olarak gösteriliyor. Aynı şekilde Nevada. Bu kodlamaya literatürde 1-hot kodlaması adı veriliyor. KMeans, lojistik regresyon gibi metotlara girdi vermek için bu transformasyon kullanılabilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> pandas <span class="im">as</span> pd, os
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sps
+<span class="im">from</span> sklearn.feature_extraction <span class="im">import</span> DictVectorizer
+
+<span class="kw">def</span> one_hot_dataframe(data, cols, replace<span class="op">=</span><span class="va">False</span>):
+    vec <span class="op">=</span> DictVectorizer()
+    mkdict <span class="op">=</span> <span class="kw">lambda</span> row: <span class="bu">dict</span>((col, row[col]) <span class="cf">for</span> col <span class="kw">in</span> cols)
+    vecData <span class="op">=</span> pd.DataFrame(vec.fit_transform(data[cols].<span class="bu">apply</span>(mkdict, axis<span class="op">=</span><span class="dv">1</span>)).toarray())
+    vecData.columns <span class="op">=</span> vec.get_feature_names()
+    vecData.index <span class="op">=</span> data.index
+    <span class="cf">if</span> replace <span class="kw">is</span> <span class="va">True</span>:
+        data <span class="op">=</span> data.drop(cols, axis<span class="op">=</span><span class="dv">1</span>)
+        data <span class="op">=</span> data.join(vecData)
+    <span class="cf">return</span> (data, vecData, vec)
+
+data <span class="op">=</span> {<span class="st">&#39;state&#39;</span>: [<span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Nevada&#39;</span>, <span class="st">&#39;Nevada&#39;</span>],
+        <span class="st">&#39;year&#39;</span>: [<span class="dv">2000</span>, <span class="dv">2001</span>, <span class="dv">2002</span>, <span class="dv">2001</span>, <span class="dv">2002</span>],
+        <span class="st">&#39;pop&#39;</span>: [<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">3.6</span>, <span class="fl">2.4</span>, <span class="fl">2.9</span>]}
+
+df <span class="op">=</span> pd.DataFrame(data)
+
+df2, _, _ <span class="op">=</span> one_hot_dataframe(df, [<span class="st">&#39;state&#39;</span>], replace<span class="op">=</span><span class="va">True</span>)
+<span class="bu">print</span> df2</code></pre></div>
+<pre><code>   pop  year  state=Nevada  state=Ohio
+0  1.5  2000           0.0         1.0
+1  1.7  2001           0.0         1.0
+2  3.6  2002           0.0         1.0
+3  2.4  2001           1.0         0.0
+4  2.9  2002           1.0         0.0</code></pre>
+<p>Unutmayalım, kategorik değerler bazen binleri bulabilir (hatta sayfa tıklama tahmini durumunda mesela milyonlar, hatta milyarlar), bu da binlerce yeni kolon demektir. Yani 1/0 kodlaması, yani 1-hot işleminden ele geçen yeni blok içinde aslında oldukca çok sayıda sıfır değeri olacak (sonuçta her satırda binlerce 'şey' içinde sadece bir tanesi 1 oluyor), yani bu bloğun bir seyrek matris olması iyi olurdu. O zaman matrisin tamamını <code>sps.csr_matrix</code> ya da <code>sps.lil_matrix</code> ile gerçekten seyrek formata çevirebiliriz, ve mesela scikit-learn paketi, numpy, scipy işlemleri seyrek matrisler ile hesap yapabilme yeteneğine sahip. Seyrekselleştirince ne elde ediyoruz? Sıfırları depolamadığımız için sadece sıfır olmayan değerler ile işlem yapıyoruz, o ölçüde kod hızlanıyor, daha az yer tutuyor.</p>
+<p>Dikkat etmek gerekir ki yeni kolonları üretince değerlerin yerleri sabitlenmiş olur. Her satır bazında bazen state=Ohio, state=Nevada, bazen sadece state=Ohio üretiyor olamayız. Üstteki örnekte her zaman 4 tane kolon elde edilmelidir.</p>
+<p>Not: 1-hot yerine bir diğer seçenek kategoriyi bir indise çevirmek (tüm kategorileri sıralayıp kaçıncı olduğuna bakarak mesela) sonra bu sayıyı ikisel sistemde belirtmek, eğer 'a' sayısı 30 indisine tekabül ediyorsa, 30 ikisel sistemde 11110, bu değer kullanılır (aslında bu son tarif edilen sistemin 1-hot sistemden daha iyi işlediği rapor ediliyor).</p>
+<p>Anahtarlama Numarası (1-Hot Encoding, Hashing Trick)</p>
+<p>Fakat bir problem var, dokümanı temsil eden ve içinde 1 ya da 0 hücreli özellik vektörünü (feature vector) oluşturmak için tüm kelimelerin ne olduğunu bilmeliyiz. Yani veriyi bir kere baştan sonra tarayarak bir sözlük oluşturmalıyız (ki öyle yapmaya mecbur kaldık) ve ancak ondan sonra her doküman için hangi kelimenin olup olmadığını saptamaya ve onu kodlamaya başlayabiliriz. Halbuki belgelere bakar bakmaz, teker teker giderken bile hemen bir özellik vektörü oluşturabilseydik daha iyi olmaz mıydı?</p>
+<p>Bunu başarmak için anahtarlama numarasını kullanmamız lazım. Bilindiği gibi temel yazılım bilime göre bir kelimeyi temsil eden bir anahtar (hash) üretebiliriz, ki bu hash değeri bir sayıdır. Bu sayının en fazla kaç olabileceğinden hareketle (hatta bu sayıya bir limit koyarak) özellik vektörümüzün boyutunu önceden saptamış oluruz. Sonra kelimeye bakarız, hash üretiriz, sonuç mesela 230 geldi, o zaman özellik vektöründeki 230'uncu kolonun değerini 1 yaparız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">d_input <span class="op">=</span> <span class="bu">dict</span>()
+
+<span class="kw">def</span> add_word(word):
+  hashed_token <span class="op">=</span> <span class="bu">hash</span>(word) <span class="op">%</span> <span class="dv">127</span>
+  d_input[hashed_token] <span class="op">=</span> d_input.setdefault(hashed_token, <span class="dv">0</span>) <span class="op">+</span> <span class="dv">1</span>
+
+add_word(<span class="st">&quot;obama&quot;</span>)
+<span class="bu">print</span> d_input</code></pre></div>
+<pre><code>{48: 1}</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">add_word(<span class="st">&quot;politics&quot;</span>)
+<span class="bu">print</span> d_input</code></pre></div>
+<pre><code>{48: 1, 91: 1}</code></pre>
+<p>Üstteki kodda bunun örneğini görüyoruz. Hash sonrası mod uyguladık (yüzde işareti ile) ve hash sonucunu en fazla 127 olacak şekilde sınırladık. Potansiyel problemler ne olabilir? Hashing mükemmel değildir, çarpışma (collision) olması mümkündür yani nadiren farklı kelimelerin aynı numaraya eşlenebilmesi durumu. Bu problemleri iyi bir anahtarlama algoritması kullanarak, mod edilen sayıyı büyük tutarak çözmek mümkündür, ya da bu tür nadir çarpışmalar &quot;kabul edilir hata&quot; olarak addedilebilir.</p>
+<p>Pandas kullanarak bir Dataframe'i otomatik olarak anahtarlamak istersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+data <span class="op">=</span> {<span class="st">&#39;state&#39;</span>: [<span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Nevada&#39;</span>, <span class="st">&#39;Nevada&#39;</span>],
+  <span class="st">&#39;year&#39;</span>: [<span class="dv">2000</span>, <span class="dv">2001</span>, <span class="dv">2002</span>, <span class="dv">2001</span>, <span class="dv">2002</span>],
+  <span class="st">&#39;pop&#39;</span>: [<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">3.6</span>, <span class="fl">2.4</span>, <span class="fl">2.9</span>]}
+
+data <span class="op">=</span> pd.DataFrame(data)
+<span class="bu">print</span> data</code></pre></div>
+<pre><code>   pop   state  year
+0  1.5    Ohio  2000
+1  1.7    Ohio  2001
+2  3.6    Ohio  2002
+3  2.4  Nevada  2001
+4  2.9  Nevada  2002</code></pre>
+<p>Şimdi bu veri üzerinde sadece eyalet (state) için bir anahtarlama numarası yapalım</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> hash_col(df,col,N):
+  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N): df[col <span class="op">+</span> <span class="st">&#39;_&#39;</span> <span class="op">+</span> <span class="bu">str</span>(i)] <span class="op">=</span> <span class="fl">0.0</span>
+  df[col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="bu">hash</span>(x[col]) <span class="op">%</span> N,axis<span class="op">=</span><span class="dv">1</span>)    
+  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):
+      idx <span class="op">=</span> df[df[col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>] <span class="op">==</span> i].index
+  df.ix[idx,<span class="st">&#39;</span><span class="sc">%s</span><span class="st">_</span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> (col,i)] <span class="op">=</span> <span class="fl">1.0</span>
+  df <span class="op">=</span> df.drop([col, col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)
+  <span class="cf">return</span> df
+
+<span class="bu">print</span> hash_col(data,<span class="st">&#39;state&#39;</span>,<span class="dv">4</span>)</code></pre></div>
+<pre><code>   pop  year  state_0  state_1  state_2  state_3
+0  1.5  2000      0.0      0.0      0.0      0.0
+1  1.7  2001      0.0      0.0      0.0      0.0
+2  3.6  2002      0.0      0.0      0.0      0.0
+3  2.4  2001      0.0      0.0      0.0      1.0
+4  2.9  2002      0.0      0.0      0.0      1.0</code></pre>
+<p>Baştan Seyrek Matris ile Çalışmak</p>
+<p>Büyük Veri ortamında, eğer kategorik değerler milyonları buluyorsa, o zaman üstteki gibi normal Numpy matrisinden seyreğe geçiş yapmak bile külfetli olabilir. Bu durumlarda daha en baştan seyrek matris üretiyor olmalıyız. Mevcut tüm değerleri önceden bildiğimizi farz edersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> pandas <span class="im">as</span> pd, os
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sps
+<span class="im">import</span> itertools
+
+<span class="kw">def</span> one_hot_column(df, cols, vocabs):
+    mats <span class="op">=</span> []<span class="op">;</span> df2 <span class="op">=</span> df.drop(cols,axis<span class="op">=</span><span class="dv">1</span>)
+    mats.append(sps.lil_matrix(np.array(df2)))
+    <span class="cf">for</span> i,col <span class="kw">in</span> <span class="bu">enumerate</span>(cols):
+        mat <span class="op">=</span> sps.lil_matrix((<span class="bu">len</span>(df), <span class="bu">len</span>(vocabs[i])))
+        <span class="cf">for</span> j,val <span class="kw">in</span> <span class="bu">enumerate</span>(np.array(df[col])):
+            mat[j,vocabs[i][val]] <span class="op">=</span> <span class="fl">1.</span>
+        mats.append(mat)
+
+    res <span class="op">=</span> sps.hstack(mats)    
+    <span class="cf">return</span> res
+            
+data <span class="op">=</span> {<span class="st">&#39;state&#39;</span>: [<span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Ohio&#39;</span>, <span class="st">&#39;Nevada&#39;</span>, <span class="st">&#39;Nevada&#39;</span>],
+        <span class="st">&#39;year&#39;</span>: [<span class="st">&#39;2000&#39;</span>, <span class="st">&#39;2001&#39;</span>, <span class="st">&#39;2002&#39;</span>, <span class="st">&#39;2001&#39;</span>, <span class="st">&#39;2002&#39;</span>],
+        <span class="st">&#39;pop&#39;</span>: [<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">3.6</span>, <span class="fl">2.4</span>, <span class="fl">2.9</span>]}
+
+df <span class="op">=</span> pd.DataFrame(data)
+<span class="bu">print</span> df
+
+vocabs <span class="op">=</span> []
+vals <span class="op">=</span> [<span class="st">&#39;Ohio&#39;</span>,<span class="st">&#39;Nevada&#39;</span>]
+vocabs.append(<span class="bu">dict</span>(itertools.izip(vals,<span class="bu">range</span>(<span class="bu">len</span>(vals)))))
+vals <span class="op">=</span> [<span class="st">&#39;2000&#39;</span>,<span class="st">&#39;2001&#39;</span>,<span class="st">&#39;2002&#39;</span>]
+vocabs.append(<span class="bu">dict</span>(itertools.izip(vals,<span class="bu">range</span>(<span class="bu">len</span>(vals)))))
+
+<span class="bu">print</span> vocabs
+
+<span class="bu">print</span> one_hot_column(df, [<span class="st">&#39;state&#39;</span>,<span class="st">&#39;year&#39;</span>], vocabs).todense()</code></pre></div>
+<pre><code>   pop   state  year
+0  1.5    Ohio  2000
+1  1.7    Ohio  2001
+2  3.6    Ohio  2002
+3  2.4  Nevada  2001
+4  2.9  Nevada  2002
+[{&#39;Ohio&#39;: 0, &#39;Nevada&#39;: 1}, {&#39;2002&#39;: 2, &#39;2000&#39;: 0, &#39;2001&#39;: 1}]
+[[ 1.5  1.   0.   1.   0.   0. ]
+ [ 1.7  1.   0.   0.   1.   0. ]
+ [ 3.6  1.   0.   0.   0.   1. ]
+ [ 2.4  0.   1.   0.   1.   0. ]
+ [ 2.9  0.   1.   0.   0.   1. ]]</code></pre>
+<p><code>one_hot_column</code> çağrısına bir &quot;sözlükler listesi&quot; verdik, sözlük her kolon için o kolonlardaki mümkün tüm değerleri bir sıra sayısı ile eşliyor. Sözlük listesinin sırası kolon sırasına uyuyor olmalı.</p>
+<p>Niye sözlük verdik? Bunun sebebi eğer azar azar (incremental) ortamda iş yapıyorsak, ki Büyük Veri (Big Data) ortamında her zaman azar azar yapay öğrenim yapmaya mecburuz, o zaman bir kategorik kolonun mevcut tüm değerlerine azar azar ulaşamazdık (verinin başında isek, en sonundaki bir kategorik değeri nasıl görelim ki?). Fakat önceden bu listeyi başka yollarla elde etmişsek, o zaman her öne-hot işlemine onu parametre olarak geçiyoruz.</p>
+<p>Sözlük niye <code>one_hot_dataframe</code> çağrısı dışında yaratıldı? Bu çağrı düz bir liste alıp oradaki değerleri sırayla bir sayıyla eşleyerek her seferinde bir sözlük yaratabilirdi. Bunu yapmadık, çünkü sözlük yaratımının sadece bir kere, <code>one_hot_dataframe</code> dışında olmasını istiyoruz. Yine Büyük Veri ortamını düşünenelim, eşleme (map) için mesela bir script yazdık, bu script içinde (basında) hemen sözlükler yaratılırdı. Daha sonra verinin tamamı için, azar azar sürekli <code>one_hot_dataframe</code> çağrısı yapılacaktır. O zaman arka arkaya sürekli aynı veriyi (sözlükleri) sıfırdan tekrar yaratmamız gerekirdi. Bu gereksiz performans kaybı demek olacaktı. Unutmayalım, Büyük Veri ortamında tek bir kategorik kolonun milyonlarca değişik değeri olabilir!</p>
+<p>Azar Azar İşlemek (Incremental, Minibatch Processing)</p>
+<p>Çoğu zaman onlarca kategori, birkaç milyonluk satır içeren bir veriye bakmamız gerekiyor; biliyoruz ki bu kadar veri için Büyük Veri teknolojilerine (mesela Spark, Hadoop gibi) geçmek gereğinden fazla külfet getirecek, elimizdeki dizüstü, masaüstü bilgisayarı bu işlemler için yeterli olmalı, fakat çoğu kütüphane tek makinada azar azar işlem yapmak için yazılmamış. Mesela üstte görülen anahtarlama yöntemi anahtarlama başlamadan önce tüm verinin hafızaya alınmasını gerektiriyor.</p>
+<p>Bu durumda kendimiz çok basit Python kavramlarını, iyi bir anahtarlama kodunu, ve lineer cebir hesaplarında seyreklik (sparsity) tekniklerini kullanarak ufak veri parçaları işleyen bir ortamı yaratabiliriz.</p>
+<p>Örnek veri olarak [4] yazısında görülen oy kalıpları verisini biraz değiştirerek yeni bir analiz için kullanalım. Veri oy verenlerin ırk, cinsiyet, meslek, hangi partiye oy verdikleri ve kazançlarını kaydetmiş, biz analizimizde bahsedilen kategorilerin bu kişilerin kazancıyla bağlantılı olup olmadığına bakacağız. Veriyi oluşturalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../stat_logit/nes.dat&#39;</span>,sep<span class="op">=</span><span class="vs">r&#39;\s+&#39;</span>)
+df <span class="op">=</span> df[[<span class="st">&#39;presvote&#39;</span>,<span class="st">&#39;year&#39;</span>,<span class="st">&#39;gender&#39;</span>,<span class="st">&#39;income&#39;</span>,<span class="st">&#39;race&#39;</span>,<span class="st">&#39;occup1&#39;</span>]]
+df <span class="op">=</span> df.dropna()
+df.to_csv(<span class="st">&#39;nes2.csv&#39;</span>,index<span class="op">=</span><span class="va">None</span>)</code></pre></div>
+<p>Önce kategorilerden ne kadar var, sayalım. Basit toplam yani,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;nes2.csv&#39;</span>)
+<span class="bu">print</span> <span class="st">u&#39;tüm veri&#39;</span>, <span class="bu">len</span>(df)
+<span class="bu">print</span> <span class="st">&#39;cinsiyet&#39;</span>, np.array(df[<span class="st">&#39;gender&#39;</span>].value_counts())
+<span class="bu">print</span> <span class="st">u&#39;ırk&#39;</span>, np.array(df[<span class="st">&#39;race&#39;</span>].value_counts())
+<span class="bu">print</span> <span class="st">&#39;parti&#39;</span>, np.array(df[<span class="st">&#39;presvote&#39;</span>].value_counts())
+<span class="bu">print</span> <span class="st">u&#39;kazanç&#39;</span>, df[<span class="st">&#39;income&#39;</span>].mean()</code></pre></div>
+<pre><code>tüm veri 13804
+cinsiyet [7461 6343]
+ırk [12075  1148   299   180    85    17]
+parti [6998 6535  271]
+kazanç 3.07649956534</code></pre>
+<p>Mesela son sonuçtaki her hücre belli bir partiye verilen oyların sayısı; veriye göre üç farklı kategori varmış demek ki, veri ABD için olduğuna göre bunlardan ilk ikisi bilinen iki büyük parti, üçüncü hücre de herhalde bağımsız adaylar.</p>
+<p>Kazanç 1 ile 5 arasında tam sayılar (1 az, 5 çok) bu sayıları kategorik olarak kabul edip aslında çok çıktılı bir sınıflayıcı eğitmeyi de seçebilirdik, fakat bu örnek için bu sayıları reel hedef olarak aldık: test verisinde tahminleri bakılırsa 2.5'lük kazanç tahminleri görülebilir, bu yüzden.</p>
+<p>Kategorik verileri ikileştirmeye gelelim. Burada üç nokta önemli, veriyi azar azar işleyeceğiz demiştik, ve veriyi seyrek matris olarak almak istiyoruz, ve hangi kategorik değerin hangi kolona eşleneceğini elle tanımlamak istemiyoruz (eşleme otomatik olmalı). Seyreklik önemli çünkü eğer 1000 farklı kategorik değere sahip olan 10 tane kolon varsa, bu 10000 tane yeni kolon yaratılması demektir - her farklı kategori için o değere tekabül eden kolon 1 olacak gerisi 0 olacak. Bu rakamlar orta ölçekte bile rahatlıkla milyonlara ulaşabilir. Eğer ikileştirme için seyrek matris kullanırsak çoğu sıfır olan değerler hafızada bile tutulmaz. Eşleme otomatik olmalı, zaten onun için anahtarlama yapacağız.</p>
+<p>Anahtarlama icin <code>sklearn.feature_extraction.text.HashingVectorizer</code> var,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> HashingVectorizer
+<span class="im">import</span> numpy <span class="im">as</span> np
+vect <span class="op">=</span> HashingVectorizer(n_features<span class="op">=</span><span class="dv">20</span>)
+a <span class="op">=</span> [<span class="st">&#39;aa&#39;</span>,<span class="st">&#39;bb&#39;</span>,<span class="st">&#39;cc&#39;</span>]
+res <span class="op">=</span> vect.transform(a)
+<span class="bu">print</span> res</code></pre></div>
+<pre><code>  (0, 5)    1.0
+  (1, 19)   1.0
+  (2, 18)   -1.0</code></pre>
+<p>Sonuçlar seyrek matris olarak, ve üç değer için üç ayrı satır olarak geldi. Anahtarlama niye bazen -1 bazen +1 veriyor? Aslında bu bizim için çok faydalı, çünkü birazdan PCA işleteceğiz, ve PCA her veri kolonunun sıfırda ortalanmış olmasını ister. Üstteki teknikte anahtar üreten fonksiyon -1,+1 arasında rasgele seçim yapıyor gibi duruyor, bize göre bu üretilen anahtar kolonlarında -1, +1 değerlerinin doğal olarak dengelenmesi için yapılmış, böylece otomatik olarak ortalamaları sıfıra inecektir. Akıllıca bir teknik.</p>
+<p>Devam edelim, sonucu tek satır olacak şekilde kendimiz tekrar düzenleyebiliriz. O zaman Python <code>yield</code> kavramını [3] kullanarak (azar azar satır okumak için), anahtarlama, ve seyrek matrisler ile şu şekilde bir kod olabilir,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> HashingVectorizer
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> pandas <span class="im">as</span> pd, csv
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sps
+
+HASH <span class="op">=</span> <span class="dv">30</span>
+vect <span class="op">=</span> HashingVectorizer(decode_error<span class="op">=</span><span class="st">&#39;ignore&#39;</span>,n_features<span class="op">=</span>HASH)
+
+<span class="kw">def</span> get_row(cols):
+    <span class="cf">with</span> <span class="bu">open</span>(<span class="st">&quot;nes2.csv&quot;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> csvfile:
+        rd <span class="op">=</span> csv.reader(csvfile)
+        headers <span class="op">=</span> {k: v <span class="cf">for</span> v, k <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">next</span>(rd))}
+        <span class="cf">for</span> row <span class="kw">in</span> rd:
+            label <span class="op">=</span> <span class="bu">float</span>(row[headers[<span class="st">&#39;income&#39;</span>]])
+            rrow <span class="op">=</span> [x <span class="op">+</span> <span class="bu">str</span>(row[headers[x]]) <span class="cf">for</span> x <span class="kw">in</span> headers <span class="cf">if</span> x <span class="kw">in</span> cols]
+            X_train <span class="op">=</span> vect.transform(rrow)
+            <span class="cf">yield</span> X_train.tocoo(), label            
+
+<span class="kw">def</span> get_minibatch(row_getter,size<span class="op">=</span><span class="dv">10</span>):
+    X_train <span class="op">=</span> sps.lil_matrix((size,HASH))
+    y_train <span class="op">=</span> []
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(size):
+        cx,y <span class="op">=</span> row_getter.<span class="bu">next</span>()
+        <span class="cf">for</span> dummy,j,val <span class="kw">in</span> <span class="bu">zip</span>(cx.row, cx.col, cx.data): X_train[i,j] <span class="op">=</span> val
+        y_train.append(y)
+    <span class="cf">return</span> X_train, y_train
+
+<span class="co"># tek bir satir goster    </span>
+cols <span class="op">=</span> [<span class="st">&#39;gender&#39;</span>,<span class="st">&#39;income&#39;</span>,<span class="st">&#39;race&#39;</span>,<span class="st">&#39;occup1&#39;</span>]
+row_getter <span class="op">=</span> get_row(cols)
+X,y <span class="op">=</span> get_minibatch(row_getter,size<span class="op">=</span><span class="dv">1</span>)
+<span class="bu">print</span> y, X.todense()</code></pre></div>
+<pre><code>[4.0] [[ 0.  0.  0. -1.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.
+   0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  1.  0.]]</code></pre>
+<p>İlgilendiğimiz kolon listesini <code>get_row</code>'a verip bir gezici fonksiyon yarattık. Bu geziciyi <code>get_minibatch</code>'e verdik, kaç tane satır istediğimizi ona söylüyoruz, o bize istenen kadar satırı arka planda geziciye sorarak seyrek matris olarak veriyor. 10 tane daha isteyelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">X,y <span class="op">=</span> get_minibatch(row_getter,size<span class="op">=</span><span class="dv">10</span>)
+<span class="bu">print</span> <span class="bu">len</span>(y), X.shape, <span class="bu">type</span>(X)</code></pre></div>
+<pre><code>10 (10, 30) &lt;class &#39;scipy.sparse.lil.lil_matrix&#39;&gt;</code></pre>
+<p>PCA</p>
+<p>Lineer Cebir'in temel bileşen analizi (PCA) tekniğini kullanarak boyut azaltması yapabiliriz. Veriyi yine satır satır işleyerek PCA hesabı yapan teknikler var, kod veriyi seyrek formatta da alabiliyor. Bu kod lineer cebir PCA yazısında işlendi.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../stat_170_pca&#39;</span>)
+<span class="im">import</span> ccipca
+cols <span class="op">=</span> [<span class="st">&#39;gender&#39;</span>,<span class="st">&#39;income&#39;</span>,<span class="st">&#39;race&#39;</span>,<span class="st">&#39;occup1&#39;</span>]
+row_getter <span class="op">=</span> get_row(cols)
+pca <span class="op">=</span> ccipca.CCIPCA(n_components<span class="op">=</span><span class="dv">10</span>,n_features<span class="op">=</span><span class="dv">30</span>)
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>): 
+    X,y <span class="op">=</span> get_minibatch(row_getter,size<span class="op">=</span><span class="dv">1</span>)
+    pca.partial_fit(X)
+pca.post_process()
+
+<span class="bu">print</span> <span class="st">&#39;varyans orani&#39;</span>
+<span class="bu">print</span> pca.explained_variance_ratio_</code></pre></div>
+<pre><code>varyans orani
+[ 0.36086926  0.16186391  0.13377998  0.09440711  0.0702763   0.05113956
+  0.04768294  0.0343724   0.02336052  0.02224802]</code></pre>
+<p>Her bileşenin verideki varyansın ne kadarını açıkladığı görülüyor.</p>
+<p>Peki 30 kolonu 10 kolona indirdik, acaba veri temsilinde, tahmin etmek amacında ilerleme elde ettik mi? Veriyi PCA'nın bulduğu uzaya yansıtıp bu boyutu azaltılmış veriyi regresyonda kullansak ne olur acaba? Yansıtma ve regresyon,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.linear_model <span class="im">import</span> SGDRegressor
+clf <span class="op">=</span> SGDRegressor(random_state<span class="op">=</span><span class="dv">1</span>, n_iter<span class="op">=</span><span class="dv">1</span>)
+row_getter <span class="op">=</span> get_row(cols)
+P <span class="op">=</span> pca.components_.T
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>):
+    X_train, y_train <span class="op">=</span> get_minibatch(row_getter,<span class="dv">1</span>)
+    Xp <span class="op">=</span> np.dot((X_train<span class="op">-</span>pca.mean_),P)
+    clf.partial_fit(Xp, y_train)</code></pre></div>
+<p>Şimdi sonraki 1000 satırı test için kullanalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">y_predict <span class="op">=</span> []
+y_real <span class="op">=</span> []
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>):
+    X_test,y_test <span class="op">=</span> get_minibatch(row_getter,<span class="dv">1</span>)
+    Xp <span class="op">=</span> np.dot((X_test<span class="op">-</span>pca.mean_),P)
+    y_predict.append(clf.predict(Xp)[<span class="dv">0</span>])
+    y_real.append(y_test[<span class="dv">0</span>])
+y_predict <span class="op">=</span> np.array(y_predict)
+y_real <span class="op">=</span> np.array(y_real)
+
+err <span class="op">=</span> np.sqrt(((y_predict<span class="op">-</span>y_real)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>()) <span class="op">/</span> <span class="bu">len</span>(y_predict)
+<span class="bu">print</span> <span class="st">&#39;ortalama tahmin hatasi&#39;</span>, err
+<span class="bu">print</span> <span class="st">&#39;maksimum deger&#39;</span>, np.<span class="bu">max</span>(y_real)</code></pre></div>
+<pre><code>ortalama tahmin hatasi 0.0105872845541
+maksimum deger 5.0</code></pre>
+<p>1 ile 5 arasında gidip gelen değerlerin tahmininde 0.01 civarı ortalama hata var. Fena değil. Peki verinin kendisini olduğu gibi alıp regresyonda kullansaydık? Hedef verisi kazanç, kaynak kolonları geri kalan kategoriler. Üstte olduğu gibi veri parçaları 1000'er satır, 10 parça olarak alacağız, yani 10,000 satır modeli eğitmek için kullanılacak. Geri kalanlar test verisi olacak.</p>
+<p><code>sklearn.linear_model.SGDRegressor</code> ufak seyrek matris parçaları ile eğitilebiliyor,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.linear_model <span class="im">import</span> SGDRegressor
+clf <span class="op">=</span> SGDRegressor(random_state<span class="op">=</span><span class="dv">1</span>, n_iter<span class="op">=</span><span class="dv">1</span>)
+row_getter <span class="op">=</span> get_row(cols)
+
+y_predict <span class="op">=</span> []<span class="op">;</span> y_real <span class="op">=</span> []
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):
+    X_train, y_train <span class="op">=</span> get_minibatch(row_getter,<span class="dv">1000</span>)
+    clf.partial_fit(X_train, y_train)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">X_test,y_test <span class="op">=</span> get_minibatch(row_getter,<span class="dv">1000</span>)
+y_predict <span class="op">=</span> clf.predict(X_test) 
+
+err <span class="op">=</span> np.sqrt(((y_predict<span class="op">-</span>y_test)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>()) <span class="op">/</span> <span class="bu">len</span>(y_predict)
+<span class="bu">print</span> <span class="st">&#39;ortalama tahmin hatasi&#39;</span>, </code></pre></div>
+<pre><code>ortalama tahmin hatasi 0.0208096951078</code></pre>
+<p>Bu sonuç ta hiç fena değil. Sonuç olarak veri içinde bazı kalıplar olduğunu gördük, tahmin yapabiliyoruz. Hangi kolonların daha önemli olduğunu bulmak için her kolonu teker teker atıp hatanın yukarı mı aşağı mı indiğine bakabilirdik.</p>
+<p>Tekrar vurgulamak gerekirse: üstteki analizde aslında çok fazla kategorik veri yok, yani <code>statsmodels.formula.api</code> üzerinden güzel formüllerle, regresyon çıktısında her kategorik değerin güzelce listelendiği türden bir kullanıma da gidebilirdik. Bu yazıda göstermeye çalıştığımız çok fazla veri, çok fazla kolon / kategori olduğunda ve tek makina ortamında takip edilebilecek çözümler.</p>
+<p>Zaman Karşılaştırmak</p>
+<p>Eğer 23:50 ile sabah 00:10 zamanını karşılaştırmak istersek ne yaparız? Eğer saat ve dakika farkını direk hesaplasak bu iki zamanın çok uzak olduğunu düşünebilirdik. Fakat aslında aralarında 20 dakika var, zaman dönüp başa gelen bir kavram.</p>
+<div class="figure">
+<img src="stat_feat_01.png" />
+
+</div>
+<p>Bu hesabı yapmak için bir yöntem çember, açılar kullanmak. Gün içindeki zamanı 0 ile 1 arasında kodlarız, sonra bu büyüklüğü <span class="math inline">\(2\pi\)</span> ile çarparız, bu bize çember üzerindeki bir noktayı verir, yani zamanı açıya çevirmiş oluruz. Sonra açının <span class="math inline">\(\sin\)</span>, <span class="math inline">\(\cos\)</span> değerini hesaplayıp iki rakam elde ederiz, bu iki sayı bize gün içindeki zamanı temsil eden bir büyüklük verir.</p>
+<p>Bu büyüklükleri birbirleri ile karşılaştırmak daha kolay, üstteki şekilde <span class="math inline">\(\theta_2\)</span> ve <span class="math inline">\(\theta_3\)</span> birbirine yakın, karşılaştırma yaparken <span class="math inline">\(\sin\)</span> bize dikey eksendeki izdüşümü, <span class="math inline">\(\cos\)</span> yatay eksendeki izdüşümünü verir, <span class="math inline">\(\theta_2,\theta_3\)</span> için y eksenindeki yansıma birbirine çok yakın. Eksen x üzerindeki yansıma farklı biri eksi biri artı yönde fakat yine de mutlak değer bağlamında birbirlerine çok yakınlar. İstediğimiz de bu zaten.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+t1 <span class="op">=</span> <span class="fl">0.12</span> <span class="op">*</span> <span class="dv">2</span><span class="op">*</span>np.pi
+t2 <span class="op">=</span> <span class="fl">0.97</span> <span class="op">*</span> <span class="dv">2</span><span class="op">*</span>np.pi
+t3 <span class="op">=</span> <span class="fl">0.03</span> <span class="op">*</span> <span class="dv">2</span><span class="op">*</span>np.pi
+
+d1 <span class="op">=</span> (np.cos(t1), np.sin(t1))
+d2 <span class="op">=</span> (np.cos(t2), np.sin(t2))
+d3 <span class="op">=</span> (np.cos(t3), np.sin(t3))
+
+<span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%f</span><span class="st"> </span><span class="sc">%f</span><span class="st">&quot;</span> <span class="op">%</span> d1)
+<span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%f</span><span class="st"> </span><span class="sc">%f</span><span class="st">&quot;</span> <span class="op">%</span> d2)
+<span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%f</span><span class="st"> </span><span class="sc">%f</span><span class="st">&quot;</span> <span class="op">%</span> d3)
+
+<span class="bu">print</span> <span class="st">u&#39;uzaklık 1-2 =&#39;</span>, lin.norm(np.array(d1)<span class="op">-</span>np.array(d2))
+<span class="bu">print</span> <span class="st">u&#39;uzaklık 2-3 =&#39;</span>, lin.norm(np.array(d2)<span class="op">-</span>np.array(d3))</code></pre></div>
+<pre><code>0.728969 0.684547
+0.982287 -0.187381
+0.982287 0.187381
+uzaklık 1-2 = 0.907980999479
+uzaklık 2-3 = 0.374762629171</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Teetor, <em>R Cookbook</em></p>
+<p>[2] Scikit-Learn Documentation, <em>4.2. Feature extraction</em>, <a href="http://scikit-learn.org/dev/modules/feature_extraction.html" class="uri">http://scikit-learn.org/dev/modules/feature_extraction.html</a></p>
+<p>[3] Bayramlı, <em>Fonksiyon Gezmek ve Yield</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2011/02/fonksiyon-gezmek-ve-yield.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2011/02/fonksiyon-gezmek-ve-yield.html</a></p>
+<p>[4] Bayramlı, Istatistik, <em>Lineer Regresyon</em></p>
+</body>
+</html>

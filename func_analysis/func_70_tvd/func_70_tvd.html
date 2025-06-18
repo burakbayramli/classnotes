@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="tam-varyasyon-ile-gürültüyü-yoketmek-total-variation-denoising">Tam Varyasyon ile Gürültüyü Yoketmek (Total Variation Denoising)</h1>
+<p>Bir sinyalden, görüntüden gürültüyü silmek için optimizasyon kullanılabilir. Orijinal sinyal <span class="math inline">\(x\)</span>'in <span class="math inline">\(y = B x + n\)</span> ile bir <span class="math inline">\(n\)</span> gürültüsü eklenerek bozulduğu (corrupted) farzedilebilir (<span class="math inline">\(B\)</span> bir değişim matrisidir, tutarlı, bilinen değişimleri temsil eder) biz eldeki <span class="math inline">\(y\)</span> ile <span class="math inline">\(x\)</span>'i kestirmeye uğraşırız. Fakat literatürde iyi bilindiği üzere <span class="math inline">\(x\)</span>'i <span class="math inline">\(y\)</span>'den tahmin etmeye uğraşmak kötü konumlanmış (ill-posed) bir sorudur. Çözüm olabilecek pek çok <span class="math inline">\(x\)</span> bulunabilir, bu sebeple arama alanını bir şekilde daraltmak gerekir, ve bunun için bir tür düzenlileştirme / regülarizasyon (regularization) kullanılması şarttır [3].</p>
+<p>Bir sayısal resimden gürültü çıkartma alanında iyi bilinen bir yöntem problemi çift hedefli bir halde konumlandırmak [4],</p>
+<p><span class="math display">\[
+|| x-x_{cor}||_2, \qquad \phi_{tv} (x) = \sum_{i=1}^{n-1} | x_{i+1} - x_i | 
+\qquad (1)
+\]</span></p>
+<p>Burada <span class="math inline">\(x_{cor} \in \mathbb{R}^n\)</span> bize verilen bozulmuş sinyal, <span class="math inline">\(x \in \mathbb{R}^n\)</span> ise bulmak istediğimiz, gürültüsü çıkartılmış sinyal, <span class="math inline">\(\phi_{tv}\)</span> ise tam varyasyon fonksiyonu. Üstteki iki hedefi minimize etmek istiyoruz, böylece aynı anda hem sinyalin kendi içindeki varyasyonu azaltan hem de bozulmuş sinyale mümkün olduğunca yakın duran bir gerçek <span class="math inline">\(x\)</span> elde edebilelim.</p>
+<p>Her iki hedef fonksiyonunu birleştirip tek bir fonksiyon haline getirip onu kısıtlanmamış (unconstrained) bir optimizasyon problemi olarak çözebiliriz,</p>
+<p><span class="math display">\[
+\psi = || x-x_{cor}||_2^2 + \mu \phi_{tv} 
+\]</span></p>
+<p>ki <span class="math inline">\(\mu\)</span> bizim seçeceğimiz bir parametre olabilir. Çözüm için mesela Newton metodunu kullanabiliriz, fakat tek bir problem var, Newton ve ona benzer diğer optimizasyon metotları için türev almak gerekli, fakat <span class="math inline">\(\phi_{tv}\)</span>'deki L1-norm'unun (tek boyutta mutlak değer fonksiyonu) <span class="math inline">\(x=0\)</span>'da türevi yoktur (birinci terimdeki Oklit normunun karesi alındığı için onun iki kere türevi alınabilir). Bu durumda <span class="math inline">\(\phi_{tv}\)</span>'yi yaklaşık olarak temsil edebilirsek, onun da türevi alınır hale gelmesi sağlayabiliriz. Bu yeni fonksiyona <span class="math inline">\(\phi_{atv}\)</span> diyelim,</p>
+<p><span class="math display">\[
+\phi_{atv} = \sum_{i=1}^{n-1} 
+\left( \sqrt{ \epsilon^2 + (x_{i+1})-x_i  } - \epsilon \right)
+\]</span></p>
+<p>ki <span class="math inline">\(\epsilon &gt; 0\)</span> yaklaşıklamanın seviyesini ayarlıyor. Bu fonksiyonun iyi bir yaklaşıklama olduğunu görmek zor değil, toplam içindeki kısmı deneyerek görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+eps <span class="op">=</span> <span class="fl">1e-6</span>
+mu <span class="op">=</span> <span class="fl">50.0</span>
+
+<span class="kw">def</span> norm_tv(x):
+   <span class="cf">return</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(np.diff(x)))
+   
+<span class="kw">def</span> norm_atv(x):
+   <span class="cf">return</span> np.<span class="bu">sum</span>(np.sqrt(eps <span class="op">+</span> np.power(np.diff(x),<span class="dv">2</span>)) <span class="op">-</span> eps)
+   
+xcor <span class="op">=</span> np.random.randn(<span class="dv">1000</span>)
+
+<span class="bu">print</span> (norm_tv(xcor))
+<span class="bu">print</span> (norm_atv(xcor))</code></pre></div>
+<pre><code>1103.2561038302395
+1103.2571969067808</code></pre>
+<p>Üstteki fonksiyonun iki kez türevi alınabilir. Şimdi analitik şekilde devam etmeden önce pür sayısal açıdan bir çözüme bakalım. Üstteki fonksiyonları direk kodlayarak ve sayısal türev üzerinden işleyebilen bir kütüphane çağrısıyla hedefi minimize edelim, eldeki sinyal,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;xcor.csv&#39;</span>,header<span class="op">=</span><span class="va">None</span>)
+xcor <span class="op">=</span> np.reshape(np.array(df[<span class="dv">0</span>]), (<span class="dv">5000</span>,<span class="dv">1</span>))
+plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(xcor)), xcor)
+plt.savefig(<span class="st">&#39;func_60_tvd_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="func_60_tvd_01.png" />
+
+</div>
+<p>Kütüphane çağrısı ile</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x0 <span class="op">=</span> np.zeros(<span class="bu">len</span>(xcor))
+
+<span class="im">from</span> scipy.optimize <span class="im">import</span> minimize, Bounds, SR1, BFGS
+
+<span class="kw">def</span> phi(x):
+   <span class="cf">return</span> np.<span class="bu">sum</span>(np.power(x<span class="op">-</span>xcor, <span class="dv">2</span>)) <span class="op">+</span> mu<span class="op">*</span>norm_atv(x)
+
+opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">400</span>, <span class="st">&#39;verbose&#39;</span>: <span class="dv">2</span>}
+
+res <span class="op">=</span> minimize (fun<span class="op">=</span>phi,
+                x0<span class="op">=</span>x0,
+                options<span class="op">=</span>opts,
+                jac<span class="op">=</span><span class="st">&#39;2-point&#39;</span>,
+                hess<span class="op">=</span>BFGS(),
+                method<span class="op">=</span><span class="st">&#39;trust-constr&#39;</span>
+                )
+
+plt.plot(<span class="bu">range</span>(<span class="dv">5000</span>), res.x)
+plt.savefig(<span class="st">&#39;func_60_tvd_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="func_60_tvd_02.png" />
+
+</div>
+<p>Sonuç fena olmadı. Fakat üstteki yaklaşımın hesabı uzun sürecektir, eğer eldeki problem hakkında bazı ek şeyler biliyorsak, bu bilgileri dahil ederek elde edilen çözüm daha hızlı olabilir. Mesela analitik olarak türevler Jacobian ve Hessian bulunabilir, Newton adımı elle kodlanabilir, ayrıca problemdeki matrislerde muhtemel bir seyreklikten (sparsity) faydalanılabilir.</p>
+<p>Hedef fonksiyonu, <span class="math inline">\(\psi(x)\)</span> diyelim, için birinci ve ikinci türev,</p>
+<p><span class="math display">\[
+\nabla \psi(x) = 2 (x-x_{cor}) + \mu \nabla \phi_{atv}(x), \qquad
+\nabla^2 \psi(x) = 2 I + \mu \nabla^2 \phi_{atv} (x)
+\]</span></p>
+<p>Zincirleme Kuralı uygulandı tabii, ve şimdi <span class="math inline">\(\phi_{atv}\)</span> üzerindeki türevleri bulmak gerekiyor. Sorun değil, daha önceki yaklaşıklamayı bunun için yapmıştık zaten. Yaklaşık fonksiyonu genel olarak belirtirsek,</p>
+<p><span class="math display">\[
+f(u) = \sqrt{\epsilon^2 + u^2} - \epsilon
+\]</span></p>
+<p>Bu fonksiyonun 1. ve 2. türevi</p>
+<p><span class="math display">\[
+f&#39;(u) = u(\epsilon^2 + u^{-1/2} ), \qquad
+f&#39;&#39;(u) = \epsilon^2 (\epsilon^2 + u^2)^{-3/2}
+\]</span></p>
+<p>Şimdi bir <span class="math inline">\(F\)</span> tanımlayalım,</p>
+<p><span class="math display">\[
+F(u_1,..., u_{n-1}) = \sum_{i=1}^{n-1} f(u_i)
+\]</span></p>
+<p>Yani <span class="math inline">\(F(u)\)</span> <span class="math inline">\(u\)</span>'nun bileşenlerinin yaklaşık L1 norm'unun toplamıdır. Nihai amacımız bu tanımdan bir <span class="math inline">\(\phi_{atv}\)</span> ifadesine ulaşmak. <span class="math inline">\(F\)</span>'in gradyanı ve Hessian'ı</p>
+<p><span class="math display">\[
+\nabla F(u) = \left[\begin{array}{ccc} f&#39;(u_1) &amp; \dots &amp; f&#39;(u_{n-1}) \end{array}\right]
+\]</span></p>
+<p><span class="math display">\[
+\nabla^2 F(u) = 
+\mathrm{diag} 
+\left[\begin{array}{ccc} f&#39;&#39;(u_1) &amp; \dots &amp; f&#39;&#39;(u_{n-1}) \end{array}\right] 
+\]</span></p>
+<p>Eğer bir ileri farklılık matrisi <span class="math inline">\(D\)</span> tanımlarsak,</p>
+<p><span class="math display">\[
+D = \left[\begin{array}{ccccc}
+-1  &amp; 1 &amp; &amp; &amp;    \\
+ &amp; -1 &amp; 1 &amp; &amp;   \\
+ &amp;  &amp; \ddots  &amp; \ddots &amp;  \\
+ &amp;  &amp;  &amp;  -1 &amp; 1
+\end{array}\right]
+\]</span></p>
+<p>O zaman <span class="math inline">\(\phi_{atv}(x) = F(Dx)\)</span> diyebiliriz. Bir <span class="math inline">\(x\)</span> vektörünü üstteki matris ile soldan çarpınca öğeleri <span class="math inline">\(\left[\begin{array}{ccc} x_2-x_1 &amp; x_3-x_2 &amp; \dots \end{array}\right]\)</span> şeklinde giden bir yeni vektör elde edeceğimizi doğrulamak zor değil. Yine Zincirleme Kuralını uygularsak,</p>
+<p><span class="math display">\[
+\nabla \phi_{atv}(x) = D^T \nabla F(Dx), \qquad
+\nabla^2 \phi_{atv}(x) = D^T \nabla^2 F(Dx) D
+\]</span></p>
+<p>Hepsini bir araya koyarsak</p>
+<p><span class="math display">\[
+\nabla \psi(x) = 2(x-x_{cor}) + \mu D^T \nabla F(Dx)
+\]</span></p>
+<p><span class="math display">\[
+\nabla^2 \psi(x) = 2 I  + \mu D^T \nabla^2 F(Dx) D
+\]</span></p>
+<p>Kodlamayı alttaki gibi yapabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> scipy.sparse <span class="im">as</span> sps
+<span class="im">import</span> scipy.sparse.linalg <span class="im">as</span> slin
+
+MU <span class="op">=</span> <span class="fl">50.0</span>
+EPSILON <span class="op">=</span> <span class="fl">0.001</span>
+
+ALPHA <span class="op">=</span> <span class="fl">0.01</span><span class="op">;</span>
+BETA <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span>
+MAXITERS <span class="op">=</span> <span class="dv">100</span><span class="op">;</span>
+NTTOL <span class="op">=</span> <span class="fl">1e-10</span><span class="op">;</span>
+
+n <span class="op">=</span> <span class="bu">len</span>(xcor)
+data <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">1</span><span class="op">*</span>np.ones(n), np.ones(n)])
+diags <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>])
+D <span class="op">=</span> sps.spdiags(data, diags, n<span class="dv">-1</span>, n)
+
+x <span class="op">=</span> np.zeros((<span class="bu">len</span>(xcor),<span class="dv">1</span>))
+
+<span class="cf">for</span> <span class="bu">iter</span> <span class="kw">in</span> <span class="bu">range</span>(MAXITERS):
+   d <span class="op">=</span> D.dot(x)
+   val1 <span class="op">=</span> np.dot((x<span class="op">-</span>xcor).T,(x<span class="op">-</span>xcor))
+   val2 <span class="op">=</span> np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> np.power(d,<span class="dv">2</span>))
+   val3 <span class="op">=</span> EPSILON<span class="op">*</span>np.ones((n<span class="dv">-1</span>,<span class="dv">1</span>))
+   val <span class="op">=</span> np.<span class="bu">float</span>(val1 <span class="op">+</span> MU<span class="op">*</span>np.<span class="bu">sum</span>(val2 <span class="op">-</span> val3))
+   grad1 <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>(x<span class="op">-</span>xcor)
+   grad2 <span class="op">=</span> MU<span class="op">*</span>D.T.dot(d <span class="op">/</span> np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> d<span class="op">**</span><span class="dv">2</span>))
+   grad <span class="op">=</span> grad1 <span class="op">+</span> grad2
+   hess1 <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>sps.eye(n)
+   hess2 <span class="op">=</span> EPSILON<span class="op">**</span><span class="dv">2</span><span class="op">*</span>(EPSILON<span class="op">**</span><span class="dv">2</span><span class="op">+</span>d<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span>(<span class="op">-</span><span class="dv">3</span><span class="op">/</span><span class="dv">2</span>)
+   hess2 <span class="op">=</span> hess2.reshape((n<span class="dv">-1</span>))
+   hess3 <span class="op">=</span> sps.spdiags(hess2, <span class="dv">0</span>, n<span class="dv">-1</span>, n<span class="dv">-1</span>)
+
+   hess <span class="op">=</span> hess1 <span class="op">+</span> MU<span class="op">*</span>hess3.dot(D).T.dot(D)
+   v <span class="op">=</span> slin.spsolve(<span class="op">-</span>hess, grad)
+   v <span class="op">=</span> np.reshape(v, (n,<span class="dv">1</span>))
+   lambdasqr <span class="op">=</span> np.<span class="bu">float</span>(np.dot(<span class="op">-</span>grad.T,v))
+   <span class="cf">if</span> lambdasqr<span class="op">/</span><span class="dv">2</span> <span class="op">&lt;</span> NTTOL: <span class="cf">break</span>
+   t <span class="op">=</span> <span class="dv">1</span><span class="op">;</span>
+   <span class="cf">while</span> <span class="va">True</span>:
+      tmp1 <span class="op">=</span> np.<span class="bu">float</span>(np.dot((x<span class="op">+</span>t<span class="op">*</span>v<span class="op">-</span>xcor).T,(x<span class="op">+</span>t<span class="op">*</span>v<span class="op">-</span>xcor)))
+      tmp2 <span class="op">=</span> MU<span class="op">*</span>np.<span class="bu">sum</span>(np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(D<span class="op">*</span>(x<span class="op">+</span>t<span class="op">*</span>v))<span class="op">**</span><span class="dv">2</span>)<span class="op">-</span>EPSILON<span class="op">*</span>np.ones((n<span class="dv">-1</span>,<span class="dv">1</span>)))
+      tmp3 <span class="op">=</span> val <span class="op">-</span> ALPHA<span class="op">*</span>t<span class="op">*</span>lambdasqr
+      <span class="cf">if</span> tmp1 <span class="op">+</span> tmp2 <span class="op">&lt;</span> tmp3: <span class="cf">break</span>
+      t <span class="op">=</span> BETA<span class="op">*</span>t
+
+   x <span class="op">=</span> x<span class="op">+</span>t<span class="op">*</span>v
+
+plt.plot(<span class="bu">range</span>(n),xcor)
+plt.plot(<span class="bu">range</span>(n),x,<span class="st">&#39;r&#39;</span>)
+plt.savefig(<span class="st">&#39;func_60_tvd_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="func_60_tvd_03.png" />
+
+</div>
+<p>Çok daha iyi bir gürültüsüz sonuç elde ettik, üstteki bu işlem çok daha hızlı.</p>
+<p>Görüntüden Gürültü Silmek</p>
+<p>Aynen tek boyutlu sinyalden gürültü silebildiğimiz gibi iki boyutlu görüntüden de gürültü silmek mümkün. Bu durumda tam varyasyon</p>
+<p><span class="math display">\[
+\sum_{i=2}^{m} \sum_{j=2}^{n} (|U_{i,j} - U_{i-1,j}| + |U_{i,j} - U_{i,j-1}|)
+\]</span></p>
+<p>olabilir, yani her pikselin bir yanindaki ve bir altındaki pikselle olan uzaklığının L1-norm'unu almak. Üstteki hesabı yapmak için aslında yine daha önce hesapladığımız <span class="math inline">\(D\)</span> matrisini kullanabiliriz. Bir <span class="math inline">\(X\)</span> imajı üzerinde <span class="math inline">\(DX\)</span> hesabı, yani <span class="math inline">\(D\)</span> ile soldan çarpım dikey farklılıkları, sağdan çarpım <span class="math inline">\(XD\)</span> ise yatay farklılıkları verecektir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.sparse <span class="im">as</span> sps
+
+X <span class="op">=</span> [[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>],
+     [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>],
+     [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>],
+     [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>]]
+
+X <span class="op">=</span> np.array(X)
+<span class="bu">print</span> (X)
+n <span class="op">=</span> X.shape[<span class="dv">0</span>]
+data <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">1</span><span class="op">*</span>np.ones(n), np.ones(n)])
+diags <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>])
+D <span class="op">=</span> sps.lil_matrix(sps.spdiags(data, diags, n, n))
+<span class="bu">print</span> (D.todense())
+<span class="bu">print</span> (<span class="st">&#39;Dikey Farklilik&#39;</span>)
+<span class="bu">print</span> (D.dot(X))
+<span class="bu">print</span> (<span class="st">&#39;Yatay Farklilik&#39;</span>)
+<span class="bu">print</span> (D.transpose().dot(X.T))</code></pre></div>
+<pre><code>[[1 2 3 4]
+ [5 6 7 8]
+ [1 2 3 4]
+ [5 6 7 8]]
+[[-1.  1.  0.  0.]
+ [ 0. -1.  1.  0.]
+ [ 0.  0. -1.  1.]
+ [ 0.  0.  0. -1.]]
+Dikey Farklilik
+[[ 4.  4.  4.  4.]
+ [-4. -4. -4. -4.]
+ [ 4.  4.  4.  4.]
+ [-5. -6. -7. -8.]]
+Yatay Farklilik
+[[-1. -5. -1. -5.]
+ [-1. -1. -1. -1.]
+ [-1. -1. -1. -1.]
+ [-1. -1. -1. -1.]]</code></pre>
+<p>L1 norm yaklaşıksallığı için daha önceki yöntemi kullanabiliriz.</p>
+<p>Gradyan almak için ise bu sefer <code>tensorflow</code> paketini kullanacağız [5]. Bir vektöre göre değil bir matrise göre türev alıyoruz, bunu sembolik yapmak yerine sembolik yaklaşım kadar kuvvetli olan otomatik türev ile gradyanı elde edebiliriz.</p>
+<p>Üstteki tüm hesapları TF ile bir hesap grafiği içinde kodlayıp, <code>tf.gradients</code> ile hedef fonksiyonunun gradyanını alacağız, ve standart gradyan inişi optimizasyonu ile bir noktadan başlayıp gradyan yönü tersinde adım atarak minimum noktaya varmaya uğraşacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> skimage <span class="im">import</span> io
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+MU <span class="op">=</span> <span class="fl">50.0</span>
+EPSILON <span class="op">=</span> <span class="fl">0.001</span>
+n <span class="op">=</span> <span class="dv">225</span>
+
+img <span class="op">=</span> io.imread(<span class="st">&#39;lena.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)
+io.imsave(<span class="st">&#39;lenad0.jpg&#39;</span>, img)
+img <span class="op">=</span> io.imread(<span class="st">&#39;lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)
+io.imsave(<span class="st">&#39;lenad1.jpg&#39;</span>, img)
+xorig <span class="op">=</span> tf.cast(tf.constant( io.imread(<span class="st">&#39;lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)),dtype<span class="op">=</span>tf.float32)
+x <span class="op">=</span> tf.placeholder(dtype<span class="op">=</span><span class="st">&quot;float&quot;</span>,shape<span class="op">=</span>[n,n],name<span class="op">=</span><span class="st">&quot;x&quot;</span>)
+
+D <span class="op">=</span> np.zeros((n,n))
+idx1, idx2 <span class="op">=</span> [], []
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):
+    idx1.append([i,i])
+    <span class="cf">if</span> i<span class="op">&lt;</span>n<span class="dv">-1</span>: idx2.append([i,i<span class="op">+</span><span class="dv">1</span>])
+idx <span class="op">=</span> idx1 <span class="op">+</span> idx2
+ones <span class="op">=</span> [<span class="fl">1.0</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]
+ones[n<span class="dv">-1</span>] <span class="op">=</span> <span class="dv">0</span>
+negs <span class="op">=</span> [<span class="op">-</span><span class="fl">1.0</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="dv">-1</span>)]
+negs[n<span class="dv">-2</span>] <span class="op">=</span> <span class="dv">0</span>
+vals <span class="op">=</span> ones <span class="op">+</span> negs
+vals <span class="op">=</span> np.array(vals).astype(np.float32)
+D <span class="op">=</span> tf.SparseTensor(indices<span class="op">=</span>idx, values<span class="op">=</span>vals, dense_shape<span class="op">=</span>[n, n])
+
+
+diff <span class="op">=</span> tf.square(tf.norm(xorig<span class="op">-</span>x, <span class="bu">ord</span><span class="op">=</span><span class="st">&#39;euclidean&#39;</span>))
+
+Ux <span class="op">=</span> tf.sparse_tensor_dense_matmul(D, x)
+Uy <span class="op">=</span> tf.sparse_tensor_dense_matmul(tf.sparse_transpose(D), tf.transpose(x))
+Uy <span class="op">=</span> tf.transpose(Uy)
+
+fUx <span class="op">=</span> tf.reduce_sum(tf.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> tf.square(Ux)) <span class="op">-</span> EPSILON)
+fUy <span class="op">=</span> tf.reduce_sum(tf.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> tf.square(Uy)) <span class="op">-</span> EPSILON)
+
+phi_atv <span class="op">=</span> fUx <span class="op">+</span> fUy
+
+psi <span class="op">=</span> diff <span class="op">+</span> MU<span class="op">*</span>phi_atv
+g <span class="op">=</span> tf.gradients(psi, x)
+g <span class="op">=</span> tf.reshape(g,[n<span class="op">*</span>n])
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+sess <span class="op">=</span> tf.Session()
+
+sess.run(init)
+
+<span class="kw">def</span> tv(xvec):
+    xmat <span class="op">=</span> xvec.reshape(n,n)
+    p <span class="op">=</span> sess.run(psi, {x: xmat} )
+    <span class="cf">return</span> p
+
+<span class="kw">def</span> tv_grad(xvec):
+    xmat <span class="op">=</span> xvec.reshape(n,n)
+    gres <span class="op">=</span> sess.run(g, {x: xmat} )
+    <span class="cf">return</span> gres
+    
+x0 <span class="op">=</span> np.zeros(n<span class="op">*</span>n)
+xcurr <span class="op">=</span> x0
+
+N <span class="op">=</span> <span class="dv">130</span>
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,N):
+    gcurr <span class="op">=</span> tv_grad(xcurr)
+    gcurr <span class="op">/=</span> gcurr.<span class="bu">max</span>()<span class="op">/</span><span class="fl">0.3</span>
+    chg <span class="op">=</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(xcurr))
+    xcurr <span class="op">=</span> xcurr <span class="op">-</span> gcurr
+ 
+xcurr <span class="op">/=</span> xcurr.<span class="bu">max</span>()<span class="op">/</span><span class="fl">255.0</span>
+io.imsave(<span class="st">&#39;lenad2.jpg&#39;</span>, np.reshape(xcurr,(n,n)))</code></pre></div>
+<p><img src="lenad0.jpg" /> <img src="lenad1.jpg" /> <img src="lenad2.jpg" /></p>
+<p>Yine total varyasyon kullanan ama farklı optimizasyon çözücüyle hesabı yapan bir yöntem <code>tlv_prim_dual.py</code> kodunda [1], sonuç (soldaki)</p>
+<p><img src="lenad3.jpg" /> <img src="lenad4.jpg" /></p>
+<p>Ayrıca <code>cvxpy</code> adlı bir paket üzerinden aynı şeyi kodlayabiliriz, yani</p>
+<p><span class="math display">\[
+\min_{\beta \in \mathbb{R}^n} 
+\frac{1}{2} \sum_{i=1}^{n} (y_i - \beta_i)^2 + 
+\lambda \sum_{(i,j) \in E)}  |\beta_i - \beta_j|
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> cvxpy
+
+lam <span class="op">=</span> <span class="fl">35.0</span>
+
+u_corr <span class="op">=</span> plt.imread(<span class="st">&quot;lenad1.jpg&quot;</span>)
+
+rows, cols <span class="op">=</span> u_corr.shape
+
+U <span class="op">=</span> cvxpy.Variable(shape<span class="op">=</span>(rows, cols))
+
+obj <span class="op">=</span> cvxpy.Minimize(<span class="fl">0.5</span> <span class="op">*</span> cvxpy.sum_squares(u_corr<span class="op">-</span>U) <span class="op">+</span> lam<span class="op">*</span>cvxpy.tv(U))
+
+prob <span class="op">=</span> cvxpy.Problem(obj)
+
+prob.solve(verbose<span class="op">=</span><span class="va">True</span>, solver<span class="op">=</span>cvxpy.SCS)
+
+plt.imshow(U.value, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)
+plt.imsave(lena4.jpg<span class="st">&#39;, U.value, cmap=&#39;</span>gray<span class="st">&#39;)</span></code></pre></div>
+<p>Üstteki sağdaki resim bu sonucu gösteriyor. Bu yaklaşımda <code>cvxpy.tv</code> ile tam varyasyon hesabını yapan kütüphanenin kendi iç çağrısını kullandık.</p>
+<p>Kaynaklar</p>
+<p>[1] Mordvintsev, <em>ROF and TV-L1 denoising with Primal-Dual algorithm</em>, <a href="https://github.com/znah/notebooks/blob/master/TV_denoise.ipynb" class="uri">https://github.com/znah/notebooks/blob/master/TV_denoise.ipynb</a></p>
+<p>[2] Chambolle, <em>An introduction to continuous optimization for imaging</em>, <a href="https://hal.archives-ouvertes.fr/hal-01346507/document" class="uri">https://hal.archives-ouvertes.fr/hal-01346507/document</a></p>
+<p>[3] Afonso, <em>Fast Image Recovery Using Variable Splitting and Constrained Optimization</em>, <a href="http://www.lx.it.pt/~mtf/Afonso_BioucasDias_Figueiredo_twocolumn_v7.pdf" class="uri">http://www.lx.it.pt/~mtf/Afonso_BioucasDias_Figueiredo_twocolumn_v7.pdf</a></p>
+<p>[4] Boyd, <em>Additional Exercises for Convex Optimization</em> <a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf" class="uri">https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf</a></p>
+<p>[5] Bayramlı, <em>Bilgisayar Bilim, Yapay Zeka, Tensorflow</em></p>
+</body>
+</html>

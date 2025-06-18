@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="minimum-kapsamlı-ağaç-minimum-spanning-tree--mst-">Minimum Kapsamlı Ağaç (Minimum Spanning Tree -MST-)</h1>
+<p>MST algoritması kenar ağırlıklarına (weights) sahip olan bir çizit (graph) yapısı içinde minimal ve kapsayan ağacı (MST) bulan algoritmaya verilen isimdir. Mesela alttaki çizit içinde</p>
+<div class="figure">
+<img src="minspan_0.png" />
+
+</div>
+<p>MST öyle bir bağlantı yapısıdır ki baştan sona, herhangi bir noktadan (node) bir diğerine geçiş yapılabilsin, ve bu tüm yolların toplamı en minimal olsun. Dikkat, herhangi bir noktadan diğerine giden yol en az olsun demiyoruz, bu durumda problem en kısa yol (shortest path) problemi olurdu, ki bu problemi <em>Dinamik Programlama</em> yazısında gördük. Burada göreceğimiz kapsayan ağacın <em>toplamının</em> minimal olmasıdır.</p>
+<p>Kapsayan ağaç (spanning tree) kavramını tanımlamak gerekirse, bir çizitin kapsayan ağacı orijinal çizitin tüm noktalarına sahip olmalıdır, ağaç içinde hiçbir döngü (cycle) olmamalıdır. Döngü derken bir noktadan diğerine atlaya atlaya giderken bizi dönüp tekrar aynı yere getirebilecek türden &quot;kapalı devre'' tür bir döngüden bahsediyoruz - bu mümkün olmamalıdır. Ayrıca çizit bağlantılı olmalıdır, yani bir kısmı diğer kısmından kopuk bir çizit üzerinde MST bulunamaz.</p>
+<p>Minimum kapsayıcı ağaç ise bu tür pek çok alternatif ağaçların içinde en az ağırlıklı olanıdır. Not, bir çizitin MST çözümü özgün (unique) olmayabilir, aynı ağırlıkta birden fazla değişik ağaç mümkündür. Mesela üstteki çizit için mümkün MST'ler altta görülüyor,</p>
+<div class="figure">
+<img src="minspan_1.png" />
+
+</div>
+<p>Kontrol edilebilir, üstteki her ağacın kenar toplamı 8'dır. Bu ağaçların her biri bir MST olarak kabul edilebilir.</p>
+<p>Uygulama bağlamında MST bulma algoritmasının ne kadar kullanışlı olacağı görülüyor herhalde; mesela elektrik hatları, telefon iletişim hatları tasarlarken MST kullanılabilir, toplam bağlantısı en az olan bir ağ yapısı her iki durumda da kullanışlı olur. Biyolojik, kimyasal ağların analizinde bile MST kullanılmaktadır.</p>
+<p>Ağaçların Özellikleri (Properties of Trees)</p>
+<p>Başlamadan önce bir ağacı ağaç yapan iki önemli özelliği belirtelim</p>
+<ol style="list-style-type: decimal">
+<li><p>Tanım itibariyle ağaç olan bir şeye, arasında bağlantı olmayan iki noktayı birleştiren bir kenar koyarsak bu ağaçta bir döngü yaratmış oluruz.</p></li>
+<li><p>Elde olan bir ağacın herhangi bir kenarını çıkartırsak bu ağacı &quot;kopartmış'' oluruz, birbiriyle bağlantısız iki alt-ağaç ortaya çıkar.</p></li>
+</ol>
+<div class="figure">
+<img src="graph_prop.png" />
+
+</div>
+<p>Resimde her iki durumu görüyoruz. Bu iki özellik çok önemli, çünkü onları MST'lerin çok temel özelliklerini ispatlamak için kullanacağız. Ondan önce bazı tanımlar,</p>
+<p>Tanım</p>
+<p>Kesik (cut): Bir çizit üzerindeki yapılan kesik, o çiziti birbiriyle alakasız, bağlantısız iki parçaya / kümeye böler. <em>Not</em>: Bir kesik birden fazla kenarın üzerinden geçebilir / kapsayabilir, çünkü bir çiziti tamamen ikiye ayırmaktan bahsediyoruz. Bir ağaçtan bahsediyor olsaydık, yukarıda belirttiğimiz gibi, tek bir kenarı kesmek yeterli olurdu.</p>
+<p>Birleştiren kenar (crossing edge): birbirinden bağlantısız iki kümedeki herhangi bir noktayı diğer kümedeki herhangi bir diğer noktayla birleştiren bir kenardır.</p>
+<p>Önerme (Proposition)</p>
+<p>Herhangi bir çiziti alalım, ve bu çizitteki bir kesik içindeki (yani kopardığı tüm kenarlar) içindeki minimum birleştiren kenara bakalım. Bu kenar o çizitin MST'sinde <em>kesinlikle</em> olmalıdır.</p>
+<p>İspat</p>
+<p>Bu ispat tersini yanlışlama (proof by contradiction) yöntemini kullanacak. Diyelim ki bir kesik var, ve o kesikteki <span class="math inline">\(e\)</span> minimum birleştiren kenar. Bu çizitin MST'si <span class="math inline">\(T\)</span> olsun. Şimdi <span class="math inline">\(e\)</span>'nin <span class="math inline">\(T\)</span>'nin içinde olmadığı durumu düşünelim (yani önermenin dediğinin tersi), ve diyelim ki şimdi <span class="math inline">\(e\)</span>'yi alıp <span class="math inline">\(T\)</span>'ye ekliyoruz. Yeni bir çizit ortaya çıkardı, fakat daha önce dediğimiz gibi, <span class="math inline">\(T\)</span>'ye bir kenar eklemek ona aynı zamanda bir döngü eklemek demektir, ki bu döngünün içinde en az bir diğer kenar <span class="math inline">\(f\)</span> olacaktır (çünkü <span class="math inline">\(e\)</span> MST'de olmadığına göre orada başka bir şey var), ki bu <span class="math inline">\(f\)</span>, <span class="math inline">\(e\)</span>'den büyüktür. Fakat o zaman <span class="math inline">\(f\)</span>'yi kesip onun yerine daha az ağırlıkta olan <span class="math inline">\(e\)</span>'yi ekleyince MST'yi, hem de daha az ağırlıkla elde etmiş olmaz mıydık? Evet. Demek ki <span class="math inline">\(e\)</span>'nin MST içinde olmaması imkansızdır çünkü MST tanım itibariyle en minimal ağırlığa sahip olmalıdır.</p>
+<p>Alttaki resimde gri ve beyaz ile gösterilen ayrı kümelerdeki noktaları bir kesik ile ayrılmışlar ve bu kümelerin arasındaki birleştiren kenarlar kırmızı ile gösteriliyor. Burada <span class="math inline">\(e\)</span> ile gösterilen kenar MST içinde olmalıdır.</p>
+<div class="figure">
+<img src="cross_edge.png" />
+
+</div>
+<p>Üstteki kavramlar Kruskal'ın MST bulan algoritmasının temelini oluşturmaktadır (bu algoritmaya kısaca Kruskal diyeceğiz). Kruskal (ilk başta) birbirinden bağımsız ağaçları yavaş yavaş yaratır, onları büyütür. Aynı anda sürekli o ağaçları minimal bir kenar ile birleştirip onları daha büyük bir ağaç yapma fırsatına bakar.</p>
+<p>Ufak ufak ağaçlar üstteki durumda gri ve beyaz noktaları kapsayan ağaçlar gibi görülebilir, bunlar çizitin farklı bölgelerinde ayrı ayrı büyürler. Eğer bu ayrı ayrı bölgelerde, onlara ait MST'ler oluşturabilmişsek, Onları minimal şekilde birleştirmek (üstte <span class="math inline">\(e\)</span> ile) bize daha büyük bir MST sağlar.</p>
+<p>Kruskal kenarları teker teker işler, önce onları ağırlıklarına göre sıralar, ve en küçük kenarları önce alır. Bu yüzden ağaçları bağlanayan &quot;birleştiren kenarın'' minimal kalması, ve önce alınması da sağlanır.</p>
+<p>Birleşim-Buluş (Union-Find)</p>
+<p>Kruskal'ın kodlama bağlamında önemli bir püf noktası, sırayla bakılan bir kenarın mevcut alt-ağaçlardan birine eklenme durumunda döngü oluşturup oluşturmadığını hızlı bir şekilde anlayabilmesidir. Bunun için şu diğer soruyu cevaplamak yeterlidir: bir kenara baktığımızda, bu kenarın iki ucundaki iki noktayı alırız, ve bu iki noktanın herhangi bir alt-ağaç içinde, yani aynı alt-ağaç içinde, olup olmadığına bakarız (hatırlarsak pek çok alt-ağaç olabiliyor). Eğer bu iki nokta herhangi bir alt-ağaç içinde bulunursa, bu kenarı çöpe atabiliriz, çünkü bu noktalar başka bir şekilde bir alt-MST oluşturmuştur, ve bu alt-MST optimaldir (bkz üstteki ispat).</p>
+<p>&quot;İki noktanın aynı alt ağaç içinde olup olmadığını anlamak'' ise şu alt-ağaçların sürekli bir &quot;temsili noktaya'' işaret etmesiyle halledilebilir (bu işaret, kenarlardan farklı). Eğer iki nokta, aynı, temsili noktaya işaret ediyorsa, onlar aynı ağaç içindedir, vep dolaylı olarak bu demektir ki bu noktalar bir şekilde &quot;bağlanmıştırlar'' çünkü her alt-ağaç aynı zamanda ufak bir MST'dir. Bu durumda yeni kenarı eklemek tanım itibariyle bir döngü oluşturur, ve gereksizdir. Eğer noktalar farklı ağaçlarda iseler, bu ağaçları birleştirmek iki temsili noktadan birinin bir diğerine işaret etmesiyle halolabilir. Evet birleştirme sonrası bazı üyeler yeni temsili noktaya işaret etmiyor olabilirler, bu durum, noktadan noktaya atlanıp temsili noktaya erişmek ile halolur. Bu arada, arama sırasında, yeni temsili noktaya olan işaretler değiştirilir, ki bu &quot;düzeltme'' işlemi yol sıkıştırma (path compression) olarak anılıyor.</p>
+<p>Alttaki kod tüm bu numaraları kullanıyor. Örnek olarak yazının başında verilen çiziti kodladık ve MST'sini bulduk. Çizit formatı iki yönlü kenar bilgisi gerektirmez, iki nokta arasındaki geçişi bir kere belirtmek yeterlidir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">G1 <span class="op">=</span> {
+  <span class="st">&#39;a&#39;</span>: {<span class="st">&#39;b&#39;</span>:<span class="dv">1</span>, <span class="st">&#39;f&#39;</span>:<span class="dv">2</span>, <span class="st">&#39;g&#39;</span>: <span class="dv">6</span>},
+  <span class="st">&#39;b&#39;</span>: {<span class="st">&#39;c&#39;</span>:<span class="dv">1</span>},
+  <span class="st">&#39;c&#39;</span>: <span class="bu">set</span>(),
+  <span class="st">&#39;d&#39;</span>: {<span class="st">&#39;f&#39;</span>:<span class="dv">1</span>, <span class="st">&#39;e&#39;</span>:<span class="dv">2</span>},
+  <span class="st">&#39;e&#39;</span>: {<span class="st">&#39;g&#39;</span>:<span class="dv">1</span>},
+  <span class="st">&#39;f&#39;</span>: <span class="bu">set</span>(),
+  <span class="st">&#39;g&#39;</span>: <span class="bu">set</span>()
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> find(C, u):
+    <span class="cf">if</span> C[u] <span class="op">!=</span> u:
+        C[u] <span class="op">=</span> find(C, C[u])                    <span class="co"># Path compression</span>
+    <span class="cf">return</span> C[u]
+
+<span class="kw">def</span> union(C, R, u, v):
+    u, v <span class="op">=</span> find(C, u), find(C, v)
+    <span class="cf">if</span> R[u] <span class="op">&gt;</span> R[v]:                             <span class="co"># Union by rank</span>
+        C[v] <span class="op">=</span> u
+    <span class="cf">else</span>:
+        C[u] <span class="op">=</span> v
+    <span class="cf">if</span> R[u] <span class="op">==</span> R[v]:                            <span class="co"># A tie: Move v up a level</span>
+        R[v] <span class="op">+=</span> <span class="dv">1</span>
+
+<span class="kw">def</span> kruskal(G):
+    E <span class="op">=</span> [(G[u][v],u,v) <span class="cf">for</span> u <span class="kw">in</span> G <span class="cf">for</span> v <span class="kw">in</span> G[u]]
+    T <span class="op">=</span> <span class="bu">set</span>()
+    C, R <span class="op">=</span> {u:u <span class="cf">for</span> u <span class="kw">in</span> G}, {u:<span class="dv">0</span> <span class="cf">for</span> u <span class="kw">in</span> G}   <span class="co"># Comp. reps and ranks</span>
+    <span class="bu">print</span> <span class="bu">list</span>(<span class="bu">sorted</span>(E))
+    <span class="cf">for</span> _, u, v <span class="kw">in</span> <span class="bu">sorted</span>(E):
+        <span class="cf">if</span> find(C, u) <span class="op">!=</span> find(C, v):
+            T.add((u, v))
+            <span class="bu">print</span> (u, v)
+            union(C, R, u, v)
+    <span class="cf">return</span> T
+
+mst <span class="op">=</span> <span class="bu">list</span>(kruskal(G1))
+<span class="bu">print</span> <span class="st">&#39;MST&#39;</span>, mst</code></pre></div>
+<pre><code>[(1, &#39;a&#39;, &#39;b&#39;), (1, &#39;b&#39;, &#39;c&#39;), (1, &#39;d&#39;, &#39;f&#39;), (1, &#39;e&#39;, &#39;g&#39;), (2, &#39;a&#39;, &#39;f&#39;),
+ (2, &#39;d&#39;, &#39;e&#39;), (6, &#39;a&#39;, &#39;g&#39;)]
+(&#39;a&#39;, &#39;b&#39;)
+(&#39;b&#39;, &#39;c&#39;)
+(&#39;d&#39;, &#39;f&#39;)
+(&#39;e&#39;, &#39;g&#39;)
+(&#39;a&#39;, &#39;f&#39;)
+(&#39;d&#39;, &#39;e&#39;)
+MST [(&#39;d&#39;, &#39;e&#39;), (&#39;e&#39;, &#39;g&#39;), (&#39;d&#39;, &#39;f&#39;), (&#39;b&#39;, &#39;c&#39;), (&#39;a&#39;, &#39;f&#39;), (&#39;a&#39;, &#39;b&#39;)]</code></pre>
+<p>Bu işleyiş (yine başta gösterdiğimiz) alternatif MST'lerden birincisini buldu (<code>a-f</code> bağlı, <code>e-f</code> bağlı değil). Güzel! Kruskal'ın işleyiş hızı <span class="math inline">\(O(E \log E)\)</span> seviyesindedir, <span class="math inline">\(E\)</span> kenar sayısıdır. Bu çok iyi bir performanstır, bu performansın mesela <span class="math inline">\(O(N^2)\)</span>'den farkını göstermek için alttaki hesaba bakalım, eğer 100,000 tane kenar olsaydı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">e <span class="op">=</span> <span class="dv">100</span> <span class="op">*</span> <span class="dv">1000</span>
+<span class="bu">print</span> <span class="st">&#39;n^2&#39;</span>, e<span class="op">**</span><span class="dv">2</span>
+<span class="bu">print</span> <span class="st">&#39;log&#39;</span>, np.log(e)
+<span class="bu">print</span> <span class="st">&#39;kruskal&#39;</span>, e<span class="op">*</span>np.log(e)</code></pre></div>
+<pre><code>n^2 10000000000
+log 11.512925465
+kruskal 1151292.5465</code></pre>
+<p>Kruskal 1 milyon kusur operasyona orantılı bir sonuç verirdi, kıyasla <span class="math inline">\(O(N^2)\)</span> 10 milyar operasyon ortaya çıkartıyor!</p>
+<p>Bir diğer örnek: Altta MST'nin adım adım oluşturulmasını da göreceğiz. Kırmızı ile işaretlenen kenar o adımda seçilen kenarı gösteriyor, siyah olanlar mevcut MST(lerde) olan kenarları.</p>
+<div class="figure">
+<img src="sedge_krus_1.png" />
+
+</div>
+<div class="figure">
+<img src="sedge_krus_2.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">G2 <span class="op">=</span> {
+  <span class="dv">0</span>: {<span class="dv">7</span>: <span class="fl">0.16</span>, <span class="dv">4</span>: <span class="fl">0.38</span>, <span class="dv">2</span>: <span class="fl">0.26</span>, <span class="dv">6</span>: <span class="fl">0.58</span>},
+  <span class="dv">1</span>: {<span class="dv">5</span>: <span class="fl">0.32</span>, <span class="dv">2</span>: <span class="fl">0.36</span>, <span class="dv">3</span>: <span class="fl">0.29</span>, <span class="dv">7</span>: <span class="fl">0.19</span>},
+  <span class="dv">2</span>: {<span class="dv">3</span>: <span class="fl">0.17</span>, <span class="dv">6</span>: <span class="fl">0.40</span>, <span class="dv">7</span>: <span class="fl">0.34</span>},
+  <span class="dv">3</span>: {<span class="dv">6</span>: <span class="fl">0.52</span>},
+  <span class="dv">4</span>: {<span class="dv">5</span>: <span class="fl">0.35</span>, <span class="dv">7</span>: <span class="fl">0.37</span>, <span class="dv">6</span>: <span class="fl">0.93</span>},
+  <span class="dv">5</span>: {<span class="dv">7</span>: <span class="fl">0.28</span>},
+  <span class="dv">6</span>: <span class="bu">set</span>(),
+  <span class="dv">7</span>: <span class="bu">set</span>()
+} 
+
+mst <span class="op">=</span> <span class="bu">list</span>(kruskal(G2))
+<span class="bu">print</span> <span class="st">&#39;MST&#39;</span>, mst</code></pre></div>
+<pre><code>[(0.16, 0, 7), (0.17, 2, 3), (0.19, 1, 7), (0.26, 0, 2), (0.28, 5, 7), (0.29, 1, 3), (0.32, 1, 5), (0.34, 2, 7), (0.35, 4, 5), (0.36, 1, 2), (0.37, 4, 7), (0.38, 0, 4), (0.4, 2, 6), (0.52, 3, 6), (0.58, 0, 6), (0.93, 4, 6)]
+(0, 7)
+(2, 3)
+(1, 7)
+(0, 2)
+(5, 7)
+(4, 5)
+(2, 6)
+MST [(2, 6), (4, 5), (5, 7), (0, 7), (2, 3), (1, 7), (0, 2)]</code></pre>
+<p>Şekilde <code>5-7</code>'yi birbirine bağlayan 6. adım sonrası <code>1-3</code>'un çözüme dahil edilmediğine dikkat edelim. Bu noktada 1 ve 3 düğümleri artık aynı ağaç içindedirler, ve bu kenarı eklemek bir döngü oluşturacaktır.</p>
+<p>Kruskal algoritması, ve ona benzer Prim, ya da &quot;bir sonraki adımda hep en yakını işleyen'' algoritmalar açgözlü (greedy) algoritmalar olarak bilinirler. Mesela <em>Dinamik Programlama</em> yazısında gördüğümüz üzere, açgözlü yöntem en kısa yolu vermeyebiliyordu. MST durumunda açgözlülük faydalıdır, açgözlülüğün faydalı olduğu mutlu örneklerden biridir diyelim!</p>
+<p>Not: Bazılarına tanıdık gelebilecek bilgisayar bilimin demirbaş problemlerinden Seyahat Eden Satış Görevlisi (Traveling Salesman Problemi -TSP-) NP-Tam olarak bilinir. MST, ki çok hızlı işleyen bir algoritma, yaklaşıksal olarak TSP'yi çözmekte kullanılabilmektedir.</p>
+<p>Kaynaklar</p>
+<p>[1] Sedgewick, R. <em>Algorithms</em>, sf. 409</p>
+<p>[2] Sedgewick, R. <em>Algorithms, 4th Edition</em>, sf. 624</p>
+<p>[3] Heatland, <em>Python Algorithms</em></p>
+</body>
+</html>

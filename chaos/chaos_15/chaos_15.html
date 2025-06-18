@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-15">Ders 15</h1>
+<p>Dersimizin kaos bölümüne geldik. Kaosu bir su çarkı örneğinde göreceğiz, su çarkını biliyoruz, eğer bir yerde doğal su akışı varsa oraya çark konabilir, su düşerken çarkı döndürür.</p>
+<div class="figure">
+<img src="waterwheel.jpg" />
+
+</div>
+<p>Bizim işleyeceğimiz su çarkı biraz değişik,</p>
+<div class="figure">
+<img src="15_01.jpg" />
+
+</div>
+<p>Bu tam bir su çarkına benzemiyor biliyorum. Bu çarkta dönen kısım yatay, bir su veren mekanizmanın altında. Bu yatay kısım kaldırılıp indirilebiliyor, yani yüzeye bir eğim halinde tutulabiliyor, bu eğimi yandaki bir vida ile ayarlayabiliyoruz [1]. Sistemimizin bir parametresi bu olacak.</p>
+<p>Mekanizmanın ortasındaki blok bir pompa, altta biriken suyu yukarı çekiyor, ve iki yana ayrılan bir boru ve su veren duş gibi bir sistemle hemen altındaki kutucuklara suyu veriyor. Duştaki su akışı tam ayrımın olduğu noktada en fazla, yanlara doğru gittikçe azalıyor. Kutucukların altında delik var, orada biriken şu aşağı yavaş yavaş mekanizmanın tabanına gidiyor, ve oradan pompayla yukarı çekiliyor, döngü devam ediyor. Kutucuklar birbirinden tamamen bağımsız.</p>
+<p>Bu sistemde sarkacımsı bir davranış olması şaşırtıcı olmamalı, üstte olan kutucuklarda biriken su onların ağırlığını arttıracak, eğim yüzünden bu ağırlık aşağı inmek isteyecek, bir dönüş hareketi ortaya çıkacak, tabii o dönüş daha boş olan kutucukları su akışı altına getirecek, böyle devam edecek.</p>
+<p>Sistemin yataylık haricindeki bir diğer parametresi dönüş azaltmak için kullanılabilecek bir fren / sürtünme parametresi. Bu sürtünmeyi arttırınca dönüş daha zorlaşıyor.</p>
+<p>Soru şu: bu sistem nasıl davranır, çark birörnek şekilde mi döner, tek bir yönde mi döner, yoksa sağa sola mı periyotsal şekilde mi döner, yoksa kaotik şekilde me davranır?</p>
+<p>Not: Alternatif bir su çarkı mekanizması alttadır. Kıyasla [1] sistemi daha &quot;temiz'' tabii, çünkü bir devridaim var, su hep sistem içinde kalıyor. [2] ile etraf sırılsıklam olabilir (!)</p>
+<div class="figure">
+<img src="waterwheelchaos.jpg" />
+
+</div>
+<p>Bu sistem [2] daha basit, üstten sabit oranda / akışta su veriliyor, ve su o anda tam altında olan tek bir bardağa gidiyor. Bardaklarda ufak delik var, sabit oranda su kaybediyorlar.</p>
+<p>Bu ve önceki çark kaotik davranış gösterir, tekerlek kaotik / beklenmeyen şekillerde bir sağa bir sola doğru dönecektir.</p>
+<p>Kaos kavramının müthiş dramatik bir şey olacağını bekleyenler video'yu izledikten sonra fikrini değiştirmiş olabilir bu arada. Kargaşa karmaşa bekleyen vardı belki. Sağa ya da sola dönüş var, vs. Fakat tahmini zor olan, acaba biraz sonra, ya a 5-10 salınım sonrasında çark sağa mı sola mı dönüyor olacak? Bunun tahmini gerçekten çok zor.</p>
+<p>Kaotik su çarkı üzerinde durmamızın sebebi şu: sistemi tarif eden denklemler kaostaki ünlü Lorenz denklemlerinin mekanik dünyadaki tıpatıp karşılığı. Lorenz denklemleri kaosta merkezi bir yere sahip, ve onları görsel olarak hayal etmek istiyorsak su çarkı kullanışlı. Sistem ayrıca düşük dereceli (iki, üç dereceli) normal diferansiyel denklemlerin (ODE) nerede faydalı olabileceğini gösteriyor. Bazıları düşünüyor ki &quot;bu tür denklemler bilimde ne işe yarar''. Birazdan göreceğiz çarkı temsil eden birkaç kısmi diferansiyel denklemi (-PDE-, ki daha çetrefil olabilirler) alacağız, ve birkaç matematiksel takla ile onları 3 tane ODE ile temsil edebileceğiz.</p>
+<p>Birazdan anlatacaklarım kitabım [3]'ün 9. bölümünden. Sistemi tarif eden denklemler sıvı dinamiğinden (fluid dynamics) geliyor. Grafik olarak çarka üstten bakalım, ve bizi ilgilendiren parametreleri gösterelim,</p>
+<div class="figure">
+<img src="15_02.png" />
+
+</div>
+<p>Notasyon,</p>
+<p><span class="math inline">\(\omega(t)\)</span> = çarkın açısal hızı</p>
+<p><span class="math inline">\(\theta\)</span> = çark üzerindeki bir noktanın açısal yeri (en üst sıfır derece)</p>
+<p><span class="math inline">\(Q(\theta)\)</span> = suyun sisteme akışı, pompalanma hızı. Bu hız <span class="math inline">\(\theta\)</span>'ya bağımlı çünkü suyun akışının <span class="math inline">\(\theta\)</span>'ya göre bir &quot;dağılımı'' var. Daha önce belirttiğimiz gibi borunun iki yana ayrıldığı yerde en çok akış, yanlarda (o duş başlığı gibi duran parçanın yanlarında) biraz daha az, başlıktan uzaktan olan yerlerde hiç. Bu azlık, çokluk, yokluk bir dağılıma sahip.</p>
+<p><span class="math inline">\(r\)</span> = çarkın yarıçapı. Kutucukların belli bir genişliği var, yarıçapa bu genişlik te dahil mi? Değil, bu genişlik çok küçük olduğu için iç yarıçap, dış yarıçap gibi bir ayrım yapmayacağım.</p>
+<p><span class="math inline">\(m(\theta, t)\)</span> = suyun tüm kutucuklar üzerinden kütle, doluluk dağılımı. [1] videosunda farkettiysek suyun tüm kutucuklardaki dolululuğu bir histogram görüntüsü yaratıyordu sanki [zaten onun için kutucuklar ve yeşil renkli su kullanılmış herhalde, bu dağılım görülebilsin diye]. O zaman <span class="math inline">\(\theta_1\)</span> ve <span class="math inline">\(\theta_2\)</span> arasındaki yoğunluk</p>
+<p><span class="math display">\[ M = \int_{\theta_1}^{\theta_2} m(\theta, t) \mathrm{d}\theta \]</span></p>
+<p>ile hesaplanır.</p>
+<p>Birazdan göstereceğim matematiksel türetiş MİT'den arkadaşım Paul Matthews tarafından yapıldı, Matthews'un oldukça çok sıvı dinamiği tecrübesi vardı, bu analizi ilk yapan o, ve sağolsun denklemleri bu derste kullanmama izin verdi. Matthews bu kaotik su çarkını ilk tasarlayan hoca Malkus ile beraber çalışıyordu. İnceleyeceğimiz değişkenler, ki bunlar tabii ki zamana bağlı olan değişkenler <span class="math inline">\(\omega(t)\)</span>, ve <span class="math inline">\(m(\delta,t)\)</span>. Bu iki değişkeni tanımlayan formülleri yazmak istiyoruz, sistemi tanımlayan / idare eden bu formüller olacak. Türetelim,</p>
+<ol style="list-style-type: decimal">
+<li>Kütlenin muhafazası</li>
+</ol>
+<p>Kütle derken su kütlesinden bahsediyoruz, bir sıvı sistemi için muhafaza şartı bir süreklilik denklemi (continuity equation) demektir. Türetildikten sonra bu denklem,</p>
+<p><span class="math display">\[ 
+\frac{\partial m}{\partial t} = Q - Km - \omega \frac{\partial m}{\partial \theta}
+\qquad (1)
+\]</span></p>
+<p>olacak. Sisteme giren kütle <span class="math inline">\(Q\)</span>. Çıkan <span class="math inline">\(Km\)</span>, ki <span class="math inline">\(K\)</span> bir sabit. Çıkan kütleyi şöyle tarif etmek mümkün: bahsettiğimiz gibi kutucukların altında delikler var, ve bu deliklerden çıkan suyun miktarı o anda mevcut suya oranlı olmaz mı? Cevap evet, çünkü mevcut su basınç yaratıp delikten daha hızlı su çıkmasına sebep olur, oran <span class="math inline">\(K\)</span> sabiti üzerinden. Akışkanlığı inceleyenler bu dinamiğin daha çetrefil olabileceğini de bilirler, fakat en basit model bu, gerçeğe çok uzak olduğu da söylenemez.</p>
+<p>Üçüncü terim taşınma / yer değiştirme / transportasyon terimi, bu terime göre mesela çarkın dönüşü sonrası su olmayan herde artık su olması durumu ortaya çıkabilir, en altta olan dolu kutucuk sağa kayıp bir alta iniyor diyelim, ve en tepede yeni bir boş kutucuk en üste geliyor, vs. Orta kısımlardaki yer değişimi önemli değil çünkü onlar kazanç ya da kayıp yaratmıyorlar.</p>
+<p>Bu denklemi türetelim şimdi. Çark üzerinde bir <span class="math inline">\([\theta_1,\theta_2]\)</span> kesiti düşünelim.</p>
+<div class="figure">
+<img src="15_03.png" />
+
+</div>
+<p>Bu kesitteki su miktarı için</p>
+<p><span class="math display">\[ 
+M = \int_{\theta_1}^{\theta_2} m(\theta, t) \mathrm{d}\theta 
+\qquad (4)
+\]</span></p>
+<p>formülünü vermiştik, bu formülün vereceği sonuç zamana göre değişecektir tabii ki. O zaman şu soruyu soralım, <span class="math inline">\(\Delta t\)</span> zaman aralığında ne olur? Nihai amacımız <span class="math inline">\(m\)</span> için bir diferansiyel denklem türetmek olduğuna göre bu soruyu sormak mantıklı. Şu anda içinde olduğumuz <span class="math inline">\(t_1\)</span>'den sonraki bir diğer <span class="math inline">\(t_2\)</span> anına kadar geçen zamanda ne olur? Kütledeki değişim zaman farkı çarpı çarkın her yerinden içeri giren kütle, eksi dışarı çıkan kütle. Bir de transportasyon var tabii,</p>
+<div class="figure">
+<img src="15_04.png" />
+
+</div>
+<p>İçeri giren <span class="math inline">\(\omega\)</span> hızının <span class="math inline">\(\Delta t\)</span> zamanında kapsadığı alan, <span class="math inline">\(\theta_1\)</span> için <span class="math inline">\(m(\theta_1) \omega \Delta t\)</span>, dışarı çıkan <span class="math inline">\(m(\theta_2) \omega \Delta t\)</span>. &quot;Ama <span class="math inline">\(\theta_1\)</span>'in tam üzeri mi, yanı değil mi?'' diye sormak akla geliyor belki, ayrıca muhakkak <span class="math inline">\(\Delta t\)</span> içindeki farklı yerlerde <span class="math inline">\(m\)</span>'nin değişik olacağı savunulabilir, fakat limite giderken <span class="math inline">\(\Delta t\)</span> sonsuz küçüleceği için işin matematiği dengeleniyor, bu sebeple noktasal <span class="math inline">\(m(\theta_i)\)</span>'leri kullanmak mümkün. Bu numara bu tür modellemelerde kullanılan klasik yaklaşıksallama tekniklerden biri. Ayrıca ortadaki parçalarda da yer değiştirme durumu var fakat o parçalar hala bakılan bölge içinde olduğu için onlarla ilgilenmiyoruz, sadece sınırdaki şartlara bakıyoruz. Hepsini bir araya koyarsak,</p>
+<p><span class="math display">\[ 
+\Delta M \approx \Delta t \bigg[ 
+\int_{\theta_1}^{\theta_2} Q(\theta) \mathrm{d}\theta -
+\int_{\theta_1}^{\theta_2}  Km \mathrm{d}\theta
+\bigg] + 
+m(\theta_1) \omega \Delta t -
+m(\theta_2) \omega \Delta t
+\]</span></p>
+<p>Şimdi üstteki ifadeden bir kısmı türevsel denklem çıkartmak istiyoruz, o zaman eşitliğin iki tarafını <span class="math inline">\(t\)</span> ile böleriz, ve <span class="math inline">\(\Delta t\)</span>'nin sıfıra gitmesini sağlarız. Bu arada dikkat edersek büyük parantez içindeki entegraller <span class="math inline">\(\theta\)</span>'ya göre alınıyor, fakat dışarıdaki en son iki terim böyle değil. O zaman bu son iki terimi de bir entegral içine alabilirsek işimiz rahatlaşır. Bunu nasıl yaparız? Alttaki ifadeye bakalım, bu doğru bir eşitlik değil mi?</p>
+<p><span class="math display">\[ 
+m(\theta_1) - m(\theta_2)  = 
+-\int_{\theta_1}^{\theta_2} 
+\frac{\partial m}{\partial \theta} \mathrm{d}\theta
+\]</span></p>
+<p>Evet. Bu eşitliği kullanarak son iki terimi entegral içine alabiliriz. Üstteki ifade Calculus'un Temel Teorisi'nden geliyor, türevin entegrali değişkenin kendisini verir, entegral sınırları çıkartma işlemi haline gelir. Bunları kullanarak entegrali tekrar yazalım,</p>
+<p><span class="math display">\[ 
+\Delta M \approx \Delta t \bigg[ 
+\int_{\theta_1}^{\theta_2}  \bigg(
+Q(\theta)  -  Km  - \omega \frac{\partial m}{\partial \theta}
+\bigg) \mathrm{d}\theta
+\bigg] 
+\]</span></p>
+<p>Dikkat edersek <span class="math inline">\(\omega\)</span>'nin entegral içinde olmasının mahzuru yok, çünkü <span class="math inline">\(\omega\)</span> <span class="math inline">\(\theta\)</span>'ya bağlı değil. <span class="math inline">\(\omega\)</span> zamana bağlı ama verili bir <span class="math inline">\(t\)</span> için çark üzerindeki her nokta için bu değer değişmiyor.</p>
+<p>Artık <span class="math inline">\(\Delta t\)</span> ile bölüp limiti alabiliriz,</p>
+<p><span class="math display">\[ 
+\dot{M} = \int_{\theta_1}^{\theta_2}  \bigg[
+Q(\theta)  -  Km  - \omega \frac{\partial m}{\partial \theta}
+\bigg] \mathrm{d}\theta
+\]</span></p>
+<p>Devam edelim, daha önce (4) formülünde <span class="math inline">\(M\)</span>'in <span class="math inline">\(m\)</span>'in entegrali olduğunu belirtmiştik. O zaman <span class="math inline">\(\dot{M}\)</span>'in (4) entegralinin zamana göre türevi olduğunu düşünebiliriz,</p>
+<p><span class="math display">\[ 
+\dot{M} = \int_{\theta_1}^{\theta_2} \bigg[ \frac{\partial m}{\partial t} \bigg] \mathrm{d}\theta 
+\]</span></p>
+<p>Argümanın son adımı şöyle; <span class="math inline">\(\theta_1,\theta_2\)</span> gelişigüzel iki açıdır, bu açıları birbirine çok yakın olarak seçildiğini düşünebiliriz, ve bu seçim tüm <span class="math inline">\(\theta_1,\theta_2\)</span> için doğru ise, uygulamalı matematikte çokça kullanılan süreklilik faraziyesi (continuity assumption) üzerinden üstteki formülde parantez içinin iki üstteki formülün parantez içine eşit olduğunu öne sürebiliriz.</p>
+<p><span class="math display">\[ 
+\frac{\partial m}{\partial t} = 
+Q(\theta)  -  Km  - \omega \frac{\partial m}{\partial \theta}
+\]</span></p>
+<p>Sistemimizin ilk denklemini bu şekilde elde ediyoruz.</p>
+<p>Soru</p>
+<p>Bir entegralin zamana göre türevini nasıl aldınız?</p>
+<p>Cevap</p>
+<p>Bunu yapmak için Leibnitz Kanununu kullandım, (4) içinde <span class="math inline">\(m\)</span> fonksiyonu zamanı içeriyor, <span class="math inline">\(M\)</span>'in tam türevini aldım. Bu tam türev entegral içinde nasıl kısmi türev oldu diye merak ediyorsanız, bu oldu çünkü diğer herşey <span class="math inline">\(t\)</span>'den bağımsız.</p>
+<p>Daha yapacak işimiz var hala değil mi? <span class="math inline">\(m\)</span>'in nasıl değiştiğini tanımladık, ama açısal hızın nasıl değiştiğini tanımlamadık. Şimdi <span class="math inline">\(\omega\)</span> için bir formül türetelim. İkinci formülün temeli Newton'un Kanunu <span class="math inline">\(F = ma\)</span>, onun dönme kuvveti (torque) dengesi olarak ifadesi. <span class="math inline">\(I(t)\)</span> çarkın dönme direncini (moment of inertia) düşünelim, eğer dönme kuvveti dengesinin ifade edeceksek bu kavrama ihtiyaç var. <span class="math inline">\(I\)</span> niye zamana bağlı? Çünkü çarktaki şu kütlesi sürekli değişim halinde, çarkın merkezinden <span class="math inline">\(r\)</span> uzaklıkta çarkın çeperinde şu toplanmış halde hatırlarsak, orada bir kütle dağılımı var, ve bu kütle değişiyor, bu dönme direncini yaratan faktörlerden biri ve bu faktör zamana bağlı. Çarkın kendisinin de belli bir kütlesi var muhakkak, bu da dönme direncine etki ediyor, ama orada değişim yok, su kütlesinde değişim var.</p>
+<p>Açısal momentumun zaman türevine bakalım, <span class="math inline">\(\dot{(I \omega)}\)</span>'a bakacağız, <span class="math inline">\(I\dot{\omega}\)</span> desek bu yanlış olurdu çünkü <span class="math inline">\(I\)</span> de zamana bağlı. Bu neye eşit? Çarkın üzerindeki dönme kuvveti nedir? Dönüşün açısal hızına oranlı bir şeydir, ve bahsettiğimiz fren mekanizması bunu yaratır. Çark ne kadar hızlı dönerse fren o kadar dönüşsel sürtünme ortaya çıkartır. Aynen bir düzlem üzerinde düz giden objenin hızına oranla bir sürtünmenin ortaya çıkacağı gibi.</p>
+<p><span class="math display">\[ 
+\dot{(I \omega)} = -v \omega + ..
+\]</span></p>
+<p>Yani lineer bir sönüm (damping) eklemiş olduk. Bu arada tüm fren mekanizmaları derli toplu, lineer olmayabilir, ama kullandığımız aracın fren sistemi sıvı bazlı, istediği kadar kaygan kalabilen, ama hala duruş yaratabilen lineer bir sistem.</p>
+<p>Çarkın üzerinde yerçekimsel dönme kuvveti var, bunu da unutmayalım, çarkın üst tarafı ağırlaşınca bu aşağı yönde bir dönme isteği yaratıyordu. Bu kuvvetin de hesaba katılması lazım.</p>
+<p><span class="math display">\[ 
+\dot{(I \omega)} = -v \omega + \textrm{yerçekim temelli dönme kuvveti} + ...
+\]</span></p>
+<p>Bu modeli ilk öğretmeye başladığımda bu noktaya geldiğimde bir öğrenci bir soru sormuştu, ve bu sebeple ne zaman bu noktaya gelsem hafif bir evham hissine kapılıyorum, çünkü öğrenci üstteki modelde eksik bir noktaya işaret etmişti, bu ne Paul'un ne de benim hesaba kattığımız bir şeydi, bir an tüm hesaplar bozulacak diye endişelenmiştim. Öğrenci bana &quot;ya kutucuklardan dışarı çıkan suyun eklediği açısal momentum ne olacak hocam?'' diye sormuştu. Evet bu nokta hakikaten eksik, fakat biraz düşününce bu momentumun yine açısal hıza oranlı bir büyüklük olacağını farkettim, o zaman üstteki <span class="math inline">\(v\)</span> sabiti ile bu durumu da idare edebilirdik. Artık <span class="math inline">\(v\)</span> sadece frenle alakalı olmayacak tabii, ama yine de formülde cebirsel değişim olmayacaktı.</p>
+<p>Neyse yerçekim temelli dönme kuvvetine dönelim. Basitleştirilmiş (üstten bakış açısı ile) resmimize bakalım,</p>
+<div class="figure">
+<img src="15_05.png" />
+
+</div>
+<p>Şimdi çarkın üst noktasından <span class="math inline">\(\theta\)</span> açısı uzaklıktaki o siyah ufak kısımdaki kütleyi düşünelim, bu kütlenin çarka uyguladığı dönme kuvveti nedir? <span class="math inline">\(\mathrm{d}\theta\)</span> bölgesinde kütle <span class="math inline">\(\mathrm{d} M = m\mathrm{d}\theta\)</span>. Dönme kuvveti <span class="math inline">\(\mathrm{d}\tau = \mathrm{d} M gr \sin\theta\)</span>. Bu dönme kuvvetinin maksimum olduğu nokta <span class="math inline">\(\pi/2\)</span>'da, yani 90 derece açıda, bu aynen kolumuzu uzatıp bir ağırlığı tutmaya benziyor, ağırlığın bizi en çok terlettiği an kolumuzun bize 90 derece (yere paralel) olduğu andır.</p>
+<p>Formülde negatif işareti yok, buna dikkat, çünkü sarkaçta olduğu gibi sallanan bir kütleyi yerine döndürme (ip, zincir ile) kuvveti değil, bir tür ters sarkaç sistemine bakıyoruz, dönme kuvveti direk çarkı döndürüyor, uzaklaşmak isteyen bir şey geriye çekmiyor.</p>
+<p>Not: <span class="math inline">\(g\)</span> çoğunlukla bildiğimiz yerçekimi için kullanılır, o 9.8 m/<span class="math inline">\(s/^2\)</span> olan büyüklük. Buradaki <span class="math inline">\(g = g_0 \sin \alpha\)</span>, ve <span class="math inline">\(\alpha\)</span> çarkın yere olan açısı.</p>
+<div class="figure">
+<img src="15_06.png" />
+
+</div>
+<p>Yani bildiğimiz yerçekimi bu formülde <span class="math inline">\(g_0\)</span>, bizim ilgilendiğimiz tekerleğe etki eden ise <span class="math inline">\(g\)</span>.</p>
+<p>Tüm kütle öğeleri üzerinden entegre edersek, yerçekimsel dönüş kuvveti</p>
+<p><span class="math display">\[ 
+\tau = gr \int_{0}^{2\pi} m(\theta, t) \sin\theta\mathrm{d}\theta
+\]</span></p>
+<p>Tamam. Şimdi elimizdekilere bakalım,</p>
+<p><span class="math display">\[ 
+\frac{d}{\mathrm{d} t} \big( I\omega \big) = 
+-v \omega + gr  \int_{0}^{2\pi} m(\theta, t) \sin\theta\mathrm{d}\theta
+\]</span></p>
+<p>Bu denklem <span class="math inline">\(\omega\)</span>'nin değişim denklemidir, aradığımız 2. denklem bu. Fakat aslında bu formül daha da basitleşebilir, <span class="math inline">\(I\)</span>'nın zamana bağlı olması pek temiz değil. Çözüm <span class="math inline">\(I\)</span>'yı sabit kabul etmek. Fakat bunu nasıl yapabiliyoruz? Malkus'a bunu ilk sorduğumda bana demişti ki &quot;çark suyun kendisinden çok daha ağır, o zaman bu faraziyeyi yapabiliriz''. Fakat aslında daha iyi bir argüman mümkün: ispatı mümkün ki sonlu bir zaman geçtikten sonra <span class="math inline">\(I\)</span> bir sabite yaklaşıyor çünkü tekerlek + içindeki mevcut su kütlesi bir sabite yaklaşıyor. Çark dönsün, dursun, kaos olsun olmasın bu yaklaşma oluyor.</p>
+<p>Bunun sebebini kabaca açıklamak gerekirse, banyoda görmüş olabileceğimiz bir durum bu, belki küvet deliğini bir süre kapatıyoruz, duşu açık tutuyoruz, ama sonra deliği açıyoruz ve böylece doluş hızı akış hızına eşit oluyor (eğer küvet deliği yeterince iyi ise), o zaman küvet taşmaz. Çark ile olan bu, çark istediği kadar dönsün, suyun bir yerden diğerine taşınması kütleyi değiştirmez [türetilmesi atlandı].</p>
+<p>Bu sabitlik sayesinde ikinci denklem şu hale gelir,</p>
+<p><span class="math display">\[ 
+I\dot{\omega} = -v\omega + gr \int_{0}^{2\pi} m(\theta,t) \sin\theta
+\mathrm{d}\theta 
+\qquad (3)
+\]</span></p>
+<p>Bu uzun zaman süresi için geçerli, ya da <span class="math inline">\(1/k\)</span>'ye göre uzun olan bir zaman süresinde.</p>
+<p>Ana formüllerimiz o zaman (1) ve (3). Bu denklemler ne kadar saç yoldurucu türden? (1) formülü bir kısmı türevsel denklem. Lineer mi değil mi? Bu açıdan bakmak her zaman en yararlısı. 2. terimde <span class="math inline">\(m\)</span> lineer, fakat 3. terimde hem <span class="math inline">\(\omega\)</span> hem <span class="math inline">\(m\)</span> (türevi üzerinden) bir çarpım ilişkisindeler, <span class="math inline">\(\omega\)</span> bir değişken sabit değil, bu bir karesel durum var demektir, o zaman (1) gayrı-lineer bir denklemdir. Fakat gayrı-lineerlik üçüncü terimde, ve bu gayrı-lineerlik <span class="math inline">\(\omega\)</span>'nin <span class="math inline">\(m\)</span> denklemine nasıl girdiğini gösteriyor (eşitliğin solunda <span class="math inline">\(m\)</span> var, ayrıca <span class="math inline">\(\omega\)</span> çarpımda <span class="math inline">\(m\)</span> türevini çarpıyor), yani bu iki değişken arasında bir bağlaşım var. Ya (3) denklemi? Bu denklem lineer çünkü eşitliğin sol tarafında <span class="math inline">\(\omega\)</span> sağ tarafında <span class="math inline">\(m\)</span> kendi terimleri içinde birinci dereceden oradalar.</p>
+<p>O zaman tek gayrı-lineerlik (1) içinde, üçüncü terimde ve olabilecek en az türden bir gayrı-lineerlik. 3. 4., vs dereceden değil, <span class="math inline">\(\sin,\cos\)</span> gibi bir ifade yok, sadece karesel bir ifade var.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>denklemi bu arada şimdiye kadar hiç görmediğiniz türden bir denklem olabilir, denklem diferansiyel, fakat içinde entegral olan bir diferansiyel denklem. Bu denklemlere entegro-diferansiyel denklemler deniyor, (3)'te <span class="math inline">\(\omega\)</span> denklemine <span class="math inline">\(m\)</span> giriyor, (1)'de de bunun tersi oluyordu, <span class="math inline">\(m\)</span> denklemine <span class="math inline">\(\omega\)</span> giriyor.</li>
+</ol>
+<p>Her şeyi güzel isimlendirdik, iş bitti, toparlanıp eve gitsek mi artık? [öğrenciler gülüyor]. Daha biraz daha işimiz var.. Fourier Analizinin muhteşem numaralarını kullanarak üstteki denklemler çok daha basit formlara indirgenebilir, ve sonuç olarak sadece üç ODE'den oluşan Lorenz sistemini elde edebiliriz.</p>
+<p>Şimdi kullanacağımız teknik genlik formüllerini türetme tekniği. <span class="math inline">\(m(\theta,t)\)</span> formülü çarkın geometrisi sebebiyle <span class="math inline">\(\theta\)</span> parametresinde <span class="math inline">\(2\pi\)</span> periyotsal olduğu için <span class="math inline">\(m\)</span>'yi bir Fourier serisi olarak yazacağız,</p>
+<p><span class="math display">\[ 
+m( \theta, t) = \sum_{n=0}^{\infty} a_n(t) \sin n \theta + b_n(t) \cos n \theta
+\]</span></p>
+<p>Burada söylenen herhangi bir <span class="math inline">\(t\)</span> anında <span class="math inline">\(m\)</span> <span class="math inline">\(\theta\)</span> üzerinden bir periyodik fonksiyondur, ve bu fonksiyonun bir genliği var, ve bu genlik zaman anı <span class="math inline">\(t\)</span>'ye bağlı, o sebeple <span class="math inline">\(a_n(t),b_n(t)\)</span> var elimizde, ki bu alt-fonksiyonlar <span class="math inline">\(t\)</span>'ye bağlı.</p>
+<p>Üstteki açılım hiçbir faraziyede bulunmuyor, burada ek bir modelleme yapmadık, açılım direk Fourier'in buluşundan geliyor, mekanik bir şekilde uyguladık. Şimdi bu açılımı alıp sistemimin formüllerine sokacağım, ve neler olacağına bakacağım. <span class="math inline">\(a_n,b_n\)</span> için, ki <span class="math inline">\(n=0,1,..\)</span> olacak şekilde, ODE'leri türetmek istiyorum. Bu işlem bana sonsuz tane ODE verecek, fakat göreceğiz ki bunların içinden üç tanesi diğerlerine bağlaşımsız hale geliyor, ve bu üç ODE Lorenz sistemi, yani su çarkının modeli, ayrıca gizli kimliği Lorenz sistemi olmak.</p>
+<p>Ama önce sisteme akan suyu Fourier serisi olarak yazalım,</p>
+<p><span class="math display">\[ 
+Q(\theta) = \sum_{n=0}^{\infty} q_n \cos n\theta
+\]</span></p>
+<p>Niye bu şekilde, <span class="math inline">\(\sin\)</span> terimi olmadan yazdım? Cevap çünkü su çarka simetrik olarak ekleniyor ve sinüs terimleri kullansaydık model doğru olmazdı, bir çift fonksiyona ihtiyaç var, <span class="math inline">\(\theta\)</span> ve <span class="math inline">\(-\theta\)</span> için şu akışı aynı.</p>
+<p>Güzel, şimdi bu iki seriyi alıp sisteme geri sokalım. Yine mekanik cebirsel bir işlem bu, türevleri bozmamaya dikkat ederek yapılan bir yerine geçirme işlemi.</p>
+<ol style="list-style-type: decimal">
+<li>şu hale gelir,</li>
+</ol>
+<p><span class="math display">\[ 
+= \frac{\partial }{\partial t}
+\bigg(
+  \sum a_n \sin n\theta + b_n \cos n\theta 
+\bigg) 
+\]</span></p>
+<p><span class="math display">\[ = 
+- \omega \frac{\partial }{\partial \theta} 
+\bigg( \sum a_n \sin n\theta + b_n \cos n\theta \bigg) + 
+\sum  q_n \cos n\theta - 
+K \sum \big( a_n \sin n\theta + b_n \cos n\theta \big)
+\]</span></p>
+<p>Tüm toplamlar sıfırdan sonsuza kadar.</p>
+<p>Üstteki son formülü açarsak ortaya bir sürü terim çıkacak, ve sonuç olarak eşitliğin her iki tarafında iki tane Fourier serisi elde etmiş olacağız. Sonra her iki taraftaki <span class="math inline">\(\sin n\theta\)</span> terimlerini kendi taraflarında toparlayıp onların katsayılarını birbirine eşit kabul edeceğiz. <span class="math inline">\(\cos n\theta\)</span> terimleri için aynı şekilde.</p>
+<p>Sol taraftaki <span class="math inline">\(\sin n\theta\)</span> terimleri hangileri? Toplam içindeki <span class="math inline">\(a_n \sin n\theta\)</span>'nin <span class="math inline">\(\frac{\partial }{\partial t}\)</span> türevi bize <span class="math inline">\(\dot{a_n}\)</span> verecek, değil mi, çünkü <span class="math inline">\(\sin n\theta\)</span>'lar <span class="math inline">\(t\)</span>'den bağımsız. <span class="math inline">\(\cos\)</span> terimine bakıyorum, oradan <span class="math inline">\(\sin\)</span> gelmiyor.</p>
+<p>Sağ tarafta, birinci terim, <span class="math inline">\(\frac{\partial }{\partial \theta}\)</span> uygulanıyor, <span class="math inline">\(\sin n\theta\)</span> elde etmenin tek yolu eğer <span class="math inline">\(\frac{\partial }{\partial \theta}\)</span> <span class="math inline">\(\cos n\theta\)</span>'ya uygulanırsa olur, değil mi? Bu olursa <span class="math inline">\(-\sin n\theta\)</span> çarpı zincirleme kanunu faktörü <span class="math inline">\(n\)</span> ortaya çıkardı, katsayı <span class="math inline">\(b_n\)</span> var, bir de dışarıda oturan bir <span class="math inline">\(\omega\)</span> var. İkinci terim, <span class="math inline">\(\sin\)</span> yok, üçüncü terimde var. Hepsi beraber,</p>
+<p><span class="math display">\[ 
+\dot{a_n} = n \omega b_n - K a_n 
+\]</span></p>
+<p><span class="math inline">\(\cos n\theta\)</span> için, benzer argüman kullanılır,</p>
+<p><span class="math display">\[ 
+\dot{b_n} = -n \omega a_n + q_n - K b_n 
+\]</span></p>
+<p>Hatırlatalım, bu denklemler <span class="math inline">\(n = 0,1,..\)</span> için, yani üstteki çift ODE'lerden sonsuz tane var. Bu arada <span class="math inline">\(\omega\)</span> da zamana bağlı, onu da hatırlayalım.</p>
+<p>Tüm bunlar (1)'den geldi. Bir de dönüş kuvvet dengesi formülü (3)'e Fourier serilerini sokmak lazım, ve muhteşem numara, abrakadabra işte burada ortaya çıkacak.</p>
+<p><span class="math display">\[ 
+I \dot{\omega} = - v \omega + gr \int_{0}^{2\pi} 
+\bigg(\sum a_n \sin n\theta + b_n \cos n\theta \bigg) \sin\theta \mathrm{d} \theta
+\]</span></p>
+<p>Abrakadabrayı görüyor muyuz? Parantez içindeki tüm fonksiyonlar, biri haricinde, <span class="math inline">\(\sin\theta\)</span>'ya dikgen ve o fonksiyonlarla olan entegral sıfır. Dikgen olmayan yine <span class="math inline">\(\sin\theta\)</span> tabii ki. Dikgen olan tüm fonksiyonlar yokolacak.</p>
+<p><span class="math display">\[   = - v \omega + gr \int_{0}^{2\pi} a_1 \sin^2 \theta\mathrm{d}\theta \]</span></p>
+<p>Daha önce titreşirler için ortalama teorisinden bahsederken görmüştük, <span class="math inline">\(\sin^2\)</span>'in ortalaması (üstteki entegrali yani) 1/2 çarpı üzerinden entegral aldığımız aralık büyüklüğü idi. Burada tüm periyotu kapsıyoruz, aralık <span class="math inline">\(2\pi\)</span>. O zaman üstteki formülde ikinci terim <span class="math inline">\(1/2 \cdot 2\pi \cdot gr \cdot a_1\)</span>, ki bu <span class="math inline">\(\pi gr a_1\)</span>'a indirgenebilir. Sonuç</p>
+<p><span class="math display">\[ I \dot{\omega} = -v \omega + \pi gr a_1 \]</span></p>
+<p>Bir de alttakiler vardı (hepsi birarada olsun diye bir daha yazdım),</p>
+<p><span class="math display">\[ 
+\dot{a_n} = n \omega b_n - K a_n 
+\]</span></p>
+<p><span class="math display">\[ 
+\dot{b_n} = -n \omega a_n + q_n - K b_n 
+\]</span></p>
+<p>Fakat hala elimizde sonsuz artı bir tane formül var demektir. Şimdi üstteki üç formüle bir daha bakalım, <span class="math inline">\(\omega\)</span>'nin nasıl değiştiğine dikkat edelim mesela. <span class="math inline">\(t\)</span> anında bir konumdayız, bir sonraki zaman diliminde, <span class="math inline">\(\Delta t\)</span> sonra, ne olur? <span class="math inline">\(\dot{\omega}\)</span> formülüne göre <span class="math inline">\(\omega\)</span>'yi güncellemek için yine <span class="math inline">\(\omega\)</span>'nin kendisini ve <span class="math inline">\(a_1\)</span>'i bilmem gerekiyor. Peki <span class="math inline">\(a_1\)</span>'i güncellemem için neyi bilmem gerekiyor? <span class="math inline">\(\dot{a_n}\)</span> formülüne bakıyoruz, <span class="math inline">\(\omega\)</span>'yi ve <span class="math inline">\(b_1\)</span>'i ve <span class="math inline">\(a_1\)</span>'in kendisini bilmem gerekiyor. <span class="math inline">\(b_1\)</span>'in güncellenmesi için yine <span class="math inline">\(\omega\)</span>, <span class="math inline">\(a_1\)</span> ve <span class="math inline">\(b_1\)</span>. Dikkat edersek sadece üç öğeden bahsediyoruz sürekli, <span class="math inline">\(a_1,b_1,\omega\)</span>. Bu üç öğe diğer tüm öğelerle bağlaşımsız hale geldi.</p>
+<p>O zaman, bu bağlaşımsızlık sebebiyle, herşeyi temsil eden üç boyutlu bir sistemdir sadece,</p>
+<p><span class="math display">\[ \dot{a_1} = \omega b_1 - K a_1 \]</span></p>
+<p><span class="math display">\[ \dot{b_1} = -\omega a_1 + q_1 - Kb_1 \]</span></p>
+<p><span class="math display">\[ \dot{\omega} = \frac{-v}{I}\omega + \frac{\pi gr}{I} a_1 \]</span></p>
+<p>İşte artık tertemiz üç boyutlu bir denklem sistemi var. Bu sistemi bir sonraki derste analiz edeceğiz. Su çarkı sistemi olarak artık bu sistemi temel alabiliriz.</p>
+<p>Şu soruyu soranlar olabilir, kullanılmayan o öteki <span class="math inline">\(a_n,b_b\)</span>'lere ne oldu? Şöyle anlatayım, üstteki üç denklem bir üç boyutlu makina sanki, sistemi tarif eden o, bu sistem bir <span class="math inline">\(\omega(t)\)</span> üretiyor. Bu <span class="math inline">\(\omega(t)\)</span>'yi elde ettikten sonra onu diğer 1'den büyük <span class="math inline">\(n\)</span>'ler için <span class="math inline">\(a_2,b_2,vs..\)</span> için <span class="math inline">\(a_n,b_n\)</span> denklemlerine sokabilirim ve bu denklemlerden bir sonuç elde edebilirim, cebirsel olarak bu mümkün. Fakat oradan gelen sonuçlar geriye, üstteki üç boyutlu makinaya geri verilmiyor, cebirsel olarak buna ihtiyaç yok. Bu sebeple makinanın kalbi üstteki üç denklem.</p>
+<p>Bir sonraki derste bu sistemi inceleyeceğiz, ki bu sistem çok daha ünlü olan Lorenz denklemlerine eşdeğer, daha ileri derslerde su çarkından da bahsetmeyeceğiz artık, direk Lorenz'i inceliyor olacağız. Ama zihnimizde fiziksel bir resim oluşması için böyle bir giriş iyi oldu herhalde.</p>
+<p>Kaynaklar</p>
+<p>[1] Strogatz, <em>Video</em>, <a href="https://www.youtube.com/watch?v=7iNCfNBEJHo" class="uri">https://www.youtube.com/watch?v=7iNCfNBEJHo</a></p>
+<p>[2] Donkers, <em>Video</em>, <a href="https://www.youtube.com/watch?v=7A_rl-DAmUE" class="uri">https://www.youtube.com/watch?v=7A_rl-DAmUE</a></p>
+<p>[3] Strogatz, <em>Nonlinear Dynamics and Chaos</em></p>
+</body>
+</html>

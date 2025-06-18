@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="geri-yansıtmayla-3d-işın-hesabı-back-projecting-a-3d-ray-ve-düzlem-mesafesi">Geri-Yansıtmayla 3D Işın Hesabı (Back-projecting a 3D Ray), ve Düzlem Mesafesi</h1>
+<p>Üç boyutlu bir noktanın iki boyuta yansımasında derinlik bilgisinin kaybolduğunu gördük, birden fazla üç boyutlu nokta aynı piksele tekabül edebiliyor. Bu durumda sadece piksel kullanarak obje mesafe ölçümünü tek bir görüntü üzerinden nasıl yapabiliriz?</p>
+<p>Eğer derinlik bilgisini kaybettiysek o zaman resimde bilinen diğer bazı faktörleri yanyana koyarak bir uzaklık hesaplayabiliriz belki. Mesela alttaki resimdeki kırmızı piksellerin mesafesini bulmak istiyorum.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> PIL <span class="im">import</span> Image
+<span class="im">import</span> util
+
+im <span class="op">=</span> np.array(Image.<span class="bu">open</span>(<span class="st">&#39;mitte.png&#39;</span>))
+plt.xlim(<span class="dv">0</span>,<span class="dv">320</span>)
+plt.ylim(<span class="dv">240</span>,<span class="dv">0</span>)
+plt.imshow(im)
+h <span class="op">=</span> np.array(im).shape[<span class="dv">0</span>]
+
+np.random.seed(<span class="dv">1</span>)
+quad <span class="op">=</span> np.array([[<span class="dv">140</span>,<span class="dv">0</span>],[<span class="dv">164</span>,<span class="fl">90.</span>],[<span class="dv">212</span>,<span class="dv">90</span>],[<span class="dv">234</span>,<span class="dv">0</span>]])
+util.plot_quad(quad, h, <span class="st">&#39;y&#39;</span>)
+N <span class="op">=</span> <span class="dv">1000</span> 
+random_points <span class="op">=</span> np.random.uniform(<span class="dv">0</span>, <span class="dv">320</span>, (N, <span class="dv">2</span>)).astype(np.<span class="bu">int</span>)
+random_points <span class="op">=</span> random_points[random_points[:,<span class="dv">1</span>] <span class="op">&lt;</span> <span class="dv">240</span>]
+mask <span class="op">=</span> np.array([util.inside_quad(quad, p)[<span class="dv">0</span>] <span class="cf">for</span> p <span class="kw">in</span> random_points])
+plt.plot(random_points[mask][:,<span class="dv">0</span>], h<span class="op">-</span>random_points[mask][:,<span class="dv">1</span>], <span class="st">&#39;r.&#39;</span>)
+p1 <span class="op">=</span> np.array([<span class="dv">215</span>, <span class="dv">180</span>, <span class="fl">1.</span>])
+plt.plot(p1[<span class="dv">0</span>], p1[<span class="dv">1</span>], <span class="st">&#39;c.&#39;</span>)
+plt.savefig(<span class="st">&#39;vision_80ray_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="vision_80ray_02.png" />
+
+</div>
+<p>Problem öyle ki bu piksellerin yolu temsil eden pikseller olduğunu biliyorum. Bu bilgiyi nasıl elde ettim? Renksel bazlı, ya da iki boyutta imajı parçalara bölmeyi çok iyi yapan bir algoritmam var belki, vs. ve bu sayede o piksellerin caddeye ait oldugunu biliyorum. O zaman, bu bilgi elde varsa, bu bana bir şey kazandırdı: üç boyutta bu piksellerin {} geldiğini biliyorum artık. Bu düzlem <span class="math inline">\(xy\)</span> düzlemidir, orada <span class="math inline">\(z=0\)</span>.</p>
+<p>Bir numara daha: bir piksele bakarak onun kesin üç boyutlu yerini hesaplayamayabilirim. Ama bir piksele tekabül eden, onu oluşturan kamera merkezinden dünyaya doğru fırlayan bir ışının (ray) kesin formülünü hesaplayabilirim.</p>
+<div class="figure">
+<img src="vision_80ray_01.png" />
+
+</div>
+<p>Mesela örnek kırmızı piksellerden biri <span class="math inline">\(p_1\)</span> noktası olabilir, kamera merkezi <span class="math inline">\(C\)</span>'den bir ışın fırlatıyoruz, bu ışın <span class="math inline">\(p_1\)</span>'i oluşturuyor ve dış dünyadaki bir <span class="math inline">\(X\)</span> noktasına doğru gidiyor. Şimdi bu iki fikri biraraya koyarsak, elde bir düzlem, bir çizgi var; üç boyutlu yer nasıl bulunur? İkisinin kesiştiği yer ile! Bu nokta yol noktasının üç boyutlu kordinatıdır.</p>
+<p>Kamera Merkezi</p>
+<p>Bu yazıda kamera merkezinin bilindiğini varsaydık. Ama eğer bilmeseydi, ve elde sadece <span class="math inline">\(P\)</span> matrisi olsa, kamera merkezini nasıl hesaplarız onu görelim. Biraz önceki resmi işlerken kameranın yerden 1 metre yükseltilmiş olduğunu farzedeceğiz (bunu biliyoruz), fakat bazen bu bilgi verilmemiş olabilir. Bu durumda dışsal matristen başlayabiliriz.</p>
+<p>Dışsal (exintrinsic) matrisler dış dünya kordinatlarının kamera kordindatlarına nasıl transform edildiğini tarif ederler. Bunun yerine kamera duruşunu modelleyip oradan geriye gidersek aynı noktaya gelmiş oluruz [1].</p>
+<p><span class="math display">\[ 
+\left[
+\begin{array}{c|c} R &amp; \boldsymbol{t} \\ \hline  \boldsymbol{0} &amp; 1 \\ \end{array}
+\right]
+ = 
+\left[ \begin{array}{c|c} R_c &amp; C \\ \hline \boldsymbol{0} &amp; 1 \\ \end{array}
+\right]^{-1} 
+\]</span></p>
+<p><span class="math display">\[ 
+= \left[ 
+\left[ \begin{array}{c|c} I &amp; C \\ 
+  \hline \boldsymbol{0} &amp; 1 \\ 
+  \end{array}
+\right]
+\left[ \begin{array}{c|c} R_c &amp; 0 \\ 
+  \hline \boldsymbol{0} &amp; 1 \\ 
+  \end{array}
+\right]
+\right]^{-1}
+\]</span></p>
+<p><span class="math display">\[ 
+= \left[
+  \begin{array}{c|c} R_c &amp; 0 \\ 
+  \hline \boldsymbol{0} &amp; 1 \\ 
+   \end{array} 
+  \right]^{-1} 
+\left[ \begin{array}{c|c} I &amp; C \\ 
+  \hline \boldsymbol{0} &amp; 1 \\ 
+   \end{array}
+\right]^{-1}
+\]</span></p>
+<p><span class="math display">\[ 
+= \left[\begin{array}{c|c} R_c^T &amp; 0 \\ 
+\hline \boldsymbol{0} &amp; 1 \\ 
+\end{array}
+\right]
+\left[ \begin{array}{c|c} I &amp; -C \\ 
+\hline \boldsymbol{0} &amp; 1 \\ 
+\end{array}
+\right]
+\]</span></p>
+<p><span class="math display">\[ 
+= \left[\begin{array}{c|c} R_c^T &amp; -R_c^TC \\ 
+\hline \boldsymbol{0} &amp; 1 \\ 
+\end{array}
+\right]
+\]</span></p>
+<p>Birbirine tekabül eden hücrelere bakınca</p>
+<p><span class="math display">\[ t = -R_c^TC\]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[ C = -R_c^T t\]</span></p>
+<p>Burada <span class="math inline">\(R_c\)</span> <span class="math inline">\(P\)</span> yansıtma matrisinin ilk üç kolonundan oluşan matristir. Ayrıca kamera merkezinin içsel matris <span class="math inline">\(K\)</span>'ye bağlı olmadığına dikkat.</p>
+<p>Sözde Ters ile <span class="math inline">\(X\)</span></p>
+<p>Şimdi <span class="math inline">\(X\)</span> bulmak lazım. Bir fikir akla geliyor, <span class="math inline">\(PX = x\)</span> olduğuna göre, <span class="math inline">\(P\)</span>'nin tersini alıp bu tersi soldan iki tarafla çarpsak olmaz mı (solda <span class="math inline">\(P\)</span> yokolur, <span class="math inline">\(X\)</span> kalır)? Burada bir problem var, <span class="math inline">\(P\)</span> matrisi <span class="math inline">\(3 \times 4\)</span> matrisi, kare matris olmadığı için tersi alınamıyor. Bu hesap için 2. derste işlenen sözde ters (pseudoinverse) işlemini kullanacağız. Hatırlatarsak, <span class="math inline">\(P\)</span>'nin sözde tersi <span class="math inline">\(P^{+}\)</span></p>
+<p><span class="math display">\[ P^{+} = P^T(PP^T)^{-1}\]</span></p>
+<p>işlemidir, ki <span class="math inline">\(PP^{+} = I\)</span>. Ama <span class="math inline">\(PP^T\)</span> çarpımı sayısal iyi sonuçlar vermeyebilir (çarpımlar çok büyür), endişeye gerek yok, sayısal kütüphaneler sözde ters işlemini SVD üzerinden çözüyor (çok hızlı), bkz. 2. ders.</p>
+<p>O zaman <span class="math inline">\(P^{+}x\)</span> ile bahsettiğimiz ışındaki bir noktayı buluruz. Dikkat, sadece birini buluruz, diğer noktalar da mümkündür. Ama o noktalar bizi ilgilendirmiyor (şimdilik) elimizde iki nokta olacak, biri kamera merkezi diğeri bu hesaplanacak olan, bu ikisi yeterli. Ondan önce üstteki hesabın gerçekten bir <span class="math inline">\(X\)</span> verip vermediğini kontrol edelim, hesaplanan noktayı tekrar geri kameraya yansıtırsak ne olur?</p>
+<p><span class="math display">\[ P (P^{+}x) = Ix = x\]</span></p>
+<p>Hesap doğruymuş demek ki. Işın hesabı yapalım. Bir önceki resimde <span class="math inline">\(p_1\)</span>'e benzeyen bir nokta iki üstteki resimde mavi renkli gösterildi. Bu piksele doğru giden bir çizgi neye benzer?</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+<span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+<span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../vision_02&#39;</span>)
+<span class="im">import</span> plot3d
+
+K <span class="op">=</span> [[ <span class="fl">282.363047</span>,      <span class="fl">0.</span>,          <span class="fl">166.21515189</span>],
+     [   <span class="fl">0.</span>,          <span class="fl">280.10715905</span>,  <span class="fl">108.05494375</span>],
+     [   <span class="fl">0.</span>,            <span class="fl">0.</span>,            <span class="fl">1.</span>        ]]
+K <span class="op">=</span> np.array(K)
+R <span class="op">=</span> np.eye(<span class="dv">3</span>)
+t <span class="op">=</span> np.array([[<span class="dv">0</span>],[<span class="fl">1.</span>],[<span class="dv">0</span>]])
+P <span class="op">=</span> K.dot(np.hstack((R,t)))
+C <span class="op">=</span> np.array([<span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">1.</span>])
+
+X <span class="op">=</span> np.dot(lin.pinv(P),p1)
+X <span class="op">=</span> X <span class="op">/</span> X[<span class="dv">3</span>]
+XX  <span class="op">=</span> np.copy(X)
+XX[<span class="dv">1</span>] <span class="op">=</span> X[<span class="dv">2</span>]<span class="op">;</span> XX[<span class="dv">2</span>] <span class="op">=</span> X[<span class="dv">1</span>]<span class="op">;</span> XX[<span class="dv">2</span>] <span class="op">=</span> <span class="op">-</span>XX[<span class="dv">2</span>]
+w <span class="op">=</span> <span class="dv">10</span>
+f <span class="op">=</span> plt.figure()
+ax <span class="op">=</span> f.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)
+xvec <span class="op">=</span> C <span class="op">-</span> XX[:<span class="dv">3</span>] 
+xvec <span class="op">=</span> <span class="op">-</span>xvec
+ax.quiver(C[<span class="dv">0</span>], C[<span class="dv">1</span>], C[<span class="dv">2</span>], xvec[<span class="dv">0</span>], xvec[<span class="dv">1</span>], xvec[<span class="dv">2</span>],color<span class="op">=</span><span class="st">&#39;red&#39;</span>)
+ax.set_xlim(<span class="dv">0</span>,<span class="dv">10</span>)<span class="op">;</span>ax.set_ylim(<span class="dv">0</span>,<span class="dv">10</span>)<span class="op">;</span>ax.set_zlim(<span class="dv">0</span>,<span class="dv">10</span>)
+ax.quiver(<span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">1.</span>, <span class="dv">0</span>, <span class="fl">5.</span>, <span class="fl">0.</span>,color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)
+plot3d.plot_plane(ax, [<span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">1.</span>], [<span class="dv">0</span>, <span class="fl">5.</span>, <span class="fl">0.</span>], color<span class="op">=</span><span class="st">&#39;y&#39;</span>, size<span class="op">=</span><span class="dv">7</span>)
+ax.set_xlabel(<span class="st">&quot;X&quot;</span>)
+ax.set_ylabel(<span class="st">&quot;Y&quot;</span>)
+ax.set_zlabel(<span class="st">&quot;Z&quot;</span>)
+ax.set_xlim(<span class="op">-</span>w,w)<span class="op">;</span>ax.set_ylim(<span class="op">-</span>w,w)<span class="op">;</span>ax.set_zlim(<span class="op">-</span>w,w)
+ax.view_init(elev<span class="op">=</span><span class="dv">5</span>, azim<span class="op">=</span><span class="dv">100</span>)
+plt.savefig(<span class="st">&#39;vision_80ray_04.png&#39;</span>)
+ax.view_init(elev<span class="op">=</span><span class="dv">5</span>, azim<span class="op">=</span><span class="dv">50</span>)
+plt.savefig(<span class="st">&#39;vision_80ray_05.png&#39;</span>)</code></pre></div>
+<p><img src="vision_80ray_04.png" /> <img src="vision_80ray_05.png" /></p>
+<p>Mavi renkli ok kameranın imaj düzlemine dik (normal) olan vektör. Kırmızı olan ok <span class="math inline">\(p_1\)</span>'e işaret eden üç boyutlu çizgi.</p>
+<p>Şimdi tüm noktaları yapalım. Altta ilk gösterilen kod iki noktayı baz alan sonsuza giden çizgi ile bir düzlem (bir nokta, bir normal ile tanımlı) arasında kesişmeyi hesaplayan çağrıdır, bkz [3]. Üstteki gördüğümüz kırmızı renkli pikselleri alıp teker teker onların ışınını bulacağız, sonra bu çizginin <span class="math inline">\(xy\)</span> düzlemi ile kesişmesini bulacağız. <span class="math inline">\(xy\)</span> düzlemini tanımlamak için bir nokta, bir de normal vektör lazım; en basit nokta orijin, yani <span class="math inline">\((0,0,0)\)</span>, normal ise dik yukarı giden birim vektör <span class="math inline">\(\left[\begin{array}{ccc} 0&amp;0&amp;1 \end{array}\right]^T\)</span>. Kamera matrisi <span class="math inline">\(K\)</span>'yi biliyoruz, çünkü kamerayı biz kalibre ettik, detaylar için [2].</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> intersect(n,V0,P0,P1):
+    <span class="co">&quot;&quot;&quot;</span>
+<span class="co">    n: duzleme normal vektor</span>
+<span class="co">    V0: duzlemdeki herhangi bir nokta</span>
+<span class="co">    P0: P0P1 cizgisinin bir ucu</span>
+<span class="co">    P1: P0P1 cizgisinin diger ucu</span>
+<span class="co">    &quot;&quot;&quot;</span>
+    w <span class="op">=</span> P0 <span class="op">-</span> V0<span class="op">;</span>
+    u <span class="op">=</span> P1<span class="op">-</span>P0<span class="op">;</span>
+    N <span class="op">=</span> <span class="op">-</span>np.dot(n,w)<span class="op">;</span>
+    D <span class="op">=</span> np.dot(n,u)
+    sI <span class="op">=</span> N <span class="op">/</span> D
+    I <span class="op">=</span> P0<span class="op">+</span> sI<span class="op">*</span>u
+    <span class="cf">return</span> I
+
+<span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+xx <span class="op">=</span> np.ones((<span class="bu">len</span>(random_points[mask]), <span class="dv">3</span>))
+xx[:,<span class="dv">0</span>] <span class="op">=</span> random_points[mask][:,<span class="dv">0</span>]
+xx[:,<span class="dv">1</span>] <span class="op">=</span> h<span class="op">-</span>random_points[mask][:,<span class="dv">1</span>]
+
+xyp <span class="op">=</span> np.array([<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>])
+xyn <span class="op">=</span> np.array([<span class="dv">0</span>,<span class="dv">0</span>,<span class="fl">1.</span>])
+
+<span class="cf">for</span> x <span class="kw">in</span> xx:
+    X <span class="op">=</span> np.dot(lin.pinv(P),np.array(x))
+    X <span class="op">=</span> X <span class="op">/</span> X[<span class="dv">3</span>]
+    XX  <span class="op">=</span> np.copy(X)
+    <span class="co"># Y-Z degistir, Y&#39;nin isaretini degistir</span>
+    XX[<span class="dv">1</span>] <span class="op">=</span> X[<span class="dv">2</span>]<span class="op">;</span> XX[<span class="dv">2</span>] <span class="op">=</span> X[<span class="dv">1</span>]<span class="op">;</span> XX[<span class="dv">2</span>] <span class="op">=</span> <span class="op">-</span>XX[<span class="dv">2</span>]
+    Xi <span class="op">=</span> intersect(xyn, xyp, XX[:<span class="dv">3</span>], C)
+    plt.plot(Xi[<span class="dv">0</span>], Xi[<span class="dv">1</span>],<span class="st">&#39;b.&#39;</span>)
+
+plt.xlim(<span class="op">-</span><span class="dv">3</span>,<span class="dv">3</span>)
+plt.ylim(<span class="dv">0</span>,<span class="dv">20</span>)
+plt.savefig(<span class="st">&#39;vision_80ray_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="vision_80ray_03.png" />
+
+</div>
+<p>Üstteki görüntü kırmızı piksellerin 3 boyutta, caddedeki kuşbakışı görüntüsü. Noktalar mantıklı, bir sağa kayış var, bu doğru çünkü her ne kadar iki boyutlu görüntüde noktalar yukarı gidiyor gibi dursa da, aslında kesişme noktasına giden çizginin sağına doğru akmışlar. Bir diğer durum en altta birkaç metrelik bir kısmın boş olması. Bu da mantıklı çünkü kamera direk altını göremiyor, en yakın görebildiği noktalar biraz daha önde olanlar.</p>
+<p>Peki kameranın duruşunu biliyorum, yere paralel, 1 metre yukarıda, direk düz ileri bakıyor. Bu bilgiyi kullanarak bir üçgen oluşturup, açılarla ve benzeri şekillerle daha basit şekilde mesafeyi hesaplayabilirdim, niye bunu yapmadım? Özellikle <span class="math inline">\(P\)</span> matrisini kullanmamızın sebebi eğer yer değiştirmeyle beraber kamerada dönüş (rotation) durumu da varsa (bu örnekte yoktu) bu bilginin de <span class="math inline">\(P\)</span> içinde olacağıdır. Bu durumda üstteki sözde ters ile yine direk bir ışını basit bir şekilde elde edebilirdik. Öteki türlü çetrefil bir sürü ek hesaplara girmek gerekecekti. Yani tarif ettiğimiz yaklaşımla her türlü kamera duruşunu idare edebiliriz.</p>
+<p>Hesapların metrik olarak bir anlamının olduğuna dikkat. Çünkü yerden 1 metre yüksekte olmayı hesabın içine direk dahil ettik, bu sebeple mesela uzaklık sonuçları, 2.5 metre, 5 metre gibi anlamlı çıktı.</p>
+<p>Kaynaklar</p>
+<p>[1] Kyle Simek, Dissecting the Camera Matrix, Part 2: The Extrinsic Matrix, <a href="http://ksimek.github.io/2012/08/22/extrinsic/" class="uri">http://ksimek.github.io/2012/08/22/extrinsic/</a></p>
+<p>[2] Bayramlı, <em>Algılayıcı Ölçümleri, Video, Android</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2017/02/algilayici-olcumleri-video-android.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2017/02/algilayici-olcumleri-video-android.html</a></p>
+<p>[3] Bayramlı, <em>Çok Boyutlu Calculus, Ders 5</em></p>
+</body>
+</html>

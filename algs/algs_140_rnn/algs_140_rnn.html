@@ -1,0 +1,463 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="kendini-tekrarlayan-yapay-sinir-ağları-recurrent-neural-network--rnn-">Kendini Tekrarlayan Yapay Sinir Ağları (Recurrent Neural Network -RNN-)</h1>
+<p>RNN'ler zaman serilerini, sıralı olan verileri modellemek için kullanılır. Mesela 2 3 1 2 3 1 2 3 1 2 3 gibi bir girdi olabilir, girdi arka arkaya gelen her 3 karakter, hedef ise 4. karakter. Bu veri üzerinde RNN eğitilebilir, ve mesela verili 2 3 1'den sonra hangi 4. sayı geldiği tahmin edilmeye uğraşılabilir. Ayrıksal olarak girdi bir harf dizisi de olabilir.</p>
+<div class="figure">
+<img src="rnn_01.png" />
+
+</div>
+<p>Daha önce işlediğimiz Öne Doğru Beslemeli (Feed-Forward) YSA'lar en temel, klasik yapılardır. Eğer bir <span class="math inline">\(N\)</span> boyutlu girdi alıyorlarsa bu verinin tüm boyutlarını aynı anda işlerler. RNN için [3] yapı şöyle değişiyor (tek bir nöron için),</p>
+<p><span class="math inline">\(x_t\)</span>: <span class="math inline">\(t\)</span> anındaki girdi.</p>
+<p><span class="math inline">\(s_t\)</span>: <span class="math inline">\(t\)</span> anındaki gizli konum.</p>
+<p><span class="math display">\[ s_t = f(U x_t +  W s_{t-1})\]</span></p>
+<p><span class="math inline">\(o_t\)</span>: <span class="math inline">\(t\)</span> anındaki çıktı, <span class="math inline">\(o_t = g(V s_t)\)</span></p>
+<p>İlginç olan <span class="math inline">\(U,V,W\)</span> ağırlık matrislerinin, parametrelerinin her zaman anı, her veri noktası için aynı olması. Yani farklı zaman dilimleri için farklı ağırlıklar atanmıyor. <span class="math inline">\(t\)</span> anındaki gizli (hidden) konum <span class="math inline">\(s_t\)</span>, bu bir nevi &quot;hafıza''. Bu fonksiyon <span class="math inline">\(x_t\)</span> girdisinin <span class="math inline">\(W\)</span> ile çarpılması, artı bir önceki konumun bir başka <span class="math inline">\(W\)</span> ile çarpılması sonucundan elde ediliyor. <span class="math inline">\(W\)</span> matrisi geçmişe ne kadar önem verileceğini tanımlıyorlar. Ardından tüm hesap bir <span class="math inline">\(\phi\)</span> ile &quot;eziliyor'' yani belli aralıklara düşmesi zorlanıyor, bunun için tipik olarak sigmoid, ya da <span class="math inline">\(tanh\)</span> kullanılır.</p>
+<div class="figure">
+<img src="rnn_07.jpg" />
+
+</div>
+<p>Bu kavramlar, konumlararası geçiş, <span class="math inline">\(t\)</span> anındaki girdilerin ondan önceki girdileri nasıl bağlı olduğunun ağırlıklar üzerinden ayarlanması, yani filtrelenmesi, aslında Markov zincirlerine benziyor (diğer bir açıdan benzemiyor çünkü MZ matematiğinde bir zaman sadece bir öncekinden etkilenir, RNN durumunda en baştaki adım en sondakini etkileyebilir [4]). Bu hesaplar sonucu elde edilen tahmin ve hata geriye yayma (backpropagation) ile ağırlık matrislerini değiştirmek için kullanılacak.</p>
+<p>RNN ismindeki &quot;tekrarlanma'' <span class="math inline">\(U,V,W\)</span>'nin her zaman adımı için aynı olmasından geliyor. Ağ bir bakıma tek bir seviye için, bir kez tanımlanıyor, ve geriye ne kadar gidileceği üzerinden o yöne doğru kopyalanıyor, ya da &quot;açılıyor (unfolding)''. Bu açılma işlemini her zaman adımı için gösterebiliriz. f Zaman İçinde Geriye Doğru Yayılma (Backpropagation Through Time -BPTT-)</p>
+<p>RNN Çesitleri, Numaraları</p>
+<p>İlla her biriminin çıktısını kullanmak gerekmez. Her RNN biriminin <span class="math inline">\(h\)</span> formundaki gizli katman çıktısı bir sonraki birime girdi kabul edildiği için bu çıktılar RNN'nin bütününü etkilerler, fakat etiket / düzeltme bağlamında direk kullanılmaları şart değildir. Mesela bir RNN'e bir veri dizisi verip, çıktılarının en sonuncusu hariç geri kalanlarını yok sayabiliriz, o zaman bir dizi-vektör RNN'i elde ederiz. Ya da RNN'e bir film hakkındaki tüm yorumları kelime kelime veri dizisi olarak verebiliriz, RNN'in tek çıktısı -1/+1 şeklinde beğendi / beğenmedi skoru olabilir, bu ünlü hissiyat analizi (sentiment analyis) örneğidir. Altta diyagramı görüyoruz,</p>
+<div class="figure">
+<img src="rnn_05.png" />
+
+</div>
+<p>Eğer zaman serisi tahmin etmek istiyorsak <span class="math inline">\(x_1,x_2,..\)</span> serisini alıp bir kaydırarak ona karşılık olan &quot;etiketleri'' kendimiz yaratabiliriz. Bu durumda <span class="math inline">\(y_1,y_2,..\)</span> serisi <span class="math inline">\(x_2,x_3,..\)</span> serisi haline gelir.</p>
+<p>Bir RNN'in tekrar eden kısım bir nöron yerine bir katman da olabilir, yani bu katman içinde birden fazla nöron olur, ve bu katman zamanda geriye doğru kopyalanır.</p>
+<div class="figure">
+<img src="rnn_06.png" />
+
+</div>
+<p>Eğer tüm çeşitleri göstermek gerekirse</p>
+<div class="figure">
+<img src="rnn_08.png" />
+
+</div>
+<p>Bire bir (one to one) çok basit, diğerleri bire çok (one to many), çoka bir (many to one), ve iki çeşit çoka çok (many to many). RNN yapısındaki tek sınır herhalde tekrarlanan hücrelerden daha fazla girdi hücresi olamayacak olması, fakat onun haricinde neredeyse her tür olasılık mümkün. Mesela soldan 4. örnekte üç boyutlu bir girdi sadece ilk üç tekrarlanan hücreye veriliyor, geri kalanlara bir şey verilmiyor, çıktı ise son üç hücreden alınıyor.</p>
+<p>Şimdi TensorFlow ile en basit RNN'yi kendimiz yaratalım. Tekrar eden bir katman olacak, içinde 5 tane nöron,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+<span class="kw">def</span> reset_graph(seed<span class="op">=</span><span class="dv">42</span>):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+reset_graph()
+
+n_inputs <span class="op">=</span> <span class="dv">3</span>
+n_neurons <span class="op">=</span> <span class="dv">5</span>
+
+X0 <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, n_inputs])
+X1 <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, n_inputs])
+
+W <span class="op">=</span> tf.Variable(tf.random_normal(shape<span class="op">=</span>[n_inputs, n_neurons],dtype<span class="op">=</span>tf.float32))
+U <span class="op">=</span> tf.Variable(tf.random_normal(shape<span class="op">=</span>[n_neurons,n_neurons],dtype<span class="op">=</span>tf.float32))
+b <span class="op">=</span> tf.Variable(tf.zeros([<span class="dv">1</span>, n_neurons], dtype<span class="op">=</span>tf.float32))
+
+Y0 <span class="op">=</span> tf.tanh(tf.matmul(X0, W) <span class="op">+</span> b)
+Y1 <span class="op">=</span> tf.tanh(tf.matmul(Y0, U) <span class="op">+</span> tf.matmul(X1, W) <span class="op">+</span> b)
+
+init <span class="op">=</span> tf.global_variables_initializer()</code></pre></div>
+<p>Şimdi iki veri noktası verip iki veri noktası çıktısına bakalım. Bu 2-2 verisinden pek çok olacak, ki bu veriler ufak toptan setimizi (minibatch) oluşturacak. Alttaki ufak veride 4 tane o şekilde veri noktası var.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="co"># ufak toptan veri</span>
+X0_batch <span class="op">=</span> np.array([[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>], [<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>], [<span class="dv">9</span>, <span class="dv">0</span>, <span class="dv">1</span>]]) <span class="co"># t = 0</span>
+X1_batch <span class="op">=</span> np.array([[<span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">7</span>], [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>], [<span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">4</span>], [<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>]]) <span class="co"># t = 1</span>
+
+<span class="cf">with</span> tf.Session() <span class="im">as</span> sess:
+    init.run()
+    Y0_val, Y1_val <span class="op">=</span> sess.run([Y0, Y1], feed_dict<span class="op">=</span>{X0: X0_batch, X1: X1_batch})
+
+<span class="bu">print</span> <span class="st">&#39;t=0&#39;</span>
+<span class="bu">print</span>(Y0_val)
+<span class="bu">print</span> <span class="st">&#39;t=1&#39;</span>
+<span class="bu">print</span>(Y1_val)</code></pre></div>
+<pre><code>t=0
+[[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
+ [ 0.9977755  -0.71978885 -0.99657625  0.9673925  -0.99989718]
+ [ 0.99999774 -0.99898815 -0.99999893  0.99677622 -0.99999988]
+ [ 1.         -1.         -1.         -0.99818915  0.99950868]]
+t=1
+[[ 1.         -1.         -1.          0.40200216 -1.        ]
+ [-0.12210433  0.62805319  0.96718419 -0.99371207 -0.25839335]
+ [ 0.99999827 -0.9999994  -0.9999975  -0.85943311 -0.9999879 ]
+ [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]</code></pre>
+<p>Dikkat, eğitim yapmadık, ayrıca çıktı da üretmedik, sadece her basamak için gizli katmanı hesapladık, ve RNN'e ileri yönde hesap yaptırdık, dört kez <span class="math inline">\(x_0,x_1\)</span> verdik o da bize dört tane <span class="math inline">\(y_0,y_1\)</span> verdi. RNN'i eğitiyor olsaydık üretilen dört <span class="math inline">\(y_0,y_1\)</span> için <span class="math inline">\(V\)</span> ile çarpım, onu &quot;gerçek'' veriyle / etiketlerle karşılaştırmamız gerekecekti, onun üzerinden düzeltme yapacaktık, vs.</p>
+<p>Üstteki kod kolaydı, fakat RNN iki yerine 100 zaman adımı geriye gitsin isteseydik, bu çizit çok daha büyük olurdu. O tür kodları kolaylaştırmak için TF'in özel çağrıları var, mesela <code>static_rnn</code> bunlardan biri. Üstteki ağı bu şekilde yaratabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">reset_graph()
+
+X0 <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, n_inputs])
+X1 <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, n_inputs])
+
+basic_cell <span class="op">=</span> tf.contrib.rnn.BasicRNNCell(num_units<span class="op">=</span>n_neurons)
+output_seqs, states <span class="op">=</span> tf.contrib.rnn.static_rnn(basic_cell, [X0, X1],
+                                                dtype<span class="op">=</span>tf.float32)
+Y0, Y1 <span class="op">=</span> output_seqs
+
+<span class="bu">print</span> <span class="st">&#39;t=0&#39;</span>
+<span class="bu">print</span>(Y0_val)
+<span class="bu">print</span> <span class="st">&#39;t=1&#39;</span>
+<span class="bu">print</span>(Y1_val)</code></pre></div>
+<pre><code>t=0
+[[-0.0664006   0.96257669  0.68105787  0.70918542 -0.89821595]
+ [ 0.9977755  -0.71978885 -0.99657625  0.9673925  -0.99989718]
+ [ 0.99999774 -0.99898815 -0.99999893  0.99677622 -0.99999988]
+ [ 1.         -1.         -1.         -0.99818915  0.99950868]]
+t=1
+[[ 1.         -1.         -1.          0.40200216 -1.        ]
+ [-0.12210433  0.62805319  0.96718419 -0.99371207 -0.25839335]
+ [ 0.99999827 -0.9999994  -0.9999975  -0.85943311 -0.9999879 ]
+ [ 0.99928284 -0.99999815 -0.99990582  0.98579615 -0.92205751]]</code></pre>
+<p>YSA'lar kendini tekrarlayan olsun ya da olmasın aslında <span class="math inline">\(f(g(h(x)))\)</span> şeklinde basit içiçe fonksiyondurlar. Klasik YSA'da en sondaki hata backprop ile ağırlıklardaki değişim girdiler yönünde geriye doğru yayılır, bunu yapmak için <span class="math inline">\(-\frac{\partial E}{\partial w}\)</span> hesaplanır, böylece tüm ağırlıklar hataya yaptıkları katkı (!) bağlamında değişikliğe uğrarlar, &quot;düzeltilirler'', yani düzeltme Zincir Kanunu ile dış fonksiyonlardan içe doğru aktarılmış olur.</p>
+<p>RNN'de içiçe olma durumu zaman faktöründen kaynaklanıyor, fonksiyonlar önceki zaman dilimleri bağlamında içiçe geçmiş durumdadırlar, çünkü bir <span class="math inline">\(t\)</span> anındaki tahmin önceki dilimlerdeki fonksiyonların sonucudur, bir geribesleme durumu vardır, her gizli konum <span class="math inline">\(h_t\)</span> sadece bir önceki <span class="math inline">\(h_{t-1}\)</span> değil ondan önceki tüm gizli konumlardan da etkilenir. O zaman eğitimin bunu gözönüne alması gerekir.</p>
+<p>Dikkat: RNN'lerde içiçe geçen fonksiyonlar sebebiyle hatalar ya çok büyüyüp ya da çok küçülebiliyor, normal derin YSA'lerde de problem olabilir bu, fakat RNN'lerde bu durum daha belirgin çünkü N adım geriye gitmek demek N kadar içiçe geçen fonksiyon demek, ve sıralı veriyi tahmin için N'in büyük olması gerekebilir.</p>
+<p>Örnek</p>
+<p>Alttaki kodda bir metin okunarak o metindeki harf sırası tahmin edilmeye uğraşılıyor. Metin tekrar sıfırdan üretilmeye çabalanıyor. Otomatik türev (automatic differentiation -AD-) alma ile içiçe geçmiş fonksiyonların zincirleme türevinin alınması sağlanıyor, <code>rnn_predict</code> hesabı 40 geriye gider, AD tüm bu zinciri takip eder.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> autograd.numpy <span class="im">as</span> np
+<span class="im">import</span> autograd.numpy.random <span class="im">as</span> npr
+<span class="im">from</span> autograd <span class="im">import</span> grad
+<span class="im">from</span> autograd.scipy.misc <span class="im">import</span> logsumexp
+<span class="im">from</span> os.path <span class="im">import</span> dirname, join
+<span class="im">from</span> builtins <span class="im">import</span> <span class="bu">range</span>
+
+<span class="kw">def</span> sigmoid(x): <span class="cf">return</span> <span class="fl">0.5</span><span class="op">*</span>(np.tanh(x) <span class="op">+</span> <span class="fl">1.0</span>)   
+
+<span class="kw">def</span> concat_and_multiply(weights, <span class="op">*</span>args):
+    cat_state <span class="op">=</span> np.hstack(args <span class="op">+</span> (np.ones((args[<span class="dv">0</span>].shape[<span class="dv">0</span>], <span class="dv">1</span>)),))
+    <span class="cf">return</span> np.dot(cat_state, weights)
+
+<span class="kw">def</span> create_rnn_params(input_size, state_size, output_size,
+                      param_scale<span class="op">=</span><span class="fl">0.01</span>, rs<span class="op">=</span>npr.RandomState(<span class="dv">0</span>)):
+    <span class="cf">return</span> {<span class="st">&#39;init hiddens&#39;</span>: rs.randn(<span class="dv">1</span>, state_size) <span class="op">*</span> param_scale,
+            <span class="st">&#39;change&#39;</span>:       rs.randn(input_size <span class="op">+</span> state_size <span class="op">+</span> <span class="dv">1</span>,
+                                     state_size) <span class="op">*</span> param_scale,
+            <span class="st">&#39;predict&#39;</span>:      rs.randn(state_size <span class="op">+</span> <span class="dv">1</span>, output_size) <span class="op">*</span> param_scale}
+
+<span class="kw">def</span> rnn_predict(params, inputs):
+    <span class="kw">def</span> update_rnn(<span class="bu">input</span>, hiddens):
+        <span class="cf">return</span> np.tanh(concat_and_multiply(params[<span class="st">&#39;change&#39;</span>], <span class="bu">input</span>, hiddens))
+
+    <span class="kw">def</span> hiddens_to_output_probs(hiddens):
+        output <span class="op">=</span> concat_and_multiply(params[<span class="st">&#39;predict&#39;</span>], hiddens)
+        <span class="cf">return</span> output <span class="op">-</span> logsumexp(output, axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>) 
+
+    num_sequences <span class="op">=</span> inputs.shape[<span class="dv">1</span>]
+    hiddens <span class="op">=</span> np.repeat(params[<span class="st">&#39;init hiddens&#39;</span>], num_sequences, axis<span class="op">=</span><span class="dv">0</span>)
+    output <span class="op">=</span> [hiddens_to_output_probs(hiddens)]
+
+    <span class="cf">for</span> <span class="bu">input</span> <span class="kw">in</span> inputs:  <span class="co"># Iterate over time steps.</span>
+        hiddens <span class="op">=</span> update_rnn(<span class="bu">input</span>, hiddens)
+        output.append(hiddens_to_output_probs(hiddens))
+    <span class="cf">return</span> output
+
+<span class="kw">def</span> string_to_one_hot(string, maxchar):
+    <span class="bu">ascii</span> <span class="op">=</span> np.array([<span class="bu">ord</span>(c) <span class="cf">for</span> c <span class="kw">in</span> string]).T
+    <span class="cf">return</span> np.array(<span class="bu">ascii</span>[:,<span class="va">None</span>] <span class="op">==</span> np.arange(maxchar)[<span class="va">None</span>, :], dtype<span class="op">=</span><span class="bu">int</span>)
+
+<span class="kw">def</span> one_hot_to_string(one_hot_matrix):
+    <span class="cf">return</span> <span class="st">&quot;&quot;</span>.join([<span class="bu">chr</span>(np.argmax(c)) <span class="cf">for</span> c <span class="kw">in</span> one_hot_matrix])
+
+<span class="kw">def</span> rnn_log_likelihood(params, inputs, targets):
+    logprobs <span class="op">=</span> rnn_predict(params, inputs)
+    loglik <span class="op">=</span> <span class="fl">0.0</span>
+    num_time_steps, num_examples, _ <span class="op">=</span> inputs.shape
+    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(num_time_steps):
+        loglik <span class="op">+=</span> np.<span class="bu">sum</span>(logprobs[t] <span class="op">*</span> targets[t])
+    <span class="cf">return</span> loglik <span class="op">/</span> (num_time_steps <span class="op">*</span> num_examples)
+
+<span class="kw">def</span> training_loss(params, <span class="bu">iter</span>):
+    <span class="cf">return</span> <span class="op">-</span>rnn.rnn_log_likelihood(params, train_inputs, train_inputs)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> autograd.numpy <span class="im">as</span> np
+<span class="im">import</span> autograd.numpy.random <span class="im">as</span> npr
+<span class="im">from</span> autograd <span class="im">import</span> grad
+<span class="im">from</span> autograd.optimizers <span class="im">import</span> adam
+<span class="im">import</span> rnn
+
+<span class="kw">def</span> build_dataset(filename, sequence_length, alphabet_size, max_lines<span class="op">=-</span><span class="dv">1</span>):
+    <span class="cf">with</span> <span class="bu">open</span>(filename) <span class="im">as</span> f:
+        content <span class="op">=</span> f.readlines()
+    content <span class="op">=</span> content[:max_lines]
+    content <span class="op">=</span> [line <span class="cf">for</span> line <span class="kw">in</span> content <span class="cf">if</span> <span class="bu">len</span>(line) <span class="op">&gt;</span> <span class="dv">2</span>]   
+    seqs <span class="op">=</span> np.zeros((sequence_length, <span class="bu">len</span>(content), alphabet_size))
+    <span class="cf">for</span> ix, line <span class="kw">in</span> <span class="bu">enumerate</span>(content):
+        padded_line <span class="op">=</span> (line <span class="op">+</span> <span class="st">&quot; &quot;</span> <span class="op">*</span> sequence_length)[:sequence_length]
+        seqs[:, ix, :] <span class="op">=</span> string_to_one_hot(padded_line, alphabet_size)
+    <span class="cf">return</span> seqs
+
+num_chars <span class="op">=</span> <span class="dv">128</span>
+text_filename <span class="op">=</span> <span class="st">&#39;rnn.py&#39;</span>
+train_inputs <span class="op">=</span> build_dataset(text_filename, sequence_length<span class="op">=</span><span class="dv">30</span>,
+                                 alphabet_size<span class="op">=</span>num_chars, max_lines<span class="op">=</span><span class="dv">60</span>)
+
+init_params <span class="op">=</span> rnn.create_rnn_params(input_size<span class="op">=</span><span class="dv">128</span>, output_size<span class="op">=</span><span class="dv">128</span>,
+                                    state_size<span class="op">=</span><span class="dv">40</span>, param_scale<span class="op">=</span><span class="fl">0.01</span>)
+                                    
+<span class="kw">def</span> print_training_prediction(weights):
+    <span class="bu">print</span>(<span class="st">&quot;Training text                         Predicted text&quot;</span>)
+    logprobs <span class="op">=</span> np.asarray(rnn_predict(weights, train_inputs))
+    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(logprobs.shape[<span class="dv">1</span>]):
+        training_text  <span class="op">=</span> one_hot_to_string(train_inputs[:,t,:])
+        predicted_text <span class="op">=</span> rnn.one_hot_to_string(logprobs[:,t,:])
+        <span class="bu">print</span>(training_text.replace(<span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>, <span class="st">&#39; &#39;</span>) <span class="op">+</span> <span class="st">&quot;|&quot;</span> <span class="op">+</span>
+              predicted_text.replace(<span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>, <span class="st">&#39; &#39;</span>))
+
+<span class="kw">def</span> callback(weights, <span class="bu">iter</span>, gradient):
+    <span class="cf">if</span> <span class="bu">iter</span> <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>:
+        <span class="bu">print</span>(<span class="st">&quot;Iteration&quot;</span>, <span class="bu">iter</span>, <span class="st">&quot;Train loss:&quot;</span>, training_loss(weights, <span class="dv">0</span>))
+        <span class="co">#print_training_prediction(weights)</span>
+
+<span class="co"># Build gradient of loss function using autograd.</span>
+training_loss_grad <span class="op">=</span> grad(training_loss)
+
+<span class="bu">print</span>(<span class="st">&quot;Training RNN...&quot;</span>)
+trained_params <span class="op">=</span> adam(training_loss_grad, init_params, step_size<span class="op">=</span><span class="fl">0.1</span>,
+                      num_iters<span class="op">=</span><span class="dv">280</span>, callback<span class="op">=</span>callback)</code></pre></div>
+<pre><code>Training RNN...
+(&#39;Iteration&#39;, 0, &#39;Train loss:&#39;, 4.854500980126768)
+(&#39;Iteration&#39;, 10, &#39;Train loss:&#39;, 3.069896973468059)
+(&#39;Iteration&#39;, 20, &#39;Train loss:&#39;, 2.9564946588218)
+(&#39;Iteration&#39;, 30, &#39;Train loss:&#39;, 2.590610887049078)
+(&#39;Iteration&#39;, 40, &#39;Train loss:&#39;, 2.3255385285729027)
+(&#39;Iteration&#39;, 50, &#39;Train loss:&#39;, 2.1211122619024696)
+(&#39;Iteration&#39;, 60, &#39;Train loss:&#39;, 1.9691676257416404)
+(&#39;Iteration&#39;, 70, &#39;Train loss:&#39;, 1.8868756780002685)
+(&#39;Iteration&#39;, 80, &#39;Train loss:&#39;, 1.7455098359656291)
+(&#39;Iteration&#39;, 90, &#39;Train loss:&#39;, 1.7750342336507772)
+(&#39;Iteration&#39;, 100, &#39;Train loss:&#39;, 1.6059292555729703)
+(&#39;Iteration&#39;, 110, &#39;Train loss:&#39;, 1.5077116694554635)
+(&#39;Iteration&#39;, 120, &#39;Train loss:&#39;, 1.437485110908115)
+(&#39;Iteration&#39;, 130, &#39;Train loss:&#39;, 1.4504849515039933)
+(&#39;Iteration&#39;, 140, &#39;Train loss:&#39;, 1.3480379515887519)
+(&#39;Iteration&#39;, 150, &#39;Train loss:&#39;, 1.4083643059429929)
+(&#39;Iteration&#39;, 160, &#39;Train loss:&#39;, 1.2655987546227996)
+(&#39;Iteration&#39;, 170, &#39;Train loss:&#39;, 1.2051278365327054)
+(&#39;Iteration&#39;, 180, &#39;Train loss:&#39;, 1.1561998913079512)
+(&#39;Iteration&#39;, 190, &#39;Train loss:&#39;, 1.1814640952544757)
+(&#39;Iteration&#39;, 200, &#39;Train loss:&#39;, 1.3673188298901471)
+(&#39;Iteration&#39;, 210, &#39;Train loss:&#39;, 1.1591863193874781)
+(&#39;Iteration&#39;, 220, &#39;Train loss:&#39;, 1.056688128805028)
+(&#39;Iteration&#39;, 230, &#39;Train loss:&#39;, 1.0465201536978259)
+(&#39;Iteration&#39;, 240, &#39;Train loss:&#39;, 1.0373081053464259)
+(&#39;Iteration&#39;, 250, &#39;Train loss:&#39;, 1.3591698106017474)
+(&#39;Iteration&#39;, 260, &#39;Train loss:&#39;, 1.1556108786809474)
+(&#39;Iteration&#39;, 270, &#39;Train loss:&#39;, 1.0323757883394502)</code></pre>
+<p>Üretmek / eğitim için <code>rnn.py</code> kodunun kendisi kullanıldı.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">num_letters <span class="op">=</span> <span class="dv">30</span>
+<span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):
+    text <span class="op">=</span> <span class="st">&quot;&quot;</span>
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_letters):
+        seqs <span class="op">=</span> rnn.string_to_one_hot(text, num_chars)[:, np.newaxis, :]
+        logprobs <span class="op">=</span> rnn.rnn_predict(trained_params, seqs)[<span class="op">-</span><span class="dv">1</span>].ravel()
+        text <span class="op">+=</span> <span class="bu">chr</span>(npr.choice(<span class="bu">len</span>(logprobs), p<span class="op">=</span>np.exp(logprobs)))
+    <span class="bu">print</span>(text)</code></pre></div>
+<pre><code>    rs.lepugnunpdit - cenedili
+def p.rnns, logs&#39;ininpum, hid_
+    ngan rrad_ti, feturn ns.sc
+def catorrtar t  aut_re_strad.
+            hiddens_numumut in
+def hiddes = rhiddensdord.rato
+    return ncan((ponddens_tram
+ders minpperen(scnt_strt onut_
+    returnts, utete, jIoutdati
+    return oute_sthorn(pund_om
+dershgline nigms, conteme_sco_
+    return 0.5*(natorad.mincde
+    contse, hiddens_mihrra opu
+    [cran_put inhgto_tut= retu
+  # Ite, wItre =        retat 
+    ashis_lik[enutnoncam(nthen
+      oonname, jItogput_pre_sp
+    cet(fiddens = lot led_ome_
+def rinnam_idt(parddens_nnd(on
+    rs.leteqslind_tat  = [hipp</code></pre>
+<p>Fena değil; <code>def</code> ile başlanan satır ardından sonraki satır tab ile boşluk bıraktı, bunlar kolay şeyler değil. Altta karşılaştırma amaçlı olarak sadece frekans sayarak üretim yapan bir kod görüyoruz. O da fena değil, bu konu hakkında daha fazla detay için [2].</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">f <span class="op">=</span> <span class="st">&quot;../../stat/stat_naive/data/a1.txt&quot;</span>
+<span class="bu">print</span> <span class="bu">open</span>(f).read()[:<span class="dv">300</span>]</code></pre></div>
+<pre><code>A well-known scientist (some say it was Bertrand Russell) once gave a
+public lecture on astronomy. He described how the earth orbits around
+the sun and how the sun, in turn, orbits around the center of a vast
+collection of stars called our galaxy. At the end of the lecture, a
+little old lady at the </code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> lm
+lmm <span class="op">=</span> lm.train_char_lm(f, order<span class="op">=</span><span class="dv">4</span>)
+res <span class="op">=</span> lm.generate_text(lmm, <span class="dv">4</span>)
+<span class="bu">print</span> res[:<span class="dv">400</span>]</code></pre></div>
+<pre><code>A well-know
+better? What the moon were caused by Ptolemy in more the picture only late the Greeks even had
+been elongstanding that the sky what eclipses rather ridiculous, but why do we know about to someone looking the sun and the earth Star
+lies one looking the North orbiting questimate thought spheres the superior smile before think we go back of the really a flat plater see then? What disk, th</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> lmm.keys()[:<span class="dv">10</span>]
+<span class="bu">print</span> lmm.get(<span class="st">&#39;pla&#39;</span>)</code></pre></div>
+<pre><code>[&#39;t w&#39;, &#39;Fir&#39;, &#39;all&#39;, &#39;t t&#39;, &#39;sci&#39;, &#39;rom&#39;, &#39;ron&#39;, &#39;roo&#39;, &#39;thi&#39;, &#39;oss&#39;]
+[(&#39;t&#39;, 0.5), (&#39;n&#39;, 0.5)]</code></pre>
+<p>Zaman Serisi Tahmini</p>
+<p>Tensorflow ile zaman serisi tahmini yapalım. Eğitim verisinin formülünü bildiğimiz bir sinüs eğrisinden alacağız, sanki eğriyi bilmiyormuş gibi yapalım, bu eğriyi sadece üretilen veriye bakarak &quot;öğreneceğiz''. Eğrinin rasgele kısımlarından toptan veri parçaları üretmek için bir çağrı yazalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">np.random.seed(<span class="dv">1</span>)
+
+t_min, t_max <span class="op">=</span> <span class="dv">0</span>, <span class="dv">30</span>
+resolution <span class="op">=</span> <span class="fl">0.1</span>
+
+<span class="kw">def</span> f(t):
+    <span class="cf">return</span> t <span class="op">*</span> np.sin(t) <span class="op">/</span> <span class="dv">3</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> np.sin(t<span class="op">*</span><span class="dv">5</span>)
+
+<span class="kw">def</span> next_batch(batch_size, n_steps):
+    t0 <span class="op">=</span> np.random.rand(batch_size, <span class="dv">1</span>) <span class="op">*</span> (t_max <span class="op">-</span> t_min <span class="op">-</span> n_steps <span class="op">*</span> resolution)
+    Ts <span class="op">=</span> t0 <span class="op">+</span> np.arange(<span class="fl">0.</span>, n_steps <span class="op">+</span> <span class="dv">1</span>) <span class="op">*</span> resolution
+    ys <span class="op">=</span> f(Ts)
+    <span class="cf">return</span> ys[:, :<span class="op">-</span><span class="dv">1</span>].reshape(<span class="op">-</span><span class="dv">1</span>, n_steps, <span class="dv">1</span>), ys[:, <span class="dv">1</span>:].reshape(<span class="op">-</span><span class="dv">1</span>, n_steps, <span class="dv">1</span>)</code></pre></div>
+<p>Eğitim verisi zaman serisinin ufak bir parçası, ve hedef verisi onun bir ileri kaydırılmış hali.</p>
+<p>Zaman serisinin rasgele şekilde nasıl örneklendiğini göstermek için üstteki çağrı içindeki örnekleme kodunun benzerini altta tekrarlayalım ve grafikleyelim. Kırmızı noktalar örneklenen veri noktaları,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">batch_size <span class="op">=</span> <span class="dv">5</span>
+n_steps <span class="op">=</span> <span class="dv">3</span>
+t0 <span class="op">=</span> np.random.rand(batch_size, <span class="dv">1</span>) <span class="op">*</span> (t_max <span class="op">-</span> t_min <span class="op">-</span> n_steps <span class="op">*</span> resolution)
+Ts <span class="op">=</span> t0 <span class="op">+</span> np.arange(<span class="fl">0.</span>, n_steps<span class="op">+</span><span class="dv">1</span>) <span class="op">*</span> resolution
+ys <span class="op">=</span> f(Ts)
+<span class="bu">print</span> ys</code></pre></div>
+<pre><code>[[-2.3141651  -1.12233854  0.27200624  1.6253068 ]
+ [ 4.31878159  4.63599743  4.61528818  4.112844  ]
+ [ 0.03397153  0.99207952  1.71474727  2.02731967]
+ [ 2.87376693  3.00044595  2.62695206  1.77847377]
+ [-0.96970753 -2.03368272 -2.93926439 -3.47887785]]</code></pre>
+<p>Grafiklersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">t <span class="op">=</span> np.linspace(t_min, t_max, <span class="bu">int</span>((t_max <span class="op">-</span> t_min) <span class="op">/</span> resolution))
+y <span class="op">=</span> f(t)
+plt.plot(t,y)
+plt.plot(Ts,ys,<span class="st">&#39;r.&#39;</span>)
+plt.savefig(<span class="st">&#39;rnn_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="rnn_03.png" />
+
+</div>
+<p>Öğrenme amacıyla daha büyük adım, iç nöron sayısı tanımlayalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+<span class="kw">def</span> reset_graph(seed<span class="op">=</span><span class="dv">42</span>):
+    tf.reset_default_graph()
+    tf.set_random_seed(seed)
+    np.random.seed(seed)
+
+reset_graph()
+
+n_steps <span class="op">=</span> <span class="dv">30</span>
+n_inputs <span class="op">=</span> <span class="dv">1</span>
+n_neurons <span class="op">=</span> <span class="dv">200</span>
+n_outputs <span class="op">=</span> <span class="dv">1</span>
+
+X <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, n_steps, n_inputs])
+y <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, n_steps, n_outputs])
+
+cell <span class="op">=</span> tf.contrib.rnn.OutputProjectionWrapper(
+    tf.contrib.rnn.BasicRNNCell(num_units<span class="op">=</span>n_neurons, activation<span class="op">=</span>tf.nn.relu),
+    output_size<span class="op">=</span>n_outputs)
+
+outputs, states <span class="op">=</span> tf.nn.dynamic_rnn(cell, X, dtype<span class="op">=</span>tf.float32)
+
+learning_rate <span class="op">=</span> <span class="fl">0.01</span>
+
+loss <span class="op">=</span> tf.reduce_mean(tf.square(outputs <span class="op">-</span> y)) <span class="co"># MSE</span>
+optimizer <span class="op">=</span> tf.train.AdamOptimizer(learning_rate<span class="op">=</span>learning_rate)
+training_op <span class="op">=</span> optimizer.minimize(loss)
+
+init <span class="op">=</span> tf.global_variables_initializer()
+
+n_iterations <span class="op">=</span> <span class="dv">300</span>
+batch_size <span class="op">=</span> <span class="dv">50</span>
+
+sess <span class="op">=</span> tf.Session()
+
+sess.run(tf.global_variables_initializer())
+
+<span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(n_iterations):
+    X_batch, y_batch <span class="op">=</span> next_batch(batch_size, n_steps)
+    sess.run(training_op, feed_dict<span class="op">=</span>{X: X_batch, y: y_batch})
+    <span class="cf">if</span> iteration <span class="op">%</span> <span class="dv">100</span> <span class="op">==</span> <span class="dv">0</span>:
+        mse <span class="op">=</span> loss.<span class="bu">eval</span>(feed_dict<span class="op">=</span>{X: X_batch, y: y_batch}, session<span class="op">=</span>sess)
+        <span class="bu">print</span>(iteration, <span class="st">&quot;</span><span class="ch">\t</span><span class="st">MSE:&quot;</span>, mse)</code></pre></div>
+<pre><code>(0, &#39;\tMSE:&#39;, 280.63486)
+(100, &#39;\tMSE:&#39;, 0.089582793)
+(200, &#39;\tMSE:&#39;, 0.044634577)</code></pre>
+<p>Öğrenme tamamlandı ve MSE hata raporu fena değil. Şimdi bu RNN'i hiç görmediğimiz geleceği tahmin için kullanalım, <code>n_more</code> adım ilerisini tahmin edeceğiz, yanlız <code>n_steps</code> zaman serisi kaydırılmış <code>n_steps</code> ilerisini tahmin için kullanılıyordu. Biz tahminleri üretirken tahmin bloğunun sadece en sondaki öğesini alacağız. Sonra bu ögeyi kaynak veriye dahil edip bir gelecek bloğu daha üreteceğiz (onun da son öğesini alacağız, vs), ve böyle gide gide <code>n_more</code> kadar geleceği bitiştirmiş olacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">n_more <span class="op">=</span> <span class="dv">40</span>
+
+t <span class="op">=</span> np.linspace(t_min, t_max, <span class="bu">int</span>((t_max <span class="op">-</span> t_min) <span class="op">/</span> resolution))
+y <span class="op">=</span> f(t)
+
+newx <span class="op">=</span> <span class="bu">list</span>(t[<span class="op">-</span>n_steps:])
+newy <span class="op">=</span> <span class="bu">list</span>(y[<span class="op">-</span>n_steps:])
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_more): <span class="co"># bu kadar daha uret</span>
+   tst_input <span class="op">=</span> np.array(newy[<span class="op">-</span>n_steps:]).reshape(<span class="dv">1</span>,n_steps,<span class="dv">1</span>) 
+   res <span class="op">=</span> sess.run(outputs, feed_dict<span class="op">=</span>{X: tst_input})
+   newy.append(res[<span class="dv">0</span>][<span class="dv">0</span>][<span class="dv">0</span>])
+   newx.append(t_max <span class="op">+</span> (i<span class="op">*</span>resolution))
+
+plt.plot(t,y)
+plt.plot(newx[n_steps<span class="dv">-1</span>:],newy[n_steps<span class="dv">-1</span>:],<span class="st">&#39;g&#39;</span>)
+
+plt.savefig(<span class="st">&#39;rnn_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="rnn_04.png" />
+
+</div>
+<p>Yeşil renkli tahmin bölümü.</p>
+<p>Problemler</p>
+<p>RNN problemlerinden biri şerisel olarak modellenen verinin ağ yapısında geriye doğru giderken eğitim sırasında yokolan gradyan (vanishing gradient) problemine sebep olabilmesi. Çünkü YSA yatay olarak derin, ve gradyan geriye doğru yayılma yaparken sayısal olarak problemlere yol açabiliyor. Çözümler adım sayısını azaltmak olabilir, ya da bu problemlerin bazılarını düzelten LSTM kullanmak olabilir.</p>
+<p>Kaynaklar</p>
+<p>[1] <em>A Beginner's Guide to Recurrent Networks and LSTMs</em>, <a href="https://deeplearning4j.org/lstm#a-beginners-guide-to-recurrent-networks-and-lstms" class="uri">https://deeplearning4j.org/lstm#a-beginners-guide-to-recurrent-networks-and-lstms</a></p>
+<p>[2] Bayramlı, <em>Derin Öğrenim ile Text Üretmek, RNN, LSTM</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2017/01/derin-ogrenim-ile-text-uretmek-rnn-lstm.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2017/01/derin-ogrenim-ile-text-uretmek-rnn-lstm.html</a></p>
+<p>[3] Britz, <em>Recurrent Neural Networks Tutorial, Part 1</em>, <a href="http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/" class="uri">http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/</a></p>
+<p>[4] Lipton, <em>A Critical Review of Recurrent Neural Networks for Sequence Learning</em>,<a href="https://arxiv.org/abs/1506.00019" class="uri">https://arxiv.org/abs/1506.00019</a></p>
+</body>
+</html>

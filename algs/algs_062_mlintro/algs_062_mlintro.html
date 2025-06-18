@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="yapay-ögrenime-giriş">Yapay Ögrenime Giriş</h1>
+<p>Bu makalede, yapay öğrenim (machine learning) konusunun amacından, motive eden faktörlerden bahsedeceğiz, ve yapay öğrenimde istatistiki yöntemler ve grafik modelleri savunan/yeğleyen bir açı ile yaklaşmaya çalışacağız.</p>
+<p>Yapay ögrenim, doğada görülen/gözlemlenen herhangi bir veriyi, veriden daha ufak şekilde temsil etmemize yardım eder. Ve bunları, gözlemlenen olay için net bir matematiksel model olmadığı zaman yapmaya uğraşır. Modeli bilgisayara oluşturttuktan sonra, bu modeli kullanarak, diğer yapay öğrenim araçlarını kullanmaya başlayabiliriz: Bunlar kümeleme (clustering), anormallik farketme (anomaly detection), regresyon (regression) ve özellik seçme (feature selection) gibi uygulamalardır.</p>
+<p>YÖ'de iki ana kavram denetimli ve denetimsiz eğitim kavramı. Çok boyutlu bir girdiyle beraber onun etiketi, ya da eşlendiği bir hedef değeri var ise, ve algoritmamızı bu iki veriyi kullanarak eğitiyorsak, bu denetimli (supervised) bir eğitim. İstatistikteki regresyon aslında bir çeşit denetimli eğitim olarak görülebilir. İki boyutta çizgi uyduruyoruz, <span class="math inline">\(x,y\)</span> girdileri var, <span class="math inline">\(x\)</span> ana girdi, <span class="math inline">\(y\)</span> ise hedef / etiket. Ya da lojistik regresyonla bir email içeriği verisini o email spam'mı değil mi etiketi (0/1 değerleri ile) beraber eğitmek bir diğer örnek. Denetimsiz (unsupervised) eğitim örneği veriyi kümelere ayırmak; kümelemeyi başka bir veriden öğrenip bir diğerine uygulamıyoruz, elde hiç eğitilmiş bir yapı olmadan her veride mevcut kümeleri keşfetmeye uğraşıyoruz.</p>
+<p>Bu makalede <span class="math inline">\(\mathbf{x}\)</span> vektörü bir boyuttaki girdiyi temsil etmek için, <span class="math inline">\(\mathbf{X}\)</span> çok boyutlu girdiyi temsil etmek için kullanılacak. Vektör <span class="math inline">\(\mathbf{x}\)</span>'in bütün elemanları tek bir özelliği ölçen büyüklükler olarak kabul edelim, ve tersi belirtilmezse bağımsız özdeşçe dağılmış (iid) olarak görelim.</p>
+<p>Regresyon Bazlı Yöntemler</p>
+<p>Model</p>
+<p>Yapay öğrenim için uygun bir başlangıç noktası, doğrusal regresyondur (linear regression). Veri olarak alınan <span class="math inline">\(\mathbf{x}\)</span> açıklamak için, hedef işlevi olarak eğriliği ve başlangıç noktasını bilmediğimiz bir doğru olan f(x)'i öğrenmeye çalışalım.</p>
+<p><span class="math display">\[
+  f(x;\theta) = \sum_{i=1}^N \theta_{1}x_{i} + \theta_{0}
+  \qquad (1)
+\]</span></p>
+<p>ki <span class="math inline">\(\theta_{0}\)</span> ve <span class="math inline">\(\theta_{1}\)</span> bilinmeyen değişkenleri temsil ediyorlar. Birçok muhtemel <span class="math inline">\(f(x;\theta)\)</span> arasından araya araya en optimal <span class="math inline">\(\theta\)</span>'yı bulmamız gerekiyor. Altta doğrusal regresyon grafini goruyoruz.</p>
+<div class="figure">
+<img src="linreg.jpg" />
+
+</div>
+<p>İlk önce (1)'i matris formuna çeviriyoruz, ki doğrusal cebir notasyonu kullanmamız mümkün olsun. Doğrusal cebir sayesinde, denklemi daha ileride çok boyutta işler hâle getirmek çok basit olacak.</p>
+<p><span class="math display">\[
+  f(x;\theta) = \sum_{i=1}^N 
+  \left[ \begin{array}{cc}
+      1 &amp; x_{i}
+  \end{array} \right]
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1}
+  \end{array} \right]
+  \qquad (2)
+\]</span></p>
+<p><span class="math display">\[
+  f(\mathbf{x};\theta) = 
+  \left[ \begin{array}{cc}
+      1 &amp; x_{1} \\
+      \vdots \\
+      1 &amp; x_{N} \\      
+  \end{array} \right]
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1}
+  \end{array} \right]
+  \qquad (3)
+\]</span></p>
+<p>(2)'de gösterilen toplama dikkat edersek, (3) formülünden kaybolduğunu göreceğiz. Toplamın yerine ilk matriste ek boyutlar geldi. Doğrusal cebirin biraz daha eklenmesi, tüm formülü daha da temiz hâle getirecektir.</p>
+<p><span class="math display">\[  
+  f(\mathbf{X};\theta) = \mathbf{X}\theta
+\]</span></p>
+<p>Arama işleminin sonuca varması için, hesaplanmış <span class="math inline">\(f(x;\theta)\)</span> ile verilen <span class="math inline">\(\mathbf{y}\)</span>'i karşılaştırması gerekir. Bu karşılaştırmayı matematiksel olarak yapmanın karşılığı bir kayıp fonksiyonu (loss function) tanımlamaktır. Bu fonksiyon, başarı/başarısızlık kriterimizi tanımladığımız yer olacaktır. Diyelim ki kayıp kriteri (yâni bizim o an elimizde olan en iyi tahminin ne kadar yanlış olduğu) <span class="math inline">\(f(x;\theta)\)</span> işlevinin sonucu ile, veri olarak elimizde olan <span class="math inline">\(\mathbf{y}\)</span>'nin farkının karesi olsun. Bu kayıp fonksiyonunu baz alarak, tüm noktalar için bu hesabı yapıp sonucu toplarsak, tüm riski hesaplamış oluruz.</p>
+<p><span class="math display">\[
+  R(\theta) = \frac{1}{2N}|\mathbf{y} - \mathbf{X}\theta|^2
+\]</span></p>
+<p>Not: <span class="math inline">\(2\)</span> teriminin kullanılma sebebi, cebirsel işlemlerin ileri safhalarında <span class="math inline">\(^2\)</span> ile otomatikman iptal olması içindir. Risk fonksiyonunu herhangi bir sayı ile çarpmak, en alt (minima) noktasının nerede olduğunu değiştirmez.</p>
+<p>Yapay öğrenim literatüründe <span class="math inline">\(R(\theta)\)</span> fonksiyonu ölçümsel risk olarak bilinir. Bizim amacımız R'yi minimize etmektir, ve bu şekilde, ve aynı zamanda, en iyi <span class="math inline">\(\theta\)</span>'yı aramaktır. Altta 3 boyutlu risk fonksiyonu grafigi.</p>
+<div class="figure">
+<img src="risk.jpg" />
+
+</div>
+<p>Risk'in en az olduğu nokta, fonksiyon değişimin en az olduğu noktadır, bunu analiz dersinden biliyoruz. Bu demektir ki, bu noktada <span class="math inline">\(R(\theta)\)</span>'nin gradyan sıfır olacaktır. Gradyan, <span class="math inline">\(R(\theta)\)</span>'nın bütün parça türevlerini (partial derivatives) vektör halindeki şeklidir. Bir işlevin gradyanını almanın sonucu elimize geçen vektör, her zaman o fonksiyonun, o noktadan hareketle en yüksek değişimin/artışın/azalışın olacağı yönü gösterecektir. Eğer bu gradyan sıfır olmuş ise, demek ki bir tam yatay düzleme geldik, ve hiç artış ve azalış imkanı kalmamış.</p>
+<p>Bazı çeşit risk formüllerinin türevi cebirsel olarak çözülmesi zor bir sonuç verebilir. Bu gibi durumlarda, yaklaşıksal (approximate) tekniklerden birini kullanarak hesaplamayı yapabiliriz: Bir bilgisayar programı ile gradyanın işaret ettiği yöne doğru <em>yürüyen</em> bir yöntem takip ederiz. Bu sayede gradyanın sıfır olduğu bölgeye erişmeye uğraşırız. Program gradyan = 0 gördüğü anda duracaktır. Önümüzdeki örnek için çıkardığımız türev, cebirsel olarak temiz olacak, o yüzden yaklaşıksal, algoritmik tekniklere şimdilik ihtiyacımız yok.</p>
+<p><span class="math display">\[ 
+  \bigtriangledown_{\theta} R\left(\theta\right) = \left[ \begin{array}{c}
+      0 \\
+      0 
+    \end{array} \right]
+ \]</span></p>
+<p><span class="math display">\[ 
+  \bigtriangledown_{\theta}\left( \frac{1}{2N}||\mathbf{y} -
+  \mathbf{X}\theta||^2\right) = 0 
+ \]</span></p>
+<p><span class="math display">\[ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \left(\mathbf{y} -  \mathbf{X}\theta \right) ^T
+  \left( \mathbf{y} -  \mathbf{X}\theta \right)
+  \right) = 0 
+ \]</span></p>
+<p><span class="math display">\[ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \left(\mathbf{y}^T -  \left(\mathbf{X}\theta\right)^T \right)
+  \left( \mathbf{y} -  \mathbf{X}\theta \right)
+  \right) = 0 
+ \]</span></p>
+<p><span class="math display">\[ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \mathbf{y}^T\mathbf{y} -
+  \mathbf{y}^T\mathbf{X}\theta -
+  \left( \mathbf{X}\theta \right)^T\mathbf{y} +
+  \theta^T\mathbf{X}^T\mathbf{X}\theta
+  \right) = 0 
+ \]</span></p>
+<p>İkinci ve üçüncü terimler aslında birbirine eşittir, çünkü vektör çarpım kurallarına göre, <span class="math inline">\(\mathbf{u}^T \mathbf{v} = \mathbf{v}^T \mathbf{u}\)</span>.</p>
+<p><span class="math display">\[ 
+  \frac{1}{2N}  \bigtriangledown_{\theta} \left(
+  \mathbf{y}^T\mathbf{y} -2
+  \mathbf{y}^T\mathbf{X}\theta +
+  \theta^T\mathbf{X}^T\mathbf{X}\theta
+  \right) = 0
+ \]</span></p>
+<p><span class="math display">\[ 
+  \frac{1}{2N} \left(
+  -2\mathbf{y}^T\mathbf{X}
+  +2\theta\mathbf{X}^T\mathbf{X} \right) = 0
+ \]</span></p>
+<p><span class="math display">\[ 
+  \frac{1}{N} \left(
+  -\mathbf{y}^T\mathbf{X}
+  +\theta\mathbf{X}^T\mathbf{X} \right) = 0
+ \]</span></p>
+<p><span class="math display">\[ 
+  \theta\mathbf{X}^T\mathbf{X} =
+  \mathbf{y}^T\mathbf{X} 
+ \]</span></p>
+<p><span class="math display">\[ 
+  \theta = \left(\mathbf{X}^T\mathbf{X}\right)^{-1}
+  \mathbf{y}^T\mathbf{X}
+ \]</span></p>
+<p><span class="math inline">\(\theta\)</span> hesaplandıktan sonra, artık bu değeri <span class="math inline">\(f(x;\theta)\)</span> içine koyabilir ve gelecekte bilinmeyen verileri tahmin için kullanabiliriz.</p>
+<p>Yüksek Boyutlar</p>
+<p>Doğrusal regresyon rahat bir şekilde çok boyutlu çalışacak şekilde uzatılabilir.</p>
+<p><span class="math display">\[
+  \mathbf{X} = 
+  \left[ \begin{array}{cccc}
+      1 &amp; x_{1} &amp; \cdots &amp; x_{1}(D) \\
+      \vdots &amp; \vdots &amp; \vdots &amp; \vdots \\
+      1 &amp; x_{N} &amp; \cdots &amp; x_{N}(D) \\
+  \end{array} \right] 
+  \qquad (7)
+\]</span></p>
+<p><span class="math display">\[ 
+  R\left(\theta\right) = \frac{1}{2N}
+  \left|
+  \left[ \begin{array}{c}
+      y_{1} \\
+      \vdots \\
+      y_{N}
+  \end{array} \right]
+  -
+  \mathbf{X}
+  \left[ \begin{array}{c}
+      \theta_{0} \\
+      \theta_{1} \\
+      \vdots \\
+      \theta_{D} 
+  \end{array} \right]
+  \right|^2 
+ \]</span></p>
+<p>Yeni risk hesabı, N veri değeri ve D boyutu için kullanılabilir. <span class="math inline">\(\theta\)</span> hesabını ise gene aynen (7) denklemi üzerinden gerçekleştirebiliriz. Bu denklemden gelen sonuç, N boyutlu bir hiper düzlemin hâm veriye en uygun (fit) hâli olacaktır.</p>
+<p>Baz Fonksiyonlar</p>
+<p>Eğitim verisini modellemenin diğer bir yolu baz fonksiyonları olarak bilinen fonksiyonlardır. Bu yöntem ile, bir polinom, sinüsyen (sinüs bazlı) ya da radyal bir <em>baz</em> fonksiyon seçilir, ve her veri noktası <span class="math inline">\(\mathbf{x}_{i\in N}\)</span>, baz fonksiyonundan geçirtilerek yeni bir <span class="math inline">\(\mathbf{x}\)</span> oluşturulur. Bu noktadan sonra uygulanacak regresyon işlemi, N baz fonksiyonunun en optimal hâldeki toplamının bulunma işlemine dönüşecektir. Baz fonksiyonları arasında en popüler olan radyal fonksiyonlardır, çünkü çok boyutlu veriyi modellememize izin verirler. Karşılaştırma olarak polinom bazlı fonksiyonlarda tek boyutun üzerine çıkamayız.</p>
+<p>Bir radyal baz fonksiyonu hesaplamak, bir bakıma her nokta yerine bir tepe fonksiyonu yerleştirmektir. Bu tepe şöyle gösterilir:</p>
+<p><span class="math display">\[
+  \phi_{i}(\mathbf{x}) = exp\left(
+  -\frac{1}{2\sigma}\left|\mathbf{x} - \mathbf{x}_{i}\right|^2
+  \right)
+\]</span></p>
+<p>ki <span class="math inline">\(\mathbf{x}\)</span> bir ya da çok boyutlu olabilir. Tepenin genişliği <span class="math inline">\(\sigma\)</span> parametresi ile kontrol edilir, ve regresyon işlemi başlamadan modelci tarafından seçilen bir değerdir. Bundan sonra risk fonksiyonu şu hâle gelecektir.</p>
+<p><span class="math display">\[
+  R(\theta) = \frac{1}{2N}|\mathbf{y} - Q\theta|^2
+\]</span></p>
+<p>ki Q değeri şuna eşittir:</p>
+<p><span class="math display">\[
+  \left[ \begin{array}{cccc}
+      1 &amp; \phi_{0}(x_{1}) &amp; \cdots &amp; \phi_{D}(x_{1}) \\
+      \vdots &amp; \vdots &amp; \vdots &amp; \vdots \\
+      1 &amp; \phi_{0}(x_{N}) &amp; \cdots &amp; \phi_{D}(x_{N}) \\
+  \end{array} \right]
+\]</span></p>
+<p>Ve hâla (7) denklemini regresyon için kullanabiliriz.</p>
+<p>Yapay Sinir Ağları</p>
+<p>Düzeltici fonksiyonların eklenmesi ile regresyon biraz daha işe yarar hâle gelir. Bunun da üstüne, regresyonu değişik seviyelerde birkaç kez yapar ve her seviyede değişik düzeltici (ya da aynı) düzeltici fonksiyonlar kullanırsak, Alttaki sekilde gördüğümüz daha çetrefilli ayrıcı problemleri çözmemiz mümkün olacaktır. Bu tür yaklaşımlara ağa benzer yapısı sebebiyle yapay sinir ağları (neural network) adı verilmiştir.</p>
+<div class="figure">
+<img src="nn1.jpg" />
+
+</div>
+<p>Düzeltici fonksiyonların ağ yapısına eklenmesiyle birlikte, gradyan yöntemini kullanarak pür cebirsel olarak en alt noktayı bulmak zorlaşır. Bu yüzden yaklaşıksal yöntemler kullanmaya mecbur oluyoruz. Bu yöntemlerden biri gradyan inişi (gradient descent) adı verilen bir yöntemdir. Çok katmanlı bir yapay sinir ağ için gradyan inişi her katmana sırayla uygulanır, ki YSA eğitmekte kullanılan ünlü BACKPROP algoritmasının altında yatan temel fikir budur. BACKPROP birçok uygulama alanında başarı ile kullanılmıştır.</p>
+<p>Bu ek gücüne rağmen, YSA'nın bazı limitasyonları hâlen mevcuttur. Öncelikle YSA'ların matematiksel analizi hala zordur. Ağ yapısına yeni bir katman eklediğimizde bunun sonuçlarının ne olacağını hâlen bilmiyoruz. Ayrıca analiz bir tarafa, YSA ile çözülmesi mümkün olmayan problemler de mevcuttur. Meselâ <span class="math inline">\(x^2+y^2=1\)</span> formülünü öğrenmek bunlardan biridir çünkü, bu formül bir fonksiyon değil, bir <em>ilişkidir</em>. Diğer bir ünlü problem balistikten Gülle Atmanın Açısı ve Uzaklığı problemidir ve regresyon bazlı bir yöntem kullanarak çözmek imkansızdır. Bu tür problemler en rahat şekilde Bayes Ağları gibi bir istatistiki yaklaşım ile çözülebilir.</p>
+<p>İstatistiki Yaklaşım</p>
+<p>İstatistiki yaklaşım, veriyi daha iyi ve kesin özetleyebilmemizi sağlar. İki boyutlu bir veri için regresyon yapınca, bilinmeyen bir doğrunun sadece açısını öğrenmiş oluyoruz. İstatistiki yaklaşım ile bir Gauss Normal dağılımın parametrelerini veriden çıkartınca, elimize geçenler merkez nokta <span class="math inline">\(\mu\)</span> (ortalama), dağılımın genişliği <span class="math inline">\(\sigma\)</span> (varyans), ve elipsin açısı <span class="math inline">\(\Sigma\)</span> (kovaryans) olacaktır. İstatistiki yaklaşım, aynı zamanda, olasılık kuramının bütün araçlarını kullanmamıza imkan verdiği için, altyapı daha sağlam olacaktır, ve böylece rasgele yöntemlere daha az başvurmuş olacağız, ve ileride modeli analiz etmemiz kolaylaşacak.</p>
+<p>Olasılık modellerinde, tek bir parametreyi öğrenmek yerine, o parametrenin üstünden tanımlanan bir dağılımı öğreniyoruz. Yâni <span class="math inline">\(y\)</span> yerine <span class="math inline">\(p(y)\)</span> kullanıyoruz. Diğer taraftan, eski yöntemde <span class="math inline">\(p(y)\)</span> yerine <span class="math inline">\(y\)</span> kullanmak, bütün ağırlığı tek bir noktada toplanmış bir dağılım öğrenmek ile aynı şey oluyor.</p>
+<p>Bir dağılıma birden fazla bilinmeyen eklemenin sonucu elimize bir ortak dağılım (joint distribution) geçmesidir. Ayrıksal (discrete) şartlarda ortak dağılım bir tablo olarak gösterilebilir ve belli (sonlu) sayıda elemanı vardır.</p>
+<p>Rasgele (random) değişkenler arasındaki bağımlılık ve bağımsızlık da ortak dağılım tablo büyüklüğünde etkileyici bir faktördür. Eğer iki olayın, ve bu sebeple bu olayların rasgele değişkenlerinin arasında bir ilişki var ise, modelimizin bu ilişkiyi yansıtması isabetli olacaktır. Fakat basitleştirmek için (meselâ) bütün değişkenlerin arasında bir ilişki kuracak olsaydık, bunun sonucu tablomuzun büyüklüğünde üstel bir patlama olurdu. Örnek olarak D bilinmeyenli ve hepsi birbiri ile ilişkili rasgele değişkenler üstünden bir dağılımın tablo büyüklüğü <span class="math inline">\(2^D\)</span> iken, bütün rasgele değişkenler birbirinden bağımsız olduğu durumda ise büyüklük <span class="math inline">\(2D\)</span>'a inecektir.</p>
+<p>Bu yüzden verimli bir yöntem şöyle olabilir: <span class="math inline">\(2D\)</span>, yâni tam bağımsızlık ile başlarız ve bağımlılık ilişkisini yavaş yavaş modele tanıştırırız. Değişkenler arasındaki bağımlılık ilişkisi <span class="math inline">\(p(y|x)\)</span> olarak gösterilir, ve okunuşu&quot;x verildiğinde <span class="math inline">\(y\)</span>'nin olasılığı'' olarak tanımlanır. Ortak dağılım <span class="math inline">\(p(x,y) = p(y|x)p(x)\)</span> olarak bilinir ve bu eşitlik olasılık kuramından iyi bilinen bir eşitliktir. Çok bilinmeyen içeren bir problemde bütün bağımlılıkların formül olarak yazılması karışık olabileceğinden, genelde çizit notasyonu kullanılır. Alttaki sekilde görülen ortak dağılım <span class="math inline">\(p(x,y,z)\)</span>, bütün olasılıkların çarpımına eşittir, yâni <span class="math inline">\(p(x)p(y|x)p(z|x)\)</span>.</p>
+<div class="figure">
+<img src="graph2.jpg" />
+
+</div>
+<p>Dikkat edilirse, bu modele göre <span class="math inline">\(p(x,y,z)\)</span> ortak dağılımı <span class="math inline">\(p(x)p(y)p(z)\)</span> çarpımına eşit değildir. Bu sonuç sadece ve sadece bütün değişkenler birbirinden bağımsız ise ortaya çıkacaktır.</p>
+<p>Olasılık dağılımlarını kullanırken, modelin bilinmeyenlerini, yâni parametrelerini bile bir rasgele değişken olarak gösterilebilir. Böylece diğer rasgele değişkenler ile bu tür değişkenler arasında bağımlılık ilişkisi kurulabilir. Meselâ, alttaki sekildeki noktaları sınıflandırma örneğinden başlayalım.</p>
+<div class="figure">
+<img src="gaussdata.jpg" />
+
+</div>
+<p>Bu örnekte, <span class="math inline">\(x \in \mathbf{R}^D\)</span> girdi verisidir, ve <span class="math inline">\(y \in \{0,1\}\)</span> de sonuçtur. Değişken y ikili sistemde olduğu için, bu dağılımı bir Bernoulli Dağılımı olarak modelleyebiliriz.</p>
+<p><span class="math display">\[
+p(y_{i}|\alpha)=\alpha^y_{i}(1-\alpha)^{1-y_{i}}
+\]</span></p>
+<p>ki <span class="math inline">\(i=1...N\)</span>. Bir dağılım tablosu yerine dağılım <em>formülü</em> kullanmak bize dağılımı cebirsel olarak manipüle etme avantajını sağlar. Bu sayede formülü En Büyük Olurluk (Maximum Likelihood) gibi bir metoda girdi olarak verebiliriz, formülün türevini alabiliriz, vs.</p>
+<p>X'leri temsil etmek için Gaussian dağılımını seçeceğiz.</p>
+<p><span class="math display">\[
+p(x_{i}|y_{i},\mu,\Sigma)=N(x_{i}|\mu_{y},\Sigma_{y})  
+\qquad (11)
+\]</span></p>
+<p>Ortak dağılım da alttaki gibi gözükecektir.</p>
+<div class="figure">
+<img src="gauss_repl_plate.jpg" />
+
+</div>
+<p>Gördüğümüz gibi <span class="math inline">\(\mu,\alpha,\Sigma\)</span> değişkenleri de rasgele değişkeni hâline getirildi. Grafiğe bakarak cebirsel ortak dağılımı <span class="math inline">\(p(x,y,\mu,\alpha,\Sigma)\)</span> şöyle gösterebiliriz.</p>
+<p><span class="math display">\[
+p(y|\alpha)p(x|y,\mu,\Sigma)p(\Sigma)p(\mu)p(\alpha) 
+\qquad (12)
+\]</span></p>
+<p>Sınıflandırma amacımıza erişebilmek için (12) formülünü, <span class="math inline">\(p(x,y|\alpha,\mu,\Sigma)\)</span> sorusunu cevaplandırabilen bir hâle getirmeliyiz. Olasılık kuramından bilinen bir değişim ile pür cebirsel olarak şöyle devam edebiliriz.</p>
+<p><span class="math display">\[
+p(x,y|\alpha,\mu,\Sigma) =
+\frac{p(x,y,\alpha,\mu,\Sigma)}
+     {p(\alpha)p(\mu)p(\Sigma)} 
+\qquad (13)
+\]</span></p>
+<p>Şimdi (13)'deki bölüneni, grafik modelden gelen ortak dağılım (12) ile değiştireceğiz.</p>
+<p><span class="math display">\[
+p(x,y|\alpha,\mu,\Sigma) =
+\frac{p(y|x)p(x|y,\mu,\Sigma)p(\alpha)p(\mu)p(\Sigma)}
+     {p(\alpha)p(\mu)p(\Sigma)} \nonumber \\
+= p(y|x)p(x|y,\mu,\Sigma) 
+\qquad (14)
+\]</span></p>
+<p>Eğitim (hâm) verisine en uygun olan parametreleri bulmak için, En Büyük Olurluk yöntemini kullanacağız. Bu metoda göre (14) formülünün her N veri noktası ile hesabından sonra birbiri ile çarparız. O zaman, bilinmeyen parametrelerin en iyi hesapsal tahmini (estimation), bu süper ortak dağılımın en yüksek olduğu noktada bulunabilir.</p>
+<p><span class="math display">\[
+Olurluk = \prod_{i=1}^N p(y|x)p(x|y,\mu,\Sigma)
+\qquad (15)
+\]</span></p>
+<p>Olurluğun en yüksek olduğu nokta, olurluk formülünün türevinin sıfır olduğu noktadadır.</p>
+<p>İleride yapılacak türev alma işlemini rahatlatmak için, (15) içindeki terimlerin log'unu alırız. Bu işlem, çarpım işaretini toplam işaretine dönüştürecektir. Bunu yapmamız en yüksek noktayı bulma açısından bir fark yaratmaz, çünkü (15) formülünün değişim hızı, toplamlı olan formülünkiyle aynıdır.</p>
+<p><span class="math display">\[
+l = \sum_{i=1}^N \log (p(y_{i}|x_{i})) + \sum_{i=1}^N \log
+(p(x_{i}|y_{i},\mu,\Sigma))
+\]</span></p>
+<p>Son terimi iki toplama çevirebiliriz. Bunun için <span class="math inline">\(y\)</span> üzerinden özetlemeyi (marginalize) iki parça halinde, <span class="math inline">\(y\)</span>'nin mümkün her değeri için yapacağız.</p>
+<p><span class="math display">\[
+l = \sum_{i=1}^N \log(p(y_{i}|\alpha)) + 
+\sum_{y_{i}\in 0} \log(p(x_{i}|\mu_{0},\Sigma_{0})) + 
+\sum_{y_{i}\in 1} \log(p(x_{i}|\mu_{1},\Sigma_{1}))
+\qquad (16)
+\]</span></p>
+<p>Şimdi, olurluğun gradyanını <span class="math inline">\(\alpha, \Sigma, \mu\)</span>'a göre (ayrı ayrı) alırsak ve bu sonuç formülleri sıfıra eşitleyip çözersek, elimize geçen parametre değerleri veriyi açıklayan en mümkün parametre değerleri olacaktır. Örnek olarak <span class="math inline">\(\frac{\partial l}{\partial \alpha}\)</span> gradyanını alalım. Parçalı türevi <span class="math inline">\(\alpha\)</span>'ya göre aldığımız için, birincisi hariç (16) içindeki bütün terimler yokolur. Sonuç olarak şu olur:</p>
+<p><span class="math display">\[ 
+  \frac{\partial l}{\partial \alpha} =
+  \frac{\partial }{\partial \alpha}
+  \sum_{i=1}^N \log (p(y_{i}|\alpha)) 
+\]</span></p>
+<p><span class="math display">\[ 
+  0 =
+  \frac{\partial}{\partial \alpha}
+  \sum_{i=1}^N \log\left(\alpha^y_{i}(1-\alpha)^{1-y_{i}}\right) 
+\]</span></p>
+<p><span class="math display">\[  
+  0 =
+  \frac{\partial}{\partial \alpha}
+  \sum_{i=1}^N y_{i}\log(\alpha) + (1-y_{i})\log(1-\alpha) 
+\]</span></p>
+<p>Problem alanından bildiğimiz üzere, bazı <span class="math inline">\(y_{i}\)</span>'ler 0 olacak, bazılari ise 1. Sıfır değerler <span class="math inline">\(y_{i}\log(\alpha)\)</span>'yi iptal edecektir, bir değerleri de <span class="math inline">\((1-y_{i})\log(1-\alpha)\)</span>'i iptal edecektir. O zaman, <span class="math inline">\(y_{i}\)</span>'leri formülden yoketmek için tüm formülü şöyle değiştirebiliriz.</p>
+<p><span class="math display">\[ 
+0 =
+\frac{\partial}{\partial \alpha}\
+\left(
+\sum_{i\in class1} \log(\alpha) +
+\sum_{i\in class0} \log(1-\alpha)
+\right)
+\]</span></p>
+<p><span class="math display">\[ 
+0 =
+\sum_{i\in class1}\frac{1}{\alpha} -
+\sum_{i\in class0}\frac{1}{1-\alpha}
+\]</span></p>
+<p>Eğer <span class="math inline">\(N_{0}\)</span> değişkenini 0 sınıfında olan i'ların toplamı, <span class="math inline">\(N_{1}\)</span>'i 1 sınıfında olan i'ların sayısı olarak alırsak</p>
+<p><span class="math display">\[ 
+0 = \frac{N_{1}}{\alpha}-\frac{N_{0}}{1-\alpha} 
+\]</span></p>
+<p><span class="math display">\[ 
+\alpha = \frac{N_{1}}{N_{1}+N_{0}} = \frac{N_{1}}{N}
+\]</span></p>
+<p>olur. Bu sonuç, <span class="math inline">\(y_{i}=1\)</span> olan <span class="math inline">\(y_{i}\)</span>'leri, toplam veri noktası sayısına bölünce <span class="math inline">\(\alpha\)</span>'nın bulunabileceği şeklindeki önseziyi de desteklemiş oluyor. Bunu tahmin de edebilirdik, ama bu önsezinin En Büyük Olurluk yöntemi tarafından matematiksel olarak doğrulanmış olması daha rahatlatıcı oldu.</p>
+<p>Diğer bilinmeyenler <span class="math inline">\(\mu_{0}, \mu_{1}, \Sigma_{0}, \Sigma_{1}\)</span> için benzer yöntemi takip edebiliriz. (16)'in türevini bilinmeyen rasgelen değişkene göre alırız, sıfıra eşitleriz ve çözeririz. Bu işlem yer darlığı sebebiyle burada gösterilmeyecektir. Bu işlemlerin sonunda formül (11)'deki tüm bilinmeyenleri bulabiliriz. (11)'i daha önce bulunmuş olan <span class="math inline">\(p(y)\)</span> ile kullanınca, (14)'u nihayet sınıflama için kullanmamız mümkün olacaktır. Yapay Öğrenim literatüründe <span class="math inline">\(p(y)\)</span>, ilk tahmin (prior guess) olarak da bilinir.</p>
+<p>Sınıflama</p>
+<p>Sınıflama için bir formül daha türetmemiz gerekiyor: <span class="math inline">\(p(y|x)\)</span>. Bu formül, sonraki tahmin (posterior) olarak bilinir, ve bilindikten sonra bize verilen ve sınıflandırılmamış yeni veri <span class="math inline">\(x\)</span>'i <span class="math inline">\(p(y|x=yeni deger)\)</span> şeklinde bu formülden geçiririz, ve <span class="math inline">\(y\)</span>'nin olurluğunu hesaplarız.</p>
+<p>Şimdi sonraki tahmin, <span class="math inline">\(p(y|x)\)</span>'i türetelim. Olasılık kuramından,</p>
+<p><span class="math display">\[
+p(y|x) = \frac{p(x,y)}{p(x)} 
+\]</span></p>
+<p>Bunun işlemesi için <span class="math inline">\(p(x)\)</span>'e ihtiyacımız var. <span class="math inline">\(p(x,y)\)</span>'i alalım, ve <span class="math inline">\(y\)</span> üzerinden özetleyelim.</p>
+<p><span class="math display">\[ 
+p(y|x) = \frac{p(x,y)}{\sum_{y}p(x,y)}  
+\]</span></p>
+<p><span class="math display">\[   
+= \frac{p(x,y)}{p(x,y=0) + p(x,y=1)}
+\]</span></p>
+<p>Artık sınıflama işlemi, <span class="math inline">\(p(y=1|x)\)</span> ve <span class="math inline">\(p(y=0|x)\)</span> formüllerini ayrı ayrı hesaplamaktan ibarettir. Hangi olasılık daha büyük ise, o y değeri <span class="math inline">\(x\)</span>'in ait olduğu sınıf olacaktır.</p>
+<p>Kaynaklar</p>
+<p>[1] C. Bishop <em>Neural Networks for Pattern Recognition</em>, Oxford University Press, 1995.</p>
+<p>[2] R. O. Duda, P. E. Hart &amp; D. G. Stork <em>Pattern Classification (2nd ed)</em>, Wiley, 2000.</p>
+<p>[3] M. Jordan, C. Bishop, <em>Introduction to Graphical Models (Online)</em>, not yet published.</p>
+<p>[4] T. Mitchell, <em>Machine Learning</em>, McGraw-Hill, 1997.</p>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="svd-ile-kümeleme-benzerlik">SVD ile Kümeleme, Benzerlik</h1>
+<p>Eşsiz Değer Ayrıştırma (Singular Value Decomposition -SVD-) ile bir veri madenciliği örneği göreceğiz. [6]'da SVD'nin matematiğini işledik. SVD bir matris <span class="math inline">\(A\)</span> üzerinde ayrıştırma yapar, ve <span class="math inline">\(A\)</span> herhangi boyutta, türde bir matris olabilir.</p>
+<div class="figure">
+<img src="svd_1.png" />
+
+</div>
+<p>Ayrıştırma <span class="math inline">\(m \times n\)</span> boyutlu matrisi <span class="math inline">\(A=CWF\)</span> olarak ayrıştırır, burada <span class="math inline">\(C\)</span>, ana matris ile aynı miktarda satıra sahiptir, <span class="math inline">\(F\)</span> aynı miktarda kolona sahiptir. Ayrıştırma sonrası <span class="math inline">\(A\)</span>'nin kertesi (rank) <span class="math inline">\(r\)</span> ortaya çıkar, eğer tüm <span class="math inline">\(A\)</span> kolonları birbirinden bağımsız ise, o zaman <span class="math inline">\(r=m\)</span> olacaktır, ama kolonların bazıları mesela aynı ölçümü değişik katlarda tekrarlıyor ise, o zaman matriste eşsizlik vardır, ve bu durumda <span class="math inline">\(r &lt; m\)</span> olur, ve ortadaki <span class="math inline">\(W\)</span> matrisi <span class="math inline">\(r \times r\)</span> olduğu için beklenenden daha ufak boyutlarda olabilir.</p>
+<p>Ayrıca SVD, <span class="math inline">\(W\)</span> çaprazındaki özdeğerleri büyüklük sırasına göre dizer, ve her özdeğere tekabül eden özvektörler de ona göre sıraya dizilmiş olacaktır, ve SVD tamamlanınca mesela &quot;en büyük 10&quot; özdeğere ait olan <span class="math inline">\(CWF\)</span> değerlerini alıp, diğerlerini atmayı da seçebiliriz, yani kerte üzerinden yapılan &quot;eleme&quot; üstüne bir eleme de kendimiz yapabiliriz. Bu elemeyi yapabilmemizin mantığı şöyle; küçük özdeğerlerin çarptığı özvektörlerin nihai toplama daha az etki ettiği söylenebilir, ve bu &quot;gürültüyü&quot; elemek sonucu değiştirmeyecektir. Ayrıca bu elemeyi yaparak bir tür boyut azaltma (dimensionality reduction) işlemini de aynı zamanda başarmış oluruz.</p>
+<p>Ayrıştırmanın Anlamları</p>
+<p>Bir ayrıştırmayı değişik şekillerde görmek mümkündür. Bunlardan önemli birisi çizit bakış açısıdır (graph interpretation). Çizit bilindiği gibi düğümler ve onlar arasındaki ayrıtlardan (edges) oluşur. Bir çizit matris formunda temsil edilebilir, satır / kolon kesişimi iki düğüm arasındaki ayrıtın ağırlığını, ya da varlığını (1 ve 0 üzerinden) temsil edecektir. Bu durumda SVD sonucunda elde edilen <span class="math inline">\(CWF\)</span>, bize iki düğüm arası geçişli (bipartite) çiziti üç düğüm arası geçişli (tripartite) çizite çevrilmiş halde geri verir. Ve bu yeni çizitde en fazla <span class="math inline">\(r\)</span> tane geçiş noktaları (waystations) oluşmuştur, üstte bahsettiğimiz eleme ile geçişler daha da azaltılabilir.</p>
+<p>Şimdi, bu geçiş noktalarına olan <span class="math inline">\(C\)</span>'nin &quot;bağlanma şekli'', &quot;bağlanma kuvveti&quot;, ek kümeleme basamağı tarafından kullanılabilir. Bu &quot;azaltılmış&quot; geçişin üzerindeki her işlem / ona yapılan her referans kümeleme için bir ipucudur. Bunu görmek için örnek zaman serilerinin SVD sonrası elde edilen <span class="math inline">\(C\)</span> (örnekte <code>u</code>) matrisinin ilk iki kolonunu bile grafiklemek yeterlidir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+data <span class="op">=</span> np.genfromtxt(<span class="st">&quot;synthetic_control.data&quot;</span>, dtype<span class="op">=</span><span class="bu">float</span>)
+
+<span class="co"># before norm, and take only 10 data points</span>
+data <span class="op">=</span> data[:,<span class="dv">0</span>:<span class="dv">10</span>]
+
+<span class="bu">print</span> data.shape
+
+<span class="co"># show the mean, and std of the first time series</span>
+<span class="bu">print</span> data[<span class="dv">0</span>,:]
+<span class="bu">print</span> np.mean(data[<span class="dv">0</span>,:], axis<span class="op">=</span><span class="dv">0</span>)
+<span class="bu">print</span> np.std(data[<span class="dv">0</span>,:], axis<span class="op">=</span><span class="dv">0</span>)
+
+<span class="co"># normalize</span>
+data <span class="op">-=</span> np.mean(data, axis<span class="op">=</span><span class="dv">0</span>)
+data <span class="op">/=</span> np.std(data, axis<span class="op">=</span><span class="dv">0</span>)
+
+<span class="co"># after norm</span>
+<span class="bu">print</span> data[<span class="dv">0</span>,:]
+
+u,s,v <span class="op">=</span> lin.svd(data, full_matrices<span class="op">=</span><span class="va">False</span>)
+<span class="bu">print</span> <span class="st">&#39;svd&#39;</span>
+<span class="bu">print</span> u.shape
+<span class="bu">print</span> s
+<span class="bu">print</span> v.shape
+
+plt.plot(u[:,<span class="dv">0</span>], u[:,<span class="dv">1</span>], <span class="st">&#39;.&#39;</span>)
+plt.savefig(<span class="st">&#39;svd_3.png&#39;</span>)</code></pre></div>
+<pre><code>(600, 10)
+[ 28.7812  34.4632  31.3381  31.2834  28.9207  33.7596  25.3969  27.7849
+  35.2479  27.1159]
+30.40918
+3.16894521278
+[-0.35501371  0.85457443 -0.10641642 -0.16202975 -0.51986031  0.56762802
+ -1.19371757 -0.29304061  1.27639519 -0.2095089 ]
+svd
+(600, 10)
+[ 48.29293361  30.97232928  24.52860861  20.63081553  20.0940039
+  17.52035809  16.48932523  16.03796372  15.41270426  14.27678793]
+(10, 10)</code></pre>
+<div class="figure">
+<img src="svd_3.png" />
+
+</div>
+<p>Görüldüğü gibi net bir şekilde iki tane küme ortaya çıktı. Bu kümeler yazının başındaki iki ayrı zaman serisi öbeklerine tekabül ediyorlar.</p>
+<p>O zaman serilerini ayırtetmek için ne yaparız? Üstteki veriler üzerinde kmeans işletebilirdik, ya da kabaca bakıyoruz, dikey olarak -0.025 seviyesinde bir çizgi ayıraç olarak görülebilir. Numpy filtreleme tekniği</p>
+<p><code>u[:,0] &lt; -0.025</code></p>
+<p>bize ana veri üzerinde uygulanabilecek <code>True</code> ve <code>False</code> değerleri verir, bunları alarak ana veriye filtrele olarak uygularız,</p>
+<p><code>data[u[:,0] &lt; -0.025]</code></p>
+<p>ve mesela birinci kümeye ait zaman serilerini bulabiliriz.</p>
+<p>Kontrol etmek için ilk 3 kolonun değerlerini üç boyutta grafikleyelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+<span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+data <span class="op">=</span> np.genfromtxt(<span class="st">&quot;synthetic_control.data&quot;</span>, dtype<span class="op">=</span><span class="bu">float</span>)
+
+data <span class="op">=</span> data[:,<span class="dv">0</span>:<span class="dv">10</span>]
+
+<span class="bu">print</span> data.shape
+
+data <span class="op">-=</span> np.mean(data, axis<span class="op">=</span><span class="dv">0</span>)
+data <span class="op">/=</span> np.std(data, axis<span class="op">=</span><span class="dv">0</span>)
+
+u,s,v <span class="op">=</span> lin.svd(data)
+<span class="bu">print</span> <span class="st">&#39;svd&#39;</span>
+<span class="bu">print</span> u.shape
+<span class="bu">print</span> s
+<span class="bu">print</span> v.shape
+
+fig <span class="op">=</span> plt.figure()
+ax <span class="op">=</span> Axes3D(fig)
+ax.plot(u[:,<span class="dv">0</span>], u[:,<span class="dv">1</span>], u[:,<span class="dv">2</span>],<span class="st">&#39;,&#39;</span>, zs<span class="op">=</span><span class="dv">0</span>, zdir<span class="op">=</span><span class="st">&#39;z&#39;</span>, label<span class="op">=</span><span class="st">&#39;zs=0, zdir=z&#39;</span>)
+plt.savefig(<span class="st">&#39;svd_4.png&#39;</span>)</code></pre></div>
+<pre><code>(600, 10)
+svd
+(600, 600)
+[ 48.29293361  30.97232928  24.52860861  20.63081553  20.0940039
+  17.52035809  16.48932523  16.03796372  15.41270426  14.27678793]
+(10, 10)</code></pre>
+<div class="figure">
+<img src="svd_4.png" />
+
+</div>
+<p>Yine iki tane küme olduğunu görüyoruz.</p>
+<p>Kelime Vektorleri [5]</p>
+<p>Diyelim ki elimizde üç tane cümle var. Bu cümlelere dayanarak bir kelimenin vektörsel temsilini bulmak istiyoruz.</p>
+<div class="figure">
+<img src="svd_7.png" />
+
+</div>
+<p>Matris içindeki sayılar her kelimenin bir diğeri ile beraber kaç kere aynı cümlede olduğuna (cooccurence) göre oluşturuldu. Mesela &quot;I'' ile &quot;like'' kelimesi beraber 2 kere çıkmış, bu matriste 1,2 ve 2,1 kordinatlarında görülüyor. O zaman bu matrise bir kelimenin satırsal ya da kolonsal temsiline bakarak o kelimenin vektörsel halini bulabiliriz. Mesela &quot;enjoy'' icin bu <span class="math inline">\(\left[\begin{array}{cccccccc} 1&amp;0&amp;0&amp;0&amp;0&amp;1&amp;0 \end{array}\right]\)</span>.</p>
+<p>Fakat gerçek uygulamalarda bu şekilde bir temsil performans ve depolama açısından bedeli olabilir; eğer eldeki kelime sayısı 1 milyon ise bu matris 1 milyon x 1 milyon öğeye ihtiyaç duyar.</p>
+<p>Çözüm: boyut azaltmak. SVD bu iş için biçilmiş kaftan.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+words <span class="op">=</span> [<span class="st">&quot;I&quot;</span>, <span class="st">&quot;like&quot;</span>, <span class="st">&quot;enjoy&quot;</span>,
+         <span class="st">&quot;deep&quot;</span>, <span class="st">&quot;learning&quot;</span>, <span class="st">&quot;NLP&quot;</span>, <span class="st">&quot;flying&quot;</span>, <span class="st">&quot;.&quot;</span>]
+X <span class="op">=</span> np.array([[<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],
+              [<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>],
+              [<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>],
+              [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],
+              [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>],
+              [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>],
+              [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>],
+              [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>]])
+
+U, s, Vh <span class="op">=</span> lin.svd(X, full_matrices<span class="op">=</span><span class="va">False</span>)
+<span class="bu">print</span> U.shape, s.shape, Vh.shape
+
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(<span class="bu">len</span>(words)):
+    plt.text(U[i,<span class="dv">0</span>], U[i,<span class="dv">1</span>], words[i])
+
+plt.ylim(<span class="op">-</span><span class="fl">0.8</span>,<span class="fl">0.8</span>)
+plt.xlim(<span class="op">-</span><span class="fl">0.8</span>,<span class="fl">0.2</span>)              
+plt.savefig(<span class="st">&#39;svd_8.png&#39;</span>)</code></pre></div>
+<pre><code>(8, 8) (8,) (8, 8)</code></pre>
+<div class="figure">
+<img src="svd_8.png" />
+
+</div>
+<p><span class="math inline">\(U\)</span>'nun ilk iki kolonunu grafikledik çünkü en büyük iki eşsiz değere tekabül eden kolonlar bunlar, yani en &quot;önemli'' değerler orada.</p>
+<p>En önemli kolonları bulduk, o zaman diyebiliriz ki bu iki kolon üzerinden bir kelimenin vektörsel temsilini de bulmuş olduk. Bu temsil eskisine göre daha küçük, ve özetleme açısından daha kuvvetli. Artık kelimelerin birbirine yakınlığı, benzerliği gibi hesaplar bu vektör üzerinden yapılabilir.</p>
+<p>Üstteki grafik yakınlık açısından bazı anlamsal yapıyı göstermeye başladı bile: mesela &quot;like'' ve &quot;enjoy'' birbirine yakın, bu mantıklı çünkü ikisi de birinin yaptığı şeyler. Diğer yandan &quot;learning'' kelimesine en yakın &quot;flying'' bu da mantıklı, her iki kelime de cümle sonlarında ortaya çıkıyorlar ve hedef kelimeler.</p>
+<p>Gerçek uygulamalar için bazı taklalar:</p>
+<p>İngilizce'nin yapısı sebebiyle sürekli görülen ama çok anlam katmayan bazı kelimeler var, mesela &quot;the'', &quot;he'', &quot;has'' gibi. Bu kelimeler direk sayılırsa bu sayı çok yüksek. Çözüm, belli bir sayı üstünü saymamak, ya da onları tamamen devreden çıkartmak.</p>
+<p>Word2Vec</p>
+<p>Yapay Sinir Ağları (YSA) literatüründe duyulan word2vec aslında üstteki vektörsel temsilin başka bir yoldan öğrenilmesinden ibaret. YSA yaklaşımı ile beraber olma sayısı hesaplanmadan vektörsel temsil direk öğreniliyor, bunun için her kelime için o kelime yakınındaki (bir pencere içindeki) diğer kelimeler tahmin edilmeye uğraşılıyor, daha doğrusu hedef fonksiyon budur, ve eğitim verisine bakılarak bu tahmindeki başarı geriye yayılım (backpropagation -backprop-) ile düzeltilerek arttırılıyor.</p>
+<p>Word2Vec'in insanı şaşırtabilen bazı ilginç özellikleri var: mesela çok büyük veriler üzerinden vektörler hesaplandıktan sonra mesela kral vektörünü alıp ondan erkek vektörünü çıkartıyorsunuz, ve kadın vektörünü toplayorsunuz ve kraliçe vektörünü elde ediyorsunuz (ona yakın bir vektörü en azından). İlginç değil mi? Bu keşif pek çok araştırmacıya &quot;vay canına'' dedirtirdi, tabii ki bunun istatistiki sebepleri var, bu konuya bakanlar da oldu, detaylar için [5, 18:50].</p>
+<p>Örnek</p>
+<p>Şimdi biraz daha değişik bir probleme bakalım, bu sefer bir grup kelimeyi birbirlerine benzerlikleri (ya da uzaklığı) üzerinden kümelemeye uğraşacağız.</p>
+<p>Benzerlik, Levenhstein mesafesi adlı ölçüt [2] üzerinden olacak. Matrisimiz her kelimenin her diğer kelime ile arasındaki uzaklığı veren bir matris olmalı, eğer 100 kelime var ise, bu matris 100 x 100 boyutlarında olacak. SVD sonrası elde edilen <code>u</code> üzerinde kmeans işleteceğiz, ve kümeleri bulacağız. Ayrıca her küme için bir &quot;temsilci'' seçebilmek için kmeans'in bize verdiği küme ortası kordinatının en yakın olduğu kelimeyi çekip çıkartacağız, ve onu temsilci olarak alacağız.</p>
+<p>Kelime mesafesi olarak</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> levenshtein(s1, s2):
+  l1 <span class="op">=</span> <span class="bu">len</span>(s1)
+  l2 <span class="op">=</span> <span class="bu">len</span>(s2)
+
+  matrix <span class="op">=</span> [<span class="bu">range</span>(l1 <span class="op">+</span> <span class="dv">1</span>)] <span class="op">*</span> (l2 <span class="op">+</span> <span class="dv">1</span>)
+  <span class="cf">for</span> zz <span class="kw">in</span> <span class="bu">range</span>(l2 <span class="op">+</span> <span class="dv">1</span>):
+    matrix[zz] <span class="op">=</span> <span class="bu">range</span>(zz,zz <span class="op">+</span> l1 <span class="op">+</span> <span class="dv">1</span>)
+  <span class="cf">for</span> zz <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,l2):
+    <span class="cf">for</span> sz <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,l1):
+      <span class="cf">if</span> s1[sz] <span class="op">==</span> s2[zz]:
+        matrix[zz<span class="op">+</span><span class="dv">1</span>][sz<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> <span class="bu">min</span>(matrix[zz<span class="op">+</span><span class="dv">1</span>][sz] <span class="op">+</span> <span class="dv">1</span>,
+                                 matrix[zz][sz<span class="op">+</span><span class="dv">1</span>] <span class="op">+</span> <span class="dv">1</span>,
+                                 matrix[zz][sz])
+      <span class="cf">else</span>:
+        matrix[zz<span class="op">+</span><span class="dv">1</span>][sz<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> <span class="bu">min</span>(matrix[zz<span class="op">+</span><span class="dv">1</span>][sz] <span class="op">+</span> <span class="dv">1</span>,
+                                 matrix[zz][sz<span class="op">+</span><span class="dv">1</span>] <span class="op">+</span> <span class="dv">1</span>,
+                                 matrix[zz][sz] <span class="op">+</span> <span class="dv">1</span>)
+  <span class="cf">return</span> matrix[l2][l1]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> leven
+s1 <span class="op">=</span> <span class="st">&quot;pizza&quot;</span>
+s2 <span class="op">=</span> <span class="st">&quot;pioazza&quot;</span>   
+distance <span class="op">=</span> leven.levenshtein(s1, s2)       
+<span class="bu">print</span> <span class="st">&#39;The Levenshtein-Distance of &#39;</span>,s1, <span class="st">&#39; and &#39;</span>, s2, <span class="st">&#39; is &#39;</span>, distance
+
+s1 <span class="op">=</span> <span class="st">&quot;hamburger&quot;</span>
+s2 <span class="op">=</span> <span class="st">&quot;haemmurger&quot;</span>   
+distance <span class="op">=</span> leven.levenshtein(s1, s2)       
+<span class="bu">print</span> <span class="st">&#39;The Levenshtein-Distance of &#39;</span>,s1, <span class="st">&#39; and &#39;</span>, s2, <span class="st">&#39; is &#39;</span>, distance</code></pre></div>
+<pre><code>The Levenshtein-Distance of  pizza  and  pioazza  is  2
+The Levenshtein-Distance of  hamburger  and  haemmurger  is  2</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+<span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans
+<span class="im">import</span> itertools
+
+words <span class="op">=</span> np.array(
+    [<span class="st">&#39;the&#39;</span>, <span class="st">&#39;be&#39;</span>, <span class="st">&#39;to&#39;</span>, <span class="st">&#39;of&#39;</span>, <span class="st">&#39;and&#39;</span>, <span class="st">&#39;a&#39;</span>, <span class="st">&#39;in&#39;</span>, <span class="st">&#39;that&#39;</span>, <span class="st">&#39;have&#39;</span>,
+     <span class="st">&#39;I&#39;</span>, <span class="st">&#39;it&#39;</span>, <span class="st">&#39;for&#39;</span>, <span class="st">&#39;not&#39;</span>, <span class="st">&#39;on&#39;</span>, <span class="st">&#39;with&#39;</span>, <span class="st">&#39;he&#39;</span>, <span class="st">&#39;as&#39;</span>, <span class="st">&#39;you&#39;</span>,
+     <span class="st">&#39;do&#39;</span>, <span class="st">&#39;at&#39;</span>, <span class="st">&#39;this&#39;</span>, <span class="st">&#39;but&#39;</span>, <span class="st">&#39;his&#39;</span>, <span class="st">&#39;by&#39;</span>, <span class="st">&#39;from&#39;</span>, <span class="st">&#39;they&#39;</span>, <span class="st">&#39;we&#39;</span>,
+     <span class="st">&#39;say&#39;</span>, <span class="st">&#39;her&#39;</span>, <span class="st">&#39;she&#39;</span>, <span class="st">&#39;or&#39;</span>, <span class="st">&#39;an&#39;</span>, <span class="st">&#39;will&#39;</span>, <span class="st">&#39;my&#39;</span>, <span class="st">&#39;one&#39;</span>, <span class="st">&#39;all&#39;</span>,
+     <span class="st">&#39;would&#39;</span>, <span class="st">&#39;there&#39;</span>, <span class="st">&#39;their&#39;</span>, <span class="st">&#39;what&#39;</span>, <span class="st">&#39;so&#39;</span>, <span class="st">&#39;up&#39;</span>, <span class="st">&#39;out&#39;</span>, <span class="st">&#39;if&#39;</span>,
+     <span class="st">&#39;about&#39;</span>, <span class="st">&#39;who&#39;</span>, <span class="st">&#39;get&#39;</span>, <span class="st">&#39;which&#39;</span>, <span class="st">&#39;go&#39;</span>, <span class="st">&#39;me&#39;</span>, <span class="st">&#39;when&#39;</span>, <span class="st">&#39;make&#39;</span>,
+     <span class="st">&#39;can&#39;</span>, <span class="st">&#39;like&#39;</span>, <span class="st">&#39;time&#39;</span>, <span class="st">&#39;no&#39;</span>, <span class="st">&#39;just&#39;</span>, <span class="st">&#39;him&#39;</span>, <span class="st">&#39;know&#39;</span>, <span class="st">&#39;take&#39;</span>,
+     <span class="st">&#39;people&#39;</span>, <span class="st">&#39;into&#39;</span>, <span class="st">&#39;year&#39;</span>, <span class="st">&#39;your&#39;</span>, <span class="st">&#39;good&#39;</span>, <span class="st">&#39;some&#39;</span>, <span class="st">&#39;could&#39;</span>,
+     <span class="st">&#39;them&#39;</span>, <span class="st">&#39;see&#39;</span>, <span class="st">&#39;other&#39;</span>, <span class="st">&#39;than&#39;</span>, <span class="st">&#39;then&#39;</span>, <span class="st">&#39;now&#39;</span>, <span class="st">&#39;look&#39;</span>,
+     <span class="st">&#39;only&#39;</span>, <span class="st">&#39;come&#39;</span>, <span class="st">&#39;its&#39;</span>, <span class="st">&#39;over&#39;</span>, <span class="st">&#39;think&#39;</span>, <span class="st">&#39;also&#39;</span>, <span class="st">&#39;back&#39;</span>,
+     <span class="st">&#39;after&#39;</span>, <span class="st">&#39;use&#39;</span>, <span class="st">&#39;two&#39;</span>, <span class="st">&#39;how&#39;</span>, <span class="st">&#39;our&#39;</span>, <span class="st">&#39;work&#39;</span>, <span class="st">&#39;first&#39;</span>, <span class="st">&#39;well&#39;</span>,
+     <span class="st">&#39;way&#39;</span>, <span class="st">&#39;even&#39;</span>, <span class="st">&#39;new&#39;</span>, <span class="st">&#39;want&#39;</span>, <span class="st">&#39;because&#39;</span>, <span class="st">&#39;any&#39;</span>, <span class="st">&#39;these&#39;</span>,
+     <span class="st">&#39;give&#39;</span>, <span class="st">&#39;day&#39;</span>, <span class="st">&#39;most&#39;</span>, <span class="st">&#39;us&#39;</span>])
+
+<span class="bu">print</span> <span class="st">&quot;calculating distances...&quot;</span>
+
+(dim,) <span class="op">=</span> words.shape
+
+f <span class="op">=</span> <span class="kw">lambda</span> (x,y): leven.levenshtein(x,y)
+
+res<span class="op">=</span>np.fromiter(itertools.imap(f, itertools.product(words, words)),
+                dtype<span class="op">=</span>np.uint8)
+A <span class="op">=</span> np.reshape(res,(dim,dim))
+
+<span class="bu">print</span> <span class="st">&quot;svd...&quot;</span>
+
+u,s,v <span class="op">=</span> lin.svd(A, full_matrices<span class="op">=</span><span class="va">False</span>)
+
+<span class="bu">print</span> u.shape
+<span class="bu">print</span> s.shape
+<span class="bu">print</span> s[:<span class="dv">10</span>]
+<span class="bu">print</span> v.shape
+
+data <span class="op">=</span> u[:,<span class="dv">0</span>:<span class="dv">8</span>]
+k<span class="op">=</span>KMeans(init<span class="op">=</span><span class="st">&#39;k-means++&#39;</span>, n_clusters<span class="op">=</span><span class="dv">25</span>, n_init<span class="op">=</span><span class="dv">10</span>)
+k.fit(data)
+centroids <span class="op">=</span> k.cluster_centers_
+labels <span class="op">=</span> k.labels_
+<span class="bu">print</span> labels[:<span class="dv">10</span>]
+
+<span class="kw">def</span> dist(x,y):   
+    <span class="cf">return</span> np.sqrt(np.<span class="bu">sum</span>((x<span class="op">-</span>y)<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">1</span>))
+    
+<span class="bu">print</span> <span class="st">&quot;clusters, centroid points..&quot;</span>
+<span class="cf">for</span> i,c <span class="kw">in</span> <span class="bu">enumerate</span>(centroids):
+    idx <span class="op">=</span> np.argmin(dist(c,data[labels<span class="op">==</span>i]))
+    <span class="bu">print</span> words[labels<span class="op">==</span>i][idx]
+    <span class="bu">print</span> words[labels<span class="op">==</span>i]
+    
+plt.plot(centroids[:,<span class="dv">0</span>],centroids[:,<span class="dv">1</span>],<span class="st">&#39;x&#39;</span>)
+plt.hold(<span class="va">True</span>)
+plt.plot(u[:,<span class="dv">0</span>], u[:,<span class="dv">1</span>], <span class="st">&#39;.&#39;</span>)
+plt.savefig(<span class="st">&#39;svd_5.png&#39;</span>)
+
+<span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+fig <span class="op">=</span> plt.figure()
+ax <span class="op">=</span> Axes3D(fig)
+ax.plot(u[:,<span class="dv">0</span>], u[:,<span class="dv">1</span>], u[:,<span class="dv">2</span>],<span class="st">&#39;.&#39;</span>, zs<span class="op">=</span><span class="dv">0</span>,
+        zdir<span class="op">=</span><span class="st">&#39;z&#39;</span>, label<span class="op">=</span><span class="st">&#39;zs=0, zdir=z&#39;</span>)
+plt.savefig(<span class="st">&#39;svd_6.png&#39;</span>)</code></pre></div>
+<pre><code>calculating distances...
+svd...
+(100, 100)
+(100,)
+[ 357.98820225   46.49125611   32.1352688    23.80316426   21.48889925
+   17.53558749   17.2577475    15.08233454   13.60531866   12.78642892]
+(100, 100)
+[ 0 12 20 17  4 23  3  7  9 14]
+clusters, centroid points..
+she
+[&#39;the&#39; &#39;she&#39;]
+even
+[&#39;one&#39; &#39;get&#39; &#39;year&#39; &#39;over&#39; &#39;after&#39; &#39;even&#39; &#39;new&#39;]
+not
+[&#39;for&#39; &#39;not&#39; &#39;on&#39; &#39;you&#39; &#39;who&#39; &#39;into&#39; &#39;now&#39; &#39;how&#39;]
+if
+[&#39;in&#39; &#39;it&#39; &#39;his&#39; &#39;if&#39; &#39;him&#39; &#39;its&#39;]
+any
+[&#39;and&#39; &#39;say&#39; &#39;an&#39; &#39;all&#39; &#39;can&#39; &#39;back&#39; &#39;way&#39; &#39;want&#39; &#39;any&#39; &#39;day&#39;]
+most
+[&#39;about&#39; &#39;just&#39; &#39;also&#39; &#39;first&#39; &#39;most&#39;]
+come
+[&#39;people&#39; &#39;some&#39; &#39;come&#39;]
+that
+[&#39;that&#39; &#39;what&#39; &#39;than&#39;]
+only
+[&#39;only&#39; &#39;well&#39;]
+have
+[&#39;have&#39; &#39;make&#39; &#39;take&#39;]
+with
+[&#39;with&#39; &#39;will&#39; &#39;which&#39;]
+like
+[&#39;like&#39; &#39;time&#39; &#39;give&#39;]
+be
+[&#39;be&#39; &#39;he&#39; &#39;we&#39; &#39;me&#39; &#39;see&#39; &#39;use&#39;]
+could
+[&#39;would&#39; &#39;could&#39;]
+I
+[&#39;I&#39; &#39;by&#39; &#39;my&#39;]
+this
+[&#39;this&#39; &#39;think&#39;]
+good
+[&#39;from&#39; &#39;know&#39; &#39;good&#39; &#39;look&#39; &#39;work&#39;]
+our
+[&#39;of&#39; &#39;or&#39; &#39;out&#39; &#39;your&#39; &#39;our&#39;]
+other
+[&#39;her&#39; &#39;there&#39; &#39;their&#39; &#39;other&#39;]
+because
+[&#39;because&#39;]
+do
+[&#39;to&#39; &#39;do&#39; &#39;so&#39; &#39;go&#39; &#39;no&#39; &#39;two&#39;]
+up
+[&#39;but&#39; &#39;up&#39; &#39;us&#39;]
+these
+[&#39;these&#39;]
+at
+[&#39;a&#39; &#39;as&#39; &#39;at&#39;]
+they
+[&#39;they&#39; &#39;when&#39; &#39;them&#39; &#39;then&#39;]</code></pre>
+<div class="figure">
+<img src="svd_5.png" />
+
+</div>
+<div class="figure">
+<img src="svd_6.png" />
+
+</div>
+<p>Bu tekniğin uygulanabileceği daha pek çok alan var. Mesela her dokümanın içindeki belli kelimelerin sayıları kolonlarda (her kolon özel bir kelimeye tekabül edecek şekilde), ve dökümanların kendisi satırlarda olacak şekilde bir matrisimiz olsaydı, SVD bu matris üzerinde de bir kümeleme için kullanılabilirdi. Bu örnekte &quot;kaç tane kelime olduğu'' gibi bir ölçüt vardır (daha önce kelimelerin birbirine uzaklığını kullandık), ama teknik yine de ise yarar.</p>
+<p>Kaynaklar</p>
+<p>Not: <code>np.fromiter .. itertools.imap</code> kullanımının tarifi için [4].</p>
+<p>[1] Alcock, <em>Synthetic Control Chart Time Series</em>, <a href="kdd.ics.uci.edu/databases/synthetic_control/synthetic_control.data.html" class="uri">kdd.ics.uci.edu/databases/synthetic_control/synthetic_control.data.html</a></p>
+<p>[2] Bayramlı, <em>Kelime Benzerligi - Levenshtein Mesafesi</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2012/07/kelime-benzerligi-levenshtein-mesafesi.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2012/07/kelime-benzerligi-levenshtein-mesafesi.html</a></p>
+<p>[3] Skillicorn, D., <em>Understanding Complex Datasets Data Mining with Matrix Decompositions</em></p>
+<p>[4] Bayramlı, <em>Dongu Yazmamak, Fonksiyonel Diller, Python</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2012/07/dongu-yazmamak-fonksiyonel-diller-python.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2012/07/dongu-yazmamak-fonksiyonel-diller-python.html</a></p>
+<p>[5] Socher, {}, <a href="https://www.youtube.com/watch?v=T8tQZChniMk" class="uri">https://www.youtube.com/watch?v=T8tQZChniMk</a></p>
+<p>[6] Bayramlı, Lineer Cebir, <em>Ders 29</em></p>
+</body>
+</html>

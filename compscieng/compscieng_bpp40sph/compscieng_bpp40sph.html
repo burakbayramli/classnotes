@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="pürüzleştirilmiş-parcaçık-hidrodinamiği-smoothed-particle-hydrodynamics--sph-">Pürüzleştirilmiş Parcaçık Hidrodinamiği (Smoothed Particle Hydrodynamics -SPH-)</h1>
+<p>SPH sıvıların dinamik hareketini görmemizi sağlayan bir simulasyon tekniğidir. Lagrangian bakış açısını temel alır, yani Euler aksine, bir sıvı paketini takip edip nereye gittiğine, hangi değişimlere uğradığına bakarız.</p>
+<p>Önce akış dinamiğini formüllerini görelim,</p>
+<p>Sıvının akışını simüle etmek pek çok alanda faydalı olabilecek bir tekniktir. Sıvıların kendisine ek olarak gazları yoğunluğu daha az olan sıvı olarak görebiliriz, hatta katı maddeler de akışkanlığı çok az sıvı gibi düşünülebilirse, böylece aerodinamikten başlayıp, gemi tasarlamaya, oradan oyunlarda duman simülasyonuna kadar giden geniş yelpazede teknikler kullanım bulabilir.</p>
+<p>SPH tekniği bu sıvı simülasyon yöntemlerinden birisidir. Navier-Stokes denklemleri bir sıvının akışını tanımlar, bu denklem simülasyon ortamında yaklaşık olarak çözülmelidir [13], bunu yapmanın iki yolu vardır. Önceki anlatımdan hareketle herhalde cevabı tahmin edebiliriz, birisi Lagrange usulü diğeri Euler usulü. SPH yöntemi Lagrange yaklaşımını takip eder, yani bir sıvı paketini alıp onun zaman ve uzayda gidişini izler. Tek bir yere mıhlanmış olmamanın (Euler usulü) pek çok avantajları var, mesela oyun grafiklerini çizerken daha geniş bir alanda iş yapabilmek mümkün, farklı maddeler arasındaki iletişim daha rahat halledilebiliyor, vs.</p>
+<p>Formülasyon için temel fizikle başlayalım. Simüle ettiğimiz bir sıvı paketidir demiştik, bu paketin ivmesini takip edelim mesela, bunun önemli olacagini tahmin edebiliriz, oradan kuvvet, enerji bağlantıları var, <span class="math inline">\(F=ma\)</span> formülünden hareketle, ve materyel türev ile</p>
+<p><span class="math display">\[
+m \frac{D \bar{u}}{D t} = F^{toplam}
+\]</span></p>
+<p>diyebiliriz. Daha önce materyel türevi yoğunluk üzerinde uygulamıştık, pek çok farklı ölçüt üzerinde materyel türev kullanılabilir demiştik, ayrıca hız <span class="math inline">\(\bar{u}\)</span> materyel türev içinde kullanılmakta, ama hızın kendisine de gayet rahat bir şekilde materyel türev uygulanabilir.</p>
+<p>Üstteki eşitliğin sağ tarafını detaylandırabiliriz, düşünelim, hangi kuvvetler bir sıvı akışı sırasında sıvı paketi / parçacık üzerinde etki ediyor? Bunlar sırasıyla basınç, ağdalık, ve yerçekim olurdu herhalde, bal gibi ağdalı bir sıvıda parçalar birbirlerine yapışkandır, şu için daha az, bu bir kuvvettir. Yerçekimi bir kuvvettir doğal olarak. Basınç ta öyle, biraz derine dalan herkes etrafındaki suyun basıncını bir kuvvet olarak hisseder. O zaman,</p>
+<p><span class="math display">\[
+m \frac{D \bar{u}}{D t} = F^{\textrm{basınç}} + F^{\textrm{ağdalık}} + F^{\textrm{yerçekim}} 
+\]</span></p>
+<p>diyebiliriz. Kuvvetlerden en basiti yerçekimi, <span class="math inline">\(F^{\textrm{yerçekim}} = m \bar{g}\)</span>. İvme <span class="math inline">\(\bar{g}\)</span> bir vektör olarak gösterildi, bu <span class="math inline">\(\bar{g} = (0, 0, 9.8)\)</span> olurdu, sadece z ekseni üzerinde etki eden bir ivmelenme yani.</p>
+<p>Diğer kuvvet basınç. Yüksek basınç bölgeleri alçak basınç bölgelerinde doğru bir kuvvet uygular. Basıncın tüm sıvı için <span class="math inline">\(p(\bar{x})\)</span> değişkeninde olduğunu düşünelim, peki basınç dengesizliğini matematiksel olarak göstermenin en basit yolu nedir? Basıncın negatif gradyanını almak, <span class="math inline">\(-\nabla p\)</span> olur mu acaba? Evet. Temel Calculus'tan hatırlarsak gradyan en dik iniş yönünü gösterir, o zaman gradyanın negatifi yüksek basınç bölgesinden dışarı, alçak basınç bölgesine doğru gösterecektir. Tabii ki bu etkiyi üzerinde olduğumuz sıvı paketinin hacmi üzerinden entegre etmemiz gerekir, ama basit bir yaklaşıklama olarak onu direk hacim <span class="math inline">\(V\)</span> ile çarpabiliriz. Tümü <span class="math inline">\(F^{\textrm{basınç}} = - V \nabla p\)</span>.</p>
+<p>Üçüncü kuvvet ağdalık. Ağdalı bir sıvı deforme edilmeye karşı direnir. Bu kuvveti kabaca &quot;her parçacığı yanındaki diğer parçacıkların ortalama hızında hareket etmesini zorlayan kuvvet'' olarak görebiliriz, bir diğer deyişle birbirine yakın olan parçacıkların arasındaki hız farklarını minimize etmeye uğraşan kuvvet. Şimdi, mesela görüntü işleme literatürünü düşünürsek, o alanda çalışanlar bir ölçünün etrafındaki ortalamadan ne kadar saptığını hesaplamak için bir diferansiyel operatör kullanır, bu operatör Laplasyan <span class="math inline">\(\nabla \cdot \nabla\)</span>. Bu operatör, aynı şekilde hacim üzerinden entegre edilince bize ağdalık kuvvetini verebilir, burada bir ek her sıvının farklı ağdalığını formüle dahil edebilmek için bir de bir dinamik ağdalık sabiti (dynamic viscosity coefficient) <span class="math inline">\(\mu\)</span> ile herşeyi çarpmak gerektiği, o zaman <span class="math inline">\(F^{\textrm{ağdalık}} = V \mu \nabla \cdot \nabla \bar{u}\)</span> formülünü elde ediyoruz.</p>
+<p>Hepsini bir araya koyunca,</p>
+<p><span class="math display">\[
+m \frac{D \bar{u}}{D t} = m\bar{g} - V \nabla p + V \mu \nabla \cdot \nabla \bar{u}
+\]</span></p>
+<p>Bu denklemi hacim ve kütle limite giderken düşüneceğiz, ama bu haliyle formül problem çıkartabilir, o zaman her şeyi <span class="math inline">\(V\)</span> ile bölersek ve sonra limiti düşünürsek daha iyi olur, <span class="math inline">\(m/V\)</span>'yi sıvı yoğunluğu <span class="math inline">\(\rho\)</span> olarak tanımlayalım,</p>
+<p><span class="math display">\[
+\rho \frac{D \bar{u}}{D t} = \rho \bar{g} -
+\nabla p +
+\mu \nabla \cdot \nabla \bar{u}
+\]</span></p>
+<p>Bu denklem bazıları için tanıdık gelebilir.. Navier-Stokes denklemine benzemiyor mu? Navier-Stokes ünlü denklemi,</p>
+<p><span class="math display">\[
+\frac{\partial \bar{u}}{\partial t} + \bar{u} + \frac{1}{\rho} \nabla p =
+\bar{g} + \nu \nabla \cdot \nabla \bar{u}
+\]</span></p>
+<p><span class="math display">\[
+\nabla \cdot \bar{u} = 0
+\]</span></p>
+<p>olarak gösterilir.</p>
+<p>Neyse bizim türetişle devam edersek, her şeyi yoğunluk <span class="math inline">\(\rho\)</span> ile bölelim,</p>
+<p><span class="math display">\[
+\frac{D \bar{u}}{D t} + \frac{1}{\rho} \nabla p =
+\bar{g}  + \frac{\mu}{\rho} \nabla \cdot \nabla \bar{u}
+\]</span></p>
+<p>Basitleştirme amacıyla kinematik ağdalık <span class="math inline">\(\nu = \mu / \rho\)</span> tanımlayalım, o zaman</p>
+<p><span class="math display">\[
+\frac{D \bar{u}}{D t} + \frac{1}{\rho} \nabla p =
+\bar{g}  + \nu \nabla \cdot \nabla \bar{u}
+\]</span></p>
+<p>Sıkıştırılamazlığın (incompressibility) <span class="math inline">\(\nabla \cdot \bar{u} = 0\)</span> olduğunu daha önce [5]'deki (2) formülünde görmüştük.</p>
+<p>Devam edelim,</p>
+<p><span class="math display">\[
+\rho \frac{D \bar{u}}{D t} = F^{toplam} 
+\]</span></p>
+<p>denklemini gördük. Bu Newton'un <span class="math inline">\(F=ma\)</span> formülasyonun bir karşılığı. Bu denklemde basınç, ağdalık gibi kuvvetler için terimler vardı. Toplam kuvvetleri açarsak,</p>
+<p><span class="math display">\[
+F^{toplam}  = F^{\textrm{basınç}} + F^{\textrm{ağdalık}} + F^{\textrm{yerçekim}} 
+\]</span></p>
+<p>Daha detaylı hali,</p>
+<p><span class="math display">\[
+\rho \frac{D \bar{u}}{D t} = 
+- \nabla p + \mu \nabla \cdot \nabla \bar{u} + \rho \bar{g}
+\qquad (1)
+\]</span></p>
+<p>Simulasyon için bize ivme gerekli. Kütle ve kuvvetten ivme, oradan sayısal entegrasyon ile yer değişimi elde edilebilir, katı-gövde simulasyonunu kodlarken [6]'da bu anlatılmıştı. O zaman eldeki <span class="math inline">\(i\)</span>'inci parçacık için toplam kuvvet <span class="math inline">\(F_i\)</span> hesaplarsak</p>
+<p><span class="math display">\[
+a_i = \frac{\mathrm{d} u_i}{\mathrm{d} t} = \frac{F_i}{\rho_i}
+\]</span></p>
+<p>ile ivmeyi buluruz, ve oradan devam ederiz.</p>
+<p>Şimdi bize gereken <span class="math inline">\(\nabla p(r_i)\)</span> ve <span class="math inline">\(\nabla^2 u(r_i)\)</span> hesaplarını yaklaşık yapabilmemizi sağlayacak bir metot kullanmak. SPH tekniği bunu sağlıyor.</p>
+<p>Bir fonksiyon <span class="math inline">\(A\)</span> aradeğerleme (interpolation) / yaklaşıklama üzerinden temsil edilebilir [1],</p>
+<p><span class="math display">\[
+A_I(r) = \int A(r&#39;) W(r-r&#39;,h) \mathrm{d} r&#39;
+\]</span></p>
+<p>Belirtilmediği yerlerde <span class="math inline">\(r = \bar{r}\)</span>, <span class="math inline">\(u = \bar{u}\)</span> kabul edilebilir, bunlar vektör, <span class="math inline">\(\mathrm{d} r&#39;\)</span> diferansiyel hacim öğesi. <span class="math inline">\(A_I\)</span> aradeğerlenmiş fonksiyon, <span class="math inline">\(A\)</span> yaklaşık göstermeye uğraştığımız fonksiyon. <span class="math inline">\(A\)</span> simulasyon ortamında hesaplanan herhangi bir ölçüt olabilir, mesela herhangi bir <span class="math inline">\(r=(x,y,z)\)</span> noktasındaki basınç, sıcaklık, yoğunluk, vs.</p>
+<p><span class="math inline">\(W\)</span> ağırlık fonksiyonudur, ya da çekirdek (kernel) fonksiyonu, sahip olması gereken bir şart,</p>
+<p><span class="math display">\[
+\int_\Omega  W(r-r&#39;,h) \mathrm{d} r&#39; = 1
+\]</span></p>
+<p>ve</p>
+<p><span class="math display">\[
+\lim_{h \to 0} W(r,h) = \delta(r)
+\]</span></p>
+<p>[4, sf. 11]. [4]'te bu tekniğin Dirac fonksiyonu ile bağlantıları anlatıldı. Eğer <span class="math inline">\(W = \delta\)</span> dersek, yani çekirdek için Dirac fonksiyonu kullanırsak, orijinal fonksiyonun kendisini elde ederiz.</p>
+<p>SPH'in temel fikri entegral aradeğerlemeden geliyor, hatta ona bir tür Çekirdek Yoğunluk Kestirme (Kernel Density Estimation) yöntemi de denebilir. Sıvıyı ayrıksal parçalara bölüyoruz, ve takip edilen ölçüt ne ise çekirdek fonksiyonu üzerinden bu ölçüt pürüzsüzleştiriliyor / etrafa yayılıyor / yumuşatılıyor. Yani çekirdek yarıçapı içindeki diğer parçacıklar o an üzerinde olduğumuz parçacığın neyini ölçüyorsak onu etkiliyor, mesela yakındaki parçacıkların basıncı ya da yoğunluğu bizim basıncı, yoğunluğu etkiliyor. Kabaca düşünülünce aslında bu bakış açısının sıvıların tabiatına son derece uygun olduğu anlaşılacaktır.</p>
+<p>Ortalamanın alınma şekli RBF tekniği [11] ile ya da olasılıktaki beklenti hesabına benziyor, RBF ile üzerinde olduğumuz veriyi etraftaki verilere Gaussian uydurarak temsil etmeye uğraşırız, SPH ile üzerinde olduğumüz parçacık ölçümünü etraftaki ölçütlerin (çoğunlukla Gaussian-ımsı) bir çekirdek üzerinden ortalamasıyla temsil ederiz. Ortalama bir entegraldir, Olasılık Teorisi'nde beklentinin alınması gibi, <span class="math inline">\(x\)</span> değerlerinin <span class="math inline">\(f(x)\)</span> üzerinden ağırlıklı ortalaması <span class="math inline">\(\int_{\-infty}^{\infty} x f(x) \mathrm{d} x\)</span>.</p>
+<p>Yaklaşıklamayı sıvıya uygulamak için onu kütle öğelerine bölmemiz gerekli, <span class="math inline">\(i\)</span>'inci öğe <span class="math inline">\(m_i\)</span> kütlesine, <span class="math inline">\(\rho_i\)</span> yoğunluğuna, ve <span class="math inline">\(r_i\)</span> pozisyonuna sahip olacak. <span class="math inline">\(A\)</span> ölçütü / hesabının <span class="math inline">\(i\)</span> parçacığındaki değeri <span class="math inline">\(A_i\)</span> ile gösterilsin. Her parçacık için,</p>
+<p><span class="math display">\[
+A(r) = \int A(r&#39;) W(r-r&#39;,h) \mathrm{d} r&#39;
+\]</span></p>
+<p>Yaklaşıklık için <span class="math inline">\(A_I(r)\)</span> da diyebilirdik, ya da <span class="math inline">\(\approx\)</span> kullanabilirdik. Şimdi,</p>
+<p><span class="math display">\[
+ = \int \frac{A(r&#39;)}{\rho(r&#39;)} W(r-r&#39;,h) \rho(r&#39;) \mathrm{d} r&#39;
+\]</span></p>
+<p><span class="math inline">\(\rho(r&#39;)\)</span>'i hem bölen hem bölünene eklediğimiz için hiçbir değişim yaratmamış olduk, ama böylece <span class="math inline">\(\rho(r&#39;) \mathrm{d} r&#39;\)</span> ifadesi elde ettik ki ona parçacık kütlesi diyebiliriz. Böylece parçacıkların kütleleri üzerinden bir toplam alabiliriz,</p>
+<p><span class="math display">\[
+A_s(r) = \sum_b m_b \frac{A_b}{\rho_b} W(r-r_b, h)
+\]</span></p>
+<p>Formülde kütle kullanımı daha faydalı çünkü kütle simülasyona başlamadan önce bilinir, hatta çoğu parçacık için birbirinin aynısıdır.</p>
+<p>Üstteki toplamın teoride tüm parçacıklar üzerinden alındığı gösterildi, fakat pratikte <span class="math inline">\(r\)</span>'ye yakın olan diğer parçacıklar üzerinden alınır, çoğunlukla çekirdek <span class="math inline">\(2h\)</span> gibi bir uzaklıkta zaten hızla sıfıra düştüğü için, ayrıca performans açısından, çok uzaktaki parçacıkları göz önüne almaya gerek yoktur.</p>
+<p>Bu formül bana herhangi bir <span class="math inline">\(r\)</span> noktasında hesaplayabileceğim bir <span class="math inline">\(A\)</span> kestirme hesabı (estimation) vermiş oldu. Parcaçık bazlı simulasyon yaptığımız için her <span class="math inline">\(i\)</span> parçacığı çevresindeki <span class="math inline">\(j\)</span> parçacıkları üzerinden bu kestirme hesabı yapabileceğiz.</p>
+<p>Bazı hesaplar formülün basit yan ürünü, mesela yoğunluk</p>
+<p><span class="math display">\[
+\rho_i = \rho(r_i) = \sum_j m_j \frac{\rho_j}{\rho_j} W(r_i-r_j, h) =
+\sum_j m_j  W(r_i-r_j, h)
+\]</span></p>
+<p>Yani etraftaki parçacıkların kütlesi üzerinden alınan bir ağırlıklı ortalama bana parçacığın yoğunluğunu veriyor.</p>
+<p>Aradeğerlemenin bize sağladığı güzel bir özellik onun üzerinden mesela kolayca gradyan alabilmem. Diyelim ki <span class="math inline">\(A\)</span> ölçümü basınç, yani <span class="math inline">\(p\)</span>. O zaman (1)'de görülen <span class="math inline">\(-\nabla p\)</span> formülünü üstteki entegral üzerinden açabilmem gerekir (<span class="math inline">\(p\)</span> ölçümünün ya da hesabının nereden geldiği ileride anlatılacak). <span class="math inline">\(r\)</span>'de olan her <span class="math inline">\(i\)</span> parçacığı için <span class="math inline">\(p(r_i)\)</span> diyelim,</p>
+<p><span class="math display">\[
+p(r_i) = \sum_j \frac{m_j p_j}{\rho_j} W(r_i-r_j,h)
+\]</span></p>
+<p>Bu denklemin gradyanını alabiliriz şimdi,</p>
+<p><span class="math display">\[
+\nabla p(r_i) = \sum \frac{m_j p_j}{\rho_j} \nabla W(r_i-r_j,h)
+\]</span></p>
+<p>Gradyan direk <span class="math inline">\(W\)</span> üzerinde uygulanmış oldu. Burada modellemeyi yapan kişi tabii ki <span class="math inline">\(W\)</span>'yi &quot;gradyanı rahat alınan'' fonksiyonlar arasından da seçecektir, böylece işi daha kolaylaşacaktır.</p>
+<p>O zaman üstteki sonuç ile <span class="math inline">\(-\nabla p\)</span> yazarsak,</p>
+<p><span class="math display">\[
+F_i^{\textrm{basınç}} = - \sum_j \frac{m_j p_j}{\rho_j} \nabla W(r_i-r_j,h)
+\]</span></p>
+<p>elde ederiz.</p>
+<p>Yanlız burada bir problem var, <span class="math inline">\(j\)</span> bölgesindeki basıncı kullanarak o fark üzerinden <span class="math inline">\(i\)</span> üzerindeki kuvveti hesapladık, fakat basınç farkı dolayısıyla <span class="math inline">\(i\)</span>'nin <span class="math inline">\(j\)</span> üzerinde uyguladığı kuvvet aynı olmayabilir. Yani kuvvet simetrik olmaz, fakat fizik kanunlarına göre etki-tepki aynı olmalıdır. Simulasyon amacıyla çoğunlukla yapılan dışarıdan müdahele ile kuvveti simetrik hale getirmektir, mesela bir yöntem basit aritmetik ortalama almak,</p>
+<p><span class="math display">\[
+F_i^{\textrm{basınç}} = - \nabla p(r_i) =
+- \sum_j m_j \frac{p_i + p_j}{2 \rho_j} \nabla W(r_i-r_j,h)
+\]</span></p>
+<p>Ağdalık kuvvetine gelelim. İlk başta (1) bazlı olarak bu formül</p>
+<p><span class="math display">\[
+F_i^{\textrm{ağdalık}} = \mu \sum_j m_j \frac{u_j}{\rho_j} \nabla^2 W (r_i-r_j, h)
+\]</span></p>
+<p>olarak yazılabilirdi. Fakat simetriklik problemi burada da var, bu problem de hıza olan bağlantıyı izafi hıza çevirerek çözülebilir, çünkü fiziksel olarak düşünülürse esas önemli olan mutlak hızlar değil iki parçacığın hızlarının farkı, ya da bir parçacığın diğerine baktığında gördüğü hız (ki bu izafi demek) o zaman</p>
+<p><span class="math display">\[
+F_i^{\textrm{ağdalık}} = \mu \sum_j m_j \frac{u_j-u_i}{\rho_j} \nabla^2 W (r_i-r_j, h)
+\]</span></p>
+<p>daha uygun olur.</p>
+<p>Çekirdek Fonksiyon Seçimi</p>
+<p>SPH'in stabilitesi, doğruluğu ve hesap hızı pürüzleştirme çekirdeğinin doğru seçilmiş olmasına bağlı [2]. Çekirdek fonksiyonlarını hangisinin, hangi durumlarda iyi olacağı aktif bir araştırma alanıdır. Yaygın kullanılan bir çekirdek <code>poly6</code> ismiyle bilinen 6. derece polinom çekirdeği. Bu fonksiyon,</p>
+<p><span class="math display">\[
+W_{poly6} (r, h) = \frac{315}{64 \pi h^9}
+\left\{ \begin{array}{ll}
+(h^2 - ||r||^2)^3 &amp; 0 \le ||r|| \le h \\
+0 &amp; ||r|| &gt; h
+\end{array} \right.
+\]</span></p>
+<p>Gradyanı,</p>
+<p><span class="math display">\[
+\nabla W (r, h) =
+- \frac{945}{32 \pi h^9} r ( h^2 - ||r||^2)^2
+\]</span></p>
+<p>Laplasyanı ise,</p>
+<p><span class="math display">\[
+\nabla^2 W (r, h) =
+- \frac{945}{32\pi h^9} (h^2 - ||r||^2)(3 h^2 - 7||r||^2)
+\]</span></p>
+<p>Tek boyutta ve <span class="math inline">\(h=1\)</span> üzerinden her üç fonksiyonu grafikleyebiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">r <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">100</span>)
+h <span class="op">=</span> <span class="dv">1</span>
+<span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.DataFrame(r)
+df.columns <span class="op">=</span> [<span class="st">&#39;r&#39;</span>]
+df[<span class="st">&#39;W&#39;</span>] <span class="op">=</span> (<span class="fl">315.</span><span class="op">/</span>(<span class="dv">64</span><span class="op">*</span>np.pi<span class="op">*</span>h<span class="op">**</span><span class="dv">9</span>)) <span class="op">*</span> (h<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> np.<span class="bu">abs</span>(r)<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">3</span>
+df <span class="op">=</span> df.set_index(<span class="st">&#39;r&#39;</span>)
+df.plot()
+plt.savefig(<span class="st">&#39;compscieng_app40sph_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app40sph_01.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df <span class="op">=</span> pd.DataFrame(r)
+df.columns <span class="op">=</span> [<span class="st">&#39;r&#39;</span>]
+df[<span class="st">&#39;W&#39;</span>] <span class="op">=</span> (<span class="fl">315.</span><span class="op">/</span>(<span class="dv">64</span><span class="op">*</span>np.pi<span class="op">*</span>h<span class="op">**</span><span class="dv">9</span>)) <span class="op">*</span> (h<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> np.<span class="bu">abs</span>(r)<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">3</span>
+df[<span class="st">&#39;Gradyan W&#39;</span>] <span class="op">=</span> <span class="fl">-945.</span><span class="op">/</span>(<span class="dv">32</span><span class="op">*</span>np.pi<span class="op">*</span>h<span class="op">**</span><span class="dv">9</span>) <span class="op">*</span> r <span class="op">*</span> (h<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> np.<span class="bu">abs</span>(r)<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>
+df <span class="op">=</span> df.set_index(<span class="st">&#39;r&#39;</span>)
+df.plot()
+plt.savefig(<span class="st">&#39;compscieng_app40sph_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app40sph_02.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df <span class="op">=</span> pd.DataFrame(r)
+df.columns <span class="op">=</span> [<span class="st">&#39;r&#39;</span>]
+df[<span class="st">&#39;W&#39;</span>] <span class="op">=</span> (<span class="fl">315.</span><span class="op">/</span>(<span class="dv">64</span><span class="op">*</span>np.pi<span class="op">*</span>h<span class="op">**</span><span class="dv">9</span>)) <span class="op">*</span> (h<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> np.<span class="bu">abs</span>(r)<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">3</span>
+df[<span class="st">&#39;Gradyan W&#39;</span>] <span class="op">=</span> <span class="fl">-945.</span><span class="op">/</span>(<span class="dv">32</span><span class="op">*</span>np.pi<span class="op">*</span>h<span class="op">**</span><span class="dv">9</span>) <span class="op">*</span> r <span class="op">*</span> (h<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> np.<span class="bu">abs</span>(r)<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>
+df[<span class="st">&#39;Laplasyan W&#39;</span>] <span class="op">=</span> <span class="fl">-945.</span><span class="op">/</span>(<span class="dv">32</span><span class="op">*</span>np.pi<span class="op">*</span>h<span class="op">**</span><span class="dv">9</span>) <span class="op">*</span> <span class="op">\</span>
+                   (h<span class="op">**</span><span class="dv">2</span><span class="op">-</span>np.<span class="bu">abs</span>(r)<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> <span class="op">\</span>
+                   (<span class="dv">3</span><span class="op">*</span>h<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">7</span><span class="op">**</span>np.<span class="bu">abs</span>(r)<span class="op">**</span><span class="dv">2</span>)
+df <span class="op">=</span> df.set_index(<span class="st">&#39;r&#39;</span>)
+df.plot()
+plt.savefig(<span class="st">&#39;compscieng_app40sph_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app40sph_03.png" />
+
+</div>
+<p>Basınç</p>
+<p>Basınç kuvveti eğer basınç biliniyorsa hesaplanabilir, basıncın kendisini hesaplamak için İdeal Gaz Kanunu gerekli [9], bu kanun</p>
+<p><span class="math display">\[
+p V = n R T
+\]</span></p>
+<p>ki <span class="math inline">\(V = 1 / \rho\)</span>, yani birim kütleye düşen hacim, <span class="math inline">\(n\)</span> mol üzerinden kaç tane gaz parçacığı olduğu, <span class="math inline">\(R\)</span> evrensel gaz sabiti, <span class="math inline">\(T\)</span> ise sıcaklık. SPH için sıvıda eşsıcaklık (isothermal), ve parçacıkların sayısı simulasyon sırasında değişmez kabul edilir, o zaman üstteki formülün sağ tarafında bir gaz sertlik (stiffness) sabiti <span class="math inline">\(k\)</span> kullanılabilir [4, sf. 18],</p>
+<p><span class="math display">\[
+p V = k
+\]</span></p>
+<p><span class="math display">\[
+p \frac{1}{\rho} = k
+\]</span></p>
+<p><span class="math display">\[
+p  = k \rho
+\]</span></p>
+<p>Sayısal kodlamalarda stabilite amaçlı olarak ayrıca bir de <span class="math inline">\(\rho_0\)</span> kullanılır, ki her basınç hesabı için yoğunluğun bu baz <span class="math inline">\(\rho_0\)</span> ile olan farkı bazlı alınır, nihai formül,</p>
+<p><span class="math display">\[
+p  = k (\rho - \rho_0)
+\]</span></p>
+<p>Simülasyon kodu alttadır. Simüle edilen bir blok sıvıyı havada asılı bir durumdan bırakmak. Ne olacak? Yerçekim etkisiyle tabii ki sıvı parçacıkları düşmeye başlayacaklar, ama normal sadece elastik çarpışma içeren simülasyondan farklı olarak şimdi sıvı parçacıkları arasında ağdalık var, yani birbirlerine yakın durmaya meyilliler. Ayrıca basınç var, tüm bunların etkisini simüle eden program acaba sıvısal bir davranış gösterecek mi? Simülasyon animasyon / video olarak [10]'da bulunabilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> random <span class="im">import</span> random
+<span class="im">from</span> collections <span class="im">import</span> defaultdict 
+<span class="im">import</span> numpy <span class="im">as</span> np, datetime
+<span class="im">import</span> sys, numpy.linalg <span class="im">as</span> lin
+<span class="im">from</span> mayavi <span class="im">import</span> mlab
+<span class="im">import</span> itertools
+
+m <span class="op">=</span> <span class="fl">0.1</span>
+R <span class="op">=</span> <span class="fl">0.1</span>
+EPS <span class="op">=</span> <span class="fl">0.1</span>
+BOUND_DAMPING <span class="op">=</span> <span class="fl">-0.6</span>
+mmin,mmax<span class="op">=</span><span class="fl">0.0</span>,<span class="fl">2.0</span>
+BN <span class="op">=</span> <span class="bu">int</span>(np.<span class="bu">abs</span>(mmax<span class="op">-</span>mmin) <span class="op">/</span> R) <span class="op">+</span> <span class="dv">1</span>
+bins <span class="op">=</span> np.linspace(mmin, mmax, BN)
+G <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">-9.8</span><span class="op">*</span><span class="dv">2</span>])
+
+REST_DENS <span class="op">=</span> <span class="fl">10.0</span>
+GAS_CONST <span class="op">=</span> <span class="fl">0.5</span>
+MASS <span class="op">=</span> <span class="fl">100.0</span>
+VISC <span class="op">=</span> <span class="fl">20.0</span>
+DT <span class="op">=</span> <span class="fl">0.1</span>
+H <span class="op">=</span> <span class="fl">0.1</span> <span class="co"># kernel radius</span>
+PI <span class="op">=</span> <span class="fl">3.14159</span>
+HSQ <span class="op">=</span> H<span class="op">*</span>H <span class="co"># radius^2 for optimization</span>
+POLY6 <span class="op">=</span> <span class="fl">315.0</span><span class="op">/</span>(<span class="fl">65.0</span><span class="op">*</span>PI<span class="op">*</span>np.power(H, <span class="fl">9.</span>))<span class="op">;</span>
+SPIKY_GRAD <span class="op">=</span> <span class="fl">-45.0</span><span class="op">/</span>(PI<span class="op">*</span>np.power(H, <span class="fl">6.</span>))<span class="op">;</span>
+VISC_LAP <span class="op">=</span> <span class="fl">45.0</span><span class="op">/</span>(PI<span class="op">*</span>np.power(H, <span class="fl">6.</span>))<span class="op">;</span>
+EPS <span class="op">=</span> <span class="fl">0.05</span>
+BOUND_DAMPING <span class="op">=</span> <span class="fl">-0.5</span>
+
+
+idx27 <span class="op">=</span> <span class="bu">list</span>(itertools.product( [<span class="op">-</span><span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>], repeat<span class="op">=</span><span class="dv">3</span>  ))
+
+<span class="kw">class</span> Simulation:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):
+        <span class="va">self</span>.r   <span class="op">=</span> R
+        <span class="va">self</span>.balls <span class="op">=</span> []
+        
+    <span class="kw">def</span> init(<span class="va">self</span>):
+        i <span class="op">=</span> <span class="dv">0</span>
+        <span class="cf">for</span> xs <span class="kw">in</span> np.linspace(<span class="dv">0</span>, <span class="fl">0.4</span>, <span class="dv">10</span>):
+            <span class="cf">for</span> ys <span class="kw">in</span> np.linspace(<span class="dv">0</span>, <span class="fl">0.4</span>, <span class="dv">10</span>):
+                <span class="cf">for</span> zs <span class="kw">in</span> np.linspace(<span class="dv">0</span>, <span class="fl">0.4</span>, <span class="dv">10</span>):
+                    v <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])
+                    f <span class="op">=</span> np.array([<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>])
+                    x <span class="op">=</span> np.array([xs, ys, zs])
+                    xi <span class="op">=</span> np.digitize(xs, bins)
+                    yi <span class="op">=</span> np.digitize(ys, bins)
+                    zi <span class="op">=</span> np.digitize(zs, bins)                    
+                    d <span class="op">=</span> {<span class="st">&#39;x&#39;</span>: x, <span class="st">&#39;f&#39;</span>:f, <span class="st">&#39;v&#39;</span>: v, <span class="st">&#39;i&#39;</span>: i, <span class="st">&#39;rho&#39;</span>: <span class="fl">0.0</span>, <span class="st">&#39;p&#39;</span>: <span class="fl">0.0</span>, <span class="st">&#39;grid&#39;</span>: (xi,yi,zi)}
+                    <span class="va">self</span>.balls.append(d)
+                    i <span class="op">+=</span> <span class="dv">1</span>
+        <span class="va">self</span>.rvec   <span class="op">=</span> np.ones(i) <span class="op">*</span> <span class="va">self</span>.r
+
+    <span class="kw">def</span> get_neighbors(<span class="va">self</span>, ball):
+        neighbors <span class="op">=</span> {}
+        cx,cy,cz <span class="op">=</span> ball[<span class="st">&#39;grid&#39;</span>]
+        <span class="cf">for</span> (xa,ya,za) <span class="kw">in</span> idx27:
+            nx,ny,nz <span class="op">=</span> cx<span class="op">+</span>xa,cy<span class="op">+</span>ya,cz<span class="op">+</span>za
+            <span class="cf">if</span> (nx,ny,nz) <span class="kw">in</span> <span class="va">self</span>.grid_hash:
+                tn <span class="op">=</span> <span class="va">self</span>.grid_hash[(nx,ny,nz)]
+                <span class="cf">for</span> n <span class="kw">in</span> tn: neighbors[ n[<span class="st">&#39;i&#39;</span>] ] <span class="op">=</span> n
+        <span class="cf">return</span> neighbors
+        
+    <span class="kw">def</span> hash_balls(<span class="va">self</span>):
+        <span class="va">self</span>.grid_hash <span class="op">=</span> defaultdict(<span class="bu">list</span>)
+        <span class="cf">for</span> i,b <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.balls):
+            xi <span class="op">=</span> np.digitize(b[<span class="st">&#39;x&#39;</span>][<span class="dv">0</span>], bins)
+            yi <span class="op">=</span> np.digitize(b[<span class="st">&#39;x&#39;</span>][<span class="dv">1</span>], bins)
+            zi <span class="op">=</span> np.digitize(b[<span class="st">&#39;x&#39;</span>][<span class="dv">2</span>], bins)
+            b[<span class="st">&#39;grid&#39;</span>] <span class="op">=</span> (xi,yi,zi)
+            <span class="va">self</span>.grid_hash[(xi,yi,zi)].append(b)
+            
+    <span class="kw">def</span> computeDensityPressure(<span class="va">self</span>):
+        <span class="cf">for</span> i,pi <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.balls):            
+            pi[<span class="st">&#39;rho&#39;</span>] <span class="op">=</span> <span class="fl">0.0</span>                
+            otherList <span class="op">=</span> <span class="va">self</span>.get_neighbors(pi)
+            <span class="cf">for</span> (k,pj) <span class="kw">in</span> otherList.items():
+                r2 <span class="op">=</span> lin.norm(pj[<span class="st">&#39;x&#39;</span>]<span class="op">-</span>pi[<span class="st">&#39;x&#39;</span>])<span class="op">**</span><span class="dv">2</span>
+                <span class="cf">if</span>  r2 <span class="op">&lt;</span> HSQ:
+                    pi[<span class="st">&#39;rho&#39;</span>] <span class="op">+=</span> MASS<span class="op">*</span>POLY6<span class="op">*</span>np.power(HSQ<span class="op">-</span>r2, <span class="fl">3.0</span>)
+            pi[<span class="st">&#39;p&#39;</span>] <span class="op">=</span> GAS_CONST<span class="op">*</span>(pi[<span class="st">&#39;rho&#39;</span>] <span class="op">-</span> REST_DENS)
+       
+                
+    <span class="kw">def</span> computeForces(<span class="va">self</span>):
+        <span class="cf">for</span> i,pi <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.balls):
+            fpress <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])
+            fvisc <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])                
+            otherList <span class="op">=</span> <span class="va">self</span>.get_neighbors(pi)
+            <span class="cf">for</span> k,pj <span class="kw">in</span> otherList.items():
+                <span class="cf">if</span> pj[<span class="st">&#39;i&#39;</span>] <span class="op">==</span> pi[<span class="st">&#39;i&#39;</span>]: <span class="cf">continue</span>
+                rij <span class="op">=</span> pi[<span class="st">&#39;x&#39;</span>]<span class="op">-</span>pj[<span class="st">&#39;x&#39;</span>]
+                r <span class="op">=</span> lin.norm(rij)
+                <span class="cf">if</span> r <span class="op">&lt;</span> H:
+                    <span class="cf">if</span> np.<span class="bu">sum</span>(rij)<span class="op">&gt;</span><span class="fl">0.0</span>: rij <span class="op">=</span> rij <span class="op">/</span> r
+                    tmp1 <span class="op">=</span> <span class="op">-</span>rij<span class="op">*</span>MASS<span class="op">*</span>(pi[<span class="st">&#39;p&#39;</span>] <span class="op">+</span> pj[<span class="st">&#39;p&#39;</span>]) <span class="op">/</span> (<span class="fl">2.0</span> <span class="op">*</span> pj[<span class="st">&#39;rho&#39;</span>])
+                    tmp2 <span class="op">=</span> SPIKY_GRAD<span class="op">*</span>np.power(H<span class="op">-</span>r,<span class="fl">2.0</span>)
+                    fpress <span class="op">+=</span> (tmp1 <span class="op">*</span> tmp2)
+                    tmp1 <span class="op">=</span> VISC<span class="op">*</span>MASS<span class="op">*</span>(pj[<span class="st">&#39;v&#39;</span>] <span class="op">-</span> pi[<span class="st">&#39;v&#39;</span>])
+                    tmp2 <span class="op">=</span> pj[<span class="st">&#39;rho&#39;</span>] <span class="op">*</span> VISC_LAP<span class="op">*</span>(H<span class="op">-</span>r)
+                    fvisc <span class="op">+=</span> (tmp1 <span class="op">/</span> tmp2)
+            fgrav <span class="op">=</span> G <span class="op">*</span> pi[<span class="st">&#39;rho&#39;</span>]
+            pi[<span class="st">&#39;f&#39;</span>] <span class="op">=</span> fpress <span class="op">+</span> fvisc <span class="op">+</span> fgrav
+                        
+    <span class="kw">def</span> integrate(<span class="va">self</span>):
+        <span class="cf">for</span> j,p <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.balls):
+            <span class="cf">if</span> p[<span class="st">&#39;rho&#39;</span>] <span class="op">&gt;</span> <span class="fl">0.0</span>: 
+                p[<span class="st">&#39;v&#39;</span>] <span class="op">+=</span> DT<span class="op">*</span>p[<span class="st">&#39;f&#39;</span>]<span class="op">/</span>p[<span class="st">&#39;rho&#39;</span>]
+            p[<span class="st">&#39;x&#39;</span>] <span class="op">+=</span> DT<span class="op">*</span>p[<span class="st">&#39;v&#39;</span>]
+
+            <span class="cf">if</span> p[<span class="st">&#39;x&#39;</span>][<span class="dv">0</span>]<span class="op">-</span>EPS <span class="op">&lt;</span> <span class="fl">0.0</span>:
+                p[<span class="st">&#39;v&#39;</span>][<span class="dv">0</span>] <span class="op">*=</span> BOUND_DAMPING
+                p[<span class="st">&#39;x&#39;</span>][<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.0</span>
+            <span class="cf">if</span> p[<span class="st">&#39;x&#39;</span>][<span class="dv">0</span>]<span class="op">+</span>EPS <span class="op">&gt;</span> <span class="fl">2.0</span>:
+                p[<span class="st">&#39;v&#39;</span>][<span class="dv">0</span>] <span class="op">*=</span> BOUND_DAMPING
+                p[<span class="st">&#39;x&#39;</span>][<span class="dv">0</span>] <span class="op">=</span> <span class="fl">2.0</span><span class="op">-</span>EPS
+
+            <span class="cf">if</span> p[<span class="st">&#39;x&#39;</span>][<span class="dv">1</span>]<span class="op">-</span>EPS <span class="op">&lt;</span> <span class="fl">0.0</span>:
+                p[<span class="st">&#39;v&#39;</span>][<span class="dv">1</span>] <span class="op">*=</span> BOUND_DAMPING
+                p[<span class="st">&#39;x&#39;</span>][<span class="dv">1</span>] <span class="op">=</span> <span class="fl">0.0</span>
+            <span class="cf">if</span> p[<span class="st">&#39;x&#39;</span>][<span class="dv">1</span>]<span class="op">+</span>EPS <span class="op">&gt;</span> <span class="fl">2.0</span>:
+                p[<span class="st">&#39;v&#39;</span>][<span class="dv">1</span>] <span class="op">*=</span> BOUND_DAMPING
+                p[<span class="st">&#39;x&#39;</span>][<span class="dv">1</span>] <span class="op">=</span> <span class="fl">2.0</span><span class="op">-</span>EPS
+
+            <span class="cf">if</span> p[<span class="st">&#39;x&#39;</span>][<span class="dv">2</span>]<span class="op">-</span>EPS <span class="op">&lt;</span> <span class="fl">0.0</span>:
+                p[<span class="st">&#39;v&#39;</span>][<span class="dv">2</span>] <span class="op">*=</span> BOUND_DAMPING
+                p[<span class="st">&#39;x&#39;</span>][<span class="dv">2</span>] <span class="op">=</span> <span class="fl">0.0</span>
+            <span class="cf">if</span> p[<span class="st">&#39;x&#39;</span>][<span class="dv">2</span>]<span class="op">+</span>EPS <span class="op">&gt;</span> <span class="fl">2.0</span>:
+                p[<span class="st">&#39;v&#39;</span>][<span class="dv">2</span>] <span class="op">*=</span> BOUND_DAMPING
+                p[<span class="st">&#39;x&#39;</span>][<span class="dv">2</span>] <span class="op">=</span> <span class="fl">2.0</span><span class="op">-</span>EPS
+
+
+        <span class="va">self</span>.hash_balls()
+                
+
+    <span class="kw">def</span> update(<span class="va">self</span>):
+        <span class="va">self</span>.hash_balls()
+        <span class="va">self</span>.computeDensityPressure()
+        <span class="va">self</span>.computeForces()
+        <span class="va">self</span>.integrate()                    
+        
+    <span class="kw">def</span> display(<span class="va">self</span>, i):
+        mlab.options.offscreen <span class="op">=</span> <span class="va">True</span>
+        ball_vect <span class="op">=</span> [[b[<span class="st">&#39;x&#39;</span>][<span class="dv">0</span>],b[<span class="st">&#39;x&#39;</span>][<span class="dv">1</span>],b[<span class="st">&#39;x&#39;</span>][<span class="dv">2</span>]] <span class="cf">for</span> b <span class="kw">in</span> <span class="va">self</span>.balls]
+        ball_vect <span class="op">=</span> np.array(ball_vect)
+
+        fig <span class="op">=</span> mlab.figure(figure<span class="op">=</span><span class="va">None</span>, fgcolor<span class="op">=</span>(<span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>), bgcolor<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), engine<span class="op">=</span><span class="va">None</span>)
+        color<span class="op">=</span>(<span class="fl">0.2</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>)
+        mlab.points3d(ball_vect[:,<span class="dv">0</span>], ball_vect[:,<span class="dv">1</span>], ball_vect[:,<span class="dv">2</span>], <span class="va">self</span>.rvec, color<span class="op">=</span>color, colormap <span class="op">=</span> <span class="st">&#39;gnuplot&#39;</span>, scale_factor<span class="op">=</span><span class="dv">1</span>, figure<span class="op">=</span>fig)
+        mlab.points3d(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">0.1</span>, color<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), scale_factor<span class="op">=</span><span class="fl">1.0</span>)
+        
+        BS <span class="op">=</span> <span class="fl">2.0</span>
+        mlab.plot3d([<span class="fl">0.0</span>,<span class="fl">0.0</span>],[<span class="fl">0.0</span>, <span class="fl">0.0</span>],[<span class="fl">0.0</span>, BS], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([<span class="fl">0.0</span>,BS],[<span class="fl">0.0</span>, <span class="fl">0.0</span>],[<span class="fl">0.0</span>, <span class="fl">0.0</span>], color<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([<span class="fl">0.0</span>,<span class="fl">0.0</span>],[<span class="fl">0.0</span>, BS],[<span class="fl">0.0</span>, <span class="fl">0.0</span>], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([<span class="fl">0.0</span>,<span class="fl">0.0</span>],[<span class="fl">0.0</span>, BS],[BS, BS], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([<span class="fl">0.0</span>,BS],[<span class="fl">0.0</span>,<span class="fl">0.0</span>],[BS,BS], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([BS,BS],[<span class="fl">0.0</span>,BS],[BS,BS], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([BS,<span class="dv">0</span>],[BS,BS],[BS,BS], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([<span class="dv">0</span>,<span class="dv">0</span>],[BS,BS],[BS,<span class="dv">0</span>], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([BS,BS],[<span class="fl">0.0</span>,<span class="fl">0.0</span>],[<span class="fl">0.0</span>,BS], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([BS,BS],[<span class="fl">0.0</span>,BS],[<span class="fl">0.0</span>,<span class="fl">0.0</span>], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([BS,<span class="fl">0.0</span>],[BS,BS],[<span class="fl">0.0</span>,<span class="fl">0.0</span>], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+        mlab.plot3d([BS,BS],[BS,BS],[<span class="fl">0.0</span>,BS], color<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), tube_radius<span class="op">=</span><span class="va">None</span>, figure<span class="op">=</span>fig)
+
+        mlab.view(azimuth<span class="op">=</span><span class="dv">50</span>, elevation<span class="op">=</span><span class="dv">80</span>, focalpoint<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>], distance<span class="op">=</span><span class="fl">8.0</span>, figure<span class="op">=</span>fig)
+        
+        mlab.savefig(filename<span class="op">=</span><span class="st">&#39;/tmp/sim/out-</span><span class="sc">%02d</span><span class="st">.png&#39;</span> <span class="op">%</span> i)
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
+    s <span class="op">=</span> Simulation()
+    s.init()
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):
+        <span class="bu">print</span> (i)
+        s.update()
+        s.display(i)
+        <span class="co">#exit()</span></code></pre></div>
+<p><img src="glutout-002.png" /> <img src="glutout-004.png" /></p>
+<p><img src="glutout-006.png" /> <img src="glutout-008.png" /></p>
+<p>Komşuları bulmak için [12]'deki ızgara bazlı yöntem kullanıldı. Bu yöntem, biraz ek yapılarak mükkemmel sonuç verebilir, ve bu önemli çünkü SPH'in doğru çalışabilmesi için <em>tüm</em> komşuların bulunabilmesi gerekir.</p>
+<p>Kaynaklar</p>
+<p>[1] Monaghan, <em>Smoothed particle hydrodynamics, 2005</em></p>
+<p>[2] Schuermann, <em>Particle-Based Fluid Simulation with SPH</em>, <a href="https://lucasschuermann.com/writing/particle-based-fluid-simulation" class="uri">https://lucasschuermann.com/writing/particle-based-fluid-simulation</a></p>
+<p>[3] Bayramlı, <em>Hesapsal Bilim, Ders 4</em></p>
+<p>[4] Kelager, <em>Lagrangian Fluid Dynamics Using Smoothed Particle Hydrodynamics</em></p>
+<p>[5] Bayramlı, <em>Fizik, Muhafaza Kanunları</em></p>
+<p>[6] Bayramlı, <em>Fizik, Simulasyon</em></p>
+<p>[7] Monaghan, <em>Introduction to SPH Part I</em>, <a href="https://www.youtu.be/tAXHCAEgSuE" class="uri">https://www.youtu.be/tAXHCAEgSuE</a></p>
+<p>[8] Müller, <em>Particle-Based Fluid Simulation for Interactive Applications</em></p>
+<p>[9] Bayramlı, <em>Fizik, Temel Fizik 3, Basınç, Çarpışma</em></p>
+<p>[10] Bayramlı, <em>Simulasyon Animasyonu</em>, <a href="https://github.com/burakbayramli/classnotes/blob/master/compscieng/compscieng_app40sph/balls4.gif?raw=true" class="uri">https://github.com/burakbayramli/classnotes/blob/master/compscieng/compscieng_app40sph/balls4.gif?raw=true</a></p>
+<p>[11] Bayramlı, <em>Istatistik, Dairesel Baz Fonksiyonları (Radial Basis Functions -RBF-)</em></p>
+<p>[12] Bayramlı, <em>Bilgisayar Bilim, Geometrik Anahtarlama (Spatial Hashing) ve Izgara (Grid) ile En Yakın Noktaları Bulmak</em></p>
+<p>[13] Schuermann, <em>Particle-Based Fluid Simulation with SPH</em>, <a href="https://lucasschuermann.com/writing/particle-based-fluid-simulation" class="uri">https://lucasschuermann.com/writing/particle-based-fluid-simulation</a></p>
+</body>
+</html>

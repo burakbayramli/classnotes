@@ -1,0 +1,461 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="çok-değişkenli-gaussian-dağılımlar">Çok Değişkenli Gaussian Dağılımlar</h1>
+<p>Çok değişkenli normal dağılımlarla iş yaparken, mesela Gaussian karışımları kullanırken, bazı numaraları bilmek faydalı olabiliyor. Bunlardan birincisi <span class="math inline">\((x-\mu)^T\Sigma^{-1}(x-\mu)\)</span> hesabını yapmaktır, diğer log-toplam-exp numarası (logsumexp trick) diye bilinen hesaptır.</p>
+<p>Birinciden başlayalım, daha kısalaştırmak için <span class="math inline">\(y=x-\mu\)</span> diyelim, yani <span class="math inline">\(y^T\Sigma^{-1}y\)</span> olsun. Şimdi bu formülde bir ters alma (inversion) işleminin olduğunu görüyoruz. Fakat bu işlem oldukça pahalı bir işlem olarak bilinir, hele hele boyutların yükseldiği durumlardan (binler, onbinler), kovaryansı temsil eden <span class="math inline">\(\Sigma\)</span>, <span class="math inline">\(n \times n\)</span> olacaktır. Acaba tersini almayı başka bir şekilde gerçekleştiremez miyiz?</p>
+<p><span class="math inline">\(\Sigma\)</span> matrisi bir kovaryans matrisi olduğu için simetrik, pozitif yarı kesin bir matristir. Bu tür matrislerin Cholesky ayrıştırmasının olduğunu biliyoruz ve bu işlem çok hızlı yapılabiliyor. O zaman</p>
+<p><span class="math display">\[ \Sigma = LL^T \]</span></p>
+<p>ki <span class="math inline">\(L\)</span> matrisi alt-üçgensel (lower triangular) bir matristir,</p>
+<p><span class="math display">\[ \Sigma^{-1} = (LL^T)^{-1} \]</span></p>
+<p><span class="math display">\[ = L^{-T}L^{-1} \]</span></p>
+<p>Bunu temel alarak iki taraftan <span class="math inline">\(y\)</span>'leri geri koyalım,</p>
+<p><span class="math display">\[ y^T\Sigma^{-1}y= y^TL^{-T}L^{-1}y \]</span></p>
+<p>Bilindiği gibi lineer cebirde istediğimiz yere parantez koyabiliriz,</p>
+<p><span class="math display">\[ = (y^TL^{-T})L^{-1}y \]</span></p>
+<p>Parantezden bir şeyin devriği gibi temsil edersek, parantez içindekilerin sırası değişir ve tek tek devriği alınır,</p>
+<p><span class="math display">\[ = (L^{-1}y)^TL^{-1}y \]</span></p>
+<p><span class="math display">\[  = |L^{-1}y|^2 \]</span></p>
+<p>Üstteki ifadede <span class="math inline">\(|\cdot|\)</span> içindeki kısım <span class="math inline">\(Ax=b\)</span> durumundaki <span class="math inline">\(x\)</span>'in en az kareler çözümü olan <span class="math inline">\(A^{-1}b\)</span>'ye benzemiyor mu? Evet. Gerçi <span class="math inline">\(n \times n\)</span> boyutunda bir matris olduğu için elimizde &quot;bilinmeyenden fazla denklem'' yok, yani bu sistem artık belirtilmiş (overdetermined) değil, yani en az kareler değil direk lineer sistem çözümü yapıyoruz. Bu durumda her standart lineer cebir kütüphanesinde mevcut bir çağrı kullanacağız, mesela <code>solve_triangular</code> (ve lower -alt- doğru seçeneğini kullanacağız), ki bu çağrı özellikle alt üçgensel matris üzerinden çözüm yapmaktadır, çünkü <span class="math inline">\(L\)</span> alt-üçgensel olduğu için çözüm geriye değer koymak (back substitution) ile anında bulunabilir. Geriye değer koymayı hatırlarsak, mesela</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cc}
+2 &amp; 0 \\
+3 &amp; 4
+\end{array}\right]
+\left[\begin{array}{c}
+x_1\\
+x_2
+\end{array}\right]
+= 
+\left[\begin{array}{c}
+6\\
+8
+\end{array}\right]
+ \]</span></p>
+<p>En üst satırda her zaman tek bir bilinmeyen olacak, çünkü matris alt üçgensel, en üst satır her zaman en boş satırdır. Bu tek bir eşitlik demektir, yani <span class="math inline">\(2x_1 = 6\)</span>, ki <span class="math inline">\(x_1 = 3\)</span>. Bunu alıp bir sonraki satıra gideriz, artık <span class="math inline">\(x_1\)</span>'i biliyoruz, sonraki satırda sadece <span class="math inline">\(x_2\)</span> bilinmeyen kalıyor, <span class="math inline">\(3\cdot x_1 + 4 \cdot x_2 = 8\)</span>, yani <span class="math inline">\(x_2 = -1/4\)</span>. Sonuca ulaştık. Daha fazla boyut olsaydı durum değişmezdi, aynı işlem daha fazla tekrarlanırdı. Bu arada bu türden bir çözümün ne kadar hızlı olacağını belirtmemize gerek yok herhalde.</p>
+<p>Demek ki <span class="math inline">\(y^T\Sigma^{-1}y\)</span> hesabı için önce <span class="math inline">\(\Sigma\)</span> üzerinde Cholesky alıyoruz, sonra <span class="math inline">\(L^{-1}y\)</span> çözdürüyoruz. Elde edilen değerin noktasal çarpımını alınca <span class="math inline">\(\Sigma\)</span>'nin tersini elde etmiş olacağız.</p>
+<p>Örnek (önce uzun yoldan),</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+Sigma <span class="op">=</span> np.array([[<span class="fl">10.</span>, <span class="fl">2.</span>],[<span class="fl">2.</span>, <span class="fl">5.</span>]])
+y <span class="op">=</span> np.array([[<span class="fl">1.</span>],[<span class="fl">2.</span>]])
+<span class="bu">print</span> np.dot(np.dot(y.T,lin.inv(Sigma)),y)</code></pre></div>
+<pre><code>[[ 0.80434783]]</code></pre>
+<p>Şimdi Cholesky ve <code>solve_triangular</code> üzerinden</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> slin
+L <span class="op">=</span> lin.cholesky(Sigma)
+x <span class="op">=</span> slin.solve_triangular(L,y,lower<span class="op">=</span><span class="va">True</span>)
+<span class="bu">print</span> np.dot(x.T,x)</code></pre></div>
+<pre><code>[[ 0.80434783]]</code></pre>
+<p>Aynı sonuca eriştik.</p>
+<p>Çok Boyutlu Gaussian'ı Parçalamak (Partitioning)</p>
+<p>Diyelim ki Normal bir vektör <span class="math inline">\(X\)</span>'i <span class="math inline">\(X = (X_1,X_2)\)</span> olarak parçaladık. Bunu Gaussian'a etkileri ne olur? Aynı şekilde <span class="math inline">\(\mu = (\mu_1,\mu_2)\)</span> olarak parçalayabiliriz. <span class="math inline">\(\Sigma\)</span> ise</p>
+<p><span class="math display">\[ \Sigma = 
+\left[\begin{array}{rr}
+\Sigma_{11} &amp; \Sigma_{12}\\
+\Sigma_{21} &amp; \Sigma_{22}
+\end{array}\right]
+\]</span></p>
+<p>olarak parçalanabilir. <span class="math inline">\(a,b\)</span>'nin parçalarının boyutları <span class="math inline">\(p,q\)</span> olsun, <span class="math inline">\(n = p+q\)</span>.</p>
+<p>Şimdi birleşik Gaussian'ı</p>
+<p><span class="math display">\[
+f(x;\mu,\Sigma) = 
+\frac{ 1}{(2\pi)^{(p+q)/2} \det(\Sigma)^{1/2}} 
+\exp 
+\bigg\{ 
+-\frac{ 1}{2}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]^T
+\left[\begin{array}{rr}
+\Sigma_{11} &amp; \Sigma_{12}\\
+\Sigma_{21} &amp; \Sigma_{22}
+\end{array}\right]^{-1}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]
+\bigg\}
+\]</span></p>
+<p>Birleşik yoğunluğu parçalar üzerinden belirtirsek, bu yoğunluğu <span class="math inline">\(X_2\)</span> için bileşen yoğunluğa ve <span class="math inline">\(X_1\)</span> için bir koşullu yoğunluğa ayırabiliriz. Yani</p>
+<p><span class="math display">\[ f(x_1,x_2) = f(x_1|x_2) f(x_2) \]</span></p>
+<p>tanımındaki parçaları elde etmeye çalışacağız. Ama bundan önce bölüntülenmiş matrislere yakından bakalım.</p>
+<p>Bir bölüntülenmiş (partitioned) matrisin tersini almak için, o matrisin parçalarının tersini almak doğru değildir, yani</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right] ^{-1} \ne
+\left[\begin{array}{rr}
+E^{-1} &amp; F ^{-1}\\
+G^{-1} &amp; H^{-1}
+\end{array}\right]  
+ \]</span></p>
+<p>Tersini alma işlemi için bazı numaralar lazım. Ana numara bölüntülenmiş matrisi köşegen bir matris haline getirmek, çünkü köşegen matrislerin tersi, köşegendeki elemanların tersidir, yani ters alma operasyonu bu tür matrislerin &quot;içine işler'', o yüzden bir şekilde bir köşegen matris elde etmeye uğraşacağız. Bunun için bölüntülenmiş matrisimizi sağdan ve soldan bazı matrislerle çarpacağız. Ayrıca şunu da bilelim,</p>
+<p><span class="math display">\[ XYZ = W \]</span></p>
+<p>durumunda <span class="math inline">\(Y\)</span>'nin tersini almak istersek, sağ ve soldaki <span class="math inline">\(X,Z\)</span> matrislerinin tersini almak gerekmez, niye?</p>
+<p><span class="math display">\[ X^{-1}XYZ = X^{-1}W \]</span></p>
+<p><span class="math display">\[ YZZ^{-1} = X^{-1}WZ^{-1} \]</span></p>
+<p><span class="math display">\[ Y = X^{-1}WZ^{-1} \]</span></p>
+<p>Şimdi iki tarafın da tersini alalım,</p>
+<p><span class="math display">\[ Y^{-1} = ZW^{-1}X \]</span></p>
+<p>Tamam, başlayalım.</p>
+<p><span class="math display">\[ M = 
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right] 
+ \]</span></p>
+<p>matrisini köşegen yapacağız. Eğer sadece alt sol köşeyi sıfırlayasaydık, bunu yapacak özel bir matrisle soldan çarpardık,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+I &amp; -FH^{-1} \\
+0 &amp; I
+\end{array}\right] 
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right] = 
+\left[\begin{array}{rr}
+E &amp; F \\
+0 &amp; H
+\end{array}\right] 
+ \]</span></p>
+<p>Sadece üst sağ köşeyi sıfırlamak isteseydik, sağdan çarpardık</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right] 
+\left[\begin{array}{rr}
+I &amp; 0 \\
+-H^{-1}G &amp; I
+\end{array}\right] 
+=
+\left[\begin{array}{rr}
+E &amp; 0 \\
+G &amp; H
+\end{array}\right] 
+ \]</span></p>
+<p>Hepsini biraraya koyalım,</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+I &amp; -FH^{-1} \\
+0 &amp; I
+\end{array}\right] 
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right] 
+\left[\begin{array}{rr}
+I &amp; 0 \\
+-H^{-1}G &amp; I
+\end{array}\right] 
+= 
+\left[\begin{array}{rr}
+E-FH^{-1}G &amp; 0 \\
+0 &amp; H
+\end{array}\right] 
+\qquad (2)
+ \]</span></p>
+<p>Bu çarpımın doğruluğu çarpım elle yapılarak kontrol edilebilir.</p>
+<p>Üstte gördüğümüz gibi</p>
+<p><span class="math display">\[ XYZ = W \]</span></p>
+<p>ifadesindeki <span class="math inline">\(Y\)</span>'nin tersi</p>
+<p><span class="math display">\[ Y^{-1} = ZW^{-1}X \]</span></p>
+<p>ile olur.</p>
+<p><span class="math display">\[ 
+\underbrace{
+\left[\begin{array}{rr}
+I &amp; -FH^{-1} \\
+0 &amp; I
+\end{array}\right] 
+}_{X}
+\underbrace{
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right] 
+}_{Y}
+\underbrace{
+\left[\begin{array}{rr}
+I &amp; 0 \\
+-H^{-1}G &amp; I
+\end{array}\right] 
+}_{Z}
+= 
+\underbrace{
+\left[\begin{array}{rr}
+E-FH^{-1}G &amp; 0 \\
+0 &amp; H
+\end{array}\right] 
+}_{W}
+ \]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right]^{-1}
+=
+\left[\begin{array}{rr}
+I &amp; 0 \\
+-H^{-1}G &amp; I
+\end{array}\right] 
+\left[\begin{array}{rr}
+E-FH^{-1}G &amp; 0 \\
+0 &amp; H
+\end{array}\right]^{-1}
+\left[\begin{array}{rr}
+I &amp; -FH^{-1} \\
+0 &amp; I
+\end{array}\right] 
+ \]</span></p>
+<p>Daha kısa olması eşitliğin sağ tarafında, ortadaki matris için <span class="math inline">\(E-FH^{-1}G\)</span> yerine <span class="math inline">\(M/H\)</span> kullanalım (bu arada <span class="math inline">\(M/H\)</span> lineer cebirde &quot;<span class="math inline">\(M\)</span>'in <span class="math inline">\(H\)</span>'e göre Schur tamamlayıcısı (complement)'' olarak bilinir),</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+E &amp; F \\
+G &amp; H
+\end{array}\right]^{-1}
+=
+\left[\begin{array}{rr}
+I &amp; 0 \\
+-H^{-1}G &amp; I
+\end{array}\right] 
+\left[\begin{array}{rr}
+(M/H)^{-1} &amp; 0 \\
+0 &amp; H^{-1}
+\end{array}\right]
+\left[\begin{array}{rr}
+I &amp; -FH^{-1} \\
+0 &amp; I
+\end{array}\right] 
+\qquad (3)
+ \]</span></p>
+<p>Eşitliğin sağ tarafındaki çarpımı gerçekleştirirsek,</p>
+<p><span class="math display">\[ =
+\left[\begin{array}{rr}
+(M/H)^{-1} &amp; -(M/H)^{-1}FH^{-1} \\
+-H^{-1}G(M/H)^{-1} &amp; H^{-1}+H^{-1}G(M/H)^{-1}FH^{-1} 
+\end{array}\right]
+ \]</span></p>
+<p>Bu final ifade bölüntülenmiş bir matrisin tersini o matrisin içindeki parçalar üzerinden temsil eden bir ifadedir.</p>
+<p>İçinde bir köşesi sıfır olan bölüntülenmiş matrislerde determinantlar şöyle işler,</p>
+<p><span class="math display">\[ 
+\det \bigg(
+\left[\begin{array}{rr}
+E &amp; 0 \\
+G &amp; H
+\end{array}\right]
+\bigg) 
+= 
+\det \bigg(
+\left[\begin{array}{rr}
+E &amp; F \\
+0 &amp; H
+\end{array}\right] 
+\bigg) =
+\det(E)\det(H)
+ \]</span></p>
+<p>Ayrıca</p>
+<p><span class="math display">\[ \det(AB) = \det(A)\det(B) \]</span></p>
+<p>O zaman (2)'nin determinantını alırsak, <span class="math inline">\(\det\)</span> yerine <span class="math inline">\(||\)</span> kullandık,</p>
+<p><span class="math display">\[ |M| = |M/H||H| 
+\qquad (4)
+\]</span></p>
+<p>Bu ifade gayet doğal duruyor (bir raslantı herhalde, ya da Schur tamamlayıcısı işareti özellikle böyle seçilmiş),</p>
+<p>Bölüntülenmiş bir matrisin devriğini almak için her bloğunun ayrı ayrı devriği alınır, ve tüm blokların yanı bölüntülenmiş tamamının bir daha devriği alınır, yani</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{rr}
+A &amp; B \\ C &amp; D 
+\end{array}\right]^T = 
+\left[\begin{array}{rr}
+A^T &amp; C^T \\ B^T &amp; D^T
+\end{array}\right]
+ \]</span></p>
+<p>Şimdi çok değişkenli Normal için bileşen ve koşullu yoğunluk hesaplarına gelelim. Gaussian formülünün <span class="math inline">\(\exp\)</span> kısmını alırsak,</p>
+<p><span class="math display">\[ \exp 
+\bigg\{ 
+-\frac{ 1}{2}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]^T
+\left[\begin{array}{rr}
+\Sigma_{11} &amp; \Sigma_{12}\\
+\Sigma_{21} &amp; \Sigma_{22}
+\end{array}\right]^{-1}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]
+\bigg\}
+\]</span></p>
+<p>(3)'teki açılımı kullanırsak, ve <span class="math inline">\(E = \Sigma_{11},F=\Sigma_{12},..\)</span> olacak şekilde,</p>
+<p><span class="math display">\[
+\exp 
+\bigg\{ 
+-\frac{ 1}{2}
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]^T
+\left[\begin{array}{rr}
+I &amp; 0 \\ 
+-\Sigma_{22}^{-1}\Sigma_{21} &amp; I
+\end{array}\right]
+\left[\begin{array}{rr}
+(\Sigma/\Sigma_{22}) &amp; 0 \\ 
+0 &amp; \Sigma_{22}^{-1} 
+\end{array}\right]
+\left[\begin{array}{rr}
+I &amp; -\Sigma_{12}\Sigma_{22}^{-1}  \\ 
+0 &amp; I
+\end{array}\right]
+\left[\begin{array}{r}
+x_1 - \mu_1\\
+x_2 - \mu_2
+\end{array}\right]
+\bigg\}
+\]</span></p>
+<p>Açılımı tamamen yaparsak,</p>
+<p><span class="math display">\[ 
+ \begin{array}{lll}
+= &amp;&amp; \exp \bigg\{
+-\frac{1 }{2} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))^T 
+(\Sigma/\Sigma_{22})^{-1} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))
+\bigg\} \cdot \\
+&amp;&amp; \exp \bigg\{
+1\frac{ 1}{2}(x_2-\mu_2)^T\Sigma_{22}^{-1} (x_2-\mu_2)
+ \bigg\}
+\end{array}
+\]</span></p>
+<p>Not: <span class="math inline">\(\Sigma_{12}^T = \Sigma_{21}\)</span>. Üstte birinci <span class="math inline">\(\exp\)</span> içinde sol bölümde devriğin içindeki ifadelerden, mesela <span class="math inline">\(x_1^T,\mu_1^T\)</span>'den ve <span class="math inline">\(\Sigma_{21}\)</span>'li ifadeden devrik işlemini çekip, büyük paranteze alınınca bu değişim oldu.</p>
+<p>Şimdi mesela 1. <span class="math inline">\(\exp\)</span>'ye dikkat edersek, ortada <span class="math inline">\((\Sigma/\Sigma_{22})^{-1}\)</span> var, ve bu ifadenin solunda ve sağında birbirinin devriği olan aynı terimler duruyor. İfadenin tamamı bir Normal dağılım. Aynı şey 2. <span class="math inline">\(\exp\)</span> için geçerli.</p>
+<p>İşin <span class="math inline">\(\exp\)</span> tarafını halletik. Şimdi <span class="math inline">\(\exp\)</span> öncesindeki kesiri (4) kullanarak parçalayalım,</p>
+<p><span class="math display">\[ 
+\frac{ 1}{(2\pi)^{(p+q)/2} \det(\Sigma)^{1/2}}  = 
+\frac{ 1}{(2\pi)^{(p+q)/2} \bigg(\det(\Sigma/\Sigma_{22})\det(\Sigma_{22})\bigg)^{1/2}} 
+\]</span></p>
+<p><span class="math display">\[ =
+\bigg( \frac{ 1}{(2\pi)^{p/2} \det(\Sigma/\Sigma_{22})^{1/2}} \bigg)
+\bigg( \frac{ 1}{(2\pi)^{q/2} \det(\Sigma_{22})^{1/2}} \bigg)
+\]</span></p>
+<p>Bu parçaların her birini ayrı bir <span class="math inline">\(\exp\)</span> önünde kullanabiliriz, ve ikinci <span class="math inline">\(\exp\)</span> ifadesinin</p>
+<p><span class="math display">\[ 
+\frac{ 1}{(2\pi)^{q/2} \det(\Sigma_{22})^{1/2}}
+\exp \bigg\{
+\frac{ 1}{2}(x_2-\mu_2)^T\Sigma_{22}^{-1} (x_2-\mu_2)
+ \bigg\}
+\]</span></p>
+<p>olduğunu görüyoruz. Bu ifade <span class="math inline">\(f(x_2)\)</span> bileşen yoğunluğudur! O zaman geri kalanlar, yani diğer kesir ve birinci <span class="math inline">\(\exp\)</span> hep beraber <span class="math inline">\(f(x_1|x_2)\)</span> yoğunluğu olmalıdır. Yani,</p>
+<p><span class="math display">\[ 
+\frac{ 1}{(2\pi)^{p/2} \det(\Sigma/\Sigma_{22})^{1/2}} \cdot
+\]</span></p>
+<p><span class="math display">\[ 
+\exp \bigg\{
+-\frac{1 }{2} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))^T 
+(\Sigma/\Sigma_{22})^{-1} 
+(x_1 - \mu_1 - \Sigma_{12}\Sigma_{22}^{-1} (x_2 - \mu_2))
+\bigg\}
+\]</span></p>
+<p>Buradan genel bir kural çıkartabiliriz,</p>
+<ol style="list-style-type: decimal">
+<li><p><span class="math inline">\(X_2\)</span>'nin bileşen yoğunluğu <span class="math inline">\(X_2 \sim N(\mu_2, \Sigma_{22})\)</span></p></li>
+<li><p><span class="math inline">\(X_2 = x_2\)</span> olmak üzere <span class="math inline">\(X_1\)</span>'in koşullu dağılımı</p></li>
+</ol>
+<p><span class="math display">\[
+X_1 | X_2 = x_2 \sim 
+N\bigg(\mu_1 + \Sigma_{12}\Sigma_{22}^{-1} (x_2 -\mu_2) \ , \
+\Sigma/\Sigma_{22} \bigg)
+\]</span></p>
+<p><span class="math inline">\(\Sigma/\Sigma_{22}\)</span> nedir? Hatırlarsak, <span class="math inline">\(M/H = E-FH^{-1}G\)</span>, ve <span class="math inline">\(E = \Sigma_{11},F=\Sigma_{12},..\)</span> o zaman</p>
+<p><span class="math display">\[ \Sigma/\Sigma_{22} = \Sigma_{11}-\Sigma_{12} \Sigma_{22}^{-1} \Sigma_{21} \]</span></p>
+<p>Yani</p>
+<p><span class="math display">\[ X_1 | X_2 = x_2 \sim 
+N\bigg(\mu_1 + \Sigma_{12}\Sigma_{22}^{-1} (x_2 -\mu_2) \ , \
+\Sigma_{11}-\Sigma_{12} \Sigma_{22}^{-1} \Sigma_{21}
+\bigg)
+\]</span></p>
+<p>log-toplam-exp (log-sum-exp trick)</p>
+<p>Bu numaranın ilk kısmı nisbeten basit. Bazı yapay öğrenim algoritmaları için olasılık değerlerinin birbiriyle çarpılması gerekiyor, mesela</p>
+<p><span class="math display">\[ r = p_1 \cdot p_2 \dots p_n \]</span></p>
+<p>Olasılıklar 1'den küçük olduğu için 1'den küçük değerlerin çarpımı aşırı küçülebilir, ve küçüklüğün taşması (underflow) ortaya çıkabilir. Eğer çarpım yerine <span class="math inline">\(\log\)</span> alırsak, çarpımlar toplama dönüşür, sonra sonucu <span class="math inline">\(\exp\)</span> ile tersine çeviririz, ve <span class="math inline">\(\log\)</span>'u alınan değerler çok küçülmez, çarpma yernie toplama işlemi kullanıldığı için de nihai değer de küçüklüğe doğru taşmaz.</p>
+<p><span class="math display">\[ \log r = \log p_1 + \log p_2 + \dots + \log p_n \]</span></p>
+<p><span class="math display">\[ r = \exp(\log p_1 + \log p_2 + \dots + \log p_n )\]</span></p>
+<p>Bir diğer durum içinde <span class="math inline">\(exp\)</span> ifadesi taşıyan bir olasılık değerinin çok küçük değerler taşıyabilmesidir. Mesela çok değişkenli Gaussian karışımları için alttaki gibi bir hesap sürekli yapılır,</p>
+<p><span class="math display">\[ = \sum_i w_i
+\frac{ 1}{(2\pi)^{k/2} \det(\Sigma)^{1/2}} \exp 
+\bigg\{ 
+-\frac{ 1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)
+\bigg\}
+\]</span></p>
+<p>ki <span class="math inline">\(0 \le w_i \le 1\)</span> şeklinde bir ağırlık değeridir. Üstteki formülün çoğunlukla <span class="math inline">\(\log\)</span>'u alınır, ve, mesela bir örnek üzerinde görürsek (ve ağırlıkları bir kenara bırakırsak),</p>
+<p><span class="math display">\[ \log(e^{-1000} + e^{-1001}) \]</span></p>
+<p>gibi hesaplar olabilir. Üstteki değerler tamamen uyduruk denemez, uygulamalarda pek çok kez karşımıza çıkan değerler bunlar. Her neyse, eğer üstteki ifadeyi kodla hesaplarsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> np.log(np.exp(<span class="op">-</span><span class="dv">1000</span>) <span class="op">+</span> np.exp(<span class="op">-</span><span class="dv">1001</span>))</code></pre></div>
+<pre><code>-inf</code></pre>
+<p>Bu durumdan kurtulmak için bir numara şudur; <span class="math inline">\(\exp\)</span> ifadeleri arasında en büyük olanını dışarı çekeriz, ve <span class="math inline">\(\log\)</span>'lar çarpımı toplam yapar,</p>
+<p><span class="math display">\[ \log(e^{-1000}(e^{0} + e^{-1} ))\]</span></p>
+<p><span class="math display">\[ -1000 + \log(1 + e^{-1})\]</span></p>
+<p>Bunu hesaplarsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="dv">-1000</span> <span class="op">+</span> np.log(<span class="dv">1</span><span class="op">+</span>np.exp(<span class="op">-</span><span class="dv">1</span>))</code></pre></div>
+<pre><code>-999.686738312</code></pre>
+<p>Bu numaranın yaptığı nedir? Maksimumu dışarı çekerek en az bir değerin küçüklüğü taşmamasını garantilemiş oluyoruz. Ayrıca, bu şekilde, geri kalan terimlerde de aşırı ufalanlar terimler kalma şansı azalıyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Flannery, <em>Numerical Recipes, 3rd Edition</em></p>
+<p>[2] Tapaswi, <em>Log-Sum-Exp Trick</em>, <a href="http://makarandtapaswi.wordpress.com/2012/07/18/log-sum-exp-trick/" class="uri">http://makarandtapaswi.wordpress.com/2012/07/18/log-sum-exp-trick/</a></p>
+</body>
+</html>

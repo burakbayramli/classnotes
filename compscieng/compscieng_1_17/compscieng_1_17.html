@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-1.17">Ders 1.17</h1>
+<p>Sonlu Öğeler Metodu (Finite Elements Method)</p>
+<p>FEM yöntemiyle diferansiyel denklem çözerken önce denklemin zayıf formu elde edilir. Dikkat, bu formu daha sonlu öğeleri ortaya atmadan, matrislerden vs bahsetmeden yazmak gerekir. Başlangıç diferansiyel denklem ve onun belli şartlarda eşit olduğu (ama çözüm için faydalı olabilecek) başka bir formu ortaya çıkartmaktan bahsediyorum.</p>
+<p>Zayıf formu &quot;kuvvetli formdan'' çıkartıyoruz, kuvvetli form diferansiyel denkleminin ilk hali,</p>
+<p><span class="math display">\[
+- \frac{\mathrm{d}}{\mathrm{d} x} \left( c(x) \frac{\mathrm{d} u}{\mathrm{d} x} \right) = f(x)
+\]</span></p>
+<p>Zayıf forma geçmek için eşitliğin iki tarafını ona <span class="math inline">\(v\)</span> sembolü vereceğim bir &quot;test fonksiyonu'' ile çarpıyorum. Dikkat, <span class="math inline">\(u\)</span> çözüm, <span class="math inline">\(v\)</span> üstteki formülü &quot;test'' etmek için kullandığım herhangi bir fonksiyon.</p>
+<p><span class="math display">\[
+- \frac{\mathrm{d}}{\mathrm{d} x} \left( c(x) \frac{\mathrm{d} u}{\mathrm{d} x} \right) v(x) =
+f(x) v(x)
+\]</span></p>
+<p>Sonra üsttekini entegre ediyorum,</p>
+<p><span class="math display">\[
+\int_{0}^{1} - \frac{\mathrm{d}}{\mathrm{d} x} \left( c(x) \frac{\mathrm{d} u}{\mathrm{d} x} \right) v(x) \mathrm{d} x=
+\int_{0}^{1} f(x) v(x) \mathrm{d} x
+\]</span></p>
+<p>Böylece zayıf forma neredeyse erişmiş olduk. Not: herhangi bir <span class="math inline">\(v(x)\)</span> dedik ama orada bazı şartlar olabilir, ileride göreceğiz. Üstteki formül her <span class="math inline">\(v(x)\)</span> için doğru olmalıysa belki <span class="math inline">\(v(x)\)</span>'in bir alanda konsantre olmasını zorlayabilirdim, sonra başka bir <span class="math inline">\(v(x)\)</span> denerdim belki onun başka noktalara konsante olmasını sağlayabilirdim... Üsttekinden neler çıkartabilirim buradan diye düşünüyorum şu anda.. Fakat sundan eminim ki sol taraf sağ tarafa eşit olmalı. Bunu kullanarak bir sürü takla attıktan sonra bile güçlü forma dönebileceğimi biliyorum.</p>
+<p>Ama biz şu anda zayıf formu seviyoruz.. onu sevmeyi öğrenmemiz lazım, bize pek çok bazı ek yetenekler sağlayacak çünkü. Eşitliğin sol tarafında ek neler yapabilirim mesela? Sağ taraf tamam, orası kafama uygun.</p>
+<p>Sol tarafı daha iyi hale getirebilirim, parçalı entegral (integrate by parts) alarak.. Formülün sol tarafına sevmediğim bazı şeyler var, mesela <span class="math inline">\(u\)</span> üzerinde iki tane türev var, ama <span class="math inline">\(v\)</span> üzerinde hiç türev yok, tek başına orada duruyor. Ben simetri görmek istiyorum. Parçalı entegral nasıl yapılıyordu,</p>
+<p><span class="math display">\[ \int y \mathrm{d} z = y  z - \int z \mathrm{d} y \]</span></p>
+<p>değil mi? Bir şeyin türevi çarpı <span class="math inline">\(v\)</span> var, türevi <span class="math inline">\(v\)</span>'ye geçiriyoruz, eşitliğin sağ tarafı hala aynı,</p>
+<p><span class="math display">\[
+\int_{0}^{1} c(x) \frac{\mathrm{d} u}{\mathrm{d} x} \frac{\mathrm{d} v}{\mathrm{d} x} \mathrm{d} x =
+\int_{0}^{1} f(x) v(x) \mathrm{d} x
+\]</span></p>
+<p>Nihai zayıf form bu. Parçalı entegral açılırken</p>
+<p><span class="math display">\[
+- \left[ c(x) \frac{\mathrm{d} u}{\mathrm{d} x}  \right]_{0}^{1}
+\]</span></p>
+<p>ortaya çıkıyor, bu sıfır olup yokoluyor, çünkü serbest uçta <span class="math inline">\(c(x) \frac{\mathrm{d} u}{\mathrm{d} x}\)</span> sıfıra eşit. Sabit uçta ise <span class="math inline">\(u\)</span> sıfıra eşit, tabii o zaman <span class="math inline">\(v\)</span> de orada sıfıra eşit olmalı işte &quot;herhangi bir <span class="math inline">\(v\)</span>'' ibaresine bir sınırlama burada geliyor, sabit uçta <span class="math inline">\(v=0\)</span> olacak şekilde bir <span class="math inline">\(v\)</span> seçilmeli.</p>
+<p>Bu arada <span class="math inline">\(v\)</span>'yi <span class="math inline">\(u\)</span>'dan ufak sapmalar olarak görmek te faydalı.. Bu durumda sabit uçta sapma sıfır demiş oluyoruz.</p>
+<p>Dersin sonunda zayıf form nasıl kullanılır onu görelim. Galerkin'in fikri buydu, Galerkin sürekli bir problemi ayrıksal bir probleme çevirmenin yolunu bulmuştu. Bilinmeyen bir fonksiyon yerine bilinmeyen <span class="math inline">\(N\)</span> tane yeni fonksiyon ortaya çıkart, ki bu yeni fonksiyonlar <span class="math inline">\(KU = F\)</span> içinde kullanılabilsin ve çözülebilsin. <span class="math inline">\(KU=F\)</span>'e FEM ile erişmeye uğraşıyorum dikkat, FD ile değil.</p>
+<p>Galerkin dedi ki <span class="math inline">\(N\)</span> tane deneme fonksiyonları <span class="math inline">\(\phi_1,...,\phi_N\)</span> olsun. Bu fonksiyonların ne olduğunu biz seçeceğiz, uygulamalı matematikte bu çok olur, bir fonksiyon seçersiniz, iyi seçerseniz her şey iyi işler, kötüyse işlemez. Neyse iyi, temel olanlardan seçtik diyelim, onların bir kombinasyonu üzerinden <span class="math inline">\(u\)</span>'yu yaklaşık şekilde temsil edebiliyoruz,</p>
+<p><span class="math display">\[
+U \approx U_1 \phi_1(x) + ... + U_N \phi_N(x)
+\]</span></p>
+<p><span class="math inline">\(\phi_1,...,\phi_N\)</span> fonksiyon, <span class="math inline">\(U_1,..,U_N\)</span> tek sayı, onları ağırlık değerleri. Şu anda bilinmeyen <span class="math inline">\(U_i\)</span> katsayıları üzerinden optimal bir <span class="math inline">\(\phi_i\)</span> kombinasyonu bulacağım ki bu olabileceği kadar <span class="math inline">\(u\)</span>'ya yakın olacak. Fakat <span class="math inline">\(N\)</span> tane bilinmeyen katsayı var burada, o zaman bana <span class="math inline">\(N\)</span> tane denklem lazım. İşte <span class="math inline">\(N\)</span> tane test fonksiyonu <span class="math inline">\(V_1,...,V_N\)</span> üzerinden zayıf formu <span class="math inline">\(N\)</span> kere kullanarak bu denklemleri üretebilirim. Her <span class="math inline">\(V_i\)</span> bana yeni bir denklem verir, <span class="math inline">\(N\)</span> tane bilinmeyenim var, bu bana bir kare matris verir, bir lineer sistem olur, <span class="math inline">\(KU = F\)</span>'e böylece erişirim.</p>
+<p>Fakat aslında bu fikir FEM'den 100 sene daha yaşlı. FEM'in katkısı deneme ve test fonksiyonlarını belli bir şekilde seçmektir, kısaca basit polinom olarak. Aklımıza gelebilir Galerkin niye bunu yapmadı? Belki yapmıştır, fakat bugünün bilgisayar yazılımları bu yolun seçilmesini daha rahatlaştırdı muhakkak. Bugün biz FEM çözerken üç, beş değil binlerce baz fonksiyon kullanabiliyoruz.</p>
+</body>
+</html>

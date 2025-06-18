@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="huffman-kodlamasi-ile-veri-sıkıştırma-compression">Huffman Kodlamasi ile Veri Sıkıştırma (Compression)</h1>
+<p>[1, sf. 159]</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> heapq <span class="im">import</span> heapify, heappush, heappop
+<span class="im">from</span> itertools <span class="im">import</span> count
+<span class="kw">def</span> huffman(seq, frq):
+    num <span class="op">=</span> count()
+    trees <span class="op">=</span> <span class="bu">list</span>(<span class="bu">zip</span>(frq, num, seq))
+    heapify(trees)
+    <span class="cf">while</span> <span class="bu">len</span>(trees) <span class="op">&gt;</span> <span class="dv">1</span>:
+       fa, _, a <span class="op">=</span> heappop(trees)
+       fb, _, b <span class="op">=</span> heappop(trees)
+       n <span class="op">=</span> <span class="bu">next</span>(num)
+       heappush(trees, (fa<span class="op">+</span>fb, n, [a, b]))
+    <span class="cf">return</span> trees[<span class="dv">0</span>][<span class="op">-</span><span class="dv">1</span>]
+
+seq <span class="op">=</span> <span class="st">&quot;abcdefghi&quot;</span>
+frq <span class="op">=</span> [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">9</span>, <span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">15</span>, <span class="dv">16</span>, <span class="dv">20</span>]
+tree <span class="op">=</span> huffman(seq, frq)
+<span class="bu">print</span> tree</code></pre></div>
+<pre><code>[[&#39;i&#39;, [[&#39;a&#39;, &#39;b&#39;], &#39;e&#39;]], [[&#39;f&#39;, &#39;g&#39;], [[&#39;c&#39;, &#39;d&#39;], &#39;h&#39;]]]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> codes(tree, prefix<span class="op">=</span><span class="st">&quot;&quot;</span>):
+    <span class="cf">if</span> <span class="bu">len</span>(tree) <span class="op">==</span> <span class="dv">1</span>:
+        <span class="cf">yield</span> (tree, prefix)                    <span class="co"># A leaf with its code</span>
+        <span class="cf">return</span>
+    <span class="cf">for</span> bit, child <span class="kw">in</span> <span class="bu">zip</span>(<span class="st">&quot;01&quot;</span>, tree):          <span class="co"># Left (0) and right (1)</span>
+        <span class="cf">for</span> pair <span class="kw">in</span> codes(child, prefix <span class="op">+</span> bit): <span class="co"># Get codes recursively</span>
+            <span class="cf">yield</span> pair
+        
+<span class="bu">print</span> <span class="bu">list</span>(codes(tree))</code></pre></div>
+<pre><code>[(&#39;i&#39;, &#39;00&#39;), (&#39;a&#39;, &#39;0100&#39;), (&#39;b&#39;, &#39;0101&#39;), (&#39;e&#39;, &#39;011&#39;), (&#39;f&#39;, &#39;100&#39;), (&#39;g&#39;, &#39;101&#39;), (&#39;c&#39;, &#39;1100&#39;), (&#39;d&#39;, &#39;1101&#39;), (&#39;h&#39;, &#39;111&#39;)]</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Heatland, <em>Python Algorithms</em></p>
+</body>
+</html>

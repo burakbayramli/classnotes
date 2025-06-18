@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="birden-fazla-düz-çizgi-regresyonu-çizgi-karışım-modeli-line-mixture-model--lmm-">Birden Fazla Düz Çizgi Regresyonu, Çizgi Karışım Modeli (Line Mixture Model -LMM-)</h1>
+<p>Aynen veriye bir veya birden fazla boyutlu Gaussian karışımlarını uydurabildiğimiz gibi birden fazla çizgilerin karışımını da veriye uydurabiliriz. Alttaki veriye bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#lines = [[1,4,10,50],[-1,30,5,50],[4,10,20,40],[0.4,0,80,100]]</span>
+lines <span class="op">=</span> [[<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">10</span>,<span class="dv">50</span>],[<span class="op">-</span><span class="dv">1</span>,<span class="dv">30</span>,<span class="dv">5</span>,<span class="dv">50</span>],[<span class="dv">4</span>,<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">40</span>]]
+xs <span class="op">=</span> []<span class="op">;</span> ys <span class="op">=</span> []
+<span class="cf">for</span> a,b,x1,x2 <span class="kw">in</span> lines:
+    x <span class="op">=</span> np.linspace(x1,x2,<span class="dv">100</span>)
+    y <span class="op">=</span> a<span class="op">*</span>x <span class="op">+</span> b
+    y <span class="op">+=</span> np.random.randn(<span class="dv">100</span>)<span class="op">*</span><span class="dv">4</span>
+    xs.append(x)<span class="op">;</span> ys.append(y)
+xs <span class="op">=</span> np.array(xs).T.flatten()
+ys <span class="op">=</span> np.array(ys).T.flatten()
+plt.scatter(xs,ys)
+plt.hold(<span class="va">True</span>)
+plt.savefig(<span class="st">&#39;stat_lmm_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_lmm_01.png" />
+
+</div>
+<p>Model olarak düz çizgi kullanmaya karar verdikten sonra önemli soru şu: çizgileri nasıl modelleriz? Bize bir olasılıksal temsil yöntemi lazım ki böylece bir maksimum olurluk denklemi türetebilelim ve bu denklemi Beklenti-Maksimizasyon (Expectation-Maximization -EM-) ile çözelim.</p>
+<p>Bir fikir: her nokta üzerinde sanki bir tek boyutlu Gaussian varmış gibi düşünebiliriz, ve o noktada hatayı (negatif olurluk) ölçeriz, ki hata o noktada olduğu düşünülen bir çizginin gerçek veri noktasına olan <span class="math inline">\(y\)</span> eksenindeki uzaklığı olabilir. Böylece lineer regresyon tekniğini aslında çok çizgili olacak şekilde genişletmiş oluyoruz. Bu karışım modelin formu şöyle,</p>
+<p><span class="math display">\[ 
+L = \prod_{i=1}^{N} \sum_{k=1}^{K} \pi_k N(y_i; f_k(x_i),\sigma_k^2)
+\]</span></p>
+<p><span class="math display">\[ \log L = \sum_{i=1}^{N} \log \sum_{k=1}^{K} \pi_k 
+\frac{1}{\sqrt{2\pi\sigma_k^2}} \exp (-(y_i-f_k(x_i))^2 / 2\sigma_k^2)
+\]</span></p>
+<p>ki çizgi tanıdık gelecek formül,</p>
+<p><span class="math display">\[ f_k(x_i) = a_kx_i + b_k \]</span></p>
+<p><span class="math inline">\(Q\)</span> fonksiyonu,</p>
+<p><span class="math display">\[ 
+Q \propto \sum_{i=1}^{N} \sum_{k=1}^{K} 
+\bigg[ \log \pi_k - \frac{1}{2} \log (\sigma_k^2) - 
+\frac{(y_i - (a_kx_i + b_k))^2}{2 \sigma_k^2}
+\bigg]\eta_{ik}
+\]</span></p>
+<p><span class="math inline">\(\eta_{ik}\)</span>, <span class="math inline">\(i\)</span> noktasının <span class="math inline">\(k\)</span> çizgisine ait olma olasılığıdır.</p>
+<p>Türevleri alırsak,</p>
+<p><span class="math display">\[ 
+\frac{\partial Q}{\partial a_k} \propto
+\sum_{i=1}^{N} (y_i - a_kx_i - b_k)x_i\eta_{ik} = 0
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{\partial Q}{\partial b_k} \propto
+\sum_{i=1}^{N} (y_i - a_kx_i - b_k)\eta_{ik} = 0
+\]</span></p>
+<p><span class="math display">\[ 
+\frac{\partial 
+\bigg( Q + \lambda \big( \sum_{k=1}^{K}\pi_k  -1 \big)  \bigg)
+}{\partial \pi_k}  \propto
+\sum_{i=1}^{N} \frac{\eta_{ik}}{\pi_k} + \lambda = 0 \qquad
+\sum_{k=1}^{K} \pi_k = 1
+\]</span></p>
+<p>Tekrar düzenleyip parametreler için çözüm yaparsak,</p>
+<p><span class="math display">\[ 
+\hat{a}_k = \frac{\sum_{i=1}^{N} x_i (y_i-b_k) \eta_{ik}}
+{\sum_{i=1}^{N}x_i^2 \eta_{ik}}
+\]</span></p>
+<p><span class="math display">\[ 
+\hat{b}_k = \frac{\sum_{i=1}^{N} (y_i - a_kx_i) \eta_{ik}}
+{\sum_{i=1}^{N} \eta_{ik}}
+\]</span></p>
+<p><span class="math display">\[ 
+\hat{\sigma}^2_k = \frac{\sum_{i=1}^{N} (y_i - (a_kx_i+b_k))^2 \eta_{ik}}
+{\sum_{i=1}^{N}\eta_{ik}}
+\]</span></p>
+<p><span class="math display">\[ 
+\hat{\pi}_k = \frac{1}{N} \sum_{i=1}^{N} \eta_{ik}
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> em_line(x,y,n_components):
+    eta <span class="op">=</span> np.random.rand(<span class="bu">len</span>(x),n_components)
+    a <span class="op">=</span> np.random.rand(n_components) <span class="op">*</span> <span class="dv">10</span>
+    b <span class="op">=</span> np.random.rand(n_components) <span class="op">*</span> <span class="dv">10</span>
+    sigma2 <span class="op">=</span> np.random.rand(n_components) <span class="op">*</span> <span class="dv">10</span>
+    pi <span class="op">=</span> np.random.rand(n_components)
+
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>):
+        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_components):
+            <span class="co"># hats</span>
+            ahat <span class="op">=</span> np.<span class="bu">sum</span>(x<span class="op">*</span>(y<span class="op">-</span>b[k])<span class="op">*</span>eta[:,k]) <span class="op">/</span> np.<span class="bu">sum</span>(x<span class="op">**</span><span class="dv">2</span><span class="op">*</span>eta[:,k])
+            etasum <span class="op">=</span> np.<span class="bu">sum</span>(eta[:,k])
+            bhat <span class="op">=</span> np.<span class="bu">sum</span>((y<span class="op">-</span>a[k]<span class="op">*</span>x)<span class="op">*</span>eta[:,k]) <span class="op">/</span> etasum
+            sigma2hat <span class="op">=</span> np.<span class="bu">sum</span>(  (y <span class="op">-</span> (a[k]<span class="op">*</span>x<span class="op">+</span>b[k]))<span class="op">**</span><span class="dv">2</span>  <span class="op">*</span> eta[:,k] ) <span class="op">/</span> etasum 
+            pihat <span class="op">=</span> (<span class="fl">1.</span><span class="op">/</span><span class="bu">len</span>(x)) <span class="op">*</span> etasum
+            <span class="co">#print ahat, bhat, sigma2hat, pihat</span>
+            a[k] <span class="op">=</span> ahat
+            b[k] <span class="op">=</span> bhat
+            sigma2[k] <span class="op">=</span> sigma2hat
+            pi[k] <span class="op">=</span> pihat
+
+        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_components):
+            tmp1 <span class="op">=</span> <span class="fl">1.</span> <span class="op">/</span> np.sqrt(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>sigma2[k])
+            tmp2 <span class="op">=</span> (y<span class="op">-</span>(a[k]<span class="op">*</span>x<span class="op">+</span>b[k]))<span class="op">**</span><span class="dv">2</span>
+            eta[:,k] <span class="op">=</span> tmp1 <span class="op">*</span> np.exp(<span class="op">-</span>( tmp2 <span class="op">/</span> (<span class="dv">2</span><span class="op">*</span>sigma2[k]) ) )
+
+        eta <span class="op">=</span> eta <span class="op">/</span> eta.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)[:,<span class="va">None</span>]
+        
+    <span class="cf">return</span> a,b,eta
+
+a,b,eta <span class="op">=</span> em_line(xs,ys,n_components<span class="op">=</span><span class="dv">3</span>)
+<span class="bu">print</span> a
+<span class="bu">print</span> b
+
+plt.scatter(xs,ys)
+plt.hold(<span class="va">True</span>)
+<span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):
+    tmp <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">60</span>,<span class="dv">100</span>)
+    plt.plot(tmp,tmp<span class="op">*</span>a[k]<span class="op">+</span>b[k])
+    plt.hold(<span class="va">True</span>)
+plt.savefig(<span class="st">&#39;stat_lmm_02.png&#39;</span>)</code></pre></div>
+<pre><code>[-1.02632885  3.9704963   0.96107527]
+[ 30.43624091  11.21649921   5.18239643]</code></pre>
+<div class="figure">
+<img src="stat_lmm_02.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">labels <span class="op">=</span>  np.argmax(eta, axis<span class="op">=</span><span class="dv">1</span>)
+colors <span class="op">=</span> [<span class="st">&#39;r&#39;</span>,<span class="st">&#39;b&#39;</span>,<span class="st">&#39;g&#39;</span>,<span class="st">&#39;c&#39;</span>]
+<span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):    
+    plt.plot(xs[labels<span class="op">==</span>k],ys[labels<span class="op">==</span>k],<span class="st">&#39;.&#39;</span><span class="op">+</span>colors[k])
+    plt.hold(<span class="va">True</span>)    
+plt.savefig(<span class="st">&#39;stat_lmm_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_lmm_03.png" />
+
+</div>
+<p>Çözüm hiç fena değil.</p>
+<p>Yanlız bazı potansiyel eksiklerden bahsedelim; çizgiler tanım itibariyle sonsuzdan gelip sonsuza giden şeylerdir, yani uzunlukları temsil ettiği veri kümesini aşabilir, bu sebeple eğer onlara yakın başka kopuk ama yakınca başka bir veri kümesi var ise LMM o kümeyi de modellemeye uğraşacağı için temsiliyet bozulabilir. Eğer yanyana kopuk pek çok veri kümesi var ise belki Gaussian Karışım Modeli (GMM) daha iyi bir çözüm olabilir. GMM'lerin kovaryansları bir kontur bağlamda ince bir elips haline gelerek düz &quot;çizgimsi'' ama kopuk bir bölgeyi rahatça temsil edebilir.</p>
+<p>Kaynaklar</p>
+<p>[1] Traa, <em>Expectation Maximization - Math and Pictures</em>, <a href="http://cal.cs.illinois.edu/~johannes/research/EM%20derivations.pdf">http://cal.cs.illinois.edu/~johannes/research/EM%20derivations.pdf</a></p>
+</body>
+</html>

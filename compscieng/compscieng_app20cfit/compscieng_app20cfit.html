@@ -1,0 +1,942 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="eğri-uydurma-aradeğerleme-interpolation">Eğri Uydurma, Aradeğerleme (Interpolation)</h1>
+<p>Diyelim ki elimizde alttaki veri var.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.arange(<span class="dv">1</span>,<span class="dv">7</span>)
+y <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="fl">5.49</span>, <span class="fl">0.89</span>, <span class="fl">-0.14</span>, <span class="fl">-1.07</span>, <span class="fl">0.84</span>])
+plt.plot(x,y,<span class="st">&#39;.&#39;</span>)
+plt.ylim(<span class="op">-</span><span class="dv">2</span>,<span class="dv">12</span>)
+plt.xlim(<span class="dv">0</span>,<span class="dv">7</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_21_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_21_01.png" />
+
+</div>
+<p>Bu veriye istediğimiz kadar bükümü olan bir eğri nasıl uydururuz? &quot;İstediğimiz kadar bükümü olan eğri'' polinom çağrısı yapabilir.. Mesela bir polinom eğri,</p>
+<p><span class="math display">\[ y = c_1 x^3 + c_2x^2 + c_3x + c_4 \]</span></p>
+<p>olarak gösterilebilir. Mesela bazı gelişigüzel sabit değerler <span class="math inline">\(c_1=1,c_2-20,c_3=1,c_4=-4\)</span> sabitlerinden alttaki görüntü çıkar,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x2 <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">1000</span>)
+c_1 <span class="op">=</span> <span class="fl">2.</span><span class="op">;</span> c_2 <span class="op">=</span> <span class="fl">-20.</span><span class="op">;</span> c_3 <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span> c_4 <span class="op">=</span> <span class="dv">-4</span>
+y2 <span class="op">=</span> c_1<span class="op">*</span>x<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> c_2<span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> c_3<span class="op">*</span>x <span class="op">+</span> c_4
+plt.plot(x2,y2)
+plt.savefig(<span class="st">&#39;compscieng_1_21_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_21_02.png" />
+
+</div>
+<p>Eğri iki kere bükülebiliyor çünkü formül küpsel. Karesel olsa sadece bir kere bükülebilirdi. Peki karesel, ya da küpsel ya da daha üst derecedeki polinomları veriye nasıl uydururuz? Acaba lineer regresyonu bir şekilde kullanabilir miyiz? Ama lineer regresyon, adı üstünde, &quot;lineer'', yani doğrusal. Doğrusal olmayan bir şeyi nasıl uyduracağız? Şimdi lineer regresyonun neyi uydurduğunu hatırlayalım,</p>
+<p><span class="math display">\[ y = c_1 z_1 + c_2 z_2 + .. + c_nz_n \]</span></p>
+<p>Bu çok boyutlu, her biri birer vektör olan <span class="math inline">\(z_1,..,z_n\)</span> ile tek vektör <span class="math inline">\(y\)</span> ilişkisini girdi olarak alıyor (üstteki formülü ya vektörsel işlem olarak ya da <span class="math inline">\(y,z_i\)</span> öğelerinin teker teker formüle geçildiği şekilde görebiliriz).</p>
+<p>Acaba şöyle bir numara yapamaz mıyız? Eğer elimizdeki tek boyutlu veriyi alıp, onun tamamının bir kere karesini, bir kere küpünü, vs. ayrı ayrı alıp her sonucu sanki ayrı bir boyutlarmış gibi lineer regresyona verirsek, otomatik olarak eğri uydurmuş olmaz mıyız ?! Yani üstteki örnek için <span class="math inline">\(z_1=x^3,z_2=x^2,z_3=x,z_4=1\)</span> olacak, matris formunda,</p>
+<p><span class="math display">\[ A = 
+\left[\begin{array}{rrrr}
+x_1^3 &amp; x_1^2 &amp; x_1 &amp; 1 \\
+x_2^3 &amp; x_2^2 &amp; x_2 &amp; 1 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots \\
+x_m^3 &amp; x_m^2 &amp; x_m &amp; 1 
+\end{array}\right]
+ \]</span></p>
+<p>ki <span class="math inline">\(x_i\)</span>, <span class="math inline">\(x\)</span> vektörünün tek bir öğesini temsil ediyor. Gerisi bildiğimiz En Az Kareler yöntemi ile <span class="math inline">\(Ax=b\)</span>'yi, ya da üstteki notasyona göre <span class="math inline">\(Ac=y\)</span> çözmek, <span class="math inline">\((A^TA)^{-1}A^Tc\)</span> ile (tabii QR kullanmak daha iyi ama bu basit örnek için önemli değil). Baştaki örneği çözelim mesela</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+A <span class="op">=</span> np.array([x<span class="op">**</span><span class="dv">3</span>, x<span class="op">**</span><span class="dv">2</span>, x, np.ones(<span class="bu">len</span>(x))]).T
+res <span class="op">=</span> np.dot(np.dot(lin.pinv(np.dot(A.T,A)),A.T),y)
+<span class="bu">print</span> A, <span class="st">&#39;</span><span class="ch">\n\n</span><span class="st">&#39;</span>, res</code></pre></div>
+<pre><code>[[   1.    1.    1.    1.]
+ [   8.    4.    2.    1.]
+ [  27.    9.    3.    1.]
+ [  64.   16.    4.    1.]
+ [ 125.   25.    5.    1.]
+ [ 216.   36.    6.    1.]] 
+
+[  0.03925926   0.42313492  -6.5032672   16.12666667]</code></pre>
+<p>Kütüphane çağrısı <code>polyfit</code> kullanırsak,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> np.polyfit(x,y,<span class="dv">3</span>)</code></pre></div>
+<pre><code>[  0.03925926   0.42313492  -6.5032672   16.12666667]</code></pre>
+<p>Tıpatıp aynı sonuç çıktı, çünkü büyük bir ihtimalle <code>polyfit</code> aynı tekniği kullanıyor!</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(x,y,<span class="st">&#39;.&#39;</span>)
+plt.ylim(<span class="op">-</span><span class="dv">2</span>,<span class="dv">12</span>)
+plt.xlim(<span class="dv">0</span>,<span class="dv">7</span>)
+yy <span class="op">=</span> res[<span class="dv">0</span>]<span class="op">*</span>x<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> res[<span class="dv">1</span>]<span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> res[<span class="dv">2</span>]<span class="op">*</span>x <span class="op">+</span> res[<span class="dv">3</span>]
+plt.plot(x,y,<span class="st">&#39;.&#39;</span>)
+plt.hold(<span class="va">True</span>)
+plt.plot(x,yy)
+plt.savefig(<span class="st">&#39;compscieng_1_21_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_21_03.png" />
+
+</div>
+<p>Uyum fena değil! Not: eğri kesikli çıktı çünkü çok az sayıda veri var.</p>
+<p>Lagrange Aradeğerlemesi (Lagrange Interpolation)</p>
+<p>En eski ve en yaygın uygulaması olan aradeğerleme fonksiyonlarından biri JL Lagrange tarafından yayınlanmış olandır. Pratik faydalarının yaninda bu tekniğin önemli bazı teorik sonuçları var, bu sebeple yaklaşık ya da olmayan entegrasyon ve türev alma teknikleri fonksiyonun Lagrange aradeğerlemesi ile temsilini baz alıyor [1, sf. 268].</p>
+<p>Lagrange tekniğinin önemli bir özelliği yaklaşık temsil edilecek fonksiyondan seçilen değerler üzerinde, o noktalarda aynen verinin söylediği değerleri tekrar üretebilmesi. Yani eğer <span class="math inline">\(f(x)\)</span>'i bir <span class="math inline">\(f_h(x)\)</span> ile yaklaşık temsil etmişsek, ve eğer <span class="math inline">\(f(1) = 3\)</span> ise, aradeğerleme sonrası <span class="math inline">\(f_h(1) = 3\)</span> olacaktır, ve bu üzerinden aradeğerleme yapılmış tüm veri noktaları için doğru olacaktır. Ayrıca bir diğer özellik üzerinden aradeğerleme yapılan <span class="math inline">\(x\)</span> değerlerinin gelişigüzel seçilebilmesi, eşit aralıkta alınma gibi bir zorunluluk yok.</p>
+<p>Şimdi diyelim ki elde modellenen <span class="math inline">\(f(x)\)</span> için elde <span class="math inline">\(n\)</span> tane <span class="math inline">\(x_1,x_2,...,x_n\)</span> değeri var, ki</p>
+<p><span class="math display">\[
+f(x_i) = y_i, \qquad i=1,2,..,n
+\]</span></p>
+<p>Çözmek istediğimiz problem mümkün olan az derecede olan bir polinom <span class="math inline">\(P_m(x)\)</span> yaratmak öyle ki bu polinom eldeki <span class="math inline">\((x_i,y_i)\)</span> veri noktalarını temsil edebilsin, yani</p>
+<p><span class="math display">\[
+P_m(x_i) = y_i, \qquad i=1,2,..,n
+\]</span></p>
+<p>Burada <span class="math inline">\(m\)</span> altsembolü dereceyi göstermek için kullanılıyor.</p>
+<p>Daha önce söylediğimiz gibi veri noktalarında aradeğerleme ve veri aynı sonuçta olmalı.</p>
+<p>Bu amaçla <span class="math inline">\(n\)</span> tane ayrı ayrı polinom <span class="math inline">\(p_i(x)\)</span> yaratacağız, ve bu polinomlar öyle tasarlanacak ki <span class="math inline">\(x_i\)</span> noktasında biri aktif olacak, diğerleri yokolacak. Bu bize bir delta fonksiyonunu hatırlatabilir, bu doğru, şu sonucu istiyoruz,</p>
+<p><span class="math display">\[
+p_i(x_j) = \delta_{ij} = \left(
+\begin{array}{ll}
+1 &amp; \textrm{eğer } j = i  \\
+0 &amp; \textrm{eğer } j \ne i 
+\end{array} \right.
+\]</span></p>
+<p>ki <span class="math inline">\(\delta_{ij}\)</span> Kronecker delta fonksiyonu. Eger <span class="math inline">\(p_i(x)\)</span>'lerin <span class="math inline">\(j \ne i\)</span> olacak sekilde <span class="math inline">\(x_j\)</span> noktalarında yokolmasını istiyorsak, onu <span class="math inline">\((x-x_j)\)</span> faktörlerinin bir çarpımı olarak yazabiliriz,</p>
+<p><span class="math display">\[
+p_i(x) = C_i \prod_{j \ne i} (x-x_j)
+\]</span></p>
+<p>Sabit <span class="math inline">\(C_i\)</span> normalize edici bir değer. Üstteki çarpımda <span class="math inline">\((x-x_i)\)</span> yok, onu dışarıda bırakarak <span class="math inline">\(p_i\)</span> elde ettik. Bir faktör hep dışarıda olacağı için <span class="math inline">\(p_i(x)\)</span> polinomunun derecesi hep <span class="math inline">\((n-1)\)</span> olacaktır. Normalizasyon sabiti <span class="math inline">\(C_i\)</span> hesaplamak için <span class="math inline">\(p_i(x_i)=1\)</span> olduğunu hatırlayalım ve bu değeri elde etmek için <span class="math inline">\(C_i = 1 / \prod_{j \ne i} (x_i - x_j)\)</span> sabiti gerekecektir, o zaman</p>
+<p><span class="math display">\[
+p_i(x) = \frac
+{\prod_{j \ne i} (x - x_j)}
+{\prod_{j \ne i} (x_i - x_j)},
+\quad i=1,2,..,n
+\]</span></p>
+<p>Her <span class="math inline">\(p_i(x)\)</span> polinomu <span class="math inline">\(x_i\)</span> haricinde diğer her noktada yokolacağı için <span class="math inline">\(P_m\)</span> polinomu <span class="math inline">\(p_i(x)\)</span>'lerin bir lineer kombinasyonu, toplamı olarak temsil edilebilir,</p>
+<p><span class="math display">\[
+P_m(x) =  \sum_{i=1}^{n} p_i (x) y_i
+\]</span></p>
+<p>Bir <span class="math inline">\(x_j\)</span> için hesap ne diyor?</p>
+<p><span class="math display">\[
+P_m(x_j) = \sum_{i=1}^{n} p_i(x_j) y_i =  \sum_{i=1}^{n} \delta_{ij} y_i = y_j
+\]</span></p>
+<p>Doğru gözüküyor. Genel formda şunu yazabiliriz,</p>
+<p><span class="math display">\[
+P_m (x) = \sum_{i=1}^{n}
+\frac{\prod_{j \ne i} (x - x_j)}{\prod_{j \ne i} (x_i - x_j)}
+\]</span></p>
+<p>Eğer <span class="math inline">\(n=2\)</span> olsaydı, eldeki iki tane <span class="math inline">\((x_1,y_1)\)</span> ve <span class="math inline">\((x_2,y_2)\)</span> için</p>
+<p><span class="math display">\[
+P_1(x) =
+\frac{(x-x_2)}{(x_1-x_2)} y_1 +
+\frac{(x-x_1)}{(x_2-x_1)} y_2 
+\]</span></p>
+<p>Bu tabii ki iki noktadan geçen düz bir çizgiyi temsil ediyor.</p>
+<p>Eğer <span class="math inline">\(n=3\)</span> olsaydı, üç noktadan geçen bir parabol elde edilirdi,</p>
+<p><span class="math display">\[
+P_2(x) =
+\frac{(x-x_2)(x-x_3)}{(x_1-x_2)(x_1-x_3)} y_1 +
+\frac{(x-x_1)(x-x_3)}{(x_2-x_1)(x_2-x_3)} y_2 +
+\frac{(x-x_1)(x-x_2)}{(x_3-x_1)(x_3-x_2)} y_3
+\]</span></p>
+<p>Altta örnek olarak <span class="math inline">\(\sin(5x)\)</span>'ten alınmış 8 veri noktası ile aradeğerleme yapan bir örnek görüyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> Lagrange(x, y, n, xi):
+   yi <span class="op">=</span> <span class="fl">0e0</span>
+   <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,n<span class="op">+</span><span class="dv">1</span>):
+      p <span class="op">=</span> <span class="fl">1e0</span>
+      <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,n<span class="op">+</span><span class="dv">1</span>):
+          <span class="cf">if</span> (j <span class="op">!=</span> i): p <span class="op">*=</span> (xi <span class="op">-</span> x[j])<span class="op">/</span>(x[i] <span class="op">-</span> x[j])
+      yi <span class="op">+=</span> p <span class="op">*</span> y[i]
+
+   <span class="cf">return</span> yi
+
+n  <span class="op">=</span> <span class="dv">8</span>  
+ni <span class="op">=</span> <span class="dv">100</span>
+
+x <span class="op">=</span> [<span class="dv">0</span>]<span class="op">*</span>(n<span class="op">+</span><span class="dv">1</span>)                                                   
+y <span class="op">=</span> [<span class="dv">0</span>]<span class="op">*</span>(n<span class="op">+</span><span class="dv">1</span>)
+
+<span class="co"># f(x) = sin(5*x), x degerleri gelisiguzel secilmis </span>
+x[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">0.15</span><span class="op">;</span> x[<span class="dv">2</span>] <span class="op">=</span> <span class="fl">0.2</span><span class="op">;</span> x[<span class="dv">3</span>] <span class="op">=</span> <span class="fl">0.3</span><span class="op">;</span> x[<span class="dv">4</span>] <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span>
+x[<span class="dv">5</span>] <span class="op">=</span> <span class="fl">0.8</span> <span class="op">;</span> x[<span class="dv">6</span>] <span class="op">=</span> <span class="fl">1.1</span><span class="op">;</span> x[<span class="dv">7</span>] <span class="op">=</span> <span class="fl">1.4</span><span class="op">;</span> x[<span class="dv">8</span>] <span class="op">=</span> <span class="fl">1.7</span>
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,n<span class="op">+</span><span class="dv">1</span>): y[i] <span class="op">=</span> np.sin(<span class="dv">5</span><span class="op">*</span>x[i])
+
+xx <span class="op">=</span> []<span class="op">;</span> yy <span class="op">=</span> []<span class="op">;</span> real <span class="op">=</span> []
+<span class="co"># x[1] ile x[8] arasinda esit aralikli x&#39;ler yarat</span>
+<span class="co"># daha fazla nokta olsun</span>
+xis <span class="op">=</span> np.linspace(x[<span class="dv">1</span>],x[<span class="op">-</span><span class="dv">1</span>],ni)
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,ni<span class="op">+</span><span class="dv">1</span>):
+   xi <span class="op">=</span> xis[i<span class="dv">-1</span>]
+   yi <span class="op">=</span> Lagrange(x,y,n,xi)
+   xx.append(xi)
+   yy.append(yi)
+   real.append(np.sin(<span class="dv">5</span><span class="op">*</span>xi)<span class="op">+</span><span class="fl">0.02</span>)
+
+xx <span class="op">=</span> np.array(xx)
+yy <span class="op">=</span> np.array(yy)
+real <span class="op">=</span> np.array(real)
+
+plt.plot(xx,yy)
+plt.plot(x,y)
+plt.plot(xx,real,<span class="st">&#39;--&#39;</span>)
+plt.legend([<span class="st">&#39;Lagrange&#39;</span>,<span class="st">u&#39;Seçilen Noktalar&#39;</span>,<span class="st">&#39;Gerçek&#39;</span>])
+
+plt.savefig(<span class="st">&#39;compscieng_app20cfit1_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app20cfit1_01.png" />
+
+</div>
+<p>İlmikler (Knots)</p>
+<p>[4], [5], yazılarındaki konuları genişletelim. Bu yazılardan biliyoruz ki basit regresyon</p>
+<p><span class="math display">\[ y_i = \beta_0 + \beta_1 x_i + \epsilon_i\]</span></p>
+<p>denklemini temel alıyor, onu veriye uyduruyor. Bu uydurma için kullandığımız <span class="math inline">\(A,x,b\)</span> matrisleri, vektörleri var. Sihirli formülü biliyoruz,</p>
+<p><span class="math display">\[ \hat{y} = X(X^TX)^{-1}X^Ty \]</span></p>
+<p>Şimdi bu formüldeki <span class="math inline">\(X\)</span> içindeki değerleri farklı &quot;bazlar'' olarak görmek faydalı olacaktır. Tek değişkenli durumda mesela bu baz</p>
+<p><span class="math display">\[ X = 
+\left[\begin{array}{cc}
+1 &amp; x_1 \\ \vdots &amp; \vdots \\ 1 &amp; x_n
+\end{array}\right]
+\]</span></p>
+<p>Eğer karesel bir formülü uyduruyorsak, yani</p>
+<p><span class="math display">\[ y_i = \beta_0 + \beta_1x_i + \beta_2x_i^2 + \epsilon_i \]</span></p>
+<p>baz</p>
+<p><span class="math display">\[ X = 
+\left[\begin{array}{ccc}
+1 &amp; x_1 &amp; x_1^2\\ 
+\vdots &amp; \vdots &amp; \vdots \\
+1 &amp; x_n &amp; x_n^2
+\end{array}\right]
+\]</span></p>
+<p>olur. Bu bakış açısını yorumlamak zor değil, regresyonun temeli değişkenlerin katsayılarını bulmaktır, o zaman <span class="math inline">\(1,x,x^2\)</span> değişkenleri için de, ya da herhangi bir başka baz bulmak için aynı teknik kullanılabilir çünkü karesel, küpsel bazlar kullanıyor olsak bile bu değerleri önceden hesaplayıp matrise koyduğumuz için kullandığımız sihirli formül hala lineer bir problemi çözüyor. Hala değişkenler var, onlar bazı katsayılar ile çarpılıp toplanarak veriye uydurulacak, ve sihirli formül bu en optimal katsayıları bulacak.</p>
+<p>Baz fikri ile devam edelim, alttaki veriye bakalım (gösterilen çizgilerin daha bulunmamış olduğunu varsayalım),</p>
+<div class="figure">
+<img src="compscieng_app20_04.png" />
+
+</div>
+<p>Bu bir kırılmış değnek (broken stick) modeli, <span class="math inline">\(x=0.6\)</span> öncesinde belli bir eğimi olan bir düz çizgi var, sonrasında başka bir eğrisi olan bir düz çizgi var. Kırılma noktasını biliyoruz, ya da regresyonun hangi noktadan geçmesini istediğimizi, ilmik noktasını (knot) biliyoruz, bu durumda baz nedir?</p>
+<p><span class="math display">\[
+(x-0.6)_{+}
+\]</span></p>
+<p>fonksiyonudur. Tanımdaki altsimge + şunu ifade eder: herhangi bir sayı <span class="math inline">\(u\)</span> eğer pozitif ise <span class="math inline">\(u_{+} = u\)</span>'dur, eğer değil ise <span class="math inline">\(u_{+} = 0\)</span> değerine sahiptir. Bunun amaçlarımız için mükemmel bir baz fonksiyonu olacağını görebiliyoruz,</p>
+<p><span class="math display">\[y_i = \beta_0 + \beta_1x_i + \beta_{11}(x_i-0.6)_{+} + \epsilon_i \]</span></p>
+<p>Bu fonksiyonun <span class="math inline">\(0.6\)</span>'ya kadar belli bir eğimi olacak, fakat <span class="math inline">\(0.6\)</span> ardından bu eğime bir &quot;ek'' yapılmaya başlanacak, <span class="math inline">\(\beta_{11}\)</span> bu ekin ne kadar olacağını yakalayacak.</p>
+<p>O zaman sihirli formüle verilecek matris</p>
+<p><span class="math display">\[ 
+X = 
+\left[\begin{array}{ccc}
+1 &amp; x_1 &amp; (x_1 - 0.6)_{+} \\ 
+\vdots &amp; \vdots &amp; \vdots \\
+1 &amp; x_n &amp; (x_n - 0.6)_{+}
+\end{array}\right]
+\]</span></p>
+<p>Regresyon çözümü bize her baz için gerekli katsayıyı (kesiyi, eğimi) verecektir.</p>
+<p>Daha abartarak (!) bir sürü ilmik üzerinden bir sürü baz tanımlayabilirdik, o zaman ufak ufak pek çok düz çizgiyi veriye uydurmak mümkün olurdu, mesela</p>
+<p><span class="math display">\[ X = 
+\left[\begin{array}{cccccc}
+1 &amp; x_1 &amp; (x_1 - 0.5)_{+} &amp; (x_1 - 0.55)_{+} &amp; \dots &amp; (x_1 - 0.96)_{+}\\ 
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+1 &amp; x_1 &amp; (x_1 - 0.5)_{+} &amp; (x_1 - 0.55)_{+} &amp; \dots &amp; (x_1 - 0.96)_{+}
+\end{array}\right]
+\]</span></p>
+<div class="figure">
+<img src="compscieng_app20_05.png" />
+
+</div>
+<p>(Resimde ilmikler 400,500,.. gibi değerlerde, yani bazlar <span class="math inline">\((x_1-500)_{+}\)</span> şeklinde olurdu)</p>
+<p>Bilinen tek ilmik üzerinden en basit örneği görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf
+<span class="im">import</span> pandas <span class="im">as</span> pd
+
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../../tser/tser_chgpt/2inclines.csv&#39;</span>)
+reslin <span class="op">=</span> smf.ols(<span class="st">&#39;y ~ 1 + x + I((x-55)*(x&gt;55))&#39;</span>, data<span class="op">=</span>df).fit()
+<span class="bu">print</span> reslin.summary()</code></pre></div>
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       0.957
+Model:                            OLS   Adj. R-squared:                  0.956
+Method:                 Least Squares   F-statistic:                     1081.
+Date:                Thu, 12 Jan 2017   Prob (F-statistic):           4.96e-67
+Time:                        14:27:42   Log-Likelihood:                -243.44
+No. Observations:                 100   AIC:                             492.9
+Df Residuals:                      97   BIC:                             500.7
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+==========================================================================================
+                             coef    std err          t      P&gt;|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------------------
+Intercept                 15.7364      0.701     22.447      0.000        14.345    17.128
+x                          0.2956      0.019     15.422      0.000         0.258     0.334
+I((x - 55) * (x &gt; 55))     0.3530      0.040      8.926      0.000         0.275     0.432
+==============================================================================
+Omnibus:                       15.710   Durbin-Watson:                   2.312
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):                4.411
+Skew:                          -0.025   Prob(JB):                        0.110
+Kurtosis:                       1.972   Cond. No.                         148.
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">df.set_index(<span class="st">&#39;x&#39;</span>).y.plot()
+plt.savefig(<span class="st">&#39;compscieng_app20_07.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app20_07.png" />
+
+</div>
+<p>Bulunan katsayılar üstteki grafiğe uyuyor.</p>
+<p>İlmik Seçmek</p>
+<p>[6, sf. 65] bu tekniği bir adım ilerletiyor; eğer ilmik seçmek isteseydik ne yapardık? Bu durumda üstteki gibi pek çok mümkün bazı regresyona verirdik, ama bu sefer regülarizasyon üzerinden eğer ise yaramayanları cezalandırırsak, çok küçülen katsayılar bizim için önemsiz sayılacaktır ve katsayısı yüksek olanlar elde tutulabilir. Regularizasyon icin {}.</p>
+<p>[6]'in cezalandırma formülasyonu bize bir Ridge regresyonu veriyor. Alttaki veride denedik,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../../tser/tser_chgpt/cave.csv&#39;</span>)
+df.C.plot()
+plt.savefig(<span class="st">&#39;compscieng_app20_06.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app20_06.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> sm
+f <span class="op">=</span> <span class="st">&quot;C ~ 1 + Temp + I((Temp &gt; 10)*(Temp-10)) + I((Temp &gt; 15)*(Temp-15)) +&quot;</span> <span class="op">+</span> <span class="op">\</span>
+    <span class="co">&quot;I((Temp &gt; 20)*(Temp-20)) + I((Temp &gt; 25)*(Temp-25)) +&quot;</span> <span class="op">+</span> <span class="op">\</span>
+    <span class="co">&quot;I((Temp &gt; 30)*(Temp-30)) + I((Temp &gt; 35)*(Temp-35)) +&quot;</span> <span class="op">+</span> <span class="op">\</span>
+    <span class="co">&quot;I((Temp &gt; 40)*(Temp-40)) + I((Temp &gt; 45)*(Temp-45)) +&quot;</span> <span class="op">+</span> <span class="op">\</span>
+    <span class="co">&quot;I((Temp &gt; 50)*(Temp-50)) + I((Temp &gt; 55)*(Temp-55)) &quot;</span> 
+model <span class="op">=</span> sm.ols(formula<span class="op">=</span>f, data<span class="op">=</span>df).fit_regularized(L1_wt<span class="op">=</span><span class="fl">0.0</span>)
+<span class="bu">print</span> model.summary()</code></pre></div>
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      C   R-squared:                       0.962
+Model:                            OLS   Adj. R-squared:                  0.956
+Method:                 Least Squares   F-statistic:                     177.4
+Date:                Thu, 12 Jan 2017   Prob (F-statistic):           2.03e-50
+Time:                        13:13:45   Log-Likelihood:                -185.82
+No. Observations:                  90   AIC:                             395.6
+Df Residuals:                      78   BIC:                             425.6
+Df Model:                          11                                         
+Covariance Type:            nonrobust                                         
+================================================================================================
+                                   coef    std err          t      P&gt;|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------------------------
+Intercept                       31.8192      1.354     23.494      0.000        29.123    34.515
+Temp                             0.3800      0.204      1.863      0.066        -0.026     0.786
+I((Temp &gt; 10) * (Temp - 10))    -0.0764      0.497     -0.154      0.878        -1.065     0.912
+I((Temp &gt; 15) * (Temp - 15))    -0.0524      0.651     -0.081      0.936        -1.348     1.243
+I((Temp &gt; 20) * (Temp - 20))    -0.0027      0.673     -0.004      0.997        -1.342     1.337
+I((Temp &gt; 25) * (Temp - 25))    -0.1210      0.674     -0.179      0.858        -1.463     1.221
+I((Temp &gt; 30) * (Temp - 30))    -0.3380      0.674     -0.501      0.618        -1.681     1.005
+I((Temp &gt; 35) * (Temp - 35))    -0.0869      0.674     -0.129      0.898        -1.429     1.256
+I((Temp &gt; 40) * (Temp - 40))     0.1147      0.674      0.170      0.865        -1.227     1.457
+I((Temp &gt; 45) * (Temp - 45))     0.0320      0.670      0.048      0.962        -1.302     1.366
+I((Temp &gt; 50) * (Temp - 50))    -0.0149      0.598     -0.025      0.980        -1.205     1.176
+I((Temp &gt; 55) * (Temp - 55))    -0.6336      0.295     -2.144      0.035        -1.222    -0.045
+==============================================================================
+Omnibus:                        7.572   Durbin-Watson:                   1.924
+Prob(Omnibus):                  0.023   Jarque-Bera (JB):                7.180
+Skew:                          -0.575   Prob(JB):                       0.0276
+Kurtosis:                       3.770   Cond. No.                         691.
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+<p>İstatistiki modelleri irdelemek bilimden ziyada biraz sanattır, fakat üstteki sonuçlarda (Temp-30) katsayısının mutlak değerinin orta bölgedeki diğerlerine göre daha yüksek olduğunu görüyoruz. Grafiğe bakılınca bu mantıklı gözüküyor.</p>
+<p>Alternatif İlmik İfadeleri</p>
+<p>Bazen sayısal hesaplarda üstte gördüğümüz <span class="math inline">\(u_{+}\)</span> ifadesinin <span class="math inline">\(\max(0,x-a)\)</span> ile formülize edildiğini görüyoruz. Yani,</p>
+<p><span class="math display">\[
+y = \beta_0 + \beta_1 x + \beta_{2}(x-a)_{+} +  \beta_{3}(x-b)_{+} + ...
+\]</span></p>
+<p>yerine</p>
+<p><span class="math display">\[
+y = \beta_0 + \beta_1 x + \beta_{2}\max(0,x-a) +  \beta_{3}\max(0,x-b) + ...
+\]</span></p>
+<p>ki <span class="math inline">\(a,b\)</span> ilmik noktaları. Bu kullanım da aynı sonuç veriyor, düşünürsek <span class="math inline">\(\max\)</span> ifadesi <span class="math inline">\(x\)</span> değeri <span class="math inline">\(a\)</span> değerini geçinceye kadar 0, ondan sonra <span class="math inline">\(x-a\)</span> verecek, bu da <span class="math inline">\(u_{+}\)</span> gibi bir kullanım ile aynı.</p>
+<p>Mesela</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">a,b,c,d <span class="op">=</span> (<span class="dv">1</span>, <span class="fl">-1.4</span>, <span class="dv">2</span>, <span class="fl">2.5</span>)
+x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,<span class="dv">100</span>)
+knots <span class="op">=</span> [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]
+<span class="kw">def</span> f(x):
+    <span class="cf">return</span> a <span class="op">+</span> <span class="op">\</span>
+           b<span class="op">*</span>np.<span class="bu">max</span>([<span class="dv">0</span>,x<span class="op">-</span>knots[<span class="dv">0</span>]]) <span class="op">+</span> <span class="op">\</span>
+           c<span class="op">*</span>np.<span class="bu">max</span>([<span class="dv">0</span>,x<span class="op">-</span>knots[<span class="dv">1</span>]]) <span class="op">+</span> <span class="op">\</span>
+           d<span class="op">*</span>np.<span class="bu">max</span>([<span class="dv">0</span>,x<span class="op">-</span>knots[<span class="dv">2</span>]])
+       
+    
+y <span class="op">=</span> np.array([f(xx) <span class="cf">for</span> xx <span class="kw">in</span> x])
+plt.plot(x,y,<span class="st">&#39;.&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app20_10.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app20_10.png" />
+
+</div>
+<p>Rasgele bazı ağırlıklarla <span class="math inline">\(x=2,3,4\)</span> noktalarında aktif olan ilmiklerle üstteki grafiği çıkarttık. Regresyon bağlamında bir optimizasyon rutinine (illa lineer regresyon olması gerekmez) veriye bakarak bir hatanın minimize edilmesi üzerinden en optimal <span class="math inline">\(a,b,c,d\)</span> ağırlıklarını buldurmak ta mümkündür.</p>
+<p>Peki <span class="math inline">\(\max\)</span> yerine baska bir fonksiyon kullanabilir miydik? <span class="math inline">\(\max\)</span>'in sonucta yaptigi belli bir esik degerinden once 0 sonrasinda baska bir deger vermek degil midir? Evet. Bu tur bir &quot;karar'' fonksiyonu sigmoid ile de elde edilebilir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">alpha <span class="op">=</span> <span class="fl">5.0</span>
+<span class="kw">def</span> sig(x,a):
+   <span class="cf">return</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>np.exp(<span class="op">-</span>alpha<span class="op">*</span>(x<span class="op">-</span>a)))
+x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">100</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">y <span class="op">=</span> sig(x,<span class="dv">0</span>)
+plt.plot(x,y)
+plt.savefig(<span class="st">&#39;compscieng_app20_11.png&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">y <span class="op">=</span> sig(x,<span class="dv">3</span>)
+plt.plot(x,y)
+plt.savefig(<span class="st">&#39;compscieng_app20_12.png&#39;</span>)</code></pre></div>
+<p><img src="compscieng_app20_11.png" /> <img src="compscieng_app20_12.png" /></p>
+<p>Normal sigmoid üst soldaki, fakat <span class="math inline">\(x-a\)</span> ile onu da istediğimiz noktaya kaydırabiliyoruz. <span class="math inline">\(\alpha\)</span> parametresi 0'dan 1'e geçişin ne kadar sert olduğunu kontrol ediyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">rho <span class="op">=</span> <span class="fl">7.0</span>
+<span class="kw">def</span> sig2(x,a):
+   <span class="cf">return</span> (x<span class="op">-</span>a)<span class="op">*</span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>np.exp(<span class="op">-</span>rho<span class="op">*</span>(x<span class="op">-</span>a)))
+
+a,b,c,d <span class="op">=</span> (<span class="dv">1</span>, <span class="fl">-1.4</span>, <span class="dv">2</span>, <span class="fl">2.5</span>)
+x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,<span class="dv">100</span>)
+knots <span class="op">=</span> [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]
+<span class="kw">def</span> f(x):
+    <span class="cf">return</span> a <span class="op">+</span> <span class="op">\</span>
+           b<span class="op">*</span>sig2(x,knots[<span class="dv">0</span>]) <span class="op">+</span> <span class="op">\</span>
+           c<span class="op">*</span>sig2(x,knots[<span class="dv">1</span>]) <span class="op">+</span> <span class="op">\</span>
+           d<span class="op">*</span>sig2(x,knots[<span class="dv">2</span>])
+           
+y <span class="op">=</span> np.array([f(xx) <span class="cf">for</span> xx <span class="kw">in</span> x])
+plt.plot(x,y)
+plt.savefig(<span class="st">&#39;compscieng_app20_13.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app20_13.png" />
+
+</div>
+<p>Daha yumuşak, pürüzsüz bir fonksiyon elde etmiş olduk. Bu birleşik eğrinin türevini almak ta daha kolay olacaktır. Gerçi otomatik türev paketleri artık içinde <span class="math inline">\(\max\)</span> bile olan ifadelerin türevini alabiliyor, fakat üsttekinin sembolik türevi rahatça alınabilir, bu seçeneğin elde olması iyidir.</p>
+<p>Küpsel Spline Eğrileri (Cubic Splines)</p>
+<p>Baz seçerken elimizde pek çok seçenek var, mesela küpsel spline eğrileri uydurmak için</p>
+<p><span class="math display">\[ (1,x,x^2,x^3,(x-k_1)_{+}^3,(x-k_2)_{+}^3,(x-k_3)_{+}^3,.. )\]</span></p>
+<p>gibi bir baz kullanabiliriz, ilmikler <span class="math inline">\(k_1,..,k_K\)</span> olarak gider, genel olarak</p>
+<p><span class="math display">\[ f(x) = \beta_0 + \beta_1x + \beta_2 x^2 + \beta_3 x^3 + 
+\sum_{s=1}^{K} \beta_{3+s} (x-k_s)^3_{+}
+\]</span></p>
+<p>formülü verilir. Bu baza kırpılmış güç bazı (truncated power basis) ismi de veriliyor.</p>
+<p>Bir örnek üzerinde görelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfcube <span class="op">=</span> pd.read_csv(<span class="st">&#39;cube.csv&#39;</span>)
+df2 <span class="op">=</span> dfcube.set_index(<span class="st">&#39;x&#39;</span>)
+df2.y.plot()
+plt.savefig(<span class="st">&#39;compscieng_app20_09.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app20_09.png" />
+
+</div>
+<p>İlmik noktalarını seçelim, 8 ve 13 noktasında olsun,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> statsmodels.api <span class="im">as</span> sm
+
+dfcube <span class="op">=</span> pd.read_csv(<span class="st">&#39;cube.csv&#39;</span>)
+dfcube.loc[:,<span class="st">&#39;1&#39;</span>] <span class="op">=</span> <span class="fl">1.</span>
+dfcube.loc[:,<span class="st">&#39;x2&#39;</span>] <span class="op">=</span> dfcube.x<span class="op">**</span><span class="dv">2</span>
+dfcube.loc[:,<span class="st">&#39;x3&#39;</span>] <span class="op">=</span> dfcube.x<span class="op">**</span><span class="dv">3</span>
+k1 <span class="op">=</span> dfcube.x<span class="dv">-8</span><span class="op">;</span> dfcube.loc[k1<span class="op">&gt;</span><span class="dv">0</span>,<span class="st">&#39;k1&#39;</span>] <span class="op">=</span> k1<span class="op">**</span><span class="dv">3</span>
+k2 <span class="op">=</span> dfcube.x<span class="dv">-13</span><span class="op">;</span> dfcube.loc[k2<span class="op">&gt;</span><span class="dv">0</span>,<span class="st">&#39;k2&#39;</span>] <span class="op">=</span> k2<span class="op">**</span><span class="dv">3</span>
+dfcube <span class="op">=</span> dfcube.fillna(<span class="dv">0</span>)
+X <span class="op">=</span> dfcube[[<span class="st">&#39;1&#39;</span>,<span class="st">&#39;x&#39;</span>,<span class="st">&#39;x2&#39;</span>,<span class="st">&#39;x3&#39;</span>,<span class="st">&#39;k1&#39;</span>,<span class="st">&#39;k2&#39;</span>]]
+y <span class="op">=</span> dfcube.y
+f <span class="op">=</span> sm.OLS(y,X).fit()
+<span class="bu">print</span> f.params</code></pre></div>
+<pre><code>1     1.586781
+x     1.747705
+x2   -0.381304
+x3    0.030443
+k1   -0.092883
+k2    0.138559
+dtype: float64</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dfcube[<span class="st">&#39;yy&#39;</span>] <span class="op">=</span> f.params[<span class="dv">0</span>]<span class="op">*</span>dfcube[<span class="st">&#39;1&#39;</span>] <span class="op">+</span> f.params[<span class="dv">1</span>]<span class="op">*</span>dfcube.x <span class="op">+</span> <span class="op">\</span>
+               f.params[<span class="dv">2</span>]<span class="op">*</span>dfcube.x2 <span class="op">+</span> f.params[<span class="dv">3</span>]<span class="op">*</span>dfcube.x3 <span class="op">+</span> <span class="op">\</span>
+               f.params[<span class="dv">4</span>]<span class="op">*</span>dfcube.k1 <span class="op">+</span> f.params[<span class="dv">5</span>]<span class="op">*</span>dfcube.k2 
+dfcube[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> y
+df2 <span class="op">=</span> dfcube.set_index(<span class="st">&#39;x&#39;</span>)
+df2[[<span class="st">&#39;y&#39;</span>,<span class="st">&#39;yy&#39;</span>]].plot()
+plt.hold(<span class="va">True</span>)
+plt.axvline(x<span class="op">=</span><span class="dv">8</span>,color<span class="op">=</span><span class="st">&#39;c&#39;</span>)
+plt.hold(<span class="va">True</span>)
+plt.axvline(x<span class="op">=</span><span class="dv">13</span>,color<span class="op">=</span><span class="st">&#39;c&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app20_08.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_app20_08.png" />
+
+</div>
+<p>Kısıtlanmış Küpsel Spline Eğrileri (Restricted Cubic Splines)</p>
+<p>Üstteki metot iyi işliyor, fakat bazen başta ve sondaki parçaların eğri değil tam düz olması istenebiliyor, yani &quot;eteklerde'' düzleştirme amaçlanıyor. Bu özel formülasyon için bkz. [3, sf. 24]. Bu yaklaşımı baz alan kod [1]'in Python çevrimini altta veriyoruz. Metota verilen isim kısıtlanmış küpsel spline eğrileri, ya da doğal spline eğrileri (natural splines).</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+<span class="kw">def</span> rcs(x,y,knots):
+    n <span class="op">=</span> <span class="bu">len</span>(y)
+    k <span class="op">=</span> knots
+    X1 <span class="op">=</span> x
+    q <span class="op">=</span> <span class="bu">len</span>(k)<span class="op">-</span><span class="dv">1</span>
+    myX<span class="op">=</span>np.zeros((n,<span class="bu">len</span>(knots)<span class="op">-</span><span class="dv">2</span>))
+
+    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(q<span class="dv">-1</span>):
+        tmp1 <span class="op">=</span> (x<span class="op">-</span>k[j])<span class="op">**</span><span class="dv">3</span> <span class="op">*</span> (x<span class="op">&gt;</span>k[j])
+    tmp2 <span class="op">=</span> (x<span class="op">-</span>k[q<span class="dv">-1</span>])<span class="op">**</span><span class="dv">3</span> <span class="op">*</span> (x<span class="op">&gt;</span>k[q<span class="dv">-1</span>])<span class="op">*</span>(k[q]<span class="op">-</span>k[j])
+    XX<span class="op">=</span> tmp1<span class="op">-</span>tmp2<span class="op">/</span>(k[q]<span class="op">-</span>k[q<span class="dv">-1</span>])
+        tmp1 <span class="op">=</span> (x<span class="op">-</span>k[q])<span class="op">**</span><span class="dv">3</span> <span class="op">*</span> (x<span class="op">&gt;</span>k[q])
+        tmp2 <span class="op">=</span> (k[q<span class="dv">-1</span>]<span class="op">-</span>k[j])
+    XX <span class="op">=</span> XX<span class="op">+</span>tmp1<span class="op">*</span>tmp2<span class="op">/</span>(k[q]<span class="op">-</span>k[q<span class="dv">-1</span>])
+    myX[:,j]<span class="op">=</span>XX
+
+    X <span class="op">=</span> np.hstack( (np.ones((n,<span class="dv">1</span>)),np.reshape(X1,(n,<span class="dv">1</span>)),myX) )
+    bhat <span class="op">=</span> np.linalg.lstsq(X,y)[<span class="dv">0</span>]
+    bhatt <span class="op">=</span> np.zeros(<span class="bu">len</span>(knots)<span class="op">+</span><span class="dv">1</span>)
+    bhatt[<span class="bu">len</span>(bhat)] <span class="op">=</span> (bhat[<span class="dv">2</span>:]<span class="op">*</span>(k[<span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>]<span class="op">-</span>k[<span class="op">-</span><span class="dv">1</span>])).<span class="bu">sum</span>()
+    bhatt[<span class="bu">len</span>(bhat)] <span class="op">=</span> bhatt[<span class="bu">len</span>(bhat)] <span class="op">/</span> (k[<span class="op">-</span><span class="dv">1</span>]<span class="op">-</span>k[<span class="op">-</span><span class="dv">2</span>])
+    bhatt <span class="op">=</span> np.hstack([bhatt, <span class="dv">0</span>])    
+    bhatt[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> (bhat[<span class="dv">2</span>:]<span class="op">*</span>(k[<span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>]<span class="op">-</span>k[<span class="op">-</span><span class="dv">2</span>])).<span class="bu">sum</span>()
+    bhatt[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> bhatt[<span class="op">-</span><span class="dv">1</span>] <span class="op">/</span> (k[<span class="op">-</span><span class="dv">2</span>]<span class="op">-</span>k[<span class="op">-</span><span class="dv">1</span>])
+    bhat <span class="op">=</span> np.hstack((bhat, bhatt[<span class="op">-</span><span class="dv">2</span>:]))
+    <span class="cf">return</span> bhat
+
+<span class="kw">def</span> speval(x,coefs,knots):
+    tmp <span class="op">=</span> coefs[<span class="dv">0</span>] <span class="op">+</span> coefs[<span class="dv">1</span>]<span class="op">*</span>x 
+    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(knots)): 
+         tmp <span class="op">=</span> tmp <span class="op">+</span> coefs[k<span class="op">+</span><span class="dv">2</span>]<span class="op">*</span>((x<span class="op">-</span>knots[k])<span class="op">**</span><span class="dv">3</span>)<span class="op">*</span>(x<span class="op">&gt;</span>knots[k])
+    <span class="cf">return</span> tmp</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+x <span class="op">=</span> np.random.randn(<span class="dv">300</span>)<span class="op">*</span>np.sqrt(<span class="dv">2</span>)
+e <span class="op">=</span> np.random.randn(<span class="dv">300</span>)<span class="op">*</span>np.sqrt(<span class="fl">0.5</span>)
+y <span class="op">=</span> np.sin(x)<span class="op">+</span>e
+df <span class="op">=</span> pd.DataFrame([x,y]).T
+df.columns <span class="op">=</span> [<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>]
+df <span class="op">=</span> df.sort_index(by<span class="op">=</span><span class="st">&#39;x&#39;</span>)
+<span class="bu">print</span> df.head()
+knots<span class="op">=</span>np.array([<span class="op">-</span><span class="fl">5.5938</span>, <span class="fl">-3.7732</span>, <span class="fl">-1.9526</span>, <span class="fl">-0.1320</span>, <span class="fl">1.6886</span>, <span class="fl">3.5092</span>, <span class="fl">5.3298</span>])<span class="op">;</span>
+bhat <span class="op">=</span> rcs(df.x,df.y,knots)
+<span class="bu">print</span> bhat
+df[<span class="st">&#39;spline&#39;</span>] <span class="op">=</span> speval(df.x, bhat, knots)
+df2 <span class="op">=</span> df.set_index(<span class="st">&#39;x&#39;</span>)
+df2[[<span class="st">&#39;y&#39;</span>,<span class="st">&#39;spline&#39;</span>]].plot()
+plt.hold(<span class="va">True</span>)
+<span class="cf">for</span> k <span class="kw">in</span> knots: plt.plot(k,speval(k,bhat,knots),<span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app20_01.png&#39;</span>)</code></pre></div>
+<pre><code>            x         y
+156 -4.037867  0.786392
+214 -3.442141  0.716684
+101 -3.331777  0.400504
+249 -3.178510 -1.019875
+235 -3.131058  0.309575
+[ 2.60209869  0.37061018 -0.09614395  0.3059325  -0.30256291 -0.05312331
+  0.33303297 -0.24924314  0.06210785]</code></pre>
+<div class="figure">
+<img src="compscieng_app20_01.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfcube <span class="op">=</span> pd.read_csv(<span class="st">&#39;cube.csv&#39;</span>)
+dfcube <span class="op">=</span> dfcube.sort_index(by<span class="op">=</span><span class="st">&#39;x&#39;</span>)
+knots<span class="op">=</span>np.array([<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">14</span>,<span class="fl">14.5</span>])<span class="op">;</span>
+bhat <span class="op">=</span> rcs(dfcube.x,dfcube.y,knots)
+<span class="bu">print</span> bhat
+dfcube[<span class="st">&#39;spline&#39;</span>] <span class="op">=</span> speval(dfcube.x, bhat, knots)
+df2 <span class="op">=</span> dfcube.set_index(<span class="st">&#39;x&#39;</span>)
+df2[[<span class="st">&#39;y&#39;</span>,<span class="st">&#39;spline&#39;</span>]].plot()
+plt.hold(<span class="va">True</span>)
+<span class="cf">for</span> k <span class="kw">in</span> knots: plt.plot(k,speval(k,bhat,knots),<span class="st">&#39;rd&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_app20_03.png&#39;</span>)</code></pre></div>
+<pre><code>[ 3.16368016  0.17418578  0.02336622 -0.01432746 -0.05277535  0.42087813
+ -0.37714154]</code></pre>
+<div class="figure">
+<img src="compscieng_app20_03.png" />
+
+</div>
+<p>Spline Eğrileri</p>
+<p>Diyelim ki elimizde 4 <span class="math inline">\(x_i,y_i\)</span> noktası var, ve bu noktalardan geçen, hepsinden <em>kesinlikle</em> geçen, yaklaşıksal bir eğri oluşturmak istiyoruz. Spline yöntemi her iki nokta arasını farklı bir küpsel (üçüncü derece) polinom ile temsil etmektir. Tekrar dikkat: tüm noktaları temsile edebilecek farklı polinomları toplamıyoruz, her aralıkta başka bir polinom fonksiyonu parçasını devreye sokuyoruz. Parçalar niye küpsel olarak seçildi? Çünkü küpsel bir eğri yeterince kavis sağlayabilir ve aynı zamanda çok fazla inişli çıkışlı, sivri değildir, yeterince pürüzsüz bir eğrinin ortaya çıkmasını sağlar.</p>
+<div class="figure">
+<img src="spline1.png" />
+
+</div>
+<p>Her <span class="math inline">\(i=0,..,n+1\)</span> için</p>
+<p><span class="math display">\[ p(x) = p_i(x) = a_i + b_i(x-x_i) + c_i(x-x_i)^2 + d_i(x-x_i)^3
+\qquad (1)
+\]</span></p>
+<p>kullanalım. Noktalar <span class="math inline">\(x_i\)</span> olarak gösteriliyor, ve her noktada aktif olan bir <span class="math inline">\(p_i\)</span> spline olacak, o noktadan bir sonrakine kadar eğriyi bu <span class="math inline">\(p_i\)</span> tanımlayacak. Noktaların sayısını <span class="math inline">\(n\)</span> yerine <span class="math inline">\(n+1\)</span> olarak aldık böylece <span class="math inline">\(n\)</span> eğri parçası ile çalışmamız mümkün olacak. Her spline bir küpsel polinom ise niye bu küpsel polinomu en basit şekliyle</p>
+<p><span class="math display">\[ p(x) = a_i + b_ix + c_ix^2 + d_ix^3 \]</span></p>
+<p>olarak tanımlamadık? Çünkü iki üstteki form ile çalışmak daha rahat. Mesela, eğer <span class="math inline">\(x\)</span> için <span class="math inline">\(x_i\)</span> değrini verirsek, ki bu <span class="math inline">\(x_1\)</span> ya da <span class="math inline">\(x_2\)</span> olabilirdi, o zaman parantez içinde <span class="math inline">\(x_i - x_i\)</span> sayesinde tüm terimler sıfır oluyor, geriye sadece <span class="math inline">\(a_i\)</span> kalıyor.</p>
+<p>Parçaların uçlarının birbirini tutması, ve tüm şeklin sürekli, akışkan bir şekilde gözükmesi için ise birkaç koşulu bizim tanımlamamız, ve zorlamamız gerekli. Önce en basit olanı: bir önceki parça ile bir sonraki parça orta nokta üzerinde aynı değere sahip olmalı. <span class="math inline">\(i=1,..,n+1\)</span> için</p>
+<p><span class="math display">\[ p_i (x_{i+1}) = p_{i+1}(x_{i+1}) \]</span></p>
+<p>Bir diğer basit gereklilik, her <span class="math inline">\(x_i\)</span>'ye tekabül eden spline fonksiyonun elimizdeki <span class="math inline">\(y_i\)</span> değerini vermesi,</p>
+<p><span class="math display">\[ p_i(x_i) = y_i \]</span></p>
+<p>&quot;Tüm noktalardan kesinlikle geçmeli'' demiştik. Son parça bir istisna oluşturuyor, bu son parçanın fonksiyonu hem son noktayı, hem de ondan bir önceki nokta için kullanılmalı, bir önceden en sona kadar aynı fonksiyon üzerindeyiz.</p>
+<p><span class="math display">\[ p_{n}(x_n) = y_{n+1} \]</span></p>
+<p>Sistemi daha detaylı olarak görmek gerekirse, tüm denklemleri yazalım,</p>
+<p><span class="math display">\[ p_1(x)  = a_1 + b_1(x-x_1) + c_1(x-x_1)^2 + d_1(x-x_1)^3\]</span></p>
+<p><span class="math display">\[ p_2(x)  = a_2 + b_2(x-x_2) + c_2(x-x_2)^2 + d_1(x-x_2)^3\]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[ p_n(x)  = a_n + b_n(x-x_n) + c_n(x-x_n)^2 + d_3(x-x_n)^3\]</span></p>
+<p>Üç noktalı şöyle bir grafik düşünelim,</p>
+<div class="figure">
+<img src="spline2.png" />
+
+</div>
+<p>Üstte bahsettiğimiz gibi, <span class="math inline">\(p_1(x_1) = a_1 = y_1\)</span> olacak, ve tüm indisler için bu geçerli. Ayrıca <span class="math inline">\(x_2\)</span> noktasında bir önceki parça ve sonraki parça aynı değere sahip olmalı demiştik, yani mesela <span class="math inline">\(p_1\)</span>'in sonunda (üstteki ilk parça) <span class="math inline">\(x_2\)</span> noktası vardır, ve aynı noktada <span class="math inline">\(p_2\)</span> başlayacaktır, o noktada <span class="math display">\[ p_1(x_2) = a_1 + b_1h_1 + c_1h_1^2 + d_1h_1^3  \]</span></p>
+<p>ve bu denklem <span class="math inline">\(p_2(x_2) = a_2 = y_2\)</span>'ye eşit. Bir de, daha önce gördük, <span class="math inline">\(a_1 = y_1\)</span> ise, o zaman</p>
+<p><span class="math display">\[ y_2 = p_1(x_2) = y_1 + b_1h_1 + c_1h_1^2 + d_1h_1^3 \]</span></p>
+<p>haline gelir. Hepsini birarada yazıyoruz (<span class="math inline">\(y\)</span>'yi sağ tarafa aldık)</p>
+<p><span class="math display">\[ y_1 + b_1h_1 + c_1h_1^2 + d_1h_1^3 = y_2 
+\qquad (2) 
+\]</span></p>
+<p><span class="math display">\[ y_2 + b_2h_2 + c_2h_2^2 + d_2h_2^3 = y_3 \]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[ y_n + b_nh_n + c_nh_n^2 + d_nh_n^3 = y_n \]</span></p>
+<p>ki <span class="math inline">\(h_1 \equiv x_2 - x_1\)</span>, <span class="math inline">\(h_2 \equiv x_3 - x_2\)</span> olarak tanımladık, <span class="math inline">\(\equiv\)</span> işareti &quot;tanımlamak (defined as)'' anlamına geliyor, <span class="math inline">\(h\)</span> harfi bir tür kısaltma olarak kullanıldı. Fakat kesintisizlik için parçaların uçlarının bitişmesi yeterli değil. Mesela alttaki figürün de uçları birleşiktir,</p>
+<div class="figure">
+<img src="spline3.png" />
+
+</div>
+<p>Demek ki ek bazı şartlar lazım. Bu ek şart &quot;süreklilik'' olabilir. Mesela alttaki örnek sürekli değildir.</p>
+<div class="figure">
+<img src="spline5.png" />
+
+</div>
+<p>Ya da daha iyisi, fonksiyonun her noktada &quot;türevi alınabilir'' olma şartı. Mesela altta koyu yuvarlaklı gösterilen noktada fonksiyonun türevi alınamaz.</p>
+<div class="figure">
+<img src="spline4.png" />
+
+</div>
+<p>O zaman şartı koyalım -- Fonksiyonun her noktasında, ikinci türev sürekli alınabilmeli. Bu çok ağır / net bir şart aslında, ve hakikaten çok pürüzsüz (smooth) fonksiyonların oluşmasına sebep oluyor. Şimdi bunun ne anlamına biraz daha yakından bakalım. Biliyoruz ki futbol sahalarının etrafında koşu alanı vardır. Bu alan şöyledir.</p>
+<div class="figure">
+<img src="spline6.png" />
+
+</div>
+<p>Bu şekil iki ayrı figürün birleşimidir aslında, düz çizgiler ve iki tane yarı çember. Üstteki düz çizgili kısım sonsuz kere türevi alınabilir bir fonksiyondur. Değil mi? Düz çizgi sabit bir sayıdır, 1. türev sıfır, ikinci türev yine sıfır, böyle gider. Peki yarı çember olan kısımlar? Aynı şekilde. Peki her noktada durum böyle midir? Kritik noktalar ufak yuvarlaklarla gösterilen yerler (altta)</p>
+<div class="figure">
+<img src="spline7.png" />
+
+</div>
+<p>Bu noktalarda kaç kere &quot;sürekli türevler'' alınabilir? Cevap, sadece bir kere. Çünkü iki kere türev alınınca ne olacağına bakalım, düz kısımda ikinci, üçüncü, vs. türev sıfır. Peki yarı çember? Onun ikinci türevi sıfır olmayan sabit bir sayı. O zaman fonksiyonun tamamının (düz çizgi ve yarı çemberin beraber) 2. türevini grafiklesek, şöyle bir şekil ortaya çıkardı,</p>
+<div class="figure">
+<img src="spline8.png" />
+
+</div>
+<p>ve bu grafikte görüyoruz ki bir zıplama var. Bu zıplama yüzünden süreklilik (2. türevde) bozulmuş oldu. O zaman spline düzgün, pürüzsüz olsun istiyorsak, her noktada, yani bağlantı noktalarında, sağdaki ve soldaki parçanın birinci ve ikinci türevinin aynı olması şartını koyabiliriz, o zaman bu noktalarda fonksiyonun tamamı iki kere sürekli türevi alınabilir hale gelir. Parçaların kendisi üzerinde bu şartı tanımlamaya gerek yok, çünkü orada polinom kullanacağımızı belirttik zaten, polinomlar sonsuz kere sürekli türevi alınabilen objelerdir.</p>
+<p>Denklem sistemimize iki tane daha şart gerekiyor. Bu şartlar fonksiyonun ilk noktada ve son noktada ikinci türevinin sıfır olması şartı olabilir. Her hangi yöndeki bir çizgi <span class="math inline">\(y = ax + b\)</span>'nin iki kere türevi alınınca sıfır gelir, yani bu şart fonksiyonumuzun son noktalarda, fonksiyonun &quot;aşağı yukarı aynı yönde'' olacak şekilde düz olarak devam etmesi anlamına geliyor. Yaklaşıksal bağlamda fena bir şart değil.</p>
+<p>O zaman ana formüllerimize dönelim, ve mesela <span class="math inline">\(p_1(x),p_2(x)\)</span>'in türevini alalım,</p>
+<p><span class="math display">\[ p_1&#39;(x) = b_1 + 2c_1h_1 + 3d_1h_1^2 \]</span></p>
+<p><span class="math display">\[ p_2&#39;(x) = b_2 + 2c_2h_2 + 3d_2h_2^2 \]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p>Türevleri eşitleyelim <span class="math inline">\(p_1&#39;(x_2) = p_2&#39;(x_2)\)</span>.</p>
+<p><span class="math display">\[ p_1&#39;(x_2) = b_1 + 2c_1h_1 + 3d_1h_1^2 \]</span></p>
+<p><span class="math display">\[  p_2&#39;(x_2) = b_2 \]</span></p>
+<p>Üstteki niye sadece <span class="math inline">\(b_2\)</span> oldu? Çünkü <span class="math inline">\(x_i-x_i\)</span> numarası onun için de geçerli, geriye sadece <span class="math inline">\(b_2\)</span> kaldı. Hepsi bir arada</p>
+<p><span class="math display">\[  b_1 + 2c_1h_1 + 3d_1h_1^2  = b_2 
+\qquad (3)\]</span></p>
+<p><span class="math display">\[  b_2 + 2c_2h_2 + 3d_2h_2^2 = b_3 \]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[  b_{n-1} + 2c_{n-1}h_{n-1} + 3d_{n-1}h_{n-1}^2 =  b_n \]</span></p>
+<p>İkinci türevler için benzer bir durum var, bu sefer sol taraftan <span class="math inline">\(b\)</span>'ler yokoluyor,</p>
+<p><span class="math display">\[ 2c_1 + 6d_1h_1 = 2c_2 
+\qquad (4) \]</span></p>
+<p><span class="math display">\[ 2c_2 + 6d_2h_2 = 2c_3 \]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[ 2c_{n-1} + 6d_{n-1}h_{n-1} = 2c_n \]</span></p>
+<p>İlk ve son ikinci türevi sıfıra eşitlemeyi unutmayalım. Son türev</p>
+<p><span class="math display">\[ 2c_n + 6d_nh_n = 2c_{n+1} = 0 \]</span></p>
+<p>İlk türev</p>
+<p><span class="math display">\[ p_1&#39;&#39;(x_1) =  c_1 + 6d_1(x_1-x_1)  = c_1 = 0\]</span></p>
+<p><span class="math display">\[ 6d_1(x_1-x_1) \]</span> sıfır olur</p>
+<p>Denklem (4)'den başlayan bölümü tekrar düzenlersek,</p>
+<p><span class="math display">\[ d_1 = \frac{ c_2 - c_1}{3h_1} 
+\qquad (5) \]</span></p>
+<p><span class="math display">\[ d_2 = \frac{ c_3 - c_2}{3h_2} \]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[ d_n = \frac{ c_{n+1} - c_n}{3h_n} \]</span></p>
+<p>Üstteki denklemleri (2) ve (3)'e geri koyarsak,</p>
+<p><span class="math display">\[ b_1 + \frac{ c_2 + 2c_1}{3}h_1 = s_1 
+\qquad (7) \]</span></p>
+<p><span class="math display">\[ b_2 + \frac{ c_3 + 2c_2}{3}h_1 = s_2 \]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[ b_n + \frac{ c_{n+1} + 2c_n}{3}h_n = s_n \]</span></p>
+<p>ki <span class="math inline">\(s_1 \equiv \frac{y_2 - y_1}{h_1}, s_2 \equiv \frac{y_3 - y_2}{h_2}\)</span>.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>ifadesini alıp tekrar düzenlersek,</li>
+</ol>
+<p><span class="math display">\[  2c_1h_1 + 3d_1h_1^2  = b_2 - b_1\]</span></p>
+<p><span class="math inline">\(3d_1h_1\)</span> için başka bir ifade kullanabiliriz, eğer (5)'i tekrar düzenlersek,</p>
+<p><span class="math display">\[ 3h_1d_1 = c_2 - c_1\]</span></p>
+<p>ve iki üstteki formüle koyarsak</p>
+<p><span class="math display">\[  2c_1h_1 + (c_2 - c_1)h_1  = b_2 - b_1\]</span></p>
+<p><span class="math display">\[  2c_1h_1 + c_2h_1 - c_1h_1  = b_2 - b_1\]</span></p>
+<p><span class="math display">\[  c_1h_1 + c_2h_1  = b_2 - b_1\]</span></p>
+<p><span class="math display">\[  (c_1 + c_2) h_1  = b_2 - b_1\]</span></p>
+<p>Bu ifade tüm <span class="math inline">\(i\)</span> noktaları için geçerli, hepsi bir arada</p>
+<p><span class="math display">\[  (c_1 + c_2) h_1  = b_2 - b_1 
+\qquad (6)\]</span></p>
+<p><span class="math display">\[  (c_2 + c_3) h_2  = b_3 - b_2\]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[  (c_{n-1} + c_n) h_{n-1}  = b_n - b_{n-1}\]</span></p>
+<p>(7)'deki ardı ardına gelen denklemleri birbirinden çıkartıp sonucu 3 ile çarparsak,</p>
+<p><span class="math display">\[ c_1h_1 + 2c_2(h_1 + h_2) + c_3h_2 = 3(s_2 - s_1) \]</span></p>
+<p><span class="math display">\[ c_2h_2 + 2c_3(h_2 + h_3) + c_4h_3 = 3(s_3 - s_2) \]</span></p>
+<p><span class="math display">\[ \vdots \]</span></p>
+<p><span class="math display">\[ c_{n-1}h_{n-1} + 2c_n(h_{n-1} + h_{n}) + c_{n+1}h_n = 3(s_n - s_{n-1}) \]</span></p>
+<p>Bu formüller birarada düşünülürse, bilinmeyenleri <span class="math inline">\(c_2,c_3,..,c_n\)</span> olan normal (ordinary) <span class="math inline">\(n-1\)</span> tane lineer denklemdirler, ve bir matris çarpımı olarak düşünülebilirler.</p>
+<p><span class="math inline">\(c_1h_1\)</span> matris formunda yok çünkü <span class="math inline">\(c_1=0\)</span>.</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cccccc}
+2(h_1+h_2) &amp; h_2 &amp; 0 &amp; 0 &amp; ... &amp; 0 \\
+h_2 &amp; 2(h_2+h_3) &amp; h_3 &amp; 0 &amp; .. &amp; 0  \\
+0 &amp; h_3 &amp; 2(h_3+h_4) &amp; h_4 &amp; .. &amp; 0 \\
+0 &amp; 0 &amp; h_4 &amp; 2(h_4+h_5) &amp; ... &amp; 0 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots  \\
+0 &amp; 0 &amp; .. &amp; 0 &amp; h_{n-1} &amp; 2(h_{n-1}+h_n) 
+\end{array}\right]
+\left[\begin{array}{r}
+c_2 \\ c_3 \\ \vdots \\ c_n
+\end{array}\right]
+ \]</span></p>
+<p>Bu denklem sağ tarafta suna eşit</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{r}
+3(s_2 - s_1) \\
+3(s_3 - s_2) \\
+3(s_4 - s_3) \\
+\vdots \\
+3(s_n - s_{n-1}) 
+\end{array}\right]
+ \]</span></p>
+<p>Bir üçgen köşegen (tridiagonal) matris iki tane ikili köşegen (bidiagonal) matrisin çarpımına eşittir. LU çarpanlarına ayırma işlemi de, bkz [11], bize bu matrisleri sağlayacaktır.</p>
+<p><span class="math display">\[ Ax = b \]</span></p>
+<p>şu hale gelir</p>
+<p><span class="math display">\[ LUx = b \]</span></p>
+<p>Şimdi eğer <span class="math inline">\(Ux = y\)</span> kabul edersek, yani yeni bir değişkeni dahil edersek, <span class="math inline">\(L\)</span>'i bulduktan sonra</p>
+<p><span class="math display">\[ Ly = b \]</span></p>
+<p>kabul edebiliriz, ve bu formülü de <span class="math inline">\(y\)</span> için çözmek çok kolaydır. Sonra çözülen <span class="math inline">\(y\)</span>'yi alıp geriye sokma (backsubstitution) ile <span class="math inline">\(x\)</span>'i buluruz, yani</p>
+<p><span class="math display">\[ Ux = y \]</span></p>
+<p>denklemini çözeriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+a <span class="op">=</span> np.array( [[<span class="fl">3.</span>,<span class="op">-</span><span class="fl">3.</span>,<span class="dv">0</span>,<span class="dv">0</span>],
+               [<span class="op">-</span><span class="fl">3.</span>,<span class="fl">8.</span>,<span class="op">-</span><span class="fl">2.</span>,<span class="dv">0</span>],
+               [<span class="dv">0</span>,<span class="fl">1.</span>,<span class="fl">2.</span>,<span class="fl">4.</span>],
+               [<span class="dv">0</span>,<span class="dv">0</span>,<span class="op">-</span><span class="fl">2.</span>,<span class="fl">6.</span>]])
+
+p,l,u <span class="op">=</span> lin.lu(a)
+
+Ly <span class="op">=</span> np.array([[<span class="fl">7.</span>,<span class="fl">8.</span>,<span class="fl">2.</span>,<span class="op">-</span><span class="fl">3.</span>]])
+
+y <span class="op">=</span> lin.solve(l,Ly.T)
+
+x <span class="op">=</span> lin.solve(u,y)
+<span class="bu">print</span> x</code></pre></div>
+<pre><code>[[ 5.44047619]
+ [ 3.10714286]
+ [ 0.26785714]
+ [-0.41071429]]</code></pre>
+<p>Spline yöntemine dönersek, elimizdeki veri ve kod şöyle olsun</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.linalg <span class="im">as</span> lin
+
+xx <span class="op">=</span> np.array([<span class="fl">4.</span>,<span class="fl">9.</span>,<span class="fl">12.</span>,<span class="fl">16.</span>,<span class="fl">22.</span>])
+
+yy <span class="op">=</span> np.array([<span class="fl">157.</span>,<span class="fl">41.</span>,<span class="fl">145.</span>,<span class="fl">92.</span>,<span class="fl">7.</span>])
+
+h <span class="op">=</span> np.diff(xx)
+
+dy <span class="op">=</span> np.diff(yy)
+
+s <span class="op">=</span> dy <span class="op">/</span> h
+
+ds <span class="op">=</span> np.diff(s)
+
+s3 <span class="op">=</span> <span class="dv">3</span> <span class="op">*</span> ds
+
+a <span class="op">=</span> np.array([[ <span class="dv">2</span><span class="op">*</span>(h[<span class="dv">0</span>]<span class="op">+</span>h[<span class="dv">1</span>]), h[<span class="dv">1</span>], <span class="dv">0</span>],
+              [ h[<span class="dv">1</span>], <span class="dv">2</span><span class="op">*</span>(h[<span class="dv">1</span>]<span class="op">+</span>h[<span class="dv">2</span>]), h[<span class="dv">2</span>]],
+              [ <span class="dv">0</span>, h[<span class="dv">2</span>], <span class="dv">2</span><span class="op">*</span>(h[<span class="dv">2</span>]<span class="op">+</span>h[<span class="dv">3</span>])]])
+
+p,l,u <span class="op">=</span> lin.lu(a)
+
+y <span class="op">=</span> lin.solve(l,s3.T)
+
+c <span class="op">=</span> lin.solve(u,y)
+<span class="bu">print</span> c</code></pre></div>
+<pre><code>[ 13.45756677 -13.90702275   2.64390455]</code></pre>
+<p><span class="math inline">\(c\)</span>'ler bulunduktan sonra <span class="math inline">\(h\)</span>'lerle beraber kullanılarak <span class="math inline">\(d\)</span>'ler bulunur, vs, ve tüm spline parçalarının katsayıları ortaya çıkartılır.</p>
+<p>Kodlar</p>
+<p>Bazı kodlar altta bulunabilir. İlk önce SciPy ile B-spline, ilmikleri biz dışarıdan tanımladık,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.interpolate <span class="im">import</span> splev, splrep
+x <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">10</span>)
+y <span class="op">=</span> np.sin(x)
+tck <span class="op">=</span> splrep(x, y, t<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">8</span>]) <span class="co"># ilmikler t icinde</span>
+x2 <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">200</span>)
+y2 <span class="op">=</span> splev(x2, tck)
+plt.plot(x, y, <span class="st">&#39;o&#39;</span>, x2, y2)
+plt.savefig(<span class="st">&#39;compscieng_1_21_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_21_05.png" />
+
+</div>
+<p>Alttaki kodlar tüm eğrinin verideki her noktayı ilmik olarak görmesi gerektiğine göre yazılmıştır, yani her veri noktası aynı zamanda bir ilmiktir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> Splines(data):
+    np1<span class="op">=</span><span class="bu">len</span>(data)
+    n<span class="op">=</span>np1<span class="dv">-1</span>
+    X,Y <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>data)
+    X <span class="op">=</span> [<span class="bu">float</span>(x) <span class="cf">for</span> x <span class="kw">in</span> X]
+    Y <span class="op">=</span> [<span class="bu">float</span>(y) <span class="cf">for</span> y <span class="kw">in</span> Y]
+    a <span class="op">=</span> Y[:]
+    b <span class="op">=</span> [<span class="fl">0.0</span>]<span class="op">*</span>(n)
+    d <span class="op">=</span> [<span class="fl">0.0</span>]<span class="op">*</span>(n)
+    h <span class="op">=</span> [X[i<span class="op">+</span><span class="dv">1</span>]<span class="op">-</span>X[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(n)]
+    alpha <span class="op">=</span> [<span class="fl">0.0</span>]<span class="op">*</span>n
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(<span class="dv">1</span>,n):
+        alpha[i] <span class="op">=</span> <span class="dv">3</span><span class="op">/</span>h[i]<span class="op">*</span>(a[i<span class="op">+</span><span class="dv">1</span>]<span class="op">-</span>a[i]) <span class="op">-</span> <span class="dv">3</span><span class="op">/</span>h[i<span class="dv">-1</span>]<span class="op">*</span>(a[i]<span class="op">-</span>a[i<span class="dv">-1</span>])
+    c <span class="op">=</span> [<span class="fl">0.0</span>]<span class="op">*</span>np1
+    L <span class="op">=</span> [<span class="fl">0.0</span>]<span class="op">*</span>np1
+    u <span class="op">=</span> [<span class="fl">0.0</span>]<span class="op">*</span>np1
+    z <span class="op">=</span> [<span class="fl">0.0</span>]<span class="op">*</span>np1
+    L[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span> u[<span class="dv">0</span>] <span class="op">=</span> z[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(<span class="dv">1</span>,n):
+        L[i] <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>(X[i<span class="op">+</span><span class="dv">1</span>]<span class="op">-</span>X[i<span class="dv">-1</span>]) <span class="op">-</span> h[i<span class="dv">-1</span>]<span class="op">*</span>u[i<span class="dv">-1</span>]
+        u[i] <span class="op">=</span> h[i]<span class="op">/</span>L[i]
+        z[i] <span class="op">=</span> (alpha[i]<span class="op">-</span>h[i<span class="dv">-1</span>]<span class="op">*</span>z[i<span class="dv">-1</span>])<span class="op">/</span>L[i]
+    L[n] <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span> z[n] <span class="op">=</span> c[n] <span class="op">=</span> <span class="fl">0.0</span>
+    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">xrange</span>(n<span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>):
+        c[j] <span class="op">=</span> z[j] <span class="op">-</span> u[j]<span class="op">*</span>c[j<span class="op">+</span><span class="dv">1</span>]
+        b[j] <span class="op">=</span> (a[j<span class="op">+</span><span class="dv">1</span>]<span class="op">-</span>a[j])<span class="op">/</span>h[j] <span class="op">-</span> (h[j]<span class="op">*</span>(c[j<span class="op">+</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">2</span><span class="op">*</span>c[j]))<span class="op">/</span><span class="dv">3</span>
+        d[j] <span class="op">=</span> (c[j<span class="op">+</span><span class="dv">1</span>]<span class="op">-</span>c[j])<span class="op">/</span>(<span class="dv">3</span><span class="op">*</span>h[j])
+    splines <span class="op">=</span> []
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(n):
+        splines.append((a[i],b[i],c[i],d[i],X[i]))
+    <span class="cf">return</span> splines,X[n]
+
+<span class="kw">def</span> splinesToPlot(splines,xn,res):
+    n<span class="op">=</span><span class="bu">len</span>(splines)
+    perSpline <span class="op">=</span> <span class="bu">int</span>(res<span class="op">/</span>n)
+    <span class="cf">if</span> perSpline <span class="op">&lt;</span> <span class="dv">3</span>: perSpline <span class="op">=</span> <span class="dv">3</span>
+    X<span class="op">=</span>[]
+    Y<span class="op">=</span>[]
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(n<span class="dv">-1</span>):
+        S <span class="op">=</span> splines[i]
+        x0 <span class="op">=</span> S[<span class="dv">4</span>]
+        x1 <span class="op">=</span> splines[i<span class="op">+</span><span class="dv">1</span>][<span class="dv">4</span>]
+        x <span class="op">=</span> np.linspace(x0,x1,perSpline)
+        <span class="cf">for</span> xi <span class="kw">in</span> x:
+            X.append(xi)
+            h<span class="op">=</span>(xi<span class="op">-</span>S[<span class="dv">4</span>])
+            Y.append(S[<span class="dv">0</span>]<span class="op">+</span>S[<span class="dv">1</span>]<span class="op">*</span>h <span class="op">+</span> S[<span class="dv">2</span>]<span class="op">*</span>h<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> S[<span class="dv">3</span>]<span class="op">*</span>h<span class="op">**</span><span class="dv">3</span>)
+    S<span class="op">=</span>splines[n<span class="dv">-1</span>]
+    x<span class="op">=</span>np.linspace(S[<span class="dv">4</span>],xn,perSpline)
+    <span class="cf">for</span> xi <span class="kw">in</span> x:
+        X.append(xi)
+        h<span class="op">=</span>(xi<span class="op">-</span>S[<span class="dv">4</span>])
+        Y.append(S[<span class="dv">0</span>]<span class="op">+</span>S[<span class="dv">1</span>]<span class="op">*</span>h <span class="op">+</span> S[<span class="dv">2</span>]<span class="op">*</span>h<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> S[<span class="dv">3</span>]<span class="op">*</span>h<span class="op">**</span><span class="dv">3</span>)
+    
+    <span class="cf">return</span> X,Y</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> Spline
+x <span class="op">=</span> <span class="kw">lambda</span> n: np.linspace(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,n)
+f <span class="op">=</span> <span class="kw">lambda</span> x: np.cos(np.sin(np.pi<span class="op">*</span>x))
+n <span class="op">=</span> <span class="dv">5</span>
+E<span class="op">=</span><span class="dv">200</span>
+data <span class="op">=</span> <span class="bu">zip</span>(x(n),f(x(n)))
+splines,xn <span class="op">=</span> Spline.Splines(data)
+X,Y <span class="op">=</span> Spline.splinesToPlot(splines,xn,E)
+plt.plot(X,Y,<span class="st">&#39;r--&#39;</span>)
+plt.plot(x(<span class="dv">300</span>),f(x(<span class="dv">300</span>)),<span class="st">&#39;k&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_21_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_21_04.png" />
+
+</div>
+<p>Bir diğer örnek</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> LUdecomp3 <span class="im">import</span> <span class="op">*</span>
+
+<span class="kw">def</span> curvatures(xData,yData):
+    n <span class="op">=</span> <span class="bu">len</span>(xData) <span class="op">-</span> <span class="dv">1</span>
+    c <span class="op">=</span> np.zeros(n)
+    d <span class="op">=</span> np.ones(n<span class="op">+</span><span class="dv">1</span>)
+    e <span class="op">=</span> np.zeros(n)
+    k <span class="op">=</span> np.zeros(n<span class="op">+</span><span class="dv">1</span>)
+    c[<span class="dv">0</span>:n<span class="dv">-1</span>] <span class="op">=</span> xData[<span class="dv">0</span>:n<span class="dv">-1</span>] <span class="op">-</span> xData[<span class="dv">1</span>:n]
+    d[<span class="dv">1</span>:n] <span class="op">=</span> <span class="fl">2.0</span><span class="op">*</span>(xData[<span class="dv">0</span>:n<span class="dv">-1</span>] <span class="op">-</span> xData[<span class="dv">2</span>:n<span class="op">+</span><span class="dv">1</span>])
+    e[<span class="dv">1</span>:n] <span class="op">=</span> xData[<span class="dv">1</span>:n] <span class="op">-</span> xData[<span class="dv">2</span>:n<span class="op">+</span><span class="dv">1</span>]
+    k[<span class="dv">1</span>:n] <span class="op">=</span><span class="fl">6.0</span><span class="op">*</span>(yData[<span class="dv">0</span>:n<span class="dv">-1</span>] <span class="op">-</span> yData[<span class="dv">1</span>:n]) <span class="op">\</span>
+             <span class="op">/</span> (xData[<span class="dv">0</span>:n<span class="dv">-1</span>] <span class="op">-</span> xData[<span class="dv">1</span>:n]) <span class="op">\</span>
+             <span class="fl">-6.0</span><span class="op">*</span>(yData[<span class="dv">1</span>:n] <span class="op">-</span> yData[<span class="dv">2</span>:n<span class="op">+</span><span class="dv">1</span>]) <span class="op">\</span>
+             <span class="op">/</span> (xData[<span class="dv">1</span>:n] <span class="op">-</span> xData[<span class="dv">2</span>:n<span class="op">+</span><span class="dv">1</span>])
+    LUdecomp3(c,d,e)
+    LUsolve3(c,d,e,k)
+    <span class="cf">return</span> k    
+
+<span class="kw">def</span> evalSpline(xData,yData,k,x):
+    <span class="kw">def</span> findSegment(xData,x):
+        iLeft <span class="op">=</span> <span class="dv">0</span>
+        iRight <span class="op">=</span> <span class="bu">len</span>(xData)<span class="op">-</span> <span class="dv">1</span>
+        <span class="cf">while</span> <span class="dv">1</span>:
+            <span class="cf">if</span> (iRight<span class="op">-</span>iLeft) <span class="op">&lt;=</span> <span class="dv">1</span>: <span class="cf">return</span> iLeft
+            i <span class="op">=</span>(iLeft <span class="op">+</span> iRight)<span class="op">/</span><span class="dv">2</span>
+            <span class="cf">if</span> x <span class="op">&lt;</span> xData[i]: iRight <span class="op">=</span> i
+            <span class="cf">else</span>: iLeft <span class="op">=</span> i
+            
+    i <span class="op">=</span> findSegment(xData,x)
+    h <span class="op">=</span> xData[i] <span class="op">-</span> xData[i<span class="op">+</span><span class="dv">1</span>]
+    y <span class="op">=</span> ((x <span class="op">-</span> xData[i<span class="op">+</span><span class="dv">1</span>])<span class="op">**</span><span class="dv">3</span><span class="op">/</span>h <span class="op">-</span> (x <span class="op">-</span> xData[i<span class="op">+</span><span class="dv">1</span>])<span class="op">*</span>h)<span class="op">*</span>k[i]<span class="op">/</span><span class="fl">6.0</span> <span class="op">\</span>
+        <span class="op">-</span> ((x <span class="op">-</span> xData[i])<span class="op">**</span><span class="dv">3</span><span class="op">/</span>h <span class="op">-</span> (x <span class="op">-</span> xData[i])<span class="op">*</span>h)<span class="op">*</span>k[i<span class="op">+</span><span class="dv">1</span>]<span class="op">/</span><span class="fl">6.0</span> <span class="op">\</span>
+        <span class="op">+</span> (yData[i]<span class="op">*</span>(x <span class="op">-</span> xData[i<span class="op">+</span><span class="dv">1</span>]) <span class="op">-</span> yData[i<span class="op">+</span><span class="dv">1</span>]<span class="op">*</span>(x <span class="op">-</span> xData[i]))<span class="op">/</span>h
+    <span class="cf">return</span> y
+
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: 
+
+    xData <span class="op">=</span> np.array([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>],<span class="bu">float</span>)
+    yData <span class="op">=</span> np.array([<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>],<span class="bu">float</span>)
+    k <span class="op">=</span> curvatures(xData,yData)
+    x <span class="op">=</span> <span class="fl">1.5</span>    
+    <span class="bu">print</span>(<span class="st">&quot;y =&quot;</span>,evalSpline(xData,yData,k,x))
+    </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, cubicSpline
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;in.csv&#39;</span>)
+res <span class="op">=</span> cubicSpline.curvatures(np.array(df.x), np.array(df.y))
+<span class="bu">print</span> res</code></pre></div>
+<pre><code>[ 0.         -2.27960615  0.5983445  -2.14369027 -0.5421918  -0.9485407
+  4.83823742  1.40244849 -0.82589911 -1.3439826   2.52298704  0.        ]</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Beu, <em>Introduction to Numerical Programming A Practical Guide for Scientists and Engineers Using Python and C/C++</em></p>
+<p>[2] Ruppert, <em>Semiparametric Regression</em></p>
+<p>[3] Harrell, <em>Regression Modeling Strategies, 2nd Edition</em></p>
+<p>[4] Bayramlı, Lineer Cebir, <em>Ders 16</em></p>
+<p>[5] Bayramlı, İstatistik, <em>Lineer Regresyon</em></p>
+<p>[6] Bantis, <em>Restricted Cubic Spline</em>, <a href="https://uk.mathworks.com/matlabcentral/fileexchange/41241-restricted-cubic-spline" class="uri">https://uk.mathworks.com/matlabcentral/fileexchange/41241-restricted-cubic-spline</a></p>
+<p>[7] Vrbik, <em>MATH 2P20 NUMERICAL ANALYSIS I Lecture Notes</em>, <a href="http://spartan.ac.brocku.ca/~jvrbik/MATH2P20/notes.pdf" class="uri">http://spartan.ac.brocku.ca/~jvrbik/MATH2P20/notes.pdf</a></p>
+<p>[8] Ertel, <em>Advanced Mathematics for Engineers Lecture No. 14</em>, <a href="http://www.youtube.com/watch?v=3rHBCglD1LQ" class="uri">http://www.youtube.com/watch?v=3rHBCglD1LQ</a></p>
+<p>[9] Ertel, <em>Advanced Mathematics for Engineers Lecture No. 15</em>, <a href="http://www.youtube.com/watch?v=nA0YpqraP9A" class="uri">http://www.youtube.com/watch?v=nA0YpqraP9A</a></p>
+<p>[10] Recktenwald, <em>Numerical Methods with MATLAB Implementations and Applications</em></p>
+<p>[11] Bayramlı, Lineer Cebir, <em>Ders 4</em></p>
+</body>
+</html>

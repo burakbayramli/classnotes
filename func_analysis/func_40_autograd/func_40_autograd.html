@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="genel-optimizasyon-paketler-autograd">Genel Optimizasyon, Paketler, Autograd</h1>
+<p>Otomatik türevin nasıl işlediğini [1] yazısında gördük. Programlama dilinde yazılmış, içinde <code>if</code>, <code>case</code>, hatta döngüler bile içerebilen herhangi bir kod parçasının türevini alabilmemizi sağlayan otomatik türev almak pek çok alanda işimize yarar. Optimizasyon alanı bunların başında geliyor. Düşünürsek, eğer sembolik olarak türev alması çok çetrefil bir durum varsa, tasaya gerek yok; bir fonksiyonu kodlayabildiğimiz anda onun türevini de alabiliriz demektir.</p>
+<p>Autograd</p>
+<p>Çok boyutlu bir fonksiyonun gradyani ve Hessian'ı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> autograd <span class="im">import</span> grad, hessian
+
+<span class="kw">def</span> objective(X): 
+    x, y, z <span class="op">=</span> X
+    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> z<span class="op">**</span><span class="dv">2</span>
+
+x,y,z <span class="op">=</span> <span class="fl">1.0</span>,<span class="fl">1.0</span>,<span class="fl">1.0</span>
+
+h <span class="op">=</span> hessian(objective, <span class="dv">0</span>)
+res <span class="op">=</span> h(np.array([x, y, z]))
+<span class="bu">print</span> (res)
+
+g <span class="op">=</span> grad(objective, <span class="dv">0</span>)
+res <span class="op">=</span> g(np.array([x, y, z]))
+<span class="bu">print</span> (res)</code></pre></div>
+<pre><code>[[2. 0. 0.]
+ [0. 2. 0.]
+ [0. 0. 2.]]
+[2. 2. 2.]</code></pre>
+<p>Ya da</p>
+<p>Hessian</p>
+<p>Mesela <span class="math inline">\(f(x_1,x_2) = x_2^3 + x_2^3 + x_1^2x_2^2\)</span> gibi bir fonksiyon var diyelim. Belli bir noktadaki Hessian</p>
+<p><span class="math display">\[
+H = \left[\begin{array}{rr}
+\frac{\partial f}{\partial x_1x_1} &amp; \frac{\partial f}{\partial x_1x_2} \\
+\frac{\partial f}{\partial x_2x_1} &amp; \frac{\partial f}{\partial x_2x_2} 
+\end{array}\right]
+\]</span></p>
+<p>hesaplatmak için <code>autograd.hessian</code> kullanırız,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> autograd 
+
+<span class="kw">def</span> f(x):
+    x1,x2<span class="op">=</span>x[<span class="dv">0</span>],x[<span class="dv">1</span>]
+    <span class="cf">return</span> x1<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> x2<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> (x1<span class="op">**</span><span class="dv">2</span>)<span class="op">*</span>(x2<span class="op">**</span><span class="dv">2</span>)
+
+<span class="bu">print</span>
+xx <span class="op">=</span> np.array([<span class="fl">1.0</span>,<span class="fl">1.0</span>])
+h <span class="op">=</span> autograd.hessian(f)
+<span class="bu">print</span> (h(xx))</code></pre></div>
+<pre><code>[[8. 4.]
+ [4. 8.]]</code></pre>
+<p>Şimdi bazı genel optimizasyon konularını işleyelim.</p>
+<p>Sınırlanmamış optimizasyonda (unconstrained optimization) <span class="math inline">\(f(x)\)</span> fonksiyonunu minimum değerde tutacak <span class="math inline">\(x\)</span> değerini bulmaya uğraşıyoruz, ki <span class="math inline">\(x\)</span> tek boyutlu skalar, ya da çok boyutlu <span class="math inline">\(x \in \mathbb{R}^n\)</span> olabilir. Yani yapmaya uğraştığımız</p>
+<p><span class="math display">\[
+\min_x f(x)
+\]</span></p>
+<p>işlemi. Peki minimumu nasıl tanımlarız? Bir nokta <span class="math inline">\(x^\ast\)</span> global minimize edicidir eğer tüm <span class="math inline">\(x\)</span>'ler için <span class="math inline">\(f(x^\ast) \le f(x)\)</span> ise, ki <span class="math inline">\(x \in \mathbb{R}^n\)</span>, en azından <span class="math inline">\(x\)</span> modelleyeni ilgilendiren tüm küme öğeleri için.</p>
+<p>Fakat çoğu zaman bir global <span class="math inline">\(f\)</span>'i kullanmak mümkün olmayabilir, fonksiyon çok çetrefil, çok boyutlu, bilinmez durumdadır, ve elimizde sadece yerel bilgi vardır. Bu durumda üstteki tanımı &quot;bir <span class="math inline">\(N\)</span> bölgesi içinde'' olacak şekilde değiştiririz ki bölge, <span class="math inline">\(x^\ast\)</span> etrafındaki, yakınındaki bölgedir.</p>
+<p>Üstteki tanımı okuyunca <span class="math inline">\(x^\ast\)</span>'in yerel minimum olup olmadığını anlamanın tek yolunun yakındaki diğer tüm noktalara teker teker bakmak olduğu anlamı çıkabilir, fakat eğer <span class="math inline">\(f\)</span> pürüzsüz bir fonksiyon ise yerel minimumu doğrulamanın çok daha hızlı bir yöntemi vardır. Hatta ve hatta eğer fonksiyon <span class="math inline">\(f\)</span> iki kez türevi alınabilir haldeyse <span class="math inline">\(x^\ast\)</span>'in yerel minimum olduğunu ispatlamak daha kolaylaşır, <span class="math inline">\(\nabla f(x^\ast)\)</span> ve Hessian <span class="math inline">\(\nabla^2 f(x^\ast)\)</span>'e bakarak bunu yapabiliriz.</p>
+<p>Minimallik için 1. ve 2. derece şartlar var. 1. derece gerekli şart (ama yeterli değil) <span class="math inline">\(\nabla f = 0\)</span> olması. Bu standard Calculus'tan bildiğimiz bir şey, minimum ya da maksimumda birinci türev sıfırdır. Ama türevin sıfır olup minimum ya da maksimum olmadığı durum da olabilir, mesela <span class="math inline">\(f(x) = x^3\)</span>. <span class="math inline">\(f&#39;(0) = 0\)</span>'dir fakat <span class="math inline">\(x=0\)</span> ne maksimum ne de minimumdur. Daha iyi bir termioloji <span class="math inline">\(\nabla f = 0\)</span> noktalarını {} olarak tanımlamaktır. <span class="math inline">\(x=0\)</span> noktasında bir değişim oluyor, bu değişim kritik bir değişim, her ne kadar minimum ya da maksimum olmasa da.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">100</span>)
+plt.plot(x,x<span class="op">**</span><span class="dv">3</span>)
+plt.grid(<span class="va">True</span>)
+plt.savefig(<span class="st">&#39;func_40_autograd_01.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="func_40_autograd_01.png" />
+
+</div>
+<p>Bir kritik noktanın yerel maksimum ya da yerel minimum olup olmadığını anlamak için fonksiyonun ikinci türevine bakabiliriz. Bir <span class="math inline">\(f: \mathbb{R}^n \to \mathbb{R}\)</span> var ve <span class="math inline">\(x^\ast\)</span> noktasının kritik nokta olduğunu düşünelim, yani <span class="math inline">\(\nabla f(x^\ast) = 0\)</span>. Şimdi çok ufak bir <span class="math inline">\(h\)</span> adımı için <span class="math inline">\(f(x^\ast + h)\)</span>'a ne olduğuna bakalım. Burada Taylor açılımı kullanabiliriz [2],</p>
+<p><span class="math display">\[
+f(x + h^\ast) = 
+f(x^\ast) + \nabla f(x^\ast) h + 
+\frac{1}{2} h^T f(x^\ast) \nabla^2 (x^\ast) f(x^\ast) h + 
+O(3)
+\]</span></p>
+<p><span class="math inline">\(\nabla^2 (x^\ast)\)</span> bir matristır içinde <span class="math inline">\(f\)</span>'nin ikinci derece türevleri vardır [6]. Şimdi, kritik noktada olduğumuz için <span class="math inline">\(\nabla f(x^\ast) = 0\)</span>, ve <span class="math inline">\(O(3)\)</span> terimlerini iptal edersek, üstteki</p>
+<p><span class="math display">\[
+f(x^\ast + h^\ast) - f(x^\ast) = \frac{1}{2} h^T \nabla^2 (x^\ast)  h + O(3)
+\]</span></p>
+<p>haline gelir. Simdi &quot;bir noktanın mesela yerel maksimum olması'' sözünü <span class="math inline">\(f(x^\ast + h^\ast) - f(x^\ast) &lt; 0\)</span> ile ifade edebiliriz, çünkü <span class="math inline">\(x^\ast\)</span> etrafındaki tüm <span class="math inline">\(x\)</span>'lerin <span class="math inline">\(f\)</span>'in daha az değerlerinden olma şartını aramış oluyoruz (adım atılıyor, çıkartma yapılıyor, sonuç sıfırdan küçük). Tabii bu &quot;tüm'' söylemi yaklaşıksal, o sebeple minimumluk ifadesi <em>yerel</em>.</p>
+<p>Devam edersek <span class="math inline">\(f(x^\ast + h^\ast) - f(x^\ast) &lt; 0\)</span> olması şartı aynı zamanda <span class="math inline">\(\frac{1}{2} h^T \nabla^2 (x^\ast) h &lt; 0\)</span> anlamına gelir, bu da <span class="math inline">\(\nabla^2 (x^\ast )\)</span> negatif kesin demektir. Çünkü <span class="math inline">\(A\)</span> simetrik bir matris olduğu zaman</p>
+<p><span class="math inline">\(x^TAx &lt; 0\)</span> ise matris negatif kesin</p>
+<p><span class="math inline">\(x^TAx \le 0\)</span> ise matris negatif yarı-kesin (negatif semi-definite)</p>
+<p><span class="math inline">\(x^TAx &gt; 0\)</span> ise matris pozitif kesin</p>
+<p><span class="math inline">\(x^TAx \ge 0\)</span> ise matris pozitif yarı-kesin (positive semi-definite)</p>
+<p>Gradyan Inisi</p>
+<p>Optimizasyonun mekaniğine gelelim. Diyelim ki basit, tek boyutlu bir <span class="math inline">\(f(x) = x^2\)</span> fonksiyonumuz var. Tek boyutlu bu ortamda bir noktadan başlayıp gradyanın (1. türev) işaret ettiği yönde ufak bir adım atmak bizi minimuma daha yaklaştırır, ve bunu ardı ardına yaparak yerel bir minimuma erisebiliriz. Örnek <span class="math inline">\(f(x)\)</span> dışbükey (convex) olduğu için bu bizi global minimuma götürür [3]. Formül</p>
+<p><span class="math display">\[
+x_{i+1} = x_i + \alpha \nabla f(x_i)
+\]</span></p>
+<p>Başlangıç <span class="math inline">\(x_0\)</span> herhangi bir nokta, üstteki formülle adım ata ata ilerliyoruz, adım boyutunu bizim tanımladığımız bir <span class="math inline">\(\alpha\)</span> sabitiyle ayarlayabiliyoruz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> autograd
+
+<span class="kw">def</span> fun(x):
+    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span>
+
+<span class="kw">def</span> grad_desc(x, fun, alpha<span class="op">=</span><span class="fl">0.1</span>, max_iter<span class="op">=</span><span class="dv">100</span>):
+    xs <span class="op">=</span> np.zeros(<span class="dv">1</span> <span class="op">+</span> max_iter)
+    xs[<span class="dv">0</span>] <span class="op">=</span> x
+    grad <span class="op">=</span> autograd.grad(fun)
+    
+    <span class="cf">for</span> step <span class="kw">in</span> <span class="bu">range</span>(max_iter):
+        x <span class="op">=</span> x <span class="op">-</span> alpha <span class="op">*</span> grad(x)
+        xs[step <span class="op">+</span> <span class="dv">1</span>] <span class="op">=</span> x
+        
+<span class="op">!</span>[](func_40_autograd_02.png)
+    <span class="cf">return</span> xs
+
+alpha <span class="op">=</span> <span class="fl">0.1</span>
+x0 <span class="op">=</span> <span class="fl">1.</span>
+
+x_opt <span class="op">=</span> grad_desc(x0, fun, alpha <span class="op">=</span> alpha, max_iter <span class="op">=</span> <span class="dv">10</span>)
+y_opt <span class="op">=</span> fun(x_opt)
+
+x_true <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">1.2</span>, <span class="fl">1.2</span>, <span class="dv">100</span>)
+y_true <span class="op">=</span> fun(x_true)
+
+plt.plot(x_true, y_true)
+plt.plot(x_opt, y_opt, <span class="st">&#39;o-&#39;</span>, c<span class="op">=</span><span class="st">&#39;red&#39;</span>)
+
+<span class="cf">for</span> i, (x, y) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(x_opt, y_opt), <span class="dv">1</span>):
+      plt.text(x <span class="op">-</span> <span class="fl">0.1</span>, y <span class="op">+</span> <span class="fl">0.1</span>, i, fontsize<span class="op">=</span><span class="dv">15</span>)
+
+plt.show()</code></pre></div>
+<div class="figure">
+<img src="func_40_autograd_02.png" />
+
+</div>
+<p>Türevi <code>autograd</code> ile aldık, bu örnekte sembolik türev kolaydı, elle <span class="math inline">\(f&#39;(x)=2x\)</span> diyebilirdik ama gösterim amaçlı direk yazılımla türevi aldık.</p>
+<p>Kısıtlanmış Optimizasyon</p>
+<p>Mühendislik problemlerinde kısıtlanmış optimizasyon çok ortaya çıkar. Prototipik örnek bir düzlem üzerindeki orijine en yakın noktayı bulmak. Mesela düzlem <span class="math inline">\(2x - y + z = 3\)</span> olsun, ve mesafeyi minimize etmek istiyoruz, bunu <span class="math inline">\(x^2+y^2+z^2\)</span> ile hesaplayabiliriz. Yani optimizasyon problemi düzlem denklemi ile sınırlanan mesafe formülünün minimal noktasını bulmak [5].</p>
+<p>Problemi direk <code>scipy.optimize.minimize</code> ile çözelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize
+
+<span class="kw">def</span> objective(X): <span class="co"># hedef</span>
+    x, y, z <span class="op">=</span> X
+    <span class="cf">return</span> x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> z<span class="op">**</span><span class="dv">2</span>
+
+<span class="kw">def</span> cons(X): <span class="co"># kisitlama</span>
+    x, y, z <span class="op">=</span> X
+    <span class="cf">return</span> <span class="dv">2</span> <span class="op">*</span> x <span class="op">-</span> y <span class="op">+</span> z <span class="op">-</span> <span class="dv">3</span>
+
+x0 <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]
+sol <span class="op">=</span> minimize(objective, x0, constraints<span class="op">=</span>{<span class="st">&#39;type&#39;</span>: <span class="st">&#39;eq&#39;</span>, <span class="st">&#39;fun&#39;</span>: cons})
+<span class="bu">print</span> (sol)</code></pre></div>
+<pre><code>     fun: 1.5000000035790053
+     jac: array([ 1.99997392, -1.00010441,  0.99994774])
+ message: &#39;Optimization terminated successfully.&#39;
+    nfev: 22
+     nit: 4
+    njev: 4
+  status: 0
+ success: True
+       x: array([ 0.99998696, -0.50005221,  0.49997386])</code></pre>
+<p>Fonksiyon <code>minimize</code> için kısıtlamalar <code>eq</code> ile sıfıra eşit olma üzerinden tanımlanır. Eğer <code>ineq</code> kullanılırsa sıfırdan büyük olma tanımlanıyor o zaman mesela <span class="math inline">\(x&gt;0\)</span> ve <span class="math inline">\(x&lt;5\)</span> kısıtlamalarını getirmek istersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">cons<span class="op">=</span>({<span class="st">&#39;type&#39;</span>: <span class="st">&#39;ineq&#39;</span>,<span class="st">&#39;fun&#39;</span>: <span class="kw">lambda</span> xvec: <span class="fl">5.0</span><span class="op">-</span>xvec[<span class="dv">1</span>]}, <span class="co"># y&lt;5</span>
+      {<span class="st">&#39;type&#39;</span>: <span class="st">&#39;ineq&#39;</span>,<span class="st">&#39;fun&#39;</span>: <span class="kw">lambda</span> xvec: xvec[<span class="dv">1</span>]}) <span class="co"># y&gt;0</span>
+sol <span class="op">=</span> minimize(objective, x0, method <span class="op">=</span> <span class="st">&#39;SLSQP&#39;</span>, constraints<span class="op">=</span>cons)
+<span class="bu">print</span> (sol)</code></pre></div>
+<p>Not: <code>SLSQP</code> metotu gradyana ihtiyaç duymuyor.</p>
+<pre><code>     fun: 1.1090612774580318e-16
+     jac: array([7.79817877e-12, 1.49011612e-08, 7.79860898e-12])
+ message: &#39;Optimization terminated successfully.&#39;
+    nfev: 20
+     nit: 4
+    njev: 4
+  status: 0
+ success: True
+       x: array([-7.44668151e-09,  2.73897702e-24, -7.44668129e-09])</code></pre>
+<p>Bazen her şeyi kendimiz yaparak tüm adımların ne yaptığından emin olmak isteyebiliriz. Mesela kısıtlama şartlarını kendimiz bir Lagrange çarpanı <span class="math inline">\(f(x) f(x) - \lambda g(x)\)</span> ifadesi üzerinden tanımlayıp, türevi alıp sıfıra eşitleyip, <span class="math inline">\(f_x(x)=f_y(x)=f_z(x)=g(x)=0\)</span> ile, elde edilen kısıtsız optimizasyonu çözmeyi tercih edebiliriz. Türevin alınmasını direk <code>autograd</code>'a yaptırırız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> autograd.numpy <span class="im">as</span> np
+<span class="im">from</span> autograd <span class="im">import</span> grad
+
+<span class="kw">def</span> F(L):
+    x, y, z, _lambda <span class="op">=</span> L
+    <span class="cf">return</span> objective([x, y, z]) <span class="op">-</span> _lambda <span class="op">*</span> eq([x, y, z])
+
+dfdL <span class="op">=</span> grad(F, <span class="dv">0</span>)
+
+<span class="co"># Find L that returns all zeros in this function.</span>
+<span class="kw">def</span> obj(L):
+    x, y, z, _lambda <span class="op">=</span> L
+    dFdx, dFdy, dFdz, dFdlam <span class="op">=</span> dfdL(L)
+    <span class="cf">return</span> [dFdx, dFdy, dFdz, eq([x, y, z])]
+
+<span class="im">from</span> scipy.optimize <span class="im">import</span> fsolve
+x, y, z, _lam <span class="op">=</span> fsolve(obj, [<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>])
+<span class="bu">print</span> (x,y,z)</code></pre></div>
+<pre><code>1.0 -0.5 0.5</code></pre>
+<p>Aynı sonuç bulundu. Şimdi merak ediyoruz, bu sonuç gerçekten minimum mu? Üstteki noktada Hessian'ın pozitif kesin olup olmadığını kontrol edebiliriz. Hessian'ı da <code>autograd</code> hesaplar! Once gradyan,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> autograd <span class="im">import</span> hessian
+h <span class="op">=</span> hessian(objective, <span class="dv">0</span>)
+res <span class="op">=</span> h(np.array([x,y,z]))
+<span class="bu">print</span> (res)</code></pre></div>
+<pre><code>[[2. 0. 0.]
+ [0. 2. 0.]
+ [0. 0. 2.]]</code></pre>
+<p>Bu matris pozitif kesin, ama çıplak gözle bariz değilse, tüm özdeğerleri pozitif olup olmadığına bakabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> (np.linalg.eig(h(np.array([x, y, z])))[<span class="dv">0</span>])</code></pre></div>
+<pre><code>[2. 2. 2.]</code></pre>
+<p>Birden Fazla Gradyan Değişkeni</p>
+<p>Diyelim ki elimizde</p>
+<p><span class="math display">\[
+g(w_1,w_2) = \tanh (w_1w_2)
+\]</span></p>
+<p>fonksiyonu var, bu üç boyutlu bir fonksiyon, ve optimizasyon amaçlı gradyan gerekiyor, gradyanın iki değişken üzerinden alınması gerekli [7].</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> autograd
+<span class="im">from</span> autograd <span class="im">import</span> numpy <span class="im">as</span> anp
+
+<span class="kw">def</span> g(w_1,w_2):
+    <span class="cf">return</span> anp.tanh(w_1<span class="op">*</span>w_2)
+
+<span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D
+<span class="im">from</span> matplotlib <span class="im">import</span> cm
+x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">20</span>)
+y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">20</span>)
+xx,yy <span class="op">=</span> np.meshgrid(x,y)
+zz <span class="op">=</span> g(xx,yy)
+fig <span class="op">=</span> plt.figure()
+ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)
+surf <span class="op">=</span> ax.plot_surface(xx, yy, zz, cmap<span class="op">=</span>cm.coolwarm)
+plt.savefig(<span class="st">&#39;func_40_autograd_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="func_40_autograd_03.png" />
+
+</div>
+<p><span class="math inline">\(g\)</span>'nin her iki kısmi türevini ve gradyanını,</p>
+<p><span class="math display">\[
+\nabla g(w_1,w_2) = \left[\begin{array}{r}
+\frac{\partial }{\partial w_1} g(w_1,w_2) \\
+\frac{\partial }{\partial w_2} g(w_1,w_2) 
+\end{array}\right]
+\]</span></p>
+<p><code>autograd</code> ile hesaplamak için</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dgdw1 <span class="op">=</span> autograd.grad(g,<span class="dv">0</span>)
+dgdw2 <span class="op">=</span> autograd.grad(g,<span class="dv">1</span>)</code></pre></div>
+<p>Dikkat edersek, 0 ve 1 parametreleri geçildi, bunlar sırasıyla <span class="math inline">\(w_1\)</span> ve <span class="math inline">\(w_2\)</span> değişkenlerine tekabül ediyorlar (<code>g</code> tanımındaki sıralarına göre, 0. ve 1. parametreler). Şimdi mesela (1.0,2.0) noktasındaki gradyanı hesaplayabiliriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">gradg <span class="op">=</span> [dgdw1(<span class="fl">1.0</span>,<span class="fl">2.0</span>), dgdw2(<span class="fl">1.0</span>,<span class="fl">2.0</span>)]
+<span class="bu">print</span> (gradg)</code></pre></div>
+<pre><code>[0.14130164970632894, 0.07065082485316447]</code></pre>
+<p>Tabii çok boyutlu ortamda yazının başındaki teknikleri kullanmak daha iyi, üstteki bir seçenek.</p>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, Ders Notları, <em>Otomatik Türev Almak (Automatic Differentiation -AD-)</em></p>
+<p>[2] Schrimpf, <a href="http://faculty.arts.ubc.ca/pschrimpf/526/526.html" class="uri">http://faculty.arts.ubc.ca/pschrimpf/526/526.html</a></p>
+<p>[3] Stoyanov, <a href="https://nikstoyanov.me/post/2019-04-14-numerical-optimizations" class="uri">https://nikstoyanov.me/post/2019-04-14-numerical-optimizations</a></p>
+<p>[5] Kitchin, <a href="http://kitchingroup.cheme.cmu.edu/blog/2018/11/03/Constrained-optimization-with-Lagrange-multipliers-and-autograd/" class="uri">http://kitchingroup.cheme.cmu.edu/blog/2018/11/03/Constrained-optimization-with-Lagrange-multipliers-and-autograd/</a></p>
+<p>[6] Bayramlı, Cok Boyutlu Calculus, <em>Vektör Calculus, Kurallar, Matris Türevleri</em></p>
+<p>[7] Watt, <em>Automatic Differentiation</em>, <a href="https://jermwatt.github.io/machine_learning_refined/notes/3_First_order_methods/3_5_Automatic.html" class="uri">https://jermwatt.github.io/machine_learning_refined/notes/3_First_order_methods/3_5_Automatic.html</a></p>
+</body>
+</html>

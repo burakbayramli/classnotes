@@ -1,0 +1,556 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="log-bariyer-yöntemi">Log-Bariyer Yöntemi</h1>
+<p>Bir dışbükey probleme bakalım şimdi, artık tanıdık olan genel form bu,</p>
+<p><span class="math display">\[
+\min_x f(x) \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+h_i(x) \le 0, \quad i=1,..,m
+\]</span> <span class="math display">\[
+Ax = b
+\]</span></p>
+<p>Tüm bu fonksiyonların dışbükey ve iki kere türevi alınabilir olduğunu farz ediyoruz. Şimdi log bariyer metotu uygulayacağız, bu ilk göreceğimiz iç-nokta yöntemi olacak [1, 14:00].</p>
+<p>Bu yöntem ile önce eşitsizlik kısıtlamalarına tekabül eden bir log bariyer fonksiyonu tanımlamak gerekiyor. Bu fonksiyon,</p>
+<p><span class="math display">\[
+\phi(x) = -\sum_{i=1}^{m} \log(-h_i(x))
+\]</span></p>
+<p>Tabii <span class="math inline">\(\log\)</span>'un negatif değerler üzerinde işletilemeyeceğini biliyoruz, o sebeple üstteki eksi ile çarpım var (kısıtlamalara göre <span class="math inline">\(h_i\)</span>'ler eksi olmalı, onu da biliyoruz). Bu fonksiyon ile yapmaya uğraştığımız gösterge (indicator) fonksiyonunu yaklaşıklamak. <span class="math inline">\(\phi\)</span>'nin tanım kümesi <span class="math inline">\(h\)</span>'ye göre harfiyen olurlu olan <span class="math inline">\(x\)</span>'ler.</p>
+<p>Şimdi log bariyerin yaklaşıklamayı nasıl yaptığına gelelim. Eşitlik kısıtlamalarını atlarsak, üstteki minimizasyon problemi şu şekilde de gösterilebilir [1, 15:53],</p>
+<p><span class="math display">\[
+\min_x f(x) + \sum_{i=1}^{m} I_{h_i(x) \le 0}(x)
+\]</span></p>
+<p><span class="math inline">\(I\)</span> her <span class="math inline">\(h_i\)</span>'nin sıfırdan küçük olup olmadığına göre 0 ya da çok büyük değerler verir, bu yüzden üstteki gibi bir temsil, eşitsizlik kısıtlamalarını kullanmakla eşdeğerdir. Çünkü minimizasyon problemi doğal olarak çok büyük değerlerden kaçacak, ve böylece kısıtlamalar dolaylı yoldan problem çözümüne dahil olmuş olacak. Altta kesikli çizgiyle göstergeç fonksiyonu görülüyor,</p>
+<div class="figure">
+<img src="func_59_barr_01.png" />
+
+</div>
+<p>Diğer kavisli çizgiler ise <span class="math inline">\(-\log(-u) \frac{1}{t}\)</span>, her <span class="math inline">\(t\)</span> için farklı bir eğri. <span class="math inline">\(t\)</span> büyütüldükçe log bariyer fonksiyonunu göstergeci daha da iyi yaklaşık temsil etmeye başlıyor / ona yaklaşıyor [1, 17:08].</p>
+<p>Altta farklı <span class="math inline">\(\mu\)</span> değerleri için <span class="math inline">\(-\mu \log(-u)\)</span> fonksiyonun değerlerini görüyoruz. Fonksiyon görüldüğü gibi <span class="math inline">\(I\)</span>'ya oldukca yakın.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> I(u): 
+   <span class="cf">if</span> u<span class="op">&lt;</span><span class="dv">0</span>: <span class="cf">return</span> <span class="fl">0.</span>
+   <span class="cf">else</span>: <span class="cf">return</span> <span class="fl">10.0</span>
+
+u <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">100</span>)
+Is <span class="op">=</span> np.array([I(x) <span class="cf">for</span> x <span class="kw">in</span> u])
+
+<span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>u)
+
+df[<span class="st">&#39;I&#39;</span>] <span class="op">=</span> Is
+df[<span class="st">&#39;$\mu$=0.5&#39;</span>] <span class="op">=</span> <span class="fl">-0.5</span><span class="op">*</span>np.log(<span class="op">-</span>u)
+df[<span class="st">&#39;$\mu$=1.0&#39;</span>] <span class="op">=</span> <span class="fl">-1.0</span><span class="op">*</span>np.log(<span class="op">-</span>u)
+df[<span class="st">&#39;$\mu$=2.0&#39;</span>] <span class="op">=</span> <span class="fl">-2.0</span><span class="op">*</span>np.log(<span class="op">-</span>u)
+
+df.plot()
+plt.savefig(<span class="st">&#39;func_59_barr_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="func_59_barr_02.png" />
+
+</div>
+<p>Herhalde simdi en yapacagimiz tahmin edilebilir, gostergec fonksiyonlariyla ile calismak zor, o zaman göstergeç toplamları log toplamları olarak yaklaşıksallanabilir,</p>
+<p><span class="math display">\[
+\min_x f(x) + \frac{1}{t} \sum_{i=1}^{m} \log(-h_i(x))
+\]</span></p>
+<p>ki <span class="math inline">\(t\)</span> büyük olacak şekilde çünkü o zaman log, göstergeci iyi yaklaşık olarak temsil ediyor, ardından bu yeni pürüzsüz problemi çözüyoruz, eşitsizlik şartlarına ihtiyaç duymadan.</p>
+<p>Log-Bariyer Calculus</p>
+<p><span class="math inline">\(\phi\)</span> fonksiyonunun bazı özelliklerini dökmek faydalı olur, ileride Newton metotundan bahsettiğimizde bu özellikler faydalı olacak. <span class="math inline">\(\phi\)</span> için gradyan ve Hessian,</p>
+<p><span class="math display">\[
+\nabla \phi(x) = - \sum_{i=1}^{m} \frac{1}{h_i(x)} \nabla h_i(x)
+\]</span></p>
+<p>Hessian</p>
+<p><span class="math display">\[
+\nabla^2 \phi(x) = 
+\sum_{i=1}^{m} \nabla h_i(x) \nabla h_i(x)^T - 
+\sum_{i=1}^{m} \frac{1}{h_i(x)} \nabla^2 h_i(x)
+\]</span></p>
+<p>Merkezi gidiş yolu (central path)</p>
+<p>Optimizasyon problemimizi <span class="math inline">\(1/t\)</span> yerine <span class="math inline">\(t\)</span> carpimi ile de gosterebiliriz, yani</p>
+<p><span class="math display">\[
+\min_x t f(x) + \phi(x) \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+Ax = b
+\]</span></p>
+<p>Herneyse, merkezi yol <span class="math inline">\(x^\ast(t)\)</span>, <span class="math inline">\(t&gt;0\)</span>'nin bir fonksiyonudur, yani her <span class="math inline">\(t\)</span> için eldeki çözümlerin ortaya çıkarttığı yoldur bir bakıma. Her <span class="math inline">\(t\)</span> için problemin çözümünü KKT koşulları ile karakterize edebiliriz.</p>
+<p><span class="math display">\[
+Ax^\ast(t) = b, \quad h_i(x^\ast(t)) &lt; 0, \quad i=1,..,m
+\]</span></p>
+<p><span class="math display">\[
+t \nabla f(x^\ast(t)) - \sum \frac{1}{h_i(x^\ast(t))} \nabla h_i(x^\ast(t)) + A^T w= 0
+\]</span></p>
+<p>Bu koşullar <span class="math inline">\(x^\ast(t)\)</span>'nin optimal olmasının ne demek olduğunu tanımlıyor. İki denklemdeki ilk denklem ana olurluktan geliyor, eşitlik sınırlamalarına tekabül eden tek ikiz değişken var, <span class="math inline">\(w\)</span>, onun işareti üzerinde kısıtlama yok çünkü eşitlik kısıtlaması. Durağanlık koşulu ikinci denklemde, ona nasıl eriştik? Problemin Lagrangian'i</p>
+<p><span class="math display">\[
+t f(x) + \phi(x) + w^T (Ax - b)
+\]</span></p>
+<p>Eğer <span class="math inline">\(x\)</span>'e göre gradyan alıp sıfıra eşitlersek durağanlığı elde ederim. Gradyan yeterli çünkü buradaki tüm fonksiyonlar dışbükey ve pürüzsüz [1, 24:04].</p>
+<p>Eğer üstteki problemi bir <span class="math inline">\(w\)</span> için çözersem o zaman merkezi yoldaki bir çözümü belli bir <span class="math inline">\(t\)</span> için karakterize etmiş / tarif etmiş oluyorum. Umudumuz o ki <span class="math inline">\(t\)</span>'yi sonsuzluğa doğru büyüttükçe üstteki KKT koşullarıyla temsil edilen çözümler orijinal problemimdeki çözüme yaklaşmaya başlayacak. Bu olabilir değil mi? <span class="math inline">\(t\)</span>'yi büyüttükçe log bariyerin nasıl göstergeç fonksiyonuna benzemeye başladığını biraz önce gördük. Bu tür log bariyerlerden oluşan optimizasyon problemi için de benzer bir durum olacağını tahmin edebiliriz.</p>
+<p>Bu kavramları lineer programlar için yakından görebiliriz. Tüm bu yaklaşımlar bu arada ilk başta LP'ler için ortaya atılmıştır.</p>
+<p>Önemli bir örnek,</p>
+<p><span class="math display">\[
+\min_x t c^T x - \sum_{i=1}^{m} \log(e_i - d_i^T x)
+\]</span></p>
+<p>Bu bir standart LP'nin bariyerleştirilmiş hali. Eşitlik kısıtlaması yok, ve bariyer fonksiyonu çokyüzlü kısıtlama <span class="math inline">\(D x \le e\)</span> ifadesine tekabül ediyor. Bu problemi belli bir <span class="math inline">\(t\)</span> için çözersem, <span class="math inline">\(t\)</span>'yi büyütürsem, bunu ardı ardına tekrar edersem umudum orijinal LP'nin çözümüne yaklaşmak.</p>
+<div class="figure">
+<img src="func_59_barr_03.png" />
+
+</div>
+<p>Resimde görüldüğü gibi, ortadan başlıyoruz, <span class="math inline">\(t=0\)</span>'da diyelim, ve <span class="math inline">\(t\)</span>'yi büyüttükçe yolda ilerliyoruz, ve sonuca erişiyoruz. Gidiş pürüzsüz, ve LP'lerin karakterinden biliyoruz ki nihai sonuç çokyüzlümün (polyhedra) ekstrem noktalarının birinde olmalı. Yarı yolda <span class="math inline">\(t=10\)</span>'daki bir nokta gösteriliyor, nihai sonuç belki <span class="math inline">\(t=100\)</span>'da [2, 26:59]</p>
+<p>KKT koşulu üzerinden durağanlığı temiz bir şekilde gösterebiliyoruz, ya da iç nokta ve ortada, merkezde bir yol takip edilmesini zorlama bağlamında, merkezlik şartı da deniyor buna, gradyan alınınca</p>
+<p><span class="math display">\[
+0 = tc - \sum_{i=1}^{m} \frac{1}{e_i - d_t ^T x^(t)} d_i
+\]</span></p>
+<p>Bu demektir ki gradyan <span class="math inline">\(\nabla (x^\ast(t))\)</span>, <span class="math inline">\(-c\)</span>'ye paralel olmalıdır, ya da <span class="math inline">\(\{ x: c^T x = c^T x^\ast(t) \}\)</span> hiper düzlemi <span class="math inline">\(\phi\)</span>'nin <span class="math inline">\(x^\ast(t)\)</span>'deki konturuna teğet durmalıdır [1, 28:12].</p>
+<p>Ikiz noktalar</p>
+<p>Birazdan merkezi yoldan ikiz noktalar alabileceğimizi göreceğiz. Bu çok faydalı olacak çünkü bu ikiz noktaları bir ikiz boşluğu hesaplamak için kullanacağız. Merkezi yoldayken bu yoldaki noktalar <span class="math inline">\(x*(t)\)</span>'leri kullanarak olurlu ikiz noktalar hesaplayabiliriz. Orijinal probleme tekrar bakarsak, bu problem için ikiz değişkenleri elde etmek için her eşitsizlik için bir <span class="math inline">\(u_i\)</span>'ye, her eşitlik şartı için bir <span class="math inline">\(v_i\)</span>'ya ihtiyacım var. Onları nasıl tanımlarım? Merkezi yol üzerindeki çözümler üzerinden,</p>
+<p><span class="math display">\[
+u_i^\ast(t) = \frac{1}{t h_i(x^\ast(t))}, \quad i=1,..,m, \quad v^\ast(t) = w/t
+\]</span></p>
+<p><span class="math inline">\(w\)</span> bariyer problemi için KKT koşullarını çözerken elde ettiğim değişken idi.</p>
+<p>Niye üsttekiler orijinal problem için olurlu? Bunu görmek kolay, ilk önce, <span class="math inline">\(u_i^\ast(t)\)</span>'nin her ögesi harfiyen pozitif, çünkü <span class="math inline">\(h_i(x^\ast(t))\)</span>'nin her ögesi harfiyen negatif. Bu bariyer probleminin ana olurluk şartından geliyor. Ayrıca <span class="math inline">\((u^\ast(t),v^\ast(t))\)</span> Lagrange ikiz fonksiyonu <span class="math inline">\(g(u,v)\)</span>'nin tanım kümesinde (domain). Hatırlarsak Lagrange ikizi formülize ettiğimizde tanım kümesinde bazı dolaylı sınırlamalar elde ediyorduk. Tarif itibariyle</p>
+<p><span class="math display">\[
+\nabla f(x^\ast(t)) + \sum_{i=1}^{m} u_i (x^\ast(t)) \nabla h_i(x^\ast(t)) + 
+A^T v^\ast(t) = 0
+\]</span></p>
+<p>Yani <span class="math inline">\(x^\ast(t)\)</span>, Lagrangian <span class="math inline">\(L(x,u^\ast(t),v^\ast(t))\)</span>'i tüm <span class="math inline">\(x\)</span>'ler üzerinden minimize edeceği için <span class="math inline">\(g(u^\ast(t),v^\ast(t)) &gt; -\infty\)</span>. Bu direk durağanlık şartından geliyor işte. O kadar bariz birşey ki aslında bazen kafa karıştırıyor. Merkezi yol probleminden çözdüğümüz durağanlık koşulu şöyleydi,</p>
+<p><span class="math display">\[
+t \nabla f(x^\ast(t)) - \sum \frac{1}{h_i(x^\ast(t))} \nabla h_i(x^\ast(t)) + A^T w= 0
+\]</span></p>
+<p>Bir <span class="math inline">\(x^\ast\)</span> çözümü ve <span class="math inline">\(w\)</span> olduğunu farz ediyoruz. Tüm formülü <span class="math inline">\(t\)</span> ile bölersem,</p>
+<p><span class="math display">\[
+\nabla f(x^\ast(t)) - \sum \frac{1}{t h_i(x^\ast(t))} \nabla h_i(x^\ast(t)) + A^T \frac{w}{t}= 0
+\]</span></p>
+<p>Tek yaptığımız &quot;üstteki orijinal problemdeki durağanlık şartına çok benziyor'' demek, değil mi, çünkü</p>
+<p><span class="math display">\[
+\nabla f(x^\ast(t)) +
+\sum \underbrace{\frac{-1}{t h_i(x^\ast(t))}}_{u_i} \nabla h_i(x^\ast(t)) + 
+A^T \underbrace{\frac{w}{t}}_{v}= 0 
+\qquad (4)
+\]</span></p>
+<p>desem, orijinal problemin durağanlık şartına benzeyen bir ifade elde etmiş olurum [2, 33:48]. Demiştik ki üstteki <span class="math inline">\(u_i,v\)</span> tanımları üzerinden orijinal problem için olurlu ikiz noktaları alabiliyoruz.</p>
+<p>Soru: niye orijinal problem için optimal noktaları elde etmedim? Biraz önce gördük, durağanlık koşulunu tatmin ettim, ana, ikiz olurluk var.. ama.. tamamlayıcı gevşeklik tatmin edilmedi. Çok önemli. Onun yerine ne var? <span class="math inline">\(u_i h_i (x) = 0\)</span> olması lazım, onun yerine ne var? Tanım itibariyle <span class="math inline">\(u_i = -1/t ..\)</span> var. O zaman sıfıra yakınsak çok yakınsak bölüm büyür, dolaylı olarak <span class="math inline">\(t\)</span>'yi büyüttükçe orijial problemin KKT koşullarını yaklaşıksallamış oluruz. O zaman log bariyer problemini çözmüş olmamıza rağmen belli bir <span class="math inline">\(t\)</span> değer için orijinal problem için çözüm olmamasının sebebi tamamlayıcı gevşekliğin tatmin edilmiyor olması.</p>
+<p>Ama elimizdekiler hala çok faydalı, çünkü herhangi bir anda merkez yol üzerinde <span class="math inline">\(t\)</span>'nin fonksiyonu olarak ne kadar alt optimal olduğumuzu sınırlamak mümkün oluyor. Bunun için sadece ikiz boşluğunu hesaplıyoruz, o kadar. O zaman <span class="math inline">\(u^\ast,v^\ast\)</span>'da Lagrange ikiz fonksiyonu hesaplıyorum, ve <span class="math inline">\(f^\ast\)</span> ile bu Lagrange farkını buluyorum, ve ikiz boşluğu hesaplanmış oluyor. (4)'te gördük ki <span class="math inline">\(x^\ast\)</span> Lagrangian'i <span class="math inline">\(u^\ast,v^\ast\)</span>'da minimize eder, o zaman ikizi alttaki gibi hesaplayarak</p>
+<p><span class="math display">\[
+g(u^\ast(t),v^\ast(t)) = 
+f(x^\ast(t)) + \sum_{i=1}^{m} u_i^\ast(t) h_i(x^\ast(t)) + v^\ast(t)^T (Ax^\ast(t) - b)
+\]</span></p>
+<p>Büyük toplamdaki ikinci terim sıfır, çünkü merkezi yolda <span class="math inline">\(Ax^\ast\)</span> her zaman <span class="math inline">\(b\)</span>'ye eşittir. Birince terimde, <span class="math inline">\(u_i\)</span>'i <span class="math inline">\(-1/t\)</span>'ye eşitledik, ve bu <span class="math inline">\(m\)</span> kere toplanacak, sonuç</p>
+<p><span class="math display">\[
+= f(x^\ast(t)) - m/t
+\]</span></p>
+<p>Yani göstermiş olduk ki merkezi yolun optimallikten olan uzaklığı en fazla <span class="math inline">\(m/t\)</span> olacaktır,</p>
+<p><span class="math display">\[
+f(x^\ast(t)) - f^\ast \le m/t
+\]</span></p>
+<p>Üstteki bariyer metorun işlediğine dair ispata en yakın sonuç, bize diyor ki eğer herhangi bir <span class="math inline">\(t\)</span> için bariyer problemini çözersem optimalliğe yakınlık her zaman <span class="math inline">\(m/t\)</span>'den küçük olur. <span class="math inline">\(t\)</span>'yi isteğe bağlı olarak büyüttükçe o ölçüde optimalliğe yaklaşmış olurum.</p>
+<p>Merkezi yolu yorumlamanın bir diğer yolu &quot;sarsıma uğratılmış KKT koşulları'' denen bir teknik üzerinden. Şimdiye kadar gördük ki merkez yol ve ona tekabül eden ikiz değerler (4)'teki durağanlık şartını çözüyor. <span class="math inline">\(u_i \ge 0\)</span>, <span class="math inline">\(h_i(x) \le 0\)</span>, ve <span class="math inline">\(Ax = b\)</span>. Tamamlayıcı gevşeklik haricinde tüm koşullar tatmin. Esas KKT koşullarında</p>
+<p><span class="math display">\[
+u_i^\ast(t) \cdot h_i^\ast(t) = 0, \quad i=1,..,m
+\]</span></p>
+<p>olurdu, biz onun yerine</p>
+<p><span class="math display">\[
+u_i^\ast(t) \cdot h_i^\ast(t) = -1/t, \quad i=1,..,m
+\]</span></p>
+<p>dedik. Yani bir anlamda log bariyer fonksiyonunu unutuyoruz, onun yerine şu probleme bakıyoruz,</p>
+<p><span class="math display">\[
+\nabla f(x^\ast(t)) + \sum_{i=1}^{m} u_i(x^\ast(t))\nabla h_i(x^\ast(t)) + A^T v^\ast(t) = 0
+\]</span></p>
+<p><span class="math display">\[
+u_i^\ast(t) \cdot h_i^\ast(t) = -1/t, \quad i=1,..,m
+\]</span></p>
+<p><span class="math display">\[
+h_i(x^\ast(t)) \le 0, \quad i=1,..,m, \quad Ax^\ast(t) = b
+\]</span></p>
+<p><span class="math display">\[
+u_i(x^\ast(t)) \ge 0
+\]</span></p>
+<p>Ve <span class="math inline">\(t\)</span>'yi büyüterek üstteki problemi çözüyorum. Yani olurluğu, durağanlığı tam olarak, tamamlayıcı gevşekliği ise yaklaşık olarak çözmüş oluyorum, ve yaklaşıksallığı gittikçe büyüyen <span class="math inline">\(t\)</span>'ler üzerinden daha sıkı hale getiriyorum. Yani log bariyer tekniği ile sarsıma uğratılmış KKT koşulları sınırlı problemleri çözmenin iki yolu.</p>
+<p>Niye ufak <span class="math inline">\(t\)</span> ile başlayıp büyütüyorum [2, 02:19]? Çünkü pratikte bu iyi işliyor. Niye işlediğini görmek zor değil, <span class="math inline">\(t\)</span> küçükken tüm fonksiyon oldukca pürüzsüz, ve onun üzerinde Newton adımları rahat işler. Ama <span class="math inline">\(t\)</span>'yi büyüttükçe onun kontrol ettiği fonksiyon kısımlarını gittikçe daha az pürüzsüz yapmaya başlıyorum, ama bu çok kötü değil çünkü bu noktada çözüm bölgesine kabaca yaklaşmış olmalıyım.</p>
+<p>Yakınsama analizi (convergence analysis)</p>
+<p>Teori</p>
+<p>Diyelim ki merkezleştirme adımlarını kesin olarak çözebiliyoruz, yani, diyelim ki ne zaman Newton metotunu uygularsam mükemmel bir sonuç alıyorum. Tabii ki bu gerçekte olmuyor ama farz edelim. O zaman, sadece <span class="math inline">\(t\)</span>'yi her adımda <span class="math inline">\(\mu\)</span> ile çarpmamızın doğal sonucu olarak ve ikizlik boşluğununun <span class="math inline">\(m / t\)</span> olması sebebiyle <span class="math inline">\(k\)</span> adım sonrası alttakini görürdük,</p>
+<p><span class="math display">\[
+f(x^(k)) - f^\ast \le \frac{m}{\mu^k t^{0}}
+\]</span></p>
+<p>Bu ifade diyor ki istenen <span class="math inline">\(\epsilon\)</span> seviyesinde bir doğruluğa erişmek için</p>
+<p><span class="math display">\[
+\frac{\log ( m / (t^{(0)} \epsilon) )}{\log \mu}
+\]</span></p>
+<p>tane merkezleştirme adımına ihtiyacımız var.</p>
+<p>Olurluk metotu (feasibility method)</p>
+<p>Bariyer metotunun bir noktadan başlaması gerekir ve bu nokta olurlu olmalıdır. Olurlu derken</p>
+<p><span class="math display">\[
+h_i(x) &lt; 0, \quad i=1,..,m, \quad Ax = b
+\]</span></p>
+<p>şartlarına uyan bir noktadan bahsediyorum. Fakat ya öyle bir nokta elimizde yoksa? Başta olurlu olan bir noktayı bulmanın kendisi de zor bir problem. Böyle bir noktayı elde etmek için olurluk metotu denen bir yöntem kullanmak gerekecek. Boyd'un kitabı [4, Bölüm 11] bu metota &quot;1. Faz (Phase I)'' ismi veriyor, problemin kendisini çözmeye &quot;2. Faz'' diyor. Pratikte bariyer metotunu kullanmak isteyenler bunu hatırlamalı.</p>
+<p>Harfiyen olurlu bir noktayı nasıl buluruz? Kulağa biraz dolambaçlı gibi gelebilir ama bu noktayı bulmak için ayrı, farklı bir optimizasyon problemi daha kurarız, onu da bariyer metotu ile çözeriz. Tabii illa bariyer metotu olması gerekmez, ana-çift iç-nokta yöntemi de olabilir, ama her halükarda alttaki problemi çözeriz.</p>
+<p>Bu problemde elimizde iki tane değişken grubu var, <span class="math inline">\(x,s\)</span>. Problem [2, 23:02],</p>
+<p><span class="math display">\[
+\min_{x,s} s \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+h_i(x) \le s, \quad i=1,..,m
+\]</span> <span class="math display">\[
+Ax = b
+\]</span></p>
+<p>Amaç harfiyen negatif bir <span class="math inline">\(s\)</span> elde etmek, böylece <span class="math inline">\(h_i(x) \le s\)</span> üzerinden ana problemin eşitsizlik şartları tatmin olacak, ayrıca <span class="math inline">\(Ax = b\)</span>'e uygun bir başlangıç noktası elde edilmiş olacak ki bu da ana problem için gerekli.</p>
+<p>Bu problemi bariyer metotu ile çözmek oldukca kolay, ana problemin kendisi kadar zor değil. Niye? İki sebep: ilki, üstteki problemi çözmek için de harfiyen olurlu bir başlangı noktası lazım, ama bu noktayı bulmak aslında çok kolay. Bana tek gereken eşitlik kısıtlaması <span class="math inline">\(Ax = b\)</span>'yi tatmin eden bir <span class="math inline">\(x\)</span> bulmak, ama bu lineer bir sistem çözümü, her lineer cebir paketi bunu çözer. Ardından elde edilen <span class="math inline">\(x\)</span> ile <span class="math inline">\(h_i(x)\)</span>'i hesaplamak, ve bunların en büyüğünü artı mesela 0.01 diyerek kullanmak [2, 24:00]. Elde edeceğimiz sonuç üstteki problem için harfiyen olurludur, eşitsizlik kısıtlamalarına harfiyen uygun. Şimdi elimde bir başlangıç <span class="math inline">\(x\)</span>'i ve <span class="math inline">\(s\)</span>'i var, ve buradan başlayarak bariyer metotunun adımlarını uygulayabilirim. İşin güzel tarafı durma şartımız çok basit, <span class="math inline">\(s\)</span>'in her ögesinin negatif olduğunu gördüğüm anda şak diye durabilirim, yani üstteki programın &quot;optimal'' olmasıyla ilgilenmiyorum sonuçta bana tek gereken ana problemim için olurlu bir başlangıç noktası. Çoğunlukla yapılan tarif edilen şekilde <span class="math inline">\(x,s\)</span> bulmak ve bunu ardı ardına yapmak ta ki tamamen negatif elde edilene kadar ve o noktada durulur, ana probleme dönülür.</p>
+<p>Alternatif olarak şu problem de çözülebilir,</p>
+<p><span class="math display">\[
+\min_{x,s} 1^T s, \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+h_i(x) \le s_i, \quad i=1,..,m
+\]</span> <span class="math display">\[
+Ax = b, s \ge 0
+\]</span></p>
+<p>Bu metotun avantajı eğer sistem olurlu değilse hangi kısıtlamanın harfiyen yerine getirilemediğini bize söyler. Dezavantaj çözmesinin biraz daha zor olabilmesi.</p>
+<p>Ekler</p>
+<p>Bir diğer başlangıç noktası bulma metotu, Faz I yaklaşımı daha [5]. Burada</p>
+<p><span class="math display">\[
+\min t, \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+Ax = b, \quad x \ge (1-t) 1, \quad t \ge 0
+\]</span></p>
+<p>problemini çözüyoruz, ki değişkenler <span class="math inline">\(x\)</span> ve <span class="math inline">\(t \in \mathbb{R}\)</span>. Eğer üstteki problemde <span class="math inline">\(t &lt; 1\)</span> olacak şekilde olurlu bir <span class="math inline">\(x,t\)</span> bulabilirsek, o zaman elimizdeki <span class="math inline">\(x\)</span> orijinal problem için de harfiyen olurlu olacaktır. Argümanın tersi de geçerli, esas LP harfiyen olurludur sadece ve sadece <span class="math inline">\(t^\ast &lt; 1\)</span> ise ki <span class="math inline">\(t^\ast\)</span> Faz I probleminin optimal değeri.</p>
+<p>Ama şimdi üstteki problem için nasıl başlangıç değeri buluruz sorusu var, ama bu daha basit. <span class="math inline">\(Ax^0 = b\)</span>'ye çözüm olan herhangi bir <span class="math inline">\(x^0\)</span>'yu alırız, ve <span class="math inline">\(t^0 = 2 - \min_i x_i^0\)</span> seçeriz. Tabii eğer <span class="math inline">\(\min_i x_i^0 &lt; 0\)</span> değil ise, yani tüm <span class="math inline">\(x_i\)</span>'lar pozitif ise, o zaman iş bitti demektir, <span class="math inline">\(x^0\)</span> zaten harfiyen olurlu. Değil ise log bariyer ile devam edeceğiz, problemi standart forma çevirmek için <span class="math inline">\(z = x + (t-1)\vec{1}\)</span> diyebiliriz,</p>
+<p><span class="math display">\[
+z = x + t \vec{1} - \vec{1}
+\]</span></p>
+<p>Ya da</p>
+<p><span class="math display">\[
+x = z - t\vec{1} + \vec{1}
+\]</span></p>
+<p>Bunu <span class="math inline">\(Ax = b\)</span> üzerinde uygularsak,</p>
+<p><span class="math display">\[
+A (z - t\vec{1} + \vec{1}) = b
+\]</span></p>
+<p><span class="math display">\[
+Az - A t\vec{1} = b - A\vec{1}
+\]</span></p>
+<p>Eşitliğin solundakiler yerine <span class="math inline">\(x\)</span>'i genişletip <span class="math inline">\(t\)</span> için yeni bir hücre yaratabiliriz, ve <span class="math inline">\(A\)</span>'ya yeni kolon ekleriz, bu kolondaki her öge mevcut <span class="math inline">\(A\)</span>'nin satırlarının toplamının negatifi olur. Bedel vektörü de <span class="math inline">\(c = [0, 0, ..., 1]\)</span> haline gelir, son öğe <span class="math inline">\(t\)</span> için.</p>
+<p>Standard LP çözen bariyer metot temelli [3] kod alttadır.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> lp_acent(A,b,c,x_0):
+    b <span class="op">=</span> b.flatten()
+    c <span class="op">=</span> c.flatten()
+    ALPHA <span class="op">=</span> <span class="fl">0.01</span>
+    BETA <span class="op">=</span> <span class="fl">0.5</span>
+    EPSILON <span class="op">=</span> <span class="fl">1e-6</span>
+    MAXITERS <span class="op">=</span> <span class="dv">100</span>
+    <span class="cf">if</span> (np.<span class="bu">min</span>(x_0)<span class="op">&lt;=</span><span class="dv">0</span>) <span class="kw">and</span> (np.linalg.norm<span class="op">&gt;</span><span class="fl">1e-3</span>):
+        <span class="bu">print</span> (<span class="st">&#39;failed&#39;</span> )
+        <span class="cf">return</span> <span class="dv">0</span>
+    lambda_hist <span class="op">=</span> []
+    x <span class="op">=</span> x_0
+    <span class="cf">for</span> <span class="bu">iter</span> <span class="kw">in</span> <span class="bu">range</span>(MAXITERS):
+        g <span class="op">=</span> c<span class="op">-</span>np.power(x,<span class="op">-</span><span class="dv">1</span>)
+        w <span class="op">=</span> np.linalg.solve(np.dot(np.dot(A,np.diag(np.power(x,<span class="dv">2</span>))),A.T),
+                            np.dot(np.dot(<span class="op">-</span>A,np.diag(np.power(x,<span class="dv">2</span>))),g))
+        dx <span class="op">=</span> np.dot(<span class="op">-</span>np.diag(np.power(x,<span class="dv">2</span>)),np.dot(A.T,w)<span class="op">+</span>g)
+        lambdasqr <span class="op">=</span> np.dot(<span class="op">-</span>g.T,dx)
+        lambda_hist.append(lambdasqr<span class="op">/</span><span class="dv">2</span>)
+        <span class="cf">if</span> lambdasqr<span class="op">/</span><span class="dv">2</span> <span class="op">&lt;=</span> EPSILON:
+            <span class="cf">break</span>
+        t  <span class="op">=</span> <span class="dv">1</span>
+        <span class="cf">while</span> np.<span class="bu">min</span>(x<span class="op">+</span>t<span class="op">*</span>dx)<span class="op">&lt;=</span><span class="dv">0</span>:
+            t <span class="op">=</span>BETA<span class="op">*</span>t
+        <span class="cf">while</span> np.dot(c.T,np.dot(t,dx))<span class="op">-</span> <span class="op">\</span>
+              np.<span class="bu">sum</span>(np.log(x<span class="op">+</span>t<span class="op">*</span>dx))<span class="op">+</span>np.<span class="bu">sum</span>(np.log(x))<span class="op">-\</span>
+              ALPHA<span class="op">*</span>t<span class="op">*</span>np.dot(g.T,dx)<span class="op">&gt;</span><span class="dv">0</span>:
+            t <span class="op">=</span> BETA<span class="op">*</span>t
+        x <span class="op">=</span> x<span class="op">+</span>t<span class="op">*</span>dx
+    <span class="cf">if</span> <span class="bu">iter</span> <span class="op">==</span> MAXITERS:
+        <span class="bu">print</span> (<span class="st">&#39;ERROR: MAXITERS reached&#39;</span>)
+    <span class="cf">else</span>:
+        <span class="cf">return</span> x,w,lambda_hist
+        
+<span class="kw">def</span> lp_barrier(A,b,c,x_0):
+    T_0 <span class="op">=</span><span class="dv">1</span>
+    MU <span class="op">=</span> <span class="dv">20</span>
+    EPSILON <span class="op">=</span> <span class="fl">1e-3</span>
+    n <span class="op">=</span> <span class="bu">len</span>(x_0)
+    t <span class="op">=</span> T_0
+    x <span class="op">=</span> x_0.flatten()
+    history <span class="op">=</span> []
+    <span class="cf">while</span> <span class="va">True</span>:
+        x_star, nu_star,lambda_hist <span class="op">=</span> lp_acent(A,b,t<span class="op">*</span>c,x)
+        x <span class="op">=</span> x_star
+        gap <span class="op">=</span> n<span class="op">/</span>t
+        history.append(lambda_hist)
+        <span class="cf">if</span> gap<span class="op">&lt;</span>EPSILON:
+            <span class="cf">break</span>
+        t <span class="op">=</span> MU<span class="op">*</span>t
+    <span class="cf">return</span> x_star,nu_star,gap
+    
+
+<span class="kw">def</span> lp_solve(A,b,c):
+    m,n <span class="op">=</span> A.shape
+    nsteps <span class="op">=</span> np.zeros((<span class="dv">2</span>,<span class="dv">1</span>))
+    x0 <span class="op">=</span> np.linalg.lstsq(A,b)[<span class="dv">0</span>]
+    t0 <span class="op">=</span> <span class="dv">2</span><span class="op">+</span>np.<span class="bu">max</span>([<span class="dv">0</span>,<span class="op">-</span>np.<span class="bu">min</span>(x0)])
+    <span class="cf">if</span> np.<span class="bu">min</span>(x0)<span class="op">&gt;</span><span class="fl">0.0</span>:
+        <span class="bu">print</span> (<span class="st">&#39;Ax=b solution already feasible&#39;</span>)
+        x_0 <span class="op">=</span> x0
+    <span class="cf">else</span>:
+        <span class="bu">print</span> (<span class="st">&quot;phase I&quot;</span>)
+        A1 <span class="op">=</span> np.hstack((A,np.dot(<span class="op">-</span>A,np.ones((n,<span class="dv">1</span>)))))
+        b1 <span class="op">=</span> b<span class="op">-</span>np.dot(A,np.ones((n,<span class="dv">1</span>)))
+        z0 <span class="op">=</span> x0<span class="op">+</span>t0<span class="op">*</span>np.ones((n,<span class="dv">1</span>))<span class="op">-</span>np.ones((n,<span class="dv">1</span>))
+        c1 <span class="op">=</span> np.vstack((np.zeros((n,<span class="dv">1</span>)),<span class="dv">1</span>))
+        z_star,nu_star,gap <span class="op">=</span> lp_barrier(A1,b1,c1,np.vstack((z0,t0)))
+        <span class="cf">if</span> z_star[n] <span class="op">&gt;=</span> <span class="dv">1</span>:
+            <span class="bu">print</span> (<span class="st">&#39;Problem is infeasible&#39;</span>)
+            exit()
+        x_0 <span class="op">=</span> z_star[<span class="dv">0</span>:n]<span class="op">-</span>(z_star[n]<span class="op">*</span>np.ones((n,<span class="dv">1</span>))).flatten()<span class="op">+\</span>
+              np.ones((n,<span class="dv">1</span>)).flatten()
+
+    x_star,nu_star,gap <span class="op">=</span> lp_barrier(A,b,c,x_0)
+    <span class="cf">return</span> x_star,gap,nsteps</code></pre></div>
+<p>Örnek olarak uyduruk bir problem seçtik, problem özellikle başta olurlu nokta bulamayacak şekilde ayarlandı, böylece gidip kendimizin bulması gerekiyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">from</span> scipy.optimize <span class="im">import</span> linprog
+<span class="im">import</span> barr
+
+<span class="im">import</span> barr
+
+A <span class="op">=</span> [[<span class="fl">1.</span>,  <span class="fl">1.</span>, <span class="fl">1.</span>, <span class="fl">0.</span>],
+     [<span class="fl">1.</span>,  <span class="fl">3.</span>, <span class="fl">0.</span>, <span class="fl">1.</span>],
+     [<span class="fl">9.</span>,  <span class="fl">1.</span>, <span class="fl">-3.</span>, <span class="fl">1.</span>]]
+b <span class="op">=</span> [[<span class="fl">5.</span>, <span class="fl">7.</span>, <span class="dv">-1</span>]]
+c <span class="op">=</span> [[<span class="op">-</span><span class="fl">1.</span>, <span class="fl">-5.</span>, <span class="fl">0.</span>, <span class="fl">0.</span> ]]
+
+A <span class="op">=</span> np.array(A)
+b <span class="op">=</span> np.array(b).T
+c <span class="op">=</span> np.array(c).T
+
+x_star,gap,nsteps <span class="op">=</span> barr.lp_solve(A,b,c)
+
+<span class="bu">print</span> (<span class="st">&#39;log bariyer ==========&#39;</span>)
+<span class="bu">print</span> (x_star)
+
+res <span class="op">=</span> linprog(c, A_eq<span class="op">=</span>A, b_eq<span class="op">=</span>b)
+<span class="bu">print</span> (<span class="st">&#39;linprog ===============&#39;</span>)
+<span class="bu">print</span> (res)</code></pre></div>
+<pre><code>phase I
+[[1.44060995]
+ [3.1918138 ]
+ [3.37720706]
+ [1.        ]
+ [2.00321027]]
+log bariyer ==========
+[4.37502314e-01 2.18747454e+00 2.37502314e+00 7.40628401e-05]
+linprog ===============
+     con: array([ 2.05213624e-11,  2.05719886e-11, -9.18283227e-11])
+     fun: -11.37499999994356
+ message: &#39;Optimization terminated successfully.&#39;
+     nit: 4
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([4.3750000e-01, 2.1875000e+00, 2.3750000e+00, 1.0991855e-11])</code></pre>
+<p>Şimdi daha önce de çözdüğümüz bir örneğe tekrar bakalım,</p>
+<p><span class="math display">\[
+\min_x -x_1 - 5x_2 \quad \textrm{öyle ki}
+\]</span> <span class="math display">\[
+x_1 + x_2 + x_3  = 5 
+\]</span> <span class="math display">\[
+x_1 + 3 x_2 + x_4 = 7
+\]</span> <span class="math display">\[
+x_1,x_2,x_3,x_4 \ge 0
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">A <span class="op">=</span> np.array([[<span class="dv">1</span>,  <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>],
+              [<span class="dv">1</span>,  <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">1</span>]])
+b <span class="op">=</span> np.array([<span class="dv">5</span>,<span class="dv">7</span>])
+c <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">1</span>, <span class="dv">-5</span>, <span class="dv">0</span>, <span class="dv">0</span> ])
+A <span class="op">=</span> np.array(A)
+b <span class="op">=</span> np.array(b).T
+c <span class="op">=</span> np.array(c).T
+
+x_star,gap,nsteps <span class="op">=</span> barr.lp_solve(A,b,c)
+
+<span class="bu">print</span> (<span class="st">&#39;log bariyer ==========&#39;</span>)
+<span class="bu">print</span> (x_star)
+
+res <span class="op">=</span> linprog(c, A_eq<span class="op">=</span>A, b_eq<span class="op">=</span>b)
+<span class="bu">print</span> (<span class="st">&#39;linprog ===============&#39;</span>)
+<span class="bu">print</span> (res)</code></pre></div>
+<pre><code>Ax=b solution already feasible
+log bariyer ==========
+[1.87451194e-04 2.33324585e+00 2.66656670e+00 7.49883368e-05]
+linprog ===============
+     con: array([1.18571819e-11, 1.18527410e-11])
+     fun: -11.66666666664022
+ message: &#39;Optimization terminated successfully.&#39;
+     nit: 4
+   slack: array([], dtype=float64)
+  status: 0
+ success: True
+       x: array([1.15454732e-13, 2.33333333e+00, 2.66666667e+00, 3.96953400e-12])</code></pre>
+<p>Bu durumda <span class="math inline">\(Ax^0=b\)</span> çözümü başlangıç için yeterliydi ve o kullanıldı.</p>
+<p>Gradyan ve Hessian</p>
+<p>Pek çok yerde kullanılan bir eşitsizlik görelim, mesela bütün <span class="math inline">\(x_i &lt; 0\)</span> olduğu bir durum, yani <span class="math inline">\(h_i(x) = -x\)</span>. O zaman bariyer neye benzer?</p>
+<p><span class="math display">\[
+\phi(x) = - \sum_{i=1}^{n} \log x_i
+\]</span></p>
+<p><span class="math display">\[
+\nabla \phi(x) = - \left[\begin{array}{c}
+1/x_1  \\ 
+\vdots \\
+1/x_n
+\end{array}\right] 
+= - X^{-1} \vec{1}
+\]</span></p>
+<p>Burada <span class="math inline">\(X\)</span> matrisi</p>
+<p><span class="math display">\[
+X = \mathrm{diag}(x) = 
+\left[\begin{array}{ccc}
+x_1 &amp; &amp; \\
+    &amp; \ddots &amp; \\
+    &amp; &amp; x_n
+\end{array}\right]
+\]</span></p>
+<p>ve <span class="math inline">\(\vec{1}\)</span> sembolu tamamen 1'lerden oluşan matris.</p>
+<p>Hessian</p>
+<p><span class="math display">\[
+\nabla^2 \phi (x) = \left[\begin{array}{ccc}
+1/x_1^2 &amp; &amp; \\
+    &amp; \ddots &amp; \\
+    &amp; &amp; 1/x_n^2
+\end{array}\right] = X^2 
+\]</span></p>
+<p>Eski Anlatım</p>
+<p><span class="math display">\[
+\min_x f(x),  \quad  \textrm{öyle ki}, 
+\]</span> <span class="math display">\[
+c_i(x) \ge 0, \quad i=1,2,..,m
+\]</span></p>
+<p><span class="math inline">\(c_i\)</span> ile gösterilen eşitsizlik içeren (üstte büyüklük türünden) kısıtlamalar olduğunu düşünelim. Bu problemi nasıl çözeriz?</p>
+<p>Bir fikir, problemin eşitizliklerini bir gösterge (indicator) fonksiyonu üzerinden, Lagrange yönteminde olduğu gibi, ana hedef fonksiyonuna dahil etmek, ve elde edilen yeni hedefi kısıtlanmamış bir problem gibi çözmek. Yani üstteki yerine, alttaki problemi çözmek,</p>
+<p><span class="math display">\[
+\min_x f(x) + \sum_{i=1}^{m} I(c_i(x))
+\]</span></p>
+<p>ki <span class="math inline">\(I\)</span> pozitif reel fonksiyonlar için göstergeç fonksiyonu,</p>
+<p><span class="math display">\[
+I(u) = 
+\left\{ \begin{array}{ll}
+0 &amp; u \le 0 \\
+\infty &amp; u &gt; 0
+\end{array} \right.
+\]</span></p>
+<p>Bu yaklaşımın nasıl işleyeceğini kabaca tahmin edebiliriz. <span class="math inline">\(I\)</span> fonksiyonu 0'dan büyük değerler için müthiş büyük değerler veriyor, bu sebeple optimizasyon sırasında o değerlerden tabii ki kaçınılacak, ve arayış istediğimiz noktalara doğru kayacak. Tabii <span class="math inline">\(x_1 &gt; 3\)</span> gibi bir şart varsa onu <span class="math inline">\(x_1 - 3 &gt; 0\)</span> şartına değiştiriyoruz ki üstteki göstergeci kullanabilelim. Bu yaklaşıma &quot;bariyer metotu&quot; ismi veriliyor çünkü <span class="math inline">\(I\)</span> ile bir bariyer yaratılmış oluyor.</p>
+<p>Fakat bir problem var, göstergeç fonksiyonunun türevini almak, ve pürüzsüz rahat kullanılabilen bir yeni fonksiyon elde etmek kolay değil. Acaba <span class="math inline">\(I\)</span> yerine onu yaklaşık temsil edebilen bir başka sürekli fonksiyon kullanamaz mıyız?</p>
+<p>Log fonksiyonunu kullanabiliriz. O zaman eldeki tüm <span class="math inline">\(c_i(x) \ge 0\)</span> kısıtlamalarını</p>
+<p><span class="math display">\[
+- \sum_{i=1}^{m} \log c_i(x)
+\]</span></p>
+<p>ile hedef fonksiyonuna dahil edebiliriz, yeni birleşik fonksiyon,</p>
+<p><span class="math display">\[
+P(x;\mu) = f(x) - \mu \sum_{i=1}^{m} \log c_i(x) 
+\]</span></p>
+<p>olur. Böylece elde edilen yaklaşım log-bariyer yaklaşımı olacaktır. Mınımizasyon sırasında hem başta bariyerden kaçınilmiş olunacak, hem de <span class="math inline">\(\mu\)</span> küçükdükçe hedefin geri kalanında istenilen minimal değerlere doğru kayılmış olunacak.</p>
+<p>Algoritma olarak optimizasyon şu şekilde gider;</p>
+<ol style="list-style-type: decimal">
+<li><p>Bir <span class="math inline">\(x\)</span> ve <span class="math inline">\(\mu\)</span> değerinden başla.</p></li>
+<li><p>Newton metotu ile birkaç adım at (durma kriteri yaklaşıma göre değisebilir)</p></li>
+<li><p><span class="math inline">\(\mu\)</span>'yu küçült</p></li>
+<li><p>Ana durma kriterine bak, tamamsa dur. Yoksa başa dön</p></li>
+</ol>
+<p>Bu yaklaşımın dışbükey (convex) problemler için global minimuma gittiği ispatlanmıştır [4, sf. 504].</p>
+<p>Örnek</p>
+<p><span class="math inline">\(\min (x_1 + 0.5)^2 + (x_2 - 0.5)^2\)</span> problemini çöz, <span class="math inline">\(x_1 \in [0,1]\)</span> ve <span class="math inline">\(x_2 \in [0,1]\)</span> kriterine göre.</p>
+<p>Üstteki fonksiyon için log-bariyer,</p>
+<p><span class="math display">\[
+P(x;\mu) = (x_1 + 0.5)^2 + (x_2-0.5)^2 -
+\mu 
+\big[
+\log x_1 + \log (1-x_1) + \log x_2 + \log (1-x_2)
+\big]
+\]</span></p>
+<p>Bu formülasyonu nasıl elde ettiğimiz bariz herhalde, <span class="math inline">\(x_1 \ge 0\)</span> ve <span class="math inline">\(x_1 \le 1\)</span> kısıtlamaları var mesela, ikinci ifadeyi büyüktür işaretine çevirmek için eksi ile çarptık, <span class="math inline">\(-x_1 \ge 1\)</span>, ya da <span class="math inline">\(1-x_1 \ge 0\)</span> böylece <span class="math inline">\(\log(1-x_1)\)</span> oldu.</p>
+<p>Artık Newton yöntemini kullanarak sanki elimizde bir kısıtlanması olmayan fonksiyon varmış gibi kodlama yapabiliriz, <span class="math inline">\(P\)</span>'yi minimize edebiliriz. Newton yönü <span class="math inline">\(d\)</span> için gereken Hessian ve Jacobian matrislerini otomatik türevle hesaplayacağız, belli bir noktadan başlayacağız, ve her adımda <span class="math inline">\(d = -H(x)^{-1} \nabla f(x)\)</span> yönünde adım atacağız.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> autograd <span class="im">import</span> numpy <span class="im">as</span> anp, grad, hessian, jacobian
+<span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+
+x <span class="op">=</span> np.array([<span class="fl">0.8</span>,<span class="fl">0.2</span>])
+mu <span class="op">=</span> <span class="fl">2.0</span>
+<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):
+    <span class="kw">def</span> P(x):
+        x1,x2<span class="op">=</span>x[<span class="dv">0</span>],x[<span class="dv">1</span>]
+        <span class="cf">return</span> (x1<span class="fl">+0.5</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> (x2<span class="fl">-0.5</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> mu <span class="op">*</span> <span class="op">\</span>
+       (anp.log(x1) <span class="op">+</span> anp.log(<span class="dv">1</span><span class="op">-</span>x1) <span class="op">+</span> anp.log(x2)<span class="op">+</span>anp.log(<span class="dv">1</span><span class="op">-</span>x2))
+
+    h <span class="op">=</span> hessian(P)
+    j <span class="op">=</span> jacobian(P)
+    J <span class="op">=</span> j(np.array(x))
+    H <span class="op">=</span> h(np.array(x))
+    d <span class="op">=</span> np.dot(<span class="op">-</span>lin.inv(H), J)
+    x <span class="op">=</span> x <span class="op">+</span> d
+    <span class="bu">print</span> (i, x, np.<span class="bu">round</span>(mu,<span class="dv">5</span>))
+    mu <span class="op">=</span> mu<span class="op">*</span><span class="fl">0.1</span></code></pre></div>
+<pre><code>0 [0.61678005 0.34693878] 2.0
+1 [-0.00858974  0.486471  ] 0.2
+2 [-0.02078755  0.49999853] 0.02
+3 [-0.18014768  0.5       ] 0.002
+4 [-0.49963245  0.5       ] 0.0002
+5 [-0.50002667  0.5       ] 2e-05
+6 [-0.50000267  0.5       ] 0.0
+7 [-0.50000027  0.5       ] 0.0
+8 [-0.50000003  0.5       ] 0.0
+9 [-0.5  0.5] 0.0</code></pre>
+<p>Görüldüğü gibi 5. adımda optimal noktaya gelindi, o noktada <span class="math inline">\(\mu\)</span> oldukca küçük, ve bariyerle tanımladığımız yerlerden uzak duruldu, optimal nokta <span class="math inline">\(x_1=-0.5,x_2=0.5\)</span> bulundu.</p>
+<p>Kaynaklar</p>
+<p>[1] Tibshirani, <em>Convex Optimization, Lecture Video 15, Part 1</em>, <a href="https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg" class="uri">https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg</a></p>
+<p>[2] Tibshirani, <em>Convex Optimization, Lecture Video 15, Part 2</em>, <a href="https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg" class="uri">https://www.youtube.com/channel/UCIvaLZcfz3ikJ1cD-zMpIXg</a></p>
+<p>[3] Bao, <em>LP-Solver, Github</em>, <a href="https://github.com/rayjim/python_proj/blob/master/hm_8/lp_solver.py" class="uri">https://github.com/rayjim/python_proj/blob/master/hm_8/lp_solver.py</a></p>
+<p>[4] Boyd, <em>Convex Optimization</em></p>
+<p>[5] Boyd, <em>Convex Optimization, Solutions to additional exercises</em></p>
+</body>
+</html>

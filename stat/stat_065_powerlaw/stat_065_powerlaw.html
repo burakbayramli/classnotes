@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="üstel-kanunlar-power-laws">Üstel Kanunlar (Power Laws)</h1>
+<p>Bir web sitesini bir ayda ziyaret etmiş olan özgün kullanıcı sayısı üzerinden bir alarm programı yazmak gerekti diyelim. Eğer çok fazla kullanıcı var ise bir admin'e bir email gönderilecek.. Akla gelen çözümlerden aylık kullanıcı sayılarının ortalamasını alıp 2 ya da 3 standart sapma kadar olan cevapları aykırı değer (outlier) olarak kabul etmek ve bu durumlarda alarm çalmak [1, sf. 255]. Çünkü, eh, veri noktalarının yüzde 99.7'si 3 standart sapma içine düşer değil mi?</p>
+<p>Burada gözardı edilen nokta şudur: verinin yüzde 99.7'si 3 standart sapma içine düşer <em>eğer veri Gaussian olarak dağılmış ise</em>. Ayrıca ortalama hesabı da problemli, burada ilk akla gelebilecek Merkezi Limit Teorisi üzerinden örneklem ortalaması gerçek ortalamaya yaklaşacağı, ki bu çoğu dağılım için doğrudur, fakat bazı dağılımlar üzerinde Merkezi Limit Teorisi işlemez! Güç Kanunları ile istatistik biliminin sınırlarına geliyoruz - gerçek dünyadan önümüze atılan veriler artık sıkça bir şekilde normal dışı verileri içerebiliyor, ve bu durumlara hazır olmamız lazım.</p>
+<p>Üstte bahsettiğimiz senaryo için aslında elimizde veri var (pek çok ay için). Verinin histogramına bakalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+dfvis<span class="op">=</span>pd.read_csv(<span class="st">&#39;visits.csv&#39;</span>,header<span class="op">=</span><span class="va">None</span>,sep<span class="op">=</span><span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)
+visits <span class="op">=</span> np.array(dfvis[<span class="dv">1</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">dfvis.hist(bins<span class="op">=</span><span class="dv">80</span>)
+plt.ylim([<span class="dv">0</span>,<span class="dv">50</span>])
+plt.savefig(<span class="st">&#39;stat_powerlaw_05.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_powerlaw_05.png" />
+
+</div>
+<p>Görüldüğü gibi bazı değerlerden aşırı çok var, bazılarından neredeyse yok. Aşırı değerler her iki uçta da gözüküyor, büyük olanlardan daha az var, evet, ama oradaki yoğunluk dikkate alınmaz seviyede de değil. Bu arada eğer y eksenini ufaltmasaydık aşırı değerler haricinde kalan değerler üstteki kadar bile gözükmeyecekti.</p>
+<p>Olasılık yoğunluk fonksiyonu (probability density function),</p>
+<p><span class="math display">\[ p(x) = C x^{-\alpha}  \]</span></p>
+<p><span class="math inline">\(C\)</span> bir normalizasyon sabiti, ki <span class="math inline">\(\lambda &gt; 0\)</span> olmak üzere, dağılımın parametresi. Bu dağılıma üstel kanun (power law) ismi verilir. Zıpf, ya Pareto dağılımı üstteki formülün farklı şekilde temsilinden ibaret.</p>
+<p>Her özgün <span class="math inline">\(\lambda\)</span> farklı bir üstel kanuna işaret eder. Mesela <span class="math inline">\(p(x) = C/ x^2\)</span> bir ustel kanun olabilir! Bildigimiz <span class="math inline">\(x^2\)</span>'yi baz alan bir dağılımdan bahsediyoruz yani! <span class="math inline">\(\alpha &gt; 1\)</span> olmalıdır, sebebini altta göreceğiz. Doğadaki çoğu üstel kanun <span class="math inline">\(2 &lt; \alpha &lt; 3\)</span> arasındadır. Beklentiyi hesaplayalım,</p>
+<p><span class="math display">\[ 
+E[X] = \int_{x_{min}}^{\infty} x p(x) \mathrm{d} x  = 
+C \int_{x_{min}}^{\infty} x ^{-\alpha + 1} \mathrm{d} x
+\]</span></p>
+<p><span class="math display">\[ = \frac{C}{2-\alpha} \bigg[ x ^{-\alpha+2}  \bigg]_{x_{min}}^{\infty} \]</span></p>
+<p>Bu ifadenin <span class="math inline">\(\alpha \le 2\)</span> için sonsuza gittiğine dikkat edelim, bahsettiğimiz gariplik burada... <span class="math inline">\(x_{min}\)</span>'in ne olduğunu birazdan göreceğiz.</p>
+<p>Log-Log Grafikleri</p>
+<p>Üstel kanun dağılımlarının ilk kez histogram log-log skalasında grafiklenince keşfedildiği düşünülmektedir, bir üstel kanun sürecinden gelen veriyi anlamaya çalışırken hem <span class="math inline">\(p(x)\)</span> hem <span class="math inline">\(x\)</span>'in log'u alınmıştır, ve bu grafik negatif eğimli düz çizgi olarak ortaya çıkmıştır. Yani</p>
+<p><span class="math display">\[ 
+\ln p(x) = -\alpha \ln x + c 
+\qquad (1)
+\]</span></p>
+<p>Üstteki yaklaşımla grafiği nasıl oluşturuz? Bunun için <code>hist</code> çağrısından histogram grafiğini değil, histogramdaki kutucukların üç noktalarını düz veri olarak almamız lazım, ki bu değerler <span class="math inline">\(x\)</span> değerlerimizi oluşturacak, sonra onların normalize edilmiş değerlerini almamız gerekiyor [4], bu değerler de <span class="math inline">\(\ln p(x)\)</span> olacak. Grafiklemeden önce elle log almamıza gerek yok, grafik rutinine skalayı log bazında ayarlamasını söylememiz yeterli, <code>xscale,yscale</code> çağrıları ile bunu yapabiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> plot_power(data):
+    hst <span class="op">=</span> plt.hist(data, normed<span class="op">=</span><span class="va">True</span>,bins<span class="op">=</span><span class="dv">1000</span>)
+    f<span class="op">=</span>plt.figure() <span class="co"># histogram halinden cik</span>
+    x <span class="op">=</span> hst[<span class="dv">1</span>][:<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span> y <span class="op">=</span> hst[<span class="dv">0</span>]
+    plt.plot(x, y,<span class="st">&#39;o&#39;</span>)
+    plt.xscale(<span class="st">&#39;log&#39;</span>)
+    plt.yscale(<span class="st">&#39;log&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plot_power(visits)
+plt.title(<span class="st">&#39;Ziyaretler&#39;</span>)
+plt.ylim(<span class="fl">1e-5</span>,<span class="fl">1e-3</span>)
+plt.savefig(<span class="st">&#39;stat_powerlaw_04.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_powerlaw_04.png" />
+
+</div>
+<p>Düz çizgiye benzer bir şekil ortaya çıktı, negatif eğimli, demek ki bir üstel kanun mümkün.</p>
+<p>Üstel kanunu yoğunluk formülüne nasıl erişiriz? Başlangıç önceden gösterdiğimiz formül olmak üzere,</p>
+<p><span class="math display">\[ \ln p(x) = -\alpha \ln x + c \]</span></p>
+<p>Eger <span class="math inline">\(\ln(c) = C\)</span> dersek,</p>
+<p><span class="math display">\[ \ln p(x) = -\alpha \ln x + \ln C \]</span></p>
+<p><span class="math display">\[  = \ln C x^{-\alpha}  \]</span></p>
+<p>ve iki tarafı <span class="math inline">\(e\)</span> üzerine alırsak,</p>
+<p><span class="math display">\[ p(x) = C x^{-\alpha}  \]</span></p>
+<p>Olasılık yoğunluk fonksiyonuna eriştik.</p>
+<p><span class="math inline">\(x_{min}\)</span> Hesabı</p>
+<p>Dikkat edilirse <span class="math inline">\(C x^{-\alpha}\)</span> fonksiyonu <span class="math inline">\(x \to 0\)</span> iken sonsuza gidiyor (diverge), demek ki her <span class="math inline">\(x \ge 0\)</span> için yoğunluk fonksiyonu geçerli değildir. O zaman üstel kanunun geçerli olduğu bir alt sınır olmalı. Bu alt sınıra <span class="math inline">\(x_{min}\)</span> diyeceğiz.</p>
+<p>Artık normalizasyon sabiti <span class="math inline">\(C\)</span>'yi hesaplayabiliriz,</p>
+<p><span class="math display">\[ \int_{x_{min}}^{\infty} C x^{-\alpha} = 1\]</span></p>
+<p><span class="math display">\[ \frac{C}{(-\alpha+1) } \bigg[ x^{-\alpha+1} \bigg]_{x_{min}}^{\infty} = 1\]</span></p>
+<p><span class="math display">\[ \frac{C}{(1-\alpha) } \bigg[ x^{-\alpha+1} \bigg]_{x_{min}}^{\infty} = 1\]</span></p>
+<p>Görülebileceği üzere bu formül sadece <span class="math inline">\(\alpha &gt; 1\)</span> için anlamlıdır, diğer durumlarda sonsuzluğa gider. Demek ki üstel kanun dağılımı için <span class="math inline">\(\alpha &gt; 1\)</span> şartını da getirmemiz gerekiyor. Devam edelim,</p>
+<p><span class="math display">\[ \frac{C}{(-\alpha+1) }  x_{min}^{-\alpha+1} = 1\]</span></p>
+<p><span class="math display">\[ C = (\alpha-1)x_{min}^{\alpha-1} \]</span></p>
+<p><span class="math inline">\(C\)</span> ile beraber ve bazı düzeltmeler ardından <span class="math inline">\(p(x)\)</span> bazen şöyle gösteriliyor [5],</p>
+<p><span class="math display">\[ p(x) = \frac{\alpha-1}{x_{min}}\bigg( \frac{x}{x_{min}} \bigg)^{-\alpha}  \]</span></p>
+<p><span class="math inline">\(\alpha,x_{min}\)</span>'i Kestirmek (Estimation)</p>
+<ol style="list-style-type: decimal">
+<li>formülüne bakarak bazıları lineer regresyon kullanarak <span class="math inline">\(x_{min}\)</span> hesabı yapabileceğini düşünüyor. Yani grafiğe bakılıyor, eh ortada lineer bir durum var, regresyon ile eğim için bir tahmin elde ederim ve bu tahmini <span class="math inline">\(\alpha\)</span> için kullanırım.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf
+hst <span class="op">=</span> plt.hist(visits, normed<span class="op">=</span><span class="va">True</span>,bins<span class="op">=</span><span class="dv">1000</span>)
+visitx <span class="op">=</span> hst[<span class="dv">1</span>][:<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span>visity <span class="op">=</span> hst[<span class="dv">0</span>]
+yy <span class="op">=</span> np.log(visity)<span class="op">;</span>xx <span class="op">=</span> np.log(visitx)
+yy <span class="op">=</span> yy[visity<span class="op">&gt;</span><span class="dv">0</span>]<span class="op">;</span>xx <span class="op">=</span> xx[visity<span class="op">&gt;</span><span class="dv">0</span>]
+df <span class="op">=</span> pd.DataFrame([yy,xx]).T
+df.columns <span class="op">=</span> [[<span class="st">&#39;y&#39;</span>,<span class="st">&#39;x&#39;</span>]]
+results <span class="op">=</span> smf.ols(<span class="st">&#39;y ~ x&#39;</span>, data<span class="op">=</span>df).fit()
+<span class="bu">print</span> <span class="st">&#39;alpha&#39;</span>, <span class="dv">-1</span> <span class="op">*</span> results.params[<span class="dv">1</span>]
+<span class="bu">print</span> <span class="st">&#39;kesi&#39;</span>, np.exp(results.params[<span class="dv">0</span>])</code></pre></div>
+<pre><code>alpha 0.540551473071
+kesi 0.00241514844497</code></pre>
+<p>Bu basit yöntemin, ne yazık ki, çok ciddi problemleri var. Bu metotun niye kullanılmaması gerektiği [3, sf. 31]'de bulunabilir.</p>
+<p>Alternatif yöntem şöyle; önce <span class="math inline">\(\alpha\)</span> için hızlı çalışan bir tahmin edici mevcut, bunu görelim; Maksimum olurluk üzerinden,</p>
+<p><span class="math display">\[ p(x;\alpha) = \prod_{i=1}^{n} \frac{\alpha-1}{x_{min}} \bigg( \frac{x_i}{x_{min}}\bigg)^{-\alpha}  \]</span></p>
+<p>Maksimum log olurluk,</p>
+<p><span class="math display">\[ \ln p(x;\alpha) = \ln \prod_{i=1}^{n} \frac{\alpha-1}{x_{min}} \bigg( \frac{x_i}{x_{min}}\bigg)^{-\alpha}  \]</span></p>
+<p><span class="math display">\[ = \sum_{i=1}^{n} \ln \frac{\alpha-1}{x_{min}} \bigg( \frac{x_i}{x_{min}}\bigg)^{-\alpha}  \]</span></p>
+<p><span class="math display">\[ = \sum_{i=1}^{n} \bigg[ \ln (\alpha-1) + \ln x_{min} - \alpha \ln \frac{x_i}{x_{min}} \bigg]   \]</span></p>
+<p><span class="math display">\[ = n \ln (\alpha-1) + n \ln x_{min} - \alpha \sum_{i=1}^{n}  \ln \frac{x_i}{x_{min}}   \]</span></p>
+<p>Maksimum değer için <span class="math inline">\(\alpha\)</span>'ya göre türevi alıp sıfıra eşitleriz ve çözeriz, <span class="math inline">\(\ln(\alpha-1)\)</span>'in türevini hatırlayalım bu arada,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> sympy
+alpha <span class="op">=</span> sympy.symbols(<span class="st">&#39;alpha&#39;</span>)
+<span class="bu">print</span> sympy.diff(sympy.log(alpha<span class="dv">-1</span>))</code></pre></div>
+<pre><code>1/(alpha - 1)</code></pre>
+<p><span class="math display">\[ =  \frac{n}{(\alpha - 1)} - \sum_{i=1}^{n}  \ln \frac{x_i}{x_{min}}  = 0 \]</span></p>
+<p><span class="math display">\[  \frac{n}{(\alpha - 1)} = \sum_{i=1}^{n}  \ln \frac{x_i}{x_{min}}   \]</span></p>
+<p><span class="math display">\[ \frac{(\alpha - 1)}{n} =  \bigg( \sum_{i=1}^{n}  \ln \frac{x_i}{x_{min}} \bigg)^{-1}  \]</span></p>
+<p><span class="math display">\[ \hat{\alpha} =  1 + n  \bigg( \sum_{i=1}^{n}  \ln \frac{x_i}{x_{min}} \bigg)^{-1}   \]</span></p>
+<p>Fakat tahmin edicinin hesabı için <span class="math inline">\(x_{min}\)</span>'i bilmek gerekiyor. Bir tavuk-yumurta problemi var, <span class="math inline">\(\hat{\alpha}\)</span> için <span class="math inline">\(x_{min}\)</span> gerekli, ama <span class="math inline">\(x_{min}\)</span>'in kendisi de bilinmiyor.</p>
+<p>O zaman üstteki tahmin ediciyi şöyle kullanırız; verideki her noktayı potansiyel bir <span class="math inline">\(x_{min}\)</span>'mis gibi alırız (ve bu nokta altındaki hiçbir noktayı dikkate almayız, bu alt sınırı bunun için seçtik), ve bu nokta için yukarıdaki formül ile <span class="math inline">\(\hat{\alpha}\)</span>'yi hesaplarız, sonra elde ettiğimiz <span class="math inline">\(x_{min}, \hat{\alpha}\)</span> ikilisini kullanarak (artık özgün bir üstel kanun dağılımımız var), bu dağılım ile veri arasındaki uyum derecesini Kolmogorov-Şmirnov testi ile hesaplarız. Elimizdeki <span class="math inline">\(n\)</span> veri noktası için <span class="math inline">\(n\)</span> tane hesap elde ederiz, ve raporlanan mesafeler arasından en ufak olanını seçeriz, ve bu mesafeye tekabül eden <span class="math inline">\(x_{min},\hat{\alpha}\)</span> ikilisini optimal parametreler olarak seçeriz. Altta örneği gösterilen <code>powerlaw</code> adlı paket [6] tam da bunu yapıyor. Ziyaret verisi üzerinde işletelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> powerlaw
+fitvis <span class="op">=</span> powerlaw.Fit(visits, discrete<span class="op">=</span><span class="va">False</span>)
+<span class="bu">print</span> <span class="st">&#39;xmin&#39;</span>, fitvis.xmin, <span class="st">&#39;alpha&#39;</span>, fitvis.alpha</code></pre></div>
+<pre><code>xmin 34.0 alpha 1.57060706124</code></pre>
+<p>Hesaplanan <span class="math inline">\(\alpha\)</span> değerinin lineer regresyondan gelen hesaptan ne kadar farklı olduğuna dikkat!</p>
+<p><code>powerlaw</code> paketine, biraz önce yaptığı tahminler üzerinden, üstel (exponential) dağılımın mı, üstel kanun dağılımının mı (isimler birbirine çok benziyor doğru) bu veri için daha olası olduğunu sorabiliriz, daha doğrusu her iki dağılım için Kolmogorov-Şmirnov testini işletiriz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> fitvis.exponential.KS()
+<span class="bu">print</span> fitvis.power_law.KS()</code></pre></div>
+<pre><code>0.487151691713
+0.0312634791749</code></pre>
+<p>Üstel kanun görüldüğü gibi daha olası (p-değer 0.05 altında). Bir olasılık hesabını da elle yapalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x0 <span class="op">=</span> <span class="fl">1e2</span>
+p <span class="op">=</span> x0<span class="op">**-</span>fitvis.alpha
+C <span class="op">=</span> (fitvis.alpha<span class="dv">-1</span>) <span class="op">*</span> fitvis.xmin<span class="op">**</span>(fitvis.alpha<span class="dv">-1</span>)
+<span class="bu">print</span> p<span class="op">*</span>C</code></pre></div>
+<pre><code>0.00308315744794</code></pre>
+<p>Bazı farklı veriler üzerinde aynı hesapları görelim. Mesela 2003 senesindeki en zengin 300 Amerikalının net varlıklarının dağılımı.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> powerlaw
+dfwl<span class="op">=</span>pd.read_csv(<span class="st">&#39;wealth.dat&#39;</span>,header<span class="op">=</span><span class="va">None</span>)
+wealth<span class="op">=</span>np.array(dfwl)[:,<span class="dv">0</span>]
+fitwl <span class="op">=</span> powerlaw.Fit(wealth, discrete<span class="op">=</span><span class="va">True</span>)
+<span class="bu">print</span> <span class="st">&#39;xmin&#39;</span>, fitwl.xmin, <span class="st">&#39;alpha&#39;</span>, fitwl.alpha
+<span class="bu">print</span> <span class="st">&#39;K-S testi&#39;</span>, fitwl.power_law.KS()</code></pre></div>
+<pre><code>xmin 1100000000.0 alpha 2.40575306524
+K-S testi 0.0432807151071</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plot_power(wealth)
+plt.savefig(<span class="st">&#39;stat_powerlaw_03.png&#39;</span>)
+plt.hold(<span class="va">False</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_powerlaw_03.png" />
+
+</div>
+<p>Dikkat, çoğunlukla bu konularda araştırma yapanlar zengin, fakir herkesi kapsayan bir ölçüm üzerinden (bu konulara ilk bakan Pareto öyle yapmıştı) tüm kazancın üstel kanunu takip ettiğini söylerler, ki bu doğrudur. Üstteki sonuç, bunun üstüne, en zengin 400 kişinin <em>kendi arasında</em> bile üstel kanunun işlediğini söylemektedir. Yani zenginlik öyle dengesiz dağılan bir şeydir ki, en zengin 400 içinde çoğunluk en tepedekilere göre daha fakirdir!</p>
+<p>Devam edelim: Herman Melville adlı yazarın ünlü <em>Moby Dick</em> romanındaki özgün kelimelerin kullanılma frekansının dağılımı,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> powerlaw
+
+dfwords<span class="op">=</span>pd.read_csv(<span class="st">&#39;words.txt&#39;</span>,header<span class="op">=</span><span class="va">None</span>)
+words<span class="op">=</span>np.array(dfwords)[:,<span class="dv">0</span>]
+fitw <span class="op">=</span> powerlaw.Fit(words, discrete<span class="op">=</span><span class="va">True</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plot_power(words)
+plt.ylim(<span class="fl">1e-6</span>,<span class="fl">1e-3</span>)
+plt.savefig(<span class="st">&#39;stat_powerlaw_02.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_powerlaw_02.png" />
+
+</div>
+<p>Bu arada <code>powerlaw</code> paketinin bazı grafikleme özellikleri de var. Veriyle beraber tahmin edilen <span class="math inline">\(-\alpha\)</span> (düz çizgi olarak), üstel dağılım (kırmızı çizgi) ve üstel kanun uyumunu aynı grafikte gösterebiliriz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">f <span class="op">=</span> plt.figure()
+fitw.power_law.plot_pdf(linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, color<span class="op">=</span><span class="st">&#39;g&#39;</span>)
+plt.hold(<span class="va">True</span>)
+fitw.exponential.plot_pdf(linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, color<span class="op">=</span><span class="st">&#39;r&#39;</span>)
+plt.hold(<span class="va">True</span>)
+fitw.plot_pdf(color<span class="op">=</span><span class="st">&#39;b&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>)
+plt.xlim(<span class="fl">1e2</span>,<span class="fl">1e4</span>)
+plt.ylim(<span class="fl">1e-8</span>,<span class="fl">1e-4</span>)
+plt.savefig(<span class="st">&#39;stat_powerlaw_01.png&#39;</span>)
+plt.hold(<span class="va">False</span>)</code></pre></div>
+<div class="figure">
+<img src="stat_powerlaw_01.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="st">&#39;Kolmogorov-Smirnov testi&#39;</span>, fitw.power_law.KS()</code></pre></div>
+<pre><code>Kolmogorov-Smirnov testi 0.00922886388026</code></pre>
+<p>Kaynaklar</p>
+<p>[1] Janert, <em>Data Analysis with Open Source Tools</em></p>
+<p>[2] Shalizi, <em>Advanced Data Analysis from an Elementary Point of View</em></p>
+<p>[3] Causet, <em>Power-Law Distributions in Empirical Data</em></p>
+<p>[4] Bayramlı, <em>Histogram Numaralari</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2015/10/histogram-numaralari.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2015/10/histogram-numaralari.html</a></p>
+<p>[5] Newman, <em>Power laws, Pareto distributions and Zipf's law</em></p>
+<p>[6] Alstott, <em>powerlaw: A Python Package for Analysis of Heavy-Tailed Distributions</em></p>
+</body>
+</html>

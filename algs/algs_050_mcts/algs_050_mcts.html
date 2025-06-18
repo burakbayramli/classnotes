@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="monte-carlo-ağaç-araması-monte-carlo-tree-search--mcts--oyun-oynayan-yapay-zeka">Monte-Carlo Ağaç Araması (Monte Carlo Tree Search -MCTS-), Oyun Oynayan Yapay Zeka</h1>
+<p>Otomatik oyun oynayan yapay zeka öğreten derslerdeki kilometre taşlarından biri altüst / minimaks algoritmasiydi. Notlarımızda anlattığımız bu algoritma, bir oyunda bizim yaptığımız, rakibin yaptığı tüm hamle seçeneklerine göre oluşan tahta konfigürasyonlarına bakarak ve bu tahtalara değer atayabilen bir değer fonksiyonuyla onları irdeleyerek rakip için en kötü bizim için en iyi olacak şekilde bir arama ile optimal oyun hamlelerini buluyordu.</p>
+<p>Fakat minimaksın bir problemi şudur: birkaç hamle sonrasına bakmak için tüm mümkün hamlelere göre kurulan ağaç müthiş büyük olabilir. Özellikle Go oyunu [1] gibi dallanma faktörü çok büyük olan oyunlarda minimaks zorluk yaşayabiliyor. Bu gibi durumlarda MCTS yaklaşımının daha başarılı olduğu bulunmuştur.</p>
+<p>Şimdi MCTS'i anlatalım, özelde UCT adı verilen üst güven aralığının ağaçlara uygulanması (upper-confidence applied to trees) adlı çeşidini gösterelim. Bunun için tabii önce UCT'yi ve onun baz çeşidi UCB1'i anlamak lazım.</p>
+<p>Kumarhanelerdeki o kollu oyun makinalarını düşünelim, oyuncunun önünde bunlardan birkaç tane olsun, ve bu makinalardan her birinin farklı ve bilinmeyen bir getiri dağılımı var. Tek kollu makinalara argoda &quot;tek kollu soyguncu (one-armed bandit)'' de denilir, bilgisayarcılar üstteki üstteki probleme &quot;çok kollu soyguncu (multi-armed bandit)'' ismi veriyorlar. Biraz esprili bir şekilde bu makinaları çok kollu bir ahtapotun hayal ediliyor bazen, ki ahtapot akıllı, yani oyunu optimal oynayacak bilgisayar programı.</p>
+<div class="figure">
+<img src="mcts_01.png" />
+
+</div>
+<p>Aklımızdaki soru şu; Getirisi en iyi olacak makina acaba hangisi? Bilsek hemen onu oynardık. Bunu başta bilmiyoruz, oturup başkasını seyredecek durumda değiliz, o zaman hem seçenekleri bir şekilde deneyecek ama bu sırada çok getiri kaybı yaşamayacak aynı zamanda uzun vadede kazançta kalacak şekilde bu oyunu oynamak istiyoruz. UCB1 adlı bir strateji bunu yapabiliyor, bu stratejiye göre her makina <span class="math inline">\(i\)</span> için bir istatistiki güven aralığı yaratılır,</p>
+<p><span class="math display">\[ \overline{x}_i \pm \sqrt{\frac{2 \ln n}{n_i}} \]</span></p>
+<p><span class="math inline">\(\overline{x}_i\)</span>: Makine <span class="math inline">\(i\)</span>'nin ortalama getirisi</p>
+<p><span class="math inline">\(n_i\)</span>: Makine <span class="math inline">\(i\)</span>'nin kaç kere oynandığı</p>
+<p><span class="math inline">\(n\)</span>: Tüm oyunlar (tüm makinelerde kaç kere oynandığı)</p>
+<p>Ve stratejimiz her adımda üst sınırı en yüksek olan makinayı oynamaktır. Bunu yaptıkça o makinanın gözlenen ortalaması kazanca / kayıba göre kayacak, ve güven aralığı ufalacak (elimizde daha fazla veri var çünkü, daha fazla veri daha fazla kesinlik demek), ve diğer makinaların aralığı genişleyecek. Bir noktada başka bir makinanın üst sınırı o anda oynadığımızı geçecek, o zaman biz bu öteki makinaya geçeceğiz. Uzun vadede bu strateji optimal olarak sonuç vermektedir.</p>
+<p>Türetmek için notasyonu biraz değiştirelim [3], <span class="math inline">\(a\)</span> bir aksiyon (ya da makina seçimi), <span class="math inline">\(Q(a) = E(r|a)\)</span>, bir aksiyon için ortalama getiri, <span class="math inline">\(U_t(a)\)</span> adım <span class="math inline">\(t\)</span>'de bir aksiyonun üst sınırı, <span class="math inline">\(\hat{Q}, \hat{U}\)</span> kestirme değerler, <span class="math inline">\(N(a)\)</span> bir aksiyonun kaç kez seçildiği. Hem <span class="math inline">\(\hat{U}\)</span> kestirme değerini sürekli hesaplayacağız, hem de güven aralığını maksimize eden aksiyonu seçeceğiz, yani.</p>
+<p><span class="math display">\[ a_t = \arg \max_{a \in A} \hat{Q}_t(a) + \hat{U}_t(a) \]</span></p>
+<p>Bu seçimi yaparken yüksek olasılıkla (with high probability) <span class="math inline">\(Q(a) \le \hat{Q}_t(a) + \hat{U}_t(a)\)</span> olmasını sağlayacağız. Bu şart için Hoeffding eşitsizliğinden başlayabiliriz (bkz [5]).</p>
+<p><span class="math inline">\(X_1,...X_n\)</span> <span class="math inline">\([0,1]\)</span> aralığında bağımsız özdeşçe dağılmış (i.i.d.) değerlere sahip rasgele değişkenler olsunlar, ve <span class="math inline">\(\overline{X}_t = \frac{1}{\tau} \sum_{\tau=1}^{t} X_\tau\)</span> örneklem ortalaması olsun. O zaman</p>
+<p><span class="math display">\[ P(E(X) &gt; \overline{X}_t + u ) \le e^{-2 t u^2}\]</span></p>
+<p>olduğunu biliyoruz, soyguncu problemindeki getiri rasgele değişkenleri için uyarlarsak,</p>
+<p><span class="math display">\[ 
+P \big( Q(a) &gt; \hat{Q}_t(a) + U_t(a)  \big) \le 
+e^{-2 N_t(a)U_t(a)^2 }
+\]</span></p>
+<p>İstediğimiz şartların oluşması için üstteki formülün doğruluğu yeterli, şimdi bu formülü baz alarak bir <span class="math inline">\(U_t(a)\)</span> hesaplayabiliriz, formülü <span class="math inline">\(U_t(a)\)</span> tek başına kalacak şekilde tekrar düzenleyebiliriz. Eşitliğin sol tarafına <span class="math inline">\(p\)</span> diyelim, burada sanki istenilen bir güven aralık büyüklüğünü baz almış oluyoruz, 95% (yani 0.95) gibi, ama burada sembolik bir değer kulladık, ilk amacımız <span class="math inline">\(u\)</span> değerine erişmek,</p>
+<p><span class="math display">\[ e^{-2 N_t(a)U_t(a)^2 } = p \]</span></p>
+<p><span class="math display">\[ \ln p = -2 N_t(a)U_t(a)^2 \]</span></p>
+<p><span class="math display">\[ \frac{-\ln p}{2 N_t(a)} = U_t(a)^2 \]</span></p>
+<p><span class="math display">\[ U_t(a) = \sqrt{\frac{-\ln p}{2 N_t(a)}} \]</span></p>
+<p><span class="math inline">\(t\)</span> büyüdükçe <span class="math inline">\(p\)</span> azalsın istiyoruz, o zaman <span class="math inline">\(p = t^{-4}\)</span> seçebiliriz, bu spesifik değer formülü de basitleştirmek için seçildi bir yandan,</p>
+<p><span class="math display">\[ U_t(a) = \sqrt{\frac{\log t}{N_t(a)}} \]</span></p>
+<p>Böylece UCB1 algoritmasına erişmiş olduk,</p>
+<p><span class="math display">\[ 
+a_t = \arg \max_{a \in A} Q(a) + \sqrt{\frac{\log t}{N_t(a)}}
+\]</span></p>
+<p>UCT ve Tic-Tac-Toe</p>
+<p>Oyunlar ve Monte Carlo işin için nasıl dahil oluyor? Mesela her adımda bir sonraki en iyi adımı bulmak istiyoruz, MC ile bu geçişi simüle ederiz, yani rasgele tahta hamlelerini deneyerek iyi olan bitişleri bulmaya uğraşırız. Bu yöntemin bir kötü tarafı, minimaks durumunda olduğu gibi, çok fazla hamle seçeneği olduğu zaman ortaya çıkar, rasgele seçim de, tüm seçenekleri deneyen deterministik seçim gibi yetersiz kalabilir.</p>
+<p>UCT burada bir çözüm olarak görülebilir. Fikir şu: verili bir tahta konumundan atılacak bir adım ötesi bir çok-kollu soyguncu problemi olarak görülebilir.</p>
+<p>İlk faz seçim fazıdır, başlangıç konumundan aşağı inmeye başlarız, ve eğer baktığımız tüm düğümlerde çok-kollu soyguncu seçimi için gerekli istatistikler var ise seçim UCB1 ile yapılır, ve devam edilir. Bu ta ki üzerinde istatistik olmayan (yani hiç ziyaret edilmemiş) bir düğüme gelinceye kadar devam eder. Eğer böyle bir düğüm(ler) var ise onlar arasından rasgele seçim yapılır, böylece o düğüm ve altındakiler ziyaret edilmiş olur ve kayıp / kazanç sonrası onların da artık istatistikleri olur ve bir sonraki adımda onlar da UCB1 ile seçiliyor (ya da seçilmiyor) olacaktır.</p>
+<p>Örnek olarak bir Tic-Tac-Toe oyunu için bir örnek görelim. X ve O taşları var, biz O için hesap yapıyoruz diyelim. A pozisyonunda (en üst) tüm alt pozisyonlar hakkında istatistik var. Mesela 1/2 görüyoruz, bu o pozisyondan iki kere geçilmiş bu geçişlerden birisi oyunun kazanılması ile bitmiş (bu bir kazanç en sol alttaki bitiş). Şimdi bir A'dan bir kez daha geliyoruz, UCB1 bize pozisyon B'ye git diyor, o seviyede en sağdaki düğüm için hiç bilgi yok, o zaman rasgele olarak o seçiliyor, oradan tek seçenek var, ve O kazanıyor. Böylece B pozisyonundaki istatistik 2/3 haline geliyor. Başlangıçtan oyun bitişine kadar her gidiş simulasyonda bir döngü, eğer 100 kere simüle et dersek bu döngü 100 kere döner.</p>
+<div class="figure">
+<img src="mcts_02.png" />
+
+</div>
+<p>Kod üzerinde görelim, üstteki başlangıç pozisyonundan X için (oyuncu 1, öteki oyuncu -1) simulasyon yapalım, 1000 kere,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> collections
+<span class="im">import</span> random
+<span class="im">import</span> math
+<span class="im">import</span> random
+<span class="im">import</span> itertools
+<span class="im">import</span> pandas <span class="im">as</span> pd
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> _new_board():
+    <span class="cf">return</span> ((<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),
+            (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),
+            (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))
+
+<span class="kw">def</span> apply_move(board_state, move, side):
+    move_x, move_y <span class="op">=</span> move
+
+    <span class="kw">def</span> get_tuples():
+        <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):
+            <span class="cf">if</span> move_x <span class="op">==</span> x:
+                temp <span class="op">=</span> <span class="bu">list</span>(board_state[x])
+                temp[move_y] <span class="op">=</span> side
+                <span class="cf">yield</span> <span class="bu">tuple</span>(temp)
+            <span class="cf">else</span>:
+                <span class="cf">yield</span> board_state[x]
+
+    <span class="cf">return</span> <span class="bu">tuple</span>(get_tuples())
+
+
+<span class="kw">def</span> available_moves(board_state):
+    <span class="cf">for</span> x, y <span class="kw">in</span> itertools.product(<span class="bu">range</span>(<span class="dv">3</span>), <span class="bu">range</span>(<span class="dv">3</span>)):
+        <span class="cf">if</span> board_state[x][y] <span class="op">==</span> <span class="dv">0</span>:
+            <span class="cf">yield</span> (x, y)
+
+
+<span class="kw">def</span> _has_3_in_a_line(line):
+    <span class="cf">return</span> <span class="bu">all</span>(x <span class="op">==</span> <span class="dv">-1</span> <span class="cf">for</span> x <span class="kw">in</span> line) <span class="op">|</span> <span class="bu">all</span>(x <span class="op">==</span> <span class="dv">1</span> <span class="cf">for</span> x <span class="kw">in</span> line)
+
+<span class="kw">def</span> has_winner(board_state):
+    <span class="co"># check rows</span>
+    <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):
+        <span class="cf">if</span> _has_3_in_a_line(board_state[x]):
+            <span class="cf">return</span> board_state[x][<span class="dv">0</span>]
+    <span class="co"># check columns</span>
+    <span class="cf">for</span> y <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):
+        <span class="cf">if</span> _has_3_in_a_line([i[y] <span class="cf">for</span> i <span class="kw">in</span> board_state]):
+            <span class="cf">return</span> board_state[<span class="dv">0</span>][y]
+
+    <span class="co"># check diagonals</span>
+    <span class="cf">if</span> _has_3_in_a_line([board_state[i][i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>)]):
+        <span class="cf">return</span> board_state[<span class="dv">0</span>][<span class="dv">0</span>]
+    <span class="cf">if</span> _has_3_in_a_line([board_state[<span class="dv">2</span> <span class="op">-</span> i][i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>)]):
+        <span class="cf">return</span> board_state[<span class="dv">0</span>][<span class="dv">2</span>]
+
+    <span class="cf">return</span> <span class="dv">0</span>  <span class="co"># no one has won, return 0 for a draw</span>
+
+<span class="kw">def</span> _upper_confidence_bounds(payout, samples_for_this_machine, log_total_samples):
+    <span class="cf">return</span> payout <span class="op">/</span> samples_for_this_machine <span class="op">+</span> <span class="op">\</span>
+        math.sqrt((<span class="dv">2</span> <span class="op">*</span> log_total_samples) <span class="op">/</span> samples_for_this_machine)
+
+
+<span class="kw">def</span> monte_carlo_tree_search_uct(board_state, side, number_of_samples):
+    state_results <span class="op">=</span> collections.defaultdict(<span class="bu">float</span>)
+    state_samples <span class="op">=</span> collections.defaultdict(<span class="bu">float</span>)
+
+    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(number_of_samples):
+        current_side <span class="op">=</span> side
+        current_board_state <span class="op">=</span> board_state
+        first_unvisited_node <span class="op">=</span> <span class="va">True</span>
+        rollout_path <span class="op">=</span> []
+        result <span class="op">=</span> <span class="dv">0</span>
+
+        <span class="cf">while</span> result <span class="op">==</span> <span class="dv">0</span>:
+            move_states <span class="op">=</span> {move: apply_move(current_board_state, move, current_side)
+                           <span class="cf">for</span> move <span class="kw">in</span> available_moves(current_board_state)}
+
+            <span class="cf">if</span> <span class="kw">not</span> move_states:
+                result <span class="op">=</span> <span class="dv">0</span>
+                <span class="cf">break</span>
+
+            <span class="cf">if</span> <span class="bu">all</span>((state <span class="kw">in</span> state_samples) <span class="cf">for</span> _, state <span class="kw">in</span> move_states):
+                log_total_samples <span class="op">=</span> math.log(<span class="bu">sum</span>(state_samples[s] <span class="op">\</span>
+                                                 <span class="cf">for</span> s <span class="kw">in</span> move_states.values()))
+                l <span class="op">=</span> <span class="kw">lambda</span> _, s: _upper_confidence_bounds(state_results[s],
+                                                          state_samples[s],
+                                                          log_total_samples)
+                move, state <span class="op">=</span> <span class="bu">max</span>(move_states, key<span class="op">=</span>l)
+            <span class="cf">else</span>:
+                move <span class="op">=</span> random.choice(<span class="bu">list</span>(move_states.keys()))
+
+            current_board_state <span class="op">=</span> move_states[move]
+
+            <span class="cf">if</span> first_unvisited_node:
+                rollout_path.append((current_board_state, current_side))
+                <span class="cf">if</span> current_board_state <span class="kw">not</span> <span class="kw">in</span> state_samples:
+                    first_unvisited_node <span class="op">=</span> <span class="va">False</span>
+
+            current_side <span class="op">=</span> <span class="op">-</span>current_side
+
+            result <span class="op">=</span> has_winner(current_board_state)
+
+        <span class="cf">for</span> path_board_state, path_side <span class="kw">in</span> rollout_path:
+            state_samples[path_board_state] <span class="op">+=</span> <span class="fl">1.</span>
+            result <span class="op">*=</span> path_side
+            result <span class="op">/=</span> <span class="fl">2.</span>
+            result <span class="op">+=</span> <span class="fl">.5</span>
+            state_results[path_board_state] <span class="op">+=</span> result
+
+    move_states <span class="op">=</span> {move: apply_move(board_state, move, side) <span class="op">\</span>
+                   <span class="cf">for</span> move <span class="kw">in</span> available_moves(board_state)}
+
+    l2 <span class="op">=</span> <span class="kw">lambda</span> x: state_results[move_states[x]] <span class="op">/</span> state_samples[move_states[x]]
+    move <span class="op">=</span> <span class="bu">max</span>(move_states, key<span class="op">=</span>l2)
+
+    <span class="cf">return</span> state_results[move_states[move]] <span class="op">/</span> state_samples[move_states[move]], move
+</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tictac_uct
+board_state <span class="op">=</span> ((<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),
+               (<span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">0</span>),
+               (<span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>))
+
+res, move <span class="op">=</span> tictac_uct.monte_carlo_tree_search_uct(board_state, <span class="dv">1</span>, <span class="dv">1000</span>)
+<span class="bu">print</span> move</code></pre></div>
+<pre><code>(1, 0)</code></pre>
+<p>X taşını üstten 2. satır ve 1. kolona koymamız isteniyor (Python 0 indisli hatırlarsak), bu hareketi yapıyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">b <span class="op">=</span> np.array(board_state)
+b[move] <span class="op">=</span> <span class="fl">1.0</span>
+<span class="bu">print</span> b</code></pre></div>
+<p>Ve bu kazanan hareket, resimde ikinci seviyede en sağdaki hamle oluyor. UCB1 doğru tavsiyeyi vermiş gibi duruyor.</p>
+<p>Not: MCTS algoritmasinin bol kullanım alanı var, A/B testlerinin istatistiksel hesabı yerine MCTS kullanmak mümkün, yani iki sayfa versiyonu arasında hangisinin daha iyi olduğu da bir tür çok-kollu soyguncu problemi olarak görülebiliyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Bayramlı, <em>Go Oyunu, GnuGo</em>, <a href="https://burakbayramli.github.io/dersblog/sk/2018/02/go-gnugo.html" class="uri">https://burakbayramli.github.io/dersblog/sk/2018/02/go-gnugo.html</a></p>
+<p>[2] Bradberry, <em>Introduction to Monte Carlo Tree Search</em>, <a href="https://jeffbradberry.com/posts/2015/09/intro-to-monte-carlo-tree-search" class="uri">https://jeffbradberry.com/posts/2015/09/intro-to-monte-carlo-tree-search</a></p>
+<p>[3] Silver, <em>Reinforcement Learning</em>, <a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html" class="uri">http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html</a></p>
+<p>[4] Zocca, <em>Python Deep Learning</em></p>
+<p>[5] Bayramlı, İstatistik, <em>Ekler</em></p>
+</body>
+</html>

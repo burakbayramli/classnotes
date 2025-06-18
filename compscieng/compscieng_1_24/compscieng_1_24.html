@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="ders-1.24">Ders 1.24</h1>
+<p>[Ders notları atlandı]</p>
+<p>FIR Filtreleri</p>
+<p>Bir sinyalin içinden belli frekansları ayıklama işlemine filtreleme adı veriliyor; çeşitleri alçak geçiren (low-pass), yüksek geçiren (high-pass), ve bant geçiren (band-pass) filtreleri. Alçak geçiren filtrelerle mesela 2 kHz üstündeki tüm frekanları sinyalden çıkartmak istiyorsak eşik değeri 2 kHz'lük olan bir filtre kullanabiliriz, yüksek geçiren bunun tersini yapabilir. Bant geçiren ise sadece belli bir aralıktaki frekanslara izin vermek için kullanılır, mesela sinyalde 4 ve 5 kHz arası frekanslar kalsın istiyorsak bir bant geçiren filtre kullanırız.</p>
+<p>Bu yazıda sonlu dürtü yanıtlı (finite impulse response -FIR-) adı verilen sayısal filtreleri kullanacağız, bu filtreler tipik olarak sonlu sayıda katsayı olarak hesaplanırlar, sonra bu katsayılar bir evrişim (convolution) operasyonu ile sinyale uygulanır.</p>
+<p>FIR filtre tasarımını kolaylaştıran en önemli numara evrişim ile ayrıksal Fourier transformu arasındaki bir ilişkiye dayanıyor. Bir <span class="math inline">\(x\)</span>'e evrişimle bir <span class="math inline">\(h\)</span> filtresi uygulayacağımızı düşünelim, ve bu bize <span class="math inline">\(y = x * h\)</span> sonucunu verecek. İlişki şudur ki eğer <span class="math inline">\(x\)</span> ve <span class="math inline">\(h\)</span>'nin Fourier transformunu alırsak <span class="math inline">\(x * h\)</span> işlemi &quot;frekans yöresinde (frequency domain)'' <span class="math inline">\(X \cdot H\)</span> çarpımına dönüşür, yani frekans yöresindeki çarpım işlemi zaman yöresindeki evrişim işlemine eşittir [1, sf. 161].</p>
+<p><span class="math display">\[ x(n) * h(n) \leftrightarrow X(\theta)H(\theta)\]</span></p>
+<p>ki <span class="math inline">\(X\)</span> ve <span class="math inline">\(H\)</span>, <span class="math inline">\(x,h\)</span>'nin Fourier transformu.</p>
+<p>İspat</p>
+<p>Ayrıksal evrişim formülünü hatırlarsak,</p>
+<p><span class="math display">\[ y(n) = x(n) * h(n) = \sum_{m=-\infty}^{\infty} x(m) h(n-m) \]</span></p>
+<p>Eşitliğin iki tarafının Fourier transformunu alalım, <span class="math inline">\(y(n)\)</span>'nin transformu <span class="math inline">\(Y(\theta)\)</span> olsun,</p>
+<p><span class="math display">\[  
+Y(\theta) = \sum_{n=-\infty}^{\infty} \bigg[
+\sum_{m=-\infty}^{\infty} x(m) h(n-m)
+\bigg] e^{-j\theta n}
+\]</span></p>
+<p>Toplamların yer değiştirebilme özelliğini kullanırsak,</p>
+<p><span class="math display">\[ 
+= \sum_{m=-\infty}^{\infty} x(m)  \sum_{n=-\infty}^{\infty} h(n-m)  e^{-j\theta n}
+\]</span></p>
+<p>Şimdi <span class="math inline">\(k = n-m\)</span> tanımlayalım,</p>
+<p><span class="math display">\[  
+= \sum_{m=-\infty}^{\infty} x(m)  \sum_{k=-\infty}^{\infty} h(k)  e^{-j\theta (k+m)}
+\]</span></p>
+<p><span class="math display">\[ 
+Y(\theta) =
+\sum_{m=-\infty}^{\infty} x(m)  e^{-j\theta m}
+\sum_{k=-\infty}^{\infty} h(k)  e^{-j\theta k}
+\]</span></p>
+<p>Son ifadede <span class="math inline">\(x\)</span> ve <span class="math inline">\(h\)</span>'nin ayrı ayrı Fourier transformlarını elde etmiş olduk, ve bu transformlar birbiriyle çarpım halindeler. İspat tamamlandı, gerçekten de evriştirilen iki öğenin arasındaki ilişki ayrı ayrı Fourier transformu üzerinden çarpım haline geliyor.</p>
+<p>Bu özellik filtre tasarımında son derece faydalı: çünkü eğer belli frekansları elemek istiyorsak bunu yapmanın en rahat yolu frekans yöresinde öyle bir <span class="math inline">\(H\)</span> tanımlamak ki <span class="math inline">\(X\)</span>'in bazı bölgelerini olduğu gibi bıraksın diğerlerini sıfırlasın. Bu fonksiyon istenen yerlerde 1 değerine diğer yerlerde 0 değerine sahip olan bir fonksiyondan ibarettir. Fonksiyon bir dikdörtgene benzer, ki bu sebeple ona &quot;tuğla duvarı (brickwall)'' deniyor. Bu tuğla duvarının önemli bir avantajı (ters Fourier transformu ile) zaman yöresine geçiş yapıldığında yine basit bir fonksiyon olması, bu ünlü <span class="math inline">\(\mathrm{sinc}\)</span> fonksiyonudur,</p>
+<p><span class="math display">\[ \mathrm{sinc} (x) = \frac{\sin(x)}{x}\]</span></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x<span class="op">=</span>np.linspace(<span class="op">-</span><span class="fl">10.0</span>,<span class="fl">10.0</span>,<span class="dv">100</span>)
+y<span class="op">=</span>np.sinc(x)
+plt.plot(x,y)<span class="op">;</span> 
+plt.savefig(<span class="st">&#39;compscieng_1_24_14.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_24_14.png" />
+
+</div>
+<p>Sayısal olarak geçişi yapalım, bir kısmı 1 gerisi 0 olan tuğla duvarı tanımlayıp <code>numpy.fft.ifft</code> ile <span class="math inline">\(h\)</span>'yi elde edelim,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">H <span class="op">=</span> np.zeros(<span class="dv">242</span>)
+H[<span class="dv">128</span>:<span class="dv">142</span>] <span class="op">=</span> <span class="fl">1.</span>
+plt.figure()
+plt.plot(H)
+plt.savefig(<span class="st">&#39;compscieng_1_24_02.png&#39;</span>)
+h1 <span class="op">=</span> np.fft.ifft(H,<span class="dv">140</span>)
+h <span class="op">=</span> np.real(np.fft.ifftshift(h1))
+plt.figure()
+plt.plot(h)
+plt.savefig(<span class="st">&#39;compscieng_1_24_01.png&#39;</span>)</code></pre></div>
+<p><img src="compscieng_1_24_02.png" /> <img src="compscieng_1_24_01.png" /></p>
+<p>İspat</p>
+<p>Diyelim ki frekans yöresinde tanımlı <span class="math inline">\(H(\omega)\)</span>'nin tuğla duvarı şekli var [3, sf. 247], öyle ki sıfırda ortalanmış ve <span class="math inline">\(-\omega,\omega\)</span> arasındaki bir bölgede fonksiyon 1, diğer yerlerde 0, yani</p>
+<p><span class="math display">\[ H(\omega) = 
+\left\{ \begin{array}{ll}
+1, &amp; -\omega_c \le \omega \le \omega_c \\
+0, &amp; \omega_c \le |\omega|
+\end{array} \right.
+\]</span></p>
+<p>Bu fonksiyonun zaman yöresindeki karşılığını analitik olarak bulalım. Ters Fourier transformu,</p>
+<p><span class="math display">\[ 
+h(t) = \frac{1}{2\pi}  \int_{-\infty}^{\infty} 
+H(\omega) e ^{j\omega t} \mathrm{d} \omega = 
+\frac{1}{2\pi} \int_{-\omega_c}^{\omega_c} e ^{j\omega t} \mathrm{d} \omega
+\]</span></p>
+<p><span class="math display">\[ 
+= \frac{1}{2\pi} \frac{1}{jt} (e ^{j\omega_c t} - e ^{-j\omega_c t}) =
+\frac{1}{\pi t} \sin(\omega_c t)
+\]</span></p>
+<p><span class="math display">\[ 
+= \frac{\omega_c}{\pi} \frac{\sin(\omega_c t)}{\omega_c t} 
+= \frac{\omega_c}{\pi} \mathrm{sinc}(\omega_c t)
+\]</span></p>
+<p><span class="math inline">\(\mathrm{sinc}\)</span>'e erişmiş olduk. Ayrıksal ortamda</p>
+<p><span class="math display">\[ h[i] = \frac{\sin(2\pi f_c i)}{i \pi}\]</span></p>
+<p>Bu fonksiyonu bir sinyal ile evriştirince ona frekans filtresi uygulamış oluruz, sadece <span class="math inline">\(f_c\)</span> altındaki frekanslara izin veren alçak geçiren (low-pass) filtreyi ederiz [2, sf. 285].</p>
+<p>Fakat bir problem var, <span class="math inline">\(\mathrm{sinc}\)</span> fonksiyonu sıfır genliğe erişmeden eksi ve artı sonsuzluğa sürekli devam eder. Bu sonsuz uzantı sayısal ortamda kullanışlı değil. Bunun için fonksiyonu bize sıfırda ortalanmış <span class="math inline">\(M+1\)</span> tane katsayı değeri bırakacak şekilde kırpacağız (<span class="math inline">\(M\)</span> çift sayı olmalı, sıfırda ortalanınca geri kalan katsayılardan her iki yönde eşit sayıda olması için), ve geri kalan tüm <span class="math inline">\(\mathrm{sinc}\)</span> değerleri sıfır kabul edilecek.</p>
+<p>Bir diğer problem sıfırda ortalama demek negatif indisler kullanmak demek, bu bilgisayarlar için problemli; o sebeple her şeyi <span class="math inline">\(M/2\)</span> sağa kaydırıyoruz.</p>
+<p>Fakat kırpmanın bir yan etkisi şudur; kırpma çok keskin bir şekilde yapıldığı için bu fonksiyonda ani bitiş (abrupt end) yaratıyor ve bu frekans yöresinde pürüzlere yol açıyor.</p>
+<div class="figure">
+<img src="compscieng_1_24_15.png" />
+
+</div>
+<p>Bu problemin bir çözümü pencereleme fonksiyonu kullanmak, ve filtreleme yapacak çekirdeği bu pencereyle çarpıp ani geçişi yumuşatmaya uğraşmak. Hamming penceresi bir seçenek,</p>
+<p><span class="math display">\[ w[i] = 0.54 - 0.46 \cos (2\pi i / M)  \]</span></p>
+<p>Nihai filtre</p>
+<p><span class="math display">\[ 
+h[i] = K \frac{\sin(2\pi f_c (i-M/2))}{i-M/2} \bigg[
+0.54 - 0.46 \cos (2\pi i / M)
+\bigg]
+\]</span></p>
+<div class="figure">
+<img src="compscieng_1_24_16.png" />
+
+</div>
+<p>Kodları altta görüyoruz,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy, matplotlib.pyplot <span class="im">as</span> plt
+<span class="im">import</span> numpy <span class="im">as</span> np
+
+<span class="kw">def</span> hamming(window_size):
+    N <span class="op">=</span> window_size<span class="op">;</span>
+    output <span class="op">=</span> np.zeros((N, <span class="dv">1</span>))<span class="op">;</span>
+    <span class="cf">if</span> np.mod(N, <span class="dv">2</span>) <span class="op">==</span> <span class="dv">0</span> :
+        m <span class="op">=</span> np.fix(N <span class="op">/</span> <span class="dv">2</span>)
+        n <span class="op">=</span> m
+    <span class="cf">else</span>:
+        m <span class="op">=</span> np.fix(N <span class="op">/</span> <span class="dv">2</span>)<span class="op">+</span><span class="dv">1</span><span class="op">;</span> 
+        n <span class="op">=</span> m<span class="dv">-1</span><span class="op">;</span> 
+    window <span class="op">=</span> <span class="fl">0.54</span> <span class="op">-</span> <span class="fl">0.46</span> <span class="op">*</span> np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>(np.arange(m)) <span class="op">/</span> (N<span class="dv">-1</span>))
+    tmp1 <span class="op">=</span> window[:<span class="bu">int</span>(m)]
+    tmp2 <span class="op">=</span> window[np.arange(<span class="bu">int</span>(n)<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>)]
+    <span class="cf">return</span> np.hstack((tmp1,tmp2))
+    
+<span class="kw">def</span> sinc_filter_low(order, fc1, fs):
+    Fc1 <span class="op">=</span> fc1 <span class="op">/</span> np.<span class="bu">float</span>(fs) 
+    M  <span class="op">=</span> order
+    B <span class="op">=</span> np.zeros((M<span class="op">+</span><span class="dv">1</span>, <span class="dv">1</span>))
+    window <span class="op">=</span> hamming(M<span class="op">+</span><span class="dv">1</span>)
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(M<span class="op">+</span><span class="dv">1</span>):
+        <span class="cf">if</span> <span class="dv">2</span> <span class="op">*</span> i <span class="op">==</span> M:
+            B[i] <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>Fc1
+        <span class="cf">else</span>:
+            tmp1 <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>Fc1 <span class="op">*</span>(i<span class="op">-</span>(M<span class="op">/</span><span class="fl">2.</span>))
+            tmp2 <span class="op">=</span> (i<span class="op">-</span>(M<span class="op">/</span><span class="fl">2.</span>))
+            B[i] <span class="op">=</span> np.sin(tmp1) <span class="op">/</span> tmp2
+        B[i] <span class="op">=</span> B[i] <span class="op">*</span> window[i]
+    <span class="cf">return</span> B <span class="op">/</span> np.<span class="bu">sum</span>(B)
+ 
+<span class="kw">def</span> sinc_filter_high(order, fc1, fs):
+    Fc1 <span class="op">=</span> fc1 <span class="op">/</span> np.<span class="bu">float</span>(fs) 
+    M  <span class="op">=</span> order
+    B <span class="op">=</span> np.zeros((M<span class="op">+</span><span class="dv">1</span>, <span class="dv">1</span>))
+    window <span class="op">=</span> hamming(M<span class="op">+</span><span class="dv">1</span>)
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(M<span class="op">+</span><span class="dv">1</span>):
+        <span class="cf">if</span> <span class="dv">2</span> <span class="op">*</span> i <span class="op">==</span> M:
+            B[i] <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>Fc1
+        <span class="cf">else</span>:
+            tmp1 <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>Fc1 <span class="op">*</span>(i<span class="op">-</span>(M<span class="op">/</span><span class="fl">2.</span>))
+            tmp2 <span class="op">=</span> (i<span class="op">-</span>(M<span class="op">/</span><span class="fl">2.</span>))
+            B[i] <span class="op">=</span> np.sin(tmp1) <span class="op">/</span> tmp2
+        B[i] <span class="op">=</span> B[i] <span class="op">*</span> window[i]
+    B <span class="op">=</span> B <span class="op">/</span> np.<span class="bu">sum</span>(B)
+    B <span class="op">=</span> <span class="op">-</span>B
+    B[(M<span class="op">/</span><span class="dv">2</span>)] <span class="op">=</span> B[(M<span class="op">/</span><span class="dv">2</span>)] <span class="op">+</span> <span class="dv">1</span>
+    <span class="cf">return</span> B
+    
+<span class="kw">def</span> sinc_filter_band(order, fc1, fc2, fs):
+    M <span class="op">=</span> order
+    A <span class="op">=</span> sinc_filter_low(order, fc1, fs).T[<span class="dv">0</span>]
+    B <span class="op">=</span> sinc_filter_high(order, fc2, fs).T[<span class="dv">0</span>]
+    output <span class="op">=</span> A<span class="op">+</span>B
+    output <span class="op">=</span> <span class="op">-</span>output
+    output[(M<span class="op">/</span><span class="dv">2</span>)] <span class="op">=</span> output[(M<span class="op">/</span><span class="dv">2</span>)] <span class="op">+</span> <span class="fl">1.</span>
+    <span class="cf">return</span> output
+
+<span class="kw">def</span> plotSpectrum(y,Fs):
+    n <span class="op">=</span> <span class="bu">len</span>(y) <span class="co"># sinyal uzunlugu</span>
+    k <span class="op">=</span> np.arange(n)
+    T <span class="op">=</span> n<span class="op">/</span>Fs
+    frq <span class="op">=</span> k<span class="op">/</span>T <span class="co"># frekansin her iki kismi</span>
+    frq <span class="op">=</span> frq[<span class="bu">range</span>(n<span class="op">/</span><span class="dv">2</span>)] <span class="co"># frekansin tek tarafi</span>
+    Y <span class="op">=</span> scipy.fft(y)<span class="op">/</span>n <span class="co"># fft hesaplamak ve normalizasyon</span>
+    Y <span class="op">=</span> Y[<span class="bu">range</span>(n<span class="op">/</span><span class="dv">2</span>)] 
+    plt.plot(frq,np.<span class="bu">abs</span>(Y),<span class="st">&#39;r&#39;</span>) <span class="co"># spektrumu grafiklemek</span>
+    </code></pre></div>
+<p>Terminoloji bilgisi: katsayıların kaç tane olduğu filtre performansında değişiklik yaratabiliyor, bu sebeple filtrelerin bazen kaç tane katsayı içerdiği özellikle belirtilir, mesela alttaki örnekteki filtrelere &quot;33 vuruşlu (33-tap)'' adı verilir.</p>
+<p>Alçak Geçiren Filtre</p>
+<p>Bir alçak geçiren filtre örneği <span class="math inline">\(f_c\)</span> eşik değeri için altta görülüyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> filt
+fy<span class="op">=</span><span class="dv">300</span><span class="op">;</span> <span class="co"># Hz ile sinyal frekansi</span>
+wy<span class="op">=</span><span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>fy<span class="op">;</span> <span class="co"># radyan / saniye ile sinyal frekansi</span>
+fs<span class="op">=</span><span class="dv">50</span><span class="op">;</span> <span class="co"># Hz ile orneklem frekansi</span>
+tiv<span class="op">=</span><span class="fl">1.</span><span class="op">/</span>fs<span class="op">;</span> <span class="co"># orneklemler arasinda zaman</span>
+tend <span class="op">=</span> <span class="dv">5</span> <span class="co"># saniye</span>
+t<span class="op">=</span>np.linspace(<span class="dv">0</span>,tend,tend<span class="op">/</span>tiv)<span class="op">;</span> <span class="co"># gecen zaman (5 saniye)</span>
+
+y<span class="op">=</span><span class="fl">0.6</span><span class="op">*</span>np.sin(wy<span class="op">*</span>t)<span class="op">+</span><span class="fl">0.3</span><span class="op">*</span>np.sin(<span class="dv">3</span><span class="op">*</span>wy<span class="op">*</span>t)<span class="op">+</span><span class="fl">0.2</span><span class="op">*</span>np.sin(<span class="dv">5</span><span class="op">*</span>wy<span class="op">*</span>t)<span class="op">;</span> 
+f<span class="op">=</span>plt.figure()
+plt.plot(t,y)
+plt.title(<span class="st">u&#39;Ana Sinyal&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_24_05.png&#39;</span>)
+f<span class="op">=</span>plt.figure()
+plt.title(<span class="st">u&#39;Filtre Öncesi Frekans&#39;</span>)
+filt.plotSpectrum(y, fs)
+plt.savefig(<span class="st">&#39;compscieng_1_24_06.png&#39;</span>)
+
+order <span class="op">=</span> <span class="dv">32</span>
+fc1 <span class="op">=</span> <span class="fl">1.0</span>
+f1 <span class="op">=</span> filt.sinc_filter_low(order, fc1, fs<span class="op">=</span><span class="dv">20</span>).T[<span class="dv">0</span>]<span class="op">;</span>
+
+y1 <span class="op">=</span> np.convolve(f1, y)
+f<span class="op">=</span>plt.figure()
+plt.title(<span class="st">u&#39;Alçak Geçiren Filtre Sonrası Sinyal&#39;</span>)
+plt.plot(np.arange(<span class="bu">len</span>(y1)), y1)
+plt.savefig(<span class="st">&#39;compscieng_1_24_08.png&#39;</span>)
+
+f<span class="op">=</span>plt.figure()
+filt.plotSpectrum(y1, fs)
+plt.title(<span class="st">u&#39;Alçak Geçiren Filtre Sonrası Frekanslar&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_24_07.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_24_05.png" />
+
+</div>
+<div class="figure">
+<img src="compscieng_1_24_06.png" />
+
+</div>
+<div class="figure">
+<img src="compscieng_1_24_07.png" />
+
+</div>
+<div class="figure">
+<img src="compscieng_1_24_08.png" />
+
+</div>
+<p>Yüksek Geçiren Filtre</p>
+<p>Yüksek geçiren filtre elde etmek için herhangi bir <span class="math inline">\(f_c\)</span> için tanımlı bir alçak geçiren filtreyi alıp katsayılarını negatife çevirmek yeterli (bir de ortada sıfır noktasında bir pozitif değer ekleniyor). Bu değişim o filtreyi <span class="math inline">\(f_c\)</span> için yüksek geçiren hale getirir.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">fc1 <span class="op">=</span> <span class="dv">4</span>
+f2 <span class="op">=</span> filt.sinc_filter_high(order, fc1, fs).T[<span class="dv">0</span>]<span class="op">;</span>
+y2 <span class="op">=</span> np.convolve(f2, y)
+f<span class="op">=</span>plt.figure()
+plt.plot(np.arange(<span class="bu">len</span>(y2)), y2)
+plt.title(<span class="st">u&#39;Yüksek Geçiren Filtre Sonrası Sinyal&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_24_10.png&#39;</span>)
+f<span class="op">=</span>plt.figure()
+filt.plotSpectrum(y2, fs)
+plt.title(<span class="st">u&#39;Yüksek Geçiren Filtre Sonrası Frekanslar&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_24_09.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_24_09.png" />
+
+</div>
+<div class="figure">
+<img src="compscieng_1_24_10.png" />
+
+</div>
+<p>Bant Geçiren Filtre</p>
+<p><span class="math inline">\(f_{c1}\)</span> ve <span class="math inline">\(f_{c2}\)</span> frekansları arası haricindeki tüm diğer frekanslar elensin istiyorsak <span class="math inline">\(f_{c1}\)</span> için alçak geçiren <span class="math inline">\(f_{c2}\)</span> için yüksek geçiren filtre tanımlayıp bu iki filtreyi toplarız. Bu toplam bize bir bant reddi (bant-reject) filtresi verir. Ama biz bunun tersini istiyoruz, o zaman eldeki katsayıların üstteki bahsedilen yöntemle tersini alırsak bir bant geçiren filtre elde ederiz.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">fc1 <span class="op">=</span> <span class="fl">4.0</span>
+fc2 <span class="op">=</span> <span class="fl">4.5</span>
+f3 <span class="op">=</span> filt.sinc_filter_band(order, fc1, fc2, fs)<span class="op">;</span>
+y3 <span class="op">=</span> np.convolve(f3, y)
+f<span class="op">=</span>plt.figure()
+plt.title(<span class="st">u&#39;Bant Geçiren Filtre Sonrası Sinyal&#39;</span>)
+plt.plot(np.arange(<span class="bu">len</span>(y3)), y3)
+plt.savefig(<span class="st">&#39;compscieng_1_24_12.png&#39;</span>)
+f<span class="op">=</span>plt.figure()
+filt.plotSpectrum(y3, fs)
+plt.title(<span class="st">u&#39;Bant Geçiren Filtre Sonrası Frekanslar&#39;</span>)
+plt.savefig(<span class="st">&#39;compscieng_1_24_11.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_24_11.png" />
+
+</div>
+<div class="figure">
+<img src="compscieng_1_24_12.png" />
+
+</div>
+<p>Karşılaştırma amaçlı olarak <code>scipy.signal.butter</code> kütüphane çağrısı ile bir Butterworth bant geçiren filtreyi de aynı veri üzerinde işlettik.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.signal <span class="im">import</span> butter, lfilter
+<span class="kw">def</span> butter_bandpass(lowcut, highcut, fs, order):
+    nyq <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> fs
+    low <span class="op">=</span> lowcut <span class="op">/</span> nyq
+    high <span class="op">=</span> highcut <span class="op">/</span> nyq
+    b, a <span class="op">=</span> butter(order, [low, high], btype<span class="op">=</span><span class="st">&#39;band&#39;</span>)
+    <span class="cf">return</span> b, a
+
+<span class="kw">def</span> butter_bandpass_filter(data, lowcut, highcut, fs, order):
+    b, a <span class="op">=</span> butter_bandpass(lowcut, highcut, fs, order<span class="op">=</span>order)
+    y <span class="op">=</span> lfilter(b, a, data)
+    <span class="cf">return</span> y
+
+low <span class="op">=</span> <span class="dv">4</span><span class="op">;</span> high<span class="op">=</span><span class="fl">4.5</span>
+yb <span class="op">=</span> butter_bandpass_filter(y, low, high, fs, order<span class="op">=</span><span class="dv">1</span>)
+plt.title(<span class="st">u&#39;Bant Geçiren (Butterworth) Filtre Sonrası Sinyal&#39;</span>)
+plt.plot(np.arange(<span class="bu">len</span>(yb)), yb)
+plt.savefig(<span class="st">&#39;compscieng_1_24_13.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="compscieng_1_24_13.png" />
+
+</div>
+<p>Not: Butterworth filtreleri FIR değil IIR filtreleri (bir sonraki yazının konusu).</p>
+<p>Kaynaklar</p>
+<p>[1] ElAli, <em>Discrete Systems and Digital Signal Processing with Matlab, 2nd Edition</em></p>
+<p>[2] Smith, <em>The Scientist and Engineer's Guide to Digital Signal Processing, 2nd Ed.</em></p>
+<p>[3] Sierra, <em>Digital Signal Processng with Matlab Examples Volume 1</em></p>
+</body>
+</html>

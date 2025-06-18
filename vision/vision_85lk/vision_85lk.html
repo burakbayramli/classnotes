@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="piksel-takibi-optik-akış-lucas-kanade-algoritması">Piksel Takibi, Optik Akış, Lucas Kanade Algoritması</h1>
+<p>Hareket halindeki bir kameranın aldığı görüntülerdeki herhangi bir pikseli nasıl takip ederiz?</p>
+<p>Matematiksel olarak temsil etmek gerekirse, zamana göre değişen 2 boyutlu görüntüyü bir fonksiyon olarak düşünelim, ki bu fonksiyonun değerleri ayrıksal olarak, imajın ta kendisi. Bir <span class="math inline">\(I(x(t),y(t),t)\)</span> fonksiyonu piksel değerlerini veriyor. Bu fonksiyonda <span class="math inline">\(x,y\)</span> ekran kordinatlarına tekabül ediyor, <span class="math inline">\(t\)</span> ise zaman, <span class="math inline">\(1,2,..\)</span> gibi değerleri indeks değerleri var, mesela <span class="math inline">\(I(100,200,1)\)</span>, bize 1. video karesindeki <span class="math inline">\(x=100,y=200\)</span> kordinatlarındaki piksel değerini verecek.</p>
+<p><span class="math inline">\(x,y\)</span> değişkenleri parametrize edildi, bir noktayı takip etmek istiyoruz çünkü, ve <span class="math inline">\(t\)</span>'ye göre bu takip edilen noktanın <span class="math inline">\(x,y\)</span> kordinatları belli bir gidişat yönünde değişiyor.</p>
+<p>Şu faraziyeyi yaparak takip problemimizi kolaylaştırabiliriz. Diyelim ki takip edilen bir nokta, görüldüğü her karede aynı piksel rengindedir. Bu çok sıradışı bir faraziye değil, resim karelerinden bir araba geçiyor mesela, ve bu arabanın üzerindeki piksellerin renkleri, en azından iki kare arasında değişmiyor. Işık seviyesi, gölgede olma, vs. gibi durumlarda biraz değişebilir, fakat basitleştirme amacıyla bu faraziye geçerlidir.</p>
+<div class="figure">
+<img src="disp2.png" />
+
+</div>
+<p>Bir diğer faraziye, kameralar hareket ettiklerinde alınan iki görüntü arasındaki tüm piksellerin yer değişimi genellikle aynı yönde olmasıdır. Bu değişim yönünü <span class="math inline">\(&lt;u,v&gt;\)</span> vektörü olarak görebiliriz, ve bu değişkenler iki görüntü arasındaki değişimde tüm pikseller için aynı olacaktır. Bu da normal, kamerayı alıp mesela sağa doğru hareket ettiriyoruz, ve görüntüdeki tüm pikseller sola doğru gidiyorlar.</p>
+<div class="figure">
+<img src="disp1.png" />
+
+</div>
+<p>Tüm bunları modelimizde nasıl kullanırız?</p>
+<p>Takip edilen nokta her karede aynı renkte ise, şu ifade doğru demektir</p>
+<p><span class="math display">\[ I(x(t),y(t),t) = \textrm{ sabit } \]</span></p>
+<p>Eğer bu fonksiyonun zamana göre türevini alırsak</p>
+<p><span class="math display">\[ \frac{d \ I(x(t),y(t),t)}{dt} = 0\]</span></p>
+<p>sonucu gelir. Eşitliğin sağı sıfır, çünkü bir sabitin türevini aldık. Sol tarafa Zincirleme Kanununu uygularsak,</p>
+<p><span class="math display">\[ \frac{\partial I}{\partial x}\frac{dx}{dt} +
+\frac{\partial I}{\partial y}\frac{dy}{dt} +
+\frac{\partial I}{\partial t} = 0
+\]</span></p>
+<p>Bu formülde <span class="math inline">\(dx/dt\)</span> ve <span class="math inline">\(dy/dt\)</span>, hareket halindeki (zaman geçerken) noktanın sonsuz küçüklükteki yer değimi. Ayrıksal bağlamda arka arkaya iki kare içindeki yer değişimi. O zaman,</p>
+<p><span class="math display">\[ \frac{dx}{dt}, \frac{dy}{dt} = u, v \]</span></p>
+<p>Alttakiler ise mesafesel (spatial) gradyanlardır, bunların nasıl hesaplanacağını çok iyi biliyoruz!</p>
+<p><span class="math display">\[ 
+\frac{\partial I}{\partial x}, \frac{\partial I}{\partial y}
+ \]</span></p>
+<p>Alttaki ise resim karelerinin zamana göre türevidir.</p>
+<p><span class="math display">\[ 
+\frac{\partial I}{\partial t}
+ \]</span></p>
+<p>Daha derli toplu olarak göstermek gerekirse ana formül nihai olarak şöyle</p>
+<p><span class="math display">\[ I_x u + I_y v + I_t = 0 \]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[ 
+\nabla I \cdot &lt;u, v&gt; = -I_t
+ \]</span></p>
+<p>Şimdi <span class="math inline">\(u,v\)</span>'nin hesaplanmasına gelelim. Üstteki formülü bir veri noktası için yazmak yeterli değil. Ama bu formülü hem takip ettiğimiz, hem de onun etrafındaki pikseller için yazarsak (onların yer değişimi de aynı değil mi?), ve bu sistemi çözersek, sonuca varabiliriz.</p>
+<p>İki tane bilinmeyenimiz var, ama böylece pek çok formül elde ediyoruz. Veriler gürültülü olduğu için, aslında bilinmeyenden &quot;daha fazla&quot; formül elde etmek iyi, bu tür denklem sistemlerine &quot;çok eşitliğe sahip (overdetermined)&quot; denir, ve böyle tür sistemler En Az Kareler (Least Squares) ile çözülür. Tüm bunları biraraya koyunca şu ortaya çıkar.</p>
+<p><span class="math display">\[ 
+\left[\begin{array}{cc}
+I_x(p_1) &amp; I_y(p_1) \\
+I_x(p_2) &amp; I_y(p_1) \\
+\vdots &amp; \vdots \\
+I_x(p_k) &amp; I_y(p_k) 
+\end{array}\right]
+\left[\begin{array}{r}
+u \\
+v
+\end{array}\right] = 
+-
+\left[\begin{array}{c}
+I_t(p_1) \\
+I_t(p_2) \\
+\vdots \\
+I_t(p_k) 
+\end{array}\right]
+ \]</span></p>
+<p>Gradyanların belli noktalarda hesaplandığını unutmayalım, o sebeple <span class="math inline">\(p_1, p_2\)</span> gibi piksel noktalarını bu fonksiyonlara geçiyoruz.</p>
+<p>Bu sistemi</p>
+<p><span class="math display">\[ A \ d = b \]</span></p>
+<p>olarak gösterebiliriz, ki <span class="math inline">\(d = &lt;u,v&gt;\)</span>. Sol tarafı <span class="math inline">\(A^T\)</span> ile çarpalım</p>
+<p><span class="math display">\[ A^TA \ d = A^Tb \]</span></p>
+<p>Eğer <span class="math inline">\(A^TA\)</span>'nin matris tersini iki tarafla çarparsak, <span class="math inline">\(d\)</span> yanlız kalır, ve sonuç elde edilir.</p>
+<p>Bu denklemi Python Numpy'da <code>pinv</code> kullanarak çözeriz.</p>
+<p>Test için üç tane resim kullandık, bu resimlerden <code>flow1-bw-0.png</code> başlangıç resmi, bu resmin ortasındaki objeleri GIMP kullanarak elle kopyaladık, bir üst sağ çapraza doğru, bir alt sol çapraza doğru, ve iki yeni resim elde ettik (<code>upright.png</code>, <code>dleft.png</code>). Takip edilen nokta gri dörtgenin alt sol köşesinde. Lucas Kanade algoritması bu noktayı takip ederek, yeşil ile işaretledi.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.signal <span class="im">as</span> si
+<span class="im">from</span> PIL <span class="im">import</span> Image
+
+<span class="kw">def</span> gauss_kern():
+    h1 <span class="op">=</span> <span class="dv">15</span>
+    h2 <span class="op">=</span> <span class="dv">15</span>
+    x, y <span class="op">=</span> np.mgrid[<span class="dv">0</span>:h2, <span class="dv">0</span>:h1]
+    x <span class="op">=</span> x<span class="op">-</span>h2<span class="op">/</span><span class="dv">2</span>
+    y <span class="op">=</span> y<span class="op">-</span>h1<span class="op">/</span><span class="dv">2</span>
+    sigma <span class="op">=</span> <span class="fl">1.5</span>
+    g <span class="op">=</span> np.exp( <span class="op">-</span>( x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span> ) <span class="op">/</span> (<span class="dv">2</span><span class="op">*</span>sigma<span class="op">**</span><span class="dv">2</span>) )<span class="op">;</span>
+    <span class="cf">return</span> g <span class="op">/</span> g.<span class="bu">sum</span>()
+
+<span class="kw">def</span> deriv(im1, im2):
+    g <span class="op">=</span> gauss_kern()
+    Img_smooth <span class="op">=</span> si.convolve(im1,g,mode<span class="op">=</span><span class="st">&#39;same&#39;</span>)
+    fx,fy<span class="op">=</span>np.gradient(Img_smooth)    
+    ft <span class="op">=</span> si.convolve2d(im1, <span class="fl">0.25</span> <span class="op">*</span> np.ones((<span class="dv">2</span>,<span class="dv">2</span>))) <span class="op">+</span> <span class="op">\</span>
+        si.convolve2d(im2, <span class="fl">-0.25</span> <span class="op">*</span> np.ones((<span class="dv">2</span>,<span class="dv">2</span>)))
+                    
+    fx <span class="op">=</span> fx[<span class="dv">0</span>:fx.shape[<span class="dv">0</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>:fx.shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]    
+    fy <span class="op">=</span> fy[<span class="dv">0</span>:fy.shape[<span class="dv">0</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>:fy.shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span>
+    ft <span class="op">=</span> ft[<span class="dv">0</span>:ft.shape[<span class="dv">0</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>:ft.shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span>
+    <span class="cf">return</span> fx, fy, ft
+
+<span class="im">import</span> warnings
+warnings.simplefilter(<span class="st">&quot;ignore&quot;</span>, np.ComplexWarning)
+
+im1 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(<span class="st">&#39;flow1-bw-0.png&#39;</span>))
+im2 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(<span class="st">&quot;upright.png&quot;</span>))
+fx, fy, ft <span class="op">=</span> deriv(im1, im2)
+<span class="bu">print</span> fx[:<span class="dv">5</span>]</code></pre></div>
+<pre><code>[[ 34.37477011  45.94010835  51.877951   ...,  53.83264716  51.877951
+   45.94010835]
+ [ 26.01168277  34.76327322  39.25648957 ...,  40.73562489  39.25648957
+   34.76327322]
+ [ 11.72919465  15.67546405  17.70154632 ...,  18.36851839  17.70154632
+   15.67546405]
+ [  3.51803959   4.70167857   5.30937909 ...,   5.50942984   5.30937909
+    4.70167857]
+ [  0.6961225    0.93033183   1.05057892 ...,   1.09016341   1.05057892
+    0.93033183]]</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.signal <span class="im">as</span> si
+<span class="im">from</span> PIL <span class="im">import</span> Image
+<span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+
+<span class="kw">def</span> lk(im1, im2, i, j, window_size) :
+    fx, fy, ft <span class="op">=</span> deriv(im1, im2)
+    halfWindow <span class="op">=</span> np.floor(window_size<span class="op">/</span><span class="dv">2</span>)
+    curFx <span class="op">=</span> fx[i<span class="op">-</span>halfWindow<span class="dv">-1</span>:i<span class="op">+</span>halfWindow, 
+               j<span class="op">-</span>halfWindow<span class="dv">-1</span>:j<span class="op">+</span>halfWindow]
+    curFy <span class="op">=</span> fy[i<span class="op">-</span>halfWindow<span class="dv">-1</span>:i<span class="op">+</span>halfWindow, 
+               j<span class="op">-</span>halfWindow<span class="dv">-1</span>:j<span class="op">+</span>halfWindow]
+    curFt <span class="op">=</span> ft[i<span class="op">-</span>halfWindow<span class="dv">-1</span>:i<span class="op">+</span>halfWindow, 
+               j<span class="op">-</span>halfWindow<span class="dv">-1</span>:j<span class="op">+</span>halfWindow]
+    curFx <span class="op">=</span> curFx.T
+    curFy <span class="op">=</span> curFy.T
+    curFt <span class="op">=</span> curFt.T
+
+    curFx <span class="op">=</span> curFx.flatten(order<span class="op">=</span><span class="st">&#39;F&#39;</span>) 
+    curFy <span class="op">=</span> curFy.flatten(order<span class="op">=</span><span class="st">&#39;F&#39;</span>) 
+    curFt <span class="op">=</span> <span class="op">-</span>curFt.flatten(order<span class="op">=</span><span class="st">&#39;F&#39;</span>) 
+    
+    A <span class="op">=</span> np.vstack((curFx, curFy)).T
+    U <span class="op">=</span> np.dot(np.dot(lin.pinv(np.dot(A.T,A)),A.T),curFt)
+    <span class="cf">return</span> U[<span class="dv">0</span>], U[<span class="dv">1</span>]
+
+<span class="kw">def</span> test(image1,image2,output): 
+    x<span class="op">=</span><span class="dv">165</span>
+    y<span class="op">=</span><span class="dv">95</span>
+    win<span class="op">=</span><span class="dv">50</span>
+    im1 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(image1))
+    im2 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(image2))
+    u, v <span class="op">=</span> lk(im1, im2, x, y, win)
+    plt.imshow(im1, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)
+    plt.hold(<span class="va">True</span>)
+    plt.plot(x,y,<span class="st">&#39;+r&#39;</span>)<span class="op">;</span>
+    <span class="co"># 3 ile carptik cunku vektor degisimi iyi hesaplandi ama</span>
+    <span class="co"># grafikleme icin cok ufakti, ikinci yesil nokta iyi gozuksun</span>
+    <span class="co"># diye onu biraz buyuttuk</span>
+    plt.plot(x<span class="op">+</span>u<span class="op">*</span><span class="dv">3</span>,y<span class="op">+</span>v<span class="op">*</span><span class="dv">3</span>,<span class="st">&#39;og&#39;</span>)
+    plt.savefig(output)
+
+test(<span class="st">&#39;flow1-bw-0.png&#39;</span>,<span class="st">&#39;dleft.png&#39;</span>,<span class="st">&#39;lk_1.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="lk_1.png" />
+
+</div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">test(<span class="st">&#39;flow1-bw-0.png&#39;</span>,<span class="st">&#39;upright.png&#39;</span>, <span class="st">&#39;lk_2.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="lk_2.png" />
+
+</div>
+<p>Bu matematiksel modele alternatif bir bakış şöyle olabilir. İki imaj karesi içinde birincisine <span class="math inline">\(I(x,y)\)</span> ikincisine <span class="math inline">\(H(x,y)\)</span> diyelim, burada <span class="math inline">\(t\)</span> üzerinden parametrizasyon olmasın; <span class="math inline">\(x,y\)</span> pikselinin <span class="math inline">\(H\)</span> içinde <span class="math inline">\(u,v\)</span> kadar yer değişiminden sonra, bu noktaların <span class="math inline">\(I\)</span>'de geldiği yerdeki grilik değerinin aynı olduğunu (yine) farzediyoruz. Sonra <span class="math inline">\(I(x+u,y+v)\)</span>'nin birinci dereceden Taylor Açılımını yapıyoruz,</p>
+<p><span class="math display">\[ I(x+u,y+v) = I(x,y) + \frac{\partial I}{\partial x}u + 
+\frac{\partial I}{\partial y}v + ...
+\]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[ I(x+u,y+v) \approx I(x,y) + \frac{\partial I}{\partial x}u + 
+\frac{\partial I}{\partial y}v 
+\]</span></p>
+<p>Grilik aynılığını ise şöyle belirtebiliriz</p>
+<p><span class="math display">\[  I(x+u,y+v) - H(x,y) = 0\]</span></p>
+<p>Taylor açılımını üstteki formülde <span class="math inline">\(I\)</span> yerine geçirelim</p>
+<p><span class="math display">\[ I(x,y) + 
+\frac{\partial I}{\partial x}u + 
+\frac{\partial I}{\partial y}v - H(x,y) = 0
+\]</span></p>
+<p><span class="math inline">\(H\)</span>'in yerini değiştirelim</p>
+<p><span class="math display">\[ I(x,y)  - H(x,y) + I_xu + I_yv = 0\]</span></p>
+<p>Şu ifade <span class="math inline">\(I(x,y) - H(x,y)\)</span> nedir? Bunlar iki imajın, sonrası ve öncesi arasındaki fark değil midir? O zaman bu hesabı imajın zamana göre alınmış türevi olarak görebiliriz, yani <span class="math inline">\(I_t = I(x,y) - H(x,y)\)</span>. Yerine koyalım</p>
+<p><span class="math display">\[ I_t + I_xu + I_yv = 0\]</span></p>
+<p><span class="math display">\[ I_xu + I_yv = -I_t \]</span></p>
+<p>Böylece aynı denkleme erişmiş olduk. Bu aslında normal, birinci dereceden Taylor açılımı ile tam diferansiyel denklemi (ve Zincirleme Kanununu) birbiriyle çok yakından alakalı.</p>
+<p>Ufak Piksel Değişimleri</p>
+<p>Konu hakkında bir nokta daha şu; Lucas-Kanade yöntemi 1. derece Taylor açılımı kulladığı için ufak piksel değişimleri için geçerlidir, çünkü Taylor açılımı yerel bir noktaya çok yakın bölgelerde bir fonksiyona yakın sonuçlar verir. Bu da aklımızda bulunsun.e</p>
+<p>OpenCV</p>
+<p>OpenCV ile optik akış kullanımı altta görülüyor.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> cv2
+
+<span class="kw">def</span> draw_flow(img, flow, step<span class="op">=</span><span class="dv">16</span>):
+    h, w <span class="op">=</span> img.shape[:<span class="dv">2</span>]
+    y, x <span class="op">=</span> np.mgrid[step<span class="op">/</span><span class="dv">2</span>:h:step, step<span class="op">/</span><span class="dv">2</span>:w:step].reshape(<span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>).astype(<span class="bu">int</span>)
+    fx, fy <span class="op">=</span> flow[y,x].T
+    lines <span class="op">=</span> np.vstack([x, y, x<span class="op">+</span>fx, y<span class="op">+</span>fy]).T.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)
+    lines <span class="op">=</span> np.int32(lines <span class="op">+</span> <span class="fl">0.5</span>)
+    vis <span class="op">=</span> cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    cv2.polylines(vis, lines, <span class="dv">0</span>, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>))
+    <span class="cf">for</span> (x1, y1), (x2, y2) <span class="kw">in</span> lines:
+        cv2.circle(vis, (x1, y1), <span class="dv">1</span>, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>), <span class="dv">-1</span>)
+    <span class="cf">return</span> vis
+
+prevgray <span class="op">=</span> cv2.imread(<span class="st">&#39;106.jpg&#39;</span>, cv2.IMREAD_GRAYSCALE)
+gray <span class="op">=</span> cv2.imread(<span class="st">&#39;107.jpg&#39;</span>, cv2.IMREAD_GRAYSCALE)
+flow <span class="op">=</span> cv2.calcOpticalFlowFarneback(prevgray, gray, <span class="va">None</span>, <span class="fl">0.5</span>, <span class="dv">3</span>, <span class="dv">15</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="fl">1.2</span>, <span class="dv">0</span>)
+cv2.imwrite(<span class="st">&#39;pde_lk_01.png&#39;</span>, draw_flow(gray, flow))</code></pre></div>
+<div class="figure">
+<img src="pde_lk_01.png" />
+
+</div>
+<p>Kaynaklar</p>
+<p>[1] Collins, <em>Introduction to Computer Vision</em>, <a href="http://www.cse.psu.edu/~rtc12/CSE486/" class="uri">http://www.cse.psu.edu/~rtc12/CSE486/</a></p>
+<p>[2] Khurram Hassan-Shafique, <em>CAP 5415 Lecture Notes, Spring 2003</em></p>
+<p>[3] Suhr, <em>Kanade-Lucas-Tomasi (KLT) Feature Tracker Feature Tracker</em>, <a href="http://web.yonsei.ac.kr/jksuhr/articles/Kanade-Lucas-Tomasi%20Tracker.pdf">http://web.yonsei.ac.kr/jksuhr/articles/Kanade-Lucas-Tomasi%20Tracker.pdf</a></p>
+</body>
+</html>

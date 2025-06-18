@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  
+  
+  
+  
+</head>
+<body>
+<h1 id="kelly-kriteri">Kelly Kriteri</h1>
+<p>Diyelim ki iki borsacı 100 lira sermaye ile başlıyor, ve şu oyunu oynuyorlar: her elde yazı/tura atıyorlar ve tahmınları tutarsa 1 lira kazanıyorlar, tutmazsa 1 lira kaybediyorlar (daha doğrusu koydukları para kadar kazanıyorlar, yoksa koydukları parayı kaybediyorlar) [1, sf. 131].</p>
+<p>Peki her elde ne kadar para koyacaklarını nasıl idare edecekler? Mesela ilk borsacı her elde sermayesinin yüzde 5'ini koysun,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+np.random.seed(<span class="dv">1</span>)
+data <span class="op">=</span> np.random.binomial(n<span class="op">=</span><span class="dv">1</span>,p<span class="op">=</span><span class="fl">550.</span><span class="op">/</span><span class="dv">1000</span>,size<span class="op">=</span><span class="dv">1001</span>)
+df <span class="op">=</span> pd.DataFrame(data,columns<span class="op">=</span>[<span class="st">&#39;dice&#39;</span>])
+<span class="co"># 0/1 zar attir, 0 -&gt; -1, yani -1/+1 zar</span>
+df.loc[df.dice<span class="op">==</span><span class="dv">0</span>,<span class="st">&#39;dice&#39;</span>] <span class="op">=</span> <span class="dv">-1</span>
+ret <span class="op">=</span> <span class="fl">0.05</span><span class="op">*</span>df.dice
+cumret1 <span class="op">=</span> <span class="fl">100.</span><span class="op">*</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)
+<span class="bu">print</span> <span class="bu">float</span>(cumret1.tail(<span class="dv">1</span>))</code></pre></div>
+<pre><code>3315.34773076</code></pre>
+<p>Diğeri ise her elde sadece sabit 5 lira koysun,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">cumret2 <span class="op">=</span> <span class="dv">100</span> <span class="op">+</span> (<span class="dv">5</span><span class="op">*</span>df.dice).cumsum()
+<span class="bu">print</span> <span class="bu">float</span>(cumret2.tail(<span class="dv">1</span>))</code></pre></div>
+<pre><code>575.0</code></pre>
+<p>Arada müthiş fark var. Her ikisinin grafiğini basalım,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">cumret1.plot(title<span class="op">=</span><span class="st">&quot;Her Elde Sermayenin Yuzde 5&#39;i&quot;</span>)
+plt.savefig(<span class="st">&#39;tser_kelly_01.png&#39;</span>)
+plt.hold(<span class="va">False</span>)
+cumret2.plot(title<span class="op">=</span><span class="st">&#39;Her Elde 5 Lira&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_kelly_02.png&#39;</span>)</code></pre></div>
+<p><img src="tser_kelly_01.png" /> <img src="tser_kelly_02.png" /></p>
+<p>Her elde hangi oranda para yatırdığımızı bulmak bir optimizasyon problemidir. Şimdi daha genel bir oyunu düşünelim, bu oyunda kazanınca yüzde <span class="math inline">\(w\)</span> kazanıyoruz, kaybedince ise yüzde 1 kaybediyoruz. Başlangıç sermayemiz <span class="math inline">\(W_0\)</span>. Her oyunda sermayemizin <span class="math inline">\(f\)</span> oranında kısmını öne sürüyoruz.</p>
+<p>Bir kazanç ardından sermayemiz</p>
+<p><span class="math display">\[ W_0(1+fw) \]</span></p>
+<p>olacaktır. Eğer kaybedersek,</p>
+<p><span class="math display">\[ W_0(1-f 1) \]</span></p>
+<p>olacaktır. İki üstteki formül kazanç faktörü, bir üstteki kayıp faktörü. Nihai paramızı bulmak için kazanç ve kayıp faktörlerini kaç kez kazanıp kaybettiğimize göre çarparız, <span class="math inline">\(n\)</span> kazanç <span class="math inline">\(m\)</span> kayıp sonrası kazanç faktörü <span class="math inline">\(G\)</span></p>
+<p><span class="math display">\[ G(f) = (1+fw)^n(1-f1)^m \]</span></p>
+<p><span class="math inline">\(G\)</span>, <span class="math inline">\(f\)</span>'in bir fonksiyonu - değişik <span class="math inline">\(f\)</span>'lere göre değişik <span class="math inline">\(G\)</span> sonuçları alınacaktır. Bir cebirsel numara ile</p>
+<p><span class="math display">\[ G(f)^{\frac{1}{n+m}} \equiv g(f) = (1+fw)^p(1-f1)^q \]</span></p>
+<p>ki <span class="math inline">\(p = n/(n+m)\)</span> ve <span class="math inline">\(q=m/(n+m)\)</span>, bu değerleri kazanç ihtimali, diğerini kayıp ihtimali olarak görebiliriz.</p>
+<p>Bu noktada <span class="math inline">\(G\)</span>'yi maksimize ederek optimal <span class="math inline">\(f\)</span>'i bulmak akla gelebilir, bu yanlış olur. Her elde elimizdeki tüm sermayeyi koymak bu problemi optimize eder, fakat her seferde eldeki tüm sermayeyi koymak matematiksel olarak iflas garantisidir. Çünkü ardı ardına <span class="math inline">\(n\)</span> kere kazanma şansı <span class="math inline">\(p^n\)</span> ise ve iflas için bir kere kaybetmek bile yeterli ise, iflas olasılığı <span class="math inline">\(\lim_{n \to \infty} 1-p^n = 1\)</span>, yani kesin.</p>
+<p>Demek ki maksimize etmek için üstteki fonksiyondan farklı bir fonksiyon bulmak gerekli, tam terminolojiyi kullanmak gerekirse, bize riski gözönüne alan bir fayda fonksiyonu (utility function) gerekiyor. Bu fayda fonksiyonu <span class="math inline">\(\log\)</span> olabilir, bu fonksiyon çok büyük değerleri cezalandıracaktır, ve optimizasyon açısından borsacının her elde kazandığı türden ekstrem şartlardan bizi uzak tutacaktır.</p>
+<p>Optimal <span class="math inline">\(f\)</span> için iki tarafın log'unu alalım ve <span class="math inline">\(d/df\)</span> ile türev alıp sıfıra eşitleyelim. Önce türev,</p>
+<p><span class="math display">\[ \log g(f) = p \log (1+fw) + q \log (1-f1) \]</span></p>
+<p><span class="math display">\[ \frac{d}{df}\big[ \log g(f) \big] = 
+\frac{d}{df}\big[ p \log (1+fw) + q \log (1-f1)  \big]
+\]</span></p>
+<p><span class="math display">\[ = 
+\frac{pw}{1+fw}  - \frac{q}{1-f}
+\]</span></p>
+<p>Sıfıra eşitleyelim ve çözelim,</p>
+<p><span class="math display">\[ 
+\frac{pw}{1+fw} = \frac{q}{1-f}
+\]</span></p>
+<p><span class="math display">\[ pw - pwf = q + fwq \]</span></p>
+<p><span class="math display">\[ pw - q = fwq + pwf \]</span></p>
+<p><span class="math display">\[ \frac{pw - q}{wq + pw} = f\]</span></p>
+<p><span class="math inline">\(p+q = 1\)</span> olduğu için <span class="math inline">\(wq + pw = w(p+w) = w\)</span> olur, o zaman</p>
+<p><span class="math display">\[ f = \frac{pw - q}{w} \]</span></p>
+<p>Optimal Kelly oranı bu <span class="math inline">\(f\)</span> değeridir. İlk baştaki örneğimiz için optimal oran</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">p<span class="op">=</span><span class="fl">0.55</span><span class="op">;</span>q<span class="op">=</span><span class="dv">1</span><span class="op">-</span>p<span class="op">;</span>w<span class="op">=</span><span class="dv">1</span>
+<span class="bu">print</span> p<span class="op">-</span>q <span class="op">/</span> w</code></pre></div>
+<pre><code>0.1</code></pre>
+<p>değeridir. Yani her elde yüzde 10 koymak en iyisi.</p>
+<p><span class="math inline">\(N\)</span> el sonra servetin beklentisi,</p>
+<p><span class="math display">\[ W = W_0 (1 + p \ln (1+fw) + q \ln (1-f1) )^N\]</span></p>
+<p>Mesela her elde yüzde 45 kazanma şansı ve kazancın kayıba göre iki kat daha fazla kazandırdığı durum için farklı <span class="math inline">\(f\)</span> değerlerini grafiklersek,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">p<span class="op">=</span><span class="fl">0.45</span><span class="op">;</span>q<span class="op">=</span><span class="dv">1</span><span class="op">-</span>p<span class="op">;</span>w<span class="op">=</span><span class="dv">2</span>
+f <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="fl">0.9</span>,<span class="dv">100</span>)
+W <span class="op">=</span> (<span class="dv">1</span> <span class="op">+</span> p<span class="op">*</span>np.log(<span class="dv">1</span><span class="op">+</span>f<span class="op">*</span><span class="dv">2</span>) <span class="op">+</span> q<span class="op">*</span>np.log(<span class="dv">1</span><span class="op">-</span>f))<span class="op">**</span><span class="dv">10</span>
+plt.plot(f,W)
+plt.xlabel(<span class="st">&#39;f&#39;</span>)
+plt.ylabel(<span class="st">&#39;W&#39;</span>)
+plt.savefig(<span class="st">&#39;tser_kelly_03.png&#39;</span>)</code></pre></div>
+<div class="figure">
+<img src="tser_kelly_03.png" />
+
+</div>
+<p>Burada Kelly degeri</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">p<span class="op">=</span><span class="fl">0.45</span><span class="op">;</span>q<span class="op">=</span><span class="dv">1</span><span class="op">-</span>p<span class="op">;</span>w<span class="op">=</span><span class="dv">2</span>
+<span class="bu">print</span> p<span class="op">-</span>q <span class="op">/</span> w</code></pre></div>
+<pre><code>0.175</code></pre>
+<p>ki bu değer üstteki grafikteki tepe noktasına tekabül ediyor. Yani her elde servetin yüzde 17.5'ini koymak en kazançlı, optimal davranıştır.</p>
+<p>Sürekli Durum (Continuous Case)</p>
+<p>Kelly değerini sürekli duruma göre genelleyelim. Diyelim ki <span class="math inline">\(n\)</span>'inci işlemimizin sonucu <span class="math inline">\(X_n\)</span> içinde, ki bu rasgele değişken sürekli bir değer / bir getiri içeriyor, ve kazanç (payoff) <span class="math inline">\(g(X_n)\)</span> ile tanımlanmış. <span class="math inline">\(X_n\)</span>'i bilmek aslında imkansız değil, sayısal borsacılar olarak geçmiş veriden yaklaşıksal olarak onu kestiriyoruz belki de, ya da başka yollardan onu biliyoruz. Getiri bağımsız özdeşçe dağılmış (i.i.d). Her periyotta servetimizin <span class="math inline">\(f\)</span> oranını koyuyoruz,</p>
+<p><span class="math display">\[ W_n = W_0 \prod_{i=1}^n (1+fg(X_i)) \]</span></p>
+<p><span class="math display">\[ \ln(W_n) = W_0 \sum_{i=1}^n \ln (1+fg(X_i))  \]</span></p>
+<p>Her iki tarafın beklentisini alalım,</p>
+<p><span class="math display">\[ E[\ln(W_n)] = n W_0 E[\ln (1+fg(X_n))]  \]</span></p>
+<p>Toplam operatörü nereye gitti? Beklenti önce toplam içine nüfuz etti. Sonra şu oldu, unutmayalım, <span class="math inline">\(X_i\)</span> i.i.d. bu sebeple toplam içindeki beklenti hesabı <span class="math inline">\(n\)</span> kere dışarı çıkacak, bu beklenti toplamlarını sadece <span class="math inline">\(n E[\cdot]\)</span> olarak belirtmek yeterli oldu, alınan tek beklenti için <span class="math inline">\(X_n\)</span> seçildi, herhangi bir diğer indis te olabilirdi.</p>
+<p>Yine <span class="math inline">\(d/df\)</span> türevi alınırsa, üstteki formülün sağ tarafını maksimize eden formülün</p>
+<p><span class="math display">\[ \int \frac{g(x) \Phi(x) \mathrm{d} x}{1 + fg(x)} = 0\]</span></p>
+<p>olduğu görülecektir. Türev entegral içine nüfuz etti, ve gerisi bilinen standart log'un türevi numarası. Üstteki formülü</p>
+<p><span class="math display">\[ E \bigg( \frac{g(x)}{1+fg(x)} \bigg) = 0\]</span></p>
+<p>olarak tanımlamak ta mümkündür. İki üstteki formülü</p>
+<p><span class="math display">\[ \int g(x) \Phi(x) \big(\frac{1}{1 + fg(x)} \big) \mathrm{d} x = 0\]</span></p>
+<p>olarak gösterelim, ve parantez içindeki ifadeyi güç serisi ile açalım,</p>
+<p><span class="math display">\[ \int g(x) \Phi(x) (1 - fg(x) + ...)  \mathrm{d} x \approx 0\]</span></p>
+<p><span class="math display">\[ = \int g(x)\Phi(x) \mathrm{d} x  - f \int g^2(x)\Phi(x) \mathrm{d} x + ..  \]</span></p>
+<p>İlginç bir durum ortaya çıktı şimdi: üstteki ifadede ilk terim tek birimlik yatırım yapıldığında elde edilecek kazanç (payoff) <span class="math inline">\(g(x)\)</span>'in beklentisi, diğeri de kazancın varyansı! O zaman yaklaşıksal olarak, üstteki 3. terimi atarak, limite giderken, ve sıfıra eşitlersek,</p>
+<p><span class="math display">\[ f^\ast = \frac{r}{\sigma^2} \]</span></p>
+<p>sonucu çıkar, <span class="math inline">\(r\)</span> bir getirinin beklentisi, diğeri de varyansı, <span class="math inline">\(f\)</span> için <span class="math inline">\(f^\ast\)</span> kullandık çünkü bu optimal olarak bizim hesapladığımız <span class="math inline">\(f\)</span>. Bu alım / satım ne kadar çetrefil bir varlıktan, onun getiri modelinden geliyor olursa olsun, üstteki ifade hep doğrudur. Dikkat: <span class="math inline">\(f\)</span>'in 1 olma zorunluluğu yoktur, hatta eksi değere bile sahip olabilir. 1'den büyük olduğu durumda bu kaldıraç / borç (leverage) kullanımı olarak addedilebilir, eğer negatif ise açığa satış olarak kullanılabilir!</p>
+<p>Çok enstrümanlı duruma geçmeden bir not: Alttaki anlatım [2]'nin portföy riskine olan yaklaşımını temel alıyor, KK enstrüman bazında ayarlamalar için kullanılmakta. [4]'te de Kelly var her enstrüman üzerinde değil tüm oynaklığı (riski) bilinen portföy ve eldeki sermaye arasında ayarlama yapmak için, daha basit bir Kelly kullanımı yani, ve bu bölümün başında işlenenler bu yaklaşım için yeterli. [4]'un esas ana risk idaresi sistemi risk eşliğidir (risk parity) ve bu alttakine alternatif bir kullanım.</p>
+<p>Çok Enstrüman</p>
+<p>Birden fazla varlığa yatırım yaptığımız ve bir portföy idare etmemiz gereken durumda üstteki Kelly formülünü bulan Dr. Thorp alttaki formülün de kullanabileceğiniz ispatlamıştır,</p>
+<p><span class="math display">\[ F = C^{-1}M \]</span></p>
+<p>ki bu formülde <span class="math inline">\(F\)</span> bir kolon vektörü <span class="math inline">\(F = (f_1^\ast,f_2^\ast,..,f_n^\ast)^T\)</span>, <span class="math inline">\(C\)</span> işe bir kovaryans matrisidir, <span class="math inline">\(C_{ij}\)</span> <span class="math inline">\(i\)</span> ve <span class="math inline">\(j\)</span> getirilerinin kovaryansıdır, ve <span class="math inline">\(M = (m_1,m_2,..,m_n)^T\)</span> ise getirilerin ortalamasını içeren bir kolon vektörüdür. Eğer değişik varlık getirileri istatistiki olarak birbirinden bağımsız olsaydı o zaman <span class="math inline">\(C\)</span>'nin çaprazı hariç diğer hücreleri sıfır olurdu, çaprazdaki her <span class="math inline">\(i\)</span> yatırımı için <span class="math inline">\(\sigma_i^2\)</span> alınıp, <span class="math inline">\(m_i\)</span> ile beraber bu bizi her varlık için iki üstteki formüle getirecektir. Bağlantı durumunda niye bir üstteki kovaryanslı formülün çıktığını burada türetmeyeceğiz, detaylar için [1]'e bakılabilir.</p>
+<p>Bir formül daha: Gaussian dağılım faraziyesinden başlayarak biriken kaldıraçlı büyüme oranı (compounded, levered growth rate) şu şekilde türetilmiştir, yazının sonuda detaylar bulunabilir),</p>
+<p><span class="math display">\[ g(f) = r + mf - s^2f^2 / 2 \]</span></p>
+<p><span class="math inline">\(f\)</span> kaldıraç (leverage), <span class="math inline">\(r\)</span> risksiz getiri (mesela banka faizi, hazine bonosu), <span class="math inline">\(m\)</span> basit, tek periyotluk birikmeyen getiri, ve <span class="math inline">\(s\)</span> bu birikmeyen getirilerin standart sapması.</p>
+<p>Eğer üstteki formülün türevini alırsak,</p>
+<p><span class="math display">\[ dg / df = m - s^2f = 0 \]</span></p>
+<p><span class="math display">\[ f^\ast = m/s^2 \]</span></p>
+<p>Yine aynı <span class="math inline">\(f^\ast\)</span> formülüne eriştik!</p>
+<p>Bir numara daha, Sharpe oranı <span class="math inline">\(S = m/s\)</span> olduğunu ayrıca <span class="math inline">\(f=m/s^2\)</span> olduğunu biliyoruz, o zaman kaldıraçlı büyüme oranı</p>
+<p><span class="math display">\[ g(f) = r + mf - s^2f^2 / 2 \]</span></p>
+<p><span class="math display">\[  = r + m(m/s^2) - s^2(m^2/s^4) / 2 \]</span></p>
+<p><span class="math display">\[  = r + m^2/s^2 - m^2/s^2 / 2 \]</span></p>
+<p><span class="math display">\[  = r + S^2 - S^2/2 \]</span></p>
+<p><span class="math display">\[ g = r +  S^2/2 \]</span></p>
+<p>Not: Formülün kaldıraçsız hali basit, <span class="math inline">\(f=1\)</span> kabul edersek,</p>
+<p><span class="math display">\[ g(f) = r + m - s^2/ 2 \]</span></p>
+<p>Çok boyutlu ortamda</p>
+<p><span class="math display">\[ g(F^\ast) = r + {F^\ast}^TCF^\ast / 2 \]</span></p>
+<p>Sharpe oranı için</p>
+<p><span class="math display">\[ S = \sqrt{{F^\ast}^TCF^\ast} \]</span></p>
+<p>Örnek</p>
+<p>Bu fikirleri S&amp;P 500 indisini takip eden SPY adlı ETF üzerinde nasıl işlediğini görelim.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+df <span class="op">=</span> pd.read_csv(<span class="st">&#39;SPY2.csv&#39;</span>,parse_dates<span class="op">=</span><span class="va">True</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)
+df <span class="op">=</span> df.sort_index()
+df[<span class="st">&#39;ret&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Adj Close&#39;</span>].pct_change()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">r <span class="op">=</span> <span class="fl">0.04</span>
+ret <span class="op">=</span> df[<span class="st">&#39;ret&#39;</span>].mean()<span class="op">*</span><span class="dv">252</span>
+s <span class="op">=</span> df[<span class="st">&#39;ret&#39;</span>].std()<span class="op">*</span>np.sqrt(<span class="dv">252</span>)
+m <span class="op">=</span> ret<span class="fl">-0.04</span>
+sharpe <span class="op">=</span> m <span class="op">/</span> s
+kelly <span class="op">=</span> m <span class="op">/</span> s<span class="op">**</span><span class="dv">2</span>
+comp_levered_g <span class="op">=</span> r <span class="op">+</span> sharpe<span class="op">**</span><span class="dv">2</span><span class="op">/</span><span class="dv">2</span>
+comp_unlevered_g <span class="op">=</span> r <span class="op">+</span> m <span class="op">-</span>s<span class="op">**</span><span class="dv">2</span><span class="op">/</span><span class="dv">2</span>
+
+<span class="co"># aslinda ustte m+r yerine direk ret kullanabilirdik, </span>
+<span class="co"># ama dokumantasyon amacli boyle daha temiz oldu</span>
+
+<span class="bu">print</span> <span class="st">&#39;r&#39;</span>, r
+<span class="bu">print</span> <span class="st">&#39;s&#39;</span>, s
+<span class="bu">print</span> <span class="st">&#39;artik getiri&#39;</span>, m
+<span class="bu">print</span> <span class="st">&#39;sharpe orani&#39;</span>, sharpe
+<span class="bu">print</span> <span class="st">&#39;kelly orani&#39;</span>, kelly
+<span class="bu">print</span> <span class="st">&#39;biriken (kaldiracli) buyume orani&#39;</span>, comp_levered_g
+<span class="bu">print</span> <span class="st">&#39;biriken (kaldiracsiz) buyume orani&#39;</span>, comp_unlevered_g</code></pre></div>
+<pre><code>r 0.04
+s 0.169131222871
+artik getiri 0.0723074732694
+sharpe orani 0.427522914113
+kelly orani 2.52775866487
+biriken (kaldiracli) buyume orani 0.131387921046
+biriken (kaldiracsiz) buyume orani 0.0980047879945</code></pre>
+<p>Dikkat, Kelly oranı <span class="math inline">\(f\)</span> zamandan bağımsızdır (kıyasla Sharpe oranı zamana bağımlıdır).</p>
+<p>Bir diğer örnek: şimdi üç tane sektöre özel ETF arasında yatırımı nasıl bölüştüreceğimizi düşünelim. Bu ETF'ler OİH (petrol sektörü), RKH (bölgesel bankalar) ve RTH (parakende ticaret).</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
+
+dfoih <span class="op">=</span> pd.read_csv(<span class="st">&#39;OIH.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)
+dfrkh <span class="op">=</span> pd.read_csv(<span class="st">&#39;RKH.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)
+dfrth <span class="op">=</span> pd.read_csv(<span class="st">&#39;RTH.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)
+df <span class="op">=</span> dfoih.join(dfrkh[<span class="st">&#39;Adj Close&#39;</span>],rsuffix<span class="op">=</span><span class="st">&#39;_rkh&#39;</span>)
+df <span class="op">=</span> df.join(dfrth[<span class="st">&#39;Adj Close&#39;</span>],rsuffix<span class="op">=</span><span class="st">&#39;_rth&#39;</span>)
+df <span class="op">=</span> df.drop([<span class="st">&#39;Low&#39;</span>,<span class="st">&#39;Open&#39;</span>,<span class="st">&#39;High&#39;</span>,<span class="st">&#39;Close&#39;</span>,<span class="st">&#39;Volume&#39;</span>],axis<span class="op">=</span><span class="dv">1</span>)
+df <span class="op">=</span> df.dropna()
+df <span class="op">=</span> df.sort_index()
+
+df[<span class="st">&#39;oihxret&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Adj Close&#39;</span>].pct_change() <span class="op">-</span> <span class="fl">0.04</span><span class="op">/</span><span class="dv">252</span>
+df[<span class="st">&#39;rkhxret&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Adj Close_rkh&#39;</span>].pct_change() <span class="op">-</span> <span class="fl">0.04</span><span class="op">/</span><span class="dv">252</span>
+df[<span class="st">&#39;rthxret&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Adj Close_rth&#39;</span>].pct_change() <span class="op">-</span> <span class="fl">0.04</span><span class="op">/</span><span class="dv">252</span>
+
+M <span class="op">=</span> <span class="dv">252</span><span class="op">*</span>df[[<span class="st">&#39;oihxret&#39;</span>,<span class="st">&#39;rkhxret&#39;</span>,<span class="st">&#39;rthxret&#39;</span>]].mean()
+C <span class="op">=</span> <span class="dv">252</span><span class="op">*</span>df[[<span class="st">&#39;oihxret&#39;</span>,<span class="st">&#39;rkhxret&#39;</span>,<span class="st">&#39;rthxret&#39;</span>]].cov()
+<span class="bu">print</span> <span class="st">&#39;Yila Uyarlanmis Ortalama Artik Getiriler, M&#39;</span>
+<span class="bu">print</span> M
+<span class="bu">print</span> <span class="st">&#39;Yila Uyarlanmis Kovaryans Matrisi, C&#39;</span>
+<span class="bu">print</span> C</code></pre></div>
+<pre><code>Yila Uyarlanmis Ortalama Artik Getiriler, M
+oihxret    0.139568
+rkhxret    0.029400
+rthxret   -0.007346
+dtype: float64
+Yila Uyarlanmis Kovaryans Matrisi, C
+          oihxret   rkhxret   rthxret
+oihxret  0.110901  0.020014  0.018255
+rkhxret  0.020014  0.037165  0.026893
+rthxret  0.018255  0.026893  0.041967</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy.linalg <span class="im">as</span> lin
+F <span class="op">=</span> np.dot(lin.inv(C),M)
+<span class="bu">print</span> <span class="st">&#39;oih, rkh, rth&#39;</span>
+<span class="bu">print</span> F</code></pre></div>
+<pre><code>oih, rkh, rth
+[ 1.2919082   1.17226473 -1.48821285]</code></pre>
+<p>Dikkat edersek RTH için ortalama artık getiri negatif. Bu durumda Kelly formülünün RTH için açığa satış tavsiyesi yapmış olması pek şaşırtıcı değil.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">F <span class="op">=</span> F.reshape((<span class="dv">3</span>,<span class="dv">1</span>))
+g <span class="op">=</span> <span class="fl">0.04</span><span class="op">+</span>np.dot(np.dot(F.T,C),F<span class="op">/</span><span class="dv">2</span>)
+<span class="bu">print</span> <span class="bu">float</span>(g)</code></pre></div>
+<pre><code>0.152853578984</code></pre>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">S <span class="op">=</span> np.sqrt(np.dot(np.dot(F.T,C),F))
+<span class="bu">print</span> <span class="bu">float</span>(S)</code></pre></div>
+<pre><code>0.4750864742</code></pre>
+<p>Soru</p>
+<p>Pek çok profosyonel borsacının cevabını bilmediği bir soru soralım: diyelim ki bir hisse geometrik rasgele yürüyüş sergiliyor, 50-50 şans ile hissenin her dakika yüzde 1 yukarı ya da aşağı gitme şansı var. Eğer bu hisseyi alırsanız, uzun vadede (ve işlem masraflarını gözardı ederek) para kazanmak mı, kaybetmek mi, ya da nötr kalmak mı daha muhtemel?</p>
+<p>Pek çok borsacı &quot;nötr!'' cevabını verecektir, fakat bu cevap yanlıştır. Doğru cevap beklenen büyüme oranı formülünde saklı,</p>
+<p><span class="math display">\[ g = m - s^2/2 \]</span></p>
+<p>Eğer <span class="math inline">\(m=0\)</span> ise, <span class="math inline">\(s=0.01\)</span> ise,</p>
+<p><span class="math display">\[ g = -(0.1)^2/2 = 0.001/2 = 0.005 \]</span></p>
+<p>Yani doğru cevap her dakika yüzde 0.005 oranıyla para kaybedecek olacağımızdır! Çünkü geometrik RY'nin ortalama biriken getiri oranı <span class="math inline">\(m\)</span> değildir, üstteki formül <span class="math inline">\(g\)</span>'dir.</p>
+<p>Burada alınacak ders şu: risk her zaman uzun vadeli büyüme oranını azaltır - risk idaresinin önemi burada ortaya çıkıyor.</p>
+<p>Kaldıraç ve Kayıptan Çıkmak</p>
+<p>Kelly formülü <span class="math inline">\(f\)</span>'in bazen sıfırdan büyük sonuç getirdiğini gördük. Ayrıca birden çok varlığı idare ederken de farkedebiliriz ki <span class="math inline">\(f_1,f_2,..,f_n\)</span> oranlarının 1'e toplanma zorunluluğu yoktur! Bu ilginç bir durum ortaya çıkartıyor, aslında dolaylı olarak Kelly formülü bize ne kadar kaldıraç kullanabileceğimizi, kullanmamız gerektiğini anlatıyor. Yani Kelly formülü hem en iyi kazanç için en optimal sermaye parçasının ne olduğunu söylüyor, hem de gerekiyorsa ne kadar borç alınabileceğini de hesaplıyor.</p>
+<p>Önceki SPY örneği için mesela <span class="math inline">\(f\)</span> 2.52 geldi, eğer anaparamız 100,000 lira ise, ve geçmiş veriden elde ettiğimiz ortalama ve standard sapma hesabına güveniyorsak, para borç alıp 252,000 liralık SPY almamız en iyisidir. Bu durumda 100,000 liralık anaparamızın yıllık biriken getirisi yüzde 13.14 olacaktır.</p>
+<p>Diğer yandan eğer bir strateji para kaybetmeye başlamışsa, Kelly bu durum için de iyidir, çünkü her işlem gününün sonunda <span class="math inline">\(f\)</span> değerlerimizi tekrar hesaplayacağımız için (tavsiye edilir!) kaybeden bir stratejinin ortalama getirisi yavaşça sıfıra yaklaşacağı için Kelly'nin tavsiye ettiği &quot;kaldıraç'' ta sıfıra yaklaşacaktır, hatta tam sıfıra da düşülebilir, bu durumda o stratejiden tamamen çıkmış oluruz demektir. Bu iyidir, bir stratejiden bu şekilde sistematik bir şekilde çıkmak, birkaç günlük kayıbı görüp ve heyecana kapılıp o pozisyondan alelacele / tamamen çıkmaktan çok daha iyidir. Kelly formülü bu bağlamda bir psikolojik subap görevi görebilir.</p>
+<p>Bu otomatik değişimin nasıl olduğunu görmek için SPY örneğine bakalım. Diyelim ki üstteki SPY için tavsiye edilen kaldıraçı kullandık, 100,000 anapara üzerinden 252,000 yatırım. Ertesi gün diyelim ki felaket kapıya dayandı, yüzde 10'lük düşüş yaşadık.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="st">&#39;portfoy&#39;</span>, <span class="dv">252000</span> <span class="op">*</span> <span class="fl">0.90</span>
+<span class="bu">print</span> <span class="st">&#39;anapara&#39;</span>, <span class="dv">100000</span> <span class="op">*</span> (<span class="fl">1.</span> <span class="op">-</span> <span class="fl">0.10</span><span class="op">*</span><span class="fl">2.52</span>)</code></pre></div>
+<pre><code>portfoy 226800.0
+anapara 74800.0</code></pre>
+<p>Anaparamız 74800'e düştü. Anaparadaki düşüş tabii ki kaldıracın etkisiyle daha büyüdü, eh, çıkışta katlama olunca düşüşte de oluyor tabii ki. Peki bu durumda Kelly ne der? Formüle göre portföyü küçültmemiz gerekir, çünkü anaparamız küçüldü,</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">print</span> <span class="dv">74800</span><span class="op">*</span><span class="fl">2.82</span></code></pre></div>
+<pre><code>210936.0</code></pre>
+<p>Yani portföy değerini 226,800 liradan 210,936 seviyesine indirmemiz lazım, bunun için aradaki fark kadar satış yapmak gerekli. Bu aslında makul bir risk idare yöntemi, eğer düşüş varsa satışa geçmek. Diğer taraftan yükseliş var ise, Kelly alışa geçmeyi de tavsiye edecektir. Diğer bazı risk idare yöntemleri bunu tavsiye etmeyebilirdi, mesela Martingale denen bir dönem kumarcıların sevdiği bir yönteme göre kaybedince bir sonraki oyunda iki katı daha fazla para koymalısınız. Pek çok kişinin bu şekilde iflas ettiği şaşırtıcı olmasa gerek.</p>
+<p>Kaldıraç ve İmkanlar</p>
+<p>Kelly formülü 10 kaldıraç tavsiyesi veriyor diyelim; peki eldeki imkanlar nedir? Eldeki sermayenin 10 katı kadar borç alabiliyor muyuz? Bu borsa aracı kurumunuza göre değişir. Aslında kaldıraç imkanları aracı kurumların müşterilerine sağladığı servisin bir parçasıdır, normal bir hesap için mesela kaldıraç 2 ve 4 arasında olabilir. Döviz piyasalarında daha fazla kaldıraca izin verildiğini biliyoruz. Bu durumda Kelly tavsiyesini eldeki imkanlara göre ayarlamak gerekir. Müsade edilen kaldıraç <span class="math inline">\(l\)</span> seviyesi için hesapladığımız her <span class="math inline">\(f_i\)</span> tavsiyesi <span class="math inline">\(l / (|f_1| + |f_2| + .. + |f_n|)\)</span> ile bölünerek azaltılmalıdır. Eğer elde hiç kaldıraç imkanı yoksa <span class="math inline">\(l=1\)</span> olacaktır, ve bu durumda <span class="math inline">\(f_i\)</span>'lar üstteki toplamlara bölünürse yeni <span class="math inline">\(f_i\)</span>'ların toplamı 1 olur! Bu mantıklı herhalde, çünkü hiç borç alamıyorsak, hiç bir strateji <span class="math inline">\(i\)</span>'ye eldekinden daha fazlasını veremeyiz, bunu yapmak parayı bir diğer stratejiden eksiltmek olurdu.</p>
+<p>Tam Kelly, Yarım Kelly</p>
+<p><span class="math inline">\(f\)</span> azaltmaktan bahsetmişken şunu da ekleyelim, <span class="math inline">\(f\)</span> için kullanılan parametrelerin hesabındaki belirsizlikler, ve getirilerin tamamen Gaussian olmaması sebebiyle bazı borsacılar tavsiye edilen Kelly sayısının yarısını kullanmayı tercih ediyorlar. Buna &quot;yarım Kelly oynamak (half-Kelly betting)'' ismi veriliyor.</p>
+<p>Maksimum düşüş sürekliliği (drawdown) ile Kelly ya da yarım Kelly arasında şöyle bir ilişki düşünülebilir, ki bu ilişki yatırımda ne kadar muhafazakar olup olmayacağımızda bize yol gösterebilir, bir varlığın geçmiş verisine bakarız, ve tek periyotluk (mesela tek gün) düşüş yüzdesi nedir. SPY örneğinde mesela bu 19 Ekim 1987'deki &quot;Kara Pazartesi'' adı verilen yüzde 20.47'lik düşüştür. Eğer bu düşüşü tolere edecek durumda değilsek, o zaman üstteki SPY örneği için yarım Kelly bile çok yüksektir (2.52 / 2 = 1.26). Eğer en fazla tolere edebileceğimiz düşüş yüzde 20 ise, o zaman uygulayabileceğimiz kaldıraç 1'den yüksek olamaz.</p>
+<p>Ekler</p>
+<p>Turetelim: <span class="math inline">\(g(f) = r + fm - s^2f^2 / 2\)</span></p>
+<p><span class="math inline">\(X\)</span>'i herhangi bir zaman diliminin getirisini temsil eden bir rasgele değişken olarak düşünelim [3, sf. 22]. Ayrıca</p>
+<p><span class="math display">\[ P(X = m+s) = P(X = m-s) = 0.5\]</span></p>
+<p>olsun, yani getirinin bir ortalama <span class="math inline">\(m\)</span> üzerinde ya da altında olma olasılığı eşit, 0.5. Bu rasgele yürüyüş, yani getirilerin normal olma faraziyesi ile uyumlu.</p>
+<p>Başlangıç sermayesi <span class="math inline">\(V_0\)</span>, sermaye yatırım oranı <span class="math inline">\(f\)</span>, risksiz (herhangi) bir varlığın getirisi <span class="math inline">\(r\)</span> üzerinden,</p>
+<p><span class="math display">\[ V(f) = V_0 (1 + (1-f)r + fX)  \]</span></p>
+<p>Riskli sermaye oranı <span class="math inline">\(X\)</span> getirisine bağlı, onu <span class="math inline">\(f\)</span> ile çarpıyoruz, geri kalanı risksiz üzerinde <span class="math inline">\((1-f)r\)</span>, tüm bunlar 1'e ekleniyor, ki çarpım bir sonraki sermaye miktarımızı <span class="math inline">\(V\)</span>'yi versin. <span class="math inline">\(V\)</span> tabii ki <span class="math inline">\(f\)</span>'in bir fonksiyonu. Tekrar düzenleyelim,</p>
+<p><span class="math display">\[ V(f) = V_0 (1 + r + f(X - r))  \]</span></p>
+<p>Şimdi zamanı <span class="math inline">\(n\)</span> parçaya bölelim, toplam kaymayı (drift) toplam varyansı aynı olacak şekilde ayarlayalım, yani <span class="math inline">\(m\)</span> yerine <span class="math inline">\(m / n\)</span>, <span class="math inline">\(s^2\)</span> yerine <span class="math inline">\(s^2/n\)</span>, ve <span class="math inline">\(r/n\)</span>, vs, yani</p>
+<p><span class="math display">\[ P(X_i = m/n + s/\sqrt{n}) = P(X_i = m/n - m/\sqrt{n}) = 0.5\]</span></p>
+<p><span class="math inline">\(n\)</span> adım sonraki <span class="math inline">\(V_n(f)\)</span> tüm <span class="math inline">\((1 + r + f(X_i - r))\)</span>'ların <span class="math inline">\(V_0\)</span> ile çarpımı, ayrıca kolaylık için <span class="math inline">\(V_0\)</span>'i sola alalım,</p>
+<p><span class="math display">\[ V_n(f)/V_0 = \prod_{i=1}^{n} (1 + r/n + f(X_i - r/n))  \]</span></p>
+<p>Maksimize etmek istediğimiz log'u alınmış beklenti, ki buna <span class="math inline">\(g(f)\)</span> diyelim,</p>
+<p><span class="math display">\[ E[\log V_n(f)/V_0] = g(f) = n E[\log (1 + (r/n) + f(X_n - (r/n)))]  \]</span></p>
+<p>Log'dan kurtulmak için güç serisi açılımı yapacağız,</p>
+<p><span class="math display">\[ \log(1+u) = u - \frac{u^2}{2} + \frac{u^3}{3} + .. \]</span></p>
+<p>Bu serinin ilk iki terimini kullanmak yaklaşıksal açıdan yeterli. Ayrıca <span class="math inline">\(X_n\)</span> yerine <span class="math inline">\(U\)</span> kullanacağız, ki <span class="math inline">\(U = \pm 1\)</span> bir simetrik Bernoulli dağılımı olsun, o zaman <span class="math inline">\(X = m/n + U s/\sqrt{n}\)</span> diyebiliriz, çünkü <span class="math inline">\(m/n\)</span> etrafında belli bir standart sapmaya göre her iki tarafa da savrulabilecek bir rasgele değişkenden bahsediyoruz. Matematik burada biraz arap saçına dönebilir, sadece log içine bakalım,</p>
+<p><span class="math display">\[ \log \bigg( 
+1 + \frac{r}{n} + f \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big) 
+\bigg)  \]</span></p>
+<p>Bu formülde <span class="math inline">\(1+\)</span> ifadesinden sonra gelen terimler güç serisi açılımına gidecek, yani</p>
+<p><span class="math display">\[ u = \frac{r}{n} + f \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big)  \]</span></p>
+<p>&quot;Eyvah <span class="math inline">\(u^2\)</span> açılımı ne kadar karmaşık olacak'' diye düşünülebilir, fakat şunu unutmayalım, nihayetinde formülün sonuşur (asymptotic) davranışını anlamaya uğraşıyoruz, yani <span class="math inline">\(n \to \infty\)</span> olacağı bir durumu inceliyoruz, ve mesela <span class="math inline">\(O(1/n \sqrt{n})\)</span> ifadelerini, yani <span class="math inline">\(1/n \sqrt{n}\)</span> ve daha küçük olan ifadeleri içeren terimleri tek bir grupta toplayıp formülden çıkartabiliriz.</p>
+<p>Eğer <span class="math inline">\(u^2\)</span>'e bakarsak,</p>
+<p><span class="math display">\[ u^2 = \frac{r^2}{n^2} + f^2(..)^2 + 2 \frac{2}{n}f(...) \]</span></p>
+<p>Ya da <span class="math inline">\(f\)</span>'in çarptığı, o parantez içindeki üç terimin karesi mesela</p>
+<p><span class="math display">\[ \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big)^2 
+= \frac{m^2}{n^2} + \frac{Usm}{\sqrt{n}n} - ...
+\]</span></p>
+<p>Bu sonuçların hepsinin bölenine bakınca <span class="math inline">\(n\sqrt{n}\)</span> ve ondan daha büyük değerleri var, mesela <span class="math inline">\(n^2\)</span>. Bu terimlerin hepsi <span class="math inline">\(O(1/n \sqrt{n})\)</span> altında gruplanacak. &quot;Sağ kalan'' tek terim <span class="math inline">\(\frac{f^2U^2s^2}{n}\)</span>.</p>
+<p><span class="math display">\[ 
+g(f)/n = 
+E\big[
+\frac{r}{n} + f \big( \frac{m}{n} + \frac{Us}{\sqrt{n}} - \frac{r}{n} \big) + 
+\frac{f^2U^2s^2}{2n} + 
+O(1/n \sqrt{n})
+\big]
+\]</span></p>
+<p>Ve beklentiyi uygularız, rasgele değişken içermeyen tüm terimler olduğu gibi kalır,</p>
+<p><span class="math display">\[ 
+= \frac{r}{n} + f \big( \frac{m}{n} + \frac{E[U]s}{\sqrt{n}} - \frac{r}{n} \big) + 
+\frac{f^2E[U^2]s^2}{2n} + 
+O(1/n \sqrt{n})
+\big]
+\]</span></p>
+<p><span class="math inline">\(E[U] = 0, E[U^2] = 1\)</span> olduğuna göre (çünkü <span class="math inline">\(U^2\)</span> her zaman 1 değerini verir),</p>
+<p><span class="math display">\[ 
+= \frac{r}{n} + f \big( \frac{m}{n} - \frac{r}{n} \big) + 
+\frac{f^2s^2}{2n} + 
+O(1/n \sqrt{n})
+\]</span></p>
+<p><span class="math display">\[ g(f) = r + f(m-r) + f^2s^2/2 + O(1/n \sqrt{n}) \]</span></p>
+<p>Ve <span class="math inline">\(n \to \infty\)</span> durumunda ufak terimleri atarız, ve</p>
+<p><span class="math display">\[ g(f) = r + f(m-r) + f^2s^2/2 \]</span></p>
+<p>ifadesine erişiriz.</p>
+<p>Not: Bu dokümanın diğer bölümünde <span class="math inline">\(m-r\)</span> yerine <span class="math inline">\(m\)</span> kullanıldı, bu ufak bir notasyon farkı, burada <span class="math inline">\(m\)</span> getiri beklentisi, orada <span class="math inline">\(m\)</span> aslında <span class="math inline">\(m-r\)</span>, yani &quot;artık getiri (excess return)''. Karışıklık olmasın.</p>
+<p>Kaynaklar</p>
+<p>[1] Sinclair, <em>Volatility Trading</em></p>
+<p>[2] Chan, <em>Algorithmic Trading</em></p>
+<p>[3] Thorp, <em>The Kelly Criterion</em></p>
+<p>[4] Brandimarte, <em>Numerical Methods in Finance and Economics with Matlab</em></p>
+</body>
+</html>
