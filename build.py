@@ -1,11 +1,9 @@
-import codecs, re, os, sys, shutil, md1, json
+import codecs, re, os, sys, shutil, json
 import util, markdown2, glob
 
 dirs = ['algs','calc_multi','chaos','compscieng',
         'func_analysis','linear','ode', 'stat',
         'tser','vision','phy']
-
-repl1_to = '<meta name="generator" content="pandoc" />\n<meta name="viewport" content="width=device-width, initial-scale=1.0"/>'
 
 def doc_dirs(topdirs):
     curr = os.getcwd()
@@ -20,9 +18,9 @@ def doc_dirs(topdirs):
             os.chdir(curr + "/" + topdir + "/" + subdir)
             mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"
             shutil.copy(mdfile,"/tmp/out.md")
-            cmd = "pandoc  /home/burak/Documents/cl3/metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
+            cmd = "pandoc  /home/burak/Documents/classnotes/metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
             os.system(cmd)            
-            cmd = "pandoc %s /home/burak/Documents/cl3/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+            cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
             os.system(cmd)
             inject_tags()        
             pdffile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".pdf"
@@ -147,7 +145,7 @@ def title_sk(to):
 def inject_tags():
     fin = codecs.open("/tmp/out.html", encoding='utf8')
     content = fin.read()
-    content2 = re.sub(r'<meta.*?pandoc.*?/>', repl1_to, content)
+    content2 = re.sub(r'<meta.*?pandoc.*?/>', util.head_insert, content)
     fout = codecs.open("/tmp/out.html",mode="w",encoding="utf-8")
     fout.write(content2)
     fout.flush()

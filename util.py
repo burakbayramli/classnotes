@@ -2,6 +2,18 @@
 # -*- coding: utf-8 -*- 
 import os, sys, re, codecs, shutil, markdown, json, markdown2
 
+head_insert = '''
+    <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"]
+      });
+    });
+    </script>
+'''
+
 html_head = '''
 <!DOCTYPE html>
 <html>
