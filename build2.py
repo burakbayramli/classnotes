@@ -1,4 +1,5 @@
-import codecs, re, os, sys, shutil, md1, json, util2
+import codecs, re, os, sys, shutil, md1, json
+import util2, markdown2, glob
 
 dirs = ['algs','calc_multi','chaos','compscieng',
         'func_analysis','linear','ode', 'stat',
@@ -98,7 +99,48 @@ def title_sci(to):
             html = subdir + "/" + util2.filename_from_title(title) + ".html"        
             fout.write("<p><a href='%s'>%s</a><p/>" % (html,title))
         fout.write("<br/><a href='../index.html'>Yukarı</a><br/>")
-            
+
+
+def gen_html_sk():
+    dirs, files = ls(os.getcwd() + "/sk")
+    for (f,size) in files:
+        if ".md" in f:
+            path = os.path.dirname(f)
+            fmd = os.path.basename(f)
+            fhtml = os.path.basename(f).replace(".md",".html")
+            update = True
+            if os.path.isfile(path + "/" + fhtml):
+                mdtime = os.path.getmtime(path + "/" + fmd)
+                htmltime = os.path.getmtime(path + "/" + fhtml)
+                if htmltime > mdtime: update = False
+            if update:
+                print ('Generating html for', f)
+                title = get_title_from_md(f)
+                content = open(path + "/" + fmd).read()
+                res = util2.html_head.replace("[title]","")
+                res += markdown2.markdown(content, extras=['fenced-code-blocks'])
+                res += util2.bottom
+                fout = open(path + "/" + fhtml, "w")
+                fout.write(res)
+                fout.close()
+        
+def title_sk(to):
+    d = "sk"
+    for year in range(2000,2026):
+        if year == 2007: continue
+        out = d + "/" + str(year) + "/index.md"
+        fout = codecs.open(out,mode="w",encoding="utf-8")
+        fout.write("# %s\n\n" % str(year))
+        for f in sorted(glob.glob(d + "/" + str(year) + "/*/*.md")):
+            fin = open(f)
+            for line in fin.readlines():
+                ff = f.replace(d, '')[1:]
+                ff = ff.replace(str(year) + "/", "")
+                ff = ff.replace(".md",".html")
+                fout.write ("[%s](%s)\n\n" % (line[2:].strip(), ff))
+                break
+        fout.close()
+
             
 if __name__ == "__main__": 
 
@@ -130,7 +172,7 @@ if __name__ == "__main__":
             doc_dirs([sys.argv[2]])
             exit()
     
-    elif sys.argv[1] == "title":
+    elif sys.argv[1] == "push":
         print ('title')
         frdirs, todirs = copy_files_and_dirs(fr, to, ".git,.pdf,_minted,zwork")
         os.chdir(to)
@@ -146,5 +188,7 @@ if __name__ == "__main__":
                 html_long = to + "/" + topdir + "/" + subdir + "/" + util2.filename_from_title(title) + ".html"                
                 print (htmlfile, html_long)
                 shutil.copy(htmlfile, html_long)
-        
+                
+        title_sk(to)
+        gen_html_sk()
         exit()
