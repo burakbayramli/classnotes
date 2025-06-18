@@ -5,6 +5,9 @@ dirs = ['algs','calc_multi','chaos','compscieng',
         'func_analysis','linear','ode', 'stat',
         'tser','vision','phy']
 
+repl1_from = '"<meta name="generator" content="pandoc" />'
+repl1_to = '"<meta name="generator" content="pandoc" />\n<meta name="viewport" content="width=device-width, initial-scale=1.0"/>'
+
 def doc_dirs(topdirs):
     curr = os.getcwd()
     print (curr)
@@ -19,9 +22,10 @@ def doc_dirs(topdirs):
             mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"
             shutil.copy(mdfile,"/tmp/out.md")
             cmd = "pandoc  /home/burak/Documents/cl3/metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
-            os.system(cmd)
-            cmd = "pandoc %s /home/burak/Documents/cl3/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
             os.system(cmd)            
+            cmd = "pandoc %s /home/burak/Documents/cl3/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+            os.system(cmd)
+            inject_tags()        
             pdffile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".pdf"
             htmlfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".html"
             print ("copying to", mdfile)            
@@ -141,6 +145,16 @@ def title_sk(to):
                 break
         fout.close()
 
+def inject_tags():
+    print ('injecting')
+    fin = codecs.open("/tmp/out.html", encoding='utf8')
+    content = fin.read()
+    content2 = re.sub(r'<meta.*?pandoc.*?/>', repl1_to, content)
+    #content = fin.read().replace(repl1_from, "xoxoxoxox")
+    fout = codecs.open("/tmp/out.html",mode="w",encoding="utf-8")
+    fout.write(content2)
+    fout.flush()
+    fout.close()                        
             
 if __name__ == "__main__": 
 
@@ -159,7 +173,8 @@ if __name__ == "__main__":
             cmd = "pandoc  /home/burak/Documents/cl3/metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
             os.system(cmd)
             cmd = "pandoc %s /home/burak/Documents/cl3/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
-            os.system(cmd) 
+            os.system(cmd)
+            inject_tags()
             shutil.copy("/tmp/out.pdf", pdffile) 
             shutil.copy("/tmp/out.html", htmlfile)
             exit()
