@@ -174,7 +174,7 @@ if __name__ == "__main__":
     
     elif sys.argv[1] == "push":
         print ('title')
-        frdirs, todirs = copy_files_and_dirs(fr, to, ".git,.pdf,_minted,zwork")
+        frdirs, todirs = copy_files_and_dirs(fr, to, ".git,.pdf,_minted,zwork,.md")
         os.chdir(to)
         title_sci(to)
         for topdir in dirs:
