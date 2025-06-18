@@ -16,3 +16,4 @@ for topdir in topdirs:
         texfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".tex"
         print (texfile)
         #os.remove(texfile)
+        
