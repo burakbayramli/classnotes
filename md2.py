@@ -4,7 +4,7 @@ topdirs = ['algs','calc_multi','chaos','compscieng',
            'func_analysis','linear','ode', 'stat',
            'tser','vision','phy']
 
-topdirs = ['phy']
+topdirs = ['algs']
 
 curr = os.getcwd()
 print (curr)
