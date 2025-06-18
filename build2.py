@@ -5,8 +5,7 @@ dirs = ['algs','calc_multi','chaos','compscieng',
         'func_analysis','linear','ode', 'stat',
         'tser','vision','phy']
 
-repl1_from = '"<meta name="generator" content="pandoc" />'
-repl1_to = '"<meta name="generator" content="pandoc" />\n<meta name="viewport" content="width=device-width, initial-scale=1.0"/>'
+repl1_to = '<meta name="generator" content="pandoc" />\n<meta name="viewport" content="width=device-width, initial-scale=1.0"/>'
 
 def doc_dirs(topdirs):
     curr = os.getcwd()
@@ -146,11 +145,9 @@ def title_sk(to):
         fout.close()
 
 def inject_tags():
-    print ('injecting')
     fin = codecs.open("/tmp/out.html", encoding='utf8')
     content = fin.read()
     content2 = re.sub(r'<meta.*?pandoc.*?/>', repl1_to, content)
-    #content = fin.read().replace(repl1_from, "xoxoxoxox")
     fout = codecs.open("/tmp/out.html",mode="w",encoding="utf-8")
     fout.write(content2)
     fout.flush()
