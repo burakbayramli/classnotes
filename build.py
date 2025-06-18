@@ -180,9 +180,9 @@ if __name__ == "__main__":
             htmlfile = currdir + "/" + currfile + "/" + currfile + ".html"
             pdffile = currdir + "/" + currfile + "/" + currfile + ".pdf"
             shutil.copy(mdfile,"/tmp/out.md")
-            cmd = "pandoc  /home/burak/Documents/cl3/metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
+            cmd = "pandoc  /home/burak/Documents/classnotes/metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
             os.system(cmd)
-            cmd = "pandoc %s /home/burak/Documents/cl3/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
+            cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
             os.system(cmd)
             inject_tags()
             shutil.copy("/tmp/out.pdf", pdffile) 
