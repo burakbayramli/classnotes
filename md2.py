@@ -24,5 +24,5 @@ for topdir in topdirs:
         htmlfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".html"
         print ("copying to", mdfile)
         shutil.copy("/tmp/out.md", mdfile) 
-        shutil.copy("/tmp/out.pdf", pdffile) 
-        shutil.copy("/tmp/out.html", htmlfile) 
+        #shutil.copy("/tmp/out.pdf", pdffile) 
+        #shutil.copy("/tmp/out.html", htmlfile) 
