@@ -26,3 +26,4 @@ for topdir in topdirs:
         shutil.copy("/tmp/out.md", mdfile) 
         #shutil.copy("/tmp/out.pdf", pdffile) 
         #shutil.copy("/tmp/out.html", htmlfile) 
+        

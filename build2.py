@@ -145,7 +145,7 @@ def title_sk(to):
 if __name__ == "__main__": 
 
     fr = os.getcwd()
-    to = os.environ['HOME'] + "/Documents/dersblog2"
+    to = os.environ['HOME'] + "/Documents/dersblog"
     
     if sys.argv[1] == "doc":
         if len(sys.argv) < 3:
