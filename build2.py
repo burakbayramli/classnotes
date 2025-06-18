@@ -195,7 +195,9 @@ if __name__ == "__main__":
 
     elif sys.argv[1] == "comb":
         pdfdir = sys.argv[2]
-        pdfs = " ".join(sorted(list(glob.glob(pdfdir + '/*/*.pdf'))))
+        pdfs = sorted(list(glob.glob(pdfdir + '/*/*.pdf')))
+        pdfs = [x for x in pdfs if "dict.pdf" not in x]
+        pdfs = " ".join(pdfs)
         print (pdfs)
         home = os.environ['HOME']
         cmd = "pdfunite " + pdfs + " " + home + "/Downloads/" + pdfdir + ".pdf"
