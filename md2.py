@@ -80,6 +80,8 @@ def conv(texfile):
 
     fout.close()
 
+    cmd = "pandoc  /home/burak/Documents/classnotes/metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
+    os.system(cmd)
     cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
     os.system(cmd)
 
@@ -87,7 +89,7 @@ topdirs = ['algs','calc_multi','chaos','compscieng',
            'func_analysis','linear','ode', 'stat',
            'tser','vision','phy']
 
-topdirs = ['linear']
+topdirs = ['phy']
 
 curr = os.getcwd()
 print (curr)
@@ -104,6 +106,8 @@ for topdir in topdirs:
         conv(texfile)
         mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"
         pdffile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".pdf"
+        htmlfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".html"
         print ("copying to", mdfile)
         shutil.copy("/tmp/out.md", mdfile) 
         shutil.copy("/tmp/out.pdf", pdffile) 
+        shutil.copy("/tmp/out.html", htmlfile) 

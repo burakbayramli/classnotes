@@ -80,9 +80,9 @@ def conv(texfile):
 
     fout.close()
 
-    cmd = "pandoc %s ../../metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
-    os.system(cmd)
     cmd = "pandoc  ../../metadata.yaml --standalone --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
+    os.system(cmd)
+    cmd = "pandoc %s ../../metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
     os.system(cmd)
     
 if __name__ == "__main__": 
