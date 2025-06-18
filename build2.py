@@ -166,7 +166,7 @@ def remove_sci_md(to):
             os.chdir(curr + "/" + topdir + "/" + subdir)
             mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"            
             print ('removing', mdfile)
-            if os.path.exists(texfile): os.remove(mdfile)
+            if os.path.exists(mdfile): os.remove(mdfile)
     
     
 if __name__ == "__main__": 
