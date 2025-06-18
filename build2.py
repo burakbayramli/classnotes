@@ -192,3 +192,11 @@ if __name__ == "__main__":
         title_sk(to)
         gen_html_sk()
         exit()
+
+    elif sys.argv[1] == "comb":
+        pdfdir = sys.argv[2]
+        pdfs = " ".join(sorted(list(glob.glob(pdfdir + '/*/*.pdf'))))
+        print (pdfs)
+        home = os.environ['HOME']
+        cmd = "pdfunite " + pdfs + " " + home + "/Downloads/" + pdfdir + ".pdf"
+        os.system(cmd)
