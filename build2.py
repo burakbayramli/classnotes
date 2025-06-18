@@ -155,7 +155,20 @@ def inject_tags():
     fout.write(content2)
     fout.flush()
     fout.close()                        
-            
+
+def remove_sci_md(to):
+    curr = to
+    for topdir in dirs:
+        for subdir in sorted(os.listdir(curr + "/" + topdir)):
+            if not os.path.isdir(curr + "/" + topdir + "/" + subdir): continue
+            if "cover" in subdir or "000" in subdir : continue
+            if "dict" in subdir: continue
+            os.chdir(curr + "/" + topdir + "/" + subdir)
+            mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"            
+            print ('removing', mdfile)
+            if os.path.exists(texfile): os.remove(mdfile)
+    
+    
 if __name__ == "__main__": 
 
     fr = os.getcwd()
@@ -189,7 +202,7 @@ if __name__ == "__main__":
     
     elif sys.argv[1] == "push":
         print ('title')
-        frdirs, todirs = copy_files_and_dirs(fr, to, ".git,.pdf,_minted,zwork,.md")
+        frdirs, todirs = copy_files_and_dirs(fr, to, ".git,.pdf,_minted,zwork")
         os.chdir(to)
         title_sci(to)
         for topdir in dirs:
@@ -206,6 +219,7 @@ if __name__ == "__main__":
                 
         title_sk(to)
         gen_html_sk()
+        remove_sci_md(to)
         exit()
 
     elif sys.argv[1] == "comb":
