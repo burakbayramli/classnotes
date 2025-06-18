@@ -11,9 +11,9 @@ for topdir in topdirs:
     for subdir in sorted(os.listdir(curr + "/" + topdir)):
         if not os.path.isdir(curr + "/" + topdir + "/" + subdir): continue
         if "cover" in subdir or "000" in subdir : continue
-        #print (topdir, subdir)
+        if "dict" in subdir: continue
         os.chdir(curr + "/" + topdir + "/" + subdir)
-        texfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".tex"
+        texfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".out"
         print (texfile)
-        os.remove(texfile)
+        #if os.path.exists(texfile): os.remove(texfile)
         
