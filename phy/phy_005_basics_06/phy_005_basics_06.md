@@ -278,13 +278,15 @@ plt.savefig('phy_005_basics_06_01.jpg')
 
 ![](phy_005_basics_06_01.jpg)
 
-Kuvvet uygulama yönü ve onun kütle merkezine doğru olan yansıması gösterildi,
-ayrıca yerçekim merkezi de bir ufak küp olarak nesne içinde belirtiliyor.
-Merkeze olan bileşen kuvveti gösteren vektörün üçü tabii ki merkeze dokunuyor
-olmalı, biz burada gösterim amaçlı olarak hem kuvveti hem de bileşenini aynı
-başlangıçtan gösterdik. Yansıtma hesabı için bkz [6]. Tork vektörü de
-hesaplanıyor, ve COG çıkışlı olarak gösteriliyor. Objenin dönüşü bu vektör
-etrafında ve vektörün büyüklüğüne oranlı hızda olacaktır.
+Kuvvet uygulama yönü ve onun kütle merkezine doğru olan yansıması
+gösterildi, ayrıca yerçekim merkezi de bir ufak küp olarak nesne
+içinde belirtiliyor.  Merkeze olan bileşen kuvveti gösteren vektörün
+ucu muhakkak merkeze dokunuyor olmalı, biz burada gösterim amaçlı
+olarak hem kuvveti hem de bileşenini aynı başlangıçtan
+gösterdik. Yansıtma hesabı için bkz [6]. Tork vektörü de hesaplanıyor,
+ve COG çıkışlı olarak gösteriliyor. Objenin dönüşü bu vektör etrafında
+ve vektörün büyüklüğüne oranlı hızda olacaktır.
+
 
 
 [devam edecek]
@@ -302,6 +304,3 @@ Kaynaklar
 [5] Bayramlı, *Normal Diferansiyel Denklemler, Trigonometri*
 
 [6] Bayramlı, *Lineer Cebir Ders 15*
-
-
-

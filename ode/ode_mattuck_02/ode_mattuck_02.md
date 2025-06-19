@@ -317,12 +317,13 @@ t
 
 Runge-Kutta
 
-Taylor Serileri ile hesap yapmanın bir dezavantajı var, hesaplanan fonksiyonun
-ikinci, üçüncü ve daha yüksek türevlerinin analitik olarak elde edilebilmesi
-gerekiyor. Bu hesap her zaman kolay elde edilmeyebilir. Runge-Kutta metotu daha
-yüksek türevlerin yerine farklı $f$ hesaplarının bir şekilde ağırlıklarını
-alarak aynı sonuç erişiyor [3, sf.282]. RK yönteminin hata payı Taylor yöntemine
-eşittir, daha doğrusu RK2 ikinci derece sonrası terimleri atılmış Taylor
+Taylor Serileri ile hesap yapmanın bir dezavantajı var, hesaplanan
+fonksiyonun ikinci, üçüncü ve daha yüksek türevlerinin analitik olarak
+elde edilebilmesi gerekiyor. Bu hesap her zaman kolay elde
+edilmeyebilir. Runge-Kutta metotu daha yüksek türevlerin yerine farklı
+$f$ hesaplarının bir şekilde ağırlıklarını alarak aynı sonuç erişiyor
+[3, sf. 282]. RK yönteminin hata payı Taylor yöntemine eşittir, daha
+doğrusu RK2 ikinci derece sonrası terimleri atılmış Taylor
 yaklaşıksallamasına eşittir, RK4 aynı şekilde dördücü derece için.
 
 RK yaklaşımını direk Taylor serilerinden türetmek mümkün, RK4 için gereken
@@ -483,10 +484,11 @@ plt.savefig('2_8.jpg')
 
 RK4
 
-En popüler Runge-Kutta metotu dorduncu derecedir, aynen ikinci derecede olduğu
-gibi sonsuz tane çeşidi olabilir (hatırlarsak RK2 ile bir sabite değeri biz
-atadık, farklı atamalar için farklı RK çeşitleri elde edilebilir), fakat alttaki
-form en yaygın kullanılan formdur [4, sf. 735].
+En popüler Runge-Kutta metotu dördüncü derecedir, aynen ikinci
+derecede olduğu gibi sonsuz tane çeşidi olabilir (hatırlarsak RK2 ile
+bir sabite değeri biz atadık, farklı atamalar için farklı RK çeşitleri
+elde edilebilir), fakat alttaki form en yaygın kullanılan formdur [4,
+sf. 735].
 
 $$
 y_{i+1} = y_i + \frac{1}{6} (k_1 + k_2 + k_3 + k4) h
