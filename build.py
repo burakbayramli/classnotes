@@ -157,7 +157,6 @@ def remove_sci_md(to):
         for subdir in sorted(os.listdir(curr + "/" + topdir)):
             if not os.path.isdir(curr + "/" + topdir + "/" + subdir): continue
             if "cover" in subdir or "000" in subdir : continue
-            if "dict" in subdir: continue
             os.chdir(curr + "/" + topdir + "/" + subdir)
             mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"            
             print ('removing', mdfile)
@@ -220,7 +219,6 @@ if __name__ == "__main__":
     elif sys.argv[1] == "comb":
         pdfdir = sys.argv[2]
         pdfs = sorted(list(glob.glob(pdfdir + '/*/*.pdf')))
-        pdfs = [x for x in pdfs if "dict.pdf" not in x]
         pdfs = " ".join(pdfs)
         print (pdfs)
         home = os.environ['HOME']
