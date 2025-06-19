@@ -1,4 +1,4 @@
-# Google Nasıl İşler? 
+# Google İşleyişi, Ekonomi Teknikleri, Özdeğer, Özvektörler
 
 Lineer Cebir hocaları Google'a müteşekkir olmalı, çünkü bu ünlü arama
 motorunun kullandığı PageRank tekniğinin özü aslında lineer cebirin
@@ -454,7 +454,4 @@ Kaynaklar
 [5] Inoua, *A Simple Measure of Economic Complexity*, [https://arxiv.org/abs/1601.05012](https://arxiv.org/abs/1601.05012)
 
 [6] Bayramlı, *Istatistik, Markov Zincirleri*
-
-
-
 

@@ -2,7 +2,7 @@
 
 Makaskirişler (Truss)
 
-Bir makaşkiriş esneyebilen çubuklardan (bar) oluşur, bu çubuklar birbirine
+Bir makaskiriş esneyebilen çubuklardan (bar) oluşur, bu çubuklar birbirine
 bağlantı pimleri (pin joint) ile bağlıdır. Bağlantı pimi derken şunu
 kastediyorum, çubukları esnetmek özellikle uzunluğu yönünde kuvvet gerektirir,
 ama pim etrafında çubukları döndürmek efor gerektirmez.
@@ -20,8 +20,8 @@ noktasına uygulanabilir.
 Mesela resimdeki 3 no'lu çubuğu sağa ve sola esnetmek zor, ama o çubuğu
 3 no'lu pim etrafında döndürmek kolay.
 
-Bu derste iki boyutlu makaşkirişler incelenecek, daha önce iki boyutlu yay-kütle
-sistemini incelediğimiz gibi; muhakkak üç boyutlu makaşkiriş sistemleri de var
+Bu derste iki boyutlu makaskirişler incelenecek, daha önce iki boyutlu yay-kütle
+sistemini incelediğimiz gibi; muhakkak üç boyutlu makaskiriş sistemleri de var
 ama iki boyut üzerinde ana başlıkları daha rahat olarak inceleyebiliriz.
 
 Üstte görülen örnekte 5 tane çubuk 3 tane düğüm (nod, pim noktası) görüyorum.
@@ -53,8 +53,8 @@ noktalarda yok, onlar biliniyor. Demek ki $A$ matrisim 5 x 6 boyutunda olacak.
 Bu yapı bize 6 tane $u$, 5 tane $e$, 5 tane çubuk kuvveti, ve 6 tane denge
 denklemi verecetir.
 
-Fakat bu makaşkirişin üstünde durmak güvenli olmayabilir.. Bu püf noktası
-makaşkirişlere özel olarak devreye giriyor, ve konuyu daha ilginç hale
+Fakat bu makaskirişin üstünde durmak güvenli olmayabilir.. Bu püf noktası
+makaskirişlere özel olarak devreye giriyor, ve konuyu daha ilginç hale
 getiriyor. Niye? Pür lineer cebirsel sebeplerle aslında, $A$ matrisi 5 x 6
 boyutlarında, yani satırdan fazla kolon var, bu durumda $A u = 0$ denklemini
 çözen sıfır olmayan bir $u$ var, [1]'deki örnekte olduğu gibi. Bu arada $A$
@@ -171,7 +171,7 @@ alta hem üste iki tane çapraz çubuk ekliyorum.
 
 ![](compscieng_1_15_07.png)
 
-Tekrar soralım, bu makaşkirişin esnemeden hareket etmesi mümkün müdür? $Au =
+Tekrar soralım, bu makaskirişin esnemeden hareket etmesi mümkün müdür? $Au =
 0$'in çözümü var mıdır sorusunu sorduk yine. Yapı artık havada uçuyor, normal
 olarak bu mümkün.. Üç şekilde bu hareket mümkün. Her şey toptan yatay sağa, ya
 da herşey dikey yukarı/aşağı gidebilir (translation). Üçüncü katı hareket şekli
@@ -198,5 +198,3 @@ Kaynaklar
 [2] Strang, *Computational Science and Engineering*
 
 [3] Kassimali, Matrix Analysis of Structures, 2nd Ed
-
-
