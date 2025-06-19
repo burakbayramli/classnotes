@@ -145,9 +145,11 @@ def title_sk(to):
 def inject_tags():
     fin = codecs.open("/tmp/out.html", encoding='utf8')
     content = fin.read()
-    content2 = re.sub(r'<meta.*?pandoc.*?/>', util.head_insert, content)
+    content = re.sub(r'<meta.*?pandoc.*?/>', util.head_insert, content)
+    title = get_title_from_md("/tmp/out.md")
+    content = re.sub(r'<title></title>', "<title>%s</title>" % title, content)
     fout = codecs.open("/tmp/out.html",mode="w",encoding="utf-8")
-    fout.write(content2)
+    fout.write(content)
     fout.flush()
     fout.close()                        
 
@@ -224,3 +226,7 @@ if __name__ == "__main__":
         home = os.environ['HOME']
         cmd = "pdfunite " + pdfs + " " + home + "/Downloads/" + pdfdir + ".pdf"
         os.system(cmd)
+
+    elif sys.argv[1] == 'zip':
+        os.system("zip /opt/Downloads/dotbkps/classnotes.zip -r /home/burak/Documents/classnotes/.git/")
+        
