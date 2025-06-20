@@ -61,7 +61,7 @@ A =
 -1 & 0 & 0 & 1 \\
 0 & 0 & -1 & 1
 \end{array}\right]
- $$
+$$
 
 Kenar 1 düğüm 1'den çıkıyor (onun için o değer -1) ve düğüm 2'ye giriyor
 (onun için değeri +1). 
@@ -105,7 +105,7 @@ $$ Ax =
 x_1 \\ x_2 \\ x_3 \\ x_4
 \end{array}\right]
 = 0
- $$
+$$
 
 Bu çarpımı açarsak, 
 
@@ -174,7 +174,7 @@ y_1 \\ y_2 \\ y_3 \\ y_4 \\ y_5
 \left[\begin{array}{r}
 0 \\ 0 \\ 0 \\ 0 
 \end{array}\right]
- $$
+$$
 
 Daha ilerlemeden önce büyük resmi göstermek istiyorum, 
 

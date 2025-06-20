@@ -162,7 +162,7 @@ $$ A =
 a_1 &   a_2 \\
 \downarrow &  \downarrow 
 \end{array}\right]
- $$
+$$
 
 $e$ düzleme diktir. Peki $p$ nedir? $a$ vektörlerinin bir kombinasyonudur, yani
 
@@ -195,7 +195,7 @@ $$
 0 \\
 0 
 \end{array}\right]
- $$
+$$
 
 Ya da
 
@@ -306,7 +306,7 @@ D
 2  
 \end{array}\right]
 }_{b}
- $$
+$$
 
 Gördüğümüz gibi 3 tane denklem ve 2 tane bilinmeyen var. Yani verilen
 (denklemler) bilinmeyenlerden daha fazla. Bu sebeple bazı denklemler (ya da

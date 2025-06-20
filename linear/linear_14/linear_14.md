@@ -65,7 +65,7 @@ y = \left[\begin{array}{r}
 x+y = \left[\begin{array}{r}
 3 \\ 1 \\ 3
 \end{array}\right]
- $$
+$$
 
 Buradan hareketle uzunluk hesapları $||y|| = 5$, $||x+y||=19$. Görüldüğü gibi
 $14+5=19$ yani hesap doğru. O zaman uzunluk hesabını noktasal çarpım olarak
@@ -73,7 +73,7 @@ $14+5=19$ yani hesap doğru. O zaman uzunluk hesabını noktasal çarpım olarak
 
 $$ 
 x^Tx + y^Ty = (x+y)^T(x+y)
- $$
+$$
 
 Dikkat, tekrar hatırlatalım, üstteki formül her zaman doğru değil, sadece $x,y$
 birbirine dik olduğu zaman doğru. Eşitliğin sağ tarafını açalım,
@@ -183,7 +183,7 @@ x \\
 \vdots \\
 0 
 \end{array}\right] 
- $$
+$$
 
 Bu matris çarpımını gerçekleştirmek için her satırı $x$ ile çarpmak gerekir,
 yani çarpımın bir diğer anlamı "her satırın $x$ ile noktasal çarpımının sıfıra
@@ -237,7 +237,7 @@ A = \left[\begin{array}{rrr}
 1 & 2 & 5 \\
 2 & 4 & 10
 \end{array}\right]
- $$
+$$
 
 Bu altuzayın boyutu 1. Sıfır uzayının boyutu ne? $n=3$, kerte $r=1$ (çünkü
 2. satır 1.'nin tekrarı). 
@@ -277,7 +277,7 @@ x_1 \\ x_2 \\ x_3
 \left[\begin{array}{r}
 0 
 \end{array}\right]
- $$
+$$
  
 Vurgulamak istediğim şu: sıfır uzayı ve satır uzayı dikgen, *ayrıca*, bu
 altuzayların boyutlarının toplamı $A$'nin boyutuna eşit. Bu bakımdan yeni bir
@@ -353,7 +353,7 @@ $$
 1 & 2 \\
 1 & 5
 \end{array}\right]
- $$
+$$
 
 $m > n$, kolonlar bağımsız o zaman $r=2$. Yani elde
 
@@ -370,7 +370,7 @@ x_1 \\ x_2
 \left[\begin{array}{rr}
 b_1 \\ b_2 \\ b_3
 \end{array}\right]
- $$
+$$
 
 denklemi var, ve bunun nasıl çözeceğim? Çok zor. Eğer verilen bir $b$ $A$'nin
 kolon uzayında ise çözüm var, ama diğer durumlarda çözüm yok. İşte bu durumda
@@ -390,7 +390,7 @@ $$
 3 & 8 \\
 8 & 30
 \end{array}\right] 
- $$
+$$
 
 Sonucun tersi alınabilir mi? 1. kolon 2. kolonun katı değil, yani evet. Ama
 dikkat, her zaman $A^TA$ tersi alınabilir bir matris vermeyebilir, mesela,
@@ -409,7 +409,7 @@ $$
 3 & 9 \\
 9 & 27
 \end{array}\right] 
- $$
+$$
 
 Burada bozukluk $A$ ile alakalı, çünkü $r=1$. Kertesi 1 olan iki matrisi
 çarpınca 1'den büyük bir kerte elde etmem imkansız. Yani $A$'nin kertesi

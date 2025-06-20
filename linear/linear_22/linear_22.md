@@ -38,7 +38,7 @@ $$
 \lambda_1x_1 & \cdots & \lambda_nx_n \\ 
 & & 
 \end{array}\right]
- $$
+$$
 
 elde ederdik. Güzel duruyor. Daha da güzel olabilir! Bir sonraki adımda üstteki
 kolonlardaki özdeğerleri dışarı çıkartmak istiyorum, 
@@ -54,7 +54,7 @@ x_1 & \cdots & x_n \\
 & \ddots & \\
 & & \lambda_n
 \end{array}\right]
- $$
+$$
 
 İçinde $\lambda$'lar olan matriste köşegen haricindeki tüm diğer hücreler
 sıfır değerini taşıyor. Bu çarpım bize istediğimiz sonucu verecek, hem de

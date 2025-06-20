@@ -45,7 +45,7 @@ $$
 1 & 2 & 3 \\
 2 & 5 & 8 
 \end{array}\right]
- $$
+$$
 
 Boyut sayısı 2'dır. Satırlara bakınca 1. ve 2. satır aynı, bağımsız sadece iki
 tane satır var. Kolon ve satır uzaylarının boyut eşitliği kuralından
@@ -83,7 +83,7 @@ $$
 0 & -1 & -1 & 0 \\
 0 & 0 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 İkinci pivot'ta eksi olmayan değer istiyorum, 2. satırı -1 ile
 çarpayım. Sonra 2. satır 2 ile çarpıp 1. satırdan çıkartayım,
@@ -94,7 +94,7 @@ $$ R =
 0 & 1 & 1 & 0 \\
 0 & 0 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 Bunlar bildiğimiz işlemler. Şimdi sol üst köşede $2 \times 2$ boyutlu $I$ var,
 hemen yanında $F$, ve en alt satır sıfır.
@@ -150,7 +150,7 @@ $$
 \left[\begin{array}{rr}
 A_{m \times n} & I_{m \times m}
 \end{array}\right]
- $$
+$$
 
 Ve bu matris üzerinde rref uygularım. Sonuç ne olur? $A$ tabii ki $R$'ye
 dönüşecek, aynı işlemler $I$ üzerinde de uygulanmış olacak, ve orada da
@@ -160,7 +160,7 @@ $$
 \left[\begin{array}{rr}
 R_{m \times n} & E_{m \times m}
 \end{array}\right]
- $$
+$$
 
 Eğer düşünürsek $E$ matrisinin $A$ üzerinde yaptığımız tüm işlemlerin bir
 kayıdı olduğunu görebiliriz. İşlemlerimizin arkada bıraktığı "iz'' bu
@@ -178,7 +178,7 @@ EA & EI
 \left[\begin{array}{rr}
 R_{m \times n} & E_{m \times m}
 \end{array}\right]
- $$
+$$
 
 çünkü 
 
@@ -196,7 +196,7 @@ A = \left[\begin{array}{rrrr}
 1 & 1 & 2 & 1 \\
 1 & 2 & 3 & 1
 \end{array}\right]
- $$
+$$
 
 Bu matrisi $R$'ye dönüştürmek için yaptığım tüm işlemleri $3 \times 3$
 boyutlu bir $I$ üzerinde uygularsam, 
@@ -207,7 +207,7 @@ $$
 1 & -1 & 0 \\
 -1 & 0 & 1 
 \end{array}\right]
- $$
+$$
 
 Bu zannediyorum ki $E$. Kontrol etmek için $A$'yi bu matrisle soldan
 çarpalım, ve $R$'yi elde edip etmeyeceğimizi görelim,
@@ -223,7 +223,7 @@ $$
 1 & 1 & 2 & 1 \\
 1 & 2 & 3 & 1
 \end{array}\right]
- $$
+$$
 
 ```python
 E = np.array([[-1,2,0],[1,-1,0],[-1,0,1]])
@@ -254,7 +254,7 @@ $$ R =
 0 & 1 & 1 & 0 \\
 0 & 0 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 Yani $R$'nin son satırına tekabül eden $E$'nin son satırı aradığımız
 vektördür.
@@ -313,7 +313,7 @@ $$
 0 & 0 & 0 \\
 0 & 0 & 7 
 \end{array}\right]
- $$
+$$
 
 Bence bu bir baz. Birbirinden bağımsızlar, ve tüm köşegen matrisler bu
 üçünün bir kombinasyonu, yani bu üç matris tüm köşegen matrisler altuzayını

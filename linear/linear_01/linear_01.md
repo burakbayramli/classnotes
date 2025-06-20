@@ -39,7 +39,7 @@ y
 0 \\
 3
 \end{array}\right]
- $$
+$$
 
 Soldaki matrise ben çoğunlukla $A$ derim, sonra içinde bilinmeyenleri
 taşıyan $x$ vektörü koyarım, ki bazıları bunu vektör olduğu için köyü
@@ -149,7 +149,7 @@ b =
 -1 \\
 4  
 \end{array}\right]
- $$
+$$
 
 Satır bakışı, üstteki ikinci denklemi alalım, grafiği neye benzer?
 Orijinden geçen bir şey yok, çünkü $0,0,0$ bir çözüm olamaz. Çözüm neye
@@ -203,7 +203,7 @@ z
 -1 \\
 4
 \end{array}\right]
- $$
+$$
 
 Yani eşitliğin sol tarafındaki üç boyutlu vektörlerin hangi kombinasyonu
 eşitliğin sağındaki üç boyutlu vektörü verir? Çizmeye uğraşalım,
@@ -250,7 +250,7 @@ z
 1 \\
 3
 \end{array}\right]
- $$
+$$
 
 (Bu sağ tarafı 1. ve 2. kolonları birbirine ekleyerek uydurduk bu arada),
 çözüm o zaman ne olurdu? Çözüm basit (çünkü kendimiz pişirdik),
@@ -313,7 +313,7 @@ $$
 1 \\
 2
 \end{array}\right]
- $$
+$$
 
 Bunu yapmanın iki yolu var. Önce benim en favori yöntemimi söyleyeyim,
 belki de sürpriz olmayacak, kolonlar kullanarak. Bu durumda, mesela üstteki
@@ -337,7 +337,7 @@ $$ =
 12 \\
 7
 \end{array}\right]
- $$
+$$
 
 Diğer bir yöntem satır bazlı. Bu durumda $A$'nin 1. satırı ile $x$'i
 çarpıyorum, yani noktasal çarpımını alıyorum, ve bu tek bir değer sonucunu

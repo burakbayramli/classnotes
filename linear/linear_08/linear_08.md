@@ -34,7 +34,7 @@ $$
 2 & 4 & 6 & 8 & b_2 \\
 3 & 6 & 8 & 10 & b_3
 \end{array}\right]
- $$
+$$
 
 Bunu eliminasyon sırasında aynı işlemleri eşitliğin sağ kısmına da rahatça
 uygulayabilmek için yaptık. Eliminasyona başlayalım; Pivot en üst sol
@@ -46,7 +46,7 @@ $$
 0 & 0 & 2 & 4 & b_2-2b_1 \\
 0 & 0 & 2 & 4 & b_3-3b_1
 \end{array}\right]
- $$
+$$
 
 Bir sonraki pivot'a geçiyorum, ve 2. satırı 3.'den çıkartıyorum,
 
@@ -56,7 +56,7 @@ $$
 0 & 0 & (2) & 4 & b_2-2b_1 \\
 0 & 0 & 0 & 0 & b_3-b_2-b_1
 \end{array}\right]
- $$
+$$
 
 En son satırdaki formül ne diyor? 
 
@@ -144,7 +144,7 @@ c_2
 \left[\begin{array}{r}
 2 \\ 0 \\ -2 \\ 1
 \end{array}\right] 
- $$
+$$
 
 $c_1,c_2$'nin çarptığı vektörleri daha önceki derste (aynı) $A$'nin sıfır
 uzayında olarak bulmuştuk, onları direk alıp kullandık. Ayrıca onların tüm
@@ -195,7 +195,7 @@ $$ A =
 6 & 1 \\
 5 & 1 
 \end{array}\right]
- $$
+$$
 
 Kerte nedir? Üstte görülen iki kolon değişik yönleri gösteriyorlar, o
 zaman iki pivot bulacağım, bu kesin. Satır azaltılmış basamaklı (row
@@ -208,7 +208,7 @@ $$ R =
 0 & 0 \\
 0 & 0 
 \end{array}\right]
- $$
+$$
 
 Bu matrisi hemen yazdım çünkü iki pivot olduğu durumda bundan başka bir
 rref matrisi bulunamaz. 
@@ -237,7 +237,7 @@ A =
 1 & 2 & 6 & 5 \\
 3 & 1 & 1 & 1 
 \end{array}\right]
- $$
+$$
 
 Kerte $r=2$ çünkü iki tane pivot olacak. Pivot kolonları hangileri olacak?
 1. ve 2. kolonlar. 
@@ -248,7 +248,7 @@ R =
 1 & 0 & &    \\
 0 & 1 & &
 \end{array}\right]
- $$
+$$
 
 Basamaklı formun baş tarafı üstteki gibi olur, sağdaki boş kısıma daha
 önce $F$ demiştim. Hiç sıfır satır yok çünkü kerte 2. Tabii $F$ boş
@@ -262,7 +262,7 @@ A =
 \left[\begin{array}{rr}
 1 & 2 \\ 3 & 1
 \end{array}\right]
- $$
+$$
 
 Bu bir kare (square) matris, ve $A$ tam kerte. Dikkat, tam kolon kerte, ya
 da tam satır kerte sözlerine gerek yok, tam kerte yeterli. Bu matris tersi
@@ -274,7 +274,7 @@ R =
 \left[\begin{array}{rr}
 1 & 0 \\ 0 & 1
 \end{array}\right]
- $$
+$$
 
 Bu matrisin sıfır uzayı nedir? İçinde sadece sıfır vektörü olan uzaydır. 
 
@@ -301,7 +301,7 @@ $$ R =
 \left[\begin{array}{rr}
 I &  F
 \end{array}\right]
- $$
+$$
 
 Ama dikkat, pivot'lar illa matrisin başında olacak diye bir kural yok,
 yani $I,F$'lerin birbirinin içine geçmiş olabilir. Bu durumda en az bir
@@ -315,7 +315,7 @@ R =
 I & F \\
 0 & 0
 \end{array}\right]
- $$
+$$
 
 Bu durumda ya hiç çözüm yoktur, ya da sonsuz tane çözüm vardır. 
 

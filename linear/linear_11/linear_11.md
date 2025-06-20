@@ -19,7 +19,7 @@ $$
 \left[\begin{array}{rrr}
 0 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 1
 \end{array}\right]
- $$
+$$
 
 Bu matrislerin her biri değişik bir hücresinde 1 değeri taşıyor, diğerleri
 için sıfır değerine sahip. Bu matrisleri kombine ederek (farklı skalar ile
@@ -47,7 +47,7 @@ $$
 \left[\begin{array}{rrr}
 0 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 1
 \end{array}\right],
- $$
+$$
 
 $$ 
 \left[\begin{array}{rrr}
@@ -148,7 +148,7 @@ A = \left[\begin{array}{ccc}
 1 & 4 & 5 \\
 2 & 8 & 10
 \end{array}\right]
- $$
+$$
  
 Bu matrisin satır uzayı için bir baz ne olabilir? 1. satır mesela. Kolon uzayı
 için baz? Ondan önce, kolon uzayının boyutu nedir?  Tabii ki bir, çünkü hem
@@ -167,7 +167,7 @@ A = \left[\begin{array}{c}
 \left[\begin{array}{ccc}
 1 & 4 & 5
 \end{array}\right]
- $$
+$$
 
 Aslında tüm kerte 1 matrislerini üstteki formda yazabiliriz, yani bir kolon
 çarpı bir vektör formunda, yani $A = u v^T$ şeklinde. Şimdilik bu matrisler
@@ -210,7 +210,7 @@ $$
 v = \left[\begin{array}{c}
 v_1 \\ v_2 \\ v_3 \\ v_4
 \end{array}\right]
- $$
+$$
 
 Şimdi $\mathbb{R}^4$'te tüm öğeleri toplanınca sonucu sıfır olan tüm
 $v$'leri oluşturduğu bir uzay $S$'i, yani düşünelim, $v_1 + v_2 + v_3 +
@@ -250,7 +250,7 @@ $$
 \left[\begin{array}{r}
 \ldots  \\ 0 \\ 0 \\ 1
 \end{array}\right]
- $$
+$$
 
 Noktalı yerlere tabii ki -1 gelecek ki tüm hücrelerin toplamı sıfır olsun,
 o zaman 
@@ -265,7 +265,7 @@ $$
 \left[\begin{array}{r}
 -1  \\ 0 \\ 0 \\ 1
 \end{array}\right]
- $$
+$$
 
 Bu baz tabii ki tek baz değil ama özel 3 vektör. 
 

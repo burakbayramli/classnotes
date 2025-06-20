@@ -68,7 +68,7 @@ A = \left[\begin{array}{cc}
 0 & 1 \\
 1 & 0
 \end{array}\right]
- $$
+$$
 
 Bu matrisi hangi vektör ile çarparsam aynı yönde bir vektör elde ederim?
 Permutasyon matrisi tanım itibariyle permutasyon yapar, yani öğelerin
@@ -182,7 +182,7 @@ $$
 \left[\begin{array}{ccc}
 1 & 1 \\ 1 & 1
 \end{array}\right]
- $$
+$$
 
 $x_2 = [1 \ -1]$. Bu da ikinci özvektör.
 
@@ -233,7 +233,7 @@ $$ \det(Q - \lambda I) =
 -\lambda & -1 \\
 1 & -\lambda
 \end{array}\right] = \lambda^2 + 1 = 0
- $$
+$$
 
 Özdeğerler nedir? $\lambda_1 = i, \lambda_2 = -i$. Bu sayılar kompleks / hayali
 sayılardır, reel değillerdir. Bu olabilir. Bir matris, üstte olduğu gibi,
@@ -258,7 +258,7 @@ $$ A =
 \left[\begin{array}{ccc}
 3 & 1 \\ 0 & 3
 \end{array}\right]
- $$
+$$
 
 Bu matris üçgensel (triangular). Bu tür matrislerde özdeğerler köşegenin
 üzerindedir! Bunu bilmek oldukça faydalıdır. Ama kontrol edelim,
@@ -269,7 +269,7 @@ $$ \det(Q - \lambda I) =
 0 & 3-\lambda
 \end{array}\right] = (3-\lambda)(3-\lambda) = 0, 
 \lambda_1 = 3, \lambda_2 = 3
- $$
+$$
 
 Problem nerede? Problem özvektörlerde. Hatırlayalım, 
 
@@ -478,7 +478,7 @@ $$
 $$ 
 \bigg| \frac{\lambda_2}{\lambda_1} \bigg| < 1, ..., 
 \bigg| \frac{\lambda_n}{\lambda_1} \bigg| < 1
- $$
+$$
 
 Bu demektir ki limit koşulu $m \to \infty$ durumunda
 

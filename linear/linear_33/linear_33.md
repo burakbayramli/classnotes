@@ -127,7 +127,7 @@ $$
  &  & \sigma_r & \\
  &  &  & 0 \\
 \end{array}\right]
- $$
+$$
 
 Sözde tersi durumunda köşegenler neye benzer? Tam tersi düşünelim, bu
 kolay, bir bolu hesabı yapıyoruz, bu hesabı sadece sıfır olan köşegen
@@ -141,7 +141,7 @@ $$
  &  & 1/\sigma_r & \\
  &  &  & 0 \\
 \end{array}\right]
- $$
+$$
 
 Dikkat, $\Sigma$ $n \times m$ boyutlarında, $\Sigma^{+}$ ise $m \times n$ boyutlarında. 
 

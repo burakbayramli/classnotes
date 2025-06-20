@@ -92,7 +92,7 @@ D
 2 \\
 2 
 \end{array}\right]
- $$
+$$
 
 $A$ için elimde iki bağımsız kolon var, yani kolon uzayı için elimde bir
 baz var, ama eşitliğin sağındaki vektör $b$ bu kolon uzayı içinde değil. O
@@ -183,7 +183,7 @@ A^TA =
 3 & 6 \\
 6 & 14
 \end{array}\right] 
- $$
+$$
 
 $$ A^Tb = 
 \left[\begin{array}{rrr}
@@ -199,7 +199,7 @@ $$ A^Tb =
 5 \\
 11 
 \end{array}\right]
- $$
+$$
 
 Sonuç matrisinin simetrik, ve tersi alınabilir olmasını beklerim. Ayrıca.. tüm
 derslerimizin sonuna yaklaşınca üsttekinin "kesin artı (positive definite)
@@ -254,7 +254,7 @@ $$
 -1/6 \\ 2/6 \\ -1/6
 \end{array}\right]
 }_{e}
- $$
+$$
 
 Bildiğimiz diğer şeyler.. $P \perp e$. $P$, $A$'nin kolon uzayında bunu zaten
 biliyoruz. Ayrıca $e \perp C(A)$.

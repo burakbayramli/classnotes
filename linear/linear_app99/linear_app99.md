@@ -35,7 +35,7 @@ $$
 a = \left[\begin{array}{r}
 3 \\ -2 \\ 1
 \end{array}\right]
- $$
+$$
 
 $$ ||a|| = \sqrt{3^2+(-2)^2+1^2} = 3.742 $$
 

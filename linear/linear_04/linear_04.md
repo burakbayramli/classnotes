@@ -57,7 +57,7 @@ $$ \stackrel{A}{
 2 & 1 \\ 8 & 7
 \end{array}\right]
 }
- $$
+$$
 
 $U$'ya yani bir üst üçgenel matrise (upper triangular matrix) erişmek
 istiyorum, 1. satırın 4 katını 2. satırdan çıkartırım. Bu işleme 2'den 
@@ -80,7 +80,7 @@ $$
 2 & 1 \\ 0 & 3
 \end{array}\right]
 }
- $$
+$$
 
 O zaman şunu yazarsak, 
 
@@ -101,7 +101,7 @@ $$
 2 & 1 \\ 0 & 3
 \end{array}\right]
 }
- $$
+$$
 
 $L$ diyen yere ne gelmeli? Basit, $E_{21}$'nin tersi gelmeli. $E_{21}A =
 U$'yu $A=LU $ yapmak için her iki tarafı soldan $E_{21}$'nin tersi ile
@@ -127,7 +127,7 @@ $$
 2 & 1 \\ 0 & 3
 \end{array}\right]
 }
- $$
+$$
 
 $L$ alt üçgensel (*l*ower triangular) demek, $U$'nun köşegeninde
 pivotlar var, sol alt kısmında sıfırlar var. Eşitliğin sağındaki $L$ içinden
@@ -143,7 +143,7 @@ $$
 \left[\begin{array}{rr}
 1 & 1/2 \\ 0 & 1
 \end{array}\right]
- $$
+$$
 
 Bu sonuca $LDU$ denebilir, Matlab her iki sonucu da üretebilmektedir. 
 
@@ -180,7 +180,7 @@ $$
 -2 & 1 & 0 \\
 0 & 0 & 1
 \end{array}\right]}
- $$
+$$
 
 Bu çarpımı yaptığımızda sonucun ilk kısmını hemen görüyoruz, üstte
 sıfırlar, köşegende 1'ler var.
@@ -191,7 +191,7 @@ $$ =
  & 1 & 0 \\
  &  & 1
 \end{array}\right]
- $$
+$$
 
 Geri kalanlar? 
 

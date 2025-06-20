@@ -82,7 +82,7 @@ A =
 \left[\begin{array}{rr}
 4 & 4 \\ -3 & 3
 \end{array}\right]
- $$
+$$
 
 $A$ tersine çevirilebilir (invertible) o zaman kertesi (rank)
 2. Aradıklarım 
@@ -176,7 +176,7 @@ $$
 \left[\begin{array}{r}
 -1 \\ 1
 \end{array}\right]
- $$
+$$
 
 Özdeğerler
 
@@ -191,7 +191,7 @@ $$
 \left[\begin{array}{r}
 -1/ \sqrt{ 2} \\ 1/ \sqrt{ 2}
 \end{array}\right]
- $$
+$$
 
 o zaman 
 
@@ -217,7 +217,7 @@ $$
 1/\sqrt{ 2} & 1/\sqrt{ 2} \\ -1/\sqrt{ 2} & 1/\sqrt{ 2}
 \end{array}\right]
 }_{V^T}
- $$
+$$
 
 Şimdi $U$'nun sırası geldi. Onun için $AA^T$ lazım. 
 
@@ -231,7 +231,7 @@ $$ A^TA =
 \left[\begin{array}{rr}
 32 & 0 \\ 0 & 18
 \end{array}\right]
- $$
+$$
 
 Raslantı oldu yukarıdaki çarpım köşegen çıktı, iyi oldu tabii, çünkü bu tür
 matrislerin özvektörlerini, özdeğerlerini hesaplamak çok
@@ -244,7 +244,7 @@ $$
 \left[\begin{array}{r}
 0 \\ 1
 \end{array}\right]
- $$
+$$
 
 Özdeğerler $\lambda_1 = 32, \lambda_2 = 18$
 
@@ -275,7 +275,7 @@ $$
 1/\sqrt{ 2} & 1/\sqrt{ 2} \\ -1/\sqrt{ 2} & 1/\sqrt{ 2}
 \end{array}\right]
 }_{V^T}
- $$
+$$
 
 Örnek 
 
@@ -293,7 +293,7 @@ $$
 \left[\begin{array}{r}
 4 \\ 3
 \end{array}\right]
- $$
+$$
 
 Özvektör bu uzayda olmalı, bu uzayda tek eleman vardır, o zaman hesap
 kolay. Tek yapmamız gereken üstteki vektörü normalize etmek, 
@@ -302,7 +302,7 @@ $$
 v_1 = \left[\begin{array}{r}
 .8 \\ .6
 \end{array}\right]
- $$
+$$
 
 Peki $v_2$? $v_1$'e dikgen olmalı. 
 
@@ -310,7 +310,7 @@ $$
 v_2 = \left[\begin{array}{r}
 .8 \\ -.6
 \end{array}\right]
- $$
+$$
 
 Aynı işlem $U$ için,
 
@@ -318,7 +318,7 @@ $$
 \left[\begin{array}{r}
 4 \\ 8
 \end{array}\right]
- $$
+$$
 
 Birinci kolonu direk aldık (bu kolon ile ikinci kolon arasında kat
 farkı olduğu direk görülmüyor ama kesirli olarak var),
@@ -327,7 +327,7 @@ $$
 u_1 = \left[\begin{array}{r}
 1/\sqrt{ 5} \\ 2/\sqrt{ 5}
 \end{array}\right]
- $$
+$$
 
 Yani
 
@@ -354,7 +354,7 @@ $$
  & 
 \end{array}\right]
 }_{V^T}
- $$
+$$
 
 $\Sigma$ içinde üç sıfır var, çünkü $A$ eşsiz. Eksik değer nedir? Şu
 çarpımın özdeğerlerini bulalım
@@ -369,7 +369,7 @@ $$ A^TA =
 \left[\begin{array}{rr}
 80 & 60 \\ 60 & 45
 \end{array}\right] 
- $$
+$$
 
 Sonuç yine eşsiz, özdeğerlerin biri sıfır. Tüm özdeğerlerin toplamı matris izine
 (trace) eşit, özdeğerlerden biri sıfır, o zaman diğeri köşegenin toplamının
@@ -398,7 +398,7 @@ $$
 .8 & .6 
 \end{array}\right]
 }_{V^T}
- $$
+$$
 
 Örneklerimiz bunlar. Şimdi ne yaptığımızı biraz düşünelim. $v_1,..,v_r$
 satır uzayı için birimdik bir bazdır. $u_1,..,u_r$ kolon uzayı için

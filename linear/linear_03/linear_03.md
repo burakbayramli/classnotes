@@ -186,7 +186,7 @@ $$
 3 & 18 \\
 4 & 24
 \end{array}\right]
- $$
+$$
 
 Sağdaki matris çok özel bir matristir; öncelikle $C$'nin kolonları mesela
 $A$'nin (şu anda bir vektör) katlarıdır aslında. Peki satırlar?  $C$'nin
@@ -219,7 +219,7 @@ $$
 \left[\begin{array}{rr}
 0 & 0
 \end{array}\right] 
- $$
+$$
 
 Eşitliğin sağında her toplamda ayrı birer matris var. Yani her çarpımdan
 bir matris elde ediyoruz, sonra bu matrisleri üst üste koyarak
@@ -280,7 +280,7 @@ A =
 \left[\begin{array}{rr}
 1 & 3 \\ 2 & 6
 \end{array}\right]
- $$
+$$
 
 Bu matrisin niye tersi yoktur? Bu soruya değişik şekillerde cevap
 verilebilir. Eğer determinantları görmüş olsaydık derdik ki "determinantı
@@ -309,7 +309,7 @@ $$
 \left[\begin{array}{r}
 0 \\ 0
 \end{array}\right]
- $$
+$$
 
 Noktalı yerlere ne gelmeli? Ne gelebilir? 
 
@@ -324,7 +324,7 @@ $$
 \left[\begin{array}{r}
 0 \\ 0
 \end{array}\right]
- $$
+$$
  
 Şimdi bir zihin egzersizi: Eğer $A$'nin tersi olsaydı, her iki tarafı
 matris tersiyle çarpardım,
@@ -359,7 +359,7 @@ $$
 0 & 1
 \end{array}\right]
 }_{I}
- $$
+$$
 
 Kolonsal olarak düşünelim, 
 
@@ -384,7 +384,7 @@ b &
 0 & 
 \end{array}\right]
 }_{I}
- $$
+$$
 
 Yani tersin ilk kolonuna öyle $a,b$ değerleri bulalım ki bu kolon $A$'yi
 çarpınca (kolonlarını kombine edince) sonuç $\left[\begin{array}{rr}1 &
@@ -414,7 +414,7 @@ b & d
 0 & 1
 \end{array}\right]
 }_{I}
- $$
+$$
 
 Belki de şöyle söylemek lazım; burada aynı anda iki denklem sistemi
 çözüyor gibiyiz. Bu bağlamda Gauss-Jordan'ın fikri şudur; her iki denklemi
@@ -434,7 +434,7 @@ b
 1  \\
 0
 \end{array}\right]
- $$
+$$
 
 $$ 
 \left[\begin{array}{rrr}
@@ -450,7 +450,7 @@ d
 0  \\
 1
 \end{array}\right]
- $$
+$$
 
 Gauss ile Jordan bu konu hakkında konuşuyorlarmış, Jordan Gauss'a
 "bunların ikisini niye aynı anda çözmüyorsun?'' demiş. Hikaye böyle! Bunun
@@ -473,7 +473,7 @@ $$
 1 & 3 & 1 & 0\\
 2 & 7 & 0 & 1
 \end{array}\right]
- $$
+$$
 
 sistemini çözmek. Üstteki sistem çözülünce sonuç matris tersi olacaktır!
 Çünkü eklemlenmiş kısıma dikkat edersek, o kısım aslında bir birim
@@ -486,7 +486,7 @@ $$
 1 & 3 & 1 & 0\\
 0 & 1 & -2 & 1
 \end{array}\right]
- $$
+$$
 
 elde ederiz. Üstteki sol matris üst üçgensel. Bu noktada Gauss "iş
 tamamdır'' diyor, fakat Jordan devam et diyor. Şimdi en üst satırdaki 3
@@ -498,7 +498,7 @@ $$
 1 & 0 & 7 & -3\\
 0 & 1 & -2 & 1
 \end{array}\right]
- $$
+$$
 
 Böylece sol kısımda birim matris edildi. Ve tanım itibariyle sağ kısımda
 ise $A^{-1}$ elde etmiş oldum. Peki bu nasıl oldu? Elimizde bir

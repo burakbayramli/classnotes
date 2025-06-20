@@ -24,7 +24,7 @@ $$ A =
 -1 & 2 \\
 1 & -2
 \end{array}\right]
- $$
+$$
 
 Başlangıç değerleri şöyle olsun
 
@@ -33,7 +33,7 @@ $$ u(0) =
 1 \\
 0
 \end{array}\right]
- $$
+$$
 
 Eğer $u_1$ ve $u_2$'yi bu sistemin temsil ettiği iki kap gibi görsek
 (mesela), her şey $u_1$'in "içinde'' olarak başlayacaktı, sonra zaman
@@ -55,7 +55,7 @@ $$
 \left[\begin{array}{c}
 1 \\ -1
 \end{array}\right]
- $$
+$$
 
 O zaman çözüm iki çözümün toplamı olacak
 
@@ -91,7 +91,7 @@ c_2 e^{-3t} \cdot
 \left[\begin{array}{r}
 1 \\ -1
 \end{array}\right]
- $$
+$$
 
 $t=0$ anında
 
@@ -108,7 +108,7 @@ c_2
 \left[\begin{array}{c}
 1 \\ 0
 \end{array}\right] 
- $$
+$$
 
 İki tane formül, iki tane bilinmeyen var. Sonuç
 
@@ -120,7 +120,7 @@ $$ u(t) =
 \frac{1}{3} \left[\begin{array}{c} 2 \\ 1 \end{array}\right]
 +
 \frac{1}{3}  e^{-3t}  \left[\begin{array}{r} 1 \\ -1 \end{array}\right] 
- $$
+$$
 
 Denklem kararlı konuma (steady-state) gelince, yani $t \rightarrow \infty$ için,
 üstel bölüm yokolacaktır, ve baştaki terim kalacaktır. 
@@ -130,7 +130,7 @@ $$ u(\infty) =
 \left[\begin{array}{c}
 2 \\ 1
 \end{array}\right]
- $$
+$$
 
 Fakat üstteki durum, yani sabit bir istikrarlı konuma yaklaşmak her zaman
 mümkün olmayabilir. Bazen sıfıra, bazen de sonsuzluğa da yaklaşabiliriz. 
@@ -198,7 +198,7 @@ c_1 \\ c_2
 \left[\begin{array}{c}
 1 \\ 0
 \end{array}\right] 
- $$
+$$
 
 Soldaki matris, özvektör matrisi $S$. O zaman $Sc = u_0$ 
 
@@ -340,7 +340,7 @@ $$ \Lambda =
 &&.. \\
 && \lambda_n
 \end{array}\right]
- $$
+$$
 
 Bunu $e$ üzeri olarak hesaplayınca ne elde ederiz? Şunu elde ederiz:
 
@@ -350,7 +350,7 @@ e^{\lambda_1t} && \\
 &&.. \\
 && e^{\lambda_n t}
 \end{array}\right]
- $$
+$$
 
 Not: Üstteki açılım sezgisel olarak tahmin edilebilecek bir şey olsa da,
 üstel olarak bir matris olunca, beklenen her işlem yapılamayabiliyor. Mesela 
@@ -360,7 +360,7 @@ $$
 \left[\begin{array}{cc}
 a & b \\ c & d
 \end{array}\right]
- $$
+$$
 
 olsaydı o zaman her elemanı üstel olarak $e^{a}$, $e^b$ şeklinde kullanmak
 ve matris içindeki yerine yazmak ise yaramazdı. Üstel matris dünyasının
@@ -378,7 +378,7 @@ $$ u =
 \left[\begin{array}{c}
 y' \\ y
 \end{array}\right]
- $$
+$$
 
 $u$'nun türevi şöyle olur
 
@@ -387,7 +387,7 @@ u' =
 \left[\begin{array}{c}
 y'' \\ y'
 \end{array}\right]
- $$
+$$
 
 $u'$ formuna göre 2. derece denklemi şu şekilde temsil edebiliriz
 
@@ -399,7 +399,7 @@ $$
 \left[\begin{array}{c}
 y' \\ y
 \end{array}\right]
- $$
+$$
 
 Genel olarak, mesela 5. dereceden bir denklemi alıp 5x5 boyutlarında 1. 
 derece denklem sistemine geçmek te mümkündür. Bu geçiş alttaki matrisin 
@@ -414,7 +414,7 @@ $$
 && 1 && \\
 &&& 1 & 
 \end{array}\right]
- $$
+$$
 
 Alternatif Anlatım 1
 

@@ -161,7 +161,7 @@ $$
 \left[\begin{array}{r}
 0 \\ 0 \\ 1 
 \end{array}\right]
- $$
+$$
 
 Tek baz değil, dikkat. Ama bu bir baz. Vektörler bağımsız mı? Evet. Yani,
 nihayetinde üstteki vektörler $x,y,z$ eksenlerini temsil ediyorlar, ve bu
@@ -187,7 +187,7 @@ $$
 \left[\begin{array}{r}
 2 \\ 2 \\ 5 
 \end{array}\right]
- $$
+$$
 
 Tahminimiz "hayır'' değil mi? Herhalde hafiften seziyoruz ki
 $\mathbb{R}^3$'te bazı vektörler vardır ki üstteki iki vektörün kombinasyonu
@@ -210,7 +210,7 @@ $$
 \left[\begin{array}{r}
 3 \\ 4 \\ 8
 \end{array}\right]
- $$
+$$
 
 Galiba bu oldu, en azından 3. vektör diğer ikisinin toplamı değil [hoca
 burada bir hata yapmıştı, bir sonraki derste düzeltti, buraya düzeltilmiş
@@ -229,7 +229,7 @@ $$
 \left[\begin{array}{r}
 2 \\ 2 \\ 5 
 \end{array}\right]
- $$
+$$
 
 Bu iki vektör herhangi bir uzay için baz oluşturur mu? 
 
@@ -279,7 +279,7 @@ $$
 1 & 1 & 2 & 1 \\
 1 & 2 & 3 & 1
 \end{array}\right]
- $$
+$$
 
 Üstteki matrisin kolonları $A$'nin kolon uzayını kapsar mı? Evet, çünkü
 zaten kolon uzayının tanımı budur. Peki üstteki kolonlar bir baz oluşturur
@@ -291,7 +291,7 @@ $$
 \left[\begin{array}{r}
 -1 \\ -1 \\ 1 \\ 0
 \end{array}\right]
- $$
+$$
 
 vektörü sıfır sonucunu verir. Yani bağımsızlık yok, baz üstteki 4 vektör
 değil. Peki hangi vektörler üstteki matrisin kolon uzayı için bir baz?
@@ -322,7 +322,7 @@ $$
 \left[\begin{array}{r}
 7 \\ 5 \\ 7 
 \end{array}\right]
- $$
+$$
 
 1. vektörün nereden geldiği bariz, 2. vektör $A$'nin tüm kolonlarının
 toplamı. Vektörler bağımsız, ve sayı doğru, iki tane vektör. 
@@ -334,7 +334,7 @@ $$
 \left[\begin{array}{r}
 -1 \\ -1 \\ 1 \\ 0
 \end{array}\right]
- $$
+$$
 
 bu uzayı kapsamak için yeterli mi? Hayır. En azından bir tane daha vektöre
 ihtiyacım var. Üstteki vektörün son iki hücresini serbest değişken denemesi
@@ -348,7 +348,7 @@ $$
 \left[\begin{array}{r}
 -1 \\ 0 \\ 0 \\ 1
 \end{array}\right]
- $$
+$$
 
 Üstteki vektörler aynı zamanda iki özel çözüm değil mi? Çünkü farklı
 serbest değişken atamalarıyla onları elde ettim bir bakıma. Peki bu iki
