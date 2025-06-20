@@ -323,7 +323,7 @@ $$ \textrm{Kenar alanı } =
 \frac{1}{2}a_1 \sqrt{u_1^2 + h^2} + 
 \frac{1}{2}a_2 \sqrt{u_2^2 + h^2} + 
 \frac{1}{2}a_3 \sqrt{u_3^2 + h^2} 
- $$
+$$
 
 Bu 3 değişken içeren bir fonksiyon, $f(u_1,u_2,u_3)$. 
 

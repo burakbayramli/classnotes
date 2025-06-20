@@ -111,7 +111,7 @@ $$ K = A =
 &&& \\
 && -1 & 2 \\
 \end{array}\right]
- $$
+$$
 
 Özdeğerler $\lambda_j(A) = 2 - 2 \cos\theta_j$
 
@@ -128,7 +128,7 @@ $$
  & \frac{ 1}{2} & \ddots & \ddots \\
  && \ddots & 0
 \end{array}\right]
- $$
+$$
 
 Boş olan yerlerde sıfır değerleri var. 
 

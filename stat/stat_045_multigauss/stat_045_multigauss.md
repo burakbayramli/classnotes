@@ -64,7 +64,7 @@ x_2
 6\\
 8
 \end{array}\right]
- $$
+$$
 
 En üst satırda her zaman tek bir bilinmeyen olacak, çünkü matris alt üçgensel,
 en üst satır her zaman en boş satırdır. Bu tek bir eşitlik
@@ -167,7 +167,7 @@ G & H
 E^{-1} & F ^{-1}\\
 G^{-1} & H^{-1}
 \end{array}\right]  
- $$
+$$
 
 Tersini alma işlemi için bazı numaralar lazım. Ana numara bölüntülenmiş matrisi 
 köşegen bir matris haline getirmek, çünkü köşegen matrislerin tersi,
@@ -198,7 +198,7 @@ $$ M =
 E & F \\
 G & H
 \end{array}\right] 
- $$
+$$
 
 matrisini köşegen yapacağız. Eğer sadece alt sol köşeyi sıfırlayasaydık, 
 bunu yapacak özel bir matrisle soldan çarpardık,
@@ -216,7 +216,7 @@ G & H
 E & F \\
 0 & H
 \end{array}\right] 
- $$
+$$
 
 Sadece üst sağ köşeyi sıfırlamak isteseydik, sağdan çarpardık
 
@@ -234,7 +234,7 @@ I & 0 \\
 E & 0 \\
 G & H
 \end{array}\right] 
- $$
+$$
 
 Hepsini biraraya koyalım, 
 
@@ -257,7 +257,7 @@ E-FH^{-1}G & 0 \\
 0 & H
 \end{array}\right] 
 \qquad (2)
- $$
+$$
 
 Bu çarpımın doğruluğu çarpım elle yapılarak kontrol edilebilir.
 
@@ -297,7 +297,7 @@ E-FH^{-1}G & 0 \\
 0 & H
 \end{array}\right] 
 }_{W}
- $$
+$$
 
 O zaman 
 
@@ -319,7 +319,7 @@ E-FH^{-1}G & 0 \\
 I & -FH^{-1} \\
 0 & I
 \end{array}\right] 
- $$
+$$
 
 Daha kısa olması eşitliğin sağ tarafında, ortadaki matris için
 $E-FH^{-1}G$ yerine $M/H$ kullanalım (bu arada $M/H$ lineer cebirde "$M$'in
@@ -344,7 +344,7 @@ I & -FH^{-1} \\
 0 & I
 \end{array}\right] 
 \qquad (3)
- $$
+$$
 
 Eşitliğin sağ tarafındaki çarpımı gerçekleştirirsek, 
 
@@ -353,7 +353,7 @@ $$ =
 (M/H)^{-1} & -(M/H)^{-1}FH^{-1} \\
 -H^{-1}G(M/H)^{-1} & H^{-1}+H^{-1}G(M/H)^{-1}FH^{-1} 
 \end{array}\right]
- $$
+$$
 
 Bu final ifade bölüntülenmiş bir matrisin tersini o matrisin içindeki parçalar
 üzerinden temsil eden bir ifadedir. 
@@ -376,7 +376,7 @@ E & F \\
 \end{array}\right] 
 \bigg) =
 \det(E)\det(H)
- $$
+$$
 
 Ayrıca 
 
@@ -402,7 +402,7 @@ A & B \\ C & D
 \left[\begin{array}{rr}
 A^T & C^T \\ B^T & D^T
 \end{array}\right]
- $$
+$$
 
 Şimdi çok değişkenli Normal için bileşen ve koşullu yoğunluk hesaplarına
 gelelim. Gaussian formülünün $\exp$ kısmını alırsak, 

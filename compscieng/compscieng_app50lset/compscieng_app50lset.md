@@ -290,14 +290,14 @@ d(\phi(x(t),y(t),t) =
 \frac{\partial \phi}{\partial x}dx + 
 \frac{\partial \phi}{\partial y}dy + 
 \frac{\partial \phi}{\partial t}dt  = 0
- $$
+$$
 
 $$ 
 \frac{d(\phi(x(t),y(t),t))}{dt} = 
 \frac{\partial \phi}{\partial x}\frac{dx}{dt} + 
 \frac{\partial \phi}{\partial y}\frac{dy}{dt} + 
 \frac{\partial \phi}{\partial t} = 0
- $$
+$$
 
 $$
  = 
@@ -319,12 +319,12 @@ olarak temsil edilebilir, ki
 $$ \bigtriangledown \phi = \bigg(
 \frac{\partial \phi}{\partial x},
 \frac{\partial \phi}{\partial y} \bigg)
- $$
+$$
 
 $$ \vec{V} = \bigg(
 \frac{dx}{dt} ,
 \frac{dy}{dt} \bigg)
- $$
+$$
 
 İki vektörün nokta çarpımı bilindiği gibi sırayla her iki vektörün
 sırasıyla uyan elemanlarının birbirleri ile çarpılması ve o
@@ -660,7 +660,7 @@ $$
 \kappa = \frac{\displaystyle
 - \frac{F_y^2F_{xx} - 2F_{xy}F_xF_y + F_x^2F_{yy}}{F_y^3}}
 {(F_y^2 + F_x^2)^{3/2}F_y^{-3}}
- $$
+$$
 
 $F_y^{-3}$ ve $F_y^{3}$ birbirlerini iptal ederler ve sonuç:
 

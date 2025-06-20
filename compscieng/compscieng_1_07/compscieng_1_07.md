@@ -48,7 +48,7 @@ $$
 a & b \\
 b & c
 \end{array}\right]
- $$
+$$
 
 bu derste $x$'in kendisi ile çarpımını ilk kez kullanıyoruz bu arada. Bu
 form doğal olarak karesel bir sonuç ortaya çıkartacak. Biraraya koyarsak
@@ -64,7 +64,7 @@ b & c
 \left[\begin{array}{r}
 x_1 \\ x_2 
 \end{array}\right]
- $$
+$$
 
 Sonuç hangi boyutlarda çıkar?
 
@@ -105,7 +105,7 @@ $$
 1 & 2 \\
 2 & 9
 \end{array}\right]
- $$
+$$
 
 Sonuç $x_1^2 + 4x_1x_2 + 9x_2^2$ olurdu, o zaman şekil üst kesitinde daha
 eliptik bir şekilde olurdu. Üstteki matriste 2 değerinden yukarı
@@ -121,7 +121,7 @@ $$
 1 & 3 \\
 3 & 9
 \end{array}\right]
- $$
+$$
 
 Bu matrise bakalım, ikinci kolon birincisinin "katı'' olduğu için hemen
 bu matrisin eşsiz olduğunu anlıyoruz. O zaman özdeğerlerinden biri
@@ -149,7 +149,7 @@ $$
 0 \\
 0
 \end{array}\right] 
- $$
+$$
 
 Hakikaten de $x_1 = 3$ ve $x_2=-1$ kullanınca $x_1^2 + 6x_1x_2 + 9x_2^2$
 formülünün sıfır sonucunu verdiğini görürüz. Şekil aşağı yukarı şöyle:
@@ -183,7 +183,7 @@ x_1 & x_2
 x_1 \\ x_2 
 \end{array}\right] =
 x_1^2 + 10x_1x_2 + 9x_2^2
- $$
+$$
 
 Bu formülü belli bazı $x$ değerleriyle negatif yapmak mümkün. Hangi
 değerler mesela? Diyelim ki $x_1 = -1$ ve $x_2 = 1/2$. Bu formül bazı
@@ -277,7 +277,7 @@ $$ C =
 A \\
 B
 \end{array}\right]
- $$
+$$
 
 Blok matrisinin devriği nedir? 
 
@@ -286,7 +286,7 @@ C^T =
 \left[\begin{array}{rr}
 A^T & B^T
 \end{array}\right]
- $$
+$$
 
 Blok matrisleri nasıl çarparım?
 

@@ -379,7 +379,7 @@ $$ \delta I = \int_{a}^{b} \bigg(
 \frac{\partial F}{\partial \phi_x}\delta\phi_x +
 \frac{\partial F}{\partial x}\delta x 
 \bigg) \mathrm{d} x
- $$
+$$
 
 $\delta x = 0$ olduğunu bildiğimize göre bu terimi formülden
 atabiliriz. Geri kalanlar:
@@ -397,7 +397,7 @@ $$
 \frac{\partial F}{\partial \phi}\delta\phi +
 \frac{\partial F}{\partial \phi_x}\delta\phi_x 
 ) \mathrm{d} x = 0
- $$
+$$
 
 Entegraldeki ikinci terime bakalım: $\delta \phi$ formülünü $\delta
 \phi_x$ formülü içinden "çekip çıkartacağız''. Bunu niye yapıyoruz?
@@ -410,7 +410,7 @@ $\delta$ operatörünün sırabağımsız olduğunu görmüştük. O zaman
 $$ 
 \delta \phi_x = \delta \bigg( \frac{d\phi}{dx} \bigg) =
 \frac{d}{dx}(\delta \phi)
- $$
+$$
 
 $\delta \phi$'yi diferansiyel operatörünün içine attık. Şimdi parçalayarak
 entegral alma (integration by parts) tekniğini kullanarak diferansiyel
@@ -444,14 +444,14 @@ O zaman (1)'ın açılımı şöyle olacaktır:
 $$ 
 \frac{\partial F}{\partial \phi_x} \delta \phi \bigg|_a^b - 
 \int_a^b \delta \phi \cdot \mathrm{d} \bigg( \frac{\partial F}{\partial \phi_x} \bigg)
- $$
+$$
 
 Sağdaki terime $dx$'leri eklersek:
 
 $$ 
 \frac{\partial F}{\partial \phi_x} \delta \phi \bigg|_a^b - 
 \int_a^b \delta \phi \cdot \frac{d}{\mathrm{d} x} \bigg( \frac{\partial F}{\partial \phi_x} \bigg) \mathrm{d} x
- $$
+$$
 
 Görüldüğü gibi $\delta \phi$'in diferansiyelinden tamamen kurtulduk. Şimdi bu
 sonucu $\delta I$ içindeki ikinci terim yerine koyalım:
@@ -484,7 +484,7 @@ $$
 \frac{\partial F}{\partial \phi} -
 \frac{d}{dx} \bigg( \frac{\partial F}{\partial \phi_x} \bigg)
 \bigg] = 0
- $$
+$$
 
 olmalıdır. Literatürde bu şarta Euler-Lagrange şartı ismi verilmiştir. Aynı
 şekilde 
@@ -514,7 +514,7 @@ $$
 \bigg[
 \frac{d}{dx} \bigg( \frac{\partial F}{\partial y'} \bigg)
 \bigg] = 0
- $$
+$$
 
 Parantez içindeki kısmi türevi hesaplayalım
 

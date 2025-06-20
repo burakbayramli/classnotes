@@ -43,7 +43,7 @@ $$ L(x) \sim \exp{\frac{-(z_1-x)^2}{2\sigma_1^2} }
 
 $$ p(z;x,\sigma) = \frac{1}{\sigma\sqrt{2\pi}} 
 \exp \bigg\{ - \frac{(z-x)^2}{2\sigma^2}  \bigg\}
- $$
+$$
 
 Ders notları [1]'de iki üstteki formülün nasıl maksimize edilerek bir
 $x_{MLE}$ formülüne erişildiğini görebiliriz. 
@@ -292,7 +292,7 @@ $$
 \left[\begin{array}{cc}
 4 & 0 \\ 0 & 1
 \end{array}\right]
- $$
+$$
 
 Nihai ölçüm nedir? 
 

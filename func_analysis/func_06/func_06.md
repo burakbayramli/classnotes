@@ -61,7 +61,7 @@ $\lambda$ değeri için
 
 $$ 
 0 \le (x-\lambda y | x-\lambda y) 
- $$
+$$
 
 Belirlenen şartlara göre bu eşitsizlik doğru olmalı. Sadece doğru olduğunu
 bildiğimiz bir ifadeyi yazdık o kadar. Bir nevi oltayı attık, bekliyoruz. 
@@ -86,7 +86,7 @@ $$
 \le
 (x|x) - \lambda(y|x) -
 \lambda(x|y) + |\lambda|^2 (y|y)
- $$
+$$
 
 Şimdi $\lambda  = (x|y)/(y|y)$ farz ediyoruz. $\lambda$ her şey olabileceğine göre bu 
 belirlediğimiz şey de olabilir. Yerine koyunca, 
@@ -95,7 +95,7 @@ $$ \le (x|x) -
 \frac{ (x|y)(y|x)}{(y|y)} - 
 \frac{ (x|y)(x|y)}{(y|y)} + 
 \frac{ |(x|y)|^2}{|(y|y)|^2}(y|y)
- $$
+$$
 
 1. önşartı kullanarak üstteki üçüncü terimin işaretini değiştirelim
 
@@ -103,11 +103,11 @@ $$ \le (x|x) -
 \frac{ (x|y)(y|x)}{(y|y)} +
 \cancel{\frac{ (x|y)(y|x)}{(y|y)}} + 
 \cancel{\frac{ |(x|y)|^2}{|(y|y)|^{\cancel{2}}}(y|y)}
- $$
+$$
 
 $$ \le (x|x) - 
 \frac{ |(x|y)|^2}{(y|y)}
- $$
+$$
 
 Ya da 
 

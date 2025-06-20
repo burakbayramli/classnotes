@@ -77,11 +77,11 @@ $$ u = x_1^2 + x_1\sin(x_2) $$
 
 $$ 
 \frac{\partial u}{\partial x_1} = 2x_1 + \sin(x_2)
- $$
+$$
 
 $$ 
 \frac{\partial u}{\partial x_2} = x_1 \cos(x_2)
- $$
+$$
 
 Notasyon
 
@@ -151,7 +151,7 @@ x_1,\\
 .. \\
 x_n
 \end{array}\right)
- $$
+$$
 
 Bu denkleme benzer bir diğer denklem lineer cebirdeki $A\vec{x} = \vec{b}$
 denklemidir.  PDE sisteminde de cevabını aradığımız, lineer cebir
@@ -177,7 +177,7 @@ $$ \mathcal{L} = \mathcal{L} \bigg(
 \frac{\partial }{\partial x_1}, \frac{\partial }{\partial x_2},..,
 u,..
 \bigg)
- $$
+$$
 
 Yani operatör kısmi türevlere ve hatta $u$'nun kendisine de bağımlı
 olabilir. 
@@ -243,21 +243,21 @@ $$
 \left[\begin{array}{r}
 1 \\ 0 \\ 0
 \end{array}\right]
- $$
+$$
 
 $$ 
 \vec{y} = 
 \left[\begin{array}{r}
 0 \\ 1 \\ 0
 \end{array}\right]
- $$
+$$
 
 $$ 
 \vec{z} = 
 \left[\begin{array}{r}
 0 \\ 0 \\ 1
 \end{array}\right]
- $$
+$$
 
 ![](1_7.png)
 
@@ -306,7 +306,7 @@ $\phi$'ler bazdırlar,
 
 $$ \mathcal{L}u = \mathcal{L} \bigg( \sum_i \alpha_i \phi_i(x) \bigg) =
 \sum_i \alpha_i \bigg( \mathcal{L} \phi_i \bigg)
- $$
+$$
 
 $$ = -\sum_i \alpha_i \lambda_i \phi_i  $$
 
@@ -752,7 +752,7 @@ eder. PDE şu formdadır
 $$ \frac{\partial u}{\partial x} + 
 p(x,y) \frac{\partial u}{\partial y} = 0 
 \qquad (1)
- $$
+$$
 
 ve $p(x,y)$, $x,y$ değişkenlerinin bir fonksiyonudur. 
 
@@ -761,7 +761,7 @@ ve $p(x,y)$, $x,y$ değişkenlerinin bir fonksiyonudur.
 $$ 
 <\frac{\partial u}{\partial x}, \frac{\partial u}{\partial y}> \cdot 
 <1,p(x,y)> = 0
- $$
+$$
 
 Bu açıdan bakınca yukarıdaki ifade yeni bir şey söylüyor, $u$'nun
 $<1,p(x,y)>$ vektörüne göre yönsel türevinin sıfır olduğunu söylüyor, yani
@@ -796,7 +796,7 @@ ortaya çıkartır, ve ne raslantı ki (!) bu çözüm eğrilerinin her birinde
 
 $$ \frac{\partial u}{\partial x} + 
 x \frac{\partial u}{\partial y} = 0 
- $$
+$$
 
 Yani $p(x,y) = x$. O zaman 
 
@@ -846,7 +846,7 @@ PDE içinde yerine koyarak sonucu kontrol edelim
 
 $$ u_x + yu_y = 
 -f'(e^{-x}y)e^{-x}y + y f'(e^{-x}y) e^{-x} = 0
- $$
+$$
 
 Dalga Denklemi 
 
@@ -880,21 +880,21 @@ hesaplayalım, ve üstteki eşitliğin sağ tarafı şöyle olur
 $$ 
 \bigg( \frac{\partial }{\partial t} - c \frac{\partial }{\partial x} \bigg)
 \frac{\partial u}{\partial t} + c \frac{\partial u}{\partial x} 
- $$
+$$
 
 $$ = 
 \frac{\partial ^2 u}{\partial t^2} + 
 c \frac{\partial u}{\partial x \partial t} - 
 c \frac{\partial u}{\partial t \partial x} - 
 c^2\frac{\partial ^2 u}{\partial x^2} 
- $$
+$$
 
 $u_{xt} = u_{tx}$ olduğuna göre ortadaki iki terim iptal olur
 
 $$ = 
 \frac{\partial ^2 u}{\partial t^2} -
 c^2\frac{\partial ^2 u}{\partial x^2} 
- $$
+$$
 
 Açılımı ispatlamış olduk. 
 
@@ -1045,13 +1045,13 @@ $$ u(x,t) =
 \frac{1}{2c} \int_0 ^{x+ct} \psi + 
 \frac{1}{2}\phi(x-ct) -
 \frac{1}{2c} \int_0 ^{x+ct} \psi 
- $$
+$$
 
 Basitleştirirsek 
 
 $$ = \frac{1}{2}[\phi(x+ct) + \phi(x-ct)] + 
 \frac{1}{2c} \int_{x-ct} ^{x+ct} \psi (s) \mathrm{d} s
- $$
+$$
 
 Bu çözüm matematikçi d'Alembert'in 1746'da bulduğu başlangıç değer
 probleminin çözümdür. 
@@ -1196,7 +1196,7 @@ $$
 \bigg) = 
 -\frac{1}{2} \frac{x}{\sqrt{4k}} t ^{-3/2} = 
 -\frac{1}{2t} \frac{x}{\sqrt{4kt}}
- $$
+$$
 
 Yani 
 
@@ -1213,7 +1213,7 @@ Bir daha $x$'e göre kısmi türev alalım, yine Zincirleme Kanunu
 $$ Q_{xx} = \frac{\partial dQ_x}{\partial dp}
 \frac{\partial p}{\partial x} = 
 \frac{1}{\sqrt{4kt}}g''(p)\frac{1}{\sqrt{4kt}} 
- $$
+$$
 
 $$ = \frac{1}{4kt}g''(p) $$
 
@@ -1222,18 +1222,18 @@ $$ Q_t - kQ_{xx} =
 k\bigg[ 
  \frac{1}{4kt}g''(p) 
 \bigg] = 0
- $$
+$$
 
 (6)'ya göre $p = x/\sqrt{4kt}$, o zaman 
 
 $$ =
 - g'(p)\frac{1}{2t} p - \frac{1}{4t}g''(p)  = 0
- $$
+$$
 
 $$ = \frac{1}{t} \bigg[
 -p\frac{1}{2}g'(p) - \frac{1}{4}g''(p)
 \bigg] = 0
- $$
+$$
 
 Tüm çarpım sıfıra eşitse, köşeli parantez içi sıfır demektir, çünkü $0 < t$
 şartı var, $t$ sıfır olamaz, ayrıca parantez içini 4 ile çarparsak, sıfıra
@@ -1260,7 +1260,7 @@ Eğer $x>0$ ise
 $$ 1 = \lim_{t \to 0} Q = 
  c_1 \int_0^{\infty} e^{-p^2} \mathrm{d} p + c_2 = 
 c_1 \frac{\pi}{2} + c_2
- $$
+$$
 
 Eğer $x<0$ ise
 
@@ -1268,7 +1268,7 @@ $$
 0 = \lim_{t \to 0} Q = 
  c_1 \int_0^{-\infty} e^{-p^2} \mathrm{d} p + c_2 = 
 -c_1 \frac{\pi}{2} + c_2
- $$
+$$
 
 Not: $\int_0^{-\infty} e^{-p^2} \mathrm{d} p$ entegralinin niye $\pi/2$ sonucunu
 verdiğini "$e^{-x^2}$ Nasıl Entegre Edilir?'' yazısında bulabilirsiniz.
@@ -1320,7 +1320,7 @@ büyük $|y|$ değerleri için sıfıra eşit olacağını farzedelim. O zaman
 
 $$ u(x,0) = 
 \int_{-\infty}^{\infty} Q(x-y, 0) \phi'(y)\mathrm{d} y 
- $$
+$$
 
 $$ 
 = \int_{-\infty}^{\infty} \phi'(y)\mathrm{d} y = \phi \bigg|_{-\infty}^{x} = \phi(x)
@@ -1376,7 +1376,7 @@ $$
 $\vec{b}$ içinde sabitler olan bir vektör olabilir
 
 $$ \vec{b} = (b_1,...,b_n)
- $$
+$$
 
 Bu denklem 1. derece PDE'lerin özel bir durumudur bu arada. 1. derece
 PDE'ler 
@@ -1537,14 +1537,14 @@ $$
 $$
 \frac{d}{dt} \int_\Omega \rho \mathrm{d} x = 
 \int_\Omega \nabla \cdot (\rho \vec{v}) \mathrm{d} x
- $$
+$$
 
 Eşitliğin solundaki türevi alıp, sağ tarafı sola taşıyalım
 
 $$ \int_\Omega \bigg( 
 \partial_t \rho + \nabla \cdot (\rho \vec{v}) 
 \bigg)dx = 0
- $$
+$$
 
 $\Omega$ işareti $\mathbb{R}^n$ içinde herhangi bir hacim ise (iki boyutta bir
 alan, 3 boyutta hacim), bu hacimi sonsuz küçülttüğümüzde artık şu ifadenin 

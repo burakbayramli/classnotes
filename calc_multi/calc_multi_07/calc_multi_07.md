@@ -66,7 +66,7 @@ $$ A =
 2 & 0 & -1 \\
 1 & 1 & 0
 \end{array}\right]
- $$
+$$
 
 Bize matrisin tersi verilmiş ve iki öğesi boş bırakılmış
 
@@ -76,7 +76,7 @@ $$ A^{-1} = \frac{1}{2}
 -1 & -2 & 5 \\
 2 & 2 & -6
 \end{array}\right]
- $$
+$$
 
 Yani bizden beklenen tersine çevirme işlemini yapmak, ama boş bırakılan
 değerlere bakalım, bu noktada bizden kafayı çalıştırıp, sadece o noktalara
@@ -89,7 +89,7 @@ $$ A =
 x & .. & ..\\
 x & .. & ..
 \end{array}\right]
- $$
+$$
 
 çünkü devriğini alma işlemini yapınca, o elemanlar A'nın tersindeki nokta nokta
 olan yere geçmiş olacaklar.
@@ -102,7 +102,7 @@ $$ A =
 -2 & .. & ..\\
 -3 & .. & ..
 \end{array}\right]
- $$
+$$
 
 Şimdi kofaktörleri hatırlayalım (Ders 3)
 
@@ -112,7 +112,7 @@ $$
 - + - \\
 + - + 
 \end{array}
- $$
+$$
 
 O zaman
 
@@ -122,7 +122,7 @@ $$ A =
 +2 & .. & ..\\
 -3 & .. & ..
 \end{array}\right]
- $$
+$$
 
 Devriğini alalım
 
@@ -132,7 +132,7 @@ $$ A =
 .. & .. & ..\\
 .. & .. & ..
 \end{array}\right]
- $$
+$$
 
 Determinant'a bölelim. Determinantın ne olduğu verilmiş, 2, ama bu değer zaten
 $1/2$ olarak $A$'nin tersi önünde duruyor. O zaman 2 ve -3 değerlerini olduğu
@@ -144,7 +144,7 @@ $$ A^{-1} = \frac{1}{2}
 -1 & -2 & 5 \\
 2 & 2 & -6
 \end{array}\right]
- $$
+$$
 
 Örnek
 

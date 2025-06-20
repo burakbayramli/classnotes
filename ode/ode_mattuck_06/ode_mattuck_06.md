@@ -422,7 +422,7 @@ $$ \cos(\theta) \approx \cos(0) + \sin(0)(\theta - 0) +
 
 $$ \cos(\theta) = \frac{0 \cdot \theta}{1!} + \frac{-1 \cdot \theta^2}{2!} +
 \frac{-1 \cdot \theta^3}{3!} + ..
- $$
+$$
 
 $$ \cos(\theta) =
 1-\frac{\theta^2}{2!}+\frac{\theta^4}{4!}-\frac{\theta^6}{6!} + ..$$
@@ -445,7 +445,7 @@ $a = 0$ McLaurin serisi
 
 $$ \sin(\theta) = \sin(0) - \cos(0)(\theta-0) + \frac{-\sin(0)}{2!}(\theta-0)^2 +
 \frac{-\cos(0)}{3!}(\theta-0)^3 + ...
- $$
+$$
 
 $$ = 0 + \frac{1 \cdot \theta}{1!} + \frac{0 \cdot \theta^2}{2!} + \frac{-1
 \cdot \theta^3}{3!} + ...$$

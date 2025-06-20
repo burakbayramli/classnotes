@@ -213,7 +213,7 @@ Transformu nedir?
 $$ \leadsto e^{-s}\mathcal{L}((t+1)^2) = 
 e^{-s}\mathcal{L} (t^2+2t+1) =
 e^{-s}(\frac{2}{s^3} + \frac{2}{s^2} + \frac{1}{s})
- $$
+$$
 
 Bayağı kalabalık bir sonuç oldu, fakat transformunu aldığımızda elde edilen
 yukarıdaki fonksiyon da o kadar basit bir fonksiyon değil zaten; altta
@@ -272,7 +272,7 @@ f(t) =
 sin(t) & 0 \le t \le \pi \\
 sin(t) + (-sin(t)) & t \ge \pi
 \end{array} \right.
- $$
+$$
 
 Terim $-\sin(t)$, $\sin(t-\pi)$'dan geldi, çünkü $\sin$'i $\pi$ kadar yana
 kaydırırsak (altta kesik çizgili) 

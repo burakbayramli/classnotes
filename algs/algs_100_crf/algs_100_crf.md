@@ -791,7 +791,7 @@ $$
 =
 \frac{\partial}{\partial w_j} [ \sum_j w_j F_j(x,y)] -
 \frac{\partial}{\partial w_j} \log Z(x;w)
- $$
+$$
 
 Türevin eksi öncesi ilk bölümü çok basit, $w_j$ ve toplam yokolacak (tüm
 $j$'lerin toplamı yokoldu, çünkü türev "tek'' bir $j$ değeri ile

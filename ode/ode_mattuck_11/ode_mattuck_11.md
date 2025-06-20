@@ -218,7 +218,7 @@ $$ W(y_1, y_2) =
 y_1 & y_2 \\
 y_1' & y_2'
 \end{array}\right|
- $$
+$$
 
 Wronskian'ı ona geçilen iki fonksiyonu biliyorsak hesaplayabiliriz, ama
 $W$, $y_1$ ve $y_2$'nin fonksiyonu değil. Wronskian $x$'in bir fonksiyonu

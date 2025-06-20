@@ -13,7 +13,7 @@ A =
 2 & 4 & 6 & 8 \\
 3 & 6 & 8 & 10
 \end{array}\right]
- $$
+$$
 
 İlk bakışta gözüme çarpan 2. kolon 1. kolonun bir katı. Ya da 2. kolon
 1. ile "aynı yönde'', bu iki kolon "bağımsız değil''. Tabii bu bilgileri
@@ -39,7 +39,7 @@ $$
 2 & 4 & 6 & 8 \\
 3 & 6 & 8 & 10
 \end{array}\right]
- $$
+$$
 
 Pivot satırını 2 ile çarpıp 2. satırdan çıkartıyoruz. Sonra pivot satırını
 3 ile çarpıp 3. satırdan çıkartıyoruz. Sonuç
@@ -50,7 +50,7 @@ $$
 0 & 0 & 2 & 4 \\
 0 & 0 & 2 & 4
 \end{array}\right]
- $$
+$$
 
 Şimdi sonraki pivot'u arıyoruz, normal durumda bu pivot
 
@@ -60,7 +60,7 @@ $$
 0 & (0) & 2 & 4 \\
 0 & 0 & 2 & 4
 \end{array}\right]
- $$
+$$
 
 olurdu. Ama orada sıfır var, o zaman bir alttaki satıra bakıyoruz, ki
 umuyoruz ki satır değiş-tokuşu yaparak o noktaya sıfır olmayan bir değer
@@ -76,7 +76,7 @@ $$
 0 & 0 & (2) & 4 \\
 0 & 0 & 2 & 4
 \end{array}\right]
- $$
+$$
 
 Şimdi 2. satırı 3. satırdan çıkartmak yeterli. Sonuç altta. Bu matrise $U$
 diyebiliriz, gerçi tam üstüçgensel (uppertriangular) sayılmaz, çünkü sıfır
@@ -90,7 +90,7 @@ U =
 0 & 0 & (2) & 4 \\
 0 & 0 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 İki tane pivot var; ve bu iki sayısı bu matris hakkında önemli bir bulguya
 işaret ediyor, bu matrisin kertesi (rank) 2. Kerte bir matrisin pivot
@@ -128,7 +128,7 @@ $$ x =
 \\
 0
 \end{array}\right]
- $$
+$$
 
 Yani $x_2=1,x_4=0$ seçtim. Şimdi üstteki 2. formülde $x_4=0$ geriye
 koyarsam, $x_3=0$ elde ederim. $x_2=1$ ise, $x_1=-2$. Böylece tamamlanmış $x$,
@@ -140,7 +140,7 @@ $$ x =
 0\\
 0
 \end{array}\right]
- $$
+$$
 
 İşte sıfır uzayında bir vektör bu, çünkü bu $Ax=0$'in çözümlerinden biri. 
 
@@ -156,7 +156,7 @@ c \cdot
 0\\
 0
 \end{array}\right]
- $$
+$$
 
 Bu bize 4 boyutlu uzayda olan bir çizgiyi tarif ediyor. Peki sıfır
 uzayının tamamını tarif etmiş olduk mu? Hayır. Çünkü iki tane serbest
@@ -171,7 +171,7 @@ $$ x =
 \\
 1
 \end{array}\right]
- $$
+$$
 
 Yani $x_2=0,x_4=1$. Bu yeni değerleri geri koyalım; $x_3=-2$, ve 1. denklem
 bize $x_1=2$ verir. Hepsi (ve bir $d$ sabiti üzerinden),
@@ -183,7 +183,7 @@ $$ x = d \cdot
 -2\\
 1
 \end{array}\right]
- $$
+$$
 
 Terminoloji; üstte belli değerler üzerinden elde ettiğim iki çözüme "özel
 çözümler'' ismi veriyorum, çünkü kendi seçtiğim belli "özel'' değerler
@@ -207,7 +207,7 @@ $$
 0 & 0 & 2 & 4 \\
 0 & 0 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 ki bu matris basamaklı, üstüçgensel sayılabilecek bir matristir. 3. satırın
 tamamen sıfır olduğuna dikkat edelim, bu oldu çünkü orijinal matriste
@@ -229,7 +229,7 @@ $$
 0 & 0 & (2) & 4 \\
 0 & 0 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 Yeni bir sıfır elde etmiş olduk (pivotlar parantezde). Bu arada
 pivotlarda hep 1 sayısı görmek istiyorum, 2. satırı 2 ile bölebilirim, bu
@@ -241,7 +241,7 @@ $$ R =
 0 & 0 & (1) & 2 \\
 0 & 0 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 Bu formdaki bir matrise azaltılmış satır basamaklı formu (reduced row
 echelon form -rref-) adı veriliyor. Python `sympy` paketindeki
@@ -292,7 +292,7 @@ d \cdot
 \left[\begin{array}{r}
 2\\ 0\\ -2\\ 1
 \end{array}\right]
- $$
+$$
 
 Önemli nokta: üstteki serbest değişkenlerin değerleri $R$'içindeki
 değerlerin negatifi alınmış hali. Niye?
@@ -307,7 +307,7 @@ $$ R =
 I & F   \\
 0 & 0
 \end{array}\right]
- $$
+$$
 
 Üstte görülen oldukça tipik bir rref matrisidir. $I$'nin boyutları $r
 \times r$, çünkü $r$ tane pivot kolonu var, $F$'nin kolon sayısı $n-r$,
@@ -333,7 +333,7 @@ I & F
 \left[\begin{array}{l}
 x_{pivot} \\ x_{serbest} 
 \end{array}\right] = 0
- $$
+$$
 
 Açarsak, 
 
@@ -348,7 +348,7 @@ A = \left[\begin{array}{rrr}
 2 & 6 & 8 \\
 2 & 8 & 10 \\
 \end{array}\right]
- $$
+$$
 
 Çözmeye başlamadan önce hemen ilk bakışla ne gördüğümüzü söyleyelim; Kaç
 tane pivot olmasını, yani kaç tane kolonun pivot'unun olmasını
@@ -367,7 +367,7 @@ $$
 0 & 2 & 2 \\
 0 & 4 & 4 \\
 \end{array}\right]
- $$
+$$
 
 Şimdi sonraki pivot'a gidiyorum, yani (2,2) kordinatına, orada sıfır
 var. Altına gidiyorum, orada 2 var. Demek ki satır değiş-tokuşu lazım, bunu
@@ -380,7 +380,7 @@ $$
 0 & 0 & 0 \\
 0 & 4 & 4 \\
 \end{array}\right]
- $$
+$$
 
 2. tane 2. satırı 4.'den çıkartıyorum, nihayet $U$'yu elde ediyorum,
 
@@ -391,7 +391,7 @@ U = \left[\begin{array}{rrr}
 0 & 0 & 0 \\
 0 & 0 & 0 \\
 \end{array}\right]
- $$
+$$
 
 Kerte yine $r=2$. Kaç tane özel çözüm var? $3-2=1$, demek ki 1 tane serbest
 kolon var. Özel çözümü bulmak için serbest değişkene 1 değeri veririm, 
@@ -410,7 +410,7 @@ $$ x =
 -1\\
 1
 \end{array}\right]
- $$
+$$
 
 Hızlı bir doğrulama yapmak gerekirse, üstteki çözüm ne diyor? $A$'nin
 1. ve 2. kolonundan -1 tane ve 3. kolonundan 1 tane alıp toplarsam sonuç
@@ -425,7 +425,7 @@ c \cdot \left[\begin{array}{r}
 -1\\
 1
 \end{array}\right]
- $$
+$$
 
 Sınavda üstteki çözümü göstermenizi beklerim. Daha ilerideki sınavlarda
 sıfır uzayın "bazını'' soracağım, o zaman $c$ olmadan tek vektörü
@@ -442,7 +442,7 @@ R = \left[\begin{array}{rrr}
 0 & 0 & 0 \\
 0 & 0 & 0 \\
 \end{array}\right]
- $$
+$$
 
 $I$ kısmı görülüyor, sol üst köşedeki $2 \times 2$ boyutlu blok
 matris. Onun hemen yanındaki $2 \times 1$ boyutlu içinde sadece 1 olan
@@ -454,7 +454,7 @@ c \cdot \left[\begin{array}{r}
 -F \\
 I
 \end{array}\right]
- $$
+$$
 
 ki $c$'nin çarptığı matris $N$ matrisi, yani sıfır uzayı matrisidir, ki bu
 matrisin kolonları bizim özel çözümlerimiz. 

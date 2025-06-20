@@ -62,13 +62,13 @@ hesaplanacağını çok iyi biliyoruz!
 
 $$ 
 \frac{\partial I}{\partial x}, \frac{\partial I}{\partial y}
- $$
+$$
 
 Alttaki ise resim karelerinin zamana göre türevidir.
 
 $$ 
 \frac{\partial I}{\partial t}
- $$
+$$
 
 Daha derli toplu olarak göstermek gerekirse ana formül nihai olarak şöyle
 
@@ -78,7 +78,7 @@ ya da
 
 $$ 
 \nabla I \cdot <u, v> = -I_t
- $$
+$$
 
 Şimdi $u,v$'nin hesaplanmasına gelelim. Üstteki formülü bir veri noktası
 için yazmak yeterli değil. Ama bu formülü hem takip ettiğimiz, hem de onun
@@ -109,7 +109,7 @@ I_t(p_2) \\
 \vdots \\
 I_t(p_k) 
 \end{array}\right]
- $$
+$$
 
 Gradyanların belli noktalarda hesaplandığını unutmayalım, o sebeple $p_1,
 p_2$ gibi piksel noktalarını bu fonksiyonlara geçiyoruz. 

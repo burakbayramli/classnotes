@@ -86,13 +86,13 @@ D(C_1,C_2) =
 \textrm{Doğru} & \textrm{ Eğer } Dif(C_1,C_2) > MInt(C_1,C_2) \textrm{ ise } \\
 \textrm{Yanlış} & \textrm{ Diğer durumda }
 \end{array} \right.
- $$
+$$
 
 Minimum iç fark $MInt$ ise şöyle tanımlıdır,
 
 $$ 
 MInt(C_1,C_2) = \min (Int(C_1)+\tau(C_1), Int(C_2)+\tau(C_2))
- $$
+$$
 
 Eşik fonksiyonu $\tau$ üstteki irdelediğimiz fark hesaplarının belli
 derecelerde dışarıdan etkilemek için koyulmuştur. Eğer bu kullanılmasaydı

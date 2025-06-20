@@ -78,7 +78,7 @@ o zaman:
 
 $$ L(\theta) = \prod_{i=1}^N \prod_{d=1}^{D} p(x_d^i) = 
 \prod_{i=1}^N \prod_{d=1}^{D} \alpha_d^{x_d^i}(1-\alpha_d)^{1-x_d^i}
- $$
+$$
 
 $\theta$ bir dağılımı tanımlayan her türlü değişken anlamında kullanıldı, bu
 örnekte içinde sadece $\alpha$ var.
@@ -101,7 +101,7 @@ Türevi alalım:
 
 $$ \frac{dlog(L)}{d\alpha_d} = \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} -
 \frac{1-x_d^i}{1-\alpha_d} \bigg) = 0
- $$
+$$
 
 1- $\alpha_d$'ye göre türev alırken $x_d^i$'ler sabit sayı gibi muamele
 görürler. 2- log'un türevi alırken log içindeki değerlerin türev alınmış hali
@@ -121,7 +121,7 @@ Devam edelim:
 
 $$ \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} - \frac{1-x_d^i}{1-\alpha_d} \bigg) =
 \frac{N_d}{\alpha_d} - \frac{N-N_d}{1-\alpha_d} = 0
- $$
+$$
 
 $\sum_{i=1}^N x_d^i = N_d$ olarak kabul ediyoruz, $N_d$ tüm veri içinde $d$
 boyutu (kelimesi) '1' kaç tane hücre olduğunu bize söyler. $x_d^i$ ya '1' ya '0'

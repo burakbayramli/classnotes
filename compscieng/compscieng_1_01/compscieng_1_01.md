@@ -11,7 +11,7 @@ K =
 0 & -1 & 2 & -1\\
 0 & 0 & -1 & 2
 \end{array}\right]
- $$
+$$
 
 nedir? Nereden gelir? Bu matris bir şeyi temsil edecek, bilimsel bir
 problemi çözmemizi sağlayacak. 
@@ -228,7 +228,7 @@ $$ C =
 0\\
 0
 \end{array}\right]
- $$
+$$
 
 Şu olabilir
 
@@ -252,7 +252,7 @@ $$ C =
 0\\
 0
 \end{array}\right]
- $$
+$$
 
 İddia ediyorum ki böyle bir vektörün olabilmesi $C$'nin tersine çevirilebilir
 olma olasılığını yoketti. Nasıl?
@@ -400,7 +400,7 @@ $$ H =
 -1 & 2 & -1\\
 0 & -1 & 1
 \end{array}\right]
- $$
+$$
 
 $$ T = 
 \left[\begin{array}{rrr}
@@ -408,7 +408,7 @@ $$ T =
 -1 & 2 & -1\\
 0 & -1 & 2
 \end{array}\right]
- $$
+$$
 
 Kitaptaki bu sorunun çözümündeki $J$ matrisi birimsel matrisin tersidir, 
 şu şekildedir:
@@ -419,7 +419,7 @@ $$
 0 & 1 & 0\\
 1 & 0 & 0
 \end{array}\right]
- $$
+$$
 
 Yani 1 sayıları sola yatık çaprazda değil sağa yatik çaprazda. Bu matrisin
 çarpım işlemi sırasında ilginç etkileri var. Eğer sağdan çarpılırsa bir

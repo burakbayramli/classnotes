@@ -213,7 +213,7 @@ değeri şudur.
 $$ B \bigg(\frac{1}{2}, \frac{1}{2} \bigg) = 
 \frac{1}{2}\log_2 \bigg(\frac{1}{2} \bigg) 
 - \frac{1}{2}\log_2 \bigg(\frac{1}{2} \bigg) = \textrm { 1 bit }
- $$
+$$
 
 Formülü kontrol etmek için, başta verdiğimiz bit örneğini kullanalım: 2
 değişik değer için kaç bit gerekir?
@@ -251,7 +251,7 @@ $$
 \frac{4}{12}B(\frac{2}{4},\frac{2}{4}) + 
 \frac{4}{12}B(\frac{2}{4},\frac{2}{4}) 
 = 1
- $$
+$$
 
 Problemi sözel olarak biraz daha berraklaştıralım. Herhangi bir düğümde
 iken, bu düğümün bilgi değerini B() ile bulabiliriz. Lokanta örneğinin ilk
@@ -271,7 +271,7 @@ $$
 \frac{2}{12}B(0,1) +
 \frac{4}{12}B(1,0) +
 \frac{6}{12}B(\frac{2}{6}, \frac{4}{6}) = 0.459
- $$
+$$
 
 Yemek Türü Parçaları
 
@@ -280,7 +280,7 @@ $$
 \frac{2}{12}B(\frac{1}{2}, \frac{1}{2}) + 
 \frac{4}{12}B(\frac{2}{4}, \frac{2}{4}) + 
 \frac{4}{12}B(\frac{2}{4}, \frac{2}{4})  = 1
- $$
+$$
 
 Görüyoruz ki, ağacın en üst seviyesini temsil etmek için 1 bit gerekiyor
 iken, müşteri bölünmesinden sonra 0.459 bit yetiyor (daha az). Fakat yemek

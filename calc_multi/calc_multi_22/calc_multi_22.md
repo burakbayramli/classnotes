@@ -244,7 +244,7 @@ seçtik.
 
 $$ \int_{f_1(x)}^{f_2(x)} \frac{\partial M}{\partial y} \mathrm{d} y =
 M(x,f_2(x)) - M(x,f_1(x))
- $$
+$$
 
 Geri koyarsak
 

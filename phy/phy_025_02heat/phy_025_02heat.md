@@ -199,7 +199,7 @@ doğru olmalıdır. Bu teoriyi (1)'e uygularsak,
 $$ c\rho A u_t(\xi_1,t)\Delta x = 
 kA[u_x(x+\Delta x, t) - u_x(x,t)] + 
 Af(\xi_2,t)\Delta x
- $$
+$$
 
 $$ x < \xi < x+\Delta x $$
 

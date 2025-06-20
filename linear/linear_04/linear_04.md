@@ -201,7 +201,7 @@ $$ =
 -2 & 1 & 0 \\
 10 & -5 & 1
 \end{array}\right]
- $$
+$$
 
 Fakat üstteki şu 10 rakamı beni rahatsız ediyor. 
 
@@ -225,7 +225,7 @@ $$
 2 & 1 & 0 \\
 0 & 5 & 1
 \end{array}\right] = L
- $$
+$$
 
 İşte bu sağdaki matris aradığımız $L$. 
 
@@ -280,7 +280,7 @@ $$
  & 1 & \\
  && 1
 \end{array}\right]
- $$
+$$
 
 Eğer 1 ile 2'yi değiştirmek istesem? Bir tiyo: istediğim permutasyon,
 değiştirici matrisi elde etmek için, istediğim değişimi birim
@@ -293,7 +293,7 @@ $$ P_{12} =
 1 & 0 & 0 \\
 0  & 0 & 1
 \end{array}\right]
- $$
+$$
 
 $$ P_{13} = 
 \left[\begin{array}{rrr}
@@ -301,7 +301,7 @@ $$ P_{13} =
 0 & 1 & 0 \\
 1  & 0 & 0
 \end{array}\right]
- $$
+$$
 
 $$ P_{23} = 
 \left[\begin{array}{rrr}
@@ -309,7 +309,7 @@ $$ P_{23} =
 0 & 0 & 1 \\
 0  & 1 & 0
 \end{array}\right]
- $$
+$$
 
 Diğer bazı matrisler, 
 
@@ -319,7 +319,7 @@ $$
 0 & 0 & 1 \\
 1  & 1 & 0
 \end{array}\right]
- $$
+$$
 
 $$     
 \left[\begin{array}{rrr}
@@ -327,7 +327,7 @@ $$
 1 & 0 & 0 \\
 0  & 1 & 0
 \end{array}\right]
- $$             
+$$             
  
 Toplam 6 tane. Eğer bu matrislerin ikisini birbiriyle çarpsam ne olur?
 Sonuç yine üstteki liste içinde olmalıdır. Tersini alırsam, yine aynı

@@ -68,7 +68,7 @@ değişkenler olarak görmek istersek,
 $$ 
 p(x,h;W) = \frac{1}{Z}
 \prod_j \prod_k \exp (W_{jk}h_jx_k) \prod_k \exp(c_kx_k) \prod_j \exp(b_jh_j) 
- $$
+$$
 
 Notasyonu kolaylaştırmak amacıyla $b,c$ terimlerini $W$ içine absorbe
 edebiliriz, $x_0=1$ ve $h_0=1$ değerlerini mecbur tutarsak ve $w_{0,:}=c$

@@ -276,7 +276,7 @@ $$ A = \frac{1}{2} \ ab \sin\theta $$
 $$ dA = \frac{1}{2} \ b \sin\theta da + 
 \frac{1}{2} \ a \sin\theta db + 
 \frac{1}{2} \ ab \cos\theta \mathrm{d} \theta
- $$
+$$
 
 $da = 0$ ise, ilk terim yokolur. 
 

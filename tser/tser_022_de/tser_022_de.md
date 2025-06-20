@@ -39,7 +39,7 @@ veri nokta sayısı $n$ işe formül,
 
 $$ 
 F = \frac{SSE_r - (SSE_1 + SSE_2) / k}{(SSE_1 + SSE_2) / (n-2k)}
- $$
+$$
 
 ki $SSE_1,SSE_2$ sırasıyla 1. ve 2. bölgedeki hataların kare toplamıdır, $SSE_u
 = SSE_1 + SSE_2$, yani bölgelerin ayrı ayrı hesaplanan hata kare toplamının

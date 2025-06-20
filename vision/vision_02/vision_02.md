@@ -78,7 +78,7 @@ $$
 \left[\begin{array}{rr}
 0 & 2 \\ -2 & 0
 \end{array}\right]
- $$
+$$
 
 Bu matrisin devriği ve negatifi aynıdır. Eksi bakışımlı matrislerin
 köşegeni sıfır olmalıdır. Bu tür matrislerin ilginç bazı özellikleri var,
@@ -121,7 +121,7 @@ $$
 u_3 & 0 & -u_1 \\
 -u_2 & u_1 & 0
 \end{array}\right] \in \mathbb{R}^{3 \times 3}
- $$
+$$
 
 Bu tür matrislerin kertesinin çift sayı olması şarttır.
 

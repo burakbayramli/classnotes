@@ -388,7 +388,7 @@ c_1 \bigg[
 c_2 \bigg[
 \frac{d^nf_2}{dx^n} + a_1 \frac{d^{n-1}f_2}{dx^{n-1}} + .. + a_n f_2
 \bigg]
- $$
+$$
 
 Büyük parantezler içindeki değerler diferansiyel denklemin $f_1$ ve $f_2$
 kullanılarak açılmış hali değil mi? O zaman o değerler sıfır. Yani

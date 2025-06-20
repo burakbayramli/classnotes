@@ -238,7 +238,7 @@ N = \left[\begin{array}{rrr}
 \hat{n}_z & 0 & -\hat{n}_x \\
 -\hat{n}_y & \hat{n}_z & 0
 \end{array}\right]
- $$
+$$
 
 Eğer $v_\perp$'u tekrar saat yönü tersinde 90 derece döndürmek istesek,
 tekrar aynı çarpımı yapardık,

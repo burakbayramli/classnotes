@@ -395,13 +395,13 @@ Bu bir azaltma formülü haline geldi, yani her transform bir öncekinin bir
 eksiltilmiş hali. 
 
 $$ \mathcal{L} (t^n) = \frac{n}{s} \mathcal{L} (t^{n-1}) 
- $$
+$$
 
 Bir sonrakine bakarsak, ve bu zinciri sonuna kadar devam ettirirsek
 
 $$ \frac{n}{s} \mathcal{L} (t^{n-1}) = ... = 
 \frac{n(n-1)...1 }{s^n}\mathcal{L}(t^0)
- $$
+$$
 
 $$ = \frac{n!}{s^{n+1}} $$
 

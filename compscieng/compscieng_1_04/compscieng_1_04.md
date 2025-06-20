@@ -63,7 +63,7 @@ $$ C =
 0 & x \le 0 \\
 x^3 / 6 & x \ge 0
 \end{array} \right.
- $$
+$$
 
 Şimdi tersten düşünelim, bir spline $C$'nin üç kere türevini alsak, sıfır
 noktasında hangi değer geri gelir? $C'''(0) = 1$ değeridir, sıfırdan önce
@@ -204,7 +204,7 @@ u_3\\
 u_4\\
 u_5
 \end{array}\right]
- $$
+$$
 
 Eşitliğin sağ tarafındaki vektör içinde ikinci hücrede 1 değeri var. O
 bizim daha önce $\delta(x-a)$ ile belirttiğimiz noktasal ağırlık. $K$'nin
@@ -220,7 +220,7 @@ u(x) =
 1-a & x \le a \\
 1-x & x \ge a 
 \end{array} \right.
- $$
+$$
 
 Sonuç ayrıksal olarak şu şekilde çizilebilir:
 

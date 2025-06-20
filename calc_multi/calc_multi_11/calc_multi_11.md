@@ -34,7 +34,7 @@ $$ dx = \cos y \mathrm{d} y $$
 
 $$ 
 \frac{dy}{dx} = \frac{1}{\cos y} = \frac{1}{\sqrt{1-x^2}}
- $$
+$$
 
 Eşitliğin sağ tarafını nasıl elde ettik? Hatırlayalım
 

@@ -40,7 +40,7 @@ Ay_1 & Ay_2 & ... & Ay_n \\
 \lambda_1y_1 & \lambda_2y_2 & ... & \lambda_ny_n \\
 &&& 
 \end{array}\right]
- $$
+$$
 
 $\lambda$'ları dışarı çekebiliriz. 
 
@@ -55,7 +55,7 @@ y_1 & y_2 & ... & y_n \\
 & .. && \\
 &&& \lambda_n \\
 \end{array}\right]
- $$
+$$
 
 $\lambda$ matrisinde $\lambda$ olmayan yerler sıfır değerini
 taşıyor. Özvektör matrisini $S$ olarak, çaprazında özdeğerleri taşıyan
@@ -186,7 +186,7 @@ $$
 \cos \theta & -\sin \theta \\
 \sin \theta & \cos \theta \\
 \end{array}\right]
- $$
+$$
 
 İlk kolona bakalım, uzunluğu hakikaten 1, çünkü $\cos \theta ^2 + \sin \theta
 ^2 = 1$. Diğer kolon da ona dik, 1. kolon ile çarpılınca sonuç sıfır olacak. 
@@ -224,7 +224,7 @@ K =
 &&&& \\
 &&&& 
 \end{array}\right]
- $$
+$$
 
 Bu matris ikinci farklılıkları ayrıksal olarak temsil etmek için
 kullanılmıştı, esnek çubuğu temsil ettiği zaman sabit / sabit problemini
@@ -297,7 +297,7 @@ y_1 =
 \sin \frac{3\pi}{5} \\
 \sin \frac{4\pi}{5} 
 \end{array}\right]
- $$
+$$
 
 ![](6_2.png)
 
@@ -311,7 +311,7 @@ sin \frac{4\pi}{5} \\
 sin \frac{6\pi}{5} \\
 sin \frac{8\pi}{5} 
 \end{array}\right]
- $$
+$$
 
 ![](6_3.png)
 

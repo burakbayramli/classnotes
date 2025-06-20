@@ -231,7 +231,7 @@ arasındaki $h$ değerlerini problem kesin olarak veriyor.
 
 $$ 
 \frac{\Delta h}{\Delta y} = -\frac{100}{300}
- $$
+$$
 
 $$ = -\frac{1}{3} $$
 
@@ -239,7 +239,7 @@ Yani
 
 $$ 
 \frac{\partial h}{\partial y} \approx -\frac{1}{3}
- $$
+$$
 
 
 

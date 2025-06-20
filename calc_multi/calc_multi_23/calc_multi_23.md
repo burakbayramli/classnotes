@@ -258,7 +258,7 @@ $$ \mathrm{div} \vec{F}  =
 \frac{\partial }{\partial x}(x) + 
 \frac{\partial }{\partial y}(y) = 
 1 + 1 = 2 
- $$
+$$
 
 $$
 \oint_C \vec{F} \hat{n} \mathrm{d} s = 

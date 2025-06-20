@@ -322,7 +322,7 @@ O zaman alan
 
 $$ \approx
 \frac{1}{2} |\vec{r} \times \vec{v}| \Delta t
- $$
+$$
 
 Peki bu alanın zamana sabit oranda olması ne demektir? Alanın $\Delta t$'ye
 oranlı olması demektir, bu da üstteki formülde $|\vec{r} \times \vec{v}|$
@@ -563,7 +563,7 @@ $$
 \frac{d}{dt}\vec{r} \cdot \vec{r} =  
 \frac{d\vec{r}}{dt} \cdot \vec{r} +
 \vec{r} \cdot \frac{d\vec{r}}{dt} = 0
- $$
+$$
 
 Sağ taraf sıfır çünkü sabit $a^2$'nin türevi sıfır. Buradaki önemli gözlem
 şudur, eşitliğin sağ tarafı "$t$'ye bağlı olmayan, sabit bir değerdir'', bunu
@@ -596,7 +596,7 @@ Türevi alınca
 
 $$ 
 \frac{d}{dt}\vec{r} \cdot \vec{r} = 0 
- $$
+$$
 
 Sağ taraf sıfır oldu çünkü orada bir sabit vardı. Diğer taraftan, eğer
 diklik olduğunu biliyorsak şu doğru olmalı
@@ -614,7 +614,7 @@ $$
 $$ 
 2 \frac{d\vec{r}}{dt} \cdot \vec{r} =
 \frac{d}{dt}(\vec{r} \cdot \vec{r})   
- $$
+$$
 
 Bu denklemin sol tarafı iki üstteki formülün sol tarafına benziyor, o zaman
 
@@ -836,7 +836,7 @@ $$ \vec{v} = -4\sin(t)\hat{i} + 4\cos(t)\hat{j} + 3\hat{k} $$
 
 $$ |v| = \sqrt{16\sin^2t + 16\cos^2t  + 9} = 
 \sqrt{16(\sin^2t + \cos^2t) + 9} = 
- $$
+$$
 
 $$ = \sqrt{16(1) + 9} = \sqrt{25} = 5 $$
 

@@ -142,7 +142,7 @@ f & f & 0 \\
 0 & 1 & 0 & 0\\
 0 & 0 & 1 & 0
 \end{array}\right]
- $$
+$$
 
 $\Pi_0$'ya standart yansıtma matrisi (standard projection matrix) ismi
 veriliyor. Bu niye faydalı? Çünkü $\Pi_0$ her durumda aynı, genel (generic) bir
@@ -249,7 +249,7 @@ f & f & 0 \\
 \left[\begin{array}{r}
 X \\ Y \\ Z \\ 1
 \end{array}\right]
- $$
+$$
 
 Elimizde pek çok transformasyon matrisi var artık. Peki bu matrislerden hangisi
 kameranın içsel yapısıyla alakalıdır acaba? Yani marka ABC satın alıyorum, ya da

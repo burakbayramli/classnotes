@@ -64,7 +64,7 @@ $$ E \bigg[
 \big( (A^TA)^{-1}A^T \epsilon \big)
 \big( (A^TA)^{-1}A^T \epsilon \big)^T
 \bigg]
- $$
+$$
 
 Beklenti içini açalım, 
 

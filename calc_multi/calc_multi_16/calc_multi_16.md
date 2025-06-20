@@ -140,7 +140,7 @@ değerine bağlı.
 $$
 \int_0^1 (\frac{2}{3} - x^2) \mathrm{d} x
 = \bigg[ \frac{2}{3}x - \frac{1}{3}x^3 \bigg]_0^1 = \frac{1}{3}
- $$
+$$
 
 Sonucu bulduk. 
 

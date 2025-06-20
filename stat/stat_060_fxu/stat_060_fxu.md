@@ -282,7 +282,7 @@ O zaman,
 
 $$ 
  \cos(2 \pi y)^2 = \frac{1}{2} + \frac{1}{2}\cos(4 \pi y)
- $$
+$$
 
 Entegrale geri koyalım,
 

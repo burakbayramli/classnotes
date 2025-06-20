@@ -443,7 +443,7 @@ O zaman bu sistemin süreklilik limiti, $\Delta x \to 0$ iken
 $$ 
 \frac{\partial ^2Y}{\partial x^2} = 
 \frac{\tau}{\rho}\frac{\partial ^2y}{\partial x^2}
- $$
+$$
 
 olacaktır. Bu denklem fizikte iyi bilinen dalga denklemidir. İnsanlar
 çoğunlukla 
@@ -562,7 +562,7 @@ x & y
 \eta_x & \eta_y
 \end{array}\right| =
 \xi_x \eta_y - \xi_y \eta_x \ne 0
- $$
+$$
 
 Üstteki ifade Calculus'un Dolaylı Fonksiyon Teorisi (Implicit Function
 Theorem of Calculus) ile alakalı. Bu teorinin yerel bağlamda niye birebir
@@ -595,11 +595,11 @@ sebep verebilir, ama bu en azından mümkün bir stratejidir.
 $$ \frac{\partial }{\partial x}u \equiv
 \frac{\partial }{\partial x}W(\xi(x,y),\eta(x,y)) =
 W_\xi\eta_x + W_\eta\eta_x 
- $$
+$$
 
 $$ \frac{\partial }{\partial y}u =
 W_\xi\eta_y + W_\eta\eta_y
- $$
+$$
 
 Bunu orijinal denkleme sokalım 
 
@@ -607,7 +607,7 @@ $$
 a(\xi,\eta) \bigg[W_\xi \eta_x + W_\eta\eta_x \bigg] +
 b(\xi,\eta) \bigg[W_\xi \eta_y + W_\eta\eta_y  \bigg] + 
 c(\xi,\eta)W = f(\xi,\eta)
- $$
+$$
 
 Tekrar düzenleyelim
 
@@ -615,7 +615,7 @@ $$ =
 \bigg[ a\xi_x + b\xi_y \bigg] W_\xi + 
 \bigg[ a\eta_x + b\eta_y \bigg] W_\eta +
 cW = f
- $$
+$$
 
 Şöyle seç
 

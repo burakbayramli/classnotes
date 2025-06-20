@@ -128,13 +128,13 @@ $$ \frac{1}{h}
 \bigg(\frac{u_{i+1}-u_{i}}{h}\bigg) -
 \bigg(\frac{u_{i}-u_{i-1}}{h}\bigg) 
 \bigg]
- $$
+$$
 
 $$ = \frac{1}{h} 
 \bigg[
 \frac{u_{i+1} - 2u_{i}+u_{i-1}}{h}
 \bigg]
- $$
+$$
 
 $$ = \frac{u_{i+1} - 2u_{i}+u_{i-1}}{h^2} $$
 
@@ -195,7 +195,7 @@ u_{i+1}-u_{i-1} \\
 u_{i+2}-u_i \\
 \vdots
 \end{array}\right]
- $$
+$$
 
 Soldaki matris $\left[\begin{array}{ccc} -1 & 0 & 1\end{array}\right]$
 yerine ikinci farklılıklar için
@@ -221,7 +221,7 @@ u_5
 1 \\
 1 
 \end{array}\right]
- $$
+$$
 
 Bu $KU = F$ denkleminin matris formudur. Diferansiyel denklem çözmek demek
 $u$ fonksiyonunu bulmak demektir, o zaman yukarıdaki bilinmeyen
@@ -339,7 +339,7 @@ u_5
 1 \\
 1 
 \end{array}\right]
- $$
+$$
 
 
 Soru: ayrıksal çözüm gerçek çözüme ne kadar yakın? Cevap hata payı $O(h)$
@@ -374,7 +374,7 @@ u_3
 1 \\
 1 
 \end{array}\right]
- $$
+$$
 
 Bu problem işte $O(h)$ hatasını azaltma konusunu işliyor, bunun için ortalama
 farklılık (centered difference) kullanılacak, $(u_1 - u_o)/h$ yerine 0'inci
@@ -427,7 +427,7 @@ u_3
 1 \\
 1 
 \end{array}\right]
- $$
+$$
 
 Matris boyutlarının nasıl büyüdüğüne, ve $u_0$'in dahil edilmesine dikkat
 edelim. Problemin başındaki matris 3x3 boyutundaydı, bu 4x4 boyutunda,

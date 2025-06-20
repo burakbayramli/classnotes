@@ -464,7 +464,7 @@ $$
 \overline{b_{j,k}} = 
 \frac{\textrm{j konumunda olup } v_k \textrm{ sembolunu görmüş olmanın beklentisi}}
 {j \textrm{ konumunda olmanın beklentisi} }
- $$
+$$
 
 $$ = \frac{\sum_{t=1}^{T-1} \gamma_t(j) 1(V_t=k) }{\sum_{t=1}^{T-1}\gamma_t(j) } 
 \qquad (5)

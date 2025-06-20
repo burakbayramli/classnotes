@@ -270,7 +270,7 @@ Bu modelin tamamının olurluğu nedir?
 $$ L(\theta, \lambda, k | y) = \frac{1}{112} \times \displaystyle \prod_{i=1}^k
 \frac{e^{-\theta}\theta^{y_i}}{y_i!}  \times \displaystyle \prod_{i=k+1}^n
 \frac{e^{-\lambda}\lambda^{y_i}}{y_i!} 
- $$
+$$
 
 Sonsal geçişini yapınca yukarıda olduğu gibi Gamma dağılımlarını elde
 ederiz:
@@ -278,7 +278,7 @@ ederiz:
 $$ L(\theta, \lambda, k | y)  \propto 
 \theta^{a_1-1+\sum_{i=1}^{k} y_i}e^{-(b_1+k)\theta} 
 \lambda^{a_2-1+\sum_{i=k+1}^n y_i}e^{-(b_2+n-k)\lambda} 
- $$
+$$
 
 $\frac{1}{112}$'yi bir sabit olduğu için formülden attık, bu durum orantılı hali
 etkilemiyor. Üstteki formül içindeki Gamma dağılımlarını görebiliyoruz, hemen
@@ -287,7 +287,7 @@ yerlerine koyalım:
 $$ L(\theta, \lambda, k | y)  \propto 
 Gamma(a_1 + \sum_{i=1}^{k} y_i, b_1+k) \
 Gamma(a_2 + \sum_{i=k+1}^{n} y_i, b_2+n-k)
- $$
+$$
 
 Gibbs örneklemeye gelelim. Bu örneklemeye göre şartsal dağılım (conditional
 distribution) formülü bulunmaya uğraşılır, hangi değişkenlerin verili olduğuna
@@ -306,14 +306,14 @@ $$ \lambda | Y_1,..,Y_n,k \sim Gamma(a_2 + \sum_{i=k+1}^{n} y_i, b_2+n-k) $$
 $$ 
 p(k | Y_1,..,Y_n) \propto \theta^{\sum_{i=1}^{k} y_i}e^{-k\theta} 
 \lambda^{\sum_{i=k+1}^n y_i}e^{k\lambda} 
- $$
+$$
 
 En son formülde içinde k olan terimleri tuttuk, gerisini attık. Formül $e$
 terimleri birleştirilerek biraz daha basitleştirilebilir:
 
 $$ p(k | Y_1,..,Y_n) \propto
 \theta^{\sum_{i=1}^{k} y_i} \lambda^{\sum_{i=k+1}^n y_i}e^{(\lambda-\theta)k} 
- $$
+$$
 
 Bir basitleştirme daha şöyle olabilir
 
@@ -329,7 +329,7 @@ $$ = \frac{\lambda^{\sum_{i=1}^n y_i}}{\lambda ^{K}} $$
 
 $$ p(k | Y_1,..,Y_n) \propto 
 \theta^{K} \frac{\lambda^{\sum_{i=1}^n y_i}}{\lambda ^{K}} e^{(\lambda-\theta)k} 
- $$
+$$
 
 $$ = \bigg(\frac{\theta}{\lambda}\bigg)^{K} \lambda^{\sum_{i=1}^n  y_i} e^{(\lambda-\theta)k} $$
 

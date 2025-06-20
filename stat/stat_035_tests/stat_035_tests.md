@@ -302,7 +302,7 @@ $$ w = \frac{k}{n} +
 \frac{k}{n} -
 1.96 \sqrt{\frac{(k/n)(1-k/n)}{n}}
 \bigg]
- $$
+$$
 
 $$ = 3.92 \sqrt{\frac{(k/n)(1-k/n)}{n}} $$
 

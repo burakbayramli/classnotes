@@ -82,7 +82,7 @@ u_1 & u_2 & u_3
 0 & 1 & 0\\
 0 & 0 & 1
 \end{array}\right]
- $$
+$$
 
 Bu probleme bakmanın değişik bir yolu: sağ taraftaki birim matrisi içindeki
 [1 0 0] gibi değerler içindeki 1 değerlerini birer zıplama (impulse) anı

@@ -26,7 +26,7 @@ se(3) \equiv \bigg\{
 \hat{w} \in so(3), v \in \mathbb{R}^3 
 \bigg\}
 \subset \mathbb{R}^{4 \times 4}
- $$
+$$
 
 Üstteki uzay Lie grubu SE(3)'e teğet idi.
 
@@ -43,7 +43,7 @@ v \\ w
 \left[\begin{array}{cc}
 \hat{w} & v \\ 0 & 0
 \end{array}\right]  \in \mathbb{R}^{4 \times 4}
- $$
+$$
 
 Hesaplanacak 6 derece serbestlik üstteki $v,w$ vektörlerinin
 içeriklerinden oluşuyor. $\land$ uygulanan fırıldak vektörü, onun sonucu
@@ -56,7 +56,7 @@ $$
 \left[\begin{array}{c}
 v \\ w
 \end{array}\right] \in \mathbb{R}^6
- $$
+$$
 
 Diferansiyel denklem sistemi
 
@@ -69,7 +69,7 @@ Bu sistemin çözümü
 
 $$ 
 g(t) = e^{\hat{\xi} t} = \sum_{n=0}^{\infty} \frac{(\hat{\xi} t)^n}{n!}
- $$
+$$
 
 Ve daha önce kendimize sorduğumuz aynı soruya tekrar geldik, acaba
 $\hat{\xi}$'nin katlarını kodlama sırasında hesaplamamız gerekecek mi?
@@ -122,7 +122,7 @@ $$ g(t) =
 \left[\begin{array}{rrr}
 R(t) & T(t) \\ 0 & 1
 \end{array}\right] \in SE(3)
- $$
+$$
 
 ile yapabiliyoruz. $t=0$ anında kamera çerçevesi / ekseni / görüntüsü
 (frame) ile dünya görüntü birbirine eşit, yani $g(0) = I$. Dünyadaki

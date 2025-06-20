@@ -332,7 +332,7 @@ Başta verilen örnek için $dy/dx$' i bulun.
 $$ \frac{ dy}{dx} = \frac{ 3}{2}, \
 \frac{dy}{du} = \frac{ 1}{2}, \
 \frac{ du}{dx} = 3
- $$
+$$
 
 $$ \frac{ dy}{dx} = \frac{ dy}{du} \cdot \frac{ du}{dx} $$
 
@@ -421,7 +421,7 @@ g(z) = \left\{ \begin{array}{ll}
 \frac{\sin z}{z} & z \ne 0 \\
 1 & z = 0
 \end{array} \right.
- $$
+$$
 
 Bu fonksiyonun $z=0$ noktasında artık türevi alınabilir. Kontrol edelim, 
 

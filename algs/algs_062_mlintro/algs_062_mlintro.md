@@ -134,26 +134,26 @@ $$
       0 \\
       0 
     \end{array} \right]
- $$
+$$
 
 $$ 
   \bigtriangledown_{\theta}\left( \frac{1}{2N}||\mathbf{y} -
   \mathbf{X}\theta||^2\right) = 0 
- $$
+$$
 
 $$ 
   \frac{1}{2N}  \bigtriangledown_{\theta} \left(
   \left(\mathbf{y} -  \mathbf{X}\theta \right) ^T
   \left( \mathbf{y} -  \mathbf{X}\theta \right)
   \right) = 0 
- $$
+$$
 
 $$ 
   \frac{1}{2N}  \bigtriangledown_{\theta} \left(
   \left(\mathbf{y}^T -  \left(\mathbf{X}\theta\right)^T \right)
   \left( \mathbf{y} -  \mathbf{X}\theta \right)
   \right) = 0 
- $$
+$$
 
 $$ 
   \frac{1}{2N}  \bigtriangledown_{\theta} \left(
@@ -162,7 +162,7 @@ $$
   \left( \mathbf{X}\theta \right)^T\mathbf{y} +
   \theta^T\mathbf{X}^T\mathbf{X}\theta
   \right) = 0 
- $$
+$$
 
 İkinci ve üçüncü terimler aslında birbirine eşittir, çünkü vektör
 çarpım kurallarına göre, $\mathbf{u}^T \mathbf{v} = \mathbf{v}^T \mathbf{u}$.
@@ -173,29 +173,29 @@ $$
   \mathbf{y}^T\mathbf{X}\theta +
   \theta^T\mathbf{X}^T\mathbf{X}\theta
   \right) = 0
- $$
+$$
 
 $$ 
   \frac{1}{2N} \left(
   -2\mathbf{y}^T\mathbf{X}
   +2\theta\mathbf{X}^T\mathbf{X} \right) = 0
- $$
+$$
 
 $$ 
   \frac{1}{N} \left(
   -\mathbf{y}^T\mathbf{X}
   +\theta\mathbf{X}^T\mathbf{X} \right) = 0
- $$
+$$
 
 $$ 
   \theta\mathbf{X}^T\mathbf{X} =
   \mathbf{y}^T\mathbf{X} 
- $$
+$$
 
 $$ 
   \theta = \left(\mathbf{X}^T\mathbf{X}\right)^{-1}
   \mathbf{y}^T\mathbf{X}
- $$
+$$
 
 $\theta$ hesaplandıktan sonra, artık bu değeri $f(x;\theta)$ içine
 koyabilir ve gelecekte bilinmeyen verileri tahmin için
@@ -233,7 +233,7 @@ $$
       \theta_{D} 
   \end{array} \right]
   \right|^2 
- $$
+$$
 
 Yeni risk hesabı, N veri değeri ve D boyutu için kullanılabilir. $\theta$
 hesabını ise gene aynen (7) denklemi üzerinden gerçekleştirebiliriz. Bu

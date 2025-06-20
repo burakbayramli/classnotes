@@ -33,7 +33,7 @@ $$
 3 & 8 & 1 \\
 0 & 4 & 1
 \end{array}\right]
- $$
+$$
 
 Artık tüm işlemleri bu matris üzerinde yapabiliriz. İlk baştaki eşitlikler,
 artı, vs gibi semboller içeren sembollere bakmıyoruz bile. Eliminasyonun
@@ -109,7 +109,7 @@ $$
 0 & 2 & -2 \\
 0 & 0 & 5
 \end{array}\right]
- $$
+$$
 
 Bu matrise $U$ adını vereceğim, bu harfi kullandım çünkü üstteki matris bir
 "üst-üçgensel (uppertriangular)'' matris. Eliminasyonun tüm amacı bu
@@ -145,7 +145,7 @@ $$
 3 & 8 & 1 \\
 0 & 4 & -4
 \end{array}\right]
- $$
+$$
 
 eliminasyon yapa yapa sona gelirdik, ve çıkarma işleminden sonra $-4$
 sıfır olurdu. 
@@ -173,7 +173,7 @@ $$
 3 & 8 & 1 & 12 \\
 0 & 4 & 1 & 2
 \end{array}\right]
- $$
+$$
 
 Bu bize eklemlenmiş (augmented) yeni bir matris verir. Böylece $A$
 üzerinde yaptığım her işlemi otomatik olarak $b$ üzerinde yapmam
@@ -193,7 +193,7 @@ $$
  6\\
  -10 
 \end{array}\right]}_{c}
- $$
+$$
 
 Burada $b$'nin dönüştüğü şeyi $c$ olarak belirttim. Yani $A$, $U$ oldu,
 $b$ $c$ oldu. Geriye koyma işlemini yapalım şimdi, ondan önce üstteki
@@ -277,7 +277,7 @@ $$
     0 & 2 & -2 \\
     0 & 4 & 1
   \end{array}\right]
- $$
+$$
 
 soldaki boş matris ne olmalı ki eşitliğin sağ tarafı doğru olsun ?
 
@@ -303,7 +303,7 @@ $$
     0 & 2 & -2 \\
     0 & 4 & 1
   \end{array}\right]
- $$
+$$
 
 Boş matrisin son satır nedir? Benzer mantık, bu sefer 1. ve 2. satırdan
 sıfır tane, 3. satırdan bir tane
@@ -325,7 +325,7 @@ $$
     0 & 2 & -2 \\
     0 & 4 & 1
   \end{array}\right]
- $$
+$$
 
 İlginç bir durum oldu, üstteki boş matris birim matrise (identity matrix)
 benzemeye başladı, aslında hiçbir değişiklik yapmak istemeseydim, orta
@@ -358,7 +358,7 @@ $$
     0 & 2 & -2 \\
     0 & 4 & 1
   \end{array}\right]
- $$
+$$
 
 Kontrol edelim; mesela eşitliğin sağındaki -2, eşitliğin solundaki
 1. matrisin 2. satırı ile 2. matrisin 3. kolonunun noktasal çarpımıdır, ve
@@ -394,7 +394,7 @@ $$
 0 & 2 & -2 \\
 0 & 0 & 5
 \end{array}\right]
- $$
+$$
 
 Bu adım için 2. satırı iki ile çarpıp 3. satırdan çıkartmıştık. Değişen
 sadece 3. satır olduğuna göre 1. ve 2. satır birim matrisin öğeleri olacak,
@@ -419,7 +419,7 @@ $$
 0 & 2 & -2 \\
 0 & 0 & 5
 \end{array}\right]
- $$
+$$
 
 Eliminasyonunu tamamı için üstteki parçaları biraraya koymak
 lazım. $A$'yi soldan önce $E_{21}$ ile, o sonucu da $E_{32}$ ile
@@ -469,7 +469,7 @@ c & d
 c & d \\
 a & b 
 \end{array}\right]
- $$
+$$
 
 Düşünelim, 1. satır için mesela, eğer 1. satırdan 0 tane, 2. satırdan
 sadece bir tane alırsam ve sonucu birbiri ile "toplarsam'', 
@@ -488,7 +488,7 @@ c & d
 c & d \\
  & 
 \end{array}\right]
- $$
+$$
 
 sonucunu elde etmez miyim? Evet. Geri kalanı da şöyle,
 
@@ -506,7 +506,7 @@ c & d
 c & d \\
 a & b
 \end{array}\right]
- $$
+$$
 
 Burada 1. satırdan bir tane ikincidan sıfır tane almış oldum.
 
@@ -540,7 +540,7 @@ c & d
 b & a \\
 d & c
 \end{array}\right]
- $$
+$$
 
 Yine aynı şekilde, 1. kolon için soldaki 1. kolondan sıfır tane,
 2. kolondan bir tane lazımdır, 
@@ -559,7 +559,7 @@ c & d
 b &  \\
 d & 
 \end{array}\right]
- $$
+$$
 
 Değil mi? Tamamlarsak,
 
@@ -577,7 +577,7 @@ c & d
 b & a \\
 d & c
 \end{array}\right]
- $$
+$$
 
 Bu da birim matrisin *kolonlarının* yer değiştirmiş halidir. 
 

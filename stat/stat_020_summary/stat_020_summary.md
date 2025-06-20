@@ -33,7 +33,7 @@ $$ \lim_{n \to \infty} P(|\bar{X} - \mu| \le \epsilon) = 1$$
 
 ya da
 
- $$ \lim_{n \to \infty} P(|\bar{X}_n-\mu| > \epsilon) = 0 $$
+$$ \lim_{n \to \infty} P(|\bar{X}_n-\mu| > \epsilon) = 0 $$
 
 ya da 
 
@@ -122,7 +122,7 @@ $$
 Artık Çebişev kuramını kullanmaya hazırız. Ispatlamaya calistigimiz neydi?
 $n \rightarrow \infty$ iken,
 
- $$ P(|\bar{X}_n-\mu| > \epsilon) \rightarrow 0 $$
+$$ P(|\bar{X}_n-\mu| > \epsilon) \rightarrow 0 $$
 
 Çebişev'den
 

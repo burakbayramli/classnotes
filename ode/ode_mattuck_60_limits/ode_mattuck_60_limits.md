@@ -283,7 +283,7 @@ $$
 \frac{f(x)}{g(x)} \stackrel{\approx}{\epsilon}
 \frac{f(x)-f(a)}{g(x)-g(a)} \stackrel{\approx}{\epsilon}
 L
- $$
+$$
 
 Ortadaki ifade (1)'e benziyor. Şimdi ilk yaklaşıksallık için 
 

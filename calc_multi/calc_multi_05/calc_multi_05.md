@@ -447,7 +447,7 @@ lazım.
 
 $$ \frac{dF}{dt} = \frac{\partial F}{\partial x}\frac{\mathrm{d} x(t)}{\mathrm{d} t} +
 \frac{\partial F}{\partial y}\frac{\mathrm{d} y(t)}{\mathrm{d} t} 
- $$
+$$
 
 Ayrıca
 
@@ -466,7 +466,7 @@ anlayalım ki üstteki ifade içinde mesela birinci terim de aslında bir
 fonksiyon, ve asıl hali
 
 $$ \frac{\mathrm{d} F}{\mathrm{d} t} = \frac{\partial F(x(t),y(t))}{\partial x}\Delta x + ...
- $$
+$$
 
 şeklinde. O zaman, bu terim üzerinde tam diferansiyel işlemini bir daha
 uyguladığımızda, Zincirleme Kanunu yine işleyecek, mesela üstte $\mathrm{d} x(t)/ \mathrm{d}
@@ -492,7 +492,7 @@ $$ =
 \frac{\partial ^2 F}{\partial y \partial x}\Delta x + 
 \frac{\partial ^2 F}{\partial y^2}\Delta y 
 \bigg) \Delta y 
- $$
+$$
 
 $$ =
 \bigg(
@@ -503,14 +503,14 @@ $$ =
 \frac{\partial ^2 F}{\partial y \partial x}\Delta x \Delta y + 
 \frac{\partial ^2 F}{\partial y^2}\Delta y^2
 \bigg) 
- $$
+$$
 
 Kalkülüs'ten biliyoruz ki 
 
 $$ 
 \frac{\partial ^2 F}{\partial x \partial y} = 
 \frac{\partial ^2 F}{\partial y \partial x} 
- $$
+$$
 
 Daha kısa gösterimle
 
@@ -522,12 +522,12 @@ kısa gösterimle bir daha yazarsak
 $$ =
 (f_{xx}\Delta x^2 + f_{xy}\Delta y \Delta x ) +
 (f_{xy}\Delta x \Delta y + f_{yy}\Delta y^2 )
- $$
+$$
 
 $$
 \frac{d^2F}{dt}  =
 (f_{xx}\Delta x^2 + 2f_{xy}\Delta y \Delta x + f_{yy}\Delta y^2 )
- $$
+$$
 
 Artık elimizde $F$ ve $F'$ var, bunları 
 
@@ -565,7 +565,7 @@ f_{xx}(x_0,y_0)\Delta x^2 +
 f_{yy}(x_0,y_0)\Delta y^2 
 ] + ... 
 \end{array}
- $$
+$$
 
 Çok Boyutlu Taylor Açılımı
 

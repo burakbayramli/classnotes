@@ -27,7 +27,7 @@ R(x) = \left\{ \begin{array}{ll}
 0 & x \le 0 \\
 x & x \ge 0 
 \end{array} \right.
- $$
+$$
 
 Şimdi sınır şartlarını kullanarak $u(x)$ içinde yerine koyalım:
 
@@ -66,7 +66,7 @@ $$ u(x) =
 -x + \frac{6}{5} + \frac{3}{5}x = \frac{6}{5} - \frac{2}{5}x & x \ge 0 \\
 & 
 \end{array} \right.
- $$
+$$
 
 Birinci kısmı sadeleştirirsek
 

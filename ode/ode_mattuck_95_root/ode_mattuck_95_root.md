@@ -36,7 +36,7 @@ $$ x^2 + \frac{b}{a}x + \bigg( \frac{b}{2a} \bigg)^2 =
 
 $$ \bigg( x + \frac{b}{2a} \bigg)^2 = 
 -\frac{c}{a} + \frac{b^2}{4a^2}
- $$
+$$
 
 $$ \bigg( x+ \frac{b}{2a} \bigg)^2 = \frac{b^2 - 4ac}{4a^2} $$
 

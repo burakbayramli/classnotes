@@ -103,7 +103,7 @@ b_2  \\
 b_3  \\
 b_4  
 \end{array}\right]
- $$
+$$
 
 Fakat "bazı'' (eşitliğin) sağ tarafları için bu denklemin çözümü
 vardır. Bu da 2. sorunun cevabını verecek, ilgilendiğim sağ taraflar
@@ -133,7 +133,7 @@ x_3
 3  \\
 4  
 \end{array}\right]
- $$
+$$
 
 Bu $b$ için çözüm vardır? Hangi $x$ bu denklemi çözer? Haldir huldür hücre
 hücre çarpımı yapmaya gerek yok. Çarpıma kolon bakışını kullanırsak, çözüm
@@ -235,7 +235,7 @@ x_3
 0  \\
 0  
 \end{array}\right]
- $$
+$$
 
 $x$'lerin 3 öğesi var, o zaman $A$'nin sıfır uzayı $\mathbb{R}^3$'un bir
 alt uzayı (tabii önce bu uzayın düzgün bir alt uzay olduğunu da
@@ -329,7 +329,7 @@ x_3
 3  \\
 4  
 \end{array}\right]
- $$
+$$
 
 Bunu çözen $x$'ler bir vektör uzayı oluştururlar mı? Cevap hayır. Bunu
 görmenin en basit yolu, sıfır vektörünün çözüm olmadığının

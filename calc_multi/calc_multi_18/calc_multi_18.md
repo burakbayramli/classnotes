@@ -102,7 +102,7 @@ $$ A' =
 3 & 1 \\
 -2 & 1
 \end{array}\right| = 5
- $$
+$$
 
 $x,y$ formundaki 1 büyüklüğündeki alan, 5 katına çıktı. Yani 
 
@@ -232,7 +232,7 @@ Olmaz, çünkü
 
 $$ J = \frac{\partial (u,v)}{\partial(x,y)} \cdot
 \frac{\partial (x,y)}{\partial(u,v)} = 1
- $$
+$$
 
 yani $u,v \to x,y$ yönünde transformu yapan Jacobian ile $x,y \to u,v$ yönünde
 transform yapan Jacobian birbirinin tersi. Bu sebeple transformu yaparken bu

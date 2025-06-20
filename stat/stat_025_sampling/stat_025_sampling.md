@@ -207,7 +207,7 @@ f_T(t) =
 \sqrt{n\pi}\Gamma(\frac{n}{2})
 \bigg(1+\frac{t^2}{n}\bigg)^{(n+1)/2}
 }
- $$
+$$
 
 Aslında Normal dağılımı $t$ dağılımının $v = \infty$ olduğu hale tekabül
 eder. Cauchy dağılımı da $t$'nin özel bir halidir, $n = 1$ halidir. Bu
@@ -243,11 +243,11 @@ $$
 $$ = 
 \frac{ 1}{\pi} \theta |_{ -\infty}^{\infty}   = 
 \frac{ 1}{\pi} [\arctan(\infty) - \arctan(-\infty)]
- $$
+$$
 
 $$ =
 \frac{ 1}{\pi} [\frac{ \pi}{2} - (-\frac{ \pi}{2}) ] = 1
- $$
+$$
 
 
 

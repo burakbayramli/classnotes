@@ -221,7 +221,7 @@ change) hesaplıyorum. Aynı şekilde
 
 $$ \frac{\partial f}{\partial y}(x_0,y_0) = 
 \lim_{\Delta y \to 0} \frac{f(x_o, y_o+\Delta y) - f(x_0,y_0)}{\Delta y}
- $$
+$$
 
 Geometriksel olarak
 

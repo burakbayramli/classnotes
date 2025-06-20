@@ -63,7 +63,7 @@ A = \frac{1}{\Delta x^2}
 0 & 0 & 0 & 0 \ldots 1 & -2 & 1 \\
 0 & 0 & 0 & 0 \ldots 0 & 1 & -2
 \end{array} \right]
- $$
+$$
 
 Ve u değerlerini bir vektör içine çekeriz:
 
@@ -75,7 +75,7 @@ u_{j,2} \\
 \vdots \\
 u_{j,n}
 \end{array} \right]
- $$
+$$
 
 $AU_j$ çarpımının (1) denklemindeki toplamları her u için teker teker
 vereceğini görebiliriz. İndislerden $j$ zaman, $i$ mesafedir, yani üstteki
@@ -132,7 +132,7 @@ $$ \left[ \begin{array}{ccccc}
 0 & 1 & -2 & 1 & 0 \\
 0 & 0 & 1 & -2 & 1
 \end{array} \right]
- $$
+$$
 
 değerlerinin her satırının (1) denklemini temsil ettiğini söylemiştik.
 Eğer şartlarımızdan biri $u_1$ ve $u_5$'un sıfır olması ise, çarpım
@@ -147,7 +147,7 @@ $$
 0 & 1 & -2 & 1 & 0 \\
 0 & 0 & 1 & -2 & 0
 \end{array} \right]
- $$
+$$
 
 Bu işler. Alternatif olarak sıfır kolon yerine, o kolonları tamamen matristen
 atabilirdik, aynı şekilde $u$ değerlerini üretirken birinci ve sonuncu değerleri

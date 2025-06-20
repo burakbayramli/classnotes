@@ -165,7 +165,7 @@ $$ =
 a_1 & a_2 \\
 b_1 & b_2 \\
 \end{array}\right|
- $$
+$$
 
 Bu hesabın sonucu kenarları $\vec{A}$ ve $\vec{B}$ olan bir paralelogramın
 alanıdır.  Tabii paralelogram içindeki üçgeni istiyorsak bu sonucu ikiye
@@ -199,7 +199,7 @@ a_1 & a_2 & a_3 \\
 b_1 & b_2 & b_3 \\
 c_1 & c_2 & c_3 
 \end{array}\right|
- $$
+$$
 
 $$ = 
 a_1
@@ -249,7 +249,7 @@ $$ \vec{A} \times \vec{B} =
 a_1 & a_2 & a_3 \\
 b_1 & b_2 & b_3 
 \end{array}\right|
- $$
+$$
 
 şeklindedir ve bu işlemin sonucu bir vektördür. Bu işlemin noktasal çarpımdan 
 farkı, noktasal çarpım sonuç olarak bir skalar sayı verirken, çapraz çarpım 
@@ -302,7 +302,7 @@ $$ \vec{A} \times \vec{B} =
 a_1 & a_2 & a_3 \\
 b_1 & b_2 & b_3 
 \end{array}\right|
- $$
+$$
 
 Determinant formülünü hatırlayalım
 
@@ -313,7 +313,7 @@ $$ =
 a_1 & a_2 \\
 b_1 & b_2 \\
 \end{array}\right|
- $$
+$$
 
 Bu formülde sadece $a_1,a_2,b_1,b_2$ var, o zaman çapraz çarpımı o hale getirmek
 için $a_3=0,b_3=0$ eşitliklerini kullanabiliriz, çünkü iki vektörü her zaman
@@ -363,7 +363,7 @@ $$
 \end{array}\right| = 
 0 \hat{i} - 0 \hat{j} + 1 \hat{k}  = 
 \hat{k}
- $$
+$$
 
 Hakikaten de sonuç sağ el kuralını kullandığımızda başparmağımızın göstereceği
 yön olan $\hat{k}$'yi gösteriyor.
@@ -436,7 +436,7 @@ $$ \vec{A} \times \vec{B} =
 a & 0 & -c \\
 a & -b & 0 
 \end{array}\right|
- $$
+$$
 
 $$ = 
 \left|\begin{array}{rr}

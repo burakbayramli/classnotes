@@ -68,7 +68,7 @@ b_k \\ B_{k+1}
 \end{array}\right], \quad 
 P_k = (A_k^TA_k)^{-1}
 \qquad (4)
- $$
+$$
 
 Matris tersi $P_k$'nin yeni veri noktası gelince nasıl güncellendiğini
 görelim, 

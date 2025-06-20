@@ -66,7 +66,7 @@ P \bigg(
 \le \frac{\bar{X} - \mu}{\sigma / \sqrt{n}} 
 \le z_{\alpha/2}
 \bigg) = 1-\alpha
- $$
+$$
 
 $P(\cdot)$ içinde biraz düzenleme, tüm terimleri $\sigma / \sqrt{n}$ ile
 çarpalım, $\bar{X}$ çıkartalım, ve $-1$ ile çarpalım,
@@ -78,7 +78,7 @@ P \bigg(
 \le \bar{X} + z_{\alpha/2}\frac{\sigma}{\sqrt{n}}
 \bigg) = 1-\alpha
 \qquad (1)
- $$
+$$
 
 Güven aralığı ifadesine aslına erişmiş olduk. Eğer \%95 kesinlikten
 bahsediyor olsaydık, ve nüfusun gerçek varyansı $\sigma^2$ biliniyor
@@ -95,7 +95,7 @@ P \bigg(
 \le \mu
 \le 64.46 + 1.96\frac{1}{\sqrt{10}}
 \bigg) = 0.95
- $$
+$$
 
 $$ P\bigg(63.84 \le \mu \le 65.08\bigg) = 0.95 $$
 
@@ -219,7 +219,7 @@ $$ P \bigg(
 \frac{\bar{Y}-\mu}{S/\sqrt{n}} \le 
 t_{\alpha/2,n-1}
 \bigg) = 1-\alpha
- $$
+$$
 
 Bu ifadeyi daha önce standart normal için yaptığımız gibi tekrar
 düzenlersek,
@@ -389,7 +389,7 @@ seçilen bir örneklemde 20 tane deterjan plastik şişeden alınan ölçümlerd
 $$ 
 \sigma^2 \le
 \sqrt{\frac{(19)0.0153}{\chi_{0.05,19}^2}}
- $$
+$$
 
 ```python
 from scipy.stats.distributions import chi2
@@ -403,7 +403,7 @@ print chi2.ppf(0.05,19)
 $$ 
 \sigma^2 \le
 \sqrt{\frac{(19)0.0153}{10.117}} = 0.0287
- $$
+$$
 
 Yani
 
@@ -459,7 +459,7 @@ P \bigg(
 \frac{\bar{X}_1-\bar{X}_2 - (\mu_1-\mu_2)} {\sqrt{\sigma_1^2/n_1 + \sigma_2^2/n_2}} \le
 z_{\alpha/2} 
 \bigg) = 1-\alpha
- $$
+$$
 
 $$ 
 P[

@@ -139,7 +139,7 @@ $$
 \left[\begin{array}{rrr}
 a & b & c \\ d & e & f \\ g & h & i
 \end{array}\right]
- $$
+$$
 
 Bu matristeki değişkenlerin değerini atamakta serbest olamıyorum,
 dediğim gibi, belirtilen iki kısıtlamaya uymam lazım. Yani bir optimizasyon
@@ -210,7 +210,7 @@ $$
 \cos \theta & -\sin \theta \\
 \sin \theta & \cos \theta 
 \end{array}\right]
- $$
+$$
 
 $\theta=0$ dersem birim matrisi elde ederim. Şimdi diyelim ki sıfır değil
 ama "sıfıra çok yakın'' bir değerim var; matristeki terimler için bir
@@ -220,7 +220,7 @@ $$
 \left[\begin{array}{rr}
 \theta & 0 \\ 0 & \theta 
 \end{array}\right]
- $$
+$$
 
 elde ederim, ki bu matris bir eksi bakışımlı matristir, birim matris artı
 üstteki değişime geldik. Ama tabii tek düzlemde olunca zaten tek serbestlik
@@ -327,7 +327,7 @@ $$ |w| =
 \left[\begin{array}{r}
 r_{32} - r_{23} \\ r_{13} - r_{31} \\ r_{21} - r_{12}
 \end{array}\right]
- $$
+$$
 
 Bu formülü ispatsız veriyoruz. Not: Dikkat, üstteki formül bir yaklaşıksallık
 değil. 
@@ -347,7 +347,7 @@ rotasyon,
 
 $$ e^{\hat{w}} = I + \frac{\hat{w}}{|w|} \sin |w| + 
 \frac{\hat{w}^2}{|w|^2} (1-\cos |w|)
- $$
+$$
 
 ile hesaplanabilir. Bu formül faydalı çünkü pratikte matrislerin 
 kuvvetini almak tercih edilmez (matris üstel açılımının / serisinin içinde
@@ -460,7 +460,7 @@ R & T \\ 0 & 1
 R \in SO(3), T \in \mathbb{R}^3 
 \bigg\}
 \subset \mathbb{R}^{4 \times 4}
- $$
+$$
 
 Eğer matrisi tam boyutlarıyla göstermek istersek,
 
@@ -482,7 +482,7 @@ g: \mathbb{R} \to SE(3) ; \qquad
 g(t) = \left[\begin{array}{rrr}
 R(t) & T(t) \\ 0 & 1
 \end{array}\right]  \in \mathbb{R}^{4 \times 4}
- $$
+$$
 
 Homojen kordinatları kullandık, ki matrisler tersi alınabilir hale gelsin.
 Bu bize "fırıldaklar" için Lie cebirini sağlıyor. Rotasyon durumuna benzer
@@ -528,7 +528,7 @@ se(3) \equiv \bigg\{
 \hat{w} \in so(3), v \in \mathbb{R}^3 
 \bigg\}
 \subset \mathbb{R}^{4 \times 4}
- $$
+$$
 
 Daha önce olduğu gibi şapka notasyonunu bir operatör olarak görüyoruz,
 hatta genişletelim, ileri ve geri gitmek için $\land$ ve $\lor$
@@ -543,7 +543,7 @@ v \\ w
 \left[\begin{array}{cc}
 \hat{w} & v \\ 0 & 0
 \end{array}\right]  \in \mathbb{R}^{4 \times 4}
- $$
+$$
 
 $$ 
 \left[\begin{array}{cc}
@@ -552,7 +552,7 @@ $$
 \left[\begin{array}{c}
 v \\ w
 \end{array}\right] \in \mathbb{R}^6
- $$
+$$
 
 Üstteki matrisin 6 serbestlik derecesi var, 3 tane dönüş için, 3 tane de
 yer değiştirme için.

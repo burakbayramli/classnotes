@@ -59,7 +59,7 @@ x_2^3 & x_2^2 & x_2 & 1 \\
 \vdots & \vdots & \vdots & \vdots \\
 x_m^3 & x_m^2 & x_m & 1 
 \end{array}\right]
- $$
+$$
 
 ki $x_i$, $x$ vektörünün tek bir öğesini temsil ediyor. Gerisi bildiğimiz En
 Az Kareler yöntemi ile $Ax=b$'yi, ya da üstteki notasyona göre $Ac=y$
@@ -1058,7 +1058,7 @@ h_2 & 2(h_2+h_3) & h_3 & 0 & .. & 0  \\
 \left[\begin{array}{r}
 c_2 \\ c_3 \\ \vdots \\ c_n
 \end{array}\right]
- $$
+$$
 
 Bu denklem sağ tarafta suna eşit 
 
@@ -1070,7 +1070,7 @@ $$
 \vdots \\
 3(s_n - s_{n-1}) 
 \end{array}\right]
- $$
+$$
 
  Bir üçgen köşegen (tridiagonal) matris iki tane ikili köşegen (bidiagonal)
  matrisin çarpımına eşittir. LU çarpanlarına ayırma işlemi de, bkz [11], bize

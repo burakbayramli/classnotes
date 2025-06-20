@@ -135,7 +135,7 @@ merak ediyoruz,
 
 $$ \langle x',y' \rangle = x'^Ty' = 
 (Ax)^T (Ay) = x^TA^TAy = {\langle x',y' \rangle}_{A^T A}
- $$
+$$
 
 Eşitliğin en sağ tarafı notasyonel bir ek. Bu çarpıma doğuşturucu
 (induced) içsel çarpım ismi veriliyor, doğuşturucu kelimesi kullanılmış
@@ -336,7 +336,7 @@ $$
 \left[\begin{array}{rrr}
 1 & 0 \\ 0 & -1
 \end{array}\right]
- $$
+$$
 
 matrisini düşünelim, bu matrisin determinantı -1. Ama bu matrisin devriğini
 kendisi ile çarparsam sonucun determinantı -1 değil.
@@ -362,7 +362,7 @@ R & T \\ 0 & 1
 \bigg |
 R \in O(n), T \in \mathbb{R}^n
 \bigg\}
- $$
+$$
 
 Öklitsel Grup içinde, eğer $R \in SO(n)$ olan alt grubu alırsam (yani
 $\det R = 1$), o zaman özel Öklitsel Grup $SE(n)$'i elde ederim. Bu grup

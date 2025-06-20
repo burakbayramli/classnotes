@@ -60,7 +60,7 @@ x$ ise, o zaman
 
 $$ ||x_n - x_m|| = ||x_n -x +x -x_m|| \le 
 ||x_n - x|| + ||x-x_m|| \to 0
- $$
+$$
 
 Fakat bu kuralın tersi her zaman doğru olmayabilir, yani her Cauchy dizisi
 yaklaşıksal olmayabilir. 
@@ -105,7 +105,7 @@ $$
 nt-\frac{n}{2} + 1 &  \frac{1}{2} - \frac{1}{n} \le t \le \frac{1}{2} \\ \\
 1 & t \ge \frac{1}{2}
 \end{array} \right.
- $$
+$$
 
 Bu dizinin her elemanı bir sürekli fonsiyondur ve bu yüzden $X$'in bir
 üyesidir. 
@@ -127,7 +127,7 @@ $$
 \frac{1}{2} \cdot 1 \cdot (\frac{ 1}{2}-a_n) =
 \frac{ 1}{2}\frac{ 1}{m} - 
 \frac{ 1}{2}\frac{ 1}{n} 
- $$
+$$
 
 Yani
 

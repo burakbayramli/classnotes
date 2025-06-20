@@ -57,7 +57,7 @@ $$
 \left[\begin{array}{c} 0 \\ 0 \\ 1 \\ 0  \end{array} \right] +
 \left[\begin{array}{c} 0 \\ 0 \\ 0 \\ 1  \end{array} \right] = 
 \left[\begin{array}{c} 1 \\ 1 \\ 1 \\ 1  \end{array} \right] 
- $$
+$$
 
 Bu ne demektir? Eşitliğin sağ tarafının "girdi'' olarak görülebildiğini de
 biliyoruz. Lineer bir sistemde girdiler toplanırsa, mümkün tüm çıktılar da
@@ -174,7 +174,7 @@ A =
 1 & 0
 \end{array}
 \right]
- $$
+$$
 
 Bu matrisin reel özdeğerleri olamaz, çünkü bu matrisin uygulanıp yönü değişmeyen
 hiçbir "reel'' vektör olamaz. Gözle görülebilen her vektör 90 derece transform
@@ -201,7 +201,7 @@ i
 1 \\
 i
 \end{array}\right]
- $$
+$$
 
 Vektör ise yaradı. Şimdi ana noktaya gelelim. Özdeğerleri nasıl
 kullanırız? Ve onlardan kaç tane vardır? "İyi'' bir matris, ki bu tanıma
@@ -214,7 +214,7 @@ $$
 2 & -1 \\
 -1 & 2
 \end{array}\right]
- $$
+$$
 
 2 x 2 boyutunda bu matriste 2 tane özvektör bulmamız lazım. Bu ufak bir matris,
 özvektörleri tahmin yapa yapa bulmaya uğraşabiliriz.
@@ -235,7 +235,7 @@ $$
 2 \\
 -1
 \end{array}\right]
- $$
+$$
 
 Olmadı. Sağdaki vektör $\left[\begin{array}{cc}1&0\end{array}\right]^T$'in bir
 katı değil. Not: Lineer cebirde kafadan işlem yapmanın yollarından biri,
@@ -253,7 +253,7 @@ $$ \left[\begin{array}{rr} 2 & -1 \\ -1 & 2
 1 \\
 1
 \end{array}\right]
- $$
+$$
 
 Bu oldu. İkinci özvektör ne olabilir?
 $\left[\begin{array}{cc}1&-1\end{array}\right]^T$ deneyelim.
@@ -272,7 +272,7 @@ $$
 3 \\
 -3
 \end{array}\right]
- $$
+$$
 
 Bu da oldu. O zaman $\lambda_1 = 1$, $\lambda_2 = 3$, özvektörler
 $\left[\begin{array}{cc} 1 & 1 \end{array}\right]^T$ ve $\left[\begin{array}{cc}
@@ -301,7 +301,7 @@ $$
 1 & 0
 \end{array}
 \right]
- $$
+$$
 
 Bu matrisin özvektörleri kompleks çıkmıştı, ki bu durum simetrik olmayan
 matrislerin bir özelliğidir. Simetrik matrisleri bu sebeple tercih ederiz,
@@ -317,7 +317,7 @@ $$
 2 & -1 \\
 -1 & 2
 \end{array}\right]
- $$
+$$
 
 Sonuç yine 4. Bu iki toplam her zaman eşit çıkmalıdır. Bir numara: bir
 tanesi hariç tüm özdeğerleri bulduksak matrisi izini kullanarak sonuncu
@@ -408,7 +408,7 @@ t+1 \textrm{ anında batıda olanlar }
 t \textrm{ anında doğuda olanlar } \\
 t \textrm{ anında batıda olanlar } 
 \end{array}\right]
- $$
+$$
 
 Buradaki $A$ matrisi belli bir gözleme dayanarak modelleyicinin bulduğu bir
 şey herhalde, problem onu bize veriyor. $A$ bir "geçiş fonksiyonu'', $t$
@@ -481,7 +481,7 @@ sıfıra yaklaşır. Yani üstteki denklemin sabit konum (steady-state)
 
 $$ 
 \frac{du}{dt} = Au
- $$
+$$
 
 problemini çözdüğümüzü farzedelim, ki $u(t)$ şöyle tanımlı
 
@@ -491,7 +491,7 @@ u(t) =
 y(t) \\
 z(t)
 \end{array}\right]
- $$
+$$
 
 Ayrı ayrı
 
@@ -515,7 +515,7 @@ z
 y \\
 z
 \end{array}\right]
- $$
+$$
 
 ki yukarıdaki 2x2 matris $A$ matrisi olacak. *Lineer Cebir Ders 23*'te
 görüldüğü gibi bu problemin çözümü 
@@ -553,7 +553,7 @@ D
 y(t) \\
 z(t)
 \end{array}\right]
- $$
+$$
 
 Bu çarpımı ayrı ayrı yapınca çözümün kitapta gösterildiği gibi
 

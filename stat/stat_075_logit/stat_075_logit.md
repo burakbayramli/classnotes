@@ -212,7 +212,7 @@ $$
 
 $$
  = \frac{1}{1+e^{-z}} \frac{1}{1+e^{z}}
- $$
+$$
 
 Çarpımda iki bölüm var, bölümler $g(z)$ ve $g(-z)$ olarak temsil edilebilir, ya
 da $g(z)$ ve $1-g(z)$,
@@ -321,14 +321,14 @@ $$
 \big(
 y(1-g(\theta^Tx)) - (1-y)g(\theta^T x)
 \big) x_j
- $$
+$$
 
 Çarpımı daha temiz görmek için sadece $y,g$ harflerini kullanırsak,
 
 $$
 \big(y(1-g) - (1-y)g \big) x_j =
 (y - yg - g + yg)x_j = (y - g)x_j
- $$
+$$
 
 yani
 
@@ -556,7 +556,7 @@ $$
 \Rightarrow \frac{1}{e^x} + 1 = \frac{1}{p}
 \Rightarrow \frac{1+e^x}{e^x} =  \frac{1}{p}
 \Rightarrow p = \frac{e^x}{1+e^x}
- $$
+$$
 
 
 Lojistik regresyon modeli 

@@ -11,7 +11,7 @@ $$ x =
 \left[\begin{array}{ccc}
 x_1 \\ \vdots \\ x_m
 \end{array}\right]
- $$
+$$
 
 Bu durumda $x$'in her hücresine / öğesine göre kısmi türevler (partial
 derivatıves) alınır, sonuçta tek boyutlu / tek sayılı fonksiyon, türev 
@@ -90,7 +90,7 @@ J(x) = \frac{\partial f(x)}{\partial x} =
 \frac{\partial f_{n}(x)}{\partial x_n} & \dots & 
 \frac{\partial f_{n}(x)}{\partial x_n}  
 \end{array}\right]
- $$
+$$
 
 Hessian ise $f$'in ikinci türevlerini içerir [3]. Bu matrisin $i,j$'inci
 öğesi fonksiyonun $\frac{\partial^2 f(x)}{\partial x_j \partial x_i}$'inci
@@ -121,7 +121,7 @@ $$
 \vdots \\ 
 \frac{\partial (a^Tx)}{\partial x_n} 
 \end{array}\right] 
- $$
+$$
 
 $$  =
 \left[\begin{array}{c}
@@ -136,7 +136,7 @@ a_1 \\
 a_n
 \end{array}\right] =
 a
- $$
+$$
 
 Niye her satırda $a_1,a_2$  gibi değerler elde ettiğimizin sebebi bariz
 herhalde, çünkü mesela ilk satırda $x_1$'e göre türev alındığı durumda
@@ -157,7 +157,7 @@ $$
 \frac{\partial (a^Tx)}{\partial x_n} 
 \end{array}\right] 
 \qquad (1)
- $$
+$$
 
 $$ =
 \left[\begin{array}{ccc}
@@ -201,7 +201,7 @@ $$
 \end{array}\right] = \left[\begin{array}{c}
 a_1^T \\ \vdots \\ a_m^T
 \end{array}\right]  = A
- $$
+$$
 
 Şu türev nasıl hesaplanır? 
 
@@ -221,7 +221,7 @@ x_1 & \dots & x_n
 a_1 & \dots & a_m \\
 \downarrow & & \downarrow 
 \end{array}\right]
- $$
+$$
 
 Şimdi matris çarpımı satır bakışını kullanalım, çarpan $x$ satırı bir
 tane, o zaman sonuç tek satır olacak. Bu tek $x$ satırının öğeleri, $A^T$
@@ -311,7 +311,7 @@ kalıbını kullanmak, ve $A = I$ yani birim matrisi koymak. Bu durumda
 
 $$ 
 = \frac{\partial (x^TIx)}{\partial \alpha}  = 2Ix = 2x
- $$
+$$
 
 Daha zor yoldan, bu bir noktasal çarpım olacaktır, $x_1x_1 + x_2x_2 + .. +
  x_nx_n$  yani $x_1^2 + x_2^2 + .. + x_n^2$. Bu tek bir skalar sonuç, o sonucun her
@@ -323,7 +323,7 @@ $$
 \dots \\
 \frac{\partial (x_1^2 + x_2^2 + .. + x_n^2)}{\partial x_n} 
 \end{array}\right]
- $$
+$$
 
 $$ 
 = \left[\begin{array}{c}
@@ -332,7 +332,7 @@ $$
 2x_n
 \end{array}\right] = 
 2x
- $$
+$$
 
 İzler (Trace)
 

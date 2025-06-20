@@ -158,7 +158,7 @@ $N$. terimden sonraki her eleman 1/2'ye $\epsilon$'dan daha yakın olsun, ve
 
 $$ 
 \bigg|\frac{n^2}{2n^2+1} - \frac{1}{2}\bigg| < \epsilon
- $$
+$$
 
 ki $n=N,n=N+1,n=N+1,N+2,...$. Sonuçtan geriye doğru gidersek işimiz
 kolaylaşır, yani verilen $N$ için $\epsilon$'nun ne kadar büyük olması
@@ -168,7 +168,7 @@ içine bakalım,
 $$ 
 \frac{n^2}{2n^2+1}  - \frac{1}{2} = 
 \frac{2n^2}{2(2n^2+1)}  - \frac{2n^2+1}{2(2n^2+1)} 
- $$
+$$
 
 $$  
 = \frac{2n^2 - 2n^2 - 1}{2(2n^2+1)} = 

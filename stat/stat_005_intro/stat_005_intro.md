@@ -575,7 +575,7 @@ $$ f(x)  =
 \frac{ 1}{b-a} & x \in [a,b] \ icin \\
 0 & diger
 \end{array} \right.
- $$
+$$
 
 işe ve $a<b$ olacak şekilde. CDF hesabı olasılık eğrisinin entegralini
 temel alır, düz dağılım bir $a,b$ arasında $1/b-a$ yüksekliğinde bir 
@@ -590,7 +590,7 @@ $$ F(x) =
 \frac{ x-a}{b-a} & x \in [a,b] \\
 1 & x > b
 \end{array} \right.
- $$
+$$
 
 Beklenti $E[X] = 1$. 
 
@@ -715,7 +715,7 @@ $X \sim N(3,5)$ ise $P(X > 1)$ nedir? Cevap:
 
 $$ 
 P(X>1) = 1 - P(X < 1) = 1 - P( Z < \frac{ 1 - 3}{\sqrt{5 }}) 
- $$
+$$
 
 $$ = 1 - \Phi(-0.8944) =  1 - 0.19 = .81 $$
 
@@ -871,7 +871,7 @@ f(x,y) =
 1 & \textit{ eğer }  0 \le x \le 1, 0 \le y \le 1  \textit{ ise }\\
 0 & \textit{ diğer durumlarda }
 \end{array} \right.
- $$
+$$
 
 $P(X < 1/2, Y < 1/2)$'yi bul. 
 
@@ -893,7 +893,7 @@ f(x,y) =
 cx^2y & \textrm{eğer } x^2 \le y \le 1 \\
 0 & \textrm{diğer}
 \end{array} \right.
- $$
+$$
 
 Niye $c$ bilinmiyor? Belki problemin modellemesi sırasında bu bilinmez
 olarak ortaya çıkmıştır. Olabilir. Bu değeri hesaplayabiliriz, çünkü
@@ -1047,7 +1047,7 @@ $$ f(x,y) =
 x+y & \textrm{eğer } 0 \le x \le 1, 0 \le y \le 1 \\
 0 & \textrm{diğer}
 \end{array} \right.
- $$
+$$
 
 $$
 f_Y(y) = \int_{0}^{1}(x+y) \mathrm{d} x = 
@@ -1078,7 +1078,7 @@ $$ f(x) =
 2x & \textrm{eğer } 0 \le x \le 1 \\
 0 & \textrm{diğerleri}
 \end{array} \right.
- $$
+$$
 
 $P(X+Y < 1)$'i hesaplayın. 
 
@@ -1091,7 +1091,7 @@ $$ f(x,y) = f_X(x)f_Y(y) =
 4xy & \textrm{eğer } 0 \le x \le 1, 0 \le y \le 1 \\
 0 & \textrm{diğerleri}
 \end{array} \right.
- $$
+$$
 
 Şimdi bu birleşik yoğunluk üzerinden istediğimiz bölgeyi hesaplarız,
 bölgeyi tanımlayan $X+Y \le 1$ ifadesi. 
