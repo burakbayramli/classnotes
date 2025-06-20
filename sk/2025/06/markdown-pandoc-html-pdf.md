@@ -62,6 +62,14 @@ ta mümkün tabii. Şablon hazırlandıktan sonra
 pandoc --template=my_template.html --mathjax -f markdown -t html doc.md -o out.html
 ```
 
+Not: Üretilen şablon dosyasına yakından bakarsak orada pek çok
+değişken kullanıldığını görebiliriz, mesela `<title>$title</title>`
+tanımı var, yani `title` adlı değişken gösterilen etiketler içine
+yazılıyor. Bu değişkenleri dışarıdan `pandoc` komutuna parametre
+olarak geçmek mümkün, mesela `-M title=12345` ile değişkene `12345`
+değerini geçmiş olduk. Bu değer üretilen HTML içinde gerekli yere
+konacaktır.
+
 PDF uretmek icin
 
 ```

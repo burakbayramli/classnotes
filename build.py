@@ -18,11 +18,12 @@ def doc_dirs(topdirs):
             os.chdir(curr + "/" + topdir + "/" + subdir)
             mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"
             shutil.copy(mdfile,"/tmp/out.md")
-            cmd = "pandoc --template=/home/burak/Documents/classnotes/template.html --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
+            #cmd = "pandoc --template=/home/burak/Documents/classnotes/template.html --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
+            title = get_title_from_md("/tmp/out.md")
+            cmd = 'pandoc --template=/home/burak/Documents/classnotes/template.html -M title="%s" --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html' % title
             os.system(cmd)            
             cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
             os.system(cmd)
-            inject_tags()        
             pdffile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".pdf"
             htmlfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".html"
             print ("copying to", mdfile)            
@@ -142,15 +143,6 @@ def title_sk(to):
                 break
         fout.close()
 
-def inject_tags():
-    fin = codecs.open("/tmp/out.html", encoding='utf8')
-    content = fin.read()
-    title = get_title_from_md("/tmp/out.md")
-    content = re.sub(r'<title></title>', "<title>%s</title>" % title, content)
-    fout = codecs.open("/tmp/out.html",mode="w",encoding="utf-8")
-    fout.write(content)
-    fout.flush()
-    fout.close()                        
 
 def remove_sci_md(to):
     curr = to
@@ -178,11 +170,11 @@ if __name__ == "__main__":
             htmlfile = currdir + "/" + currfile + "/" + currfile + ".html"
             pdffile = currdir + "/" + currfile + "/" + currfile + ".pdf"
             shutil.copy(mdfile,"/tmp/out.md")
-            cmd = "pandoc --template=/home/burak/Documents/classnotes/template.html --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
+            title = get_title_from_md("/tmp/out.md")
+            cmd = 'pandoc --template=/home/burak/Documents/classnotes/template.html -M title="%s" --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html' % title
             os.system(cmd)
             cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
             os.system(cmd)
-            inject_tags()
             shutil.copy("/tmp/out.pdf", pdffile) 
             shutil.copy("/tmp/out.html", htmlfile)
             exit()
