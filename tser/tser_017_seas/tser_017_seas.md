@@ -93,11 +93,12 @@ uydurabiliriz. Fakat bu sinüs fonksiyonunun benliğini, başlangıç noktasın�
 bilmiyoruz, bu durumlarda [6]'da sinüssel regresyon tekniğini gördük. Fakat
 belki de daha rahatı veriye bir 4'üncü derece polinom uydurmaktır.
 
-Bu garip gelebilir, polinom uydurmayı çoğunlukla ikinci, üçüncü derecede
-eğrileri modelleyen çerçevede görmüş olabiliriz, bu yaklaşım fakat periyotsal
-fonksiyonları da çok rahat temsil edebiliyor. Sebebi herhalde sinüs fonsiyonunun
-Taylor açılımında [3] gizli, Taylor açılımında sonsuza kadar giden türevler
-polinom açılımda kullanılır, sinüsün 1'den 4'e kadar olan türevlerine bakarsak,
+Bu garip gelebilir, polinom uydurmayı çoğunlukla ikinci, üçüncü
+derecede eğrileri modelleyen çerçevede görmüş olabiliriz, fakat bu
+yaklaşım periyotsal fonksiyonları da çok rahat temsil
+edebiliyor. Sebebi herhalde sinüs fonsiyonunun Taylor açılımında [3]
+gizli, Taylor açılımında sonsuza kadar giden türevler polinom açılımda
+kullanılır, sinüsün 1'den 4'e kadar olan türevlerine bakarsak,
 
 $\sin^{\prime}(x)=\cos(x),\quad$
 $\sin^{\prime\prime}(x)=-\sin(x),\quad$,
@@ -353,15 +354,11 @@ Skew:                           0.024   Prob(JB):                     1.66e-05
 Kurtosis:                       1.852   Cond. No.                         20.5
 ==============================================================================
 
-Warnings:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 ```
-
 
 
 Kaynaklar
 
 [1] Cross Validated, *How to find a good fit for semi­sinusoidal model in  R?*,
 [http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r](http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r)
-
 
