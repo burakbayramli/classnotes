@@ -232,21 +232,15 @@ def plot_vector1(fig, orig, v, color='blue'):
    '''
    baslangıcı orig olan v büyüklüğü/yönünde olan vektorü çiz
    '''
-   ax = fig.gca(projection='3d')
    orig = np.array(orig); v=np.array(v)
    ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
-   ax = fig.gca(projection='3d')  
-   return fig
 
 def plot_vector2(fig, torig, tend, color='blue'):
    '''
    baslangic torig bitis tend olmak uzere bir vektor ciz
    '''
-   ax = fig.gca(projection='3d')
    v = tend - torig
    ax.quiver(torig[0], torig[1], torig[2], v[0], v[1], v[2],color=color)
-   ax = fig.gca(projection='3d')  
-   return fig
 
 tidx = 7
 f0 = np.array([40,20,10])
@@ -258,15 +252,14 @@ b = cog-f0
 flin = (a.dot(b) / (lin.norm(b)**2))*b
 
 tau = np.cross(f1-cog,f1-f0)
-figure = plt.figure()
-ax = mplot3d.Axes3D(figure)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 obj = mplot3d.art3d.Poly3DCollection(mesh1.vectors)
 obj.set_edgecolor('k')
 obj.set_alpha(0.3)
 ax.add_collection3d(obj)
-plot_vector2(figure, f0, f1)
-plot_vector1(figure, cog, tau, color='cyan')
-plot_vector1(figure, f0, flin, color='cyan')
+plot_vector2(ax, f0, f1)
+plot_vector1(ax, cog, tau, color='cyan')
+plot_vector1(ax, f0, flin, color='cyan')
 ax.plot(cog[0], cog[1], cog[2], 'gs')
 ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
 ax.text(65,0,8,r'$\tau$',fontsize=20)

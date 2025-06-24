@@ -463,8 +463,3 @@ $Ax=0$ hakkında söyleyecek daha fazla bir şey kalmadı sanıyorum. $Ax=b$
 konusunda söyleyeceklerimiz daha var, ama bu bir sonraki derste. 
 
 
-
-
-
-
-

@@ -10,3 +10,9 @@ session. That choice is remembered until you change it again.
 
 gnome-tweaks
 
+python3-virtualenv git emacs texlive-latex-base net-tools mpv
+emacs chromium-browser texlive-base djvulibre-bin imagemagick
+
+
+
+
