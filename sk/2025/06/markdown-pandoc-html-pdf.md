@@ -70,6 +70,16 @@ olarak geçmek mümkün, mesela `-M title=12345` ile değişkene `12345`
 değerini geçmiş olduk. Bu değer üretilen HTML içinde gerekli yere
 konacaktır.
 
+Not: En son Pandoc 3.1.3 için MathJax'in nereden okunması gerektiğini
+direk belirtmek gerekebiliyor, mesela bizim son kullanımda
+
+```
+--mathjax=https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full
+```
+
+gibi bir parametre vermek gerekti, bu verilmediği zaman `pandoc` yerel bir dizinde
+MathJax arıyordu.
+
 PDF uretmek icin
 
 ```

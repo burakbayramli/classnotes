@@ -142,7 +142,7 @@ b'YnViaXJrZWxpbWU=\n'
 ```
 
 ```python
-d = base64.decodestring(e)
+d = base64.decodebytes(e)
 print (d)
 ```
 
@@ -166,7 +166,7 @@ import pickle, base64
 a = list(range(10))
 a = base64.encodestring(pickle.dumps(a)).decode()
 print (a)
-b = pickle.loads(base64.decodestring(a.encode('utf-8')))
+b = pickle.loads(base64.decodebytes(a.encode('utf-8')))
 print (b)
 ```
 

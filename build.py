@@ -14,11 +14,9 @@ def doc_dirs(topdirs):
             print (subdir)
             if not os.path.isdir(curr + "/" + topdir + "/" + subdir): continue
             if "cover" in subdir or "000" in subdir : continue
-            #print (topdir, subdir)
             os.chdir(curr + "/" + topdir + "/" + subdir)
             mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"
             shutil.copy(mdfile,"/tmp/out.md")
-            #cmd = "pandoc --template=/home/burak/Documents/classnotes/template.html --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
             title = get_title_from_md("/tmp/out.md")
             cmd = 'pandoc --template=/home/burak/Documents/classnotes/template.html -M title="%s" --mathjax=https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full -f markdown -t html /tmp/out.md -o /tmp/out.html' % title
             os.system(cmd)            

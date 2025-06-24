@@ -206,7 +206,7 @@ def get(key):
     response = requests.post('http://localhost:8080/get', json={"key":key})
     print("Status code: ", response.status_code)
     res = response.json()
-    res = pickle.loads(base64.decodestring(res['result'].encode('utf-8')))
+    res = pickle.loads(base64.decodebytes(res['result'].encode('utf-8')))
     return res
     
 def set(key,value):

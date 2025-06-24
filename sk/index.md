@@ -3,6 +3,8 @@
 
 ## En Son
 
+24/6 - [Ubuntu 24, Acer Swift 3](https://burakbayramli.github.io/dersblog/sk/2025/06/ubuntu-24-acer.html)
+
 19/6 - [Diferansiyel Denklemler - Ders 2 - Ekler, Runge-Kutta](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_02/ders_2.html)
 
 3/6 - [Döndürme (Rotation) - 2, Dörtlü Gruplar (Quaternions)](https://burakbayramli.github.io/dersblog/phy/phy_073_rot/dondurme__rotation___2.html)
@@ -10,8 +12,6 @@
 22/5 - [AABB, Üçgen Kesişmesi, Hızlı Çarpışma Saptaması](https://burakbayramli.github.io/dersblog/sk/2025/04/aabb_ucgen_kesismesi_carpisma_saptamasi.html)
 
 14/5 - [AABB Ağaçları ile Çarpışma Saptamasına Giriş](https://burakbayramli.github.io/dersblog/sk/2025/04/aabb-randall-tr.html)
-
-6/5 - [Çok Değişkenli Calculus - Ekler - 3D Çizgi/Üçgen, Üçgen/Üçgen Kesişme Hesapları](https://burakbayramli.github.io/dersblog/calc_multi/calc_multi_75_app/green_in_teorisi_duzlem_kesismeleri_egriler.html)
 
 ## Konular, Referans
 

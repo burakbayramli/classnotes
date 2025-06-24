@@ -14,6 +14,8 @@
 
 [Ubuntu 22](../../2023/05/ubuntu-22.html)
 
+[Ubuntu 24, Acer Swift 3](../../2025/06/ubuntu-24-acer.html)
+
 [Ubuntu SWAP Alanı Nasıl Arttırılır?](../../2013/03/ubuntu-swap-alani-nasil-arttirilir.html)
 
 [Yerel Ağ (Network) Kurmak - Ubuntu](../../2013/09/yerel-ag-kurmak-ubuntu.html)

@@ -191,7 +191,7 @@ etmek isteyebiliriz. Önce
 sudo apt install wmctrl
 ```
 
-Bu program komutu satırından herşeyi `wmctrl -k on` ile minimize edebilir.
+Bu program komutu satırından herşeyi `wmctrln -k on` ile minimize edebilir.
 Şimdi bir ikon yaratalım,
 
 ```

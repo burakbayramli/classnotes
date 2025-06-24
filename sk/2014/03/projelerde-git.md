@@ -236,4 +236,9 @@ ama hala tarihte olan dosyaları aramak istiyorsak,
 git log --all --full-history -- "**/*myscript*.py"
 ```
 
+### Son 7 Gündeki Değişimleri Görmek
+
+```
+git log --since="7 day ago" --name-only --pretty=format: | sort | uniq
+```
 
