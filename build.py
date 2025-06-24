@@ -20,7 +20,7 @@ def doc_dirs(topdirs):
             shutil.copy(mdfile,"/tmp/out.md")
             #cmd = "pandoc --template=/home/burak/Documents/classnotes/template.html --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html" 
             title = get_title_from_md("/tmp/out.md")
-            cmd = 'pandoc --template=/home/burak/Documents/classnotes/template.html -M title="%s" --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html' % title
+            cmd = 'pandoc --template=/home/burak/Documents/classnotes/template.html -M title="%s" --mathjax=https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full -f markdown -t html /tmp/out.md -o /tmp/out.html' % title
             os.system(cmd)            
             cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
             os.system(cmd)
@@ -171,7 +171,7 @@ if __name__ == "__main__":
             pdffile = currdir + "/" + currfile + "/" + currfile + ".pdf"
             shutil.copy(mdfile,"/tmp/out.md")
             title = get_title_from_md("/tmp/out.md")
-            cmd = 'pandoc --template=/home/burak/Documents/classnotes/template.html -M title="%s" --mathjax -f markdown -t html /tmp/out.md -o /tmp/out.html' % title
+            cmd = 'pandoc --template=/home/burak/Documents/classnotes/template.html -M title="%s" --mathjax=https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full -f markdown -t html /tmp/out.md -o /tmp/out.html' % title
             os.system(cmd)
             cmd = "pandoc %s /home/burak/Documents/classnotes/metadata.yaml -t latex  -fmarkdown-implicit_figures -o %s" % ("/tmp/out.md","/tmp/out.pdf")
             os.system(cmd)
