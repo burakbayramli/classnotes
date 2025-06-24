@@ -297,5 +297,3 @@ Kaynaklar
 [5] Bayramlı, *Normal Diferansiyel Denklemler, Trigonometri*
 
 [6] Bayramlı, *Lineer Cebir Ders 15*
-
-
