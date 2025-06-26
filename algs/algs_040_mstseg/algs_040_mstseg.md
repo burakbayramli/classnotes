@@ -228,13 +228,18 @@ Basit bir örnek
 ```python
 import scipy.sparse as sps, felz
 import scipy.io as io
-X = io.mmread('simple.mtx')
+X = np.array([[0.,    0.5,   0.,    0.,    0.   ],
+              [0.,    0.,    1.,    0.,    0.5  ],
+              [0.,    0.,    0.,    0.33,  0.   ],
+              [0.,    0.,    0.,    0.,    0.   ],
+              [0.,    0.,    0.,    0.,    0.   ]])
+X = sps.coo_matrix(X)
 clf = felz.Felzenswalb(min_size=1,c=1.0)
 clf.fit(X)
 print (clf.labels_)
 ```
 
-```
+```text
 (5, 5)
 [1, 1, 3, 3, 1]
 ```
@@ -245,7 +250,7 @@ Biraz daha çetrefil bir örnek
 import scipy.sparse as sps
 import scipy.io as io, random
 import pandas as pd, os, sys
-syn = pd.read_csv("../algs_080_kmeans/synthetic.txt",comment='#',names=['a','b'],sep="   ")
+syn = pd.read_csv("../algs_080_kmeans/synthetic2.txt",comment='#',names=['a','b'],sep=";")
 data = np.array(syn)
 
 from sklearn.metrics.pairwise import euclidean_distances
@@ -260,7 +265,7 @@ print ('non-zero items', len(X4.nonzero()[0]))
 print (X4.shape)
 ```
 
-```
+```text
 non-zero items 87010
 (3000, 3000)
 ```
@@ -281,7 +286,7 @@ print (len(syn['cluster'].unique()), 'clusters found')
 print (syn[:5])
 ```
 
-```
+```text
 19 clusters found
        a      b  cluster
 0  54620  43523      120
@@ -295,7 +300,7 @@ print (syn[:5])
 import random
 for clust in syn['cluster'].unique():
     tmp = np.array(syn[syn['cluster'] == clust][['a','b']])
-    plt.scatter(tmp[:,0], tmp[:,1], c=np.random.rand(3,1))
+    plt.scatter(tmp[:,0], tmp[:,1])
 plt.savefig('mstseg_01.png')
 ```
 
@@ -308,7 +313,7 @@ gruplayalım.
 import scipy.linalg as lin
 import scipy.sparse as sps
 import itertools, sys
-sys.path.append('../svdcluster/')
+sys.path.append('../../linear/linear_app50svdcluster')
 import leven
 
 words = np.array(
@@ -327,13 +332,13 @@ words = np.array(
      'give', 'day', 'most', 'us'])
 
 (dim,) = words.shape
-f = lambda (x,y): leven.levenshtein(x,y)
-res=np.fromiter(itertools.imap(f, itertools.product(words, words)),dtype=np.uint8)
+f = lambda xy: leven.levenshtein(xy[0], xy[1])
+res=np.fromiter(map(f, itertools.product(words, words)),dtype=np.uint8)
 A = sps.coo_matrix(np.reshape(res,(dim,dim)))
-print A.shape
+print (A.shape)
 ```
 
-```
+```text
 (100, 100)
 ```
 
@@ -345,21 +350,21 @@ clf = felz.Felzenswalb(min_size=1.5,c=0.2)
 clf.fit(A)
 labels = np.array(clf.labels_)
 c = len(np.unique(labels))
-print c, 'clusters found'
+print (c, 'clusters found')
 ```
 
-```
+```text
 (100, 100)
 16 clusters found
 ```
 
 ```python
 for c in np.unique(labels):
-    print 'cluster', c
-    print words[labels==c]
+    print ('cluster', c)
+    print (words[labels==c])
 ```
 
-```
+```text
 cluster 9
 ['a' 'I' 'as' 'at' 'up' 'also' 'use' 'because' 'us']
 cluster 10

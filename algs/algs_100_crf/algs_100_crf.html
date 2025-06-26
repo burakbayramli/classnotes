@@ -15,105 +15,222 @@
    
   <title>Log Lineer Modeller ve Koşulsal Rasgele Alanlar (Log Linear Models and Conditional Random Fields -CRF-)</title>
   <style type="text/css">code{white-space: pre;}</style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
-<h1 id="log-lineer-modeller-ve-koşulsal-rasgele-alanlar-log-linear-models-and-conditional-random-fields--crf-">Log Lineer Modeller ve Koşulsal Rasgele Alanlar (Log Linear Models and Conditional Random Fields -CRF-)</h1>
+<h1
+id="log-lineer-modeller-ve-koşulsal-rasgele-alanlar-log-linear-models-and-conditional-random-fields--crf-">Log
+Lineer Modeller ve Koşulsal Rasgele Alanlar (Log Linear Models and
+Conditional Random Fields -CRF-)</h1>
 <p>Charles Elkan ders notları</p>
-<p>Elkan'ın yapay öğrenim konusuna bakışı ilginç, ona göre yapay öğrenim bir bilgisayar bilim (computer science) konusudur, mesela altta işlenen maksimum olurluk bilgisayar bilimdir.</p>
+<p>Elkan’ın yapay öğrenim konusuna bakışı ilginç, ona göre yapay öğrenim
+bir bilgisayar bilim (computer science) konusudur, mesela altta işlenen
+maksimum olurluk bilgisayar bilimdir.</p>
 <p>Koşulsal Olurluk (Conditional Likelihood)</p>
-<p>Diyelim ki elimizde eğitim verisi olarak ikili <span class="math inline">\(&lt; x,y &gt;\)</span> veri noktaları var. O zaman <span class="math inline">\(y\)</span>'nin <span class="math inline">\(x\)</span>'e koşulsal olarak bağlı (conditional on) bir dağılımı olduğunu söyleyebiliriz.</p>
+<p>Diyelim ki elimizde eğitim verisi olarak ikili <span
+class="math inline">\(&lt; x,y &gt;\)</span> veri noktaları var. O zaman
+<span class="math inline">\(y\)</span>’nin <span
+class="math inline">\(x\)</span>’e koşulsal olarak bağlı (conditional
+on) bir dağılımı olduğunu söyleyebiliriz.</p>
 <p><span class="math display">\[
 y \sim f(x;\theta)
 \]</span></p>
-<p>Yani her <span class="math inline">\(x\)</span> için farklı bir <span class="math inline">\(y\)</span> dağılımı ortaya çıkabilir. Ve tüm bu farklı dağılımların ortak noktası <span class="math inline">\(\theta\)</span> parametresidir. Koşulsal olasılık yani şöyle yazılabilir,</p>
+<p>Yani her <span class="math inline">\(x\)</span> için farklı bir <span
+class="math inline">\(y\)</span> dağılımı ortaya çıkabilir. Ve tüm bu
+farklı dağılımların ortak noktası <span
+class="math inline">\(\theta\)</span> parametresidir. Koşulsal olasılık
+yani şöyle yazılabilir,</p>
 <p><span class="math display">\[
 P(Y=y | X=x;\theta)
 \]</span></p>
-<p>Üsttekiler <span class="math inline">\(Y\)</span> için bir model ortaya koydu, peki elimizde <span class="math inline">\(X\)</span>'in dağılımı için bir olasılık modelimiz var mı? Cevap hayır. Niye? Düşünelim, <span class="math inline">\(p(y,x)\)</span> nedir ?</p>
+<p>Üsttekiler <span class="math inline">\(Y\)</span> için bir model
+ortaya koydu, peki elimizde <span class="math inline">\(X\)</span>’in
+dağılımı için bir olasılık modelimiz var mı? Cevap hayır. Niye?
+Düşünelim, <span class="math inline">\(p(y,x)\)</span> nedir ?</p>
 <p><span class="math display">\[
 p(x,y) = p(x)p(y|x)
 \]</span></p>
-<p>Üstte <span class="math inline">\(p(y|x)\)</span>'i tanımlayacak (<span class="math inline">\(\theta\)</span> üzerinden) bir olasılık demeti / ailesi tanımladık, fakat elimizde <span class="math inline">\(p(x)\)</span> dağılımını verecek bir model yok, o zaman <span class="math inline">\(p(x,y)\)</span>'yi tanımlayacak bir model de yok.</p>
-<p>Fakat bu dünyanın sonu değil. Belki de Yapay Öğrenim (machine learning) branşının bir sloganı şu olmalı: &quot;Öğrenmen gerekmeyen şeyi öğrenme''. Üstteki örnekte <span class="math inline">\(p(y|x)\)</span>'i öğrenebiliriz, ama <span class="math inline">\(p(x)\)</span>'i illa öğrenmemiz gerekir mi?</p>
-<p>Sınıflayıcı (classifier) ve denetimli (supervised) öğrenim durumunu düşünürsek, bize eğitim amaçlı olarak <span class="math inline">\(&lt; x,y &gt;\)</span> ikili veri noktaları sağlanacak. <span class="math inline">\(x\)</span> kaynak veri, <span class="math inline">\(y\)</span> tahmin edilecek (ya da başta eğitim hedefi olan) etiket olacak. <span class="math inline">\(y\)</span> için bir model ortaya çıkartıyoruz, çünkü test zamanında <span class="math inline">\(y\)</span> olmayacak, fakat <span class="math inline">\(x\)</span> hep olacak. Yani <span class="math inline">\(y\)</span>'nin modellenmesi mecburi, çünkü &quot;genelleyerek'' onun ne olduğunu bulacağız, ama <span class="math inline">\(x\)</span> hep verili.</p>
+<p>Üstte <span class="math inline">\(p(y|x)\)</span>’i tanımlayacak
+(<span class="math inline">\(\theta\)</span> üzerinden) bir olasılık
+demeti / ailesi tanımladık, fakat elimizde <span
+class="math inline">\(p(x)\)</span> dağılımını verecek bir model yok, o
+zaman <span class="math inline">\(p(x,y)\)</span>’yi tanımlayacak bir
+model de yok.</p>
+<p>Fakat bu dünyanın sonu değil. Belki de Yapay Öğrenim (machine
+learning) branşının bir sloganı şu olmalı: “Öğrenmen gerekmeyen şeyi
+öğrenme’’. Üstteki örnekte <span class="math inline">\(p(y|x)\)</span>’i
+öğrenebiliriz, ama <span class="math inline">\(p(x)\)</span>’i illa
+öğrenmemiz gerekir mi?</p>
+<p>Sınıflayıcı (classifier) ve denetimli (supervised) öğrenim durumunu
+düşünürsek, bize eğitim amaçlı olarak <span class="math inline">\(&lt;
+x,y &gt;\)</span> ikili veri noktaları sağlanacak. <span
+class="math inline">\(x\)</span> kaynak veri, <span
+class="math inline">\(y\)</span> tahmin edilecek (ya da başta eğitim
+hedefi olan) etiket olacak. <span class="math inline">\(y\)</span> için
+bir model ortaya çıkartıyoruz, çünkü test zamanında <span
+class="math inline">\(y\)</span> olmayacak, fakat <span
+class="math inline">\(x\)</span> hep olacak. Yani <span
+class="math inline">\(y\)</span>’nin modellenmesi mecburi, çünkü
+“genelleyerek’’ onun ne olduğunu bulacağız, ama <span
+class="math inline">\(x\)</span> hep verili.</p>
 <p>Koşulsal Olurluk Maksimum Olurluk Prensibi</p>
-<p>Eğitim verisi <span class="math inline">\(&lt; x_1,y_1 &gt;,...,&lt; x_n,y_n &gt;\)</span> için, <span class="math inline">\(\theta\)</span>'yi şöyle seç</p>
+<p>Eğitim verisi <span class="math inline">\(&lt; x_1,y_1 &gt;,...,&lt;
+x_n,y_n &gt;\)</span> için, <span
+class="math inline">\(\theta\)</span>’yi şöyle seç</p>
 <p><span class="math display">\[
 \hat{\theta} =  \arg\max_{\theta} \prod_{i=1}^{n} p(y_i | x_i;\theta)
 \]</span></p>
-<p>Normal maksimum olurlukta bilindiği gibi olasılıkların çarpımı maksimize edilir, burada maksimize ettiğimiz &quot;koşulsal'' olasılıkların çarpımı.</p>
-<p>Burada önemli bir soru şu: bildiğimiz gibi maksimum olurluk hesabı her veri noktasının bir diğerinden bağımsız olduğunu farzeder [çünkü her olurluk hesabını bir diğer ile çarpıyoruz, başka ek çarpım, toplama, vs yapmıyoruz], bu faraziye doğru bir faraziye midir? Bu soru ve ona verilecek cevap çok önemli. Evet, eğer eğitim noktaları birbirinden bağımsız değilse maksimum olurluk kullanmamalıyız. Bağımsızlığı da iyi tanımlamak gerekiyor tabii, eğer üstteki durumda <span class="math inline">\(x_i\)</span> <em>verildikten sonra</em> <span class="math inline">\(y_i\)</span>'ların birbirinden bağımsız olması yeterli.</p>
-<p>Bu model klasik İstatistik'te çokça kullanılan bir yaklaşımdır, hatta lineer regresyon'un temeli üstteki faraziyedir.</p>
+<p>Normal maksimum olurlukta bilindiği gibi olasılıkların çarpımı
+maksimize edilir, burada maksimize ettiğimiz “koşulsal’’ olasılıkların
+çarpımı.</p>
+<p>Burada önemli bir soru şu: bildiğimiz gibi maksimum olurluk hesabı
+her veri noktasının bir diğerinden bağımsız olduğunu farzeder [çünkü her
+olurluk hesabını bir diğer ile çarpıyoruz, başka ek çarpım, toplama, vs
+yapmıyoruz], bu faraziye doğru bir faraziye midir? Bu soru ve ona
+verilecek cevap çok önemli. Evet, eğer eğitim noktaları birbirinden
+bağımsız değilse maksimum olurluk kullanmamalıyız. Bağımsızlığı da iyi
+tanımlamak gerekiyor tabii, eğer üstteki durumda <span
+class="math inline">\(x_i\)</span> <em>verildikten sonra</em> <span
+class="math inline">\(y_i\)</span>’ların birbirinden bağımsız olması
+yeterli.</p>
+<p>Bu model klasik İstatistik’te çokça kullanılan bir yaklaşımdır, hatta
+lineer regresyon’un temeli üstteki faraziyedir.</p>
 <p><span class="math display">\[
 y = \alpha + \bar{\beta}\bar{x} + N(0,\sigma^2)
 \]</span></p>
-<p>Bu standart lineer regresyon modeli, ve bu modelde her <span class="math inline">\(y\)</span> ona tekabül eden <span class="math inline">\(x\)</span>'e bağlı, bu sayede <span class="math inline">\(x\)</span>'ler biliniyorsa <span class="math inline">\(y\)</span>'ler birbirinden koşulsal olarak bağımsız hale geliyor, böylece <span class="math inline">\(x\)</span>'ler birbirine bağımlı olsa bile <span class="math inline">\(\alpha\)</span> ve <span class="math inline">\(\beta\)</span> 'nin bulunması mümkün oluyor.</p>
-<div class="figure">
-<img src="crf_1.png" />
-
-</div>
-<p>Üstteki resimde eğitim noktaları (training points) mavi olsun, test noktaları yeşil olsun (hemen altında). Bazı Yapay Öğrenim yaklaşımları diyebilir ki eğitim <span class="math inline">\(x\)</span>'lerinin dağılımı test <span class="math inline">\(x\)</span>'lerinin dağılımından farklı, bu veri seti öğrenilemez (yani genellenemez, modellenemez). Fakat klasik İstatistik buna bakar ve der ki <span class="math inline">\(x\)</span>'lerin verildiği durumda <span class="math inline">\(y\)</span>'ler bağımsızdır, bu şekilde bir koşulsal model öğrenilebilir.</p>
-<p>Lojistik Regresyon aynı şekilde işler (lojistik regresyon, log lineer modellerin özel bir halidir, CRF'ler aynı şekilde). Burada da öğrenilen bir</p>
+<p>Bu standart lineer regresyon modeli, ve bu modelde her <span
+class="math inline">\(y\)</span> ona tekabül eden <span
+class="math inline">\(x\)</span>’e bağlı, bu sayede <span
+class="math inline">\(x\)</span>’ler biliniyorsa <span
+class="math inline">\(y\)</span>’ler birbirinden koşulsal olarak
+bağımsız hale geliyor, böylece <span
+class="math inline">\(x\)</span>’ler birbirine bağımlı olsa bile <span
+class="math inline">\(\alpha\)</span> ve <span
+class="math inline">\(\beta\)</span> ’nin bulunması mümkün oluyor.</p>
+<p><img src="crf_1.png" /></p>
+<p>Üstteki resimde eğitim noktaları (training points) mavi olsun, test
+noktaları yeşil olsun (hemen altında). Bazı Yapay Öğrenim yaklaşımları
+diyebilir ki eğitim <span class="math inline">\(x\)</span>’lerinin
+dağılımı test <span class="math inline">\(x\)</span>’lerinin
+dağılımından farklı, bu veri seti öğrenilemez (yani genellenemez,
+modellenemez). Fakat klasik İstatistik buna bakar ve der ki <span
+class="math inline">\(x\)</span>’lerin verildiği durumda <span
+class="math inline">\(y\)</span>’ler bağımsızdır, bu şekilde bir
+koşulsal model öğrenilebilir.</p>
+<p>Lojistik Regresyon aynı şekilde işler (lojistik regresyon, log lineer
+modellerin özel bir halidir, CRF’ler aynı şekilde). Burada da öğrenilen
+bir</p>
 <p><span class="math display">\[
 p = p(y | x;\alpha, \beta)
 \]</span></p>
-<p>modeli vardır ve <span class="math inline">\(y\)</span> değerleri sadece 0 ve 1 olabilir. Tahmin edilen olasılık ise <span class="math inline">\(y\)</span>'nin 1 olma olasılığıdır. Bu model Rasgele Gradyan Çıkışı ile eğitilir [detaylar için bkz <em>Lojistik Regresyon</em> notları].</p>
+<p>modeli vardır ve <span class="math inline">\(y\)</span> değerleri
+sadece 0 ve 1 olabilir. Tahmin edilen olasılık ise <span
+class="math inline">\(y\)</span>’nin 1 olma olasılığıdır. Bu model
+Rasgele Gradyan Çıkışı ile eğitilir [detaylar için bkz <em>Lojistik
+Regresyon</em> notları].</p>
 <p><span class="math display">\[
 \log \frac{p}{1-p} = \alpha + \sum_j \beta_j x_j
 \]</span></p>
-<div class="figure">
-<img src="crf_2.png" />
-
-</div>
-<p><span class="math inline">\(p\)</span> log şansının monotonik bir fonksiyonudur, ve ters yönden bakarsak, log şans <span class="math inline">\(p\)</span>'nin monotonik bir fonksiyonudur. Yani lineer bir fonksiyon (sağ taraf) ne kadar büyürse, olasılık / log şans o kadar büyüyecektir. Bu büyüme durumu mesela <span class="math inline">\(\beta_j\)</span> katsayısını veri analizi bağlamında yorumlanabilir hale getirir. Diyelim ki <span class="math inline">\(\beta_4\)</span> katsayısı pozitif, o zaman diğer tüm şartların eşit olduğu durumda (with all else being equal) <span class="math inline">\(x_4\)</span> ne kadar buyurse 1 olma olasılığı o kadar artar.</p>
-<p>Lojistik modellerin önemli bazı avantajları var, ki bu avantajlar log lineer modellere de sirayet ediyor (bu iyi).</p>
-<ol style="list-style-type: decimal">
-<li>Değişkenler arası ilinti (correlation) probleme yol açmaz: Bu fayda aslında daha önce belirttiğimiz <span class="math inline">\(x\)</span>'lerin birbirine bağımlı olabilmesi ile alakalı. Bağımsızlık önşartı aranmadığı için istediğimiz kadar <span class="math inline">\(x\)</span>'i problemin üzerine atabiliriz, eğitici algoritma bunlardan çıkartabildiği kadar iyi bir model bulacaktır.</li>
+<p><img src="crf_2.png" /></p>
+<p><span class="math inline">\(p\)</span> log şansının monotonik bir
+fonksiyonudur, ve ters yönden bakarsak, log şans <span
+class="math inline">\(p\)</span>’nin monotonik bir fonksiyonudur. Yani
+lineer bir fonksiyon (sağ taraf) ne kadar büyürse, olasılık / log şans o
+kadar büyüyecektir. Bu büyüme durumu mesela <span
+class="math inline">\(\beta_j\)</span> katsayısını veri analizi
+bağlamında yorumlanabilir hale getirir. Diyelim ki <span
+class="math inline">\(\beta_4\)</span> katsayısı pozitif, o zaman diğer
+tüm şartların eşit olduğu durumda (with all else being equal) <span
+class="math inline">\(x_4\)</span> ne kadar buyurse 1 olma olasılığı o
+kadar artar.</p>
+<p>Lojistik modellerin önemli bazı avantajları var, ki bu avantajlar log
+lineer modellere de sirayet ediyor (bu iyi).</p>
+<ol type="1">
+<li>Değişkenler arası ilinti (correlation) probleme yol açmaz: Bu fayda
+aslında daha önce belirttiğimiz <span
+class="math inline">\(x\)</span>’lerin birbirine bağımlı olabilmesi ile
+alakalı. Bağımsızlık önşartı aranmadığı için istediğimiz kadar <span
+class="math inline">\(x\)</span>’i problemin üzerine atabiliriz, eğitici
+algoritma bunlardan çıkartabildiği kadar iyi bir model bulacaktır.</li>
 </ol>
-<p>Kıyasla mesela Naive Bayes böyle değildir, eğer bir NB sınıflayıcısını eğitiyorsak, ve öğelerin (feature) arasında ilinti var ise, sınıflayıcının doğrulugu (accuracy) azalabilir.</p>
-<ol start="2" style="list-style-type: decimal">
-<li><p>LR ile &quot;1 olma olasılığını'', yani &quot;bir sayısal skoru'', elde ediyoruz, bu sadece 1/0 değerinden daha fazla bir bilgi demektir.</p></li>
-<li><p>Bu skor, anlamı olan bir olasılıksal değerdir: Sonuçta SVM sınıflayıcıları da <span class="math inline">\(-\infty\)</span> ve <span class="math inline">\(+\infty\)</span> arasında değerler döndürürler, ve bu değerler sıralama (ranking) amaçlı kullanılabilir, fakat olasılık matematiği açısından anlamı olan bir değerin olması bundan bile iyidir. Naive Bayes 0 ve 1 arasında değer döndürebilir, fakat bu değerlerin de olasılıksal olarak aslında anlamı yoktur, pratikte görüldü ki bu değerler çok uç noktalarda, ya sıfıra çok yakın, ya bire çok yakın. Literatürde NB skorlarının &quot;iyi kalibre edilmiş olmadığı'' söylenir.</p></li>
+<p>Kıyasla mesela Naive Bayes böyle değildir, eğer bir NB
+sınıflayıcısını eğitiyorsak, ve öğelerin (feature) arasında ilinti var
+ise, sınıflayıcının doğrulugu (accuracy) azalabilir.</p>
+<ol start="2" type="1">
+<li><p>LR ile “1 olma olasılığını’‘, yani “bir sayısal skoru’’, elde
+ediyoruz, bu sadece 1/0 değerinden daha fazla bir bilgi
+demektir.</p></li>
+<li><p>Bu skor, anlamı olan bir olasılıksal değerdir: Sonuçta SVM
+sınıflayıcıları da <span class="math inline">\(-\infty\)</span> ve <span
+class="math inline">\(+\infty\)</span> arasında değerler döndürürler, ve
+bu değerler sıralama (ranking) amaçlı kullanılabilir, fakat olasılık
+matematiği açısından anlamı olan bir değerin olması bundan bile iyidir.
+Naive Bayes 0 ve 1 arasında değer döndürebilir, fakat bu değerlerin de
+olasılıksal olarak aslında anlamı yoktur, pratikte görüldü ki bu
+değerler çok uç noktalarda, ya sıfıra çok yakın, ya bire çok yakın.
+Literatürde NB skorlarının “iyi kalibre edilmiş olmadığı’’
+söylenir.</p></li>
 </ol>
-<p><span class="math inline">\(X_1,...,X_n\)</span> test örnekleri ve tahmin edilen olasılıklar <span class="math inline">\(P(Y=1 | x_i) = v_i\)</span> olsun. Diyelim ki <span class="math inline">\(s = \sum_i v_i\)</span> ve <span class="math inline">\(t\)</span> sayısı <span class="math inline">\(1,..,n\)</span> tane öğenin içinden <span class="math inline">\(y = 1\)</span> değerini taşıyan öğelerin sayısı olsun. Örnek, elimizde 100 tane eğitim noktası var, bunların 60'ı 1 değerinde. Bu durumda <span class="math inline">\(s\)</span> yaklaşık 60 olacaktır (rasgele gürültüyü hesaba katarsak tabii), yani <span class="math inline">\(E[t] = s\)</span> denebilecektir ve bu sadece eğer olasılıklar iyi kalibre edilmişse söylenebilir.</p>
-<ol start="4" style="list-style-type: decimal">
-<li>Dengesiz eğitim verisi kullanılabilir: pek çok eğitim setinde mesela 1 değeri taşıyan değerleri 0 değeri taşıyanlardan çok daha fazla. Lojistik regresyon bu tür veriyle rahatça çalışabilir.</li>
+<p><span class="math inline">\(X_1,...,X_n\)</span> test örnekleri ve
+tahmin edilen olasılıklar <span class="math inline">\(P(Y=1 | x_i) =
+v_i\)</span> olsun. Diyelim ki <span class="math inline">\(s = \sum_i
+v_i\)</span> ve <span class="math inline">\(t\)</span> sayısı <span
+class="math inline">\(1,..,n\)</span> tane öğenin içinden <span
+class="math inline">\(y = 1\)</span> değerini taşıyan öğelerin sayısı
+olsun. Örnek, elimizde 100 tane eğitim noktası var, bunların 60’ı 1
+değerinde. Bu durumda <span class="math inline">\(s\)</span> yaklaşık 60
+olacaktır (rasgele gürültüyü hesaba katarsak tabii), yani <span
+class="math inline">\(E[t] = s\)</span> denebilecektir ve bu sadece eğer
+olasılıklar iyi kalibre edilmişse söylenebilir.</p>
+<ol start="4" type="1">
+<li>Dengesiz eğitim verisi kullanılabilir: pek çok eğitim setinde mesela
+1 değeri taşıyan değerleri 0 değeri taşıyanlardan çok daha fazla.
+Lojistik regresyon bu tür veriyle rahatça çalışabilir.</li>
 </ol>
 <p>Ders 3</p>
-<p>Lojistik regresyon için log olurluğun (LCL) türevini almak lazım. Önce basitleştirme amaçlı <span class="math inline">\(\alpha = \beta_o\)</span>, ve <span class="math inline">\(x_0 = 1\)</span>. O zaman log şansın eski hali (altta eşitliğin sol tarafı) şöyle yazılabilir (sağ taraf), daha derli toplu bir formül olur,</p>
+<p>Lojistik regresyon için log olurluğun (LCL) türevini almak lazım.
+Önce basitleştirme amaçlı <span class="math inline">\(\alpha =
+\beta_o\)</span>, ve <span class="math inline">\(x_0 = 1\)</span>. O
+zaman log şansın eski hali (altta eşitliğin sol tarafı) şöyle
+yazılabilir (sağ taraf), daha derli toplu bir formül olur,</p>
 <p><span class="math display">\[
 \alpha + \sum_j \beta_j x_j  = \sum_{j=0}^{d} \beta_j x_j
 \]</span></p>
-<p>Bulmak istediğim her <span class="math inline">\(j\)</span> için <span class="math inline">\(\frac{d}{d \beta_j} LCL\)</span> lazım</p>
-<p><span class="math display">\[ 
-\frac{d}{d \beta_j} LCL = 
+<p>Bulmak istediğim her <span class="math inline">\(j\)</span> için
+<span class="math inline">\(\frac{d}{d \beta_j} LCL\)</span> lazım</p>
+<p><span class="math display">\[
+\frac{d}{d \beta_j} LCL =
 \sum_{i:y_i=1} \frac{d}{d \beta_j} \log p(1|..)
 + \sum_{i:y_i=0} \frac{d}{d \beta_j} \log p(0|..)
 \qquad (3)
 \]</span></p>
-<p>Eğer üstteki bir bölümü <span class="math inline">\(p\)</span> diğerine <span class="math inline">\(1-p\)</span> dersem, yani şöyle</p>
-<p><span class="math display">\[ 
+<p>Eğer üstteki bir bölümü <span class="math inline">\(p\)</span>
+diğerine <span class="math inline">\(1-p\)</span> dersem, yani şöyle</p>
+<p><span class="math display">\[
 = \sum_{i:y_i=1} \frac{d}{d \beta_j} \underbrace{\log p(1|..)}_{p}
 + \sum_{i:y_i=0} \frac{d}{d \beta_j} \underbrace{\log p(0|..)}_{1-p}
 \]</span></p>
 <p>O zaman</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 = \sum_{i:y_i=1} \frac{d}{d \beta_j}\log p
 + \sum_{i:y_i=0} \frac{d}{d \beta_j} \log (1-p)
 \]</span></p>
 <p>Biliyoruz ki</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \frac{d}{d \beta_j}\log p = \frac{1}{p}\frac{d}{d \beta_j} p
 \qquad (1)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \frac{d}{d \beta_j}\log (1-p) = \frac{1}{1-p}(-1)\frac{d}{d \beta_j} p
 \qquad (2)
 \]</span></p>
-<p>Üstteki son iki formülün her ikisinde de <span class="math inline">\(d / d \beta_j p\)</span> kısmı olduğuna dikkat.</p>
+<p>Üstteki son iki formülün her ikisinde de <span
+class="math inline">\(d / d \beta_j p\)</span> kısmı olduğuna
+dikkat.</p>
 <p>Notasyon</p>
 <p><span class="math display">\[
 e = \exp \big[ - \sum_{j=0}^n \beta_jx_j \big]
@@ -124,7 +241,9 @@ p = \frac{ 1}{1+e}
 <p><span class="math display">\[
 1-p = \frac{ 1+e-1}{1+e} = \frac{ e}{1+e}
 \]</span></p>
-<p>Şimdi <span class="math inline">\(d / d \beta_j p\)</span> 'ye dönelim, ve <span class="math inline">\(p\)</span>'nin üstteki gibi olduğundan hareketle,</p>
+<p>Şimdi <span class="math inline">\(d / d \beta_j p\)</span> ’ye
+dönelim, ve <span class="math inline">\(p\)</span>’nin üstteki gibi
+olduğundan hareketle,</p>
 <p><span class="math display">\[
 \frac{ d}{d \beta_j}p = (-1)(1+e)^{-2} \frac{ d}{d \beta_j}e
 \]</span></p>
@@ -134,36 +253,57 @@ p = \frac{ 1}{1+e}
 <p><span class="math display">\[
 = \frac{ 1}{1+e} \frac{ e}{1+e}x_j = p(1-p)x_j
 \]</span></p>
-<p>Son ifade kodlama için oldukça uygun, <span class="math inline">\(d/d \beta_j p\)</span> hesabını yine içinde <span class="math inline">\(p\)</span> içeren bir ifadeye bağladık, ayrıca türev <span class="math inline">\(x_j\)</span> ile orantılı.</p>
-<p>Bu hesapla aslında (1) içindeki <span class="math inline">\(d/d \beta_j p\)</span> kısmını hesaplamış olduk. Eğer yerine koyarsak,</p>
-<p><span class="math display">\[ 
-\frac{d}{d \beta_j}\log p = \frac{1}{p}p(1-p)x_j 
+<p>Son ifade kodlama için oldukça uygun, <span class="math inline">\(d/d
+\beta_j p\)</span> hesabını yine içinde <span
+class="math inline">\(p\)</span> içeren bir ifadeye bağladık, ayrıca
+türev <span class="math inline">\(x_j\)</span> ile orantılı.</p>
+<p>Bu hesapla aslında (1) içindeki <span class="math inline">\(d/d
+\beta_j p\)</span> kısmını hesaplamış olduk. Eğer yerine koyarsak,</p>
+<p><span class="math display">\[
+\frac{d}{d \beta_j}\log p = \frac{1}{p}p(1-p)x_j
 \]</span></p>
-<p><span class="math inline">\(p\)</span>'ler iptal olur</p>
-<p><span class="math display">\[ 
-= (1-p)x_j 
+<p><span class="math inline">\(p\)</span>’ler iptal olur</p>
+<p><span class="math display">\[
+= (1-p)x_j
 \]</span></p>
 <p>Aynı şekilde (2) için</p>
-<p><span class="math display">\[ 
-\frac{d}{d \beta_j}\log (1-p) = \frac{1}{1-p}(-1) p(1-p)x_j 
+<p><span class="math display">\[
+\frac{d}{d \beta_j}\log (1-p) = \frac{1}{1-p}(-1) p(1-p)x_j
 \]</span></p>
-<p><span class="math display">\[ 
- =  -px_j 
+<p><span class="math display">\[
+=  -px_j
 \]</span></p>
-<p>Üstteki türevler tek bir eğitim veri noktası için. Tüm eğitim veri setinin türevi her noktanın türevlerinin toplamı olacak, (3)'de görüldüğü gibi.</p>
-<p><span class="math display">\[ \frac{d}{d \beta_j} LCL = 
-\sum_{i: y_i = 1} (1-p_i)x_{ij} + 
+<p>Üstteki türevler tek bir eğitim veri noktası için. Tüm eğitim veri
+setinin türevi her noktanın türevlerinin toplamı olacak, (3)’de
+görüldüğü gibi.</p>
+<p><span class="math display">\[ \frac{d}{d \beta_j} LCL =
+\sum_{i: y_i = 1} (1-p_i)x_{ij} +
 \sum_{i: y_i = 0} -p_i x_{ij}  
 \qquad (4)
 \]</span></p>
-<p><span class="math inline">\(x_{ij}\)</span> notasyonunda <span class="math inline">\(j\)</span>, <span class="math inline">\(j\)</span>'inci öğe / özellik anlamına geliyor. Şimdi notasyonel bir numara kullanacağım,</p>
-<p><span class="math display">\[ = \sum_{tum \ i} (y_i - p_i)x_{ij} \]</span></p>
-<p>Bunu niye yaptım? (4) formülünde eşitliğin sağ tarafı, birinci terim içinde 1 sayısı var, sonraki terimde 1 yok. Eğer 1 olup olmaması yerine <span class="math inline">\(y_i\)</span> kullanırsam, ki zaten 1'in olup olmaması <span class="math inline">\(y_i\)</span>'nin 1 olup olmamasına bağlı, tek bir terimde işi halledebilirim. <span class="math inline">\(y_i=1\)</span> olduğu zaman üstteki ifade <span class="math inline">\(1-p_i\)</span> olacaktır, olmadığı zaman <span class="math inline">\(-p_i\)</span> olacaktır.</p>
-<p>Eriştiğimiz sonucu analiz etmemiz gerekirse, nihai formül gayet basit ve temiz çıktı.</p>
+<p><span class="math inline">\(x_{ij}\)</span> notasyonunda <span
+class="math inline">\(j\)</span>, <span
+class="math inline">\(j\)</span>’inci öğe / özellik anlamına geliyor.
+Şimdi notasyonel bir numara kullanacağım,</p>
+<p><span class="math display">\[ = \sum_{tum \ i} (y_i - p_i)x_{ij}
+\]</span></p>
+<p>Bunu niye yaptım? (4) formülünde eşitliğin sağ tarafı, birinci terim
+içinde 1 sayısı var, sonraki terimde 1 yok. Eğer 1 olup olmaması yerine
+<span class="math inline">\(y_i\)</span> kullanırsam, ki zaten 1’in olup
+olmaması <span class="math inline">\(y_i\)</span>’nin 1 olup olmamasına
+bağlı, tek bir terimde işi halledebilirim. <span
+class="math inline">\(y_i=1\)</span> olduğu zaman üstteki ifade <span
+class="math inline">\(1-p_i\)</span> olacaktır, olmadığı zaman <span
+class="math inline">\(-p_i\)</span> olacaktır.</p>
+<p>Eriştiğimiz sonucu analiz etmemiz gerekirse, nihai formül gayet basit
+ve temiz çıktı.</p>
 <p>[24:10] kalibrasyonla alakalı bir yorum</p>
 <p>Rasgele Gradyan Çıkışı (Stochastic Gradient Ascent)</p>
-<p>Fikir: türevi eğitim noktası basına hesapla, ve modeli hemen güncelle.</p>
-<p>Eğitim noktaları <span class="math inline">\(&lt; x,y &gt;\)</span> olarak gelsinler. Her nokta için, ve her <span class="math inline">\(\beta_j\)</span> için</p>
+<p>Fikir: türevi eğitim noktası basına hesapla, ve modeli hemen
+güncelle.</p>
+<p>Eğitim noktaları <span class="math inline">\(&lt; x,y &gt;\)</span>
+olarak gelsinler. Her nokta için, ve her <span
+class="math inline">\(\beta_j\)</span> için</p>
 <p><span class="math display">\[
 \frac{d}{d \beta_j} p(y|x;\beta) = g_j
 \]</span></p>
@@ -171,165 +311,473 @@ p = \frac{ 1}{1+e}
 <p><span class="math display">\[
 \beta_j := \beta_j + \alpha g_j
 \]</span></p>
-<p>Gradyanın ne olduğunu hatırlayalım, bir fonksiyonun maksimumuna &quot;doğru'' olan bir gidiş yönünü gösterir, ve bu gidiş yönü o fonksiyonu oluşturan değişkenlerin (parçalı türevleri) üzerinden belirtilir. O zaman elimizdeki gradyan o iç değişkenlerin maksimum yöndeki değişim şeklini bize tarif eder.</p>
+<p>Gradyanın ne olduğunu hatırlayalım, bir fonksiyonun maksimumuna
+“doğru’’ olan bir gidiş yönünü gösterir, ve bu gidiş yönü o fonksiyonu
+oluşturan değişkenlerin (parçalı türevleri) üzerinden belirtilir. O
+zaman elimizdeki gradyan o iç değişkenlerin maksimum yöndeki değişim
+şeklini bize tarif eder.</p>
 <p>Algoritmanın tamamı: alttaki formül için</p>
-<p><span class="math display">\[ \frac{d}{d \beta_j}p(y|\bar{x};\bar{\beta}) = (y-p)x_j \]</span></p>
+<p><span class="math display">\[ \frac{d}{d
+\beta_j}p(y|\bar{x};\bar{\beta}) = (y-p)x_j \]</span></p>
 <p>Her <span class="math inline">\(x\)</span> için</p>
 <ul>
-<li><p>O anki modele göre <span class="math inline">\(p\)</span>'yi hesapla</p></li>
+<li><p>O anki modele göre <span class="math inline">\(p\)</span>’yi
+hesapla</p></li>
 <li><p>Her <span class="math inline">\(j = 0,..,d\)</span> için</p></li>
 </ul>
-<p><span class="math inline">\(\beta_j := \beta_j + \alpha \underbrace{ (y-p) x_j}_{\textrm{kısmi türev}}\)</span> hesapla</p>
-<p>Peki metotun ismindeki &quot;rasgele (stochastic)'' tanımı nereden geliyor? İyi bir soru bu çünkü metotta rasgele sayı üretimi gibi şeyler görmüyoruz. Cevap, metot yine de rasgele, çünkü her noktayı ayrı ayrı işliyoruz, ve bu noktaların eğitim algoritmasını gelişi bir nevi &quot;veriyi örneklemek'' gibi sanki, ek olarak veriyi eğitime almadan önce rasgele şekilde karıştırmak ta iyi olabilir.</p>
+<p><span class="math inline">\(\beta_j := \beta_j + \alpha \underbrace{
+(y-p) x_j}_{\textrm{kısmi türev}}\)</span> hesapla</p>
+<p>Peki metotun ismindeki “rasgele (stochastic)’’ tanımı nereden
+geliyor? İyi bir soru bu çünkü metotta rasgele sayı üretimi gibi şeyler
+görmüyoruz. Cevap, metot yine de rasgele, çünkü her noktayı ayrı ayrı
+işliyoruz, ve bu noktaların eğitim algoritmasını gelişi bir nevi”veriyi
+örneklemek’’ gibi sanki, ek olarak veriyi eğitime almadan önce rasgele
+şekilde karıştırmak ta iyi olabilir.</p>
 <p>Bazı Tavsiyeler (Heuristics)</p>
-<ol style="list-style-type: decimal">
-<li><p>Her özellik (feature) <span class="math inline">\(x_j\)</span>'i ölçeklemek, yani aynı ortalama (mean) ve varyansa sahip olacak şekilde tekrar ayarlamak. Yani mesela 0 ile 100 arasında olabilecek &quot;yaş'' gibi bir özelliği, 0 ve 1 arasında değişen özellikler ile aynı ortalama ve varyansa sahip olacak şekilde ayarlamak. Bunun sebebi güncelleme hesabındaki <span class="math inline">\(\lambda\)</span>'nin tek bir sabit olması, ve bu sabit her <span class="math inline">\(j\)</span> için aynıdır, o sebeple <span class="math inline">\(\lambda\)</span>'nin her öğeye &quot;aynı şekilde'' uygulanabilmesi için öğelerin birbirine yakın olması iyidir. Ek olarak, genellikle eğitim verisinde 0 ile 1 arasında ikisel türden öğeler vardır, o sebeple bu şekilde olmayan diğer ögeleri 0 ve 1 arasında çekmek daha uygun ve kolay olur.</p></li>
-<li><p>Veriyi rasgele şekilde sıralamak. Terminoloji: eğitim veri seti üzerinden bir geçiş yapmak bir &quot;çağ'' (epoch) olarak bilinir.</p></li>
-<li><p><span class="math inline">\(\lambda\)</span>'yi deneme / yanılma yöntemi ile bulun (bu sabiti bulmanın sistemik bir yöntemi yok). Belki verinin içinden alınan daha ufak bir örneklem üzerinde bu deneme / yanılma işlemi yapılabilir.</p></li>
-<li><p>Deneme yanılma işlemini şöyle yapabilirsiniz: büyük bir <span class="math inline">\(\lambda\)</span> ile ise başlarsınız, ve her çağda <span class="math inline">\(\lambda\)</span> değerini azaltabilirsiniz (mesela her çağ sonunda <span class="math inline">\(1/2\)</span> ile çarparak).</p></li>
+<ol type="1">
+<li><p>Her özellik (feature) <span class="math inline">\(x_j\)</span>’i
+ölçeklemek, yani aynı ortalama (mean) ve varyansa sahip olacak şekilde
+tekrar ayarlamak. Yani mesela 0 ile 100 arasında olabilecek “yaş’’ gibi
+bir özelliği, 0 ve 1 arasında değişen özellikler ile aynı ortalama ve
+varyansa sahip olacak şekilde ayarlamak. Bunun sebebi güncelleme
+hesabındaki <span class="math inline">\(\lambda\)</span>’nin tek bir
+sabit olması, ve bu sabit her <span class="math inline">\(j\)</span>
+için aynıdır, o sebeple <span class="math inline">\(\lambda\)</span>’nin
+her öğeye”aynı şekilde’’ uygulanabilmesi için öğelerin birbirine yakın
+olması iyidir. Ek olarak, genellikle eğitim verisinde 0 ile 1 arasında
+ikisel türden öğeler vardır, o sebeple bu şekilde olmayan diğer ögeleri
+0 ve 1 arasında çekmek daha uygun ve kolay olur.</p></li>
+<li><p>Veriyi rasgele şekilde sıralamak. Terminoloji: eğitim veri seti
+üzerinden bir geçiş yapmak bir “çağ’’ (epoch) olarak bilinir.</p></li>
+<li><p><span class="math inline">\(\lambda\)</span>’yi deneme / yanılma
+yöntemi ile bulun (bu sabiti bulmanın sistemik bir yöntemi yok). Belki
+verinin içinden alınan daha ufak bir örneklem üzerinde bu deneme /
+yanılma işlemi yapılabilir.</p></li>
+<li><p>Deneme yanılma işlemini şöyle yapabilirsiniz: büyük bir <span
+class="math inline">\(\lambda\)</span> ile ise başlarsınız, ve her çağda
+<span class="math inline">\(\lambda\)</span> değerini azaltabilirsiniz
+(mesela her çağ sonunda <span class="math inline">\(1/2\)</span> ile
+çarparak).</p></li>
 </ol>
 <p>Ders 4</p>
 <p>Log Lineer Modeller</p>
-<p>Bu modeller lojistik regresyonun yapıya sahip (structured) girdiler ve çıktılar için genellenmiş halidir. Lojistik regresyonda girdi <span class="math inline">\(\bar{x} \in \mathbb{R}^d\)</span> ve çıktı <span class="math inline">\(y \in {0,1}\)</span> idi, yani çıktı ikiseldi. Fakat biz bundan daha genel yapay öğrenim problemlerini çözmek istiyoruz, yani istediğimiz <span class="math inline">\(x \in \mathbb{X}\)</span>, ki <span class="math inline">\(\mathbb{X}\)</span> herhangi bir uzay olabilmeli, ve <span class="math inline">\(y \in \mathbb{Y}\)</span> ki <span class="math inline">\(\mathbb{Y}\)</span> aynı şekilde herhangi bir uzay olabilmeli.</p>
-<p>Mesela <span class="math inline">\(x\)</span> bir cümle olabilmeli, diyelim ki <span class="math inline">\(x\)</span> = &quot;he sat on the mat'', tercümesi &quot;adam paspasın üzerinde oturdu''. Buna karşılık olan <span class="math inline">\(y\)</span> ise mesela şöyle olabilmeli, <span class="math inline">\(y\)</span> = &quot;pronoun verb article noun'', yani her kelimenin hangi gramer ögesi olduğunu gösteren bir ibare. Mesela &quot;sat'' yani oturmak, bir fiil (verb), &quot;mat'' paspas, bir isim (noun), ve <span class="math inline">\(y\)</span> içinde gelen eğitim verisinde bunlar olabilmeli (üstteki örnekte ikinci öğe), sadece 0/1 değerleri değil.</p>
-<p>Bu tabii ki denetimli bir eğitim şekli olacak. Fakat dikkat bazı yapay öğrenim uygulamalarında &quot;çok sınıftan gelen'' ama tek bir değer vardır, mesela <span class="math inline">\(y \in {1,2,3}\)</span> olabilir, 3 sınıflı bir çıktı yani. Bazen çıktı gerçek sayı (real number) olabilir, ama yine de tek bir <span class="math inline">\(y\)</span> değeri vardır. Üstteki durum böyle değildir. Potansiyel olarak <span class="math inline">\(y\)</span>'nin büyüklüğü <span class="math inline">\(x\)</span> ile birebir aynı bile olmayabilir. Bu tür bir karışık eşlemeden bahsediyoruz. Tek sınırlamamız <span class="math inline">\(\mathbb{Y}\)</span>'nin sonlu (finite) olması.</p>
-<p>Model şöyle (notasyonu biraz değiştirdik, <span class="math inline">\(\beta\)</span> yerine <span class="math inline">\(w\)</span> kullanıyoruz mesela, <span class="math inline">\(w\)</span> modelin &quot;ağırlıklarını (weights)'' temsil ediyor.</p>
+<p>Bu modeller lojistik regresyonun yapıya sahip (structured) girdiler
+ve çıktılar için genellenmiş halidir. Lojistik regresyonda girdi <span
+class="math inline">\(\bar{x} \in \mathbb{R}^d\)</span> ve çıktı <span
+class="math inline">\(y \in {0,1}\)</span> idi, yani çıktı ikiseldi.
+Fakat biz bundan daha genel yapay öğrenim problemlerini çözmek
+istiyoruz, yani istediğimiz <span class="math inline">\(x \in
+\mathbb{X}\)</span>, ki <span class="math inline">\(\mathbb{X}\)</span>
+herhangi bir uzay olabilmeli, ve <span class="math inline">\(y \in
+\mathbb{Y}\)</span> ki <span class="math inline">\(\mathbb{Y}\)</span>
+aynı şekilde herhangi bir uzay olabilmeli.</p>
+<p>Mesela <span class="math inline">\(x\)</span> bir cümle olabilmeli,
+diyelim ki <span class="math inline">\(x\)</span> = “he sat on the
+mat’‘, tercümesi “adam paspasın üzerinde oturdu’‘. Buna karşılık olan
+<span class="math inline">\(y\)</span> ise mesela şöyle olabilmeli,
+<span class="math inline">\(y\)</span> = “pronoun verb article noun’‘,
+yani her kelimenin hangi gramer ögesi olduğunu gösteren bir ibare.
+Mesela “sat’’ yani oturmak, bir fiil (verb),”mat’’ paspas, bir isim
+(noun), ve <span class="math inline">\(y\)</span> içinde gelen eğitim
+verisinde bunlar olabilmeli (üstteki örnekte ikinci öğe), sadece 0/1
+değerleri değil.</p>
+<p>Bu tabii ki denetimli bir eğitim şekli olacak. Fakat dikkat bazı
+yapay öğrenim uygulamalarında “çok sınıftan gelen’’ ama tek bir değer
+vardır, mesela <span class="math inline">\(y \in {1,2,3}\)</span>
+olabilir, 3 sınıflı bir çıktı yani. Bazen çıktı gerçek sayı (real
+number) olabilir, ama yine de tek bir <span
+class="math inline">\(y\)</span> değeri vardır. Üstteki durum böyle
+değildir. Potansiyel olarak <span class="math inline">\(y\)</span>’nin
+büyüklüğü <span class="math inline">\(x\)</span> ile birebir aynı bile
+olmayabilir. Bu tür bir karışık eşlemeden bahsediyoruz. Tek sınırlamamız
+<span class="math inline">\(\mathbb{Y}\)</span>’nin sonlu (finite)
+olması.</p>
+<p>Model şöyle (notasyonu biraz değiştirdik, <span
+class="math inline">\(\beta\)</span> yerine <span
+class="math inline">\(w\)</span> kullanıyoruz mesela, <span
+class="math inline">\(w\)</span> modelin “ağırlıklarını (weights)’’
+temsil ediyor.</p>
 <p><span class="math display">\[
-p(y|x;w) = 
+p(y|x;w) =
 \frac{\exp \big[ \sum_{j} w_j F_j (x,y) \big]}{Z(x,w)}
 \]</span></p>
-<p>Yakından bakarsak model LR modeline benziyor. Bir lineer fonksiyonun <span class="math inline">\(\exp\)</span>'sı alınıyor ve bu değer olasılık hesabında kullanılıyor. İleride zaten göreceğiz ki LR üstteki yaklaşımın bir &quot;özel durumu'', yani üstteki model daha genel bir tanım.</p>
-<p>Aklımıza birçok soru geliyor herhalde, mesela &quot;<span class="math inline">\(Z\)</span> nedir?'' ya da &quot;<span class="math inline">\(F_j\)</span> nasıl hesaplanır?'' gibi. <span class="math inline">\(Z\)</span> şöyle tanımlanır</p>
-<p><span class="math display">\[ Z(x,w) = \sum_{y&#39;} \exp \big[ \sum_j w_j F_j(x,y&#39;) \big] \]</span></p>
-<p>Tüm <span class="math inline">\(y&#39;\)</span>'lere bakılıyor, yani tüm mümkün <span class="math inline">\(\mathbb{Y}\)</span> değerleri teker teker <span class="math inline">\(y&#39;\)</span> üzerinden toplamda kullanılıyor. <span class="math inline">\(\mathbb{Y}\)</span>'nin sonlu olma faraziyesi burada önemli hale geliyor, toplamı sonsuz bir küme üzerinden yapamayız.</p>
-<p><span class="math inline">\(Z\)</span> normalizasyon için kullanılıyor, çünkü olasılık teorisinde eğer elimizde çoklu bir hedef var ise, bu hedeflere olan olasılık değerlerinin toplamı 1 olmalıdır. <span class="math inline">\(Z\)</span> işte bunu garantiler, bu sebeple bölen (denominator) bölümün (nominator) toplamı olmalıdır.</p>
-<p>Her <span class="math inline">\(F_j(x,y)\)</span> bir özellik fonksiyonudur (feature function). Niye? Çünkü elimdeki <span class="math inline">\(x\)</span>'ler illa bir vektör olmayabilir, yani <span class="math inline">\(x_j\)</span> &quot;vektörünü'' alıp <span class="math inline">\(w_j\)</span> &quot;vektörü'' ile çarpamam, bu sebeple önce bir fonksiyon ile bir sayısal (numerical) değer üretmem gerekiyor. Küme olarak</p>
-<p><span class="math display">\[ F_J: \mathbb{X} \times \mathbb{Y} \to \mathbb{R} \]</span></p>
-<p>Eğer $ F_j(x,y) &gt; 0 $ ve <span class="math inline">\(w_i &gt; 0\)</span> ise, o zaman <span class="math inline">\(F_j(x,y) = 0\)</span>'a kıyasla <span class="math inline">\(p(y|x;w)\)</span> artar. Sezgisel olarak tarif edersek özellik fonksiyonun (OF) söylediği şudur, eğer ağırlık pozitif ise OF'in değeri ne kadar buyurse elimizdeki <span class="math inline">\(y\)</span>, <span class="math inline">\(x\)</span> ile o kadar &quot;uyumludur'' (tabii ki belli bir özellik yani <span class="math inline">\(j\)</span> için). Negatif ilinti bunun tam tersi olurdu.</p>
-<p>Eğitim <span class="math inline">\(w_j\)</span> ağırlıklarını bulmamızı sağlar. <span class="math inline">\(F\)</span> önceden tanımlıdır (yani eğitime bile başlamadan önce), bu fonksiyonun ne olacağı &quot;seçilir''. Seçilirken tabii ki <span class="math inline">\(x,y\)</span> arasındaki ilintiye göre fazla / az sonuç geri getirebilecek şekilde seçilmelidir.</p>
-<p>Kelime örneğine geri dönersek, bir <span class="math inline">\(F\)</span> şöyle olabilir,</p>
-<p>$ F_{15}(x,y) =$ &quot;eğer ikinci kelimenin baş harfi büyük ve ikinci etiket isim (noun)''. OF'ler reel değerlidir. Bunun özel durumu 0/1 değeri veren OF'lerdir. Biraz önceki örnek mesela 0/1 döndürüyor.</p>
-<p>Ya da <span class="math inline">\(F_{14}(x,y)\)</span> diyelim ki şöyle &quot;ilk kelimenin baş harfi büyük, ve ilk etiket bir isim''. Tahmin edebiliriz ki eğitim setimizde ilk kelimesinin baş harfi büyük <em>olan</em> ama o kelimesi isim olmayan pek çok örnek olacaktır. Bu durumda <span class="math inline">\(w_{14}\)</span> küçük olur.</p>
-<p>Dediğimiz gibi <span class="math inline">\(F\)</span> reel değeri olabilir, mesela</p>
-<p><span class="math display">\[ F_{16}(x,y) = length(y) - length(x) \]</span></p>
-<p>yani bu fonksiyonda <span class="math inline">\(x\)</span>'nin uzunluğunu <span class="math inline">\(y\)</span>'nin uzunluğundan çıkartıyoruz. Bu ne işe yarar? Diyelim ki otomatik tercüme yapması için bir yapay öğrenim programı yazıyoruz, <span class="math inline">\(x,y\)</span> eğitim noktaları birbirinin tercümesi olan İngilizce/Fransızca cümleler. Çoğunlukla Fransızca cümleler tekabül ettikleri İngilizce cümlelerden çok daha uzun oluyorlar, yani üstteki çıkarma çoğunlukla pozitif sonuç verecek. Değişik bir açıdan bakarsak, pozitif bir sonuç, bir tercümenin doğru olduğu yönünde bir işaret olarak kabul edilebilir, ve üstteki OF üzerinden eğitim algoritması bunu kullanır. Eğitim sonrası <span class="math inline">\(w_{16}\)</span> pozitif bir ağırlık alacaktır.</p>
-<p>Bir log lineer modelde (buna CRF'ler de dahil) ilk yapılan iş probleminiz için önemli olan OF'leri ortaya çıkartmak.</p>
-<p><span class="math inline">\(F\)</span> tanımlamanın değişik bir başka yolu:</p>
-<p><span class="math inline">\(a(x)\)</span> bir fonksiyon olsun. Her <span class="math inline">\(v \in \mathbb{Y}\)</span> için</p>
+<p>Yakından bakarsak model LR modeline benziyor. Bir lineer fonksiyonun
+<span class="math inline">\(\exp\)</span>’sı alınıyor ve bu değer
+olasılık hesabında kullanılıyor. İleride zaten göreceğiz ki LR üstteki
+yaklaşımın bir “özel durumu’’, yani üstteki model daha genel bir
+tanım.</p>
+<p>Aklımıza birçok soru geliyor herhalde, mesela “<span
+class="math inline">\(Z\)</span> nedir?’’ ya da”<span
+class="math inline">\(F_j\)</span> nasıl hesaplanır?’’ gibi. <span
+class="math inline">\(Z\)</span> şöyle tanımlanır</p>
+<p><span class="math display">\[ Z(x,w) = \sum_{y&#39;} \exp \big[
+\sum_j w_j F_j(x,y&#39;) \big] \]</span></p>
+<p>Tüm <span class="math inline">\(y&#39;\)</span>’lere bakılıyor, yani
+tüm mümkün <span class="math inline">\(\mathbb{Y}\)</span> değerleri
+teker teker <span class="math inline">\(y&#39;\)</span> üzerinden
+toplamda kullanılıyor. <span
+class="math inline">\(\mathbb{Y}\)</span>’nin sonlu olma faraziyesi
+burada önemli hale geliyor, toplamı sonsuz bir küme üzerinden
+yapamayız.</p>
+<p><span class="math inline">\(Z\)</span> normalizasyon için
+kullanılıyor, çünkü olasılık teorisinde eğer elimizde çoklu bir hedef
+var ise, bu hedeflere olan olasılık değerlerinin toplamı 1 olmalıdır.
+<span class="math inline">\(Z\)</span> işte bunu garantiler, bu sebeple
+bölen (denominator) bölümün (nominator) toplamı olmalıdır.</p>
+<p>Her <span class="math inline">\(F_j(x,y)\)</span> bir özellik
+fonksiyonudur (feature function). Niye? Çünkü elimdeki <span
+class="math inline">\(x\)</span>’ler illa bir vektör olmayabilir, yani
+<span class="math inline">\(x_j\)</span> “vektörünü’’ alıp <span
+class="math inline">\(w_j\)</span>”vektörü’’ ile çarpamam, bu sebeple
+önce bir fonksiyon ile bir sayısal (numerical) değer üretmem gerekiyor.
+Küme olarak</p>
+<p><span class="math display">\[ F_J: \mathbb{X} \times \mathbb{Y} \to
+\mathbb{R} \]</span></p>
+<p>Eğer $ F_j(x,y) &gt; 0 $ ve <span class="math inline">\(w_i &gt;
+0\)</span> ise, o zaman <span class="math inline">\(F_j(x,y) =
+0\)</span>’a kıyasla <span class="math inline">\(p(y|x;w)\)</span>
+artar. Sezgisel olarak tarif edersek özellik fonksiyonun (OF) söylediği
+şudur, eğer ağırlık pozitif ise OF’in değeri ne kadar buyurse elimizdeki
+<span class="math inline">\(y\)</span>, <span
+class="math inline">\(x\)</span> ile o kadar “uyumludur’’ (tabii ki
+belli bir özellik yani <span class="math inline">\(j\)</span> için).
+Negatif ilinti bunun tam tersi olurdu.</p>
+<p>Eğitim <span class="math inline">\(w_j\)</span> ağırlıklarını
+bulmamızı sağlar. <span class="math inline">\(F\)</span> önceden
+tanımlıdır (yani eğitime bile başlamadan önce), bu fonksiyonun ne
+olacağı “seçilir’’. Seçilirken tabii ki <span
+class="math inline">\(x,y\)</span> arasındaki ilintiye göre fazla / az
+sonuç geri getirebilecek şekilde seçilmelidir.</p>
+<p>Kelime örneğine geri dönersek, bir <span
+class="math inline">\(F\)</span> şöyle olabilir,</p>
+<p>$ F_{15}(x,y) =$ “eğer ikinci kelimenin baş harfi büyük ve ikinci
+etiket isim (noun)’’. OF’ler reel değerlidir. Bunun özel durumu 0/1
+değeri veren OF’lerdir. Biraz önceki örnek mesela 0/1 döndürüyor.</p>
+<p>Ya da <span class="math inline">\(F_{14}(x,y)\)</span> diyelim ki
+şöyle “ilk kelimenin baş harfi büyük, ve ilk etiket bir isim’’. Tahmin
+edebiliriz ki eğitim setimizde ilk kelimesinin baş harfi büyük
+<em>olan</em> ama o kelimesi isim olmayan pek çok örnek olacaktır. Bu
+durumda <span class="math inline">\(w_{14}\)</span> küçük olur.</p>
+<p>Dediğimiz gibi <span class="math inline">\(F\)</span> reel değeri
+olabilir, mesela</p>
+<p><span class="math display">\[ F_{16}(x,y) = length(y) - length(x)
+\]</span></p>
+<p>yani bu fonksiyonda <span class="math inline">\(x\)</span>’nin
+uzunluğunu <span class="math inline">\(y\)</span>’nin uzunluğundan
+çıkartıyoruz. Bu ne işe yarar? Diyelim ki otomatik tercüme yapması için
+bir yapay öğrenim programı yazıyoruz, <span
+class="math inline">\(x,y\)</span> eğitim noktaları birbirinin tercümesi
+olan İngilizce/Fransızca cümleler. Çoğunlukla Fransızca cümleler tekabül
+ettikleri İngilizce cümlelerden çok daha uzun oluyorlar, yani üstteki
+çıkarma çoğunlukla pozitif sonuç verecek. Değişik bir açıdan bakarsak,
+pozitif bir sonuç, bir tercümenin doğru olduğu yönünde bir işaret olarak
+kabul edilebilir, ve üstteki OF üzerinden eğitim algoritması bunu
+kullanır. Eğitim sonrası <span class="math inline">\(w_{16}\)</span>
+pozitif bir ağırlık alacaktır.</p>
+<p>Bir log lineer modelde (buna CRF’ler de dahil) ilk yapılan iş
+probleminiz için önemli olan OF’leri ortaya çıkartmak.</p>
+<p><span class="math inline">\(F\)</span> tanımlamanın değişik bir başka
+yolu:</p>
+<p><span class="math inline">\(a(x)\)</span> bir fonksiyon olsun. Her
+<span class="math inline">\(v \in \mathbb{Y}\)</span> için</p>
 <p><span class="math display">\[ F_j(x,y) = a(x) I(y=v)\]</span></p>
 <p>tanımlayalım.</p>
-<p><span class="math display">\[ p(y|x;w) = \frac{\exp \sum_j w_j F_j (x,y)}{Z} \]</span></p>
-<p>Şimdi lineer zincirli CRF konusuna bakalım. Yine <span class="math inline">\(x \in \mathbb{X}\)</span> ve <span class="math inline">\(y \in \mathbb{Y}\)</span>. <span class="math inline">\(x\)</span> bir girdi zinciri, <span class="math inline">\(y\)</span> bir çıktı zinciri ve en basit durumda <span class="math inline">\(x\)</span> ile aynı uzunlukta. Konuşma bölümlerini etiketlemek bu kategoriye dahil, ama bir diğer uygulama kelimeyi arasına eksi işaretleri koyarak bölme (hyphenation).</p>
-<p>Mesela girdi <span class="math inline">\(x=\)</span>''beloved'', çıktı <span class="math inline">\(y=\)</span>''00100000'' çünkü bu kelime &quot;be-loved'' olarak bölünür.</p>
+<p><span class="math display">\[ p(y|x;w) = \frac{\exp \sum_j w_j F_j
+(x,y)}{Z} \]</span></p>
+<p>Şimdi lineer zincirli CRF konusuna bakalım. Yine <span
+class="math inline">\(x \in \mathbb{X}\)</span> ve <span
+class="math inline">\(y \in \mathbb{Y}\)</span>. <span
+class="math inline">\(x\)</span> bir girdi zinciri, <span
+class="math inline">\(y\)</span> bir çıktı zinciri ve en basit durumda
+<span class="math inline">\(x\)</span> ile aynı uzunlukta. Konuşma
+bölümlerini etiketlemek bu kategoriye dahil, ama bir diğer uygulama
+kelimeyi arasına eksi işaretleri koyarak bölme (hyphenation).</p>
+<p>Mesela girdi <span class="math inline">\(x=\)</span>‘’beloved’‘,
+çıktı <span class="math inline">\(y=\)</span>’‘00100000’’ çünkü bu
+kelime “be-loved’’ olarak bölünür.</p>
 <p>Bu uygulama için bir OF</p>
-<p><span class="math display">\[ F_j(x,y) = \frac{\textrm{kaç  tane 1 var}}{\textrm{x uzunluğu}} \]</span></p>
-<p><span class="math inline">\(x=\)</span>''beloved'', çıktı <span class="math inline">\(y=\)</span>''00100000'' için sonuç <span class="math inline">\(1/7\)</span> olurdu.</p>
-<p>Lineer zincir CRF için hangi OF'lerin bazı sınırları var.</p>
-<p><span class="math display">\[ F_j (\bar{x},\bar{y}) = \sum_i f_j(y_{i-1}y_i\bar{x} i) \]</span></p>
-<p>ki sembol üzeri düz çizgiyi (<span class="math inline">\(\bar{x}\)</span> gibi) bu sefer bir sıralı veri temsil etmek için kullanıyorum)</p>
+<p><span class="math display">\[ F_j(x,y) = \frac{\textrm{kaç  tane 1
+var}}{\textrm{x uzunluğu}} \]</span></p>
+<p><span class="math inline">\(x=\)</span>‘’beloved’‘, çıktı <span
+class="math inline">\(y=\)</span>’‘00100000’’ için sonuç <span
+class="math inline">\(1/7\)</span> olurdu.</p>
+<p>Lineer zincir CRF için hangi OF’lerin bazı sınırları var.</p>
+<p><span class="math display">\[ F_j (\bar{x},\bar{y}) = \sum_i
+f_j(y_{i-1}y_i\bar{x} i) \]</span></p>
+<p>ki sembol üzeri düz çizgiyi (<span
+class="math inline">\(\bar{x}\)</span> gibi) bu sefer bir sıralı veri
+temsil etmek için kullanıyorum)</p>
 <p>Mesela</p>
-<p><span class="math display">\[ f_{18} =   f_j(y_{i-1}y_i\bar{x} i) = &quot; i=2, y_{i-1} = 0, y_i = 1,
+<p><span class="math display">\[ f_{18} =   f_j(y_{i-1}y_i\bar{x} i) =
+&quot; i=2, y_{i-1} = 0, y_i = 1,
 x_1x_2 = &quot;as&quot; &quot;\]</span></p>
-<p>Mesela &quot;async'' kelimesi &quot;a-sync'' olarak bölünebilir, ve eğitim setinde &quot;async'' ile &quot;$y=$01...'' gelirse üstteki OF bu bölünmeyi ödüllendirir / öğrenir.</p>
-<p>Şimdi CRF olmayan bir Lineer Model'e bakalım,</p>
-<p>Mesela çok etiketli denetimli (supervised) öğrenim. &quot;Çok etiketli'' ne demektir? Dikkat, &quot;çok sınıflı (multi label)'' değil, yani tek öğenin iki veya daha fazla değer arasından birini seçmesinden bahsetmiyoruz. Birden fazla etiket alabilmekten bahsediyoruz, mesela bir İnternet sayfası, bir veya daha fazla kategoriye aynı anda ait olabilir, mesela hem Spor, hem İş Dünyası. Diyelim ki 10 mümkün etiket var, bir doküman kaç değişik şekilde etiketlenebilir?</p>
-<p><span class="math inline">\(2^{10} = 1024\)</span> şekilde (bu sayı, hesap bir kümenin kaç değişik şekilde alt kümesi olabilir hesabını yansıtıyor aynı zamanda, yani sıralama önemli olmadan belli sayıda öğenin kaç değişik şekilde alt kümeleri olabilir sorusu). Bu büyük bir rakam. Ve bu kadar çok olasılık var ise, eğitim verisi tüm kombinasyonlar için örnek veri içermeyebilir. Fakat muhakkak algoritmamızın bu kombinasyonları tahmin edebilmesini tercih ederiz.</p>
-<p>Çözüm? 10 değişik sınıflayıcı kurarark bu problemi çözebiliriz (ayrı ayrı, tek başına tek sınıfa bakılınca yeterli veri çıkar herhalde), fakat bu şekilde &quot;sınıflararası'' ilişkileri yakalayamayız. Log lineer model yaklaşımında öyle bir ikisel (binary) OF yaratırsınız ki, mesela,</p>
-<p><span class="math display">\[F_{19}(x,y) = &quot;Spor \in y, \textrm{İş Dünyası} \in y&quot; \]</span></p>
-<p>Dikkat edersek OF sadece <span class="math inline">\(y\)</span>'ye bakıyor. Bu OF'yi içeren algoritma eğitilince üstteki OF için bir pozitif ağırlık öğrenilebilecektir.</p>
-<p>Soru: bir anlamda problemin yerini değiştirmiş olmuyor muyuz? Mesela üstteki şekilde bu sefer her türlü kombinasyon için OF'mi yaratacağız? Cevap: eğer sadece ikili eşlere bakıyorsak, kombinasyon hesabı <span class="math inline">\(C(10,2) = 45\)</span> sonucunu verir. Bu fena bir sayı değil.</p>
-<p>Ayrıca verinin seyrekliği bize hangi kombinasyonların dahil edilip edilmeyeceği yönünde yardımcı olabilir.</p>
-<p>Soru: çok sınıflı problemler lojistik regresyonu geliştirerek çözülemez mi? Cevap: böyle bir yaklaşım var, buna multinom lojistik regresyon deniyor. Fakat bu yaklaşımın log lineer modellerin özel bir hali olduğunu belirtmek isterim, yani yapay öğrenim dünyasının aktif olarak araştırdığı alan artık burası, multinom lojistik regresyon aşıldı. Zaten log lineer modeller ile çok etiketli problemleri de çözebiliyorsunuz.</p>
+<p>Mesela “async’’ kelimesi”a-sync’’ olarak bölünebilir, ve eğitim
+setinde “async’’ ile”$y=$01…’’ gelirse üstteki OF bu bölünmeyi
+ödüllendirir / öğrenir.</p>
+<p>Şimdi CRF olmayan bir Lineer Model’e bakalım,</p>
+<p>Mesela çok etiketli denetimli (supervised) öğrenim. “Çok etiketli’’
+ne demektir? Dikkat,”çok sınıflı (multi label)’’ değil, yani tek öğenin
+iki veya daha fazla değer arasından birini seçmesinden bahsetmiyoruz.
+Birden fazla etiket alabilmekten bahsediyoruz, mesela bir İnternet
+sayfası, bir veya daha fazla kategoriye aynı anda ait olabilir, mesela
+hem Spor, hem İş Dünyası. Diyelim ki 10 mümkün etiket var, bir doküman
+kaç değişik şekilde etiketlenebilir?</p>
+<p><span class="math inline">\(2^{10} = 1024\)</span> şekilde (bu sayı,
+hesap bir kümenin kaç değişik şekilde alt kümesi olabilir hesabını
+yansıtıyor aynı zamanda, yani sıralama önemli olmadan belli sayıda
+öğenin kaç değişik şekilde alt kümeleri olabilir sorusu). Bu büyük bir
+rakam. Ve bu kadar çok olasılık var ise, eğitim verisi tüm
+kombinasyonlar için örnek veri içermeyebilir. Fakat muhakkak
+algoritmamızın bu kombinasyonları tahmin edebilmesini tercih ederiz.</p>
+<p>Çözüm? 10 değişik sınıflayıcı kurarark bu problemi çözebiliriz (ayrı
+ayrı, tek başına tek sınıfa bakılınca yeterli veri çıkar herhalde),
+fakat bu şekilde “sınıflararası’’ ilişkileri yakalayamayız. Log lineer
+model yaklaşımında öyle bir ikisel (binary) OF yaratırsınız ki,
+mesela,</p>
+<p><span class="math display">\[F_{19}(x,y) = &quot;Spor \in y,
+\textrm{İş Dünyası} \in y&quot; \]</span></p>
+<p>Dikkat edersek OF sadece <span class="math inline">\(y\)</span>’ye
+bakıyor. Bu OF’yi içeren algoritma eğitilince üstteki OF için bir
+pozitif ağırlık öğrenilebilecektir.</p>
+<p>Soru: bir anlamda problemin yerini değiştirmiş olmuyor muyuz? Mesela
+üstteki şekilde bu sefer her türlü kombinasyon için OF’mi yaratacağız?
+Cevap: eğer sadece ikili eşlere bakıyorsak, kombinasyon hesabı <span
+class="math inline">\(C(10,2) = 45\)</span> sonucunu verir. Bu fena bir
+sayı değil.</p>
+<p>Ayrıca verinin seyrekliği bize hangi kombinasyonların dahil edilip
+edilmeyeceği yönünde yardımcı olabilir.</p>
+<p>Soru: çok sınıflı problemler lojistik regresyonu geliştirerek
+çözülemez mi? Cevap: böyle bir yaklaşım var, buna multinom lojistik
+regresyon deniyor. Fakat bu yaklaşımın log lineer modellerin özel bir
+hali olduğunu belirtmek isterim, yani yapay öğrenim dünyasının aktif
+olarak araştırdığı alan artık burası, multinom lojistik regresyon
+aşıldı. Zaten log lineer modeller ile çok etiketli problemleri de
+çözebiliyorsunuz.</p>
 <p>Ders 5</p>
-<p>Soru: biraz önce sadece <span class="math inline">\(y\)</span>'ler arasında bir OF tanımlayabildiğimizi gördük. Peki sadece <span class="math inline">\(x\)</span>'ler arasında OF tanımlamak faydalı olur muydu? Cevap: Formülü tekrar hatırlayalım,</p>
-<p><span class="math display">\[ p(y|x;w) = \frac{\exp \sum_j w_j F_j (x,y)}{Z(x,w)} \]</span></p>
-<p>OF'nin görevi hangi <span class="math inline">\(y\)</span>'lerin daha yüksek olasılığı olduğunu belirtmek. Eğer sadece <span class="math inline">\(x\)</span> var ise, bu durumda bölüm ve bölendeki değerler birbirini iptal ederdi. Her <span class="math inline">\(y\)</span> için aynı <span class="math inline">\(x\)</span> &quot;katkısı'' olurdu ve bunun sınıflayıcıya hiçbir faydası olmazdı.</p>
+<p>Soru: biraz önce sadece <span class="math inline">\(y\)</span>’ler
+arasında bir OF tanımlayabildiğimizi gördük. Peki sadece <span
+class="math inline">\(x\)</span>’ler arasında OF tanımlamak faydalı olur
+muydu? Cevap: Formülü tekrar hatırlayalım,</p>
+<p><span class="math display">\[ p(y|x;w) = \frac{\exp \sum_j w_j F_j
+(x,y)}{Z(x,w)} \]</span></p>
+<p>OF’nin görevi hangi <span class="math inline">\(y\)</span>’lerin daha
+yüksek olasılığı olduğunu belirtmek. Eğer sadece <span
+class="math inline">\(x\)</span> var ise, bu durumda bölüm ve bölendeki
+değerler birbirini iptal ederdi. Her <span
+class="math inline">\(y\)</span> için aynı <span
+class="math inline">\(x\)</span> “katkısı’’ olurdu ve bunun
+sınıflayıcıya hiçbir faydası olmazdı.</p>
 <p>[8:00-18:00 atlandı]</p>
 <p>Çözdüğümüz problemler şu formatta</p>
 <p><span class="math display">\[
-p(\bar{y}|\bar{x};w) = \frac{\exp \sum_j w_j F_j (\bar{x},y)}{Z(\bar{x},w)}
+p(\bar{y}|\bar{x};w) = \frac{\exp \sum_j w_j F_j
+(\bar{x},y)}{Z(\bar{x},w)}
 \]</span></p>
 <p>Tahmin etmek için</p>
-<p><span class="math display">\[ \hat{y} = \arg\max_{y} \exp \sum_j w_j F_j(\bar{x},y)\]</span> Bir <span class="math inline">\(\bar{y}\)</span> tahmin etmek için bu modellerden birini kullanacaksak, <span class="math inline">\(p(\bar{y}|\bar{x};w)\)</span> formülüne <span class="math inline">\(\bar{x}\)</span>'i koyarız, ve elde edilen dağılımda hangi <span class="math inline">\(\bar{y}\)</span>'nin olasılığı daha yüksekse onu seçeriz. Daha yüksek olasılığa sahip olan <span class="math inline">\(\bar{y}\)</span>, <span class="math inline">\(p(\bar{y}|\bar{x};w)\)</span> formülünde bölümü daha yüksek olandır. Bölen her <span class="math inline">\(\bar{y}\)</span> için sabit / aynı.</p>
-<p>Aslında <span class="math inline">\(\exp\)</span>'ye ihtiyaç yok, çünkü <span class="math inline">\(\exp\)</span> monotonik bir fonksiyon, yani sadece şu kullanılabilir,</p>
-<p><span class="math display">\[ \hat{y} = \arg\max_{y}  \sum_j w_j F_j(\bar{x},y)\]</span></p>
-<p>En olası <span class="math inline">\(y\)</span>'yi bulmak için <span class="math inline">\(Z\)</span>'nin gerekmediğine de dikkat, çünkü bu sabit tüm seçenekler için aynı.</p>
-<p>Burada tahmin etmek bağlamında zor olan şey, en yüksek <span class="math inline">\(y\)</span>'yi bulmak için tüm <span class="math inline">\(y\)</span>'lere teker teker bakmaya mecbur olmamız. Bu bakma işlemi çok zaman alabilir, o zaman bu problemi bir şekilde çözmem lazım.</p>
-<p>Diğer problem, tüm olasılıkların 1'e toplanabilmesini sağlayan normalize sabitinin hesabı, yani <span class="math inline">\(Z(\bar{x},w) = \sum_{y&#39;}\exp [ \sum_j w_j F_j(\bar{x},\bar{y})]\)</span>, ki eğer olasılık değeri hesaplayacaksak bu sabit gerekli.</p>
-<p>Yani iki ana problem var, bir de eğitim algoritması var, ki bu aynen lojistik regresyon örneğinde olduğu gibi rasgele gradyan çıkışı üzerinden olacak, bu 3 algoritmayı şimdi sunacağız.</p>
+<p><span class="math display">\[ \hat{y} = \arg\max_{y} \exp \sum_j w_j
+F_j(\bar{x},y)\]</span> Bir <span class="math inline">\(\bar{y}\)</span>
+tahmin etmek için bu modellerden birini kullanacaksak, <span
+class="math inline">\(p(\bar{y}|\bar{x};w)\)</span> formülüne <span
+class="math inline">\(\bar{x}\)</span>’i koyarız, ve elde edilen
+dağılımda hangi <span class="math inline">\(\bar{y}\)</span>’nin
+olasılığı daha yüksekse onu seçeriz. Daha yüksek olasılığa sahip olan
+<span class="math inline">\(\bar{y}\)</span>, <span
+class="math inline">\(p(\bar{y}|\bar{x};w)\)</span> formülünde bölümü
+daha yüksek olandır. Bölen her <span
+class="math inline">\(\bar{y}\)</span> için sabit / aynı.</p>
+<p>Aslında <span class="math inline">\(\exp\)</span>’ye ihtiyaç yok,
+çünkü <span class="math inline">\(\exp\)</span> monotonik bir fonksiyon,
+yani sadece şu kullanılabilir,</p>
+<p><span class="math display">\[ \hat{y} = \arg\max_{y}  \sum_j w_j
+F_j(\bar{x},y)\]</span></p>
+<p>En olası <span class="math inline">\(y\)</span>’yi bulmak için <span
+class="math inline">\(Z\)</span>’nin gerekmediğine de dikkat, çünkü bu
+sabit tüm seçenekler için aynı.</p>
+<p>Burada tahmin etmek bağlamında zor olan şey, en yüksek <span
+class="math inline">\(y\)</span>’yi bulmak için tüm <span
+class="math inline">\(y\)</span>’lere teker teker bakmaya mecbur
+olmamız. Bu bakma işlemi çok zaman alabilir, o zaman bu problemi bir
+şekilde çözmem lazım.</p>
+<p>Diğer problem, tüm olasılıkların 1’e toplanabilmesini sağlayan
+normalize sabitinin hesabı, yani <span
+class="math inline">\(Z(\bar{x},w) = \sum_{y&#39;}\exp [ \sum_j w_j
+F_j(\bar{x},\bar{y})]\)</span>, ki eğer olasılık değeri hesaplayacaksak
+bu sabit gerekli.</p>
+<p>Yani iki ana problem var, bir de eğitim algoritması var, ki bu aynen
+lojistik regresyon örneğinde olduğu gibi rasgele gradyan çıkışı
+üzerinden olacak, bu 3 algoritmayı şimdi sunacağız.</p>
 <p>Algoritma 1</p>
 <p>Önce,</p>
-<p><span class="math display">\[ \hat{y} = \arg\max_{\bar{y}}  \sum_j w_j F_j(\bar{x},\bar{y})\]</span></p>
-<p>Bu hesabı polinom zamanda (polynomial time) yapmak istiyoruz. Tanımı biraz değiştirelim,</p>
-<p><span class="math display">\[ = \arg\max_{\bar{y}}  \sum_j w_j \sum_i f_j(y_{i-1}y_i \bar{x} i )\]</span> <span class="math inline">\(j\)</span> tüm özellikler, <span class="math inline">\(i\)</span> <span class="math inline">\(x,y\)</span> &quot;boyunca'' ilerleyen indisler. Üstteki ibare tek bir eğitim veri noktası için yapılıyor, yani <span class="math inline">\(i\)</span> değişik veri noktalarını indislemiyor (genellikle öyle olur, o yüzden belirtmek istedik).</p>
+<p><span class="math display">\[ \hat{y} = \arg\max_{\bar{y}}  \sum_j
+w_j F_j(\bar{x},\bar{y})\]</span></p>
+<p>Bu hesabı polinom zamanda (polynomial time) yapmak istiyoruz. Tanımı
+biraz değiştirelim,</p>
+<p><span class="math display">\[ = \arg\max_{\bar{y}}  \sum_j w_j \sum_i
+f_j(y_{i-1}y_i \bar{x} i )\]</span> <span
+class="math inline">\(j\)</span> tüm özellikler, <span
+class="math inline">\(i\)</span> <span
+class="math inline">\(x,y\)</span> “boyunca’’ ilerleyen indisler.
+Üstteki ibare tek bir eğitim veri noktası için yapılıyor, yani <span
+class="math inline">\(i\)</span> değişik veri noktalarını indislemiyor
+(genellikle öyle olur, o yüzden belirtmek istedik).</p>
 <p>Toplam işlemlerinin sırasını değiştirelim,</p>
-<p><span class="math display">\[ = \arg\max_{\bar{y}}  \sum_i  \sum_j w_j f_j(y_{i-1}y_i \bar{x} i )\]</span> İçerideki toplama <span class="math inline">\(g_i(y_{i-1}y_i)\)</span> ismi verelim, böylece her <span class="math inline">\(i\)</span> için değişik bir <span class="math inline">\(g\)</span> fonksiyonuna sahip oluyorum.</p>
-<p><span class="math display">\[  = \arg\max_{\bar{y}}  \sum_i  g_i(y_{i-1}y_i) \]</span></p>
-<p><span class="math inline">\(y_{i-1},y_i\)</span> kelime bölme probleminde iki değerden birini alabilir. Cümle etiketleme probleminde belki 20 değerden birini alabilirler. <span class="math inline">\(\bar{x},\bar{w}\)</span> zaten sabit (eğitim verisi içindeler, ya da sabit olarak görülüyorlar). Bu durumda <span class="math inline">\(g\)</span>'yi temsil etmek için nasıl bir veri yapısı kullanmalıyım? Çünkü bilgisayar bilim yapıyoruz, ve bilgisayar bilimde veri yapıları vardır. Bize gereken belli <span class="math inline">\(y_{i-1},y_i\)</span> kombinasyonu için bir <span class="math inline">\(g\)</span> değeri döndürülmesi, ve bu sonucu bir yerde depolayabilmek.</p>
-<p>Gereken yapı basit bir matris olabilir. Diyelim ki <span class="math inline">\(m\)</span> farklı <span class="math inline">\(y\)</span> değeri var ise, <span class="math inline">\(m^2\)</span> hücresi olan bir matris işimizi görür. Her <span class="math inline">\(g_i\)</span> için ayrı bir <span class="math inline">\(m^2\)</span> matrisi olacak tabii ki. <span class="math inline">\(n\)</span> tane matris, <span class="math inline">\(d\)</span> değer var ise işlem zamanı <span class="math inline">\(O(m^2nd)\)</span>.</p>
-<p>Algoritmamda ilk yapacağım iş mümkün <span class="math inline">\(g\)</span> değerlerini önceden hesaplayıp (precompute) bir yerde depolu olarak tutmak / hazır etmek.</p>
+<p><span class="math display">\[ = \arg\max_{\bar{y}}  \sum_i  \sum_j
+w_j f_j(y_{i-1}y_i \bar{x} i )\]</span> İçerideki toplama <span
+class="math inline">\(g_i(y_{i-1}y_i)\)</span> ismi verelim, böylece her
+<span class="math inline">\(i\)</span> için değişik bir <span
+class="math inline">\(g\)</span> fonksiyonuna sahip oluyorum.</p>
+<p><span class="math display">\[  =
+\arg\max_{\bar{y}}  \sum_i  g_i(y_{i-1}y_i) \]</span></p>
+<p><span class="math inline">\(y_{i-1},y_i\)</span> kelime bölme
+probleminde iki değerden birini alabilir. Cümle etiketleme probleminde
+belki 20 değerden birini alabilirler. <span
+class="math inline">\(\bar{x},\bar{w}\)</span> zaten sabit (eğitim
+verisi içindeler, ya da sabit olarak görülüyorlar). Bu durumda <span
+class="math inline">\(g\)</span>’yi temsil etmek için nasıl bir veri
+yapısı kullanmalıyım? Çünkü bilgisayar bilim yapıyoruz, ve bilgisayar
+bilimde veri yapıları vardır. Bize gereken belli <span
+class="math inline">\(y_{i-1},y_i\)</span> kombinasyonu için bir <span
+class="math inline">\(g\)</span> değeri döndürülmesi, ve bu sonucu bir
+yerde depolayabilmek.</p>
+<p>Gereken yapı basit bir matris olabilir. Diyelim ki <span
+class="math inline">\(m\)</span> farklı <span
+class="math inline">\(y\)</span> değeri var ise, <span
+class="math inline">\(m^2\)</span> hücresi olan bir matris işimizi
+görür. Her <span class="math inline">\(g_i\)</span> için ayrı bir <span
+class="math inline">\(m^2\)</span> matrisi olacak tabii ki. <span
+class="math inline">\(n\)</span> tane matris, <span
+class="math inline">\(d\)</span> değer var ise işlem zamanı <span
+class="math inline">\(O(m^2nd)\)</span>.</p>
+<p>Algoritmamda ilk yapacağım iş mümkün <span
+class="math inline">\(g\)</span> değerlerini önceden hesaplayıp
+(precompute) bir yerde depolu olarak tutmak / hazır etmek.</p>
 <p>Tanım</p>
-<p><span class="math inline">\(Skor(y_1,...,y_k) = \sum_{i=1}^{k} g_i(y_{i-1} y_i)\)</span></p>
-<p>Amacımız öyle bir <span class="math inline">\(y\)</span> sıralaması (sequence) bulmak ki bu sıranın skoru en yüksek olsun.</p>
-<p><span class="math inline">\(U(k)\)</span> = en iyi sıralama <span class="math inline">\(y_1,...,y_k\)</span>'nin skoru</p>
-<p><span class="math inline">\(U(k,v)\)</span> = <span class="math inline">\(y_k=v\)</span> olma şartıyla en iyi sıralama <span class="math inline">\(y_1,...,y_k\)</span>'nin skoru</p>
-<p>Amacım <span class="math inline">\(U(n+1, \textrm{BİTİŞ})\)</span>'i bulmak. Mümkün etiketlere BAŞLA, BİTİŞ adlı iki yeni değer ekledik, bu bazı formülleri kolaşlaştıracak. Bu tanım aslında <span class="math inline">\(\arg\max\)</span> ile bulmaya çalıştığım şeyin bir bölümj aslında, sadece amacımı bu şekilde tekrar tanımladım. Tekrar belirtmek gerekirse,</p>
-<p><span class="math display">\[U(k,v) = \max_{y_1,y_{k-1}}  [ \sum_{ i=1}^{k-1}  g_i(y_{i-1}y_i) +  g_k(y_k,v) ]\]</span></p>
+<p><span class="math inline">\(Skor(y_1,...,y_k) = \sum_{i=1}^{k}
+g_i(y_{i-1} y_i)\)</span></p>
+<p>Amacımız öyle bir <span class="math inline">\(y\)</span> sıralaması
+(sequence) bulmak ki bu sıranın skoru en yüksek olsun.</p>
+<p><span class="math inline">\(U(k)\)</span> = en iyi sıralama <span
+class="math inline">\(y_1,...,y_k\)</span>’nin skoru</p>
+<p><span class="math inline">\(U(k,v)\)</span> = <span
+class="math inline">\(y_k=v\)</span> olma şartıyla en iyi sıralama <span
+class="math inline">\(y_1,...,y_k\)</span>’nin skoru</p>
+<p>Amacım <span class="math inline">\(U(n+1, \textrm{BİTİŞ})\)</span>’i
+bulmak. Mümkün etiketlere BAŞLA, BİTİŞ adlı iki yeni değer ekledik, bu
+bazı formülleri kolaşlaştıracak. Bu tanım aslında <span
+class="math inline">\(\arg\max\)</span> ile bulmaya çalıştığım şeyin bir
+bölümj aslında, sadece amacımı bu şekilde tekrar tanımladım. Tekrar
+belirtmek gerekirse,</p>
+<p><span class="math display">\[U(k,v) = \max_{y_1,y_{k-1}}  [ \sum_{
+i=1}^{k-1}  g_i(y_{i-1}y_i) +  g_k(y_k,v) ]\]</span></p>
 <p>İlginç bölüme geldik. Üstteki tanımı özyineli olarak tanımlarsak,</p>
-<p><span class="math display">\[ U(k,v) = \max_{y_{k-1}} [ U({k-1},y_{k-1}) + g_k(y_{k-1},v)]  \]</span></p>
-<p>Bu özyineli fonksiyonun avantajı nedir? Aslında bir önceki formüle göre çok daha çetrefil duruyor. Avantaj şurada, dinamik programlama (dynamiç programming) tekniklerini kullanarak bir döngü içinde üstteki özyineli hesabı yapmak mümkün. Şimdi teker teker bakalım,</p>
+<p><span class="math display">\[ U(k,v) = \max_{y_{k-1}} [
+U({k-1},y_{k-1}) + g_k(y_{k-1},v)]  \]</span></p>
+<p>Bu özyineli fonksiyonun avantajı nedir? Aslında bir önceki formüle
+göre çok daha çetrefil duruyor. Avantaj şurada, dinamik programlama
+(dynamiç programming) tekniklerini kullanarak bir döngü içinde üstteki
+özyineli hesabı yapmak mümkün. Şimdi teker teker bakalım,</p>
 <p><span class="math inline">\(y_0 = \textrm{BAŞLA}\)</span></p>
-<p><span class="math inline">\(U(1,v) = \max_{y_0} [ U(0,y_o) + g_1(y_0,v)]\)</span></p>
+<p><span class="math inline">\(U(1,v) = \max_{y_0} [ U(0,y_o) +
+g_1(y_0,v)]\)</span></p>
 <p>Bu ilk basamakta aslında bir maksimizasyon yok, o zaman</p>
 <p>$ = g(,v)$</p>
 <p>yeterli.</p>
 <p>Ama ikinci basamakta işler zorlaşıyor,</p>
-<p><span class="math inline">\(U(2,v) = \max_{y_1} [ U(1,y_1) + g_2(y_1,v) ]\)</span></p>
-<p>Fakat eşitliğin sağ tarafındaki <span class="math inline">\(U\)</span> hesabını bir önceki basamakta hesapladım ve depoladım, onu hemen kullanabilirim. Bu hesabın yükü nedir? Her mümkün <span class="math inline">\(v\)</span> değerine (<span class="math inline">\(m\)</span> tane) bakmam lazım, ve bu işlem sırasında her <span class="math inline">\(y_1\)</span> mümkün değeri (yine <span class="math inline">\(m\)</span> tane) irdelemem lazım. Yani <span class="math inline">\(O(m^2)\)</span>.</p>
-<p>Bu işlemi <span class="math inline">\(U(n+1, \textrm{BİTİŞ})\)</span>'e kadar yapmam lazım. Toplam yük <span class="math inline">\(O(nm^2)\)</span>.</p>
-<p><span class="math inline">\(g\)</span> matrislerini hesaplamak için <span class="math inline">\(O(nm^2d)\)</span> demiştik, bu <span class="math inline">\(O(nm^2)\)</span>'ten daha büyüktür / ona baskındır, ve <span class="math inline">\(O\)</span> aritmetiğine göre daha büyük olan kullanılır.</p>
-<p>Bu algoritma dinamik programlamanın özel bir halidir, bazen ona Viterbi algoritması ismi de verilir. Bilindiği gibi Viterbi algoritması Gizli Markov Modelleri (Hidden Markov Models) yapısını dekode etmek için kullanılıyor. CRF'lerin HMM'e kısmen bağlantısı olduğu düşünülürse, Viterbi algoritmasının burada da ortaya çıkması şaşırtıcı değil.</p>
+<p><span class="math inline">\(U(2,v) = \max_{y_1} [ U(1,y_1) +
+g_2(y_1,v) ]\)</span></p>
+<p>Fakat eşitliğin sağ tarafındaki <span
+class="math inline">\(U\)</span> hesabını bir önceki basamakta
+hesapladım ve depoladım, onu hemen kullanabilirim. Bu hesabın yükü
+nedir? Her mümkün <span class="math inline">\(v\)</span> değerine (<span
+class="math inline">\(m\)</span> tane) bakmam lazım, ve bu işlem
+sırasında her <span class="math inline">\(y_1\)</span> mümkün değeri
+(yine <span class="math inline">\(m\)</span> tane) irdelemem lazım. Yani
+<span class="math inline">\(O(m^2)\)</span>.</p>
+<p>Bu işlemi <span class="math inline">\(U(n+1,
+\textrm{BİTİŞ})\)</span>’e kadar yapmam lazım. Toplam yük <span
+class="math inline">\(O(nm^2)\)</span>.</p>
+<p><span class="math inline">\(g\)</span> matrislerini hesaplamak için
+<span class="math inline">\(O(nm^2d)\)</span> demiştik, bu <span
+class="math inline">\(O(nm^2)\)</span>’ten daha büyüktür / ona
+baskındır, ve <span class="math inline">\(O\)</span> aritmetiğine göre
+daha büyük olan kullanılır.</p>
+<p>Bu algoritma dinamik programlamanın özel bir halidir, bazen ona
+Viterbi algoritması ismi de verilir. Bilindiği gibi Viterbi algoritması
+Gizli Markov Modelleri (Hidden Markov Models) yapısını dekode etmek için
+kullanılıyor. CRF’lerin HMM’e kısmen bağlantısı olduğu düşünülürse,
+Viterbi algoritmasının burada da ortaya çıkması şaşırtıcı değil.</p>
 <p>Algoritma 2</p>
 <p>Şunu hesapla</p>
-<p><span class="math display">\[Z(\bar{x},w) = \sum_{y&#39;} \exp 
+<p><span class="math display">\[Z(\bar{x},w) = \sum_{y&#39;} \exp
 \underbrace{\sum_j w_j F_j(\bar{x},\bar{y})}_{g}
 \]</span></p>
-<p>İçerideki toplama <span class="math inline">\(g_i\)</span> demiştik,</p>
-<p><span class="math display">\[ g = \sum_i g_i(y_{i-1}y_i) \]</span> Yani</p>
+<p>İçerideki toplama <span class="math inline">\(g_i\)</span>
+demiştik,</p>
+<p><span class="math display">\[ g = \sum_i g_i(y_{i-1}y_i) \]</span>
+Yani</p>
 <p><span class="math display">\[
-Z(\bar{x},w) = 
-\sum_{\bar{y}} \exp 
-\sum_i g_i(y_{i-1}y_i) 
+Z(\bar{x},w) =
+\sum_{\bar{y}} \exp
+\sum_i g_i(y_{i-1}y_i)
 \]</span></p>
-<p>Bir toplamın <span class="math inline">\(\exp\)</span>'sı, <span class="math inline">\(\exp\)</span>'lerin çarpımı haline dönüşür, yani <span class="math inline">\(\exp\)</span> toplamdan &quot;içeri'' nüfuz eder,</p>
+<p>Bir toplamın <span class="math inline">\(\exp\)</span>’sı, <span
+class="math inline">\(\exp\)</span>’lerin çarpımı haline dönüşür, yani
+<span class="math inline">\(\exp\)</span> toplamdan “içeri’’ nüfuz
+eder,</p>
 <p><span class="math display">\[
- = \sum_{\bar{y}} \prod_i \exp  g_i(y_{i-1}y_i) 
+= \sum_{\bar{y}} \prod_i \exp  g_i(y_{i-1}y_i)
 \qquad (5)
 \]</span></p>
-<p><span class="math inline">\(t=1,..,n+1\)</span> için şunu tanımlayalım,</p>
+<p><span class="math inline">\(t=1,..,n+1\)</span> için şunu
+tanımlayalım,</p>
 <p><span class="math inline">\(M_t(u,v) = \exp g_t(u,v)\)</span></p>
-<p><span class="math inline">\(M_t\)</span> aşağı yukarı <span class="math inline">\(g\)</span> ile aynı şey, her değişik <span class="math inline">\(g\)</span> fonsiyonu için değişik bir matris var, bu matris hücrelerinin <span class="math inline">\(\exp\)</span>'sinin alınmış hali <span class="math inline">\(M_t\)</span> matrisi.</p>
-<p><span class="math inline">\(M_1(u,v)\)</span> sadece <span class="math inline">\(u=\textrm{BAŞLA}\)</span> için geçerli.</p>
-<p><span class="math inline">\(M_{n+1}(u,v)\)</span> sadece <span class="math inline">\(b=\textrm{BİTİŞ}\)</span> için geçerli.</p>
-<p><span class="math inline">\(M_{12} = M_1M_2\)</span> yani matris çarpımı.</p>
-<p><span class="math inline">\(M_{12}(\textrm{BAŞLA},w)\)</span>'yu düşünelim (ki bu tek bir hücre değeri)</p>
-<div class="figure">
-<img src="crf_3.jpg" />
-
-</div>
-<p>Bu ifadenin sol taraftaki <span class="math inline">\(M_1\)</span> içinde <span class="math inline">\(\textrm{BAŞLA}\)</span> satırını sağ taraftaki <span class="math inline">\(M_2\)</span> <span class="math inline">\(w\)</span> kolonu ile çarptığını düşünebiliriz.</p>
-<p><span class="math display">\[M_{12}(\textrm{BAŞLA},w) = \sum_v M_1(\textrm{BAŞLA}, v)M_2(v,w)  \]</span></p>
-<p><span class="math display">\[ = \sum_v \exp [g_1(\textrm{BAŞLA},v) + g_2(v,w)] \]</span></p>
-<p>Bu istediğimiz gibi bir ifadeye dönüşmeye başladı, çünkü hatırlarsak, (5)'e benzeyen bir şeyleri elde etmeye uğraşıyoruz. Gerçi üstteki ifade tüm <span class="math inline">\(y\)</span> değerleri için değil, tek bir <span class="math inline">\(v\)</span> için, ama yine de uygun, üstteki <span class="math inline">\(v\)</span> yerine <span class="math inline">\(y_1\)</span> dersek belki daha uygun olur,</p>
-<p><span class="math display">\[ = \sum_{y_1} \exp [g_1(\textrm{BAŞLA},y_1) + g_2(y_1,w)] \]</span></p>
-<p>Üçlü bir çarpma görelim: <span class="math inline">\(M_{123}\)</span>.</p>
-<p><span class="math display">\[ M_{123} = \sum_{y_2} M_{12}(\textrm{BAŞLA}, y_2)M_3(y_2,w)  \]</span></p>
-<p><span class="math display">\[ = \sum_{y_2} [ \sum_{y_1}\exp [g_1(\textrm{BAŞLA},y_1) + g_2(y_1y_2) ] 
+<p><span class="math inline">\(M_t\)</span> aşağı yukarı <span
+class="math inline">\(g\)</span> ile aynı şey, her değişik <span
+class="math inline">\(g\)</span> fonsiyonu için değişik bir matris var,
+bu matris hücrelerinin <span class="math inline">\(\exp\)</span>’sinin
+alınmış hali <span class="math inline">\(M_t\)</span> matrisi.</p>
+<p><span class="math inline">\(M_1(u,v)\)</span> sadece <span
+class="math inline">\(u=\textrm{BAŞLA}\)</span> için geçerli.</p>
+<p><span class="math inline">\(M_{n+1}(u,v)\)</span> sadece <span
+class="math inline">\(b=\textrm{BİTİŞ}\)</span> için geçerli.</p>
+<p><span class="math inline">\(M_{12} = M_1M_2\)</span> yani matris
+çarpımı.</p>
+<p><span class="math inline">\(M_{12}(\textrm{BAŞLA},w)\)</span>’yu
+düşünelim (ki bu tek bir hücre değeri)</p>
+<p><img src="crf_3.jpg" /></p>
+<p>Bu ifadenin sol taraftaki <span class="math inline">\(M_1\)</span>
+içinde <span class="math inline">\(\textrm{BAŞLA}\)</span> satırını sağ
+taraftaki <span class="math inline">\(M_2\)</span> <span
+class="math inline">\(w\)</span> kolonu ile çarptığını
+düşünebiliriz.</p>
+<p><span class="math display">\[M_{12}(\textrm{BAŞLA},w) = \sum_v
+M_1(\textrm{BAŞLA}, v)M_2(v,w)  \]</span></p>
+<p><span class="math display">\[ = \sum_v \exp [g_1(\textrm{BAŞLA},v) +
+g_2(v,w)] \]</span></p>
+<p>Bu istediğimiz gibi bir ifadeye dönüşmeye başladı, çünkü hatırlarsak,
+(5)’e benzeyen bir şeyleri elde etmeye uğraşıyoruz. Gerçi üstteki ifade
+tüm <span class="math inline">\(y\)</span> değerleri için değil, tek bir
+<span class="math inline">\(v\)</span> için, ama yine de uygun, üstteki
+<span class="math inline">\(v\)</span> yerine <span
+class="math inline">\(y_1\)</span> dersek belki daha uygun olur,</p>
+<p><span class="math display">\[ = \sum_{y_1} \exp
+[g_1(\textrm{BAŞLA},y_1) + g_2(y_1,w)] \]</span></p>
+<p>Üçlü bir çarpma görelim: <span
+class="math inline">\(M_{123}\)</span>.</p>
+<p><span class="math display">\[ M_{123} = \sum_{y_2}
+M_{12}(\textrm{BAŞLA}, y_2)M_3(y_2,w)  \]</span></p>
+<p><span class="math display">\[ = \sum_{y_2} [ \sum_{y_1}\exp
+[g_1(\textrm{BAŞLA},y_1) + g_2(y_1y_2) ]
 \exp g_3(y_2,w) ]
 \]</span></p>
-<p><span class="math display">\[ \sum_{y_1,y_2} \exp [g_1(\textrm{BAŞLA},y_1) + g_2(y_1y_2) + g_3(y_2,v)]  \]</span></p>
-<p>Yani üç matrisi birbiriyle çarparak <span class="math inline">\(y_1,y_2\)</span> üzerinden toplam almış oluyorum. Ve böyle devam edersem, yani tüm matrisleri birbiriyle çarparsam ve <span class="math inline">\(\textrm{BAŞLA}, \textrm{BİTİŞ}\)</span> değerlerine bakarsam,</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[ \sum_{y_1,y_2} \exp
+[g_1(\textrm{BAŞLA},y_1) + g_2(y_1y_2) + g_3(y_2,v)]  \]</span></p>
+<p>Yani üç matrisi birbiriyle çarparak <span
+class="math inline">\(y_1,y_2\)</span> üzerinden toplam almış oluyorum.
+Ve böyle devam edersem, yani tüm matrisleri birbiriyle çarparsam ve
+<span class="math inline">\(\textrm{BAŞLA}, \textrm{BİTİŞ}\)</span>
+değerlerine bakarsam,</p>
+<p><span class="math display">\[
 M_{123...n+1} (\textrm{BAŞLA}, \textrm{BİTİŞ}) =  
 \]</span> <span class="math display">\[
 \sum_{y_1,...,y_n}  \exp [
@@ -337,71 +785,121 @@ M_{123...n+1} (\textrm{BAŞLA}, \textrm{BİTİŞ}) =
 (y_n, \textrm{BİTİŞ} )
 ]
 \]</span></p>
-<p>Bu ifade parçalara ayırma (partition) fonsiyonu için tam ihtiyacım olan şey. Daha önce Viterbi algoritmasından bahsettik, hatta bu algoritma dinamik programlama kategorisine girer dedik, üstteki algoritma dinamik programlama bile sayılmaz, aslında bir matris çarpımı sadece. Daha genel olarak üstteki algoritma ileri-geri (forward-backward) algoritmasının bir türevi, bu algoritmalar bildiğimiz gibi HMM'lerde sıkça kullanılıyorlar.</p>
-<p>Bu iki algoritma CRF'ler için gerekli. Şimdi CRF'leri nasıl eğiteceğimizi görelim.</p>
+<p>Bu ifade parçalara ayırma (partition) fonsiyonu için tam ihtiyacım
+olan şey. Daha önce Viterbi algoritmasından bahsettik, hatta bu
+algoritma dinamik programlama kategorisine girer dedik, üstteki
+algoritma dinamik programlama bile sayılmaz, aslında bir matris çarpımı
+sadece. Daha genel olarak üstteki algoritma ileri-geri
+(forward-backward) algoritmasının bir türevi, bu algoritmalar bildiğimiz
+gibi HMM’lerde sıkça kullanılıyorlar.</p>
+<p>Bu iki algoritma CRF’ler için gerekli. Şimdi CRF’leri nasıl
+eğiteceğimizi görelim.</p>
 <p>Eğitim</p>
 <p>Maksimizasyon için rasgele gradyan çıkışı kullanacağız.</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 p(y|x;w) = \frac{\exp \sum_j w_j F_j(x,y)  }{Z(x;w)}
 \]</span></p>
-<p>Gradyan çıkışı için üstteki formülün türevini alabilmeliyiz. Önce <span class="math inline">\(\log\)</span>'unu almak lazım, çünkü <span class="math inline">\(\partial / \partial w_j \log p\)</span> hesabı gerekli, üsttekinin <span class="math inline">\(\log\)</span>'u ise bölümün <span class="math inline">\(\log\)</span>'u eksi bölenin <span class="math inline">\(\log\)</span>'u.</p>
+<p>Gradyan çıkışı için üstteki formülün türevini alabilmeliyiz. Önce
+<span class="math inline">\(\log\)</span>’unu almak lazım, çünkü <span
+class="math inline">\(\partial / \partial w_j \log p\)</span> hesabı
+gerekli, üsttekinin <span class="math inline">\(\log\)</span>’u ise
+bölümün <span class="math inline">\(\log\)</span>’u eksi bölenin <span
+class="math inline">\(\log\)</span>’u.</p>
 <p><span class="math display">\[
- \frac{\partial}{\partial w_j} \log p
+\frac{\partial}{\partial w_j} \log p
 =
 \frac{\partial}{\partial w_j} [ \sum_j w_j F_j(x,y)] -
 \frac{\partial}{\partial w_j} \log Z(x;w)
 \]</span></p>
-<p>Türevin eksi öncesi ilk bölümü çok basit, <span class="math inline">\(w_j\)</span> ve toplam yokolacak (tüm <span class="math inline">\(j\)</span>'lerin toplamı yokoldu, çünkü türev &quot;tek'' bir <span class="math inline">\(j\)</span> değeri ile ilgileniyor, diğerleri sıfır oluyor)</p>
-<p><span class="math display">\[ 
+<p>Türevin eksi öncesi ilk bölümü çok basit, <span
+class="math inline">\(w_j\)</span> ve toplam yokolacak (tüm <span
+class="math inline">\(j\)</span>’lerin toplamı yokoldu, çünkü türev
+“tek’’ bir <span class="math inline">\(j\)</span> değeri ile
+ilgileniyor, diğerleri sıfır oluyor)</p>
+<p><span class="math display">\[
 = F_j(x,y) -
 \frac{\partial}{\partial w_j} \log Z(x;w)
 \]</span></p>
-<p>Eksiden sonraki kısım çok zarif bir sonuca dönüşecek, birazdan göreceğiz.</p>
-<p><span class="math display">\[ 
-\frac{\partial}{\partial w_j} \log Z(x;w) = 
-\frac{1}{Z} \frac{\partial}{\partial w_j} Z 
+<p>Eksiden sonraki kısım çok zarif bir sonuca dönüşecek, birazdan
+göreceğiz.</p>
+<p><span class="math display">\[
+\frac{\partial}{\partial w_j} \log Z(x;w) =
+\frac{1}{Z} \frac{\partial}{\partial w_j} Z
 \]</span></p>
 <p>Türevi toplam içine taşıyoruz,</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 = \frac{1}{Z} \sum_{y&#39;} \frac{\partial}{\partial w_j} [
-\exp [ \sum_{j&#39;} w_j&#39; F_{j&#39;}(x,y&#39;) ] ] 
+\exp [ \sum_{j&#39;} w_j&#39; F_{j&#39;}(x,y&#39;) ] ]
 \]</span></p>
 <p><span class="math display">\[  
-= \frac{1}{Z}\sum_{y&#39;} 
+= \frac{1}{Z}\sum_{y&#39;}
 \bigg[
 \exp [ \sum_{j&#39;} w_{j&#39;} F_{j&#39;}(x,y&#39;) ] F_j(x,y&#39;)
 \bigg]
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 = \sum_{y&#39;} F_j (x,y&#39;)
 \frac{
 \exp [ \sum_{j&#39;} w_{j&#39;} F_{j&#39;}(x,y&#39;) ]
 }
 {Z}
 \]</span></p>
-<p>Şimdi ilginç kısma geldik, üstteki kesirli kısım <span class="math inline">\(p(y&#39; | x;w)\)</span> değerine eşittir.</p>
-<p><span class="math display">\[ = \sum_{y&#39;} F_j (x,y&#39;) p(y&#39; | x;w)\]</span></p>
-<p>İlginç durum burada ortaya çıkıyor, çünkü üstteki aynı zamanda bir beklenti (expectation) tanımı değil mi? Tüm <span class="math inline">\(F_j\)</span> değerlerini o değerlerin olasılıkları ile çarpıp toplarsak bir beklenti elde etmez miyiz? Evet. O zaman beklenti tanımını kullanabiliriz,</p>
-<p><span class="math display">\[\frac{\partial}{\partial w_j} \log p = F_j(x,y) - E[F_j(x,y&#39;) ] \]</span></p>
-<p>ki <span class="math inline">\(y&#39;\)</span> şöyle bir dağılımı takip ediyor,</p>
+<p>Şimdi ilginç kısma geldik, üstteki kesirli kısım <span
+class="math inline">\(p(y&#39; | x;w)\)</span> değerine eşittir.</p>
+<p><span class="math display">\[ = \sum_{y&#39;} F_j (x,y&#39;) p(y&#39;
+| x;w)\]</span></p>
+<p>İlginç durum burada ortaya çıkıyor, çünkü üstteki aynı zamanda bir
+beklenti (expectation) tanımı değil mi? Tüm <span
+class="math inline">\(F_j\)</span> değerlerini o değerlerin olasılıkları
+ile çarpıp toplarsak bir beklenti elde etmez miyiz? Evet. O zaman
+beklenti tanımını kullanabiliriz,</p>
+<p><span class="math display">\[\frac{\partial}{\partial w_j} \log p =
+F_j(x,y) - E[F_j(x,y&#39;) ] \]</span></p>
+<p>ki <span class="math inline">\(y&#39;\)</span> şöyle bir dağılımı
+takip ediyor,</p>
 <p><span class="math display">\[ y&#39; \sim p(y&#39;|x;w) \]</span></p>
-<p>Soru: <span class="math inline">\(\frac{\partial}{\partial w_j} \log p = ?\)</span> Yani bu türev ne zaman sıfıra eşittir?</p>
-<p>Cevap: Türevin açılımına bakınca mesela, <span class="math inline">\(F_j=0\)</span> olunca mı? Hayır, çünkü OF sıfır olsa bile beklenti kısmı sıfır olmayabilir. O zaman şöyle söylemek gerekir, eğer tüm <span class="math inline">\(y&#39;\)</span> için <span class="math inline">\(F_j(x,y&#39;) - 0\)</span> ise, o zaman türev sıfır olur.</p>
-<p>Çoğunlukla <span class="math inline">\(F_j(x,y) = a(x)I(y=v)\)</span>. Hatırlarsak bu yöntem bir özelliği (ki <span class="math inline">\((a(x)\)</span> ile temsil ediliyor), her mümkün <span class="math inline">\(v\)</span> değeri için bir OF'ye çevirmenin yolu idi (tek <span class="math inline">\(x\)</span>'e bağlı OF olamaz).</p>
-<p>O zaman şunu da söyleyebiliriz, eğer <span class="math inline">\(a(x) = 0\)</span> ise, her <span class="math inline">\(y\)</span> için <span class="math inline">\(F_j(x,y) = 0\)</span> demektir.</p>
-<p>Bu bilginin faydası şudur, veride seyreklik var ise, lojistik regresyon bunları atlamayı bilir. Demek ki aynı şekilde koşulsal lineer modeller de bu özellikleri atlayabilir. Eğer bir özellik <span class="math inline">\(a(x)=0\)</span> ise, o özellik ağırlık güncellemesi (weight update) sırasında atlanır.</p>
+<p>Soru: <span class="math inline">\(\frac{\partial}{\partial w_j} \log
+p = ?\)</span> Yani bu türev ne zaman sıfıra eşittir?</p>
+<p>Cevap: Türevin açılımına bakınca mesela, <span
+class="math inline">\(F_j=0\)</span> olunca mı? Hayır, çünkü OF sıfır
+olsa bile beklenti kısmı sıfır olmayabilir. O zaman şöyle söylemek
+gerekir, eğer tüm <span class="math inline">\(y&#39;\)</span> için <span
+class="math inline">\(F_j(x,y&#39;) - 0\)</span> ise, o zaman türev
+sıfır olur.</p>
+<p>Çoğunlukla <span class="math inline">\(F_j(x,y) =
+a(x)I(y=v)\)</span>. Hatırlarsak bu yöntem bir özelliği (ki <span
+class="math inline">\((a(x)\)</span> ile temsil ediliyor), her mümkün
+<span class="math inline">\(v\)</span> değeri için bir OF’ye çevirmenin
+yolu idi (tek <span class="math inline">\(x\)</span>’e bağlı OF
+olamaz).</p>
+<p>O zaman şunu da söyleyebiliriz, eğer <span class="math inline">\(a(x)
+= 0\)</span> ise, her <span class="math inline">\(y\)</span> için <span
+class="math inline">\(F_j(x,y) = 0\)</span> demektir.</p>
+<p>Bu bilginin faydası şudur, veride seyreklik var ise, lojistik
+regresyon bunları atlamayı bilir. Demek ki aynı şekilde koşulsal lineer
+modeller de bu özellikleri atlayabilir. Eğer bir özellik <span
+class="math inline">\(a(x)=0\)</span> ise, o özellik ağırlık
+güncellemesi (weight update) sırasında atlanır.</p>
 <p>Algoritma <code>train_crf</code></p>
 <ul>
-<li><p>Her eğitim noktası <span class="math inline">\(x,y\)</span> için</p>
+<li><p>Her eğitim noktası <span class="math inline">\(x,y\)</span>
+için</p>
 <ul>
 <li><p><span class="math inline">\(j\)</span> için</p></li>
-<li><span class="math inline">\(E[F_j(x,y&#39;)]\)</span> hesapla (buna sadece <span class="math inline">\(E\)</span> diyelim)</li>
-<li><p>Güncelle: <span class="math inline">\(w_j := w_j + \lambda[F_j(x,y) - E]\)</span></p></li>
+<li><p><span class="math inline">\(E[F_j(x,y&#39;)]\)</span> hesapla
+(buna sadece <span class="math inline">\(E\)</span> diyelim)</p></li>
+<li><p>Güncelle: <span class="math inline">\(w_j := w_j +
+\lambda[F_j(x,y) - E]\)</span></p></li>
 </ul></li>
 </ul>
-<p>Bu hesabın en pahalı kısmı neresi? Beklenti hesabı. Bu beklentileri hesaplanması için daha önce verdiğimiz matris çarpımı yöntemine benzer bir yöntem kullanmak gerekiyor (burada vermeyeceğiz, arama motorunda Rahul Gupta üzerinden arayabilirsiniz, bu kişi bu konuyu anlatıyor).</p>
+<p>Bu hesabın en pahalı kısmı neresi? Beklenti hesabı. Bu beklentileri
+hesaplanması için daha önce verdiğimiz matris çarpımı yöntemine benzer
+bir yöntem kullanmak gerekiyor (burada vermeyeceğiz, arama motorunda
+Rahul Gupta üzerinden arayabilirsiniz, bu kişi bu konuyu anlatıyor).</p>
 <p>Kaynak</p>
-<p>[1] Elkan, <em>Log-linear Models and Conditional Random Fields</em>, <a href="http://videolectures.net/cikm08_elkan_llmacrf" class="uri">http://videolectures.net/cikm08_elkan_llmacrf</a></p>
+<p>[1] Elkan, <em>Log-linear Models and Conditional Random Fields</em>,
+<a
+href="http://videolectures.net/cikm08_elkan_llmacrf">http://videolectures.net/cikm08_elkan_llmacrf</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

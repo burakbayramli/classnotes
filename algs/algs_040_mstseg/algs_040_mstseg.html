@@ -306,7 +306,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.c_ <span class="op">=</span> c</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fit(<span class="va">self</span>, X):</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> X.shape</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> (X.shape)</span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        G <span class="op">=</span> {}</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(X.shape[<span class="dv">0</span>]): G[i] <span class="op">=</span> {}</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> u,v,w <span class="kw">in</span> itertools.izip(X.row, X.col, X.data): G[u][v] <span class="op">=</span> w</span>
@@ -337,18 +337,23 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.sparse <span class="im">as</span> sps, felz</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.io <span class="im">as</span> io</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> io.mmread(<span class="st">&#39;simple.mtx&#39;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> felz.Felzenswalb(min_size<span class="op">=</span><span class="dv">1</span>,c<span class="op">=</span><span class="fl">1.0</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>clf.fit(X)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> clf.labels_    </span></code></pre></div>
-<pre><code>(5, 5)
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.array([[<span class="fl">0.</span>,    <span class="fl">0.5</span>,   <span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>   ],</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">1.</span>,    <span class="fl">0.</span>,    <span class="fl">0.5</span>  ],</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.33</span>,  <span class="fl">0.</span>   ],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>   ],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>,    <span class="fl">0.</span>   ]])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sps.coo_matrix(X)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> felz.Felzenswalb(min_size<span class="op">=</span><span class="dv">1</span>,c<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>clf.fit(X)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (clf.labels_)</span></code></pre></div>
+<pre class="text"><code>(5, 5)
 [1, 1, 3, 3, 1]</code></pre>
 <p>Biraz daha çetrefil bir örnek</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.sparse <span class="im">as</span> sps</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.io <span class="im">as</span> io, random</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, os, sys</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>syn <span class="op">=</span> pd.read_csv(<span class="st">&quot;../kmeans/synthetic.txt&quot;</span>,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>,names<span class="op">=</span>[<span class="st">&#39;a&#39;</span>,<span class="st">&#39;b&#39;</span>],sep<span class="op">=</span><span class="st">&quot;   &quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>syn <span class="op">=</span> pd.read_csv(<span class="st">&quot;../algs_080_kmeans/synthetic2.txt&quot;</span>,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>,names<span class="op">=</span>[<span class="st">&#39;a&#39;</span>,<span class="st">&#39;b&#39;</span>],sep<span class="op">=</span><span class="st">&quot;;&quot;</span>)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.array(syn)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> euclidean_distances</span>
@@ -359,20 +364,20 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>X2[X <span class="op">&gt;</span> <span class="dv">2000</span>] <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>X3 <span class="op">=</span> sps.lil_matrix(X2)</span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>X4 <span class="op">=</span> sps.triu(X3)</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;non-zero items&#39;</span>, <span class="bu">len</span>(X4.nonzero()[<span class="dv">0</span>])</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> X4.shape</span></code></pre></div>
-<pre><code>non-zero items 87010
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;non-zero items&#39;</span>, <span class="bu">len</span>(X4.nonzero()[<span class="dv">0</span>]))</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (X4.shape)</span></code></pre></div>
+<pre class="text"><code>non-zero items 87010
 (3000, 3000)</code></pre>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> felz</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> felz.Felzenswalb(min_size<span class="op">=</span><span class="dv">20</span>,c<span class="op">=</span><span class="dv">800</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>clf.fit(X4)</span></code></pre></div>
-<pre><code>(3000, 3000)</code></pre>
+<pre class="text"><code>(3000, 3000)</code></pre>
 <div class="sourceCode" id="cb8"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>syn[<span class="st">&#39;cluster&#39;</span>] <span class="op">=</span> clf.labels_</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="bu">len</span>(syn[<span class="st">&#39;cluster&#39;</span>].unique()), <span class="st">&#39;clusters found&#39;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> syn[:<span class="dv">5</span>]</span></code></pre></div>
-<pre><code>19 clusters found
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(syn[<span class="st">&#39;cluster&#39;</span>].unique()), <span class="st">&#39;clusters found&#39;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (syn[:<span class="dv">5</span>])</span></code></pre></div>
+<pre class="text"><code>19 clusters found
        a      b  cluster
 0  54620  43523      120
 1  52694  42750      120
@@ -383,7 +388,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> clust <span class="kw">in</span> syn[<span class="st">&#39;cluster&#39;</span>].unique():</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> np.array(syn[syn[<span class="st">&#39;cluster&#39;</span>] <span class="op">==</span> clust][[<span class="st">&#39;a&#39;</span>,<span class="st">&#39;b&#39;</span>]])</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    plt.scatter(tmp[:,<span class="dv">0</span>], tmp[:,<span class="dv">1</span>], c<span class="op">=</span>np.random.rand(<span class="dv">3</span>,<span class="dv">1</span>))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    plt.scatter(tmp[:,<span class="dv">0</span>], tmp[:,<span class="dv">1</span>])</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;mstseg_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="mstseg_01.png" /></p>
 <p>Şimdi [4] yazısında gördüğümüz kelime gruplaması örneğini Felzenswalb
@@ -392,7 +397,7 @@ ile gruplayalım.</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.linalg <span class="im">as</span> lin</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.sparse <span class="im">as</span> sps</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> itertools, sys</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;../svdcluster/&#39;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;../../linear/linear_app50svdcluster&#39;</span>)</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> leven</span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>words <span class="op">=</span> np.array(</span>
@@ -411,11 +416,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a h
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>     <span class="st">&#39;give&#39;</span>, <span class="st">&#39;day&#39;</span>, <span class="st">&#39;most&#39;</span>, <span class="st">&#39;us&#39;</span>])</span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>(dim,) <span class="op">=</span> words.shape</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="kw">lambda</span> (x,y): leven.levenshtein(x,y)</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>res<span class="op">=</span>np.fromiter(itertools.imap(f, itertools.product(words, words)),dtype<span class="op">=</span>np.uint8)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="kw">lambda</span> xy: leven.levenshtein(xy[<span class="dv">0</span>], xy[<span class="dv">1</span>])</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>res<span class="op">=</span>np.fromiter(<span class="bu">map</span>(f, itertools.product(words, words)),dtype<span class="op">=</span>np.uint8)</span>
 <span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> sps.coo_matrix(np.reshape(res,(dim,dim)))</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> A.shape</span></code></pre></div>
-<pre><code>(100, 100)</code></pre>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (A.shape)</span></code></pre></div>
+<pre class="text"><code>(100, 100)</code></pre>
 <p>Kümelemeyi yapalım, <code>min_size=2</code> seçtik çünkü ufak kümeler
 de mümkün.</p>
 <div class="sourceCode" id="cb13"><pre
@@ -424,14 +429,14 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a h
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>clf.fit(A)</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> np.array(clf.labels_)</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> <span class="bu">len</span>(np.unique(labels))</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> c, <span class="st">&#39;clusters found&#39;</span></span></code></pre></div>
-<pre><code>(100, 100)
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (c, <span class="st">&#39;clusters found&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>(100, 100)
 16 clusters found</code></pre>
 <div class="sourceCode" id="cb15"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> c <span class="kw">in</span> np.unique(labels):</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="st">&#39;cluster&#39;</span>, c</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> words[labels<span class="op">==</span>c]</span></code></pre></div>
-<pre><code>cluster 9
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">&#39;cluster&#39;</span>, c)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (words[labels<span class="op">==</span>c])</span></code></pre></div>
+<pre class="text"><code>cluster 9
 [&#39;a&#39; &#39;I&#39; &#39;as&#39; &#39;at&#39; &#39;up&#39; &#39;also&#39; &#39;use&#39; &#39;because&#39; &#39;us&#39;]
 cluster 10
 [&#39;in&#39; &#39;it&#39; &#39;with&#39; &#39;which&#39; &#39;its&#39; &#39;first&#39;]
