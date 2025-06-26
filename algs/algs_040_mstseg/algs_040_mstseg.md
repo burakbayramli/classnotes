@@ -194,7 +194,7 @@ class Felzenswalb:
         self.c_ = c
 
     def fit(self, X):
-        print X.shape
+        print (X.shape)
         G = {}
         for i in range(X.shape[0]): G[i] = {}
         for u,v,w in itertools.izip(X.row, X.col, X.data): G[u][v] = w
@@ -231,7 +231,7 @@ import scipy.io as io
 X = io.mmread('simple.mtx')
 clf = felz.Felzenswalb(min_size=1,c=1.0)
 clf.fit(X)
-print clf.labels_    
+print (clf.labels_)
 ```
 
 ```
@@ -245,7 +245,7 @@ Biraz daha çetrefil bir örnek
 import scipy.sparse as sps
 import scipy.io as io, random
 import pandas as pd, os, sys
-syn = pd.read_csv("../kmeans/synthetic.txt",comment='#',names=['a','b'],sep="   ")
+syn = pd.read_csv("../algs_080_kmeans/synthetic.txt",comment='#',names=['a','b'],sep="   ")
 data = np.array(syn)
 
 from sklearn.metrics.pairwise import euclidean_distances
@@ -256,8 +256,8 @@ X2 = X.copy()
 X2[X > 2000] = 0.0
 X3 = sps.lil_matrix(X2)
 X4 = sps.triu(X3)
-print 'non-zero items', len(X4.nonzero()[0])
-print X4.shape
+print ('non-zero items', len(X4.nonzero()[0]))
+print (X4.shape)
 ```
 
 ```
@@ -271,14 +271,14 @@ clf = felz.Felzenswalb(min_size=20,c=800)
 clf.fit(X4)
 ```
 
-```
+```text
 (3000, 3000)
 ```
 
 ```python
 syn['cluster'] = clf.labels_
-print len(syn['cluster'].unique()), 'clusters found'
-print syn[:5]
+print (len(syn['cluster'].unique()), 'clusters found')
+print (syn[:5])
 ```
 
 ```

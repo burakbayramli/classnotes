@@ -424,10 +424,10 @@ def level_order(tree, include_all=False):
 ```python
 import bpq, kdtree
 tree = kdtree.create([[2,3,4], [4,5,6], [5,3,2]])
-print tree.search_nn( (1, 2, 3) )
+print (tree.search_nn( (1, 2, 3) ))
 ```
 
-```
+```text
 (<KDNode - [2, 3, 4]>, 3.0)
 ```
 
@@ -436,17 +436,17 @@ x = np.random.random((1000,2)) * 100.
 kx = [list(xxx) for xxx in x]
 tree = kdtree.create(kx)
 kres = tree.search_knn( [39, 39], k=7 )
-for kx in kres: print kx
+for kx in kres: print (kx)
 ```
 
-```
-(<KDNode - [37.944809008167091, 36.859556115064997]>, 5.694928053800966)
-(<KDNode - [36.282279773622861, 39.25727857203173]>, 7.452195492486094)
-(<KDNode - [36.011835939092215, 39.387237685986818]>, 9.07907748034933)
-(<KDNode - [38.766178732185438, 34.670053651771802]>, 18.803107763817117)
-(<KDNode - [39.443975626797602, 34.581772823651235]>, 19.7178457390171)
-(<KDNode - [42.733856969186199, 36.292326352854367]>, 21.27318444578728)
-(<KDNode - [43.489959416330848, 37.855783990677935]>, 21.468965836286962)
+```text
+(<KDNode - [np.float64(39.364728144553865), np.float64(39.05146120930619)]>, 0.13567487549296073)
+(<KDNode - [np.float64(40.26032144132441), np.float64(37.867345065620206)]>, 2.8713173358369266)
+(<KDNode - [np.float64(41.027532514928566), np.float64(39.98338309762837)]>, 5.077930415793724)
+(<KDNode - [np.float64(41.19458364933335), np.float64(37.654723299101256)]>, 6.625966795902305)
+(<KDNode - [np.float64(36.46902062671158), np.float64(41.335617219637236)]>, 11.8609643846774)
+(<KDNode - [np.float64(40.23345261800878), np.float64(35.58095468251084)]>, 13.211276243917254)
+(<KDNode - [np.float64(38.09174668525085), np.float64(42.90978409879636)]>, 16.111335782953674)
 ```
 
 Küre Agaçları (Ball Tree, BT) 
@@ -564,10 +564,7 @@ Algoritma `ball_knn`$\left(PS^{in},node\right)$
      * $x$'i $PS_{out}$'a ekle
      * `if` $|PS^{out}| == k+1$ o zaman en uzak olan komşuyu
        $PS^{out}$'tan çıkart ve $D_{sofar}$'i güncelle
-   
-
-  
-
+    
 * Eğer uç nokta değil ise iki çocuk düğümden daha yakın olanını
   incele, sonra daha uzakta olanına bak. büyük bir ihtimalle arama devam
   ettirilirse bu arama kendiliğinden kesilecektir.
@@ -578,10 +575,7 @@ Algoritma `ball_knn`$\left(PS^{in},node\right)$
       * $node_2 = node$'un $q$'dan en uzak çocuğu;
       * $PS^{temp}$ = `ball_knn`($PS^{in},node_1)$;
       * $PS^{out}$ = `ball_knn`($PS^{temp},node_2);$
-
         
-
-
 Küre Ağaçları (BT) metotu önce küreleri, ağaçları oluşturmalıdır. Bu
 küreler hiyerarşik şekilde planlanır, tüm noktaların içinde olduğu bir "en
 üst küre" vardır her kürenin iki tane çocuk küresi olabilir. Belli bir
@@ -613,14 +607,14 @@ import balltree, pprint
 
 points = np.array([[3.,3.],[2.,2.]])
 q = [1.,1.]
-print 'diff', points-q
-print 'dist', balltree.dist(points,q)
+print ('diff', points-q)
+print ('dist', balltree.dist(points,q))
 ```
 
-```
-diff [[ 2.  2.]
- [ 1.  1.]]
-dist [ 2.82842712  1.41421356]
+```text
+diff [[2. 2.]
+ [1. 1.]]
+dist [2.82842712 1.41421356]
 ```
 
 ```python
@@ -692,7 +686,7 @@ def search_tree(new_point, knn_matches, node, k):
         # nothing to do
         return knn_matches
     elif node_points != None: # if node is a leaf
-        print knn_matches_out
+        print (knn_matches_out)
         knn_matches_out = knn_matches[:] # copy it
         for p in node_points: # linear scan
             if norm(new_point,p) < radius:
@@ -727,54 +721,12 @@ points = np.array([[3.,4.],[5.,5.],[9.,2.],[3.2,5.],[7.,5.],
 tree = balltree.new_node()
 balltree.form_tree(points,tree,all_points=points)
 pp = pprint.PrettyPrinter(indent=4)
-print "tree"
+print ("tree")
 pp.pprint(tree)
 newp = np.array([7.,7.])
-dummyp = [np.Inf,np.Inf] # it should be removed immediately
-res = balltree.search_tree(newp,[np.Inf, [dummyp]], tree, k=2)
-print "done", res
-```
-
-```
-tree
-[   array([ 3.,  4.]),
-    7.0710678118654755,
-    None,
-    [   [   array([ 8.,  9.]),
-            3.1622776601683795,
-            array([[ 8.,  9.],
-       [ 7.,  6.]]),
-            [None, None]],
-        [   array([ 3.,  4.]),
-            6.324555320336759,
-            None,
-            [   [   array([ 9.,  2.]),
-                    3.6055512754639891,
-                    None,
-                    [   [   array([ 7.,  5.]),
-                            1.4142135623730951,
-                            array([[ 7.,  5.],
-       [ 8.,  4.]]),
-                            [None, None]],
-                        [   array([ 9.,  2.]),
-                            3.0,
-                            array([[ 9.,  2.],
-       [ 6.,  2.]]),
-                            [None, None]]]],
-                [   array([ 3.,  4.]),
-                    2.2360679774997898,
-                    None,
-                    [   [   array([ 5.,  5.]),
-                            0.0,
-                            array([[ 5.,  5.]]),
-                            [None, None]],
-                        [   array([ 3.,  4.]),
-                            1.019803902718557,
-                            array([[ 3. ,  4. ],
-       [ 3.2,  5. ]]),
-                            [None, None]]]]]]]]
-None
-done [1.0, [[[8.0, 9.0]], [[7.0, 6.0]]]]
+dummyp = [np.inf,np.inf] # it should be removed immediately
+res = balltree.search_tree(newp,[np.inf, [dummyp]], tree, k=2)
+print ("done", res)
 ```
 
 Bu iki grup, o anda işlemekte olduğumuz ağaç düğümün (node) iki

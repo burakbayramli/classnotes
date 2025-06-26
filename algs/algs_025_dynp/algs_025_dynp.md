@@ -72,10 +72,10 @@ Böylece $w(u,v)$ basit bir Python sözlük (dictionary) erişimi haline
 geliyor, `a,b` arası parça mesafe için 
 
 ```python
-print DAG['a']['b']
+print (DAG['a']['b'])
 ```
 
-```
+```text
 2
 ```
 
@@ -89,9 +89,9 @@ def memo(func):
     @wraps(func)                                
     def wrap(*args):                            
         if args not in cache:
-            print 'onbellekte yok -', args[0]
+            print ('onbellekte yok -', args[0])
             cache[args] = func(*args)
-        else: print 'onbellekte var -', args[0]
+        else: print ('onbellekte var -', args[0])
         return cache[args]                      
     return wrap 
 ```
@@ -102,15 +102,15 @@ from memo import *
 def rec_dag_sp(W, s, t): 
     @memo                                    
     def d(u):
-        print 'Dugum:' + u[0]
-        if u == t:  print 'Son nokta t, geri donus'; return 0  
+        print ('Dugum:' + u[0])
+        if u == t:  print ('Son nokta t, geri donus'); return 0
         min_dist = min(W[u][v]+d(v) for v in W[u])  
-        print 'Geri donus,',u,'uzerindeyiz, mesafe=',min_dist
+        print ('Geri donus,',u,'uzerindeyiz, mesafe=',min_dist)
         return min_dist
     return d(s)                                 
 
 dist = rec_dag_sp(DAG, 'a', 'f')
-print 'toplam mesafe=', dist
+print ('toplam mesafe=', dist)
 ```
 
 ```

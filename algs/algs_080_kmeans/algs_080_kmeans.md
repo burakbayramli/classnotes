@@ -54,12 +54,12 @@ konu başka bir yazıda işlenecek.
 
 ```python
 import pandas as pd
-data = pd.read_csv("synthetic.txt",names=['a','b'],sep="   ")
-print data.shape
+data = data = pd.read_csv("synthetic2.txt",names=['a','b'],sep=';')
+print (data.shape)
 data = np.array(data)
 ```
 
-```
+```text
 (3000, 2)
 ```
 
@@ -69,7 +69,10 @@ plt.savefig('kmeans_1.png')
 ```
 
 ![](kmeans_1.png)
+
 ```python
+import random
+
 def euc_to_clusters(x,y):
     return np.sqrt(np.sum((x-y)**2, axis=1))
 
@@ -101,24 +104,23 @@ class KMeans():
 ```
 
 ```python
-cf = KMeans(k=5,iter=20)
+cf = KMeans(n_clusters=5,n_iter=20)
 cf.fit(data)
-print cf.labels_
+print (cf.labels_)
 ```
 
-```
-[3 3 3 ..., 2 2 2]
+```text
+[2 2 2 ... 1 1 1]
 ```
 
 Üstteki sonucun içinde iki ana vektör var, bu vektörlerden birincisi içinde
-2,0, gibi sayılar görülüyor, bu sayılar her noktaya tekabül eden küme
+2,1, gibi sayılar görülüyor, bu sayılar her noktaya tekabül eden küme
 atamaları.  İkinci vektör içinde iki boyutlu $k$ tane vektör var, bu
 vektörler de her kümenin merkez noktası. Merkez noktalarını ham veri
 üzerinde grafiklersek (kırmızı noktalar)
 
 ```python
 plt.scatter(data[:,0],data[:,1])
-plt.hold(True)
 plt.ylim([30000,70000])
 for x in cf.centers_: plt.plot(x[0],x[1],'rd')
 plt.savefig('kmeans_2.png')
@@ -130,11 +132,10 @@ Görüldüğü gibi 5 tane küme için üstteki merkezler bulundu. Fena
 değil. Eğer 10 dersek
 
 ```python
-cf = KMeans(k=10,iter=30)
+cf = KMeans(n_clusters=10,n_iter=30)
 cf.fit(data)
 plt.scatter(data[:,0],data[:,1])
 plt.ylim([30000,70000])
-plt.hold(True)
 for x in cf.centers_: plt.plot(x[0],x[1],'rd')
 plt.savefig('kmeans_3.png')
 ```
@@ -158,10 +159,10 @@ kolona tekabül edecek şekilde sağa doğru açarız, ve o değerin yeni kolonu
 ```python
 import pandas as pd
 df = pd.read_csv("crx.csv")
-print df[:2]
+print (df[:2])
 ```
 
-```
+```text
   A1     A2    A3 A4 A5 A6 A7    A8 A9 A10  A11 A12 A13    A14  A15 A16
 0  b  30.83  0.00  u  g  w  v  1.25  t   t    1   f   g  00202    0   +
 1  a  58.67  4.46  u  g  q  h  3.04  t   t    6   f   g  00043  560   +
@@ -175,71 +176,71 @@ from sklearn.feature_extraction import DictVectorizer
 def one_hot_dataframe(data, cols):
     vec = DictVectorizer()
     mkdict = lambda row: dict((col, row[col]) for col in cols)
-    vecData = pd.DataFrame(vec.fit_transform(data[cols].to_dict(outtype='records')).toarray())
-    vecData.columns = vec.get_feature_names()
+    vecData = pd.DataFrame(vec.fit_transform(data[cols].to_dict(orient='records')).toarray())
+    vecData.columns = vec.get_feature_names_out()
     vecData.index = data.index
     data = data.drop(cols, axis=1)
     data = data.join(vecData)
     return data
 
 df2 = one_hot_dataframe(df,['A1','A4','A5','A6','A7','A9','A10','A12','A13'])
-print df2.ix[0]
+print (df2.iloc[0])
 ```
 
-```
+```text
 A2       30.83
-A3           0
+A3         0.0
 A8        1.25
 A11          1
 A14      00202
 A15          0
 A16          +
-A10=f        0
-A10=t        1
-A12=f        1
-A12=t        0
-A13=g        1
-A13=p        0
-A13=s        0
-A1=?         0
-A1=a         0
-A1=b         1
-A4=?         0
-A4=l         0
-A4=u         1
-A4=y         0
-A5=?         0
-A5=g         1
-A5=gg        0
-A5=p         0
-A6=?         0
-A6=aa        0
-A6=c         0
-A6=cc        0
-A6=d         0
-A6=e         0
-A6=ff        0
-A6=i         0
-A6=j         0
-A6=k         0
-A6=m         0
-A6=q         0
-A6=r         0
-A6=w         1
-A6=x         0
-A7=?         0
-A7=bb        0
-A7=dd        0
-A7=ff        0
-A7=h         0
-A7=j         0
-A7=n         0
-A7=o         0
-A7=v         1
-A7=z         0
-A9=f         0
-A9=t         1
-Name: 0, Length: 52, dtype: object
+A10=f      0.0
+A10=t      1.0
+A12=f      1.0
+A12=t      0.0
+A13=g      1.0
+A13=p      0.0
+A13=s      0.0
+A1=?       0.0
+A1=a       0.0
+A1=b       1.0
+A4=?       0.0
+A4=l       0.0
+A4=u       1.0
+A4=y       0.0
+A5=?       0.0
+A5=g       1.0
+A5=gg      0.0
+A5=p       0.0
+A6=?       0.0
+A6=aa      0.0
+A6=c       0.0
+A6=cc      0.0
+A6=d       0.0
+A6=e       0.0
+A6=ff      0.0
+A6=i       0.0
+A6=j       0.0
+A6=k       0.0
+A6=m       0.0
+A6=q       0.0
+A6=r       0.0
+A6=w       1.0
+A6=x       0.0
+A7=?       0.0
+A7=bb      0.0
+A7=dd      0.0
+A7=ff      0.0
+A7=h       0.0
+A7=j       0.0
+A7=n       0.0
+A7=o       0.0
+A7=v       1.0
+A7=z       0.0
+A9=f       0.0
+A9=t       1.0
+Name: 0, dtype: object
 ```
 
 İşlem sonucunda A12=f mesela için 1 verilmiş, ama A12=t (ve diğer her
@@ -309,12 +310,12 @@ df3 = normalize(df3, norm='l2', axis=0)
 df3 = normalize(df3, norm='l2', axis=1)
 
 u,s,v=slin.svds(df3,k=10)
-print s
+print (s)
 ```
 
-```
-[  4.45826083   4.49654025   4.68382638   4.93391665   4.98604314
-   5.153349     5.63521289   5.70490968   6.68558115  14.81145675]
+```text
+[ 4.45826083  4.49654025  4.68382638  4.93391665  4.98604314  5.153349
+  5.63521289  5.70490968  6.68558115 14.81145675]
 ```
 
 Bakıyoruz, averajdan yüksek olan en büyük sadece iki kolon var. SVD
@@ -325,11 +326,11 @@ tekrar işletiyoruz,
 
 ```python
 u,s,v=slin.svds(df3,k=2)
-print s
+print (s)
 ```
 
-```
-[  6.68558115  14.81145675]
+```text
+[ 6.68558115 14.81145675]
 ```
 
 Şimdi $U$ üzerinde kümeleme yapacağız, ve kontrol için kenara koyduğumuz
@@ -345,11 +346,11 @@ clf.fit(u)
 labels_true = np.array(df['A16'])
 labels_pred = clf.labels_
 match = np.sum((labels_true == labels_pred).astype(int))
-print float(match)/len(df), 1-float(match)/len(df)
+print (float(match)/len(df), 1-float(match)/len(df))
 ```
 
-```
-0.217457886677 0.782542113323
+```text
+0.7856049004594181 0.2143950995405819
 ```
 
 Başarı yüzde \%78. Çok iyi. Üstteki örnek küme sayısının (dikkat SVD
@@ -377,15 +378,15 @@ for i in range(5):
      labels_true = np.array(df['A16'])
      labels_pred = clf.labels_
      match = np.sum((labels_true == labels_pred).astype(int))
-     print float(match)/len(df), 1-float(match)/len(df)
+     print (float(match)/len(df), 1-float(match)/len(df))
 ```
 
-```
-0.436447166922 0.563552833078
-0.258805513017 0.741194486983
-0.367534456355 0.632465543645
-0.390505359877 0.609494640123
-0.456355283308 0.543644716692
+```text
+0.7580398162327718 0.24196018376722817
+0.5712098009188361 0.4287901990811639
+0.3001531393568147 0.6998468606431854
+0.44716692189892804 0.552833078101072
+0.6125574272588055 0.38744257274119454
 ```
 
 Görüldüğü gibi bazen çok iyi sonuçlar alıyor olsak bile bazen çok kötü

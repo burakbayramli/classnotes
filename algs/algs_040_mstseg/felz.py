@@ -28,10 +28,10 @@ class Felzenswalb:
         self.c_ = c
 
     def fit(self, X):
-        print X.shape
+        print (X.shape)
         G = {}
         for i in range(X.shape[0]): G[i] = {}
-        for u,v,w in itertools.izip(X.row, X.col, X.data): G[u][v] = w
+        for u,v,w in zip(X.row, X.col, X.data): G[u][v] = w
         E = [(G[u][v],u,v) for u in G for v in G[u]]
         E = sorted(E)        
         T = set()

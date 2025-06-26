@@ -5,8 +5,8 @@ import itertools, numpy as np
 __rmin__ = 2
 
 def dist(vect,x):
-    return np.fromiter(itertools.imap
-                       (np.linalg.norm, vect-x),dtype=np.float)
+    return np.fromiter(map
+                       (np.linalg.norm, vect-x),dtype=float)
 
 def norm(x,y): return np.linalg.norm(x-y)
 
@@ -66,7 +66,7 @@ def search_tree(new_point, knn_matches, node, k):
         # nothing to do
         return knn_matches
     elif node_points != None: # if node is a leaf
-        print knn_matches_out
+        print (knn_matches_out)
         knn_matches_out = knn_matches[:] # copy it
         for p in node_points: # linear scan
             if norm(new_point,p) < radius:
