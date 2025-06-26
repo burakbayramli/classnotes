@@ -2,7 +2,7 @@
 
 Daha önce rotasyon matrisi bazlı hareket denklemlerini vermiştik. Bu yazıda
 cisim duruşu ve dönüş mekaniğini kuaterniyon kavramı üzerinden hesaplayacağız,
-daha önce görülen bazı kavramların da tekrar üzerinden geçeceğiz.
+daha önce görülen bazı kavramların da tekrar üzerinden geçeceğiz. 
 
 Lineer Hız, Momentum
 

@@ -23,7 +23,7 @@ Makina açılınca `sudo apt install` ile kurulacak programlar,
 gnome-tweaks python3-virtualenv git emacs texlive-latex-base net-tools
 mpv emacs chromium-browser texlive-base djvulibre-bin imagemagick recoll
 texlive-fonts-recommended texlive-fonts-extra python3-pandoc gimp xkbset
-nodejs ccrypt htop
+nodejs ccrypt htop vlc
 ```
 
 Biz CAPS tuşunu hep CTRL yaparız, bu versiyonda bunu Gnome Tweaks ile
@@ -47,6 +47,11 @@ sırasında kullanıcı/şifre girmeden önce alt sağdaki ufak dişli çark
 ikonuna tıklayarak ve "Ubuntu on xorg" seçerek değiştirebiliriz, bu
 seçim sonraki girişlerde de hatırlanacaktır, ve onun sayesinde üstteki
 ayarlar işler hale gelir.
+
+Yine aynı Tweaks programı üzerinden arka planı düz tek renkli resim
+yapabiliriz, Appearance kısmından Background alanına bakalım, orada
+Default Image seçeneği var, orada siyah renkli bir JPG dosyası
+verebiliriz, Web'de bu tür pek çok görüntü dosyası var.
 
 Her programı işlediği sırada soldaki çabuk erişim alanına
 "yapıştırmak" mümkündür, mesela Firefox işlerken ikonu solda gözükür,
@@ -79,7 +84,7 @@ Burada `pip install` ile
 
 ```
 matplotlib pytest-shutil jupyter-notebook markdown numpy-stl
-ipython zmq importlib numpy Shutil pandas
+ipython zmq importlib numpy Shutil pandas feedparser
 ```
 
 ![](acer1.jpg)

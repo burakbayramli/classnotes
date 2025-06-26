@@ -113,9 +113,9 @@ deriz sonuç olarak
 
 ```
 ...
-    ↳ HD WebCam: HD WebCam                    	id=10	[slave  keyboard (3)]
-    ↳ AT Translated Set 2 keyboard            	id=13	[slave  keyboard (3)]
-    ↳ Acer WMI hotkeys                        	id=14	[slave  keyboard (3)]
+     HD WebCam: HD WebCam                    	id=10	[slave  keyboard (3)]
+     AT Translated Set 2 keyboard            	id=13	[slave  keyboard (3)]
+     Acer WMI hotkeys                        	id=14	[slave  keyboard (3)]
 ...
 ```
 

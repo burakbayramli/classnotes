@@ -20,7 +20,7 @@ if __name__ == "__main__":
             i = int(res.replace("/",""))
             f = "/opt/Downloads/skpdf/%04d-%s" % (i,f)
             os.chdir(dir)
-            cmd = "pandoc %s --latex-engine=xelatex -fmarkdown-implicit_figures -o %s" % (os.path.basename(file),f)
+            cmd = "pandoc %s -t latex -fmarkdown-implicit_figures -o %s" % (os.path.basename(file),f)
             if not os.path.isfile(f): 
                 print (cmd)                
                 os.system(cmd)
